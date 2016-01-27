@@ -1,0 +1,34 @@
+/* Linker Command File */
+ 
+-FORMAT=INTEL32
+-map -maxhexlen=64 -quiet -warnoverlap -xref -unresolved=fatal
+-sort ADDRESS=ascending -warn -NOdebug -NOigcase
+define __copy_code_to_ram = 0
+
+range rom $000000 : $7FFFFF 
+range ram $D00000 : $D65800
+range bss $D031F6 : $D13FD6
+ 
+change code is ram 
+change data is ram 
+change text is ram
+change strsect is text
+
+locate .header at $D1A87F
+locate .icon at (top of .header)+1
+locate .launcher at (top of .icon)+1
+locate .libs at (top of .launcher)+1
+locate .startup at (top of .libs)+1
+locate code at (top of .startup)+1
+locate data at (top of code)+1
+locate text at (top of data)+1
+
+define __low_bss = base of bss
+define __len_bss = length of bss
+
+define __heaptop = (highaddr of bss)
+define __heapbot = (top of bss)+1
+
+define __stack = $D1A87E
+
+/* End Linker Command File */
