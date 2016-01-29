@@ -26,7 +26,7 @@ ASM_FLAGS = \
 
 CFLAGS =  \
         -quiet -define:NDEBUG -define:_EZ80190 -define:_EZ80 -define:_SIMULATE -NOlistinc -NOmodsect -cpu:eZ80190 -keepasm \
-        -optspeed -NOreduceopt -stdinc:$(HEADERS) -usrinc:".\include" -NOdebug \
+        -optspeed -NOreduceopt -stdinc:$(HEADERS) -usrinc:"." -NOdebug \
         -asmsw:"$(ASM_FLAGS)" -asm $(ASMSOURCES)
  
 LDFLAGS = @.\Linkcmd
