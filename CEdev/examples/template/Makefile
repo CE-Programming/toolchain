@@ -16,7 +16,7 @@ OBJECTS = $(SOURCES:.c=.obj)
 OBJECTSLD = $(SOURCES:.c=.obj,)
 OBJECTSLD += $(ASMSOURCES:.asm=.obj,)
 
-HEADERS = ".;$(CEDEV)\include\ce;$(CEDEV)\include;$(CEDEV)\include\std;$(CEDEV)\lib\ce\include;$(CEDEV)\lib\ce\include\asm"
+HEADERS = ".;.\include;.\include\asm;$(CEDEV)\include\ce;$(CEDEV)\include\ce\asm;$(CEDEV)\include\;$(CEDEV)\include\std;$(CEDEV)\lib\ce;$(CEDEV)\lib\ce\asm;"
 LIBRARIES = "$(CEDEV)\lib\std\chelp.lib,$(CEDEV)\lib\std\crt.lib,$(CEDEV)\lib\std\crtS.lib,$(CEDEV)\lib\std\nokernel.lib,$(CEDEV)\lib\std\fplib.lib,$(CEDEV)\lib\std\fplibS.lib"
 STARTUPMODULE = "$(CEDEV)\include\startup\cstartup.obj,"
 
@@ -34,7 +34,7 @@ LDFLAGS += $(TARGET)= $(OBJECTSLD) $(STARTUPMODULE) $(LIBRARIES)
 LDFLAGS += GROUP MEMORY = ROM, RAM
 
 %.obj : %.c
-	$(CC) $(CFLAGS) $< 
+	$(CC) $(CFLAGS) $<
  
 $(TARGET) : $(OBJECTS)
 	$(LD) $(LDFLAGS)
