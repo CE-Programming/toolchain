@@ -8,8 +8,13 @@
 ; Standard CE startup module
 ;=============================================================================
  xref __low_bss
- xdef __saveIY
  xref _main
+ 
+ xdef _start
+ xdef _exit
+ xdef _errno
+ xdef __saveIY
+ xdef __saveSP
  
  .assume ADL = 1
  
@@ -22,8 +27,8 @@
  segment .header
  db %EF
  db %7B
- db %00			; Magic byte recognition for C programs - who starts their program with a nop?
-_crt0:
+ db %00			; Magic byte recognition for C programs
+_start:
  segment .startup
  di			; disable interrupts
  call _RunIndicOff	; turn off run indicator
@@ -33,7 +38,7 @@ _crt0:
 
  ld (__saveSP),sp
  call _main		;Save SP and call main
-__exit:
+_exit:
  ld sp,(__saveSP)
  ld iy,%D00080		; Restore IY for OS
  ret
