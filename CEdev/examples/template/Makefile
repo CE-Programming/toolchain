@@ -1,4 +1,4 @@
-CEDEV ?= ..
+CEDEV ?= ..\..
 BIN = $(CEDEV)\bin
 INCLUDE = $(CEDEV)\include
 WORKDIR ?= src
