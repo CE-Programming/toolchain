@@ -1,8 +1,6 @@
 CEDEV ?= ..
 BIN = $(CEDEV)\bin
 INCLUDE = $(CEDEV)\include
-WORKDIR ?= src
-OUTDIR ?= src
 
 TARGET ?= template
 
