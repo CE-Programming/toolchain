@@ -1,8 +1,7 @@
-CEDEV ?= ..\..
+REALWINPATH = $(subst /,\,$(realpath $(1)))
+CEDEV := $(call REALWINPATH,$(CEDEV))
 BIN = $(CEDEV)\bin
 INCLUDE = $(CEDEV)\include
-WORKDIR ?= src
-OUTDIR ?= src
 
 TARGET ?= template
 
@@ -43,7 +42,8 @@ $(TARGET).hex : $(OBJECTS) $(STARTUPMODULE) $(LIBRARIES)
 	$(CV) $(@:%.8xp=%)
 
 %.obj : %.c
-	$(CC) $(CFLAGS) $<
+	cd $(dir $@) && \
+	$(CC) $(CFLAGS) $(notdir $<)
 
 %.obj : %.asm
 	$(CC) $(CFLAGS) $<
