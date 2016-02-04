@@ -1,3 +1,4 @@
+CEDEV ?= ..\..
 REALWINPATH = $(subst /,\,$(realpath $(1)))
 CEDEV := $(call REALWINPATH,$(CEDEV))
 BIN = $(CEDEV)\bin
