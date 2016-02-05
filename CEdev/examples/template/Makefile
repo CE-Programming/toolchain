@@ -1,6 +1,5 @@
-CEDEV ?= ..\..
 REALWINPATH = $(subst /,\,$(realpath $(1)))
-CEDEV := $(call REALWINPATH,$(CEDEV))
+CEDEV ?= $(call REALWINPATH,..\..)
 BIN = $(CEDEV)\bin
 INCLUDE = $(CEDEV)\include
 
@@ -21,7 +20,7 @@ STARTUPMODULE = $(CEDEV)\include\startup\cstartup.obj
 
 ASM_FLAGS = \
 	-name -define:_EZ80=1 -define:_SIMULATE=1 -include:$(HEADERS) -NOlist -NOlistmac \
-	-pagelen:250 -pagewidth:100 -quiet -sdiopt -warn -NOdebug -NOigcase -cpu:eZ80190
+	-pagelen:250 -pagewidth:132 -quiet -sdiopt -warn -NOdebug -NOigcase -cpu:eZ80190
 
 CFLAGS =  \
 	-quiet -define:NDEBUG -define:_EZ80190 -define:_EZ80 -define:_SIMULATE -NOlistinc -NOmodsect -cpu:eZ80190 -keepasm \
@@ -43,7 +42,7 @@ $(TARGET).hex : $(OBJECTS) $(STARTUPMODULE) $(LIBRARIES)
 	$(CV) $(@:%.8xp=%)
 
 %.obj : %.c
-	cd $(dir $@) && \
+	@ cd $(dir $@) && \
 	$(CC) $(CFLAGS) $(notdir $<)
 
 %.obj : %.asm
