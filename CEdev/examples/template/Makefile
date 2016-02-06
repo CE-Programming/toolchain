@@ -15,7 +15,7 @@ ASMSOURCES = $(wildcard *.asm)
 OBJECTS = $(SOURCES:%.c=%.obj) $(ASMSOURCES:%.asm=%.obj)
 
 HEADERS = .;$(CEDEV)\include\ce;$(CEDEV)\include\ce\asm;$(CEDEV)\include;$(CEDEV)\include\std;$(CEDEV)\lib\ce;$(CEDEV)\lib\ce\asm
-LIBRARIES = $(CEDEV)\lib\std\chelp.lib $(CEDEV)\lib\std\crt.lib $(CEDEV)\lib\std\crtS.lib $(CEDEV)\lib\std\nokernel.lib $(CEDEV)\lib\std\fplib.lib $(CEDEV)\lib\std\fplibS.lib
+LIBRARIES = $(CEDEV)\lib\std\cdebug.lib $(CEDEV)\lib\std\chelp.lib $(CEDEV)\lib\std\crt.lib $(CEDEV)\lib\std\crtS.lib $(CEDEV)\lib\std\nokernel.lib $(CEDEV)\lib\std\fplib.lib $(CEDEV)\lib\std\fplibS.lib
 STARTUPMODULE = $(CEDEV)\include\startup\cstartup.obj
 
 ASM_FLAGS = \
@@ -24,7 +24,7 @@ ASM_FLAGS = \
 
 CFLAGS =  \
 	-quiet -define:NDEBUG -define:_EZ80190 -define:_EZ80 -define:_SIMULATE -NOlistinc -NOmodsect -cpu:eZ80190 -keepasm \
-	-optspeed -NOreduceopt -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
+	-optspeed -NOreduceopt -NOgenprintf -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
 	-asmsw:"$(ASM_FLAGS)" -asm $(ASMSOURCES)
 
 LDFLAGS += GROUP MEMORY = ROM, RAM
