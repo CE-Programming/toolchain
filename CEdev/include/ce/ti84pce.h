@@ -5,6 +5,9 @@
 #ifndef TICE_H
 #define TICE_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #pragma asm "include "./asm/tice.asm""
 #pragma asm "xref __saveIY"
 
