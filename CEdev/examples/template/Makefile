@@ -49,6 +49,6 @@ $(TARGET).hex : $(OBJECTS) $(STARTUPMODULE) $(LIBRARIES)
 	$(CC) $(CFLAGS) $<
     
 clean :
-	$(RM) $(wildcard *.src *.obj $(TARGET).*)
+	$(RM) $(OBJECTS:%.obj=%.src) $(OBJECTS) $(TARGET).*)
 
 .PHONY : all clean
