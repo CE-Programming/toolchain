@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #pragma asm "include "./asm/tice.asm""
+#pragma asm "include "./asm/cstartup.asm""
 #pragma asm "xref __saveIY"
 
 /* === Function Prototypes ==================== */

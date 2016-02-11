@@ -2,9 +2,6 @@
 
  ifndef USING_SHARED_LIBRARIES
  define USING_SHARED_LIBRARIES
-
- define .launcher,space=ram
- define .libs,space=ram
  
  segment .launcher
  ld hl,__libloadappvar
@@ -50,6 +47,6 @@ __missingappvar:
  db "Need"
 __libloadappvar:
  db " LibLoad",0
- 
  endif
  segment .libs
+ end

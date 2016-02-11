@@ -1,3 +1,5 @@
+	ifndef TICEASM_MODULE
+	define TICEASM_MODULE
 ; === Location Equates =======================
 _GetBootVerMajor   equ 000080h ; Boot Call
 _GetHardwareVers   equ 000084h ; Boot Call
@@ -113,6 +115,7 @@ _memcpy        equ 0000A4h ; Boot Call
 _memmove       equ 0000A8h ; Boot Call
 _memset        equ 0000ACh ; Boot Call
 _memclear      equ 0000B0h ; Boot Call
+_printf        equ 0000B4h ; Boot Call
 _DoNothing     equ 0000F8h ; Boot Call
 _setjmp        equ 0000B8h ; Boot Call
 _longjmp       equ 000098h ; Boot Call
@@ -5476,3 +5479,4 @@ inAfternoon     equ 3       ;1 = current time is in afternoon (PM) (I think)
 useTokensInString   equ 4       ;1 = use tokens instead of characters when displaying clock as string (for getTmStr and getDtStr vs. MODE screen) (keep this reset)
 displayClock        equ 5       ;1 = display clock (this is set every second, reset otherwise)
 clockOn         equ 6       ;1 = clock on
+	endif

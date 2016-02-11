@@ -5,8 +5,8 @@
 -sort ADDRESS=ascending -warn -NOdebug -NOigcase
 define __copy_code_to_ram = 0
 
-range rom $000000 : $7FFFFF 
-range ram $D00000 : $D65800
+range rom $000000 : $FFFFFF 
+range ram $D00000 : $FFFFFF
 range bss $D031F6 : $D13FD6
  
 change code is ram 
