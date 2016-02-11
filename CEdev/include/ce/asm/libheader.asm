@@ -49,4 +49,3 @@ __libloadappvar:
  db " LibLoad",0
  endif
  segment .libs
- end

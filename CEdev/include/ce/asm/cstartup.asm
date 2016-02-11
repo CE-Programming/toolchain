@@ -45,6 +45,9 @@ _init:
 	jp	__program_description_end
 	endif
 	
+	segment .launcher
+	segment .libs
+	
 ;-------------------------------------------------------------------------------
 	segment .startup
 __c_startup:
@@ -77,4 +80,3 @@ _errno:
 ; End Standard Startup Module
 ;-------------------------------------------------------------------------------
 	endif
-	end
