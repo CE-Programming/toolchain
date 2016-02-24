@@ -1,7 +1,8 @@
-TARGET ?= demo0
+#Change 'template' to the name of your program
+TARGET ?= template
 
 #Change ICONC to "ICON" to include a custom icon, and "NICON" to not use an icon
-ICONC ?= ICON
+ICONC ?= NICON
 DESCRIPTION ?= "Template C Program"
 
 REALWINPATH := $(subst /,\,$(realpath $(1)))
@@ -23,7 +24,7 @@ ASMSOURCES := $(wildcard *.asm)
 ASMSOURCES += $(ICONASM)
 PNG_FLAGS := -c
 else
-ASMSOURCES = $(filter-out iconc.asm, $(wildcard *.asm))
+ASMSOURCES := $(filter-out iconc.asm, $(wildcard *.asm))
 PNG_FLAGS := -h
 endif
 OBJECTS := $(SOURCES:%.c=%.obj) $(ASMSOURCES:%.asm=%.obj)
