@@ -7,8 +7,8 @@
 ; Standard CE startup module definitions and references
 ;-------------------------------------------------------------------------------
 	xref	__low_bss
-        xref	__len_code
-        xref	__low_code
+	xref	__len_code
+	xref	__low_code
 	
 	xref	_main
 	xref	_PopErrorHandler
@@ -67,13 +67,13 @@ _exit:
 	ld	iy,%D00080	; Restore IY for OS
 	ret
 ;-------------------------------------------------------------------------------
-	segment	bss
+	segment	data
 __saveSP:
-	ds	3
+	db	0,0,0
 __saveIY:
-	ds	3
+	db	0,0,0
 _errno:
-	ds	3
+	db	0,0,0
 ;-------------------------------------------------------------------------------
 	segment	code
 ;-------------------------------------------------------------------------------
