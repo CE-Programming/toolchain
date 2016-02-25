@@ -31,7 +31,7 @@ void main(void) {
     /* Don't use GetKey in your programs */
     _OS( GetKey() );
     
-    fillscrn(purple);
+    fillscrn(lightgreen);
     
     /* Don't use GetKey in your programs */
     _OS( GetKey() );
