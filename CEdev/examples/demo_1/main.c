@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <ti84pce.h>
+#include <tice.h>
 
 /* Standard headers - it's recommended to leave them included */
 #include <math.h>
@@ -11,47 +11,47 @@
 #include <string.h>
 
 /* Other available headers */
-// stdarg.h, setjmp.h, ctype.h, float.h, iso646.h, limits.h, errno.h, assert.h, debug.h
+// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h
 
-/* definitions */
-#define darkred    (0xC0C0)
-#define lightgreen (0x6F6F)
-#define vram       ((uint16_t*)0xD40000)
-#define lcdsize    (320*240*2)
+/* Put function prototypes here */
+void fillScreen(unsigned color);
+void waitSeconds(uint8_t seconds);
 
-/* Put your function prototypes here */
-void fillscrn(uint16_t color);
-void cleanUp(void);
+/* Location of memory-mapped screen */
+uint16_t *lcd_vramArray =  (uint16_t*)0xD40000;
 
 /* Put all your code here */
-void main(void) {
+void main(void) { 
+    /* Turn the whole screen black */
+    fillScreen(0x00);
     
-    fillscrn(darkred);
+    /* Wait for a second */
+    waitSeconds(1);
     
-    /* Don't use GetKey in your programs */
-    _OS( GetKey() );
+    /* Turn the whole screen red */
+    fillScreen(0xE0);
     
-    fillscrn(lightgreen);
+    /* Wait for a second */
+    waitSeconds(1);
     
-    /* Don't use GetKey in your programs */
-    _OS( GetKey() );
-    
-    cleanUp();
+    /* Clean up for the return to the OS */
+    pgrm_CleanUp();
 }
 
-/* Other functions */
-void fillscrn(uint16_t color) {
-    memset(vram, color, lcdsize);
+/* Fill the screen with a given color */
+void fillScreen(unsigned color) {
+    /* memset_fast is a way faster implementation of memset; either one will work here though */
+    memset_fast(lcd_vramArray, color, 320*240*2);
 }
 
-void cleanUp(void) {
-    /* Clear/invalidate some RAM areas */
-    /* Restore the home screen nicely */
-    _OS( asm("CALL _DelRes");
-         asm("CALL _ClrTxtShd");
-         asm("CALL _ClrScrn");
-         asm("CALL _HomeUp");
-         asm("CALL _DrawStatusBar");
-    );
-    asm("SET  graphDraw,(iy+graphFlags)");
+/* Wait for a specified about of seconds between 0 and 60 */
+void waitSeconds(uint8_t seconds) {
+    /* Set the inital seconds to 0 */
+    rtc_SetSeconds(0);
+    
+    /* Load the 0 seconds into the clock */
+    rtc_LoadSetTime();
+    
+    /* Wait until we reach the second needed */
+    while(rtc_GetSeconds() != seconds+1);
 }

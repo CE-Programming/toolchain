@@ -1,6 +1,7 @@
 -- Demo 1 ------------------------------------------------------------------------
 
 This is a simple demo to demonstrate filling the screen with a certain color.
+It also shows how to pause for an exact amount of time measured by seconds
 
 -- Compiling ----------------------------------------------------------------------
 

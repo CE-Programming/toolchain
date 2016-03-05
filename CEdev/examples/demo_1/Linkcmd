@@ -3,6 +3,7 @@
 -FORMAT=INTEL32
 -map -maxhexlen=64 -quiet -warnoverlap -xref -unresolved=fatal
 -sort ADDRESS=ascending -warn -NOdebug -NOigcase
+
 define __copy_code_to_ram = 0
 
 range rom $000000 : $FFFFFF 

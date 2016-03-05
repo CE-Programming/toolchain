@@ -11,8 +11,6 @@
 	xref	__low_code
 	
 	xref	_main
-	xref	_PopErrorHandler
-	xref	_RunIndicOff
 	
 	xdef	_errno
 	xdef	_init
@@ -52,13 +50,12 @@ _init:
 	segment .startup
 __c_startup:
 _c_int0:
-	di
 	call	%020848		; _RunIndicOff
 	ld	hl,__low_bss
 	ld	bc,%10DE2	; Maximum size of BSS+Heap
 	call	%0210DC		; _MemClear
 
-	ld	hl,__exit
+	di
 	ld	(__saveSP),sp
 	call	_main
 __exit:
