@@ -1,6 +1,6 @@
-// Parts from Matt "MateoConLechuga" Waltz and
+// Parts from Matt "MateoConLechuga" Waltz and Jacob "jacobly" Young, in addtion to
 // contributors of http://wikiti.brandonw.net/index.php?title=84PCE:OS:Include_File
-// Latest as of Oct. 18, 2015
+// Latest as of March. 5, 2016
 
 #ifndef TICE_H
 #define TICE_H
@@ -28,6 +28,16 @@
 /* LCD defines */
 #define lcd_GetBacklightLevel()  (*((uint8_t*)0xF60024))
 #define lcd_SetBacklightLevel(b) ((*((uint8_t*)0xF60024)) = (uint8_t)(b);
+
+/**
+ * OS varaible type definitions
+ */
+typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
+typedef struct { real_t real, imag; } cplx_t;
+typedef struct { uint16_t dim; real_t *items; } list_t;
+typedef struct { uint16_t dim; cplx_t *items; } cplx_list_t;
+typedef struct { uint8_t cols, rows; real_t *items; } matrix_t;
+typedef struct { uint16_t size; uint8_t *data; } var_t;
 
 /**
  * Cleans up everything and gets ready to enter back to the OS
@@ -155,10 +165,32 @@ size_t os_MemChk(void **free);
 void os_ThrowError(uint8_t error);
 
 /**
- * OS number type definitions
+ * Returns a pointer to symtable of the OS
  */
-typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
-typedef struct { real_t real, imag; } cplx_t;
+void *os_GetSymTablePtr(void);
+
+/**
+ * Creates an appvar; and returns a pointer to the structure 
+ * Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
+ */
+var_t *os_CreateAppVar(const char *name, uint16_t size);
+
+/**
+ * Returns next entry or NULL if no more entries, pass os_GetSymTablePtr() as first entry
+ */
+void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *name, void **data);
+
+/**
+ * If file exists, returns 1 and sets entry and data, otherwise returns 0.
+ * entry and/or data can be NULL if you don't care
+ */
+int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
+
+/**
+ * type is set to the current varaible type in ANS, and a pointer to the data is returned
+ * Returns NULL if Ans doesn't exist or type is NULL
+ */
+void *os_RclAns(uint8_t *type);
 
 /**
  * Copies a real_t type to another location
@@ -310,22 +342,6 @@ void os_SetFlagBits(int16_t offset_pattern);
 void os_ResetFlagBits(int16_t offset_pattern);
 
 /**
- * Creates an AppVar
- * returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
- */
-uint24_t *os_CreateAppVar(char *name, unsigned int size);
-
-/**
- * Returns a pointer to symtable of the OS
- */
-uint24_t *os_GetSymTablePtr(void);
-
-/**
- * Things you shouldn't use unless you know what you are doing:
- */
-void ForceCmdNoChar(void);
-
-/**
  * Whole bunch of possibly useful timer functions
  */
 void boot_SetTimersControlRegister(uint16_t value);
@@ -350,6 +366,11 @@ void boot_SetTimer2MatchValue1(uint32_t value);
 uint32_t boot_GetTimer2MatchValue1(void);
 void boot_SetTimer2MatchValue2(uint32_t value);
 uint32_t boot_GetTimer2MatchValue2(void);
+
+/**
+ * Things you shouldn't use unless you know what you are doing:
+ */
+void os_ForceCmdNoChar(void);
 /* ============================================ */
 
 /* === OS and Bootcode Funtion Wrapper ======== */

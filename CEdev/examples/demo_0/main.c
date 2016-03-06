@@ -14,12 +14,12 @@
 // stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h
 
 /* Put function prototypes here */
-void printText(char *text, uint8_t x, uint8_t y);
-void printTextSmall(char *text, uint8_t xpos, uint8_t ypos);
+void printText(const char *text, uint8_t x, uint8_t y);
+void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos);
 
 /* Initialize some strings */
-char HelloWorld[] = "Hello World!";
-char Welcome[] = "Welcome to C!";
+const char HelloWorld[] = "Hello World!";
+const char Welcome[] = "Welcome to C!";
 char Apples[] = "Apples";
 char Oranges[] = "Oranges";
 
@@ -29,7 +29,7 @@ void main(void) {
     uint8_t count;
 
     /* This function cleans up the screen and gets everything ready for the OS */
-    pgrm_cleanup();
+    pgrm_CleanUp();
     
     /* Print a few strings */
     printText(HelloWorld, 0, 0);
@@ -55,7 +55,7 @@ void main(void) {
 }
 
 /* Draw text on the homescreen at the given X/Y location */
-void printText(char *text, uint8_t xpos, uint8_t ypos) {
+void printText(const char *text, uint8_t xpos, uint8_t ypos) {
     _OS(
          os_SetCursorPos(ypos, xpos);
          os_PutStrFull(text);
@@ -63,7 +63,7 @@ void printText(char *text, uint8_t xpos, uint8_t ypos) {
 }
 
 /* Draw small text at the given X/Y location */
-void printTextSmall(char *text, uint8_t xpos, uint8_t ypos) {
+void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos) {
     _OS(
          os_FontDrawText(text, xpos, ypos);
        );
