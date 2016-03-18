@@ -18,15 +18,15 @@
 #include <string.h>
 
 /* Other available headers */
-/* stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h */
+// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 
 /* Put your function prototypes here */
 
 /* Put all your globals here. */
 
 void main(void) {
-	pgrm_CleanUp();/* Fill in the body of the main function here */
+	/* Fill in the body of the main function here */
+	pgrm_CleanUp();
 }
 
 /* Put other functions here */
-

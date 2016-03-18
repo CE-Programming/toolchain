@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Other available headers */
-// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h
+// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 
 /* Put function prototypes here */
 void fillScreen(unsigned color);
@@ -45,6 +45,8 @@ void fillScreen(unsigned color) {
 }
 
 /* Wait for a specified about of seconds between 0 and 60 */
+/* Note that this will affect the user's actual time on the calculator */
+/* A better option would be to use the general purpose timers, since they provide more accurate timming */
 void waitSeconds(uint8_t seconds) {
     /* Set the inital seconds to 0 */
     rtc_SetSeconds(0);

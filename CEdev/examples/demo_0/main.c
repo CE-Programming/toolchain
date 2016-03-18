@@ -11,16 +11,16 @@
 #include <string.h>
 
 /* Other available headers */
-// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h
+// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 
 /* Put function prototypes here */
 void printText(const char *text, uint8_t x, uint8_t y);
 void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos);
 
-/* Initialize some strings */
+/* Initialize some strings -- It is faster to place strings as globals */
 const char HelloWorld[] = "Hello World!";
 const char Welcome[] = "Welcome to C!";
-char Apples[] = "Apples";
+char Apples[] = "Apples!";
 char Oranges[] = "Oranges";
 
 /* Put all your code here */
@@ -49,22 +49,19 @@ void main(void) {
     }
     
     /* Do not use os_GetKey() in your programs; this is just a demo */
-    _OS( os_GetKey() );
+    os_GetKey();
     
+    /* Clean up, and exit */
     pgrm_CleanUp();
 }
 
 /* Draw text on the homescreen at the given X/Y location */
 void printText(const char *text, uint8_t xpos, uint8_t ypos) {
-    _OS(
-         os_SetCursorPos(ypos, xpos);
-         os_PutStrFull(text);
-       );
+    os_SetCursorPos(ypos, xpos);
+    os_PutStrFull(text);
 }
 
 /* Draw small text at the given X/Y location */
 void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos) {
-    _OS(
-         os_FontDrawText(text, xpos, ypos);
-       );
+    os_FontDrawText(text, xpos, ypos);
 }
