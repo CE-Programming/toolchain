@@ -230,7 +230,6 @@ _os_ChkFindSym                  equ 021FB8h
 _os_MemChk                      equ 021FF0h
 _os_FontDrawTransText           equ 022178h
 _os_CreateAppVar                equ 022184h
-
 _asm_MoveDown                   equ 0207F4h
 _asm_MoveUp                     equ 020800h
 _asm_HomeUp                     equ 020828h

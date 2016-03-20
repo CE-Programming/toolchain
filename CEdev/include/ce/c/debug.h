@@ -1,12 +1,15 @@
-/*************************************************
- * CE debug header file
- *************************************************/
-
-/* To print to the console, just use
- * dbg_printf(dbgout, const char*, ...); */
+/**
+ * Copyright (c) 2016, Matthew Waltz
+ *
+ * This file provides some useful debugging functions
+ */
 
 #ifdef dbg_printf
 #undef dbg_printf
+#endif
+
+#ifdef dbg_sprintf
+#undef dbg_sprintf
 #endif
 
 #ifdef dbgout
@@ -19,10 +22,18 @@
 
 #ifndef NDEBUG
 
+/**
+ * Use dbg_sprintf(dbgout, const char*, ...);
+ * to print to the console
+ */
+#define dbg_sprintf sprintf
 #define dbg_printf sprintf
 #define dbgout ((const char*)0xFB0000)
 
-void debugger(void);                    /* Opens the debugger */
+/**
+ * opens the debugger
+ */
+void debugger(void);
 
 #else
     

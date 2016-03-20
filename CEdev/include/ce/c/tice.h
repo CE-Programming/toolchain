@@ -23,7 +23,7 @@
 #define rtc_SetSeconds(s)       ((*((uint8_t*)0xF30024)) = (uint8_t)(s))
 #define rtc_SetMinutes(m)       ((*((uint8_t*)0xF30028)) = (uint8_t)(m))
 #define rtc_SetHours(h)         ((*((uint8_t*)0xF3002C)) = (uint8_t)(h))
-#define rtc_SetDays(d)          ((*((uint16_t*)0xF3002C)) = (uint16_t)(d))
+#define rtc_SetDays(d)          ((*((uint16_t*)0xF30030)) = (uint16_t)(d))
 #define rtc_Time()              (*(volatile uint32_t*)0xF30044)
 
 /* LCD defines */
@@ -369,20 +369,25 @@ void boot_SetTimer2MatchValue2(uint32_t value);
 uint32_t boot_GetTimer2MatchValue2(void);
 
 /**
- * Things you shouldn't use unless you know what you are doing:
+ * Things you shouldn't use unless you know what you are doing
  */
 void os_ForceCmdNoChar(void);
-/* ============================================ */
 
-/* === OS and Bootcode Funtion Wrapper ======== */
-#pragma asm "xref __saveIY"
-#define _OS(FUNC) \
-    do { \
-      asm("	LD	(__saveIY),IY"); \
-      asm("	LD	IY, 13631616"); \
-      FUNC ; \
-      asm("	LD	IY,(__saveIY)"); \
-    } while (0)
-/* ============================================ */
+
+/**
+ * Use this function to call assembly functions in the OS and Bootcode
+ */
+void _ASM(void *function);
+
+/**
+ * Assembly functions ( Don't forget to call from _ASM() )
+ */
+void asm_MoveUp(void);
+void asm_MoveDown(void);
+void asm_HomeUp(void);
+void asm_RunIndicOn(void);
+void asm_RunIndicOff(void);
+void asm_DisableAPD(void);
+void asm_EnableAPD(void);
 
 #endif

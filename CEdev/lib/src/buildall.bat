@@ -8,9 +8,9 @@ REM  Modified by Matt Waltz for CE support
 REM ----------------------------------------------------
 
 REM +--Setting environment variables-------------------+
-set BIN=%CEDev%\bin
-set INC=%CEDev%\include
-set LIBPATH=%CEDev%\lib
+set BIN=%CEDEV%\bin
+set INC=%CEDEV%\include
+set LIBPATH=%CEDEV%\lib
 set SRC=.
 
 set ASM=%BIN%\ez80asm.exe
@@ -33,7 +33,7 @@ set FP_ASM_SRC=fpadd.asm fpcmp.asm fpdiv.asm fpftol.asm fpltof.asm fpmul.asm fpn
 set DEBUG_C_SRC=
 set DEBUG_ASM_SRC=debugger.asm
 set TICE_C_SRC=
-set TICE_ASM_SRC=tice.asm memset_fast.asm pgrm_cleanup.asm abort.asm
+set TICE_ASM_SRC=tice.asm memset_fast.asm pgrm_cleanup.asm abort.asm asm_call.asm
 
 set CPU=EZ80F91
 set STDINC=%INC%\std
