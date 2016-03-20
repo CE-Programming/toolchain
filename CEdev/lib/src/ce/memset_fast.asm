@@ -30,8 +30,8 @@ _memset_fast:
 	ld	de,(ix)
 	inc	de
 	ldir
-	ld	hl,(ix)
 ret:
+	ld	hl,(ix)
 	pop	ix
 	ret
 	
