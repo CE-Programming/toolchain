@@ -3,9 +3,9 @@
 ; Call an OS or Bootcode routine
 ;-------------------------------------------------------------------------
 	.assume ADL=1
-	.def __ASM
+	.def __OS
 
-__ASM:
+__OS:
 	pop	de
 	pop	hl
 	push	hl

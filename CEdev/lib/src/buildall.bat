@@ -33,7 +33,7 @@ set FP_ASM_SRC=fpadd.asm fpcmp.asm fpdiv.asm fpftol.asm fpltof.asm fpmul.asm fpn
 set DEBUG_C_SRC=
 set DEBUG_ASM_SRC=debugger.asm
 set TICE_C_SRC=
-set TICE_ASM_SRC=tice.asm memset_fast.asm pgrm_cleanup.asm abort.asm asm_call.asm
+set TICE_ASM_SRC=tice.asm memset_fast.asm pgrm_cleanup.asm abort.asm os.asm
 
 set CPU=EZ80F91
 set STDINC=%INC%\std

@@ -1,6 +1,7 @@
 ; Parts from Matt "MateoConLechuga" Waltz and
 ; contributors of http://wikiti.brandonw.net/index.php?title=84PCE:OS:Include_File
 ; Latest as of 11 February 2016
+
 	ifndef STARTUP_MODULE
 	define STARTUP_MODULE
 ;-------------------------------------------------------------------------------
@@ -16,7 +17,6 @@
 	xdef	_init
 	xdef	_exit
 	xdef	__exit
-	xdef	__saveIY
 	xdef	__saveSP
 	xdef	__c_startup
 	xdef	_c_int0

@@ -376,8 +376,9 @@ void os_ForceCmdNoChar(void);
 
 /**
  * Use this function to call assembly functions in the OS and Bootcode
+ * i.e. _OS( asm_HomeUp );
  */
-void _ASM(void *function);
+void _OS(void *function);
 
 /**
  * Assembly functions ( Don't forget to call from _ASM() )
