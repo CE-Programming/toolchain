@@ -44,7 +44,7 @@ CC = wine "$(BIN)eZ80cc"
 LD = wine "$(BIN)eZ80link"
 CV = wine "$(BIN)convhex"
 PG = wine "$(BIN)convpng" >/dev/null
-RM = rm --force
+RM = rm -f
 endif
 BIN = $(call NATIVEPATH,$(CEDEV)/bin/)
 
@@ -89,7 +89,7 @@ ASM_FLAGS := \
 	-pagelen:250 -pagewidth:132 -quiet -sdiopt -warn -NOdebug -NOigcase -cpu:EZ80F91
 
 CFLAGS := \
-	-quiet -define:DEBUG -define:_EZ80F91 -define:_EZ80 -define:$(ICONC) -define:_SIMULATE -NOlistinc -NOmodsect -cpu:EZ80F91 -keepasm \
+	-quiet -define:$(DEBUGMODE) -define:_EZ80F91 -define:_EZ80 -define:$(ICONC) -define:_SIMULATE -NOlistinc -NOmodsect -cpu:EZ80F91 -keepasm \
 	-optspeed -NOreduceopt -NOgenprintf -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
 	-asmsw:"$(ASM_FLAGS)" -asm $(ASMSOURCES)
 
