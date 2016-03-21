@@ -32,4 +32,8 @@ double fmod(double x, double y);
 double frexp(double value, int * exp);
 double modf(double value, double * iptr);
 
+int isinf(double n);
+int isnan(double n);
+int finite(double n);
+
 #endif

@@ -55,6 +55,7 @@ int vprintf(char * format,va_list arg);
 int vsprintf(char * s,char * format,va_list arg);
 char *gets(char * s);
 int puts(char * s);
+int fflush(void *);
 
 int getchar(void);
 int putchar(int c);
