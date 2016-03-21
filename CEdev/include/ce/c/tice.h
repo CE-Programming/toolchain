@@ -179,7 +179,7 @@ var_t *os_CreateAppVar(const char *name, uint16_t size);
 /**
  * Returns next entry or NULL if no more entries, pass os_GetSymTablePtr() as first entry
  */
-void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *name, void **data);
+void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, const char *name, void **data);
 
 /**
  * If file exists, returns 1 and sets entry and data, otherwise returns 0.

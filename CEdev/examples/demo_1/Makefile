@@ -11,7 +11,7 @@
 TARGET ?= DEMO1
 ICONC ?= NICON
 DEBUGMODE ?= NDEBUG
-DESCRIPTION ?= "CE C SDK program - Demo 1"
+DESCRIPTION ?= "Example C program - Demo 1"
 ARCHIVED ?= NO
 APPVAR ?= NO
 #----------------------------
@@ -24,7 +24,6 @@ APPVAR ?= NO
 empty :=
 space := $(empty) $(empty)
 comma := ,
-suffix := .asm$(empty) $(empty)
 TARGETHEX := $(TARGET).hex
 
 BIN = $(call NATIVEPATH,$(CEDEV)/bin)
@@ -71,33 +70,110 @@ ASMSOURCES := $(filter-out iconc.asm, $(wildcard *.asm))
 PNG_FLAGS := -h
 endif
 OBJECTS := $(SOURCES:%.c=%.obj) $(ASMSOURCES:%.asm=%.obj)
-ASMSOURCES += $(call WINPATH,$(addprefix $(CEDEV)/include/ce/asm/,cstartup.asm))
+ASMSOURCES += $(call WINPATH,$(CEDEV)/include/ce/asm/cstartup.asm)
 ifdef L
-ASMSOURCES += $(call WINPATH,$(addprefix $(CEDEV)/include/ce/asm/,libheader.asm))
+ASMSOURCES += $(call WINPATH,$(CEDEV)/include/ce/asm/libheader.asm)
 OBJECTS += libheader.obj
 endif
-LIBS := $(call WINPATH,$(addprefix $(CEDEV)/lib/ce/,$(addsuffix $(suffix),$(L))))
+LIBLOC := $(foreach var,$(L),lib/ce/$(var))
+LIBS := $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).asm))
 ASMSOURCES += $(LIBS)
 OBJECTS += $(notdir $(LIBS:%.asm=%.obj))
 OBJECTS += cstartup.obj
-HEADERS := $(subst $(space),;,$(call WINPATH,. $(addprefix $(CEDEV)/,. include/ce/asm include/ce/c include include/std lib/std/ce lib/ce)))
+HEADERS := $(subst $(space),;,$(call WINPATH,. $(addprefix $(CEDEV)/,. include/ce/asm include/ce/c include include/std lib/std/ce lib/ce $(LIBLOC))))
 LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib chelp.lib crt.lib crtS.lib nokernel.lib fplib.lib fplibS.lib))
+LIBRARIES += $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).lib))
 
 ASM_FLAGS := \
 	-define:_EZ80=1 -define:_SIMULATE=1 -define:$(ICONC) -include:$(HEADERS) -NOlist -NOlistmac \
 	-pagelen:250 -pagewidth:132 -quiet -sdiopt -warn -NOdebug -NOigcase -cpu:EZ80F91
 
-CFLAGS :=  \
+CFLAGS := \
 	-quiet -define:DEBUG -define:_EZ80F91 -define:_EZ80 -define:$(ICONC) -define:_SIMULATE -NOlistinc -NOmodsect -cpu:EZ80F91 -keepasm \
 	-optspeed -NOreduceopt -NOgenprintf -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
 	-asmsw:"$(ASM_FLAGS)" -asm $(ASMSOURCES)
 
-LDFLAGS += GROUP MEMORY = ROM, RAM
+LDFLAGS := \
+	-FORMAT=INTEL32 \
+	-map -maxhexlen=64 -quiet -warnoverlap -xref -unresolved=fatal \
+	-sort ADDRESS=ascending -warn -NOdebug -NOigcase \
+	define __copy_code_to_ram = 0 \
+	range rom $$000000 : $$FFFFFF \
+	range ram $$D00000 : $$FFFFFF \
+	range bss $$D031F6 : $$D13FD6 \
+	change code is ram \
+	change data is ram \
+	change text is ram \
+	change strsect is text \
+	define __low_bss = base of bss \
+	define __len_bss = length of bss \
+	define __heaptop = (highaddr of bss) \
+	define __heapbot = (top of bss)+1 \
+	define __stack = $$D1A87E \
+	locate .header at $$D1A87F \
+	locate .icon at (top of .header)+1 \
+	locate .launcher at (top of .icon)+1 \
+	locate .libs at (top of .launcher)+1
+
+ifdef L
+#Define library absolute location
+LIBNUM := $(words $(L))
+LDLIBS := locate .$(word 1,$(L))_header at (top of .libs)+1
+#Make library headers relative to library functions
+LDLIBS += locate .$(word 1,$(L)) at (top of .$(word 1,$(L))_header)+1
+ifneq ($(LIBNUM),1)
+LDLIBS += locate .$(word 2,$(L))_header at (top of .$(word 1,$(L))+1)
+LDLIBS += locate .$(word 2,$(L)) at (top of .$(word 2,$(L))_header)+1
+ifneq ($(LIBNUM),2)
+LDLIBS += locate .$(word 3,$(L))_header at (top of .$(word 2,$(L))+1)
+LDLIBS += locate .$(word 3,$(L)) at (top of .$(word 3,$(L))_header)+1
+ifneq ($(LIBNUM),3)
+LDLIBS += locate .$(word 4,$(L))_header at (top of .$(word 3,$(L))+1)
+LDLIBS += locate .$(word 4,$(L)) at (top of .$(word 4,$(L))_header)+1
+ifneq ($(LIBNUM),4)
+LDLIBS += locate .$(word 5,$(L))_header at (top of .$(word 4,$(L))+1)
+LDLIBS += locate .$(word 5,$(L)) at (top of .$(word 5,$(L))_header)+1
+ifneq ($(LIBNUM),5)
+LDLIBS += locate .$(word 6,$(L))_header at (top of .$(word 5,$(L))+1)
+LDLIBS += locate .$(word 6,$(L)) at (top of .$(word 6,$(L))_header)+1
+ifneq ($(LIBNUM),6)
+LDLIBS += locate .$(word 7,$(L))_header at (top of .$(word 6,$(L))+1)
+LDLIBS += locate .$(word 7,$(L)) at (top of .$(word 7,$(L))_header)+1
+ifneq ($(LIBNUM),7)
+LDLIBS += locate .$(word 8,$(L))_header at (top of .$(word 7,$(L))+1)
+LDLIBS += locate .$(word 8,$(L)) at (top of .$(word 8,$(L))_header)+1
+ifneq ($(LIBNUM),8)
+LDLIBS += locate .$(word 9,$(L))_header at (top of .$(word 8,$(L))+1)
+LDLIBS += locate .$(word 9,$(L)) at (top of .$(word 9,$(L))_header)+1
+ifneq ($(LIBNUM),9)
+LDLIBS += locate .$(word 10,$(L))_header at (top of .$(word 9,$(L))+1)
+LDLIBS += locate .$(word 10,$(L)) at (top of .$(word 10,$(L))_header)+1
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+#Chain each library one after another
+LDFLAGS += $(LDLIBS)
+LDLAST := .$(word $(words $(L)),$(L))
+else
+LDLAST := .libs
+endif
+
+LDFLAGS += \
+	locate .startup at (top of $(LDLAST))+1 \
+	locate code at (top of .startup)+1 \
+	locate data at (top of code)+1 \
+	locate text at (top of data)+1
 
 all : $(TARGETTYPE)
 
 $(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
-	@$(LD) @Linkcmd $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))" $(LDFLAGS) || @$(RM) $(TARGETTYPE) $(TARGETHEX)
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))" || @$(RM) $(TARGETTYPE) $(TARGETHEX)
 
 %.8xv : %.hex
 	@$(CV) $(CVFLAGS) $(@:%.8xv=%)
@@ -109,12 +185,6 @@ $(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
 	@$(PG) $(PNG_FLAGS) $(DESCRIPTION)
 	@cd $(dir $@) && \
 	 $(CC) $(CFLAGS) $(notdir $<)
-
-%.obj : %.asm
-	@$(CC) $(CFLAGS) $<
-
-%.obj : %.src
-	@$(CC) $(CFLAGS) $<
 
 clean :
 	@$(RM) $(ICONASM) $(OBJECTS) $(OBJECTS:%.obj=%.src) $(TARGETTYPE) $(TARGETHEX) $(TARGET).map
