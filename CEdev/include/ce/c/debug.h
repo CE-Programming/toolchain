@@ -29,6 +29,7 @@
 #define dbg_sprintf sprintf
 #define dbg_printf sprintf
 #define dbgout ((const char*)0xFB0000)
+#define dbgerr ((const char*)0xFC0000)
 
 /**
  * opens the debugger
