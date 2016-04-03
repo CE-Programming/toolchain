@@ -33,7 +33,7 @@ set FP_ASM_SRC=fpadd.asm fpcmp.asm fpdiv.asm fpftol.asm fpltof.asm fpmul.asm fpn
 set DEBUG_C_SRC=
 set DEBUG_ASM_SRC=debugger.asm
 set TICE_C_SRC=
-set TICE_ASM_SRC=tice.asm memset_fast.asm pgrm_cleanup.asm abort.asm os.asm
+set TICE_ASM_SRC=tice.asm memset_fast.asm pgrm_cleanup.asm abort.asm os.asm int_reset.asm
 
 set CPU=EZ80F91
 set STDINC=%INC%\std
@@ -50,6 +50,22 @@ mkdir %LIBPATH%\std\ce
 
 echo %SRC%\std\fpdumy.asm
 %ASM% -NOlist -quiet -debug -cpu=%CPU% %SRC%\std\fpdumy
+
+REM --- CE Libraries
+
+echo --Building CE Debugger library...
+set C_SRC=%DEBUG_C_SRC%
+set ASM_SRC=%DEBUG_ASM_SRC%
+set C_FLG=%CFLG_DBG% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%" -define:_%CPU%
+set ASM_FLG=%AFLG% -cpu:%CPU% -debug -include:%CEINC%
+call buildcelib.bat cdebug.lib
+
+echo --Building TICE library...
+set C_SRC=%TICE_C_SRC%
+set ASM_SRC=%TICE_ASM_SRC%
+set C_FLG=%CFLG_DBG% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%" -define:_%CPU%
+set ASM_FLG=%AFLG% -cpu:%CPU% -debug -include:%CEINC%
+call buildcelib.bat ctice.lib
 
 echo --Building RTL libraries...
 set C_SRC=%RTL_C_SRC%
@@ -89,22 +105,6 @@ set ASM_SRC=
 set C_FLG=%CFLG_REL% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%"
 set ASM_FLG=%AFLG% -cpu:%CPU% -NOdebug
 call buildstdlib.bat fplibS.lib
-
-REM --- CE Libraries
-
-echo --Building CE Debugger library...
-set C_SRC=%DEBUG_C_SRC%
-set ASM_SRC=%DEBUG_ASM_SRC%
-set C_FLG=%CFLG_DBG% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%" -define:_%CPU%
-set ASM_FLG=%AFLG% -cpu:%CPU% -debug -include:%CEINC%
-call buildcelib.bat cdebug.lib
-
-echo --Building TICE library...
-set C_SRC=%TICE_C_SRC%
-set ASM_SRC=%TICE_ASM_SRC%
-set C_FLG=%CFLG_DBG% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%" -define:_%CPU%
-set ASM_FLG=%AFLG% -cpu:%CPU% -debug -include:%CEINC%
-call buildcelib.bat ctice.lib
 
 echo --Copying the libraries...
 REM -- copy the libraries --

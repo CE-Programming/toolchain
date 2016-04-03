@@ -9,22 +9,49 @@
 
 #----------------------------
 TARGET ?= DEMO0
-ICONC ?= ICON
-DEBUGMODE ?= NDEBUG
 DESCRIPTION ?= "Example C program - Demo 0"
+DEBUGMODE ?= NDEBUG
 ARCHIVED ?= NO
 APPVAR ?= NO
 #----------------------------
 
-#Add shared library names to the L varible, i.e.
-# L := graphc fileioc keypadc
+#These directories specify where source and output should go
 
 #----------------------------
+SRCDIR := src
+OBJDIR := obj
+BINDIR := bin
+GFXDIR := src/gfx
+#----------------------------
 
+#Add shared library names to the L varible, for instance:
+# L := graphc fileioc keypadc
+L := 
+
+#----------------------------
+#Try not to edit anything below these lines unless you know what you are doing
+#----------------------------
+
+#----------------------------
 empty :=
 space := $(empty) $(empty)
 comma := ,
 TARGETHEX := $(TARGET).hex
+
+ICON_PNG := iconc.png
+ICON_ASM := iconc.asm
+CSTARTUP_ASM := cstartup.asm
+LIBHEADER_ASM := libheader.asm
+
+ICON_OBJ := $(ICON_ASM:%.asm=%.obj)
+CSTARTUP_OBJ := $(CSTARTUP_ASM:%.asm=%.obj)
+LIBHEADER_OBJ := $(LIBHEADER_ASM:%.asm=%.obj)
+
+LIBHEADER_LOC := $(CEDEV)/include/ce/asm/$(LIBHEADER_ASM)
+CSTARTUP_LOC := $(CEDEV)/include/ce/asm/$(CSTARTUP_ASM)
+ICON_LOC := .
+
+ALLDIRS := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
 
 BIN = $(call NATIVEPATH,$(CEDEV)/bin)
 ifeq ($(OS),Windows_NT)
@@ -32,21 +59,28 @@ NATIVEPATH = $(subst /,\,$(1))
 WINPATH = $(NATIVEPATH)
 CEDEV ?= $(realpath ..\..)
 CC = "$(BIN)eZ80cc"
+AS = "$(BIN)eZ80asm"
 LD = "$(BIN)eZ80link"
 CV = "$(BIN)convhex"
-PG = "$(BIN)convpng" >nul
-RM = del /f 2>nul
+PG = "$(BIN)convpng"
+CD = cd
+RM = del /F /Q
+CP = copy /Y
+NULL = >nul 2>&1
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH = $(subst \,\\,$(shell winepath --windows $(1)))
 CEDEV ?= $(realpath ../..)
 CC = wine "$(BIN)eZ80cc"
 LD = wine "$(BIN)eZ80link"
-CV = wine "$(BIN)convhex"
-PG = wine "$(BIN)convpng" >/dev/null
+CV = "$(BIN)convhex_linux"
+PG = "$(BIN)convpng_linux"
+CD = cd
 RM = rm -f
+CP = cp -f
+NULL = >/dev/null
 endif
-BIN = $(call NATIVEPATH,$(CEDEV)/bin/)
+BIN := $(call NATIVEPATH,$(CEDEV)/bin/)
 
 ifneq ($(ARCHIVED),NO)
 CVFLAGS := -a
@@ -58,29 +92,35 @@ else
 TARGETTYPE := $(TARGET).8xp
 endif
 
-SOURCES := $(wildcard *.c)
-ASMSOURCES := $(wildcard *.asm)
-ICONASM := iconc.asm
+ifneq ("$(wildcard $(ICON_PNG))","")
+ICONC := ICON
+endif
+
+SOURCES := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
+ASMSOURCES := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.asm)))
+SOURCES := $(call WINPATH,$(addprefix $(CURDIR)/,$(SOURCES)))
+ASMSOURCES := $(call WINPATH,$(addprefix $(CURDIR)/,$(ASMSOURCES)))
+
+OBJECTS := $(addprefix $(OBJDIR)/,$(notdir $(SOURCES:%.c=%.obj)))
+OBJECTS += $(addprefix $(OBJDIR)/,$(notdir $(ASMSOURCES:%.asm=%.obj)))
+OBJECTS += $(OBJDIR)/$(CSTARTUP_OBJ)
+
 ifeq ($(ICONC),ICON)
-ASMSOURCES := $(wildcard *.asm)
-ASMSOURCES += $(ICONASM)
-PNG_FLAGS := -c
+ICON_CONV := $(PG) -c $(DESCRIPTION) && $(CP) $(ICON_ASM) $(OBJDIR) $(NULL) && $(RM) $(ICON_ASM) $(NULL)
+OBJECTS += $(OBJDIR)/$(ICON_OBJ)
 else
-ASMSOURCES := $(filter-out iconc.asm, $(wildcard *.asm))
-PNG_FLAGS := -h
+ICON_CONV :=
 endif
-OBJECTS := $(SOURCES:%.c=%.obj) $(ASMSOURCES:%.asm=%.obj)
-ASMSOURCES += $(call WINPATH,$(CEDEV)/include/ce/asm/cstartup.asm)
+
 ifdef L
-ASMSOURCES += $(call WINPATH,$(CEDEV)/include/ce/asm/libheader.asm)
-OBJECTS += libheader.obj
-endif
+OBJECTS += $(OBJDIR)/$(LIBHEADER_OBJ)
 LIBLOC := $(foreach var,$(L),lib/ce/$(var))
 LIBS := $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).asm))
-ASMSOURCES += $(LIBS)
-OBJECTS += $(notdir $(LIBS:%.asm=%.obj))
-OBJECTS += cstartup.obj
-HEADERS := $(subst $(space),;,$(call WINPATH,. $(addprefix $(CEDEV)/,. include/ce/asm include/ce/c include include/std lib/std/ce lib/ce $(LIBLOC))))
+OBJECTS += $(OBJDIR)/$(notdir $(LIBS:%.asm=%.obj))
+endif
+
+LIBS := $(subst $(space),;,$(LIBS))
+HEADERS := $(subst $(space),;,$(call WINPATH,. $(ALLDIRS) $(addprefix $(CEDEV)/,. include/ce/asm include/ce/c include include/std lib/std/ce lib/ce $(LIBLOC))))
 LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib chelp.lib crt.lib crtS.lib nokernel.lib fplib.lib fplibS.lib))
 LIBRARIES += $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).lib))
 
@@ -91,7 +131,7 @@ ASM_FLAGS := \
 CFLAGS := \
 	-quiet -define:$(DEBUGMODE) -define:_EZ80F91 -define:_EZ80 -define:$(ICONC) -define:_SIMULATE -NOlistinc -NOmodsect -cpu:EZ80F91 -keepasm \
 	-optspeed -NOreduceopt -NOgenprintf -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
-	-asmsw:"$(ASM_FLAGS)" -asm $(ASMSOURCES)
+	-asmsw:"$(ASM_FLAGS)"
 
 LDFLAGS := \
 	-FORMAT=INTEL32 \
@@ -116,10 +156,8 @@ LDFLAGS := \
 	locate .libs at (top of .launcher)+1
 
 ifdef L
-#Define library absolute location
 LIBNUM := $(words $(L))
 LDLIBS := locate .$(word 1,$(L))_header at (top of .libs)+1
-#Make library headers relative to library functions
 LDLIBS += locate .$(word 1,$(L)) at (top of .$(word 1,$(L))_header)+1
 ifneq ($(LIBNUM),1)
 LDLIBS += locate .$(word 2,$(L))_header at (top of .$(word 1,$(L))+1)
@@ -148,6 +186,9 @@ LDLIBS += locate .$(word 9,$(L)) at (top of .$(word 9,$(L))_header)+1
 ifneq ($(LIBNUM),9)
 LDLIBS += locate .$(word 10,$(L))_header at (top of .$(word 9,$(L))+1)
 LDLIBS += locate .$(word 10,$(L)) at (top of .$(word 10,$(L))_header)+1
+ifneq ($(LIBNUM),10)
+LDLIBS += locate .$(word 11,$(L))_header at (top of .$(word 10,$(L))+1)
+LDLIBS += locate .$(word 11,$(L)) at (top of .$(word 11,$(L))_header)+1
 endif
 endif
 endif
@@ -157,7 +198,7 @@ endif
 endif
 endif
 endif
-#Chain each library one after another
+endif
 LDFLAGS += $(LDLIBS)
 LDLAST := .$(word $(words $(L)),$(L))
 else
@@ -170,23 +211,45 @@ LDFLAGS += \
 	locate data at (top of code)+1 \
 	locate text at (top of data)+1
 
-all : $(TARGETTYPE)
+all : $(BINDIR)/$(TARGETTYPE)
 
-$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
-	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))" || @$(RM) $(TARGETTYPE) $(TARGETHEX)
+$(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))" || @$(RM) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETHEX) $(NULL)
 
 %.8xv : %.hex
 	@$(CV) $(CVFLAGS) $(@:%.8xv=%)
-	
+
 %.8xp : %.hex
 	@$(CV) $(CVFLAGS) $(@:%.8xp=%)
 
-%.obj : %.c
-	@$(PG) $(PNG_FLAGS) $(DESCRIPTION)
-	@cd $(dir $@) && \
-	 $(CC) $(CFLAGS) $(notdir $<)
+$(OBJDIR)/$(ICON_OBJ) : $(ICON_PNG)
+	@$(ICON_CONV) && \
+	@$(CD) $(OBJDIR) && \
+	$(AS) $(ASM_FLAGS) $(ICON_ASM)
+	
+$(OBJDIR)/%.obj : $(SRCDIR)/%.asm
+	@$(CD) $(OBJDIR) && \
+        $(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+
+$(OBJDIR)/%.obj : $(SRCDIR)/%.c
+	@$(CD) $(OBJDIR) && \
+	 $(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+
+$(OBJDIR)/%.obj : $(GFXDIR)/%.c
+	@$(CD) $(OBJDIR) && \
+	 $(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+
+$(OBJDIR)/$(CSTARTUP_OBJ) : $(CSTARTUP_LOC)
+	@$(CD) $(OBJDIR) && \
+	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
+
+$(OBJDIR)/$(LIBHEADER_OBJ) : $(LIBHEADER_LOC)
+	@$(CD) $(OBJDIR) && \
+	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
+	@$(CD) $(OBJDIR) && \
+	$(AS) $(ASM_FLAGS) $(LIBS)
 
 clean :
-	@$(RM) $(ICONASM) $(OBJECTS) $(OBJECTS:%.obj=%.src) $(TARGETTYPE) $(TARGETHEX) $(TARGET).map
+	@$(RM) $(OBJDIR)\* $(BINDIR)\* $(NULL)
 
 .PHONY : all clean

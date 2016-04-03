@@ -14,10 +14,11 @@
 	xref	_main
 	
 	xdef	_errno
-	xdef	_init
 	xdef	_exit
+	xdef	__init
 	xdef	__exit
-	xdef	__saveSP
+	xdef	__saves
+	xdef	__errsp
 	xdef	__c_startup
 	xdef	_c_int0
 	
@@ -29,17 +30,16 @@
 	define	.libs,space=ram
 	define	.startup,space=ram
 
-_errno    equ 0D008DCh
-	
+_errno     equ 0D008DCh
+
 ;-------------------------------------------------------------------------------
 ; Standard CE startup module code
 ;-------------------------------------------------------------------------------
 	segment .header
 	db	%EF
 	db	%7B
-_init:
 	db	%00	; Magic byte recognition for C programs
-	
+__init:	
 	ifdef	ICON
 	xref	__program_description_end
 	jp	__program_description_end
@@ -52,26 +52,31 @@ _init:
 	segment .startup
 __c_startup:
 _c_int0:
-	call	%020848		; _RunIndicOff
-	ld	hl,__low_bss
-	ld	bc,%10DE2	; Maximum size of BSS+Heap
-	call	%0210DC		; _MemClear
-
 	di
-	ld	(__saveSP),sp
+	call	0020848h
+	ld	hl,0E00005h
+	ld	a,(hl)
+	ld	(__saves+1),a
+	ld	(hl),2          ; reduce flash wait states (because of rtl)
+	ld	hl,__low_bss
+	ld	bc,010DE2h      ; maximum size of BSS+Heap
+	call	00210DCh        ; _MemClear
+
+	ld	(__errsp+1),sp
 	call	_main
 __exit:
 _exit:
-	ld	sp,(__saveSP)
-	ld	iy,%D00080	; Restore IY for OS
+	ld	hl,0E00005h
+__saves:
+	ld	(hl),0
+__errsp:
+	ld	sp,0
+	ld	iy,0D00080h      ; Restore IY for OS
 	ret
-;-------------------------------------------------------------------------------
-	segment	data
-__saveSP:
-	db	0,0,0
 ;-------------------------------------------------------------------------------
 	segment	code
 ;-------------------------------------------------------------------------------
 ; End Standard Startup Module
 ;-------------------------------------------------------------------------------
 	endif
+	end
