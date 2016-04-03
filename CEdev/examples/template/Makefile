@@ -116,10 +116,9 @@ ifdef L
 OBJECTS += $(OBJDIR)/$(LIBHEADER_OBJ)
 LIBLOC := $(foreach var,$(L),lib/ce/$(var))
 LIBS := $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).asm))
-OBJECTS += $(OBJDIR)/$(notdir $(LIBS:%.asm=%.obj))
+OBJECTS += $(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj)))
 endif
 
-LIBS := $(subst $(space),;,$(LIBS))
 HEADERS := $(subst $(space),;,$(call WINPATH,. $(ALLDIRS) $(addprefix $(CEDEV)/,. include/ce/asm include/ce/c include include/std lib/std/ce lib/ce $(LIBLOC))))
 LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib chelp.lib crt.lib crtS.lib nokernel.lib fplib.lib fplibS.lib))
 LIBRARIES += $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).lib))
@@ -247,7 +246,9 @@ $(OBJDIR)/$(LIBHEADER_OBJ) : $(LIBHEADER_LOC)
 	@$(CD) $(OBJDIR) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
 	@$(CD) $(OBJDIR) && \
-	$(AS) $(ASM_FLAGS) $(LIBS)
+	$(CC) $(CFLAGS) -asm $(LIBS)
+	
+$(OBJDIR)/%.obj :
 
 clean :
 	@$(RM) $(OBJDIR)\* $(BINDIR)\* $(NULL)
