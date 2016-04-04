@@ -35,7 +35,7 @@ __inarc:
  ld de,__relocationstart
  jp (hl)		; jump to the loader -- it should take care of everything
 __notfound:
- call %020814           ; _clrscrn
+ call %020814		; _clrscrn
  call %020828		; _homeup
  ld hl,__missingappvar
  call %0207C0		; _puts
@@ -43,7 +43,7 @@ __notfound:
  ld hl,__linkaddress
  call %0207C0		; _puts
  call %020D8C		; _getkey
- jp %020814
+ jp %020814				; _clrscrn
 __relocationstart:	; libraries to be relocated will be placed here for the relocator
  segment .libs
  ;...
