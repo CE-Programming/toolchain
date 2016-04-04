@@ -38,7 +38,7 @@ set TICE_ASM_SRC=tice.asm memset_fast.asm pgrm_cleanup.asm abort.asm os.asm int_
 set CPU=EZ80F91
 set STDINC=%INC%\std
 set CEINC=%SRC%\ce\include
-set ZLGINC=%SRC%\std\include
+set ZLGINC=%SRC%\std_include
 set CFLG_DBG=-debug -reduceopt
 set CFLG_REL=-NOdebug -optsize
 set AFLG=-genobj -NOigcase -include:%STDINC% -include:%ZLGINC% -NOlist -NOlistmac -pagelen:56 -pagewidth:100 -quiet -sdiopt -warn -NOzmasm
@@ -73,18 +73,21 @@ set ASM_SRC=%RTL_ASM_SRC%
 set C_FLG=%CFLG_REL% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%" -define:_%CPU%
 set ASM_FLG=%AFLG% -cpu:%CPU% -NOdebug
 call buildstdlib.bat crt.lib
+call buildstdlib_static.bat crt_static.lib
 
 set C_SRC=%RTL_ST_C_SRC%
 set ASM_SRC=
 set C_FLG=%CFLG_REL% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%" -define:_%CPU%
 set ASM_FLG=%AFLG% -cpu:%CPU% -NOdebug
 call buildstdlib.bat crtS.lib
+call buildstdlib_static.bat crtS_static.lib
 
 set C_SRC=%RTL_NOKERNEL_C_SRC%
 set ASM_SRC=
 set C_FLG=%CFLG_REL% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%" -define:_%CPU%
 set ASM_FLG=%AFLG% -cpu:%CPU% -NOdebug
 call buildstdlib.bat nokernel.lib
+call buildstdlib_static.bat nokernel_static.lib
 
 echo --Building CHLP libraries...
 set C_SRC=%HLP_C_SRC%
@@ -92,6 +95,7 @@ set ASM_SRC=%HLP_ASM_SRC%
 set C_FLG=%CFLG_REL% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%"
 set ASM_FLG=%AFLG% -cpu:%CPU% -NOdebug
 call buildstdlib.bat chelp.lib
+call buildstdlib_static.bat chelp_static.lib
 
 echo --Building FPLIB libraries...
 set C_SRC=%FP_C_SRC%
@@ -99,12 +103,14 @@ set ASM_SRC=%FP_ASM_SRC%
 set C_FLG=%CFLG_REL% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%"
 set ASM_FLG=%AFLG% -cpu:%CPU% -NOdebug
 call buildstdlib.bat fplib.lib
+call buildstdlib_static.bat fplib_static.lib
 
 set C_SRC=%FP_ST_C_SRC%
 set ASM_SRC=
 set C_FLG=%CFLG_REL% -cpu:%CPU% -asmsw:"-cpu:%CPU% -include:%STDINC% -include:%ZLGINC%"
 set ASM_FLG=%AFLG% -cpu:%CPU% -NOdebug
 call buildstdlib.bat fplibS.lib
+call buildstdlib_static.bat fplibS_static.lib
 
 echo --Copying the libraries...
 REM -- copy the libraries --

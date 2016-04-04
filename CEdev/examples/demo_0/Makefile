@@ -6,6 +6,7 @@
 #Change DESCRIPTION to modify what is displayed within a compatible shell
 #Change ARCHIVED to "YES" to mark the output as archived, and "NO" to not
 #Change APPVAR to "YES" to create the file as an AppVar, otherwise "NO" for programs
+#Change STATIC to "YES" to build your program with statically linked RTL functions (This generally means faster; albeit quite larger programs)
 
 #----------------------------
 TARGET ?= DEMO0
@@ -13,6 +14,7 @@ DESCRIPTION ?= "Example C program - Demo 0"
 DEBUGMODE ?= NDEBUG
 ARCHIVED ?= NO
 APPVAR ?= NO
+STATIC ?= NO
 #----------------------------
 
 #These directories specify where source and output should go
@@ -25,8 +27,8 @@ GFXDIR := src/gfx
 #----------------------------
 
 #Add shared library names to the L varible, for instance:
-# L := graphc fileioc keypadc
-L := 
+# L ?= graphc fileioc keypadc
+L ?= 
 
 #----------------------------
 #Try not to edit anything below these lines unless you know what you are doing
@@ -82,10 +84,10 @@ NULL = >/dev/null
 endif
 BIN := $(call NATIVEPATH,$(CEDEV)/bin/)
 
-ifneq ($(ARCHIVED),NO)
+ifeq ($(ARCHIVED),YES)
 CVFLAGS := -a
 endif
-ifneq ($(APPVAR),NO)
+ifeq ($(APPVAR),YES)
 CVFLAGS += -v
 TARGETTYPE := $(TARGET).8xv
 else
@@ -120,7 +122,13 @@ OBJECTS += $(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj)))
 endif
 
 HEADERS := $(subst $(space),;,$(call WINPATH,. $(ALLDIRS) $(addprefix $(CEDEV)/,. include/ce/asm include/ce/c include include/std lib/std/ce lib/ce $(LIBLOC))))
-LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib chelp.lib crt.lib crtS.lib nokernel.lib fplib.lib fplibS.lib))
+LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,chelp crt crtS nokernel fplib fplibS))
+ifeq ($(STATIC),YES)
+LIBRARIES := $(addsuffix _static.lib,$(LIBRARIES))
+else
+LIBRARIES := $(addsuffix .lib,$(LIBRARIES))
+endif
+LIBRARIES += $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib))
 LIBRARIES += $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).lib))
 
 ASM_FLAGS := \
@@ -213,7 +221,8 @@ LDFLAGS += \
 all : $(BINDIR)/$(TARGETTYPE)
 
 $(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
-	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))" || @$(RM) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETHEX) $(NULL)
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))" || \
+	$(RM) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETHEX) $(NULL)
 
 %.8xv : %.hex
 	@$(CV) $(CVFLAGS) $(@:%.8xv=%)
