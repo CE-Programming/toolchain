@@ -40,15 +40,21 @@ __notfound:
  ld hl,__missingappvar
  call %0207C0		; _puts
  call %0207F0		; _newline
- jp %020D8C		; _getkey
+ ld hl,__linkaddress
+ call %0207C0		; _puts
+ call %020D8C		; _getkey
+ jp %020814
 __relocationstart:	; libraries to be relocated will be placed here for the relocator
  segment .libs
  ;...
  ;...
- ;...s
+ ;...
  segment data
 __missingappvar:
  db "Need"
 __libloadappvar:
  db " LibLoad",0
+__linkaddress:
+ db "http://tiny.cc/celibs",0
+ 
  endif
