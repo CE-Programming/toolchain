@@ -381,7 +381,7 @@ void os_ForceCmdNoChar(void);
 void _OS(void *function);
 
 /**
- * Assembly functions ( Don't forget to call from _ASM() )
+ * Assembly functions ( Don't forget to call them from _OS() )
  */
 void asm_MoveUp(void);
 void asm_MoveDown(void);
