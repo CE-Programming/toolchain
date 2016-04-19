@@ -9,30 +9,23 @@
 	.assume adl=1
 
 _memset_fast:
-	push	ix
-	ld	ix,6
-	add	ix,sp
-	ld	hl,(ix)
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy+3)
 	ld	bc,0
 	or	a,a
 	sbc	hl,bc
 	jr	z,ret
-	ld	hl,(ix)
-	ld	bc,(ix+06)
-	ld	a,(ix+03)
+	ld	bc,(iy+9)
+	ld	a,(iy+6)
 	ld	(hl),a
-	dec	bc
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,bc
-	jr	z,ret
-	ld	hl,(ix)
-	ld	de,(ix)
-	inc	de
+	push	hl
+	cpi
+	ex	de,hl
+	pop	hl
+	jp	po,ret
 	ldir
-ret:
-	ld	hl,(ix)
-	pop	ix
+ret:	ld	hl,(iy+3)
 	ret
 	
 	end
