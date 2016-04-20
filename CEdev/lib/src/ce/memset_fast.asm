@@ -11,18 +11,16 @@
 _memset_fast:
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+3)
-	ld	bc,0
-	or	a,a
-	sbc	hl,bc
-	jr	z,ret
 	ld	bc,(iy+9)
+	sbc	hl,hl 
+	adc	hl,bc
+	jr	z,ret
+	ld	hl,(iy+3)
 	ld	a,(iy+6)
 	ld	(hl),a
-	push	hl
 	cpi
 	ex	de,hl
-	pop	hl
+	ld	hl,(iy+3)
 	jp	po,ret
 	ldir
 ret:	ld	hl,(iy+3)
