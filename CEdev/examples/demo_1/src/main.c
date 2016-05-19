@@ -35,7 +35,7 @@ void main(void) {
     waitSeconds(1);
     
     /* Clean up for the return to the OS */
-    pgrm_CleanUp();
+    prgm_CleanUp();
 }
 
 /* Fill the screen with a given color */

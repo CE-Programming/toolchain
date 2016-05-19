@@ -1,6 +1,4 @@
-; Parts from Matt "MateoConLechuga" Waltz and
-; contributors of http://wikiti.brandonw.net/index.php?title=84PCE:OS:Include_File
-; Latest as of 11 February 2016
+; Created by Matt "MateoConLechuga" Waltz
 
 	ifndef STARTUP_MODULE
 	define STARTUP_MODULE
@@ -53,7 +51,7 @@ __init:
 __c_startup:
 _c_int0:
 	di
-	call	0020848h
+	call	0020848h	; _RunInicOff
 	ld	hl,0E00005h
 	ld	a,(hl)
 	ld	(__saves+1),a

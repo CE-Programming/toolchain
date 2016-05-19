@@ -1,6 +1,6 @@
 // Parts from Matt "MateoConLechuga" Waltz and Jacob "jacobly" Young, in addtion to
 // contributors of http://wikiti.brandonw.net/index.php?title=84PCE:OS:Include_File
-// Latest as of March. 5, 2016
+// Latest as of June 2016
 
 #ifndef TICE_H
 #define TICE_H
@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+
+#define randInt(min, max)       ((unsigned)rand() % ((max) - (min) + 1) + (min))
 
 /* Defines for MMIO memory areas */
 
@@ -28,7 +30,7 @@
 
 /* LCD defines */
 #define lcd_GetBacklightLevel()  (*((uint8_t*)0xF60024))
-#define lcd_SetBacklightLevel(b) ((*((uint8_t*)0xF60024)) = (uint8_t)(b);
+#define lcd_SetBacklightLevel(b) ((*((uint8_t*)0xF60024))) = (uint8_t)(b);
 
 /**
  * OS varaible type definitions
@@ -45,6 +47,9 @@ typedef struct { uint16_t size; uint8_t *data; } var_t;
  * when you are ready to exit your program
  */
 void pgrm_CleanUp(void);
+
+/* This is here because Mateo can't spell */
+#define prgm_CleanUp pgrm_CleanUp
 
 /**
  * A faster implementation of memset
@@ -343,8 +348,34 @@ void os_SetFlagBits(int16_t offset_pattern);
 void os_ResetFlagBits(int16_t offset_pattern);
 
 /**
- * Whole bunch of possibly useful timer functions
+ * Whole bunch of useful timer functions
+ * Use the below defines to send to boot_SetTimersControlRegister
  */
+#define TIMER1_ENABLE	1 << 0	// Enables Timer 1
+#define TIMER1_32K	1 << 1	// Use the 32K clock for timer 1
+#define TIMER1_CPU	0 << 1	// Use the CPU clock rate for timer 1
+#define TIMER1_INT	1 << 2	// Enable an interrupt for the timer 1
+#define TIMER1_NOINT	0 << 2	// Disable interrupts for the timer 1
+#define TIMER1_UP	1 << 9	// Timer 1 counts up
+#define TIMER1_DOWN	0 << 9	// Timer 1 counts down
+
+#define TIMER2_ENABLE	1 << 3	// Enables Timer 2
+#define TIMER2_32K	1 << 4	// Use the 32K clock for timer 2
+#define TIMER2_CPU	0 << 4	// Use the CPU clock rate for timer 2
+#define TIMER2_INT	1 << 5	// Enable an interrupt for the timer 2
+#define TIMER2_NOINT	0 << 5	// Disable interrupts for the timer 2
+#define TIMER2_UP	1 << 10	// Timer 2 counts up
+#define TIMER2_DOWN	0 << 10	// Timer 2 counts down
+
+/* These defines can be used to check the status of the timer */
+#define TIMER1_MATCH1	1 << 0	// Timer 1 hit the first match value
+#define TIMER1_MATCH2	1 << 1	// Timer 1 hit the second match value
+#define TIMER1_RELOADED	1 << 2	// Timer 1 was reloaded (Needs to have TIMER1_INT enabled)
+
+#define TIMER2_MATCH1	1 << 3	// Timer 2 hit the first match value
+#define TIMER2_MATCH2	1 << 4	// Timer 2 hit the second match value
+#define TIMER2_RELOADED	1 << 5	// Timer 2 was reloaded (Needs to have TIMER2_INT enabled)
+
 void boot_SetTimersControlRegister(uint16_t value);
 uint16_t boot_GetTimersControlRegister(void);
 void boot_SetTimersInterruptStatus(uint16_t value);
@@ -381,7 +412,7 @@ void os_ForceCmdNoChar(void);
 void _OS(void *function);
 
 /**
- * Assembly functions ( Don't forget to call them from _OS() )
+ * Assembly functions ( Don't forget to call from _OS() )
  */
 void asm_MoveUp(void);
 void asm_MoveDown(void);

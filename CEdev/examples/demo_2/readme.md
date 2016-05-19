@@ -1,7 +1,6 @@
--- Demo 1 ------------------------------------------------------------------------
+-- Demo 2 ------------------------------------------------------------------------
 
-This is a simple demo to demonstrate filling the screen with a certain color.
-It also shows how to pause for an exact amount of time measured by seconds
+This demo demonstrates controlling the LCD backlight by fading in and out
 
 -- Compiling ----------------------------------------------------------------------
 

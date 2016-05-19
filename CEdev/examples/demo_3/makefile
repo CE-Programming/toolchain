@@ -8,13 +8,13 @@
 #Change DESCRIPTION to modify what is displayed within a compatible shell (Not compiled in if icon is not present)
 
 #----------------------------
-TARGET ?= DEMO1
+TARGET ?= DEMO3
 DEBUGMODE ?= NDEBUG
 ARCHIVED ?= NO
 APPVAR ?= NO
 #----------------------------
 ICONPNG := iconc.png
-DESCRIPTION ?= "C Toolchain Demo 1"
+DESCRIPTION ?= "C Toolchain Demo 3"
 #----------------------------
 
 #Add shared library names to the L varible, for instance:
