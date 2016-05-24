@@ -199,7 +199,7 @@ _os_RealSqrt                    equ 021D00h
 _os_RealSub                     equ 021D04h
 _os_RealTanRad                  equ 021D08h
 _os_StrToReal                   equ 021D0Ch
-_os_RealInt                     equ 021D10h 
+_os_RealInt                     equ 021D10h
 _os_SetFlagBits                 equ 021D14h
 _os_ResetFlagBits               equ 021D18h
 _os_TestFlagBits                equ 021D1Ch

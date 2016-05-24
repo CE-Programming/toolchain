@@ -1,0 +1,84 @@
+; Zilog eZ80 ANSI C Compiler Release 3.4
+; -nomodsect -optspeed -noreduceopt -peephole -globalopt
+; -localcse -const=RAM 
+	FILE	"..\SRC\MAIN.C"
+	.assume ADL=1
+	SEGMENT CODE
+;    1	/* Keep these headers */
+;    2	#include <stdbool.h>
+;    3	#include <stddef.h>
+;    4	#include <stdint.h>
+;    5	#include <tice.h>
+;    6	
+;    7	/* Standard headers - it's recommended to leave them included */
+;    8	#include <math.h>
+;    9	#include <stdio.h>
+;   10	#include <stdlib.h>
+;   11	#include <string.h>
+;   12	
+;   13	/* Other available headers */
+;   14	// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
+;   15	#include <assert.h>
+;   16	#include <debug.h>
+;   17	
+;   18	/* Put function prototypes here */
+;   19	
+;   20	/* Put all your code here */
+;   21	void main(void) {
+_main:
+	LD	HL,-1
+	CALL	__frameset
+;   22		uint8_t i;
+;   23		
+;   24		for(i=0; i<200; i++) {
+	LD	(IX+-1),0
+	JR	L_3
+L_1:
+;   25			dbg_sprintf(dbgout,"This is test %d of a really long string to make sure output is okayish.\n", i);
+	LD	A,(IX+-1)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	LD	BC,L__0
+	PUSH	BC
+	LD	BC,16449536
+	PUSH	BC
+	CALL	_sprintf
+	POP	BC
+	POP	BC
+	POP	BC
+	INC	(IX+-1)
+;   26		}
+L_3:
+	LD	A,(IX+-1)
+	CP	A,200
+	JR	C,L_1
+;   27		
+;   28		/* Clean up for the return to the OS */
+;   29		prgm_CleanUp();
+	CALL	_pgrm_CleanUp
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _main ***************************
+;Name                         Addr/Register   Size   Type
+;_pgrm_CleanUp                       IMPORT  -----   function
+;_sprintf                            IMPORT  -----   function
+;i                                     IX-1      1   variable
+
+
+; Stack Frame Size: 7 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+	SEGMENT STRSECT
+L__0:
+	DB	"This is test %d of a really long string to make sure output is okayish."
+	DB	10,0
+	XREF _sprintf:ROM
+	XREF _pgrm_CleanUp:ROM
+	XREF __frameset:ROM
+	XDEF _main
+	END

@@ -18,7 +18,7 @@ DESCRIPTION ?= "C Toolchain Demo 0"
 #----------------------------
 
 #Add shared library names to the L varible, for instance:
-# L := graphc fileioc keypadc
+# L := graphx fileioc keypadc
 L := 
 
 #These directories specify where source and output should go
@@ -97,7 +97,7 @@ TARGETTYPE := $(TARGET).8xp
 endif
 TARGETMAP := $(TARGET).map
 
-#Find all of the available C and ASM files (Remeber, you can create C <-> assembly routines easily this way)
+#Find all of the available C and ASM files (Remember, you can create C <-> assembly routines easily this way)
 SOURCES := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
 ASMSOURCES := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.asm)))
 
@@ -107,8 +107,8 @@ OBJECTS += $(addprefix $(OBJDIR)/,$(notdir $(ASMSOURCES:%.asm=%.obj)))
 OBJECTS += $(OBJDIR)/$(CSTARTUP_OBJ)
 
 #Check if there is an icon present that we can convert; if so, generate a recipe to build it properly
-ifneq ("$(wildcard $(ICON_PNG))","")
-ICON_CONV := $(PG) -c $(ICON_PNG)$(comma)$(DESCRIPTION) && \
+ifneq ("$(wildcard $(ICONPNG))","")
+ICON_CONV := $(PG) -c $(ICONPNG)$(comma)$(DESCRIPTION) && \
              $(CP) $(ICON_ASM) $(OBJDIR) $(NULL) && \
 	     $(RM) $(ICON_ASM) $(NULL)
 OBJECTS += $(OBJDIR)/$(ICON_OBJ)
@@ -142,7 +142,7 @@ CFLAGS := \
 	-optspeed -NOreduceopt -NOgenprintf -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
 	-asmsw:"$(ASM_FLAGS)"
 
-#This is a giant mess, but basically it is just repeated code to properly align all of the nesasary libraries and
+#This is a giant mess, but basically it is just repeated code to properly align all of the necessary libraries and
 #their header information. Kind of annoying, but this is the only certain way ZDS is able to organize things properly
 #Currently 11 libraries are supported; more can be added later if needed (probably not)
 ifdef L
@@ -194,7 +194,7 @@ else
 LDLAST := .libs
 endif
 
-#These are the linker flags, basically organized to properly set up the enviornment
+#These are the linker flags, basically organized to properly set up the environment
 LDFLAGS := \
 	-FORMAT=INTEL32 \
 	-map -maxhexlen=64 -quiet -warnoverlap -xref -unresolved=fatal \
@@ -228,7 +228,7 @@ LDFLAGS := \
 all : $(BINDIR)/$(TARGETTYPE)
 
 #This rule builds the Intel HEX file
-$(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES) $(USERHEADERS)
+$(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
 	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))"
 
 #These rules use ConvHEX to convert the Intel HEX file to a calculator format
@@ -238,7 +238,7 @@ $(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES) $(USERHEADERS)
 	@$(CV) $(CVFLAGS) $(@:%.8xp=%)
 
 #This rule handles conversion of the icon, if it is ever updated
-$(OBJDIR)/$(ICON_OBJ) : $(ICON_PNG)
+$(OBJDIR)/$(ICON_OBJ) : $(ICONPNG)
 	@$(ICON_CONV) && \
 	@$(CD) $(OBJDIR) && \
 	@$(AS) $(ASM_FLAGS) $(ICON_ASM)
@@ -270,8 +270,8 @@ $(OBJDIR)/$(LIBHEADER_OBJ) : $(LIBHEADER_LOC)
 	@$(CC) $(CFLAGS) -asm $(LIBS)
 
 #This is just a silly rule needed for the icon conversion to work properly
-$(OBJDIR)/%.obj :
-
+$(OBJDIR)/%.obj : 
+	
 #This rule cleans up everything
 clean :
 	@$(RM) $(call WINPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJECTS) $(OBJDIR)/*.src $(OBJDIR)/$(ICON_ASM)) $(NULL)

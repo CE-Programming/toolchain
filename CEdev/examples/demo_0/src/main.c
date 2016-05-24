@@ -23,33 +23,35 @@ const char Welcome[] = "Welcome to C!";
 char Apples[] = "Apples!";
 char Oranges[] = "Oranges";
 
+int24_t h = 12;
+
 /* Put all your code here */
 void main(void) {
     /* uint8_t is an unsigned integer that can range from 0-255. It generally performs faster than just an int, so try to use it when possible */
-    uint8_t count;
+    uint8_t count = h;
 
     /* This function cleans up the screen and gets everything ready for the OS */
     prgm_CleanUp();
     
     /* Print a few strings */
-    printText( HelloWorld, 0, 0);
-    printText( Welcome, 0, 1 );
+    printText(HelloWorld, 0, 0);
+    printText(Welcome, 0, 1);
     
     /* This will print 'Apples' */
     for(count=3; count<6; count++) {
-        printText( Apples, 0, count );
+        printText(Apples, 0, count);
     }
     
     /* Copy the 'Oranges' string to the 'Apples' location */
-    strcpy( Apples, Oranges );
+    strcpy(Apples, Oranges);
     
     /* This will print 'Oranges'. Therefore, apples are oranges */
     for(count=6; count<9; count++) {
-        printText( Apples, 0, count );
+        printText(Apples, 0, count);
     }
     
-    /* Do not use os_GetKey() in your programs */
-    while(!os_GetCSC());
+    /* Do not use os_GetKey() in your programs; this is just a demo */
+    os_GetKey();
     
     /* Clean up, and exit */
     prgm_CleanUp();

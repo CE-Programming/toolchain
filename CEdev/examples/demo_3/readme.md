@@ -4,9 +4,8 @@ This demo demonstrates using the hardware timers, and makes a simple second coun
 
 -- Compiling ----------------------------------------------------------------------
 
-To compile this demo1 project, simple run `make` within a shell in
-this directory. You can change the name, description,
-or icon for the demo like this:
+To compile this demo project, simply run `make` within a shell in
+this directory. You can change the name or description for the demo like this:
     make TARGET=myprog DESCRIPTION="Some description here"
 
 If you wish to easily delete all the created files outputted by make, type:

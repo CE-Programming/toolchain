@@ -1,0 +1,50 @@
+; Zilog eZ80 ANSI C Compiler Release 3.4
+; -nomodsect -optspeed -noreduceopt -peephole -globalopt
+; -localcse -const=ROM 
+	FILE	"..\SRC\MAIN.C"
+	.assume ADL=1
+	SEGMENT CODE
+;    1	//--------------------------------------
+;    2	// Program Name:
+;    3	// Author:
+;    4	// License:
+;    5	// Description:
+;    6	//--------------------------------------
+;    7	
+;    8	/* Keep these headers */
+;    9	#include <stdbool.h>
+;   10	#include <stddef.h>
+;   11	#include <stdint.h>
+;   12	#include <tice.h>
+;   13	
+;   14	/* Standard headers - it's recommended to leave them included */
+;   15	#include <math.h>
+;   16	#include <stdio.h>
+;   17	#include <stdlib.h>
+;   18	#include <string.h>
+;   19	
+;   20	/* Other available headers */
+;   21	// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
+;   22	
+;   23	/* Put your function prototypes here */
+;   24	
+;   25	/* Put all your globals here. */
+;   26	
+;   27	void main(void) {
+_main:
+;   28		/* Fill in the body of the main function here */
+;   29		//pgrm_CleanUp();
+;   30	}
+	RET	
+
+
+;**************************** _main ***************************
+;Name                         Addr/Register   Size   Type
+
+
+; Stack Frame Size: 6 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+	XDEF _main
+	END

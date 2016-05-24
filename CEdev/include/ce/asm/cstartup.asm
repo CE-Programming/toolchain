@@ -6,22 +6,14 @@
 ; Standard CE startup module definitions and references
 ;-------------------------------------------------------------------------------
 	xref	__low_bss
-	xref	__len_code
-	xref	__low_code
-	
 	xref	_main
 	
 	xdef	_errno
 	xdef	_exit
-	xdef	__init
-	xdef	__exit
-	xdef	__saves
-	xdef	__errsp
-	xdef	__c_startup
-	xdef	_c_int0
+	xdef	_init
 	
 	.assume	ADL = 1
- 
+
 	define	.header,space=ram
 	define	.icon,space=ram
 	define	.launcher,space=ram
@@ -34,10 +26,10 @@ _errno     equ 0D008DCh
 ; Standard CE startup module code
 ;-------------------------------------------------------------------------------
 	segment .header
-	db	%EF
-	db	%7B
-	db	%00	; Magic byte recognition for C programs
-__init:	
+	db	239
+	db	123
+	db	0		; Magic byte recognition for C programs
+_init:
 	ifdef	ICON
 	xref	__program_description_end
 	jp	__program_description_end
@@ -45,11 +37,10 @@ __init:
 	
 	segment .launcher
 	segment .libs
-	
+
 ;-------------------------------------------------------------------------------
 	segment .startup
-__c_startup:
-_c_int0:
+
 	di
 	call	0020848h	; _RunInicOff
 	ld	hl,0E00005h
@@ -62,7 +53,6 @@ _c_int0:
 
 	ld	(__errsp+1),sp
 	call	_main
-__exit:
 _exit:
 	ld	hl,0E00005h
 __saves:
@@ -76,5 +66,6 @@ __errsp:
 ;-------------------------------------------------------------------------------
 ; End Standard Startup Module
 ;-------------------------------------------------------------------------------
+
 	endif
 	end

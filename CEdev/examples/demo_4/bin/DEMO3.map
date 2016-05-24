@@ -1,0 +1,123 @@
+
+IEEE 695 OMF Linker Version 6.25 (11121301)
+Copyright (C) 1999-2008 Zilog, Inc. All Rights Reserved
+
+LINK MAP:
+
+DATE:      Sun May 22 01:48:44 2016
+PROCESSOR: assembler
+FILES:     obj\main.obj           
+           obj\cstartup.obj
+           C:\CEdev\lib\std\ce\ctice.lib
+           C:\CEdev\lib\std\ce\cdebug.lib
+           C:\CEdev\lib\std\chelp.lib
+           C:\CEdev\lib\std\crt.lib
+           C:\CEdev\lib\std\crtS.lib
+           C:\CEdev\lib\std\nokernel.lib
+           C:\CEdev\lib\std\fplib.lib
+           C:\CEdev\lib\std\fplibS.lib
+           
+
+
+COMMAND LIST:
+=============
+-FORMAT=INTEL32 -map -maxhexlen=64 -quiet -warnoverlap -xref -unresolved=fatal -sort ADDRESS=ascending -warn -NOdebug -NOigcase define __copy_code_to_ram = 0 range rom $000000 : $FFFFFF range ram $D00000 : $FFFFFF range bss $D031F6 : $D13FD6 change code is ram change data is ram change text is ram change strsect is text define __low_bss = base of bss define __len_bss = length of bss define __heaptop = (highaddr of bss) define __heapbot = (top of bss)+1 define __stack = $D1A87E locate .header at $D1A87F locate .icon at (top of .header)+1 locate .launcher at (top of .icon)+1 locate .libs at (top of .launcher)+1 locate .startup at (top of .libs)+1 locate code at (top of .startup)+1 locate data at (top of code)+1 locate text at (top of data)+1 bin/DEMO3.hex = obj\main.obj,obj\cstartup.obj,C:\CEdev\lib\std\ce\ctice.lib,C:\CEdev\lib\std\ce\cdebug.lib,C:\CEdev\lib\std\chelp.lib,C:\CEdev\lib\std\crt.lib,C:\CEdev\lib\std\crtS.lib,C:\CEdev\lib\std\nokernel.lib,C:\CEdev\lib\std\fplib.lib,C:\CEdev\lib\std\fplibS.lib 
+
+SPACE ALLOCATION:
+=================
+
+Space                     Base         Top      Size      Used    Unused
+------------------ ----------- ----------- --------- --------- ---------
+RAM                   D:D1A87F    D:D1A956   300000H       D8H   2FFF28H
+                                          (  3145728       216   3145512)
+
+
+SEGMENTS WITHIN SPACE:
+======================
+
+RAM                Type                Base        Top         Size
+------------------ ------------------- ----------- ----------- ---------
+.header            normal data            D:D1A87F    D:D1A881        3h
+.startup           normal data            D:D1A882    D:D1A8B6       35h
+CODE               normal data            D:D1A8B7    D:D1A90D       57h
+TEXT               normal data            D:D1A90E    D:D1A956       49h
+
+SEGMENTS WITHIN MODULES:
+========================
+
+Module: ..\SRC\MAIN.C (File: main.obj) Version: 1:0 05/22/2016 01:48:44
+
+    Name                                        Base        Top      Size
+    --------------------------------------- ----------- ----------- ---------
+    Segment: CODE                              D:D1A8B7    D:D1A8F0       3ah
+    Segment: TEXT (was STRSECT)                D:D1A90E    D:D1A956       49h
+
+
+Module: C:\CEdev\include\ce\asm\cstartup.asm (File: cstartup.obj) Version: 1:0 05/22/2016 01:48:44
+
+    Name                                        Base        Top      Size
+    --------------------------------------- ----------- ----------- ---------
+    Segment: .header                           D:D1A87F    D:D1A881        3h
+    Segment: .startup                          D:D1A882    D:D1A8B6       35h
+
+
+Module: ce\toolchain\pgrm_cleanup.asm (Library: ctice.lib) Version: 1:0 05/20/2016 22:30:07
+
+    Name                                        Base        Top      Size
+    --------------------------------------- ----------- ----------- ---------
+    Segment: CODE                              D:D1A8F1    D:D1A90D       1dh
+
+EXTERNAL DEFINITIONS:
+=====================
+
+Symbol                             Address   Module          Segment
+-------------------------------- ----------- --------------- --------------------------------
+__copy_code_to_ram                  00000000 (User Defined)
+__len_bss                           00000000 (User Defined)
+__low_bss                           00000000 (User Defined)
+__heapbot                           00000001 (User Defined)
+__heaptop                           00D13FD6 (User Defined)
+__stack                             00D1A87E (User Defined)
+_sprintf                            D:0000BC sprintf         CODE                            
+__frameset                          D:00012C frameset        CODE                            
+_errno                              D:D008DC cstartup        CODE                            
+_init                               D:D1A882 cstartup        .header                         
+_exit                               D:D1A8A7 cstartup        .startup                        
+_main                               D:D1A8B7 MAIN            CODE                            
+_pgrm_CleanUp                       D:D1A8F1 pgrm_cleanup    CODE                            
+
+13 external symbol(s).
+
+SYMBOL CROSS REFERENCE:
+=======================
+Name                              Use         Module
+--------------------------------- ----------- -------------------------
+__copy_code_to_ram                Defined     LINKER
+__len_bss                         Defined     LINKER
+__low_bss                         Defined     LINKER
+                                  Referenced  C:\CEdev\include\ce\asm\cstartup.asm
+__heapbot                         Defined     LINKER
+__heaptop                         Defined     LINKER
+__stack                           Defined     LINKER
+_sprintf                          Defined     std\sprintf.asm
+                                  Referenced  ..\SRC\MAIN.C
+__frameset                        Defined     std\frameset.asm
+                                  Referenced  ..\SRC\MAIN.C
+_errno                            Defined     C:\CEdev\include\ce\asm\cstartup.asm
+_init                             Defined     C:\CEdev\include\ce\asm\cstartup.asm
+_exit                             Defined     C:\CEdev\include\ce\asm\cstartup.asm
+_main                             Defined     ..\SRC\MAIN.C
+                                  Referenced  C:\CEdev\include\ce\asm\cstartup.asm
+_pgrm_CleanUp                     Defined     ce\toolchain\pgrm_cleanup.asm
+                                  Referenced  ..\SRC\MAIN.C
+
+OUTPUT CHECKSUM
+===============
+bin/DEMO3.hex        005BF6
+
+
+
+END OF LINK MAP:
+================
+0 Errors
+0 Warnings
