@@ -221,7 +221,7 @@ LDFLAGS := \
 	locate .startup at (top of $(LDLAST))+1 \
 	locate code at (top of .startup)+1 \
 	locate data at (top of code)+1 \
-	locate text at (top of data)+1 \
+	locate text at (top of data)+1
 
 #The rules to build all of the different sorts of files
 

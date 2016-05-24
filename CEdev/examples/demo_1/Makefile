@@ -216,11 +216,10 @@ LDFLAGS := \
 	locate .icon at (top of .header)+1 \
 	locate .launcher at (top of .icon)+1 \
 	locate .libs at (top of .launcher)+1 \
+	$(LDLIBS) \
 	locate .startup at (top of $(LDLAST))+1 \
 	locate code at (top of .startup)+1 \
-	locate data at (top of code)+1 \
-	locate text at (top of data)+1 \
-	$(LDLIBS)
+	locate data at (top of code)+1
 
 #The rules to build all of the different sorts of files
 
