@@ -121,7 +121,7 @@ endif
 ifdef L
 LIBLOC := $(foreach var,$(L),lib/ce/$(var))
 LIBS := $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).asm))
-OBJECTS += $(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj)))
+LOBJECTS := $(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj)))
 OBJECTS += $(OBJDIR)/$(LIBHEADER_OBJ)
 endif
 
@@ -139,7 +139,7 @@ ASM_FLAGS := \
 #Define the C flags used by the Zilog compiler
 CFLAGS := \
 	-quiet -define:$(DEBUGMODE) -define:_EZ80F91 -define:_EZ80 -define:$(ICONC) -define:_SIMULATE -NOlistinc -NOmodsect -cpu:EZ80F91 -keepasm \
-	-optspeed -NOreduceopt -NOgenprintf -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
+	-optsize -NOreduceopt -NOgenprintf -stdinc:"$(HEADERS)" -usrinc:"." -NOdebug \
 	-asmsw:"$(ASM_FLAGS)"
 
 #This is a giant mess, but basically it is just repeated code to properly align all of the necessary libraries and
@@ -229,7 +229,7 @@ all : $(BINDIR)/$(TARGETTYPE)
 
 #This rule builds the Intel HEX file
 $(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
-	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))"
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))$(comma)$(subst $(space),$(comma),$(LOBJECTS))" 
 
 #These rules use ConvHEX to convert the Intel HEX file to a calculator format
 %.8xv : %.hex

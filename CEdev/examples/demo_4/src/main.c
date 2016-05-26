@@ -21,9 +21,9 @@
 void main(void) {
 	uint8_t i;
 	
-	for(i=0; i<200; i++) {
-		dbg_sprintf(dbgout,"This is test %d of a really long string to make sure output is okayish.\n", i);
-	}
+	dbg_sprintf(dbgout,"Testing\n");
+	
+	
 	
 	/* Clean up for the return to the OS */
 	prgm_CleanUp();

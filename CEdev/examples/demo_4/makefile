@@ -8,13 +8,13 @@
 #Change DESCRIPTION to modify what is displayed within a compatible shell (Not compiled in if icon is not present)
 
 #----------------------------
-TARGET ?= DEMO3
+TARGET ?= DEMO4
 DEBUGMODE ?= DEBUG
 ARCHIVED ?= NO
 APPVAR ?= NO
 #----------------------------
 ICONPNG := iconc.png
-DESCRIPTION ?= "C Toolchain Demo 3"
+DESCRIPTION ?= "C Toolchain Demo 4"
 #----------------------------
 
 #Add shared library names to the L varible, for instance:
@@ -121,7 +121,7 @@ endif
 ifdef L
 LIBLOC := $(foreach var,$(L),lib/ce/$(var))
 LIBS := $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).asm))
-OBJECTS += $(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj)))
+LOBJECTS := $(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj)))
 OBJECTS += $(OBJDIR)/$(LIBHEADER_OBJ)
 endif
 
@@ -229,7 +229,7 @@ all : $(BINDIR)/$(TARGETTYPE)
 
 #This rule builds the Intel HEX file
 $(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
-	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))"
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))$(comma)$(subst $(space),$(comma),$(LOBJECTS))" 
 
 #These rules use ConvHEX to convert the Intel HEX file to a calculator format
 %.8xv : %.hex

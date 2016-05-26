@@ -28,6 +28,23 @@
 #define rtc_SetDays(d)          ((*((uint16_t*)0xF30030)) = (uint16_t)(d))
 #define rtc_Time()              (*(volatile uint32_t*)0xF30044)
 
+/**
+ * Resets the RTC back to its original values
+ * If enable is true, the RTC will be enabled during this function
+ */
+void boot_RTCInitialize(bool enable);
+
+/**
+ * Returns a pointer to the system stats
+ */
+void *os_GetSystemStats(void);
+
+/**
+ * Sets up the defualt error handlers if an OS routine encounters an error when running
+ */
+void os_PushErrorHandler(void *routine);
+void os_PopErrorHandler(void);
+
 /* LCD defines */
 #define lcd_GetBacklightLevel()  (*((uint8_t*)0xF60024))
 #define lcd_SetBacklightLevel(b) ((*((uint8_t*)0xF60024))) = (uint8_t)(b);
@@ -46,10 +63,10 @@ typedef struct { uint16_t size; uint8_t *data; } var_t;
  * Cleans up everything and gets ready to enter back to the OS
  * when you are ready to exit your program
  */
-void pgrm_CleanUp(void);
+void prgm_CleanUp(void);
 
 /* This is here because Mateo can't spell */
-#define prgm_CleanUp pgrm_CleanUp
+#define pgrm_CleanUp prgm_CleanUp
 
 /**
  * A faster implementation of memset

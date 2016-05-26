@@ -1,11 +1,10 @@
-; (c) Copyright 2016 Matt Waltz
 ;-------------------------------------------------------------------------
 ; Performs a simple cleanup in order to get ready for the OS
 ;-------------------------------------------------------------------------
 	.assume ADL=1
-	.def _pgrm_CleanUp
+	.def _prgm_CleanUp
 	
-_pgrm_CleanUp:
+_prgm_CleanUp:
 	ld	iy,%D00080
 	call	%0020E5C ; _DelRes
 	call	%0020818 ; _ClrTxtShd

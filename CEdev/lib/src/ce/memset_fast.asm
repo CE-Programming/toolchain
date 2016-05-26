@@ -1,4 +1,3 @@
-; (c) Copyright 2016 Matt Waltz
 ;-------------------------------------------------------------------------
 ; Faster memset variation
 ; Reasons faster:

@@ -1,7 +1,6 @@
-; (c) Copyright 2016 Matt Waltz
 ;-------------------------------------------------------------------------
 ; void abort(void) function
-; For use in CEmu
+; For use in CEmu; triggers an open  in the debugger
 ;-------------------------------------------------------------------------
 	.def	_abort
 	.ref	_exit
