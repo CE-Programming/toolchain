@@ -121,7 +121,7 @@ endif
 ifdef L
 LIBLOC := $(foreach var,$(L),lib/ce/$(var))
 LIBS := $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).asm))
-LOBJECTS := $(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj)))
+LOBJECTS := $(comma)$(subst $(space),$(comma),$(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj))))
 OBJECTS += $(OBJDIR)/$(LIBHEADER_OBJ)
 endif
 
@@ -228,7 +228,7 @@ all : $(BINDIR)/$(TARGETTYPE)
 
 #This rule builds the Intel HEX file
 $(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
-	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))$(comma)$(subst $(space),$(comma),$(LOBJECTS))" 
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))$(LOBJECTS)"
 
 #These rules use ConvHEX to convert the Intel HEX file to a calculator format
 %.8xv : %.hex
