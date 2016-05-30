@@ -31,9 +31,9 @@ set FP_ST_C_SRC=udtof.c udtog.c
 set FP_ASM_SRC=fpadd.asm fpcmp.asm fpdiv.asm fpftol.asm fpltof.asm fpmul.asm fpneg.asm fppack.asm fpsub.asm fpultof.asm fpupop1.asm fpupop2.asm sqrtf.asm
 
 set DEBUG_C_SRC=
-set DEBUG_ASM_SRC=debugger.asm
+set DEBUG_ASM_SRC=debugger.asm removeallbreakpoints.asm removeallwatchpoints.asm removebreakpoint.asm removewatchpoint.asm setbreakpoint.asm setreadwatchpoint.asm setwritewatchpoint.asm setreadwritewatchpoint.asm  setwatchpoint.asm
 set TICE_C_SRC=
-set TICE_ASM_SRC=tice.asm memset_fast.asm prgm_cleanup.asm abort.asm os.asm
+set TICE_ASM_SRC=tice.asm memset_fast.asm prgmcleanup.asm abort.asm os.asm
 
 set CPU=EZ80F91
 set STDINC=%INC%\std

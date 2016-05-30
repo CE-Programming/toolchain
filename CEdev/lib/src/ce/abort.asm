@@ -7,6 +7,7 @@
 	.assume adl=1
 
 _abort:
-	ld	a,1
-	ld	(0FFFFFFh),a
+	scf
+	sbc	hl,hl
+	ld	(hl),1
 	jp	_exit

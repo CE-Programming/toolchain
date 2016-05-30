@@ -1,6 +1,6 @@
 -- Demo 4 ------------------------------------------------------------------------
 
-This demo demonstrates how to use the debugging features implemented in CEmu
+This demo demonstrates how to use a few of the debugging features implemented in CEmu
 
 -- Compiling ----------------------------------------------------------------------
 
