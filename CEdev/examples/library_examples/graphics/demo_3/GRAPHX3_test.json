@@ -1,0 +1,50 @@
+{
+  "rom": "84pce_515.rom",
+  "transfer_files": [
+    "bin/GRAPHX3.8xp"
+  ],
+  "target": {
+    "name": "GRAPHX3",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|300",
+    "hash|1",
+    "key|enter",
+    "delay|150",
+    "hash|2",
+    "key|enter",
+    "delay|150",
+    "hash|3",
+    "key|enter",
+    "delay|300",
+    "hash|4"
+  ],
+  "hashes": {
+    "1": {
+      "description": "Outlines: Yellow rectangle + blue triangle + red circle",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "4C1E2CDE" ]
+    },
+    "2": {
+      "description": "Filled shaped: Yellow rectangle + blue triangle + red circle",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "840C9EDD" ]
+    },
+    "3": {
+      "description": "Same, with screen shifted down a bit",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "699E4435" ]
+    },
+    "4": {
+      "description": "Back to the home screen (exit check)",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44" ]
+    }
+  }
+}
