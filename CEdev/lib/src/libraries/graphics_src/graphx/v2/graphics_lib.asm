@@ -233,10 +233,10 @@ _FillScreen:
 	ld	hl,3
 	add	hl,sp
 	ld	a,(hl)				; get the color index to use
-	ld	bc,lcdSize
-	ld	hl,(currDrawBuffer)
-	push	hl
-	pop	de
+	ld	bc,lcdSize-1
+	ld	de,(currDrawBuffer)
+	sbc	hl,hl
+	add	hl,de
 	inc	de
 	ld	(hl),a
 	ldir
@@ -356,13 +356,13 @@ _FillRectangle_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
+	ld	a,(iy+12)			; a = height
+	or	a,a
+	ret	z				; make sure height is not 0
 	ld	bc,(iy+9)			; bc = width
 	sbc	hl,hl
 	adc	hl,bc
 	ret	z				; make sure width is not 0
-	ld	a,(iy+12)			; a = height
-	or	a,a
-	ret	z				; make sure height is not 0
 	ld	hl,(iy+3)			; hl = x coordinate
 	ld	e,(iy+6)			; e = y coordinate
 _FillRectangle_NoClip_ASM:
@@ -370,23 +370,39 @@ _FillRectangle_NoClip_ASM:
 	mlt	de
 	add	hl,de
 	add	hl,de
-	ld	iy,(currDrawBuffer)
+	ld	de,(currDrawBuffer)
+	add	hl,de
 	ex	de,hl				; de -> place to begin drawing
-	ld	(_RectangleWidth_SMC),bc \.r
-_Rectangle_Loop_NoClip:
-	add	iy,de
-	lea	de,iy
-_RectangleWidth_SMC =$+1
-	ld	bc,0
+	push 	de
+	ld	(_RectangleWidth1_SMC),bc \.r
+	ld	(_RectangleWidth2_SMC),bc \.r
 	ld	hl,color1 \.r
 	ldi					; check if we only need to draw 1 pixel
+	pop	hl
 	jp	po,_Rectangle_NoClip_Skip \.r
-	scf
-	sbc	hl,hl
-	add	hl,de
-	ldir					; draw the current line
+	ldir
 _Rectangle_NoClip_Skip:
-	ld	de,lcdWidth			; move to next line
+	dec 	a
+	ret	z
+	inc	b
+	ld	c,$40				; = slightly faster "ld bc,lcdWidth"
+_Rectangle_Loop_NoClip:
+	add	hl,bc
+	dec	de
+	ex	de,hl
+_RectangleWidth1_SMC =$+1
+	ld	bc,0
+	lddr
+	dec	a
+	ret	z
+	ld      bc,2*lcdWidth+1
+	add     hl,bc
+        inc     de
+        ex      de,hl
+_RectangleWidth2_SMC =$+1        
+        ld      bc,0
+        ldir
+        ld      bc,2*lcdWidth-1
 	dec	a
 	jr	nz,_Rectangle_Loop_NoClip
 	ret
@@ -3015,7 +3031,7 @@ _:	jp	po,t_32 \.r
 	ret
 
 _Polygon_NoClip:
-	ld	hl,_Line_NoClip
+	ld	hl,_Line_NoClip \.r
 	jr	+_
 _Polygon:
 	ld	hl,_Line \.r
@@ -3024,11 +3040,11 @@ _:	ld	(_LineType0_SMC),hl \.r
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	sbc	hl,hl
-	ld	(tmpWidth),hl \.r		; set the for loop counter to 0 (tmpWidth is used as a temp variable)
 	ld	hl,(ix+9)
 	dec	hl
-	ld	(ix+9),hl		; decrement the number of points
+	ld	(ix+9),hl			; decrement the number of points
+	sbc	hl,hl
+	ld	(tmpWidth),hl \.r		; set the for loop counter to 0 (tmpWidth is used as a temp variable)
 	jr	p_3
 p_1:
 	ld	hl,(tmpWidth) \.r
