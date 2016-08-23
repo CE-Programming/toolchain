@@ -1,6 +1,6 @@
 /**
  * @file    GRAPHX CE C Library
- * @version 1.0
+ * @version 2.0
  *
  * @section LICENSE
  *
@@ -164,12 +164,11 @@ uint8_t *gfx_TilePtrMapped(gfx_tilemap_t *tilemap, uint8_t x_offset, uint8_t y_o
 #define gfx_GetTileMapped(a,b,c)	(*(gfx_TilePtrMapped(a, b, c)))
 
 /**
- * Decompress a block of data using an LZ77 decoder
+ * Decompress a block of data using an LZ77 decoder compressed using ConvPNG
  *  in  : Compressed buffer
- *  out : Decompressed buffer; must be large enough to hold decompressed data
- *  insize : Number of input bytes
+ *  out : Decompression buffer; must be large enough to hold decompressed data (size of sprite)
  */
-void gfx_LZDecompress(uint8_t *in, uint8_t *out, unsigned in_size);
+void gfx_LZDecompressSprite(uint8_t *in, gfx_image_t *out);
 
 /**
  * Sets the color index that drawing routines will use
@@ -296,6 +295,11 @@ void gfx_BlitLines(uint8_t buffer, uint8_t y_loc, uint8_t num_lines);
 void gfx_BlitArea(uint8_t buffer, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
 #define gfx_BlitBuffer() gfx_Blit(gfx_screen)
 #define gfx_BlitScreen() gfx_Blit(gfx_buffer)
+
+/**
+ * Scales text in integer steps. Values in the range from 1-5 are preferred.
+ */
+void gfx_SetTextScale(uint8_t width_scale, uint8_t height_scale);
 
 /**
  * Outputs a character at the current cursor position
