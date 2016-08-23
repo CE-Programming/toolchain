@@ -1,3 +1,3 @@
 # Demo 7
 
-This example demonstrates some interesting techniques using the gfx_SwapDraw and gfx_Blit functions
+Exactly like the tilemap demo 6, but uses tilemap image compression to reduce size by 17000 bytes.

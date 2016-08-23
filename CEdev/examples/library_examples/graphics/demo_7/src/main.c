@@ -12,44 +12,105 @@
 
 /* Shared libraries */
 #include <lib/ce/graphx.h>
+#include "gfx/tiles_gfx.h"
 
-/* Put function prototypes here */
+/* Tilemap defines */
+#define TILE_WIDTH          (16)
+#define TILE_HEIGHT         (16)
+
+#define TILE_SIZE           ((TILE_WIDTH * TILE_HEIGHT) + 2) // +2 for width and height bytes
+#define TILEMAP_WIDTH       (32)
+#define TILEMAP_HEIGHT      (25)
+
+#define TILEMAP_DRAW_WIDTH  (20)
+#define TILEMAP_DRAW_HEIGHT (14)
+
+#define Y_OFFSET            (16)
+#define X_OFFSET            (0)
+
+/* This is where the tilemap data is stored */
+extern uint8_t tilemap_map[];
+
+/* Place to hold decompressed tile pointers */
+gfx_image_t *tileset_tiles[128];
 
 /* Put all your code here */
 void main(void) {
+	uint8_t key, i;
+	gfx_image_t *tmp_ptr;
+	gfx_tilemap_t tilemap;
 	unsigned x_offset = 0, y_offset = 0;
+    
+	malloc(0);
+    
+	/* Decompress the tiles */
+	for(i = 0; i < 128; i++) {
+		tmp_ptr = gfx_AllocSprite( TILE_WIDTH, TILE_HEIGHT, malloc );
+		gfx_LZDecompressSprite( tileset_tiles_data_compressed[i], tmp_ptr );
+		tileset_tiles[i] = tmp_ptr;
+	}
+    
+	/* Initialize the tilemap structure */
+	tilemap.map = tilemap_map;
+	tilemap.tiles = tileset_tiles;
+	tilemap.type_width = gfx_tile_16_pixel;
+	tilemap.type_height = gfx_tile_16_pixel;
+	tilemap.tile_height = TILE_HEIGHT;
+	tilemap.tile_width = TILE_WIDTH;
+	tilemap.draw_height = TILEMAP_DRAW_HEIGHT;
+	tilemap.draw_width = TILEMAP_DRAW_WIDTH;
+	tilemap.height = TILEMAP_HEIGHT;
+	tilemap.width = TILEMAP_WIDTH;
+	tilemap.y_loc = Y_OFFSET;
+	tilemap.x_loc = X_OFFSET;
     
 	/* Initialize the 8bpp graphics */
 	gfx_Begin( gfx_8bpp );
 	
 	/* Set up the palette */
-	gfx_SetColor( gfx_black );
+	gfx_SetPalette( tiles_gfx_pal, sizeof(tiles_gfx_pal), 0 );
+	gfx_SetColor( gfx_white );
 	
 	/* Draw to buffer to avoid tearing */
 	gfx_SetDrawBuffer();
 	
-	/* Draw a line on the buffer */
-	//gfx_FillScreen( gfx_black );
-	gfx_Line(0,0,319,239);
+	/* Set monospace font with width of 8 */
+	gfx_SetMonospaceFont(8);
+
+	/* Wait for the enter key to quit */
+	while((key = os_GetCSC()) != 9) {
 	
-	/* Wait for a key */
-	while(!os_GetCSC()); 
-	
-	/* Swap the buffer with the screen */
-	gfx_SwapDraw();
-	
-	/* Copy part of the screen to the offscreen buffer */
-	gfx_Blit( gfx_buffer );
-	//gfx_BlitLines( gfx_buffer, 0, 20 );
-	//gfx_BlitArea( gfx_buffer, 0, 0, 160, 120 );
-	
-	/* This should cause half of the line to flicker, and the other half to stay steady */
-	
-	while(!os_GetCSC()) {
+		/* Draw tilemap and coords */
+		gfx_Tilemap(&tilemap, x_offset, y_offset);
+		gfx_FillRectangle(0,0,320,16);
+		gfx_PrintStringXY("x offset:",48,4);
+		gfx_PrintUInt(x_offset,4);
+		gfx_PrintString(" y offset:");
+		gfx_PrintUInt(y_offset,4);
+		
+		/* Do something based on the keypress */
+		switch(key) {
+			case 1:
+				if (y_offset < (TILEMAP_HEIGHT * TILE_HEIGHT) - (TILEMAP_DRAW_HEIGHT * TILE_HEIGHT))
+					y_offset += TILE_HEIGHT;
+				break;
+			case 2:
+				if (x_offset)
+					x_offset -= TILE_WIDTH;
+				break;
+			case 3:
+				if (x_offset < (TILEMAP_WIDTH * TILE_WIDTH) - (TILEMAP_DRAW_WIDTH * TILE_WIDTH))
+					x_offset += TILE_WIDTH;
+				break;
+			case 4:
+				if (y_offset)
+					y_offset -= TILE_HEIGHT;
+				break;
+			default:
+				break;
+		}
 		gfx_SwapDraw();
 	}
-	
-	//while(!os_GetCSC());
 	
 	/* Close the graphics and return to the OS */
 	gfx_End();

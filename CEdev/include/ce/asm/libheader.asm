@@ -38,6 +38,8 @@ __notfound:
 	ld	hl,__missingappvar
 	call	%0207C0		; _puts
 	call 	%0207F0		; _newline
+	ld	hl,__webaddress
+	call	%0207C0		; _puts
 	jp	%020D8C		; _getkey
 __relocationstart:		; libraries to be relocated will be placed here for the relocator
 	segment	.libs
@@ -49,5 +51,7 @@ __missingappvar:
 	db	"Need"
 __libloadappvar:
 	db	" LibLoad",0
+__webaddress:
+	db	"http://tiny.cc/clibs",0
 
  endif

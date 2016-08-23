@@ -50,8 +50,8 @@ void main(void) {
         printText(Apples, 0, count);
     }
     
-    /* Do not use os_GetKey() in your programs; this is just a demo */
-    os_GetKey();
+    /* Wait for a key press */
+    while( !os_GetCSC() );
     
     /* Clean up, and exit */
     prgm_CleanUp();

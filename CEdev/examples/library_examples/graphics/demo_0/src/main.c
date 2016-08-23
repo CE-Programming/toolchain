@@ -18,7 +18,11 @@ void print_string_centered(const char *str);
 
 /* Put all your code here */
 void main(void) {
+	unsigned x;
+	uint8_t y;
 	const char msg[] = "Hello World!";
+	
+	gfx_palette[0] = 0;
 	
 	/* Seed the random numbers */
 	srand( rtc_Time() );

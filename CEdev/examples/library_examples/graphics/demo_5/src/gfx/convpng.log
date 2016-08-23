@@ -1,12 +1,10 @@
 Opened convpng.ini
 
---- Group tiles_gfx (C) ---
+--- Group all_gfx (C) ---
 Building Palette...
-Palette quality : 100.00%
-TranspColorIndex : 0x00
-TranspColor : 0x7F22
+Palette quality : 97.52%
 1:
- tileset : 100.00% (tileset.c)
+ apple : 97.37% (compression: 4096 -> 2680 bytes) (apple.c)
 
 Converted in 0 s
 

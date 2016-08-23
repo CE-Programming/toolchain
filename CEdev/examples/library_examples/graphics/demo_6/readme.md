@@ -1,3 +1,3 @@
 # Demo 6
 
-Exactly like the tilemap demo 5, but uses tilemap image compression to reduce size by 17000 bytes.
+An example of tilemaping using a sequence of tiles and the keypad

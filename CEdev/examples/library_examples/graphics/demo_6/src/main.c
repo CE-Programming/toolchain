@@ -15,41 +15,28 @@
 #include "gfx/tiles_gfx.h"
 
 /* Tilemap defines */
-#define TILE_WIDTH          (16)
-#define TILE_HEIGHT         (16)
+#define TILE_WIDTH  16
+#define TILE_HEIGHT 16
 
-#define TILE_SIZE           ((TILE_WIDTH * TILE_HEIGHT) + 2) // +2 for width and height bytes
-#define TILEMAP_WIDTH       (32)
-#define TILEMAP_HEIGHT      (25)
+#define TILEMAP_WIDTH  32
+#define TILEMAP_HEIGHT 25
 
-#define TILEMAP_DRAW_WIDTH  (20)
-#define TILEMAP_DRAW_HEIGHT (14)
+#define TILEMAP_DRAW_WIDTH  20
+#define TILEMAP_DRAW_HEIGHT 14
 
-#define Y_OFFSET            (16)
-#define X_OFFSET            (0)
+#define Y_OFFSET 16
+#define X_OFFSET 0
 
-/* This is where the tilemap data is stored */
 extern uint8_t tilemap_map[];
 
-/* Place to hold decompressed tile pointers */
-gfx_image_t *tileset_tiles[128];
-
-/* Put functions prototypes here */
+/* Put functions here */
 
 /* Put all your code here */
 void main(void) {
-	uint8_t key, i;
-	uint8_t *tmp_ptr;
+	uint8_t key;
 	gfx_tilemap_t tilemap;
 	unsigned x_offset = 0, y_offset = 0;
-    
-	/* Decompress the tiles */
-	for(i = 0; i < 128; i++) {
-		tmp_ptr = (uint8_t*)malloc(TILE_SIZE);
-		gfx_LZDecompress(tileset_tiles_data_compressed[i], tmp_ptr, TILE_SIZE);
-		tileset_tiles[i] = (gfx_image_t*)tmp_ptr;
-	}
-    
+
 	/* Initialize the tilemap structure */
 	tilemap.map = tilemap_map;
 	tilemap.tiles = tileset_tiles;
