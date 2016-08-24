@@ -543,12 +543,12 @@ _HorizLine_NoClip:
 	ld	iy,0
 	add	iy,sp
 	ld	e,(iy+6)			; y coordinate
-	ld	bc,(iy+9)			; x coordinate
+	ld	bc,(iy+9)			; width
 _RectHoriz_ASM:
 	sbc	hl,hl
 	adc	hl,bc
 	ret	z				; make sure the width is not 0
-	ld	hl,(iy+3)
+	ld	hl,(iy+3)			; x coordinate
 _HorizLine_NoClip_ASM:
 	ld	d,lcdWidth/2
 	mlt	de
@@ -971,10 +971,7 @@ _FillCircle_NoClip:
 	add	ix,sp
 	lea	hl,ix+-9
 	ld	sp,hl
-	ld	hl,-9
 	sbc	hl,hl
-	ld.s	(ix+7),hl
-	ld.s	(ix+10),hl
 	ld	(ix+-3),hl
 	ld	bc,(ix+12)
 	ld	(ix+-6),bc
@@ -986,49 +983,65 @@ _FillCircle_NoClipSectors:
 	ld	hl,(ix+-3)
 	add	hl,hl
 	push	hl
-	ld	hl,(ix+9)
 	ld	bc,(ix+-6)
+	ld	hl,(ix+9)
 	add	hl,bc
-	ld	e,l
-	ld	hl,(ix+6)
+	push	hl
 	ld	bc,(ix+-3)
+	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	pop	bc
-	push	bc
 	push	hl
-	call	_HorizLine_NoClip_ASM \.r
+	call	_HorizLine_NoClip \.r
+	lea	hl,ix+-9
+	ld	sp,hl
+	ld	hl,(ix+-3)
+	add	hl,hl
+	push	hl
+	ld	bc,(ix+-6)
+	ld	hl,(ix+9)
+	or	a,a
+	sbc	hl,bc
+	push	hl
+	ld	bc,(ix+-3)
+	ld	hl,(ix+6)
+	or	a,a
+	sbc	hl,bc
+	push	hl
+	call	_HorizLine_NoClip \.r
+	lea	hl,ix+-9
+	ld	sp,hl
 	ld	hl,(ix+-6)
 	add	hl,hl
 	push	hl
 	ld	bc,(ix+-3)
 	ld	hl,(ix+9)
 	add	hl,bc
-	ld	e,l
+	push	hl
 	ld	bc,(ix+-6)
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	pop	bc
-	push	bc
 	push	hl
-	call	_HorizLine_NoClip_ASM \.r
+	call	_HorizLine_NoClip \.r
+	lea	hl,ix+-9
+	ld	sp,hl
+	ld	hl,(ix+-6)
+	add	hl,hl
+	push	hl
 	ld	bc,(ix+-3)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,bc
-	ld	e,l
-	pop	hl
-	pop	bc
-	call	_HorizLine_NoClip_ASM \.r
+	push	hl
 	ld	bc,(ix+-6)
-	ld	hl,(ix+9)
+	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	ld	e,l
-	pop	hl
-	pop	bc
-	call	_HorizLine_NoClip_ASM \.r
+	push	hl
+	call	_HorizLine_NoClip \.r
+	lea	hl,ix+-9
+	ld	sp,hl
 	ld	bc,(ix+-3)
 	inc	bc
 	ld	(ix+-3),bc
