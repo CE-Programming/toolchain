@@ -543,12 +543,12 @@ _HorizLine_NoClip:
 	ld	iy,0
 	add	iy,sp
 	ld	e,(iy+6)			; y coordinate
-	ld	bc,(iy+9)			; width
+	ld	bc,(iy+9)			; x coordinate
 _RectHoriz_ASM:
 	sbc	hl,hl
 	adc	hl,bc
 	ret	z				; make sure the width is not 0
-	ld	hl,(iy+3)			; x coordinate
+	ld	hl,(iy+3)
 _HorizLine_NoClip_ASM:
 	ld	d,lcdWidth/2
 	mlt	de
@@ -1352,6 +1352,20 @@ dy12 =$+1
 	jr	changeYLoop
 
 ;-------------------------------------------------------------------------------
+_CheckBlit_ASM:
+	ld	hl,vram+lcdSize
+	ld	de,(mpLcdBase)
+	or	a,a
+	sbc	hl,de
+	add	hl,de
+	jr	nz,+_
+	ld	hl,vram
+_:	or	a,a				; if 0, copy buffer to screen
+	ret	nz
+	ex	de,hl
+	ret
+
+;-------------------------------------------------------------------------------
 _Blit:
 ; Copies the buffer image to the screen and vice versa
 ; Arguments:
@@ -1363,13 +1377,9 @@ _Blit:
 	push	hl
 	push	de
 	ld	a,l				; this is a uint8_t
-	ld	hl,(currDrawBuffer)
+	call	_CheckBlit_ASM \.r
 	ld	bc,lcdSize
-	ld	de,(mpLcdBase)
-_:	or	a,a				; if 0, copy buffer to screen
-	jr	z,+_
-	ex	de,hl
-_:	ldir
+	ldir
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1388,22 +1398,19 @@ _BlitLines:
 	mlt	hl
 	add	hl,hl
 	push	hl
-	pop	bc				; number of lines to copy
 	ld	l,(iy+6)
 	ld	h,lcdWidth/2
 	mlt	hl
 	add	hl,hl
 	push	hl
-	ld	de,(currDrawBuffer)
-	add	hl,de				; hl -> peek location
-	pop	de
-	push	hl
-	ld	hl,(mpLcdBase)
-	add	hl,de
-	pop	de
+	call	_CheckBlit_ASM \.r
+	pop	bc
+	add	hl,bc
 	ex	de,hl
-	ld	a,(iy+3)			; a = buffer to copy to
-	jr	--_
+	add	hl,bc
+	pop	bc				; number of lines to copy
+	ldir
+	ret
 
 ;-------------------------------------------------------------------------------
 _BlitArea:
@@ -1425,18 +1432,12 @@ _BlitArea:
 	add	hl,hl
 	add	hl,de
 	push	hl				; save amount to increment
-	ld	de,(currDrawBuffer)
-	add	hl,de
-	pop	de				; restore amount to increment
-	push	hl
-	ld	hl,(mpLcdBase)
-	add	hl,de				; get ptr to screen
-	pop	de				; restore ptr to buffer
-	ld	a,(iy+3)
-	or	a,a
-	jr	nz,+_
-	ex	de,hl				; swap if copy swap
-_:	ld	bc,(iy+12)
+	call	_CheckBlit_ASM \.r
+	pop	bc
+	add	hl,bc
+	ex	de,hl
+	add	hl,bc
+	ld	bc,(iy+12)
 	ld	(_BlitAreaWidth_SMC),bc \.r
 	push	hl
 	ld	hl,lcdWidth
