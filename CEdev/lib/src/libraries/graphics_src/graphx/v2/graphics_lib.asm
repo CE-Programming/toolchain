@@ -1408,6 +1408,7 @@ _BlitLines:
 	add	hl,bc
 	ex	de,hl
 	add	hl,bc
+	ex	de,hl
 	pop	bc				; number of lines to copy
 	ldir
 	ret
@@ -1437,6 +1438,7 @@ _BlitArea:
 	add	hl,bc
 	ex	de,hl
 	add	hl,bc
+	ex	de,hl
 	ld	bc,(iy+12)
 	ld	(_BlitAreaWidth_SMC),bc \.r
 	push	hl
@@ -1876,6 +1878,7 @@ _GetSprite_NoClip:
 	add	iy,sp
 	ld	de,(iy+6)
 	ld	c,(iy+9)
+	push	bc
 	ld	iy,(iy+3)
 	ld	hl,lcdWidth
 	ld	c,(iy+0)
@@ -1885,6 +1888,7 @@ _GetSprite_NoClip:
 	ld	(NoClipSprGrabNextLine),a \.r
 	ld	hl,(currDrawBuffer)
 	add	hl,de
+	pop	bc
 	ld	b,lcdWidth/2
 	mlt	bc
 	add	hl,bc
