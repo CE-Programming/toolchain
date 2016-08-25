@@ -2429,6 +2429,8 @@ _SetTextScale:
 	push	hl
 	push	de
 	ld	a,l
+	ld	de,TextWidthScale_SMC \.r
+	ld	hl,UseLargeFont_SMC \.r
 	cp	a,c
 	jr	z,+_
 	jr	++_
@@ -2437,14 +2439,17 @@ _:	dec	a
 	inc	a
 _:	or	a,a
 	ret	z
-	ld	(TextWidthScale_SMC),a \.r
+	ld	(de),a
 	ld	a,c
 	or	a,a
 	ret	z
 	ld	(TextHeightScale_SMC),a \.r
-	ld	a,1
+	ld	(hl),1
+	ret
 _BothAreOne:
-	ld	(UseLargeFont_SMC),a \.r
+	ld	(hl),a
+	ld	a,1
+	ld	(de),a
 	ret
 
 ;-------------------------------------------------------------------------------
