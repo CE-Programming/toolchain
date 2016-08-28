@@ -14,10 +14,10 @@
 #define BUFSIZ		128		/* buffer size */
 #define EOF		(-1)		/* end of file */
 #define L_tmpnam	12
-#define SEEK_CUR	0
-#define SEEK_END	1
-#define SEEK_SET	2
-#define SYS_OPEN	3		/* max open files */
+#define SEEK_CUR	1
+#define SEEK_END	2
+#define SEEK_SET	0
+#define SYS_OPEN	5		/* max open files */
 #define FOPEN_MAX	SYS_OPEN
 #define TMP_MAX 	50
 

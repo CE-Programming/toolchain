@@ -507,22 +507,29 @@ _Seek:
 	ld	iy,0
 	add	iy,sp
 	ld	de,(iy+3)
-	ld	c,(ix+9)
+	ld	c,(iy+9)
 	call	_CheckIfSlotOpen \.r
 	jp	z,_ReturnNEG1L \.r
 	ld	a,(iy+6)
 	or	a,a
+	jr	z,SeekSet
+	dec	a
 	jr	z,SeekCur
 	dec	a
-	jr	z,SeekEnd
-	dec	a
 	jp	nz,_ReturnNEG1L \.r
-_SeekHandler_ASM:
+SeekEnd:
+	push	de
+	call	_GetSlotSize_ASM \.r
+SeekSet_ASM:
+	pop	hl
+	add	hl,bc
+	ex	de,hl
+SeekSet:
 	call	_GetSlotSize_ASM \.r
 	push	bc
 	pop	hl
 	or	a,a
-	sbc	hl,de 
+	sbc	hl,de
 	push	de
 	pop	bc
 	jp	c,_ReturnNEG1L \.r
@@ -530,18 +537,8 @@ _SeekHandler_ASM:
 SeekCur:
 	push	de
 	call	_GetSlotOffset_ASM \.r
-	pop	hl
-	add	hl,bc
-	ex	de,hl
-	jr	_SeekHandler_ASM
-SeekEnd:
-	push	de
-	call	_GetSlotSize_ASM \.r
-	pop	hl
-	add	hl,bc
-	ex	de,hl
-	jr	_SeekHandler_ASM
-
+	jr	SeekSet_ASM
+	
 ;-------------------------------------------------------------------------------
 _PutChar:
 ; Performs an fputc on an AppVar

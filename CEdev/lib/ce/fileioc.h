@@ -151,9 +151,9 @@ int ti_GetC(const ti_var_t slot);
 
 /**
  * Seeks to an offset from the origin:
- * SEEK_SET (2) - Seek from beginning of file
- * SEEK_END (1) - Seek from end of file
- * SEEK_CUR (0) - Seek from current offset in file
+ * SEEK_SET (0) - Seek from beginning of file
+ * SEEK_CUR (1) - Seek from current offset in file
+ * SEEK_END (2) - Seek from end of file
  * slot:
  *  varaible slot seeking in
  */
