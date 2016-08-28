@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 /**
  * Varible and flag definitions
