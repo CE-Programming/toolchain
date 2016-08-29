@@ -74,7 +74,6 @@ void ti_CloseAll(void);
  * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   (RAM)
  * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                (RAM)
  * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.   (RAM)
- * Unlike the standard implementation of fopen, the "b" (binary) mode is not available because characters are only 8 bits wide on this platform.
  * Type:
  *  Specifies the type of variable to open
  */
