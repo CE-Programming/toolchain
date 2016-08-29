@@ -169,7 +169,7 @@ uint8_t *gfx_TilePtrMapped(gfx_tilemap_t *tilemap, uint8_t x_offset, uint8_t y_o
  *  out : Decompression buffer; must be large enough to hold decompressed data (size of sprite)
  *  in_size : Size of compressed buffer (using sizeof works well)
  */
-void gfx_LZDecompress(uint8_t *in, uint8_t *out, size_t in_size);
+void gfx_LZDecompress(uint8_t *in, uint8_t *out, unsigned int in_size);
 
 /**
  * Decompress a block of data using an LZ77 decoder that was compressed using ConvPNG
