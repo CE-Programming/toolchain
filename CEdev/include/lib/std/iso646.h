@@ -15,4 +15,4 @@
 #define xor_eq ^=
 #endif
 
-#endif /* __ISO646_H */
+#endif

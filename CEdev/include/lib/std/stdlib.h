@@ -57,26 +57,32 @@ typedef unsigned int size_t;
 #define NULL	(void *)0
 #endif
 
-void * calloc(int nmemb,size_t size);
+/* Dynamic memory functions */
+void *calloc(int nmemb,size_t size);
+void *malloc(size_t size);
+void *realloc(void * ptr,size_t size);
 void free(void * ptr);
-void * malloc(size_t size);
-void * realloc(void * ptr,size_t size);
+
+/* Character and string functions */
 double atof(char * nptr);
 int atoi(char * nptr);
 long atol(char * nptr);
 double strtod(char * nptr,char ** endptr);
 long strtol(char *nptr,char ** endptr,int base);
 unsigned long strtoul(char *nptr,char ** endptr,int base);
-int rand(void);
+
 void srand(unsigned int seed);
+int rand(void);
+
+/* Binary search and quicksort */
+void *bsearch(void * key,void * base, size_t nmemb, size_t size, int (*compar)(void * ,void * ));
+void qsort(void * base,size_t nmemb,size_t size, int (*compar)(void * ,void * ));
+
+/* Exit and abort */
 void abort(void);
 void exit(int status);
-onexit_t onexit(onexit_t (*func)(void));
-void * bsearch(void * key,void * base,
-	size_t nmemb, size_t size,
-	int (*compar)(void * ,void * ));
-void  qsort(void * base,size_t nmemb,size_t size,
-	int (*compar)(void * ,void * ));
+
+/* Absolutes and division */
 int abs(int j);
 div_t div(int numer,int denom);
 long labs(long j);

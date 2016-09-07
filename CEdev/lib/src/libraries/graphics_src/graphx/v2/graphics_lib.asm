@@ -570,7 +570,7 @@ _MemSet_ASM:
 
 ;-------------------------------------------------------------------------------
 _VertLine:
-; Draws an clipped horizontal line with the global color index
+; Draws an clipped vertical line with the global color index
 ; Arguments:
 ;  arg0 : X Coord
 ;  arg1 : Y Coord
@@ -1095,10 +1095,12 @@ _Line:
 ;  arg0: y1
 ; Returns:
 ;  true if drawn, false if offscreen
-	ld	hl,xmax \.r
+	ld	hl,_xmax \.r
 	ld	de,(hl)
 	dec	de
 	ld	(hl),de
+	ld	hl,_ymax \.r
+	dec	(hl)
 	ld	iy,0
 	add	iy,sp
 	lea	hl,iy+-10
@@ -1206,10 +1208,12 @@ m_30:	ld	c,(iy+12)
 	ld	de,(iy+3)
 	call	_Line_NoClip_ASM \.r
 m_31:	ld	sp,iy
-	ld	hl,xmax \.r
+	ld	hl,_xmax \.r
 	ld	de,(hl)
 	inc	de
 	ld	(hl),de
+	ld	hl,_ymax \.r
+	inc	(hl)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1463,103 +1467,119 @@ _BlitAreaDelta_SMC =$+1
 	ret
 
 ;-------------------------------------------------------------------------------
-_ShiftDown:
-; Shifts whatever is in the clip  down by some pixels
+_ShiftLeft:
+; Shifts whatever is in the clip left by some pixels
 ; Arguments:
 ;  arg0 : Amount to shift by
 ; Returns:
 ;  None
-	call	_DownRightShiftCalculate_ASM \.r
-	ex	de,hl
-	ld	hl,3
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,lcdWidth/2
-	mlt	hl
-	add	hl,hl
-	add	hl,de
-	ex	de,hl
-	jr	+_
-
-;-------------------------------------------------------------------------------
-_ShiftRight:
-; Shifts whatever is in the clip  right by some pixels
-; Arguments:
-;  arg0 : Amount to shift by
-; Returns:
-;  None
-	call	_DownRightShiftCalculate_ASM \.r
-	pop	de
-	pop	bc
-	push	bc
-	push	de
-	push	hl
-	pop	de
-	sbc	hl,bc
-	dec	hl
-	dec	de
-	inc	a
-XDeltaDownRight_SMC =$+1
-_:	ld	bc,0
-	lddr
-PosOffsetDownRight_SMC =$+1
-	ld	bc,0
-	sbc	hl,bc
-	ex	de,hl
-	or	a,a
-	sbc	hl,bc
-	ex	de,hl
-	dec	a
-	jr	nz,-_
-	ret
+	.db	$F6
 
 ;-------------------------------------------------------------------------------
 _ShiftUp:
-; Shifts whatever is in the clip  up by some pixels
+; Shifts whatever is in the clip up by some pixels
 ; Arguments:
 ;  arg0 : Amount to shift by
 ; Returns:
 ;  None
-	call	_UpLeftShiftCalculate_ASM \.r
+	scf
+	ld	a,$B0
+	call	_ShiftCalculate_ASM \.r
+	ld	(ShiftAmtOff_SMC),hl \.r
+	jr	z,_
+	sbc	hl,hl
+_:	ex	de,hl
+	ld	hl,(_xmax) \.r
+	ld	bc,(_xmin) \.r
+	sbc	hl,bc
+	sbc	hl,de
+	ld	(ShiftCpyAmt_SMC),hl \.r
 	ex	de,hl
-	ld	hl,3
+	ld	hl,lcdWidth
+	sbc	hl,de
+	ld	(ShiftLineOff_SMC),hl \.r
+	ld	hl,_ymax \.r
+	sub	a,(hl)
+	ld	hl,_ymin \.r
+	ld	e,(hl)
+	add	a,e
+	jr	_Shift_ASM
+
+;-------------------------------------------------------------------------------
+_ShiftRight:
+; Shifts whatever is in the clip right by some pixels
+; Arguments:
+;  arg0 : Amount to shift by
+; Returns:
+;  None
+	.db	$F6
+
+;-------------------------------------------------------------------------------
+_ShiftDown:
+; Shifts whatever is in the clip down by some pixels
+; Arguments:
+;  arg0 : Amount to shift by
+; Returns:
+;  None
+	scf
+	ld	a,$B8
+	call	_ShiftCalculate_ASM \.r
+	ex	de,hl
+	sbc	hl,hl
+	sbc	hl,de
+	ld	(ShiftAmtOff_SMC),hl \.r
+	or	a,a
+	jr	z,_
+	sbc	hl,hl
+_:	ld	bc,(_xmax) \.r
+	add	hl,bc
+	dec	bc
+	ld	e,a
+	ld	a,(_ymin) \.r
+	add	a,e
+	ld	de,(_xmin) \.r
+	sbc	hl,de
+	ld	(ShiftCpyAmt_SMC),hl \.r
+	ld	de,-lcdWidth
+	add	hl,de
+	ld	(ShiftLineOff_SMC),hl \.r
+	ld	hl,_ymax \.r
+	ld	e,(hl)
+	sub	a,e
+	dec	e
+_Shift_ASM:
+	ld	d,lcdWidth/2
+	mlt	de
+	ld	hl,(currDrawBuffer)
+	add	hl,de
+	add	hl,de
+	add	hl,bc
+ShiftCpyAmt_SMC =$+1
+_:	ld	bc,0
+	ex	de,hl
+ShiftAmtOff_SMC =$+1
+	ld	hl,0
+	add	hl,de
+ShiftCpyDir_SMC =$+1
+	ldir
+ShiftLineOff_SMC =$+1
+	ld	hl,0
+	add	hl,de
+	inc	a
+	jr	nz,-_
+	ret
+
+_ShiftCalculate_ASM:
+	ld	(ShiftCpyDir_SMC),a \.r
+	sbc	a,a
+	ld	hl,6
 	add	hl,sp
-	ld	l,(hl)
+	ld	hl,(hl)
+	and	a,l
+	ret	z
 	ld	h,lcdWidth/2
 	mlt	hl
 	add	hl,hl
-	add	hl,de
-	jr	+_
-
-;-------------------------------------------------------------------------------
-_ShiftLeft:
-; Shifts whatever is in the clip  left by some pixels
-; Arguments:
-;  arg0 : Amount to shift by
-; Returns:
-;  None
-	call	_UpLeftShiftCalculate_ASM \.r
-	pop	de
-	pop	bc
-	push	bc
-	push	de
-	push	hl
-	pop	de
-	add	hl,bc
-	dec	hl
-	dec	de
-	inc	a
-XDeltaUpLeft_SMC =$+1
-_:	ld	bc,0
-	ldir
-PosOffsetUpLeft_SMC =$+1
-	ld	bc,0
-	add	hl,bc
-	ex	de,hl
-	add	hl,bc
-	ex	de,hl
-	dec	a
-	jr	nz,-_
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1571,7 +1591,7 @@ _GetClipRegion:
 	ld	hl,3
 	add	hl,sp
 	ld	iy,(hl)
-	call	_ClipRectangularRegion_ASM
+	call	_ClipRectangularRegion_ASM \.r
 	sbc	a,a
 	inc	a
 	ret
@@ -1864,8 +1884,12 @@ _:	ld	c,0
 	jr	nz,-_
 	ret
 
+FF
+FE
+
 ;-------------------------------------------------------------------------------
 _GetSprite_NoClip:
+;_GetSprite:
 ; Grabs the data from the current draw buffer and stores it in another buffer
 ; Arguments:
 ;  arg0 : Pointer to storage buffer
@@ -1874,36 +1898,43 @@ _GetSprite_NoClip:
 ; Returns:
 ;  Pointer to resultant sprite
 	ld	iy,0
-	lea	bc,iy
 	add	iy,sp
-	ld	de,(iy+6)
-	ld	c,(iy+9)
-	push	bc
-	ld	iy,(iy+3)
-	ld	hl,lcdWidth
-	ld	c,(iy+0)
-	ld	a,c
-	sbc	hl,bc
-	ld	(NoClipSprGrabMoveAmt),hl \.r
-	ld	(NoClipSprGrabNextLine),a \.r
-	ld	hl,(currDrawBuffer)
-	add	hl,de
-	pop	bc
+	ld	bc,(iy+9)
+	bit	0,b
 	ld	b,lcdWidth/2
 	mlt	bc
+	ld	hl,(currDrawBuffer)
 	add	hl,bc
 	add	hl,bc
-	ld	a,(iy+1)
-	lea	de,iy+2
-NoClipSprGrabNextLine =$+1
+	jr	z,_
+	ld	de,-lcdWidth*256
+	add	hl,de
+_:	ld	de,(iy+6)
+	add	hl,de
+	ld	de,(iy+3)
+	push	de
+	ld	a,(de)
+	inc	de
+	ld	(GetSprCpyAmt),a \.r
+	ld	c,a
+	ld	a,lcdWidth&$ff
+	sub	a,c
+	ld	c,a
+	sbc	a,a
+	inc	a
+	ld	b,a
+	ld	(GetSprLineOff),bc \.r
+	ld	a,(de)
+	inc	de
+GetSprCpyAmt =$+1
 _:	ld	bc,0
 	ldir
-NoClipSprGrabMoveAmt =$+1
+GetSprLineOff =$+1
 	ld	bc,0
 	add	hl,bc
 	dec	a
 	jr	nz,-_
-	lea	hl,iy
+	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1926,7 +1957,6 @@ _TransparentSprite_NoClip:
 	mlt	bc
 	add	hl,bc
 	add	hl,bc
-	ld	b,0
 	push	hl
 	ld	a,(iy+0)
 	ld	(NoClipSprTransNextLine),a \.r
@@ -1936,6 +1966,7 @@ _TransparentSprite_NoClip:
 	push	ix
 	ld	ixh,a
 	xor	a,a
+	ld	b,a
 NoClipSprTransNextLine =$+1
 _:	ld	c,0
 	lea	de,iy
@@ -2110,6 +2141,7 @@ _Tilemap:
 _:	ld	(_DrawTile_SMC),hl \.r
 	push	ix
 	ld	ix,0
+	lea	bc,ix
 	add	ix,sp
 	lea	hl,ix+-12
 	ld	sp,hl
@@ -3666,62 +3698,6 @@ _PixelPtr_ASM:
 	add	hl,de
 	add	hl,de
 	ret
-
-;-------------------------------------------------------------------------------
-_UpLeftShiftCalculate_ASM:
-; Calculates the position to shift the  for up/left
-; Inputs:
-;  None
-; Outputs:
-;  HL->Place to draw
-	ld	hl,(_xmax) \.r
-	ld	de,(_xmin) \.r
-	push	de
-	or	a,a
-	sbc	hl,de
-	ld	(XDeltaUpLeft_SMC),hl \.r
-	ex	de,hl
-	ld	hl,lcdWidth
-	or	a,a
-	sbc	hl,de
-	ld	(PosOffsetUpLeft_SMC),hl \.r
-	ld	a,(_ymin) \.r
-	ld	c,a
-	ld	a,(_ymax) \.r
-	ld	l,c
-_:	sub	a,c
-	ld	h,lcdWidth/2
-	mlt	hl
-	add	hl,hl
-	pop	de
-	add	hl,de
-	ld	de,(currDrawBuffer)
-	add	hl,de
-	ret
-
-;-------------------------------------------------------------------------------
-_DownRightShiftCalculate_ASM:
-; Calculates the position to shift the  for dowm/right
-; Inputs:
-;  None
-; Outputs:
-;  HL->Place to draw
-	ld	hl,(_xmax) \.r
-	ld	de,(_xmin) \.r
-	push	hl
-	or	a,a
-	sbc	hl,de
-	ld	(XDeltaDownRight_SMC),hl \.r
-	ex	de,hl
-	ld	hl,lcdWidth
-	or	a,a
-	sbc	hl,de
-	ld	(PosOffsetDownRight_SMC),hl \.r
-	ld	a,(_ymin) \.r
-	ld	c,a
-	ld	a,(_ymax) \.r
-	ld	l,a
-	jr	-_
 
 ;-------------------------------------------------------------------------------
 _Max_ASM:

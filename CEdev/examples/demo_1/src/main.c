@@ -25,14 +25,14 @@ void main(void) {
     /* Turn the whole screen black */
     fillScreen(0x00);
     
-    /* Wait for a second */
-    waitSeconds(1);
+    /* Wait for a key press */
+    while( !os_GetCSC() );
     
     /* Turn the whole screen red */
     fillScreen(0xE0);
     
-    /* Wait for a second */
-    waitSeconds(1);
+    /* Wait for a key press */
+    while( !os_GetCSC() );
     
     /* Clean up for the return to the OS */
     prgm_CleanUp();
@@ -42,18 +42,4 @@ void main(void) {
 void fillScreen(unsigned color) {
     /* memset_fast is a way faster implementation of memset; either one will work here though */
     memset_fast(lcd_vramArray, color, 320*240*2);
-}
-
-/* Wait for a specified about of seconds between 0 and 60 */
-/* Note that this will affect the user's actual time on the calculator */
-/* A better option would be to use the general purpose timers, since they provide more accurate timming */
-void waitSeconds(uint8_t seconds) {
-    /* Set the inital seconds to 0 */
-    rtc_SetSeconds(0);
-    
-    /* Load the 0 seconds into the clock */
-    rtc_LoadSetTime();
-    
-    /* Wait until we reach the second needed */
-    while(rtc_GetSeconds() != seconds+1);
 }

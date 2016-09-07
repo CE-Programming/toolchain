@@ -36,8 +36,8 @@ set TICE_C_SRC=
 set TICE_ASM_SRC=tice.asm memset_fast.asm prgmcleanup.asm abort.asm os.asm
 
 set CPU=EZ80F91
-set STDINC=%INC%\std
-set CEINC=%SRC%\ce\include
+set STDINC=%INC%\lib\std
+set CEINC=%CEDEV%\include\lib\ce
 set ZLGINC=%SRC%\std_include
 set CFLG_DBG=-debug -reduceopt
 set CFLG_REL=-NOdebug -optsize

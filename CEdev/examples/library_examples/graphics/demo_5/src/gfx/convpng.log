@@ -2,10 +2,10 @@ Opened convpng.ini
 
 --- Group all_gfx (C) ---
 Building Palette...
-Palette quality : 97.52%
+Palette quality : 95.62%
 1:
- apple : 97.37% (compression: 4096 -> 2680 bytes) (apple.c)
+ apple : 95.39% (compression: 52802 -> 29966 bytes) (apple.c)
 
-Converted in 0 s
+Converted in 2 s
 
 Finished!

@@ -18,7 +18,7 @@ void print_string_centered(const char *str);
 
 /* Put all your code here */
 void main(void) {
-	const char msg[] = "Hello World!";
+	const char *msg = "Hello World!";
 	
 	/* Seed the random numbers */
 	srand( rtc_Time() );
@@ -32,7 +32,7 @@ void main(void) {
 	/* Set the random text color */
 	gfx_SetTextFGColor( randInt(1,255) );
 	
-	/* Print a string centered on the screen */
+	/* Print the message on the screen */
 	print_string_centered( msg );
 	
 	/* Wait for a key to be pressed */

@@ -26,7 +26,7 @@
 
 void main(void) {
 	/* Fill in the body of the main function here */
-	//pgrm_CleanUp();
+	prgm_CleanUp();
 }
 
 /* Put other functions here */

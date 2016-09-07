@@ -69,10 +69,17 @@ typedef struct gfx_point {
 gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine);
 
 /**
- * This routine should probably be used globally, or for small sprites as it uses the stack
+ * This routine should be used globally as it uses the BSS
+ * Note that you will have to initialize the width and height of the sprite manually
  */
-#define gfx_TempSprite(name, width, height) uint8_t name_data[2 + (width) * (height)] = { (width), (height) }; \
-                                            gfx_image_t *name = (gfx_image_t *)name_data
+#define gfx_UninitedSprite(name, max_width, max_height) uint8_t name##_data[2 + (max_width) * (max_height)]; \
+                                                        gfx_image_t *name = (gfx_image_t *)name##_data
+					    
+/**
+ * This routine should be used for small sprites as it uses the stack
+ */
+#define gfx_TempSprite(name, width, height) uint8_t name##_data[2 + (width) * (height)] = { (width), (height) }; \
+                                            gfx_image_t *name = (gfx_image_t *)name##_data
 
 typedef enum gfx_mode {
 	gfx_8bpp = 0x27
@@ -109,28 +116,28 @@ typedef struct gfx_region {
 
 /* Type for tilemap */
 typedef struct gfx_tilemap {
-	uint8_t *map;             /* pointer to indexed map array */
-	gfx_image_t **tiles;          /* pointer to tiles */
-	uint8_t tile_height;      /* individual tile height */
-	uint8_t tile_width;       /* individual tile width */
-	uint8_t draw_height;      /* number of rows to draw in the tilemap */
-	uint8_t draw_width;       /* number of cols to draw tilemap */
-	uint8_t type_width;       /* 2^type_width = tile_width */
-	uint8_t type_height;      /* 2^type_height = tile_height */
-	uint8_t height;           /* total number of rows in the tilemap */
-	uint8_t width;            /* total number of cols in the tilemap */
-	uint8_t y_loc;            /* y pixel location to begin drawing at */
-	uint24_t x_loc;           /* x pixel location to begin drawing at */
+	uint8_t *map;		/* pointer to indexed map array */
+	gfx_image_t **tiles;	/* pointer to tiles */
+	uint8_t tile_height;	/* individual tile height */
+	uint8_t tile_width;	/* individual tile width */
+	uint8_t draw_height;	/* number of rows to draw in the tilemap */
+	uint8_t draw_width;	/* number of cols to draw tilemap */
+	uint8_t type_width;	/* 2^type_width = tile_width */
+	uint8_t type_height;	/* 2^type_height = tile_height */
+	uint8_t height;		/* total number of rows in the tilemap */
+	uint8_t width;		/* total number of cols in the tilemap */
+	uint8_t y_loc;		/* y pixel location to begin drawing at */
+	uint24_t x_loc;		/* x pixel location to begin drawing at */
 } gfx_tilemap_t;
 
 typedef enum gfx_tilemap_type {
-	gfx_tile_2_pixel = 1,      /* Set when using 2 pixel tiles */
-	gfx_tile_4_pixel,          /* Set when using 4 pixel tiles */
-	gfx_tile_8_pixel,          /* Set when using 8 pixel tiles */
-	gfx_tile_16_pixel,         /* Set when using 16 pixel tiles */
-	gfx_tile_32_pixel,         /* Set when using 32 pixel tiles */
-	gfx_tile_64_pixel,         /* Set when using 64 pixel tiles */
-	gfx_tile_128_pixel,        /* Set when using 128 pixel tiles */
+	gfx_tile_2_pixel = 1,	/* Set when using 2 pixel tiles */
+	gfx_tile_4_pixel,	/* Set when using 4 pixel tiles */
+	gfx_tile_8_pixel,	/* Set when using 8 pixel tiles */
+	gfx_tile_16_pixel,	/* Set when using 16 pixel tiles */
+	gfx_tile_32_pixel,	/* Set when using 32 pixel tiles */
+	gfx_tile_64_pixel,	/* Set when using 64 pixel tiles */
+	gfx_tile_128_pixel,	/* Set when using 128 pixel tiles */
 } gfx_tilemap_type_t;
 
 /**
@@ -389,7 +396,7 @@ void gfx_TransparentSprite_NoClip(gfx_image_t *data, uint24_t x, uint8_t y);
  * A pointer to sprite_buffer is also returned for ease of use.
  * sprite_buffer is updated with the screen coordinates given.
  */
-gfx_image_t *gfx_GetSprite_NoClip(gfx_image_t *sprite_buffer, uint24_t x, uint8_t y);
+gfx_image_t *gfx_GetSprite_NoClip(gfx_image_t *sprite_buffer, int x, int y);
 #define gfx_GetSprite gfx_GetSprite_NoClip
 
 /**
@@ -397,8 +404,8 @@ gfx_image_t *gfx_GetSprite_NoClip(gfx_image_t *sprite_buffer, uint24_t x, uint8_
  * Scaling factors must be greater than or equal to 1, and an integer factor
  * Useable with gfx_GetSprite in order to create clipped versions
  */
-void gfx_ScaledSprite_NoClip(gfx_image_t *data, int24_t x, int24_t y, uint8_t width_scale, uint8_t height_scale);
-void gfx_ScaledTransparentSprite_NoClip(gfx_image_t *data, int24_t x, int24_t y, uint8_t width_scale, uint8_t height_scale);
+void gfx_ScaledSprite_NoClip(gfx_image_t *data, int x, int y, uint8_t width_scale, uint8_t height_scale);
+void gfx_ScaledTransparentSprite_NoClip(gfx_image_t *data, int x, int y, uint8_t width_scale, uint8_t height_scale);
 
 /**
  * Sprite flipping and rotating routines
@@ -444,7 +451,7 @@ unsigned int gfx_GetCharWidth(const char c);
 
 /**
  * Sets the clipping window for clipped routines
- * This routine is inclusive
+ * This routine is exclusive
  */
 void gfx_SetClipRegion(int xmin, int ymin, int xmax, int ymax);
 
@@ -458,8 +465,8 @@ bool gfx_GetClipRegion(gfx_region_t *region);
  * Screen shifting routines that operate within the clipping window
  * Note that the data left over is undefined (Must be drawn over)
  */
-void gfx_ShiftDown(uint24_t pixels);
-void gfx_ShiftUp(uint24_t pixels);
+void gfx_ShiftDown(uint8_t pixels);
+void gfx_ShiftUp(uint8_t pixels);
 void gfx_ShiftLeft(uint24_t pixels);
 void gfx_ShiftRight(uint24_t pixels);
 

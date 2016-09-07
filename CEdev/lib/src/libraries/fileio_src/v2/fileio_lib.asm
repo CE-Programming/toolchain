@@ -71,7 +71,7 @@ _CloseAll:
 
 ;-------------------------------------------------------------------------------
 _Resize:
-; Resizes an AppVar
+; Resizes a variable
 ; Arguments:
 ;  arg0 : New size
 ;  arg1 : Slot number
@@ -861,6 +861,7 @@ _DetectVar:
 ; Arguments:
 ;  arg0 : address of pointer to being search
 ;  arg1 : pointer to null terminated string of data to search for
+;  arg2 : type of varaible to search for
 	pop	hl
 	pop	de
 	pop	bc
@@ -875,7 +876,6 @@ _Detect:
 ; Finds an AppVar that starts with some data
 ;  arg0 : address of pointer to being search
 ;  arg1 : pointer to null terminated string of data to search for
-;  arg2 : type of varaible to search for
 	ld	a,appVarObj
 _:	ld	(DetectType_SMC),a \.r
 	push	ix

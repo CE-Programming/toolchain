@@ -13,8 +13,12 @@
 /* Shared libraries */
 #include <lib/ce/graphx.h>
 
+/*
+ * This tutorial is meant to be played around with to get a feeling for how buffering works
+ */
+ 
 /* Put function prototypes here */
-
+ 
 /* Put all your code here */
 void main(void) {
 	unsigned x_offset = 0, y_offset = 0;
@@ -30,10 +34,10 @@ void main(void) {
 	
 	/* Draw a line on the buffer */
 	//gfx_FillScreen( gfx_black );
-	gfx_Line(0,0,319,239);
+	gfx_Line( 0, 0, 319, 239 );
 	
 	/* Wait for a key */
-	while(!os_GetCSC()); 
+	while( !os_GetCSC() ); 
 	
 	/* Swap the buffer with the screen */
 	gfx_SwapDraw();
@@ -45,11 +49,9 @@ void main(void) {
 	
 	/* This should cause half of the line to flicker, and the other half to stay steady */
 	
-	while(!os_GetCSC()) {
+	while( !os_GetCSC() ) {
 		gfx_SwapDraw();
 	}
-	
-	//while(!os_GetCSC());
 	
 	/* Close the graphics and return to the OS */
 	gfx_End();

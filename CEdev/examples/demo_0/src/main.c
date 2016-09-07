@@ -23,12 +23,10 @@ const char Welcome[] = "Welcome to C!";
 char Apples[] = "Apples!";
 char Oranges[] = "Oranges";
 
-int24_t h = 12;
-
 /* Put all your code here */
 void main(void) {
     /* uint8_t is an unsigned integer that can range from 0-255. It generally performs faster than just an int, so try to use it when possible */
-    uint8_t count = h;
+    uint8_t count;
 
     /* This function cleans up the screen and gets everything ready for the OS */
     prgm_CleanUp();

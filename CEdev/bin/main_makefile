@@ -1,4 +1,12 @@
 #----------------------------
+# Startup modules and LibLoad library setup -- feel free to modify these to suit your program.
+# Can be found in CEDev/include/asm
+#----------------------------
+CSTARTUP_ASM := cstartup.asm
+LIBHEADER_ASM := libheader.asm
+#----------------------------
+
+#----------------------------
 #Try not to edit anything below these lines unless you know what you are doing
 #----------------------------
 
@@ -16,8 +24,6 @@ NULL = >nul 2>&1
 #Generate the default names for input and object files
 TARGETHEX := $(TARGET).hex
 ICON_ASM := iconc.asm
-CSTARTUP_ASM := cstartup.asm
-LIBHEADER_ASM := libheader.asm
 
 #Objects
 ICON_OBJ := $(ICON_ASM:%.asm=%.obj)
@@ -25,8 +31,8 @@ CSTARTUP_OBJ := $(CSTARTUP_ASM:%.asm=%.obj)
 LIBHEADER_OBJ := $(LIBHEADER_ASM:%.asm=%.obj)
 
 #Get the locations of the startup modules and LibLoad modules
-LIBHEADER_LOC := $(CEDEV)/include/ce/asm/$(LIBHEADER_ASM)
-CSTARTUP_LOC := $(CEDEV)/include/ce/asm/$(CSTARTUP_ASM)
+LIBHEADER_LOC := $(CEDEV)/include/asm/$(LIBHEADER_ASM)
+CSTARTUP_LOC := $(CEDEV)/include/asm/$(CSTARTUP_ASM)
 
 #Find all the directories in the source input
 ALLDIRS := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
@@ -87,7 +93,7 @@ endif
 
 #Define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
 USERHEADERS := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
-HEADERS := $(subst $(space),;,$(call WINPATH,. $(ALLDIRS) $(addprefix $(CEDEV)/,. include/ce/asm include/ce/c include include/std lib/std/ce lib/ce $(LIBLOC))))
+HEADERS := $(subst $(space),;,$(call WINPATH,. $(ALLDIRS) $(addprefix $(CEDEV)/,. include include/asm include/lib/ce include/lib/std $(LIBLOC))))
 LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib chelp.lib crt.lib crtS.lib nokernel.lib fplib.lib fplibS.lib))
 LIBRARIES += $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).lib))
 

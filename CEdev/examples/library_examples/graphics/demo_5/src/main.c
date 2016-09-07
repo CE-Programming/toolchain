@@ -23,7 +23,7 @@ void main(void) {
 	malloc(0);
 	
 	/* Allocate space for the decompressed sprite */
-	apple = gfx_AllocSprite( 64, 64, malloc );
+	apple = gfx_AllocSprite( 220, 240, malloc );
 	
 	/* Initialize the 8bpp graphics */
 	gfx_Begin( gfx_8bpp );
@@ -38,13 +38,7 @@ void main(void) {
 	gfx_LZDecompressSprite( apple_data_compressed, apple );
 	
 	/* Draw the decompressed sprite */
-	gfx_Sprite( apple, (320 - 64) / 2, (240 - 64) / 2);
-
-	/* Print some scaled text */
-	gfx_SetTextScale( 5, 5 );
-	gfx_SetTextFGColor( 0x01 );
-	gfx_SetTextBGColor( 0x00 );
-	gfx_PrintStringXY( "Apples!", 5, 5 );
+	gfx_Sprite( apple, (320 - 220) / 2, (240 - 240) / 2);
 	
 	/* Wait for a key */
 	while( !os_GetCSC() );

@@ -4,7 +4,7 @@
 #define all_gfx_H
 #include <stdint.h>
 
-extern uint8_t apple_data_compressed[2680];
+extern uint8_t apple_data_compressed[29966];
 extern uint16_t all_gfx_pal[256];
 
 #endif
