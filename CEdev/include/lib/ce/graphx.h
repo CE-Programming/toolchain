@@ -255,9 +255,9 @@ void gfx_FillRectangle_NoClip(uint24_t x, uint8_t y, uint24_t width, uint8_t hei
  * Draws a filled circle measured from the top left origin.
  */
 void gfx_Circle(int x, int y, unsigned radius);
-void gfx_Circle_NoClip(uint24_t x, uint8_t y, uint8_t radius);
 void gfx_FillCircle(int x, int y, unsigned radius);
 void gfx_FillCircle_NoClip(uint24_t x, uint8_t y, uint8_t radius);
+#define gfx_Circle_NoClip gfx_Circle
 
 /**
  * Draws a polygon outline
