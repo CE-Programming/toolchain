@@ -43,23 +43,25 @@ _init:
 
 	di
 	call	0020848h	; _RunInicOff
-	ld	hl,0E00005h
-	ld	a,(hl)
-	ld	(__saves+1),a
-	ld	(hl),2          ; reduce flash wait states (because of rtl)
 	ld	hl,__low_bss
 	ld	bc,010DE2h      ; maximum size of BSS+Heap
 	call	00210DCh        ; _MemClear
-
-	ld	(__errsp+1),sp
+	push	iy
+	ld	a,(0E00005h)
+	push	af
+	ld	(hl),2          ; reduce flash wait states (because of rtl)
+	ld	hl,(0F20030h)   ; save timer control state
+	push	hl
+	ld	(__errsp+1),sp  ; save the stack from death
 	call	_main
 _exit:
-	ld	hl,0E00005h
-__saves:
-	ld	(hl),0
 __errsp:
 	ld	sp,0
-	ld	iy,0D00080h      ; Restore IY for OS
+	pop	hl
+	ld	(0F20030h),hl   ; restore timer control state
+	pop	af
+	ld	(0E00005h),a    ; restore flash wait states
+	pop	iy              ; restore iy for OS
 	ret
 ;-------------------------------------------------------------------------------
 	segment	code
