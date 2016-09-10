@@ -1284,4 +1284,16 @@ void asm_EnableAPD(void);
 #define tLcapIAcute	0xCD
 #define tGarbageCollect	0xCE
 
+// 2 byte extended tokens (tExtTok) present in OS 5.2 and above
+#define tSEQn		0x8F	// 'SEQ(n)'
+#define tSEQn1		0x90	// 'SEQ(n+1)'
+#define tSEQn2		0x91	// 'SEQ(n+2)'
+#define tLEFT		0x92	// 'LEFT'
+#define tCENTER		0x93	// 'CENTER'
+#define tRIGHT		0x94	// 'RIGHT'
+#define tInvBinom	0x95	// 'invBinom('
+#define tWait		0x96	// 'Wait_'
+#define tToString	0x97	// 'toString('4
+#define tEval		0x98	// 'eval('
+
 #endif
