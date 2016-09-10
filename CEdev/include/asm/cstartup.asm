@@ -47,7 +47,9 @@ _init:
 	ld	bc,010DE2h      ; maximum size of BSS+Heap
 	call	00210DCh        ; _MemClear
 	push	iy
-	ld	a,(0E00005h)
+	ld	hl,0E00005h
+	push	hl
+	ld	a,(hl)
 	push	af
 	ld	(hl),2          ; reduce flash wait states (because of rtl)
 	ld	hl,(0F20030h)   ; save timer control state
@@ -60,7 +62,8 @@ __errsp:
 	pop	hl
 	ld	(0F20030h),hl   ; restore timer control state
 	pop	af
-	ld	(0E00005h),a    ; restore flash wait states
+	pop	hl
+	ld	(hl),a    ; restore flash wait states
 	pop	iy              ; restore iy for OS
 	ret
 ;-------------------------------------------------------------------------------
