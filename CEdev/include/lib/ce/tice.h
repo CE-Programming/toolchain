@@ -1293,7 +1293,7 @@ void asm_EnableAPD(void);
 #define tRIGHT		0x94	// 'RIGHT'
 #define tInvBinom	0x95	// 'invBinom('
 #define tWait		0x96	// 'Wait_'
-#define tToString	0x97	// 'toString('4
+#define tToString	0x97	// 'toString('
 #define tEval		0x98	// 'eval('
 
 #endif

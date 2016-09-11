@@ -2302,13 +2302,13 @@ _TilePtrMapped:
 	ld	ix,0
 	add	ix,sp
 	ld	iy,(ix+6)
-	ld	h,(ix+12)
-	ld	l,(iy+9)
+	ld	h,(ix+12)	; y offset
+	ld	l,(iy+13)
 	mlt	hl
 	ex	de,hl
 	sbc	hl,hl
-	ld	l,(ix+9)
-	ld	bc,(iy+0)
+	ld	l,(ix+9)	; x offset
+	ld	bc,(iy+0)	; pointer to map
 	add	hl,de
 	add	hl,bc
 	pop	ix
