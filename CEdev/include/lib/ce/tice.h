@@ -267,55 +267,52 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
 void *os_RclAns(uint8_t *type);
 
 /**
- * Copies a real_t type to another location
- * Returns dest
+ * Copies a real_t
  */
-real_t *os_RealCopy(real_t *dest, const real_t *src);
+real_t os_RealCopy(const real_t *src);
 
 /**
- * Urnary operations used to interact with the OS math functions
- * All return result
+ * Unary operations used to interact with the OS math functions
  */
-real_t *os_RealAcosRad(real_t *result, const real_t *arg);
-real_t *os_RealAsinRad(real_t *result, const real_t *arg);
-real_t *os_RealAtanRad(real_t *result, const real_t *arg);
-real_t *os_RealCosRad(real_t *result, const real_t *arg);
-real_t *os_RealRadToDeg(real_t *result, const real_t *arg);
-real_t *os_RealExp(real_t *result, const real_t *arg);
-real_t *os_RealFloor(real_t *result, const real_t *arg);
-real_t *os_RealFrac(real_t *result, const real_t *arg);
-real_t *os_RealRoundInt(real_t *result, const real_t *arg);
-real_t *os_RealLog(real_t *result, const real_t *arg);
-real_t *os_RealNeg(real_t *result, const real_t *arg);
-real_t *os_RealDegToRad(real_t *result, const real_t *arg);
-real_t *os_RealInv(real_t *result, const real_t *arg);
-real_t *os_RealSinRad(real_t *result, const real_t *arg);
-real_t *os_RealSqrt(real_t *result, const real_t *arg);
-real_t *os_RealTanRad(real_t *result, const real_t *arg);
-real_t *os_RealInt(real_t *result, const real_t *arg);
-cplx_t *os_CplxSquare(cplx_t *result, const cplx_t *arg);
+real_t os_RealAcosRad(const real_t *arg);
+real_t os_RealAsinRad(const real_t *arg);
+real_t os_RealAtanRad(const real_t *arg);
+real_t os_RealCosRad(const real_t *arg);
+real_t os_RealRadToDeg(const real_t *arg);
+real_t os_RealExp(const real_t *arg);
+real_t os_RealFloor(const real_t *arg);
+real_t os_RealFrac(const real_t *arg);
+real_t os_RealRoundInt(const real_t *arg);
+real_t os_RealLog(const real_t *arg);
+real_t os_RealNeg(const real_t *arg);
+real_t os_RealDegToRad(const real_t *arg);
+real_t os_RealInv(const real_t *arg);
+real_t os_RealSinRad(const real_t *arg);
+real_t os_RealSqrt(const real_t *arg);
+real_t os_RealTanRad(const real_t *arg);
+real_t os_RealInt(const real_t *arg);
+cplx_t os_CplxSquare(const cplx_t *arg);
 
 /**
  * Binary operations used to interact with the OS math functions
- * All return result
  */
-real_t *os_RealAdd(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealDiv(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealGcd(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealLcm(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealMax(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealMin(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealMul(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealNcr(real_t *result, const real_t *total, const real_t *num);
-real_t *os_RealNpr(real_t *result, const real_t *total, const real_t *num);
-real_t *os_RealPow(real_t *result, const real_t *base, const real_t *exp);
-real_t *os_RealRandInt(real_t *result, const real_t *min, const real_t *max);
-real_t *os_RealMod(real_t *result, const real_t *arg1, const real_t *arg2);
-real_t *os_RealSub(real_t *result, const real_t *arg1, const real_t *arg2);
+real_t os_RealAdd(const real_t *arg1, const real_t *arg2);
+real_t os_RealDiv(const real_t *arg1, const real_t *arg2);
+real_t os_RealGcd(const real_t *arg1, const real_t *arg2);
+real_t os_RealLcm(const real_t *arg1, const real_t *arg2);
+real_t os_RealMax(const real_t *arg1, const real_t *arg2);
+real_t os_RealMin(const real_t *arg1, const real_t *arg2);
+real_t os_RealMul(const real_t *arg1, const real_t *arg2);
+real_t os_RealNcr(const real_t *total, const real_t *num);
+real_t os_RealNpr(const real_t *total, const real_t *num);
+real_t os_RealPow(const real_t *base, const real_t *exp);
+real_t os_RealRandInt(const real_t *min, const real_t *max);
+real_t os_RealMod(const real_t *arg1, const real_t *arg2);
+real_t os_RealSub(const real_t *arg1, const real_t *arg2);
 /**
  * digits must be in the range 0 - 9
  */
-real_t *os_RealRound(real_t *result, const real_t *arg, char digits);
+real_t os_RealRound(const real_t *arg, char digits);
 
 /**
  * Returns -1, 0, or 1 depending on the comparison
@@ -326,10 +323,10 @@ int os_RealCompare(const real_t *arg1, const real_t *arg2);
  * Conversion routines for ti-floats.
  * All saturate on overflow.
  */
-int24_t os_RealToInt24(real_t *arg);
-real_t *os_Int24ToReal(real_t *result, int24_t arg);
-float os_RealToFloat(real_t *arg);
-real_t *os_FloatToReal(real_t *result, float arg);
+int24_t os_RealToInt24(const real_t *arg);
+real_t os_Int24ToReal(int24_t arg);
+float os_RealToFloat(const real_t *arg);
+real_t os_FloatToReal(float arg);
 
 /** os_RealToStr:
   *  This converts a ti-float to a ti-ascii string.
@@ -359,7 +356,7 @@ int os_RealToStr(char *result, const real_t *arg, char maxLength, char mode, cha
   *  end: if non-null, pointer to end of parsed number is stored here
   *  returns result
   */
-real_t *os_StrToReal(real_t *result, const char *string, char **end);
+real_t os_StrToReal(const char *string, char **end);
 
 /** 
  * Basically a reimplemented form of printf that prints to some debugging device
