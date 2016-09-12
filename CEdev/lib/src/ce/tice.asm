@@ -112,6 +112,8 @@
 	.def _os_GetDrawBGColor_BROKEN
 	.def _os_GetDrawFGColor
 	.def _os_FontGetID
+	.def _os_RealToInt24
+	.def _os_Int24ToReal
 	.def _os_ForceCmdNoChar
 	.def _os_GetSymTablePtr
 	.def _os_NextSymEntry
@@ -119,6 +121,8 @@
 	.def _os_MemChk
 	.def _os_SetTimer2
 	.def _os_DisableTimer2
+	.def _os_FloatToReal
+	.def _os_RealToFloat
 	.def _os_FontDrawTransText
 	.def _os_CreateAppVar
 	.def _asm_MoveDown
@@ -242,6 +246,8 @@ _os_GetSystemStats              equ 021ED4h
 _os_GetDrawBGColor_BROKEN       equ 021EE4h ; doesn't work due to bug (needs to be ld hl.sis)
 _os_GetDrawFGColor              equ 021EE8h
 _os_FontGetID                   equ 021EECh
+_os_RealToInt24                 equ 021EF4h
+_os_Int24ToReal                 equ 021EF8h
 _os_ForceCmdNoChar              equ 021FA8h
 _os_GetSymTablePtr              equ 021FB0h
 _os_NextSymEntry                equ 021FB4h
@@ -249,6 +255,8 @@ _os_ChkFindSym                  equ 021FB8h
 _os_MemChk                      equ 021FF0h
 _os_SetTimer2                   equ 022080h
 _os_DisableTimer2               equ 022084h
+_os_FloatToReal                 equ 022170h
+_os_RealToFloat                 equ 022174h
 _os_FontDrawTransText           equ 022178h
 _os_CreateAppVar                equ 022184h
 _asm_MoveDown                   equ 0207F4h

@@ -322,6 +322,15 @@ real_t *os_RealRound(real_t *result, const real_t *arg, char digits);
  */
 int os_RealCompare(const real_t *arg1, const real_t *arg2);
 
+/**
+ * Conversion routines for ti-floats.
+ * All saturate on overflow.
+ */
+int24_t os_RealToInt24(real_t *arg);
+real_t *os_Int24ToReal(real_t *result, int24_t arg);
+float os_RealToFloat(real_t *arg);
+real_t *os_FloatToReal(real_t *result, float arg);
+
 /** os_RealToStr:
   *  This converts a ti-float to a ti-ascii string.
   *  result: zero terminated string copied to this address
