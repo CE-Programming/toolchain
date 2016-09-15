@@ -426,6 +426,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
  * Use the below defines to send to boot_SetTimersControlRegister
  */
 #define TIMER1_ENABLE	1 << 0	// Enables Timer 1
+#define TIMER1_DISABLE	0 << 0	// Disables Timer 1
 #define TIMER1_32K	1 << 1	// Use the 32K clock for timer 1
 #define TIMER1_CPU	0 << 1	// Use the CPU clock rate for timer 1
 #define TIMER1_INT	1 << 2	// Enable an interrupt for the timer 1
@@ -434,6 +435,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define TIMER1_DOWN	0 << 9	// Timer 1 counts down
 
 #define TIMER2_ENABLE	1 << 3	// Enables Timer 2
+#define TIMER2_DISABLE	0 << 3	// Enables Timer 2
 #define TIMER2_32K	1 << 4	// Use the 32K clock for timer 2
 #define TIMER2_CPU	0 << 4	// Use the CPU clock rate for timer 2
 #define TIMER2_INT	1 << 5	// Enable an interrupt for the timer 2
