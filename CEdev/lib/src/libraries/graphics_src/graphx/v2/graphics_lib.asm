@@ -1407,6 +1407,7 @@ _BlitLines:
 	mlt	hl
 	add	hl,hl
 	push	hl
+	ld	a,(iy+3)
 	call	_CheckBlit_ASM \.r
 	pop	bc
 	add	hl,bc
@@ -1437,6 +1438,7 @@ _BlitArea:
 	add	hl,hl
 	add	hl,de
 	push	hl				; save amount to increment
+	ld	a,(iy+3)
 	call	_CheckBlit_ASM \.r
 	pop	bc
 	add	hl,bc

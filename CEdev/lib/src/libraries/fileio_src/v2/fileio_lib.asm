@@ -378,19 +378,18 @@ _Write:
 ;  arg3 : Slot number
 ; Returns:
 ;  Number of chunks written if success
-	push	ix
-	ld	ix,0
-	add	ix,sp
-	ld	c,(ix+15)
+	ld	iy,0
+	add	iy,sp
+	ld	c,(iy+12)
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNULL_PopIX \.r
-	ld	bc,(ix+9)
-	ld	hl,(ix+12)
+	jp	z,_ReturnNULL \.r
+	ld	bc,(iy+6)
+	ld	hl,(iy+9)
 	call	__smulu			; hl*bc
 	ex	de,hl
 	call	_CheckInRAM_ASM \.r
 	jp	c,_ReturnNULL_PopIX \.r
-	ld	hl,(ix+6)
+	ld	hl,(iy+3)
 	ld	bc,0
 _:	ld	a,(hl)
 	push	hl
@@ -421,17 +420,16 @@ _Read:
 ;  arg3 : Slot number
 ; Returns:
 ;  Number of chunks read if success
-	push	ix
-	ld	ix,0
-	add	ix,sp
-	ld	c,(ix+15)
+	ld	iy,0
+	add	iy,sp
+	ld	c,(iy+12)
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNULL_PopIX \.r
-	ld	bc,(ix+9)
-	ld	hl,(ix+12)
+	jp	z,_ReturnNULL \.r
+	ld	bc,(iy+6)
+	ld	hl,(iy+9)
 	call	__smulu			; hl*bc
 	ex	de,hl
-	ld	hl,(ix+6)
+	ld	hl,(iy+3)
 	ld	bc,0
 _:	push	hl
 	push	de
@@ -449,13 +447,12 @@ _:	push	hl
 	ld	a,e
 	or	a,d
 	jr	nz,-_
-_s:	ld	de,(ix+9)
+_s:	ld	de,(iy+6)
 	ex.s	de,hl
 	push	hl
 	ld	l,c
 	ld	h,b
 	pop	bc
-	pop	ix
 	jp	__sdivu
 
 ;-------------------------------------------------------------------------------

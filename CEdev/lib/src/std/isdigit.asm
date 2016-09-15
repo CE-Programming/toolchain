@@ -15,8 +15,7 @@ _isdigit:
 	push	hl
 	or	a,a
 	sbc	hl,hl
-	ld	a,e
-	and	a,128
+	bit	7,e
 	ret	nz
 	ex	de,hl
 	ld	de,___maptab

@@ -17,8 +17,8 @@ set ASM=%BIN%\ez80asm.exe
 set CC=%BIN%\eZ80cc.exe
 set LIB=%BIN%\ez80lib.exe
 
-set RTL_C_SRC=atoi.c atol.c atos.c bsearch.c calloc.c labs.c maptab.c modf.c qsort.c rand.c sabs.c srand.c strtod.c strtol.c strtoul.c ufltinfo.c ufltrnd.c upscan.c ureverse.c usscan.c strdup.c
-set RTL_ST_C_SRC=sscanf.c uitoa.c ultoa.c ustoa.c uuitoa.c uultoa.c uustoa.c vprintf.c vsprintf.c
+set RTL_C_SRC=atoi.c atol.c atos.c bsearch.c calloc.c labs.c maptab.c modf.c qsort.c rand.c sabs.c srand.c strtod.c strtol.c strtoul.c ufltinfo.c ufltrnd.c ureverse.c strdup.c
+set RTL_ST_C_SRC=uitoa.c ultoa.c ustoa.c uuitoa.c uultoa.c uustoa.c vprintf.c vsprintf.c
 
 set RTL_NOKERNEL_C_SRC=free.c malloc.c realloc.c
 set RTL_ASM_SRC=abs.asm isalnum.asm isalpha.asm iscntrl.asm isdigit.asm isgraph.asm islower.asm isprint.asm ispunct.asm isspace.asm isupper.asm isxdigit.asm isascii.asm sprintf.asm strtok.asm longjmp.asm memchr.asm memcmp.asm memcpy.asm memmove.asm memset.asm sbrk.asm setjmp.asm strcat.asm strchr.asm strcmp.asm strcpy.asm strcspn.asm strlen.asm strncat.asm strncmp.asm strncpy.asm strpbrk.asm strrchr.asm strspn.asm strstr.asm div.asm ldiv.asm tolower.asm toupper.asm strncasecmp.asm
