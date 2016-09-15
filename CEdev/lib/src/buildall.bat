@@ -17,11 +17,11 @@ set ASM=%BIN%\ez80asm.exe
 set CC=%BIN%\eZ80cc.exe
 set LIB=%BIN%\ez80lib.exe
 
-set RTL_C_SRC=abs.c atoi.c atol.c atos.c bsearch.c calloc.c isalnum.c isalpha.c iscntrl.c isdigit.c isgraph.c islower.c isprint.c ispunct.c isspace.c isupper.c isxdigit.c isascii.c labs.c maptab.c modf.c qsort.c rand.c sabs.c srand.c strtod.c strtol.c strtoul.c tolower.c toupper.c ufltinfo.c ufltrnd.c upscan.c ureverse.c usscan.c strdup.c strncasecmp.c strcasecmp.c
+set RTL_C_SRC=atoi.c atol.c atos.c bsearch.c calloc.c labs.c maptab.c modf.c qsort.c rand.c sabs.c srand.c strtod.c strtol.c strtoul.c ufltinfo.c ufltrnd.c upscan.c ureverse.c usscan.c strdup.c
 set RTL_ST_C_SRC=sscanf.c uitoa.c ultoa.c ustoa.c uuitoa.c uultoa.c uustoa.c vprintf.c vsprintf.c
 
 set RTL_NOKERNEL_C_SRC=free.c malloc.c realloc.c
-set RTL_ASM_SRC=sprintf.asm strtok.asm longjmp.asm memchr.asm memcmp.asm memcpy.asm memmove.asm memset.asm sbrk.asm setjmp.asm strcat.asm strchr.asm strcmp.asm strcpy.asm strcspn.asm strlen.asm strncat.asm strncmp.asm strncpy.asm strpbrk.asm strrchr.asm strspn.asm strstr.asm div.asm ldiv.asm
+set RTL_ASM_SRC=abs.asm isalnum.asm isalpha.asm iscntrl.asm isdigit.asm isgraph.asm islower.asm isprint.asm ispunct.asm isspace.asm isupper.asm isxdigit.asm isascii.asm sprintf.asm strtok.asm longjmp.asm memchr.asm memcmp.asm memcpy.asm memmove.asm memset.asm sbrk.asm setjmp.asm strcat.asm strchr.asm strcmp.asm strcpy.asm strcspn.asm strlen.asm strncat.asm strncmp.asm strncpy.asm strpbrk.asm strrchr.asm strspn.asm strstr.asm div.asm ldiv.asm tolower.asm toupper.asm strncasecmp.asm
 
 set HLP_C_SRC=
 set HLP_ASM_SRC=bdivs.asm bdivu.asm bldix.asm bldiy.asm bmuls.asm brems.asm bremu.asm bshl.asm bshrs.asm bshru.asm bstix.asm bstiy.asm case.asm iand.asm idivs.asm idivu.asm ildix.asm ildiy.asm imulu.asm indcall.asm ineg.asm inot.asm ior.asm irems.asm iremu.asm ishl.asm ishrs.asm ishru.asm istix.asm istiy.asm itol.asm ixor.asm ladd.asm land.asm lcmpu.asm ldivs.asm ldivu.asm lldix.asm lldiy.asm lmulu.asm lneg.asm lnot.asm lor.asm lrems.asm lremu.asm lshl.asm lshrs.asm lshru.asm lstix.asm lstiy.asm lsub.asm lxor.asm sand.asm sdivs.asm sdivu.asm sldix.asm sldiy.asm smulu.asm sneg.asm snot.asm sor.asm srems.asm sremu.asm sshl.asm sshrs.asm sshru.asm sstix.asm sstiy.asm stoi.asm stoiu.asm sxor.asm frbmuls.asm frbtof.asm frftob.asm frftoi.asm frftos.asm frftoub.asm frftoui.asm frftous.asm frimuls.asm frimulu.asm fritof.asm frsmuls.asm frsmulu.asm frstof.asm frubtof.asm fruitof.asm frustof.asm frameset0.asm frameset.asm setflag.asm scmpzero.asm icmpzero.asm lcmpzero.asm seqcase.asm seqcaseD.asm case24.asm case24D.asm case16.asm case16D.asm case8.asm case8D.asm

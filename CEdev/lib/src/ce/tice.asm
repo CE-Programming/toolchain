@@ -109,7 +109,7 @@
 	.def _os_SetTimer1
 	.def _os_DisableTimer1
 	.def _os_GetSystemStats
-	.def _os_GetDrawBGColor_BROKEN
+	.def _os_GetDrawBGColor
 	.def _os_GetDrawFGColor
 	.def _os_FontGetID
 	.def _os_RealToInt24
@@ -243,7 +243,7 @@ _os_FontSelect                  equ 021E28h
 _os_SetTimer1                   equ 021EC8h
 _os_DisableTimer1               equ 021ECCh
 _os_GetSystemStats              equ 021ED4h
-_os_GetDrawBGColor_BROKEN       equ 021EE4h ; doesn't work due to bug (needs to be ld hl.sis)
+_os_GetDrawBGColor              equ 021EE4h
 _os_GetDrawFGColor              equ 021EE8h
 _os_FontGetID                   equ 021EECh
 _os_RealToInt24                 equ 021EF4h

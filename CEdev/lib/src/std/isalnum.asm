@@ -7,6 +7,7 @@
 ; 	if( (unsigned char)c & (unsigned char)0x80 )
 ;		return (0);
 ;	return(__maptab[c] & (unsigned char)(UC|LC|DIG));
+; }
 
 _isalnum:
 	pop	hl
@@ -23,7 +24,6 @@ _isalnum:
 	add	hl,de
 	ld	a,(hl)
 	and	a,13
-	or	a,a
 	sbc	hl,hl
 	ld	l,a
 	ret

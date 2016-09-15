@@ -1,14 +1,15 @@
-	.def	_isalpha
+	.def	_isxdigit
 	.ref	___maptab
 	.assume adl=1
-	
+
 ; original source
-; int isalnum(int c) {
+; int isxdigit(int c) {
 ; 	if( (unsigned char)c & (unsigned char)0x80 )
 ;		return (0);
-;	return(__maptab[c] & (unsigned char)(UC|LC));
+;	return(__maptab[c] & (unsigned char)(DIG|HEX));
+; }
 
-_isalpha:
+_isxdigit:
 	pop	hl
 	pop	de
 	push	de
@@ -22,7 +23,7 @@ _isalpha:
 	ld	de,___maptab
 	add	hl,de
 	ld	a,(hl)
-	and	a,12
+	and	a,17
 	sbc	hl,hl
 	ld	l,a
 	ret
