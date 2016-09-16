@@ -13,9 +13,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def	__sshrs, __sshrs_b
+	.def __sshrs, __sshrs_b
 	.assume adl=1
-	
-__sshrs_b      equ 00024Ch
-__sshrs        equ 000248h	
 
+__sshrs_b	equ 00024Ch
+__sshrs		equ 000248h

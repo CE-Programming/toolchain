@@ -11,8 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __lldix
 	.assume adl=1
-        .def    __lldix
 	
-__lldix        equ 0001C0h
-
+__lldix		equ 0001C0h

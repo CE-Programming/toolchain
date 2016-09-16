@@ -10,8 +10,7 @@
 ; Registers Used:
 ;	None
 ;-------------------------------------------------------------------------
-	.assume adl=1 
-	.def    __lnot
-	.ref	__inot
+	.def __lnot
+	.assume adl=1
 
-__lnot         equ 0001D4h
+__lnot		equ 0001D4h

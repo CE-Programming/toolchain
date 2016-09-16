@@ -1,12 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
+	.def _strcmp
+	.assume adl=1
 
-	.assume ADL=1
-	SEGMENT code
+; int strcmp(register char *s1, register char *s2)
 
-	XDEF _strcmp
-
-;   int strcmp(register char *s1, register char *s2)
-_strcmp        equ 0000C8h
-
-	END
-
+_strcmp		equ 0000C8h

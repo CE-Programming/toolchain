@@ -1,11 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
-	FILE	".\strlen.asm"
-	.assume ADL=1
-	SEGMENT code
+	.def _strlen
+	.assume adl=1
 
-;   size_t strlen(char *s)
-_strlen        equ 0000D4h
+; size_t strlen(char *s);
 
-	XDEF _strlen
-	END
-
+_strlen		equ 0000D4h

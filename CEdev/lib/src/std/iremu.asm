@@ -14,9 +14,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __iremu
 	.assume adl=1
-        .def    __iremu
-	.ref	__idvrmu
 
-__iremu        equ 000170h
+__iremu		equ 000170h
 

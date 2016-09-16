@@ -8,8 +8,7 @@
 ; Output:
 ; Registers Used:
 ;-------------------------------------------------------------------------
+	.def __indcall
 	.assume adl=1
-	.def	__indcall
 
-__indcall      equ 00015Ch
-
+__indcall	equ 00015Ch

@@ -17,8 +17,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __smulu,__smuls
 	.assume adl=1
-	.def	__smulu,__smuls
 
 __smuls        equ 000224h
 __smulu        equ 000228h

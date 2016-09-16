@@ -1,13 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
+	.def _strcspn
+	.assume adl=1
 
-	.assume ADL=1
-	SEGMENT code
+; size_t strcspn(char *s1, char *s2);
 
-	XREF _strlen:ROM
-	XDEF _strcspn
-	
-;   size_t strcspn(char *s1, char *s2)
-_strcspn       equ 0000D0h
-
-	END
-
+_strcspn	equ 0000D0h

@@ -13,11 +13,7 @@
 ; Registers Used:
 ;	None
 ;-------------------------------------------------------------------------
-
-	segment	code
-
+	.def __lcmpu
 	.assume adl=1
-	.def	__lcmpu, __lcmps
 
-__lcmps        equ 0001A8h
-__lcmpu        equ 0001ACh
+__lcmpu		equ 0001ACh

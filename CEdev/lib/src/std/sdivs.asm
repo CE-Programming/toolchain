@@ -14,8 +14,7 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
+	.def __sdivs
 	.assume adl=1
-	.def	__sdivs
-	.ref	__idivs
 	
-__sdivs        equ 000208h
+__sdivs		equ 000208h

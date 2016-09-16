@@ -19,7 +19,7 @@
 ; Registers Used:
 ; 
 ;-------------------------------------------------------------------------
+	.def __seqcase
 	.assume adl=1
-	.def	__seqcase
 
-__seqcase      equ 000210h
+__seqcase	equ 000210h

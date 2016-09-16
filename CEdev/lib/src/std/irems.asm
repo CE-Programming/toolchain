@@ -13,9 +13,7 @@
 ; Registers Used:
 ;	de,af
 ;-------------------------------------------------------------------------
+	.def __irems
 	.assume adl=1
-	.def	__irems
-	.ref	__iremu
 
-__irems        equ 00016Ch
-
+__irems		equ 00016Ch

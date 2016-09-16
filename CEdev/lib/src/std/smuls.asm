@@ -6,7 +6,7 @@
 ;		  bc : 16 bits
 ; 
 ;	Operand2: 
-;		  hl :	 16 bits
+;		  hl : 16 bits
 ;
 ; Output:
 ;	Result:   hl : 16 bits
@@ -14,8 +14,7 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
+	.def __smuls
 	.assume adl=1
-	.def	__smuls
-	.ref	__imuls
 	
-__smuls        equ 000224h	
+__smuls		equ 000224h	

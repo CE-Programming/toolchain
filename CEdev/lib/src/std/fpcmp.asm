@@ -21,10 +21,7 @@
 ; OUTPUTS:	FLAGS based on Op1 - Op2
 ;
 ;--------------------------------------------------------------
-	segment	CODE
+	.def __fcmp
 	.assume adl=1
-	.def	__fcmp
-	.ref	__lcmps
 
 __fcmp         equ 000274h
-

@@ -13,9 +13,7 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
+	.def __ldivs
 	.assume adl=1
-	.def	__ldivs
-	.ref	__ldivu, __lneg
-	
-__ldivs        equ 0001B4h
 
+__ldivs		equ 0001B4h

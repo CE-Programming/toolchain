@@ -10,8 +10,7 @@
 ; Registers Used:
 ;	flags
 ;-------------------------------------------------------------------------
+	.def __lneg
 	.assume adl=1
-	.def	__lneg
 	
-__lneg         equ 0001D0h
-
+__lneg		equ 0001D0h

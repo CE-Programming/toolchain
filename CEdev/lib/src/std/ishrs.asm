@@ -13,10 +13,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def	__ishrs, __ishrs_b
+	.def __ishrs, __ishrs_b
 	.assume adl=1
 
-__ishrs_b      equ 000180h
-__ishrs        equ 00017Ch
-
-
+__ishrs_b	equ 000180h
+__ishrs		equ 00017Ch

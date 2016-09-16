@@ -11,8 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __ildiy
 	.assume adl=1
-        .def    __ildiy
 
-__ildiy        equ 00014Ch
-
+__ildiy		equ 00014Ch

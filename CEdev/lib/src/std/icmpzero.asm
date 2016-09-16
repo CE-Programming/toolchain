@@ -10,8 +10,7 @@
 ; Registers Used:
 ;	None
 ;-------------------------------------------------------------------------
- 
 	.def	__icmpzero
 	.assume adl=1
 
-__icmpzero     equ 000138h
+__icmpzero	equ 000138h

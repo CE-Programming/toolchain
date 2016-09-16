@@ -3438,22 +3438,22 @@ _FlipSpriteY:
 	ld	(ix+1),a
 	ld	(ix+0),c
 	lea	de,ix+2
-	push	ix
-	ld	iyl,a
+	ex	(sp),ix
 _FlipHorizWidth_SMC =$+1
 _:	ld	b,0
-_:	ld	a,(hl)
+	ld	c,a
+_:	dec	hl
+	ld	a,(hl)
 	ld	(de),a
-	dec	hl
 	inc	de
 	djnz	-_
+	ld	a,c
 _FlipHorizDelta_SMC =$+1
 	ld	bc,0
 	add	hl,bc
-	dec 	iyl
+	dec 	a
 	jr	nz,--_
 	pop	hl
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------

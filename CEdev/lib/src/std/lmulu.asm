@@ -16,9 +16,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __lmulu
 	.assume adl=1
-	.def	__lmulu,__lmuls
 
-__lmuls        equ 0001C8h
-__lmulu        equ 0001CCh
-
+__lmulu		equ 0001CCh

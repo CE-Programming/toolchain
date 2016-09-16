@@ -13,8 +13,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def	__ishru, __ishru_b
+	.def __ishru, __ishru_b
 	.assume adl=1
-	
-__ishru_b      equ 000188h
-__ishru        equ 000184h
+
+__ishru_b	equ 000188h
+__ishru		equ 000184h

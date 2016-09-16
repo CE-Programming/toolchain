@@ -13,7 +13,7 @@
 ; Registers Used:
 ;	None
 ;-------------------------------------------------------------------------
+	.def __lcmps
 	.assume adl=1
-	.def	__lcmps
 
-__lcmps        equ 0001A8h
+__lcmps		equ 0001A8h

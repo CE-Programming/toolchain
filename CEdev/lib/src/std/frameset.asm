@@ -1,5 +1,12 @@
-;	        Copyright 1992-2008 Zilog, Inc. 
 	.assume adl=1
 	.def	__frameset
 	
-__frameset     equ 00012Ch
+__frameset:
+	pop	de
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	add	hl,sp
+	ld	sp,hl
+	ex	de,hl
+	jp	(hl)

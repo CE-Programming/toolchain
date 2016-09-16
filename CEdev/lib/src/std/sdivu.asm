@@ -14,9 +14,8 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
+	.def __sdivu
 	.assume adl=1
-	.def	__sdivu
-	.ref	__idivu
 	
 __sdivu        equ 00020Ch
 

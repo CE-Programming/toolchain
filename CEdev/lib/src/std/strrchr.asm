@@ -1,12 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
-	FILE	".\strrchr.asm"
-	.ASSUME ADL=1
-	SEGMENT code
+	.def _strrchr
+	.assume adl=1
 
-;   char *strrchr(char *s,int c)
-_strrchr       equ 0000E8h
+; char *strrchr(char *s, int c)
 
-	XREF _strlen:ROM
-	XDEF _strrchr
-	END
-
+_strrchr	equ 0000E8h

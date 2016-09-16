@@ -11,8 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __lstiy
 	.assume adl=1
-        .def    __lstiy
 	
 __lstiy        equ 0001F4h
-

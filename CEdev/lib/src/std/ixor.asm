@@ -13,7 +13,7 @@
 ; Registers Used:
 ;	a
 ;-------------------------------------------------------------------------
+	.def __ixor
 	.assume adl=1
-	.def	__ixor
 
-__ixor         equ 000198h
+__ixor		equ 000198h

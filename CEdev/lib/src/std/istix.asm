@@ -12,8 +12,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __istix
 	.assume adl=1
-        .def    __istix
-	
-__istix        equ 00018Ch
 
+__istix		equ 00018Ch

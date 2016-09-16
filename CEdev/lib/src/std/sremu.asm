@@ -14,9 +14,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.assume adl=1
 	.def	__sremu
 	.ref	__iremu
-	
-__sremu        equ 00023Ch
+	.assume adl=1
 
+__sremu		equ 00023Ch

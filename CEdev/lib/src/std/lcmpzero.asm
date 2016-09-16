@@ -10,8 +10,7 @@
 ; Registers Used:
 ;	None
 ;-------------------------------------------------------------------------
-	.def	__lcmpzero
-	.ref	__lcmpu
+	.def __lcmpzero
 	.assume adl=1
 
-__lcmpzero     equ 0001B0h
+__lcmpzero	equ 0001B0h

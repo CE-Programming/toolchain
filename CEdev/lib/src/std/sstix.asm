@@ -12,8 +12,8 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __sstix
 	.assume adl=1
-        .def    __sstix
 	
-__sstix        equ 000258h
+__sstix		equ 000258h
 

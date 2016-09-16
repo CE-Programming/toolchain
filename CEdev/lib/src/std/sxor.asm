@@ -12,8 +12,7 @@
 ; Registers Used:
 ;	a
 ;-------------------------------------------------------------------------
+	.def __sxor
 	.assume adl=1
-	.def	__sxor
 
-__sxor         equ 000268h
-	
+__sxor		equ 000268h

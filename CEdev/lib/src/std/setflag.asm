@@ -15,8 +15,8 @@
 ;		S = S xor 0 -> S = S
 ;	if ( V != 0)
 ;		S = S xor V
- 
-	.def	__setflag
+;-------------------------------------------------------------------------
+	.def __setflag
 	.assume adl=1
 
-__setflag      equ 000218h
+__setflag	equ 000218h

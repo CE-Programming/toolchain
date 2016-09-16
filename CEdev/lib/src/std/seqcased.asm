@@ -20,7 +20,7 @@
 ;	DW24 defaultLab             6+3*numCases
 ; 
 ;-------------------------------------------------------------------------
+	.def __seqcaseD
 	.assume adl=1
-	.def	__seqcaseD
 
-__seqcaseD     equ 000214h
+__seqcaseD	equ 000214h

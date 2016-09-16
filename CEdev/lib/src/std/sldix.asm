@@ -11,8 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __sldix
 	.assume adl=1
-        .def    __sldix
 	
-__sldix        equ 00021Ch
-
+__sldix		equ 00021Ch

@@ -11,7 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __lstix
 	.assume adl=1
-        .def    __lstix
-	
-__lstix        equ 0001F0h
+
+__lstix		equ 0001F0h

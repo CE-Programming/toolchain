@@ -13,17 +13,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __ldivu, __ldvrmu
 	.assume adl=1
-	.def	__ldivu,__ldvrmu
 
 __ldivu        equ 0001B8h
-
-; Input:
-;	EuHL = dividend
-;	AuBC = divisor
-; Output:
-;	EuIX = quotient
-;	AuHL = remainder
 __ldvrmu       equ 0001BCh
-
-

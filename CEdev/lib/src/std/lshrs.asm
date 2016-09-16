@@ -13,8 +13,7 @@
 ; Registers Used:
 ;	flags
 ;-------------------------------------------------------------------------
-	.def	__lshrs
+	.def __lshrs
 	.assume adl=1
 
 __lshrs        equ 0001E8h
-

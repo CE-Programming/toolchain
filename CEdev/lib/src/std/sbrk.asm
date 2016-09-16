@@ -14,7 +14,7 @@
 	.assume adl=1
 	.ref	__heapbot
 	.ref	__heaptop
-    .def    __s_sbrk
+	.def    __s_sbrk
 
 	SEGMENT DATA
 __sbrkbase:
@@ -28,11 +28,13 @@ __s_sbrk:
 	ld	de,(__sbrkbase)
 	add	hl,de
 	jr	c,_fail
+	
         ; fail  if hl >= sp.
         ; hl is now, or will be, the next un-allocated address = minimal value
         ; for sp that will not corrupt allocated data or that writing to
         ; allocated data may corrupt the stack.
-        ; Actually, if hl is anywhere close to sp we're probably in trouble,
+        ; Actually, if hl is anywhere close to sp we're probably in trouble :(
+	
         push    hl
         sbc     hl,sp
         pop     hl

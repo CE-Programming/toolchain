@@ -13,9 +13,7 @@
 ; Registers Used:
 ;	de,af
 ;-------------------------------------------------------------------------
+	.def __lrems
 	.assume adl=1
-	.def	__lrems
-	.ref	__lremu, __lneg
 	
-__lrems        equ 0001DCh
-
+__lrems		equ 0001DCh

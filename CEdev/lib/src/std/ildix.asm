@@ -11,8 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __ildix
 	.assume adl=1
-        .def    __ildix
 	
-__ildix        equ 000148h
-
+__ildix		equ 000148h

@@ -11,8 +11,8 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __sldiy
 	.assume adl=1
-        .def    __sldiy
 	
-__sldiy        equ 000220h
+__sldiy		equ 000220h
 

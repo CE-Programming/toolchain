@@ -10,8 +10,7 @@
 ; Registers Used:
 ;	None
 ;-------------------------------------------------------------------------
- 
-	.def	__scmpzero
+	.def __scmpzero
 	.assume adl=1
 
-__scmpzero        equ 000204h
+__scmpzero	equ 000204h

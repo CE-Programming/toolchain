@@ -12,7 +12,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __istiy
 	.assume adl=1
-        .def    __istiy
-	
-__istiy        equ 000190h
+
+__istiy		equ 000190h

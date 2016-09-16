@@ -1,6 +1,6 @@
 ; (c) Copyright 2001-2008 Zilog, Inc.
 ;-------------------------------------------------------------------------
-; Integer Multiplication Signed/Unsigned.
+; Integer Multiplication Unsigned.
 ;	Note:	When multipying two n-bit values, the low-order n-bits
 ;		of the product are the same, whether or not the values
 ;		are considered signed or unsigned.
@@ -16,10 +16,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __imulu,__imul_b
 	.assume adl=1
-	.def	__imulu,__imuls,__imul_b
-	
-__imul_b       equ 000150h
-__imuls        equ 000154h
-__imulu        equ 000158h
+
+__imul_b	equ 000150h
+__imulu		equ 000158h
 

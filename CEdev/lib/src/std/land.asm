@@ -13,9 +13,7 @@
 ; Registers Used:
 
 ;-------------------------------------------------------------------------
+	.def __land
 	.assume adl=1
-	.def	__land
-	.ref	__iand
 
-__land         equ 0001A4h
-
+__land		equ 0001A4h

@@ -13,8 +13,8 @@
 ; Registers Used:
 
 ;-------------------------------------------------------------------------
+	.def __ladd, __ladd_b
 	.assume adl=1
-	.def	__ladd, __ladd_b
 
 __ladd_b       equ 0001A0h
 __ladd         equ 00019Ch

@@ -1,4 +1,3 @@
-; Created 12/2001: G.Loegel
 ; (c) Copyright 2001-2008 Zilog, Inc.
 ;-------------------------------------------------------------------------
 ; Short Shift Left
@@ -13,10 +12,11 @@
 ;	Result:   HL : 16 bit 
 ; Registers Used:
 ;	none
+; Comments:
+;       Created 12/2001: G.Loegel
 ;-------------------------------------------------------------------------
-	.def	__sshl, __sshl_b
+	.def __sshl, __sshl_b
 	.assume adl=1
 
-__sshl_b       equ 000244h
-__sshl         equ 000240h	
-
+__sshl_b	equ 000244h
+__sshl		equ 000240h

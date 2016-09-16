@@ -13,8 +13,7 @@
 ; Registers Used:
 ;	flags
 ;-------------------------------------------------------------------------
+	.def __lsub
 	.assume adl=1
-        .def    __lsub
 
-__lsub         equ 0001F8h
-
+__lsub		equ 0001F8h

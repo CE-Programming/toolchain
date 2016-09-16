@@ -1,12 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
+	.def _strchr
+	.assume adl=1
 
-	.assume ADL=1
-	SEGMENT code
+; char *strchr(char *s, int c);
 
-	XREF _strlen
-	XDEF _strchr
-
-;   char *strchr(char *s,int c)
-_strchr        equ 0000C4h
-
-	END
+_strchr		equ 0000C4h

@@ -14,18 +14,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __idivu,__idvrmu
 	.assume adl=1
-	.def	__idivu,__idvrmu
 
-__idivu        equ 000140h
-
-; Input:
-;	uHL = dividend
-;	uBC = divisor
-; Output:
-;	uDE = quotient
-;	uHL = remainder
-; Uses:
-;	AF, BC
-__idvrmu       equ 000144h
-
+__idivu		equ 000140h
+__idvrmu	equ 000144h

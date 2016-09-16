@@ -13,8 +13,7 @@
 ; Registers Used:
 ;	flags
 ;-------------------------------------------------------------------------
-	.def	__lshru
+	.def __lshru
 	.assume adl=1
 
-__lshru        equ 0001ECh
-
+__lshru		equ 0001ECh

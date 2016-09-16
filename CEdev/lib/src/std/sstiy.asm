@@ -12,8 +12,8 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+        .def __sstiy
 	.assume adl=1
-        .def    __sstiy
 	
-__sstiy        equ 00025Ch
+__sstiy		equ 00025Ch
 

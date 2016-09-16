@@ -30,8 +30,7 @@
 #define q1  0.152151737879002e+5
 #define q2  -0.173678953558234e+3
 
-double sinh(double arg)
-{
+double sinh(double arg) {
 	double temp, argsq;
 	register int sign;
 
@@ -59,8 +58,7 @@ double sinh(double arg)
 	return(sign*temp);
 }
 
-double cosh(double arg)
-{
+double cosh(double arg) {
     double val;
 
 	if(arg < 0)

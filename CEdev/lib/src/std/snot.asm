@@ -10,25 +10,7 @@
 ; Registers Used:
 ;	a
 ;-------------------------------------------------------------------------
+	.def __snot
 	.assume adl=1
-	 
-	.def	__snot
-__snot:
-	push	af
-	;; 
-	;; low 8 bits
-	;; 
-	ld	a,l
-	cpl
-	ld	l,a
-	;; 
-	;; high 8 bits
-	;; 
-	ld	a,h
-	cpl
-	ld	h,a
 
-	pop	af
-	ret	
-
- 
+__snot		equ 000230h

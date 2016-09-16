@@ -10,7 +10,7 @@
 ; Registers Used:
 ;	a
 ;-------------------------------------------------------------------------
-        .def    __stoi
+        .def __stoi
 	.assume adl=1
 
-__stoi         equ 000260h
+__stoi		equ 000260h

@@ -13,8 +13,7 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
-	.assume adl=1
 	.def	__lxor
-	.ref	__ixor
+	.assume adl=1
 
-__lxor         equ 0001FCh	
+__lxor		equ 0001FCh	

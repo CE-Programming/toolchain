@@ -13,9 +13,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __lremu
 	.assume adl=1
-	.def	__lremu
-	.ref	__ldvrmu
 
-__lremu        equ 0001E0h
-
+__lremu		equ 0001E0h

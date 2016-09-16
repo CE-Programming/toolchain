@@ -14,9 +14,8 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
+	.ref __irems
+	.def __srems
 	.assume adl=1
-	.ref	__irems
-	.def	__srems
 
-__srems        equ 000238h
-
+__srems		equ 000238h

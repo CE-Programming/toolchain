@@ -1,6 +1,6 @@
-; (c) Copyright 2001-2008 Zilog, Inc.
-
-	.assume adl=1
 	.def	_sprintf
-	
-_sprintf       equ 0000BCh
+	.assume adl=1
+
+; int sprintf ( char * str, const char * format, ... );
+
+_sprintf	equ 0000BCh

@@ -9,9 +9,8 @@
 ;	Result:   hl : 24/16 bit
 ; Registers Used:
 ;-------------------------------------------------------------------------
+	.def __inot,__snot
 	.assume adl=1
-	.def	__inot,__snot
-	
+
 __inot         equ 000164h
 __snot         equ 000230h
-

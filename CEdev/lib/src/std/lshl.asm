@@ -13,8 +13,7 @@
 ; Registers Used:
 ;	flags
 ;-------------------------------------------------------------------------
-	.def	__lshl
+	.def __lshl
 	.assume adl=1
 
-__lshl         equ 0001E4h
-
+__lshl		equ 0001E4h

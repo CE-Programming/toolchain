@@ -13,7 +13,7 @@
 ; Registers Used:
 ;	a
 ;-------------------------------------------------------------------------
+	.def __sand
 	.assume adl=1
-	.def	__sand
 	
-__sand         equ 000200h	
+__sand		equ 000200h

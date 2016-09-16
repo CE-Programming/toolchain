@@ -1,12 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
+	.def _strncpy
+	.assume adl=1
 
-	.ASSUME ADL=1
-	SEGMENT code
+; char *strncpy(char *dst, char *src, size_t n)
 
-;   char *strncpy(char *dst,char *src,size_t n)
-_strncpy       equ 0000E0h
-
-	XREF _strlen
-	XDEF _strncpy
-	END
-
+_strncpy	equ 0000E0h

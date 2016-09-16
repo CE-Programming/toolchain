@@ -13,8 +13,7 @@
 ; Registers Used:
 ;	de,af
 ;-------------------------------------------------------------------------
+	.def __lmuls
 	.assume adl=1
-	.def	__lmuls
-	.ref	__lmulu
-	
-__lmuls        equ 0001C8h
+
+__lmuls		equ 0001C8h

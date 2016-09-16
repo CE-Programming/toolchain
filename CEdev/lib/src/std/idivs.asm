@@ -14,8 +14,7 @@
 ; Registers Used:
 ;	a, de
 ;-------------------------------------------------------------------------
+	.def __idivs
 	.assume adl=1
-	.def	__idivs
-	.ref	__idivu
 
-__idivs        equ 00013Ch
+__idivs		equ 00013Ch

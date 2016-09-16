@@ -1,13 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
-	FILE	".\strpbrk.asm"
-	.ASSUME ADL=1
-	SEGMENT code
+	.def _strpbrk
+	.assume adl=1
 	
-;   char *strpbrk(char *s1,char *s2)
-_strpbrk       equ 0000E4h
+; char *strpbrk(char *s1, char *s2)
 
-	XREF _strchr:ROM
-	XREF _strlen
-	XDEF _strpbrk
-	END
-
+_strpbrk	equ 0000E4h

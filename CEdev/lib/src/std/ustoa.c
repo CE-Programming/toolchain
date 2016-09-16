@@ -35,4 +35,3 @@ char _mt_stoa(short n,char* __print_buff,struct fmt_type* print_fmt)
   return(_mt_ltoa((long)n,__print_buff,print_fmt));
 }
 #endif
-

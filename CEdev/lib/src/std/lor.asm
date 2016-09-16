@@ -13,9 +13,7 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
+	.def __lor
 	.assume adl=1
-	.def    __lor
-	.ref	__ior
 
-__lor          equ 0001D8h
-
+__lor		equ 0001D8h

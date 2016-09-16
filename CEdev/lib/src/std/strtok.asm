@@ -1,10 +1,5 @@
-; Copyright (C) 1999-2008 Zilog, Inc, All Rights Reserved
-;-------------------------------------------------------------------------
-	.assume ADL=1
-	SEGMENT code
-	XDEF _strtok
+	.def _strtok
+	.assume adl=1
 	
-_strtok        equ 0000F4h
-
-	END
+_strtok		equ 0000F4h
 	

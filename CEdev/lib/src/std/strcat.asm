@@ -1,11 +1,6 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
-
-	SEGMENT code
-	.assume ADL=1
-	XDEF _strcat
+	.def _strcat
+	.assume adl=1
 	
-;   char *strcat(char *s1,char *s2)
-_strcat        equ 0000C0h
-	
-	END
+; char *strcat(char *s1, char *s2);
 
+_strcat		equ 0000C0h

@@ -6,7 +6,6 @@
 #include <math.h>
 #define	ln10	2.30258509299404
 
-double log10(double arg)
-{
+double log10(double arg) {
 	return(log(arg)/ln10);
 }

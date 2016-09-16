@@ -20,8 +20,8 @@
 ; Registers Used:
 ;	a,b,c,d,e,h,l,iy
 ;-------------------------------------------------------------------------
-	.assume adl=1
 	.def	.uldiv
+	.assume adl=1
 
 .uldiv:
 	push	ix

@@ -11,8 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __lldiy
 	.assume adl=1
-        .def    __lldiy
-	
-__lldiy        equ 0001C4h
 
+__lldiy		equ 0001C4h
