@@ -8,25 +8,20 @@ _calloc:
 	pop	de
 	pop	bc
 	pop	hl
-	push	bc
 	push	hl
+	push	bc
 	push	de
 	call	__imulu
 	push	hl
 	call	_malloc
-	add	hl,de 
-	or	a,a 
+	add	hl,de
+	xor	a,a
 	sbc	hl,de
-	pop	bc
-	ret	z
-	push	bc
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	push	hl
+	ld	e,a
 	push	de
-	call	_memset
+	push	hl
+	call	nz,_memset
 	pop	hl
-	pop	bc
+	pop	de
 	pop	bc
 	ret
