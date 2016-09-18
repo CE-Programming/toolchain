@@ -20,9 +20,8 @@
 ; Table Format:
 ;	[24-bit value][JP label (4-bytes)] 7 bytes total
 ; 
-; 
 ;-------------------------------------------------------------------------
+	.def __case
 	.assume adl=1
-	.def	__case
 
-__case equ 000110h 
+__case		equ 000110h 

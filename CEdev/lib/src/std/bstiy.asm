@@ -12,8 +12,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __bstiy
 	.assume adl=1
-        .def    __bstiy
 	
-__bstiy        equ 000108h
-
+__bstiy		equ 000108h

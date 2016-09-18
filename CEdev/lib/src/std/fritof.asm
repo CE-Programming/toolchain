@@ -11,9 +11,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __fritof
 	.assume adl=1
-	.def	__fritof
-	.ref	__fruitof
 
-__fritof       equ 0002B8h
-
+__fritof	equ 0002B8h

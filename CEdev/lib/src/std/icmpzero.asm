@@ -13,4 +13,8 @@
 	.def	__icmpzero
 	.assume adl=1
 
-__icmpzero	equ 000138h
+__icmpzero:
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ret

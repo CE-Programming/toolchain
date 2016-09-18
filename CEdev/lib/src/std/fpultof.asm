@@ -16,12 +16,7 @@
 ;		abc:	IEEE Single precision.
 ;
 ;--------------------------------------------------------------
-
-	segment	CODE
+	.def __ultof
 	.assume	adl=1
-	.ref	__fppack
-        .def    __ultof
-	
-__ultof        equ 000280h
 
-	end
+__ultof		equ 000280h

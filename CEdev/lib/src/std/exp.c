@@ -23,8 +23,7 @@
 #define	sqrt2	1.41421356237310
 #define	maxf	10000
 
-double exp(double arg)
-{
+double exp(double arg) {
 	double fraction;
 	double temp1, temp2, xsq;
 	int ent;

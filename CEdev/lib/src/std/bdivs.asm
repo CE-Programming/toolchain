@@ -13,32 +13,25 @@
 ; Registers Used:
 ;	d, e
 ;-------------------------------------------------------------------------
-	.def	__bdivs
-	.ref	__bdivu
+	.ref __bdivu
+	.def __bdivs
 	.assume adl=1
 
 __bdivs:
 	push	bc
-	;;
-	;; Check the sign
-	;; 
 	xor	a,a
-	sub a,b
-	jp m,_L0
-	ld b,a
+	sub	a,b
+	jp	m,_L0
+	ld	b,a
 _L0:
 	xor	a,a
-	sub a,c
-	jp m,_L1
-	ld c,a
+	sub	a,c
+	jp	m,_L1
+	ld	c,a
 _L1:
-
 	call	__bdivu
-	;;
-	;; Check the sign of the quotient
-	;; 
 	pop	bc
-	push hl
+	push	hl
 	ld	l,a
 	ld	a,b
 	xor	a,c
@@ -47,6 +40,4 @@ _L1:
 	neg
 _L2:
 	pop	hl
-
-	ret	
-
+	ret

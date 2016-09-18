@@ -12,8 +12,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __bstix
 	.assume adl=1
-        .def    __bstix
 
-__bstix        equ 00010Ch
+__bstix		equ 00010Ch
 

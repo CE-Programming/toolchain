@@ -7,8 +7,7 @@
 /************************************************************************/
 #include <math.h>
 
-double floor(double d)
-{
+double floor(double d) {
 	double fraction;
 
 	if (d<0.0) {
@@ -22,4 +21,3 @@ double floor(double d)
 	}
 	return(d);
 }
-

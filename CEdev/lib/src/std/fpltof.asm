@@ -14,12 +14,7 @@
 ; OUTPUTS:	AuBC 32-bit	IEEE Single precision.
 ;
 ;--------------------------------------------------------------
-
-	segment	CODE
+	.def __ltof
 	.assume	adl=1
 
-	.ref	__fppack
-        .def    __ltof
-
-__ltof         equ 000284h
-
+__ltof		equ 000284h

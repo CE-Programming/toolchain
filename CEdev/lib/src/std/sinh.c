@@ -36,10 +36,10 @@ double sinh(double arg) {
 
 	sign = 1;
 	if(arg < 0) {
-		arg = - arg;
+		arg = -arg;
 		sign = -1;
 	}
-
+	
 	if(arg > 21.) {
 		temp = exp(arg)/2;
 		if (sign>0)
@@ -59,17 +59,19 @@ double sinh(double arg) {
 }
 
 double cosh(double arg) {
-    double val;
+	double val;
 
-	if(arg < 0)
-		arg = - arg;
+	if(arg < 0) {
+		arg = -arg;
+	}
+	
+	val = exp(arg);
+	
 	if(arg > 21.) {
-		return(exp(arg)/2);
+		return(val/2);
 	}
 
-	val = exp(arg);
 	val += exp(-arg);
 	val /= 2;
 	return(val);
-//	return((exp(arg) + exp(-arg))/2);
 }

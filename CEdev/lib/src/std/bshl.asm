@@ -12,8 +12,7 @@
 ; Registers Used:
 ;       flags
 ;-------------------------------------------------------------------------
-        .def    __bshl
+	.def __bshl
 	.assume adl=1
 
-__bshl         equ 000100h	
-
+__bshl		equ 000100h

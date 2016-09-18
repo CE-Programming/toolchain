@@ -11,9 +11,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __frstof
 	.assume adl=1
-	.def	__frstof
-	.ref	__fritof
 	
-__frstof       equ 0002C0h
-
+__frstof	equ 0002C0h

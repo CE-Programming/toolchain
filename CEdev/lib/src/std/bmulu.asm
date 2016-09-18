@@ -13,7 +13,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def	__bmulu
+	.def __bmulu
 	.assume adl=1
 
 __bmulu:

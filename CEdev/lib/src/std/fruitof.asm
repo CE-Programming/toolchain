@@ -11,8 +11,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __fruitof
 	.assume adl=1
-	.def	__fruitof
 
-__fruitof      equ 0002BCh
-
+__fruitof	equ 0002BCh

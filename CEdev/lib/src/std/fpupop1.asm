@@ -23,10 +23,7 @@
 ; MODIFIES:
 ;		flags
 ;--------------------------------------------------------------
-
-	segment	CODE
-
-	.def	__fpupop1
+	.def __fpupop1
 	.assume adl=1
 
 __fpupop1:
@@ -49,4 +46,3 @@ nzero:
 	or	a,a		;set Z/NZ
 	pop	ix
 	ret
-

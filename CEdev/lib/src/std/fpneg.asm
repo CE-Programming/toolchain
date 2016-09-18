@@ -16,12 +16,17 @@
 ;		AuBC:	32-bit IEEE Single Precision.
 ;
 ;--------------------------------------------------------------
-	segment	CODE
-	
+	.def __fneg
 	.assume adl=1
-	.def	__fneg
 	
-__fneg         equ 00028Ch
-	
-	end
-
+__fneg:
+	or	a,a
+	jr	nz,__noexit
+	push	hl
+	sbc	hl,hl
+	sbc	hl,bc
+	pop	hl
+	ret	z
+__noexit:
+	xor	a,80h
+	ret

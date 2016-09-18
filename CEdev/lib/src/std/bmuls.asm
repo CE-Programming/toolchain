@@ -13,12 +13,12 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def	__bmuls
+	.def __bmuls
 	.assume adl=1
 
 __bmuls:
 	push	bc
-        ld      c,a
+	ld	c,a
 	mlt	bc
 	ld	a,c
 	pop	bc

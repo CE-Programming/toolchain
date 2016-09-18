@@ -1,4 +1,4 @@
-/* tgamma.c  - public domain implementation of function tgamma(3m)
+/* gamma.c  - public domain implementation of function tgamma(3m)
 reference - Haruhiko Okumura: C-gengo niyoru saishin algorithm jiten
             (New Algorithm handbook in C language) (Gijyutsu hyouron
             sha, Tokyo, 1991) [in Japanese]

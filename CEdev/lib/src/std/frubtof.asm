@@ -11,7 +11,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __frubtof
 	.assume adl=1
-	.def	__frubtof
 
-__frubtof      equ 0002C4h
+__frubtof	equ 0002C4h

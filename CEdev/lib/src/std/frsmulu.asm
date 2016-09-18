@@ -14,8 +14,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __frsmulu
 	.assume adl=1
-	.def	__frsmulu
 
 __frsmulu:
 	push	af
@@ -49,4 +49,3 @@ _L0:
 	pop	de
 	pop	af
 	ret
-

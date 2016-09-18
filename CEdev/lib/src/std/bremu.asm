@@ -13,7 +13,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def	__bremu
+	.def __bremu
 	.assume adl=1
 
 __bremu:
@@ -21,7 +21,7 @@ __bremu:
 	push	hl
 	ld	h,a
 	xor	a,a
-	ld	b,8		;i = 8 (bit counter)
+	ld	b,8
 loop:
 	sla	h
 	rla
@@ -33,10 +33,6 @@ over:
 	inc	h
 under:
 	djnz	loop
-	;;
-	;; Quotient in h
-	;; Remainder in a
-	;;
 	pop	hl
 	pop	bc
 	ret

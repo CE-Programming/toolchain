@@ -11,7 +11,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __frftous
 	.assume adl=1
-	.def	__frftous
 
-__frftous      equ 0002B4h
+__frftous	equ 0002B4h

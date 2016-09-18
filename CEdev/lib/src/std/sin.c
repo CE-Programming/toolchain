@@ -25,8 +25,7 @@
 
 double sinus(double,int);
 
-double sin(double arg)
-{
+double sin(double arg) {
 	return(sinus(arg, 0));
 }
 

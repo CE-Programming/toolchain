@@ -23,30 +23,25 @@
 ; MODIFIES:
 ;		flags
 ;--------------------------------------------------------------
-
-	segment	code
-
-	.def	__fpupop2
+	.def __fpupop2
 	.assume adl=1
 
 __fpupop2:
-	push	ix
-	ld	ix,0
-	add	ix,sp
-	push	hl
-	add	hl,hl		;carry = high-order bit
-	set	7,(ix-1)	;set high-order bit of mantissa
-	pop	hl		;restore modified mantissa
-	rl	e		;compute exponent, carry = sign
-	ld	d,0
-	push	af
-	jr	nz,nzero	;skip if exponent non-zero
-
-	ld	hl,0		;clear mantissa
-	or	a,a		;clear carry
+	push    bc
+	ld	bc,0800000h
+	add	hl,bc
+	jr	nc,ncarry
+	add	hl,bc
+	scf
+ncarry:
+	ld	d,c
+	pop	bc
+	rl	e
+	jr	nz,nzero
+	or	a,a
+	sbc	hl,hl
 nzero:
-	rl	d		;set 1 if negative operand
-	pop	af
-	pop	ix
+	rl	d
+	inc	e
+	dec	e
 	ret
-

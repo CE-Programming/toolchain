@@ -14,13 +14,7 @@
 ; OUTPUTS:	abc:	32-bit	signed long.
 ;
 ;--------------------------------------------------------------
-
-	segment	CODE
+	.def __ftol
 	.assume adl=1
-	
-	.ref	__fpupop1, __lshrs, __lshl
-        .def    __ftol
 
-__ftol         equ 00027Ch
-
-	end
+__ftol		equ 00027Ch

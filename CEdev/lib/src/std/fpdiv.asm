@@ -22,11 +22,7 @@
 ;	flags
 ;
 ;--------------------------------------------------------------
-
-	segment	code
-
+	.def __fdiv
 	.assume adl=1
-	.ref	__fpupop1, __fpupop2, __fppack
-        .def    __fdiv
 
-__fdiv         equ 000278h
+__fdiv		equ 000278h

@@ -20,12 +20,7 @@
 ;	flags
 ;
 ;-------------------------------------------------------------------------
-
-	segment	code
-
+	.def __fmul
 	.assume adl=1
-	.ref	__fpupop1, __fpupop2, __fppack
-        .def    __fmul
 
-__fmul         equ 000288h
-
+__fmul		equ 000288h

@@ -19,11 +19,7 @@
 ; negated before being returned.
 ;
 ;--------------------------------------------------------------
-
-	segment	CODE
+	.def __fadd
 	.assume adl=1
-	.ref	__fpupop1, __fpupop2, __fppack
-	.def    __fadd
-	
-__fadd         equ 000270h
 
+__fadd		equ 000270h

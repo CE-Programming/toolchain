@@ -20,10 +20,8 @@
 ; Registers Used:
 
 ;-------------------------------------------------------------------------
-	segment	CODE
+	.def __fsub
+	.ref __fadd
 	.assume adl=1
-	.def	__fsub
-	.ref	__fadd
 
-__fsub         equ 000290h
-
+__fsub		equ 000290h

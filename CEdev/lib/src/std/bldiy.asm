@@ -11,8 +11,7 @@
 ; Registers Used:
 ;      
 ;-------------------------------------------------------------------------
+	.def __bldiy
 	.assume adl=1
-        .def    __bldiy
-	
-__bldiy        equ 0000FCh
 
+__bldiy		equ 0000FCh

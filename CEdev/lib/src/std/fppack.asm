@@ -22,10 +22,7 @@
 ; MODIFIES:	
 ;	flags
 ;--------------------------------------------------------------
-
-	segment	code
+	.def __fppack
 	.assume adl=1
-	.def	__fppack
 
-__fppack       equ 00026Ch
-
+__fppack	equ 00026Ch

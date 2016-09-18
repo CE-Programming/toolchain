@@ -11,9 +11,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __frustof
 	.assume adl=1
-	.def	__frustof
-	.ref	__fruitof
 	
-__frustof      equ 0002C8h
-
+__frustof	equ 0002C8h

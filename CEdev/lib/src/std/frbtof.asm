@@ -11,8 +11,7 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
+	.def __frbtof
 	.assume adl=1
-	.def	__frbtof
-	.ref	__frubtof
 
-__frbtof       equ 00029Ch
+__frbtof	equ 00029Ch

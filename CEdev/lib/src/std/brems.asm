@@ -13,13 +13,12 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
-	.def	__brems
-	.ref	__bremu
+	.ref __bremu
+	.def __brems
 	.assume adl=1
 
 __brems:
 	push	bc
-;	push	af
 	ld	b,a
 	bit	7,c
 	jr	z,skip1
@@ -37,8 +36,5 @@ skip2:
 	jr	z,skip3
 	neg
 skip3:
-;	ld	c,a
-;	pop	af
-;	ld	a,c
 	pop	bc
 	ret

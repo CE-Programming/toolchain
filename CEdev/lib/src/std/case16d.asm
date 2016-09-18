@@ -11,8 +11,7 @@
 ; Registers Used:
 ; 
 ;-------------------------------------------------------------------------
+	.def __case16D
 	.assume adl=1
-	.def	__case16D
 
-__case16D      equ 000118h
-
+__case16D	equ 000118h

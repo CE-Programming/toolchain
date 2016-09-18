@@ -12,11 +12,11 @@
 ; Registers Used:
 ;       flags
 ;-------------------------------------------------------------------------
-        .def    __bshrs
+        .def __bshrs
 	.assume adl=1
 
 __bshrs:
-        push    bc
+        ld	a,b
         inc	b
         jr      test
 
@@ -25,6 +25,5 @@ loop:
 test:
        	djnz	loop
 
-	pop	bc
-	ret	
-
+	ld	b,a
+	ret

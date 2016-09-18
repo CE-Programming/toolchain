@@ -13,8 +13,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def	__bdivu
+	.def __bdivu
 	.assume adl=1
+
 __bdivu:
 	push	bc
 	push	hl
@@ -32,10 +33,7 @@ over:
 	inc	h
 under:
 	djnz	loop
-	;;
-	;; Quotient in h
-	;; Remainder in a
-	;;
+
 	ld	a,h
 	pop	hl
 	pop	bc

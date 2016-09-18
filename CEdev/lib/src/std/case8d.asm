@@ -11,8 +11,7 @@
 ; Registers Used:
 ; 
 ;-------------------------------------------------------------------------
+	.def __case8D
 	.assume adl=1
-	.def	__case8D
 
-__case8D       equ 000128h
-
+__case8D	equ 000128h
