@@ -17,14 +17,16 @@ _calloc:
 	add	hl,de 
 	or	a,a 
 	sbc	hl,de
+	pop	bc
 	ex	de,hl
-	pop	hl
 	ret	z
-	push	hl
+	push	bc
 	or	a,a
 	sbc	hl,hl
 	push	hl
 	push	de
 	call	_memset
 	pop	hl
+	pop	bc
+	pop	bc
 	ret

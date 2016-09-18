@@ -16,7 +16,7 @@
 	.assume adl=1
 
 __bshrs:
-        ld	a,b
+        push	bc
         inc	b
         jr      test
 
@@ -25,5 +25,5 @@ loop:
 test:
        	djnz	loop
 
-	ld	b,a
+	pop	bc
 	ret

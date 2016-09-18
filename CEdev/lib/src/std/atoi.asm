@@ -11,7 +11,7 @@ _atoi:
 	push	bc
 	ld	bc,10
 	push	bc
-	ld	c,0
+	ld	c,b
 	push	bc
 	push	de
 	call	_strtol
