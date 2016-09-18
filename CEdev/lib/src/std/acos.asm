@@ -33,25 +33,23 @@ _acos:
 	call	__fcmp
 	jp	p,l_2
 
-l_1:	ld	bc,4
-	ld	(_errno),bc
-	xor	a,a
-	sbc	hl,hl
+l_1:	ld	hl,4
+	ld	(_errno),hl
+	ld	l,h
+	ld	e,h
 	jr	l_3
 
 l_2:	ld	c,(ix+9)
-	ld	b,0
 	push	bc
 	ld	bc,(ix+6)
 	push	bc
 	call	_asin
-	ld	sp,ix
 	ld	bc,13176795
 	ld	a,63
 	call	__fsub
 	ld	hl,bc
+	ld	e,a
 
-l_3:	ld	e,a
-	ld	sp,ix
+l_3:	ld	sp,ix
 	pop	ix
 	ret
