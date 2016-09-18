@@ -52,5 +52,6 @@ l_2:	ld	c,(ix+9)
 	ld	hl,bc
 
 l_3:	ld	e,a
+	ld	sp,ix
 	pop	ix
 	ret
