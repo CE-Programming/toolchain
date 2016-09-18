@@ -18,9 +18,9 @@ _calloc:
 	or	a,a 
 	sbc	hl,de
 	pop	bc
-	ex	de,hl
 	ret	z
 	push	bc
+	ex	de,hl
 	or	a,a
 	sbc	hl,hl
 	push	hl
