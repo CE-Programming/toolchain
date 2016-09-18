@@ -17,18 +17,22 @@
 ; }
 
 _acos:
-	call	__frameset0
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
+	ld	a,e
 	ld	hl,8388608
 	ld	e,63
-	ld	bc,(ix+6)
-	ld	a,(ix+9)
 	push	bc
 	push	hl
 	call	__fcmp
 	pop	bc
 	pop	hl
 	jp	m,l_1
-	ld	e,(ix+9)
+	ld	e,a
 	ld	a,191
 	call	__fcmp
 	jp	p,l_2
@@ -37,19 +41,14 @@ l_1:	ld	hl,4
 	ld	(_errno),hl
 	ld	l,h
 	ld	e,h
-	jr	l_3
+	ret
 
-l_2:	ld	c,(ix+9)
-	push	bc
-	ld	bc,(ix+6)
-	push	bc
+l_2:	push	de
+	push	hl
 	call	_asin
 	ld	bc,13176795
 	ld	a,63
 	call	__fsub
 	ld	hl,bc
 	ld	e,a
-
-l_3:	ld	sp,ix
-	pop	ix
 	ret
