@@ -3,6 +3,7 @@
 	.ref __fcmp
 	.ref __fneg
 	.def _cos
+	.assume adl=1
 	
 ; double cos(double arg);
 
@@ -12,8 +13,8 @@ _cos:
 	ld	e,(ix+9)
 	ld	bc,0
 	xor	a,a
-	push	hl
 	push	de
+	push	hl
 	call	__fcmp
 	pop	bc
 	pop	de

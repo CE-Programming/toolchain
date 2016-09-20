@@ -20,20 +20,19 @@
 ; Registers Used:
 ;	a,b,c,d,e,h,l,iy
 ;-------------------------------------------------------------------------
-	.def	.uldiv
 	.assume adl=1
+	.def	.uldiv
 
 .uldiv:
 	push	ix
 	ld	ix,0
-	lea	de,ix		;res = 0;
 	add	ix,sp
-	
-	ld	b,e		
-	ld	c,e
 
-	or	a,a
-	sbc	hl,hl		;num = 0		
+	ld	de,0		;res = 0;
+	ld	b,0		
+
+	ld	hl,0		;num = 0
+	ld	c,0		
 
 	ld	iy,32		;i = 32;
 	
@@ -116,7 +115,6 @@ done:
 	ret	
 
 	.def	.uldivbdechl
-	
 .uldivbdechl:
 	push	bc
 	push	hl

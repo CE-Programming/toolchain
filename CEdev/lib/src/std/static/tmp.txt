@@ -1,0 +1,16 @@
+acos.asm
+atof.asm
+ceil.asm
+cos.asm
+fabs.asm
+isalnum.asm
+isalpha.asm
+iscntrl.asm
+isdigit.asm
+isgraph.asm
+islower.asm
+isprint.asm
+ispunct.asm
+isspace.asm
+isupper.asm
+isxdigit.asm

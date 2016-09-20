@@ -18,15 +18,15 @@ _div:
 
 	ld	hl,21
 	add	hl,sp
-	ld	bc,(hl) 		; bc=val of denominator
+	ld	bc,(hl) 	; bc=val of denominator
 	dec	hl
 	dec	hl
 	dec	hl
-	ld	hl,(hl) 		; hl=val of numerator
+	ld	hl,(hl) 	; hl=val of numerator
 	push	hl
 	call	__idivs
 	ex	de,hl 		; de= quotient
-	pop	hl			; hl=val of numerator
+	pop	hl		; hl=val of numerator
 	call	__irems
 	ld	bc,hl
 
@@ -40,7 +40,7 @@ _div:
 	dec	hl
 	dec	hl
 	dec	hl
-	ld	(hl),de 		;quotient
+	ld	(hl),de 	;quotient
 
 	pop	de
 	pop	bc

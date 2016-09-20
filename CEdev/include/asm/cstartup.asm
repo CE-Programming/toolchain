@@ -41,8 +41,8 @@ _init:
 ;-------------------------------------------------------------------------------
 	segment .startup
 
-	di
 	call	0020848h	; _RunInicOff
+	di
 	ld	hl,__low_bss
 	ld	bc,010DE2h      ; maximum size of BSS+Heap
 	call	00210DCh        ; _MemClear
