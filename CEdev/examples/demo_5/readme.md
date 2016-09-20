@@ -1,6 +1,6 @@
--- Demo 4 ------------------------------------------------------------------------
+-- Demo 5 ------------------------------------------------------------------------
 
-This demo demonstrates using more uses of the timers
+This demo demonstrates how to use a few of the debugging features implemented in CEmu
 
 -- Compiling ----------------------------------------------------------------------
 

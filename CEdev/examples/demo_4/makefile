@@ -9,7 +9,7 @@
 
 #----------------------------
 TARGET ?= DEMO4
-DEBUGMODE ?= DEBUG
+DEBUGMODE ?= NDEBUG
 ARCHIVED ?= NO
 APPVAR ?= NO
 #----------------------------
@@ -37,6 +37,12 @@ BSSHEAP_LOW := D031F6
 BSSHEAP_HIGH := D13FD6
 STACK_HIGH := D1A87E
 INIT_LOC := D1A87F
+#----------------------------
+
+#Use the (slower) OS embedded functions (Advanced)
+
+#----------------------------
+USE_FLASH_FUNCTIONS ?= YES
 #----------------------------
 
 include $(CEDEV)/bin/main_makefile

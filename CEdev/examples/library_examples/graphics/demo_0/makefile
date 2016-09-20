@@ -39,4 +39,10 @@ STACK_HIGH := D1A87E
 INIT_LOC := D1A87F
 #----------------------------
 
+#Use the (slower) OS embedded functions (Advanced)
+
+#----------------------------
+USE_FLASH_FUNCTIONS ?= YES
+#----------------------------
+
 include $(CEDEV)/bin/main_makefile

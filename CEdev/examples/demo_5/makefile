@@ -8,18 +8,18 @@
 #Change DESCRIPTION to modify what is displayed within a compatible shell (Not compiled in if icon is not present)
 
 #----------------------------
-TARGET ?= GRAPHX3
-DEBUGMODE ?= NDEBUG
+TARGET ?= DEMO5
+DEBUGMODE ?= DEBUG
 ARCHIVED ?= NO
 APPVAR ?= NO
 #----------------------------
-ICONPNG ?= iconc.png
-DESCRIPTION ?= "C Graphics Demo 3"
+ICONPNG := iconc.png
+DESCRIPTION ?= "C Toolchain Demo 5"
 #----------------------------
 
 #Add shared library names to the L varible, for instance:
 # L := graphx fileioc keypadc
-L := graphx
+L := 
 
 #These directories specify where source and output should go
 

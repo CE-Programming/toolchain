@@ -12,33 +12,54 @@
 
 /* Other available headers */
 // stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
-#include <assert.h>
-#include <debug.h>
 
-/* Put function prototypes here */
+#define ONE_SECOND		32768/1
+#define HALF_SECOND		32768/2
+#define QUARTER_SECOND		32768/4
+
+/* Function Prototypes */
+void reset_counter(void);
 
 /* Put all your code here */
 void main(void) {
-	/* Set the intial value of some variables */
-	int dbg_test_var_1 = 10;
-	uint8_t dbg_test_var_2 = 3;
+	unsigned count = 0;
+	char str[10];
 	
-	/* Print a simple debugging string */
-	dbg_sprintf(dbgout, "This is the start of a CEmu debugging test\n");
+	timer_1_MatchValue_1 = ONE_SECOND;
 	
-	/* Set a watchpoint that will break anytime we write/change this varaible */
-	dbg_SetWriteWatchpoint( &dbg_test_var_1, sizeof dbg_test_var_1 );
-	
-	/* Set a non breaking watchpoint just so we can see what is in this variable at any given time */
-	dbg_SetWatchpoint( &dbg_test_var_2, sizeof dbg_test_var_2 );
-	
-	/* Now, let's write to the varaible to see what happens (Go to the 'Watchpoints' tab in CEmu to view the status) */
-	dbg_test_var_1 = 5;
-	
-	/* Remove the watchpoint that we had set */
-	dbg_RemoveWatchpoint( &dbg_test_var_1 );
-	dbg_RemoveWatchpoint( &dbg_test_var_2 );
-	
-	/* Clean up everything */
+	/* Clean up the home screen */
 	prgm_CleanUp();
+	
+	/* Reset the counter */
+	reset_counter();
+	
+	do {
+		/* If the timer is reloaded, we reached 0 */
+		if(timer_IntStatus & TIMER1_MATCH1) {
+			/* Print the count */
+			sprintf( str, "%u", count++ );
+			os_SetCursorPos( 0, 0 );
+			os_PutStrFull( str );
+			
+			/* Reset the count */
+			reset_counter();
+			
+			/* Acknowledge the interrupt */
+			timer_IntStatus = TIMER1_MATCH1;
+		}
+	} while(!os_GetCSC());
+	
+	/* Clean up for the return to the OS */
+	prgm_CleanUp();
+}
+
+void reset_counter(void) {
+	/* Disable the timer so it doesn't run when we don't want it to be running */
+	timer_Control = TIMER1_DISABLE;
+	
+	/* By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time */
+	timer_1_Counter = 0;
+	
+	/* Enable the timer, set it to the 32768 kHz clock, enable an interrupt once it reaches 0, and make it count down */
+	timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_NOINT | TIMER1_UP;
 }

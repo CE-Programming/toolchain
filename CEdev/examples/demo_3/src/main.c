@@ -13,40 +13,39 @@
 /* Other available headers */
 // stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 
-/* Put function prototypes here */
+#define ONE_SECOND		32768/1
+#define HALF_SECOND		32768/2
+#define QUARTER_SECOND		32768/4
 
 /* Put all your code here */
 void main(void) {
 	unsigned seconds = 0;
 	char str[10];
-	
+
 	/* Clean up the home screen */
 	prgm_CleanUp();
 	
-	/* Set the cursor posistion */
-	os_SetCursorPos( 0, 0 );
-	
-	/* Disable everything in the timers so they don't run when we don't want them to */
-	boot_SetTimersControlRegister( 0 );
+	/* Disable the timer so it doesn't run when we don't want it to be running */
+	timer_Control = TIMER1_DISABLE;
 	
 	/* By using the 32768 kHz clock, we can count for exactly 1 second here, or a different interval of time */
-	boot_SetTimer1ReloadValue( 32768 );
-	boot_SetTimer1Counter( 32768 );
+	timer_1_ReloadValue = timer_1_Counter = ONE_SECOND;
 	
 	/* Enable the timer, set it to the 32768 kHz clock, enable an interrupt once it reaches 0, and make it count down */
-	boot_SetTimersControlRegister( TIMER1_ENABLE | TIMER1_32K | TIMER1_INT | TIMER1_DOWN );
+	timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN;
 	
-	while(!os_GetCSC()) {
-		if(boot_GetTimersInterruptStatus() & TIMER1_RELOADED) {
+	do {
+		/* If the timer is reloaded, we reached 0 */
+		if(timer_IntStatus & TIMER1_RELOADED) {
 			/* Print a string */
-			sprintf(str, "%u", seconds++);
-			os_SetCursorPos(0,0);
-			os_PutStrFull(str);
+			sprintf( str, "%u", seconds++ );
+			os_SetCursorPos( 0, 0 );
+			os_PutStrFull( str );
 			
 			/* Acknowledge the reload */
-			boot_SetTimersInterruptStatus( TIMER1_RELOADED );
+			timer_IntStatus = TIMER1_RELOADED;
 		}
-	}
+	} while(!os_GetCSC());
 	
 	/* Clean up for the return to the OS */
 	prgm_CleanUp();

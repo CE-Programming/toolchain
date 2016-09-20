@@ -9,24 +9,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define randInt(min, max)       ((unsigned)rand() % ((max) - (min) + 1) + (min))
+/* Creates a random integer value */
+#define randInt(min, max)	((unsigned)rand() % ((max) - (min) + 1) + (min))
 
-/* Defines for MMIO memory areas */
-
-/* RTC defines */
-/* There’s a whole slew of bootcode RTC functions, but a lot of them are kind of pointless when you could just use these defines from MMIO */
-#define rtc_GetSeconds()        (*((uint8_t*)0xF30000))
-#define rtc_GetMinutes()        (*((uint8_t*)0xF30004))
-#define rtc_GetHours()          (*((uint8_t*)0xF30008))
-#define rtc_GetDays()           (*((uint16_t*)0xF3000C))
-#define rtc_GetControl()        (*((uint8_t*)0xF30020))
-#define rtc_SetControl(c)       ((*((uint8_t*)0xF30020)) = (uint8_t)(c))
-#define rtc_LoadSetTime()       ((*((uint8_t*)0xF30020)) = (*((uint8_t*)0xF30020))|64)
-#define rtc_SetSeconds(s)       ((*((uint8_t*)0xF30024)) = (uint8_t)(s))
-#define rtc_SetMinutes(m)       ((*((uint8_t*)0xF30028)) = (uint8_t)(m))
-#define rtc_SetHours(h)         ((*((uint8_t*)0xF3002C)) = (uint8_t)(h))
-#define rtc_SetDays(d)          ((*((uint16_t*)0xF30030)) = (uint16_t)(d))
-#define rtc_Time()              (*(volatile uint32_t*)0xF30044)
+/* RTC define -- useful for srand() */
+#define rtc_Time()	(*(volatile uint32_t*)0xF30044)
 
 /**
  * Resets the RTC back to its original values
@@ -46,8 +33,7 @@ void os_PushErrorHandler(void *routine);
 void os_PopErrorHandler(void);
 
 /* LCD defines */
-#define lcd_GetBacklightLevel()  (*((uint8_t*)0xF60024))
-#define lcd_SetBacklightLevel(b) ((*((uint8_t*)0xF60024))) = (uint8_t)(b);
+#define lcd_BacklightLevel	(*((uint8_t*)0xF60024))
 
 /**
  * OS varaible type definitions
@@ -97,67 +83,6 @@ void boot_ClearVRAM(void);
  * Checks if the [on] key was pressed
  */
 bool boot_CheckOnPressed(void);
-
-/**
- * Returns extended keys as 16-bits
- */
-int os_GetKey(void);
-
-/**
- * Performs an OS call to get the keypad scan code
- * Values returned are listed below
- */
-int os_GetCSC(void);
-typedef uint8_t sk_key_t;
-#define sk_Down       0x01
-#define sk_Left       0x02
-#define sk_Right      0x03
-#define sk_Up         0x04
-#define sk_Enter      0x09
-#define sk_2nd        0x36
-#define sk_Clear      0x0F
-#define sk_Alpha      0x30
-#define sk_Add        0x0A
-#define sk_Sub        0x0B
-#define sk_Mul        0x0C
-#define sk_Div        0x0D
-#define sk_Graph      0x31
-#define sk_Trace      0x32
-#define sk_Zoom       0x33
-#define sk_Window     0x34
-#define sk_Yequ       0x35
-#define sk_Mode       0x37
-#define sk_Del        0x38
-#define sk_Store      0x2A
-#define sk_Ln         0x2B
-#define sk_Log        0x2C
-#define sk_Square     0x2D
-#define sk_Recip      0x2E
-#define sk_Math       0x2F
-#define sk_0          0x21
-#define sk_1          0x22
-#define sk_4          0x23
-#define sk_7          0x24
-#define sk_2          0x1A
-#define sk_5          0x1B
-#define sk_8          0x1C
-#define sk_3          0x12
-#define sk_6          0x13
-#define sk_9          0x14
-#define sk_Comma      0x25
-#define sk_Sin        0x26
-#define sk_Apps       0x27
-#define sk_GraphVar   0x28
-#define sk_DecPnt     0x19
-#define sk_LParen     0x1D
-#define sk_Cos        0x1E
-#define sk_Pgrm       0x1F
-#define sk_Stat       0x20
-#define sk_Chs        0x10
-#define sk_RParen     0x15
-#define sk_Tan        0x16
-#define sk_Vars       0x17
-#define sk_Power      0x0E
 
 /**
  * Disables the OS cursor
@@ -379,15 +304,6 @@ void boot_NewLine(void);
 void boot_PrintBootVersion(void);
 
 /**
- * Sets the calculator into 6MHz mode and 48MHz modes. Note that the ones
- * suffix with I perserve the interrupt vectors
- */
-void boot_Set6MHzMode(void);
-void boot_Set48MHzMode(void);
-void boot_Set6MHzModeI(void);
-void boot_Set48MHzModeI(void);
-
-/**
  * Returns the current battery status
  */
 uint8_t boot_GetBatteryStatus(void);
@@ -429,7 +345,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define TIMER1_DISABLE	0 << 0	// Disables Timer 1
 #define TIMER1_32K	1 << 1	// Use the 32K clock for timer 1
 #define TIMER1_CPU	0 << 1	// Use the CPU clock rate for timer 1
-#define TIMER1_INT	1 << 2	// Enable an interrupt for the timer 1
+#define TIMER1_0INT	1 << 2	// Enable an interrupt when 0 is reached for the timer 1
 #define TIMER1_NOINT	0 << 2	// Disable interrupts for the timer 1
 #define TIMER1_UP	1 << 9	// Timer 1 counts up
 #define TIMER1_DOWN	0 << 9	// Timer 1 counts down
@@ -438,7 +354,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define TIMER2_DISABLE	0 << 3	// Enables Timer 2
 #define TIMER2_32K	1 << 4	// Use the 32K clock for timer 2
 #define TIMER2_CPU	0 << 4	// Use the CPU clock rate for timer 2
-#define TIMER2_INT	1 << 5	// Enable an interrupt for the timer 2
+#define TIMER2_0INT	1 << 5	// Enable an interrupt when 0 is reached for the timer 2
 #define TIMER2_NOINT	0 << 5	// Disable interrupts for the timer 2
 #define TIMER2_UP	1 << 10	// Timer 2 counts up
 #define TIMER2_DOWN	0 << 10	// Timer 2 counts down
@@ -452,34 +368,92 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define TIMER2_MATCH2	1 << 4	// Timer 2 hit the second match value
 #define TIMER2_RELOADED	1 << 5	// Timer 2 was reloaded (Needs to have TIMER2_INT enabled)
 
-void boot_SetTimersControlRegister(uint16_t value);
-uint16_t boot_GetTimersControlRegister(void);
-void boot_SetTimersInterruptStatus(uint16_t value);
-uint16_t boot_GetTimersInterruptStatus(void);
-void boot_SetTimersInterruptMask(uint16_t value);
-uint16_t boot_GetTimersInterruptMask(void);
-void boot_SetTimer1Counter(uint32_t count);
-uint32_t boot_GetTimer1Counter(void);
-void boot_SetTimer1ReloadValue(uint32_t value);
-uint32_t boot_GetTimer1ReloadValue(void);
-void boot_SetTimer1MatchValue1(uint32_t value);
-uint32_t boot_GetTimer1MatchValue1(void);
-void boot_SetTimer1MatchValue2(uint32_t value);
-uint32_t boot_GetTimer1MatchValue2(void);
-void boot_SetTimer2Counter(uint32_t count);
-uint32_t boot_GetTimer2Counter(void);
-void boot_SetTimer2ReloadValue(uint32_t value);
-uint32_t boot_GetTimer2ReloadValue(void);
-void boot_SetTimer2MatchValue1(uint32_t value);
-uint32_t boot_GetTimer2MatchValue1(void);
-void boot_SetTimer2MatchValue2(uint32_t value);
-uint32_t boot_GetTimer2MatchValue2(void);
+#define timer_1_Counter		(*(volatile uint32_t *)0xF20000)
+#define timer_2_Counter		(*(volatile uint32_t *)0xF20010)
+#define timer_1_ReloadValue	(*(uint32_t *)0xF20004)
+#define timer_2_ReloadValue	(*(uint32_t *)0xF20014)
+#define timer_1_MatchValue_1	(*(uint32_t *)0xF20008) 
+#define timer_1_MatchValue_2	(*(uint32_t *)0xF2000C)
+#define timer_2_MatchValue_1	(*(uint32_t *)0xF20018) 
+#define timer_2_MatchValue_2	(*(uint32_t *)0xF2001C)  
+#define timer_Control		(*(uint16_t *)0xF20030)
+#define timer_IntMask		(*(uint16_t *)0xF20038)
+#define timer_IntStatus		(*(volatile uint16_t *)0xF20034)
+
+/**
+ * Returns extended keys as 16-bits
+ */
+int os_GetKey(void);
+
+/**
+ * Performs an OS call to get the keypad scan code
+ * Values returned are listed below
+ */
+int os_GetCSC(void);
+typedef uint8_t sk_key_t;
+#define sk_Down       0x01
+#define sk_Left       0x02
+#define sk_Right      0x03
+#define sk_Up         0x04
+#define sk_Enter      0x09
+#define sk_2nd        0x36
+#define sk_Clear      0x0F
+#define sk_Alpha      0x30
+#define sk_Add        0x0A
+#define sk_Sub        0x0B
+#define sk_Mul        0x0C
+#define sk_Div        0x0D
+#define sk_Graph      0x31
+#define sk_Trace      0x32
+#define sk_Zoom       0x33
+#define sk_Window     0x34
+#define sk_Yequ       0x35
+#define sk_Mode       0x37
+#define sk_Del        0x38
+#define sk_Store      0x2A
+#define sk_Ln         0x2B
+#define sk_Log        0x2C
+#define sk_Square     0x2D
+#define sk_Recip      0x2E
+#define sk_Math       0x2F
+#define sk_0          0x21
+#define sk_1          0x22
+#define sk_4          0x23
+#define sk_7          0x24
+#define sk_2          0x1A
+#define sk_5          0x1B
+#define sk_8          0x1C
+#define sk_3          0x12
+#define sk_6          0x13
+#define sk_9          0x14
+#define sk_Comma      0x25
+#define sk_Sin        0x26
+#define sk_Apps       0x27
+#define sk_GraphVar   0x28
+#define sk_DecPnt     0x19
+#define sk_LParen     0x1D
+#define sk_Cos        0x1E
+#define sk_Prgm       0x1F
+#define sk_Stat       0x20
+#define sk_Chs        0x10
+#define sk_RParen     0x15
+#define sk_Tan        0x16
+#define sk_Vars       0x17
+#define sk_Power      0x0E
 
 /**
  * Things you shouldn't use unless you know what you are doing
  */
 void os_ForceCmdNoChar(void);
 
+/**
+ * Sets the calculator into 6MHz mode and 48MHz modes. Note that the ones
+ * suffix with I perserve the interrupt vectors
+ */
+void boot_Set6MHzMode(void);
+void boot_Set48MHzMode(void);
+void boot_Set6MHzModeI(void);
+void boot_Set48MHzModeI(void);
 
 /**
  * Use this function to call assembly functions in the OS and Bootcode
