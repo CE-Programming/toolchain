@@ -20,28 +20,6 @@
 	.def _boot_USBBusPowered
 	.def _boot_USBSelfPowered
 	.def _boot_ResetTimer3
-	.def _boot_SetTimersControlRegister
-	.def _boot_GetTimersControlRegister
-	.def _boot_SetTimersInterruptStatus
-	.def _boot_GetTimersInterruptStatus
-	.def _boot_SetTimersInterruptMask
-	.def _boot_GetTimersInterruptMask
-	.def _boot_SetTimer1Counter
-	.def _boot_GetTimer1Counter
-	.def _boot_SetTimer1ReloadValue
-	.def _boot_GetTimer1ReloadValue
-	.def _boot_SetTimer1MatchValue1
-	.def _boot_GetTimer1MatchValue1
-	.def _boot_SetTimer1MatchValue2
-	.def _boot_GetTimer1MatchValue2
-	.def _boot_SetTimer2Counter
-	.def _boot_GetTimer2Counter
-	.def _boot_SetTimer2ReloadValue
-	.def _boot_GetTimer2ReloadValue
-	.def _boot_SetTimer2MatchValue1
-	.def _boot_GetTimer2MatchValue1
-	.def _boot_SetTimer2MatchValue2
-	.def _boot_GetTimer2MatchValue2
 	.def _boot_CheckOnPressed
 	.def _boot_RTCInitialize
 	.def _boot_SetTime
@@ -154,28 +132,6 @@ _boot_DoNothing2                equ 0003DCh
 _boot_USBBusPowered             equ 0003E4h
 _boot_USBSelfPowered            equ 0003E8h
 _boot_ResetTimer3               equ 0004F8h
-_boot_SetTimersControlRegister  equ 000520h
-_boot_GetTimersControlRegister  equ 000524h
-_boot_SetTimersInterruptStatus  equ 000528h
-_boot_GetTimersInterruptStatus  equ 00052Ch
-_boot_SetTimersInterruptMask    equ 000530h
-_boot_GetTimersInterruptMask    equ 000534h
-_boot_SetTimer1Counter          equ 000538h
-_boot_GetTimer1Counter          equ 00053Ch
-_boot_SetTimer1ReloadValue      equ 000540h
-_boot_GetTimer1ReloadValue      equ 000544h
-_boot_SetTimer1MatchValue1      equ 000548h
-_boot_GetTimer1MatchValue1      equ 00054Ch
-_boot_SetTimer1MatchValue2      equ 000550h
-_boot_GetTimer1MatchValue2      equ 000554h
-_boot_SetTimer2Counter          equ 000558h
-_boot_GetTimer2Counter          equ 00055Ch
-_boot_SetTimer2ReloadValue      equ 000560h
-_boot_GetTimer2ReloadValue      equ 000564h
-_boot_SetTimer2MatchValue1      equ 000568h
-_boot_GetTimer2MatchValue1      equ 00056Ch
-_boot_SetTimer2MatchValue2      equ 000570h
-_boot_GetTimer2MatchValue2      equ 000574h
 _boot_CheckOnPressed            equ 00057Ch
 _boot_RTCInitialize             equ 000584h
 _boot_SetTime                   equ 0005B4h
