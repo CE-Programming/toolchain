@@ -376,7 +376,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define timer_1_MatchValue_2	(*(uint32_t *)0xF2000C)
 #define timer_2_MatchValue_1	(*(uint32_t *)0xF20018) 
 #define timer_2_MatchValue_2	(*(uint32_t *)0xF2001C)  
-#define timer_Control		(*(uint16_t *)0xF20030)
+#define timer_Control		(*(uint32_t *)0xF20030)
 #define timer_IntMask		(*(uint16_t *)0xF20038)
 #define timer_IntStatus		(*(volatile uint16_t *)0xF20034)
 

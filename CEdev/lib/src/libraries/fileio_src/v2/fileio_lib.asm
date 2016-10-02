@@ -178,6 +178,7 @@ _Open:
 ;  Slot number if no error
 	ld	a,appVarObj
 _:	ld	(varTypeOpen),a \.r
+	ld	(op1),a
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -211,17 +212,18 @@ _:	ld	(varTypeOpen),a \.r
 _:	ld	(currSlot),a
 	ld	hl,(ix+6)
 	ld	de,op1+1
-	ld	bc,9
+	ld	bc,8
 	ldir
 	xor	a,a
 	ld	(de),a
 	ld	hl,(ix+9)
 	ld	a,(hl)
 	cp	a,'w'
+	ld	iy,flags
 	jr	nz,nooverwite
 	call	_PushOP1
 	call	_ChkFindSym
-	call	nc,_delvararc
+	call	nc,_DelVarArc
 	call	_PopOP1
 nooverwite:
 	ld	hl,(ix+9)
@@ -241,8 +243,6 @@ archivevar:
 	call	_ChkFindSym
 	call	_ChkInRam
 	jr	z,+_
-	inc	de
-	inc	de
 	or	a,a
 	sbc	hl,hl
 	ex	de,hl
@@ -251,8 +251,10 @@ archivevar:
 	ld	d,(hl)
 	ex	de,hl
 	call	_EnoughMem
-	jp	c,_ReturnNULL_PopIX \.r
+	push	af
 	call	_PopOP1
+	pop	af
+	jp	c,_ReturnNULL_PopIX \.r
 	call	_PushOP1
 	call	_Arc_Unarc
 	call	_PopOP1
@@ -277,9 +279,8 @@ _:	call	_ChkFindSym
 	ld	de,0
 	ld	e,a
 	add	hl,de
-	ex	(sp),hl
-	add	hl,de
-	pop	de
+	ex	de,hl
+	pop	hl
 	jr	_SavePtrs_ASM
 _:	ld	hl,(ix+9)
 	ld	a,(hl)
@@ -289,6 +290,7 @@ _:	ld	hl,(ix+9)
 	sbc	hl,hl
 varTypeOpen =$+1
 	ld	a,0
+	ld	iy,flags
 	call	_CreateVar
 _SavePtrs_ASM:
 	push	hl
@@ -309,7 +311,7 @@ _SavePtrs_ASM:
 	ld	a,(currSlot)
 	ld	l,a
 	ret
- 
+
 ;-------------------------------------------------------------------------------
 _SetArchiveStatus:
 ; Sets the archive status of a slot
@@ -318,8 +320,6 @@ _SetArchiveStatus:
 ;  arg1 : Slot number
 ; Returns:
 ;  None
-	ld	a,appVarObj
-	ld	(varTypeOpenArc),a \.r
 	pop	hl
 	pop	de
 	pop	bc
@@ -332,10 +332,12 @@ _SetArchiveStatus:
 	push	af
 	call	_GetSlotVATPtr_ASM \.r
 	ld	hl,(hl)
+	ld	a,(hl)
+	ld	(OP1),a
 	ld	bc,-6
 	add	hl,bc
 	ld	b,(hl)
-	ld	de,op1+1
+	ld	de,OP1+1
 	dec	hl
 _:	ld	a,(hl)
 	ld	(de),a
@@ -344,15 +346,11 @@ _:	ld	a,(hl)
 	djnz	-_
 	xor	a,a
 	ld	(de),a
-varTypeOpenArc =$+1
-	ld	a,0
-	ld	(OP1),a
+	call	_PushOP1
+	ld	iy,flags
 	call	_ChkFindSym
 	call	_ChkInRam
 	push	af
-	ld	bc,0
-	call	_GetSlotVATPtr_ASM \.r
-	ld	(hl),bc
 	pop	bc
 	pop	af
 	or	a,a
@@ -360,12 +358,22 @@ varTypeOpenArc =$+1
 SetArchived:
 	push	bc
 	pop	af
-	jp	z,_Arc_Unarc
-	ret
+	call	z,_Arc_Unarc
+	jr	RelocateVar
 SetNotArchived:
 	push	bc
 	pop	af
-	jp	nz,_Arc_Unarc
+	call	nz,_Arc_Unarc
+RelocateVar:
+	call	_PopOP1
+	call	_ChkFindSym
+	jp	c,_ReturnNEG1L \.r
+	push	hl
+	call	_GetSlotVATPtr_ASM \.r
+	pop	bc
+	ld	(hl),bc
+	call	_GetSlotDataPtr_ASM \.r
+	ld	(hl),de
 	ret
  
 ;-------------------------------------------------------------------------------
@@ -382,34 +390,62 @@ _Write:
 	add	iy,sp
 	ld	c,(iy+12)
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNULL \.r
+	jr	z,_ReturnNULL_Close
+	call	_CheckInRAM_ASM \.r
+	jr	z,_ReturnNULL_Close
 	ld	bc,(iy+6)
 	ld	hl,(iy+9)
-	call	__smulu			; hl*bc
-	ex	de,hl
-	call	_CheckInRAM_ASM \.r
-	jp	c,_ReturnNULL_PopIX \.r
-	ld	hl,(iy+3)
-	ld	bc,0
-_:	ld	a,(hl)
+	call	__smulu
+	ld	(CopySize_SMC),hl \.r
 	push	hl
-	push	de
-	push	bc
-	ld	(charIn),a
-	call	_PutChar_ASM \.r
-	rl	h
-	pop	bc
-	pop	de
+	call	_GetSlotOffset_ASM \.r
 	pop	hl
-	jr	c,_s			; was there a write error?
-	inc	hl
+	add	hl,bc
+	push	hl
+	call	_GetSlotSize_ASM \.r	; bc = size of file
+	pop	hl			; hl = needed size
+	or	a,a
 	inc	bc
-	dec	de
-	ld	a,e
-	or	a,d
-	jr	nz,-_
-	jr	_s			; jump to copy computations
- 
+	sbc	hl,bc
+	jr	c,NoCoreNeeded
+	inc	hl
+	ld	(resizeBytes),hl
+	call	AddMemoryToVar \.r
+	or	a,a
+	jr	z,_ReturnNULL_Close
+NoCoreNeeded:
+	call	_GetSlotCurrDataPtr_ASM \.r
+	ex	de,hl
+	ld	hl,(iy+3)
+CopySize_SMC =$+1
+	ld	bc,0
+	push	bc
+	ldir
+	call	_GetSlotOffset_ASM \.r
+	pop	hl
+	add	hl,bc
+	ex	de,hl
+	call	_GetSlotOffsetPtr_ASM \.r
+	ld	(hl),de
+	ld	hl,(iy+9)
+	ret
+
+_ReturnNULL_Close:
+	xor	a,a
+	sbc	hl,hl
+	ret
+
+_GetSlotCurrDataPtr_ASM:
+	call	_GetSlotDataPtr_ASM \.r
+	ld	hl,(hl)
+	push	hl
+	call	_GetSlotOffset_ASM \.r
+	pop	hl
+	add	hl,bc
+	inc	hl
+	inc	hl
+	ret
+
 ;-------------------------------------------------------------------------------
 _Read:
 ; Performs an fread to an AppVar
@@ -424,36 +460,25 @@ _Read:
 	add	iy,sp
 	ld	c,(iy+12)
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNULL \.r
+	jr	z,_ReturnNULL_Close
 	ld	bc,(iy+6)
 	ld	hl,(iy+9)
-	call	__smulu			; hl*bc
-	ex	de,hl
-	ld	hl,(iy+3)
-	ld	bc,0
-_:	push	hl
-	push	de
-	push	bc
-	call	_GetChar_ASM \.r
-	rl	h
-	pop	bc
-	pop	de
-	pop	hl
-	jr	c,_s
-	ld	(hl),a
-	inc	hl
-	inc	bc
-	dec	de
-	ld	a,e
-	or	a,d
-	jr	nz,-_
-_s:	ld	de,(iy+6)
-	ex.s	de,hl
 	push	hl
-	ld	l,c
-	ld	h,b
+	call	__smulu
+	push	hl
+	call	_GetSlotCurrDataPtr_ASM \.r
+	ld	de,(iy+3)
 	pop	bc
-	jp	__sdivu
+	push	bc
+	ldir
+	call	_GetSlotOffset_ASM \.r
+	pop	hl
+	add	hl,bc
+	ex	de,hl
+	call	_GetSlotOffsetPtr_ASM \.r
+	ld	(hl),de
+	pop	hl
+	ret
 
 ;-------------------------------------------------------------------------------
 _GetChar:
@@ -578,6 +603,8 @@ Increment:
 	ex	de,hl
 	call	AddMemoryToVar \.r
 	pop	bc
+	or	a,a
+	jp	z,_ReturnNEG1L \.r
 noIncrement:
 	call	_GetSlotDataPtr_ASM \.r
 	ld	hl,(hl)
@@ -631,6 +658,7 @@ _:	pop	de
 	ld	(OP1),a
 	call	_ChkFindSym
 	jp	c,_ReturnNULL \.r
+	ld	iy,flags
 	call	_DelVarArc
 	scf
 	sbc	hl,hl
@@ -726,6 +754,12 @@ AddMemoryToVar:
 	inc	hl
 	ex	de,hl
 	ld	hl,(resizeBytes)
+	push	hl
+	push	de
+	call	_EnoughMem
+	pop	de
+	pop	hl
+	jr	c,_ReturnNULLC
 	call	_InsertMem
 	pop	hl
 	ld	hl,(hl)
@@ -767,8 +801,13 @@ SaveSize:
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d					; write new size
+_ReturnNEG1C:
+	ld	a,255
 	ret
- 
+_ReturnNULLC:
+	xor	a,a
+	ret
+
 _ReturnNULL_PopIX:
 	pop	ix
 _ReturnNULL:

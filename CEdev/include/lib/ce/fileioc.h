@@ -128,7 +128,7 @@ size_t ti_Write(const void *data, size_t size, size_t count, const ti_var_t slot
  *  number of data chunks to read from the variable slot
  * slot:
  *  varaible slot to read from
- * Returns the number of chuncks read (should be equal to count)
+ * Returns the number of chunks read (should be equal to count)
  */
 size_t ti_Read(const void *data, size_t size, size_t count, const ti_var_t slot);
 
@@ -179,8 +179,8 @@ uint16_t ti_Tell(const ti_var_t slot);
 uint16_t ti_GetSize(const ti_var_t slot);
 
 /**
- * Resizes the slot to the new size; note that the current file
- * offset is set to the beginning of the file
+ * Resizes the file slot
+ * The file offset is set to the beginning of the file
  */
 int ti_Resize(size_t new_size, const ti_var_t slot);
 
@@ -192,7 +192,6 @@ int ti_IsArchived(const ti_var_t slot);
 /**
  * Sets the varaible into either the archive or RAM
  * Returns zero if the operation fails if not enough memory or some other error
- * NOTE: This routine also closes the file handle. You must reopen the file afterwords.
  */
 int ti_SetArchiveStatus(bool archived, const ti_var_t slot);
 

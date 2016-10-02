@@ -163,7 +163,7 @@ void kb_Reset(void);
 * Keyboard group 1
 */
 #define kb_KeyGraph           (kb_lkey_t)(1 << 8 | 1<<0)
-#define key_trace             (kb_lkey_t)(1 << 8 | 1<<1)
+#define kb_KeyTrace           (kb_lkey_t)(1 << 8 | 1<<1)
 #define kb_KeyZoom            (kb_lkey_t)(1 << 8 | 1<<2)
 #define kb_KeyWindow          (kb_lkey_t)(1 << 8 | 1<<3)
 #define kb_KeyYequ            (kb_lkey_t)(1 << 8 | 1<<4)
@@ -214,7 +214,7 @@ void kb_Reset(void);
 #define kb_Key6              (kb_lkey_t)(5 << 8 | 1<<2)
 #define kb_Key9              (kb_lkey_t)(5 << 8 | 1<<3)
 #define kb_KeyRParen         (kb_lkey_t)(5 << 8 | 1<<4)
-#define key_tan              (kb_lkey_t)(5 << 8 | 1<<5)
+#define kb_KeyTan            (kb_lkey_t)(5 << 8 | 1<<5)
 #define kb_KeyVars           (kb_lkey_t)(5 << 8 | 1<<6)
 
 /**
