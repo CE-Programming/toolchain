@@ -1,0 +1,139 @@
+	.def _int_Initialize
+	.def _int_Handler
+	.def _int_SetVector
+	.def _int_Reset
+	.assume adl=1
+
+;-------------------------------------------------------------------------------
+; Interrupts equates
+mpIntStatus		equ	0F00000h
+mpIntMask		equ	0F00004h
+mpIntAck		equ	0F00008h
+mpIntLachEnable		equ	0F0000Ch
+mpIntXor		equ	0F00010h
+mpIntStatusMasked	equ	0F00014h
+
+intOnKey		equ	1
+intTimer1		equ	2
+intTimer2		equ	4
+intTimer3		equ	8
+intOsTimer		equ	10h
+intKbd			equ	400h
+intLcd			equ	800h
+intRtc			equ	1000h
+
+;-------------------------------------------------------------------------------
+_int_Initialize:
+	di
+	ld	hl,cconf
+	ld	de,mpIntMask
+	ld	bc,16
+	ldir
+	ld	hl,0D18879h
+	ld	de,0C90611h
+	ld	(hl),de
+	dec	hl
+	ld	(hl),0EDh
+	push	hl
+	inc	d
+	call	0D18878h
+	ld	hl, 0E10010h | ((_int_Handler >> 8) & 000FF00h)
+	ld	de, 0C3h | ((_int_Handler << 8) & 0FFFF00h)
+	ld	(hl),h
+	inc	hl
+	ld	(hl),de
+	ld	hl,0E30800h
+	ld	bc,0109h
+	ld	a,0E1h
+	call	00210E0h ; _Memset
+	ld	h,0E3h
+	ld	i,hl
+	im	2
+	ld	d,3
+	ret
+
+_int_Handler:
+	ex	af,af'
+	exx
+	ld	hl,(mpIntStatusMasked)
+	add	hl,hl
+	inc	hl
+	add	hl,hl
+	xor	a,a
+isr_loop:
+	inc	a
+	add	hl,hl
+	jr	nc,isr_loop
+identified:
+	dec	a
+	add	a,a
+	add	a,a
+	ld	(isr_dispatch_smc+1),a
+	exx
+	ex	af, af'
+isr_dispatch_smc:
+	jr	$+2
+iv_list:
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+unhandledInt:
+	ei
+	ret
+	
+;-------------------------------------------------------------------------------
+_int_SetVector:
+	ld	iy,0
+	add	iy,sp
+	ld	a,21
+	ld	l,(iy+3)
+	sub	a,l
+	ld	l,a
+	ld	h,4
+	mlt	hl
+	ld	de,iv_list+1
+	add	hl,de
+	ld	de,(iy+6)
+	ld	(hl),de
+	ret
+
+;-------------------------------------------------------------------------------
+_int_Reset:
+	di
+	ld	hl, lconf
+	ld	de, mpIntMask
+	ld	bc, 16
+	ldir
+	im	1
+	ret
+	
+lconf:	db 011h,030h,000h,000h
+	db 000h,000h,000h,000h
+	db 019h,000h,000h,000h
+	; Mask
+cconf:	db 000h,000h,000h,000h
+	; ACK
+	db 0FFh,0FFh,0FFh,0FFh
+	; Latch
+	db 000h,000h,000h,000h
+	; Invert
+	db 000h,000h,000h,000h

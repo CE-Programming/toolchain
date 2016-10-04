@@ -14,8 +14,7 @@
 // stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 
 /* Put function prototypes here */
-void fillScreen(unsigned color);
-void waitSeconds(uint8_t seconds);
+void fillScreen(uint8_t color);
 
 /* Location of memory-mapped screen */
 uint16_t *lcd_vramArray =  (uint16_t*)0xD40000;
@@ -39,7 +38,7 @@ void main(void) {
 }
 
 /* Fill the screen with a given color */
-void fillScreen(unsigned color) {
+void fillScreen(uint8_t color) {
     /* memset_fast is a way faster implementation of memset; either one will work here though */
     memset_fast(lcd_vramArray, color, 320*240*2);
 }

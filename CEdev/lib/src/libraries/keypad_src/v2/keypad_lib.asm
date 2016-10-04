@@ -4,18 +4,21 @@
  .libraryName		"KEYPADC"	                    ; Name of library
  .libraryVersion	2		                    ; Version information (1-255)
  
+;-------------------------------------------------------------------------------
+; v1 functions - Can no longer add/remove
+;-------------------------------------------------------------------------------
  .function "kb_Scan",_Scan
  .function "kb_ScanGroup",_ScanGroup
  .function "kb_AnyKey",_AnyKey
  .function "kb_Reset",_Reset
- 
+
  .beginDependencies
  .endDependencies
  
 ;-------------------------------------------------------------------------------
 _Scan:
 ; Scans the keypad and updates data registers
-; Note: Disables interrupts during execution
+; Note: Disables interrupts during execution, and restores on exit
 ; Arguments:
 ;  None
 ; Returns:

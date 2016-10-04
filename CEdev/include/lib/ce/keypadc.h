@@ -68,6 +68,22 @@ void kb_Scan(void);
  */
 void kb_Reset(void);
 
+#define kb_EnableInt			(*(uint8_t*)0xF5000C)
+#define kb_IntAcknowledge		(*(volatile uint8_t*)0xF50008)
+#define kb_IntStatus			(*(volatile uint8_t*)0xF50008)
+#define kb_Config			(*(uint32_t*)0xF50000)
+#define kb_DataArray			((uint16_t*)0xF50010)
+
+#define MODE_0_IDLE			(0)
+#define MODE_1_INDISCRIMINATE		(1)
+#define MODE_2_SINGLE			(2)
+#define MODE_3_CONTINUOUS		(3)
+#define DEFAULT_SCAN_CYCLES		(0x0F0F0000)
+
+#define KB_SCAN_COMPLETE		1<<0
+#define KB_DATA_CHANGED			1<<1
+#define KB_MODE_1_PRESS			1<<2
+
 /**
  * Keyboard group 0 (Unused)
  */

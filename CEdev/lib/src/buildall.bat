@@ -36,6 +36,9 @@ set RTL_SHARED_ASM_SRC=abs.asm atoi.asm atol.asm atos.asm calloc.asm div.asm fin
 set HLP_C_SRC=
 set HLP_ASM_SRC=bdivs.asm bdivu.asm bldix.asm bldiy.asm bmuls.asm brems.asm bremu.asm bshl.asm bshrs.asm bshru.asm bstix.asm bstiy.asm case.asm case24.asm case24D.asm case16.asm case16D.asm case8.asm case8D.asm iand.asm idivs.asm idivu.asm ildix.asm ildiy.asm imulu.asm imuls.asm indcall.asm ineg.asm inot.asm ior.asm irems.asm iremu.asm ishl.asm ishrs.asm ishru.asm istix.asm istiy.asm itol.asm ixor.asm ladd.asm land.asm lcmpu.asm lcmps.asm ldivs.asm ldivu.asm lldix.asm lldiy.asm lmulu.asm lmuls.asm lneg.asm lnot.asm lor.asm lrems.asm lremu.asm lshl.asm lshrs.asm lshru.asm lstix.asm lstiy.asm lsub.asm lxor.asm sand.asm sdivs.asm sdivu.asm sldix.asm sldiy.asm smulu.asm sneg.asm snot.asm sor.asm srems.asm sremu.asm sshl.asm sshrs.asm sshru.asm sstix.asm sstiy.asm stoi.asm stoiu.asm sxor.asm frbmuls.asm frbtof.asm frftob.asm frftoi.asm frftos.asm frftoub.asm frftoui.asm frftous.asm frimuls.asm frimulu.asm fritof.asm frsmuls.asm frsmulu.asm frstof.asm frubtof.asm fruitof.asm frustof.asm frameset0.asm frameset.asm setflag.asm scmpzero.asm icmpzero.asm lcmpzero.asm seqcase.asm seqcaseD.asm
 
+set INT_C_SRC=
+set INT_ASM_SRC=interrupts.asm
+
 set DEBUG_C_SRC=
 set DEBUG_ASM_SRC=debugger.asm removeallbreakpoints.asm removeallwatchpoints.asm removebreakpoint.asm removewatchpoint.asm setbreakpoint.asm setreadwatchpoint.asm setwritewatchpoint.asm setreadwritewatchpoint.asm  setwatchpoint.asm
 set TICE_C_SRC=
@@ -70,6 +73,12 @@ set C_SRC=%TICE_C_SRC%
 set ASM_SRC=%TICE_ASM_SRC%
 call buildlib.bat ctice.lib
 
+echo -- Building Interrupt library...
+set MY_PATH=%CE_PATH%
+set C_SRC=%INT_C_SRC%
+set ASM_SRC=%INT_ASM_SRC%
+call buildlib.bat cintce.lib
+
 echo -- Building CHLP libraries...
 set MY_PATH=%SHARED_PATH%
 set C_SRC=%HLP_C_SRC%
@@ -100,6 +109,7 @@ REM -- copy the libraries --
 copy /Y *.lib %LIBPATH%\std
 move /Y %LIBPATH%\std\ctice.lib %LIBPATH%\std\ce\ctice.lib
 move /Y %LIBPATH%\std\cdebug.lib %LIBPATH%\std\ce\cdebug.lib
+move /Y %LIBPATH%\std\cintce.lib %LIBPATH%\std\ce\cintce.lib
 
 REM -- cleanup intermediate files --
 if exist *.lib del *.lib

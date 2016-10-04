@@ -6,6 +6,7 @@
 	
 _prgm_CleanUp:
 	ld	iy,%D00080
+	res	4,(iy+9) ; onInterrupt,(iy+onFlags)
 	call	%0020E5C ; _DelRes
 	call	%0020818 ; _ClrTxtShd
 	call	%0020814 ; _ClrScrn

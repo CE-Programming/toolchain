@@ -362,11 +362,11 @@ void os_ResetFlagBits(int16_t offset_pattern);
 /* These defines can be used to check the status of the timer */
 #define TIMER1_MATCH1	1 << 0	// Timer 1 hit the first match value
 #define TIMER1_MATCH2	1 << 1	// Timer 1 hit the second match value
-#define TIMER1_RELOADED	1 << 2	// Timer 1 was reloaded (Needs to have TIMER1_INT enabled)
+#define TIMER1_RELOADED	1 << 2	// Timer 1 was reloaded (Needs to have TIMER1_0INT enabled)
 
 #define TIMER2_MATCH1	1 << 3	// Timer 2 hit the first match value
 #define TIMER2_MATCH2	1 << 4	// Timer 2 hit the second match value
-#define TIMER2_RELOADED	1 << 5	// Timer 2 was reloaded (Needs to have TIMER2_INT enabled)
+#define TIMER2_RELOADED	1 << 5	// Timer 2 was reloaded (Needs to have TIMER2_0INT enabled)
 
 #define timer_1_Counter		(*(volatile uint32_t *)0xF20000)
 #define timer_2_Counter		(*(volatile uint32_t *)0xF20010)
@@ -374,11 +374,12 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define timer_2_ReloadValue	(*(uint32_t *)0xF20014)
 #define timer_1_MatchValue_1	(*(uint32_t *)0xF20008) 
 #define timer_1_MatchValue_2	(*(uint32_t *)0xF2000C)
-#define timer_2_MatchValue_1	(*(uint32_t *)0xF20018) 
-#define timer_2_MatchValue_2	(*(uint32_t *)0xF2001C)  
+#define timer_2_MatchValue_1	(*(uint32_t *)0xF20018)
+#define timer_2_MatchValue_2	(*(uint32_t *)0xF2001C)
 #define timer_Control		(*(uint32_t *)0xF20030)
-#define timer_IntMask		(*(uint16_t *)0xF20038)
+#define timer_EnableInt		(*(uint16_t *)0xF20038)
 #define timer_IntStatus		(*(volatile uint16_t *)0xF20034)
+#define timer_IntAcknowledge	(*(volatile uint16_t *)0xF20034)
 
 /**
  * Returns extended keys as 16-bits

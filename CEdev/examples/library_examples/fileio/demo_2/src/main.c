@@ -13,9 +13,6 @@
 /* Shared library headers -- depends on which ones you wish to use */
 #include <lib/ce/fileioc.h>
 
-/* Declare some strings and variables */
-const char prgmName[] = "ABC";
-
 /* Function prototypes */
 void printText(int8_t xpos, int8_t ypos, const char *text);
 
