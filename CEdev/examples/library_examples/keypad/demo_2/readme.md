@@ -1,3 +1,3 @@
-# Demo 1
+# Demo 2
 
-This demo shows how to interpret multiple keypresses at the same time
+This demo waits for the enter, clear, or on key to be pressed using interrupts
