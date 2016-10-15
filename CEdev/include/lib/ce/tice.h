@@ -19,20 +19,8 @@
 #define RTC_UNFREEZE		(1<<7)
 #define RTC_FREEZE		(0<<7)
 #define RTC_LOAD		(1<<6)
-#define RTC_ALARM_INT_SOURCE	(1<<5)
-#define RTC_DAY_INT_SOURCE	(1<<4)
-#define RTC_HR_INT_SOURCE	(1<<3)
-#define RTC_MIN_INT_SOURCE	(1<<2)
-#define RTC_SEC_INT_SOURCE	(1<<1)
 #define RTC_ENABLE		(1<<0)|RTC_UNFREEZE
 #define RTC_DISABLE		(0<<0)
-
-#define RTC_LOAD_INT		(1<<5)
-#define RTC_ALARM_INT		(1<<4)
-#define RTC_DAY_INT		(1<<3)
-#define RTC_HR_INT		(1<<2)
-#define RTC_MIN_INT		(1<<1)
-#define RTC_SEC_INT		(1<<0)
 
 #define rtc_Seconds		(*(volatile uint8_t*)0xF30000)
 #define rtc_Minutes		(*(volatile uint8_t*)0xF30004)
@@ -46,9 +34,29 @@
 #define rtc_LoadMinutes		(*(uint8_t*)0xF30028)
 #define rtc_LoadHours		(*(uint8_t*)0xF3002C)
 #define rtc_LoadDays		(*(uint16_t*)0xF30030)
-#define rtc_IntStatus		(*(volatile uint8_t*)0xF30037)
-#define rtc_IntAcknowledge	(*(volatile uint8_t*)0xF30034)
 #define rtc_IsBusy()		(rtc_Control & RTC_LOAD)
+
+/**
+ * The RTC does not appear to handle interrupt status correctly as of yet
+ * However, this may just require more testing. These will hopefully be updated
+ * in the near future
+ */
+#if 0
+#define RTC_ALARM_INT_SOURCE	(1<<5)
+#define RTC_DAY_INT_SOURCE	(1<<4)
+#define RTC_HR_INT_SOURCE	(1<<3)
+#define RTC_MIN_INT_SOURCE	(1<<2)
+#define RTC_SEC_INT_SOURCE	(1<<1)
+
+#define RTC_LOAD_INT		(1<<5)
+#define RTC_ALARM_INT		(1<<4)
+#define RTC_DAY_INT		(1<<3)
+#define RTC_HR_INT		(1<<2)
+#define RTC_MIN_INT		(1<<1)
+#define RTC_SEC_INT		(1<<0)
+#define rtc_IntStatus		(*(volatile uint8_t*)0xF30034)
+#define rtc_IntAcknowledge	(*(volatile uint8_t*)0xF30034)
+#endif
 
 /**
  * Resets the RTC back to its original values
