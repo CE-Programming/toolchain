@@ -68,7 +68,7 @@ void kb_Scan(void);
  */
 void kb_Reset(void);
 
-#define kb_SetMode(mode)		(kb_Config = (kb_Config & ~3)|mode)
+#define kb_SetMode(mode)		(kb_Config = ((kb_Config & ~3)|(mode)))
 
 #define MODE_0_IDLE			(0)
 #define MODE_1_INDISCRIMINATE		(1)
@@ -81,9 +81,9 @@ void kb_Reset(void);
 #define kb_Config			(*(uint8_t*)0xF50000)
 #define kb_DataArray			((uint16_t*)0xF50010)
 
-#define KB_SCAN_COMPLETE		1<<0
-#define KB_DATA_CHANGED			1<<1
-#define KB_MODE_1_PRESS			1<<2
+#define KB_SCAN_COMPLETE		(1<<0)
+#define KB_DATA_CHANGED			(1<<1)
+#define KB_MODE_1_PRESS			(1<<2)
 
 /**
  * Keyboard group 0 (Unused)
