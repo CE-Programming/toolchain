@@ -25,6 +25,10 @@ intRtc			equ	1000h
 ;-------------------------------------------------------------------------------
 _int_Initialize:
 	di
+	ld	de,lconf
+	ld	hl,mpIntMask
+	ld	bc,16
+	ldir
 	ld	hl,cconf
 	ld	de,mpIntMask
 	ld	bc,16
@@ -125,12 +129,11 @@ _int_Reset:
 	ldir
 	im	1
 	ret
-	
-lconf:	db 011h,030h,000h,000h
+	segment bss
+lconf:	ds	16
+	segment data
+cconf:	; Mask
 	db 000h,000h,000h,000h
-	db 019h,000h,000h,000h
-	; Mask
-cconf:	db 000h,000h,000h,000h
 	; ACK
 	db 0FFh,0FFh,0FFh,0FFh
 	; Latch

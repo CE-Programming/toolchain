@@ -22,7 +22,7 @@ void interrupt isr_keyboard(void);
 
 /* Global Flag */
 uint8_t exit_loop = false;
-
+int a;
 /* Main Function */
 void main(void) {
 	/* Initialize the interrupt handlers */
@@ -37,7 +37,7 @@ void main(void) {
 	kb_EnableInt = KB_DATA_CHANGED;
 	
 	/* Configure the keypad to be continously scanning */
-	kb_Config = MODE_3_CONTINUOUS | DEFAULT_SCAN_CYCLES;
+	kb_SetMode(MODE_3_CONTINUOUS);
 	
 	/* Interrupts can now generate after this */
 	int_Enable();
@@ -47,6 +47,7 @@ void main(void) {
 	
 	/* Reset the interrupt handler and cleanup the program */
 	int_Reset();
+	kb_Reset();
 	prgm_CleanUp();
 }
 
@@ -71,5 +72,5 @@ void interrupt isr_keyboard(void) {
 	/* Must acknowledge that the interrupt occured to clear the flag */
 	int_Acknowledge = INT_KEYBOARD;
 	/* Acknowledge in the keypad controller (Not technically required because interrupt controller handles signal) */
-	//kb_IntAcknowledge = KB_DATA_CHANGED;
+	kb_IntAcknowledge = KB_DATA_CHANGED;
 }

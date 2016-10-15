@@ -37,7 +37,7 @@ void main(void) {
 	kb_EnableInt = KB_MODE_1_PRESS;
 	
 	/* Configure the keypad to be continously scanning */
-	kb_Config = MODE_1_INDISCRIMINATE | DEFAULT_SCAN_CYCLES;
+	kb_SetMode(MODE_1_INDISCRIMINATE);
 	
 	/* Interrupts can now generate after this */
 	int_Enable();
@@ -47,6 +47,7 @@ void main(void) {
 	
 	/* Reset the interrupt handler and cleanup the program */
 	int_Reset();
+	kb_Reset();
 	prgm_CleanUp();
 }
 

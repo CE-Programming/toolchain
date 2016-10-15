@@ -18,8 +18,6 @@
 void interrupt isr_timer1(void);
 void interrupt isr_on(void);
 
-/* Global status flag */
-bool exit_loop = false;
 /* Location of memory-mapped screen */
 uint16_t *lcd_vramArray = (uint16_t*)0xD40000;
 

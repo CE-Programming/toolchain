@@ -35,7 +35,7 @@
  .beginDependencies
  .endDependencies
 
-resizeBytes	equ 0E30C0Eh
+resizeBytes	equ 0E30C0Ch
 currSlot	equ 0E30C11h
 charIn		equ 0E30C12h
 
