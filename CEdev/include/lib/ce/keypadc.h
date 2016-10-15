@@ -46,19 +46,19 @@ typedef uint16_t kb_lkey_t;
 
 /**
  * Scans the given keyboard row and returns the row value
- * Note: Disables interrupts during execution, and restores on completion
+ * Note: Disables interrupts
  */
 uint8_t kb_ScanGroup(uint8_t row);
 
 /**
  * Scans the keyboard quickly to tell if any key was pressed
- * Note: Disables interrupts during execution, and restores on completion
+ * Note: Disables interrupts
  */
 uint8_t kb_AnyKey(void);
 
 /**
  * Scans the keyboard to update data values
- * Note: Disables interrupts during execution, and restores on completion
+ * Note: Disables interrupts
  */
 void kb_Scan(void);
 
@@ -68,7 +68,11 @@ void kb_Scan(void);
  */
 void kb_Reset(void);
 
+/**
+ * Used for changing the scan operation on the keypad
+ */
 #define kb_SetMode(mode)		(kb_Config = ((kb_Config & ~3)|(mode)))
+#define kb_GetMode()			(kb_Config & 3)
 
 #define MODE_0_IDLE			(0)
 #define MODE_1_INDISCRIMINATE		(1)
