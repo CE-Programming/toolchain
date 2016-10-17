@@ -1858,32 +1858,37 @@ _Sprite_NoClip:
 ;  arg2 : Y Coord
 ; Returns:
 ;  None
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy+6)			; hl = x coordinate
-	ld	c,(iy+9)			; c = y coordinate
-	ld	iy,(iy+3)			; iy -> sprite struct
-	ld	de,(currDrawBuffer)
-	add	hl,de
-	ld	b,lcdWidth/2
-	mlt	bc
+	ld 	(NoClipSprSaveSp),sp \.r
+	inc	sp
+	inc	sp
+	inc	sp
+	pop	iy			; iy = sprite structure
+	pop	bc			; bc = x coordinate
+	pop	de			; de = y coordinate
+	ld	hl,(currDrawBuffer)
 	add	hl,bc
-	add	hl,bc				; hl -> start draw location
-	ld	b,0
-	push	hl
-	ld	a,(iy+0)
-	ld	(NoClipSprLineNext),a \.r	; a = width
+	ld	d,lcdWidth/2
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ex	de,hl			; de = (x,y) address on screen
+	ld	hl,lcdWidth
+	ld 	b,0
+	ld 	c,(iy+0)			; c = width
+	sbc	hl,bc	
+	ld	sp,hl			; sp = 320 - width
 	ld	a,(iy+1)			; a = height
-	lea	hl,iy+2				; hl = data
-	pop	iy
-NoClipSprLineNext =$+1
-_:	ld	c,0
-	lea	de,iy
-	ldir
-	ld	de,lcdWidth
-	add	iy,de
+	lea 	hl,iy+2			; hl = data
+	ld	iyl,c			; width saved in iyl
+_:	ldir
+	ld	c,iyl
+	ex	de,hl
+	add	hl,sp
+	ex	de,hl
 	dec	a
 	jr	nz,-_
+NoClipSprSaveSp=$+1
+_:	ld	sp,0
 	ret
 
 ;-------------------------------------------------------------------------------
