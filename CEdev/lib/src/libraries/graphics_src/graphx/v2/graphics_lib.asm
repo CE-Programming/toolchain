@@ -1796,16 +1796,50 @@ ClipSprTransNextAmt =$+1
 	pop	ix
 	ret
 
-_:	ldi
+_TransparentPlot_ASM_Opaque:
+	ldi
 	ret	po
-_TransparentPlot_ASM:
-_:	cp	a,(hl)
-	jr	nz,--_
+	cp	a,(hl)
+	jr	z,_TransparentPlot_ASM_Transparent
+	ldi
+	ret	po
+	cp	a,(hl)
+	jr	z,_TransparentPlot_ASM_Transparent
+	ldi
+	ret	po
+	cp	a,(hl)
+	jr	z,_TransparentPlot_ASM_Transparent
+	ldi
+	ret	po
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_ASM_Opaque
+_TransparentPlot_ASM_Transparent:
 	inc	de
 	inc	hl
 	dec	c
-	jr	nz,-_ 				; 41 cycles
-	ret
+	ret	z
+_TransparentPlot_ASM:
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_ASM_Opaque
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_ASM_Opaque
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_ASM_Opaque
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+	cp	a,(hl)
+	jr	z,_TransparentPlot_ASM_Transparent
+	jr	_TransparentPlot_ASM_Opaque
 
 ;-------------------------------------------------------------------------------
 _Sprite:
