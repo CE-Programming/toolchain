@@ -34,12 +34,12 @@
 #define rtc_LoadMinutes     (*(uint8_t*)0xF30028)
 #define rtc_LoadHours       (*(uint8_t*)0xF3002C)
 #define rtc_LoadDays        (*(uint16_t*)0xF30030)
+#define rtc_IntStatus       (*(volatile uint8_t*)0xF30034)
+#define rtc_IntAcknowledge  (*(volatile uint8_t*)0xF30034)
 #define rtc_IsBusy()        (rtc_Control & RTC_LOAD)
 
 /**
- * The RTC does not appear to handle interrupt status correctly as of yet
- * However, this may just require more testing. These will hopefully be updated
- * in the near future
+ * RTC interrupt masks
  */
 #define RTC_ALARM_INT_SOURCE    (1<<5)
 #define RTC_DAY_INT_SOURCE      (1<<4)
@@ -54,8 +54,6 @@
 #define RTC_MIN_INT             (1<<1)
 #define RTC_SEC_INT             (1<<0)
 #define RTC_INT_MASK            (RTC_SEC_INT | RTC_MIN_INT | RTC_HR_INT | RTC_DAY_INT | RTC_ALARM_INT | RTC_LOAD_INT)
-#define rtc_IntStatus           (*(volatile uint8_t*)0xF30034)
-#define rtc_IntAcknowledge      (*(volatile uint8_t*)0xF30034)
 
 /**
  * Resets the RTC back to its original values

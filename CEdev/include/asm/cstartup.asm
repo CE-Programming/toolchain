@@ -7,10 +7,11 @@
 ;-------------------------------------------------------------------------------
 	xref	__low_bss
 	xref	_main
-	
+	xref	_exit
+
 	xdef	_errno
-	xdef	_exit
 	xdef	_init
+	xdef	__exit
 	
 	.assume	ADL = 1
 
@@ -51,20 +52,28 @@ _init:
 	push	hl
 	ld	a,(hl)
 	push	af
-	ld	(hl),2          ; reduce flash wait states (because of rtl)
+	ld	(hl),1          ; reduce flash wait states (because of rtl)
 	ld	hl,(0F20030h)   ; save timer control state
 	push	hl
 	ld	(__errsp+1),sp  ; save the stack from death
 	call	_main
-_exit:
+
+	ifdef	USE_AT_EXIT
+	push	hl
+	call	_exit
+	endif
+
+__exit:
+	ex	de,hl
 __errsp:
 	ld	sp,0
 	pop	hl
 	ld	(0F20030h),hl   ; restore timer control state
 	pop	af
 	pop	hl
-	ld	(hl),a    ; restore flash wait states
+	ld	(hl),a          ; restore flash wait states
 	pop	iy              ; restore iy for OS
+	ex	de,hl
 	ret
 ;-------------------------------------------------------------------------------
 	segment	code
