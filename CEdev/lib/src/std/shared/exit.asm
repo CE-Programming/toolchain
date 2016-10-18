@@ -47,7 +47,7 @@ _exit:
 	ld	de,_already_in_atexit
 	ld	a,(de)
 	or	a,a
-	ret	nz             ; check to see if some idiot called exit()
+	jp	nz,__exit            ; check to see if some idiot called exit()
 	inc	a
 	ld	(de),a
 	push	hl
@@ -68,4 +68,4 @@ _lexit:	ld	hl,___atexit_registered
 	jr	_lexit
 
 _end:	pop	hl
-	ret
+	jp	__exit
