@@ -59,43 +59,43 @@ void int_SetVector(uint8_t ivect, void (*handler)(void));
 /**
  * Enable/Disable global interrupts
  */
-#define int_Enable() asm("ei")
-#define int_Disable() asm("di")
+#define int_Enable()    asm("ei")
+#define int_Disable()   asm("di")
 
 /**
  * Interrupt sources
  */
-#define ON_IVECT	0
-#define TIMER1_IVECT	1
-#define TIMER2_IVECT	2
-#define TIMER3_IVECT	3
-#define TIMEROS_IVECT	4
-#define KEYBOARD_IVECT	10
-#define LCD_IVECT	11
-#define RTC_IVECT	12
-#define USB_IVECT	13
+#define ON_IVECT        0
+#define TIMER1_IVECT    1
+#define TIMER2_IVECT    2
+#define TIMER3_IVECT    3
+#define TIMEROS_IVECT   4
+#define KEYBOARD_IVECT  10
+#define LCD_IVECT       11
+#define RTC_IVECT       12
+#define USB_IVECT       13
 
 /**
  * Interrupt config bitmasks
  */
-#define INT_ON		1<<ON_IVECT
-#define INT_TIMER1	1<<TIMER1_IVECT
-#define INT_TIMER2	1<<TIMER2_IVECT
-#define INT_TIMER3	1<<TIMER3_IVECT
-#define INT_TIMEROS	1<<TIMEROS_IVECT
+#define INT_ON          1<<ON_IVECT
+#define INT_TIMER1      1<<TIMER1_IVECT
+#define INT_TIMER2      1<<TIMER2_IVECT
+#define INT_TIMER3      1<<TIMER3_IVECT
+#define INT_TIMEROS     1<<TIMEROS_IVECT
 #define INT_KEYBOARD	1<<KEYBOARD_IVECT
-#define INT_LCD		1<<LCD_IVECT
-#define INT_RTC		1<<RTC_IVECT
-#define INT_USB		1<<USB_IVECT
+#define INT_LCD         1<<LCD_IVECT
+#define INT_RTC         1<<RTC_IVECT
+#define INT_USB         1<<USB_IVECT
 
 /**
  * Interrupt controller registers
  */
-#define int_RawStatus		(*(volatile uint24_t*)0x0F00000)
-#define int_MaskedStatus	(*(volatile uint24_t*)0x0F00014)
-#define int_EnableConfig	(*(uint24_t*)0x0F00004)
-#define int_LatchConfig		(*(uint24_t*)0x0F0000C)
-#define int_InvertConfig	(*(uint24_t*)0x0F00010)
-#define int_Acknowledge		(*(uint24_t*)0x0F00008)
+#define int_RawStatus       (*(volatile uint24_t*)0x0F00000)
+#define int_MaskedStatus    (*(volatile uint24_t*)0x0F00014)
+#define int_EnableConfig    (*(uint24_t*)0x0F00004)
+#define int_LatchConfig     (*(uint24_t*)0x0F0000C)
+#define int_InvertConfig    (*(uint24_t*)0x0F00010)
+#define int_Acknowledge     (*(uint24_t*)0x0F00008)
 
 #endif

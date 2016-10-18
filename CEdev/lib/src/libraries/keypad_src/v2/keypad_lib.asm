@@ -23,17 +23,12 @@ _Scan:
 ;  None
 ; Returns:
 ;  None
-	ld	a,i
-	push	af
 	di
 	ld	hl,$f50200	;DI_Mode=$f5xx00
 	ld	(hl),h
 	xor	a,a
 _:	cp	a,(hl)
 	jr	nz,-_
-	pop	af
-	ret	po
-	ei
 	ret
  
 ;-------------------------------------------------------------------------------
@@ -61,8 +56,6 @@ _ScanGroup:
 	pop	bc
 	push	bc
 	push	hl
-	ld	a,i
-	push	af
 	di
 	ld	hl,$f50200	;DI_Mode=$f5xx00
 	ld	(hl),h
@@ -76,15 +69,9 @@ _:	cp	a,(hl)
 	mlt	hl
 	ld	de,kbdG1-2
 	add	hl,de
-	pop	af
 	ld	a,(hl)
-	ret	po
-	ei
 	ret
-_:	pop	af
-	ret	po
-	ei
-	xor	a,a
+_:	xor	a,a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -95,8 +82,6 @@ _AnyKey:
 ;  None
 ; Returns:
 ;  0 if no key is pressed
-	ld	a,i
-	push	af
 	di
 	ld	hl,$f50200	;DI_Mode=$f5xx00
 	ld	(hl),h
@@ -123,10 +108,6 @@ _:	cp	a,(hl)
 	inc	hl
 	inc	hl
 	or	a,(hl)
-	pop	bc
-	bit	2,c
-	ret	z
-	ei
 	ret
 
  .endLibrary
