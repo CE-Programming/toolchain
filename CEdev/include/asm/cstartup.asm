@@ -58,7 +58,7 @@ _init:
 	ld	(__errsp+1),sp  ; save the stack from death
 	call	_main
 
-	ifdef	USE_AT_EXIT
+	ifdef	_USING_AT_EXIT
 	push	hl
 	call	_exit
 	endif

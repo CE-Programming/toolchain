@@ -1,9 +1,9 @@
 ;-------------------------------------------------------------------------
-; Performs a simple cleanup in order to get ready for the OS
+; Performs a simple cleanup for the OS
 ;-------------------------------------------------------------------------
-	.assume ADL=1
 	.def _prgm_CleanUp
-	
+	.assume ADL=1
+
 _prgm_CleanUp:
 	ld	iy,%D00080
 	res	4,(iy+9) ; onInterrupt,(iy+onFlags)
