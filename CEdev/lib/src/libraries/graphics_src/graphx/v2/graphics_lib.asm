@@ -624,8 +624,8 @@ _VertLine_NoClip:
 	ld	e,(iy+6)			; y
 	ld	b,(iy+9)			; length
 _VertLine_ASM:
-	xor 	a
-	or	b
+	xor 	a,a
+	or	a,b
 	ret	z
 	ld	d,lcdWidth/2
 	mlt	de

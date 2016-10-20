@@ -36,12 +36,12 @@ _Reset:
 ; Returns:
 ;  None
 	ld	hl,DI_Mode
-	xor	a		; Mode 0
+	xor	a,a		; Mode 0
 	ld	(hl),a
 	inc	l		; 0F50001h
 	ld	(hl),15	; Wait 15*256 APB cycles before scanning each row
 	inc	l		; 0F50002h
-	xor	a
+	xor	a,a
 	ld	(hl),a
 	inc	l		; 0F50003h
 	ld	(hl),15	; Wait 15 APB cycles before each scan

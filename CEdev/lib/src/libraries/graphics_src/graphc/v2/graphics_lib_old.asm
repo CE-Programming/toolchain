@@ -675,7 +675,7 @@ _:	ld	a,(hl)
 	ld	l,mpLcdBase&$ff
 	ld	de,(hl)
 	ld	(currentDrawingBuffer),de
-	cp	d
+	cp	a,d
 	ld	de,vram
 	jr	nc,_
 	ld	de,vram+lcdSize
