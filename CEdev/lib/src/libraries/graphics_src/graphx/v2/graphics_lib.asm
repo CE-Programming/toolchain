@@ -624,7 +624,8 @@ _VertLine_NoClip:
 	ld	e,(iy+6)			; y
 	ld	b,(iy+9)			; length
 _VertLine_ASM:
-	dec	b
+	xor 	a
+	or	b
 	ret	z
 	ld	d,lcdWidth/2
 	mlt	de
@@ -635,7 +636,8 @@ _VertLine_ASM:
 _RectVert_ASM:
 	ld	de,lcdWidth
 color3 =$+1
-_:	ld	(hl),0				; loop for height
+	ld 	a,0
+_:	ld	(hl),a				; loop for height
 	add	hl,de
 	djnz	-_
 	ret
