@@ -677,14 +677,9 @@ _SwapDraw:
 ;  None
 ; Returns:
 ;  None
-	ld	hl,vram
 	ld	de,(mpLcdBase)
-	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jr	nz,+_
-	ld	hl,vram+lcdSize
-_:	ld	(currDrawBuffer),de		; set up the new buffer location
+	ld	hl, (currDrawBuffer)
+	ld	(currDrawBuffer),de		; set up the new buffer location
 	ld	(mpLcdBase),hl			; set the new pointer location
 	ld	hl,mpLcdIcr
 	set	2,(hl)				; clear the previous intrpt set
