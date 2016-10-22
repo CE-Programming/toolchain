@@ -483,12 +483,14 @@ _Rectangle_NoClip:
 	call	_RectHoriz_ASM \.r		; top horizontal line
 	pop	bc
 	push	bc
-	call	_RectVert_ASM \.r		; left vertical line
+	call	_RectVert_ASM \.r		; right vertical line
 	pop	bc
 	pop	hl
 	ld	e,c
-	call	_VertLine_ASM \.r		; right vertical line
+	call	_VertLine_ASM \.r		; left vertical line
 	pop	bc
+	or	a,a
+	sbc	hl,de
 	jp	_MemSet_ASM \.r			; bottom horizontal line
 
 ;-------------------------------------------------------------------------------
@@ -605,7 +607,7 @@ _VertLine:
 	ret	c				; return if not within y bounds
 	ld	hl,(iy+9)
 	sbc	hl,de
-	ld	a,l
+	ld	b,l
 	ld	hl,(iy+3)
 	jr	_VertLine_ASM			; jump to unclipped version
 
@@ -622,11 +624,11 @@ _VertLine_NoClip:
 	add	iy,sp
 	ld	hl,(iy+3)			; x
 	ld	e,(iy+6)			; y
-	ld	a,(iy+9)			; length
+	ld	b,(iy+9)			; length
 _VertLine_ASM:
-	or	a,a
+	xor	a,a
+	or	a,b
 	ret	z
-	ld	b,a
 	ld	d,lcdWidth/2
 	mlt	de
 	add.s	hl,de
