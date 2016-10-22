@@ -510,6 +510,7 @@ _HorizLine:
 	ld	de,(iy+6)
 	call	_SignedCompare_ASM \.r		; compare y coordinate <-> ymax
 	ret	c
+	ret	z
 	ld	hl,(iy+9)
 	ld	de,(iy+3)
 	add	hl,de
@@ -604,8 +605,7 @@ _VertLine:
 	ret	c				; return if not within y bounds
 	ld	hl,(iy+9)
 	sbc	hl,de
-	ld	b,l
-	inc	b
+	ld	a,l
 	ld	hl,(iy+3)
 	jr	_VertLine_ASM			; jump to unclipped version
 
@@ -622,11 +622,11 @@ _VertLine_NoClip:
 	add	iy,sp
 	ld	hl,(iy+3)			; x
 	ld	e,(iy+6)			; y
-	ld	b,(iy+9)			; length
+	ld	a,(iy+9)			; length
 _VertLine_ASM:
-	xor 	a,a
-	or	a,b
+	or	a,a
 	ret	z
+	ld	b,a
 	ld	d,lcdWidth/2
 	mlt	de
 	add.s	hl,de
