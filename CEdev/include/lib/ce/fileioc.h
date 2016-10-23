@@ -54,6 +54,13 @@
 #define TI_MATRIX_TYPE		(0x02)
 #define TI_STRING_TYPE		(0x04)
 #define TI_EQU_TYPE		(0x03)
+/**
+ * For compatibility reasons
+ */
+#define ti_Program             TI_PRGM_TYPE
+#define ti_ProtectedProgram    TI_PPRGM_TYPE
+#define ti_TempProgram         TI_TPRGM_TYPE
+#define ti_AppVar              TI_APPVAR_TYPE
 
 #ifndef EOF
 #define EOF (-1)
