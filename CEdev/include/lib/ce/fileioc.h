@@ -1,8 +1,8 @@
 /**
- * @file    FILEIOC CE C Library
- * @version 2.0
+ * FILEIOC CE C Library
+ * \version 2.0
  *
- * @section LICENSE
+ * \section LICENSE
  *
  * Copyright (c) 2016, Matthew Waltz
  * All rights reserved.
@@ -28,7 +28,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * @section DESCRIPTION
+ * \section DESCRIPTION
  *
  * This library implements some variable opening and editing routines
  */
@@ -40,19 +40,28 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <tice.h>
 
 /**
  * Varible and flag definitions
  */
-#define ti_Program             (5)
-#define ti_ProtectedProgram    (6)
-#define ti_AppVar              (21)
-#define ti_TempProgram         (22)
+#define TI_PRGM_TYPE		(0x05)
+#define TI_PPRGM_TYPE		(0x06)
+#define TI_TPRGM_TYPE		(0x16)
+#define TI_APPVAR_TYPE		(0x15)
+#define TI_REAL_TYPE		(0x00)
+#define TI_CPLX_TYPE		(0x0C)
+#define TI_MATRIX_TYPE		(0x02)
+#define TI_STRING_TYPE		(0x04)
+#define TI_EQU_TYPE		(0x03)
 
 #ifndef EOF
 #define EOF (-1)
 #endif
 
+/**
+ * Some variable types
+ */
 typedef uint8_t ti_var_t;
 
 /**
@@ -76,7 +85,7 @@ void ti_CloseAll(void);
  * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.   (RAM)
  * Unlike the standard implementation of fopen, the "b" (binary) mode is not available because characters are only 8 bits wide on this platform.
  * Type:
- *  Specifies the type of variable to open
+ *  Specifies the type of variable to open -- Only useable when it makes sense
  */
 ti_var_t ti_Open(const char *varname, const char *mode);
 ti_var_t ti_OpenVar(const char *varname, const char *mode, uint8_t type);
@@ -215,5 +224,103 @@ char *ti_GetTokenString(void **read_pointer, uint8_t *length_of_token, unsigned 
  * Good way for fast reading of data
  */
 void *ti_GetDataPtr(const ti_var_t slot);
+
+/**
+ * Sets a varaible
+ * Returns 0 if success
+ */
+uint8_t ti_SetVar(uint8_t obj_type, const char *name, void *data);
+
+/**
+ * Stores a varaible
+ * Returns 0 if success
+ */
+uint8_t ti_StoVar(uint8_t obj_type_to, void *to, uint8_t obj_type_from, void *from);
+
+/**
+ * Recalls a varaible
+ * Returns 0 if success
+ * data is set to the data being pointed to
+ */
+uint8_t ti_RclVar(uint8_t obj_type, const char *var_name, void **data_struct);
+
+/**
+ * Some more definitions using Ans
+ */
+#define TI_ANS_TYPE	0x00
+#define TI_TEMP_TYPE	0x80
+#define ti_Ans		("\x72\0")
+
+/**
+ * Some string definitions
+ */
+#define ti_Str1     ("\xAA\x0\0")
+#define ti_Str2     ("\xAA\x1\0")
+#define ti_Str3     ("\xAA\x2\0")
+#define ti_Str4     ("\xAA\x3\0")
+#define ti_Str5     ("\xAA\x4\0")
+#define ti_Str6     ("\xAA\x5\0")
+#define ti_Str7     ("\xAA\x6\0")
+#define ti_Str8     ("\xAA\x7\0")
+#define ti_Str0     ("\xAA\x8\0")
+
+/**
+ * Some equation definitions
+ */
+#define ti_EquY1    ("\x5E\x10\0")
+#define ti_EquY2    ("\x5E\x11\0")
+#define ti_EquY3    ("\x5E\x12\0")
+#define ti_EquY4    ("\x5E\x13\0")
+#define ti_EquY5    ("\x5E\x14\0")
+#define ti_EquY6    ("\x5E\x15\0")
+#define ti_EquY7    ("\x5E\x16\0")
+#define ti_EquY8    ("\x5E\x17\0")
+#define ti_EquY9    ("\x5E\x18\0")
+#define ti_EquY0    ("\x5E\x19\0")
+
+/**
+ * Some real and complex defines
+ */
+#define ti_A        ("\x41\0\0")
+#define ti_B        ("\x42\0\0")
+#define ti_C        ("\x43\0\0")
+#define ti_D        ("\x44\0\0")
+#define ti_E        ("\x45\0\0")
+#define ti_F        ("\x46\0\0")
+#define ti_G        ("\x47\0\0")
+#define ti_H        ("\x48\0\0")
+#define ti_I        ("\x49\0\0")
+#define ti_J        ("\x4A\0\0")
+#define ti_K        ("\x4B\0\0")
+#define ti_L        ("\x4C\0\0")
+#define ti_M        ("\x4D\0\0")
+#define ti_N	    ("\x4E\0\0")
+#define ti_O        ("\x4F\0\0")
+#define ti_P        ("\x50\0\0")
+#define ti_Q        ("\x51\0\0")
+#define ti_R        ("\x52\0\0")
+#define ti_S        ("\x53\0\0")
+#define ti_T        ("\x54\0\0")
+#define ti_U        ("\x55\0\0")
+#define ti_V        ("\x56\0\0")
+#define ti_W        ("\x57\0\0")
+#define ti_X        ("\x58\0\0")
+#define ti_Y        ("\x59\0\0")
+#define ti_Z        ("\x60\0\0")
+#define ti_Theta    ("\x61\0\0")
+
+/**
+ * Some matrix defines
+ */
+#define ti_MatA     ("\x5C\x0\0")
+#define ti_MatB     ("\x5C\x1\0")
+#define ti_MatC     ("\x5C\x2\0")
+#define ti_MatD     ("\x5C\x3\0")
+#define ti_MatE     ("\x5C\x4\0")
+#define ti_MatF     ("\x5C\x5\0")
+#define ti_MatG     ("\x5C\x6\0")
+#define ti_MatH     ("\x5C\x7\0")
+#define ti_MatI     ("\x5C\x8\0")
+#define ti_MatJ     ("\x5C\x9\0")
 
 #endif

@@ -4,7 +4,7 @@
 :: Set LIB_SRC to the assembly source of your library
 
 set LIB_NAME=FILEIOC
-set LIB_SRC=fileio_lib_old.asm
+set LIB_SRC=fileio_lib.asm
 
 echo Assembling Library...
 mkdir lib

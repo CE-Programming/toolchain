@@ -56,6 +56,11 @@
 #define RTC_INT_MASK            (RTC_SEC_INT | RTC_MIN_INT | RTC_HR_INT | RTC_DAY_INT | RTC_ALARM_INT | RTC_LOAD_INT)
 
 /**
+ * LCD defines
+ */
+#define lcd_BacklightLevel	(*(uint8_t*)0xF60024)
+
+/**
  * Resets the RTC back to its original values
  * If enable is true, the RTC will be enabled during this function
  */
@@ -72,18 +77,16 @@ void *os_GetSystemStats(void);
 void os_PushErrorHandler(void *routine);
 void os_PopErrorHandler(void);
 
-/* LCD defines */
-#define lcd_BacklightLevel	(*((uint8_t*)0xF60024))
-
 /**
  * OS varaible type definitions
  */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
 typedef struct { real_t real, imag; } cplx_t;
-typedef struct { uint16_t dim; real_t *items; } list_t;
-typedef struct { uint16_t dim; cplx_t *items; } cplx_list_t;
-typedef struct { uint8_t cols, rows; real_t *items; } matrix_t;
-typedef struct { uint16_t size; uint8_t *data; } var_t;
+typedef struct { uint16_t dim; real_t items[1]; } list_t;
+typedef struct { uint16_t dim; cplx_t items[1]; } cplx_list_t;
+typedef struct { uint8_t cols, rows; real_t items[1]; } matrix_t;
+typedef struct { uint16_t len; char data[1]; } string_t;
+typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
 /**
  * Cleans up everything and gets ready to enter back to the OS

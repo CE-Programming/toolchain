@@ -931,7 +931,7 @@ _:	ld	(DetectType_SMC),a \.r
 	ld	hl,(progPtr)
 fdetect:
 	ld	de,(pTemp)
-	or	a,a
+	or	a
 	sbc	hl,de
 	jr	c,finish
 	jr	z,finish

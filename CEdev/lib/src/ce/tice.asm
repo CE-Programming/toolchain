@@ -1,7 +1,7 @@
 ; C Functions present in the CE OS and Bootcode
 
 ; --- External Definitions -------------------
-    .assume ADL=1
+	.assume ADL=1
 	.def _boot_GetBootVerMajor
 	.def _boot_GetHardwareVers
 	.def _boot_GetBootVerMinor
