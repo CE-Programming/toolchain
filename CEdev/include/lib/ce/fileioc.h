@@ -56,6 +56,23 @@
 #define TI_EQU_TYPE             (0x03)
 #define TI_REAL_LIST_TYPE       (0x01)
 #define TI_CPLX_LIST_TYPE       (0x0D)
+#define TI_PRGM_TYPE		(0x05)
+#define TI_PPRGM_TYPE		(0x06)
+#define TI_TPRGM_TYPE		(0x16)
+#define TI_APPVAR_TYPE		(0x15)
+#define TI_REAL_TYPE		(0x00)
+#define TI_CPLX_TYPE		(0x0C)
+#define TI_MATRIX_TYPE		(0x02)
+#define TI_STRING_TYPE		(0x04)
+#define TI_EQU_TYPE		(0x03)
+
+/**
+ * For compatibility reasons
+ */
+#define ti_Program             TI_PRGM_TYPE
+#define ti_ProtectedProgram    TI_PPRGM_TYPE
+#define ti_TempProgram         TI_TPRGM_TYPE
+#define ti_AppVar              TI_APPVAR_TYPE
 
 #ifndef EOF
 #define EOF (-1)
