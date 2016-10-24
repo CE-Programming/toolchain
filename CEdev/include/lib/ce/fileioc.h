@@ -45,15 +45,17 @@
 /**
  * Varible and flag definitions
  */
-#define TI_PRGM_TYPE		(0x05)
-#define TI_PPRGM_TYPE		(0x06)
-#define TI_TPRGM_TYPE		(0x16)
-#define TI_APPVAR_TYPE		(0x15)
-#define TI_REAL_TYPE		(0x00)
-#define TI_CPLX_TYPE		(0x0C)
-#define TI_MATRIX_TYPE		(0x02)
-#define TI_STRING_TYPE		(0x04)
-#define TI_EQU_TYPE		(0x03)
+#define TI_PRGM_TYPE            (0x05)
+#define TI_PPRGM_TYPE           (0x06)
+#define TI_TPRGM_TYPE           (0x16)
+#define TI_APPVAR_TYPE          (0x15)
+#define TI_REAL_TYPE            (0x00)
+#define TI_CPLX_TYPE            (0x0C)
+#define TI_MATRIX_TYPE          (0x02)
+#define TI_STRING_TYPE          (0x04)
+#define TI_EQU_TYPE             (0x03)
+#define TI_REAL_LIST_TYPE       (0x01)
+#define TI_CPLX_LIST_TYPE       (0x0D)
 
 #ifndef EOF
 #define EOF (-1)
@@ -244,11 +246,21 @@ uint8_t ti_StoVar(uint8_t obj_type_to, void *to, uint8_t obj_type_from, void *fr
  */
 uint8_t ti_RclVar(uint8_t obj_type, const char *var_name, void **data_struct);
 
+string_t *ti_CustomAllocString(unsigned len, void (*malloc_routine)(size_t));
+#define ti_AllocString(len) ti_CustomAllocString(len, (void*)malloc)
+list_t *ti_CustomAllocList(unsigned dim, void (*malloc_routine)(size_t));
+#define ti_AllocList(dim) ti_CustomAllocList(dim, (void*)malloc)
+matrix_t *ti_CustomAllocMatrix(uint8_t rows, uint8_t cols, void (*malloc_routine)(size_t));
+#define ti_AllocMatrix(rows, cols) ti_CustomAllocMatrix(rows, cols, (void*)malloc)
+cplx_list_t *ti_CustomAllocCplxList(unsigned dim, void (*malloc_routine)(size_t));
+#define ti_AllocCplxList(dim) ti_CustomAllocCplxList(dim, (void*)malloc)
+equ_t *ti_CustomAllocEqu(unsigned len, void (*malloc_routine)(size_t));
+#define ti_AllocEqu(len) ti_CustomAllocEqu(len, (void*)malloc)
+
 /**
  * Some more definitions using Ans
  */
 #define TI_ANS_TYPE	0x00
-#define TI_TEMP_TYPE	0x80
 #define ti_Ans		("\x72\0")
 
 /**
@@ -322,5 +334,15 @@ uint8_t ti_RclVar(uint8_t obj_type, const char *var_name, void **data_struct);
 #define ti_MatH     ("\x5C\x7\0")
 #define ti_MatI     ("\x5C\x8\0")
 #define ti_MatJ     ("\x5C\x9\0")
+
+/**
+ * Some list defines
+ */
+#define ti_L1        ("\x5D\x0\0")
+#define ti_L2        ("\x5D\x1\0")
+#define ti_L3        ("\x5D\x2\0")
+#define ti_L4        ("\x5D\x3\0")
+#define ti_L5        ("\x5D\x4\0")
+#define ti_L6        ("\x5D\x5\0")
 
 #endif

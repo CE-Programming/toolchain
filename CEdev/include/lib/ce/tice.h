@@ -86,7 +86,10 @@ typedef struct { uint16_t dim; real_t items[1]; } list_t;
 typedef struct { uint16_t dim; cplx_t items[1]; } cplx_list_t;
 typedef struct { uint8_t cols, rows; real_t items[1]; } matrix_t;
 typedef struct { uint16_t len; char data[1]; } string_t;
+typedef struct { uint16_t len; char data[1]; } equ_t;
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
+
+#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
 /**
  * Cleans up everything and gets ready to enter back to the OS

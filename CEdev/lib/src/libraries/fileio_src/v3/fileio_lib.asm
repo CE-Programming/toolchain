@@ -37,6 +37,11 @@
  .function "ti_SetVar",_SetVar
  .function "ti_StoVar",_StoVar
  .function "ti_RclVar",_RclVar
+ .function "ti_CustomAllocString",_CustomAllocString
+ .function "ti_CustomAllocList",_CustomAllocList
+ .function "ti_CustomAllocMatrix",_CustomAllocMatrix
+ .function "ti_CustomAllocCplxList",_CustomAllocCplxList
+ .function "ti_CustomAllocEqu",_CustomAllocEqu
 
  .beginDependencies
  .endDependencies
@@ -58,6 +63,82 @@ charIn		equ 0E30C12h
 #define DataPtr3 $D01FF3
 #define DataPtr4 $D01FF9
 ;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
+_CustomAllocString:
+_CustomAllocEqu:
+; Allocates space for a string/equation
+; Arguments:
+;  arg0 : len
+;  arg1 : pointer to malloc routine
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy+3)
+	ld	iy,(iy+6)
+	push	hl
+	inc	hl
+	inc	hl
+	call	__indcall
+	pop	de
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	dec	hl
+	ret
+
+;-------------------------------------------------------------------------------
+_CustomAllocCplxList:
+; Allocates space for a complex list
+; Arguments:
+;  arg0 : dim
+;  arg1 : pointer to malloc routine
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy+3)
+	ld	iy,(iy+6)
+	push	hl
+	add	hl,hl
+	jr	_AllocVar_ASM
+
+;-------------------------------------------------------------------------------
+; Allocates space for a real list
+; Arguments:
+;  arg0 : dim
+;  arg1 : pointer to malloc routine
+_CustomAllocList:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy+3)
+	ld	iy,(iy+6)
+	push	hl
+	jr	_AllocVar_ASM
+
+;-------------------------------------------------------------------------------
+_CustomAllocMatrix:
+	ld	iy,0
+	add	iy,sp
+	ld	h,(iy+3)
+	ld	l,(iy+6)
+	ld	iy,(iy+9)
+	push	hl
+	mlt	hl
+_AllocVar_ASM:
+	call	_HLTimes9
+	inc	hl
+	inc	hl
+	push	hl
+	call	__indcall
+	pop	de
+	pop	de
+	add	hl,de 
+	or	a,a 
+	sbc	hl,de
+	ret	z
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	dec	hl
+	ret
 
 ;-------------------------------------------------------------------------------
 _CloseAll:
@@ -948,17 +1029,11 @@ _SetVar:
 	ld	hl,(ix+12)
 	and	a,03Fh
 	call	_DataSize
-	ld	a,(ix+6)
 	pop	ix
 	push	hl
 	ex	de,hl
 	dec	hl
 	dec	hl
-	tst	a,080h
-	jr	z,+_
-	and	a,03Fh
-	call	_CreateTemp
-_:	and	a,03Fh
 	call	_CreateVar
 	inc	bc
 	inc	bc
