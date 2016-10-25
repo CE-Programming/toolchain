@@ -34,7 +34,7 @@ void main(void) {
 		return;
 	
 	prime_factors((unsigned)in);
-	list_out = ti_AllocList(total_primes);
+	list_out = ti_MallocList(total_primes);
 	
 	for(i=0; i<total_primes; i++) {
 		list_out->items[i] = os_Int24ToReal(primes[i]);

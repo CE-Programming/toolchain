@@ -37,11 +37,11 @@
  .function "ti_SetVar",_SetVar
  .function "ti_StoVar",_StoVar
  .function "ti_RclVar",_RclVar
- .function "ti_CustomAllocString",_CustomAllocString
- .function "ti_CustomAllocList",_CustomAllocList
- .function "ti_CustomAllocMatrix",_CustomAllocMatrix
- .function "ti_CustomAllocCplxList",_CustomAllocCplxList
- .function "ti_CustomAllocEqu",_CustomAllocEqu
+ .function "ti_AllocString",_AllocString
+ .function "ti_AllocList",_AllocList
+ .function "ti_AllocMatrix",_AllocMatrix
+ .function "ti_AllocCplxList",_AllocCplxList
+ .function "ti_AllocEqu",_AllocEqu
 
  .beginDependencies
  .endDependencies
@@ -65,8 +65,8 @@ charIn		equ 0E30C12h
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
-_CustomAllocString:
-_CustomAllocEqu:
+_AllocString:
+_AllocEqu:
 ; Allocates space for a string/equation
 ; Arguments:
 ;  arg0 : len
@@ -87,7 +87,7 @@ _CustomAllocEqu:
 	ret
 
 ;-------------------------------------------------------------------------------
-_CustomAllocCplxList:
+_AllocCplxList:
 ; Allocates space for a complex list
 ; Arguments:
 ;  arg0 : dim
@@ -105,7 +105,7 @@ _CustomAllocCplxList:
 ; Arguments:
 ;  arg0 : dim
 ;  arg1 : pointer to malloc routine
-_CustomAllocList:
+_AllocList:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)
@@ -114,7 +114,7 @@ _CustomAllocList:
 	jr	_AllocVar_ASM
 
 ;-------------------------------------------------------------------------------
-_CustomAllocMatrix:
+_AllocMatrix:
 	ld	iy,0
 	add	iy,sp
 	ld	h,(iy+3)

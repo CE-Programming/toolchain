@@ -249,42 +249,42 @@ uint8_t ti_RclVar(const uint8_t var_type, const char *var_name, void **data_stru
 /**
  * Allocates space for a real variable
  */
-#define ti_AllocReal() ((real_t*)malloc(sizeof(real_t)))
+#define ti_MallocReal() ((real_t*)malloc(sizeof(real_t)))
 
 /**
  * Allocates space for a complex variable
  */
-#define ti_AllocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
+#define ti_MallocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
 
 /**
  * Allocates space for a string variable
  */
-string_t *ti_CustomAllocString(unsigned len, void (*malloc_routine)(size_t));
-#define ti_AllocString(len) ti_CustomAllocString(len, (void*)malloc)
+string_t *ti_AllocString(unsigned len, void (*malloc_routine)(size_t));
+#define ti_MallocString(len) ti_AllocString(len, (void*)malloc)
 
 /**
  * Allocates space for a list variable
  */
-list_t *ti_CustomAllocList(unsigned dim, void (*malloc_routine)(size_t));
-#define ti_AllocList(dim) ti_CustomAllocList(dim, (void*)malloc)
+list_t *ti_AllocList(unsigned dim, void (*malloc_routine)(size_t));
+#define ti_MallocList(dim) ti_AllocList(dim, (void*)malloc)
 
 /**
  * Allocates space for a matrix variable
  */
-matrix_t *ti_CustomAllocMatrix(uint8_t rows, uint8_t cols, void (*malloc_routine)(size_t));
-#define ti_AllocMatrix(rows, cols) ti_CustomAllocMatrix(rows, cols, (void*)malloc)
+matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void (*malloc_routine)(size_t));
+#define ti_MallocMatrix(rows, cols) ti_AllocMatrix(rows, cols, (void*)malloc)
 
 /**
  * Allocates space for a complex list variable
  */
-cplx_list_t *ti_CustomAllocCplxList(unsigned dim, void (*malloc_routine)(size_t));
-#define ti_AllocCplxList(dim) ti_CustomAllocCplxList(dim, (void*)malloc)
+cplx_list_t *ti_AllocCplxList(unsigned dim, void (*malloc_routine)(size_t));
+#define ti_MallocCplxList(dim) ti_AllocCplxList(dim, (void*)malloc)
 
 /**
  * Allocates space for an equation variable
  */
-equ_t *ti_CustomAllocEqu(unsigned len, void (*malloc_routine)(size_t));
-#define ti_AllocEqu(len) ti_CustomAllocEqu(len, (void*)malloc)
+equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
+#define ti_MallocEqu(len) ti_AllocEqu(len, (void*)malloc)
 
 /**
  * Some more definitions using Ans
