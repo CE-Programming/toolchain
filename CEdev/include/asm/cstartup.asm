@@ -14,8 +14,6 @@
 	.def	_init
 	.def	_exit
 	.def	__exit
-	.def	___atexit_registered
-	.def	___atexit
 
 	define	.header,space=ram
 	define	.icon,space=ram
@@ -59,33 +57,6 @@ _init:
 	push	hl
 	ld	(__errsp+1),sp  ; save the stack from death
 	call	_main
-	jr	_xit
-
-_exit:	pop	de
-	pop	hl
-_xit:	ld	de,_already_in_atexit
-	ld	a,(de)
-	or	a,a
-	jr	nz,__exit            ; check to see if some idiot called exit()
-	inc	a
-	ld	(de),a
-	push	hl
-_lexit:	ld	hl,___atexit_registered
-	ld	a,(hl)
-	or	a,a
-	jr	z,__ee
-	dec	a
-	ld	(hl),a
-	ld	l,a
-	ld	h,3
-	mlt	hl
-	ld	bc,___atexit
-	add	hl,bc
-	ld	iy,(hl)
-	call	00015Ch               ; __indcall
-	jr	_lexit
-__ee:	pop	hl
-
 __exit:	ex	de,hl
 
 __errsp:
@@ -98,14 +69,10 @@ __errsp:
 	pop	iy              ; restore iy for OS
 	ex	de,hl		; program return value in hl
 	ret
+_exit:	pop	de
+	pop	de
+	jr	__errsp
 ;-------------------------------------------------------------------------------
-	segment bss
-___atexit:
-	ds	96
-_already_in_atexit:
-	ds	1
-___atexit_registered:
-	ds	1
 	segment code
 ;-------------------------------------------------------------------------------
 ; End Standard Startup Module

@@ -82,10 +82,6 @@ void qsort(void * base,size_t nmemb,size_t size, int (*compar)(void * ,void * ))
 void abort(void);
 void exit(int status);
 
-/* Called at exit, needs USE_AT_EXIT compiler flag */
-#define ATEXIT_MAX 32
-int atexit(void (*function)(void));
-
 /* Absolutes and division */
 int abs(int j);
 long labs(long j);
