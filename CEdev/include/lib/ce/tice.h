@@ -1,6 +1,6 @@
 // Parts from Matt "MateoConLechuga" Waltz and Jacob "jacobly" Young, in addtion to
 // contributors of http://wikiti.brandonw.net/index.php?title=84PCE:OS:Include_File
-// Latest as of June 2016
+// Latest as of October 2016
 
 #ifndef TICE_H
 #define TICE_H
@@ -9,11 +9,15 @@
 #include <stdint.h>
 #include <stddef.h>
 
+
+/************* HARDWARE AND CUSTOM ROUTINES *************/
+
+
 /* Creates a random integer value */
-#define randInt(min, max)	((unsigned)rand() % ((max) - (min) + 1) + (min))
+#define randInt(min, max)   (unsigned)rand() % ((max) - (min) + 1) + (min))
 
 /* RTC define -- useful for srand() */
-#define rtc_Time()	(*(volatile uint32_t*)0xF30044)
+#define rtc_Time()          (*(volatile uint32_t*)0xF30044)
 
 /* RTC definitions */
 #define RTC_UNFREEZE        (1<<7)
@@ -22,6 +26,7 @@
 #define RTC_ENABLE          (1<<0)|RTC_UNFREEZE
 #define RTC_DISABLE         (0<<0)
 
+/* RTC registers */
 #define rtc_Seconds         (*(volatile uint8_t*)0xF30000)
 #define rtc_Minutes         (*(volatile uint8_t*)0xF30004)
 #define rtc_Hours           (*(volatile uint8_t*)0xF30008)
@@ -38,15 +43,14 @@
 #define rtc_IntAcknowledge  (*(volatile uint8_t*)0xF30034)
 #define rtc_IsBusy()        (rtc_Control & RTC_LOAD)
 
-/**
- * RTC interrupt masks
- */
+/* RTC interrupt masks */
 #define RTC_ALARM_INT_SOURCE    (1<<5)
 #define RTC_DAY_INT_SOURCE      (1<<4)
 #define RTC_HR_INT_SOURCE       (1<<3)
 #define RTC_MIN_INT_SOURCE      (1<<2)
 #define RTC_SEC_INT_SOURCE      (1<<1)
 
+/* RTC interrupt statuses */
 #define RTC_LOAD_INT            (1<<5)
 #define RTC_ALARM_INT           (1<<4)
 #define RTC_DAY_INT             (1<<3)
@@ -55,31 +59,52 @@
 #define RTC_SEC_INT             (1<<0)
 #define RTC_INT_MASK            (RTC_SEC_INT | RTC_MIN_INT | RTC_HR_INT | RTC_DAY_INT | RTC_ALARM_INT | RTC_LOAD_INT)
 
-/**
- * LCD defines
- */
-#define lcd_BacklightLevel	(*(uint8_t*)0xF60024)
+/* Whole bunch of useful timer functions */
+#define TIMER1_ENABLE	1 << 0	// Enables Timer 1
+#define TIMER1_DISABLE	0 << 0	// Disables Timer 1
+#define TIMER1_32K	1 << 1	// Use the 32K clock for timer 1
+#define TIMER1_CPU	0 << 1	// Use the CPU clock rate for timer 1
+#define TIMER1_0INT	1 << 2	// Enable an interrupt when 0 is reached for the timer 1
+#define TIMER1_NOINT	0 << 2	// Disable interrupts for the timer 1
+#define TIMER1_UP	1 << 9	// Timer 1 counts up
+#define TIMER1_DOWN	0 << 9	// Timer 1 counts down
 
-/**
- * Resets the RTC back to its original values
- * If enable is true, the RTC will be enabled during this function
- */
-void boot_RTCInitialize(bool enable);
+#define TIMER2_ENABLE	1 << 3	// Enables Timer 2
+#define TIMER2_DISABLE	0 << 3	// Enables Timer 2
+#define TIMER2_32K	1 << 4	// Use the 32K clock for timer 2
+#define TIMER2_CPU	0 << 4	// Use the CPU clock rate for timer 2
+#define TIMER2_0INT	1 << 5	// Enable an interrupt when 0 is reached for the timer 2
+#define TIMER2_NOINT	0 << 5	// Disable interrupts for the timer 2
+#define TIMER2_UP	1 << 10	// Timer 2 counts up
+#define TIMER2_DOWN	0 << 10	// Timer 2 counts down
 
-/**
- * Returns a pointer to the system stats
- */
-void *os_GetSystemStats(void);
+/* These defines can be used to check the status of the timer */
+#define TIMER1_MATCH1	1 << 0	// Timer 1 hit the first match value
+#define TIMER1_MATCH2	1 << 1	// Timer 1 hit the second match value
+#define TIMER1_RELOADED	1 << 2	// Timer 1 was reloaded (Needs to have TIMER1_0INT enabled)
 
-/**
- * Sets up the defualt error handlers if an OS routine encounters an error when running
- */
-void os_PushErrorHandler(void *routine);
-void os_PopErrorHandler(void);
+#define TIMER2_MATCH1	1 << 3	// Timer 2 hit the first match value
+#define TIMER2_MATCH2	1 << 4	// Timer 2 hit the second match value
+#define TIMER2_RELOADED	1 << 5	// Timer 2 was reloaded (Needs to have TIMER2_0INT enabled)
 
-/**
- * OS varaible type definitions
- */
+/* Timer registers */
+#define timer_1_Counter		(*(volatile uint32_t *)0xF20000)
+#define timer_2_Counter		(*(volatile uint32_t *)0xF20010)
+#define timer_1_ReloadValue	(*(uint32_t *)0xF20004)
+#define timer_2_ReloadValue	(*(uint32_t *)0xF20014)
+#define timer_1_MatchValue_1	(*(uint32_t *)0xF20008) 
+#define timer_1_MatchValue_2	(*(uint32_t *)0xF2000C)
+#define timer_2_MatchValue_1	(*(uint32_t *)0xF20018)
+#define timer_2_MatchValue_2	(*(uint32_t *)0xF2001C)
+#define timer_Control		(*(uint32_t *)0xF20030)
+#define timer_EnableInt		(*(uint16_t *)0xF20038)
+#define timer_IntStatus		(*(volatile uint16_t *)0xF20034)
+#define timer_IntAcknowledge	(*(volatile uint16_t *)0xF20034)
+
+/* LCD defines */
+#define lcd_BacklightLevel      (*(uint8_t*)0xF60024)
+
+/* OS varaible type definitions */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
 typedef struct { real_t real, imag; } cplx_t;
 typedef struct { uint16_t dim; real_t items[1]; } list_t;
@@ -89,24 +114,27 @@ typedef struct { uint16_t len; char data[1]; } string_t;
 typedef struct { uint16_t len; char data[1]; } equ_t;
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
+#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 #define NEG_SIGN_MASK    0x80
 #define POS_SIGN_MASK    0x00
 #define CPLX_SIGN_MASK   0x0C
-#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
-/**
- * Cleans up everything and gets ready to enter back to the OS
- * when you are ready to exit your program
- */
+/* Cleans up everything and gets ready to enter back to the OS when you are ready to exit your program */
 void prgm_CleanUp(void);
-
-/* This is here because Mateo can't spell */
 #define pgrm_CleanUp prgm_CleanUp
 
-/**
- * A faster implementation of memset
- */
+/* A faster implementation of memset */
 void *memset_fast(void *ptr,int value,size_t num);
+
+
+/************* TI OS SPECIFIC ROUTINES AND IMPLEMENTATIONS *************/
+
+
+/**
+ * Resets the RTC back to its original values
+ * If enable is true, the RTC will be enabled during this function
+ */
+void boot_RTCInitialize(bool enable);
 
 /**
  * Returns the Bootcode version major
@@ -133,6 +161,41 @@ void boot_ClearVRAM(void);
  */
 bool boot_CheckOnPressed(void);
 
+/** 
+ * Basically a reimplemented form of printf that prints to some debugging device
+ */
+void boot_DebugPrintf(const char *string);
+
+/**
+ * Turns off the calculator (probably not a good idea to use)
+ */
+void boot_TurnOff(void);
+
+/**
+ * Inserts a new line at the current cursor posistion on the homescreen
+ */
+void boot_NewLine(void);
+
+/**
+ * Prints the boot version at a really silly place on the homescreen
+ */
+void boot_PrintBootVersion(void);
+
+/**
+ * Returns the current battery status
+ */
+uint8_t boot_GetBatteryStatus(void);
+
+/**
+ * Waits for 10 ms
+ */
+void boot_WaitShort(void);
+
+/**
+ * Set the time of the calculator
+ */
+void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
+
 /**
  * Disables the OS cursor
  */
@@ -147,20 +210,20 @@ void os_EnableCursor(void);
  * Set/Get the foreground color used to draw text on the graphscreen
  */
 void os_SetDrawFGColor(int color);
-int os_GetDrawFGColor(void);
+uint24_t os_GetDrawFGColor(void);
 
 /**
  * Set/Get the backgroundground color used to draw text on the graphscreen
  * os_GetDrawBGColor is only useable in OS 5.2 and above; use at your own risk
  */
-void os_SetDrawBGColor(int color);
-void os_GetDrawBGColor(int color);
+void os_SetDrawBGColor(uint24_t color);
+uint24_t os_GetDrawBGColor(void);
 
 /**
  * Set/Get the cursor posistion used on the homescreen
  */
 void os_SetCursorPos(uint8_t curRow, uint8_t curCol);
-void os_GetCursorPos(unsigned int *curRow, unsigned int *curCol);
+void os_GetCursorPos(uint8_t **curRow, uint8_t **curCol);
 
 /**
  * Selects/Gets the font to use when drawing on the graphscreen
@@ -168,33 +231,33 @@ void os_GetCursorPos(unsigned int *curRow, unsigned int *curCol);
  * 1: large monospace font
  */
 void os_FontSelect(char id);
-int os_FontGetID(void);
+uint24_t os_FontGetID(void);
 
 /**
  * Returns the width of a string in the varaible-width format
  * Second function is used to get the height of the characters
  */
-int os_FontGetWidth(const char *string);
-int os_FontGetHeight(void);
+uint24_t os_FontGetWidth(const char *string);
+uint24_t os_FontGetHeight(void);
 
 /**
  * Draws a text using the small font to the screen
  * Returns the end column
  */
-int os_FontDrawText(const char *string, uint16_t col, uint8_t row);
-int os_FontDrawTransText(const char *string, uint16_t col, uint8_t row);
+uint24_t os_FontDrawText(const char *string, uint16_t col, uint8_t row);
+uint24_t os_FontDrawTransText(const char *string, uint16_t col, uint8_t row);
 
 /**
  * Puts some text at the current homescreen cursor location
  * Returns 1 if string fits on screen, 0 otherwise
  */
-int os_PutStrFull(const char *string);
+uint24_t os_PutStrFull(const char *string);
 
 /**
  * Puts some text at the current homescreen cursor location
  * Returns 1 if string fits on line, 0 otherwise
  */
-int os_PutStrLine(const char *string);
+uint24_t os_PutStrLine(const char *string);
 
 /**
  * Set/Get a particular flag variable
@@ -211,6 +274,17 @@ size_t os_MemChk(void **free);
  * Throws an OS error
  */
 void os_ThrowError(uint8_t error);
+
+/**
+ * Returns a pointer to the system stats
+ */
+void *os_GetSystemStats(void);
+
+/**
+ * Sets up the defualt error handlers if an OS routine encounters an error when running
+ */
+void os_PushErrorHandler(void *routine);
+void os_PopErrorHandler(void);
 
 /**
  * Returns a pointer to symtable of the OS
@@ -332,52 +406,6 @@ int os_RealToStr(char *result, const real_t *arg, char maxLength, char mode, cha
   */
 real_t os_StrToReal(const char *string, char **end);
 
-/** 
- * Basically a reimplemented form of printf that prints to some debugging device
- */
-void boot_DebugPrintf(const char *string);
-
-/**
- * Turns off the calculator (probably not a good idea to use)
- */
-void boot_TurnOff(void);
-
-/**
- * Inserts a new line at the current cursor posistion on the homescreen
- */
-void boot_NewLine(void);
-
-/**
- * Prints the boot version at a really silly place on the homescreen
- */
-void boot_PrintBootVersion(void);
-
-/**
- * Returns the current battery status
- */
-uint8_t boot_GetBatteryStatus(void);
-
-/**
- * Waits for just a bit
- * Someone should really look at this to see how long it actually is
- */
-void boot_WaitShort(void);
-
-/**
- * Checks if the calculator is being powered via USB
- */
-bool boot_USBPowered(void);
-
-/**
- * Checks if there is not a USB plug of A type in the USB port
- */
-bool boot_NotPlugTypeA(void);
-
-/**
- * Set the time of the calculator
- */
-void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
-
 /**
  * High 8 is unsigned offset, low 8 is bits to test
  * os_TestFlagBits will return a 0 or 1
@@ -387,119 +415,22 @@ void os_SetFlagBits(int16_t offset_pattern);
 void os_ResetFlagBits(int16_t offset_pattern);
 
 /**
- * Whole bunch of useful timer functions
- * Use the below defines to send to boot_SetTimersControlRegister
+ * Returns extended key in high byte
  */
-#define TIMER1_ENABLE	1 << 0	// Enables Timer 1
-#define TIMER1_DISABLE	0 << 0	// Disables Timer 1
-#define TIMER1_32K	1 << 1	// Use the 32K clock for timer 1
-#define TIMER1_CPU	0 << 1	// Use the CPU clock rate for timer 1
-#define TIMER1_0INT	1 << 2	// Enable an interrupt when 0 is reached for the timer 1
-#define TIMER1_NOINT	0 << 2	// Disable interrupts for the timer 1
-#define TIMER1_UP	1 << 9	// Timer 1 counts up
-#define TIMER1_DOWN	0 << 9	// Timer 1 counts down
-
-#define TIMER2_ENABLE	1 << 3	// Enables Timer 2
-#define TIMER2_DISABLE	0 << 3	// Enables Timer 2
-#define TIMER2_32K	1 << 4	// Use the 32K clock for timer 2
-#define TIMER2_CPU	0 << 4	// Use the CPU clock rate for timer 2
-#define TIMER2_0INT	1 << 5	// Enable an interrupt when 0 is reached for the timer 2
-#define TIMER2_NOINT	0 << 5	// Disable interrupts for the timer 2
-#define TIMER2_UP	1 << 10	// Timer 2 counts up
-#define TIMER2_DOWN	0 << 10	// Timer 2 counts down
-
-/* These defines can be used to check the status of the timer */
-#define TIMER1_MATCH1	1 << 0	// Timer 1 hit the first match value
-#define TIMER1_MATCH2	1 << 1	// Timer 1 hit the second match value
-#define TIMER1_RELOADED	1 << 2	// Timer 1 was reloaded (Needs to have TIMER1_0INT enabled)
-
-#define TIMER2_MATCH1	1 << 3	// Timer 2 hit the first match value
-#define TIMER2_MATCH2	1 << 4	// Timer 2 hit the second match value
-#define TIMER2_RELOADED	1 << 5	// Timer 2 was reloaded (Needs to have TIMER2_0INT enabled)
-
-#define timer_1_Counter		(*(volatile uint32_t *)0xF20000)
-#define timer_2_Counter		(*(volatile uint32_t *)0xF20010)
-#define timer_1_ReloadValue	(*(uint32_t *)0xF20004)
-#define timer_2_ReloadValue	(*(uint32_t *)0xF20014)
-#define timer_1_MatchValue_1	(*(uint32_t *)0xF20008) 
-#define timer_1_MatchValue_2	(*(uint32_t *)0xF2000C)
-#define timer_2_MatchValue_1	(*(uint32_t *)0xF20018)
-#define timer_2_MatchValue_2	(*(uint32_t *)0xF2001C)
-#define timer_Control		(*(uint32_t *)0xF20030)
-#define timer_EnableInt		(*(uint16_t *)0xF20038)
-#define timer_IntStatus		(*(volatile uint16_t *)0xF20034)
-#define timer_IntAcknowledge	(*(volatile uint16_t *)0xF20034)
-
-/**
- * Returns extended keys as 16-bits
- */
-int os_GetKey(void);
+uint16_t os_GetKey(void);
 
 /**
  * Performs an OS call to get the keypad scan code
+ * Technically return type is uint24_t, but that is not useful as the high byte is 0
  * Values returned are listed below
  */
-int os_GetCSC(void);
+uint8_t os_GetCSC(void);
 typedef uint8_t sk_key_t;
-#define sk_Down       0x01
-#define sk_Left       0x02
-#define sk_Right      0x03
-#define sk_Up         0x04
-#define sk_Enter      0x09
-#define sk_2nd        0x36
-#define sk_Clear      0x0F
-#define sk_Alpha      0x30
-#define sk_Add        0x0A
-#define sk_Sub        0x0B
-#define sk_Mul        0x0C
-#define sk_Div        0x0D
-#define sk_Graph      0x31
-#define sk_Trace      0x32
-#define sk_Zoom       0x33
-#define sk_Window     0x34
-#define sk_Yequ       0x35
-#define sk_Mode       0x37
-#define sk_Del        0x38
-#define sk_Store      0x2A
-#define sk_Ln         0x2B
-#define sk_Log        0x2C
-#define sk_Square     0x2D
-#define sk_Recip      0x2E
-#define sk_Math       0x2F
-#define sk_0          0x21
-#define sk_1          0x22
-#define sk_4          0x23
-#define sk_7          0x24
-#define sk_2          0x1A
-#define sk_5          0x1B
-#define sk_8          0x1C
-#define sk_3          0x12
-#define sk_6          0x13
-#define sk_9          0x14
-#define sk_Comma      0x25
-#define sk_Sin        0x26
-#define sk_Apps       0x27
-#define sk_GraphVar   0x28
-#define sk_DecPnt     0x19
-#define sk_LParen     0x1D
-#define sk_Cos        0x1E
-#define sk_Prgm       0x1F
-#define sk_Stat       0x20
-#define sk_Chs        0x10
-#define sk_RParen     0x15
-#define sk_Tan        0x16
-#define sk_Vars       0x17
-#define sk_Power      0x0E
 
 /**
  * Things you shouldn't use unless you know what you are doing
  */
 void os_ForceCmdNoChar(void);
-
-/**
- * Sets the calculator into 6MHz mode and 48MHz modes. Note that the ones
- * suffix with I perserve the interrupt vectors
- */
 void boot_Set6MHzMode(void);
 void boot_Set48MHzMode(void);
 void boot_Set6MHzModeI(void);
@@ -526,64 +457,157 @@ void asm_ArcChk(void);
 /**
  * OS RAM Location defines for direct modification
  */
-#define os_ramStart         ((uint8_t*)0xD00000)
-#define os_flags            ((uint8_t*)0xD00080)
-#define os_textFlags        (*(uint8_t*)0xD00080)
-#define os_apdFlags         (*(uint8_t*)0xD00088)
-#define os_rclFlags         (*(uint8_t*)0xD0008E)
+#define OS_BLUE_COLOR       10
+#define OS_RED_COLOR        11
+#define OS_BLACK_COLOR      12
+#define OS_MAGENTA_COLOR    13
+#define OS_GREEN_COLOR      14
+#define OS_ORANGE_COLOR     15
+#define OS_BROWN_COLOR      16
+#define OS_NAVY_COLOR       17
+#define OS_LTBLUE_COLOR     18
+#define OS_YELLOW_COLOR     19
+#define OS_WHITE_COLOR      20
+#define OS_LTGRAY_COLOR     21
+#define OS_MEDGRAY_COLOR    22
+#define OS_GRAY_COLOR       23
+#define OS_DARKGRAY_COLOR   24
 
-#define os_kbdScanCode      (*(uint8_t*)0xD00587)
-#define os_kbdLGSC          (*(uint8_t*)0xD00588)
-#define os_kbdPSC           (*(uint8_t*)0xD00589)
-#define os_kbdWUR           (*(uint8_t*)0xD0058A)
-#define os_kbdDebncCnt      (*(uint8_t*)0xD0058B)
-#define os_kbdKey	    (*(uint8_t*)0xD0058C)
-#define os_kbdGetKy         (*(uint8_t*)0xD0058D)
-#define os_keyExtend        (*(uint8_t*)0xD0058E)
-#define os_brightness       (*(uint8_t*)0xD0058F)
-#define os_apdSubTimer      (*(uint8_t*)0xD00590)
-#define os_apdTimer         (*(uint8_t*)0xD00591)
-#define os_curRow           (*(uint8_t*)0xD00595)
-#define os_curCol           (*(uint8_t*)0xD00596)
+#define os_ramStart          ((uint8_t*)0xD00000)
+#define os_flags             ((uint8_t*)0xD00080)
+#define os_textFlags         (*(uint8_t*)0xD00080)
+#define os_apdFlags          (*(uint8_t*)0xD00088)
+#define os_rclFlags          (*(uint8_t*)0xD0008E)
+ 
+#define os_kbdScanCode       (*(uint8_t*)0xD00587)
+#define os_kbdLGSC           (*(uint8_t*)0xD00588)
+#define os_kbdPSC            (*(uint8_t*)0xD00589)
+#define os_kbdWUR            (*(uint8_t*)0xD0058A)
+#define os_kbdDebncCnt       (*(uint8_t*)0xD0058B)
+#define os_kbdKey	     (*(uint8_t*)0xD0058C)
+#define os_kbdGetKy          (*(uint8_t*)0xD0058D)
+#define os_keyExtend         (*(uint8_t*)0xD0058E)
+#define os_brightness        (*(uint8_t*)0xD0058F)
+#define os_apdSubTimer       (*(uint8_t*)0xD00590)
+#define os_apdTimer          (*(uint8_t*)0xD00591)
+#define os_curRow            (*(uint8_t*)0xD00595)
+#define os_curCol            (*(uint8_t*)0xD00596)
 
-#define os_OP1              ((uint8_t*)0xD005F8)
-#define os_OP2              ((uint8_t*)0xD00603)
-#define os_OP3              ((uint8_t*)0xD0060E)
-#define os_OP4              ((uint8_t*)0xD00619)
-#define os_OP5              ((uint8_t*)0xD00624)
-#define os_OP6              ((uint8_t*)0xD0062F)
+#define os_OP1               ((uint8_t*)0xD005F8)
+#define os_OP2               ((uint8_t*)0xD00603)
+#define os_OP3               ((uint8_t*)0xD0060E)
+#define os_OP4               ((uint8_t*)0xD00619)
+#define os_OP5               ((uint8_t*)0xD00624)
+#define os_OP6               ((uint8_t*)0xD0062F)
 
-#define os_progToEdit       ((char*)0xD0065B)
-#define os_nameBuff         ((char*)0xD00663)
+#define os_progToEdit        ((char*)0xD0065B)
+#define os_nameBuff          ((char*)0xD00663)
 
-#define os_promptRow        (*(uint8_t*)0xD00800)
-#define os_promptCol        (*(uint8_t*)0xD00801)
-#define os_promptIns        (*(uint8_t*)0xD00802)
-#define os_promptShift      (*(uint8_t*)0xD00803)
-#define os_promptRet        (*(uint8_t*)0xD00804)
-#define os_promptValid      (*(uint8_t*)0xD00807)
+#define os_promptRow         (*(uint8_t*)0xD00800)
+#define os_promptCol         (*(uint8_t*)0xD00801)
+#define os_promptIns         (*(uint8_t*)0xD00802)
+#define os_promptShift       (*(uint8_t*)0xD00803)
+#define os_promptRet         (*(uint8_t*)0xD00804)
+#define os_promptValid       (*(uint8_t*)0xD00807)
 
-#define os_penCol           (*(uint24_t*)0xD008D2)
-#define os_penRow           (*(uint8_t*)0xD008D5)
+#define os_penCol            (*(uint24_t*)0xD008D2)
+#define os_penRow            (*(uint8_t*)0xD008D5)
 
-#define os_asmPrgmSize      (*(uint16_t*)0xD0118C)
+#define os_asmPrgmSize       (*(uint16_t*)0xD0118C) 
 
-#define os_appErr1          ((char*)0xD025A9)
-#define os_appErr2          ((char*)0xD025B6)
+#define os_y1LineType        (*(uint8_t*)0xD024BF)
+#define os_y2LineType        (*(uint8_t*)0xD024C0)
+#define os_y3LineType        (*(uint8_t*)0xD024C1)
+#define os_y4LineType        (*(uint8_t*)0xD024C2)
+#define os_y5LineType        (*(uint8_t*)0xD024C3)
+#define os_y6LineType        (*(uint8_t*)0xD024C4)
+#define os_y7LineType        (*(uint8_t*)0xD024C5)
+#define os_y8LineType        (*(uint8_t*)0xD024C6)
+#define os_y9LineType        (*(uint8_t*)0xD024C7)
+#define os_y0LineType        (*(uint8_t*)0xD024C8)
+#define os_para1LineType     (*(uint8_t*)0xD024C9)
+#define os_para2LineType     (*(uint8_t*)0xD024CA)
+#define os_para3LineType     (*(uint8_t*)0xD024CB)
+#define os_para4LineType     (*(uint8_t*)0xD024CC)
+#define os_para5LineType     (*(uint8_t*)0xD024CD)
+#define os_para6LineType     (*(uint8_t*)0xD024CE)
+#define os_polar1LineType    (*(uint8_t*)0xD024CF)
+#define os_polar2LineType    (*(uint8_t*)0xD024D0)
+#define os_polar3LineType    (*(uint8_t*)0xD024D1)
+#define os_polar4LineType    (*(uint8_t*)0xD024D2)
+#define os_polar5LineType    (*(uint8_t*)0xD024D3)
+#define os_polar6LineType    (*(uint8_t*)0xD024D4)
+#define os_secULineType      (*(uint8_t*)0xD024D5)
+#define os_secVLineType      (*(uint8_t*)0xD024D6)
+#define os_secWLineType      (*(uint8_t*)0xD024D7)
+#define os_y1LineColor       (*(uint8_t*)0xD024D8)
+#define os_y2LineColor       (*(uint8_t*)0xD024D9)
+#define os_y3LineColor       (*(uint8_t*)0xD024DA)
+#define os_y4LineColor       (*(uint8_t*)0xD024DB)
+#define os_y5LineColor       (*(uint8_t*)0xD024DC)
+#define os_y6LineColor       (*(uint8_t*)0xD024DD)
+#define os_y7LineColor       (*(uint8_t*)0xD024DE)
+#define os_y8LineColor       (*(uint8_t*)0xD024DF)
+#define os_y9LineColor       (*(uint8_t*)0xD024E0)
+#define os_y0LineColor       (*(uint8_t*)0xD024E1)
+#define os_para1LineColor    (*(uint8_t*)0xD024E2)
+#define os_para2LineColor    (*(uint8_t*)0xD024E3)
+#define os_para3LineColor    (*(uint8_t*)0xD024E4)
+#define os_para4LineColor    (*(uint8_t*)0xD024E5)
+#define os_para5LineColor    (*(uint8_t*)0xD024E6)
+#define os_para6LineColor    (*(uint8_t*)0xD024E7)
+#define os_polar1LineColor   (*(uint8_t*)0xD024E8)
+#define os_polar2LineColor   (*(uint8_t*)0xD024E9)
+#define os_polar3LineColor   (*(uint8_t*)0xD024EA)
+#define os_polar4LineColor   (*(uint8_t*)0xD024EB)
+#define os_polar5LineColor   (*(uint8_t*)0xD024EC)
+#define os_polar6LineColor   (*(uint8_t*)0xD024ED)
+#define os_secULineColor     (*(uint8_t*)0xD024EE)
+#define os_secVLineColor     (*(uint8_t*)0xD024EF)
+#define os_secWLineColor     (*(uint8_t*)0xD024F0)
 
-#define os_tempFreeArc      (*(uint24_t*)0xD02655) // set after asm_ArcChk call
+#define os_appErr1           ((char*)0xD025A9)
+#define os_appErr2           ((char*)0xD025B6)
 
-#define os_textBGcolor      (*(uint16_t*)0xD02688)
-#define os_textFGcolor      (*(uint16_t*)0xD0268A)
+#define os_cursorHookPtr     (*(uint24_t*)0xD025D5)
+#define os_libraryHookPtr    (*(uint24_t*)0xD025D8)
+#define os_rawKeyHookPtr     (*(uint24_t*)0xD025DB)
+#define os_getKeyHookPtr     (*(uint24_t*)0xD025DE)
+#define os_homescreenHookPtr (*(uint24_t*)0xD025E1)
+#define os_windowHookPtr     (*(uint24_t*)0xD025E4)
+#define os_graphHookPtr      (*(uint24_t*)0xD025E7)
+#define os_yEqualsHookPtr    (*(uint24_t*)0xD025EA)
+#define os_fontHookPtr       (*(uint24_t*)0xD025ED)
+#define os_regraphHookPtr    (*(uint24_t*)0xD025F0)
+#define os_graphicsHookPtr   (*(uint24_t*)0xD025F3)
+#define os_traceHookPtr      (*(uint24_t*)0xD025F6)
+#define os_parserHookPtr     (*(uint24_t*)0xD025F9)
+#define os_appChangeHookPtr  (*(uint24_t*)0xD025FC)
+#define os_catalog1HookPtr   (*(uint24_t*)0xD025FF)
+#define os_helpHookPtr       (*(uint24_t*)0xD02602)
+#define os_cxRedispHookPtr   (*(uint24_t*)0xD02605)
+#define os_menuHookPtr       (*(uint24_t*)0xD02608)
+#define os_catalog2HookPtr   (*(uint24_t*)0xD0260B)
+#define os_tokenHookPtr      (*(uint24_t*)0xD0260E)
+#define os_localizeHookPtr   (*(uint24_t*)0xD02611)
+#define os_silentLinkHookPtr (*(uint24_t*)0xD02614)
+#define os_USBActiveHookPtr  (*(uint24_t*)0xD0261A)
 
-#define os_drawBGColor      (*(uint16_t*)0xD026AA)
-#define os_drawFGColor      (*(uint16_t*)0xD026AC)
-#define os_drawColorCode    (*(uint8_t*)0xD026AE)
+#define os_tempFreeArc       (*(uint24_t*)0xD02655) /* Set after asm_ArcChk call */
 
-#define os_graphBGColor     ((uint16_t*)0xD02A98)
+#define os_textBGcolor       (*(uint16_t*)0xD02688)
+#define os_textFGcolor       (*(uint16_t*)0xD0268A)
 
-#define os_fillRectColor    (*(uint16_t*)0xD02AC0)
-#define os_statusBarBGColor ((uint16_t*)0xD02ACC)
+#define os_drawBGColor       (*(uint16_t*)0xD026AA)
+#define os_drawFGColor       (*(uint16_t*)0xD026AC)
+#define os_drawColorCode     (*(uint8_t*)0xD026AE)
+
+#define os_batteryStatus     (*(uint8_t*)0xD02A86)
+
+#define os_graphBGColor      ((uint16_t*)0xD02A98)
+
+#define os_fillRectColor     (*(uint16_t*)0xD02AC0)
+#define os_statusBarBGColor  ((uint16_t*)0xD02ACC)
 
 /**
  * ---- TI-OS Token definitions ----
@@ -1390,5 +1414,115 @@ void asm_ArcChk(void);
 #define tWait		0x96	// 'Wait_'
 #define tToString	0x97	// 'toString('
 #define tEval		0x98	// 'eval('
+
+/**
+ * --- TIOS System error codes ---
+ */
+#define OS_E_EDIT           1<<7
+#define OS_E_MASK           0x7F
+#define OS_E_OVERFLOW       1+OS_E_EDIT
+#define OS_E_DIVBY0         2+OS_E_EDIT
+#define OS_E_SINGULARMAT    3+OS_E_EDIT
+#define OS_E_DOMAIN         4+OS_E_EDIT
+#define OS_E_INCREMENT      5+OS_E_EDIT
+#define OS_E_BREAK          6+OS_E_EDIT
+#define OS_E_NONREAL        7+OS_E_EDIT
+#define OS_E_SYNTAX         8+OS_E_EDIT
+#define OS_E_DATATYPE       9+OS_E_EDIT
+#define OS_E_ARGUMENT       10+OS_E_EDIT
+#define OS_E_DIMMISMATCH    11+OS_E_EDIT
+#define OS_E_DIMENSION      12+OS_E_EDIT
+#define OS_E_UNDEFINED      13+OS_E_EDIT
+#define OS_E_MEMORY         14+OS_E_EDIT
+#define OS_E_INVALID        15+OS_E_EDIT
+#define OS_E_ILLEGALNEST    16+OS_E_EDIT
+#define OS_E_BOUND          17+OS_E_EDIT
+#define OS_E_GRAPHRANGE     18+OS_E_EDIT
+#define OS_E_ZOOM           19+OS_E_EDIT
+#define OS_E_LABEL          20
+#define OS_E_STAT           21
+#define OS_E_SOLVER         22+OS_E_EDIT
+#define OS_E_SINGULARITY    23+OS_E_EDIT
+#define OS_E_SIGNCHANGE     24+OS_E_EDIT
+#define OS_E_ITERATIONS     25+OS_E_EDIT
+#define OS_E_BADGUESS       26+OS_E_EDIT
+#define OS_E_STATPLOT       27
+#define OS_E_TOLTOOSMALL    28+OS_E_EDIT
+#define OS_E_RESERVED       29+OS_E_EDIT
+#define OS_E_MODE           30+OS_E_EDIT
+#define OS_E_LNKERR         31+OS_E_EDIT
+#define OS_E_LNKMEMERR      32+OS_E_EDIT
+#define OS_E_LNKTRANSERR    33+OS_E_EDIT
+#define OS_E_LNKDUPERR      34+OS_E_EDIT
+#define OS_E_LNKMEMFULL     35+OS_E_EDIT
+#define OS_E_UNKNOWN        36+OS_E_EDIT
+#define OS_E_SCALE          37+OS_E_EDIT
+#define OS_E_IDNOTFOUND     38
+#define OS_E_NOMODE         39+OS_E_EDIT
+#define OS_E_VALIDATION     40
+#define OS_E_LENGTH         41+OS_E_EDIT
+#define OS_E_APPLICATION    42+OS_E_EDIT
+#define OS_E_APPERR1        43+OS_E_EDIT
+#define OS_E_APPERR2        44+OS_E_EDIT
+#define OS_E_EXPIREDAPP     45
+#define OS_E_BADADD         46
+#define OS_E_ARCHIVED       47+OS_E_EDIT
+#define OS_E_VERSION        48
+#define OS_E_ARCHFULL       49
+#define OS_E_VARIABLE       50+OS_E_EDIT
+#define OS_E_DUPLICATE      51+OS_E_EDIT
+
+/**
+ * --- TI-OS os_GetCSC Scan Code Return Values ---
+ */
+#define sk_Down             0x01
+#define sk_Left             0x02
+#define sk_Right            0x03
+#define sk_Up               0x04
+#define sk_Enter            0x09
+#define sk_2nd              0x36
+#define sk_Clear            0x0F
+#define sk_Alpha            0x30
+#define sk_Add              0x0A
+#define sk_Sub              0x0B
+#define sk_Mul              0x0C
+#define sk_Div              0x0D
+#define sk_Graph            0x31
+#define sk_Trace            0x32
+#define sk_Zoom             0x33
+#define sk_Window           0x34
+#define sk_Yequ             0x35
+#define sk_Mode             0x37
+#define sk_Del              0x38
+#define sk_Store            0x2A
+#define sk_Ln               0x2B
+#define sk_Log              0x2C
+#define sk_Square           0x2D
+#define sk_Recip            0x2E
+#define sk_Math             0x2F
+#define sk_0                0x21
+#define sk_1                0x22
+#define sk_4                0x23
+#define sk_7                0x24
+#define sk_2                0x1A
+#define sk_5                0x1B
+#define sk_8                0x1C
+#define sk_3                0x12
+#define sk_6                0x13
+#define sk_9                0x14
+#define sk_Comma            0x25
+#define sk_Sin              0x26
+#define sk_Apps             0x27
+#define sk_GraphVar         0x28
+#define sk_DecPnt           0x19
+#define sk_LParen           0x1D
+#define sk_Cos              0x1E
+#define sk_Prgm             0x1F
+#define sk_Stat             0x20
+#define sk_Chs              0x10
+#define sk_RParen           0x15
+#define sk_Tan              0x16
+#define sk_Vars             0x17
+#define sk_Power            0x0E
 
 #endif
