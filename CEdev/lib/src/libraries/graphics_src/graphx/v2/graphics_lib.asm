@@ -974,125 +974,89 @@ _FillCircle_NoClip:
 ;  arg2 : Radius
 ; Returns:
 ;  None
-	push	ix
-	ld	ix,0
-	add	ix,sp
-	lea	hl,ix+-9
-	ld	sp,hl
-	sbc	hl,hl
-	ld	(ix+-3),hl
-	ld	bc,(ix+12)
-	ld	(ix+-6),bc
-	inc	hl
-	sbc	hl,bc
-	ld	(ix+-9),hl
-	jp	k_4 \.r
-_FillCircle_NoClipSectors:
-	ld	hl,(ix+-3)
-	add	hl,hl
-	push	hl
-	ld	bc,(ix+-6)
-	ld	hl,(ix+9)
-	add	hl,bc
-	push	hl
-	ld	bc,(ix+-3)
-	ld	hl,(ix+6)
+	ld 	iy,0
+	add	iy,sp
+	ld 	a,(iy+9)		; Radius
 	or	a,a
-	sbc	hl,bc
-	push	hl
-	call	_HorizLine_NoClip \.r
-	lea	hl,ix+-9
-	ld	sp,hl
-	ld	hl,(ix+-3)
-	add	hl,hl
-	push	hl
-	ld	bc,(ix+-6)
-	ld	hl,(ix+9)
-	or	a,a
-	sbc	hl,bc
-	push	hl
-	ld	bc,(ix+-3)
-	ld	hl,(ix+6)
-	or	a,a
-	sbc	hl,bc
-	push	hl
-	call	_HorizLine_NoClip \.r
-	lea	hl,ix+-9
-	ld	sp,hl
-	ld	hl,(ix+-6)
-	add	hl,hl
-	push	hl
-	ld	bc,(ix+-3)
-	ld	hl,(ix+9)
-	add	hl,bc
-	push	hl
-	ld	bc,(ix+-6)
-	ld	hl,(ix+6)
-	or	a,a
-	sbc	hl,bc
-	push	hl
-	call	_HorizLine_NoClip \.r
-	lea	hl,ix+-9
-	ld	sp,hl
-	ld	hl,(ix+-6)
-	add	hl,hl
-	push	hl
-	ld	bc,(ix+-3)
-	ld	hl,(ix+9)
-	or	a,a
-	sbc	hl,bc
-	push	hl
-	ld	bc,(ix+-6)
-	ld	hl,(ix+6)
-	or	a,a
-	sbc	hl,bc
-	push	hl
-	call	_HorizLine_NoClip \.r
-	lea	hl,ix+-9
-	ld	sp,hl
-	ld	bc,(ix+-3)
-	inc	bc
-	ld	(ix+-3),bc
-	ld	bc,(ix+-9)
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,bc
-	jp	m,k__2 \.r
-	jp	pe,k_3 \.r
-	jr	k__3
-k__2:	jp	po,k_3 \.r
-k__3:	ld	hl,(ix+-3)
-	add	hl,hl
-	inc	hl
-	ld	bc,(ix+-9)
-	add	hl,bc
-	ld	(ix+-9),hl
-	jr	k_4
-k_3:	ld	bc,(ix+-6)
-	dec	bc
-	ld	(ix+-6),bc
-	ld	hl,(ix+-3)
-	ld	de,(ix+-9)
-	or	a,a
-	sbc	hl,bc
-	add	hl,hl
-	inc	hl
+	ret	z
+	ld	bc,0
+	ld	c,a
+	ld 	hl,(currDrawBuffer)
+	ld 	d,lcdWidth/2
+	ld 	e,(iy+6)		; Yc (circle center pos)
+	mlt 	de
 	add	hl,de
-	ld	(ix+-9),hl
-k_4:	ld	bc,(ix+-3)
-	ld	hl,(ix+-6)
-	or	a,a
-	sbc	hl,bc
-	jp	p,+_ \.r
-	jp	pe,_FillCircle_NoClipSectors \.r
-	ld	sp,ix
-	pop	ix
+	add	hl,de
+	ld	d,b
+	ld 	e,(iy+3)		; Xc (circle center pos)
+	add	hl,de
+	ld 	(circle_center_pos),hl \.r
+	sbc 	hl,bc
+	ld 	(circle_datcol_ldirpos),hl \.r
+	ex 	de,hl			; de = Xc - Radius
+	ld 	hl,color1 \.r
+	push	de
+	ldi
+	pop	hl
+	ret 	po
+	rlc 	c
+	inc	c
+	ldir
+	ld 	(circle_datcol_lddrpos),hl \.r
+	ld 	b,a
+	inc	a
+	ld 	d,a
+	ld 	e,a
+	mlt 	de
+	ld 	ix,0
+	add	ix,de
+	ld 	c,a
+Fory:	lea	hl,ix+0			; kind of For(y,R,1,-1
+	ld 	a,c
+	ld 	d,b
+	ld 	e,b
+	mlt 	de			; de = y²
+	sbc 	hl,de
+	ex 	de,hl			; de = (R²-y²)
+Forx:	ld 	h,a			; kind of For(x,R,y,-1
+	ld 	l,a
+	mlt 	hl			; hl = x²
+	sbc 	hl,de			; x² < (R² - y²) ?
+	dec	a
+	jr 	nc,Forx 		; no?..then loop
+	push	bc			; Yes?..Here we go!
+circle_center_pos =$+1
+	ld 	hl,0			; hl = 'on-screen' center pos
+	ld 	c,lcdWidth/2
+	mlt 	bc
+	push	bc			; bc = 160*y
+	add	hl,bc
+	add	hl,bc
+	ld 	b,0
+	ld 	c,a			; bc = x
+	add	hl,bc
+	ex 	de,hl			; de = 'on-screen' horizontal drawing beginning address
+circle_datcol_lddrpos =$+1
+	ld 	hl,0			; hl = pointer to color data
+	ld 	b,0
+	inc	a
+	rlca
+	ld 	c,a			; bc = drawing length
+	lddr				; trace 1st horizontal line (bottom)
+	pop	hl			; Now, calculs for mirrored position...
+	add	hl,hl
+	add	hl,hl			; hl = 160*y*4
+	inc	de
+	ex 	de,hl
+	sbc 	hl,de
+	ex 	de,hl			; de = 'on-screen' horizontal drawing beginning address
+circle_datcol_ldirpos =$+1
+	ld 	hl,0			; hl = pointer to color data
+	ld 	c,a			; bc = drawing length
+	ldir				; trace 2nd horizontal line (top)
+	pop	bc
+	djnz 	Fory
 	ret
-_:	jp	po,_FillCircle_NoClipSectors \.r
-	ld	sp,ix
-	pop	ix
-	ret
-
 ;-------------------------------------------------------------------------------
 _Line:
 ; Draws an arbitrarily clipped line
