@@ -66,7 +66,7 @@ typedef struct gfx_point {
  * Note that if you use the system malloc routine, it must be used elsewhere in your program
  * otherwise it will not be linked correctly
  */
-gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine);
+gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void (*malloc_routine)(size_t));
 
 /**
  * This routine should be used globally as it uses the BSS

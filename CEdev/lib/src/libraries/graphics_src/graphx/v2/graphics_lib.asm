@@ -116,6 +116,10 @@ _AllocSprite:
 	call	__indcall
 	pop	de
 	pop	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ret	z
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
