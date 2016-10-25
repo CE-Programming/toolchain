@@ -15,7 +15,7 @@
 
 void prime_factors(unsigned n);
 
-int primes[1000];
+int primes[24];
 int total_primes = 0;
 
 /* Main Function */
@@ -48,16 +48,33 @@ void main(void) {
 
 /* Store to an array all the prime numbers */
 void prime_factors(unsigned n) {
-	unsigned div = 2;
-	unsigned end = sqrt(n);
+	unsigned div, end;
 	
-	while(div <= n) {
-		if (n%div) { 
-			div++;
-		} else {
-			n /= div;
-			primes[total_primes++] = div;
-			if(n==1) break;
-		}
+	while (!(n % 2)) {
+		primes[total_primes++] = 2;
+		n /= 2;
 	}
+	
+	if (n == 1) {
+		return;
+	}
+	
+	div = 3;
+	end = sqrt(n);
+	
+	while (div <= end) {
+		if (!(n % div)) {
+			do {
+				primes[total_primes++] = div;
+				n /= div;
+			} while (!(n % div));
+			if (n == 1) {
+				return;
+			}
+			end = sqrt(n);
+		}
+		div += 2;
+	}
+	
+	primes[total_primes++] = n;
 }
