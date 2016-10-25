@@ -477,25 +477,59 @@ _Rectangle_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+3)
-	ld	e,(iy+6)
-	ld	bc,(iy+9)
-	ld	d,(iy+12)
-	push	bc
-	push	hl
+	ld	bc,(iy+9)			; width
+	ld	a,b
+	or	a,c				; check if width > 0
+	ret	z
+	ld 	a,(iy+12)			; height
+	or	a,a				; check if height > 0
+	ret	z	
+	ld	hl,(currDrawBuffer)
+	ld	d,lcdWidth/2
+	ld	e,(iy+6)			; Y coord.
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ld	de,(iy+3)			; X coord.
+	add	hl,de
+	ex	de,hl				; de = address where to begin drawing
 	push	de
-	call	_RectHoriz_ASM \.r		; top horizontal line
-	pop	bc
-	push	bc
-	call	_RectVert_ASM \.r		; right vertical line
-	pop	bc
+	ld	hl,color1 \.r
+	ldi
 	pop	hl
-	ld	e,c
-	call	_VertLine_ASM \.r		; left vertical line
-	pop	bc
-	or	a,a
-	sbc	hl,de
-	jp	_MemSet_ASM \.r			; bottom horizontal line
+	jp	po,_Rectangle_Draw_Down \.r 	; if width=1 then no horizontal line at all
+	ldir					; draw top horizontal line
+	dec 	a				; We can leave right now if height = 1
+	ret	z	
+	ld 	b,a				; b = height - 1
+	ld	c,(hl)
+	ld	de,lcdWidth
+_Rectangle_Vert_Loop1:
+	add	hl,de
+	ld	(hl),c
+	djnz	_Rectangle_Vert_Loop1 \.r	
+	ex	de,hl
+	scf
+	sbc	hl,hl				; hl = -1
+	add	hl,de				; hl = de - 1
+	ex	de,hl				; de = hl - 1
+	ld	bc,(iy+9)			; as we are sure width > 1 ...
+	dec	bc				; we can (& have to) decrease it
+	lddr					; draw bottom horizontal line
+	ld	de,-lcdWidth			; -320 for drawing up
+_Rectangle_LastVert_Draw:
+	dec	a				; decrease height then leave right now if null
+	ret	z
+	ld	c,(hl)
+	ld	b,a
+_Rectangle_Vert_Loop2:
+	add	hl,de
+	ld	(hl),c
+	djnz	_Rectangle_Vert_Loop2 \.r
+	ret
+_Rectangle_Draw_Down:
+	ld	de,lcdWidth			; +320 for drawing down
+	jr	_Rectangle_LastVert_Draw \.r
 
 ;-------------------------------------------------------------------------------
 _HorizLine:
