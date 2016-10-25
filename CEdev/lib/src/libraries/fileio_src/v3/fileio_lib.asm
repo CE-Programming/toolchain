@@ -1096,6 +1096,9 @@ _RclVar
 	jp	nz,_ReturnNEG1C \.r
 	ld	iy,0
 	add	iy,sp
+	and	a,03Fh
+	cp	a,(iy+3)  ; var type
+	jp	nz,_ReturnNEG1C \.r
 	ld	hl,(iy+9)
 	ld	(hl),de
 	ret

@@ -56,23 +56,6 @@
 #define TI_EQU_TYPE             (0x03)
 #define TI_REAL_LIST_TYPE       (0x01)
 #define TI_CPLX_LIST_TYPE       (0x0D)
-#define TI_PRGM_TYPE		(0x05)
-#define TI_PPRGM_TYPE		(0x06)
-#define TI_TPRGM_TYPE		(0x16)
-#define TI_APPVAR_TYPE		(0x15)
-#define TI_REAL_TYPE		(0x00)
-#define TI_CPLX_TYPE		(0x0C)
-#define TI_MATRIX_TYPE		(0x02)
-#define TI_STRING_TYPE		(0x04)
-#define TI_EQU_TYPE		(0x03)
-
-/**
- * For compatibility reasons
- */
-#define ti_Program             TI_PRGM_TYPE
-#define ti_ProtectedProgram    TI_PPRGM_TYPE
-#define ti_TempProgram         TI_TPRGM_TYPE
-#define ti_AppVar              TI_APPVAR_TYPE
 
 #ifndef EOF
 #define EOF (-1)
@@ -248,29 +231,58 @@ void *ti_GetDataPtr(const ti_var_t slot);
  * Sets a varaible
  * Returns 0 if success
  */
-uint8_t ti_SetVar(uint8_t obj_type, const char *name, void *data);
+uint8_t ti_SetVar(const ti_var_t var_type, const char *name, void *data);
 
 /**
- * Stores a varaible
+ * Stores a varaible to another variable
  * Returns 0 if success
  */
-uint8_t ti_StoVar(uint8_t obj_type_to, void *to, uint8_t obj_type_from, void *from);
+uint8_t ti_StoVar(const ti_var_t var_type_to, void *to, const ti_var_t var_type_from, void *from);
 
 /**
  * Recalls a varaible
  * Returns 0 if success
  * data is set to the data being pointed to
  */
-uint8_t ti_RclVar(uint8_t obj_type, const char *var_name, void **data_struct);
+uint8_t ti_RclVar(const uint8_t var_type, const char *var_name, void **data_struct);
 
+/**
+ * Allocates space for a real variable
+ */
+#define ti_AllocReal() ((real_t*)malloc(sizeof(real_t)))
+
+/**
+ * Allocates space for a complex variable
+ */
+#define ti_AllocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
+
+/**
+ * Allocates space for a string variable
+ */
 string_t *ti_CustomAllocString(unsigned len, void (*malloc_routine)(size_t));
 #define ti_AllocString(len) ti_CustomAllocString(len, (void*)malloc)
+
+/**
+ * Allocates space for a list variable
+ */
 list_t *ti_CustomAllocList(unsigned dim, void (*malloc_routine)(size_t));
 #define ti_AllocList(dim) ti_CustomAllocList(dim, (void*)malloc)
+
+/**
+ * Allocates space for a matrix variable
+ */
 matrix_t *ti_CustomAllocMatrix(uint8_t rows, uint8_t cols, void (*malloc_routine)(size_t));
 #define ti_AllocMatrix(rows, cols) ti_CustomAllocMatrix(rows, cols, (void*)malloc)
+
+/**
+ * Allocates space for a complex list variable
+ */
 cplx_list_t *ti_CustomAllocCplxList(unsigned dim, void (*malloc_routine)(size_t));
 #define ti_AllocCplxList(dim) ti_CustomAllocCplxList(dim, (void*)malloc)
+
+/**
+ * Allocates space for an equation variable
+ */
 equ_t *ti_CustomAllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_AllocEqu(len) ti_CustomAllocEqu(len, (void*)malloc)
 
@@ -296,16 +308,16 @@ equ_t *ti_CustomAllocEqu(unsigned len, void (*malloc_routine)(size_t));
 /**
  * Some equation definitions
  */
-#define ti_EquY1    ("\x5E\x10\0")
-#define ti_EquY2    ("\x5E\x11\0")
-#define ti_EquY3    ("\x5E\x12\0")
-#define ti_EquY4    ("\x5E\x13\0")
-#define ti_EquY5    ("\x5E\x14\0")
-#define ti_EquY6    ("\x5E\x15\0")
-#define ti_EquY7    ("\x5E\x16\0")
-#define ti_EquY8    ("\x5E\x17\0")
-#define ti_EquY9    ("\x5E\x18\0")
-#define ti_EquY0    ("\x5E\x19\0")
+#define ti_Y1       ("\x5E\x10\0")
+#define ti_Y2       ("\x5E\x11\0")
+#define ti_Y3       ("\x5E\x12\0")
+#define ti_Y4       ("\x5E\x13\0")
+#define ti_Y5       ("\x5E\x14\0")
+#define ti_Y6       ("\x5E\x15\0")
+#define ti_Y7       ("\x5E\x16\0")
+#define ti_Y8       ("\x5E\x17\0")
+#define ti_Y9       ("\x5E\x18\0")
+#define ti_Y0       ("\x5E\x19\0")
 
 /**
  * Some real and complex defines
@@ -361,5 +373,13 @@ equ_t *ti_CustomAllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_L4        ("\x5D\x3\0")
 #define ti_L5        ("\x5D\x4\0")
 #define ti_L6        ("\x5D\x5\0")
+
+/**
+ * For compatibility reasons
+ */
+#define ti_Program             TI_PRGM_TYPE
+#define ti_ProtectedProgram    TI_PPRGM_TYPE
+#define ti_TempProgram         TI_TPRGM_TYPE
+#define ti_AppVar              TI_APPVAR_TYPE
 
 #endif
