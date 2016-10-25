@@ -13,6 +13,12 @@
 /* Shared library headers - depends on which ones you wish to use */
 #include <lib/ce/fileioc.h>
 
+/* Some common function prototypes. Maybe in the future these functions will become a library */
+cplx_t Int24ToCplx(int real, int imag);
+cplx_t FloatToCplx(float real, float imag);
+cplx_t RealToCplx(real_t real, real_t imag);
+cplx_t StrToCplx(char *real, char **real_end, char *imag, char **imag_end);
+
 /* Main Function */
 void main(void) {
 	/* Declare some variables */
@@ -26,10 +32,7 @@ void main(void) {
 	real_t	  real_3_5 = os_FloatToReal(3.5);
 	
 	/* Store the value '1.5+2.5i' into the varaible B */
-	my_cplx.real = real_1_5;
-	my_cplx.imag = real_2_5;
-	my_cplx.real.sign |= CPLX_SIGN_MASK;
-	my_cplx.imag.sign |= CPLX_SIGN_MASK;
+	my_cplx = FloatToCplx(1.5, 2.5);
 	ti_SetVar(TI_CPLX_TYPE, ti_B, &my_cplx);
 	
 	/* Store the value '1.5' into the varaible A */
@@ -61,4 +64,44 @@ void main(void) {
 
 	/* Clean up everything */
 	prgm_CleanUp();
+}
+
+/* Stores some ints to a complex variable type */
+cplx_t Int24ToCplx(int real, int imag) {
+	cplx_t res;
+	res.real = os_Int24ToReal(real);
+	res.real.sign |= TI_CPLX_TYPE;
+	res.imag = os_Int24ToReal(imag);
+	res.imag.sign |= TI_CPLX_TYPE;
+	return res;
+}
+
+/* Stores some floats to a complex variable type */
+cplx_t FloatToCplx(float real, float imag) {
+	cplx_t res;
+	res.real = os_FloatToReal(real);
+	res.real.sign |= TI_CPLX_TYPE;
+	res.imag = os_FloatToReal(imag);
+	res.imag.sign |= TI_CPLX_TYPE;
+	return res;
+}
+
+/* Converts a pair of reals to a complex number */
+cplx_t RealToCplx(real_t real, real_t imag) {
+	cplx_t res;
+	res.real = real;
+	res.real.sign |= TI_CPLX_TYPE;
+	res.imag = imag;
+	res.imag.sign |= TI_CPLX_TYPE;
+	return res;
+}
+
+/* Converts strings to a complex variable type */
+cplx_t StrToCplx(char *real, char **real_end, char *imag, char **imag_end) {
+	cplx_t res;
+	res.real = os_StrToReal(real, real_end);
+	res.real.sign |= TI_CPLX_TYPE;
+	res.imag = os_StrToReal(imag, imag_end);
+	res.imag.sign |= TI_CPLX_TYPE;
+	return res;
 }
