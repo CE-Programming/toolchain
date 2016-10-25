@@ -23,8 +23,6 @@ bool exit_loop = false;
 
 /* Main function */
 void main(void) {
-    char str[10];
-
     /* Randomize things */
     srand( rtc_Time() );
 

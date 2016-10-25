@@ -6,11 +6,6 @@ CSTARTUP_ASM := cstartup.asm
 LIBHEADER_ASM := libheader.asm
 #----------------------------
 
-#Change to 'YES' if atexit() is used
-#----------------------------
-USE_AT_EXIT ?= NO
-#----------------------------
-
 #----------------------------
 #Try not to edit anything below these lines unless you know what you are doing
 #----------------------------
@@ -67,11 +62,6 @@ TARGETTYPE := $(TARGET).8xp
 endif
 TARGETMAP := $(TARGET).map
 
-#determine if the user wants to use atexit
-ifeq ($(USE_AT_EXIT),YES)
-USE_AT_EXIT := _USING_AT_EXIT
-endif
-
 #Find all of the available C and ASM files (Remember, you can create C <-> assembly routines easily this way)
 SOURCES := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
 ASMSOURCES := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.asm)))
@@ -114,7 +104,7 @@ LIBRARIES += $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/ce/$(var)/$(var).lib
 
 #Define the assembler flags used by the Zilog assembler
 ASM_FLAGS := \
-	-define:_EZ80=1 -define:_SIMULATE=0 -define:$(DEBUGMODE) -define:$(ICONC) -define:$(USE_AT_EXIT) -include:$(HEADERS) -NOlist -NOlistmac \
+	-define:_EZ80=1 -define:_SIMULATE=0 -define:$(DEBUGMODE) -define:$(ICONC) -include:$(HEADERS) -NOlist -NOlistmac \
 	-pagelen:250 -pagewidth:132 -quiet -sdiopt -warn -NOdebug -NOigcase -cpu:EZ80F91
 
 #Define the C flags used by the Zilog compiler
