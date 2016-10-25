@@ -89,6 +89,9 @@ typedef struct { uint16_t len; char data[1]; } string_t;
 typedef struct { uint16_t len; char data[1]; } equ_t;
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
+#define NEG_SIGN_MASK    0x80
+#define POS_SIGN_MASK    0x00
+#define CPLX_SIGN_MASK   0x0C
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
 /**
@@ -506,7 +509,7 @@ void boot_Set48MHzModeI(void);
  * Use this function to call assembly functions in the OS and Bootcode
  * i.e. _OS( asm_HomeUp );
  */
-void _OS(void *function);
+void _OS(void (*function)(void));
 
 /**
  * Assembly functions ( Don't forget to call from _OS() )
@@ -518,6 +521,69 @@ void asm_RunIndicOn(void);
 void asm_RunIndicOff(void);
 void asm_DisableAPD(void);
 void asm_EnableAPD(void);
+void asm_ArcChk(void);
+
+/**
+ * OS RAM Location defines for direct modification
+ */
+#define os_ramStart         ((uint8_t*)0xD00000)
+#define os_flags            ((uint8_t*)0xD00080)
+#define os_textFlags        (*(uint8_t*)0xD00080)
+#define os_apdFlags         (*(uint8_t*)0xD00088)
+#define os_rclFlags         (*(uint8_t*)0xD0008E)
+
+#define os_kbdScanCode      (*(uint8_t*)0xD00587)
+#define os_kbdLGSC          (*(uint8_t*)0xD00588)
+#define os_kbdPSC           (*(uint8_t*)0xD00589)
+#define os_kbdWUR           (*(uint8_t*)0xD0058A)
+#define os_kbdDebncCnt      (*(uint8_t*)0xD0058B)
+#define os_kbdKey	    (*(uint8_t*)0xD0058C)
+#define os_kbdGetKy         (*(uint8_t*)0xD0058D)
+#define os_keyExtend        (*(uint8_t*)0xD0058E)
+#define os_brightness       (*(uint8_t*)0xD0058F)
+#define os_apdSubTimer      (*(uint8_t*)0xD00590)
+#define os_apdTimer         (*(uint8_t*)0xD00591)
+#define os_curRow           (*(uint8_t*)0xD00595)
+#define os_curCol           (*(uint8_t*)0xD00596)
+
+#define os_OP1              ((uint8_t*)0xD005F8)
+#define os_OP2              ((uint8_t*)0xD00603)
+#define os_OP3              ((uint8_t*)0xD0060E)
+#define os_OP4              ((uint8_t*)0xD00619)
+#define os_OP5              ((uint8_t*)0xD00624)
+#define os_OP6              ((uint8_t*)0xD0062F)
+
+#define os_progToEdit       ((char*)0xD0065B)
+#define os_nameBuff         ((char*)0xD00663)
+
+#define os_promptRow        (*(uint8_t*)0xD00800)
+#define os_promptCol        (*(uint8_t*)0xD00801)
+#define os_promptIns        (*(uint8_t*)0xD00802)
+#define os_promptShift      (*(uint8_t*)0xD00803)
+#define os_promptRet        (*(uint8_t*)0xD00804)
+#define os_promptValid      (*(uint8_t*)0xD00807)
+
+#define os_penCol           (*(uint24_t*)0xD008D2)
+#define os_penRow           (*(uint8_t*)0xD008D5)
+
+#define os_asmPrgmSize      (*(uint16_t*)0xD0118C)
+
+#define os_appErr1          ((char*)0xD025A9)
+#define os_appErr2          ((char*)0xD025B6)
+
+#define os_tempFreeArc      (*(uint24_t*)0xD02655) // set after asm_ArcChk call
+
+#define os_textBGcolor      (*(uint16_t*)0xD02688)
+#define os_textFGcolor      (*(uint16_t*)0xD0268A)
+
+#define os_drawBGColor      (*(uint16_t*)0xD026AA)
+#define os_drawFGColor      (*(uint16_t*)0xD026AC)
+#define os_drawColorCode    (*(uint8_t*)0xD026AE)
+
+#define os_graphBGColor     ((uint16_t*)0xD02A98)
+
+#define os_fillRectColor    (*(uint16_t*)0xD02AC0)
+#define os_statusBarBGColor ((uint16_t*)0xD02ACC)
 
 /**
  * ---- TI-OS Token definitions ----

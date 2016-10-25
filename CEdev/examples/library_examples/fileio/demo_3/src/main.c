@@ -28,6 +28,8 @@ void main(void) {
 	/* Store the value '1.5+2.5i' into the varaible B */
 	my_cplx.real = real_1_5;
 	my_cplx.imag = real_2_5;
+	my_cplx.real.sign |= CPLX_SIGN_MASK;
+	my_cplx.imag.sign |= CPLX_SIGN_MASK;
 	ti_SetVar(TI_CPLX_TYPE, ti_B, &my_cplx);
 	
 	/* Store the value '1.5' into the varaible A */
@@ -39,7 +41,7 @@ void main(void) {
 	my_equ->data[0] = '2';
 	my_equ->data[1] = tAdd;
 	my_equ->data[2] = '2';
-	ti_SetVar(TI_EQU_TYPE, ti_EquY1, my_equ);
+	ti_SetVar(TI_EQU_TYPE, ti_Y1, my_equ);
 	free(my_equ);
 	
 	/* Store the list {1.5,2.5,3.5} to L1 */
@@ -50,7 +52,7 @@ void main(void) {
 	ti_SetVar(TI_REAL_LIST_TYPE, ti_L1, my_list);
 	free(my_list);
 	
-	/* Store the matrix [2.5,2.5] to Ans */
+	/* Store the matrix [[2.5,2.5]] to Ans */
 	my_matrix = ti_AllocMatrix(1,2);
 	matrix_element(my_matrix, 0, 0) = real_2_5;
 	matrix_element(my_matrix, 0, 1) = real_2_5;

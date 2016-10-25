@@ -1,8 +1,8 @@
 /**
  * FILEIOC CE C Library
- * \version 2.0
+ * @version 2.0
  *
- * \section LICENSE
+ * @section LICENSE
  *
  * Copyright (c) 2016, Matthew Waltz
  * All rights reserved.
@@ -28,7 +28,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * \section DESCRIPTION
+ * @section DESCRIPTION
  *
  * This library implements some variable opening and editing routines
  */

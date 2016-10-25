@@ -110,6 +110,7 @@
 	.def _asm_RunIndicOff
 	.def _asm_DisableAPD
 	.def _asm_EnableAPD
+	.def _asm_ArcChk
 ; --------------------------------------------
 
 ; --- Location Equates -----------------------
@@ -215,6 +216,9 @@ _os_FloatToReal                 equ 022170h
 _os_RealToFloat                 equ 022174h
 _os_FontDrawTransText           equ 022178h
 _os_CreateAppVar                equ 022184h
+
+; Directly callable asm functions
+
 _asm_MoveDown                   equ 0207F4h
 _asm_MoveUp                     equ 020800h
 _asm_HomeUp                     equ 020828h
@@ -222,6 +226,7 @@ _asm_RunIndicOn                 equ 020844h
 _asm_RunIndicOff                equ 020848h
 _asm_DisableAPD                 equ 021134h
 _asm_EnableAPD                  equ 021138h
+_asm_ArcChk                     equ 022040h
 ; --------------------------------------------
 
 	end
