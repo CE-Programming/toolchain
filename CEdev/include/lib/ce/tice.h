@@ -124,7 +124,7 @@ void prgm_CleanUp(void);
 #define pgrm_CleanUp prgm_CleanUp
 
 /* A faster implementation of memset */
-void *memset_fast(void *ptr,int value,size_t num);
+void *memset_fast(void *ptr, int c, size_t num);
 
 
 /************* TI OS SPECIFIC ROUTINES AND IMPLEMENTATIONS *************/
@@ -209,7 +209,7 @@ void os_EnableCursor(void);
 /**
  * Set/Get the foreground color used to draw text on the graphscreen
  */
-void os_SetDrawFGColor(int color);
+void os_SetDrawFGColor(uint24_t color);
 uint24_t os_GetDrawFGColor(void);
 
 /**
@@ -457,21 +457,21 @@ void asm_ArcChk(void);
 /**
  * OS RAM Location defines for direct modification
  */
-#define OS_BLUE_COLOR       10
-#define OS_RED_COLOR        11
-#define OS_BLACK_COLOR      12
-#define OS_MAGENTA_COLOR    13
-#define OS_GREEN_COLOR      14
-#define OS_ORANGE_COLOR     15
-#define OS_BROWN_COLOR      16
-#define OS_NAVY_COLOR       17
-#define OS_LTBLUE_COLOR     18
-#define OS_YELLOW_COLOR     19
-#define OS_WHITE_COLOR      20
-#define OS_LTGRAY_COLOR     21
-#define OS_MEDGRAY_COLOR    22
-#define OS_GRAY_COLOR       23
-#define OS_DARKGRAY_COLOR   24
+#define OS_COLOR_BLUE        10
+#define OS_COLOR_RED         11
+#define OS_COLOR_BLACK       12
+#define OS_COLOR_MAGENTA     13
+#define OS_COLOR_GREEN       14
+#define OS_COLOR_ORANGE      15
+#define OS_COLOR_BROWN       16
+#define OS_COLOR_NAVY        17
+#define OS_COLOR_LTBLUE      18
+#define OS_COLOR_YELLOW      19
+#define OS_COLOR_WHITE       20
+#define OS_COLOR_LTGRAY      21
+#define OS_COLOR_MEDGRAY     22
+#define OS_COLOR_GRAY        23
+#define OS_COLOR_DARKGRAY    24
 
 #define os_ramStart          ((uint8_t*)0xD00000)
 #define os_flags             ((uint8_t*)0xD00080)
