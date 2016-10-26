@@ -1008,10 +1008,10 @@ _FillCircle_NoClip:
 	ld 	d,a
 	ld 	e,a
 	mlt 	de
-	ld 	ix,0
-	add	ix,de
+	ld 	iy,0
+	add	iy,de
 	ld 	c,a
-Fory:	lea	hl,ix+0			; kind of For(y,R,1,-1
+Fory:	lea	hl,iy+0			; kind of For(y,R,1,-1
 	ld 	a,c
 	ld 	d,b
 	ld 	e,b
