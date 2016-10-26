@@ -260,37 +260,37 @@ uint8_t ti_RclVar(const uint8_t var_type, const char *var_name, void **data_stru
  * Allocates space for a string variable
  */
 string_t *ti_AllocString(unsigned len, void (*malloc_routine)(size_t));
-#define ti_MallocString(len) ti_AllocString(len, (void*)malloc)
+#define ti_MallocString(len) ti_AllocString((len), ((void*)malloc))
 
 /**
  * Allocates space for a list variable
  */
 list_t *ti_AllocList(unsigned dim, void (*malloc_routine)(size_t));
-#define ti_MallocList(dim) ti_AllocList(dim, (void*)malloc)
+#define ti_MallocList(dim) ti_AllocList((dim), ((void*)malloc))
 
 /**
  * Allocates space for a matrix variable
  */
 matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void (*malloc_routine)(size_t));
-#define ti_MallocMatrix(rows, cols) ti_AllocMatrix(rows, cols, (void*)malloc)
+#define ti_MallocMatrix(rows, cols) ti_AllocMatrix((rows), (cols), ((void*)malloc))
 
 /**
  * Allocates space for a complex list variable
  */
 cplx_list_t *ti_AllocCplxList(unsigned dim, void (*malloc_routine)(size_t));
-#define ti_MallocCplxList(dim) ti_AllocCplxList(dim, (void*)malloc)
+#define ti_MallocCplxList(dim) ti_AllocCplxList((dim), ((void*)malloc))
 
 /**
  * Allocates space for an equation variable
  */
 equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
-#define ti_MallocEqu(len) ti_AllocEqu(len, (void*)malloc)
+#define ti_MallocEqu(len) ti_AllocEqu((len), ((void*)malloc))
 
 /**
  * Some more definitions using Ans
  */
-#define TI_ANS_TYPE	0x00
-#define ti_Ans		("\x72\0")
+#define TI_ANS_TYPE (0x00)
+#define ti_Ans      ("\x72\0")
 
 /**
  * Some string definitions
@@ -304,6 +304,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_Str7     ("\xAA\x6\0")
 #define ti_Str8     ("\xAA\x7\0")
 #define ti_Str0     ("\xAA\x8\0")
+#define ti_StrT     ('\xAA')
 
 /**
  * Some equation definitions
@@ -318,6 +319,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_Y8       ("\x5E\x17\0")
 #define ti_Y9       ("\x5E\x18\0")
 #define ti_Y0       ("\x5E\x19\0")
+#define ti_EquT     ('\x5E')
 
 /**
  * Some real and complex defines
@@ -363,6 +365,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_MatH     ("\x5C\x7\0")
 #define ti_MatI     ("\x5C\x8\0")
 #define ti_MatJ     ("\x5C\x9\0")
+#define ti_MatT     ('\x5C')
 
 /**
  * Some list defines
@@ -373,6 +376,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_L4        ("\x5D\x3\0")
 #define ti_L5        ("\x5D\x4\0")
 #define ti_L6        ("\x5D\x5\0")
+#define ti_LT        ('\x5D')
 
 /**
  * For compatibility reasons

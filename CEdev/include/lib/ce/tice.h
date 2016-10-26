@@ -15,7 +15,7 @@
 
 
 /* Creates a random integer value */
-#define randInt(min, max)       (unsigned)rand() % ((max) - (min) + 1) + (min))
+#define randInt(min, max)       ((unsigned)rand() % ((max) - (min) + 1) + (min))
 
 /* RTC define -- useful for srand() */
 #define rtc_Time()              (*(volatile uint32_t*)0xF30044)
@@ -24,7 +24,7 @@
 #define RTC_UNFREEZE            (1<<7)
 #define RTC_FREEZE              (0<<7)
 #define RTC_LOAD                (1<<6)
-#define RTC_ENABLE              (1<<0)|RTC_UNFREEZE
+#define RTC_ENABLE              ((1<<0)|RTC_UNFREEZE)
 #define RTC_DISABLE             (0<<0)
 
 /* RTC registers */
@@ -104,6 +104,8 @@
 
 /* LCD defines */
 #define lcd_BacklightLevel       (*(uint8_t*)0xF60024)
+#define lcd_Width                (320)
+#define lcd_Height               (240)
 
 /* OS varaible type definitions */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;

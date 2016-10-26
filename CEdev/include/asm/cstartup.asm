@@ -21,7 +21,7 @@
 	define	.libs,space=ram
 	define	.startup,space=ram
 
-_errno     equ 0D008DCh
+_errno  equ 0D008DCh
 
 ;-------------------------------------------------------------------------------
 ; Standard CE startup module code
@@ -57,8 +57,8 @@ _init:
 	push	hl
 	ld	(__errsp+1),sp  ; save the stack from death
 	call	_main
-__exit:	ex	de,hl
-
+__exit:
+	ex	de,hl
 __errsp:
 	ld	sp,0
 	pop	hl
@@ -69,7 +69,8 @@ __errsp:
 	pop	iy              ; restore iy for OS
 	ex	de,hl		; program return value in hl
 	ret
-_exit:	pop	de
+_exit:
+	pop	de
 	pop	de
 	jr	__errsp
 ;-------------------------------------------------------------------------------
