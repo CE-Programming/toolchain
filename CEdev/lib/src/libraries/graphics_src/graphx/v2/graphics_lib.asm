@@ -1581,86 +1581,96 @@ _ScaledSprite_NoClip:
 ;  arg6 : Height Scale (integer)
 ; Returns:
 ;  None
-		ld	iy,0
-		add	iy,sp
-		ld	a,(iy+15)			; Height of Scale
-		or	a,a
-		ret	z
-		ld	(NcSprHscl+1),a
-		ld	l,a
-		ld	a,(iy+15)			; Width of Scale
-		or	a,a
-		ret	z
-		ld	h,lcdWidth/2
-		mlt	hl
-		add	hl,hl
-		ld	(NcSprHscl320+1),hl \.r
-		push	ix
-		ld	ixl,a			; Width of Scale
-		ld	de,(iy+6)			;  x coordinate
-		ld	c,(iy+9)			;  y coordinate
-		ld	iy,(iy+3)			; start of sprite structure
-		ld	h,a
-		ld	a,(iy+0)
-		ld	(NcSprWidth+1),a \.r
-		ld	l,a
-		mlt	hl
-		ld	(SprWxSclW1+1),hl \.r
-		ld	(SprWxSclW2+1),hl \.r
-		ld	a,(iy+1)
-		ld	ixh,a			; Height of Sprite
-		ld	hl,(currDrawBuffer) \.r
-		add	hl,de
-		ld	b,lcdWidth/2
-		mlt	bc
-		add	hl,bc
-		inc	hl
-NcSprBigLoop:	add	hl,bc
-		ex	de,hl
-		sbc	hl,hl
-		ld	b,l
-		add	hl,de
-		dec	hl
-		push	de
-NcSprWidth:	ld	a,0			; Width of Sprite
-		jr	NcSprLpEntry
-NcSprWlp:	ldir
-NcSprLpEntry:	ld	c,(iy+2)
-		inc	iy
-		ld	(hl),c
-		ld	c,ixl			; Width of Scale
-		dec	a
-		jr	nz,NcSprWlp
-		dec	c
-		jr	z,NcSprHscl
-		ldir
-NcSprHscl:	ld	a,0			; Height of Scale
-		dec	a
-		jr	z,NcSprW_end
-		inc	b
-		ld	c,$40			; bc = lcdWidth
-NcSprLineCopy:	add	hl,bc
-		dec	de
-		ex	de,hl
-SprWxSclW1:	ld	bc,0			; WidthSprite x WidthScale
-		lddr
-		dec	a
-		jr	z,NcSprW_end
-		ld	bc,641
-		add	hl,bc
-		inc	de
-		ex 	de,hl
-SprWxSclW2:	ld	bc,0			; WidthSprite x WidthScale
-		ldir
-		ld	bc,639
-		dec	a
-		jr	nz,NcSprLineCopy
-NcSprW_end:	pop	hl
-NcSprHscl320:	ld	bc,0			; lcdWidth x HeightScale
-		dec	ixh
-		jr	nz,NcSprBigLoop
-		pop	ix
-		ret
+	ld	iy,0
+	add	iy,sp
+	ld	a,(iy+15)		; Height of Scale
+	or	a,a
+	ret	z
+	ld	(NcSprHscl+1),a
+	ld	l,a
+	ld	a,(iy+15)		; Width of Scale
+	or	a,a
+	ret	z
+	ld	h,lcdWidth/2
+	mlt	hl
+	add	hl,hl
+	ld	(NcSprHscl320+1),hl \.r
+	push	ix
+	ld	ixl,a			; Width of Scale
+	ld	de,(iy+6)		;  x coordinate
+	ld	c,(iy+9)		;  y coordinate
+	ld	iy,(iy+3)		; start of sprite structure
+	ld	h,a
+	ld	a,(iy+0)
+	ld	(NcSprWidth+1),a \.r
+	ld	l,a
+	mlt	hl
+	ld	(SprWxSclW1+1),hl \.r
+	ld	(SprWxSclW2+1),hl \.r
+	ld	a,(iy+1)
+	ld	ixh,a			; Height of Sprite
+	ld	hl,(currDrawBuffer) \.r
+	add	hl,de
+	ld	b,lcdWidth/2
+	mlt	bc
+	add	hl,bc
+	inc	hl
+NcSprBigLoop:
+	add	hl,bc
+	ex	de,hl
+	sbc	hl,hl
+	ld	b,l
+	add	hl,de
+	dec	hl
+	push	de
+NcSprWidth:
+	ld	a,0			; Width of Sprite
+	jr	NcSprLpEntry
+NcSprWlp:
+	ldir
+NcSprLpEntry:
+	ld	c,(iy+2)
+	inc	iy
+	ld	(hl),c
+	ld	c,ixl			; Width of Scale
+	dec	a
+	jr	nz,NcSprWlp
+	dec	c
+	jr	z,NcSprHscl
+	ldir
+NcSprHscl:
+	ld	a,0			; Height of Scale
+	dec	a
+	jr	z,NcSprW_end
+	inc	b
+	ld	c,$40			; bc = lcdWidth
+NcSprLineCopy:
+	add	hl,bc
+	dec	de
+	ex	de,hl
+SprWxSclW1:
+	ld	bc,0			; WidthSprite x WidthScale
+	lddr
+	dec	a
+	jr	z,NcSprW_end
+	ld	bc,641
+	add	hl,bc
+	inc	de
+	ex 	de,hl
+SprWxSclW2:
+	ld	bc,0			; WidthSprite x WidthScale
+	ldir
+	ld	bc,639
+	dec	a
+	jr	nz,NcSprLineCopy
+NcSprW_end:
+	pop	hl
+NcSprHscl320:
+	ld	bc,0			; lcdWidth x HeightScale
+	dec	ixh
+	jr	nz,NcSprBigLoop
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 _ScaledTransparentSprite_NoClip:
