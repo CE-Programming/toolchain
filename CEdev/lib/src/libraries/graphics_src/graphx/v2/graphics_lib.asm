@@ -1581,29 +1581,25 @@ _ScaledSprite_NoClip:
 ;  arg6 : Height Scale (integer)
 ; Returns:
 ;  None
+	
 	ld	iy,0
 	add	iy,sp
-	ld	a,(iy+15)		; Height of Scale
-	or	a,a
-	ret	z
-	ld	(NcSprHscl+1),a
-	ld	l,a
-	ld	a,(iy+15)		; Width of Scale
-	or	a,a
-	ret	z
+	push	ix
 	ld	h,lcdWidth/2
+	ld	l,(iy+15)		; Height of Scale
+	ld	a,l
+	ld	(NcSprHscl+1),a
 	mlt	hl
 	add	hl,hl
 	ld	(NcSprHscl320+1),hl \.r
-	push	ix
-	ld	ixl,a			; Width of Scale
 	ld	de,(iy+6)		;  x coordinate
 	ld	c,(iy+9)		;  y coordinate
+	ld	h,(iy+12)		; Width of Scale
+	ld	ixl,h
 	ld	iy,(iy+3)		; start of sprite structure
-	ld	h,a
-	ld	a,(iy+0)
+	ld	l,(iy+0)
+	ld	a,l
 	ld	(NcSprWidth+1),a \.r
-	ld	l,a
 	mlt	hl
 	ld	(SprWxSclW1+1),hl \.r
 	ld	(SprWxSclW2+1),hl \.r
@@ -1611,10 +1607,10 @@ _ScaledSprite_NoClip:
 	ld	ixh,a			; Height of Sprite
 	ld	hl,(currDrawBuffer) \.r
 	add	hl,de
+	inc	hl
 	ld	b,lcdWidth/2
 	mlt	bc
 	add	hl,bc
-	inc	hl
 NcSprBigLoop:
 	add	hl,bc
 	ex	de,hl
