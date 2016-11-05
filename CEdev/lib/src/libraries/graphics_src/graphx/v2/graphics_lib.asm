@@ -1866,30 +1866,47 @@ _Sprite_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+6)			; hl = x coordinate
-	ld	c,(iy+9)			; c = y coordinate
-	ld	iy,(iy+3)			; iy -> sprite struct
-	ld	de,(currDrawBuffer)
-	add	hl,de
-	ld	b,lcdWidth/2
-	mlt	bc
+	ld	hl,(currDrawBuffer) \.r
+	ld	bc,(iy+6)			;  x coordinate
 	add	hl,bc
-	add	hl,bc				; hl -> start draw location
+	ld	d,lcdWidth/2
+	ld	e,(iy+9)			;  y coordinate
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ex	de,hl				; de = start draw location
+	ld	iy,(iy+3)			; iy = sprite structure
+	ld	a,(iy+1)			; sprite height
+	push	af
 	ld	b,0
-	push	hl
-	ld	a,(iy+0)
-	ld	(NoClipSprLineNext),a \.r	; a = width
-	ld	a,(iy+1)			; a = height
-	lea	hl,iy+2				; hl = data
-	pop	iy
-NoClipSprLineNext =$+1
-_:	ld	c,0
-	lea	de,iy
+	ld	c,(iy+0)			; sprite width
+	ld	hl,lcdWidth
+	sbc	hl,bc
+	rr	h
+	ld	a,l
+	rra	
+	lea	hl,iy+2				; hl = sprite data
+	ld	iyh,c				; sprite width
+	ld	iyl,a				; = (lcdWidth-SpriteWidth)/2
+	ld	a,$f3
+	sbc	a,b
+	ld	(SprNcJrStep+1),a \.r	
+SprNcSprHcnt:
+	pop	af				; a = sprite height
+	jr	SprNcLpStart
+	inc	de				; needed if sprite width is odd
+SprNcLpEvenW:
+	ld	c,iyl				; = (lcdWidth-SpriteWidth)/2
+	ex	de,hl
+	add	hl,bc
+	add	hl,bc
+	ex	de,hl
+	ld	c,iyh				; sprite width
+SprNcLpStart:
 	ldir
-	ld	de,lcdWidth
-	add	iy,de
 	dec	a
-	jr	nz,-_
+SprNcJrStep:	
+	jr	nz,SprNcLpEvenW
 	ret
 
 ;-------------------------------------------------------------------------------
