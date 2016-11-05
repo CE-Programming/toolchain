@@ -3845,43 +3845,38 @@ __imulu_ASM:
 ;  BC : Operand 2
 ; Outputs:
 ;  HL = HL*BC
+
+	push	hl
 	push	bc
 	push	hl
-	ex	de,hl
-	ld	hl,2
-	add	hl,sp
-	ld	b,(hl)
-	mlt	bc
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	a,d
-	ld	d,(hl)
+	ld	iy,0
+	ld	d,l
+	ld	e,b
 	mlt	de
-	dec	hl
-	ld	l,(hl)
-	ld	h,a
-	mlt	hl
-	ld	a,l
-	add	a,e
-	add	a,c
-	pop	de
-	pop	bc
-	push	bc
-	or	a,a
-	sbc	hl,hl
-	add.s	hl,de
-	ex	de,hl
-	ld	h,b
-	mlt	hl
-	ld	b,d
-	mlt	bc
-	add	hl,bc
-	add	a,h
-	ld	h,a
-	pop	bc
+	add	iy,de
 	ld	d,c
+	ld	e,h
 	mlt	de
+	add	iy,de
+	ld	d,c
+	ld	e,l
+	mlt	de
+	ld	c,h
+	mlt	bc
+	ld	a,c
+	inc	sp
+	inc	sp
+	pop	hl
+	mlt 	hl
+	add	a,l
+	pop	hl
+	inc	sp
+	mlt 	hl
+	add	a,l
+	ld	b,a
+	ld	c,0
+	lea	hl,iy+0
+	add	hl,bc
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
