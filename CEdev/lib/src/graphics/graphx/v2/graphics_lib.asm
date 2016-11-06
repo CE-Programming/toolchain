@@ -235,7 +235,7 @@ _:	ld	a,b
 _FillScreen:
 ; Fills the screen with the specified color index
 ; Arguments:
-;  arg0 : Color Index
+;  arg0 : Color index
 ; Returns:
 ;  None
 	ld	hl,3
@@ -318,7 +318,7 @@ color1 =$+1
 
 ;-------------------------------------------------------------------------------
 _FillRectangle:
-; Draws an unclipped rectangle with the global color index
+; Draws a clipped rectangle with the global color index
 ; Arguments:
 ;  arg0 : X Coord
 ;  arg1 : Y Coord
@@ -435,7 +435,6 @@ _Rectangle:
 	push	de
 	push	hl
 	call	_HorizLine \.r              ; top horizontal line
-	ld	sp,ix
 	ld	hl,(ix+6)
 	ld	de,(ix+9)
 	ld	bc,(ix+15)
@@ -443,7 +442,6 @@ _Rectangle:
 	push	de
 	push	hl
 	call	_VertLine \.r               ; left vertical line
-	ld	sp,ix
 	ld	hl,(ix+6)
 	ld	de,(ix+9)
 	ld	bc,(ix+12)
@@ -454,7 +452,6 @@ _Rectangle:
 	push	de
 	push	hl
 	call	_VertLine \.r               ; right vertical line
-	ld	sp,ix
 	ld	de,(ix+6)
 	ld	hl,(ix+9)
 	ld	bc,(ix+15)
@@ -517,10 +514,10 @@ _HorizLine:
 	call	_SignedCompare_ASM \.r      ; compare y coordinate <-> ymin
 	ret	c
 	ld	hl,(_ymax) \.r
+	dec	hl                          ; inclusive
 	ld	de,(iy+6)
 	call	_SignedCompare_ASM \.r      ; compare y coordinate <-> ymax
 	ret	c
-	ret	z
 	ld	hl,(iy+9)
 	ld	de,(iy+3)
 	add	hl,de
@@ -639,7 +636,7 @@ _VertLine_ASM:
 	ret	z                           ; check if length is 0
 	ld	d,lcdWidth/2
 	mlt	de
-	add.s	hl,de
+	add	hl,de
 	add	hl,de
 	ld	de,(currDrawBuffer)
 	add	hl,de                       ; hl -> drawing location
@@ -980,24 +977,24 @@ _FillCircle_NoClip:
 ;  None
 	ld 	iy,0
 	add	iy,sp
-	ld 	a,(iy+9)                    ; Radius
+	ld 	a,(iy+9)                    ; radius
 	or	a,a
 	ret	z
 	ld	bc,0
 	ld	c,a
 	ld 	hl,(currDrawBuffer)
 	ld 	d,lcdWidth/2
-	ld 	e,(iy+6)                    ; Yc (circle center pos)
+	ld 	e,(iy+6)                    ; y coord (circle center pos)
 	mlt 	de
 	add	hl,de
 	add	hl,de
 	ld	d,b
-	ld 	e,(iy+3)                    ; Xc (circle center pos)
+	ld 	e,(iy+3)                    ; x coord (circle center pos)
 	add	hl,de
 	ld 	(FCircleCenterPos_SMC),hl \.r
 	sbc 	hl,bc
 	ld 	(FCircleLdirpos_SMC),hl \.r
-	ex 	de,hl                       ; de = Xc - Radius
+	ex 	de,hl                       ; de = x coord - radius
 	ld 	hl,color1 \.r               ; hl = color of circle
 	push	de
 	ldi
@@ -1027,8 +1024,8 @@ Forx:	ld 	h,a                         ; kind of For(x,R,y,-1
 	mlt 	hl                          ; hl = x²
 	sbc 	hl,de                       ; x² < (R² - y²) ?
 	dec	a
-	jr 	nc,Forx                     ; no? - Then loop
-	push	bc                          ; yes?  Here we go!
+	jr 	nc,Forx                     ; no?   then loop
+	push	bc                          ; yes?  here we go!
 FCircleCenterPos_SMC =$+1
 	ld 	hl,0                        ; hl = 'on-screen' center pos
 	ld 	c,lcdWidth/2
@@ -1047,7 +1044,7 @@ FCircleLddrpos_SMC =$+1
 	rlca
 	ld 	c,a                         ; bc = drawing length
 	lddr                                ; trace 1st horizontal line (bottom)
-	pop	hl                          ; Now, calculate mirrored position...
+	pop	hl                          ; now, calculate mirrored position...
 	add	hl,hl
 	add	hl,hl                       ; hl = 160*y*4
 	inc	de
@@ -1175,17 +1172,16 @@ OutcodeOutOutcode1:
 	call	_ComputeOutcode_ASM \.r
 	ld	(iy+-2),a                   ; c = outcode1
 	jp	CohenSutherlandLoop \.r
-TrivialAccept:
-	dec	iy
-	inc	sp
-	inc	sp
-	inc	sp
-	jp	_Line_NoClip_ASM \.r        ; line routine handler
 TrivialReject:
 	inc	sp
 	inc	sp
 	inc	sp
 	ret
+TrivialAccept:
+	inc	sp
+	inc	sp
+	inc	sp
+	;jr	_Line_NoClip                ; line routine handler
 
 ;-------------------------------------------------------------------------------
 _Line_NoClip:
@@ -1199,7 +1195,6 @@ _Line_NoClip:
 ;  None
 	ld	iy,-1
 	add	iy,sp
-_Line_NoClip_ASM:
 	ld	de,(iy+4)                   ; de = x1
 	ld	c,(iy+7)                    ; c = y1
 	ld	hl,(iy+10)                  ; hl = x2
@@ -1976,8 +1971,7 @@ _ClipDraw_ASM:
 	jr	z,NoTopClipNeeded_ASM
 	ld	a,l                         ; save the clipped distance
 	ld	hl,(iy+3)                   ; hl = tmpHeight
-	or	a,a
-	add	hl,de                       ; y coordinate - tmpHeight
+	add	hl,de                       ; y coordinate + tmpHeight
 	ret	nc                          ; return if offscreen
 	ld	(iy+3),hl                   ; store new tmpHeight
 	ld	l,a                         ; restore clipped amount
@@ -2465,17 +2459,18 @@ _PrintChar_ASM:
 	push	ix                          ; save stack pointer
 	push	hl                          ; save hl pointer if string
 	ld	e,a                         ; e = char
-MonoFlag_SMC =$+1
+FixedWidthFont_SMC =$+1
 	ld	a,0
 	or	a,a
-	jr	nz,+_
+	jr	nz,HasFixedWidth
 	sbc	hl,hl
 	ld	l,e                         ; hl = character
 	ld	bc,(CharSpacing_ASM) \.r
 	add	hl,bc
 	ld	a,(hl)                      ; a = char width
+HasFixedWidth:
 TextXPos_SMC = $+1
-_:	ld	bc,0
+	ld	bc,0
 	sbc	hl,hl
 	ld	l,a
 	ld	ixh,a                       ; ixh = char width
@@ -2507,26 +2502,30 @@ UseLargeFont_SMC =$+1
 	ld	a,0
 	or	a,a
 	jr	nz,_PrintLargeFont_ASM
-_:	ld	c,(hl)                      ; c = 8 pixels
+CharLoop:
+	ld	c,(hl)                      ; c = 8 pixels
 	add	iy,de                       ; get draw location
 	lea	de,iy
 	ld	b,ixh
+NextPixel:
 TextBGColor_SMC =$+1
-_:	ld	a,255
+	ld	a,255
 	rlc	c
-	jr	nc,+_
+	jr	nc,IsBGColor
 TextFGColor_SMC =$+1
 	ld	a,0
+IsBGColor:
 TextTransColor_1_SMC =$+1
-_:	cp	a,255                       ; check if transparent
-	jr	z,+_
+	cp	a,255                       ; check if transparent
+	jr	z,IsTransparent
 	ld	(de),a
-_:	inc	de                          ; move to next pixel
-	djnz	---_
+IsTransparent:
+	inc	de                          ; move to next pixel
+	djnz	NextPixel
 	ld	de,lcdwidth
 	inc	hl
 	dec	ixl
-	jr	nz,----_
+	jr	nz,CharLoop
 	pop	hl                          ; restore hl and stack pointer
 	pop	ix
 	ret
@@ -2541,7 +2540,7 @@ TextHeightScale_SMC =$+1
 _:	ld	b,1
 	push	hl
 	ld	c,(hl)                      ; c = 8 pixels
-_hscale:
+HScale:
 	push	bc
 	add	iy,de                       ; get draw location
 	lea	de,iy
@@ -2556,29 +2555,28 @@ TextTransColor_2_SMC =$+1
 _:	cp	a,255                       ; check if transparent
 	jr	z,+_
 	
-wscale1:	
+WScale1:	
 	ld	(de),a
 	inc	de
 	dec	l
-	jr	nz,wscale1
+	jr	nz,WScale1
 	djnz	--_
-	jr	_done
+	jr	CharDone
 _:
-wscale2:
+WScale2:
 	inc	de
 	dec	l
-	jr	nz,wscale2                  ; move to next pixel
+	jr	nz,WScale2                  ; move to next pixel
 	djnz	---_
-_done:
-	ld	de,lcdwidth
+CharDone:
+	ld	de,lcdWidth
 	
 	pop	bc
-	djnz	_hscale
+	djnz	HScale
 	
 	pop	hl
 	inc	hl
 	dec	ixl
-	
 	jr	nz,----_
 	pop	hl                          ; restore hl and stack pointer
 	pop	ix
@@ -2691,7 +2689,7 @@ _GetCharWidth:
 _GetCharWidth_ASM:
 	sbc	hl,hl
 	ld	l,a
-	ld	a,(MonoFlag_SMC) \.r        ; is mono width
+	ld	a,(FixedWidthFont_SMC) \.r  ; is fixed width
 	or	a,a
 	jr	nz,+_
 	ld	bc,(CharSpacing_ASM) \.r    ; lookup spacing
@@ -2759,7 +2757,7 @@ _SetMonospaceFont:
 	push	de
 	push	hl
 	ld	a,e                         ; a = width
-	ld	(MonoFlag_SMC),a \.r        ; store the value of the monospace width
+	ld	(FixedWidthFont_SMC),a \.r  ; store the value of the monospace width
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3047,24 +3045,39 @@ _:	jp	po,t_32 \.r
 	pop	ix
 	ret
 
+;-------------------------------------------------------------------------------
 _Polygon_NoClip:
+; Draws a clipped polygon outline
+; Arguments:
+;  arg0 : Pointer to polygon points
+;  arg1 : length of polygon point array
+; Returns:
+;  None
 	ld	hl,_Line_NoClip \.r
 	jr	+_
+;-------------------------------------------------------------------------------
 _Polygon:
+; Draws a clipped polygon outline
+; Arguments:
+;  arg0 : Pointer to polygon points
+;  arg1 : length of polygon point array
+; Returns:
+;  None
 	ld	hl,_Line \.r
-_:	ld	(_LineType0_SMC),hl \.r
-	ld	(_LineType1_SMC),hl \.r
+_:	ld	(LineType0_SMC),hl \.r
+	ld	(LineType1_SMC),hl \.r
 	push	ix
 	ld	ix,0
 	add	ix,sp
+	push	hl
 	ld	hl,(ix+9)
 	dec	hl
 	ld	(ix+9),hl			; decrement the number of points
 	sbc	hl,hl
-	ld	(tmpWidth),hl \.r		; set the for loop counter to 0 (tmpWidth is used as a temp variable)
-	jr	p_3
-p_1:
-	ld	hl,(tmpWidth) \.r
+	ld	(ix+-3),hl                  ; set the for loop counter to 0 (tmpWidth is used as a temp variable)
+	jr	StartDrawLoop
+DrawLinesLoop:
+	ld	hl,(ix+-3)
 	add	hl,hl
 	inc	hl
 	inc	hl
@@ -3077,32 +3090,33 @@ p_1:
 	ld	bc,(ix+6)
 	add	hl,bc
 	ld	bc,(hl)
-	push	bc			; push the last argument
+	push	bc                          ; push the last argument
 	dec	hl
 	dec	hl
 	dec	hl
 	ld	bc,(hl)
-	push	bc			; push the third argument
+	push	bc                          ; push the third argument
 	dec	hl
 	dec	hl
 	dec	hl
 	ld	bc,(hl)
-	push	bc			; push the second argument
+	push	bc                          ; push the second argument
 	dec	hl
 	dec	hl
 	dec	hl
 	ld	bc,(hl)
-	push	bc			; push the first argument
-_LineType0_SMC =$+1
+	push	bc                          ; push the first argument
 	call	0
+LineType0_SMC =$-3
 	ld	sp,ix
-	ld	hl,(tmpWidth) \.r
+	ld	hl,(ix+-3)
 	inc	hl
-	ld	(tmpWidth),hl \.r		; increment the counter
-p_3:	ld	bc,(ix+9)
+	ld	(ix+-3),hl                  ; increment the counter
+StartDrawLoop:
+	ld	bc,(ix+9)
 	or	a,a
 	sbc	hl,bc
-	jr	c,p_1			; check if drawn all the points
+	jr	c,DrawLinesLoop             ; check if drawn all the points
 	ld	de,(ix+6)
 	add	hl,bc
 	inc	hl
@@ -3115,25 +3129,25 @@ p_3:	ld	bc,(ix+9)
 	sbc	hl,bc
 	add	hl,de
 	ld	bc,(hl)
-	push	bc			; push the last argument
+	push	bc                          ; push the last argument
 	dec	hl
 	dec	hl
 	dec	hl
 	ld	bc,(hl)
-	push	bc			; push the third argument
+	push	bc                          ; push the third argument
 	ex	de,hl
 	inc	hl
 	inc	hl
 	inc	hl
 	ld	bc,(hl)
-	push	bc			; push the second argument
+	push	bc                          ; push the second argument
 	dec	hl
 	dec	hl
 	dec	hl
 	ld	bc,(hl)
-	push	bc			; push the first argument
-_LineType1_SMC =$+1
+	push	bc                           ; push the first argument
 	call	0
+LineType1_SMC =$-3
 	ld	sp,ix
 	pop	ix
 	ret
@@ -3213,8 +3227,9 @@ l_13:	ld	bc,(ix+-14)
 	ld	bc,(ix+-3)
 	add	hl,bc
 	ld	(ix+-3),hl
-	ld	bc,0
-	ld	(ix+-11),bc
+	or	a,a
+	sbc	hl,hl
+	ld	(ix+-11),hl
 	jr	l_11
 l_9:	ld	bc,(ix+-20)
 	ld	hl,(ix+-6)
@@ -3328,8 +3343,9 @@ d_13:	ld	bc,(ix+-14)
 	ld	bc,(ix+-3)
 	add	hl,bc
 	ld	(ix+-3),hl
-	ld	bc,0
-	ld	(ix+-11),bc
+	or	a,a
+	sbc	hl,hl
+	ld	(ix+-11),hl
 	jr	d_11
 d_9:	ld	bc,(ix+-23)
 	ld	hl,(ix+-6)
@@ -3372,7 +3388,7 @@ d_18:	ld	bc,(ix+-17)
 d_19:	ld	sp,ix
 	pop	ix
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _FlipSpriteY:
 ; Flips an array horizontally about the center vertical axis
@@ -3381,41 +3397,43 @@ _FlipSpriteY:
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
+	push	ix
 	ld	iy,0
 	add	iy,sp
-	push	ix
 	ld	ix,(iy+3)
-	ld	a,(ix+0)
+	ld	a,(ix+0)                    ; a = width of sprite
 	sbc	hl,hl
 	ld	l,a
 	ld	c,a
 	push	hl
-	ld	(_FlipHorizWidth_SMC),a \.r
+	ld	(FlipHorizWidth_SMC),a \.r
 	add	hl,hl
-	ld	(_FlipHorizDelta_SMC),hl \.r
-	ld	a,(ix+1)
+	ld	(FlipHorizDelta_SMC),hl \.r ; width*2
+	ld	a,(ix+1)                    ; a = height of sprite
 	pop	hl
 	lea	de,ix+2
 	add	hl,de
 	ld	ix,(iy+6)
-	ld	(ix+1),a
-	ld	(ix+0),c
-	lea	de,ix+2
-	ex	(sp),ix
-_FlipHorizWidth_SMC =$+1
-_:	ld	b,0
+	ld	(ix+1),a                    ; store height to width
+	ld	(ix+0),c                    ; store width to height
+	lea	de,ix+2                     ; de -> sprite data
+	ex	(sp),ix                     ; restore stack frame
+FixupNextLine:
+FlipHorizWidth_SMC =$+1
+	ld	b,0
 	ld	c,a
-_:	dec	hl
+FixupNextPixel:
+	dec	hl
 	ld	a,(hl)
-	ld	(de),a
+	ld	(de),a                      ; store the new pixel data
 	inc	de
-	djnz	-_
+	djnz	FixupNextPixel
 	ld	a,c
-_FlipHorizDelta_SMC =$+1
+FlipHorizDelta_SMC =$+1
 	ld	bc,0
 	add	hl,bc
 	dec 	a
-	jr	nz,--_
+	jr	nz,FixupNextLine
 	pop	hl
 	ret
 
@@ -3500,7 +3518,7 @@ _:	ld	a,(hl)
 	pop	hl
 	pop	ix
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _RotateSpriteCC:
 ; Rotates a sprite 90 degrees counter clockwise
@@ -3594,7 +3612,8 @@ _LZ_ReadVarSize_ASM:
 	ld	sp,hl
 	ld	(ix+-3),de
 	ld	(ix+-6),de
-_:	ld	de,0
+DoWhileLoop:
+	ld	de,0
 	ld	hl,(ix+9)
 	ld	a,(hl)
 	or	a,a
@@ -3630,7 +3649,7 @@ _:	ld	de,0
 	sbc	hl,hl
 	ld	l,a
 	sbc	hl,de
-	jr	nz,-_
+	jr	nz,DoWhileLoop
 	ld	hl,(ix+6)
 	ld	bc,(ix+-3)
 	ld	(hl),bc
@@ -3794,9 +3813,17 @@ _:	dec	a
 	ret
 
 ;-------------------------------------------------------------------------------
-__imulsDE_ASM
+__imulsDE_ASM:
+__imuluDE_ASM:
+; Performs (un)signed integer multiplication
+; Inputs:
+;  HL : Operand 1
+;  DE : Operand 2
+; Outputs:
+;  HL = HL*DE
 	push	de
 	pop	bc
+;-------------------------------------------------------------------------------
 __imuls_ASM:
 __imulu_ASM:
 ; Performs (un)signed integer multiplication
@@ -3868,7 +3895,7 @@ _ComputeOutcode_ASM:
 	ccf
 _:	rla
 	ld	hl,(_xmax) \.r
-	dec	hl
+	dec	hl                          ; inclusive
 	sbc	hl,bc
 	add	hl,hl
 	jp	po,+_ \.r
@@ -3882,7 +3909,7 @@ _:	rla
 	ccf
 _:	rla
 	ld	hl,(_ymax) \.r
-	dec	hl
+	dec	hl                          ; inclusive
 	sbc	hl,de
 	add	hl,hl
 	rla
