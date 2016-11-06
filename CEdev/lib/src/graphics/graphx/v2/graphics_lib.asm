@@ -139,6 +139,7 @@ _SetClipRegion:
 ;  Must be within (0,0,320,240)
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	call	_SetFullScrnClip_ASM \.r    ; clip against the actual LCD screen
 	ld	iy,0
 	add	iy,sp
@@ -157,6 +158,7 @@ _SetColor:
 ;  arg0 : Color Index
 ; Returns:
 ;  Previous global color index
+	call	_FixupCall \.r
 	pop	hl
 	pop	de
 	push	de                          ; e = new color value
@@ -179,9 +181,6 @@ _Begin:
 ; Returns:
 ;  None
 	call	_boot_ClearVRAM             ; clear the screen
-	ld	hl,tmpWidth
-	ld	bc,11
-	call	_MemClear
 	pop	bc
 	pop	de
 	ld	a,e                         ; a = bpp mode
@@ -238,6 +237,7 @@ _FillScreen:
 ;  arg0 : Color index
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,3
 	add	hl,sp
 	ld	a,(hl)                      ; get the color index to use
@@ -280,6 +280,7 @@ _GetPixel:
 ;  arg1 : Y Coord
 ; Returns:
 ;  Color index of X,Y Coord
+	call	_FixupCall \.r
 	ld	hl,3
 	add	hl,sp
 	ld	bc,(hl)                     ; bc = x coordinate
@@ -301,6 +302,7 @@ _SetPixel:
 ;  arg1 : Y Coord
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,3
 	add	hl,sp
 	ld	bc,(hl)                     ; bc = x coordinate
@@ -326,6 +328,7 @@ _FillRectangle:
 ;  arg3 : Height
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+9)                   ; hl = width
@@ -362,6 +365,7 @@ _FillRectangle_NoClip:
 ;  arg3 : Height
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	a,(iy+12)                   ; a = height
@@ -425,6 +429,7 @@ _Rectangle:
 ;  arg3 : Height
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	push	ix                          ; need to use ix because lines use iy
 	ld	ix,0
 	add	ix,sp
@@ -476,6 +481,7 @@ _Rectangle_NoClip:
 ;  arg3 : Height
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)                   ; hl = x
@@ -507,6 +513,7 @@ _HorizLine:
 ;  arg2 : Length
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	de,(_ymin) \.r
@@ -548,6 +555,7 @@ _HorizLine_NoClip:
 ;  arg2 : Length
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	e,(iy+6)                    ; e = y coordinate
@@ -585,6 +593,7 @@ _VertLine:
 ;  arg2 : Length
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(_xmax) \.r
@@ -625,6 +634,7 @@ _VertLine_NoClip:
 ;  arg2 : Length
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)                   ; hl = x
@@ -682,6 +692,7 @@ _SwapDraw:
 ;  None
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,vram
 	ld	de,(mpLcdBase)
 	or	a,a
@@ -722,6 +733,7 @@ _Circle:
 ;  arg2 : Radius
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	lea	hl,iy+-9
@@ -847,6 +859,7 @@ _FillCircle:
 ;  arg2 : Radius
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -975,6 +988,7 @@ _FillCircle_NoClip:
 ;  arg2 : Radius
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld 	iy,0
 	add	iy,sp
 	ld 	a,(iy+9)                    ; radius
@@ -1069,6 +1083,7 @@ _Line:
 ;  arg0: y1
 ; Returns:
 ;  true if drawn, false if offscreen
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	push	hl                          ; temp storage
@@ -1193,6 +1208,7 @@ _Line_NoClip:
 ;  arg3 : Y1 Coord (c)
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,-1
 	add	iy,sp
 	ld	de,(iy+4)                   ; de = x1
@@ -1303,6 +1319,7 @@ _Blit:
 ;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	pop	de
 	pop	hl
 	push	hl
@@ -1322,6 +1339,7 @@ _BlitLines:
 ;  arg2 : Number of lines to copy
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	l,(iy+9)                    ; l = y coordinate
@@ -1356,6 +1374,7 @@ _BlitArea:
 ;  arg4 : Height
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	de,(iy+6)                   ; de = x coordinate
@@ -1536,6 +1555,7 @@ _ScaledSprite_NoClip:
 ;  arg6 : Height Scale (integer)
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+6)                   ; hl = x coordinate
@@ -1616,6 +1636,7 @@ _ScaledTransparentSprite_NoClip:
 ;  arg6 : Height Scale (integer)
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+6)			; hl = x coordinate
@@ -1688,6 +1709,7 @@ _TransparentSprite:
 ;  arg2 : Y Coord
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	push	ix                          ; save ix sp
 	call	_ClipDraw_ASM \.r
 	pop	ix                          ; restore ix sp
@@ -1779,6 +1801,7 @@ _Sprite:
 ;  arg4 : Height -- 8bits
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	push	ix                          ; save ix sp
 	call	_ClipDraw_ASM \.r
 	pop	ix                          ; restore ix sp
@@ -1819,6 +1842,7 @@ _Sprite_NoClip:
 ;  arg2 : Y Coord
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+6)                   ; hl = x coordinate
@@ -1857,6 +1881,7 @@ _GetSprite_NoClip:
 ;  arg2 : Y Coord
 ; Returns:
 ;  Pointer to resultant sprite
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	bc,(iy+9)                   ; bc = y coord
@@ -1906,6 +1931,7 @@ _TransparentSprite_NoClip:
 ;  arg2 : Y Coord
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+6)                   ; hl = x coordinate
@@ -2050,16 +2076,19 @@ tmpSpriteWidth =$+1
 ;-------------------------------------------------------------------------------
 _TransparentTilemap_NoClip:
 ; Tilemapping subsection
+	call	_FixupCall \.r
 	ld	hl,_TransparentSprite_NoClip \.r
 	jr	+_
 ;-------------------------------------------------------------------------------
 _Tilemap_NoClip:
 ; Tilemapping subsection
+	call	_FixupCall \.r
 	ld	hl,_Sprite_NoClip \.r
 	jr	+_
 ;-------------------------------------------------------------------------------
 _TransparentTilemap:
 ; Tilemapping subsection
+	call	_FixupCall \.r
 	ld	hl,_TransparentSprite \.r
 	jr	+_
 ;-------------------------------------------------------------------------------
@@ -2096,6 +2125,7 @@ _Tilemap:
 ;      }
 ;  }
 ;
+	call	_FixupCall \.r
 	ld	hl,_Sprite \.r
 _:	ld	(_DrawTile_SMC),hl \.r
 	push	ix
@@ -2228,6 +2258,7 @@ _TilePtr:
 ;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset, uint8_t tile) {
 ;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
+	call	_FixupCall \.r
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -2260,6 +2291,7 @@ _TilePtrMapped:
 ;  arg2 : Y Map Offset
 ; Returns:
 ;  A pointer to the indexed tile in the tilemap (so it can be looked at or changed)
+	call	_FixupCall \.r
 	push	ix
 	ld	ix,0                        ; setup frame
 	add	ix,sp
@@ -2373,6 +2405,7 @@ _PrintStringXY:
 ;  arg2 : Text Y Pos
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,9
 	add	hl,sp
 	ld	a,(hl)
@@ -2394,6 +2427,7 @@ _PrintString:
 ;  arg0 : Pointer to string
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	pop	de
 	pop	hl
 	push	hl
@@ -2450,6 +2484,7 @@ _PrintChar:
 ;  arg0 : Character to draw
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	pop	hl
 	pop	de
 	push	de
@@ -2590,6 +2625,7 @@ _PrintUInt:
 ;  arg1 : Number of characters to print
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)                   ; hl = uint
@@ -2635,6 +2671,7 @@ _PrintInt:
 ;  arg1 : Number of characters to print
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	iy,0
 	lea	bc,iy
 	add	iy,sp
@@ -2767,6 +2804,7 @@ _FillTriangle_NoClip:
 ;  arg0-5 : x0,y0,x1,y1,x2,y2
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,_HorizLine_NoClip \.r
 	jr	+_
 ;-------------------------------------------------------------------------------
@@ -2776,6 +2814,7 @@ _FillTriangle:
 ;  arg0-5 : x0,y0,x1,y1,x2,y2
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,_HorizLine \.r
 _:	ld	(HLine0_SMC),hl \.r
 	ld	(HLine1_SMC),hl \.r
@@ -3053,6 +3092,7 @@ _Polygon_NoClip:
 ;  arg1 : length of polygon point array
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,_Line_NoClip \.r
 	jr	+_
 ;-------------------------------------------------------------------------------
@@ -3063,6 +3103,7 @@ _Polygon:
 ;  arg1 : length of polygon point array
 ; Returns:
 ;  None
+	call	_FixupCall \.r
 	ld	hl,_Line \.r
 _:	ld	(LineType0_SMC),hl \.r
 	ld	(LineType1_SMC),hl \.r
@@ -3397,6 +3438,7 @@ _FlipSpriteY:
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
+	call	_FixupCall \.r
 	push	ix
 	ld	iy,0
 	add	iy,sp
@@ -3445,6 +3487,7 @@ _FlipSpriteX:
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	push	ix
@@ -3527,6 +3570,7 @@ _RotateSpriteCC:
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
+	call	_FixupCall \.r
 	ld	iy,0
 	lea	de,iy
 	add	iy,sp
@@ -3571,6 +3615,7 @@ _RotateSpriteHalf:
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
+	call	_FixupCall \.r
 	ld	iy,0
 	add	iy,sp
 	push	ix
@@ -3707,7 +3752,7 @@ _Min_ASM:
 	or	a,a
 	sbc	hl,de
 	ex	de,hl
-	jp	p,_ \.r
+	jp	p,+_ \.r
 	ret	pe
 	add	hl,de
 _:	ret	po
@@ -3915,6 +3960,25 @@ _:	rla
 	rla
 	ret	po
 	xor	a,1
+	ret
+
+;-------------------------------------------------------------------------------
+_FixupCall:
+; This function fixes the calling address on the first call to a function
+; This is useful for functions that need to be super fast; as it avoids the extra
+; jump in the jump table
+; Arguments:
+;  None
+; Returns:
+;  None
+	pop	de                          ; de -> calling routine return location
+	pop	hl                          ; hl -> fixup location
+	push	hl
+	push	de
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	(hl),de
 	ret
 
 ;-------------------------------------------------------------------------------
