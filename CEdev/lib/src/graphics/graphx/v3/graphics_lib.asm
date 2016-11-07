@@ -279,7 +279,7 @@ _ZeroScreen:
 ;  None
 ; Returns:
 ;  None
-	ld	hl,$FB0000
+	ld	hl,$E40000
 	ld	de,(currDrawBuffer)
 	ld	bc,lcdSize
 	ldir
