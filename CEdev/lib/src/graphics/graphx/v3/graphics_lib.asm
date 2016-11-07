@@ -81,10 +81,14 @@
  .function "gfx_FillTriangle",_FillTriangle
  .function "gfx_FillTriangle_NoClip",_FillTriangle_NoClip
 ;-------------------------------------------------------------------------------
-; v2 functions
+; v2 functions - Can no longer move/delete
 ;-------------------------------------------------------------------------------
  .function "gfx_LZDecompressSprite",_LZDecompressSprite
  .function "gfx_SetTextScale",_SetTextScale
+;-------------------------------------------------------------------------------
+; v3 functions
+;-------------------------------------------------------------------------------
+ .function "gfx_SetTransparentColor",_SetTransparentColor
 ;-------------------------------------------------------------------------------
 
  .beginDependencies
@@ -154,7 +158,7 @@ _SetClipRegion:
 _SetColor:
 ; Sets the global color index for all routines
 ; Arguments:
-;  arg0 : Color Index
+;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
 	pop	hl
@@ -169,6 +173,26 @@ _SetColor:
 	ld	(color3),a \.r
 	ld	(color4),a \.r              ; store all the new color values
 	ld	a,d                         ; return previous color index
+	ret
+
+;-------------------------------------------------------------------------------
+_SetTransparentColor:
+; Sets the global transparent color index for all routines
+; Arguments:
+;  arg0 : Transparent color index
+; Returns:
+;  Previous transparent color index
+	pop	hl
+	pop	de
+	push	de                          ; e = new transparent color value
+	push	hl
+	ld	hl,tcolor1 \.r              ; load the address of the current transparent color
+	ld	d,(hl)                      ; d = old color
+	ld	a,e
+	ld	(hl),a
+	ld	(tcolor2),a \.r
+	ld	(tcolor3),a \.r             ; store all the new transparent colors
+	ld	a,d                         ; return previous transparent color index
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1675,7 +1699,8 @@ NoClipSprTransWidth =$+1
 NcSprTScaledWidth =$+1
 _:	ld	b,0
 	ld	a,(hl)                      ; get sprite pixel
-	or	a,a
+tcolor2 =$+1
+	cp	a,0
 	jr	nz,++_                      ; is transparent?
 _:	inc	de
 	djnz	-_
@@ -1731,10 +1756,11 @@ _TransparentSprite:
 	pop	iy
 	push	ix
 	ld	ixh,a
+tcolor1 =$+1
+	ld	a,0
 ClipSprTransNextLine =$+1
 _:	ld	c,0
 	lea	de,iy
-	xor	a,a
 	call	_TransparentPlot_ASM \.r    ; call the transparent routine
 ClipSprTransNextAmt =$+1
 	ld	c,0
@@ -1965,8 +1991,9 @@ _TransparentSprite_NoClip:
 	pop	iy
 	push	ix
 	ld	ixh,a                       ; ixh = height of sprite
-	xor	a,a
-	ld	b,a                         ; zero mid byte
+	ld	b,0                         ; zero mid byte
+tcolor3 =$+1
+	ld	a,0
 NoClipSprTransNextLine =$+1
 _:	ld	c,0
 	lea	de,iy
@@ -1991,7 +2018,7 @@ _ClipDraw_ASM:
 ;  DE : New X coordinate
 ;  NC : If offscreen
 	ld	ix,6                        ; get pointer to arguments
-	ld	iy,ix-6
+	lea	iy,ix-6
 	add	ix,sp
 	ld	hl,(ix+3)
 	ld	a,(hl)

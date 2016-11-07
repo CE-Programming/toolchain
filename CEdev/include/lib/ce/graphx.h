@@ -194,6 +194,13 @@ void gfx_LZDecompressSprite(uint8_t *in, gfx_image_t *out);
 uint8_t gfx_SetColor(uint8_t index);
 
 /**
+ * Sets the tcolor index that drawing routines will use
+ * This currently applies to transparent sprites, both scaled and unscaled
+ * Returns the previous transparent color index
+ */
+uint8_t gfx_SetTransparentColor(uint8_t index);
+
+/**
  * Sets up the default palette for the given mode
  */
 void gfx_SetDefaultPalette(gfx_mode_t mode);

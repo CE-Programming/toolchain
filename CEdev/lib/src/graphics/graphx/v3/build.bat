@@ -4,7 +4,7 @@
 :: Set LIB_SRC to the assembly source of your library
 
 set LIB_NAME=GRAPHX
-set LIB_SRC=graphics_lib_old.asm
+set LIB_SRC=graphics_lib.asm
 
 echo Assembling Library...
 mkdir lib
