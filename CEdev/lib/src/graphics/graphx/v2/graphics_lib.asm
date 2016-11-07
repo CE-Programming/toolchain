@@ -238,14 +238,22 @@ _FillScreen:
 	ld	hl,3
 	add	hl,sp
 	ld	a,(hl)                      ; get the color index to use
-	ld	bc,lcdSize-1
 	ld	de,(currDrawBuffer)         ; de -> current buffer
+	or	a,a
+	jr	z,_FastFillScreen
 	sbc	hl,hl
 	add	hl,de
 	inc	de
 	ld	(hl),a                      ; store the new color
+	ld	bc,lcdSize-1
 	ldir                                ; fill the screen with color
 	ret
+_FastFillScreen:
+	ld	hl,$e40000
+	ld	bc,lcdSize
+	ldir
+	ret
+
 
 ;-------------------------------------------------------------------------------
 _SetPalette:
@@ -2630,10 +2638,9 @@ _PrintUInt_ASM:
 	ld	a,8
 	sub	a,c
 	ret	c                           ; make sure less than 8 
-	ld	c,a
-	ld	b,8
-	mlt	bc
-	ld	a,c
+	rla
+	rla
+	rla
 	ld	(Offset_SMC),a \.r          ; select the jump we need
 Offset_SMC =$+1
 	jr	$
