@@ -89,6 +89,7 @@
 ; v3 functions
 ;-------------------------------------------------------------------------------
  .function "gfx_SetTransparentColor",_SetTransparentColor
+ .function "gfx_ZeroScreen",_ZeroScreen
 ;-------------------------------------------------------------------------------
 
  .beginDependencies
@@ -263,8 +264,6 @@ _FillScreen:
 	add	hl,sp
 	ld	a,(hl)                      ; get the color index to use
 	ld	de,(currDrawBuffer)         ; de -> current buffer
-	or	a,a
-	jr	z,_FastFillScreen
 	sbc	hl,hl
 	add	hl,de
 	inc	de
@@ -272,8 +271,16 @@ _FillScreen:
 	ld	bc,lcdSize-1
 	ldir                                ; fill the screen with color
 	ret
-_FastFillScreen:
-	ld	hl,$e40000
+
+;-------------------------------------------------------------------------------
+_ZeroScreen:
+; Fills the current screen with a bunch of zeros
+; Arguments:
+;  None
+; Returns:
+;  None
+	ld	hl,$FF0000
+	ld	de,(currDrawBuffer)
 	ld	bc,lcdSize
 	ldir
 	ret

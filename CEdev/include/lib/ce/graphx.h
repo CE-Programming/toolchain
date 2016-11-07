@@ -216,6 +216,11 @@ void gfx_SetPalette(uint16_t *palette, uint24_t size, uint8_t offset);
 void gfx_FillScreen(uint8_t color);
 
 /**
+ * Implements a faster version of gfx_FillScreen(0)
+ */
+void gfx_ZeroScreen(void);
+
+/**
  * Sets the XY pixel measured from the top left origin of the screen to the
  * given palette index color. This routine performs clipping.
  */
