@@ -141,12 +141,12 @@ _SetClipRegion:
 ;  None
 	call	_SetFullScrnClip_ASM \.r    ; clip against the actual LCD screen
 	ld	iy,0
+	lea	bc,iy+12
 	add	iy,sp
 	call	_ClipRectRegion_ASM \.r     ; iy points to the start of the arguments
-	lea	hl,iy
 	ret	c
+	lea	hl,iy
 	ld	de,_xmin \.r                ; copy the variables in
-	ld	bc,12
 	ldir                                ; copy in the new structure
 	ret
 
@@ -981,11 +981,11 @@ _FillCircle_NoClip:
 ; Returns:
 ;  None
 	ld 	iy,0
+	lea	bc,iy+0
 	add	iy,sp
 	ld 	a,(iy+9)                    ; radius
 	or	a,a
 	ret	z
-	ld	bc,0
 	ld	c,a
 	ld 	hl,(currDrawBuffer)
 	ld 	d,lcdWidth/2
@@ -1991,13 +1991,13 @@ _ClipDraw_ASM:
 ;  DE : New X coordinate
 ;  NC : If offscreen
 	ld	ix,6                        ; get pointer to arguments
+	ld	iy,ix-6
 	add	ix,sp
 	ld	hl,(ix+3)
 	ld	a,(hl)
 	ld	de,tmpWidth \.r
 	ld	(de),a                     ; save tmpWidth
 	ld	(tmpSpriteWidth),a \.r     ; save tmpSpriteWidth
-	ld	iy,0
 	add	iy,de
 	inc	hl
 	ld	a,(hl)
@@ -2179,9 +2179,9 @@ _:	srl	h
 	sbc	hl,hl
 	ld	l,(iy+14)
 	ld	bc,(ix+12)
+	ld	(ix+-3),h
 	sbc	hl,bc
 	ld	(ix+-12),hl
-	ld	(ix+-3),0
 	jp	_Y_Loop_ASM \.r
 
 _X_Res_SMC =$+3
@@ -3202,11 +3202,10 @@ _LZDecompress:
 ;  None
 	push	ix
 	ld	ix,0
-	lea	bc,ix
+	lea	bc,ix+1
 	add	ix,sp
 	lea	hl,ix+-20
 	ld	sp,hl
-	inc	bc
 	ld	hl,(ix+12)
 	or	a,a
 	sbc	hl,bc
