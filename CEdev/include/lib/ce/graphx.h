@@ -480,33 +480,33 @@ void gfx_ShiftRight(uint24_t pixels);
  * Checks if we are currently in a rectangular hotspot area
  */
 #define gfx_CheckRectangleHotspot(master_x, master_y, master_width, master_height, test_x, test_y, test_width, test_height) \
-	   (((test_x) < ((master_x) + (master_width))) && \
-	   (((test_x) + (test_width)) > (master_x)) && \
-	   ((test_y) < ((master_y) + (master_height))) && \
-	   (((test_y) + (test_height)) > (master_y)))
+           (((test_x) < ((master_x) + (master_width))) && \
+           (((test_x) + (test_width)) > (master_x)) && \
+           ((test_y) < ((master_y) + (master_height))) && \
+           (((test_y) + (test_height)) > (master_y)))
 
 /**
  * Converts an RGB value to a palette color
  * Conversion is not 100% perfect, but is quite close
  */
-#define gfx_RGBTo1555(r,g,b)	((uint16_t)(((uint8_t)(r) >> 3) << 10) | \
-				(((uint8_t)(g) >> 3) << 5) | \
-				((uint8_t)(b) >> 3))
+#define gfx_RGBTo1555(r,g,b) ((uint16_t)(((uint8_t)(r) >> 3) << 10) | \
+                             (((uint8_t)(g) >> 3) << 5) | \
+                             ((uint8_t)(b) >> 3))
 
-#define gfx_lcdWidth		320
-#define gfx_lcdHeight		240
+#define gfx_lcdWidth    320
+#define gfx_lcdHeight   240
 
 /**
  * Some simple color definitions using the standard palette
  */
-#define gfx_black	0x00
-#define gfx_red		0xE0
-#define gfx_orange	0xE3
-#define gfx_green	0x03
-#define gfx_blue	0x10
-#define gfx_purple	0x50
-#define gfx_yellow	0xE7
-#define gfx_pink	0xF0
-#define gfx_white	0xFF
+#define gfx_black       0x00
+#define gfx_red         0xE0
+#define gfx_orange      0xE3
+#define gfx_green       0x03
+#define gfx_blue        0x10
+#define gfx_purple      0x50
+#define gfx_yellow      0xE7
+#define gfx_pink        0xF0
+#define gfx_white       0xFF
 
 #endif 

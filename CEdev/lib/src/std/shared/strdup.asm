@@ -2,7 +2,6 @@
 	.ref _malloc
 	.ref _strlen
 	.ref _strcpy
-	.ref __icmpzero
 	.def _strdup
 	.assume adl=1
 
@@ -18,8 +17,10 @@ _strdup:
 	call	_malloc
 	pop	bc
 	ld	(ix+-3),hl
-	call	__icmpzero
-	jr	z,l_1
+	add	hl,de 
+	or	a,a 
+	sbc	hl,de
+	jr	z,MallocFail
 	ld	bc,(ix+6)
 	push	bc
 	ld	bc,(ix+-3)
@@ -27,7 +28,8 @@ _strdup:
 	call	_strcpy
 	pop	bc
 	pop	bc
-l_1:	ld	hl,(ix+-3)
+MallocFail:
+	ld	hl,(ix+-3)
 	ld	sp,ix
 	pop	ix
 	ret

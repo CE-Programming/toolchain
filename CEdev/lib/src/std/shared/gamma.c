@@ -1,43 +1,13 @@
-/* gamma.c  - public domain implementation of function tgamma(3m)
-reference - Haruhiko Okumura: C-gengo niyoru saishin algorithm jiten
-            (New Algorithm handbook in C language) (Gijyutsu hyouron
-            sha, Tokyo, 1991) [in Japanese]
-            http://oku.edu.mie-u.ac.jp/~okumura/algo/
+/*
+ * gamma.c  - public domain implementation of function tgamma(3m)
+ * reference - Haruhiko Okumura: C-gengo niyoru saishin algorithm jiten
+ *  (New Algorithm handbook in C language) (Gijyutsu hyouronsha, Tokyo, 1991) [in Japanese]
+ *  http://oku.edu.mie-u.ac.jp/~okumura/algo/
 */
 
-/***********************************************************
-    gamma.c -- Gamma function
-***********************************************************/
 #include <math.h>
 #include <errno.h>
 
-#ifdef HAVE_LGAMMA_R
-
-double tgamma(double x) {
-    int sign;
-    double d;
-    if (x == 0.0) { /* Pole Error */
-        errno = ERANGE;
-        return 1/x < 0 ? -HUGE_VAL : HUGE_VAL;
-    }
-    if (x < 0) {
-        double i, f;
-        f = modf(-x, &i);
-        if (f == 0.0) { /* Domain Error */
-	    static double zero = 0.0;
-            errno = EDOM;
-            return zero/zero;
-        }
-    }
-    d = lgamma_r(x, &sign);
-    return sign * exp(d);
-}
-
-#else
-
-#include <errno.h>
-#define PI      3.14159265358979324  /* $\pi$ */
-#define LOG_2PI 1.83787706640934548  /* $\log 2\pi$ */
 #define N       8
 
 #define B0  1                 /* Bernoulli numbers */
@@ -51,9 +21,7 @@ double tgamma(double x) {
 #define B14 ( 7.0 / 6.0)
 #define B16 (-3617.0 / 510.0)
 
-static double
-loggamma(double x)  /* the natural logarithm of the Gamma function. */
-{
+static double loggamma(double x) { /* the natural logarithm of the Gamma function. */
     double v, w;
 
     v = 1;
@@ -63,18 +31,17 @@ loggamma(double x)  /* the natural logarithm of the Gamma function. */
                 + (B12 / (12 * 11))) * w + (B10 / (10 *  9))) * w
                 + (B8  / ( 8 *  7))) * w + (B6  / ( 6 *  5))) * w
                 + (B4  / ( 4 *  3))) * w + (B2  / ( 2 *  1))) / x
-                + 0.5 * LOG_2PI - log(v) - x + (x - 0.5) * log(x);
+                + 0.5 * M_LOG_2M_PI - log(v) - x + (x - 0.5) * log(x);
 }
 
-double tgamma(double x)  /* Gamma function */
-{
+double tgamma(double x) { /* Gamma function */
     if (x == 0.0) { /* Pole Error */
         errno = ERANGE;
         return 1/x < 0 ? -HUGE_VAL : HUGE_VAL;
     }
     if (x < 0) {
         int sign;
-        static double zero = 0.0;
+	static double zero = 0.0;
         double i, f;
         f = modf(-x, &i);
         if (f == 0.0) { /* Domain Error */
@@ -82,8 +49,7 @@ double tgamma(double x)  /* Gamma function */
             return zero/zero;
         }
         sign = (fmod(i, 2.0) != 0.0) ? 1 : -1;
-        return sign * PI / (sin(PI * f) * exp(loggamma(1 - x)));
+        return sign * M_PI / (sin(M_PI * f) * exp(loggamma(1 - x)));
     }
     return exp(loggamma(x));
 }
-#endif
