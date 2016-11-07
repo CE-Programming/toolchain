@@ -297,11 +297,9 @@ _SetPalette:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	sbc	hl,hl
+	ld	hl,mpLcdPalette>>1
 	ld	l,(iy+9)                    ; offset in palette
 	add	hl,hl
-	ld	de,mpLcdPalette             ; de -> mmio palette
-	add	hl,de
 	ex	de,hl
 	ld	hl,(iy+3)                   ; pointer to input palette
 	ld	bc,(iy+6)                   ; size of input palette
