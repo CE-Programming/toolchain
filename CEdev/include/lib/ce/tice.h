@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 
-/************* HARDWARE AND CUSTOM ROUTINES *************/
+/************* HARDWARE AND CUSTOM ROUTINE DEFINITIONS *************/
 
 
 /* Creates a random integer value */
@@ -24,7 +24,7 @@
 #define RTC_UNFREEZE            (1<<7)
 #define RTC_FREEZE              (0<<7)
 #define RTC_LOAD                (1<<6)
-#define RTC_ENABLE              ((1<<0)|RTC_UNFREEZE)
+#define RTC_ENABLE              ((1<<0)|(RTC_UNFREEZE))
 #define RTC_DISABLE             (0<<0)
 
 /* RTC registers */
@@ -104,8 +104,23 @@
 
 /* LCD defines */
 #define lcd_BacklightLevel       (*(uint8_t*)0xF60024)
-#define lcd_Width                (320)
-#define lcd_Height               (240)
+#define lcd_Timing0              (*(uint32_t*)0xE30000)
+#define lcd_Timing1              (*(uint32_t*)0xE30004)
+#define lcd_Timing2              (*(uint32_t*)0xE30008)
+#define lcd_Timing3              (*(uint32_t*)0xE3000C)
+#define lcd_UpBase               (*(uint32_t*)0xE30010)
+#define lcd_LpBase               (*(uint32_t*)0xE30014)
+#define lcd_Control              (*(uint32_t*)0xE30018)
+#define lcd_EnableInt            (*(uint32_t*)0xE3001C)
+#define lcd_IntStatus            (*(uint32_t*)0xE30020)
+#define lcd_IntStatusMasked      (*(uint32_t*)0xE30024)
+#define lcd_IntAcknowledge       (*(uint32_t*)0xE30028)
+#define lcd_UpBaseCurr           (*(uint32_t*)0xE3002C)
+#define lcd_LpBaseCurr           (*(uint32_t*)0xE30030)
+#define lcd_Palette              ((uint16_t*)0xE30200)
+
+#define LCD_WIDTH                (320)
+#define LCD_HEIGHT               (240)
 
 /* OS varaible type definitions */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
@@ -121,7 +136,6 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
 /* Cleans up everything and gets ready to enter back to the OS when you are ready to exit your program */
 void prgm_CleanUp(void);
-#define pgrm_CleanUp prgm_CleanUp
 
 /* A faster implementation of memset */
 void *memset_fast(void *ptr, int c, size_t num);
@@ -223,7 +237,7 @@ uint24_t os_GetDrawBGColor(void);
  * Set/Get the cursor posistion used on the homescreen
  */
 void os_SetCursorPos(uint8_t curRow, uint8_t curCol);
-void os_GetCursorPos(uint8_t **curRow, uint8_t **curCol);
+void os_GetCursorPos(unsigned int *curRow, unsigned int *curCol);
 
 /**
  * Selects/Gets the font to use when drawing on the graphscreen
@@ -670,10 +684,10 @@ void asm_ArcChk(void);
 
 #define os_batteryStatus     (*(uint8_t*)0xD02A86)
 
-#define os_graphBGColor      ((uint16_t*)0xD02A98)
+#define os_graphBGColor      (*(uint16_t*)0xD02A98)
 
 #define os_fillRectColor     (*(uint16_t*)0xD02AC0)
-#define os_statusBarBGColor  ((uint16_t*)0xD02ACC)
+#define os_statusBarBGColor  (*(uint16_t*)0xD02ACC)
 
 /**
  * ---- TI-OS Token definitions ----
@@ -1590,5 +1604,8 @@ void asm_ArcChk(void);
 #define sk_Tan              0x16
 #define sk_Vars             0x17
 #define sk_Power            0x0E
+
+/* Compatibility defines */
+#define pgrm_CleanUp prgm_CleanUp
 
 #endif

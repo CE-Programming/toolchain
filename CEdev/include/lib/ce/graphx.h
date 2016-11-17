@@ -67,7 +67,7 @@ typedef struct gfx_point {
  * otherwise it will not be linked correctly
  */
 gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine);
-#define gfx_MallocSprite(width, height) gfx_AllocSprite(uint8_t width, uint8_t height, (void*)malloc)
+#define gfx_MallocSprite(width, height) gfx_AllocSprite(width, height, (void*)malloc)
 
 /**
  * This routine should be used globally as it uses the BSS
@@ -112,7 +112,7 @@ extern uint8_t gfx_vram[2][240][320];
 
 /* Type for the clip region */
 typedef struct gfx_region {
-	int x_left, y_top, x_right, y_bottom;
+	int xmin, ymin, xmax, ymax;
 } gfx_region_t;
 
 /* Type for tilemap */
@@ -409,8 +409,8 @@ void gfx_TransparentSprite_NoClip(gfx_image_t *data, uint24_t x, uint8_t y);
  * A pointer to sprite_buffer is also returned for ease of use.
  * sprite_buffer is updated with the screen coordinates given.
  */
-gfx_image_t *gfx_GetSprite_NoClip(gfx_image_t *sprite_buffer, int x, int y);
-#define gfx_GetSprite gfx_GetSprite_NoClip
+gfx_image_t *gfx_GetSprite(gfx_image_t *sprite_buffer, int x, int y);
+#define gfx_GetSprite_NoClip gfx_GetSprite
 
 /**
  * Unclipped scaled sprite routines
