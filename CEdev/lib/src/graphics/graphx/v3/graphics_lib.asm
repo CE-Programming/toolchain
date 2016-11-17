@@ -3130,41 +3130,46 @@ _:	ld	(HLine0_SMC),hl \.r
 	ld	(HLine1_SMC),hl \.r
 	ld	(HLine2_SMC),hl \.r
 	push	ix
-	ld	ix,0                         ; first, sort the points
+	ld	ix,0
 	add	ix,sp
-	ld	hl,(ix+9)                    ; y0
-	ld	de,(ix+15)                   ; y1
+	lea	hl,ix+-39
+	ld	sp,hl
+	sbc	hl,hl
+	ld	(ix+-15),hl
+	ld	(ix+-18),hl
+	ld	hl,(ix+9)
+	ld	de,(ix+15)
 	call	_SignedCompare_ASM \.r
-	jr	c,+_                         ; if (y0 > y1)
+	jr	c,+_
 	ld	hl,(ix+9)
 	ld	(ix+9),de
-	ld	(ix+15),hl                   ; swap y0,y1
+	ld	(ix+15),hl
 	ld	hl,(ix+6)
 	ld	de,(ix+12)
 	ld	(ix+6),de
-	ld	(ix+12),hl                   ; swap x0,x1
-_:	ld	hl,(ix+15)                   ; y1
-	ld	de,(ix+21)                   ; y2
+	ld	(ix+12),hl
+_:	ld	hl,(ix+15)
+	ld	de,(ix+21)
 	call	_SignedCompare_ASM \.r
-	jr	c,+_                         ; if (y1 > y2)
+	jr	c,+_
 	ld	hl,(ix+15)
 	ld	(ix+15),de
-	ld	(ix+21),hl                   ; swap y1,y2
+	ld	(ix+21),hl
 	ld	hl,(ix+12)
 	ld	de,(ix+18)
 	ld	(ix+12),de
-	ld	(ix+18),hl                   ; swap x1,x2
-_:	ld	hl,(ix+9)                    ; y0
-	ld	de,(ix+15)                   ; y1
+	ld	(ix+18),hl
+_:	ld	hl,(ix+9)
+	ld	de,(ix+15)
 	call	_SignedCompare_ASM \.r
-	jr	c,+_                         ; if (y0 > y1)
+	jr	c,+_
 	ld	hl,(ix+9)
 	ld	(ix+9),de
-	ld	(ix+15),hl                   ; swap y0,y1
+	ld	(ix+15),hl
 	ld	hl,(ix+6)
 	ld	de,(ix+12)
 	ld	(ix+6),de
-	ld	(ix+12),hl                   ; swap x0,x1
+	ld	(ix+12),hl
 _:	ld	de,(ix+12)
 	ld	hl,(ix+18)
 	or	a,a
