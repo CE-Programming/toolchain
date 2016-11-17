@@ -66,7 +66,7 @@ typedef struct gfx_point {
  * Note that if you use the system malloc routine, it must be used elsewhere in your program
  * otherwise it will not be linked correctly
  */
-gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void (*malloc_routine)(size_t));
+gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine);
 #define gfx_MallocSprite(width, height) gfx_AllocSprite(uint8_t width, uint8_t height, (void*)malloc)
 
 /**
@@ -321,8 +321,8 @@ void gfx_SwapDraw(void);
 void gfx_Blit(uint8_t buffer);
 void gfx_BlitLines(uint8_t buffer, uint8_t y_loc, uint8_t num_lines);
 void gfx_BlitArea(uint8_t buffer, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
-#define gfx_BlitBuffer() gfx_Blit(gfx_screen)
-#define gfx_BlitScreen() gfx_Blit(gfx_buffer)
+#define gfx_BlitScreen() gfx_Blit(gfx_screen)
+#define gfx_BlitBuffer() gfx_Blit(gfx_buffer)
 
 /**
  * Scales text in integer steps. Values in the range from 1-5 are preferred.

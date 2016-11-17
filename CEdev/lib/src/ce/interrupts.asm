@@ -6,21 +6,21 @@
 
 ;-------------------------------------------------------------------------------
 ; Interrupts equates
-mpIntStatus		equ	0F00000h
-mpIntMask		equ	0F00004h
-mpIntAck		equ	0F00008h
-mpIntLachEnable		equ	0F0000Ch
-mpIntXor		equ	0F00010h
-mpIntStatusMasked	equ	0F00014h
+mpIntStatus             equ 0F00000h
+mpIntMask               equ 0F00004h
+mpIntAck                equ 0F00008h
+mpIntLachEnable         equ 0F0000Ch
+mpIntXor                equ 0F00010h
+mpIntStatusMasked       equ 0F00014h
 
-intOnKey		equ	1
-intTimer1		equ	2
-intTimer2		equ	4
-intTimer3		equ	8
-intOsTimer		equ	10h
-intKbd			equ	400h
-intLcd			equ	800h
-intRtc			equ	1000h
+intOnKey                equ 1
+intTimer1               equ 2
+intTimer2               equ 4
+intTimer3               equ 8
+intOsTimer              equ 10h
+intKbd                  equ 400h
+intLcd                  equ 800h
+intRtc                  equ 1000h
 
 ;-------------------------------------------------------------------------------
 _int_Initialize:

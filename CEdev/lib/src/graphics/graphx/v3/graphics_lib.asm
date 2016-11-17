@@ -150,7 +150,7 @@ _SetClipRegion:
 	add	iy,sp
 	call	_ClipRectRegion_ASM \.r     ; iy points to the start of the arguments
 	ret	c
-	lea	hl,iy
+	lea	hl,iy+3
 	ld	de,_xmin \.r                ; copy the variables in
 	ldir                                ; copy in the new structure
 	ret
@@ -288,7 +288,7 @@ _ZeroScreen:
 
 ;-------------------------------------------------------------------------------
 _SetPalette:
-; Sets the palette starting at 0x00 index and onward
+; Sets the palette colors
 ; Arguments:
 ;  arg0 : Pointer to palette
 ;  arg1 : Size of palette in bytes
