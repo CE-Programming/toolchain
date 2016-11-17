@@ -331,13 +331,13 @@ void gfx_SetTextScale(uint8_t width_scale, uint8_t height_scale);
 
 /**
  * Outputs a character at the current cursor position
- * No text clipping is performed.
+ * By default, no text clipping is performed (configurable with gfx_SetTextConfig)
  */
 void gfx_PrintChar(const char c);
 
 /**
  * Outputs a signed integer at the current cursor position.
- * No text clipping is performed.
+ * By default, no text clipping is performed (configurable with gfx_SetTextConfig)
  * Values range from: (-8388608 - 8388607)
  * length must be between 0-8
  */
@@ -345,7 +345,7 @@ void gfx_PrintInt(int n, uint8_t length);
 
 /**
  * Outputs an unsigned integer at the current cursor position.
- * No text clipping is performed.
+ * By default, no text clipping is performed (configurable with gfx_SetTextConfig)
  * Values range from: (0-16777215)
  * length must be between 0-8
  */
@@ -353,14 +353,14 @@ void gfx_PrintUInt(unsigned n, uint8_t length);
 
 /**
  * Outputs a string at the current cursor position
- * No text clipping is performed.
+ * By default, no text clipping is performed (configurable with gfx_SetTextConfig)
  */
 void gfx_PrintString(const char *string);
 
 /**
  * Outputs a string at the given XY coordinates measured from the top left origin.
  * The current cursor position is updated.
- * No text clipping is performed.
+ * By default, no text clipping is performed (configurable with gfx_SetTextConfig)
  */
 void gfx_PrintStringXY(const char *string, int x, int y);
 
@@ -499,17 +499,6 @@ void gfx_ShiftDown(uint8_t pixels);
 void gfx_ShiftUp(uint8_t pixels);
 void gfx_ShiftLeft(uint24_t pixels);
 void gfx_ShiftRight(uint24_t pixels);
-
-/**
- * The following routines are used to implement text clipping; which is
- * substantially slower than normal text. However, these may be useful.
- */
-
-/**
- * Outputs a string at the given XY coordinates.
- * The current cursor position is updated.
- */
-void gfx_PrintStringXY_Clip(const char *string, int x, int y);
 
 /**
  * Produces a random integer value
