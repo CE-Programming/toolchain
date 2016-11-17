@@ -2,7 +2,7 @@
 #include "..\..\..\include\ti84pce.inc"
 
  .libraryName		"GRAPHX"          ; Name of library
- .libraryVersion	2                 ; Version information (1-255)
+ .libraryVersion	3                 ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete
@@ -90,6 +90,8 @@
 ;-------------------------------------------------------------------------------
  .function "gfx_SetTransparentColor",_SetTransparentColor
  .function "gfx_ZeroScreen",_ZeroScreen
+ .function "gfx_SetTextConfig",_SetTextConfig
+ .function "gfx_GetSpriteChar",_GetSpriteChar
 ;-------------------------------------------------------------------------------
 
  .beginDependencies
@@ -99,6 +101,10 @@
 ; Used throughout the library
 lcdSize                 equ lcdWidth*lcdHeight
 currDrawBuffer          equ 0E30014h
+DEFAULT_TP_COLOR        equ 0
+DEFAULT_TEXT_FG_COLOR   equ 0
+DEFAULT_TEXT_BG_COLOR   equ 255
+DEFAULT_TEXT_TP_COLOR   equ 255
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -166,13 +172,13 @@ _SetColor:
 	pop	de
 	push	de                          ; e = new color value
 	push	hl
-	ld	hl,color1 \.r               ; load the address of the current color
+	ld	hl,Color_SMC_1 \.r          ; load the address of the current color
 	ld	d,(hl)                      ; d = old color
 	ld	a,e
 	ld	(hl),a
-	ld	(color2),a \.r
-	ld	(color3),a \.r
-	ld	(color4),a \.r              ; store all the new color values
+	ld	(Color_SMC_2),a \.r
+	ld	(Color_SMC_3),a \.r
+	ld	(Color_SMC_4),a \.r         ; store all the new color values
 	ld	a,d                         ; return previous color index
 	ret
 
@@ -187,12 +193,13 @@ _SetTransparentColor:
 	pop	de
 	push	de                          ; e = new transparent color value
 	push	hl
-	ld	hl,tcolor1 \.r              ; load the address of the current transparent color
+	ld	hl,TColor_SMC_1 \.r         ; load the address of the current transparent color
 	ld	d,(hl)                      ; d = old color
 	ld	a,e
 	ld	(hl),a
-	ld	(tcolor2),a \.r
-	ld	(tcolor3),a \.r             ; store all the new transparent colors
+	ld	(TColor_SMC_2),a \.r
+	ld	(TColor_SMC_3),a \.r        ; store all the new transparent colors
+	ld	(TColor_SMC_4),a \.r        ; store all the new transparent colors
 	ld	a,d                         ; return previous transparent color index
 	ret
 
@@ -203,6 +210,10 @@ _Begin:
 ;  arg0: bpp mode to start in
 ; Returns:
 ;  None
+	ld	hl,LargeFontJump_SMC \.r
+	ld	a,(hl)
+	ld	(UseLargeFont_SMC),a \.r    ; store the jump offset for later
+	ld	(hl),0                      ; jump nowhere if false
 	call	_boot_ClearVRAM             ; clear the screen
 	pop	bc
 	pop	de
@@ -349,7 +360,7 @@ _SetPixel:
 _SetPixel_ASM:
 	call	_PixelPtr_ASM \.r
 	ret	c                           ; return if out of bounds
-color1 =$+1
+Color_SMC_1 =$+1
 	ld	(hl),0                      ; get the actual pixel
 	ret
 
@@ -421,7 +432,7 @@ _FillRectangle_NoClip_ASM:
 	push 	de
 	ld	(_RectangleWidth1_SMC),bc \.r
 	ld	(_RectangleWidth2_SMC),bc \.r
-	ld	hl,color1 \.r
+	ld	hl,Color_SMC_1 \.r
 	ldi                                 ; check if we only need to draw 1 pixel
 	pop	hl
 	jp	po,_Rectangle_NoClip_Skip \.r
@@ -601,7 +612,7 @@ _HorizLine_NoClip_ASM:
 	add	hl,de
 	ld	de,(currDrawBuffer)
 	add	hl,de                       ; hl -> place to draw
-color2 =$+1
+Color_SMC_2 =$+1
 	ld	a,0                         ; color index to use
 _MemSet_ASM:
 	ld	(hl),a
@@ -679,7 +690,7 @@ _VertLine_ASM:
 	add	hl,de                       ; hl -> drawing location
 _RectVert_ASM:
 	ld	de,lcdWidth
-color3 =$+1
+Color_SMC_3 =$+1
 	ld 	a,0
 _:	ld	(hl),a                      ; loop for height
 	add	hl,de
@@ -1032,7 +1043,7 @@ _FillCircle_NoClip:
 	sbc 	hl,bc
 	ld 	(FCircleLdirpos_SMC),hl \.r
 	ex 	de,hl                       ; de = x coord - radius
-	ld 	hl,color1 \.r               ; hl = color of circle
+	ld 	hl,Color_SMC_1 \.r               ; hl = color of circle
 	push	de
 	ldi
 	pop	hl
@@ -1281,7 +1292,7 @@ _:	push	hl                          ; (iy-6) = hl = dx = |xe-xs|
 	pop	iy
 	pop	hl
 	lea	bc,iy+1
-	ld	a,(color4) \.r
+	ld	a,(Color_SMC_4) \.r
 LineH:	ld	(hl),a
 	cpi
 LineHD = $ - 1
@@ -1306,7 +1317,7 @@ _:	dec	de		            ; de = 2dx
 	ld	a,iyl
 _:	ld	bc,lcdWidth
 LineV:	ld	(hl),0
-color4 = $-1
+Color_SMC_4 = $-1
 	inc	a
 	ret	z
 	add	hl,bc
@@ -1707,8 +1718,8 @@ NoClipSprTransWidth =$+1
 NcSprTScaledWidth =$+1
 _:	ld	b,0
 	ld	a,(hl)                      ; get sprite pixel
-tcolor2 =$+1
-	cp	a,0
+TColor_SMC_2 =$+1
+	cp	a,DEFAULT_TP_COLOR
 	jr	nz,++_                      ; is transparent?
 _:	inc	de
 	djnz	-_
@@ -1764,8 +1775,8 @@ _TransparentSprite:
 	pop	iy
 	push	ix
 	ld	ixh,a
-tcolor1 =$+1
-	ld	a,0
+TColor_SMC_1 =$+1
+	ld	a,DEFAULT_TP_COLOR
 ClipSprTransNextLine =$+1
 _:	ld	c,0
 	lea	de,iy
@@ -1999,10 +2010,10 @@ _TransparentSprite_NoClip:
 	push	ix
 	ld	ixh,a                       ; ixh = height of sprite
 	ld	b,0                         ; zero mid byte
-tcolor3 =$+1
-	ld	a,0
-NoClipSprTransNextLine =$+1
+	ld	a,DEFAULT_TP_COLOR
+TColor_SMC_3 =$-1
 _:	ld	c,0
+NoClipSprTransNextLine =$-1
 	lea	de,iy
 	call	_TransparentPlot_ASM \.r    ; call the plotter
 	ld	de,lcdWidth
@@ -2181,7 +2192,7 @@ _Tilemap:
 ;  }
 ;
 	ld	hl,_Sprite \.r
-_:	ld	(_DrawTile_SMC),hl \.r
+_:	ld	(DrawTile_SMC),hl \.r
 	push	ix
 	ld	ix,0
 	lea	bc,ix
@@ -2214,10 +2225,10 @@ _:	srl	h
 	rr	l
 	djnz	-_
 	ld	a,l
-	ld	(_X_Res_SMC),a \.r
+	ld	(X_Res_SMC),a \.r
 	ld	hl,(iy+15)
 	sbc	hl,bc
-	ld	(_X_Draw_SMC),hl \.r ; x_draw = tilemap->x_loc-x_offset;
+	ld	(X_Draw_SMC),hl \.r ; x_draw = tilemap->x_loc-x_offset;
 	
 	or	a,a
 	sbc	hl,hl
@@ -2226,32 +2237,32 @@ _:	srl	h
 	ld	(ix+-3),h
 	sbc	hl,bc
 	ld	(ix+-12),hl
-	jp	_Y_Loop_ASM \.r
+	jp	Y_Loop \.r
 
-_X_Res_SMC =$+3
+X_Res_SMC =$+3
 n_8:	ld	(ix+-1),0
 	ld	(ix+-2),0
-_X_Draw_SMC =$+1
+X_Draw_SMC =$+1
 	ld	hl,0
 	ld	(ix+-7),hl
 	ld	l,(iy+13)
 	ld	h,(ix+-4)
 	mlt	hl
-	ld	(_Y_Next_SMC),hl \.r
-	jr	_X_Loop_ASM
+	ld	(Y_Next_SMC),hl \.r
+	jr	X_Loop
 
 _InLoop_ASM:
 	sbc	hl,hl
 	ld	l,(ix+-1)
 	ld	bc,(iy+0)
 	add	hl,bc
-_Y_Next_SMC =$+1
+Y_Next_SMC =$+1
 	ld	bc,0
 	add	hl,bc
 	ld	a,(hl)
 	ld	l,a
 	inc	a
-	jr	z,_BlankTile_ASM
+	jr	z,BlankTile
 	ld	h,3
 	mlt	hl
 	ld	de,(iy+3)
@@ -2262,12 +2273,12 @@ _Y_Next_SMC =$+1
 	push	bc
 	ld	bc,(hl)
 	push	bc
-_DrawTile_SMC =$+1
+DrawTile_SMC =$+1
 	call	0
 	lea	hl,ix+-12
 	ld	sp,hl
 	ld	iy,(ix+6)
-_BlankTile_ASM:
+BlankTile:
 	or	a,a
 	sbc	hl,hl
 	ld	l,(iy+7)
@@ -2277,7 +2288,7 @@ _BlankTile_ASM:
 	inc	(ix+-1)
 	inc	(ix+-2)
 
-_X_Loop_ASM:
+X_Loop:
 	ld	a,(iy+9)
 	cp	a,(ix+-2)
 	jr	nz,_InLoop_ASM
@@ -2290,7 +2301,7 @@ _X_Loop_ASM:
 	inc	(ix+-4)
 	inc	(ix+-3)
 
-_Y_Loop_ASM:
+Y_Loop:
 	ld	a,(iy+8)
 	cp	a,(ix+-3)
 	jp	nz,n_8 \.r
@@ -2377,7 +2388,7 @@ _GetTextY:
 ;  None
 ; Returns:
 ;  Y Text cursor posistion
-	ld	a,(TextYPos_SMC) \.r        ; return y pos
+	ld	hl,(TextYPos_SMC) \.r       ; return y pos
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2391,8 +2402,12 @@ _SetTextBGColorC:
 	pop	de
 	push	de
 	push	hl
-	ld	hl,TextBGColor_SMC \.r
+	ld	hl,TBGColor_SMC_1 \.r
 	ld	a,(hl)                      ; a = old bg color
+	ld	(hl),e
+	ld	hl,TBGColor_SMC_2 \.r
+	ld	(hl),e                      ; e = new bg color
+	ld	hl,TBGColor_SMC_3 \.r
 	ld	(hl),e                      ; e = new bg color
 	ret
 
@@ -2407,8 +2422,12 @@ _SetTextFGColorC:
 	pop	de
 	push	de
 	push	hl
-	ld	hl,TextFGColor_SMC \.r
+	ld	hl,TFGColor_SMC_1 \.r
 	ld	a,(hl)                      ; a = old fg color
+	ld	(hl),e
+	ld	hl,TFGColor_SMC_2 \.r
+	ld	(hl),e                      ; e = new fg color
+	ld	hl,TFGColor_SMC_3 \.r
 	ld	(hl),e                      ; e = new fg color
 	ret
 
@@ -2423,10 +2442,12 @@ _SetTextTransparentColorC:
 	pop	de
 	push	de
 	push	hl
-	ld	hl,TextTransColor_1_SMC \.r
+	ld	hl,TTPColor_SMC_1 \.r
 	ld	a,(hl)                      ; a = old transparent color
 	ld	(hl),e
-	ld	hl,TextTransColor_2_SMC \.r
+	ld	hl,TTPColor_SMC_2 \.r
+	ld	(hl),e                      
+	ld	hl,TTPColor_SMC_3 \.r
 	ld	(hl),e                      ; store new transparent color
 	ret
 	
@@ -2438,6 +2459,9 @@ _SetTextXY:
 ;  arg1 : Text Y Pos
 ; Returns:
 ;  None
+	jp	_SetTextXY_ASM \.r
+SetTextXY_SMC =$-3
+_SetTextXY_ASM:
 	ld	hl,3
 	add	hl,sp                       ; hl -> arg0
 	ld	de,TextXPos_SMC \.r
@@ -2449,6 +2473,49 @@ _SetTextXY:
 	ret
 
 ;-------------------------------------------------------------------------------
+_SetTextXY_Clip_ASM:
+; Sets the text X and Y posistions
+; Arguments:
+;  arg0 : Text X Pos
+;  arg1 : Text Y Pos
+; Returns:
+;  None
+	ld	hl,3
+	add	hl,sp                       ; hl -> arg0
+	ld	de,TextXPos_SMC \.r
+	ldi
+	ldi
+	ldi                                 ; copy in new x pos
+	ld	hl,(hl)
+	ld	(TextYPos_SMC),hl \.r       ; set new y pos
+	ret
+	
+;-------------------------------------------------------------------------------
+_PrintStringXY_Clip_ASM:
+; Places a string at the given coordinates
+; Arguments:
+;  arg0 : Pointer to string
+;  arg1 : Text X Pos
+;  arg2 : Text Y Pos
+; Returns:
+;  None
+	ld	hl,3
+	add	hl,sp
+	ld	de,(hl)
+	push	de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	de,TextXPos_SMC \.r
+	ldi
+	ldi
+	ldi                                 ; copy in the y location
+	ld	hl,(hl)
+	ld	(TextYPos_SMC),hl \.r       ; set new y pos
+	pop	hl
+	jr	NextCharLoop                ; jump to the main string handler
+
+;-------------------------------------------------------------------------------
 _PrintStringXY:
 ; Places a string at the given coordinates
 ; Arguments:
@@ -2457,6 +2524,9 @@ _PrintStringXY:
 ;  arg2 : Text Y Pos
 ; Returns:
 ;  None
+	jp	_PrintStringXY_ASM \.r
+PrintStringXY_SMC =$-3
+_PrintStringXY_ASM:
 	ld	hl,9
 	add	hl,sp
 	ld	a,(hl)
@@ -2469,7 +2539,7 @@ _PrintStringXY:
 	dec	hl
 	dec	hl
 	ld	hl,(hl)
-	jr	+_
+	jr	NextCharLoop
 
 ;-------------------------------------------------------------------------------
 _PrintString:
@@ -2482,12 +2552,14 @@ _PrintString:
 	pop	hl
 	push	hl
 	push	de
-_:	ld	a,(hl)
+NextCharLoop:
+	ld	a,(hl)                      ; get the current character
 	or	a,a
 	ret	z
 	call	_PrintChar_ASM \.r
-	inc	hl
-	jr	-_
+PrintChar_SMC_3 =$-3
+	inc	hl                          ; move to the next one
+	jr	NextCharLoop
 
 ;-------------------------------------------------------------------------------
 _SetTextScale:
@@ -2505,28 +2577,80 @@ _SetTextScale:
 	push	de
 	ld	a,l
 	ld	de,TextWidthScale_SMC \.r
-	ld	hl,UseLargeFont_SMC \.r
+	ld	hl,LargeFontJump_SMC \.r
 	cp	a,c
-	jr	z,+_
-	jr	++_
-_:	dec	a
-	jr	z,_BothAreOne
+	jr	z,AreTheSame
+	jr	NotTheSame
+AreTheSame:
+	dec	a
+	jr	z,BothAreOne                ; if they are both one; just use normal drawing
 	inc	a
-_:	or	a,a
-	ret	z
+NotTheSame:
+	or	a,a
+	ret	z                           ; null check
 	ld	(de),a
 	ld	a,c
 	or	a,a
-	ret	z
+	ret	z                           ; null check
 	ld	(TextHeightScale_SMC),a \.r
-	ld	(hl),1
+	ld	(hl),0                      ; modified at boot to SM the jump
+UseLargeFont_SMC =$-1
 	ret
-_BothAreOne:
-	ld	(hl),a
-	ld	a,1
+BothAreOne:
+	ld	(hl),a                      ; store a 0, which means no (literal) jump
+	inc	a
 	ld	(de),a
 	ret
-
+	
+;-------------------------------------------------------------------------------
+; Definitions for gfx_SetTextConfig
+#define TEXT_CLIP   1
+#define TEXT_NOCLIP 2
+;-------------------------------------------------------------------------------
+_SetTextConfig:
+; Configures text depending on the arguments
+; Arguments:
+;  arg0 : Configuration numbers
+; Returns:
+;  None
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	ld	a,e                         ; a = argument
+	dec	a                           ; TEXT_CLIP
+	jr	z,SetClipText
+	dec	a                           ; TEXT_NOCLIP
+	ret	nz
+	ld	de,_PrintChar_ASM \.r
+	ld	bc,_PrintStringXY_ASM \.r
+	ld	iy,_SetTextXY_ASM \.r
+	jr	SetCharSMC                  ; set unclipped character routine
+SetClipText:
+	ld	de,_PrintChar_Clip_ASM \.r
+	ld	bc,_PrintStringXY_Clip_ASM \.r
+	ld	iy,_SetTextXY_Clip_ASM \.r
+SetCharSMC:
+	ld	hl,PrintChar_SMC_0 \.r
+	ld	(hl),de                     ; holy crap what a hack
+	ld	hl,PrintChar_SMC_1 \.r
+	ld	(hl),de
+	ld	hl,PrintChar_SMC_2 \.r
+	ld	(hl),de
+	ld	hl,PrintChar_SMC_3 \.r
+	ld	(hl),de                     ; modify all the interal routines to use the clipped text routine
+	push	bc
+	pop	hl
+	ld	(PrintStringXY_SMC),hl \.r ; change which text routines we want to use
+	push	iy
+	pop	hl
+	ld	(SetTextXY_SMC),hl \.r
+	or	a,a
+	sbc	hl,hl
+	ld	(TextYPos_SMC),hl \.r
+	ld	(TextXPos_SMC),hl \.r       ; reset the current posistions
+	ret
+	
 ;-------------------------------------------------------------------------------
 _PrintChar:
 ; Places a character at the current cursor position
@@ -2539,6 +2663,8 @@ _PrintChar:
 	push	de
 	push	hl
 	ld	a,e                         ; a = char
+	jp	_PrintChar_ASM \.r          ; this is SMC'd to use as a grappling hook into the clipped version
+PrintChar_SMC_0 =$-3
 _PrintChar_ASM:
 	push	ix                          ; save stack pointer
 	push	hl                          ; save hl pointer if string
@@ -2564,7 +2690,7 @@ TextXPos_SMC = $+1
 	add	hl,bc
 	ld	(TextXPos_SMC),hl \.r
 TextYPos_SMC = $+1
-	ld	l,0
+	ld	hl,0
 	ld	h,lcdWidth/2
 	mlt	hl
 	add	hl,hl
@@ -2582,25 +2708,23 @@ TextYPos_SMC = $+1
 	add	hl,bc
 	ld	iy,0
 	ld	ixl,8
-UseLargeFont_SMC =$+1
-	ld	a,0
-	or	a,a
-	jr	nz,_PrintLargeFont_ASM
+	jr	_PrintLargeFont_ASM         ; SMC the jump
+LargeFontJump_SMC =$-1
 CharLoop:
 	ld	c,(hl)                      ; c = 8 pixels
 	add	iy,de                       ; get draw location
 	lea	de,iy
 	ld	b,ixh
 NextPixel:
-TextBGColor_SMC =$+1
-	ld	a,255
+	ld	a,DEFAULT_TEXT_BG_COLOR
+TBGColor_SMC_1 =$-1
 	rlc	c
 	jr	nc,IsBGColor
-TextFGColor_SMC =$+1
-	ld	a,0
+	ld	a,DEFAULT_TEXT_FG_COLOR
+TFGColor_SMC_1 =$-1
 IsBGColor:
-TextTransColor_1_SMC =$+1
-	cp	a,255                       ; check if transparent
+	cp	a,DEFAULT_TEXT_TP_COLOR     ; check if transparent
+TTPColor_SMC_1 =$-1
 	jr	z,IsTransparent
 	ld	(de),a
 IsTransparent:
@@ -2620,8 +2744,9 @@ _PrintLargeFont_ASM:
 ; This is so that way unscaled font can still be reasonably fast
 ; Returns:
 ;  None
-TextHeightScale_SMC =$+1
-_:	ld	b,1
+LargeFontLoop:	
+	ld	b,1
+TextHeightScale_SMC =$-1
 	push	hl
 	ld	c,(hl)                      ; c = 8 pixels
 HScale:
@@ -2629,14 +2754,16 @@ HScale:
 	add	iy,de                       ; get draw location
 	lea	de,iy
 	ld	b,ixh
-_:	ld	a,(TextBGColor_SMC) \.r
-TextWidthScale_SMC =$+1
+_:	ld	a,DEFAULT_TEXT_BG_COLOR
+TBGColor_SMC_3 =$-1
 	ld	l,1
+TextWidthScale_SMC =$-1
 	rlc	c
 	jr	nc,+_
-	ld	a,(TextFGColor_SMC) \.r
-TextTransColor_2_SMC =$+1
-_:	cp	a,255                       ; check if transparent
+	ld	a,DEFAULT_TEXT_FG_COLOR
+TFGColor_SMC_3 =$-1
+_:	cp	a,DEFAULT_TEXT_TP_COLOR     ; check if transparent
+TTPColor_SMC_2 =$-1
 	jr	z,+_
 	
 WScale1:	
@@ -2661,9 +2788,62 @@ CharDone:
 	pop	hl
 	inc	hl
 	dec	ixl
-	jr	nz,----_
+	jr	nz,LargeFontLoop
 	pop	hl                          ; restore hl and stack pointer
 	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+_PrintChar_Clip_ASM:
+; Clipped text for characters printing routine
+; Arguments:
+;  arg0 : Character to draw
+; Returns:
+;  None
+	push	hl                          ; save hl pointer if string
+	
+	ld	e,a                         ; e = char
+	
+	ld	a,(FixedWidthFont_SMC) \.r
+	or	a,a
+	jr	nz,CHasFixedWidth
+	sbc	hl,hl
+	ld	l,e                         ; hl = character
+	ld	bc,(CharSpacing_ASM) \.r
+	add	hl,bc
+	ld	a,(hl)                      ; a = char width
+CHasFixedWidth:
+	or	a,a
+	sbc	hl,hl
+	ld	l,e                         ; hl = character
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	bc,(TextData_ASM) \.r       ; get text data array
+	add	hl,bc                       ; de = draw location
+	ld	de,tmpCharData \.r          ; store pixel data into temporary sprite
+	ld	iyl,8
+	ld	iyh,a                       ; ixh = char width
+	ld	(tmpCharDataSprite),a \.r   ; store width of character we are drawing
+	call	GetChar_ASM \.r             ; store the character data
+	ld	bc,(TextYPos_SMC) \.r
+	push	bc
+	ld	bc,(TextXPos_SMC) \.r       ; compute the new locations
+	push	bc
+	or	a,a
+	sbc	hl,hl
+	ld	a,iyh
+	ld	l,a
+	add	hl,bc
+	ld	(TextXPos_SMC),hl \.r       ; move the text x posisition by the character width
+	ld	bc,tmpCharDataSprite \.r
+	push	bc
+	call	_TransparentSprite \.r
+	pop	bc
+	pop	bc
+	pop	bc
+	
+	pop	hl                          ; restore hl and stack pointer
 	ret
 	
 ;-------------------------------------------------------------------------------
@@ -2709,7 +2889,8 @@ Num2:	inc	a
 	jr	c,Num2
 	sbc	hl,bc
 	jp	_PrintChar_ASM \.r          ; print the actual character needed
- 
+PrintChar_SMC_1 =$-3
+
 ;-------------------------------------------------------------------------------
 _PrintInt:
 ; Places an int at the current cursor position
@@ -2732,6 +2913,7 @@ _PrintInt:
 	sbc	hl,bc
 	ld	a,'-'
 	call	_PrintChar_ASM \.r          ; place negative symbol
+PrintChar_SMC_2 =$-3
 	pop	bc
 _:	jp	_PrintUInt_ASM \.r          ; handle integer
 
@@ -2752,6 +2934,7 @@ _:	ld	a,(hl)
 	jr	z,+_                        ; loop until null byte
 	push	hl
 	call	_GetCharWidth_ASM \.r
+	ex	de,hl
 	pop	hl
 	inc	hl
 	jr	-_
@@ -2774,20 +2957,103 @@ _GetCharWidth_ASM:
 	ld	l,a
 	ld	a,(FixedWidthFont_SMC) \.r  ; is fixed width
 	or	a,a
-	jr	nz,+_
+	jr	nz,IsFixedMono
 	ld	bc,(CharSpacing_ASM) \.r    ; lookup spacing
 	add	hl,bc
 	ld	a,(hl)
-_:	or	a,a
-	sbc	hl,hl
+IsFixedMono:
 	ld	l,a
 	ld	a,(TextWidthScale_SMC) \.r  ; add scaling factor
 	ld	h,a
 	mlt	hl
 	add	hl,de
-	ex	de,hl
 	ret
 
+;-------------------------------------------------------------------------------
+_GetSpriteChar:
+; Sets the data in char_sprite (must have previously allocated an 8x8 width sprite)
+; the pixel map of the character c
+; Arguments:
+;  arg0 : Pointer to allocated sprite
+;  arg1 : Character
+; Returns:
+;  Pointer to sprite
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	ld	a,(FixedWidthFont_SMC) \.r
+	or	a,a
+	jr	nz,GetHasFixedWidth
+	sbc	hl,hl
+	ld	l,e                         ; hl = character
+	ld	bc,(CharSpacing_ASM) \.r
+	add	hl,bc
+	ld	a,(hl)                      ; a = char width
+GetHasFixedWidth:
+	or	a,a
+	sbc	hl,hl
+	ld	l,e                         ; hl = character
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	bc,(TextData_ASM) \.r       ; get text data array
+	add	hl,bc                       ; de = draw location
+	ld	de,tmpCharDataSprite \.r
+	ex	de,hl
+	push	hl                          ; save pointer to sprite
+	ld	a,8
+	ld	iyh,a                       ; ixh = char width
+	ld	(hl),a                      ; store width of character we are drawing
+	inc	hl
+	ld	iyl,a                       ; height of char
+	inc	hl
+	ex	de,hl
+	call	GetChar_ASM \.r             ; read the character into the array
+	pop	hl
+	ret
+
+;-------------------------------------------------------------------------------
+GetChar_ASM:
+; Places a character data into a nice buffer
+; Inputs:
+;  HL : Points to character pixmap
+;  DE : Points to output buffer
+; Outputs:
+;  Stored pixmap image
+;  Uses IY
+GetCharLoop:
+	ld	c,(hl)                      ; c = 8 pixels (or width based)
+	ld	b,iyh
+GetNextPixel:
+	ld	a,DEFAULT_TEXT_BG_COLOR
+TBGColor_SMC_2 =$-1
+	rlc	c
+	jr	nc,GetIsBGColor
+	ld	a,DEFAULT_TEXT_FG_COLOR
+TFGColor_SMC_2 =$-1
+GetIsBGColor:
+	cp	a,DEFAULT_TEXT_TP_COLOR     ; check if transparent
+TTPColor_SMC_3 =$-1
+	jr	z,GetIsTransparent
+	ld	(de),a
+	inc	de
+	djnz	GetNextPixel
+	inc	hl
+	dec	iyl
+	jr	nz,GetCharLoop
+	ret
+GetIsTransparent:
+	ld	a,0
+TColor_SMC_4 =$-1
+	ld	(de),a
+	inc	de                          ; move to next pixel
+	djnz	GetNextPixel
+	inc	hl
+	dec	iyl
+	jr	nz,GetCharLoop              ; okay we stored the character sprite now draw it
+	ret
+	
 ;-------------------------------------------------------------------------------
 _SetCustomFontData:
 ; Sets the font to be custom
@@ -4160,5 +4426,17 @@ _ymax:
 
 tmpWidth:
 	.dl 0,0,0
-
+	
+tmpCharDataSprite:
+	.db 8,8
+tmpCharData:
+	.db 0,0,0,0,0,0,0,0
+	.db 0,0,0,0,0,0,0,0
+	.db 0,0,0,0,0,0,0,0
+	.db 0,0,0,0,0,0,0,0
+	.db 0,0,0,0,0,0,0,0
+	.db 0,0,0,0,0,0,0,0
+	.db 0,0,0,0,0,0,0,0
+	.db 0,0,0,0,0,0,0,0
+	
  .endLibrary

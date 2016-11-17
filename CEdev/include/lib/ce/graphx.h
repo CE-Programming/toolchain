@@ -362,22 +362,33 @@ void gfx_PrintString(const char *string);
  * The current cursor position is updated.
  * No text clipping is performed.
  */
-void gfx_PrintStringXY(const char *string, uint24_t x, uint8_t y);
+void gfx_PrintStringXY(const char *string, int x, int y);
 
 /**
  * Returns the current text cursor X position
  */
-uint24_t gfx_GetTextX(void);
+int gfx_GetTextX(void);
 
 /**
  * Returns the current text cursor Y position
  */
-uint8_t gfx_GetTextY(void);
+int gfx_GetTextY(void);
 
 /**
  * Sets the text cursor XY position
  */
-void gfx_SetTextXY(uint24_t x, uint8_t y);
+void gfx_SetTextXY(int x, int y);
+
+/**
+ * Sets the configuration for the text routines. The current options are:
+ * GFX_TEXT_CLIP     - Default, text routines do not clip (much faster)
+ * GFX_TEXT_NOCLIP   - Text routines will clip against the defined clip window
+ *
+ * Clipped text does not scale text
+ */
+void gfx_SetTextConfig(uint8_t config);
+#define GFX_TEXT_CLIP   1
+#define GFX_TEXT_NOCLIP 2
 
 /**
  * Sets the text foreground (FG), background (BG), and transparent (TP) color indexes
@@ -433,6 +444,12 @@ gfx_image_t *gfx_RotateSpriteCC(gfx_image_t *sprite_in, gfx_image_t *sprite_out)
 gfx_image_t *gfx_RotateSpriteHalf(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
 
 /**
+ * Creates a temporary sprite for the character c. This may be useful for performing rotations and other
+ * operations on characters? The sprite returned is always 8x8 pixels.
+ */
+gfx_image_t *gfx_GetSpriteChar(char c);
+
+/**
  * Set the font routines to use the provided font, formated 8x8
  */
 void gfx_SetFontData(uint8_t *fontdata);
@@ -482,6 +499,17 @@ void gfx_ShiftDown(uint8_t pixels);
 void gfx_ShiftUp(uint8_t pixels);
 void gfx_ShiftLeft(uint24_t pixels);
 void gfx_ShiftRight(uint24_t pixels);
+
+/**
+ * The following routines are used to implement text clipping; which is
+ * substantially slower than normal text. However, these may be useful.
+ */
+
+/**
+ * Outputs a string at the given XY coordinates.
+ * The current cursor position is updated.
+ */
+void gfx_PrintStringXY_Clip(const char *string, int x, int y);
 
 /**
  * Produces a random integer value
