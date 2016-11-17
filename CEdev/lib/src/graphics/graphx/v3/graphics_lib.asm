@@ -2040,15 +2040,21 @@ _ClipDraw_ASM:
 	ld	(iy+6),hl                   ; save a ptr to the sprite data to change offsets
 	ld	de,(ix+9)
 	ld	hl,(_ymin) \.r
+	call	_SignedCompare_ASM \.r
+	jr	c,NoTopClipNeeded_ASM
+	ld	hl,(iy+3)
+	add	hl,de
+	ex	de,hl
+	ld	hl,(_ymin) \.r
+	call	_SignedCompare_ASM \.r
+	ret	nc
+	ld	de,(ix+9)                   ; y location
+	ld	hl,(_ymin) \.r              ; ymin
+	or	a,a
 	sbc	hl,de
-	jp	m,NoTopClipNeeded_ASM \.r   ; check clipping against the top
-	jr	z,NoTopClipNeeded_ASM
-	ld	a,l                         ; save the clipped distance
-	ld	hl,(iy+3)                   ; hl = tmpHeight
-	add	hl,de                       ; y coordinate + tmpHeight
-	ret	nc                          ; return if offscreen
-	ld	(iy+3),hl                   ; store new tmpHeight
-	ld	l,a                         ; restore clipped amount
+	ld	a,(iy+3)
+	sub	a,l
+	ld	(iy+3),a
 	ld	h,(iy+0)                    ; h = tmpWidth
 	mlt	hl                          ; hl = amount of lines clipped off
 	ld	de,(iy+6)                   ; de -> sprite data
@@ -2084,12 +2090,16 @@ NoBottomClipNeeded_ASM:
 	call	_SignedCompare_ASM \.r
 	ret	nc                          ; return if offscreen
 	ld	de,(ix+6)                   ; de = x coordinate
-	ld	hl,(iy+6)                   ; hl -> sprite data
-	ccf
+	ld	hl,(_xmin) \.r
+	or	a,a
 	sbc	hl,de
+	ex	de,hl                       ; calculate new offset
+	ld	hl,(iy+6)                   ; hl -> sprite data
+	add	hl,de
 	ld	(iy+6),hl                   ; save new ptr
 	ld	hl,(iy+0)                   ; hl = tmpWidth
-	add	hl,de
+	or	a,a
+	sbc	hl,de
 	ld	(iy+0),hl                   ; save new width
 	ld	hl,(_xmin) \.r
 	ld	(ix+6),hl                   ; save min x coordinate
