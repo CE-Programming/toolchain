@@ -1594,7 +1594,7 @@ _ScaledSprite_NoClip:
 	ld	(SprWxSclW2+1),hl \.r
 	ld	a,(iy+1)
 	ld	ixh,a                       ; height of sprite
-	ld	hl,(currDrawBuffer) \.r
+	ld	hl,(currDrawBuffer)
 	add	hl,de
 	inc	hl
 	ld	b,lcdWidth/2
@@ -1875,7 +1875,7 @@ _Sprite_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(currDrawBuffer) \.r
+	ld	hl,(currDrawBuffer)
 	ld	bc,(iy+6)			;  x coordinate
 	add	hl,bc
 	ld	d,lcdWidth/2
