@@ -68,7 +68,7 @@
  .function "gfx_TransparentSprite",_TransparentSprite
  .function "gfx_Sprite_NoClip",_Sprite_NoClip
  .function "gfx_TransparentSprite_NoClip",_TransparentSprite_NoClip
- .function "gfx_GetSprite_NoClip",_GetSprite_NoClip
+ .function "gfx_GetSprite",_GetSprite
  .function "gfx_ScaledSprite_NoClip",_ScaledSprite_NoClip
  .function "gfx_ScaledTransparentSprite_NoClip",_ScaledTransparentSprite_NoClip
  .function "gfx_FlipSpriteY",_FlipSpriteY
@@ -251,6 +251,9 @@ _:	ld	a,b
 	inc	de
 	inc	b
 	jr	nz,-_                       ; loop for 256 times to fill palette
+	scf
+	sbc	hl,hl
+	ld	(mpLcdPalette+(255*2)),hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1576,7 +1579,7 @@ _ScaledSprite_NoClip:
 	ld	h,lcdWidth/2
 	ld	l,(iy+15)                   ; height of scale
 	ld	a,l
-	ld	(NcSprHscl+1),a
+	ld	(NcSprHscl+1),a \.r
 	mlt	hl
 	add	hl,hl
 	ld	(NcSprHscl320+1),hl \.r
@@ -1919,8 +1922,7 @@ SprNcJrStep:
 	ret
 
 ;-------------------------------------------------------------------------------
-_GetSprite_NoClip:
-;_GetSprite:
+_GetSprite:
 ; Grabs the data from the current draw buffer and stores it in another buffer
 ; Arguments:
 ;  arg0 : Pointer to storage buffer
@@ -3352,27 +3354,24 @@ _LZDecompressSprite:
 	inc	hl
 	ld	d,(hl)
 	ex.s	de,hl
+	inc	hl
+	inc	hl
 	ld	(ix+-17),hl
-	or	a,a
-	ld	bc,1
-	sbc	hl,bc
-	jp	c,d_19 \.r
+	ld	bc,3
+	ld	(ix+-3),bc
 	ld	iy,(ix+6)
 	ld	a,(iy+2)
 	ld	(ix+-8),a
-	dec	bc
-	ld	(ix+-6),bc
-	ld	bc,3
-	ld	(ix+-3),bc
+	or	a,a
+	sbc	hl,hl
+	ld	(ix+-6),hl
 d_17:	ld	bc,(ix+-3)
 	ld	hl,(ix+6)
 	add	hl,bc
-	ld	a,(hl)
-	ld	(ix+-7),a
-	ld	bc,(ix+-3)
 	inc	bc
 	ld	(ix+-3),bc
-	ld	a,(ix+-7)
+	ld	a,(hl)
+	ld	(ix+-7),a
 	cp	a,(ix+-8)
 	jp	nz,d_16 \.r
 	ld	bc,(ix+-3)
@@ -3385,11 +3384,10 @@ d_17:	ld	bc,(ix+-3)
 	ld	bc,(ix+-6)
 	ld	hl,(ix+9)
 	add	hl,bc
-	ld	a,(ix+-8)
-	ld	(hl),a
-	ld	bc,(ix+-6)
 	inc	bc
 	ld	(ix+-6),bc
+	ld	a,(ix+-8)
+	ld	(hl),a
 	ld	bc,(ix+-3)
 	inc	bc
 	ld	(ix+-3),bc
@@ -3425,14 +3423,13 @@ d_9:	ld	bc,(ix+-23)
 	add	hl,bc
 	push	hl
 	pop	iy
+	ld	bc,(ix+-6)
 	ld	hl,(ix+9)
-	ld	bc,(ix+-6)
 	add	hl,bc
-	ld	a,(iy)
-	ld	(hl),a
-	ld	bc,(ix+-6)
 	inc	bc
 	ld	(ix+-6),bc
+	ld	a,(iy)
+	ld	(hl),a
 	ld	bc,(ix+-11)
 	inc	bc
 	ld	(ix+-11),bc
@@ -3445,17 +3442,16 @@ d_11:	ld	bc,(ix+-20)
 d_16:	ld	bc,(ix+-6)
 	ld	hl,(ix+9)
 	add	hl,bc
-	ld	a,(ix+-7)
-	ld	(hl),a
-	ld	bc,(ix+-6)
 	inc	bc
 	ld	(ix+-6),bc
+	ld	a,(ix+-7)
+	ld	(hl),a
 d_18:	ld	bc,(ix+-17)
 	ld	hl,(ix+-3)
 	or	a,a
 	sbc	hl,bc
 	jp	c,d_17 \.r
-d_19:	ld	sp,ix
+	ld	sp,ix
 	pop	ix
 	ret
 
@@ -3467,9 +3463,9 @@ _FlipSpriteY:
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	push	ix
 	ld	iy,0
 	add	iy,sp
+	push	ix
 	ld	ix,(iy+3)
 	ld	a,(ix+0)                    ; a = width of sprite
 	sbc	hl,hl
@@ -3683,7 +3679,9 @@ _LZ_ReadVarSize_ASM:
 	ld	(ix+-3),de
 	ld	(ix+-6),de
 DoWhileLoop:
-	ld	de,0
+	or	a,a
+	sbc	hl,hl
+	ex	de,hl
 	ld	hl,(ix+9)
 	ld	a,(hl)
 	or	a,a
