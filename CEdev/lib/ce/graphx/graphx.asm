@@ -14,5 +14,5 @@ _gfx_vram:
  define .GRAPHX_HEADER,space=ram
  define .GRAPHX,space=ram
  segment .GRAPHX_HEADER
- db 192,"GRAPHX",0,2
+ db 192,"GRAPHX",0,3
  end
