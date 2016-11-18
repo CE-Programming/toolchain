@@ -585,7 +585,6 @@ _HorizLine:
 	sbc	hl,de
 	push	hl
 	pop	bc                          ; bc = length
-	ld	e,(iy+6)                    ; e = y coordinate
 	jr	_RectHoriz_ASM
 
 ;-------------------------------------------------------------------------------
@@ -599,20 +598,19 @@ _HorizLine_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	e,(iy+6)                    ; e = y coordinate
 	ld	bc,(iy+9)                   ; bc = x coordinate
 _RectHoriz_ASM:
+	ld	e,(iy+6)                    ; e = y coordinate
 	sbc	hl,hl
 	adc	hl,bc
 	ret	z                           ; make sure the width is not 0
-	ld	hl,(iy+3)
-_HorizLine_NoClip_ASM:
-	ld	d,lcdWidth/2
-	mlt	de
-	add	hl,de
-	add	hl,de
-	ld	de,(currDrawBuffer)
-	add	hl,de                       ; hl -> place to draw
+	ld hl,(currDrawBuffer)
+	ld d, ldcWidth/2
+	mlt de
+	add hl, de
+	add hl, de
+	ld de, (iy+3)
+	add hl, de                         ; hl -> place to draw
 Color_SMC_2 =$+1
 	ld	a,0                         ; color index to use
 _MemSet_ASM:
