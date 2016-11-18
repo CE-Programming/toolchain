@@ -179,6 +179,7 @@ _SetColor:
 	ld	(Color_SMC_2),a \.r
 	ld	(Color_SMC_3),a \.r
 	ld	(Color_SMC_4),a \.r         ; store all the new color values
+	ld	(Color_SMC_5),a \.r         ; store all the new color values
 	ld	a,d                         ; return previous color index
 	ret
 
@@ -1241,108 +1242,134 @@ _Line_NoClip:
 ;  arg3 : Y1 Coord (c)
 ; Returns:
 ;  None
-	ld	iy,-1
+	ld	iy,0
 	add	iy,sp
-	ld	de,(iy+4)                   ; de = x1
-	ld	c,(iy+7)                    ; c = y1
-	ld	hl,(iy+10)                  ; hl = x2
-	ld	b,(iy+13)                   ; b = y2
+	ld	de,(iy+3)
+	ld	hl,(iy+9)
+	ld	b,(iy+6)
+	ld	c,(iy+12)
+_Line_NoClip_ASM:
 	ld	a,c
-	sbc	a,b
-	jr	c,_
-	scf
-	ld	a,b
-	sbc	a,c                         ; a = -dy-1 = -|y1-y2|-1
-	ld	c,b                         ; c = ys = min(y1,y2)
-	ex	de,hl                       ; de = xs, hl = xe
-_:	push	hl
-	ld	hl,(currDrawBuffer)
-	add	hl,de
-	ld	b,lcdWidth/2
-	mlt	bc
-	add	hl,bc
-	add	hl,bc
-	ex	(sp),hl                     ; (iy-3) = &currDrawBuffer[xs][ys]
-	ld	c,a                         ; c = -dy
+	ld	(y1),a \.r
+	ld	(nde),hl \.r
+	push	de
+	push	bc
+	or	a,a
 	sbc	hl,de
-	sbc	a,a
-	jr	nc,_
-	add	hl,de
+	ld	a,$03
+	jr	nc,+_
+	ld	a,$0B
+_:	ld	(xStep),a \.r
+	ld	(xStep2),a \.r
 	ex	de,hl
-	and	a,8
-	sbc	hl,de
-_:	push	hl                          ; (iy-6) = hl = dx = |xe-xs|
-	add	hl,hl                       ; hl = 2dx
-	ex	de,hl                       ; de = 2dx
-	scf
+	or	a,a
 	sbc	hl,hl
-	ld	l,c
-	push	hl
-	pop	iy                          ; iy = -dy-1
-	adc	hl,hl                       ; hl = -2dy-1
-	inc	de                          ; de = 2dx+1
-	add	hl,de
-	or	a,$a1
 	sbc	hl,de
-	jr	nc,_                        ; if (dx >= dy)
-	ld	(LineHD),a \.r
-	ld	(LineHH),hl \.r
+	jp	p,+_ \.r
 	ex	de,hl
-	ld	(LineHW),hl \.r
-	pop	iy
-	pop	hl
-	lea	bc,iy+1
-	ld	a,(Color_SMC_4) \.r
-LineH:	ld	(hl),a
-	cpi
-LineHD = $ - 1
-	ret	po
-	add	iy,de
-	jr	c,LineH
-	ld	de,0
-LineHW = $ - 3
-	add	iy,de
-	ld	de,lcdWidth
-	add	hl,de
-	ld	de,-1
-LineHH = $-3
-	jr	LineH
-_:	dec	de		            ; de = 2dx
-	inc	hl
-	xor	a,$23^$a1
-	ld	(LineVD),a \.r
-	ld	(LineVH),hl \.r
-	pop	hl
-	pop	hl
-	ld	a,iyl
-_:	ld	bc,lcdWidth
-LineV:	ld	(hl),0
-Color_SMC_4 = $-1
-	inc	a
-	ret	z
+_:	ld	(dx),hl \.r
+	push	hl
+	add	hl,hl
+	ld	(dx1),hl \.r
+	ld	(dx12),hl \.r
+	or	a,a
+	sbc	hl,hl
+	ex	de,hl
+	sbc	hl,hl
+	ld	e,b
+	ld	l,c
+	sbc	hl,de
+	ld	a,30
+	adc	a,a
+	ld	(yStep),a \.r
+	ld	(yStep2),a \.r
+	ex	de,hl
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,de
+	jp	p,+_ \.r
+	ex	de,hl
+_:	ld	(dy),hl \.r
+	add	hl,hl
+	ld	(dy1),hl \.r
+	ld	(dy12),hl \.r
+	pop	de
+	pop	af
+	srl	h
+	rr	l
+	sbc	hl,de
+	pop	bc
+	ld	hl,0
+	jr	nc,changeYLoop
+changeXLoop:
+	push	hl
+	ld	l,a
+	ld	h,lcdWidth/2 
+	mlt	hl
+	add	hl,hl
 	add	hl,bc
-	add	iy,de
-	jr	nc,LineV
-	inc	hl
-LineVD = $-1
-	ld	bc,-1
-LineVH = $-3
-	add	iy,bc
-	jr	-_
-
-;-------------------------------------------------------------------------------
-_CheckBlit_ASM:
-	ld	hl,vram+lcdSize
-	ld	de,(mpLcdBase)                 
+	ld	de,(currDrawBuffer)
+	add	hl,de
+Color_SMC_4 =$+1
+	ld	(hl),0
+	sbc	hl,hl
+	ld	h,b
+	ld	l,c
+	or	a,a
+nde =$+1
+	ld	de,0
+	sbc	hl,de
+	pop	hl
+	ret	z
+xStep	nop
+dy1 =$+1
+	ld	de,0
+	or	a,a
+	adc	hl,de
+	jp	m,changeXLoop \.r
+dx =$+1
+	ld	de,0
 	or	a,a
 	sbc	hl,de
 	add	hl,de
-	jr	nz,+_
-	ld	hl,vram
-_:	or	a,a                         ; if 0, copy buffer to screen
-	ret	nz
-	ex	de,hl
-	ret
+	jr	c,changeXLoop
+yStep	nop
+dx1 =$+1
+	ld	de,0
+	sbc	hl,de
+	jr	changeXLoop
+changeYLoop:
+	push	hl
+	ld	l,a
+	ld	h,lcdWidth/2 
+	mlt	hl
+	add	hl,hl
+	add	hl,bc
+	ld	de,(currDrawBuffer)
+	add	hl,de
+Color_SMC_5 =$+1
+	ld	(hl),0
+	pop	hl
+y1 =$+1
+	cp	a,0
+	ret	z
+yStep2	nop
+dx12 =$+1
+	ld	de,0
+	or	a,a
+	adc	hl,de
+	jp	m,changeYLoop \.r
+dy =$+1
+	ld	de,0
+	or	a,a
+	sbc	hl,de
+	add	hl,de
+	jr	c,changeYLoop
+xStep2	nop
+dy12 =$+1
+	ld	de,0
+	sbc	hl,de
+	jr	changeYLoop
 
 ;-------------------------------------------------------------------------------
 _Blit:
@@ -1441,6 +1468,20 @@ _BlitAreaDelta_SMC =$+1
 	ld	de,lcdWidth                 ; increment to next line
 	dec	a
 	jr	nz,-_
+	ret
+
+;-------------------------------------------------------------------------------
+_CheckBlit_ASM:
+	ld	hl,vram+lcdSize
+	ld	de,(mpLcdBase)                 
+	or	a,a
+	sbc	hl,de
+	add	hl,de
+	jr	nz,+_
+	ld	hl,vram
+_:	or	a,a                         ; if 0, copy buffer to screen
+	ret	nz
+	ex	de,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3423,83 +3464,56 @@ _:	ld	(LineType0_SMC),hl \.r
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	push	hl
+	lea	hl,ix+-9
+	ld	sp,hl
+	ld	bc,(ix+6)
+	ld	(ix+-3),bc
 	ld	hl,(ix+9)
 	dec	hl
-	ld	(ix+9),hl			; decrement the number of points
-	sbc	hl,hl
-	ld	(ix+-3),hl                  ; set the for loop counter to 0 (tmpWidth is used as a temp variable)
-	jr	StartDrawLoop
-DrawLinesLoop:
-	ld	hl,(ix+-3)
-	add	hl,hl
-	inc	hl
-	inc	hl
-	inc	hl
-	push	hl
-	pop	bc
-	add	hl,hl
-	add	hl,hl
-	sbc	hl,bc
-	ld	bc,(ix+6)
-	add	hl,bc
+	ld	(ix+9),hl
+	ld	iy,(ix+-3)
+	jr	StartPolygonLoop
+PolygonLoop:
+	lea	hl,iy+9
 	ld	bc,(hl)
-	push	bc                          ; push the last argument
-	dec	hl
-	dec	hl
-	dec	hl
+	push	bc
+	lea	hl,iy+6
 	ld	bc,(hl)
-	push	bc                          ; push the third argument
-	dec	hl
-	dec	hl
-	dec	hl
+	push	bc
+	lea	hl,iy+3
 	ld	bc,(hl)
-	push	bc                          ; push the second argument
-	dec	hl
-	dec	hl
-	dec	hl
+	push	bc
+	lea	hl,iy+0
 	ld	bc,(hl)
-	push	bc                          ; push the first argument
+	push	bc
 	call	0
 LineType0_SMC =$-3
-	ld	sp,ix
-	ld	hl,(ix+-3)
-	inc	hl
-	ld	(ix+-3),hl                  ; increment the counter
-StartDrawLoop:
-	ld	bc,(ix+9)
+	lea	hl,ix+-9
+	ld	sp,hl
+	ld	iy,(ix+-3)
+	lea	iy,iy+6
+	ld	(ix+-3),iy
+	ld	hl,(ix+9)
+	dec	hl
+	ld	(ix+9),hl
+StartPolygonLoop:
+	add	hl,bc
 	or	a,a
 	sbc	hl,bc
-	jr	c,DrawLinesLoop             ; check if drawn all the points
-	ld	de,(ix+6)
-	add	hl,bc
-	inc	hl
-	add	hl,hl
-	dec	hl
-	push	hl
-	pop	bc
-	add	hl,hl
-	add	hl,hl
-	sbc	hl,bc
-	add	hl,de
+	jr	nz,PolygonLoop
+	lea	hl,iy+3
 	ld	bc,(hl)
-	push	bc                          ; push the last argument
-	dec	hl
-	dec	hl
-	dec	hl
+	push	bc
+	lea	hl,iy+0
 	ld	bc,(hl)
-	push	bc                          ; push the third argument
-	ex	de,hl
-	inc	hl
-	inc	hl
-	inc	hl
+	push	bc
+	ld	iy,(ix+6)
+	lea	hl,iy+3
 	ld	bc,(hl)
-	push	bc                          ; push the second argument
-	dec	hl
-	dec	hl
-	dec	hl
+	push	bc
+	lea	hl,iy+0
 	ld	bc,(hl)
-	push	bc                           ; push the first argument
+	push	bc
 	call	0
 LineType1_SMC =$-3
 	ld	sp,ix
