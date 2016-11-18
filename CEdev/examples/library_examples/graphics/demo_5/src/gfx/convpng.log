@@ -1,10 +1,11 @@
 Opened convpng.ini
 
 --- Group all_gfx (C) ---
-Building Palette...
+Building palette with [256] available indices ...
+Built palette with [256] indices.
 Palette quality : 95.62%
 1:
- apple : 95.39% (compression: 52802 -> 29966 bytes) (apple.c)
+ apple : 95.39% (compress: 52802 -> 29966 bytes)
 
 Converted in 2 s
 

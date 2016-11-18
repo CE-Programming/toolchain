@@ -1,10 +1,10 @@
 {
   "rom": "84pce_515.rom",
   "transfer_files": [
-    "bin/GRAPHX2.8xp"
+    "bin/GRAPHX10.8xp"
   ],
   "target": {
-    "name": "GRAPHX2",
+    "name": "GRAPHX10",
     "isASM": true
   },
   "sequence": [
@@ -17,10 +17,10 @@
   ],
   "hashes": {
     "1": {
-      "description": "Make sure the rotated sprites are displayed properly",
+      "description": "Test flipped text",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "40F05140" ]
+      "expected_CRCs": [ "198A8841" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",

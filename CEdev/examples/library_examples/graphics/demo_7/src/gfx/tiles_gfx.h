@@ -4,6 +4,8 @@
 #define tiles_gfx_H
 #include <stdint.h>
 
+#define tiles_gfx_transpcolor_index 0
+
 extern uint8_t tileset_tile_0_data_compressed[];
 extern uint8_t tileset_tile_1_data_compressed[];
 extern uint8_t tileset_tile_2_data_compressed[];

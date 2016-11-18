@@ -4,6 +4,8 @@
 #define tiles_gfx_H
 #include <stdint.h>
 
+#define tiles_gfx_transpcolor_index 0
+
 extern uint8_t tileset_tile_0_data[258];
 #define tileset_tile_0 ((gfx_image_t*)tileset_tile_0_data)
 extern uint8_t tileset_tile_1_data[258];
@@ -262,6 +264,6 @@ extern uint8_t tileset_tile_127_data[258];
 #define tileset_tile_127 ((gfx_image_t*)tileset_tile_127_data)
 extern uint8_t *tileset_tiles_data[128];
 #define tileset_tiles ((gfx_image_t**)tileset_tiles_data)
-extern uint16_t tiles_gfx_pal[77];
+extern uint16_t tiles_gfx_pal[76];
 
 #endif

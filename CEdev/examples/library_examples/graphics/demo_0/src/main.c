@@ -45,5 +45,5 @@ void main(void) {
 
 /* Prints a screen centered string */
 void print_string_centered(const char *str) {
-	gfx_PrintStringXY(str, (gfx_lcdWidth-gfx_GetStringWidth(str)) / 2, (gfx_lcdHeight-gfx_FontHeight()) / 2);
+	gfx_PrintStringXY(str, (LCD_WIDTH-gfx_GetStringWidth(str)) / 2, (LCD_HEIGHT-gfx_FontHeight()) / 2);
 }

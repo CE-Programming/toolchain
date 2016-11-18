@@ -8,13 +8,13 @@
 #Change DESCRIPTION to modify what is displayed within a compatible shell (Not compiled in if icon is not present)
 
 #----------------------------
-TARGET ?= GRAPHX6
+TARGET ?= GRAPHX9
 DEBUGMODE ?= NDEBUG
 ARCHIVED ?= NO
 APPVAR ?= NO
 #----------------------------
 ICONPNG ?= iconc.png
-DESCRIPTION ?= "C Graphics Demo 6"
+DESCRIPTION ?= "C Graphics Demo 9"
 #----------------------------
 
 #Add shared library names to the L varible, for instance:

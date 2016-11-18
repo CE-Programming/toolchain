@@ -1,41 +1,47 @@
 {
   "rom": "84pce_515.rom",
   "transfer_files": [
-    "bin/GRAPHX6.8xp"
+    "bin/GRAPHX9.8xp"
   ],
   "target": {
-    "name": "GRAPHX6",
+    "name": "GRAPHX9",
     "isASM": true
   },
   "sequence": [
     "action|launch",
-    "delay|800",
+    "delay|300",
     "hash|1",
-    "delay|100",
-    "key|right",
-    "key|right",
-    "key|down",
-    "key|down",
-    "delay|100",
-    "hash|2",
     "key|enter",
-    "delay|200",
-    "hash|3"
+    "delay|300",
+    "hash|2",
+    "key|right",
+    "key|left",
+    "delay|300",
+    "hash|3",
+    "key|enter",
+    "delay|300",
+    "hash|4"
   ],
   "hashes": {
     "1": {
-      "description": "Initial sprite map state (top left)",
+      "description": "Check text scaling",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "A03E20B2" ]
+      "expected_CRCs": [ "BCD2C22B" ]
     },
     "2": {
-      "description": "Moving a bit to the bottom right",
+      "description": "Check text clipping",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "4A0831CE" ]
+      "expected_CRCs": [ "BCD2C22B" ]
     },
     "3": {
+      "description": "Check clipped region movement and text clipping",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "BE2F6B1A" ]
+    },
+    "4": {
       "description": "Back to the home screen (exit check)",
       "start": "vram_start",
       "size": "vram_16_size",
