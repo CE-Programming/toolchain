@@ -31,8 +31,8 @@ int main () {
 
     wcscpy(toolchain_bin_w, toolchain_path_w);
     wcscat(toolchain_bin_w, L"\\bin");
-    printf("CEDEV Varible: %ls\n", toolchain_path_w);
-    printf("PATH Variable: %ls\n", toolchain_bin_w);
+    printf("CEDEV Variable: %ls\n", toolchain_path_w);
+    printf("PATH Variable:  %ls\n", toolchain_bin_w);
 
     // Get the current key value if it exists
     if (RegOpenKeyW(HKEY_CURRENT_USER, L"Environment", &hkey) != ERROR_SUCCESS) {
@@ -97,7 +97,7 @@ int main () {
     }
 
     RegCloseKey(hkey);
-    std::cout << std::endl << "Success!";
+    printf("\nSuccess! You can now delete setup_win.exe if you wish");
     waitForUser();
     return 0;
 
@@ -108,6 +108,6 @@ err:
 }
 
 void waitForUser(void) {
-    std::cout << std::endl << "Press [Enter] to exit...";
+    printf("\nPress [Enter] to exit...");
     std::cin.ignore();
 }
