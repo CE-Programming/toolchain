@@ -2368,18 +2368,18 @@ _TilePtr:
 	ld	ix,0
 	add	ix,sp
 	ld	iy,(ix+6)
-	ld	b,(iy+14)
+	ld	b,(iy+10)
 	ld	hl,(ix+9)
 _:	srl	h
 	rr	l
 	djnz	-_
 	ex	de,hl
-	ld	b,(iy+15)
+	ld	b,(iy+11)
 	ld	hl,(ix+12)
 _:	srl	h
 	rr	l
 	djnz	-_
-	ld	h,(iy+9)
+	ld	h,(iy+13)
 	mlt	hl
 	add	hl,de
 	ld	de,(iy+0)
