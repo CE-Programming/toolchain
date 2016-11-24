@@ -17,21 +17,21 @@
 
 /* Put all your code here */
 void main(void) {
-	uint8_t i, backlight_level;
+	uint8_t i, bl_level_copy;
 	
-	backlight_level = lcd_GetBacklightLevel();
+	bl_level_copy = lcd_BacklightLevel;
 	
-	for(i = backlight_level; i > 0; i--) {
+	for(i = bl_level_copy; i > 0; i--) {
 		boot_WaitShort();
-		lcd_SetBacklightLevel(i);
+		lcd_BacklightLevel = i;
 	}
 	
 	for(i = 0; i < 255; i++) {
 		boot_WaitShort();
-		lcd_SetBacklightLevel(i);
+		lcd_BacklightLevel = i;
 	}
 
-	lcd_SetBacklightLevel(backlight_level);
+	lcd_BacklightLevel = bl_level_copy;
 
 	/* Clean up for the return to the OS */
 	prgm_CleanUp();
