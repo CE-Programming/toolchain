@@ -2252,11 +2252,11 @@ _:	ld	(DrawTile_SMC),hl \.r
 _:	srl	h
 	rr	l
 	djnz	-_
-	ld	(ix+-4),l   ; y = y_offset / tilemap->tile_height
-	ld	(ix+12),bc  ; y_offset = y_offset % tilemap->tile_height;
+	ld	(ix+-4),l                   ; y = y_offset / tilemap->tile_height
+	ld	(ix+12),bc                  ; y_offset = y_offset % tilemap->tile_height;
 	
 	ld	b,(iy+10)
-	ld	hl,(ix+9)
+	ld	hl,(ix+9)                   ; x offset
 	ld	c,(iy+7)
 	dec	c
 	ld	a,l
@@ -2268,8 +2268,9 @@ _:	srl	h
 	ld	a,l
 	ld	(X_Res_SMC),a \.r
 	ld	hl,(iy+15)
+	or	a,a
 	sbc	hl,bc
-	ld	(X_Draw_SMC),hl \.r ; x_draw = tilemap->x_loc-x_offset;
+	ld	(X_Draw_SMC),hl \.r         ; x_draw = tilemap->x_loc-x_offset;
 	
 	or	a,a
 	sbc	hl,hl
