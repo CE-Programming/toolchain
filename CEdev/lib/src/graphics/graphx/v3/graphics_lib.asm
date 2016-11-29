@@ -1037,8 +1037,7 @@ _FillCircle_NoClip:
 	mlt 	de
 	add	hl,de
 	add	hl,de
-	ld	d,b
-	ld 	e,(iy+3)                    ; x coord (circle center pos)
+	ld 	de,(iy+3)                    ; x coord (circle center pos)
 	add	hl,de
 	ld 	(FCircleCenterPos_SMC),hl \.r
 	sbc 	hl,bc
@@ -2252,11 +2251,11 @@ _:	ld	(DrawTile_SMC),hl \.r
 _:	srl	h
 	rr	l
 	djnz	-_
-	ld	(ix+-4),l   ; y = y_offset / tilemap->tile_height
-	ld	(ix+12),bc  ; y_offset = y_offset % tilemap->tile_height;
+	ld	(ix+-4),l                   ; y = y_offset / tilemap->tile_height
+	ld	(ix+12),bc                  ; y_offset = y_offset % tilemap->tile_height;
 	
 	ld	b,(iy+10)
-	ld	hl,(ix+9)
+	ld	hl,(ix+9)                   ; x offset
 	ld	c,(iy+7)
 	dec	c
 	ld	a,l
@@ -2268,8 +2267,9 @@ _:	srl	h
 	ld	a,l
 	ld	(X_Res_SMC),a \.r
 	ld	hl,(iy+15)
+	or	a,a
 	sbc	hl,bc
-	ld	(X_Draw_SMC),hl \.r ; x_draw = tilemap->x_loc-x_offset;
+	ld	(X_Draw_SMC),hl \.r         ; x_draw = tilemap->x_loc-x_offset;
 	
 	or	a,a
 	sbc	hl,hl
@@ -2368,18 +2368,18 @@ _TilePtr:
 	ld	ix,0
 	add	ix,sp
 	ld	iy,(ix+6)
-	ld	b,(iy+14)
+	ld	b,(iy+10)
 	ld	hl,(ix+9)
 _:	srl	h
 	rr	l
 	djnz	-_
 	ex	de,hl
-	ld	b,(iy+15)
+	ld	b,(iy+11)
 	ld	hl,(ix+12)
 _:	srl	h
 	rr	l
 	djnz	-_
-	ld	h,(iy+9)
+	ld	h,(iy+13)
 	mlt	hl
 	add	hl,de
 	ld	de,(iy+0)
