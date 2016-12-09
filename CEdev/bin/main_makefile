@@ -6,8 +6,11 @@ CSTARTUP_ASM := cstartup.asm
 LIBHEADER_ASM := libheader.asm
 #----------------------------
 
+SHELL := cmd.exe
+VERSION := 6.5
+
 #----------------------------
-#Try not to edit anything below these lines unless you know what you are doing
+# Try not to edit anything below these lines unless you know what you are doing
 #----------------------------
 
 #----------------------------
@@ -200,13 +203,17 @@ all : $(BINDIR)/$(TARGETTYPE)
 	
 #This rule builds the Intel HEX file
 $(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
+	@if not exist $(BINDIR) mkdir $(BINDIR)
+	@if not exist $(OBJDIR) mkdir $(OBJDIR)
 	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))$(LOBJECTS)"
 	
 #These rules use ConvHEX to convert the Intel HEX file to a calculator format
 %.8xv : %.hex
-	@$(CV) $(CVFLAGS) $(@:%.8xv=%)
+	@$(CD) $(BINDIR) && \
+	@$(CV) $(CVFLAGS) $(notdir $(@:%.8xv=%))
 %.8xp : %.hex
-	@$(CV) $(CVFLAGS) $(@:%.8xp=%)
+	@$(CD) $(BINDIR) && \
+	@$(CV) $(CVFLAGS) $(notdir $(@:%.8xp=%))
 	
 #This rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ) : $(ICONPNG)
@@ -240,12 +247,14 @@ $(OBJDIR)/$(LIBHEADER_OBJ) : $(LIBHEADER_LOC)
 	@$(CD) $(OBJDIR) && \
 	@$(CC) $(CFLAGS) -asm $(LIBS)
 	
-#This is just a silly rule needed for the icon conversion to work properly
 $(OBJDIR)/%.obj : 
 	
 #This rule cleans up everything
 clean :
 	@$(RM) $(call WINPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJECTS) $(OBJDIR)/*.src $(OBJDIR)/$(ICON_ASM)) $(NULL)
 	@echo Cleaned build files.
+	
+version :
+	@echo C CE SDK Version $(VERSION)
 	
 .PHONY : all clean
