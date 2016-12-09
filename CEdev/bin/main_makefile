@@ -203,6 +203,7 @@ all : $(BINDIR)/$(TARGETTYPE)
 	
 #This rule builds the Intel HEX file
 $(BINDIR)/$(TARGETHEX) : $(OBJECTS) $(LIBRARIES)
+	@echo C CE SDK Version $(VERSION)
 	@if not exist $(BINDIR) mkdir $(BINDIR)
 	@if not exist $(OBJDIR) mkdir $(OBJDIR)
 	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINPATH,$^))$(LOBJECTS)"
