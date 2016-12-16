@@ -45,22 +45,22 @@ typedef uint8_t kb_key_t;
 typedef uint16_t kb_lkey_t;
 
 /**
+ * Scans the keyboard to update data values
+ * Note: Disables interrupts
+ */
+void kb_Scan(void);
+
+/**
  * Scans the given keyboard row and returns the row value
  * Note: Disables interrupts
  */
-uint8_t kb_ScanGroup(uint8_t row);
+kb_key_t kb_ScanGroup(uint8_t row);
 
 /**
  * Scans the keyboard quickly to tell if any key was pressed
  * Note: Disables interrupts
  */
 uint8_t kb_AnyKey(void);
-
-/**
- * Scans the keyboard to update data values
- * Note: Disables interrupts
- */
-void kb_Scan(void);
 
 /**
  * Resets the keyboard
@@ -74,20 +74,20 @@ void kb_Reset(void);
 #define kb_SetMode(mode)		(kb_Config = ((kb_Config & ~3)|(mode)))
 #define kb_GetMode()			(kb_Config & 3)
 
-#define MODE_0_IDLE			(0)
-#define MODE_1_INDISCRIMINATE		(1)
-#define MODE_2_SINGLE			(2)
-#define MODE_3_CONTINUOUS		(3)
+#define MODE_0_IDLE             (0)
+#define MODE_1_INDISCRIMINATE   (1)
+#define MODE_2_SINGLE           (2)
+#define MODE_3_CONTINUOUS       (3)
 
-#define kb_EnableInt			(*(uint8_t*)0xF5000C)
-#define kb_IntAcknowledge		(*(volatile uint8_t*)0xF50008)
-#define kb_IntStatus			(*(volatile uint8_t*)0xF50008)
-#define kb_Config			(*(uint8_t*)0xF50000)
-#define kb_DataArray			((uint16_t*)0xF50010)
+#define kb_EnableInt            (*(uint8_t*)0xF5000C)
+#define kb_IntAcknowledge       (*(volatile uint8_t*)0xF50008)
+#define kb_IntStatus            (*(volatile uint8_t*)0xF50008)
+#define kb_Config               (*(uint8_t*)0xF50000)
+#define kb_Data                 ((uint16_t*)0xF50010)
 
-#define KB_SCAN_COMPLETE		(1<<0)
-#define KB_DATA_CHANGED			(1<<1)
-#define KB_MODE_1_PRESS			(1<<2)
+#define KB_SCAN_COMPLETE        (1<<0)
+#define KB_DATA_CHANGED         (1<<1)
+#define KB_MODE_1_PRESS         (1<<2)
 
 /**
  * Keyboard group 0 (Unused)
@@ -178,8 +178,6 @@ void kb_Reset(void);
 #define kb_Right      1<<2
 #define kb_Up         1<<3
 
-#define kb_dataArray ((uint16_t*)0xF50010)
-
 /**
 * Keyboard group 1
 */
@@ -257,4 +255,10 @@ void kb_Reset(void);
 #define kb_KeyRight          (kb_lkey_t)(7 << 8 | 1<<2)
 #define kb_KeyUp             (kb_lkey_t)(7 << 8 | 1<<3)
 
+/**
+ * Compatibility defines
+ */
+#define kb_DataArray ((uint16_t*)0xF50010)
+#define kb_dataArray ((uint16_t*)0xF50010)
+ 
 #endif

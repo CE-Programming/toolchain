@@ -83,7 +83,7 @@ gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine
                                             gfx_image_t *name = (gfx_image_t *)name##_data
 
 typedef enum gfx_mode {
-	gfx_8bpp = 0x27
+    gfx_8bpp = 0x27
 } gfx_mode_t;
 
 /**
@@ -108,7 +108,7 @@ extern uint16_t gfx_palette[256];
  * Array of the LCD VRAM
  */
 extern uint8_t gfx_vram[2][240][320];
-#define gfx_vbuffer (*(uint8_t (*)[240][320])0xE30014)
+#define gfx_vbuffer (**(uint8_t(**)[240][320])0xE30014)
 
 /* Type for the clip region */
 typedef struct gfx_region {
@@ -477,7 +477,7 @@ unsigned int gfx_GetStringWidth(const char *string);
  */
 unsigned int gfx_GetCharWidth(const char c);
 #define gfx_GetCharHeight(c) 8
-#define gfx_FontHeight() 8
+#define gfx_FontHeight()     8
 
 /**
  * Sets the clipping window for clipped routines
@@ -501,9 +501,24 @@ void gfx_ShiftLeft(uint24_t pixels);
 void gfx_ShiftRight(uint24_t pixels);
 
 /**
- * Produces a random integer value
+ * Lightens a given 1555 color; useful for palette color conversions.
+ * amt as 0 means full white, 255 returns original color, in between returns lightened color
  */
-#define gfx_RandInt(min, max) ((unsigned)rand() % ((max) - (min) + 1) + (min))
+uint16_t gfx_Lighten(uint16_t color, uint8_t amt);
+
+/**
+ * Darkens a given 1555 color; useful for palette color conversions.
+ * amt as 0 returns full black, 255 returns original color, in between returns darkened color
+ */
+uint16_t gfx_Darken(uint16_t color, uint8_t amt);
+
+/**
+ * Converts an RGB value to a palette color
+ * Conversion is not 100% perfect, but is quite close
+ */
+#define gfx_RGBTo1555(r,g,b) ((uint16_t)(((uint8_t)(r) >> 3) << 10) | \
+                             (((uint8_t)(g) >> 3) << 5) | \
+                             ((uint8_t)(b) >> 3))
 
 /**
  * Checks if we are currently in a rectangular hotspot area
@@ -513,14 +528,6 @@ void gfx_ShiftRight(uint24_t pixels);
            (((test_x) + (test_width)) > (master_x)) && \
            ((test_y) < ((master_y) + (master_height))) && \
            (((test_y) + (test_height)) > (master_y)))
-
-/**
- * Converts an RGB value to a palette color
- * Conversion is not 100% perfect, but is quite close
- */
-#define gfx_RGBTo1555(r,g,b) ((uint16_t)(((uint8_t)(r) >> 3) << 10) | \
-                             (((uint8_t)(g) >> 3) << 5) | \
-                             ((uint8_t)(b) >> 3))
 
 #define gfx_lcdWidth    320
 #define gfx_lcdHeight   240
