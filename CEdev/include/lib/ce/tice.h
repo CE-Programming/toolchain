@@ -134,10 +134,14 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
-/* Cleans up everything and gets ready to enter back to the OS when you are ready to exit your program */
+/** 
+ * Cleans up everything and gets ready to enter back to the OS when you are ready to exit your program
+ */
 void prgm_CleanUp(void);
 
-/* A faster implementation of memset */
+/**
+ * A faster implementation of memset
+ */
 void *memset_fast(void *ptr, int c, size_t num);
 
 

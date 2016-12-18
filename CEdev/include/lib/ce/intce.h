@@ -1,6 +1,6 @@
 /**
  * @file    INTERRUPT CE C Library
- * @version 1.0
+ * @version 1
  *
  * @section LICENSE
  *

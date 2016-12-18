@@ -1,10 +1,42 @@
 /**
- * @brief This file provides some useful debugging functions
+ * @file C DEBUGGING LIBRARY
+ * @version 3
+ *
+ * @section LICENSE
+ *
+ * Copyright (c) 2016
+ * Matthew "MateoConLechuga" Waltz
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ * 
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @section DESCRIPTION
+ *
+ * This library implements some some useful debugging functions
  */
 
 /**
  * @brief Use dbg_sprintf(dbgout, const char*, ...); to print to the emulator console. See the syntax for 'printf' for more information
- * @param out can be dbgout (normal) or dbgerr (red)
+ * @param out can be dbgout (black) or dbgerr (red)
  *
  * void dbg_sprintf(out, const char*, ...);
  */
@@ -150,17 +182,17 @@
 #define dbgout ((const char*)0xFB0000)
 #define dbgerr ((const char*)0xFC0000)
 #else
-#define dbg_Debugger(ignore) //
-#define dbg_SetBreakpoint(ignore) //
-#define dbg_RemoveBreakpoint(ignore) //
-#define dbg_SetWatchpoint(ignore,ignore) //
-#define dbg_SetReadWatchpoint(ignore,ignore) //
-#define dbg_SetWriteWatchpoint(ignore,ignore) //
+#define dbg_Debugger(ignore)                      //
+#define dbg_SetBreakpoint(ignore)                 //
+#define dbg_RemoveBreakpoint(ignore)              //
+#define dbg_SetWatchpoint(ignore,ignore)          //
+#define dbg_SetReadWatchpoint(ignore,ignore)      //
+#define dbg_SetWriteWatchpoint(ignore,ignore)     //
 #define dbg_SetReadWriteWatchpoint(ignore,ignore) //
-#define dbg_RemoveWatchpoint(ignore) //
-#define dbg_RemoveAllWatchpoints(ignore) //
-#define dbg_RemoveAllBreakpoints(ignore) //
-#define dbg_sprintf //
+#define dbg_RemoveWatchpoint(ignore)              //
+#define dbg_RemoveAllWatchpoints(ignore)          //
+#define dbg_RemoveAllBreakpoints(ignore)          //
+#define dbg_sprintf                               //
 #define dbgout (NULL)
 #define dbgerr (NULL)
 #endif

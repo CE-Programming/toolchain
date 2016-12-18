@@ -1,5 +1,5 @@
-#include "..\..\include\relocation.inc"
-#include "..\..\include\ti84pce.inc"
+#include "..\include\relocation.inc"
+#include "..\include\ti84pce.inc"
 
  .libraryName		"KEYPADC"	                    ; Name of library
  .libraryVersion	2		                    ; Version information (1-255)

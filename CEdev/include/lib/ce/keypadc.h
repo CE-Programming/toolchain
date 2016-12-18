@@ -1,6 +1,6 @@
 /**
  * @file    KEYPADC CE C Library
- * @version 1.1
+ * @version 2
  *
  * @section LICENSE
  *

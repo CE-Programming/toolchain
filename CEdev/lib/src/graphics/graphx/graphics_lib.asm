@@ -1,8 +1,8 @@
-#include "..\..\..\include\relocation.inc"
-#include "..\..\..\include\ti84pce.inc"
+#include "..\..\include\relocation.inc"
+#include "..\..\include\ti84pce.inc"
 
  .libraryName		"GRAPHX"          ; Name of library
- .libraryVersion	3                 ; Version information (1-255)
+ .libraryVersion	4                 ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete
@@ -20,7 +20,7 @@
  .function "gfx_SwapDraw",_SwapDraw
  .function "gfx_Blit",_Blit
  .function "gfx_BlitLines",_BlitLines
- .function "gfx_BlitArea",_BlitArea
+ .function "gfx_BlitRectangle",_BlitRectangle
  .function "gfx_PrintChar",_PrintChar
  .function "gfx_PrintInt",_PrintInt
  .function "gfx_PrintUInt",_PrintUInt
@@ -86,12 +86,17 @@
  .function "gfx_LZDecompressSprite",_LZDecompressSprite
  .function "gfx_SetTextScale",_SetTextScale
 ;-------------------------------------------------------------------------------
-; v3 functions
+; v3 functions - Can no longer move/delete
 ;-------------------------------------------------------------------------------
  .function "gfx_SetTransparentColor",_SetTransparentColor
  .function "gfx_ZeroScreen",_ZeroScreen
  .function "gfx_SetTextConfig",_SetTextConfig
  .function "gfx_GetSpriteChar",_GetSpriteChar
+;-------------------------------------------------------------------------------
+; v4 functions
+;-------------------------------------------------------------------------------
+ .function "gfx_Lighten",_Lighten
+ .function "gfx_Darken",_Darken
 ;-------------------------------------------------------------------------------
 
  .beginDependencies
@@ -162,6 +167,117 @@ _SetClipRegion:
 	ret
 
 ;-------------------------------------------------------------------------------
+_Lighten:
+; Lightens a 16 bit 1555 color (0 = white, 255 = same color)
+; Arguments:
+;  arg0 : 16 bit color
+;  arg1 : 8 bit change amount
+; Returns:
+;  16 bit color value
+	pop	de
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	de
+	ld	a,b
+	cpl
+	ld	b,a
+	ld	a,c
+	cpl                                 ; invert 16 bit color input
+	call	_Darken_ASM \.r
+	ld	a,l
+	cpl
+	ld	l,a
+	ld	a,h
+	cpl
+	ld	h,a                         ; invert output
+	ret
+	
+;-------------------------------------------------------------------------------
+_Darken:
+; Darkens a 16 bit 1555 color (0 = black, 255 = same color)
+; Arguments:
+;  arg0 : 16 bit color
+;  arg1 : 8 bit change amount
+; Returns:
+;  16 bit color value
+	pop	de
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	de
+	ld	a,c
+_Darken_ASM:
+	ld	c,l
+	ld	iyl,a
+	ld	de,128
+	and	a,31
+	ld	l,a
+	ld	h,c
+	mlt	hl
+	add	hl,de
+	push	hl                          ; h = blue color
+	ld	a,b
+	rrca
+	rrca
+	and	a,31
+	ld	l,a
+	ld	h,c
+	mlt	hl
+	add	hl,de
+	push	hl                          ; h = red color
+	ld	a,iyl
+	rrca
+	rrca
+	rrca
+	rrca
+	and	a,14
+	ld	l,a
+	ld	a,b
+	and	a,3
+	rlca
+	rlca
+	rlca
+	rlca
+	or	a,l
+	ld	l,a
+	ld	a,h
+	rlca
+	and	a,1
+	or	a,l
+	ld	l,a
+	ld	h,c
+	mlt	hl
+	add	hl,de                       ; h = green color
+	ld	a,h
+	and 	a,1
+	rrca
+	ld	d,a
+	ld	a,h
+	rrca
+	rrca
+	rrca
+	rrca
+	ld	l,a
+	and	a,3
+	or	a,d
+	ld	d,a
+	ld	a,l
+	and	a,224
+	ld	e,a                       ; green store complete
+	pop	af                        ; a = red color
+	rlca
+	rlca
+	or	a,d
+	ld	h,a                       ; high byte complete
+	pop	af                        ; a = blue color
+	or	a,e
+	ld	l,a                       ; hl complete
+	ret
+	
+;-------------------------------------------------------------------------------
 _SetColor:
 ; Sets the global color index for all routines
 ; Arguments:
@@ -198,7 +314,7 @@ _SetTransparentColor:
 	ld	d,(hl)                      ; d = old color
 	ld	a,e
 	ld	(hl),a
-	ld	(TColor_SMC_2),a \.r
+	ld	(TColor_SMC_2),a
 	ld	(TColor_SMC_3),a \.r        ; store all the new transparent colors
 	ld	(TColor_SMC_4),a \.r        ; store all the new transparent colors
 	ld	a,d                         ; return previous transparent color index
@@ -325,10 +441,10 @@ _SetPalette:
 _GetPixel:
 ; Gets the color index of a pixel
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ; Returns:
-;  Color index of X,Y Coord
+;  Color index of X,Y coordinate
 	ld	hl,3
 	add	hl,sp
 	ld	bc,(hl)                     ; bc = x coordinate
@@ -346,8 +462,8 @@ _GetPixel:
 _SetPixel:
 ; Sets the color pixel to the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ; Returns:
 ;  None
 	ld	hl,3
@@ -369,8 +485,8 @@ Color_SMC_1 =$+1
 _FillRectangle:
 ; Draws a clipped rectangle with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Width
 ;  arg3 : Height
 ; Returns:
@@ -405,8 +521,8 @@ _FillRectangle:
 _FillRectangle_NoClip:
 ; Draws an unclipped rectangle with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Width
 ;  arg3 : Height
 ; Returns:
@@ -468,8 +584,8 @@ _RectangleWidth2_SMC =$+1
 _Rectangle:
 ; Draws an clipped rectangle outline with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Width
 ;  arg3 : Height
 ; Returns:
@@ -519,8 +635,8 @@ _Rectangle:
 _Rectangle_NoClip:
 ; Draws an unclipped rectangle outline with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Width
 ;  arg3 : Height
 ; Returns:
@@ -551,8 +667,8 @@ _Rectangle_NoClip:
 _HorizLine:
 ; Draws an clipped horizontal line with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Length
 ; Returns:
 ;  None
@@ -592,8 +708,8 @@ _HorizLine:
 _HorizLine_NoClip:
 ; Draws an unclipped horizontal line with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Length
 ; Returns:
 ;  None
@@ -629,8 +745,8 @@ _MemSet_ASM:
 _VertLine:
 ; Draws an clipped vertical line with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Length
 ; Returns:
 ;  None
@@ -669,8 +785,8 @@ _VertLine:
 _VertLine_NoClip:
 ; Draws an unclipped vertical line with the global color index
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Length
 ; Returns:
 ;  None
@@ -766,8 +882,8 @@ _GetDraw:
 _Circle:
 ; Draws a clipped circle outline
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Radius
 ; Returns:
 ;  None
@@ -891,8 +1007,8 @@ _:	ld	sp,iy
 _FillCircle:
 ; Draws an clipped circle
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Radius
 ; Returns:
 ;  None
@@ -1019,8 +1135,8 @@ _:	jp	po,_FillCircleSectors \.r
 _FillCircle_NoClip:
 ; Draws an unclipped circle
 ; Arguments:
-;  arg0 : X Coord
-;  arg1 : Y Coord
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
 ;  arg2 : Radius
 ; Returns:
 ;  None
@@ -1033,16 +1149,16 @@ _FillCircle_NoClip:
 	ld	c,a
 	ld 	hl,(currDrawBuffer)
 	ld 	d,lcdWidth/2
-	ld 	e,(iy+6)                    ; y coord (circle center pos)
+	ld 	e,(iy+6)                    ; y coordinate (circle center pos)
 	mlt 	de
 	add	hl,de
 	add	hl,de
-	ld 	de,(iy+3)                    ; x coord (circle center pos)
+	ld 	de,(iy+3)                    ; x coordinate (circle center pos)
 	add	hl,de
 	ld 	(FCircleCenterPos_SMC),hl \.r
 	sbc 	hl,bc
 	ld 	(FCircleLdirpos_SMC),hl \.r
-	ex 	de,hl                       ; de = x coord - radius
+	ex 	de,hl                       ; de = x coordinate - radius
 	ld 	hl,Color_SMC_1 \.r               ; hl = color of circle
 	push	de
 	ldi
@@ -1235,10 +1351,10 @@ TrivialAccept:
 _Line_NoClip:
 ; Draws an unclipped arbitrary line
 ; Arguments:
-;  arg0 : X0 Coord (hl)
-;  arg1 : Y0 Coord (b)
-;  arg2 : X1 Coord (de)
-;  arg3 : Y1 Coord (c)
+;  arg0 : X0 coordinate (hl)
+;  arg1 : Y0 coordinate (b)
+;  arg2 : X1 coordinate (de)
+;  arg3 : Y1 coordinate (c)
 ; Returns:
 ;  None
 	ld	iy,0
@@ -1420,7 +1536,7 @@ _BlitLines:
 	ret
 
 ;-------------------------------------------------------------------------------
-_BlitArea:
+_BlitRectangle:
 ; Copies the buffer image to the screen and vice versa rectangularly
 ; Arguments:
 ;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
@@ -1447,21 +1563,21 @@ _BlitArea:
 	add	hl,bc
 	ex	de,hl
 	ld	bc,(iy+12)                  ; the width of things
-	ld	(_BlitAreaWidth_SMC),bc \.r
+	ld	(BlitRectWidth_SMC),bc \.r
 	push	hl
 	ld	hl,lcdWidth
 	or	a,a
 	sbc	hl,bc                       ; change in width for rectangle
-	ld	(_BlitAreaDelta_SMC),hl \.r
+	ld	(BlitRectDelta_SMC),hl \.r
 	pop	hl
 	ld	a,(iy+15)
 	ld	iy,0
 _:	add	iy,de
 	lea	de,iy
-_BlitAreaWidth_SMC =$+1
+BlitRectWidth_SMC =$+1
 	ld	bc,0                        ; smc for speedz
 	ldir
-_BlitAreaDelta_SMC =$+1
+BlitRectDelta_SMC =$+1
 	ld	bc,0                        ; increment to next line
 	add	hl,bc
 	ld	de,lcdWidth                 ; increment to next line
@@ -1503,7 +1619,7 @@ _ShiftUp:
 	ld	a,$B0
 	call	_ShiftCalculate_ASM \.r
 	ld	(ShiftAmtOff_SMC),hl \.r
-	jr	z,_
+	jr	z,+_
 	sbc	hl,hl
 _:	ex	de,hl
 	ld	hl,(_xmax) \.r
@@ -1618,8 +1734,8 @@ _ScaledSprite_NoClip:
 ; Draws a scaled sprite to the screen
 ; Arguments:
 ;  arg0 : Pointer to sprite
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ;  arg5 : Width Scale (integer)
 ;  arg6 : Height Scale (integer)
 ; Returns:
@@ -1716,8 +1832,8 @@ _ScaledTransparentSprite_NoClip:
 ; Draws a scaled sprite to the screen with transparency
 ; Arguments:
 ;  arg0 : Pointer to sprite structure
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ;  arg5 : Width Scale (integer)
 ;  arg6 : Height Scale (integer)
 ; Returns:
@@ -1791,8 +1907,8 @@ _TransparentSprite:
 ; Draws a transparent sprite with clipping
 ; Arguments:
 ;  arg0 : Pointer to sprite
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ; Returns:
 ;  None
 	push	ix                          ; save ix sp
@@ -1881,8 +1997,8 @@ _Sprite:
 ; Places an sprite on the screen as fast as possible with clipping
 ; Arguments:
 ;  arg0 : Pointer to sprite
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ;  arg3 : Width -- 8bits
 ;  arg4 : Height -- 8bits
 ; Returns:
@@ -1923,8 +2039,8 @@ _Sprite_NoClip:
 ; Places an sprite on the screen as fast as possible
 ; Arguments:
 ;  arg0 : Pointer to sprite
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ; Returns:
 ;  None
 	ld	iy,0
@@ -1977,13 +2093,13 @@ _GetSprite:
 ; Grabs the data from the current draw buffer and stores it in another buffer
 ; Arguments:
 ;  arg0 : Pointer to storage buffer
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ; Returns:
 ;  Pointer to resultant sprite
 	ld	iy,0
 	add	iy,sp
-	ld	bc,(iy+9)                   ; bc = y coord
+	ld	bc,(iy+9)                   ; bc = y coordinate
 	bit	0,b                         ; check if negative y
 	ld	b,lcdWidth/2
 	mlt	bc
@@ -2026,8 +2142,8 @@ _TransparentSprite_NoClip:
 ; Draws a transparent sprite to the current buffer
 ; Arguments:
 ;  arg0 : Pointer to sprite
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ; Returns:
 ;  None
 	ld	iy,0
@@ -2068,8 +2184,8 @@ _ClipDraw_ASM:
 ; Clipping stuff
 ; Arguments:
 ;  arg0 : Pointer to sprite structure
-;  arg1 : X Coord
-;  arg2 : Y Coord
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
 ; Returns:
 ;  A  : How much to add to the sprite per iteration
 ;  L  : New Y coordinate

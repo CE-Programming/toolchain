@@ -17,7 +17,7 @@
  .echo > relocation_table ""
  .echo > totname " .db 192,\"",noextname,"\",0,"
  .echo > asmname " define .",noextname,"_HEADER,space=ram\n define .",noextname,",space=ram\n segment .",noextname,"_HEADER\n .assume ADL=1\n db 192,\"",noextname,"\",0,"
- .db 192,192
+ .db 192,193
 #endmacro
 #define .libraryName libraryName(
 
@@ -45,14 +45,13 @@
  .echo >> modulename "_",funcname,":\n"
  .echo >> modulename " jp ",numfunctions*3,"\n"
  .echo >> modulename " end"
- .dl funclabel
+ .dw funclabel
 
  #define numfunctions numfunctions+1
 #endmacro
 #define .function function(
 
 ;---------------------------------------------
-
 #macro endLibrary()
  clr()
  wr("_libendaddr:")
@@ -62,10 +61,10 @@
  .dl _depend_start			; ptr
  .dl _libendaddr			; size
 
- .echo "Total library size:\t",6+numrelocations*3+numfunctions*3+_libendaddr
+ .echo "Total library size:\t",6+(numrelocations*2)+(numfunctions*2)+_libendaddr
  .echo "Extracted library size:\t",_libendaddr
- .echo "Relocation table size:\t",numrelocations*3
- .echo "Functions vector size:\t",numfunctions*3
+ .echo "Relocation table size:\t",numrelocations*2
+ .echo "Functions vector size:\t",numfunctions*2
  .echo "Success!"
  .echo >> asmname " end\n"
 #endmacro
@@ -76,8 +75,7 @@
 #macro relocate()
  #define numrelocations numrelocations+1
  
- #define offset eval($-3)
- .echo >> relocation_table " .dl ",offset,"\n"
+ .echo >> relocation_table " .dw ",eval($-3),"\n"
 #endmacro
 #define .r relocate()
 
