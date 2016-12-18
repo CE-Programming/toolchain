@@ -3,8 +3,8 @@
 :: Set LIB_NAME to the name of your library
 :: Set LIB_SRC to the assembly source of your library
 
-set LIB_NAME=FILEIOC
-set LIB_SRC=fileio_lib_old.asm
+set LIB_NAME=GRAPHX
+set LIB_SRC=graphics_lib.asm
 
 echo Assembling Library...
 mkdir lib

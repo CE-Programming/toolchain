@@ -1,6 +1,6 @@
 /**
  * @file    GRAPHX CE C Library
- * @version 2.0
+ * @version 4
  *
  * @section LICENSE
  *
@@ -100,14 +100,20 @@ void gfx_End(void);
 
 /**
  * Used for accessing the palette directly
- * 256 is valid only for the 8 bpp mode
+ * 256 bytes in size
  */
-extern uint16_t gfx_palette[256];
+#define gfx_palette ((uint16_t*)0xE30200)
 
 /**
  * Array of the LCD VRAM
+ * 153600 bytes in size
  */
-extern uint8_t gfx_vram[2][240][320];
+#define gfx_vram ((uint8_t*)0xD40000)
+
+/**
+ * Array of the current buffer
+ * 76800 bytes in size
+ */
 #define gfx_vbuffer (**(uint8_t(**)[240][320])0xE30014)
 
 /* Type for the clip region */
@@ -313,14 +319,15 @@ uint8_t gfx_GetDraw(void);
 void gfx_SwapDraw(void);
 
 /**
- * Copies the input buffer to the opposite buffer
+ * Copies the input buffer to the opposite buffer (No clipping is performed; as it is a copy not a draw)
  * Arguments:
  *  gfx_screen: copies screen to buffer
  *  gfx_buffer: copies buffer to screen
  */
 void gfx_Blit(uint8_t buffer);
 void gfx_BlitLines(uint8_t buffer, uint8_t y_loc, uint8_t num_lines);
-void gfx_BlitArea(uint8_t buffer, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
+void gfx_BlitRectangle(uint8_t buffer, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
+void gfx_BlitCircle(uint8_t buffer, uint24_t x, uint8_t y, uint8_t radius);
 #define gfx_BlitScreen() gfx_Blit(gfx_screen)
 #define gfx_BlitBuffer() gfx_Blit(gfx_buffer)
 
@@ -545,4 +552,9 @@ uint16_t gfx_Darken(uint16_t color, uint8_t amt);
 #define gfx_pink        0xF0
 #define gfx_white       0xFF
 
-#endif 
+/**
+ * Compatability defines (don't use please)
+ */
+#define gfx_BlitArea gfx_BlitRectangle
+
+#endif

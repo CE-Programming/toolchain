@@ -3,8 +3,8 @@
 :: Set LIB_NAME to the name of your library
 :: Set LIB_SRC to the assembly source of your library
 
-set LIB_NAME=GRAPHX
-set LIB_SRC=graphics_lib_old.asm
+set LIB_NAME=KEYPADC
+set LIB_SRC=keypad_lib.asm
 
 echo Assembling Library...
 mkdir lib
@@ -17,7 +17,7 @@ set BIN=%CEDEV%\bin
 set ASM=%BIN%\ez80asm.exe
 set LIB=%BIN%\ez80lib.exe
 set ASM_FLG=-genobj -NOigcase -NOlist -NOlistmac -pagelen:56 -pagewidth:100 -quiet -sdiopt -cpu:EZ80F91 -NOdebug
-..\..\..\include\spasm -E %LIB_SRC% %LIB_NAME%.8xv
+..\include\spasm -E %LIB_SRC% %LIB_NAME%.8xv
 echo Building library...
 if exist *.obj del *.obj
 if exist %LIB_LIB% del %LIB_LIB%

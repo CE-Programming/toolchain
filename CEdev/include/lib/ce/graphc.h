@@ -1,13 +1,14 @@
 /*###########################################################################*/
 
-#warning The graphc library is deprecated! The graphx library should be used instead
-
+#warning The graphc library is deprecated! The graphx library should be used instead.
+#warning The graphc library is deprecated! The graphx library should be used instead.
+#warning The graphc library is deprecated! The graphx library should be used instead.
 
 /*###########################################################################*/
 
 /**
  * @file    GRAPHC CE C Library
- * @version 3.0
+ * @version 3
  *
  * @section LICENSE
  *

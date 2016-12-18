@@ -49,7 +49,7 @@ set STDINC=%INC%\lib\std
 set CEINC=%CEDEV%\include\lib\ce
 set ZLGINC=%SRC%\include
 set CFLG_REL=-NOdebug -optsize -NOkeeplst -promote -quiet -fplib
-set AFLG=-genobj -NOigcase -include:%STDINC% -include:%ZLGINC% -NOlist -NOlistmac -pagelen:56 -pagewidth:100 -quiet -sdiopt -warn -NOzmasm
+set AFLG=-genobj -NOigcase -include:%STDINC% -include:%ZLGINC% -NOlist -NOlistmac -pagelen:55 -pagewidth:100 -quiet -sdiopt -warn -NOzmasm
 
 REM ---make sure dir exists
 mkdir %LIBPATH%
