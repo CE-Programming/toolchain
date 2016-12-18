@@ -21,33 +21,33 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 
 /* Main Function */
 void main(void) {
-	ti_var_t myProgram;
-	uint8_t *data_ptr;
-	uint8_t token_length;
-	
-	/* Close any files that may be open already */
-	ti_CloseAll();
+    ti_var_t myProgram;
+    uint8_t *data_ptr;
+    uint8_t token_length;
     
-	/* Open a new variable; deleting it if it already exists */
-	myProgram = ti_OpenVar(prgmName,"r",ti_Program);
+    /* Close any files that may be open already */
+    ti_CloseAll();
     
-	/* Make sure we opened okay */
-	if (!myProgram) goto err;
+    /* Open a new variable; deleting it if it already exists */
+    myProgram = ti_OpenVar(prgmName,"r",ti_Program);
+    
+    /* Make sure we opened okay */
+    if (!myProgram) goto err;
 
-	data_ptr = ti_GetDataPtr( myProgram );
-	printText( 0, 0, ti_GetTokenString( &data_ptr, NULL, NULL ) );
-	printText( 0, 1, ti_GetTokenString( &data_ptr, NULL, NULL ) );
-	
-err:	
-	/* Wait for a key */
-	while( !os_GetCSC() );
+    data_ptr = ti_GetDataPtr( myProgram );
+    printText( 0, 0, ti_GetTokenString( &data_ptr, NULL, NULL ) );
+    printText( 0, 1, ti_GetTokenString( &data_ptr, NULL, NULL ) );
     
-	ti_CloseAll();
-	prgm_CleanUp();
+err:    
+    /* Wait for a key */
+    while( !os_GetCSC() );
+    
+    ti_CloseAll();
+    prgm_CleanUp();
 }
 
 /* Draw text on the homescreen at the given X/Y location */
 void printText(int8_t xpos, int8_t ypos, const char *text) {
-	os_SetCursorPos(ypos, xpos);
-	os_PutStrFull(text);
+    os_SetCursorPos(ypos, xpos);
+    os_PutStrFull(text);
 }

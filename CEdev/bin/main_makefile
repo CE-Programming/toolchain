@@ -229,12 +229,12 @@ $(OBJDIR)/%.obj : $(SRCDIR)/%.asm
 	@$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 	
 #These rules compile the source files into object files
-$(OBJDIR)/%.obj : $(SRCDIR)/%.c
+$(OBJDIR)/%.obj : $(SRCDIR)/%.c $(USERHEADERS)
 	@if not exist $(OBJDIR) mkdir $(OBJDIR)
 	@$(CD) $(OBJDIR) && \
 	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 	
-$(OBJDIR)/%.obj : $(GFXDIR)/%.c
+$(OBJDIR)/%.obj : $(GFXDIR)/%.c $(USERHEADERS)
 	@if not exist $(OBJDIR) mkdir $(OBJDIR)
 	@$(CD) $(OBJDIR) && \
 	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))

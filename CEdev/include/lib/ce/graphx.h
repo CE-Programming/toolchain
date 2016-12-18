@@ -47,16 +47,16 @@
  */
 
 typedef struct gfx_image {
-	uint8_t width;
-	uint8_t height;
-	uint8_t data[1];
+    uint8_t width;
+    uint8_t height;
+    uint8_t data[1];
 } gfx_image_t;
 
 /**
  * A simple structure for working with 2D points
  */
 typedef struct gfx_point {
-	int x,y;
+    int x,y;
 } gfx_point_t;
 
 /**
@@ -75,7 +75,7 @@ gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine
  */
 #define gfx_UninitedSprite(name, max_width, max_height) uint8_t name##_data[2 + (max_width) * (max_height)]; \
                                                         gfx_image_t *name = (gfx_image_t *)name##_data
-					    
+                        
 /**
  * This routine should be used for small sprites as it uses the stack
  */
@@ -87,7 +87,7 @@ typedef enum gfx_mode {
 } gfx_mode_t;
 
 /**
- * Initializes the graphics setup 
+ * Initializes the graphics setup
  * Set LCD to 8bpp mode and loads the default palette
  */
 int gfx_Begin(gfx_mode_t mode);
@@ -118,33 +118,33 @@ void gfx_End(void);
 
 /* Type for the clip region */
 typedef struct gfx_region {
-	int xmin, ymin, xmax, ymax;
+    int xmin, ymin, xmax, ymax;
 } gfx_region_t;
 
 /* Type for tilemap */
 typedef struct gfx_tilemap {
-	uint8_t *map;		/* pointer to indexed map array */
-	gfx_image_t **tiles;	/* pointer to tiles */
-	uint8_t tile_height;	/* individual tile height */
-	uint8_t tile_width;	/* individual tile width */
-	uint8_t draw_height;	/* number of rows to draw in the tilemap */
-	uint8_t draw_width;	/* number of cols to draw tilemap */
-	uint8_t type_width;	/* 2^type_width = tile_width */
-	uint8_t type_height;	/* 2^type_height = tile_height */
-	uint8_t height;		/* total number of rows in the tilemap */
-	uint8_t width;		/* total number of cols in the tilemap */
-	uint8_t y_loc;		/* y pixel location to begin drawing at */
-	uint24_t x_loc;		/* x pixel location to begin drawing at */
+    uint8_t *map;            /* pointer to indexed map array */
+    gfx_image_t **tiles;     /* pointer to tiles */
+    uint8_t tile_height;     /* individual tile height */
+    uint8_t tile_width;      /* individual tile width */
+    uint8_t draw_height;     /* number of rows to draw in the tilemap */
+    uint8_t draw_width;      /* number of cols to draw tilemap */
+    uint8_t type_width;      /* 2^type_width = tile_width */
+    uint8_t type_height;     /* 2^type_height = tile_height */
+    uint8_t height;          /* total number of rows in the tilemap */
+    uint8_t width;           /* total number of cols in the tilemap */
+    uint8_t y_loc;           /* y pixel location to begin drawing at */
+    uint24_t x_loc;          /* x pixel location to begin drawing at */
 } gfx_tilemap_t;
 
 typedef enum gfx_tilemap_type {
-	gfx_tile_2_pixel = 1,	/* Set when using 2 pixel tiles */
-	gfx_tile_4_pixel,	/* Set when using 4 pixel tiles */
-	gfx_tile_8_pixel,	/* Set when using 8 pixel tiles */
-	gfx_tile_16_pixel,	/* Set when using 16 pixel tiles */
-	gfx_tile_32_pixel,	/* Set when using 32 pixel tiles */
-	gfx_tile_64_pixel,	/* Set when using 64 pixel tiles */
-	gfx_tile_128_pixel,	/* Set when using 128 pixel tiles */
+    gfx_tile_2_pixel = 1,     /* Set when using 2 pixel tiles */
+    gfx_tile_4_pixel,         /* Set when using 4 pixel tiles */
+    gfx_tile_8_pixel,         /* Set when using 8 pixel tiles */
+    gfx_tile_16_pixel,        /* Set when using 16 pixel tiles */
+    gfx_tile_32_pixel,        /* Set when using 32 pixel tiles */
+    gfx_tile_64_pixel,        /* Set when using 64 pixel tiles */
+    gfx_tile_128_pixel,       /* Set when using 128 pixel tiles */
 } gfx_tilemap_type_t;
 
 /**
@@ -167,23 +167,15 @@ void gfx_TransparentTilemap_NoClip(gfx_tilemap_t *tilemap, uint24_t x_offset, ui
  * Tile Setting/Getting -- Uses absolute pixel offsets from the top left
  */
 uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, uint24_t x_offset, uint24_t y_offset);
-#define gfx_SetTile(a,b,c,d)	(*(gfx_TilePtr(a, b, c)) = (uint8_t)d)
-#define gfx_GetTile(a,b,c)	(*(gfx_TilePtr(a, b, c)))
+#define gfx_SetTile(a,b,c,d)    (*(gfx_TilePtr(a, b, c)) = (uint8_t)d)
+#define gfx_GetTile(a,b,c)      (*(gfx_TilePtr(a, b, c)))
 
 /**
  * Tile Setting/Getting -- Uses a mapped offsets from the tile map itself
  */
 uint8_t *gfx_TilePtrMapped(gfx_tilemap_t *tilemap, uint8_t x_offset, uint8_t y_offset);
-#define gfx_SetTileMapped(a,b,c,d)	(*(gfx_TilePtrMapped(a, b, c)) = (uint8_t)d)
-#define gfx_GetTileMapped(a,b,c)	(*(gfx_TilePtrMapped(a, b, c)))
-
-/**
- * Decompress a block of data using an LZ77 decoder
- *  in  : Compressed buffer
- *  out : Decompression buffer; must be large enough to hold decompressed data (size of sprite)
- *  in_size : Size of compressed buffer (using sizeof works well)
- */
-void gfx_LZDecompress(uint8_t *in, uint8_t *out, unsigned int in_size);
+#define gfx_SetTileMapped(a,b,c,d)    (*(gfx_TilePtrMapped(a, b, c)) = (uint8_t)d)
+#define gfx_GetTileMapped(a,b,c)      (*(gfx_TilePtrMapped(a, b, c)))
 
 /**
  * Decompress a block of data using an LZ77 decoder that was compressed using ConvPNG
@@ -219,7 +211,7 @@ void gfx_SetPalette(uint16_t *palette, uint24_t size, uint8_t offset);
 /**
  * Fills the screen with the given palette index
  */
-void gfx_FillScreen(uint8_t color);
+void gfx_FillScreen(uint8_t index);
 
 /**
  * Implements a faster version of gfx_FillScreen(0)
@@ -536,8 +528,8 @@ uint16_t gfx_Darken(uint16_t color, uint8_t amt);
            ((test_y) < ((master_y) + (master_height))) && \
            (((test_y) + (test_height)) > (master_y)))
 
-#define gfx_lcdWidth    320
-#define gfx_lcdHeight   240
+#define gfx_lcdWidth    (320)
+#define gfx_lcdHeight   (240)
 
 /**
  * Some simple color definitions using the standard palette
@@ -556,5 +548,6 @@ uint16_t gfx_Darken(uint16_t color, uint8_t amt);
  * Compatability defines (don't use please)
  */
 #define gfx_BlitArea gfx_BlitRectangle
+void gfx_LZDecompress(uint8_t *in, uint8_t *out, unsigned int in_size);
 
 #endif

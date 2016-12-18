@@ -22,36 +22,36 @@ bool exit_loop = false;
 
 /* Main function */
 void main(void) {
-	/* Print a little string -- Note that using OS routines doesn't work too well when interrupts are actually running */
-	prgm_CleanUp();
-	os_SetCursorPos( 0, 0 );
-	os_PutStrFull("Press ON");
-	
-	/* Initialize the interrupt handlers */
-	int_Initialize();
-	
-	/* Set the isr_on routine to run when the [ON] key is pressed */
-	int_SetVector(ON_IVECT, isr_on);
-	
-	/* Tell the interrupt controller that the ON flag should latch and be enabled */
-	int_LatchConfig = int_EnableConfig = INT_ON;
-	
-	/* Interrupts can now generate after this */
-	int_Enable();
-	
-	/* Wait for the [ON] key to be pressed */
-	while( !exit_loop );
-	
-	/* Reset the interrupt handler and cleanup the program */
-	int_Reset();
-	prgm_CleanUp();
+    /* Print a little string -- NOTE: using OS routines doesn't work well when interrupts are enabled */
+    prgm_CleanUp();
+    os_SetCursorPos( 0, 0 );
+    os_PutStrFull("Press ON");
+    
+    /* Initialize the interrupt handlers */
+    int_Initialize();
+    
+    /* Set the isr_on routine to run when the [ON] key is pressed */
+    int_SetVector(ON_IVECT, isr_on);
+    
+    /* Tell the interrupt controller that the ON interrupt should be enabled */
+    int_EnableConfig = INT_ON;
+    
+    /* Interrupts can now generate after this */
+    int_Enable();
+    
+    /* Wait for the [ON] key to be pressed */
+    while( !exit_loop );
+    
+    /* Reset the interrupt handler and cleanup the program */
+    int_Reset();
+    prgm_CleanUp();
 }
 
 /* Interrupt routine to run when the [ON] key is pressed */
 void interrupt isr_on(void) {
-	/* Exit the "infinite" loop */
-	exit_loop = true;
-	
-	/* Must acknowledge that the interrupt occured to clear the flag */
-	int_Acknowledge = INT_ON;
+    /* Exit the "infinite" loop */
+    exit_loop = true;
+    
+    /* Must acknowledge that the interrupt occured to clear the flag */
+    int_Acknowledge = INT_ON;
 }
