@@ -118,9 +118,11 @@
 #define lcd_UpBaseCurr           (*(uint32_t*)0xE3002C)
 #define lcd_LpBaseCurr           (*(uint32_t*)0xE30030)
 #define lcd_Palette              ((uint16_t*)0xE30200)
+#define lcd_Ram                  ((uint8_t*)0xD40000)
 
 #define LCD_WIDTH                (320)
 #define LCD_HEIGHT               (240)
+#define LCD_SIZE                 (LCD_WIDTH*LCD_HEIGHT*2)
 
 /* OS varaible type definitions */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;

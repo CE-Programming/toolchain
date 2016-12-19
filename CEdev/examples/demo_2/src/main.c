@@ -11,28 +11,31 @@
 #include <string.h>
 
 /* Other available headers */
-// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
+// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h, intce.h
 
 /* Put function prototypes here */
 
 /* Put all your code here */
 void main(void) {
-	uint8_t i, bl_level_copy;
-	
-	bl_level_copy = lcd_BacklightLevel;
-	
-	for(i = bl_level_copy; i > 0; i--) {
-		boot_WaitShort();
-		lcd_BacklightLevel = i;
-	}
-	
-	for(i = 0; i < 255; i++) {
-		boot_WaitShort();
-		lcd_BacklightLevel = i;
-	}
+    uint8_t i, level;
+    
+    /* Store the current brightness level */
+    level = lcd_BacklightLevel;
+    
+    /* Change lcd brightness levels */
+    for(i = level; i > 0; i--) {
+        boot_WaitShort();
+        lcd_BacklightLevel = i;
+    }
+    
+    for(i = 0; i < 255; i++) {
+        boot_WaitShort();
+        lcd_BacklightLevel = i;
+    }
 
-	lcd_BacklightLevel = bl_level_copy;
+    /* Restore the old brightness level */
+    lcd_BacklightLevel = level;
 
-	/* Clean up for the return to the OS */
-	prgm_CleanUp();
+    /* Clean up for the return to the OS */
+    prgm_CleanUp();
 }

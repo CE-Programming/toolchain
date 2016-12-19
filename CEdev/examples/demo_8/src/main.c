@@ -62,7 +62,7 @@ void interrupt isr_rtc(void) {
     /* If a second passed, increment a counter */
     if(status & RTC_SEC_INT) {
         seconds++;
-        memset_fast((uint8_t*)0xD40000, randInt(0,255), 320*240*2);
+        memset_fast(lcd_Ram, randInt(0,255), LCD_SIZE);
     }
 
     /* Acknowledge all outstanding interrupts */

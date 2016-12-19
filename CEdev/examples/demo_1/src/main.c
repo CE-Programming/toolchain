@@ -11,13 +11,10 @@
 #include <string.h>
 
 /* Other available headers */
-// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
+// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h, intce.h
 
 /* Put function prototypes here */
 void fillScreen(uint8_t color);
-
-/* Location of memory-mapped screen */
-uint16_t *lcd_vramArray =  (uint16_t*)0xD40000;
 
 /* Put all your code here */
 void main(void) { 
@@ -40,5 +37,5 @@ void main(void) {
 /* Fill the screen with a given color */
 void fillScreen(uint8_t color) {
     /* memset_fast is a way faster implementation of memset; either one will work here though */
-    memset_fast(lcd_vramArray, color, 320*240*2);
+    memset_fast(lcd_Ram, color, LCD_SIZE);
 }
