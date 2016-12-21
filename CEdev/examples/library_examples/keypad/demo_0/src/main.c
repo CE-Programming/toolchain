@@ -20,10 +20,14 @@ void fillScreen(uint8_t color);
 void main(void) {
     /* Key varaible */
     kb_key_t key;
-
+    
     /* Loop until 2nd is pressed */
-    while(kb_ScanGroup(kb_group_1) != kb_2nd) {
-        key = kb_ScanGroup(kb_group_7);
+    do {
+		/* Update kb_Data */
+		kb_Scan();
+		
+		/* Load group 7 registers */
+        key = kb_Data[kb_group_7];
         
         switch(key) {
             case kb_Down:           /* Change screen color to black */
@@ -41,7 +45,8 @@ void main(void) {
             default:
                 break;
         }
-    }
+    } while( kb_Data[kb_group_1] != kb_2nd );
+	
     prgm_CleanUp();
 }
 

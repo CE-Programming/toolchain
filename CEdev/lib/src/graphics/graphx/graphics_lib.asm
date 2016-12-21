@@ -314,7 +314,7 @@ _SetTransparentColor:
 	ld	d,(hl)                      ; d = old color
 	ld	a,e
 	ld	(hl),a
-	ld	(TColor_SMC_2),a
+	ld	(TColor_SMC_2),a \.r
 	ld	(TColor_SMC_3),a \.r        ; store all the new transparent colors
 	ld	(TColor_SMC_4),a \.r        ; store all the new transparent colors
 	ld	a,d                         ; return previous transparent color index

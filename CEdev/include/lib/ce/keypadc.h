@@ -83,7 +83,7 @@ void kb_Reset(void);
 #define kb_IntAcknowledge       (*(volatile uint8_t*)0xF50008)
 #define kb_IntStatus            (*(volatile uint8_t*)0xF50008)
 #define kb_Config               (*(uint8_t*)0xF50000)
-#define kb_Data                 ((uint16_t*)0xF50010)
+#define kb_Data                 (uint8_t)((uint16_t*)0xF50010)
 
 #define KB_SCAN_COMPLETE        (1<<0)
 #define KB_DATA_CHANGED         (1<<1)
@@ -142,7 +142,7 @@ void kb_Reset(void);
 #define kb_8          1<<3
 #define kb_LParen     1<<4
 #define kb_Cos        1<<5
-#define kb_Pgrm       1<<6
+#define kb_Prgm       1<<6
 #define kb_Stat       1<<7
 
 /**
@@ -222,7 +222,7 @@ void kb_Reset(void);
 #define kb_Key8               (kb_lkey_t)(4 << 8 | 1<<3)
 #define kb_KeyLParen          (kb_lkey_t)(4 << 8 | 1<<4)
 #define kb_KeyCos             (kb_lkey_t)(4 << 8 | 1<<5)
-#define kb_KeyPgrm            (kb_lkey_t)(4 << 8 | 1<<6)
+#define kb_KeyPrgm            (kb_lkey_t)(4 << 8 | 1<<6)
 #define kb_KeyStat            (kb_lkey_t)(4 << 8 | 1<<7)
 
 /**
