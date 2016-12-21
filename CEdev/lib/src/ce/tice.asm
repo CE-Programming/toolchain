@@ -2,27 +2,25 @@
 
 ; --- External Definitions -------------------
 	.assume ADL=1
-	.def _boot_GetBootVerMajor
-	.def _boot_GetHardwareVers
-	.def _boot_GetBootVerMinor
+	.def _boot_GetBootMajorVer
+	.def _boot_GetHardwareVer
+	.def _boot_GetBootMinorVer
 	.def _boot_DebugPrintf
 	.def _boot_ClearVRAM
 	.def _boot_TurnOff
 	.def _boot_NewLine
-	.def _boot_PrintBootVersion
 	.def _boot_Set6MHzMode
 	.def _boot_Set48MHzMode
 	.def _boot_Set6MHzModeI
 	.def _boot_Set48MHzModeI
 	.def _boot_GetBatteryStatus
 	.def _boot_WaitShort
-	.def _boot_DoNothing1, _boot_DoNothing2
-	.def _boot_USBBusPowered
-	.def _boot_USBSelfPowered
-	.def _boot_ResetTimer3
 	.def _boot_CheckOnPressed
-	.def _boot_RTCInitialize
+	.def _boot_SetDate
+	.def _boot_GetDate
+	.def _boot_GetTime
 	.def _boot_SetTime
+	.def _boot_IsAfterNoon
 	
 	.def _os_PushErrorHandler
 	.def _os_PopErrorHandler
@@ -114,28 +112,25 @@
 ; --------------------------------------------
 
 ; --- Location Equates -----------------------
-_boot_GetBootVerMajor           equ 000080h
-_boot_GetHardwareVers           equ 000084h
-_boot_GetBootVerMinor           equ 00008Ch
+_boot_GetBootMajorVer           equ 000080h
+_boot_GetHardwareVer            equ 000084h
+_boot_GetBootMinorVer           equ 00008Ch
 _boot_DebugPrintf               equ 0000B4h
 _boot_ClearVRAM                 equ 000374h
 _boot_TurnOff                   equ 000388h
 _boot_NewLine                   equ 000390h
-_boot_PrintBootVersion          equ 000394h
 _boot_Set6MHzMode               equ 00039Ch
 _boot_Set48MHzMode              equ 0003A0h
 _boot_Set6MHzModeI              equ 0003A4h
 _boot_Set48MHzModeI             equ 0003A8h
 _boot_GetBatteryStatus          equ 0003B0h
 _boot_WaitShort                 equ 0003B4h
-_boot_DoNothing1                equ 0003D8h
-_boot_DoNothing2                equ 0003DCh
-_boot_USBBusPowered             equ 0003E4h
-_boot_USBSelfPowered            equ 0003E8h
-_boot_ResetTimer3               equ 0004F8h
 _boot_CheckOnPressed            equ 00057Ch
-_boot_RTCInitialize             equ 000584h
+_boot_SetDate                   equ 000598h
+_boot_GetDate                   equ 0005A8h
+_boot_GetTime                   equ 0005B0h
 _boot_SetTime                   equ 0005B4h
+_boot_IsAfterNoon               equ 0005C8h
 
 _os_PushErrorHandler            equ 021C78h
 _os_PopErrorHandler             equ 021C7Ch

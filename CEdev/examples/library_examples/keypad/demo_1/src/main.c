@@ -20,11 +20,17 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 void main(void) {
 	/* Key varaible */
 	kb_key_t key;
-	char erase_string[] = "     ";
-	
+	const char *erase_string = "     ";
+
+    prgm_CleanUp();
+    
 	/* Loop until 2nd is pressed */
-	while(kb_ScanGroup(kb_group_1) != kb_2nd) {
-		key = kb_ScanGroup(kb_group_7);
+	do {
+		
+		/* Update kb_Data */
+		kb_Scan();
+		
+		key = kb_Data[kb_group_7];
 
 		/* Print the current arrow key input */
 		if(key & kb_Down) {
@@ -47,7 +53,8 @@ void main(void) {
 		} else {
 			printText(0,3,erase_string);
 		}
-	}
+	} while( kb_Data[kb_group_1] != kb_2nd );
+
 	prgm_CleanUp();
 }
 

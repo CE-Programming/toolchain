@@ -22,7 +22,7 @@ void interrupt isr_keyboard(void);
 
 /* Global Flag */
 uint8_t exit_loop = false;
-int a;
+
 /* Main Function */
 void main(void) {
     /* Initialize the interrupt handlers */
