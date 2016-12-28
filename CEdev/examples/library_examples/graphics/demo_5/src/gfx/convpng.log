@@ -5,8 +5,8 @@ Building palette with [256] available indices ...
 Built palette with [256] indices.
 Palette quality : 95.62%
 1:
- apple : 95.39% (compress: 52802 -> 29966 bytes)
+ apple : 95.39% (compress: 52802 -> 20881 bytes)
 
-Converted in 2 s
+Converted in 1 s
 
 Finished!

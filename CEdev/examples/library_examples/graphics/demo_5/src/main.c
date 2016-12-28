@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Decompression functions */
+#include <decompress.h>
+
 /* Shared libraries */
 #include <lib/ce/graphx.h>
 #include "gfx/all_gfx.h"
@@ -25,17 +28,15 @@ void main(void) {
     /* Allocate space for the decompressed sprite */
     apple = gfx_MallocSprite( 220, 240 );
     
+    /* Decompress the sprite */
+    dzx7_Standard( apple_compressed, apple ); // or dzx7_Turbo
+    
     /* Initialize the 8bpp graphics */
     gfx_Begin( gfx_8bpp );
     
     /* Set up the palette */
     gfx_SetPalette( all_gfx_pal, sizeof(all_gfx_pal), 0 );
-    
-    /* Looking at the output palette, this color is white */
     gfx_FillScreen( 0x00 );
-    
-    /* Decompress the sprite */
-    gfx_LZDecompressSprite( apple_data_compressed, apple );
     
     /* Draw the decompressed sprite */
     gfx_Sprite( apple, (320 - 220) / 2, (240 - 240) / 2);

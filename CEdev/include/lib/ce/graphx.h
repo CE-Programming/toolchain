@@ -178,13 +178,6 @@ uint8_t *gfx_TilePtrMapped(gfx_tilemap_t *tilemap, uint8_t x_offset, uint8_t y_o
 #define gfx_GetTileMapped(a,b,c)      (*(gfx_TilePtrMapped(a, b, c)))
 
 /**
- * Decompress a block of data using an LZ77 decoder that was compressed using ConvPNG
- *  in  : Compressed buffer
- *  out : Decompression buffer; must be large enough to hold decompressed data (size of sprite)
- */
-void gfx_LZDecompressSprite(uint8_t *in, gfx_image_t *out);
-
-/**
  * Sets the color index that drawing routines will use
  * This applies to lines, rectangles, etc
  * Returns the previous global color index

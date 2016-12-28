@@ -42,7 +42,7 @@ set INT_ASM_SRC=interrupts.asm
 set DEBUG_C_SRC=
 set DEBUG_ASM_SRC=debugger.asm removeallbreakpoints.asm removeallwatchpoints.asm removebreakpoint.asm removewatchpoint.asm setbreakpoint.asm setreadwatchpoint.asm setwritewatchpoint.asm setreadwritewatchpoint.asm  setwatchpoint.asm
 set TICE_C_SRC=
-set TICE_ASM_SRC=tice.asm memset_fast.asm prgmcleanup.asm abort.asm os.asm
+set TICE_ASM_SRC=dzx7_standard.asm dzx7_turbo.asm tice.asm memset_fast.asm prgmcleanup.asm abort.asm os.asm
 
 set CPU=EZ80F91
 set STDINC=%INC%\lib\std

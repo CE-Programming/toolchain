@@ -32,3 +32,4 @@ move /Y %LIB_8XV% lib > nul
 move /Y %LIB_JMP% lib > nul
 cd lib
 for /F %%a in ('dir /L /B') do rename %%a %%a
+cd ..
