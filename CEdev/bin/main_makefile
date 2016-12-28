@@ -7,7 +7,7 @@ LIBHEADER_ASM := libheader.asm
 #----------------------------
 
 SHELL := cmd.exe
-VERSION := 6.7
+VERSION := 6.8
 
 #----------------------------
 # Try not to edit anything below these lines unless you know what you are doing

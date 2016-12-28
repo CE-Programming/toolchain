@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Decompression functions */
+#include <decompress.h>
+
 /* Shared libraries */
 #include <lib/ce/graphx.h>
 #include "gfx/tiles_gfx.h"
@@ -46,7 +49,7 @@ void main(void) {
     /* Decompress the tiles */
     for(i = 0; i < 128; i++) {
         tmp_ptr = gfx_AllocSprite( TILE_WIDTH, TILE_HEIGHT, malloc );
-        gfx_LZDecompressSprite( tileset_tiles_data_compressed[i], tmp_ptr );
+        dzx7_Turbo( tileset_tiles_compressed[i], tmp_ptr ); // or dzx7_Standard, but in this case we have a lot of tiles
         tileset_tiles[i] = tmp_ptr;
     }
     
