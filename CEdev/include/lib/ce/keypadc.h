@@ -260,5 +260,6 @@ void kb_Reset(void);
  */
 #define kb_DataArray ((uint16_t*)0xF50010)
 #define kb_dataArray ((uint16_t*)0xF50010)
- 
+#define kb_KeyPgrm   kb_KeyPrgm
+
 #endif
