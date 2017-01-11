@@ -10,5 +10,5 @@ Toolchain for C programming on the 'CE' series of TI calculators (TI-84 Plus CE 
 
 Included you will find the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These perform efficient and easy support for graphics, file I/O, keypad input, etc. You can find examples in [`CEdev/examples/library_examples`](CEdev/examples/library_examples)
 
-For more information on how to use this toolchain, please see the documentation page:
-https://ce-programming.github.io/documentation/
+For more information on how to use this toolchain, please see the documentation page: https://ce-programming.github.io/documentation/  
+You can also join us on IRC on the EFNet servers: #ez80-dev (and #cemu-dev for CEmu)
