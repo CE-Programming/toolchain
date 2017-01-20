@@ -11,12 +11,12 @@
 ; --------------------------------------------
 
 ; --- Location Equates -----------------------
-_usb_BusPowered                 equ 000080h
-_usb_SelfPowered                equ 000084h
-_usb_ResetChip                  equ 00008Ch
-_usb_DisableTimer               equ 0000B4h
-_usb_EnableTimer                equ 000374h
-_usb_ResetTimer                 equ 000388h
+_usb_BusPowered                 equ 0003E4h
+_usb_SelfPowered                equ 0003E8h
+_usb_ResetChip                  equ 0003F4h
+_usb_DisableTimer               equ 0004F4h
+_usb_EnableTimer                equ 0004F8h
+_usb_ResetTimer                 equ 0004F0h
 ; --------------------------------------------
 
 	end

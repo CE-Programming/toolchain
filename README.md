@@ -1,4 +1,4 @@
-# Toolchain
+# CE C Toolchain
 Toolchain for C programming on the 'CE' series of TI calculators (TI-84 Plus CE / TI-83 Premium CE)
 
 # Installation
