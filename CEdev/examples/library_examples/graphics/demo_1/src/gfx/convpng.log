@@ -1,15 +1,14 @@
 Opened convpng.ini
 
 --- Group logo_gfx (C) ---
-Using built-in xlibc palette...
-TranspColorIndex : 0x00
+Building palette with [256] available indices ...
+Built palette with [190] indices.
+Palette quality : 100.00%
+TranspColorIndex : 0
 TranspColor : 0xFFFF
 1:
- ubuntu : Converted! (ubuntu.c)
+ ubuntu : 100.00% (ubuntu.c)
 
 Converted in 0 s
-
-[warning] image quality *may* be too low.
-Please try grouping similar images, reducing image colors, or selecting a better palette.
 
 Finished!

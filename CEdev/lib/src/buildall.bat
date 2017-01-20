@@ -39,8 +39,12 @@ set HLP_ASM_SRC=bdivs.asm bdivu.asm bldix.asm bldiy.asm bmuls.asm brems.asm brem
 set INT_C_SRC=
 set INT_ASM_SRC=interrupts.asm
 
+set USB_C_SRC=
+set USB_ASM_SRC=usb.asm
+
 set DEBUG_C_SRC=
 set DEBUG_ASM_SRC=debugger.asm removeallbreakpoints.asm removeallwatchpoints.asm removebreakpoint.asm removewatchpoint.asm setbreakpoint.asm setreadwatchpoint.asm setwritewatchpoint.asm setreadwritewatchpoint.asm  setwatchpoint.asm
+
 set TICE_C_SRC=
 set TICE_ASM_SRC=dzx7_standard.asm dzx7_turbo.asm tice.asm memset_fast.asm prgmcleanup.asm abort.asm os.asm
 
@@ -79,6 +83,12 @@ set C_SRC=%INT_C_SRC%
 set ASM_SRC=%INT_ASM_SRC%
 call buildlib.bat cintce.lib
 
+echo -- Building USB library...
+set MY_PATH=%CE_PATH%
+set C_SRC=%USB_C_SRC%
+set ASM_SRC=%USB_ASM_SRC%
+call buildlib.bat cusbce.lib
+
 echo -- Building CHLP libraries...
 set MY_PATH=%SHARED_PATH%
 set C_SRC=%HLP_C_SRC%
@@ -110,6 +120,7 @@ copy /Y *.lib %LIBPATH%\std
 move /Y %LIBPATH%\std\ctice.lib %LIBPATH%\std\ce\ctice.lib
 move /Y %LIBPATH%\std\cdebug.lib %LIBPATH%\std\ce\cdebug.lib
 move /Y %LIBPATH%\std\cintce.lib %LIBPATH%\std\ce\cintce.lib
+move /Y %LIBPATH%\std\cusbce.lib %LIBPATH%\std\ce\cusbce.lib
 
 REM -- cleanup intermediate files --
 if exist *.lib del *.lib

@@ -25,8 +25,6 @@
 void main(void) {
     /* Create a buffer the same size as the ubuntu sprite */
     gfx_UninitedSprite( sprite_buffer, UBUNTU_SPRITE_WIDTH, UBUNTU_SPRITE_HEIGHT );
-    sprite_buffer->width = UBUNTU_SPRITE_WIDTH;
-    sprite_buffer->height = UBUNTU_SPRITE_HEIGHT;
     
     gfx_Begin( gfx_8bpp );
     

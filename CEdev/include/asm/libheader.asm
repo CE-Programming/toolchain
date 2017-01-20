@@ -16,9 +16,9 @@ __findlibload:
 	ld	(%D005F8),a	; op1
 
 	call	%02050C		; _chkfindsym
-	jp	c,__notfound
+	jr	c,__notfound
 	call	%021F98		; _chkinram
-	jp	nz,__inarc	; if in ram, archive LibLoad and search again
+	jr	nz,__inarc	; if in ram, archive LibLoad and search again
 	call	%021448		; _arc_unarc
 	jr	__findlibload
 __inarc:

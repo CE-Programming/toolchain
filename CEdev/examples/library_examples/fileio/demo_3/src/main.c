@@ -14,10 +14,10 @@
 #include <lib/ce/fileioc.h>
 
 /* Some function prototypes. Maybe in the future these functions will become a library */
-cplx_t Int24ToCplx(int real, int imag);
-cplx_t FloatToCplx(float real, float imag);
-cplx_t RealToCplx(real_t real, real_t imag);
-cplx_t StrToCplx(char *real, char **real_end, char *imag, char **imag_end);
+cplx_t Int24sToCplx(int real, int imag);
+cplx_t FloatsToCplx(float real, float imag);
+cplx_t RealsToCplx(real_t real, real_t imag);
+cplx_t StrsToCplx(char *real, char **real_end, char *imag, char **imag_end);
 
 /* Main Function */
 void main(void) {

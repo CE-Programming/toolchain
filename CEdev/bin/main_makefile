@@ -7,7 +7,7 @@ LIBHEADER_ASM := libheader.asm
 #----------------------------
 
 SHELL := cmd.exe
-VERSION := 6.8
+VERSION := 6.9
 
 #----------------------------
 # Try not to edit anything below these lines unless you know what you are doing
@@ -26,6 +26,8 @@ NULL = >nul 2>&1
 
 #Generate the default names for input and object files
 TARGETHEX := $(TARGET).hex
+TARGETMAP := $(TARGET).map
+TARGETTYPE := $(TARGET).8xp
 ICON_ASM := iconc.asm
 
 #Objects
@@ -53,17 +55,13 @@ CV = "$(BIN)convhex"
 PG = "$(BIN)convpng"
 BIN := $(call NATIVEPATH,$(CEDEV)/bin/)
 
-#Determine if output should be archived or an AppVar
+#Determine if output should be archived or compressed
 ifneq ($(ARCHIVED),NO)
 CVFLAGS := -a
 endif
-ifneq ($(APPVAR),NO)
-CVFLAGS += -v
-TARGETTYPE := $(TARGET).8xv
-else
-TARGETTYPE := $(TARGET).8xp
+ifneq ($(COMPRESSED),NO)
+CVFLAGS += -x
 endif
-TARGETMAP := $(TARGET).map
 
 #Find all of the available C and ASM files (Remember, you can create C <-> assembly routines easily this way)
 SOURCES := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
@@ -97,7 +95,7 @@ endif
 #Define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
 USERHEADERS := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
 HEADERS := $(subst $(space),;,$(call WINPATH,. $(ALLDIRS) $(addprefix $(CEDEV)/,. include include/asm include/lib/ce include/lib/std $(LIBLOC))))
-LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib ce/cintce.lib chelp.lib crt.lib))
+LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib ce/cintce.lib ce/cusbce.lib chelp.lib crt.lib))
 ifneq ($(USE_FLASH_FUNCTIONS),NO)
 LIBRARIES += $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,crt_linked.lib))
 else

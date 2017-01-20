@@ -20,7 +20,7 @@
       "description": "Make sure the sprites are displayed properly",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "CC5F9503" ]
+      "expected_CRCs": [ "33F94FD9" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",

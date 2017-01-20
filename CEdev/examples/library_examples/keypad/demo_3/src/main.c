@@ -62,7 +62,7 @@ void interrupt isr_on(void) {
 
 void interrupt isr_keyboard(void) {
     /* Fill the screen with a fun color */
-    memset_fast(lcd_Ram, randomInt(0,255), LCD_SIZE);
+    memset_fast(lcd_Ram, randInt(0,255), LCD_SIZE);
     
     /* Must acknowledge that the interrupt occured to clear the flag */
     int_Acknowledge = INT_KEYBOARD;

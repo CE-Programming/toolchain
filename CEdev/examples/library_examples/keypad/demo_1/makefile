@@ -3,15 +3,15 @@
 #Change TARGET to specify the output program name
 #Change DEBUGMODE to "DEBUG" in order to compile debug.h functions in, and "NDEBUG" to not compile debugging functions
 #Change ARCHIVED to "YES" to mark the output as archived, and "NO" to not
-#Change APPVAR to "YES" to create the file as an AppVar, otherwise "NO" for programs
 #Change ICONPNG to change the name of the png file that should be made into the icon
 #Change DESCRIPTION to modify what is displayed within a compatible shell (Not compiled in if icon is not present)
+#Change COMPRESSED to change if the output program should be a self extracting archive (usually reduces program size)
 
 #----------------------------
 TARGET ?= KEYPAD1
 DEBUGMODE ?= NDEBUG
 ARCHIVED ?= NO
-APPVAR ?= NO
+COMPRESSED ?= NO
 #----------------------------
 ICONPNG ?= iconc.png
 DESCRIPTION ?= "C Keypad Demo 1"

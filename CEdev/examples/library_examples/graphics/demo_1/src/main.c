@@ -12,6 +12,8 @@
 
 /* Shared libraries */
 #include <lib/ce/graphx.h>
+
+/* Include the sprite data */
 #include "gfx/logo_gfx.h"
 
 /* Put function prototypes here */
@@ -20,7 +22,11 @@
 void main(void) {
     /* Initialize the 8bpp graphics */
     gfx_Begin( gfx_8bpp );
+    
+    /* Set up the palette for our sprites */
     gfx_SetPalette( logo_gfx_pal, sizeof(logo_gfx_pal), 0);
+    
+    /* Fill the screen with color index 0 */
     gfx_FillScreen( 0 );
 
     /* Draw a bunch of different styled sprites on the screen */
