@@ -2473,11 +2473,10 @@ _TilePtr:
 ;  arg0 : Tilemap Struct
 ;  arg1 : X Pixel Offset (Unsigned)
 ;  arg2 : Y Pixel Offset (Unsigned)
-;  arg3 : New Tile Index
 ; Returns:
 ;  A pointer to an indexed tile in the tilemap (so it can be looked at or changed)
 ; C Function:
-;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset, uint8_t tile) {
+;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
 ;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
 	push	ix
