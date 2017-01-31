@@ -2515,15 +2515,15 @@ _TilePtrMapped:
 	pop	iy			; tilemap struct
 	pop	de			; x offset
 	ex	(sp),hl			; y offset
-	push	bc
-	push	bc
-	push	bc
-	ld	h,(iy+13)		; tilemap width
-	mlt	hl
+  push  bc
+  push  bc
+  push  bc
+	ld  h,(iy+13)		; tilemap width
+  mlt	hl
 	ld	d,0
 	add.s	hl,de
 	ld	de,(iy+0)		; tilemap data
-	add	hl,de
+  add	hl,de
 	ret
 
 ;-------------------------------------------------------------------------------
