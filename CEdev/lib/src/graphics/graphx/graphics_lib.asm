@@ -2511,10 +2511,13 @@ _TilePtrMapped:
 ;  arg2 : Y Map Offset
 ; Returns:
 ;  A pointer to the indexed tile in the tilemap (so it can be looked at or changed)
-	pop	hl			; return vector
+	pop	bc			; return vector
 	pop	iy			; tilemap struct
 	pop	de			; x offset
 	ex	(sp),hl			; y offset
+	push	bc
+	push	bc
+	push	bc
 	ld	h,(iy+13)		; tilemap width
 	mlt	hl
 	ld	d,0
