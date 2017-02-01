@@ -2609,7 +2609,7 @@ _SetTextTransparentColorC:
 	
 ;-------------------------------------------------------------------------------
 _SetTextXY:
-; Sets the transparency text color for text routines
+; Sets the text X and Y posistions
 ; Arguments:
 ;  arg0 : Text X Pos
 ;  arg1 : Text Y Pos
