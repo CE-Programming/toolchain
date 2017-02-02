@@ -174,24 +174,29 @@ _Lighten:
 ;  arg1 : 8 bit change amount
 ; Returns:
 ;  16 bit color value
-	pop	de
-	pop	bc
-	pop	hl
-	push	hl
+
+; Read params
+	pop	de			;; de = return vector
+	pop	bc			;; bc = color
+	ex	(sp),hl			;; l = amt
 	push	bc
 	push	de
+; Strategy: lighten(color, amt) = ~darken(~color, amt)
+; Darken the inverted color
+	ld	a,c
+	cpl
+	ld	c,a
 	ld	a,b
 	cpl
-	ld	b,a
-	ld	a,c
-	cpl                                 ; invert 16 bit color input
-	call	_Darken_ASM \.r
+	ld	b,a			;; bc = ~color
+	call	_Darken_ASM \.r		;; hl = darken(~color, amt)
+; Invert the darken result for the lighten result
 	ld	a,l
 	cpl
 	ld	l,a
 	ld	a,h
 	cpl
-	ld	h,a                         ; invert output
+	ld	h,a			;; hl = ~darken(~color, amt) = lighten(color, amt)
 	ret
 	
 ;-------------------------------------------------------------------------------
@@ -202,79 +207,64 @@ _Darken:
 ;  arg1 : 8 bit change amount
 ; Returns:
 ;  16 bit color value
-	pop	de
-	pop	bc
-	pop	hl
-	push	hl
+
+; Read params
+	pop	de			;; de = return vector
+	pop	bc			;; bc = color
+	ex	(sp),hl			;; l = amt
 	push	bc
 	push	de
-	ld	a,c
+; Comments assume 1555 RGB color
 _Darken_ASM:
-	ld	c,l
-	ld	iyl,a
-	ld	de,128
-	and	a,31
-	ld	l,a
-	ld	h,c
-	mlt	hl
-	add	hl,de
-	push	hl                          ; h = blue color
-	ld	a,b
-	rrca
-	rrca
-	and	a,31
-	ld	l,a
-	ld	h,c
-	mlt	hl
-	add	hl,de
-	push	hl                          ; h = red color
-	ld	a,iyl
-	rrca
-	rrca
-	rrca
-	rrca
-	and	a,14
-	ld	l,a
-	ld	a,b
-	and	a,3
-	rlca
-	rlca
-	rlca
-	rlca
-	or	a,l
-	ld	l,a
+; Calculate the output blue value
+	push	bc
+	ld	a,c			;; a = color & $FF
+	ld	c,l			;; c = amt
+	and	a,%00011111
+	ld	h,a			;; h = blue
+	mlt	hl			;; hl = blue * amt
+	ld	de,128			;; de = 128
+	add	hl,de			;; hl = blue * amt + 128
+	ld	l,h
+	ld	h,d			;; hl = (blue * amt + 128) / 256 = blue_out
+	ex	(sp),hl			;; hl = color, tmp1 = blue_out
+; Isolate the input red value
+	ld	a,h			;; a = color >> 8
+	rra				;; a = color >> 9
+	and	a,%00111110
+	ld	b,a			;; b = red << 1
+; Calculate the output green value
+	add.s	hl,hl
+	rla				;; a & 1 = green & 1
+	add	hl,hl
+	add	hl,hl			;; hl = color << 3
+	rra
 	ld	a,h
-	rlca
-	and	a,1
-	or	a,l
-	ld	l,a
-	ld	h,c
-	mlt	hl
-	add	hl,de                       ; h = green color
-	ld	a,h
-	and 	a,1
-	rrca
-	ld	d,a
-	ld	a,h
-	rrca
-	rrca
-	rrca
-	rrca
-	ld	l,a
-	and	a,3
-	or	a,d
-	ld	d,a
-	ld	a,l
-	and	a,224
-	ld	e,a                       ; green store complete
-	pop	af                        ; a = red color
-	rlca
-	rlca
-	or	a,d
-	ld	h,a                       ; high byte complete
-	pop	af                        ; a = blue color
-	or	a,e
-	ld	l,a                       ; hl complete
+	rla
+	and	a,%00111111
+	ld	h,a			;; h = green
+	ld	l,c			;; l = amt
+	mlt	hl			;; hl = green * amt
+	add	hl,de			;; hl = green * amt + 128
+	ld	l,h			;; l = (green * amt + 128) / 256 = green_out
+; Calculate the output red value
+	mlt	bc			;; bc = red * amt << 1
+	inc	b			;; b = (red * amt + 128 << 1) / 256
+	srl	b			;; b = (red * amt + 128) / 256 = red_out
+; Position the output red and green bits
+	add	hl,hl
+	add	hl,hl			;; l = green_out << 2
+	ld	h,b			;; h = red_out
+	add	hl,hl
+	add	hl,hl			;; hl = (red_out << 10) | (green_out << 4)
+	bit	4,l
+	jr	z,_
+	set	7,h
+	res	4,l
+_					;; hl = (green_out & 1 << 15) | (red_out << 10) | (green_out >> 1 << 5)
+; Add the output blue value (no positioning necessary) for the final output color
+	pop	bc			;; bc = blue_out
+	add	hl,bc			;; hl = color_out
 	ret
 	
 ;-------------------------------------------------------------------------------
@@ -4547,3 +4537,4 @@ tmpCharData:
 	.db 0,0,0,0,0,0,0,0
 	
  .endLibrary
+
