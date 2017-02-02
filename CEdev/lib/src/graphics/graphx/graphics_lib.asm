@@ -2615,36 +2615,14 @@ _SetTextXY:
 ;  arg1 : Text Y Pos
 ; Returns:
 ;  None
-	jp	_SetTextXY_ASM \.r
-SetTextXY_SMC =$-3
-_SetTextXY_ASM:
-	ld	hl,3
-	add	hl,sp                       ; hl -> arg0
-	ld	de,TextXPos_SMC \.r
-	ldi
-	ldi                                 ; copy in new x pos
-	inc	hl
-	ld	a,(hl)
-	ld	(TextYPos_SMC),a \.r        ; set new y pos
-	ret
-
-;-------------------------------------------------------------------------------
-_SetTextXY_Clip_ASM:
-; Sets the text X and Y positions
-; Arguments:
-;  arg0 : Text X Pos
-;  arg1 : Text Y Pos
-; Returns:
-;  None
-	ld	hl,3
-	add	hl,sp                       ; hl -> arg0
-	ld	de,TextXPos_SMC \.r
-	ldi
-	ldi
-	ldi                                 ; copy in new x pos
-	ld	hl,(hl)
-	ld	(TextYPos_SMC),hl \.r       ; set new y pos
-	ret
+	pop	de			; de=return address, sp=&xpos
+	pop	hl			; hl=xpos, sp=&ypos
+	ld	(TextXPos_SMC),hl \.r
+	ex	(sp),hl			; hl=ypos, ypos=don't care
+	ld	(TextYPos_SMC),hl \.r
+	push	hl			; xpos=don't care, sp=&xpos
+	ex	de,hl			; hl=return address
+	jp	(hl)
 	
 ;-------------------------------------------------------------------------------
 _PrintStringXY_Clip_ASM:
@@ -2780,12 +2758,10 @@ _SetTextConfig:
 	ret	nz
 	ld	de,_PrintChar_ASM \.r
 	ld	bc,_PrintStringXY_ASM \.r
-	ld	iy,_SetTextXY_ASM \.r
 	jr	SetCharSMC                  ; set unclipped character routine
 SetClipText:
 	ld	de,_PrintChar_Clip_ASM \.r
 	ld	bc,_PrintStringXY_Clip_ASM \.r
-	ld	iy,_SetTextXY_Clip_ASM \.r
 SetCharSMC:
 	ld	hl,PrintChar_SMC_0 \.r
 	ld	(hl),de                     ; holy crap what a hack
@@ -2798,9 +2774,6 @@ SetCharSMC:
 	push	bc
 	pop	hl
 	ld	(PrintStringXY_SMC),hl \.r ; change which text routines we want to use
-	push	iy
-	pop	hl
-	ld	(SetTextXY_SMC),hl \.r
 	or	a,a
 	sbc	hl,hl
 	ld	(TextYPos_SMC),hl \.r
