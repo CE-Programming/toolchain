@@ -2609,7 +2609,7 @@ _SetTextTransparentColorC:
 	
 ;-------------------------------------------------------------------------------
 _SetTextXY:
-; Sets the text X and Y posistions
+; Sets the text X and Y positions
 ; Arguments:
 ;  arg0 : Text X Pos
 ;  arg1 : Text Y Pos
@@ -2630,7 +2630,7 @@ _SetTextXY_ASM:
 
 ;-------------------------------------------------------------------------------
 _SetTextXY_Clip_ASM:
-; Sets the text X and Y posistions
+; Sets the text X and Y positions
 ; Arguments:
 ;  arg0 : Text X Pos
 ;  arg1 : Text Y Pos
