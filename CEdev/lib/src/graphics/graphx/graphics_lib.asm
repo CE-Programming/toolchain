@@ -2622,6 +2622,11 @@ _SetTextXY:
 	ld	(TextYPos_SMC),hl \.r
 	push	hl			; xpos=don't care, sp=&xpos
 	ex	de,hl			; hl=return address
+;-------------------------------------------------------------------------------
+_indcallHL_ASM:
+; Calls HL
+; Inputs:
+;  HL : Address to call
 	jp	(hl)
 	
 ;-------------------------------------------------------------------------------
@@ -4367,13 +4372,6 @@ _:	rla
 	ret	po
 	xor	a,1
 	ret
-
-;-------------------------------------------------------------------------------
-_indcallHL_ASM:
-; Calls HL
-; Inputs:
-;  HL : Address to call
-	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 CharSpacing_ASM:
