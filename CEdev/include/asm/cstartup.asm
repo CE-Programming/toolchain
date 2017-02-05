@@ -53,12 +53,15 @@ _init:
 	ld	a,(hl)
 	push	af
 	ld	(hl),1          ; reduce flash wait states (because of rtl)
-	call	0004F4h         ; _usb_DisableTimer
+	call	0004F4h         ; usb_DisableTimers
 	ld	(__errsp+1),sp  ; save the stack from death
 	call	_main
 __exit:
 	ex	de,hl
 __errsp:
+	push	de
+	call	0004F0h         ; usb_ResetTimers
+	pop	de
 	ld	sp,0
 	pop	af
 	pop	hl

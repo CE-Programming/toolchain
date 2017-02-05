@@ -32,8 +32,8 @@ void main(void) {
     int_SetVector(ON_IVECT, isr_on);
     int_SetVector(KEYBOARD_IVECT, isr_keyboard);
     
-    /* Tell the interrupt controller that the ON flag should latch and be enabled */
-    int_LatchConfig = int_EnableConfig = INT_ON | INT_KEYBOARD;
+    /* Tell the interrupt controller that the ON flag to be enabled */
+    int_EnableConfig = INT_ON | INT_KEYBOARD;
     kb_EnableInt = KB_DATA_CHANGED;
     
     /* Configure the keypad to be continously scanning */
@@ -62,10 +62,10 @@ void interrupt isr_on(void) {
 
 void interrupt isr_keyboard(void) {
     /* Read the keypad data */
-    kb_key_t key = kb_DataArray[kb_group_6];
+    kb_key_t key = kb_Data[kb_group_6];
     
     /* If [enter] or [clear] are pressed, set the flag */
-    if(key & (kb_Enter | kb_KeyClear)) {
+    if(key & (kb_Enter | kb_Clear)) {
         exit_loop = true;
     }
     

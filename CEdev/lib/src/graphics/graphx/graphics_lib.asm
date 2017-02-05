@@ -406,7 +406,6 @@ _ZeroScreen:
 	ldir
 	ret
 
-
 ;-------------------------------------------------------------------------------
 _SetPalette:
 ; Sets the palette colors
@@ -562,7 +561,7 @@ _RectangleWidth1_SMC =$+1
 	add     hl,bc
         inc     de
         ex      de,hl
-_RectangleWidth2_SMC =$+1        
+_RectangleWidth2_SMC =$+1
         ld      bc,0
         ldir
         ld      bc,2*lcdWidth-1

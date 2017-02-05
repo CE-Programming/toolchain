@@ -113,6 +113,19 @@ set C_SRC=%RTL_STATIC_C_SRC%
 set ASM_SRC=%RTL_STATIC_ASM_SRC%
 call buildlib.bat crt_static.lib
 
+echo -- Building Libraries...
+cd fileio
+call build.bat
+cd ..
+cd keypad
+call build.bat
+cd ..
+cd graphics/graphc
+call build.bat
+cd ../graphx
+call build.bat
+cd ../..
+
 echo -- Copying the libraries...
 
 REM -- copy the libraries --

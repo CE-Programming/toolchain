@@ -33,7 +33,7 @@ void main(void) {
     int_SetVector(KEYBOARD_IVECT, isr_keyboard);
     
     /* Tell the interrupt controller that the ON flag should latch and be enabled */
-    int_LatchConfig = int_EnableConfig = INT_ON | INT_KEYBOARD;
+    int_EnableConfig = INT_ON | INT_KEYBOARD;
     kb_EnableInt = KB_MODE_1_PRESS;
     
     /* Configure the keypad to be continously scanning */

@@ -59,16 +59,16 @@ void usb_ResetChip(void);
 /**
  * Disables the usb timer interrupt (timer 3)
  */
-void usb_DisableTimer(void);
+void usb_DisableTimers(void);
 
 /**
  * Enables the usb timer interrupt (timer 3)
  */
-void usb_EnableTimer(void);
+void usb_EnableTimers(void);
 
 /**
  * Resets the usb timer interrupt (timer 3)
  */
-void usb_ResetTimer(void);
+void usb_ResetTimers(void);
 
 #endif

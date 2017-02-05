@@ -5,6 +5,7 @@
 
 set LIB_NAME=GRAPHX
 set LIB_SRC=graphics_lib.asm
+set SPASM_EXE=%CEDEV%\lib\src\include\spasm.exe
 
 echo Assembling Library...
 mkdir lib
@@ -17,7 +18,7 @@ set BIN=%CEDEV%\bin
 set ASM=%BIN%\ez80asm.exe
 set LIB=%BIN%\ez80lib.exe
 set ASM_FLG=-genobj -NOigcase -NOlist -NOlistmac -pagelen:56 -pagewidth:100 -quiet -sdiopt -cpu:EZ80F91 -NOdebug
-..\..\include\spasm -E %LIB_SRC% %LIB_NAME%.8xv
+%SPASM_EXE% -E %LIB_SRC% %LIB_NAME%.8xv
 echo Building library...
 if exist *.obj del *.obj
 if exist %LIB_LIB% del %LIB_LIB%
@@ -32,4 +33,6 @@ move /Y %LIB_8XV% lib > nul
 move /Y %LIB_JMP% lib > nul
 cd lib
 for /F %%a in ('dir /L /B') do rename %%a %%a
+move /Y %LIB_LIB% %CEDEV%/lib/ce/%LIB_NAME% > nul
+move /Y %LIB_ASM% %CEDEV%/lib/ce/%LIB_NAME% > nul
 cd ..
