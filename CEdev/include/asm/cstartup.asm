@@ -66,7 +66,7 @@ __errsp:
 	pop	iy              ; restore iy for OS
 	push	de
 	call	0004F0h         ; usb_ResetTimers
-	pop	hl		; program return value in hl
+	pop	hl              ; program return value in hl
 	ret
 _exit:
 	pop	de

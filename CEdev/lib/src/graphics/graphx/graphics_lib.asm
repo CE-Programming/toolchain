@@ -2318,8 +2318,8 @@ _Tilemap:
 ;      uint8_t x_res = x_offset/tilemap->tile_width;
 ;      uint8_t y = y_offset/tilemap->tile_height;
 ;  
-;      x_offset = x_offset % tilemap->tile_width;
-;      y_offset = y_offset % tilemap->tile_height;
+;      x_offset = x_offset%tilemap->tile_width;
+;      y_offset = y_offset%tilemap->tile_height;
 ;  	
 ;      y_draw = tilemap->y_loc-y_offset;
 ;      for(y_tile = 0; y_tile <= tilemap->draw_height; y_tile++) {
@@ -2423,10 +2423,10 @@ DrawTile_SMC =$+1
 	call	0
 	lea	hl,ix+-12
 	ld	sp,hl
-	ld	iy,(ix+6)
 BlankTile:
 	or	a,a
 	sbc	hl,hl
+	ld	iy,(ix+6)
 	ld	l,(iy+7)
 	ld	bc,(ix+-7)
 	add	hl,bc
