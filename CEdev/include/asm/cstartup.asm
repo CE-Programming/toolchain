@@ -59,15 +59,14 @@ _init:
 __exit:
 	ex	de,hl
 __errsp:
-	push	de
-	call	0004F0h         ; usb_ResetTimers
-	pop	de
 	ld	sp,0
 	pop	af
 	pop	hl
 	ld	(hl),a          ; restore flash wait states
 	pop	iy              ; restore iy for OS
-	ex	de,hl		; program return value in hl
+	push	de
+	call	0004F0h         ; usb_ResetTimers
+	pop	hl		; program return value in hl
 	ret
 _exit:
 	pop	de
