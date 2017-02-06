@@ -274,20 +274,20 @@ _SetColor:
 ;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
-	pop	hl
-	pop	de
-	push	de                          ; e = new color value
-	push	hl
-	ld	hl,Color_SMC_1 \.r          ; load the address of the current color
-	ld	d,(hl)                      ; d = old color
-	ld	a,e
-	ld	(hl),a
+	pop	de			;; de = return vetor
+	ex	(sp),hl			;; l = color
+	ld	a,l			;; a = color
+	ld	hl,Color_SMC_1 \.r
+	ld	c,(hl)			;; c = old color
+	ld	(hl),a			; store all the new color values
 	ld	(Color_SMC_2),a \.r
 	ld	(Color_SMC_3),a \.r
-	ld	(Color_SMC_4),a \.r         ; store all the new color values
-	ld	(Color_SMC_5),a \.r         ; store all the new color values
-	ld	a,d                         ; return previous color index
-	ret
+	ld	(Color_SMC_4),a \.r
+	ld	(Color_SMC_5),a \.r
+_SetColor_Ret:
+	ld	a,c			; a = old color
+	ex	de,hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 _SetTransparentColor:
@@ -296,19 +296,16 @@ _SetTransparentColor:
 ;  arg0 : Transparent color index
 ; Returns:
 ;  Previous transparent color index
-	pop	hl
-	pop	de
-	push	de                          ; e = new transparent color value
-	push	hl
-	ld	hl,TColor_SMC_1 \.r         ; load the address of the current transparent color
-	ld	d,(hl)                      ; d = old color
-	ld	a,e
-	ld	(hl),a
+	pop	de			;; de = return vetor
+	ex	(sp),hl			;; l = color
+	ld	a,l			;; a = color
+	ld	hl,TColor_SMC_1 \.r
+	ld	c,(hl)			;; c = old color
+	ld	(hl),a			; store all the new color values
 	ld	(TColor_SMC_2),a \.r
-	ld	(TColor_SMC_3),a \.r        ; store all the new transparent colors
-	ld	(TColor_SMC_4),a \.r        ; store all the new transparent colors
-	ld	a,d                         ; return previous transparent color index
-	ret
+	ld	(TColor_SMC_3),a \.r
+	ld	(TColor_SMC_4),a \.r
+	jr	_SetColor_Ret
 
 ;-------------------------------------------------------------------------------
 _Begin:
@@ -4536,4 +4533,3 @@ tmpCharData:
 	.db 0,0,0,0,0,0,0,0
 	
  .endLibrary
-
