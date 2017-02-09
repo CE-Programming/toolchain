@@ -2362,6 +2362,9 @@ _:	ld	(DrawTile_SMC),hl \.r
 	or	a,a
 	jr	nz,_height_is_pow2
 	call	__idvrmu
+	ex	de,hl
+	push	de
+	pop	bc
 	jr	_height_is_not_pow2
 _height_is_pow2:                            ; compute as power of 2 height using shifts
 	ld	b,a
@@ -2373,8 +2376,8 @@ _:	srl	h
 	rr	l
 	djnz	-_
 _height_is_not_pow2:
-	ld	(ix+-4),l                   ; y = y_offset / tilemap->t_tile_height
-	ld	(ix+y_offset),bc            ; y_offset = y_offset % tilemap->t_tile_height;
+	ld	(ix+-4),l                   ; y = y_offset / tilemap->tile_height
+	ld	(ix+y_offset),bc            ; y_offset = y_offset % tilemap->tile_height;
 	
 	ld	c,(iy+t_tile_width)
 	ld	hl,(ix+x_offset)            ; x offset
@@ -2382,6 +2385,9 @@ _height_is_not_pow2:
 	or	a,a
 	jr	nz,_width_is_pow2
 	call	__idvrmu
+	ex	de,hl
+	push	de
+	pop	bc
 	jr	_width_is_not_pow2
 _width_is_pow2:
 	ld	b,a
@@ -2398,7 +2404,7 @@ _width_is_not_pow2:
 	ld	hl,(iy+t_x_loc)
 	or	a,a
 	sbc	hl,bc
-	ld	(x_offset_smc),hl \.r       ; x_offset_smc = tilemap->t_x_loc - x_offset;
+	ld	(x_offset_smc),hl \.r       ; x_offset_smc = tilemap->x_loc - x_offset;
 	
 	or	a,a
 	sbc	hl,hl
@@ -2422,6 +2428,7 @@ x_offset_smc =$+1
 	jr	X_Loop
 
 _x_loop_inner:
+	or	a,a
 	sbc	hl,hl
 	ld	l,(ix+-1)
 	ld	bc,(iy+t_data)              ; iy -> tilemap data
@@ -2490,7 +2497,7 @@ _TilePtr:
 ;  A pointer to an indexed tile in the tilemap (so it can be looked at or changed)
 ; C Function:
 ;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
-;      return &tilemap->map[(x_offset/tilemap->t_tile_width)+((y_offset/tilemap->t_tile_height)*tilemap->width)];
+;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
 	push	ix
 	ld	ix,0
@@ -2499,10 +2506,11 @@ _TilePtr:
 	ld	hl,(ix+x_offset)
 	ld	a,(iy+t_type_width)
 	or	a,a
-	jr	z,+_
+	jr	nz,+_
 	ld	bc,0
 	ld	c,(iy+t_tile_width)
 	call	__idvrmu
+	ex	de,hl
 	jr	_width_no_pow2
 _:	ld	b,a
 _:	srl	h
@@ -2513,10 +2521,13 @@ _width_no_pow2:
 	ld	hl,(ix+y_offset)
 	ld	a,(iy+t_type_height)
 	or	a,a
-	jr	z,+_
+	jr	nz,+_
 	ld	bc,0
 	ld	c,(iy+t_tile_height)
+	push	de
 	call	__idvrmu
+	ex	de,hl
+	pop	de
 	jr	_height_no_pow2
 _:	ld	b,a
 _:	srl	h
