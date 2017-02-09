@@ -2314,10 +2314,10 @@ _Tilemap:
 ;      uint8_t x, x_tile, y_tile, y_next;
 ;      uint8_t x_res = x_offset/tilemap->tile_width;
 ;      uint8_t y = y_offset/tilemap->tile_height;
-;  
+;      
 ;      x_offset = x_offset%tilemap->tile_width;
 ;      y_offset = y_offset%tilemap->tile_height;
-;  	
+;      
 ;      y_draw = tilemap->y_loc-y_offset;
 ;      for(y_tile = 0; y_tile <= tilemap->draw_height; y_tile++) {
 ;          x = x_res;
@@ -2333,6 +2333,19 @@ _Tilemap:
 ;      }
 ;  }
 ;
+t_data        .equ 0
+t_type_width  .equ 10
+t_type_height .equ 11
+t_height      .equ 12
+t_width       .equ 13
+t_tile_height .equ 6
+t_tile_width  .equ 7
+t_draw_height .equ 8
+t_draw_width  .equ 9
+t_x_loc       .equ 15
+
+x_offset      .equ 9
+y_offset      .equ 12
 	ld	hl,_Sprite \.r
 _:	ld	(DrawTile_SMC),hl \.r
 	push	ix
@@ -2341,11 +2354,17 @@ _:	ld	(DrawTile_SMC),hl \.r
 	add	ix,sp
 	lea	hl,ix+-12
 	ld	sp,hl
-	ld	iy,(ix+6)
+	ld	iy,(ix+6)                   ; iy -> tilemap structure
 	
-	ld	b,(iy+11)
-	ld	hl,(ix+12)
-	ld	c,(iy+6)
+	ld	hl,(ix+y_offset)
+	ld	c,(iy+t_tile_height)
+	ld	a,(iy+t_type_height)
+	or	a,a
+	jr	nz,_height_is_pow2
+	call	__idvrmu
+	jr	_height_is_not_pow2
+_height_is_pow2:                            ; compute as power of 2 height using shifts
+	ld	b,a
 	dec	c
 	ld	a,l
 	and	a,c
@@ -2353,12 +2372,19 @@ _:	ld	(DrawTile_SMC),hl \.r
 _:	srl	h
 	rr	l
 	djnz	-_
-	ld	(ix+-4),l                   ; y = y_offset / tilemap->tile_height
-	ld	(ix+12),bc                  ; y_offset = y_offset % tilemap->tile_height;
+_height_is_not_pow2:
+	ld	(ix+-4),l                   ; y = y_offset / tilemap->t_tile_height
+	ld	(ix+y_offset),bc            ; y_offset = y_offset % tilemap->t_tile_height;
 	
-	ld	b,(iy+10)
-	ld	hl,(ix+9)                   ; x offset
-	ld	c,(iy+7)
+	ld	c,(iy+t_tile_width)
+	ld	hl,(ix+x_offset)            ; x offset
+	ld	a,(iy+t_type_width)
+	or	a,a
+	jr	nz,_width_is_pow2
+	call	__idvrmu
+	jr	_width_is_not_pow2
+_width_is_pow2:
+	ld	b,a
 	dec	c
 	ld	a,l
 	and	a,c
@@ -2366,40 +2392,41 @@ _:	srl	h
 _:	srl	h
 	rr	l
 	djnz	-_
+_width_is_not_pow2:
 	ld	a,l
-	ld	(X_Res_SMC),a \.r
-	ld	hl,(iy+15)
+	ld	(x_res_smc),a \.r
+	ld	hl,(iy+t_x_loc)
 	or	a,a
 	sbc	hl,bc
-	ld	(X_Draw_SMC),hl \.r         ; x_draw = tilemap->x_loc-x_offset;
+	ld	(x_offset_smc),hl \.r       ; x_offset_smc = tilemap->t_x_loc - x_offset;
 	
 	or	a,a
 	sbc	hl,hl
 	ld	l,(iy+14)
-	ld	bc,(ix+12)
+	ld	bc,(ix+y_offset)
 	ld	(ix+-3),h
 	sbc	hl,bc
 	ld	(ix+-12),hl
 	jp	Y_Loop \.r
 
-X_Res_SMC =$+3
+x_res_smc =$+3
 n_8:	ld	(ix+-1),0
-	ld	(ix+-2),0
-X_Draw_SMC =$+1
+x_offset_smc =$+1
 	ld	hl,0
 	ld	(ix+-7),hl
-	ld	l,(iy+13)
+	ld	l,(iy+t_width)
 	ld	h,(ix+-4)
 	mlt	hl
-	ld	(Y_Next_SMC),hl \.r
+	ld	(y_next_smc),hl \.r
+	xor	a,a
 	jr	X_Loop
 
-_InLoop_ASM:
+_x_loop_inner:
 	sbc	hl,hl
 	ld	l,(ix+-1)
-	ld	bc,(iy+0)
+	ld	bc,(iy+t_data)              ; iy -> tilemap data
 	add	hl,bc
-Y_Next_SMC =$+1
+y_next_smc =$+1
 	ld	bc,0
 	add	hl,bc
 	ld	a,(hl)
@@ -2417,7 +2444,7 @@ Y_Next_SMC =$+1
 	ld	bc,(hl)
 	push	bc
 DrawTile_SMC =$+1
-	call	0
+	call	0                           ; call sprite drawing routine
 	lea	hl,ix+-12
 	ld	sp,hl
 BlankTile:
@@ -2429,14 +2456,14 @@ BlankTile:
 	add	hl,bc
 	ld	(ix+-7),hl
 	inc	(ix+-1)
-	inc	(ix+-2)
+	ld	a,(ix+-2)
+	inc	a
 
 X_Loop:
-	ld	a,(iy+9)
-	cp	a,(ix+-2)
-	jr	nz,_InLoop_ASM
-	or	a,a
-	sbc	hl,hl
+	ld	(ix+-2),a
+	cp	a,(iy+t_draw_width)
+	jr	nz,_x_loop_inner
+	ld	h,0
 	ld	l,(iy+6)
 	ld	bc,(ix+-12)
 	add	hl,bc
@@ -2445,7 +2472,7 @@ X_Loop:
 	inc	(ix+-3)
 
 Y_Loop:
-	ld	a,(iy+8)
+	ld	a,(iy+t_draw_height)
 	cp	a,(ix+-3)
 	jp	nz,n_8 \.r
 	ld	sp,ix
@@ -2463,27 +2490,43 @@ _TilePtr:
 ;  A pointer to an indexed tile in the tilemap (so it can be looked at or changed)
 ; C Function:
 ;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
-;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
+;      return &tilemap->map[(x_offset/tilemap->t_tile_width)+((y_offset/tilemap->t_tile_height)*tilemap->width)];
 ;  }
 	push	ix
 	ld	ix,0
 	add	ix,sp
 	ld	iy,(ix+6)
-	ld	b,(iy+10)
-	ld	hl,(ix+9)
+	ld	hl,(ix+x_offset)
+	ld	a,(iy+t_type_width)
+	or	a,a
+	jr	z,+_
+	ld	bc,0
+	ld	c,(iy+t_tile_width)
+	call	__idvrmu
+	jr	_width_no_pow2
+_:	ld	b,a
 _:	srl	h
 	rr	l
 	djnz	-_
+_width_no_pow2:
 	ex	de,hl
-	ld	b,(iy+11)
-	ld	hl,(ix+12)
+	ld	hl,(ix+y_offset)
+	ld	a,(iy+t_type_height)
+	or	a,a
+	jr	z,+_
+	ld	bc,0
+	ld	c,(iy+t_tile_height)
+	call	__idvrmu
+	jr	_height_no_pow2
+_:	ld	b,a
 _:	srl	h
 	rr	l
 	djnz	-_
-	ld	h,(iy+13)
+_height_no_pow2:
+	ld	h,(iy+t_width)
 	mlt	hl
 	add	hl,de
-	ld	de,(iy+0)
+	ld	de,(iy+t_data)
 	add	hl,de
 	pop	ix
 	ret
