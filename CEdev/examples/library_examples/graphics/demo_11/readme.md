@@ -1,3 +1,3 @@
-# Demo 10
+# Demo 11
 
-A simple demo showing an upside down string
+Demonstrates rectangle drawing and using gfx_Darken and gfx_Lighten to modify colors in the palette to implement fade effects.
