@@ -129,8 +129,8 @@ typedef struct gfx_tilemap {
     uint8_t tile_width;      /* individual tile width */
     uint8_t draw_height;     /* number of rows to draw in the tilemap */
     uint8_t draw_width;      /* number of cols to draw tilemap */
-    uint8_t type_width;      /* 2^type_width = tile_width */
-    uint8_t type_height;     /* 2^type_height = tile_height */
+    uint8_t type_width;      /* 2^type_width = tile_width (see enum gfx_tilemap_type) */
+    uint8_t type_height;     /* 2^type_height = tile_height (see enum gfx_tilemap_type) */
     uint8_t height;          /* total number of rows in the tilemap */
     uint8_t width;           /* total number of cols in the tilemap */
     uint8_t y_loc;           /* y pixel location to begin drawing at */
@@ -138,7 +138,8 @@ typedef struct gfx_tilemap {
 } gfx_tilemap_t;
 
 typedef enum gfx_tilemap_type {
-    gfx_tile_2_pixel = 1,     /* Set when using 2 pixel tiles */
+    gfx_tile_no_pow2 = 0,     /* Set when using non powers of 2 */
+    gfx_tile_2_pixel,         /* Set when using 2 pixel tiles */
     gfx_tile_4_pixel,         /* Set when using 4 pixel tiles */
     gfx_tile_8_pixel,         /* Set when using 8 pixel tiles */
     gfx_tile_16_pixel,        /* Set when using 16 pixel tiles */
