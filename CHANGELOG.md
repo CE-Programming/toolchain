@@ -8,8 +8,8 @@
   - Add scripts to build/clean libraries and examples easily ([`61d915f`](https://github.com/CE-Programming/toolchain/commit/61d915f) - [MattWaltz](https://github.com/MattWaltz))
   - Move spasm to /bin rather than /lib/src/include ([`61d915f`](https://github.com/CE-Programming/toolchain/commit/61d915f) - [MattWaltz](https://github.com/MattWaltz))
   - Fix graphx demo 11 readme ([`3017951`](https://github.com/CE-Programming/toolchain/commit/3017951) - [Runer112](https://github.com/Runer112))
-  - Add Changelog file ([`0595378`](https://github.com/CE-Programming/toolchain/commit/0595378) - [MattWaltz](https://github.com/MattWaltz))
-  - CR EOL purge ([`15a573e`](https://github.com/CE-Programming/toolchain/commit/15a573e)+[`c19b360`](https://github.com/CE-Programming/toolchain/commit/c19b360) - [Runer112](https://github.com/Runer112)+[Adriweb](https://github.com/Adriweb))
+  - Add Changelog file ([`0595378`](https://github.com/CE-Programming/toolchain/commit/0595378)+[`544e75f`](https://github.com/CE-Programming/toolchain/commit/544e75f) - [MattWaltz](https://github.com/MattWaltz)+[Adriweb](https://github.com/Adriweb))
+  - Restrict LF EOL conversions to text files ([`c19b360`](https://github.com/CE-Programming/toolchain/commit/c19b360) - [Adriweb](https://github.com/Adriweb))
 
 # [v6.95](https://github.com/CE-Programming/toolchain/tree/v6.95) (2017-02-10)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.91...v6.95)
@@ -18,6 +18,7 @@
   - Improve build system and misc. cleanup ([`63ff603`](https://github.com/CE-Programming/toolchain/commit/63ff603)+[`4b3f137`](https://github.com/CE-Programming/toolchain/commit/4b3f137) - [MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112))
   - Modify `cstartup.asm` to disable usb timers and reset them on exit ([`63ff603`](https://github.com/CE-Programming/toolchain/commit/63ff603)+[`03809e5`](https://github.com/CE-Programming/toolchain/commit/03809e5) - [MattWaltz](https://github.com/MattWaltz))
   - Characters `0x01`-`0x1F` are considered printable rather than control ([`de96c7a`](https://github.com/CE-Programming/toolchain/commit/de96c7a) - [Runer112](https://github.com/Runer112))
+  - CR EOL purge ([`15a573e`](https://github.com/CE-Programming/toolchain/commit/15a573e) - [Runer112](https://github.com/Runer112))
   - Minor documentation fixes
 
 ### Libraries
