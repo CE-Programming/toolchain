@@ -11,7 +11,7 @@
   - Add Changelog file ([`0595378`](https://github.com/CE-Programming/toolchain/commit/0595378)+[`544e75f`](https://github.com/CE-Programming/toolchain/commit/544e75f) - [MattWaltz](https://github.com/MattWaltz)+[Adriweb](https://github.com/Adriweb))
   - Restrict LF EOL conversions to text files ([`c19b360`](https://github.com/CE-Programming/toolchain/commit/c19b360) - [Adriweb](https://github.com/Adriweb))
 
-# [v6.95](https://github.com/CE-Programming/toolchain/tree/v6.95) (2017-02-10)
+# [v6.95](https://github.com/CE-Programming/toolchain/releases/tag/v6.95) (2017-02-10)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.91...v6.95)
 
 ### Toolchain
@@ -31,39 +31,39 @@
   - Fix bug with tile index 255
 
 
-# [v6.91](https://github.com/CE-Programming/toolchain/tree/v6.91) (2017-01-20)
+# [v6.91](https://github.com/CE-Programming/toolchain/releases/tag/v6.91) (2017-01-20)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.9...v6.91)
 
-# [v6.9](https://github.com/CE-Programming/toolchain/tree/v6.9) (2016-12-28)
+# [v6.9](https://github.com/CE-Programming/toolchain/releases/tag/v6.9) (2016-12-28)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.8...v6.9)
 
-# [v6.8](https://github.com/CE-Programming/toolchain/tree/v6.8) (2016-12-28)
+# [v6.8](https://github.com/CE-Programming/toolchain/releases/tag/v6.8) (2016-12-28)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.7...v6.8)
 
-# [v6.7](https://github.com/CE-Programming/toolchain/tree/v6.7) (2016-12-21)
+# [v6.7](https://github.com/CE-Programming/toolchain/releases/tag/v6.7) (2016-12-21)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.6...v6.7)
 
-# [v6.6](https://github.com/CE-Programming/toolchain/tree/v6.6) (2016-12-18)
+# [v6.6](https://github.com/CE-Programming/toolchain/releases/tag/v6.6) (2016-12-18)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.5...v6.6)
 
-# [v6.5](https://github.com/CE-Programming/toolchain/tree/v6.5) (2016-12-12)
+# [v6.5](https://github.com/CE-Programming/toolchain/releases/tag/v6.5) (2016-12-12)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.3...v6.5)
 
 **Closed issues:**
 
 - obj dir something something [\#43](https://github.com/CE-Programming/toolchain/issues/43)
 
-# [v6.3](https://github.com/CE-Programming/toolchain/tree/v6.3) (2016-11-24)
+# [v6.3](https://github.com/CE-Programming/toolchain/releases/tag/v6.3) (2016-11-24)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.2...v6.3)
 
 **Fixed bugs:**
 
 - demo2 doesn't compile [\#42](https://github.com/CE-Programming/toolchain/issues/42)
 
-# [v6.2](https://github.com/CE-Programming/toolchain/tree/v6.2) (2016-11-23)
+# [v6.2](https://github.com/CE-Programming/toolchain/releases/tag/v6.2) (2016-11-23)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.1...v6.2)
 
-# [v6.1](https://github.com/CE-Programming/toolchain/tree/v6.1) (2016-11-19)
+# [v6.1](https://github.com/CE-Programming/toolchain/releases/tag/v6.1) (2016-11-19)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.0...v6.1)
 
 **Implemented enhancements:**
@@ -78,7 +78,7 @@
 - optimisation of imuls|imulu \(8,5% faster\) [\#37](https://github.com/CE-Programming/toolchain/pull/37) (Grosged)
 - suggest a faster FillCircle\_NoClip routine [\#34](https://github.com/CE-Programming/toolchain/pull/34) (Grosged)
 
-# [v6.0](https://github.com/CE-Programming/toolchain/tree/v6.0) (2016-10-26)
+# [v6.0](https://github.com/CE-Programming/toolchain/releases/tag/v6.0) (2016-10-26)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.9...v6.0)
 
 **Closed issues:**
@@ -90,19 +90,19 @@
 - \_VertLine\_NoClip improvements [\#30](https://github.com/CE-Programming/toolchain/pull/30) (Grosged)
 - Optimized \_TransparentPlot\_ASM for speed\* [\#28](https://github.com/CE-Programming/toolchain/pull/28) ([Runer112](https://github.com/Runer112))
 
-# [v5.9](https://github.com/CE-Programming/toolchain/tree/v5.9) (2016-10-15)
+# [v5.9](https://github.com/CE-Programming/toolchain/releases/tag/v5.9) (2016-10-15)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/5.8...v5.9)
 
-## [5.8](https://github.com/CE-Programming/toolchain/tree/5.8) (2016-10-04)
+## [5.8](https://github.com/CE-Programming/toolchain/releases/tag/5.8) (2016-10-04)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.7...5.8)
 
-# [v5.7](https://github.com/CE-Programming/toolchain/tree/v5.7) (2016-09-21)
+# [v5.7](https://github.com/CE-Programming/toolchain/releases/tag/v5.7) (2016-09-21)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.6...v5.7)
 
-# [v5.6](https://github.com/CE-Programming/toolchain/tree/v5.6) (2016-09-20)
+# [v5.6](https://github.com/CE-Programming/toolchain/releases/tag/v5.6) (2016-09-20)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.5...v5.6)
 
-# [v5.5](https://github.com/CE-Programming/toolchain/tree/v5.5) (2016-09-10)
+# [v5.5](https://github.com/CE-Programming/toolchain/releases/tag/v5.5) (2016-09-10)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.2...v5.5)
 
 **Fixed bugs:**
@@ -115,49 +115,49 @@
 - Clipping is broken [\#24](https://github.com/CE-Programming/toolchain/issues/24)
 - SEEK\_\* are defined and implemented incorrectly [\#23](https://github.com/CE-Programming/toolchain/issues/23)
 
-# [v5.2](https://github.com/CE-Programming/toolchain/tree/v5.2) (2016-08-25)
+# [v5.2](https://github.com/CE-Programming/toolchain/releases/tag/v5.2) (2016-08-25)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.1...v5.2)
 
-# [v5.1](https://github.com/CE-Programming/toolchain/tree/v5.1) (2016-08-23)
+# [v5.1](https://github.com/CE-Programming/toolchain/releases/tag/v5.1) (2016-08-23)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.0...v5.1)
 
-# [v5.0](https://github.com/CE-Programming/toolchain/tree/v5.0) (2016-08-23)
+# [v5.0](https://github.com/CE-Programming/toolchain/releases/tag/v5.0) (2016-08-23)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v4.6...v5.0)
 
-# [v4.6](https://github.com/CE-Programming/toolchain/tree/v4.6) (2016-05-26)
+# [v4.6](https://github.com/CE-Programming/toolchain/releases/tag/v4.6) (2016-05-26)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v4.5...v4.6)
 
-# [v4.5](https://github.com/CE-Programming/toolchain/tree/v4.5) (2016-05-24)
+# [v4.5](https://github.com/CE-Programming/toolchain/releases/tag/v4.5) (2016-05-24)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v4.0...v4.5)
 
-# [v4.0](https://github.com/CE-Programming/toolchain/tree/v4.0) (2016-05-19)
+# [v4.0](https://github.com/CE-Programming/toolchain/releases/tag/v4.0) (2016-05-19)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v4.4...v4.0)
 
-# [v4.4](https://github.com/CE-Programming/toolchain/tree/v4.4) (2016-05-19)
+# [v4.4](https://github.com/CE-Programming/toolchain/releases/tag/v4.4) (2016-05-19)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v4.2...v4.4)
 
-# [v4.2](https://github.com/CE-Programming/toolchain/tree/v4.2) (2016-05-19)
+# [v4.2](https://github.com/CE-Programming/toolchain/releases/tag/v4.2) (2016-05-19)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v3.4...v4.2)
 
-# [v3.4](https://github.com/CE-Programming/toolchain/tree/v3.4) (2016-04-04)
+# [v3.4](https://github.com/CE-Programming/toolchain/releases/tag/v3.4) (2016-04-04)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v3.3...v3.4)
 
-# [v3.3](https://github.com/CE-Programming/toolchain/tree/v3.3) (2016-04-04)
+# [v3.3](https://github.com/CE-Programming/toolchain/releases/tag/v3.3) (2016-04-04)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v3.2...v3.3)
 
-# [v3.2](https://github.com/CE-Programming/toolchain/tree/v3.2) (2016-04-03)
+# [v3.2](https://github.com/CE-Programming/toolchain/releases/tag/v3.2) (2016-04-03)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v3.1...v3.2)
 
-# [v3.1](https://github.com/CE-Programming/toolchain/tree/v3.1) (2016-03-21)
+# [v3.1](https://github.com/CE-Programming/toolchain/releases/tag/v3.1) (2016-03-21)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v3.0...v3.1)
 
-# [v3.0](https://github.com/CE-Programming/toolchain/tree/v3.0) (2016-03-21)
+# [v3.0](https://github.com/CE-Programming/toolchain/releases/tag/v3.0) (2016-03-21)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v2.2...v3.0)
 
-# [v2.2](https://github.com/CE-Programming/toolchain/tree/v2.2) (2016-03-20)
+# [v2.2](https://github.com/CE-Programming/toolchain/releases/tag/v2.2) (2016-03-20)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v2.1...v2.2)
 
-# [v2.1](https://github.com/CE-Programming/toolchain/tree/v2.1) (2016-03-18)
+# [v2.1](https://github.com/CE-Programming/toolchain/releases/tag/v2.1) (2016-03-18)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v2.0...v2.1)
 
 **Implemented enhancements:**
@@ -173,7 +173,7 @@
 
 - tice.h does not include string.h [\#21](https://github.com/CE-Programming/toolchain/issues/21)
 
-# [v2.0](https://github.com/CE-Programming/toolchain/tree/v2.0) (2016-03-06)
+# [v2.0](https://github.com/CE-Programming/toolchain/releases/tag/v2.0) (2016-03-06)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v1.7...v2.0)
 
 **Implemented enhancements:**
@@ -185,7 +185,7 @@
 - executing makefile twice in succession outputs 8xp even if linking fails [\#7](https://github.com/CE-Programming/toolchain/issues/7)
 - Makefile incorrectly escaped with wine 1.9.2 under Ubuntu 14.04 [\#6](https://github.com/CE-Programming/toolchain/issues/6)
 
-# [v1.7](https://github.com/CE-Programming/toolchain/tree/v1.7) (2016-02-11)
+# [v1.7](https://github.com/CE-Programming/toolchain/releases/tag/v1.7) (2016-02-11)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v1.6...v1.7)
 
 **Implemented enhancements:**
@@ -203,14 +203,14 @@
 - \<debug.h\> should respect the NDEBUG flag used by \<assert.h\> [\#12](https://github.com/CE-Programming/toolchain/issues/12)
 - abort\(\) should not be redefined in \<debug.h\> [\#11](https://github.com/CE-Programming/toolchain/issues/11)
 
-# [v1.6](https://github.com/CE-Programming/toolchain/tree/v1.6) (2016-02-06)
+# [v1.6](https://github.com/CE-Programming/toolchain/releases/tag/v1.6) (2016-02-06)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v1.5...v1.6)
 
 **Closed issues:**
 
 - dbg\_printf should not take a buffer argument. [\#13](https://github.com/CE-Programming/toolchain/issues/13)
 
-# [v1.5](https://github.com/CE-Programming/toolchain/tree/v1.5) (2016-02-06)
+# [v1.5](https://github.com/CE-Programming/toolchain/releases/tag/v1.5) (2016-02-06)
 **Implemented enhancements:**
 
 - Increase subdirectory portability [\#9](https://github.com/CE-Programming/toolchain/pull/9) ([elfprince13](https://github.com/elfprince13))
