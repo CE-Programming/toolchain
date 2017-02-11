@@ -91,10 +91,10 @@
 - Optimized \_TransparentPlot\_ASM for speed\* [\#28](https://github.com/CE-Programming/toolchain/pull/28) ([Runer112](https://github.com/Runer112))
 
 # [v5.9](https://github.com/CE-Programming/toolchain/releases/tag/v5.9) (2016-10-15)
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/5.8...v5.9)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.8...v5.9)
 
-## [5.8](https://github.com/CE-Programming/toolchain/releases/tag/5.8) (2016-10-04)
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.7...5.8)
+# v5.8 (2016-10-04)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.7...v5.8)
 
 # [v5.7](https://github.com/CE-Programming/toolchain/releases/tag/v5.7) (2016-09-21)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v5.6...v5.7)
