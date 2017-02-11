@@ -5,7 +5,7 @@
 
 set LIB_NAME=FILEIOC
 set LIB_SRC=fileio_lib.asm
-set SPASM_EXE=%CEDEV%\lib\src\include\spasm.exe
+set SPASM_EXE=%CEDEV%\bin\spasm.exe
 
 echo Assembling Library...
 mkdir lib
