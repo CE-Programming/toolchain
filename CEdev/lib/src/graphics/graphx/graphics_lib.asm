@@ -2551,21 +2551,20 @@ _TilePtrMapped:
 ;  arg2 : Y Map Offset
 ; Returns:
 ;  A pointer to the indexed tile in the tilemap (so it can be looked at or changed)
-	push	ix
-	ld	ix,0                        ; setup frame
-	add	ix,sp
-	ld	iy,(ix+6)                   ; tilemap struct pointer
-	ld	h,(ix+12)                   ; y offset
-	ld	l,(iy+13)                   ; height
+	pop	de			; return vector
+	pop	iy			; tilemap struct
+	pop	bc			; x offset
+	ex	(sp),hl			; y offset
+	push	bc
+	push	bc
+	ld	h,(iy+13)		; tilemap width
 	mlt	hl
-	ex	de,hl
-	sbc	hl,hl
-	ld	l,(ix+9)                    ; x offset
-	ld	bc,(iy+0)                   ; pointer to map
-	add	hl,de
+	ld	b,0
+	add.s	hl,bc
+	ld	bc,(iy+0)		; tilemap data
 	add	hl,bc
-	pop	ix                          ; end frame
-	ret
+	ex	de,hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 _GetTextX:
