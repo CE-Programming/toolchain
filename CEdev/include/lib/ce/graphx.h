@@ -313,7 +313,6 @@ void gfx_SwapDraw(void);
 void gfx_Blit(uint8_t buffer);
 void gfx_BlitLines(uint8_t buffer, uint8_t y_loc, uint8_t num_lines);
 void gfx_BlitRectangle(uint8_t buffer, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
-void gfx_BlitCircle(uint8_t buffer, uint24_t x, uint8_t y, uint8_t radius);
 #define gfx_BlitScreen() gfx_Blit(gfx_screen)
 #define gfx_BlitBuffer() gfx_Blit(gfx_buffer)
 
