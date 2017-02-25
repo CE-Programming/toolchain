@@ -12,33 +12,44 @@
     "delay|300",
     "hash|1",
     "key|enter",
+    "delay|150",
     "hash|2",
     "key|enter",
+    "delay|150",
     "hash|3",
     "key|enter",
+    "delay|150",
+    "hash|4",
+    "key|enter",
     "delay|300",
-    "hash|4"
+    "hash|5"
   ],
   "hashes": {
     "1": {
-      "description": "The initial empty shapes will be drawn",
+      "description": "The empty and filled blue circles are drawn correctly",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "C8E3ED16" ]
+      "expected_CRCs": [ "717D4A38" ]
     },
     "2": {
-      "description": "The shapes will now be drawn filled",
+      "description": "The yellow rectangle, red circle, and blue triangle are drawn correctly",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "72560CA7" ]
+    },
+    "3": {
+      "description": "Filled yellow rectangle, red circle, and blue triangle are drawn correctly",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "840C9EDD" ]
     },
-    "3": {
-      "description": "The screen will be shifted down a bit, twice",
+    "4": {
+      "description": "The screen is shifted down a bit, twice",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "BB71AB35" ]
     },
-    "4": {
+    "5": {
       "description": "Back to the home screen (exit check)",
       "start": "vram_start",
       "size": "vram_16_size",
