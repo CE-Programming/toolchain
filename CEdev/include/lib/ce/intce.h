@@ -43,11 +43,13 @@
 
 /**
  * Initizalize to use custom interrupts
+ * Saves status of current interrupt state
  */
 void int_Initialize(void);
 
 /**
  * Resets interrupts back to the OS expected values
+ * Must have called int_Initialize before using
  */
 void int_Reset(void);
 
@@ -61,6 +63,11 @@ void int_SetVector(uint8_t ivect, void (*handler)(void));
  */
 #define int_Enable()    asm("ei")
 #define int_Disable()   asm("di")
+
+/**
+ * Blocking wait for interrupt to trigger
+ */
+#define int_Wait()      asm("halt")
 
 /**
  * Interrupt sources

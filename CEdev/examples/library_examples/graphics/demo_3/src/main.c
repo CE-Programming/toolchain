@@ -17,7 +17,9 @@
 
 /* Put all your code here */
 void main(void) {
-
+    uint8_t y;
+    uint24_t i;
+    
     /* Triangle coordinates */
     int verts[6] = { 
             160,  1,  /* (x0, y0) */
@@ -29,6 +31,31 @@ void main(void) {
     gfx_Begin( gfx_8bpp );
 
     /* Draw a yellow rectangle outline */
+    gfx_SetColor( gfx_blue );
+    
+    /* Draw some circles to make sure they all look the same */
+    y = 40;
+    for (i = 2; i < 13; i++) {
+        y += i;
+        gfx_FillCircle_NoClip(30, y, i);
+        y = y + i + 3;
+    }
+    y = 40;
+    for (i = 2; i < 13; i++) {
+        y += i;
+        gfx_FillCircle(70, y, i);
+        y = y + i + 3;
+    }
+    y = 40;
+    for (i = 2; i < 13; i++) {
+        y += i;
+        gfx_Circle(110, y, i);
+        y = y + i + 3;
+    }
+    
+    /* Wait for any key */
+    while(!os_GetCSC());
+    
     gfx_SetColor( gfx_yellow );
     gfx_Rectangle( 0, 0, 320, 240 );
     

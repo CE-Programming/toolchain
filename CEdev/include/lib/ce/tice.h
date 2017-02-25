@@ -223,7 +223,7 @@ void boot_NewLine(void);
 uint8_t boot_GetBatteryStatus(void);
 
 /**
- * Waits for 10 ms
+ * Waits for ~10 ms
  */
 void boot_WaitShort(void);
 

@@ -62,7 +62,7 @@
  .function "gfx_TransparentTilemap_NoClip",_TransparentTilemap_NoClip
  .function "gfx_TilePtr",_TilePtr
  .function "gfx_TilePtrMapped",_TilePtrMapped
- .function "gfx_LZDecompress",_LZDecompress
+ .function "gfx_Reserved",_Reserved
  .function "gfx_AllocSprite",_AllocSprite
  .function "gfx_Sprite",_Sprite
  .function "gfx_TransparentSprite",_TransparentSprite
@@ -174,29 +174,26 @@ _Lighten:
 ;  arg1 : 8 bit change amount
 ; Returns:
 ;  16 bit color value
-
-; Read params
-	pop	de			;; de = return vector
-	pop	bc			;; bc = color
-	ex	(sp),hl			;; l = amt
+	pop	de                          ; de = return vector
+	pop	bc                          ; bc = color
+	ex	(sp),hl                     ; l = amt
 	push	bc
 	push	de
-; Strategy: lighten(color, amt) = ~darken(~color, amt)
-; Darken the inverted color
+                                            ; Strategy: lighten(color, amt) = ~darken(~color, amt)
+                                            ; Darken the inverted color
 	ld	a,c
 	cpl
 	ld	c,a
 	ld	a,b
 	cpl
-	ld	b,a			;; bc = ~color
-	call	_Darken_ASM \.r		;; hl = darken(~color, amt)
-; Invert the darken result for the lighten result
-	ld	a,l
+	ld	b,a                         ; bc = ~color
+	call	_Darken_ASM \.r	            ; hl = darken(~color, amt)
+	ld	a,l                         ; Invert the darken result for the lighten result
 	cpl
 	ld	l,a
 	ld	a,h
 	cpl
-	ld	h,a			;; hl = ~darken(~color, amt) = lighten(color, amt)
+	ld	h,a                         ; hl = ~darken(~color, amt) = lighten(color, amt)
 	ret
 	
 ;-------------------------------------------------------------------------------
@@ -209,62 +206,61 @@ _Darken:
 ;  16 bit color value
 
 ; Read params
-	pop	de			;; de = return vector
-	pop	bc			;; bc = color
-	ex	(sp),hl			;; l = amt
+	pop	de                          ; de = return vector
+	pop	bc                          ; bc = color
+	ex	(sp),hl                     ; l = amt
 	push	bc
-	push	de
-; Comments assume 1555 RGB color
+	push	de                          ; Comments assume 1555 RGB color
 _Darken_ASM:
-; Calculate the output blue value
+                                            ; Calculate the output blue value
 	push	bc
-	ld	a,c			;; a = color & $FF
-	ld	c,l			;; c = amt
+	ld	a,c                         ; a = color & $FF
+	ld	c,l                         ; c = amt
 	and	a,%00011111
-	ld	h,a			;; h = blue
-	mlt	hl			;; hl = blue * amt
-	ld	de,128			;; de = 128
-	add	hl,de			;; hl = blue * amt + 128
+	ld	h,a                         ; h = blue
+	mlt	hl                          ; hl = blue * amt
+	ld	de,128                      ; de = 128
+	add	hl,de                       ; hl = blue * amt + 128
 	ld	l,h
-	ld	h,d			;; hl = (blue * amt + 128) / 256 = blue_out
-	ex	(sp),hl			;; hl = color, tmp1 = blue_out
-; Isolate the input red value
-	ld	a,h			;; a = color >> 8
-	rra				;; a = color >> 9
+	ld	h,d                         ; hl = (blue * amt + 128) / 256 = blue_out
+	ex	(sp),hl                     ; hl = color, tmp1 = blue_out
+                                            ; Isolate the input red value
+	ld	a,h                         ; a = color >> 8
+	rra                                 ; a = color >> 9
 	and	a,%00111110
-	ld	b,a			;; b = red << 1
-; Calculate the output green value
+	ld	b,a                         ; b = red << 1
+                                            ; Calculate the output green value
 	add.s	hl,hl
-	rla				;; a & 1 = green & 1
+	rla                                 ; a & 1 = green & 1
 	add	hl,hl
-	add	hl,hl			;; hl = color << 3
+	add	hl,hl                       ; hl = color << 3
 	rra
 	ld	a,h
 	rla
 	and	a,%00111111
-	ld	h,a			;; h = green
-	ld	l,c			;; l = amt
-	mlt	hl			;; hl = green * amt
-	add	hl,de			;; hl = green * amt + 128
-	ld	l,h			;; l = (green * amt + 128) / 256 = green_out
-; Calculate the output red value
-	mlt	bc			;; bc = red * amt << 1
-	inc	b			;; b = (red * amt + 128 << 1) / 256
-	srl	b			;; b = (red * amt + 128) / 256 = red_out
-; Position the output red and green bits
+	ld	h,a                         ; h = green
+	ld	l,c                         ; l = amt
+	mlt	hl                          ; hl = green * amt
+	add	hl,de                       ; hl = green * amt + 128
+	ld	l,h                         ; l = (green * amt + 128) / 256 = green_out
+                                            ; Calculate the output red value
+	mlt	bc                          ; bc = red * amt << 1
+	inc	b                           ; b = (red * amt + 128 << 1) / 256
+	srl	b                           ; b = (red * amt + 128) / 256 = red_out
+                                            ; Position the output red and green bits
 	add	hl,hl
-	add	hl,hl			;; l = green_out << 2
-	ld	h,b			;; h = red_out
+	add	hl,hl                       ; l = green_out << 2
+	ld	h,b                         ; h = red_out
 	add	hl,hl
-	add	hl,hl			;; hl = (red_out << 10) | (green_out << 4)
+	add	hl,hl                       ; hl = (red_out << 10) | (green_out << 4)
 	bit	4,l
-	jr	z,_
+	jr	z,+_
 	set	7,h
 	res	4,l
-_					;; hl = (green_out & 1 << 15) | (red_out << 10) | (green_out >> 1 << 5)
-; Add the output blue value (no positioning necessary) for the final output color
-	pop	bc			;; bc = blue_out
-	add	hl,bc			;; hl = color_out
+_:                                          ; hl = (green_out & 1 << 15) | (red_out << 10) | (green_out >> 1 << 5)
+                                            ; Add the output blue value (no positioning necessary) for the final output color
+	pop	bc                          ; bc = blue_out
+	add	hl,bc                       ; hl = color_out
 	ret
 	
 ;-------------------------------------------------------------------------------
@@ -274,18 +270,18 @@ _SetColor:
 ;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
-	pop	de			;; de = return vetor
-	ex	(sp),hl			;; l = color
-	ld	a,l			;; a = color
+	pop	de                          ; de = return vetor
+	ex	(sp),hl                     ; l = color
+	ld	a,l                         ; a = color
 	ld	hl,Color_SMC_1 \.r
-	ld	c,(hl)			;; c = old color
-	ld	(hl),a			; store all the new color values
+	ld	c,(hl)                      ; c = old color
+	ld	(hl),a                      ; store all the new color values
 	ld	(Color_SMC_2),a \.r
 	ld	(Color_SMC_3),a \.r
 	ld	(Color_SMC_4),a \.r
 	ld	(Color_SMC_5),a \.r
 _SetColor_Ret:
-	ld	a,c			; a = old color
+	ld	a,c                         ; a = old color
 	ex	de,hl
 	jp	(hl)
 
@@ -296,12 +292,12 @@ _SetTransparentColor:
 ;  arg0 : Transparent color index
 ; Returns:
 ;  Previous transparent color index
-	pop	de			;; de = return vetor
-	ex	(sp),hl			;; l = color
-	ld	a,l			;; a = color
+	pop	de                          ; de = return vetor
+	ex	(sp),hl                     ; l = color
+	ld	a,l                         ; a = color
 	ld	hl,TColor_SMC_1 \.r
-	ld	c,(hl)			;; c = old color
-	ld	(hl),a			; store all the new color values
+	ld	c,(hl)                      ; c = old color
+	ld	(hl),a                      ; store all the new color values
 	ld	(TColor_SMC_2),a \.r
 	ld	(TColor_SMC_3),a \.r
 	ld	(TColor_SMC_4),a \.r
@@ -963,9 +959,7 @@ l__2:	jp	po,l_3 \.r
 l__3:	ld	hl,(iy+-3)
 	add	hl,hl
 	inc	hl
-	ld	bc,(iy+-9)
 	add	hl,bc
-	ld	(iy+-9),hl
 	jr	l_4
 l_3:	ld	bc,(iy+-6)
 	dec	bc
@@ -977,8 +971,8 @@ l_3:	ld	bc,(iy+-6)
 	add	hl,hl
 	inc	hl
 	add	hl,de
-	ld	(iy+-9),hl
-l_4:	ld	bc,(iy+-3)
+l_4:	ld	(iy+-9),hl
+	ld	bc,(iy+-3)
 	ld	hl,(iy+-6)
 	or	a,a
 	sbc	hl,bc
@@ -1009,11 +1003,12 @@ _FillCircle:
 	ld	(ix+-6),bc
 	inc	hl
 	sbc	hl,bc
-	ld	(ix+-9),hl
 	jp	b_4 \.r
 _FillCircleSectors:
 	ld	hl,(ix+-3)
 	add	hl,hl
+	inc	hl
+	ld	(FCircleX0_SMC),hl \.r
 	push	hl
 	ld	bc,(ix+-6)
 	ld	hl,(ix+9)
@@ -1023,28 +1018,25 @@ _FillCircleSectors:
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
+	ld	(FCircleX1_SMC),hl \.r
 	push	hl
 	call	_HorizLine \.r
-	lea	hl,ix+-9
-	ld	sp,hl
-	ld	hl,(ix+-3)
-	add	hl,hl
+FCircleX0_SMC: =$+1
+	ld	hl,0
 	push	hl
 	ld	bc,(ix+-6)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,bc
 	push	hl
-	ld	bc,(ix+-3)
-	ld	hl,(ix+6)
-	or	a,a
-	sbc	hl,bc
+FCircleX1_SMC: =$+1
+	ld	hl,0
 	push	hl
 	call	_HorizLine \.r
-	lea	hl,ix+-9
-	ld	sp,hl
 	ld	hl,(ix+-6)
 	add	hl,hl
+	inc	hl
+	ld	(FCircleX2_SMC),hl \.r
 	push	hl
 	ld	bc,(ix+-3)
 	ld	hl,(ix+9)
@@ -1054,22 +1046,19 @@ _FillCircleSectors:
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
+	ld	(FCircleX3_SMC),hl \.r
 	push	hl
 	call	_HorizLine \.r
-	lea	hl,ix+-9
-	ld	sp,hl
-	ld	hl,(ix+-6)
-	add	hl,hl
+FCircleX2_SMC: =$+1
+	ld	hl,0
 	push	hl
 	ld	bc,(ix+-3)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,bc
 	push	hl
-	ld	bc,(ix+-6)
-	ld	hl,(ix+6)
-	or	a,a
-	sbc	hl,bc
+FCircleX3_SMC: =$+1
+	ld	hl,0
 	push	hl
 	call	_HorizLine \.r
 	lea	hl,ix+-9
@@ -1088,9 +1077,7 @@ b__2:	jp	po,b_3 \.r
 b__3:	ld	hl,(ix+-3)
 	add	hl,hl
 	inc	hl
-	ld	bc,(ix+-9)
 	add	hl,bc
-	ld	(ix+-9),hl
 	jr	b_4
 b_3:	ld	bc,(ix+-6)
 	dec	bc
@@ -1102,8 +1089,8 @@ b_3:	ld	bc,(ix+-6)
 	add	hl,hl
 	inc	hl
 	add	hl,de
-	ld	(ix+-9),hl
-b_4:	ld	bc,(ix+-3)
+b_4:	ld	(ix+-9),hl
+	ld	bc,(ix+-3)
 	ld	hl,(ix+-6)
 	or	a,a
 	sbc	hl,bc
@@ -1139,13 +1126,13 @@ _FillCircle_NoClip:
 	mlt 	de
 	add	hl,de
 	add	hl,de
-	ld 	de,(iy+3)                    ; x coordinate (circle center pos)
+	ld 	de,(iy+3)                   ; x coordinate (circle center pos)
 	add	hl,de
 	ld 	(FCircleCenterPos_SMC),hl \.r
 	sbc 	hl,bc
 	ld 	(FCircleLdirpos_SMC),hl \.r
 	ex 	de,hl                       ; de = x coordinate - radius
-	ld 	hl,Color_SMC_1 \.r               ; hl = color of circle
+	ld 	hl,Color_SMC_1 \.r          ; hl = color of circle
 	push	de
 	ldi
 	pop	hl
@@ -3648,122 +3635,8 @@ LineType1_SMC =$-3
 	ret
 
 ;-------------------------------------------------------------------------------
-_LZDecompress:
-; Decompresses in lz77 format the input data into the output buffer
-; Arguments:
-;  arg0 : Pointer to Input Buffer
-;  arg1 : Pointer to Output Buffer
-;  arg2 : Input Buffer Size
-; Returns:
-;  None
-	push	ix
-	ld	ix,0
-	lea	bc,ix+1
-	add	ix,sp
-	lea	hl,ix+-20
-	ld	sp,hl
-	ld	hl,(ix+12)
-	or	a,a
-	sbc	hl,bc
-	jp	c,l_19 \.r
-	ld	hl,(ix+6)
-	ld	a,(hl)
-	ld	(ix+-7),a
-	ld	(ix+-3),bc
-	dec	bc
-	ld	(ix+-6),bc
-l_17:	ld	bc,(ix+-3)
-	ld	hl,(ix+6)
-	add	hl,bc
-	ld	a,(hl)
-	ld	(ix+-8),a
-	ld	bc,(ix+-3)
-	inc	bc
-	ld	(ix+-3),bc
-	ld	a,(ix+-8)
-	cp	a,(ix+-7)
-	jp	nz,l_16 \.r
-	ld	bc,(ix+-3)
-	ld	hl,(ix+6)
-	add	hl,bc
-	ld	(ix+-14),hl
-	ld	a,(hl)
-	or	a,a
-	jr	nz,l_13
-	ld	bc,(ix+-6)
-	ld	hl,(ix+9)
-	add	hl,bc
-	ld	a,(ix+-7)
-	ld	(hl),a
-	ld	bc,(ix+-6)
-	inc	bc
-	ld	(ix+-6),bc
-	ld	bc,(ix+-3)
-	inc	bc
-	ld	(ix+-3),bc
-	jr	l_18
-l_13:	ld	bc,(ix+-14)
-	push	bc
-	pea	ix+-17
-	call	_LZ_ReadVarSize_ASM \.r
-	pop	bc
-	pop	bc
-	ld	bc,(ix+-3)
-	add	hl,bc
-	ld	(ix+-3),hl
-	ld	bc,(ix+6)
-	add	hl,bc
-	push	hl
-	pea	ix+-20
-	call	_LZ_ReadVarSize_ASM \.r
-	pop	bc
-	pop	bc
-	ld	bc,(ix+-3)
-	add	hl,bc
-	ld	(ix+-3),hl
-	or	a,a
-	sbc	hl,hl
-	ld	(ix+-11),hl
-	jr	l_11
-l_9:	ld	bc,(ix+-20)
-	ld	hl,(ix+-6)
-	or	a,a
-	sbc	hl,bc
-	ld	bc,(ix+9)
-	add	hl,bc
-	ex	de,hl
-	ld	hl,(ix+9)
-	ld	bc,(ix+-6)
-	add	hl,bc
-	ld	a,(de)
-	ld	(hl),a
-	ld	bc,(ix+-6)
-	inc	bc
-	ld	(ix+-6),bc
-	ld	bc,(ix+-11)
-	inc	bc
-	ld	(ix+-11),bc
-l_11:	ld	bc,(ix+-17)
-	ld	hl,(ix+-11)
-	or	a,a
-	sbc	hl,bc
-	jr	c,l_9
-	jr	l_18
-l_16:	ld	bc,(ix+-6)
-	ld	hl,(ix+9)
-	add	hl,bc
-	ld	a,(ix+-8)
-	ld	(hl),a
-	ld	bc,(ix+-6)
-	inc	bc
-	ld	(ix+-6),bc
-l_18:	ld	bc,(ix+12)
-	ld	hl,(ix+-3)
-	or	a,a
-	sbc	hl,bc
-	jp	c,l_17 \.r
-l_19:	ld	sp,ix
-	pop	ix
+_Reserved:
+; Deprecated unused function (available for use)
 	ret
 
 ;-------------------------------------------------------------------------------
