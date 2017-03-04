@@ -698,7 +698,7 @@ _HorizLine_NoClip:
 	ld	iy,0
 	add	iy,sp
 	ld	e,(iy+6)                    ; e = y coordinate
-	ld	bc,(iy+9)                   ; bc = x coordinate
+	ld	bc,(iy+9)                   ; bc = width
 _RectHoriz_ASM:
 	sbc	hl,hl
 	adc	hl,bc
@@ -871,41 +871,43 @@ _Circle:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	lea	hl,iy+-9
+	lea	hl,iy-9
 	ld	sp,hl
-	sbc	hl,sp
-	ld	(iy+-3),hl
 	ld	bc,(iy+9)
-	ld	(iy+-6),bc
-	inc	hl
+	ld	(iy-6),bc
+	sbc	hl,hl
+	ld	(iy-3),hl
+	adc	hl,bc
+	jp	z,_Circle_Exit \.r
+	ld	hl,1
+	or	a,a
 	sbc	hl,bc
-	ld	(iy+-9),hl
 	jp	l_4 \.r
 l_5:	ld	bc,(iy+3)
-	ld	hl,(iy+-6)
+	ld	hl,(iy-6)
 	add	hl,bc
 	push	hl
 	push	hl
 	pop	bc
 	ld	de,(iy+6)
-	ld	hl,(iy+-3)
+	ld	hl,(iy-3)
 	add	hl,de
 	ex	de,hl
 	push	de
 	call	_SetPixel_ASM \.r
 	ld	bc,(iy+6)
-	ld	hl,(iy+-6)
+	ld	hl,(iy-6)
 	add	hl,bc
 	ex	de,hl
 	push	de
 	ld	bc,(iy+3)
-	ld	hl,(iy+-3)
+	ld	hl,(iy-3)
 	add	hl,bc
 	push	hl
 	push	hl
 	pop	bc
 	call	_SetPixel_ASM \.r
-	ld	bc,(iy+-6)
+	ld	bc,(iy-6)
 	ld	hl,(iy+6)
 	or	a,a
 	sbc	hl,bc
@@ -914,7 +916,7 @@ l_5:	ld	bc,(iy+3)
 	push	de
 	call	_SetPixel_ASM \.r
 	pop	de
-	ld	bc,(iy+-3)
+	ld	bc,(iy-3)
 	ld	hl,(iy+3)
 	or	a,a
 	sbc	hl,bc
@@ -926,7 +928,7 @@ l_5:	ld	bc,(iy+3)
 	pop	de
 	call	_SetPixel_ASM \.r
 	pop	de
-	ld	bc,(iy+-6)
+	ld	bc,(iy-6)
 	ld	hl,(iy+3)
 	or	a,a
 	sbc	hl,bc
@@ -934,7 +936,7 @@ l_5:	ld	bc,(iy+3)
 	push	hl
 	pop	bc
 	call	_SetPixel_ASM \.r
-	ld	bc,(iy+-3)
+	ld	bc,(iy-3)
 	ld	hl,(iy+6)
 	or	a,a
 	sbc	hl,bc
@@ -945,10 +947,10 @@ l_5:	ld	bc,(iy+3)
 	pop	de
 	pop	bc
 	call	_SetPixel_ASM \.r
-	ld	bc,(iy+-3)
+	ld	bc,(iy-3)
 	inc	bc
-	ld	(iy+-3),bc
-	ld	bc,(iy+-9)
+	ld	(iy-3),bc
+	ld	bc,(iy-9)
 	or	a,a
 	sbc	hl,hl
 	sbc	hl,bc
@@ -956,30 +958,31 @@ l_5:	ld	bc,(iy+3)
 	jp	pe,l_3 \.r
 	jr	l__3
 l__2:	jp	po,l_3 \.r
-l__3:	ld	hl,(iy+-3)
+l__3:	ld	hl,(iy-3)
 	add	hl,hl
 	inc	hl
 	add	hl,bc
 	jr	l_4
-l_3:	ld	bc,(iy+-6)
+l_3:	ld	bc,(iy-6)
 	dec	bc
-	ld	(iy+-6),bc
-	ld	hl,(iy+-3)
-	ld	de,(iy+-9)
+	ld	(iy-6),bc
+	ld	hl,(iy-3)
 	or	a,a
 	sbc	hl,bc
 	add	hl,hl
 	inc	hl
+	ld	de,(iy-9)
 	add	hl,de
-l_4:	ld	(iy+-9),hl
-	ld	bc,(iy+-3)
-	ld	hl,(iy+-6)
+l_4:	ld	(iy-9),hl
+	ld	bc,(iy-3)
+	ld	hl,(iy-6)
 	or	a,a
 	sbc	hl,bc
 	jp	p,l__4 \.r
 	jp	pe,l_5 \.r
 	jr	+_
 l__4:	jp	po,l_5 \.r
+_Circle_Exit:
 _:	ld	sp,iy
 	ret
 
@@ -997,18 +1000,21 @@ _FillCircle:
 	add	ix,sp
 	lea	hl,ix+-9
 	ld	sp,hl
-	sbc	hl,hl
-	ld	(ix+-3),hl
 	ld	bc,(ix+12)
 	ld	(ix+-6),bc
-	inc	hl
+	sbc	hl,hl
+	ld	(ix-3),hl
+	adc	hl,bc
+	jp	z,_RstStack \.r
+	ld	hl,1
+	or	a,a
 	sbc	hl,bc
 	jp	b_4 \.r
 _FillCircleSectors:
 	ld	hl,(ix+-3)
 	add	hl,hl
 	inc	hl
-	ld	(FCircleX0_SMC),hl \.r
+	ld	(FCircle0_SMC),hl \.r
 	push	hl
 	ld	bc,(ix+-6)
 	ld	hl,(ix+9)
@@ -1018,10 +1024,10 @@ _FillCircleSectors:
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	ld	(FCircleX1_SMC),hl \.r
+	ld	(FCircle1_SMC),hl \.r
 	push	hl
 	call	_HorizLine \.r
-FCircleX0_SMC: =$+1
+FCircle0_SMC: =$+1
 	ld	hl,0
 	push	hl
 	ld	bc,(ix+-6)
@@ -1029,14 +1035,14 @@ FCircleX0_SMC: =$+1
 	or	a,a
 	sbc	hl,bc
 	push	hl
-FCircleX1_SMC: =$+1
+FCircle1_SMC: =$+1
 	ld	hl,0
 	push	hl
 	call	_HorizLine \.r
 	ld	hl,(ix+-6)
 	add	hl,hl
 	inc	hl
-	ld	(FCircleX2_SMC),hl \.r
+	ld	(FCircle2_SMC),hl \.r
 	push	hl
 	ld	bc,(ix+-3)
 	ld	hl,(ix+9)
@@ -1046,10 +1052,10 @@ FCircleX1_SMC: =$+1
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	ld	(FCircleX3_SMC),hl \.r
+	ld	(FCircle3_SMC),hl \.r
 	push	hl
 	call	_HorizLine \.r
-FCircleX2_SMC: =$+1
+FCircle2_SMC: =$+1
 	ld	hl,0
 	push	hl
 	ld	bc,(ix+-3)
@@ -1057,7 +1063,7 @@ FCircleX2_SMC: =$+1
 	or	a,a
 	sbc	hl,bc
 	push	hl
-FCircleX3_SMC: =$+1
+FCircle3_SMC: =$+1
 	ld	hl,0
 	push	hl
 	call	_HorizLine \.r
@@ -1108,92 +1114,115 @@ _:	jp	po,_FillCircleSectors \.r
 _FillCircle_NoClip:
 ; Draws an unclipped circle
 ; Arguments:
-;  arg0 : X coordinate
-;  arg1 : Y coordinate
-;  arg2 : Radius
+;  arg0 : X coordinate   (24b)
+;  arg1 : Y coordinate   (8b)
+;  arg2 : Radius         (8b)
 ; Returns:
 ;  None
-	ld 	iy,0
-	lea	bc,iy+0
-	add	iy,sp
-	ld 	a,(iy+9)                    ; radius
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	lea	hl,ix-9
+	ld	sp,hl
+	ld	bc,(ix+12)
+	ld	(ix-6),bc
+	sbc	hl,hl
+	ld	(ix-3),hl
+	adc	hl,bc
+	jp	z,_RstStack \.r
+	ld	hl,1
 	or	a,a
-	ret	z
-	ld	c,a
-	ld 	hl,(currDrawBuffer)
-	ld 	d,lcdWidth/2
-	ld 	e,(iy+6)                    ; y coordinate (circle center pos)
-	mlt 	de
-	add	hl,de
-	add	hl,de
-	ld 	de,(iy+3)                   ; x coordinate (circle center pos)
-	add	hl,de
-	ld 	(FCircleCenterPos_SMC),hl \.r
-	sbc 	hl,bc
-	ld 	(FCircleLdirpos_SMC),hl \.r
-	ex 	de,hl                       ; de = x coordinate - radius
-	ld 	hl,Color_SMC_1 \.r          ; hl = color of circle
-	push	de
-	ldi
-	pop	hl
-	ret 	po
-	rlc 	c
-	inc	c
-	ldir
-	ld 	(FCircleLddrpos_SMC),hl \.r
-	ld 	b,a
-	inc	a
-	ld 	d,a
-	ld 	e,a
-	mlt 	de
-	ld 	iy,0
-	add	iy,de
-	ld 	c,a
-Fory:	lea	hl,iy+0                     ; kind of For(y,R,1,-1
-	ld 	a,c
-	ld 	d,b
-	ld 	e,b
-	mlt 	de                          ; de = y²
-	sbc 	hl,de
-	ex 	de,hl                       ; de = (R²-y²)
-Forx:	ld 	h,a                         ; kind of For(x,R,y,-1
-	ld 	l,a
-	mlt 	hl                          ; hl = x²
-	sbc 	hl,de                       ; x² < (R² - y²) ?
-	dec	a
-	jr 	nc,Forx                     ; no?   then loop
-	push	bc                          ; yes?  here we go!
-FCircleCenterPos_SMC =$+1
-	ld 	hl,0                        ; hl = 'on-screen' center pos
-	ld 	c,lcdWidth/2
-	mlt 	bc
-	push	bc                          ; bc = 160*y
-	add	hl,bc
-	add	hl,bc
-	ld 	b,0
-	ld 	c,a                         ; bc = x
-	add	hl,bc
-	ex 	de,hl                       ; de = 'on-screen' horizontal drawing beginning address
-FCircleLddrpos_SMC =$+1
-	ld 	hl,0                        ; hl = pointer to color data
-	ld 	b,0
-	inc	a
-	rlca
-	ld 	c,a                         ; bc = drawing length
-	lddr                                ; trace 1st horizontal line (bottom)
-	pop	hl                          ; now, calculate mirrored position...
+	sbc	hl,bc
+	jp	_FillCircleNC_Loop \.r
+_FillCircle_NoClipSectors:
+	ld	hl,(ix+-3)
 	add	hl,hl
-	add	hl,hl                       ; hl = 160*y*4
-	inc	de
-	ex 	de,hl
-	sbc 	hl,de
-	ex 	de,hl                       ; de = 'on-screen' horizontal drawing beginning address
-FCircleLdirpos_SMC =$+1
-	ld 	hl,0                        ; hl = pointer to color data
-	ld 	c,a                         ; bc = drawing length
-	ldir                                ; trace 2nd horizontal line (top)
+	inc	hl
+	ld	(FCircleNC0_SMC),hl \.r
+	push	hl
+	ld	bc,(ix-6)
+	ld	hl,(ix+9)
+	add	hl,bc
+	ld	e,l
+	ld	bc,(ix-3)
+	ld	hl,(ix+6)
+	or	a,a
+	sbc	hl,bc
+	ld	(FCircleNC1_SMC),hl \.r
 	pop	bc
-	djnz 	Fory
+	call	_HorizLine_NoClip_ASM \.r
+FCircleNC0_SMC: =$+1
+	ld	bc,0
+	ld	de,(ix-6)
+	ld	hl,(ix+9)
+	or	a,a
+	sbc	hl,de
+	ld	e,l
+FCircleNC1_SMC: =$+1
+	ld	hl,0
+	call	_HorizLine_NoClip_ASM \.r
+	ld	hl,(ix-6)
+	add	hl,hl
+	inc	hl
+	ld	(FCircleNC3_SMC),hl \.r
+	push	hl
+	ld	bc,(ix-3)
+	ld	hl,(ix+9)
+	add	hl,bc
+	ld	e,l
+	ld	bc,(ix-6)
+	ld	hl,(ix+6)
+	or	a,a
+	sbc	hl,bc
+	ld	(FCircleNC4_SMC),hl \.r
+	pop	bc
+	call	_HorizLine_NoClip_ASM \.r
+FCircleNC3_SMC: =$+1
+	ld	bc,0
+	ld	de,(ix-3)
+	ld	hl,(ix+9)
+	or	a,a
+	sbc	hl,de
+	ld	e,l
+FCircleNC4_SMC: =$+1
+	ld	hl,0
+	call	_HorizLine_NoClip_ASM \.r
+	ld	bc,(ix-3)
+	inc	bc
+	ld	(ix-3),bc
+	ld	bc,(ix-9)
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,bc
+	jp	m,+_ \.r
+	jp	pe,+++_ \.r
+	jr	++_
+_:	jp	po,++_ \.r
+_:	ld	hl,(ix-3)
+	add	hl,hl
+	inc	hl
+	add	hl,bc
+	jr	_FillCircleNC_Loop
+_:	ld	bc,(ix-6)
+	dec	bc
+	ld	(ix-6),bc
+	ld	hl,(ix-3)
+	or	a,a
+	sbc	hl,bc
+	add	hl,hl
+	inc	hl
+	ld	de,(ix-9)
+	add	hl,de
+_FillCircleNC_Loop:
+	ld	(ix-9),hl
+	ld	bc,(ix-3)
+	ld	hl,(ix-6)
+	or	a,a
+	sbc	hl,bc
+	jp	nc,_FillCircle_NoClipSectors \.r
+_RstStack:
+	ld	sp,ix
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------

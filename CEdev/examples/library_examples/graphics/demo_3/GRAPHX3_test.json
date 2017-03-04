@@ -29,25 +29,25 @@
       "description": "The empty and filled blue circles are drawn correctly",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "717D4A38" ]
+      "expected_CRCs": [ "2C41178A" ]
     },
     "2": {
       "description": "The yellow rectangle, red circle, and blue triangle are drawn correctly",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "72560CA7" ]
+      "expected_CRCs": [ "C8E3ED16" ]
     },
     "3": {
       "description": "Filled yellow rectangle, red circle, and blue triangle are drawn correctly",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "840C9EDD" ]
+      "expected_CRCs": [ "D7543DD6" ]
     },
     "4": {
       "description": "The screen is shifted down a bit, twice",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "BB71AB35" ]
+      "expected_CRCs": [ "3624A6E5" ]
     },
     "5": {
       "description": "Back to the home screen (exit check)",

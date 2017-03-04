@@ -36,25 +36,26 @@ void main(void) {
     y = 40;
     for (i = 2; i < 13; i++) {
         y += i;
-        gfx_FillCircle_NoClip(30, y, i);
-        y = y + i + 3;
+        gfx_FillCircle_NoClip(80, y, i);
+        y += i + 3;
     }
     y = 40;
     for (i = 2; i < 13; i++) {
         y += i;
-        gfx_FillCircle(70, y, i);
-        y = y + i + 3;
+        gfx_FillCircle(240, y, i);
+        y += i + 3;
     }
     y = 40;
     for (i = 2; i < 13; i++) {
         y += i;
-        gfx_Circle(110, y, i);
-        y = y + i + 3;
+        gfx_Circle(160, y, i);
+        y += i + 3;
     }
 
     /* Wait for any key */
     while(!os_GetCSC());
 
+    gfx_FillScreen( gfx_white );
     gfx_SetColor( gfx_yellow );
     gfx_Rectangle( 0, 0, 320, 240 );
 
