@@ -1,10 +1,12 @@
-/* Derived from Matt "MateoConLechuga" Waltz and Jacob "jacobly" Young, in addtion to
- * contributors of http://wikiti.brandonw.net/index.php?title=84PCE:OS:Include_File
- * Latest as of Dec 2016
+/**
+ * @file
+ * @authors Matt "MateoConLechuga" Waltz
+ * @authors Jacob "jacobly" Young
+ * @brief Core CE define file
  */
 
-#ifndef TICE_H
-#define TICE_H
+#ifndef H_TICE
+#define H_TICE
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -14,7 +16,9 @@
 /************* HARDWARE AND CUSTOM ROUTINE DEFINITIONS *************/
 
 
-/* Creates a random integer value */
+/**
+ * Creates a random integer value
+ */
 #define randInt(min, max)       ((unsigned)rand() % ((max) - (min) + 1) + (min))
 
 /* RTC define -- useful for srand() */
@@ -120,20 +124,51 @@
 #define lcd_Palette              ((uint16_t*)0xE30200)
 #define lcd_Ram                  ((uint16_t*)0xD40000)
 
-#define LCD_WIDTH                (320)
-#define LCD_HEIGHT               (240)
-#define LCD_SIZE                 (LCD_WIDTH*LCD_HEIGHT*2)
+#define LCD_WIDTH                (320)                            /**< Width of LCD in pixels */
+#define LCD_HEIGHT               (240)                            /**< Height of LCD in pixels */
+#define LCD_SIZE                 (LCD_WIDTH*LCD_HEIGHT*2)         /**< Total number of pixels in LCD */
 
-/* OS varaible type definitions */
+/**
+ * @brief Structure of real varaible type
+ */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
+/**
+ * @brief Structure of complex varaible type
+ */
 typedef struct { real_t real, imag; } cplx_t;
+/**
+ * @brief Structure of list varaible type
+ */
 typedef struct { uint16_t dim; real_t items[1]; } list_t;
+/**
+ * @brief Structure of complex list varaible type
+ */
 typedef struct { uint16_t dim; cplx_t items[1]; } cplx_list_t;
+/**
+ * @brief Structure of matrix varaible type
+ */
 typedef struct { uint8_t cols, rows; real_t items[1]; } matrix_t;
+/**
+ * @brief Structure of string varaible type
+ */
 typedef struct { uint16_t len; char data[1]; } string_t;
+/**
+ * @brief Structure of equation varaible type
+ */
 typedef struct { uint16_t len; char data[1]; } equ_t;
+/**
+ * @brief Structure of miscellaneous varaible type
+ */
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
+/** 
+ * Gets an element from a matrix
+ *
+ * @param matrix Structure of matrix
+ * @param row Row in matrix
+ * @param col Column in matrix
+ * @returns real_t containing element data
+ */
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
 /** 
@@ -143,6 +178,11 @@ void prgm_CleanUp(void);
 
 /**
  * A faster implementation of memset
+ *
+ * @param ptr Pointer to data
+ * @param c Value to set data to
+ * @param num Size of data to set
+ * @returns @p ptr
  */
 void *memset_fast(void *ptr, int c, size_t num);
 
@@ -153,42 +193,62 @@ void *memset_fast(void *ptr, int c, size_t num);
 /**** Date and time functions ****/
 
 /**
+ * Sets the calculator's date
+ * 
  * Performs checks to ensure date is within range
+ * @param day Day to set
+ * @param month Month to set
+ * @param year Year to set
  */
 void boot_SetDate(uint8_t day, uint8_t month, uint24_t year);
 
 /**
- * Gets the current date from the calculator
+ * Gets the calculator's date
+ * 
+ * @param day Pointer to variable to store day
+ * @param month Pointer to variable to store month
+ * @param year Pointer to variable to store year
  */
 void boot_GetDate(uint8_t *day, uint8_t *month, uint24_t *year);
 
 /**
- * Set the time of the calculator
+ * Sets the calculator's time
+ * 
+ * Performs checks to ensure time is within range
+ * @param seconds Seconds to set
+ * @param minutes Minutes to set
+ * @param hours Hours to set
  */
 void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
 
 /**
- * Get the time of the calculator
+ * Gets the calculator's time
+ * 
+ * @param seconds Pointer to variable to store seconds
+ * @param minutes Pointer to variable to store minutes
+ * @param hours Pointer to variable to store hours
  */
 void boot_GetTime(uint8_t *seconds, uint8_t *minutes, uint8_t *hours);
 
 /**
- * Returns true if past noon
+ * Checks if past noon
+ *
+ * @returns True if past noon
  */
 bool boot_IsAfterNoon(void);
 
 /**
- * Returns the Bootcode version major
+ * @returns Bootcode version major
  */
 uint8_t boot_GetBootMajorVer(void);
 
 /**
- * Returns the Bootcode version minor
+ * @returns Bootcode version minor
  */
 uint8_t boot_GetBootMinorVer(void);
 
 /**
- * Returns the Harware version
+ * @returns Hardware version
  */
 uint8_t boot_GetHardwareVer(void);
 
@@ -199,11 +259,15 @@ void boot_ClearVRAM(void);
 
 /**
  * Checks if the [on] key was pressed
+ *
+ * @returns True is returned if [on] key was pressed
  */
 bool boot_CheckOnPressed(void);
 
 /** 
  * Basically a reimplemented form of printf that prints to some debugging device
+ *
+ * @param string String to send to debug device
  */
 void boot_DebugPrintf(const char *string);
 
@@ -218,7 +282,7 @@ void boot_TurnOff(void);
 void boot_NewLine(void);
 
 /**
- * Returns the current battery status
+ * @returns Current battery status
  */
 uint8_t boot_GetBatteryStatus(void);
 
@@ -240,99 +304,183 @@ void os_DisableCursor(void);
 void os_EnableCursor(void);
 
 /**
- * Set/Get the foreground color used to draw text on the graphscreen
+ * Sets the foreground color used to draw text on the graphscreen
+ * @param color 565 BGR color to set text foreground to
  */
 void os_SetDrawFGColor(uint24_t color);
+
+/**
+ * Gets the foreground color used to draw text on the graphscreen
+ * @returns 565 BGR color of text foreground
+ */
 uint24_t os_GetDrawFGColor(void);
 
 /**
- * Set/Get the backgroundground color used to draw text on the graphscreen
- * os_GetDrawBGColor is only useable in OS 5.2 and above; use at your own risk
+ * Sets the background color used to draw text on the graphscreen
+ * @param color 565 BGR color to set text background to
  */
 void os_SetDrawBGColor(uint24_t color);
+
+/**
+ * Gets the background color used to draw text on the graphscreen
+ *
+ * @returns 565 BGR color of text nackground
+ * @warning Only useable in OS 5.2 and above; use at your own risk
+ */
 uint24_t os_GetDrawBGColor(void);
 
 /**
- * Set/Get the cursor posistion used on the homescreen
+ * Set the cursor posistion used on the homescreen
+ *
+ * @param curRow The row aligned offset
+ * @param curCol The column aligned offset
  */
 void os_SetCursorPos(uint8_t curRow, uint8_t curCol);
+
+/**
+ * Gets the cursor posistion used on the homescreen
+ *
+ * @param curRow Pointer to store the row aligned offset
+ * @param curCol Pointer to store the column aligned offset
+ */
 void os_GetCursorPos(unsigned int *curRow, unsigned int *curCol);
 
 /**
- * Selects/Gets the font to use when drawing on the graphscreen
- * 0: small font
+ * Selects the font to use when drawing on the graphscreen
+ *
+ * @param id
+ * 0: small font                                      <br>
  * 1: large monospace font
  */
 void os_FontSelect(char id);
+
+/**
+ * Gets the font to use when drawing on the graphscreen
+ *
+ * @returns
+ * 0: small font                                      <br>
+ * 1: large monospace font
+ */
 uint24_t os_FontGetID(void);
 
 /**
- * Returns the width of a string in the varaible-width format
- * Second function is used to get the height of the characters
+ * @param string String to get pixel width of
+ * @returns The width of a string in the varaible-width format
  */
 uint24_t os_FontGetWidth(const char *string);
+
+/**
+ * @returns The height of the font characters
+ */
 uint24_t os_FontGetHeight(void);
 
 /**
- * Draws a text using the small font to the screen
- * Returns the end column
+ * Draws text using the small font to the screen
+ *
+ * @param string String to draw
+ * @param col Column to start drawing at
+ * @param row Row to start drawing at
+ * @returns The end column
  */
 uint24_t os_FontDrawText(const char *string, uint16_t col, uint8_t row);
+
+/**
+ * Draws transparent text using the small font to the screen
+ *
+ * @param string String to draw
+ * @param col Column to start drawing at
+ * @param row Row to start drawing at
+ * @returns The end column
+ */
 uint24_t os_FontDrawTransText(const char *string, uint16_t col, uint8_t row);
 
 /**
  * Puts some text at the current homescreen cursor location
- * Returns 1 if string fits on screen, 0 otherwise
+ *
+ * @param string Test to put on homescreen
+ * @returns 1 if string fits on screen, 0 otherwise
  */
 uint24_t os_PutStrFull(const char *string);
 
 /**
  * Puts some text at the current homescreen cursor location
- * Returns 1 if string fits on line, 0 otherwise
+ *
+ * @param string Test to put on homescreen
+ * @returns 1 if string fits on line, 0 otherwise
  */
 uint24_t os_PutStrLine(const char *string);
 
 /**
- * Set/Get a particular flag variable
+ * Set a particular flag variable
+ *
+ * @param offset Offset to particular flag in list
+ * @param set Bitmask of flag to set
  */
 void os_SetFlagByte(int offset, uint8_t set);
+
+/**
+ * Get a particular flag variable
+ *
+ * @param offset Offset to particular flag in list
+ * @returns Bitmask of flag
+ */
 uint8_t os_GetFlagByte(int offset);
 
 /**
- * Returns amount of free ram, free set to start of free ram
+ * Get amount of free ram in order to allocate extra ram
+ * 
+ * @param free Set to start of free available ram
+ * @returns Size of available ram
  */
 size_t os_MemChk(void **free);
 
 /**
  * Throws an OS error
+ *
+ * @param error Error code to throw
  */
 void os_ThrowError(uint8_t error);
 
 /**
- * Returns a pointer to the system stats
- * [3]     - Hardware version
- * [12-13] - Boot Version Major
- * [14]    - Boot Version Minor
- * [15-16] - Boot Version Build
- * [28-37] - Calc ID (From certificate if exists)
+ * Gets a pointer to the system stats
+ *
+ * @returns
+ * [3]     - Hardware version                       <br>
+ * [12-13] - Boot Version Major                     <br>
+ * [14]    - Boot Version Minor                     <br>
+ * [15-16] - Boot Version Build                     <br>
+ * [28-37] - Calc ID (From certificate if exists)   <br>
  * [38-39] - Appears to be localization language
  */
 void *os_GetSystemStats(void);
 
 /**
  * Sets up the defualt error handlers if an OS routine encounters an error when running
+ *
+ * @param routine Error handling routine
+ * @see os_PopErrorHandler
  */
 void os_PushErrorHandler(void *routine);
+
+/**
+ * Restores state after a call to os_PushErrorHandler
+ *
+ * @see os_PushErrorHandler
+ */
 void os_PopErrorHandler(void);
 
 /**
- * Returns a pointer to symtable of the OS
+ * @returns A pointer to symtable of the OS
  */
 void *os_GetSymTablePtr(void);
 
 /**
- * Creates an appvar; and returns a pointer to the structure 
- * Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
+ * Creates an AppVar
+ *
+ * @param name Pointer to name of AppVar to create
+ * @param size Size of AppVar to create
+ * @returns A pointer to the AppVar data
+ * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
  */
 var_t *os_CreateAppVar(const char *name, uint16_t size);
 
@@ -342,25 +490,34 @@ var_t *os_CreateAppVar(const char *name, uint16_t size);
 void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, const char *name, void **data);
 
 /**
- * If file exists, returns 1 and sets entry and data, otherwise returns 0.
- * entry and/or data can be NULL if you don't care
+ * Locates a symbol in the symtable
+ *
+ * @param type Type of symbol to find
+ * @param name Pointer to name of symbol to find
+ * @param entry Can be NULL if you don't care
+ * @param data Can be NULL if you don't care
+ * @returns If file exists, returns 1 and sets entry and data, otherwise returns 0.
  */
 int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
 
 /**
- * type is set to the current varaible type in ANS, and a pointer to the data is returned
- * Returns NULL if Ans doesn't exist or type is NULL
+ * Gets the Answer
+ *
+ * @param type This is set to the current varaible type in ANS
+ * @returns Pointer to the data
+ * @note Returns NULL if Ans doesn't exist or type is NULL
  */
 void *os_RclAns(uint8_t *type);
 
 /**
  * Copies a real_t
+ *
+ * @param src Pointer to original real_t
+ * @returns Copied real_t
  */
 real_t os_RealCopy(const real_t *src);
 
-/**
- * Unary operations used to interact with the OS math functions
- */
+/* Unary operations used to interact with the OS math functions */
 real_t os_RealAcosRad(const real_t *arg);
 real_t os_RealAsinRad(const real_t *arg);
 real_t os_RealAtanRad(const real_t *arg);
@@ -380,9 +537,7 @@ real_t os_RealTanRad(const real_t *arg);
 real_t os_RealInt(const real_t *arg);
 cplx_t os_CplxSquare(const cplx_t *arg);
 
-/**
- * Binary operations used to interact with the OS math functions
- */
+/* Binary operations used to interact with the OS math functions */
 real_t os_RealAdd(const real_t *arg1, const real_t *arg2);
 real_t os_RealDiv(const real_t *arg1, const real_t *arg2);
 real_t os_RealGcd(const real_t *arg1, const real_t *arg2);
@@ -396,83 +551,126 @@ real_t os_RealPow(const real_t *base, const real_t *exp);
 real_t os_RealRandInt(const real_t *min, const real_t *max);
 real_t os_RealMod(const real_t *arg1, const real_t *arg2);
 real_t os_RealSub(const real_t *arg1, const real_t *arg2);
+
 /**
- * digits must be in the range 0 - 9
+ * Rounds a real_t
+ * 
+ * @note digits must be in the range 0 - 9
  */
 real_t os_RealRound(const real_t *arg, char digits);
 
 /**
- * Returns -1, 0, or 1 depending on the comparison
+ * Compares two real_t
+ *
+ * @returns -1, 0, or 1 depending on the comparison
  */
 int os_RealCompare(const real_t *arg1, const real_t *arg2);
 
 /**
- * Conversion routines for ti-floats.
- * All saturate on overflow.
+ * Converts a real_t to an integer
+ * @note Saturates on overflow
  */
 int24_t os_RealToInt24(const real_t *arg);
+
+/**
+ * Converts an integer to a real_t
+ * @note Saturates on overflow
+ */
 real_t os_Int24ToReal(int24_t arg);
+
+/**
+ * Converts a real_t to a float
+ * @note Saturates on overflow
+ */
 float os_RealToFloat(const real_t *arg);
+
+/**
+ * Converts an float to a real_t
+ * @note Saturates on overflow
+ */
 real_t os_FloatToReal(float arg);
 
-/** os_RealToStr:
-  *  This converts a ti-float to a ti-ascii string.
-  *  result: zero terminated string copied to this address
-  *  arg: real to convert
-  * maxLength: 
-  *  <=0: use default max length (14)
-  *  >0:  max length of result, minimum of 6
-  * mode:
-  *  0: Use current mode for everything (digits ignored)
-  *  1: Normal mode
-  *  2: Sci mode
-  *  3: Eng mode
-  *  >4: Use current Normal/Sci/Eng mode (digits still used)
-  * digits:
-  *  -1:  Float mode
-  *  0-9: Fix # mode
-  *  returns length of result
-  */
+/** This converts a ti-float to a ti-ascii string.
+ *
+ * @param result Zero terminated string copied to this address
+ * @param arg Real to convert
+ * @param maxLength
+ *  <=0: use default max length (14)                            <br>
+ *  >0:  max length of result, minimum of 6
+ * @param mode:
+ *  0: Use current mode for everything (digits ignored)         <br>
+ *  1: Normal mode                                              <br>
+ *  2: Sci mode                                                 <br>
+ *  3: Eng mode                                                 <br>
+ *  >4: Use current Normal/Sci/Eng mode (digits still used)     <br>
+ * @param digits
+ *  -1:  Float mode                                             <br>
+ *  0-9: Fix # mode                                             <br>
+ * @returns Length of result
+ */
 int os_RealToStr(char *result, const real_t *arg, char maxLength, char mode, char digits);
 
-/** os_StrToReal:
-  *  This converts a ti-ascii string to a ti-float.
-  *  String format regexp: / *[-\032+]?[0-9]*(\.[0-9]*)?([eE\033][-\032+]?[0-9]*)?/
-  *  result: resulting ti-float stored here, on exponent overflow this is +-9.9999999999999e99
-  *  string: ti-ascii string to convert
-  *  end: if non-null, pointer to end of parsed number is stored here
-  *  returns result
-  */
+/**
+ *  This converts a ti-ascii string to a ti-float.
+ * 
+ *  String format regexp: / *[-\032+]?[0-9]*(\.[0-9]*)?([eE\033][-\032+]?[0-9]*)?/
+ *  @param string TI-ascii string to convert
+ *  @param end If non-null, pointer to end of parsed number is stored here
+ *  @returns resulting TI-float; on exponent overflow this is +-9.9999999999999e99
+ */
 real_t os_StrToReal(const char *string, char **end);
 
 /**
  * High 8 is unsigned offset, low 8 is bits to test
- * os_TestFlagBits will return a 0 or 1
  */
 int os_TestFlagBits(uint16_t offset_pattern);
 void os_SetFlagBits(int16_t offset_pattern);
 void os_ResetFlagBits(int16_t offset_pattern);
 
 /**
- * Returns extended key in high byte
+ * Gets a key from the OS
+ * 
+ * @returns Key code
+ * @returns Extended key code in high byte
  */
 uint16_t os_GetKey(void);
 
 /**
  * Performs an OS call to get the keypad scan code
+ *
  * Technically return type is uint24_t, but that is not useful as the high byte is 0
- * Values returned are listed below
+ * @returns Key scan code
  */
-typedef uint8_t sk_key_t;
 sk_key_t os_GetCSC(void);
 
 /**
- * Things you shouldn't use unless you know what you are doing
+ * @brief Scan code type
+ */
+typedef uint8_t sk_key_t;
+
+/**
+ * Runs the calulator at 6 MHz
  */
 void boot_Set6MHzMode(void);
+
+/**
+ * Runs the calulator at 48 MHz
+ */
 void boot_Set48MHzMode(void);
+
+/**
+ * Runs the calulator at 6 MHz (saves interrupt status)
+ */
 void boot_Set6MHzModeI(void);
+
+/**
+ * Runs the calulator at 48 MHz (saves interrupt status)
+ */
 void boot_Set48MHzModeI(void);
+
+/**
+ * Executes the assembly routine _ForceCmdNoChar
+ */
 void os_ForceCmdNoChar(void);
 
 /**
@@ -482,35 +680,65 @@ void os_ForceCmdNoChar(void);
 void _OS(void *function);
 
 /**
- * Assembly functions ( Don't forget to call from _OS() )
+ * Assembly routine to scroll homescreen up
  */
 void asm_MoveUp(void);
+
+/**
+ * Assembly routine to scroll homescreen down
+ */
 void asm_MoveDown(void);
+
+/**
+ * Assembly routine to move row and column posistion to (0,0)
+ */
 void asm_HomeUp(void);
+
+/**
+ * Assembly routine to turn on the Run Indicator
+ */
 void asm_RunIndicOn(void);
+
+/**
+ * Assembly routine to turn off the Run Indicator
+ */
 void asm_RunIndicOff(void);
+
+/**
+ * Assembly routine to turn off APD
+ */
 void asm_DisableAPD(void);
+
+/**
+ * Assembly routine to turn on APD
+ */
 void asm_EnableAPD(void);
+
+/**
+ * Assembly routine check the amount of free archive
+ */
 void asm_ArcChk(void);
 
 /**
- * OS RAM Location defines for direct modification
- */
-#define OS_COLOR_BLUE        10
-#define OS_COLOR_RED         11
-#define OS_COLOR_BLACK       12
-#define OS_COLOR_MAGENTA     13
-#define OS_COLOR_GREEN       14
-#define OS_COLOR_ORANGE      15
-#define OS_COLOR_BROWN       16
-#define OS_COLOR_NAVY        17
-#define OS_COLOR_LTBLUE      18
-#define OS_COLOR_YELLOW      19
-#define OS_COLOR_WHITE       20
-#define OS_COLOR_LTGRAY      21
-#define OS_COLOR_MEDGRAY     22
-#define OS_COLOR_GRAY        23
-#define OS_COLOR_DARKGRAY    24
+ * Colors used by the OS
+*/
+typedef enum {
+    OS_COLOR_BLUE = 10,
+    OS_COLOR_RED,
+    OS_COLOR_BLACK,
+    OS_COLOR_MAGENTA,
+    OS_COLOR_GREEN,
+    OS_COLOR_ORANGE,
+    OS_COLOR_BROWN,
+    OS_COLOR_NAVY,
+    OS_COLOR_LTBLUE,
+    OS_COLOR_YELLOW,
+    OS_COLOR_WHITE,
+    OS_COLOR_LTGRAY,
+    OS_COLOR_MEDGRAY,
+    OS_COLOR_GRAY,
+    OS_COLOR_DARKGRAY
+} os_colors_t;
 
 #define os_RamStart          ((uint8_t*)0xD00000)
 #define os_Flags             ((uint8_t*)0xD00080)
@@ -720,7 +948,7 @@ void asm_ArcChk(void);
 #define os_TmpHours          (*(real_t*)0xD02B1C)
 #define os_TmpMinutes        (*(real_t*)0xD02B25)
 
-/**
+/*
  * ---- TI-OS Token definitions ----
  */
 #define tToDMS              0x01
@@ -815,7 +1043,7 @@ void asm_ArcChk(void);
 #define tZ                  0x5A
 #define tTheta              0x5B
 
-/**
+/*
  * Extended Tokens
  */
 #define tExtTok             0xEF
@@ -897,7 +1125,7 @@ void asm_ArcChk(void);
 #define tVarOut             0x62
 #define tVarSys             0x63
 
-/**
+/*
  * Mode settings tokens
  */
 #define tRad                0x64 // 'Radian'
@@ -1526,7 +1754,7 @@ void asm_ArcChk(void);
 #define tToString           0x97 /* 'toString('  */
 #define tEval               0x98 /* 'eval('      */
 
-/**
+/*
  * --- TIOS System error codes ---
  */
 #define OS_E_EDIT           1<<7
@@ -1583,7 +1811,7 @@ void asm_ArcChk(void);
 #define OS_E_VARIABLE       50+OS_E_EDIT
 #define OS_E_DUPLICATE      51+OS_E_EDIT
 
-/**
+/*
  * --- TI-OS os_GetCSC Scan Code Return Values ---
  */
 #define sk_Down             0x01

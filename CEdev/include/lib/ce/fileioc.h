@@ -1,36 +1,7 @@
 /**
- * FILEIOC CE C Library
- * @version 3
- *
- * @section LICENSE
- *
- * Copyright (c) 2016, Matthew Waltz
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- * * Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.
- * 
- * * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * @section DESCRIPTION
- *
- * This library implements some variable opening and editing routines
+ * @file
+ * @author Matt "MateoConLechuga" Waltz
+ * @brief Implements variable reading and writing routines
  */
 
 #ifndef H_FILEIOC
@@ -42,9 +13,7 @@
 #include <stdio.h>
 #include <tice.h>
 
-/**
- * Varible and flag definitions
- */
+/* Varible and flag definitions */
 #define TI_PRGM_TYPE            (0x05)
 #define TI_PPRGM_TYPE           (0x06)
 #define TI_TPRGM_TYPE           (0x16)
@@ -62,239 +31,309 @@
 #endif
 
 /**
- * Some variable types
+ * @brief Variable slot type
  */
 typedef uint8_t ti_var_t;
 
 /**
  * Closes all open slots
- * Call before you use any varaible functions
+ * @warning Call before you use any variable functions
  */
 void ti_CloseAll(void);
 
 /**
- * Opens a varaible given then name and flags
- * ti_Open opens an AppVar as default file storage
- * ti_OpenVar opens a Program or Protected Program, depending on the type given
- * If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
- * Otherwise it returns the available slot number (1-5)
- * Available modes:
- * "r"  - Opens a file for reading. The file must exist. Keeps file in archive if in archive.                                   (Archive)
- * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 (RAM)
- * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  (RAM)
- * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   (RAM)
- * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                (RAM)
- * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.   (RAM)
- * Unlike the standard implementation of fopen, the "b" (binary) mode is not available because characters are only 8 bits wide on this platform.
- * Type:
- *  Specifies the type of variable to open -- Only useable when it makes sense
+ * Opens a file
+ *
+ * An AppVar is used as default file storage
+ * @param name Name of file to open
+ * @param mode
+ * "r"  - Opens a file for reading. The file must exist. Keeps file in archive if in archive.                                   <br>
+ * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
+ * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
+ * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
+ * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                <br>
+ * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
+ * @returns Slot variable
+ * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
  */
-ti_var_t ti_Open(const char *varname, const char *mode);
+ti_var_t ti_Open(const char *name, const char *mode);
+ 
+/**
+ * Opens a variable
+ *
+ * Can open any type of program or appvar variable
+ * @param varname Name of variable to open
+ * @param mode
+ * "r"  - Opens a file for reading. The file must exist. Keeps file in archive if in archive.                                   <br>
+ * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
+ * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
+ * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
+ * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                <br>
+ * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
+ * @param type Specifies the type of variable to open
+ * @returns Slot variable
+ * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
+ */
 ti_var_t ti_OpenVar(const char *varname, const char *mode, uint8_t type);
 
 /**
  * Frees an open variable slot
- * Returns zero if closing failed
+ * @returns Zero if closing failed
  */
 int ti_Close(const ti_var_t slot);
 
 /**
- * Returns the name of the file(s) that contains the string as the first part of the variable
- * This can then be used with ti_Open and other functions
+ * Returns the name of the file(s) that contains the string as the first part of the variable; 
+ * which can then be used with ti_Open and other functions
+ *
  * seach_pos should be set to NULL to begin a search, and is then updated with each call
  *
- * For example:
+ * @code
  *  uint8_t *search_pos = NULL;
  *  char *var_name;
  *  while((var_name = ti_Detect( &search_pos, "my_data" )) != NULL) {
  *    ...do something with the name or search_pos...
  *  }
- * If the return value is NULL, either the variable wasn't found in the current search span, or there are no more variables to find
- * If detection_string is NULL, return is NULL as well
+ * @endcode
+ * @note If the return value is NULL, either the variable wasn't found in the current search span, or there are no more variables to find
+ * @note If detection_string is NULL, return is NULL as well
  */
 char *ti_Detect(void **curr_search_posistion, const char *detection_string);
 char *ti_DetectVar(void **curr_search_posistion, const char *detection_string, uint8_t var_type);
 
 /**
- * Writes to the current variable pointer given:
- * data:
- *  pointer to data to write
- * size:
- *  size (in bytes) of the data we are writting
- * count:
- *  number of data chunks to write to the variable slot
- * slot:
- *  varaible slot to write the data to
- * Returns the number of chunks written (should be equal to count)
+ * Writes to the current variable slot
+ *
+ * @param data Pointer to data to write
+ * @param size Size (in bytes) of a single data chunk
+ * @param count Number of data chunks to write to the variable slot
+ * @param slot Variable slot to write the data to
+ * @returns The number of chunks written (should be equal to count)
  */
 size_t ti_Write(const void *data, size_t size, size_t count, const ti_var_t slot);
 
 /**
- * Reads from the current variable pointer given:
- * data:
- *  pointer to data to read into
- * size:
- *  size (in bytes) of the data we are reading
- * count:
- *  number of data chunks to read from the variable slot
- * slot:
- *  varaible slot to read from
- * Returns the number of chunks read (should be equal to count)
+ * Reads from the current variable pointer
+ *
+ * @param data Pointer to data to read into
+ * @param size Size (in bytes) of a single data chunk
+ * @param count Number of data chunks to read from the variable slot
+ * @param slot Variable slot to read the data from
+ * @returns The number of chunks read (should be equal to count)
  */
 size_t ti_Read(const void *data, size_t size, size_t count, const ti_var_t slot);
 
 /**
- * Puts a character directly into the slot data pointer, and increments the offset
- * Returns 'EOF' if current offset is larger than file size, or memory isn't large enough
- * c is internally converted to an unsigned char
- * c is returned if no error occurs
- * slot:
- *  varaible slot to put the character to
+ * Writes a character directly into the slot data pointer, and increments the offset
+ *
+ * @param c Character to write
+ * @param slot Variable slot to put the character to
+ * @returns The input c is returned if no error
+ * @returns 'EOF' if current offset is larger than file size, or memory isn't large enough
  */
 int ti_PutC(const char c, const ti_var_t slot);
 
 /**
  * Pulls a character directly from the slot data pointer, and increments the offset
- * Reads 'EOF' if current offset is larger than file size
- * slot:
- *  varaible slot to get the character from
+ *
+ * @param slot Variable slot to get the character from
+ * @returns 1 byte character at the current variable offset
+ * @returns 'EOF' if current offset is larger than file size
  */
 int ti_GetC(const ti_var_t slot);
 
 /**
- * Seeks to an offset from the origin:
- * SEEK_SET (0) - Seek from beginning of file
- * SEEK_CUR (1) - Seek from current offset in file
+ * Seeks to an offset
+ *
+ * @param offset Number of bytes to offest from (can be negative)
+ * @param origin
+ * SEEK_SET (0) - Seek from beginning of file        <br>
+ * SEEK_CUR (1) - Seek from current offset in file   <br>
  * SEEK_END (2) - Seek from end of file
- * slot:
- *  varaible slot seeking in
+ * @param slot Variable slot seeking in
+ * @returns 'EOF' on seek failure
  */
 int ti_Seek(int offset, unsigned int origin, const ti_var_t slot);
 
 /**
  * Seeks to the start of the given variable
+ *
  * Basically an ti_Seek(0, SEEK_SET, slot);
- * slot:
- *  varaible slot seeking in
+ * @param slot Variable slot to rewind
+ * @returns 'EOF' on rewind failure
  */
 int ti_Rewind(const ti_var_t slot);
 
 /**
- * Returns the value of the current cursor offset
+ * Gets the offset in a slot
+ *
+ * @param slot Slot to test
+ * @returns The value of the current slot offset
  */
 uint16_t ti_Tell(const ti_var_t slot);
 
 /**
- * Returns the size of the variable in the slot
+ * Gets the size of a slot
+ *
+ * @param slot Slot to test
+ * @returns The size of the slot variablee
  */
 uint16_t ti_GetSize(const ti_var_t slot);
 
 /**
- * Resizes the file slot
- * The file offset is set to the beginning of the file
+ * Resizes the slot variable
+ *
+ * @param slot Slot to resize
+ * @param new_size New size of slot 
+ * @note The variable offset is set to the beginning of the file
  */
 int ti_Resize(size_t new_size, const ti_var_t slot);
 
 /**
- * Returns zero if the slot is not in the archive
+ * Tests if a slot is in the archive
+ *
+ * @param slot Slot to test
+ * @returns Zero (0) if the slot is not in the archive
  */
 int ti_IsArchived(const ti_var_t slot);
 
 /**
- * Sets the varaible into either the archive or RAM
- * Returns zero if the operation fails if not enough memory or some other error
+ * Sends the variable into either the archive or RAM if needed
+ * 
+ * @param archived
+ * True - Send to Archive                                                <br>
+ * False - Send to RAM
+ * @param slot Slot to send
+ * @returns Zero if the operation fails from not enough memory or another error
  */
 int ti_SetArchiveStatus(bool archived, const ti_var_t slot);
 
 /**
- * ti_Delete    - Deletes an AppVar given the name
- * ti_DeleteVar - Deletes a varaible given the name and type
+ * Deletes an AppVar
+ *
+ * @param name Name of AppVar to delete
+ * @returns 0 if failed
  */
-int ti_Delete(const char *varname);
+int ti_Delete(const char *name);
+
+/**
+ * Deletes a variable given the name and type
+ *
+ * @param varname Name of variable to delete
+ * @param type Type of variable to delete
+ * @returns 0 if failed
+ */
 int ti_DeleteVar(const char *varname, uint8_t type);
 
 /**
  * Gets the string used for displaying a TI token
- * read_pointer is updated to the next token, depending on if it is 1 or 2 bytes in length
- * length_of_token gets the length of the token, used for determining the next read location (Can be NULL if you don't care)
- * length_of_string returns the length of the returned string (Can be NULL if you don't care)
+ *
+ * @param length_of_string Pointer to variable to hold length of resulting string (Can be NULL if you don't care)
+ * @param length_of_token Pointer to varaible to hold length of the token, used for determining the next read location (Can be NULL if you don't care)
+ * @param read_pointer Address of pointer to data to read
+ * @note read_pointer is updated to the next token, depending on if it is 1 or 2 bytes in length
  */
-char *ti_GetTokenString(void **read_pointer, uint8_t *length_of_token, unsigned *length_of_string);
+char *ti_GetTokenString(void **read_pointer, uint8_t *length_of_token, unsigned int *length_of_string);
 
 /**
- * Gets a pointer to the data located at the current posistion in the slot
+ * Gets a pointer to the data located at the current posistion in the slot; 
  * Good way for fast reading of data
+ * @param slot Variable slot to get pointer of
+ * @returns Pointer to variable data
  */
 void *ti_GetDataPtr(const ti_var_t slot);
 
 /**
- * Sets a varaible
- * Returns 0 if success
+ * Sets a variable
+ *
+ * @param name Pointer to name of varaible 
+ * @param data Pointer to data to set
+ * @param var_type Type of varaible to set
+ * @returns 0 if success
  */
 uint8_t ti_SetVar(const ti_var_t var_type, const char *name, void *data);
 
 /**
- * Stores a varaible to another variable
- * Returns 0 if success
+ * Stores a variable to another variable
+ *
+ * @param var_type_to Type of varaible to store to 
+ * @param to Pointer to data to store to
+ * @param var_type_from Type of varaible to get from
+ * @param from Pointer to data to get from
+ * @returns 0 if success
  */
 uint8_t ti_StoVar(const ti_var_t var_type_to, void *to, const ti_var_t var_type_from, void *from);
 
 /**
- * Recalls a varaible
- * Returns 0 if success
- * data is set to the data being pointed to
+ * Recalls a variable
+ *
+ * @param var_type Type of variable to recall
+ * @param var_name Pointer to name of variable to recall
+ * @param data_struct Address of pointer to variable structure
+ * @returns 0 if success
+ * @note data_struct is set to the variable's data
  */
 uint8_t ti_RclVar(const uint8_t var_type, const char *var_name, void **data_struct);
 
 /**
  * Allocates space for a real variable
+ * @returns Pointer to variable
  */
 #define ti_MallocReal() ((real_t*)malloc(sizeof(real_t)))
 
 /**
  * Allocates space for a complex variable
+ * @returns Pointer to variable
  */
 #define ti_MallocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
 
 /**
  * Allocates space for a string variable
+ * @param len Length of string
+ * @returns Pointer to variable
  */
-string_t *ti_AllocString(unsigned len, void (*malloc_routine)(size_t));
 #define ti_MallocString(len) ti_AllocString((len), ((void*)malloc))
 
 /**
  * Allocates space for a list variable
+ * @param dim Dimension of list
+ * @returns Pointer to variable
  */
-list_t *ti_AllocList(unsigned dim, void (*malloc_routine)(size_t));
 #define ti_MallocList(dim) ti_AllocList((dim), ((void*)malloc))
 
 /**
  * Allocates space for a matrix variable
+ * @param rows Rows in matrix
+ * @param cols Columns in matrix
+ * @returns Pointer to variable
  */
-matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void (*malloc_routine)(size_t));
 #define ti_MallocMatrix(rows, cols) ti_AllocMatrix((rows), (cols), ((void*)malloc))
 
 /**
  * Allocates space for a complex list variable
+ * @param dim Dimension of complex list
+ * @returns Pointer to variable
  */
-cplx_list_t *ti_AllocCplxList(unsigned dim, void (*malloc_routine)(size_t));
 #define ti_MallocCplxList(dim) ti_AllocCplxList((dim), ((void*)malloc))
 
 /**
  * Allocates space for an equation variable
+ * @param len Length of equation variable
+ * @returns Pointer to variable
  */
-equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_MallocEqu(len) ti_AllocEqu((len), ((void*)malloc))
 
-/**
- * Some more definitions using Ans
- */
+string_t *ti_AllocString(unsigned len, void (*malloc_routine)(size_t));
+list_t *ti_AllocList(unsigned dim, void (*malloc_routine)(size_t));
+matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void (*malloc_routine)(size_t));
+cplx_list_t *ti_AllocCplxList(unsigned dim, void (*malloc_routine)(size_t));
+equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
+
+/* Some more definitions using Ans */
 #define TI_ANS_TYPE (0x00)
 #define ti_Ans      ("\x72\0")
 
-/**
- * Some string definitions
- */
+/* Some string definitions */
 #define ti_Str1     ("\xAA\x0\0")
 #define ti_Str2     ("\xAA\x1\0")
 #define ti_Str3     ("\xAA\x2\0")
@@ -306,9 +345,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_Str0     ("\xAA\x8\0")
 #define ti_StrT     ('\xAA')
 
-/**
- * Some equation definitions
- */
+/* Some equation definitions */
 #define ti_Y1       ("\x5E\x10\0")
 #define ti_Y2       ("\x5E\x11\0")
 #define ti_Y3       ("\x5E\x12\0")
@@ -321,9 +358,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_Y0       ("\x5E\x19\0")
 #define ti_EquT     ('\x5E')
 
-/**
- * Some real and complex defines
- */
+/* Some real and complex defines */
 #define ti_A        ("\x41\0\0")
 #define ti_B        ("\x42\0\0")
 #define ti_C        ("\x43\0\0")
@@ -352,9 +387,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_Z        ("\x60\0\0")
 #define ti_Theta    ("\x61\0\0")
 
-/**
- * Some matrix defines
- */
+/* Some matrix defines */
 #define ti_MatA     ("\x5C\x0\0")
 #define ti_MatB     ("\x5C\x1\0")
 #define ti_MatC     ("\x5C\x2\0")
@@ -367,9 +400,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_MatJ     ("\x5C\x9\0")
 #define ti_MatT     ('\x5C')
 
-/**
- * Some list defines
- */
+/*  Some list defines */
 #define ti_L1        ("\x5D\x0\0")
 #define ti_L2        ("\x5D\x1\0")
 #define ti_L3        ("\x5D\x2\0")
@@ -378,9 +409,7 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_L6        ("\x5D\x5\0")
 #define ti_LT        ('\x5D')
 
-/**
- * For compatibility reasons
- */
+/* Compatibility defines */
 #define ti_Program             TI_PRGM_TYPE
 #define ti_ProtectedProgram    TI_PPRGM_TYPE
 #define ti_TempProgram         TI_TPRGM_TYPE
