@@ -119,6 +119,5 @@ var searchData=
   ['gfx_5fvertline_5fnoclip',['gfx_VertLine_NoClip',['../graphx_8h.html#a1a6bbe0b65c1cf7a34c1f7b90a3c0d55',1,'graphx.h']]],
   ['gfx_5fvram',['gfx_vram',['../graphx_8h.html#a8d2b69b621ed1962190eff3e64ac44a6',1,'graphx.h']]],
   ['gfx_5fzeroscreen',['gfx_ZeroScreen',['../graphx_8h.html#ac93e5b03cdb37fd830c147cdf3db8ba3',1,'graphx.h']]],
-  ['graphc_2eh',['graphc.h',['../graphc_8h.html',1,'']]],
   ['graphx_2eh',['graphx.h',['../graphx_8h.html',1,'']]]
 ];
