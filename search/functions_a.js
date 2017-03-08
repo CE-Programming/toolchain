@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['ti_5fclose',['ti_Close',['../fileioc_8h.html#a939e6eb809618c4dc4bdf0e9e12838fa',1,'fileioc.h']]],
+  ['ti_5fcloseall',['ti_CloseAll',['../fileioc_8h.html#a2a9a88c6c2200809894fdab31ffef226',1,'fileioc.h']]],
+  ['ti_5fdelete',['ti_Delete',['../fileioc_8h.html#a226e1d9967372ee94b9d4dbd53dcc72a',1,'fileioc.h']]],
+  ['ti_5fdeletevar',['ti_DeleteVar',['../fileioc_8h.html#ab1cac356bc4d7a03f7f17b33c66ab496',1,'fileioc.h']]],
+  ['ti_5fdetect',['ti_Detect',['../fileioc_8h.html#a8ab3898aa9f1d56ebf783816e3ce0e17',1,'fileioc.h']]],
+  ['ti_5fgetc',['ti_GetC',['../fileioc_8h.html#a6388c3a5a6e7134de97b308df1f8f40e',1,'fileioc.h']]],
+  ['ti_5fgetdataptr',['ti_GetDataPtr',['../fileioc_8h.html#afe953ef410b48c76d7ac1ea7e4ee7148',1,'fileioc.h']]],
+  ['ti_5fgetsize',['ti_GetSize',['../fileioc_8h.html#a52e4f847fe66929ccfa14ab52bcf80c1',1,'fileioc.h']]],
+  ['ti_5fgettokenstring',['ti_GetTokenString',['../fileioc_8h.html#a0fc4887847703e0eba433e28065833b4',1,'fileioc.h']]],
+  ['ti_5fisarchived',['ti_IsArchived',['../fileioc_8h.html#a856864cab001e242c56aa00a962bf2e3',1,'fileioc.h']]],
+  ['ti_5fopen',['ti_Open',['../fileioc_8h.html#a2842e9d72ce53bca7b41c22838881775',1,'fileioc.h']]],
+  ['ti_5fopenvar',['ti_OpenVar',['../fileioc_8h.html#a75e6644985670553ff3e479d61ec788b',1,'fileioc.h']]],
+  ['ti_5fputc',['ti_PutC',['../fileioc_8h.html#a5e4f8e1c166bd14e339c8d8457419343',1,'fileioc.h']]],
+  ['ti_5frclvar',['ti_RclVar',['../fileioc_8h.html#ab568cd59ad586f34b6a36b0d80c7b0f6',1,'fileioc.h']]],
+  ['ti_5fread',['ti_Read',['../fileioc_8h.html#a69e606ae891de24dc0d9331b7bd52085',1,'fileioc.h']]],
+  ['ti_5fresize',['ti_Resize',['../fileioc_8h.html#a226c894f6a87148634b2a06314f96e8c',1,'fileioc.h']]],
+  ['ti_5frewind',['ti_Rewind',['../fileioc_8h.html#ae13786d7a50cfa328291102d024d1998',1,'fileioc.h']]],
+  ['ti_5fseek',['ti_Seek',['../fileioc_8h.html#aeade963f1ba3ee1cdd09522fb8215cc6',1,'fileioc.h']]],
+  ['ti_5fsetarchivestatus',['ti_SetArchiveStatus',['../fileioc_8h.html#aa5138d0e2a0a9e78cc1153df1a8cf36c',1,'fileioc.h']]],
+  ['ti_5fsetvar',['ti_SetVar',['../fileioc_8h.html#a2c3d4f47d22e805d679cbacc0293cb8b',1,'fileioc.h']]],
+  ['ti_5fstovar',['ti_StoVar',['../fileioc_8h.html#a747cc0d2bb36c7c52f7acff10da3a3f0',1,'fileioc.h']]],
+  ['ti_5ftell',['ti_Tell',['../fileioc_8h.html#a33f35c518ff3e533caa9ff2c03c68e80',1,'fileioc.h']]],
+  ['ti_5fwrite',['ti_Write',['../fileioc_8h.html#a77a62881f0d97425482ce3b49efd683e',1,'fileioc.h']]]
+];
