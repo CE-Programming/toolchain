@@ -40,16 +40,18 @@ uint8_t kb_AnyKey(void);
 void kb_Reset(void);
 
 /**
- * Sets the keypad scanning mode
+ * @brief Sets the keypad scanning mode
  * @see kb_scan_mode_t
  */
-#define kb_SetMode(mode)		(kb_Config = ((kb_Config & ~3)|(mode)))
+#define kb_SetMode(mode) \
+(kb_Config = ((kb_Config & ~3)|(mode)))
 
 /**
- * Gets the keypad scanning mode
+ * @brief Gets the keypad scanning mode
  * @see kb_scan_mode_t
  */
-#define kb_GetMode()			(kb_Config & 3)
+#define kb_GetMode() \
+(kb_Config & 3)
 
 /**
  * Different available scanning modes
@@ -61,11 +63,16 @@ typedef enum {
     MODE_3_CONTINUOUS      /**< Continuous scan. When scanning completes, it just starts over again after a delay. */
 } kb_scan_mode_t;
 
-#define kb_EnableInt            (*(uint8_t*)0xF5000C)          /**< Enabled keypad interrupt signals */
-#define kb_IntAcknowledge       (*(volatile uint8_t*)0xF50008) /**< Acknowledege keypad interrupt signals */
-#define kb_IntStatus            (*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals */
-#define kb_Config               (*(uint8_t*)0xF50000)          /**< Configuration of keypad controller */
-#define kb_Data                 (uint8_t)((uint16_t*)0xF50010) /**< Keypad Data registers */
+#define kb_EnableInt \
+(*(uint8_t*)0xF5000C)          /**< Enabled keypad interrupt signals */
+#define kb_IntAcknowledge \
+(*(volatile uint8_t*)0xF50008) /**< Acknowledege keypad interrupt signals */
+#define kb_IntStatus \
+(*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals */
+#define kb_Config \
+(*(uint8_t*)0xF50000)          /**< Configuration of keypad controller */
+#define kb_Data \
+(uint8_t)((uint16_t*)0xF50010) /**< Keypad Data registers */
 
 /**
  * Different available interrupt signals

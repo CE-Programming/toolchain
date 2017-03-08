@@ -58,7 +58,8 @@ gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine
  * @param height Height of the requested sprite
  * @see gfx_AllocSprite
  */
-#define gfx_MallocSprite(width, height) gfx_AllocSprite(width, height, (void*)malloc)
+#define gfx_MallocSprite(width, height) \
+gfx_AllocSprite(width, height, (void*)malloc)
 
 /**
  * Allocates memory for a sprite
@@ -69,8 +70,9 @@ gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine
  * @param max_width Maximum width sprite will eventually be
  * @param max_height Maximum height sprite will eventually be
  */
-#define gfx_UninitedSprite(name, max_width, max_height) uint8_t name##_data[2 + (max_width) * (max_height)]; \
-                                                        gfx_image_t *name = (gfx_image_t *)name##_data
+#define gfx_UninitedSprite(name, max_width, max_height) \
+uint8_t name##_data[2 + (max_width) * (max_height)]; \
+gfx_image_t *name = (gfx_image_t *)name##_data
                         
 /**
  * Allocates memory for a sprite
@@ -81,8 +83,9 @@ gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine
  * @param width Width of allocated sprite
  * @param height Height of allocated sprite
  */
-#define gfx_TempSprite(name, width, height) uint8_t name##_data[2 + (width) * (height)] = { (width), (height) }; \
-                                            gfx_image_t *name = (gfx_image_t *)name##_data
+#define gfx_TempSprite(name, width, height) \
+uint8_t name##_data[2 + (width) * (height)] = { (width), (height) }; \
+gfx_image_t *name = (gfx_image_t *)name##_data
 
 /**
  * Initializes the graphics library setup
@@ -103,7 +106,8 @@ void gfx_End(void);
  *
  * This consists of 256 entries, each 2 bytes in size for a total of 512 bytes
  */
-#define gfx_palette ((uint16_t*)0xE30200)
+#define gfx_palette \
+((uint16_t*)0xE30200)
 
 /**
  * Array of the LCD RAM
@@ -111,7 +115,8 @@ void gfx_End(void);
  * Total of 153600 bytes in size
  * @see gfx_vbuffer
  */
-#define gfx_vram ((uint8_t*)0xD40000)
+#define gfx_vram \
+((uint8_t*)0xD40000)
 
 /**
  * Array of the current drawing buffer
@@ -119,7 +124,8 @@ void gfx_End(void);
  * Total of 76800 bytes in size
  * @see gfx_vram
  */
-#define gfx_vbuffer (**(uint8_t(**)[240][320])0xE30014)
+#define gfx_vbuffer \
+(**(uint8_t(**)[240][320])0xE30014)
 
 /**
  * @brief Defines a rectangular graphics region
@@ -226,7 +232,8 @@ uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, uint24_t x_offset, uint24_t y_offse
  * @param y_offset Offset in pixels from the top of the tilemap
  * @param value Value to set tile to
  */
-#define gfx_SetTile(tilemap, x_offset, y_offset, value) (*(gfx_TilePtr((tilemap), (x_offset), (y_offset))) = (uint8_t)(value))
+#define gfx_SetTile(tilemap, x_offset, y_offset, value) \
+(*(gfx_TilePtr((tilemap), (x_offset), (y_offset))) = (uint8_t)(value))
 
 /**
  * Gets a particular tile's value given an initialized tilemap structure and pixel offsets
@@ -235,7 +242,8 @@ uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, uint24_t x_offset, uint24_t y_offse
  * @param x_offset Offset in pixels from the left of the tilemap
  * @param y_offset Offset in pixels from the top of the tilemap
  */
-#define gfx_GetTile(tilemap, x_offset, y_offset) (*(gfx_TilePtr((tilemap), (x_offset), (y_offset))))
+#define gfx_GetTile(tilemap, x_offset, y_offset) \
+(*(gfx_TilePtr((tilemap), (x_offset), (y_offset))))
 
 /**
  * Gets a pointer to a particular tile given an initialized tilemap structure and mapped offsets
@@ -254,7 +262,8 @@ uint8_t *gfx_TilePtrMapped(gfx_tilemap_t *tilemap, uint8_t row, uint8_t col);
  * @param col Offset in bytes in the column
  * @param value Value to set tile to
  */
-#define gfx_SetTileMapped(tilemap, row, col, value) (*(gfx_TilePtrMapped((tilemap), (row), (col))) = (uint8_t)(value))
+#define gfx_SetTileMapped(tilemap, row, col, value) \
+(*(gfx_TilePtrMapped((tilemap), (row), (col))) = (uint8_t)(value))
 
 /**
  * Gets a particular tile's value given an initialized tilemap structure and mapped offsets
@@ -263,7 +272,8 @@ uint8_t *gfx_TilePtrMapped(gfx_tilemap_t *tilemap, uint8_t row, uint8_t col);
  * @param row Offset in bytes in the row
  * @param col Offset in bytes in the column
  */
-#define gfx_GetTileMapped(tilemap, row, col) (*(gfx_TilePtrMapped((tilemap), (row), (col))))
+#define gfx_GetTileMapped(tilemap, row, col) \
+(*(gfx_TilePtrMapped((tilemap), (row), (col))))
 
 /**
  * Sets the color index that drawing routines will use
@@ -494,7 +504,8 @@ void gfx_FillCircle_NoClip(uint24_t x, uint8_t y, unsigned radius);
  * @param y Y coordinate
  * @param radius The radius of the circle
  */
-#define gfx_Circle_NoClip(x, y, radius) gfx_Circle((x), (y), (radius))
+#define gfx_Circle_NoClip(x, y, radius) \
+gfx_Circle((x), (y), (radius))
 
 /**
  * Draws a polygon outline
@@ -565,12 +576,14 @@ typedef enum {
 /**
  * Forces all graphics routines to draw to the screen
  */
-#define gfx_SetDrawBuffer() gfx_SetDraw(gfx_buffer)
+#define gfx_SetDrawBuffer() \
+gfx_SetDraw(gfx_buffer)
 
 /**
  * Forces all graphics routines to draw to the buffer
  */
-#define gfx_SetDrawScreen() gfx_SetDraw(gfx_screen)
+#define gfx_SetDrawScreen() \
+gfx_SetDraw(gfx_screen)
 
 /**
  * Gets current draw location
@@ -623,12 +636,14 @@ void gfx_BlitRectangle(uint8_t location, uint24_t x, uint8_t y, uint24_t width, 
 /**
  * Copies the screen to the buffer
  */
-#define gfx_BlitScreen() gfx_Blit(gfx_screen)
+#define gfx_BlitScreen() \
+gfx_Blit(gfx_screen)
 
 /**
  * Copies the buffer to the screen
  */
-#define gfx_BlitBuffer() gfx_Blit(gfx_buffer)
+#define gfx_BlitBuffer() \
+gfx_Blit(gfx_buffer)
 
 /**
  * Sets the scaling for text
@@ -813,7 +828,8 @@ gfx_image_t *gfx_GetSprite(gfx_image_t *sprite_buffer, int x, int y);
  * @returns A pointer to sprite_buffer
  * @note sprite_buffer must be pointing to a large enough buffer to hold width*height number of bytes
  */
-#define gfx_GetSprite_NoClip(sprite_buffer, x, y) gfx_GetSprite((sprite_buffer), (x), (y))
+#define gfx_GetSprite_NoClip(sprite_buffer, x, y) \
+gfx_GetSprite((sprite_buffer), (x), (y))
 
 /**
  * Scale an unclipped sprite
@@ -945,7 +961,8 @@ unsigned int gfx_GetCharWidth(const char c);
  * @param c Character to get height of
  * @returns Height in pixels of character
  */
-#define gfx_GetCharHeight(c) 8
+#define gfx_GetCharHeight(c) \
+8
 
 /**
  * Sets the clipping window
@@ -1023,18 +1040,19 @@ uint16_t gfx_Darken(uint16_t color, uint8_t amount);
  *
  * Conversion is not 100% perfect, but is quite close
  */
-#define gfx_RGBTo1555(r,g,b) ((uint16_t)(((uint8_t)(r) >> 3) << 10) | \
-                             (((uint8_t)(g) >> 3) << 5) | \
-                             ((uint8_t)(b) >> 3))
+#define gfx_RGBTo1555(r,g,b) \
+((uint16_t)(((uint8_t)(r) >> 3) << 10) | \
+(((uint8_t)(g) >> 3) << 5) | \
+((uint8_t)(b) >> 3))
 
 /**
  * Checks if we are currently in a rectangular hotspot area
  */
 #define gfx_CheckRectangleHotspot(master_x, master_y, master_width, master_height, test_x, test_y, test_width, test_height) \
-           (((test_x) < ((master_x) + (master_width))) && \
-           (((test_x) + (test_width)) > (master_x)) && \
-           ((test_y) < ((master_y) + (master_height))) && \
-           (((test_y) + (test_height)) > (master_y)))
+(((test_x) < ((master_x) + (master_width))) && \
+(((test_x) + (test_width)) > (master_x)) && \
+((test_y) < ((master_y) + (master_height))) && \
+(((test_y) + (test_height)) > (master_y)))
 
 /* Color definitions (try to avoid) */
 #define gfx_black       0x00

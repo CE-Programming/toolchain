@@ -32,17 +32,20 @@ void int_SetVector(uint8_t ivect, void (*handler)(void));
 /**
  * @brief Enable global interrupts
  */
-#define int_Enable()    asm("ei")
+#define int_Enable() \
+asm("ei")
 
 /**
  * @brief Diasble global interrupts
  */
-#define int_Disable()   asm("di")
+#define int_Disable() \
+asm("di")
 
 /**
  * @brief Blocking wait for an interrupt to trigger
  */
-#define int_Wait()      asm("halt")
+#define int_Wait() \
+asm("halt")
 
 #define ON_IVECT        0  // [on] key interrupt source
 #define TIMER1_IVECT    1  // Timer 1 interrupt source

@@ -19,7 +19,8 @@
 /**
  * Creates a random integer value
  */
-#define randInt(min, max)       ((unsigned)rand() % ((max) - (min) + 1) + (min))
+#define randInt(min, max) \
+((unsigned)rand() % ((max) - (min) + 1) + (min))
 
 /* RTC define -- useful for srand() */
 #define rtc_Time()              (*(volatile uint32_t*)0xF30044)
@@ -124,9 +125,23 @@
 #define lcd_Palette              ((uint16_t*)0xE30200)
 #define lcd_Ram                  ((uint16_t*)0xD40000)
 
-#define LCD_WIDTH                (320)                            /**< Width of LCD in pixels */
-#define LCD_HEIGHT               (240)                            /**< Height of LCD in pixels */
-#define LCD_SIZE                 (LCD_WIDTH*LCD_HEIGHT*2)         /**< Total number of pixels in LCD */
+/**
+ * Width of LCD in pixels
+ */
+#define LCD_WIDTH \
+(320)
+
+/**
+ * Height of LCD in pixels
+ */
+#define LCD_HEIGHT \
+(240)
+
+/**
+ * Total number of pixels in LCD 
+ */
+#define LCD_SIZE \
+(LCD_WIDTH*LCD_HEIGHT*2)
 
 /**
  * @brief Structure of real varaible type

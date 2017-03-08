@@ -5,70 +5,92 @@
  */
 
 /**
- * @fn void dbg_sprintf(out, const char*, ...)
- * @brief Use to print to the emulator console. See the syntax for 'printf' for more information
- * @param out can be dbgout (black) or dbgerr (red)
+ * void dbg_sprintf(out, const char*, ...)
+ *
+ * @brief Use to print to the emulator console.
+ * 
+ * See the syntax for 'printf' for more information
+ * @param out Can be dbgout (black) or dbgerr (red)
+ * @def dbg_sprintf
  */
 
 /**
- * @fn void dbg_Debugger(void);
+ * void dbg_Debugger(void)
+ *
  * @brief Opens the debugger
+ * @def dbg_Debugger
  */
 
 /**
- * @fn void dbg_SetBreakpoint(void *address)
+ * void dbg_SetBreakpoint(void *address)
+ *
  * @brief Sets a breakpoint at a particular address in an emulator
- * @param address is the address of the breakpoint to set
+ * @param address The address of the breakpoint to set
+ * @def dbg_SetBreakpoint
  */
 
 /**
- * @fn void dbg_RemoveBreakpoint(void *address)
+ * @def dbg_RemoveBreakpoint
+ * void dbg_RemoveBreakpoint(void *address)
+ *
  * @brief Removes a breakpoint at a particular address in an emulator
- * @param address is the address of the breakpoint to remove
+ * @param address The address of the breakpoint to remove
  */
 
 /**
- * @fn void dbg_SetWatchpoint(void *address, unsigned length)
+ * void dbg_SetWatchpoint(void *address, unsigned length)
+ *
  * @brief Sets a non-breaking watchpoint at a particular address in an emulator
- * @param address is the address of the watchpoint to set
- * @param length is the size of the data at the address (values 1-4)
+ * @param address The address of the watchpoint to set
+ * @param length The size of the data at the address (values 1-4)
+ * @def dbg_SetWatchpoint
  */
 
 /**
- * @fn void dbg_SetReadWatchpoint(void *address, unsigned length)
+ * void dbg_SetReadWatchpoint(void *address, unsigned length)
+ *
  * @brief Sets a read watchpoint at a particular address in an emulator
- * @param address is the address of the watchpoint to set
- * @param length is the size of the data at the address (values 1-4)
+ * @param address The address of the watchpoint to set
+ * @param length The size of the data at the address (values 1-4)
+ * @def dbg_SetReadWatchpoint
  */
  
 /**
- * @fn void dbg_SetWriteWatchpoint(void *address, unsigned length)
+ * void dbg_SetWriteWatchpoint(void *address, unsigned length)
+ *
  * @brief Sets a write watchpoint at a particular address in an emulator
- * @param address is the address of the watchpoint to set
- * @param length is the size of the data at the address (values 1-4)
+ * @param address The address of the watchpoint to set
+ * @param length The size of the data at the address (values 1-4)
+ * @def dbg_SetWriteWatchpoint
  */
 
 /**
- * @fn void dbg_SetReadWriteWatchpoint(void *address, unsigned length)
+ * void dbg_SetReadWriteWatchpoint(void *address, unsigned length)
+ *
  * @brief Sets a read and write watchpoint at a particular address in an emulator
- * @param address is the address of the watchpoint to set
- * @param length is the size of the data at the address (values 1-4)
+ * @param address The address of the watchpoint to set
+ * @param length The size of the data at the address (values 1-4)
+ * @def dbg_SetReadWriteWatchpoint
  */
 
 /**
- * @fn void dbg_RemoveWatchpoint(void *address)
+ * void dbg_RemoveWatchpoint(void *address)
+ *
  * @brief Removes a watchpoint at a particular address in an emulator
- * @param address is the address of the watchpoint to remove
+ * @param address The address of the watchpoint to remove
+ * @def dbg_RemoveWatchpoint
  */
  
 /**
- * @fn void dbg_RemoveAllBreakpoints(void)
+ * void dbg_RemoveAllBreakpoints(void)
  * @brief Removes all breakpoints in an emulator
+ * @def dbg_RemoveAllBreakpoints(void)
  */
  
 /**
- * @fn void dbg_RemoveAllWatchpoints(void)
+ * void dbg_RemoveAllWatchpoints(void)
  * @brief Removes all watchpoints in an emulator
+ * @def dbg_RemoveAllWatchpoints
  */
 
 /* Preprocessor definitions (should not be looked at :P) */
