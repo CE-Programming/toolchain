@@ -651,17 +651,17 @@ void os_ResetFlagBits(int16_t offset_pattern);
 uint16_t os_GetKey(void);
 
 /**
+ * @brief Scan code type
+ */
+typedef uint8_t sk_key_t;
+
+/**
  * Performs an OS call to get the keypad scan code
  *
  * Technically return type is uint24_t, but that is not useful as the high byte is 0
  * @returns Key scan code
  */
 sk_key_t os_GetCSC(void);
-
-/**
- * @brief Scan code type
- */
-typedef uint8_t sk_key_t;
 
 /**
  * Runs the calulator at 6 MHz

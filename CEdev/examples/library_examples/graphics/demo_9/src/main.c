@@ -16,6 +16,7 @@
 /* Use some random color as the transparent one */
 #define TRANSPARENT_COLOR 10
 #define FONT_WIDTH        8
+#define FONT_HEIGHT       8
 
 /* Put function prototypes here */
  
@@ -50,7 +51,7 @@ void main(void) {
     
     /* Configure the font to normal size, clipped, and monospaced */
     gfx_SetTextScale(1,1);
-    gfx_SetTextConfig( GFX_TEXT_CLIP );
+    gfx_SetTextConfig( gfx_text_clip );
     gfx_SetMonospaceFont( FONT_WIDTH );
     
     /* Graphics routines draw to the back buffer */

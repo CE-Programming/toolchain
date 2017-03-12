@@ -172,7 +172,7 @@ typedef enum {
     gfx_tile_16_pixel,        /**< Set when using 16 pixel tiles */
     gfx_tile_32_pixel,        /**< Set when using 32 pixel tiles */
     gfx_tile_64_pixel,        /**< Set when using 64 pixel tiles */
-    gfx_tile_128_pixel,       /**< Set when using 128 pixel tiles */
+    gfx_tile_128_pixel        /**< Set when using 128 pixel tiles */
 } gfx_tilemap_type_t;
 
 /**
@@ -907,6 +907,16 @@ gfx_image_t *gfx_RotateSpriteCC(gfx_image_t *sprite_in, gfx_image_t *sprite_out)
 gfx_image_t *gfx_RotateSpriteHalf(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
 
 /**
+ * Resizes a sprite to new dimensions
+ *
+ * Place new image dimensions in sprite_out; i.e. sprite_out->width = 80; sprite_out->height = 20.
+ * @param sprite_in Input sprite to scale
+ * @param sprite_out Pointer to where scaled sprite will be stored
+ * @returns A pointer to sprite_out
+ */
+gfx_image_t *gfx_ScaleSprite(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
+
+/**
  * Creates a temporary character sprite 
  * 
  * This may be useful for performing rotations and other 
@@ -931,10 +941,19 @@ void gfx_SetFontData(uint8_t *data);
 void gfx_SetFontSpacing(uint8_t *spacing);
 
 /**
+ * Sets the height in pixels of each character
+ * 
+ * The default value is 8 pixels
+ * @param height New font height in pixels
+ * @returns Previous height of font in pixels
+ */
+uint8_t gfx_SetFontHeight(uint8_t height);
+
+/**
  * Sets monospaced font
  *
  * @param spacing Distance between characters
- * @note To disable monospaced font set to 0
+ * @note To disable monospaced font, set to 0
  */
 void gfx_SetMonospaceFont(uint8_t spacing);
 
@@ -954,15 +973,6 @@ unsigned int gfx_GetStringWidth(const char *string);
  * @note Takes into account monospacing flag
  */
 unsigned int gfx_GetCharWidth(const char c);
-
-/**
- * Gets pixel height of a character
- * 
- * @param c Character to get height of
- * @returns Height in pixels of character
- */
-#define gfx_GetCharHeight(c) \
-8
 
 /**
  * Sets the clipping window

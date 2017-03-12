@@ -30,8 +30,8 @@
  .function "gfx_SetTextBGColor",_SetTextBGColorC
  .function "gfx_SetTextFGColor",_SetTextFGColorC
  .function "gfx_SetTextTransparentColor",_SetTextTransparentColorC
- .function "gfx_SetCustomFontData",_SetCustomFontData
- .function "gfx_SetCustomFontSpacing",_SetCustomFontSpacing
+ .function "gfx_SetFontData",_SetFontData
+ .function "gfx_SetFontSpacing",_SetFontSpacing
  .function "gfx_SetMonospaceFont",_SetMonospaceFont
  .function "gfx_GetStringWidth",_GetStringWidth
  .function "gfx_GetCharWidth",_GetCharWidth
@@ -83,7 +83,7 @@
 ;-------------------------------------------------------------------------------
 ; v2 functions - Can no longer move/delete
 ;-------------------------------------------------------------------------------
- .function "gfx_LZDecompressSprite",_LZDecompressSprite
+ .function "gfx_LZDecompressSprite_Deprecated",_LZDecompressSprite_Deprecated
  .function "gfx_SetTextScale",_SetTextScale
 ;-------------------------------------------------------------------------------
 ; v3 functions - Can no longer move/delete
@@ -98,7 +98,11 @@
  .function "gfx_Lighten",_Lighten
  .function "gfx_Darken",_Darken
 ;-------------------------------------------------------------------------------
-
+; v5 functions
+;-------------------------------------------------------------------------------
+ .function "gfx_SetFontHeight",_SetFontHeight
+ .function "gfx_ScaleSprite",_ScaleSprite
+ 
  .beginDependencies
  .endDependencies
 
@@ -2891,6 +2895,7 @@ TextYPos_SMC = $+1
 	ld	bc,(TextData_ASM) \.r       ; get text data array
 	add	hl,bc
 	ld	iy,0
+FONT_HEIGHT_SMC_3 =$+2
 	ld	ixl,8
 	jr	_PrintLargeFont_ASM         ; SMC the jump
 LargeFontJump_SMC =$-1
@@ -3006,6 +3011,7 @@ CHasFixedWidth:
 	ld	bc,(TextData_ASM) \.r       ; get text data array
 	add	hl,bc                       ; de = draw location
 	ld	de,tmpCharData \.r          ; store pixel data into temporary sprite
+FONT_HEIGHT_SMC_2 =$+2
 	ld	iyl,8
 	ld	iyh,a                       ; ixh = char width
 	ld	(tmpCharDataSprite),a \.r   ; store width of character we are drawing
@@ -3186,6 +3192,7 @@ GetHasFixedWidth:
 	ld	de,tmpCharDataSprite \.r
 	ex	de,hl
 	push	hl                          ; save pointer to sprite
+FONT_HEIGHT_SMC_1 =$+2
 	ld	a,8
 	ld	iyh,a                       ; ixh = char width
 	ld	(hl),a                      ; store width of character we are drawing
@@ -3239,7 +3246,27 @@ TColor_SMC_4 =$-1
 	ret
 	
 ;-------------------------------------------------------------------------------
-_SetCustomFontData:
+_SetFontHeight:
+; Sets the height of the font in pixels
+; Arguments:
+;  arg0 : New font height
+; Returns:
+;  Previous font height
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	ld	hl,FONT_HEIGHT_SMC_1 \.r
+	ld	a,(hl)                      ; a = old height
+	ld	(hl),e
+	ld	hl,FONT_HEIGHT_SMC_2 \.r
+	ld	(hl),e                      
+	ld	hl,FONT_HEIGHT_SMC_3 \.r
+	ld	(hl),e                      ; store new height
+	ret
+
+;-------------------------------------------------------------------------------
+_SetFontData:
 ; Sets the font to be custom
 ; Arguments:
 ;  arg0 : Pointer to font data
@@ -3259,7 +3286,7 @@ _:	ld	(TextData_ASM),hl \.r       ; save pointer to custom font
 	ret
 
 ;-------------------------------------------------------------------------------
-_SetCustomFontSpacing:
+_SetFontSpacing:
 ; Sets the font to be custom spacing
 ; Arguments:
 ;  arg0 : Pointer to font spacing
@@ -3669,7 +3696,7 @@ _Reserved:
 	ret
 
 ;-------------------------------------------------------------------------------
-_LZDecompressSprite:
+_LZDecompressSprite_Deprecated:
 ; Decompresses a sprite that is LZ77 compressed from ConvPNG
 	ld	hl,-23
 	call	__frameset
@@ -3988,12 +4015,169 @@ _:	ld	a,(de)
 	ret
 
 ;-------------------------------------------------------------------------------
+_ScaleSprite:
+; Scale an image using an output buffer
+	scf
+	sbc	hl,hl
+	ld	(hl),2
+	
+	ld	hl,-27
+	call	__frameset
+	
+	or	a,a
+	sbc	hl,hl
+	ld	(ix-24),hl                  ; uint8_t *PrevSource = null
+	ld	(ix-20),hl                  ; uint8_t Err = 0
+	
+	ld	hl,(ix+9)
+	ld	a,(hl)
+	ld	(ix-1),a                    ; uint8_t TgtWidth = sprite_out->width
+	ld	(TgtWidth),a \.r
+	ld	(TgtWidth_2),a \.r
+	inc	hl
+	ld	a,(hl)
+	ld	(TgtHeight),a \.r           ; uint8_t TgtHeight = sprite_out->height
+	ld	iyh,a                       ; uint8_t NumPixels = TgtHeight
+	ld	e,a
+	inc	hl
+	ld	(ix-4),hl                   ; uint8_t *Target = sprite_out->data
+	ld	hl,(ix+6)
+	ld	a,(hl)
+	ld	c,a
+	ld	(SrcWidth),a \.r            ; uint8_t SrcWidth = sprite_in->width
+	inc	hl
+	ld	d,(hl)                      ; uint8_t SrcHeight = sprite_in->height
+	inc	hl
+	push	hl                          ; uint8_t *Source = sprite_in->data
+
+	xor	a,a
+	ld	b,8
+_:	sla	d
+	rla
+	cp	a,e
+	jr	c,+_
+	sub	e
+	inc	d
+_:	djnz	--_
+	ld	e,c
+	mlt	de
+	ld	(FractPart),a \.r           ; uint8_t FractPart = SrcHeight % TgtHeight
+	ld	(IntPart),de \.r            ; uint8_t IntPart = (SrcHeight / TgtHeight) * SrcWidth
+	
+	ld	d,c
+	ld	e,(ix-1)
+	xor	a,a
+	ld	b,8
+_:	sla	d
+	rla
+	cp	a,e
+	jr	c,+_
+	sub	e
+	inc	d
+_:	djnz	--_
+	ld	(FractPartWidth),a \.r      ; uint8_t FractPartWidth = SrcWidth % TgtWidth;
+	ld	a,d
+	ld	(IntPartWidth),a \.r        ; uint8_t IntPartWidth = SrcWidth / TgtWidth
+
+	pop	de
+	jp	WhileNumPixelsLoop \.r      ; while (NumPixels-- > 0)
+WhileNumPixels:
+	ld	hl,(ix-24)
+	or	a,a
+	sbc	hl,de
+	push	de
+	ld	bc,0
+	jr	nz,Source_NotEq_Prev        ; if (Source == PrevSource)
+	ld	c,(ix-1)
+	or	a,a
+	sbc	hl,hl
+	ld	l,c
+	ex	de,hl
+	ld	hl,(ix-4)
+	push	hl
+	or	a,a
+	sbc	hl,de
+	pop	de
+	ldir                                ; memcpy(Target, Target-TgtWidth, TgtWidth)
+	ld	(ix-4),de                   ; Target += TgtWidth
+	jr	DoneLine
+Source_NotEq_Prev:
+	ld	(ix-24),de                  ; PrevSource = Source; uint8_t *SourceLine = Source;
+TgtWidth_2 =$+2
+	ld	iyl,0                       ; uint8_t NumPixelsLine = TgtWidth;
+	or	a,a
+	sbc	hl,hl
+	push	ix
+	ld	ix,(ix-4)
+	jr	WhileNumPixelsLineStart     ; while (NumPixelsLine-- > 0)
+WhileNumPixelsLineLoop:
+	push	hl
+	ld	a,(de)
+	ld	(ix),a
+	inc	ix                          ; *Target++ = *SourceLine
+IntPartWidth =$+1
+	ld	hl,0
+	add	hl,de
+	ex	de,hl                       ; SourceLine += IntPartWidth
+	pop	hl
+FractPartWidth =$+1
+	ld	c,0
+	add	hl,bc
+TgtWidth =$+1
+	ld	c,0
+	or	a,a
+	sbc	hl,bc                       ; if (ErrLine >= TgtWidth)  
+	jr	c,WhileNumPixelsLine
+	inc	de                          ; SourceLine++
+	jr	WhileNumPixelsLineStart
+WhileNumPixelsLine:
+	add	hl,bc                       ; Errline -= TgtWidth
+WhileNumPixelsLineStart:
+	ld	a,iyl
+	dec	iyl
+	or	a,a
+	jr	nz,WhileNumPixelsLineLoop
+	lea	hl,ix
+	pop	ix
+	ld	(ix-4),hl
+DoneLine:
+	pop	de
+IntPart =$+1
+	ld	hl,0
+	add	hl,de
+	ex	de,hl                       ; Source += IntPart
+FractPart =$+1	
+	ld	c,0
+	ld	hl,(ix-20)
+	add	hl,bc
+	ld	(ix-20),hl                  ; Err += FractPart
+TgtHeight =$+1
+	ld	c,0
+	or	a,a
+	sbc	hl,bc                       ; if (Err >= TgtHeight)
+	jr	c,WhileNumPixelsLoop
+	ld	(ix-20),hl                  ; Err -= tgtheight;
+SrcWidth =$+1
+	ld	hl,0
+	add	hl,de
+	ex	de,hl                       ; Source += SrcWidth;
+WhileNumPixelsLoop:
+	ld	a,iyh
+	dec	iyh
+	or	a,a
+	jp	nz,WhileNumPixels \.r
+	ld	hl,(ix+9)                   ; return sprite_out;
+	ld	sp,ix
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
 ; Inner library routines
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
 _LZ_ReadVarSize_ASM:
-; LZ Decompression Subroutine
+; LZ Decompression Subroutine (This should no longer be accessible by the API)
 	push	ix
 	ld	ix,0
 	lea	de,ix
