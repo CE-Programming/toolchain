@@ -102,7 +102,8 @@
 ;-------------------------------------------------------------------------------
  .function "gfx_SetFontHeight",_SetFontHeight
  .function "gfx_ScaleSprite",_ScaleSprite
- 
+ .function "gfx_FloodFill",_FloodFill
+
  .beginDependencies
  .endDependencies
 
@@ -4017,10 +4018,11 @@ _:	ld	a,(de)
 ;-------------------------------------------------------------------------------
 _ScaleSprite:
 ; Scale an image using an output buffer
-	scf
-	sbc	hl,hl
-	ld	(hl),2
-	
+; Arguments:
+;  arg0 : Pointer to sprite struct input
+;  arg1 : Pointer to sprite struct output
+; Returns:
+;  arg1 : Pointer to sprite struct output
 	ld	hl,-27
 	call	__frameset
 	
@@ -4169,6 +4171,11 @@ WhileNumPixelsLoop:
 	ld	hl,(ix+9)                   ; return sprite_out;
 	ld	sp,ix
 	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+_FloodFill:
+; Preforms a naive implementation of a flood fill so no one crashes the stack
 	ret
 
 ;-------------------------------------------------------------------------------

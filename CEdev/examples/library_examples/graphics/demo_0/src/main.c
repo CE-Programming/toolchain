@@ -13,7 +13,7 @@
 /* Shared libraries */
 #include <lib/ce/graphx.h>
 
-#define FONT_WIDTH 8
+#define FONT_HEIGHT 8
 
 /* Put function prototypes here */
 void print_string_centered(const char *str);
@@ -47,5 +47,5 @@ void main(void) {
 
 /* Prints a screen centered string */
 void print_string_centered(const char *str) {
-    gfx_PrintStringXY(str, (LCD_WIDTH-gfx_GetStringWidth(str)) / 2, (LCD_HEIGHT-FONT_WIDTH) / 2);
+    gfx_PrintStringXY(str, (LCD_WIDTH-gfx_GetStringWidth(str)) / 2, (LCD_HEIGHT-FONT_HEIGHT) / 2);
 }
