@@ -546,7 +546,7 @@ _Rectangle_NoClip_Skip:
 	ret	z
 	inc	b
 	ld	c,$40                       ; = slightly faster "ld bc,lcdWidth"
-_Rectangle_Loop_NoClip:
+_RectangleLoop_NoClip:
 	add	hl,bc
 	dec	de
 	ex	de,hl
@@ -564,7 +564,7 @@ _RectangleWidth2_SMC =$+1
         ldir
         ld      bc,2*lcdWidth-1
 	dec	a
-	jr	nz,_Rectangle_Loop_NoClip
+	jr	nz,_RectangleLoop_NoClip
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2448,7 +2448,7 @@ x_offset_smc =$+1
 	xor	a,a
 	jr	X_Loop
 
-_x_loop_inner:
+_xLoop_inner:
 	or	a,a
 	sbc	hl,hl
 	ld	l,(ix+-1)
@@ -2490,7 +2490,7 @@ BlankTile:
 X_Loop:
 	ld	(ix+-2),a
 	cp	a,(iy+t_draw_width)
-	jr	nz,_x_loop_inner
+	jr	nz,_xLoop_inner
 	ld	h,0
 	ld	l,(iy+6)
 	ld	bc,(ix+-12)
@@ -4170,12 +4170,342 @@ WhileNumPixelsLoop:
 	jp	nz,WhileNumPixels \.r
 	ld	hl,(ix+9)                   ; return sprite_out;
 	ld	sp,ix
+RestoreStack:
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 _FloodFill:
-; Preforms a naive implementation of a flood fill so no one crashes the stack
+; Preforms an implementation of a flood fill so no one hopefully crashes the stack
+; Maximum stack depth is 2049 bytes
+; Arguments:
+;  arg0 : X Coordinate
+;  arg1 : Y Coordinate
+;  arg2 : New Color Index
+; Returns:
+;  None
+	ld	hl,-2049
+	call	__frameset
+	ld	bc,(_xmax) \.r
+	ld	(ix-49),bc                  ; int xmax = maxx;
+	ld	bc,(_ymax) \.r
+	ld	(ix-9),bc                   ; int ymax = maxy;
+	ld	bc,(_ymin) \.r
+	ld	(ix-13),bc                  ; int ymin = miny;
+	lea	hl,ix
+	ld	de,-2049
+	add	hl,de
+	ld	(ix-3),hl                   ; end of stack
+	push	hl
+	pop	iy                          ; linesegment stack[maxdepth], *sp = stack
+	or	a,a
+	sbc	hl,hl
+	ld	l,(ix+9)
+	ld	(ix+9),hl
+	ld	e,l
+	ld	bc,(ix+6)
+	call	_PixelPtrNoChks_ASM \.r     ; old_color = getpixel(x, y)
+	ld	b,(ix+12)                   ; new_color
+	ld	a,(hl)
+	cp	a,b
+	jr	z,RestoreStack              ; if( old_color == new_color ) return
+	ld	(OldColor_SMC_1),a \.r
+	ld	(OldColor_SMC_2),a \.r
+	ld	(OldColor_SMC_3),a \.r
+	ld	a,b
+	ld	(NewColor_SMC_1),a \.r
+	ld	(NewColor_SMC_2),a \.r
+	
+	ld	hl,(ix+9)                   ; y
+	ld	de,(ix-9)
+	inc	hl
+	or	a,a
+	sbc	hl,de
+	jp	p,+_ \.r
+	jp	pe,InvalidPush_1 \.r
+	jr	++_
+_:	jp	po,InvalidPush_1 \.r
+_:	ld	bc,(ix+6)
+	ld	(iy+0),bc
+	ld	(iy+3),bc
+	ld	a,(ix+9)
+	ld	(iy+6),a
+	ld	(iy+9),1
+	lea	iy,iy+10                    ; push(x, x, y, 1);
+InvalidPush_1:
+	add	hl,de
+	dec	hl
+	or	a,a
+	sbc	hl,de
+	jp	p,+_ \.r
+	jp	pe,InvalidPush_2 \.r
+	jr	++_
+_:	jp	po,InvalidPush_2 \.r
+_:	ld	bc,(ix+6)
+	ld	(iy+0),bc
+	ld	(iy+3),bc
+	ld	a,(ix+9)
+	inc	a
+	ld	(iy+6),a
+	ld	(iy+9),-1
+	lea	iy,iy+10                    ; push(x, x, y+1, -1);
+InvalidPush_2:
+	
+	jp	WhileStackNotEmptyBegin \.r ; while ( sp > stack )
+WhileStackNotEmpty:
+	lea	iy,iy-10
+	ld	bc,(iy+0)
+	ld	(ix-16),bc                  ; xl
+	ld	de,(iy+3)
+	ld	(ix-22),de
+	ld	a,(iy+9)
+	ld	e,a
+	rla
+	sbc	hl,hl
+	ld	l,e
+	ld	(ix-6),hl
+	ld	de,(iy+6)
+	add	hl,de
+	ld	(ix+9),l                    ; pop (xl, xr, y, dy);
+                                            ; for ( x = xl; x >= xmin && gfx_getpixel(x, y) == old_color; --x )
+	ld	e,l
+	ld	hl,(currDrawBuffer)
+	add	hl,bc
+	ld	d,lcdWidth/2
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ex	de,hl                       ; de -> scanline, bc = x
+	ld	hl,(_xmin) \.r              ; hl = xmin
+	jr	Loop_For_Begin_1
+Loop_For_1:
+NewColor_SMC_1 =$+1
+	ld	a,0
+	ld	(de),a                      ; setpixel(x, y);
+	dec	de
+	dec	bc
+Loop_For_Begin_1:
+	or	a,a
+	sbc	hl,bc
+	jr	nc,Loop_For_Done
+	add	hl,bc
+	ld	a,(de)
+OldColor_SMC_1 =$+1
+	cp	a,0
+	jr	z,Loop_For_1
+Loop_For_Done:
+	ld	(ix+6),bc
+
+	ld	bc,(ix-16)
+	ld	hl,(ix+6)
+	or	a,a
+	sbc	hl,bc                       ; if ( x >= xl ) goto skip
+	jp	nc,SkipChecks \.r
+	add	hl,bc
+	inc	hl
+	ld	(ix-19),hl                  ; left = x+1;
+	or	a,a
+	sbc	hl,bc                       ; if( left < xl )
+	jp	p,+_ \.r
+	jp	pe,NoPush_5 \.r
+	jr	++_
+_:	jp	po,NoPush_5 \.r
+_:	lea	bc,ix-49                    ;  push(xl-1, left, y, -dy) -- Left leak?
+	lea	hl,iy
+	or	a,a
+	sbc	hl,bc
+	jr	nc,InvalidPush_5
+	ld	bc,(ix-16)
+	dec	bc                          ; xl-1 = bc
+	ld	de,(ix-6)
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,de
+	ld	a,l                         ; negate -dy
+	add	hl,bc
+	ld	de,(ix-13)
+	or	a,a
+	sbc	hl,de
+	jp	m,_ \.r
+	jp	pe,InvalidPush_5 \.r
+	jr	++_
+_:	jp	po,InvalidPush_5 \.r
+_:	add	hl,de
+	ld	de,(ix-9)
+	or	a,a
+	sbc	hl,de
+	jp	p,+_ \.r
+	jp	pe,InvalidPush_5 \.r
+	jr	++_
+_:	jp	po,InvalidPush_5 \.r
+_:	ld	(iy+0),bc
+	ld	bc,(ix-19)
+	ld	(iy+3),bc
+	ld	c,(ix+9)
+	ld	(iy+6),c
+	ld	(iy+9),a                    ; a = -dy
+	lea	iy,iy+10
+NoPush_5:
+InvalidPush_5:
+	ld	bc,(ix-16)
+	inc	bc                          ; x = xl+1;
+	
+DoWhileLoop:
+	ld	e,(ix+9)
+	ld	hl,(currDrawBuffer)
+	add	hl,bc
+	ld	d,lcdWidth/2
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ex	de,hl
+	push	bc
+	pop	hl
+	ld	bc,(ix-49)
+	jr	Loop_For_Begin_2
+Loop_For_2:
+NewColor_SMC_2 =$+1
+	ld	a,0
+	ld	(de),a
+	inc	de
+	inc	hl
+Loop_For_Begin_2:
+	or	a,a
+	sbc	hl,bc
+	jr	nc,Loop_For_Done_2_2
+	add	hl,bc
+	ld	a,(de)
+OldColor_SMC_2 =$+1
+	cp	a,0
+	jr	z,Loop_For_2
+	jr	Loop_For_Done_2
+Loop_For_Done_2_2:
+	add	hl,bc
+Loop_For_Done_2:
+	ld	(ix+6),hl
+	ex	de,hl                       ; de = x
+	
+	lea	bc,ix-49
+	lea	hl,iy
+	or	a,a
+	sbc	hl,bc
+	jr	nc,InvalidPush_3
+	ld	bc,(ix-6)
+	ld	hl,(ix+9)
+	ld	a,l                         ; a = y
+	add	hl,bc
+	ld	bc,(ix-13)
+	or	a,a
+	sbc	hl,bc
+	jp	m,+_ \.r
+	jp	pe,InvalidPush_3 \.r
+	jr	++_
+_:	jp	po,InvalidPush_3 \.r
+_:	add	hl,bc
+	ld	bc,(ix-9)
+	or	a,a
+	sbc	hl,bc
+	jp	p,+_ \.r
+	jp	pe,InvalidPush_3 \.r
+	jr	++_
+_:	jp	po,InvalidPush_3 \.r
+_:	ld	bc,(ix-19)
+	ld	(iy+0),bc
+	dec	de
+	ld	(iy+3),de                   ; x-1
+	ld	(iy+6),a                    ; a = y
+	ld	a,(ix-6)
+	ld	(iy+9),a
+	lea	iy,iy+10                    ; push(left, x-1, y, dy)
+InvalidPush_3:
+	ld	hl,(ix-22)
+	inc	hl
+	ld	(ix-43),hl
+	ld	bc,(ix+6)
+	or	a,a
+	sbc	hl,bc                       ; if( x > xr+1 ) push(xr+1, x-1, y, -dy); -- Was there a leak on the right?
+	jp	p,+_	\.r
+	jp	pe,InvalidPush_4 \.r
+	jr	++_
+_:	jp	po,InvalidPush_4 \.r
+_:	lea	de,ix-49
+	lea	hl,iy
+	or	a,a
+	sbc	hl,de
+	jr	nc,InvalidPush_4            ; stack limit
+	ld	de,(ix-6)
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,de
+	ld	a,l                         ; negate a = -dy
+	ld	bc,(ix+9)
+	add	hl,bc
+	ld	(ix-31),hl
+	ld	bc,(ix-13)
+	or	a,a
+	sbc	hl,bc
+	jp	m,+_ \.r
+	jp	pe,InvalidPush_4 \.r
+	jr	++_
+_:	jp	po,InvalidPush_4 \.r
+_:	ld	hl,(ix-31)
+	ld	bc,(ix-9)
+	or	a,a
+	sbc	hl,bc
+	jp	p,+_ \.r
+	jp	pe,InvalidPush_4 \.r
+	jr	++_
+_:	jp	po,InvalidPush_4 \.r
+_:	ld	bc,(ix-43)
+	ld	(iy+0),bc
+	ld	bc,(ix+6)
+	dec	bc
+	ld	(iy+3),bc
+	ld	(iy+9),a                    ; a = -dy
+	ld	a,(ix+9)
+	ld	(iy+6),a
+	lea	iy,iy+10                    ; push(xr+1, x-1, y, -dy);
+SkipChecks:
+InvalidPush_4:
+	ld	bc,(ix+6)                   ; for( ++x; x <= xr && getpixel(x, y) != old_color; ++x );
+	inc	bc
+	ld	e,(ix+9)
+	ld	hl,(currDrawBuffer)
+	add	hl,bc
+	ld	d,lcdWidth/2
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ex	de,hl                       ; de -> scanline, bc = x
+	ld	hl,(ix-22)                  ; hl = xr
+	jr	Loop_For_Begin_3
+Loop_For_3:
+	inc	bc
+	inc	de
+Loop_For_Begin_3:
+	or	a,a
+	sbc	hl,bc
+	jr	c,Loop_For_Done_3
+	add	hl,bc
+	ld	a,(de)
+OldColor_SMC_3 =$+1
+	cp	a,0
+	jr	nz,Loop_For_3
+Loop_For_Done_3:
+	ld	(ix-19),bc                  ; left = x
+	ld	(ix+6),bc
+	ld	hl,(ix-22)
+	or	a,a
+	sbc	hl,bc
+	jp	nc,DoWhileLoop \.r
+WhileStackNotEmptyBegin:
+	ld	hl,(ix-3)
+	lea	bc,iy
+	or	a,a
+	sbc	hl,bc
+	jp	c,WhileStackNotEmpty \.r
+	ld	sp,ix
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -4193,7 +4523,7 @@ _LZ_ReadVarSize_ASM:
 	ld	sp,hl
 	ld	(ix+-3),de
 	ld	(ix+-6),de
-DoWhileLoop:
+LZDoWhileLoop:
 	or	a,a
 	sbc	hl,hl
 	ex	de,hl
@@ -4232,7 +4562,7 @@ DoWhileLoop:
 	sbc	hl,hl
 	ld	l,a
 	sbc	hl,de
-	jr	nz,DoWhileLoop
+	jr	nz,LZDoWhileLoop
 	ld	hl,(ix+6)
 	ld	bc,(ix+-3)
 	ld	(hl),bc
@@ -4255,6 +4585,7 @@ _PixelPtr_ASM:
 	ld	hl,-lcdHeight
 	add	hl,de
 	ret	c
+_PixelPtrNoChks_ASM:
 	ld	hl,(currDrawBuffer)
 	add	hl,bc
 	ld	d,lcdWidth/2
@@ -4339,14 +4670,16 @@ _SetFullScrnClip_ASM:
 ; Inputs:
 ;  None
 ; Outputs:
-;  HL=0
-	ld	hl,lcdWidth
-	ld	(_xmax),hl \.r
-	ld	hl,lcdHeight
-	ld	(_ymax),hl \.r
-	ld	l,0
+;  HL=lcdWidth
+	ld	a,lcdHeight
+	ld	(_ymax),a \.r
+	xor	a,a
+	ld	(_ymin),a \.r
+	sbc	hl,hl
 	ld	(_xmin),hl \.r
-	ld	(_ymin),hl \.r
+	inc	h
+	ld	l,lcdWidth-$ff
+	ld	(_xmax),hl \.r
 	ret
 
 ;-------------------------------------------------------------------------------

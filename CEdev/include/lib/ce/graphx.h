@@ -1046,6 +1046,15 @@ uint16_t gfx_Lighten(uint16_t color, uint8_t amount);
 uint16_t gfx_Darken(uint16_t color, uint8_t amount);
 
 /**
+ * Fills an area with a color
+ * 
+ * @param x X coordinate to begin filling at
+ * @param y Y coordinate to begin filling at
+ * @param color New color to fill with
+ */
+void gfx_FloodFill(unsigned int x, unsigned int y, uint8_t color);
+
+/**
  * Converts an RGB value to a palette color
  *
  * Conversion is not 100% perfect, but is quite close
