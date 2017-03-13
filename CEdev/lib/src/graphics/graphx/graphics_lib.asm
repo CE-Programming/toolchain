@@ -2212,20 +2212,19 @@ _ClipDraw_ASM:
 	ld	(iy+3),a                    ; save tmpHeight
 	inc	hl
 	ld	(iy+6),hl                   ; save a ptr to the sprite data to change offsets
-	ld	de,(ix+9)
+	ld	bc,(ix+9)
 	ld	hl,(_ymin) \.r
-	call	_SignedCompare_ASM \.r
+	call	_SignedCompareBC_ASM \.r
 	jr	c,NoTopClipNeeded_ASM
 	ld	hl,(iy+3)
-	add	hl,de
+	add	hl,bc
 	ex	de,hl
 	ld	hl,(_ymin) \.r
 	call	_SignedCompare_ASM \.r
-	ret	nc
-	ld	de,(ix+9)                   ; y location
+	ret	nc                          ; bc = y location
 	ld	hl,(_ymin) \.r              ; ymin
 	or	a,a
-	sbc	hl,de
+	sbc	hl,bc
 	ld	a,(iy+3)
 	sub	a,l
 	ld	(iy+3),a
@@ -2234,22 +2233,23 @@ _ClipDraw_ASM:
 	ld	de,(iy+6)                   ; de -> sprite data
 	add	hl,de
 	ld	(iy+6),hl                   ; store new ptr
-	ld	de,(_ymin) \.r
-	ld	(ix+9),de                   ; new y location ymin
+	ld	a,(_ymin) \.r               ; new y location ymin
+	ld	c,a
 NoTopClipNeeded_ASM:
-	ex	de,hl                       ; hl = y coordinate
+	push	bc
+	pop	hl                          ; hl = y coordinate
 	ld	de,(_ymax) \.r
 	call	_SignedCompare_ASM \.r
 	ret	nc                          ; return if offscreen on bottom
-	ld	de,(ix+9)                   ; de = y coordinate
+	                                    ; bc = y coordinate
 	ld	hl,(iy+3)                   ; hl = tmpHeight
-	add	hl,de
+	add	hl,bc
 	ld	de,(_ymax) \.r
 	call	_SignedCompare_ASM \.r
 	jr	c,NoBottomClipNeeded_ASM    ; is partially clipped bottom?
 	ex	de,hl                       ; hl = ymax
-	ld	de,(ix+9)                   ; de = y coordinate
-	sbc	hl,de
+	                                    ; bc = y coordinate
+	sbc	hl,bc
 	ld	(iy+3),hl                   ; store new tmpHeight
 NoBottomClipNeeded_ASM:
 	ld	hl,(ix+6)                   ; hl = x coordinate
@@ -2300,7 +2300,7 @@ NoRightClip_ASM:
 tmpSpriteWidth =$+1
 	ld	a,0
 	ld	de,(ix+6)                   ; de = x coordinate
-	ld	l,(ix+9)                    ; l = y coordinate
+	ld	l,c                         ; l = y coordinate
 	sub	a,(iy+0)                    ; compute new x width
 	scf                                 ; set carry for success
 	ret
@@ -4663,7 +4663,14 @@ _SignedCompare_ASM:
 	ret	po
 	ccf
 	ret
-
+_SignedCompareBC_ASM:
+	or	a,a
+	sbc	hl,bc
+	add	hl,hl
+	ret	po
+	ccf
+	ret
+	
 ;-------------------------------------------------------------------------------
 _SetFullScrnClip_ASM:
 ; Sets the clipping  to the entire screen
