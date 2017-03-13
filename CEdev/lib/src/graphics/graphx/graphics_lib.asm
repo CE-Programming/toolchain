@@ -118,6 +118,12 @@ DEFAULT_TEXT_TP_COLOR   equ 255
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
+; Useful Macros
+#define mSignedCompareDE() or a,a \ sbc hl,de \ add hl,hl \ jp po,$+5 \.r \ ccf \
+#define mSignedCompareBC() or a,a \ sbc hl,bc \ add hl,hl \ jp po,$+5 \.r \ ccf \
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
 _AllocSprite:
 ; Allocates space for a new sprite
 ; Arguments:
@@ -663,12 +669,12 @@ _HorizLine:
 	add	iy,sp
 	ld	de,(_ymin) \.r
 	ld	hl,(iy+6)
-	call	_SignedCompare_ASM \.r      ; compare y coordinate <-> ymin
+	mSignedCompareDE()                  ; compare y coordinate <-> ymin
 	ret	c
 	ld	hl,(_ymax) \.r
 	dec	hl                          ; inclusive
 	ld	de,(iy+6)
-	call	_SignedCompare_ASM \.r      ; compare y coordinate <-> ymax
+	mSignedCompareDE()                  ; compare y coordinate <-> ymax
 	ret	c
 	ld	hl,(iy+9)
 	ld	de,(iy+3)
@@ -682,7 +688,7 @@ _HorizLine:
 	call	_Min_ASM \.r
 	ld	(iy+9),hl                   ; save minimum x value
 	ld	de,(iy+3)
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	c
 	ld	hl,(iy+9)
 	sbc	hl,de
@@ -742,11 +748,11 @@ _VertLine:
 	ld	hl,(_xmax) \.r
 	dec	hl                          ; inclusive
 	ld	de,(iy+3)
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	c                           ; return if x > xmax
-	ld	hl,(iy+3)
+	ex	de,hl
 	ld	de,(_xmin) \.r
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	c                           ; return if x < xmin
 	ld	hl,(iy+9)
 	ld	de,(iy+6)
@@ -760,7 +766,7 @@ _VertLine:
 	call	_Min_ASM \.r                ; get maximum y
 	ld	(iy+9),hl
 	ld	de,(iy+6)
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	c                           ; return if not within y bounds
 	ld	hl,(iy+9)
 	sbc	hl,de
@@ -2010,6 +2016,10 @@ _Sprite:
 ;  arg4 : Height -- 8bits
 ; Returns:
 ;  None
+	scf
+	sbc	hl,hl
+	ld	(hl),2
+	
 	push	ix                          ; save ix sp
 	call	_ClipDraw_ASM \.r
 	pop	ix                          ; restore ix sp
@@ -2214,13 +2224,13 @@ _ClipDraw_ASM:
 	ld	(iy+6),hl                   ; save a ptr to the sprite data to change offsets
 	ld	bc,(ix+9)
 	ld	hl,(_ymin) \.r
-	call	_SignedCompareBC_ASM \.r
+	mSignedCompareBC()
 	jr	c,NoTopClipNeeded_ASM
 	ld	hl,(iy+3)
 	add	hl,bc
 	ex	de,hl
 	ld	hl,(_ymin) \.r
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	nc                          ; bc = y location
 	ld	hl,(_ymin) \.r              ; ymin
 	or	a,a
@@ -2239,13 +2249,13 @@ NoTopClipNeeded_ASM:
 	push	bc
 	pop	hl                          ; hl = y coordinate
 	ld	de,(_ymax) \.r
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	nc                          ; return if offscreen on bottom
 	                                    ; bc = y coordinate
 	ld	hl,(iy+3)                   ; hl = tmpHeight
 	add	hl,bc
 	ld	de,(_ymax) \.r
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	jr	c,NoBottomClipNeeded_ASM    ; is partially clipped bottom?
 	ex	de,hl                       ; hl = ymax
 	                                    ; bc = y coordinate
@@ -2254,14 +2264,14 @@ NoTopClipNeeded_ASM:
 NoBottomClipNeeded_ASM:
 	ld	hl,(ix+6)                   ; hl = x coordinate
 	ld	de,(_xmin) \.r
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ld	hl,(ix+6)                   ; hl = x coordinate
 	jr	nc,NoLeftClip_ASM           ; is partially clipped left?
 	ld	de,(iy+0)                   ; de = tmpWidth
 	add	hl,de					
 	ld	de,(_xmin) \.r
 	ex	de,hl
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	nc                          ; return if offscreen
 	ld	de,(ix+6)                   ; de = x coordinate
 	ld	hl,(_xmin) \.r
@@ -2279,15 +2289,15 @@ NoBottomClipNeeded_ASM:
 	ld	(ix+6),hl                   ; save min x coordinate
 NoLeftClip_ASM:
 	ld	de,(_xmax) \.r              ; de = xmax
-	call	_SignedCompare_ASM \.r
+	mSignedCompareDE()
 	ret	nc                          ; return if offscreen
 	ld	hl,(ix+6)                   ; hl = x coordinate
 	ld	de,(iy+0)                   ; de = tmpWidth
 	add	hl,de
 	ld	de,(_xmax) \.r
 	ex	de,hl
-	call	_SignedCompare_ASM \.r      ; is partially clipped right?
-	jr	nc,NoRightClip_ASM
+	mSignedCompareDE()
+	jr	nc,NoRightClip_ASM          ; is partially clipped right?
 	ld	hl,(_xmax) \.r              ; clip on the right
 	ld	de,(ix+6)
 	ccf
@@ -4231,7 +4241,7 @@ _:	ld	bc,(ix+6)
 	ld	a,(ix+9)
 	ld	(iy+6),a
 	ld	(iy+9),1
-	lea	iy,iy+10                    ; push(x, x, y, 1);
+	lea	iy,iy+10                    ; push(x, x, y, 1)
 InvalidPush_1:
 	add	hl,de
 	dec	hl
@@ -4248,7 +4258,7 @@ _:	ld	bc,(ix+6)
 	inc	a
 	ld	(iy+6),a
 	ld	(iy+9),-1
-	lea	iy,iy+10                    ; push(x, x, y+1, -1);
+	lea	iy,iy+10                    ; push(x, x, y+1, -1)
 InvalidPush_2:
 	
 	jp	WhileStackNotEmptyBegin \.r ; while ( sp > stack )
@@ -4267,7 +4277,7 @@ WhileStackNotEmpty:
 	ld	de,(iy+6)
 	add	hl,de
 	ld	(ix+9),l                    ; pop (xl, xr, y, dy);
-                                            ; for ( x = xl; x >= xmin && gfx_getpixel(x, y) == old_color; --x )
+                                            ; for ( x = xl; x >= xmin && getpixel(x, y) == old_color; --x )
 	ld	e,l
 	ld	hl,(currDrawBuffer)
 	add	hl,bc
@@ -4281,7 +4291,7 @@ WhileStackNotEmpty:
 Loop_For_1:
 NewColor_SMC_1 =$+1
 	ld	a,0
-	ld	(de),a                      ; setpixel(x, y);
+	ld	(de),a                      ; setpixel(x, y)
 	dec	de
 	dec	bc
 Loop_For_Begin_1:
@@ -4303,7 +4313,7 @@ Loop_For_Done:
 	jp	nc,SkipChecks \.r
 	add	hl,bc
 	inc	hl
-	ld	(ix-19),hl                  ; left = x+1;
+	ld	(ix-19),hl                  ; left = x+1
 	or	a,a
 	sbc	hl,bc                       ; if( left < xl )
 	jp	p,+_ \.r
@@ -4348,7 +4358,7 @@ _:	ld	(iy+0),bc
 NoPush_5:
 InvalidPush_5:
 	ld	bc,(ix-16)
-	inc	bc                          ; x = xl+1;
+	inc	bc                          ; x = xl+1
 	
 DoWhileLoop:
 	ld	e,(ix+9)
@@ -4464,10 +4474,10 @@ _:	ld	bc,(ix-43)
 	ld	(iy+9),a                    ; a = -dy
 	ld	a,(ix+9)
 	ld	(iy+6),a
-	lea	iy,iy+10                    ; push(xr+1, x-1, y, -dy);
+	lea	iy,iy+10                    ; push(xr+1, x-1, y, -dy)
 SkipChecks:
 InvalidPush_4:
-	ld	bc,(ix+6)                   ; for( ++x; x <= xr && getpixel(x, y) != old_color; ++x );
+	ld	bc,(ix+6)                   ; for( ++x; x <= xr && getpixel(x, y) != old_color; ++x )
 	inc	bc
 	ld	e,(ix+9)
 	ld	hl,(currDrawBuffer)
@@ -4487,7 +4497,7 @@ Loop_For_Begin_3:
 	sbc	hl,bc
 	jr	c,Loop_For_Done_3
 	add	hl,bc
-	ld	a,(de)
+	ld	a,(de)                      ; getpixel(x, y)
 OldColor_SMC_3 =$+1
 	cp	a,0
 	jr	nz,Loop_For_3
