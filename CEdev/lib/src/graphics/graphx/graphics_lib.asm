@@ -2016,10 +2016,6 @@ _Sprite:
 ;  arg4 : Height -- 8bits
 ; Returns:
 ;  None
-	scf
-	sbc	hl,hl
-	ld	(hl),2
-	
 	push	ix                          ; save ix sp
 	call	_ClipDraw_ASM \.r
 	pop	ix                          ; restore ix sp
