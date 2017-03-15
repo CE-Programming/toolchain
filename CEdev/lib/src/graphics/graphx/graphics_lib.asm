@@ -4029,157 +4029,103 @@ _ScaleSprite:
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	ld	hl,-27
-	call	__frameset
-	
-	or	a,a
-	sbc	hl,hl
-	ld	(ix-24),hl                  ; uint8_t *PrevSource = null
-	ld	(ix-20),hl                  ; uint8_t Err = 0
-	
-	ld	hl,(ix+9)
-	ld	a,(hl)
-	ld	(ix-1),a                    ; uint8_t TgtWidth = sprite_out->width
-	ld	(TgtWidth),a \.r
-	ld	(TgtWidth_2),a \.r
-	inc	hl
-	ld	a,(hl)
-	ld	(TgtHeight),a \.r           ; uint8_t TgtHeight = sprite_out->height
-	ld	iyh,a                       ; uint8_t NumPixels = TgtHeight
-	ld	e,a
-	inc	hl
-	ld	(ix-4),hl                   ; uint8_t *Target = sprite_out->data
-	ld	hl,(ix+6)
-	ld	a,(hl)
-	ld	c,a
-	ld	(SrcWidth),a \.r            ; uint8_t SrcWidth = sprite_in->width
-	inc	hl
-	ld	d,(hl)                      ; uint8_t SrcHeight = sprite_in->height
-	inc	hl
-	push	hl                          ; uint8_t *Source = sprite_in->data
-
-	xor	a,a
-	ld	b,8
-_:	sla	d
-	rla
-	cp	a,e
-	jr	c,+_
-	sub	e
-	inc	d
-_:	djnz	--_
-	ld	e,c
-	mlt	de
-	ld	(FractPart),a \.r           ; uint8_t FractPart = SrcHeight % TgtHeight
-	ld	(IntPart),de \.r            ; uint8_t IntPart = (SrcHeight / TgtHeight) * SrcWidth
-	
-	ld	d,c
-	ld	e,(ix-1)
-	xor	a,a
-	ld	b,8
-_:	sla	d
-	rla
-	cp	a,e
-	jr	c,+_
-	sub	e
-	inc	d
-_:	djnz	--_
-	ld	(FractPartWidth),a \.r      ; uint8_t FractPartWidth = SrcWidth % TgtWidth;
-	ld	a,d
-	ld	(IntPartWidth),a \.r        ; uint8_t IntPartWidth = SrcWidth / TgtWidth
-
-	pop	de
-	jp	WhileNumPixelsLoop \.r      ; while (NumPixels-- > 0)
-WhileNumPixels:
-	ld	hl,(ix-24)
-	or	a,a
-	sbc	hl,de
-	push	de
-	ld	bc,0
-	jr	nz,Source_NotEq_Prev        ; if (Source == PrevSource)
-	ld	c,(ix-1)
-	or	a,a
-	sbc	hl,hl
-	ld	l,c
-	ex	de,hl
-	ld	hl,(ix-4)
-	push	hl
-	or	a,a
-	sbc	hl,de
-	pop	de
-	ldir                                ; memcpy(Target, Target-TgtWidth, TgtWidth)
-	ld	(ix-4),de                   ; Target += TgtWidth
-	jr	DoneLine
-Source_NotEq_Prev:
-	ld	(ix-24),de                  ; PrevSource = Source; uint8_t *SourceLine = Source;
-TgtWidth_2 =$+2
-	ld	iyl,0                       ; uint8_t NumPixelsLine = TgtWidth;
-	or	a,a
-	sbc	hl,hl
+	ld	iy,0
+	lea	bc,iy
+	add	iy,sp
 	push	ix
-	ld	ix,(ix-4)
-	jr	WhileNumPixelsLineStart     ; while (NumPixelsLine-- > 0)
-WhileNumPixelsLineLoop:
+	ld	hl,(iy+6)
 	push	hl
-	ld	a,(de)
-	ld	(ix),a
-	inc	ix                          ; *Target++ = *SourceLine
-IntPartWidth =$+1
-	ld	hl,0
-	add	hl,de
-	ex	de,hl                       ; SourceLine += IntPartWidth
-	pop	hl
-FractPartWidth =$+1
-	ld	c,0
+	ld	a,(hl)
+	ld	ixh,a                       ; target_width
+	ld	(targetwidth),a \.r
+	inc	hl
+	xor	a,a
+	sub	a,(hl)
+	ld	ixl,a                       ; -target_height
+	inc	hl
+	push	hl                          ; hl->tgt_data
+	ld	hl,(iy+3)
+	ld	e,(hl)                      ; src_width
+	inc	hl
+	ld	c,(hl)                      ; src_height
+	inc	hl
+	push	hl                          ; hl->src_data
+	push	de                          ; e = src_width
+	call	_UCDivA_ASM \.r             ; ca = dv = (source_height*256)/target_height    
+	pop	hl                          ; l = src_width
+	ld	(dv_shl_16+2),a \.r
+	ld	h,c
+        ld	c,l
+	mlt	hl
+	ld	(dv_shr_8_times_width),hl \.r
 	add	hl,bc
-TgtWidth =$+1
+	ld	(dv_shr_8_times_width_plus_width),hl \.r
+	xor	a,a
+	sub	a,ixh                       ; -target_width
+	call	_UCDivA_ASM \.r             ; ca = du = (source_width*256)/target_width
+	pop	hl                          ; hl->src_data
+	pop	de                          ; de->tgt_data
+	ld	iy,0
+	ld	iyl,a
+	ld	a,c                         ; du = bc:iyl
+	ld	(du),a \.r                  ; ixl = target_height
+
+; b = out_loop_times
+; de = target buffer adress
+out:
+	push	hl
+targetwidth =$+2
+	ld	iyh, 0
+	xor	a,a
+	ld	b,a
+du =$+1
 	ld	c,0
-	or	a,a
-	sbc	hl,bc                       ; if (ErrLine >= TgtWidth)  
-	jr	c,WhileNumPixelsLine
-	inc	de                          ; SourceLine++
-	jr	WhileNumPixelsLineStart
-WhileNumPixelsLine:
-	add	hl,bc                       ; Errline -= TgtWidth
-WhileNumPixelsLineStart:
-	ld	a,iyl
-	dec	iyl
-	or	a,a
-	jr	nz,WhileNumPixelsLineLoop
-	lea	hl,ix
-	pop	ix
-	ld	(ix-4),hl
-DoneLine:
-	pop	de
-IntPart =$+1
-	ld	hl,0
-	add	hl,de
-	ex	de,hl                       ; Source += IntPart
-FractPart =$+1	
-	ld	c,0
-	ld	hl,(ix-20)
-	add	hl,bc
-	ld	(ix-20),hl                  ; Err += FractPart
-TgtHeight =$+1
-	ld	c,0
-	or	a,a
-	sbc	hl,bc                       ; if (Err >= TgtHeight)
-	jr	c,WhileNumPixelsLoop
-	ld	(ix-20),hl                  ; Err -= tgtheight;
-SrcWidth =$+1
-	ld	hl,0
-	add	hl,de
-	ex	de,hl                       ; Source += SrcWidth;
-WhileNumPixelsLoop:
-	ld	a,iyh
+loop:	ldi
+	add	a,iyl
+	adc	hl,bc                       ; xu += du
+	inc	bc                          ; bc:iyl is du
 	dec	iyh
-	or	a,a
-	jp	nz,WhileNumPixels \.r
-	ld	hl,(ix+9)                   ; return sprite_out;
-	ld	sp,ix
-RestoreStack:
+	jr	nz,loop
+	pop	hl                          ; add up to hla
+dv_shl_16 =$+1
+	ld	bc,0                        ; dv<<16
+	add	iy,bc
+dv_shr_8_times_width =$+1
+	ld	bc,0                        ; dv>>8*src_width
+	jr	nc,+_
+dv_shr_8_times_width_plus_width =$+1
+	ld	bc,0                        ; dv>>8*src_width+src_width
+_:	add	hl,bc
+	inc	ixl
+	jr	nz,out
+	pop	hl
 	pop	ix
 	ret
-
+	
+_UCDivA_ASM:
+	sbc	hl,hl
+	ld	h,a
+	xor	a,a
+	ld	l,a
+	ex	de,hl
+	sbc	hl,hl
+	ld	l,c
+	call	+_ \.r
+	ld	c,a
+_:	ld	b,8
+_:	add	hl,hl
+	add	hl,de
+	jr	c,+_
+	sbc	hl,de
+_:	rla
+	djnz	--_
+	ret                                 ; ca = c*256/a, h = c*256%a
+	
+;-------------------------------------------------------------------------------
+RestoreStack:
+	ld	sp,ix
+	pop	ix
+	ret
 ;-------------------------------------------------------------------------------
 _FloodFill:
 ; Preforms an implementation of a flood fill so no one hopefully crashes the stack

@@ -658,7 +658,19 @@ typedef uint8_t sk_key_t;
 /**
  * Performs an OS call to get the keypad scan code
  *
- * Technically return type is uint24_t, but that is not useful as the high byte is 0
+ * You can also use this function to get input from the user as a string like this:
+ * @code
+ * const char *chars = "\0\0\0\0\0\0\0\0\0\0\"WRMH\0\0?[VQLG\0\0:ZUPKFC\0 YTOJEB\0\0XSNIDA\0\0\0\0\0\0\0\0";
+ * uint8_t key, i = 0;
+ * char buffer[50];
+ * 
+ * while((key = os_GetCSC()) != sk_Enter) {
+ *     if(chars[key]) {
+ *         buffer[i++] = chars[key];
+ *     }
+ * }
+ * @endcode
+ * Feel free to modify the string to suit your needs.
  * @returns Key scan code
  */
 sk_key_t os_GetCSC(void);
