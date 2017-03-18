@@ -16,6 +16,7 @@
 /* Use some random color as the transparent one */
 #define TRANSPARENT_COLOR 10
 #define FONT_WIDTH        8
+#define FONT_HEIGHT       8
 
 /* Put function prototypes here */
 
@@ -38,7 +39,7 @@ void main(void) {
     gfx_SetMonospaceFont( FONT_WIDTH );
     
     /* Print some upside down text */
-    printu(my_str, (LCD_WIDTH - gfx_GetStringWidth(my_str)) / 2, (LCD_HEIGHT - gfx_FontHeight()) / 2);
+    printu(my_str, (LCD_WIDTH - gfx_GetStringWidth(my_str)) / 2, (LCD_HEIGHT - FONT_HEIGHT) / 2);
     
     /* Wait for key */
     while(!os_GetCSC());

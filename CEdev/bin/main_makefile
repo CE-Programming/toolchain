@@ -7,7 +7,7 @@ LIBHEADER_ASM := libheader.asm
 #----------------------------
 
 SHELL := cmd.exe
-VERSION := 6.9
+VERSION := 7.1
 
 #----------------------------
 # Try not to edit anything below these lines unless you know what you are doing
@@ -23,6 +23,7 @@ CD = cd
 RM = del /F /Q
 CP = copy /Y
 NULL = >nul 2>&1
+RM_DIR = rmdir /s /q
 
 #Generate the default names for input and object files
 TARGETHEX := $(TARGET).hex
@@ -256,8 +257,14 @@ $(OBJDIR)/%.obj :
 	
 #This rule cleans up everything
 clean :
-	@$(RM) $(call WINPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJECTS) $(OBJDIR)/*.src $(OBJDIR)/$(ICON_ASM)) $(NULL)
+	@$(RM) $(call WINPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJECTS) $(OBJDIR)/*.src $(OBJDIR)/*.asm) $(NULL)
 	@echo Cleaned build files.
+
+#This rule cleans up everything except the executable
+clean-leave-executable :
+	@$(RM) $(call WINPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETMAP)) $(NULL)
+	@$(RM_DIR) $(call WINPATH,$(OBJDIR)) $(NULL)
+	@echo Cleaned $(TARGET)
 	
 version :
 	@echo C CE SDK Version $(VERSION)

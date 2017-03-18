@@ -5,7 +5,7 @@
 
 set LIB_NAME=GRAPHC
 set LIB_SRC=graphics_lib_old.asm
-set SPASM_EXE=%CEDEV%\lib\src\include\spasm.exe
+set SPASM_EXE=%CEDEV%\bin\spasm.exe
 
 echo Assembling Library...
 mkdir lib

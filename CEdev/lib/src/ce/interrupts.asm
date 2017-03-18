@@ -25,6 +25,10 @@ intRtc                  equ 1000h
 ;-------------------------------------------------------------------------------
 _int_Initialize:
 	di
+	ld	de,lconf
+	ld	hl,mpIntMask
+	ld	bc,16
+	ldir
 	ld	hl,cconf
 	ld	de,mpIntMask
 	ld	bc,16
@@ -125,12 +129,14 @@ _int_Reset:
 	ldir
 	im	1
 	ret
+	segment bss
+lconf:	ds	16
 	segment data
-lconf:	dw	intOnKey | intOsTimer | intRtc | 2000h, 0
-	dw	0FFFFh, 0FFFFh
-	dw	intOnKey | intOsTimer, 0
-	dw	0, 0
-cconf:	;dw	0, 0
-	dw	0FFFFh, 0FFFFh
-	dw	0, 0
-	dw	0, 0
+cconf:	; Mask
+	db 000h,000h,000h,000h
+	; ACK
+	db 0FFh,0FFh,0FFh,0FFh
+	; Latch
+	db 000h,000h,000h,000h
+	; Invert
+	db 000h,000h,000h,000h

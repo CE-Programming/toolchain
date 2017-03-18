@@ -21,8 +21,6 @@
  
 /* Put all your code here */
 void main(void) {
-    unsigned x_offset = 0, y_offset = 0;
-    
     /* Initialize the 8bpp graphics */
     gfx_Begin( gfx_8bpp );
     
@@ -34,7 +32,7 @@ void main(void) {
     
     /* Draw a line on the buffer */
     //gfx_FillScreen( gfx_black );
-    gfx_Line( 0, 0, 319, 239 );
+    gfx_Line( 0, 0, LCD_WIDTH-1, LCD_HEIGHT-1 );
     
     /* Wait for a key */
     while( !os_GetCSC() ); 

@@ -34,6 +34,7 @@ call :setfiles RTL_LINKED_ASM_SRC %LINKED_PATH%\*.asm
 call :setfiles RTL_SHARED_C_SRC %SHARED_PATH%\*.c
 call :setfiles RTL_SHARED_ASM_SRC %SHARED_PATH%\*.asm
 
+
 set INT_C_SRC=
 set INT_ASM_SRC=interrupts.asm
 

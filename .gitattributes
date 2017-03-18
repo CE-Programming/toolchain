@@ -1,0 +1,9 @@
+*.c	text eol=lf
+*.h	text eol=lf
+*.asm	text eol=lf
+*.inc	text eol=lf
+*.ini	text eol=lf
+*.log	text eol=lf
+*.bat	text eol=lf
+*.txt	text eol=lf
+*.md	text eol=lf
