@@ -1,0 +1,12 @@
+[submodule "src/tools/spasm"]
+	path = src/tools/spasm
+	url = https://github.com/alberthdev/spasm-ng
+[submodule "src/tools/convtile"]
+	path = src/tools/convtile
+	url = https://github.com/MattWaltz/convtile
+[submodule "src/tools/convhex"]
+	path = src/tools/convhex
+	url = https://github.com/MattWaltz/convhex
+[submodule "src/tools/convpng"]
+	path = src/tools/convpng
+	url = https://github.com/MattWaltz/convpng
