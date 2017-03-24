@@ -2653,6 +2653,8 @@ progCurrent		equ 0D0082Dh
 ;D0082E	; something used to execute apps with _NewContext0
 userMenuSA		equ 0D00838h
 
+tempErrorMessage	equ 0D00842h
+
 ioPrompt		equ 0D00879h
 ioFlag			equ 0D00894h
 sndRecState		equ 0D00896h
@@ -2783,6 +2785,30 @@ cal_PV			equ 0D01F89h
 cal_PMT			equ 0D01F92h
 cal_FV			equ 0D01F9Bh
 cal_PY			equ 0D01FA4h
+DeltaX			equ 0D01FAEh
+DeltaY			equ 0D01FB7h
+TraceStep		equ 0D0203Dh
+
+Plot1MarkType		equ 0D0227Eh
+Plot1List1		equ 0D0227Fh
+Plot1List2		equ 0D02284h
+Plot1FreqList		equ 0D02289h
+Plot1XYOnOff		equ 0D0228Eh
+Plot1Color		equ 0D0228Fh
+
+Plot2MarkType		equ 0D02290h
+Plot2List1		equ 0D02291h
+Plot2List2		equ 0D02296h
+Plot2FreqList		equ 0D0229Bh
+Plot2XYOnOff		equ 0D022A0h
+Plot2Color		equ 0D022A1h
+
+Plot3MarkType		equ 0D022A2h
+Plot3List1		equ 0D022A3h
+Plot3List2		equ 0D022A8h
+Plot3FreqList		equ 0D022ADh
+Plot3XYOnOff		equ 0D022B2h
+Plot3Color		equ 0D022B3h
 
 ES			equ 0D022BAh
 
@@ -2964,6 +2990,9 @@ batteryStatus		equ 0D02A86h
 
 graphBGColor		equ 0D02A98h
 
+errorLineY		equ 0D02A1Bh
+errorLineX		equ 0D02A23h
+
 fillRectColor		equ 0D02AC0h
 statusBarBGColor	equ 0D02ACCh
 
@@ -3003,7 +3032,6 @@ vRamEnd			equ 0D65800h
 ;--------------------------------
 pCpuSpeed		equ 0001h
 pHardwareId		equ 0003h
-pUsbRange		equ 3000h
 
 ;SHA256 Ports
 ;--------------------------------
@@ -3021,6 +3049,252 @@ mpShaData		equ mpShaRange + shaData
 shaState		equ 60h ; 20h bytes
 pShaState		equ pShaRange + shaState
 mpShaState		equ mpShaRange + shaState
+
+;USB Ports
+;--------------------------------
+pUsbRange		equ 03000h
+mpUsbRange		equ 0E20000h
+
+usbCapLen		equ 0000h
+pUsbCapLen		equ pUsbRange + usbCapLen
+mpUsbCapLen		equ mpUsbRange + usbCapLen
+usbHciVer		equ 0002h
+pUsbHciVer		equ pUsbRange + usbHciVer
+mpUsbHciVer		equ mpUsbRange + usbHciVer
+usbHcsParams		equ 0004h
+pUsbHcsParams		equ pUsbRange + usbHcsParams
+mpUsbHcsParams		equ mpUsbRange + usbHcsParams
+usbHccParams		equ 0008h
+pUsbHccParams		equ pUsbRange + usbHccParams
+mpUsbHccParams		equ mpUsbRange + usbHccParams
+usbCmd			equ 0010h
+pUsbCmd			equ pUsbRange + usbCmd
+mpUsbCmd		equ mpUsbRange + usbCmd
+usbSts			equ 0014h
+pUsbSts			equ pUsbRange + usbSts
+mpUsbSts		equ mpUsbRange + usbSts
+usbInt			equ 0018h
+pUsbInt			equ pUsbRange + usbInt
+mpUsbInt		equ mpUsbRange + usbInt
+usbFrIdx		equ 001Ch
+pUsbFrIdx		equ pUsbRange + usbFrIdx
+mpUsbFrIdx		equ mpUsbRange + usbFrIdx
+usbPeriodicListBase	equ 0020h
+pUsbPeriodicListBase	equ pUsbRange + usbPeriodicListBase
+mpUsbPeriodicListBase	equ mpUsbRange + usbPeriodicListBase
+usbAsyncListAddr	equ 0024h
+pUsbAsyncListAddr	equ pUsbRange + usbAsyncListAddr
+mpAsyncListAddr		equ mpUsbRange + usbAsyncListAddr
+usbPortSC		equ 0030h
+pUsbPortSC		equ pUsbRange + usbPortSC
+mpUsbPortSC		equ mpUsbRange + usbPortSC
+usbMisc			equ 0040h
+pUsbMisc		equ pUsbRange + usbMisc
+mpUsbMisc		equ mpUsbRange + usbMisc
+usbOtgCsr		equ 0080h
+pUsbOtgCsr		equ pUsbRange + usbOtgCsr
+mpUsbOtgCsr		equ mpUsbRange + usbOtgCsr
+usbOtgIsr		equ 0084h
+pUsbOtgIsr		equ pUsbRange + usbOtgIsr
+mpUsbOtgIsr		equ mpUsbRange + usbOtgIsr
+usbOtgIer		equ 0088h
+pUsbOtgIer		equ pUsbRange + usbOtgIer
+mpUsbOtgIer		equ mpUsbRange + usbOtgIer
+usbIsr			equ 00C0h
+pUsbIsr			equ pUsbRange + usbIsr
+mpUsbIsr		equ mpUsbRange + usbIsr
+usbImr			equ 00C4h
+pUsbImr			equ pUsbRange + usbImr
+mpUsbImr		equ mpUsbRange + usbImr
+usbDevCtrl		equ 0100h
+pUsbDevCtrl		equ pUsbRange + usbDevCtrl
+mpUsbDevCtrl		equ mpUsbRange + usbDevCtrl
+usbDevAddr		equ 0104h
+pUsbDevAddr		equ pUsbRange + usbDevAddr
+mpUsbDevAddr		equ mpUsbRange + usbDevAddr
+usbDevTest		equ 0108h
+pUsbDevTest		equ pUsbRange + usbDevTest
+mpUsbDevTest		equ mpUsbRange + usbDevTest
+usbSofFnr		equ 010Ch
+pUsbSofFnr		equ pUsbRange + usbSofFnr
+mpUsbSofFnr		equ mpUsbRange + usbSofFnr
+usbSofMtr		equ 0110h
+pUsbSofMtr		equ pUsbRange + usbSofMtr
+mpUsbSofMtr		equ mpUsbRange + usbSofMtr
+usbPhyTmsr		equ 0114h
+pUsbPhyTmsr		equ pUsbRange + usbPhyTmsr
+mpUsbPhyTmsr		equ mpUsbRange + usbPhyTmsr
+usbCxsr			equ 011Ch
+pUsbCxsr		equ pUsbRange + usbCxsr
+mpUsbCxsr		equ mpUsbRange + usbCxsr
+usbCxFifo		equ 0120h
+pUsbCxFifo		equ pUsbRange + usbCxFifo
+mpUsbCxFifo		equ mpUsbRange + usbCxFifo
+usbIdle			equ 0124h
+pUsbIdle		equ pUsbRange + usbIdle
+mpUsbIdle		equ mpUsbRange + usbIdle
+usbGimr			equ 0130h
+pUsbGimr		equ pUsbRange + usbGimr
+mpUsbGimr		equ mpUsbRange + usbGimr
+usbCxImr		equ 0134h
+pUsbCxImr		equ pUsbRange + usbCxImr
+mpUsbCxImr		equ mpUsbRange + usbCxImr
+usbFifoRxImr		equ 0138h
+pUsbFifoRxImr		equ pUsbRange + usbFifoRxImr
+mpUsbFifoRxImr		equ mpUsbRange + usbFifoRxImr
+usbFifoTxImr		equ 013Ah
+pUsbFifoTxImr		equ pUsbRange + usbFifoTxImr
+mpUsbFifoTxImr		equ mpUsbRange + usbFifoTxImr
+usbDevImr		equ 013Ch
+pUsbDevImr		equ pUsbRange + usbDevImr
+mpUsbDevImr		equ mpUsbRange + usbDevImr
+usbGisr			equ 0140h
+pUsbGisr		equ pUsbRange + usbGisr
+mpUsbGisr		equ mpUsbRange + usbGisr
+usbCxIsr		equ 0144h
+pUsbCxIsr		equ pUsbRange + usbCxIsr
+mpUsbCxIsr		equ mpUsbRange + usbCxIsr
+usbFifoRxIsr		equ 0148h
+pUsbFifoRxIsr		equ pUsbRange + usbFifoRxIsr
+mpUsbFifoRxIsr		equ mpUsbRange + usbFifoRxIsr
+usbFifoTxIsr		equ 014Ah
+pUsbFifoTxIsr		equ pUsbRange + usbFifoTxIsr
+mpUsbFifoTxIsr		equ mpUsbRange + usbFifoTxIsr
+usbDevIsr		equ 014Ch
+pUsbDevIsr		equ pUsbRange + usbDevIsr
+mpUsbDevIsr		equ mpUsbRange + usbDevIsr
+usbRxZlp		equ 0150h
+pUsbRxZlp		equ pUsbRange + usbRxZlp
+mpUsbRxZlp		equ mpUsbRange + usbRxZlp
+usbTxZlp		equ 0154h
+pUsbTxZlp		equ pUsbRange + usbTxZlp
+mpUsbTxZlp		equ mpUsbRange + usbTxZlp
+usbIsoEasr		equ 0158h
+pUsbIsoEasr		equ pUsbRange + usbIsoEasr
+mpUsbIsoEasr		equ mpUsbRange + usbIsoEasr
+usbIep1			equ 0160h
+pUsbIep1		equ pUsbRange + usbIep1
+mpUsbIep1		equ mpUsbRange + usbIep1
+usbIep2			equ 0164h
+pUsbIep2		equ pUsbRange + usbIep2
+mpUsbIep2		equ mpUsbRange + usbIep2
+usbIep3			equ 0168h
+pUsbIep3		equ pUsbRange + usbIep3
+mpUsbIep3		equ mpUsbRange + usbIep3
+usbIep4			equ 016Ch
+pUsbIep4		equ pUsbRange + usbIep4
+mpUsbIep4		equ mpUsbRange + usbIep4
+usbIep5			equ 0170h
+pUsbIep5		equ pUsbRange + usbIep5
+mpUsbIep5		equ mpUsbRange + usbIep5
+usbIep6			equ 0174h
+pUsbIep6		equ pUsbRange + usbIep6
+mpUsbIep6		equ mpUsbRange + usbIep6
+usbIep7			equ 0178h
+pUsbIep7		equ pUsbRange + usbIep7
+mpUsbIep7		equ mpUsbRange + usbIep7
+usbIep8			equ 017Ch
+pUsbIep8		equ pUsbRange + usbIep8
+mpUsbIep8		equ mpUsbRange + usbIep8
+usbOep1			equ 0180h
+pUsbOep1		equ pUsbRange + usbOep1
+mpUsbOep1		equ mpUsbRange + usbOep1
+usbOep2			equ 0184h
+pUsbOep2		equ pUsbRange + usbOep2
+mpUsbOep2		equ mpUsbRange + usbOep2
+usbOep3			equ 0188h
+pUsbOep3		equ pUsbRange + usbOep3
+mpUsbOep3		equ mpUsbRange + usbOep3
+usbOep4			equ 018Ch
+pUsbOep4		equ pUsbRange + usbOep4
+mpUsbOep4		equ mpUsbRange + usbOep4
+usbOep5			equ 0190h
+pUsbOep5		equ pUsbRange + usbOep5
+mpUsbOep5		equ mpUsbRange + usbOep5
+usbOep6			equ 0194h
+pUsbOep6		equ pUsbRange + usbOep6
+mpUsbOep6		equ mpUsbRange + usbOep6
+usbOep7			equ 0198h
+pUsbOep7		equ pUsbRange + usbOep7
+mpUsbOep7		equ mpUsbRange + usbOep7
+usbOep8			equ 019Ch
+pUsbOep8		equ pUsbRange + usbOep8
+mpUsbOep8		equ mpUsbRange + usbOep8
+usbEp1Map		equ 01A0h
+pUsbEp1Map		equ pUsbRange + usbEp1Map
+mpUsbEp1Map		equ mpUsbRange + usbEp1Map
+usbEp2Map		equ 01A1h
+pUsbEp2Map		equ pUsbRange + usbEp2Map
+mpUsbEp2Map		equ mpUsbRange + usbEp2Map
+usbEp3Map		equ 01A2h
+pUsbEp3Map		equ pUsbRange + usbEp3Map
+mpUsbEp3Map		equ mpUsbRange + usbEp3Map
+usbEp4Map		equ 01A3h
+pUsbEp4Map		equ pUsbRange + usbEp4Map
+mpUsbEp4Map		equ mpUsbRange + usbEp4Map
+usbEp5Map		equ 01A4h
+pUsbEp5Map		equ pUsbRange + usbEp5Map
+mpUsbEp5Map		equ mpUsbRange + usbEp5Map
+usbEp6Map		equ 01A5h
+pUsbEp6Map		equ pUsbRange + usbEp6Map
+mpUsbEp6Map		equ mpUsbRange + usbEp6Map
+usbEp7Map		equ 01A6h
+pUsbEp7Map		equ pUsbRange + usbEp7Map
+mpUsbEp7Map		equ mpUsbRange + usbEp7Map
+usbEp8Map		equ 01A7h
+pUsbEp8Map		equ pUsbRange + usbEp8Map
+mpUsbEp8Map		equ mpUsbRange + usbEp8Map
+usbFifo0Map		equ 01A8h
+pUsbFifo0Map		equ pUsbRange + usbFifo0Map
+mpUsbFifo0Map		equ mpUsbRange + usbFifo0Map
+usbFifo1Map		equ 01A9h
+pUsbFifo1Map		equ pUsbRange + usbFifo1Map
+mpUsbFifo1Map		equ mpUsbRange + usbFifo1Map
+usbFifo2Map		equ 01AAh
+pUsbFifo2Map		equ pUsbRange + usbFifo2Map
+mpUsbFifo2Map		equ mpUsbRange + usbFifo2Map
+usbFifo3Map		equ 01ABh
+pUsbFifo3Map		equ pUsbRange + usbFifo3Map
+mpUsbFifo3Map		equ mpUsbRange + usbFifo3Map
+usbFifo0Cfg		equ 01ACh
+pUsbFifo0Cfg		equ pUsbRange + usbFifo0Cfg
+mpUsbFifo0Cfg		equ mpUsbRange + usbFifo0Cfg
+usbFifo1Cfg		equ 01ADh
+pUsbFifo1Cfg		equ pUsbRange + usbFifo1Cfg
+mpUsbFifo1Cfg		equ mpUsbRange + usbFifo1Cfg
+usbFifo2Cfg		equ 01AEh
+pUsbFifo2Cfg		equ pUsbRange + usbFifo2Cfg
+mpUsbFifo2Cfg		equ mpUsbRange + usbFifo2Cfg
+usbFifo3Cfg		equ 01AFh
+pUsbFifo3Cfg		equ pUsbRange + usbFifo3Cfg
+mpUsbFifo3Cfg		equ mpUsbRange + usbFifo3Cfg
+usbFifo0Csr		equ 01B0h
+pUsbFifo0Csr		equ pUsbRange + usbFifo0Csr
+mpUsbFifo0Csr		equ mpUsbRange + usbFifo0Csr
+usbFifo1Csr		equ 01B4h
+pUsbFifo1Csr		equ pUsbRange + usbFifo1Csr
+mpUsbFifo1Csr		equ mpUsbRange + usbFifo1Csr
+usbFifo2Csr		equ 01B8h
+pUsbFifo2Csr		equ pUsbRange + usbFifo2Csr
+mpUsbFifo2Csr		equ mpUsbRange + usbFifo2Csr
+usbFifo3Csr		equ 01BCh
+pUsbFifo3Csr		equ pUsbRange + usbFifo3Csr
+mpUsbFifo3Csr		equ mpUsbRange + usbFifo3Csr
+usbDmaFifo		equ 01C0h
+pUsbDmaFifo		equ pUsbRange + usbDmaFifo
+mpUsbDmaFifo		equ mpUsbRange + usbDmaFifo
+usbDmaCtrl		equ 01C8h
+pUsbDmaCtrl		equ pUsbRange + usbDmaCtrl
+mpUsbDmaCtrl		equ mpUsbRange + usbDmaCtrl
+usbDmaLen		equ 01C9h
+pUsbDmaLen		equ pUsbRange + usbDmaLen
+mpUsbDmaLen		equ mpUsbRange + usbDmaLen
+usbDmaAddr		equ 01CCh
+pUsbDmaAddr		equ pUsbRange + usbDmaAddr
+mpUsbDmaAddr		equ mpUsbRange + usbDmaAddr
+usbDmaData		equ 01D0h
+pUsbDmaData		equ pUsbRange + usbDmaData
+mpUsbDmaData		equ mpUsbRange + usbDmaData
 
 ;LCD Ports
 ;--------------------------------
@@ -3175,20 +3449,20 @@ bTmr1Enable		equ 0
 tmr1Enable		equ 1<<bTmr1Enable
 bTmr1Crystal		equ 1
 tmr1Crystal		equ 1<<bTmr1Crystal
-bTmr1IntOverflow	equ 2
-tmr1IntOverflow		equ 1<<bTmr1IntOverflow
+bTmr1Overflow		equ 2
+tmr1Overflow		equ 1<<bTmr1Overflow
 bTmr2Enable		equ 3
 tmr2Enable		equ 1<<bTmr2Enable
 bTmr2Crystal		equ 4
 tmr2Crystal		equ 1<<bTmr2Crystal
-bTmr2IntOverflow	equ 5
-tmr2IntOverflow		equ 1<<bTmr2IntOverflow
+bTmr2Overflow		equ 5
+tmr2Overflow		equ 1<<bTmr2Overflow
 bTmr3Enable		equ 6
 tmr3Enable		equ 1<<bTmr3Enable
 bTmr3Crystal		equ 7
 tmr3Crystal		equ 1<<bTmr3Crystal
-bTmr3IntOverflow	equ 8
-tmr3IntOverflow		equ 1<<bTmr3IntOverflow
+bTmr3Overflow		equ 8
+tmr3Overflow		equ 1<<bTmr3Overflow
 bTmr1CountUp		equ 9
 tmr1CountUp		equ 1<<bTmr1CountUp
 bTmr2CountUp		equ 10
@@ -3204,20 +3478,20 @@ bTmr1IntMatch1		equ 0
 tmr1IntMatch1		equ 1<<bTmr1IntMatch1
 bTmr1IntMatch2		equ 1
 tmr1IntMatch2		equ 1<<bTmr1IntMatch2
-;bTmr1IntOverflow	equ 2
-;tmr1IntOverflow	equ 1<<bTmr1IntOverflow
+bTmr1IntOverflow	equ 2
+tmr1IntOverflow		equ 1<<bTmr1IntOverflow
 bTmr2IntMatch1		equ 3
 tmr2IntMatch1		equ 1<<bTmr2IntMatch1
 bTmr2IntMatch2		equ 4
 tmr2IntMatch2		equ 1<<bTmr2IntMatch2
-;bTmr2IntOverflow	equ 5
-;tmr2IntOverflow	equ 1<<bTmr2IntOverflow
+bTmr2IntOverflow	equ 5
+tmr2IntOverflow		equ 1<<bTmr2IntOverflow
 bTmr3IntMatch1		equ 6
 tmr3IntMatch1		equ 1<<bTmr3IntMatch1
 bTmr3IntMatch2		equ 7
 tmr3IntMatch2		equ 1<<bTmr3IntMatch2
-;bTmr3IntOverflow	equ 8
-;tmr3IntOverflow	equ 1<<bTmr3IntOverflow
+bTmr3IntOverflow	equ 8
+tmr3IntOverflow		equ 1<<bTmr3IntOverflow
 
 tmrIntMask		equ 38h
 pTmrIntMask		equ 7038h
@@ -5751,7 +6025,7 @@ MedX3			equ MedX2 + FPLEN
 MedY1			equ MedX3 + FPLEN
 MedY2			equ MedY1 + FPLEN
 MedY3			equ MedY2 + FPLEN
-PStat			equ MedY3 + 2*FPLEN
+PStat			equ MedY3 + (2*FPLEN)
 ZStat			equ PStat + FPLEN
 TStat			equ ZStat + FPLEN
 ChiStat			equ TStat + FPLEN
@@ -5832,7 +6106,8 @@ textInsMode		equ 4		;0=overstrike, 1=insert mode
 ;----------------------------------------------------------------------
 ParsFlag		equ 6h		;PARSER flags
 listOpen		equ 5		; {...}
-matrixOpen		equ 7		; [...]
+matrixOpen1		equ 6		; [[...]]
+matrixOpen2		equ 7		; [...]
 ;----------------------------------------------------------------------
 ParsFlag2		equ 7h		;PARSER flags
 numOP1			equ 0		;1=RESULT IN OP1, 0=NO RESULT
@@ -6011,7 +6286,8 @@ noCompletionByte	equ 2		;1 = do not write 0FCh when calling Arc_Unarc, leave as 
 noDataWrite		equ 3		;1 = do not write data when calling Arc_Unarc, nor size bytes
 writeSizeBytesOnly	equ 5		;1 = only write size bytes when calling Arc_Unarc
 ;----------------------------------------------------------------------
-;There is a flag 27h.
+statusBarFlags		equ 27h
+noStatusBarMode		equ 7		; 1 = abort drawing of statusbar mode, like "TEST MODE ENABLED"
 ;----------------------------------------------------------------------
 APIFlg			equ 28h
 appAllowContext		equ 0           ;app wants context changes to happen
@@ -6109,6 +6385,9 @@ clockOn			equ 6		;1 = clock on
 ;----------------------------------------------------------------------
 mathprintFlags		equ 44h
 mathprintEnabled	equ 5		;1 = use mathprint styling
+;----------------------------------------------------------------------
+InitialBootMenuFlags	equ 45h
+dispinitialBootMenu	equ 4		; 1 = don't display the initial boot menu
 ;----------------------------------------------------------------------
 backlightFlags		equ 46h
 restoreBrightness	equ 0		;1 = restore lcd brightness when needed
