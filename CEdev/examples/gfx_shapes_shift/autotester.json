@@ -1,0 +1,59 @@
+{
+  "rom": "84pce_515.rom",
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|300",
+    "hash|1",
+    "key|enter",
+    "delay|150",
+    "hash|2",
+    "key|enter",
+    "delay|150",
+    "hash|3",
+    "key|enter",
+    "delay|150",
+    "hash|4",
+    "key|enter",
+    "delay|300",
+    "hash|5"
+  ],
+  "hashes": {
+    "1": {
+      "description": "The empty and filled blue circles are drawn correctly",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "2C41178A" ]
+    },
+    "2": {
+      "description": "The yellow rectangle, red circle, and blue triangle are drawn correctly",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "C8E3ED16" ]
+    },
+    "3": {
+      "description": "Filled yellow rectangle, red circle, and blue triangle are drawn correctly",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "D7543DD6" ]
+    },
+    "4": {
+      "description": "The screen is shifted down a bit, twice",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "3624A6E5" ]
+    },
+    "5": {
+      "description": "Back to the home screen (exit check)",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44" ]
+    }
+  }
+}

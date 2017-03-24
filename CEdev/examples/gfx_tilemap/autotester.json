@@ -1,0 +1,45 @@
+{
+  "rom": "84pce_515.rom",
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|800",
+    "hash|1",
+    "delay|100",
+    "key|right",
+    "key|right",
+    "key|down",
+    "key|down",
+    "delay|100",
+    "hash|2",
+    "key|enter",
+    "delay|200",
+    "hash|3"
+  ],
+  "hashes": {
+    "1": {
+      "description": "Initial sprite map state (top left)",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "A03E20B2" ]
+    },
+    "2": {
+      "description": "Moving a bit to the bottom right",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "4A0831CE" ]
+    },
+    "3": {
+      "description": "Back to the home screen (exit check)",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44" ]
+    }
+  }
+}
