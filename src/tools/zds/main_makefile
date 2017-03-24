@@ -96,7 +96,7 @@ endif
 #Define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
 USERHEADERS := $(call WINPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
 HEADERS := $(subst $(space),;,$(call WINPATH,. $(ALLDIRS) $(addprefix $(CEDEV)/,. include include/asm include/lib/ce include/lib/std $(LIBLOC))))
-LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib ce/cintce.lib ce/cusbce.lib crt.lib))
+LIBRARIES := $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,ce/ctice.lib ce/cdebug.lib ce/cintce.lib ce/cusbce.lib chelp.lib crt.lib))
 ifneq ($(USE_FLASH_FUNCTIONS),NO)
 LIBRARIES += $(call WINPATH,$(addprefix $(CEDEV)/lib/std/,crt_linked.lib))
 else
