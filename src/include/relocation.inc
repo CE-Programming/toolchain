@@ -6,10 +6,10 @@
  #define numrelocations 0
  
  clr()
- wr("#define asmname ",name,".asm")
+ wr("#define asmname ",name,"_header.asm")
  run()
  clr()
- wr("#define totname ",name,".jmp")
+ wr("#define totname ",name,"_equates.asm")
  run()
  
  #define noextname eval(name)

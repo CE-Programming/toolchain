@@ -1,5 +1,5 @@
-#include "..\..\include\relocation.inc"
-#include "..\..\include\ti84pce.inc"
+#include "..\include\relocation.inc"
+#include "..\include\ti84pce.inc"
 
  .libraryName		"GRAPHX"          ; Name of library
  .libraryVersion	4                 ; Version information (1-255)
