@@ -34,7 +34,7 @@ LIB_LIB := $(NAME).lib
 EZC   = $(wildcard *.c)
 EZSRC = $(wildcard *.src)
 
-all: $(LIB_LIB)
+all: clean_lib $(LIB_LIB)
 
 $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj)) $(LIB_LIB)($(EZC:.c=.obj))
 
@@ -48,10 +48,13 @@ $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj)) $(LIB_LIB)($(EZC:.c=.obj))
 %.obj: %.src
 	$(ASM) $(ASMFLGS) $(call WINPATH,$<)
 
+clean_lib:
+	$(RM) $(LIB_LIB)
+
 clean:
 	$(RM) $(LIB_LIB) *.obj
 
 $(LIB_LIB)():
 	
-.PHONY: all clean
+.PHONY: all clean clean_lib
 

@@ -6,18 +6,35 @@
 ifeq ($(OS),Windows_NT)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
-CEDEV     ?= C:\CEdev
-BIN       ?= $(CEDEV)/bin
+CP         = xcopy
+PREFIX    ?= C:
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
-CEDEV     ?= $(HOME)/CEdev
-BIN       ?= $(CEDEV)/bin
+CP         = cp
+PREFIX    ?= $(HOME)
 endif
 
 STATICDIR := $(call NATIVEPATH,$(CURDIR)/static)
 LINKEDDIR := $(call NATIVEPATH,$(CURDIR)/linked)
 SHAREDDIR := $(call NATIVEPATH,$(CURDIR)/shared)
+
+DEV        ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
+BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
+
+INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
+LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
+H_LOC      := $(call NATIVEPATH,$(INSTALLLOC)/include/std)
+
+LIBSTATIC   = $(call NATIVEPATH,$(wildcard $(STATICDIR)/*.lib))
+LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.lib))
+LIBLINKED   = $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.lib))
+LIBH        = $(call NATIVEPATH,$(wildcard *.h))
+
+RMLIBSTATIC = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIBSTATIC)))
+RMLIBSHARED = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIBSHARED)))
+RMLIBLINKED = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIBLINKED)))
+RMLIBH      = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIBH)))
 
 all: all-static all-linked all-shared
 	
@@ -35,5 +52,17 @@ clean:
 	$(MAKE) -C $(LINKEDDIR) clean
 	$(MAKE) -C $(STATICDIR) clean
 
-.PHONY: all clean all-static all-shared all-linked
+install:
+	$(CP) $(LIBH) $(H_LOC)
+	$(CP) $(LIBSTATIC) $(LIB_LOC)
+	$(CP) $(LIBSHARED) $(LIB_LOC)
+	$(CP) $(LIBLINKED) $(LIB_LOC)
+
+uninstall:
+	$(RM) $(RMLIBH)
+	$(RM) $(RMLIBSTATIC)
+	$(RM) $(RMLIBSHARED)
+	$(RM) $(RMLIBLINKED)
+
+.PHONY: all clean all-static all-shared all-linked install uninstall
 

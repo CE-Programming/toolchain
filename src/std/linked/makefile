@@ -10,8 +10,9 @@ ifeq ($(OS),Windows_NT)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 RM         = del /f 2>nul
-CEDEV     ?= C:\CEdev
-BIN       ?= $(CEDEV)/bin
+PREFIX    ?= C:
+DEV       ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
+BIN       ?= $(call NATIVEPATH,$(DEV)/bin)
 ASM        = $(call NATIVEPATH,$(BIN)/ez80asm.exe)
 LIB        = $(call NATIVEPATH,$(BIN)/ez80lib.exe)
 CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
@@ -19,8 +20,9 @@ else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
 RM         = rm --force
-CEDEV     ?= $(HOME)/CEdev
-BIN       ?= $(CEDEV)/bin
+PREFIX    ?= $(HOME)
+DEV       ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
+BIN       ?= $(call NATIVEPATH,$(DEV)/bin)
 ASM        = $(call NATIVEPATH,wine $(BIN)/ez80asm.exe)
 LIB        = $(call NATIVEPATH,wine $(BIN)/ez80lib.exe)
 CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
@@ -34,7 +36,7 @@ LIB_LIB := $(NAME).lib
 EZC   = $(wildcard *.c)
 EZSRC = $(wildcard *.src)
 
-all: $(LIB_LIB)
+all: clean_lib $(LIB_LIB)
 
 $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj)) $(LIB_LIB)($(EZC:.c=.obj))
 
@@ -48,10 +50,13 @@ $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj)) $(LIB_LIB)($(EZC:.c=.obj))
 %.obj: %.src
 	$(ASM) $(ASMFLGS) $(call WINPATH,$<)
 
+clean_lib:
+	$(RM) $(LIB_LIB)
+
 clean:
 	$(RM) $(LIB_LIB) *.obj
 
 $(LIB_LIB)():
 	
-.PHONY: all clean
+.PHONY: all clean clean_lib
 
