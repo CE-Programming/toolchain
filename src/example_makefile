@@ -23,14 +23,17 @@ ifeq ($(OS),Windows_NT)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 WINRELPATH = $(subst /,\,$(1))
+WINCHKDIR  = if not exist $(1)
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
-BIN        = $(CEDEV)/bin
+BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 AS         = $(call NATIVEPATH,$(BIN)/ez80asm.exe)
 LD         = $(call NATIVEPATH,$(BIN)/ez80link.exe)
 CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 CD         = cd
 CP         = copy /Y
+CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
+PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
 NULL       = >nul 2>&1
 RMDIR      = rmdir /s /q
 MKDIR      = mkdir
@@ -41,7 +44,7 @@ WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
 WINRELPATH = $(subst /,\,$(1))
 RM         = rm --force
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
-BIN        = $(CEDEV)/bin
+BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 AS         = $(call NATIVEPATH,wine $(BIN)/ez80asm.exe)
 LD         = $(call NATIVEPATH,wine $(BIN)/ez80link.exe)
 CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
@@ -49,7 +52,7 @@ CD         = cd
 CP         = cp
 CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
-NULL       = >nul 2>&1
+NULL       =
 RMDIR      = rm -rf
 MKDIR      = mkdir -p
 chain     := ;
@@ -73,7 +76,7 @@ LIBHEADER_OBJ := $(LIBHEADER_ASM:%.asm=%.obj)
 
 
 #Find all the directories in the source input
-ALLDIRS       := $(call NATIVEPATH,$(sort $(dir $(wildcard $(SRCDIR)/*/))))
+ALLDIRS       := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
 
 #Determine if output should be archived or compressed
 ifeq ($(ARCHIVED),YES)
@@ -217,11 +220,20 @@ LDFLAGS := \
 
 ifneq ($(OS),Windows_NT)
 	LDFLAGS := '$(LDFLAGS)'
+else
+	WINCHKBINDIR := $(WINCHKDIR)$(BINDIR)
+	WINCHKOBJDIR := $(WINCHKDIR)$(OBJDIR)
 endif
 
 #This rule is trigged to build everything
-all: $(BINDIR) $(OBJDIR) $(BINDIR)/$(TARGET8XP)
-	
+all: add_dirs $(BINDIR)/$(TARGET8XP)
+	@echo "Finished."
+
+add_dirs:
+	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR)
+	@$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
+	@echo "Looking for changes..."
+
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 	$(CD) $(BINDIR) $(chain) \
 	$(CV) $(CVFLAGS) $(notdir $<)
@@ -229,13 +241,6 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 $(BINDIR)/$(TARGETHEX): $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJECTS)
 	echo C CE SDK Version $(VERSION)
 	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINRELPATH,$^) $(LOBJECTS) $(LIBRARIES))"
-
-$(OBJDIR):
-	echo $(OBJECTS)
-	$(MKDIR) $(OBJDIR)
-
-$(BINDIR):
-	$(MKDIR) $(BINDIR)
 
 #This rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
@@ -274,5 +279,5 @@ clean:
 version:
 	@echo C SDK Version $(VERSION)
 	
-.PHONY: all clean version
-
+.PHONY: all clean version add_dirs
+ 
