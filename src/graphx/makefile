@@ -32,7 +32,6 @@ TOUCH       = touch $(1)
 CP          = cp
 PREFIX     ?= $(HOME)
 endif
-uc = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
 
 DEV        ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
 BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
@@ -48,8 +47,8 @@ TBL         = relocation_table
 
 LIB_LIB    := $(NAME).lib
 LIB_8XV    := $(NAME).8xv
-LIB_ASM    := $(call uc,$(NAME))_header.asm
-LIB_JMP    := $(call uc,$(NAME))_equates.asm
+LIB_ASM    := $(NAME)_header.asm
+LIB_JMP    := $(NAME)_equates.asm
 LIB_H      := $(NAME).h
 
 ASMFLGS    := -genobj -NOigcase -NOlist -NOlistmac -quiet -sdiopt -cpu:EZ80F91 -NOdebug

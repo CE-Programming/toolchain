@@ -45,4 +45,4 @@ INIT_LOC := D1A87F
 USE_FLASH_FUNCTIONS ?= YES
 #----------------------------
 
-include $(CEDEV)/include/make/main_makefile
+include $(CEDEV)/include/.makefile

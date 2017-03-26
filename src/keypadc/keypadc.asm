@@ -1,8 +1,9 @@
 #include "..\include\relocation.inc"
 #include "..\include\ti84pce.inc"
 
- .libraryName		"KEYPADC"	                    ; Name of library
- .libraryVersion	2		                    ; Version information (1-255)
+ .libraryAppVar     "KEYPADC"         ; Name of library on the calc
+ .libraryName		"keypadc"         ; Name of library
+ .libraryVersion	2		          ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer add/remove

@@ -68,6 +68,7 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std
 #----------------------------
 ce:
 	$(MAKE) -C $(CEDIR) BIN=$(BIN)
+
 clean-ce:
 	$(MAKE) -C $(CEDIR) clean
 #----------------------------
@@ -113,11 +114,12 @@ clean-keypadc:
 #----------------------------
 
 uninstall:
-	$(RMDIR) $(INSTALLLOC)/CEdev
+	$(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 
 install: $(DIRS)
 	$(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/asm/*) $(call NATIVEPATH,$(INSTALLLIB)/asm)
+	$(CP) $(call NATIVEPATH,$(SRCDIR)/example_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
 	$(CP) $(SPASM) $(INSTALLBIN)
 	$(CP) $(CONVHEX) $(INSTALLBIN)
 	$(CP) $(CONVPNG) $(INSTALLBIN)

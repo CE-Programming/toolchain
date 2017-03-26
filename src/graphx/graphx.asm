@@ -1,8 +1,9 @@
 #include "..\include\relocation.inc"
 #include "..\include\ti84pce.inc"
 
- .libraryName		"GRAPHX"          ; Name of library
- .libraryVersion	4                 ; Version information (1-255)
+ .libraryAppVar     "GRAPHX"          ; Name of library on the calc
+ .libraryName		"graphx"          ; Name of library
+ .libraryVersion	5                 ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete

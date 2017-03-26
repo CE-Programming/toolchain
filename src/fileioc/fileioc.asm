@@ -1,7 +1,8 @@
 #include "..\include\relocation.inc"
 #include "..\include\ti84pce.inc"
 
- .libraryName           "FILEIOC"       ; Name of library
+ .libraryAppVar         "FILEIOC"       ; Name of library on the calc
+ .libraryName		    "fileioc"       ; Name of library
  .libraryVersion        3               ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------

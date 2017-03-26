@@ -26,13 +26,13 @@ LIB        = $(call NATIVEPATH,wine $(BIN)/ez80lib.exe)
 CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
 endif
 
-ASMFLGS := -genobj -NOigcase -NOlist -NOlistmac -quiet -sdiopt -cpu:EZ80F91 -NOdebug -include:..
-CCFLGS  := -NOdebug -NOkeeplst -promote -quiet -fplib -optsize -cpu:EZ80F91 -stdinc:.. -define:_EZ80F91 -asmsw:"$(ASMFLGS)"
-LIBFLGS := -quiet -warn
-LIB_LIB := $(NAME).lib
+ASMFLGS   := -genobj -NOigcase -NOlist -NOlistmac -quiet -sdiopt -cpu:EZ80F91 -NOdebug -include:..
+CCFLGS    := -NOdebug -NOkeeplst -promote -quiet -fplib -optsize -cpu:EZ80F91 -stdinc:.. -define:_EZ80F91 -asmsw:"$(ASMFLGS)"
+LIBFLGS   := -quiet -warn
+LIB_LIB   := $(NAME).lib
 
-EZC   = $(wildcard *.c)
-EZSRC = $(wildcard *.src)
+EZC        = $(wildcard *.c)
+EZSRC      = $(wildcard *.src)
 
 all: clean_lib $(LIB_LIB)
 
@@ -40,7 +40,7 @@ $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj)) $(LIB_LIB)($(EZC:.c=.obj))
 
 .PRECIOUS: %.obj
 (%.obj): %.obj
-	$(LIB) $(LIBFLGS) $@=+-$%
+	$(LIB) $(LIBFLGS) $@=+$%
 
 %.obj: %.c
 	$(CC) $(CCFLGS) $(call WINPATH,$<)
@@ -56,5 +56,5 @@ clean:
 
 $(LIB_LIB)():
 	
-.PHONY: all clean clean_lib
+.PHONY: all clean clean_lib $(LIB_LIB)()
 

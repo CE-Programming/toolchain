@@ -15,7 +15,6 @@ ifeq ($(OS),Windows_NT)
 NATIVEPATH  = $(subst /,\,$(1))
 WINPATH     = $(NATIVEPATH)
 RM          = del /f 2>nul
-RMI         = del /f 2>nul $(1)
 MKDIR       = mkdir
 ASM         = $(call NATIVEPATH,$(BIN)/ez80asm.exe)
 LIB         = $(call NATIVEPATH,$(BIN)/ez80lib.exe)
@@ -26,7 +25,6 @@ else
 NATIVEPATH  = $(subst \,/,$(1))
 WINPATH     = $(subst \,\\,$(shell winepath --windows $(1)))
 RM          = rm --force
-RMI         = find . -maxdepth 1 -iname $(1) -exec rm {} \;
 MKDIR       = mkdir -p
 ASM         = $(call NATIVEPATH,wine $(BIN)/ez80asm.exe)
 LIB         = $(call NATIVEPATH,wine $(BIN)/ez80lib.exe)
@@ -40,6 +38,7 @@ BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
+LIBH_LOC   := $(call NATIVEPATH,$(INSTALLLOC)/lib/asm)
 H_LOC      := $(call NATIVEPATH,$(INSTALLLOC)/include/ce/libs)
 
 EZOBJ       = $(wildcard *.obj)
@@ -72,13 +71,12 @@ $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj))
 	$(RM) $<
 
 clean:
-	$(RM) $(LIB_8XV) $(LIB_LIB) $(LIB_8XV) $(LIB_JMP) $(EZOBJ) $(EZSRC) $(TBL)
-	$(call RMI,$(LIB_ASM))
-	$(call RMI,$(LIB_JMP))
+	$(RM) $(LIB_8XV) $(LIB_LIB) $(LIB_8XV) $(LIB_ASM) $(LIB_JMP) $(EZOBJ) $(EZSRC) $(TBL)
 
 install:
 	$(CP) $(LIB_H) $(H_LOC)
 	$(CP) $(LIB_LIB) $(LIB_LOC)
+	$(CP) $(LIB_ASM) $(LIBH_LOC)
 
 uninstall:
 	$(RM) $(call NATIVEPATH,$(H_LOC)/$(LIB_H))

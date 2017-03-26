@@ -2,8 +2,8 @@
 # Makefile
 #----------------------------
 
-# set LIB_LIB to the name of the library
-LIB_LIB := cce
+# set NAME to the name of the library
+NAME := cce
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
@@ -29,29 +29,45 @@ BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
-H_LOC      := $(call NATIVEPATH,$(INSTALLLOC)/include/ce)
+LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include/ce)
 
+ASMFLGS    := -genobj -NOigcase -NOlist -NOlistmac -quiet -sdiopt -cpu:EZ80F91 -NOdebug
+LIBFLGS    := -quiet -warn
 LIB_H      := $(wildcard *.h)
 
-ASMFLGS := -genobj -NOigcase -NOlist -NOlistmac -quiet -sdiopt -cpu:EZ80F91 -NOdebug
-LIBFLGS := -quiet -warn
+LIB_LIB    := $(NAME).lib
+EZC         = $(wildcard *.c)
+EZSRC       = $(wildcard *.src)
 
-all: $(patsubst %.asm,%.obj,$(wildcard *.asm))
-	$(LIB) $(LIBFLGS) $(LIB_LIB)=+$<
+all: clean_lib $(LIB_LIB)
 
-%.obj: %.asm
+$(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj)) $(LIB_LIB)($(EZC:.c=.obj))
+
+.PRECIOUS: %.obj
+(%.obj): %.obj
+	$(LIB) $(LIBFLGS) $@=+$%
+
+%.obj: %.c
+	$(CC) $(CCFLGS) $(call WINPATH,$<)
+
+%.obj: %.src
 	$(ASM) $(ASMFLGS) $(call WINPATH,$<)
+
+clean_lib:
+	$(RM) $(LIB_LIB)
 
 clean:
 	$(RM) $(LIB_LIB) *.obj
 
+$(LIB_LIB)():
+	
 install:
-	$(CP) $(LIB_H) $(H_LOC)
-	$(CP) $(LIB_LIB).lib $(LIB_LOC)
+	$(CP) $(LIB_H) $(LOC_H)
+	$(CP) $(LIB_LIB) $(LIB_LOC)
 
 uninstall:
-	$(RM) $(call NATIVEPATH,$(H_LOC)/$(LIB_H))
-	$(RM) $(call NATIVEPATH,$(LIB_LOC)/$(LIB_LIB).lib)
+	$(RM) $(call NATIVEPATH,$(LOC_H)/$(LIB_H))
+	$(RM) $(call NATIVEPATH,$(LIB_LOC)/$(LIB_LIB))
 
-.PHONY: all clean install uninstall
+.PHONY: all clean clean_lib install uninstall $(LIB_LIB)()
 
