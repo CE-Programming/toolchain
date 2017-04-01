@@ -42,7 +42,7 @@ else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
 WINRELPATH = $(subst /,\,$(1))
-RM         = rm --force
+RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 AS         = $(call NATIVEPATH,wine $(BIN)/ez80asm.exe)
@@ -240,7 +240,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 
 $(BINDIR)/$(TARGETHEX): $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJECTS)
 	echo C CE SDK Version $(VERSION)
-	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(strip $(call WINRELPATH,$^) $(LOBJECTS)$(LIBRARIES)))"
+	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINRELPATH,$^) $(LOBJECTS)$(LIBRARIES))"
 
 #This rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)

@@ -11,11 +11,11 @@
 #include <string.h>
 
 /* Shared library headers - depends on which ones you wish to use */
-#include <lib/ce/fileioc.h>
+#include <libs/fileioc.h>
 
-void prime_factors(unsigned n);
+void prime_factors(unsigned int n);
 
-int primes[24];
+int primes[512];
 int total_primes = 0;
 
 /* Main Function */
@@ -46,8 +46,8 @@ void main(void) {
 }
 
 /* Store to an array all the prime numbers */
-void prime_factors(unsigned n) {
-    unsigned div, end;
+void prime_factors(unsigned int n) {
+    unsigned int div, end;
     
     while (!(n % 2)) {
         primes[total_primes++] = 2;

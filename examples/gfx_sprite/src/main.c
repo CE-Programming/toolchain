@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared libraries */
-#include <lib/ce/graphx.h>
+#include <libs/graphx.h>
 
 /* Include the sprite data */
 #include "gfx/logo_gfx.h"

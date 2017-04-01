@@ -24,7 +24,7 @@ PREFIX     ?= C:
 else
 NATIVEPATH  = $(subst \,/,$(1))
 WINPATH     = $(subst \,\\,$(shell winepath --windows $(1)))
-RM          = rm --force
+RM          = rm -f
 MKDIR       = mkdir -p
 ASM         = $(call NATIVEPATH,wine $(BIN)/ez80asm.exe)
 LIB         = $(call NATIVEPATH,wine $(BIN)/ez80lib.exe)

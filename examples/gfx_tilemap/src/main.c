@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared libraries */
-#include <lib/ce/graphx.h>
+#include <libs/graphx.h>
 #include "gfx/tiles_gfx.h"
 
 /* Tilemap defines */

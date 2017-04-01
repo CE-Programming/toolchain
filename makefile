@@ -15,7 +15,7 @@ CPDIR      = xcopy
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))
-RM         = rm --force
+RM         = rm -f
 MKDIR      = mkdir -p
 RMDIR      = rm -rf
 PREFIX    ?= $(HOME)

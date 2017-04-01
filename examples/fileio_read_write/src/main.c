@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared library headers -- depends on which ones you wish to use */
-#include <lib/ce/fileioc.h>
+#include <libs/fileioc.h>
 
 /* Declare some strings and variables */
 const char nameAppVar[] = "AppVar";

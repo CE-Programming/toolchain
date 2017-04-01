@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared library headers - depends on which ones you wish to use */
-#include <lib/ce/fileioc.h>
+#include <libs/fileioc.h>
 
 /* Some function prototypes. Maybe in the future these functions will become a library */
 cplx_t Int24sToCplx(int real, int imag);

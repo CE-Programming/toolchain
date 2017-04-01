@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared libraries */
-#include <lib/ce/graphx.h>
+#include <libs/graphx.h>
 
 /*
  * This tutorial is meant to be played around with to get a feeling for how buffering works

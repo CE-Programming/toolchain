@@ -14,7 +14,7 @@
 #include <intce.h>
 
 /* CE Keypad C Library */
-#include <lib/ce/keypadc.h>
+#include <libs/keypadc.h>
 
 /* Function prototypes */
 void interrupt isr_on(void);

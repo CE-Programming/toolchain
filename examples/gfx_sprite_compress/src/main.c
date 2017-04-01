@@ -14,7 +14,7 @@
 #include <decompress.h>
 
 /* Shared libraries */
-#include <lib/ce/graphx.h>
+#include <libs/graphx.h>
 #include "gfx/all_gfx.h"
 
 /* Put all your code here */

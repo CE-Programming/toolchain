@@ -19,7 +19,7 @@ CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
-RM         = rm --force
+RM         = rm -f
 PREFIX    ?= $(HOME)
 DEV       ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
 BIN       ?= $(call NATIVEPATH,$(DEV)/bin)

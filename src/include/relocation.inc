@@ -14,7 +14,7 @@
  
  #define noextname eval(name)
  
- .echo > relocation_table ""
+ .echo > relocation_table "\n"
  .echo > totname " .db 192,\"",noextname,"\",0,"
  .echo > asmname " define .",noextname,"_header,space=ram\n define .",noextname,",space=ram\n segment .",noextname,"_header\n .assume adl=1\n db 192,\"",ucname,"\",0,"
  .db 192,193
