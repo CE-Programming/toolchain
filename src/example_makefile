@@ -240,7 +240,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 
 $(BINDIR)/$(TARGETHEX): $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJECTS)
 	echo C CE SDK Version $(VERSION)
-	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINRELPATH,$^) $(LOBJECTS) $(LIBRARIES))"
+	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(strip $(call WINRELPATH,$^) $(LOBJECTS)$(LIBRARIES)))"
 
 #This rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
