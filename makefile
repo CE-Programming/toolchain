@@ -10,8 +10,10 @@ RM         = del /f 2>nul
 RMDIR      = rmdir /s /q
 MKDIR      = mkdir
 PREFIX    ?= C:
-CP         = copy
-CPDIR      = xcopy
+INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
+CP         = copy /y
+EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
+CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))
@@ -19,11 +21,11 @@ RM         = rm -f
 MKDIR      = mkdir -p
 RMDIR      = rm -rf
 PREFIX    ?= $(HOME)
+INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = cp
-CPDIR      = cp -r
+CP_EXMPLS  = cp -r $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 endif
 
-INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)
 SRCDIR     := $(call NATIVEPATH,$(CURDIR)/src)
 SPASMDIR   := $(call NATIVEPATH,$(TOOLSDIR)/spasm-ng)
@@ -36,6 +38,13 @@ STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
 SPASM      := $(call NATIVEPATH,$(SPASMDIR)/spasm)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
 CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
+
+
+ifeq ($(OS),Windows_NT)
+SPASM      := $(call NATIVEPATH,$(SPASMDIR)/spasm.exe)
+CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex.exe)
+CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
+endif
 
 BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
 
@@ -117,7 +126,7 @@ uninstall:
 	$(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 
 install: $(DIRS)
-	$(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+	$(CP_EXMPLS)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/asm/*) $(call NATIVEPATH,$(INSTALLLIB)/asm)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/example_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
 	$(CP) $(SPASM) $(INSTALLBIN)

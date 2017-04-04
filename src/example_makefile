@@ -31,7 +31,7 @@ AS         = $(call NATIVEPATH,$(BIN)/ez80asm.exe)
 LD         = $(call NATIVEPATH,$(BIN)/ez80link.exe)
 CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 CD         = cd
-CP         = copy /Y
+CP         = copy /y
 CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
 PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
 NULL       = >nul 2>&1
@@ -120,13 +120,18 @@ HEADERS       := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDE
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst /;,;,$(HEADERS))
-LIBRARIES     := $(call NATIVEPATH,$(addprefix $(CEDEV)/lib/,cce.lib cshared.lib))
+
 ifeq ($(USE_FLASH_FUNCTIONS),YES)
-LIBRARIES     += $(call NATIVEPATH,$(addprefix $(CEDEV)/lib/,clinked.lib))
+LINKED_OS_FUN := clinked.lib
 else
-LIBRARIES     += $(call NATIVEPATH,$(addprefix $(CEDEV)/lib/,cstatic.lib))
+LINKED_OS_FUN := cstatic.lib
 endif
+
+LIBRARIES     := $(call NATIVEPATH,$(addprefix $(CEDEV)/lib/,cce.lib cshared.lib $(LINKED_OS_FUN)))
+
+ifdef L
 LIBRARIES     += $(call NATIVEPATH,$(foreach var,$(L),$(CEDEV)/lib/$(var).lib))
+endif
 
 #Define the assembler flags used by the Zilog assembler
 ASM_FLAGS       := \
@@ -240,7 +245,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 
 $(BINDIR)/$(TARGETHEX): $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJECTS)
 	echo C CE SDK Version $(VERSION)
-	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call WINRELPATH,$^) $(LOBJECTS)$(LIBRARIES))"
+	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call NATIVEPATH,$^) $(LOBJECTS)$(LIBRARIES))"
 
 #This rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)

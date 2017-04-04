@@ -18,8 +18,8 @@ RM          = del /f 2>nul
 MKDIR       = mkdir
 ASM         = $(call NATIVEPATH,$(BIN)/ez80asm.exe)
 LIB         = $(call NATIVEPATH,$(BIN)/ez80lib.exe)
-TOUCH       = copy /b $(1)+,, $(1)
-CP          = xcopy
+TOUCH       = copy /y /b $(1)+,, $(1)
+CP          = xcopy /y
 PREFIX     ?= C:
 else
 NATIVEPATH  = $(subst \,/,$(1))

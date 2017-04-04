@@ -12,7 +12,7 @@ WINPATH    = $(NATIVEPATH)
 RM         = del /f 2>nul
 ASM        = $(call NATIVEPATH,$(BIN)/ez80asm.exe)
 LIB        = $(call NATIVEPATH,$(BIN)/ez80lib.exe)
-CP         = xcopy
+CP         = xcopy /y
 PREFIX    ?= C:
 else
 NATIVEPATH = $(subst \,/,$(1))
@@ -39,6 +39,12 @@ LIB_LIB    := $(NAME).lib
 EZC         = $(wildcard *.c)
 EZSRC       = $(wildcard *.src)
 
+ifeq ($(OS),Windows_NT)
+COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
+else
+COPY_HEADERS = $(CP) $(LIB_H) $(LOC_H)
+endif
+
 all: clean_lib $(LIB_LIB)
 
 $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj)) $(LIB_LIB)($(EZC:.c=.obj))
@@ -62,11 +68,11 @@ clean:
 $(LIB_LIB)():
 	
 install:
-	$(CP) $(LIB_H) $(LOC_H)
+	$(COPY_HEADERS)
 	$(CP) $(LIB_LIB) $(LIB_LOC)
 
 uninstall:
-	$(RM) $(call NATIVEPATH,$(LOC_H)/$(LIB_H))
+	$(RM) $(call NATIVEPATH,$(LOC_H)/*.h)
 	$(RM) $(call NATIVEPATH,$(LIB_LOC)/$(LIB_LIB))
 
 .PHONY: all clean clean_lib install uninstall $(LIB_LIB)()
