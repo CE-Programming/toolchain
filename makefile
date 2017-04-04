@@ -2,6 +2,8 @@
 # Makefile
 #----------------------------
 
+RELEASE_NAME := CEdev
+
 # common/os specific things
 ifeq ($(OS),Windows_NT)
 NATIVEPATH = $(subst /,\,$(1))
@@ -13,7 +15,20 @@ PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
-CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
+CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
+ZIPVBS     = __zip.vbs
+ARCH       = cd $(INSTALLLOC) && \
+             echo Set oArg = WScript.Arguments > $(ZIPVBS) && \
+             echo Set fso = CreateObject("Scripting.FileSystemObject") >> $(ZIPVBS) && \
+             echo inDir = fso.GetAbsolutePathName(oArg(0)) >> $(ZIPVBS) && \
+             echo outZip = fso.GetAbsolutePathName(oArg(1)) >> $(ZIPVBS) && \
+             echo fso.CreateTextFile(outZip, True).Write "PK" ^& Chr(5) ^& Chr(6) ^& String(18, vbNullChar) >> $(ZIPVBS) && \
+             echo Set oShell = CreateObject("Shell.Application") >> $(ZIPVBS) && \
+             echo Set src = oShell.NameSpace(inDir).Items >> $(ZIPVBS) && \
+             echo oShell.NameSpace(outZip).CopyHere(src) >> $(ZIPVBS) && \
+             echo wScript.Sleep 5000 >> $(ZIPVBS) && \
+             CScript $(ZIPVBS) $(RELEASE_NAME) $(RELEASE_NAME).zip && \
+             $(RM) $(ZIPVBS)
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))
@@ -24,6 +39,7 @@ PREFIX    ?= $(HOME)
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = cp
 CP_EXMPLS  = cp -r $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+ARCH       = cd $(INSTALLLOC) ; tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
 endif
 
 TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)
@@ -52,9 +68,10 @@ GRAPHXDIR  := $(call NATIVEPATH,$(SRCDIR)/graphx)
 KEYPADCDIR := $(call NATIVEPATH,$(SRCDIR)/keypadc)
 FILEIOCDIR := $(call NATIVEPATH,$(SRCDIR)/fileioc)
 
-INSTALLBIN := $(call NATIVEPATH,$(INSTALLLOC)/CEdev/bin)
-INSTALLINC := $(call NATIVEPATH,$(INSTALLLOC)/CEdev/include)
-INSTALLLIB := $(call NATIVEPATH,$(INSTALLLOC)/CEdev/lib)
+CEDEVDIR   := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME))
+INSTALLBIN := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/bin)
+INSTALLINC := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/include)
+INSTALLLIB := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib)
 DIRS       := $(INSTALLINC) $(INSTALLINC)/ce $(INSTALLINC)/ce/libs $(INSTALLINC)/std $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
@@ -98,10 +115,6 @@ graphx: $(SPASM)
 	$(MAKE) -C $(GRAPHXDIR) SPASM=$(SPASM) BIN=$(BIN)
 clean-graphx:
 	$(MAKE) -C $(GRAPHXDIR) clean
-install-graphx:
-	$(MAKE) -C $(GRAPHXDIR) install
-uninstall-graphx:
-	$(MAKE) -C $(GRAPHXDIR) uninstall
 #----------------------------
 
 #----------------------------
@@ -148,6 +161,27 @@ $(DIRS):
 	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
 	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce/libs)
 
-
-.PHONY: all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall
+dist: install
+	$(ARCH)
+	
+help:
+	@echo Available targets:
+	@echo all
+	@echo ce
+	@echo std
+	@echo graphx
+	@echo fileioc
+	@echo keypadc
+	@echo clean
+	@echo clean-ce
+	@echo clean-std
+	@echo clean-graphx
+	@echo clean-fileioc
+	@echo clean-keypadc
+	@echo install
+	@echo uninstall
+	@echo dist
+	@echo help
+	
+.PHONY: all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
 
