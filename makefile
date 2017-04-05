@@ -16,19 +16,8 @@ INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
-ZIPVBS     = __zip.vbs
-ARCH       = cd $(INSTALLLOC) && \
-             echo Set oArg = WScript.Arguments > $(ZIPVBS) && \
-             echo Set fso = CreateObject("Scripting.FileSystemObject") >> $(ZIPVBS) && \
-             echo inDir = fso.GetAbsolutePathName(oArg(0)) >> $(ZIPVBS) && \
-             echo outZip = fso.GetAbsolutePathName(oArg(1)) >> $(ZIPVBS) && \
-             echo fso.CreateTextFile(outZip, True).Write "PK" ^& Chr(5) ^& Chr(6) ^& String(18, vbNullChar) >> $(ZIPVBS) && \
-             echo Set oShell = CreateObject("Shell.Application") >> $(ZIPVBS) && \
-             echo Set src = oShell.NameSpace(inDir).Items >> $(ZIPVBS) && \
-             echo oShell.NameSpace(outZip).CopyHere(src) >> $(ZIPVBS) && \
-             echo wScript.Sleep 5000 >> $(ZIPVBS) && \
-             CScript $(ZIPVBS) $(RELEASE_NAME) $(RELEASE_NAME).zip && \
-             $(RM) $(ZIPVBS)
+ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\installer\installer.nsi) && \
+             (if not exist "..\release" mkdir "..\release") && move /y installer\CEdev.exe release
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))
@@ -39,7 +28,9 @@ PREFIX    ?= $(HOME)
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = cp
 CP_EXMPLS  = cp -r $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
-ARCH       = cd $(INSTALLLOC) ; tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME)
+ARCH       = cd $(INSTALLLOC) ; tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
+             cd $(CURDIR) ; mkdir -p release ; mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
+chain     := ;
 endif
 
 TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)

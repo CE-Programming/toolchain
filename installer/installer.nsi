@@ -48,8 +48,8 @@ Section ""
 
   SetOutPath "$INSTDIR"
   
-  ;Add released file
-  File /r "C:\CEdev\*.*"
+  ;Add installed folder (DIST_PATH is set from the makefile)
+  File /r ${DIST_PATH}\*.*
   
   ;Add to PATH
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
