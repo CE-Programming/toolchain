@@ -6,7 +6,7 @@ CSTARTUP_ASM  := cstartup.asm
 LIBHEADER_ASM := libheader.asm
 #----------------------------
 
-VERSION := 7.2
+VERSION := 7.5
 
 #----------------------------
 # Try not to edit anything below these lines unless you know what you are doing
@@ -232,54 +232,54 @@ endif
 
 #This rule is trigged to build everything
 all: add_dirs $(BINDIR)/$(TARGET8XP)
-	@echo "Finished."
+	@echo Finished.
 
 add_dirs:
 	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR)
 	@$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
-	@echo "Looking for changes..."
+	@echo C CE SDK Version $(VERSION)
+	@echo Looking for changes...
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
-	$(CD) $(BINDIR) $(chain) \
-	$(CV) $(CVFLAGS) $(notdir $<)
+	@$(CD) $(BINDIR) $(chain) \
+	@$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETHEX): $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJECTS)
-	echo C CE SDK Version $(VERSION)
-	$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call NATIVEPATH,$^) $(LOBJECTS)$(LIBRARIES))"
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call NATIVEPATH,$^) $(LOBJECTS)$(LIBRARIES))"
 
 #This rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
-	$(ICON_CONV) $(chain) \
-	$(CD) $(OBJDIR) $(chain) \
-	$(AS) $(ASM_FLAGS) $(ICON_ASM)
+	@$(ICON_CONV) $(chain) \
+	@$(CD) $(OBJDIR) $(chain) \
+	@$(AS) $(ASM_FLAGS) $(ICON_ASM)
 	
 #This rule builds the assembly files and places them in the object directory
 $(OBJDIR)/%.obj: $(SRCDIR)/%.asm
-	$(CD) $(OBJDIR) $(chain) \
-	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+	@$(CD) $(OBJDIR) $(chain) \
+	@$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 	
 #These rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
-	$(CD) $(OBJDIR) $(chain) \
-	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+	@$(CD) $(OBJDIR) $(chain) \
+	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 	
 $(OBJDIR)/%.obj: $(GFXDIR)/%.c $(USERHEADERS)
-	$(CD) $(OBJDIR) $(chain) \
-	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+	@$(CD) $(OBJDIR) $(chain) \
+	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 $(CSTARTUPOBJ): $(CSTARTUP_LOC)
-	$(CD) $(OBJDIR) $(chain) \
-	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
+	@$(CD) $(OBJDIR) $(chain) \
+	@$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
 
 $(LIBHOBJ): $(LIBHEADER_LOC)
-	$(CD) $(OBJDIR) $(chain) \
-	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
-	$(CD) $(OBJDIR) $(chain) \
-	$(AS) $(ASM_FLAGS) $(LIBS)
+	@$(CD) $(OBJDIR) $(chain) \
+	@$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
+	@$(CD) $(OBJDIR) $(chain) \
+	@$(AS) $(ASM_FLAGS) $(LIBS)
 
 clean:
-	$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJECTS) $(OBJDIR)/*.src $(OBJDIR)/*.asm)
-	echo Cleaned build files.
+	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJECTS) $(OBJDIR)/*.src $(OBJDIR)/*.asm)
+	@echo Cleaned build files.
 	
 version:
 	@echo C SDK Version $(VERSION)
