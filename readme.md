@@ -13,15 +13,19 @@ Included you will find examples using the ['Standard' CE C Libraries](https://gi
 These steps are only if you wish to help with development of the toolchain. 
 
 If you are using windows, [mingw+msys](http://www.mingw.org) is required for building.
+
 If you are using linux or mac, [wine](https://www.winehq.org) is required for building.
 
 Clone the repo: (Note the --recursive option)
+
 `git clone --recursive https://github.com/CE-Programming/toolchain.git`
 
 Then type:
+
 `cd toolchain && make && make install`
 
-By default, `make install` will install into the home (~) directory on linux and mac, and in the root (C:\) drive on windows. This is configurable with `make install PREFIX={NEWDIR}`
+By default, `make install` will install into the home (~/CEdev) directory on linux and mac, and in the root drive (C:\\CEdev) directory on windows.
+This is configurable with `make install PREFIX={DIFFERENT_LOCATION}`
 
 If you wish to view a list of available makefile rules, type: `make help`
 
@@ -31,4 +35,4 @@ To build a release, type: `make dist`
 
 ## Help
 
-You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions: [ask for help](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login)
+You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions. ([ask for help](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login))
