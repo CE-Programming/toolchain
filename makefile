@@ -15,7 +15,7 @@ MKDIR      = mkdir
 PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
-SPASMFLG   = MINGW_COMPILE=YES
+SPASMFLG   = NO_APPSIGN=1 MINGW_COMPILE=YES
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\installer\installer.nsi) && \
@@ -28,6 +28,7 @@ MKDIR      = mkdir -p
 RMDIR      = rm -rf
 PREFIX    ?= $(HOME)
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
+SPASMFLG   = NO_APPSIGN=1
 CP         = cp
 CP_EXMPLS  = cp -r $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 ARCH       = cd $(INSTALLLOC) ; tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
@@ -159,7 +160,7 @@ $(DIRS):
 
 dist: install
 	$(ARCH)
-	
+
 help:
 	@echo Available targets:
 	@echo all
@@ -178,6 +179,6 @@ help:
 	@echo uninstall
 	@echo dist
 	@echo help
-	
+
 .PHONY: all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
 

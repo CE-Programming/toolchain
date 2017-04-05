@@ -242,29 +242,29 @@ add_dirs:
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 	@$(CD) $(BINDIR) $(chain) \
-	@$(CV) $(CVFLAGS) $(notdir $<)
+	$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETHEX): $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJECTS)
-	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(call NATIVEPATH,$^) $(LOBJECTS)$(LIBRARIES))"
+	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(subst $(space)$(space),$(space),$(call NATIVEPATH,$^) $(LOBJECTS) $(LIBRARIES)))"
 
 #This rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
-	@$(ICON_CONV) $(chain) \
-	@$(CD) $(OBJDIR) $(chain) \
-	@$(AS) $(ASM_FLAGS) $(ICON_ASM)
-	
+	$(ICON_CONV) $(chain) \
+	$(CD) $(OBJDIR) $(chain) \
+	$(AS) $(ASM_FLAGS) $(ICON_ASM)
+
 #This rule builds the assembly files and places them in the object directory
 $(OBJDIR)/%.obj: $(SRCDIR)/%.asm
-	@$(CD) $(OBJDIR) $(chain) \
+	$(CD) $(OBJDIR) $(chain) \
 	@$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
-	
+
 #These rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
-	@$(CD) $(OBJDIR) $(chain) \
+	$(CD) $(OBJDIR) $(chain) \
 	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
-	
+
 $(OBJDIR)/%.obj: $(GFXDIR)/%.c $(USERHEADERS)
-	@$(CD) $(OBJDIR) $(chain) \
+	$(CD) $(OBJDIR) $(chain) \
 	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 $(CSTARTUPOBJ): $(CSTARTUP_LOC)
@@ -280,9 +280,9 @@ $(LIBHOBJ): $(LIBHEADER_LOC)
 clean:
 	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(CSTARTUPOBJ) $(OBJECTS) $(LIBHOBJ) $(OBJDIR)/*.src $(OBJDIR)/*.asm)
 	@echo Cleaned build files.
-	
+
 version:
 	@echo C SDK Version $(VERSION)
-	
+
 .PHONY: all clean version add_dirs
- 
+
