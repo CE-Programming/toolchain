@@ -1,6 +1,3 @@
-[submodule "src/tools/convtile"]
-	path = tools/convtile
-	url = https://github.com/MattWaltz/convtile
 [submodule "src/tools/convhex"]
 	path = tools/convhex
 	url = https://github.com/MattWaltz/convhex
@@ -9,4 +6,4 @@
 	url = https://github.com/MattWaltz/convpng
 [submodule "tools/spasm-ng"]
 	path = tools/spasm-ng
-	url = https://github.com/jacobly0/spasm-ng
+	url = https://github.com/MattWaltz/spasm-ng.git

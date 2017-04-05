@@ -24,6 +24,7 @@
  *
  *  http://nsis.sourceforge.net/Environmental_Variables:_append%2C_prepend%2C_and_remove_entries
  *
+ *  Modified for CE C toolchain (Doesn't require uninstall support)
  */
  
  
@@ -32,7 +33,7 @@
 !verbose push
 !verbose 3
 !include "LogicLib.nsh"
-!include "WinMessages.NSH"
+!include "WinMessages.nsh"
 !include "StrFunc.nsh"
  
 ; ---- Fix for conflict if StrFunc.nsh is already includes in main file -----------------------
@@ -40,10 +41,6 @@
   !ifndef ${StrFuncName}_INCLUDED
     ${${StrFuncName}}
   !endif
-  !ifndef Un${StrFuncName}_INCLUDED
-    ${Un${StrFuncName}}
-  !endif
-  !define un.${StrFuncName} "${Un${StrFuncName}}"
 !macroend
  
 !insertmacro _IncludeStrFunction StrTok
@@ -60,16 +57,6 @@
   Pop "${ResultVar}"
 !macroend
 !define EnvVarUpdate '!insertmacro "_EnvVarUpdateConstructor"'
- 
-!macro _unEnvVarUpdateConstructor ResultVar EnvVarName Action Regloc PathString
-  Push "${EnvVarName}"
-  Push "${Action}"
-  Push "${RegLoc}"
-  Push "${PathString}"
-    Call un.EnvVarUpdate
-  Pop "${ResultVar}"
-!macroend
-!define un.EnvVarUpdate '!insertmacro "_unEnvVarUpdateConstructor"'
 ; ---------------------------------- Macro Definitions end-------------------------------------
  
 ;----------------------------------- EnvVarUpdate start----------------------------------------
@@ -320,7 +307,6 @@ FunctionEnd
  
 !macroend   ; EnvVarUpdate UN
 !insertmacro EnvVarUpdate ""
-!insertmacro EnvVarUpdate "un."
 ;----------------------------------- EnvVarUpdate end----------------------------------------
  
 !verbose pop

@@ -51,6 +51,10 @@ Section ""
   ;Add installed folder (DIST_PATH is set from the makefile)
   File /r ${DIST_PATH}\*.*
   
+  ;Check for old path
+  ReadRegStr $R1 ${env_hkcu} "CEDEV"
+  ${EnvVarUpdate} $0 "PATH" "R" "HKLM" "$R1\bin"
+
   ;Add to PATH
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
 

@@ -8,16 +8,18 @@ RELEASE_NAME := CEdev
 ifeq ($(OS),Windows_NT)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
+WINCHKDIR  = if exist $(1)
 RM         = del /f 2>nul
 RMDIR      = rmdir /s /q
 MKDIR      = mkdir
 PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
+SPASMFLG   = MINGW_COMPILE=YES
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\installer\installer.nsi) && \
-             (if not exist "..\release" mkdir "..\release") && move /y installer\CEdev.exe release
+             (if not exist "release" mkdir "release") && move /y installer\CEdev.exe release\\
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))
@@ -72,12 +74,15 @@ all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc ce std
 # tool rules
 #----------------------------
 $(SPASM) $(CONVHEX) $(CONVPNG):
-	$(MAKE) -C $(dir $@)
+	$(MAKE) -C $(SPASMDIR) $(SPASMFLG)
+	$(MAKE) -C $(CONVHEXDIR)
+	$(MAKE) -C $(CONVPNGDIR)
 
 clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std
 	$(MAKE) -C $(SPASMDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
+	$(WINCHKDIR) $(RMDIR) release
 #----------------------------
 
 #----------------------------
@@ -127,7 +132,7 @@ clean-keypadc:
 #----------------------------
 
 uninstall:
-	$(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+	$(WINCHKDIR) $(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 
 install: $(DIRS)
 	$(CP_EXMPLS)
