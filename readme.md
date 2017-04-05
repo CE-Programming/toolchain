@@ -1,14 +1,34 @@
-# CE C Toolchain
-Toolchain for C programming on the 'CE' series of TI calculators (TI-84 Plus CE / TI-83 Premium CE)
+# About
 
-# Installation
-1. Download and extract the .zip file from [the latest release](https://github.com/CE-Programming/toolchain/releases/latest) ; you should see a folder inside called 'CEdev'  
-**Note:** Place the CEdev folder somewhere close to your root directory, i.e. `C:\CEdev` (or `~/CEdev` on macOS/Linux), with **no spaces** in the path for best results.
-2. Add a user environment variable called `CEDEV`, pointing to the CEdev folder _(instructions on how to do that on: [Windows](http://www.computerhope.com/issues/ch000549.htm), [Mac](http://stackoverflow.com/a/7502061/378298), [Linux](http://unix.stackexchange.com/a/117470))_
-3. Edit the system environment variable called `PATH` to append the `bin` folder in the CEdev folder (`CEdev/bin`) _(instructions on how to do that on: [Windows](http://www.computerhope.com/issues/ch000549.htm), [Mac](http://stackoverflow.com/a/7502061/378298), [Linux](http://unix.stackexchange.com/a/117470))_
-4. If you are running under Linux or macOS, [wine](https://www.winehq.org/) is required to build. Usually using the absolute path to make.exe in the CEdev/bin directory works the best, i.e. `wine ~/CEdev/make.exe`
+The CE C Software Development Kit incorporates a wide variety of tools and documentation in order to build programs in C natively for the TI-84+CE/TI-83PCE line of calculators.
 
-Included you will find the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These perform efficient and easy support for graphics, file I/O, keypad input, etc. You can find examples in [`CEdev/examples/library_examples`](CEdev/examples/library_examples)
+# Getting Started
 
-For more information on how to use this toolchain, please see the documentation page: https://ce-programming.github.io/documentation/  
-You can also join us on IRC on the EFNet servers: #ez80-dev (and #cemu-dev for CEmu)
+It is recommended that you grab the latest release from [here](https://github.com/CE-Programming/toolchain/releases/latest) if you are looking to get started. Feel free to also bookmark the [wiki pages](https://github.com/CE-Programming/toolchain/wiki), as they will become a helpful guide.
+
+Included you will find examples using the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These perform efficient and easy support for graphics, file I/O, keypad input, etc. Be sure to grab them if you plan to use them.
+
+## Building
+
+These steps are only if you wish to help with development of the toolchain. 
+
+If you are using windows, [mingw+msys](http://www.mingw.org) is required for building.
+If you are using linux or mac, [wine](https://www.winehq.org) is required for building.
+
+Clone the repo: (Note the --recursive option)
+`git clone --recursive https://github.com/CE-Programming/toolchain.git`
+
+Then type:
+`cd toolchain && make && make install`
+
+By default, `make install` will install into the home (~) directory on linux and mac, and in the root (C:\) drive on windows. This is configurable with `make install PREFIX={NEWDIR}`
+
+If you wish to view a list of available makefile rules, type: `make help`
+
+If you wish to build a release; [nsis](https://sourceforge.net/projects/nsis/) is required for windows. Because of limitations of the current software; the special *Large strings* build is needed. You can find it [here](http://nsis.sourceforge.net/Special_Builds). Note also that you must configure your path variable to point to the nsis installation directory.
+
+To build a release, type: `make dist`
+
+## Help
+
+You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions: [ask for help](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login)

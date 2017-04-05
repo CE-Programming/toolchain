@@ -11,6 +11,9 @@ obj/
 # Precompiled Headers
 *.gch
 *.pch
+relocation_table
+*_header.asm
+*_equates.asm
 
 # Libraries
 *.lib
@@ -25,6 +28,7 @@ obj/
 
 # Executables
 *.hex
+*.8xv
 
 # Debug files
 *.dSYM/
