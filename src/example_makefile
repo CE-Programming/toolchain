@@ -278,7 +278,7 @@ $(LIBHOBJ): $(LIBHEADER_LOC)
 	@$(AS) $(ASM_FLAGS) $(LIBS)
 
 clean:
-	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJECTS) $(OBJDIR)/*.src $(OBJDIR)/*.asm)
+	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(CSTARTUPOBJ) $(OBJECTS) $(LIBHOBJ) $(OBJDIR)/*.src $(OBJDIR)/*.asm)
 	@echo Cleaned build files.
 	
 version:
