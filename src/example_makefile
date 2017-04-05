@@ -241,7 +241,7 @@ add_dirs:
 	@echo Looking for changes...
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
-	@$(CD) $(BINDIR) $(chain) \
+	$(CD) $(BINDIR) $(chain) \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETHEX): $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJECTS)
@@ -256,26 +256,26 @@ $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
 #This rule builds the assembly files and places them in the object directory
 $(OBJDIR)/%.obj: $(SRCDIR)/%.asm
 	$(CD) $(OBJDIR) $(chain) \
-	@$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 #These rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
 	$(CD) $(OBJDIR) $(chain) \
-	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 $(OBJDIR)/%.obj: $(GFXDIR)/%.c $(USERHEADERS)
 	$(CD) $(OBJDIR) $(chain) \
-	@$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 $(CSTARTUPOBJ): $(CSTARTUP_LOC)
-	@$(CD) $(OBJDIR) $(chain) \
-	@$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
+	$(CD) $(OBJDIR) $(chain) \
+	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
 
 $(LIBHOBJ): $(LIBHEADER_LOC)
-	@$(CD) $(OBJDIR) $(chain) \
-	@$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
-	@$(CD) $(OBJDIR) $(chain) \
-	@$(AS) $(ASM_FLAGS) $(LIBS)
+	$(CD) $(OBJDIR) $(chain) \
+	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
+	$(CD) $(OBJDIR) $(chain) \
+	$(AS) $(ASM_FLAGS) $(LIBS)
 
 clean:
 	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(CSTARTUPOBJ) $(OBJECTS) $(LIBHOBJ) $(OBJDIR)/*.src $(OBJDIR)/*.asm)
