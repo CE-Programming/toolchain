@@ -19,15 +19,15 @@ If you are using linux or mac, [wine](https://www.winehq.org) is required for bu
 Clone the repo: (Note the --recursive option)
 
 ```
-    git clone --recursive https://github.com/CE-Programming/toolchain.git
+git clone --recursive https://github.com/CE-Programming/toolchain.git
 ```
 
 Then use:
 
 ```
-    cd toolchain
-    make
-    make install
+cd toolchain
+make
+make install
 ```
 
 By default, `make install` will install into the home (~/CEdev) directory on linux and mac, and in the root drive (C:\\CEdev) directory on windows.
