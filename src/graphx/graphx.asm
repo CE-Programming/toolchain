@@ -137,23 +137,23 @@ _AllocSprite:
 	push	bc
 	pop	hl
 	add	hl,sp
-	ld	e,(hl)			;; e = width
+	ld	e,(hl)                      ; e = width
 	add	hl,bc
-	ld	d,(hl)			;; d = height
+	ld	d,(hl)                      ; d = height
 	add	hl,bc
-	ld	hl,(hl)			;; hl = malloc
+	ld	hl,(hl)                     ; hl = malloc
 	push	de
-	mlt	de			;; de = width * height
-	inc	de			; +2 to store width and height
-	inc	de			;; de = width * height + 2
+	mlt	de                          ; de = width * height
+	inc	de                          ; +2 to store width and height
+	inc	de                          ; de = width * height + 2
 	push	de
-	call	_indcallHL_ASM		;; hl = malloc(width * height + 2)
-	pop	de			;; de = width * height + 2
-	add	hl,de			; this should never carry
-	sbc	hl,de			; check if malloc failed (hl == 0)
-	pop	de			;; e = width, d = height
-	ret	z			; abort if malloc failed
-	ld	(hl),de			; store width and height
+	call	_indcallHL_ASM \.r          ; hl = malloc(width * height + 2)
+	pop	de                          ; de = width * height + 2
+	add	hl,de                       ; this should never carry
+	sbc	hl,de                       ; check if malloc failed (hl == 0)
+	pop	de                          ; e = width, d = height
+	ret	z                           ; abort if malloc failed
+	ld	(hl),de                     ; store width and height
 	ret
 
 ;-------------------------------------------------------------------------------
