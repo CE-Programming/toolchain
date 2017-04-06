@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared libraries */
-#include <libs/graphx.h>
+#include <lib/graphx.h>
 
 #define FONT_HEIGHT 8
 

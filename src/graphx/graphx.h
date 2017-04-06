@@ -1051,8 +1051,10 @@ uint16_t gfx_Darken(uint16_t color, uint8_t amount);
  * @param x X coordinate to begin filling at
  * @param y Y coordinate to begin filling at
  * @param color New color to fill with
+ *
+ * @note This routine performs clipping to stay within the window, but you must ensure it starts in the window.
  */
-void gfx_FloodFill(unsigned int x, unsigned int y, uint8_t color);
+void gfx_FloodFill(unsigned int x, uint8_t y, uint8_t color);
 
 /**
  * Converts an RGB value to a palette color

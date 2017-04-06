@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* CE Keypad C Library */
-#include <libs/keypadc.h>
+#include <lib/keypadc.h>
 
 /* Some LCD defines */
 void fillScreen(uint8_t color);

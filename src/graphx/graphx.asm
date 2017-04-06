@@ -2,8 +2,8 @@
 #include "..\include\ti84pce.inc"
 
  .libraryAppVar     "GRAPHX"          ; Name of library on the calc
- .libraryName		"graphx"          ; Name of library
- .libraryVersion	5                 ; Version information (1-255)
+ .libraryName       "graphx"          ; Name of library
+ .libraryVersion    5                 ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete

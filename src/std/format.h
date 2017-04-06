@@ -72,6 +72,12 @@ struct flt_info {
   unsigned char digits[MAXDIGITS];	/* max significant digits      */
 };
 
+extern struct fmt_type __print_fmt;
+extern char __print_buff[];
+extern unsigned char __print_len;
+extern char __print_leading_char;  // Initial +, -, or space for number
+extern void __print_send();
+
 extern void _u_stoa(short);
 extern void _u_ustoa(unsigned short);
 extern void _u_itoa(int);

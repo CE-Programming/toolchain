@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared libraries */
-#include <libs/graphx.h>
+#include <lib/graphx.h>
 
 /* Use some random color as the transparent one */
 #define TRANSPARENT_COLOR 10

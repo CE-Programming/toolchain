@@ -1,9 +1,9 @@
 #include "..\include\relocation.inc"
 #include "..\include\ti84pce.inc"
 
- .libraryAppVar         "FILEIOC"       ; Name of library on the calc
- .libraryName		    "fileioc"       ; Name of library
- .libraryVersion        3               ; Version information (1-255)
+ .libraryAppVar     "FILEIOC"       ; Name of library on the calc
+ .libraryName       "fileioc"       ; Name of library
+ .libraryVersion    3               ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------
 ; v1 functions -- Cannot move/delete/insert (Can fix/optimize though)

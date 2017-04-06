@@ -2,8 +2,8 @@
 #include "..\include\ti84pce.inc"
 
  .libraryAppVar     "KEYPADC"         ; Name of library on the calc
- .libraryName		"keypadc"         ; Name of library
- .libraryVersion	2		          ; Version information (1-255)
+ .libraryName       "keypadc"         ; Name of library
+ .libraryVersion    2                 ; Version information (1-255)
  
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer add/remove

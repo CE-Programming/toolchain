@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared library headers -- depends on which ones you wish to use */
-#include <libs/fileioc.h>
+#include <lib/fileioc.h>
 
 /* Declare some strings and variables */
 const char prgmName[] = "ABC";

@@ -2,7 +2,28 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.95...HEAD)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.0...HEAD)
+
+# [v7.0](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-02-17)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.95...v7.0)
+
+### Toolchain
+  - Rework entire toolchain setup and hierarchy ([`559dd1c`](https://github.com/CE-Programming/toolchain/commit/559dd1c) - [MattWaltz](https://github.com/MattWaltz))
+  - Doxygen header files ([`4402637`](https://github.com/CE-Programming/toolchain/commit/4402637) - [MattWaltz](https://github.com/MattWaltz))
+
+### Libraries
+
+#####  GRAPHX
+  - Added gfx_FloodFill ([`60006ac`](https://github.com/CE-Programming/toolchain/commit/60006ac) - [MattWaltz](https://github.com/MattWaltz))
+  - Added gfx_ScaleSprite ([`7618598`](https://github.com/CE-Programming/toolchain/commit/7618598) - [MattWaltz](https://github.com/MattWaltz))
+  - Added gfx_SetFontHeight ([`4402637`](https://github.com/CE-Programming/toolchain/commit/4402637) - [MattWaltz](https://github.com/MattWaltz))
+  - Optimized ClipDraw helper function ([`82e5d5a`](https://github.com/CE-Programming/toolchain/commit/82e5d5a) - [MattWaltz](https://github.com/MattWaltz))
+  - Optimized gfx_AllocSprite ([`2c12310`](https://github.com/CE-Programming/toolchain/commit/2c12310) - [Runer112](https://github.com/Runer112))
+
+# [v6.999](https://github.com/CE-Programming/toolchain/releases/tag/v6.999) (2017-02-17)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.95...v6.999)
 
 ### Toolchain
   - Add scripts to build/clean libraries and examples easily ([`61d915f`](https://github.com/CE-Programming/toolchain/commit/61d915f) - [MattWaltz](https://github.com/MattWaltz))

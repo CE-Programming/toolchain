@@ -1,45 +1,42 @@
- !include "MUI2.nsh"
- !include "EnvVarUpdate.nsh"
- !include "winmessages.nsh"
- !define env_hkcu 'HKCU "Environment"'
- 
- !define MUI_ICON "icon.ico"
 ;--------------------------------
+; Incldudes
+
+  !include "MUI2.nsh"
+  !include "EnvVarUpdate.nsh"
+  !include "winmessages.nsh"
+  
+;--------------------------------
+;Names
 
   Name "CE C SDK"
   BrandingText "CE C Software Development Kit"
   
 ;--------------------------------
+;Input and output
 
-  ;Name and file
   OutFile "CEdev.exe"
-  
-  ; Get system drive
-
-  ;Default installation folder
   InstallDir "$INSTDIR"
-
-  ;Request application privileges for Windows Vista
   RequestExecutionLevel admin
 
 ;--------------------------------
-;Interface Settings
+;Interface and defines
 
+  !define env_hkcu 'HKCU "Environment"'
   !define MUI_ABORTWARNING
+  !define MUI_ICON "icon.ico"
   
 ;--------------------------------
 ;Pages
 
   !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirectoryLeave"
-  
   !insertmacro MUI_PAGE_DIRECTORY
+  
   !insertmacro MUI_PAGE_INSTFILES
 
 ;--------------------------------
 ;Languages
  
   !insertmacro MUI_LANGUAGE "English"
-  !insertmacro MUI_LANGUAGE "French"
   
 ;--------------------------------
 ;Installer Section
@@ -48,23 +45,21 @@ Section ""
 
   SetOutPath "$INSTDIR"
   
-  ;Add installed folder (DIST_PATH is set from the makefile)
   File /r ${DIST_PATH}\*.*
   
-  ;Check for old path
   ReadRegStr $R1 ${env_hkcu} "CEDEV"
   ${EnvVarUpdate} $0 "PATH" "R" "HKLM" "$R1\bin"
 
-  ;Add to PATH
   ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
 
-  ;Add CEDEV variable
   WriteRegExpandStr ${env_hkcu} "CEDEV" "$INSTDIR"
   
-  ; make sure windows knows about the change
   SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 SectionEnd
+
+;--------------------------------
+;Check for spaces
 
 Function DirectoryLeave
 
@@ -105,9 +100,14 @@ Function CheckForSpaces
  
 FunctionEnd
 
+;--------------------------------
+; Find system drive
+
 Function .onInit
 
   ReadEnvStr $R0 SYSTEMDRIVE
   StrCpy $INSTDIR "$R0\CEdev"
   
 FunctionEnd
+
+;--------------------------------

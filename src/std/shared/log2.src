@@ -24,3 +24,4 @@ _log2:
 	ld	sp,ix
 	pop	ix
 	ret
+
