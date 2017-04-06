@@ -1,11 +1,7 @@
-/*************************************************
- *  Copyright (C) 1999-2008 by  Zilog, Inc.
- *  All Rights Reserved
- *************************************************/
 #ifndef CTYPE_H
 #define CTYPE_H
 
-#define TRUE 1
+#define TRUE  1
 #define FALSE 0
 
 int isalnum(int c);

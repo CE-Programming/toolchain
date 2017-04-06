@@ -1,7 +1,8 @@
-/*************************************************
+/*
  *  Copyright (C) 1999-2008 by  Zilog, Inc.
  *  All Rights Reserved
- *************************************************/
+ *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
+ */
 #ifndef STDDEF_H
 #define STDDEF_H
 

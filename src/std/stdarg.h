@@ -1,7 +1,7 @@
-/*************************************************
+/*
  *  Copyright (C) 1999-2008 by  Zilog, Inc.
  *  All Rights Reserved
- *************************************************/
+ */
 #ifndef STDARG_H
 #define STDARG_H
 

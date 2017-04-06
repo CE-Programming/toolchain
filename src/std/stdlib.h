@@ -1,7 +1,8 @@
-/*************************************************
+/*
  *  Copyright (C) 1999-2008 by  Zilog, Inc.
  *  All Rights Reserved
- *************************************************/
+ *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
+ */
 #ifndef STDLIB_H
 #define STDLIB_H
 
@@ -57,10 +58,10 @@ typedef unsigned int size_t;
 #endif
 
 /* Dynamic memory functions */
-void *calloc(int nmemb,size_t size);
-void *malloc(size_t size);
-void *realloc(void * ptr,size_t size);
-void free(void * ptr);
+void *calloc(size_t, size_t);
+void *malloc(size_t);
+void *realloc(void *, size_t);
+void free(void *);
 
 /* Character and string functions */
 double atof(char * nptr);

@@ -1,8 +1,8 @@
-/*************************************************
+/*
  *  Copyright (C) 1999-2008 by  Zilog, Inc.
  *  All Rights Reserved
- *************************************************/
-
+ *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
+ */
 #ifndef FORMAT_H
 #define FORMAT_H
 
@@ -18,7 +18,6 @@
 #define MAXDIGITS 10
 #define MINEXP -4
 #define DEFAULT_PRECISION 6
-
 
 /* format status codes */
 #define FMT_OK 0
@@ -73,22 +72,6 @@ struct flt_info {
   unsigned char digits[MAXDIGITS];	/* max significant digits      */
 };
 
-#ifndef _MULTI_THREAD
-extern struct fmt_type __print_fmt;
-extern char __print_buff[];
-extern unsigned char __print_len;
-extern char __print_leading_char;  // Initial +, -, or space for number
-extern char _PTR_ __print_out;
-
-extern void __print_send();
-extern void __fprint_send();
-extern reentrant void __print_uputch(char);  // Putch to uart
-extern reentrant void __print_sputch(char);  // Putch to sprintf buffer
-extern void (*__print_xputch)(char);
-extern void __print_sendstring(char _PTR_);
-extern void __print_putch(char);
-//extern void __print_putromstring(char rom * sp);
-
 extern void _u_stoa(short);
 extern void _u_ustoa(unsigned short);
 extern void _u_itoa(int);
@@ -99,28 +82,6 @@ extern int  _u_print(char _PTR_ src,char _PTR_ fmt,va_list);
 extern int  _u_scan(char _PTR_ src,char _PTR_ fmt,va_list ap);
 extern void _u_dtof(double);
 extern void _u_dtog(double);
-
-#else		/* _MULTI_THREAD */
-extern const struct fmt_type __clear_fmt_type;
-unsigned char __mt_print_send(char __print_leading_char,char* __print_buff,struct fmt_type* print_fmt);
-unsigned char __mt_sprint_send(char**dest,char __print_leading_char,char* __print_buff,struct fmt_type* print_fmt);
-unsigned char __mt_fprint_send(char __print_leading_char,char* __print_buff,struct fmt_type* print_fmt);
-unsigned char __mt_fsprint_send(char**dest,char __print_leading_char,char* __print_buff,struct fmt_type* print_fmt);
-unsigned char __mt_print_sendstring(char* sp,struct fmt_type* print_fmt);
-unsigned char __mt_sprint_sendstring(char** dest,char* sp,struct fmt_type* print_fmt);
-char _mt_stoa(short n,char* __print_buff,struct fmt_type* print_fmt);
-void _mt_ustoa(unsigned short n,char* __print_buff,struct fmt_type* print_fmt);
-char _mt_itoa(int n,char* __print_buff,struct fmt_type* print_fmt);
-void _mt_uitoa(unsigned int n,char* __print_buff,struct fmt_type* print_fmt);
-char _mt_ltoa(long val,char* __print_buff,struct fmt_type* print_fmt);
-void _mt_ultoa(unsigned long n,char* __print_buff,struct fmt_type* print_fmt);
-int _mt_print(char _PTR_ fmt,va_list argp);
-int _mt_sprint(char _PTR_ dest,char _PTR_ fmt,va_list argp);
-int _mt_scan(char _PTR_ fmt,va_list ap);
-int _mt_sscan(char _PTR_ src,char _PTR_ fmt,va_list ap);
-char _mt_dtof(double n,char* __print_buff,struct fmt_type* fmt);
-char _mt_dtog(double n,char* __print_buff,struct fmt_type* fmt);
-#endif
 
 extern char _PTR_ _u_pscan(char _PTR_ fmt,struct fmt_type _PTR_ str, va_list _PTR_ argp);
 extern char _PTR_ _u_sscan (char _PTR_ fmt,struct fmt_type _PTR_ str);

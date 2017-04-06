@@ -1,7 +1,8 @@
-/*************************************************
+/*
  *  Copyright (C) 1999-2008 by  Zilog, Inc.
  *  All Rights Reserved
- *************************************************/
+ *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
+ */
 #ifndef STRING_H
 #define STRING_H
 
@@ -10,31 +11,32 @@
 typedef unsigned int size_t;
 #endif
 
-char *strcpy(void *s1, void *s2);
-void *memcpy(void *s1, void *s2, size_t n);
-void *memchr(void *s, int c, size_t n);
-void *memset(void *s, int c, size_t n);
-void *memmove(void *s1, void *s2, size_t n);
-int memcmp(void *s1, void *s2, size_t n);
+void *memcpy(void *, const void *, size_t);
+void *memchr(const void *, int, size_t);
+void *memset(void *, int, size_t);
+void *memmove(void *, const void *, size_t);
+int memcmp(const void *, const void *, size_t);
 
-char *strncpy(char *s1, char *s2, size_t n);
-char *strcat(char *s1, char *s2);
-char *strncat(char *s1, char *s2, size_t n);
-char *strchr(char *s, int c);
-char *strpbrk(char *s1, char *s2);
-char *strrchr(char *s, int c);
-char *strstr(char *s1, char *s2);
-char *strtok(char *s1, char *s2);
+char *strcpy(char *, const char *);
+char *strncpy(char *, const char *, size_t);
+char *strcat(char *, const char *);
+char *strncat(char *, const char *, size_t);
+char *strchr(const char *, int);
+char *strpbrk(const char *, const char *);
+char *strrchr(const char *, int);
+char *strstr(const char *, const char *);
+char *strtok(char *, const char *);
 char *strerror(int errnum);
-char *strdup(const char *s);
-char *strndup(const char *s, size_t n);
-size_t strcspn(char *s1, char *s2);
-size_t strspn(char *s1, char *s2);
-size_t strlen(char *s);
-size_t strnlen(char *s, size_t n);
-int strcmp(char *s1, char *s2);
-int strncmp(char *s1, char *s2, size_t n);
-int strcasecmp(const char *s1, const char *s2);
-int strncasecmp(const char *s1, const char *s2, size_t n);
+char *strdup(const char *);
+char *strndup(const char *, size_t n);
+size_t strcspn(const char *, const char *);
+size_t strspn(const char *, const char *);
+size_t strlen(const char *);
+size_t strnlen(const char *, size_t);
+int strcmp(const char *, const char *);
+int strncmp(const char *, const char *, size_t);
+int strcasecmp(const char *, const char *);
+int strncasecmp(const char *, const char *, size_t);
 
 #endif
+

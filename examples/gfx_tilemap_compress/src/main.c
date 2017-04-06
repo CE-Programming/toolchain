@@ -88,11 +88,11 @@ void main(void) {
     
         /* Draw tilemap and coords */
         gfx_Tilemap(&tilemap, x_offset, y_offset);
-        gfx_FillRectangle(0,0,320,16);
-        gfx_PrintStringXY("x offset:",48,4);
-        gfx_PrintUInt(x_offset,4);
+        gfx_FillRectangle(0, 0, 320, 16);
+        gfx_PrintStringXY("x offset:", 48, 4);
+        gfx_PrintUInt(x_offset, 4);
         gfx_PrintString(" y offset:");
-        gfx_PrintUInt(y_offset,4);
+        gfx_PrintUInt(y_offset, 4);
         
         /* Do something based on the keypress */
         switch(key) {

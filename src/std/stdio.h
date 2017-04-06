@@ -1,8 +1,8 @@
-/*************************************************
+/*
  *  Copyright (C) 1999-2008 by  Zilog, Inc.
  *  All Rights Reserved
- *  Modified by Matt Waltz for TI84+CE platform
- *************************************************/
+ *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
+ */
 #ifndef STDIO_H
 #define STDIO_H
 
