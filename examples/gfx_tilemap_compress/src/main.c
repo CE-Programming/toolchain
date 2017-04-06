@@ -39,33 +39,36 @@ gfx_image_t *tileset_tiles[128];
 
 /* Put all your code here */
 void main(void) {
-    uint8_t key, i;
+    sk_key_t key;
+    uint8_t i;
+    unsigned int x_offset = 0;
+    unsigned int y_offset = 0;
     gfx_image_t *tmp_ptr;
     gfx_tilemap_t tilemap;
-    unsigned x_offset = 0, y_offset = 0;
-    
+
+    /* For linking purposes */
     malloc(0);
     
     /* Decompress the tiles */
     for(i = 0; i < 128; i++) {
-        tmp_ptr = gfx_AllocSprite( TILE_WIDTH, TILE_HEIGHT, malloc );
+        tmp_ptr = gfx_MallocSprite( TILE_WIDTH, TILE_HEIGHT );
         dzx7_Turbo( tileset_tiles_compressed[i], tmp_ptr ); // or dzx7_Standard, but in this case we have a lot of tiles
         tileset_tiles[i] = tmp_ptr;
     }
     
     /* Initialize the tilemap structure */
-    tilemap.map = tilemap_map;
-    tilemap.tiles = tileset_tiles;
-    tilemap.type_width = gfx_tile_16_pixel;
+    tilemap.map         = tilemap_map;
+    tilemap.tiles       = tileset_tiles;
+    tilemap.type_width  = gfx_tile_16_pixel;
     tilemap.type_height = gfx_tile_16_pixel;
     tilemap.tile_height = TILE_HEIGHT;
-    tilemap.tile_width = TILE_WIDTH;
+    tilemap.tile_width  = TILE_WIDTH;
     tilemap.draw_height = TILEMAP_DRAW_HEIGHT;
-    tilemap.draw_width = TILEMAP_DRAW_WIDTH;
-    tilemap.height = TILEMAP_HEIGHT;
-    tilemap.width = TILEMAP_WIDTH;
-    tilemap.y_loc = Y_OFFSET;
-    tilemap.x_loc = X_OFFSET;
+    tilemap.draw_width  = TILEMAP_DRAW_WIDTH;
+    tilemap.height      = TILEMAP_HEIGHT;
+    tilemap.width       = TILEMAP_WIDTH;
+    tilemap.y_loc       = Y_OFFSET;
+    tilemap.x_loc       = X_OFFSET;
     
     /* Initialize the 8bpp graphics */
     gfx_Begin( gfx_8bpp );
