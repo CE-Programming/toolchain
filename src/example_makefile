@@ -6,7 +6,7 @@ CSTARTUP_ASM  := cstartup.asm
 LIBHEADER_ASM := libheader.asm
 #----------------------------
 
-VERSION := 7.5
+VERSION := 7.0
 
 #----------------------------
 # Try not to edit anything below these lines unless you know what you are doing
