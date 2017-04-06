@@ -133,27 +133,27 @@ _AllocSprite:
 ;  arg2 : pointer to malloc routine
 ; Returns:
 ;  Pointer to allocated sprite, first byte width, second height
-	ld	iy,0
-	add	iy,sp
-	ld	l,(iy+3)                    ; l = width of sprite
-	ld	h,(iy+6)                    ; h = height of sprite
-	ld	iy,(iy+9)                   ; iy = pointer to some malloc
-	push	hl
-	mlt	hl                          ; width * height
-	inc	hl
-	inc	hl                          ; allocate space for width and height bytes
-	push	hl
-	call	__indcall                   ; call the malloc routine
-	pop	de
-	pop	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	ret	z                           ; check to make sure malloc did not fail
-	ld	(hl),e                      ; store width
-	inc	hl
-	ld	(hl),d                      ; store height
-	dec	hl                          ; return sprite pointer
+	ld	bc,3
+	push	bc
+	pop	hl
+	add	hl,sp
+	ld	e,(hl)                      ; e = width
+	add	hl,bc
+	ld	d,(hl)                      ; d = height
+	add	hl,bc
+	ld	hl,(hl)                     ; hl = malloc
+	push	de
+	mlt	de                          ; de = width * height
+	inc	de                          ; +2 to store width and height
+	inc	de                          ; de = width * height + 2
+	push	de
+	call	_indcallHL_ASM \.r          ; hl = malloc(width * height + 2)
+	pop	de                          ; de = width * height + 2
+	add	hl,de                       ; this should never carry
+	sbc	hl,de                       ; check if malloc failed (hl == 0)
+	pop	de                          ; e = width, d = height
+	ret	z                           ; abort if malloc failed
+	ld	(hl),de                     ; store width and height
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2689,6 +2689,11 @@ _SetTextXY:
 	ld	(TextYPos_SMC),hl \.r
 	push	hl			; xpos=don't care, sp=&xpos
 	ex	de,hl			; hl=return address
+;-------------------------------------------------------------------------------
+_indcallHL_ASM:
+; Calls HL
+; Inputs:
+;  HL : Address to call
 	jp	(hl)
 	
 ;-------------------------------------------------------------------------------
