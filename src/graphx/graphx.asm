@@ -4121,342 +4121,272 @@ _:	add	hl,hl
 _:	rla
 	djnz	--_
 	ret                                 ; ca = c*256/a, h = c*256%a
-	
-;-------------------------------------------------------------------------------
-RestoreStack:
-	ld	sp,ix
-	pop	ix
-	ret
+
 ;-------------------------------------------------------------------------------
 _FloodFill:
 ; Preforms an implementation of a flood fill so no one hopefully crashes the stack
-; Maximum stack depth is 2049 bytes
+; Maximum stack depth is 3224 bytes
 ; Arguments:
 ;  arg0 : X Coordinate
 ;  arg1 : Y Coordinate
 ;  arg2 : New Color Index
 ; Returns:
 ;  None
-	ld	hl,-2049
+	ld	hl,-3224
 	call	__frameset
-	ld	bc,(_xmax) \.r
-	ld	(ix-49),bc                  ; int xmax = maxx;
-	ld	bc,(_ymax) \.r
-	ld	(ix-9),bc                   ; int ymax = maxy;
-	ld	bc,(_ymin) \.r
-	ld	(ix-13),bc                  ; int ymin = miny;
-	lea	hl,ix
-	ld	de,-2049
-	add	hl,de
-	ld	(ix-3),hl                   ; end of stack
-	push	hl
-	pop	iy                          ; linesegment stack[maxdepth], *sp = stack
-	or	a,a
-	sbc	hl,hl
-	ld	l,(ix+9)
-	ld	(ix+9),hl
-	ld	e,l
+
+	ld	e,(ix+9)
 	ld	bc,(ix+6)
-	call	_PixelPtrNoChks_ASM \.r     ; old_color = getpixel(x, y)
-	ld	b,(ix+12)                   ; new_color
+	call	_PixelPtrNoChks_ASM \.r     ; ov = p(x, y);
 	ld	a,(hl)
-	cp	a,b
-	jr	z,RestoreStack              ; if( old_color == new_color ) return
-	ld	(OldColor_SMC_1),a \.r
-	ld	(OldColor_SMC_2),a \.r
-	ld	(OldColor_SMC_3),a \.r
-	ld	a,b
-	ld	(NewColor_SMC_1),a \.r
-	ld	(NewColor_SMC_2),a \.r
-	
-	ld	hl,(ix+9)                   ; y
-	ld	de,(ix-9)
-	inc	hl
-	or	a,a
-	sbc	hl,de
-	jp	p,+_ \.r
-	jp	pe,InvalidPush_1 \.r
-	jr	++_
-_:	jp	po,InvalidPush_1 \.r
-_:	ld	bc,(ix+6)
-	ld	(iy+0),bc
-	ld	(iy+3),bc
+
+	ld	(ff_color0_smc),a \.r
+	ld	(ff_color1_smc),a \.r
+	ld	(ff_color2_smc),a \.r
+
+	ld	hl,(_xmax) \.r              ; smc to gain speedz in inner loops
+	ld	(ff_xmax_smc),hl \.r
+	ld	hl,(_xmin) \.r
+	ld	(ff_xmin_smc),hl \.r
+
+	lea	iy,ix
+	ld	bc,-3224
+	add	iy,bc
+	ld	(ff_stacktop_smc),iy \.r
+
 	ld	a,(ix+9)
-	ld	(iy+6),a
-	ld	(iy+9),1
-	lea	iy,iy+10                    ; push(x, x, y, 1)
-InvalidPush_1:
-	add	hl,de
-	dec	hl
-	or	a,a
-	sbc	hl,de
-	jp	p,+_ \.r
-	jp	pe,InvalidPush_2 \.r
-	jr	++_
-_:	jp	po,InvalidPush_2 \.r
-_:	ld	bc,(ix+6)
-	ld	(iy+0),bc
-	ld	(iy+3),bc
-	ld	a,(ix+9)
+	ld	hl,(ix+6)
+	ld	(iy+0),hl                   ; sp->xl = x;
+	ld	(iy+3),hl                   ; sp->xr = x;
+	ld	(iy+6),a                    ; sp->y  = y;
+	ld	(iy+7),1                    ; sp->dy = 1;
+	lea	iy,iy+8                     ; sp++;
+
 	inc	a
-	ld	(iy+6),a
-	ld	(iy+9),-1
-	lea	iy,iy+10                    ; push(x, x, y+1, -1)
-InvalidPush_2:
-	
-	jp	WhileStackNotEmptyBegin \.r ; while ( sp > stack )
-WhileStackNotEmpty:
-	lea	iy,iy-10
+	ld	(iy+6),a                    ; sp->y  = y+1;
+	ld	(iy+0),hl                   ; sp->xl = x;
+	ld	(iy+3),hl                   ; sp->xr = x;
+	ld	(iy+7),255                  ; sp->dy = -1;
+	lea	iy,iy+8                     ; sp++;
+
+	ld	a,(ix+12)
+	ld	(ff_newcolor0_smc),a \.r
+	ld	(ff_newcolor1_smc),a \.r
+
+ff_doloop:                                  ; do {
+	lea	iy,iy-8                     ; sp--;
+	ld	a,(iy+7)
+	ld	(ix-4),a                    ; dy = sp->dy;
+	add	a,(iy+6)                    ; y  = sp->y+dy;
+	ld	(ix+9),a
+	ld	bc,(iy+3)
+	ld	(ix-15),bc                  ; x2 = sp->xr;
 	ld	bc,(iy+0)
-	ld	(ix-16),bc                  ; xl
-	ld	de,(iy+3)
-	ld	(ix-22),de
-	ld	a,(iy+9)
-	ld	e,a
-	rla
-	sbc	hl,hl
-	ld	l,e
-	ld	(ix-6),hl
-	ld	de,(iy+6)
-	add	hl,de
-	ld	(ix+9),l                    ; pop (xl, xr, y, dy);
-                                            ; for ( x = xl; x >= xmin && getpixel(x, y) == old_color; --x )
-	ld	e,l
+	ld	(ix-8),bc                   ; x1 = sp->xl;
+
 	ld	hl,(currDrawBuffer)
 	add	hl,bc
+	ld	e,a
 	ld	d,lcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
-	ex	de,hl                       ; de -> scanline, bc = x
-	ld	hl,(_xmin) \.r              ; hl = xmin
-	jr	Loop_For_Begin_1
-Loop_For_1:
-NewColor_SMC_1 =$+1
-	ld	a,0
-	ld	(de),a                      ; setpixel(x, y)
-	dec	de
+
+	jr	+_
+ff_forloop0:                                ; for (x=x1; !(x & 0x8000) && x>=xmin && p(x, y) == ov; x--) { s(x, y); }
+ff_newcolor0_smc =$+1
+	ld	(hl),0
+	dec	hl
 	dec	bc
-Loop_For_Begin_1:
+_:	bit	7,b
+	jr	nz,+_
+ff_xmin_smc =$+1
+	ld	de,0
+	or	a,a
+	sbc	hl,de
+	add	hl,de
+	jr	c,+_
+	ld	a,(hl)
+ff_color0_smc =$+1
+	cp	a,0
+	jr	z,ff_forloop0
+
+_:	ld	(ix+6),bc
+	ld	bc,(ix-8)
+	ld	hl,(ix+6)
+	bit	7,h
+	jr	nz,+_
 	or	a,a
 	sbc	hl,bc
-	jr	nc,Loop_For_Done
 	add	hl,bc
-	ld	a,(de)
-OldColor_SMC_1 =$+1
-	cp	a,0
-	jr	z,Loop_For_1
-Loop_For_Done:
-	ld	(ix+6),bc
-
-	ld	bc,(ix-16)
-	ld	hl,(ix+6)
+	jp	nc,ff_skip \.r              ; if (!(x & 0x8000) && (unsigned)x>=x1) goto skip;
+_:	inc	hl
+	ld	(ix-11),hl                  ; l = x+1;
 	or	a,a
-	sbc	hl,bc                       ; if ( x >= xl ) goto skip
-	jp	nc,SkipChecks \.r
-	add	hl,bc
-	inc	hl
-	ld	(ix-19),hl                  ; left = x+1
-	or	a,a
-	sbc	hl,bc                       ; if( left < xl )
-	jp	p,+_ \.r
-	jp	pe,NoPush_5 \.r
-	jr	++_
-_:	jp	po,NoPush_5 \.r
-_:	lea	bc,ix-49                    ;  push(xl-1, left, y, -dy) -- Left leak?
+	sbc	hl,bc
+	jr	nc,ff_badpush0              ; if (l<x1) { push(y, l, x1-1, -dy); }
+	lea	de,ix-24
 	lea	hl,iy
 	or	a,a
-	sbc	hl,bc
-	jr	nc,InvalidPush_5
-	ld	bc,(ix-16)
-	dec	bc                          ; xl-1 = bc
-	ld	de,(ix-6)
-	or	a,a
-	sbc	hl,hl
 	sbc	hl,de
-	ld	a,l                         ; negate -dy
-	add	hl,bc
-	ld	de,(ix-13)
-	or	a,a
-	sbc	hl,de
-	jp	m,_ \.r
-	jp	pe,InvalidPush_5 \.r
-	jr	++_
-_:	jp	po,InvalidPush_5 \.r
-_:	add	hl,de
-	ld	de,(ix-9)
-	or	a,a
-	sbc	hl,de
-	jp	p,+_ \.r
-	jp	pe,InvalidPush_5 \.r
-	jr	++_
-_:	jp	po,InvalidPush_5 \.r
-_:	ld	(iy+0),bc
-	ld	bc,(ix-19)
+	jr	nc,ff_badpush0              ; check stack limit
+	ld	a,(_ymin) \.r
+	ld	e,a
+	ld	a,(ix-4)
+	neg
+	add	a,(ix+9)
+	cp	a,e
+	jr	c,ff_badpush0
+	ld	e,a
+	ld	a,(_ymax) \.r
+	cp	a,e
+	jr	c,ff_badpush0               ; compare y values
+	ld	a,(ix+9)
+	ld	(iy+6),a
+	ld	bc,(ix-11)
+	ld	(iy+0),bc
+	ld	bc,(ix-8)
+	dec	bc
 	ld	(iy+3),bc
-	ld	c,(ix+9)
-	ld	(iy+6),c
-	ld	(iy+9),a                    ; a = -dy
-	lea	iy,iy+10
-NoPush_5:
-InvalidPush_5:
-	ld	bc,(ix-16)
-	inc	bc                          ; x = xl+1
-	
-DoWhileLoop:
-	ld	e,(ix+9)
+	ld	a,(ix-4)
+	neg	
+	ld	(iy+7),a
+	lea	iy,iy+8
+ff_badpush0:
+	ld	bc,(ix-8)
+	inc	bc                          ; x = x1+1;
+
+	ld	(ix+6),bc
+
 	ld	hl,(currDrawBuffer)
 	add	hl,bc
+	ld	e,(ix+9)
 	ld	d,lcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
-	ex	de,hl
-	push	bc
-	pop	hl
-	ld	bc,(ix-49)
-	jr	Loop_For_Begin_2
-Loop_For_2:
-NewColor_SMC_2 =$+1
+	ex	de,hl                       ; de -> draw location
+                                            ; do {
+	jr	ff_innerdoloop              ; for (; (unsigned)x<=xmax && gfx_getpixel(x, y) == ov; x++) { gfx_setpixel(x, y); }
+ff_forloop1:
+ff_newcolor1_smc =$+1
 	ld	a,0
 	ld	(de),a
 	inc	de
-	inc	hl
-Loop_For_Begin_2:
+	inc	bc
+ff_xmax_smc =$+1
+ff_innerdoloop:
+	ld	hl,0
 	or	a,a
 	sbc	hl,bc
-	jr	nc,Loop_For_Done_2_2
-	add	hl,bc
+	jr	c,+_
 	ld	a,(de)
-OldColor_SMC_2 =$+1
+ff_color1_smc =$+1
 	cp	a,0
-	jr	z,Loop_For_2
-	jr	Loop_For_Done_2
-Loop_For_Done_2_2:
-	add	hl,bc
-Loop_For_Done_2:
-	ld	(ix+6),hl
-	ex	de,hl                       ; de = x
-	
-	lea	bc,ix-49
-	lea	hl,iy
-	or	a,a
-	sbc	hl,bc
-	jr	nc,InvalidPush_3
-	ld	bc,(ix-6)
-	ld	hl,(ix+9)
-	ld	a,l                         ; a = y
-	add	hl,bc
-	ld	bc,(ix-13)
-	or	a,a
-	sbc	hl,bc
-	jp	m,+_ \.r
-	jp	pe,InvalidPush_3 \.r
-	jr	++_
-_:	jp	po,InvalidPush_3 \.r
-_:	add	hl,bc
-	ld	bc,(ix-9)
-	or	a,a
-	sbc	hl,bc
-	jp	p,+_ \.r
-	jp	pe,InvalidPush_3 \.r
-	jr	++_
-_:	jp	po,InvalidPush_3 \.r
-_:	ld	bc,(ix-19)
-	ld	(iy+0),bc
-	dec	de
-	ld	(iy+3),de                   ; x-1
-	ld	(iy+6),a                    ; a = y
-	ld	a,(ix-6)
-	ld	(iy+9),a
-	lea	iy,iy+10                    ; push(left, x-1, y, dy)
-InvalidPush_3:
-	ld	hl,(ix-22)
-	inc	hl
-	ld	(ix-43),hl
-	ld	bc,(ix+6)
-	or	a,a
-	sbc	hl,bc                       ; if( x > xr+1 ) push(xr+1, x-1, y, -dy); -- Was there a leak on the right?
-	jp	p,+_	\.r
-	jp	pe,InvalidPush_4 \.r
-	jr	++_
-_:	jp	po,InvalidPush_4 \.r
-_:	lea	de,ix-49
+	jr	z,ff_forloop1
+
+_:	ld	(ix+6),bc
+	lea	de,ix-24                    ; push(y, l, x-1, dy);
 	lea	hl,iy
 	or	a,a
 	sbc	hl,de
-	jr	nc,InvalidPush_4            ; stack limit
-	ld	de,(ix-6)
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,de
-	ld	a,l                         ; negate a = -dy
-	ld	bc,(ix+9)
-	add	hl,bc
-	ld	(ix-31),hl
-	ld	bc,(ix-13)
-	or	a,a
-	sbc	hl,bc
-	jp	m,+_ \.r
-	jp	pe,InvalidPush_4 \.r
-	jr	++_
-_:	jp	po,InvalidPush_4 \.r
-_:	ld	hl,(ix-31)
-	ld	bc,(ix-9)
-	or	a,a
-	sbc	hl,bc
-	jp	p,+_ \.r
-	jp	pe,InvalidPush_4 \.r
-	jr	++_
-_:	jp	po,InvalidPush_4 \.r
-_:	ld	bc,(ix-43)
+	jr	nc,ff_badpush1
+	ld	a,(_ymin) \.r
+	ld	e,a
+	ld	a,(ix-4)
+	add	a,(ix+9)
+	cp	a,e
+	jr	c,ff_badpush1
+	ld	e,a
+	ld	a,(_ymax) \.r
+	cp	a,e
+	jr	c,ff_badpush1               ; compare y values
+	ld	a,(ix+9)
+	ld	(iy+6),a
+	ld	bc,(ix-11)
 	ld	(iy+0),bc
 	ld	bc,(ix+6)
 	dec	bc
 	ld	(iy+3),bc
-	ld	(iy+9),a                    ; a = -dy
+	ld	a,(ix-4)
+	ld	(iy+7),a
+	lea	iy,iy+8
+ff_badpush1:
+	ld	hl,(ix-15)                  ; if (x>x2+1) { push(y, x2+1, x-1, -dy); }
+	inc	hl
+	or	a,a
+	ld	bc,(ix+6)
+	sbc	hl,bc
+	jr	nc,ff_skip
+	lea	de,ix-24
+	lea	hl,iy
+	or	a,a
+	sbc	hl,de
+	jr	nc,ff_badpush2
+	ld	a,(_ymin) \.r
+	ld	e,a
+	ld	a,(ix-4)
+	neg
+	add	a,(ix+9)
+	cp	a,e
+	jr	c,ff_badpush2
+	ld	e,a
+	ld	a,(_ymax) \.r
+	cp	a,e
+	jr	c,ff_badpush2               ; compare y values
 	ld	a,(ix+9)
 	ld	(iy+6),a
-	lea	iy,iy+10                    ; push(xr+1, x-1, y, -dy)
-SkipChecks:
-InvalidPush_4:
-	ld	bc,(ix+6)                   ; for( ++x; x <= xr && getpixel(x, y) != old_color; ++x )
+	ld	bc,(ix-15)
 	inc	bc
-	ld	e,(ix+9)
+	ld	(iy+0),bc
+	ld	bc,(ix+6)
+	dec	bc
+	ld	(iy+3),bc
+	ld	a,(ix-4)
+	neg	
+	ld	(iy+7),a
+	lea	iy,iy+8
+ff_skip:
+ff_badpush2:                                ; skip: for (x++; (unsigned)x<=x2 && gfx_getpixel(x, y) != ov; x++);
+	ld	bc,(ix+6)
+	inc	bc
+
 	ld	hl,(currDrawBuffer)
 	add	hl,bc
+	ld	e,(ix+9)
 	ld	d,lcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
-	ex	de,hl                       ; de -> scanline, bc = x
-	ld	hl,(ix-22)                  ; hl = xr
-	jr	Loop_For_Begin_3
-Loop_For_3:
+	ex	de,hl                       ; de -> draw location
+
+	jr	+_
+ff_forloop2:
 	inc	bc
 	inc	de
-Loop_For_Begin_3:
+_:	ld	hl,(ix-15)
 	or	a,a
 	sbc	hl,bc
-	jr	c,Loop_For_Done_3
-	add	hl,bc
-	ld	a,(de)                      ; getpixel(x, y)
-OldColor_SMC_3 =$+1
+	jr	c,+_
+	ld	a,(de)
+ff_color2_smc =$+1
 	cp	a,0
-	jr	nz,Loop_For_3
-Loop_For_Done_3:
-	ld	(ix-19),bc                  ; left = x
-	ld	(ix+6),bc
-	ld	hl,(ix-22)
+	jr	nz,ff_forloop2
+
+_:	ld	(ix+6),bc
+	ld	(ix-11),bc                  ; l = x;
+	ld	hl,(ix-15)
 	or	a,a
 	sbc	hl,bc
-	jp	nc,DoWhileLoop \.r
-WhileStackNotEmptyBegin:
-	ld	hl,(ix-3)
-	lea	bc,iy
+	jp	nc,ff_innerdoloop \.r       ; } while ((unsigned)x<=x2);
+
+ff_stacktop_smc =$+1
+	ld	hl,0
+	lea	de,iy
 	or	a,a
-	sbc	hl,bc
-	jp	c,WhileStackNotEmpty \.r
+	sbc	hl,de
+	jp	c,ff_doloop \.r             ; } while (sp>stack);
+
 	ld	sp,ix
 	pop	ix
 	ret

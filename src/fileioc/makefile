@@ -5,7 +5,7 @@
 # set NAME to the name of the library
 # set SRC to the assembly source of the library
 NAME := fileioc
-SRC  := fileioc.asm
+VARN := FILEIOC
 
 # defult locations
 SPASM ?= spasm
@@ -33,6 +33,7 @@ CP          = cp
 PREFIX     ?= $(HOME)
 endif
 
+SRC        += $(NAME).asm
 DEV        ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
 BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 
@@ -46,7 +47,7 @@ EZSRC       = $(wildcard *.src)
 TBL         = relocation_table
 
 LIB_LIB    := $(NAME).lib
-LIB_8XV    := $(NAME).8xv
+LIB_8XV    := $(VARN).8xv
 LIB_ASM    := $(NAME)_header.asm
 LIB_JMP    := $(NAME)_equates.asm
 LIB_H      := $(NAME).h
@@ -71,7 +72,7 @@ $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj))
 	$(RM) $<
 
 clean:
-	$(RM) $(LIB_8XV) $(LIB_LIB) $(LIB_8XV) $(LIB_ASM) $(LIB_JMP) $(EZOBJ) $(EZSRC) $(TBL)
+	$(RM) $(LIB_8XV) $(LIB_LIB) $(LIB_ASM) $(LIB_JMP) $(EZOBJ) $(EZSRC) $(TBL)
 
 install:
 	$(CP) $(LIB_H) $(H_LOC)
