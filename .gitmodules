@@ -1,0 +1,9 @@
+[submodule "src/tools/convhex"]
+	path = tools/convhex
+	url = https://github.com/MattWaltz/convhex
+[submodule "src/tools/convpng"]
+	path = tools/convpng
+	url = https://github.com/MattWaltz/convpng
+[submodule "tools/spasm-ng"]
+	path = tools/spasm-ng
+	url = https://github.com/MattWaltz/spasm-ng.git
