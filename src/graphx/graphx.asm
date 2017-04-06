@@ -4124,7 +4124,7 @@ _:	rla
 
 ;-------------------------------------------------------------------------------
 _FloodFill:
-; Preforms an implementation of a flood fill so no one hopefully crashes the stack
+; Implements a flood fill so no one hopefully crashes the stack
 ; Maximum stack depth is 3224 bytes
 ; Arguments:
 ;  arg0 : X Coordinate
@@ -4140,9 +4140,13 @@ _FloodFill:
 	call	_PixelPtrNoChks_ASM \.r     ; ov = p(x, y);
 	ld	a,(hl)
 
-	ld	(ff_color0_smc),a \.r
-	ld	(ff_color1_smc),a \.r
-	ld	(ff_color2_smc),a \.r
+	ld	(ff_oldcolor0_smc),a \.r
+	ld	(ff_oldcolor1_smc),a \.r
+	ld	(ff_oldcolor2_smc),a \.r
+
+	ld	a,(ix+12)
+	ld	(ff_newcolor0_smc),a \.r
+	ld	(ff_newcolor1_smc),a \.r
 
 	ld	hl,(_xmax) \.r              ; smc to gain speedz in inner loops
 	ld	(ff_xmax_smc),hl \.r
@@ -4169,10 +4173,6 @@ _FloodFill:
 	ld	(iy+7),255                  ; sp->dy = -1;
 	lea	iy,iy+8                     ; sp++;
 
-	ld	a,(ix+12)
-	ld	(ff_newcolor0_smc),a \.r
-	ld	(ff_newcolor1_smc),a \.r
-
 ff_doloop:                                  ; do {
 	lea	iy,iy-8                     ; sp--;
 	ld	a,(iy+7)
@@ -4191,6 +4191,10 @@ ff_doloop:                                  ; do {
 	mlt	de
 	add	hl,de
 	add	hl,de
+ff_xmin_smc =$+1
+	ld	de,0
+ff_oldcolor0_smc =$+1
+	ld	a,0
 
 	jr	+_
 ff_forloop0:                                ; for (x=x1; !(x & 0x8000) && x>=xmin && p(x, y) == ov; x--) { s(x, y); }
@@ -4200,15 +4204,11 @@ ff_newcolor0_smc =$+1
 	dec	bc
 _:	bit	7,b
 	jr	nz,+_
-ff_xmin_smc =$+1
-	ld	de,0
 	or	a,a
 	sbc	hl,de
-	add	hl,de
 	jr	c,+_
-	ld	a,(hl)
-ff_color0_smc =$+1
-	cp	a,0
+	add	hl,de
+	cp	a,(hl)
 	jr	z,ff_forloop0
 
 _:	ld	(ix+6),bc
@@ -4218,8 +4218,8 @@ _:	ld	(ix+6),bc
 	jr	nz,+_
 	or	a,a
 	sbc	hl,bc
-	add	hl,bc
 	jp	nc,ff_skip \.r              ; if (!(x & 0x8000) && (unsigned)x>=x1) goto skip;
+	add	hl,bc
 _:	inc	hl
 	ld	(ix-11),hl                  ; l = x+1;
 	or	a,a
@@ -4256,8 +4256,6 @@ ff_badpush0:
 	ld	bc,(ix-8)
 	inc	bc                          ; x = x1+1;
 
-	ld	(ix+6),bc
-
 	ld	hl,(currDrawBuffer)
 	add	hl,bc
 	ld	e,(ix+9)
@@ -4267,21 +4265,23 @@ ff_badpush0:
 	add	hl,de
 	ex	de,hl                       ; de -> draw location
                                             ; do {
-	jr	ff_innerdoloop              ; for (; (unsigned)x<=xmax && gfx_getpixel(x, y) == ov; x++) { gfx_setpixel(x, y); }
+ff_forloop1start:
+ff_xmax_smc =$+1
+	ld	hl,0
+
+	jr	+_                          ; for (; (unsigned)x<=xmax && gfx_getpixel(x, y) == ov; x++) { gfx_setpixel(x, y); }
 ff_forloop1:
 ff_newcolor1_smc =$+1
 	ld	a,0
 	ld	(de),a
 	inc	de
 	inc	bc
-ff_xmax_smc =$+1
-ff_innerdoloop:
-	ld	hl,0
-	or	a,a
+_:	or	a,a
 	sbc	hl,bc
 	jr	c,+_
+	add	hl,bc
 	ld	a,(de)
-ff_color1_smc =$+1
+ff_oldcolor1_smc =$+1
 	cp	a,0
 	jr	z,ff_forloop1
 
@@ -4301,21 +4301,20 @@ _:	ld	(ix+6),bc
 	ld	a,(_ymax) \.r
 	cp	a,e
 	jr	c,ff_badpush1               ; compare y values
+	dec	bc
+	ld	(iy+3),bc
 	ld	a,(ix+9)
 	ld	(iy+6),a
 	ld	bc,(ix-11)
 	ld	(iy+0),bc
-	ld	bc,(ix+6)
-	dec	bc
-	ld	(iy+3),bc
 	ld	a,(ix-4)
 	ld	(iy+7),a
 	lea	iy,iy+8
 ff_badpush1:
 	ld	hl,(ix-15)                  ; if (x>x2+1) { push(y, x2+1, x-1, -dy); }
+	ld	bc,(ix+6)
 	inc	hl
 	or	a,a
-	ld	bc,(ix+6)
 	sbc	hl,bc
 	jr	nc,ff_skip
 	lea	de,ix-24
@@ -4334,17 +4333,16 @@ ff_badpush1:
 	ld	a,(_ymax) \.r
 	cp	a,e
 	jr	c,ff_badpush2               ; compare y values
-	ld	a,(ix+9)
-	ld	(iy+6),a
+	dec	bc
+	ld	(iy+3),bc
 	ld	bc,(ix-15)
 	inc	bc
 	ld	(iy+0),bc
-	ld	bc,(ix+6)
-	dec	bc
-	ld	(iy+3),bc
 	ld	a,(ix-4)
 	neg	
 	ld	(iy+7),a
+	ld	a,(ix+9)
+	ld	(iy+6),a
 	lea	iy,iy+8
 ff_skip:
 ff_badpush2:                                ; skip: for (x++; (unsigned)x<=x2 && gfx_getpixel(x, y) != ov; x++);
@@ -4359,26 +4357,26 @@ ff_badpush2:                                ; skip: for (x++; (unsigned)x<=x2 &&
 	add	hl,de
 	add	hl,de
 	ex	de,hl                       ; de -> draw location
+	ld	hl,(ix-15)
 
 	jr	+_
 ff_forloop2:
 	inc	bc
 	inc	de
-_:	ld	hl,(ix-15)
-	or	a,a
+_:	or	a,a
 	sbc	hl,bc
+	add	hl,bc
 	jr	c,+_
 	ld	a,(de)
-ff_color2_smc =$+1
+ff_oldcolor2_smc =$+1
 	cp	a,0
 	jr	nz,ff_forloop2
 
 _:	ld	(ix+6),bc
 	ld	(ix-11),bc                  ; l = x;
-	ld	hl,(ix-15)
 	or	a,a
 	sbc	hl,bc
-	jp	nc,ff_innerdoloop \.r       ; } while ((unsigned)x<=x2);
+	jp	nc,ff_forloop1start \.r     ; } while ((unsigned)x<=x2);
 
 ff_stacktop_smc =$+1
 	ld	hl,0
