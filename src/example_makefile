@@ -116,7 +116,7 @@ endif
 
 #Define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
 USERHEADERS   := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
-HEADERS       := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,include/ce include/std)))
+HEADERS       := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,./ include/ce include/std)))
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst /;,;,$(HEADERS))

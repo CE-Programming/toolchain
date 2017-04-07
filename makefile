@@ -18,6 +18,7 @@ CP         = copy /y
 SPASMFLG   = NO_APPSIGN=1 MINGW_COMPILE=YES
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
+CPDIR      = xcopy /y /s /e
 ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\installer\installer.nsi) && \
              (if not exist "release" mkdir "release") && move /y installer\CEdev.exe release\\
 else
@@ -30,6 +31,7 @@ PREFIX    ?= $(HOME)
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 SPASMFLG   = NO_APPSIGN=1
 CP         = cp
+CPDIR      = cp -r
 CP_EXMPLS  = cp -r $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 ARCH       = cd $(INSTALLLOC) ; tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
              cd $(CURDIR) ; mkdir -p release ; mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
@@ -148,6 +150,7 @@ install: $(DIRS)
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat/ce) $(call NATIVEPATH,$(INSTALLLIB))
 
 $(DIRS):
 	$(MKDIR) $(INSTALLBIN)
