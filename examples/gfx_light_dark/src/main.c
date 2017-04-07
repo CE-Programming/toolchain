@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared libraries */
-#include <lib/graphx.h>
+#include <graphx.h>
 
 #define color gfx_RGBTo1555(34, 55, 89)
 

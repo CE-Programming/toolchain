@@ -156,7 +156,6 @@ $(DIRS):
 	$(MKDIR) $(call NATIVEPATH,$(INSTALLLIB)/asm)
 	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce)
 	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
-	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce/lib)
 
 dist: install
 	$(ARCH)

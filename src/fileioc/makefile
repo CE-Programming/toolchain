@@ -40,7 +40,7 @@ BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
 LIBH_LOC   := $(call NATIVEPATH,$(INSTALLLOC)/lib/asm)
-H_LOC      := $(call NATIVEPATH,$(INSTALLLOC)/include/ce/lib/)
+H_LOC      := $(call NATIVEPATH,$(INSTALLLOC)/include/ce/)
 
 EZOBJ       = $(wildcard *.obj)
 EZSRC       = $(wildcard *.src)

@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared libraries */
-#include <lib/graphx.h>
+#include <graphx.h>
 
 /* Place function prototypes here */
 

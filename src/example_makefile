@@ -108,15 +108,15 @@ endif
 
 #Are there any shared libraries that we need to find? If so, add in the proper objects and sources and header files
 ifdef L
-LIBS          := $(call NATIVEPATH,$(foreach var,$(L),$(CEDEV)/lib/asm/$(var)_header.asm))
-LOBJECTS      := $(call WINRELPATH,$(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj))))
-LIBHOBJ       := $(OBJDIR)/$(LIBHEADER_OBJ)
-LIBS          := $(call WINPATH,$(foreach var,$(L),$(CEDEV)/lib/asm/$(var)_header.asm))
+LIBS          := $(call NATIVEPATH,$(strip $(foreach var,$(L),$(space)$(CEDEV)/lib/asm/$(var)_header.asm)))
+LOBJECTS      := $(call NATIVEPATH,$(addprefix $(OBJDIR)/,$(notdir $(LIBS:%.asm=%.obj))))
+LIBHOBJ       := $(call NATIVEPATH,$(OBJDIR)/$(LIBHEADER_OBJ))
+LIBS          := $(call NATIVEPATH,$(foreach var,$(L),$(CEDEV)/lib/asm/$(var)_header.asm$(space)))
 endif
 
 #Define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
 USERHEADERS   := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
-HEADERS       := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,include/ce include/ce/libs include/std)))
+HEADERS       := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,include/ce include/std)))
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst /;,;,$(HEADERS))
@@ -271,11 +271,13 @@ $(CSTARTUPOBJ): $(CSTARTUP_LOC)
 	@$(CD) $(OBJDIR) $(chain) \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
 
-$(LIBHOBJ): $(LIBHEADER_LOC)
+$(LIBHOBJ): $(LIBHEADER_LOC) $(LIBS)
 	@$(CD) $(OBJDIR) $(chain) \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$<)
+
+$(LIBS):
 	@$(CD) $(OBJDIR) $(chain) \
-	$(AS) $(ASM_FLAGS) $(LIBS)
+	$(AS) $(ASM_FLAGS) $(call WINPATH,$@)
 
 clean:
 	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(CSTARTUPOBJ) $(LIBHOBJ) $(OBJDIR)/*.obj $(OBJDIR)/*.src $(OBJDIR)/*.asm)
@@ -284,5 +286,5 @@ clean:
 version:
 	@echo C SDK Version $(VERSION)
 
-.PHONY: all clean version add_dirs
+.PHONY: all clean version add_dirs $(LIBS)
 

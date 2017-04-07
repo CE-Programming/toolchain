@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* Shared library headers -- depends on which ones you wish to use */
-#include <lib/fileioc.h>
+#include <fileioc.h>
 
 /* Function prototypes */
 void printText(int8_t xpos, int8_t ypos, const char *text);

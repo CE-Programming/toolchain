@@ -14,7 +14,7 @@
 #include <decompress.h>
 
 /* Shared libraries */
-#include <lib/graphx.h>
+#include <graphx.h>
 #include "gfx/tiles_gfx.h"
 
 /* Tilemap defines */

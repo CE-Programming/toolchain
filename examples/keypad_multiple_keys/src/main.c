@@ -11,7 +11,7 @@
 #include <string.h>
 
 /* CE Keypad C Library */
-#include <lib/keypadc.h>
+#include <keypadc.h>
 
 /* Function prototypes */
 void printText(int8_t xpos, int8_t ypos, const char *text);
