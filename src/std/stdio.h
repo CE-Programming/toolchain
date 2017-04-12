@@ -9,12 +9,12 @@
 #include <stdarg.h>
 #include <format.h>
 
-#define L_tmpnam	12
-#define SEEK_CUR	1
-#define SEEK_END	2
-#define SEEK_SET	0
-#define SYS_OPEN	5		/* max open files */
-#define FOPEN_MAX	SYS_OPEN
+#define L_tmpnam  12
+#define SEEK_CUR  1
+#define SEEK_END  2
+#define SEEK_SET  0
+#define SYS_OPEN  5          /* max open files */
+#define FOPEN_MAX SYS_OPEN
 
 /* ANSI prototypes */
 #ifndef SIZE_T_DEFINED
@@ -23,15 +23,15 @@ typedef unsigned int size_t;
 #endif
 
 #ifndef NULL
-#define NULL		(void *)0
+#define NULL (void *)0
 #endif
 
 #ifndef EOF
-#define EOF		(-1)		/* end of file */
+#define EOF (-1)             /* end of file */
 #endif
 
-int sprintf(char * s,char * format, ...);
-int vprintf(char * format,va_list arg);
-int vsprintf(char * s,char * format, va_list arg);
+int sprintf(const char *s, const char *format, ...);
+int vprintf(const char *format, va_list arg);
+int vsprintf(const char *s, const char *format, va_list arg);
 
 #endif
