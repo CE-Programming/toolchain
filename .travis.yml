@@ -12,11 +12,11 @@ install:
 
 script:
   - export CEDEV=~/CEDev
-  - export PATH=$(CEDEV)/bin/:$PATH
+  - export PATH=$CEDEV/bin/:$PATH
   - make
   - make install
   - make dist
-  - cd $(CEDEV)/examples
+  - cd $CEDEV/examples
   - make
   
 notifications:
