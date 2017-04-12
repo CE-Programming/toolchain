@@ -30,8 +30,8 @@ typedef unsigned int size_t;
 #define EOF (-1)             /* end of file */
 #endif
 
-int sprintf(const char *s, const char *format, ...);
+int sprintf(char *s, const char *format, ...);
 int vprintf(const char *format, va_list arg);
-int vsprintf(const char *s, const char *format, va_list arg);
+int vsprintf(char *s, const char *format, va_list arg);
 
 #endif
