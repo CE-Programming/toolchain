@@ -1,8 +1,8 @@
-# About
+# CE C Programming Toolchain/SDK -  [![Build Status](https://travis-ci.org/CE-Programming/toolchain.svg)](https://travis-ci.org/CE-Programming/toolchain)
 
 The CE C Software Development Kit incorporates a wide variety of tools and documentation in order to build programs in C natively for the TI-84+CE/TI-83PCE line of calculators.
 
-# Getting Started
+## Getting Started
 
 It is recommended that you grab the latest release from [here](https://github.com/CE-Programming/toolchain/releases/latest) if you are looking to get started. Feel free to also bookmark the [wiki pages](https://github.com/CE-Programming/toolchain/wiki), as they will become a helpful guide.
 
@@ -16,9 +16,9 @@ You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions. (
 
 These steps are only if you wish to help with development of the toolchain. 
 
-If you are using windows, [mingw+msys](http://www.mingw.org) is required for building.
+If you are using Windows, [mingw+msys](http://www.mingw.org) is required for building.
 
-If you are using linux or mac, [wine](https://www.winehq.org) is required for building.
+If you are using Linux or macOS, [wine](https://www.winehq.org) is required for building.
 
 Clone the repo: (Note the --recursive option)
 
