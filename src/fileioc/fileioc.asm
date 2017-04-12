@@ -267,6 +267,7 @@ _Open:
 	ld	a,appVarObj
 _:	ld	(varTypeOpen),a \.r
 	ld	(op1),a
+	ld	iy,flags
 	push	ix
 	ld	ix,0
 	add	ix,sp

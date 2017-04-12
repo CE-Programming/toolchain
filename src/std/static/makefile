@@ -33,6 +33,7 @@ LIB_LIB   := $(NAME).lib
 
 EZC        = $(wildcard *.c)
 EZSRC      = $(wildcard *.src)
+EZOBJ      = $(wildcard *.obj)
 
 all: clean_lib $(LIB_LIB)
 
@@ -52,7 +53,7 @@ clean_lib:
 	$(RM) $(LIB_LIB)
 
 clean:
-	$(RM) $(LIB_LIB) *.obj
+	$(RM) $(LIB_LIB) $(EZOBJ)
 
 $(LIB_LIB)():
 	

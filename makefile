@@ -33,9 +33,10 @@ SPASMFLG   = NO_APPSIGN=1
 CP         = cp
 CPDIR      = cp -r
 CP_EXMPLS  = cp -r $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
-ARCH       = cd $(INSTALLLOC) ; tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
-             cd $(CURDIR) ; mkdir -p release ; mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
+ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
+             cd $(CURDIR) && mkdir -p release && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
 chain     := ;
+CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
 endif
 
 TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)
@@ -134,10 +135,16 @@ clean-keypadc:
 	$(MAKE) -C $(KEYPADCDIR) clean
 #----------------------------
 
+#----------------------------
+# uninstall rule
+#----------------------------
 uninstall:
 	$(WINCHKDIR) $(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 
-install: $(DIRS)
+#----------------------------
+# install rule
+#----------------------------
+install: $(DIRS) chmod
 	$(CP_EXMPLS)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/asm/*) $(call NATIVEPATH,$(INSTALLLIB)/asm)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/example_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
@@ -150,7 +157,10 @@ install: $(DIRS)
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat/lib) $(call NATIVEPATH,$(INSTALLINC))
+	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat/lib) $(call NATIVEPATH,$(INSTALLINC)/)
+
+chmod:
+	$(CHMOD)
 
 $(DIRS):
 	$(MKDIR) $(INSTALLBIN)
@@ -160,9 +170,15 @@ $(DIRS):
 	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce)
 	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
 
+#----------------------------
+# release rule
+#----------------------------
 dist: install
 	$(ARCH)
 
+#----------------------------
+# makefile help rule
+#----------------------------
 help:
 	@echo Available targets:
 	@echo all
@@ -182,5 +198,5 @@ help:
 	@echo dist
 	@echo help
 
-.PHONY: all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
+.PHONY: chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
 

@@ -68,8 +68,7 @@ $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj))
 	$(LIB) $(LIBFLGS) $@=+$%
 
 %.obj: %.src
-	$(ASM) $(ASMFLGS) $(call WINPATH,$<)
-	$(RM) $<
+	$(ASM) $(ASMFLGS) $(call WINPATH,$<) && $(RM) $<
 
 clean:
 	$(RM) $(LIB_8XV) $(LIB_LIB) $(LIB_ASM) $(LIB_JMP) $(EZOBJ) $(EZSRC) $(TBL)

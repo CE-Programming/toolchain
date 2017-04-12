@@ -38,6 +38,7 @@ LIB_H      := $(wildcard *.h)
 LIB_LIB    := $(NAME).lib
 EZC         = $(wildcard *.c)
 EZSRC       = $(wildcard *.src)
+EZOBJ       = $(wildcard *.obj)
 
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
@@ -63,7 +64,7 @@ clean_lib:
 	$(RM) $(LIB_LIB)
 
 clean:
-	$(RM) $(LIB_LIB) *.obj
+	$(RM) $(LIB_LIB) $(EZOBJ)
 
 $(LIB_LIB)():
 	
