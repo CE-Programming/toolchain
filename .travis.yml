@@ -1,0 +1,28 @@
+language: cpp
+
+branches:
+  only:
+    - master
+
+before_install:
+  - sudo apt-get update -qq
+
+install:
+  - sudo apt-get install -y --force-yes -qq wine
+
+script:
+  - export CEDEV=~/CEDev
+  - export PATH=$(CEDEV)/bin/:$PATH
+  - make
+  - make install
+  - make dist
+  - cd $(CEDEV)/examples
+  - make
+  
+notifications:
+  irc:
+    channels:
+      - "irc.choopa.net#ez80-dev"
+    on_success: change
+    on_failure: always
+    skip_join: true
