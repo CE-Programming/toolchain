@@ -8,6 +8,10 @@ It is recommended that you grab the latest release from [here](https://github.co
 
 Included you will find examples using the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These perform efficient and easy support for graphics, file I/O, keypad input, etc. Be sure to grab them if you plan to use them.
 
+## Help
+
+You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions. ([ask for help](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login))
+
 ## Building
 
 These steps are only if you wish to help with development of the toolchain. 
@@ -38,7 +42,3 @@ If you wish to view a list of available makefile rules, type: `make help`
 If you wish to build a release; [nsis](https://sourceforge.net/projects/nsis/) is required for windows. Because of limitations of the current software; the special *Large strings* build is needed. You can find it [here](http://nsis.sourceforge.net/Special_Builds). Note also that you must configure your path variable to point to the nsis installation directory.
 
 To build a release, type: `make dist`
-
-## Help
-
-You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions. ([ask for help](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login))
