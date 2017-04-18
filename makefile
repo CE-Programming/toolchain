@@ -19,8 +19,8 @@ SPASMFLG   = NO_APPSIGN=1 MINGW_COMPILE=YES
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 CPDIR      = xcopy /y /s /e
-ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\installer\installer.nsi) && \
-             (if not exist "release" mkdir "release") && move /y installer\CEdev.exe release\\
+ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\tools\installer\installer.nsi) && \
+             (if not exist "release" mkdir "release") && move /y tools\installer\CEdev.exe release\\
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))
@@ -87,6 +87,8 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
 	$(WINCHKDIR) $(RMDIR) release
+	$(WINCHKDIR) $(RMDIR) doxygen
+
 #----------------------------
 
 #----------------------------
@@ -177,6 +179,12 @@ dist: install
 	$(ARCH)
 
 #----------------------------
+# doxygen rule
+#----------------------------
+doxygen:
+	cd $(call NATIVEPATH,tools/doxygen) && doxygen config
+
+#----------------------------
 # makefile help rule
 #----------------------------
 help:
@@ -197,6 +205,7 @@ help:
 	@echo uninstall
 	@echo dist
 	@echo help
+	@echo doxygen
 
-.PHONY: chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
+.PHONY: doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
 
