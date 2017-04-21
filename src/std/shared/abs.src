@@ -1,7 +1,7 @@
 	.def	_abs
 	.assume adl=1
 	
-int abs(int);
+;int abs(int);
 
 _abs:
 	pop	hl
