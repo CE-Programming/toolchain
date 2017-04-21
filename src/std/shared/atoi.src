@@ -2,7 +2,7 @@
 	.def _atoi
 	.assume adl=1
 
-; int atos(char *cp);
+; int atoi(char *cp);
 
 _atoi:
 	pop	bc
@@ -19,3 +19,4 @@ _atoi:
 	pop	bc
 	pop	bc
 	ret
+

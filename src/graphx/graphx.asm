@@ -94,12 +94,12 @@
  .function "gfx_SetTextConfig",_SetTextConfig
  .function "gfx_GetSpriteChar",_GetSpriteChar
 ;-------------------------------------------------------------------------------
-; v4 functions
+; v4 functions - Can no longer move/delete
 ;-------------------------------------------------------------------------------
  .function "gfx_Lighten",_Lighten
  .function "gfx_Darken",_Darken
 ;-------------------------------------------------------------------------------
-; v5 functions
+; v5 functions - Can no longer move/delete
 ;-------------------------------------------------------------------------------
  .function "gfx_SetFontHeight",_SetFontHeight
  .function "gfx_ScaleSprite",_ScaleSprite

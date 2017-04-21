@@ -5,3 +5,4 @@
 ; short int atos(char *cp);
 
 _atos		equ _atoi
+

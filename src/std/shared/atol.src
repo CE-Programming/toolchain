@@ -2,6 +2,7 @@
 	.def _atol
 	.assume adl=1
 
-; long atos(char *cp);
+; long atol(char *cp);
 
 _atol		equ _atoi
+

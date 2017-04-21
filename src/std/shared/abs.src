@@ -1,6 +1,8 @@
 	.def	_abs
 	.assume adl=1
 	
+int abs(int);
+
 _abs:
 	pop	hl
 	pop	de
@@ -12,3 +14,4 @@ _abs:
 	ret	p
 	ex	de,hl
 	ret
+
