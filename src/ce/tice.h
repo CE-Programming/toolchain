@@ -215,7 +215,7 @@ void *memset_fast(void *ptr, int c, size_t num);
  * @param month Month to set
  * @param year Year to set
  */
-void boot_SetDate(uint8_t day, uint8_t month, uint24_t year);
+void boot_SetDate(uint8_t day, uint8_t month, uint16_t year);
 
 /**
  * Gets the calculator's date
@@ -224,7 +224,7 @@ void boot_SetDate(uint8_t day, uint8_t month, uint24_t year);
  * @param month Pointer to variable to store month
  * @param year Pointer to variable to store year
  */
-void boot_GetDate(uint8_t *day, uint8_t *month, uint24_t *year);
+void boot_GetDate(uint8_t *day, uint8_t *month, uint16_t *year);
 
 /**
  * Sets the calculator's time

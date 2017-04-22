@@ -3647,55 +3647,43 @@ _:	ld	(LineType0_SMC),hl \.r
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	lea	hl,ix+-9
 	ld	sp,hl
-	ld	bc,(ix+6)
-	ld	(ix+-3),bc
-	ld	hl,(ix+9)
-	dec	hl
-	ld	(ix+9),hl
-	ld	iy,(ix+-3)
+	ld	iy,(ix+6)
 	jr	StartPolygonLoop
 PolygonLoop:
-	lea	hl,iy+9
-	ld	bc,(hl)
+	push	iy
+	ld	bc,(iy+9)
 	push	bc
-	lea	hl,iy+6
-	ld	bc,(hl)
+	ld	bc,(iy+6)
 	push	bc
-	lea	hl,iy+3
-	ld	bc,(hl)
+	ld	bc,(iy+3)
 	push	bc
-	lea	hl,iy+0
-	ld	bc,(hl)
+	ld	bc,(iy+0)
 	push	bc
 	call	0
 LineType0_SMC =$-3
-	lea	hl,ix+-9
-	ld	sp,hl
-	ld	iy,(ix+-3)
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	iy
 	lea	iy,iy+6
-	ld	(ix+-3),iy
+StartPolygonLoop:
 	ld	hl,(ix+9)
 	dec	hl
 	ld	(ix+9),hl
-StartPolygonLoop:
 	add	hl,bc
 	or	a,a
 	sbc	hl,bc
 	jr	nz,PolygonLoop
-	lea	hl,iy+3
-	ld	bc,(hl)
+	ld	bc,(iy+3)
 	push	bc
-	lea	hl,iy+0
-	ld	bc,(hl)
+	ld	bc,(iy+0)
 	push	bc
 	ld	iy,(ix+6)
-	lea	hl,iy+3
-	ld	bc,(hl)
+	ld	bc,(iy+3)
 	push	bc
-	lea	hl,iy+0
-	ld	bc,(hl)
+	ld	bc,(iy+0)
 	push	bc
 	call	0
 LineType1_SMC =$-3
@@ -3710,7 +3698,7 @@ _Reserved:
 
 ;-------------------------------------------------------------------------------
 _LZDecompressSprite_Deprecated:
-; Decompresses a sprite that is LZ77 compressed from ConvPNG
+; Decompresses a sprite that is LZ77 compressed from ConvPNG (Deprecated)
 	ld	hl,-23
 	call	__frameset
 	ld	hl,(ix+6)
@@ -4274,7 +4262,7 @@ ff_forloop1start:
 ff_xmax_smc =$+1
 	ld	hl,0
 
-	jr	+_                          ; for (; (unsigned)x<=xmax && gfx_getpixel(x, y) == ov; x++) { gfx_setpixel(x, y); }
+	jr	+_                          ; for (; (unsigned)x<=xmax && p(x, y) == ov; x++) { s(x, y); }
 ff_forloop1:
 ff_newcolor1_smc =$+1
 	ld	a,0
@@ -4350,7 +4338,7 @@ ff_badpush1:
 	ld	(iy+6),a
 	lea	iy,iy+8
 ff_skip:
-ff_badpush2:                                ; skip: for (x++; (unsigned)x<=x2 && gfx_getpixel(x, y) != ov; x++);
+ff_badpush2:                                ; skip: for (x++; (unsigned)x<=x2 && p(x, y) != ov; x++);
 	ld	bc,(ix+6)
 	inc	bc
 
