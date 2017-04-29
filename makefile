@@ -173,6 +173,7 @@ $(DIRS):
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLIB)/asm) $(MKDIR) $(call NATIVEPATH,$(INSTALLLIB)/asm)
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/ce) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce)
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/std) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
+	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/compat) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/compat)
 
 #----------------------------
 # release rule
