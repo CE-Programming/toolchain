@@ -967,6 +967,7 @@ _:	inc	de
 	ld	(hl),de
 	pop	hl
 	push	iy
+	ld	iy,flags
 	call	_Get_Tok_Strng
 	pop	iy
 	ld	hl,(iy+9)
