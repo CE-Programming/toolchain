@@ -833,10 +833,10 @@ _DetectVar:
 ;  arg0 : address of pointer to being search
 ;  arg1 : pointer to null terminated string of data to search for
 ;  arg2 : type of varaible to search for
-	ld	hl, 9
-	add	hl, sp
-	ld	a, (hl)
-	jr	+_
+	ld      hl, 9
+	add     hl, sp
+	ld      a, (hl)
+	jr      +_
 
 ;-------------------------------------------------------------------------------
 _Detect:
