@@ -1010,10 +1010,10 @@ _FillCircle:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	lea	hl,ix+-9
+	lea	hl,ix-9
 	ld	sp,hl
 	ld	bc,(ix+12)
-	ld	(ix+-6),bc
+	ld	(ix-6),bc
 	sbc	hl,hl
 	ld	(ix-3),hl
 	adc	hl,bc
@@ -1023,16 +1023,16 @@ _FillCircle:
 	sbc	hl,bc
 	jp	b_4 \.r
 _FillCircleSectors:
-	ld	hl,(ix+-3)
+	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
 	ld	(FCircle0_SMC),hl \.r
 	push	hl
-	ld	bc,(ix+-6)
+	ld	bc,(ix-6)
 	ld	hl,(ix+9)
 	add	hl,bc
 	push	hl
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
@@ -1042,7 +1042,7 @@ _FillCircleSectors:
 FCircle0_SMC: =$+1
 	ld	hl,0
 	push	hl
-	ld	bc,(ix+-6)
+	ld	bc,(ix-6)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,bc
@@ -1051,16 +1051,16 @@ FCircle1_SMC: =$+1
 	ld	hl,0
 	push	hl
 	call	_HorizLine \.r
-	ld	hl,(ix+-6)
+	ld	hl,(ix-6)
 	add	hl,hl
 	inc	hl
 	ld	(FCircle2_SMC),hl \.r
 	push	hl
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	ld	hl,(ix+9)
 	add	hl,bc
 	push	hl
-	ld	bc,(ix+-6)
+	ld	bc,(ix-6)
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
@@ -1070,7 +1070,7 @@ FCircle1_SMC: =$+1
 FCircle2_SMC: =$+1
 	ld	hl,0
 	push	hl
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,bc
@@ -1079,12 +1079,12 @@ FCircle3_SMC: =$+1
 	ld	hl,0
 	push	hl
 	call	_HorizLine \.r
-	lea	hl,ix+-9
+	lea	hl,ix-9
 	ld	sp,hl
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	inc	bc
-	ld	(ix+-3),bc
-	ld	bc,(ix+-9)
+	ld	(ix-3),bc
+	ld	bc,(ix-9)
 	or	a,a
 	sbc	hl,hl
 	sbc	hl,bc
@@ -1092,24 +1092,24 @@ FCircle3_SMC: =$+1
 	jp	pe,b_3 \.r
 	jr	b__3
 b__2:	jp	po,b_3 \.r
-b__3:	ld	hl,(ix+-3)
+b__3:	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
 	add	hl,bc
 	jr	b_4
-b_3:	ld	bc,(ix+-6)
+b_3:	ld	bc,(ix-6)
 	dec	bc
-	ld	(ix+-6),bc
-	ld	hl,(ix+-3)
-	ld	de,(ix+-9)
+	ld	(ix-6),bc
+	ld	hl,(ix-3)
+	ld	de,(ix-9)
 	or	a,a
 	sbc	hl,bc
 	add	hl,hl
 	inc	hl
 	add	hl,de
-b_4:	ld	(ix+-9),hl
-	ld	bc,(ix+-3)
-	ld	hl,(ix+-6)
+b_4:	ld	(ix-9),hl
+	ld	bc,(ix-3)
+	ld	hl,(ix-6)
 	or	a,a
 	sbc	hl,bc
 	jp	p,+_ \.r
@@ -1147,7 +1147,7 @@ _FillCircle_NoClip:
 	sbc	hl,bc
 	jp	_FillCircleNC_Loop \.r
 _FillCircle_NoClipSectors:
-	ld	hl,(ix+-3)
+	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
 	ld	(FCircleNC0_SMC),hl \.r
@@ -1253,14 +1253,14 @@ _Line:
 	ld	hl,(iy+3)                   ; x0
 	ld	de,(iy+6)                   ; y0
 	call	_ComputeOutcode_ASM \.r
-	ld	(iy+-1),a
+	ld	(iy-1),a
 	ld	hl,(iy+9)                   ; x1
 	ld	de,(iy+12)                  ; y1
 	call	_ComputeOutcode_ASM \.r
-	ld	(iy+-2),a
+	ld	(iy-2),a
 CohenSutherlandLoop:
-	ld	b,(iy+-1)                   ; b = outcode0
-	ld	a,(iy+-2)                   ; a = outcode1
+	ld	b,(iy-1)                    ; b = outcode0
+	ld	a,(iy-2)                    ; a = outcode1
 	tst	a,b
 	jp	nz,TrivialReject \.r        ; if(outcode0|outcode1)
 	or	a,a
@@ -1337,18 +1337,18 @@ ComputeNewY:
 	pop	hl                          ; (x) hl = ymax_ymin
 FinishComputations:
 	pop	af
-	cp	a,(iy+-1)
+	cp	a,(iy-1)
 	jr	nz,OutcodeOutOutcode1
 	ld	(iy+3),hl
 	ld	(iy+6),de
 	call	_ComputeOutcode_ASM \.r
-	ld	(iy+-1),a                   ; b = outcode0
+	ld	(iy-1),a                    ; b = outcode0
 	jp	CohenSutherlandLoop \.r
 OutcodeOutOutcode1:
 	ld	(iy+9),hl
 	ld	(iy+12),de
 	call	_ComputeOutcode_ASM \.r
-	ld	(iy+-2),a                   ; c = outcode1
+	ld	(iy-2),a                    ; c = outcode1
 	jp	CohenSutherlandLoop \.r
 TrivialReject:
 	inc	sp
@@ -2380,7 +2380,7 @@ _:	ld	(DrawTile_SMC),hl \.r
 	ld	ix,0
 	lea	bc,ix
 	add	ix,sp
-	lea	hl,ix+-12
+	lea	hl,ix-12
 	ld	sp,hl
 	ld	iy,(ix+6)                   ; iy -> tilemap structure
 	
@@ -2404,7 +2404,7 @@ _:	srl	h
 	rr	l
 	djnz	-_
 _height_is_not_pow2:
-	ld	(ix+-4),l                   ; y = y_offset / tilemap->tile_height
+	ld	(ix-4),l                    ; y = y_offset / tilemap->tile_height
 	ld	(ix+y_offset),bc            ; y_offset = y_offset % tilemap->tile_height;
 	
 	ld	c,(iy+t_tile_width)
@@ -2438,18 +2438,18 @@ _width_is_not_pow2:
 	sbc	hl,hl
 	ld	l,(iy+14)
 	ld	bc,(ix+y_offset)
-	ld	(ix+-3),h
+	ld	(ix-3),h
 	sbc	hl,bc
-	ld	(ix+-12),hl
+	ld	(ix-12),hl
 	jp	Y_Loop \.r
 
 x_res_smc =$+3
-n_8:	ld	(ix+-1),0
+n_8:	ld	(ix-1),0
 x_offset_smc =$+1
 	ld	hl,0
-	ld	(ix+-7),hl
+	ld	(ix-7),hl
 	ld	l,(iy+t_width)
-	ld	h,(ix+-4)
+	ld	h,(ix-4)
 	mlt	hl
 	ld	(y_next_smc),hl \.r
 	xor	a,a
@@ -2458,7 +2458,7 @@ x_offset_smc =$+1
 _xLoop_inner:
 	or	a,a
 	sbc	hl,hl
-	ld	l,(ix+-1)
+	ld	l,(ix-1)
 	ld	bc,(iy+t_data)              ; iy -> tilemap data
 	add	hl,bc
 y_next_smc =$+1
@@ -2472,43 +2472,43 @@ y_next_smc =$+1
 	mlt	hl
 	ld	de,(iy+3)
 	add	hl,de
-	ld	bc,(ix+-12)
+	ld	bc,(ix-12)
 	push	bc
-	ld	bc,(ix+-7)
+	ld	bc,(ix-7)
 	push	bc
 	ld	bc,(hl)
 	push	bc
 DrawTile_SMC =$+1
 	call	0                           ; call sprite drawing routine
-	lea	hl,ix+-12
+	lea	hl,ix-12
 	ld	sp,hl
 BlankTile:
 	or	a,a
 	sbc	hl,hl
 	ld	iy,(ix+6)
 	ld	l,(iy+7)
-	ld	bc,(ix+-7)
+	ld	bc,(ix-7)
 	add	hl,bc
-	ld	(ix+-7),hl
-	inc	(ix+-1)
-	ld	a,(ix+-2)
+	ld	(ix-7),hl
+	inc	(ix-1)
+	ld	a,(ix-2)
 	inc	a
 
 X_Loop:
-	ld	(ix+-2),a
+	ld	(ix-2),a
 	cp	a,(iy+t_draw_width)
 	jr	nz,_xLoop_inner
 	ld	h,0
 	ld	l,(iy+6)
-	ld	bc,(ix+-12)
+	ld	bc,(ix-12)
 	add	hl,bc
-	ld	(ix+-12),hl
-	inc	(ix+-4)
-	inc	(ix+-3)
+	ld	(ix-12),hl
+	inc	(ix-4)
+	inc	(ix-3)
 
 Y_Loop:
 	ld	a,(iy+t_draw_height)
-	cp	a,(ix+-3)
+	cp	a,(ix-3)
 	jp	nz,n_8 \.r
 	ld	sp,ix
 	pop	ix
@@ -3356,11 +3356,11 @@ _:	ld	(HLine0_SMC),hl \.r
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	lea	hl,ix+-39
+	lea	hl,ix-39
 	ld	sp,hl
 	sbc	hl,hl
-	ld	(ix+-15),hl
-	ld	(ix+-18),hl
+	ld	(ix-15),hl
+	ld	(ix-18),hl
 	ld	hl,(ix+9)
 	ld	de,(ix+15)
 	call	_SignedCompare_ASM \.r
@@ -3398,66 +3398,66 @@ _:	ld	de,(ix+12)
 	ld	hl,(ix+18)
 	or	a,a
 	sbc	hl,de
-	ld	(ix+-24),hl
+	ld	(ix-24),hl
 	ld	de,(ix+6)
 	ld	hl,(ix+12)
 	or	a,a
 	sbc	hl,de
-	ld	(ix+-39),hl
+	ld	(ix-39),hl
 	ld	de,(ix+9)
 	ld	hl,(ix+15)
 	or	a,a
 	sbc	hl,de
-	ld	(ix+-36),hl
+	ld	(ix-36),hl
 	ld	de,(ix+6)
 	ld	hl,(ix+18)
 	or	a,a
 	sbc	hl,de
-	ld	(ix+-21),hl
+	ld	(ix-21),hl
 	ld	de,(ix+9)
 	ld	hl,(ix+21)
 	or	a,a
 	sbc	hl,de
-	ld	(ix+-30),hl
+	ld	(ix-30),hl
 	ld	de,(ix+15)
 	ld	hl,(ix+21)
 	or	a,a
 	sbc	hl,de
-	ld	(ix+-33),hl
+	ld	(ix-33),hl
 	ld	de,(ix+21)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,de
 	jp	nz,t_17 \.r
 	ld	hl,(ix+6)
-	ld	(ix+-6),hl
-	ld	(ix+-3),hl
+	ld	(ix-6),hl
+	ld	(ix-3),hl
 	ld	de,(ix+12)
 	call	_SignedCompare_ASM \.r
 	jr	c,t_8
-	ld	(ix+-3),de
+	ld	(ix-3),de
 	jr	t_12
 t_8:	ld	hl,(ix+12)
-	ld	de,(ix+-6)
+	ld	de,(ix-6)
 	call	_SignedCompare_ASM \.r
 	jr	c,t_12
 	ld	de,(ix+12)
-	ld	(ix+-6),de
-t_12:	ld	hl,(ix+-3)
+	ld	(ix-6),de
+t_12:	ld	hl,(ix-3)
 	ld	de,(ix+18)
 	call	_SignedCompare_ASM \.r
 	jr	c,t_11	
-	ld	(ix+-3),de
+	ld	(ix-3),de
 	jr	t_13
 t_11:	ld	hl,(ix+18)
-	ld	de,(ix+-6)
+	ld	de,(ix-6)
 	call	_SignedCompare_ASM \.r
 	jr	c,t_13
 	ld	de,(ix+18)
-	ld	(ix+-6),de
-t_13:	ld	bc,(ix+-3)
+	ld	(ix-6),de
+t_13:	ld	bc,(ix-3)
 	ld	de,(ix+9)
-	ld	hl,(ix+-6)
+	ld	hl,(ix-6)
 	or	a,a
 	sbc	hl,bc
 	inc	hl
@@ -3484,36 +3484,36 @@ t_20:	ld	hl,(ix+15)
 	sbc	hl,de
 	add	hl,de
 	jr	nz,t_19
-	ld	(ix+-27),hl
+	ld	(ix-27),hl
 	jr	t_27
 t_19:	dec	hl
-	ld	(ix+-27),hl
+	ld	(ix-27),hl
 t_27:	ld	bc,(ix+9)
-	ld	(ix+-12),bc
+	ld	(ix-12),bc
 	jp	t_26 \.r
-t_24:	ld	hl,(ix+-15)
-	ld	bc,(ix+-36)
+t_24:	ld	hl,(ix-15)
+	ld	bc,(ix-36)
 	call	__idivs_ASM \.r
 	ld	bc,(ix+6)
 	add	hl,bc
-	ld	(ix+-3),hl
-	ld	hl,(ix+-18)
-	ld	bc,(ix+-30)
+	ld	(ix-3),hl
+	ld	hl,(ix-18)
+	ld	bc,(ix-30)
 	call	__idivs_ASM \.r
 	ld	bc,(ix+6)
 	add	hl,bc
-	ld	(ix+-6),hl
+	ld	(ix-6),hl
 	ex	de,hl
-	ld	bc,(ix+-39)
-	ld	hl,(ix+-15)
+	ld	bc,(ix-39)
+	ld	hl,(ix-15)
 	add	hl,bc
-	ld	(ix+-15),hl
-	ld	bc,(ix+-21)
-	ld	hl,(ix+-18)
+	ld	(ix-15),hl
+	ld	bc,(ix-21)
+	ld	hl,(ix-18)
 	add	hl,bc
-	ld	(ix+-18),hl
+	ld	(ix-18),hl
 	ex	de,hl
-	ld	de,(ix+-3)
+	ld	de,(ix-3)
 	or	a,a
 	sbc	hl,de
 	add	hl,de
@@ -3522,25 +3522,25 @@ t_24:	ld	hl,(ix+-15)
 	jr	t__32
 t__31:	jp	po,t_23 \.r
 t__32:	ex	de,hl
-	ld	(ix+-3),de
-	ld	(ix+-6),hl
-t_23:	ld	de,(ix+-3)
-	ld	hl,(ix+-6)
+	ld	(ix-3),de
+	ld	(ix-6),hl
+t_23:	ld	de,(ix-3)
+	ld	hl,(ix-6)
 	or	a,a
 	sbc	hl,de
-	ld	bc,(ix+-12)
+	ld	bc,(ix-12)
 	inc	hl
 	push	hl
 	push	bc
 	push	de
 HLine1_SMC =$+1
 	call	0
-	lea	hl,ix+-39
+	lea	hl,ix-39
 	ld	sp,hl
-	ld	bc,(ix+-12)
+	ld	bc,(ix-12)
 	inc	bc
-	ld	(ix+-12),bc
-t_26:	ld	hl,(ix+-27)
+	ld	(ix-12),bc
+t_26:	ld	hl,(ix-27)
 	or	a,a
 	sbc	hl,bc
 	jp	p,+_ \.r
@@ -3548,43 +3548,43 @@ t_26:	ld	hl,(ix+-27)
 	jr	++_
 _:	jp	po,t_24 \.r
 _:	ld	bc,(ix+15)
-	ld	hl,(ix+-12)
+	ld	hl,(ix-12)
 	or	a,a
 	sbc	hl,bc
-	ld	bc,(ix+-24)
+	ld	bc,(ix-24)
 	call	__imuls_ASM \.r
-	ld	(ix+-15),hl
+	ld	(ix-15),hl
 	ld	bc,(ix+9)
-	ld	hl,(ix+-12)
+	ld	hl,(ix-12)
 	or	a,a
 	sbc	hl,bc
-	ld	bc,(ix+-21)
+	ld	bc,(ix-21)
 	call	__imuls_ASM \.r
-	ld	(ix+-18),hl
+	ld	(ix-18),hl
 	jp	t_34 \.r
-t_32:	ld	hl,(ix+-15)
-	ld	bc,(ix+-33)
+t_32:	ld	hl,(ix-15)
+	ld	bc,(ix-33)
 	call	__idivs_ASM \.r
 	ld	bc,(ix+12)
 	add	hl,bc
-	ld	(ix+-3),hl
-	ld	hl,(ix+-18)
-	ld	bc,(ix+-30)
+	ld	(ix-3),hl
+	ld	hl,(ix-18)
+	ld	bc,(ix-30)
 	call	__idivs_ASM \.r
 	ld	bc,(ix+6)
 	add	hl,bc
-	ld	(ix+-6),hl
+	ld	(ix-6),hl
 	ex	de,hl
-	ld	bc,(ix+-21)
-	ld	hl,(ix+-18)
+	ld	bc,(ix-21)
+	ld	hl,(ix-18)
 	add	hl,bc
-	ld	(ix+-18),hl
-	ld	bc,(ix+-24)
-	ld	hl,(ix+-15)
+	ld	(ix-18),hl
+	ld	bc,(ix-24)
+	ld	hl,(ix-15)
 	add	hl,bc
-	ld	(ix+-15),hl
+	ld	(ix-15),hl
 	ex	de,hl
-	ld	de,(ix+-3)
+	ld	de,(ix-3)
 	or	a,a
 	sbc	hl,de
 	add	hl,de
@@ -3593,23 +3593,23 @@ t_32:	ld	hl,(ix+-15)
 	jr	++_
 _:	jp	po,+++_ \.r
 _:	ex	de,hl
-	ld	(ix+-3),de
-	ld	(ix+-6),hl
+	ld	(ix-3),de
+	ld	(ix-6),hl
 _:	or	a,a
 	sbc	hl,de
-	ld	bc,(ix+-12)
+	ld	bc,(ix-12)
 	inc	hl
 	push	hl
 	push	bc
 	push	de
 HLine2_SMC =$+1
 	call	0
-	lea	hl,ix+-39
+	lea	hl,ix-39
 	ld	sp,hl
-	ld	bc,(ix+-12)
+	ld	bc,(ix-12)
 	inc	bc
-	ld	(ix+-12),bc
-t_34:	ld	bc,(ix+-12)
+	ld	(ix-12),bc
+t_34:	ld	bc,(ix-12)
 	ld	hl,(ix+21)
 	or	a,a
 	sbc	hl,bc
@@ -3708,98 +3708,98 @@ _LZDecompressSprite_Deprecated:
 	ex.s	de,hl
 	inc	hl
 	inc	hl
-	ld	(ix+-17),hl
+	ld	(ix-17),hl
 	ld	bc,3
-	ld	(ix+-3),bc
+	ld	(ix-3),bc
 	ld	iy,(ix+6)
 	ld	a,(iy+2)
-	ld	(ix+-8),a
+	ld	(ix-8),a
 	or	a,a
 	sbc	hl,hl
-	ld	(ix+-6),hl
-d_17:	ld	bc,(ix+-3)
+	ld	(ix-6),hl
+d_17:	ld	bc,(ix-3)
 	ld	hl,(ix+6)
 	add	hl,bc
 	inc	bc
-	ld	(ix+-3),bc
+	ld	(ix-3),bc
 	ld	a,(hl)
-	ld	(ix+-7),a
-	cp	a,(ix+-8)
+	ld	(ix-7),a
+	cp	a,(ix-8)
 	jp	nz,d_16 \.r
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	ld	hl,(ix+6)
 	add	hl,bc
-	ld	(ix+-14),hl
+	ld	(ix-14),hl
 	ld	a,(hl)
 	or	a,a
 	jr	nz,d_13
-	ld	bc,(ix+-6)
+	ld	bc,(ix-6)
 	ld	hl,(ix+9)
 	add	hl,bc
 	inc	bc
-	ld	(ix+-6),bc
-	ld	a,(ix+-8)
+	ld	(ix-6),bc
+	ld	a,(ix-8)
 	ld	(hl),a
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	inc	bc
-	ld	(ix+-3),bc
+	ld	(ix-3),bc
 	jr	d_18
-d_13:	ld	bc,(ix+-14)
+d_13:	ld	bc,(ix-14)
 	push	bc
-	pea	ix+-20
+	pea	ix-20
 	call	_LZ_ReadVarSize_ASM \.r
 	pop	bc
 	pop	bc
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	add	hl,bc
-	ld	(ix+-3),hl
+	ld	(ix-3),hl
 	ld	bc,(ix+6)
 	add	hl,bc
 	push	hl
-	pea	ix+-23
+	pea	ix-23
 	call	_LZ_ReadVarSize_ASM \.r
 	pop	bc
 	pop	bc
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	add	hl,bc
-	ld	(ix+-3),hl
+	ld	(ix-3),hl
 	or	a,a
 	sbc	hl,hl
-	ld	(ix+-11),hl
+	ld	(ix-11),hl
 	jr	d_11
-d_9:	ld	bc,(ix+-23)
-	ld	hl,(ix+-6)
+d_9:	ld	bc,(ix-23)
+	ld	hl,(ix-6)
 	or	a,a
 	sbc	hl,bc
 	ld	bc,(ix+9)
 	add	hl,bc
 	push	hl
 	pop	iy
-	ld	bc,(ix+-6)
+	ld	bc,(ix-6)
 	ld	hl,(ix+9)
 	add	hl,bc
 	inc	bc
-	ld	(ix+-6),bc
+	ld	(ix-6),bc
 	ld	a,(iy)
 	ld	(hl),a
-	ld	bc,(ix+-11)
+	ld	bc,(ix-11)
 	inc	bc
-	ld	(ix+-11),bc
-d_11:	ld	bc,(ix+-20)
-	ld	hl,(ix+-11)
+	ld	(ix-11),bc
+d_11:	ld	bc,(ix-20)
+	ld	hl,(ix-11)
 	or	a,a
 	sbc	hl,bc
 	jr	c,d_9
 	jr	d_18
-d_16:	ld	bc,(ix+-6)
+d_16:	ld	bc,(ix-6)
 	ld	hl,(ix+9)
 	add	hl,bc
 	inc	bc
-	ld	(ix+-6),bc
-	ld	a,(ix+-7)
+	ld	(ix-6),bc
+	ld	a,(ix-7)
 	ld	(hl),a
-d_18:	ld	bc,(ix+-17)
-	ld	hl,(ix+-3)
+d_18:	ld	bc,(ix-17)
+	ld	hl,(ix-3)
 	or	a,a
 	sbc	hl,bc
 	jp	c,d_17 \.r
@@ -4393,10 +4393,10 @@ _LZ_ReadVarSize_ASM:
 	ld	ix,0
 	lea	de,ix
 	add	ix,sp
-	lea	hl,ix+-12
+	lea	hl,ix-12
 	ld	sp,hl
-	ld	(ix+-3),de
-	ld	(ix+-6),de
+	ld	(ix-3),de
+	ld	(ix-6),de
 LZDoWhileLoop:
 	or	a,a
 	sbc	hl,hl
@@ -4406,16 +4406,16 @@ LZDoWhileLoop:
 	or	a,a
 	sbc	hl,hl
 	ld	l,a
-	ld	(ix+-9),hl
+	ld	(ix-9),hl
 	ld	bc,(ix+9)
 	inc	bc
 	ld	(ix+9),bc
-	ld	a,(ix+-9)
+	ld	a,(ix-9)
 	and	a,127
 	sbc	hl,hl
 	ld	l,a
-	ld	(ix+-12),hl
-	ld	hl,(ix+-3)
+	ld	(ix-12),hl
+	ld	hl,(ix-3)
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -4425,22 +4425,22 @@ LZDoWhileLoop:
 	add	hl,hl
 	push	hl
 	pop	bc
-	ld	hl,(ix+-12)
+	ld	hl,(ix-12)
 	call	__ior
-	ld	(ix+-3),hl
-	ld	bc,(ix+-6)
+	ld	(ix-3),hl
+	ld	bc,(ix-6)
 	inc	bc
-	ld	(ix+-6),bc
-	ld	a,(ix+-9)
+	ld	(ix-6),bc
+	ld	a,(ix-9)
 	and	a,128
 	sbc	hl,hl
 	ld	l,a
 	sbc	hl,de
 	jr	nz,LZDoWhileLoop
 	ld	hl,(ix+6)
-	ld	bc,(ix+-3)
+	ld	bc,(ix-3)
 	ld	(hl),bc
-	ld	hl,(ix+-6)
+	ld	hl,(ix-6)
 	ld	sp,ix
 	pop	ix
 	ret

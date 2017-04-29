@@ -177,6 +177,7 @@
 #endif
 
 /* simple function prototypes (should not ever be used or even looked at) */
+void Debugger(void);
 void SetBreakpoint(void *address);
 void RemoveBreakpoint(void *address);
 void SetWatchpoint(void *address, unsigned length);
@@ -186,3 +187,4 @@ void SetReadWriteWatchpoint(void *address, unsigned length);
 void RemoveWatchpoint(void *address);
 void RemoveAllWatchpoints(void);
 void RemoveAllBreakpoints(void);
+
