@@ -833,13 +833,9 @@ _DetectVar:
 ;  arg0 : address of pointer to being search
 ;  arg1 : pointer to null terminated string of data to search for
 ;  arg2 : type of varaible to search for
-	pop	hl
-	pop	de
-	pop	bc
-	push	bc
-	push	de
-	push	hl
-	ld	a,c
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy+9)
 	jr	+_
 
 ;-------------------------------------------------------------------------------
