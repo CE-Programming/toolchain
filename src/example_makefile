@@ -23,7 +23,7 @@ ifeq ($(OS),Windows_NT)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 WINRELPATH = $(subst /,\,$(1))
-WINCHKDIR  = if not exist $(1)
+WINCHKDIR  = if not exist
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
@@ -116,7 +116,7 @@ endif
 
 #Define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
 USERHEADERS   := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
-HEADERS       := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,include include/ce include/std)))
+HEADERS       := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,include/compat include/ce include/std)))
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst \;,;,$(HEADERS))
 HEADERS       := $(subst /;,;,$(HEADERS))

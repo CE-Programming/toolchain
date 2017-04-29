@@ -8,7 +8,9 @@ RELEASE_NAME := CEdev
 ifeq ($(OS),Windows_NT)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
-WINCHKDIR  = if exist $(1)
+WINCHKPATH = $(NATIVEPATH)
+WINCHKDIR := if exist
+WINNCHKDIR:= if not exist
 RM         = del /f 2>nul
 RMDIR      = rmdir /s /q
 MKDIR      = mkdir
@@ -69,7 +71,7 @@ CEDEVDIR   := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME))
 INSTALLBIN := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/bin)
 INSTALLINC := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/include)
 INSTALLLIB := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib)
-DIRS       := $(INSTALLINC) $(INSTALLINC)/ce $(INSTALLINC)/ce/libs $(INSTALLINC)/std $(INSTALLBIN) $(INSTALLLIB)
+DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLINC)/ce $(INSTALLINC)/ce/libs $(INSTALLINC)/std $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
 all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc ce std
@@ -141,7 +143,7 @@ clean-keypadc:
 # uninstall rule
 #----------------------------
 uninstall:
-	$(WINCHKDIR) $(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+	$(WINCHKDIR) $(call WINCHKPATH,$(INSTALLLOC)/CEdev) $(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 
 #----------------------------
 # install rule
@@ -159,18 +161,18 @@ install: $(DIRS) chmod
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat/lib) $(call NATIVEPATH,$(INSTALLINC)/)
+	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat) $(call NATIVEPATH,$(INSTALLINC)/compat)
 
 chmod:
 	$(CHMOD)
 
 $(DIRS):
-	$(MKDIR) $(INSTALLBIN)
-	$(MKDIR) $(INSTALLLIB)
-	$(MKDIR) $(INSTALLINC)
-	$(MKDIR) $(call NATIVEPATH,$(INSTALLLIB)/asm)
-	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce)
-	$(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
+	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLBIN)) $(MKDIR) $(INSTALLBIN)
+	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLIB)) $(MKDIR) $(INSTALLLIB)
+	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)) $(MKDIR) $(INSTALLINC)
+	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLIB)/asm) $(MKDIR) $(call NATIVEPATH,$(INSTALLLIB)/asm)
+	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/ce) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce)
+	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/std) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
 
 #----------------------------
 # release rule
