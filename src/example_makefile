@@ -226,8 +226,8 @@ LDFLAGS := \
 ifneq ($(OS),Windows_NT)
 	LDFLAGS := '$(LDFLAGS)'
 else
-	WINCHKBINDIR := $(WINCHKDIR)$(BINDIR)
-	WINCHKOBJDIR := $(WINCHKDIR)$(OBJDIR)
+	WINCHKBINDIR := $(WINCHKDIR) $(BINDIR)
+	WINCHKOBJDIR := $(WINCHKDIR) $(OBJDIR)
 endif
 
 #This rule is trigged to build everything
@@ -235,8 +235,8 @@ all: add_dirs $(BINDIR)/$(TARGET8XP)
 	@echo Finished.
 
 add_dirs:
-	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR)
-	@$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
+	$(WINCHKBINDIR) $(MKDIR) $(BINDIR)
+	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
 	@echo C CE SDK Version $(VERSION)
 	@echo Looking for changes...
 
