@@ -44,3 +44,4 @@ void main(void) {
 void print_string_centered(const char *str) {
     gfx_PrintStringXY(str, (LCD_WIDTH-gfx_GetStringWidth(str)) / 2, (LCD_HEIGHT-FONT_HEIGHT) / 2);
 }
+

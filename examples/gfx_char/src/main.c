@@ -50,3 +50,4 @@ void printu(char *str, int x, int y) {
         x += gfx_GetCharWidth(*str++);
     }
 }
+

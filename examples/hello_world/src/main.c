@@ -42,3 +42,4 @@ void printText(const char *text, uint8_t xpos, uint8_t ypos) {
 void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos) {
     os_FontDrawText(text, xpos, ypos);
 }
+

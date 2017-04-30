@@ -70,3 +70,4 @@ void prime_factors(unsigned int n) {
     
     primes[total_primes++] = n;
 }
+

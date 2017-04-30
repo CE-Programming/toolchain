@@ -27,3 +27,4 @@ void main(void) {
     /* Restore the old brightness level */
     lcd_BacklightLevel = level;
 }
+

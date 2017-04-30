@@ -26,16 +26,16 @@ void main(void) {
         
         switch (key) {
             case kb_Down:           /* Change screen color to black */
-                fillScreen(0x00);
+                fill_screen(0x00);
                 break;
             case kb_Right:          /* Change screen color to red */
-                fillScreen(0xE0);
+                fill_screen(0xE0);
                 break;
             case kb_Up:             /* Change screen color to white */
-                fillScreen(0xFF);
+                fill_screen(0xFF);
                 break;
             case kb_Left:           /* Change screen color to a different red */
-                fillScreen(0xC0);
+                fill_screen(0xC0);
                 break;
             default:
                 break;
@@ -47,3 +47,4 @@ void main(void) {
 void fill_screen(uint8_t color) {
     memset_fast(lcd_Ram, color, LCD_SIZE);
 }
+

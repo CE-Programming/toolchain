@@ -138,3 +138,4 @@ extern uint8_t *tileset_tiles_compressed[128];
 extern uint16_t tiles_gfx_pal[76];
 
 #endif
+

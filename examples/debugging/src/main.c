@@ -33,3 +33,4 @@ void main(void) {
     /* Fail this assertion */
     assert(dbg_test_var_2);
 }
+

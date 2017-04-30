@@ -267,3 +267,4 @@ extern uint8_t *tileset_tiles_data[128];
 extern uint16_t tiles_gfx_pal[76];
 
 #endif
+

@@ -100,3 +100,4 @@ void main(void) {
     /* Close the graphics and return to the OS */
     gfx_End();
 }
+

@@ -8,3 +8,4 @@ extern uint8_t apple_compressed[20881];
 extern uint16_t all_gfx_pal[256];
 
 #endif
+

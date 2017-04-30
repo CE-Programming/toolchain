@@ -66,3 +66,4 @@ void interrupt isr_timer1(void) {
     /* Must acknowledge that the interrupt occured to clear the flag */
     int_Acknowledge = INT_TIMER1;
 }
+

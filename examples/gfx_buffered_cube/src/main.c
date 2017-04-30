@@ -112,3 +112,4 @@ void rotate(void) {
         gfx_Line(face1[i][0], face1[i][1], face2[ i ][0], face2[ i ][1]);
     }
 }
+

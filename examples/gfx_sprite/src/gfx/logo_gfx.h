@@ -11,3 +11,4 @@ extern uint8_t ubuntu_data[1026];
 extern uint16_t logo_gfx_pal[190];
 
 #endif
+

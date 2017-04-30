@@ -48,3 +48,4 @@ void main(void) {
     /* Close the graphics */
     gfx_End();
 }
+

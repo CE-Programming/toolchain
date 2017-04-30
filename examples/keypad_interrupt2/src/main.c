@@ -61,3 +61,4 @@ void interrupt isr_keyboard(void) {
     /* Acknowledge in the keypad controller (This is required for mode 1) */
     kb_IntAcknowledge = KB_MODE_1_PRESS;
 }
+
