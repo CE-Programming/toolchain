@@ -153,9 +153,7 @@ char _mt_dtof(double n,char* __print_buff,struct fmt_type* fmt)
 
   *s = '\0';
 out:;
-#ifndef _MULTI_THREAD
-  __fprint_send();
-#else
+#ifdef _MULTI_THREAD
   return __print_leading_char;
 #endif
 }
