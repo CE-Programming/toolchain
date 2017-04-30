@@ -1,20 +1,15 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Other available headers */
-// assert.h stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 #include <intce.h>
 
-/* Place function prototypes here */
+/* Function prototypes */
 void interrupt isr_timer1(void);
 void interrupt isr_on(void);
 
@@ -50,7 +45,7 @@ void main(void) {
     int_Enable();
     
     /* The interrupts will trigger inside this loop */
-    while(true);
+    while (true);
 }
 
 /* Interrupt routine to run when the timer expires */
@@ -60,7 +55,6 @@ void interrupt isr_on(void) {
     
     /* Reset interrupts and exit */
     int_Reset();
-    prgm_CleanUp();
     exit(0);
 }
 

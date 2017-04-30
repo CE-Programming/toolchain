@@ -1,17 +1,11 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* Other available headers */
-// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h, intce.h
 
 #define ONE_SECOND         32768/1
 #define HALF_SECOND        32768/2
@@ -20,26 +14,23 @@
 /* Function Prototypes */
 void reset_counter(void);
 
-/* Put all your code here */
 void main(void) {
-    unsigned count = 0;
+    unsigned int count = 0;
     char str[10];
     
     timer_1_MatchValue_1 = ONE_SECOND;
-    
-    /* Clean up the home screen */
-    prgm_CleanUp();
     
     /* Reset the counter */
     reset_counter();
     
     do {
-        /* Count until we reach the match value */
-        if(timer_IntStatus & TIMER1_MATCH1) {
+
+        /* Poll until we reach the match value */
+        if (timer_IntStatus & TIMER1_MATCH1) {
             /* Print the count */
-            sprintf( str, "%u", count++ );
-            os_SetCursorPos( 0, 0 );
-            os_PutStrFull( str );
+            sprintf(str, "%u", count++);
+            os_SetCursorPos(0, 0);
+            os_PutStrFull(str);
             
             /* Reset the count */
             reset_counter();
@@ -47,10 +38,8 @@ void main(void) {
             /* Acknowledge the interrupt */
             timer_IntStatus = TIMER1_MATCH1;
         }
-    } while(!os_GetCSC());
-    
-    /* Clean up for the return to the OS */
-    prgm_CleanUp();
+
+    } while (count < 5);
 }
 
 void reset_counter(void) {

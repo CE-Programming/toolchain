@@ -26,9 +26,6 @@ void main(void) {
     /* Remove the watchpoint that we had set */
     dbg_RemoveWatchpoint(&dbg_test_var_1);
     dbg_RemoveWatchpoint(&dbg_test_var_2);
-    
-    /* Clean up everything */
-    prgm_CleanUp();
 
     /* Set this value to zero */
     dbg_test_var_2 = 0;
@@ -36,4 +33,3 @@ void main(void) {
     /* Fail this assertion */
     assert(dbg_test_var_2);
 }
-

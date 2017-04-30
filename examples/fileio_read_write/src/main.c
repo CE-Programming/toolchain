@@ -64,11 +64,11 @@ err:
     printText(0, 0, "An error occured");
 noerr:
   
-    /* Get the scan codes */
-    while(!os_GetCSC());
+    /* Pause */
+    while (!os_GetCSC());
     
+    /* Close all open files */
     ti_CloseAll();
-    prgm_CleanUp();
 }
 
 /* Draw text on the homescreen at the given X/Y location */
@@ -76,4 +76,3 @@ void printText(int8_t xpos, int8_t ypos, const char *text) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
-

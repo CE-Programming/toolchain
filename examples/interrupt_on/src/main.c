@@ -1,20 +1,15 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Other available headers */
-// assert.h stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 #include <intce.h>
 
-/* Place function prototypes here */
+/* Function prototypes */
 void interrupt isr_on(void);
 
 /* Global status flag */
@@ -23,8 +18,7 @@ bool exit_loop = false;
 /* Main function */
 void main(void) {
     /* Print a little string -- NOTE: using OS routines doesn't work well when interrupts are enabled */
-    prgm_CleanUp();
-    os_SetCursorPos( 0, 0 );
+    os_SetCursorPos(0, 0);
     os_PutStrFull("Press ON");
     
     /* Initialize the interrupt handlers */
@@ -40,11 +34,10 @@ void main(void) {
     int_Enable();
     
     /* Wait for the [ON] key to be pressed */
-    while( !exit_loop );
+    while (!exit_loop);
     
     /* Reset the interrupt handler and cleanup the program */
     int_Reset();
-    prgm_CleanUp();
 }
 
 /* Interrupt routine to run when the [ON] key is pressed */

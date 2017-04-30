@@ -25,17 +25,16 @@ void main(void) {
     const char search_string[] = { 0xFD, 0x21, 0x80, 0x00 };
     
     /* Find all of the variables that start with this string */
-    while((var_name = ti_Detect(&search_pos, search_string)) != NULL) {
+    while ((var_name = ti_Detect(&search_pos, search_string)) != NULL) {
         /* Print the name of the variable (Should be LibLoad) */
         printText(0, y++, var_name);
     }
     
     /* Wait for a key */
-    while(!os_GetCSC());
+    while (!os_GetCSC());
     
-    /* Clean up everything */
+    /* Close all open files */
     ti_CloseAll();
-    prgm_CleanUp();
 }
 
 /* Draw text on the homescreen at the given X/Y location */
@@ -43,4 +42,3 @@ void printText(int8_t xpos, int8_t ypos, const char *text) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
-

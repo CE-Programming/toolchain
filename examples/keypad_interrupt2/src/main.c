@@ -1,19 +1,13 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
- 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Interrupt library */
 #include <intce.h>
-
-/* CE Keypad C Library */
 #include <keypadc.h>
 
 /* Function prototypes */
@@ -23,7 +17,6 @@ void interrupt isr_keyboard(void);
 /* Global Flag */
 uint8_t exit_loop = false;
 
-/* Main Function */
 void main(void) {
     /* Initialize the interrupt handlers */
     int_Initialize();
@@ -43,12 +36,11 @@ void main(void) {
     int_Enable();
     
     /* Wait for the [ON] key to be pressed */
-    while( !exit_loop );
+    while (!exit_loop);
     
-    /* Reset the interrupt handler and cleanup the program */
+    /* Reset the interrupt handler and keypad */
     int_Reset();
     kb_Reset();
-    prgm_CleanUp();
 }
 
 /* Interrupt routine to run when the [ON] key is pressed */

@@ -1,33 +1,24 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Other available headers */
-// assert.h stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 #include <intce.h>
 
-/* Place function prototypes here */
+/* Function prototypes */
 void interrupt isr_rtc(void);
 void interrupt isr_on(void);
 
 unsigned seconds = 0;
 bool exit_loop = false;
 
-/* Main function */
 void main(void) {
     /* Randomize things */
-    srand( rtc_Time() );
-
-    /* Clean up the home screen */
-    prgm_CleanUp();
+    srand(rtc_Time());
 
     /* Initialize the interrupt handlers */
     int_Initialize();
@@ -42,17 +33,16 @@ void main(void) {
     rtc_Control = RTC_ENABLE | RTC_LOAD | RTC_SEC_INT_SOURCE;
 
     /* Wait for the RTC to load in the new values and then acknowledge all the interrupts */
-    while( rtc_IsBusy() );
+    while (rtc_IsBusy());
     rtc_IntAcknowledge = RTC_INT_MASK;
 
     /* Enable interrupts */
     int_Enable();
 
-    while(!exit_loop);
+    while (!exit_loop);
 
-    /* Reset interrupts and exit */
+    /* Reset interrupts */
     int_Reset();
-    prgm_CleanUp();
 }
 
 void interrupt isr_rtc(void) {
@@ -60,9 +50,9 @@ void interrupt isr_rtc(void) {
     uint8_t status = rtc_IntStatus;
 
     /* If a second passed, increment a counter */
-    if(status & RTC_SEC_INT) {
-        seconds++;
+    if (status & RTC_SEC_INT) {
         memset_fast(lcd_Ram, randInt(0,255), LCD_SIZE);
+        seconds++;
     }
 
     /* Acknowledge all outstanding interrupts */

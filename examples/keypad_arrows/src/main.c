@@ -1,35 +1,30 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
- 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* CE Keypad C Library */
 #include <keypadc.h>
 
-/* Some LCD defines */
-void fillScreen(uint8_t color);
+/* Function Prototypes */
+void fill_screen(uint8_t color);
 
-/* Main Function */
 void main(void) {
     /* Key varaible */
     kb_key_t key;
     
     /* Loop until 2nd is pressed */
     do {
-		/* Update kb_Data */
-		kb_Scan();
+        /* Update kb_Data */
+        kb_Scan();
 		
-		/* Load group 7 registers */
+        /* Load group 7 registers */
         key = kb_Data[kb_group_7];
         
-        switch(key) {
+        switch (key) {
             case kb_Down:           /* Change screen color to black */
                 fillScreen(0x00);
                 break;
@@ -45,12 +40,10 @@ void main(void) {
             default:
                 break;
         }
-    } while( kb_Data[kb_group_1] != kb_2nd );
-	
-    prgm_CleanUp();
+    } while (kb_Data[kb_group_1] != kb_2nd);
 }
 
 /* Simple way to fill the screen with a given color */
-void fillScreen(uint8_t color) {
+void fill_screen(uint8_t color) {
     memset_fast(lcd_Ram, color, LCD_SIZE);
 }

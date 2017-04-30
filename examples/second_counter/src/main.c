@@ -1,17 +1,11 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* Other available headers */
-// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h, intce.h
 
 #define ONE_SECOND         32768/1
 #define HALF_SECOND        32768/2
@@ -22,9 +16,6 @@ void main(void) {
     unsigned seconds = 0;
     char str[10];
 
-    /* Clean up the home screen */
-    prgm_CleanUp();
-    
     /* Disable the timer so it doesn't run when we don't want it to be running */
     timer_Control = TIMER1_DISABLE;
     
@@ -36,17 +27,14 @@ void main(void) {
     
     do {
         /* If the timer is reloaded, we reached 0 */
-        if(timer_IntStatus & TIMER1_RELOADED) {
+        if (timer_IntStatus & TIMER1_RELOADED) {
             /* Print a string */
-            sprintf( str, "%u", seconds++ );
-            os_SetCursorPos( 0, 0 );
-            os_PutStrFull( str );
+            sprintf(str, "%u", seconds++);
+            os_SetCursorPos(0, 0);
+            os_PutStrFull(str);
             
             /* Acknowledge the reload */
             timer_IntAcknowledge = TIMER1_RELOADED;
         }
-    } while(!os_GetCSC());
-    
-    /* Clean up for the return to the OS */
-    prgm_CleanUp();
+    } while (!os_GetCSC());
 }

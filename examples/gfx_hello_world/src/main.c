@@ -1,48 +1,43 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Shared libraries */
 #include <graphx.h>
 
 #define FONT_HEIGHT 8
 
-/* Put function prototypes here */
+/* Function prototypes */
 void print_string_centered(const char *str);
 
-/* Put all your code here */
 void main(void) {
     const char *msg = "Hello World!";
     
     /* Seed the random numbers */
-    srand( rtc_Time() );
+    srand(rtc_Time());
     
     /* Initialize the 8bpp graphics */
-    gfx_Begin( gfx_8bpp );
+    gfx_Begin(gfx_8bpp);
     
     /* Fill the screen black */
-    gfx_FillScreen( gfx_black );
+    gfx_FillScreen(gfx_black);
     
     /* Set the random text color */
-    gfx_SetTextFGColor( randInt(1,255) );
+    gfx_SetTextFGColor(randInt(1,255));
     
     /* Print the message on the screen */
-    print_string_centered( msg );
+    print_string_centered(msg);
     
     /* Wait for a key to be pressed */
-    while( !os_GetCSC() );
+    while (!os_GetCSC());
     
-    /* Close the graphics and return to the OS */
+    /* Close the graphics */
     gfx_End();
-    prgm_CleanUp();
 }
 
 /* Prints a screen centered string */

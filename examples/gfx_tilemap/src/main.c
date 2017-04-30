@@ -1,37 +1,34 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Shared libraries */
 #include <graphx.h>
+
+/* Include the graphics */
 #include "gfx/tiles_gfx.h"
 
-/* Tilemap defines */
-#define TILE_WIDTH  16
-#define TILE_HEIGHT 16
+/* Include the external map data */
+extern uint8_t tilemap_map[];
 
-#define TILEMAP_WIDTH  32
-#define TILEMAP_HEIGHT 25
+/* Tilemap defines */
+#define TILE_WIDTH          16
+#define TILE_HEIGHT         16
+
+#define TILEMAP_WIDTH       32
+#define TILEMAP_HEIGHT      25
 
 #define TILEMAP_DRAW_WIDTH  20
 #define TILEMAP_DRAW_HEIGHT 14
 
-#define Y_OFFSET 16
-#define X_OFFSET 0
+#define Y_OFFSET            16
+#define X_OFFSET            0
 
-extern uint8_t tilemap_map[];
-
-/* Put functions here */
-
-/* Put all your code here */
 void main(void) {
     sk_key_t key;
     unsigned int x_offset = 0;
@@ -53,11 +50,11 @@ void main(void) {
     tilemap.x_loc       = X_OFFSET;
     
     /* Initialize the 8bpp graphics */
-    gfx_Begin( gfx_8bpp );
+    gfx_Begin(gfx_8bpp);
     
     /* Set up the palette */
-    gfx_SetPalette( tiles_gfx_pal, sizeof(tiles_gfx_pal), 0 );
-    gfx_SetColor( gfx_white );
+    gfx_SetPalette(tiles_gfx_pal, sizeof(tiles_gfx_pal), 0);
+    gfx_SetColor(gfx_white);
     
     /* Draw to buffer to avoid tearing */
     gfx_SetDrawBuffer();
@@ -66,7 +63,7 @@ void main(void) {
     gfx_SetMonospaceFont(8);
 
     /* Wait for the enter key to quit */
-    while((key = os_GetCSC()) != sk_Enter) {
+    while ((key = os_GetCSC()) != sk_Enter) {
     
         /* Draw tilemap and coords */
         gfx_Tilemap(&tilemap, x_offset, y_offset);
@@ -77,7 +74,7 @@ void main(void) {
         gfx_PrintUInt(y_offset, 4);
         
         /* Do something based on the keypress */
-        switch(key) {
+        switch (key) {
             case sk_Down:
                 if (y_offset < (TILEMAP_HEIGHT * TILE_HEIGHT) - (TILEMAP_DRAW_HEIGHT * TILE_HEIGHT))
                     y_offset += TILE_HEIGHT;
@@ -102,5 +99,4 @@ void main(void) {
     
     /* Close the graphics and return to the OS */
     gfx_End();
-    prgm_CleanUp();
 }

@@ -1,22 +1,19 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Shared libraries */
 #include <graphx.h>
 
-/* Put function prototypes here */
+/* Function prototypes */
 void rotate(void);
 
-/* Put globals here */
+/* Globals */
 #define ORG (-50)
 #define DEG (6.0)
 #define ANG (DEG * M_PI / 180.0)
@@ -47,10 +44,10 @@ float midx1,
       midx2,
       midy2;
 
-uint8_t loop;
-
 /* Place main code in main */
 void main(void) {
+    uint8_t loop = 0;
+
     /* Seed the random numbers */
     srand(rtc_Time());
     
@@ -70,8 +67,8 @@ void main(void) {
     while (!os_GetCSC()) {
         
         /* Change the color of the cube depending on loop (mod 16) */
-        if (!((loop++) & 0xF)) {
-            gfx_SetColor(rand() & 0xFE);
+        if (!((loop++) & 0xf)) {
+            gfx_SetColor(rand() & 0xfe);
         }
         
         /* Call the rotation code */
@@ -81,9 +78,8 @@ void main(void) {
         gfx_SwapDraw();
     }
     
-    /* Clean up the program */
+    /* End the graphics */
     gfx_End();
-    prgm_CleanUp();
 }
 
 /* Rotation code */

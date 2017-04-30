@@ -1,49 +1,44 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
- 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Shared library headers -- depends on which ones you wish to use */
 #include <fileioc.h>
 
-/* Declare some strings and variables */
-const char prgmName[] = "ABC";
+/* Declare the program name */
+const char *prgmName = "ABC";
 
 /* Function prototypes */
 void printText(int8_t xpos, int8_t ypos, const char *text);
 
 /* Main Function */
 void main(void) {
-    ti_var_t myProgram;
+    ti_var_t prgm;
     uint8_t *data_ptr;
-    uint8_t token_length;
     
     /* Close any files that may be open already */
     ti_CloseAll();
     
-    /* Open a new variable; deleting it if it already exists */
-    myProgram = ti_OpenVar(prgmName,"r",ti_Program);
+    /* Open the program for reading */
+    prgm = ti_OpenVar(prgmName, "r", TI_PRGM_TYPE);
     
     /* Make sure we opened okay */
-    if (!myProgram) goto err;
+    if (!prgm) goto err;
 
-    data_ptr = ti_GetDataPtr( myProgram );
-    printText( 0, 0, ti_GetTokenString( &data_ptr, NULL, NULL ) );
-    printText( 0, 1, ti_GetTokenString( &data_ptr, NULL, NULL ) );
+    data_ptr = ti_GetDataPtr(prgm);
+    printText(0, 0, ti_GetTokenString(&data_ptr, NULL, NULL));
+    printText(0, 1, ti_GetTokenString(&data_ptr, NULL, NULL));
     
 err:    
-    /* Wait for a key */
-    while( !os_GetCSC() );
+    /* Pause */
+    while (!os_GetCSC());
     
+    /* Close files */
     ti_CloseAll();
-    prgm_CleanUp();
 }
 
 /* Draw text on the homescreen at the given X/Y location */

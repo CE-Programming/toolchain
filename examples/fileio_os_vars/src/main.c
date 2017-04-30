@@ -1,16 +1,13 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
- 
-/* Standard headers - it's recommended to leave them included */
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Shared library headers - depends on which ones you wish to use */
 #include <fileioc.h>
 
 /* Some function prototypes. Maybe in the future these functions will become a library */
@@ -61,9 +58,6 @@ void main(void) {
     matrix_element(my_matrix, 0, 1) = real_2_5;
     ti_SetVar(TI_MATRIX_TYPE, ti_Ans, my_matrix);
     free(my_matrix);
-
-    /* Clean up everything */
-    prgm_CleanUp();
 }
 
 /* Stores some ints to a complex variable type */

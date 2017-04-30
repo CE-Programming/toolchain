@@ -1,28 +1,22 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
 
-/* Standard headers - it's recommended to leave them included */
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Shared libraries */
 #include <graphx.h>
 
 #define color gfx_RGBTo1555(34, 55, 89)
 
-/* Put function prototypes here */
-
-/* Put all your code here */
 void main(void) {
     uint8_t i = 0;
 	
     /* Initialize the 8bpp graphics */
-    gfx_Begin( gfx_8bpp );
+    gfx_Begin(gfx_8bpp);
 	
     /* For i in 0..255 */
     do {
@@ -51,16 +45,15 @@ void main(void) {
 
         /* Wait for a keypress at the start of each quarter of the fade */
         if (!(i & 0x3f)) {
-            while(!os_GetCSC());
+            while (!os_GetCSC());
         }
         
     /* Loop until i is 0 again because of 8 bit range */
-    } while(++i);
+    } while (++i);
 	
     /* Wait for a keypress */
-    while(!os_GetCSC());
+    while (!os_GetCSC());
 	
     /* Usual cleanup */
     gfx_End();
-    prgm_CleanUp();
 }
