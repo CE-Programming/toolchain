@@ -186,11 +186,6 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
  */
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
-/** 
- * Cleans up everything and gets ready to enter back to the OS when you are ready to exit your program
- */
-void prgm_CleanUp(void);
-
 /**
  * A faster implementation of memset
  *
@@ -1892,6 +1887,8 @@ typedef enum {
 #define sk_Power            0x0E
 
 /* Compatibility defines */
-#define pgrm_CleanUp prgm_CleanUp
+#define prgm_CleanUp()
+#define pgrm_CleanUp()
 
 #endif
+

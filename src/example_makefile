@@ -2,11 +2,12 @@
 # Makefile
 # Startup modules and LibLoad library setup
 #----------------------------
-CSTARTUP_ASM  := cstartup.asm
-LIBHEADER_ASM := libheader.asm
+CSTARTUP_ASM  ?= cstartup.asm
+LIBHEADER_ASM ?= libheader.asm
+CLEANUP       ?= YES
 #----------------------------
 
-VERSION := 7.0
+VERSION := 7.2
 
 #----------------------------
 # Try not to edit anything below these lines unless you know what you are doing
@@ -85,6 +86,9 @@ endif
 ifeq ($(COMPRESSED),YES)
 CVFLAGS       += -x
 endif
+ifeq ($(CLEANUP),YES)
+PRGM_CLEANUP  := 1
+endif
 
 #Find all of the available C and ASM files (Remember, you can create C <-> assembly routines easily this way)
 SOURCES       := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
@@ -135,7 +139,7 @@ endif
 
 #Define the assembler flags used by the Zilog assembler
 ASM_FLAGS       := \
-	-define:_EZ80 -define:$(DEBUGMODE) -define:$(ICONC) -NOlist -NOlistmac \
+	-define:_EZ80 -define:$(DEBUGMODE) -define:$(PRGM_CLEANUP) -define:$(ICONC) -NOlist -NOlistmac \
 	-pagelen:250 -pagewidth:130 -quiet -sdiopt -warn -NOdebug -NOigcase -cpu:EZ80F91
 
 #Define the C flags used by the Zilog compiler
@@ -235,8 +239,8 @@ all: add_dirs $(BINDIR)/$(TARGET8XP)
 	@echo Finished.
 
 add_dirs:
-	$(WINCHKBINDIR) $(MKDIR) $(BINDIR)
-	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
+	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR)
+	@$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
 	@echo C CE SDK Version $(VERSION)
 	@echo Looking for changes...
 

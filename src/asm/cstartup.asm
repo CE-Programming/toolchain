@@ -63,10 +63,22 @@ __errsp:
 	pop	af
 	pop	hl
 	ld	(hl),a          ; restore flash wait states
-	pop	iy              ; restore iy for OS
 	push	de
 	call	0004F0h         ; usb_ResetTimers
+
+	ifdef	PRGM_CLEANUP
+	ld	iy,%D00080
+	res	4,(iy+9)        ; onInterrupt,(iy+onFlags)
+	call	%0020E5C        ; _DelRes
+	call	%0020818        ; _ClrTxtShd
+	call	%0020814        ; _ClrScrn
+	call	%0020828        ; _HomeUp
+	set	0,(iy+3)        ; graphDraw,(iy+graphFlags)
+	call	%0021A3C        ; _DrawStatusBar
+	endif
+
 	pop	hl              ; program return value in hl
+	pop	iy              ; restore previous iy
 	ret
 _exit:
 	pop	de
@@ -80,3 +92,4 @@ _exit:
 
 	endif
 	end
+
