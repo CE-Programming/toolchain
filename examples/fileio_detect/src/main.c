@@ -1,16 +1,12 @@
-/* Keep these headers */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <tice.h>
- 
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Shared library headers -- depends on which ones you wish to use */
 #include <fileioc.h>
 
 /* Function prototypes */
@@ -29,13 +25,13 @@ void main(void) {
     const char search_string[] = { 0xFD, 0x21, 0x80, 0x00 };
     
     /* Find all of the variables that start with this string */
-    while((var_name = ti_Detect( &search_pos, search_string )) != NULL) {
+    while((var_name = ti_Detect(&search_pos, search_string)) != NULL) {
         /* Print the name of the variable (Should be LibLoad) */
-        printText(0,y++,var_name);
+        printText(0, y++, var_name);
     }
     
     /* Wait for a key */
-    while( !os_GetCSC() );
+    while(!os_GetCSC());
     
     /* Clean up everything */
     ti_CloseAll();
@@ -47,3 +43,4 @@ void printText(int8_t xpos, int8_t ypos, const char *text) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
+
