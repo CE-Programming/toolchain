@@ -17,6 +17,9 @@ void main(void) {
     kb_key_t key;
     const char *erase_string = "     ";
     
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Loop until 2nd is pressed */
     do {
         
@@ -27,24 +30,24 @@ void main(void) {
 
         /* Print the current arrow key input */
         if (key & kb_Down) {
-            printText(0,0,"Down");
+            printText(0, 0, "Down");
         } else {
-            printText(0,0,erase_string);
+            printText(0, 0, erase_string);
         }
         if (key & kb_Up) {
-            printText(0,1,"Up");
+            printText(0, 1, "Up");
         } else {
-            printText(0,1,erase_string);
+            printText(0, 1, erase_string);
         }
         if (key & kb_Left) {
-            printText(0,2,"Left");
+            printText(0, 2, "Left");
         } else {
-            printText(0,2,erase_string);
+            printText(0, 2, erase_string);
         }
         if (key & kb_Right) {
-            printText(0,3,"Right");
+            printText(0, 3, "Right");
         } else {
-            printText(0,3,erase_string);
+            printText(0, 3, erase_string);
         }
 
     } while (kb_Data[kb_group_1] != kb_2nd);

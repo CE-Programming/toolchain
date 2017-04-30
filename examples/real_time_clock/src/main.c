@@ -17,6 +17,10 @@ unsigned seconds = 0;
 bool exit_loop = false;
 
 void main(void) {
+
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Randomize things */
     srand(rtc_Time());
 

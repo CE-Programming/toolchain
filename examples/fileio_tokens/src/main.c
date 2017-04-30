@@ -18,8 +18,15 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 /* Main Function */
 void main(void) {
     ti_var_t prgm;
+    char *text;
     uint8_t *data_ptr;
-    
+    uint8_t token_length;
+    uint16_t size;
+    int8_t y = 0;
+
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Close any files that may be open already */
     ti_CloseAll();
     
@@ -28,12 +35,16 @@ void main(void) {
     
     /* Make sure we opened okay */
     if (!prgm) goto err;
-
-    data_ptr = ti_GetDataPtr(prgm);
-    printText(0, 0, ti_GetTokenString(&data_ptr, NULL, NULL));
-    printText(0, 1, ti_GetTokenString(&data_ptr, NULL, NULL));
     
-err:    
+    data_ptr = ti_GetDataPtr(prgm);
+    size = ti_GetSize(prgm);
+
+    while (size && y < 8) {
+        printText(0, y++, ti_GetTokenString(&data_ptr, &token_length, NULL));
+        size -= token_length;
+    }
+    
+err:
     /* Pause */
     while (!os_GetCSC());
     

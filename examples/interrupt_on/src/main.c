@@ -17,7 +17,8 @@ bool exit_loop = false;
 
 /* Main function */
 void main(void) {
-    /* Print a little string -- NOTE: using OS routines doesn't work well when interrupts are enabled */
+    /* Print a little string -- NOTE: OS routines don't work well when interrupts are enabled */
+    os_ClrHome();
     os_SetCursorPos(0, 0);
     os_PutStrFull("Press ON");
     

@@ -31,6 +31,9 @@ void main(void) {
     ti_var_t myAppVar;
     int x;
     
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Declare some varaible values */
     strcpy(data.name, "My Data");
     data.var1 = VAR1_VALUE;

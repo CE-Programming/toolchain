@@ -22,6 +22,9 @@ void main(void) {
     unsigned i;
     int in;
     
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Get the answer variable */
     if (ti_RclVar(TI_REAL_TYPE, ti_Ans, &real_in)) return;    
     if ((in = os_RealToInt24(real_in)) < 1) return;

@@ -20,6 +20,9 @@ void main(void) {
     
     timer_1_MatchValue_1 = ONE_SECOND;
     
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Reset the counter */
     reset_counter();
     

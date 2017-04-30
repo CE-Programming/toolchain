@@ -16,6 +16,9 @@ void main(void) {
     unsigned seconds = 0;
     char str[10];
 
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Disable the timer so it doesn't run when we don't want it to be running */
     timer_Control = TIMER1_DISABLE;
     

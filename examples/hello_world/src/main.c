@@ -24,6 +24,9 @@ void main(void) {
     const char *HelloWorld = "Hello World!";
     const char *Welcome = "Welcome to C!";
     
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Print a few strings */
     printText(HelloWorld, 0, 0);
     printText(Welcome, 0, 1);
