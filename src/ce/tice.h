@@ -187,9 +187,14 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
 /** 
- * Resets the OS homescreen
+ * Resets the OS homescreen; accounts for split screen
  */
 #define os_ClrHome() do { _OS(asm_ClrLCD); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
+
+/** 
+ * Resets the OS homescreen fully
+ */
+#define os_ClrHomeFull() do { _OS(asm_ClrLCDFull); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
 
 /**
  * A faster implementation of memset
@@ -745,6 +750,11 @@ void asm_EnableAPD(void);
  * Assembly routine checks the amount of free archive
  */
 void asm_ArcChk(void);
+
+/**
+ * Assembly routine to clear the homescreen lcd
+ */
+void asm_ClrLCDFull(void);
 
 /**
  * Assembly routine to clear the homescreen lcd.
