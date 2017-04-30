@@ -110,7 +110,7 @@ char *ti_Detect(void **curr_search_posistion, const char *detection_string);
  * @code
  *  char *var_name;
  *  uint8_t *search_pos = NULL;
- *  while((var_name = ti_Detect(&search_pos, "my_data", TI_PRGM_TYPE)) != NULL) {
+ *  while((var_name = ti_DetectVar(&search_pos, "my_data", TI_PRGM_TYPE)) != NULL) {
  *    ...do something with the name or search_pos...
  *  }
  * @endcode
