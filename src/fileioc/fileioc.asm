@@ -852,8 +852,10 @@ _:	ld	(DetectType_SMC),a \.r
 	add	hl,de
 	or	a,a
 	sbc	hl,de
-	jr	z,finish
-	ld	hl,(ix+6)
+	jr	nz,+_                    ; if null, then detect everything
+	ld	hl,fdetectall \.r
+	ld	(ix+9),hl
+_:	ld	hl,(ix+6)
 	ld	hl,(hl)
 	add	hl,bc
 	or	a,a
@@ -940,6 +942,9 @@ _:	ld	a,(hl)
 	xor	a,a
 	ld	(de),a
 	ret
+
+fdetectall:
+	.db	0
 
 ;-------------------------------------------------------------------------------
 _GetTokenString:

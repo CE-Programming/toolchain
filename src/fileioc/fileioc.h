@@ -86,19 +86,39 @@ int ti_Close(const ti_var_t slot);
  * Returns the name of the file(s) that contains the string as the first part of the variable; 
  * which can then be used with ti_Open and other functions
  *
- * seach_pos should be set to NULL to begin a search, and is then updated with each call
+ * seach_pos should be set to NULL to begin a search, and is updated with each call
  *
  * @code
- *  uint8_t *search_pos = NULL;
  *  char *var_name;
- *  while((var_name = ti_Detect( &search_pos, "my_data" )) != NULL) {
+ *  uint8_t *search_pos = NULL;
+ *  while((var_name = ti_Detect(&search_pos, "my_data")) != NULL) {
  *    ...do something with the name or search_pos...
  *  }
  * @endcode
- * @note If the return value is NULL, either the variable wasn't found in the current search span, or there are no more variables to find
- * @note If detection_string is NULL, return is NULL as well
+ * @param curr_search_posistion Current offset in the VAT
+ * @param detection_string String to search for (NULL to search for all)
+ * @note If the return value is NULL, there are no more variables to find
  */
 char *ti_Detect(void **curr_search_posistion, const char *detection_string);
+
+/**
+ * Returns the name of the file(s) that contains the string as the first part of the variable; 
+ * which can then be used with ti_OpenVar and other functions
+ *
+ * seach_pos should be set to NULL to begin a search, and is updated with each call
+ *
+ * @code
+ *  char *var_name;
+ *  uint8_t *search_pos = NULL;
+ *  while((var_name = ti_Detect(&search_pos, "my_data", TI_PRGM_TYPE)) != NULL) {
+ *    ...do something with the name or search_pos...
+ *  }
+ * @endcode
+ * @param curr_search_posistion Current offset in the VAT
+ * @param detection_string String to search for (NULL to search for all)
+ * @param var_type Type of variable to detect
+ * @note If the return value is NULL, there are no more variables to find
+ */
 char *ti_DetectVar(void **curr_search_posistion, const char *detection_string, uint8_t var_type);
 
 /**
@@ -416,3 +436,4 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_AppVar              TI_APPVAR_TYPE
 
 #endif
+
