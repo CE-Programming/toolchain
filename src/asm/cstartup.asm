@@ -42,7 +42,7 @@ _init:
 ;-------------------------------------------------------------------------------
 	segment .startup
 
-	call	0020848h	; _RunInicOff
+	call	0020848h	; _RunInicOff, assumes iy=flags
 	di
 	ld	hl,__low_bss
 	ld	bc,010DE2h      ; maximum size of BSS+Heap
@@ -57,17 +57,16 @@ _init:
 	ld	(__errsp+1),sp  ; save the stack from death
 	call	_main
 __exit:
-	ex	de,hl
 __errsp:
 	ld	sp,0
 	pop	af
-	pop	hl
-	ld	(hl),a          ; restore flash wait states
-	push	de
+	pop	de
+	ld	(de),a          ; restore flash wait states
+	pop	iy              ; restore iy for OS
+	push	hl		; exit code
 	call	0004F0h         ; usb_ResetTimers
 
 	ifdef	PRGM_CLEANUP
-	ld	iy,%D00080
 	res	4,(iy+9)        ; onInterrupt,(iy+onFlags)
 	set	0,(iy+3)        ; graphDraw,(iy+graphFlags)
 	call	%0020808        ; _ClrLCDFull
@@ -75,13 +74,14 @@ __errsp:
 	call	%0021A3C        ; _DrawStatusBar
 	endif
 
-	pop	hl              ; program return value in hl
-	pop	iy              ; restore previous iy
+	pop	hl              ; exit code
 	ret
+
 _exit:
 	pop	de
 	pop	de
 	jr	__errsp
+
 ;-------------------------------------------------------------------------------
 	segment code
 ;-------------------------------------------------------------------------------
