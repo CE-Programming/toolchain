@@ -19,14 +19,14 @@ void main(void) {
     int8_t y = 0;
     ti_var_t myVar;
     char *var_name;
-    
-    /* Clear the homescreen */
-    os_ClrHome();
 
     /* First couple bytes of the LibLoad AppVar, which is known to exist *
     /* Technically is a null-terminated string, if an odd looking one */
     const char search_string[] = { 0xFD, 0x21, 0x80, 0x00 };
     
+    /* Clear the homescreen */
+    os_ClrHome();
+
     /* Find all of the variables that start with this string */
     while ((var_name = ti_Detect(&search_pos, search_string)) != NULL) {
         /* Print the name of the variable (Should be LibLoad) */
