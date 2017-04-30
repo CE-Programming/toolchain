@@ -186,6 +186,11 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
  */
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
+/** 
+ * Resets the OS homescreen
+ */
+#define os_ClrHome() do { _OS(asm_ClrLCD); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
+
 /**
  * A faster implementation of memset
  *
@@ -737,13 +742,24 @@ void asm_DisableAPD(void);
 void asm_EnableAPD(void);
 
 /**
- * Assembly routine check the amount of free archive
+ * Assembly routine checks the amount of free archive
  */
 void asm_ArcChk(void);
 
 /**
+ * Assembly routine to clear the homescreen lcd.
+ * Accounts for split screen
+ */
+void asm_ClrLCD(void);
+
+/**
+ * Assembly routine to redraw the status bar
+ */
+void asm_DrawStatusBar(void);
+
+/**
  * Colors used by the OS
-*/
+ */
 typedef enum {
     OS_COLOR_BLUE = 10,
     OS_COLOR_RED,
@@ -773,7 +789,7 @@ typedef enum {
 #define os_KbdPSC            (*(uint8_t*)0xD00589)
 #define os_KbdWUR            (*(uint8_t*)0xD0058A)
 #define os_KbdDebncCnt       (*(uint8_t*)0xD0058B)
-#define os_KbdKey	         (*(uint8_t*)0xD0058C)
+#define os_KbdKey            (*(uint8_t*)0xD0058C)
 #define os_KbdGetKy          (*(uint8_t*)0xD0058D)
 #define os_KeyExtend         (*(uint8_t*)0xD0058E)
 #define os_Brightness        (*(uint8_t*)0xD0058F)
@@ -948,7 +964,7 @@ typedef enum {
 #define os_SilentLinkHookPtr (*(uint24_t*)0xD02614)
 #define os_ActiveUSBHookPtr  (*(uint24_t*)0xD0261A)
 
-#define os_TempFreeArc       (*(uint24_t*)0xD02655) /* Set after asm_ArcChk call */
+#define os_TempFreeArc       (*(uint24_t*)0xD02655) /**< Set after asm_ArcChk call */
 
 #define os_TextBGcolor       (*(uint16_t*)0xD02688)
 #define os_TextFGcolor       (*(uint16_t*)0xD0268A)
@@ -971,8 +987,9 @@ typedef enum {
 #define os_TmpMinutes        (*(real_t*)0xD02B25)
 
 /*
- * ---- TI-OS Token definitions ----
+ * TI-OS Token definitions
  */
+
 #define tToDMS              0x01
 #define tToDEC              0x02
 #define tToAbc              0x03

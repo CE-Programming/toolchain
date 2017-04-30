@@ -87,7 +87,7 @@ ifeq ($(COMPRESSED),YES)
 CVFLAGS       += -x
 endif
 ifeq ($(CLEANUP),YES)
-PRGM_CLEANUP  := 1
+SET_CLEANUP   := PRGM_CLEANUP
 endif
 
 #Find all of the available C and ASM files (Remember, you can create C <-> assembly routines easily this way)
@@ -139,7 +139,7 @@ endif
 
 #Define the assembler flags used by the Zilog assembler
 ASM_FLAGS       := \
-	-define:_EZ80 -define:$(DEBUGMODE) -define:$(PRGM_CLEANUP) -define:$(ICONC) -NOlist -NOlistmac \
+	-define:_EZ80 -define:$(DEBUGMODE) -define:$(SET_CLEANUP) -define:$(ICONC) -NOlist -NOlistmac \
 	-pagelen:250 -pagewidth:130 -quiet -sdiopt -warn -NOdebug -NOigcase -cpu:EZ80F91
 
 #Define the C flags used by the Zilog compiler
