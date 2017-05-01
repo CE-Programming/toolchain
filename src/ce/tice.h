@@ -768,6 +768,16 @@ void asm_ClrLCD(void);
 void asm_DrawStatusBar(void);
 
 /**
+ * Invalidate and clear stat variables
+ */
+void asm_DelRes(void);
+
+/**
+ * Invalidate and clear text shadow area
+ */
+void asm_ClrTxtShd(void);
+
+/**
  * Colors used by the OS
  */
 typedef enum {

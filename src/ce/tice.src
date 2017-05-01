@@ -106,9 +106,11 @@
 	.def _asm_MoveUp
 	.def _asm_ClrLCDFull
 	.def _asm_ClrLCD
+	.def _asm_ClrTxtShd
 	.def _asm_HomeUp
 	.def _asm_RunIndicOn
 	.def _asm_RunIndicOff
+	.def _asm_DelRes
 	.def _asm_DisableAPD
 	.def _asm_EnableAPD
 	.def _asm_DrawStatusBar
@@ -222,9 +224,11 @@ _asm_MoveDown                   equ 0207F4h
 _asm_MoveUp                     equ 020800h
 _asm_ClrLCDFull                 equ 020808h
 _asm_ClrLCD                     equ 02080Ch
+_asm_ClrTxtShd                  equ 020818h
 _asm_HomeUp                     equ 020828h
 _asm_RunIndicOn                 equ 020844h
 _asm_RunIndicOff                equ 020848h
+_asm_DelRes                     equ 020E5Ch
 _asm_DisableAPD                 equ 021134h
 _asm_EnableAPD                  equ 021138h
 _asm_DrawStatusBar              equ 021A3Ch
