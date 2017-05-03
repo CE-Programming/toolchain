@@ -485,6 +485,10 @@ _Write:
 	ld	bc,(iy+6)
 	ld	hl,(iy+9)
 	call	__smulu
+	add	hl,de
+	xor	a,a
+	sbc	hl,de
+	ret	z
 	ld	(CopySize_SMC),hl \.r
 	push	hl
 	call	_GetSlotOffset_ASM \.r
