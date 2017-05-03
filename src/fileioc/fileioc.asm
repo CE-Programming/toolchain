@@ -482,13 +482,13 @@ _Write:
 	jr	z,_ReturnNULL_Close
 	call	_CheckInRAM_ASM \.r
 	jr	z,_ReturnNULL_Close
-	ld	hl,(iy+6)
+	ld	bc,(iy+6)
+	ld	hl,(iy+9)
+	call	__smulu
 	add	hl,de
 	or	a,a
 	sbc	hl,de
 	jr	z,_ReturnNULL_Close
-	ld	bc,(iy+9)
-	call	__smulu
 	ld	(CopySize_SMC),hl \.r
 	push	hl
 	call	_GetSlotOffset_ASM \.r
