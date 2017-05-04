@@ -23,6 +23,7 @@ CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e 
 CPDIR      = xcopy /y /s /e
 ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\tools\installer\installer.nsi) && \
              (if not exist "release" mkdir "release") && move /y tools\installer\CEdev.exe release\\
+CHMOD     :=
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))

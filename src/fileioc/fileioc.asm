@@ -172,7 +172,7 @@ _Resize:
 	push	hl
 	push	de
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 	push	hl
 	call	_CheckInRAM_ASM \.r
 	pop	hl
@@ -456,7 +456,7 @@ SetNotArchived:
 RelocateVar:
 	call	_PopOP1
 	call	_ChkFindSym
-	jp	c,_ReturnNEG1L \.r
+	jp	c,_ReturnNEG1 \.r
 	push	hl
 	call	_GetSlotVATPtr_ASM \.r
 	pop	bc
@@ -479,9 +479,9 @@ _Write:
 	add	iy,sp
 	ld	c,(iy+12)
 	call	_CheckIfSlotOpen \.r
-	jr	z,_ReturnNULL_Close
+	jr	z,_ReturnNULL_rel
 	call	_CheckInRAM_ASM \.r
-	jr	z,_ReturnNULL_Close
+	jr	z,_ReturnNULL_rel
 	ld	bc,(iy+6)
 	ld	hl,(iy+9)
 	call	__smulu
@@ -505,7 +505,7 @@ _Write:
 	ld	(resizeBytes),hl
 	call	AddMemoryToVar \.r
 	or	a,a
-	jr	z,_ReturnNULL_Close
+	jr	z,_ReturnNULL_rel
 NoCoreNeeded:
 	call	_GetSlotCurrDataPtr_ASM \.r
 	ex	de,hl
@@ -523,7 +523,9 @@ CopySize_SMC =$+1
 	ld	hl,(iy+9)
 	ret
 
-_ReturnNULL_Close:
+_ReturnNULL_rel_pop1:
+	pop	hl
+_ReturnNULL_rel:
 	xor	a,a
 	sbc	hl,hl
 	ret
@@ -553,11 +555,15 @@ _Read:
 	add	iy,sp
 	ld	c,(iy+12)
 	call	_CheckIfSlotOpen \.r
-	jr	z,_ReturnNULL_Close
+	jr	z,_ReturnNULL_rel
 	ld	bc,(iy+6)
 	ld	hl,(iy+9)
 	push	hl
 	call	__smulu
+	add	hl,de
+	xor	a,a
+	sbc	hl,de
+	jr	z,_ReturnNULL_rel_pop1
 	push	hl
 	call	_GetSlotCurrDataPtr_ASM \.r
 	ld	de,(iy+3)
@@ -585,7 +591,7 @@ _GetChar:
 	push	bc
 	push	de
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 _GetChar_ASM:
 	call	_GetSlotSize_ASM \.r
 	push	bc
@@ -594,7 +600,7 @@ _GetChar_ASM:
 	dec	hl
 	or	a,a
 	sbc	hl,bc				; size-offset
-	jp	c,_ReturnNEG1L \.r
+	jp	c,_ReturnNEG1 \.r
 	push	bc
 	call	_GetSlotDataPtr_ASM \.r
 	ld	hl,(hl)
@@ -624,14 +630,14 @@ _Seek:
 	ld	de,(iy+3)
 	ld	c,(iy+9)
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 	ld	a,(iy+6)
 	or	a,a
 	jr	z,SeekSet
 	dec	a
 	jr	z,SeekCur
 	dec	a
-	jp	nz,_ReturnNEG1L \.r
+	jp	nz,_ReturnNEG1 \.r
 SeekEnd:
 	push	de
 	call	_GetSlotSize_ASM \.r
@@ -647,7 +653,7 @@ SeekSet:
 	sbc	hl,de
 	push	de
 	pop	bc
-	jp	c,_ReturnNEG1L \.r
+	jp	c,_ReturnNEG1 \.r
 	jp	_SetSlotOffset_ASM \.r
 SeekCur:
 	push	de
@@ -671,11 +677,11 @@ _PutChar:
 	ld	a,l
 	ld	(charIn),a
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 	push	hl
 	call	_CheckInRAM_ASM \.r
 	pop	hl
-	jp	c,_ReturnNEG1L \.r
+	jp	c,_ReturnNEG1 \.r
 _PutChar_ASM:
 	call	_GetSlotSize_ASM \.r
 	push	bc
@@ -683,7 +689,7 @@ _PutChar_ASM:
 	pop	hl
 	or	a,a
 	sbc	hl,bc
-	jp	c,_ReturnNEG1L \.r
+	jp	c,_ReturnNEG1 \.r
 	jr	nz,noIncrement
 Increment:
 	push	bc
@@ -691,13 +697,13 @@ Increment:
 	ld	(resizeBytes),hl
 	call	_EnoughMem
 	pop	bc
-	jp	c,_ReturnNEG1L \.r
+	jp	c,_ReturnNEG1 \.r
 	push	bc
 	ex	de,hl
 	call	AddMemoryToVar \.r
 	pop	bc
 	or	a,a
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 noIncrement:
 	call	_GetSlotDataPtr_ASM \.r
 	ld	hl,(hl)
@@ -769,7 +775,7 @@ _Rewind:
 	push	bc
 	push	hl
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 	ld	bc,0
 	call	_SetSlotOffset_ASM \.r
 	or	a,a
@@ -788,7 +794,7 @@ _Tell:
 	push	bc
 	push	hl
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 	call	_GetSlotOffset_ASM \.r
 	push	bc
 	pop	hl
@@ -806,7 +812,7 @@ _GetSize:
 	push	bc
 	push	hl
 	call	_CheckIfSlotOpen \.r
-	jp	z,_ReturnNEG1L \.r
+	jp	z,_ReturnNEG1 \.r
 	call	_GetSlotSize_ASM \.r
 	push	bc
 	pop	hl
@@ -1198,10 +1204,11 @@ _ReturnNULL:
 	xor	a,a
 	sbc	hl,hl
 	ret
-_ReturnNEG1L:
+_ReturnNEG1:
 	scf
 	sbc	hl,hl
 	ret
+
 _CheckIfSlotOpen:
 	ld	a,c
 	ld	(currSlot),a
