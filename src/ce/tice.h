@@ -803,7 +803,9 @@ typedef enum {
 #define os_TextFlags         (*(uint8_t*)0xD00080)
 #define os_ApdFlags          (*(uint8_t*)0xD00088)
 #define os_RclFlags          (*(uint8_t*)0xD0008E)
- 
+
+#define os_AppData           ((uint8_t*)0xD00429)
+
 #define os_KbdScanCode       (*(uint8_t*)0xD00587)
 #define os_KbdLGSC           (*(uint8_t*)0xD00588)
 #define os_KbdPSC            (*(uint8_t*)0xD00589)
@@ -824,9 +826,12 @@ typedef enum {
 #define os_OP4               ((uint8_t*)0xD00619)
 #define os_OP5               ((uint8_t*)0xD00624)
 #define os_OP6               ((uint8_t*)0xD0062F)
+#define os_OP7               ((uint8_t*)0xD0063A)
 
 #define os_ProgToEdit        ((char*)0xD0065B)
 #define os_NameBuff          ((char*)0xD00663)
+
+#define os_TextShadow        ((uint8_t*)0xD006C0)          /**< Text buffer 260 bytes */
 
 #define os_PromptRow         (*(uint8_t*)0xD00800)
 #define os_PromptCol         (*(uint8_t*)0xD00801)
@@ -835,10 +840,11 @@ typedef enum {
 #define os_PromptRet         (*(uint8_t*)0xD00804)
 #define os_PromptValid       (*(uint8_t*)0xD00807)
 
-#define os_PenCol            (*(uint24_t*)0xD008D2)
-#define os_PenRow            (*(uint8_t*)0xD008D5)
+#define os_PenCol            (*(uint24_t*)0xD008D2)        /**< Small font column location */
+#define os_PenRow            (*(uint8_t*)0xD008D5)         /**< Small font row location */
 
-#define os_AsmPrgmSize       (*(uint16_t*)0xD0118C) 
+#define os_StatVars          ((uint8_t*)0xD01191)
+#define os_AsmPrgmSize       (*(uint16_t*)0xD0118C)        /**< Current size of executing program */
 
 #define os_uXMin             (*(real_t*)0xD01D61)
 #define os_uXMax             (*(real_t*)0xD01D6A)
@@ -906,6 +912,8 @@ typedef enum {
 #define os_Cal_FV            (*(real_t*)0xD01F9B)
 #define os_Cal_PY            (*(real_t*)0xD01FA4)
 
+#define os_CmdShadow         ((uint8_t*)0xD0232D)
+
 #define os_Y1LineType        (*(uint8_t*)0xD024BF)
 #define os_Y2LineType        (*(uint8_t*)0xD024C0)
 #define os_Y3LineType        (*(uint8_t*)0xD024C1)
@@ -955,10 +963,10 @@ typedef enum {
 #define os_Polar6LineColor   (*(uint8_t*)0xD024ED)
 #define os_SecULineColor     (*(uint8_t*)0xD024EE)
 #define os_SecVLineColor     (*(uint8_t*)0xD024EF)
-#define os_SecWLineColor     (*(uint8_t*)0xD024F0)
+#define os_SecWLineColor     (*(uint8_t*)0xD024F0)   
 
-#define os_AppErr1           ((char*)0xD025A9)
-#define os_AppErr2           ((char*)0xD025B6)
+#define os_AppErr1           ((char*)0xD025A9)             /**< String [1] for custom error */
+#define os_AppErr2           ((char*)0xD025B6)             /**< String [2] for custom error */
 
 #define os_CursorHookPtr     (*(uint24_t*)0xD025D5)
 #define os_LibraryHookPtr    (*(uint24_t*)0xD025D8)
@@ -984,27 +992,29 @@ typedef enum {
 #define os_SilentLinkHookPtr (*(uint24_t*)0xD02614)
 #define os_ActiveUSBHookPtr  (*(uint24_t*)0xD0261A)
 
-#define os_TempFreeArc       (*(uint24_t*)0xD02655) /**< Set after asm_ArcChk call */
+#define os_TempFreeArc       (*(uint24_t*)0xD02655)        /**< Set after asm_ArcChk call */
 
-#define os_TextBGcolor       (*(uint16_t*)0xD02688)
-#define os_TextFGcolor       (*(uint16_t*)0xD0268A)
+#define os_TextBGcolor       (*(uint16_t*)0xD02688)        /**< Large font background color */
+#define os_TextFGcolor       (*(uint16_t*)0xD0268A)        /**< Large font foreground color */
 
-#define os_DrawBGColor       (*(uint16_t*)0xD026AA)
-#define os_DrawFGColor       (*(uint16_t*)0xD026AC)
+#define os_DrawBGColor       (*(uint16_t*)0xD026AA)        /**< Small font background color */
+#define os_DrawFGColor       (*(uint16_t*)0xD026AC)        /**< Small font foreground color */
 #define os_DrawColorCode     (*(uint8_t*)0xD026AE)
 
 #define os_BatteryStatus     (*(uint8_t*)0xD02A86)
 
-#define os_GraphBGColor      (*(uint16_t*)0xD02A98)
+#define os_GraphBGColor      (*(uint16_t*)0xD02A98)        /**< Graph background 565 color */
 
 #define os_FillRectColor     (*(uint16_t*)0xD02AC0)
-#define os_StatusBarBGColor  (*(uint16_t*)0xD02ACC)
+#define os_StatusBarBGColor  (*(uint16_t*)0xD02ACC)        /**< Status bar 565 color */
 
 #define os_TmpYears          (*(real_t*)0xD02B01)
 #define os_TmpMonths         (*(real_t*)0xD02B0A)
 #define os_TmpDays           (*(real_t*)0xD02B13)
 #define os_TmpHours          (*(real_t*)0xD02B1C)
 #define os_TmpMinutes        (*(real_t*)0xD02B25)
+
+#define os_RamCode           ((uint8_t*)0xD18C7C)          /**< 1023 bytes free ram */
 
 /*
  * TI-OS Token definitions

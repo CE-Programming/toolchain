@@ -37,8 +37,11 @@ make install
 By default, `make install` will install into the home (~/CEdev) directory on linux and mac, and in the root drive (C:\\CEdev) directory on windows.
 This is configurable with `make install PREFIX={DIFFERENT_LOCATION}`
 
+To build a release, use: `make dist`
+
 If you wish to view a list of available makefile rules, type: `make help`
+
+### Building Windows Release
 
 If you wish to build a release; [nsis](https://sourceforge.net/projects/nsis/) is required for windows. Because of limitations of the current software; the special *Large strings* build is needed. You can find it [here](http://nsis.sourceforge.net/Special_Builds). Note also that you must configure your path variable to point to the nsis installation directory.
 
-To build a release, type: `make dist`

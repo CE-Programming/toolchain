@@ -143,7 +143,7 @@ _AllocVar_ASM:
 
 ;-------------------------------------------------------------------------------
 _CloseAll:
-; Initializes the File IO library
+; Closes all open file handles
 ; Arguments:
 ;  None
 ; Returns:
