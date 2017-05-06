@@ -9,6 +9,7 @@ before_install:
 
 install:
   - sudo apt-get install -y --force-yes -qq wine
+  - git clone https://github.com/CE-Programming/CEmu.git cemu
 
 script:
   - export CEDEV=~/CEdev
@@ -18,7 +19,14 @@ script:
   - make dist
   - cd $CEDEV/examples
   - make
-  
+  - cd cemu/core
+  - make
+  - cd ../tests/autotester
+  - make
+  - export PATH=$(pwd):$PATH
+  - cd $CEDEV/examples
+  - for f in */*.json; do autotester "$f"; done
+
 notifications:
   irc:
     channels:
@@ -26,3 +34,4 @@ notifications:
     on_success: change
     on_failure: always
     skip_join: true
+
