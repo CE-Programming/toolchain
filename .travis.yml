@@ -23,16 +23,19 @@ script:
   - cd $CEDEV/examples
   - make
 # Build CEmu core and autotester_cli
-#  - todo: grab rom with the special travis way of doing so
   - cd && git clone https://github.com/CE-Programming/CEmu.git
   - cd CEmu/core
   - make -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
   - cd ../tests/autotester
   - make -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
   - export PATH=$(pwd):$PATH
+# Grab ROM for tests below
+  - curl -s https://travis:$ROM_GETTER_PASS@tiplanet.org/scripts/travis/84pce_515_521.rom 2>/dev/null > 84pce_515_521.rom
+  - export AUTOTESTER_ROM=$(realpath ./84pce_515_521.rom)
+  - export AUTOTESTER_LIBS_DIR=$(realpath ./)
 # Test toolchain examples
   - cd $CEDEV/examples
-  - for f in */*.json; do autotester "$f"; done
+  - for f in */*.json; do echo "Testing $f"; autotester "$f"; done
 
 notifications:
   irc:
@@ -42,3 +45,6 @@ notifications:
     on_failure: always
     skip_join: true
 
+env:
+  global:
+    secure: B4fGooSHsmOl+eRBEGLXq5Clb64p47t+hdI8MnKnzZX/28nnkhti2xqqXMGOYNB+U0yHRGDKss4bFYq5AKdrq8ckTBsSSPZdLpCknYALqsE6+uuvYVvaaiV5hzGiXHZ+ULFidCR5gv7JXorL4PG9llIT9Nu7V4j5/xTVYoHYzDcyKGiX96FAwOOsLHvL3QJgLIP00CpluhJ1cduOedp9hpQjRFwJ/5YGNGvtbk98zVEnjprf8Pzrr9HW9FTBF91JkYd3R/oayDQUojDT/+CfDgQJh20LYoNDeFi3vOGn4j5a+n1MKSlmneuqb4+W5nBQGr+kKFMBkUJX+1EC3+fOHFjx808e/H7xLiKjm2Q/dbmQ9tFOLJR+mtww/ylx5NS9FoG4HIZFfgZsFw45bwY+bsXJAUUDNYcSHjrg9ix4Cx8s2cumRLQt8VUSebmXTEEDcLMFvL8+UBrMjVhJ7em6e6QXKl7qYo5KcZz8ktkMxawfEeFUwmnpSNPOT438elytGURzR7ll5cbmNXoytbRA7jJpbvDzdC+ulI0CLukoR+zlPn3qIrzHYmwXp1Zul44FHIabQdEIaPkYEUUIeJxTzN3FEyC5cL4CsA92dwmon/V6gsvs6rX5921BUjmFktd4z+s733bWIl8bfqOTp60XNG28Advda72xMdzMemMVcgI=
