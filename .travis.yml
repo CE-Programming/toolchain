@@ -5,9 +5,11 @@ branches:
     - master
 
 before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
 
 install:
+  - sudo apt-get install -y --force-yes -qq g++-6 gcc-6; export CXX="g++-6" CC="gcc-6"; $CXX --version
   - sudo apt-get install -y --force-yes -qq wine
   - git clone https://github.com/CE-Programming/CEmu.git cemu
 
@@ -24,6 +26,7 @@ script:
   - export PATH=$(pwd):$PATH
   - cd $CEDEV/examples
   - make
+#  - todo: grab rom with the special travis way of doing so
   - for f in */*.json; do autotester "$f"; done
 
 notifications:
