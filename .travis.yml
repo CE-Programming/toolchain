@@ -11,22 +11,26 @@ before_install:
 install:
   - sudo apt-get install -y --force-yes -qq g++-6 gcc-6; export CXX="g++-6" CC="gcc-6"; $CXX --version
   - sudo apt-get install -y --force-yes -qq wine
-  - git clone https://github.com/CE-Programming/CEmu.git cemu
 
 script:
+# Build CEmu core and autotester_cli
+#  - todo: grab rom with the special travis way of doing so
+  - cd && git clone https://github.com/CE-Programming/CEmu.git
+  - cd CEmu/core
+  - make -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
+  - cd ../tests/autotester
+  - make -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
+  - export PATH=$(pwd):$PATH
+# Build toolchain
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - make
   - make install
   - make dist
-  - cd cemu/core
-  - make
-  - cd ../tests/autotester
-  - make
-  - export PATH=$(pwd):$PATH
+# Build examples
   - cd $CEDEV/examples
   - make
-#  - todo: grab rom with the special travis way of doing so
+# Test examples
   - for f in */*.json; do autotester "$f"; done
 
 notifications:
