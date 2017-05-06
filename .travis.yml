@@ -17,14 +17,13 @@ script:
   - make
   - make install
   - make dist
-  - cd $CEDEV/examples
-  - make
   - cd cemu/core
   - make
   - cd ../tests/autotester
   - make
   - export PATH=$(pwd):$PATH
   - cd $CEDEV/examples
+  - make
   - for f in */*.json; do autotester "$f"; done
 
 notifications:
