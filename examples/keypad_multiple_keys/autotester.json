@@ -23,6 +23,7 @@
     "hash|4",
     "delay|200",
     "key|2nd",
+    "delay|300",
     "hash|5"
   ],
   "hashes": {
@@ -30,25 +31,25 @@
       "description": "The screen shows Down",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "4D80390D" ]
+      "expected_CRCs": [ "349F4775" ]
     },
     "2": {
       "description": "The screen shows Right",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "D9FC9218" ]
+      "expected_CRCs": [ "349F4775" ]
     },
     "3": {
       "description": "The screen shows Up",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "CCC2D101" ]
+      "expected_CRCs": [ "349F4775" ]
     },
     "4": {
       "description": "The screen shows Left",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "BE6FB3A8" ]
+      "expected_CRCs": [ "349F4775" ]
     },
     "5": {
       "description": "Back to the home screen (exit check)",

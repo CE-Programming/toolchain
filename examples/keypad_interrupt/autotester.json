@@ -13,6 +13,8 @@
     "hash|1",
     "delay|200",
     "key|clear",
+    "key|clear",
+    "delay|300",
     "hash|2"
   ],
   "hashes": {
