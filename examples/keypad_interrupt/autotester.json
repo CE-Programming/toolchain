@@ -12,8 +12,7 @@
     "delay|300",
     "hash|1",
     "delay|200",
-    "key|clear",
-    "key|clear",
+    "key|on",
     "delay|300",
     "hash|2"
   ],
