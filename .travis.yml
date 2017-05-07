@@ -13,12 +13,14 @@ install:
   - sudo apt-get install -y --force-yes -qq wine
 
 script:
-# Build toolchain
+# Build toolchain and libs
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
+  - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
   - make
   - make install
   - make dist
+  - make dist-libs
 # Build examples
   - cd $CEDEV/examples
   - make
@@ -31,8 +33,7 @@ script:
   - export PATH=$(pwd):$PATH
 # Grab ROM for tests below
   - curl -s https://travis:$ROM_GETTER_PASS@tiplanet.org/scripts/travis/84pce_515_521.rom 2>/dev/null > 84pce_515_521.rom
-  - export AUTOTESTER_ROM=$(realpath ./84pce_515_521.rom)
-  - export AUTOTESTER_LIBS_DIR=$(realpath ./)
+  - export AUTOTESTER_ROM=$(pwd)/84pce_515_521.rom
 # Test toolchain examples
   - cd $CEDEV/examples
   - for f in */*.json; do echo "Testing $f"; autotester "$f"; done
