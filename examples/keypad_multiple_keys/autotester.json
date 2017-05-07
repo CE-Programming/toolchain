@@ -29,26 +29,26 @@
     "1": {
       "description": "The screen shows Down",
       "start": "vram_start",
-      "size": "vram_8_size",
-      "expected_CRCs": [ "52139093" ]
+      "size": "vram_16_size",
+      "expected_CRCs": [ "4D80390D" ]
     },
     "2": {
       "description": "The screen shows Right",
       "start": "vram_start",
-      "size": "vram_8_size",
-      "expected_CRCs": [ "6817A1DD" ]
+      "size": "vram_16_size",
+      "expected_CRCs": [ "D9FC9218" ]
     },
     "3": {
       "description": "The screen shows Up",
       "start": "vram_start",
-      "size": "vram_8_size",
-      "expected_CRCs": [ "744E2649" ]
+      "size": "vram_16_size",
+      "expected_CRCs": [ "CCC2D101" ]
     },
     "4": {
       "description": "The screen shows Left",
       "start": "vram_start",
-      "size": "vram_8_size",
-      "expected_CRCs": [ "2AAF1D5E" ]
+      "size": "vram_16_size",
+      "expected_CRCs": [ "BE6FB3A8" ]
     },
     "5": {
       "description": "Back to the home screen (exit check)",

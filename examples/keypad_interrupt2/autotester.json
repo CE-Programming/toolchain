@@ -11,36 +11,22 @@
     "action|launch",
     "delay|300",
     "hash|1",
-    "key|down",
-    "key|right",
-    "delay|200",
+    "delay|300",
     "key|on",
-    "delay|200",
-    "hash|2",
-    "key|enter",
-    "delay|200",
-    "key|clear",
-    "key|clear",
-    "hash|3"
+    "hash|2"
   ],
   "hashes": {
     "1": {
-      "description": "Should be at a white screen",
+      "description": "Should be waiting for input",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "349F4775" ]
+      "expected_CRCs": [ "62EEC034" ]
     },
     "2": {
-      "description": "Should be at the ERR:BREAK screen",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "45F25C8E" ]
-    },
-    "3": {
       "description": "Back to the home screen, cleared",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "349F4775", "A32840C8" ]
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44" ]
     }
   }
 }

@@ -6,6 +6,8 @@
 *.ko
 *.obj
 *.elf
+*.8xp
+*.8xv
 obj/
 release/
 
