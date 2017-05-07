@@ -22,7 +22,7 @@ EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 CPDIR      = xcopy /y /s /e
 ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\tools\installer\installer.nsi) && \
-             (if not exist "release" mkdir "release") && move /y tools\installer\CEdev.exe release\\
+             $(WINNCHKDIR) "release" $(MKDIR) "release" && move /y tools\installer\CEdev.exe release\\
 CHMOD     :=
 else
 NATIVEPATH = $(subst \,/,$(1))
@@ -35,9 +35,9 @@ INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 SPASMFLG   = NO_APPSIGN=1
 CP         = cp
 CPDIR      = cp -r
-CP_EXMPLS  = cp -r $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+CP_EXMPLS  = $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
-             cd $(CURDIR) && mkdir -p release && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
+             cd $(CURDIR) && $(MKDIR) release && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
 chain     := ;
 CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
 endif
@@ -47,7 +47,6 @@ SRCDIR     := $(call NATIVEPATH,$(CURDIR)/src)
 SPASMDIR   := $(call NATIVEPATH,$(TOOLSDIR)/spasm-ng)
 CONVHEXDIR := $(call NATIVEPATH,$(TOOLSDIR)/convhex)
 CONVPNGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convpng)
-
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
 
@@ -75,7 +74,14 @@ INSTALLLIB := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib)
 DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLINC)/ce $(INSTALLINC)/ce/libs $(INSTALLINC)/std $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
-all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc ce std
+all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc libload ce std
+
+clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload
+	$(MAKE) -C $(SPASMDIR) clean
+	$(MAKE) -C $(CONVHEXDIR) clean
+	$(MAKE) -C $(CONVPNGDIR) clean
+	$(WINCHKDIR) $(RMDIR) release
+	$(WINCHKDIR) $(RMDIR) doxygen
 
 #----------------------------
 # tool rules
@@ -84,14 +90,6 @@ $(SPASM) $(CONVHEX) $(CONVPNG):
 	$(MAKE) -C $(SPASMDIR) $(SPASMFLG)
 	$(MAKE) -C $(CONVHEXDIR)
 	$(MAKE) -C $(CONVPNGDIR)
-
-clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std
-	$(MAKE) -C $(SPASMDIR) clean
-	$(MAKE) -C $(CONVHEXDIR) clean
-	$(MAKE) -C $(CONVPNGDIR) clean
-	$(WINCHKDIR) $(RMDIR) release
-	$(WINCHKDIR) $(RMDIR) doxygen
-
 #----------------------------
 
 #----------------------------
@@ -99,7 +97,6 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std
 #----------------------------
 ce:
 	$(MAKE) -C $(CEDIR) BIN=$(BIN)
-
 clean-ce:
 	$(MAKE) -C $(CEDIR) clean
 #----------------------------
@@ -141,10 +138,20 @@ clean-keypadc:
 #----------------------------
 
 #----------------------------
+# libload rules
+#----------------------------
+libload: $(SPASM)
+	cd $(call NATIVEPATH,src/libload) && $(SPASM) -E -Z -I $(call NATIVEPATH,../include) libload.asm LibLoad.8xv
+clean-libload:
+	$(RM) $(call NATIVEPATH,src/libload/LibLoad.8xv)
+#----------------------------
+
+#----------------------------
 # uninstall rule
 #----------------------------
 uninstall:
 	$(WINCHKDIR) $(call WINCHKPATH,$(INSTALLLOC)/CEdev) $(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+#----------------------------
 
 #----------------------------
 # install rule
@@ -163,10 +170,6 @@ install: $(DIRS) chmod
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat) $(call NATIVEPATH,$(INSTALLINC)/compat)
-
-chmod:
-	$(CHMOD)
-
 $(DIRS):
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLBIN)) $(MKDIR) $(INSTALLBIN)
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLIB)) $(MKDIR) $(INSTALLLIB)
@@ -175,18 +178,35 @@ $(DIRS):
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/ce) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce)
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/std) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/compat) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/compat)
+chmod:
+	$(CHMOD)
+#----------------------------
 
 #----------------------------
 # release rule
 #----------------------------
 dist: install
 	$(ARCH)
+#----------------------------
+
+#----------------------------
+# libraries release rules
+#----------------------------
+dist-libs: clibraries
+	$(CP) $(call NATIVEPATH,src/graphx/GRAPHX.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
+	$(CP) $(call NATIVEPATH,src/fileioc/FILEIOC.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
+	$(CP) $(call NATIVEPATH,src/keypadc/KEYPADC.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
+	$(CP) $(call NATIVEPATH,src/libload/LibLoad.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
+clibraries:
+	$(WINNCHKDIR) $(call WINCHKPATH,clibraries) $(MKDIR) clibraries
+#----------------------------
 
 #----------------------------
 # doxygen rule
 #----------------------------
 doxygen:
 	cd $(call NATIVEPATH,tools/doxygen) && doxygen config
+#----------------------------
 
 #----------------------------
 # makefile help rule
@@ -210,6 +230,8 @@ help:
 	@echo dist
 	@echo help
 	@echo doxygen
+	@echo dist-libs
+#----------------------------
 
-.PHONY: doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
+.PHONY: clean-libload libload dist-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
 

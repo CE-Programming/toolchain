@@ -7,3 +7,6 @@
 [submodule "tools/spasm-ng"]
 	path = tools/spasm-ng
 	url = https://github.com/MattWaltz/spasm-ng.git
+[submodule "src/libload"]
+	path = src/libload
+	url = https://github.com/CE-Programming/libload.git
