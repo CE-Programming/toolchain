@@ -59,7 +59,7 @@ all: $(LIB_8XV)
 
 $(LIB_8XV): $(SRC)
 	$(RM) $(LIB_LIB)
-	$(SPASM) -E $(SRC) $(LIB_8XV)
+	$(SPASM) -E -Z $(SRC) $(LIB_8XV)
 	$(MAKE) $(LIB_LIB)
 
 $(LIB_LIB): $(LIB_LIB)($(EZSRC:.src=.obj))
