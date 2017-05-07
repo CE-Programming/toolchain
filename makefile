@@ -140,8 +140,8 @@ clean-keypadc:
 #----------------------------
 # libload rules
 #----------------------------
-libload:
-	cd $(call NATIVEPATH,src/libload) && spasm -E -Z -I $(call NATIVEPATH,../include) libload.asm LibLoad.8xv
+libload: $(SPASM)
+	cd $(call NATIVEPATH,src/libload) && $(SPASM) -E -Z -I $(call NATIVEPATH,../include) libload.asm LibLoad.8xv
 clean-libload:
 	$(RM) $(call NATIVEPATH,src/libload/LibLoad.8xv)
 #----------------------------
