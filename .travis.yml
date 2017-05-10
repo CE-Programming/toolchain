@@ -36,7 +36,7 @@ script:
   - export AUTOTESTER_ROM=$(pwd)/84pce_515_521.rom
 # Test toolchain examples
   - cd $CEDEV/examples
-  - for f in */*.json; do echo "Testing $f"; autotester "$f"; done
+  - RESULT=0; for f in */*.json; do echo "Launching autotester on $f"; autotester "$f"; RESULT=`expr $RESULT + $?`; done; return $RESULT
 
 notifications:
   irc:
