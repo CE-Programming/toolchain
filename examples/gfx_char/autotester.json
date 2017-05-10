@@ -1,7 +1,7 @@
 {
   "rom": "84pce_515.rom",
   "transfer_files": [
-    "bin/GRAPHX10.8xp"
+    "bin/DEMO.8xp"
   ],
   "target": {
     "name": "GRAPHX10",
