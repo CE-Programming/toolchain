@@ -4,20 +4,18 @@
     "bin/DEMO.8xp"
   ],
   "target": {
-    "name": "GRAPHX10",
+    "name": "DEMO",
     "isASM": true
   },
   "sequence": [
     "action|launch",
-    "delay|300",
-    "hash|1",
+    "hashWait|1",
     "key|enter",
-    "delay|300",
-    "hash|2"
+    "hashWait|2"
   ],
   "hashes": {
     "1": {
-      "description": "Test flipped text",
+      "description": "Test flipped text on black background",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "198A8841" ]
@@ -30,4 +28,3 @@
     }
   }
 }
-
