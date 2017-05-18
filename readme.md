@@ -12,13 +12,11 @@ Included you will find examples using the ['Standard' CE C Libraries](https://gi
 
 You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions. ([ask for help](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login))
 
-## Building
+## Building on linux and macOS
 
 These steps are only if you wish to help with development of the toolchain. 
 
-If you are using Windows, [mingw+msys](http://www.mingw.org) is required for building.
-
-If you are using Linux or macOS, [wine](https://www.winehq.org) is required for building.
+On linux and macOS, [wine](https://www.winehq.org) is required for building.
 
 Clone the repo: (Note the --recursive option)
 
@@ -34,14 +32,40 @@ make
 make install
 ```
 
-By default, `make install` will install into the home (~/CEdev) directory on linux and mac, and in the root drive (C:\\CEdev) directory on windows.
-This is configurable with `make install PREFIX={DIFFERENT_LOCATION}`
+By default, `make install` will install into the home (~/CEdev) directory.
 
-To build a release, use: `make dist`
+This is configurable with `make install PREFIX={DIFFERENT_LOCATION}`
 
 If you wish to view a list of available makefile rules, type: `make help`
 
-### Building Windows Release
+To build a release, use: `make dist`
 
-If you wish to build a release; [nsis](https://sourceforge.net/projects/nsis/) is required for windows. Because of limitations of the current software; the special *Large strings* build is needed. You can find it [here](http://nsis.sourceforge.net/Special_Builds). Note also that you must configure your path variable to point to the nsis installation directory.
+## Building on windows
+
+If you are using Windows, [mingw](http://www.mingw.org) is required for building.
+You will just need `mingw32-base` and `mingw32-gcc-g++`
+
+Clone the repo: (Note the --recursive option)
+
+```
+git clone --recursive https://github.com/CE-Programming/toolchain.git
+```
+
+Then use:
+
+```
+cd toolchain
+mingw32-make
+mingw32-make install
+```
+
+By default, `mingw32-make install` will install into the root drive (C:\\CEdev) directory.
+
+This is configurable with `mingw32-make install PREFIX={DIFFERENT_LOCATION}`
+
+If you wish to view a list of available makefile rules, type: `mingw32-make help`
+
+To build a release, use: `mingw32-make dist`
+
+For releases, [nsis](https://sourceforge.net/projects/nsis/) is required for windows. Because of limitations of the current software; the special *Large strings* build is needed. You can find it [here](http://nsis.sourceforge.net/Special_Builds). Note also that you must configure your path variable to point to the nsis installation directory.
 
