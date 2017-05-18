@@ -120,8 +120,8 @@ DEFAULT_TEXT_TP_COLOR   equ 255
 
 ;-------------------------------------------------------------------------------
 ; Useful Macros
-#define mSignedCompareDE() or a,a \ sbc hl,de \ add hl,hl \ jp po,$+5 \.r \ ccf \
-#define mSignedCompareBC() or a,a \ sbc hl,bc \ add hl,hl \ jp po,$+5 \.r \ ccf \
+#define mIsHLLessThanDE() or a,a \ sbc hl,de \ add hl,hl \ jp po,$+5 \.r \ ccf \
+#define mIsHLLessThanBC() or a,a \ sbc hl,bc \ add hl,hl \ jp po,$+5 \.r \ ccf \
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -670,12 +670,12 @@ _HorizLine:
 	add	iy,sp
 	ld	de,(_ymin) \.r
 	ld	hl,(iy+6)
-	mSignedCompareDE()                  ; compare y coordinate <-> ymin
+	mIsHLLessThanDE()                  ; compare y coordinate <-> ymin
 	ret	c
 	ld	hl,(_ymax) \.r
 	dec	hl                          ; inclusive
 	ld	de,(iy+6)
-	mSignedCompareDE()                  ; compare y coordinate <-> ymax
+	mIsHLLessThanDE()                  ; compare y coordinate <-> ymax
 	ret	c
 	ld	hl,(iy+9)
 	ld	de,(iy+3)
@@ -689,7 +689,7 @@ _HorizLine:
 	call	_Min_ASM \.r
 	ld	(iy+9),hl                   ; save minimum x value
 	ld	de,(iy+3)
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	c
 	ld	hl,(iy+9)
 	sbc	hl,de
@@ -749,11 +749,11 @@ _VertLine:
 	ld	hl,(_xmax) \.r
 	dec	hl                          ; inclusive
 	ld	de,(iy+3)
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	c                           ; return if x > xmax
 	ex	de,hl
 	ld	de,(_xmin) \.r
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	c                           ; return if x < xmin
 	ld	hl,(iy+9)
 	ld	de,(iy+6)
@@ -767,7 +767,7 @@ _VertLine:
 	call	_Min_ASM \.r                ; get maximum y
 	ld	(iy+9),hl
 	ld	de,(iy+6)
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	c                           ; return if not within y bounds
 	ld	hl,(iy+9)
 	sbc	hl,de
@@ -2211,8 +2211,8 @@ _ClipDraw_ASM:
 	ld	hl,(ix+3)
 	ld	a,(hl)
 	ld	de,tmpWidth \.r
-	ld	(de),a                     ; save tmpWidth
-	ld	(tmpSpriteWidth),a \.r     ; save tmpSpriteWidth
+	ld	(de),a                      ; save tmpWidth
+	ld	(tmpSpriteWidth),a \.r      ; save tmpSpriteWidth
 	add	iy,de
 	inc	hl
 	ld	a,(hl)
@@ -2221,13 +2221,13 @@ _ClipDraw_ASM:
 	ld	(iy+6),hl                   ; save a ptr to the sprite data to change offsets
 	ld	bc,(ix+9)
 	ld	hl,(_ymin) \.r
-	mSignedCompareBC()
+	mIsHLLessThanBC()
 	jr	c,NoTopClipNeeded_ASM
 	ld	hl,(iy+3)
 	add	hl,bc
 	ex	de,hl
 	ld	hl,(_ymin) \.r
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	nc                          ; bc = y location
 	ld	hl,(_ymin) \.r              ; ymin
 	or	a,a
@@ -2245,13 +2245,13 @@ NoTopClipNeeded_ASM:
 	push	bc
 	pop	hl                          ; hl = y coordinate
 	ld	de,(_ymax) \.r
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	nc                          ; return if offscreen on bottom
 	                                    ; bc = y coordinate
 	ld	hl,(iy+3)                   ; hl = tmpHeight
 	add	hl,bc
 	ld	de,(_ymax) \.r
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	jr	c,NoBottomClipNeeded_ASM    ; is partially clipped bottom?
 	ex	de,hl                       ; hl = ymax
 	                                    ; bc = y coordinate
@@ -2260,14 +2260,14 @@ NoTopClipNeeded_ASM:
 NoBottomClipNeeded_ASM:
 	ld	hl,(ix+6)                   ; hl = x coordinate
 	ld	de,(_xmin) \.r
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ld	hl,(ix+6)                   ; hl = x coordinate
 	jr	nc,NoLeftClip_ASM           ; is partially clipped left?
 	ld	de,(iy+0)                   ; de = tmpWidth
 	add	hl,de					
 	ld	de,(_xmin) \.r
 	ex	de,hl
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	nc                          ; return if offscreen
 	ld	de,(ix+6)                   ; de = x coordinate
 	ld	hl,(_xmin) \.r
@@ -2285,14 +2285,14 @@ NoBottomClipNeeded_ASM:
 	ld	(ix+6),hl                   ; save min x coordinate
 NoLeftClip_ASM:
 	ld	de,(_xmax) \.r              ; de = xmax
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	ret	nc                          ; return if offscreen
 	ld	hl,(ix+6)                   ; hl = x coordinate
 	ld	de,(iy+0)                   ; de = tmpWidth
 	add	hl,de
 	ld	de,(_xmax) \.r
 	ex	de,hl
-	mSignedCompareDE()
+	mIsHLLessThanDE()
 	jr	nc,NoRightClip_ASM          ; is partially clipped right?
 	ld	hl,(_xmax) \.r              ; clip on the right
 	ld	de,(ix+6)
