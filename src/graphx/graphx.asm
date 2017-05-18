@@ -2240,8 +2240,7 @@ _ClipDraw_ASM:
 	ld	de,(iy+6)                   ; de -> sprite data
 	add	hl,de
 	ld	(iy+6),hl                   ; store new ptr
-	ld	a,(_ymin) \.r               ; new y location ymin
-	ld	c,a
+	ld	bc,(_ymin) \.r              ; new y location ymin
 NoTopClipNeeded_ASM:
 	push	bc
 	pop	hl                          ; hl = y coordinate
@@ -2311,7 +2310,7 @@ tmpSpriteWidth =$+1
 	sub	a,(iy+0)                    ; compute new x width
 	scf                                 ; set carry for success
 	ret
-
+	
 ;-------------------------------------------------------------------------------
 _TransparentTilemap_NoClip:
 ; Tilemapping subsection
