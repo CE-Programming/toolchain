@@ -22,7 +22,7 @@
     "hash|4",
     "key|enter",
     "delay|300",
-    "hash|5"
+    "hashWait|5"
   ],
   "hashes": {
     "1": {
