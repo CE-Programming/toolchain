@@ -21,6 +21,7 @@ space := $(empty) $(empty)
 comma := $(empty),$(empty)
 
 ifeq ($(OS),Windows_NT)
+SHELL     := cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 WINRELPATH = $(subst /,\,$(1))
