@@ -61,7 +61,7 @@ void interrupt isr_on(void) {
 /* Interrupt routine to run when the timer expires */
 void interrupt isr_timer1(void) {
     /* Fill the screen with a random color */
-    memset_fast(lcd_Ram, randInt(0,255), LCD_SIZE);
+    memset(lcd_Ram, randInt(0,255), LCD_SIZE);
     
     /* Must acknowledge that the interrupt occured to clear the flag */
     int_Acknowledge = INT_TIMER1;

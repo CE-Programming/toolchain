@@ -12,9 +12,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
-
-/************* HARDWARE AND CUSTOM ROUTINE DEFINITIONS *************/
-
+/*
+ * Hardware & custom macros/functions
+ */
 
 /**
  * Creates a random integer value
@@ -22,7 +22,9 @@
 #define randInt(min, max) \
 ((unsigned)rand() % ((max) - (min) + 1) + (min))
 
-/* RTC define -- useful for srand() */
+/**
+ * Gets a combination of the RTC time; useful for srand()
+ */
 #define rtc_Time()              (*(volatile uint32_t*)0xF30044)
 
 /* RTC definitions */
@@ -196,21 +198,9 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
  */
 #define os_ClrHomeFull() do { _OS(asm_ClrLCDFull); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
 
-/**
- * A faster implementation of memset
- *
- * @param ptr Pointer to data
- * @param c Value to set data to
- * @param num Size of data to set
- * @returns @p ptr
+/*
+ * Bootcode functions
  */
-void *memset_fast(void *ptr, int c, size_t num);
-
-
-/************* TI BOOT/OS SPECIFIC ROUTINES AND IMPLEMENTATIONS *************/
-
-
-/**** Date and time functions ****/
 
 /**
  * Sets the calculator's date
@@ -311,7 +301,9 @@ uint8_t boot_GetBatteryStatus(void);
  */
 void boot_WaitShort(void);
 
-/**** OS ROUTINES ****/
+/*
+ * OS Routines
+ */
 
 /**
  * Disables the OS cursor
@@ -1936,6 +1928,7 @@ typedef enum {
 /* Compatibility defines */
 #define prgm_CleanUp()
 #define pgrm_CleanUp()
+#define memset_fast memset
 
 #endif
 

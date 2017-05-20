@@ -26,7 +26,6 @@ void main(void) {
 
 /* Fill the screen with a given color */
 void fill_screen(uint8_t color) {
-    /* memset_fast is a way faster implementation of memset; either one will work here though */
-    memset_fast(lcd_Ram, color, LCD_SIZE);
+    memset(lcd_Ram, color, LCD_SIZE);
 }
 

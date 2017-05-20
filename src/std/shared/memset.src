@@ -3,4 +3,24 @@
 
 ; void *memset(void *dest, int c, size_t count);
 
-_memset		equ 0000ACh
+_memset:
+	pop	iy
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
+	push	iy
+	cpi
+	add	hl,bc
+	ret	c
+	dec	hl
+	ld	(hl),e
+	ret	po
+	push	hl
+	pop	de
+	dec	de
+	lddr
+	ret
+
