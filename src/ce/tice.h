@@ -620,7 +620,7 @@ real_t os_FloatToReal(float arg);
  *  0-9: Fix # mode                                             <br>
  * @returns Length of result
  */
-int os_RealToStr(char *result, const real_t *arg, char maxLength, char mode, char digits);
+int os_RealToStr(char *result, const real_t *arg, int8_t maxLength, uint8_t mode, int8_t digits);
 
 /**
  *  This converts a ti-ascii string to a ti-float.
