@@ -22,7 +22,7 @@ void main(void) {
         kb_Scan();
 		
         /* Load group 7 registers */
-        key = kb_Data[kb_group_7];
+        key = kb_Data[7];
         
         switch (key) {
             case kb_Down:           /* Change screen color to black */
@@ -40,7 +40,7 @@ void main(void) {
             default:
                 break;
         }
-    } while (kb_Data[kb_group_1] != kb_2nd);
+    } while (kb_Data[1] != kb_2nd);
 }
 
 /* Simple way to fill the screen with a given color */

@@ -26,7 +26,7 @@ void main(void) {
         /* Update kb_Data */
         kb_Scan();
         
-        key = kb_Data[kb_group_7];
+        key = kb_Data[7];
 
         /* Print the current arrow key input */
         if (key & kb_Down) {
@@ -50,7 +50,7 @@ void main(void) {
             printText(0, 3, erase_string);
         }
 
-    } while (kb_Data[kb_group_1] != kb_2nd);
+    } while (kb_Data[1] != kb_2nd);
 }
 
 /* Draw text on the homescreen at the given X/Y location */

@@ -71,8 +71,29 @@ typedef enum {
 (*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals */
 #define kb_Config \
 (*(uint8_t*)0xF50000)          /**< Configuration of keypad controller */
+
+/**
+ * Keypad Data registers
+ *
+ * | Offset | Bit 0      | Bit 1      | Bit 2      | Bit 3      |  Bit 4     |  Bit 5     |  Bit 6     | Bit 7      |
+ * | -------| ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- | ---------- |
+ * | 1      | kb_Graph   | kb_Trace   | kb_Zoom    | kb_Window  | kb_Yequ    | kb_2nd     | kb_Mode    | kb_Del     |
+ * | 2      |            | kb_Sto     | kb_Ln      | kb_Log     | kb_Square  | kb_Recip   | kb_Math    | kb_Alpha   |
+ * | 3      | kb_0       | kb_1       | kb_4       | kb_7       | kb_Comma   | kb_Sin     | kb_Apps    | kb_GraphVar|
+ * | 4      | kb_DecPnt  | kb_2       | kb_5       | kb_8       | kb_LParen  | kb_Cos     | kb_Prgm    | kb_Stat    |
+ * | 5      | kb_Chs     | kb_3       | kb_6       | kb_9       | kb_RParen  | kb_Tan     | kb_Vars    |            |
+ * | 6      | kb_Enter   | kb_Add     | kb_Sub     | kb_Mul     | kb_Div     | kb_Power   | kb_Clear   |            |
+ * | 7      | kb_Down    | kb_Left    | kb_Right   | kb_Up      |            |            |            |            |
+ * 
+ * These data registers can be indexed just like an array. For example, if you want to check the status of the '2nd' key:
+ * @code
+ *  if (kb_Data[1] & kb_2nd) {
+ *      ...
+ *  }
+ * @endcode
+ */
 #define kb_Data \
-(uint8_t)((uint16_t*)0xF50010) /**< Keypad Data registers */
+(uint8_t)((uint16_t*)0xF50010)
 
 /**
  * Different available interrupt signals
@@ -83,11 +104,7 @@ typedef enum {
     KB_MODE_1_PRESS = 4   /**< Interrupt set when a key is pressed in MODE_1_INDISCRIMINATE */
 } kb_int_signal_t;
 
-/* Keyboard group 0 (Unused) */
-#define kb_group_0      0
-
 /* Keyboard group 1 */
-#define kb_group_1    1
 #define kb_Graph      1<<0
 #define kb_Trace      1<<1
 #define kb_Zoom       1<<2
@@ -98,7 +115,6 @@ typedef enum {
 #define kb_Del        1<<7
 
 /* Keyboard group 2 */
-#define kb_group_2    2
 #define kb_Store      1<<1
 #define kb_Ln         1<<2
 #define kb_Log        1<<3
@@ -108,7 +124,6 @@ typedef enum {
 #define kb_Alpha      1<<7
 
 /* Keyboard group 3 */
-#define kb_group_3    3
 #define kb_0          1<<0
 #define kb_1          1<<1
 #define kb_4          1<<2
@@ -119,7 +134,6 @@ typedef enum {
 #define kb_GraphVar   1<<7
 
 /* Keyboard group 4 */
-#define kb_group_4    4
 #define kb_DecPnt     1<<0
 #define kb_2          1<<1
 #define kb_5          1<<2
@@ -130,7 +144,6 @@ typedef enum {
 #define kb_Stat       1<<7
 
 /* Keyboard group 5 */
-#define kb_group_5    5
 #define kb_Chs        1<<0
 #define kb_3          1<<1
 #define kb_6          1<<2
@@ -140,7 +153,6 @@ typedef enum {
 #define kb_Vars       1<<6
 
 /* Keyboard group 6 */
-#define kb_group_6    6
 #define kb_Enter      1<<0
 #define kb_Add        1<<1
 #define kb_Sub        1<<2
@@ -150,7 +162,6 @@ typedef enum {
 #define kb_Clear      1<<6
 
 /* Keyboard group 7 */
-#define kb_group_7    7
 #define kb_Down       1<<0
 #define kb_Left       1<<1
 #define kb_Right      1<<2
@@ -223,5 +234,13 @@ typedef enum {
 #define kb_DataArray ((uint16_t*)0xF50010)
 #define kb_dataArray ((uint16_t*)0xF50010)
 #define kb_KeyPgrm   kb_KeyPrgm
+#define kb_group_0 0
+#define kb_group_1 1
+#define kb_group_2 2
+#define kb_group_3 3
+#define kb_group_4 4
+#define kb_group_5 5
+#define kb_group_6 6
+#define kb_group_7 7
 
 #endif

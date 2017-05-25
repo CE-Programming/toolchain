@@ -54,7 +54,7 @@ void interrupt isr_on(void) {
 
 void interrupt isr_keyboard(void) {
     /* Read the keypad data */
-    kb_key_t key = kb_Data[kb_group_6];
+    kb_key_t key = kb_Data[6];
     
     /* If [enter] or [clear] are pressed, set the flag */
     if (key & (kb_Enter | kb_Clear)) {
