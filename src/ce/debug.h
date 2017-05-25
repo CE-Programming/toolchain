@@ -4,6 +4,8 @@
  * @brief Contains useful debugging features for use with the integrated CEmu debugger
  */
 
+#include <stdio.h>
+
 /**
  * void dbg_sprintf(out, const char*, ...)
  *
