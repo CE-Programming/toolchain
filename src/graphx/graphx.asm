@@ -2073,11 +2073,11 @@ _Sprite_NoClip:
 	inc	hl
 	ld	iyh,c
 	xor	a,a
-	rr	c
+	srl	c
 	sbc	a,SprNcJrStep-SprNcLpEvenW
 	ld	(SprNcJrStep-1),a \.r
 	ld	a,lcdWidth>>1
-	sub	a,b
+	sub	a,c
 	ld	iyl,a				; (lcdWidth-spriteWidth)/2
 	ld	a,(hl)				; spriteHeight
 	inc	hl
