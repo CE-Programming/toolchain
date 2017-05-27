@@ -2095,7 +2095,7 @@ SprNcLpStart:
 	ldir
 	dec	a
 	jr	nz,SprNcLpOddW
-xSprNcJrStep:
+SprNcJrStep:
 	ret
 
 ;-------------------------------------------------------------------------------
