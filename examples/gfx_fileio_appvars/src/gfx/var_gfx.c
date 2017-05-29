@@ -3,6 +3,6 @@
 #include "var_gfx.h"
 
 uint8_t *var_gfx[2] = {
- 0,
- 1026,
+ (uint8_t*)0,
+ (uint8_t*)1026,
 };
