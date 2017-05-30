@@ -9,7 +9,7 @@
 
 #----------------------------
 TARGET ?= DEMO
-DEBUGMODE ?= DEBUG
+DEBUGMODE ?= NDEBUG
 ARCHIVED ?= NO
 COMPRESSED ?= NO
 #----------------------------

@@ -4,6 +4,5 @@
 #define __all_gfx__
 #include <stdint.h>
 
-extern uint16_t all_gfx_pal[256];
 
 #endif
