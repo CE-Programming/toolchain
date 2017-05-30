@@ -6,8 +6,6 @@
 *.ko
 *.obj
 *.elf
-*.8xp
-*.8xv
 obj/
 release/
 
@@ -32,7 +30,11 @@ relocation_table
 # Executables
 *.hex
 *.8xv
+*.8xp
 
 # Debug files
 *.dSYM/
 *.map
+
+# Log files
+*.log
