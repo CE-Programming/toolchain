@@ -11,9 +11,11 @@
 
 typedef int onexit_t;
 
+#ifndef __cplusplus
 #ifndef WCHAR_T_DEFINED
 #define WCHAR_T_DEFINED
 typedef unsigned short wchar_t;
+#endif
 #endif
 
 typedef struct {
