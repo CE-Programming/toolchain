@@ -4,6 +4,7 @@
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
+SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 CP         = xcopy /y
@@ -24,7 +25,7 @@ BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
-LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include/std)
+LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include)
 
 LIBSTATIC   = $(call NATIVEPATH,$(wildcard $(STATICDIR)/*.lib))
 LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.lib))

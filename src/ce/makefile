@@ -7,6 +7,7 @@ NAME := cce
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
+SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 RM         = del /f 2>nul
@@ -29,7 +30,7 @@ BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
-LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include/ce)
+LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include)
 
 ASMFLGS    := -genobj -NOigcase -NOlist -NOlistmac -quiet -sdiopt -cpu:EZ80F91 -NOdebug
 LIBFLGS    := -quiet -warn

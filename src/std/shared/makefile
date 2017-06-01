@@ -7,6 +7,7 @@ NAME := cshared
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
+SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 RM         = del /f 2>nul

@@ -7,18 +7,18 @@
 ;-------------------------------------------------------------------------------
 	.assume	adl=1
 
-	.ref	__low_bss
 	.ref	_main
+	.ref	__low_bss
 
 	.def	_errno
 	.def	_init
 	.def	_exit
-	.def	__exit
+	.def	__errsp
 
 	define	.header,space=ram
-	define	.icon,space=ram
 	define	.launcher,space=ram
 	define	.libs,space=ram
+	define	.exit,space=ram
 	define	.startup,space=ram
 
 _errno  equ 0D008DCh
@@ -31,16 +31,11 @@ _errno  equ 0D008DCh
 	db	123
 	db	0		; Magic byte recognition for C programs
 _init:
-	ifdef	ICON
-	.ref	__program_description_end
-	jp	__program_description_end
-	endif
-	
-	segment .launcher
-	segment .libs
 
 ;-------------------------------------------------------------------------------
 	segment .startup
+
+	.def	__exit
 
 	call	0020848h	; _RunInicOff, assumes iy=flags
 	di
@@ -66,13 +61,10 @@ __errsp:
 	push	hl		; exit code
 	call	0004F0h         ; usb_ResetTimers
 
-	ifdef	PRGM_CLEANUP
-	res	4,(iy+9)        ; onInterrupt,(iy+onFlags)
-	set	0,(iy+3)        ; graphDraw,(iy+graphFlags)
-	call	%0020808        ; _ClrLCDFull
-	call	%0020828        ; _HomeUp
-	call	%0021A3C        ; _DrawStatusBar
-	endif
+;-------------------------------------------------------------------------------
+	segment .exit
+
+	.ref	__exit
 
 	pop	hl              ; exit code
 	ret
@@ -80,7 +72,7 @@ __errsp:
 _exit:
 	pop	hl
 	pop	hl
-	jr	__errsp
+	jr	__exit
 
 ;-------------------------------------------------------------------------------
 	segment code

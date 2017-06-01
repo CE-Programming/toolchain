@@ -12,6 +12,7 @@ SPASM ?= spasm
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
+SHELL       = cmd.exe
 NATIVEPATH  = $(subst /,\,$(1))
 WINPATH     = $(NATIVEPATH)
 RM          = del /f 2>nul
@@ -39,8 +40,7 @@ BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
-LIBH_LOC   := $(call NATIVEPATH,$(INSTALLLOC)/lib/asm)
-H_LOC      := $(call NATIVEPATH,$(INSTALLLOC)/include/ce/)
+H_LOC      := $(call NATIVEPATH,$(INSTALLLOC)/include)
 
 EZOBJ       = $(wildcard *.obj)
 EZSRC       = $(wildcard *.src)
@@ -52,10 +52,13 @@ LIB_ASM    := $(NAME)_header.asm
 LIB_JMP    := $(NAME)_equates.asm
 LIB_H      := $(NAME).h
 
+LIB_OBJ    := $(NAME)_header.obj
+
 ASMFLGS    := -genobj -NOigcase -NOlist -NOlistmac -quiet -sdiopt -cpu:EZ80F91 -NOdebug
 LIBFLGS    := -quiet -warn
 
 all: $(LIB_8XV)
+	$(ASM) $(ASMFLGS) $(LIB_ASM)
 
 $(LIB_8XV): $(SRC)
 	$(RM) $(LIB_LIB)
@@ -76,7 +79,7 @@ clean:
 install:
 	$(CP) $(LIB_H) $(H_LOC)
 	$(CP) $(LIB_LIB) $(LIB_LOC)
-	$(CP) $(LIB_ASM) $(LIBH_LOC)
+	$(CP) $(LIB_OBJ) $(LIB_LOC)
 
 uninstall:
 	$(RM) $(call NATIVEPATH,$(H_LOC)/$(LIB_H))

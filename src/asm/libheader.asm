@@ -3,7 +3,7 @@
  ifndef USING_SHARED_LIBRARIES
  define USING_SHARED_LIBRARIES
  
-	.assume	ADL=1
+	.assume	adl=1
  
 	define	.launcher,space=ram
 	define	.libs,space=ram

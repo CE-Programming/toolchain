@@ -6,6 +6,7 @@ RELEASE_NAME := CEdev
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
+SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 WINCHKPATH = $(NATIVEPATH)
@@ -23,7 +24,6 @@ CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e 
 CPDIR      = xcopy /y /s /e
 ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\tools\installer\installer.nsi) && \
              $(WINNCHKDIR) "release" $(MKDIR) "release" && move /y tools\installer\CEdev.exe release\\
-CHMOD     :=
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(shell winepath --windows $(1))
@@ -38,7 +38,6 @@ CPDIR      = cp -r
 CP_EXMPLS  = $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
              cd $(CURDIR) && $(MKDIR) release && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
-chain     := ;
 CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
 endif
 
@@ -49,6 +48,7 @@ CONVHEXDIR := $(call NATIVEPATH,$(TOOLSDIR)/convhex)
 CONVPNGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convpng)
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
+ASMDIR     := $(call NATIVEPATH,$(SRCDIR)/asm)
 
 SPASM      := $(call NATIVEPATH,$(SPASMDIR)/spasm)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
@@ -71,24 +71,26 @@ CEDEVDIR   := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME))
 INSTALLBIN := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/bin)
 INSTALLINC := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/include)
 INSTALLLIB := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib)
-DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLINC)/ce $(INSTALLINC)/ce/libs $(INSTALLINC)/std $(INSTALLBIN) $(INSTALLLIB)
+DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
-all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc libload ce std
+all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc libload ce std asm
 
-clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload
+clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-asm
 	$(MAKE) -C $(SPASMDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
-	$(WINCHKDIR) $(RMDIR) release
-	$(WINCHKDIR) $(RMDIR) doxygen
+	$(WINCHKDIR) $(call WINCHKPATH,release) $(RMDIR) release
+	$(WINCHKDIR) $(call WINCHKPATH,doxygen) $(RMDIR) doxygen
 
 #----------------------------
 # tool rules
 #----------------------------
-$(SPASM) $(CONVHEX) $(CONVPNG):
+$(SPASM):
 	$(MAKE) -C $(SPASMDIR) $(SPASMFLG)
+$(CONVHEX):
 	$(MAKE) -C $(CONVHEXDIR)
+$(CONVPNG):
 	$(MAKE) -C $(CONVPNGDIR)
 #----------------------------
 
@@ -147,6 +149,15 @@ clean-libload:
 #----------------------------
 
 #----------------------------
+# asm rules
+#----------------------------
+asm:
+	$(MAKE) -C $(ASMDIR) BIN=$(BIN)
+clean-asm:
+	$(MAKE) -C $(ASMDIR) clean
+#----------------------------
+
+#----------------------------
 # uninstall rule
 #----------------------------
 uninstall:
@@ -158,7 +169,7 @@ uninstall:
 #----------------------------
 install: $(DIRS) chmod
 	$(CP_EXMPLS)
-	$(CP) $(call NATIVEPATH,$(SRCDIR)/asm/*) $(call NATIVEPATH,$(INSTALLLIB)/asm)
+	$(CP) $(call NATIVEPATH,$(SRCDIR)/asm/*.obj) $(call NATIVEPATH,$(INSTALLLIB))
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/example_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
 	$(CP) $(SPASM) $(INSTALLBIN)
 	$(CP) $(CONVHEX) $(INSTALLBIN)
@@ -169,15 +180,13 @@ install: $(DIRS) chmod
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat) $(call NATIVEPATH,$(INSTALLINC)/compat)
+	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat) $(call NATIVEPATH,$(INSTALLINC))
+	
 $(DIRS):
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLBIN)) $(MKDIR) $(INSTALLBIN)
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLIB)) $(MKDIR) $(INSTALLLIB)
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)) $(MKDIR) $(INSTALLINC)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLIB)/asm) $(MKDIR) $(call NATIVEPATH,$(INSTALLLIB)/asm)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/ce) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/ce)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/std) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/std)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)/compat) $(MKDIR) $(call NATIVEPATH,$(INSTALLINC)/compat)
+	
 chmod:
 	$(CHMOD)
 #----------------------------
@@ -215,12 +224,14 @@ help:
 	@echo Available targets:
 	@echo all
 	@echo ce
+	@echo asm
 	@echo std
 	@echo graphx
 	@echo fileioc
 	@echo keypadc
 	@echo clean
 	@echo clean-ce
+	@echo clean-asm
 	@echo clean-std
 	@echo clean-graphx
 	@echo clean-fileioc
