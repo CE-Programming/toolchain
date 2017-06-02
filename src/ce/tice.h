@@ -12,6 +12,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Hardware & custom macros/functions
  */
@@ -701,7 +705,7 @@ void os_ForceCmdNoChar(void);
  * Use this function to call assembly functions in the OS and Bootcode
  * i.e. _OS( asm_ArcChk );
  */
-void _OS(void *function);
+void _OS(void (*function)(void));
 
 /**
  * Assembly routine to scroll homescreen up
@@ -1930,5 +1934,9 @@ typedef enum {
 #define pgrm_CleanUp()
 #define memset_fast memset
 
+#ifdef __cplusplus
+}
+#endif
+    
 #endif
 
