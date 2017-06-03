@@ -10,6 +10,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Initizalize to use custom interrupts
  * @note Saves status of current interrupt state
@@ -73,5 +77,9 @@ asm("halt")
 #define int_LatchConfig     (*(uint24_t*)0x0F0000C)          /**< Latchable interrupt signals       */
 #define int_InvertConfig    (*(uint24_t*)0x0F00010)          /**< Invertable interrupt signals      */
 #define int_Acknowledge     (*(uint24_t*)0x0F00008)          /**< Acknowledge interrupt signals     */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

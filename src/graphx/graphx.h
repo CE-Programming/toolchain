@@ -13,6 +13,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Defines an image type with which to create sprites
  */
@@ -1092,5 +1096,9 @@ void gfx_LZDecompress(uint8_t *in, uint8_t *out, unsigned int in_size);
 
 #define gfx_lcdWidth    (320)
 #define gfx_lcdHeight   (240)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

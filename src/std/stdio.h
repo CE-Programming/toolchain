@@ -9,6 +9,10 @@
 #include <stdarg.h>
 #include <format.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define L_tmpnam  12
 #define SEEK_CUR  1
 #define SEEK_END  2
@@ -33,5 +37,9 @@ typedef unsigned int size_t;
 int sprintf(char *s, const char *format, ...);
 int vprintf(const char *format, va_list arg);
 int vsprintf(char *s, const char *format, va_list arg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

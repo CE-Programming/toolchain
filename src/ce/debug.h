@@ -6,6 +6,10 @@
 
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * void dbg_sprintf(out, const char*, ...)
  *
@@ -189,4 +193,8 @@ void SetReadWriteWatchpoint(void *address, unsigned length);
 void RemoveWatchpoint(void *address);
 void RemoveAllWatchpoints(void);
 void RemoveAllBreakpoints(void);
+
+#ifdef __cplusplus
+}
+#endif
 

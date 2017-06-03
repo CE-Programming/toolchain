@@ -9,6 +9,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _PTR_
 #define _PTR_ *
 #endif
@@ -97,4 +101,9 @@ extern char _PTR_ _u_dtoe(double);
 
 extern void _u_flt_info(double,struct flt_info _PTR_);
 extern void _u_flt_rnd(struct flt_info _PTR_ , char);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

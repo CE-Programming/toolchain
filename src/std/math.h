@@ -6,6 +6,10 @@
 #ifndef MATH_H
 #define MATH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern double _huge_val;
 #define HUGE_VAL _huge_val	                   /* overflow error */
 
@@ -55,5 +59,9 @@ int finite(double n);
 
 double tgamma(double x);
 double log2(double x);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

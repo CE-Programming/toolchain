@@ -11,6 +11,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @returns True if the usb bus line is powered, i.e. connected to a another calc
  */
@@ -40,5 +44,9 @@ void usb_EnableTimers(void);
  * Resets the usb timer interrupt (timer 3)
  */
 void usb_ResetTimers(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

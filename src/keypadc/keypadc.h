@@ -11,6 +11,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint8_t kb_key_t;   ///< Normal key type
 typedef uint16_t kb_lkey_t; ///< Long key type
 
@@ -242,5 +246,9 @@ typedef enum {
 #define kb_group_5 5
 #define kb_group_6 6
 #define kb_group_7 7
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

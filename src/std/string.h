@@ -6,6 +6,10 @@
 #ifndef STRING_H
 #define STRING_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SIZE_T_DEFINED
 #define SIZE_T_DEFINED
 typedef unsigned int size_t;
@@ -38,5 +42,8 @@ int strncmp(const char *, const char *, size_t);
 int strcasecmp(const char *, const char *);
 int strncasecmp(const char *, const char *, size_t);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif

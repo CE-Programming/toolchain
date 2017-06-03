@@ -13,6 +13,10 @@
 #include <stdio.h>
 #include <tice.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Varible and flag definitions */
 #define TI_PRGM_TYPE            (0x05)
 #define TI_PPRGM_TYPE           (0x06)
@@ -434,6 +438,10 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_ProtectedProgram    TI_PPRGM_TYPE
 #define ti_TempProgram         TI_TPRGM_TYPE
 #define ti_AppVar              TI_APPVAR_TYPE
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
