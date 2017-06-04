@@ -10,17 +10,14 @@
   },
   "sequence": [
     "action|launch",
-    "delay|800",
-    "hash|1",
+    "hashWait|1",
     "delay|100",
     "key|right",
     "key|right",
     "key|down",
     "key|down",
-    "delay|100",
-    "hash|2",
+    "hashWait|2",
     "key|enter",
-    "delay|200",
     "hashWait|3"
   ],
   "hashes": {
@@ -28,19 +25,19 @@
       "description": "Initial sprite map state (top left)",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "A03E20B2" ]
+      "expected_CRCs": [ "5BD329" ]
     },
     "2": {
       "description": "Moving a bit to the bottom right",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "4A0831CE" ]
+      "expected_CRCs": [ "CE4327FB" ]
     },
     "3": {
       "description": "Back to the home screen (exit check)",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44" ]
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "43BF8092", "5ACF1C01" ]
     }
   }
 }

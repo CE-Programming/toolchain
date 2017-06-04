@@ -14,6 +14,7 @@ install:
 
 script:
 # Build toolchain and libs
+  - export WINEDEBUG=-all
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
