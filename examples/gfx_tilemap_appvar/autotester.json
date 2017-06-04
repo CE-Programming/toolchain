@@ -1,7 +1,7 @@
 {
   "rom": "84pce_515.rom",
   "transfer_files": [
-    "bin/DEMO.8xp"
+    "bin/DEMO.8xp",
     "src/gfx/var_gfx.8xv"
   ],
   "target": {
