@@ -29,6 +29,9 @@ WINCHKDIR  = if not exist
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
+AS         = $(call NATIVEPATH,$(BIN)/ez80asm.exe)
+LD         = $(call NATIVEPATH,$(BIN)/ez80link.exe)
+CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 CD         = cd
 CP         = copy /y
 CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
@@ -43,7 +46,9 @@ WINRELPATH = $(subst /,\,$(1))
 RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
-ADDWINE    = wine$(space)
+AS         = $(call NATIVEPATH,wine $(BIN)/ez80asm.exe)
+LD         = $(call NATIVEPATH,wine $(BIN)/ez80link.exe)
+CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
 CD         = cd
 CP         = cp
 CV         = $(call NATIVEPATH,$(BIN)/convhex)
@@ -52,10 +57,6 @@ RMDIR      = rm -rf
 MKDIR      = mkdir -p
 TESTDIR    = test -d $(1)
 endif
-
-AS        ?= $(call NATIVEPATH,$(ADDWINE)$(BIN)/ez80asm.exe)
-LD        ?= $(call NATIVEPATH,$(ADDWINE)$(BIN)/ez80link.exe)
-CC        ?= $(call NATIVEPATH,$(ADDWINE)$(BIN)/ez80cc.exe)
 
 # generate the default names for input and object files
 TARGETHEX     := $(TARGET).hex
