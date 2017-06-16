@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 extern uint8_t ubuntu_data[1026];
-#define ubuntu ((gfx_image_t*)ubuntu_data)
+#define ubuntu ((gfx_sprite_t*)ubuntu_data)
 extern uint16_t logo_gfx_pal[190];
 
 #endif

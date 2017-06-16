@@ -1,11 +1,7 @@
-/************************************************************************/
-/*									*/
-/*			Copyright (C)1987-2008 by				*/
-/*		            Zilog, Inc.           			*/
-/*									*/
-/*		        San Jose, California     			*/
-/*									*/
-/************************************************************************/
+/*************************************************
+ *  Copyright (C) 1999-2008 by  Zilog, Inc.
+ *  All Rights Reserved
+ *************************************************/
 #include <format.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -24,11 +20,6 @@
 *	-1 if an error occured.
 *
 *************************************************/
-int vsprintf(char *string,char *fmt,va_list args)
-{
-#ifndef _MULTI_THREAD
-  return(_u_print(string,fmt,args));
-#else
-  return(_mt_sprint(string,fmt,args));
-#endif
+int vsprintf(char *string,char *fmt,va_list args) {
+    return(_u_print(string, fmt, args));
 }

@@ -143,9 +143,9 @@ clean-keypadc:
 # libload rules
 #----------------------------
 libload: $(SPASM)
-	cd $(call NATIVEPATH,src/libload) && $(SPASM) -E -Z -I $(call NATIVEPATH,../include) libload.asm LibLoad.8xv
+	cd $(call NATIVEPATH,src/sub/libload) && $(SPASM) -E -Z -I $(call NATIVEPATH,../../include) libload.asm LibLoad.8xv
 clean-libload:
-	$(RM) $(call NATIVEPATH,src/libload/LibLoad.8xv)
+	$(RM) $(call NATIVEPATH,src/sub/libload/LibLoad.8xv)
 #----------------------------
 
 #----------------------------
@@ -180,7 +180,7 @@ install: $(DIRS) chmod
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compat) $(call NATIVEPATH,$(INSTALLINC))
+	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/sub/compat) $(call NATIVEPATH,$(INSTALLINC))
 	
 $(DIRS):
 	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLBIN)) $(MKDIR) $(INSTALLBIN)
@@ -205,7 +205,7 @@ dist-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/graphx/GRAPHX.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
 	$(CP) $(call NATIVEPATH,src/fileioc/FILEIOC.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
 	$(CP) $(call NATIVEPATH,src/keypadc/KEYPADC.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
-	$(CP) $(call NATIVEPATH,src/libload/LibLoad.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
+	$(CP) $(call NATIVEPATH,src/sub/libload/LibLoad.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
 clibraries:
 	$(WINNCHKDIR) $(call WINCHKPATH,clibraries) $(MKDIR) clibraries
 #----------------------------

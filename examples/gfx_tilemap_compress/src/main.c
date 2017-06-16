@@ -31,7 +31,7 @@
 extern uint8_t tilemap_map[];
 
 /* Place to hold decompressed tile pointers */
-gfx_image_t *tileset_tiles[128];
+gfx_sprite_t *tileset_tiles[128];
 
 /* Put all your code here */
 void main(void) {
@@ -39,7 +39,7 @@ void main(void) {
     uint8_t i;
     unsigned int x_offset = 0;
     unsigned int y_offset = 0;
-    gfx_image_t *tmp_ptr;
+    gfx_sprite_t *tmp_ptr;
     gfx_tilemap_t tilemap;
 
     /* For linking purposes */

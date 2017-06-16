@@ -9,8 +9,8 @@
 #define var_gfx_num 3
 
 extern uint8_t *var_gfx[3];
-#define ubuntu ((gfx_image_t*)var_gfx[0])
-#define mint ((gfx_image_t*)var_gfx[1])
+#define ubuntu ((gfx_sprite_t*)var_gfx[0])
+#define mint ((gfx_sprite_t*)var_gfx[1])
 
 bool var_gfx_init(void);
 #define sizeof_all_gfx_pal 512

@@ -24,7 +24,7 @@ typedef struct {
     uint8_t width;   /**< Width of the image  */
     uint8_t height;  /**< Height of the image */
     uint8_t data[1]; /**< Image data array    */
-} gfx_image_t;
+} gfx_sprite_t;
 
 /**
  * @brief A simple structure for working with 2D points
@@ -52,7 +52,7 @@ typedef enum {
  * @param height Height of the requested sprite
  * @param malloc_routine Routine used to allocate memory
  */
-gfx_image_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine);
+gfx_sprite_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine);
 
 /**
  * Allocates memory for a sprite
@@ -76,7 +76,7 @@ gfx_AllocSprite(width, height, (void*)malloc)
  */
 #define gfx_UninitedSprite(name, max_width, max_height) \
 uint8_t name##_data[2 + (max_width) * (max_height)]; \
-gfx_image_t *name = (gfx_image_t *)name##_data
+gfx_sprite_t *name = (gfx_sprite_t *)name##_data
                         
 /**
  * Allocates memory for a sprite
@@ -89,7 +89,7 @@ gfx_image_t *name = (gfx_image_t *)name##_data
  */
 #define gfx_TempSprite(name, width, height) \
 uint8_t name##_data[2 + (width) * (height)] = { (width), (height) }; \
-gfx_image_t *name = (gfx_image_t *)name##_data
+gfx_sprite_t *name = (gfx_sprite_t *)name##_data
 
 /**
  * Initializes the graphics library setup
@@ -150,7 +150,7 @@ typedef struct {
  */
 typedef struct {
     uint8_t *map;            /**< Pointer to indexed map array */
-    gfx_image_t **tiles;     /**< Pointer to tiles */
+    gfx_sprite_t **tiles;     /**< Pointer to tiles */
     uint8_t tile_height;     /**< Individual tile height */
     uint8_t tile_width;      /**< Individual tile width */
     uint8_t draw_height;     /**< Number of tiles per row to draw */
@@ -781,7 +781,7 @@ uint8_t gfx_SetTextTransparentColor(uint8_t color);
  * @param x X coordinate
  * @param y Y coordinate
  */
-void gfx_Sprite(gfx_image_t *sprite, int x, int y);
+void gfx_Sprite(gfx_sprite_t *sprite, int x, int y);
 
 /**
  * Draws an unclipped sprite
@@ -790,7 +790,7 @@ void gfx_Sprite(gfx_image_t *sprite, int x, int y);
  * @param x X coordinate
  * @param y Y coordinate
  */
-void gfx_Sprite_NoClip(gfx_image_t *sprite, uint24_t x, uint8_t y);
+void gfx_Sprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y);
 
 /**
  * Draws a transparent sprite
@@ -799,7 +799,7 @@ void gfx_Sprite_NoClip(gfx_image_t *sprite, uint24_t x, uint8_t y);
  * @param x X coordinate
  * @param y Y coordinate
  */
-void gfx_TransparentSprite(gfx_image_t *sprite, int x, int y);
+void gfx_TransparentSprite(gfx_sprite_t *sprite, int x, int y);
 
 /**
  * Draws an unclipped transparent sprite
@@ -808,7 +808,7 @@ void gfx_TransparentSprite(gfx_image_t *sprite, int x, int y);
  * @param x X coordinate
  * @param y Y coordinate
  */
-void gfx_TransparentSprite_NoClip(gfx_image_t *sprite, uint24_t x, uint8_t y);
+void gfx_TransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y);
 
 /**
  * Grab the background behind a sprite
@@ -820,7 +820,7 @@ void gfx_TransparentSprite_NoClip(gfx_image_t *sprite, uint24_t x, uint8_t y);
  * @returns A pointer to sprite_buffer
  * @note sprite_buffer must be pointing to a large enough buffer to hold width*height number of bytes
  */
-gfx_image_t *gfx_GetSprite(gfx_image_t *sprite_buffer, int x, int y);
+gfx_sprite_t *gfx_GetSprite(gfx_sprite_t *sprite_buffer, int x, int y);
 
 /**
  * Grab the background behind an unclipped sprite
@@ -846,7 +846,7 @@ gfx_GetSprite((sprite_buffer), (x), (y))
  * @param height_scale Height scaling factor
  * @note Useable with gfx_GetSprite in order to create clipped versions
  */
-void gfx_ScaledSprite_NoClip(gfx_image_t *sprite, int x, int y, uint8_t width_scale, uint8_t height_scale);
+void gfx_ScaledSprite_NoClip(gfx_sprite_t *sprite, int x, int y, uint8_t width_scale, uint8_t height_scale);
 
 /**
  * Scale an unclipped transparent sprite
@@ -859,7 +859,7 @@ void gfx_ScaledSprite_NoClip(gfx_image_t *sprite, int x, int y, uint8_t width_sc
  * @param height_scale Height scaling factor
  * @note Useable with gfx_GetSprite in order to create clipped versions
  */
-void gfx_ScaledTransparentSprite_NoClip(gfx_image_t *sprite, int x, int y, uint8_t width_scale, uint8_t height_scale);
+void gfx_ScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, int x, int y, uint8_t width_scale, uint8_t height_scale);
 
 /**
  * Flips a sprite along the X axis
@@ -869,7 +869,7 @@ void gfx_ScaledTransparentSprite_NoClip(gfx_image_t *sprite, int x, int y, uint8
  * @returns A pointer to sprite_out
  * @note sprite_in and sprite_out cannot be the same
  */
-gfx_image_t *gfx_FlipSpriteX(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
+gfx_sprite_t *gfx_FlipSpriteX(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
  * Flips a sprite along the Y axis
@@ -879,7 +879,7 @@ gfx_image_t *gfx_FlipSpriteX(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
  * @returns A pointer to sprite_out
  * @note sprite_in and sprite_out cannot be the same
  */
-gfx_image_t *gfx_FlipSpriteY(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
+gfx_sprite_t *gfx_FlipSpriteY(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
  * Rotates a sprite 90 degrees clockwise
@@ -889,7 +889,7 @@ gfx_image_t *gfx_FlipSpriteY(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
  * @returns A pointer to sprite_out
  * @note sprite_in and sprite_out cannot be the same
  */
-gfx_image_t *gfx_RotateSpriteC(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
+gfx_sprite_t *gfx_RotateSpriteC(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
  * Rotates a sprite 90 degrees counter clockwise
@@ -899,7 +899,7 @@ gfx_image_t *gfx_RotateSpriteC(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
  * @returns A pointer to sprite_out
  * @note sprite_in and sprite_out cannot be the same
  */
-gfx_image_t *gfx_RotateSpriteCC(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
+gfx_sprite_t *gfx_RotateSpriteCC(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
  * Rotates a sprite 180 degrees
@@ -908,7 +908,7 @@ gfx_image_t *gfx_RotateSpriteCC(gfx_image_t *sprite_in, gfx_image_t *sprite_out)
  * @param sprite_out Pointer to where rotated sprite will be stored
  * @returns A pointer to sprite_out
  */
-gfx_image_t *gfx_RotateSpriteHalf(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
+gfx_sprite_t *gfx_RotateSpriteHalf(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
  * Resizes a sprite to new dimensions
@@ -918,7 +918,7 @@ gfx_image_t *gfx_RotateSpriteHalf(gfx_image_t *sprite_in, gfx_image_t *sprite_ou
  * @param sprite_out Pointer to where scaled sprite will be stored
  * @returns A pointer to sprite_out
  */
-gfx_image_t *gfx_ScaleSprite(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
+gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
  * Creates a temporary character sprite 
@@ -927,7 +927,7 @@ gfx_image_t *gfx_ScaleSprite(gfx_image_t *sprite_in, gfx_image_t *sprite_out);
  * operations on characters. The sprite returned is always 8x8 pixels.
  * @param c Character to generate
  */
-gfx_image_t *gfx_GetSpriteChar(char c);
+gfx_sprite_t *gfx_GetSpriteChar(char c);
 
 /**
  * Set the font
@@ -1091,6 +1091,7 @@ void gfx_FloodFill(unsigned int x, uint8_t y, uint8_t color);
 #define gfx_white       0xFF
 
 /* Compatability defines (don't use please) */
+typedef gfx_sprite_t gfx_image_t;
 #define gfx_BlitArea gfx_BlitRectangle
 void gfx_LZDecompress(uint8_t *in, uint8_t *out, unsigned int in_size);
 

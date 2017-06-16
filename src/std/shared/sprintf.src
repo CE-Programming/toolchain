@@ -1,6 +1,7 @@
 	.def	_sprintf
 	.assume adl=1
 
-; int sprintf ( char * str, const char * format, ... );
+; int sprintf (char * str, const char * format, ...);
 
 _sprintf	equ 0000BCh
+

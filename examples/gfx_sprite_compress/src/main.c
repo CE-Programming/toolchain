@@ -17,7 +17,7 @@
 /* Put all your code here */
 void main(void) {
     /* Define our sprite */
-    gfx_image_t *apple;
+    gfx_sprite_t *apple;
     
     /* This is just here so that the malloc function is compiled into the binary */
     malloc(0);
