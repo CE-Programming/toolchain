@@ -1,8 +1,8 @@
-### GraphX/KeypadC Partial Redraw
+### GraphX/KeypadC Sprite with Keys
 
-Demonstrates using partial redraw with the GraphX library.
+Demonstrates using the GraphX and KeypadC library together to move a sprite
 
-![Screenshot](screenshot.png)
+![Screenshot](screenshot.gif)
 
 ---
 
