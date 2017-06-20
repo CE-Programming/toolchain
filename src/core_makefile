@@ -20,8 +20,8 @@ empty :=
 space := $(empty) $(empty)
 comma := $(empty),$(empty)
 
-TARGET ?= NAME
-ICONPNG ?= ICON
+TARGET ?= $(NAME)
+ICONPNG ?= $(ICON)
 
 BSSHEAP_LOW  := D031F6
 BSSHEAP_HIGH := D13FD6
