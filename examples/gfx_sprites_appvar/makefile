@@ -13,7 +13,7 @@ COMPRESSED  ?= NO
 ICON        ?= iconc.png
 DESCRIPTION ?= "C SDK Demo"
 
-L ?= graphx
+L ?= graphx fileioc
 
 # ----------------------------
 # Specify source and output locations
