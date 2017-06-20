@@ -20,6 +20,14 @@ empty :=
 space := $(empty) $(empty)
 comma := $(empty),$(empty)
 
+TARGET ?= NAME
+ICONPNG ?= ICON
+
+BSSHEAP_LOW  := D031F6
+BSSHEAP_HIGH := D13FD6
+STACK_HIGH   := D1A87E
+INIT_LOC     := D1A87F
+
 ifeq ($(OS),Windows_NT)
 SHELL     := cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
@@ -55,7 +63,6 @@ CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
 RMDIR      = rm -rf
 MKDIR      = mkdir -p
-TESTDIR    = test -d $(1)
 endif
 
 # generate the default names for input and object files

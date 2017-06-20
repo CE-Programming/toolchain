@@ -9,6 +9,7 @@
 
 	.ref	_main
 	.ref	__low_bss
+	.ref	__len_bss
 
 	.def	_errno
 	.def	_init
@@ -40,7 +41,7 @@ _init:
 	call	0020848h	; _RunInicOff, assumes iy=flags
 	di
 	ld	hl,__low_bss
-	ld	bc,010DE2h      ; maximum size of BSS+Heap
+	ld	bc,__len_bss    ; BSS byte size
 	call	00210DCh        ; _MemClear, handles __low_bss of 0 which is nice
 	push	iy
 	ld	hl,0E00005h

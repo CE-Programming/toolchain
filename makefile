@@ -48,7 +48,7 @@ CONVHEXDIR := $(call NATIVEPATH,$(TOOLSDIR)/convhex)
 CONVPNGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convpng)
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
-ASMDIR     := $(call NATIVEPATH,$(SRCDIR)/asm)
+STARTDIR   := $(call NATIVEPATH,$(SRCDIR)/startup)
 
 SPASM      := $(call NATIVEPATH,$(SPASMDIR)/spasm)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
@@ -74,9 +74,9 @@ INSTALLLIB := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib)
 DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
-all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc libload ce std asm
+all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc libload ce std startup
 
-clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-asm
+clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(SPASMDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
@@ -149,12 +149,12 @@ clean-libload:
 #----------------------------
 
 #----------------------------
-# asm rules
+# startup rules
 #----------------------------
-asm:
-	$(MAKE) -C $(ASMDIR) BIN=$(BIN)
-clean-asm:
-	$(MAKE) -C $(ASMDIR) clean
+startup:
+	$(MAKE) -C $(STARTDIR) BIN=$(BIN)
+clean-startup:
+	$(MAKE) -C $(STARTDIR) clean
 #----------------------------
 
 #----------------------------
@@ -169,8 +169,8 @@ uninstall:
 #----------------------------
 install: $(DIRS) chmod
 	$(CP_EXMPLS)
-	$(CP) $(call NATIVEPATH,$(SRCDIR)/asm/*.obj) $(call NATIVEPATH,$(INSTALLLIB))
-	$(CP) $(call NATIVEPATH,$(SRCDIR)/example_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
+	$(CP) $(call NATIVEPATH,$(SRCDIR)/startup/*.obj) $(call NATIVEPATH,$(INSTALLLIB))
+	$(CP) $(call NATIVEPATH,$(SRCDIR)/core_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
 	$(CP) $(SPASM) $(INSTALLBIN)
 	$(CP) $(CONVHEX) $(INSTALLBIN)
 	$(CP) $(CONVPNG) $(INSTALLBIN)
