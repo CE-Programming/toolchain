@@ -1,0 +1,96 @@
+	.assume adl=1
+	.def _delay
+
+mpTmrRange		equ 0F20000h
+
+tmr2Counter		equ 10h
+tmr2Load		equ 14h
+tmr2Match1		equ 18h
+tmr2Match2		equ 1Ch
+
+tmrCtrl			equ 30h
+
+bTmr2Enable		equ 3
+tmr2Enable		equ 1<<bTmr2Enable
+bTmr2Crystal		equ 4
+tmr2Crystal		equ 1<<bTmr2Crystal
+bTmr2Overflow		equ 5
+tmr2Overflow		equ 1<<bTmr2Overflow
+bTmr2CountUp		equ 10
+tmr2CountUp		equ 1<<bTmr2CountUp
+
+; void delay(uint16_t millis);
+
+_delay:
+; Read argument.
+	pop	de
+	ex	(sp),hl			; hl = millis
+	push	de
+; Abort ASAP if millis == 0.
+	ld	a,h
+	or	a,l
+	ret	z
+; Set up timer 2 control bits: disabled, CPU clock, no interrupt, count down.
+	ld	iy,mpTmrRange
+	ld	bc,(iy+tmrCtrl)		; note: bcu = 0
+	ld	a,c
+	and	a,~(tmr2Enable|tmr2Crystal|tmr2Overflow)
+	ld	c,a
+	res	bTmr2CountUp-8,b
+	ld	(iy+tmrCtrl),bc
+; Convert millis to CPU cycles by multiplying by 48000.
+	ld	b,h
+	ld	c,l			; bc = millis
+	srl	b
+	rr	c			; bc = millis/2 = millis*(48000&0FFh)>>8
+	ld	e,l
+	ld	d,48000>>8		; 48000/256 == 187.5
+	ld	l,d
+	mlt	de			; de = (millis&0FFh)*(48000>>8)
+	mlt	hl			; hl = (millis>>8)*(48000>>8)
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl			; hl = (millis&0FF00h)*(48000>>8)
+	add	hl,de			; hl = millis*(48000>>8)
+	add	hl,bc			; hl = millis*48000>>8
+; Offset overhead and the unknown counter low byte.
+; Assume unknown counter low byte is quite high from a previous delay call.
+; These instructions are not included in cc counts.
+	dec	hl
+	dec	hl
+	dec	hl			; hl = (millis*48000>>8)-3
+; Set up timer 2 counter, match, and reload values.
+	ld	(iy+tmr2Counter+1),hl	; counter = millis*48000-768+0xxh
+	ld	a,-1
+	ld	(iy+tmr2Match1+3),a	; match1 = 0FFxxxxxxh
+	ld	(iy+tmr2Match2+3),a	; match2 = 0FFxxxxxxh
+	dec	a
+	ld	(iy+tmr2Load+3),a	; reload = 0FExxxxxxh
+; Enable timer 2.
+	lea	hl,iy+tmrCtrl		; hl = mpTmrCtrl
+	set	bTmr2Enable,(hl)
+; Wait until timer 2 expires (underflows).
+; Will catch the underflow if not interrupted for a continuous period of
+; ((254-188)<<24)/48000000 ~ 23.1s.
+	ld	a,1+((0FFFFh*24000<<1)-12>>24) ; = 188
+; 358 cc up to this point
+_delay_wait:
+	cp	a,(iy+tmr2Counter+3)
+	jr	nc,_delay_wait
+; 12-41 cc to exit waitloop
+; Disable timer 2.
+	res	bTmr2Enable,(hl)
+; Done.
+	ret
+; ~420 cc up to this point
+; caller overhead:
+;	ld	bc,millis
+;	push	bc
+;	call	_delay
+;	pop	bc
+; ~484 cc total
