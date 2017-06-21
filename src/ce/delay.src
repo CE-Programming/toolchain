@@ -24,67 +24,70 @@ tmr2CountUp		equ 1<<bTmr2CountUp
 _delay:
 ; Read argument.
 	pop	de
-	ex	(sp),hl			; hl = millis
+	ex	(sp),hl			; 0hl = millis
 	push	de
 ; Abort ASAP if millis == 0.
 	ld	a,h
 	or	a,l
 	ret	z
-; Set up timer 2 control bits: disabled, CPU clock, no interrupt, count down.
-	ld	iy,mpTmrRange
-	ld	bc,(iy+tmrCtrl)		; note: bcu = 0
-	ld	a,c
-	and	a,~(tmr2Enable|tmr2Crystal|tmr2Overflow)
-	ld	c,a
-	res	bTmr2CountUp-8,b
-	ld	(iy+tmrCtrl),bc
 ; Convert millis to CPU cycles by multiplying by 48000.
+; Subtract 2 to offset overhead and the unknown counter low byte.
 	ld	b,h
-	ld	c,l			; bc = millis
+	ld	c,l			; 0bc = millis
+	dec.s	bc			; bc = millis-1; need to set bcu = 0
 	srl	b
-	rr	c			; bc = millis/2 = millis*(48000&0FFh)>>8
+	rr	c			; bc = (millis-1)>>1
+					;    = millis*(48000&0FFh)>>8,
+					;      off by -1 or -0.5
 	ld	e,l
 	ld	d,48000>>8		; 48000/256 == 187.5
 	ld	l,d
 	mlt	de			; de = (millis&0FFh)*(48000>>8)
 	mlt	hl			; hl = (millis>>8)*(48000>>8)
+	dec	hl
 	push	hl
 	dec	sp
 	pop	hl
 	inc	sp
-	ld	l,0			; hl = (millis&0FF00h)*(48000>>8)
-	add	hl,de			; hl = millis*(48000>>8)
-	add	hl,bc			; hl = millis*48000>>8
-; Offset overhead and the unknown counter low byte.
-; Assume unknown counter low byte is quite high from a previous delay call.
-; These instructions are not included in cc counts.
-	dec	hl
-	dec	hl
-	dec	hl			; hl = (millis*48000>>8)-3
+	ld	l,-2			; hl = (millis&0FF00h)*(48000>>8)-2
+	add	hl,de			; hl = millis*(48000>>8)-2
+	add	hl,bc			; hl ~ (millis*48000>>8)-3
+; Set up timer 2 control bits: disabled, CPU clock, no interrupt, count down.
+	ex	de,hl			; de ~ (millis*48000>>8)-3
+	ld	hl,mpTmrRange+tmrCtrl
+	res	bTmr2Enable,(hl)
+	res	bTmr2Crystal,(hl)
+	res	bTmr2Overflow,(hl)
+	inc	hl
+	res	bTmr2CountUp-8,(hl)
 ; Set up timer 2 counter, match, and reload values.
-	ld	(iy+tmr2Counter+1),hl	; counter = millis*48000-768+0xxh
-	ld	a,-1
-	ld	(iy+tmr2Match1+3),a	; match1 = 0FFxxxxxxh
-	ld	(iy+tmr2Match2+3),a	; match2 = 0FFxxxxxxh
-	dec	a
-	ld	(iy+tmr2Load+3),a	; reload = 0FExxxxxxh
+	ld	l,tmr2Counter+1
+	ld	(hl),de			; counter = millis*48000-768+0xxh
+	ld	l,tmr2Match1+3
+	ld	(hl),0FFh		; match1 = 0FFxxxxxxh
+	ld	l,tmr2Match2+3
+	ld	(hl),0FFh		; match2 = 0FFxxxxxxh
+	ld	l,tmr2Load+3
+	ld	(hl),0FEh		; reload = 0FExxxxxxh
 ; Enable timer 2.
-	set	bTmr2Enable,(iy+tmrCtrl)
+	ld	l,tmrCtrl
+	set	bTmr2Enable,(hl)
 ; Wait until timer 2 expires (underflows).
 ; Will catch the underflow if not interrupted for a continuous period of
 ; ((254-188)<<24)/48000000 ~ 23.1s.
+	ld	l,tmr2Counter+3
 	ld	a,1+((0FFFFh*24000<<1)-12>>24) ; = 188
-; 351 cc up to this point
+; 380 cc up to this point
 _delay_wait:
-	cp	a,(iy+tmr2Counter+3)
+	cp	a,(hl)
 	jr	nc,_delay_wait
-; 12-41 cc to exit waitloop
+; 12-29 cc to exit waitloop
 ; Done.
 	ret
-; ~413 cc up to this point
+; ~421 cc up to this point
 ; caller overhead:
 ;	ld	bc,millis
 ;	push	bc
 ;	call	_delay
 ;	pop	bc
-; ~477 cc total
+; ~485 cc total
