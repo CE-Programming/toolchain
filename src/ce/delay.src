@@ -48,14 +48,11 @@ _delay:
 	ld	l,d
 	mlt	de			; de = (millis&0FFh)*(48000>>8)
 	mlt	hl			; hl = (millis>>8)*(48000>>8)
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl			; hl = (millis&0FF00h)*(48000>>8)
+	push	hl
+	dec	sp
+	pop	hl
+	inc	sp
+	ld	l,0			; hl = (millis&0FF00h)*(48000>>8)
 	add	hl,de			; hl = millis*(48000>>8)
 	add	hl,bc			; hl = millis*48000>>8
 ; Offset overhead and the unknown counter low byte.
@@ -78,7 +75,7 @@ _delay:
 ; Will catch the underflow if not interrupted for a continuous period of
 ; ((254-188)<<24)/48000000 ~ 23.1s.
 	ld	a,1+((0FFFFh*24000<<1)-12>>24) ; = 188
-; 358 cc up to this point
+; 368 cc up to this point
 _delay_wait:
 	cp	a,(iy+tmr2Counter+3)
 	jr	nc,_delay_wait
@@ -87,10 +84,10 @@ _delay_wait:
 	res	bTmr2Enable,(hl)
 ; Done.
 	ret
-; ~420 cc up to this point
+; ~430 cc up to this point
 ; caller overhead:
 ;	ld	bc,millis
 ;	push	bc
 ;	call	_delay
 ;	pop	bc
-; ~484 cc total
+; ~494 cc total
