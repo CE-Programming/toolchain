@@ -40,9 +40,13 @@ _init:
 
 	call	0020848h	; _RunInicOff, assumes iy=flags
 	di
-	ld	hl,__low_bss
 	ld	bc,__len_bss    ; BSS byte size
-	call	00210DCh        ; _MemClear, handles __low_bss of 0 which is nice
+	sbc	hl,hl
+	adc	hl,bc
+	jr	z,__no_bss
+	ld	hl,__low_bss
+	call	00210DCh        ; _MemClear
+__no_bss:
 	push	iy
 	ld	hl,0E00005h
 	push	hl
