@@ -41,12 +41,12 @@ _init:
 	call	0020848h	; _RunInicOff, assumes iy=flags
 	di
 	ld	bc,__len_bss    ; BSS byte size
-	sbc	hl,hl
-	adc	hl,bc
-	jr	z,__no_bss
-	ld	hl,__low_bss
-	call	00210DCh        ; _MemClear
-__no_bss:
+	ld	hl,__low_bss    ; BSS low address
+	push	bc
+	push	hl
+	call	0000B0h        ; _memclear
+	pop	hl
+	pop	hl
 	push	iy
 	ld	hl,0E00005h
 	push	hl
