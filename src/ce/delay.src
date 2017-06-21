@@ -69,25 +69,22 @@ _delay:
 	dec	a
 	ld	(iy+tmr2Load+3),a	; reload = 0FExxxxxxh
 ; Enable timer 2.
-	lea	hl,iy+tmrCtrl		; hl = mpTmrCtrl
-	set	bTmr2Enable,(hl)
+	set	bTmr2Enable,(iy+tmrCtrl)
 ; Wait until timer 2 expires (underflows).
 ; Will catch the underflow if not interrupted for a continuous period of
 ; ((254-188)<<24)/48000000 ~ 23.1s.
 	ld	a,1+((0FFFFh*24000<<1)-12>>24) ; = 188
-; 368 cc up to this point
+; 351 cc up to this point
 _delay_wait:
 	cp	a,(iy+tmr2Counter+3)
 	jr	nc,_delay_wait
 ; 12-41 cc to exit waitloop
-; Disable timer 2.
-	res	bTmr2Enable,(hl)
 ; Done.
 	ret
-; ~430 cc up to this point
+; ~413 cc up to this point
 ; caller overhead:
 ;	ld	bc,millis
 ;	push	bc
 ;	call	_delay
 ;	pop	bc
-; ~494 cc total
+; ~477 cc total
