@@ -29,10 +29,11 @@ extern "C" {
 /**
  * Delays for a number of milliseconds.
  * <p>
- * Assumes that the CPU clock speed is 48MHz.
- * @param millis number of milliseconds
+ * Counts time spent while interrupted. Assumes a CPU clock speed of 48MHz.
+ *
+ * @param msec number of milliseconds
  */
-void delay(uint16_t millis);
+void delay(uint16_t msec);
 
 /**
  * Gets a combination of the RTC time; useful for srand()
