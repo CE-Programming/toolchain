@@ -11,5 +11,5 @@ void main(void) {
     delay(5000);
     os_SetCursorPos(1, 22);
     os_PutStrFull("Done");
-    delay(1000);
+    delay(100);
 }

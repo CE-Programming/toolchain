@@ -9,23 +9,23 @@
   },
   "sequence": [
     "action|launch",
-    "hashWait|1"
-    "delay|4950",
+    "hashWait|1",
+    "delay|4800",
     "hashWait|2"
   ],
   "hashes": {
     "1": {
-      "description": "10s delay start",
+      "description": "Waiting for 5000 ms...",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "00000000" ]
+      "expected_CRCs": [ "690F0EEC" ]
     },
     "2": {
-      "description": "10s delay end",
+      "description": "Done",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "00000000" ],
-      "timeout": 150
+      "expected_CRCs": [ "948248E" ],
+      "timeout": 250
     }
   }
 }
