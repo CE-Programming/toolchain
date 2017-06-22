@@ -1,6 +1,8 @@
 ### Delay Demo
 
-This demo demonstrates using the delay() function
+Demonstrates using the millisecond delay function in tice.h.
+
+![Screenshot](screenshot.gif)
 
 ---
 
