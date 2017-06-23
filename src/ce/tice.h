@@ -27,6 +27,15 @@ extern "C" {
 ((unsigned)rand() % ((max) - (min) + 1) + (min))
 
 /**
+ * Delays for a number of milliseconds.
+ * <p>
+ * Counts time spent while interrupted. Assumes a CPU clock speed of 48MHz.
+ *
+ * @param msec number of milliseconds
+ */
+void delay(uint16_t msec);
+
+/**
  * Gets a combination of the RTC time; useful for srand()
  */
 #define rtc_Time()              (*(volatile uint32_t*)0xF30044)
@@ -104,7 +113,7 @@ extern "C" {
 #define timer_2_Counter          (*(volatile uint32_t*)0xF20010)
 #define timer_1_ReloadValue      (*(uint32_t*)0xF20004)
 #define timer_2_ReloadValue      (*(uint32_t*)0xF20014)
-#define timer_1_MatchValue_1     (*(uint32_t*)0xF20008) 
+#define timer_1_MatchValue_1     (*(uint32_t*)0xF20008)
 #define timer_1_MatchValue_2     (*(uint32_t*)0xF2000C)
 #define timer_2_MatchValue_1     (*(uint32_t*)0xF20018)
 #define timer_2_MatchValue_2     (*(uint32_t*)0xF2001C)
@@ -144,7 +153,7 @@ extern "C" {
 (240)
 
 /**
- * Total number of pixels in LCD 
+ * Total number of pixels in LCD
  */
 #define LCD_SIZE \
 (LCD_WIDTH*LCD_HEIGHT*2)
@@ -182,7 +191,7 @@ typedef struct { uint16_t len; char data[1]; } equ_t;
  */
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
-/** 
+/**
  * Gets an element from a matrix
  *
  * @param matrix Structure of matrix
@@ -192,12 +201,12 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
  */
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
-/** 
+/**
  * Resets the OS homescreen; accounts for split screen
  */
 #define os_ClrHome() do { _OS(asm_ClrLCD); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
 
-/** 
+/**
  * Resets the OS homescreen fully
  */
 #define os_ClrHomeFull() do { _OS(asm_ClrLCDFull); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
@@ -208,7 +217,7 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
 /**
  * Sets the calculator's date
- * 
+ *
  * Performs checks to ensure date is within range
  * @param day Day to set
  * @param month Month to set
@@ -218,7 +227,7 @@ void boot_SetDate(uint8_t day, uint8_t month, uint16_t year);
 
 /**
  * Gets the calculator's date
- * 
+ *
  * @param day Pointer to variable to store day
  * @param month Pointer to variable to store month
  * @param year Pointer to variable to store year
@@ -227,7 +236,7 @@ void boot_GetDate(uint8_t *day, uint8_t *month, uint16_t *year);
 
 /**
  * Sets the calculator's time
- * 
+ *
  * Performs checks to ensure time is within range
  * @param seconds Seconds to set
  * @param minutes Minutes to set
@@ -237,7 +246,7 @@ void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
 
 /**
  * Gets the calculator's time
- * 
+ *
  * @param seconds Pointer to variable to store seconds
  * @param minutes Pointer to variable to store minutes
  * @param hours Pointer to variable to store hours
@@ -278,7 +287,7 @@ void boot_ClearVRAM(void);
  */
 bool boot_CheckOnPressed(void);
 
-/** 
+/**
  * Basically a reimplemented form of printf that prints to some debugging device
  *
  * @param string String to send to debug device
@@ -444,7 +453,7 @@ uint8_t os_GetFlagByte(int offset);
 
 /**
  * Get amount of free ram in order to allocate extra ram
- * 
+ *
  * @param free Set to start of free available ram
  * @returns Size of available ram
  */
@@ -570,7 +579,7 @@ real_t os_RealSub(const real_t *arg1, const real_t *arg2);
 
 /**
  * Rounds a real_t
- * 
+ *
  * @note digits must be in the range 0 - 9
  */
 real_t os_RealRound(const real_t *arg, char digits);
@@ -628,7 +637,7 @@ int os_RealToStr(char *result, const real_t *arg, int8_t maxLength, uint8_t mode
 
 /**
  *  This converts a ti-ascii string to a ti-float.
- * 
+ *
  *  String format regexp: / *[-\032+]?[0-9]*(\.[0-9]*)?([eE\033][-\032+]?[0-9]*)?/
  *  @param string TI-ascii string to convert
  *  @param end If non-null, pointer to end of parsed number is stored here
@@ -645,7 +654,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 
 /**
  * Gets a key from the OS
- * 
+ *
  * @returns Key code
  * @returns Extended key code in high byte
  */
@@ -664,7 +673,7 @@ typedef uint8_t sk_key_t;
  * const char *chars = "\0\0\0\0\0\0\0\0\0\0\"WRMH\0\0?[VQLG\0\0:ZUPKFC\0 YTOJEB\0\0XSNIDA\0\0\0\0\0\0\0\0";
  * uint8_t key, i = 0;
  * char buffer[50];
- * 
+ *
  * while((key = os_GetCSC()) != sk_Enter) {
  *     if(chars[key]) {
  *         buffer[i++] = chars[key];
@@ -959,7 +968,7 @@ typedef enum {
 #define os_Polar6LineColor   (*(uint8_t*)0xD024ED)
 #define os_SecULineColor     (*(uint8_t*)0xD024EE)
 #define os_SecVLineColor     (*(uint8_t*)0xD024EF)
-#define os_SecWLineColor     (*(uint8_t*)0xD024F0)   
+#define os_SecWLineColor     (*(uint8_t*)0xD024F0)
 
 #define os_AppErr1           ((char*)0xD025A9)             /**< String [1] for custom error */
 #define os_AppErr2           ((char*)0xD025B6)             /**< String [2] for custom error */
@@ -1560,7 +1569,7 @@ typedef enum {
 #define tXmax               0x0B
 #define tYmin               0x0C
 #define tYmax               0x0D
-#define tTmin               0x0E    
+#define tTmin               0x0E
 #define tTmax               0x0F
 #define tThetaMin           0x10
 #define tThetaMax           0x11
@@ -1939,4 +1948,3 @@ typedef enum {
 #endif
 
 #endif
-

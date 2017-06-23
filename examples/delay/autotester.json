@@ -1,0 +1,31 @@
+{
+  "rom": "84pce_515.rom",
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "hashWait|1",
+    "delay|4800",
+    "hashWait|2"
+  ],
+  "hashes": {
+    "1": {
+      "description": "Waiting for 5000 ms...",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "690F0EEC" ]
+    },
+    "2": {
+      "description": "Done",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "948248E" ],
+      "timeout": 250
+    }
+  }
+}
