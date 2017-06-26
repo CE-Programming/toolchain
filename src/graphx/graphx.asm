@@ -386,16 +386,17 @@ _FillScreen:
 ;  arg0 : Color index
 ; Returns:
 ;  None
-	ld	hl,3
-	add	hl,sp
-	ld	a,(hl)                      ; get the color index to use
-	ld	de,(currDrawBuffer)         ; de -> current buffer
-	sbc	hl,hl
-	add	hl,de
-	inc	de
-	ld	(hl),a                      ; store the new color
+	pop	bc
+	ex	(sp),hl			; l = color
+	push	bc
+	ld	a,l			; a = color
+	ld	hl,(currDrawBuffer)	; hl = buffer
+	push	hl
+	pop	de			; de = buffer
+_	ld	(de),a			; *buffer = color
+	inc	de			; de = buffer+1
 	ld	bc,lcdSize-1
-	ldir                                ; fill the screen with color
+	ldir				; fill the rest of the buffer
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -405,11 +406,10 @@ _ZeroScreen:
 ;  None
 ; Returns:
 ;  None
-	ld	hl,$E40000
+	ld	hl,$E40000		; E40000-EFFFFF: reads as 0, 1 waitstate
 	ld	de,(currDrawBuffer)
-	ld	bc,lcdSize
-	ldir
-	ret
+	xor	a,a
+	jr	-_
 
 ;-------------------------------------------------------------------------------
 _SetPalette:
