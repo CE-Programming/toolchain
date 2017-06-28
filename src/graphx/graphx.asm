@@ -4,7 +4,7 @@
  .libraryAppVar     "GRAPHX"          ; Name of library on the calc
  .libraryName       "graphx"          ; Name of library
  .libraryVersion    5                 ; Version information (1-255)
- 
+
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete
 ;-------------------------------------------------------------------------------
@@ -207,7 +207,7 @@ _Lighten:
 	cpl
 	ld	h,a                         ; hl = ~darken(~color, amt) = lighten(color, amt)
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _Darken:
 ; Darkens a 16 bit 1555 color (0 = black, 255 = same color)
@@ -274,7 +274,7 @@ _:                                          ; hl = (green_out & 1 << 15) | (red_
 	pop	bc                          ; bc = blue_out
 	add	hl,bc                       ; hl = color_out
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _SetColor:
 ; Sets the global color index for all routines
@@ -490,10 +490,10 @@ _FillRectangle:
 	ld	hl,(iy+9)                   ; hl = width
 	ld	de,(iy+3)                   ; de = x coordinate
 	add	hl,de
-	ld	(iy+9),hl 
+	ld	(iy+9),hl
 	ld	hl,(iy+12)                  ; hl = height
 	ld	de,(iy+6)                   ; de = y coordinate
-	add	hl,de		
+	add	hl,de
 	ld	(iy+12),hl
 	call	_ClipRectRegion_ASM \.r
 	ret	c                           ; return if offscreen
@@ -1266,7 +1266,7 @@ CohenSutherlandLoop:
 	or	a,a
 	jr	nz,GetOutOutcode
 	or	a,b
-	jp	z,TrivialAccept \.r                             
+	jp	z,TrivialAccept \.r
 GetOutOutcode:                              ; select correct outcode
 	push	af                          ; a = outoutcode
 	rra
@@ -1433,7 +1433,7 @@ _:	ld	(dy),hl \.r
 changeXLoop:
 	push	hl
 	ld	l,a
-	ld	h,lcdWidth/2 
+	ld	h,lcdWidth/2
 	mlt	hl
 	add	hl,hl
 	add	hl,bc
@@ -1470,7 +1470,7 @@ dx1 =$+1
 changeYLoop:
 	push	hl
 	ld	l,a
-	ld	h,lcdWidth/2 
+	ld	h,lcdWidth/2
 	mlt	hl
 	add	hl,hl
 	add	hl,bc
@@ -1602,7 +1602,7 @@ BlitRectDelta_SMC =$+1
 ;-------------------------------------------------------------------------------
 _CheckBlit_ASM:
 	ld	hl,vram+lcdSize
-	ld	de,(mpLcdBase)                 
+	ld	de,(mpLcdBase)
 	or	a,a
 	sbc	hl,de
 	add	hl,de
@@ -2261,7 +2261,7 @@ NoBottomClipNeeded_ASM:
 	ld	hl,(ix+6)                   ; hl = x coordinate
 	jr	nc,NoLeftClip_ASM           ; is partially clipped left?
 	ld	de,(iy+0)                   ; de = tmpWidth
-	add	hl,de					
+	add	hl,de
 	ld	de,(_xmin) \.r
 	ex	de,hl
 	mIsHLLessThanDE()
@@ -2307,7 +2307,7 @@ tmpSpriteWidth =$+1
 	sub	a,(iy+0)                    ; compute new x width
 	scf                                 ; set carry for success
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _TransparentTilemap_NoClip:
 ; Tilemapping subsection
@@ -2338,10 +2338,10 @@ _Tilemap:
 ;      uint8_t x, x_tile, y_tile, y_next;
 ;      uint8_t x_res = x_offset/tilemap->tile_width;
 ;      uint8_t y = y_offset/tilemap->tile_height;
-;      
+;
 ;      x_offset = x_offset%tilemap->tile_width;
 ;      y_offset = y_offset%tilemap->tile_height;
-;      
+;
 ;      y_draw = tilemap->y_loc-y_offset;
 ;      for(y_tile = 0; y_tile <= tilemap->draw_height; y_tile++) {
 ;          x = x_res;
@@ -2379,7 +2379,7 @@ _:	ld	(DrawTile_SMC),hl \.r
 	lea	hl,ix-12
 	ld	sp,hl
 	ld	iy,(ix+6)                   ; iy -> tilemap structure
-	
+
 	ld	hl,(ix+y_offset)
 	ld	c,(iy+t_tile_height)
 	ld	a,(iy+t_type_height)
@@ -2402,7 +2402,7 @@ _:	srl	h
 _height_is_not_pow2:
 	ld	(ix-4),l                    ; y = y_offset / tilemap->tile_height
 	ld	(ix+y_offset),bc            ; y_offset = y_offset % tilemap->tile_height;
-	
+
 	ld	c,(iy+t_tile_width)
 	ld	hl,(ix+x_offset)            ; x offset
 	ld	a,(iy+t_type_width)
@@ -2429,7 +2429,7 @@ _width_is_not_pow2:
 	or	a,a
 	sbc	hl,bc
 	ld	(x_offset_smc),hl \.r       ; x_offset_smc = tilemap->x_loc - x_offset;
-	
+
 	or	a,a
 	sbc	hl,hl
 	ld	l,(iy+14)
@@ -2665,11 +2665,11 @@ _SetTextTransparentColorC:
 	ld	a,(hl)                      ; a = old transparent color
 	ld	(hl),e
 	ld	hl,TTPColor_SMC_2 \.r
-	ld	(hl),e                      
+	ld	(hl),e
 	ld	hl,TTPColor_SMC_3 \.r
 	ld	(hl),e                      ; store new transparent color
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _SetTextXY:
 ; Sets the text X and Y positions
@@ -2691,7 +2691,7 @@ _indcallHL_ASM:
 ; Inputs:
 ;  HL : Address to call
 	jp	(hl)
-	
+
 ;-------------------------------------------------------------------------------
 _PrintStringXY_Clip_ASM:
 ; Places a string at the given coordinates
@@ -2803,7 +2803,7 @@ BothAreOne:
 	inc	a
 	ld	(de),a
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 ; Definitions for gfx_SetTextConfig
 #define TEXT_CLIP   1
@@ -2847,7 +2847,7 @@ SetCharSMC:
 	ld	(TextYPos_SMC),hl \.r
 	ld	(TextXPos_SMC),hl \.r       ; reset the current posistions
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _PrintChar:
 ; Places a character at the current cursor position
@@ -2942,7 +2942,7 @@ _PrintLargeFont_ASM:
 ; This is so that way unscaled font can still be reasonably fast
 ; Returns:
 ;  None
-LargeFontLoop:	
+LargeFontLoop:
 	ld	b,1
 TextHeightScale_SMC =$-1
 	push	hl
@@ -2963,8 +2963,8 @@ TFGColor_SMC_3 =$-1
 _:	cp	a,DEFAULT_TEXT_TP_COLOR     ; check if transparent
 TTPColor_SMC_2 =$-1
 	jr	z,+_
-	
-WScale1:	
+
+WScale1:
 	ld	(de),a
 	inc	de
 	dec	l
@@ -2979,10 +2979,10 @@ WScale2:
 	djnz	---_
 CharDone:
 	ld	de,lcdWidth
-	
+
 	pop	bc
 	djnz	HScale
-	
+
 	pop	hl
 	inc	hl
 	dec	ixl
@@ -2999,9 +2999,9 @@ _PrintChar_Clip_ASM:
 ; Returns:
 ;  None
 	push	hl                          ; save hl pointer if string
-	
+
 	ld	e,a                         ; e = char
-	
+
 	ld	a,(FixedWidthFont_SMC) \.r
 	or	a,a
 	jr	nz,CHasFixedWidth
@@ -3041,10 +3041,10 @@ FONT_HEIGHT_SMC_2 =$+2
 	pop	bc
 	pop	bc
 	pop	bc
-	
+
 	pop	hl                          ; restore hl and stack pointer
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _PrintUInt:
 ; Places an unsigned int at the current cursor position
@@ -3060,7 +3060,7 @@ _PrintUInt:
 _PrintUInt_ASM:
 	ld	a,8
 	sub	a,c
-	ret	c                           ; make sure less than 8 
+	ret	c                           ; make sure less than 8
 	rla
 	rla
 	rla
@@ -3140,7 +3140,7 @@ _:	ld	a,(hl)
 _:	ex	de,hl                       ; return width of string
 	ret
 
-;-------------------------------------------------------------------------------	
+;-------------------------------------------------------------------------------
 _GetCharWidth:
 ; Gets the width of a character
 ; Arguments:
@@ -3253,7 +3253,7 @@ TColor_SMC_4 =$-1
 	dec	iyl
 	jr	nz,GetCharLoop              ; okay we stored the character sprite now draw it
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _SetFontHeight:
 ; Sets the height of the font in pixels
@@ -3269,7 +3269,7 @@ _SetFontHeight:
 	ld	a,(hl)                      ; a = old height
 	ld	(hl),e
 	ld	hl,FONT_HEIGHT_SMC_2 \.r
-	ld	(hl),e                      
+	ld	(hl),e
 	ld	hl,FONT_HEIGHT_SMC_3 \.r
 	ld	(hl),e                      ; store new height
 	ret
@@ -3442,7 +3442,7 @@ t_8:	ld	hl,(ix+12)
 t_12:	ld	hl,(ix-3)
 	ld	de,(ix+18)
 	call	_SignedCompare_ASM \.r
-	jr	c,t_11	
+	jr	c,t_11
 	ld	(ix-3),de
 	jr	t_13
 t_11:	ld	hl,(ix+18)
@@ -4041,7 +4041,7 @@ _ScaleSprite:
 	inc	hl
 	push	hl                          ; hl->src_data
 	push	de                          ; e = src_width
-	call	_UCDivA_ASM \.r             ; ca = dv = (source_height*256)/target_height    
+	call	_UCDivA_ASM \.r             ; ca = dv = (source_height*256)/target_height
 	pop	hl                          ; l = src_width
 	ld	(dv_shl_16+2),a \.r
 	ld	h,c
@@ -4091,7 +4091,7 @@ _:	add	hl,bc
 	pop	hl
 	pop	ix
 	ret
-	
+
 _UCDivA_ASM:
 	sbc	hl,hl
 	ld	h,a
@@ -4238,7 +4238,7 @@ _:	inc	hl
 	dec	bc
 	ld	(iy+3),bc
 	ld	a,(ix-4)
-	neg	
+	neg
 	ld	(iy+7),a
 	lea	iy,iy+8
 ff_badpush0:
@@ -4328,7 +4328,7 @@ ff_badpush1:
 	inc	bc
 	ld	(iy+0),bc
 	ld	a,(ix-4)
-	neg	
+	neg
 	ld	(iy+7),a
 	ld	a,(ix+9)
 	ld	(iy+6),a
@@ -4540,7 +4540,7 @@ _SignedCompareBC_ASM:
 	ret	po
 	ccf
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _SetFullScrnClip_ASM:
 ; Sets the clipping  to the entire screen
@@ -4728,7 +4728,7 @@ DefaultCharSpacing_ASM:
 	.db 8,8,8,8,7,8,8,8,8,8,8,7,3,7,8,8
 	.db 8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
 	.db 8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
- 
+
 ;-------------------------------------------------------------------------------
 DefaultTextData_ASM:
 Char000: .db $00,$00,$00,$00,$00,$00,$00,$00	; .
@@ -4763,7 +4763,7 @@ Char028: .db $00,$00,$C0,$C0,$C0,$FE,$00,$00	; .
 Char029: .db $00,$24,$66,$FF,$66,$24,$00,$00	; .
 Char030: .db $00,$18,$3C,$7E,$FF,$FF,$00,$00	; .
 Char031: .db $00,$FF,$FF,$7E,$3C,$18,$00,$00	; .
-Char032: .db $00,$00,$00,$00,$00,$00,$00,$00	;  
+Char032: .db $00,$00,$00,$00,$00,$00,$00,$00	;
 Char033: .db $C0,$C0,$C0,$C0,$C0,$00,$C0,$00	; !
 Char034: .db $D8,$D8,$D8,$00,$00,$00,$00,$00	; "
 Char035: .db $6C,$6C,$FE,$6C,$FE,$6C,$6C,$00	; #
@@ -4863,7 +4863,7 @@ Char127: .db $00,$10,$38,$6C,$C6,$C6,$FE,$00	; .
 ;-------------------------------------------------------------------------------
 ; Inner library data
 ;-------------------------------------------------------------------------------
- 
+
 _xmin:
 	.dl 0
 _ymin:
@@ -4875,7 +4875,7 @@ _ymax:
 
 tmpWidth:
 	.dl 0,0,0
-	
+
 tmpCharDataSprite:
 	.db 8,8
 tmpCharData:
@@ -4887,5 +4887,5 @@ tmpCharData:
 	.db 0,0,0,0,0,0,0,0
 	.db 0,0,0,0,0,0,0,0
 	.db 0,0,0,0,0,0,0,0
-	
+
  .endLibrary
