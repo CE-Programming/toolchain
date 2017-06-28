@@ -369,14 +369,15 @@ _:	ld	a,b
 	ld	(de),a
 	inc	de
 	ld	a,b
+	rla
+	rla
+	rla
+	ld	a,b
 	rra
 	ld	(de),a
 	inc	de
 	inc	b
 	jr	nz,-_                       ; loop for 256 times to fill palette
-	scf
-	sbc	hl,hl
-	ld	(mpLcdPalette+(255*2)),hl
 	ret
 
 ;-------------------------------------------------------------------------------
