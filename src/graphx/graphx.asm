@@ -3,7 +3,7 @@
 
  .libraryAppVar     "GRAPHX"          ; Name of library on the calc
  .libraryName       "graphx"          ; Name of library
- .libraryVersion    5                 ; Version information (1-255)
+ .libraryVersion    6                 ; Version information (1-255)
 
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete
@@ -104,6 +104,15 @@
  .function "gfx_SetFontHeight",_SetFontHeight
  .function "gfx_ScaleSprite",_ScaleSprite
  .function "gfx_FloodFill",_FloodFill
+;-------------------------------------------------------------------------------
+; v6 functions - Can no longer move/delete
+;-------------------------------------------------------------------------------
+ .function "gfx_RLETSprite",_RLETSprite
+ .function "gfx_RLETSprite_NoClip",_RLETSprite_NoClip
+ .function "gfx_ConvertFromRLETSprite",_ConvertFromRLETSprite
+ .function "gfx_ConvertToRLETSprite",_ConvertToRLETSprite
+ .function "gfx_ConvertToNewRLETSprite",_ConvertToNewRLETSprite
+
 
  .beginDependencies
  .endDependencies
@@ -122,6 +131,7 @@ DEFAULT_TEXT_TP_COLOR   equ 255
 ; Useful Macros
 #define mIsHLLessThanDE() or a,a \ sbc hl,de \ add hl,hl \ jp po,$+5 \.r \ ccf \
 #define mIsHLLessThanBC() or a,a \ sbc hl,bc \ add hl,hl \ jp po,$+5 \.r \ ccf \
+#define s8(x) 1*((x)|(((x)&80h)<<1))
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -313,6 +323,7 @@ _SetTransparentColor:
 	ld	(TColor_SMC_2),a \.r
 	ld	(TColor_SMC_3),a \.r
 	ld	(TColor_SMC_4),a \.r
+	ld	(TColor_SMC_5),a \.r
 	jr	_SetColor_Ret
 
 ;-------------------------------------------------------------------------------
@@ -4376,6 +4387,576 @@ ff_stacktop_smc =$+1
 
 	ld	sp,ix
 	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+_RLETSprite:
+; Draws a sprite with RLE transparency with clipping.
+; Arguments:
+;  arg0 : pointer to sprite structure
+;  arg1 : x-coordinate
+;  arg2 : y-coordinate
+; Returns:
+;  None
+	ld	iy,0
+	lea	bc,iy			; bc = 0
+	add	iy,sp			; iy = frame
+; Clip bottom
+	ld	hl,(iy+3)		; hl = sprite struct
+	ld	c,(hl)			; bc = height
+	ld	hl,(_ymax) \.r		; hl = ymax
+	ld	de,(iy+9)		; de = y
+	sbc	hl,de			; hl = ymax-y
+	ret	m			; m ==> ymax < y || y ~ int_min ==> fully off-screen
+	ret	z			; z ==> ymax == y ==> fully off-screen
+	sbc	hl,bc			; hl = ymax-y-height = -(height off-screen)
+	jr	nc,_RLETSprite_SkipClipBottom ; nc ==> height-off-screen <= 0 ==> fully on-screen
+	add	hl,bc			; hl = ymax-y = height on-screen
+	ld	c,l			; bc = height on-screen
+_RLETSprite_SkipClipBottom:
+; ymax-y did not overflow ==> y-ymin will not overflow
+; Clip top
+	ld	hl,(_ymin) \.r		; hl = ymin
+	ex	de,hl			; de = ymin
+					; hl = y
+	xor	a,a
+	sbc	hl,de			; hl = y-ymin
+	jp	p,_RLETSprite_SkipClipTop \.r ; p ==> y >= ymin ==> fully on-screen
+	add	hl,bc			; hl = y-ymin+height = height on-screen
+	ret	nc			; nc ==> height on-screen < 0 ==> fully off-screen
+	ld	a,l			; a = height on-screen
+	or	a,a
+	ret	z			; z ==> height on-screen == 0 ==> fully off-screen
+	ld	a,c
+	sub	a,l			; a = height off-screen
+	ld	b,a			; b = height off-screen
+	ld	c,l			; c = height on-screen
+	sbc	hl,hl			; y = ymin (after add hl,de)
+_RLETSprite_SkipClipTop:
+	ld	(_RLETSprite_Heights_SMC),bc \.r
+	add	hl,de			; hl = y (clipped)
+	ld	(iy+9),l		; write back clipped y
+; de = ymin => d = deu = 0
+; Clip left
+	ld	hl,(iy+3)		; hl = sprite struct
+	inc	hl
+	ld	e,(hl)			; de = width
+	ld	hl,(iy+6)		; hl = x
+	ld	bc,(_xmin) \.r		; bc = xmin
+	sbc	hl,bc			; hl = x-xmin
+	ret	pe			; v ==> x ~ int_min ==> fully off-screen
+	jp	p,_RLETSprite_SkipClipLeft \.r ; p ==> x >= xmin ==> fully on-screen
+	add	hl,de			; hl = x-xmin+width = width on-screen
+	ret	nc			; nc ==> width on-screen < 0 ==> fully off-screen
+	ld	a,l			; a = width on-screen
+	or	a,a
+	ret	z			; z ==> width on-screen == 0 ==> fully off-screen
+	ld	h,a			; h = width on-screen
+	ld	a,e			; a = width
+	ld	e,h			; de = width on-screen
+	sub	a,l			; a = width - width on-screen = width off-screen
+	ld	(_RLETSprite_ClipLeft_Width_SMC),a \.r
+	inc	d			; d[0] = 1
+	sbc	hl,hl			; x = xmin (after add hl,bc)
+_RLETSprite_SkipClipLeft:
+; x >= xmin ==> x >= 0
+; Clip right
+	add	hl,bc			; hl = x (clipped)
+	ld	(iy+6),hl		; write back clipped x
+	ld	bc,(_xmax) \.r		; bc = xmax
+	sbc	hl,bc			; hl = x-xmax
+	ret	nc			; nc ==> x >= xmax ==> fully off-screen
+	ld	a,d			; a[0] = clip left?
+	ld	d,0			; de = width
+	add	hl,de			; hl = x-xmax+width = width off-screen
+	ld	d,a			; d[0] = clip left?
+	jr	nc,_RLETSprite_SkipClipRight ; nc ==> width off-screen < 0 ==> fully on-screen
+	ld	a,l			; a = width off-screen
+	or	a,a
+	jr	z,_RLETSprite_SkipClipRight ; z ==> width off-screen == 0 ==> fully on-screen
+	ld	(_RLETSprite_ExitRight_Opaque_Width_SMC),a \.r
+	ld	(_RLETSprite_ExitRight_Trans_Width_SMC),a \.r
+	ld	a,e			; a = width
+	sub	a,l			; a = width - width off-screen = width on-screen
+	ld	e,a			; e = width on-screen
+	set	1,d			; d[1] = 1
+_RLETSprite_SkipClipRight:
+; Calculate the pointer to the top-left corner of the sprite in the buffer
+	ld	hl,(currDrawBuffer)
+	ld	bc,(iy+6)		; bc = x (clipped)
+	add	hl,bc
+	ld	c,(iy+9)		; c = y (clipped)
+	ld	b,lcdWidth/2
+	mlt	bc			; bc = y*160
+	add	hl,bc
+	add	hl,bc
+; Get the pointer to the start of the sprite data, clipping the top if necessary
+	push	hl			; (sp) = top-left corner of sprite in buffer
+	push	de			;   (sp) = (x clip bits)<<8|(width on-screen)
+	ld	bc,0			; b = height off-screen (top), c = height on-screen
+_RLETSprite_Heights_SMC = $-3
+	ld	d,c
+	push	de			;     (sp) = (height on-screen)<<8|(width on-screen)
+	ld	hl,(iy+3)		; hl = sprite struct
+	inc	hl
+	xor	a,a			; a = 0
+	ld	d,a			; d = deu = 0
+	or	a,b			; a = height off-screen
+	jr	z,_RLETSprite_ClipTop_End ; z => height off-screen == 0
+	ld	c,(hl)			; c = width
+_RLETSprite_ClipTop_Row:
+	ld	a,c			; a = width
+_RLETSprite_ClipTop_Trans:
+	inc	hl
+	sub	a,(hl)			; a = width remaining after trans run
+	jr	z,_RLETSprite_ClipTop_RowEnd ; z ==> width remaining == 0
+_RLETSprite_ClipTop_Opaque:
+	inc	hl
+	ld	e,(hl)			; de = opaque run length
+	sub	a,e			; a = width remaining after opaque run
+	add	hl,de			; skip opaque run
+	jr	nz,_RLETSprite_ClipTop_Trans ; nz ==> width remaining != 0
+_RLETSprite_ClipTop_RowEnd:
+	djnz	_RLETSprite_ClipTop_Row	; decrement height remaining off-screen,
+					; nz => still off-screen
+_RLETSprite_ClipTop_End:		; a = 0
+	inc	hl			; hl = start of (clipped) sprite data
+; Do stuff
+	pop	iy			;     iyh = height on-screen, iyl = width on-screen
+	pop	bc			;   bcu = 0, b = x clip bits
+	pop	de			; de = buffer
+	dec	de			; decrement buffer pointer (negate inc)
+	or	a,b
+	ld	a,iyl			; a = width on-screen
+	jp	z,_RLETSprite_NoClip_Begin \.r
+	cpl				; a = 255-(width on-screen)
+	add	a,lcdWidth-255		; a = (lcdWidth-(width on-screen))&0FFh
+	rra				; a = (lcdWidth-(width on-screen))/2
+	dec	b
+	jr	z,_RLETSprite_ClipLeftMiddle
+	ld	(_RLETSprite_ClipRight_HalfRowDelta_SMC),a \.r
+	sbc	a,a
+	djnz	_RLETSprite_ClipLeftMiddleClipRight
+_RLETSprite_MiddleClipRight:
+	sub	a,s8(_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_Middle_Row_WidthEven)
+	ld	(_RLETSprite_ClipRight_LoopJr_SMC),a \.r
+_RLETSprite_Middle_Row_WidthOdd:
+	inc	de			; increment buffer pointer
+_RLETSprite_Middle_Row_WidthEven:
+	ld	a,iyl			; a = width on-screen
+	jr	_RLETSprite_Middle_Trans
+_RLETSprite_Middle_OpaqueCopy_:
+	inc	hl
+_RLETSprite_Middle_OpaqueCopy:
+	ldir				; copy opaque run
+_RLETSprite_Middle_Trans:
+	ld	c,(hl)			; bc = trans run length
+	sub	a,c			; a = width remaining on-screen after trans run
+	ex	de,hl			; de = sprite, hl = buffer
+	jr	c,_RLETSprite_ExitRight_Trans ; c ==> width remaining on-screen < 0
+	inc	de
+_RLETSprite_Middle_TransSkip:
+	add	hl,bc			; skip trans run
+	ex	de,hl			; de = buffer, hl = sprite
+_RLETSprite_Middle_Opaque:
+	ld	c,(hl)			; bc = opaque run length
+	sub	a,c			; a = width remaining on-screen after opqaue run
+	jr	nc,_RLETSprite_Middle_OpaqueCopy_ ; nc ==> width remaining on-screen >= 0
+_RLETSprite_ExitRight_Opaque:
+	add	a,c
+	ld	c,a			; bc = width remaining on-screen before opaque run
+	ld	a,(hl)
+	inc	hl
+	sub	c
+	ldir				; copy on-screen part of opaque run
+	ld	c,a			; bc = opaque run length off-screen
+	ld	a,0			; a = width off-screen
+_RLETSprite_ExitRight_Opaque_Width_SMC = $-1
+	jr	_RLETSprite_ClipRight_OpaqueSkip
+
+_RLETSprite_ExitRight_Trans:
+	add	a,c			; a = width remaining on-screen before trans run
+	ld	c,a			; bc = width remaining on-screen before trans run
+	add	hl,bc			; skip on-screen part of trans run
+	ex	de,hl			; de = buffer, hl = sprite
+	add	a,0			; a = width remaining on-screen before trans run + width off-screen
+_RLETSprite_ExitRight_Trans_Width_SMC = $-1
+_RLETSprite_ClipRight_Trans:
+	sub	a,(hl)			; a = width remaining off-screen after trans run
+	inc	hl
+	jr	z,_RLETSprite_ClipRight_RowEnd ; z ==> width remaining off-screen == 0
+_RLETSprite_ClipRight_Opaque:
+	ld	c,(hl)			; bc = opaque run length
+	inc	hl
+_RLETSprite_ClipRight_OpaqueSkip:
+	sub	a,c			; a = width remaining off-screen after opaque run
+	add	hl,bc			; skip opaque run
+	jr	nz,_RLETSprite_ClipRight_Trans ; nz ==> width remaining off-screen != 0
+_RLETSprite_ClipRight_RowEnd:
+	ex	de,hl			; de = sprite, hl = buffer
+	ld	c,0			; c = (lcdWidth-(width on-screen))/2
+_RLETSprite_ClipRight_HalfRowDelta_SMC = $-1
+	add	hl,bc			; advance buffer to next row
+	add	hl,bc
+	ex	de,hl			; de = buffer, hl = sprite
+	dec	iyh			; decrement height remaining
+	jr	nz,_RLETSprite_Middle_Trans ; nz ==> height remaining != 0
+_RLETSprite_ClipRight_LoopJr_SMC = $-1
+	ret
+
+_RLETSprite_ClipLeftMiddleClipRight:
+	dec	b			; b = 0
+	sub	a,s8(_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven)
+	ld	(_RLETSprite_ClipRight_LoopJr_SMC),a \.r
+	ld	a,s8(_RLETSprite_Middle_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1))
+	ld	c,s8(_RLETSprite_Middle_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1))
+	jr	_RLETSprite_ClipLeftMiddle_DoSMC
+
+_RLETSprite_ClipLeftMiddle:
+	ld	(_RLETSprite_NoClip_HalfRowDelta_SMC),a \.r
+	sbc	a,a
+	sub	a,s8(_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven)
+	ld	(_RLETSprite_NoClip_LoopJr_SMC),a \.r
+	ld	a,s8(_RLETSprite_NoClip_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1))
+	ld	c,s8(_RLETSprite_NoClip_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1))
+_RLETSprite_ClipLeftMiddle_DoSMC:
+	ld	(_RLETSprite_EnterLeft_Opaque_Jr_SMC),a \.r
+	ld	a,c
+	ld	(_RLETSprite_EnterLeft_Trans_Jr_SMC),a \.r
+_RLETSprite_ClipLeft_Row_WidthOdd:
+	inc	de			; increment buffer pointer
+_RLETSprite_ClipLeft_Row_WidthEven:
+	ld	a,0			; a = width off-screen
+_RLETSprite_ClipLeft_Width_SMC = $-1
+	jr	_RLETSprite_ClipLeft_Trans
+_RLETSprite_ClipLeft_OpaqueSkip:
+	ld	c,(hl)			; bc = opaque run length
+	inc	hl
+	add	hl,bc			; skip opaque run
+_RLETSprite_ClipLeft_Trans:
+	sub	a,(hl)			; a = width remaining off-screen after trans run
+	inc	hl
+	jr	c,_RLETSprite_EnterLeft_Trans ; c ==> partially on-screen
+_RLETSprite_ClipLeft_Opaque:
+	ld	c,a			; bc = width remaining off-screen before opaque run
+	sub	a,(hl)			; a = width remaining off-screen after opaque run
+	jr	nc,_RLETSprite_ClipLeft_OpaqueSkip ; nc ==> still off-screen
+_RLETSprite_EnterLeft_Opaque:
+	inc	hl
+	add	hl,bc			; skip off-screen part of opaque run
+	neg
+	ld	c,a			; bc = opaque run length on-screen
+	ld	a,iyl			; a = width on-screen
+	sub	a,c			; a = width remaining on-screen after opaque run
+	jr	_RLETSprite_NoClip_OpaqueCopy
+_RLETSprite_EnterLeft_Opaque_Jr_SMC = $-1
+
+_RLETSprite_EnterLeft_Trans:
+	neg
+	ld	c,a			; bc = opaque run length on-screen
+	ld	a,iyl			; a = width on-screen
+	sub	a,c			; a = width remaining on-screen after opaque run
+	ex	de,hl			; de = sprite, hl = buffer
+	jr	_RLETSprite_NoClip_TransSkip
+_RLETSprite_EnterLeft_Trans_Jr_SMC = $-1
+
+;-------------------------------------------------------------------------------
+_RLETSprite_NoClip:
+; Draws a sprite with RLE transparency without clipping.
+; Arguments:
+;  arg0 : pointer to sprite structure
+;  arg1 : x-coordinate
+;  arg2 : y-coordinate
+; Returns:
+;  None
+	ld	iy,0
+	add	iy,sp
+; Calculate the pointer to the top-left corner of the sprite in the buffer.
+	ld	hl,(currDrawBuffer)
+	ld	bc,(iy+6)		; bc = x
+	add	hl,bc
+	ld	c,(iy+9)		; c = y
+	ld	b,lcdWidth/2
+	mlt	bc			; bc = y*160
+	add	hl,bc
+	add	hl,bc
+	ex	de,hl			; de = top-left corner of sprite in buffer
+; Read the sprite width and height.
+	ld	hl,(iy+3)		; hl = sprite struct
+	ld	iy,(hl)			; iyh = height, iyl = width
+	ld	a,(hl)			; a = width
+	inc	hl
+	inc	hl			; hl = sprite data
+; Initialize values for looping.
+	ld	b,0			; b = 0
+	dec	de			; decrement buffer pointer (negate inc)
+_RLETSprite_NoClip_Begin:
+; Generate the code to advance the buffer pointer to the start of the next row.
+	cpl				; a = 255-width
+	add	a,lcdWidth-255		; a = (lcdWidth-width)&0FFh
+	rra				; a = (lcdWidth-width)/2
+	ld	(_RLETSprite_NoClip_HalfRowDelta_SMC),a \.r
+	sbc	a,a
+	sub	a,s8(_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_NoClip_Row_WidthEven)
+	ld	(_RLETSprite_NoClip_LoopJr_SMC),a \.r
+; Row loop (if sprite width is odd)
+_RLETSprite_NoClip_Row_WidthOdd:
+	inc	de			; increment buffer pointer
+; Row loop (if sprite width is even) {
+_RLETSprite_NoClip_Row_WidthEven:
+	ld	a,iyl			; a = width
+;; Data loop {
+_RLETSprite_NoClip_Trans:
+;;; Read the length of a transparent run and skip that many bytes in the buffer.
+	ld	c,(hl)			; bc = trans run length
+	inc	hl
+	sub	a,c			; a = width remaining after trans run
+	ex	de,hl			; de = sprite, hl = buffer
+_RLETSprite_NoClip_TransSkip:
+	add	hl,bc			; skip trans run
+;;; Break out of data loop if width remaining == 0.
+	jr	z,_RLETSprite_NoClip_RowEnd ; z ==> width remaining == 0
+	ex	de,hl			; de = buffer, hl = sprite
+_RLETSprite_NoClip_Opaque:
+;;; Read the length of an opaque run and copy it to the buffer.
+	ld	c,(hl)			; bc = opaque run length
+	inc	hl
+	sub	a,c			; a = width remaining after opqaue run
+_RLETSprite_NoClip_OpaqueCopy:
+	ldir				; copy opaque run
+;;; Continue data loop while width remaining != 0.
+	jr	nz,_RLETSprite_NoClip_Trans ; nz ==> width remaining != 0
+	ex	de,hl			; de = sprite, hl = buffer
+;; }
+_RLETSprite_NoClip_RowEnd:
+;; Advance buffer pointer to the next row (minus one if width is odd).
+	ld	c,0			; c = (lcdWidth-width)/2
+_RLETSprite_NoClip_HalfRowDelta_SMC = $-1
+	add	hl,bc			; advance buffer to next row
+	add	hl,bc
+	ex	de,hl			; de = buffer, hl = sprite
+;; Decrement height remaining. Continue row loop while not zero.
+	dec	iyh			; decrement height remaining
+	jr	nz,_RLETSprite_NoClip_Row_WidthEven ; nz ==> height remaining != 0
+_RLETSprite_NoClip_LoopJr_SMC = $-1
+; }
+; Done.
+	ret
+
+;-------------------------------------------------------------------------------
+_ConvertFromRLETSprite:
+; Converts a sprite with RLE transpareny to a sprite with normal transparency.
+; Arguments:
+;  arg0 : pointer to gfx_rletsprite_t input
+;  arg1 : pointer to gfx_sprite_t output
+; Returns:
+;  arg1 : pointer to gfx_sprite_t output
+	pop	bc
+	pop	de			; de = gfx_rletsprite_t *input
+	ex	(sp),hl			; hl = gfx_sprite_t *output
+	push	de
+	push	bc
+	ex	de,hl			; de = output, hl = input
+; Save output to return.
+	push	de
+; Read and copy the sprite width and height.
+	ld	iy,(hl)			; iyh = height, iyl = width
+	ldi				; output height = height
+	ldi				; output width = width, hl = input data
+; Initialize values for looping.
+	inc.s	bc			; bcu = 0
+; Row loop {
+_ConvertFromRLETSprite_Row:
+	ld	a,iyl			; a = width
+;; Data loop {
+_ConvertFromRLETSprite_Trans:
+;;; Read the length of a transparent run.
+	ld	b,(hl)			; b = trans run length
+	inc	hl
+	inc	b
+	dec	b
+;;; Skip the transparent run if the length is zero.
+	jr	z,_ConvertFromRLETSprite_Opaque ; z ==> trans run length == 0
+;;; Write <transparent run length> zeros to the output.
+	sub	a,b			; a = width remaining after trans run
+	ld	c,0			; c = trans color
+TColor_SMC_5 = $-1
+	ex	de,hl			; de = input data, hl = output data
+_ConvertFromRLETSprite_TransLoop:
+	ld	(hl),c			; write trans color to output
+	inc	hl
+	djnz	_ConvertFromRLETSprite_TransLoop ; decrement trans run length remaining,
+						 ; nz ==> trans run length remaining != 0
+	ex	de,hl			; de = output data, hl = input data
+;;; Break out of data loop if width remaining == 0.
+	jr	z,_ConvertFromRLETSprite_RowEnd ; z ==> width remaining == 0
+_ConvertFromRLETSprite_Opaque:
+;;; Read the length of an opaque run and copy it to the output.
+	ld	c,(hl)			; bc = opaque run length
+	inc	hl
+	sub	a,c			; a = width remaining after opqaue run
+	ldir				; copy opaque run
+;;; Continue data loop while width remaining != 0.
+	jr	nz,_ConvertFromRLETSprite_Trans ; nz ==> width remaining != 0
+;; }
+_ConvertFromRLETSprite_RowEnd:
+;; Decrement height remaining. Continue row loop while not zero.
+	dec	iyh			; decrement height remaining
+	jr	nz,_ConvertFromRLETSprite_Row ; nz ==> height remaining != 0
+; }
+; Return output.
+	pop	hl			; hl = output
+	ret
+
+;-------------------------------------------------------------------------------
+_ConvertToNewRLETSprite:
+; Converts a sprite with normal transpareny to a sprite with RLE transparency,
+; allocating the exact amount of necessary space for the converted sprite.
+; Arguments:
+;  arg0 : pointer to gfx_sprite_t input
+;  arg1 : pointer to malloc
+; Returns:
+;  arg1 : pointer to gfx_rletsprite_t output
+	pop	bc
+	pop	de			; de = gfx_sprite_t *input
+	ex	(sp),hl			; hl = malloc
+	push	de
+	push	bc
+	ld	(_ConvertToNewRLETSprite_Malloc_SMC),hl \.r
+	ex	de,hl			; hl = input
+; Save input to copy after allocating output.
+	push	hl
+; Read the sprite width and height.
+	ld	iy,(hl)			; iyh = height, iyl = width
+	inc	hl			; hl = <input data>-1
+; Initialize values for looping.
+	inc.s	bc			; bcu = 0
+	ld	de,2			; de = 2 = output size
+	ld	a,(TColor_SMC_5) \.r	; a = trans color
+; Row loop {
+_ConvertToNewRLETSprite_Row:
+	ld	b,iyl			; b = width
+	inc	de			; increment output size for first trans run
+;; Transparent loop {
+_ConvertToNewRLETSprite_TransLoop:
+	inc	hl
+	cp	a,(hl)			; compare an input pixel to trans color
+	inc	de			; increment output size for potential opaque run
+	jr	nz,_ConvertToNewRLETSprite_OpaquePixel ; nz ==> not transparent
+	dec	de			; revert output size, not opaque run
+_ConvertToNewRLETSprite_TransPixel:
+;;; Continue while width remaining != 0.
+	djnz	_ConvertToNewRLETSprite_TransLoop ; decrement width remaining,
+						  ; nz ==> width remaining != 0
+;; }
+;; Finish row.
+	jr	_ConvertToNewRLETSprite_RowEnd
+;; Opaque loop {
+_ConvertToNewRLETSprite_OpaqueLoop:
+	inc	hl
+	cp	a,(hl)			; compare an input pixel to trans color
+_ConvertToNewRLETSprite_OpaquePixel:
+	inc	de			; increment output length
+	jr	z,_ConvertToNewRLETSprite_TransPixel ; z ==> transparent
+;;; Continue while width remaining != 0.
+	djnz	_ConvertToNewRLETSprite_OpaqueLoop ; decrement width remaining,
+						   ; nz ==> width remaining != 0
+;; }
+_ConvertToNewRLETSprite_RowEnd:
+;; Decrement height remaining. Continue row loop while not zero.
+	dec	iyh			; decrement height remaining
+	jr	nz,_ConvertToNewRLETSprite_Row ; nz ==> height remaining != 0
+; }
+; Allocate output.
+	push	de
+	call	0			; malloc(output size), hl = output
+_ConvertToNewRLETSprite_Malloc_SMC = $-3
+	pop	de
+; Convert sprite.
+	pop	de			; de = input
+	jr	_ConvertToRLETSprite_ASM
+
+;-------------------------------------------------------------------------------
+_ConvertToRLETSprite:
+; Converts a sprite with normal transpareny to a sprite with RLE transparency.
+; Arguments:
+;  arg0 : pointer to gfx_sprite_t input
+;  arg1 : pointer to gfx_rletsprite_t output
+; Returns:
+;  arg1 : pointer to gfx_rletsprite_t output
+	pop	bc
+	pop	de			; de = gfx_sprite_t *input
+	ex	(sp),hl			; hl = gfx_rletsprite_t *output
+	push	de
+	push	bc
+_ConvertToRLETSprite_ASM:
+	ex	de,hl			; de = output, hl = input
+; Save output to return.
+	push	de
+; Read and copy the sprite width and height.
+	ld	iy,(hl)			; iyh = height, iyl = width
+	ldi				; output height = height
+	ldi				; output width = width, hl = input data
+; Initialize values for looping.
+	inc.s	bc			; bcu = 0
+	ld	a,(TColor_SMC_5) \.r	; a = trans color
+; Row loop {
+_ConvertToRLETSprite_Row:
+	ld	b,iyl			; b = width
+;; Data loop {
+_ConvertToRLETSprite_Trans:
+;;; Calculate the length of a transparent run.
+	ld	c,0			; c = 0 = trans run length
+;;; Transparent loop {
+_ConvertToRLETSprite_TransLoop:
+	cp	a,(hl)			; compare an input pixel to trans color
+	jr	nz,_ConvertToRLETSprite_TransEnd ; nz ==> not transparent
+	inc	hl
+	inc	bc			; increment trans run length
+;;;; Continue transparent loop while width remaining != 0.
+	djnz	_ConvertToRLETSprite_TransLoop ; decrement width remaining,
+					       ; nz ==> width remaining != 0
+;;; }
+;;; Write the length of the transparent run to the output.
+_ConvertToRLETSprite_TransEnd:
+	ex	de,hl			; de = input data, hl = output data
+	ld	(hl),c			; write trans run length
+	inc	hl
+	ex	de,hl			; de = output data, hl = input data
+;;; Break out of data loop if width remaining == 0.
+	jr	z,_ConvertToRLETSprite_RowEnd ; z ==> last pixel was transparent
+					      ;   ==> width remaining == 0
+;;; Copy an opaque run to the output.
+_ConvertToRLETSprite_Opaque:
+	ld	c,0			; c = 0 = opaque run length
+	push	de			; (sp) = location to write opaque run length
+	inc	de
+;;; Opaque loop {
+_ConvertToRLETSprite_OpaqueLoop:
+	cp	a,(hl)			; compare an input pixel to trans color
+	jr	z,_ConvertToRLETSprite_OpaqueEnd ; z ==> transparent
+	inc	bc			; cancel dec bc from upcoming ldi
+	ldi				; copy opaque pixel
+	inc	bc			; increment opaque run length
+;;;; Continue opaque/data loop while width remaining != 0.
+	djnz	_ConvertToRLETSprite_OpaqueLoop ; decrement width remaining,
+						; nz ==> width remaining != 0
+_ConvertToRLETSprite_OpaqueEnd:
+	ex	(sp),hl			; (sp) = input data, hl = location to write opaque run length
+	ld	(hl),c			; write opaque run length
+	pop	hl			; hl = input data
+;;; Continue data loop if width remaining != 0.
+	jr	z,_ConvertToRLETSprite_Trans ; z ==> last pixel was transparent
+					     ;   ==> width remaining != 0
+;;; }
+;; }
+_ConvertToRLETSprite_RowEnd:
+;; Decrement height remaining. Continue row loop while not zero.
+	dec	iyh			; decrement height remaining
+	jr	nz,_ConvertToRLETSprite_Row ; nz ==> height remaining != 0
+; }
+; Return output.
+	pop	hl			; hl = output
 	ret
 
 ;-------------------------------------------------------------------------------

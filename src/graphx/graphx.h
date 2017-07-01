@@ -18,13 +18,53 @@ extern "C" {
 #endif
 
 /**
- * @brief Defines an image type with which to create sprites
+ * @brief Sprite (image) type.
+ *
+ * Whether or not a sprite includes transparency is not explicitly encoded, and
+ * is determined only by usage. If used with transparency, transparent pixels
+ * are those with a certain color index, which can be set with
+ * gfx_SetTransparentColor().
+ *
+ * @attention
+ * Displaying a gfx_rletsprite_t (which includes transparency) is significantly
+ * faster than displaying a gfx_sprite_t with transparency, and should be
+ * preferred. However, gfx_rletsprite_t does not support transformations, such
+ * as flipping and rotation. Such transformations can be applied to a
+ * gfx_sprite_t, which can then be converted to a gfx_rletsprite_t for faster
+ * display using gfx_ConvertToNewRLETSprite() or gfx_ConvertToRLETSprite().
+ *
+ * @remarks
+ * Create at compile-time with a tool like
+ * <a href="https://github.com/MattWaltz/convpng" target="_blank">convpng</a>.
+ * Create at runtime (with uninitialized data) with gfx_MallocSprite(),
+ * gfx_UninitedSprite(), or gfx_TempSprite().
  */
 typedef struct {
     uint8_t width;   /**< Width of the image  */
     uint8_t height;  /**< Height of the image */
     uint8_t data[1]; /**< Image data array    */
 } gfx_sprite_t;
+
+/**
+ * @brief Sprite (image) type with RLE transparency.
+ *
+ * @attention
+ * Displaying a gfx_rletsprite_t (which includes transparency) is significantly
+ * faster than displaying a gfx_sprite_t with transparency, and should be
+ * preferred. However, gfx_rletsprite_t does not support transformations, such
+ * as flipping and rotation. Such transformations can be applied to a
+ * gfx_sprite_t, which can then be converted to a gfx_rletsprite_t for faster
+ * display using gfx_ConvertToNewRLETSprite() or gfx_ConvertToRLETSprite().
+ *
+ * @remarks
+ * Create at compile-time with a tool like
+ * <a href="https://github.com/MattWaltz/convpng" target="_blank">convpng</a>.
+ */
+typedef struct {
+    uint8_t width;   /**< Width of the image  */
+    uint8_t height;  /**< Height of the image */
+    uint8_t data[1]; /**< Image data array    */
+} gfx_rletsprite_t;
 
 /**
  * @brief A simple structure for working with 2D points
@@ -43,53 +83,166 @@ typedef enum {
 } gfx_mode_t;
 
 /**
- * Allocates memory for a sprite
+ * Dynamically allocates memory for a sprite.
  *
- * Returns NULL upon failure to allocate space, otherwise a pointer to the sprite structure.
- * Note that if you use the system malloc routine, it must be used elsewhere in your program 
- * otherwise it will not be linked correctly.
- * @param width Width of the requested sprite
- * @param height Height of the requested sprite
- * @param malloc_routine Routine used to allocate memory
+ * Allocates the memory with \p malloc_routine. \p width and \p height will be
+ * set in the allocated sprite. Returns \c NULL upon allocation failure.
+ *
+ * @note
+ * If not used in a dynamic context and \p width and \p height are static,
+ * consider statically allocating the sprite instead with gfx_UninitedSprite()
+ * or gfx_TempSprite().
+ *
+ * @remarks
+ * If using \c malloc as the \p malloc_routine, gfx_MallocSprite() can be used
+ * as a shortcut.
+ *
+ * @param width sprite width
+ * @param height sprite height
+ * @param malloc_routine malloc implementation to use
+ * @return pointer to the allocated sprite
  */
-gfx_sprite_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *malloc_routine);
+gfx_sprite_t *gfx_AllocSprite(uint8_t width, uint8_t height, void *(*malloc_routine)(size_t));
 
 /**
- * Allocates memory for a sprite
+ * Dynamically allocates memory for a sprite using \c malloc.
  *
- * Works the same as gfx_AllocSprite but uses internal malloc routine for allocation.
- * @param width Width of the requested sprite
- * @param height Height of the requested sprite
+ * \p width and \p height will be set in the sprite. Returns \c NULL upon
+ * allocation failure.
+ *
+ * @note
+ * If not used in a dynamic context and \p width and \p height are static,
+ * consider statically allocating the sprite instead with gfx_UninitedSprite()
+ * or gfx_TempSprite().
+ *
+ * @param width sprite width
+ * @param height sprite height
+ * @return pointer to the allocated sprite
  * @see gfx_AllocSprite
  */
 #define gfx_MallocSprite(width, height) \
-gfx_AllocSprite(width, height, (void*)malloc)
+gfx_AllocSprite(width, height, malloc)
 
 /**
- * Allocates memory for a sprite
+ * Statically allocates unitialized memory for a sprite.
  *
- * This routine is intended for global variables. 
- * Note that you will have to initialize the width and height of the sprite manually.
- * @param name Name of new sprite
- * @param max_width Maximum width sprite will eventually be
- * @param max_height Maximum height sprite will eventually be
+ * Declares a <tt>gfx_sprite_t *</tt> with the given \p name pointing to the
+ * allocated memory. \p width and \p height will \b not be set in the sprite,
+ * unlike gfx_TempSprite().
+ *
+ * @warning
+ * If used outside of a function body, the memory will be allocated in the
+ * global unitialized data segment (BSS). If used inside a function body, the
+ * memory will be allocated on the stack. If the sprite is sufficiently large,
+ * usage inside a function body will overflow the stack, so it is recommended
+ * that this normally be used outside of a function body.
+ *
+ * @param name name of declared <tt>gfx_sprite_t *</tt>
+ * @param width sprite width
+ * @param height sprite height
+ * @see gfx_MallocSprite
  */
-#define gfx_UninitedSprite(name, max_width, max_height) \
-uint8_t name##_data[2 + (max_width) * (max_height)]; \
+#define gfx_UninitedSprite(name, width, height) \
+uint8_t name##_data[2 + (width) * (height)]; \
 gfx_sprite_t *name = (gfx_sprite_t *)name##_data
-                        
+
 /**
- * Allocates memory for a sprite
+ * Statically allocates memory for a sprite.
  *
- * This routine is intended for small local variables. 
- * Note that you will have to initialize the width and height of the sprite manually.
- * @param name Name of new sprite
- * @param width Width of allocated sprite
- * @param height Height of allocated sprite
+ * Declares a <tt>gfx_sprite_t *</tt> with the given \p name pointing to the
+ * allocated memory. \p width and \p height will be set in the sprite, unlike
+ * gfx_UninitedSprite().
+ *
+ * @attention
+ * Due to \p width and \p height being set, the memory will be allocated in the
+ * initialized data segment. If the compiled program is not compressed, then
+ * this could be a serious source of bloat and gfx_UninitedSprite() should be
+ * preferred.
+ *
+ * @param name name of declared <tt>gfx_sprite_t *</tt>
+ * @param width sprite width
+ * @param height sprite height
+ * @see gfx_MallocSprite
  */
 #define gfx_TempSprite(name, width, height) \
 uint8_t name##_data[2 + (width) * (height)] = { (width), (height) }; \
 gfx_sprite_t *name = (gfx_sprite_t *)name##_data
+
+/**
+ * Dynamically allocates memory for a sprite with RLE transpareny.
+ *
+ * Allocates the memory with \p malloc_routine. Returns \c NULL upon allocation
+ * failure.
+ *
+ * \p data_size is the maximum predicted/calculated size of the sprite data
+ * (excuding the width and height bytes) that will be stored in the allocated
+ * sprite. Sprite data size could be up to <tt>(width + 1) * height * 3 / 2</tt>
+ * bytes in the worst case, in which pixels horizontally alternate between
+ * non-transparent and transparent and each row begins with a non-transparent
+ * pixel. But if the average length of a horizontal transparent run is at least
+ * 2, then the sprite data will be no larger than <tt>(width + 1) * height</tt>
+ * bytes. The exact data size necessary is <tt>2 *
+ * num_horizontal_transparent_runs + num_non_transparent_pixels +
+ * num_rows_beginning_with_non_transparent_pixel -
+ * num_rows_ending_with_transparent_pixel</tt> bytes.
+ *
+ * @note
+ * If not used in a dynamic context and \p data_size is static, consider
+ * statically allocating the sprite instead with gfx_UninitedRLETSprite() or
+ * gfx_TempRLETSprite().
+ *
+ * @remarks
+ * If using \c malloc as the \p malloc_routine, gfx_MallocRLETSprite() can be
+ * used as a shortcut.
+ *
+ * @param data_size (maximum) sprite data size
+ * @param malloc_routine malloc implementation to use
+ * @return pointer to the allocated sprite
+ */
+#define gfx_AllocRLETSprite(data_size, malloc_routine) \
+(gfx_rletsprite_t *)(malloc_routine)(data_size)
+
+/**
+ * Dynamically allocates memory for a sprite with RLE transparency using \c
+ * malloc.
+ *
+ * \p data_size is the size to allocate for sprite data; see
+ * gfx_AllocRLETSprite() for information. Returns \c NULL upon allocation
+ * failure.
+ *
+ * @note
+ * If not used in a dynamic context and \p data_size is static, consider
+ * statically allocating the sprite instead with gfx_UninitedRLETSprite() or
+ * gfx_TempRLETSprite().
+ *
+ * @param data_size (maximum) sprite data size
+ * @return pointer to the allocated sprite
+ * @see gfx_AllocRLETSprite
+ */
+#define gfx_MallocRLETSprite(data_size) \
+gfx_AllocRLETSprite(data_size, malloc)
+
+/**
+ * Statically allocates unitialized memory for a sprite with RLE transparency.
+ *
+ * Declares a <tt>gfx_rletsprite_t *</tt> with the given \p name pointing to the
+ * allocated memory. \p data_size is the size to allocate for sprite data; see
+ * gfx_AllocRLETSprite() for information.
+ *
+ * @warning
+ * If used outside of a function body, the memory will be allocated in the
+ * global unitialized data segment (BSS). If used inside a function body, the
+ * memory will be allocated on the stack. If the sprite is sufficiently large,
+ * usage inside a function body will overflow the stack, so it is recommended
+ * that this normally be used outside of a function body.
+ *
+ * @param name name of declared <tt>gfx_rletsprite_t *</tt>
+ * @param data_size (maximum) sprite data size
+ * @see gfx_MallocRLETSprite
+ */
+#define gfx_UninitedRLETSprite(name, data_size) \
+uint8_t name##_data[2 + (data_size)]; \
+gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 
 /**
  * Initializes the graphics library setup
@@ -330,7 +483,7 @@ void gfx_ZeroScreen(void);
 /**
  * Sets a pixel to the global color index
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * Pixels are only clipped within the screen boundaries
  * @param x X coordinate location
  * @param y Y coordinate location
@@ -341,7 +494,7 @@ void gfx_SetPixel(uint24_t x, uint8_t y);
 /**
  * Gets a pixel's color index
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * Pixels are only clipped within the screen boundaries
  * @param x X coordinate location
  * @param y Y coordinate location
@@ -351,7 +504,7 @@ uint8_t gfx_GetPixel(uint24_t x, uint8_t y);
 /**
  * Draws a line
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x0 First X coordinate
  * @param y0 First Y coordinate
  * @param x1 Second X coordinate
@@ -362,7 +515,7 @@ void gfx_Line(int x0, int y0, int x1, int y1);
 /**
  * Draws an unclipped line
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x0 First X coordinate
  * @param y0 First Y coordinate
  * @param x1 Second X coordinate
@@ -373,7 +526,7 @@ void gfx_Line_NoClip(uint24_t x0, uint8_t y0, uint24_t x1, uint8_t y1);
 /**
  * Clips the points in a window region
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x0 First X coordinate
  * @param y0 First Y coordinate
  * @param x1 Second X coordinate
@@ -385,7 +538,7 @@ bool gfx_CohenSutherlandClip(int *x0, int *y0, int *x1, int *y1);
 /**
  * Draws a horizontal line
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * Performs faster than using @c gfx_Line
  * @param x X coordinate
  * @param y Y coordinate
@@ -396,7 +549,7 @@ void gfx_HorizLine(int x, int y, int length);
 /**
  * Draws an unclipped horizontal line
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * Performs faster than using @c gfx_Line
  * @param x X coordinate
  * @param y Y coordinate
@@ -407,7 +560,7 @@ void gfx_HorizLine_NoClip(uint24_t x, uint8_t y, uint24_t length);
 /**
  * Draws a vertical line
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * Performs faster than using @c gfx_Line
  * @param x X coordinate
  * @param y Y coordinate
@@ -418,7 +571,7 @@ void gfx_VertLine(int x, int y, int length);
 /**
  * Draws an unclipped vertical line
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * Performs faster than using @c gfx_Line
  * @param x X coordinate
  * @param y Y coordinate
@@ -429,7 +582,7 @@ void gfx_VertLine_NoClip(uint24_t x, uint8_t y, uint24_t length);
 /**
  * Draws a rectangle outline
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
@@ -440,7 +593,7 @@ void gfx_Rectangle(int x, int y, int width, int height);
 /**
  * Draws an unclipped rectangle outline
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
@@ -451,7 +604,7 @@ void gfx_Rectangle_NoClip(uint24_t x, uint8_t y, uint24_t width, uint8_t height)
 /**
  * Draws a filled rectangle
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
@@ -462,7 +615,7 @@ void gfx_FillRectangle(int x, int y, int width, int height);
 /**
  * Draws an unclipped filled rectangle
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
@@ -473,7 +626,7 @@ void gfx_FillRectangle_NoClip(uint24_t x, uint8_t y, uint24_t width, uint8_t hei
 /**
  * Draws a circle outline
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param radius The radius of the circle
@@ -483,7 +636,7 @@ void gfx_Circle(int x, int y, unsigned radius);
 /**
  * Draws a filled circle
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param radius The radius of the circle
@@ -493,7 +646,7 @@ void gfx_FillCircle(int x, int y, unsigned radius);
 /**
  * Draws an unclipped filled circle
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param radius The radius of the circle
@@ -503,7 +656,7 @@ void gfx_FillCircle_NoClip(uint24_t x, uint8_t y, unsigned radius);
 /**
  * Draws an unclipped circle outline
  *
- * This is measured from the top left origin of the screen. 
+ * This is measured from the top left origin of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param radius The radius of the circle
@@ -514,7 +667,7 @@ gfx_Circle((x), (y), (radius))
 /**
  * Draws a polygon outline
  *
- * Points are measured from the top left origin of the screen. 
+ * Points are measured from the top left origin of the screen.
  * @code
  * int points[6] = {
  *                    160,  1,  // (x0, y0)
@@ -532,7 +685,7 @@ void gfx_Polygon(int *points, unsigned num_points);
 /**
  * Draws an unclipped polygon outline
  *
- * Points are measured from the top left origin of the screen. 
+ * Points are measured from the top left origin of the screen.
  * @code
  * int points[6] = {
  *                    160,  1,  // (x0, y0)
@@ -661,14 +814,14 @@ void gfx_SetTextScale(uint8_t width_scale, uint8_t height_scale);
 /**
  * Prints a character
  *
- * Outputs a character at the current cursor position.  
+ * Outputs a character at the current cursor position.
  * @param c Character to print
  * @note By default, no text clipping is performed (configurable with gfx_SetTextConfig)
  */
 void gfx_PrintChar(const char c);
 
 /**
- * Prints a signed integer 
+ * Prints a signed integer
  *
  * Outputs at the current cursor position.
  * @param n Integer to print
@@ -921,9 +1074,9 @@ gfx_sprite_t *gfx_RotateSpriteHalf(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite
 gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
- * Creates a temporary character sprite 
- * 
- * This may be useful for performing rotations and other 
+ * Creates a temporary character sprite
+ *
+ * This may be useful for performing rotations and other
  * operations on characters. The sprite returned is always 8x8 pixels.
  * @param c Character to generate
  */
@@ -946,7 +1099,7 @@ void gfx_SetFontSpacing(uint8_t *spacing);
 
 /**
  * Sets the height in pixels of each character
- * 
+ *
  * The default value is 8 pixels
  * @param height New font height in pixels
  * @returns Previous height of font in pixels
@@ -971,7 +1124,7 @@ unsigned int gfx_GetStringWidth(const char *string);
 
 /**
  * Get pixel width of a character
- * 
+ *
  * @param c Character to get width of
  * @returns Width in pixels of character
  * @note Takes into account monospacing flag
@@ -1031,7 +1184,7 @@ void gfx_ShiftRight(uint24_t pixels);
 
 /**
  * Lightens a given 1555 color; useful for palette color conversions.
- * 
+ *
  * @param color Original color input in 1555 format
  * @param amount Amount to lighten by
  * @returns Darkened color
@@ -1041,7 +1194,7 @@ uint16_t gfx_Lighten(uint16_t color, uint8_t amount);
 
 /**
  * Darkens a given 1555 color; useful for palette color conversions.
- * 
+ *
  * @param color Original color input in 1555 format
  * @param amount Amount to darken by
  * @returns Darkened color
@@ -1051,7 +1204,7 @@ uint16_t gfx_Darken(uint16_t color, uint8_t amount);
 
 /**
  * Fills an area with a color
- * 
+ *
  * @param x X coordinate to begin filling at
  * @param y Y coordinate to begin filling at
  * @param color New color to fill with
@@ -1059,6 +1212,119 @@ uint16_t gfx_Darken(uint16_t color, uint8_t amount);
  * @note This routine performs clipping to stay within the window, but you must ensure it starts in the window.
  */
 void gfx_FloodFill(unsigned int x, uint8_t y, uint8_t color);
+
+/**
+ * Draws a sprite with RLE transparency.
+ *
+ * @param sprite sprite to draw
+ * @param x x-coordinate
+ * @param y y-coordinate
+ */
+void gfx_RLETSprite(gfx_rletsprite_t *sprite, int x, int y);
+
+/**
+ * Draws an unclipped sprite with RLE transparency.
+ *
+ * @param sprite sprite to draw
+ * @param x x-coordinate
+ * @param y y-coordinate
+ */
+void gfx_RLETSprite_NoClip(gfx_rletsprite_t *sprite, uint24_t x, uint8_t y);
+
+/**
+ * Converts a sprite with RLE transpareny to a sprite with normal transparency.
+ *
+ * Width and height will be set in the converted sprite.
+ *
+ * The transparent color index in the converted sprite is controlled by
+ * gfx_SetTransparentColor().
+ *
+ * @attention
+ * The output sprite must have been allocated with a large enough \c data field
+ * to hold the converted sprite data, which will be <tt>width * height</tt>
+ * bytes large.
+ *
+ * @param[in] sprite_in input sprite with RLE transparency
+ * @param[out] sprite_out converted sprite with normal transparency
+ * @returns the converted sprite
+ * @see gfx_ConvertMallocRLETSprite
+ * @see gfx_ConvertToRLETSprite
+ */
+gfx_sprite_t *gfx_ConvertFromRLETSprite(gfx_rletsprite_t *sprite_in, gfx_sprite_t *sprite_out);
+
+/**
+ * Converts a sprite with normal transpareny to a sprite with RLE transparency.
+ *
+ * Width and height will be set in the converted sprite.
+ *
+ * The transparent color index in the input sprite is controlled by
+ * gfx_SetTransparentColor().
+ *
+ * @attention
+ * The output sprite must have been allocated with a large enough data field to
+ * hold the converted sprite data; see gfx_AllocRLETSprite() for information.
+ *
+ * @note
+ * To avoid needing to predict the output size and risking either the prediction
+ * being too high and wasting space, or being too low and corrupting memory,
+ * gfx_ConvertMallocRLETSprite() can be used instead to allocate the exact
+ * amount of necessary space for the converted sprite.
+ *
+ * @param[in] sprite_in input sprite with normal transparency
+ * @param[out] sprite_out converted sprite with RLE transparency
+ * @returns the converted sprite
+ * @see gfx_ConvertFromRLETSprite
+ */
+gfx_rletsprite_t *gfx_ConvertToRLETSprite(gfx_sprite_t *sprite_in, gfx_rletsprite_t *sprite_out);
+
+
+/**
+ * Converts a sprite with normal transpareny to a sprite with RLE transparency,
+ * allocating the exact amount of necessary space for the converted sprite.
+ *
+ * Allocates the memory with \p malloc_routine. Width and height will be set in
+ * the converted sprite. Returns \c NULL upon allocation failure.
+ *
+ * The transparent color index in the input sprite is controlled by
+ * gfx_SetTransparentColor().
+ *
+ * @remarks
+ * If using \c malloc as the \p malloc_routine, gfx_ConvertMallocRLETSprite()
+ * can be used as a shortcut.
+ *
+ * @remarks
+ * A gfx_sprite_t can be converted into an appropriately large,
+ * already-allocated gfx_rletsprite_t using gfx_ConvertToRLETSprite().
+ *
+ * @param sprite_in input sprite with normal transparency
+ * @param malloc_routine malloc implementation to use
+ * @returns a newly allocated converted sprite with RLE transparency
+ * @see gfx_ConvertFromRLETSprite
+ */
+gfx_rletsprite_t *gfx_ConvertToNewRLETSprite(gfx_sprite_t *sprite_in, void *(*malloc_routine)(size_t));
+
+/**
+ * Converts a sprite with normal transpareny to a sprite with RLE transparency,
+ * allocating the exact amount of necessary space for the converted sprite using
+ * \c malloc.
+ *
+ * Width and height will be set in the converted sprite. Returns \c NULL upon
+ * allocation failure.
+ *
+ * The transparent color index in the input sprite is controlled by
+ * gfx_SetTransparentColor().
+ *
+ * @remarks
+ * A gfx_sprite_t can be converted into an appropriately large,
+ * already-allocated gfx_rletsprite_t using gfx_ConvertToRLETSprite().
+ *
+ * @param sprite_in input sprite with normal transparency
+ * @param malloc_routine malloc implementation to use
+ * @returns a newly allocated converted sprite with RLE transparency
+ * @see gfx_ConvertFromRLETSprite
+ */
+#define gfx_ConvertMallocRLETSprite(sprite_in) \
+gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 
 /**
  * Converts an RGB value to a palette color

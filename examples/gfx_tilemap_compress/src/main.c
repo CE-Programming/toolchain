@@ -42,16 +42,13 @@ void main(void) {
     gfx_sprite_t *tmp_ptr;
     gfx_tilemap_t tilemap;
 
-    /* For linking purposes */
-    malloc(0);
-    
     /* Decompress the tiles */
     for (i = 0; i < 128; i++) {
         tmp_ptr = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);
         dzx7_Turbo(tileset_tiles_compressed[i], tmp_ptr); // or dzx7_Standard, but in this case we have a lot of tiles
         tileset_tiles[i] = tmp_ptr;
     }
-    
+
     /* Initialize the tilemap structure */
     tilemap.map         = tilemap_map;
     tilemap.tiles       = tileset_tiles;
@@ -65,23 +62,23 @@ void main(void) {
     tilemap.width       = TILEMAP_WIDTH;
     tilemap.y_loc       = Y_OFFSET;
     tilemap.x_loc       = X_OFFSET;
-    
+
     /* Initialize the 8bpp graphics */
     gfx_Begin(gfx_8bpp);
-    
+
     /* Set up the palette */
     gfx_SetPalette(tiles_gfx_pal, sizeof tiles_gfx_pal, 0);
     gfx_SetColor(gfx_white);
-    
+
     /* Draw to buffer to avoid tearing */
     gfx_SetDrawBuffer();
-    
+
     /* Set monospace font with width of 8 */
     gfx_SetMonospaceFont(8);
 
     /* Wait for the enter key to quit */
     while ((key = os_GetCSC()) != sk_Enter) {
-    
+
         /* Draw tilemap and coords */
         gfx_Tilemap(&tilemap, x_offset, y_offset);
         gfx_FillRectangle(0, 0, 320, 16);
@@ -89,7 +86,7 @@ void main(void) {
         gfx_PrintUInt(x_offset, 4);
         gfx_PrintString(" y offset:");
         gfx_PrintUInt(y_offset, 4);
-        
+
         /* Do something based on the keypress */
         switch (key) {
             case sk_Down:
@@ -113,8 +110,7 @@ void main(void) {
         }
         gfx_SwapDraw();
     }
-    
+
     /* Close the graphics */
     gfx_End();
 }
-
