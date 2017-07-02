@@ -10,3 +10,6 @@
 [submodule "src/sub/libload"]
 	path = src/sub/libload
 	url = https://github.com/CE-Programming/libload.git
+[submodule "tools/convtile"]
+	path = tools/convtile
+	url = https://github.com/MattWaltz/convtile.git
