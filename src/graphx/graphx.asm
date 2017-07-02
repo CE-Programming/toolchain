@@ -2079,14 +2079,14 @@ _Sprite_NoClip:
 	ld	(SprNcJrStep-1),a \.r
 	ld	a,lcdWidth/2
 	sub	a,c
-	ld	iyl,a				; (lcdWidth-spriteWidth)/2
+	ld	iyl,a				; (lcdWidth/2)-(spriteWidth/2)
 	ld	a,(hl)				; spriteHeight
 	inc	hl
 	jr	SprNcLpStart
 SprNcLpOddW:
-	inc	de				; needed if sprite width is odd
+	dec	de				; needed if sprite width is odd
 SprNcLpEvenW:
-	ld	c,iyl				; (lcdWidth-spriteWidth)/2
+	ld	c,iyl				; (lcdWidth/2)-(spriteWidth/2)
 	ex	de,hl
 	add	hl,bc
 	add	hl,bc
