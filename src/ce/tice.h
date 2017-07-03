@@ -21,10 +21,25 @@ extern "C" {
  */
 
 /**
- * Creates a random integer value
+ * Returns a pseudo-random 32-bit integer.
+ *
+ * @return the random integer
+ */
+uint32_t random(void);
+
+/**
+ * Seeds the pseudo-random number generator used by random() and rand() with the
+ * value seed.
+ *
+ * @param seed the seed value
+ */
+void srandom(uint32_t seed);
+
+/**
+ * Returns a pseudo-random integer in the range of min to max-1.
  */
 #define randInt(min, max) \
-((unsigned)rand() % ((max) - (min) + 1) + (min))
+((unsigned)random() % ((max) - (min) + 1) + (min))
 
 /**
  * Delays for a number of milliseconds.
