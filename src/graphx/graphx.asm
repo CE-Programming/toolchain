@@ -497,17 +497,15 @@ _FillRectangle:
 	add	hl,de
 	ld	(iy+12),hl
 	call	_ClipRectRegion_ASM \.r
-	ret	c                           ; return if offscreen
+	ret	c                           ; return if offscreen or degenerate
 	ld	de,(iy+3)
 	ld	hl,(iy+9)
-	sbc	hl,de                       ; make sure that the width is not 0
-	ret	z
+	sbc	hl,de
 	push	hl
 	ld	de,(iy+6)
 	ld	hl,(iy+12)
 	sbc	hl,de
 	pop	bc                          ; bc = new width
-	ret	z
 	ld	a,l                         ; a = new height
 	ld	hl,(iy+3)                   ; hl = new x, de = new y
 	jr	_FillRectangle_NoClip_ASM
@@ -4516,7 +4514,7 @@ _ClipRectRegion_ASM:
 	call	_Min_ASM \.r
 	ld	(iy+9),hl
 	ld	de,(iy+3)
-	call	_SignedCompare_ASM \.r
+	call	_ClipRectRegion_Compare_ASM \.r
 	ret	c
 	ld	hl,(_ymin) \.r
 	ld	de,(iy+6)
@@ -4527,16 +4525,11 @@ _ClipRectRegion_ASM:
 	call	_Min_ASM \.r
 	ld	(iy+12),hl
 	ld	de,(iy+6)
+_ClipRectRegion_Compare_ASM:
+	dec	hl
 _SignedCompare_ASM:
 	or	a,a
 	sbc	hl,de
-	add	hl,hl
-	ret	po
-	ccf
-	ret
-_SignedCompareBC_ASM:
-	or	a,a
-	sbc	hl,bc
 	add	hl,hl
 	ret	po
 	ccf
@@ -4556,7 +4549,7 @@ _SetFullScrnClip_ASM:
 	sbc	hl,hl
 	ld	(_xmin),hl \.r
 	inc	h
-	ld	l,lcdWidth-$ff
+	ld	l,lcdWidth&$ff
 	ld	(_xmax),hl \.r
 	ret
 
