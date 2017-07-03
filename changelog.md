@@ -2,7 +2,11 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.0...HEAD)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.3...HEAD)
+
+# [v7.3](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-02-17)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.2...v7.3)
 
 # [v7.0](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-02-17)
 
