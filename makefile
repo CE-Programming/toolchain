@@ -82,6 +82,7 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload
 	$(MAKE) -C $(SPASMDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
+	$(MAKE) -C $(CONVTILDIR) clean
 	$(WINCHKDIR) $(call WINCHKPATH,release) $(RMDIR) release
 	$(WINCHKDIR) $(call WINCHKPATH,doxygen) $(RMDIR) doxygen
 
