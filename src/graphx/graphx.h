@@ -97,6 +97,11 @@ gfx_sprite_t *name = (gfx_sprite_t *)name##_data
  * @see gfx_mode_t
  */
 int gfx_Begin(gfx_mode_t mode);
+    
+/**
+ * Helper macro to easily initialize the graphics library setup
+ */
+#define gfx_Begin() gfx_Begin(0x27)
 
 /**
  * Closes the graphics setup
