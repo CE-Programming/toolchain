@@ -49,7 +49,7 @@ typedef union header _HEADER;
 extern double _huge_val;
 #define HUGE_VAL _huge_val      /* overflow error */
 
-#define RAND_MAX 32767          /* maximum value returned by rand() */
+#define RAND_MAX 8388607        /* maximum value returned by rand() */
 
 #ifndef SIZE_T_DEFINED
 #define SIZE_T_DEFINED
