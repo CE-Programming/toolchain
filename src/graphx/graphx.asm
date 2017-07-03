@@ -380,14 +380,15 @@ _:	ld	a,b
 	ld	(de),a
 	inc	de
 	ld	a,b
+	rla
+	rla
+	rla
+	ld	a,b
 	rra
 	ld	(de),a
 	inc	de
 	inc	b
 	jr	nz,-_                       ; loop for 256 times to fill palette
-	scf
-	sbc	hl,hl
-	ld	(mpLcdPalette+(255*2)),hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -507,17 +508,15 @@ _FillRectangle:
 	add	hl,de
 	ld	(iy+12),hl
 	call	_ClipRectRegion_ASM \.r
-	ret	c                           ; return if offscreen
+	ret	c                           ; return if offscreen or degenerate
 	ld	de,(iy+3)
 	ld	hl,(iy+9)
-	sbc	hl,de                       ; make sure that the width is not 0
-	ret	z
+	sbc	hl,de
 	push	hl
 	ld	de,(iy+6)
 	ld	hl,(iy+12)
 	sbc	hl,de
 	pop	bc                          ; bc = new width
-	ret	z
 	ld	a,l                         ; a = new height
 	ld	hl,(iy+3)                   ; hl = new x, de = new y
 	jr	_FillRectangle_NoClip_ASM
@@ -2090,14 +2089,14 @@ _Sprite_NoClip:
 	ld	(SprNcJrStep-1),a \.r
 	ld	a,lcdWidth/2
 	sub	a,c
-	ld	iyl,a				; (lcdWidth-spriteWidth)/2
+	ld	iyl,a				; (lcdWidth/2)-(spriteWidth/2)
 	ld	a,(hl)				; spriteHeight
 	inc	hl
 	jr	SprNcLpStart
 SprNcLpOddW:
-	inc	de				; needed if sprite width is odd
+	dec	de				; needed if sprite width is odd
 SprNcLpEvenW:
-	ld	c,iyl				; (lcdWidth-spriteWidth)/2
+	ld	c,iyl				; (lcdWidth/2)-(spriteWidth/2)
 	ex	de,hl
 	add	hl,bc
 	add	hl,bc
@@ -5096,7 +5095,7 @@ _ClipRectRegion_ASM:
 	call	_Min_ASM \.r
 	ld	(iy+9),hl
 	ld	de,(iy+3)
-	call	_SignedCompare_ASM \.r
+	call	_ClipRectRegion_Compare_ASM \.r
 	ret	c
 	ld	hl,(_ymin) \.r
 	ld	de,(iy+6)
@@ -5107,16 +5106,11 @@ _ClipRectRegion_ASM:
 	call	_Min_ASM \.r
 	ld	(iy+12),hl
 	ld	de,(iy+6)
+_ClipRectRegion_Compare_ASM:
+	dec	hl
 _SignedCompare_ASM:
 	or	a,a
 	sbc	hl,de
-	add	hl,hl
-	ret	po
-	ccf
-	ret
-_SignedCompareBC_ASM:
-	or	a,a
-	sbc	hl,bc
 	add	hl,hl
 	ret	po
 	ccf
@@ -5136,7 +5130,7 @@ _SetFullScrnClip_ASM:
 	sbc	hl,hl
 	ld	(_xmin),hl \.r
 	inc	h
-	ld	l,lcdWidth-$ff
+	ld	l,lcdWidth&$ff
 	ld	(_xmax),hl \.r
 	ret
 

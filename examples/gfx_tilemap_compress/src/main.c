@@ -12,12 +12,13 @@
 
 /* Include the graphics */
 #include "gfx/tiles_gfx.h"
+#include "tilemap/tilemapdata.h"
 
 /* Tilemap defines */
 #define TILE_WIDTH          (16)
 #define TILE_HEIGHT         (16)
-
 #define TILE_SIZE           ((TILE_WIDTH * TILE_HEIGHT) + 2) // +2 for width and height bytes
+
 #define TILEMAP_WIDTH       (32)
 #define TILEMAP_HEIGHT      (25)
 
@@ -27,8 +28,8 @@
 #define Y_OFFSET            (16)
 #define X_OFFSET            (0)
 
-/* This is where the tilemap data is stored */
-extern uint8_t tilemap_map[];
+/* This is where the decompressed tilemap data is to be stored */
+uint8_t tilemap_map[TILEMAP_WIDTH * TILEMAP_HEIGHT];
 
 /* Place to hold decompressed tile pointers */
 gfx_sprite_t *tileset_tiles[128];
@@ -43,11 +44,13 @@ void main(void) {
     gfx_tilemap_t tilemap;
 
     /* Decompress the tiles */
-    for (i = 0; i < 128; i++) {
+    for (i = 0; i < sizeof(tileset_tiles)/sizeof(gfx_sprite_t*) ; i++) {
         tmp_ptr = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);
         dzx7_Turbo(tileset_tiles_compressed[i], tmp_ptr); // or dzx7_Standard, but in this case we have a lot of tiles
         tileset_tiles[i] = tmp_ptr;
     }
+
+    dzx7_Turbo(tilemap_compressed, tilemap_map);
 
     /* Initialize the tilemap structure */
     tilemap.map         = tilemap_map;
@@ -63,8 +66,8 @@ void main(void) {
     tilemap.y_loc       = Y_OFFSET;
     tilemap.x_loc       = X_OFFSET;
 
-    /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    /* Initialize the graphics scene */
+    gfx_Begin();
 
     /* Set up the palette */
     gfx_SetPalette(tiles_gfx_pal, sizeof tiles_gfx_pal, 0);

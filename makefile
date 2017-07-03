@@ -46,6 +46,7 @@ SRCDIR     := $(call NATIVEPATH,$(CURDIR)/src)
 SPASMDIR   := $(call NATIVEPATH,$(TOOLSDIR)/spasm-ng)
 CONVHEXDIR := $(call NATIVEPATH,$(TOOLSDIR)/convhex)
 CONVPNGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convpng)
+CONVTILDIR := $(call NATIVEPATH,$(TOOLSDIR)/convtile)
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
 STARTDIR   := $(call NATIVEPATH,$(SRCDIR)/startup)
@@ -53,12 +54,13 @@ STARTDIR   := $(call NATIVEPATH,$(SRCDIR)/startup)
 SPASM      := $(call NATIVEPATH,$(SPASMDIR)/spasm)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
 CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
-
+CONVTILE   := $(call NATIVEPATH,$(CONVTILDIR)/convtile)
 
 ifeq ($(OS),Windows_NT)
 SPASM      := $(call NATIVEPATH,$(SPASMDIR)/spasm.exe)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex.exe)
 CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
+CONVTILE   := $(call NATIVEPATH,$(CONVTILDIR)/convtile.exe)
 endif
 
 BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
@@ -74,7 +76,7 @@ INSTALLLIB := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib)
 DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
-all: $(SPASM) $(CONVHEX) $(CONVPNG) graphx fileioc keypadc libload ce std startup
+all: $(SPASM) $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
 
 clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(SPASMDIR) clean
@@ -92,6 +94,8 @@ $(CONVHEX):
 	$(MAKE) -C $(CONVHEXDIR)
 $(CONVPNG):
 	$(MAKE) -C $(CONVPNGDIR)
+$(CONVTILE):
+	$(MAKE) -C $(CONVTILDIR)
 #----------------------------
 
 #----------------------------
@@ -174,6 +178,7 @@ install: $(DIRS) chmod
 	$(CP) $(SPASM) $(INSTALLBIN)
 	$(CP) $(CONVHEX) $(INSTALLBIN)
 	$(CP) $(CONVPNG) $(INSTALLBIN)
+	$(CP) $(CONVTILE) $(INSTALLBIN)
 	$(CP) $(call NATIVEPATH,$(BIN)/*) $(INSTALLBIN)
 	$(MAKE) -C $(GRAPHXDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(KEYPADCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
