@@ -60,7 +60,7 @@ void main(void) {
     midy2 = (face2[1][1] + face2[2][1]) / 2.0;
     
     /* Start the graphics routines */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     gfx_SetDraw(gfx_buffer);
     
     /* Loop until a key is pressed */

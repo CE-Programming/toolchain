@@ -19,7 +19,7 @@ void main(void) {
     /* Create a buffer the same size as the ubuntu sprite */
     gfx_UninitedSprite(sprite_buffer, UBUNTU_SPRITE_WIDTH, UBUNTU_SPRITE_HEIGHT);
     
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     
     /* Setup the palette used by the sprites*/
     gfx_SetPalette(logo_gfx_pal, sizeof(logo_gfx_pal), 0);

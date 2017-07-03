@@ -22,7 +22,7 @@ void main(void) {
     var_gfx_init();
     
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     
     /* Set up the palette for the sprite */
     gfx_SetPalette(all_gfx_pal, sizeof_all_gfx_pal, 0);

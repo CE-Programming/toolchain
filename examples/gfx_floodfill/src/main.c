@@ -28,7 +28,7 @@ void main(void) {
     }
 
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     
     /* Set up the palette */
     gfx_SetColor(gfx_black);

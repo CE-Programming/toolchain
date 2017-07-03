@@ -22,7 +22,7 @@ void main(void) {
     };
 
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     gfx_SetColor(gfx_blue);
 
     /* Draw some circles to make sure they all look the same */

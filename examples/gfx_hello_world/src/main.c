@@ -22,7 +22,7 @@ void main(void) {
     srand(rtc_Time());
     
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     
     /* Fill the screen black */
     gfx_FillScreen(gfx_black);

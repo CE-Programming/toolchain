@@ -24,7 +24,7 @@ void main(void) {
     int box_scale = 20;
     
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     gfx_FillScreen(gfx_black);
     
     /* Setup the colors */

@@ -21,7 +21,7 @@ const char *my_str = "!!DEPPILF si txet sihT";
 
 void main(void) {
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     gfx_FillScreen(gfx_black);
     
     /* Setup the colors */

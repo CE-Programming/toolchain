@@ -54,7 +54,7 @@ void main(void) {
     tilemap.x_loc       = X_OFFSET;
     
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
     
     /* Set up the palette */
     gfx_SetPalette(tiles_gfx_pal, sizeof_tiles_gfx_pal, 0);

@@ -12,7 +12,7 @@
 
 /* Include the graphics */
 #include "gfx/tiles_gfx.h"
-#include "tilemap/tilemapdata.h"
+#include "tilemapdata.h"
 
 /* Tilemap defines */
 #define TILE_WIDTH          (16)

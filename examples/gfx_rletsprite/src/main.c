@@ -33,7 +33,7 @@ void main(void) {
     gfx_rletsprite_t *ubuntu_malloc;
 
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
 
     /* Set up the palette for our sprites */
     gfx_SetPalette(logo_gfx_pal, sizeof logo_gfx_pal, 0);

@@ -26,7 +26,7 @@ void main(void) {
     dzx7_Standard(apple_compressed, apple); // or dzx7_Turbo
 
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
 
     /* Set up the palette */
     gfx_SetPalette(all_gfx_pal, sizeof all_gfx_pal, 0);

@@ -16,7 +16,7 @@ void main(void) {
     uint8_t i = 0;
 	
     /* Initialize the 8bpp graphics */
-    gfx_Begin(gfx_8bpp);
+    gfx_Begin();
 	
     /* For i in 0..255 */
     do {
