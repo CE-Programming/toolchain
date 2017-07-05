@@ -4402,6 +4402,7 @@ _RLETSprite:
 	add	iy,sp			; iy = frame
 ; Clip bottom
 	ld	hl,(iy+3)		; hl = sprite struct
+	inc	hl
 	ld	c,(hl)			; bc = height
 	ld	hl,(_ymax) \.r		; hl = ymax
 	ld	de,(iy+9)		; de = y
@@ -4438,7 +4439,6 @@ _RLETSprite_SkipClipTop:
 ; de = ymin => d = deu = 0
 ; Clip left
 	ld	hl,(iy+3)		; hl = sprite struct
-	inc	hl
 	ld	e,(hl)			; de = width
 	ld	hl,(iy+6)		; hl = x
 	ld	bc,(_xmin) \.r		; bc = xmin
@@ -4497,29 +4497,29 @@ _RLETSprite_Heights_SMC = $-3
 	ld	d,c
 	push	de			;     (sp) = (height on-screen)<<8|(width on-screen)
 	ld	hl,(iy+3)		; hl = sprite struct
+	ld	c,(hl)			; c = width
 	inc	hl
+	inc	hl			; hl = start of sprite data
 	xor	a,a			; a = 0
 	ld	d,a			; d = deu = 0
 	or	a,b			; a = height off-screen
 	jr	z,_RLETSprite_ClipTop_End ; z => height off-screen == 0
-	ld	c,(hl)			; c = width
 _RLETSprite_ClipTop_Row:
 	ld	a,c			; a = width
 _RLETSprite_ClipTop_Trans:
-	inc	hl
 	sub	a,(hl)			; a = width remaining after trans run
+	inc	hl
 	jr	z,_RLETSprite_ClipTop_RowEnd ; z ==> width remaining == 0
 _RLETSprite_ClipTop_Opaque:
-	inc	hl
 	ld	e,(hl)			; de = opaque run length
+	inc	hl
 	sub	a,e			; a = width remaining after opaque run
 	add	hl,de			; skip opaque run
 	jr	nz,_RLETSprite_ClipTop_Trans ; nz ==> width remaining != 0
 _RLETSprite_ClipTop_RowEnd:
 	djnz	_RLETSprite_ClipTop_Row	; decrement height remaining off-screen,
 					; nz => still off-screen
-_RLETSprite_ClipTop_End:		; a = 0
-	inc	hl			; hl = start of (clipped) sprite data
+_RLETSprite_ClipTop_End:		; a = 0, hl = start of (clipped) sprite data
 ; Do stuff
 	pop	iy			;     iyh = height on-screen, iyl = width on-screen
 	pop	bc			;   bcu = 0, b = x clip bits
@@ -4562,12 +4562,14 @@ _RLETSprite_Middle_Opaque:
 	sub	a,c			; a = width remaining on-screen after opqaue run
 	jr	nc,_RLETSprite_Middle_OpaqueCopy_ ; nc ==> width remaining on-screen >= 0
 _RLETSprite_ExitRight_Opaque:
-	add	a,c
+	add	a,c			; a = width remaining on-screen before opaque run
 	ld	c,a			; bc = width remaining on-screen before opaque run
-	ld	a,(hl)
+	ld	a,(hl)			; a = opaque run length
 	inc	hl
-	sub	c
+	jr	z,_RLETSprite_ExitRight_Opaque_SkipCopy ; z ==> width remaining on-screen == 0
+	sub	c			; a = opaque run length off-screen
 	ldir				; copy on-screen part of opaque run
+_RLETSprite_ExitRight_Opaque_SkipCopy:
 	ld	c,a			; bc = opaque run length off-screen
 	ld	a,0			; a = width off-screen
 _RLETSprite_ExitRight_Opaque_Width_SMC = $-1
@@ -4643,7 +4645,7 @@ _RLETSprite_ClipLeft_Opaque:
 _RLETSprite_EnterLeft_Opaque:
 	inc	hl
 	add	hl,bc			; skip off-screen part of opaque run
-	neg
+	neg				; a = opaque run length on-screen
 	ld	c,a			; bc = opaque run length on-screen
 	ld	a,iyl			; a = width on-screen
 	sub	a,c			; a = width remaining on-screen after opaque run
@@ -4651,10 +4653,10 @@ _RLETSprite_EnterLeft_Opaque:
 _RLETSprite_EnterLeft_Opaque_Jr_SMC = $-1
 
 _RLETSprite_EnterLeft_Trans:
-	neg
-	ld	c,a			; bc = opaque run length on-screen
+	neg				; a = trans run length on-screen
+	ld	c,a			; bc = trans run length on-screen
 	ld	a,iyl			; a = width on-screen
-	sub	a,c			; a = width remaining on-screen after opaque run
+	sub	a,c			; a = width remaining on-screen after trans run
 	ex	de,hl			; de = sprite, hl = buffer
 	jr	_RLETSprite_NoClip_TransSkip
 _RLETSprite_EnterLeft_Trans_Jr_SMC = $-1
