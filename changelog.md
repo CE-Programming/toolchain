@@ -4,11 +4,72 @@
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.3...HEAD)
 
+
 # [v7.3](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-02-17)
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.2...v7.3)
 
-# [v7.0](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-02-17)
+### Toolchain
+  - Automated testing through Travis - ([Adriweb](https://github.com/Adriweb))
+  - Fixed C++-compatibility-related things - ([Adriweb](https://github.com/Adriweb))
+  - Fixed/improved autotester files - ([Adriweb](https://github.com/Adriweb)+[MattWaltz](https://github.com/MattWaltz))
+  - Improved Makefile ([MattWaltz](https://github.com/MattWaltz))
+  - Misc. fixes and optimizations ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
+  - Fixed some docs and examples ([MattWaltz](https://github.com/MattWaltz))
+  - More demos ([MattWaltz](https://github.com/MattWaltz))
+  - Fixed bss and cstarted-related things ([MattWaltz](https://github.com/MattWaltz))
+  - Added ms delay function - ([Runer112](https://github.com/Runer112)) 
+  - Improved rand function - ([Runer112](https://github.com/Runer112)) 
+  - Overall misc. cleanup and documentation - ([Runer112](https://github.com/Runer112)) 
+
+### Libraries
+
+#####  GRAPHX
+  - Clipped sprites fixes ([MattWaltz](https://github.com/MattWaltz))
+  - Code optimizations ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
+  - ConvPNG-related updates ([MattWaltz](https://github.com/MattWaltz))
+  - ConvTile-related updates ([MattWaltz](https://github.com/MattWaltz))
+  - Renaming: gfx_sprite_t from gfx_image_t ([MattWaltz](https://github.com/MattWaltz))
+  - Added gfx_RLETSprite (sprites with RLE transparency) - ([Runer112](https://github.com/Runer112))
+  - Improved palette generation - ([Runer112](https://github.com/Runer112))
+
+
+# [v7.2](https://github.com/CE-Programming/toolchain/releases/tag/v7.2) (2017-05-06)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.1...v7.2)
+
+### Toolchain
+  - Implicit `prgm_CleanUp` by default - ([MattWaltz](https://github.com/MattWaltz))
+  - Examples cleanup - ([MattWaltz](https://github.com/MattWaltz))
+  - Fix some example screenshots - ([MattWaltz](https://github.com/MattWaltz))
+  - Routines optimizations - ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)) 
+
+### Libraries
+
+#####  FILEIOC
+  - Misc. fixes - ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[PeterTillema](https://github.com/PeterTillema))
+
+
+# [v7.1](https://github.com/CE-Programming/toolchain/releases/tag/v7.1) (2017-04-30)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.0...v7.1)
+
+### Toolchain
+  - Compatibility headers and better include paths - ([Adriweb](https://github.com/Adriweb))
+  - Travis CI integration - ([Adriweb](https://github.com/Adriweb))
+  - Example screenshots - ([Adriweb](https://github.com/Adriweb))
+  - Improved documentation - ([MattWaltz](https://github.com/MattWaltz))
+  - Misc. fixes - ([MattWaltz](https://github.com/MattWaltz))
+  - Fix Windows install - ([MattWaltz](https://github.com/MattWaltz))
+
+### Libraries
+
+#####  GRAPHX
+  - Bug. fixes - ([MattWaltz](https://github.com/MattWaltz)+[PeterTillema](https://github.com/PeterTillema))
+  - Optimizations - ([MattWaltz](https://github.com/MattWaltz))
+  
+
+# [v7.0](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-04-07)
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.95...v7.0)
 
