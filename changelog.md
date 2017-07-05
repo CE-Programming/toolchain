@@ -4,23 +4,27 @@
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.3...HEAD)
 
+### Libraries
 
-# [v7.3](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-02-17)
+#####  GRAPHX
+  - Fixed gfx_RLETSprite where width != height, and in a right clip case - ([`5c84e9b`](https://github.com/CE-Programming/toolchain/commit/5c84e9b) - [Runer112](https://github.com/Runer112))
+
+# [v7.3](https://github.com/CE-Programming/toolchain/releases/tag/v7.3) (2017-07-04)
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.2...v7.3)
 
 ### Toolchain
-  - Automated testing through Travis - ([Adriweb](https://github.com/Adriweb))
-  - Fixed C++-compatibility-related things - ([Adriweb](https://github.com/Adriweb))
-  - Fixed/improved autotester files - ([Adriweb](https://github.com/Adriweb)+[MattWaltz](https://github.com/MattWaltz))
+  - Automated testing through Travis ([Adriweb](https://github.com/Adriweb))
+  - Fixed C++-compatibility-related things ([Adriweb](https://github.com/Adriweb))
+  - Fixed/improved autotester files ([Adriweb](https://github.com/Adriweb)+[MattWaltz](https://github.com/MattWaltz))
   - Improved Makefile ([MattWaltz](https://github.com/MattWaltz))
   - Misc. fixes and optimizations ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
   - Fixed some docs and examples ([MattWaltz](https://github.com/MattWaltz))
   - More demos ([MattWaltz](https://github.com/MattWaltz))
   - Fixed bss and cstarted-related things ([MattWaltz](https://github.com/MattWaltz))
-  - Added ms delay function - ([Runer112](https://github.com/Runer112)) 
-  - Improved rand function - ([Runer112](https://github.com/Runer112)) 
-  - Overall misc. cleanup and documentation - ([Runer112](https://github.com/Runer112)) 
+  - Added millisecond delay function ([`ae19350`](https://github.com/CE-Programming/toolchain/commit/ae19350) - [Runer112](https://github.com/Runer112))
+  - Improved (pseudo)random number generation ([`b6c1929`](https://github.com/CE-Programming/toolchain/commit/b6c1929) - [Runer112](https://github.com/Runer112))
+  - Overall misc. cleanup and documentation ([Runer112](https://github.com/Runer112))
 
 ### Libraries
 
@@ -30,8 +34,9 @@
   - ConvPNG-related updates ([MattWaltz](https://github.com/MattWaltz))
   - ConvTile-related updates ([MattWaltz](https://github.com/MattWaltz))
   - Renaming: gfx_sprite_t from gfx_image_t ([MattWaltz](https://github.com/MattWaltz))
-  - Added gfx_RLETSprite (sprites with RLE transparency) - ([Runer112](https://github.com/Runer112))
-  - Improved palette generation - ([Runer112](https://github.com/Runer112))
+  - Fixed green LSB in default palette colors ([`be9fea4`](https://github.com/CE-Programming/toolchain/commit/be9fea4) - [Runer112](https://github.com/Runer112))
+  - Added fast (RLE) transparent sprite type, gfx_rletsprite_t, and functions: gfx_AllocRLETSprite, gfx_MallocRLETSprite, gfx_UninitedRLETSprite, gfx_RLETSprite, gfx_RLETSprite_NoClip, gfx_ConvertFromRLETSprite, gfx_ConvertToRLETSprite, gfx_ConvertToNewRLETSprite, gfx_ConvertMallocRLETSprite ([`e26bf07`](https://github.com/CE-Programming/toolchain/commit/e26bf07) - [Runer112](https://github.com/Runer112))
+  - Fixed drawing unclipped sprites with odd width ([`5a4cc95`](https://github.com/CE-Programming/toolchain/commit/5a4cc95) - [Runer112](https://github.com/Runer112))
 
 
 # [v7.2](https://github.com/CE-Programming/toolchain/releases/tag/v7.2) (2017-05-06)
