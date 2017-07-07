@@ -7,7 +7,7 @@ CCLEANUP_OBJ  ?= ccleanup.obj
 CLEANUP       ?= YES
 #----------------------------
 
-VERSION := 7.3
+VERSION := 7.4
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
@@ -30,6 +30,7 @@ INIT_LOC     := D1A87F
 
 ifeq ($(OS),Windows_NT)
 SHELL     := cmd.exe
+CURDIR    := $(shell cmd /c for %%I in ("$(CURDIR)") do @echo %%~sI)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 WINRELPATH = $(subst /,\,$(1))
