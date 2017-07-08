@@ -36,7 +36,7 @@ uint32_t random(void);
 void srandom(uint32_t seed);
 
 /**
- * Returns a pseudo-random integer in the range of min to max-1.
+ * Returns a pseudo-random integer in the range of \p min to \p max (inclusive).
  */
 #define randInt(min, max) \
 ((unsigned)random() % ((max) - (min) + 1) + (min))
