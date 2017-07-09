@@ -7,6 +7,7 @@ branches:
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
+  - sudo apt-get install doxygen
 
 install:
   - sudo apt-get install -y --force-yes -qq g++-6 gcc-6; export CXX="g++-6" CC="gcc-6"; $CXX --version
@@ -22,6 +23,8 @@ script:
   - make install
   - make dist
   - make dist-libs
+# Build the doxygen
+  - make doxygen
 # Build examples
   - cd $CEDEV/examples
   - make
@@ -38,6 +41,9 @@ script:
 # Test toolchain examples
   - cd $CEDEV/examples
   - RESULT=0; for f in */*.json; do echo "Launching autotester on $f"; autotester "$f"; RESULT=`expr $RESULT + $?`; done; return $RESULT
+
+after_success:
+  - bash deploy.sh
 
 notifications:
   irc:
