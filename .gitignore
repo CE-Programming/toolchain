@@ -1,6 +1,9 @@
 # Backups
 *~
 
+# Doxygen specific
+doxygen/
+
 # Object files
 *.o
 *.ko
