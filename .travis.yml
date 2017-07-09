@@ -28,7 +28,7 @@ script:
   - git clone https://github.com/CE-Programming/CEmu.git
   - make -C CEmu/core -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
   - make -C CEmu/tests/autotester -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
-  - export PATH=$(pwd):$PATH
+  - export PATH=$(pwd)/CEmu/tests/autotester:$PATH
 # Grab ROM for tests below
   - curl -s https://travis:$ROM_GETTER_PASS@tiplanet.org/scripts/travis/84pce_515_521.rom 2>/dev/null > 84pce_515_521.rom
   - export AUTOTESTER_ROM=$(pwd)/84pce_515_521.rom
