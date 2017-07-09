@@ -45,7 +45,7 @@ after_success:
   - cd build
   - cmake -G "Unix Makefiles" ..
   - make
-  - make install
+  - sudo make install
   - cd ../..
   - make doxygen
   - bash deploy.sh
