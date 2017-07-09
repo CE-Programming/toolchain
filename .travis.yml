@@ -19,6 +19,7 @@ script:
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
+  - export BASE_PATH=$(pwd)
   - make
   - make install
   - make dist
@@ -43,6 +44,7 @@ script:
   - RESULT=0; for f in */*.json; do echo "Launching autotester on $f"; autotester "$f"; RESULT=`expr $RESULT + $?`; done; return $RESULT
 
 after_success:
+  - cd $BASE_PATH
   - bash deploy.sh
 
 notifications:
