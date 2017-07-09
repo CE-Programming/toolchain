@@ -7,7 +7,6 @@ branches:
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
-  - sudo apt-get install doxygen
 
 install:
   - sudo apt-get install -y --force-yes -qq g++-6 gcc-6; export CXX="g++-6" CC="gcc-6"; $CXX --version
@@ -19,32 +18,34 @@ script:
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
-  - export BASE_PATH=$(pwd)
   - make
   - make install
   - make dist
   - make dist-libs
-# Build the doxygen
-  - make doxygen
 # Build examples
-  - cd $CEDEV/examples
-  - make
+  - make -C $CEDEV/examples
 # Build CEmu core and autotester_cli
-  - cd && git clone https://github.com/CE-Programming/CEmu.git
-  - cd CEmu/core
-  - make -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
-  - cd ../tests/autotester
-  - make -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
+  - git clone https://github.com/CE-Programming/CEmu.git
+  - make -C CEmu/core -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
+  - make -C CEmu/tests/autotester -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
   - export PATH=$(pwd):$PATH
 # Grab ROM for tests below
   - curl -s https://travis:$ROM_GETTER_PASS@tiplanet.org/scripts/travis/84pce_515_521.rom 2>/dev/null > 84pce_515_521.rom
   - export AUTOTESTER_ROM=$(pwd)/84pce_515_521.rom
 # Test toolchain examples
-  - cd $CEDEV/examples
-  - RESULT=0; for f in */*.json; do echo "Launching autotester on $f"; autotester "$f"; RESULT=`expr $RESULT + $?`; done; return $RESULT
+  - RESULT=0; for f in $CEDEV/examples/*/*.json; do echo "Launching autotester on $f"; autotester "$f"; RESULT=`expr $RESULT + $?`; done; return $RESULT
 
 after_success:
-  - cd $BASE_PATH
+# Build the doxygen
+  - git clone https://github.com/doxygen/doxygen.git doc
+  - cd doc
+  - mkdir build
+  - cd build
+  - cmake -G "Unix Makefiles" ..
+  - make
+  - make install
+  - cd ../..
+  - make doxygen
   - bash deploy.sh
 
 notifications:
