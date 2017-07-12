@@ -3,7 +3,7 @@
 
  .libraryAppVar     "GRAPHX"          ; Name of library on the calc
  .libraryName       "graphx"          ; Name of library
- .libraryVersion    6                 ; Version information (1-255)
+ .libraryVersion    7                 ; Version information (1-255)
 
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete
@@ -112,8 +112,11 @@
  .function "gfx_ConvertFromRLETSprite",_ConvertFromRLETSprite
  .function "gfx_ConvertToRLETSprite",_ConvertToRLETSprite
  .function "gfx_ConvertToNewRLETSprite",_ConvertToNewRLETSprite
-
-
+;-------------------------------------------------------------------------------
+; v7 functions
+;-------------------------------------------------------------------------------
+ .function "gfx_RotateScaleSprite",_RotateScaleSprite
+ 
  .beginDependencies
  .endDependencies
 
@@ -4120,6 +4123,301 @@ _:	add	hl,hl
 _:	rla
 	djnz	--_
 	ret                                 ; ca = c*256/a, h = c*256%a
+
+;-------------------------------------------------------------------------------
+_RotateScaleSprite:
+; Rotate and scale an image using an output buffer
+; Arguments:
+;  arg0 : Pointer to sprite struct input
+;  arg1 : Pointer to sprite struct output
+;  arg2 : Rotation angle as an integer
+;  arg3 : Scale factor (64 = 100%)
+; Returns:
+;  arg1 : Pointer to sprite struct output
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	push	hl
+	ld	iy,(ix+6)				; sprite pointer
+	lea	hl,iy+2
+	ld	(_smc_dsrs_sprptr_0 + 1),hl \.r		; write smc
+	
+_ScaleRotateSprite_ASM:
+	; sinf = sinTable[angle] * 128 / scale;
+	ld	a,(ix+12)				; angle
+	call	getSinCos \.r
+	ld	l,0
+	ld	h,a
+	rlca
+	rr	h					; hl = sinTable[angle] * 128
+	ld	c,(ix+15)
+	ld	b,0
+	call	_16Div8Signed \.r			; hl = sinTable[angle] * 128 / scale (sin)
+	ex	de,hl
+	ld	a,d
+	rlca
+	sbc	hl,hl
+	ld	l,e
+	ld	h,d
+	ld	(_smc_dsrs_sinf_1 + 1),hl \.r		; write smc
+	push	hl
+	ex	de,hl
+	sbc	hl,hl
+	ccf
+	sbc	hl,de
+	ld	(_smc_dsrs_sinf_0 + 1),hl \.r		; write smc
+	pop	hl
+
+	; dxs = sinf * -(size * scale / 128);
+	ld	c,(ix+15)
+	ld	b,(iy)
+	mlt	bc					; size * scale
+	rl	c
+	rl	b
+	ld	c,b					; (size * scale / 128)
+	xor	a,a
+	sub	a,c
+	ld	c,a
+	sbc	a,a
+	ld	b,a					; -(size * scale / 128)
+	ld	(ix-3),bc
+	
+	ld	d,b
+	ld	e,l
+	ld	b,h
+	ld	h,c
+	mlt	bc
+	mlt	de
+	mlt	hl
+	ld	a,h
+	add	a,c
+	add	a,e
+	ld	h,a					; sinf * -(size * scale / 128)
+	
+	ex	de,hl
+	rlca
+	sbc	hl,hl
+	ld	l,e
+	ld	h,d
+	ld	(_smc_dsrs_dys_0 + 1),hl \.r		; write smc
+	push	hl
+	
+	; cosf = sinTable[angle + 64] * 128 / scale
+	ld	a,64
+	add	a,(ix+12)				; angle + 64
+	call	getSinCos \.r
+	ld	l,0
+	ld	h,a
+	rlca
+	rr	h					; hl = sinTable[angle + 64] * 128
+	ld	c,(ix+15)
+	ld	b,0
+	call	_16Div8Signed \.r			; hl = sinTable[angle + 64] * 128 / scale (cos)
+	ex	de,hl
+	ld	a,d
+	rlca
+	sbc	hl,hl
+	ld	l,e
+	ld	h,d
+	ld	(_smc_dsrs_cosf_0 + 1),hl \.r		; write smc
+	ld	(_smc_dsrs_cosf_1 + 1),hl \.r		; write smc
+
+	; dxc = cosf * -(size * scale / 128);
+	ld	bc,(ix-3)				; -(size * scale / 128)
+	
+	ld	d,b
+	ld	e,l
+	ld	b,h
+	ld	h,c
+	mlt	bc
+	mlt	de
+	mlt	hl
+	ld	a,h
+	add	a,c
+	add	a,e
+	ld	h,a					; cosf * -(size * scale / 128)
+	
+	ex	de,hl
+	rlca
+	sbc	hl,hl
+	ld	l,e
+	ld	h,d
+	ld	(_smc_dsrs_dyc_0 + 1),hl \.r		; write smc
+ 	push	hl
+	
+	ld	a,(iy)					; size
+	ld	(_smc_dsrs_ssize_1 + 1),a \.r		; write smc
+	dec	a
+	ld	(_smc_dsrs_ssize_0 + 1),a \.r		; write smc
+	inc	a
+	ld	b,a
+	ld	c,(ix+15)
+	mlt	bc					; size * scale
+	srl	a					; size / 2
+	or	a,a
+	sbc	hl,hl
+	ld	h,a
+	ld	(_smc_dsrs_size128_0 + 1),hl \.r	; write smc
+	ld	(_smc_dsrs_size128_1 + 1),hl \.r	; write smc
+	ld	a,b
+	rl	c
+	adc	a,a
+	rl	c
+	adc	a,a					; size * scale / 64
+	jr	nz,+_
+	inc	a					; hax for scale = 1?
+_:	ld	(_smc_dsrs_size_1 + 2),a \.r		; write smc
+
+	pop	de					; smc = dxc start
+	pop	hl					; smc = dxs start
+	
+	ld	iy,(ix+9)				; sprite storing to
+	push	iy
+	ld	(iy+0),a
+	ld	(iy+1),a
+	lea	ix,iy+2
+	
+	ld	iyh,a					; size * scale / 64
+drawSpriteRotateScale_Loop1:
+	push	hl					; dxs
+	push	de					; dxc
+
+	; xs = (dxs + dyc) + (size * 128);
+_smc_dsrs_dyc_0:
+	ld	bc,$000000
+	add	hl,bc
+_smc_dsrs_size128_0:
+	ld	bc,$000000
+	add	hl,bc
+	ex	de,hl					; de = (dxs + dyc) + (size * 128)
+	; ys = (dxc - dys) + (size * 128);
+_smc_dsrs_dys_0:
+	ld	bc,$000000
+	or	a,a
+	sbc	hl,bc
+_smc_dsrs_size128_1:
+	ld	bc,$000000
+	add	hl,bc					; hl = (dxc - dys) + (size * 128)
+
+_smc_dsrs_size_1:					; smc = size * scale / 64
+	ld	iyl,$00
+drawSpriteRotateScale_Loop2:
+	push	hl					; xs
+ 
+	ld	a,d
+	or	a,h
+	rlca
+	jr	c,_dsrs_tp_pixel
+_smc_dsrs_ssize_0:
+	ld	a,$00
+	cp	a,d
+	jr	c,_dsrs_tp_pixel
+	cp	a,h
+	jr	c,_dsrs_tp_pixel
+
+	; get pixel and draw to buffer
+_smc_dsrs_ssize_1:
+	ld	c,$00
+	ld	b,h
+	mlt	bc
+	sbc	hl,hl
+	ld	l,d
+	add	hl,bc					; y * size + x
+_smc_dsrs_sprptr_0:
+	ld	bc,$000000
+	add	hl,bc
+	ld	a,(hl)
+	ld	(ix),a					; write pixel
+_dsrs_tp_pixel:
+	inc	ix					; x++s
+_smc_dsrs_cosf_0:					; smc = cosf
+	ld	hl,$000000
+	add	hl,de					; xs += cosf
+	ex	de,hl
+	pop	hl					; ys
+_smc_dsrs_sinf_0:					; smc = -sinf
+	ld	bc,$000000
+	add	hl,bc					; ys += -sinf
+	dec	iyl
+	jr	nz,drawSpriteRotateScale_Loop2		; x loop
+
+	pop	hl					; dxc
+_smc_dsrs_cosf_1:					; smc = cosf
+	ld	bc,$000000
+	add	hl,bc					; dxc += cosf
+	ex	de,hl
+	pop	hl					; dxs
+_smc_dsrs_sinf_1:					; smc = sinf
+	ld	bc,$000000
+	add	hl,bc					; dxs += sinf
+
+	dec	iyh
+	jp	nz,drawSpriteRotateScale_Loop1 \.r	; y loop
+	pop	hl					; sprite out ptr
+	pop	de
+	pop	ix
+	ret
+
+getSinCos:
+	; returns a = sin/cos(a) * 128
+	ld	c,a
+	bit	7,a
+	jr	z,$+4
+	sub	a,128
+	bit	6,a
+	jr	z,$+6
+	ld	e,a
+	ld	a,128
+	sub	a,e
+	ld	de,0
+	ld	e,a
+	ld	hl,sinTable \.r
+	add	hl,de
+	ld	a,(hl)
+	bit	7,c
+	ret	z
+	neg
+	ret
+
+sinTable:
+	; sin(x) * 128
+	.db 0,3,6,9,13,16,19,22,25,28,31,34,37,40,43,46
+	.db 49,52,55,58,60,63,66,68,71,74,76,79,81,84,86,88
+	.db 91,93,95,97,99,101,103,105,106,108,110,111,113,114,116,117
+	.db 118,119,121,122,122,123,124,125,126,126,127,127,127,127,127,127,127
+
+_16Div8Signed:
+	ld	a,h
+	xor	a,c
+	push	af
+	bit	7,h
+	jr	z,+_
+	ex	de,hl
+	sbc	hl,hl
+	sbc	hl,de
+_:	xor	a,a
+	sub	a,c
+	jp	m,+_ \.r
+	ld	c,a
+_:	push	hl
+	dec	sp
+	pop	hl
+	inc	sp
+	ld	b,16
+	xor	a,a
+_:	add	hl,hl
+	rla
+	cp	a,c
+	jr	c,+_
+	sub	a,c
+	inc	l
+_:	djnz	--_
+	pop	af
+	ret	p
+	ex	de,hl
+	sbc	hl,hl
+	sbc	hl,de
+	ret
 
 ;-------------------------------------------------------------------------------
 _FloodFill:

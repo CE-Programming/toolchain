@@ -1079,6 +1079,31 @@ gfx_sprite_t *gfx_RotateSpriteHalf(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite
 gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
+ * Fixed Rotation with scaling fator for sprites
+ *
+ * The output sprite is updated with the dimensions required for the implemented scaling factor.
+ * You must make sure that \p sprite_out has enough memory to store the needed output sprite. This can be
+ * found with the following formula: size = (max_scale / 64) * width * height + 2;
+ *
+ * @note A scale factor of 64 represents 100% scaling
+ * @warning This routine only accepts square input sprites
+ * @param sprite_in Input sprite to rotate/scale
+ * @param sprite_out Pointer to where rotated/scaled sprite will be stored
+ * @returns A pointer to sprite_out
+ */
+gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out, uint8_t angle, uint8_t scale);
+    
+/**
+ * A helper function to only perform rotation using gfx_RotateScaleSprite
+ *
+ * @param sprite_in Input sprite to rotate
+ * @param sprite_out Pointer to where rotated sprite will be stored
+ * @returns A pointer to sprite_out
+ * @see gfx_RotateScaleSprite
+ */
+#define gfx_RotateSprite(sprite_in, sprite_out, angle) gfx_RotateScaleSprite(sprite_in, sprite_out, angle, 64)
+    
+/**
  * Creates a temporary character sprite
  *
  * This may be useful for performing rotations and other
