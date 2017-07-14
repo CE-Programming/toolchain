@@ -116,6 +116,8 @@
 ; v7 functions
 ;-------------------------------------------------------------------------------
  .function "gfx_RotateScaleSprite",_RotateScaleSprite
+ .function "gfx_RotatedScaledTransparentSprite_NoClip",_RotatedScaledTransparentSprite_NoClip
+ .function "gfx_RotatedScaledSprite_NoClip",_RotatedScaledSprite_NoClip
  
  .beginDependencies
  .endDependencies
@@ -327,6 +329,8 @@ _SetTransparentColor:
 	ld	(TColor_SMC_3),a \.r
 	ld	(TColor_SMC_4),a \.r
 	ld	(TColor_SMC_5),a \.r
+	ld	(TColor_SMC_6),a \.r
+	ld	(TColor_SMC_7),a \.r
 	jr	_SetColor_Ret
 
 ;-------------------------------------------------------------------------------
@@ -4125,6 +4129,245 @@ _:	rla
 	ret                                 ; ca = c*256/a, h = c*256%a
 
 ;-------------------------------------------------------------------------------
+_RotatedScaledSprite_NoClip:
+; Rotate and scale an image drawn directly to the screen buffer
+; Arguments:
+;  arg0 : Pointer to sprite struct input
+;  arg1 : Pointer to sprite struct output
+;  arg2 : Rotation angle as an integer
+;  arg3 : Scale factor (64 = 100%)
+; Returns:
+;  arg1 : Pointer to sprite struct output
+	xor	a,a
+	jr	_RotatedScaled_ASM
+	
+;-------------------------------------------------------------------------------
+_RotatedScaledTransparentSprite_NoClip:
+; Rotate and scale an image drawn directly to the screen buffer
+; Arguments:
+;  arg0 : Pointer to sprite struct input
+;  arg1 : Pointer to sprite struct output
+;  arg2 : Rotation angle as an integer
+;  arg3 : Scale factor (64 = 100%)
+; Returns:
+;  arg1 : Pointer to sprite struct output
+	ld	a,3
+	
+_RotatedScaled_ASM:
+	ld	(_smc_tp),a \.r
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	push	hl
+	ld	iy,(ix+6)				; sprite pointer
+	lea	hl,iy+2
+	ld	(_dsrs_sprptr_0 + 1),hl \.r		; write smc
+	
+	ld	l,(ix+12)				; y
+	ld	h,160
+	mlt	hl
+	add	hl,hl
+	ld	de,(ix+9)				; x
+	add	hl,de
+	ex	de,hl
+	ld	hl,(currDrawBuffer)
+	add	hl,de					; offset buffer
+	push	hl
+	
+	; sinf = sinTable[angle] * 128 / scale;
+	ld	a,(ix+15)				; angle
+	call	getSinCos \.r
+	ld	l,0
+	ld	h,a
+	rlca
+	rr	h					; hl = sinTable[angle] * 128
+	ld	c,(ix+18)
+	ld	b,0
+	call	_16Div8Signed \.r			; hl = sinTable[angle] * 128 / scale (sin)
+	ex	de,hl
+	ld	a,d
+	rlca
+	sbc	hl,hl
+	ld	l,e
+	ld	h,d
+	ld	(_dsrs_sinf_1 + 1),hl \.r		; write smc
+	push	hl
+	ex	de,hl
+	sbc	hl,hl
+	ccf
+	sbc	hl,de
+	ld	(_dsrs_sinf_0 + 1),hl \.r		; write smc
+	pop	hl
+
+	; dxs = sinf * -(size * scale / 128);
+	ld	c,(ix+18)
+	ld	b,(iy)
+	mlt	bc					; size * scale
+	rl	c
+	rl	b
+	ld	c,b					; (size * scale / 128)
+	xor	a,a
+	sub	a,c
+	ld	c,a
+	sbc	a,a
+	ld	b,a					; -(size * scale / 128)
+	ld	(ix-3),bc
+	call	_16Mul16SignedNeg \.r			; sinf * -(size * scale / 128)
+	ld	(_dsrs_dys_0 + 1),hl \.r		; write smc
+	push	hl
+	
+	; cosf = sinTable[angle + 64] * 128 / scale
+	ld	a,64
+	add	a,(ix+15)				; angle + 64
+	call	getSinCos \.r
+	ld	l,0
+	ld	h,a
+	rlca
+	rr	h					; hl = sinTable[angle + 64] * 128
+	ld	c,(ix+18)
+	ld	b,0
+	call	_16Div8Signed \.r			; hl = sinTable[angle + 64] * 128 / scale (cos)
+	ex	de,hl
+	ld	a,d
+	rlca
+	sbc	hl,hl
+	ld	l,e
+	ld	h,d
+	ld	(_dsrs_cosf_0 + 1),hl \.r		; write smc
+	ld	(_dsrs_cosf_1 + 1),hl \.r		; write smc
+
+	; dxc = cosf * -(size * scale / 128);
+	ld	bc,(ix-3)				; -(size * scale / 128)
+	call	_16Mul16SignedNeg \.r			; cosf * -(size * scale / 128)
+	ld	(_dsrs_dyc_0 + 1),hl \.r		; write smc
+ 	push	hl
+	
+	ld	a,(iy)					; size
+	ld	(_dsrs_ssize_1 + 1),a \.r		; write smc
+	dec	a
+	ld	(_dsrs_ssize_0 + 1),a \.r		; write smc
+	inc	a
+	ld	b,a
+	ld	c,(ix+18)
+	mlt	bc					; size * scale
+	srl	a					; size / 2
+	or	a,a
+	sbc	hl,hl
+	ld	h,a
+	ld	(_dsrs_size128_0 + 1),hl \.r		; write smc
+	ld	(_dsrs_size128_1 + 1),hl \.r		; write smc
+	ld	a,b
+	rl	c
+	adc	a,a
+	rl	c
+	adc	a,a					; size * scale / 64
+	jr	nz,+_
+	inc	a					; hax for scale = 1?
+_:	ld	(_dsrs_size_1 + 2),a \.r		; write smc
+
+ 	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	ld	de,lcdWidth
+	ex	de,hl
+	sbc	hl,de
+	ld	(_line_add + 1),hl \.r
+	
+	pop	de					; smc = dxc start
+	pop	hl					; smc = dxs start
+	pop	ix
+	
+	push	af
+	ld	iyh,a					; size * scale / 64
+drawSpriteRotatedScaled_Loop1:
+	push	hl					; dxs
+	push	de					; dxc
+
+	; xs = (dxs + dyc) + (size * 128);
+_dsrs_dyc_0:
+	ld	bc,$000000
+	add	hl,bc
+_dsrs_size128_0:
+	ld	bc,$000000
+	add	hl,bc
+	ex	de,hl					; de = (dxs + dyc) + (size * 128)
+	; ys = (dxc - dys) + (size * 128);
+_dsrs_dys_0:
+	ld	bc,$000000
+	or	a,a
+	sbc	hl,bc
+_dsrs_size128_1:
+	ld	bc,$000000
+	add	hl,bc					; hl = (dxc - dys) + (size * 128)
+
+_dsrs_size_1:						; smc = size * scale / 64
+	ld	iyl,$00
+drawSpriteRotatedScaled_Loop2:
+	push	hl					; xs
+ 
+	ld	a,d
+	or	a,h
+	rlca
+	jr	c,drawSpriteRotatedScaled_SkipPixel
+_dsrs_ssize_0:
+	ld	a,$00
+	cp	a,d
+	jr	c,drawSpriteRotatedScaled_SkipPixel
+	cp	a,h
+	jr	c,drawSpriteRotatedScaled_SkipPixel
+
+	; get pixel and draw to buffer
+_dsrs_ssize_1:
+	ld	c,$00
+	ld	b,h
+	mlt	bc
+	sbc	hl,hl
+	ld	l,d
+	add	hl,bc					; y * size + x
+_dsrs_sprptr_0:
+	ld	bc,$000000
+	add	hl,bc
+	ld	a,(hl)
+	cp	a,DEFAULT_TP_COLOR
+TColor_SMC_6 =$-1
+	jr	z,$+5
+_smc_tp =$-1
+	ld	(ix),a					; write pixel
+drawSpriteRotatedScaled_SkipPixel:
+	inc	ix					; x++s
+_dsrs_cosf_0:						; smc = cosf
+	ld	hl,$000000
+	add	hl,de					; xs += cosf
+	ex	de,hl
+	pop	hl					; ys
+_dsrs_sinf_0:						; smc = -sinf
+	ld	bc,$000000
+	add	hl,bc					; ys += -sinf
+	dec	iyl
+	jr	nz,drawSpriteRotatedScaled_Loop2		; x loop
+
+	pop	hl					; dxc
+_dsrs_cosf_1:						; smc = cosf
+	ld	bc,$000000
+	add	hl,bc					; dxc += cosf
+	ex	de,hl
+	pop	hl					; dxs
+_dsrs_sinf_1:						; smc = sinf
+	ld	bc,$000000
+	add	hl,bc					; dxs += sinf
+
+_line_add:
+	ld	bc,$000000
+	add	ix,bc					; y++
+	
+	dec	iyh
+	jp	nz,drawSpriteRotatedScaled_Loop1 \.r	; y loop
+	pop	af					; sprite out ptr
+	pop	de
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
 _RotateScaleSprite:
 ; Rotate and scale an image using an output buffer
 ; Arguments:
@@ -4181,24 +4424,7 @@ _ScaleRotateSprite_ASM:
 	sbc	a,a
 	ld	b,a					; -(size * scale / 128)
 	ld	(ix-3),bc
-	
-	ld	d,b
-	ld	e,l
-	ld	b,h
-	ld	h,c
-	mlt	bc
-	mlt	de
-	mlt	hl
-	ld	a,h
-	add	a,c
-	add	a,e
-	ld	h,a					; sinf * -(size * scale / 128)
-	
-	ex	de,hl
-	rlca
-	sbc	hl,hl
-	ld	l,e
-	ld	h,d
+	call	_16Mul16SignedNeg \.r			; sinf * -(size * scale / 128)
 	ld	(_smc_dsrs_dys_0 + 1),hl \.r		; write smc
 	push	hl
 	
@@ -4224,24 +4450,7 @@ _ScaleRotateSprite_ASM:
 
 	; dxc = cosf * -(size * scale / 128);
 	ld	bc,(ix-3)				; -(size * scale / 128)
-	
-	ld	d,b
-	ld	e,l
-	ld	b,h
-	ld	h,c
-	mlt	bc
-	mlt	de
-	mlt	hl
-	ld	a,h
-	add	a,c
-	add	a,e
-	ld	h,a					; cosf * -(size * scale / 128)
-	
-	ex	de,hl
-	rlca
-	sbc	hl,hl
-	ld	l,e
-	ld	h,d
+	call	_16Mul16SignedNeg \.r			; cosf * -(size * scale / 128)
 	ld	(_smc_dsrs_dyc_0 + 1),hl \.r		; write smc
  	push	hl
 	
@@ -4307,13 +4516,15 @@ drawSpriteRotateScale_Loop2:
 	ld	a,d
 	or	a,h
 	rlca
-	jr	c,_dsrs_tp_pixel
+	ld	c,DEFAULT_TP_COLOR
+TColor_SMC_7 =$-1
+	jr	c,drawSpriteRotateScale_SkipPixel
 _smc_dsrs_ssize_0:
 	ld	a,$00
 	cp	a,d
-	jr	c,_dsrs_tp_pixel
+	jr	c,drawSpriteRotateScale_SkipPixel
 	cp	a,h
-	jr	c,_dsrs_tp_pixel
+	jr	c,drawSpriteRotateScale_SkipPixel
 
 	; get pixel and draw to buffer
 _smc_dsrs_ssize_1:
@@ -4326,9 +4537,9 @@ _smc_dsrs_ssize_1:
 _smc_dsrs_sprptr_0:
 	ld	bc,$000000
 	add	hl,bc
-	ld	a,(hl)
-	ld	(ix),a					; write pixel
-_dsrs_tp_pixel:
+	ld	c,(hl)
+drawSpriteRotateScale_SkipPixel:
+	ld	(ix),c					; write pixel
 	inc	ix					; x++s
 _smc_dsrs_cosf_0:					; smc = cosf
 	ld	hl,$000000
@@ -4417,6 +4628,25 @@ _:	djnz	--_
 	ex	de,hl
 	sbc	hl,hl
 	sbc	hl,de
+	ret
+
+_16Mul16SignedNeg:
+	ld	d,b
+	ld	e,l
+	ld	b,h
+	ld	h,c
+	mlt	bc
+	mlt	de
+	mlt	hl
+	ld	a,h
+	add	a,c
+	add	a,e
+	ld	h,a
+	ex	de,hl
+	rlca
+	sbc	hl,hl
+	ld	l,e
+	ld	h,d
 	ret
 
 ;-------------------------------------------------------------------------------

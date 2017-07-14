@@ -1004,7 +1004,7 @@ gfx_GetSprite((sprite_buffer), (x), (y))
  * @param height_scale Height scaling factor
  * @note Useable with gfx_GetSprite in order to create clipped versions
  */
-void gfx_ScaledSprite_NoClip(gfx_sprite_t *sprite, int x, int y, uint8_t width_scale, uint8_t height_scale);
+void gfx_ScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t width_scale, uint8_t height_scale);
 
 /**
  * Scale an unclipped transparent sprite
@@ -1017,8 +1017,58 @@ void gfx_ScaledSprite_NoClip(gfx_sprite_t *sprite, int x, int y, uint8_t width_s
  * @param height_scale Height scaling factor
  * @note Useable with gfx_GetSprite in order to create clipped versions
  */
-void gfx_ScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, int x, int y, uint8_t width_scale, uint8_t height_scale);
+void gfx_ScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t width_scale, uint8_t height_scale);
 
+/**
+ * Fixed Rotation with scaling fator for sprites
+ *
+ * @note A scale factor of 64 represents 100% scaling
+ * @warning This routine only accepts square input sprites
+ * @param sprite Input sprite to rotate/scale
+ * @param x X coordinate position
+ * @param x Y coordinate position
+ * @param angle 256 position angular integer
+ * @param scale Scaling factor; range is about 1% to 400% scale
+ * @returns The size of the sprite after scaling. This can be used for centering purposes.
+ * @returns A pointer to \p sprite_out
+ */
+uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t angle, uint8_t scale);
+
+/**
+ * A helper macro to only perform rotation using gfx_RotatedScaledTransparentSprite_NoClip
+ *
+ * @param sprite_in Input sprite to rotate
+ * @param sprite_out Pointer to where rotated sprite will be stored
+ * @param angle 256 position angular integer
+ * @see gfx_RotatedScaledTransparentSprite_NoClip
+ */
+#define gfx_RotatedTransparentSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle)
+
+/**
+ * Fixed Rotation with scaling fator for sprites without transparency
+ *
+ * @note A scale factor of 64 represents 100% scaling
+ * @warning This routine only accepts square input sprites
+ * @param sprite Input sprite to rotate/scale
+ * @param x X coordinate position
+ * @param x Y coordinate position
+ * @param angle 256 position angular integer
+ * @param scale Scaling factor; range is about 1% to 400% scale
+ * @returns The size of the sprite after scaling. This can be used for centering purposes.
+ * @returns A pointer to \p sprite_out
+ */
+uint8_t gfx_RotatedScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t angle, uint8_t scale);
+
+/**
+ * A helper macro to only perform rotation using gfx_RotatedScaledSprite_NoClip
+ *
+ * @param sprite_in Input sprite to rotate
+ * @param sprite_out Pointer to where rotated sprite will be stored
+ * @param angle 256 position angular integer
+ * @see gfx_RotatedScaledTransparentSprite_NoClip
+ */
+#define gfx_RotatedSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle)
+    
 /**
  * Flips a sprite along the X axis
  *
@@ -1074,7 +1124,7 @@ gfx_sprite_t *gfx_RotateSpriteHalf(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite
  * Place new image dimensions in sprite_out; i.e. sprite_out->width = 80; sprite_out->height = 20.
  * @param sprite_in Input sprite to scale
  * @param sprite_out Pointer to where scaled sprite will be stored
- * @returns A pointer to sprite_out
+ * @returns A pointer to \p sprite_out
  */
 gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
@@ -1089,16 +1139,19 @@ gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out)
  * @warning This routine only accepts square input sprites
  * @param sprite_in Input sprite to rotate/scale
  * @param sprite_out Pointer to where rotated/scaled sprite will be stored
- * @returns A pointer to sprite_out
+ * @param angle 256 position angular integer
+ * @param scale Scaling factor; range is about 1% to 400% scale
+ * @returns A pointer to \p sprite_out
  */
 gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out, uint8_t angle, uint8_t scale);
     
 /**
- * A helper function to only perform rotation using gfx_RotateScaleSprite
+ * A helper macro to only perform rotation using gfx_RotateScaleSprite
  *
  * @param sprite_in Input sprite to rotate
  * @param sprite_out Pointer to where rotated sprite will be stored
- * @returns A pointer to sprite_out
+ * @param angle 256 position angular integer
+ * @returns A pointer to \p sprite_out
  * @see gfx_RotateScaleSprite
  */
 #define gfx_RotateSprite(sprite_in, sprite_out, angle) gfx_RotateScaleSprite(sprite_in, sprite_out, angle, 64)
