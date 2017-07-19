@@ -1,3 +1,6 @@
+dist: trusty
+sudo: required
+
 language: cpp
 
 branches:
@@ -6,13 +9,11 @@ branches:
 
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo add-apt-repository ppa:george-edison55/precise-backports -y
   - sudo apt-get update -qq
 
 install:
   - sudo apt-get install -y --force-yes -qq g++-6 gcc-6; export CXX="g++-6" CC="gcc-6"; $CXX --version
   - sudo apt-get install -y --force-yes -qq wine
-  - sudo apt-get install -y --force-yes -qq cmake cmake-data
 
 script:
 # Build toolchain and libs
