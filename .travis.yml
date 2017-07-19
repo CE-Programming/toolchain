@@ -49,7 +49,7 @@ after_success:
   - sudo make install
   - cd ../..
   - make doxygen
-  - bash deploy.sh
+  - bash .deploy.sh
 
 notifications:
   irc:
