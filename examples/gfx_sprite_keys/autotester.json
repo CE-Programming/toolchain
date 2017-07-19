@@ -18,7 +18,7 @@
       "description": "Make sure the sprite is displayed",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "FC2662D8" ]
+      "expected_CRCs": [ "F9825FDD" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",

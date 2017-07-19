@@ -20,7 +20,7 @@
       "description": "Make sure the rotated sprites are displayed properly",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "40F05140" ]
+      "expected_CRCs": [ "14098FC" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",

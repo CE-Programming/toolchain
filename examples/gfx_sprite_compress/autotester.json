@@ -20,7 +20,7 @@
       "description": "A green apple will be displayed",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "832EE7AC" ]
+      "expected_CRCs": [ "250E0F47" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",
