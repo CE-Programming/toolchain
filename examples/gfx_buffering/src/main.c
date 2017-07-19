@@ -23,7 +23,7 @@ void main(void) {
     
     /* Draw a line on the buffer */
     //gfx_FillScreen(gfx_black);
-    gfx_Line(0, 0, LCD_WIDTH-1, LCD_HEIGHT-1);
+    gfx_Line(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
     
     /* Wait for a key */
     while (!os_GetCSC()); 
@@ -32,7 +32,7 @@ void main(void) {
     gfx_SwapDraw();
     
     /* Copy part of the screen to the offscreen buffer */
-    gfx_Blit(gfx_buffer);
+    gfx_BlitBuffer();
     //gfx_BlitLines(gfx_buffer, 0, 20);
     //gfx_BlitRectangle(gfx_buffer, 0, 0, 160, 120);
     

@@ -32,16 +32,16 @@ void main(void) {
         
         /* Fade out to black */
         gfx_SetColor(0);
-        gfx_FillRectangle_NoClip(0,0,160,120);
+        gfx_FillRectangle_NoClip(0, 0, 160, 120);
         /* Fade in from black */
         gfx_SetColor(1);
-        gfx_FillRectangle_NoClip(160,0,160,120);
+        gfx_FillRectangle_NoClip(160, 0, 160, 120);
         /* Fade in from white */
         gfx_SetColor(2);
-        gfx_FillRectangle_NoClip(0,120,160,120);
+        gfx_FillRectangle_NoClip(0, 120, 160, 120);
         /* Fade out to white */
         gfx_SetColor(3);
-        gfx_FillRectangle_NoClip(160,120,160,120);
+        gfx_FillRectangle_NoClip(160, 120, 160, 120);
 
         /* Wait for a keypress at the start of each quarter of the fade */
         if (!(i & 0x3f)) {

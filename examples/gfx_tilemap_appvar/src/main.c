@@ -57,7 +57,7 @@ void main(void) {
     gfx_Begin();
     
     /* Set up the palette */
-    gfx_SetPalette(tiles_gfx_pal, sizeof_tiles_gfx_pal, 0);
+    gfx_SetPalette(tiles_gfx_pal, sizeof_tiles_gfx_pal);
     gfx_SetColor(gfx_white);
     
     /* Draw to buffer to avoid tearing */

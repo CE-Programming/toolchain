@@ -18,7 +18,8 @@ void main(void) {
     uint8_t key = 24;
     
     /* Starting text posistion */
-    int x = (LCD_WIDTH/2)-20, y = (LCD_HEIGHT/2)-5;
+    int x = (LCD_WIDTH / 2) - 20;
+    int y = (LCD_HEIGHT / 2) - 5;
     
     int box_stride = 1;
     int box_scale = 20;
@@ -36,14 +37,14 @@ void main(void) {
     gfx_SetTextTransparentColor(TRANSPARENT_COLOR);
     
     /* Print some scaled font */
-    gfx_SetTextScale(2,2);
+    gfx_SetTextScale(2, 2);
     gfx_PrintStringXY("This text is SCALED!!", 15, 10);
     
     /* Wait for a key before continuing */
     while (!os_GetCSC());
     
     /* Configure the font to normal size, clipped, and monospaced */
-    gfx_SetTextScale(1,1);
+    gfx_SetTextScale(1, 1);
     gfx_SetTextConfig(gfx_text_clip);
     gfx_SetMonospaceFont(FONT_WIDTH);
     
@@ -70,7 +71,7 @@ void main(void) {
             box_scale += box_stride;
             
             /* Check if we should increase or decrease the clip region */
-            if (box_scale > 100 || box_scale < 1) {
+            if (box_scale > 100 || box_scale < 10) {
                 box_stride = -box_stride;
             }
             

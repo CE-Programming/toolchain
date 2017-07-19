@@ -21,18 +21,18 @@ void main(void) {
     /* The common function name is <appvar name>_init */
     var_gfx_init();
     
-    /* Initialize the 8bpp graphics */
+    /* Initialize the graphics */
     gfx_Begin();
     
     /* Set up the palette for the sprite */
-    gfx_SetPalette(all_gfx_pal, sizeof_all_gfx_pal, 0);
+    gfx_SetPalette(all_gfx_pal, sizeof_all_gfx_pal);
     
     /* Fill the screen with color index 0 */
     gfx_FillScreen(0);
     
     /* Draw the sprites directly from the appvar */
-    gfx_Sprite(ubuntu, LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 16);
-    gfx_Sprite(mint, LCD_WIDTH/2 + 16, LCD_HEIGHT/2 - 16);
+    gfx_Sprite(ubuntu, LCD_WIDTH / 2 - 16, LCD_HEIGHT / 2 - 16);
+    gfx_Sprite(mint, LCD_WIDTH / 2 + 16, LCD_HEIGHT / 2 - 16);
     
     /* Wait for a key to be pressed */
     while (!os_GetCSC());

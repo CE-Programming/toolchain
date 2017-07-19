@@ -20,7 +20,7 @@ void main(void) {
     gfx_sprite_t *apple;
 
     /* Allocate space for the decompressed sprite */
-    apple = gfx_MallocSprite(220, 240);
+    apple = gfx_MallocSprite(apple_width, apple_height);
 
     /* Decompress the sprite */
     dzx7_Standard(apple_compressed, apple); // or dzx7_Turbo
@@ -29,11 +29,11 @@ void main(void) {
     gfx_Begin();
 
     /* Set up the palette */
-    gfx_SetPalette(all_gfx_pal, sizeof all_gfx_pal, 0);
+    gfx_SetPalette(all_gfx_pal, sizeof_all_gfx_pal);
     gfx_FillScreen(0);
 
     /* Draw the decompressed sprite */
-    gfx_Sprite(apple, (320 - 220) / 2, (240 - 240) / 2);
+    gfx_Sprite(apple, (LCD_WIDTH - 220) / 2, (LCD_HEIGHT - 240) / 2);
 
     /* Wait for a key */
     while (!os_GetCSC());

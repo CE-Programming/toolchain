@@ -1,14 +1,16 @@
 // Converted using ConvPNG
 // This file contains all the graphics sources for easier inclusion in a project
-#ifndef logo_gfx_H
-#define logo_gfx_H
+#ifndef __logo_gfx__
+#define __logo_gfx__
 #include <stdint.h>
 
-#define logo_gfx_transpcolor_index 0
+#define logo_gfx_transparent_color_index 0
 
+#define ubuntu_width 32
+#define ubuntu_height 32
 extern uint8_t ubuntu_data[1026];
 #define ubuntu ((gfx_sprite_t*)ubuntu_data)
-extern uint16_t logo_gfx_pal[190];
+#define sizeof_logo_gfx_pal 378
+extern uint16_t logo_gfx_pal[189];
 
 #endif
-

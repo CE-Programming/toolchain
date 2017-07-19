@@ -4,10 +4,9 @@
 
 DIRS = $(wildcard */makefile)
 
-all clean .PHONY: $(DIRS)
+all clean gfx .PHONY: $(DIRS)
 
 $(DIRS):
 	$(MAKE) -C $(dir $@) $(MAKECMDGOALS)
 
-.PHONY: all clean
-
+.PHONY: all clean gfx

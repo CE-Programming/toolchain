@@ -1,10 +1,10 @@
 // Converted using ConvPNG
 // This file contains all the graphics sources for easier inclusion in a project
-#ifndef tiles_gfx_H
-#define tiles_gfx_H
+#ifndef __tiles_gfx__
+#define __tiles_gfx__
 #include <stdint.h>
 
-#define tiles_gfx_transpcolor_index 0
+#define tiles_gfx_transparent_color_index 0
 
 extern uint8_t tileset_tile_0_compressed[];
 extern uint8_t tileset_tile_1_compressed[];
@@ -134,8 +134,9 @@ extern uint8_t tileset_tile_124_compressed[];
 extern uint8_t tileset_tile_125_compressed[];
 extern uint8_t tileset_tile_126_compressed[];
 extern uint8_t tileset_tile_127_compressed[];
+#define tileset_tiles_num 128
 extern uint8_t *tileset_tiles_compressed[128];
+#define sizeof_tiles_gfx_pal 152
 extern uint16_t tiles_gfx_pal[76];
 
 #endif
-

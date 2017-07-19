@@ -28,7 +28,7 @@ void main(void) {
     gfx_FillScreen(gfx_black);
     
     /* Set the random text color */
-    gfx_SetTextFGColor(randInt(1,255));
+    gfx_SetTextFGColor(randInt(1, 255));
     
     /* Print the message on the screen */
     print_string_centered(msg);
@@ -42,6 +42,6 @@ void main(void) {
 
 /* Prints a screen centered string */
 void print_string_centered(const char *str) {
-    gfx_PrintStringXY(str, (LCD_WIDTH-gfx_GetStringWidth(str)) / 2, (LCD_HEIGHT-FONT_HEIGHT) / 2);
+    gfx_PrintStringXY(str, (LCD_WIDTH - gfx_GetStringWidth(str)) / 2, (LCD_HEIGHT - FONT_HEIGHT) / 2);
 }
 

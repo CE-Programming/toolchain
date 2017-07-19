@@ -61,7 +61,7 @@ void main(void) {
     
     /* Start the graphics routines */
     gfx_Begin();
-    gfx_SetDraw(gfx_buffer);
+    gfx_SetDrawBuffer();
     
     /* Loop until a key is pressed */
     while (!os_GetCSC()) {

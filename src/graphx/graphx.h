@@ -472,6 +472,14 @@ void gfx_SetDefaultPalette(gfx_mode_t mode);
 void gfx_SetPalette(uint16_t *palette, uint24_t size, uint8_t offset);
 
 /**
+ * Helper macro to initialize the palette with a default offset of 0
+ *
+ * @param palette Pointer to palette to use
+ * @param size Size of palette to store
+ */
+#define gfx_SetPalette(palette, size) gfx_SetPalette(palette, size, 0)
+
+/**
  * Fills the screen with a given palette index
  *
  * @param index Color index to fill with

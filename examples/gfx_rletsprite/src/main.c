@@ -14,8 +14,8 @@
 /* Include the sprite data */
 #include "gfx/logo_gfx.h"
 
-#define w 31
-#define h 30
+#define w ubuntu_width
+#define h ubuntu_height
 
 #define xmin ((gfx_lcdWidth-w*6)/2)
 #define ymin ((gfx_lcdHeight-h*6)/2)
@@ -39,7 +39,7 @@ void main(void) {
     gfx_Begin();
 
     /* Set up the palette for our sprites */
-    gfx_SetPalette(logo_gfx_pal, sizeof logo_gfx_pal, 0);
+    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal);
     gfx_palette[255] = gfx_RGBTo1555(192, 192, 192);
 
     /* Set a centered 192*192 clip region, bordered by gray and filled with color index 0 */
