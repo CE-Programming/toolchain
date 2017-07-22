@@ -216,12 +216,14 @@ endif
 # this rule is trigged to build everything
 all: $(BINDIR)/$(TARGET8XP)
 
-$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
-	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
-	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR) && \
-	echo C CE SDK Version $(VERSION) && \
+$(BINDIR)/$(TARGET8XP): dirs $(BINDIR)/$(TARGETHEX)
+	@echo C CE SDK Version $(VERSION) && \
 	$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
+
+dirs:
+	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
+	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
 
 $(BINDIR)/$(TARGETHEX): $(OBJECTS)
 	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(strip $(call NATIVEPATH,$^)))"
@@ -270,4 +272,4 @@ gfx:
 version:
 	@echo C SDK Version $(VERSION)
 
-.PHONY: all clean version gfx
+.PHONY: all clean version gfx dirs
