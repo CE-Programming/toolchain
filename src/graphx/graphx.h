@@ -3,6 +3,7 @@
  * @authors Matt "MateoConLechuga" Waltz
  * @authors Jacob "jacobly" Young
  * @authors Zachary "Runer112" Wassall
+ * @authors Patrick "tr1p1ea" Prendergast
  * @authors "grosged"
  * @brief Contains optimized graphics operations and routines
  */

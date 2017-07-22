@@ -7,7 +7,7 @@ CCLEANUP_OBJ  ?= ccleanup.obj
 CLEANUP       ?= YES
 #----------------------------
 
-VERSION := 7.4
+VERSION := 7.5
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
@@ -79,12 +79,14 @@ ICON_OBJ      := $(ICON_ASM:%.src=%.obj)
 ALLDIRS       := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
 
 # find all of the available C, H and ASM files (Remember, you can create C <-> assembly routines easily this way)
-SOURCES       := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
+CSOURCES      := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
+CPPSOURCES    := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.cpp)))
 USERHEADERS   := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
+USERHEADERS   += $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.hpp)))
 ASMSOURCES    := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.asm)))
 
 # figure out what the names of the sources will become once made into objects
-OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(SOURCES:%.c=%.obj)))
+OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(CSOURCES:%.c=%.obj)))
 OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(ASMSOURCES:%.asm=%.obj)))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
@@ -212,17 +214,13 @@ else
 endif
 
 # this rule is trigged to build everything
-all: dirs $(BINDIR)/$(TARGET8XP)
-	@echo Finished.
-
-dirs:
-	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR)
-	@$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
-	@echo C CE SDK Version $(VERSION)
-	@echo Looking for changes...
+all: $(BINDIR)/$(TARGET8XP)
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
-	@$(CD) $(BINDIR) && \
+	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
+	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR) && \
+	echo C CE SDK Version $(VERSION) && \
+	$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETHEX): $(OBJECTS)
@@ -247,11 +245,6 @@ $(OBJDIR)/%.obj: $(SRCDIR)/%.asm $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
-# this rule builds the assembly files and places them in the object directory
-$(OBJDIR)/%.obj: $(SRCDIR)/*/%.asm $(USERHEADERS)
-	@$(CD) $(OBJDIR) && \
-	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
-
 # these rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
@@ -261,6 +254,11 @@ $(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
 $(OBJDIR)/%.obj: $(SRCDIR)/*/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+
+# this rule builds the assembly files and places them in the object directory
+$(OBJDIR)/%.obj: $(SRCDIR)/*/%.asm $(USERHEADERS)
+	@$(CD) $(OBJDIR) && \
+	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 clean:
 	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJDIR)/$(ICON_ASM) $(OBJDIR)/*.obj $(OBJDIR)/*.src)
@@ -272,5 +270,4 @@ gfx:
 version:
 	@echo C SDK Version $(VERSION)
 
-.PHONY: all clean version gfx dirs
-
+.PHONY: all clean version gfx
