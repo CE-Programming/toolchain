@@ -214,16 +214,16 @@ else
 endif
 
 # this rule is trigged to build everything
-all: $(BINDIR)/$(TARGET8XP)
-
-$(BINDIR)/$(TARGET8XP): dirs $(BINDIR)/$(TARGETHEX)
-	@echo C CE SDK Version $(VERSION) && \
-	$(CD) $(BINDIR) && \
-	$(CV) $(CVFLAGS) $(notdir $<)
+all: dirs $(BINDIR)/$(TARGET8XP)
 
 dirs:
-	@$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
+	@echo C CE SDK Version $(VERSION) && \
+	$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
 	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
+	
+$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
+	@$(CD) $(BINDIR) && \
+	$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETHEX): $(OBJECTS)
 	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(strip $(call NATIVEPATH,$^)))"
