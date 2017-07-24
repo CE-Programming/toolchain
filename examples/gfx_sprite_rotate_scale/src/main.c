@@ -23,7 +23,7 @@ void main(void) {
     gfx_Begin();
     
     /* Setup the palette used by the sprites*/
-    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal);
+    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal, 0);
 
     /* Loop for a bunch of times */
     for (x = 0; ++x;) {

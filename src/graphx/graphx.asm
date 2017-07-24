@@ -345,14 +345,10 @@ _Begin:
 	ld	(UseLargeFont_SMC),a \.r    ; store the jump offset for later
 	ld	(hl),0                      ; jump nowhere if false
 	call	_boot_ClearVRAM             ; clear the screen
-	pop	bc
-	pop	de
-	ld	a,e                         ; a = bpp mode
-	push	de
-	push	bc
 	ld	hl,currDrawBuffer
 _:	ld	de,vram
 	ld	(hl),de                     ; set the current draw to the screen
+	ld	a,lcdBpp8
 	ld	(mpLcdCtrl),a
 	ld	l,mpLcdIcr&$FF
 	ld	(hl),4                      ; allow interrupts status for double buffering

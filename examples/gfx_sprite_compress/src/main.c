@@ -29,7 +29,7 @@ void main(void) {
     gfx_Begin();
 
     /* Set up the palette */
-    gfx_SetPalette(all_gfx_pal, sizeof_all_gfx_pal);
+    gfx_SetPalette(all_gfx_pal, sizeof_all_gfx_pal, 0);
     gfx_FillScreen(0);
 
     /* Draw the decompressed sprite */

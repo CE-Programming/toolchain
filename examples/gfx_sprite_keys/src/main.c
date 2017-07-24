@@ -42,7 +42,7 @@ void main(void) {
     gfx_Begin();
     
     /* Set up the palette for our sprites */
-    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal);
+    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal, 0);
     
     /* Start at 0, 0 */
     x = 0;

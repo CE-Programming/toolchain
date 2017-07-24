@@ -18,7 +18,7 @@ void main(void) {
     gfx_Begin();
     
     /* Set up the palette for our sprites */
-    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal);
+    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal, 0);
     
     /* Fill the screen with color index 0 */
     gfx_FillScreen(0);

@@ -39,7 +39,7 @@ void main(void) {
     gfx_Begin();
 
     /* Set up the palette for our sprites */
-    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal);
+    gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal, 0);
     gfx_palette[255] = gfx_RGBTo1555(192, 192, 192);
 
     /* Set a centered 192*192 clip region, bordered by gray and filled with color index 0 */

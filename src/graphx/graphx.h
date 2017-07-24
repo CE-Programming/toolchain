@@ -247,16 +247,9 @@ gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 
 /**
  * Initializes the graphics library setup
- * @param mode Mode to start the library in
- * @see gfx_mode_t
  */
-int gfx_Begin(gfx_mode_t mode);
+int gfx_Begin();
     
-/**
- * Helper macro to easily initialize the graphics library setup
- */
-#define gfx_Begin() gfx_Begin(0x27)
-
 /**
  * Closes the graphics setup
  *
@@ -471,14 +464,6 @@ void gfx_SetDefaultPalette(gfx_mode_t mode);
  * @param offset Offset in bytes to start at (Generally set to 0)
  */
 void gfx_SetPalette(uint16_t *palette, uint24_t size, uint8_t offset);
-
-/**
- * Helper macro to initialize the palette with a default offset of 0
- *
- * @param palette Pointer to palette to use
- * @param size Size of palette to store
- */
-#define gfx_SetPalette(palette, size) gfx_SetPalette(palette, size, 0)
 
 /**
  * Fills the screen with a given palette index
