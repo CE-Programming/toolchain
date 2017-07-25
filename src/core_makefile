@@ -7,7 +7,7 @@ CCLEANUP_OBJ  ?= ccleanup.obj
 CLEANUP       ?= YES
 #----------------------------
 
-VERSION := 7.5
+VERSION := 7.4
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
