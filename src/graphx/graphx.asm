@@ -1378,140 +1378,128 @@ TrivialAccept:
 _Line_NoClip:
 ; Draws an unclipped arbitrary line
 ; Arguments:
-;  arg0 : X0 coordinate (hl)
-;  arg1 : Y0 coordinate (b)
-;  arg2 : X1 coordinate (de)
-;  arg3 : Y1 coordinate (c)
+;  arg0 : X1 coordinate (hl)
+;  arg1 : Y1 coordinate (b)
+;  arg2 : X2 coordinate (de)
+;  arg3 : Y2 coordinate (c)
 ; Returns:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	de,(iy+3)
-	ld	hl,(iy+9)
+	ld	hl,(iy+3)
+	ld	de,(iy+9)
 	ld	b,(iy+6)
-	ld	c,(iy+12)
-_Line_NoClip_ASM:
-	ld	a,c
-	ld	(y1),a \.r
-	ld	(nde),hl \.r
-	push	de
-	push	bc
+	ld	c,(iy+12)			; line from hl,b to de,c
 	or	a,a
 	sbc	hl,de
-	ld	a,$03
-	jr	nc,+_
-	ld	a,$0B
-_:	ld	(xStep),a \.r
-	ld	(xStep2),a \.r
+	add	hl,de
+	jr	c,+_				; draw left to right
 	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,de
-	jp	p,+_ \.r
-	ex	de,hl
-_:	ld	(dx),hl \.r
+	ld	a,b
+	ld	b,c
+	ld	c,a
+_:	push	bc
+	pop	iy
 	push	hl
-	add	hl,hl
-	ld	(dx1),hl \.r
-	ld	(dx12),hl \.r
-	or	a,a
-	sbc	hl,hl
-	ex	de,hl
-	sbc	hl,hl
-	ld	e,b
-	ld	l,c
-	sbc	hl,de
-	ld	a,30
-	adc	a,a
-	ld	(yStep),a \.r
-	ld	(yStep2),a \.r
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,de
-	jp	p,+_ \.r
-	ex	de,hl
-_:	ld	(dy),hl \.r
-	add	hl,hl
-	ld	(dy1),hl \.r
-	ld	(dy12),hl \.r
-	pop	de
-	pop	af
-	srl	h
-	rr	l
-	sbc	hl,de
+	ld	hl,(currDrawBuffer)
+	ld	c,160
+	mlt	bc
+	add	hl,bc
+	add	hl,bc				; y0 * screenwidth
 	pop	bc
-	ld	hl,0
-	jr	nc,changeYLoop
-changeXLoop:
+	add	hl,bc				; y0 * screenwidth + x0
+	push	hl				; save buffer
+	ex	de,hl
+	or	a,a
+	sbc	hl,bc				; xe - xs
 	push	hl
-	ld	l,a
-	ld	h,lcdWidth/2
-	mlt	hl
-	add	hl,hl
-	add	hl,bc
-	ld	de,(currDrawBuffer)
-	add	hl,de
-Color_SMC_4 =$+1
-	ld	(hl),0
+	pop	bc				; bc = dx
+	ld	a,iyh
+	or	a,a
 	sbc	hl,hl
-	ld	h,b
-	ld	l,c
-	or	a,a
-nde =$+1
-	ld	de,0
+	ld	l,a				; y1
+	ex	de,hl
+	ld	a,iyl
+	sbc	hl,hl
+	ld	l,a				; y0
 	sbc	hl,de
+	jr	nc,$+9
+	ex	de,hl
+	sbc	hl,hl
+	ccf
+	sbc	hl,de
+	inc	hl				; abs(dy)
+	ld	a,iyl
+	sub	a,iyh
+	ld	iy,-320
+	jr	c,$+7
+	ld	iy,320
+	or	a,a
+	sbc	hl,bc
+	add	hl,bc				; hl = dy
+	jr	nc,dl_vertical
+dl_horizontal:
+	ld	a,l
+	or	a,h
+	ld	a,$38
+	jr	nz,$+4
+	xor	a,$20
+	ld	(_smc_dl_jr_0 + 0),a \.r	; write smc
+	ld	(_smc_dl_width_1 + 1),iy \.r	; write smc
+	ex	de,hl
+	sbc	hl,hl
+	ccf
+	sbc	hl,de
+	inc	hl
+	ex	de,hl				; de = -dy
+	pop	hl				; restore buffer
+	ld	(_smc_dl_dx_1 + 1),bc \.r	; write smc
+	ld	(_smc_dl_dy_1 + 1),de \.r	; write smc
+	push	bc
+	srl	b
+	rr	c
+	push	bc
+	pop	iy				; iy = dx / 2
+	pop	bc
+	inc	bc
+Color_SMC_4 =$+1
+	ld	a,$00
+dl_hloop:
+	ld	(hl),a				; write pixel
+	cpi
+	ret	po
+	add	iy,de				; dy
+_smc_dl_jr_0:
+	jr	c,dl_hloop
+_smc_dl_width_1:
+	ld	de,$000000
+	add	hl,de				; y inc
+_smc_dl_dx_1:
+	ld	de,$000000			; dx
+	add	iy,de
+_smc_dl_dy_1:
+	ld	de,$000000			; dy
+	jr	dl_hloop
+dl_vertical:
+	lea	de,iy
+	ld	b,c
+	ld	a,l
+	ld	iyl,a
+	ld	c,a
+	srl	a				; a = dy / 2
+	inc	c
 	pop	hl
-	ret	z
-xStep	nop
-dy1 =$+1
-	ld	de,0
-	or	a,a
-	adc	hl,de
-	jp	m,changeXLoop \.r
-dx =$+1
-	ld	de,0
-	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jr	c,changeXLoop
-yStep	nop
-dx1 =$+1
-	ld	de,0
-	sbc	hl,de
-	jr	changeXLoop
-changeYLoop:
-	push	hl
-	ld	l,a
-	ld	h,lcdWidth/2
-	mlt	hl
-	add	hl,hl
-	add	hl,bc
-	ld	de,(currDrawBuffer)
-	add	hl,de
+dl_vloop:
 Color_SMC_5 =$+1
-	ld	(hl),0
-	pop	hl
-y1 =$+1
-	cp	a,0
+	ld	(hl),$00			; write pixel
+	dec	c
 	ret	z
-yStep2	nop
-dx12 =$+1
-	ld	de,0
-	or	a,a
-	adc	hl,de
-	jp	m,changeYLoop \.r
-dy =$+1
-	ld	de,0
-	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jr	c,changeYLoop
-xStep2	nop
-dy12 =$+1
-	ld	de,0
-	sbc	hl,de
-	jr	changeYLoop
+	add	hl,de				; y inc
+	sub	a,b				; dx
+	jr	nc,dl_vloop
+	inc	hl
+	add	a,iyl				; dy
+	jr	dl_vloop
 
 ;-------------------------------------------------------------------------------
 _Blit:
