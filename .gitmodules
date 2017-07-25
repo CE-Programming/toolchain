@@ -13,3 +13,6 @@
 [submodule "tools/convtile"]
 	path = tools/convtile
 	url = https://github.com/MattWaltz/convtile.git
+[submodule "tools/fasmg/fasmg-ez80"]
+	path = tools/fasmg/fasmg-ez80
+	url = https://github.com/jacobly0/fasmg-ez80.git

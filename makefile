@@ -200,14 +200,14 @@ chmod:
 #----------------------------
 # release rule
 #----------------------------
-dist: install
+release: install
 	$(ARCH)
 #----------------------------
 
 #----------------------------
 # libraries release rules
 #----------------------------
-dist-libs: clibraries
+release-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/graphx/GRAPHX.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
 	$(CP) $(call NATIVEPATH,src/fileioc/FILEIOC.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
 	$(CP) $(call NATIVEPATH,src/keypadc/KEYPADC.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
@@ -244,11 +244,11 @@ help:
 	@echo clean-keypadc
 	@echo install
 	@echo uninstall
-	@echo dist
+	@echo release
 	@echo help
 	@echo doxygen
-	@echo dist-libs
+	@echo release-libs
 #----------------------------
 
-.PHONY: clean-libload libload dist-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help dist
+.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help release
 
