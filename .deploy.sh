@@ -2,6 +2,10 @@
 
 set -o errexit
 
+if [ "$TRAVIS_BRANCH" != "master" ]; then
+  exit 0
+fi
+
 rev=$(git rev-parse --short HEAD)
 
 cd doxygen/html
