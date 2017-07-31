@@ -829,22 +829,21 @@ _SetDraw:
 ;  arg0: buffer or screen
 ; Returns:
 ;  None
+	pop	de
 	pop	hl
-	pop	bc
-	push	bc
-	push	hl
-	ld	hl,(mpLcdBase)              ; get current base
-	ld	de,vram
-	ld	a,c
+	ld	a,l
 	or	a,a
+	ld	hl,(mpLcdBase)              ; get current base
+	ld	bc,vram
 	jr	z,+++_
-	sbc	hl,de
-	jr	nz,++_                      ; if not the same, swap
-_:	ld	de,vram+lcdSize
-_:	ld	(currDrawBuffer),de
-	ret
-_:	sbc	hl,de
-	jr	z,--_                       ; if the same, swap
+	sbc	hl,bc
+	jr	nz,++_
+_:	ld	bc,vram+lcdSize
+_:	ld	(currDrawBuffer),bc
+	ex	de,hl
+	jp	(hl)
+_:	sbc	hl,bc
+	jr	z,--_
 	jr	---_
 
 ;-------------------------------------------------------------------------------
