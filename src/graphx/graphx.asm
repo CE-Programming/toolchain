@@ -2617,18 +2617,17 @@ _SetTextBGColorC:
 ;  arg0 : Color index to set BG to
 ; Returns:
 ;  Previous text color palette index
-	pop	hl
 	pop	de
-	push	de
-	push	hl
+	ex	(sp),hl
+	ld	a,l
 	ld	hl,TBGColor_SMC_1 \.r
-	ld	a,(hl)                      ; a = old bg color
-	ld	(hl),e
-	ld	hl,TBGColor_SMC_2 \.r
-	ld	(hl),e                      ; e = new bg color
-	ld	hl,TBGColor_SMC_3 \.r
-	ld	(hl),e                      ; e = new bg color
-	ret
+	ld	c,(hl)                      ; c = old bg color
+	ld	(hl),a
+	ld	(TBGColor_SMC_2),a \.r
+	ld	(TBGColor_SMC_3),a \.r
+	ld	a,c
+	ex	de,hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 _SetTextFGColorC:
@@ -2637,18 +2636,17 @@ _SetTextFGColorC:
 ;  arg0 : Color index to set FG to
 ; Returns:
 ;  Previous text color palette index
-	pop	hl
 	pop	de
-	push	de
-	push	hl
+	ex	(sp),hl
+	ld	a,l
 	ld	hl,TFGColor_SMC_1 \.r
-	ld	a,(hl)                      ; a = old fg color
-	ld	(hl),e
-	ld	hl,TFGColor_SMC_2 \.r
-	ld	(hl),e                      ; e = new fg color
-	ld	hl,TFGColor_SMC_3 \.r
-	ld	(hl),e                      ; e = new fg color
-	ret
+	ld	c,(hl)                      ; c = old fg color
+	ld	(hl),a                      ; a = new fg color
+	ld	(TFGColor_SMC_2),a \.r
+	ld	(TFGColor_SMC_3),a \.r
+	ld	a,c
+	ex	de,hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 _SetTextTransparentColorC:
@@ -2657,18 +2655,17 @@ _SetTextTransparentColorC:
 ;  arg0 : Color index to set transparent text to
 ; Returns:
 ;  Previous text color palette index
-	pop	hl
 	pop	de
-	push	de
-	push	hl
+	ex	(sp),hl
+	ld	a,l
 	ld	hl,TTPColor_SMC_1 \.r
-	ld	a,(hl)                      ; a = old transparent color
-	ld	(hl),e
-	ld	hl,TTPColor_SMC_2 \.r
-	ld	(hl),e
-	ld	hl,TTPColor_SMC_3 \.r
-	ld	(hl),e                      ; store new transparent color
-	ret
+	ld	c,(hl)                      ; c = old transparent color
+	ld	(hl),a                      ; a = new transparent color
+	ld	(TTPColor_SMC_2),a \.r
+	ld	(TTPColor_SMC_3),a \.r
+	ld	a,c
+	ex	de,hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 _SetTextXY:
