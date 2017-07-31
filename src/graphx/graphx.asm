@@ -764,8 +764,8 @@ _VertLine:
 	ld	de,(iy+3)
 	mIsHLLessThanDE()
 	ret	c                           ; return if x > xmax
+	ld	hl,(_xmin) \.r
 	ex	de,hl
-	ld	de,(_xmin) \.r
 	mIsHLLessThanDE()
 	ret	c                           ; return if x < xmin
 	ld	hl,(iy+9)
@@ -829,22 +829,21 @@ _SetDraw:
 ;  arg0: buffer or screen
 ; Returns:
 ;  None
-	pop	hl
-	pop	bc
-	push	bc
-	push	hl
-	ld	hl,(mpLcdBase)              ; get current base
-	ld	de,vram
-	ld	a,c
+	pop	de
+	ex	(sp),hl
+	ld	a,l
 	or	a,a
+	ld	hl,(mpLcdBase)              ; get current base
+	ld	bc,vram
 	jr	z,+++_
-	sbc	hl,de
-	jr	nz,++_                      ; if not the same, swap
-_:	ld	de,vram+lcdSize
-_:	ld	(currDrawBuffer),de
-	ret
-_:	sbc	hl,de
-	jr	z,--_                       ; if the same, swap
+	sbc	hl,bc
+	jr	nz,++_
+_:	ld	bc,vram+lcdSize
+_:	ld	(currDrawBuffer),bc
+	ex	de,hl
+	jp	(hl)
+_:	sbc	hl,bc
+	jr	z,--_
 	jr	---_
 
 ;-------------------------------------------------------------------------------
