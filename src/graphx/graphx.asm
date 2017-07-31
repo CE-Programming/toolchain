@@ -830,7 +830,7 @@ _SetDraw:
 ; Returns:
 ;  None
 	pop	de
-	pop	hl
+	ex	(sp),hl
 	ld	a,l
 	or	a,a
 	ld	hl,(mpLcdBase)              ; get current base
