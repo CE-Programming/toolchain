@@ -764,8 +764,8 @@ _VertLine:
 	ld	de,(iy+3)
 	mIsHLLessThanDE()
 	ret	c                           ; return if x > xmax
+	ld	hl,(_xmin) \.r
 	ex	de,hl
-	ld	de,(_xmin) \.r
 	mIsHLLessThanDE()
 	ret	c                           ; return if x < xmin
 	ld	hl,(iy+9)
