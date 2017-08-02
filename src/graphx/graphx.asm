@@ -724,8 +724,8 @@ _HorizLine_NoClip:
 	ld	bc,(iy+10)                  ; bc = width
 _RectHoriz_ASM:
 	sbc	hl,hl
-	add hl,bc
-	ret nc                          ; make sure the width is not 0
+	add	hl,bc
+	ret	nc                          ; make sure the width is not 0
 	ld	hl,(iy+4)
 _HorizLine_NoClip_ASM:
 	ld	d,lcdWidth/2
@@ -5540,8 +5540,8 @@ _PixelPtr_ASM:
 	ld	hl,-lcdWidth
 	add	hl,bc
 	ret	c
-	ld  a,256-lcdHeight
-	add a,e
+	ld	a,256-lcdHeight
+	add	a,e
 	ret	c
 _PixelPtrNoChks_ASM:
 	ld	hl,(currDrawBuffer)
