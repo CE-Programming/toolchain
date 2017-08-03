@@ -332,18 +332,6 @@ _SetTransparentColor:
 	ld	(TColor_SMC_6),a \.r
 	ld	(TColor_SMC_7),a \.r
 	jr	_SetColor_Ret
-    
-;-------------------------------------------------------------------------------
-_End:
-; Closes the graphics library and sets up for the TI-OS
-; Arguments:
-;  None
-; Returns:
-;  None
-	call	_boot_ClearVRAM             ; clear the screen
-	ld	hl,mpLcdBase
-	ld	a,lcdBpp16                  ; restore the screen mode
-	jr	+_
 
 ;-------------------------------------------------------------------------------
 _Begin:
@@ -364,6 +352,19 @@ _:	ld	de,vram
 	ld	(mpLcdCtrl),a
 	ld	l,mpLcdIcr&$FF
 	ld	(hl),4                      ; allow interrupts status for double buffering
+	jr	_SetDefaultPalette          ; setup the default palette
+
+;-------------------------------------------------------------------------------
+_End:
+; Closes the graphics library and sets up for the TI-OS
+; Arguments:
+;  None
+; Returns:
+;  None
+	call	_boot_ClearVRAM             ; clear the screen
+	ld	hl,mpLcdBase
+	ld	a,lcdBpp16                  ; restore the screen mode
+	jr	-_
 
 ;-------------------------------------------------------------------------------
 _SetDefaultPalette:
@@ -459,6 +460,7 @@ _GetPixel:
 	inc	hl
 	inc	hl
 	inc	hl                          ; move to next argument
+	ld	de,0
 	ld	e,(hl)                      ; e = y coordinate
 	call	_PixelPtr_ASM \.r
 	ret	c                           ; return if out of bounds
@@ -479,6 +481,7 @@ _SetPixel:
 	inc	hl
 	inc	hl
 	inc	hl                          ; move to next argument
+	ld	de,0
 	ld	e,(hl)                      ; e = y coordinate
 _SetPixel_ASM:
 	call	_PixelPtr_ASM \.r
@@ -645,12 +648,12 @@ _Rectangle_NoClip:
 ;  arg3 : Height
 ; Returns:
 ;  None
-	ld	iy,-1
+	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+4)                   ; hl = x
-	ld	e,(iy+7)                    ; e = y
-	ld	bc,(iy+10)                  ; bc = width
-	ld	d,(iy+13)                   ; d = height
+	ld	hl,(iy+3)                   ; hl = x
+	ld	e,(iy+6)                    ; e = y
+	ld	bc,(iy+9)                   ; bc = width
+	ld	d,(iy+12)                   ; d = height
 	push	bc
 	push	hl
 	push	de
@@ -676,37 +679,36 @@ _HorizLine:
 ;  arg2 : Length
 ; Returns:
 ;  None
-	ld	iy,-1
+	ld	iy,0
 	add	iy,sp
 	ld	de,(_ymin) \.r
-	ld	hl,(iy+7)
+	ld	hl,(iy+6)
 	mIsHLLessThanDE()                  ; compare y coordinate <-> ymin
 	ret	c
 	ld	hl,(_ymax) \.r
 	dec	hl                          ; inclusive
-	ld	de,(iy+7)
+	ld	de,(iy+6)
 	mIsHLLessThanDE()                  ; compare y coordinate <-> ymax
 	ret	c
-	ld	hl,(iy+10)
-	ld	de,(iy+4)
+	ld	hl,(iy+9)
+	ld	de,(iy+3)
 	add	hl,de
-	ld	(iy+10),hl
+	ld	(iy+9),hl
 	ld	hl,(_xmin) \.r
 	call	_Max_ASM \.r
-	ld	(iy+4),hl                   ; save maximum x value
+	ld	(iy+3),hl                   ; save maximum x value
 	ld	hl,(_xmax) \.r
-	ld	de,(iy+10)
+	ld	de,(iy+9)
 	call	_Min_ASM \.r
-	ld	(iy+10),hl                  ; save minimum x value
-	ld	de,(iy+4)
+	ld	(iy+9),hl                   ; save minimum x value
+	ld	de,(iy+3)
 	mIsHLLessThanDE()
 	ret	c
-	ld	hl,(iy+10)
+	ld	hl,(iy+9)
 	sbc	hl,de
 	push	hl
 	pop	bc                          ; bc = length
-	ld	e,(iy+7)                    ; e = y coordinate
-	scf
+	ld	e,(iy+6)                    ; e = y coordinate
 	jr	_RectHoriz_ASM
 
 ;-------------------------------------------------------------------------------
@@ -718,15 +720,15 @@ _HorizLine_NoClip:
 ;  arg2 : Length
 ; Returns:
 ;  None
-	ld	iy,-1
+	ld	iy,0
 	add	iy,sp
-	ld	e,(iy+7)                    ; e = y coordinate
-	ld	bc,(iy+10)                  ; bc = width
+	ld	e,(iy+6)                    ; e = y coordinate
+	ld	bc,(iy+9)                   ; bc = width
 _RectHoriz_ASM:
 	sbc	hl,hl
-	add	hl,bc
-	ret	nc                          ; make sure the width is not 0
-	ld	hl,(iy+4)
+	adc	hl,bc
+	ret	z                           ; make sure the width is not 0
+	ld	hl,(iy+3)
 _HorizLine_NoClip_ASM:
 	ld	d,lcdWidth/2
 	mlt	de
@@ -5540,8 +5542,8 @@ _PixelPtr_ASM:
 	ld	hl,-lcdWidth
 	add	hl,bc
 	ret	c
-	ld	a,256-lcdHeight
-	add	a,e
+	ld	hl,-lcdHeight
+	add	hl,de
 	ret	c
 _PixelPtrNoChks_ASM:
 	ld	hl,(currDrawBuffer)
@@ -5644,7 +5646,7 @@ _SetFullScrnClip_ASM:
 
 ;-------------------------------------------------------------------------------
 __idivs_ASM:
-; Performs signed integer division
+; Performs signed interger division
 ; Inputs:
 ;  HL : Operand 1
 ;  BC : Operand 2
