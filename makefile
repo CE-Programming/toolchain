@@ -200,6 +200,7 @@ chmod:
 #----------------------------
 # release rule
 #----------------------------
+dist: release
 release: install
 	$(ARCH)
 #----------------------------
@@ -207,6 +208,7 @@ release: install
 #----------------------------
 # libraries release rules
 #----------------------------
+dist-libs: release-libs
 release-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/graphx/GRAPHX.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
 	$(CP) $(call NATIVEPATH,src/fileioc/FILEIOC.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)

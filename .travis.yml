@@ -23,8 +23,8 @@ script:
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
   - make
   - make install
-  - make dist
-  - make dist-libs
+  - make release
+  - make release-libs
 # Build examples
   - make -C $CEDEV/examples
 # Build CEmu core and autotester_cli
