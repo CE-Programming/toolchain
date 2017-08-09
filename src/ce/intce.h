@@ -9,7 +9,7 @@
 #define H_INTCE
 
 #ifndef FORCE_INTERRUPTS
-#error TI has removed custom interrupt support on models > revision I. Please contact them via ti-cares@ti.com (aka ti-doesnt-care@ti.com). Alternatively if you only wish to support older models, define FORCE_INTERRUPTS at compile time.
+#error TI has removed custom interrupt support on CE models with hardware revision >= I. You can complain about it to ti-cares@ti.com. Alternatively if you only want to target pre-I models, define FORCE_INTERRUPTS before including intce.h
 #endif
 
 #include <stdint.h>
