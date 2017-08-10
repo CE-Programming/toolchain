@@ -25,7 +25,7 @@ echo "## List of tested functions" > $outfile
 for f in $files
 do
     echo -e "\n### $f" >> $outfile
-    echo -e "| Function | Tested? | Search link |" >> $outfile
+    echo -e "| Function | Tested? | Occurrences |" >> $outfile
     echo -e "| -------- | ------- | ----------- |" >> $outfile
 
     # This will produce a list of funcName:funcLine, which we'll parse in the for loop below.
@@ -44,8 +44,9 @@ do
             searchLink=""
         else
             ((totalTested++))
-            foundStr="YES (x$count)"
-            searchLink="[occurrences](https://github.com/search?q=${func}+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)"
+            [[ "$count" == "1" ]] && plural="" || plural="s"
+            foundStr="YES"
+            searchLink="[in $count file${plural}](https://github.com/search?q=${func}+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)"
         fi
         echo -e "| [\`${func}\`](/${f}#L${line}) | $foundStr | $searchLink" >> $outfile
     done
