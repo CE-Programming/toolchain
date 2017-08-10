@@ -17,9 +17,10 @@ files="src/fileioc/fileioc.h src/graphx/graphx.h src/keypadc/keypadc.h src/ce/ti
 # The destination markdown file
 outfile=$DIR/tested-functions-list.md
 
-echo "## List of tested functions" > $outfile
-
+# Find once the example sources we'll be searching in
 exampleFiles=$(find ./examples -type f \( -iname '*.c' -o -iname '*.cpp' -o -iname '*.h' -o -iname '*.hpp' -o -iname '*.asm' \))
+
+echo "## List of tested functions" > $outfile
 
 for f in $files
 do
@@ -27,7 +28,7 @@ do
     echo -e "| Function | Tested? | Search link |" >> $outfile
     echo -e "| -------- | ------- | ----------- |" >> $outfile
 
-    # This will produce a list of funcName:funcLine, which we'll parse i nthe for loop below.
+    # This will produce a list of funcName:funcLine, which we'll parse in the for loop below.
     filefuncts=$(ctags -u --fields=n --c-kinds=p --output-format=json $f | sed -e 's/.*"name": "\(.*\)", "path.*"line": \(.*\)}/\1:\2/g')
     totalFuncs=0
     totalTested=0
@@ -36,7 +37,7 @@ do
         ((totalFuncs++))
         func=${funcAndLine%:*}
         line=${funcAndLine##*:}
-        count=$(grep -l "$func" ${exampleFiles} | wc -l | awk '{print $1}')
+        count=$(grep -l "\b${func}\b" ${exampleFiles} | wc -l | awk '{print $1}')
         if [[ "$count" == "0" ]]
         then
             foundStr="✗"

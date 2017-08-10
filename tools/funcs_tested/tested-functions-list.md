@@ -4,9 +4,9 @@
 | Function | Tested? | Search link |
 | -------- | ------- | ----------- |
 | [`ti_CloseAll`](/src/fileioc/fileioc.h#L47) | YES (x5) | [occurrences](https://github.com/search?q=ti_CloseAll+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`ti_Open`](/src/fileioc/fileioc.h#L64) | YES (x4) | [occurrences](https://github.com/search?q=ti_Open+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_Open`](/src/fileioc/fileioc.h#L64) | YES (x3) | [occurrences](https://github.com/search?q=ti_Open+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_OpenVar`](/src/fileioc/fileioc.h#L82) | YES (x1) | [occurrences](https://github.com/search?q=ti_OpenVar+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`ti_Close`](/src/fileioc/fileioc.h#L88) | YES (x5) | [occurrences](https://github.com/search?q=ti_Close+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_Close`](/src/fileioc/fileioc.h#L88) | ✗ | 
 | [`ti_Detect`](/src/fileioc/fileioc.h#L107) | YES (x1) | [occurrences](https://github.com/search?q=ti_Detect+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_DetectVar`](/src/fileioc/fileioc.h#L127) | ✗ | 
 | [`ti_Write`](/src/fileioc/fileioc.h#L138) | YES (x1) | [occurrences](https://github.com/search?q=ti_Write+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -33,7 +33,7 @@
 | [`ti_AllocCplxList`](/src/fileioc/fileioc.h#L354) | ✗ | 
 | [`ti_AllocEqu`](/src/fileioc/fileioc.h#L355) | ✗ | 
 
-**Total: 13/29 tested.**
+**Total: 12/29 tested.**
 
 ### src/graphx/graphx.h
 | Function | Tested? | Search link |
@@ -64,7 +64,7 @@
 | [`gfx_VertLine_NoClip`](/src/graphx/graphx.h#L580) | ✗ | 
 | [`gfx_Rectangle`](/src/graphx/graphx.h#L591) | YES (x2) | [occurrences](https://github.com/search?q=gfx_Rectangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_Rectangle_NoClip`](/src/graphx/graphx.h#L602) | ✗ | 
-| [`gfx_FillRectangle`](/src/graphx/graphx.h#L613) | YES (x6) | [occurrences](https://github.com/search?q=gfx_FillRectangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_FillRectangle`](/src/graphx/graphx.h#L613) | YES (x4) | [occurrences](https://github.com/search?q=gfx_FillRectangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_FillRectangle_NoClip`](/src/graphx/graphx.h#L624) | YES (x2) | [occurrences](https://github.com/search?q=gfx_FillRectangle_NoClip+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_Circle`](/src/graphx/graphx.h#L634) | YES (x1) | [occurrences](https://github.com/search?q=gfx_Circle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_FillCircle`](/src/graphx/graphx.h#L644) | YES (x1) | [occurrences](https://github.com/search?q=gfx_FillCircle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -73,17 +73,17 @@
 | [`gfx_Polygon_NoClip`](/src/graphx/graphx.h#L701) | ✗ | 
 | [`gfx_FillTriangle`](/src/graphx/graphx.h#L714) | YES (x1) | [occurrences](https://github.com/search?q=gfx_FillTriangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_FillTriangle_NoClip`](/src/graphx/graphx.h#L715) | ✗ | 
-| [`gfx_SetDraw`](/src/graphx/graphx.h#L723) | YES (x7) | [occurrences](https://github.com/search?q=gfx_SetDraw+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_SetDraw`](/src/graphx/graphx.h#L723) | ✗ | 
 | [`gfx_GetDraw`](/src/graphx/graphx.h#L751) | ✗ | 
 | [`gfx_SwapDraw`](/src/graphx/graphx.h#L758) | YES (x6) | [occurrences](https://github.com/search?q=gfx_SwapDraw+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_Blit`](/src/graphx/graphx.h#L767) | YES (x2) | [occurrences](https://github.com/search?q=gfx_Blit+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_Blit`](/src/graphx/graphx.h#L767) | ✗ | 
 | [`gfx_BlitLines`](/src/graphx/graphx.h#L778) | YES (x1) | [occurrences](https://github.com/search?q=gfx_BlitLines+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_BlitRectangle`](/src/graphx/graphx.h#L791) | YES (x1) | [occurrences](https://github.com/search?q=gfx_BlitRectangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_SetTextScale`](/src/graphx/graphx.h#L812) | YES (x1) | [occurrences](https://github.com/search?q=gfx_SetTextScale+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_PrintChar`](/src/graphx/graphx.h#L821) | ✗ | 
 | [`gfx_PrintInt`](/src/graphx/graphx.h#L833) | ✗ | 
 | [`gfx_PrintUInt`](/src/graphx/graphx.h#L845) | YES (x3) | [occurrences](https://github.com/search?q=gfx_PrintUInt+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_PrintString`](/src/graphx/graphx.h#L854) | YES (x5) | [occurrences](https://github.com/search?q=gfx_PrintString+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_PrintString`](/src/graphx/graphx.h#L854) | YES (x3) | [occurrences](https://github.com/search?q=gfx_PrintString+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_PrintStringXY`](/src/graphx/graphx.h#L866) | YES (x5) | [occurrences](https://github.com/search?q=gfx_PrintStringXY+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_GetTextX`](/src/graphx/graphx.h#L871) | ✗ | 
 | [`gfx_GetTextY`](/src/graphx/graphx.h#L876) | ✗ | 
@@ -92,11 +92,11 @@
 | [`gfx_SetTextFGColor`](/src/graphx/graphx.h#L910) | YES (x3) | [occurrences](https://github.com/search?q=gfx_SetTextFGColor+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_SetTextBGColor`](/src/graphx/graphx.h#L919) | YES (x2) | [occurrences](https://github.com/search?q=gfx_SetTextBGColor+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_SetTextTransparentColor`](/src/graphx/graphx.h#L928) | YES (x2) | [occurrences](https://github.com/search?q=gfx_SetTextTransparentColor+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_Sprite`](/src/graphx/graphx.h#L937) | YES (x6) | [occurrences](https://github.com/search?q=gfx_Sprite+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_Sprite`](/src/graphx/graphx.h#L937) | YES (x5) | [occurrences](https://github.com/search?q=gfx_Sprite+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_Sprite_NoClip`](/src/graphx/graphx.h#L946) | YES (x3) | [occurrences](https://github.com/search?q=gfx_Sprite_NoClip+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_TransparentSprite`](/src/graphx/graphx.h#L955) | YES (x3) | [occurrences](https://github.com/search?q=gfx_TransparentSprite+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_TransparentSprite`](/src/graphx/graphx.h#L955) | YES (x2) | [occurrences](https://github.com/search?q=gfx_TransparentSprite+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_TransparentSprite_NoClip`](/src/graphx/graphx.h#L964) | YES (x2) | [occurrences](https://github.com/search?q=gfx_TransparentSprite_NoClip+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_GetSprite`](/src/graphx/graphx.h#L976) | YES (x1) | [occurrences](https://github.com/search?q=gfx_GetSprite+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_GetSprite`](/src/graphx/graphx.h#L976) | ✗ | 
 | [`gfx_ScaledSprite_NoClip`](/src/graphx/graphx.h#L1002) | YES (x1) | [occurrences](https://github.com/search?q=gfx_ScaledSprite_NoClip+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_ScaledTransparentSprite_NoClip`](/src/graphx/graphx.h#L1015) | YES (x1) | [occurrences](https://github.com/search?q=gfx_ScaledTransparentSprite_NoClip+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_RotatedScaledTransparentSprite_NoClip`](/src/graphx/graphx.h#L1030) | ✗ | 
@@ -131,7 +131,7 @@
 | [`gfx_ConvertToNewRLETSprite`](/src/graphx/graphx.h#L1382) | ✗ | 
 | [`gfx_LZDecompress`](/src/graphx/graphx.h#L1440) | ✗ | 
 
-**Total: 54/92 tested.**
+**Total: 51/92 tested.**
 
 ### src/keypadc/keypadc.h
 | Function | Tested? | Search link |

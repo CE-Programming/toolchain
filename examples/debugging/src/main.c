@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <debug.h>
 
+/* Even though in debug.h there are prototypes for SetWriteWatchpoint, SetWatchpoint, RemoveWatchpoint... you have to use the dbg_ prefix */
+
 void main(void) {
     /* Set the intial value of some variables */
     int dbg_test_var_1 = 10;
