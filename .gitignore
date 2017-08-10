@@ -1,7 +1,9 @@
-# Backups
+# Backups and IDE stuff
 *~
+.idea/
 
-# Doxygen specific
+
+# Generated documentation
 doxygen/
 
 # Object files
@@ -11,6 +13,7 @@ doxygen/
 *.elf
 obj/
 release/
+cmake-build-debug/
 
 # Precompiled Headers
 *.gch
@@ -35,9 +38,6 @@ relocation_table
 *.8xv
 *.8xp
 !*var_gfx.8xv
-
-# Generated documentation
-doxygen/
 
 # Debug files
 *.dSYM/
