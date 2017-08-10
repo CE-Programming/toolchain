@@ -98,7 +98,7 @@ void main(void) {
     gfx_TransparentSprite_NoClip(ubuntu_normal, xmin + w * 3 / 2, ymin + h * 3);
     gfx_ConvertToRLETSprite(ubuntu_normal, ubuntu_uninited);
     gfx_RLETSprite_NoClip(ubuntu_uninited, xmin + w * 5 / 2, ymin + h * 3);
-    ubuntu_malloc = gfx_ConvertMallocRLETSprite(ubuntu_normal);
+    ubuntu_malloc = gfx_ConvertMallocRLETSprite(ubuntu_normal); // Same as gfx_ConvertToNewRLETSprite(ubuntu_normal, malloc)
     gfx_RLETSprite_NoClip(ubuntu_malloc, xmin + w * 7 / 2, ymin + h * 3);
 
     /* Wait for a key to be pressed */

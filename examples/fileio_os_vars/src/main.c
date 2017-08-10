@@ -37,7 +37,7 @@ void main(void) {
     ti_SetVar(TI_REAL_TYPE, ti_A, &my_real);
 
     /* Store the equation "2+2" into the Y1 variable */
-    my_equ = ti_MallocEqu(3);
+    my_equ = ti_MallocEqu(3); // Same as ti_AllocEqu(3, malloc)
     my_equ->data[0] = '2';
     my_equ->data[1] = tAdd;
     my_equ->data[2] = '2';
@@ -45,7 +45,7 @@ void main(void) {
     free(my_equ);
 
     /* Store the list {1.5,2.5,3.5} to L1 */
-    my_list = ti_MallocList(3);
+    my_list = ti_MallocList(3); // Same as ti_AllocList(3, malloc)
     my_list->items[0] = real_1_5;
     my_list->items[1] = real_2_5;
     my_list->items[2] = real_3_5;
@@ -53,7 +53,7 @@ void main(void) {
     free(my_list);
 
     /* Store the matrix [[2.5,2.5]] to Ans */
-    my_matrix = ti_MallocMatrix(1,2);
+    my_matrix = ti_MallocMatrix(1,2); // Same as ti_AllocMatrix(1, 2, malloc)
     matrix_element(my_matrix, 0, 0) = real_2_5;
     matrix_element(my_matrix, 0, 1) = real_2_5;
     ti_SetVar(TI_MATRIX_TYPE, ti_Ans, my_matrix);

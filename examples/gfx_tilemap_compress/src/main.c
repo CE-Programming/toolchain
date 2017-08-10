@@ -45,7 +45,7 @@ void main(void) {
 
     /* Decompress the tiles */
     for (i = 0; i < sizeof(tileset_tiles)/sizeof(gfx_sprite_t*) ; i++) {
-        tmp_ptr = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);
+        tmp_ptr = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);  // Same as gfx_AllocSprite(TILE_WIDTH, TILE_HEIGHT, malloc)
         dzx7_Turbo(tileset_tiles_compressed[i], tmp_ptr); // or dzx7_Standard, but in this case we have a lot of tiles
         tileset_tiles[i] = tmp_ptr;
     }
@@ -73,7 +73,7 @@ void main(void) {
     gfx_SetPalette(tiles_gfx_pal, sizeof_tiles_gfx_pal, 0);
     gfx_SetColor(gfx_white);
 
-    /* Draw to buffer to avoid tearing */
+    /* Draw to buffer to avoid tearing. Note, this is the same as gfx_SetDraw(gfx_buffer) */
     gfx_SetDrawBuffer();
 
     /* Set monospace font with width of 8 */

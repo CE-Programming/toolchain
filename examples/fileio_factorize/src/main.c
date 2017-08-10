@@ -12,7 +12,7 @@
 void prime_factors(unsigned int n);
 
 int primes[512];
-int total_primes = 0;
+unsigned int total_primes = 0;
 
 /* Main Function */
 void main(void) {
@@ -34,7 +34,7 @@ void main(void) {
 
     /* Create a list to store the primes */
     if (!total_primes) return;
-    list_out = ti_MallocList(total_primes);
+    list_out = ti_MallocList(total_primes); // Same as ti_AllocList(total_primes, malloc)
 
     /* Write out the list of primes */
     for (i=0; i<total_primes; i++) {
