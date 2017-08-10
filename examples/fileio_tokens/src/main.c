@@ -29,13 +29,13 @@ void main(void) {
 
     /* Close any files that may be open already */
     ti_CloseAll();
-    
+
     /* Open the program for reading */
     prgm = ti_OpenVar(prgmName, "r", TI_PRGM_TYPE);
-    
+
     /* Make sure we opened okay */
     if (!prgm) goto err;
-    
+
     data_ptr = ti_GetDataPtr(prgm);
     size = ti_GetSize(prgm);
 
@@ -43,11 +43,11 @@ void main(void) {
         printText(0, y++, ti_GetTokenString(&data_ptr, &token_length, NULL));
         size -= token_length;
     }
-    
+
 err:
     /* Pause */
     while (!os_GetCSC());
-    
+
     /* Close files */
     ti_CloseAll();
 }
@@ -57,4 +57,3 @@ void printText(int8_t xpos, int8_t ypos, const char *text) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
-

@@ -62,7 +62,7 @@ void ti_CloseAll(void);
  * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
  */
 ti_var_t ti_Open(const char *name, const char *mode);
- 
+
 /**
  * Opens a variable
  *
@@ -445,4 +445,3 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #endif
 
 #endif
-

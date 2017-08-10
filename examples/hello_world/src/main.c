@@ -23,14 +23,14 @@ void main(void) {
     /* Initialize some strings */
     const char *HelloWorld = "Hello World!";
     const char *Welcome = "Welcome to C!";
-    
+
     /* Clear the homescreen */
     os_ClrHome();
 
     /* Print a few strings */
     printText(HelloWorld, 0, 0);
     printText(Welcome, 0, 1);
-    
+
     /* Wait for a key press */
     while (!os_GetCSC());
 }
@@ -45,4 +45,3 @@ void printText(const char *text, uint8_t xpos, uint8_t ypos) {
 void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos) {
     os_FontDrawText(text, xpos, ypos);
 }
-

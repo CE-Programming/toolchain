@@ -30,7 +30,7 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 void main(void) {
     ti_var_t myAppVar;
     int x;
-    
+
     /* Clear the homescreen */
     os_ClrHome();
 
@@ -38,10 +38,10 @@ void main(void) {
     strcpy(data.name, "My Data");
     data.var1 = VAR1_VALUE;
     data.var2 = VAR2_VALUE;
-    
+
     /* Close any files that may be open already */
     ti_CloseAll();
-    
+
     /* Open a new variable; deleting it if it already exists */
     myAppVar = ti_Open(appvarName, "w");
 
@@ -59,17 +59,17 @@ void main(void) {
 
     /* Make sure we read these varaibles correctly too */
     if (data.var1 != VAR1_VALUE && data.var2 != VAR2_VALUE) goto err;
-    
+
     printText(0, 0, "Read was successful");
     goto noerr;
 
 err:
     printText(0, 0, "An error occured");
 noerr:
-  
+
     /* Pause */
     while (!os_GetCSC());
-    
+
     /* Close all open files */
     ti_CloseAll();
 }
@@ -79,4 +79,3 @@ void printText(int8_t xpos, int8_t ypos, const char *text) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
-

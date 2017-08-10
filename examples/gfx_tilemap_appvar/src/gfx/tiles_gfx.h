@@ -6,5 +6,4 @@
 
 #define tiles_gfx_transparent_color_index 0
 
-
 #endif

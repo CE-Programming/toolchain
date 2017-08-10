@@ -16,16 +16,16 @@ void main(void) {
     /* Key varaible */
     kb_key_t key;
     const char *erase_string = "     ";
-    
+
     /* Clear the homescreen */
     os_ClrHome();
 
     /* Loop until 2nd is pressed */
     do {
-        
+
         /* Update kb_Data */
         kb_Scan();
-        
+
         key = kb_Data[7];
 
         /* Print the current arrow key input */
@@ -58,4 +58,3 @@ void printText(int8_t xpos, int8_t ypos, const char *text) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
-

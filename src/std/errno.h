@@ -13,4 +13,3 @@
 #define ERANGE		5	/* range error */
 extern int errno;
 #endif
-

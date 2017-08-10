@@ -60,7 +60,7 @@ extern "C" {
  * @param length The size of the data at the address (values 1-4)
  * @def dbg_SetReadWatchpoint
  */
- 
+
 /**
  * void dbg_SetWriteWatchpoint(void *address, unsigned length)
  *
@@ -86,13 +86,13 @@ extern "C" {
  * @param address The address of the watchpoint to remove
  * @def dbg_RemoveWatchpoint
  */
- 
+
 /**
  * void dbg_RemoveAllBreakpoints(void)
  * @brief Removes all breakpoints in an emulator
  * @def dbg_RemoveAllBreakpoints(void)
  */
- 
+
 /**
  * void dbg_RemoveAllWatchpoints(void)
  * @brief Removes all watchpoints in an emulator
@@ -197,4 +197,3 @@ void RemoveAllBreakpoints(void);
 #ifdef __cplusplus
 }
 #endif
-

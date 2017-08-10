@@ -21,4 +21,3 @@ typedef unsigned char bool;
 
 #endif
 #endif
-

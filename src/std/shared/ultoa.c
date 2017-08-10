@@ -50,7 +50,7 @@ char _mt_ltoa(long val,char* __print_buff,struct fmt_type* print_fmt)
 
   if (__print_fmt.precision < 0)
     __print_fmt.precision = 1;
- 
+
   if (__print_fmt.field_width < 0)
   {
     __print_fmt.flags |= FMT_FLAG_MINUS;

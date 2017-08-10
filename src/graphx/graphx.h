@@ -250,7 +250,7 @@ gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
  * Initializes the graphics library setup
  */
 int gfx_Begin();
-    
+
 /**
  * Closes the graphics setup
  *
@@ -1063,7 +1063,7 @@ uint8_t gfx_RotatedScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t
  * @see gfx_RotatedScaledTransparentSprite_NoClip
  */
 #define gfx_RotatedSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle)
-    
+
 /**
  * Flips a sprite along the X axis
  *
@@ -1139,7 +1139,7 @@ gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out)
  * @returns A pointer to \p sprite_out
  */
 gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out, uint8_t angle, uint8_t scale);
-    
+
 /**
  * A helper macro to only perform rotation using gfx_RotateScaleSprite
  *
@@ -1150,7 +1150,7 @@ gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprit
  * @see gfx_RotateScaleSprite
  */
 #define gfx_RotateSprite(sprite_in, sprite_out, angle) gfx_RotateScaleSprite(sprite_in, sprite_out, angle, 64)
-    
+
 /**
  * Creates a temporary character sprite
  *
@@ -1354,7 +1354,6 @@ gfx_sprite_t *gfx_ConvertFromRLETSprite(gfx_rletsprite_t *sprite_in, gfx_sprite_
  * @see gfx_ConvertFromRLETSprite
  */
 gfx_rletsprite_t *gfx_ConvertToRLETSprite(gfx_sprite_t *sprite_in, gfx_rletsprite_t *sprite_out);
-
 
 /**
  * Converts a sprite with normal transpareny to a sprite with RLE transparency,

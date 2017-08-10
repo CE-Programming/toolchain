@@ -215,7 +215,7 @@ static char * write_f_digits(char * s, struct fmt_type* fmt,struct flt_info* pin
     __print_fmt.pad_post_fract =ndig;
 	ndig = 0;
   }
- 
+
   return s;
 }
 

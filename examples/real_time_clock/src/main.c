@@ -27,12 +27,12 @@ void main(void) {
 
     /* Wait until 5 seconds have passed */
     while (seconds < 5) {
-        
+
         /* If a second passed, increment the second counter */
         if (rtc_IntStatus & RTC_SEC_INT) {
             memset(lcd_Ram, randInt(0,255), LCD_SIZE);
             seconds++;
-            
+
             rtc_IntAcknowledge = rtc_IntStatus;
         }
     }

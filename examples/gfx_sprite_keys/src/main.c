@@ -23,7 +23,7 @@ void draw_sprite(int x, int y) {
 
     /* Draw a bunch of different styled sprites on the screen */
     gfx_Sprite(ubuntu, x, y);
-    
+
     /* Draw to the screen */
     gfx_BlitBuffer();
 }
@@ -34,37 +34,37 @@ void main(void) {
     bool up;
     bool down;
     kb_key_t arrows;
-    
+
     /* Coordinates used for the sprite */
     int x, y;
-    
+
     /* Initialize the 8bpp graphics */
     gfx_Begin();
-    
+
     /* Set up the palette for our sprites */
     gfx_SetPalette(logo_gfx_pal, sizeof_logo_gfx_pal, 0);
-    
+
     /* Start at 0, 0 */
     x = 0;
     y = 0;
-    
+
     gfx_SetDrawBuffer();
-    
+
     draw_sprite(x, y);
-    
+
     do {
         /* Scan the keypad to update kb_Data */
         kb_Scan();
-        
+
         /* Get the arrow key statuses */
         arrows = kb_Data[7];
-        
+
         /* Convert the data to booleans so we can read them easier */
         right = arrows & kb_Right;
         left  = arrows & kb_Left;
         down  = arrows & kb_Down;
         up    = arrows & kb_Up;
-        
+
         /* If any arrows are pressed, do this */
         if (arrows) {
             /* Do different directions depending on the keypress */
@@ -83,7 +83,7 @@ void main(void) {
             draw_sprite(x, y);
         }
     } while (kb_Data[6] != kb_Clear);
-    
+
     /* Close the graphics */
     gfx_End();
 }

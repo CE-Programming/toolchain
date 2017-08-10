@@ -14,13 +14,13 @@
 
 void main(void) {
     uint8_t i = 0;
-	
+
     /* Initialize the 8bpp graphics */
     gfx_Begin();
-	
+
     /* For i in 0..255 */
     do {
-        
+
         /* Fade out to black */
         gfx_palette[0] = gfx_Darken(color, i);
         /* Fade in from black */
@@ -29,7 +29,7 @@ void main(void) {
         gfx_palette[3] = gfx_Lighten(color, ~i);
         /* Fade out to white */
         gfx_palette[2] = gfx_Lighten(color, i);
-        
+
         /* Fade out to black */
         gfx_SetColor(0);
         gfx_FillRectangle_NoClip(0, 0, 160, 120);
@@ -47,14 +47,13 @@ void main(void) {
         if (!(i & 0x3f)) {
             while (!os_GetCSC());
         }
-        
+
     /* Loop until i is 0 again because of 8 bit range */
     } while (++i);
-	
+
     /* Wait for a keypress */
     while (!os_GetCSC());
-	
+
     /* Usual cleanup */
     gfx_End();
 }
-

@@ -27,15 +27,15 @@ void main(void) {
     real_t    real_1_5 = os_FloatToReal(1.5);
     real_t    real_2_5 = os_FloatToReal(2.5);
     real_t    real_3_5 = os_FloatToReal(3.5);
-    
+
     /* Store the value '1.5+2.5i' into the varaible B */
     my_cplx = FloatsToCplx(1.5, 2.5);
     ti_SetVar(TI_CPLX_TYPE, ti_B, &my_cplx);
-    
+
     /* Store the value '1.5' into the varaible A */
     my_real = real_1_5;
     ti_SetVar(TI_REAL_TYPE, ti_A, &my_real);
-    
+
     /* Store the equation "2+2" into the Y1 variable */
     my_equ = ti_MallocEqu(3);
     my_equ->data[0] = '2';
@@ -43,7 +43,7 @@ void main(void) {
     my_equ->data[2] = '2';
     ti_SetVar(TI_EQU_TYPE, ti_Y1, my_equ);
     free(my_equ);
-    
+
     /* Store the list {1.5,2.5,3.5} to L1 */
     my_list = ti_MallocList(3);
     my_list->items[0] = real_1_5;
@@ -51,7 +51,7 @@ void main(void) {
     my_list->items[2] = real_3_5;
     ti_SetVar(TI_REAL_LIST_TYPE, ti_L1, my_list);
     free(my_list);
-    
+
     /* Store the matrix [[2.5,2.5]] to Ans */
     my_matrix = ti_MallocMatrix(1,2);
     matrix_element(my_matrix, 0, 0) = real_2_5;
@@ -99,4 +99,3 @@ cplx_t StrsToCplx(char *real, char **real_end, char *imag, char **imag_end) {
     res.imag.sign |= TI_CPLX_TYPE;
     return res;
 }
-
