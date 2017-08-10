@@ -164,8 +164,8 @@ extern "C" {
 #define dbg_RemoveAllWatchpoints RemoveAllWatchpoints
 #define dbg_RemoveAllBreakpoints RemoveAllBreakpoints
 #define dbg_sprintf sprintf
-#define dbgout ((const char*)0xFB0000)
-#define dbgerr ((const char*)0xFC0000)
+#define dbgout ((char*)0xFB0000)
+#define dbgerr ((char*)0xFC0000)
 #else
 #define dbg_Debugger(ignore)                      //
 #define dbg_SetBreakpoint(ignore)                 //
