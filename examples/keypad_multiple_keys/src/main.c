@@ -13,7 +13,7 @@
 void printText(int8_t xpos, int8_t ypos, const char *text);
 
 void main(void) {
-    /* Key varaible */
+    /* Key variable */
     kb_key_t key;
     const char *erase_string = "     ";
 

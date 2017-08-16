@@ -22,13 +22,13 @@ void main(void) {
     /* You can enter the debugger manually */
     dbg_Debugger();
 
-    /* Set a watchpoint that will break anytime we write/change this varaible */
+    /* Set a watchpoint that will break anytime we write/change this variable */
     dbg_SetWriteWatchpoint(&dbg_test_var_1, sizeof dbg_test_var_1);
 
     /* Set a non breaking watchpoint just so we can see what is in this variable at any given time */
     dbg_SetWatchpoint(&dbg_test_var_2, sizeof dbg_test_var_2);
 
-    /* Now, let's write to the varaible to see what happens (Go to the 'Watchpoints' tab in CEmu to view the status) */
+    /* Now, let's write to the variable to see what happens (Go to the 'Watchpoints' tab in CEmu to view the status) */
     dbg_test_var_1 = 5;
 
     /* Remove the watchpoint that we had set */

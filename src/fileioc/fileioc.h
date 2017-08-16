@@ -254,7 +254,7 @@ int ti_DeleteVar(const char *varname, uint8_t type);
  * Gets the string used for displaying a TI token
  *
  * @param length_of_string Pointer to variable to hold length of resulting string (Can be NULL if you don't care)
- * @param length_of_token Pointer to varaible to hold length of the token, used for determining the next read location (Can be NULL if you don't care)
+ * @param length_of_token Pointer to variable to hold length of the token, used for determining the next read location (Can be NULL if you don't care)
  * @param read_pointer Address of pointer to data to read
  * @note read_pointer is updated to the next token, depending on if it is 1 or 2 bytes in length
  */
@@ -271,9 +271,9 @@ void *ti_GetDataPtr(const ti_var_t slot);
 /**
  * Sets a variable
  *
- * @param name Pointer to name of varaible 
+ * @param name Pointer to name of variable
  * @param data Pointer to data to set
- * @param var_type Type of varaible to set
+ * @param var_type Type of variable to set
  * @returns 0 if success
  */
 uint8_t ti_SetVar(const ti_var_t var_type, const char *name, void *data);
@@ -281,9 +281,9 @@ uint8_t ti_SetVar(const ti_var_t var_type, const char *name, void *data);
 /**
  * Stores a variable to another variable
  *
- * @param var_type_to Type of varaible to store to 
+ * @param var_type_to Type of variable to store to
  * @param to Pointer to data to store to
- * @param var_type_from Type of varaible to get from
+ * @param var_type_from Type of variable to get from
  * @param from Pointer to data to get from
  * @returns 0 if success
  */

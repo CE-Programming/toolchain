@@ -28,11 +28,11 @@ void main(void) {
     real_t    real_2_5 = os_FloatToReal(2.5);
     real_t    real_3_5 = os_FloatToReal(3.5);
 
-    /* Store the value '1.5+2.5i' into the varaible B */
+    /* Store the value '1.5+2.5i' into the variable B */
     my_cplx = FloatsToCplx(1.5, 2.5);
     ti_SetVar(TI_CPLX_TYPE, ti_B, &my_cplx);
 
-    /* Store the value '1.5' into the varaible A */
+    /* Store the value '1.5' into the variable A */
     my_real = real_1_5;
     ti_SetVar(TI_REAL_TYPE, ti_A, &my_real);
 

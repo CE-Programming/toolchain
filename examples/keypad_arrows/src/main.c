@@ -13,7 +13,7 @@
 void fill_screen(uint8_t color);
 
 void main(void) {
-    /* Key varaible */
+    /* Key variable */
     kb_key_t key;
 
     /* Loop until 2nd is pressed */

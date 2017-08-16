@@ -34,7 +34,7 @@ void main(void) {
     /* Clear the homescreen */
     os_ClrHome();
 
-    /* Declare some varaible values */
+    /* Declare some variable values */
     strcpy(data.name, "My Data");
     data.var1 = VAR1_VALUE;
     data.var2 = VAR2_VALUE;
@@ -57,7 +57,7 @@ void main(void) {
     /* Let's read it just to make sure we wrote it correctly */
     if (ti_Read(&data, sizeof(data_t), 1, myAppVar) != 1)   goto err;
 
-    /* Make sure we read these varaibles correctly too */
+    /* Make sure we read these variables correctly too */
     if (data.var1 != VAR1_VALUE && data.var2 != VAR2_VALUE) goto err;
 
     printText(0, 0, "Read was successful");

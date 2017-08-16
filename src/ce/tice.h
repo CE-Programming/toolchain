@@ -174,35 +174,35 @@ void delay(uint16_t msec);
 (LCD_WIDTH*LCD_HEIGHT*2)
 
 /**
- * @brief Structure of real varaible type
+ * @brief Structure of real variable type
  */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
 /**
- * @brief Structure of complex varaible type
+ * @brief Structure of complex variable type
  */
 typedef struct { real_t real, imag; } cplx_t;
 /**
- * @brief Structure of list varaible type
+ * @brief Structure of list variable type
  */
 typedef struct { uint16_t dim; real_t items[1]; } list_t;
 /**
- * @brief Structure of complex list varaible type
+ * @brief Structure of complex list variable type
  */
 typedef struct { uint16_t dim; cplx_t items[1]; } cplx_list_t;
 /**
- * @brief Structure of matrix varaible type
+ * @brief Structure of matrix variable type
  */
 typedef struct { uint8_t cols, rows; real_t items[1]; } matrix_t;
 /**
- * @brief Structure of string varaible type
+ * @brief Structure of string variable type
  */
 typedef struct { uint16_t len; char data[1]; } string_t;
 /**
- * @brief Structure of equation varaible type
+ * @brief Structure of equation variable type
  */
 typedef struct { uint16_t len; char data[1]; } equ_t;
 /**
- * @brief Structure of miscellaneous varaible type
+ * @brief Structure of miscellaneous variable type
  */
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
@@ -405,7 +405,7 @@ uint24_t os_FontGetID(void);
 
 /**
  * @param string String to get pixel width of
- * @returns The width of a string in the varaible-width format
+ * @returns The width of a string in the variable-width format
  */
 uint24_t os_FontGetWidth(const char *string);
 
@@ -543,7 +543,7 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
 /**
  * Gets the Answer
  *
- * @param type This is set to the current varaible type in ANS
+ * @param type This is set to the current variable type in ANS
  * @returns Pointer to the data
  * @note Returns NULL if Ans doesn't exist or type is NULL
  */
