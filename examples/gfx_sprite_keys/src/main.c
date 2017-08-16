@@ -25,7 +25,7 @@ void draw_sprite(int x, int y) {
     gfx_Sprite(ubuntu, x, y);
 
     /* Draw to the screen */
-    gfx_BlitBuffer();
+    gfx_BlitBuffer(); // This is the same as gfx_Blit(gfx_buffer)
 }
 
 void main(void) {

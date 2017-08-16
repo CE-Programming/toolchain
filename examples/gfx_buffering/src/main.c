@@ -19,7 +19,7 @@ void main(void) {
     gfx_SetColor(gfx_black);
 
     /* Draw to buffer to avoid tearing */
-    gfx_SetDrawBuffer();
+    gfx_SetDrawBuffer(); // This is the same as gfx_SetDraw(gfx_buffer)
 
     /* Draw a line on the buffer */
     //gfx_FillScreen(gfx_black);
@@ -32,7 +32,7 @@ void main(void) {
     gfx_SwapDraw();
 
     /* Copy part of the screen to the offscreen buffer */
-    gfx_BlitBuffer();
+    gfx_BlitBuffer(); // This is the same as gfx_Blit(gfx_buffer)
     //gfx_BlitLines(gfx_buffer, 0, 20);
     //gfx_BlitRectangle(gfx_buffer, 0, 0, 160, 120);
 

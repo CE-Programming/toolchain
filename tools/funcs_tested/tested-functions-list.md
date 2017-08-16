@@ -73,10 +73,10 @@
 | [`gfx_Polygon_NoClip`](/src/graphx/graphx.h#L701) | ✗ | 
 | [`gfx_FillTriangle`](/src/graphx/graphx.h#L714) | YES | [in 1 file](https://github.com/search?q=gfx_FillTriangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_FillTriangle_NoClip`](/src/graphx/graphx.h#L715) | ✗ | 
-| [`gfx_SetDraw`](/src/graphx/graphx.h#L723) | YES | [in 1 file](https://github.com/search?q=gfx_SetDraw+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_SetDraw`](/src/graphx/graphx.h#L723) | YES | [in 2 files](https://github.com/search?q=gfx_SetDraw+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_GetDraw`](/src/graphx/graphx.h#L751) | ✗ | 
 | [`gfx_SwapDraw`](/src/graphx/graphx.h#L758) | YES | [in 6 files](https://github.com/search?q=gfx_SwapDraw+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_Blit`](/src/graphx/graphx.h#L767) | ✗ | 
+| [`gfx_Blit`](/src/graphx/graphx.h#L767) | YES | [in 2 files](https://github.com/search?q=gfx_Blit+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_BlitLines`](/src/graphx/graphx.h#L778) | YES | [in 1 file](https://github.com/search?q=gfx_BlitLines+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_BlitRectangle`](/src/graphx/graphx.h#L791) | YES | [in 1 file](https://github.com/search?q=gfx_BlitRectangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_SetTextScale`](/src/graphx/graphx.h#L812) | YES | [in 1 file](https://github.com/search?q=gfx_SetTextScale+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -118,9 +118,9 @@
 | [`gfx_SetClipRegion`](/src/graphx/graphx.h#L1222) | YES | [in 2 files](https://github.com/search?q=gfx_SetClipRegion+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_GetClipRegion`](/src/graphx/graphx.h#L1229) | ✗ | 
 | [`gfx_ShiftDown`](/src/graphx/graphx.h#L1237) | YES | [in 1 file](https://github.com/search?q=gfx_ShiftDown+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_ShiftUp`](/src/graphx/graphx.h#L1245) | ✗ | 
-| [`gfx_ShiftLeft`](/src/graphx/graphx.h#L1253) | ✗ | 
-| [`gfx_ShiftRight`](/src/graphx/graphx.h#L1261) | ✗ | 
+| [`gfx_ShiftUp`](/src/graphx/graphx.h#L1245) | YES | [in 1 file](https://github.com/search?q=gfx_ShiftUp+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_ShiftLeft`](/src/graphx/graphx.h#L1253) | YES | [in 1 file](https://github.com/search?q=gfx_ShiftLeft+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_ShiftRight`](/src/graphx/graphx.h#L1261) | YES | [in 1 file](https://github.com/search?q=gfx_ShiftRight+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_Lighten`](/src/graphx/graphx.h#L1271) | YES | [in 1 file](https://github.com/search?q=gfx_Lighten+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_Darken`](/src/graphx/graphx.h#L1281) | YES | [in 1 file](https://github.com/search?q=gfx_Darken+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_FloodFill`](/src/graphx/graphx.h#L1292) | YES | [in 1 file](https://github.com/search?q=gfx_FloodFill+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -131,7 +131,7 @@
 | [`gfx_ConvertToNewRLETSprite`](/src/graphx/graphx.h#L1381) | YES | [in 1 file](https://github.com/search?q=gfx_ConvertToNewRLETSprite+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_LZDecompress`](/src/graphx/graphx.h#L1439) | ✗ | 
 
-**Total: 54/92 tested.**
+**Total: 58/92 tested.**
 
 ### src/keypadc/keypadc.h
 | Function | Tested? | Occurrences |
@@ -270,7 +270,7 @@
 ### src/ce/debug.h
 | Function | Tested? | Occurrences |
 | -------- | ------- | ----------- |
-| [`Debugger`](/src/ce/debug.h#L186) | ✗ | 
+| [`Debugger`](/src/ce/debug.h#L186) | YES | [in 1 file](https://github.com/search?q=Debugger+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`SetBreakpoint`](/src/ce/debug.h#L187) | ✗ | 
 | [`RemoveBreakpoint`](/src/ce/debug.h#L188) | ✗ | 
 | [`SetWatchpoint`](/src/ce/debug.h#L189) | YES | [in 1 file](https://github.com/search?q=SetWatchpoint+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -278,10 +278,10 @@
 | [`SetWriteWatchpoint`](/src/ce/debug.h#L191) | YES | [in 1 file](https://github.com/search?q=SetWriteWatchpoint+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`SetReadWriteWatchpoint`](/src/ce/debug.h#L192) | ✗ | 
 | [`RemoveWatchpoint`](/src/ce/debug.h#L193) | YES | [in 1 file](https://github.com/search?q=RemoveWatchpoint+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`RemoveAllWatchpoints`](/src/ce/debug.h#L194) | ✗ | 
-| [`RemoveAllBreakpoints`](/src/ce/debug.h#L195) | ✗ | 
+| [`RemoveAllWatchpoints`](/src/ce/debug.h#L194) | YES | [in 1 file](https://github.com/search?q=RemoveAllWatchpoints+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`RemoveAllBreakpoints`](/src/ce/debug.h#L195) | YES | [in 1 file](https://github.com/search?q=RemoveAllBreakpoints+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 
-**Total: 3/10 tested.**
+**Total: 6/10 tested.**
 
 
 ---

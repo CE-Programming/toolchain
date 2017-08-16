@@ -81,6 +81,10 @@ void main(void) {
     /* Shift the screen around a bit */
     gfx_ShiftDown(20);
     gfx_ShiftDown(20);
+    gfx_ShiftLeft(20);
+    gfx_ShiftLeft(20);
+    gfx_ShiftUp(20);
+    gfx_ShiftRight(20);
 
     /* Wait for any key */
     while (!os_GetCSC());

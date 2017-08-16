@@ -6,7 +6,10 @@
 #include <assert.h>
 #include <debug.h>
 
-/* Even though in debug.h there are prototypes for SetWriteWatchpoint, SetWatchpoint, RemoveWatchpoint... you have to use the dbg_ prefix */
+/*
+ * Even though debug.h has prototypes for Debugger, SetWriteWatchpoint, SetWatchpoint, RemoveWatchpoint, RemoveAllWatchpoints, RemoveAllBreakpoints...
+ * you have to use the dbg_ prefix as shown here:
+ */
 
 void main(void) {
     /* Set the intial value of some variables */
@@ -15,6 +18,9 @@ void main(void) {
 
     /* Print a simple debugging string */
     dbg_sprintf(dbgout, "This is the start of a CEmu debugging test\n");
+
+    /* You can enter the debugger manually */
+    dbg_Debugger();
 
     /* Set a watchpoint that will break anytime we write/change this varaible */
     dbg_SetWriteWatchpoint(&dbg_test_var_1, sizeof dbg_test_var_1);
@@ -28,6 +34,10 @@ void main(void) {
     /* Remove the watchpoint that we had set */
     dbg_RemoveWatchpoint(&dbg_test_var_1);
     dbg_RemoveWatchpoint(&dbg_test_var_2);
+
+    /* We can also use those */
+    dbg_RemoveAllWatchpoints();
+    dbg_RemoveAllBreakpoints();
 
     /* Set this value to zero */
     dbg_test_var_2 = 0;

@@ -44,10 +44,10 @@
       "expected_CRCs": [ "D7543DD6" ]
     },
     "4": {
-      "description": "The screen is shifted down a bit, twice",
+      "description": "The screen is shifted several times",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "3624A6E5" ]
+      "expected_CRCs": [ "F2BD5102" ]
     },
     "5": {
       "description": "Back to the home screen (exit check)",
