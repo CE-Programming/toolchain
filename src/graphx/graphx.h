@@ -731,13 +731,13 @@ typedef enum {
 } gfx_draw_location_t;
 
 /**
- * Forces all graphics routines to draw to the screen
+ * Makes the subsequent GraphX drawing routines act on the buffer
  */
 #define gfx_SetDrawBuffer() \
 gfx_SetDraw(gfx_buffer)
 
 /**
- * Forces all graphics routines to draw to the buffer
+ * Makes the subsequent GraphX drawing routines act on the screen
  */
 #define gfx_SetDrawScreen() \
 gfx_SetDraw(gfx_screen)
@@ -964,7 +964,7 @@ void gfx_TransparentSprite(gfx_sprite_t *sprite, int x, int y);
 void gfx_TransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y);
 
 /**
- * Grab the background behind a sprite
+ * Grabs the background behind a sprite
  *
  * This is useful for partial redraw.
  * @param sprite_buffer Buffer used to store grabbed sprite
@@ -976,7 +976,7 @@ void gfx_TransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y);
 gfx_sprite_t *gfx_GetSprite(gfx_sprite_t *sprite_buffer, int x, int y);
 
 /**
- * Grab the background behind an unclipped sprite
+ * Grabs the background behind an unclipped sprite
  *
  * This is useful for partial redraw.
  * @param sprite_buffer Buffer used to store grabbed sprite
@@ -989,7 +989,7 @@ gfx_sprite_t *gfx_GetSprite(gfx_sprite_t *sprite_buffer, int x, int y);
 gfx_GetSprite((sprite_buffer), (x), (y))
 
 /**
- * Scale an unclipped sprite
+ * Scales an unclipped sprite
  *
  * Scaling factors must be greater than or equal to 1, and an integer factor
  * @param sprite Pointer to initialized sprite structure
@@ -1002,7 +1002,7 @@ gfx_GetSprite((sprite_buffer), (x), (y))
 void gfx_ScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t width_scale, uint8_t height_scale);
 
 /**
- * Scale an unclipped transparent sprite
+ * Scales an unclipped transparent sprite
  *
  * Scaling factors must be greater than or equal to 1, and an integer factor
  * @param sprite Pointer to initialized sprite structure
@@ -1030,7 +1030,7 @@ void gfx_ScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_
 uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t angle, uint8_t scale);
 
 /**
- * A helper macro to only perform rotation using gfx_RotatedScaledTransparentSprite_NoClip
+ * Helper macro to only perform rotation using gfx_RotatedScaledTransparentSprite_NoClip
  *
  * @param sprite_in Input sprite to rotate
  * @param sprite_out Pointer to where rotated sprite will be stored
@@ -1055,7 +1055,7 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t
 uint8_t gfx_RotatedScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t angle, uint8_t scale);
 
 /**
- * A helper macro to only perform rotation using gfx_RotatedScaledSprite_NoClip
+ * Helper macro to only perform rotation using gfx_RotatedScaledSprite_NoClip
  *
  * @param sprite_in Input sprite to rotate
  * @param sprite_out Pointer to where rotated sprite will be stored
@@ -1124,7 +1124,7 @@ gfx_sprite_t *gfx_RotateSpriteHalf(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite
 gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out);
 
 /**
- * Fixed Rotation with scaling fator for sprites
+ * Fixed Rotation with scaling factor for sprites
  *
  * The output sprite is updated with the dimensions required for the implemented scaling factor.
  * You must make sure that \p sprite_out has enough memory to store the needed output sprite. This can be
@@ -1141,7 +1141,7 @@ gfx_sprite_t *gfx_ScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out)
 gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprite_out, uint8_t angle, uint8_t scale);
 
 /**
- * A helper macro to only perform rotation using gfx_RotateScaleSprite
+ * Helper macro to only perform rotation using gfx_RotateScaleSprite
  *
  * @param sprite_in Input sprite to rotate
  * @param sprite_out Pointer to where rotated sprite will be stored
@@ -1161,7 +1161,7 @@ gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprit
 gfx_sprite_t *gfx_GetSpriteChar(char c);
 
 /**
- * Set the font
+ * Sets the font
  *
  * @param data Pointer to formated 8x8 pixel font
  * @note Format is a total of 8 bytes
@@ -1169,7 +1169,7 @@ gfx_sprite_t *gfx_GetSpriteChar(char c);
 void gfx_SetFontData(uint8_t *data);
 
 /**
- * Set the font spacing
+ * Sets the font spacing
  *
  * @param spacing Pointer to array of character spacing
  */
@@ -1193,7 +1193,7 @@ uint8_t gfx_SetFontHeight(uint8_t height);
 void gfx_SetMonospaceFont(uint8_t spacing);
 
 /**
- * Get pixel width of string
+ * Gets the pixel width of the given string
  *
  * @param string Pointer to string
  * @note Takes into account monospacing flag
@@ -1201,7 +1201,7 @@ void gfx_SetMonospaceFont(uint8_t spacing);
 unsigned int gfx_GetStringWidth(const char *string);
 
 /**
- * Get pixel width of a character
+ * Gets the pixel width of the given character
  *
  * @param c Character to get width of
  * @returns Width in pixels of character
