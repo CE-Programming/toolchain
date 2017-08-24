@@ -1163,8 +1163,11 @@ gfx_sprite_t *gfx_GetSpriteChar(char c);
 /**
  * Sets the font
  *
+ * Fonts can be created manually or and exported to a C-style format using 8x8 Pixel ROM Font Editor.
+ * (https://www.min.at/prinz/o/software/pixelfont/#download)
+ *
  * @param data Pointer to formated 8x8 pixel font
- * @note Format is a total of 8 bytes
+ * @note Format of font data is 8 bytes horizontally aligned.
  */
 void gfx_SetFontData(uint8_t *data);
 
