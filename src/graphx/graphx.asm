@@ -397,7 +397,7 @@ _:	ld	a,b
 	ret
 
 ;-------------------------------------------------------------------------------
-_FillScreen_PushesPerIter equ 115
+_FillScreen_PushesPerIter equ 115	; see fillscreen.xlsx for derivation
 _FillScreen_NumIters equ (lcdSize-interruptStackSize)/(_FillScreen_PushesPerIter*3)
 _FillScreen_BytesToPush equ _FillScreen_PushesPerIter*3*_FillScreen_NumIters
 _FillScreen_BytesToLddr equ lcdSize-_FillScreen_BytesToPush
