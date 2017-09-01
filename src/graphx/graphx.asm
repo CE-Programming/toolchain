@@ -125,7 +125,8 @@
 ;-------------------------------------------------------------------------------
 ; Used throughout the library
 lcdSize                 equ lcdWidth*lcdHeight
-stackSize               equ 4000
+interruptStackSize      equ 4000	; minimum stack size to provide for
+					; interrupts if moving the stack
 currDrawBuffer          equ 0E30014h
 DEFAULT_TP_COLOR        equ 0
 DEFAULT_TEXT_FG_COLOR   equ 0
@@ -397,7 +398,7 @@ _:	ld	a,b
 
 ;-------------------------------------------------------------------------------
 _FillScreen_PushesPerIter equ 115
-_FillScreen_NumIters equ (lcdSize-stackSize)/(_FillScreen_PushesPerIter*3)
+_FillScreen_NumIters equ (lcdSize-interruptStackSize)/(_FillScreen_PushesPerIter*3)
 _FillScreen_BytesToPush equ _FillScreen_PushesPerIter*3*_FillScreen_NumIters
 _FillScreen_BytesToLddr equ lcdSize-_FillScreen_BytesToPush
 
