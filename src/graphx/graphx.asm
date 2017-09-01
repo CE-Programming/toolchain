@@ -118,13 +118,14 @@
  .function "gfx_RotateScaleSprite",_RotateScaleSprite
  .function "gfx_RotatedScaledTransparentSprite_NoClip",_RotatedScaledTransparentSprite_NoClip
  .function "gfx_RotatedScaledSprite_NoClip",_RotatedScaledSprite_NoClip
- 
+
  .beginDependencies
  .endDependencies
 
 ;-------------------------------------------------------------------------------
 ; Used throughout the library
 lcdSize                 equ lcdWidth*lcdHeight
+stackSize               equ 4000
 currDrawBuffer          equ 0E30014h
 DEFAULT_TP_COLOR        equ 0
 DEFAULT_TEXT_FG_COLOR   equ 0
@@ -395,36 +396,87 @@ _:	ld	a,b
 	ret
 
 ;-------------------------------------------------------------------------------
+_FillScreen_PushesPerIter equ 115
+_FillScreen_NumIters equ (lcdSize-stackSize)/(_FillScreen_PushesPerIter*3)
+_FillScreen_BytesToPush equ _FillScreen_PushesPerIter*3*_FillScreen_NumIters
+_FillScreen_BytesToLddr equ lcdSize-_FillScreen_BytesToPush
+
 _FillScreen:
 ; Fills the screen with the specified color index
 ; Arguments:
 ;  arg0 : Color index
 ; Returns:
 ;  None
-	pop	bc
-	ex	(sp),hl			; l = color
-	push	bc
-	ld	a,l			; a = color
-	ld	hl,(currDrawBuffer)	; hl = buffer
+	ld	iy,0
+	add	iy,sp			; iy = original sp
+	ld	hl,(currDrawBuffer)
+	ld	bc,lcdSize
+	add	hl,bc
+	ld	sp,hl			; sp = end (exclusive) of buffer
+	ld	hl,_FillScreen_FastCode_SrcEnd-1 \.r
+	ld	de,_FillScreen_FastCode_DestEnd-1
+	ld	bc,_FillScreen_FastCode_SrcSize
+	lddr				; copy fast code after push run
+					; de = pointer second to last push
+					; bc = 0
+	push	de
+	pop	hl
+	inc	hl			; hl  = pointer to last push (already copied)
+	ld	c,_FillScreen_PushesPerIter-1
+	lddr				; fill push run
+	ld	a,$E1
+	ld	(de),a			; write initial pop hl
+	ld	de,(iy+1)		; deu = color
+	ld	d,(iy+3)		; d = color
+	ld	e,d			; e = color
+	ld	b,_FillScreen_NumIters	; b = number of fast code iterations
+	call	_FillScreen_FastCode_Dest ; do fast fill
+	sbc	hl,hl
+	add	hl,sp			; hl = pointer to last byte fast-filled
+	ld	sp,iy			; sp = original sp
 	push	hl
-	pop	de			; de = buffer
-_	ld	(de),a			; *buffer = color
-	inc	de			; de = buffer+1
-	ld	bc,lcdSize-1
-	ldir				; fill the rest of the buffer
+	pop	de
+	dec	de			; de = pointer to first byte to slow-fill
+	ld	bc,_FillScreen_BytesToLddr
+	lddr				; finish with slow fill
 	ret
+
+_FillScreen_FastCode_Src:
+.org mpLcdCrsrImage
+_FillScreen_FastCode_Dest:
+
+;	pop	hl
+.org $+1
+_FillScreen_Loop:
+;	push	de
+;	push	de
+;	.
+;	.
+;	.
+;	push	de
+	push	de
+.org $+_FillScreen_PushesPerIter-1
+	djnz	_FillScreen_Loop
+	jp	(hl)
+
+_FillScreen_FastCode_DestEnd:
+_FillScreen_FastCode_DestSize equ _FillScreen_FastCode_DestEnd-_FillScreen_FastCode_Dest
+_FillScreen_FastCode_SrcSize equ _FillScreen_FastCode_DestSize-(_FillScreen_PushesPerIter-1+1)
+.org _FillScreen_FastCode_Src+_FillScreen_FastCode_SrcSize
+_FillScreen_FastCode_SrcEnd:
 
 ;-------------------------------------------------------------------------------
 _ZeroScreen:
-; Fills the current screen with a bunch of zeros
+; Fills the screen with color index 0
 ; Arguments:
 ;  None
 ; Returns:
 ;  None
-	ld	hl,$E40000		; E40000-EFFFFF: reads as 0, 1 waitstate
-	ld	de,(currDrawBuffer)
-	xor	a,a
-	jr	-_
+	ld	l,0
+	push	hl
+	call	_FillScreen \.r
+	pop	hl
+	ret
 
 ;-------------------------------------------------------------------------------
 _SetPalette:
@@ -4120,7 +4172,7 @@ _RotatedScaledSprite_NoClip:
 ;  arg1 : Pointer to sprite struct output
 	xor	a,a
 	jr	_RotatedScaled_ASM
-	
+
 ;-------------------------------------------------------------------------------
 _RotatedScaledTransparentSprite_NoClip:
 ; Rotate and scale an image drawn directly to the screen buffer
@@ -4132,7 +4184,7 @@ _RotatedScaledTransparentSprite_NoClip:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	ld	a,3
-	
+
 _RotatedScaled_ASM:
 	ld	(_smc_tp),a \.r
 	push	ix
@@ -4142,7 +4194,7 @@ _RotatedScaled_ASM:
 	ld	iy,(ix+6)				; sprite pointer
 	lea	hl,iy+2
 	ld	(_dsrs_sprptr_0 + 1),hl \.r		; write smc
-	
+
 	ld	l,(ix+12)				; y
 	ld	h,160
 	mlt	hl
@@ -4153,7 +4205,7 @@ _RotatedScaled_ASM:
 	ld	hl,(currDrawBuffer)
 	add	hl,de					; offset buffer
 	push	hl
-	
+
 	; sinf = sinTable[angle] * 128 / scale;
 	ld	a,(ix+15)				; angle
 	call	getSinCos \.r
@@ -4195,7 +4247,7 @@ _RotatedScaled_ASM:
 	call	_16Mul16SignedNeg \.r			; sinf * -(size * scale / 128)
 	ld	(_dsrs_dys_0 + 1),hl \.r		; write smc
 	push	hl
-	
+
 	; cosf = sinTable[angle + 64] * 128 / scale
 	ld	a,64
 	add	a,(ix+15)				; angle + 64
@@ -4221,7 +4273,7 @@ _RotatedScaled_ASM:
 	call	_16Mul16SignedNeg \.r			; cosf * -(size * scale / 128)
 	ld	(_dsrs_dyc_0 + 1),hl \.r		; write smc
  	push	hl
-	
+
 	ld	a,(iy)					; size
 	ld	(_dsrs_ssize_1 + 1),a \.r		; write smc
 	dec	a
@@ -4252,11 +4304,11 @@ _:	ld	(_dsrs_size_1 + 2),a \.r		; write smc
 	ex	de,hl
 	sbc	hl,de
 	ld	(_line_add + 1),hl \.r
-	
+
 	pop	de					; smc = dxc start
 	pop	hl					; smc = dxs start
 	pop	ix
-	
+
 	push	af
 	ld	iyh,a					; size * scale / 64
 drawSpriteRotatedScaled_Loop1:
@@ -4284,7 +4336,7 @@ _dsrs_size_1:						; smc = size * scale / 64
 	ld	iyl,$00
 drawSpriteRotatedScaled_Loop2:
 	push	hl					; xs
- 
+
 	ld	a,d
 	or	a,h
 	rlca
@@ -4339,7 +4391,7 @@ _dsrs_sinf_1:						; smc = sinf
 _line_add:
 	ld	bc,$000000
 	add	ix,bc					; y++
-	
+
 	dec	iyh
 	jp	nz,drawSpriteRotatedScaled_Loop1 \.r	; y loop
 	pop	af					; sprite out ptr
@@ -4364,7 +4416,7 @@ _RotateScaleSprite:
 	ld	iy,(ix+6)				; sprite pointer
 	lea	hl,iy+2
 	ld	(_smc_dsrs_sprptr_0 + 1),hl \.r		; write smc
-	
+
 _ScaleRotateSprite_ASM:
 	; sinf = sinTable[angle] * 128 / scale;
 	ld	a,(ix+12)				; angle
@@ -4407,7 +4459,7 @@ _ScaleRotateSprite_ASM:
 	call	_16Mul16SignedNeg \.r			; sinf * -(size * scale / 128)
 	ld	(_smc_dsrs_dys_0 + 1),hl \.r		; write smc
 	push	hl
-	
+
 	; cosf = sinTable[angle + 64] * 128 / scale
 	ld	a,64
 	add	a,(ix+12)				; angle + 64
@@ -4433,7 +4485,7 @@ _ScaleRotateSprite_ASM:
 	call	_16Mul16SignedNeg \.r			; cosf * -(size * scale / 128)
 	ld	(_smc_dsrs_dyc_0 + 1),hl \.r		; write smc
  	push	hl
-	
+
 	ld	a,(iy)					; size
 	ld	(_smc_dsrs_ssize_1 + 1),a \.r		; write smc
 	dec	a
@@ -4459,13 +4511,13 @@ _:	ld	(_smc_dsrs_size_1 + 2),a \.r		; write smc
 
 	pop	de					; smc = dxc start
 	pop	hl					; smc = dxs start
-	
+
 	ld	iy,(ix+9)				; sprite storing to
 	push	iy
 	ld	(iy+0),a
 	ld	(iy+1),a
 	lea	ix,iy+2
-	
+
 	ld	iyh,a					; size * scale / 64
 drawSpriteRotateScale_Loop1:
 	push	hl					; dxs
@@ -4492,7 +4544,7 @@ _smc_dsrs_size_1:					; smc = size * scale / 64
 	ld	iyl,$00
 drawSpriteRotateScale_Loop2:
 	push	hl					; xs
- 
+
 	ld	a,d
 	or	a,h
 	rlca
