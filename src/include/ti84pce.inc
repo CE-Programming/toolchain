@@ -3002,8 +3002,6 @@ TempOP2ToOP6		equ 0D02B39h ; 55 bytes where OP2 to OP6 are temporary saved
 
 gCurYLoc		equ 0D02FD6h ; current y pixel location for C functions
 
-spinnerCount		equ 0D17744h ; when recieving an OS or data transfers, used as a counter for which character to draw
-
 ;safeRAM Locations
 ;---------------------------------------------
 ;appData		equ 0D00429h ; 256 bytes
@@ -3018,8 +3016,13 @@ cursorImage		equ 0E30800h ; 1020 bytes
 
 ;semiSafeRAM Locations
 ;---------------------------------------------
-tempStr			equ 0D17731h ; unknown size
-ramCode			equ 0D18C7Ch ; 1023 bytes       ; used by the bootcode when working with flash
+usbArea			equ 0D13FD8h ; 14306 bytes used for usb, probably need to disable timer3/usb interrupts to use
+usbInited		equ 0D177B7h ; zero this byte while using usbArea and to reset the usb stack when interrupts are re-enabled
+heapBot			equ 0D1887Ch ; 1024 bytes used for flash ram routines, rest used rarely
+ramCodeTop		equ 0D18C7Ch
+heapTop			equ 0D1987Ch
+stackBot		equ 0D1987Eh
+stackTop		equ 0D1A87Eh
 
 ;RAM Equates Continued
 ;---------------------------------------------
@@ -3079,12 +3082,12 @@ mpUsbInt		equ mpUsbRange + usbInt
 usbFrIdx		equ 001Ch
 pUsbFrIdx		equ pUsbRange + usbFrIdx
 mpUsbFrIdx		equ mpUsbRange + usbFrIdx
-usbPeriodicListBase	equ 0020h
+usbPeriodicListBase	equ 0024h
 pUsbPeriodicListBase	equ pUsbRange + usbPeriodicListBase
 mpUsbPeriodicListBase	equ mpUsbRange + usbPeriodicListBase
-usbAsyncListAddr	equ 0024h
+usbAsyncListAddr	equ 0028h
 pUsbAsyncListAddr	equ pUsbRange + usbAsyncListAddr
-mpAsyncListAddr		equ mpUsbRange + usbAsyncListAddr
+mpUsbAsyncListAddr	equ mpUsbRange + usbAsyncListAddr
 usbPortSC		equ 0030h
 pUsbPortSC		equ pUsbRange + usbPortSC
 mpUsbPortSC		equ mpUsbRange + usbPortSC
@@ -3298,22 +3301,35 @@ mpUsbDmaData		equ mpUsbRange + usbDmaData
 
 ;LCD Ports
 ;--------------------------------
-pLcdCtrlRange		equ 4000h
-mpLcdCtrlRange		equ 0E30000h
-pLcdBase		equ 4010h
-mpLcdBase		equ 0E30010h
+pLcdRange		equ 04000h
+mpLcdRange		equ 0E30000h
 
-pLcdImsc		equ 401Ch
-mpLcdImsc		equ 0E3001Ch
-pLcdCtrl		equ 4018h
-mpLcdCtrl		equ 0E30018h
-pLcdRis			equ 4020h
-mpLcdRis		equ 0E30020h
-pLcdIcr			equ 4028h
-mpLcdIcr		equ 0E30028h
+lcdTiming0		equ 0000h
+pLcdTiming0		equ pLcdRange + lcdTiming0
+mpLcdTiming0		equ mpLcdRange + lcdTiming0
+lcdTiming1		equ 0004h
+pLcdTiming1		equ pLcdRange + lcdTiming1
+mpLcdTiming1		equ mpLcdRange + lcdTiming1
+lcdTiming2		equ 0008h
+pLcdTiming2		equ pLcdRange + lcdTiming2
+mpLcdTiming2		equ mpLcdRange + lcdTiming2
+lcdTiming3		equ 000Ch
+pLcdTiming3		equ pLcdRange + lcdTiming3
+mpLcdTiming3		equ mpLcdRange + lcdTiming3
 
-bitLcdLnBuim		equ 04h
+lcdBase			equ 0010h
+pLcdBase		equ pLcdRange + lcdBase
+mpLcdBase		equ mpLcdRange + lcdBase
+lcdUpbase		equ 0010h
+pLcdUpbase		equ pLcdRange + lcdUpbase
+mpLcdUpbase		equ mpLcdRange + lcdUpbase
+lcdLpbase		equ 0014h
+pLcdLpbase		equ pLcdRange + lcdLpbase
+mpLcdLpbase		equ mpLcdRange + lcdLpbase
 
+lcdCtrl			equ 0018h
+pLcdCtrl		equ pLcdRange + lcdCtrl
+mpLcdCtrl		equ mpLcdRange + lcdCtrl
 lcdEn			equ 01h
 lcdTft			equ 20h
 lcdBpp1			equ 0000b | lcdTft | lcdEn
@@ -3328,29 +3344,81 @@ lcdBgr			equ 100h
 lcdBigEndian		equ 200h
 lcdBigEndianPixels	equ 400h
 lcdPwr			equ 800h
-lcdIntVSync		equ 00h
+lcdIntVSync		equ 0000h
 lcdIntBack		equ 1000h
 lcdIntActiveVideo	equ 2000h
 lcdIntFront		equ 4000h
 lcdWatermark		equ 10000h
 lcdNormalMode		equ lcdPwr | lcdBgr | lcdBpp16
 
-pLcdPalette		equ 4200h
-mpLcdPalette		equ 0E30200h
-pLcdCursorImg		equ 4800h
-mpLcdCursorImg		equ 0E30800h
-pLcdCrsrCtrl		equ 4C00h
-mpLcdCrsrCtrl		equ 0E30C00h
-pLcdCrsrConfig		equ 4C04h
-mpLcdCrsrConfig		equ 0E30C04h
-pLcdCrsrPal0		equ 4C08h
-mpLcdCrsrPal0		equ 0E30C08h
-pLcdCrsrPal1		equ 4C0Ch
-mpLcdCrsrPal1		equ 0E30C0Ch
-pLcdCrsrXy		equ 4C10h
-mpLcdCrsrXy		equ 0E30C10h
-pLcdCrsrClip		equ 4C14h
-mpLcdCrsrClip		equ 0E30C14h
+lcdImsc			equ 001Ch
+pLcdImsc		equ pLcdRange + lcdImsc
+mpLcdImsc		equ mpLcdRange + lcdImsc
+lcdRis			equ 0020h
+pLcdRis			equ pLcdRange + lcdRis
+mpLcdRis		equ mpLcdRange + lcdRis
+lcdMis			equ 0024h
+pLcdMis			equ pLcdRange + lcdMis
+mpLcdMis		equ mpLcdRange + lcdMis
+lcdIcr			equ 0028h
+pLcdIcr			equ pLcdRange + lcdIcr
+mpLcdIcr		equ mpLcdRange + lcdIcr
+
+bLcdIntFuf		equ 1
+lcdIntFuf		equ 1 << bLcdIntFuf
+bLcdIntLNBU		equ 2
+lcdIntLNBU		equ 1 << bLcdIntLNBU
+bLcdIntVcomp		equ 3
+lcdIntVcomp		equ 1 << bLcdIntVcomp
+bLcdIntMbErr		equ 4
+lcdIntMbErr		equ 1 << bLcdIntMbErr
+
+lcdCurr			equ 002Ch
+pLcdCurr		equ pLcdRange + lcdCurr
+mpLcdCurr		equ mpLcdRange + lcdCurr
+lcdUpcurr		equ 002Ch
+pLcdUpcurr		equ pLcdRange + lcdUpcurr
+mpLcdUpcurr		equ mpLcdRange + lcdUpcurr
+lcdLpcurr		equ 0030h
+pLcdLpcurr		equ pLcdRange + lcdLpcurr
+mpLcdLpcurr		equ mpLcdRange + lcdLpcurr
+lcdPalette		equ 0200h
+pLcdPalette		equ pLcdRange + lcdPalette
+mpLcdPalette		equ mpLcdRange + lcdPalette
+
+lcdCrsrImage		equ 0800h
+pLcdCrsrImage		equ pLcdRange + lcdCrsrImage
+mpLcdCrsrImage		equ mpLcdRange + lcdCrsrImage
+lcdCrsrCtrl		equ 0C00h
+pLcdCrsrCtrl		equ pLcdRange + lcdCrsrCtrl
+mpLcdCrsrCtrl		equ mpLcdRange + lcdCrsrCtrl
+lcdCrsrConfig		equ 0C04h
+pLcdCrsrConfig		equ pLcdRange + lcdCrsrConfig
+mpLcdCrsrConfig		equ mpLcdRange + lcdCrsrConfig
+lcdCrsrPalette0		equ 0C08h
+pLcdCrsrPalette0	equ pLcdRange + lcdCrsrPalette0
+mpLcdCrsrPalette0	equ mpLcdRange + lcdCrsrPalette0
+lcdCrsrPalette1		equ 0C0Ch
+pLcdCrsrPalette1	equ pLcdRange + lcdCrsrPalette1
+mpLcdCrsrPalette1	equ mpLcdRange + lcdCrsrPalette1
+lcdCrsrXY		equ 0C10h
+pLcdCrsrXY		equ pLcdRange + lcdCrsrXY
+mpLcdCrsrXY		equ mpLcdRange + lcdCrsrXY
+lcdCrsrClip		equ 0C14h
+pLcdCrsrClip		equ pLcdRange + lcdCrsrClip
+mpLcdCrsrClip		equ mpLcdRange + lcdCrsrClip
+lcdCrsrImsc		equ 0C20h
+pLcdCrsrImsc		equ pLcdRange + lcdCrsrImsc
+mpLcdCrsrImsc		equ mpLcdRange + lcdCrsrImsc
+lcdCrsrIcr		equ 0C24h
+pLcdCrsrIcr		equ pLcdRange + lcdCrsrIcr
+mpLcdCrsrIcr		equ mpLcdRange + lcdCrsrIcr
+lcdCrsrRis		equ 0C28h
+pLcdCrsrRis		equ pLcdRange + lcdCrsrRis
+mpLcdCrsrRis		equ mpLcdRange + lcdCrsrRis
+lcdCrsrMis		equ 0C2Ch
+pLcdCrsrMis		equ pLcdRange + lcdCrsrMis
+mpLcdCrsrMis		equ mpLcdRange + lcdCrsrMis
 
 ;Interrupt Ports
 ;-----------------------------------
@@ -3553,7 +3621,7 @@ keyModeScan		equ 3
 pBlLevel		equ 0B024h
 mpBlLevel		equ 0F60024h
 
-;Character Font Equates  
+;Character Font Equates
 ;-------------------------------------
 LrecurN			equ 001h
 LrecurU			equ 002h
@@ -4481,7 +4549,7 @@ kSelectA		equ kE2BT+147
 kZFitA			equ kE2BT+148
 kE2BT_End		equ kZFitA
 
-;More 2 Byte Keys 
+;More 2 Byte Keys
 ;-------------------------------------
 kE2BT2			equ 00h
 kGDB1			equ kE2BT2
@@ -5036,7 +5104,7 @@ tFact			equ tPost ;2Dh '!'
 tCubicR			equ 2Eh
 tQuartR			equ 2Fh
 
-;Number Tokens 
+;Number Tokens
 ;---------------------------------------
 NUMS			equ 30h
 ;
@@ -5175,6 +5243,15 @@ tBorderColor	equ	6Ch
 tAsm84CeCmp	equ	07Bh
 tAsm84CePrgm	equ	07Ah
 
+; OS 5.2+ only
+tLEFT           equ     92h
+tCENTER         equ     93h
+tRIGHT          equ     94h
+tInvBinom       equ     95h
+tWait           equ     96h
+tToString       equ     97h
+tEval           equ     98h
+
 ;These Var Tokens Are 1st Of A Double Token
 ;-----------------------------------------------
 
@@ -5305,7 +5382,7 @@ tDrInv			equ GRCMDS+36 ;A8h 'DrInv_'
 tDrawF			equ GRCMDS+37 ;A9h 'DrawF_'
 tVarStrng		equ 0AAh
 
-;Functions with No Arguments								
+;Functions with No Arguments
 ;--------------------------------------------------
 NOARG			equ 0ABh
 tRand			equ NOARG ;ABh 'rand'
@@ -5874,7 +5951,7 @@ tLcapIAcute		equ 0CDh
 tGarbagec		equ 0CEh
 LastToken		equ 0CEh ;tLAST TOKEN IN THIS VERSION...
 
-;Data Type Equates												
+;Data Type Equates
 ;---------------------------------------------------------------------
 RealObj			equ 0
 ListObj			equ 1
@@ -5901,7 +5978,7 @@ AppVarObj		equ 15h	;application variable
 TempProgObj		equ 16h ;program, home deletes when finished
 GroupObj		equ 17h ;group.
 
-;System Error Codes												
+;System Error Codes
 ;-----------------------------------------------------------
 E_EDITF			equ 7 ;allow re-entering application
 E_EDIT			equ 1<<E_EDITF
@@ -6054,7 +6131,7 @@ E_MS			equ E_SS + FPLEN
 ;System Flags
 ;----------------------------------------------------------------------
 ioDelFlag		equ 0h
-inDelete		equ 0		;1 = DELETE SCREEN 
+inDelete		equ 0		;1 = DELETE SCREEN
 
 trigFlags		equ 0h		;Trigonometry mode settings
 trigDeg			equ 2		;1 = degrees, 0=radians
@@ -6360,7 +6437,7 @@ silentLinkHookActive	equ 7		;1 = silent link hook active
 hookflags5		equ 3Ah
 usbActivityHookActive	equ 0		;1 = USB activity hook active
 ;----------------------------------------------------------------------
-plotFlag3		equ 3Ch  
+plotFlag3		equ 3Ch
 bufferOnly		equ 0
 useFastCirc		equ 4
 ;----------------------------------------------------------------------
