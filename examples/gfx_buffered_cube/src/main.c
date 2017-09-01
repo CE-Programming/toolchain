@@ -19,20 +19,18 @@ void rotate(void);
 #define ANG (DEG * M_PI / 180.0)
 
 /* define the verticies for the two rectangles */
-float face1[5][2] = {
-    { 140, 45  },
-    { 240, 45  },
+float face1[4][2] = {
+    { 140,  45 },
+    { 240,  45 },
     { 240, 145 },
     { 140, 145 },
-    { 140, 45  },
 };
 
-float face2[5][2] = {
-    { 140 + ORG, 45  - ORG },
-    { 240 + ORG, 45  - ORG },
+float face2[4][2] = {
+    { 140 + ORG,  45 - ORG },
+    { 240 + ORG,  45 - ORG },
     { 240 + ORG, 145 - ORG },
     { 140 + ORG, 145 - ORG },
-    { 140 + ORG, 45  - ORG },
 };
 
 /* declare some globals */
@@ -68,7 +66,7 @@ void main(void) {
 
         /* Change the color of the cube depending on loop (mod 16) */
         if (!((loop++) & 0xf)) {
-            gfx_SetColor(rand() & 0xfe);
+            gfx_SetColor(rand());
         }
 
         /* Call the rotation code */
@@ -84,14 +82,11 @@ void main(void) {
 
 /* Rotation code */
 void rotate(void) {
-    uint8_t i;
+    uint8_t i, j;
     float tmp1, tmp2;
 
-    /* Clear out the old rectangles */
-    gfx_FillScreen(gfx_white);
-
-    /* Compute the new face places */
-    for (i=0; i<5; i++) {
+    /* Compute the new vertex coordinates */
+    for (i=0; i<4; i++) {
         tmp1 = face1[i][0] - midx1;
         tmp2 = face1[i][1] - midy1;
 
@@ -105,10 +100,14 @@ void rotate(void) {
         face2[i][1] = midy2 + (tmp1 * sin_angle) + (tmp2 * cos_angle);
     }
 
-    /* Draw the cube itself */
+    /* Clear the drawing buffer */
+    gfx_FillScreen(gfx_white);
+
+    /* Draw the cube */
     for (i=0; i<4; i++) {
-        gfx_Line(face1[i][0], face1[i][1], face1[i+1][0], face1[i+1][1]);
-        gfx_Line(face2[i][0], face2[i][1], face2[i+1][0], face2[i+1][1]);
-        gfx_Line(face1[i][0], face1[i][1], face2[ i ][0], face2[ i ][1]);
+        j = i + 1 & 3;
+        gfx_Line(face1[i][0], face1[i][1], face1[j][0], face1[j][1]);
+        gfx_Line(face2[i][0], face2[i][1], face2[j][0], face2[j][1]);
+        gfx_Line(face1[i][0], face1[i][1], face2[i][0], face2[i][1]);
     }
 }
