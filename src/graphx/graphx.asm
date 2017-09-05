@@ -5348,7 +5348,7 @@ _ConvertFromRLETSprite_TransLoop:
 	ld	(hl),c			; write trans color to output
 	inc	hl
 	djnz	_ConvertFromRLETSprite_TransLoop ; decrement trans run length remaining,
-					; nz ==> trans run length remaining != 0
+						 ; nz ==> trans run length remaining != 0
 	ex	de,hl			; de = output data, hl = input data
 ;;; Break out of data loop if width remaining == 0.
 	jr	z,_ConvertFromRLETSprite_RowEnd ; z ==> width remaining == 0
@@ -5409,7 +5409,7 @@ _ConvertToNewRLETSprite_TransLoop:
 _ConvertToNewRLETSprite_TransPixel:
 ;;; Continue while width remaining != 0.
 	djnz	_ConvertToNewRLETSprite_TransLoop ; decrement width remaining,
-					; nz ==> width remaining != 0
+						  ; nz ==> width remaining != 0
 ;; }
 ;; Finish row.
 	jr	_ConvertToNewRLETSprite_RowEnd
@@ -5422,7 +5422,7 @@ _ConvertToNewRLETSprite_OpaquePixel:
 	jr	z,_ConvertToNewRLETSprite_TransPixel ; z ==> transparent
 ;;; Continue while width remaining != 0.
 	djnz	_ConvertToNewRLETSprite_OpaqueLoop ; decrement width remaining,
-					; nz ==> width remaining != 0
+						   ; nz ==> width remaining != 0
 ;; }
 _ConvertToNewRLETSprite_RowEnd:
 ;; Decrement height remaining. Continue row loop while not zero.
@@ -5477,7 +5477,7 @@ _ConvertToRLETSprite_TransLoop:
 	inc	bc			; increment trans run length
 ;;;; Continue transparent loop while width remaining != 0.
 	djnz	_ConvertToRLETSprite_TransLoop ; decrement width remaining,
-					; nz ==> width remaining != 0
+					       ; nz ==> width remaining != 0
 ;;; }
 ;;; Write the length of the transparent run to the output.
 _ConvertToRLETSprite_TransEnd:
@@ -5487,7 +5487,7 @@ _ConvertToRLETSprite_TransEnd:
 	ex	de,hl			; de = output data, hl = input data
 ;;; Break out of data loop if width remaining == 0.
 	jr	z,_ConvertToRLETSprite_RowEnd ; z ==> last pixel was transparent
-					;   ==> width remaining == 0
+					      ;   ==> width remaining == 0
 ;;; Copy an opaque run to the output.
 _ConvertToRLETSprite_Opaque:
 	ld	c,0			; c = 0 = opaque run length
@@ -5502,14 +5502,14 @@ _ConvertToRLETSprite_OpaqueLoop:
 	inc	bc			; increment opaque run length
 ;;;; Continue opaque/data loop while width remaining != 0.
 	djnz	_ConvertToRLETSprite_OpaqueLoop ; decrement width remaining,
-					; nz ==> width remaining != 0
+						; nz ==> width remaining != 0
 _ConvertToRLETSprite_OpaqueEnd:
 	ex	(sp),hl			; (sp) = input data, hl = location to write opaque run length
 	ld	(hl),c			; write opaque run length
 	pop	hl			; hl = input data
 ;;; Continue data loop if width remaining != 0.
 	jr	z,_ConvertToRLETSprite_Trans ; z ==> last pixel was transparent
-					;   ==> width remaining != 0
+					     ;   ==> width remaining != 0
 ;;; }
 ;; }
 _ConvertToRLETSprite_RowEnd:
