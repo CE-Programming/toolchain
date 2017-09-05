@@ -520,19 +520,30 @@ gfx_GetPixel:
 ; Returns:
 ;  Color index of X,Y coordinate
 	ld	hl,3
-	add	hl,sp
-	ld	bc,(hl)			; bc = x coordinate
+	add	hl,sp			; hl = &x
+	inc.s	bc
+	ld	c,(hl)
 	inc	hl
+	ld	b,(hl)			; bc = (uint16_t)x
 	inc	hl
-	inc	hl			; move to next argument
-	ld	e,(hl)			; e = y coordinate
+	inc	hl			; hl = &y
+	ld	e,(hl)			; e = y
 	ld	d,LcdWidth/2
-	mlt	de
-	ld	hl,(CurrentBuffer)
+	mlt	de			; de = y * (lcdWidth / 2)
+	ld	hl,(CurrentBuffer)	; hl = buffer
 	add	hl,bc
 	add	hl,de
-	add	hl,de
-	ld	a,(hl)			; get the actual pixel
+	add	hl,de			; hl = buffer + y * (lcdWidth / 2)*2 + (uint16_t)x
+					;    = buffer + y * lcdWidth + (uint16_t)x
+					;    = &buffer[y][x]
+; No clipping is necessary, because if the pixel is offscreen, the result is
+; undefined. All that is necessary is to ensure that there are no side effects
+; of reading outside of the buffer. In this case, the largest possible offset
+; into the buffer is 255 * lcdWidth + 65535 = 147135 bytes. Even in the case
+; that the current buffer is the second half of VRAM, the largest that this
+; pointer can be is $D52C00 + 147135 = $D76ABF. This goes beyond the end of
+; mapped RAM, but only into unmapped memory with no read side effects.
+	ld	a,(hl)			; a = buffer[y][x]
 	ret
 ;-------------------------------------------------------------------------------
 gfx_SetPixel:
