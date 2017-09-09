@@ -40,14 +40,8 @@ script:
 
 after_success:
 # Build the doxygen
-  - git clone https://github.com/doxygen/doxygen.git doc
-  - cd doc
-  - mkdir build
-  - cd build
-  - cmake -G "Unix Makefiles" ..
-  - make
-  - sudo make install
-  - cd ../..
+  - curl -fsSL ftp://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.linux.bin.tar.gz | tar xz
+  - export PATH="$PWD/doxygen-1.8.13/bin:$PATH"
   - make doxygen
   - bash .deploy.sh
 
