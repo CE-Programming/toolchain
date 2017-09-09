@@ -156,7 +156,7 @@ clean-keypadc:
 # libload rules
 #----------------------------
 libload: $(FASMG)
-	cd $(call NATIVEPATH,src/sub/libload) && $(FASMG) -E -Z -I $(call NATIVEPATH,../../include) libload.asm LibLoad.8xv
+	cd $(call NATIVEPATH,src/sub/libload) && $(FASMG) libload.asm LibLoad.8xv
 clean-libload:
 	$(RM) $(call NATIVEPATH,src/sub/libload/LibLoad.8xv)
 #----------------------------

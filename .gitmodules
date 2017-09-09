@@ -4,9 +4,6 @@
 [submodule "src/tools/convpng"]
 	path = tools/convpng
 	url = https://github.com/MattWaltz/convpng
-[submodule "tools/spasm-ng"]
-	path = tools/spasm-ng
-	url = https://github.com/MattWaltz/spasm-ng.git
 [submodule "src/sub/libload"]
 	path = src/sub/libload
 	url = https://github.com/CE-Programming/libload.git

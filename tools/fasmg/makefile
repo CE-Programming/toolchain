@@ -22,7 +22,7 @@ BIN ?=$(call NATIVEPATH,$(DEV)/bin)
 INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
 
 INCDIR :=$(call NATIVEPATH,../../src/include/)
-FILES :=$(addprefix $(INCDIR),ez80.inc linker.fasmg ti84pceg.inc tiformat.inc)
+FILES :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
 
 all: $(FILES)
 
