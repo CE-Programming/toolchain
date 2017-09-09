@@ -73,4 +73,3 @@
 #define LDBL_MIN	FLT_MIN
 
 #endif
-

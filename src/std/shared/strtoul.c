@@ -34,7 +34,7 @@ unsigned long strtoul(char * cp,char ** endptr,int base)
     ++cp;
 
   sign = 0;
-  
+
   if ( *cp == '+' ) {
     ++cp;
   }

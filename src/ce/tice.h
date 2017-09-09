@@ -174,35 +174,35 @@ void delay(uint16_t msec);
 (LCD_WIDTH*LCD_HEIGHT*2)
 
 /**
- * @brief Structure of real varaible type
+ * @brief Structure of real variable type
  */
 typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
 /**
- * @brief Structure of complex varaible type
+ * @brief Structure of complex variable type
  */
 typedef struct { real_t real, imag; } cplx_t;
 /**
- * @brief Structure of list varaible type
+ * @brief Structure of list variable type
  */
 typedef struct { uint16_t dim; real_t items[1]; } list_t;
 /**
- * @brief Structure of complex list varaible type
+ * @brief Structure of complex list variable type
  */
 typedef struct { uint16_t dim; cplx_t items[1]; } cplx_list_t;
 /**
- * @brief Structure of matrix varaible type
+ * @brief Structure of matrix variable type
  */
 typedef struct { uint8_t cols, rows; real_t items[1]; } matrix_t;
 /**
- * @brief Structure of string varaible type
+ * @brief Structure of string variable type
  */
 typedef struct { uint16_t len; char data[1]; } string_t;
 /**
- * @brief Structure of equation varaible type
+ * @brief Structure of equation variable type
  */
 typedef struct { uint16_t len; char data[1]; } equ_t;
 /**
- * @brief Structure of miscellaneous varaible type
+ * @brief Structure of miscellaneous variable type
  */
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 
@@ -405,7 +405,7 @@ uint24_t os_FontGetID(void);
 
 /**
  * @param string String to get pixel width of
- * @returns The width of a string in the varaible-width format
+ * @returns The width of a string in the variable-width format
  */
 uint24_t os_FontGetWidth(const char *string);
 
@@ -543,7 +543,7 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
 /**
  * Gets the Answer
  *
- * @param type This is set to the current varaible type in ANS
+ * @param type This is set to the current variable type in ANS
  * @returns Pointer to the data
  * @note Returns NULL if Ans doesn't exist or type is NULL
  */
@@ -1846,59 +1846,59 @@ typedef enum {
 /*
  * --- TIOS System error codes ---
  */
-#define OS_E_EDIT           1<<7
-#define OS_E_MASK           0x7F
-#define OS_E_OVERFLOW       1+OS_E_EDIT
-#define OS_E_DIVBY0         2+OS_E_EDIT
-#define OS_E_SINGULARMAT    3+OS_E_EDIT
-#define OS_E_DOMAIN         4+OS_E_EDIT
-#define OS_E_INCREMENT      5+OS_E_EDIT
-#define OS_E_BREAK          6+OS_E_EDIT
-#define OS_E_NONREAL        7+OS_E_EDIT
-#define OS_E_SYNTAX         8+OS_E_EDIT
-#define OS_E_DATATYPE       9+OS_E_EDIT
-#define OS_E_ARGUMENT       10+OS_E_EDIT
-#define OS_E_DIMMISMATCH    11+OS_E_EDIT
-#define OS_E_DIMENSION      12+OS_E_EDIT
-#define OS_E_UNDEFINED      13+OS_E_EDIT
-#define OS_E_MEMORY         14+OS_E_EDIT
-#define OS_E_INVALID        15+OS_E_EDIT
-#define OS_E_ILLEGALNEST    16+OS_E_EDIT
-#define OS_E_BOUND          17+OS_E_EDIT
-#define OS_E_GRAPHRANGE     18+OS_E_EDIT
-#define OS_E_ZOOM           19+OS_E_EDIT
-#define OS_E_LABEL          20
-#define OS_E_STAT           21
-#define OS_E_SOLVER         22+OS_E_EDIT
-#define OS_E_SINGULARITY    23+OS_E_EDIT
-#define OS_E_SIGNCHANGE     24+OS_E_EDIT
-#define OS_E_ITERATIONS     25+OS_E_EDIT
-#define OS_E_BADGUESS       26+OS_E_EDIT
-#define OS_E_STATPLOT       27
-#define OS_E_TOLTOOSMALL    28+OS_E_EDIT
-#define OS_E_RESERVED       29+OS_E_EDIT
-#define OS_E_MODE           30+OS_E_EDIT
-#define OS_E_LNKERR         31+OS_E_EDIT
-#define OS_E_LNKMEMERR      32+OS_E_EDIT
-#define OS_E_LNKTRANSERR    33+OS_E_EDIT
-#define OS_E_LNKDUPERR      34+OS_E_EDIT
-#define OS_E_LNKMEMFULL     35+OS_E_EDIT
-#define OS_E_UNKNOWN        36+OS_E_EDIT
-#define OS_E_SCALE          37+OS_E_EDIT
-#define OS_E_IDNOTFOUND     38
-#define OS_E_NOMODE         39+OS_E_EDIT
-#define OS_E_VALIDATION     40
-#define OS_E_LENGTH         41+OS_E_EDIT
-#define OS_E_APPLICATION    42+OS_E_EDIT
-#define OS_E_APPERR1        43+OS_E_EDIT
-#define OS_E_APPERR2        44+OS_E_EDIT
-#define OS_E_EXPIREDAPP     45
-#define OS_E_BADADD         46
-#define OS_E_ARCHIVED       47+OS_E_EDIT
-#define OS_E_VERSION        48
-#define OS_E_ARCHFULL       49
-#define OS_E_VARIABLE       50+OS_E_EDIT
-#define OS_E_DUPLICATE      51+OS_E_EDIT
+#define OS_E_EDIT           (1<<7)
+#define OS_E_MASK           (0x7F)
+#define OS_E_OVERFLOW       (1+OS_E_EDIT)
+#define OS_E_DIVBY0         (2+OS_E_EDIT)
+#define OS_E_SINGULARMAT    (3+OS_E_EDIT)
+#define OS_E_DOMAIN         (4+OS_E_EDIT)
+#define OS_E_INCREMENT      (5+OS_E_EDIT)
+#define OS_E_BREAK          (6+OS_E_EDIT)
+#define OS_E_NONREAL        (7+OS_E_EDIT)
+#define OS_E_SYNTAX         (8+OS_E_EDIT)
+#define OS_E_DATATYPE       (9+OS_E_EDIT)
+#define OS_E_ARGUMENT       (10+OS_E_EDIT)
+#define OS_E_DIMMISMATCH    (11+OS_E_EDIT)
+#define OS_E_DIMENSION      (12+OS_E_EDIT)
+#define OS_E_UNDEFINED      (13+OS_E_EDIT)
+#define OS_E_MEMORY         (14+OS_E_EDIT)
+#define OS_E_INVALID        (15+OS_E_EDIT)
+#define OS_E_ILLEGALNEST    (16+OS_E_EDIT)
+#define OS_E_BOUND          (17+OS_E_EDIT)
+#define OS_E_GRAPHRANGE     (18+OS_E_EDIT)
+#define OS_E_ZOOM           (19+OS_E_EDIT)
+#define OS_E_LABEL          (20)
+#define OS_E_STAT           (21)
+#define OS_E_SOLVER         (22+OS_E_EDIT)
+#define OS_E_SINGULARITY    (23+OS_E_EDIT)
+#define OS_E_SIGNCHANGE     (24+OS_E_EDIT)
+#define OS_E_ITERATIONS     (25+OS_E_EDIT)
+#define OS_E_BADGUESS       (26+OS_E_EDIT)
+#define OS_E_STATPLOT       (27)
+#define OS_E_TOLTOOSMALL    (28+OS_E_EDIT)
+#define OS_E_RESERVED       (29+OS_E_EDIT)
+#define OS_E_MODE           (30+OS_E_EDIT)
+#define OS_E_LNKERR         (31+OS_E_EDIT)
+#define OS_E_LNKMEMERR      (32+OS_E_EDIT)
+#define OS_E_LNKTRANSERR    (33+OS_E_EDIT)
+#define OS_E_LNKDUPERR      (34+OS_E_EDIT)
+#define OS_E_LNKMEMFULL     (35+OS_E_EDIT)
+#define OS_E_UNKNOWN        (36+OS_E_EDIT)
+#define OS_E_SCALE          (37+OS_E_EDIT)
+#define OS_E_IDNOTFOUND     (38)
+#define OS_E_NOMODE         (39+OS_E_EDIT)
+#define OS_E_VALIDATION     (40)
+#define OS_E_LENGTH         (41+OS_E_EDIT)
+#define OS_E_APPLICATION    (42+OS_E_EDIT)
+#define OS_E_APPERR1        (43+OS_E_EDIT)
+#define OS_E_APPERR2        (44+OS_E_EDIT)
+#define OS_E_EXPIREDAPP     (45)
+#define OS_E_BADADD         (46)
+#define OS_E_ARCHIVED       (47+OS_E_EDIT)
+#define OS_E_VERSION        (48)
+#define OS_E_ARCHFULL       (49)
+#define OS_E_VARIABLE       (50+OS_E_EDIT)
+#define OS_E_DUPLICATE      (51+OS_E_EDIT)
 
 /*
  * --- TI-OS os_GetCSC Scan Code Return Values ---

@@ -29,10 +29,10 @@ void main(void) {
 
     /* Initialize the 8bpp graphics */
     gfx_Begin();
-    
+
     /* Set up the palette */
     gfx_SetColor(gfx_black);
-    
+
     /* Draw a polygon on the buffer */
     gfx_Polygon(pts, 5);
 
@@ -44,8 +44,7 @@ void main(void) {
 
     /* Pause */
     while (!os_GetCSC()); 
-    
+
     /* Close the graphics */
     gfx_End();
 }
-

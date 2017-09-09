@@ -14,35 +14,34 @@
 void main(void) {
     /* Initialize the 8bpp graphics */
     gfx_Begin();
-    
+
     /* Set up the palette */
     gfx_SetColor(gfx_black);
-    
+
     /* Draw to buffer to avoid tearing */
-    gfx_SetDrawBuffer();
-    
+    gfx_SetDrawBuffer(); // This is the same as gfx_SetDraw(gfx_buffer)
+
     /* Draw a line on the buffer */
     //gfx_FillScreen(gfx_black);
     gfx_Line(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
-    
+
     /* Wait for a key */
     while (!os_GetCSC()); 
-    
+
     /* Swap the buffer with the screen */
     gfx_SwapDraw();
-    
+
     /* Copy part of the screen to the offscreen buffer */
-    gfx_BlitBuffer();
+    gfx_BlitBuffer(); // This is the same as gfx_Blit(gfx_buffer)
     //gfx_BlitLines(gfx_buffer, 0, 20);
     //gfx_BlitRectangle(gfx_buffer, 0, 0, 160, 120);
-    
+
     /* This should cause half of the line to flicker, and the other half to stay steady */
-    
+
     while (!os_GetCSC()) {
         gfx_SwapDraw();
     }
-    
+
     /* Close the graphics */
     gfx_End();
 }
-

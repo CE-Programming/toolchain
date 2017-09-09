@@ -48,7 +48,7 @@ double ldexp( double value, int power )
 	int powerplusexponent;
 
 	if ( value == 0.0 ) return 0;
-    
+
 	floating.value = value;
     exponent = (floating.bits >> exponent_shift) & exponent_mask;
 	powerplusexponent = power + exponent;

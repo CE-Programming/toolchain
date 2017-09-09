@@ -32,7 +32,7 @@ void *realloc(void *ptr,size_t size) {
 		if (h->s.size >= (size+sizeof(HEADER))) {
 			return(ptr);
 		}
-	
+
 		if (p = malloc(size)) {
 			memcpy(p,ptr,size);
 			free(ptr);

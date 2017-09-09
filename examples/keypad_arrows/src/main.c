@@ -13,17 +13,17 @@
 void fill_screen(uint8_t color);
 
 void main(void) {
-    /* Key varaible */
+    /* Key variable */
     kb_key_t key;
-    
+
     /* Loop until 2nd is pressed */
     do {
         /* Update kb_Data */
         kb_Scan();
-		
+
         /* Load group 7 registers */
         key = kb_Data[7];
-        
+
         switch (key) {
             case kb_Down:           /* Change screen color to black */
                 fill_screen(0x00);
@@ -47,4 +47,3 @@ void main(void) {
 void fill_screen(uint8_t color) {
     memset(lcd_Ram, color, LCD_SIZE);
 }
-

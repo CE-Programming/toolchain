@@ -31,7 +31,7 @@ double asin(double arg) {
 	} else {
 		temp = atan(arg/temp);
 	}
-	
+
 	return(sign*temp);
 }
 

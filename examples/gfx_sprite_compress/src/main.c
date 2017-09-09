@@ -20,7 +20,7 @@ void main(void) {
     gfx_sprite_t *apple;
 
     /* Allocate space for the decompressed sprite */
-    apple = gfx_MallocSprite(apple_width, apple_height);
+    apple = gfx_MallocSprite(apple_width, apple_height); // Same as: gfx_AllocSprite(apple_width, apple_height, malloc)
 
     /* Decompress the sprite */
     dzx7_Standard(apple_compressed, apple); // or dzx7_Turbo
