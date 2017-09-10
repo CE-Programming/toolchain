@@ -182,7 +182,7 @@ uninstall:
 #----------------------------
 install: $(DIRS) chmod
 	$(CP_EXMPLS)
-	$(CP) $(call NATIVEPATH,$(SRCDIR)/startup/*.obj) $(call NATIVEPATH,$(INSTALLLIB))
+	$(CP) $(call NATIVEPATH,$(SRCDIR)/startup/*.src) $(call NATIVEPATH,$(INSTALLLIB))
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/core_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
 	$(CP) $(FASMG) $(INSTALLBIN)
 	$(CP) $(CONVHEX) $(INSTALLBIN)
