@@ -26,6 +26,8 @@
 *
 *************************************************/
 
+void __print_sendstring(char *sp);
+
 #ifndef _MULTI_THREAD
 void _u_ltoa(long val)
 #else
@@ -128,7 +130,7 @@ char _mt_ltoa(long val,char* __print_buff,struct fmt_type* print_fmt)
 
   _u_reverse(__print_buff);
 #ifndef _MULTI_THREAD
-  __print_send();
+  __print_sendstring(__print_buff);
 #else
   return __print_leading_char;
 #endif
