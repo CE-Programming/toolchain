@@ -31,7 +31,7 @@ int _u_print(char *dest, char *fmt, va_list argp) {
 
                 /* error in format string, just dump out from p to fmt */
 
-                for (;sp < fmt;++__print_len,++sp) { 
+                for (;sp < fmt;++__print_len,++sp) {
                     __print_putch(*sp++);
                 }
                 return -1;
@@ -73,7 +73,7 @@ int _u_print(char *dest, char *fmt, va_list argp) {
                     case 'c':
                         __print_buff[0] = va_arg(argp,int);
                         __print_buff[1] = '\0';
-                        __print_send();
+                        __print_sendstring(__print_buff);
                         break;
                     case 's':
                         sp = va_arg(argp, char*);
