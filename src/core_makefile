@@ -236,43 +236,43 @@ $(BINDIR)/$(TARGETHEX): $(OBJECTS)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
-	@$(call SAFEMKDIR,$(@D))
-	@$(ICON_CONV) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(ICON_CONV) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(AS) $(ASM_FLAGS) $(ICON_ASM)
 
 $(OBJDIR)/%.obj: $(GFXDIR)/%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D))
-	@$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 $(OBJDIR)/%.obj: $(GFXDIR)/%.asm $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D))
-	@$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # this rule builds the assembly files and places them in the object directory
 $(OBJDIR)/%.obj: $(SRCDIR)/%.asm $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D))
-	@$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D))
-	@$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/*/%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D))
-	@$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # this rule builds the assembly files and places them in the object directory
 $(OBJDIR)/%.obj: $(SRCDIR)/*/%.asm $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D))
-	@$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 clean:
