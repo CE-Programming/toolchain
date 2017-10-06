@@ -859,19 +859,23 @@ _:	ld	(DetectType_SMC),a \.r
 	ld	ix,0
 	add	ix,sp
 	ld	hl,(ix+9)
-	add	hl,de
+	add	hl,bc
 	or	a,a
-	sbc	hl,de
+	sbc	hl,bc
 	jr	nz,+_                    ; if null, then detect everything
 	ld	hl,fdetectall \.r
 	ld	(ix+9),hl
 _:	ld	hl,(ix+6)
+	add	hl,bc
+	or	a,a
+	sbc	hl,bc
+	jr	nz,+_
 	ld	hl,(hl)
 	add	hl,bc
 	or	a,a
 	sbc	hl,bc
 	jr	nz,fdetect
-	ld	hl,(progPtr)
+_:	ld	hl,(progPtr)
 fdetect:
 	ld	de,(pTemp)
 	or	a,a
