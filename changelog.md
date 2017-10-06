@@ -1,13 +1,48 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
+*Note: toolchain releases aren't necessarily in sync with libraries releases.*
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.3...HEAD)
+## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
+See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.2...HEAD)
+
+
+# [v7.4.2](https://github.com/CE-Programming/toolchain/releases/tag/v7.4.2) (2017-08-13)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.1...v7.4.2)
+
+### Toolchain
+  - Misc. code fixes ([Adriweb](https://github.com/Adriweb))
+  - Fix environment variable setting and paths on the windows installer ([MattWaltz](https://github.com/MattWaltz))
+
+# [v7.4.1](https://github.com/CE-Programming/toolchain/releases/tag/v7.4.1) (2017-08-10)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.4...v7.4.1)
+
+### Toolchain
+  - Better Travis settings for docs deployment ([Adriweb](https://github.com/Adriweb))
+  - Tested-functions-list tool ([Adriweb](https://github.com/Adriweb))
+  - Deprecate support for mode 2 interrupts and related things ([MattWaltz](https://github.com/MattWaltz))
+
+### Libraries
+  - Minor header fixes (missing includes) in GraphX and FileIOC ([Adriweb](https://github.com/Adriweb))
+  - Code optimizations in GraphX ([PeterTillema](https://github.com/PeterTillema))
+
+# [v7.4](https://github.com/CE-Programming/toolchain/releases/tag/v7.4) (2017-07-25)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.3...v7.4)
+
+### Toolchain
+  - Various Makefile fixes (windows spaces, subdirectories...) ([MattWaltz](https://github.com/MattWaltz))
+  - More and better documentation ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
+  - ConvPNG updates to use W/H defines ([MattWaltz](https://github.com/MattWaltz))
 
 ### Libraries
 
 #####  GRAPHX
   - Fixed gfx_RLETSprite where width != height, and in a right clip case - ([`5c84e9b`](https://github.com/CE-Programming/toolchain/commit/5c84e9b) - [Runer112](https://github.com/Runer112))
+  - Add gfx_RotateScaleSprite and related functions + docs ([MattWaltz](https://github.com/MattWaltz))
+  - Improve line routine implementation ([MattWaltz](https://github.com/MattWaltz))
+  - Fix the new gfx_Begin and some bad macro usages ([Jacobly](https://github.com/jacobly0))
 
 # [v7.3](https://github.com/CE-Programming/toolchain/releases/tag/v7.3) (2017-07-04)
 
