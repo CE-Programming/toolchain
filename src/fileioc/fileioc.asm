@@ -869,7 +869,7 @@ _:	ld	hl,(ix+6)
 	add	hl,bc
 	or	a,a
 	sbc	hl,bc
-	jr	nz,+_
+	jr	z,+_
 	ld	hl,(hl)
 	add	hl,bc
 	or	a,a
