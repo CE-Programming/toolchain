@@ -932,9 +932,9 @@ ffound:	pop	hl
 	add	hl,de
 	or	a,a
 	sbc	hl,de
-	jr	z,finish
+	jr	z,+_
 	ld	(hl),de
-	ld	hl,OP6
+_:	ld	hl,OP6
 	pop	ix
 	ret
 
