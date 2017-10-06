@@ -12,7 +12,7 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 
 ### Toolchain
   - Misc. code fixes ([Adriweb](https://github.com/Adriweb))
-  - Fix environment variable setting and paths on the windows installer ([MattWaltz](https://github.com/MattWaltz))
+  - Fix environment variable setting and paths on the windows installer ([MateoConLechuga](https://github.com/MateoConLechuga))
 
 # [v7.4.1](https://github.com/CE-Programming/toolchain/releases/tag/v7.4.1) (2017-08-10)
 
@@ -21,7 +21,7 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 ### Toolchain
   - Better Travis settings for docs deployment ([Adriweb](https://github.com/Adriweb))
   - Tested-functions-list tool ([Adriweb](https://github.com/Adriweb))
-  - Deprecate support for mode 2 interrupts and related things ([MattWaltz](https://github.com/MattWaltz))
+  - Deprecate support for mode 2 interrupts and related things ([MateoConLechuga](https://github.com/MateoConLechuga))
 
 ### Libraries
   - Minor header fixes (missing includes) in GraphX and FileIOC ([Adriweb](https://github.com/Adriweb))
@@ -32,16 +32,16 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.3...v7.4)
 
 ### Toolchain
-  - Various Makefile fixes (windows spaces, subdirectories...) ([MattWaltz](https://github.com/MattWaltz))
-  - More and better documentation ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
-  - ConvPNG updates to use W/H defines ([MattWaltz](https://github.com/MattWaltz))
+  - Various Makefile fixes (windows spaces, subdirectories...) ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - More and better documentation ([MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
+  - ConvPNG updates to use W/H defines ([MateoConLechuga](https://github.com/MateoConLechuga))
 
 ### Libraries
 
 #####  GRAPHX
   - Fixed gfx_RLETSprite where width != height, and in a right clip case - ([`5c84e9b`](https://github.com/CE-Programming/toolchain/commit/5c84e9b) - [Runer112](https://github.com/Runer112))
-  - Add gfx_RotateScaleSprite and related functions + docs ([MattWaltz](https://github.com/MattWaltz))
-  - Improve line routine implementation ([MattWaltz](https://github.com/MattWaltz))
+  - Add gfx_RotateScaleSprite and related functions + docs ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Improve line routine implementation ([MateoConLechuga](https://github.com/MateoConLechuga))
   - Fix the new gfx_Begin and some bad macro usages ([Jacobly](https://github.com/jacobly0))
 
 # [v7.3](https://github.com/CE-Programming/toolchain/releases/tag/v7.3) (2017-07-04)
@@ -51,12 +51,12 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 ### Toolchain
   - Automated testing through Travis ([Adriweb](https://github.com/Adriweb))
   - Fixed C++-compatibility-related things ([Adriweb](https://github.com/Adriweb))
-  - Fixed/improved autotester files ([Adriweb](https://github.com/Adriweb)+[MattWaltz](https://github.com/MattWaltz))
-  - Improved Makefile ([MattWaltz](https://github.com/MattWaltz))
-  - Misc. fixes and optimizations ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
-  - Fixed some docs and examples ([MattWaltz](https://github.com/MattWaltz))
-  - More demos ([MattWaltz](https://github.com/MattWaltz))
-  - Fixed bss and cstarted-related things ([MattWaltz](https://github.com/MattWaltz))
+  - Fixed/improved autotester files ([Adriweb](https://github.com/Adriweb)+[MateoConLechuga](https://github.com/MateoConLechuga))
+  - Improved Makefile ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Misc. fixes and optimizations ([MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
+  - Fixed some docs and examples ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - More demos ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Fixed bss and cstarted-related things ([MateoConLechuga](https://github.com/MateoConLechuga))
   - Added millisecond delay function ([`ae19350`](https://github.com/CE-Programming/toolchain/commit/ae19350) - [Runer112](https://github.com/Runer112))
   - Improved (pseudo)random number generation ([`b6c1929`](https://github.com/CE-Programming/toolchain/commit/b6c1929) - [Runer112](https://github.com/Runer112))
   - Overall misc. cleanup and documentation ([Runer112](https://github.com/Runer112))
@@ -64,11 +64,11 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 ### Libraries
 
 #####  GRAPHX
-  - Clipped sprites fixes ([MattWaltz](https://github.com/MattWaltz))
-  - Code optimizations ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
-  - ConvPNG-related updates ([MattWaltz](https://github.com/MattWaltz))
-  - ConvTile-related updates ([MattWaltz](https://github.com/MattWaltz))
-  - Renaming: gfx_sprite_t from gfx_image_t ([MattWaltz](https://github.com/MattWaltz))
+  - Clipped sprites fixes ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Code optimizations ([MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112)+[Jacobly](https://github.com/jacobly0))
+  - ConvPNG-related updates ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - ConvTile-related updates ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Renaming: gfx_sprite_t from gfx_image_t ([MateoConLechuga](https://github.com/MateoConLechuga))
   - Fixed green LSB in default palette colors ([`be9fea4`](https://github.com/CE-Programming/toolchain/commit/be9fea4) - [Runer112](https://github.com/Runer112))
   - Added fast (RLE) transparent sprite type, gfx_rletsprite_t, and functions: gfx_AllocRLETSprite, gfx_MallocRLETSprite, gfx_UninitedRLETSprite, gfx_RLETSprite, gfx_RLETSprite_NoClip, gfx_ConvertFromRLETSprite, gfx_ConvertToRLETSprite, gfx_ConvertToNewRLETSprite, gfx_ConvertMallocRLETSprite ([`e26bf07`](https://github.com/CE-Programming/toolchain/commit/e26bf07) - [Runer112](https://github.com/Runer112))
   - Fixed drawing unclipped sprites with odd width ([`5a4cc95`](https://github.com/CE-Programming/toolchain/commit/5a4cc95) - [Runer112](https://github.com/Runer112))
@@ -79,15 +79,15 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.1...v7.2)
 
 ### Toolchain
-  - Implicit `prgm_CleanUp` by default - ([MattWaltz](https://github.com/MattWaltz))
-  - Examples cleanup - ([MattWaltz](https://github.com/MattWaltz))
-  - Fix some example screenshots - ([MattWaltz](https://github.com/MattWaltz))
-  - Routines optimizations - ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)) 
+  - Implicit `prgm_CleanUp` by default - ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Examples cleanup - ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Fix some example screenshots - ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Routines optimizations - ([MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112)) 
 
 ### Libraries
 
 #####  FILEIOC
-  - Misc. fixes - ([MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112)+[PeterTillema](https://github.com/PeterTillema))
+  - Misc. fixes - ([MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112)+[PeterTillema](https://github.com/PeterTillema))
 
 
 # [v7.1](https://github.com/CE-Programming/toolchain/releases/tag/v7.1) (2017-04-30)
@@ -98,15 +98,15 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
   - Compatibility headers and better include paths - ([Adriweb](https://github.com/Adriweb))
   - Travis CI integration - ([Adriweb](https://github.com/Adriweb))
   - Example screenshots - ([Adriweb](https://github.com/Adriweb))
-  - Improved documentation - ([MattWaltz](https://github.com/MattWaltz))
-  - Misc. fixes - ([MattWaltz](https://github.com/MattWaltz))
-  - Fix Windows install - ([MattWaltz](https://github.com/MattWaltz))
+  - Improved documentation - ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Misc. fixes - ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Fix Windows install - ([MateoConLechuga](https://github.com/MateoConLechuga))
 
 ### Libraries
 
 #####  GRAPHX
-  - Bug. fixes - ([MattWaltz](https://github.com/MattWaltz)+[PeterTillema](https://github.com/PeterTillema))
-  - Optimizations - ([MattWaltz](https://github.com/MattWaltz))
+  - Bug. fixes - ([MateoConLechuga](https://github.com/MateoConLechuga)+[PeterTillema](https://github.com/PeterTillema))
+  - Optimizations - ([MateoConLechuga](https://github.com/MateoConLechuga))
   
 
 # [v7.0](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-04-07)
@@ -114,16 +114,16 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.95...v7.0)
 
 ### Toolchain
-  - Rework entire toolchain setup and hierarchy ([`559dd1c`](https://github.com/CE-Programming/toolchain/commit/559dd1c) - [MattWaltz](https://github.com/MattWaltz))
-  - Doxygen header files ([`4402637`](https://github.com/CE-Programming/toolchain/commit/4402637) - [MattWaltz](https://github.com/MattWaltz))
+  - Rework entire toolchain setup and hierarchy ([`559dd1c`](https://github.com/CE-Programming/toolchain/commit/559dd1c) - [MateoConLechuga](https://github.com/MateoConLechuga))
+  - Doxygen header files ([`4402637`](https://github.com/CE-Programming/toolchain/commit/4402637) - [MateoConLechuga](https://github.com/MateoConLechuga))
 
 ### Libraries
 
 #####  GRAPHX
-  - Added gfx_FloodFill ([`60006ac`](https://github.com/CE-Programming/toolchain/commit/60006ac) - [MattWaltz](https://github.com/MattWaltz))
-  - Added gfx_ScaleSprite ([`7618598`](https://github.com/CE-Programming/toolchain/commit/7618598) - [MattWaltz](https://github.com/MattWaltz))
-  - Added gfx_SetFontHeight ([`4402637`](https://github.com/CE-Programming/toolchain/commit/4402637) - [MattWaltz](https://github.com/MattWaltz))
-  - Optimized ClipDraw helper function ([`82e5d5a`](https://github.com/CE-Programming/toolchain/commit/82e5d5a) - [MattWaltz](https://github.com/MattWaltz))
+  - Added gfx_FloodFill ([`60006ac`](https://github.com/CE-Programming/toolchain/commit/60006ac) - [MateoConLechuga](https://github.com/MateoConLechuga))
+  - Added gfx_ScaleSprite ([`7618598`](https://github.com/CE-Programming/toolchain/commit/7618598) - [MateoConLechuga](https://github.com/MateoConLechuga))
+  - Added gfx_SetFontHeight ([`4402637`](https://github.com/CE-Programming/toolchain/commit/4402637) - [MateoConLechuga](https://github.com/MateoConLechuga))
+  - Optimized ClipDraw helper function ([`82e5d5a`](https://github.com/CE-Programming/toolchain/commit/82e5d5a) - [MateoConLechuga](https://github.com/MateoConLechuga))
   - Optimized gfx_AllocSprite ([`2c12310`](https://github.com/CE-Programming/toolchain/commit/2c12310) - [Runer112](https://github.com/Runer112))
 
 # [v6.999](https://github.com/CE-Programming/toolchain/releases/tag/v6.999) (2017-02-17)
@@ -131,18 +131,18 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.95...v6.999)
 
 ### Toolchain
-  - Add scripts to build/clean libraries and examples easily ([`61d915f`](https://github.com/CE-Programming/toolchain/commit/61d915f) - [MattWaltz](https://github.com/MattWaltz))
-  - Move spasm to /bin rather than /lib/src/include ([`61d915f`](https://github.com/CE-Programming/toolchain/commit/61d915f) - [MattWaltz](https://github.com/MattWaltz))
+  - Add scripts to build/clean libraries and examples easily ([`61d915f`](https://github.com/CE-Programming/toolchain/commit/61d915f) - [MateoConLechuga](https://github.com/MateoConLechuga))
+  - Move spasm to /bin rather than /lib/src/include ([`61d915f`](https://github.com/CE-Programming/toolchain/commit/61d915f) - [MateoConLechuga](https://github.com/MateoConLechuga))
   - Fix graphx demo 11 readme ([`3017951`](https://github.com/CE-Programming/toolchain/commit/3017951) - [Runer112](https://github.com/Runer112))
-  - Add Changelog file ([`0595378`](https://github.com/CE-Programming/toolchain/commit/0595378)+[`544e75f`](https://github.com/CE-Programming/toolchain/commit/544e75f) - [MattWaltz](https://github.com/MattWaltz)+[Adriweb](https://github.com/Adriweb))
+  - Add Changelog file ([`0595378`](https://github.com/CE-Programming/toolchain/commit/0595378)+[`544e75f`](https://github.com/CE-Programming/toolchain/commit/544e75f) - [MateoConLechuga](https://github.com/MateoConLechuga)+[Adriweb](https://github.com/Adriweb))
   - Restrict LF EOL conversions to text files ([`c19b360`](https://github.com/CE-Programming/toolchain/commit/c19b360) - [Adriweb](https://github.com/Adriweb))
 
 # [v6.95](https://github.com/CE-Programming/toolchain/releases/tag/v6.95) (2017-02-10)
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v6.91...v6.95)
 
 ### Toolchain
-  - Improve build system and misc. cleanup ([`63ff603`](https://github.com/CE-Programming/toolchain/commit/63ff603)+[`4b3f137`](https://github.com/CE-Programming/toolchain/commit/4b3f137) - [MattWaltz](https://github.com/MattWaltz)+[Runer112](https://github.com/Runer112))
-  - Modify `cstartup.asm` to disable usb timers and reset them on exit ([`63ff603`](https://github.com/CE-Programming/toolchain/commit/63ff603)+[`03809e5`](https://github.com/CE-Programming/toolchain/commit/03809e5) - [MattWaltz](https://github.com/MattWaltz))
+  - Improve build system and misc. cleanup ([`63ff603`](https://github.com/CE-Programming/toolchain/commit/63ff603)+[`4b3f137`](https://github.com/CE-Programming/toolchain/commit/4b3f137) - [MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112))
+  - Modify `cstartup.asm` to disable usb timers and reset them on exit ([`63ff603`](https://github.com/CE-Programming/toolchain/commit/63ff603)+[`03809e5`](https://github.com/CE-Programming/toolchain/commit/03809e5) - [MateoConLechuga](https://github.com/MateoConLechuga))
   - Characters `0x01`-`0x1F` are considered printable rather than control ([`de96c7a`](https://github.com/CE-Programming/toolchain/commit/de96c7a) - [Runer112](https://github.com/Runer112))
   - CR EOL purge ([`15a573e`](https://github.com/CE-Programming/toolchain/commit/15a573e) - [Runer112](https://github.com/Runer112))
   - Minor documentation fixes
@@ -153,7 +153,7 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.
   - Optimize gfx\_Darken (about 25% faster) and gfx\_Lighten (about 19% faster) ([`9e7835a`](https://github.com/CE-Programming/toolchain/commit/9e7835a) - [Runer112](https://github.com/Runer112))
   - Optimize _SetColor and _SetTransparentColor ([`fc43abb`](https://github.com/CE-Programming/toolchain/commit/fc43abb) - [Runer112](https://github.com/Runer112))
   - Optimize _SetTextXY (#47) ([`6643e90`](https://github.com/CE-Programming/toolchain/commit/6643e90) - [Runer112](https://github.com/Runer112))
-  - Add support for width/height of tiles not powers of 2 ([`93930fb`](https://github.com/CE-Programming/toolchain/commit/93930fb)+[`78be69c`](https://github.com/CE-Programming/toolchain/commit/78be69c) - [MattWaltz](https://github.com/MattWaltz))
+  - Add support for width/height of tiles not powers of 2 ([`93930fb`](https://github.com/CE-Programming/toolchain/commit/93930fb)+[`78be69c`](https://github.com/CE-Programming/toolchain/commit/78be69c) - [MateoConLechuga](https://github.com/MateoConLechuga))
   - Fix bug with tile index 255
 
 
