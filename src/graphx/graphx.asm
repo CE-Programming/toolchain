@@ -343,9 +343,13 @@ _Begin:
 ; Returns:
 ;  None
 	ld	hl,LargeFontJump_SMC \.r
+	ld	de,UseLargeFont_SMC \.r
+	ld	a,(de)
+	or	a,a
+	jr	nz,+_
 	ld	a,(hl)
-	ld	(UseLargeFont_SMC),a \.r ; store the jump offset for later
-	ld	(hl),0			; jump nowhere if false
+	ld	(de),a			; store the jump offset for later
+_:	ld	(hl),0			; jump nowhere if false
 	call	_boot_ClearVRAM		; clear the screen
 	ld	a,lcdBpp8
 	ld	hl,currDrawBuffer
