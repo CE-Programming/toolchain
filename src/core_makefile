@@ -91,7 +91,7 @@ ASMSOURCES    := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.asm))
 
 # figure out what the names of the sources will become once made into objects
 OBJECTS       := $(filter %.obj,$(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(subst \,/,$(CSOURCES))))
-OBJECTS       += $(filter %.obj,$(patsubst $(SRCDIR)/%.asm,$(OBJDIR)/%.obj,$(subst \,/,$(CSOURCES))))
+OBJECTS       += $(filter %.obj,$(patsubst $(SRCDIR)/%.asm,$(OBJDIR)/%.obj,$(subst \,/,$(ASMSOURCES))))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
