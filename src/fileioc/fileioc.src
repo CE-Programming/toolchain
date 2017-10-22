@@ -2,14 +2,14 @@
 include '../include/ez80.inc'
 include '../include/ti84pceg.inc'
 include '../include/tiformat.inc'
-format ti appvar 'FILEIOC'
+format ti archived appvar 'FILEIOC'
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
 library 'FILEIOC', 3
 
 ;-------------------------------------------------------------------------------
-; v1 functions -- Cannot move/delete/insert (Can fix/optimize though)
+; v1 functions
 ;-------------------------------------------------------------------------------
 	export ti_CloseAll
 	export ti_Open
@@ -55,8 +55,8 @@ dependencies
 
 ;-------------------------------------------------------------------------------
 resizeBytes := $E30C0C
-currSlot    := $E30C11
-charIn      := $E30C12
+currSlot := $E30C11
+charIn := $E30C12
 ;-------------------------------------------------------------------------------
 VATPtr0 := $D0244E
 VATPtr1 := $D0257B
