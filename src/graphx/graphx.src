@@ -131,7 +131,7 @@ dependencies
 LcdSize            := LcdWidth*LcdHeight
 InterruptStackSize := 4000	; minimum stack size to provide for interrupts if moving the stack
 CurrentBuffer      := 0E30014h
-DEFAULT_TP_COLOR   := 0
+TRASPARENT_COLOR   := 0
 TEXT_FG_COLOR      := 0
 TEXT_BG_COLOR      := 255
 TEXT_TP_COLOR      := 255
@@ -153,7 +153,7 @@ macro mIsHLLessThanBC?
 	ccf
 end macro
 macro s8? value
-	1 * ((value) or (((value) and 80h) shl 1))
+	(1 * ((value) or (((value) and 80h) shl 1)))
 end macro
 ;-------------------------------------------------------------------------------
 
@@ -188,7 +188,7 @@ gfx_End:
 ;  None
 	call	_boot_ClearVRAM		; clear the screen
 	ld	hl,mpLcdBase
-	ld	a,lcdBpp16		; restore the screen mode
+	ld	a,LcdBpp16		; restore the screen mode
 	jr	SetGfx
 	
 ;-------------------------------------------------------------------------------
@@ -283,8 +283,6 @@ gfx_Darken:
 ;  arg1 : 8 bit change amount
 ; Returns:
 ;  16 bit color value
-
-; Read params
 	pop	de			; de = return vector
 	pop	bc			; bc = color
 	ex	(sp),hl			; l = amt
@@ -294,7 +292,7 @@ _Darken:
 	push	bc			; Calculate the output blue value
 	ld	a,c			; a = color & $FF
 	ld	c,l			; c = amt
-	and	a,%00011111
+	and	a,31
 	ld	h,a			; h = blue
 	mlt	hl			; hl = blue * amt
 	ld	de,128			; de = 128
@@ -305,7 +303,7 @@ _Darken:
 					; Isolate the input red value
 	ld	a,h			; a = color >> 8
 	rra				; a = color >> 9
-	and	a,%00111110
+	and	a,62
 	ld	b,a			; b = red << 1
 					; Calculate the output green value
 	add.s	hl,hl
@@ -315,7 +313,7 @@ _Darken:
 	rra
 	ld	a,h
 	rla
-	and	a,%00111111
+	and	a,63
 	ld	h,a			; h = green
 	ld	l,c			; l = amt
 	mlt	hl			; hl = green * amt
@@ -397,7 +395,7 @@ gfx_SetDefaultPalette:
 	ld	a,b
 	rrca
 	xor	a,b
-	and	a,%11100000
+	and	a,224
 	xor	a,b
 	ld	(de),a
 	inc	de
@@ -485,7 +483,7 @@ gfx_ZeroScreen:
 ;  None
 	ld	l,0
 	push	hl
-	call	_FillScreen
+	call	gfx_FillScreen
 	pop	hl
 	ret
 
@@ -1103,16 +1101,16 @@ gfx_FillCircle:
 	sbc	hl,hl
 	ld	(ix-3),hl
 	adc	hl,bc
-	jp	z,_RstStack
+	jp	z,_ResetStack
 	ld	hl,1
 	or	a,a
 	sbc	hl,bc
-	jp	b_4
+	jp	.cmp3
 .fillsectors:
 	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
-	ld	(FCircle0_SMC),hl
+	ld	(.circle0),hl
 	push	hl
 	ld	bc,(ix-6)
 	ld	hl,(ix+9)
@@ -1122,11 +1120,11 @@ gfx_FillCircle:
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	ld	(FCircle1_SMC),hl
+	ld	(.circle1),hl
 	push	hl
-	call	_HorizLine
+	call	gfx_HorizLine
 	ld	hl,0
-FCircle0_SMC = $ - 3
+.circle0 = $ - 3
 	push	hl
 	ld	bc,(ix-6)
 	ld	hl,(ix+9)
@@ -1134,13 +1132,13 @@ FCircle0_SMC = $ - 3
 	sbc	hl,bc
 	push	hl
 	ld	hl,0
-FCircle1_SMC = $ - 3
+.circle1 = $ - 3
 	push	hl
-	call	_HorizLine
+	call	gfx_HorizLine
 	ld	hl,(ix-6)
 	add	hl,hl
 	inc	hl
-	ld	(FCircle2_SMC),hl
+	ld	(.circle2),hl
 	push	hl
 	ld	bc,(ix-3)
 	ld	hl,(ix+9)
@@ -1150,21 +1148,21 @@ FCircle1_SMC = $ - 3
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	ld	(FCircle3_SMC),hl
+	ld	(.circle3),hl
 	push	hl
-	call	_HorizLine
-FCircle2_SMC: =$+1
+	call	gfx_HorizLine
 	ld	hl,0
+.circle2 = $ - 3
 	push	hl
 	ld	bc,(ix-3)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,bc
 	push	hl
-FCircle3_SMC: =$+1
 	ld	hl,0
+.circle3 = $ - 3
 	push	hl
-	call	_HorizLine
+	call	gfx_HorizLine
 	lea	hl,ix-9
 	ld	sp,hl
 	ld	bc,(ix-3)
@@ -1174,16 +1172,19 @@ FCircle3_SMC: =$+1
 	or	a,a
 	sbc	hl,hl
 	sbc	hl,bc
-	jp	m,b__2
-	jp	pe,b_3
-	jr	b__3
-b__2:	jp	po,b_3
-b__3:	ld	hl,(ix-3)
+	jp	m,.cmp0
+	jp	pe,.cmp2
+	jr	.cmp1
+.cmp0:
+	jp	po,.cmp2
+.cmp1:
+	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
 	add	hl,bc
-	jr	b_4
-b_3:	ld	bc,(ix-6)
+	jr	.cmp3
+.cmp2:
+	ld	bc,(ix-6)
 	dec	bc
 	ld	(ix-6),bc
 	ld	hl,(ix-3)
@@ -1193,28 +1194,30 @@ b_3:	ld	bc,(ix-6)
 	add	hl,hl
 	inc	hl
 	add	hl,de
-b_4:	ld	(ix-9),hl
+.cmp3:
+	ld	(ix-9),hl
 	ld	bc,(ix-3)
 	ld	hl,(ix-6)
 	or	a,a
 	sbc	hl,bc
-	jp	p,+_
+	jp	p,.check
 	jp	pe,.fillsectors
 	ld	sp,ix
 	pop	ix
 	ret
-_:	jp	po,.fillsectors
+.check:
+	jp	po,.fillsectors
 	ld	sp,ix
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
-_FillCircle_NoClip:
+gfx_FillCircle_NoClip:
 ; Draws an unclipped circle
 ; Arguments:
-;  arg0 : X coordinate   (24b)
-;  arg1 : Y coordinate   (8b)
-;  arg2 : Radius         (8b)
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
+;  arg2 : Radius
 ; Returns:
 ;  None
 	push	ix
@@ -1227,16 +1230,16 @@ _FillCircle_NoClip:
 	sbc	hl,hl
 	ld	(ix-3),hl
 	adc	hl,bc
-	jp	z,_RstStack
+	jp	z,_ResetStack
 	ld	hl,1
 	or	a,a
 	sbc	hl,bc
-	jp	_FillCircleNC_Loop
-_FillCircle_NoClipSectors:
+	jp	.loop
+.fillsectors:
 	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
-	ld	(FCircleNC0_SMC),hl
+	ld	(.circle0),hl
 	push	hl
 	ld	bc,(ix-6)
 	ld	hl,(ix+9)
@@ -1246,23 +1249,23 @@ _FillCircle_NoClipSectors:
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	ld	(FCircleNC1_SMC),hl
+	ld	(.circle1),hl
 	pop	bc
 	call	_HorizLine_NoClip
-FCircleNC0_SMC: =$+1
 	ld	bc,0
+.circle0 = $ - 3
 	ld	de,(ix-6)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,de
 	ld	e,l
-FCircleNC1_SMC: =$+1
 	ld	hl,0
+.circle1 = $ - 3
 	call	_HorizLine_NoClip
 	ld	hl,(ix-6)
 	add	hl,hl
 	inc	hl
-	ld	(FCircleNC3_SMC),hl
+	ld	(.circle2),hl
 	push	hl
 	ld	bc,(ix-3)
 	ld	hl,(ix+9)
@@ -1272,18 +1275,18 @@ FCircleNC1_SMC: =$+1
 	ld	hl,(ix+6)
 	or	a,a
 	sbc	hl,bc
-	ld	(FCircleNC4_SMC),hl
+	ld	(.circle3),hl
 	pop	bc
 	call	_HorizLine_NoClip
-FCircleNC3_SMC: =$+1
 	ld	bc,0
+.circle2 = $ - 3
 	ld	de,(ix-3)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,de
 	ld	e,l
-FCircleNC4_SMC: =$+1
 	ld	hl,0
+.circle3 = $ - 3
 	call	_HorizLine_NoClip
 	ld	bc,(ix-3)
 	inc	bc
@@ -1292,16 +1295,19 @@ FCircleNC4_SMC: =$+1
 	or	a,a
 	sbc	hl,hl
 	sbc	hl,bc
-	jp	m,+_
-	jp	pe,+++_
-	jr	++_
-_:	jp	po,++_
-_:	ld	hl,(ix-3)
+	jp	m,.cmp0
+	jp	pe,.cmp2
+	jr	.cmp1
+.cmp0:
+	jp	po,.cmp2
+.cmp1:
+	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
 	add	hl,bc
-	jr	_FillCircleNC_Loop
-_:	ld	bc,(ix-6)
+	jr	.loop
+.cmp2:
+	ld	bc,(ix-6)
 	dec	bc
 	ld	(ix-6),bc
 	ld	hl,(ix-3)
@@ -1311,14 +1317,14 @@ _:	ld	bc,(ix-6)
 	inc	hl
 	ld	de,(ix-9)
 	add	hl,de
-_FillCircleNC_Loop:
+.loop:
 	ld	(ix-9),hl
 	ld	bc,(ix-3)
 	ld	hl,(ix-6)
 	or	a,a
 	sbc	hl,bc
-	jp	nc,_FillCircle_NoClipSectors
-_RstStack:
+	jp	nc,.fillsectors
+_ResetStack:
 	ld	sp,ix
 	pop	ix
 	ret
@@ -1356,11 +1362,11 @@ CohenSutherlandLoop:
 GetOutOutcode:				; select correct outcode
 	push	af			; a = outoutcode
 	rra
-	jr	nc,NotTop		; if (outcodeOut & TOP)
+	jr	nc,.notop		; if (outcodeOut & TOP)
 	ld	hl,(_YMax)
 	dec	hl			; inclusive
 	jr	ComputeNewX
-NotTop:
+.notop:
 	rra
 	jr	nc,NotBottom		; if (outcodeOut & BOTTOM)
 	ld	hl,(_YMin)
@@ -1535,8 +1541,8 @@ dl_horizontal:
 	pop	iy			; iy = dx / 2
 	pop	bc
 	inc	bc
-Color_4 =$+1
-	ld	a,$00
+	ld	a,0
+Color_4 = $ - 1
 dl_hloop:
 	ld	(hl),a			; write pixel
 	cpi
@@ -1545,13 +1551,13 @@ dl_hloop:
 _smc_dl_jr_0:
 	jr	c,dl_hloop
 _smc_dl_width_1:
-	ld	de,$000000
+	ld	de,0
 	add	hl,de			; y inc
 _smc_dl_dx_1:
-	ld	de,$000000		; dx
+	ld	de,0			; dx
 	add	iy,de
 _smc_dl_dy_1:
-	ld	de,$000000		; dy
+	ld	de,0			; dy
 	jr	dl_hloop
 dl_vertical:
 	lea	de,iy
@@ -1563,8 +1569,8 @@ dl_vertical:
 	inc	c
 	pop	hl
 dl_vloop:
-Color_5 =$+1
-	ld	(hl),$00		; write pixel
+	ld	(hl),0			; write pixel
+Color_5 = $ - 1
 	dec	c
 	ret	z
 	add	hl,de			; y inc
@@ -1693,7 +1699,7 @@ gfx_ShiftUp:
 	scf
 	ld	a,$B0
 	call	_ShiftCalculate
-	ld	(ShiftAmtOff_SMC),hl
+	ld	(ShiftAmountOffset),hl
 	jr	z,.next
 	sbc	hl,hl
 .next:
@@ -1736,11 +1742,12 @@ gfx_ShiftDown:
 	ex	de,hl
 	sbc	hl,hl
 	sbc	hl,de
-	ld	(ShiftAmtOff_SMC),hl
+	ld	(ShiftAmountOffset),hl
 	or	a,a
-	jr	z,_
+	jr	z,.next
 	sbc	hl,hl
-_:	ld	bc,(_XMax)
+.next:
+	ld	bc,(_XMax)
 	add	hl,bc
 	dec	bc
 	ld	e,a
@@ -1768,7 +1775,7 @@ _Shift:
 ShiftCopyAmount = $ - 3
 	ex	de,hl
 	ld	hl,0
-ShiftAmtOff_SMC = $ - 3
+ShiftAmountOffset = $ - 3
 	add	hl,de
 	ldir
 ShiftCopyDirection = $ - 2
@@ -1780,7 +1787,7 @@ ShiftLineOff = $ - 3
 	ret
 
 ;-------------------------------------------------------------------------------
-_GetClipRegion:
+gfx_GetClipRegion:
 ; Arguments:
 ;  Pointer to struct
 ; Returns:
@@ -1794,7 +1801,7 @@ _GetClipRegion:
 	ret
 
 ;-------------------------------------------------------------------------------
-_ScaledSprite_NoClip:
+gfx_ScaledSprite_NoClip:
 ; Draws a scaled sprite to the screen
 ; Arguments:
 ;  arg0 : Pointer to sprite
@@ -1892,7 +1899,7 @@ NcSprHscl320:
 	ret
 
 ;-------------------------------------------------------------------------------
-_ScaledTransparentSprite_NoClip:
+gfx_ScaledTransparentSprite_NoClip:
 ; Draws a scaled sprite to the screen with transparency
 ; Arguments:
 ;  arg0 : Pointer to sprite structure
@@ -1915,59 +1922,65 @@ _ScaledTransparentSprite_NoClip:
 	ex	de,hl			; de -> start draw location
 	ld	hl,LcdWidth
 	ld	a,(iy+15)
-	ld	(NcSprTHeightScale),a
+	ld	(.heightscale),a
 	ld	a,(iy+12)
-	ld	(NcSprTScaledWidth),a ; SMC faster inner loop
+	ld	(.widthscale),a		; smc faster inner loop
 	ld	iy,(iy+3)		; iy -> start of sprite struct
 	ld	c,(iy+0)		; c = width
 	ld	b,a
 	ld	a,c
 	mlt	bc
 	sbc	hl,bc			; find x offset next
-	ld	(NoClipSprTransScaledMoveAmt),hl
-	ld	(NoClipSprTransWidth),a
+	ld	(.amount),hl
+	ld	(.width),a
 	ld	a,(iy+1)
 	lea	hl,iy+2			; hl -> sprite data
 	push	ix			; save ix sp
 	ld	ixh,a			; ixh = height
-NcSprTHeightScale =$+2
-_:	ld	ixl,0			; ixl = height scale
-_:	push	hl
-NoClipSprTransWidth =$+1
+.loop:
+	ld	ixl,0			; ixl = height scale
+.heightscale = $ - 1
+.loopheight:
+	push	hl
 	ld	c,0
-NcSprTScaledWidth =$+1
-_:	ld	b,0
+.width = $ - 1
+.loopwidth:
+	ld	b,0
+.widthscale = $ - 1
 	ld	a,(hl)			; get sprite pixel
-TransparentColor_2 =$+1
-	cp	a,DEFAULT_TP_COLOR
-	jr	nz,++_			; is transparent?
-_:	inc	de
-	djnz	-_
-	jr	++_			; loop for next pixel
-_:	ld	(de),a
+	cp	a,TRASPARENT_COLOR
+TransparentColor_2 = $ - 1
+	jr	nz,.next		; is transparent?
+.skip:
 	inc	de
-	djnz	-_			; set and loop for next pixel
-_:	inc	hl
+	djnz	.skip
+	jr	.locate			; loop for next pixel
+.next:
+	ld	(de),a
+	inc	de
+	djnz	.next			; set and loop for next pixel
+.locate:
+	inc	hl
 	dec	c
-	jr	nz,----_		; loop for width
+	jr	nz,.loopwidth		; loop for width
 	ex	de,hl
 	ld	iy,0
 	add	iy,de			; save hl
-NoClipSprTransScaledMoveAmt =$+1
 	ld	bc,0
+.amount = $ - 3
 	add	hl,bc			; get next draw location
 	ex	de,hl
 	pop	hl
 	dec	ixl			; loop height scale
-	jr	nz,-----_
+	jr	nz,.loopheight
 	lea	hl,iy			; restore hl
 	dec	ixh			; loop height
-	jr	nz,------_
+	jr	nz,.loop
 	pop	ix			; restore ix sp
 	ret
 
 ;-------------------------------------------------------------------------------
-_TransparentSprite:
+gfx_TransparentSprite:
 ; Draws a transparent sprite with clipping
 ; Arguments:
 ;  arg0 : Pointer to sprite
@@ -1976,12 +1989,12 @@ _TransparentSprite:
 ; Returns:
 ;  None
 	push	ix			; save ix sp
-	call	_ClipDraw_ASM
+	call	_ClipCoordinates
 	pop	ix			; restore ix sp
 	ret	nc
-	ld	(ClipSprTransNextAmt),a
+	ld	(.amount),a
 	ld	a,(iy+0)		; _TmpWidth
-	ld	(ClipSprTransNextLine),a
+	ld	(.next),a
 	ld	a,(iy+3)		; tmpHeight
 	ld	h,LcdWidth/2
 	mlt	hl
@@ -1995,69 +2008,70 @@ _TransparentSprite:
 	pop	iy
 	push	ix
 	ld	ixh,a
-TransparentColor_1 =$+1
-	ld	a,DEFAULT_TP_COLOR
-ClipSprTransNextLine =$+1
-_:	ld	c,0
-	lea	de,iy
-	call	_TransparentPlot_ASM ; call the transparent routine
-ClipSprTransNextAmt =$+1
+	ld	a,TRASPARENT_COLOR
+TransparentColor_1 = $ - 1
+.loop:
 	ld	c,0
+.next = $ - 1
+	lea	de,iy
+	call	_TransparentPlot	; call the transparent routine
+	ld	c,0
+.amount = $ - 1
 	add	hl,bc
 	ld	de,LcdWidth		; move to next row
 	add	iy,de
 	dec	ixh
-	jr	nz,-_
+	jr	nz,.loop
 	pop	ix
 	ret
 
-_TransparentPlot_ASM_Opaque:		; routine to handle transparent plotting
+_TransparentPlot_Opaque:		; routine to handle transparent plotting
 	ldi
 	ret	po
 	cp	a,(hl)
-	jr	z,_TransparentPlot_ASM_Transparent
+	jr	z,_TransparentPlot_Transparent
 	ldi
 	ret	po
 	cp	a,(hl)
-	jr	z,_TransparentPlot_ASM_Transparent
+	jr	z,_TransparentPlot_Transparent
 	ldi
 	ret	po
 	cp	a,(hl)
-	jr	z,_TransparentPlot_ASM_Transparent
+	jr	z,_TransparentPlot_Transparent
 	ldi
 	ret	po
 	cp	a,(hl)
-	jr	nz,_TransparentPlot_ASM_Opaque
-_TransparentPlot_ASM_Transparent:
+	jr	nz,_TransparentPlot_Opaque
+_TransparentPlot_Transparent:
 	inc	de
 	inc	hl
 	dec	c
 	ret	z
-_TransparentPlot_ASM:
+_TransparentPlot:
 	cp	a,(hl)
-	jr	nz,_TransparentPlot_ASM_Opaque
-	inc	de
-	inc	hl
-	dec	c
-	ret	z
-	cp	a,(hl)
-	jr	nz,_TransparentPlot_ASM_Opaque
+	jr	nz,_TransparentPlot_Opaque
 	inc	de
 	inc	hl
 	dec	c
 	ret	z
 	cp	a,(hl)
-	jr	nz,_TransparentPlot_ASM_Opaque
+	jr	nz,_TransparentPlot_Opaque
 	inc	de
 	inc	hl
 	dec	c
 	ret	z
 	cp	a,(hl)
-	jr	z,_TransparentPlot_ASM_Transparent
-	jr	_TransparentPlot_ASM_Opaque
+	jr	nz,_TransparentPlot_Opaque
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+	cp	a,(hl)
+	jr	z,_TransparentPlot_Transparent
+	jr	_TransparentPlot_Opaque
 
 ;-------------------------------------------------------------------------------
-_Sprite:
+gfx_Sprite:
 ; Places an sprite on the screen as fast as possible with clipping
 ; Arguments:
 ;  arg0 : Pointer to sprite
@@ -2068,12 +2082,12 @@ _Sprite:
 ; Returns:
 ;  None
 	push	ix			; save ix sp
-	call	_ClipDraw_ASM
+	call	_ClipCoordinates
 	pop	ix			; restore ix sp
 	ret	nc
-	ld	(ClipSprNextAmt),a
+	ld	(.amount),a
 	ld	a,(iy+0)		; a = _TmpWidth
-	ld	(ClipSprLineNext),a
+	ld	(.next),a
 	ld	a,(iy+3)		; a = tmpHeight
 	ld	h,LcdWidth/2
 	mlt	hl
@@ -2085,21 +2099,22 @@ _Sprite:
 	ld	hl,(iy+6)		; hl -> sprite data
 	pop	iy
 	ld	bc,0
-ClipSprLineNext =$+1
-_:	ld	c,0
+.loop:
+	ld	c,0
+.next = $ - 1
 	lea	de,iy
 	ldir
 	ld	de,LcdWidth
 	add	iy,de
-ClipSprNextAmt =$+1
 	ld	c,0
+.amount = $ - 1
 	add	hl,bc			; move to next line
 	dec	a
-	jr	nz,-_
+	jr	nz,.loop
 	ret
 
 ;-------------------------------------------------------------------------------
-_Sprite_NoClip:
+gfx_Sprite_NoClip:
 ; Places an sprite on the screen as fast as possible
 ; Arguments:
 ;  arg0 : Pointer to sprite
@@ -2125,32 +2140,32 @@ _Sprite_NoClip:
 	xor	a,a
 	ld	b,a
 	srl	c
-	sbc	a,SprNcJrStep-SprNcLpEvenW
-	ld	(SprNcJrStep-1),a
+	sbc	a,.step-.evenw
+	ld	(.step),a
 	ld	a,LcdWidth/2
 	sub	a,c
 	ld	iyl,a			; (LcdWidth/2)-(spriteWidth/2)
 	ld	a,(hl)			; spriteHeight
 	inc	hl
-	jr	SprNcLpStart
-SprNcLpOddW:
+	jr	.start
+.loop:
 	dec	de			; needed if sprite width is odd
-SprNcLpEvenW:
+.evenw:
 	ld	c,iyl			; (LcdWidth/2)-(spriteWidth/2)
 	ex	de,hl
 	add	hl,bc
 	add	hl,bc
 	ex	de,hl
-SprNcLpStart:
+.start:
 	ld	c,iyh			; spriteWidth
 	ldir
 	dec	a
-	jr	nz,SprNcLpOddW
-SprNcJrStep:
+	jr	nz,.loop
+.step = $ - 1
 	ret
 
 ;-------------------------------------------------------------------------------
-_GetSprite:
+gfx_GetSprite:
 ; Grabs the data from the current draw buffer and stores it in another buffer
 ; Arguments:
 ;  arg0 : Pointer to storage buffer
@@ -2167,39 +2182,41 @@ _GetSprite:
 	ld	hl,(CurrentBuffer)
 	add	hl,bc
 	add	hl,bc			; hl -> place to begin drawing
-	jr	z,_
-	ld	de,-LcdWidth*256
+	jr	z,.next
+	ld	de,(-LcdWidth)*256
 	add	hl,de			; fix if negative
-_:	ld	de,(iy+6)
+.next:
+	ld	de,(iy+6)
 	add	hl,de
 	ld	de,(iy+3)
 	push	de
 	ld	a,(de)
 	inc	de
-	ld	(GetSprCpyAmt),a	; amount to copy per line
+	ld	(.amount),a	; amount to copy per line
 	ld	c,a
-	ld	a,LcdWidth&$ff
+	ld	a,LcdWidth and $ff
 	sub	a,c
 	ld	c,a
 	sbc	a,a
 	inc	a
 	ld	b,a			; the amount to add to get to the next line
-	ld	(GetSprLineOff),bc
+	ld	(.offset),bc
 	ld	a,(de)
 	inc	de
-GetSprCpyAmt =$+1
-_:	ld	bc,0
-	ldir				; copy the data into the struct data
-GetSprLineOff =$+1
+.loop:
 	ld	bc,0
+.amount = $ - 3
+	ldir				; copy the data into the struct data
+	ld	bc,0
+.offset = $ - 3
 	add	hl,bc
 	dec	a
-	jr	nz,-_
+	jr	nz,.loop
 	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
-_TransparentSprite_NoClip:
+gfx_TransparentSprite_NoClip:
 ; Draws a transparent sprite to the current buffer
 ; Arguments:
 ;  arg0 : Pointer to sprite
@@ -2220,28 +2237,29 @@ _TransparentSprite_NoClip:
 	add	hl,bc			; hl -> place to draw
 	push	hl
 	ld	a,(iy+0)
-	ld	(NoClipSprTransNextLine),a
+	ld	(.next),a
 	ld	a,(iy+1)
 	lea	hl,iy+2
 	pop	iy
 	push	ix
 	ld	ixh,a			; ixh = height of sprite
 	ld	b,0			; zero mid byte
-	ld	a,DEFAULT_TP_COLOR
-TransparentColor_3 =$-1
-_:	ld	c,0
-NoClipSprTransNextLine =$-1
+	ld	a,TRASPARENT_COLOR
+TransparentColor_3 = $ - 1
+.loop:
+	ld	c,0
+.next =$-1
 	lea	de,iy
-	call	_TransparentPlot_ASM ; call the plotter
+	call	_TransparentPlot	; call the plotter
 	ld	de,LcdWidth
 	add	iy,de
 	dec	ixh			; loop for height
-	jr	nz,-_
+	jr	nz,.loop
 	pop	ix			; restore stack pointer
 	ret
 
 ;-------------------------------------------------------------------------------
-_ClipDraw_ASM:
+_ClipCoordinates:
 ; Clipping stuff
 ; Arguments:
 ;  arg0 : Pointer to sprite structure
@@ -2259,7 +2277,7 @@ _ClipDraw_ASM:
 	ld	a,(hl)
 	ld	de,_TmpWidth
 	ld	(de),a			; save _TmpWidth
-	ld	(tmpSpriteWidth),a	; save tmpSpriteWidth
+	ld	(.width),a		; save tmpSpriteWidth
 	add	iy,de
 	inc	hl
 	ld	a,(hl)
@@ -2269,7 +2287,7 @@ _ClipDraw_ASM:
 	ld	bc,(ix+9)
 	ld	hl,(_YMin)
 	mIsHLLessThanBC
-	jr	c,NoTopClipNeeded_ASM
+	jr	c,.notop
 	ld	hl,(iy+3)
 	add	hl,bc
 	ex	de,hl
@@ -2288,7 +2306,7 @@ _ClipDraw_ASM:
 	add	hl,de
 	ld	(iy+6),hl		; store new ptr
 	ld	bc,(_YMin)		; new y location ymin
-NoTopClipNeeded_ASM:
+.notop:
 	push	bc
 	pop	hl			; hl = y coordinate
 	ld	de,(_YMax)
@@ -2299,17 +2317,17 @@ NoTopClipNeeded_ASM:
 	add	hl,bc
 	ld	de,(_YMax)
 	mIsHLLessThanDE
-	jr	c,NoBottomClipNeeded_ASM ; is partially clipped bottom?
+	jr	c,.notbottom		; is partially clipped bottom?
 	ex	de,hl			; hl = ymax
 					; bc = y coordinate
 	sbc	hl,bc
 	ld	(iy+3),hl		; store new tmpHeight
-NoBottomClipNeeded_ASM:
+.notbottom:
 	ld	hl,(ix+6)		; hl = x coordinate
 	ld	de,(_XMin)
 	mIsHLLessThanDE
 	ld	hl,(ix+6)		; hl = x coordinate
-	jr	nc,NoLeftClip_ASM	; is partially clipped left?
+	jr	nc,.noleft		; is partially clipped left?
 	ld	de,(iy+0)		; de = _TmpWidth
 	add	hl,de
 	ld	de,(_XMin)
@@ -2330,7 +2348,7 @@ NoBottomClipNeeded_ASM:
 	ld	(iy+0),hl		; save new width
 	ld	hl,(_XMin)
 	ld	(ix+6),hl		; save min x coordinate
-NoLeftClip_ASM:
+.noleft:
 	ld	de,(_XMax)		; de = xmax
 	mIsHLLessThanDE
 	ret	nc			; return if offscreen
@@ -2340,18 +2358,18 @@ NoLeftClip_ASM:
 	ld	de,(_XMax)
 	ex	de,hl
 	mIsHLLessThanDE
-	jr	nc,NoRightClip_ASM	; is partially clipped right?
+	jr	nc,.noright		; is partially clipped right?
 	ld	hl,(_XMax)		; clip on the right
 	ld	de,(ix+6)
 	ccf
 	sbc	hl,de
 	ld	(iy+0),hl		; save new _TmpWidth
-NoRightClip_ASM:
+.noright:
 	ld	a,(iy+3)
 	or	a,a
 	ret	z			; quit if new tmpHeight is 0 (edge case)
-tmpSpriteWidth =$+1
 	ld	a,0
+.width = $ - 1
 	ld	de,(ix+6)		; de = x coordinate
 	ld	l,c			; l = y coordinate
 	sub	a,(iy+0)		; compute new x width
@@ -2359,22 +2377,22 @@ tmpSpriteWidth =$+1
 	ret
 
 ;-------------------------------------------------------------------------------
-_TransparentTilemap_NoClip:
+gfx_TransparentTilemap_NoClip:
 ; Tilemapping subsection
-	ld	hl,_TransparentSprite_NoClip
-	jr	+_
+	ld	hl,gfx_TransparentSprite_NoClip
+	jr	_Tilemap
 ;-------------------------------------------------------------------------------
-_Tilemap_NoClip:
+gfx_Tilemap_NoClip:
 ; Tilemapping subsection
-	ld	hl,_Sprite_NoClip
-	jr	+_
+	ld	hl,gfx_Sprite_NoClip
+	jr	_Tilemap
 ;-------------------------------------------------------------------------------
-_TransparentTilemap:
+gfx_TransparentTilemap:
 ; Tilemapping subsection
-	ld	hl,_TransparentSprite
-	jr	+_
+	ld	hl,gfx_TransparentSprite
+	jr	_Tilemap
 ;-------------------------------------------------------------------------------
-_Tilemap:
+gfx_Tilemap:
 ; Draws a tilemap given a tile map structure and some offsets
 ; Arguments:
 ;  arg0 : Tilemap Struct
@@ -2407,21 +2425,22 @@ _Tilemap:
 ;      }
 ;  }
 ;
-t_data        .equ 0
-t_type_width  .equ 10
-t_type_height .equ 11
-t_height      .equ 12
-t_width       .equ 13
-t_tile_height .equ 6
-t_tile_width  .equ 7
-t_draw_height .equ 8
-t_draw_width  .equ 9
-t_x_loc       .equ 15
+t_data        := 0
+t_type_width  := 10
+t_type_height := 11
+t_height      := 12
+t_width       := 13
+t_tile_height := 6
+t_tile_width  := 7
+t_draw_height := 8
+t_draw_width  := 9
+t_x_loc       := 15
+x_offset      := 9
+y_offset      := 12
 
-x_offset      .equ 9
-y_offset      .equ 12
-	ld	hl,_Sprite
-_:	ld	(DrawTile_SMC),hl
+	ld	hl,gfx_Sprite
+_Tilemap:
+	ld	(.tilemethod),hl
 	push	ix
 	ld	ix,0
 	lea	bc,ix
@@ -2434,22 +2453,23 @@ _:	ld	(DrawTile_SMC),hl
 	ld	c,(iy+t_tile_height)
 	ld	a,(iy+t_type_height)
 	or	a,a
-	jr	nz,_height_is_pow2
+	jr	nz,.heightpow2
 	call	__idvrmu
 	ex	de,hl
 	push	de
 	pop	bc
-	jr	_height_is_not_pow2
-_height_is_pow2:			; compute as power of 2 height using shifts
+	jr	.heightnotpow2
+.heightpow2:				; compute as power of 2 height using shifts
 	ld	b,a
 	dec	c
 	ld	a,l
 	and	a,c
 	ld	c,a
-_:	srl	h
+.div0:
+	srl	h
 	rr	l
-	djnz	-_
-_height_is_not_pow2:
+	djnz	.div0
+.heightnotpow2:
 	ld	(ix-4),l		; y = y_offset / tilemap->tile_height
 	ld	(ix+y_offset),bc	; y_offset = y_offset % tilemap->tile_height;
 
@@ -2457,28 +2477,29 @@ _height_is_not_pow2:
 	ld	hl,(ix+x_offset)	; x offset
 	ld	a,(iy+t_type_width)
 	or	a,a
-	jr	nz,_width_is_pow2
+	jr	nz,.widthpow2
 	call	__idvrmu
 	ex	de,hl
 	push	de
 	pop	bc
-	jr	_width_is_not_pow2
-_width_is_pow2:
+	jr	.widthnotpow2
+.widthpow2:
 	ld	b,a
 	dec	c
 	ld	a,l
 	and	a,c
 	ld	c,a
-_:	srl	h
+.div1:
+	srl	h
 	rr	l
-	djnz	-_
-_width_is_not_pow2:
+	djnz	.div1
+.widthnotpow2:
 	ld	a,l
-	ld	(x_res_smc),a
+	ld	(.xres),a
 	ld	hl,(iy+t_x_loc)
 	or	a,a
 	sbc	hl,bc
-	ld	(x_offset_smc),hl	; x_offset_smc = tilemap->x_loc - x_offset;
+	ld	(.xoffset),hl		; tilemap->x_loc - x_offset;
 
 	or	a,a
 	sbc	hl,hl
@@ -2487,33 +2508,34 @@ _width_is_not_pow2:
 	ld	(ix-3),h
 	sbc	hl,bc
 	ld	(ix-12),hl
-	jp	Y_Loop
+	jp	.yloop
 
-x_res_smc =$+3
-n_8:	ld	(ix-1),0
-x_offset_smc =$+1
+.xres =  $ + 3
+.loop:
+	ld	(ix-1),0
 	ld	hl,0
+.xoffset = $ - 3
 	ld	(ix-7),hl
 	ld	l,(iy+t_width)
 	ld	h,(ix-4)
 	mlt	hl
-	ld	(y_next_smc),hl
+	ld	(.ynext),hl
 	xor	a,a
-	jr	X_Loop
+	jr	.xloop
 
-_xLoop_inner:
+.xloopinner:
 	or	a,a
 	sbc	hl,hl
 	ld	l,(ix-1)
 	ld	bc,(iy+t_data)		; iy -> tilemap data
 	add	hl,bc
-y_next_smc =$+1
 	ld	bc,0
+.ynext = $ - 3
 	add	hl,bc
 	ld	a,(hl)
 	ld	l,a
 	inc	a
-	jr	z,BlankTile
+	jr	z,.blanktile
 	ld	h,3
 	mlt	hl
 	ld	de,(iy+3)
@@ -2524,11 +2546,11 @@ y_next_smc =$+1
 	push	bc
 	ld	bc,(hl)
 	push	bc
-DrawTile_SMC =$+1
 	call	0			; call sprite drawing routine
+.tilemethod = $ - 3
 	lea	hl,ix-12
 	ld	sp,hl
-BlankTile:
+.blanktile:
 	or	a,a
 	sbc	hl,hl
 	ld	iy,(ix+6)
@@ -2540,10 +2562,10 @@ BlankTile:
 	ld	a,(ix-2)
 	inc	a
 
-X_Loop:
+.xloop:
 	ld	(ix-2),a
 	cp	a,(iy+t_draw_width)
-	jr	nz,_xLoop_inner
+	jr	nz,.xloopinner
 	ld	h,0
 	ld	l,(iy+6)
 	ld	bc,(ix-12)
@@ -2552,16 +2574,16 @@ X_Loop:
 	inc	(ix-4)
 	inc	(ix-3)
 
-Y_Loop:
+.yloop:
 	ld	a,(iy+t_draw_height)
 	cp	a,(ix-3)
-	jp	nz,n_8
+	jp	nz,.loop
 	ld	sp,ix
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
-_TilePtr:
+gfx_TilePtr:
 ; Returns a pointer to a tile given the pixel offsets
 ; Arguments:
 ;  arg0 : Tilemap Struct
@@ -2580,34 +2602,37 @@ _TilePtr:
 	ld	hl,(ix+x_offset)
 	ld	a,(iy+t_type_width)
 	or	a,a
-	jr	nz,+_
+	jr	nz,.fastdiv0
 	ld	bc,0
 	ld	c,(iy+t_tile_width)
 	call	__idvrmu
 	ex	de,hl
-	jr	_width_no_pow2
-_:	ld	b,a
-_:	srl	h
+	jr	.widthnotpow2
+.fastdiv0:
+	ld	b,a
+.div0:
+	srl	h
 	rr	l
-	djnz	-_
-_width_no_pow2:
+	djnz	.div0
+.widthnotpow2:
 	ex	de,hl
 	ld	hl,(ix+y_offset)
 	ld	a,(iy+t_type_height)
 	or	a,a
-	jr	nz,+_
+	jr	nz,.fastdiv1
 	ld	bc,0
 	ld	c,(iy+t_tile_height)
 	push	de
 	call	__idvrmu
 	ex	de,hl
 	pop	de
-	jr	_height_no_pow2
-_:	ld	b,a
-_:	srl	h
+	jr	.heightnotpow2
+.fastdiv1:
+	ld	b,a
+.div1:	srl	h
 	rr	l
-	djnz	-_
-_height_no_pow2:
+	djnz	.div1
+.heightnotpow2:
 	ld	h,(iy+t_width)
 	mlt	hl
 	add	hl,de
@@ -2617,7 +2642,7 @@ _height_no_pow2:
 	ret
 
 ;-------------------------------------------------------------------------------
-_TilePtrMapped:
+gfx_TilePtrMapped:
 ; Returns a direct pointer to the input tile
 ; Arguments:
 ;  arg0 : Tilemap Struct
@@ -2641,7 +2666,7 @@ _TilePtrMapped:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
-_GetTextX:
+gfx_GetTextX:
 ; Gets the X position of the text cursor
 ; Arguments:
 ;  None
@@ -2651,7 +2676,7 @@ _GetTextX:
 	ret
 
 ;-------------------------------------------------------------------------------
-_GetTextY:
+gfx_GetTextY:
 ; Gets the Y position of the text cursor
 ; Arguments:
 ;  None
@@ -2661,7 +2686,7 @@ _GetTextY:
 	ret
 
 ;-------------------------------------------------------------------------------
-_SetTextBGColorC:
+gfx_SetTextBGColor:
 ; Sets the background text color for text routines
 ; Arguments:
 ;  arg0 : Color index to set BG to
@@ -2680,7 +2705,7 @@ _SetTextBGColorC:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
-_SetTextFGColorC:
+gfx_SetTextFGColor:
 ; Sets the foreground text color for text routines
 ; Arguments:
 ;  arg0 : Color index to set FG to
@@ -2699,7 +2724,7 @@ _SetTextFGColorC:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
-_SetTextTransparentColorC:
+gfx_SetTextTransparentColor:
 ; Sets the transparency text color for text routines
 ; Arguments:
 ;  arg0 : Color index to set transparent text to
@@ -2718,7 +2743,7 @@ _SetTextTransparentColorC:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
-_SetTextXY:
+gfx_SetTextXY:
 ; Sets the text X and Y positions
 ; Arguments:
 ;  arg0 : Text X Pos
@@ -2762,10 +2787,10 @@ _PrintStringXY_Clip:
 	ld	hl,(hl)
 	ld	(_TextYPos),hl	; set new y pos
 	pop	hl
-	jr	NextCharLoop		; jump to the main string handler
+	jr	_DrawCharacters		; jump to the main string handler
 
 ;-------------------------------------------------------------------------------
-_PrintStringXY:
+gfx_PrintStringXY:
 ; Places a string at the given coordinates
 ; Arguments:
 ;  arg0 : Pointer to string
@@ -2774,7 +2799,7 @@ _PrintStringXY:
 ; Returns:
 ;  None
 	jp	_PrintStringXY
-_PrintStringXY =$-3
+__PrintStringXY = $ - 3
 _PrintStringXY:
 	ld	hl,9
 	add	hl,sp
@@ -2782,16 +2807,16 @@ _PrintStringXY:
 	ld	(_TextYPos),a
 	dec	hl
 	dec	hl
-	ld	de,_TextXPos+1
+	ld	de,_TextXPos + 1
 	ldd
 	ldd
 	dec	hl
 	dec	hl
 	ld	hl,(hl)
-	jr	NextCharLoop
+	jr	_DrawCharacters
 
 ;-------------------------------------------------------------------------------
-_PrintString:
+gfx_PrintString:
 ; Places a string at the current cursor position
 ; Arguments:
 ;  arg0 : Pointer to string
@@ -2801,17 +2826,17 @@ _PrintString:
 	pop	hl
 	push	hl
 	push	de
-NextCharLoop:
+_DrawCharacters:
 	ld	a,(hl)			; get the current character
 	or	a,a
 	ret	z
 	call	_PrintChar
-PrintChar_3 =$-3
+PrintChar_3 = $ - 3
 	inc	hl			; move to the next one
-	jr	NextCharLoop
+	jr	_DrawCharacters
 
 ;-------------------------------------------------------------------------------
-_SetTextScale:
+gfx_SetTextScale:
 ; Changes the amount of text scaling (note that height and width are independent)
 ; Arguments:
 ;  arg0 : Width scale (1 is default)
@@ -2828,13 +2853,13 @@ _SetTextScale:
 	ld	de,_TextWidthScale
 	ld	hl,_LargeFontJump
 	cp	a,c
-	jr	z,AreTheSame
-	jr	NotTheSame
-AreTheSame:
+	jr	z,.match
+	jr	.nomatch
+.match:
 	dec	a
-	jr	z,BothAreOne		; if they are both one; just use normal drawing
+	jr	z,.bothone		; if they are both one; just use normal drawing
 	inc	a
-NotTheSame:
+.nomatch:
 	or	a,a
 	ret	z			; null check
 	ld	(de),a
@@ -2843,18 +2868,14 @@ NotTheSame:
 	ret	z			; null check
 	ld	(_TextHeightScale),a
 	ld	(hl),0			; modified at boot to SM the jump
-UseLargeFont =$-1
+UseLargeFont = $ - 1
 	ret
-BothAreOne:
+.bothone:
 	ld	(hl),a			; store a 0, which means no (literal) jump
 	inc	a
 	ld	(de),a
 	ret
 
-;-------------------------------------------------------------------------------
-; Definitions for gfx_SetTextConfig
-#define TEXT_CLIP   1
-#define TEXT_NOCLIP 2
 ;-------------------------------------------------------------------------------
 gfx_SetTextConfig:
 ; Configures text depending on the arguments
@@ -2867,9 +2888,9 @@ gfx_SetTextConfig:
 	push	de
 	push	hl
 	ld	a,e			; a = argument
-	dec	a			; TEXT_CLIP
+	dec	a			; 1 = TEXT_CLIP
 	jr	z,.setcliptext
-	dec	a			; TEXT_NOCLIP
+	dec	a			; 2 = TEXT_NOCLIP
 	ret	nz
 	ld	de,_PrintChar
 	ld	bc,_PrintStringXY
@@ -2888,8 +2909,8 @@ gfx_SetTextConfig:
 	ld	(hl),de			; modify all the interal routines to use the clipped text routine
 	push	bc
 	pop	hl
-	ld	(_PrintStringXY),hl	; change which text routines we want to use
-	or	a,a
+	ld	(__PrintStringXY),hl	; change which text routines we want to use
+	xor	a,a
 	sbc	hl,hl
 	ld	(_TextYPos),hl
 	ld	(_TextXPos),hl		; reset the current posistions
@@ -2984,7 +3005,7 @@ _TextTPColor_1 =$-1
 	ret
 
 ;-------------------------------------------------------------------------------
-gfx_PrintLargeFont:
+_PrintLargeFont:
 ; Prints in scaled font for prosperity
 ; This is so that way unscaled font can still be reasonably fast
 ; Returns:
@@ -3224,7 +3245,7 @@ _GetCharWidth:
 	ret
 
 ;-------------------------------------------------------------------------------
-_GetSpriteChar:
+gfx_GetSpriteChar:
 ; Sets the data in char_sprite (must have previously allocated an 8x8 width sprite)
 ; the pixel map of the character c
 ; Arguments:
@@ -3269,7 +3290,7 @@ _TextHeight_1 =$+2
 	ret
 
 ;-------------------------------------------------------------------------------
-gfx_GetChar:
+_GetChar:
 ; Places a character data into a nice buffer
 ; Inputs:
 ;  HL : Points to character pixmap
@@ -3303,7 +3324,7 @@ _TextTPColor_3 = $ - 1
 TransparentColor_4 = $ - 1
 	ld	(de),a
 	inc	de			; move to next pixel
-	djnz	GetNextPixel
+	djnz	.nextpixel
 	inc	hl
 	dec	iyl
 	jr	nz,.loop		; okay we stored the character sprite now draw it
@@ -3351,7 +3372,7 @@ gfx_SetFontData:
 	ret
 
 ;-------------------------------------------------------------------------------
-_SetFontSpacing:
+gfx_SetFontSpacing:
 ; Sets the font to be custom spacing
 ; Arguments:
 ;  arg0 : Pointer to font spacing
@@ -3372,7 +3393,7 @@ _SetFontSpacing:
 	ret
 
 ;-------------------------------------------------------------------------------
-_SetMonospaceFont:
+gfx_SetMonospaceFont:
 ; Sets the font to be monospace
 ; Arguments:
 ;  arg0 : Monospace spacing amount
@@ -3402,11 +3423,11 @@ gfx_FillTriangle:
 ;  arg0-5 : x0,y0,x1,y1,x2,y2
 ; Returns:
 ;  None
-	ld	hl,_HorizLine
+	ld	hl,gfx_HorizLine
 _FillTriangle:
-	ld	(HLine0_SMC),hl
-	ld	(HLine1_SMC),hl
-	ld	(HLine2_SMC),hl
+	ld	(.line0),hl
+	ld	(.line1),hl
+	ld	(.line2),hl
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -3418,7 +3439,7 @@ _FillTriangle:
 	ld	hl,(ix+9)
 	ld	de,(ix+15)
 	call	_SignedCompare
-	jr	c,+_
+	jr	c,.cmp0
 	ld	hl,(ix+9)
 	ld	(ix+9),de
 	ld	(ix+15),hl
@@ -3426,10 +3447,11 @@ _FillTriangle:
 	ld	de,(ix+12)
 	ld	(ix+6),de
 	ld	(ix+12),hl
-_:	ld	hl,(ix+15)
+.cmp0:
+	ld	hl,(ix+15)
 	ld	de,(ix+21)
 	call	_SignedCompare
-	jr	c,+_
+	jr	c,.cmp1
 	ld	hl,(ix+15)
 	ld	(ix+15),de
 	ld	(ix+21),hl
@@ -3437,10 +3459,11 @@ _:	ld	hl,(ix+15)
 	ld	de,(ix+18)
 	ld	(ix+12),de
 	ld	(ix+18),hl
-_:	ld	hl,(ix+9)
+.cmp1:
+	ld	hl,(ix+9)
 	ld	de,(ix+15)
 	call	_SignedCompare
-	jr	c,+_
+	jr	c,.cmp2
 	ld	hl,(ix+9)
 	ld	(ix+9),de
 	ld	(ix+15),hl
@@ -3448,7 +3471,8 @@ _:	ld	hl,(ix+9)
 	ld	de,(ix+12)
 	ld	(ix+6),de
 	ld	(ix+12),hl
-_:	ld	de,(ix+12)
+.cmp2:
+	ld	de,(ix+12)
 	ld	hl,(ix+18)
 	or	a,a
 	sbc	hl,de
@@ -3482,34 +3506,38 @@ _:	ld	de,(ix+12)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,de
-	jp	nz,t_17
+	jp	nz,.loop
 	ld	hl,(ix+6)
 	ld	(ix-6),hl
 	ld	(ix-3),hl
 	ld	de,(ix+12)
 	call	_SignedCompare
-	jr	c,t_8
+	jr	c,.cmp3
 	ld	(ix-3),de
-	jr	t_12
-t_8:	ld	hl,(ix+12)
+	jr	.cmp4
+.cmp3:
+	ld	hl,(ix+12)
 	ld	de,(ix-6)
 	call	_SignedCompare
-	jr	c,t_12
+	jr	c,.cmp4
 	ld	de,(ix+12)
 	ld	(ix-6),de
-t_12:	ld	hl,(ix-3)
+.cmp4:
+	ld	hl,(ix-3)
 	ld	de,(ix+18)
 	call	_SignedCompare
-	jr	c,t_11
+	jr	c,.cmp5
 	ld	(ix-3),de
-	jr	t_13
-t_11:	ld	hl,(ix+18)
+	jr	.cmp6
+.cmp5:
+	ld	hl,(ix+18)
 	ld	de,(ix-6)
 	call	_SignedCompare
-	jr	c,t_13
+	jr	c,.cmp6
 	ld	de,(ix+18)
 	ld	(ix-6),de
-t_13:	ld	bc,(ix-3)
+.cmp6:
+	ld	bc,(ix-3)
 	ld	de,(ix+9)
 	ld	hl,(ix-6)
 	or	a,a
@@ -3518,34 +3546,41 @@ t_13:	ld	bc,(ix-3)
 	push	hl
 	push	de
 	push	bc
-HLine0_SMC =$+1
 	call	0
+.line0 = $ - 3
 	ld	sp,ix
 	pop	ix
 	ret
-t_17:	ld	de,(ix+21)
+.loop:
+	ld	de,(ix+21)
 	ld	hl,(_YMax)
 	or	a,a
 	sbc	hl,de
 	add	hl,de
-	jp	p,t__29
-	jp	pe,t_20
-	jr	t__30
-t__29:	jp	po,t_20
-t__30:	ld	(ix+21),hl
-t_20:	ld	hl,(ix+15)
+	jp	p,.cmp7
+	jp	pe,.cmp9
+	jr	.cmp8
+.cmp7:
+	jp	po,.cmp9
+.cmp8:
+	ld	(ix+21),hl
+.cmp9:
+	ld	hl,(ix+15)
 	or	a,a
 	sbc	hl,de
 	add	hl,de
-	jr	nz,t_19
+	jr	nz,.cmp10
 	ld	(ix-27),hl
-	jr	t_27
-t_19:	dec	hl
+	jr	.cmp11
+.cmp10:
+	dec	hl
 	ld	(ix-27),hl
-t_27:	ld	bc,(ix+9)
+.cmp11:
+	ld	bc,(ix+9)
 	ld	(ix-12),bc
-	jp	t_26
-t_24:	ld	hl,(ix-15)
+	jp	.cmp16
+.cmp12:
+	ld	hl,(ix-15)
 	ld	bc,(ix-36)
 	call	_DivideHLBC
 	ld	bc,(ix+6)
@@ -3571,14 +3606,17 @@ t_24:	ld	hl,(ix-15)
 	or	a,a
 	sbc	hl,de
 	add	hl,de
-	jp	p,t__31
-	jp	pe,t_23
-	jr	t__32
-t__31:	jp	po,t_23
-t__32:	ex	de,hl
+	jp	p,.cmp13
+	jp	pe,.cmp15
+	jr	.cmp14
+.cmp13:
+	jp	po,.cmp15
+.cmp14:
+	ex	de,hl
 	ld	(ix-3),de
 	ld	(ix-6),hl
-t_23:	ld	de,(ix-3)
+.cmp15:
+	ld	de,(ix-3)
 	ld	hl,(ix-6)
 	or	a,a
 	sbc	hl,de
@@ -3587,21 +3625,24 @@ t_23:	ld	de,(ix-3)
 	push	hl
 	push	bc
 	push	de
-HLine1_SMC =$+1
 	call	0
+.line1 = $ - 3
 	lea	hl,ix-39
 	ld	sp,hl
 	ld	bc,(ix-12)
 	inc	bc
 	ld	(ix-12),bc
-t_26:	ld	hl,(ix-27)
+.cmp16:
+	ld	hl,(ix-27)
 	or	a,a
 	sbc	hl,bc
-	jp	p,+_
-	jp	pe,t_24
-	jr	++_
-_:	jp	po,t_24
-_:	ld	bc,(ix+15)
+	jp	p,.cmp17
+	jp	pe,.cmp12
+	jr	.cmp18
+.cmp17:
+	jp	po,.cmp12
+.cmp18:
+	ld	bc,(ix+15)
 	ld	hl,(ix-12)
 	or	a,a
 	sbc	hl,bc
@@ -3615,8 +3656,9 @@ _:	ld	bc,(ix+15)
 	ld	bc,(ix-21)
 	call	_MultiplyHLBC
 	ld	(ix-18),hl
-	jp	t_34
-t_32:	ld	hl,(ix-15)
+	jp	.start
+.cmp19:
+	ld	hl,(ix-15)
 	ld	bc,(ix-33)
 	call	_DivideHLBC
 	ld	bc,(ix+12)
@@ -3642,37 +3684,39 @@ t_32:	ld	hl,(ix-15)
 	or	a,a
 	sbc	hl,de
 	add	hl,de
-	jp	p,+_
-	jp	pe,+++_
-	jr	++_
-_:	jp	po,+++_
-_:	ex	de,hl
+	jp	p,.cmp20
+	jp	pe,.cmp22
+	jr	.cmp21
+.cmp20:	jp	po,.check
+.cmp21:	ex	de,hl
 	ld	(ix-3),de
 	ld	(ix-6),hl
-_:	or	a,a
+.cmp22:	or	a,a
 	sbc	hl,de
 	ld	bc,(ix-12)
 	inc	hl
 	push	hl
 	push	bc
 	push	de
-HLine2_SMC =$+1
 	call	0
+.line2 = $ - 3
 	lea	hl,ix-39
 	ld	sp,hl
 	ld	bc,(ix-12)
 	inc	bc
 	ld	(ix-12),bc
-t_34:	ld	bc,(ix-12)
+.start:
+	ld	bc,(ix-12)
 	ld	hl,(ix+21)
 	or	a,a
 	sbc	hl,bc
 	jp	p,+_
-	jp	pe,t_32
+	jp	pe,.cmp19
 	ld	sp,ix
 	pop	ix
 	ret
-_:	jp	po,t_32
+.check:
+	jp	po,.cmp19
 	ld	sp,ix
 	pop	ix
 	ret
@@ -3685,7 +3729,7 @@ gfx_Polygon_NoClip:
 ;  arg1 : length of polygon point array
 ; Returns:
 ;  None
-	ld	hl,_Line_NoClip
+	ld	hl,gfx_Line_NoClip
 	jr	_Polygon
 ;-------------------------------------------------------------------------------
 gfx_Polygon:
@@ -3695,17 +3739,17 @@ gfx_Polygon:
 ;  arg1 : length of polygon point array
 ; Returns:
 ;  None
-	ld	hl,_Line
+	ld	hl,gfx_Line
 _Polygon:
-	ld	(LineType0_SMC),hl
-	ld	(LineType1_SMC),hl
+	ld	(.line0),hl
+	ld	(.line1),hl
 	push	ix
 	ld	ix,0
 	add	ix,sp
 	ld	sp,hl
 	ld	iy,(ix+6)
-	jr	StartPolygonLoop
-PolygonLoop:
+	jr	.startloop
+.loop:
 	push	iy
 	ld	bc,(iy+9)
 	push	bc
@@ -3716,21 +3760,21 @@ PolygonLoop:
 	ld	bc,(iy+0)
 	push	bc
 	call	0
-LineType0_SMC =$-3
+.line0 = $ - 3
 	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc
 	pop	iy
 	lea	iy,iy+6
-StartPolygonLoop:
+.startloop:
 	ld	hl,(ix+9)
 	dec	hl
 	ld	(ix+9),hl
 	add	hl,bc
 	or	a,a
 	sbc	hl,bc
-	jr	nz,PolygonLoop
+	jr	nz,.loop
 	ld	bc,(iy+3)
 	push	bc
 	ld	bc,(iy+0)
@@ -3741,13 +3785,13 @@ StartPolygonLoop:
 	ld	bc,(iy+0)
 	push	bc
 	call	0
-LineType1_SMC =$-3
+.line1 = $ - 3
 	ld	sp,ix
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
-_Reserved:
+gfx_Reserved:
 ; Deprecated unused function (available for use)
 	ret
 
@@ -3996,7 +4040,7 @@ gfx_RotateSpriteC:
 	ret
 
 ;-------------------------------------------------------------------------------
-_RotateSpriteCC:
+gfx_RotateSpriteCC:
 ; Rotates a sprite 90 degrees counter clockwise
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
@@ -4158,26 +4202,6 @@ dv_shr_8_times_width_plus_width = $ - 3
 	pop	ix
 	ret
 
-_UCDivA:
-	sbc	hl,hl
-	ld	h,a
-	xor	a,a
-	ld	l,a
-	ex	de,hl
-	sbc	hl,hl
-	ld	l,c
-	call	.load
-	ld	c,a
-.load:
-	ld	b,8
-.loop:	add	hl,hl
-	add	hl,de
-	jr	c,.skip
-	sbc	hl,de
-.skip:	rla
-	djnz	.loop
-	ret				; ca = c*256/a, h = c*256%a
-
 ;-------------------------------------------------------------------------------
 gfx_RotatedScaledSprite_NoClip:
 ; Rotate and scale an image drawn directly to the screen buffer
@@ -4204,14 +4228,14 @@ gfx_RotatedScaledTransparentSprite_NoClip:
 	ld	a,3
 
 _RotatedScaledSprite:
-	ld	(RotatedScaled),a
+	ld	(.rotatescale),a
 	push	ix
 	ld	ix,0
 	add	ix,sp
 	push	hl
 	ld	iy,(ix+6)		; sprite pointer
 	lea	hl,iy+2
-	ld	(dsrs_sprptr_0),hl	; write smc
+	ld	(.dsrs_sprptr_0),hl	; write smc
 
 	ld	l,(ix+12)		; y
 	ld	h,160
@@ -4240,13 +4264,13 @@ _RotatedScaledSprite:
 	sbc	hl,hl
 	ld	l,e
 	ld	h,d
-	ld	(dsrs_sinf_1),hl	; write smc
+	ld	(.dsrs_sinf_1),hl	; write smc
 	push	hl
 	ex	de,hl
 	sbc	hl,hl
 	ccf
 	sbc	hl,de
-	ld	(dsrs_sinf_0),hl	; write smc
+	ld	(.dsrs_sinf_0),hl	; write smc
 	pop	hl
 
 	; dxs = sinf * -(size * scale / 128);
@@ -4263,7 +4287,7 @@ _RotatedScaledSprite:
 	ld	b,a			; -(size * scale / 128)
 	ld	(ix-3),bc
 	call	_16Mul16SignedNeg	; sinf * -(size * scale / 128)
-	ld	(dsrs_dys_0),hl		; write smc
+	ld	(.dsrs_dys_0),hl	; write smc
 	push	hl
 
 	; cosf = _SineTable[angle + 64] * 128 / scale
@@ -4283,19 +4307,19 @@ _RotatedScaledSprite:
 	sbc	hl,hl
 	ld	l,e
 	ld	h,d
-	ld	(dsrs_cosf_0),hl	; write smc
-	ld	(dsrs_cosf_1),hl	; write smc
+	ld	(.dsrs_cosf_0),hl	; write smc
+	ld	(.dsrs_cosf_1),hl	; write smc
 
 	; dxc = cosf * -(size * scale / 128);
 	ld	bc,(ix-3)		; -(size * scale / 128)
 	call	_16Mul16SignedNeg	; cosf * -(size * scale / 128)
-	ld	(dsrs_dyc_0),hl		; write smc
+	ld	(.dsrs_dyc_0),hl	; write smc
 	push	hl
 
 	ld	a,(iy)			; size
-	ld	(dsrs_ssize_1),a	; write smc
+	ld	(.dsrs_ssize_1),a	; write smc
 	dec	a
-	ld	(dsrs_ssize_0),a	; write smc
+	ld	(.dsrs_ssize_0),a	; write smc
 	inc	a
 	ld	b,a
 	ld	c,(ix+18)
@@ -4304,8 +4328,8 @@ _RotatedScaledSprite:
 	or	a,a
 	sbc	hl,hl
 	ld	h,a
-	ld	(dsrs_size128_0),hl	; write smc
-	ld	(dsrs_size128_1),hl	; write smc
+	ld	(.dsrs_size128_0),hl	; write smc
+	ld	(.dsrs_size128_1),hl	; write smc
 	ld	a,b
 	rl	c
 	adc	a,a
@@ -4314,7 +4338,7 @@ _RotatedScaledSprite:
 	jr	nz,.hax
 	inc	a			; hax for scale = 1?
 .hax:
-	ld	(dsrs_size_1),a 	; write smc
+	ld	(.dsrs_size_1),a 	; write smc
 
 	or	a,a
 	sbc	hl,hl
@@ -4322,7 +4346,7 @@ _RotatedScaledSprite:
 	ld	de,LcdWidth
 	ex	de,hl
 	sbc	hl,de
-	ld	(line_add),hl
+	ld	(.line_add),hl
 
 	pop	de			; smc = dxc start
 	pop	hl			; smc = dxs start
@@ -4336,22 +4360,22 @@ _RotatedScaledSprite:
 
 	; xs = (dxs + dyc) + (size * 128);
 	ld	bc,0
-dsrs_dyc_0 = $ - 3
+.dsrs_dyc_0 = $ - 3
 	add	hl,bc
 	ld	bc,0
-dsrs_size128_0 = $ - 3
+.dsrs_size128_0 = $ - 3
 	add	hl,bc
 	ex	de,hl			; de = (dxs + dyc) + (size * 128)
 	; ys = (dxc - dys) + (size * 128);
 	ld	bc,0
-dsrs_dys_0 = $ - 3
+.dsrs_dys_0 = $ - 3
 	or	a,a
 	sbc	hl,bc
 	ld	bc,0
-dsrs_size128_1 = $ - 3
+.dsrs_size128_1 = $ - 3
 	add	hl,bc			; hl = (dxc - dys) + (size * 128)
 
-dsrs_size_1 = $ + 2			; smc = size * scale / 64
+.dsrs_size_1 = $ + 2			; smc = size * scale / 64
 	ld	iyl,0
 .inner:
 	push	hl			; xs
@@ -4361,7 +4385,7 @@ dsrs_size_1 = $ + 2			; smc = size * scale / 64
 	rlca
 	jr	c,.skip
 	ld	a,0
-dsrs_ssize_0 = $ - 1
+.dsrs_ssize_0 = $ - 1
 	cp	a,d
 	jr	c,.skip
 	cp	a,h
@@ -4369,46 +4393,46 @@ dsrs_ssize_0 = $ - 1
 
 	; get pixel and draw to buffer
 	ld	c,0
-dsrs_ssize_1 = $ - 1
+.dsrs_ssize_1 = $ - 1
 	ld	b,h
 	mlt	bc
 	sbc	hl,hl
 	ld	l,d
 	add	hl,bc			; y * size + x
 	ld	bc,0
-dsrs_sprptr_0 = $ - 3
+.dsrs_sprptr_0 = $ - 3
 	add	hl,bc
 	ld	a,(hl)
-	cp	a,DEFAULT_TP_COLOR
+	cp	a,TRASPARENT_COLOR
 TransparentColor_6 =$-1
 	jr	z,$+5
-RotatedScaled = $ - 1
+.rotatescale = $ - 1
 	ld	(ix),a			; write pixel
 .skip:
 	inc	ix			; x++s
 	ld	hl,0			; smc = cosf
-dsrs_cosf_0 = $ - 3
+.dsrs_cosf_0 = $ - 3
 	add	hl,de			; xs += cosf
 	ex	de,hl
 	pop	hl			; ys
 	ld	bc,0			; smc = -sinf
-dsrs_sinf_0 = $ - 3
+.dsrs_sinf_0 = $ - 3
 	add	hl,bc			; ys += -sinf
 	dec	iyl
 	jr	nz,.inner		 ; x loop
 
 	pop	hl			; dxc
 	ld	bc,0			; smc = cosf
-dsrs_cosf_1 = $ - 3
+.dsrs_cosf_1 = $ - 3
 	add	hl,bc			; dxc += cosf
 	ex	de,hl
 	pop	hl			; dxs
 	ld	bc,0			; smc = sinf
-dsrs_sinf_1 = $ - 3
+.dsrs_sinf_1 = $ - 3
 	add	hl,bc			; dxs += sinf
 
 	ld	bc,0
-line_add:
+.line_add = $ - 3
 	add	ix,bc			; y++
 
 	dec	iyh
@@ -4488,7 +4512,7 @@ gfx_RotateScaleSprite:
 	rr	h			; hl = _SineTable[angle + 64] * 128
 	ld	c,(ix+15)
 	ld	b,0
-	call	_16Div8Signed	; hl = _SineTable[angle + 64] * 128 / scale (cos)
+	call	_16Div8Signed		; hl = _SineTable[angle + 64] * 128 / scale (cos)
 	ex	de,hl
 	ld	a,d
 	rlca
@@ -4523,9 +4547,10 @@ gfx_RotateScaleSprite:
 	adc	a,a
 	rl	c
 	adc	a,a			; size * scale / 64
-	jr	nz,+_
+	jr	nz,.skip
 	inc	a			; hax for scale = 1?
-_:	ld	(_smc_dsrs_size_1 + 2),a ; write smc
+.skip:
+	ld	(_smc_dsrs_size_1 + 2),a ; write smc
 
 	pop	de			; smc = dxc start
 	pop	hl			; smc = dxs start
@@ -4537,7 +4562,7 @@ _:	ld	(_smc_dsrs_size_1 + 2),a ; write smc
 	lea	ix,iy+2
 
 	ld	iyh,a			; size * scale / 64
-drawSpriteRotateScale_Loop1:
+_yloop:
 	push	hl			; dxs
 	push	de			; dxc
 
@@ -4560,17 +4585,17 @@ _smc_dsrs_size128_1:
 
 _smc_dsrs_size_1:			; smc = size * scale / 64
 	ld	iyl,$00
-drawSpriteRotateScale_Loop2:
+_xloop:
 	push	hl			; xs
 
 	ld	a,d
 	or	a,h
 	rlca
-	ld	c,DEFAULT_TP_COLOR
-TransparentColor_7 =$-1
+	ld	c,TRASPARENT_COLOR
+TransparentColor_7 = $ - 1
 	jr	c,drawSpriteRotateScale_SkipPixel
 _smcdsrs_ssize_0:
-	ld	a,$00
+	ld	a,0
 	cp	a,d
 	jr	c,drawSpriteRotateScale_SkipPixel
 	cp	a,h
@@ -4578,42 +4603,42 @@ _smcdsrs_ssize_0:
 
 	; get pixel and draw to buffer
 _smcdsrs_ssize_1:
-	ld	c,$00
+	ld	c,0
 	ld	b,h
 	mlt	bc
 	sbc	hl,hl
 	ld	l,d
 	add	hl,bc			; y * size + x
 _smc_dsrs_sprptr_0:
-	ld	bc,$000000
+	ld	bc,0
 	add	hl,bc
 	ld	c,(hl)
 drawSpriteRotateScale_SkipPixel:
 	ld	(ix),c			; write pixel
 	inc	ix			; x++s
 _smcdsrs_cosf_0:			; smc = cosf
-	ld	hl,$000000
+	ld	hl,0
 	add	hl,de			; xs += cosf
 	ex	de,hl
 	pop	hl			; ys
 _smc_dsrs_sinf_0:			; smc = -sinf
-	ld	bc,$000000
+	ld	bc,0
 	add	hl,bc			; ys += -sinf
 	dec	iyl
-	jr	nz,drawSpriteRotateScale_Loop2 ; x loop
+	jr	nz,_xloop		; x loop
 
 	pop	hl			; dxc
 _smc_dsrs_cosf_1:			; smc = cosf
-	ld	bc,$000000
+	ld	bc,0
 	add	hl,bc			; dxc += cosf
 	ex	de,hl
 	pop	hl			; dxs
 _smc_dsrs_sinf_1:			; smc = sinf
-	ld	bc,$000000
+	ld	bc,0
 	add	hl,bc			; dxs += sinf
 
 	dec	iyh
-	jp	nz,drawSpriteRotateScale_Loop1 ; y loop
+	jp	nz,_yloop		; y loop
 	pop	hl			; sprite out ptr
 	pop	de
 	pop	ix
@@ -4771,15 +4796,15 @@ gfx_FloodFill:
 	mlt	de
 	add	hl,de
 	add	hl,de
-.xmin =$+1
 	ld	de,0
-.oldcolor0 =$+1
+.xmin = $ - 3
 	ld	a,0
+.oldcolor0 = $ - 1
 
 	jr	.begin
 .forloop0:				; for (x=x1; !(x & 0x8000) && x>=xmin && p(x, y) == ov; x--) { s(x, y); }
-.newcolor0 =$+1
 	ld	(hl),0
+.newcolor0 = $ - 1
 	dec	hl
 	dec	bc
 .begin:
@@ -4787,7 +4812,7 @@ gfx_FloodFill:
 	jr	nz,.nonnegative
 	or	a,a
 	sbc	hl,de
-	jr	c,+_
+	jr	c,.nonnegative
 	add	hl,de
 	cp	a,(hl)
 	jr	z,.forloop0
@@ -4868,7 +4893,7 @@ gfx_FloodFill:
 .oldcolor1 = $ - 1
 	jr	z,.forloop1
 
-.ovat
+.ovat:
 	ld	(ix+6),bc
 	lea	de,ix-24		; push(y, l, x-1, dy);
 	lea	hl,iy
@@ -5704,6 +5729,27 @@ _SignedCompare:
 	ret	po
 	ccf
 	ret
+
+;-------------------------------------------------------------------------------
+_UCDivA:
+	sbc	hl,hl
+	ld	h,a
+	xor	a,a
+	ld	l,a
+	ex	de,hl
+	sbc	hl,hl
+	ld	l,c
+	call	.load
+	ld	c,a
+.load:
+	ld	b,8
+.loop:	add	hl,hl
+	add	hl,de
+	jr	c,.skip
+	sbc	hl,de
+.skip:	rla
+	djnz	.loop
+	ret				; ca = c*256/a, h = c*256%a
 
 ;-------------------------------------------------------------------------------
 _SetFullScreenClip:
