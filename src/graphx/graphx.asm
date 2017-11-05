@@ -152,9 +152,6 @@ macro mIsHLLessThanBC?
 	jp	po,$+5
 	ccf
 end macro
-macro s8? value
-	(1 * ((value) or (((value) and 80h) shl 1)))
-end macro
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -468,11 +465,11 @@ _FillScreen_FastCode_Dest:
 	djnz	.loop
 	jp	(hl)
 
-FillScreen_FastCode_DestEnd = $
+FillScreen_FastCode_DestEnd  := $
 FillScreen_FastCode_DestSize := FillScreen_FastCode_DestEnd-_FillScreen_FastCode_Dest
 FillScreen_FastCode_SrcSize  := FillScreen_FastCode_DestSize-(FillScreen_PushesPerIter-1+1)
 	org _FillScreen_FastCode_Src+FillScreen_FastCode_SrcSize
-FillScreen_FastCode_SrcEnd = $
+FillScreen_FastCode_SrcEnd   := $
 
 ;-------------------------------------------------------------------------------
 gfx_ZeroScreen:
@@ -548,7 +545,7 @@ _SetPixel:
 	call	_PixelPtr
 	ret	c			; return if out of bounds
 	ld	(hl),0			; get the actual pixel
-Color_1 = $ - 1
+Color_1 = $-1
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -798,7 +795,7 @@ _HorizLine_NoClip:
 	ld	de,(CurrentBuffer)
 	add	hl,de			; hl -> place to draw
 	ld	a,0			; color index to use
-Color_2 = $ - 1
+Color_2 := $-1
 _MemorySet:
 	ld	(hl),a
 	push	hl
@@ -876,7 +873,7 @@ _VertLine_NoClip:
 _RectVert_NoClip:
 	ld	de,LcdWidth
 	ld	a,0
-Color_3 = $ - 1
+Color_3 := $-1
 .loop:
 	ld	(hl),a			; loop for height
 	add	hl,de
@@ -1124,7 +1121,7 @@ gfx_FillCircle:
 	push	hl
 	call	gfx_HorizLine
 	ld	hl,0
-.circle0 = $ - 3
+.circle0 := $-3
 	push	hl
 	ld	bc,(ix-6)
 	ld	hl,(ix+9)
@@ -1132,7 +1129,7 @@ gfx_FillCircle:
 	sbc	hl,bc
 	push	hl
 	ld	hl,0
-.circle1 = $ - 3
+.circle1 := $-3
 	push	hl
 	call	gfx_HorizLine
 	ld	hl,(ix-6)
@@ -1152,7 +1149,7 @@ gfx_FillCircle:
 	push	hl
 	call	gfx_HorizLine
 	ld	hl,0
-.circle2 = $ - 3
+.circle2 := $-3
 	push	hl
 	ld	bc,(ix-3)
 	ld	hl,(ix+9)
@@ -1160,7 +1157,7 @@ gfx_FillCircle:
 	sbc	hl,bc
 	push	hl
 	ld	hl,0
-.circle3 = $ - 3
+.circle3 := $-3
 	push	hl
 	call	gfx_HorizLine
 	lea	hl,ix-9
@@ -1253,14 +1250,14 @@ gfx_FillCircle_NoClip:
 	pop	bc
 	call	_HorizLine_NoClip
 	ld	bc,0
-.circle0 = $ - 3
+.circle0 := $-3
 	ld	de,(ix-6)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,de
 	ld	e,l
 	ld	hl,0
-.circle1 = $ - 3
+.circle1 := $-3
 	call	_HorizLine_NoClip
 	ld	hl,(ix-6)
 	add	hl,hl
@@ -1279,14 +1276,14 @@ gfx_FillCircle_NoClip:
 	pop	bc
 	call	_HorizLine_NoClip
 	ld	bc,0
-.circle2 = $ - 3
+.circle2 := $-3
 	ld	de,(ix-3)
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,de
 	ld	e,l
 	ld	hl,0
-.circle3 = $ - 3
+.circle3 := $-3
 	call	_HorizLine_NoClip
 	ld	bc,(ix-3)
 	inc	bc
@@ -1542,7 +1539,7 @@ dl_horizontal:
 	pop	bc
 	inc	bc
 	ld	a,0
-Color_4 = $ - 1
+Color_4 := $-1
 dl_hloop:
 	ld	(hl),a			; write pixel
 	cpi
@@ -1570,7 +1567,7 @@ dl_vertical:
 	pop	hl
 dl_vloop:
 	ld	(hl),0			; write pixel
-Color_5 = $ - 1
+Color_5 := $-1
 	dec	c
 	ret	z
 	add	hl,de			; y inc
@@ -1670,10 +1667,10 @@ gfx_BlitRectangle:
 	add	iy,de
 	lea	de,iy
 	ld	bc,0			; smc for speedz
-.width = $ - 3
+.width := $-3
 	ldir
 	ld	bc,0			; increment to next line
-.delta = $ - 3
+.delta := $-3
 	add	hl,bc
 	ld	de,LcdWidth		; increment to next line
 	dec	a
@@ -1772,15 +1769,15 @@ _Shift:
 	add	hl,bc
 .loop:
 	ld	bc,0
-ShiftCopyAmount = $ - 3
+ShiftCopyAmount = $-3
 	ex	de,hl
 	ld	hl,0
-ShiftAmountOffset = $ - 3
+ShiftAmountOffset = $-3
 	add	hl,de
 	ldir
-ShiftCopyDirection = $ - 2
+ShiftCopyDirection = $-2
 	ld	hl,0
-ShiftLineOff = $ - 3
+ShiftLineOff = $-3
 	add	hl,de
 	inc	a
 	jr	nz,.loop
@@ -1939,17 +1936,17 @@ gfx_ScaledTransparentSprite_NoClip:
 	ld	ixh,a			; ixh = height
 .loop:
 	ld	ixl,0			; ixl = height scale
-.heightscale = $ - 1
+.heightscale := $-1
 .loopheight:
 	push	hl
 	ld	c,0
-.width = $ - 1
+.width := $-1
 .loopwidth:
 	ld	b,0
-.widthscale = $ - 1
+.widthscale := $-1
 	ld	a,(hl)			; get sprite pixel
 	cp	a,TRASPARENT_COLOR
-TransparentColor_2 = $ - 1
+TransparentColor_2 := $-1
 	jr	nz,.next		; is transparent?
 .skip:
 	inc	de
@@ -1967,7 +1964,7 @@ TransparentColor_2 = $ - 1
 	ld	iy,0
 	add	iy,de			; save hl
 	ld	bc,0
-.amount = $ - 3
+.amount := $-3
 	add	hl,bc			; get next draw location
 	ex	de,hl
 	pop	hl
@@ -2009,14 +2006,14 @@ gfx_TransparentSprite:
 	push	ix
 	ld	ixh,a
 	ld	a,TRASPARENT_COLOR
-TransparentColor_1 = $ - 1
+TransparentColor_1 := $-1
 .loop:
 	ld	c,0
-.next = $ - 1
+.next := $-1
 	lea	de,iy
 	call	_TransparentPlot	; call the transparent routine
 	ld	c,0
-.amount = $ - 1
+.amount := $-1
 	add	hl,bc
 	ld	de,LcdWidth		; move to next row
 	add	iy,de
@@ -2101,13 +2098,13 @@ gfx_Sprite:
 	ld	bc,0
 .loop:
 	ld	c,0
-.next = $ - 1
+.next := $-1
 	lea	de,iy
 	ldir
 	ld	de,LcdWidth
 	add	iy,de
 	ld	c,0
-.amount = $ - 1
+.amount := $-1
 	add	hl,bc			; move to next line
 	dec	a
 	jr	nz,.loop
@@ -2161,7 +2158,7 @@ gfx_Sprite_NoClip:
 	ldir
 	dec	a
 	jr	nz,.loop
-.step = $ - 1
+.step := $-1
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2205,10 +2202,10 @@ gfx_GetSprite:
 	inc	de
 .loop:
 	ld	bc,0
-.amount = $ - 3
+.amount := $-3
 	ldir				; copy the data into the struct data
 	ld	bc,0
-.offset = $ - 3
+.offset := $-3
 	add	hl,bc
 	dec	a
 	jr	nz,.loop
@@ -2245,10 +2242,10 @@ gfx_TransparentSprite_NoClip:
 	ld	ixh,a			; ixh = height of sprite
 	ld	b,0			; zero mid byte
 	ld	a,TRASPARENT_COLOR
-TransparentColor_3 = $ - 1
+TransparentColor_3 := $-1
 .loop:
 	ld	c,0
-.next =$-1
+.next := $-1
 	lea	de,iy
 	call	_TransparentPlot	; call the plotter
 	ld	de,LcdWidth
@@ -2369,7 +2366,7 @@ _ClipCoordinates:
 	or	a,a
 	ret	z			; quit if new tmpHeight is 0 (edge case)
 	ld	a,0
-.width = $ - 1
+.width := $-1
 	ld	de,(ix+6)		; de = x coordinate
 	ld	l,c			; l = y coordinate
 	sub	a,(iy+0)		; compute new x width
@@ -2510,11 +2507,11 @@ _Tilemap:
 	ld	(ix-12),hl
 	jp	.yloop
 
-.xres =  $ + 3
+.xres := $+3
 .loop:
 	ld	(ix-1),0
 	ld	hl,0
-.xoffset = $ - 3
+.xoffset := $-3
 	ld	(ix-7),hl
 	ld	l,(iy+t_width)
 	ld	h,(ix-4)
@@ -2530,7 +2527,7 @@ _Tilemap:
 	ld	bc,(iy+t_data)		; iy -> tilemap data
 	add	hl,bc
 	ld	bc,0
-.ynext = $ - 3
+.ynext := $-3
 	add	hl,bc
 	ld	a,(hl)
 	ld	l,a
@@ -2547,7 +2544,7 @@ _Tilemap:
 	ld	bc,(hl)
 	push	bc
 	call	0			; call sprite drawing routine
-.tilemethod = $ - 3
+.tilemethod := $-3
 	lea	hl,ix-12
 	ld	sp,hl
 .blanktile:
@@ -2799,7 +2796,7 @@ gfx_PrintStringXY:
 ; Returns:
 ;  None
 	jp	_PrintStringXY
-__PrintStringXY = $ - 3
+__PrintStringXY = $-3
 _PrintStringXY:
 	ld	hl,9
 	add	hl,sp
@@ -2831,7 +2828,7 @@ _DrawCharacters:
 	or	a,a
 	ret	z
 	call	_PrintChar
-PrintChar_3 = $ - 3
+PrintChar_3 = $-3
 	inc	hl			; move to the next one
 	jr	_DrawCharacters
 
@@ -2868,7 +2865,7 @@ gfx_SetTextScale:
 	ret	z			; null check
 	ld	(_TextHeightScale),a
 	ld	(hl),0			; modified at boot to SM the jump
-UseLargeFont = $ - 1
+UseLargeFont := $-1
 	ret
 .bothone:
 	ld	(hl),a			; store a 0, which means no (literal) jump
@@ -2929,13 +2926,13 @@ gfx_PrintChar:
 	push	hl
 	ld	a,e			; a = char
 	jp	_PrintChar		; this is SMC'd to use as a grappling hook into the clipped version
-PrintChar_0 = $ - 3
+PrintChar_0 := $-3
 _PrintChar:
 	push	ix			; save stack pointer
 	push	hl			; save hl pointer if string
 	ld	e,a			; e = char
 	ld	a,0
-_TextFixedWidth = $ - 1
+_TextFixedWidth = $-1
 	or	a,a
 	jr	nz,.fixed
 	sbc	hl,hl
@@ -2945,7 +2942,7 @@ _TextFixedWidth = $ - 1
 	ld	a,(hl)			; a = char width
 .fixed:
 	ld	bc,0
-_TextXPos = $ - 3
+_TextXPos := $-3
 	sbc	hl,hl
 	ld	l,a
 	ld	ixh,a			; ixh = char width
@@ -2955,7 +2952,7 @@ _TextXPos = $ - 3
 	add	hl,bc
 	ld	(_TextXPos),hl
 	ld	hl,0
-_TextYPos = $ - 3
+_TextYPos := $-3
 	ld	h,LcdWidth/2
 	mlt	hl
 	add	hl,hl
@@ -2972,10 +2969,10 @@ _TextYPos = $ - 3
 	ld	bc,(_TextData)		; get text data array
 	add	hl,bc
 	ld	iy,0
-_TextHeight_3 =$+2
+_TextHeight_3 := $+2
 	ld	ixl,8
 	jr	_PrintLargeFont		; SMC the jump
-_LargeFontJump = $ - 1
+_LargeFontJump := $-1
 .loop:
 	ld	c,(hl)			; c = 8 pixels
 	add	iy,de			; get draw location
@@ -2983,14 +2980,14 @@ _LargeFontJump = $ - 1
 	ld	b,ixh
 .nextpixel:
 	ld	a,TEXT_BG_COLOR
-_TextBGColor_1 =$-1
+_TextBGColor_1 := $-1
 	rlc	c
 	jr	nc,.bgcolor
 	ld	a,TEXT_FG_COLOR
-_TextFGColor_1 =$-1
+_TextFGColor_1 := $-1
 .bgcolor:
 	cp	a,TEXT_TP_COLOR		; check if transparent
-_TextTPColor_1 =$-1
+_TextTPColor_1 := $-1
 	jr	z,.transparent
 	ld	(de),a
 .transparent:
@@ -3012,7 +3009,7 @@ _PrintLargeFont:
 ;  None
 .loop:
 	ld	b,1
-_TextHeightScale = $ - 1
+_TextHeightScale := $-1
 	push	hl
 	ld	c,(hl)			; c = 8 pixels
 .hscale:
@@ -3022,16 +3019,16 @@ _TextHeightScale = $ - 1
 	ld	b,ixh
 .inner:
 	ld	a,TEXT_BG_COLOR
-_TextBGColor_3 = $ - 1
+_TextBGColor_3 := $-1
 	ld	l,1
-_TextWidthScale = $ - 1
+_TextWidthScale := $-1
 	rlc	c
 	jr	nc,.bgcolor
 	ld	a,TEXT_FG_COLOR
-_TextFGColor_3 = $ - 1
+_TextFGColor_3 := $-1
 .bgcolor:
 	cp	a,TEXT_TP_COLOR		; check if transparent
-_TextTPColor_2 = $ - 1
+_TextTPColor_2 := $-1
 	jr	z,.fgcolor
 
 .wscale0:
@@ -3091,7 +3088,7 @@ _PrintChar_Clip:
 	ld	bc,(_TextData)		; get text data array
 	add	hl,bc			; de = draw location
 	ld	de,_TmpCharData		; store pixel data into temporary sprite
-_TextHeight_2 = $ + 2
+_TextHeight_2 := $+2
 	ld	iyl,8
 	ld	iyh,a			; ixh = char width
 	ld	(_TmpCharSprite),a	; store width of character we are drawing
@@ -3137,7 +3134,7 @@ _PrintUInt:
 	rla
 	ld	(.offset),a		; select the jump we need
 	jr	$
-.offset = $ - 1
+.offset = $-1
 	ld	bc,-10000000
 	call	.num1
 	ld	bc,-1000000
@@ -3161,7 +3158,7 @@ _PrintUInt:
 	jr	c,.num2
 	sbc	hl,bc
 	jp	_PrintChar		; print the character needed
-PrintChar_1 = $ - 3
+PrintChar_1 := $-3
 
 ;-------------------------------------------------------------------------------
 gfx_PrintInt:
@@ -3185,7 +3182,7 @@ gfx_PrintInt:
 	sbc	hl,bc
 	ld	a,'-'
 	call	_PrintChar		; place negative symbol
-PrintChar_2 = $ - 3
+PrintChar_2 := $-3
 	pop	bc
 .positive:
 	jp	_PrintUInt		; handle integer
@@ -3277,7 +3274,7 @@ gfx_GetSpriteChar:
 	ld	de,_TmpCharSprite
 	ex	de,hl
 	push	hl			; save pointer to sprite
-_TextHeight_1 =$+2
+_TextHeight_1 := $+2
 	ld	a,8
 	ld	iyh,a			; ixh = char width
 	ld	(hl),a			; store width of character we are drawing
@@ -3303,14 +3300,14 @@ _GetChar:
 	ld	b,iyh
 .nextpixel:
 	ld	a,TEXT_BG_COLOR
-_TextBGColor_2 = $ - 1
+_TextBGColor_2 := $-1
 	rlc	c
 	jr	nc,.bgcolor
 	ld	a,TEXT_FG_COLOR
-_TextFGColor_2 = $ - 1
+_TextFGColor_2 := $-1
 .bgcolor:
 	cp	a,TEXT_TP_COLOR		; check if transparent
-_TextTPColor_3 = $ - 1
+_TextTPColor_3 := $-1
 	jr	z,.transparent
 	ld	(de),a
 	inc	de
@@ -3321,7 +3318,7 @@ _TextTPColor_3 = $ - 1
 	ret
 .transparent:
 	ld	a,0
-TransparentColor_4 = $ - 1
+TransparentColor_4 := $-1
 	ld	(de),a
 	inc	de			; move to next pixel
 	djnz	.nextpixel
@@ -3547,7 +3544,7 @@ _FillTriangle:
 	push	de
 	push	bc
 	call	0
-.line0 = $ - 3
+.line0 = $-3
 	ld	sp,ix
 	pop	ix
 	ret
@@ -3626,7 +3623,7 @@ _FillTriangle:
 	push	bc
 	push	de
 	call	0
-.line1 = $ - 3
+.line1 := $-3
 	lea	hl,ix-39
 	ld	sp,hl
 	ld	bc,(ix-12)
@@ -3699,7 +3696,7 @@ _FillTriangle:
 	push	bc
 	push	de
 	call	0
-.line2 = $ - 3
+.line2 := $-3
 	lea	hl,ix-39
 	ld	sp,hl
 	ld	bc,(ix-12)
@@ -3760,7 +3757,7 @@ _Polygon:
 	ld	bc,(iy+0)
 	push	bc
 	call	0
-.line0 = $ - 3
+.line0 := $-3
 	pop	bc
 	pop	bc
 	pop	bc
@@ -3785,7 +3782,7 @@ _Polygon:
 	ld	bc,(iy+0)
 	push	bc
 	call	0
-.line1 = $ - 3
+.line1 := $-3
 	ld	sp,ix
 	pop	ix
 	ret
@@ -3937,7 +3934,7 @@ gfx_FlipSpriteY:
 	ex	(sp),ix			; restore stack frame
 .loop:
 	ld	b,0
-.width = $ - 1
+.width := $-1
 	ld	c,a
 .pixelloop:
 	dec	hl
@@ -3947,7 +3944,7 @@ gfx_FlipSpriteY:
 	djnz	.pixelloop
 	ld	a,c
 	ld	bc,0
-.delta = $ - 3
+.delta := $-3
 	add	hl,bc
 	dec	a
 	jr	nz,.loop
@@ -3985,10 +3982,10 @@ gfx_FlipSpriteX:
 	push	ix
 .loop:
 	ld	bc,0
-.width = $ - 3
+.width := $-3
 	ldir
 	ld	bc,-1
-.delta = $ - 3
+.delta := $-3
 	add	hl,bc
 	add	hl,bc
 	dec	a
@@ -4023,7 +4020,7 @@ gfx_RotateSpriteC:
 	push	ix
 .outer:
 	ld	b,0
-.width = $ - 1
+.width := $-1
 	lea	ix,iy
 .inner:
 	ld	a,(hl)
@@ -4069,7 +4066,7 @@ gfx_RotateSpriteCC:
 	push	ix
 .outer:
 	ld	b,0
-.width = $ - 1
+.width := $-1
 	lea	ix,iy
 .inner:
 	ld	a,(hl)
@@ -4173,12 +4170,12 @@ gfx_ScaleSprite:
 ; de = target buffer adress
 .outer:
 	push	hl
-ScaleWidth = $ + 2
+ScaleWidth := $+2
 	ld	iyh, 0
 	xor	a,a
 	ld	b,a
 	ld	c,0
-du = $ - 1
+du := $-1
 .loop:	ldi
 	add	a,iyl
 	adc	hl,bc			; xu += du
@@ -4187,13 +4184,13 @@ du = $ - 1
 	jr	nz,.loop
 	pop	hl			; add up to hla
 	ld	bc,0			; dv<<16
-dv_shl_16 = $ - 1
+dv_shl_16 := $-1
 	add	iy,bc
 	ld	bc,0			; dv>>8*src_width
-dv_shr_8_times_width = $ - 3
+dv_shr_8_times_width := $-3
 	jr	nc,.skip
 	ld	bc,0			; dv>>8*src_width+src_width
-dv_shr_8_times_width_plus_width = $ - 3
+dv_shr_8_times_width_plus_width := $-3
 .skip:
 	add	hl,bc
 	inc	ixl
@@ -4360,22 +4357,22 @@ _RotatedScaledSprite:
 
 	; xs = (dxs + dyc) + (size * 128);
 	ld	bc,0
-.dsrs_dyc_0 = $ - 3
+.dsrs_dyc_0 := $-3
 	add	hl,bc
 	ld	bc,0
-.dsrs_size128_0 = $ - 3
+.dsrs_size128_0 := $-3
 	add	hl,bc
 	ex	de,hl			; de = (dxs + dyc) + (size * 128)
 	; ys = (dxc - dys) + (size * 128);
 	ld	bc,0
-.dsrs_dys_0 = $ - 3
+.dsrs_dys_0 := $-3
 	or	a,a
 	sbc	hl,bc
 	ld	bc,0
-.dsrs_size128_1 = $ - 3
+.dsrs_size128_1 := $-3
 	add	hl,bc			; hl = (dxc - dys) + (size * 128)
 
-.dsrs_size_1 = $ + 2			; smc = size * scale / 64
+.dsrs_size_1 := $+2			; smc = size * scale / 64
 	ld	iyl,0
 .inner:
 	push	hl			; xs
@@ -4385,7 +4382,7 @@ _RotatedScaledSprite:
 	rlca
 	jr	c,.skip
 	ld	a,0
-.dsrs_ssize_0 = $ - 1
+.dsrs_ssize_0 := $-1
 	cp	a,d
 	jr	c,.skip
 	cp	a,h
@@ -4393,46 +4390,46 @@ _RotatedScaledSprite:
 
 	; get pixel and draw to buffer
 	ld	c,0
-.dsrs_ssize_1 = $ - 1
+.dsrs_ssize_1 := $-1
 	ld	b,h
 	mlt	bc
 	sbc	hl,hl
 	ld	l,d
 	add	hl,bc			; y * size + x
 	ld	bc,0
-.dsrs_sprptr_0 = $ - 3
+.dsrs_sprptr_0 := $-3
 	add	hl,bc
 	ld	a,(hl)
 	cp	a,TRASPARENT_COLOR
-TransparentColor_6 =$-1
+TransparentColor_6 := $-1
 	jr	z,$+5
-.rotatescale = $ - 1
+.rotatescale := $-1
 	ld	(ix),a			; write pixel
 .skip:
 	inc	ix			; x++s
 	ld	hl,0			; smc = cosf
-.dsrs_cosf_0 = $ - 3
+.dsrs_cosf_0 := $-3
 	add	hl,de			; xs += cosf
 	ex	de,hl
 	pop	hl			; ys
 	ld	bc,0			; smc = -sinf
-.dsrs_sinf_0 = $ - 3
+.dsrs_sinf_0 := $-3
 	add	hl,bc			; ys += -sinf
 	dec	iyl
 	jr	nz,.inner		 ; x loop
 
 	pop	hl			; dxc
 	ld	bc,0			; smc = cosf
-.dsrs_cosf_1 = $ - 3
+.dsrs_cosf_1 := $-3
 	add	hl,bc			; dxc += cosf
 	ex	de,hl
 	pop	hl			; dxs
 	ld	bc,0			; smc = sinf
-.dsrs_sinf_1 = $ - 3
+.dsrs_sinf_1 := $-3
 	add	hl,bc			; dxs += sinf
 
 	ld	bc,0
-.line_add = $ - 3
+.line_add := $-3
 	add	ix,bc			; y++
 
 	dec	iyh
@@ -4592,7 +4589,7 @@ _xloop:
 	or	a,h
 	rlca
 	ld	c,TRASPARENT_COLOR
-TransparentColor_7 = $ - 1
+TransparentColor_7 := $-1
 	jr	c,drawSpriteRotateScale_SkipPixel
 _smcdsrs_ssize_0:
 	ld	a,0
@@ -4797,14 +4794,14 @@ gfx_FloodFill:
 	add	hl,de
 	add	hl,de
 	ld	de,0
-.xmin = $ - 3
+.xmin = $-3
 	ld	a,0
-.oldcolor0 = $ - 1
+.oldcolor0 = $-1
 
 	jr	.begin
 .forloop0:				; for (x=x1; !(x & 0x8000) && x>=xmin && p(x, y) == ov; x--) { s(x, y); }
 	ld	(hl),0
-.newcolor0 = $ - 1
+.newcolor0 = $-1
 	dec	hl
 	dec	bc
 .begin:
@@ -4875,11 +4872,11 @@ gfx_FloodFill:
 					; do {
 .forloop1start:
 	ld	hl,0
-.xmax = $ - 3
+.xmax = $-3
 	jr	.atov			; for (; (unsigned)x<=xmax && p(x, y) == ov; x++) { s(x, y); }
 .forloop1:
 	ld	a,0
-.newcolor1 = $ - 1
+.newcolor1 = $-1
 	ld	(de),a
 	inc	de
 	inc	bc
@@ -4890,7 +4887,7 @@ gfx_FloodFill:
 	add	hl,bc
 	ld	a,(de)
 	cp	a,0
-.oldcolor1 = $ - 1
+.oldcolor1 = $-1
 	jr	z,.forloop1
 
 .ovat:
@@ -4979,7 +4976,7 @@ gfx_FloodFill:
 	jr	c,.done
 	ld	a,(de)
 	cp	a,0
-.oldcolor2 = $ - 1
+.oldcolor2 = $-1
 	jr	nz,.forloop2
 
 .done:
@@ -4990,7 +4987,7 @@ gfx_FloodFill:
 	jp	nc,.forloop1start	; } while ((unsigned)x<=x2);
 
 	ld	hl,0
-.stack = $ - 3
+.stack = $-3
 	lea	de,iy
 	or	a,a
 	sbc	hl,de
@@ -5022,10 +5019,10 @@ gfx_RLETSprite:
 	ret	m			; m ==> ymax < y || y ~ int_min ==> fully off-screen
 	ret	z			; z ==> ymax == y ==> fully off-screen
 	sbc	hl,bc			; hl = ymax-y-height = -(height off-screen)
-	jr	nc,.skipbottomclip	; nc ==> height-off-screen <= 0 ==> fully on-screen
+	jr	nc,_RLETSprite_SkipClipBottom ; nc ==> height-off-screen <= 0 ==> fully on-screen
 	add	hl,bc			; hl = ymax-y = height on-screen
 	ld	c,l			; bc = height on-screen
-.skipbottomclip:
+_RLETSprite_SkipClipBottom:
 ; ymax-y did not overflow ==> y-ymin will not overflow
 ; Clip top
 	ld	hl,(_YMin)		; hl = ymin
@@ -5033,7 +5030,7 @@ gfx_RLETSprite:
 					; hl = y
 	xor	a,a
 	sbc	hl,de			; hl = y-ymin
-	jp	p,.skiptopclip		 ; p ==> y >= ymin ==> fully on-screen
+	jp	p,_RLETSprite_SkipClipTop ; p ==> y >= ymin ==> fully on-screen
 	add	hl,bc			; hl = y-ymin+height = height on-screen
 	ret	nc			; nc ==> height on-screen < 0 ==> fully off-screen
 	ld	a,l			; a = height on-screen
@@ -5044,8 +5041,8 @@ gfx_RLETSprite:
 	ld	b,a			; b = height off-screen
 	ld	c,l			; c = height on-screen
 	sbc	hl,hl			; y = ymin (after add hl,de)
-.skiptopclip:
-	ld	(.heights),bc
+_RLETSprite_SkipClipTop:
+	ld	(_RLETSprite_Heights_SMC),bc
 	add	hl,de			; hl = y (clipped)
 	ld	(iy+9),l		; write back clipped y
 ; de = ymin => d = deu = 0
@@ -5056,7 +5053,7 @@ gfx_RLETSprite:
 	ld	bc,(_XMin)		; bc = xmin
 	sbc	hl,bc			; hl = x-xmin
 	ret	pe			; v ==> x ~ int_min ==> fully off-screen
-	jp	p,.skipleftclip 	; p ==> x >= xmin ==> fully on-screen
+	jp	p,_RLETSprite_SkipClipLeft ; p ==> x >= xmin ==> fully on-screen
 	add	hl,de			; hl = x-xmin+width = width on-screen
 	ret	nc			; nc ==> width on-screen < 0 ==> fully off-screen
 	ld	a,l			; a = width on-screen
@@ -5069,7 +5066,7 @@ gfx_RLETSprite:
 	ld	(_RLETSprite_ClipLeft_Width_SMC),a
 	inc	d			; d[0] = 1
 	sbc	hl,hl			; x = xmin (after add hl,bc)
-.skipleftclip:
+_RLETSprite_SkipClipLeft:
 ; x >= xmin ==> x >= 0
 ; Clip right
 	add	hl,bc			; hl = x (clipped)
@@ -5081,23 +5078,23 @@ gfx_RLETSprite:
 	ld	d,0			; de = width
 	add	hl,de			; hl = x-xmax+width = width off-screen
 	ld	d,a			; d[0] = clip left?
-	jr	nc,.skiprightclip ; nc ==> width off-screen < 0 ==> fully on-screen
+	jr	nc,_RLETSprite_SkipClipRight ; nc ==> width off-screen < 0 ==> fully on-screen
 	ld	a,l			; a = width off-screen
 	or	a,a
-	jr	z,.skiprightclip 	; z ==> width off-screen == 0 ==> fully on-screen
+	jr	z,_RLETSprite_SkipClipRight ; z ==> width off-screen == 0 ==> fully on-screen
 	ld	(_RLETSprite_ExitRight_Opaque_Width_SMC),a
 	ld	(_RLETSprite_ExitRight_Trans_Width_SMC),a
 	ld	a,e			; a = width
 	sub	a,l			; a = width - width off-screen = width on-screen
 	ld	e,a			; e = width on-screen
 	set	1,d			; d[1] = 1
-.skiprightclip:
+_RLETSprite_SkipClipRight:
 ; Calculate the pointer to the top-left corner of the sprite in the buffer
 	ld	hl,(CurrentBuffer)
 	ld	bc,(iy+6)		; bc = x (clipped)
 	add	hl,bc
 	ld	c,(iy+9)		; c = y (clipped)
-	ld	b,LcdWidth/2
+	ld	b,lcdWidth/2
 	mlt	bc			; bc = y*160
 	add	hl,bc
 	add	hl,bc
@@ -5105,7 +5102,7 @@ gfx_RLETSprite:
 	push	hl			; (sp) = top-left corner of sprite in buffer
 	push	de			;   (sp) = (x clip bits)<<8|(width on-screen)
 	ld	bc,0			; b = height off-screen (top), c = height on-screen
-.heights = $ - 3
+_RLETSprite_Heights_SMC = $-3
 	ld	d,c
 	push	de			;     (sp) = (height on-screen)<<8|(width on-screen)
 	ld	hl,(iy+3)		; hl = sprite struct
@@ -5115,23 +5112,23 @@ gfx_RLETSprite:
 	xor	a,a			; a = 0
 	ld	d,a			; d = deu = 0
 	or	a,b			; a = height off-screen
-	jr	z,.cliptopend ; z => height off-screen == 0
-.cliptoprow:
+	jr	z,_RLETSprite_ClipTop_End ; z => height off-screen == 0
+_RLETSprite_ClipTop_Row:
 	ld	a,c			; a = width
-.cliptoptrans:
+_RLETSprite_ClipTop_Trans:
 	sub	a,(hl)			; a = width remaining after trans run
 	inc	hl
-	jr	z,.cliptoprowend 	; z ==> width remaining == 0
-.cliptopopaque:
+	jr	z,_RLETSprite_ClipTop_RowEnd ; z ==> width remaining == 0
+_RLETSprite_ClipTop_Opaque:
 	ld	e,(hl)			; de = opaque run length
 	inc	hl
 	sub	a,e			; a = width remaining after opaque run
 	add	hl,de			; skip opaque run
-	jr	nz,.cliptoptrans	 ; nz ==> width remaining != 0
-.cliptoprowend:
-	djnz	.cliptoprow		; decrement height remaining off-screen,
+	jr	nz,_RLETSprite_ClipTop_Trans ; nz ==> width remaining != 0
+_RLETSprite_ClipTop_RowEnd:
+	djnz	_RLETSprite_ClipTop_Row	; decrement height remaining off-screen,
 					; nz => still off-screen
-.cliptopend:		; a = 0, hl = start of (clipped) sprite data
+_RLETSprite_ClipTop_End:		; a = 0, hl = start of (clipped) sprite data
 ; Do stuff
 	pop	iy			;     iyh = height on-screen, iyl = width on-screen
 	pop	bc			;   bcu = 0, b = x clip bits
@@ -5141,15 +5138,15 @@ gfx_RLETSprite:
 	ld	a,iyl			; a = width on-screen
 	jp	z,_RLETSprite_NoClip_Begin
 	cpl				; a = 255-(width on-screen)
-	add	a,LcdWidth-255		; a = (LcdWidth-(width on-screen))&0FFh
-	rra				; a = (LcdWidth-(width on-screen))/2
+	add	a,lcdWidth-255		; a = (lcdWidth-(width on-screen))&0FFh
+	rra				; a = (lcdWidth-(width on-screen))/2
 	dec	b
 	jr	z,_RLETSprite_ClipLeftMiddle
 	ld	(_RLETSprite_ClipRight_HalfRowDelta_SMC),a
 	sbc	a,a
 	djnz	_RLETSprite_ClipLeftMiddleClipRight
-.middleclipright:
-	sub	a,s8(_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_Middle_Row_WidthEven)
+_RLETSprite_MiddleClipRight:
+	sub	a,_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_Middle_Row_WidthEven
 	ld	(_RLETSprite_ClipRight_LoopJr_SMC),a
 _RLETSprite_Middle_Row_WidthOdd:
 	inc	de			; increment buffer pointer
@@ -5207,7 +5204,7 @@ _RLETSprite_ClipRight_OpaqueSkip:
 	jr	nz,_RLETSprite_ClipRight_Trans ; nz ==> width remaining off-screen != 0
 _RLETSprite_ClipRight_RowEnd:
 	ex	de,hl			; de = sprite, hl = buffer
-	ld	c,0			; c = (LcdWidth-(width on-screen))/2
+	ld	c,0			; c = (lcdWidth-(width on-screen))/2
 _RLETSprite_ClipRight_HalfRowDelta_SMC = $-1
 	add	hl,bc			; advance buffer to next row
 	add	hl,bc
@@ -5219,19 +5216,19 @@ _RLETSprite_ClipRight_LoopJr_SMC = $-1
 
 _RLETSprite_ClipLeftMiddleClipRight:
 	dec	b			; b = 0
-	sub	a,s8(_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven)
+	sub	a,_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven
 	ld	(_RLETSprite_ClipRight_LoopJr_SMC),a
-	ld	a,s8(_RLETSprite_Middle_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1))
-	ld	c,s8(_RLETSprite_Middle_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1))
+	ld	a,_RLETSprite_Middle_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1)
+	ld	c,_RLETSprite_Middle_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1)
 	jr	_RLETSprite_ClipLeftMiddle_DoSMC
 
 _RLETSprite_ClipLeftMiddle:
 	ld	(_RLETSprite_NoClip_HalfRowDelta_SMC),a
 	sbc	a,a
-	sub	a,s8(_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven)
+	sub	a,_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven
 	ld	(_RLETSprite_NoClip_LoopJr_SMC),a
-	ld	a,s8(_RLETSprite_NoClip_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1))
-	ld	c,s8(_RLETSprite_NoClip_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1))
+	ld	a,_RLETSprite_NoClip_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1)
+	ld	c,_RLETSprite_NoClip_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1)
 _RLETSprite_ClipLeftMiddle_DoSMC:
 	ld	(_RLETSprite_EnterLeft_Opaque_Jr_SMC),a
 	ld	a,c
@@ -5289,7 +5286,7 @@ gfx_RLETSprite_NoClip:
 	ld	bc,(iy+6)		; bc = x
 	add	hl,bc
 	ld	c,(iy+9)		; c = y
-	ld	b,LcdWidth/2
+	ld	b,lcdWidth/2
 	mlt	bc			; bc = y*160
 	add	hl,bc
 	add	hl,bc
@@ -5306,11 +5303,11 @@ gfx_RLETSprite_NoClip:
 _RLETSprite_NoClip_Begin:
 ; Generate the code to advance the buffer pointer to the start of the next row.
 	cpl				; a = 255-width
-	add	a,LcdWidth-255		; a = (LcdWidth-width)&0FFh
-	rra				; a = (LcdWidth-width)/2
+	add	a,lcdWidth-255		; a = (lcdWidth-width)&0FFh
+	rra				; a = (lcdWidth-width)/2
 	ld	(_RLETSprite_NoClip_HalfRowDelta_SMC),a
 	sbc	a,a
-	sub	a,s8(_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_NoClip_Row_WidthEven)
+	sub	a,_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_NoClip_Row_WidthEven
 	ld	(_RLETSprite_NoClip_LoopJr_SMC),a
 ; Row loop (if sprite width is odd)
 _RLETSprite_NoClip_Row_WidthOdd:
@@ -5343,7 +5340,7 @@ _RLETSprite_NoClip_OpaqueCopy:
 ;; }
 _RLETSprite_NoClip_RowEnd:
 ;; Advance buffer pointer to the next row (minus one if width is odd).
-	ld	c,0			; c = (LcdWidth-width)/2
+	ld	c,0			; c = (lcdWidth-width)/2
 _RLETSprite_NoClip_HalfRowDelta_SMC = $-1
 	add	hl,bc			; advance buffer to next row
 	add	hl,bc
@@ -5668,10 +5665,11 @@ _Maximum:
 	or	a,a
 	sbc	hl,de
 	add	hl,de
-	jp	p,+_
+	jp	p,.skip
 	ret	pe
 	ex	de,hl
-_:	ret	po
+.skip:
+	ret	po
 	ex	de,hl
 	ret
 
@@ -5685,10 +5683,11 @@ _Minimum:
 	or	a,a
 	sbc	hl,de
 	ex	de,hl
-	jp	p,+_
+	jp	p,.skip
 	ret	pe
 	add	hl,de
-_:	ret	po
+.skip:
+	ret	po
 	add	hl,de
 	ret
 

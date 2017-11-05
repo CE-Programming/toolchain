@@ -24,7 +24,7 @@ CP          =cp
 PREFIX     ?=$(HOME)
 endif
 
-SRC        +=$(NAME).src
+SRC        +=$(NAME).asm
 DEV        ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
 BIN        ?=$(call NATIVEPATH,$(DEV)/bin)
 
