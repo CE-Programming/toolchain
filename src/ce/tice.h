@@ -1947,7 +1947,7 @@ typedef enum {
 #define sk_Cos              0x1E
 #define sk_Prgm             0x1F
 #define sk_Stat             0x20
-#define sk_Chs              0x10
+#define sk_Chs              0x11
 #define sk_RParen           0x15
 #define sk_Tan              0x16
 #define sk_Vars             0x17

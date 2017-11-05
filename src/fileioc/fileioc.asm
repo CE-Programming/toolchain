@@ -389,7 +389,7 @@ _Open:
 	jp	z,_ReturnNull_IX
 	or	a,a
 	sbc	hl,hl
-varTypeOpen = $ + 1
+varTypeOpen := $+1
 	ld	a,0
 	ld	iy,flags
 	call	_CreateVar
@@ -523,7 +523,7 @@ NoCoreNeeded:
 	call	_GetSlotCurrentDataPtr
 	ex	de,hl
 	ld	hl,(iy+3)
-CopySize_SMC =$+1
+CopySize_SMC := $+1
 	ld	bc,0
 	push	bc
 	ldir
@@ -869,7 +869,7 @@ ti_Detect:
 ;  arg1 : pointer to null terminated string of data to search for
 	ld	a,appVarObj
 _Detect:
-	ld	(DetectType_SMC),a
+	ld	(_DetectType),a
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -906,7 +906,7 @@ _Detect:
 .fcontinue:
 	push	hl
 	ld	a,(hl)
-DetectType_SMC = $ + 1
+_DetectType := $+1
 	cp	a,appVarObj
 	jr	nz,.fskip
 .fgoodtype:
@@ -988,7 +988,7 @@ ti_GetTokenString:
 	ld	iy,0
 	add	iy,sp
 	ld	a,1
-	ld	(TokLen_SMC),a
+	ld	(_TokenLength),a
 	ld	hl,(iy+3)
 	ld	hl,(hl)
 	push	hl
@@ -997,7 +997,7 @@ ti_GetTokenString:
 	ex	de,hl
 	jr	nz,.not2byte
 	inc	de
-	ld	hl,TokLen_SMC
+	ld	hl,_TokenLength
 	inc	(hl)
 .not2byte:
 	inc	de
@@ -1020,7 +1020,7 @@ ti_GetTokenString:
 	or	a,a
 	sbc	hl,bc
 	jr	z,.skipstore
-TokLen_SMC = $ + 1
+_TokenLength := $+1
 	ld	(hl),1
 .skipstore:
 	ld	hl,OP3
@@ -1099,12 +1099,14 @@ ti_StoVar:
 	jr	z,_iscr
 	cp	a,0Ch				; if a cplx we have to look up the varaible
 	jr	nz,_notcr
-_iscr:	call	_FindSym
+_iscr:
+	call	_FindSym
 	jp	c,_notcr			; just fill it with zero
 	and	a,03Fh
 	ex	de,hl
 	call	_Mov9OP1OP2
-_notcr:	call	_PushOP1
+_notcr:
+	call	_PushOP1
 	ld	hl,(iy+6)			; pointer to var string
 	ld	a,(iy+3)
 	call	_SetVarStr

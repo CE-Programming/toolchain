@@ -14,6 +14,7 @@ NATIVEPATH =$(subst \,/,$(1))
 RM         =rm -f
 CP         =cp
 PREFIX    ?=$(HOME)
+ADDEXE     =chmod +x fasmg
 endif
 
 DEV ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
@@ -25,6 +26,7 @@ INCDIR :=$(call NATIVEPATH,../../src/include/)
 FILES :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
 
 all: $(FILES)
+	$(ADDEXE)
 
 $(FILES):
 	$(CP) $(call NATIVEPATH,fasmg-ez80/$(@F)) $(INCDIR)$(@F)
