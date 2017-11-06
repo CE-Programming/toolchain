@@ -20,7 +20,7 @@ BIN       ?= $(CEDEV)/bin
 CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
 endif
 
-CCFLGS    := -nodebug -nogenprint -nokeeplst -keepasm -promote -quiet -fplib -optsize -cpu:EZ80F91 -stdinc:.. -define:_EZ80F91 -asmsw:"-cpu:EZ80F91 -nogenobj"
+CCFLGS    := -noasm -nodebug -nogenprint -nokeeplst -keepasm -promote -quiet -fplib -optsize -cpu:EZ80F91 -stdinc:.. -define:_EZ80F91 -define:_EZ80
 
 EZC       := $(wildcard *.c)
 EZSRC     := $(EZC:%.c=%.src)
