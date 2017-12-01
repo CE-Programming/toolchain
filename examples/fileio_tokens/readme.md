@@ -6,5 +6,5 @@ This demo shows how to use the ti_GetDataPtr and ti_GetTokenString functions. It
 
 ---
 
-This demo is a part of the C SDK Toolcahin for use on the CE.
+This demo is a part of the C SDK Toolchain for use on the CE.
 
