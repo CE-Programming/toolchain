@@ -7,5 +7,5 @@ LibLoad is used because it is known to exist for demonstration.
 
 ---
 
-This demo is a part of the C SDK Toolcahin for use on the CE.
+This demo is a part of the C SDK Toolchain for use on the CE.
 
