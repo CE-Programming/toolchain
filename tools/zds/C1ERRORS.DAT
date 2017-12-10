@@ -1,7 +1,7 @@
 --
 --		Preprocessor error messages
 --
-45
+47
 Illegal constant expression in directive
 Concatenation at end-of-file.  Ignored
 Illegal token
@@ -47,10 +47,12 @@ Unmatched "#elif" found
 "#" preceeded by non whitespace character 
 Unterminated quoted character
 Empty file encountered
+Unbalanced pop of warning state
+Only compiler frontend warnings can be suppressed
 --
 --	Front-End error messages
 --
-125
+128
 Syntax error
 Function "%s" already declared
 Constant integer expression expected
@@ -176,6 +178,6 @@ Type defaults to int
 Statement has no effect
 Indirectly called function must be of reentrant type
 Conflicting string placement directive in string constant
-
-
-
+Interrupt routine cannot have arguments or return a value
+Cannot call an interrupt handler
+Objects with the SFR type qualifiers cannot be accessed through pointers, arrays, or as struct members
