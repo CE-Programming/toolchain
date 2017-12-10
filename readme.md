@@ -1,24 +1,24 @@
 # CE C Programming Toolchain/SDK -  [![Build Status](https://travis-ci.org/CE-Programming/toolchain.svg)](https://travis-ci.org/CE-Programming/toolchain)
 
-The CE C Software Development Kit incorporates a wide variety of tools and documentation in order to build programs in C natively for the TI-84+CE/TI-83PCE line of calculators.
+The CE C Software Development Kit incorporates a wide variety of tools and documentation in order to build programs in C natively for the TI-84 Plus CE / TI-83 Premium CE calculators series.
 
 ## Getting Started
 
-It is recommended that you grab the latest release from [here](https://github.com/CE-Programming/toolchain/releases/latest) if you are looking to get started. Feel free to also bookmark the [wiki pages](https://github.com/CE-Programming/toolchain/wiki), as they will become a helpful guide.
+It is recommended that you grab the latest release from [here](https://github.com/CE-Programming/toolchain/releases/latest) if you are looking to get started. Feel free to also bookmark the [wiki pages](https://github.com/CE-Programming/toolchain/wiki), as they will become quite helpful.
 
-Included you will find examples using the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These perform efficient and easy support for graphics, file I/O, keypad input, etc. Be sure to grab them if you plan to use them.
+Included you will find examples using the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These provide efficient and easy support for graphics, file I/O, keypad input, etc. Be sure to grab them if you plan to use them. The [header documentation](https://ce-programming.github.io/toolchain/files.html) will let you know about the available functions.
 
 ## Help
 
-You can join us on the IRC/EFNet server `#ez80-dev` if you have any questions. ([ask for help](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login))
+You can join us on the EFNet IRC server, on the `#ez80-dev` channel, if you have any questions ([webchat link](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login)).
 
 ## Building on linux and macOS
 
 These steps are only if you wish to help with development of the toolchain. 
 
-On linux and macOS, [wine](https://www.winehq.org) is required for building.
+On Linux and macOS, [wine](https://www.winehq.org) is required for building.
 
-Clone the repo: (Note the --recursive option)
+Clone the repo: (Note the `--recursive` option)
 
 ```
 git clone --recursive https://github.com/CE-Programming/toolchain.git
@@ -40,12 +40,12 @@ If you wish to view a list of available makefile rules, type: `make help`
 
 To build a release, use: `make dist`
 
-## Building on windows
+## Building on Windows
 
-If you are using Windows, [mingw](http://www.mingw.org) is required for building.
+If you are using Windows, [MinGW](http://www.mingw.org) is required for building.
 You will just need `mingw32-base` and `mingw32-gcc-g++`
 
-Clone the repo: (Note the --recursive option)
+Clone the repo: (Note the `--recursive` option)
 
 ```
 git clone --recursive https://github.com/CE-Programming/toolchain.git
@@ -67,5 +67,5 @@ If you wish to view a list of available makefile rules, type: `mingw32-make help
 
 To build a release, use: `mingw32-make dist`
 
-For releases, [nsis](https://sourceforge.net/projects/nsis/) is required for windows. Because of limitations of the current software; the special *Large strings* build is needed. You can find it [here](http://nsis.sourceforge.net/Special_Builds). Note also that you must configure your path variable to point to the nsis installation directory.
+For releases, [NSIS](https://sourceforge.net/projects/nsis/) is required for Windows. Because of limitations of the current software; the special *Large strings* build is needed. You can find it [here](http://nsis.sourceforge.net/Special_Builds). Note also that you must configure your path variable to point to the NSIS installation directory.
 
