@@ -1161,15 +1161,27 @@ gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprit
 gfx_sprite_t *gfx_GetSpriteChar(char c);
 
 /**
- * Sets the font
+ * Sets the font's character data
  *
  * Fonts can be created manually or and exported to a C-style format using 8x8 Pixel ROM Font Editor.
  * (https://www.min.at/prinz/o/software/pixelfont/#download)
  *
  * @param data Pointer to formated 8x8 pixel font
+ * @returns Pointer to previous font data
  * @note Format of font data is 8 bytes horizontally aligned.
  */
-void gfx_SetFontData(uint8_t *data);
+uint8_t *gfx_SetFontData(uint8_t *data);
+
+/**
+ * Sets the font data for a specific character
+ *
+ * @param index Character index to modify (if using default font, values range from 0-127, custom font can have indexes 0-255)
+ * @param data Pointer to formated 8x8 pixel font
+ * @returns Pointer to current character data if \p data is NULL, otherwise a pointer to next character data
+ * @note Format of font data is 8 bytes horizontally aligned.
+ * @see gfx_SetFontData
+ */
+uint8_t *gfx_SetCharData(uint8_t index, uint8_t *data);
 
 /**
  * Sets the font spacing

@@ -201,7 +201,7 @@ uint16_t ti_Tell(const ti_var_t slot);
  * Gets the size of a slot
  *
  * @param slot Slot to test
- * @returns The size of the slot variablee
+ * @returns The size of the slot variable
  */
 uint16_t ti_GetSize(const ti_var_t slot);
 
@@ -209,7 +209,8 @@ uint16_t ti_GetSize(const ti_var_t slot);
  * Resizes the slot variable
  *
  * @param slot Slot to resize
- * @param new_size New size of slot 
+ * @param new_size New size of slot
+ * @returns Resized size on success, 0 on failure, or -1 if the slot cannot be opened
  * @note The variable offset is set to the beginning of the file
  */
 int ti_Resize(size_t new_size, const ti_var_t slot);
