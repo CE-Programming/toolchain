@@ -1,21 +1,34 @@
 
-Zilog Developer Studio II - eZ80Acclaim! 5.3.0 (Build 17041303)
+Zilog Developer Studio II - eZ80Acclaim! 5.2.0 (Build 11121401)
 ==============================================================================
     Thank you for purchasing a Zilog eZ80Acclaim! development kit!
 
-    The technical documentation supplied  in  the installation is available in
-    PDF format.  This  format  requires  that  Acrobat Reader or equivalent be
-    installed on the host machine. 
+    The following features are provided in this release:
+        - Intelligent Editor
+        - eZ80Acclaim! language tools including C compiler, assembler,
+          linker/locator, and librarian
+        - Instruction Set Simulator and Disassembler
+        - Zilog Standard Library (ZSL)
+        - Zilog Real-Time Kernel (RZK)
+        - Zilog Full-Feature TCIP/IP Software suites(ZTP)
+        - In-Circuit Debugger and Flash programmer
+        - USB Smart Cable, Ethernet Smart Cable, ZPAK II, and eZ80Acclaim!
+          Serial Smart Cable support
 
-    In  the event of a component problem,  please  complete the Problem Report
-    Form and submit it with your request.  The form is located in the installa-
-    tion directory of your hard drive.  Our  staff will use the information to
-    diagnose or log the problem.
+    The technical documentation supplied on this CD-ROM is available in PDF
+    format. This format requires that Acrobat Reader or equivalent be
+    installed on the host machine.  Acrobat Reader is available on this
+    CD-ROM and is available free on the Adobe website at www.adobe.com.
+
+    In the event of a component problem, please complete the Problem Report
+    Form and submit it with your request.  The form is located on the CD and
+    in the installation directory of your hard drive.  Our staff will use the
+    information to diagnose or log the problem.
 
     Contact Information
     --------------------------------------------------------------------------
-      Zilog Inc. Web Site	: http://www.zilog.com
-      Technical Support Channel	: http://support.zilog.com
+      Zilog Inc. Web Site:  http://www.zilog.com
+      Technical Support Channel:  http://support.zilog.com
 
     Table of Contents
     --------------------------------------------------------------------------
@@ -30,59 +43,36 @@ Zilog Developer Studio II - eZ80Acclaim! 5.3.0 (Build 17041303)
 
 A. CHANGES FROM PREVIOUS RELEASE
 ==============================================================================
-    Refer  to  the 'Migrating from a Previous Release' section  of the FAQ for
-    information  and  pointers related  to  migrating/converting  existing ZDS
+    Refer to the 'Migrating from a Previous Release' section of the FAQ for
+    information and pointers related to migrating/converting existing ZDS
     projects and targets.
 
-    (to 5.3.0)
-    - Support has been added for Structured Assembly code.  This feature is 
-      described fully in the section Using the Macro Assembler > Structured
-      Assembly in the ZDS II Online Help.  Previously this feature was
-      undocumented and had numerous bugs, but now it has been tested and is
-      ready for use.
-    - An extended form of the #pragma asm directive has been added to more
-      easily support extended sections of embedded assembly code in C
-      programs.
-
-    - Updated RZK/ZTP to 2.5.0.
-      Please read RZK_ZTP_ReleaseNotes.txt for details
-    - Added a right-mouse click editor feature to block/unblock C comments.
-    - Added long filename support in generated makefile, linker command and 
-      library command files.
-    - Added hierarchical display of dependency include files below the source
-      file in the workspace window.
-    - Added register address display in the SFR window when a register is 
-      hovered.
-     -Added column sorting for symbol window.
-    
-    (to 5.2.1)
-
-    - Updated documentation
-    - Updated RZK/ZTP to 2.4.1.
-      Please read RZK_ZTP_ReleaseNotes.txt for details
-
     (to 5.2.0)
-    - A new option, "Pad Branch",  has been added  for  C code projects, which
-      greatly improves the ease of debugging.  When this option is selected in
-      a debug build,  breakpoint  operation  is  much  enhanced  over  earlier 
-      releases of ZDS II for Acclaim.
-
-      Processor pipeline  issues  that  formerly  caused unexpected failure to
-      break, or extremely slow performance when breakpoints were placed inside
-      loops, can  now  easily be avoided.  See  items  19  and  20 below under
-      Precautions and Limitations: Debugger and Programmer,and the ZDS II User
-      Manual, for more details.
-    - Added  external flash support  for Spansion Flash S29GL064N and ST Flash
-      M29W640FB70N6E
-    - Changed edit box display to list box  in the project->settings->linker->
-      additional objects and library page
-    - Numerous  Change  Requests  have  been  addressed.  Refer  to the Closed 
+    - A new option, "Pad Branch", has been added for C code projects, which greatly
+      improves the ease of debugging.  When this option is selected in a debug build,
+      breakpoint operation is much enhanced over earlier releases of ZDS II for Acclaim.
+      Processor pipeline issues that formerly caused unexpected failure to break, or
+      extremely slow performance when breakpoints were placed inside loops, can now
+      easily be avoided.  See items 19 and 20 below under Precautions and Limitations:
+      Debugger and Programmer, and the ZDS II User Manual, for more details.
+    - Added external flash support for Spansion Flash S29GL064N and ST Flash M29W640FB70N6E
+    - Changed edit box display to list box in the project->settings->linker->additional objects 
+      and library page
+    - Numerous Change Requests have been addressed.  Refer to the Closed 
       Change Requests section.
 
     (to 5.1.1)
-    - Change Request 13067, a crucial defect  affecting  the implementation of
-      some  switch-case statements in C code,  has been fixed.  This issue may
-      manifest itself in incorrect prompt behavior in some applications.
+    - Change Request 13067, a crucial defect affecting the implementation of some
+      switch-case statements in C code, has been fixed.  This issue may manifest
+      itself in incorrect prompt behavior in some applications.
+
+    (to 5.1.0)
+    - Numerous Change Requests have been addressed.  Refer to the Closed 
+      Change Requests section.
+    - New linker warnings may be seen, compared to pre-5.0.0 builds.  These warnings alert the
+      user to a potentially troublesome linker situation which the user should investigate.  
+      A new FAQ has been added describing this issue in full.
+	
 
 B. COMPATIBILITY
 ==============================================================================
@@ -113,12 +103,12 @@ B. COMPATIBILITY
 
     In-Circuit Debuggers/Programmers
     --------------------------------------------------------------------------
-      USB Smart Cable, version 1.6
+      USB Smart Cable, version 1.2 or later:
           ~ Supports target frequencies from 5MHz to 50MHz
           ~ Supports target voltages from 3.0V to 3.6V
           ~ Requires 2mA from the target
-
-          Important!!! Do not use Firmware 1.7 or 1.8 !!!
+      Note: USB Smart Cables distributed with ZDS 4.8.1 Beta are not 
+            compatible with the drivers in this release.
       
       Ethernet Smart Cable, version 1.0 or later:
           ~ Supports target frequencies from 5MHz to 50MHz
@@ -137,14 +127,14 @@ B. COMPATIBILITY
           ~ target current consumption is about 170mA (should not 
             exceed 300mA)
 
-      USB device  drivers  and  installation instructions  can be found in the 
+      USB device drivers and installation instructions can be found in the 
       following locations:
             For Vista-32:
-                   <ZDS installation>\Device Drivers\USB\x32
+                   <CD-ROM or ZDS installation>\Device Drivers\USB\x32
             For Vista-64:
-                   <ZDS installation>\Device Drivers\USB\x64
-
-      The  firmware  and  upgrade  instructions  can be found in the following 
+                   <CD-ROM or ZDS installation>\Device Drivers\USB\x64
+     
+      The firmware and upgrade instructions can be found in the following 
       directory:  
 
           <ZDS installation>\bin\firmware\
@@ -157,10 +147,38 @@ C. SYSTEM REQUIREMENTS
 ==============================================================================
     Supported Operating Systems
     --------------------------------------------------------------------------
-      Windows XP Pro (SP3)
-      Windows  7 32/64-bit
-      Windows  8 32/64-bit
-      Windows 10 32/64-bit
+      Windows XP Professional 32-bit
+      Windows Vista 32-bit
+      Windows Vista 64-bit
+      Windows 2000 SP4
+      Windows 7 32-bit
+      Windows 7 64-bit
+
+    Recommended Host System Configuration
+    --------------------------------------------------------------------------
+      Windows XP Professional SP3 or later
+      Pentium IV 2.2GHz processor or Higher
+      1024MB RAM or Higher
+      135 MB hard disk space
+      Super VGA Video Adapter
+      CD-ROM for installation
+      RS232 communication port with hardware flow control
+      USB High-Speed port (when using USB Smart Cable)
+      Ethernet port (when using Ethernet Smart Cable)
+      Internet browser (Internet Explorer or Netscape)
+
+    Minimum Host System Configuration
+    --------------------------------------------------------------------------
+      Windows XP Professional SP2
+      Pentium IV 1.2GHz processor
+      512 MB RAM
+      25 MB hard disk space (Application only)
+      Super VGA Video Adapter
+      CD-ROM for installation
+      RS232 communication port with hardware flow control
+      USB High-Speed port (when using USB Smart Cable)
+      Ethernet port (when using Ethernet Smart Cable)
+      Internet browser (Internet Explorer or Netscape)
 
     USB Smart Cable
     --------------------------------------------------------------------------
@@ -173,15 +191,15 @@ C. SYSTEM REQUIREMENTS
     --------------------------------------------------------------------------
       Ethernet 10Base-T compatible connection
 
-      *The  Ethernet Smart Cable,  available  separately in the Ethernet Smart
-       Cable Accessory Kit, is supported.
+      *The Ethernet Smart Cable, available separately in the Ethernet Smart Cable 
+       Accessory Kit, is supported.
 
     Serial Smart Cable for eZ80Acclaim!
     --------------------------------------------------------------------------
-      RS232 Communication port  with  hardware  flow and modem control signals
+      RS232 Communication port with hardware flow and modem control signals
 
-      *Some  USB  to  RS232 devices  are  not compatible because they lack the
-       necessary hardware signals and/or  they  use  proprietary  auto-sensing
+      *Some USB to RS232 devices are not compatible because they lack the
+       necessary hardware signals and/or they use proprietary auto-sensing
        mechanisms which prevent the Smart Cable from connecting.
 
     ZPAK II
@@ -189,184 +207,182 @@ C. SYSTEM REQUIREMENTS
       Ethernet 10Base-T compatible connection
       RS232 Communication port
 
+
 D. APPLICATION AND OTHER OS ISSUES
 ==============================================================================
-   1.  Apply  the  latest  Windows updates to the host system when appropriate.
+   1.  Apply the latest Windows updates to the host system when appropriate.
 
-   2.  ZDS II  will  terminate  an active target connection when the host goes
-       into Stand by or Hibernate.  If  a wireless Ethernet connection is used
+   2.  ZDS II will terminate an active target connection when the host goes
+       into Stand by or Hibernate.  If a wireless Ethernet connection is used
        with the ZPAK, ZDS may not be able to reconnect to the ZPAK.  Reset the
        ZPAK if this is encountered.
 
-   3.  Some systems with  one or more other USB devices connected may not boot
+   3.  Some systems with one or more other USB devices connected may not boot
        properly after connecting the USB Smart Cable.
-       Workaround:  Connect the USB Smart Cable  after  the system has started.
+       Workaround:  Connect the USB Smart Cable after the system has started.
 
 
 E. PRECAUTIONS AND LIMITATIONS
 ==============================================================================
     Debugger & Programmer
     --------------------------------------------------------------------------
-    1. If  Flash memory  is programmed to use the Watch-Dog Timer, or HALT/SLP
-       instructions within the first few instructions after reset,the debugger
+    1. If Flash memory is programmed to use the Watch-Dog Timer, or HALT/SLP
+       instructions within the first few instructions after reset, the debugger
        may not be able to gain control of the target.
-       Refer to FAQ 'How is the new Hardware Reset Implemented?'  for  informa-
-       tion on how to apply a fix for this problem.
+       Refer to FAQ 'How is the new Hardware Reset Implemented?' for
+       information on how to apply a fix for this problem.
 
-    2. The  ZDS debugger  may  not  be  able to maintain a reliable connection
-       with a target that uses the Watch-Dog Timer (WDT)  to  generate a reset
-       so disabling the WDT during a debug session is recommended.  If the WDT
-       generates an NMI, the debugger  will not lose the target connection and
-       the default boot module's NMI handler may be replaced by an application
-       specific NMI handler.
+    2. The ZDS debugger may not be able to maintain a reliable connection
+       with a target that uses the Watch-Dog Timer (WDT) to generate a
+       reset so disabling the WDT during a debug session is recommended.
+       If the WDT generates an NMI, the debugger will not lose the target
+       connection and the default boot module's NMI handler may be replaced
+       by an application specific NMI handler.
 
-    3. The  eZ80  and eZ80Acclaim! working registers may become corrupt during
-       a debug session if code  is  executed from zero wait state memory. This
-       applies to internal and external memory.
-
-       Workaround:  Debug the code in one or more  wait state memory.  You may
-                    do  this  by  adding wait  states to the internal Flash or
+    3. The eZ80 and eZ80Acclaim! working registers may become corrupt during
+       a debug session if code is executed from zero wait state memory.
+       This applies to internal and external memory.
+       Workaround:  Debug the code in one or more wait state memory.  You may
+                    do this by adding wait states to the internal Flash or
                     the external Chip Select control register.
 
-    4. Program  execution  may  not break or will break after breakpoints that
+    4. Program execution may not break or will break after breakpoints that
        are set inside internal SRAM.
 
-    5. The  maximum amount  of  breakpoints supported by the hardware is three 
+    5. The maximum amount of breakpoints supported by the hardware is three 
        while the simulator has no limit..
- 
-    6. The  Zilog  development  tools  may not reset all internal registers to
-       their hardware reset state  after a  connection is established and/or a
-       debug reset is performed.  This  may  allow a previously loaded program
-       to interact with the operation  of the  current program's debug session.
-       For example, if Flash  was  previously  loaded with a program that uses
-       timer 3 interrupts, a program that  is  running  in debug mode and does
-       NOT reset the timer 3 registers to disable its  interrupts  will  still
-       encounter a timer 3 interrupt request.
 
-       Workaround:  Erase the internal flash with the integrated  Flash Loader
-                    to prevent any unused registers  from  being  changed from
+    6. The Zilog development tools may not reset all internal registers to
+       their hardware reset state after a connection is established and/or a
+       debug reset is performed.  This may allow a previously loaded program
+       to interact with the operation of the current program's debug session.
+       For example, if Flash was previously loaded with a program that uses
+       timer 3 interrupts, a program that is running in debug mode and does
+       NOT reset the timer 3 registers to disable its interrupts will still
+       encounter a timer 3 interrupt request.
+       Workaround:  Erase the internal flash with the integrated Flash Loader
+                    to prevent any unused registers from being changed from
                     its hardware reset state.
 
     7. Some Port Authority USB to Serial DB9 adapters provided by Cables to Go
        are not compatible with the Serial Smart Cable for eZ80Acclaim!.
 
-    8. ZDS  may  have difficulty establishing a connection if a Flash resident
-       program  has enabled and selected the PLL as the system clock.  In this
-       event, select the  Oscillator Clock option  and  set  the  System Clock
+    8. ZDS may have difficulty establishing a connection if a Flash resident
+       program has enabled and selected the PLL as the system clock.  In this
+       event, select the Oscillator Clock option and set the System Clock
        Frequency equal to the frequency of the system clock that was used with
-       the  PLL  enabled  and selected.  Then  erase  the  program, disconnect,
-       restore the Clock settings to  their appropriate values, and  reconnect.
+       the PLL enabled and selected.  Then erase the program, disconnect,
+       restore the Clock settings to their appropriate values, and reconnect.
        Refer to the Debugging section of the FAQ for more information.
 
-    9. The  Flash programmer  may  identify  blocks  of  Flash  that  are  not
-       physically  present  on  the  application board if the chip select that
-       enables the Flash device is  programmed  with  a  higher  boundary then
+    9. The Flash programmer may identify blocks of Flash that are not
+       physically present on the application board if the chip select that
+       enables the Flash device is programmed with a higher boundary then
        what is physically available.
 
-   10. The USB  and  Ethernet Smart Cable  will hold the  reset line low if it
-       detects a target power loss.
+   10. The USB and Ethernet Smart Cable will hold the reset line low if
+       it detects a target power loss.
 
-   11. The  ZDS flash  programmer  requires  the  external flash device memory
-       locations  to  be  aligned  with  the  flash  device's  specified block
-       arrangement, otherwise  the  entire  flash device will not be erased or
+   11. The ZDS flash programmer requires the external flash device memory
+       locations to be aligned with the flash device's specified block
+       arrangement, otherwise the entire flash device will not be erased or
        programmed correctly.
-       For example, the  Micron flash  on  the  eZ80Acclaim! modules should be
-       placed on a  1MB boundary because  the  upper  four  address lines  are
-       ignored when  it  is  enabled.  If  the  chip select  lower boundary is
-       040000h,  an access  at  the  same  location  would result in an access
+       For example, the Micron flash on the eZ80Acclaim! modules should be
+       placed on a 1MB boundary because the upper four address lines are
+       ignored when it is enabled.  If the chip select lower boundary is
+       040000h, an access at the same location would result in an access
        of block 6 instead of block 0.
 
-   12. Connecting  the ZPAK's TIM directly to the target board's ZDI connector
-       is recommended.  If an adaptor  is  required  avoid  using wire wrap or
-       any other prototype material otherwise download,  program  and/or debug
-       operations may not be reliable.  When  using an adaptor,  the following
-       changes  to  the  ZPAK TIM  (Zilog PC: 99C0853-001) may  help  increase
+   12. Connecting the ZPAK's TIM directly to the target board's ZDI connector
+       is recommended.  If an adaptor is required avoid using wire wrap or
+       any other prototype material otherwise download, program and/or debug
+       operations may not be reliable.  When using an adaptor, the following
+       changes to the ZPAK TIM (Zilog PC: 99C0853-001) may help increase
        communication reliability:
 
        a) Change R10 to 10-22 Ohm.
        b) Change R6 to 2.2K if changing R10 does not help.
 
-   13. Debug  and  Flash program  operations  may  not  be reliable on targets
+   13. Debug and Flash program operations may not be reliable on targets
        with system clock frequencies less than 5MHz.
 
    14. The simulator does not support UART input.
 
    15. The simulator treats halt/sleep instruction as a NOP.
 
-   16. ZDS opens a UDP port to search  for Ethernet Smart Cables and should be
-       allowed  to  do so  through  an active firewall that stands between ZDS
-       and  the  Ethernet  Smart  Cable.  The  firewall  may  be  disabled  or
-       configured to grant ZDS the right  to open a local UDP port.  The local
+   16. ZDS opens a UDP port to search for Ethernet Smart Cables and should be
+       allowed to do so through an active firewall that stands between ZDS
+       and the Ethernet Smart Cable.  The firewall may be disabled or
+       configured to grant ZDS the right to open a local UDP port.  The local
        port number is assigned by the host and the foreign port number is 3000.
 
-   17. Working  with  large   projects  across  a  network  may  saturate  the 
-       communication  interface  of  the  host computer.  ZDS  may report "Not 
+   17. Working with large projects across a network may saturate the 
+       communication interface of the host computer.  ZDS may report "Not 
        Responding" messages while it is waiting for all the files to be opened.  
-       ZDS is actually still loading information  and  will  begin 'responding' 
+       ZDS is actually still loading information and will begin 'responding' 
        as soon as the transfer is complete.  It is recommended that the source 
        files be copied and installed on the ZDS host computer.
 
-   18. Page Erase  of  internal Flash memory is used as the default to protect
-       user  data  or  programs (i.e. Boot Loaders ) in  Flash.  The  user can 
-       select  mass  erase  by  removing  the  check  mark from the Project ->    
-       Settings ->  Debugger tab  "Use Page Erase Before Flashing".  When Page 
-       Erase is selected, note that the debugger will erase  all pages  within 
-       the program's address range prior  to  programming Flash.   The address 
-       range is determined by the lowest  and  highest  addresses contained in 
-       the .LOD file and those pages and all the pages in  between  are erased 
-       in one step to speed the download process.  If  the  program overlaps a 
-       page by a single byte  the  entire  page  will be erased. (i.e. For ROM 
-       Address Range: 0-38, 8000-FF00, the .LOD download will  erase the Flash 
-       from 0-FFFF).  The Flash Loader can be used  if  you  need  to download
-       non-overlapping .HEX files  in  non-sequential  order  because  the ZDS 
-       linker will sort the addresses when the file is created  and  the Flash 
-       Loader  can  then  determine  the  exact pages to erase.  (i.e. For ROM 
-       address Range:  0-38,  8000-FF00  the  .HEX  download  will erase 0-1FF 
+   18. Page Erase of internal Flash memory is used as the default to protect
+       user data or programs (i.e. Boot Loaders) in Flash.  The user can 
+       select mass erase by removing the check mark from the Project ->    
+       Settings -> Debugger tab "Use Page Erase Before Flashing".  When Page 
+       Erase is selected, note that the debugger will erase all pages within 
+       the program's address range prior to programming Flash.   The address 
+       range is determined by the lowest and highest addresses contained in 
+       the .LOD file and those pages and all the pages in between are erased 
+       in one step to speed the download process.  If the program overlaps a 
+       page by a single byte the entire page will be erased. (i.e. For ROM 
+       Address Range: 0-38, 8000-FF00, the .LOD download will erase the Flash 
+       from 0-FFFF).  The Flash Loader can be used if you need to download
+       non-overlapping .HEX files in non-sequential order because the ZDS 
+       linker will sort the addresses when the file is created and the Flash 
+       Loader can then determine the exact pages to erase.  (i.e. For ROM 
+       address Range: 0-38, 8000-FF00 the .HEX download will erase 0-1FF 
        (entire page) and 8000-FFFF).
 
-   19. Due  to  the  instruction  pipeline,  it  is  not  recommended to set a
+   19. Due to the instruction pipeline, it is not recommended to set a
        breakpoint on the 1st instruction of an ISR.
 	   
-       In version 5.2.0, a  new option is provided that will take care of this
+       In version 5.2.0, a new option is provided that will take care of this
        issue for you automatically in your C code.  If you select "Insert NOPs
-       to  improve  Debugger breakpoints” in the C > Advanced page  of project
-       settings, the compiler will insert a few NOPs at the beginning  of your
-       ISR, eliminating this problem.  You can then simply set the  breakpoint
-       in your C code on the opening  curly  brace  of  your ISR.  This option
+       to improve Debugger breakpoints” in the C > Advanced page of project
+       settings, the compiler will insert a few NOPs at the beginning of your
+       ISR, eliminating this problem.  You can then simply set the breakpoint
+       in your C code on the opening curly brace of your ISR.  This option
        comes at the cost of a modest increase in code size from the added NOPs;
-       when you’re finished debugging, turning the  feature  off again removes
+       when you’re finished debugging, turning the feature off again removes
        the NOPs and gets rid of the added code size.
 	   
-       If  you  choose  not to use this new feature, you will need to manually
-       ensure  that  you  set  breakpoints  at  least 3 bytes beyond the first 
+       If you choose not to use this new feature, you will need to manually
+       ensure that you set breakpoints at least 3 bytes beyond the first 
        instruction of all ISRs.
 
-   20. Why  does  it  take a long time to hit a breakpoint in a loop or branch
+   20. Why does it take a long time to hit a breakpoint in a loop or branch
        statement?
 
-       Due to the instruction pipeline  in eZ80, eZ80Acclaim! and  eZ80Acclaim
-       Plus! processors,it is impossible to break execution on the instruction
-       following a branch instruction such as JR, JP, LDIR, etc. This can lead
-       to false breaks  or extremely slow execution as the debugger repeatedly
-       stops and resumes execution.
+       Due to the instruction pipeline in eZ80, eZ80Acclaim! and 
+       eZ80AcclaimPlus! processors, it is impossible to break execution on the
+       instruction following a branch instruction such as JR, JP, LDIR, etc.
+       This can lead to false breaks or extremely slow execution as the debugger
+       repeatedly stops and resumes execution.
 	   
-       In version 5.2.0, a new option is provided  that will take care of this 
+       In version 5.2.0, a new option is provided that will take care of this 
        issue for you automatically in your C code.  If you select "Insert NOPs
-       to improve Debugger breakpoints"  in the C > Advanced page  of  project 
-       settings,  the  compiler  will  insert  a  few  NOPs  following  branch 
-       instructions, eliminating this problem.  You  can  then  simply set the
-       breakpoint wherever you wish  in your C code,  and  the  debugger  will 
+       to improve Debugger breakpoints" in the C > Advanced page of project 
+       settings, the compiler will insert a few NOPs following branch 
+       instructions, eliminating this problem.  You can then simply set the
+       breakpoint wherever you wish in your C code, and the debugger will 
        execute at its proper speed and break only when it should.  This option
        comes at the cost of a modest increase in code size from the added NOPs;
        when you’re finished debugging, turning the feature off again removes
        the NOPs and gets rid of the added code size.
 	   
-       If you choose not  to use  this  new feature, you will need to manually
-       ensure  that  you always set breakpoints 3 or 4 instructions beyond all
+       If you choose not to use this new feature, you will need to manually
+       ensure that you always set breakpoints 3 or 4 instructions beyond all
        branches for best execution speed and debugging results.
 
-       Example ( when "Insert NOPS to  improve  Debugger  breakpoints  is  NOT
-                 selected):
+       Example (when "Insert NOPS to improve Debugger breakpoints is NOT selected):
 
        C- Code:
     
@@ -541,28 +557,15 @@ F. CLOSED CHANGE REQUESTS
 ==============================================================================
     IDE
     --------------------------------------------------------------------------
-   (Fixed in 5.3.0)
-       CR 13457 Add a block comment/uncomment editor feature.
-       CR 13443 Support debugging for source file with more than 64K lines
-       CR 13421 Addd long filename support in makefile, linker and library command
-                file
-       CR 13400 Negative 16-bit value is not displayed properly in the watch window
-       CR 13282 When downloading firmware to the USB Smart Cable, ZDS must not 
-                continue the download process and issue a more appropriate message 
-       CR 13193 Fix File Types dialog window. Options – File Types Tab
-       CR 13342 Can not save all files during a debug session > Alt F-V shortcut.
-       CR 13281 Edit Menu Manage Breakpoints Go to Code does not work when 
-                the target file is opened but not focused. 
-                
    (Fixed in 5.2.0)
        CR 13200 Auto-completion feature does work for structure members in nested
-                level greater than 2.
+          level greater than 2.
        CR 12991 Filename is getting converted to uppercase after connecting to
                 a debugger/main().  A word-around is to open the main.c source
                 file before using the debugger.		  
        CR 12982 Changing  the  background  color to "Black" of the editor from 
-                Tools >Options >Editor tab >Color >Default > Background  makes
-                the cursor invisible. 		  
+          Tools >Options >Editor tab >Color >Default > Background  makes
+          the cursor invisible. 		  
        CR 1256  The object/libraries on the project settings->linker should be
                 displayed in list box.	
        CR 11708 Add support for ST M29W640FB70N6E abd Spansion S29GL064N flashes.
@@ -570,42 +573,18 @@ F. CLOSED CHANGE REQUESTS
        CR 10324 Bitfield data is not displayed properly in watch window
        CR 9459  The Save All icon does not grey out when no files are opened
 	   
+   (Fixed in 5.1.0)
+       CR 12988 The yellow PC indicator does not show up when its coressponding
+                file is opened.
+       CR 13042 Save As to a file does not work for read-only file.
+       CR 13045 Show PC command does not work very well.On the right-click
+                context menu, the command Show PC does not work unless you are
+                already in the correct file.
+       CR 13050 Crash when a big hex file is opened or viewed.	
+
 	   
     Assembler
     --------------------------------------------------------------------------
-    (Fixed in 5.3.0)
-       CR 13472  Errors are reported when project filenames contain a space.
-       CR 13443  ZDS II doesn't support full debugging of an assembly source
-                 code file containing more than 65535 lines.
-       CR 13425  Problems ensue if the final instruction in a segment is
-                 modified by jump optimization.
-       CR 13396  Use of the current PC via the $ symbol in an IF directive may
-                 be incorrect due to later optimization of some instructions.
-       CR 13395  Symbols defined using the $ symbol may have incorrect values
-                 due to later optimization of some instructions.
-       CR 13394  Equates that use '$' are not handled correctly by 
-                 optimizations that change instruction size.
-       CR 13390  Jump optimization involving a change from JR to JP, when the
-                 $ symbol is used, produces incorrect code.
-       CR 13358  The assembler improperly reports an error on LD A,(IX-128)
-                 and related instructions.
-       CR 13319  Text of a warning message related to jump optimization
-                 needs clarification.
-       CR 13318  Jump optimization setting should interact sensibly with 
-                 compiler-generated code in mixed C & assembly projects.
-       CR 13317  Assembler not honoring user option to disable jump
-                 optimization.
-       CR 13273  The assembler sometimes reports a bogus warning message when
-                 "Show absolute addresses in assembler listings" is selected.
-       CR 13249  Several problems with assembler correctly enforcing the
-                 restricted scope of local and anonymous labels.
-       CR 13240  CONDLIST directive does not interact correctly with NOLIST 
-                 directive in assembler listing files.
-       CR 13059  Assembler should not allow relocatable data in a directive
-                 that reserves space, such as BLKB.
-       CR 11704  Assembler gives internal error for deeply nested (more than 
-                 six levels) STRUCT TAG definitions.
-
     (Fixed in 5.2.0)
        CR 13245 The assembler crashes when a long expression that includes
                 symbols not yet defined is used as an operand.
@@ -631,32 +610,29 @@ F. CLOSED CHANGE REQUESTS
                 and is immediately followed by a semicolon.
        CR  1625 Assembler can't debug into included files.
 
+    (Fixed in 5.1.0)
+       CR 13054 Use of a symbol defined by an ENDSTRUCT directive prior to the
+                definition caused the symbol to be treated as undefined.
+       CR 13052 Use of the IFSAME or IFNOSAME directives inside the false branch
+                of another IF directive terminated the containing IF.
+       CR 13046 Using the GLOBALS or XDEF directive on STRUCT labels causes a
+                fatal linker error.
+       CR 13041 A warning detected in the 2nd pass of the assembler is treated
+                as an error.
+       CR 13040 An XDEF'ed EQU-defined symbol causes an error if it in turn depends
+                on an XREF symbol defined in another module.
+       CR 12996 The assembler dies with an internal error, rather than a useful
+                error message, upon finding an undefined symbol (e.g. a typo).
+       CR 12993 Anonymous symbols in absolute segments are improperly treated by
+                applying relocation information.
+       CR 12960 Can't assemble LD.LIL HL, (Mmn) in Z80 (ADL=0) mode.
+       CR 12323 The assembler dies with an internal error, rather than a useful
+                error message, if a symbol is defined and later mistakenly 
+                declared EXTERN in the same file.
+
        
     Compiler
     --------------------------------------------------------------------------
-    (Fixed in 5.3.0)
-       CR 13441  Bad code when the option Pad Branch > Insert NPOs is ON and 
-                 the jump distance is close to the +/- 128 byte limit for
-                 relative jumps.
-       CR 13430  An optimization for addition of a variable with several
-                 constants is inappropriate when the constants are floating-
-                 point values.
-       CR 13376  Numerous improvements to make the compiler listing files more
-                 useful and readable.
-       CR 13371  Bad code generated when computing a macro parameter that is 
-                 used repeatedly inside the macro.
-       CR 13366  Implementation of the compiler ALIGN directive does not allow
-                 variables to be initialized properly.
-       CR 13357  Compiler unnecessarily consumes stack space for temporary
-                 variables which later are optimized away.
-       CR 13343  Building a library (such as the RTL) can cause the compiler to 
-                 crash if the path to the library exceeds 80 characters.
-       CR 13294  Support new #pragmas asm and endasm to allow easier embedding
-                 of blocks of assembly code inside C programs.
-       CR 13270  Compiler does not convert fract variables to float correctly.
-       CR 12926  Improve efficiency of compiled shift code when the number of
-                 bits to be shifted is a multiple of 8.
-
     (Fixed in 5.2.0)
        CR 13242 Some bit-field manipulating code gives a P3 internal error
                 when built, depending on the size of the bit-field's declared 
@@ -693,15 +669,53 @@ F. CLOSED CHANGE REQUESTS
        CR  9997 Compiler hangs when compiling a switch-case for which the
                 default case is an empty while(1) loop.
 
+    (Fixed in 5.1.1)
+       CR 13067 Due to improper usage of an LD.S instruction with its dependence
+                on the MBASE register, control can jump to the incorrect branch
+                in certain switch-case constructs when MBASE is nonzero.
+
+    (Fixed in 5.1.0)
+       CR 13048 The optimizer may incorrectly move a variable outside of a loop
+                if its initialized value is used only on the first pass through
+                the loop.
+       CR 13030 "Limit optimizations for easier debugging" option not fully 
+                supported; code blocks may cross line number boundaries.
+       CR 13029 When the compiler generates an LDIR instruction, earlier
+                instructions to set up registers can be improperly optimized
+                away.
+       CR 13028 If a function returns a structure that was returned to it by
+                another function, the size of the returned structure may be 
+                corrupted.
+       CR 13026 The compiler improperly may change the number of consecutive
+                accesses to volatile variables, or the order of accesses to
+                different volatile variables.
+       CR 13025 The compiler does not support the simplest syntax for pointers
+                to special function registers.
+       CR 13024 In debug information, the compiler sometimes places the line
+                number after some instructions, causing breakpoints to be
+                slightly out of their proper locations.
+       CR 13018 The compiler dies with an internal error, rather than a useful
+                error message, if a non-existent structure member is
+                referenced (e.g. due to a typo).
+       CR 13003 The compiler puts the wrong type in debug information for an
+                SFR pointer, resulting in an incorrect watch window display.
+       CR 12998 The compiler doesn't accept the (strictly speaking illegal, but
+                now common) use of const-qualified variables as array dimensions.
+       CR 12985 Concatenation of 3 strings fails if the middle one contains
+                only a single character.
+       CR 12963 The compiler may incorrectly generate an indirect operand when it
+                should be a literal value, for bitwise operations on volatile
+                variables that are not grouped with parentheses.
+       CR 12924 Improved code generation for switch-case statements when the cases
+                are sequential or nearly so, making the code more efficient.
+	
+    (Fixed in 5.0.1)
+       CR 12975 Compiler generates wrong offset for 2nd access to a multibyte 
+                struct member in an array of structs.
+
 
     Linker
     --------------------------------------------------------------------------
-    (Fixed in 5.3.0)
-       CR 13377  When padding bytes with 0xFF, omit padding address ranges that
-                 aren't included in the Linker > Address Spaces listing.
-       CR 13259  Linker crashes if Linker Command File refers to non-existent 
-                 address space.
-
     (Fixed in 5.2.0)
        CR 13101 The linker needs to indicate via a clearer message that a
                 build has failed.
@@ -718,15 +732,29 @@ F. CLOSED CHANGE REQUESTS
        CR  9754 When both the relist and CHANGE directives are used, wrong
                 absolute addresses may be shown for _TEXT sections.
 
+    (Fixed in 5.1.0)
+       CR 13019 Request to lift the existing limit on ALIGN value to < 64K.
+
 	
     Run-Time Library
     --------------------------------------------------------------------------
-    (Fixed in 5.3.0)
-       CR 13316  Build problems when using the multi-threaded version of some
-                 Acclaim floating-point libraries.
+    (Fixed in 5.1.1)
+       CR 13062 Unsigned longs whose most significant bit is 1 are printed
+                incorrectly by printf, due to an incorrect function signature
+                for _mt_ultoa().
 
+    (Fixed in 5.1.0)
+       CR 13031 Required macro MB_LEN_MAX is missing from limits.h.
+       CR 12158 Due to a typo, the function exit() is missing from the Acclaim
+                standard startup module.
 	   
-    RZK and ZTP
+    Zilog Standard Library
+    --------------------------------------------------------------------------
+    (Fixed in 5.1.0)
+       CR 12992 Misplaced parentheses in definition of UART_IIR_FIFOEN in ZSL
+                header file uartdefs.h.
+
+    RZK znd ZTP
     --------------------------------------------------------------------------
     (Fixed in 5.1.0) please see <installation directory>\ZTP\ZTP2.3.1_Lib\
                      RZK_ZTP_ReleaseNotes.txt
