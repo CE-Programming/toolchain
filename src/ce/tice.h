@@ -668,6 +668,16 @@ void os_SetFlagBits(int16_t offset_pattern);
 void os_ResetFlagBits(int16_t offset_pattern);
 
 /**
+ * Custom implementation input routine for use in conjunction with the TIOS
+ *
+ * @param string Input prompt string to be displayed to the user
+ * @param buf Storage location to store input string
+ * @param bufsize Available storage size for input string. -1 for null termination.
+ * @returns None
+ */
+void os_GetStringInput(char *string, char *buf, size_t bufsize);
+
+/**
  * Gets a key from the OS
  *
  * @returns Key code

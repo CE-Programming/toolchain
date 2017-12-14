@@ -3,7 +3,7 @@
 
  .libraryAppVar     "GRAPHX"		; Name of library on the calc
  .libraryName       "graphx"		; Name of library
- .libraryVersion    7			; Version information (1-255)
+ .libraryVersion    8			; Version information (1-255)
 
 ;-------------------------------------------------------------------------------
 ; v1 functions - Can no longer move/delete
@@ -118,7 +118,11 @@
  .function "gfx_RotateScaleSprite",_RotateScaleSprite
  .function "gfx_RotatedScaledTransparentSprite_NoClip",_RotatedScaledTransparentSprite_NoClip
  .function "gfx_RotatedScaledSprite_NoClip",_RotatedScaledSprite_NoClip
-
+;-------------------------------------------------------------------------------
+; v8 functions
+;-------------------------------------------------------------------------------
+ .function "gfx_SetCharData",_SetCharData
+ 
  .beginDependencies
  .endDependencies
 
@@ -3335,7 +3339,7 @@ _SetFontData:
 ;  arg0 : Pointer to font data
 ;  Set Pointer to NULL to use default font
 ; Returns:
-;  None
+;  Pointer to previous font data
 	pop	de
 	pop	hl
 	push	hl			; hl -> custom font data
@@ -3343,9 +3347,39 @@ _SetFontData:
 	add	hl,de
 	or	a,a
 	sbc	hl,de
+	ld	de,(TextData_ASM) \.r
 	jr	nz,+_			; if null make default font
 	ld	hl,Char000 \.r
 _:	ld	(TextData_ASM),hl \.r	; save pointer to custom font
+	ex	de,hl
+	ret
+
+;-------------------------------------------------------------------------------
+_SetCharData:
+; Sets a custom font for a specific character
+; Arguments:
+;  arg1 : Character index to change (0-127 or 0-255)
+;  arg0 : Pointer to character data; if null returns current data
+; Returns:
+;  Pointer to character data if null, otherwise pointer to next character
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy+6)		; de -> custom character data
+	add	hl,de
+	or	a,a
+	sbc	hl,de			; sets z flag if null
+	ex	de,hl
+	or	a,a
+	sbc	hl,hl
+	ld	l,(iy+3)		; hl = index
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ld	bc,(TextData_ASM)
+	add	hl,bc
+	ret	z
+	ld	bc,8
+	ldir
 	ret
 
 ;-------------------------------------------------------------------------------
