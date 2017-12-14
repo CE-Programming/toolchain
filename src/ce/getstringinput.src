@@ -1,0 +1,57 @@
+;-------------------------------------------------------------------------
+; void os_GetStringInput(char *string, char *buf, size_t bufsize)
+;-------------------------------------------------------------------------
+	.def	_os_GetStringInput
+	.assume adl=1
+
+_os_GetStringInput:
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	ld	hl,(ix+6)		; hl -> input string prompt
+	add	hl,de
+	xor	a,a
+	sbc	hl,de
+	ld	de,0D00879h		; ioPrompt
+	jr	z,donecopy
+copyloop:
+	ld	a,(hl)
+	or	a,a
+	jr	z,donecopy
+	ld	(de),a
+	inc	hl
+	inc	de
+	jr	copyloop		; copy the input prompt here
+donecopy:
+	ld	(de),a
+	ld	(0D00599h),a		; curUnder
+	ld	iy,0D00080h
+	ld	b,(iy+9)
+	ld	c,(iy+28)		; back up old flag values
+	res	6,(iy+28)
+	set	7,(iy+9)
+	push	ix
+	push	bc
+	call	021320h			; _GetStringInput, get the input from the user
+	pop	bc
+	res	4,b			; restore old flag values
+	ld	(iy+9),b
+	ld	(iy+28),c
+	ld	hl,(0D0244Eh)		; editSym
+	call	020AE8h			; _VarNameToOP1HL, lookup the temporary input symbol
+	call	02050Ch			; _ChkFindSym
+	pop	ix
+	jr	c,SomeError
+	ex	de,hl
+	inc	hl
+	inc	hl
+	ld	de,(ix+9)		; hl -> input string prompt
+	ld	bc,(ix+12)		; bc = input string length
+	dec	bc
+	ldir
+	xor	a,a
+	ld	(de),a			; null terminate the string
+SomeError:
+	call	021578h			; DeleteTempEditEqu, delete the temporary input
+	pop	ix
+	ret
