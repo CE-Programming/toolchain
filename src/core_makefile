@@ -7,7 +7,7 @@ CCLEANUP_OBJ  ?= ccleanup.obj
 CLEANUP       ?= YES
 #----------------------------
 
-VERSION := 7.4
+VERSION := 7.5
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
@@ -16,10 +16,6 @@ VERSION := 7.4
 #----------------------------
 
 # define some common makefile things
-
-# source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
-rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
-
 empty :=
 space := $(empty) $(empty)
 comma := $(empty),$(empty)
@@ -83,15 +79,15 @@ ICON_OBJ      := $(ICON_ASM:%.src=%.obj)
 ALLDIRS       := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
 
 # find all of the available C, H and ASM files (Remember, you can create C <-> assembly routines easily this way)
-CSOURCES      := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.c))
-CPPSOURCES    := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.cpp))
-USERHEADERS   := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.h))
-USERHEADERS   += $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.hpp))
-ASMSOURCES    := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.asm))
+CSOURCES      := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.c)))
+CPPSOURCES    := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.cpp)))
+USERHEADERS   := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h)))
+USERHEADERS   += $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.hpp)))
+ASMSOURCES    := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.asm)))
 
 # figure out what the names of the sources will become once made into objects
-OBJECTS       := $(filter %.obj,$(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(subst \,/,$(CSOURCES))))
-OBJECTS       += $(filter %.obj,$(patsubst $(SRCDIR)/%.asm,$(OBJDIR)/%.obj,$(subst \,/,$(ASMSOURCES))))
+OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(CSOURCES:%.c=%.obj)))
+OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(ASMSOURCES:%.asm=%.obj)))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
@@ -212,11 +208,9 @@ LDFLAGS := \
 
 ifneq ($(OS),Windows_NT)
 	LDFLAGS := '$(LDFLAGS)'
-	SAFEMKDIR = $(MKDIR) $(call NATIVEPATH,$1)
 else
 	WINCHKBINDIR := $(WINCHKDIR) $(BINDIR)
 	WINCHKOBJDIR := $(WINCHKDIR) $(OBJDIR)
-	SAFEMKDIR = $(WINCHKDIR) $(call NATIVEPATH,$1) $(MKDIR) $(call NATIVEPATH,$1)
 endif
 
 # this rule is trigged to build everything
@@ -226,7 +220,7 @@ dirs:
 	@echo C CE SDK Version $(VERSION) && \
 	$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
 	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
-
+	
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 	@$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
@@ -236,43 +230,36 @@ $(BINDIR)/$(TARGETHEX): $(OBJECTS)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
-	@$(call SAFEMKDIR,$(@D)) && \
-	$(ICON_CONV) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(ICON_CONV) && \
+	$(CD) $(OBJDIR) && \
 	$(AS) $(ASM_FLAGS) $(ICON_ASM)
 
 $(OBJDIR)/%.obj: $(GFXDIR)/%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 $(OBJDIR)/%.obj: $(GFXDIR)/%.asm $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(CD) $(OBJDIR) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # this rule builds the assembly files and places them in the object directory
 $(OBJDIR)/%.obj: $(SRCDIR)/%.asm $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(CD) $(OBJDIR) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.obj: $(SRCDIR)/*/%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # this rule builds the assembly files and places them in the object directory
 $(OBJDIR)/%.obj: $(SRCDIR)/*/%.asm $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
+	@$(CD) $(OBJDIR) && \
 	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 clean:
