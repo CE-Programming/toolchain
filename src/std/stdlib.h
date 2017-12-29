@@ -60,7 +60,7 @@ typedef unsigned int size_t;
 #define NALLOC 50
 
 #ifndef NULL
-#define NULL    (void *)0
+#define NULL    ((void *)0)
 #endif
 
 /* Dynamic memory functions */
