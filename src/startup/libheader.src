@@ -1,8 +1,10 @@
-; Created by Matt "MateoConLechuga" Waltz
-
-	segment	.launcher
-	.assume	adl=1
+;-------------------------------------------------------------------------------
+; Libload launcher for shared libraries
+;-------------------------------------------------------------------------------
 	.def	__findlibload
+
+	segment	launcher
+	.assume	adl=1
 
 __findlibload:
 	ld	hl,__libloadappvar
@@ -37,7 +39,7 @@ __notfound:
 	call	0207C0h		; _puts
 	jp	020D8Ch		; _getkey
 __relocationstart:		; libraries to be relocated will be placed here for the relocator
-	segment	.libs
+	segment	libs
 	;...
 	;...
 	;...

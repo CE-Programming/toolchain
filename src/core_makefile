@@ -1,7 +1,11 @@
 #----------------------------
-# Makefile
+# Core C Makefile
 #----------------------------
-CLEANUP       ?= YES
+CLEANUP      ?= YES
+BSSHEAP_LOW  ?= D031F6
+BSSHEAP_HIGH ?= D13FD6
+STACK_HIGH   ?= D1A87E
+INIT_LOC     ?= D1A87F
 #----------------------------
 
 VERSION := 8.0
@@ -20,11 +24,7 @@ comma := $(empty),$(empty)
 TARGET ?= $(NAME)
 ICONPNG ?= $(ICON)
 
-BSSHEAP_LOW  := D031F6
-BSSHEAP_HIGH := D13FD6
-STACK_HIGH   := D1A87E
-INIT_LOC     := D1A87F
-
+# get the os specific items
 ifeq ($(OS),Windows_NT)
 SHELL     := cmd.exe
 CURDIR    := $(shell cmd /c for %%I in ("$(CURDIR)") do @echo %%~sI)
@@ -82,11 +82,14 @@ USERHEADERS   := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h
 USERHEADERS   += $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.hpp)))
 ASMSOURCES    := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.asm)))
 
-# figure out what the names of the sources will become once made into objects
-OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(CSOURCES:%.c=%.src)))
+# create links for later
+LINK_CSOURCES   := $(addprefix $(OBJDIR)/,$(notdir $(CSOURCES:%.c=%.src)))
+LINK_CPPSOURCES := $(addprefix $(OBJDIR)/,$(notdir $(CPPSOURCES:%.cpp=%.src)))
+LINK_ASMSOURCES := $(ASMSOURCES)
 
-# objects for linking
-LINK_FILES    := $(ASMSOURCES)
+# files created to be used for linking
+LINK_FILES    += $(LINK_CSOURCES)
+LINK_FILES    += $(LINK_ASMSOURCES)
 LINK_FILES    += $(wildcard $(CEDEV)/lib/*.src)
 LINK_FILES    += $(wildcard $(CEDEV)/lib/shared/*.src)
 LINK_LIBLOAD  := $(wildcard $(CEDEV)/lib/libload/*.asm)
@@ -108,7 +111,7 @@ ifeq ($(COMPRESSED),YES)
 CVFLAGS += -x
 endif
 ifeq ($(CLEANUP),YES)
-else
+ENTRY += $(comma)$(space)__ccleanup
 endif
 
 # choose static or linked flash functions
@@ -141,7 +144,9 @@ LDFLAGS := \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'entry $(ENTRY)' \
 	-i 'locate header at $$$(INIT_LOC)' \
-	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
+	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text' \
+	-i 'libs $(LINK_LIBLOAD)' \
+	$(CEDEV)/include/fasmg-ez80/ld.fasmg
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
@@ -155,24 +160,25 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	@$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
-$(BINDIR)/$(TARGETBIN): $(OBJECTS) $(LINK_FILES)
-	$(LD) $(LDFLAGS) $(CEDEV)/include/fasmg-ez80/ld.fasmg -i 'files $(call NATIVEPATH,$^)' -i 'libs $(LINK_LIBLOAD)' $@
+$(BINDIR)/$(TARGETBIN): $(LINK_FILES)
+	@$(LD) $(LDFLAGS) -i 'files $(call NATIVEPATH,$^)' $@
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 	@$(ICON_CONV)
 
-$(OBJDIR)/%.src: $(GFXDIR)/%.c $(USERHEADERS)
+# these rules compile the source files into object files
+$(OBJDIR)/%.src: */%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 # these rules compile the source files into object files
-$(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
+$(OBJDIR)/%.src: **/*/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 clean:
-	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETBIN) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJDIR)/$(ICON_ASM) $(OBJDIR)/*.obj $(OBJDIR)/*.src)
+	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETBIN) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJDIR)/$(ICON_ASM) $(OBJDIR)/*.src)
 	@echo Cleaned build files.
 
 gfx:
