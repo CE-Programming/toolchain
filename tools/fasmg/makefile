@@ -9,12 +9,20 @@ NATIVEPATH =$(subst /,\,$(1))
 RM         =del /f 2>nul
 CP         =xcopy /y
 PREFIX    ?=C:
+NAME       =fasmg.exe
+FASMGP     =windows\$(NAME)
 else
+NAME       =fasmg
+ifeq ($(shell uname -s),Darwin)
+FASMGP     =macos/$(NAME)
+else
+FASMGP     =linux/$(NAME)
+endif
 NATIVEPATH =$(subst \,/,$(1))
 RM         =rm -f
 CP         =cp
 PREFIX    ?=$(HOME)
-ADDEXE     =chmod +x fasmg
+ADDEXE     =chmod +x $(NAME)
 endif
 
 DEV ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
@@ -26,17 +34,17 @@ INCDIR :=$(call NATIVEPATH,../../src/include/)
 FILES :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
 
 all: $(FILES)
-	$(ADDEXE)
+	$(CP) $(call NATIVEPATH,$(FASMGP)) . && $(ADDEXE)
 
 $(FILES):
 	$(CP) $(call NATIVEPATH,fasmg-ez80/$(@F)) $(INCDIR)$(@F)
 
 clean:
 	$(RM) $(FILES)
+	$(RM) $(NAME)
 
 install:
 
 uninstall:
 
 .PHONY: all clean install uninstall
-

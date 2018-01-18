@@ -121,8 +121,9 @@ library 'GRAPHX', 8
 	export gfx_RotateScaleSprite
 	export gfx_RotatedScaledTransparentSprite_NoClip
 	export gfx_RotatedScaledSprite_NoClip
-;
+;-------------------------------------------------------------------------------
 ; v8 functions
+;-------------------------------------------------------------------------------
 	export gfx_SetCharData
 
 ;-------------------------------------------------------------------------------
@@ -154,6 +155,12 @@ macro mIsHLLessThanBC?
 	add	hl,hl
 	jp	po,$+5
 	ccf
+end macro
+macro s8 op, imm
+	local i
+ 	i = imm
+	assert i >= -128 & i < 128
+	op, i
 end macro
 ;-------------------------------------------------------------------------------
 
@@ -3374,7 +3381,7 @@ gfx_SetFontData:
 	ret
 
 ;-------------------------------------------------------------------------------
-_SetCharData:
+gfx_SetCharData:
 ; Sets a custom font for a specific character
 ; Arguments:
 ;  arg1 : Character index to change (0-127 or 0-255)
@@ -3394,7 +3401,7 @@ _SetCharData:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,(TextData_ASM)
+	ld	bc,(_TextData)
 	add	hl,bc
 	ret	z
 	ld	bc,8
@@ -5046,7 +5053,7 @@ gfx_RLETSprite:
 	ld	hl,(iy+3)		; hl = sprite struct
 	inc	hl
 	ld	c,(hl)			; bc = height
-	ld	hl,(_ymax)		; hl = ymax
+	ld	hl,(_YMax)		; hl = ymax
 	ld	de,(iy+9)		; de = y
 	sbc	hl,de			; hl = ymax-y
 	ret	m			; m ==> ymax < y || y ~ int_min ==> fully off-screen
@@ -5104,7 +5111,7 @@ _RLETSprite_SkipClipLeft:
 ; Clip right
 	add	hl,bc			; hl = x (clipped)
 	ld	(iy+6),hl		; write back clipped x
-	ld	bc,(_xmax)		; bc = xmax
+	ld	bc,(_XMax)		; bc = xmax
 	sbc	hl,bc			; hl = x-xmax
 	ret	nc			; nc ==> x >= xmax ==> fully off-screen
 	ld	a,d			; a[0] = clip left?
@@ -5123,7 +5130,7 @@ _RLETSprite_SkipClipLeft:
 	set	1,d			; d[1] = 1
 _RLETSprite_SkipClipRight:
 ; Calculate the pointer to the top-left corner of the sprite in the buffer
-	ld	hl,(currDrawBuffer)
+	ld	hl,(CurrentBuffer)
 	ld	bc,(iy+6)		; bc = x (clipped)
 	add	hl,bc
 	ld	c,(iy+9)		; c = y (clipped)
@@ -5179,7 +5186,7 @@ _RLETSprite_ClipTop_End:		; a = 0, hl = start of (clipped) sprite data
 	sbc	a,a
 	djnz	_RLETSprite_ClipLeftMiddleClipRight
 _RLETSprite_MiddleClipRight:
-	sub	a,s8(_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_Middle_Row_WidthEven)
+	s8	sub a,_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_Middle_Row_WidthEven
 	ld	(_RLETSprite_ClipRight_LoopJr_SMC),a
 _RLETSprite_Middle_Row_WidthOdd:
 	inc	de			; increment buffer pointer
@@ -5249,19 +5256,19 @@ _RLETSprite_ClipRight_LoopJr_SMC := $-1
 
 _RLETSprite_ClipLeftMiddleClipRight:
 	dec	b			; b = 0
-	sub	a,s8(_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven)
+	s8	sub a,_RLETSprite_ClipRight_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven
 	ld	(_RLETSprite_ClipRight_LoopJr_SMC),a
-	ld	a,s8(_RLETSprite_Middle_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1))
-	ld	c,s8(_RLETSprite_Middle_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1))
+	s8	ld a,_RLETSprite_Middle_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1)
+	s8	ld c,_RLETSprite_Middle_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1)
 	jr	_RLETSprite_ClipLeftMiddle_DoSMC
 
 _RLETSprite_ClipLeftMiddle:
 	ld	(_RLETSprite_NoClip_HalfRowDelta_SMC),a
 	sbc	a,a
-	sub	a,s8(_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven)
+	s8	sub a,_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_ClipLeft_Row_WidthEven
 	ld	(_RLETSprite_NoClip_LoopJr_SMC),a
-	ld	a,s8(_RLETSprite_NoClip_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1))
-	ld	c,s8(_RLETSprite_NoClip_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1))
+	s8	ld a,_RLETSprite_NoClip_OpaqueCopy-(_RLETSprite_EnterLeft_Opaque_Jr_SMC+1)
+	s8	ld c,_RLETSprite_NoClip_TransSkip-(_RLETSprite_EnterLeft_Trans_Jr_SMC+1)
 _RLETSprite_ClipLeftMiddle_DoSMC:
 	ld	(_RLETSprite_EnterLeft_Opaque_Jr_SMC),a
 	ld	a,c
@@ -5315,7 +5322,7 @@ gfx_RLETSprite_NoClip:
 	ld	iy,0
 	add	iy,sp
 ; Calculate the pointer to the top-left corner of the sprite in the buffer.
-	ld	hl,(currDrawBuffer)
+	ld	hl,(CurrentBuffer)
 	ld	bc,(iy+6)		; bc = x
 	add	hl,bc
 	ld	c,(iy+9)		; c = y
@@ -5340,7 +5347,7 @@ _RLETSprite_NoClip_Begin:
 	rra				; a = (lcdWidth-width)/2
 	ld	(_RLETSprite_NoClip_HalfRowDelta_SMC),a
 	sbc	a,a
-	sub	a,s8(_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_NoClip_Row_WidthEven)
+	s8	sub a,_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_NoClip_Row_WidthEven
 	ld	(_RLETSprite_NoClip_LoopJr_SMC),a
 ; Row loop (if sprite width is odd)
 _RLETSprite_NoClip_Row_WidthOdd:

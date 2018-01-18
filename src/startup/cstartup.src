@@ -1,7 +1,5 @@
 ; Created by Matt "MateoConLechuga" Waltz
 
-	ifndef STARTUP_MODULE
-	define STARTUP_MODULE
 ;-------------------------------------------------------------------------------
 ; Standard CE startup module definitions and references
 ;-------------------------------------------------------------------------------
@@ -69,8 +67,6 @@ __errsp:
 ;-------------------------------------------------------------------------------
 	segment .exit
 
-	.ref	__exit
-
 	pop	hl              ; exit code
 	ret
 
@@ -85,6 +81,4 @@ _exit:
 ; End Standard Startup Module
 ;-------------------------------------------------------------------------------
 
-	endif
 	end
-

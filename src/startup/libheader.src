@@ -1,10 +1,7 @@
 ; Created by Matt "MateoConLechuga" Waltz
 
- ifndef USING_SHARED_LIBRARIES
- define USING_SHARED_LIBRARIES
- 
 	.assume	adl=1
- 
+
 	define	.launcher,space=ram
 	define	.libs,space=ram
 	segment	.launcher
@@ -53,5 +50,3 @@ __libloadappvar:
 	db	" LibLoad",0
 __webaddress:
 	db	"http://tiny.cc/clibs",0
-
- endif
