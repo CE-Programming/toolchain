@@ -70,7 +70,7 @@ TARGETTYPE    := $(TARGET).8xp
 ICON_ASM      := iconc.src
 
 # init entry
-ENTRY         := _init
+ENTRY         := _init, __findlibload
 
 # find all the directories in the source input
 ALLDIRS       := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
