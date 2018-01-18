@@ -96,10 +96,9 @@ LINK_LIBLOAD  := $(wildcard $(CEDEV)/lib/libload/*.asm)
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
-ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(DESCRIPTION) && \
-              $(CP) $(ICON_ASM) $(OBJDIR) $(NULL) && \
-              $(RM) $(ICON_ASM) $(NULL)
-LINK_FILES += $(call NATIVEPATH,$(OBJDIR)/$(ICON_ASM))
+LINK_ICON  := $(call NATIVEPATH,$(OBJDIR)/$(ICON_ASM))
+ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(LINK_ICON)$(comma)$(DESCRIPTION)
+LINK_FILES += $(LINK_ICON)
 ENTRY      += $(comma)$(space)__program_icon
 endif
 
