@@ -64,10 +64,13 @@ MKDIR      = mkdir -p
 endif
 
 # generate default names
-TARGETHEX     := $(TARGET).hex
+TARGETBIN     := $(TARGET).bin
 TARGETMAP     := $(TARGET).map
 TARGETTYPE    := $(TARGET).8xp
 ICON_ASM      := iconc.src
+
+# init entry
+ENTRY         := _init
 
 # find all the directories in the source input
 ALLDIRS       := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
@@ -81,14 +84,20 @@ ASMSOURCES    := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.a
 
 # figure out what the names of the sources will become once made into objects
 OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(CSOURCES:%.c=%.src)))
-OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(ASMSOURCES:%.asm=%.src)))
+
+# objects for linking
+LINK_FILES    := $(ASMSOURCES)
+LINK_FILES    += $(wildcard $(CEDEV)/lib/*.src)
+LINK_FILES    += $(wildcard $(CEDEV)/lib/shared/*.src)
+LINK_LIBLOAD  := $(wildcard $(CEDEV)/lib/libload/*.asm)
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
-ICON_CONV := $(PG) -c $(ICONPNG)$(comma)$(DESCRIPTION) && \
-             $(CP) $(ICON_ASM) $(OBJDIR) $(NULL) && \
-             $(RM) $(ICON_ASM) $(NULL)
-else
+ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(DESCRIPTION) && \
+              $(CP) $(ICON_ASM) $(OBJDIR) $(NULL) && \
+              $(RM) $(ICON_ASM) $(NULL)
+LINK_FILES += $(call NATIVEPATH,$(OBJDIR)/$(ICON_OBJ))
+ENTRY      += $(comma)$(space)__program_icon
 endif
 
 # determine if output should be archived or compressed
@@ -104,7 +113,9 @@ endif
 
 # choose static or linked flash functions
 ifeq ($(USE_FLASH_FUNCTIONS),YES)
+LINK_FILES += $(wildcard $(CEDEV)/lib/linked/*.src)
 else
+LINK_FILES += $(wildcard $(CEDEV)/lib/static/*.src)
 endif
 
 # define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
@@ -128,7 +139,9 @@ LDFLAGS := \
 	-i 'symbol __heaptop = bss.high' \
 	-i 'symbol __heapbot = bss.top' \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
-	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,text'
+	-i 'entry $(ENTRY)' \
+	-i 'locate header at $$$(INIT_LOC)' \
+	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
@@ -138,12 +151,12 @@ dirs:
 	$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
 	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
 
-$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
+$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	@$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
-$(BINDIR)/$(TARGETHEX): $(OBJECTS)
-	#@$(LD) $(LDFLAGS)  -i 'files "$(subst $(space),$(comma),$(strip $(call NATIVEPATH,$^)))"' $@
+$(BINDIR)/$(TARGETBIN): $(OBJECTS) $(LINK_FILES)
+	$(LD) $(LDFLAGS) $(CEDEV)/include/fasmg-ez80/ld.fasmg -i 'files $(call NATIVEPATH,$^)' -i 'libs $(LINK_LIBLOAD)' $@
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
@@ -155,20 +168,13 @@ $(OBJDIR)/%.src: $(GFXDIR)/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
-$(OBJDIR)/%.src: $(GFXDIR)/%.asm $(USERHEADERS)
-	@$(CP) $< $@
-
-# this rule builds the assembly files and places them in the object directory
-$(OBJDIR)/%.src: $(SRCDIR)/%.asm $(USERHEADERS)
-	@$(CP) $< $@
-
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 clean:
-	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJDIR)/$(ICON_ASM) $(OBJDIR)/*.obj $(OBJDIR)/*.src)
+	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETBIN) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJDIR)/$(ICON_ASM) $(OBJDIR)/*.obj $(OBJDIR)/*.src)
 	@echo Cleaned build files.
 
 gfx:

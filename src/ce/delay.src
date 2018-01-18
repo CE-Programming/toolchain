@@ -11,13 +11,9 @@ tmr2Match2		equ 1Ch
 tmrCtrl			equ 30h
 
 bTmr2Enable		equ 3
-tmr2Enable		equ 1<<bTmr2Enable
 bTmr2Crystal		equ 4
-tmr2Crystal		equ 1<<bTmr2Crystal
 bTmr2Overflow		equ 5
-tmr2Overflow		equ 1<<bTmr2Overflow
 bTmr2CountUp		equ 10
-tmr2CountUp		equ 1<<bTmr2CountUp
 
 ; void delay(uint16_t millis);
 
@@ -40,7 +36,7 @@ _delay:
 					;    = millis*(48000&0FFh)>>8,
 					;      off by -1 or -0.5
 	ld	e,l
-	ld	d,48000>>8		; 48000/256 == 187.5
+	ld	d,18			; 48000/256 == 187.5
 	ld	l,d
 	mlt	de			; de = (millis&0FFh)*(48000>>8)
 	mlt	hl			; hl = (millis>>8)*(48000>>8)
@@ -76,7 +72,7 @@ _delay:
 ; Will catch the underflow if not interrupted for a continuous period of
 ; ((254-188)<<24)/48000000 ~ 23.1s.
 	ld	l,tmr2Counter+3
-	ld	a,1+((0FFFFh*24000<<1)-12>>24) ; = 188
+	ld	a,188			; = 1+((0FFFFh*24000 shl 1)-12 shr 24)
 ; 380 cc up to this point
 _delay_wait:
 	cp	a,(hl)

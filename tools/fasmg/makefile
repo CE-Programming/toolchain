@@ -27,11 +27,13 @@ endif
 
 DEV ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
 BIN ?=$(call NATIVEPATH,$(DEV)/bin)
+INC ?=$(call NATIVEPATH,$(DEV)/include/fasmg-ez80/)
 
 INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
 
-INCDIR :=$(call NATIVEPATH,../../src/include/)
-FILES :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
+INCDIR     :=$(call NATIVEPATH,../../src/include/)
+FILES      :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
+INCFILES   :=$(addprefix $(INC),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
 
 all: $(FILES)
 	$(CP) $(call NATIVEPATH,$(FASMGP)) . && $(ADDEXE)
@@ -43,7 +45,11 @@ clean:
 	$(RM) $(FILES)
 	$(RM) $(NAME)
 
-install:
+install: $(INCFILES)
+	$(CP) $(NAME) $(BIN)
+
+$(INCFILES):
+	$(CP) $(call NATIVEPATH,fasmg-ez80/$(@F)) $(INC)$(@F)
 
 uninstall:
 
