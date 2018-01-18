@@ -1,13 +1,10 @@
 #----------------------------
 # Makefile
 #----------------------------
-CSTARTUP_OBJ  ?= cstartup.obj
-LIBHEADER_OBJ ?= libheader.obj
-CCLEANUP_OBJ  ?= ccleanup.obj
 CLEANUP       ?= YES
 #----------------------------
 
-VERSION := 7.5
+VERSION := 8.0
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
@@ -39,11 +36,12 @@ RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 AS         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
+LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
-CD         = cd
-CP         = copy /y
 CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
 PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
+CD         = cd
+CP         = copy /y
 NULL       = >nul 2>&1
 RMDIR      = rmdir /s /q
 MKDIR      = mkdir
@@ -54,24 +52,22 @@ WINRELPATH = $(subst /,\,$(1))
 RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
-AS         = $(call NATIVEPATH,wine $(BIN)/fasmg.exe)
 CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
-CD         = cd
-CP         = cp
+AS         = $(call NATIVEPATH,$(BIN)/fasmg)
+LD         = $(call NATIVEPATH,$(BIN)/fasmg)
 CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
+CD         = cd
+CP         = cp
 RMDIR      = rm -rf
 MKDIR      = mkdir -p
 endif
 
-# generate the default names for input and object files
+# generate default names
 TARGETHEX     := $(TARGET).hex
 TARGETMAP     := $(TARGET).map
 TARGETTYPE    := $(TARGET).8xp
 ICON_ASM      := iconc.src
-
-# default objects
-ICON_OBJ      := $(ICON_ASM:%.src=%.obj)
 
 # find all the directories in the source input
 ALLDIRS       := $(sort $(dir $(wildcard $(SRCDIR)/*/)))
@@ -84,19 +80,15 @@ USERHEADERS   += $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.h
 ASMSOURCES    := $(call NATIVEPATH,$(foreach dir,$(ALLDIRS),$(wildcard $(dir)*.asm)))
 
 # figure out what the names of the sources will become once made into objects
-OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(CSOURCES:%.c=%.obj)))
-OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(ASMSOURCES:%.asm=%.obj)))
+OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(CSOURCES:%.c=%.src)))
+OBJECTS       += $(addprefix $(OBJDIR)/,$(notdir $(ASMSOURCES:%.asm=%.src)))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
 ICON_CONV := $(PG) -c $(ICONPNG)$(comma)$(DESCRIPTION) && \
              $(CP) $(ICON_ASM) $(OBJDIR) $(NULL) && \
              $(RM) $(ICON_ASM) $(NULL)
-OBJECTS += $(OBJDIR)/$(ICON_OBJ)
-LDICON := locate .icon at (top of .header)+1 \
-	  locate .launcher at (top of .icon)+1
 else
-LDICON := locate .launcher at (top of .header)+1
 endif
 
 # determine if output should be archived or compressed
@@ -107,78 +99,27 @@ ifeq ($(COMPRESSED),YES)
 CVFLAGS += -x
 endif
 ifeq ($(CLEANUP),YES)
-OBJECTS += $(call NATIVEPATH,$(CEDEV)/lib/$(CCLEANUP_OBJ))
-LDCLEAN := locate .cleanup at (top of .startup)+1 \
-	   locate .exit at (top of .cleanup)+1
 else
-LDCLEAN := locate .exit at (top of .startup)+1
 endif
 
 # choose static or linked flash functions
 ifeq ($(USE_FLASH_FUNCTIONS),YES)
-LINKED_OS_FUN := clinked.lib
 else
-LINKED_OS_FUN := cstatic.lib
 endif
-
-OBJECTS += $(call NATIVEPATH,$(addprefix $(CEDEV)/lib/,cce.lib cshared.lib $(LINKED_OS_FUN)))
-
-# are there any shared libraries that we need to find? If so, add in the proper objects and sources and header files
-ifdef L
-OBJECTS += $(call NATIVEPATH,$(foreach var,$(L),$(CEDEV)/lib/$(var).lib))
-OBJECTS += $(call NATIVEPATH,$(strip $(foreach var,$(L),$(space)$(CEDEV)/lib/$(var)_header.obj)))
-OBJECTS += $(call NATIVEPATH,$(CEDEV)/lib/$(LIBHEADER_OBJ))
-endif
-
-# the main startup moduel
-OBJECTS += $(call NATIVEPATH,$(CEDEV)/lib/$(CSTARTUP_OBJ))
 
 # define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
-HEADERS := $(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,include include/compat)))
-HEADERS := $(subst \;,;,$(HEADERS))
-HEADERS := $(subst \;,;,$(HEADERS))
-HEADERS := $(subst /;,;,$(HEADERS))
-
-# define the assembler flags used by the Zilog assembler
-ASM_FLAGS ?= \
-	-define:_EZ80 -define:$(DEBUGMODE) -quiet -sdiopt -warn -NOdebug -NOigcase -NOlist -NOlistmac -cpu:EZ80F91
+HEADERS :=$(subst $(space),;,$(call WINPATH,$(ALLDIRS) $(addprefix $(CEDEV)/,include include/compat)))
+HEADERS :=$(subst \;,;,$(HEADERS))
+HEADERS :=$(subst \;,;,$(HEADERS))
+HEADERS :=$(subst /;,;,$(HEADERS))
 
 # define the C flags used by the Zilog compiler
 CFLAGS ?= \
-	-define:_EZ80 -define:$(DEBUGMODE) -NOlistinc -NOmodsect -cpu:EZ80F91 -keepasm \
-	-optspeed -NOreduceopt -NOgenprintf -quiet -stdinc:"$(HEADERS)" -NOdebug -asmsw:"$(ASM_FLAGS)"
-
-# this is a giant mess, but basically it is just repeated code to properly align all of the necessary libraries and
-# their header information. kind of annoying, but this is the only certain way ZDS is able to organize things properly
-# currently 5 libraries are supported; more can be added later if needed (probably not)
-ifdef L
-LIBNUM := $(words $(L))
-LDLIBS := locate .$(word 1,$(L))_header at (top of .libs)+1
-LDLIBS += locate .$(word 1,$(L)) at (top of .$(word 1,$(L))_header)+1
-ifneq ($(LIBNUM),1)
-LDLIBS += locate .$(word 2,$(L))_header at (top of .$(word 1,$(L))+1)
-LDLIBS += locate .$(word 2,$(L)) at (top of .$(word 2,$(L))_header)+1
-ifneq ($(LIBNUM),2)
-LDLIBS += locate .$(word 3,$(L))_header at (top of .$(word 2,$(L))+1)
-LDLIBS += locate .$(word 3,$(L)) at (top of .$(word 3,$(L))_header)+1
-ifneq ($(LIBNUM),3)
-LDLIBS += locate .$(word 4,$(L))_header at (top of .$(word 3,$(L))+1)
-LDLIBS += locate .$(word 4,$(L)) at (top of .$(word 4,$(L))_header)+1
-ifneq ($(LIBNUM),4)
-LDLIBS += locate .$(word 5,$(L))_header at (top of .$(word 4,$(L))+1)
-LDLIBS += locate .$(word 5,$(L)) at (top of .$(word 5,$(L))_header)+1
-endif
-endif
-endif
-endif
-LDLAST := .$(word $(words $(L)),$(L))
-else
-LDLAST := .libs
-endif
+        -noasm -nodebug -nogenprint -keepasm -quiet -optsize -cpu:EZ80F91 -optspeed -noreduceopt -nodebug -nolistinc -nomodsect \
+	-stdinc:"$(HEADERS)" -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS := \
-	-FORMAT=INTEL32 \
 	-map -maxhexlen=64 -quiet -warnoverlap -xref -unresolved=fatal \
 	-sort ADDRESS=ascending -warn -NOdebug -NOigcase \
 	define __copy_code_to_ram = 0 \
@@ -204,13 +145,6 @@ LDFLAGS := \
 	locate data at (top of code)+1 \
 	locate text at (top of data)+1
 
-ifneq ($(OS),Windows_NT)
-	LDFLAGS := '$(LDFLAGS)'
-else
-	WINCHKBINDIR := $(WINCHKDIR) $(BINDIR)
-	WINCHKOBJDIR := $(WINCHKDIR) $(OBJDIR)
-endif
-
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
 
@@ -218,13 +152,13 @@ dirs:
 	@echo C CE SDK Version $(VERSION) && \
 	$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
 	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
-	
+
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 	@$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETHEX): $(OBJECTS)
-	@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(strip $(call NATIVEPATH,$^)))"
+	#@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(strip $(call NATIVEPATH,$^)))"
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
@@ -232,33 +166,21 @@ $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
 	$(CD) $(OBJDIR) && \
 	$(AS) $(ASM_FLAGS) $(ICON_ASM)
 
-$(OBJDIR)/%.obj: $(GFXDIR)/%.c $(USERHEADERS)
+$(OBJDIR)/%.src: $(GFXDIR)/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
-$(OBJDIR)/%.obj: $(GFXDIR)/%.asm $(USERHEADERS)
-	@$(CD) $(OBJDIR) && \
-	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+$(OBJDIR)/%.src: $(GFXDIR)/%.asm $(USERHEADERS)
+	@$(CP) $< $@
 
 # this rule builds the assembly files and places them in the object directory
-$(OBJDIR)/%.obj: $(SRCDIR)/%.asm $(USERHEADERS)
-	@$(CD) $(OBJDIR) && \
-	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
+$(OBJDIR)/%.src: $(SRCDIR)/%.asm $(USERHEADERS)
+	@$(CP) $< $@
 
 # these rules compile the source files into object files
-$(OBJDIR)/%.obj: $(SRCDIR)/%.c $(USERHEADERS)
+$(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
 	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
-
-# these rules compile the source files into object files
-$(OBJDIR)/%.obj: $(SRCDIR)/*/%.c $(USERHEADERS)
-	@$(CD) $(OBJDIR) && \
-	$(CC) $(CFLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
-
-# this rule builds the assembly files and places them in the object directory
-$(OBJDIR)/%.obj: $(SRCDIR)/*/%.asm $(USERHEADERS)
-	@$(CD) $(OBJDIR) && \
-	$(AS) $(ASM_FLAGS) $(call WINPATH,$(addprefix $(CURDIR)/,$<))
 
 clean:
 	@$(RM) $(call NATIVEPATH,$(BINDIR)/$(TARGETHEX) $(BINDIR)/$(TARGETTYPE) $(BINDIR)/$(TARGETMAP) $(OBJDIR)/$(ICON_ASM) $(OBJDIR)/*.obj $(OBJDIR)/*.src)

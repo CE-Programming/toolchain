@@ -20,7 +20,7 @@ DEV        ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
 BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
 
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
-LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
+LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib/shared)
 LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include)
 
 LIB_H      := $(wildcard *.h)
@@ -41,4 +41,3 @@ install:
 	$(COPY_SRCS)
 
 .PHONY: all clean install
-

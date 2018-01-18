@@ -30,7 +30,7 @@ BIN        ?=$(call NATIVEPATH,$(DEV)/bin)
 
 INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
 H_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/include)
-I_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/lib/shared)
+I_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/lib/libload)
 
 LIB_8XV    :=$(NAME).8xv
 LIB_H      :=$(NAME).h

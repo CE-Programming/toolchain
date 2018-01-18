@@ -34,14 +34,14 @@ LIB_H       = $(call NATIVEPATH,$(wildcard *.h))
 
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBSTATIC = (robocopy . $(LIB_LOC) $(LIBSTATIC) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBSHARED = (robocopy . $(LIB_LOC) $(LIBSHARED) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBLINKED = (robocopy . $(LIB_LOC) $(LIBLINKED) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBSTATIC = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/static) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBSHARED = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/shared) $(LIBSHARED) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBLINKED = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/linked) $(LIBLINKED) /njh /njs /ndl /nc /ns) ^& exit 0
 else
 COPY_HEADERS = $(CP) $(LIB_H) $(LOC_H)
-COPY_LIBSTATIC = $(CP) $(LIBSTATIC) $(LIB_LOC)
-COPY_LIBSHARED = $(CP) $(LIBSHARED) $(LIB_LOC)
-COPY_LIBLINKED = $(CP) $(LIBLINKED) $(LIB_LOC)
+COPY_LIBSTATIC = $(CP) $(LIBSTATIC) $(call NATIVEPATH,$(LIB_LOC)/static)
+COPY_LIBSHARED = $(CP) $(LIBSHARED) $(call NATIVEPATH,$(LIB_LOC)/shared)
+COPY_LIBLINKED = $(CP) $(LIBLINKED) $(call NATIVEPATH,$(LIB_LOC)/linked)
 endif
 
 all:
@@ -61,4 +61,3 @@ install:
 	$(COPY_LIBLINKED)
 
 .PHONY: all clean install
-

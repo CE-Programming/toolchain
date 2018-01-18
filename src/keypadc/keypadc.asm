@@ -6,7 +6,7 @@ format ti archived appvar 'KEYPADC'
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'KEYPADC', 1
+library 'KEYPADC', 2
 
 ;-------------------------------------------------------------------------------
 ; v1 functions
@@ -31,14 +31,14 @@ kb_Scan:
 ; Returns:
 ;  None
 	di
-	ld	hl,$f50200		; DI_Mode=$f5xx00
+	ld	hl,$f50200		; DI_Mode = $f5xx00
 	ld	(hl),h
 	xor	a,a
 .loop:
 	cp	a,(hl)
 	jr	nz,.loop
 	ret
- 
+
 ;-------------------------------------------------------------------------------
 kb_Reset:
 ; Resets the keypad (Only use if modified)
@@ -51,7 +51,7 @@ kb_Reset:
 	ld	hl,$08080f		; (nb of columns,nb of row) to scan/Wait 15 APB cycles before each scan
 	ld	(DI_Mode+3),hl
 	ret
- 
+
 ;-------------------------------------------------------------------------------
 kb_ScanGroup:
 ; Scans a keypad group
@@ -65,7 +65,7 @@ kb_ScanGroup:
 	push	bc
 	push	hl
 	di
-	ld	hl,$f50200		; DI_Mode=$f5xx00
+	ld	hl,$f50200		; DI_Mode = $f5xx00
 	ld	(hl),h
 	xor	a,a
 .loop:
@@ -93,13 +93,13 @@ kb_AnyKey:
 ; Returns:
 ;  0 if no key is pressed
 	di
-	ld	hl,$f50200		; DI_Mode=$f5xx00
+	ld	hl,$f50200		; DI_Mode = $f5xx00
 	ld	(hl),h
 	xor	a,a
 .loop:
 	cp	a,(hl)
 	jr	nz,.loop
-	ld	l,$12			; kbdG1=$f5xx12
+	ld	l,$12			; kbdG1 = $f5xx12
 	or	a,(hl)
 	inc	hl
 	inc	hl
