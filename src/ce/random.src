@@ -24,11 +24,11 @@
 ;	return result;
 ; }
 
-	SEGMENT DATA
+	segment data
 __state:
 	dl	0d0e0f10h,090a0b0ch,05060708h,01020304h
 
-	SEGMENT CODE
+	segment code
 _random:
 ; Read state[0] and perform state shifting.
 	ld	iy,__state		; iy = &state[0]

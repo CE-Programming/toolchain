@@ -6,7 +6,7 @@
 
 _rand:
 	call	_random
-	ld	de,1<<23
+	ld	de,8388608
 	sbc	hl,de
 	ret	p
 	add	hl,de

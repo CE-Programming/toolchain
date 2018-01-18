@@ -36,7 +36,7 @@ _delay:
 					;    = millis*(48000&0FFh)>>8,
 					;      off by -1 or -0.5
 	ld	e,l
-	ld	d,18			; 48000/256 == 187.5
+	ld	d,187			; 48000/256 == 187.5
 	ld	l,d
 	mlt	de			; de = (millis&0FFh)*(48000>>8)
 	mlt	hl			; hl = (millis>>8)*(48000>>8)

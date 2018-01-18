@@ -96,7 +96,7 @@ ifneq ("$(wildcard $(ICONPNG))","")
 ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(DESCRIPTION) && \
               $(CP) $(ICON_ASM) $(OBJDIR) $(NULL) && \
               $(RM) $(ICON_ASM) $(NULL)
-LINK_FILES += $(call NATIVEPATH,$(OBJDIR)/$(ICON_OBJ))
+LINK_FILES += $(call NATIVEPATH,$(OBJDIR)/$(ICON_ASM))
 ENTRY      += $(comma)$(space)__program_icon
 endif
 
@@ -159,10 +159,8 @@ $(BINDIR)/$(TARGETBIN): $(OBJECTS) $(LINK_FILES)
 	$(LD) $(LDFLAGS) $(CEDEV)/include/fasmg-ez80/ld.fasmg -i 'files $(call NATIVEPATH,$^)' -i 'libs $(LINK_LIBLOAD)' $@
 
 # this rule handles conversion of the icon, if it is ever updated
-$(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
-	@$(ICON_CONV) && \
-	$(CD) $(OBJDIR) && \
-	$(AS) $(ASM_FLAGS) $(ICON_ASM)
+$(OBJDIR)/$(ICON_ASM): $(ICONPNG)
+	@$(ICON_CONV)
 
 $(OBJDIR)/%.src: $(GFXDIR)/%.c $(USERHEADERS)
 	@$(CD) $(OBJDIR) && \
