@@ -120,30 +120,15 @@ CFLAGS ?= \
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS := \
-	-map -maxhexlen=64 -quiet -warnoverlap -xref -unresolved=fatal \
-	-sort ADDRESS=ascending -warn -NOdebug -NOigcase \
-	define __copy_code_to_ram = 0 \
-	range rom $$000000 : $$3FFFFF \
-	range ram $$D00000 : $$FFFFFF \
-	range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH) \
-	change code is ram \
-	change data is ram \
-	change text is ram \
-	change strsect is text \
-	define __low_bss = base of bss \
-	define __len_bss = length of bss \
-	define __heaptop = (highaddr of bss) \
-	define __heapbot = (top of bss)+1 \
-	define __stack = $$$(STACK_HIGH) \
-	locate .header at $$$(INIT_LOC) \
-	$(LDICON) \
-	locate .libs at (top of .launcher)+1 \
-	$(LDLIBS) \
-	locate .startup at (top of $(LDLAST))+1 \
-	$(LDCLEAN) \
-	locate code at (top of .exit)+1 \
-	locate data at (top of code)+1 \
-	locate text at (top of data)+1
+	-i 'range rom $$000000 : $$3FFFFF' \
+	-i 'range ram $$D00000 : $$FFFFFF' \
+	-i 'range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)' \
+	-i 'symbol __low_bss = bss.base' \
+	-i 'symbol __len_bss = bss.length' \
+	-i 'symbol __heaptop = bss.high' \
+	-i 'symbol __heapbot = bss.top' \
+	-i 'symbol __stack = $$$(STACK_HIGH)' \
+	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,text'
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
@@ -158,7 +143,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETHEX)
 	$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETHEX): $(OBJECTS)
-	#@$(LD) $(LDFLAGS) $@ = "$(subst $(space),$(comma),$(strip $(call NATIVEPATH,$^)))"
+	#@$(LD) $(LDFLAGS)  -i 'files "$(subst $(space),$(comma),$(strip $(call NATIVEPATH,$^)))"' $@
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_OBJ): $(ICONPNG)
