@@ -33,6 +33,9 @@ relocation_table
 *.so.*
 *.dylib
 
+# macos
+.DS_Store
+
 # executables
 *.hex
 *.8xv
