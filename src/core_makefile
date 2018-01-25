@@ -1,11 +1,12 @@
 #----------------------------
 # Core C Makefile
 #----------------------------
-CLEANUP      ?= YES
-BSSHEAP_LOW  ?= D031F6
-BSSHEAP_HIGH ?= D13FD6
-STACK_HIGH   ?= D1A87E
-INIT_LOC     ?= D1A87F
+CLEANUP             ?= YES
+BSSHEAP_LOW         ?= D031F6
+BSSHEAP_HIGH        ?= D13FD6
+STACK_HIGH          ?= D1A87E
+INIT_LOC            ?= D1A87F
+USE_FLASH_FUNCTIONS ?= YES
 #----------------------------
 
 VERSION := 8.0
@@ -23,6 +24,8 @@ comma := $(empty),$(empty)
 
 TARGET ?= $(NAME)
 ICONPNG ?= $(ICON)
+DEBUGMODE = NDEBUG
+CCDEBUGFLAG = -nodebug
 
 # get the os specific items
 ifeq ($(OS),Windows_NT)
@@ -133,12 +136,13 @@ HEADERS :=$(subst /;,;,$(HEADERS))
 
 # define the C flags used by the Zilog compiler
 CFLAGS ?= \
-        -noasm -nodebug -nogenprint -keepasm -quiet -optsize -cpu:EZ80F91 -optspeed -noreduceopt -nodebug -nolistinc -nomodsect \
-	-stdinc:"$(HEADERS)" -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE)
+    -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet -optsize -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect \
+    -stdinc:"$(HEADERS)" -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE)
 
 # these are the linker flags, basically organized to properly set up the environment
-LDFLAGS := \
+LDFLAGS ?= \
 	$(CEDEV)/include/fasmg-ez80/ld.fasmg \
+	$(LDDEBUGFLAG) \
 	-i 'range rom $$000000 : $$3FFFFF' \
 	-i 'range ram $$D00000 : $$FFFFFF' \
 	-i 'range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)' \
@@ -162,9 +166,14 @@ WINCHKOBJDIR := $(WINCHKDIR) $(OBJDIR)
 SAFEMKDIR     = $(WINCHKDIR) $(call NATIVEPATH,$(1)) $(MKDIR) $(call NATIVEPATH,$(1))
 endif
 
-
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
+
+# this rule is trigged to build debug everything
+debug: LDDEBUGFLAG = -i 'dbg'
+debug: DEBUGMODE = DEBUG
+debug: CCDEBUGFLAG = -debug
+debug: dirs $(BINDIR)/$(TARGET8XP)
 
 dirs:
 	@echo C CE SDK Version $(VERSION) && \

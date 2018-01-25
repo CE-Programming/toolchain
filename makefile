@@ -254,7 +254,7 @@ help:
 	@echo ce
 	@echo asm
 	@echo std
-	@ez80 fasmg
+	@echo fasmg
 	@echo graphx
 	@echo fileioc
 	@echo keypadc
