@@ -230,9 +230,9 @@ release: install
 #----------------------------
 dist-libs: release-libs
 release-libs: clibraries
-	$(CP) $(call NATIVEPATH,src/graphx/GRAPHX.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
-	$(CP) $(call NATIVEPATH,src/fileioc/FILEIOC.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
-	$(CP) $(call NATIVEPATH,src/keypadc/KEYPADC.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
+	$(CP) $(call NATIVEPATH,src/graphx/graphx.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
+	$(CP) $(call NATIVEPATH,src/fileioc/fileioc.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
+	$(CP) $(call NATIVEPATH,src/keypadc/keypadc.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
 	$(CP) $(call NATIVEPATH,src/sub/libload/LibLoad.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
 clibraries:
 	$(WINNCHKDIR) $(call WINCHKPATH,clibraries) $(MKDIR) clibraries
