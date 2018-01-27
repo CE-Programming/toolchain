@@ -18,7 +18,6 @@ macro library? name*,version*
 
 	macro export? function*
 		lib.exports equ function-lib.base
-		lib.numfunctions = lib.numfunctions + 1
 	end macro
 
 	macro @ez80.word @value*
@@ -34,7 +33,6 @@ macro library? name*,version*
 	end macro
 
 	format ti archived appvar name
-	lib.numfunctions = 0
 	org 0
 	lib.init = $
 	db 192,193,version
