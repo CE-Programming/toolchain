@@ -10,7 +10,7 @@
   "sequence": [
     "action|launch",
     "hashWait|1",
-    "delay|4800",
+    "delay|5100",
     "hashWait|2"
   ],
   "hashes": {
@@ -24,7 +24,7 @@
       "description": "Done",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "948248E" ],
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "948248E" ],
       "timeout": 250
     }
   }

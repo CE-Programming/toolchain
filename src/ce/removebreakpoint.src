@@ -1,14 +1,11 @@
-;-------------------------------------------------------------------------
-; For use in CEmu (And maybe other future emulators)
-;-------------------------------------------------------------------------
-	.def	_RemoveBreakpoint
+; ---
+; remove breakpoint
+; ---
+
+	.def	_dbg_RemoveBreakpoint
 	.assume	adl=1
 
-;--------------------------------------------------------------------
-_RemoveBreakpoint:
-; Removes a breakpoint at a particular address
-; Arguments
-;  DE = Address to remove
+_dbg_RemoveBreakpoint:
 	pop	hl
 	pop	de
 	push	de

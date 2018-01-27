@@ -27,49 +27,37 @@ INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
 LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include)
 
-LIBSTATIC   = $(call NATIVEPATH,$(wildcard $(STATICDIR)/*.lib))
-LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.lib))
-LIBLINKED   = $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.lib))
+LIBSTATIC   = $(call NATIVEPATH,$(wildcard $(STATICDIR)/*.src))
+LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.src))
+LIBLINKED   = $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.src))
 LIB_H       = $(call NATIVEPATH,$(wildcard *.h))
-
-RMLIBSTATIC = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIBSTATIC)))
-RMLIBSHARED = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIBSHARED)))
-RMLIBLINKED = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIBLINKED)))
-RMLIBH      = $(call NATIVEPATH,$(LIB_LOC)/$(notdir $(LIB_H)))
 
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBSTATIC = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/static) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBSHARED = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/shared) $(LIBSHARED) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBLINKED = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/linked) $(LIBLINKED) /njh /njs /ndl /nc /ns) ^& exit 0
 else
 COPY_HEADERS = $(CP) $(LIB_H) $(LOC_H)
+COPY_LIBSTATIC = $(CP) $(LIBSTATIC) $(call NATIVEPATH,$(LIB_LOC)/static)
+COPY_LIBSHARED = $(CP) $(LIBSHARED) $(call NATIVEPATH,$(LIB_LOC)/shared)
+COPY_LIBLINKED = $(CP) $(LIBLINKED) $(call NATIVEPATH,$(LIB_LOC)/linked)
 endif
 
-all: all-static all-linked all-shared
-	
-all-static:
+all:
 	$(MAKE) -C $(STATICDIR) BIN=$(BIN)
-
-all-linked:
 	$(MAKE) -C $(LINKEDDIR) BIN=$(BIN)
-
-all-shared:
 	$(MAKE) -C $(SHAREDDIR) BIN=$(BIN)
 
 clean:
-	$(MAKE) -C $(SHAREDDIR) clean
-	$(MAKE) -C $(LINKEDDIR) clean
-	$(MAKE) -C $(STATICDIR) clean
+	$(MAKE) -C $(SHAREDDIR) $(MAKECMDGOALS)
+	$(MAKE) -C $(LINKEDDIR) $(MAKECMDGOALS)
+	$(MAKE) -C $(STATICDIR) $(MAKECMDGOALS)
 
 install:
 	$(COPY_HEADERS)
-	$(CP) $(LIBSTATIC) $(LIB_LOC)
-	$(CP) $(LIBSHARED) $(LIB_LOC)
-	$(CP) $(LIBLINKED) $(LIB_LOC)
+	$(COPY_LIBSTATIC)
+	$(COPY_LIBSHARED)
+	$(COPY_LIBLINKED)
 
-uninstall:
-	$(RM) $(RMLIBH)
-	$(RM) $(RMLIBSTATIC)
-	$(RM) $(RMLIBSHARED)
-	$(RM) $(RMLIBLINKED)
-
-.PHONY: all clean all-static all-shared all-linked install uninstall
-
+.PHONY: all clean install

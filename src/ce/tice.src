@@ -1,7 +1,6 @@
-; C Functions present in the CE OS and Bootcode
-
-; --- External Definitions -------------------
-	.assume ADL=1
+; ---
+; external definitions
+; ---
 	.def _boot_GetBootMajorVer
 	.def _boot_GetHardwareVer
 	.def _boot_GetBootMinorVer
@@ -21,7 +20,7 @@
 	.def _boot_GetTime
 	.def _boot_SetTime
 	.def _boot_IsAfterNoon
-	
+
 	.def _os_PushErrorHandler
 	.def _os_PopErrorHandler
 	.def _os_ThrowError
@@ -115,9 +114,11 @@
 	.def _asm_EnableAPD
 	.def _asm_DrawStatusBar
 	.def _asm_ArcChk
-; --------------------------------------------
+	.assume adl=1
 
-; --- Location Equates -----------------------
+; ---
+; locations
+; ---
 _boot_GetBootMajorVer           equ 000080h
 _boot_GetHardwareVer            equ 000084h
 _boot_GetBootMinorVer           equ 00008Ch
@@ -218,8 +219,9 @@ _os_RealToFloat                 equ 022174h
 _os_FontDrawTransText           equ 022178h
 _os_CreateAppVar                equ 022184h
 
-; Directly callable asm functions
-
+; ---
+; directly callable asm functions
+; ---
 _asm_MoveDown                   equ 0207F4h
 _asm_MoveUp                     equ 020800h
 _asm_ClrLCDFull                 equ 020808h
@@ -233,6 +235,3 @@ _asm_DisableAPD                 equ 021134h
 _asm_EnableAPD                  equ 021138h
 _asm_DrawStatusBar              equ 021A3Ch
 _asm_ArcChk                     equ 022040h
-; --------------------------------------------
-
-	end

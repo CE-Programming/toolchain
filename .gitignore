@@ -1,9 +1,9 @@
-# Backups and IDE stuff
+# backups and ide stuff
 *~
 .idea/
 
 
-# Generated documentation
+# generated documentation
 doxygen/
 
 # Object files
@@ -15,33 +15,42 @@ obj/
 release/
 cmake-build-debug/
 
-# Precompiled Headers
+# precompiled headers
 *.gch
 *.pch
 relocation_table
 *_header.asm
 *_equates.asm
 
-# Libraries
+# libraries
 *.lib
 *.a
 *.la
 *.lo
 
-# Shared objects
+# shared objects
 *.so
 *.so.*
 *.dylib
 
-# Executables
+# macos
+.DS_Store
+
+# executables
 *.hex
 *.8xv
 *.8xp
 !*var_gfx.8xv
 
-# Debug files
+# debug files
 *.dSYM/
 *.map
 
-# Log files
+# log files
 *.log
+
+# fasmg files
+src/include/ez80.inc
+src/include/ld.fasmg
+src/include/ti84pceg.inc
+src/include/tiformat.inc

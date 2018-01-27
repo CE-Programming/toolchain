@@ -1,11 +1,11 @@
-;-------------------------------------------------------------------------
-; void debugger(void) function
-; For use in CEmu, opens the debugger
-;-------------------------------------------------------------------------
-	.def	_Debugger
+; ---
+; opens the debugger
+; ---
+
+	.def	_dbg_Debugger
 	.assume adl=1
 
-_Debugger:
+_dbg_Debugger:
 	scf
 	sbc	hl,hl
 	ld	(hl),2

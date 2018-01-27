@@ -1,8 +1,10 @@
-	.def _random
-	.def __state
-	.assume adl=1
+; ---
+; uint32_t random(void)
+; ---
 
-; uint32_t random(void);
+	.def	_random
+	.def	__state
+	.assume	adl=1
 
 ; https://github.com/MersenneTwister-Lab/XSadd/blob/master/xsadd.h#L75
 ; using shift parameters (19, 21, 8) instead of (15, 18, 11)
@@ -24,11 +26,11 @@
 ;	return result;
 ; }
 
-	SEGMENT DATA
+	segment data
 __state:
 	dl	0d0e0f10h,090a0b0ch,05060708h,01020304h
 
-	SEGMENT CODE
+	segment code
 _random:
 ; Read state[0] and perform state shifting.
 	ld	iy,__state		; iy = &state[0]

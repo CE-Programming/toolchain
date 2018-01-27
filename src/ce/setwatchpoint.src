@@ -1,15 +1,11 @@
-;-------------------------------------------------------------------------
-; For use in CEmu (And maybe other future emulators)
-;-------------------------------------------------------------------------
-	.def	_SetWatchpoint
+; ---
+; set watchpoint
+; ---
+
+	.def	_dbg_SetWatchpoint
 	.assume	adl=1
 
-;--------------------------------------------------------------------
-_SetWatchpoint:
-; Sets an empty watchpoint at a particular address
-; Arguments
-;  DE = Address to set as breakpoint
-;   C = Length of watchpoint
+_dbg_SetWatchpoint:
 	pop	hl
 	pop	de
 	pop	bc

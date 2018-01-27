@@ -10,8 +10,7 @@
 ; Registers Used:
 ;	a,de
 ;-------------------------------------------------------------------------
-	.def __ineg,__sneg
+	.def __ineg
 	.assume adl=1
 
 __ineg         equ 000160h
-__sneg         equ 00022Ch

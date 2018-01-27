@@ -1,0 +1,69 @@
+;-------------------------------------------------------------------------------
+; Standard CE startup module definitions and references
+;-------------------------------------------------------------------------------
+
+	.ref	_main
+	.ref	__low_bss
+	.ref	__len_bss
+
+	.def	_errno
+	.def	_init
+	.def	_exit
+	.def	__exit
+	.def	__exitsp
+
+	.assume	adl=1
+
+_errno  equ 0D008DCh
+
+;-------------------------------------------------------------------------------
+	segment header
+	db	0efh
+	db	07bh
+	db	0		; Magic byte recognition for C programs
+_init:
+
+;-------------------------------------------------------------------------------
+	segment startup
+
+	call	0020848h	; _RunInicOff, assumes iy=flags
+	di
+	ld	bc,__len_bss	; BSS byte size
+	ld	hl,__low_bss	; BSS low address
+	push	bc
+	push	hl
+	call	0000B0h		; _memclear
+	pop	hl
+	pop	hl
+	push	iy
+	ld	hl,0E00005h
+	push	hl
+	ld	a,(hl)
+	push	af
+	ld	(hl),3		; reduce flash wait states (because of rtl)
+	call	0004F4h		; usb_DisableTimers
+	ld	(__exitsp+1),sp	; save the stack from death
+	call	_main
+__exit:
+__exitsp:
+	ld	sp,0
+	pop	af
+	pop	de
+	ld	(de),a		; restore flash wait states
+	pop	iy		; restore iy for OS
+	push	hl		; exit code
+	call	0004F0h		; usb_ResetTimers
+
+;-------------------------------------------------------------------------------
+	segment exit
+
+	pop	hl		; exit code
+	ret
+
+_exit:
+	pop	hl
+	pop	hl
+	jr	__exit
+
+;-------------------------------------------------------------------------------
+	segment code
