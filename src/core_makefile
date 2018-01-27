@@ -156,8 +156,6 @@ LDFLAGS ?= \
 	$(CEDEV)/include/fasmg-ez80/ld.fasmg \
 	$(LDDEBUGFLAG) \
 	$(LDMAPFLAG) \
-	-i 'range rom $$000000 : $$3FFFFF' \
-	-i 'range ram $$D00000 : $$FFFFFF' \
 	-i 'range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)' \
 	-i 'symbol __low_bss = bss.base' \
 	-i 'symbol __len_bss = bss.length' \

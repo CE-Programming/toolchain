@@ -1,8 +1,4 @@
 ;-------------------------------------------------------------------------------
-include '../include/ez80.inc'
-include '../include/ti84pceg.inc'
-include '../include/tiformat.inc'
-format ti archived appvar 'FILEIOC'
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
