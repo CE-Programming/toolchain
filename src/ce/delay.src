@@ -1,5 +1,10 @@
-	.assume adl=1
-	.def _delay
+
+; ---
+; void delay(uint16_t millis)
+; ---
+
+	.def	_delay
+	.assume	adl=1
 
 mpTmrRange		equ 0F20000h
 
@@ -14,8 +19,6 @@ bTmr2Enable		equ 3
 bTmr2Crystal		equ 4
 bTmr2Overflow		equ 5
 bTmr2CountUp		equ 10
-
-; void delay(uint16_t millis);
 
 _delay:
 ; Read argument.

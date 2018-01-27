@@ -1,15 +1,11 @@
-;-------------------------------------------------------------------------
-; For use in CEmu (And maybe other future emulators)
-;-------------------------------------------------------------------------
-	.def	_SetReadWatchpoint
+; ---
+; set read watchpoint
+; ---
+
+	.def	_dbg_SetReadWatchpoint
 	.assume	adl=1
 
-;--------------------------------------------------------------------
-_SetReadWatchpoint:
-; Sets a watchpoint at a particular address
-; Arguments
-;  DE = Address to set as watchpoint
-;   C = Length of watchpoint
+_dbg_SetReadWatchpoint:
 	pop	hl
 	pop	de
 	pop	bc

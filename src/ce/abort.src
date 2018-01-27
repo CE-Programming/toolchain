@@ -1,7 +1,7 @@
-;-------------------------------------------------------------------------
-; void abort(void) function
-; For use in CEmu; triggers an open  in the debugger
-;-------------------------------------------------------------------------
+; ---
+; triggers open debugger
+; ---
+
 	.def	_abort
 	.ref	__exit
 	.assume adl=1

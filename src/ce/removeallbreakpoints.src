@@ -1,14 +1,11 @@
-;-------------------------------------------------------------------------
-; For use in CEmu (And maybe other future emulators)
-;-------------------------------------------------------------------------
-	.def	_RemoveAllBreakpoints
+; ---
+; remove all breakpoints
+; ---
+
+	.def	_dbg_RemoveAllBreakpoints
 	.assume	adl=1
 
-;--------------------------------------------------------------------
-_RemoveAllBreakpoints:
-; Sets a breakpoint at a particular address
-; Arguments
-;  HL = Address to set as breakpoint
+_dbg_RemoveAllBreakpoints:
 	scf
 	sbc	hl,hl
 	ld	(hl),9
