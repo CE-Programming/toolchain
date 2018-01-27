@@ -11,6 +11,7 @@
 	.def	_exit
 	.def	__exit
 	.def	__exitsp
+	.def	__errsp
 
 	.assume	adl=1
 
@@ -46,6 +47,7 @@ _init:
 	call	_main
 __exit:
 __exitsp:
+__errsp:
 	ld	sp,0
 	pop	af
 	pop	de
