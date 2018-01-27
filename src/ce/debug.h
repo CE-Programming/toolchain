@@ -105,7 +105,7 @@ void dbg_RemoveAllBreakpoints(void);
 #define dbg_RemoveWatchpoint(ignore) ((void)0)
 #define dbg_RemoveAllWatchpoints(ignore) ((void)0)
 #define dbg_RemoveAllBreakpoints(ignore) ((void)0)
-#define dbg_sprintf (void)
+#define dbg_sprintf if(0)(void)
 #define dbgout (NULL)
 #define dbgerr (NULL)
 #endif

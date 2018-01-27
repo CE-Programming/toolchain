@@ -993,7 +993,7 @@ gfx_Circle:
 	add	hl,de
 	ex	de,hl
 	push	de
-	call	gfx_SetPixel
+	call	_SetPixel
 	ld	bc,(iy+6)
 	ld	hl,(iy-6)
 	add	hl,bc
@@ -1005,7 +1005,7 @@ gfx_Circle:
 	push	hl
 	push	hl
 	pop	bc
-	call	gfx_SetPixel
+	call	_SetPixel
 	ld	bc,(iy-6)
 	ld	hl,(iy+6)
 	or	a,a
@@ -1013,7 +1013,7 @@ gfx_Circle:
 	ex	de,hl
 	pop	bc
 	push	de
-	call	gfx_SetPixel
+	call	_SetPixel
 	pop	de
 	ld	bc,(iy-3)
 	ld	hl,(iy+3)
@@ -1022,10 +1022,10 @@ gfx_Circle:
 	push	hl
 	push	hl
 	pop	bc
-	call	gfx_SetPixel
+	call	_SetPixel
 	pop	bc
 	pop	de
-	call	gfx_SetPixel
+	call	_SetPixel
 	pop	de
 	ld	bc,(iy-6)
 	ld	hl,(iy+3)
@@ -1034,7 +1034,7 @@ gfx_Circle:
 	push	hl
 	push	hl
 	pop	bc
-	call	gfx_SetPixel
+	call	_SetPixel
 	ld	bc,(iy-3)
 	ld	hl,(iy+6)
 	or	a,a
@@ -1042,10 +1042,10 @@ gfx_Circle:
 	ex	de,hl
 	pop	bc
 	push	de
-	call	gfx_SetPixel
+	call	_SetPixel
 	pop	de
 	pop	bc
-	call	gfx_SetPixel
+	call	_SetPixel
 	ld	bc,(iy-3)
 	inc	bc
 	ld	(iy-3),bc
@@ -1084,7 +1084,8 @@ gfx_Circle:
 	jp	p,.check
 	jp	pe,.sectors
 	jr	.exit
-.check:	jp	po,.sectors
+.check:
+	jp	po,.sectors
 .exit:
 	ld	sp,iy
 	ret
@@ -1763,13 +1764,14 @@ gfx_ShiftDown:
 	ld	de,(_XMin)
 	sbc	hl,de
 	ld	(ShiftCopyAmount),hl
-	ld	de,-LcdWidth
+	ld	de,0 - LcdWidth
 	add	hl,de
 	ld	(ShiftLineOff),hl
 	ld	hl,_YMax
 	ld	e,(hl)
 	sub	a,e
 	dec	e
+
 _Shift:
 	ld	d,LcdWidth/2
 	mlt	de
@@ -1777,17 +1779,17 @@ _Shift:
 	add	hl,de
 	add	hl,de
 	add	hl,bc
+ShiftCopyAmount :=$+1
 .loop:
 	ld	bc,0
-ShiftCopyAmount = $-3
 	ex	de,hl
+ShiftAmountOffset :=$+1
 	ld	hl,0
-ShiftAmountOffset = $-3
 	add	hl,de
+ShiftCopyDirection :=$+1
 	ldir
-ShiftCopyDirection = $-2
+ShiftLineOff :=$+1
 	ld	hl,0
-ShiftLineOff = $-3
 	add	hl,de
 	inc	a
 	jr	nz,.loop
@@ -2147,8 +2149,8 @@ gfx_Sprite_NoClip:
 	xor	a,a
 	ld	b,a
 	srl	c
-	sbc	a,.step-.evenw
-	ld	(.step),a
+	sbc	a,.step - .evenw
+	ld	(.step - 1),a
 	ld	a,LcdWidth/2
 	sub	a,c
 	ld	iyl,a			; (LcdWidth/2)-(spriteWidth/2)
@@ -2168,7 +2170,7 @@ gfx_Sprite_NoClip:
 	ldir
 	dec	a
 	jr	nz,.loop
-.step := $-1
+.step:
 	ret
 
 ;-------------------------------------------------------------------------------
