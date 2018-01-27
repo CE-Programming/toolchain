@@ -7,6 +7,13 @@ BSSHEAP_HIGH        ?= D13FD6
 STACK_HIGH          ?= D1A87E
 INIT_LOC            ?= D1A87F
 USE_FLASH_FUNCTIONS ?= YES
+OUTPUT_MAP          ?= YES
+ARCHIVED            ?= NO
+#----------------------------
+SRCDIR              ?= src
+OBJDIR              ?= obj
+BINDIR              ?= bin
+GFXDIR              ?= src/gfx
 #----------------------------
 
 VERSION := 8.0
@@ -119,6 +126,9 @@ endif
 ifeq ($(CLEANUP),YES)
 U_CLEANUP = 1
 endif
+ifeq ($(OUTPUT_MAP),YES)
+LDMAPFLAG = -i 'map'
+endif
 
 # choose static or linked flash functions
 ifeq ($(USE_FLASH_FUNCTIONS),YES)
@@ -143,6 +153,7 @@ CFLAGS ?= \
 LDFLAGS ?= \
 	$(CEDEV)/include/fasmg-ez80/ld.fasmg \
 	$(LDDEBUGFLAG) \
+	$(LDMAPFLAG) \
 	-i 'range rom $$000000 : $$3FFFFF' \
 	-i 'range ram $$D00000 : $$FFFFFF' \
 	-i 'range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)' \

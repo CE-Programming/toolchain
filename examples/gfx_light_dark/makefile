@@ -11,12 +11,5 @@ ICON        ?= iconc.png
 DESCRIPTION ?= "C SDK Demo"
 
 # ----------------------------
-# Specify source and output locations
-# ----------------------------
-
-SRCDIR ?= src
-OBJDIR ?= obj
-BINDIR ?= bin
-GFXDIR ?= src/gfx
 
 include $(CEDEV)/include/.makefile

@@ -9,17 +9,14 @@
   },
   "sequence": [
     "action|launch",
-    "delay|800",
-    "hash|1",
+    "hashWait|1",
     "delay|100",
     "key|right",
     "key|right",
     "key|down",
     "key|down",
-    "delay|100",
-    "hash|2",
+    "hashWait|2",
     "key|enter",
-    "delay|200",
     "hashWait|3"
   ],
   "hashes": {
