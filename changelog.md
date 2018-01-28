@@ -3,8 +3,23 @@
 *Note: toolchain releases aren't necessarily in sync with libraries releases.*
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
-See full [commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.2...HEAD)
+See full [commit list](https://github.com/CE-Programming/toolchain/compare/v8.0...HEAD)
 
+# [v8.0](https://github.com/CE-Programming/toolchain/releases/tag/v8.0) (2018-01-28)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v7.4.2...v8.0)
+
+### Toolchain
+  - Replace ZDS assembler with fasmg-ez80 ([Jacobly](https://github.com/jacobly0)))
+  - Replace ZDS linker/librarian with fasmg-ez80 ([Jacobly](https://github.com/jacobly0)))
+  - Integrate fasmg-ez80 into toolchain ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Library translation to fasmg-ez80 format ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Add more tests and header file cleanup ([Adriweb](https://github.com/Adriweb))
+
+### Libraries
+  - Optimize gfx_FillScreen() and gfx_ZeroScreen() [Runer112](https://github.com/Runer112)
+  - Fix gfx_FillTriangle() and gfx_FillTriangle_NoClip() ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Add gfx_SetCharData() and os_GetStringInput() ([MateoConLechuga](https://github.com/MateoConLechuga))
 
 # [v7.4.2](https://github.com/CE-Programming/toolchain/releases/tag/v7.4.2) (2017-08-13)
 
