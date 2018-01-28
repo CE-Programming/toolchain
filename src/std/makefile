@@ -34,9 +34,9 @@ LIB_H       = $(call NATIVEPATH,$(wildcard *.h))
 
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBSTATIC = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/static) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBSHARED = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/shared) $(LIBSHARED) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBLINKED = (robocopy . $(call NATIVEPATH,$(LIB_LOC)/linked) $(LIBLINKED) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBSTATIC = (robocopy $(STATICDIR) $(call NATIVEPATH,$(LIB_LOC)/static) $(notdir $(LIBSTATIC)) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBSHARED = (robocopy $(SHAREDDIR) $(call NATIVEPATH,$(LIB_LOC)/shared) $(notdir $(LIBSHARED)) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_LIBLINKED = (robocopy $(LINKEDDIR) $(call NATIVEPATH,$(LIB_LOC)/linked) $(notdir $(LIBLINKED)) /njh /njs /ndl /nc /ns) ^& exit 0
 else
 COPY_HEADERS = $(CP) $(LIB_H) $(LOC_H)
 COPY_LIBSTATIC = $(CP) $(LIBSTATIC) $(call NATIVEPATH,$(LIB_LOC)/static)

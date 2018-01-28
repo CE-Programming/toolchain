@@ -27,8 +27,8 @@ LIB_H      := $(wildcard *.h)
 SRC        := $(wildcard *.src)
 
 ifeq ($(OS),Windows_NT)
-COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_SRCS = (robocopy . $(LOC_H) $(SRC) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_HEADERS = (robocopy . $(LOC_H) $(notdir $(LIB_H)) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_SRCS = (robocopy . $(LIB_LOC) $(notdir $(SRC)) /njh /njs /ndl /nc /ns) ^& exit 0
 else
 COPY_HEADERS = $(CP) $(LIB_H) $(LOC_H)
 COPY_SRCS = $(CP) $(SRC) $(LIB_LOC)

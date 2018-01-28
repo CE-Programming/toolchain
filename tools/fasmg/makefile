@@ -7,7 +7,7 @@ ifeq ($(OS),Windows_NT)
 SHELL      =cmd.exe
 NATIVEPATH =$(subst /,\,$(1))
 RM         =del /f 2>nul
-CP         =xcopy /y
+CP         =echo f|xcopy /y
 PREFIX    ?=C:
 NAME       =fasmg.exe
 FASMGP     =windows\$(NAME)
@@ -22,7 +22,7 @@ NATIVEPATH =$(subst \,/,$(1))
 RM         =rm -f
 CP         =cp
 PREFIX    ?=$(HOME)
-ADDEXE     =chmod +x $(NAME)
+ADDEXE     =&& chmod +x $(NAME)
 endif
 
 DEV ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
@@ -36,7 +36,7 @@ FILES      :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
 INCFILES   :=$(addprefix $(INC),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
 
 all: $(FILES)
-	$(CP) $(call NATIVEPATH,$(FASMGP)) . && $(ADDEXE)
+	$(CP) $(call NATIVEPATH,$(FASMGP)) . $(ADDEXE)
 
 $(FILES):
 	$(CP) $(call NATIVEPATH,fasmg-ez80/$(@F)) $(INCDIR)$(@F)
