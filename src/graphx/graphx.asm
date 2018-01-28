@@ -3448,7 +3448,7 @@ gfx_FillTriangle_NoClip:
 ;  arg0-5 : x0,y0,x1,y1,x2,y2
 ; Returns:
 ;  None
-	ld	hl,_HorizLine_NoClip
+	ld	hl,gfx_HorizLine_NoClip
 	jr	_FillTriangle
 ;-------------------------------------------------------------------------------
 gfx_FillTriangle:
@@ -3469,9 +3469,9 @@ _FillTriangle:
 	ld	sp,hl
 	sbc	hl,hl
 	ld	(ix-15),hl
-	ld	(ix-18),hl
-	ld	hl,(ix+9)
-	ld	de,(ix+15)
+	ld	(ix-18),hl		; int sa = 0, sb = 0;
+	ld	hl,(ix+9)		; sort coordinates by y order (y2 >= y1 >= y0)
+	ld	de,(ix+15)		; if (y0 > y1)
 	call	_SignedCompare
 	jr	c,.cmp0
 	ld	hl,(ix+9)
@@ -3506,251 +3506,265 @@ _FillTriangle:
 	ld	(ix+6),de
 	ld	(ix+12),hl
 .cmp2:
-	ld	de,(ix+12)
-	ld	hl,(ix+18)
-	or	a,a
-	sbc	hl,de
-	ld	(ix-24),hl
-	ld	de,(ix+6)
-	ld	hl,(ix+12)
-	or	a,a
-	sbc	hl,de
-	ld	(ix-39),hl
-	ld	de,(ix+9)
-	ld	hl,(ix+15)
-	or	a,a
-	sbc	hl,de
-	ld	(ix-36),hl
-	ld	de,(ix+6)
-	ld	hl,(ix+18)
-	or	a,a
-	sbc	hl,de
-	ld	(ix-21),hl
-	ld	de,(ix+9)
-	ld	hl,(ix+21)
-	or	a,a
-	sbc	hl,de
-	ld	(ix-30),hl
-	ld	de,(ix+15)
-	ld	hl,(ix+21)
-	or	a,a
-	sbc	hl,de
-	ld	(ix-33),hl
-	ld	de,(ix+21)
+	ld	de,(ix+21)		; if(y0 == y2) - handle awkward all-on-same-line case as its own thing
 	ld	hl,(ix+9)
 	or	a,a
 	sbc	hl,de
-	jp	nz,.loop
-	ld	hl,(ix+6)
-	ld	(ix-6),hl
-	ld	(ix-3),hl
-	ld	de,(ix+12)
-	call	_SignedCompare
-	jr	c,.cmp3
-	ld	(ix-3),de
-	jr	.cmp4
-.cmp3:
-	ld	hl,(ix+12)
-	ld	de,(ix-6)
-	call	_SignedCompare
-	jr	c,.cmp4
-	ld	de,(ix+12)
-	ld	(ix-6),de
-.cmp4:
-	ld	hl,(ix-3)
-	ld	de,(ix+18)
-	call	_SignedCompare
-	jr	c,.cmp5
-	ld	(ix-3),de
-	jr	.cmp6
-.cmp5:
-	ld	hl,(ix+18)
-	ld	de,(ix-6)
-	call	_SignedCompare
-	jr	c,.cmp6
-	ld	de,(ix+18)
-	ld	(ix-6),de
-.cmp6:
-	ld	bc,(ix-3)
-	ld	de,(ix+9)
-	ld	hl,(ix-6)
+	jp	nz,.notflat
+	ld	bc,(ix+6)		; x0
+	ld	(ix-6),bc		; a = x0
+	ld	(ix-3),bc		; b = x0;
+	ld	hl,(ix+12)		; if (x1 < a) { a = x1; }
 	or	a,a
 	sbc	hl,bc
+	jp	p,.cmp00
+	jp	pe,.cmp01
+	jr	.cmp02
+.cmp00:
+	jp	po,.cmp01
+.cmp02:
+	ld	bc,(ix+12)
+	ld	(ix-3),bc
+	jr	.cmp11
+.cmp01:
+	ld	bc,(ix+12)
+	ld	hl,(ix-6)
+	or	a,a
+	sbc	hl,bc			; else if (x1 > b) { b = x1; }
+	jp	p,.cmp10
+	jp	pe,.cmp11
+	jr	.cmp12
+.cmp10:
+	jp	po,.cmp11
+.cmp12:
+	ld	bc,(ix+12)
+	ld	(ix-6),bc
+.cmp11:
+	ld	bc,(ix-3)
+	ld	hl,(ix+18)
+	or	a,a
+	sbc	hl,bc			; if (x2 < a) { a = x2; }
+	jp	p,.cmp20
+	jp	pe,.cmp21
+	jr	.cmp22
+.cmp20:
+	jp	po,.cmp21
+.cmp22:
+	ld	bc,(ix+18)
+	ld	(ix-3),bc
+	jr	.cmp31
+.cmp21:
+	ld	bc,(ix+18)
+	ld	hl,(ix-6)
+	or	a,a
+	sbc	hl,bc			; else if (x2 > b) { b = x2; }
+	jp	p,.cmp30
+	jp	pe,.cmp31
+	jr	.cmp32
+.cmp30:
+	jp	po,.cmp31
+.cmp32:
+	ld	bc,(ix+18)
+	ld	(ix-6),bc
+.cmp31:
+	ld	de,(ix-3)
+	ld	hl,(ix-6)
+	or	a,a
+	sbc	hl,de
 	inc	hl
 	push	hl
-	push	de
+	ld	bc,(ix+9)
 	push	bc
-	call	0
-.line0 = $-3
+	push	de
+	call	0			; horizline(a, y0, b-a+1);
+.line0 := $-3
+	pop	bc
+	pop	bc
+	pop	bc
 	ld	sp,ix
 	pop	ix
-	ret
-.loop:
-	ld	de,(ix+21)
-	ld	hl,(_YMax)
+	ret				; return;
+.notflat:
+	ld	bc,(ix+6)		; x0
+	ld	hl,(ix+12)
 	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jp	p,.cmp7
-	jp	pe,.cmp9
-	jr	.cmp8
-.cmp7:
-	jp	po,.cmp9
-.cmp8:
-	ld	(ix+21),hl
-.cmp9:
+	sbc	hl,bc
+	ld	(ix-36),hl		; dx01 = x1 - x0;
+	ld	hl,(ix+18)
+	or	a,a
+	sbc	hl,bc
+	ld	(ix-21),hl		; dx02 = x2 - x0;
+	ld	bc,(ix+9)		; y0
 	ld	hl,(ix+15)
 	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jr	nz,.cmp10
-	ld	(ix-27),hl
-	jr	.cmp11
-.cmp10:
-	dec	hl
-	ld	(ix-27),hl
-.cmp11:
+	sbc	hl,bc
+	ld	(ix-33),hl		; dy01 = y1 - y0;
+	ld	hl,(ix+21)
+	or	a,a
+	sbc	hl,bc
+	ld	(ix-27),hl		; dy02 = y2 - y0;
+	ld	bc,(ix+12)
+	ld	hl,(ix+18)
+	or	a,a
+	sbc	hl,bc
+	ld	(ix-30),hl		; dx12 = x2 - x1;
+	ld	bc,(ix+15)
+	ld	hl,(ix+21)
+	or	a,a
+	sbc	hl,bc
+	ld	(ix-39),hl		; dy12 = y2 - y1;
+	jr	nz,.elselast		; if (y1 == y2) { last = y1; }
+	ld	(ix-24),bc
+	jr	.sublast
+.elselast:
+	ld	bc,(ix+15)		; else { last = y1-1; }
+	dec	bc
+	ld	(ix-24),bc
+.sublast:
 	ld	bc,(ix+9)
-	ld	(ix-12),bc
-	jp	.cmp16
-.cmp12:
+	ld	(ix-12),bc		; for (y = y0; y <= last; y++)
+	jp	.firstloopstart
+.firstloop:
 	ld	hl,(ix-15)
-	ld	bc,(ix-36)
+	ld	bc,(ix-33)
 	call	_DivideHLBC
 	ld	bc,(ix+6)
 	add	hl,bc
-	ld	(ix-3),hl
+	ld	(ix-3),hl		; a = x0 + sa / dy01;
 	ld	hl,(ix-18)
-	ld	bc,(ix-30)
+	ld	bc,(ix-27)
 	call	_DivideHLBC
 	ld	bc,(ix+6)
 	add	hl,bc
-	ld	(ix-6),hl
-	ex	de,hl
-	ld	bc,(ix-39)
+	ld	(ix-6),hl		; b = x0 + sb / dy02;
+	ld	bc,(ix-36)
 	ld	hl,(ix-15)
 	add	hl,bc
-	ld	(ix-15),hl
+	ld	(ix-15),hl		; sa += dx01;
 	ld	bc,(ix-21)
 	ld	hl,(ix-18)
 	add	hl,bc
-	ld	(ix-18),hl
-	ex	de,hl
-	ld	de,(ix-3)
-	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jp	p,.cmp13
-	jp	pe,.cmp15
-	jr	.cmp14
-.cmp13:
-	jp	po,.cmp15
-.cmp14:
-	ex	de,hl
-	ld	(ix-3),de
-	ld	(ix-6),hl
-.cmp15:
+	ld	(ix-18),hl		; sb += dx02;
 	ld	de,(ix-3)
 	ld	hl,(ix-6)
 	or	a,a
+	sbc	hl,de			; if (b < a) { swap(a,b); }
+	jp	p,.cmp40
+	jp	pe,.cmp41
+	jr	.cmp42
+.cmp40:
+	jp	po,.cmp41
+.cmp42:
+	ld	hl,(ix-3)
+	ld	de,(ix-6)
+	ld	(ix-3),de
+	ld	(ix-6),hl
+.cmp41:
+	ld	hl,(ix-6)
+	or	a,a
 	sbc	hl,de
-	ld	bc,(ix-12)
 	inc	hl
 	push	hl
+	ld	bc,(ix-12)
 	push	bc
 	push	de
-	call	0
+	call	0			; horizline(a, y, b-a+1);
 .line1 := $-3
-	lea	hl,ix-39
-	ld	sp,hl
+	pop	bc
+	pop	bc
+	pop	bc
 	ld	bc,(ix-12)
 	inc	bc
 	ld	(ix-12),bc
-.cmp16:
-	ld	hl,(ix-27)
+.firstloopstart:
+	ld	hl,(ix-24)
 	or	a,a
 	sbc	hl,bc
-	jp	p,.cmp17
-	jp	pe,.cmp12
-	jr	.cmp18
-.cmp17:
-	jp	po,.cmp12
-.cmp18:
+	jp	p,.cmp50
+	jp	pe,.firstloop
+	jr	.cmp52
+.cmp50:
+	jp	po,.firstloop
+.cmp52:
 	ld	bc,(ix+15)
 	ld	hl,(ix-12)
 	or	a,a
 	sbc	hl,bc
-	ld	bc,(ix-24)
-	call	_MultiplyHLBC
+	ld	bc,(ix-30)
+	call	_MultiplyHLBC		; sa = dx12 * (y - y1);
 	ld	(ix-15),hl
 	ld	bc,(ix+9)
 	ld	hl,(ix-12)
 	or	a,a
 	sbc	hl,bc
 	ld	bc,(ix-21)
-	call	_MultiplyHLBC
+	call	_MultiplyHLBC		; sb = dx02 * (y - y0);
 	ld	(ix-18),hl
-	jp	.start
-.cmp19:
+	jp	.secondloopstart	; for(; y <= y2; y++)
+.secondloop:
 	ld	hl,(ix-15)
-	ld	bc,(ix-33)
+	ld	bc,(ix-39)
 	call	_DivideHLBC
 	ld	bc,(ix+12)
 	add	hl,bc
-	ld	(ix-3),hl
+	ld	(ix-3),hl		; a = x1 + sa / dy12;
 	ld	hl,(ix-18)
-	ld	bc,(ix-30)
+	ld	bc,(ix-27)
 	call	_DivideHLBC
 	ld	bc,(ix+6)
 	add	hl,bc
-	ld	(ix-6),hl
-	ex	de,hl
+	ld	(ix-6),hl		; b = x0 + sb / dy02;
+	ld	bc,(ix-30)
+	ld	hl,(ix-15)
+	add	hl,bc
+	ld	(ix-15),hl		; sa += dx12;
 	ld	bc,(ix-21)
 	ld	hl,(ix-18)
 	add	hl,bc
-	ld	(ix-18),hl
-	ld	bc,(ix-24)
-	ld	hl,(ix-15)
-	add	hl,bc
-	ld	(ix-15),hl
-	ex	de,hl
+	ld	(ix-18),hl		; sb += dx02;
 	ld	de,(ix-3)
+	ld	hl,(ix-6)
 	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jp	p,.cmp20
-	jp	pe,.cmp22
-	jr	.cmp21
-.cmp20:	jp	po,.check
-.cmp21:	ex	de,hl
+	sbc	hl,de			; if (b < a) { swap(a,b); }
+	jp	p,.cmp60
+	jp	pe,.cmp61
+	jr	.cmp62
+.cmp60:
+	jp	po,.cmp61
+.cmp62:
+	ld	hl,(ix-3)
+	ld	de,(ix-6)
 	ld	(ix-3),de
 	ld	(ix-6),hl
-.cmp22:	or	a,a
+.cmp61:
+	ld	hl,(ix-6)
+	or	a,a
 	sbc	hl,de
-	ld	bc,(ix-12)
 	inc	hl
 	push	hl
+	ld	bc,(ix-12)
 	push	bc
 	push	de
-	call	0
+	call	0			; horizline(a, y, b-a+1);
 .line2 := $-3
-	lea	hl,ix-39
-	ld	sp,hl
+	pop	bc
+	pop	bc
+	pop	bc
 	ld	bc,(ix-12)
 	inc	bc
 	ld	(ix-12),bc
-.start:
+.secondloopstart:
 	ld	bc,(ix-12)
 	ld	hl,(ix+21)
 	or	a,a
 	sbc	hl,bc
-	jp	p,+_
-	jp	pe,.cmp19
+	jp	p,.cmp70
+	jp	pe,.secondloop
 	ld	sp,ix
 	pop	ix
 	ret
-.check:
-	jp	po,.cmp19
+.cmp70:
+	jp	po,.secondloop
 	ld	sp,ix
 	pop	ix
 	ret

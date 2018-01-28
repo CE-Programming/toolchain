@@ -89,6 +89,24 @@ void main(void) {
     /* Wait for any key */
     while (!os_GetCSC());
 
+    gfx_FillScreen(gfx_white);
+
+    /* Test triangle drawing */
+    gfx_SetColor(gfx_blue);
+    gfx_FillTriangle(110, 170, 110, 70, 230, 70);
+    gfx_SetColor(gfx_green);
+    gfx_FillTriangle_NoClip(110, 170, 230, 70, 230, 170);
+    gfx_SetColor(gfx_black);
+    gfx_FillTriangle(110, 170, 200, 200, 230, 200);
+    gfx_FillTriangle_NoClip(140, 40, 110, 40, 230, 70);
+    gfx_FillTriangle(1, 1, 318, 1, 1, 1);
+    gfx_FillTriangle_NoClip(1, 238, 1, 238, 318, 238);
+    gfx_FillTriangle(1, 3, 1, 236, 1, 236);
+    gfx_FillTriangle_NoClip(318, 3, 318, 236, 318, 3);
+
+    /* Wait for any key */
+    while (!os_GetCSC());
+
     /* Close the graphics */
     gfx_End();
 }

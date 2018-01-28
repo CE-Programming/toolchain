@@ -9,20 +9,17 @@
   },
   "sequence": [
     "action|launch",
-    "delay|300",
-    "hash|1",
+    "hashWait|1",
     "key|enter",
-    "delay|150",
-    "hash|2",
+    "hashWait|2",
     "key|enter",
-    "delay|150",
-    "hash|3",
+    "hashWait|3",
     "key|enter",
-    "delay|150",
-    "hash|4",
+    "hashWait|4",
     "key|enter",
-    "delay|300",
-    "hashWait|5"
+    "hashWait|5",
+    "key|enter",
+    "hashWait|6"
   ],
   "hashes": {
     "1": {
@@ -50,6 +47,12 @@
       "expected_CRCs": [ "F2BD5102" ]
     },
     "5": {
+      "description": "The screen displays many different triangles",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "CDE95095" ]
+    },
+    "6": {
       "description": "Back to the home screen (exit check)",
       "start": "vram_start",
       "size": "vram_16_size",
