@@ -57,6 +57,7 @@ NULL       = >nul 2>&1
 RMDIR      = rmdir /s /q
 MKDIR      = mkdir
 else
+MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(subst \,\\,$(shell winepath -w $(1)))
 WINRELPATH = $(subst /,\,$(1))
@@ -179,7 +180,7 @@ SAFEMKDIR     = $(MKDIR) $(call NATIVEPATH,$(1))
 else
 WINCHKBINDIR := $(WINCHKDIR) $(BINDIR)
 WINCHKOBJDIR := $(WINCHKDIR) $(OBJDIR)
-SAFEMKDIR     = $(WINCHKDIR) $(call NATIVEPATH,$(1)) $(MKDIR) $(call NATIVEPATH,$(1))
+SAFEMKDIR     = ($(WINCHKDIR) $(call NATIVEPATH,$(1)) $(MKDIR) $(call NATIVEPATH,$(1)))
 endif
 
 # this rule is trigged to build everything
@@ -209,14 +210,14 @@ $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: */%.c $(USERHEADERS)
-	@($(call SAFEMKDIR,$(@D))) && \
-	($(CD) $(call NATIVEPATH,$(@D))) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: **/*/%.c $(USERHEADERS)
-	@($(call SAFEMKDIR,$(@D))) && \
-	($(CD) $(call NATIVEPATH,$(@D))) && \
+	@$(call SAFEMKDIR,$(@D)) && \
+	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
 clean:
