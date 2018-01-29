@@ -85,7 +85,7 @@ ICON_ASM      := iconc.src
 F_STARTUP     := $(call NATIVEPATH,$(CEDEV)/lib/cstartup.src)
 F_LAUNCHER    := $(call NATIVEPATH,$(CEDEV)/lib/libheader.src)
 F_CLEANUP     := $(call NATIVEPATH,$(CEDEV)/lib/ccleanup.src)
-F_ICON        := $(call NATIVEPATH,$(OBJDIR)/$(ICON_ASM))
+F_ICON        := $(OBJDIR)/$(ICON_ASM)
 
 # set use cases
 U_CLEANUP = 0
@@ -116,8 +116,8 @@ LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.asm))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
-LINK_ICON  := $(call NATIVEPATH,$(OBJDIR)/$(ICON_ASM))
-ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(LINK_ICON)$(comma)$(DESCRIPTION)
+LINK_ICON  := $(F_ICON)
+ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(LINK_ICON))$(comma)$(DESCRIPTION)
 U_ICON     = 1
 endif
 
