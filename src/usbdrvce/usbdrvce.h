@@ -30,6 +30,13 @@ typedef enum usb_error {
   USB_ERROR_NOT_SUPPORTED,
 } usb_error_t;
 
+typedef enum usb_find_flags {
+  USB_FIND_INACTIVE = 1 << 0, /**< Only return unactivated devices. */
+  USB_FIND_ACTIVE   = 1 << 1, /**< Only return activated devices. */
+  USB_FIND_DEVICE   = 1 << 2, /**< Only return non-hubs. */
+  USB_FIND_HUB      = 1 << 3, /**< Only return hubs. */
+} usb_find_flags_t;
+
 typedef enum usb_transfer_type {
   USB_CONTROL_TRANSFER,
   USB_ISOCHRONOUS_TRANSFER,
@@ -87,6 +94,19 @@ usb_error_t usb_Init(device_callback_t connect_handler, void *connect_data, devi
  * @note This must be called before the program exits.
  */
 void usb_Cleanup(void);
+
+/**
+ * Finds the first device satisfying flags.
+ * @param flags What kinds of devices to return.
+ */
+usb_device_t usb_FindFirstDevice(usb_find_flags_t flags);
+
+/**
+ * Finds the next device after \p from satisfying flags.
+ * @param from Device to start the search from.
+ * @param flags What kinds of devices to return.
+ */
+usb_device_t usb_FindNextDevice(usb_device_t from, usb_find_flags_t flags);
 
 /**
  * Calls any triggered device or transfer callbacks.
