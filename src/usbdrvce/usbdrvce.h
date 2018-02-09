@@ -106,6 +106,7 @@ void usb_Cleanup(void);
 /**
  * Finds the first device satisfying flags.
  * @param flags What kinds of devices to return.
+ * @return The first matching device, or NULL if no matching devices.
  */
 usb_device_t usb_FindFirstDevice(usb_find_flags_t flags);
 
@@ -113,6 +114,7 @@ usb_device_t usb_FindFirstDevice(usb_find_flags_t flags);
  * Finds the next device after \p from satisfying flags.
  * @param from Device to start the search from.
  * @param flags What kinds of devices to return.
+ * @return The first matching device after \p from, or NULL if no matching devices.
  */
 usb_device_t usb_FindNextDevice(usb_device_t from, usb_find_flags_t flags);
 
