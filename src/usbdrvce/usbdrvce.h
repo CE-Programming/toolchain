@@ -37,6 +37,14 @@ typedef enum usb_find_flags {
   USB_FIND_HUB      = 1 << 3, /**< Only return hubs. */
 } usb_find_flags_t;
 
+typedef enum usb_speed {
+  USB_SPEED_UNKNOWN = -1,
+  USB_SPEED_FULL,
+  USB_SPEED_LOW,
+  USB_SPEED_HIGH,
+  USB_SPEED_SUPER,
+} usb_speed_t;
+
 typedef enum usb_transfer_type {
   USB_CONTROL_TRANSFER,
   USB_ISOCHRONOUS_TRANSFER,
@@ -115,6 +123,44 @@ usb_device_t usb_FindNextDevice(usb_device_t from, usb_find_flags_t flags);
 usb_error_t usb_HandleEvents(void);
 
 /**
+ * Clears an endpoint's halt/stall condition.
+ * @param device The device to communicate with.
+ * @param endpoint The endpoint to communicate with.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_ClearHalt(device_t device, uint8_t endpoint);
+
+/**
+ * Performs a usb reset on a device. This causes an inactive device to become active.
+ * @param device The device to communicate with.
+ * @param endpoint The endpoint to communicate with.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_ResetDevice(device_t device);
+
+/**
+ * Gets a device's address.
+ * @param device The device to communicate with.
+ * @return The usb address of \p device.
+ */
+uint8_t usb_GetDeviceAddress(device_t device);
+
+/**
+ * Gets a device's speed.
+ * @param device The device to communicate with.
+ * @return The usb speed of \p device, or USB_SPEED_UNKNOWN if unknown.
+ */
+usb_speed_t usb_GetDeviceSpeed(device_t device);
+
+/**
+ * Gets the maximum packet size of an endpoint.
+ * @param device The device to communicate with.
+ * @param endpoint The endpoint to communicate with.
+ * @return The endpoint's wMaxPacketSize or 0 on error.
+ */
+usb_speed_t usb_GetMaxPacketSize(device_t device, uint8_t endpoint);
+
+/**
  * Determines how large of a buffer would be required to receive the complete configuration descriptor at \p index.
  * @param device The device to communicate with.
  * @param index Which configuration descriptor to query.
@@ -126,15 +172,35 @@ usb_error_t usb_GetConfigurationDescriptorTotalLength(device_t device, uint8_t i
 /**
  * Fetches the configuration at \p index.
  * @param device The device to communicate with.
- * @param configuration_descriptor A complete configuration descriptor received from the device to use.
  * @param type Descriptor type to fetch.
  * @param index Descriptor index to fetch.
- * @param buffer Returns the fetched descriptor.
+ * @param descriptor Returns the fetched descriptor.
  * @param length The number of bytes to transfer.
- * The \p buffer must by at least this large.
+ * The \p descriptor buffer must by at least this large.
+ * @param transferred Returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetDescriptor(device_t device, uint8_t type, uint8_t index, void *buffer, size_t length);
+usb_error_t usb_GetDescriptor(device_t device, uint8_t type, uint8_t index, void *descriptor, size_t length, size_t *transferred);
+
+/**
+ * Changes the configuration at \p index, not usually supported.
+ * @param device The device to communicate with.
+ * @param type Descriptor type to modify.
+ * @param index Descriptor index to modify.
+ * @param descriptor The new descriptor data.
+ * @param length The number of bytes in the new descriptor.
+ * The \p descriptor buffer must by at least this large.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_SetDescriptor(device_t device, uint8_t type, uint8_t index, void *descriptor, size_t length);
+
+/**
+ * Gets the currently active configuration of a device.
+ * @param device The device to communicate with.
+ * @param configuration Returns the current configuration value, or 0 if unconfigured.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_GetConfiguration(device_t device, uint8_t *configuration);
 
 /**
  * Selects the configuration specified by the \p configuration_descriptor.
@@ -144,6 +210,26 @@ usb_error_t usb_GetDescriptor(device_t device, uint8_t type, uint8_t index, void
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetConfiguration(device_t device, void *configuration_descriptor);
+
+/**
+ * Selects the configuration specified by the \p configuration_descriptor.
+ * This must be called before pipes other than the default control pipe can be accessed.
+ * @param device The device to communicate with.
+ * @param interface Interface index to query.
+ * @param alternate_setting Returns the alternate setting in use.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_GetInterfaceAltSetting(device_t device, uint8_t interface, uint8_t *alternate_setting);
+
+/**
+ * Selects the configuration specified by the \p configuration_descriptor.
+ * This must be called before pipes other than the default control pipe can be accessed.
+ * @param device The device to communicate with.
+ * @param interface Interface index to modify.
+ * @param alternate_setting Alternate setting to use.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_SetInterfaceAltSetting(device_t device, uint8_t interface, uint8_t alternate_setting);
 
 /**
  * Schedules a control transfer and waits for it to complete.
