@@ -12,4 +12,7 @@ DESCRIPTION ?= "C SDK Demo"
 
 # ----------------------------
 
+# This is just so the main makefile in $CEDEV/examples makes this one be like "make debug"
+.DEFAULT_GOAL := debug
+
 include $(CEDEV)/include/.makefile
