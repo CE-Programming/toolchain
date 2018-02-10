@@ -1,4 +1,5 @@
 {
+  "__comment": "FIXME timing is overly lenient becuase the autotester framework is bad",
   "rom": "84pce_515.rom",
   "transfer_files": [
     "bin/DEMO.8xp"
@@ -10,7 +11,7 @@
   "sequence": [
     "action|launch",
     "hashWait|1",
-    "delay|5100",
+    "delay|4800",
     "hashWait|2"
   ],
   "hashes": {
@@ -24,8 +25,8 @@
       "description": "Done",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "948248E" ],
-      "timeout": 250
+      "expected_CRCs": [ "948248E" ],
+      "timeout": 500
     }
   }
 }
