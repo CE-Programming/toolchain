@@ -43,5 +43,6 @@ void printText(const char *text, uint8_t xpos, uint8_t ypos) {
 
 /* Draw small text at the given X/Y location */
 void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos) {
+    os_FontSelect(0); // sets small font (1 == big, see docs)
     os_FontDrawText(text, xpos, ypos);
 }
