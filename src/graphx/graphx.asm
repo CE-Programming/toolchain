@@ -5887,10 +5887,8 @@ _MultiplyHLDE:
 ;  DE : Operand 2
 ; Outputs:
 ;  HL = HL*DE
-	push	iy
-	push	hl
 	push	de
-	jr	DEused
+	pop	bc
 
 ;-------------------------------------------------------------------------------
 _MultiplyHLBC:
@@ -5903,7 +5901,7 @@ _MultiplyHLBC:
 	push	iy
 	push	hl
 	push	bc
-DEused:	push	hl
+	push	hl
 	ld	iy,0
 	ld	d,l
 	ld	e,b
