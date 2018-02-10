@@ -1,5 +1,5 @@
 {
-  "__comment": "FIXME timing is overly lenient becuase the autotester framework is bad",
+  "__comment": "FIXME timing is way too lenient because the autotester framework and travis are trash",
   "rom": "84pce_515.rom",
   "transfer_files": [
     "bin/DEMO.8xp"
@@ -11,7 +11,7 @@
   "sequence": [
     "action|launch",
     "hashWait|1",
-    "delay|4800",
+    "delay|4500",
     "hashWait|2",
     "hashWait|3"
   ],
@@ -27,7 +27,7 @@
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [ "948248E" ],
-      "timeout": 500
+      "timeout": 1100
     },
     "3": {
       "description": "Back to the home screen (exit check)",
