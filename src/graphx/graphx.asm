@@ -548,7 +548,8 @@ gfx_SetPixel:
 	inc	hl
 	inc	hl
 	inc	hl			; move to next argument
-	ld	de,(hl)			; e = y coordinate
+	ld	de,0
+	ld	e,(hl)			; e = y coordinate
 _SetPixel:
 	call	_PixelPtr
 	ret	c			; return if out of bounds
