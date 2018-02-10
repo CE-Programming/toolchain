@@ -12,7 +12,8 @@
     "action|launch",
     "hashWait|1",
     "delay|4800",
-    "hashWait|2"
+    "hashWait|2",
+    "hashWait|3"
   ],
   "hashes": {
     "1": {
@@ -27,6 +28,12 @@
       "size": "vram_16_size",
       "expected_CRCs": [ "948248E" ],
       "timeout": 500
+    },
+    "3": {
+      "description": "Back to the home screen (exit check)",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44" ]
     }
   }
 }
