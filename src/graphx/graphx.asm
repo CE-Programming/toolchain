@@ -202,14 +202,16 @@ gfx_AllocSprite:
 ;  arg2 : pointer to malloc routine
 ; Returns:
 ;  Pointer to allocated sprite, first byte width, second height
-	ld	bc,3
-	push	bc
-	pop	hl
+	ld	hl,3
 	add	hl,sp
 	ld	e,(hl)			; e = width
-	add	hl,bc
+	inc	hl
+	inc	hl
+	inc	hl
 	ld	d,(hl)			; d = height
-	add	hl,bc
+	inc	hl
+	inc	hl
+	inc	hl
 	ld	hl,(hl)			; hl = malloc
 	push	de
 	mlt	de			; de = width * height
@@ -523,13 +525,15 @@ gfx_GetPixel:
 	inc	hl
 	inc	hl
 	inc	hl			; move to next argument
-	ld	de,0
 	ld	e,(hl)			; e = y coordinate
-	call	_PixelPtr
-	ret	c			; return if out of bounds
+	ld	d,LcdWidth/2
+	mlt	de
+	ld	hl,(CurrentBuffer)
+	add	hl,bc
+	add	hl,de
+	add	hl,de
 	ld	a,(hl)			; get the actual pixel
 	ret
-
 ;-------------------------------------------------------------------------------
 gfx_SetPixel:
 ; Sets the color pixel to the global color index
@@ -544,8 +548,7 @@ gfx_SetPixel:
 	inc	hl
 	inc	hl
 	inc	hl			; move to next argument
-	ld	de,0
-	ld	e,(hl)			; e = y coordinate
+	ld	de,(hl)			; e = y coordinate
 _SetPixel:
 	call	_PixelPtr
 	ret	c			; return if out of bounds
@@ -803,11 +806,11 @@ _HorizLine_NoClip:
 Color_2 := $-1
 _MemorySet:
 	ld	(hl),a
-	push	hl
 	cpi
-	ex	de,hl
-	pop	hl
 	ret	po
+	ex	de,hl
+	ld	hl,-1
+	add	hl,de
 	ldir
 	ret
 
