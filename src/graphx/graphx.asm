@@ -545,10 +545,8 @@ gfx_SetPixel:
 	ld	hl,3
 	add	hl,sp
 	ld	bc,(hl)			; bc = x coordinate
-	inc	hl
-	inc	hl
-	inc	hl			; move to next argument
-	ld	de,0
+	ld	de,3
+	add	hl,de			; move to next argument
 	ld	e,(hl)			; e = y coordinate
 _SetPixel:
 	call	_PixelPtr
