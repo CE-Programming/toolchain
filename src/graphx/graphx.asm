@@ -4164,10 +4164,13 @@ gfx_RotateSpriteHalf:
 	mlt	bc
 	add	hl,bc
 	lea	de,iy
-ploop:	inc	de
+	push	de
+.loop:
+	inc	de
 	inc	de
 	ldd
-	jp	pe,ploop
+	jp	pe,.loop
+	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
