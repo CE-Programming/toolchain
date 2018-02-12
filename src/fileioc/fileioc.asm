@@ -365,14 +365,13 @@ _Open:
 	cp	a,'r'
 	pop	hl
 	jp	nz,_ReturnNull_IX
-        ex	de,hl				; skip vat entry in archive
-	push	de
 	push	hl
+	push	de
 	pop	iy
 	ld	a,10
 	add	a,(iy+9)
-	ld	de,0
-	ld	e,a
+	sbc	hl,hl
+	ld	l,a
 	add	hl,de
 	ex	de,hl
 	pop	hl
