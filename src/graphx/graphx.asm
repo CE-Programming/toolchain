@@ -5097,8 +5097,7 @@ _RLETSprite_SkipClipBottom:
 	jp	p,_RLETSprite_SkipClipTop ; p ==> y >= ymin ==> fully on-screen
 	add	hl,bc			; hl = y-ymin+height = height on-screen
 	ret	nc			; nc ==> height on-screen < 0 ==> fully off-screen
-	ld	a,l			; a = height on-screen
-	or	a,a
+	or	a,l			; a = height on-screen
 	ret	z			; z ==> height on-screen == 0 ==> fully off-screen
 	ld	a,c
 	sub	a,l			; a = height off-screen
