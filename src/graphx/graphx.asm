@@ -4156,29 +4156,22 @@ gfx_RotateSpriteHalf:
 ;  arg1 : Pointer to sprite struct output
 	ld	iy,0
 	add	iy,sp
-	push	ix
-	ld	ix,(iy+3)
-	ld	c,(ix+0)		; c = width
-	ld	b,(ix+1)		; b = height
-	lea	de,ix+2
-	ld	ix,(iy+6)
-	ld	(ix+0),c
-	ld	(ix+1),b
+	ld	hl,(iy+3)
+	ld	c,(hl)		; c = width 
+	inc	hl
+	ld	b,(hl)		; b = height
+	ld	iy,(iy+6)
+	ld	(iy+0),bc
 	mlt	bc
-	lea	hl,ix+1
 	add	hl,bc
-	push	ix
+	lea	de,iy
+	push	de
 .loop:
-	ld	a,(de)
-	ld	(hl),a
 	inc	de
-	dec	hl
-	dec	bc
-	ld	a,b
-	or	a,c
-	jr	nz,.loop
+	inc	de
+	ldd
+	jp	pe,.loop
 	pop	hl
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
