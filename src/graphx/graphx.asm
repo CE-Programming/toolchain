@@ -4157,8 +4157,9 @@ gfx_RotateSpriteHalf:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)
-	ld	bc,(hl)		; c = width ; b = height
+	ld	c,(hl)		; c = width 
 	inc	hl
+	ld	b,(hl)		; b = height
 	ld	iy,(iy+6)
 	ld	(iy+0),bc
 	mlt	bc
