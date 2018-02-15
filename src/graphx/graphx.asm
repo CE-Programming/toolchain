@@ -180,10 +180,40 @@ gfx_Begin:
 SetGfx:
 	ld	de,VRAM
 	ld	(hl),de			; set the current draw to the screen
-	ld	(mpLcdCtrl),a
-	ld	l,mpLcdIcr and $ff
-	ld	(hl),4			; allow interrupts status for double buffering
-	jp	gfx_SetDefaultPalette	; setup the default palette
+assert CurrentBuffer and -$100 = mpLcdRange
+	ld	l,lcdCtrl
+	ld	(hl),a
+;	jp	gfx_SetDefaultPalette	; setup the default palette
+assert $ = gfx_SetDefaultPalette
+
+;-------------------------------------------------------------------------------
+gfx_SetDefaultPalette:
+; Sets up the default palette where H=L
+; Arguments:
+;  None
+; Returns:
+;  None
+	ld	de,mpLcdPalette		; address of mmio palette
+	ld	b,e			; b = 0
+.loop:
+	ld	a,b
+	rrca
+	xor	a,b
+	and	a,224
+	xor	a,b
+	ld	(de),a
+	inc	de
+	ld	a,b
+	rla
+	rla
+	rla
+	ld	a,b
+	rra
+	ld	(de),a
+	inc	de
+	inc	b
+	jr	nz,.loop		; loop for 256 times to fill palette
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_End:
@@ -389,35 +419,6 @@ gfx_SetTransparentColor:
 	ld	(TransparentColor_6),a
 	ld	(TransparentColor_7),a
 	jr	_SetColor
-
-;-------------------------------------------------------------------------------
-gfx_SetDefaultPalette:
-; Sets up the default palette where H=L
-; Arguments:
-;  None
-; Returns:
-;  None
-	ld	de,mpLcdPalette		; address of mmio palette
-	ld	b,e			; b = 0
-.loop:
-	ld	a,b
-	rrca
-	xor	a,b
-	and	a,224
-	xor	a,b
-	ld	(de),a
-	inc	de
-	ld	a,b
-	rla
-	rla
-	rla
-	ld	a,b
-	rra
-	ld	(de),a
-	inc	de
-	inc	b
-	jr	nz,.loop		; loop for 256 times to fill palette
-	ret
 
 ;-------------------------------------------------------------------------------
 gfx_FillScreen:
