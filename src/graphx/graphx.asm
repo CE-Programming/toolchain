@@ -133,7 +133,7 @@ library 'GRAPHX', 9
 ;-------------------------------------------------------------------------------
 LcdSize            := LcdWidth*LcdHeight
 InterruptStackSize := 4000	; minimum stack size to provide for interrupts if moving the stack
-CurrentBuffer      := 0E30014h
+CurrentBuffer      := mpLcdLpbase
 TRASPARENT_COLOR   := 0
 TEXT_FG_COLOR      := 0
 TEXT_BG_COLOR      := 255
@@ -943,20 +943,23 @@ gfx_SwapDraw:
 ;  None
 ; Returns:
 ;  None
-	ld	hl,vram
-	ld	de,(mpLcdBase)
-	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jr	nz,.swap
-	ld	hl,vram+LcdSize
-.swap:
-	ld	(CurrentBuffer),de	; set up the new buffer location
-	ld	(mpLcdBase),hl		; set the new pointer location
-	ld	hl,mpLcdIcr
-	set	2,(hl)			; clear the previous intrpt set
+	ld	iy,mpLcdRange
+	ld	hl,(iy-mpLcdRange+CurrentBuffer+1) ; hl = old_draw>>8
+	ld	(iy+lcdBase+1),hl	; screen = old_draw
+	ld	a,l
+	xor	a,(LcdSize shr 8) and $FF
+	ld	l,a			; l = (old_draw>>8)^(LcdSize>>8)
+	inc	h
+	res	1,h			; h = (old_draw>>16)+1&-2
+					; assuming !((old_draw>>16)&2):
+					;   = (old_draw>>16)^1
+					;   = (old_draw>>16)^(LcdSize>>16)
+					; hl = (old_draw>>8)^(LcdSize>>8)
+					;    = (new_draw)>>8
+	ld	(iy-mpLcdRange+CurrentBuffer+1),hl
+	set	bLcdIntLNBU,(iy+lcdIcr)	; clear interrupt checked by gfx_Wait
 	ld	a,$F5			; push af
-	ld	(gfx_Wait),a		; enable vsync wait
+	ld	(gfx_Wait),a		; enable wait logic
 	ret
 
 ;-------------------------------------------------------------------------------
