@@ -4806,14 +4806,12 @@ gfx_FloodFill:
 
 	ld	e,(ix+9)
 	ld	bc,(ix+6)
-	
 	ld	hl,(CurrentBuffer)
 	add	hl,bc
 	ld	d,LcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
-	
 	ld	a,(hl)
 
 	ld	(.oldcolor0),a
