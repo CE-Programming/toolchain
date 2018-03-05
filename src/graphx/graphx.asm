@@ -1693,16 +1693,18 @@ gfx_BlitRectangle:
 	pop	hl
 	ld	a,(iy+15)
 	ld	iy,0
-.loop:
 	add	iy,de
-	lea	de,iy
+.loop:
 	ld	bc,0			; smc for speedz
 .width := $-3
 	ldir
+	inc	b
+	ld	c,$40			; increment to next line		
+	add	iy,bc
+	lea	de,iy
 	ld	bc,0			; increment to next line
 .delta := $-3
 	add	hl,bc
-	ld	de,LcdWidth		; increment to next line
 	dec	a
 	jr	nz,.loop
 	ret
