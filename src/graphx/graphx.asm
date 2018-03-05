@@ -528,6 +528,7 @@ gfx_GetPixel:
 	inc	hl
 	inc	hl			; hl = &y
 	ld	e,(hl)			; e = y
+_GetPixel:
 	ld	d,LcdWidth/2
 	mlt	de			; de = y * (lcdWidth / 2)
 	ld	hl,(CurrentBuffer)	; hl = buffer
@@ -4806,13 +4807,7 @@ gfx_FloodFill:
 
 	ld	e,(ix+9)
 	ld	bc,(ix+6)
-	ld	hl,(CurrentBuffer)
-	add	hl,bc
-	ld	d,LcdWidth/2
-	mlt	de
-	add	hl,de
-	add	hl,de
-	ld	a,(hl)
+	call	_GetPixel		; ov = p(x, y);
 
 	ld	(.oldcolor0),a
 	ld	(.oldcolor1),a
