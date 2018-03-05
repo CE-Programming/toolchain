@@ -528,6 +528,7 @@ gfx_GetPixel:
 	inc	hl
 	inc	hl			; hl = &y
 	ld	e,(hl)			; e = y
+_GetPixel:
 	ld	d,LcdWidth/2
 	mlt	de			; de = y * (lcdWidth / 2)
 	ld	hl,(CurrentBuffer)	; hl = buffer
@@ -560,8 +561,18 @@ gfx_SetPixel:
 	add	hl,de			; move to next argument
 	ld	e,(hl)			; e = y coordinate
 _SetPixel:
-	call	_PixelPtr
-	ret	c			; return if out of bounds
+	ld	hl,-LcdWidth
+	add	hl,bc
+	ret	c			; return if out of bounds		
+	ld	hl,-LcdHeight
+	add	hl,de
+	ret	c			; return if out of bounds	
+	ld	hl,(CurrentBuffer)
+	add	hl,bc
+	ld	d,LcdWidth/2
+	mlt	de
+	add	hl,de
+	add	hl,de
 	ld	(hl),0			; get the actual pixel
 Color_1 = $-1
 	ret
@@ -4796,8 +4807,7 @@ gfx_FloodFill:
 
 	ld	e,(ix+9)
 	ld	bc,(ix+6)
-	call	_PixelPtrNoChecks	; ov = p(x, y);
-	ld	a,(hl)
+	call	_GetPixel		; ov = p(x, y);
 
 	ld	(.oldcolor0),a
 	ld	(.oldcolor1),a
@@ -5687,29 +5697,6 @@ _LZ_ReadVarSize:
 	ld	hl,(ix-6)
 	ld	sp,ix
 	pop	ix
-	ret
-
-;-------------------------------------------------------------------------------
-_PixelPtr:
-; Gets the address of a pixel
-; Inputs:
-;  BC=X
-;   E=Y
-; Outputs:
-;  HL->address of pixel
-	ld	hl,-LcdWidth
-	add	hl,bc
-	ret	c
-	ld	hl,-LcdHeight
-	add	hl,de
-	ret	c
-_PixelPtrNoChecks:
-	ld	hl,(CurrentBuffer)
-	add	hl,bc
-	ld	d,LcdWidth/2
-	mlt	de
-	add	hl,de
-	add	hl,de
 	ret
 
 ;-------------------------------------------------------------------------------
