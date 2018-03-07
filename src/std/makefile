@@ -51,13 +51,13 @@ endif
 all:
 	$(MAKE) -C $(FILEIODIR) BIN=$(BIN)
 	$(MAKE) -C $(STATICDIR) BIN=$(BIN)
-	$(MAKE) -C $(LINKEDDIR) BIN=$(BIN)
+#	$(MAKE) -C $(LINKEDDIR) BIN=$(BIN) # nothing to do
 	$(MAKE) -C $(SHAREDDIR) BIN=$(BIN)
 
 clean:
 	$(MAKE) -C $(FILEIODIR) $(MAKECMDGOALS)
 	$(MAKE) -C $(SHAREDDIR) $(MAKECMDGOALS)
-	$(MAKE) -C $(LINKEDDIR) $(MAKECMDGOALS)
+#	$(MAKE) -C $(LINKEDDIR) $(MAKECMDGOALS) # nothing to do
 	$(MAKE) -C $(STATICDIR) $(MAKECMDGOALS)
 
 install:
