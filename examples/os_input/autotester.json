@@ -15,18 +15,17 @@
     "key|2",
     "delay|200",
     "key|enter",
-    "delay|200",
-    "hash|1",
+    "hashWait|1",
     "key|enter",
-    "delay|200",
     "hashWait|2"
   ],
   "hashes": {
     "1": {
-      "description": "Output should be N is 12",
+      "description": "Output should be 'N is 12.'",
       "start": "0xD44B00",
-      "size": "0x25800",
-      "expected_CRCs": [ "7DBE5A77" ]
+      "size": "128000",
+      "size_comment": "offset + 320x200x2 because we don't want the busy indicator",
+      "expected_CRCs": [ "44FD49F5" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",
