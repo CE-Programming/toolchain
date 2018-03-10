@@ -2803,20 +2803,15 @@ _PrintStringXY_Clip:
 ;  arg2 : Text Y Pos
 ; Returns:
 ;  None
-	ld	hl,3
-	add	hl,sp
-	ld	de,(hl)
-	push	de
-	inc	hl
-	inc	hl
-	inc	hl
+	ld	iy,3
+	lea	bc,iy
+	add	iy,sp
+	lea	hl,iy+3
 	ld	de,_TextXPos
-	ldi
-	ldi
-	ldi				; copy in the y location
+	ldir			; copy in the y location
 	ld	hl,(hl)
 	ld	(_TextYPos),hl	; set new y pos
-	pop	hl
+	ld	hl,(iy)
 	jr	_DrawCharacters		; jump to the main string handler
 
 ;-------------------------------------------------------------------------------
