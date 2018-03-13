@@ -1,9 +1,30 @@
 ; ---
-; void os_GetStringInput(char *string, char *buf, size_t bufsize)
+; void os_GetStringInput(char *string, char *buf, size_t size)
 ; ---
 
 	.def	_os_GetStringInput
 	.assume adl=1
+
+kUp := 3
+kLeft := 2
+kDown := 4
+kEnter := 5
+kClear := 9
+kRight := 1
+curLock := 4
+flags := $D00080
+curRow := $D00595
+curUnder := $D00599
+_PutS := $207C0
+_PutC := $207B8
+_PutPS := $207C8
+_GetKey := $20D8C
+_CursorOn := $208B0
+_CursorOff := $208A8
+_PullDownChk := $208BC
+_ConvKeyToTok := $20E40
+_GetTokString := $20874
+_PutTokString := $20D74
 
 _os_GetStringInput:
 	push	ix
@@ -13,46 +34,101 @@ _os_GetStringInput:
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
-	ld	de,0D00879h		; ioPrompt
-	jr	z,donecopy
-copyloop:
+	jr	z,__nodisp
+	ld	iy,flags
+	call	_PutS
+__nodisp:
+	ld	hl,(curRow)
+	ld	(__savecur),hl
+	ld	a,(ix+12)
+	dec	a
+	ld	(ix+12),a
+	ld	(ix+6),a
+__start:
+	ld	de,(ix+9)
+__loop:
+	ld	a,' '
+	ld	(curUnder),a
+	push	de
+	push	ix
+	call	_CursorOn
+__getkey:
+	call	_GetKey
+	call	_CursorOff
+	call	_PullDownChk
+	call	_CursorOn
+	jr	c,__getkey
+	cp	a,kLeft
+	jr	z,__loop
+	cp	a,kDown
+	jr	z,__loop
+	cp	a,kRight
+	jr	z,__loop
+	cp	a,kUp
+	jr	z,__loop
+	cp	a,kClear
+	jr	z,__clearpop
+	cp	a,kEnter
+	jr	z,__done
+	call	_ConvKeyToTok
+	call	_GetTokString
+	pop	ix
+	pop	de
+	ld	b,(hl)
+	inc	hl
+	ld	a,(ix+12)
+	sub	a,b
+	jr	nc,__notfull
+	ld	b,(ix+12)
+	xor	a,a
+__notfull:
+	ld	(ix+12),a
+__draw:
 	ld	a,(hl)
-	or	a,a
-	jr	z,donecopy
 	ld	(de),a
 	inc	hl
 	inc	de
-	jr	copyloop		; copy the input prompt here
-donecopy:
-	ld	(de),a
-	ld	(0D00599h),a		; curUnder
-	ld	iy,0D00080h
-	ld	b,(iy+9)
-	ld	c,(iy+28)		; back up old flag values
-	res	6,(iy+28)
-	set	7,(iy+9)
-	push	ix
-	push	bc
-	call	021320h			; _GetStringInput, get the input from the user
-	pop	bc
-	res	4,b			; restore old flag values
-	ld	(iy+9),b
-	ld	(iy+28),c
-	ld	hl,(0D0244Eh)		; editSym
-	call	020AE8h			; _VarNameToOP1HL, lookup the temporary input symbol
-	call	02050Ch			; _ChkFindSym
+	call	_PutC
+	djnz	__draw
+	ld	a,(ix+12)
+	or	a,a
+	jr	nz,__loop
+__full:
+	ld	a,' '
+	ld	(curUnder),a
+	call	_GetKey
+	cp	a,kClear
+	jr	z,__clear
+	cp	a,kEnter
+	jr	z,__exit
+	jr	__full
+__clearpop:
 	pop	ix
-	jr	c,SomeError
-	ex	de,hl
-	inc	hl
-	inc	hl
-	ld	de,(ix+9)		; hl -> input string prompt
-	ld	bc,(ix+12)		; bc = input string length
-	dec	bc
-	ldir
+	pop	de
+__clear:
+__savecur := $+1
+	ld	hl,0
+	ld	(curRow),hl
+	ld	a,(ix+6)
+	ld	b,(ix+12)
+	ld	(ix+12),a
+	sub	a,b
+	ld	b,a
+	inc	b
+__clearloop:
+	ld	a,' '
+	call	_PutC
+	djnz	__clearloop
+	ld	hl,(__savecur)
+	ld	(curRow),hl
+	jr	__start
+__done:
+	pop	ix
+	pop	de
+__exit:
+	ld	a,' '
+	ld	(curUnder),a
 	xor	a,a
-	ld	(de),a			; null terminate the string
-SomeError:
-	call	021578h			; DeleteTempEditEqu, delete the temporary input
+	ld	(de),a
 	pop	ix
 	ret
