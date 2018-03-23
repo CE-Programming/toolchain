@@ -81,6 +81,7 @@
 	.def _os_SetDrawBGColor
 	.def _os_SetDrawFGColor
 	.def _os_FontSelect
+	.def _os_RclAns
 	.def _os_SetTimer1
 	.def _os_DisableTimer1
 	.def _os_GetSystemStats
@@ -199,6 +200,7 @@ _os_InitDrawing                 equ 021E1Ch
 _os_SetDrawBGColor              equ 021E20h
 _os_SetDrawFGColor              equ 021E24h
 _os_FontSelect                  equ 021E28h
+_os_RclAns                      equ 021E70h
 _os_SetTimer1                   equ 021EC8h
 _os_DisableTimer1               equ 021ECCh
 _os_GetSystemStats              equ 021ED4h
