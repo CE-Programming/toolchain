@@ -130,5 +130,7 @@ __exit:
 	ld	(curUnder),a
 	xor	a,a
 	ld	(de),a
+	call	_CursorOff
+	di
 	pop	ix
 	ret
