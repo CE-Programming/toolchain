@@ -1620,15 +1620,14 @@ gfx_Blit:
 ;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
 ; Returns:
 ;  None
-	pop	de
-	pop	hl
-	push	hl
-	push	de
+	pop	iy			; iy = return vector
+	ex	(sp),hl
 	ld	a,l			; a = buffer to blit to
 	call	_CheckBlit		; determine which buffer to blit
 	ld	bc,LcdSize
+_Blit_Ldir:
 	ldir				; just do it
-	ret
+	jp	(iy)
 
 ;-------------------------------------------------------------------------------
 gfx_BlitLines:
@@ -1639,28 +1638,30 @@ gfx_BlitLines:
 ;  arg2 : Number of lines to copy
 ; Returns:
 ;  None
-	ld	iy,0
-	add	iy,sp
-	ld	l,(iy+9)		; l = y coordinate
+	pop	iy			; iy = return vector
+	pop	bc
+	ld	a,c			; a = buffer to blit to
+	pop	de			; e = number of lines to copy
+	ex	(sp),hl			; l = y coordinate
+	push	de
+	push	bc
 	ld	h,LcdWidth/2
+	ld	d,h
 	mlt	hl
-	add	hl,hl			; hl -> place to end
+	add	hl,hl			; hl -> number of bytes to copy
 	push	hl
-	ld	l,(iy+6)
-	ld	h,LcdWidth/2
+	ex	de,hl
 	mlt	hl
-	add	hl,hl			; hl -> place to start
+	add	hl,hl			; hl -> offset to start at
 	push	hl
-	ld	a,(iy+3)
 	call	_CheckBlit		; determine which buffer to blit
 	pop	bc
 	add	hl,bc
 	ex	de,hl
 	add	hl,bc
 	ex	de,hl
-	pop	bc			; number of lines to copy
-	ldir				; blit it
-	ret
+	pop	bc			; number of bytes to copy
+	jr	_Blit_Ldir
 
 ;-------------------------------------------------------------------------------
 gfx_BlitRectangle:
