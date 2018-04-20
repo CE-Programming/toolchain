@@ -737,25 +737,26 @@ gfx_Rectangle_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+3)		; hl = x
-	ld	e,(iy+6)		; e = y
-	ld	bc,(iy+9)		; bc = width
-	ld	d,(iy+12)		; d = height
-	push	bc
-	push	hl
-	push	de
-	call	_RectHoriz_NoClip	; top horizontal line
-	pop	bc
-	push	bc
-	call	_RectVert_NoClip	; right vertical line
-	pop	bc
-	pop	hl
-	ld	e,c
-	call	_VertLine_NoClip	; left vertical line
-	pop	bc
+	ld	a,(iy+12)		; a = height
 	or	a,a
-	sbc	hl,de
-	jp	_MemorySet		; bottom horizontal line
+	ret	z			; abort if height == 0
+	ld	bc,(iy+9)		; bc = width
+	sbc	hl,hl
+	adc	hl,bc
+	ret	z			; abort if width == 0
+	push	bc
+	call	_HorizLine_NoClip_NotDegen_StackXY ; draw top horizontal line
+					; hl = &buf[y][x+width-1]
+	ld	b,a			; b = height
+	call	_VertLine_NoClip_Draw	; draw right vertical line
+	ld	b,(iy+12)		; b = height
+	ld	e,(iy+6)		; e = y
+	call	_VertLine_NoClip_NotDegen_StackX ; draw left vertical line
+					; hl = &buf[y+height][x]
+					; de = LcdWidth
+	sbc	hl,de			; hl = &buf[y+height-1][x]
+	pop	bc			; bc = width
+	jp	_HorizLine_NoClip_Draw	; draw bottom horizontal line
 
 ;-------------------------------------------------------------------------------
 gfx_HorizLine:
@@ -795,8 +796,7 @@ gfx_HorizLine:
 	sbc	hl,de
 	push	hl
 	pop	bc			; bc = length
-	ld	e,(iy+6)		; e = y coordinate
-	jr	_RectHoriz_NoClip
+	jr	_HorizLine_NoClip_StackXY
 
 ;-------------------------------------------------------------------------------
 gfx_HorizLine_NoClip:
@@ -809,24 +809,24 @@ gfx_HorizLine_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	e,(iy+6)		; e = y coordinate
-	ld	bc,(iy+9)		; bc = width
-_RectHoriz_NoClip:
+	ld	bc,(iy+9)		; bc = length
+_HorizLine_NoClip_StackXY:
 	sbc	hl,hl
 	adc	hl,bc
-	ret	z			; make sure the width is not 0
-	ld	hl,(iy+3)
-_HorizLine_NoClip:
+	ret	z			; abort if length == 0
+_HorizLine_NoClip_NotDegen_StackXY:
+	ld	e,(iy+6)		; e = y
+	ld	hl,(iy+3)		; hl = x
+_HorizLine_NoClip_NotDegen:
 	ld	d,LcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
 	ld	de,(CurrentBuffer)
 	add	hl,de			; hl -> place to draw
-	ld	a,0			; color index to use
+_HorizLine_NoClip_Draw:
+	ld	(hl),0
 Color_2 := $-1
-_MemorySet:
-	ld	(hl),a
 	cpi
 	ret	po
 	ex	de,hl
@@ -872,8 +872,7 @@ gfx_VertLine:
 	ld	hl,(iy+9)
 	sbc	hl,de
 	ld	b,l
-	ld	hl,(iy+3)
-	jr	_VertLine_NoClip		; jump to unclipped version
+	jr	_VertLine_NoClip_StackX		; jump to unclipped version
 
 ;-------------------------------------------------------------------------------
 gfx_VertLine_NoClip:
@@ -886,20 +885,21 @@ gfx_VertLine_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+3)		; hl = x
 	ld	e,(iy+6)		; e = y
 	ld	b,(iy+9)		; b = length
-_VertLine_NoClip:
+_VertLine_NoClip_StackX:
 	xor	a,a
 	or	a,b
-	ret	z			; check if length is 0
+	ret	z			; abort if length == 0
+_VertLine_NoClip_NotDegen_StackX:
+	ld	hl,(iy+3)		; hl = x
 	ld	d,LcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
 	ld	de,(CurrentBuffer)
 	add	hl,de			; hl -> drawing location
-_RectVert_NoClip:
+_VertLine_NoClip_Draw:
 	ld	de,LcdWidth
 	ld	a,0
 Color_3 := $-1
@@ -1278,7 +1278,7 @@ gfx_FillCircle_NoClip:
 	sbc	hl,bc
 	ld	(.circle1),hl
 	pop	bc
-	call	_HorizLine_NoClip
+	call	_HorizLine_NoClip_NotDegen
 	ld	bc,0
 .circle0 := $-3
 	ld	de,(ix-6)
@@ -1288,7 +1288,7 @@ gfx_FillCircle_NoClip:
 	ld	e,l
 	ld	hl,0
 .circle1 := $-3
-	call	_HorizLine_NoClip
+	call	_HorizLine_NoClip_NotDegen
 	ld	hl,(ix-6)
 	add	hl,hl
 	inc	hl
@@ -1304,7 +1304,7 @@ gfx_FillCircle_NoClip:
 	sbc	hl,bc
 	ld	(.circle3),hl
 	pop	bc
-	call	_HorizLine_NoClip
+	call	_HorizLine_NoClip_NotDegen
 	ld	bc,0
 .circle2 := $-3
 	ld	de,(ix-3)
@@ -1314,7 +1314,7 @@ gfx_FillCircle_NoClip:
 	ld	e,l
 	ld	hl,0
 .circle3 := $-3
-	call	_HorizLine_NoClip
+	call	_HorizLine_NoClip_NotDegen
 	ld	bc,(ix-3)
 	inc	bc
 	ld	(ix-3),bc
