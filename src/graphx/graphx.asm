@@ -500,16 +500,21 @@ gfx_SetPalette:
 ;  arg2 : Offset at which to start inserting the palette
 ; Returns:
 ;  None
-	ld	iy,0
-	add	iy,sp
+	pop	iy			; iy = return vector
+	pop	hl			; hl = src
+	pop	bc			; bc = size
+	pop	de			; e = offset
+	push	de
+	push	bc
+	push	hl
 	ld	hl,mpLcdPalette shr 1
-	ld	l,(iy+9)		; offset in palette
-	add	hl,hl
-	ex	de,hl
-	ld	hl,(iy+3)		; pointer to input palette
-	ld	bc,(iy+6)		; size of input palette
-	ldir				; copy the palette in
-	ret
+	ld	l,e			; l = offset
+	add	hl,hl			; hl = &palette[offset] = dest
+	ex	de,hl			; de = dest
+	pop	hl			; hl = src
+	push	hl
+	ldir
+	jp	(iy)
 
 ;-------------------------------------------------------------------------------
 gfx_GetPixel:
