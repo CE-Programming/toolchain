@@ -229,24 +229,28 @@ gfx_AllocSprite:
 
 ;-------------------------------------------------------------------------------
 gfx_SetClipRegion:
-; Sets the clipping  for clipped routines
+; Sets the clipping region for clipped routines
 ; Arguments:
 ;  arg0 : Xmin
 ;  arg1 : Ymin
 ;  arg2 : Xmax
 ;  arg3 : Ymax
-;  Must be within (0,0,320,240)
 ; Returns:
 ;  None
-	call	_SetFullScreenClip	; clip against the actual LCD screen
+	call	_SetClipRegion_Full	; clip against the actual LCD screen
 	ld	iy,0
-	lea	bc,iy+12
 	add	iy,sp
 	call	_ClipRegion		; iy points to the start of the arguments
 	ret	c
 	lea	hl,iy+3
-	ld	de,_XMin		; copy the variables in
-	ldir				; copy in the new structure
+	jr	_SetClipRegion_Copy
+
+_SetClipRegion_Full:
+	ld	hl,_ClipRegion_Full
+_SetClipRegion_Copy:
+	ld	de,_XMin
+	ld	bc,4*3
+	ldir
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -5797,24 +5801,6 @@ _UCDivA:
 	ret				; ca = c*256/a, h = c*256%a
 
 ;-------------------------------------------------------------------------------
-_SetFullScreenClip:
-; Sets the clipping  to the entire screen
-; Inputs:
-;  None
-; Outputs:
-;  HL=LcdWidth
-	ld	a,LcdHeight
-	ld	(_YMax),a
-	xor	a,a
-	ld	(_YMin),a
-	sbc	hl,hl
-	ld	(_XMin),hl
-	inc	h
-	ld	l,LcdWidth and $ff
-	ld	(_XMax),hl
-	ret
-
-;-------------------------------------------------------------------------------
 _DivideHLBC:
 ; Performs signed interger division
 ; Inputs:
@@ -6156,6 +6142,12 @@ _YMin:
 _XMax:
 	dl	LcdWidth
 _YMax:
+	dl	LcdHeight
+
+_ClipRegion_Full:
+	dl	0
+	dl	0
+	dl	LcdWidth
 	dl	LcdHeight
 
 _TmpWidth:
