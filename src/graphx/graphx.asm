@@ -563,10 +563,10 @@ gfx_SetPixel:
 _SetPixel:
 	ld	hl,-LcdWidth
 	add	hl,bc
-	ret	c			; return if out of bounds		
+	ret	c			; return if out of bounds
 	ld	hl,-LcdHeight
 	add	hl,de
-	ret	c			; return if out of bounds	
+	ret	c			; return if out of bounds
 	ld	hl,(CurrentBuffer)
 	add	hl,bc
 	ld	d,LcdWidth/2
@@ -1699,7 +1699,7 @@ gfx_BlitRectangle:
 .width := $-3
 	ldir
 	inc	b
-	ld	c,$40			; increment to next line		
+	ld	c,$40			; increment to next line
 	add	iy,bc
 	lea	de,iy
 	ld	bc,0			; increment to next line
@@ -4165,7 +4165,7 @@ gfx_RotateSpriteHalf:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)
-	ld	c,(hl)		; c = width 
+	ld	c,(hl)		; c = width
 	inc	hl
 	ld	b,(hl)		; b = height
 	ld	iy,(iy+6)
