@@ -977,11 +977,10 @@ gfx_GetDraw:
 ; Returns:
 ;  Returns true if drawing on the buffer
 	ld	hl,(CurrentBuffer)
-	ld	de,(mpLcdBase)
-	xor	a,a
-	sbc	hl,de
+	ld	a,(mpLcdBase+1)
+	sub	a,h			; comparing high byte only is sufficient
 	ret	z			; drawing to screen
-	inc	a
+	ld	a,1
 	ret				; drawing to buffer
 
 ;-------------------------------------------------------------------------------
