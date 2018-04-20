@@ -202,16 +202,14 @@ gfx_AllocSprite:
 ;  arg2 : pointer to malloc routine
 ; Returns:
 ;  Pointer to allocated sprite, first byte width, second height
-	ld	hl,3
+	ld	bc,3
+	push	bc
+	pop	hl
 	add	hl,sp
 	ld	e,(hl)			; e = width
-	inc	hl
-	inc	hl
-	inc	hl
+	add	hl,bc
 	ld	d,(hl)			; d = height
-	inc	hl
-	inc	hl
-	inc	hl
+	add	hl,bc
 	ld	hl,(hl)			; hl = malloc
 	push	de
 	mlt	de			; de = width * height
