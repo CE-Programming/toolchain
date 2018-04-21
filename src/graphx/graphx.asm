@@ -976,12 +976,10 @@ gfx_GetDraw:
 ;  None
 ; Returns:
 ;  Returns true if drawing on the buffer
-	ld	hl,(CurrentBuffer)
-	ld	a,(mpLcdBase+1)
-	sub	a,h			; comparing high byte only is sufficient
-	ret	z			; drawing to screen
-	ld	a,1
-	ret				; drawing to buffer
+	ld	a,(mpLcdBase+2)		; comparing upper byte only is sufficient
+	ld	hl,CurrentBuffer+2
+	xor	a,(hl)			; always 0 or 1
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_Circle:
