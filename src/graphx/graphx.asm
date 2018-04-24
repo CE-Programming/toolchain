@@ -128,7 +128,8 @@ library 'GRAPHX', 8
 
 ;-------------------------------------------------------------------------------
 LcdSize            := LcdWidth*LcdHeight
-InterruptStackSize := 4000	; minimum stack size to provide for interrupts if moving the stack
+; minimum stack size to provide for interrupts if moving the stack
+InterruptStackSize := 4000
 CurrentBuffer      := 0E30014h
 TRASPARENT_COLOR   := 0
 TEXT_FG_COLOR      := 0
@@ -425,7 +426,7 @@ gfx_FillScreen:
 ; Returns:
 ;  None
 
-FillScreen_PushesPerIter := 115	; see fillscreen.xlsx for derivation
+FillScreen_PushesPerIter := 115		; see fillscreen.xlsx for derivation
 FillScreen_NumIters      := (LcdSize-InterruptStackSize)/(FillScreen_PushesPerIter*3)
 FillScreen_BytesToPush   := FillScreen_PushesPerIter*3*FillScreen_NumIters
 FillScreen_BytesToLddr   := LcdSize-FillScreen_BytesToPush
@@ -753,14 +754,14 @@ gfx_Rectangle_NoClip:
 	ret	z			; abort if width == 0
 	push	bc
 	call	_HorizLine_NoClip_NotDegen_StackXY ; draw top horizontal line
-					; hl = &buf[y][x+width-1]
+						   ; hl = &buf[y][x+width-1]
 	ld	b,a			; b = height
 	call	_VertLine_NoClip_Draw	; draw right vertical line
 	ld	b,(iy+12)		; b = height
 	ld	e,(iy+6)		; e = y
 	call	_VertLine_NoClip_NotDegen_StackX ; draw left vertical line
-					; hl = &buf[y+height][x]
-					; de = LcdWidth
+						 ; hl = &buf[y+height][x]
+						 ; de = LcdWidth
 	sbc	hl,de			; hl = &buf[y+height-1][x]
 	pop	bc			; bc = width
 	jp	_HorizLine_NoClip_Draw	; draw bottom horizontal line
@@ -778,12 +779,12 @@ gfx_HorizLine:
 	add	iy,sp
 	ld	de,(_YMin)
 	ld	hl,(iy+6)
-	mIsHLLessThanDE		; compare y coordinate <-> ymin
+	mIsHLLessThanDE			; compare y coordinate <-> ymin
 	ret	c
 	ld	hl,(_YMax)
 	dec	hl			; inclusive
 	ld	de,(iy+6)
-	mIsHLLessThanDE		; compare y coordinate <-> ymax
+	mIsHLLessThanDE			; compare y coordinate <-> ymax
 	ret	c
 	ld	hl,(iy+9)
 	ld	de,(iy+3)
@@ -879,7 +880,7 @@ gfx_VertLine:
 	ld	hl,(iy+9)
 	sbc	hl,de
 	ld	b,l
-	jr	_VertLine_NoClip_StackX		; jump to unclipped version
+	jr	_VertLine_NoClip_StackX	; jump to unclipped version
 
 ;-------------------------------------------------------------------------------
 gfx_VertLine_NoClip:
@@ -1830,7 +1831,7 @@ gfx_GetClipRegion:
 	ld	hl,3
 	add	hl,sp
 	ld	iy,(hl)
-	call	_ClipRegion	; get the clipping region
+	call	_ClipRegion		; get the clipping region
 	sbc	a,a			; return false if offscreen (0)
 	inc	a
 	ret
@@ -2227,7 +2228,7 @@ gfx_GetSprite:
 	push	de
 	ld	a,(de)
 	inc	de
-	ld	(.amount),a	; amount to copy per line
+	ld	(.amount),a		; amount to copy per line
 	ld	c,a
 	ld	a,LcdWidth and $ff
 	sub	a,c
@@ -2707,7 +2708,7 @@ gfx_GetTextX:
 ;  None
 ; Returns:
 ;  X Text cursor posistion
-	ld	hl,(_TextXPos)	; return x pos
+	ld	hl,(_TextXPos)		; return x pos
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2717,7 +2718,7 @@ gfx_GetTextY:
 ;  None
 ; Returns:
 ;  Y Text cursor posistion
-	ld	hl,(_TextYPos)	; return y pos
+	ld	hl,(_TextYPos)		; return y pos
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2813,9 +2814,9 @@ _PrintStringXY_Clip:
 	add	iy,sp
 	lea	hl,iy+3
 	ld	de,_TextXPos
-	ldir			; copy in the y location
+	ldir				; copy in the y location
 	ld	hl,(hl)
-	ld	(_TextYPos),hl	; set new y pos
+	ld	(_TextYPos),hl		; set new y pos
 	ld	hl,(iy)
 	jr	_DrawCharacters		; jump to the main string handler
 
@@ -3302,7 +3303,7 @@ gfx_GetSpriteChar:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,(_TextData)	; get text data array
+	ld	bc,(_TextData)		; get text data array
 	add	hl,bc			; de = draw location
 	ld	de,_TmpCharSprite
 	ex	de,hl
@@ -3396,7 +3397,7 @@ gfx_SetFontData:
 	or	a,a
 	sbc	hl,de
 	ld	de,(_TextData)
-	jr	nz,.nonnull			; if null make default font
+	jr	nz,.nonnull		; if null make default font
 	ld	hl,_DefaultTextData
 .nonnull:
 	ld	(_TextData),hl		; save pointer to custom font
@@ -3464,7 +3465,7 @@ gfx_SetMonospaceFont:
 	push	de
 	push	hl
 	ld	a,e			; a = width
-	ld	(_TextFixedWidth),a 	; store the value of the monospace width
+	ld	(_TextFixedWidth),a	; store the value of the monospace width
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -4170,9 +4171,9 @@ gfx_RotateSpriteHalf:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)
-	ld	c,(hl)		; c = width
+	ld	c,(hl)			; c = width
 	inc	hl
-	ld	b,(hl)		; b = height
+	ld	b,(hl)			; b = height
 	ld	iy,(iy+6)
 	ld	(iy+0),bc
 	mlt	bc
@@ -4405,7 +4406,7 @@ _RotatedScaledSprite:
 	jr	nz,.hax
 	inc	a			; hax for scale = 1?
 .hax:
-	ld	(.dsrs_size_1),a 	; write smc
+	ld	(.dsrs_size_1),a	; write smc
 
 	or	a,a
 	sbc	hl,hl
@@ -4486,7 +4487,7 @@ TransparentColor_6 := $-1
 .dsrs_sinf_0 := $-3
 	add	hl,bc			; ys += -sinf
 	dec	iyl
-	jr	nz,.inner		 ; x loop
+	jr	nz,.inner		; x loop
 
 	pop	hl			; dxc
 	ld	bc,0			; smc = cosf
