@@ -242,8 +242,8 @@ gfx_SetClipRegion:
 	call	_ClipRegion		; iy points to the start of the arguments
 	ret	c
 	lea	hl,iy+3
-	jr	_SetClipRegion_Copy
-
+;	jr	_SetClipRegion_Copy	; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 _SetClipRegion_Full:
 	ld	hl,_ClipRegion_Full
 _SetClipRegion_Copy:
@@ -2416,17 +2416,20 @@ _ClipCoordinates:
 gfx_TransparentTilemap_NoClip:
 ; Tilemapping subsection
 	ld	hl,gfx_TransparentSprite_NoClip
-	jr	_Tilemap
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_Tilemap_NoClip:
 ; Tilemapping subsection
 	ld	hl,gfx_Sprite_NoClip
-	jr	_Tilemap
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_TransparentTilemap:
 ; Tilemapping subsection
 	ld	hl,gfx_TransparentSprite
-	jr	_Tilemap
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_Tilemap:
 ; Draws a tilemap given a tile map structure and some offsets
@@ -2844,7 +2847,8 @@ _PrintStringXY:
 	dec	hl
 	dec	hl
 	ld	hl,(hl)
-	jr	_DrawCharacters
+;	jr	_DrawCharacters		; emulated by dummifying next instructions:
+	db	$01			; pop de \ ex (sp),hl \ push de -> ld bc,*
 
 ;-------------------------------------------------------------------------------
 gfx_PrintString:
@@ -2854,8 +2858,7 @@ gfx_PrintString:
 ; Returns:
 ;  None
 	pop	de
-	pop	hl
-	push	hl
+	ex	(sp),hl
 	push	de
 _DrawCharacters:
 	ld	a,(hl)			; get the current character
@@ -3476,7 +3479,8 @@ gfx_FillTriangle_NoClip:
 ; Returns:
 ;  None
 	ld	hl,gfx_HorizLine_NoClip
-	jr	_FillTriangle
+;	jr	_FillTriangle		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_FillTriangle:
 ; Draws a filled triangle with clipping
@@ -3805,7 +3809,8 @@ gfx_Polygon_NoClip:
 ; Returns:
 ;  None
 	ld	hl,gfx_Line_NoClip
-	jr	_Polygon
+;	jr	_Polygon		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_Polygon:
 ; Draws a clipped polygon outline
@@ -4281,7 +4286,8 @@ gfx_RotatedScaledSprite_NoClip:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	xor	a,a
-	jr	_RotatedScaledSprite
+;	jr	_RotatedScaledSprite	; emulated by dummifying next instruction:
+	db	$FE			; ld a,3 -> cp a,$3E \ inc bc
 
 ;-------------------------------------------------------------------------------
 gfx_RotatedScaledTransparentSprite_NoClip:

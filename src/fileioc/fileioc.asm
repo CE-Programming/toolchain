@@ -256,7 +256,9 @@ ti_OpenVar:
 	ld	iy,0
 	add	iy,sp
 	ld	a,(iy+9)
-	jr	_Open
+;	jr	_Open			; emulated by dummifying next instruction:
+	db	$FE			; ld a,appVarObj -> cp a,$3E \ dec d
+assert appVarObj = $15
 ;-------------------------------------------------------------------------------
 ti_Open:
 ; Opens an AppVar
@@ -743,7 +745,9 @@ ti_DeleteVar:
 	push	de
 	push	hl
 	ld	a,c
-	jr	_Delete
+;	jr	_Delete			; emulated by dummifying next instruction:
+	db	$FE			; ld a,appVarObj -> cp a,$3E \ dec d
+assert appVarObj = $15
 
 ;-------------------------------------------------------------------------------
 ti_Delete:
@@ -854,7 +858,9 @@ ti_DetectVar:
 	ld	hl,9
 	add	hl,sp
 	ld	a,(hl)
-	jr	_Detect
+;	jr	_Detect			; emulated by dummifying next instruction:
+	db	$FE			; ld a,appVarObj -> cp a,$3E \ dec d
+assert appVarObj = $15
 
 ;-------------------------------------------------------------------------------
 ti_Detect:
