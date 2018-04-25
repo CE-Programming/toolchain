@@ -1483,7 +1483,7 @@ TrivialAccept:
 	inc	sp
 	inc	sp
 	inc	sp
-	;jr	_Line_NoClip                ; line routine handler
+;	jr	_Line_NoClip		; line routine handler
 
 ;-------------------------------------------------------------------------------
 gfx_Line_NoClip:
