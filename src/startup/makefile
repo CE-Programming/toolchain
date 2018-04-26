@@ -9,15 +9,11 @@ NATIVEPATH =$(subst /,\,$(1))
 WINPATH    =$(NATIVEPATH)
 CP         =xcopy /y
 PREFIX    ?=C:
-WINCHKPATH =$(NATIVEPATH)
-WINCHKDIR :=if exist
-RMDIR      =rmdir /s /q
 else
 NATIVEPATH =$(subst \,/,$(1))
 WINPATH    =$(subst \,\\,$(shell winepath --windows $(1)))
 CP         =cp
 PREFIX    ?=$(HOME)
-RMDIR      =rm -rf
 endif
 
 DEV        ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
@@ -38,8 +34,5 @@ install:
 	$(CP) $(CSTARTUP_SRC) $(I_LOC)
 	$(CP) $(CCLEANUP_SRC) $(I_LOC)
 	$(CP) $(LIBHEADER_SRC) $(I_LOC)
-
-uninstall:
-	$(WINCHKDIR) $(call WINCHKPATH,$(I_LOC)) $(RMDIR) $(I_LOC)
 
 .PHONY: all clean install uninstall
