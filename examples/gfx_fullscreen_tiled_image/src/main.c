@@ -25,7 +25,9 @@ extern uint8_t tilemap_map[];
 void main(void) {
     unsigned int i;
     unsigned int x, y;
-    gfx_sprite_t *tile = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);
+    gfx_sprite_t *tile;
+
+    tile = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);
 
     /* Initialize the graphics */
     if (!var_gfx_init()) {
