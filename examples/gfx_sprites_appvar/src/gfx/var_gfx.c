@@ -1,4 +1,4 @@
-// Converted using ConvPNG
+// convpng
 #include <stdint.h>
 #include "var_gfx.h"
 
@@ -10,7 +10,7 @@ uint8_t *var_gfx[3] = {
 };
 
 bool var_gfx_init(void) {
-    unsigned int data,i;
+    unsigned int data, i;
     ti_var_t appvar;
 
     ti_CloseAll();
@@ -22,5 +22,6 @@ bool var_gfx_init(void) {
     }
 
     ti_CloseAll();
+
     return (bool)appvar;
 }

@@ -1,5 +1,5 @@
-// Converted using ConvPNG
-// This file contains all the graphics sources for easier inclusion in a project
+// convpng
+// this file contains all the graphics sources for easy inclusion in a project
 #ifndef __var_gfx__
 #define __var_gfx__
 #include <stdint.h>
@@ -11,9 +11,8 @@
 extern uint8_t *var_gfx[3];
 #define ubuntu ((gfx_sprite_t*)var_gfx[0])
 #define mint ((gfx_sprite_t*)var_gfx[1])
-
-bool var_gfx_init(void);
 #define sizeof_all_gfx_pal 512
 #define all_gfx_pal ((uint16_t*)var_gfx[2])
+bool var_gfx_init(void);
 
 #endif

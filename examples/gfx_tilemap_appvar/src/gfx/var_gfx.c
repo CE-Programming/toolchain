@@ -1,4 +1,4 @@
-// Converted using ConvPNG
+// convpng
 #include <stdint.h>
 #include "var_gfx.h"
 

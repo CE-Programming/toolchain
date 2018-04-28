@@ -179,7 +179,7 @@ clean-startup:
 # uninstall rule
 #----------------------------
 uninstall:
-	$(call RMDIR,$(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+	$(call RMDIR,$(call NATIVEPATH,$(INSTALLLOC)/CEdev))
 #----------------------------
 
 #----------------------------
@@ -273,4 +273,4 @@ help:
 	@echo help
 #----------------------------
 
-.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help release fasmg
+.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install export_appvarstall help release fasmg
