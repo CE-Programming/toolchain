@@ -11,9 +11,13 @@ doxygen/
 *.ko
 *.obj
 *.elf
+*.bin
 obj/
 release/
+build/
 cmake-build-debug/
+tools/fasmg/fasmg
+tools/fasmg/fasmg.exe
 
 # precompiled headers
 *.gch

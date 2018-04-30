@@ -7,6 +7,8 @@ ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
+RMDIR      = call && (if exist $(1) rmdir /s /q $(1))
+MKDIR      = call && (if not exist $(1) mkdir $(1))
 RM         = del /f 2>nul
 CEDEV     ?= C:\CEdev
 BIN       ?= $(CEDEV)/bin
@@ -14,23 +16,27 @@ CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 else
 NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
+RMDIR      = rm -rf $(1)
+MKDIR      = mkdir -p $(1)
 RM         = rm -f
 CEDEV     ?= $(HOME)/CEdev
 BIN       ?= $(CEDEV)/bin
 CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
 endif
 
-CCFLGS    := -noasm -nodebug -nogenprint -nokeeplst -keepasm -promote -quiet -fplib -optsize -cpu:EZ80F91 -stdinc:"..;..\\..\\fileioc;..\\..\\ce" -define:_EZ80F91 -define:_EZ80
+CCFLGS    := -noasm -nodebug -nogenprint -nokeeplst -keepasm -promote -quiet -fplib -optsize -cpu:EZ80F91 -stdinc:"..\\..;..\\..\\..\\fileioc;..\\..\\..\\ce" -define:_EZ80F91 -define:_EZ80
 
 EZC       := $(wildcard *.c)
-EZSRC     := $(EZC:%.c=%.src)
+EZSRC     := $(addprefix build/,$(EZC:%.c=%.src))
 
 all: $(EZSRC)
 
-%.src: %.c
-	$(CC) $(CCFLGS) $(call WINPATH,$<)
+build/%.src: %.c
+	@$(call MKDIR,build) && \
+	cd build && \
+	$(CC) $(CCFLGS) $(call WINPATH,$(notdir $<))
 
 clean:
-	$(RM) $(EZSRC)
-	
+	$(call RMDIR,build)
+
 .PHONY: all clean

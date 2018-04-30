@@ -8,8 +8,6 @@ RELEASE_NAME := CEdev
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
-WINPATH    = $(NATIVEPATH)
-WINCHKPATH = $(NATIVEPATH)
 RM         = del /f 2>nul
 RMDIR      = call && (if exist $(1) rmdir /s /q $(1))
 MKDIR      = call && (if not exist $(1) mkdir $(1))
@@ -23,7 +21,6 @@ ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEde
              $(call MKDIR,release) && move /y tools\installer\CEdev.exe release\\
 else
 NATIVEPATH = $(subst \,/,$(1))
-WINPATH    = $(shell winepath --windows $(1))
 RM         = rm -f
 RMDIR      = rm -rf $(1)
 MKDIR      = mkdir -p $(1)

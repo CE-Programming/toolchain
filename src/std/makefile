@@ -34,6 +34,11 @@ LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.src))
 LIBLINKED   = $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.src))
 LIB_H       = $(call NATIVEPATH,$(wildcard *.h))
 
+LIBFILEIO  += $(call NATIVEPATH,$(wildcard $(FILEIODIR)/build/*.src))
+LIBSTATIC  += $(call NATIVEPATH,$(wildcard $(STATICDIR)/build/*.src))
+LIBSHARED  += $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/build/*.src))
+LIBLINKED  += $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/build/*.src))
+
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
 COPY_LIBFILEIO = (robocopy $(FILEIODIR) $(call NATIVEPATH,$(LIB_LOC)/fileio) $(notdir $(LIBFILEIO)) /njh /njs /ndl /nc /ns) ^& exit 0
