@@ -99,7 +99,7 @@ FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,s
 all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
 	@echo Toolchain built.
 
-clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-startup
+clean: clean-graphx clean-fileioc clean-keypadc clean-usbdrvce clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
@@ -177,6 +177,15 @@ clean-keypadc:
 #----------------------------
 
 #----------------------------
+# usbdrvce rules
+#----------------------------
+usbdrvce: $(FASMG)
+	$(MAKE) -C $(USBDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
+clean-usbdrvce:
+	$(MAKE) -C $(USBDRVCEDIR) clean
+#----------------------------
+
+#----------------------------
 # libload rules
 #----------------------------
 libload: $(FASMG)
@@ -218,6 +227,7 @@ install: $(DIRS) chmod all linker_script
 	$(MAKE) -C $(GRAPHXDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(KEYPADCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(USBDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(LIBLOADDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
@@ -251,9 +261,10 @@ release: install
 #----------------------------
 dist-libs: release-libs
 release-libs:
-	$(CONVHEX) -g 4 $(call NATIVEPATH,src/graphx/graphx.8xv) \
+	$(CONVHEX) -g 5 $(call NATIVEPATH,src/graphx/graphx.8xv) \
 	$(call NATIVEPATH,src/fileioc/fileioc.8xv) \
 	$(call NATIVEPATH,src/keypadc/keypadc.8xv) \
+	$(call NATIVEPATH,src/libload/usbdrvce.8xv) \
 	$(call NATIVEPATH,src/libload/libload.8xv) \
 	$(call NATIVEPATH,clibs.8xg)
 #----------------------------
@@ -297,6 +308,7 @@ help:
 	@echo graphx
 	@echo fileioc
 	@echo keypadc
+	@echo usbdrvce
 	@echo clean
 	@echo clean-ce
 	@echo clean-asm
@@ -304,13 +316,11 @@ help:
 	@echo clean-graphx
 	@echo clean-fileioc
 	@echo clean-keypadc
-	@echo doxygen
+	@echo clean-usbdrvce
 	@echo install
 	@echo uninstall
 	@echo release
 	@echo release-libs
 	@echo help
 
-#----------------------------
-.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help release fasmg
-
+.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc usbdrvce clean-usbdrvce install uninstall help release fasmg
