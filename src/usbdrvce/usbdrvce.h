@@ -70,7 +70,7 @@ typedef struct usb_device *usb_device_t; /**< opaque handle representing a conne
  * @param data Opaque pointer passed to usb_Init().
  * @return Return USB_SUCCESS to initialize the device, USB_IGNORE to ignore a device without erroring, or an error to ignore the device and return from usb_HandleEvents().
  */
-typedef usb_error_t (*device_callback_t)(usb_device device, void *data);
+typedef usb_error_t (*device_callback_t)(usb_device_t device, void *data);
 
 /**
  * Type of the function to be called when a transfer finishes.
@@ -82,7 +82,7 @@ typedef usb_error_t (*device_callback_t)(usb_device device, void *data);
  * Only valid if \p status was USB_TRANSFER_COMPLETED.
  * @return Return USB_SUCCESS to free the transfer, USB_IGNORE to restart the transfer or an error to free the transfer and return from usb_HandleEvents().
  */
-typedef usb_error_t (*transfer_callback_t)(usb_device device, uint8_t endpoint, usb_transfer_status status, size_t transferred, void *data);
+typedef usb_error_t (*transfer_callback_t)(usb_device_t device, uint8_t endpoint, usb_transfer_status_t status, size_t transferred, void *data);
 
 /**
  * Initializes the usb driver.
@@ -130,7 +130,7 @@ usb_error_t usb_HandleEvents(void);
  * @param endpoint The endpoint to communicate with.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_ClearHalt(device_t device, uint8_t endpoint);
+usb_error_t usb_ClearHalt(usb_device_t device, uint8_t endpoint);
 
 /**
  * Performs a usb reset on a device. This causes an inactive device to become active.
@@ -138,21 +138,21 @@ usb_error_t usb_ClearHalt(device_t device, uint8_t endpoint);
  * @param endpoint The endpoint to communicate with.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_ResetDevice(device_t device);
+usb_error_t usb_ResetDevice(usb_device_t device);
 
 /**
  * Gets a device's address.
  * @param device The device to communicate with.
  * @return The usb address of \p device.
  */
-uint8_t usb_GetDeviceAddress(device_t device);
+uint8_t usb_GetDeviceAddress(usb_device_t device);
 
 /**
  * Gets a device's speed.
  * @param device The device to communicate with.
  * @return The usb speed of \p device, or USB_SPEED_UNKNOWN if unknown.
  */
-usb_speed_t usb_GetDeviceSpeed(device_t device);
+usb_speed_t usb_GetDeviceSpeed(usb_device_t device);
 
 /**
  * Gets the maximum packet size of an endpoint.
@@ -160,7 +160,7 @@ usb_speed_t usb_GetDeviceSpeed(device_t device);
  * @param endpoint The endpoint to communicate with.
  * @return The endpoint's wMaxPacketSize or 0 on error.
  */
-usb_speed_t usb_GetMaxPacketSize(device_t device, uint8_t endpoint);
+usb_speed_t usb_GetMaxPacketSize(usb_device_t device, uint8_t endpoint);
 
 /**
  * Determines how large of a buffer would be required to receive the complete configuration descriptor at \p index.
@@ -169,7 +169,7 @@ usb_speed_t usb_GetMaxPacketSize(device_t device, uint8_t endpoint);
  * @param total_length Returns the number of bytes in the complete configuration descriptor.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetConfigurationDescriptorTotalLength(device_t device, uint8_t index, size_t *total_length);
+usb_error_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device, uint8_t index, size_t *total_length);
 
 /**
  * Fetches the configuration at \p index.
@@ -182,7 +182,7 @@ usb_error_t usb_GetConfigurationDescriptorTotalLength(device_t device, uint8_t i
  * @param transferred Returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetDescriptor(device_t device, uint8_t type, uint8_t index, void *descriptor, size_t length, size_t *transferred);
+usb_error_t usb_GetDescriptor(usb_device_t device, uint8_t type, uint8_t index, void *descriptor, size_t length, size_t *transferred);
 
 /**
  * Changes the configuration at \p index, not usually supported.
@@ -194,7 +194,7 @@ usb_error_t usb_GetDescriptor(device_t device, uint8_t type, uint8_t index, void
  * The \p descriptor buffer must by at least this large.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetDescriptor(device_t device, uint8_t type, uint8_t index, void *descriptor, size_t length);
+usb_error_t usb_SetDescriptor(usb_device_t device, uint8_t type, uint8_t index, void *descriptor, size_t length);
 
 /**
  * Gets the currently active configuration of a device.
@@ -202,7 +202,7 @@ usb_error_t usb_SetDescriptor(device_t device, uint8_t type, uint8_t index, void
  * @param configuration Returns the current configuration value, or 0 if unconfigured.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetConfiguration(device_t device, uint8_t *configuration);
+usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *configuration);
 
 /**
  * Selects the configuration specified by the \p configuration_descriptor.
@@ -211,7 +211,7 @@ usb_error_t usb_GetConfiguration(device_t device, uint8_t *configuration);
  * @param configuration_descriptor A complete configuration descriptor fetched with usb_GetDescriptor().
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetConfiguration(device_t device, void *configuration_descriptor);
+usb_error_t usb_SetConfiguration(usb_device_t device, void *configuration_descriptor);
 
 /**
  * Selects the configuration specified by the \p configuration_descriptor.
@@ -221,7 +221,7 @@ usb_error_t usb_SetConfiguration(device_t device, void *configuration_descriptor
  * @param alternate_setting Returns the alternate setting in use.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetInterfaceAltSetting(device_t device, uint8_t interface, uint8_t *alternate_setting);
+usb_error_t usb_GetInterfaceAltSetting(usb_device_t device, uint8_t interface, uint8_t *alternate_setting);
 
 /**
  * Selects the configuration specified by the \p configuration_descriptor.
@@ -231,7 +231,7 @@ usb_error_t usb_GetInterfaceAltSetting(device_t device, uint8_t interface, uint8
  * @param alternate_setting Alternate setting to use.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetInterfaceAltSetting(device_t device, uint8_t interface, uint8_t alternate_setting);
+usb_error_t usb_SetInterfaceAltSetting(usb_device_t device, uint8_t interface, uint8_t alternate_setting);
 
 /**
  * Schedules a control transfer and waits for it to complete.
@@ -249,7 +249,7 @@ usb_error_t usb_SetInterfaceAltSetting(device_t device, uint8_t interface, uint8
  * @param transferred Returns the number of bytes actually transferred.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_ControlTransfer(device_t device, uint8_t endpoint, uint8_t bmRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex, void *buffer, uint16_t wLength, size_t *transferred);
+usb_error_t usb_ControlTransfer(usb_device_t device, uint8_t endpoint, uint8_t bmRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex, void *buffer, uint16_t wLength, size_t *transferred);
 
 /**
  * Schedules a bulk transfer and waits for it to complete.
@@ -262,7 +262,7 @@ usb_error_t usb_ControlTransfer(device_t device, uint8_t endpoint, uint8_t bmReq
  * @param transferred Returns the number of bytes actually transferred.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_BulkTransfer(device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
+usb_error_t usb_BulkTransfer(usb_device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
 
 /**
  * Schedules an interrupt transfer and waits for it to complete.
@@ -275,7 +275,7 @@ usb_error_t usb_BulkTransfer(device_t device, uint8_t endpoint, void *buffer, si
  * @param transferred Returns the number of bytes actually transferred.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_InterruptTransfer(device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
+usb_error_t usb_InterruptTransfer(usb_device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
 
 /**
  * Schedules an isochronous transfer and waits for it to complete.
@@ -288,7 +288,7 @@ usb_error_t usb_InterruptTransfer(device_t device, uint8_t endpoint, void *buffe
  * @param transferred Returns the number of bytes actually transferred.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_IsochronousTransfer(device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
+usb_error_t usb_IsochronousTransfer(usb_device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
 
 /**
  * Schedules a transfer.
@@ -307,7 +307,7 @@ usb_error_t usb_IsochronousTransfer(device_t device, uint8_t endpoint, void *buf
  * @param data Opaque pointer to be passed to the \p handler.
  * @return USB_SUCCESS if the transfer was scheduled or an error.
  */
-usb_error_t usb_ScheduleTransfer(device_t device, uint8_t endpoint, usb_transfer_type_t type, void *buffer, size_t length, transfer_callback_t handler, void *data);
+usb_error_t usb_ScheduleTransfer(usb_device_t device, uint8_t endpoint, usb_transfer_type_t type, void *buffer, size_t length, transfer_callback_t handler, void *data);
 
 #ifdef __cplusplus
 }
