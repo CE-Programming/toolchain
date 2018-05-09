@@ -194,7 +194,19 @@ SetGfx:
 	ld	(hl),de			; set the current draw to the screen
 assert CurrentBuffer and -$100 = mpLcdRange
 	ld	l,lcdCtrl
-	ld	(hl),a
+	ld	(hl),a			; set bpp
+	ld	l,lcdTiming0+1
+	ld	de,_LcdTiming
+	ld	b,8
+.ExchangeTimingLoop:			; exchange stored and active timing
+	ld	a,(de)
+	ld	c,a
+	ld	a,(hl)
+	ld	(de),a
+	ld	(hl),c
+	inc	hl
+	inc	de
+	djnz	.ExchangeTimingLoop
 ;	jp	gfx_SetDefaultPalette	; setup the default palette
 assert $ = gfx_SetDefaultPalette
 
@@ -6240,6 +6252,20 @@ _DefaultTextData:
 	db	$E0,$30,$30,$1C,$30,$30,$E0,$00 ; }
 	db	$76,$DC,$00,$00,$00,$00,$00,$00 ; ~
 	db	$00,$10,$38,$6C,$C6,$C6,$FE,$00 ; .
+
+_LcdTiming:
+;	db	14 shl 2		; PPL shl 2
+	db	0			; HSW
+	db	157			; HFP
+	db	0			; HBP
+	dw	(0 shl 10)+319		; (VSW shl 10)+LPP
+	db	179			; VFP
+	db	0			; VBP
+	db	(0 shl 6)+(0 shl 5)+0	; (ACB shl 6)+(CLKSEL shl 5)+PCD_LO
+;  H = ((PPL+1)*16)+(HSW+1)+(HFP+1)+(HBP+1) = 240+1+158+1 = 400
+;  V = (LPP+1)+(VSW+1)+VFP+VBP = 320+180+0+0 = 500
+; CC = H*V*PCD*2 = 400*500*2*2 = 800000
+; Hz = 48000000/CC = 60
 
 _XMin:
 	dl	0
