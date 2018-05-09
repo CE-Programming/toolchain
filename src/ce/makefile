@@ -6,12 +6,10 @@
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
-WINPATH    = $(NATIVEPATH)
 CP         = xcopy /y
 PREFIX    ?= C:
 else
 NATIVEPATH = $(subst \,/,$(1))
-WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
 CP         = cp
 PREFIX    ?= $(HOME)
 endif
