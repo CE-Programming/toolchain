@@ -162,6 +162,17 @@ macro s8 op, imm
 	assert i >= -128 & i < 128
 	op, i
 end macro
+
+wait_quick.usages_counter = 0
+
+macro wait_quick?
+	call	_WaitQuick
+	wait_quick.usages_counter = wait_quick.usages_counter + 1
+end macro
+
+postpone
+	wait_quick.usages := wait_quick.usages_counter
+end postpone
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -576,7 +587,7 @@ gfx_SetPixel:
 	add	hl,de			; move to next argument
 	ld	e,(hl)			; e = y coordinate
 _SetPixel:
-	call	gfx_Wait
+	wait_quick
 _SetPixel_NoWait:
 	ld	hl,-LcdWidth
 	add	hl,bc
@@ -661,7 +672,7 @@ _FillRectangle_NoClip:
 	ld	(.width1),bc
 	ld	(.width2),bc
 	ld	hl,Color_1
-	call	gfx_Wait
+	wait_quick
 	ldi				; check if we only need to draw 1 pixel
 	pop	hl
 	jp	po,.skip
@@ -836,7 +847,7 @@ _HorizLine_NoClip_NotDegen_StackXY:
 	ld	e,(iy+6)		; e = y
 	ld	hl,(iy+3)		; hl = x
 _HorizLine_NoClip_NotDegen:
-	call	gfx_Wait
+	wait_quick
 _HorizLine_NoClip_NotDegen_NoWait:
 	ld	d,LcdWidth/2
 	mlt	de
@@ -923,7 +934,7 @@ _VertLine_NoClip_Draw:
 	ld	de,LcdWidth
 	ld	a,0
 Color_3 := $-1
-	call	gfx_Wait
+	wait_quick
 .loop:
 	ld	(hl),a			; loop for height
 	add	hl,de
@@ -980,8 +991,23 @@ gfx_SwapDraw:
 					; hl = (old_draw>>8)^(LcdSize>>8)
 					;    = (new_draw)>>8
 	ld	(iy-mpLcdRange+CurrentBuffer+1),hl
-	ld	a,$F5			; push af
-	ld	(gfx_Wait),a		; enable wait logic
+	ld	hl,gfx_Wait
+	ld	(hl),$F5		; push af; enable wait logic
+	push	hl
+	dec	sp
+	pop	hl
+	ld	l,$CD			; call *
+					; hl=(_Wait<<8)|$CD
+	dec	sp
+	dec	sp			; sp-=3 to match pop hl later
+.WriteWaits:
+repeat wait_quick.usages
+	pop	hl
+	ret
+	nop
+	nop
+end repeat
+	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -997,6 +1023,33 @@ gfx_GetDraw:
 	ret
 
 ;-------------------------------------------------------------------------------
+_WaitQuick:
+	ex	(sp),hl			; hl = return vector
+	push	de
+	push	hl
+	ld	de,gfx_Wait
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	(hl),de			; call _WaitQuick -> call _Wait
+	dec	hl			; hl = callee
+	ex	de,hl			; de = callee
+	ld	hl,gfx_SwapDraw.WriteWaits
+.WriteWaitsTail = $-3
+	ld	(hl),$22		; ld (callee),hl
+	inc	hl
+	ld	(hl),de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(.WriteWaitsTail),hl
+	pop	hl
+	pop	de
+	ex	(sp),hl
+;	jp	gfx_Wait
+assert $ = gfx_Wait
+
+;-------------------------------------------------------------------------------
 gfx_Wait:
 ; Waits for the screen buffer to finish being displayed after gfx_SwapDraw
 ; Arguments:
@@ -1004,14 +1057,16 @@ gfx_Wait:
 ; Returns:
 ;  None
 	ret				; will be SMC'd into push af
-.loop:
+.BusyLoop:
 	ld	a,(mpLcdRis)
 	bit	bLcdIntLNBU,a
-	jr	z,.loop
+	jr	z,.BusyLoop
 	ld	a,$C9			; ret
 	ld	(gfx_Wait),a		; disable wait logic
 	pop	af
-	ret
+	push	hl
+	ld	hl,$0218		; jr $+4
+	jr	gfx_SwapDraw.WriteWaits
 
 ;-------------------------------------------------------------------------------
 gfx_Circle:
@@ -1608,7 +1663,7 @@ dl_horizontal:
 	inc	bc
 	ld	a,0
 Color_4 := $-1
-	call	gfx_Wait
+	wait_quick
 dl_hloop:
 	ld	(hl),a			; write pixel
 	cpi
@@ -1634,7 +1689,7 @@ dl_vertical:
 	srl	a			; a = dy / 2
 	inc	c
 	pop	hl
-	call	gfx_Wait
+	wait_quick
 dl_vloop:
 	ld	(hl),0			; write pixel
 Color_5 := $-1
@@ -2084,7 +2139,7 @@ gfx_TransparentSprite:
 	ld	ixh,a
 	ld	a,TRASPARENT_COLOR
 TransparentColor_1 := $-1
-	call	gfx_Wait
+	wait_quick
 .loop:
 	ld	c,0
 .next := $-1
@@ -2174,7 +2229,7 @@ gfx_Sprite:
 	ld	hl,(iy+6)		; hl -> sprite data
 	pop	iy
 	ld	bc,0
-	call	gfx_Wait
+	wait_quick
 .loop:
 	ld	c,0
 .next := $-1
@@ -2223,7 +2278,7 @@ gfx_Sprite_NoClip:
 	ld	iyl,a			; (LcdWidth/2)-(spriteWidth/2)
 	ld	a,(hl)			; spriteHeight
 	inc	hl
-	call	gfx_Wait
+	wait_quick
 	jr	.start
 .loop:
 	dec	de			; needed if sprite width is odd
@@ -2323,7 +2378,7 @@ gfx_TransparentSprite_NoClip:
 	ld	b,0			; zero mid byte
 	ld	a,TRASPARENT_COLOR
 TransparentColor_3 := $-1
-	call	gfx_Wait
+	wait_quick
 .loop:
 	ld	c,0
 .next := $-1
@@ -3050,7 +3105,7 @@ _TextYPos := $-3
 	ld	iy,0
 _TextHeight_3 := $+2
 	ld	ixl,8
-	call	gfx_Wait
+	wait_quick
 	jr	_PrintLargeFont		; SMC the jump
 _LargeFontJump := $-1
 .loop:
@@ -5263,7 +5318,7 @@ _RLETSprite_ClipTop_End:		; a = 0, hl = start of (clipped) sprite data
 	add	a,lcdWidth-255		; a = (lcdWidth-(width on-screen))&0FFh
 	rra				; a = (lcdWidth-(width on-screen))/2
 	dec	b
-	call	gfx_Wait
+	wait_quick
 	jr	z,_RLETSprite_ClipLeftMiddle
 	ld	(_RLETSprite_ClipRight_HalfRowDelta_SMC),a
 	sbc	a,a
@@ -5432,7 +5487,7 @@ _RLETSprite_NoClip_Begin:
 	sbc	a,a
 	s8	sub a,_RLETSprite_NoClip_LoopJr_SMC+1-_RLETSprite_NoClip_Row_WidthEven
 	ld	(_RLETSprite_NoClip_LoopJr_SMC),a
-	call	gfx_Wait
+	wait_quick
 ; Row loop (if sprite width is odd)
 _RLETSprite_NoClip_Row_WidthOdd:
 	inc	de			; increment buffer pointer
