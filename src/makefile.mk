@@ -17,7 +17,7 @@ BINDIR              ?= bin
 GFXDIR              ?= src/gfx
 #----------------------------
 
-VERSION := 8.0
+VERSION := 8.2
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
@@ -42,7 +42,6 @@ MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 WINRELPATH = $(subst /,\,$(1))
-WINCHKDIR  = if not exist
 TOLOWER    = $(1)
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
@@ -54,8 +53,8 @@ PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
 CD         = cd
 CP         = copy /y
 NULL       = >nul 2>&1
-RMDIR      = rmdir /s /q
-MKDIR      = mkdir
+RMDIR      = call && (if exist $(1) rmdir /s /q $(1))
+MKDIR      = call && (if not exist $(1) mkdir $(1))
 else
 MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst \,/,$(1))
@@ -71,9 +70,15 @@ CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
 CD         = cd
 CP         = cp
-RMDIR      = rm -rf
-MKDIR      = mkdir -p
+RMDIR      = rm -rf $(1)
+MKDIR      = mkdir -p $(1)
 endif
+
+# ensure native paths
+SRCDIR := $(call NATIVEPATH,$(SRCDIR))
+OBJDIR := $(call NATIVEPATH,$(OBJDIR))
+BINDIR := $(call NATIVEPATH,$(BINDIR))
+GFXDIR := $(call NATIVEPATH,$(GFXDIR))
 
 # generate default names
 TARGETBIN     := $(TARGET).bin
@@ -176,14 +181,6 @@ LDFLAGS ?= \
 	-i 'sources '$(F_STARTUP)'' \
 	-i 'deps $(call NATIVEPATH,$(LINK_FILES))'
 
-ifneq ($(OS),Windows_NT)
-SAFEMKDIR     = $(MKDIR) $(call NATIVEPATH,$(1))
-else
-WINCHKBINDIR := $(WINCHKDIR) $(BINDIR)
-WINCHKOBJDIR := $(WINCHKDIR) $(OBJDIR)
-SAFEMKDIR     = ($(WINCHKDIR) $(call NATIVEPATH,$(1)) $(MKDIR) $(call NATIVEPATH,$(1)))
-endif
-
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
 
@@ -195,8 +192,8 @@ debug: dirs $(BINDIR)/$(TARGET8XP)
 
 dirs:
 	@echo C CE SDK Version $(VERSION) && \
-	$(WINCHKBINDIR) $(MKDIR) $(BINDIR) && \
-	$(WINCHKOBJDIR) $(MKDIR) $(OBJDIR)
+	$(call MKDIR,$(BINDIR)) && \
+	$(call MKDIR,$(OBJDIR))
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	@$(CD) $(BINDIR) && \
@@ -211,20 +208,20 @@ $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: */%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
+	@$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: **/*/%.c $(USERHEADERS)
-	@$(call SAFEMKDIR,$(@D)) && \
+	@$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
 clean:
-	@$(RMDIR) $(call NATIVEPATH,$(OBJDIR))
-	@$(RMDIR) $(call NATIVEPATH,$(BINDIR))
-	@echo Cleaned build files.
+	@$(call RMDIR,$(OBJDIR)) && \
+	$(call RMDIR,$(BINDIR)) && \
+	echo Cleaned build files.
 
 gfx:
 	@$(CD) $(GFXDIR) && convpng

@@ -919,8 +919,8 @@ void gfx_SetTextConfig(uint8_t config);
  * @brief Different available text modes
  */
 typedef enum {
-    gfx_text_clip = 1, /**< Default, text routines do not clip (much faster) */
-    gfx_text_noclip    /**< Text routines will clip against the defined clip window */
+    gfx_text_clip = 1, /**< Text routines will clip against the defined clip window */
+    gfx_text_noclip    /**< Default, text routines do not clip (much faster) */
 } gfx_text_options_t;
 
 /**

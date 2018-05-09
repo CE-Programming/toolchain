@@ -217,7 +217,7 @@ NoResize:
 
 ;-------------------------------------------------------------------------------
 ti_IsArchived:
-; Checks if a varaible is archived
+; Checks if a variable is archived
 ; Arguments:
 ;  arg0 : Slot number
 ; Returns:
@@ -248,20 +248,22 @@ _IsInRAM:
 ti_OpenVar:
 ; Opens a variable
 ; Arguments:
-;  arg0 : Pointer to varaible name
+;  arg0 : Pointer to variable name
 ;  arg1 : Opening flags
-;  arg2 : Varaible Type
+;  arg2 : variable Type
 ; Returns:
 ;  Slot number if no error
 	ld	iy,0
 	add	iy,sp
 	ld	a,(iy+9)
-	jr	_Open
+;	jr	_Open			; emulated by dummifying next instruction:
+	db	$FE			; ld a,appVarObj -> cp a,$3E \ dec d
+assert appVarObj = $15
 ;-------------------------------------------------------------------------------
 ti_Open:
 ; Opens an AppVar
 ; Arguments:
-;  arg0 : Pointer to varaible name
+;  arg0 : Pointer to variable name
 ;  arg1 : Opening flags
 ; Returns:
 ;  Slot number if no error
@@ -743,7 +745,9 @@ ti_DeleteVar:
 	push	de
 	push	hl
 	ld	a,c
-	jr	_Delete
+;	jr	_Delete			; emulated by dummifying next instruction:
+	db	$FE			; ld a,appVarObj -> cp a,$3E \ dec d
+assert appVarObj = $15
 
 ;-------------------------------------------------------------------------------
 ti_Delete:
@@ -773,7 +777,7 @@ _Delete:
 
 ;-------------------------------------------------------------------------------
 ti_Rewind:
-; Performs an frewind on a varaible
+; Performs an frewind on a variable
 ; Arguments:
 ;  arg0 : Slot number
 ; Returns:
@@ -792,7 +796,7 @@ ti_Rewind:
 
 ;-------------------------------------------------------------------------------
 ti_Tell:
-; Performs an ftell on a varaible
+; Performs an ftell on a variable
 ; Arguments:
 ;  arg0 : Slot number
 ; Returns:
@@ -828,7 +832,7 @@ ti_GetSize:
 
 ;-------------------------------------------------------------------------------
 ti_Close:
-; Closes an open slot varaible
+; Closes an open slot variable
 ; Arguments:
 ;  arg0 : Slot number
 ; Returns:
@@ -850,11 +854,13 @@ ti_DetectVar:
 ; Arguments:
 ;  arg0 : address of pointer to being search
 ;  arg1 : pointer to null terminated string of data to search for
-;  arg2 : type of varaible to search for
+;  arg2 : type of variable to search for
 	ld	hl,9
 	add	hl,sp
 	ld	a,(hl)
-	jr	_Detect
+;	jr	_Detect			; emulated by dummifying next instruction:
+	db	$FE			; ld a,appVarObj -> cp a,$3E \ dec d
+assert appVarObj = $15
 
 ;-------------------------------------------------------------------------------
 ti_Detect:
@@ -1049,8 +1055,8 @@ ti_GetDataPtr:
 
 ;-------------------------------------------------------------------------------
 ti_SetVar:
-; Sets a varaible
-; Gets a pointer to a varaible data struct
+; Sets a variable
+; Gets a pointer to a variable data struct
 ; Arguments:
 ;  arg0 : Pointer to variable name string
 ;  arg1 : Pointer to data structure pointer
@@ -1083,8 +1089,8 @@ ti_SetVar:
 
 ;-------------------------------------------------------------------------------
 ti_StoVar:
-; Stores a varaible
-; Gets a pointer to a varaible data struct
+; Stores a variable
+; Gets a pointer to a variable data struct
 ; Arguments:
 ;  arg0 : Pointer to variable name string
 ;  arg1 : Pointer to data structure pointer
@@ -1095,9 +1101,9 @@ ti_StoVar:
 	ld	hl,(iy+12)			; pointer to var string
 	call	_SetVarStr
 	ld	a,(iy+9)
-	or	a,a				; if a real we have to look up the varaible
+	or	a,a				; if a real we have to look up the variable
 	jr	z,_iscr
-	cp	a,0Ch				; if a cplx we have to look up the varaible
+	cp	a,0Ch				; if a cplx we have to look up the variable
 	jr	nz,_notcr
 _iscr:
 	call	_FindSym
@@ -1120,7 +1126,7 @@ _notcr:
 
 ;-------------------------------------------------------------------------------
 ti_RclVar:
-; Gets a pointer to a varaible data struct
+; Gets a pointer to a variable data struct
 ; Arguments:
 ;  arg0 : Pointer to variable name string
 ;  arg1 : Pointer to data structure pointer

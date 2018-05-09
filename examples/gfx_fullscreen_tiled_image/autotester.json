@@ -1,7 +1,8 @@
 {
   "rom": "84pce_515.rom",
   "transfer_files": [
-    "bin/DEMO.8xp"
+    "bin/DEMO.8xp",
+    "src/gfx/var_gfx.8xv"
   ],
   "target": {
     "name": "DEMO",
@@ -9,26 +10,22 @@
   },
   "sequence": [
     "action|launch",
-    "delay|300",
-    "hash|1",
+    "hashWait|1",
     "key|enter",
-    "key|enter",
-    "delay|300",
     "hashWait|2"
   ],
   "hashes": {
     "1": {
-      "description": "The background will be blank",
+      "description": "Fullscreen tiled image",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "3132DE74" ]
+      "expected_CRCs": [ "2846A371" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44" ]
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "43BF8092", "5ACF1C01" ]
     }
   }
 }
-

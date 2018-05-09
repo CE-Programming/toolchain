@@ -28,7 +28,7 @@ script:
 # Build examples
   - make -C $CEDEV/examples
 # Build CEmu core and autotester_cli
-  - git clone https://github.com/CE-Programming/CEmu.git
+  - git clone --recursive -b latest-stable --depth 1 https://github.com/CE-Programming/CEmu.git
   - make -C CEmu/core -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
   - make -C CEmu/tests/autotester -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
   - export PATH=$(pwd)/CEmu/tests/autotester:$PATH

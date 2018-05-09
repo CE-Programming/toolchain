@@ -8,15 +8,32 @@
 #ifndef H_INTCE
 #define H_INTCE
 
-#ifndef FORCE_INTERRUPTS
-#error TI has removed custom interrupt support on CE models with hardware revision >= I. You can complain about it to ti-cares@ti.com. Alternatively if you only want to target pre-I models, define FORCE_INTERRUPTS before including intce.h
-#endif
-
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief Enable global interrupts
+ */
+#define int_Enable() \
+asm("ei")
+
+/**
+ * @brief Diasble global interrupts
+ */
+#define int_Disable() \
+asm("di")
+
+/**
+ * @brief Blocking wait for an interrupt to trigger
+ */
+#define int_Wait() \
+asm("halt")
+
+#ifdef FORCE_INTERRUPTS
+#warning TI has removed custom interrupt support on CE models with hardware revision >= I. Please check that this is acceptable.
 
 /**
  * Initizalize to use custom interrupts
@@ -37,23 +54,7 @@ void int_Reset(void);
  */
 void int_SetVector(uint8_t ivect, void (*handler)(void));
 
-/**
- * @brief Enable global interrupts
- */
-#define int_Enable() \
-asm("ei")
-
-/**
- * @brief Diasble global interrupts
- */
-#define int_Disable() \
-asm("di")
-
-/**
- * @brief Blocking wait for an interrupt to trigger
- */
-#define int_Wait() \
-asm("halt")
+#endif
 
 #define ON_IVECT        0  /**< [on] key interrupt source        */
 #define TIMER1_IVECT    1  /**< Timer 1 interrupt source         */

@@ -541,7 +541,7 @@ void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *n
 int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
 
 /**
- * Gets the Answer
+ * Gets the Ans variable
  *
  * @param type This is set to the current variable type in ANS
  * @returns Pointer to the data
@@ -550,7 +550,7 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
 void *os_RclAns(uint8_t *type);
 
 /**
- * Copies a real_t
+ * Copies a real_t type
  *
  * @param src Pointer to original real_t
  * @returns Copied real_t
@@ -668,7 +668,9 @@ void os_SetFlagBits(int16_t offset_pattern);
 void os_ResetFlagBits(int16_t offset_pattern);
 
 /**
- * Custom implementation input routine for use in conjunction with the TIOS
+ * Custom implementation input routine for use in conjunction with the TIOS.
+ * It is HIGHLY recommended you implement your own routine, this routine has
+ * some quirks. It is good enough for getting basic input however.
  *
  * @param string Input prompt string to be displayed to the user
  * @param buf Storage location to store input string

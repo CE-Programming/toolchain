@@ -6,12 +6,10 @@
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
-WINPATH    = $(NATIVEPATH)
 CP         = xcopy /y
 PREFIX    ?= C:
 else
 NATIVEPATH = $(subst \,/,$(1))
-WINPATH    = $(subst \,\\,$(shell winepath --windows $(1)))
 CP         = cp
 PREFIX    ?= $(HOME)
 endif
@@ -34,6 +32,11 @@ LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.src))
 LIBLINKED   = $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.src))
 LIB_H       = $(call NATIVEPATH,$(wildcard *.h))
 
+LIBFILEIO  += $(call NATIVEPATH,$(wildcard $(FILEIODIR)/build/*.src))
+LIBSTATIC  += $(call NATIVEPATH,$(wildcard $(STATICDIR)/build/*.src))
+LIBSHARED  += $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/build/*.src))
+LIBLINKED  += $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/build/*.src))
+
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
 COPY_LIBFILEIO = (robocopy $(FILEIODIR) $(call NATIVEPATH,$(LIB_LOC)/fileio) $(notdir $(LIBFILEIO)) /njh /njs /ndl /nc /ns) ^& exit 0
@@ -51,13 +54,13 @@ endif
 all:
 	$(MAKE) -C $(FILEIODIR) BIN=$(BIN)
 	$(MAKE) -C $(STATICDIR) BIN=$(BIN)
-	$(MAKE) -C $(LINKEDDIR) BIN=$(BIN)
+#	$(MAKE) -C $(LINKEDDIR) BIN=$(BIN) # nothing to do
 	$(MAKE) -C $(SHAREDDIR) BIN=$(BIN)
 
 clean:
 	$(MAKE) -C $(FILEIODIR) $(MAKECMDGOALS)
 	$(MAKE) -C $(SHAREDDIR) $(MAKECMDGOALS)
-	$(MAKE) -C $(LINKEDDIR) $(MAKECMDGOALS)
+#	$(MAKE) -C $(LINKEDDIR) $(MAKECMDGOALS) # nothing to do
 	$(MAKE) -C $(STATICDIR) $(MAKECMDGOALS)
 
 install:

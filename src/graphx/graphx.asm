@@ -132,7 +132,8 @@ library 'GRAPHX', 9
 
 ;-------------------------------------------------------------------------------
 LcdSize            := LcdWidth*LcdHeight
-InterruptStackSize := 4000	; minimum stack size to provide for interrupts if moving the stack
+; minimum stack size to provide for interrupts if moving the stack
+InterruptStackSize := 4000
 CurrentBuffer      := mpLcdLpbase
 TRASPARENT_COLOR   := 0
 TEXT_FG_COLOR      := 0
@@ -236,16 +237,14 @@ gfx_AllocSprite:
 ;  arg2 : pointer to malloc routine
 ; Returns:
 ;  Pointer to allocated sprite, first byte width, second height
-	ld	hl,3
+	ld	bc,3
+	push	bc
+	pop	hl
 	add	hl,sp
 	ld	e,(hl)			; e = width
-	inc	hl
-	inc	hl
-	inc	hl
+	add	hl,bc
 	ld	d,(hl)			; d = height
-	inc	hl
-	inc	hl
-	inc	hl
+	add	hl,bc
 	ld	hl,(hl)			; hl = malloc
 	push	de
 	mlt	de			; de = width * height
@@ -263,24 +262,28 @@ gfx_AllocSprite:
 
 ;-------------------------------------------------------------------------------
 gfx_SetClipRegion:
-; Sets the clipping  for clipped routines
+; Sets the clipping region for clipped routines
 ; Arguments:
 ;  arg0 : Xmin
 ;  arg1 : Ymin
 ;  arg2 : Xmax
 ;  arg3 : Ymax
-;  Must be within (0,0,320,240)
 ; Returns:
 ;  None
-	call	_SetFullScreenClip	; clip against the actual LCD screen
+	call	_SetClipRegion_Full	; clip against the actual LCD screen
 	ld	iy,0
-	lea	bc,iy+12
 	add	iy,sp
 	call	_ClipRegion		; iy points to the start of the arguments
 	ret	c
 	lea	hl,iy+3
-	ld	de,_XMin		; copy the variables in
-	ldir				; copy in the new structure
+;	jr	_SetClipRegion_Copy	; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
+_SetClipRegion_Full:
+	ld	hl,_ClipRegion_Full
+_SetClipRegion_Copy:
+	ld	de,_XMin
+	ld	bc,4*3
+	ldir
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -428,7 +431,7 @@ gfx_FillScreen:
 ; Returns:
 ;  None
 
-FillScreen_PushesPerIter := 115	; see fillscreen.xlsx for derivation
+FillScreen_PushesPerIter := 115		; see fillscreen.xlsx for derivation
 FillScreen_NumIters      := (LcdSize-InterruptStackSize)/(FillScreen_PushesPerIter*3)
 FillScreen_BytesToPush   := FillScreen_PushesPerIter*3*FillScreen_NumIters
 FillScreen_BytesToLddr   := LcdSize-FillScreen_BytesToPush
@@ -506,16 +509,21 @@ gfx_SetPalette:
 ;  arg2 : Offset at which to start inserting the palette
 ; Returns:
 ;  None
-	ld	iy,0
-	add	iy,sp
+	pop	iy			; iy = return vector
+	pop	hl			; hl = src
+	pop	bc			; bc = size
+	pop	de			; e = offset
+	push	de
+	push	bc
+	push	hl
 	ld	hl,mpLcdPalette shr 1
-	ld	l,(iy+9)		; offset in palette
-	add	hl,hl
-	ex	de,hl
-	ld	hl,(iy+3)		; pointer to input palette
-	ld	bc,(iy+6)		; size of input palette
-	ldir				; copy the palette in
-	ret
+	ld	l,e			; l = offset
+	add	hl,hl			; hl = &palette[offset] = dest
+	ex	de,hl			; de = dest
+	pop	hl			; hl = src
+	push	hl
+	ldir
+	jp	(iy)
 
 ;-------------------------------------------------------------------------------
 gfx_GetPixel:
@@ -534,6 +542,7 @@ gfx_GetPixel:
 	inc	hl
 	inc	hl			; hl = &y
 	ld	e,(hl)			; e = y
+_GetPixel:
 	ld	d,LcdWidth/2
 	mlt	de			; de = y * (lcdWidth / 2)
 	ld	hl,(CurrentBuffer)	; hl = buffer
@@ -566,10 +575,21 @@ gfx_SetPixel:
 	ld	de,3
 	add	hl,de			; move to next argument
 	ld	e,(hl)			; e = y coordinate
+_SetPixel:
 	call	gfx_Wait
 _SetPixel_NoWait:
-	call	_PixelPtr
+	ld	hl,-LcdWidth
+	add	hl,bc
 	ret	c			; return if out of bounds
+	ld	hl,-LcdHeight
+	add	hl,de
+	ret	c			; return if out of bounds
+	ld	hl,(CurrentBuffer)
+	add	hl,bc
+	ld	d,LcdWidth/2
+	mlt	de
+	add	hl,de
+	add	hl,de
 	ld	(hl),0			; get the actual pixel
 Color_1 = $-1
 	ret
@@ -735,25 +755,26 @@ gfx_Rectangle_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+3)		; hl = x
-	ld	e,(iy+6)		; e = y
-	ld	bc,(iy+9)		; bc = width
-	ld	d,(iy+12)		; d = height
-	push	bc
-	push	hl
-	push	de
-	call	_RectHoriz_NoClip	; top horizontal line
-	pop	bc
-	push	bc
-	call	_RectVert_NoClip	; right vertical line
-	pop	bc
-	pop	hl
-	ld	e,c
-	call	_VertLine_NoClip	; left vertical line
-	pop	bc
+	ld	a,(iy+12)		; a = height
 	or	a,a
-	sbc	hl,de
-	jp	_MemorySet		; bottom horizontal line
+	ret	z			; abort if height == 0
+	ld	bc,(iy+9)		; bc = width
+	sbc	hl,hl
+	adc	hl,bc
+	ret	z			; abort if width == 0
+	push	bc
+	call	_HorizLine_NoClip_NotDegen_StackXY ; draw top horizontal line
+						   ; hl = &buf[y][x+width-1]
+	ld	b,a			; b = height
+	call	_VertLine_NoClip_Draw	; draw right vertical line
+	ld	b,(iy+12)		; b = height
+	ld	e,(iy+6)		; e = y
+	call	_VertLine_NoClip_NotDegen_StackX ; draw left vertical line
+						 ; hl = &buf[y+height][x]
+						 ; de = LcdWidth
+	sbc	hl,de			; hl = &buf[y+height-1][x]
+	pop	bc			; bc = width
+	jp	_HorizLine_NoClip_Draw	; draw bottom horizontal line
 
 ;-------------------------------------------------------------------------------
 gfx_HorizLine:
@@ -768,12 +789,12 @@ gfx_HorizLine:
 	add	iy,sp
 	ld	de,(_YMin)
 	ld	hl,(iy+6)
-	mIsHLLessThanDE		; compare y coordinate <-> ymin
+	mIsHLLessThanDE			; compare y coordinate <-> ymin
 	ret	c
 	ld	hl,(_YMax)
 	dec	hl			; inclusive
 	ld	de,(iy+6)
-	mIsHLLessThanDE		; compare y coordinate <-> ymax
+	mIsHLLessThanDE			; compare y coordinate <-> ymax
 	ret	c
 	ld	hl,(iy+9)
 	ld	de,(iy+3)
@@ -793,8 +814,7 @@ gfx_HorizLine:
 	sbc	hl,de
 	push	hl
 	pop	bc			; bc = length
-	ld	e,(iy+6)		; e = y coordinate
-	jr	_RectHoriz_NoClip
+	jr	_HorizLine_NoClip_StackXY
 
 ;-------------------------------------------------------------------------------
 gfx_HorizLine_NoClip:
@@ -807,25 +827,26 @@ gfx_HorizLine_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	e,(iy+6)		; e = y coordinate
-	ld	bc,(iy+9)		; bc = width
-_RectHoriz_NoClip:
+	ld	bc,(iy+9)		; bc = length
+_HorizLine_NoClip_StackXY:
 	sbc	hl,hl
 	adc	hl,bc
-	ret	z			; make sure the width is not 0
-	ld	hl,(iy+3)
+	ret	z			; abort if length == 0
+_HorizLine_NoClip_NotDegen_StackXY:
+	ld	e,(iy+6)		; e = y
+	ld	hl,(iy+3)		; hl = x
+_HorizLine_NoClip_NotDegen:
 	call	gfx_Wait
-_HorizLine_NoClip_NoWait:
+_HorizLine_NoClip_NotDegen_NoWait:
 	ld	d,LcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
 	ld	de,(CurrentBuffer)
 	add	hl,de			; hl -> place to draw
-	ld	a,0			; color index to use
+_HorizLine_NoClip_Draw:
+	ld	(hl),0
 Color_2 := $-1
-_MemorySet:
-	ld	(hl),a
 	cpi
 	ret	po
 	ex	de,hl
@@ -871,8 +892,7 @@ gfx_VertLine:
 	ld	hl,(iy+9)
 	sbc	hl,de
 	ld	b,l
-	ld	hl,(iy+3)
-	jr	_VertLine_NoClip		; jump to unclipped version
+	jr	_VertLine_NoClip_StackX	; jump to unclipped version
 
 ;-------------------------------------------------------------------------------
 gfx_VertLine_NoClip:
@@ -885,20 +905,21 @@ gfx_VertLine_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy+3)		; hl = x
 	ld	e,(iy+6)		; e = y
 	ld	b,(iy+9)		; b = length
-_VertLine_NoClip:
+_VertLine_NoClip_StackX:
 	xor	a,a
 	or	a,b
-	ret	z			; check if length is 0
+	ret	z			; abort if length == 0
+_VertLine_NoClip_NotDegen_StackX:
+	ld	hl,(iy+3)		; hl = x
 	ld	d,LcdWidth/2
 	mlt	de
 	add	hl,de
 	add	hl,de
 	ld	de,(CurrentBuffer)
 	add	hl,de			; hl -> drawing location
-_RectVert_NoClip:
+_VertLine_NoClip_Draw:
 	ld	de,LcdWidth
 	ld	a,0
 Color_3 := $-1
@@ -970,13 +991,10 @@ gfx_GetDraw:
 ;  None
 ; Returns:
 ;  Returns true if drawing on the buffer
-	ld	hl,(CurrentBuffer)
-	ld	de,(mpLcdBase)
-	xor	a,a
-	sbc	hl,de
-	ret	z			; drawing to screen
-	inc	a
-	ret				; drawing to buffer
+	ld	a,(mpLcdBase+2)		; comparing upper byte only is sufficient
+	ld	hl,CurrentBuffer+2
+	xor	a,(hl)			; always 0 or 1
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_Wait:
@@ -1298,7 +1316,7 @@ gfx_FillCircle_NoClip:
 	sbc	hl,bc
 	ld	(.circle1),hl
 	pop	bc
-	call	_HorizLine_NoClip_NoWait
+	call	_HorizLine_NoClip_NotDegen_NoWait
 	ld	bc,0
 .circle0 := $-3
 	ld	de,(ix-6)
@@ -1308,7 +1326,7 @@ gfx_FillCircle_NoClip:
 	ld	e,l
 	ld	hl,0
 .circle1 := $-3
-	call	_HorizLine_NoClip_NoWait
+	call	_HorizLine_NoClip_NotDegen_NoWait
 	ld	hl,(ix-6)
 	add	hl,hl
 	inc	hl
@@ -1324,7 +1342,7 @@ gfx_FillCircle_NoClip:
 	sbc	hl,bc
 	ld	(.circle3),hl
 	pop	bc
-	call	_HorizLine_NoClip_NoWait
+	call	_HorizLine_NoClip_NotDegen_NoWait
 	ld	bc,0
 .circle2 := $-3
 	ld	de,(ix-3)
@@ -1334,7 +1352,7 @@ gfx_FillCircle_NoClip:
 	ld	e,l
 	ld	hl,0
 .circle3 := $-3
-	call	_HorizLine_NoClip_NoWait
+	call	_HorizLine_NoClip_NotDegen_NoWait
 	ld	bc,(ix-3)
 	inc	bc
 	ld	(ix-3),bc
@@ -1498,7 +1516,7 @@ TrivialAccept:
 	inc	sp
 	inc	sp
 	inc	sp
-	;jr	_Line_NoClip                ; line routine handler
+;	jr	_Line_NoClip		; line routine handler
 
 ;-------------------------------------------------------------------------------
 gfx_Line_NoClip:
@@ -1636,15 +1654,14 @@ gfx_Blit:
 ;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
 ; Returns:
 ;  None
-	pop	de
-	pop	hl
-	push	hl
-	push	de
+	pop	iy			; iy = return vector
+	ex	(sp),hl
 	ld	a,l			; a = buffer to blit to
 	call	_CheckBlit		; determine which buffer to blit
 	ld	bc,LcdSize
+_Blit_Ldir:
 	ldir				; just do it
-	ret
+	jp	(iy)
 
 ;-------------------------------------------------------------------------------
 gfx_BlitLines:
@@ -1655,28 +1672,30 @@ gfx_BlitLines:
 ;  arg2 : Number of lines to copy
 ; Returns:
 ;  None
-	ld	iy,0
-	add	iy,sp
-	ld	l,(iy+9)		; l = y coordinate
+	pop	iy			; iy = return vector
+	pop	bc
+	ld	a,c			; a = buffer to blit to
+	pop	de			; e = number of lines to copy
+	ex	(sp),hl			; l = y coordinate
+	push	de
+	push	bc
 	ld	h,LcdWidth/2
+	ld	d,h
 	mlt	hl
-	add	hl,hl			; hl -> place to end
+	add	hl,hl			; hl -> number of bytes to copy
 	push	hl
-	ld	l,(iy+6)
-	ld	h,LcdWidth/2
+	ex	de,hl
 	mlt	hl
-	add	hl,hl			; hl -> place to start
+	add	hl,hl			; hl -> offset to start at
 	push	hl
-	ld	a,(iy+3)
 	call	_CheckBlit		; determine which buffer to blit
 	pop	bc
 	add	hl,bc
 	ex	de,hl
 	add	hl,bc
 	ex	de,hl
-	pop	bc			; number of lines to copy
-	ldir				; blit it
-	ret
+	pop	bc			; number of bytes to copy
+	jr	_Blit_Ldir
 
 ;-------------------------------------------------------------------------------
 gfx_BlitRectangle:
@@ -1715,16 +1734,18 @@ gfx_BlitRectangle:
 	pop	hl
 	ld	a,(iy+15)
 	ld	iy,0
-.loop:
 	add	iy,de
-	lea	de,iy
+.loop:
 	ld	bc,0			; smc for speedz
 .width := $-3
 	ldir
+	inc	b
+	ld	c,$40			; increment to next line
+	add	iy,bc
+	lea	de,iy
 	ld	bc,0			; increment to next line
 .delta := $-3
 	add	hl,bc
-	ld	de,LcdWidth		; increment to next line
 	dec	a
 	jr	nz,.loop
 	ret
@@ -1846,7 +1867,7 @@ gfx_GetClipRegion:
 	ld	hl,3
 	add	hl,sp
 	ld	iy,(hl)
-	call	_ClipRegion	; get the clipping region
+	call	_ClipRegion		; get the clipping region
 	sbc	a,a			; return false if offscreen (0)
 	inc	a
 	ret
@@ -2248,7 +2269,7 @@ gfx_GetSprite:
 	push	de
 	ld	a,(de)
 	inc	de
-	ld	(.amount),a	; amount to copy per line
+	ld	(.amount),a		; amount to copy per line
 	ld	c,a
 	ld	a,LcdWidth and $ff
 	sub	a,c
@@ -2437,17 +2458,20 @@ _ClipCoordinates:
 gfx_TransparentTilemap_NoClip:
 ; Tilemapping subsection
 	ld	hl,gfx_TransparentSprite_NoClip
-	jr	_Tilemap
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_Tilemap_NoClip:
 ; Tilemapping subsection
 	ld	hl,gfx_Sprite_NoClip
-	jr	_Tilemap
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_TransparentTilemap:
 ; Tilemapping subsection
 	ld	hl,gfx_TransparentSprite
-	jr	_Tilemap
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_Tilemap:
 ; Draws a tilemap given a tile map structure and some offsets
@@ -2729,7 +2753,7 @@ gfx_GetTextX:
 ;  None
 ; Returns:
 ;  X Text cursor posistion
-	ld	hl,(_TextXPos)	; return x pos
+	ld	hl,(_TextXPos)		; return x pos
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2739,7 +2763,7 @@ gfx_GetTextY:
 ;  None
 ; Returns:
 ;  Y Text cursor posistion
-	ld	hl,(_TextYPos)	; return y pos
+	ld	hl,(_TextYPos)		; return y pos
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2830,20 +2854,15 @@ _PrintStringXY_Clip:
 ;  arg2 : Text Y Pos
 ; Returns:
 ;  None
-	ld	hl,3
-	add	hl,sp
-	ld	de,(hl)
-	push	de
-	inc	hl
-	inc	hl
-	inc	hl
+	ld	iy,3
+	lea	bc,iy
+	add	iy,sp
+	lea	hl,iy+3
 	ld	de,_TextXPos
-	ldi
-	ldi
-	ldi				; copy in the y location
+	ldir				; copy in the y location
 	ld	hl,(hl)
-	ld	(_TextYPos),hl	; set new y pos
-	pop	hl
+	ld	(_TextYPos),hl		; set new y pos
+	ld	hl,(iy)
 	jr	_DrawCharacters		; jump to the main string handler
 
 ;-------------------------------------------------------------------------------
@@ -2870,7 +2889,8 @@ _PrintStringXY:
 	dec	hl
 	dec	hl
 	ld	hl,(hl)
-	jr	_DrawCharacters
+;	jr	_DrawCharacters		; emulated by dummifying next instructions:
+	db	$01			; pop de \ ex (sp),hl \ push de -> ld bc,*
 
 ;-------------------------------------------------------------------------------
 gfx_PrintString:
@@ -2880,8 +2900,7 @@ gfx_PrintString:
 ; Returns:
 ;  None
 	pop	de
-	pop	hl
-	push	hl
+	ex	(sp),hl
 	push	de
 _DrawCharacters:
 	ld	a,(hl)			; get the current character
@@ -3330,7 +3349,7 @@ gfx_GetSpriteChar:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,(_TextData)	; get text data array
+	ld	bc,(_TextData)		; get text data array
 	add	hl,bc			; de = draw location
 	ld	de,_TmpCharSprite
 	ex	de,hl
@@ -3424,7 +3443,7 @@ gfx_SetFontData:
 	or	a,a
 	sbc	hl,de
 	ld	de,(_TextData)
-	jr	nz,.nonnull			; if null make default font
+	jr	nz,.nonnull		; if null make default font
 	ld	hl,_DefaultTextData
 .nonnull:
 	ld	(_TextData),hl		; save pointer to custom font
@@ -3492,7 +3511,7 @@ gfx_SetMonospaceFont:
 	push	de
 	push	hl
 	ld	a,e			; a = width
-	ld	(_TextFixedWidth),a 	; store the value of the monospace width
+	ld	(_TextFixedWidth),a	; store the value of the monospace width
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3503,7 +3522,8 @@ gfx_FillTriangle_NoClip:
 ; Returns:
 ;  None
 	ld	hl,gfx_HorizLine_NoClip
-	jr	_FillTriangle
+;	jr	_FillTriangle		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_FillTriangle:
 ; Draws a filled triangle with clipping
@@ -3832,7 +3852,8 @@ gfx_Polygon_NoClip:
 ; Returns:
 ;  None
 	ld	hl,gfx_Line_NoClip
-	jr	_Polygon
+;	jr	_Polygon		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfx_Polygon:
 ; Draws a clipped polygon outline
@@ -4198,9 +4219,9 @@ gfx_RotateSpriteHalf:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy+3)
-	ld	c,(hl)		; c = width 
+	ld	c,(hl)			; c = width
 	inc	hl
-	ld	b,(hl)		; b = height
+	ld	b,(hl)			; b = height
 	ld	iy,(iy+6)
 	ld	(iy+0),bc
 	mlt	bc
@@ -4308,7 +4329,8 @@ gfx_RotatedScaledSprite_NoClip:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	xor	a,a
-	jr	_RotatedScaledSprite
+;	jr	_RotatedScaledSprite	; emulated by dummifying next instruction:
+	db	$FE			; ld a,3 -> cp a,$3E \ inc bc
 
 ;-------------------------------------------------------------------------------
 gfx_RotatedScaledTransparentSprite_NoClip:
@@ -4433,7 +4455,7 @@ _RotatedScaledSprite:
 	jr	nz,.hax
 	inc	a			; hax for scale = 1?
 .hax:
-	ld	(.dsrs_size_1),a 	; write smc
+	ld	(.dsrs_size_1),a	; write smc
 
 	or	a,a
 	sbc	hl,hl
@@ -4515,7 +4537,7 @@ TransparentColor_6 := $-1
 .dsrs_sinf_0 := $-3
 	add	hl,bc			; ys += -sinf
 	dec	iyl
-	jr	nz,.inner		 ; x loop
+	jr	nz,.inner		; x loop
 
 	pop	hl			; dxc
 	ld	bc,0			; smc = cosf
@@ -4838,8 +4860,7 @@ gfx_FloodFill:
 
 	ld	e,(ix+9)
 	ld	bc,(ix+6)
-	call	_PixelPtrNoChecks	; ov = p(x, y);
-	ld	a,(hl)
+	call	_GetPixel		; ov = p(x, y);
 
 	ld	(.oldcolor0),a
 	ld	(.oldcolor1),a
@@ -5736,29 +5757,6 @@ _LZ_ReadVarSize:
 	ret
 
 ;-------------------------------------------------------------------------------
-_PixelPtr:
-; Gets the address of a pixel
-; Inputs:
-;  BC=X
-;   E=Y
-; Outputs:
-;  HL->address of pixel
-	ld	hl,-LcdWidth
-	add	hl,bc
-	ret	c
-	ld	hl,-LcdHeight
-	add	hl,de
-	ret	c
-_PixelPtrNoChecks:
-	ld	hl,(CurrentBuffer)
-	add	hl,bc
-	ld	d,LcdWidth/2
-	mlt	de
-	add	hl,de
-	add	hl,de
-	ret
-
-;-------------------------------------------------------------------------------
 _Maximum:
 ; Calculate the resut of a signed comparison
 ; Inputs:
@@ -5852,24 +5850,6 @@ _UCDivA:
 .skip:	rla
 	djnz	.loop
 	ret				; ca = c*256/a, h = c*256%a
-
-;-------------------------------------------------------------------------------
-_SetFullScreenClip:
-; Sets the clipping  to the entire screen
-; Inputs:
-;  None
-; Outputs:
-;  HL=LcdWidth
-	ld	a,LcdHeight
-	ld	(_YMax),a
-	xor	a,a
-	ld	(_YMin),a
-	sbc	hl,hl
-	ld	(_XMin),hl
-	inc	h
-	ld	l,LcdWidth and $ff
-	ld	(_XMax),hl
-	ret
 
 ;-------------------------------------------------------------------------------
 _DivideHLBC:
@@ -6213,6 +6193,12 @@ _YMin:
 _XMax:
 	dl	LcdWidth
 _YMax:
+	dl	LcdHeight
+
+_ClipRegion_Full:
+	dl	0
+	dl	0
+	dl	LcdWidth
 	dl	LcdHeight
 
 _TmpWidth:

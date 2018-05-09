@@ -1,8 +1,9 @@
-// Converted using ConvPNG
+// convpng
 #include <stdint.h>
 #include "tiles_gfx.h"
 
 uint8_t *tileset_tiles_data[128] = {
+ (uint8_t*)0,
  (uint8_t*)258,
  (uint8_t*)516,
  (uint8_t*)774,
@@ -130,5 +131,4 @@ uint8_t *tileset_tiles_data[128] = {
  (uint8_t*)32250,
  (uint8_t*)32508,
  (uint8_t*)32766,
- (uint8_t*)33024,
 };

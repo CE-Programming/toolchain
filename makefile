@@ -8,34 +8,29 @@ RELEASE_NAME := CEdev
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
-WINPATH    = $(NATIVEPATH)
-WINCHKPATH = $(NATIVEPATH)
-WINCHKDIR := if exist
-WINNCHKDIR:= if not exist
 RM         = del /f 2>nul
-RMDIR      = rmdir /s /q
-MKDIR      = mkdir
+RMDIR      = call && (if exist $(1) rmdir /s /q $(1))
+MKDIR      = call && (if not exist $(1) mkdir $(1))
 PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
-CP_EXMPLS  = (if not exist "$(EXMPL_DIR)" mkdir $(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
+CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 CPDIR      = xcopy /y /s /e
 ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\tools\installer\installer.nsi) && \
-             $(WINNCHKDIR) "release" $(MKDIR) "release" && move /y tools\installer\CEdev.exe release\\
+             $(call MKDIR,release) && move /y tools\installer\CEdev.exe release\\
 else
 NATIVEPATH = $(subst \,/,$(1))
-WINPATH    = $(shell winepath --windows $(1))
 RM         = rm -f
-MKDIR      = mkdir -p
-RMDIR      = rm -rf
+RMDIR      = rm -rf $(1)
+MKDIR      = mkdir -p $(1)
 PREFIX    ?= $(HOME)
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = cp
 CPDIR      = cp -r
 CP_EXMPLS  = $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
 ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
-             cd $(CURDIR) && $(MKDIR) release && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
+             cd $(CURDIR) && $(call MKDIR,release) && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
 CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
 endif
 
@@ -89,8 +84,8 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
 	$(MAKE) -C $(CONVTILDIR) clean
-	$(WINCHKDIR) $(call WINCHKPATH,release) $(RMDIR) release
-	$(WINCHKDIR) $(call WINCHKPATH,doxygen) $(RMDIR) doxygen
+	$(call RMDIR,release)
+	$(call RMDIR,doxygen)
 
 #----------------------------
 # tool rules
@@ -181,7 +176,7 @@ clean-startup:
 # uninstall rule
 #----------------------------
 uninstall:
-	$(WINCHKDIR) $(call WINCHKPATH,$(INSTALLLOC)/CEdev) $(RMDIR) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+	$(call RMDIR,$(call NATIVEPATH,$(INSTALLLOC)/CEdev))
 #----------------------------
 
 #----------------------------
@@ -190,7 +185,7 @@ uninstall:
 install: $(DIRS) chmod
 	$(CP_EXMPLS)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/startup/*.src) $(call NATIVEPATH,$(INSTALLLIB))
-	$(CP) $(call NATIVEPATH,$(SRCDIR)/core_makefile) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
+	$(CP) $(call NATIVEPATH,$(SRCDIR)/makefile.mk) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
 	$(CP) $(FASMG) $(INSTALLBIN)
 	$(CP) $(CONVHEX) $(INSTALLBIN)
 	$(CP) $(CONVPNG) $(INSTALLBIN)
@@ -205,15 +200,15 @@ install: $(DIRS) chmod
 	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/sub/compat) $(call NATIVEPATH,$(INSTALLINC))
 
 $(DIRS):
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLBIN)) $(MKDIR) $(INSTALLBIN)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLIB)) $(MKDIR) $(INSTALLLIB)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLINC)) $(MKDIR) $(INSTALLINC)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLBF)) $(MKDIR) $(INSTALLBF)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLL)) $(MKDIR) $(INSTALLLL)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLIO)) $(MKDIR) $(INSTALLIO)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLSH)) $(MKDIR) $(INSTALLSH)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLST)) $(MKDIR) $(INSTALLST)
-	$(WINNCHKDIR) $(call WINCHKPATH,$(INSTALLLI)) $(MKDIR) $(INSTALLLI)
+	$(call MKDIR,$(INSTALLBIN))
+	$(call MKDIR,$(INSTALLLIB))
+	$(call MKDIR,$(INSTALLINC))
+	$(call MKDIR,$(INSTALLBF))
+	$(call MKDIR,$(INSTALLLL))
+	$(call MKDIR,$(INSTALLIO))
+	$(call MKDIR,$(INSTALLSH))
+	$(call MKDIR,$(INSTALLST))
+	$(call MKDIR,$(INSTALLLI))
 
 chmod:
 	$(CHMOD)
@@ -237,7 +232,7 @@ release-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/keypadc/keypadc.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
 	$(CP) $(call NATIVEPATH,src/sub/libload/LibLoad.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
 clibraries:
-	$(WINNCHKDIR) $(call WINCHKPATH,clibraries) $(MKDIR) clibraries
+	$(call MKDIR,clibraries)
 #----------------------------
 
 #----------------------------

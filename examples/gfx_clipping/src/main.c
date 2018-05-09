@@ -64,8 +64,8 @@ void main(void) {
             gfx_FillScreen(gfx_black);
             gfx_PrintStringXY("FUN WITH CLIPPING", x, y);
 
-            /* Draw a rectangle on the edged of the clipping region so we can see it */
-            gfx_Rectangle((LCD_WIDTH/2) - box_scale, (LCD_HEIGHT/2) - box_scale, box_scale * 2, box_scale * 2);
+            /* Draw a rectangle on the edges of the clipping region so we can see it */
+            gfx_Rectangle_NoClip((LCD_WIDTH/2) - box_scale, (LCD_HEIGHT/2) - box_scale, box_scale * 2, box_scale * 2);
 
             /* Change the clipping region */
             box_scale += box_stride;
