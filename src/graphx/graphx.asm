@@ -968,6 +968,7 @@ gfx_SwapDraw:
 	ld	iy,mpLcdRange
 	ld	hl,(iy-mpLcdRange+CurrentBuffer+1) ; hl = old_draw>>8
 	ld	(iy+lcdBase+1),hl	; screen = old_draw
+	set	bLcdIntLNBU,(iy+lcdIcr)	; clear interrupt checked by gfx_Wait
 	ld	a,l
 	xor	a,(LcdSize shr 8) and $FF
 	ld	l,a			; l = (old_draw>>8)^(LcdSize>>8)
@@ -979,7 +980,6 @@ gfx_SwapDraw:
 					; hl = (old_draw>>8)^(LcdSize>>8)
 					;    = (new_draw)>>8
 	ld	(iy-mpLcdRange+CurrentBuffer+1),hl
-	set	bLcdIntLNBU,(iy+lcdIcr)	; clear interrupt checked by gfx_Wait
 	ld	a,$F5			; push af
 	ld	(gfx_Wait),a		; enable wait logic
 	ret
