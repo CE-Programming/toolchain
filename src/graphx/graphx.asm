@@ -187,14 +187,15 @@ gfx_Begin:
 	ld	(UseLargeFont),a	; store the jump offset for later
 	ld	(hl),0			; jump nowhere if false
 	call	_boot_ClearVRAM		; clear the screen
-	ld	a,LcdBpp8
+lcdGraphxMode := lcdWatermark+lcdIntFront+lcdPwr+lcdBgr+lcdBpp8
+	ld	de,lcdGraphxMode
 	ld	hl,CurrentBuffer
 SetGfx:
 	ld	bc,VRAM
 	ld	(hl),bc			; set the current draw to the screen
 assert CurrentBuffer and -$100 = mpLcdRange
 	ld	l,lcdCtrl
-	ld	(hl),a			; set bpp
+	ld	(hl),de			; set lots of control parameters
 	ld	l,lcdTiming0+1
 	ld	de,_LcdTiming
 assert VRAM and $FF = 0
@@ -247,9 +248,9 @@ gfx_End:
 ; Returns:
 ;  None
 	call	_boot_ClearVRAM		; clear the screen
+	ld	de,lcdNormalMode
 	ld	hl,mpLcdBase
-	ld	a,LcdBpp16		; restore the screen mode
-	jr	SetGfx
+	jr	SetGfx			; restore the screen mode
 
 ;-------------------------------------------------------------------------------
 gfx_AllocSprite:
@@ -989,12 +990,16 @@ gfx_SwapDraw:
 ; Returns:
 ;  None
 	ld	iy,mpLcdRange
+.WaitLoop:
+	bit	bLcdIntLNBU,(iy+lcdRis)
+	jr	z,.WaitLoop
 	ld	hl,(iy-mpLcdRange+CurrentBuffer+1) ; hl = old_draw>>8
 .LcdSizeH := (LcdSize shr 8) and $FF
+assert .LcdSizeH and lcdIntVcomp
 assert .LcdSizeH and lcdIntLNBU
 	ld	a,.LcdSizeH		; a = LcdSize>>8
 	ld	(iy+lcdBase+1),hl	; screen = old_draw
-	ld	(iy+lcdIcr),a		; clear interrupt checked by gfx_Wait
+	ld	(iy+lcdIcr),a		; clear interrupt statuses to wait for
 	xor	a,l
 	ld	l,a			; l = (old_draw>>8)^(LcdSize>>8)
 	inc	h
@@ -1071,10 +1076,10 @@ gfx_Wait:
 ; Returns:
 ;  None
 	ret				; will be SMC'd into push af
-.BusyLoop:
+.WaitLoop:
 	ld	a,(mpLcdRis)
-	bit	bLcdIntLNBU,a
-	jr	z,.BusyLoop
+	bit	bLcdIntVcomp,a
+	jr	z,.WaitLoop
 	ld	a,$C9			; ret
 	ld	(gfx_Wait),a		; disable wait logic
 	pop	af
