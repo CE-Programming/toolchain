@@ -190,22 +190,22 @@ gfx_Begin:
 	ld	a,LcdBpp8
 	ld	hl,CurrentBuffer
 SetGfx:
-	ld	de,VRAM
-	ld	(hl),de			; set the current draw to the screen
+	ld	bc,VRAM
+	ld	(hl),bc			; set the current draw to the screen
 assert CurrentBuffer and -$100 = mpLcdRange
 	ld	l,lcdCtrl
 	ld	(hl),a			; set bpp
 	ld	l,lcdTiming0+1
 	ld	de,_LcdTiming
-	ld	b,8
+assert VRAM and $FF = 0
+	ld	b,8+1			; +1 because c = 0, so first ldi will
+					; decrement b
 .ExchangeTimingLoop:			; exchange stored and active timing
 	ld	a,(de)
-	ld	c,a
-	ld	a,(hl)
-	ld	(de),a
-	ld	(hl),c
+	ldi
+	dec	hl
+	ld	(hl),a
 	inc	hl
-	inc	de
 	djnz	.ExchangeTimingLoop
 ;	jp	gfx_SetDefaultPalette	; setup the default palette
 assert $ = gfx_SetDefaultPalette
@@ -990,10 +990,12 @@ gfx_SwapDraw:
 ;  None
 	ld	iy,mpLcdRange
 	ld	hl,(iy-mpLcdRange+CurrentBuffer+1) ; hl = old_draw>>8
+.LcdSizeH := (LcdSize shr 8) and $FF
+assert .LcdSizeH and lcdIntLNBU
+	ld	a,.LcdSizeH		; a = LcdSize>>8
 	ld	(iy+lcdBase+1),hl	; screen = old_draw
-	set	bLcdIntLNBU,(iy+lcdIcr)	; clear interrupt checked by gfx_Wait
-	ld	a,l
-	xor	a,(LcdSize shr 8) and $FF
+	ld	(iy+lcdIcr),a		; clear interrupt checked by gfx_Wait
+	xor	a,l
 	ld	l,a			; l = (old_draw>>8)^(LcdSize>>8)
 	inc	h
 	res	1,h			; h = (old_draw>>16)+1&-2
