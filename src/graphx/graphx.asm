@@ -995,69 +995,6 @@ gfx_GetDraw:
 	ret
 
 ;-------------------------------------------------------------------------------
-gfx_SwapDraw:
-; Swaps the roles of the screen and drawing buffers
-; Arguments:
-;  None
-; Returns:
-;  None
-	ld	iy,mpLcdRange
-.WaitLoop:
-	bit	bLcdIntLNBU,(iy+lcdRis)
-	jr	z,.WaitLoop
-assert vRam and $FF = 0
-assert LcdSize and $FF = 0
-	ld	bc,(iy-mpLcdRange+CurrentBuffer+1) ; bc = old_draw>>8
-.NegLcdSizeShr8 := -LcdSize shr 8
-assert (.NegLcdSizeShr8 shr 8) and lcdIntVcomp
-assert (.NegLcdSizeShr8 shr 8) and lcdIntLNBU
-	ld	de,.NegLcdSizeShr8	; de = -LcdSize>>8
-	ld	(iy+lcdBase+1),bc	; screen = old_draw
-	ld	(iy+lcdIcr),d		; clear interrupt statuses to wait for
-.ReadLcdCurr:
-	ld	a,(iy+lcdCurr+2)	; a = *lcdCurr>>16
-	ld	hl,(iy+lcdCurr+1)	; hl = *lcdCurr>>8
-	sub	a,h
-	jr	nz,.ReadLcdCurr		; nz ==> lcdCurr may have updated
-					;        mid-read; retry read
-					; a = 0
-	sub	a,e			; a = LcdSize>>8
-	xor	a,c			; a = (old_draw>>8)^(LcdSize>>8)
-	ld	c,a			; c = (old_draw>>8)^(LcdSize>>8)
-	inc	b
-	res	1,b			; b = (old_draw>>16)+1&-2
-					; assuming !((old_draw>>16)&2):
-					;   = (old_draw>>16)^1
-					;   = (old_draw>>16)^(LcdSize>>16)
-					; bc = (old_draw>>8)^(LcdSize>>8)
-					;    = new_draw>>8
-	ld	(iy-mpLcdRange+CurrentBuffer+1),bc
-	sbc	hl,bc			; hl = (*lcdCurr>>8)-(new_draw>>8)
-	add	hl,de
-	ret	c			; c ==> (*lcdCurr < new_draw)
-					;    || (*lcdCurr >= (new_draw+LcdSize))
-					;   ==> LCD update position already
-					;       outside of new drawing buffer
-	ld	hl,gfx_Wait
-	ld	(hl),$F5		; push af; enable wait logic
-	push	hl
-	dec	sp
-	pop	hl
-	ld	l,$CD			; call *
-					; hl=(_Wait<<8)|$CD
-	dec	sp
-	dec	sp			; sp-=3 to match pop hl later
-.WriteWaits:
-repeat wait_quick.usages
-	pop	hl
-	ret
-	nop
-	nop
-end repeat
-	pop	hl
-	ret
-
-;-------------------------------------------------------------------------------
 _WaitQuick:
 	ex	(sp),hl			; hl = return vector
 	push	de
@@ -1080,9 +1017,9 @@ _WaitQuick:
 	ex	de,hl			; hl = callee
 	pop	de
 	ex	(sp),hl
-	push	af
+	push	hl
 ;	jr	gfx_Wait.WaitLoop	; emulated by dummifying next instruction:
-	db	$3E			; ret || push af -> ld a,*
+	db	$3E			; ret || push hl -> ld a,*
 
 ;-------------------------------------------------------------------------------
 gfx_Wait:
@@ -1091,17 +1028,80 @@ gfx_Wait:
 ;  None
 ; Returns:
 ;  None
-	ret				; will be SMC'd into push af
-.WaitLoop:
+	ret				; will be SMC'd into push hl
+	push	af
 	ld	a,(mpLcdRis)
 	bit	bLcdIntVcomp,a
-	jr	z,.WaitLoop
+	jr	nz,.WaitDone
+	push	de
+.WaitLoop:
+.ReadLcdCurr:
+	ld	a,(mpLcdCurr+2)		; a = *mpLcdCurr>>16
+	ld	hl,(mpLcdCurr+1)	; hl = *mpLcdCurr>>8
+	sub	a,h
+	jr	nz,.ReadLcdCurr		; nz ==> lcdCurr may have updated
+					;        mid-read; retry read
+	ld	de,(CurrentBuffer+1)
+	sbc	hl,de
+	ld	de,-LcdSize shr 8
+	add	hl,de
+	jr	nc,.WaitLoop
+	pop	de
+.WaitDone:
 	ld	a,$C9			; ret
 	ld	(gfx_Wait),a		; disable wait logic
 	pop	af
-	push	hl
 	ld	hl,$0218		; jr $+4
 	jr	gfx_SwapDraw.WriteWaits
+
+;-------------------------------------------------------------------------------
+gfx_SwapDraw:
+; Swaps the roles of the screen and drawing buffers
+; Arguments:
+;  None
+; Returns:
+;  None
+	ld	iy,mpLcdRange
+.WaitLoop:
+	bit	bLcdIntLNBU,(iy+lcdRis)
+	jr	z,.WaitLoop
+assert vRam and $FF = 0
+assert LcdSize and $FF = 0
+	ld	bc,(iy-mpLcdRange+CurrentBuffer+1) ; bc = old_draw>>8
+.LcdSizeH := (LcdSize shr 8) and $FF
+assert .LcdSizeH and lcdIntVcomp
+assert .LcdSizeH and lcdIntLNBU
+	ld	a,.LcdSizeH		; a = LcdSize>>8
+	ld	(iy+lcdBase+1),bc	; screen = old_draw
+	ld	(iy+lcdIcr),a		; clear interrupt statuses to wait for
+	xor	a,c			; a = (old_draw>>8)^(LcdSize>>8)
+	ld	c,a			; c = (old_draw>>8)^(LcdSize>>8)
+	inc	b
+	res	1,b			; b = (old_draw>>16)+1&-2
+					; assuming !((old_draw>>16)&2):
+					;   = (old_draw>>16)^1
+					;   = (old_draw>>16)^(LcdSize>>16)
+					; bc = (old_draw>>8)^(LcdSize>>8)
+					;    = new_draw>>8
+	ld	(iy-mpLcdRange+CurrentBuffer+1),bc
+	ld	hl,gfx_Wait
+	ld	(hl),$E5		; push hl; enable wait logic
+	push	hl
+	dec	sp
+	pop	hl
+	ld	l,$CD			; call *
+					; hl=(_Wait<<8)|$CD
+	dec	sp
+	dec	sp			; sp-=3 to match pop hl later
+.WriteWaits:
+repeat wait_quick.usages
+	pop	hl
+	ret
+	nop
+	nop
+end repeat
+	pop	hl
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_Circle:
