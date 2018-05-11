@@ -2530,6 +2530,9 @@ curCell			equ 0D0016Eh            ; selected list cell
 
 SmallEditCancelParse	equ 0D001A4h
 
+curRowBackup		equ 0D0033Ch		; backup of curRow
+shiftFlagsLocBackup	equ 0D00358h		; backup of shiftFlagsLoc
+appFlagsLocBackup	equ 0D00366h		; backup of appFlagsLoc
 penRowBackup		equ 0D003E3h		; backup of penRow
 mathprintBackup		equ 0D003E6h		; backup of mathprint flags
 winLeftEdgeBackup	equ 0D003D2h		; backup of winLeftEdge
@@ -2789,6 +2792,8 @@ DeltaX			equ 0D01FAEh
 DeltaY			equ 0D01FB7h
 TraceStep		equ 0D0203Dh
 
+TblStart		equ 0D02267h
+DeltaTbl		equ 0D02270h
 Plot1MarkType		equ 0D0227Eh
 Plot1List1		equ 0D0227Fh
 Plot1List2		equ 0D02284h
@@ -3347,7 +3352,7 @@ lcdPwr			equ 800h
 lcdIntVSync		equ 0000h
 lcdIntBack		equ 1000h
 lcdIntActiveVideo	equ 2000h
-lcdIntFront		equ 4000h
+lcdIntFront		equ 3000h
 lcdWatermark		equ 10000h
 lcdNormalMode		equ lcdPwr | lcdBgr | lcdBpp16
 
