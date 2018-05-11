@@ -1062,7 +1062,6 @@ gfx_GetDraw:
 _WaitQuick:
 	ex	(sp),hl			; hl = return vector
 	push	de
-	push	hl
 	ld	de,gfx_Wait
 	dec	hl
 	dec	hl
@@ -1079,11 +1078,12 @@ _WaitQuick:
 	inc	hl
 	inc	hl
 	ld	(.WriteWaitsTail),hl
-	pop	hl
+	ex	de,hl			; hl = callee
 	pop	de
 	ex	(sp),hl
-;	jp	gfx_Wait
-assert $ = gfx_Wait
+	push	af
+;	jr	gfx_Wait.WaitLoop	; emulated by dummifying next instruction:
+	db	$3E			; ret || push af -> ld a,*
 
 ;-------------------------------------------------------------------------------
 gfx_Wait:
