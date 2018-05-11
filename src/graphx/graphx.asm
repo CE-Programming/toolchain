@@ -993,23 +993,40 @@ gfx_SwapDraw:
 .WaitLoop:
 	bit	bLcdIntLNBU,(iy+lcdRis)
 	jr	z,.WaitLoop
-	ld	hl,(iy-mpLcdRange+CurrentBuffer+1) ; hl = old_draw>>8
+assert vRam and $FF = 0
+assert LcdSize and $FF = 0
+	ld	bc,(iy-mpLcdRange+CurrentBuffer+1) ; bc = old_draw>>8
 .LcdSizeH := (LcdSize shr 8) and $FF
 assert .LcdSizeH and lcdIntVcomp
 assert .LcdSizeH and lcdIntLNBU
 	ld	a,.LcdSizeH		; a = LcdSize>>8
-	ld	(iy+lcdBase+1),hl	; screen = old_draw
+	ld	(iy+lcdBase+1),bc	; screen = old_draw
 	ld	(iy+lcdIcr),a		; clear interrupt statuses to wait for
-	xor	a,l
-	ld	l,a			; l = (old_draw>>8)^(LcdSize>>8)
-	inc	h
-	res	1,h			; h = (old_draw>>16)+1&-2
+.ReadLcdCurr:
+	ld	hl,(iy+lcdCurr+1)	; hl = *lcdCurr>>8
+	ld	de,(iy+lcdCurr+1)	; de = *lcdCurr>>8
+	or	a,a
+	sbc	hl,de			; hl = ?
+	jr	nz,.ReadLcdCurr		; nz ==> lcdCurr may have updated
+					;        mid-read; retry read
+	xor	a,c
+	ld	c,a			; c = (old_draw>>8)^(LcdSize>>8)
+	inc	b
+	res	1,b			; b = (old_draw>>16)+1&-2
 					; assuming !((old_draw>>16)&2):
 					;   = (old_draw>>16)^1
 					;   = (old_draw>>16)^(LcdSize>>16)
-					; hl = (old_draw>>8)^(LcdSize>>8)
-					;    = (new_draw)>>8
-	ld	(iy-mpLcdRange+CurrentBuffer+1),hl
+					; bc = (old_draw>>8)^(LcdSize>>8)
+					;    = new_draw>>8
+	ld	(iy-mpLcdRange+CurrentBuffer+1),bc
+	ex	de,hl			; hl = *lcdCurr>>8
+	sbc	hl,bc			; hl = (*lcdCurr>>8)-(new_draw>>8)
+	ld	de,-LcdSize shr 8	; de = -LcdSize>>8
+	add	hl,de
+	ret	c			; c ==> (*lcdCurr < new_draw)
+					;    || (*lcdCurr >= (new_draw+LcdSize))
+					;   ==> LCD update position already
+					;       outside of new drawing buffer
 	ld	hl,gfx_Wait
 	ld	(hl),$F5		; push af; enable wait logic
 	push	hl
