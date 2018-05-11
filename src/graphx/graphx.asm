@@ -996,20 +996,21 @@ gfx_SwapDraw:
 assert vRam and $FF = 0
 assert LcdSize and $FF = 0
 	ld	bc,(iy-mpLcdRange+CurrentBuffer+1) ; bc = old_draw>>8
-.LcdSizeH := (LcdSize shr 8) and $FF
-assert .LcdSizeH and lcdIntVcomp
-assert .LcdSizeH and lcdIntLNBU
-	ld	a,.LcdSizeH		; a = LcdSize>>8
+.NegLcdSizeShr8 := -LcdSize shr 8
+assert (.NegLcdSizeShr8 shr 8) and lcdIntVcomp
+assert (.NegLcdSizeShr8 shr 8) and lcdIntLNBU
+	ld	de,.NegLcdSizeShr8	; de = -LcdSize>>8
 	ld	(iy+lcdBase+1),bc	; screen = old_draw
-	ld	(iy+lcdIcr),a		; clear interrupt statuses to wait for
+	ld	(iy+lcdIcr),d		; clear interrupt statuses to wait for
 .ReadLcdCurr:
+	ld	a,(iy+lcdCurr+2)	; a = *lcdCurr>>16
 	ld	hl,(iy+lcdCurr+1)	; hl = *lcdCurr>>8
-	ld	de,(iy+lcdCurr+1)	; de = *lcdCurr>>8
-	or	a,a
-	sbc	hl,de			; hl = ?
+	sub	a,h
 	jr	nz,.ReadLcdCurr		; nz ==> lcdCurr may have updated
 					;        mid-read; retry read
-	xor	a,c
+					; a = 0
+	sub	a,e			; a = LcdSize>>8
+	xor	a,c			; a = (old_draw>>8)^(LcdSize>>8)
 	ld	c,a			; c = (old_draw>>8)^(LcdSize>>8)
 	inc	b
 	res	1,b			; b = (old_draw>>16)+1&-2
@@ -1019,9 +1020,7 @@ assert .LcdSizeH and lcdIntLNBU
 					; bc = (old_draw>>8)^(LcdSize>>8)
 					;    = new_draw>>8
 	ld	(iy-mpLcdRange+CurrentBuffer+1),bc
-	ex	de,hl			; hl = *lcdCurr>>8
 	sbc	hl,bc			; hl = (*lcdCurr>>8)-(new_draw>>8)
-	ld	de,-LcdSize shr 8	; de = -LcdSize>>8
 	add	hl,de
 	ret	c			; c ==> (*lcdCurr < new_draw)
 					;    || (*lcdCurr >= (new_draw+LcdSize))
