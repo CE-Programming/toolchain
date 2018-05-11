@@ -462,10 +462,6 @@ FillScreen_BytesToLddr   := LcdSize-FillScreen_BytesToPush
 
 	ld	iy,0
 	add	iy,sp			; iy = original sp
-	ld	hl,(CurrentBuffer)
-	ld	bc,LcdSize
-	add	hl,bc
-	ld	sp,hl			; sp = end (exclusive) of buffer
 	ld	hl,FillScreen_FastCode_SrcEnd-1
 	ld	de,FillScreen_FastCode_DestEnd-1
 	ld	bc,FillScreen_FastCode_SrcSize
@@ -479,11 +475,15 @@ FillScreen_BytesToLddr   := LcdSize-FillScreen_BytesToPush
 	lddr				; fill push run
 	ld	a,$E1
 	ld	(de),a			; write initial pop hl
+	ld	hl,(CurrentBuffer)
+	ld	de,LcdSize
+	add	hl,de			; hl = end (exclusive) of buffer
 	ld	de,(iy+1)		; deu = color
 	ld	d,(iy+3)		; d = color
 	ld	e,d			; e = color
 	ld	b,FillScreen_NumIters	; b = number of fast code iterations
 	call	gfx_Wait
+	ld	sp,hl			; sp = end (exclusive) of buffer
 	call	_FillScreen_FastCode_Dest ; do fast fill
 	sbc	hl,hl
 	add	hl,sp			; hl = pointer to last byte fast-filled
