@@ -983,6 +983,18 @@ gfx_SetDraw:
 	jr	.set
 
 ;-------------------------------------------------------------------------------
+gfx_GetDraw:
+; Gets the current drawing state
+; Arguments:
+;  None
+; Returns:
+;  Returns true if drawing on the buffer
+	ld	a,(mpLcdBase+2)		; comparing upper byte only is sufficient
+	ld	hl,CurrentBuffer+2
+	xor	a,(hl)			; always 0 or 1
+	ret
+
+;-------------------------------------------------------------------------------
 gfx_SwapDraw:
 ; Swaps the roles of the screen and drawing buffers
 ; Arguments:
@@ -1043,18 +1055,6 @@ repeat wait_quick.usages
 	nop
 end repeat
 	pop	hl
-	ret
-
-;-------------------------------------------------------------------------------
-gfx_GetDraw:
-; Gets the current drawing state
-; Arguments:
-;  None
-; Returns:
-;  Returns true if drawing on the buffer
-	ld	a,(mpLcdBase+2)		; comparing upper byte only is sufficient
-	ld	hl,CurrentBuffer+2
-	xor	a,(hl)			; always 0 or 1
 	ret
 
 ;-------------------------------------------------------------------------------
