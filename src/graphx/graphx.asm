@@ -1019,7 +1019,7 @@ _WaitQuick:
 	ex	(sp),hl
 	push	hl
 ;	jr	gfx_Wait.WaitLoop	; emulated by dummifying next instruction:
-	db	$3E			; ret || push hl -> ld a,*
+	db	$2E			; ret || push hl -> ld l,*
 
 ;-------------------------------------------------------------------------------
 gfx_Wait:
