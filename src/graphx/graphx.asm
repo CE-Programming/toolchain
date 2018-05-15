@@ -1005,7 +1005,7 @@ _WaitQuick:
 	ld	(hl),de			; call _WaitQuick -> call _Wait
 	dec	hl			; hl = callee
 	ex	de,hl			; de = callee
-	ld	hl,gfx_SwapDraw.WriteWaits
+	ld	hl,_WriteWaitQuickSMC
 .WriteWaitsTail = $-3
 	ld	(hl),$22		; ld (callee),hl
 	inc	hl
@@ -1054,7 +1054,17 @@ gfx_Wait:
 	ld	(gfx_Wait),a		; disable wait logic
 	pop	af
 	ld	hl,$0218		; jr $+4
-	jr	gfx_SwapDraw.WriteWaits
+_WriteWaitQuickSMC:
+repeat wait_quick.usages
+; Each call _WaitQuick will replace the next unmodified 4-byte entry with
+; ld (_WaitQuick_callee_x),hl.
+	pop	hl
+	ret
+	nop
+	nop
+end repeat
+	pop	hl
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_SwapDraw:
@@ -1095,17 +1105,7 @@ assert .LcdSizeH and lcdIntLNBU
 					; hl = first 3 bytes of call _Wait
 	dec	sp
 	dec	sp			; sp -= 3 to match pop hl later
-.WriteWaits:
-repeat wait_quick.usages
-; Each call _WaitQuick will replace the next unmodified 4-byte entry with
-; ld (_WaitQuick_callee_x),hl.
-	pop	hl
-	ret
-	nop
-	nop
-end repeat
-	pop	hl
-	ret
+	jr	_WriteWaitQuickSMC
 
 ;-------------------------------------------------------------------------------
 gfx_Circle:
