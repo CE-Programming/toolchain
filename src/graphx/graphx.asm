@@ -996,8 +996,8 @@ gfx_GetDraw:
 
 ;-------------------------------------------------------------------------------
 _WaitQuick:
-	ex	(sp),hl			; hl = return vector
-	push	de
+	ex	(sp),hl			; hl saved, hl = return vector
+	push	de			; de saved
 	ld	de,gfx_Wait
 	dec	hl
 	dec	hl
@@ -1015,10 +1015,12 @@ _WaitQuick:
 	inc	hl
 	ld	(.WriteWaitsTail),hl
 	ex	de,hl			; hl = callee
-	pop	de
-	ex	(sp),hl
+	pop	de			; de restored
+	ex	(sp),hl			; return vector = callee, hl restored
+; Fall through to gfx_Wait, but don't let it return immediately. Even if it ends
+; up not waiting, it will re-write the quick wait SMC, including for the callee.
 	push	hl
-;	jr	gfx_Wait.WaitLoop	; emulated by dummifying next instruction:
+;	jr	gfx_Wait+1		; emulated by dummifying next instruction:
 	db	$2E			; ret || push hl -> ld l,*
 
 ;-------------------------------------------------------------------------------
@@ -1090,11 +1092,13 @@ assert .LcdSizeH and lcdIntLNBU
 	dec	sp
 	pop	hl
 	ld	l,$CD			; call *
-					; hl=(_Wait<<8)|$CD
+					; hl = first 3 bytes of call _Wait
 	dec	sp
-	dec	sp			; sp-=3 to match pop hl later
+	dec	sp			; sp -= 3 to match pop hl later
 .WriteWaits:
 repeat wait_quick.usages
+; Each call _WaitQuick will replace the next unmodified 4-byte entry with
+; ld (_WaitQuick_callee_x),hl.
 	pop	hl
 	ret
 	nop
