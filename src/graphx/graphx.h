@@ -751,11 +751,34 @@ gfx_SetDraw(gfx_screen)
 uint8_t gfx_GetDraw(void);
 
 /**
- * Swaps the buffer with the visible screen and vice versa.
+ * Swaps the roles of the screen and drawing buffers.
  *
- * The current drawing location remains the same.
+ * Does not wait for the old screen buffer to finish being displayed. Instead,
+ * the next invocation of a graphx drawing function will block, waiting for this
+ * event. To block and wait explicitly, use gfx_Wait().
+ *
+ * @remarks
+ * In practice, this function should be invoked immediately after finishing
+ * drawing a frame to the drawing buffer, and invocation of the first graphx
+ * drawing function for the next frame should be scheduled as late as possible
+ * relative to non-drawing logic. Non-drawing logic can execute during time when
+ * a drawing function may otherwise block.
+ *
+ * The LCD driver maintains its own screen buffer pointer for the duration of a
+ * refresh. The swap performed by this function will only be picked up at a
+ * point between refreshes.
  */
 void gfx_SwapDraw(void);
+
+/**
+ * Waits for the screen buffer to finish being displayed after gfx_SwapDraw().
+ *
+ * @remarks
+ * In practice, this function should not need to be invoked by user code. It
+ * should be invoked by custom drawing functions (as late as reasonably
+ * possible) before writing to the drawing buffer, gfx_vbuffer.
+ */
+void gfx_Wait(void);
 
 /**
  * Copies the input buffer to the opposite buffer
