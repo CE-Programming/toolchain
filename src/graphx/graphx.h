@@ -1060,7 +1060,7 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t
  * @param angle 256 position angular integer
  * @see gfx_RotatedScaledTransparentSprite_NoClip
  */
-#define gfx_RotatedTransparentSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle)
+#define gfx_RotatedTransparentSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle, 64)
 
 /**
  * Fixed Rotation with scaling fator for sprites without transparency
@@ -1085,7 +1085,7 @@ uint8_t gfx_RotatedScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t
  * @param angle 256 position angular integer
  * @see gfx_RotatedScaledTransparentSprite_NoClip
  */
-#define gfx_RotatedSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle)
+#define gfx_RotatedSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle, 64)
 
 /**
  * Flips a sprite along the X axis
