@@ -606,8 +606,7 @@ _GetChar_ASM:
 	push	bc
 	call	_GetSlotOffset
 	pop	hl
-	dec	hl
-	or	a,a
+	scf
 	sbc	hl,bc				; size-offset
 	jp	c,_ReturnNegativeOne
 	push	bc
