@@ -53,7 +53,3 @@ notifications:
     on_success: change
     on_failure: always
     skip_join: true
-
-env:
-  global:
-    secure: B4fGooSHsmOl+eRBEGLXq5Clb64p47t+hdI8MnKnzZX/28nnkhti2xqqXMGOYNB+U0yHRGDKss4bFYq5AKdrq8ckTBsSSPZdLpCknYALqsE6+uuvYVvaaiV5hzGiXHZ+ULFidCR5gv7JXorL4PG9llIT9Nu7V4j5/xTVYoHYzDcyKGiX96FAwOOsLHvL3QJgLIP00CpluhJ1cduOedp9hpQjRFwJ/5YGNGvtbk98zVEnjprf8Pzrr9HW9FTBF91JkYd3R/oayDQUojDT/+CfDgQJh20LYoNDeFi3vOGn4j5a+n1MKSlmneuqb4+W5nBQGr+kKFMBkUJX+1EC3+fOHFjx808e/H7xLiKjm2Q/dbmQ9tFOLJR+mtww/ylx5NS9FoG4HIZFfgZsFw45bwY+bsXJAUUDNYcSHjrg9ix4Cx8s2cumRLQt8VUSebmXTEEDcLMFvL8+UBrMjVhJ7em6e6QXKl7qYo5KcZz8ktkMxawfEeFUwmnpSNPOT438elytGURzR7ll5cbmNXoytbRA7jJpbvDzdC+ulI0CLukoR+zlPn3qIrzHYmwXp1Zul44FHIabQdEIaPkYEUUIeJxTzN3FEyC5cL4CsA92dwmon/V6gsvs6rX5921BUjmFktd4z+s733bWIl8bfqOTp60XNG28Advda72xMdzMemMVcgI=
