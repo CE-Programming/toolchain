@@ -1303,7 +1303,7 @@ void gfx_ShiftRight(uint24_t pixels);
  *
  * @param color Original color input in 1555 format
  * @param amount Amount to lighten by
- * @returns Darkened color
+ * @returns Lightened color
  * @note 0 returns full white, 255 returns original color
  */
 uint16_t gfx_Lighten(uint16_t color, uint8_t amount);
