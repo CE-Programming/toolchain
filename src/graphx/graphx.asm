@@ -173,6 +173,29 @@ end macro
 postpone
 	wait_quick.usages := wait_quick.usages_counter
 end postpone
+
+macro setBytes args&
+	local count
+	iterate arg, args
+		count := %%
+		break
+	end iterate
+
+	call	_SetBytes
+	db	count
+
+	iterate arg, args
+		assert arg relativeto $
+		assert arg >= count * 2 + $
+
+		local ofs
+		ofs = arg - $ - 2
+		assert ofs < $10000
+
+		dw	ofs
+	end iterate
+end macro
+
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -411,6 +434,9 @@ gfx_SetColor:
 ;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
+if 0 ; this may be called frequently enough that speed is important
+	setBytes Color_1, Color_2, Color_3, Color_4, Color_5
+else
 	pop	de			; de = return vetor
 	ex	(sp),hl			; l = color
 	ld	a,l			; a = color
@@ -425,6 +451,7 @@ _SetColor:
 	ld	a,c			; a = old color
 	ex	de,hl
 	jp	(hl)
+end if
 
 ;-------------------------------------------------------------------------------
 gfx_SetTransparentColor:
@@ -433,19 +460,7 @@ gfx_SetTransparentColor:
 ;  arg0 : Transparent color index
 ; Returns:
 ;  Previous transparent color index
-	pop	de			; de = return vetor
-	ex	(sp),hl			; l = color
-	ld	a,l			; a = color
-	ld	hl,TransparentColor_1
-	ld	c,(hl)			; c = old color
-	ld	(hl),a			; store all the new color values
-	ld	(TransparentColor_2),a
-	ld	(TransparentColor_3),a
-	ld	(TransparentColor_4),a
-	ld	(TransparentColor_5),a
-	ld	(TransparentColor_6),a
-	ld	(TransparentColor_7),a
-	jr	_SetColor
+	setBytes TransparentColor_1, TransparentColor_2, TransparentColor_3, TransparentColor_4, TransparentColor_5, TransparentColor_6, TransparentColor_7, TransparentColor_8, TransparentColor_9
 
 ;-------------------------------------------------------------------------------
 gfx_FillScreen:
@@ -2889,17 +2904,7 @@ gfx_SetTextBGColor:
 ;  arg0 : Color index to set BG to
 ; Returns:
 ;  Previous text color palette index
-	pop	de
-	ex	(sp),hl
-	ld	a,l
-	ld	hl,_TextBGColor_1
-	ld	c,(hl)			; c = old bg color
-	ld	(hl),a
-	ld	(_TextBGColor_2),a
-	ld	(_TextBGColor_3),a
-	ld	a,c
-	ex	de,hl
-	jp	(hl)
+	setBytes _TextBGColor_1, _TextBGColor_2, _TextBGColor_3
 
 ;-------------------------------------------------------------------------------
 gfx_SetTextFGColor:
@@ -2908,17 +2913,7 @@ gfx_SetTextFGColor:
 ;  arg0 : Color index to set FG to
 ; Returns:
 ;  Previous text color palette index
-	pop	de
-	ex	(sp),hl
-	ld	a,l
-	ld	hl,_TextFGColor_1
-	ld	c,(hl)			; c = old fg color
-	ld	(hl),a			; a = new fg color
-	ld	(_TextFGColor_2),a
-	ld	(_TextFGColor_3),a
-	ld	a,c
-	ex	de,hl
-	jp	(hl)
+	setBytes _TextFGColor_1, _TextFGColor_2, _TextFGColor_3
 
 ;-------------------------------------------------------------------------------
 gfx_SetTextTransparentColor:
@@ -2927,17 +2922,16 @@ gfx_SetTextTransparentColor:
 ;  arg0 : Color index to set transparent text to
 ; Returns:
 ;  Previous text color palette index
-	pop	de
-	ex	(sp),hl
-	ld	a,l
-	ld	hl,_TextTPColor_1
-	ld	c,(hl)			; c = old transparent color
-	ld	(hl),a			; a = new transparent color
-	ld	(_TextTPColor_2),a
-	ld	(_TextTPColor_3),a
-	ld	a,c
-	ex	de,hl
-	jp	(hl)
+	setBytes _TextTPColor_1, _TextTPColor_2, _TextTPColor_3
+
+;-------------------------------------------------------------------------------
+gfx_SetFontHeight:
+; Sets the height of the font in pixels
+; Arguments:
+;  arg0 : New font height
+; Returns:
+;  Previous font height
+	setBytes _TextHeight_1, _TextHeight_2, _TextHeight_3
 
 ;-------------------------------------------------------------------------------
 _PrintStringXY_Clip:
@@ -3499,26 +3493,6 @@ TransparentColor_4 := $-1
 	inc	hl
 	dec	iyl
 	jr	nz,.loop		; okay we stored the character sprite now draw it
-	ret
-
-;-------------------------------------------------------------------------------
-gfx_SetFontHeight:
-; Sets the height of the font in pixels
-; Arguments:
-;  arg0 : New font height
-; Returns:
-;  Previous font height
-	pop	hl
-	pop	de
-	push	de
-	push	hl
-	ld	hl,_TextHeight_1
-	ld	a,(hl)			; a = old height
-	ld	(hl),e
-	ld	hl,_TextHeight_2
-	ld	(hl),e
-	ld	hl,_TextHeight_3
-	ld	(hl),e			; store new height
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -5659,7 +5633,8 @@ gfx_ConvertToNewRLETSprite:
 	inc	hl			; hl = <input data>-1
 ; Initialize values for looping.
 	ld	de,2			; de = 2 = output size
-	ld	a,(TransparentColor_5)	; a = trans color
+	ld	a,0			; a = trans color
+TransparentColor_8 := $-1
 ; Row loop {
 _ConvertToNewRLETSprite_Row:
 	ld	b,iyl			; b = width
@@ -5726,7 +5701,8 @@ _ConvertToRLETSprite_ASM:
 	ldi				; output width = width, hl = input data
 ; Initialize values for looping.
 	inc.s	bc			; bcu = 0
-	ld	a,(TransparentColor_5)	; a = trans color
+	ld	a,0			; a = trans color
+TransparentColor_9 := $-1
 ; Row loop {
 _ConvertToRLETSprite_Row:
 	ld	b,iyl			; b = width
@@ -6126,6 +6102,30 @@ _ShiftCalculate:
 	mlt	hl
 	add	hl,hl
 	ret
+
+;-------------------------------------------------------------------------------
+_SetBytes:
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	ld	b,(hl)
+.loop:
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ex	de,hl
+	inc.s	hl
+	add	hl,de
+	ld	a,(hl)
+	ld	(hl),c
+	ex	de,hl
+	djnz	.loop
+	ret
+
+
 
 ;-------------------------------------------------------------------------------
 ; Internal library data
