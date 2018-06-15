@@ -5658,7 +5658,6 @@ gfx_ConvertToNewRLETSprite:
 	ld	iy,(hl)			; iyh = height, iyl = width
 	inc	hl			; hl = <input data>-1
 ; Initialize values for looping.
-	inc.s	bc			; bcu = 0
 	ld	de,2			; de = 2 = output size
 	ld	a,(TransparentColor_5)	; a = trans color
 ; Row loop {
