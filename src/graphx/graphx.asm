@@ -2861,6 +2861,28 @@ gfx_GetTextY:
 	ret
 
 ;-------------------------------------------------------------------------------
+gfx_SetTextXY:
+; Sets the text X and Y positions
+; Arguments:
+;  arg0 : Text X Pos
+;  arg1 : Text Y Pos
+; Returns:
+;  None
+	pop	de			; de=return address, sp=&xpos
+	pop	hl			; hl=xpos, sp=&ypos
+	ld	(_TextXPos),hl
+	ex	(sp),hl			; hl=ypos, ypos=don't care
+	ld	(_TextYPos),hl
+	push	hl			; xpos=don't care, sp=&xpos
+	ex	de,hl			; hl=return address
+;-------------------------------------------------------------------------------
+_indcallHL:
+; Calls HL
+; Inputs:
+;  HL : Address to call
+	jp	(hl)
+
+;-------------------------------------------------------------------------------
 gfx_SetTextBGColor:
 ; Sets the background text color for text routines
 ; Arguments:
@@ -2915,28 +2937,6 @@ gfx_SetTextTransparentColor:
 	ld	(_TextTPColor_3),a
 	ld	a,c
 	ex	de,hl
-	jp	(hl)
-
-;-------------------------------------------------------------------------------
-gfx_SetTextXY:
-; Sets the text X and Y positions
-; Arguments:
-;  arg0 : Text X Pos
-;  arg1 : Text Y Pos
-; Returns:
-;  None
-	pop	de			; de=return address, sp=&xpos
-	pop	hl			; hl=xpos, sp=&ypos
-	ld	(_TextXPos),hl
-	ex	(sp),hl			; hl=ypos, ypos=don't care
-	ld	(_TextYPos),hl
-	push	hl			; xpos=don't care, sp=&xpos
-	ex	de,hl			; hl=return address
-;-------------------------------------------------------------------------------
-_indcallHL:
-; Calls HL
-; Inputs:
-;  HL : Address to call
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
