@@ -88,7 +88,7 @@ ti_var_t ti_OpenVar(const char *varname, const char *mode, uint8_t type);
 int ti_Close(const ti_var_t slot);
 
 /**
- * Returns the name of the file(s) that contains the string as the first part of the variable; 
+ * Returns the name of the file(s) that contains the string as the first part of the variable;
  * which can then be used with ti_Open and other functions
  *
  * seach_pos should be set to NULL to begin a search, and is updated with each call
@@ -107,7 +107,7 @@ int ti_Close(const ti_var_t slot);
 char *ti_Detect(void **curr_search_posistion, const char *detection_string);
 
 /**
- * Returns the name of the file(s) that contains the string as the first part of the variable; 
+ * Returns the name of the file(s) that contains the string as the first part of the variable;
  * which can then be used with ti_OpenVar and other functions
  *
  * seach_pos should be set to NULL to begin a search, and is updated with each call
@@ -125,6 +125,29 @@ char *ti_Detect(void **curr_search_posistion, const char *detection_string);
  * @note If the return value is NULL, there are no more variables to find
  */
 char *ti_DetectVar(void **curr_search_posistion, const char *detection_string, uint8_t var_type);
+
+/**
+ * Returns the name of the file(s) that contains the string as the first part of the variable;
+ * which can then be used with ti_OpenVar and other functions
+ *
+ * seach_pos should be set to NULL to begin a search, and is updated with each call
+ *
+ * @code
+ *  char *var_name;
+ *  uint8_t *search_pos = NULL;
+ *  uint8_t type;
+ *  while((var_name = ti_DetectVar(&search_pos, "my_data", &type)) != NULL) {
+ *    if (type == TI_PRGM_TYPE || type == TI_PPRGM_TYPE) {
+ *     ...do something with the name or search_pos...
+ *    }
+ *  }
+ * @endcode
+ * @param curr_search_posistion Current offset in the VAT
+ * @param detection_string String to search for (NULL to search for all)
+ * @param var_type Type of variable found
+ * @note If the return value is NULL, there are no more variables to find
+ */
+char *ti_DetectAny(void **curr_search_posistion, const char *detection_string, uint8_t *var_type);
 
 /**
  * Writes to the current variable slot
@@ -225,7 +248,7 @@ int ti_IsArchived(const ti_var_t slot);
 
 /**
  * Sends the variable into either the archive or RAM if needed
- * 
+ *
  * @param archived
  * True - Send to Archive                                                <br>
  * False - Send to RAM
@@ -262,7 +285,7 @@ int ti_DeleteVar(const char *varname, uint8_t type);
 char *ti_GetTokenString(void **read_pointer, uint8_t *length_of_token, unsigned int *length_of_string);
 
 /**
- * Gets a pointer to the data located at the current posistion in the slot; 
+ * Gets a pointer to the data located at the current posistion in the slot;
  * Good way for fast reading of data
  * @param slot Variable slot to get pointer of
  * @returns Pointer to variable data

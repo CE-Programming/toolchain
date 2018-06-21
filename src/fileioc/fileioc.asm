@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'FILEIOC', 3
+library 'FILEIOC', 4
 
 ;-------------------------------------------------------------------------------
 ; no dependencies
@@ -47,6 +47,9 @@ library 'FILEIOC', 3
 	export ti_AllocCplxList
 	export ti_AllocEqu
 ;-------------------------------------------------------------------------------
+; v4 functions
+;-------------------------------------------------------------------------------
+	export ti_DetectAny
 
 ;-------------------------------------------------------------------------------
 resizeBytes := $E30C0C
@@ -848,6 +851,16 @@ ti_Close:
 	ret
 
 ;-------------------------------------------------------------------------------
+ti_DetectAny:
+; Finds a variable that starts with some data
+; Arguments:
+;  arg0 : address of pointer to being search
+;  arg1 : pointer to null terminated string of data to search for
+;  arg2 : pointer storage of type of variable found
+	ld	a,$ff
+	jr	_DetectJump
+
+;-------------------------------------------------------------------------------
 ti_DetectVar:
 ; Finds a variable that starts with some data
 ; Arguments:
@@ -869,6 +882,9 @@ ti_Detect:
 	ld	a,appVarObj
 _Detect:
 	ld	(_DetectType),a
+	xor	a,a
+_DetectJump:
+	ld	(_DetectFlag),a
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -909,7 +925,13 @@ _Detect:
 
 .fcontinue:
 	push	hl
+	ld	a,(_DetectFlag)
+	or	a,a
 	ld	a,(hl)
+	jr	z,.fdetectnormal
+	ld	(ix+12),a
+	jr	.fgoodtype
+.fdetectnormal:
 _DetectType := $+1
 	cp	a,appVarObj
 	jr	nz,.fskip
@@ -981,6 +1003,8 @@ _DetectType := $+1
 	ret
 
 .fdetectall:
+	db	0
+_DetectFlag:
 	db	0
 
 ;-------------------------------------------------------------------------------
