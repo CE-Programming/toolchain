@@ -277,33 +277,28 @@ _Open:
 	ld	iy,flags
 	push	ix
 	ld	ix,0
+	lea	de,ix-1
 	add	ix,sp
-	xor	a,a
 	ld	hl,(VATPtr0)
+	xor	a,a
 	add	hl,de
-	inc	a
-	sbc	hl,de
-	jr	z,.slot
+	jr	nc,.slot
 	ld	hl,(VATPtr1)
-	add	hl,de
 	inc	a
-	sbc	hl,de
-	jr	z,.slot
+	add	hl,de
+	jr	nc,.slot
 	ld	hl,(VATPtr2)
-	add	hl,de
 	inc	a
-	sbc	hl,de
-	jr	z,.slot
+	add	hl,de
+	jr	nc,.slot
 	ld	hl,(VATPtr3)
-	add	hl,de
 	inc	a
-	sbc	hl,de
-	jr	z,.slot
+	add	hl,de
+	jr	nc,.slot
 	ld	hl,(VATPtr4)
-	add	hl,de
 	inc	a
-	sbc	hl,de
-	jr	z,.slot
+	add	hl,de
+	jr	nc,.slot
 	jp	_ReturnNull_IX
 .slot:
 	ld	(currSlot),a
