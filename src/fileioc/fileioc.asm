@@ -152,13 +152,12 @@ ti_CloseAll:
 ;  None
 ; Returns:
 ;  None
-	or	a,a
-	sbc	hl,hl
-	ld	(VATPtr0),hl
-	ld	(VATPtr1),hl
-	ld	(VATPtr2),hl
-	ld	(VATPtr3),hl
-	ld	(VATPtr4),hl
+	ld	a,$40
+	ld	(VATPtr0+2),a
+	ld	(VATPtr1+2),a
+	ld	(VATPtr2+2),a
+	ld	(VATPtr3+2),a
+	ld	(VATPtr4+2),a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -277,29 +276,28 @@ _Open:
 	ld	iy,flags
 	push	ix
 	ld	ix,0
-	lea	de,ix-1
 	add	ix,sp
-	ld	hl,(VATPtr0)
 	xor	a,a
-	add	hl,de
+	ld	hl,(VATPtr0)
+	inc	a
+	add	hl,hl
 	jr	nc,.slot
 	ld	hl,(VATPtr1)
 	inc	a
-	add	hl,de
+	add	hl,hl
 	jr	nc,.slot
 	ld	hl,(VATPtr2)
 	inc	a
-	add	hl,de
+	add	hl,hl
 	jr	nc,.slot
 	ld	hl,(VATPtr3)
 	inc	a
-	add	hl,de
+	add	hl,hl
 	jr	nc,.slot
 	ld	hl,(VATPtr4)
 	inc	a
-	add	hl,de
-	jr	nc,.slot
-	jp	_ReturnNull_IX
+	add	hl,hl
+	jp	c,_ReturnNull_IX
 .slot:
 	ld	(currSlot),a
 	ld	hl,(ix+6)
@@ -841,8 +839,9 @@ ti_Close:
 	ld	a,c
 	ld	(currSlot),a
 	call	_GetSlotVATPtr
-	ld	de,0
-	ld	(hl),de
+	inc	hl
+	inc	hl
+	ld	(hl),$40
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1264,13 +1263,10 @@ _IsSlotOpen:
 	ld	a,c
 	ld	(currSlot),a
 	push	hl
-	push	bc
 	call	_GetSlotVATPtr
-	ld	hl,(hl)
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	pop	bc
+	inc	hl
+	inc	hl
+	bit	7,(hl)
 	pop	hl
 	ret
 _GetSlotVATPtr:
