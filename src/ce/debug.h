@@ -21,6 +21,13 @@ extern "C" {
  * @def dbg_sprintf
  */
 
+/**
+ * void dbg_ClearConsole(void)
+ *
+ * @brief Clears the emulator's console screen.
+ * @def dbg_ClearConsole
+ */
+
 #ifndef NDEBUG
 
 /**
@@ -94,6 +101,7 @@ void dbg_RemoveAllBreakpoints(void);
 #define dbgout ((char*)0xFB0000) /**< Standard debug output */
 #define dbgerr ((char*)0xFC0000) /**< Error debug output */
 #define dbg_sprintf sprintf
+#define dbg_ClearConsole() (*(unsigned char*)0xFD0000 = 1)
 #else
 #define dbg_Debugger(ignore) ((void)0)
 #define dbg_SetBreakpoint(ignore) ((void)0)
@@ -106,6 +114,7 @@ void dbg_RemoveAllBreakpoints(void);
 #define dbg_RemoveAllWatchpoints(ignore) ((void)0)
 #define dbg_RemoveAllBreakpoints(ignore) ((void)0)
 #define dbg_sprintf if(0)(void)
+#define dbg_ClearConsole(ignore) ((void)0)
 #define dbgout (NULL)
 #define dbgerr (NULL)
 #endif
