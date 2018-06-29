@@ -466,7 +466,7 @@ gfx_SetColor:
 ;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
-	setSmcBytesFast Color
+	setSmcBytesFast _Color
 
 ;-------------------------------------------------------------------------------
 gfx_SetTransparentColor:
@@ -475,7 +475,7 @@ gfx_SetTransparentColor:
 ;  arg0 : Transparent color index
 ; Returns:
 ;  Previous transparent color index
-	setSmcBytes TransparentColor
+	setSmcBytes _TransparentColor
 
 ;-------------------------------------------------------------------------------
 gfx_FillScreen:
@@ -645,7 +645,7 @@ _SetPixel_NoWait:
 	add	hl,de
 	add	hl,de
 	ld	(hl),0			; get the actual pixel
-smcByte Color
+smcByte _Color
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -900,7 +900,7 @@ _HorizLine_NoClip_NotDegen_NoWait:
 	add	hl,de			; hl -> place to draw
 _HorizLine_NoClip_Draw:
 	ld	(hl),0
-smcByte Color
+smcByte _Color
 	cpi
 	ret	po
 	ex	de,hl
@@ -976,7 +976,7 @@ _VertLine_NoClip_NotDegen_StackX:
 _VertLine_NoClip_Draw:
 	ld	de,LcdWidth
 	ld	a,0
-smcByte Color
+smcByte _Color
 	wait_quick
 .loop:
 	ld	(hl),a			; loop for height
@@ -1731,7 +1731,7 @@ dl_horizontal:
 	pop	bc
 	inc	bc
 	ld	a,0
-smcByte Color
+smcByte _Color
 	wait_quick
 dl_hloop:
 	ld	(hl),a			; write pixel
@@ -1761,7 +1761,7 @@ dl_vertical:
 	wait_quick
 dl_vloop:
 	ld	(hl),0			; write pixel
-smcByte Color
+smcByte _Color
 	dec	c
 	ret	z
 	add	hl,de			; y inc
@@ -2147,7 +2147,7 @@ gfx_ScaledTransparentSprite_NoClip:
 .widthscale := $-1
 	ld	a,(hl)			; get sprite pixel
 	cp	a,TRASPARENT_COLOR
-smcByte TransparentColor
+smcByte _TransparentColor
 	jr	nz,.next		; is transparent?
 .skip:
 	inc	de
@@ -2207,7 +2207,7 @@ gfx_TransparentSprite:
 	push	ix
 	ld	ixh,a
 	ld	a,TRASPARENT_COLOR
-smcByte TransparentColor
+smcByte _TransparentColor
 	wait_quick
 .loop:
 	ld	c,0
@@ -2446,7 +2446,7 @@ gfx_TransparentSprite_NoClip:
 	ld	ixh,a			; ixh = height of sprite
 	ld	b,0			; zero mid byte
 	ld	a,TRASPARENT_COLOR
-smcByte TransparentColor
+smcByte _TransparentColor
 	wait_quick
 .loop:
 	ld	c,0
@@ -3501,7 +3501,7 @@ smcByte _TextTPColor
 	ret
 .transparent:
 	ld	a,0
-smcByte TransparentColor
+smcByte _TransparentColor
 	ld	(de),a
 	inc	de			; move to next pixel
 	djnz	.nextpixel
@@ -4605,7 +4605,7 @@ _RotatedScaledSprite:
 	add	hl,bc
 	ld	a,(hl)
 	cp	a,TRASPARENT_COLOR
-smcByte TransparentColor
+smcByte _TransparentColor
 	jr	z,$+5
 .rotatescale := $-1
 	ld	(ix),a			; write pixel
@@ -4793,7 +4793,7 @@ _xloop:
 	or	a,h
 	rlca
 	ld	c,TRASPARENT_COLOR
-smcByte TransparentColor
+smcByte _TransparentColor
 	jr	c,drawSpriteRotateScale_SkipPixel
 _smcdsrs_ssize_0:
 	ld	a,0
@@ -5597,7 +5597,7 @@ _ConvertFromRLETSprite_Trans:
 ;;; Write <transparent run length> zeros to the output.
 	sub	a,b			; a = width remaining after trans run
 	ld	c,0			; c = trans color
-smcByte TransparentColor
+smcByte _TransparentColor
 	ex	de,hl			; de = input data, hl = output data
 _ConvertFromRLETSprite_TransLoop:
 	ld	(hl),c			; write trans color to output
@@ -5649,7 +5649,7 @@ gfx_ConvertToNewRLETSprite:
 ; Initialize values for looping.
 	ld	de,2			; de = 2 = output size
 	ld	a,0			; a = trans color
-smcByte TransparentColor
+smcByte _TransparentColor
 ; Row loop {
 _ConvertToNewRLETSprite_Row:
 	ld	b,iyl			; b = width
@@ -5717,7 +5717,7 @@ _ConvertToRLETSprite_ASM:
 ; Initialize values for looping.
 	inc.s	bc			; bcu = 0
 	ld	a,0			; a = trans color
-smcByte TransparentColor
+smcByte _TransparentColor
 ; Row loop {
 _ConvertToRLETSprite_Row:
 	ld	b,iyl			; b = width
