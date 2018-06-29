@@ -163,6 +163,7 @@ macro s8 op, imm
 	op, i
 end macro
 
+;-------------------------------------------------------------------------------
 wait_quick.usages_counter = 0
 
 macro wait_quick?
@@ -174,6 +175,7 @@ postpone
 	wait_quick.usages := wait_quick.usages_counter
 end postpone
 
+;-------------------------------------------------------------------------------
 macro setBytes name*
 	local addr, data
 	postpone
@@ -192,6 +194,34 @@ macro setBytes name*
 	call	_SetBytes
 addr	db	data
 end macro
+
+macro setBytesFast name*
+	local first, data
+	postpone
+		virtual
+			irpv each, name
+				if % = 1
+					first := each
+				else
+					ld	(each),a
+				end if
+			end irpv
+			load data: $-$$ from $$
+		end virtual
+	end postpone
+
+	pop	de			; de = return vetor
+	ex	(sp),hl			; l = byte
+	ld	a,l			; a = byte
+	ld	hl,first
+	ld	c,(hl)			; c = old byte
+	ld	(hl),a
+	db	data
+	ld	a,c			; a = old byte
+	ex	de,hl			; hl = return vector
+	jp	(hl)
+end macro
+
 macro smcByte name*, addr: $-1
 	local link
 	link := addr
@@ -436,21 +466,7 @@ gfx_SetColor:
 ;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
-	; Could use the setBytes macro, but this may be called frequently enough that speed is important
-	pop	de			; de = return vetor
-	ex	(sp),hl			; l = color
-	ld	a,l			; a = color
-	ld	hl,Color_1
-	ld	c,(hl)			; c = old color
-	ld	(hl),a			; store all the new color values
-	ld	(Color_2),a
-	ld	(Color_3),a
-	ld	(Color_4),a
-	ld	(Color_5),a
-_SetColor:
-	ld	a,c			; a = old color
-	ex	de,hl
-	jp	(hl)
+	setBytesFast Color
 
 ;-------------------------------------------------------------------------------
 gfx_SetTransparentColor:
@@ -629,7 +645,7 @@ _SetPixel_NoWait:
 	add	hl,de
 	add	hl,de
 	ld	(hl),0			; get the actual pixel
-Color_1 = $-1
+smcByte Color
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -698,7 +714,7 @@ _FillRectangle_NoClip:
 	push	de
 	ld	(.width1),bc
 	ld	(.width2),bc
-	ld	hl,Color_1
+	ld	hl,Color
 	wait_quick
 	ldi				; check if we only need to draw 1 pixel
 	pop	hl
@@ -884,7 +900,7 @@ _HorizLine_NoClip_NotDegen_NoWait:
 	add	hl,de			; hl -> place to draw
 _HorizLine_NoClip_Draw:
 	ld	(hl),0
-Color_2 := $-1
+smcByte Color
 	cpi
 	ret	po
 	ex	de,hl
@@ -960,7 +976,7 @@ _VertLine_NoClip_NotDegen_StackX:
 _VertLine_NoClip_Draw:
 	ld	de,LcdWidth
 	ld	a,0
-Color_3 := $-1
+smcByte Color
 	wait_quick
 .loop:
 	ld	(hl),a			; loop for height
@@ -1715,7 +1731,7 @@ dl_horizontal:
 	pop	bc
 	inc	bc
 	ld	a,0
-Color_4 := $-1
+smcByte Color
 	wait_quick
 dl_hloop:
 	ld	(hl),a			; write pixel
@@ -1745,7 +1761,7 @@ dl_vertical:
 	wait_quick
 dl_vloop:
 	ld	(hl),0			; write pixel
-Color_5 := $-1
+smcByte Color
 	dec	c
 	ret	z
 	add	hl,de			; y inc
