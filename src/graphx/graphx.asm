@@ -196,27 +196,29 @@ addr	db	data
 end macro
 
 macro setSmcBytesFast name*
-	local addr, first, data
+	local temp, list
 	postpone
-		virtual at addr
-			irpv each, name
-				if % = 1
-					first := each
-				else
-					ld	(each),a
-				end if
-			end irpv
-			load data: $-$$ from $$
-		end virtual
+		temp equ each
+		irpv each, name
+			temp equ temp, each
+		end irpv
+		list equ temp
 	end postpone
 
 	pop	de			; de = return vetor
 	ex	(sp),hl			; l = byte
 	ld	a,l			; a = byte
-	ld	hl,first
-	ld	c,(hl)			; c = old byte
-	ld	(hl),a
-addr	db	data
+	match expand, list
+		iterate expand
+			if % = 1
+				ld	hl,each
+				ld	c,(hl)
+				ld	(hl),a
+			else
+				ld	(each),a
+			end if
+		end iterate
+	end match
 	ld	a,c			; a = old byte
 	ex	de,hl			; hl = return vector
 	jp	(hl)
