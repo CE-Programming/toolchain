@@ -176,7 +176,7 @@ postpone
 end postpone
 
 ;-------------------------------------------------------------------------------
-macro setBytes name*
+macro setSmcBytes name*
 	local addr, data
 	postpone
 		virtual
@@ -191,11 +191,11 @@ macro setBytes name*
 		end virtual
 	end postpone
 
-	call	_SetBytes
+	call	_SetSmcBytes
 addr	db	data
 end macro
 
-macro setBytesFast name*
+macro setSmcBytesFast name*
 	local first, data
 	postpone
 		virtual
@@ -466,7 +466,7 @@ gfx_SetColor:
 ;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
-	setBytesFast Color
+	setSmcBytesFast Color
 
 ;-------------------------------------------------------------------------------
 gfx_SetTransparentColor:
@@ -475,7 +475,7 @@ gfx_SetTransparentColor:
 ;  arg0 : Transparent color index
 ; Returns:
 ;  Previous transparent color index
-	setBytes TransparentColor
+	setSmcBytes TransparentColor
 
 ;-------------------------------------------------------------------------------
 gfx_FillScreen:
@@ -2919,7 +2919,7 @@ gfx_SetTextBGColor:
 ;  arg0 : Color index to set BG to
 ; Returns:
 ;  Previous text color palette index
-	setBytes _TextBGColor
+	setSmcBytes _TextBGColor
 
 ;-------------------------------------------------------------------------------
 gfx_SetTextFGColor:
@@ -2928,7 +2928,7 @@ gfx_SetTextFGColor:
 ;  arg0 : Color index to set FG to
 ; Returns:
 ;  Previous text color palette index
-	setBytes _TextFGColor
+	setSmcBytes _TextFGColor
 
 ;-------------------------------------------------------------------------------
 gfx_SetTextTransparentColor:
@@ -2937,7 +2937,7 @@ gfx_SetTextTransparentColor:
 ;  arg0 : Color index to set transparent text to
 ; Returns:
 ;  Previous text color palette index
-	setBytes _TextTPColor
+	setSmcBytes _TextTPColor
 
 ;-------------------------------------------------------------------------------
 gfx_SetFontHeight:
@@ -2946,7 +2946,7 @@ gfx_SetFontHeight:
 ;  arg0 : New font height
 ; Returns:
 ;  Previous font height
-	setBytes _TextHeight
+	setSmcBytes _TextHeight
 
 ;-------------------------------------------------------------------------------
 _PrintStringXY_Clip:
@@ -6119,7 +6119,7 @@ _ShiftCalculate:
 	ret
 
 ;-------------------------------------------------------------------------------
-_SetBytes:
+_SetSmcBytes:
 	pop	hl
 	pop	de
 	pop	bc
