@@ -179,13 +179,13 @@ end postpone
 macro setSmcBytes name*
 	local addr, data
 	postpone
-		virtual
+		virtual at addr
 			irpv each, name
 				if % = 1
 					db %%
 				end if
 				assert each >= addr + 1 + 2*%%
-				dw each - addr - 1 - 2*%
+				dw each - $ - 2
 			end irpv
 			load data: $-$$ from $$
 		end virtual
@@ -196,9 +196,9 @@ addr	db	data
 end macro
 
 macro setSmcBytesFast name*
-	local first, data
+	local addr, first, data
 	postpone
-		virtual
+		virtual at addr
 			irpv each, name
 				if % = 1
 					first := each
@@ -216,7 +216,7 @@ macro setSmcBytesFast name*
 	ld	hl,first
 	ld	c,(hl)			; c = old byte
 	ld	(hl),a
-	db	data
+addr	db	data
 	ld	a,c			; a = old byte
 	ex	de,hl			; hl = return vector
 	jp	(hl)
