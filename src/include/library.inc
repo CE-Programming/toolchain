@@ -5,12 +5,12 @@ include 'tiformat.inc'
 macro library? name*, version*
 	local lib
 	element lib.base
+	virtual
+		lib.exports.area::
+	end virtual
 	virtual as 'lib'
 		lib.exports.file::
 		db 'library', 9, `name, ', ', `version, 10
-	end virtual
-	virtual
-		lib.exports.area::
 	end virtual
 	virtual
 		lib.relocations.area::
@@ -25,11 +25,15 @@ macro library? name*, version*
 	org lib.base
 
 	macro export? function*
-		virtual lib.exports.file
-			db 9, 'export', 9, `function, 10
-		end virtual
+		local offset
 		virtual lib.exports.area
 			dw function-lib.base
+			offset = $-$$
+		end virtual
+		virtual lib.exports.file
+			repeat 1, string: offset
+				db 9, 'export', 9, `function, ' ; ', `string, 10
+			end repeat
 		end virtual
 	end macro
 
