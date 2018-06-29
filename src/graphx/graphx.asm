@@ -192,6 +192,11 @@ macro setBytes name*
 	call	_SetBytes
 addr	db	data
 end macro
+macro smcByte name*, addr: $-1
+	local link
+	link := addr
+	name equ link
+end macro
 
 ;-------------------------------------------------------------------------------
 
@@ -2126,7 +2131,7 @@ gfx_ScaledTransparentSprite_NoClip:
 .widthscale := $-1
 	ld	a,(hl)			; get sprite pixel
 	cp	a,TRASPARENT_COLOR
-TransparentColor =: $-1
+smcByte TransparentColor
 	jr	nz,.next		; is transparent?
 .skip:
 	inc	de
@@ -2186,7 +2191,7 @@ gfx_TransparentSprite:
 	push	ix
 	ld	ixh,a
 	ld	a,TRASPARENT_COLOR
-TransparentColor =: $-1
+smcByte TransparentColor
 	wait_quick
 .loop:
 	ld	c,0
@@ -2425,7 +2430,7 @@ gfx_TransparentSprite_NoClip:
 	ld	ixh,a			; ixh = height of sprite
 	ld	b,0			; zero mid byte
 	ld	a,TRASPARENT_COLOR
-TransparentColor =: $-1
+smcByte TransparentColor
 	wait_quick
 .loop:
 	ld	c,0
@@ -3131,7 +3136,7 @@ _TextYPos := $-3
 	add	hl,bc
 	ld	iy,0
 	ld	ixl,8
-_TextHeight =: $-1
+smcByte _TextHeight
 	wait_quick
 	jr	_PrintLargeFont		; SMC the jump
 _LargeFontJump := $-1
@@ -3142,14 +3147,14 @@ _LargeFontJump := $-1
 	ld	b,ixh
 .nextpixel:
 	ld	a,TEXT_BG_COLOR
-_TextBGColor =: $-1
+smcByte _TextBGColor
 	rlc	c
 	jr	nc,.bgcolor
 	ld	a,TEXT_FG_COLOR
-_TextFGColor =: $-1
+smcByte _TextFGColor
 .bgcolor:
 	cp	a,TEXT_TP_COLOR		; check if transparent
-_TextTPColor =: $-1
+smcByte _TextTPColor
 	jr	z,.transparent
 	ld	(de),a
 .transparent:
@@ -3181,16 +3186,16 @@ _TextHeightScale := $-1
 	ld	b,ixh
 .inner:
 	ld	a,TEXT_BG_COLOR
-_TextBGColor =: $-1
+smcByte _TextBGColor
 	ld	l,1
 _TextWidthScale := $-1
 	rlc	c
 	jr	nc,.bgcolor
 	ld	a,TEXT_FG_COLOR
-_TextFGColor =: $-1
+smcByte _TextFGColor
 .bgcolor:
 	cp	a,TEXT_TP_COLOR		; check if transparent
-_TextTPColor =: $-1
+smcByte _TextTPColor
 	jr	z,.fgcolor
 
 .wscale0:
@@ -3251,7 +3256,7 @@ _PrintChar_Clip:
 	add	hl,bc			; de = draw location
 	ld	de,_TmpCharData		; store pixel data into temporary sprite
 	ld	iyl,8
-_TextHeight =: $-1
+smcByte _TextHeight
 	ld	iyh,a			; ixh = char width
 	ld	(_TmpCharSprite),a	; store width of character we are drawing
 	call	_GetChar		; store the character data
@@ -3437,7 +3442,7 @@ gfx_GetSpriteChar:
 	ex	de,hl
 	push	hl			; save pointer to sprite
 	ld	a,8
-_TextHeight =: $-1
+smcByte _TextHeight
 	ld	iyh,a			; ixh = char width
 	ld	(hl),a			; store width of character we are drawing
 	inc	hl
@@ -3462,14 +3467,14 @@ _GetChar:
 	ld	b,iyh
 .nextpixel:
 	ld	a,TEXT_BG_COLOR
-_TextBGColor =: $-1
+smcByte _TextBGColor
 	rlc	c
 	jr	nc,.bgcolor
 	ld	a,TEXT_FG_COLOR
-_TextFGColor =: $-1
+smcByte _TextFGColor
 .bgcolor:
 	cp	a,TEXT_TP_COLOR		; check if transparent
-_TextTPColor =: $-1
+smcByte _TextTPColor
 	jr	z,.transparent
 	ld	(de),a
 	inc	de
@@ -3480,7 +3485,7 @@ _TextTPColor =: $-1
 	ret
 .transparent:
 	ld	a,0
-TransparentColor =: $-1
+smcByte TransparentColor
 	ld	(de),a
 	inc	de			; move to next pixel
 	djnz	.nextpixel
@@ -4584,7 +4589,7 @@ _RotatedScaledSprite:
 	add	hl,bc
 	ld	a,(hl)
 	cp	a,TRASPARENT_COLOR
-TransparentColor =: $-1
+smcByte TransparentColor
 	jr	z,$+5
 .rotatescale := $-1
 	ld	(ix),a			; write pixel
@@ -4772,7 +4777,7 @@ _xloop:
 	or	a,h
 	rlca
 	ld	c,TRASPARENT_COLOR
-TransparentColor =: $-1
+smcByte TransparentColor
 	jr	c,drawSpriteRotateScale_SkipPixel
 _smcdsrs_ssize_0:
 	ld	a,0
@@ -5576,7 +5581,7 @@ _ConvertFromRLETSprite_Trans:
 ;;; Write <transparent run length> zeros to the output.
 	sub	a,b			; a = width remaining after trans run
 	ld	c,0			; c = trans color
-TransparentColor =: $-1
+smcByte TransparentColor
 	ex	de,hl			; de = input data, hl = output data
 _ConvertFromRLETSprite_TransLoop:
 	ld	(hl),c			; write trans color to output
@@ -5628,7 +5633,7 @@ gfx_ConvertToNewRLETSprite:
 ; Initialize values for looping.
 	ld	de,2			; de = 2 = output size
 	ld	a,0			; a = trans color
-TransparentColor =: $-1
+smcByte TransparentColor
 ; Row loop {
 _ConvertToNewRLETSprite_Row:
 	ld	b,iyl			; b = width
@@ -5696,7 +5701,7 @@ _ConvertToRLETSprite_ASM:
 ; Initialize values for looping.
 	inc.s	bc			; bcu = 0
 	ld	a,0			; a = trans color
-TransparentColor =: $-1
+smcByte TransparentColor
 ; Row loop {
 _ConvertToRLETSprite_Row:
 	ld	b,iyl			; b = width
