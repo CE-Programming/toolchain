@@ -185,7 +185,7 @@ macro setBytes name*
 				assert each >= addr + 1 + 2*%%
 				dw each - addr - 1 - 2*%
 			end irpv
-			load data: $$-$ from $$
+			load data: $-$$ from $$
 		end virtual
 	end postpone
 
