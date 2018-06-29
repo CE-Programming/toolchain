@@ -714,7 +714,7 @@ _FillRectangle_NoClip:
 	push	de
 	ld	(.width1),bc
 	ld	(.width2),bc
-	ld	hl,Color
+	ld	hl,_Color
 	wait_quick
 	ldi				; check if we only need to draw 1 pixel
 	pop	hl
