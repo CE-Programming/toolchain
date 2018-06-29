@@ -2,9 +2,13 @@ include 'ez80.inc'
 include 'ti84pceg.inc'
 include 'tiformat.inc'
 
-macro library? name*,version*
+macro library? name*, version*
 	local lib
 	element lib.base
+	virtual as 'lib'
+		lib.exports.file::
+		db 'library', 9, `name, ', ', `version, 10
+	end virtual
 	virtual
 		lib.exports.area::
 	end virtual
@@ -21,6 +25,9 @@ macro library? name*,version*
 	org lib.base
 
 	macro export? function*
+		virtual lib.exports.file
+			db 9, 'export', 9, `function, 10
+		end virtual
 		virtual lib.exports.area
 			dw function-lib.base
 		end virtual
