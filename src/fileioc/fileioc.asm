@@ -50,6 +50,7 @@ library 'FILEIOC', 4
 ; v4 functions
 ;-------------------------------------------------------------------------------
 	export ti_DetectAny
+	export ti_GetVATPtr
 
 ;-------------------------------------------------------------------------------
 resizeBytes := $E30C0C
@@ -1069,6 +1070,21 @@ ti_GetDataPtr:
 	pop	hl
 	add	hl,bc
 	ret
+
+;-------------------------------------------------------------------------------
+ti_GetVATPtr:
+; Returns a pointer to the VAT location in the given variable
+; Arguments:
+;  arg0 : Slot number
+; Returns:
+;  Pointer to VAT pointer
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	call	_IsSlotOpen
+	jp	z,_ReturnNull
+	jp	_GetSlotVATPtr
 
 ;-------------------------------------------------------------------------------
 ti_SetVar:
