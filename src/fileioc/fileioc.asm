@@ -1077,7 +1077,7 @@ ti_GetVATPtr:
 ; Arguments:
 ;  arg0 : Slot number
 ; Returns:
-;  Pointer to VAT pointer
+;  VAT location of variable
 	pop	de
 	pop	bc
 	push	bc
