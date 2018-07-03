@@ -293,6 +293,14 @@ char *ti_GetTokenString(void **read_pointer, uint8_t *length_of_token, unsigned 
 void *ti_GetDataPtr(const ti_var_t slot);
 
 /**
+ * Gets the VAT location of the slot
+ *
+ * @param slot Variable slot to get VAT location of
+ * @returns VAT location of variable
+ */
+void *ti_GetVATPtr(const ti_var_t slot);
+
+/**
  * Sets a variable
  *
  * @param name Pointer to name of variable
