@@ -24,18 +24,20 @@ macro library? name*, version*
 	lib.base_offset := $%
 	org lib.base
 
-	macro export? function*
-		local offset
-		virtual lib.exports.area
-			dw function-lib.base
-			offset = $-$$
-		end virtual
-		virtual lib.exports.file
-			repeat 1, string: offset
-				db 9, 'export', 9, `function, ' ; ', `string, 10
-			end repeat
-		end virtual
-	end macro
+	iterate name, export, export_pointer
+		macro name? function*
+			local offset
+			virtual lib.exports.area
+				dw function-lib.base
+				offset = $-$$
+			end virtual
+			virtual lib.exports.file
+				repeat 1, string: offset
+					db 9, `name, 9, `function, ' ; ', `string, 10
+				end repeat
+			end virtual
+		end macro
+	end iterate
 
 	macro @ez80.word @value*
 		local value, address
