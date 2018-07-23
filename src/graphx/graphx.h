@@ -846,24 +846,24 @@ void gfx_PrintChar(const char c);
 /**
  * Prints a signed integer
  *
- * Outputs at the current cursor position.
+ * Outputs at the current cursor position. Padded with leading zeros if
+ * necessary to satisfy the specified minimum length.
  * @param n Integer to print
- * @param length Length of integer character display
+ * @param length Minimum number of characters to print
  * @note By default, no text clipping is performed (configurable with gfx_SetTextConfig)
- * @note Values range from -8388608 to 8388607
- * @note Length must be between 0-8
+ * @note \c length must be between 1 and 8, inclusive
  */
 void gfx_PrintInt(int n, uint8_t length);
 
 /**
  * Prints an unsigned integer
  *
- * Outputs at the current cursor position.
+ * Outputs at the current cursor position. Padded with leading zeros if
+ * necessary to satisfy the specified minimum length.
  * @param n Unsigned integer to print
- * @param length Length of unsigned integer character display
+ * @param length Minimum number of characters to print
  * @note By default, no text clipping is performed (configurable with gfx_SetTextConfig)
- * @note Values range from 0-16777215
- * @note Length must be between 0-8
+ * @note \c length must be between 1 and 8, inclusive
  */
 void gfx_PrintUInt(unsigned int n, uint8_t length);
 

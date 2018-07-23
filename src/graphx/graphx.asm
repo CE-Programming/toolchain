@@ -3012,7 +3012,7 @@ _DrawCharacters:
 	or	a,a
 	ret	z
 	call	_PrintChar
-PrintChar_3 = $-3
+PrintChar_2 = $-3
 	inc	hl			; move to the next one
 	jr	_DrawCharacters
 
@@ -3085,8 +3085,6 @@ gfx_SetTextConfig:
 	ld	hl,PrintChar_1
 	ld	(hl),de
 	ld	hl,PrintChar_2
-	ld	(hl),de
-	ld	hl,PrintChar_3
 	ld	(hl),de			; modify all the interal routines to use the clipped text routine
 	push	bc
 	pop	hl
@@ -3299,53 +3297,6 @@ smcByte _TextHeight
 	ret
 
 ;-------------------------------------------------------------------------------
-gfx_PrintUInt:
-; Places an unsigned int at the current cursor position
-; Arguments:
-;  arg0 : Number to print
-;  arg1 : Number of characters to print
-; Returns:
-;  None
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy+3)		; hl = uint
-	ld	c,(iy+6)		; c = num chars
-_PrintUInt:
-	ld	a,8
-	sub	a,c
-	ret	c			; make sure less than 8
-	rla
-	rla
-	rla
-	ld	(.offset),a		; select the jump we need
-	jr	$
-.offset = $-1
-	ld	bc,-10000000
-	call	.num1
-	ld	bc,-1000000
-	call	.num1
-	ld	bc,-100000
-	call	.num1
-	ld	bc,-10000
-	call	.num1
-	ld	bc,-1000
-	call	.num1
-	ld	bc,-100
-	call	.num1
-	ld	bc,-10
-	call	.num1
-	ld	bc,-1
-.num1:
-	ld	a,'0'-1
-.num2:
-	inc	a
-	add	hl,bc
-	jr	c,.num2
-	sbc	hl,bc
-	jp	_PrintChar		; print the character needed
-PrintChar_1 := $-3
-
-;-------------------------------------------------------------------------------
 gfx_PrintInt:
 ; Places an int at the current cursor position
 ; Arguments:
@@ -3353,24 +3304,79 @@ gfx_PrintInt:
 ;  arg1 : Number of characters to print
 ; Returns:
 ;  None
-	ld	iy,0
-	lea	bc,iy
-	add	iy,sp
-	ld	c,(iy+6)		; c = num chars
-	ld	hl,(iy+3)		; hl = int
-	bit	7,(iy+5)		; if negative
-	jr	z,.positive
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+	add	hl,hl
+	db	$3E			; xor a,a -> ld a,*
+
+;-------------------------------------------------------------------------------
+gfx_PrintUInt:
+; Places an unsigned int at the current cursor position
+; Arguments:
+;  arg0 : Number to print
+;  arg1 : Minimum number of characters to print
+; Returns:
+;  None
+	xor	a,a
+	pop	de
+	pop	hl			; hl = uint
+	pop	bc			; c = min num chars
 	push	bc
 	push	hl
-	pop	bc
+	push	de
+	jr	nc,.begin		; c ==> actually a negative int
+	ex	de,hl
+	or	a,a
 	sbc	hl,hl
-	sbc	hl,bc
+	sbc	hl,de			; hl = -int
 	ld	a,'-'
-	call	_PrintChar		; place negative symbol
-PrintChar_2 := $-3
+	call	.printchar
+	dec	c
+	jr	nz,.begin
+	inc	c
+.begin:
+	ld	de,-10000000
+	call	.num1
+	ld	de,-1000000
+	call	.num1
+	ld	de,-100000
+	call	.num1
+	ld	de,-10000
+	call	.num1
+	ld	de,-1000
+	call	.num1
+	ld	de,-100
+	call	.num1
+	ld	de,-10
+	call	.num1
+	ld	de,-1
+.num1:
+	xor	a,a
+.num2:
+	inc	a
+	add	hl,de
+	jr	c,.num2
+	sbc	hl,de
+	dec	a			; a = next digit
+	jr	nz,.printdigit		; z ==> digit is zero, maybe don't print
+	ld	a,c
+	inc	c
+	cp	a,8
+	ret	c			; nc ==> a digit has already been
+					;        printed, or must start printing
+					;        to satisfy min num chars
+	xor	a,a
+.printdigit:
+	add	a,'0'
+	ld	c,a			; mark that a digit has been printed
+.printchar:
+	push	bc
+	call	_PrintChar
+PrintChar_1 := $-3
 	pop	bc
-.positive:
-	jp	_PrintUInt		; handle integer
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_GetStringWidth:
