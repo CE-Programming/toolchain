@@ -20,7 +20,7 @@
       "description": "Assert that the read was succesful",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "D0979D5B" ]
+      "expected_CRCs": [ "D720F0D9" ]
     },
     "2": {
       "description": "Back to the home screen (exit check)",

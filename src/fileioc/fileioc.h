@@ -301,6 +301,15 @@ void *ti_GetDataPtr(const ti_var_t slot);
 void *ti_GetVATPtr(const ti_var_t slot);
 
 /**
+ * Gets the variable name of an already opened slot
+ *
+ * @param slot Variable slot to get name of
+ * @param name Buffer to store name in, generally at least 10 bytes including null terminator.
+ * @returns None
+ */
+void ti_GetName(char *name, const ti_var_t slot);
+
+/**
  * Sets a variable
  *
  * @param name Pointer to name of variable

@@ -51,6 +51,7 @@ library 'FILEIOC', 4
 ;-------------------------------------------------------------------------------
 	export ti_DetectAny
 	export ti_GetVATPtr
+	export ti_GetName
 
 ;-------------------------------------------------------------------------------
 resizeBytes := $E30C0C
@@ -1084,7 +1085,43 @@ ti_GetVATPtr:
 	push	de
 	call	_IsSlotOpen
 	jp	z,_ReturnNull
-	jp	_GetSlotVATPtr
+	call	_GetSlotVATPtr
+	ld	hl,(hl)
+	ret
+
+;-------------------------------------------------------------------------------
+ti_GetName:
+; Gets the variable name of an open slot
+; Arguments:
+;  arg0 : Name buffer
+;  arg1 : Slot number
+; Returns:
+;  None
+	pop	de
+	pop	hl
+	pop	bc
+	push	bc
+	push	hl
+	push	de
+	push	hl
+	call	_IsSlotOpen
+	pop	de
+	ret	z
+	call	_GetSlotVATPtr
+	ld	hl,(hl)
+	ld	bc,-6
+	add	hl,bc
+	ld	b,(hl)				; length of name
+	dec	hl
+.copy:
+	ld	a,(hl)
+	ld	(de),a
+	inc	de
+	dec	hl
+	djnz	.copy
+	xor	a,a
+	ld	(de),a				; terminate the string
+	ret
 
 ;-------------------------------------------------------------------------------
 ti_SetVar:
