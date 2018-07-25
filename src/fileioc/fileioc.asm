@@ -927,7 +927,8 @@ _DetectJump:
 	or	a,a
 	ld	a,(hl)
 	jr	z,.fdetectnormal
-	ld	(ix+12),a
+	ld	de,(ix+12)
+	ld	(de),a
 	jr	.fgoodtype
 .fdetectnormal:
 _DetectType := $+1
