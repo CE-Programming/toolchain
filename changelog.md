@@ -3,7 +3,28 @@
 *Note: toolchain releases aren't necessarily in sync with libraries releases.*
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
-See full [commit list](https://github.com/CE-Programming/toolchain/compare/v8.2...HEAD)
+See full [commit list](https://github.com/CE-Programming/toolchain/compare/v8.3...HEAD)
+  
+# [v8.3](https://github.com/CE-Programming/toolchain/releases/tag/v8.3) (2018-07-25)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.2...v8.3)
+
+### Toolchain
+  - Misc. build improvements and fixes ([MateoConLechuga](https://github.com/MateoConLechuga) + [Runer112](https://github.com/Runer112) + [Adriweb](https://github.com/Adriweb))
+  - Fixed GetC retval in some cases ([Runer112](https://github.com/Runer112))
+  - Travis config file cleanup ([Adriweb](https://github.com/Adriweb))
+  - New macros and features related to fasmg ([Jacobly](https://github.com/jacobly0))
+  - Compression-related APIs fixes and updates ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Misc. code cleanup ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - Some documentation updates ([TIAnonyme0](https://github.com/TIAnonyme0) + [Runer112](https://github.com/Runer112))
+  - Submodules updates for [ConvPNG](https://github.com/mateoconlechuga/convpng) and [fasmg](https://github.com/jacobly0/fasmg-ez80) ([MateoConLechuga](https://github.com/MateoConLechuga) + [Jacobly](https://github.com/jacobly0))
+
+### Libraries
+  - Optimized several routines ([MateoConLechuga](https://github.com/MateoConLechuga) + [Runer112](https://github.com/Runer112))
+  - GraphX: many improvements, in both performance and reliability  ([Runer112](https://github.com/Runer112))
+  - GraphX: optimize and improve behavior of gfx_PrintInt and gfx_PrintUInt ([Runer112](https://github.com/Runer112))
+  - FileIO: Add ti_GetName, ti_Rename and ti_RenameVar ([MateoConLechuga](https://github.com/MateoConLechuga))
+  - FileIO: Add ti_GetVATPtr ([PeterTillema](https://github.com/PeterTillema))
   
 # [v8.2](https://github.com/CE-Programming/toolchain/releases/tag/v8.2) (2018-03-24)
 
@@ -13,7 +34,7 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v8.2.
   - Add full screen image example ([MateoConLechuga](https://github.com/MateoConLechuga))
   - Add os_GetStringInput ([MateoConLechuga](https://github.com/MateoConLechuga))
   - Fixed a Windows build issue for src/std/linked ([Runer112](https://github.com/Runer112))
-  - Blutting demo instead of buffering demo ([Runer112](https://github.com/Runer112))
+  - Blitting demo instead of buffering demo ([Runer112](https://github.com/Runer112))
   - Use latest-stable CEmu for Travis auto-tests ([Adriweb](https://github.com/Adriweb))
 
 ### Libraries
