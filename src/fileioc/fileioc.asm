@@ -466,6 +466,19 @@ ti_SetArchiveStatus:
 	call	_PopOP1
 	call	_ChkFindSym
 	jp	c,_ReturnNegativeOne
+	call	_ChkInRam
+	jr	z,.saveptrs
+	push	hl
+	push	de
+	pop	iy
+	ld	a,10
+	add	a,(iy+9)
+	sbc	hl,hl
+	ld	l,a
+	add	hl,de
+	ex	de,hl
+	pop	hl
+.saveptrs:
 	push	hl
 	call	_GetSlotVATPtr
 	pop	bc
