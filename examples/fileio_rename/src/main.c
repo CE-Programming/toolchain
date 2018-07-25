@@ -40,8 +40,10 @@ void main(void) {
         printText(0, 0, "Old Name: ");
         printText(10, 0, nameBuffer);
 
+        /* Close the old file */
+        ti_CloseAll();
+
         /* Rename the old file to the new file name */
-        /* Note: This function closes all open files! */
         ti_Rename(oldName, newName);
 
         /* Ensure the new name of the file is correct */

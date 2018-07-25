@@ -1163,10 +1163,6 @@ ti_Rename:
 	push	hl			; hl -> old name
 	push	bc
 
-	push	af
-	call	ti_CloseAll
-	pop	af
-
 	push	de			; new
 	push	de			; new
 	ld	de,OP1

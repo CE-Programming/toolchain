@@ -315,18 +315,18 @@ void ti_GetName(char *name, const ti_var_t slot);
  * @param old Old name of file
  * @param new New name of file
  * @returns 0 if success, 1 if file already exists, 2 any other error occurs.
- * @warning: This function closes all open slots!
+ * @warning It is potentially hazardous to rename an open file. Be sure to close the open file before renaming,
  */
 uint8_t ti_Rename(const char *old, const char *new);
 
 /**
  * Renames a variable
  *
- * @param old Old name of file
- * @param new New name of file
+ * @param old Old name of variable
+ * @param new New name of variable
  * @param type Type of variable to rename
- * @returns 0 if success, 1 if file already exists, 2 any other error occurs.
- * @warning: This function closes all open slots!
+ * @returns 0 if success, 1 if variable already exists, 2 any other error occurs.
+ * @warning It is potentially hazardous to rename an open variable. Be sure to close the open variable before renaming,
  */
 uint8_t ti_RenameVar(const char *old, const char *new, const uint8_t type);
 
