@@ -3,7 +3,7 @@
 # Tool to generate a list of things that are used/tested in the toolchain example codes.
 # Dependencies: universal-ctags built with json support
 
-set -e
+set -ex
 
 # Grab current path
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
