@@ -1,1 +1,0 @@
-Just use: #include <TheLibName.h>
