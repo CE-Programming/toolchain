@@ -31,7 +31,8 @@ See full [commit list](https://github.com/CE-Programming/toolchain/compare/v8.3.
   - Added ti_GetVATPtr ([PeterTillema](https://github.com/PeterTillema))
   - Fixed ti_GetC for empty variables ([PeterTillema](https://github.com/PeterTillema))
   - Fixed variable creation erroneously opening closed slots ([Runer112](https://github.com/Runer112))
-  
+  - Fixed ti_DetectAny type access ([PeterTillema](https://github.com/PeterTillema))
+
 # [v8.2](https://github.com/CE-Programming/toolchain/releases/tag/v8.2) (2018-03-24)
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.1...v8.2)
