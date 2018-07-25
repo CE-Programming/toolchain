@@ -1,7 +1,7 @@
 #!/bin/bash
 # Adrien 'Adriweb' Bertrand
 # Tool to generate a list of things that are used/tested in the toolchain example codes.
-# Dependencies: universal-ctags
+# Dependencies: universal-ctags built with json support
 
 set -e
 
@@ -37,7 +37,7 @@ do
         ((totalFuncs++))
         func=${funcAndLine%:*}
         line=${funcAndLine##*:}
-        count=$(grep -l "\b${func}\b" ${exampleFiles} | wc -l | awk '{print $1}')
+        count=$(grep -l "\b${func}\s*(" ${exampleFiles} | wc -l | awk '{print $1}')
         if [[ "$count" == "0" ]]
         then
             foundStr="✗"
