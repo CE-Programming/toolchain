@@ -52,6 +52,8 @@ library 'FILEIOC', 4
 	export ti_DetectAny
 	export ti_GetVATPtr
 	export ti_GetName
+	export ti_Rename
+	export ti_RenameVar
 
 ;-------------------------------------------------------------------------------
 resizeBytes := $E30C0C
@@ -888,7 +890,7 @@ _DetectJump:
 	add	hl,bc
 	or	a,a
 	sbc	hl,bc
-	jr	nz,.detectall			; if null, then detect everything
+	jr	nz,.detectall		; if null, then detect everything
 	ld	hl,.fdetectall
 	ld	(ix+9),hl
 .detectall:
@@ -945,13 +947,13 @@ _DetectType := $+1
 	cp	a,$D0
 	jr	nc,.finram
 	ld	de,9
-	add	hl,de				; skip archive VAT stuff
+	add	hl,de			; skip archive VAT stuff
 	ld	e,(hl)
 	add	hl,de
 	inc	hl
 .finram:
 	inc	hl
-	inc	hl				; hl -> data
+	inc	hl			; hl -> data
 	ld	bc,(ix+9)
 .fcmp:
 	ld	a,(bc)
@@ -961,7 +963,7 @@ _DetectType := $+1
 	inc	bc
 	inc	de
 	inc	hl
-	jr	z,.fcmp				; check the string at the memory
+	jr	z,.fcmp			; check the string at the memory
 .fskip:
 	pop	hl
 	call	.fbypassname
@@ -982,7 +984,7 @@ _DetectType := $+1
 	pop	ix
 	ret
 
-.fbypassname:					; bypass the name in the VAT (also used for setting the string name)
+.fbypassname:				; bypass the name in the VAT (also used for setting the string name)
 	ld	de,OP6
 	ld	bc,-6
 	add	hl,bc
@@ -1111,7 +1113,7 @@ ti_GetName:
 	ld	hl,(hl)
 	ld	bc,-6
 	add	hl,bc
-	ld	b,(hl)				; length of name
+	ld	b,(hl)			; length of name
 	dec	hl
 .copy:
 	ld	a,(hl)
@@ -1120,16 +1122,136 @@ ti_GetName:
 	dec	hl
 	djnz	.copy
 	xor	a,a
-	ld	(de),a				; terminate the string
+	ld	(de),a			; terminate the string
+	ret
+
+;-------------------------------------------------------------------------------
+ti_RenameVar:
+; Renames a variable with a new name
+; Arguments:
+;  arg0 : Old name pointer
+;  arg1 : New name pointer
+;  arg2 : Variable type
+; Returns:
+;  0 if success
+;  1 if new file already exists
+;  2 if old file does not exist
+;  3 if other error
+	ld	iy,0
+	add	iy,sp
+	ld	a,(iy+9)
+	ld	iy,flags		; probably not needed
+	jr	ti_Rename.start
+
+;-------------------------------------------------------------------------------
+ti_Rename:
+; Renames an appvar with a new name
+; Arguments:
+;  arg0 : Old name pointer
+;  arg1 : New name pointer
+; Returns:
+;  0 if success
+;  1 if new file already exists
+;  2 if old file does not exist
+;  3 if other error
+	ld	a,appVarObj		; file type
+.start:
+	pop	bc
+	pop	hl
+	pop	de
+	push	de			; de -> new name
+	push	hl			; hl -> old name
+	push	bc
+
+	push	af
+	call	ti_CloseAll
+	pop	af
+
+	push	de			; new
+	push	de			; new
+	ld	de,OP1
+	ld	(de),a
+	inc	de
+	call	_Mov8b
+	call	_PushOP1		; save old name
+
+	ld	hl,_Arc_Unarc
+	ld	(.smc_archive),hl
+
+	pop	hl			; new name
+	ld	de,OP1+1
+	call	_Mov8b
+	call	_ChkFindSym
+	push	af
+	call	_PopOP1
+	pop	af
+	jr	nc,.return_1		; check if name already exists
+.locate_program:
+	call	_ChkFindSym		; find old name
+	jr	c,.return_2
+	call	_ChkInRam
+	jr	nz,.in_archive
+	ld	hl,$f8			; $f8 = ret
+	ld	(.smc_archive),hl
+	call	_PushOP1
+	call	_Arc_Unarc
+	call	_PopOP1
+	jr	.locate_program
+.in_archive:
+	ex	de,hl
+	ld	de,9
+	add	hl,de			; skip vat stuff
+	ld	e,(hl)
+	add	hl,de
+	inc	hl			; size of name
+	call	_LoadDEInd_s
+	pop	bc			; bc -> new name
+	push	hl
+	push	de
+	push	bc
+	call	_PushOP1		; old name
+
+	pop	hl
+	ld	de,OP1+1
+	call	_Mov8b
+	call	_PushOP1		; new name
+	pop	hl
+	push	hl
+	ld	a,(OP1)
+	call	_CreateVar
+	inc	de
+	inc	de
+	pop	bc
+	pop	hl
+	call	_ChkBCIs0
+	jr	z,.is_zero
+	ldir
+.is_zero:
+	call	_PopOP1
+	call	_Arc_Unarc
+.smc_archive := $-3
+	call	_PopOP1
+	call	_ChkFindSym
+	call	_DelVarArc
+	xor	a,a
+	ret
+.return_1:
+	pop	de			; new name
+	ld	a,1
+	ret
+.return_2:
+	pop	de			; new name
+	ld	a,2
 	ret
 
 ;-------------------------------------------------------------------------------
 ti_SetVar:
 ; Sets a variable
-; Gets a pointer to a variable data struct
+; Gets a pointer to a variable data structure
 ; Arguments:
-;  arg0 : Pointer to variable name string
-;  arg1 : Pointer to data structure pointer
+;  arg0 : Pointer to name of variable
+;  arg1 : Pointer to data to set
+;  arg2 : Type of variable to set
 ; Returns:
 ;  Any error codes returned when storing
 	push	ix
@@ -1160,10 +1282,12 @@ ti_SetVar:
 ;-------------------------------------------------------------------------------
 ti_StoVar:
 ; Stores a variable
-; Gets a pointer to a variable data struct
+; Gets a pointer to a variable data structure
 ; Arguments:
-;  arg0 : Pointer to variable name string
-;  arg1 : Pointer to data structure pointer
+;  arg0 : Type of variable to store to
+;  arg1 : Pointer to data to store to
+;  arg2 : Type of variable to get from
+;  arg3 : Pointer to data to get from
 ; Returns:
 ;  Any error codes returned when storing
 	ld	iy,0
@@ -1230,7 +1354,7 @@ _SetVarStr:
 ;  a - Type
 	ld	de,OP1+1
 	call	_Mov9b
-	and	a,03Fh
+	and	a,$3f
 	ld	(OP1),a
 	ret
 

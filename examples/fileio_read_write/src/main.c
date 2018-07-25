@@ -28,7 +28,7 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 
 /* Main Function */
 void main(void) {
-    char name_buffer[10];
+    char nameBuffer[10];
     ti_var_t myAppVar;
     int x;
 
@@ -62,10 +62,10 @@ void main(void) {
     if (data.var1 != VAR1_VALUE && data.var2 != VAR2_VALUE) goto err;
 
     /* Ensure the name of the AppVar is correct */
-    ti_GetName(name_buffer, myAppVar);
+    ti_GetName(nameBuffer, myAppVar);
 
     printText(0, 0, "Appvar: ");
-    printText(8, 0, name_buffer);
+    printText(8, 0, nameBuffer);
     printText(0, 1, "Read was successful");
     goto noerr;
 
@@ -85,3 +85,4 @@ void printText(int8_t xpos, int8_t ypos, const char *text) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
+

@@ -310,6 +310,27 @@ void *ti_GetVATPtr(const ti_var_t slot);
 void ti_GetName(char *name, const ti_var_t slot);
 
 /**
+ * Renames a file
+ *
+ * @param old Old name of file
+ * @param new New name of file
+ * @returns 0 if success, 1 if file already exists, 2 any other error occurs.
+ * @warning: This function closes all open slots!
+ */
+uint8_t ti_Rename(char *old, char *new);
+
+/**
+ * Renames a variable
+ *
+ * @param old Old name of file
+ * @param new New name of file
+ * @param type Type of variable to rename
+ * @returns 0 if success, 1 if file already exists, 2 any other error occurs.
+ * @warning: This function closes all open slots!
+ */
+uint8_t ti_RenameVar(char *old, char *new, uint8_t type);
+
+/**
  * Sets a variable
  *
  * @param name Pointer to name of variable
