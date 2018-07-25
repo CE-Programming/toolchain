@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <decompress.h>
+#include <compression.h>
 #include <graphx.h>
 
 /* Include the graphics file */
@@ -20,10 +20,10 @@ void main(void) {
     gfx_sprite_t *apple;
 
     /* Allocate space for the decompressed sprite */
-    apple = gfx_MallocSprite(apple_width, apple_height); // Same as: gfx_AllocSprite(apple_width, apple_height, malloc)
+    apple = gfx_MallocSprite(apple_width, apple_height); /* Same as: gfx_AllocSprite(apple_width, apple_height, malloc) */
 
     /* Decompress the sprite */
-    dzx7_Standard(apple_compressed, apple); // or dzx7_Turbo
+    zx7_Decompress(apple, apple_compressed);
 
     /* Initialize the 8bpp graphics */
     gfx_Begin();

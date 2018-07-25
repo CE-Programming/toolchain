@@ -9,7 +9,6 @@
 #include <string.h>
 
 #include <graphx.h>
-#include <debug.h>
 
 #include "gfx/logo_gfx.h"
 

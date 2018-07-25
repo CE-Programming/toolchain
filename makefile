@@ -197,7 +197,7 @@ install: $(DIRS) chmod
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/sub/compat) $(call NATIVEPATH,$(INSTALLINC))
+	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compatibility) $(call NATIVEPATH,$(INSTALLINC))
 
 $(DIRS):
 	$(call MKDIR,$(INSTALLBIN))

@@ -8,9 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <decompress.h>
+#include <compression.h>
 #include <graphx.h>
-#include <debug.h>
 
 /* Include the graphics */
 #include "gfx/tiles_gfx.h"
@@ -43,7 +42,7 @@ void main(void) {
 
     /* Decompress the tiles */
     for (; i < tileset_tiles_num; i++) {
-        dzx7_Turbo(tileset_tiles_compressed[i], tile);
+        zx7_Decompress(tile, tileset_tiles_compressed[i]);
         gfx_Sprite_NoClip(tile, x, y);
         x += TILE_WIDTH;
         if (x >= LCD_WIDTH) {

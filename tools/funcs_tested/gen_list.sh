@@ -12,7 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../../
 
 # All header files we want to extract prototypes from
-files="src/fileioc/fileioc.h src/graphx/graphx.h src/keypadc/keypadc.h src/ce/tice.h src/ce/decompress.h src/ce/debug.h"
+files="src/fileioc/fileioc.h src/graphx/graphx.h src/keypadc/keypadc.h src/ce/tice.h src/ce/compression.h src/ce/debug.h"
 
 # The destination markdown file
 outfile=$DIR/tested-functions-list.md

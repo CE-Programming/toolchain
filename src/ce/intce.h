@@ -5,8 +5,8 @@
  * @brief Interrupt configuring and setting
  */
 
-#ifndef H_INTCE
-#define H_INTCE
+#ifndef INTCE_H
+#define INTCE_H
 
 #include <stdint.h>
 
@@ -38,12 +38,14 @@ asm("halt")
 /**
  * Initizalize to use custom interrupts
  * @note Saves status of current interrupt state
+ * @warning TI has removed custom interrupt support on CE models with hardware revision >= I.
  */
 void int_Initialize(void);
 
 /**
  * Resets interrupts back to the OS expected values
  * @warning Must have called int_Initialize before using
+ * @warning TI has removed custom interrupt support on CE models with hardware revision >= I.
  */
 void int_Reset(void);
 
@@ -51,6 +53,7 @@ void int_Reset(void);
  * Sets up an interrupt vector given an ISR
  * @param ivect Interrupt vector to set
  * @param handler Handler to interrupt service routine
+ * @warning TI has removed custom interrupt support on CE models with hardware revision >= I.
  */
 void int_SetVector(uint8_t ivect, void (*handler)(void));
 

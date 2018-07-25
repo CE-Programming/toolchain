@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <decompress.h>
+#include <compression.h>
 #include <graphx.h>
 
 /* Include the graphics */
@@ -43,14 +43,14 @@ void main(void) {
     gfx_sprite_t *tmp_ptr;
     gfx_tilemap_t tilemap;
 
-    /* Decompress the tiles */
+    /* Decompress the compressed tiles */
     for (i = 0; i < sizeof(tileset_tiles)/sizeof(gfx_sprite_t*) ; i++) {
-        tmp_ptr = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);  // Same as gfx_AllocSprite(TILE_WIDTH, TILE_HEIGHT, malloc)
-        dzx7_Turbo(tileset_tiles_compressed[i], tmp_ptr); // or dzx7_Standard, but in this case we have a lot of tiles
+        tmp_ptr = gfx_MallocSprite(TILE_WIDTH, TILE_HEIGHT);  /* Same as gfx_AllocSprite(TILE_WIDTH, TILE_HEIGHT, malloc) */
+        zx7_Decompress(tmp_ptr, tileset_tiles_compressed[i]);
         tileset_tiles[i] = tmp_ptr;
     }
 
-    dzx7_Turbo(tilemap_compressed, tilemap_map);
+    zx7_Decompress(tilemap_map, tilemap_compressed);
 
     /* Initialize the tilemap structure */
     tilemap.map         = tilemap_map;

@@ -5,7 +5,7 @@
 	path = tools/convpng
 	url = https://github.com/MattWaltz/convpng
 [submodule "src/sub/libload"]
-	path = src/sub/libload
+	path = src/libload
 	url = https://github.com/CE-Programming/libload.git
 [submodule "tools/convtile"]
 	path = tools/convtile
