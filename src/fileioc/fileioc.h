@@ -272,7 +272,7 @@ int ti_Delete(const char *name);
  * @param type Type of variable to delete
  * @returns 0 if failed
  */
-int ti_DeleteVar(const char *varname, uint8_t type);
+int ti_DeleteVar(const char *varname, const uint8_t type);
 
 /**
  * Gets the string used for displaying a TI token
@@ -317,7 +317,7 @@ void ti_GetName(char *name, const ti_var_t slot);
  * @returns 0 if success, 1 if file already exists, 2 any other error occurs.
  * @warning: This function closes all open slots!
  */
-uint8_t ti_Rename(char *old, char *new);
+uint8_t ti_Rename(const char *old, const char *new);
 
 /**
  * Renames a variable
@@ -328,7 +328,7 @@ uint8_t ti_Rename(char *old, char *new);
  * @returns 0 if success, 1 if file already exists, 2 any other error occurs.
  * @warning: This function closes all open slots!
  */
-uint8_t ti_RenameVar(char *old, char *new, uint8_t type);
+uint8_t ti_RenameVar(const char *old, const char *new, const uint8_t type);
 
 /**
  * Sets a variable
