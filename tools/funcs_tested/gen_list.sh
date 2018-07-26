@@ -1,7 +1,7 @@
 #!/bin/bash
 # Adrien 'Adriweb' Bertrand
 # Tool to generate a list of things that are used/tested in the toolchain example codes.
-# Dependencies: universal-ctags built with json support
+# Thanks to jacobly for the sed trick
 
 set -ex
 
@@ -12,7 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../../
 
 # All header files we want to extract prototypes from
-files="src/fileioc/fileioc.h src/graphx/graphx.h src/keypadc/keypadc.h src/ce/tice.h src/ce/compression.h src/ce/debug.h"
+libraries="fileioc graphx keypadc"
 
 # The destination markdown file
 outfile=$DIR/tested-functions-list.md
@@ -22,33 +22,32 @@ exampleFiles=$(find ./examples -type f \( -iname '*.c' -o -iname '*.cpp' -o -ina
 
 echo "## List of tested functions" > $outfile
 
-for f in $files
+for library in $libraries
 do
-    echo -e "\n### $f" >> $outfile
+    echo -e "\n### $library" >> $outfile
     echo -e "| Function | Tested? | Occurrences |" >> $outfile
     echo -e "| -------- | ------- | ----------- |" >> $outfile
 
     # This will produce a list of funcName:funcLine, which we'll parse in the for loop below.
-    filefuncts=$(ctags -u --fields=n --c-kinds=p --output-format=json $f | sed -e 's/.*"name": "\(.*\)", "path.*"line": \(.*\)}/\1:\2/g')
+    filefuncts=$(sed -nse 's/^\s*export\s\+\(\w\+\)$/\1/;Ts;p;=;:s' src/$library/*.asm | sed -e 'N;s/\n/:/')
     totalFuncs=0
     totalTested=0
     for funcAndLine in $filefuncts
     do
-        ((totalFuncs++))
+        : $((totalFuncs++))
         func=${funcAndLine%:*}
         line=${funcAndLine##*:}
-        count=$(grep -l "\b${func}\s*(" ${exampleFiles} | wc -l | awk '{print $1}')
-        if [[ "$count" == "0" ]]
+        count=$(grep -l "\b${func}\s*(" ${exampleFiles} | wc -l | tr -d ' ')
+        if [[ $count -eq 0 ]]
         then
             foundStr="✗"
             searchLink=""
         else
-            ((totalTested++))
-            [[ "$count" == "1" ]] && plural="" || plural="s"
+            : $((totalTested++))
             foundStr="YES"
-            searchLink="[in $count file${plural}](https://github.com/search?q=${func}+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)"
+            searchLink=" [in $count file$([[ $count -eq 1 ]] || printf s)](https://github.com/search?q=${func}+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)"
         fi
-        echo -e "| [\`${func}\`](/${f}#L${line}) | $foundStr | $searchLink" >> $outfile
+        echo -e "| [\`${func}\`](/${f}#L${line}) | $foundStr |$searchLink" >> $outfile
     done
     echo -e "\n**Total: ${totalTested}/${totalFuncs} tested.**" >> $outfile
 done

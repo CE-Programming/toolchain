@@ -9,7 +9,6 @@ addons:
       - gcc-6
       - g++-6
       - wine
-      - libjansson-dev
     sources:
       - ubuntu-toolchain-r-test
 
@@ -46,11 +45,6 @@ script:
 
 after_success:
 # Update the funcs_tested file (WIP)
-  - git clone --recursive --depth 1 https://github.com/universal-ctags/ctags.git
-  - cd ctags
-  - ./autogen.sh && ./configure && make -j4
-  - export PATH="$PWD:$PATH"
-  - cd ..
   - ./tools/funcs_tested/gen_list.sh
 # Build the doxygen
   - curl -fsSL ftp://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.linux.bin.tar.gz | tar xz
