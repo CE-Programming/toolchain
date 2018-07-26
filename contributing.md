@@ -10,7 +10,7 @@ In order to maintain consistency and neatness across files, here are the guidlin
 
 * Use snake_case for label and variable names.
 
-* When using index registers, add a space paritition in the arithmetic operation, e.g. (ix + 9)
+* When using index registers or offsets from a label, add a space paritition in the arithmetic operation, e.g. `(ix + 9)`, `OP1 + 1`
 
 * Use local labels.
 
@@ -19,6 +19,8 @@ In order to maintain consistency and neatness across files, here are the guidlin
 * Internal routines shall be prefixed with `util_`.
 
 * SMC labels shall be prefixed with `.smc_`, e.g. `.smc_label := $-3`, and always offset backwards.
+
+* Hexadecimal literals shall be lowercase, prefixed with `$`, e.g. `$3f`
 
 ## C Sources
 
