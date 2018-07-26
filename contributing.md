@@ -16,7 +16,9 @@ In order to maintain consistency and neatness across files, here are the guidlin
 
 * Comments should be all lowercase, including the first letter.
 
-* Internal routines should be prefixed with `util_`.
+* Internal routines shall be prefixed with `util_`.
+
+* SMC labels shall be prefixed with `.smc_`, e.g. `.smc_label := $-3`, and always offset backwards.
 
 ## C Sources
 
