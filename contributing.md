@@ -4,13 +4,15 @@ In order to maintain consistency and neatness across files, here are the guidlin
 
 ## eZ80 Assembly Sources
 
-* Spaces are evil. Use 1 tab to the opcode, and 1 tab to the operand.
+* Spaces are evil. Use 1 tab to the opcode, and 1 tab to the operand, with a single space in operands:
+
+    	ld	iy, (iy + 6)
 
 * Comments should be tabbed out to the same location for all comments in the same file.
 
 * Use snake_case for label and variable names.
 
-* When using index registers or offsets from a label, add a space paritition in the arithmetic operation, e.g. `(ix + 9)`, `OP1 + 1`
+* Add a space between any arithmetic operation, e.g. `(ix + 9)`, `OP1 + 1`
 
 * Use local labels.
 
