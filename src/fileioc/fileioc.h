@@ -333,9 +333,9 @@ uint8_t ti_RenameVar(const char *old, const char *new, const uint8_t type);
 /**
  * Sets a variable
  *
+ * @param var_type Type of variable to set
  * @param name Pointer to name of variable
  * @param data Pointer to data to set
- * @param var_type Type of variable to set
  * @returns 0 if success
  */
 uint8_t ti_SetVar(const ti_var_t var_type, const char *name, void *data);

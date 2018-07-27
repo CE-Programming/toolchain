@@ -1252,15 +1252,15 @@ ti_Rename:
 ti_SetVar:
 ; sets an os variable structure value
 ; args:
-;  sp + 3 : pointer to name of variable
-;  sp + 6 : pointer to data to set
-;  sp + 9 : type of variable to set
+;  sp + 3 : type of variable to set
+;  sp + 6 : pointer to name of variable
+;  sp + 9 : pointer to data to set
 ; return:
 ;  a = any error code, 0 if success
 	push	ix
 	ld	ix, 0
 	add	ix, sp
-	ld	hl, (ix + 9)		; pointer to var string
+	ld	hl, (ix + 9)		; pointer to data
 	ld	a, (ix + 6)
 	call	util_set_var_str
 	call	_ChkFindSym
@@ -1294,7 +1294,7 @@ ti_StoVar:
 ;  a = any error code, 0 if success
 	ld	iy, 0
 	add	iy, sp
-	ld	hl, (iy + 12)		; pointer to var string
+	ld	hl, (iy + 12)		; pointer to data
 	call	util_set_var_str
 	ld	a, (iy + 9)
 	or	a, a			; if real look up the variable
@@ -1330,7 +1330,7 @@ ti_RclVar:
 ;  a = type of variable
 	ld	iy, 0
 	add	iy, sp
-	ld	hl, (iy + 6)		; pointer to var string
+	ld	hl, (iy + 6)		; pointer to data
 	ld	a, (iy + 3)		; var type
 	call	util_set_var_str
 	call	_FindSym
