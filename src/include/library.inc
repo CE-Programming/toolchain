@@ -2,7 +2,7 @@ include 'ez80.inc'
 include 'ti84pceg.inc'
 include 'tiformat.inc'
 
-macro library? name*, version*
+macro library? name*, version*, magic1: 192, magic2: 193
 	local lib
 	element lib.base
 	virtual
@@ -18,7 +18,7 @@ macro library? name*, version*
 
 	format ti archived appvar name
 	org 0
-	db 192,193,version
+	db magic1,magic2,version
 	dw lib.exports
 	lib.dependencies:
 	lib.base_offset := $%
