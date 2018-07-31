@@ -7,6 +7,8 @@
 	.assume	adl=1
 
 __findlibload:
+	call	020628h		; _pushop1, save running program name
+__tryfind:
 	ld	hl,__libloadappvar
 	call	020320h		; _mov9toop1
 	ld	a,015h		; saves a whole 3 bytes
@@ -17,8 +19,9 @@ __findlibload:
 	call	021F98h		; _chkinram
 	jr	nz,__inarc	; if in ram, archive LibLoad and search again
 	call	021448h		; _arc_unarc
-	jr	__findlibload
+	jr	__tryfind
 __inarc:
+	call	0205C4h		; _popop1, restore running program name
 	ex	de,hl
 	ld	de,9
 	add	hl,de
@@ -30,6 +33,7 @@ __inarc:
 	ld	de,__relocationstart
 	jp	(hl)		; jump to the loader -- it should take care of everything
 __notfound:
+	call	0205C4h		; _popop1, restore running program name
 	call	020814h		; _clrscrn
 	call	020828h		; _homeup
 	ld	hl,__missingappvar
