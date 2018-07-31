@@ -21,8 +21,9 @@ __tryfind:
 	call	021448h		; _arc_unarc
 	jr	__tryfind
 __inarc:
+	push	de
 	call	0205C4h		; _popop1, restore running program name
-	ex	de,hl
+	pop	hl
 	ld	de,9
 	add	hl,de
 	ld	e,(hl)
