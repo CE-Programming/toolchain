@@ -22,7 +22,7 @@ void main(void) {
 
     /* First couple bytes of the LibLoad AppVar, which is known to exist *
     /* Technically is a null-terminated string, if an odd looking one */
-    const char search_string[] = { 0xFD, 0x21, 0x80, 0x00 };
+    const char search_string[] = { 0xBF, 0xFE, 0x00 };
 
     /* Clear the homescreen */
     os_ClrHome();
