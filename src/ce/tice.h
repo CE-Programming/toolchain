@@ -503,7 +503,7 @@ void *os_GetSystemStats(void);
  * @code
  * int errno = os_PushErrorHandler();
  * if (errno) {
- *     // handle error, but do not call os_PopErrorHandler()
+ *     // handle error, but no longer under the protection of the error handler so do not call os_PopErrorHandler()
  * } else {
  *     // run some code that may error
  *     os_PopErrorHandler();
@@ -516,8 +516,8 @@ void *os_GetSystemStats(void);
 int os_PushErrorHandler(void);
 
 /**
- * Restores state after a call to os_PushErrorHandler, but should not be called along the error
- * path, and restores stack and ix to their state before the call to os_PushErrorHandler.
+ * Restores stack state after a call to os_PushErrorHandler.  Must be called with stack in the same state
+ * as it was when os_PushErrorHandler returned with 0, and should not be called along the error path.
  *
  * @see os_PushErrorHandler
  */
