@@ -495,15 +495,29 @@ void os_ThrowError(uint8_t error);
 void *os_GetSystemStats(void);
 
 /**
- * Sets up the defualt error handlers if an OS routine encounters an error when running
+ * This function can return twice (like setjmp).
+ * First return always happens with a return value of 0.
+ * Second return only happens if an error occurs before os_PopErrorHandler is called,
+ * with the errNo as the return value.
+ *
+ * @code
+ * int errno = os_PushErrorHandler();
+ * if (errno) {
+ *     // handle error, but do not call os_PopErrorHandler()
+ * } else {
+ *     // run some code that may error
+ *     os_PopErrorHandler();
+ * }
+ * @endcode
  *
  * @param routine Error handling routine
  * @see os_PopErrorHandler
  */
-void os_PushErrorHandler(void *routine);
+int os_PushErrorHandler(void);
 
 /**
- * Restores state after a call to os_PushErrorHandler
+ * Restores state after a call to os_PushErrorHandler, but should not be called along the error
+ * path, and restores stack and ix to their state before the call to os_PushErrorHandler.
  *
  * @see os_PushErrorHandler
  */
