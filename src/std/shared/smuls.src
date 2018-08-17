@@ -17,4 +17,5 @@
 	.def __smuls
 	.assume adl=1
 	
-__smuls		equ 000224h	
+__smuls		equ 000224h
+
