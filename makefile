@@ -77,7 +77,7 @@ DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
 all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
-	@echo "Toolchain built."
+	@echo Toolchain built.
 
 clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
