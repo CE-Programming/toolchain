@@ -32,10 +32,15 @@ LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.src))
 LIBLINKED   = $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.src))
 LIB_H       = $(call NATIVEPATH,$(wildcard *.h))
 
-LIBFILEIO  += $(call NATIVEPATH,$(wildcard $(FILEIODIR)/build/*.src))
-LIBSTATIC  += $(call NATIVEPATH,$(wildcard $(STATICDIR)/build/*.src))
-LIBSHARED  += $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/build/*.src))
-LIBLINKED  += $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/build/*.src))
+LIBFILEIO_C := $(call NATIVEPATH,$(wildcard $(FILEIODIR)/*.c))
+LIBSTATIC_C := $(call NATIVEPATH,$(wildcard $(STATICDIR)/*.c))
+LIBSHARED_C := $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.c))
+LIBLINKED_C := $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.c))
+
+LIBFILEIO  += $(call NATIVEPATH,$(LIBFILEIO_C:$(FILEIODIR)/%.c=$(FILEIODIR)/build/%.src))
+LIBSTATIC  += $(call NATIVEPATH,$(LIBSTATIC_C:$(STATICDIR)/%.c=$(STATICDIR)/build/%.src))
+LIBSHARED  += $(call NATIVEPATH,$(LIBSHARED_C:$(SHAREDDIR)/%.c=$(SHAREDDIR)/build/%.src))
+LIBLINKED  += $(call NATIVEPATH,$(LIBLINKED_C:$(LINKEDDIR)/%.c=$(LINKEDDIR)/build/%.src))
 
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
@@ -63,7 +68,7 @@ clean:
 #	$(MAKE) -C $(LINKEDDIR) $(MAKECMDGOALS) # nothing to do
 	$(MAKE) -C $(STATICDIR) $(MAKECMDGOALS)
 
-install:
+install: all
 	$(COPY_HEADERS)
 	$(COPY_LIBFILEIO)
 	$(COPY_LIBSTATIC)
