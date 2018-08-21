@@ -726,8 +726,8 @@ void gfx_SetDraw(uint8_t location);
  * @brief Different locations routines can be drawn to
  */
 typedef enum {
-    gfx_screen = 0, /**< Draw to screen */
-    gfx_buffer      /**< Draw to buffer */
+    gfx_screen = 0, /**< Screen */
+    gfx_buffer      /**< Buffer */
 } gfx_draw_location_t;
 
 /**
@@ -784,34 +784,34 @@ void gfx_Wait(void);
  * Copies the input buffer to the opposite buffer
  *
  * No clipping is performed; as it is a copy not a draw
- * @param location gfx_screen - copies screen to buffer
- * @param location gfx_buffer - copies buffer to screen
+ * @param src drawing location to copy from
+ * @see gfx_draw_location_t
  */
-void gfx_Blit(uint8_t location);
+void gfx_Blit(uint8_t src);
 
 /**
  * Copies lines from the input buffer to the opposite buffer
  *
  * No clipping is performed; as it is a copy not a draw
- * @param location gfx_screen - copies screen to buffer
- * @param location gfx_buffer - copies buffer to screen
+ * @param src drawing location to copy from
  * @param y_loc Y Location to begin copying at
  * @param num_lines Number of lines to copy
+ * @see gfx_draw_location_t
  */
-void gfx_BlitLines(uint8_t location, uint8_t y_loc, uint8_t num_lines);
+void gfx_BlitLines(uint8_t src, uint8_t y_loc, uint8_t num_lines);
 
 /**
  * Copies a rectangle from the input buffer to the opposite buffer
  *
  * No clipping is performed; as it is a copy not a draw
- * @param location gfx_screen - copies screen to buffer
- * @param location gfx_buffer - copies buffer to screen
+ * @param src drawing location to copy from
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
  * @param height Height of rectangle
+ * @see gfx_draw_location_t
  */
-void gfx_BlitRectangle(uint8_t location, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
+void gfx_BlitRectangle(uint8_t src, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
 
 /**
  * Copies the screen to the buffer

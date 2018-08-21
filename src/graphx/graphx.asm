@@ -1777,13 +1777,13 @@ smcByte _Color
 gfx_Blit:
 ; Copies the buffer image to the screen and vice versa
 ; Arguments:
-;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
 ; Returns:
 ;  None
 	pop	iy			; iy = return vector
 	ex	(sp),hl
-	ld	a,l			; a = buffer to blit to
-	call	_CheckBlit		; determine which buffer to blit
+	ld	a,l			; a = buffer to blit from
+	call	_CheckBlit		; determine blit buffers
 	ld	bc,LcdSize
 _Blit_Ldir:
 	ldir				; just do it
@@ -1793,14 +1793,14 @@ _Blit_Ldir:
 gfx_BlitLines:
 ; Copies the buffer image to the screen and vice versa line wise
 ; Arguments:
-;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
 ;  arg1 : Y coordinate
 ;  arg2 : Number of lines to copy
 ; Returns:
 ;  None
 	pop	iy			; iy = return vector
 	pop	bc
-	ld	a,c			; a = buffer to blit to
+	ld	a,c			; a = buffer to blit from
 	pop	de			; e = number of lines to copy
 	ex	(sp),hl			; l = y coordinate
 	push	de
@@ -1814,7 +1814,7 @@ gfx_BlitLines:
 	mlt	hl
 	add	hl,hl			; hl -> offset to start at
 	push	hl
-	call	_CheckBlit		; determine which buffer to blit
+	call	_CheckBlit		; determineblit buffers
 	pop	bc
 	add	hl,bc
 	ex	de,hl
@@ -1827,7 +1827,7 @@ gfx_BlitLines:
 gfx_BlitRectangle:
 ; Copies the buffer image to the screen and vice versa rectangularly
 ; Arguments:
-;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
 ;  arg1 : X coordinate
 ;  arg2 : Y coordinate
 ;  arg3 : Width
@@ -1843,8 +1843,8 @@ gfx_BlitRectangle:
 	add	hl,hl
 	add	hl,de			; hl = amount to increment
 	push	hl			; save amount to increment
-	ld	a,(iy+3)
-	call	_CheckBlit		; determine which buffer to blit
+	ld	a,(iy+3)		; a = buffer to blit from
+	call	_CheckBlit		; determine blit buffers
 	pop	bc
 	add	hl,bc
 	ex	de,hl
