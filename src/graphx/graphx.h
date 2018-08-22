@@ -1,11 +1,41 @@
 /**
  * @file
+ * @brief Contains optimized graphics operations and routines
+ *
+ * Example program template with best graphx buffer usage pattern:
+ * @code
+ * // Standard #includes omitted
+ *
+ * bool partial_redraw;
+ *
+ * // Implement us!
+ * void begin();
+ * void end();
+ * bool step();
+ * void draw();
+ *
+ * void main() {
+ *     begin(); // No rendering allowed!
+ *     gfx_Begin();
+ *     gfx_SetDrawBuffer(); // Draw to the buffer to avoid rendering artifats
+ *
+ *     while (step()) { // No rendering allowed in step!
+ *         if (partial_redraw) // Only want to redraw part of the previous frame?
+ *             gfx_BlitScreen(); // Copy previous frame as a base for this frame
+ *         draw(); // As little non-rendering logic as possible
+ *         gfx_SwapDraw(); // Queue the buffered frame to be displayed
+ *     }
+ *
+ *     gfx_End();
+ *     end();
+ * }
+ * @endcode
+ *
  * @authors Matt "MateoConLechuga" Waltz
  * @authors Jacob "jacobly" Young
  * @authors Zachary "Runer112" Wassall
  * @authors Patrick "tr1p1ea" Prendergast
  * @authors "grosged"
- * @brief Contains optimized graphics operations and routines
  */
 
 #ifndef H_GRAPHX
@@ -757,16 +787,16 @@ uint8_t gfx_GetDraw(void);
  * the next invocation of a graphx drawing function will block, waiting for this
  * event. To block and wait explicitly, use gfx_Wait().
  *
+ * The LCD driver maintains its own screen buffer pointer for the duration of a
+ * refresh. The swap performed by this function will only be picked up at a
+ * point between refreshes.
+ *
  * @remarks
  * In practice, this function should be invoked immediately after finishing
  * drawing a frame to the drawing buffer, and invocation of the first graphx
  * drawing function for the next frame should be scheduled as late as possible
  * relative to non-drawing logic. Non-drawing logic can execute during time when
  * a drawing function may otherwise block.
- *
- * The LCD driver maintains its own screen buffer pointer for the duration of a
- * refresh. The swap performed by this function will only be picked up at a
- * point between refreshes.
  */
 void gfx_SwapDraw(void);
 
