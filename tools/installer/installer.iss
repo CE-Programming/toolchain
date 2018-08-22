@@ -2,7 +2,7 @@
 
 [Setup]
 AppName=TI-84+CE C SDK
-AppVersion=8.5
+AppVersion={#APP_VERSION}
 DefaultDirName={sd}\CEdev
 DefaultGroupName=CEdev
 Compression=lzma2

@@ -15,9 +15,9 @@ PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
-CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 CPDIR      = xcopy /y /s /e
-ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
+CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
+ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
              cd ..\.. && move /y tools\installer\CEdev.exe release\\
 else
 NATIVEPATH = $(subst \,/,$(1))

@@ -6,54 +6,48 @@
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
-CP         = xcopy /y
 PREFIX    ?= C:
 else
 NATIVEPATH = $(subst \,/,$(1))
-CP         = cp
 PREFIX    ?= $(HOME)
 endif
 
-FILEIODIR := $(call NATIVEPATH,$(CURDIR)/fileio)
-STATICDIR := $(call NATIVEPATH,$(CURDIR)/static)
-LINKEDDIR := $(call NATIVEPATH,$(CURDIR)/linked)
-SHAREDDIR := $(call NATIVEPATH,$(CURDIR)/shared)
+FILEIODIR := $(CURDIR)/fileio
+STATICDIR := $(CURDIR)/static
+LINKEDDIR := $(CURDIR)/linked
+SHAREDDIR := $(CURDIR)/shared
 
-DEV        ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
-BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
+DEV        ?= $(PREFIX)/CEdev
+BIN        ?= $(PREFIX)/CEdev/bin
 
-INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
-LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib)
-LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include)
+LIB_LOC    := $(DESTDIR)$(DEV)/lib
+LOC_H      := $(DESTDIR)$(DEV)/include
+LIB_H       = $(wildcard *.h)
 
-LIBFILEIO   = $(call NATIVEPATH,$(wildcard $(FILEIODIR)/*.src))
-LIBSTATIC   = $(call NATIVEPATH,$(wildcard $(STATICDIR)/*.src))
-LIBSHARED   = $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.src))
-LIBLINKED   = $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.src))
-LIB_H       = $(call NATIVEPATH,$(wildcard *.h))
-
-LIBFILEIO_C := $(call NATIVEPATH,$(wildcard $(FILEIODIR)/*.c))
-LIBSTATIC_C := $(call NATIVEPATH,$(wildcard $(STATICDIR)/*.c))
-LIBSHARED_C := $(call NATIVEPATH,$(wildcard $(SHAREDDIR)/*.c))
-LIBLINKED_C := $(call NATIVEPATH,$(wildcard $(LINKEDDIR)/*.c))
-
-LIBFILEIO  += $(call NATIVEPATH,$(LIBFILEIO_C:$(FILEIODIR)/%.c=$(FILEIODIR)/build/%.src))
-LIBSTATIC  += $(call NATIVEPATH,$(LIBSTATIC_C:$(STATICDIR)/%.c=$(STATICDIR)/build/%.src))
-LIBSHARED  += $(call NATIVEPATH,$(LIBSHARED_C:$(SHAREDDIR)/%.c=$(SHAREDDIR)/build/%.src))
-LIBLINKED  += $(call NATIVEPATH,$(LIBLINKED_C:$(LINKEDDIR)/%.c=$(LINKEDDIR)/build/%.src))
-
+# windows is trash at copying files, so just do it manually
 ifeq ($(OS),Windows_NT)
-COPY_HEADERS = (robocopy . $(LOC_H) $(LIB_H) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBFILEIO = (robocopy $(FILEIODIR) $(call NATIVEPATH,$(LIB_LOC)/fileio) $(notdir $(LIBFILEIO)) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBSTATIC = (robocopy $(STATICDIR) $(call NATIVEPATH,$(LIB_LOC)/static) $(notdir $(LIBSTATIC)) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBSHARED = (robocopy $(SHAREDDIR) $(call NATIVEPATH,$(LIB_LOC)/shared) $(notdir $(LIBSHARED)) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_LIBLINKED = (robocopy $(LINKEDDIR) $(call NATIVEPATH,$(LIB_LOC)/linked) $(notdir $(LIBLINKED)) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY_HEADERS   = xcopy /y $(call NATIVEPATH,$(CURDIR)/*.h) $(call NATIVEPATH,$(LOC_H))
+COPY_LIBFILEIO = xcopy /y $(call NATIVEPATH,$(FILEIODIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/fileio)
+COPY_LIBSTATIC = xcopy /y $(call NATIVEPATH,$(STATICDIR)/*.src) $(call NATIVEPATH,$(LIB_LOC)/static) && \
+                 xcopy /y $(call NATIVEPATH,$(STATICDIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/static)
+COPY_LIBSHARED = xcopy /y $(call NATIVEPATH,$(SHAREDDIR)/*.src) $(call NATIVEPATH,$(LIB_LOC)/shared) && \
+                 xcopy /y $(call NATIVEPATH,$(SHAREDDIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/shared)
+COPY_LIBLINKED = xcopy /y $(call NATIVEPATH,$(LINKEDDIR)/*.src) $(call NATIVEPATH,$(LIB_LOC)/linked)
 else
-COPY_HEADERS = $(CP) $(LIB_H) $(LOC_H)
-COPY_LIBFILEIO = $(CP) $(LIBFILEIO) $(call NATIVEPATH,$(LIB_LOC)/fileio)
-COPY_LIBSTATIC = $(CP) $(LIBSTATIC) $(call NATIVEPATH,$(LIB_LOC)/static)
-COPY_LIBSHARED = $(CP) $(LIBSHARED) $(call NATIVEPATH,$(LIB_LOC)/shared)
-COPY_LIBLINKED = $(CP) $(LIBLINKED) $(call NATIVEPATH,$(LIB_LOC)/linked)
+LIBFILEIO_C = $(wildcard $(FILEIODIR)/*.c)
+LIBSTATIC_C = $(wildcard $(STATICDIR)/*.c)
+LIBSHARED_C = $(wildcard $(SHAREDDIR)/*.c)
+LIBLINKED_C = $(wildcard $(LINKEDDIR)/*.c)
+LIBFILEIO   = $(wildcard $(FILEIODIR)/*.src) $(LIBFILEIO_C:$(FILEIODIR)/%.c=$(FILEIODIR)/build/%.src)
+LIBSTATIC   = $(wildcard $(STATICDIR)/*.src) $(LIBSTATIC_C:$(STATICDIR)/%.c=$(STATICDIR)/build/%.src)
+LIBSHARED   = $(wildcard $(SHAREDDIR)/*.src) $(LIBSHARED_C:$(SHAREDDIR)/%.c=$(SHAREDDIR)/build/%.src)
+LIBLINKED   = $(wildcard $(LINKEDDIR)/*.src) $(LIBLINKED_C:$(LINKEDDIR)/%.c=$(LINKEDDIR)/build/%.src)
+
+COPY_HEADERS = cp $(call NATIVEPATH,$(LIB_H)) $(call NATIVEPATH,$(LOC_H))
+COPY_LIBFILEIO = cp $(call NATIVEPATH,$(LIBFILEIO)) $(call NATIVEPATH,$(LIB_LOC)/fileio)
+COPY_LIBSTATIC = cp $(call NATIVEPATH,$(LIBSTATIC)) $(call NATIVEPATH,$(LIB_LOC)/static)
+COPY_LIBSHARED = cp $(call NATIVEPATH,$(LIBSHARED)) $(call NATIVEPATH,$(LIB_LOC)/shared)
+COPY_LIBLINKED = cp $(call NATIVEPATH,$(LIBLINKED)) $(call NATIVEPATH,$(LIB_LOC)/linked)
 endif
 
 all:
