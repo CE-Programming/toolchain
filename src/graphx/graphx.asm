@@ -1815,7 +1815,7 @@ gfx_BlitLines:
 	mlt	hl
 	add	hl,hl			; hl -> offset to start at
 	push	hl
-	call	_CheckBlit		; determineblit buffers
+	call	_CheckBlit		; determine blit buffers
 	pop	bc
 	add	hl,bc
 	ex	de,hl
