@@ -1786,6 +1786,7 @@ gfx_Blit:
 	call	_CheckBlit		; determine blit buffers
 	ld	bc,LcdSize
 _Blit_Ldir:
+	call	gfx_Wait
 	ldir				; just do it
 	jp	(iy)
 
@@ -1861,6 +1862,7 @@ gfx_BlitRectangle:
 	ld	a,(iy+15)
 	ld	iy,0
 	add	iy,de
+	call	gfx_Wait
 .loop:
 	ld	bc,0			; smc for speedz
 .width := $-3
