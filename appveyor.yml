@@ -14,9 +14,10 @@ install:
   # MinGW
   - if defined MINGW_ROOT set PATH=%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
   #- if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost mingw-w64-%MINGW_ARCH%-libarchive"
+  - if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S msys2-runtime-devel"
 
 build_script:
-  - if defined MINGW_ROOT mingw32-make -j%NUMBER_OF_PROCESSORS%
+  - if defined MINGW_ROOT mingw32-make
   - if defined MINGW_ROOT mingw32-make install
   
   # Some environment variables for later...
