@@ -8,9 +8,12 @@ environment:
     MINGW_ROOT: C:\msys64\mingw64
 
 install:
+  # Recursive checkout
+  - git submodule update --init --recursive
+
   # MinGW
   - if defined MINGW_ROOT set PATH=%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
-  - if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost mingw-w64-%MINGW_ARCH%-libarchive"
+  #- if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost mingw-w64-%MINGW_ARCH%-libarchive"
 
 build_script:
   - if defined MINGW_ROOT mingw32-make -j%NUMBER_OF_PROCESSORS%
