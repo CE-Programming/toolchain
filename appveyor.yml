@@ -26,6 +26,9 @@ build_script:
   - set PATH=%CEDEV%\bin\;%PATH%
   - set AUTOTESTER_LIBS_DIR=%CD%\clibraries
   
+  # Wait for 10s before building any more...
+  - timeout /t 10 /nobreak
+  
   # Build examples
   - if defined MINGW_ROOT mingw32-make -C %CEDEV%\examples
 
