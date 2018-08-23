@@ -30,7 +30,7 @@ build_script:
   - timeout /t 10 /nobreak
   
   # Build examples
-  - if defined MINGW_ROOT mingw32-make -C %CEDEV%\examples
+  - if defined MINGW_ROOT make -C %CEDEV%\examples
 
   # Build CEmu core and autotester_cli
   - git clone --recursive -b latest-stable --depth 1 https://github.com/CE-Programming/CEmu.git
