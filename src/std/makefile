@@ -26,7 +26,7 @@ LIB_H       = $(wildcard *.h)
 
 # windows is trash at copying files, so just do it manually
 ifeq ($(OS),Windows_NT)
-COPY_HEADERS   = xcopy /y $(call NATIVEPATH,$(CURDIR)/*.h) $(call NATIVEPATH,$(LOC_H))
+COPY_HEADERS   = xcopy /y *.h $(call NATIVEPATH,$(LOC_H))
 COPY_LIBFILEIO = xcopy /y $(call NATIVEPATH,$(FILEIODIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/fileio)
 COPY_LIBSTATIC = xcopy /y $(call NATIVEPATH,$(STATICDIR)/*.src) $(call NATIVEPATH,$(LIB_LOC)/static) && \
                  xcopy /y $(call NATIVEPATH,$(STATICDIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/static)
