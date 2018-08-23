@@ -1,0 +1,47 @@
+version: "{branch}-ci-{build}"
+
+environment:
+  matrix:
+  - MINGW_ARCH: i686
+    MINGW_ROOT: C:\msys64\mingw32
+  - MINGW_ARCH: x86_64
+    MINGW_ROOT: C:\msys64\mingw64
+
+install:
+  # MinGW
+  - if defined MINGW_ROOT set PATH=%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
+  - if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost mingw-w64-%MINGW_ARCH%-libarchive"
+
+build_script:
+  - if defined MINGW_ROOT mingw32-make -j%NUMBER_OF_PROCESSORS%
+  - if defined MINGW_ROOT mingw32-make install
+  
+  # Some environment variables for later...
+  - set CEDEV=C:\CEdev
+  - set PATH=%CEDEV%\bin\;%PATH%
+  - set AUTOTESTER_LIBS_DIR=%CD%\clibraries
+  
+  # Build examples
+  - if defined MINGW_ROOT mingw32-make -C %CEDEV%
+
+  # Build CEmu core and autotester_cli
+  - git clone --recursive -b latest-stable --depth 1 https://github.com/CE-Programming/CEmu.git
+  - mingw32-make -C CEmu/core -j%NUMBER_OF_PROCESSORS%
+  - mingw32-make -C CEmu/tests/autotester -j%NUMBER_OF_PROCESSORS%
+  - set PATH=%CD%\CEmu\tests\autotester;%PATH%
+  
+  # Grab ROM for tests below
+  - set ROM_FILE_NAME=84pce_515_53.rom
+  - curl -s https://tiplanet.org/scripts/travis/%ROM_FILE_NAME% 2> nul > %ROM_FILE_NAME%
+  - set AUTOTESTER_ROM=%CD%\%ROM_FILE_NAME%
+
+  # Test toolchain examples
+  - cmd: |
+      set RESULT=0
+      for /d %%d in (%CEDEV%\examples\*) do (for %%f in (%%d\*.json) do (
+        echo Launching autotester on %%f
+        autotester "%%f"
+        set /a "RESULT=%RESULT% + %errorlevel%"
+      ))
+      exit /b %RESULT%
+
