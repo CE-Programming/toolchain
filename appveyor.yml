@@ -27,7 +27,7 @@ build_script:
   - set AUTOTESTER_LIBS_DIR=%CD%\clibraries
   
   # Build examples
-  - if defined MINGW_ROOT mingw32-make -C %CEDEV%
+  - if defined MINGW_ROOT mingw32-make -C %CEDEV%\examples
 
   # Build CEmu core and autotester_cli
   - git clone --recursive -b latest-stable --depth 1 https://github.com/CE-Programming/CEmu.git
