@@ -4,6 +4,7 @@ environment:
   matrix:
   - MINGW_ARCH: i686
     MINGW_ROOT: C:\MinGW
+    MSYS2_MINGW_ROOT: C:\msys64\mingw32
   - MINGW_ARCH: x86_64
     MINGW_ROOT: C:\msys64\mingw64
     USING_MSYS2: yes
@@ -13,6 +14,7 @@ install:
   - git submodule update --init --recursive
 
   # MinGW
+  - set OLD_PATH=%PATH%
   - if defined MINGW_ROOT if not defined USING_MSYS2 set PATH=%MINGW_ROOT%\bin;%PATH%
   - if defined MINGW_ROOT if defined USING_MSYS2 set PATH=%MINGW_ROOT%\bin;C:\msys64\usr\bin\;%PATH%
   #- if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost mingw-w64-%MINGW_ARCH%-libarchive"
@@ -34,8 +36,14 @@ build_script:
 
   # Build CEmu core and autotester_cli
   - git clone --recursive -b latest-stable --depth 1 https://github.com/CE-Programming/CEmu.git
-  - mingw32-make -C CEmu/core -j%NUMBER_OF_PROCESSORS%
-  - mingw32-make -C CEmu/tests/autotester -j%NUMBER_OF_PROCESSORS%
+  
+  # Workaround for bad bad symlinks (v1.0 seems to have them)
+  - if exist CEmu\core\debug\debug.cpp ( move CEmu\core\debug\debug.c CEmu\core\debug\debug.c.old & copy CEmu\core\debug\debug.cpp CEmu\core\debug\debug.c )
+  
+  # Set env to MSYS2
+  - set PATH=%MSYS2_MINGW_ROOT%\bin;C:\msys64\usr\bin\;%OLD_PATH%
+  - make -C CEmu/core -j%NUMBER_OF_PROCESSORS%
+  - make -C CEmu/tests/autotester -j%NUMBER_OF_PROCESSORS%
   - set PATH=%CD%\CEmu\tests\autotester;%PATH%
   
   # Grab ROM for tests below
