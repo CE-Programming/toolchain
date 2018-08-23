@@ -27,12 +27,12 @@ LIB_H       = $(wildcard *.h)
 # windows is trash at copying files, so just do it manually
 ifeq ($(OS),Windows_NT)
 COPY_HEADERS   = xcopy /y *.h $(call NATIVEPATH,$(LOC_H))
-COPY_LIBFILEIO = xcopy /y $(call NATIVEPATH,$(FILEIODIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/fileio)
-COPY_LIBSTATIC = xcopy /y $(call NATIVEPATH,$(STATICDIR)/*.src) $(call NATIVEPATH,$(LIB_LOC)/static) && \
-                 xcopy /y $(call NATIVEPATH,$(STATICDIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/static)
-COPY_LIBSHARED = xcopy /y $(call NATIVEPATH,$(SHAREDDIR)/*.src) $(call NATIVEPATH,$(LIB_LOC)/shared) && \
-                 xcopy /y $(call NATIVEPATH,$(SHAREDDIR)/build/*.src) $(call NATIVEPATH,$(LIB_LOC)/shared)
-COPY_LIBLINKED = xcopy /y $(call NATIVEPATH,$(LINKEDDIR)/*.src) $(call NATIVEPATH,$(LIB_LOC)/linked)
+COPY_LIBFILEIO = cd $(call NATIVEPATH,$(FILEIODIR)/build) && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/fileio)
+COPY_LIBSTATIC = cd $(call NATIVEPATH,$(STATICDIR)) && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/static) && \
+                 cd build && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/static)
+COPY_LIBSHARED = cd $(call NATIVEPATH,$(SHAREDDIR)) && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/shared) && \
+                 cd build && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/shared)
+COPY_LIBLINKED = cd $(call NATIVEPATH,$(LINKEDDIR)) && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/linked)
 else
 LIBFILEIO_C = $(wildcard $(FILEIODIR)/*.c)
 LIBSTATIC_C = $(wildcard $(STATICDIR)/*.c)
