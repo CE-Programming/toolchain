@@ -3,7 +3,7 @@ version: "{branch}-ci-{build}"
 environment:
   matrix:
   - MINGW_ARCH: i686
-    MINGW_ROOT: C:\MinGW\bin
+    MINGW_ROOT: C:\MinGW
   - MINGW_ARCH: x86_64
     MINGW_ROOT: C:\msys64\mingw64
     USING_MSYS2: yes
