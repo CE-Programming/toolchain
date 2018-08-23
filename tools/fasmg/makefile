@@ -53,4 +53,4 @@ $(INCFILES):
 
 uninstall:
 
-.PHONY: all clean install uninstall
+.PHONY: all clean install uninstall $(FILES)
