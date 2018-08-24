@@ -42,7 +42,6 @@ MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst /,\,$(1))
 WINPATH    = $(NATIVEPATH)
 WINRELPATH = $(subst /,\,$(1))
-TOLOWER    = $(1)
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
@@ -61,7 +60,6 @@ NATIVEPATH = $(subst \,/,$(1))
 WINPATH    = $(subst \,\\,$(shell winepath -w $(1)))
 WINRELPATH = $(subst /,\,$(1))
 RM         = rm -f
-TOLOWER    = $(shell printf %s "$(1)" | tr [:upper:] [:lower:])
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 CC         = $(call NATIVEPATH,wine "$(BIN)/ez80cc.exe")
@@ -112,8 +110,8 @@ LINK_CPPSOURCES := $(filter %.src,$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.src,$(s
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
-LINK_FILES    += $(call TOLOWER,$(LINK_CSOURCES))
-LINK_FILES    += $(call TOLOWER,$(LINK_CPPSOURCES))
+LINK_FILES    += $(LINK_CSOURCES)
+LINK_FILES    += $(LINK_CPPSOURCES)
 LINK_FILES    += $(LINK_ASMSOURCES)
 LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/shared/*.src))
 LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/fileio/*.src))
