@@ -115,7 +115,7 @@ LINK_FILES    += $(LINK_CPPSOURCES)
 LINK_FILES    += $(LINK_ASMSOURCES)
 LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/shared/*.src))
 LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/fileio/*.src))
-LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.asm))
+LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.lib))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
