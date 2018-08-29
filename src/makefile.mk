@@ -97,11 +97,9 @@ ICON_ASM      := iconc.src
 F_STARTUP     := $(call NATIVEPATH,$(CEDEV)/lib/cstartup.src)
 F_LAUNCHER    := $(call NATIVEPATH,$(CEDEV)/lib/libheader.src)
 F_CLEANUP     := $(call NATIVEPATH,$(CEDEV)/lib/ccleanup.src)
-F_ICON        := $(OBJDIR)/$(ICON_ASM)
 
 # set use cases
 U_CLEANUP = 0
-U_ICON    = 0
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
@@ -129,9 +127,9 @@ LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload.lib))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
-LINK_ICON  := $(F_ICON)
-ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(LINK_ICON))$(comma)$(DESCRIPTION)
-U_ICON     = 1
+F_ICON     := $(OBJDIR)/$(ICON_ASM)
+ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(F_ICON))$(comma)$(DESCRIPTION)
+LINK_ICON   = "$(F_ICON)" if 1,$(space)
 endif
 
 # determine if output should be archived or compressed
@@ -184,7 +182,7 @@ LDFLAGS ?= \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
 	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
-	-i 'srcs "$(F_LAUNCHER)" if libs.length, "$(F_ICON)" if $(U_ICON), "$(F_CLEANUP)" if $(U_CLEANUP)' \
+	-i 'srcs $(LINK_ICON)"$(F_LAUNCHER)" if libs.length, "$(F_CLEANUP)" if $(U_CLEANUP)' \
 	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
 	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
 
@@ -206,7 +204,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	$(Q)$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
-$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(LINK_ICON)
+$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(F_ICON)
 	$(Q)$(LD) $(LDFLAGS) $@
 
 # this rule handles conversion of the icon, if it is ever updated
