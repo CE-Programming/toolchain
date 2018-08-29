@@ -53,7 +53,7 @@ WINRELPATH = $(subst /,\,$(1))
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
-LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
+LD         = INCLUDE="$(CEDEV)" $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
 PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
@@ -71,7 +71,7 @@ RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 CC         = $(call NATIVEPATH,wine "$(BIN)/ez80cc.exe")
-LD         = $(call NATIVEPATH,$(BIN)/fasmg)
+LD         = INCLUDE="$(CEDEV)" $(call NATIVEPATH,$(BIN)/fasmg)
 CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
 CD         = cd
@@ -120,8 +120,6 @@ LINK_ASMSOURCES := $(ASMSOURCES)
 LINK_FILES += $(LINK_CSOURCES)
 LINK_FILES += $(LINK_CPPSOURCES)
 LINK_FILES += $(LINK_ASMSOURCES)
-LINK_FILES += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/shared/*.src))
-LINK_FILES += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/fileio/*.src))
 LINK_LIBS  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.lib))
 LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload.lib))
 
@@ -148,9 +146,9 @@ endif
 
 # choose static or linked flash functions
 ifeq ($(USE_FLASH_FUNCTIONS),YES)
-LINK_FILES += $(wildcard $(CEDEV)/lib/linked/*.src)
+STATIC := 0
 else
-LINK_FILES += $(wildcard $(CEDEV)/lib/static/*.src)
+STATIC := 1
 endif
 
 # define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
@@ -181,10 +179,12 @@ LDFLAGS ?= \
 	-i 'symbol __heapbot = bss.top' \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
+	-i 'STATIC=$$$(STATIC)' \
 	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
 	-i 'srcs $(LINK_ICON)"$(F_LAUNCHER)" if libs.length, "$(F_CLEANUP)" if $(U_CLEANUP)' \
 	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
-	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
+	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text' \
+	.linker_script
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)

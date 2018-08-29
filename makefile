@@ -8,6 +8,7 @@ RELEASE_NAME := CEdev
 empty :=
 space := $(empty) $(empty)
 comma := $(empty),$(empty)
+tab   := $(empty)	$(empty)
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
@@ -22,6 +23,7 @@ CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CPDIR      = xcopy /y /s /e
 CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
+APPEND     = echo$(if $(1), $(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$(1))))))),.) >>$@
 ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
              cd ..\.. && move /y tools\installer\CEdev.exe release\\
 else
@@ -34,6 +36,7 @@ INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = cp
 CPDIR      = cp -r
 CP_EXMPLS  = $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
+APPEND     = echo '$(subst ','\'',$(1))' >>$@
 ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
              cd $(CURDIR) && $(call MKDIR,release) && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
 CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
@@ -95,6 +98,7 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
 	$(MAKE) -C $(CONVTILDIR) clean
+	$(RM) linker_script
 	$(call RMDIR,release)
 	$(call RMDIR,doxygen)
 
@@ -258,13 +262,15 @@ doxygen:
 # linker script rule
 #----------------------------
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
-	@echo "if STATIC" >linker_script && \
-	echo "	srcs $(call FASMG_FILES,$(notdir $(STATIC_FILES)))" >>linker_script && \
-	echo "else" >>linker_script && \
-	echo "	srcs $(call FASMG_FILES,$(notdir $(LINKED_FILES)))" >>linker_script && \
-	echo "end if" >>linker_script && \
-	echo "srcs $(call FASMG_FILES,$(notdir $(SHARED_FILES)))" >>linker_script && \
-	echo "srcs $(call FASMG_FILES,$(notdir $(FILEIO_FILES)))" >>linker_script
+	$(RM) $@ && \
+	$(call APPEND,if STATIC) && \
+	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix lib/static/,$(notdir $(STATIC_FILES))))) && \
+	$(call APPEND,else) && \
+	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix lib/linked/,$(notdir $(LINKED_FILES))))) && \
+	$(call APPEND,end if) && \
+	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix lib/shared/,$(notdir $(SHARED_FILES))))) && \
+	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix lib/fileio/,$(notdir $(FILEIO_FILES))))) && \
+	$(CP) $(call NATIVEPATH,$@) $(call NATIVEPATH,$(INSTALLINC)/.linker_script)
 
 #----------------------------
 # makefile help rule
