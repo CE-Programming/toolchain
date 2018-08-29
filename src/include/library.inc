@@ -10,7 +10,9 @@ macro library? name*, version*, magic: <192,193>
 	end virtual
 	virtual as 'lib'
 		lib.exports.file::
-		db 'library', 9, `name, ', ', `version, 10
+		repeat 1, string: version
+			db 'library', 9, '"', name, '", ', `string, 10
+		end repeat
 	end virtual
 	virtual
 		lib.relocations.area::
