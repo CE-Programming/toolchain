@@ -71,6 +71,7 @@ CP         = cp
 RMDIR      = rm -rf $(1)
 MKDIR      = mkdir -p $(1)
 endif
+FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(1))))))
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -174,10 +175,9 @@ LDFLAGS ?= \
 	-i 'symbol __heapbot = bss.top' \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
-	-i 'libs $(LINK_LIBS)' \
-	-i 'libs $(LINK_LIBLOAD) if libs.length' \
-	-i 'srcs '$(F_LAUNCHER)' if libs.length, '$(F_ICON)' if $(U_ICON), '$(F_CLEANUP)' if $(U_CLEANUP)' \
-	-i 'srcs '$(F_STARTUP)' if 1, $(call NATIVEPATH,$(LINK_FILES))' \
+	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
+	-i 'srcs "$(F_LAUNCHER)" if libs.length, "$(F_ICON)" if $(U_ICON), "$(F_CLEANUP)" if $(U_CLEANUP)' \
+	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
 	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text' \
 
 # this rule is trigged to build everything
