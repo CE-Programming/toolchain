@@ -110,12 +110,13 @@ LINK_CPPSOURCES := $(filter %.src,$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.src,$(s
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
-LINK_FILES    += $(LINK_CSOURCES)
-LINK_FILES    += $(LINK_CPPSOURCES)
-LINK_FILES    += $(LINK_ASMSOURCES)
-LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/shared/*.src))
-LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/fileio/*.src))
-LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.lib))
+LINK_FILES += $(LINK_CSOURCES)
+LINK_FILES += $(LINK_CPPSOURCES)
+LINK_FILES += $(LINK_ASMSOURCES)
+LINK_FILES += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/shared/*.src))
+LINK_FILES += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/fileio/*.src))
+LINK_LIBS  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.lib))
+LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload.lib))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
@@ -173,11 +174,11 @@ LDFLAGS ?= \
 	-i 'symbol __heapbot = bss.top' \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
-	-i 'libs $(LINK_LIBLOAD)' \
+	-i 'libs $(LINK_LIBS)' \
+	-i 'libs $(LINK_LIBLOAD) if libs.length' \
+	-i 'srcs '$(F_LAUNCHER)' if libs.length, '$(F_ICON)' if $(U_ICON), '$(F_CLEANUP)' if $(U_CLEANUP)' \
+	-i 'srcs '$(F_STARTUP)' if 1, $(call NATIVEPATH,$(LINK_FILES))' \
 	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text' \
-	-i 'sources '$(F_LAUNCHER)' if libs.length, '$(F_ICON)' if $(U_ICON), '$(F_CLEANUP)' if $(U_CLEANUP)' \
-	-i 'sources '$(F_STARTUP)'' \
-	-i 'deps $(call NATIVEPATH,$(LINK_FILES))'
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
