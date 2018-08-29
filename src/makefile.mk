@@ -35,6 +35,14 @@ ICONPNG ?= $(ICON)
 DEBUGMODE = NDEBUG
 CCDEBUGFLAG = -nodebug
 
+# verbosity
+V ?= 0
+ifeq ($(V),0)
+Q = @
+else
+Q =
+endif
+
 # get the os specific items
 ifeq ($(OS),Windows_NT)
 SHELL     := cmd.exe
@@ -71,6 +79,7 @@ CP         = cp
 RMDIR      = rm -rf $(1)
 MKDIR      = mkdir -p $(1)
 endif
+FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(1))))))
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -88,11 +97,9 @@ ICON_ASM      := iconc.src
 F_STARTUP     := $(call NATIVEPATH,$(CEDEV)/lib/cstartup.src)
 F_LAUNCHER    := $(call NATIVEPATH,$(CEDEV)/lib/libheader.src)
 F_CLEANUP     := $(call NATIVEPATH,$(CEDEV)/lib/ccleanup.src)
-F_ICON        := $(OBJDIR)/$(ICON_ASM)
 
 # set use cases
 U_CLEANUP = 0
-U_ICON    = 0
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
@@ -110,18 +117,19 @@ LINK_CPPSOURCES := $(filter %.src,$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.src,$(s
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
-LINK_FILES    += $(LINK_CSOURCES)
-LINK_FILES    += $(LINK_CPPSOURCES)
-LINK_FILES    += $(LINK_ASMSOURCES)
-LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/shared/*.src))
-LINK_FILES    += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/fileio/*.src))
-LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.lib))
+LINK_FILES += $(LINK_CSOURCES)
+LINK_FILES += $(LINK_CPPSOURCES)
+LINK_FILES += $(LINK_ASMSOURCES)
+LINK_FILES += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/shared/*.src))
+LINK_FILES += $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/fileio/*.src))
+LINK_LIBS  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.lib))
+LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload.lib))
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
-LINK_ICON  := $(F_ICON)
-ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(LINK_ICON))$(comma)$(DESCRIPTION)
-U_ICON     = 1
+F_ICON     := $(OBJDIR)/$(ICON_ASM)
+ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(F_ICON))$(comma)$(DESCRIPTION)
+LINK_ICON   = "$(F_ICON)" if 1,$(space)
 endif
 
 # determine if output should be archived or compressed
@@ -173,11 +181,10 @@ LDFLAGS ?= \
 	-i 'symbol __heapbot = bss.top' \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
-	-i 'libs $(LINK_LIBLOAD)' \
-	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text' \
-	-i 'sources '$(F_LAUNCHER)' if libs.length, '$(F_ICON)' if $(U_ICON), '$(F_CLEANUP)' if $(U_CLEANUP)' \
-	-i 'sources '$(F_STARTUP)'' \
-	-i 'deps $(call NATIVEPATH,$(LINK_FILES))'
+	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
+	-i 'srcs $(LINK_ICON)"$(F_LAUNCHER)" if libs.length, "$(F_CLEANUP)" if $(U_CLEANUP)' \
+	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
+	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
@@ -194,25 +201,25 @@ dirs:
 	$(call MKDIR,$(OBJDIR))
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
-	@$(CD) $(BINDIR) && \
+	$(Q)$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
-$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(LINK_ICON)
-	@$(LD) $(LDFLAGS) $@
+$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(F_ICON)
+	$(Q)$(LD) $(LDFLAGS) $@
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
-	@$(ICON_CONV)
+	$(Q)$(ICON_CONV)
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: */%.c $(USERHEADERS)
-	@$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
+	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: **/*/%.c $(USERHEADERS)
-	@$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
+	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
@@ -222,7 +229,7 @@ clean:
 	echo Cleaned build files.
 
 gfx:
-	@$(CD) $(GFXDIR) && convpng
+	$(Q)$(CD) $(GFXDIR) && convpng
 
 version:
 	@echo C SDK Version $(VERSION)

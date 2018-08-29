@@ -2,7 +2,7 @@ include 'ez80.inc'
 include 'ti84pceg.inc'
 include 'tiformat.inc'
 
-macro library? name*, version*
+macro library? name*, version*, magic: <192,193>
 	local lib
 	element lib.base
 	virtual
@@ -10,7 +10,9 @@ macro library? name*, version*
 	end virtual
 	virtual as 'lib'
 		lib.exports.file::
-		db 'library', 9, `name, ', ', `version, 10
+		repeat 1, string: version
+			db 'library', 9, '"', name, '", ', `string, 10
+		end repeat
 	end virtual
 	virtual
 		lib.relocations.area::
@@ -18,11 +20,18 @@ macro library? name*, version*
 
 	format ti archived appvar name
 	org 0
-	db 192,193,version
+	db magic,version
 	dw lib.exports
 	lib.dependencies:
 	lib.base_offset := $%
-	org lib.base
+
+	macro disable_relocations?
+		org $% - lib.base_offset + lib.dependencies
+	end macro
+	macro enable_relocations?
+		org $% - lib.base_offset + lib.base
+	end macro
+	enable_relocations?
 
 	iterate each, export, export_pointer
 		macro each? function*

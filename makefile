@@ -61,7 +61,7 @@ BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
 GRAPHXDIR  := $(call NATIVEPATH,$(SRCDIR)/graphx)
 KEYPADCDIR := $(call NATIVEPATH,$(SRCDIR)/keypadc)
 FILEIOCDIR := $(call NATIVEPATH,$(SRCDIR)/fileioc)
-TEMPLATEDIR:= $(call NATIVEPATH,$(SRCDIR)/lib-template)
+LIBLOADDIR := $(call NATIVEPATH,$(SRCDIR)/libload)
 
 CEDEVDIR   := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME))
 INSTALLBIN := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/bin)
@@ -158,9 +158,9 @@ clean-keypadc:
 # libload rules
 #----------------------------
 libload: $(FASMG)
-	cd $(call NATIVEPATH,src/libload) && $(FASMG) libload.asm LibLoad.8xv
+	$(MAKE) -C $(LIBLOADDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-libload:
-	$(RM) $(call NATIVEPATH,src/libload/LibLoad.8xv)
+	$(MAKE) -C $(LIBLOADDIR) clean
 #----------------------------
 
 #----------------------------
@@ -195,6 +195,7 @@ install: $(DIRS) chmod all
 	$(MAKE) -C $(GRAPHXDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(KEYPADCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(LIBLOADDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compatibility) $(call NATIVEPATH,$(INSTALLINC))
@@ -230,7 +231,7 @@ release-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/graphx/graphx.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
 	$(CP) $(call NATIVEPATH,src/fileioc/fileioc.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
 	$(CP) $(call NATIVEPATH,src/keypadc/keypadc.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
-	$(CP) $(call NATIVEPATH,src/libload/LibLoad.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
+	$(CP) $(call NATIVEPATH,src/libload/libload.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
 clibraries:
 	$(call MKDIR,clibraries)
 #----------------------------
