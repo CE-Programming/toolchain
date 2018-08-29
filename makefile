@@ -231,7 +231,7 @@ release-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/graphx/graphx.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
 	$(CP) $(call NATIVEPATH,src/fileioc/fileioc.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
 	$(CP) $(call NATIVEPATH,src/keypadc/keypadc.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
-	$(CP) $(call NATIVEPATH,src/libload/LibLoad.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
+	$(CP) $(call NATIVEPATH,src/libload/libload.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
 clibraries:
 	$(call MKDIR,clibraries)
 #----------------------------
