@@ -35,6 +35,14 @@ ICONPNG ?= $(ICON)
 DEBUGMODE = NDEBUG
 CCDEBUGFLAG = -nodebug
 
+# verbosity
+V ?= 0
+ifeq ($(V),0)
+Q = @
+else
+Q =
+endif
+
 # get the os specific items
 ifeq ($(OS),Windows_NT)
 SHELL     := cmd.exe
@@ -178,7 +186,7 @@ LDFLAGS ?= \
 	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
 	-i 'srcs "$(F_LAUNCHER)" if libs.length, "$(F_ICON)" if $(U_ICON), "$(F_CLEANUP)" if $(U_CLEANUP)' \
 	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
-	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text' \
+	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
@@ -195,25 +203,25 @@ dirs:
 	$(call MKDIR,$(OBJDIR))
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
-	@$(CD) $(BINDIR) && \
+	$(Q)$(CD) $(BINDIR) && \
 	$(CV) $(CVFLAGS) $(notdir $<)
 
 $(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(LINK_ICON)
-	@$(LD) $(LDFLAGS) $@
+	$(Q)$(LD) $(LDFLAGS) $@
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
-	@$(ICON_CONV)
+	$(Q)$(ICON_CONV)
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: */%.c $(USERHEADERS)
-	@$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
+	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: **/*/%.c $(USERHEADERS)
-	@$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
+	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
 	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
 
@@ -223,7 +231,7 @@ clean:
 	echo Cleaned build files.
 
 gfx:
-	@$(CD) $(GFXDIR) && convpng
+	$(Q)$(CD) $(GFXDIR) && convpng
 
 version:
 	@echo C SDK Version $(VERSION)
