@@ -1,11 +1,41 @@
 /**
  * @file
+ * @brief Contains optimized graphics operations and routines
+ *
+ * Example program template with best graphx buffer usage pattern:
+ * @code
+ * // Standard #includes omitted
+ *
+ * bool partial_redraw;
+ *
+ * // Implement us!
+ * void begin();
+ * void end();
+ * bool step();
+ * void draw();
+ *
+ * void main() {
+ *     begin(); // No rendering allowed!
+ *     gfx_Begin();
+ *     gfx_SetDrawBuffer(); // Draw to the buffer to avoid rendering artifats
+ *
+ *     while (step()) { // No rendering allowed in step!
+ *         if (partial_redraw) // Only want to redraw part of the previous frame?
+ *             gfx_BlitScreen(); // Copy previous frame as a base for this frame
+ *         draw(); // As little non-rendering logic as possible
+ *         gfx_SwapDraw(); // Queue the buffered frame to be displayed
+ *     }
+ *
+ *     gfx_End();
+ *     end();
+ * }
+ * @endcode
+ *
  * @authors Matt "MateoConLechuga" Waltz
  * @authors Jacob "jacobly" Young
  * @authors Zachary "Runer112" Wassall
  * @authors Patrick "tr1p1ea" Prendergast
  * @authors "grosged"
- * @brief Contains optimized graphics operations and routines
  */
 
 #ifndef H_GRAPHX
@@ -726,8 +756,8 @@ void gfx_SetDraw(uint8_t location);
  * @brief Different locations routines can be drawn to
  */
 typedef enum {
-    gfx_screen = 0, /**< Draw to screen */
-    gfx_buffer      /**< Draw to buffer */
+    gfx_screen = 0, /**< Screen */
+    gfx_buffer      /**< Buffer */
 } gfx_draw_location_t;
 
 /**
@@ -757,16 +787,16 @@ uint8_t gfx_GetDraw(void);
  * the next invocation of a graphx drawing function will block, waiting for this
  * event. To block and wait explicitly, use gfx_Wait().
  *
+ * The LCD driver maintains its own screen buffer pointer for the duration of a
+ * refresh. The swap performed by this function will only be picked up at a
+ * point between refreshes.
+ *
  * @remarks
  * In practice, this function should be invoked immediately after finishing
  * drawing a frame to the drawing buffer, and invocation of the first graphx
  * drawing function for the next frame should be scheduled as late as possible
  * relative to non-drawing logic. Non-drawing logic can execute during time when
  * a drawing function may otherwise block.
- *
- * The LCD driver maintains its own screen buffer pointer for the duration of a
- * refresh. The swap performed by this function will only be picked up at a
- * point between refreshes.
  */
 void gfx_SwapDraw(void);
 
@@ -784,34 +814,34 @@ void gfx_Wait(void);
  * Copies the input buffer to the opposite buffer
  *
  * No clipping is performed; as it is a copy not a draw
- * @param location gfx_screen - copies screen to buffer
- * @param location gfx_buffer - copies buffer to screen
+ * @param src drawing location to copy from
+ * @see gfx_draw_location_t
  */
-void gfx_Blit(uint8_t location);
+void gfx_Blit(uint8_t src);
 
 /**
  * Copies lines from the input buffer to the opposite buffer
  *
  * No clipping is performed; as it is a copy not a draw
- * @param location gfx_screen - copies screen to buffer
- * @param location gfx_buffer - copies buffer to screen
+ * @param src drawing location to copy from
  * @param y_loc Y Location to begin copying at
  * @param num_lines Number of lines to copy
+ * @see gfx_draw_location_t
  */
-void gfx_BlitLines(uint8_t location, uint8_t y_loc, uint8_t num_lines);
+void gfx_BlitLines(uint8_t src, uint8_t y_loc, uint8_t num_lines);
 
 /**
  * Copies a rectangle from the input buffer to the opposite buffer
  *
  * No clipping is performed; as it is a copy not a draw
- * @param location gfx_screen - copies screen to buffer
- * @param location gfx_buffer - copies buffer to screen
+ * @param src drawing location to copy from
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
  * @param height Height of rectangle
+ * @see gfx_draw_location_t
  */
-void gfx_BlitRectangle(uint8_t location, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
+void gfx_BlitRectangle(uint8_t src, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
 
 /**
  * Copies the screen to the buffer

@@ -15,10 +15,10 @@ PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
-CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && xcopy /y /s /e $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 CPDIR      = xcopy /y /s /e
-ARCH       = makensis.exe /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) $(call NATIVEPATH,$(CURDIR)\tools\installer\installer.nsi) && \
-             $(call MKDIR,release) && move /y tools\installer\CEdev.exe release\\
+CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
+ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
+             cd ..\.. && move /y tools\installer\CEdev.exe release\\
 else
 NATIVEPATH = $(subst \,/,$(1))
 RM         = rm -f
@@ -77,7 +77,7 @@ DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
 all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
-	@echo "Toolchain built."
+	@echo Toolchain built.
 
 clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
@@ -182,7 +182,7 @@ uninstall:
 #----------------------------
 # install rule
 #----------------------------
-install: $(DIRS) chmod
+install: $(DIRS) chmod all
 	$(CP_EXMPLS)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/startup/*.src) $(call NATIVEPATH,$(INSTALLLIB))
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/makefile.mk) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
@@ -271,3 +271,4 @@ help:
 #----------------------------
 
 .PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help release fasmg
+

@@ -24,7 +24,7 @@ void draw_sprite(int x, int y) {
     /* Draw a bunch of different styled sprites on the screen */
     gfx_Sprite(ubuntu, x, y);
 
-    /* Draw to the screen */
+    /* Copy the buffer to the screen */
     gfx_BlitBuffer(); // This is the same as gfx_Blit(gfx_buffer)
 }
 

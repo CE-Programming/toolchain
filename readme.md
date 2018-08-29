@@ -10,7 +10,8 @@ Included you will find examples using the ['Standard' CE C Libraries](https://gi
 
 ## Help
 
-You can join us on the EFNet IRC server, on the `#ez80-dev` channel, if you have any questions ([webchat link](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login)). If you don't get a response in a reasonable amount of time, feel free to ask it [here](https://github.com/CE-Programming/toolchain/issues) and we will get back to you as soon as possible.
+You can join us on the EFNet IRC server, on the `#ez80-dev` channel, if you have any questions ([webchat link](http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login)).  
+If you don't get a response in a reasonable amount of time, feel free to ask it [here](https://github.com/CE-Programming/toolchain/issues) and we will get back to you as soon as possible.
 
 ## Contributing
 

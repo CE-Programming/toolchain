@@ -1332,11 +1332,15 @@ ti_RclVar:
 	add	iy, sp
 	ld	hl, (iy + 6)		; pointer to data
 	ld	a, (iy + 3)		; var type
+	ld	iy, flags
 	call	util_set_var_str
 	call	_FindSym
-	jp	c,util_ret_neg_one_byte
+	jp	c, util_ret_neg_one_byte
+	push	af
 	call	_ChkInRAM
-	jp	nz,util_ret_neg_one_byte
+	pop	bc
+	ld	a, b
+	jp	nz, util_ret_neg_one_byte
 	ld	iy, 0
 	add	iy, sp
 	and	a, $3f

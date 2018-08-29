@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'GRAPHX', 9
+library 'GRAPHX', 10
 
 ;-------------------------------------------------------------------------------
 ; no dependencies
@@ -1777,15 +1777,16 @@ smcByte _Color
 gfx_Blit:
 ; Copies the buffer image to the screen and vice versa
 ; Arguments:
-;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
 ; Returns:
 ;  None
 	pop	iy			; iy = return vector
 	ex	(sp),hl
-	ld	a,l			; a = buffer to blit to
-	call	_CheckBlit		; determine which buffer to blit
+	ld	a,l			; a = buffer to blit from
+	call	_CheckBlit		; determine blit buffers
 	ld	bc,LcdSize
 _Blit_Ldir:
+	call	gfx_Wait
 	ldir				; just do it
 	jp	(iy)
 
@@ -1793,14 +1794,14 @@ _Blit_Ldir:
 gfx_BlitLines:
 ; Copies the buffer image to the screen and vice versa line wise
 ; Arguments:
-;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
 ;  arg1 : Y coordinate
 ;  arg2 : Number of lines to copy
 ; Returns:
 ;  None
 	pop	iy			; iy = return vector
 	pop	bc
-	ld	a,c			; a = buffer to blit to
+	ld	a,c			; a = buffer to blit from
 	pop	de			; e = number of lines to copy
 	ex	(sp),hl			; l = y coordinate
 	push	de
@@ -1814,7 +1815,7 @@ gfx_BlitLines:
 	mlt	hl
 	add	hl,hl			; hl -> offset to start at
 	push	hl
-	call	_CheckBlit		; determine which buffer to blit
+	call	_CheckBlit		; determine blit buffers
 	pop	bc
 	add	hl,bc
 	ex	de,hl
@@ -1827,7 +1828,7 @@ gfx_BlitLines:
 gfx_BlitRectangle:
 ; Copies the buffer image to the screen and vice versa rectangularly
 ; Arguments:
-;  arg0 : Buffer to copy to (screen = 0, buffer = 1)
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
 ;  arg1 : X coordinate
 ;  arg2 : Y coordinate
 ;  arg3 : Width
@@ -1843,8 +1844,8 @@ gfx_BlitRectangle:
 	add	hl,hl
 	add	hl,de			; hl = amount to increment
 	push	hl			; save amount to increment
-	ld	a,(iy+3)
-	call	_CheckBlit		; determine which buffer to blit
+	ld	a,(iy+3)		; a = buffer to blit from
+	call	_CheckBlit		; determine blit buffers
 	pop	bc
 	add	hl,bc
 	ex	de,hl
@@ -1861,6 +1862,7 @@ gfx_BlitRectangle:
 	ld	a,(iy+15)
 	ld	iy,0
 	add	iy,de
+	call	gfx_Wait
 .loop:
 	ld	bc,0			; smc for speedz
 .width := $-3
@@ -2951,26 +2953,6 @@ gfx_SetFontHeight:
 	setSmcBytes _TextHeight
 
 ;-------------------------------------------------------------------------------
-_PrintStringXY_Clip:
-; Places a string at the given coordinates
-; Arguments:
-;  arg0 : Pointer to string
-;  arg1 : Text X Pos
-;  arg2 : Text Y Pos
-; Returns:
-;  None
-	ld	iy,3
-	lea	bc,iy
-	add	iy,sp
-	lea	hl,iy+3
-	ld	de,_TextXPos
-	ldir				; copy in the y location
-	ld	hl,(hl)
-	ld	(_TextYPos),hl		; set new y pos
-	ld	hl,(iy)
-	jr	_DrawCharacters		; jump to the main string handler
-
-;-------------------------------------------------------------------------------
 gfx_PrintStringXY:
 ; Places a string at the given coordinates
 ; Arguments:
@@ -2979,21 +2961,12 @@ gfx_PrintStringXY:
 ;  arg2 : Text Y Pos
 ; Returns:
 ;  None
-	jp	_PrintStringXY
-__PrintStringXY = $-3
-_PrintStringXY:
-	ld	hl,9
-	add	hl,sp
-	ld	a,(hl)
-	ld	(_TextYPos),a
-	dec	hl
-	dec	hl
-	ld	de,_TextXPos + 1
-	ldd
-	ldd
-	dec	hl
-	dec	hl
-	ld	hl,(hl)
+	pop	iy			; iy = return vector
+	pop	bc			; bc = str
+	call	gfx_SetTextXY
+	push	bc
+	ex	(sp),hl			; hl = str
+	push	iy
 ;	jr	_DrawCharacters		; emulated by dummifying next instructions:
 	db	$01			; pop de \ ex (sp),hl \ push de -> ld bc,*
 
@@ -3064,35 +3037,18 @@ gfx_SetTextConfig:
 ;  arg0 : Configuration numbers
 ; Returns:
 ;  None
-	pop	hl
 	pop	de
+	ex	(sp),hl			; hl = config
 	push	de
-	push	hl
-	ld	a,e			; a = argument
-	dec	a			; 1 = TEXT_CLIP
-	jr	z,.setcliptext
-	dec	a			; 2 = TEXT_NOCLIP
-	ret	nz
-	ld	de,_PrintChar
-	ld	bc,_PrintStringXY
-	jr	.setunclippedtext	; set unclipped character routine
-.setcliptext:
-	ld	de,_PrintChar_Clip
-	ld	bc,_PrintStringXY_Clip
-.setunclippedtext:
-	ld	hl,PrintChar_0
-	ld	(hl),de			; holy crap what a hack
-	ld	hl,PrintChar_1
-	ld	(hl),de
-	ld	hl,PrintChar_2
-	ld	(hl),de			; modify all the interal routines to use the clipped text routine
-	push	bc
-	pop	hl
-	ld	(__PrintStringXY),hl	; change which text routines we want to use
-	xor	a,a
-	sbc	hl,hl
-	ld	(_TextYPos),hl
-	ld	(_TextXPos),hl		; reset the current posistions
+	dec	l			; l = config - 1
+	ld	hl,_PrintChar_Clip
+	jr	z,.writesmc		; z ==> config == gfx_text_clip
+; config == gfx_text_noclip
+	ld	hl,_PrintChar
+.writesmc:				; hl = PrintChar routine
+	ld	(PrintChar_0),hl
+	ld	(PrintChar_1),hl
+	ld	(PrintChar_2),hl
 	ret
 
 ;-------------------------------------------------------------------------------

@@ -495,15 +495,29 @@ void os_ThrowError(uint8_t error);
 void *os_GetSystemStats(void);
 
 /**
- * Sets up the defualt error handlers if an OS routine encounters an error when running
+ * This function can return twice (like setjmp).
+ * First return always happens with a return value of 0.
+ * Second return only happens if an error occurs before os_PopErrorHandler is called,
+ * with the errNo as the return value.
+ *
+ * @code
+ * int errno = os_PushErrorHandler();
+ * if (errno) {
+ *     // handle error, but no longer under the protection of the error handler so do not call os_PopErrorHandler()
+ * } else {
+ *     // run some code that may error
+ *     os_PopErrorHandler();
+ * }
+ * @endcode
  *
  * @param routine Error handling routine
  * @see os_PopErrorHandler
  */
-void os_PushErrorHandler(void *routine);
+int os_PushErrorHandler(void);
 
 /**
- * Restores state after a call to os_PushErrorHandler
+ * Restores stack state after a call to os_PushErrorHandler.  Must be called with stack in the same state
+ * as it was when os_PushErrorHandler returned with 0, and should not be called along the error path.
  *
  * @see os_PushErrorHandler
  */
@@ -1143,88 +1157,7 @@ typedef enum {
 #define tY                  0x59
 #define tZ                  0x5A
 #define tTheta              0x5B
-
-/*
- * Extended Tokens
- */
-#define tExtTok             0xEF
-#define tSetDate            0x00
-#define tSetTime            0x01
-#define tCheckTmr           0x02
-#define tSetDtFmt           0x03
-#define tSetTmFmt           0x04
-#define tTimeCnv            0x05
-#define tDayOfWk            0x06
-#define tGetDtStr           0x07
-#define tGetTmStr           0x08
-#define tGetDate            0x09
-#define tGetTime            0x0A
-#define tStartTmr           0x0B
-#define tGtDtFmt            0x0C
-#define tGetTmFmt           0x0D
-#define tIsClockOn          0x0E
-#define tClockOff           0x0F
-#define tClockOn            0x10
-#define tOpenLib            0x11
-#define tExecLib            0x12
-#define tInvT               0x13
-#define tChiSquaredTest     0x14
-#define tLinRegTInt         0x15
-#define tManualFit          0x16
-#define tZQuadrant          0x17
-#define tZFracHalf          0x18
-#define tZFracThird         0x19
-#define tZFracFourth        0x1A
-#define tZFracFifth         0x1B
-#define tZFracEighth        0x1C
-#define tZFracTenth         0x1D
-#define tFracSlash          0x2E
-#define tFracMixedNum       0x2F
-#define tSwapImProper       0x30
-#define tSwapFracDec        0x31
-#define tRemainder          0x32
-#define tSummationSigma     0x33
-#define tLogBase            0x34
-#define tRandIntNoRep       0x35
-#define tMathPrint          0x36
-#define tClassic            0x38
-#define tAutoAnswer         0x3B
-#define tDecAnswer          0x3C
-#define tFracAnswer         0x3D
-#define tBlue               0x41
-#define tRed                0x42
-#define tBlack              0x43
-#define tMagenta            0x44
-#define tGreen              0x45
-#define tOrange             0x46
-#define tBrown              0x47
-#define tNavy               0x48
-#define tLtBlue             0x49
-#define tYellow             0x4A
-#define tWhite              0x4B
-#define tLtGray             0x4C
-#define tMedGray            0x4D
-#define tGray               0x4E
-#define tDarkGray           0x4F
-#define tGraphColor         0x65
-#define tTextColor          0x67
-#define tBackgroundOn       0x5B
-#define tBackgroundOff      0x64
-#define tThin               0x74
-#define tBorderColor        0x6C
-#define tAsm84CPrgm         0x68
-#define tAsm84CCmp          0x69
-#define tAsm84CeCmp         0x7B
-#define tAsm84CePrgm        0x7A
-
-#define tVarMat             0x5C
-#define tVarLst             0x5D
-#define tVarEqu             0x5E
 #define tProg               0x5F
-#define tVarPict            0x60
-#define tVarGDB             0x61
-#define tVarOut             0x62
-#define tVarSys             0x63
 
 /*
  * Mode settings tokens
@@ -1304,7 +1237,6 @@ typedef enum {
 #define tTanLn              0xA7 // 'TanLn'
 #define tDrInv              0xA8 // 'DrInv_'
 #define tDrawF              0xA9 // 'DrawF_'
-#define tVarStrng           0xAA
 
 // Functions with no argument
 #define tRand               0xAB // 'rand'
@@ -1399,6 +1331,7 @@ typedef enum {
 #define tScatter            0xFE // 'Scatter_'
 #define tLR1                0xFF // 'LINR(AX+B)'
 
+#define tGFormat            0x7E
 // 2nd Half Of Graph Format Tokens
 #define tSeq                0x00 // 'SeqG'
 #define tSimulG             0x01 // 'SimulG'
@@ -1420,6 +1353,7 @@ typedef enum {
 #define tvw                 0x11 // V vs W
 #define tuw                 0x12 // U vs W
 
+#define tVarMat             0x5C
 // 2nd Half Of User Matrix Tokens
 #define tMatA               0x00 // MAT A
 #define tMatB               0x01 // MAT B
@@ -1432,6 +1366,7 @@ typedef enum {
 #define tMatI               0x08 // MAT I
 #define tMatJ               0x09 // MAT J
 
+#define tVarLst             0x5D
 // 2nd Half Of User List Tokens
 #define tL1                 0x00 // LIST 1
 #define tL2                 0x01 // LIST 2
@@ -1440,7 +1375,9 @@ typedef enum {
 #define tL5                 0x04 // LIST 5
 #define tL6                 0x05 // LIST 6
 
+#define tVarEqu             0x5E
 // 2nd Half Of User Equation Tokens
+
 // Y Equations have bit 4 set
 #define tY1                 0x10 // Y1
 #define tY2                 0x11 // Y2
@@ -1480,6 +1417,7 @@ typedef enum {
 #define tvn                 0x81 // Vn
 #define twn                 0x82 // Wn
 
+#define tVarPict            0x60
 // 2nd Half User Picture Tokens
 #define tPic1               0x00 // PIC1
 #define tPic2               0x01 // PIC2
@@ -1492,6 +1430,7 @@ typedef enum {
 #define tPic9               0x08 // PIC9
 #define tPic0               0x09 // PIC0
 
+#define tVarGDB             0x61
 // 2nd Half User Graph Database Tokens
 #define tGDB1               0x00 // GDB1
 #define tGDB2               0x01 // GDB2
@@ -1504,6 +1443,7 @@ typedef enum {
 #define tGDB9               0x08 // GDB9
 #define tGDB0               0x09 // GDB0
 
+#define tVarStrng           0xAA
 // 2nd Half Of String Vars
 #define tStr1               0x00
 #define tStr2               0x01
@@ -1516,6 +1456,7 @@ typedef enum {
 #define tStr9               0x08
 #define tStr0               0x09
 
+#define tVarOut             0x62
 // 2nd Half Of System Output Only Variables
 #define tRegEq              0x01 // REGRESSION EQUATION
 #define tStatN              0x02 // STATISTICS N
@@ -1581,6 +1522,7 @@ typedef enum {
 #define tE_SS               0x3B
 #define tE_MS               0x3C
 
+#define tVarSys             0x63
 // 2nd Half Of System Input/Output Variables
 #define tuXscl              0x00
 #define tuYscl              0x01
@@ -1842,6 +1784,77 @@ typedef enum {
 #define tLtau               0xCC
 #define tLcapIAcute         0xCD
 #define tGarbageCollect     0xCE
+
+#define tExtTok             0xEF
+// 2nd Byte Of tExtTok Tokens
+#define tSetDate            0x00
+#define tSetTime            0x01
+#define tCheckTmr           0x02
+#define tSetDtFmt           0x03
+#define tSetTmFmt           0x04
+#define tTimeCnv            0x05
+#define tDayOfWk            0x06
+#define tGetDtStr           0x07
+#define tGetTmStr           0x08
+#define tGetDate            0x09
+#define tGetTime            0x0A
+#define tStartTmr           0x0B
+#define tGtDtFmt            0x0C
+#define tGetTmFmt           0x0D
+#define tIsClockOn          0x0E
+#define tClockOff           0x0F
+#define tClockOn            0x10
+#define tOpenLib            0x11
+#define tExecLib            0x12
+#define tInvT               0x13
+#define tChiSquaredTest     0x14
+#define tLinRegTInt         0x15
+#define tManualFit          0x16
+#define tZQuadrant          0x17
+#define tZFracHalf          0x18
+#define tZFracThird         0x19
+#define tZFracFourth        0x1A
+#define tZFracFifth         0x1B
+#define tZFracEighth        0x1C
+#define tZFracTenth         0x1D
+#define tFracSlash          0x2E
+#define tFracMixedNum       0x2F
+#define tSwapImProper       0x30
+#define tSwapFracDec        0x31
+#define tRemainder          0x32
+#define tSummationSigma     0x33
+#define tLogBase            0x34
+#define tRandIntNoRep       0x35
+#define tMathPrint          0x36
+#define tClassic            0x38
+#define tAutoAnswer         0x3B
+#define tDecAnswer          0x3C
+#define tFracAnswer         0x3D
+#define tBlue               0x41
+#define tRed                0x42
+#define tBlack              0x43
+#define tMagenta            0x44
+#define tGreen              0x45
+#define tOrange             0x46
+#define tBrown              0x47
+#define tNavy               0x48
+#define tLtBlue             0x49
+#define tYellow             0x4A
+#define tWhite              0x4B
+#define tLtGray             0x4C
+#define tMedGray            0x4D
+#define tGray               0x4E
+#define tDarkGray           0x4F
+#define tGraphColor         0x65
+#define tTextColor          0x67
+#define tBackgroundOn       0x5B
+#define tBackgroundOff      0x64
+#define tThin               0x74
+#define tBorderColor        0x6C
+#define tAsm84CPrgm         0x68
+#define tAsm84CCmp          0x69
+#define tAsm84CeCmp         0x7B
+#define tAsm84CePrgm        0x7A
 
 /* 2 byte extended tokens (tExtTok) present in OS 5.2 and above */
 #define tSEQn               0x8F /* 'SEQ(n)'     */
