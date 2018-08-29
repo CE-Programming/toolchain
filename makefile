@@ -263,6 +263,11 @@ doxygen:
 #----------------------------
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(RM) $@ && \
+	$(call APPEND,include "include/fasmg-ez80/ld.fasmg") && \
+	$(call APPEND,symbol __low_bss = bss.base) && \
+	$(call APPEND,symbol __len_bss = bss.length) && \
+	$(call APPEND,symbol __heaptop = bss.high) && \
+	$(call APPEND,symbol __heapbot = bss.top) && \
 	$(call APPEND,if STATIC) && \
 	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix lib/static/,$(notdir $(STATIC_FILES))))) && \
 	$(call APPEND,else) && \

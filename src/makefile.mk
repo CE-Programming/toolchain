@@ -169,22 +169,17 @@ CFLAGS ?= \
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
-	$(CEDEV)/include/fasmg-ez80/ld.fasmg \
+	.linker_script \
 	$(LDDEBUGFLAG) \
 	$(LDMAPFLAG) \
 	-i 'range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)' \
-	-i 'symbol __low_bss = bss.base' \
-	-i 'symbol __len_bss = bss.length' \
-	-i 'symbol __heaptop = bss.high' \
-	-i 'symbol __heapbot = bss.top' \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
 	-i 'STATIC=$$$(STATIC)' \
 	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
 	-i 'srcs $(LINK_ICON)"$(F_LAUNCHER)" if libs.length, "$(F_CLEANUP)" if $(U_CLEANUP)' \
 	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
-	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text' \
-	.linker_script
+	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
