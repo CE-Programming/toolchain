@@ -84,10 +84,10 @@ INSTALLLI  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/linked)
 DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
-FILEIO_FILES = $(wildcard ./src/std/fileio/*.src) $(wildcard ./src/std/fileio/build/*.src)
-STATIC_FILES = $(wildcard ./src/std/static/*.src) $(wildcard ./src/std/static/build/*.src)
-SHARED_FILES = $(wildcard ./src/std/shared/*.src) $(wildcard ./src/std/shared/build/*.src)
-LINKED_FILES = $(wildcard ./src/std/linked/*.src) $(wildcard ./src/std/linked/build/*.src)
+STATIC_FILES = $(wildcard src/std/static/*.src src/std/static/build/*.src)
+LINKED_FILES = $(wildcard src/std/linked/*.src src/std/linked/build/*.src)
+SHARED_FILES = $(wildcard src/ce/*.src src/std/shared/*.src src/std/shared/build/*.src)
+FILEIO_FILES = $(wildcard src/std/fileio/*.src src/std/fileio/build/*.src)
 FASMG_FILES  = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(1))))))
 
 all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
@@ -263,18 +263,17 @@ doxygen:
 #----------------------------
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(RM) $@ && \
-	$(call APPEND,include "include/fasmg-ez80/ld.fasmg") && \
 	$(call APPEND,symbol __low_bss = bss.base) && \
 	$(call APPEND,symbol __len_bss = bss.length) && \
 	$(call APPEND,symbol __heaptop = bss.high) && \
 	$(call APPEND,symbol __heapbot = bss.top) && \
 	$(call APPEND,if STATIC) && \
-	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix lib/static/,$(notdir $(STATIC_FILES))))) && \
+	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix ../../lib/static/,$(notdir $(STATIC_FILES))))) && \
 	$(call APPEND,else) && \
-	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix lib/linked/,$(notdir $(LINKED_FILES))))) && \
+	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix ../../lib/linked/,$(notdir $(LINKED_FILES))))) && \
 	$(call APPEND,end if) && \
-	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix lib/shared/,$(notdir $(SHARED_FILES))))) && \
-	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix lib/fileio/,$(notdir $(FILEIO_FILES))))) && \
+	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix ../../lib/shared/,$(notdir $(SHARED_FILES))))) && \
+	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix ../../lib/fileio/,$(notdir $(FILEIO_FILES))))) && \
 	$(CP) $(call NATIVEPATH,$@) $(call NATIVEPATH,$(INSTALLINC)/.linker_script)
 
 #----------------------------

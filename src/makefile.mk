@@ -53,7 +53,7 @@ WINRELPATH = $(subst /,\,$(1))
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
-LD         = INCLUDE="$(CEDEV)" $(call NATIVEPATH,$(BIN)/fasmg.exe)
+LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
 PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
@@ -71,7 +71,7 @@ RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 CC         = $(call NATIVEPATH,wine "$(BIN)/ez80cc.exe")
-LD         = INCLUDE="$(CEDEV)" $(call NATIVEPATH,$(BIN)/fasmg)
+LD         = $(call NATIVEPATH,$(BIN)/fasmg)
 CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
 CD         = cd
@@ -169,13 +169,14 @@ CFLAGS ?= \
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
-	.linker_script \
+	$(CEDEV)/include/fasmg-ez80/ld.fasmg \
+	-i 'include "$(CEDEV)/include/.linker_script"' \
 	$(LDDEBUGFLAG) \
 	$(LDMAPFLAG) \
 	-i 'range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)' \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
-	-i 'STATIC=$$$(STATIC)' \
+	-i 'STATIC=$(STATIC)' \
 	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
 	-i 'srcs $(LINK_ICON)"$(F_LAUNCHER)" if libs.length, "$(F_CLEANUP)" if $(U_CLEANUP)' \
 	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
