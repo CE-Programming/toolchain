@@ -4,6 +4,11 @@
 
 RELEASE_NAME := CEdev
 
+# define some common makefile things
+empty :=
+space := $(empty) $(empty)
+comma := $(empty),$(empty)
+
 # common/os specific things
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
@@ -75,6 +80,12 @@ INSTALLST  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/static)
 INSTALLLI  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/linked)
 DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
+
+FILEIO_FILES = $(wildcard ./src/std/fileio/*.src) $(wildcard ./src/std/fileio/build/*.src)
+STATIC_FILES = $(wildcard ./src/std/static/*.src) $(wildcard ./src/std/static/build/*.src)
+SHARED_FILES = $(wildcard ./src/std/shared/*.src) $(wildcard ./src/std/shared/build/*.src)
+LINKED_FILES = $(wildcard ./src/std/linked/*.src) $(wildcard ./src/std/linked/build/*.src)
+FASMG_FILES  = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(1))))))
 
 all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
 	@echo Toolchain built.
@@ -182,7 +193,7 @@ uninstall:
 #----------------------------
 # install rule
 #----------------------------
-install: $(DIRS) chmod all
+install: $(DIRS) chmod all linker_script
 	$(CP_EXMPLS)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/startup/*.src) $(call NATIVEPATH,$(INSTALLLIB))
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/makefile.mk) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
@@ -244,6 +255,18 @@ doxygen:
 #----------------------------
 
 #----------------------------
+# linker script rule
+#----------------------------
+linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
+	@echo "if STATIC" >linker_script && \
+	echo "	srcs $(call FASMG_FILES,$(notdir $(STATIC_FILES)))" >>linker_script && \
+	echo "else" >>linker_script && \
+	echo "	srcs $(call FASMG_FILES,$(notdir $(LINKED_FILES)))" >>linker_script && \
+	echo "end if" >>linker_script && \
+	echo "srcs $(call FASMG_FILES,$(notdir $(SHARED_FILES)))" >>linker_script && \
+	echo "srcs $(call FASMG_FILES,$(notdir $(FILEIO_FILES)))" >>linker_script
+
+#----------------------------
 # makefile help rule
 #----------------------------
 help:
@@ -263,13 +286,13 @@ help:
 	@echo clean-graphx
 	@echo clean-fileioc
 	@echo clean-keypadc
+	@echo doxygen
 	@echo install
 	@echo uninstall
 	@echo release
-	@echo doxygen
 	@echo release-libs
 	@echo help
-#----------------------------
 
+#----------------------------
 .PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help release fasmg
 
