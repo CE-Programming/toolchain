@@ -98,9 +98,6 @@ F_STARTUP     := $(call NATIVEPATH,$(CEDEV)/lib/cstartup.src)
 F_LAUNCHER    := $(call NATIVEPATH,$(CEDEV)/lib/libheader.src)
 F_CLEANUP     := $(call NATIVEPATH,$(CEDEV)/lib/ccleanup.src)
 
-# set use cases
-U_CLEANUP = 0
-
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
 
@@ -127,7 +124,7 @@ LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload.lib))
 ifneq ("$(wildcard $(ICONPNG))","")
 F_ICON     := $(OBJDIR)/$(ICON_ASM)
 ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(F_ICON))$(comma)$(DESCRIPTION)
-LINK_ICON   = "$(F_ICON)" if 1,$(space)
+LINK_ICON   = , "$(F_ICON)" used
 endif
 
 # determine if output should be archived or compressed
@@ -138,7 +135,7 @@ ifeq ($(COMPRESSED),YES)
 CVFLAGS += -x
 endif
 ifeq ($(CLEANUP),YES)
-U_CLEANUP = 1
+LINK_CLEANUP = , "$(F_CLEANUP)" used
 endif
 ifeq ($(OUTPUT_MAP),YES)
 LDMAPFLAG = -i 'map'
@@ -177,9 +174,9 @@ LDFLAGS ?= \
 	-i 'symbol __stack = $$$(STACK_HIGH)' \
 	-i 'locate header at $$$(INIT_LOC)' \
 	-i 'STATIC=$(STATIC)' \
-	-i 'libs $(LINK_LIBLOAD) if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
-	-i 'srcs $(LINK_ICON)"$(F_LAUNCHER)" if libs.length, "$(F_CLEANUP)" if $(U_CLEANUP)' \
-	-i 'srcs "$(F_STARTUP)" if 1, $(call FASMG_FILES,$(LINK_FILES))' \
+	-i 'libs $(LINK_LIBLOAD) used if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
+	-i 'srcs "$(F_LAUNCHER)" used if libs.length$(LINK_ICON)$(LINK_CLEANUP)' \
+	-i 'srcs "$(F_STARTUP)" used, $(call FASMG_FILES,$(LINK_FILES))' \
 	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
 
 # this rule is trigged to build everything
