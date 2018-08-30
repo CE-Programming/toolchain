@@ -82,10 +82,10 @@ INSTALLLI  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/linked)
 DIRS       := $(INSTALLINC) $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
-STATIC_FILES = $(wildcard src/std/static/*.src src/std/static/build/*.src)
-LINKED_FILES = $(wildcard src/std/linked/*.src src/std/linked/build/*.src)
-SHARED_FILES = $(wildcard src/ce/*.src src/std/shared/*.src src/std/shared/build/*.src)
-FILEIO_FILES = $(wildcard src/std/fileio/*.src src/std/fileio/build/*.src)
+STATIC_FILES := $(wildcard src/std/static/*.src) $(patsubst src/std/static/%.c,src/std/static/build/%.src,$(wildcard src/std/static/*.c))
+LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,src/std/linked/build/%.src,$(wildcard src/std/linked/*.c))
+SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
+FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
 all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
 	@echo Toolchain built.

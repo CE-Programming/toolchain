@@ -59,14 +59,16 @@ CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
 PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
 CD         = cd
 CP         = copy /y
+MV         = move /y
 NULL       = >nul 2>&1
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
 MKDIR      = call && (if not exist $1 mkdir $1)
-QUOTE_ARG  = "$(subst ",',$1)" #'
+QUOTE_ARG  = "$(subst ",',$1)"#'
+TO_LOWER   = $1
 else
 MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst \,/,$1)
-WINPATH    = $(subst \,\\,$(shell winepath -w $1))
+WINPATH    = $(shell winepath -w $1)
 WINRELPATH = $(subst /,\,$1)
 RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
@@ -77,11 +79,13 @@ CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
 CD         = cd
 CP         = cp
+MV         = mv
 RMDIR      = rm -rf $1
 MKDIR      = mkdir -p $1
-QUOTE_ARG  = '$(subst ','\'',$1)' #'
+QUOTE_ARG  = '$(subst ','\'',$1)'#'
+TO_LOWER   = $(shell printf %s $(call QUOTE_ARG,$1) | tr [:upper:] [:lower:])
 endif
-FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1))))) #"
+FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -110,8 +114,8 @@ USERHEADERS   := $(call rwildcard,$(SRCDIR),*.h *.hpp)
 ASMSOURCES    := $(call rwildcard,$(SRCDIR),*.asm)
 
 # create links for later
-LINK_CSOURCES := $(filter %.src,$(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.src,$(subst \,/,$(CSOURCES))))
-LINK_CPPSOURCES := $(filter %.src,$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.src,$(subst \,/,$(CSPPOURCES))))
+LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.src)
+LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%=$(OBJDIR)/%.src)
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
@@ -147,17 +151,6 @@ else
 STATIC := 1
 endif
 
-# define the nesassary headers, along with any the user may have defined, where modification should just trigger a build
-HEADERS :=$(strip $(subst $(space),;,$(call WINPATH,$(sort $(dir $(USERHEADERS))))))
-ifeq ($(words $(HEADERS)),0)
-HEADERS :=$(call WINPATH,$(CEDEV)/include);$(call WINPATH,$(CEDEV)/include/compat)
-else
-HEADERS +=$(strip ;$(call WINPATH,$(CEDEV)/include);$(call WINPATH,$(CEDEV)/include/compat))
-endif
-HEADERS :=$(subst \;,;,$(HEADERS))
-HEADERS :=$(subst \;,;,$(HEADERS))
-HEADERS :=$(subst /;,;,$(HEADERS))
-
 # define the C flags used by the Zilog compiler
 CFLAGS ?= \
     -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE)
@@ -172,8 +165,8 @@ LDFLAGS ?= \
 	-i $(call QUOTE_ARG,symbol __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate header at $$$(INIT_LOC)) \
 	-i $(call QUOTE_ARG,STATIC := $(STATIC)) \
-	-i $(call QUOTE_ARG,srcs $(call FASMG_FILES,$(F_LAUNCHER)) used if libs.length$(LINK_ICON)$(LINK_CLEANUP), $(call FASMG_FILES,$(F_STARTUP)) used, $(call FASMG_FILES,$(LINK_FILES))) \
-	-i $(call QUOTE_ARG,libs $(call FASMG_FILES,$(LINK_LIBLOAD)) used if libs.length, $(call FASMG_FILES,$(LINK_LIBS)))
+	-i $(call QUOTE_ARG,srcs $(call FASMG_FILES,$(F_LAUNCHER)) used if libs.length$(LINK_ICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP)) used$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
+	-i $(call QUOTE_ARG,libs $(call FASMG_FILES,$(LINK_LIBLOAD)) used if libs.length$(comma) $(call FASMG_FILES,$(LINK_LIBS)))
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
@@ -201,15 +194,15 @@ $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 	$(Q)$(ICON_CONV)
 
 # these rules compile the source files into object files
-$(OBJDIR)/%.src: **/%.c $(USERHEADERS)
+$(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
-	$(CC) $(CFLAGS) $(QUOTE_ARG,$(call WINPATH,$(addprefix $(MAKEDIR)/,$<)))
+	$(CC) $(CFLAGS) $(call QUOTE_ARG,$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))) && \
+	$(MV) $(call QUOTE_ARG,$(call TO_LOWER,$(@F))) $(call QUOTE_ARG,$@)
 
 clean:
-	@$(call RMDIR,$(OBJDIR)) && \
-	$(call RMDIR,$(BINDIR)) && \
-	echo Cleaned build files.
+	$(Q)$(call RMDIR,$(OBJDIR))
+	$(Q)$(call RMDIR,$(BINDIR))
+	@echo Cleaned build files.
 
 gfx:
 	$(Q)$(CD) $(GFXDIR) && convpng
