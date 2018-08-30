@@ -24,8 +24,6 @@ CPDIR      = xcopy /e /i /q /r /y /b
 CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
              cd ..\.. && move /y tools\installer\CEdev.exe release\\
-QUOTE_ARG  = "$(subst ",',$1" #'
-APPEND     = echo$(if $1, $(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1)))))),.) >>$@
 else
 NATIVEPATH = $(subst \,/,$1)
 RM         = rm -f
@@ -39,8 +37,6 @@ CP_EXMPLS  = $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(
 ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
              cd $(CURDIR) && $(call MKDIR,release) && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
 CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
-QUOTE_ARG  = '$(subst ','\'',$1)' #'
-APPEND     = @echo $(call QUOTE_ARG,$1) >>$@
 endif
 FASMG_FILES  = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1))))) #"
 
@@ -266,18 +262,17 @@ doxygen:
 #----------------------------
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES) $(FILEIO_FILES)
 	@echo Generating linker script...
-	@$(RM) $@
-	$(call APPEND,symbol __low_bss = bss.base)
-	$(call APPEND,symbol __len_bss = bss.length)
-	$(call APPEND,symbol __heaptop = bss.high)
-	$(call APPEND,symbol __heapbot = bss.top)
-	$(call APPEND,order $(subst $(space),$(comma) ,header icon launcher libs startup cleanup exit code data strsect text))
-	$(call APPEND,if STATIC)
-	$(call APPEND,	srcs $(call FASMG_FILES,$(addprefix ../../lib/static/,$(notdir $(STATIC_FILES)))))
-	$(call APPEND,else)
-	$(call APPEND,	srcs $(call FASMG_FILES,$(addprefix ../../lib/linked/,$(notdir $(LINKED_FILES)))))
-	$(call APPEND,end if)
-	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix ../../lib/shared/,$(notdir $(SHARED_FILES))) $(addprefix ../../lib/fileio/,$(notdir $(FILEIO_FILES)))))
+	$(file  >$@,symbol __low_bss = bss.base)
+	$(file >>$@,symbol __len_bss = bss.length)
+	$(file >>$@,symbol __heaptop = bss.high)
+	$(file >>$@,symbol __heapbot = bss.top)
+	$(file >>$@,order $(subst $(space),$(comma) ,header icon launcher libs startup cleanup exit code data strsect text))
+	$(file >>$@,if STATIC)
+	$(file >>$@,	srcs $(call FASMG_FILES,$(addprefix ../../lib/static/,$(notdir $(STATIC_FILES)))))
+	$(file >>$@,else)
+	$(file >>$@,	srcs $(call FASMG_FILES,$(addprefix ../../lib/linked/,$(notdir $(LINKED_FILES)))))
+	$(file >>$@,end if)
+	$(file >>$@,srcs $(call FASMG_FILES,$(addprefix ../../lib/shared/,$(notdir $(SHARED_FILES))) $(addprefix ../../lib/fileio/,$(notdir $(FILEIO_FILES)))))
 
 #----------------------------
 # makefile help rule
