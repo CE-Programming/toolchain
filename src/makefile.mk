@@ -28,7 +28,7 @@ VERSION := 8.4
 # define some common makefile things
 empty :=
 space := $(empty) $(empty)
-comma := $(empty),$(empty)
+comma := ,
 
 TARGET ?= $(NAME)
 ICONPNG ?= $(ICON)
@@ -47,9 +47,9 @@ endif
 ifeq ($(OS),Windows_NT)
 SHELL     := cmd.exe
 MAKEDIR   := $(CURDIR)
-NATIVEPATH = $(subst /,\,$(1))
+NATIVEPATH = $(subst /,\,$1)
 WINPATH    = $(NATIVEPATH)
-WINRELPATH = $(subst /,\,$(1))
+WINRELPATH = $(subst /,\,$1)
 RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
@@ -60,13 +60,14 @@ PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
 CD         = cd
 CP         = copy /y
 NULL       = >nul 2>&1
-RMDIR      = call && (if exist $(1) rmdir /s /q $(1))
-MKDIR      = call && (if not exist $(1) mkdir $(1))
+RMDIR      = call && (if exist $1 rmdir /s /q $1)
+MKDIR      = call && (if not exist $1 mkdir $1)
+QUOTE_ARG  = "$(subst ",',$1)" #'
 else
 MAKEDIR   := $(CURDIR)
-NATIVEPATH = $(subst \,/,$(1))
-WINPATH    = $(subst \,\\,$(shell winepath -w $(1)))
-WINRELPATH = $(subst /,\,$(1))
+NATIVEPATH = $(subst \,/,$1)
+WINPATH    = $(subst \,\\,$(shell winepath -w $1))
+WINRELPATH = $(subst /,\,$1)
 RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
@@ -76,10 +77,11 @@ CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
 CD         = cd
 CP         = cp
-RMDIR      = rm -rf $(1)
-MKDIR      = mkdir -p $(1)
+RMDIR      = rm -rf $1
+MKDIR      = mkdir -p $1
+QUOTE_ARG  = '$(subst ','\'',$1)' #'
 endif
-FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(1))))))
+FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1))))) #"
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -102,11 +104,10 @@ F_CLEANUP     := $(call NATIVEPATH,$(CEDEV)/lib/ccleanup.src)
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
 
 # find all of the available C, H and ASM files (Remember, you can create C <-> assembly routines easily this way)
-CSOURCES      := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.c))
-CPPSOURCES    := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.cpp))
-USERHEADERS   := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.h))
-USERHEADERS   += $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.hpp))
-ASMSOURCES    := $(call NATIVEPATH,$(call rwildcard,$(SRCDIR),*.asm))
+CSOURCES      := $(call rwildcard,$(SRCDIR),*.c)
+CPPSOURCES    := $(call rwildcard,$(SRCDIR),*.cpp)
+USERHEADERS   := $(call rwildcard,$(SRCDIR),*.h *.hpp)
+ASMSOURCES    := $(call rwildcard,$(SRCDIR),*.asm)
 
 # create links for later
 LINK_CSOURCES := $(filter %.src,$(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.src,$(subst \,/,$(CSOURCES))))
@@ -114,17 +115,15 @@ LINK_CPPSOURCES := $(filter %.src,$(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.src,$(s
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
-LINK_FILES += $(LINK_CSOURCES)
-LINK_FILES += $(LINK_CPPSOURCES)
-LINK_FILES += $(LINK_ASMSOURCES)
-LINK_LIBS  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload/*.lib))
-LINK_LIBLOAD  := $(call NATIVEPATH,$(wildcard $(CEDEV)/lib/libload.lib))
+LINK_FILES   := $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
+LINK_LIBS    := $(wildcard $(CEDEV)/lib/libload/*.lib)
+LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
 F_ICON     := $(OBJDIR)/$(ICON_ASM)
 ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(F_ICON))$(comma)$(DESCRIPTION)
-LINK_ICON   = , "$(F_ICON)" used
+LINK_ICON   = , $(call FASMG_FILES,$(F_ICON)) used
 endif
 
 # determine if output should be archived or compressed
@@ -135,10 +134,10 @@ ifeq ($(COMPRESSED),YES)
 CVFLAGS += -x
 endif
 ifeq ($(CLEANUP),YES)
-LINK_CLEANUP = , "$(F_CLEANUP)" used
+LINK_CLEANUP = , $(call FASMG_FILES,$(F_CLEANUP)) used
 endif
 ifeq ($(OUTPUT_MAP),YES)
-LDMAPFLAG = -i 'map'
+LDMAPFLAG = -i map
 endif
 
 # choose static or linked flash functions
@@ -161,29 +160,26 @@ HEADERS :=$(subst /;,;,$(HEADERS))
 
 # define the C flags used by the Zilog compiler
 CFLAGS ?= \
-    -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect \
-    -stdinc:"$(HEADERS)" -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE)
+    -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
-	$(CEDEV)/include/fasmg-ez80/ld.fasmg \
-	-i 'include "$(CEDEV)/include/.linker_script"' \
+	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/include/fasmg-ez80/ld.fasmg)) \
+	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(CEDEV)/include/.linker_script)) \
 	$(LDDEBUGFLAG) \
 	$(LDMAPFLAG) \
-	-i 'range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)' \
-	-i 'symbol __stack = $$$(STACK_HIGH)' \
-	-i 'locate header at $$$(INIT_LOC)' \
-	-i 'STATIC=$(STATIC)' \
-	-i 'libs $(LINK_LIBLOAD) used if libs.length, $(call FASMG_FILES,$(LINK_LIBS))' \
-	-i 'srcs "$(F_LAUNCHER)" used if libs.length$(LINK_ICON)$(LINK_CLEANUP)' \
-	-i 'srcs "$(F_STARTUP)" used, $(call FASMG_FILES,$(LINK_FILES))' \
-	-i 'order header,icon,launcher,libs,startup,cleanup,exit,code,data,strsect,text'
+	-i $(call QUOTE_ARG,range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
+	-i $(call QUOTE_ARG,symbol __stack = $$$(STACK_HIGH)) \
+	-i $(call QUOTE_ARG,locate header at $$$(INIT_LOC)) \
+	-i $(call QUOTE_ARG,STATIC := $(STATIC)) \
+	-i $(call QUOTE_ARG,srcs $(call FASMG_FILES,$(F_LAUNCHER)) used if libs.length$(LINK_ICON)$(LINK_CLEANUP), $(call FASMG_FILES,$(F_STARTUP)) used, $(call FASMG_FILES,$(LINK_FILES))) \
+	-i $(call QUOTE_ARG,libs $(call FASMG_FILES,$(LINK_LIBLOAD)) used if libs.length, $(call FASMG_FILES,$(LINK_LIBS)))
 
 # this rule is trigged to build everything
 all: dirs $(BINDIR)/$(TARGET8XP)
 
 # this rule is trigged to build debug everything
-debug: LDDEBUGFLAG = -i 'dbg'
+debug: LDDEBUGFLAG = -i dbg
 debug: DEBUGMODE = DEBUG
 debug: CCDEBUGFLAG = -debug
 debug: dirs $(BINDIR)/$(TARGET8XP)
@@ -205,16 +201,10 @@ $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 	$(Q)$(ICON_CONV)
 
 # these rules compile the source files into object files
-$(OBJDIR)/%.src: */%.c $(USERHEADERS)
+$(OBJDIR)/%.src: **/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
 	$(CD) $(call NATIVEPATH,$(@D)) && \
-	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
-
-# these rules compile the source files into object files
-$(OBJDIR)/%.src: **/*/%.c $(USERHEADERS)
-	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
-	$(CD) $(call NATIVEPATH,$(@D)) && \
-	$(CC) $(CFLAGS) "$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))"
+	$(CC) $(CFLAGS) $(QUOTE_ARG,$(call WINPATH,$(addprefix $(MAKEDIR)/,$<)))
 
 clean:
 	@$(call RMDIR,$(OBJDIR)) && \

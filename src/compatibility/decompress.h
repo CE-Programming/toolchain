@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-/* compatibility defines (do not use) */
+#warning compatibility defines (do not use)
 void dzx7_Turbo(void *src, void *dst);
 void dzx7_Standard(void *src, void *dst);
 

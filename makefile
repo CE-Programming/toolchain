@@ -7,40 +7,42 @@ RELEASE_NAME := CEdev
 # define some common makefile things
 empty :=
 space := $(empty) $(empty)
-comma := $(empty),$(empty)
-tab   := $(empty)	$(empty)
+comma := ,
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
-NATIVEPATH = $(subst /,\,$(1))
+NATIVEPATH = $(subst /,\,$1)
 RM         = del /f 2>nul
-RMDIR      = call && (if exist $(1) rmdir /s /q $(1))
-MKDIR      = call && (if not exist $(1) mkdir $(1))
+RMDIR      = call && (if exist $1 rmdir /s /q $1)
+MKDIR      = call && (if not exist $1 mkdir $1)
 PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
-CPDIR      = xcopy /y /s /e
+CPDIR      = xcopy /e /i /q /r /y /b
 CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
-APPEND     = echo$(if $(1), $(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$(1))))))),.) >>$@
 ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
              cd ..\.. && move /y tools\installer\CEdev.exe release\\
+QUOTE_ARG  = "$(subst ",',$1" #'
+APPEND     = echo$(if $1, $(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1)))))),.) >>$@
 else
-NATIVEPATH = $(subst \,/,$(1))
+NATIVEPATH = $(subst \,/,$1)
 RM         = rm -f
-RMDIR      = rm -rf $(1)
-MKDIR      = mkdir -p $(1)
+RMDIR      = rm -rf $1
+MKDIR      = mkdir -p $1
 PREFIX    ?= $(HOME)
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = cp
 CPDIR      = cp -r
 CP_EXMPLS  = $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(INSTALLLOC)/CEdev)
-APPEND     = echo '$(subst ','\'',$(1))' >>$@
 ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
              cd $(CURDIR) && $(call MKDIR,release) && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
 CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
+QUOTE_ARG  = '$(subst ','\'',$1)' #'
+APPEND     = @echo $(call QUOTE_ARG,$1) >>$@
 endif
+FASMG_FILES  = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1))))) #"
 
 TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)
 SRCDIR     := $(call NATIVEPATH,$(CURDIR)/src)
@@ -81,14 +83,13 @@ INSTALLIO  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/fileio)
 INSTALLSH  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/shared)
 INSTALLST  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/static)
 INSTALLLI  := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME)/lib/linked)
-DIRS       := $(INSTALLINC) $(INSTALLINC)/compat $(INSTALLBIN) $(INSTALLLIB)
+DIRS       := $(INSTALLINC) $(INSTALLBIN) $(INSTALLLIB)
 DIRS       := $(call NATIVEPATH,$(DIRS))
 
 STATIC_FILES = $(wildcard src/std/static/*.src src/std/static/build/*.src)
 LINKED_FILES = $(wildcard src/std/linked/*.src src/std/linked/build/*.src)
 SHARED_FILES = $(wildcard src/ce/*.src src/std/shared/*.src src/std/shared/build/*.src)
 FILEIO_FILES = $(wildcard src/std/fileio/*.src src/std/fileio/build/*.src)
-FASMG_FILES  = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(1))))))
 
 all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
 	@echo Toolchain built.
@@ -100,6 +101,7 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload
 	$(MAKE) -C $(CONVTILDIR) clean
 	$(RM) linker_script
 	$(call RMDIR,release)
+	$(call RMDIR,clibraries)
 	$(call RMDIR,doxygen)
 
 #----------------------------
@@ -201,6 +203,7 @@ install: $(DIRS) chmod all linker_script
 	$(CP_EXMPLS)
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/startup/*.src) $(call NATIVEPATH,$(INSTALLLIB))
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/makefile.mk) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
+	$(CP) $(call NATIVEPATH,linker_script) $(call NATIVEPATH,$(INSTALLINC)/.linker_script)
 	$(CP) $(FASMG) $(INSTALLBIN)
 	$(CP) $(CONVHEX) $(INSTALLBIN)
 	$(CP) $(CONVPNG) $(INSTALLBIN)
@@ -213,7 +216,7 @@ install: $(DIRS) chmod all linker_script
 	$(MAKE) -C $(LIBLOADDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compatibility) $(call NATIVEPATH,$(INSTALLINC))
+	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compatibility/*) $(call NATIVEPATH,$(INSTALLINC))
 
 $(DIRS):
 	$(call MKDIR,$(INSTALLBIN))
@@ -261,20 +264,20 @@ doxygen:
 #----------------------------
 # linker script rule
 #----------------------------
-linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
-	$(RM) $@ && \
-	$(call APPEND,symbol __low_bss = bss.base) && \
-	$(call APPEND,symbol __len_bss = bss.length) && \
-	$(call APPEND,symbol __heaptop = bss.high) && \
-	$(call APPEND,symbol __heapbot = bss.top) && \
-	$(call APPEND,if STATIC) && \
-	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix ../../lib/static/,$(notdir $(STATIC_FILES))))) && \
-	$(call APPEND,else) && \
-	$(call APPEND,$(tab)srcs $(call FASMG_FILES,$(addprefix ../../lib/linked/,$(notdir $(LINKED_FILES))))) && \
-	$(call APPEND,end if) && \
-	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix ../../lib/shared/,$(notdir $(SHARED_FILES))))) && \
-	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix ../../lib/fileio/,$(notdir $(FILEIO_FILES))))) && \
-	$(CP) $(call NATIVEPATH,$@) $(call NATIVEPATH,$(INSTALLINC)/.linker_script)
+linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES) $(FILEIO_FILES)
+	@echo Generating linker script...
+	@$(RM) $@
+	$(call APPEND,symbol __low_bss = bss.base)
+	$(call APPEND,symbol __len_bss = bss.length)
+	$(call APPEND,symbol __heaptop = bss.high)
+	$(call APPEND,symbol __heapbot = bss.top)
+	$(call APPEND,order $(subst $(space),$(comma) ,header icon launcher libs startup cleanup exit code data strsect text))
+	$(call APPEND,if STATIC)
+	$(call APPEND,	srcs $(call FASMG_FILES,$(addprefix ../../lib/static/,$(notdir $(STATIC_FILES)))))
+	$(call APPEND,else)
+	$(call APPEND,	srcs $(call FASMG_FILES,$(addprefix ../../lib/linked/,$(notdir $(LINKED_FILES)))))
+	$(call APPEND,end if)
+	$(call APPEND,srcs $(call FASMG_FILES,$(addprefix ../../lib/shared/,$(notdir $(SHARED_FILES))) $(addprefix ../../lib/fileio/,$(notdir $(FILEIO_FILES)))))
 
 #----------------------------
 # makefile help rule

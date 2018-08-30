@@ -42,7 +42,7 @@ $(LIB_8XV): $(SRC)
 	$(FASMG) $< $@
 
 clean:
-	$(RM) $(LIB_8XV)
+	$(RM) $(LIB) $(LIB_8XV)
 
 install:
 	$(CP) $(LIB_H) $(H_LOC)
