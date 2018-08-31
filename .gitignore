@@ -18,6 +18,7 @@ build/
 cmake-build-debug/
 tools/fasmg/fasmg
 tools/fasmg/fasmg.exe
+linker_script
 
 # precompiled headers
 *.gch

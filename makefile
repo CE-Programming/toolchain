@@ -8,6 +8,10 @@ RELEASE_NAME := CEdev
 empty :=
 space := $(empty) $(empty)
 comma := ,
+define newline
+
+$(empty)
+endef
 
 # common/os specific things
 ifeq ($(OS),Windows_NT)
@@ -24,6 +28,8 @@ CPDIR      = xcopy /e /i /q /r /y /b
 CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
 ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
              cd ..\.. && move /y tools\installer\CEdev.exe release\\
+QUOTE_ARG  = "$(subst ",',$1)"#'
+APPEND     = @echo$(if $1, $(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))),.) >>$@
 else
 NATIVEPATH = $(subst \,/,$1)
 RM         = rm -f
@@ -37,8 +43,11 @@ CP_EXMPLS  = $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(call NATIVEPATH,$(
 ARCH       = cd $(INSTALLLOC) && tar -czf $(RELEASE_NAME).tar.gz $(RELEASE_NAME) ; \
              cd $(CURDIR) && $(call MKDIR,release) && mv -f $(INSTALLLOC)/$(RELEASE_NAME).tar.gz release
 CHMOD      = find $(BIN) -name "*.exe" -exec chmod +x {} \;
+QUOTE_ARG  = '$(subst ','\'',$1)'#'
+APPEND     = @echo $(call QUOTE_ARG,$1) >>$@
 endif
-FASMG_FILES  = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1))))) #"
+FASMG_FILES  = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
+APPEND_FILES = $(foreach file,$(addprefix ../../lib/$2/,$(notdir $3)),$(call APPEND,$1$(call FASMG_FILES,$(file)))$(newline))
 
 TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)
 SRCDIR     := $(call NATIVEPATH,$(CURDIR)/src)
@@ -261,18 +270,20 @@ doxygen:
 # linker script rule
 #----------------------------
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES) $(FILEIO_FILES)
+	$(RM) $(call QUOTE_ARG,$@)
 	@echo Generating linker script...
-	$(file  >$@,symbol __low_bss = bss.base)
-	$(file >>$@,symbol __len_bss = bss.length)
-	$(file >>$@,symbol __heaptop = bss.high)
-	$(file >>$@,symbol __heapbot = bss.top)
-	$(file >>$@,order $(subst $(space),$(comma) ,header icon launcher libs startup cleanup exit code data strsect text))
-	$(file >>$@,if STATIC)
-	$(file >>$@,	srcs $(call FASMG_FILES,$(addprefix ../../lib/static/,$(notdir $(STATIC_FILES)))))
-	$(file >>$@,else)
-	$(file >>$@,	srcs $(call FASMG_FILES,$(addprefix ../../lib/linked/,$(notdir $(LINKED_FILES)))))
-	$(file >>$@,end if)
-	$(file >>$@,srcs $(call FASMG_FILES,$(addprefix ../../lib/shared/,$(notdir $(SHARED_FILES))) $(addprefix ../../lib/fileio/,$(notdir $(FILEIO_FILES)))))
+	$(call APPEND,symbol __low_bss = bss.base)
+	$(call APPEND,symbol __len_bss = bss.length)
+	$(call APPEND,symbol __heaptop = bss.high)
+	$(call APPEND,symbol __heapbot = bss.top)
+	$(call APPEND,order $(subst $(space),$(comma) ,header icon launcher libs startup cleanup exit code data strsect text))
+	$(call APPEND,if STATIC)
+	$(call APPEND_FILES,	srcs ,static,$(STATIC_FILES))
+	$(call APPEND,else)
+	$(call APPEND_FILES,	srcs ,linked,$(LINKED_FILES))
+	$(call APPEND,end if)
+	$(call APPEND_FILES,srcs ,shared,$(SHARED_FILES))
+	$(call APPEND_FILES,srcs ,fileio,$(FILEIO_FILES))
 
 #----------------------------
 # makefile help rule
