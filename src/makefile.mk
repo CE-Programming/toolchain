@@ -96,7 +96,7 @@ GFXDIR := $(call NATIVEPATH,$(GFXDIR))
 # generate default names
 TARGETBIN     := $(TARGET).bin
 TARGETMAP     := $(TARGET).map
-TARGETTYPE    := $(TARGET).8xp
+TARGET8XP     := $(TARGET).8xp
 ICON_ASM      := iconc.src
 
 # init conditionals
@@ -169,13 +169,13 @@ LDFLAGS ?= \
 	-i $(call QUOTE_ARG,libs $(call FASMG_FILES,$(LINK_LIBLOAD)) used if libs.length$(comma) $(call FASMG_FILES,$(LINK_LIBS)))
 
 # this rule is trigged to build everything
-all: dirs $(BINDIR)/$(TARGET8XP)
+all: dirs $(BINDIR)/$(TARGET8XP) ;
 
 # this rule is trigged to build debug everything
 debug: LDDEBUGFLAG = -i dbg
 debug: DEBUGMODE = DEBUG
 debug: CCDEBUGFLAG = -debug
-debug: dirs $(BINDIR)/$(TARGET8XP)
+debug: dirs $(BINDIR)/$(TARGET8XP) ;
 
 dirs:
 	@echo C CE SDK Version $(VERSION) && \
@@ -210,4 +210,4 @@ gfx:
 version:
 	@echo C SDK Version $(VERSION)
 
-.PHONY: all clean version gfx dirs
+.PHONY: all clean version gfx dirs debug
