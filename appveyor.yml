@@ -10,10 +10,6 @@ environment:
     MSYS2_MINGW_ROOT_FOR_CEMU: C:\msys64\mingw64
     USING_MSYS2: yes
 
-matrix:
-  allow_failures:
-    - USING_MSYS2: yes
-
 install:
   # Recursive checkout
   - git submodule update --init --recursive
