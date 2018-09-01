@@ -1,4 +1,4 @@
-# CE C Programming Toolchain/SDK -  [![Build Status](https://travis-ci.org/CE-Programming/toolchain.svg)](https://travis-ci.org/CE-Programming/toolchain)
+# CE C Programming Toolchain/SDK   [![Build Status](https://travis-ci.org/CE-Programming/toolchain.svg)](https://travis-ci.org/CE-Programming/toolchain) [![Build Status](https://ci.appveyor.com/api/projects/status/github/CE-Programming/toolchain?branch=master&svg=true)](https://ci.appveyor.com/project/adriweb/toolchain) [![IRC badge](https://img.shields.io/badge/IRC%20channel-%23ez80--dev%20on%20EFNet-blue.svg)](http://chat.efnet.org/irc.cgi?adv=1&nick=ce-dev&chan=%23ez80-dev)
 
 The CE C Software Development Kit incorporates a wide variety of tools and documentation in order to build programs in C natively for the TI-84 Plus CE / TI-83 Premium CE calculators series.
 
