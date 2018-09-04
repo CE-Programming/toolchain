@@ -119,7 +119,7 @@ typedef enum {
 #define kb_Del        1<<7
 
 /* Keyboard group 2 */
-#define kb_Store      1<<1
+#define kb_Sto        1<<1
 #define kb_Ln         1<<2
 #define kb_Log        1<<3
 #define kb_Square     1<<4
@@ -237,7 +237,8 @@ typedef enum {
 /* Compatibility defines */
 #define kb_DataArray ((uint16_t*)0xF50010)
 #define kb_dataArray ((uint16_t*)0xF50010)
-#define kb_KeyPgrm   kb_KeyPrgm
+#define kb_Store 1<<1
+#define kb_KeyPgrm kb_KeyPrgm
 #define kb_group_0 0
 #define kb_group_1 1
 #define kb_group_2 2
