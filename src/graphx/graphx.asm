@@ -240,7 +240,7 @@ gfx_Begin:
 ; Returns:
 ;  None
 	ld	hl,_LargeFontJump
-	ld	a,(hl)
+	ld	a,_PrintLargeFont-(_LargeFontJump+1)
 	ld	(UseLargeFont),a	; store the jump offset for later
 	ld	(hl),0			; jump nowhere if false
 	call	_boot_ClearVRAM		; clear the screen
