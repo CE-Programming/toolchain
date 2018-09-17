@@ -466,6 +466,8 @@ _throwerror:				; draw the error message onscreen
 	call	_NewLine		; make it look pretty
 	ld	hl,_libnamestr
 	call	_PutS
+	ld	hl,OP1+1+8
+	ld	(hl),0
 	ld	hl,OP1+1
 	call	_PutS
 	call	_NewLine
