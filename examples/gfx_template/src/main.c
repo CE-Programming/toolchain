@@ -55,7 +55,7 @@ void end() {
     /* Implement me! */
 }
 
-void step() {
+bool step() {
     /* Implement me! */
 }
 
