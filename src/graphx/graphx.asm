@@ -566,18 +566,17 @@ gfx_SetPalette:
 ; Returns:
 ;  None
 	pop	iy			; iy = return vector
-	pop	hl			; hl = src
+	pop	de			; de = src
 	pop	bc			; bc = size
-	pop	de			; e = offset
-	push	de
+	ex	(sp),hl			; l = offset
 	push	bc
-	push	hl
+	push	de
+	ld	a,l
+assert mpLcdPalette and 1 = 0
 	ld	hl,mpLcdPalette shr 1
-	ld	l,e			; l = offset
+	ld	l,a			; hl = (palette >> 1) + offset
 	add	hl,hl			; hl = &palette[offset] = dest
-	ex	de,hl			; de = dest
-	pop	hl			; hl = src
-	push	hl
+	ex	de,hl			; de = dest, hl = src
 	ldir
 	jp	(iy)
 
