@@ -351,17 +351,14 @@ gfx_SetClipRegion:
 ;  arg3 : Ymax
 ; Returns:
 ;  None
-	call	_SetClipRegion_Full	; clip against the actual LCD screen
+	ld	hl,_ClipRegion_Full	; clip against the actual LCD screen
+	call	.copy
 	ld	iy,0
 	add	iy,sp
 	call	_ClipRegion		; iy points to the start of the arguments
 	ret	c
 	lea	hl,iy+3
-;	jr	_SetClipRegion_Copy	; emulated by dummifying next instruction:
-	db	$FD			; ld hl,* -> ld iy,*
-_SetClipRegion_Full:
-	ld	hl,_ClipRegion_Full
-_SetClipRegion_Copy:
+.copy:
 	ld	de,_XMin
 	ld	bc,4*3
 	ldir
