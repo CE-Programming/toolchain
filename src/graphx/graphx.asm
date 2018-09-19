@@ -5183,26 +5183,26 @@ gfx_RLETSprite:
 	sbc	hl,de			; hl = ymax-y
 	ret	m			; m ==> ymax < y || y ~ int_min ==> fully off-screen
 	ret	z			; z ==> ymax == y ==> fully off-screen
+	xor	a,a			; a = 0
 	sbc	hl,bc			; hl = ymax-y-height = -(height off-screen)
 	jr	nc,_RLETSprite_SkipClipBottom ; nc ==> height-off-screen <= 0 ==> fully on-screen
 	add	hl,bc			; hl = ymax-y = height on-screen
 	ld	c,l			; bc = height on-screen
+	or	a,a
 _RLETSprite_SkipClipBottom:
 ; ymax-y did not overflow ==> y-ymin will not overflow
 ; Clip top
 	ld	hl,(_YMin)		; hl = ymin
 	ex	de,hl			; de = ymin
 					; hl = y
-	xor	a,a
 	sbc	hl,de			; hl = y-ymin
 	jp	p,_RLETSprite_SkipClipTop ; p ==> y >= ymin ==> fully on-screen
 	add	hl,bc			; hl = y-ymin+height = height on-screen
 	ret	nc			; nc ==> height on-screen < 0 ==> fully off-screen
-	ld	a,l			; a = height on-screen
-	or	a,a
+	or	a,l			; a = height on-screen
 	ret	z			; z ==> height on-screen == 0 ==> fully off-screen
-	ld	a,c
-	sub	a,l			; a = height off-screen
+	ld	a,c			; a = height
+	sub	a,l			; a = height - height on-screen = height off-screen
 	ld	b,a			; b = height off-screen
 	ld	c,l			; c = height on-screen
 	sbc	hl,hl			; y = ymin (after add hl,de)
@@ -5224,11 +5224,10 @@ _RLETSprite_SkipClipTop:
 	ld	a,l			; a = width on-screen
 	or	a,a
 	ret	z			; z ==> width on-screen == 0 ==> fully off-screen
-	ld	h,a			; h = width on-screen
 	ld	a,e			; a = width
-	ld	e,h			; de = width on-screen
 	sub	a,l			; a = width - width on-screen = width off-screen
 	ld	(_RLETSprite_ClipLeft_Width_SMC),a
+	ld	e,l			; e = width on-screen
 	inc	d			; d[0] = 1
 	sbc	hl,hl			; x = xmin (after add hl,bc)
 _RLETSprite_SkipClipLeft:
