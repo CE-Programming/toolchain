@@ -27,39 +27,39 @@ _init:
 ;-------------------------------------------------------------------------------
 	segment startup
 
-	call	0020848h	; _RunInicOff, assumes iy=flags
-	di
-	ld	bc,__len_bss	; BSS byte size
-	ld	hl,__low_bss	; BSS low address
+	call	0020848h	; _RunInicOff, assumes iy = flags
+	call	00004F4h	; _usb_DisableTimer
+	di			; disable interrupts
+	ld	hl,0E00305h
+	push	hl		; save flash wait state control port
+	ld	a,(hl)
+	push	af		; save flash wait states
+	ld	(hl),h		; set flash wait states to 3; 1 was definitely
+				; too low for some calcs, 2 is untested
+	push	iy		; save iy (flags)
+	ld	(__exitsp+1),sp	; save sp for exiting
+	ld	bc,__len_bss
+	ld	hl,__low_bss
 	push	bc
 	push	hl
-	call	0000B0h		; _memclear
-	pop	hl
-	pop	hl
-	push	iy
-	ld	hl,0E00005h
-	push	hl
-	ld	a,(hl)
-	push	af
-	ld	(hl),3		; reduce flash wait states (because of rtl)
-	call	0004F4h		; usb_DisableTimers
-	ld	(__exitsp+1),sp	; save the stack from death
+	call	0000B0h		; __memclear, clear BSS
+				; args will get removed from stack on exit
 	call	_main
 __exit:
 __exitsp:
 __errsp:
 	ld	sp,0
-	pop	af
-	pop	de
-	ld	(de),a		; restore flash wait states
-	pop	iy		; restore iy for OS
-	push	hl		; exit code
-	call	0004F0h		; usb_ResetTimers
+	pop	iy		; iy = flags
+	pop	af		; a = original flash wait states
+	ex	(sp),hl		; hl = flash wait state control port,
+				; save exit code
+	ld	(hl),a		; restore flash wait states
+	call	00004F0h	; _usb_ResetTimer
 
 ;-------------------------------------------------------------------------------
 	segment exit
 
-	pop	hl		; exit code
+	pop	hl		; hl = exit code
 	ret
 
 _exit:
