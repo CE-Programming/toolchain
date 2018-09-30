@@ -21,6 +21,7 @@
 	.def _boot_SetTime
 	.def _boot_IsAfterNoon
 
+	.def _os_NewLine
 	.def _os_PushErrorHandler
 	.def _os_PopErrorHandler
 	.def _os_ThrowError
@@ -140,6 +141,7 @@ _boot_GetTime                   equ 0005B0h
 _boot_SetTime                   equ 0005B4h
 _boot_IsAfterNoon               equ 0005C8h
 
+_os_NewLine                     equ 0207F0h
 _os_PushErrorHandler            equ 021C78h
 _os_PopErrorHandler             equ 021C7Ch
 _os_ThrowError                  equ 021C80h

@@ -316,6 +316,7 @@ void boot_TurnOff(void);
 
 /**
  * Inserts a new line at the current cursor posistion on the homescreen
+ * Does not scroll.
  */
 void boot_NewLine(void);
 
@@ -332,6 +333,12 @@ void boot_WaitShort(void);
 /*
  * OS Routines
  */
+
+/**
+ * Inserts a new line at the current cursor posistion on the homescreen
+ * Does scroll.
+ */
+void os_NewLine(void);
 
 /**
  * Disables the OS cursor
