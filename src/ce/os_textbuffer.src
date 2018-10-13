@@ -3,6 +3,7 @@
 ; ---
 
 	.def	_os_DisableHomeTextBuffer
+	.def	_os_EnableHomeTextBuffer
 	.assume adl=1
 
 _os_DisableHomeTextBuffer:
