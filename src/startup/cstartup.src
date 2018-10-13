@@ -5,6 +5,8 @@
 	.ref	_main
 	.ref	__low_bss
 	.ref	__len_bss
+	.ref	_os_DisableHomeTextBuffer
+	.ref	_os_EnableHomeTextBuffer
 
 	.def	_errno
 	.def	_init
@@ -30,6 +32,7 @@ _init:
 	call	0020848h	; _RunInicOff, assumes iy = flags
 	call	00004F4h	; _usb_DisableTimer
 	di			; disable interrupts
+	call	_os_DisableHomeTextBuffer
 	ld	hl,0E00305h
 	push	hl		; save flash wait state control port
 	ld	a,(hl)
@@ -55,6 +58,7 @@ __errsp:
 				; save exit code
 	ld	(hl),a		; restore flash wait states
 	call	00004F0h	; _usb_ResetTimer
+	call	_os_EnableHomeTextBuffer
 
 ;-------------------------------------------------------------------------------
 	segment exit

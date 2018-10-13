@@ -1,0 +1,21 @@
+; ---
+; enables / disables homescreen text buffering which can destroy bss / heap
+; ---
+
+	.def	_os_DisableHomeTextBuffer
+	.assume adl=1
+
+_os_DisableHomeTextBuffer:
+	ld	iy,$d00080
+	res	1,(iy + $0d)	; no text buffer
+	res	3,(iy + $4a)	; use first shadow buffer
+	set	5,(iy + $4c)	; only display
+	ret
+
+_os_EnableHomeTextBuffer:
+	ld	iy,$d00080
+	set	1,(iy + $0d)	; use text buffer
+	res	3,(iy + $4a)	; use first shadow buffer
+	res	5,(iy + $4c)	; use shadow buffer
+	ret
+

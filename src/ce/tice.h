@@ -709,6 +709,16 @@ void os_GetStringInput(char *string, char *buf, size_t bufsize);
 uint16_t os_GetKey(void);
 
 /**
+ * Disable text buffering on the homescreen. C programs use this area by default for the BSS / Heap.
+ */
+void os_DisableHomeTextBuffer(void);
+
+/**
+ * Enables text buffering on the homescreen. C programs use this area by default for the BSS / Heap.
+ */
+void os_EnableHomeTextBuffer(void);
+
+/**
  * @brief Scan code type
  */
 typedef uint8_t sk_key_t;
