@@ -1,0 +1,28 @@
+; ---
+; uint32_t atomic_load_32(volatile uint32_t *p)
+; ---
+
+	.def	_atomic_load_32
+	.assume	adl=1
+
+_atomic_load_32:
+	pop	hl
+	ex	(sp),iy
+	push	hl
+	ld	c,0
+retry:
+	inc	c
+	ld	b,c
+wait:
+	djnz	wait
+	lea	hl,iy+3
+	ld	de,(iy)
+	ld	a,(hl)
+	cp	a,(hl)
+	ld	hl,(iy)
+	jr	nz,retry
+	sbc	hl,de
+	jr	nz,retry
+	add	hl,de
+	ld	e,a
+	ret

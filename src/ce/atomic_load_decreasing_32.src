@@ -1,0 +1,34 @@
+; ---
+; uint32_t atomic_load_decreasing_32(volatile uint32_t *p)
+; ---
+
+	.def	_atomic_load_decreasing_32
+	.assume	adl=1
+
+_atomic_load_decreasing_32:
+	pop	hl
+	ex	(sp),iy
+	push	hl
+	lea	hl,iy+3
+	ld	a,i
+	di
+	ld	de,(iy)
+	ld	c,(hl)
+	ld	a,(hl)
+	ld	hl,(iy)
+	jp	po,no_ei
+	ei
+no_ei:
+	or	a,a
+	sbc	hl,de
+	sbc	a,c
+	jr	c,swap
+	add	hl,de
+	adc	a,c
+	ld	e,a
+	ret
+
+swap:
+	ex	de,hl
+	ld	e,c
+	ret
