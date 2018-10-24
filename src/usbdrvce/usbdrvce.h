@@ -41,7 +41,7 @@ typedef enum usb_device_event {
 typedef enum usb_error {
   USB_SUCCESS,
   USB_IGNORE,
-  USB_ERROR_UNINITIALIZED,
+  USB_ERROR_SYSTEM,
   USB_ERROR_INVALID_PARAM,
   USB_ERROR_SCHEDULE_FULL,
   USB_ERROR_NO_DEVICE,
@@ -173,6 +173,12 @@ void usb_SetDeviceDescriptors(void **full_speed_descriptors,
                               void **high_speed_descriptors);
 
 /**
+ * Calls any triggered device or transfer callbacks.
+ * @return An error returned by a callback or USB_SUCCESS.
+ */
+usb_error_t usb_ProcessEvents(void);
+
+/**
  * Finds the next device connected through \p root after \p from satisfying
  * flags.
  * @param root Hub below which to limit search.
@@ -203,16 +209,25 @@ usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
   usb_FindDevice(usb_RootHub, from, flags)
 
 /**
+ * Gets the hub that \p device is attached to, or NULL if \p device is the root
+ * hub.
  * @param device Device to get the hub of.
- * @return The hub that \pdevice is attached to.
+ * @return The hub that \p device is attached to, or NULL if none.
  */
-usb_device_t usb_DeviceHub(usb_device_t device);
+usb_device_t usb_GetDeviceHub(usb_device_t device);
 
 /**
- * Calls any triggered device or transfer callbacks.
- * @return An error returned by a callback or USB_SUCCESS.
+ * Sets the user data associated with \p device.
+ * @param device Device to set the user data of.
  */
-usb_error_t usb_ProcessEvents(void);
+void usb_SetDeviceUserData(usb_device_t device, void *data);
+
+/**
+ * Gets the user data associated with \p device.
+ * @param device Device to get the user data of.
+ * @return The user data associated with \p device.
+ */
+void *usb_GetDeviceUserData(usb_device_t device);
 
 /**
  * Clears an endpoint's halt/stall condition.
