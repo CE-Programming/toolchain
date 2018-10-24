@@ -18,7 +18,7 @@ void print(float elapsed) {
 
     /* If the elapsed time is small enough that the OS would print it using */
     /* scientific notation, force it down to zero before conversion */
-    elapsed_real = os_FloatToReal(elapsed <= 0.001f ? 0 : elapsed);
+    elapsed_real = os_FloatToReal(elapsed <= 0.001f ? 0.0f : elapsed);
 
     /* Convert the elapsed time real to a string */
     os_RealToStr(str, &elapsed_real, 8, 1, 2);
@@ -34,7 +34,7 @@ void main(void) {
     os_ClrHome();
 
     /* Display an initial time of zero */
-    print(0);
+    print(0.0f);
 
     /* Disable the timer */
     timer_Control = TIMER1_DISABLE;
