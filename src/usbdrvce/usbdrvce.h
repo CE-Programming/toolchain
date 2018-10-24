@@ -15,11 +15,11 @@ extern "C" {
 #endif
 
 typedef enum usb_init_flags {
-  USB_USE_C_HEAP         = 1 << 1, /**< Use part of the default C heap.
+  USB_USE_C_HEAP         = 1 << 0, /**< Use part of the default C heap.
                                         @warning Do not use this unless you
                                         changed your program's bss/heap to end
                                         at 0xD10000! */
-  USB_USE_PERIODIC_LIST  = 1 << 4, /**< Use space normally used for periodic.
+  USB_USE_PERIODIC_LIST  = 1 << 1, /**< Use space normally used for periodic.
                                         @warning This disables support for
                                         interrupt transfers, isochronous
                                         transfers, and hubs! */
@@ -41,6 +41,8 @@ typedef enum usb_device_event {
 typedef enum usb_error {
   USB_SUCCESS,
   USB_IGNORE,
+  USB_ERROR_UNINITIALIZED,
+  USB_ERROR_INVALID_PARAM,
   USB_ERROR_SCHEDULE_FULL,
   USB_ERROR_NO_DEVICE,
   USB_ERROR_NO_MEMORY,
@@ -147,8 +149,8 @@ typedef usb_error_t (*usb_transfer_callback_t)(usb_device_t device,
  * @note This must be called before any other function, and can be called again
  * to cancel all transfers and close all connections.
  */
-usb_error_t usb_Init(usb_device_callback_t event_handler, void *event_data,
-                     usb_init_flags_t flags);
+usb_error_t usb_Init(usb_device_event_callback_t event_handler,
+                     void *event_data, usb_init_flags_t flags);
 
 /**
  * Uninitializes the usb driver.
