@@ -9,25 +9,80 @@ _atomic_load_increasing_32:
 	pop	hl
 	ex	(sp),iy
 	push	hl
+; Temporarily disable interrupts.
 	ld	a,i
 	di
-	ld	de,(iy)
-	ld	c,(iy+3)
-	ld	hl,(iy)
-	ld	a,(iy+3)
+; Read the value twice.
+; first value read = cude, second value read = auhl
+					; Time between first and last byte read:
+	ld	de,(iy)			;      2R
+	ld	c,(iy+3)		; + 3F+1R
+	ld	hl,(iy)			; + 3F+3R
+	ld	a,(iy+3)		; + 3F+1R
+					; = 9F+7R
+					; = 56cc (assuming F = R = 3)
+					; ~ 1.17us (assuming 48MHz clock speed)
+					; + approximate worst-case LCD + USB DMA
+					; ~ 5us
+; Re-enable interrupts if they were previously enabled.
 	jp	po,no_ei
 	ei
 no_ei:
+; Compare and return the lesser of the two values read.
+;
+; If the values differ, then the underlying value changed between reading the
+; first byte of the first 32-bit read and the last byte of the second 32-bit
+; read:
+;  * If a change occurs between the two 32-bit reads, then both values read
+;    remain valid.
+;  * If a change occurs in the middle of one of the 32-bit reads:
+;     * If the bytes already read change but the bytes yet to read do not
+;       change, then the value read is the valid value before the change.
+;     * If the bytes already read do not change but the yet still to read
+;       change, then the value read is the valid value after the change.
+;     * If the bytes already read and the bytes yet to read change, then the
+;       value read is an invalid mix of the values before and after the change.
+;
+; If the final case did not occur, then both values read are valid.
+;
+; If the final case occurred for only the second value read, then due to reading
+; bytes in little-endian order, one to three upper bytes will reflect the
+; increased value after the change. Regardless of the lower bytes, the valid,
+; first value read will be less than the invalid, second value read.
+;
+; If the final case occurred for only the first value read, then due to reading
+; bytes in little-endian order, one to three upper bytes will reflect the
+; increased value after the change, while the remaining one to three lower bytes
+; will reflect the value before the change. If it is assumed that the value
+; increased by less than 256, then the upper bytes must have increased through
+; carry and the lower bytes of the valid, second value read will be less than
+; the lower bytes of the invalid, first value read. And because the full second
+; value read will reflect the the increased value after the change, and
+; therefore the two values read will only differ in the lower bytes, it follows
+; that the full, valid, second valid read will be less than the full, invalid,
+; first value read. (Note that this assertion can be extended to include 256
+; because only one byte would change, making this whole case unreachable.)
+;
+; If the third case occurred for both values read, then both are invalid. There
+; is no reasonable way to detect this, so it is assumed that this did not occur.
+;
+; Combining all of these cases and assumptions, the lesser of the two values
+; read will always be valid.
 	or	a,a
 	sbc	hl,de
-	sbc	a,c
+	sbc	a,c			; auhl = second value read
+					;         - first value read
 	jr	c,no_swap
+; second value read >= first value read
+;  ==> first value read is valid
 	ex	de,hl
-	ld	e,c
+	ld	e,c			; euhl = first value read
 	ret
 
 no_swap:
+; second value read < first value read
+;  ==> second value read is valid
 	add	hl,de
 	adc	a,c
-	ld	e,a
+	ld	e,a			; euhl = second value read
 	ret

@@ -11,18 +11,51 @@ _atomic_load_32:
 	push	hl
 	ld	c,0
 retry:
+; Wait for a different (increasing) amount of time before each retry to prevent
+; getting caught in an endless loop of the value changing between reads with a
+; fixed period equal to the amount of time it takes for each retry
 	inc	c
 	ld	b,c
 wait:
 	djnz	wait
+; Read the value twice.
 	lea	hl,iy+3
-	ld	de,(iy)
-	ld	a,(hl)
-	cp	a,(hl)
-	ld	hl,(iy)
+					; Time between first and last byte read:
+	ld	de,(iy)			;      2R
+	ld	a,(hl)			; + 1F+1R
+	cp	a,(hl)			; + 1F+1R
+	ld	hl,(iy)			; + 3F+3R
+					; = 5F+7R
+					; = 48cc (assuming F = R = 3)
+					; = 1us (assuming 48MHz clock speed)
+					; Don't need to worry about DMA, just
+					; retry until not interrupted by DMA
+; Retry if the values read differ.
+;
+; If the values differ, then the underlying value changed between reading the
+; first byte of the first 32-bit read and the last byte of the second 32-bit
+; read:
+;  * If a change occurs between the two 32-bit reads, then both values read
+;    remain valid.
+;  * If a change occurs in the middle of one of the 32-bit reads:
+;     * If the bytes already read change but the bytes yet to read do not
+;       change, then the value read is the valid value before the change.
+;     * If the bytes already read do not change but the yet still to read
+;       change, then the value read is the valid value after the change.
+;     * If the bytes already read and the bytes yet to read change, then the
+;       value read is an invalid mix of the values before and after the change.
+;
+; Without reading the value again, there is not enough information to determine
+; if the third case occurred. If it did occur, then one of the values is
+; invalid. But there is also not enough information to determine which is
+; invalid, and therefore which is valid. So reading the value must be retried.
+;
+; (Furthermore, if a change occurs in the middle of both 32-bit reads and the
+; bytes already read change in both, then both values read become invalid.)
 	jr	nz,retry
 	sbc	hl,de
 	jr	nz,retry
+; Values don't differ, good to go.
 	add	hl,de
-	ld	e,a
+	ld	e,a			; euhl = value read
 	ret
