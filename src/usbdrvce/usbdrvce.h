@@ -108,7 +108,7 @@ typedef struct usb_control_setup {
 
 typedef struct usb_device *usb_device_t; /**< opaque handle for a device */
 
-#define USB_RETRY_FOREVER 0
+#define USB_RETRY_FOREVER 0xFFFFFFu
 
 #define usb_RootHub ((usb_device_t)0xD13FC0)
 
@@ -165,7 +165,7 @@ void usb_Cleanup(void);
  * descriptors will be used.  In a passed array, the first entry points to a
  * device descriptor, and the rest to each configuration descriptor.  If the
  * first entry is NULL, then that speed is disabled.  The arrays just need
- * to be readable, but the descriptors themselves must be in ram.
+ * to be readable, but the descriptors themselves must be in RAM.
  * @param descriptors An array of pointers to descriptors, pointer to NULL for
  * disabled, or NULL for default.
  */
@@ -342,21 +342,22 @@ usb_error_t usb_SetInterfaceAltSetting(usb_device_t device, uint8_t interface,
                                        uint8_t alternate_setting);
 
 /**
- * If endpoint is a control endpoint, schedules a control transfer to that
- * endpoint and waits for it to complete.  If endpoint is not a control
- * endpoint, schedules a transfer of the endpoint's transfer type using
- * setup->wLength as the number of bytes to transfer and ignoring the rest of
- * the fields in setup, and waits for it to complete.
+ * Schedules a transfer to the pipe connected to \p endpoint of \p device, in
+ * the direction indicated by \p setup->bmRequestType, using \p buffer as the
+ * data buffer, \p setup->wLength as the buffer length, and then waits for it to
+ * complete.  If acting as usb host and using a control pipe, \p setup is used
+ * as the setup packet, otherwise all fields not mentioned above are ignored.
  * @param device The device to communicate with.
- * @param endpoint Address of the control endpoint to communicate with.
- * Bit 7 is ignored.
- * @param setup The setup packet to send.
- * @param buffer Data to transfer that must reside in RAM and be at least
- * setup->wLength bytes.
+ * @param endpoint Address of the endpoint to communicate with. Bit 7 is
+ * ignored.
+ * @param setup Indicates the transfer direction and buffer length.  If acting
+ * as usb host and using a control pipe, also used as the setup packet to send.
+ * @param buffer Data to transfer that must reside in RAM and have room for at
+ * least \p setup->wLength bytes.
  * @param retries How many times to retry the transfer before timing out.
- * If retries is 0, the transfer never times out.
+ * If retries is USB_RETRY_FOREVER, the transfer never times out.
  * @param transferred Returns the number of bytes actually transferred.
- * NULL means don't return anything.
+ * If \p transferred is NULL then nothing is returned.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_ControlTransfer(usb_device_t device, uint8_t endpoint,
@@ -364,14 +365,18 @@ usb_error_t usb_ControlTransfer(usb_device_t device, uint8_t endpoint,
                                 unsigned retries, size_t *transferred);
 
 /**
- * Schedules a control transfer to the default control pipe and waits for it to
- * complete.
+ * Schedules a control transfer to the default control pipe of \p device, in the
+ * direction indicated by \p setup->bmRequestType, using \p buffer as the data
+ * buffer, \p setup->wLength as the buffer length, and then waits for it to
+ * complete.  If acting as usb host, \p setup is used as the setup packet,
+ * otherwise all fields not mentioned above are ignored.
  * @param device The device to communicate with.
- * @param setup The setup packet to send.
+ * @param setup Indicates the transfer direction and buffer length.  If acting
+ * as usb host, also used as the setup packet to send.
  * @param buffer Data to transfer that must reside in RAM and be at least
  * setup->wLength bytes.
  * @param retries How many times to retry the transfer before timing out.
- * If retries is 0, the transfer never times out.
+ * If retries is USB_RETRY_FOREVER, the transfer never times out.
  * @param transferred Returns the number of bytes actually transferred.
  * NULL means don't return anything.
  * @return USB_SUCCESS if the transfer succeeded or an error.
@@ -380,23 +385,22 @@ usb_error_t usb_ControlTransfer(usb_device_t device, uint8_t endpoint,
   usb_ControlTransfer(device, 0, setup, buffer, retries, transferred)
 
 /**
- * If endpoint is not a control endpoint, schedules a transfer of the endpoint's
- * transfer type and waits for it to complete.  If endpoint is a control
- * endpoint, schedules a control transfer interpreting the beginning of buffer
- * as the \c usb_control_setup_t, uses the rest of the buffer as the transfer
- * buffer, and waits for it to complete.
+ * Schedules a transfer to the pipe connected to \p endpoint of \p device, using
+ * \p length as the buffer length, and waits for it to complete. If acting as
+ * usb host and using a control pipe, uses the beginning of \p buffer as the
+ * setup packet to send, its \c bmRequestType for the transfer direction, and
+ * the rest of \p buffer as the data buffer.  Otherwise, uses \p endpoint for
+ * transfer direction and  the whole \p buffer as the data buffer.
  * @param device The device to communicate with.
- * @param endpoint Address of the bulk endpoint to communicate with.
- * Bit 7 specifies the direction of the transfer, ignored for control transfers.
- * @param buffer Data to transfer that must reside in RAM.
- * Starts with a \c usb_control_setup_t.
- * @param length The number of bytes to transfer.
- * The \p buffer must be at least this large.
- * Ignored for control transfers, where the buffer must be at least \code{.c}
- * sizeof(usb_control_setup_t) + ((usb_control_setup_t *)buffer)->wLength
- * \endcode bytes.
+ * @param endpoint Address of the endpoint to communicate with. Bit 7 indicates
+ * the transfer direction for non-control transfers.
+ * @param buffer Data to transfer that must reside in RAM.  When acting as usb
+ * host and using a control pipe, starts with a \c usb_control_setup_t.
+ * @param length Number of bytes to transfer.  The \p buffer must be at least
+ * this large.  However, this is ignored for control transfers when acting as
+ * usb host where the \c wLength of the setup packet is used instead.
  * @param retries How many times to retry the transfer before timing out.
- * If retries is 0, the transfer never times out.
+ * If retries is USB_RETRY_FOREVER, the transfer never times out.
  * @param transferred Returns the number of bytes actually transferred.
  * NULL means don't return anything.
  * @return USB_SUCCESS if the transfer succeeded or an error.
@@ -408,20 +412,19 @@ usb_error_t usb_Transfer(usb_device_t device, uint8_t endpoint, void *buffer,
 #define usb_IsochronousTransfer usb_Transfer
 
 /**
- * If endpoint is a control endpoint, schedules a control transfer to that
- * endpoint.  If endpoint is not a control endpoint, schedules a transfer of the
- * endpoint's transfer type using setup->wLength as the number of bytes to
- * transfer and ignoring the rest of the fields in setup.
+ * Schedules a transfer to the pipe connected to \p endpoint of \p device, in
+ * the direction indicated by \p setup->bmRequestType, using \p buffer as the
+ * data buffer, and \p setup->wLength as the buffer length.  If acting as usb
+ * host and using a control pipe, \p setup is used as the setup packet,
+ * otherwise all fields not mentioned above are ignored.
  * @param device The device to communicate with.
- * @param endpoint Address of endpoint to communicate with.
- * Bit 7 is ignored for control transfers, and the direction of other transfers.
- * @param setup Setup packet, ignored for non-control transfers.
- * @param buffer Data to transfer that must reside in RAM.
- * This buffer must remain valid until the callback is called i.e. it cannot be
- * modified or freed.
- * @param length Number of bytes to transfer.
- * The \p buffer must be at least this large.
- * However, this is ignored for control transfers
+ * @param endpoint Address of endpoint to communicate with.  Bit 7 indicates the
+ * transfer direction for non-control transfers.
+ * @param setup Indicates the transfer direction and buffer length.  If acting
+ * as usb host and using a control pipe, also used as the setup packet to send.
+ * @param buffer Data to transfer that must reside in RAM.  This buffer must
+ * remain valid until the callback is called i.e. it cannot be modified or
+ * freed.
  * @param transferred Returns the number of bytes actually transferred.
  * @param handler Function to be called when the transfer finishes.
  * @param data Opaque pointer to be passed to the \p handler.
@@ -434,6 +437,26 @@ usb_error_t usb_ScheduleControlTransfer(usb_device_t device, uint8_t endpoint,
                                         void *data);
 
 /**
+ * Schedules a control transfer to the default control pipe of \p device, in
+ * the direction indicated by \p setup->bmRequestType, using \p buffer as the
+ * data buffer, and \p setup->wLength as the buffer length.  If acting as usb
+ * host, \p setup is used as the setup packet, otherwise all fields not
+ * mentioned above are ignored.
+ * @param device The device to communicate with.
+ * @param setup Indicates the transfer direction and buffer length.  If acting
+ * as usb host, also used as the setup packet to send.
+ * @param buffer Data to transfer that must reside in RAM.  This buffer must
+ * remain valid until the callback is called i.e. it cannot be modified or
+ * freed.
+ * @param transferred Returns the number of bytes actually transferred.
+ * @param handler Function to be called when the transfer finishes.
+ * @param data Opaque pointer to be passed to the \p handler.
+ * @return USB_SUCCESS if the transfer was scheduled or an error.
+ */
+#define usb_ScheduleDefaultControlTransfer(device, setup, buffer, handler, data)\
+  usb_ScheduleControlTransfer(device, 0, setup, buffer, handler, data)
+
+/**
  * If endpoint is not a control endpoint, schedules a transfer of the endpoint's
  * transfer type.  If the endpoint is a control endpoint, schedules a control
  * transfer interpreting the beginning of buffer as the \c usb_control_setup_t
@@ -442,14 +465,13 @@ usb_error_t usb_ScheduleControlTransfer(usb_device_t device, uint8_t endpoint,
  * @param endpoint Address of endpoint to communicate with.
  * Bit 7 is ignored for control transfers, and the direction of other transfers.
  * @param type Type of the endpoint and transfer.
- * @param buffer Data to transfer that must reside in RAM.
- * This buffer must remain valid until the callback is called i.e. it cannot be
+ * @param buffer Data to transfer that must reside in RAM.  When acting as usb
+ * host and using a control pipe, starts with a \c usb_control_setup_t.  This
+ * buffer must remain valid until the callback is called i.e. it cannot be
  * modified or freed.
- * @param length Number of bytes to transfer.
- * The \p buffer must be at least this large.
- * Ignored for control transfers, where the buffer must be at least \code{.c}
- * sizeof(usb_control_setup_t) + ((usb_control_setup_t *)buffer)->wLength
- * \endcode bytes.
+ * @param length Number of bytes to transfer.  The \p buffer must be at least
+ * this large.  However, this is ignored for control transfers when acting as
+ * usb host where the \c wLength of the setup packet is used instead.
  * @param transferred Returns the number of bytes actually transferred.
  * @param handler Function to be called when the transfer finishes.
  * @param data Opaque pointer to be passed to the \p handler.
