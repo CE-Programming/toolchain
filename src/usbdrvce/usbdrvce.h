@@ -255,7 +255,7 @@ uint8_t usb_GetDeviceAddress(usb_device_t device);
 /**
  * Gets a device's speed.
  * @param device The device to communicate with.
- * @return The usb speed of \p device, or USB_SPEED_UNKNOWN if unknown.
+ * @return The \c usb_speed_t of \p device, or USB_SPEED_UNKNOWN if unknown.
  */
 usb_speed_t usb_GetDeviceSpeed(usb_device_t device);
 
@@ -265,15 +265,16 @@ usb_speed_t usb_GetDeviceSpeed(usb_device_t device);
  * @param endpoint The endpoint to communicate with.
  * @return The endpoint's wMaxPacketSize or 0 on error.
  */
-uint16_t usb_GetMaxPacketSize(usb_device_t device, uint8_t endpoint);
+uint16_t usb_GetEndpointMaxPacketSize(usb_device_t device, uint8_t endpoint);
 
 /**
  * Gets the transfer type of an endpoint.
  * @param device The device to communicate with.
  * @param endpoint The endpoint to communicate with.
- * @return The endpoint's transfer type or USB_UNUSED_ENDPOINT.
+ * @return The endpoint's \c usb_transfer_type_t or USB_UNUSED_ENDPOINT.
  */
-usb_transfer_type_t usb_GetTransferType(usb_device_t device, uint8_t endpoint);
+usb_transfer_type_t usb_GetEndpointTransferType(usb_device_t device,
+                                                uint8_t endpoint);
 
 /**
  * Determines how large of a buffer would be required to receive the complete
