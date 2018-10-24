@@ -3433,6 +3433,12 @@ namespace ti?
 ?bFifoEmpty		:= 8
 ?bmFifoEmpty		:= 0Fh shl bFifoEmpty
 
+?usbCxFifoBytes		:= 0123h
+?pUsbCxFifoBytes		:= pUsbRange + usbCxFifoBytes
+?mpUsbCxFifoBytes	:= mpUsbRange + usbCxFifoBytes
+?bUsbCxFifoBytes		:= 0
+?bmUsbCxFifoBytes	:= 07Fh
+
 ?usbIdle			:= 0124h
 ?pUsbIdle		:= pUsbRange + usbIdle
 ?mpUsbIdle		:= mpUsbRange + usbIdle
