@@ -22,13 +22,13 @@ no_ei:
 	or	a,a
 	sbc	hl,de
 	sbc	a,c
-	jr	nc,swap
+	jr	c,no_swap
+	ex	de,hl
+	ld	e,c
+	ret
+
+no_swap:
 	add	hl,de
 	adc	a,c
 	ld	e,a
-	ret
-
-swap:
-	ex	de,hl
-	ld	e,c
 	ret
