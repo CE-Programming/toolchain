@@ -170,6 +170,15 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define TIMER2_UP                (1<<10) /* Timer 2 counts up                                      */
 #define TIMER2_DOWN              (0<<10) /* Timer 2 counts down                                    */
 
+#define TIMER3_ENABLE            (1<<6)  /* Enables Timer 3                                        */
+#define TIMER3_DISABLE           (0<<6)  /* Disables Timer 3                                       */
+#define TIMER3_32K               (1<<7)  /* Use the 32K clock for timer 3                          */
+#define TIMER3_CPU               (0<<7)  /* Use the CPU clock rate for timer 3                     */
+#define TIMER3_0INT              (1<<8)  /* Enable an interrupt when 0 is reached for the timer 3  */
+#define TIMER3_NOINT             (0<<8)  /* Disable interrupts for the timer 3                     */
+#define TIMER3_UP                (1<<11) /* Timer 3 counts up                                      */
+#define TIMER3_DOWN              (0<<11) /* Timer 3 counts down                                    */
+
 /* These defines can be used to check the status of the timer */
 #define TIMER1_MATCH1            (1<<0)  /* Timer 1 hit the first match value                      */
 #define TIMER1_MATCH2            (1<<1)  /* Timer 1 hit the second match value                     */
@@ -179,15 +188,23 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define TIMER2_MATCH2            (1<<4)  /* Timer 2 hit the second match value                     */
 #define TIMER2_RELOADED          (1<<5)  /* Timer 2 was reloaded (Needs TIMER2_0INT enabled)       */
 
+#define TIMER3_MATCH1            (1<<6)  /* Timer 3 hit the first match value                      */
+#define TIMER3_MATCH2            (1<<7)  /* Timer 3 hit the second match value                     */
+#define TIMER3_RELOADED          (1<<8)  /* Timer 3 was reloaded (Needs TIMER3_0INT enabled)       */
+
 /* Timer registers */
 #define timer_1_Counter          (*(volatile uint32_t*)0xF20000)
-#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)
 #define timer_1_ReloadValue      (*(uint32_t*)0xF20004)
-#define timer_2_ReloadValue      (*(uint32_t*)0xF20014)
 #define timer_1_MatchValue_1     (*(uint32_t*)0xF20008)
 #define timer_1_MatchValue_2     (*(uint32_t*)0xF2000C)
+#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)
+#define timer_2_ReloadValue      (*(uint32_t*)0xF20014)
 #define timer_2_MatchValue_1     (*(uint32_t*)0xF20018)
 #define timer_2_MatchValue_2     (*(uint32_t*)0xF2001C)
+#define timer_3_Counter          (*(volatile uint32_t*)0xF20020)
+#define timer_3_ReloadValue      (*(uint32_t*)0xF20024)
+#define timer_3_MatchValue_1     (*(uint32_t*)0xF20028)
+#define timer_3_MatchValue_2     (*(uint32_t*)0xF2002C)
 #define timer_Control            (*(uint16_t*)0xF20030)
 #define timer_IntStatus          (*(volatile uint16_t*)0xF20034)
 #define timer_IntAcknowledge     (*(volatile uint16_t*)0xF20034)
