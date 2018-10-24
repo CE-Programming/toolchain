@@ -9,13 +9,12 @@ _atomic_load_increasing_32:
 	pop	hl
 	ex	(sp),iy
 	push	hl
-	lea	hl,iy+3
 	ld	a,i
 	di
 	ld	de,(iy)
-	ld	c,(hl)
-	ld	a,(hl)
+	ld	c,(iy+3)
 	ld	hl,(iy)
+	ld	a,(iy+3)
 	jp	po,no_ei
 	ei
 no_ei:
