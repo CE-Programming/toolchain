@@ -80,9 +80,10 @@ uint32_t atomic_load_32(volatile uint32_t *p);
  * the lesser of the two values read.
  *
  * @attention
- * If the minimum period between two value changes is 1us or less and the
- * value's maximum rate of change over a 1us period exceeds 256 (assuming a CPU
- * clock speed of 48MHz), then the value returned may be incorrect.
+ * If the minimum period between two value changes is 5us or less and the
+ * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
+ * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
+ * note may be the fact that a 48MHz counter does not exceed this limit.
  *
  * @param p pointer to 32-bit value
  */
@@ -98,9 +99,10 @@ uint32_t atomic_load_increasing_32(volatile uint32_t *p);
  * the greater of the two values read.
  *
  * @attention
- * If the minimum period between two value changes is 1us or less and the
- * value's maximum rate of change over a 1us period exceeds 256 (assuming a CPU
- * clock speed of 48MHz), then the value returned may be incorrect.
+ * If the minimum period between two value changes is 5us or less and the
+ * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
+ * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
+ * note may be the fact that a 48MHz counter does not exceed this limit.
  *
  * @param p pointer to 32-bit value
  */
