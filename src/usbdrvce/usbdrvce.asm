@@ -13,6 +13,9 @@ library 'USBDRVCE', 0
 ;-------------------------------------------------------------------------------
 	export usb_Init
 	export usb_Cleanup
+	export usb_GetDeviceHub
+	export usb_SetDeviceUserData
+	export usb_GetDeviceUserData
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -43,11 +46,18 @@ end virtual
 ;-------------------------------------------------------------------------------
 ; memory structures
 ;-------------------------------------------------------------------------------
-virtual at 0
-	devEndpoints	rl 1	; pointer to array of endpoints
+virtual at 0			; device structure
+	devHub		rl 1	; hub this device is connected to
 	devHubPorts	rb 1	; number of ports in this hub
-	devAddr		rb 1	; device addr, 0 if disabled
-	devSpeed	rb 1	; device speed
+	devAddr		rb 1	; device addr and $7F
+	devSpeed	rb 1	; device speed shl 4
+	devEps		rl 1	; pointer to array of endpoints
+		        rb 1
+	devHubInfo	rw 1	; hub addr or port number shl 7 or 1 shl 14
+	devChild	rl 1	; first device connected to this hub
+	devSibling	rl 1	; next device connected to the same hub
+	devUserData	rl 1	; user data
+	devSize:
 end virtual
 ;-------------------------------------------------------------------------------
 
@@ -57,7 +67,7 @@ end virtual
 virtual at 0
 	USB_SUCCESS		rb 1
 	USB_IGNORE		rb 1
-	USB_ERROR_UNINITIALIZED	rb 1
+	USB_ERROR_SYSTEM	rb 1
 	USB_ERROR_INVALID_PARAM	rb 1
 	USB_ERROR_SCHEDULE_FULL	rb 1
 	USB_ERROR_NO_DEVICE	rb 1
@@ -78,11 +88,12 @@ usb_Init:
 	ld	(hl),a
 	dec	l;usbDevCtrl and $FF
 	ld	(hl),bmUsbDevReset or bmUsbDevEn
-	ld	hl,6
-	push	hl
+	sbc	hl,hl
+	ld	(rootDev+devUserData),hl
+	ld	l,3
 	add	hl,sp
 	ld	de,eventCallback
-	pop	bc
+	ld	c,6
 	ldir
 	ld	c,(hl)
 	ld	hl,USB_ERROR_INVALID_PARAM
@@ -139,11 +150,20 @@ usb_Cleanup:
 	ret
 
 _Check:
-	ld	a,(usbInited)
-	dec	a
+	call	.check
 	ret	z
 	pop	hl
-	ld	hl,USB_ERROR_UNINITIALIZED
+	ld	hl,USB_ERROR_SYSTEM
+	ret
+.check:
+	ld	a,(mpIntMask)
+	and	a,intTmr3
+	ret	nz
+	ld	a,(mpUsbSts)
+	and	a,bmUsbIntHostSysErr
+	ret	nz
+	ld	a,(usbInited)
+	dec	a
 	ret
 
 iterate <size,align>, 32,32, 64,256
@@ -174,3 +194,33 @@ _Free#size#Align#align:
 	ret
 
 end iterate
+
+;-------------------------------------------------------------------------------
+usb_GetDeviceHub:
+	pop	de
+	ex	(sp),iy
+	push	de
+	ld	hl,(iy+devHub)
+	bit	0,l
+	ret	z
+	or	a,a
+	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetDeviceUserData:
+	pop	de
+	ex	(sp),iy
+	push	de
+	ld	hl,(iy+devUserData)
+	ret
+
+;-------------------------------------------------------------------------------
+usb_SetDeviceUserData:
+	pop	de
+	pop	iy
+	ex	(sp),hl
+	push	hl
+	ld	(iy+devUserData),hl
+	ex	de,hl
+	jp	(hl)
