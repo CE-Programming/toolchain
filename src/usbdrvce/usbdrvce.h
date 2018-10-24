@@ -21,6 +21,12 @@ typedef enum usb_init_flags {
   USB_DEFAULT_INIT_FLAGS = USB_USE_USB_AREA | USB_USE_OS_HEAP, /**< Default flags for use with usb_init(). */
 } usb_init_flags_t;
 
+typedef enum usb_connect_flags {
+  USB_CONNECT_SPEED     = 3 << 0, /**< usb_speed_t of the device */
+  USB_CONNECT_CONNECTED	= 1 << 2, /**< Connect vs Disconnect */
+  USB_CONNECTED_TO_HOST	= 1 << 3, /**< Host vs Device Dis/connected*/
+} usb_conn_flags_t;
+
 typedef enum usb_error {
   USB_SUCCESS,
   USB_IGNORE,
@@ -28,6 +34,8 @@ typedef enum usb_error {
   USB_ERROR_NO_DEVICE,
   USB_ERROR_NO_MEMORY,
   USB_ERROR_NOT_SUPPORTED,
+  USB_ERROR_TIMEOUT,
+  USB_USER_ERROR = 100,
 } usb_error_t;
 
 typedef enum usb_find_flags {
@@ -46,6 +54,7 @@ typedef enum usb_speed {
 } usb_speed_t;
 
 typedef enum usb_transfer_type {
+  USB_UNUSED_ENDPOINT = -1,
   USB_CONTROL_TRANSFER,
   USB_ISOCHRONOUS_TRANSFER,
   USB_BULK_TRANSFER,
@@ -62,15 +71,22 @@ typedef enum usb_transfer_status {
   USB_TRANSFER_NO_DEVICE,      /**< The device was disconnected. */
 } usb_transfer_status_t;
 
+typedef struct usb_control_setup {
+  uint8_t bmRequestType, bRequest;
+  uint16_t wValue, wIndex, wLength;
+} usb_control_setup_t;
+
 typedef struct usb_device *usb_device_t; /**< opaque handle representing a connected device */
+
+#define USB_RETRY_FOREVER 0
 
 /**
  * Type of the function to be called when a usb device is connected or disconnected.
  * @param device Handle for the device that was connected or disconnected.
  * @param data Opaque pointer passed to usb_Init().
- * @return Return USB_SUCCESS to initialize the device, USB_IGNORE to ignore a device without erroring, or an error to ignore the device and return from usb_HandleEvents().
+ * @return Return USB_SUCCESS to initialize the device, USB_IGNORE to ignore a device without erroring, or an error to ignore the device and return from usb_ProcessEvents().
  */
-typedef usb_error_t (*device_callback_t)(usb_device_t device, void *data);
+typedef usb_error_t (*usb_connect_callback_t)(usb_device_t device, void *data, usb_connect_flags_t flags);
 
 /**
  * Type of the function to be called when a transfer finishes.
@@ -80,28 +96,39 @@ typedef usb_error_t (*device_callback_t)(usb_device_t device, void *data);
  * @param data Opaque pointer passed to usb_ScheduleTransfer().
  * @param transferred The number of bytes transferred.
  * Only valid if \p status was USB_TRANSFER_COMPLETED.
- * @return Return USB_SUCCESS to free the transfer, USB_IGNORE to restart the transfer or an error to free the transfer and return from usb_HandleEvents().
+ * @return Return USB_SUCCESS to free the transfer, USB_IGNORE to restart the transfer or an error to free the transfer and return from usb_ProcessEvents().
  */
-typedef usb_error_t (*transfer_callback_t)(usb_device_t device, uint8_t endpoint, usb_transfer_status_t status, size_t transferred, void *data);
+typedef usb_error_t (*usb_transfer_callback_t)(usb_device_t device, uint8_t endpoint, usb_transfer_status_t status, size_t transferred, void *data);
 
 /**
  * Initializes the usb driver.
- * @param connect_handler Function to be called when a usb device is connected.
+ * @param connect_handler Function to be called when a usb device is dis/connected..
  * @param connect_data Opaque pointer to be passed to the \p connect_handler.
- * @param disconnect_handler Function to be called when a usb device is disconnected.
- * @param disconnect_data Opaque pointer to be passed to the \p disconnect_handler.
  * @param flags Which areas of memory to use.
  * @return USB_SUCCESS if initialization succeeded.
  * @note This must be called before any other function, and can be called again
  * to cancel all transfers and close all connections.
  */
-usb_error_t usb_Init(device_callback_t connect_handler, void *connect_data, device_callback_t disconnect_handler, void *disconnect_data, usb_init_flags_t flags);
+usb_error_t usb_Init(usb_connect_callback_t connect_handler, void *connect_data, usb_init_flags_t flags);
 
 /**
  * Deinitializes the usb driver.
  * @note This must be called before the program exits.
  */
 void usb_Cleanup(void);
+
+/**
+ * Sets the descriptors to use when connected to a host.  If this is not called
+ * before a call to usb_connect_callback_t with (flags & USB_CONNECTED_TO_HOST)
+ * returns, or is called with NULL, then the default calculator device
+ * descriptors will be used.  In a passed array, the first entry points to a
+ * device descriptor, and the rest to each configuration descriptor.  If the
+ * first entry is NULL, then that speed is disabled.  The arrays just need
+ * to be readable, but the descriptors themselves must be in ram.
+ * @param descriptors An array of pointers to descriptors, pointer to NULL for
+ * disabled, or NULL for default.
+ */
+void usb_SetDeviceDescriptors(void **full_speed_descriptors, void **high_speed_descriptors);
 
 /**
  * Finds the first device satisfying flags.
@@ -122,7 +149,7 @@ usb_device_t usb_FindNextDevice(usb_device_t from, usb_find_flags_t flags);
  * Calls any triggered device or transfer callbacks.
  * @return An error returned by a callback or USB_SUCCESS.
  */
-usb_error_t usb_HandleEvents(void);
+usb_error_t usb_ProcessEvents(void);
 
 /**
  * Clears an endpoint's halt/stall condition.
@@ -160,7 +187,15 @@ usb_speed_t usb_GetDeviceSpeed(usb_device_t device);
  * @param endpoint The endpoint to communicate with.
  * @return The endpoint's wMaxPacketSize or 0 on error.
  */
-usb_speed_t usb_GetMaxPacketSize(usb_device_t device, uint8_t endpoint);
+uint16_t usb_GetMaxPacketSize(usb_device_t device, uint8_t endpoint);
+
+/**
+ * Gets the transfer type of an endpoint, or USB_UNUSED_ENDPOINT for unused endpoints.
+ * @param device The device to communicate with.
+ * @param endpoint The endpoint to communicate with.
+ * @return The endpoint's wMaxPacketSize or 0 on error.
+ */
+usb_transfer_type_t usb_GetTransferType(usb_device_t device, uint8_t endpoint);
 
 /**
  * Determines how large of a buffer would be required to receive the complete configuration descriptor at \p index.
@@ -234,71 +269,82 @@ usb_error_t usb_GetInterfaceAltSetting(usb_device_t device, uint8_t interface, u
 usb_error_t usb_SetInterfaceAltSetting(usb_device_t device, uint8_t interface, uint8_t alternate_setting);
 
 /**
- * Schedules a control transfer and waits for it to complete.
+ * If endpoint is a control endpoint, schedules a control transfer to that
+ * endpoint and waits for it to complete.  If endpoint is not a control
+ * endpoint, schedules a transfer of the endpoint's transfer type using
+ * setup->wLength as the number of bytes to transfer and ignoring the rest of
+ * the fields in setup, and waits for it to complete.
  * @param device The device to communicate with.
  * @param endpoint Address of the control endpoint to communicate with.
  * Bit 7 is ignored.
- * @param bmRequestType The request type field of the setup packet.
- * Bit 7 specifies the direction of the transfer.
- * @param bRequest The request field of the setup packet.
- * @param wValue The value field of the setup packet.
- * @param wIndex The index field of the setup packet.
- * @param buffer Data to transfer that must reside in RAM.
- * @param wLength The length field of the setup packet.
- * The buffer must be at least this large.
+ * @param setup The setup packet to send.
+ * @param buffer Data to transfer that must reside in RAM and be at least
+ * setup->wLength bytes.
+ * @param retries How many times to retry the transfer before timing out.
+ * If retries is 0, the transfer never times out.
  * @param transferred Returns the number of bytes actually transferred.
+ * NULL means don't return anything.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_ControlTransfer(usb_device_t device, uint8_t endpoint, uint8_t bmRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex, void *buffer, uint16_t wLength, size_t *transferred);
+usb_error_t usb_ControlTransfer(usb_device_t device, uint8_t endpoint,
+				usb_control_setup_t *setup, void *buffer,
+				unsigned retries, size_t *transferred);
 
 /**
- * Schedules a bulk transfer and waits for it to complete.
+ * Schedules a control transfer to the default control pipe and waits for it to
+ * complete.
+ * @param device The device to communicate with.
+ * @param setup The setup packet to send.
+ * @param buffer Data to transfer that must reside in RAM and be at least
+ * setup->wLength bytes.
+ * @param retries How many times to retry the transfer before timing out.
+ * If retries is 0, the transfer never times out.
+ * @param transferred Returns the number of bytes actually transferred.
+ * NULL means don't return anything.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+#define usb_DefaultControlTransfer(device, setup, buffer, retries, transferred)\
+  usb_ControlTransfer(device, 0, setup, buffer, retries, transferred)
+
+/**
+ * If endpoint is not a control endpoint, schedules a transfer of the endpoint's
+ * transfer type and waits for it to complete.  If endpoint is a control
+ * endpoint, schedules a control transfer interpreting the beginning of buffer
+ * as the \c usb_control_setup_t, uses the rest of the buffer as the transfer
+ * buffer, and waits for it to complete.
  * @param device The device to communicate with.
  * @param endpoint Address of the bulk endpoint to communicate with.
- * Bit 7 specifies the direction of the transfer.
+ * Bit 7 specifies the direction of the transfer, ignored for control transfers.
  * @param buffer Data to transfer that must reside in RAM.
+ * Starts with a \c usb_control_setup_t.
  * @param length The number of bytes to transfer.
  * The \p buffer must be at least this large.
+ * Ignored for control transfers, where the buffer must be at least \code{.c}
+ * sizeof(usb_control_setup_t) + ((usb_control_setup_t *)buffer)->wLength
+ * \endcode bytes.
+ * @param retries How many times to retry the transfer before timing out.
+ * If retries is 0, the transfer never times out.
  * @param transferred Returns the number of bytes actually transferred.
+ * NULL means don't return anything.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_BulkTransfer(usb_device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
+usb_error_t usb_Transfer(usb_device_t device, uint8_t endpoint, void *buffer,
+			 size_t length, unsigned retries, size_t *transferred);
+#define usb_BulkTransfer usb_Transfer
+#define usb_InterruptTransfer usb_Transfer
+#define usb_IsochronousTransfer usb_Transfer
 
 /**
- * Schedules an interrupt transfer and waits for it to complete.
- * @param device The device to communicate with.
- * @param endpoint Address of the interrupt endpoint to communicate with.
- * Bit 7 specifies the direction of the transfer.
- * @param buffer Data to transfer that must reside in RAM.
- * @param length The number of bytes to transfer.
- * The \p buffer must be at least this large.
- * @param transferred Returns the number of bytes actually transferred.
- * @return USB_SUCCESS if the transfer succeeded or an error.
- */
-usb_error_t usb_InterruptTransfer(usb_device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
-
-/**
- * Schedules an isochronous transfer and waits for it to complete.
- * @param device The device to communicate with.
- * @param endpoint Address of the isochronous endpoint to communicate with.
- * Bit 7 specifies the direction of the transfer.
- * @param buffer Data to transfer that must reside in RAM.
- * @param length The number of bytes to transfer.
- * The \p buffer must be at least this large.
- * @param transferred Returns the number of bytes actually transferred.
- * @return USB_SUCCESS if the transfer succeeded or an error.
- */
-usb_error_t usb_IsochronousTransfer(usb_device_t device, uint8_t endpoint, void *buffer, size_t length, size_t *transferred);
-
-/**
- * Schedules a transfer.
+ * If endpoint is a control endpoint, schedules a control transfer to that
+ * endpoint.  If endpoint is not a control endpoint, schedules a transfer of the
+ * endpoint's transfer type using setup->wLength as the number of bytes to
+ * transfer and ignoring the rest of the fields in setup.
  * @param device The device to communicate with.
  * @param endpoint Address of endpoint to communicate with.
  * Bit 7 is ignored for control transfers, and the direction of other transfers.
- * @param type Type of the endpoint and transfer.
+ * @param setup Setup packet, ignored for non-control transfers.
  * @param buffer Data to transfer that must reside in RAM.
  * This buffer must remain valid until the callback is called i.e. it cannot be modified or freed.
- * For control transfers, the setup packet occupies the first 8 bytes of the buffer regardless of the direction of transfer, and should not be included in the setup packet's wLength field, and the \p length parameter is ignored.
  * @param length Number of bytes to transfer.
  * The \p buffer must be at least this large.
  * However, this is ignored for control transfers
@@ -307,7 +353,39 @@ usb_error_t usb_IsochronousTransfer(usb_device_t device, uint8_t endpoint, void 
  * @param data Opaque pointer to be passed to the \p handler.
  * @return USB_SUCCESS if the transfer was scheduled or an error.
  */
-usb_error_t usb_ScheduleTransfer(usb_device_t device, uint8_t endpoint, usb_transfer_type_t type, void *buffer, size_t length, transfer_callback_t handler, void *data);
+usb_error_t usb_ScheduleControlTransfer(usb_device_t device, uint8_t endpoint,
+					usb_control_setup_t *setup,
+					void *buffer,
+					usb_transfer_callback_t handler,
+					void *data);
+
+/**
+ * If endpoint is not a control endpoint, schedules a transfer of the endpoint's
+ * transfer type.  If the endpoint is a control endpoint, schedules a control
+ * transfer interpreting the beginning of buffer as the \c usb_control_setup_t
+ * and using the rest of the buffer as the transfer buffer.
+ * @param device The device to communicate with.
+ * @param endpoint Address of endpoint to communicate with.
+ * Bit 7 is ignored for control transfers, and the direction of other transfers.
+ * @param type Type of the endpoint and transfer.
+ * @param buffer Data to transfer that must reside in RAM.
+ * This buffer must remain valid until the callback is called i.e. it cannot be modified or freed.
+ * @param length Number of bytes to transfer.
+ * The \p buffer must be at least this large.
+ * Ignored for control transfers, where the buffer must be at least \code{.c}
+ * sizeof(usb_control_setup_t) + ((usb_control_setup_t *)buffer)->wLength
+ * \endcode bytes.
+ * @param transferred Returns the number of bytes actually transferred.
+ * @param handler Function to be called when the transfer finishes.
+ * @param data Opaque pointer to be passed to the \p handler.
+ * @return USB_SUCCESS if the transfer was scheduled or an error.
+ */
+usb_error_t usb_ScheduleTransfer(usb_device_t device, uint8_t endpoint,
+				 void *buffer, size_t length,
+				 usb_transfer_callback_t handler, void *data);
+#define usb_ScheduleBulkTransfer usb_ScheduleTransfer
+#define usb_ScheduleInterruptTransfer usb_ScheduleTransfer
+#define usb_ScheduleIsochronousTransfer usb_ScheduleTransfer
 
 #ifdef __cplusplus
 }
