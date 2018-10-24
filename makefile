@@ -76,6 +76,7 @@ BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
 GRAPHXDIR  := $(call NATIVEPATH,$(SRCDIR)/graphx)
 KEYPADCDIR := $(call NATIVEPATH,$(SRCDIR)/keypadc)
 FILEIOCDIR := $(call NATIVEPATH,$(SRCDIR)/fileioc)
+USBDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/usbdrvce)
 LIBLOADDIR := $(call NATIVEPATH,$(SRCDIR)/libload)
 
 CEDEVDIR   := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME))
@@ -96,7 +97,7 @@ LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,s
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
+all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc usbdrvce libload ce std startup
 	@echo Toolchain built.
 
 clean: clean-graphx clean-fileioc clean-keypadc clean-usbdrvce clean-ce clean-std clean-libload clean-startup
@@ -317,6 +318,7 @@ help:
 	@echo clean-fileioc
 	@echo clean-keypadc
 	@echo clean-usbdrvce
+	@echo doxygen
 	@echo install
 	@echo uninstall
 	@echo release

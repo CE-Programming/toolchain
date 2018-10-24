@@ -32,6 +32,7 @@ INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
 H_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/include)
 I_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/lib/libload)
 
+LIB        :=$(NAME).lib
 LIB_8XV    :=$(NAME).8xv
 LIB_H      :=$(NAME).h
 
@@ -41,10 +42,10 @@ $(LIB_8XV): $(SRC)
 	$(FASMG) $< $@
 
 clean:
-	$(RM) $(LIB_8XV)
+	$(RM) $(LIB) $(LIB_8XV)
 
 install:
 	$(CP) $(LIB_H) $(H_LOC)
-	$(CP) $(SRC) $(I_LOC)
+	$(CP) $(LIB) $(I_LOC)
 
 .PHONY: all clean install
