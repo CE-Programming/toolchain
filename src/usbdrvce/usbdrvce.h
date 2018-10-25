@@ -51,66 +51,230 @@ typedef enum usb_error {
   USB_USER_ERROR = 100,
 } usb_error_t;
 
-typedef enum usb_find_flags {
-  USB_FIND_DISABLED = 1 << 0, /**< Only return disabled devices. */
-  USB_FIND_ENABLED  = 1 << 1, /**< Only return enabled devices. */
-  USB_FIND_DEVICE   = 1 << 2, /**< Only return non-hubs. */
-  USB_FIND_HUB      = 1 << 3, /**< Only return hubs. */
-  USB_FIND_DIRECT   = 1 << 4, /**< Only return devices directly attached to the
-                                   specified \p root hub. */
-} usb_find_flags_t;
+typedef enum usb_transfer_status {
+  USB_TRANSFER_COMPLETED,    /**< Transfered successfully. @note A receive    */
+                             /**  transfer will complete when the end of a    */
+                             /**  packet is detected, or the buffer is        */
+                             /**  filled, whichever happens first.            */
+  USB_TRANSFER_ERROR,        /**< Transfer failed due to timout and/or        */
+                             /**  corruption.                                 */
+  USB_TRANSFER_TIMED_OUT,    /**< Max retry attempts exceeded.                */
+  USB_TRANSFER_CANCELLED,    /**< Transfer was cancelled by the user.         */
+  USB_TRANSFER_STALL,        /**< Endpoint halt condition detected or control */
+                             /**  request not supported.                      */
+  USB_TRANSFER_NO_DEVICE,    /**< The device was disconnected.                */
+  USB_TRANSFER_OVERFLOW,     /**< Device sent more bytes than can be stored   */
+                             /**  in the transfer buffer, and were therefore  */
+                             /**  lost. @note This can be avoided by ensuring */
+                             /**  that receive buffer lengths are always a    */
+                             /**  multiple of the endpoint's maximum packet   */
+                             /**  length.                                     */
+  USB_TRANSFER_MEMORY_ERROR, /**< Memory could not be accessed in a timely    */
+                             /**  enough fashion to complete the transfer.    */
+                             /**  @note This probably means that non-default  */
+                             /**  cpu speed or lcd parameters are in use.     */
+  USB_TRANSFER_HOST_ERROR,   /**< The results of the transaction were         */
+                             /**  missed due to host hold-off. @note This     */
+                             /**  probably indicates a bug in this library.   */
+} usb_transfer_status_t;
+
+typedef enum usb_find_flag {
+  USB_FIND_DISABLED = 1 << 0, /**< Only return disabled devices.              */
+  USB_FIND_ENABLED  = 1 << 1, /**< Only return enabled devices.               */
+  USB_FIND_DEVICE   = 1 << 2, /**< Only return non-hubs.                      */
+  USB_FIND_HUB      = 1 << 3, /**< Only return hubs.                          */
+  USB_FIND_DIRECT   = 1 << 4, /**< Only return devices directly attached to   */
+                              /**  the specified \p root hub.                 */
+} usb_find_flag_t;
 
 typedef enum usb_speed {
   USB_SPEED_UNKNOWN = -1,
-  USB_SPEED_FULL,
-  USB_SPEED_LOW,
-  USB_SPEED_HIGH,
-  USB_SPEED_SUPER,
+  USB_SPEED_FULL,             /**<  12 Mb/s                                    */
+  USB_SPEED_LOW,              /**< 1.5 Mb/s                                    */
+  USB_SPEED_HIGH,             /**< 480 Mb/s                                    */
+  USB_SPEED_SUPER,            /**<   5 Gb/s                                    */
 } usb_speed_t;
 
+typedef enum usb_transfer_direction {
+  USB_HOST_TO_DEVICE = 0 << 7,
+  USB_DEVICE_TO_HOST = 1 << 7,
+} usb_transfer_direction_t;
+
+typedef enum usb_request_type {
+  USB_STANDARD_REQUEST = 0 << 5,
+  USB_CLASS_REQUEST    = 1 << 5,
+  USB_VENDOR_REQUEST   = 2 << 5,
+} usb_request_type_t;
+
+typedef enum usb_request {
+  USB_GET_STATUS,
+  USB_CLEAR_FEATURE,
+  USB_SET_FEATURE = 3,
+  USB_SET_ADDRESS = 5,
+  USB_GET_DESCRIPTOR,
+  USB_SET_DESCRIPTOR,
+  USB_GET_CONFIGURATION,
+  USB_SET_CONFIGURATION,
+  USB_GET_INTERFACE,
+  USB_SET_INTERFACE,
+  USB_SYNC_FRAME,
+} usb_request_t;
+
+typedef enum usb_descriptor_type {
+  USB_DEVICE_DESCRIPTOR = 1,
+  USB_CONFIGURATION_DESCRIPTOR,
+  USB_STRING_DESCRIPTOR,
+  USB_INTERFACE_DESCRIPTOR,
+  USB_ENDPOINT_DESCRIPTOR,
+  USB_DEVICE_QUALIFIER_DESCRIPTOR,
+  USB_OTHER_SPEED_CONFIGURATION_DESCRIPTOR,
+  USB_INTERFACE_POWER_DESCRIPTOR,
+} usb_descriptor_type_t;
+
+typedef enum usb_class {
+  USB_INTERFACE_SPECIFIC_CLASS,
+  USB_AUDIO_CLASS,
+  USB_COMM_CLASS,
+  USB_HID_CLASS,
+  USB_PHYSICAL_CLASS = 5,
+  USB_IMAGE_CLASS,
+  USB_PRINTER_CLASS,
+  USB_STORAGE_CLASS,
+  USB_HUB_CLASS,
+  USB_CDC_DATA_CLASS,
+  USB_SMART_CARD_CLASS,
+  USB_CONTENT_SECURITY_CLASS,
+  USB_VIDEO_CLASS,
+  USB_PERSONAL_HEALTCARE_CLASS,
+  USB_AUDIO_VIDEO_CLASS,
+  USB_BILLBOARD_CLASS,
+  USB_TYPE_C_BRIDGE_CLASS,
+  USB_DIAGNOSTIC_DEVICE_CLASS = 0xDC,
+  USB_WIRELESS_CONTROLLER_CLASS = 0xE0,
+  USB_MISCELLANEOUS_CLASS = 0xEF,
+  USB_APPLICATION_SPECIFIC_CLASS = 0xFE,
+  USB_VENDOR_SPECIFIC_CLASS = 0xFF,
+} usb_class_t;
+
+typedef enum usb_configuration_attributes {
+  USB_BUS_POWERED              = 0 << 6,
+  USB_SELF_POWERED             = 1 << 6,
+  USB_NO_REMOTE_WAKEUP         = 0 << 5,
+  USB_REMOTE_WAKEUP            = 1 << 5,
+  USB_CONFIGURATION_ATTRIBUTES = 1 << 7,
+} usb_configuration_attributes_t;
+
+typedef enum usb_usage_type {
+  USB_DATA_ENDPOINT                   = 0 << 4,
+  USB_FEEDBACK_ENDPOINT               = 1 << 4,
+  USB_IMPLICIT_FEEDBACK_DATA_ENDPOINT = 2 << 4,
+} usb_usage_type_t;
+
+typedef enum usb_synchronization_type {
+  USB_NO_SYNCHRONIZATION = 0 << 2,
+  USB_ASYNCHRONOUS       = 1 << 2,
+  USB_ADAPTIVE           = 2 << 2,
+  USB_SYNCHRONOUS        = 3 << 2,
+} usb_synchronization_type_t;
+
 typedef enum usb_transfer_type {
-  USB_UNUSED_ENDPOINT = -1,
   USB_CONTROL_TRANSFER,
   USB_ISOCHRONOUS_TRANSFER,
   USB_BULK_TRANSFER,
   USB_INTERRUPT_TRANSFER,
 } usb_transfer_type_t;
 
-typedef enum usb_transfer_status {
-  USB_TRANSFER_COMPLETED,      /**< Transfered successfully. @note A receive
-                                    transfer will complete when the end of a
-                                    packet is detected, or the buffer is filled,
-                                    whichever happens first. */
-  USB_TRANSFER_STALLED,        /**< Endpoint halt condition detected or control
-                                    request not supported. */
-  USB_TRANSFER_FAILED,         /**< Transfer failed due to timout and/or
-                                    corruption. */
-  USB_TRANSFER_MEMORY_ERROR,   /**< Memory could not be accessed in a timely
-                                    enough fashion to complete the transfer.
-                                    @note This usually means you changed the cpu
-                                    speed or lcd parameters or something. */
-  USB_TRANSFER_OVERFLOW_ERROR, /**< Device sent more bytes than can be stored in
-                                    the transfer buffer, and were therefore
-                                    lost. @note This can be avoided be making
-                                    sure receive buffer lengths are always a
-                                    multiple of the endpoint's maximum packet
-                                    length. */
-  USB_TRANSFER_HOST_ERROR,     /**< The results of the transaction were missed
-                                    due to host hold-off. @note This usually
-                                    indicates a bug in this library. */
-  USB_TRANSFER_NO_DEVICE,      /**< The device was disconnected. */
-} usb_transfer_status_t;
-
 typedef struct usb_control_setup {
-  uint8_t bmRequestType, bRequest;
-  uint16_t wValue, wIndex, wLength;
+  uint8_t  bmRequestType;       /**< direction, type, and recipient           */
+  uint8_t  bRequest;            /**< usb_request_t                            */
+  uint16_t wValue;              /**< request specific                         */
+  uint16_t wIndex;              /**< request specific                         */
+  uint16_t wLength;             /**< transfer length                          */
 } usb_control_setup_t;
 
-typedef struct usb_device *usb_device_t; /**< opaque handle for a device */
+typedef struct usb_descriptor {
+  uint8_t  bLength;             /**< The length of this descriptor.           */
+  uint8_t  bDescriptorType;     /**< A usb_descriptor_type_t.                 */
+  uint8_t  data[1];             /**< The rest of the descriptor               */
+} usb_descriptor_t;
+
+typedef struct usb_device_descriptor {
+  uint8_t  bLength;             /**< 18                                       */
+  uint8_t  bDescriptorType;     /**< USB_DEVICE_DESCRIPTOR                    */
+  uint16_t bcdUSB;              /**< usb specification version                */
+  uint8_t  bDeviceClass;        /**< usb_class_t                              */
+  uint8_t  bDeviceSubClass;     /**< usb class specific                       */
+  uint8_t  bDeviceProtocol;     /**< usb class specific                       */
+  uint8_t  bMaxPacketSize0;     /**< 8, 16, 32, or 64                         */
+  uint16_t idVendor;            /**< usb assigned vendor id                   */
+  uint16_t idProduct;           /**< usb assigned product id                  */
+  uint16_t bcdDevice;           /**< device version                           */
+  uint8_t  iManufacturer;       /**< index of manufacturer string descriptor  */
+  uint8_t  iProduct;            /**< index of product string descriptor       */
+  uint8_t  iSerialNumber;       /**< index of serial number string descriptor */
+  uint8_t  bNumConfigurations;  /**< how many valid configuration indices     */
+} usb_device_descriptor_t;
+
+typedef struct usb_device_qualifier_descriptor {
+  uint8_t  bLength;             /**< 10                                       */
+  uint8_t  bDescriptorType;     /**< USB_DEVICE_QUALIFIER_DESCRIPTOR          */
+  uint16_t bcdUSB;              /**< usb specification version                */
+  uint8_t  bDeviceClass;        /**< usb_class_t                              */
+  uint8_t  bDeviceSubClass;     /**< usb class specific                       */
+  uint8_t  bDeviceProtocol;     /**< usb class specific                       */
+  uint8_t  bMaxPacketSize0;     /**< 8, 16, 32, or 64                         */
+  uint8_t  bNumConfigurations;  /**< how many valid configuration indices     */
+  uint8_t  bReserved;           /**< must be 0                                */
+} usb_device_qualifier_descriptor_t;
+
+typedef struct usb_configuration_descriptor {
+  uint8_t  bLength;             /**< 9                                        */
+  uint8_t  bDescriptorType;     /**< USB_CONFIGURATION_DESCRIPTOR             */
+  uint16_t wTotalLength;        /**< total length of combined descriptors     */
+  uint8_t  bNumInterfaces;      /**< how many interface descriptors follow    */
+  uint8_t  bConfigurationValue; /**< value used to select this configuration  */
+  uint8_t  iConfiguration;      /**< index of description string descriptor   */
+  uint8_t  bmAttributes;        /**< usb_configuration_attributes_t           */
+  uint8_t  bMaxPower;           /**< units of 2mA                             */
+} usb_configuration_descriptor_t;
+typedef struct usb_configuration_descriptor usb_other_speed_configuration_t;
+
+typedef struct usb_interface_descriptor {
+  uint8_t  bLength;             /**< 9                                        */
+  uint8_t  bDescriptorType;     /**< USB_INTERFACE_DESCRIPTOR                 */
+  uint8_t  bInterfaceNumber;    /**< zero-based interface index               */
+  uint8_t  bAlternateSetting;   /**< value used to select this alt setting    */
+  uint8_t  bNumEndpoints;       /**< how many endpoint descriptors follow     */
+  uint8_t  bInterfaceClass;     /**< usb_class_t                              */
+  uint8_t  bInterfaceSubClass;  /**< usb class specific                       */
+  uint8_t  bInterfaceProtocol;  /**< usb class specific                       */
+  uint8_t  iInterface;          /**< index of description string descriptor   */
+} usb_interface_descriptor_t;
+
+typedef struct usb_endpoint_descriptor {
+  uint8_t  bLength;             /**< 7                                        */
+  uint8_t  bDescriptorType;     /**< USB_ENDPOINT_DESCRIPTOR                  */
+  uint8_t  bEndpointAddress;    /**< endpoint direction and number            */
+  uint8_t  bmAttributes;        /**< usb_usage_type_t |                       */
+                                /**  usb_synchronization_type_t |             */
+                                /**  usb_transfer_type_t                      */
+  uint16_t wMaxPacketSize;      /**  transfer type specific                   */
+  uint8_t  bInterval;           /**  transfer type specific                   */
+} usb_endpoint_descriptor_t;
+
+typedef struct usb_string_descriptor {
+  uint8_t  bLength;             /**< byte length, not character length        */
+  uint8_t  bDescriptorType;     /**< USB_STRING_DESCRIPTOR                    */
+  wchar_t  bString[1];          /**< UTF-16 string, no null termination       */
+} usb_string_descriptor_t;
+
+typedef struct usb_device   *usb_device_t;   /**< opaque  device  handle */
+typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
+typedef struct usb_transfer *usb_transfer_t; /**< opaque transfer handle */
 
 #define USB_RETRY_FOREVER 0xFFFFFFu
 
-#define usb_RootHub ((usb_device_t)0xD13FC0)
+#define usb_RootHub ((usb_device_t)0xD13FC0) /**< Root hub device */
 
 /**
  * Type of the function to be called when a usb device event occurs.
@@ -169,50 +333,34 @@ void usb_Cleanup(void);
  * @param descriptors An array of pointers to descriptors, pointer to NULL for
  * disabled, or NULL for default.
  */
-void usb_SetDeviceDescriptors(void **full_speed_descriptors,
-                              void **high_speed_descriptors);
+void usb_SetDeviceDescriptors(void *const *full_speed_descriptors,
+                              void *const *high_speed_descriptors);
 
 /**
- * Calls any triggered device or transfer callbacks.
+ * Calls any device or transfer callbacks that have triggered.
  * @return An error returned by a callback or USB_SUCCESS.
  */
-usb_error_t usb_ProcessEvents(void);
+usb_error_t usb_HandleEvents(void);
 
 /**
- * Finds the next device connected through \p root after \p from satisfying
- * flags.
- * @param root Hub below which to limit search.
- * @param from Device to start the search from.
- * @param flags What kinds of devices to return.
- * @return The first matching device under \p root and after \p from, or NULL if
- *         no more matching devices.
+ * Waits for any device or transfer events to occur, then calls their associated
+ * callbacks.
+ * @return An error returned by a callback or USB_SUCCESS.
  */
-usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
-                            usb_find_flags_t flags);
+usb_error_t usb_WaitForEvents(void);
 
 /**
- * Finds the first device satisfying flags.
- * @param flags What kinds of devices to return.
- * @return The first matching device, or NULL if no more matching devices.
+ * Waits for any interrupt to occur, then calls any device or transfer callbacks
+ * that may have triggered.
+ * @return An error returned by a callback or USB_SUCCESS.
  */
-#define usb_FindFirstDevice(flags)\
-  usb_FindDevice(usb_RootHub, usb_RootHub, flags)
-
-/**
- * Finds the next device after \p from satisfying flags.
- * @param from Device to start the search from.
- * @param flags What kinds of devices to return.
- * @return The first matching device after \p from, or NULL if no matching
- * devices.
- */
-#define usb_FindNextDevice(flags, from)\
-  usb_FindDevice(usb_RootHub, from, flags)
+usb_error_t usb_WaitForInterrupt(void);
 
 /**
  * Gets the hub that \p device is attached to, or NULL if \p device is the root
  * hub.
  * @param device Device to get the hub of.
- * @return The hub that \p device is attached to, or NULL if none.
+ * @return The hub device or NULL.
  */
 usb_device_t usb_GetDeviceHub(usb_device_t device);
 
@@ -230,59 +378,64 @@ void usb_SetDeviceUserData(usb_device_t device, void *data);
 void *usb_GetDeviceUserData(usb_device_t device);
 
 /**
- * Clears an endpoint's halt/stall condition.
- * @param device The device to communicate with.
- * @param endpoint The endpoint to communicate with.
- * @return USB_SUCCESS if the transfer succeeded or an error.
+ * Finds the next device connected through \p root after \p from satisfying
+ * flags, or NULL if no more matching devices.
+ * @param root Hub below which to limit search.
+ * @param from Device to start the search from.
+ * @param flags What kinds of devices to return.
+ * @return The next matching device or NULL if none.
  */
-usb_error_t usb_ClearHalt(usb_device_t device, uint8_t endpoint);
+usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
+                            usb_find_flag_t flags);
 
 /**
- * Performs a usb reset on a device. This causes a device to become enabled.
- * @param device The device to communicate with.
- * @param endpoint The endpoint to communicate with.
+ * Finds the first device satisfying flags.
+ * @param flags What kinds of devices to return.
+ * @return The first matching device, or NULL if no more matching devices.
+ */
+#define usb_FindFirstDevice(flags)\
+  usb_FindDevice(usb_RootHub, usb_RootHub, flags)
+
+/**
+ * Finds the next device after \p from satisfying flags, or NULL if there are no
+ * more devices that match.
+ * @param from Device to start the search from.
+ * @param flags What kinds of devices to return.
+ * @return The next matching device or NULL if none.
+ */
+#define usb_FindNextDevice(from, flags)\
+  usb_FindDevice(usb_RootHub, from, flags)
+
+/**
+ * Performs a usb reset on a device. This triggers a device enabled event when
+ * the reset finishes.
+ * @param device The device to reset.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_ResetDevice(usb_device_t device);
 
 /**
- * Gets a device's address.
+ * Gets the usb address of a \p device, or 0 if disabled.
  * @param device The device to communicate with.
- * @return The usb address of \p device, or 0 if disabled.
+ * @return The usb address or 0.
  */
 uint8_t usb_GetDeviceAddress(usb_device_t device);
 
 /**
- * Gets a device's speed.
+ * Gets the speed of a \device, or USB_SPEED_UNKNOWN if unknown.
  * @param device The device to communicate with.
- * @return The \c usb_speed_t of \p device, or USB_SPEED_UNKNOWN if unknown.
+ * @return The \c usb_speed_t.
  */
 usb_speed_t usb_GetDeviceSpeed(usb_device_t device);
 
 /**
- * Gets the maximum packet size of an endpoint.
- * @param device The device to communicate with.
- * @param endpoint The endpoint to communicate with.
- * @return The endpoint's wMaxPacketSize or 0 on error.
- */
-uint16_t usb_GetEndpointMaxPacketSize(usb_device_t device, uint8_t endpoint);
-
-/**
- * Gets the transfer type of an endpoint.
- * @param device The device to communicate with.
- * @param endpoint The endpoint to communicate with.
- * @return The endpoint's \c usb_transfer_type_t or USB_UNUSED_ENDPOINT.
- */
-usb_transfer_type_t usb_GetEndpointTransferType(usb_device_t device,
-                                                uint8_t endpoint);
-
-/**
  * Determines how large of a buffer would be required to receive the complete
  * configuration descriptor at \p index.
+ * @note Blocks while the configuration descriptor is fetched.
  * @param device The device to communicate with.
  * @param index Which configuration descriptor to query.
- * @param total_length Returns the number of bytes in the complete configuration
- * descriptor.
+ * @param total_length Returns the total number of bytes in a complete
+ * configuration descriptor.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
@@ -290,7 +443,39 @@ usb_error_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
                                                       size_t *total_length);
 
 /**
- * Fetches the configuration at \p index.
+ * Gets the descriptor of a \p device of \p type at \p index.
+ * @note Blocks while the descriptor is fetched.
+ * @param device The device to communicate with.
+ * @param type The \c usb_descriptor_type_t to fetch.
+ * @param index Descriptor index to fetch.
+ * @param descriptor Returns the fetched descriptor.
+ * @param length The maximum number of bytes to receive.
+ * The \p descriptor buffer must by at least this large.
+ * @param transferred Returns the number of bytes actually received.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
+                              uint8_t index, void *descriptor, size_t length,
+                              size_t *transferred);
+
+/**
+ * Changes the descriptor at \p index.
+ * @note Blocks while the descriptor is modified.
+ * @note Devices do not usually support this.
+ * @param device The device to communicate with.
+ * @param type The \c usb_descriptor_type_t to change.
+ * @param index The descriptor index to change..
+ * @param descriptor The new descriptor.
+ * @param length The number of bytes in the new descriptor.
+ * The \p descriptor buffer must by at least this large.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type, uint8_t index,
+                              const void *descriptor, size_t length);
+
+/**
+ * Gets the string descriptor at \p index.
+ * @note Blocks while the descriptor is fetched.
  * @param device The device to communicate with.
  * @param type Descriptor type to fetch.
  * @param index Descriptor index to fetch.
@@ -300,12 +485,14 @@ usb_error_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
  * @param transferred Returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetDescriptor(usb_device_t device, uint8_t type, uint8_t index,
-                              void *descriptor, size_t length,
-                              size_t *transferred);
+usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t type, uint8_t index,
+                                    void *descriptor, size_t length,
+                                    size_t *transferred);
 
 /**
- * Changes the configuration at \p index, not usually supported.
+ * Changes the descriptor at \p index, not usually supported.  Blocks while
+ * the descriptor is modified.
+ * @note Devices do not usually support this.
  * @param device The device to communicate with.
  * @param type Descriptor type to modify.
  * @param index Descriptor index to modify.
@@ -314,8 +501,8 @@ usb_error_t usb_GetDescriptor(usb_device_t device, uint8_t type, uint8_t index,
  * The \p descriptor buffer must by at least this large.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetDescriptor(usb_device_t device, uint8_t type, uint8_t index,
-                              void *descriptor, size_t length);
+usb_error_t usb_SetStringDescriptor(usb_device_t device, uint8_t type, uint8_t index,
+                                    const void *descriptor, size_t length);
 
 /**
  * Gets the currently active configuration of a device.
@@ -335,7 +522,7 @@ usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *index);
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetConfiguration(usb_device_t device,
-                                 void *configuration_descriptor);
+                                 const void *configuration_descriptor);
 
 /**
  * Gets the current alternate setting in use on the specified interface.
@@ -358,6 +545,44 @@ usb_error_t usb_SetInterfaceAltSetting(usb_device_t device, uint8_t interface,
                                        uint8_t alternate_setting);
 
 /**
+ * Gets the endpoint of a \p device with a given \p address, or NULL if that
+ * address is unused.
+ * @param device Device to get the user data of.
+ * @param address Address of the endpoint to get.
+ * @return The specified endpoint or NULL.
+ */
+usb_endpoint_t usb_GetDeviceEndpoint(usb_device_t device, uint8_t address);
+
+/**
+ * Gets the device that \p endpoint is connected to.
+ * @param endpoint Endpoint to get the device of.
+ * @return The device for an \p endpoint.
+ */
+usb_device_t usb_GetEndpointDevice(usb_endpoint_t endpoint);
+
+/**
+ * Gets the maximum packet size of an endpoint.
+ * @param endpoint The endpoint to get the maximum packet size of..
+ * @return The wMaxPacketSize for an \p endpoint.
+ */
+uint16_t usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
+
+/**
+ * Gets the transfer type of an endpoint.
+ * @param endpoint The endpoint to get the transfer type of.
+ * @return The usb_transfer_type for an endpoint.
+ */
+usb_transfer_type_t usb_GetEndpointTransferType(usb_endpoint_t endpoint);
+
+/**
+ * Clears an endpoint's halt condition, indicated by transfers to that endpoint
+ * stalling.  This function blocks until the halt condition is cleared.
+ * @param endpoint The endpoint to clear the halt condition of.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_ClearEndpointHalt(usb_endpoint_t endpoint);
+
+/**
  * Schedules a transfer to the pipe connected to \p endpoint of \p device, in
  * the direction indicated by \p setup->bmRequestType, using \p buffer as the
  * data buffer, \p setup->wLength as the buffer length, and then waits for it to
@@ -376,7 +601,7 @@ usb_error_t usb_SetInterfaceAltSetting(usb_device_t device, uint8_t interface,
  * If \p transferred is NULL then nothing is returned.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_ControlTransfer(usb_device_t device, uint8_t endpoint,
+usb_error_t usb_ControlTransfer(usb_endpoint_t endpoint,
                                 usb_control_setup_t *setup, void *buffer,
                                 unsigned retries, size_t *transferred);
 
