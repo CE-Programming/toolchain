@@ -241,7 +241,10 @@ gfx_Begin:
 ;  None
 	ld	hl,_LargeFontJump
 	ld	a,(hl)
+	or	a,a
+	jr	nz,.alreadyset
 	ld	(UseLargeFont),a	; store the jump offset for later
+.alreadyset:
 	ld	(hl),0			; jump nowhere if false
 	call	_boot_ClearVRAM		; clear the screen
 lcdGraphxMode := lcdWatermark+lcdIntFront+lcdPwr+lcdBgr+lcdBpp8
