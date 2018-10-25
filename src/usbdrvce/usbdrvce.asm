@@ -33,7 +33,13 @@ struc transfer			; transfer structure
 	.status		rb 1	; transfer status
 	.type		rb 1	; transfer type or 3 shl 2 or last shl 7
 	.remaining	rw 1	; transfer remaining length
-	.buffers	dbx 20: ?
+	label .buffers: 20	; transfer buffers
+			rw 1
+	.callback	rd 1	; user callback
+	.data		rd 1	; user callback data
+	.length		rd 1	; original transfer length
+	.endpoint	rd 1	; pointer to endpoint structure
+			rw 1
 	size := $-.
 end struc
 struc endpoint			; endpoint structure
@@ -44,7 +50,11 @@ struc endpoint			; endpoint structure
 	.info		rb 1	; ep or speed shl 4 or dtc shl 6
 	.maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
 	.cur		rd 1	; current transfer pointer
-	.overlay	transfer	; current transfer
+	.overlay	transfer; current transfer
+	.first		rl 1	; pointer to first scheduled transfer
+	.last		rl 1	; pointer to last dummy transfer
+	.device		rl 1	; pointer to device
+	.data		rl 1	; user data
 	size := $-.
 end struc
 struc device			; device structure
