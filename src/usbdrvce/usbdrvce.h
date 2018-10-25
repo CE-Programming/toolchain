@@ -28,15 +28,15 @@ typedef enum usb_init_flags {
   USB_DEFAULT_INIT_FLAGS = USB_USE_USB_AREA | USB_USE_OS_HEAP,
 } usb_init_flags_t;
 
-typedef enum usb_device_event {
-  USB_DEVICE_DISCONNECTED,
-  USB_DEVICE_CONNECTED,
-  USB_DEVICE_DISABLED,
-  USB_DEVICE_ENABLED,
-  USB_DEVICE_OVERCURRENT_DEACTIVATED,
-  USB_DEVICE_OVERCURRENT_ACTIVATED,
-  USB_DEVICE_DEFAULT_SETUP,
-} usb_device_event_t;
+typedef enum usb_event {
+  USB_DEVICE_DISCONNECTED_EVENT,
+  USB_DEVICE_CONNECTED_EVENT,
+  USB_DEVICE_DISABLED_EVENT,
+  USB_DEVICE_ENABLED_EVENT,
+  USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT,
+  USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT,
+  USB_DEFAULT_SETUP_EVENT,
+} usb_event_t;
 
 typedef enum usb_error {
   USB_SUCCESS,
@@ -275,21 +275,77 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
 #define usb_RootHub ((usb_device_t)0xD13FC0) /**< Root hub device */
 
 /**
+ * A pointer to \c usb_callback_data_t is passed to the \c usb_event_callback_t.
+ * The default is void *, but this can be changed by doing:
+ * \code
+ * #define usb_callback_data_t struct my_usb_callback_data
+ * #include <usbdrvce.h>
+ * \endcode
+ */
+#ifndef usb_callback_data_t
+#define usb_callback_data_t void
+#endif
+/**
+ * A pointer to \c usb_device_data_t can be associated with devices.
+ * The default is void *, but this can be changed by doing:
+ * \code
+ * #define usb_device_data_t struct my_usb_callback_data
+ * #include <usbdrvce.h>
+ * \endcode
+ */
+#ifndef usb_device_data_t
+#define usb_device_data_t void
+#endif
+/**
+ * A pointer to \c usb_endpoint_data_t can be associated with endpoints.
+ * The default is void *, but this can be changed by doing:
+ * \code
+ * #define usb_endpoint_data_t struct my_usb_callback_data
+ * #include <usbdrvce.h>
+ * \endcode
+ */
+#ifndef usb_endpoint_data_t
+#define usb_endpoint_data_t void
+#endif
+/**
+ * A pointer to \c usb_transfer_data_t is passed to \c usb_transfer_callback_t.
+ * The default is void *, but this can be changed by doing:
+ * \code
+ * #define usb_transfer_data_t struct my_usb_callback_data
+ * #include <usbdrvce.h>
+ * \endcode
+ */
+#ifndef usb_transfer_data_t
+#define usb_transfer_data_t void
+#endif
+
+/**
  * Type of the function to be called when a usb device event occurs.
  * @param device Handle for the device where the event originated.
- * @param data Opaque pointer passed to usb_Init().
+ * @param data Opaque pointer passed to usb_Init().  By default is of type
+ * void *, but that can be changed by doing:
+ * \code
+ * #define usb_device_callback_data_t struct mystruct
+ * #include <usbdrvce.h>
+ * \endcode
  * @return Return USB_SUCCESS to initialize the device, USB_IGNORE to ignore it
  * without erroring, or an error to ignore the device and to return from
  * usb_ProcessEvents().
  */
-typedef usb_error_t (*usb_device_event_callback_t)(usb_device_t device,
-                                                   usb_device_event_t event,
-                                                   void *data);
+typedef usb_error_t (*usb_event_callback_t)(usb_device_t device,
+                                            usb_event_t event,
+                                            usb_callback_data_t *data);
 
 /**
  * Type of the function to be called when a transfer finishes.
  * @param endpoint The transfer endpoint.
  * @param status Status of the transfer.
+ * @param data Opaque pointer passed to usb_Schedule*Transfer().  By default is
+ * of type void *, but that can be changed by doing:
+ * \code
+ * #define usb_transfer_callback_data_t struct mystruct
+ * #include <usbdrvce.h>
+ * \endcode
  * @param data Opaque pointer passed to usb_ScheduleTransfer().
  * @param transferred The number of bytes transferred.
  * Only valid if \p status was USB_TRANSFER_COMPLETED.
@@ -298,19 +354,20 @@ typedef usb_error_t (*usb_device_event_callback_t)(usb_device_t device,
  */
 typedef usb_error_t (*usb_transfer_callback_t)(usb_endpoint_t endpoint,
                                                usb_transfer_status_t status,
-                                               size_t transferred, void *data);
+                                               size_t transferred,
+                                               usb_transfer_data_t *data);
 
 /**
  * Initializes the usb driver.
- * @param event_handler Function to be called when a usb event happens.
- * @param event_data Opaque pointer to be passed to the \p event_handler.
+ * @param handler Function to be called when a usb event happens.
+ * @param data Opaque pointer to be passed to \p handler.
  * @param flags Which areas of memory to use.
  * @return USB_SUCCESS if initialization succeeded.
  * @note This must be called before any other function, and can be called again
- * to cancel all transfers and close all connections.
+ * to cancel all transfers and disable all devices.
  */
-usb_error_t usb_Init(usb_device_event_callback_t event_handler,
-                     void *event_data, usb_init_flags_t flags);
+usb_error_t usb_Init(usb_event_callback_t handler, usb_callback_data_t *data,
+                     usb_init_flags_t flags);
 
 /**
  * Uninitializes the usb driver.
@@ -346,8 +403,8 @@ usb_error_t usb_HandleEvents(void);
 usb_error_t usb_WaitForEvents(void);
 
 /**
- * Waits for any interrupt to occur, then calls any device or transfer callbacks
- * that may have triggered.
+ * Waits for any interrupt or usb event to occur, then calls any device or
+ * transfer callbacks that may have triggered.
  * @return An error returned by a callback or USB_SUCCESS.
  */
 usb_error_t usb_WaitForInterrupt(void);
@@ -364,14 +421,14 @@ usb_device_t usb_GetDeviceHub(usb_device_t device);
  * Sets the user data associated with \p device.
  * @param device Device to set the user data of.
  */
-void usb_SetDeviceUserData(usb_device_t device, void *data);
+void usb_SetDeviceData(usb_device_t device, usb_device_data_t *data);
 
 /**
  * Gets the user data associated with \p device.
  * @param device Device to get the user data of.
- * @return The user data associated with \p device.
+ * @return The user data last set with \c usb_SetDeviceData.
  */
-void *usb_GetDeviceUserData(usb_device_t device);
+usb_device_data_t *usb_GetDeviceData(usb_device_t device);
 
 /**
  * Finds the next device connected through \p root after \p from satisfying
@@ -431,13 +488,11 @@ usb_speed_t usb_GetDeviceSpeed(usb_device_t device);
  * @note Blocks while the configuration descriptor is fetched.
  * @param device The device to communicate with.
  * @param index Which configuration descriptor to query.
- * @param total_length Returns the total number of bytes in a complete
- * configuration descriptor.
- * @return USB_SUCCESS if the transfer succeeded or an error.
+ * @return The total length in bytes of the combined configuration descriptor or
+ * 0 on error.
  */
-usb_error_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
-                                                      uint8_t index,
-                                                      size_t *total_length);
+size_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
+                                                 uint8_t index);
 
 /**
  * Gets the descriptor of a \p device of \p type at \p index.
@@ -452,8 +507,8 @@ usb_error_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
-                              uint8_t index, void *descriptor, size_t length,
-                              size_t *transferred);
+                              uint8_t index, usb_descriptor_t *descriptor,
+                              size_t length, size_t *transferred);
 
 /**
  * Changes the descriptor at \p index.
@@ -467,8 +522,9 @@ usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * The \p descriptor buffer must by at least this large.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type, uint8_t index,
-                              const void *descriptor, size_t length);
+usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
+                              uint8_t index, const usb_descriptor_t *descriptor,
+                              size_t length);
 
 /**
  * Gets the string descriptor at \p index.
@@ -514,7 +570,7 @@ usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *index);
  * This must be called before pipes other than the default control pipe can be
  * accessed.
  * @param device The device to communicate with.
- * @param configuration_descriptor A complete configuration descriptor fetched
+ * @param configuration_descriptor A combined configuration descriptor fetched
  * with usb_GetDescriptor().
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
@@ -556,6 +612,19 @@ usb_endpoint_t usb_GetDeviceEndpoint(usb_device_t device, uint8_t address);
  * @return The device for an \p endpoint.
  */
 usb_device_t usb_GetEndpointDevice(usb_endpoint_t endpoint);
+
+/**
+ * Sets the user data associated with \p endpoint.
+ * @param endpoint Endpoint to set the user data of.
+ */
+void usb_SetEndpointData(usb_endpoint_t endpoint, usb_endpoint_data_t *data);
+
+/**
+ * Gets the user data associated with \p endpoint.
+ * @param device Endpoint to get the user data of.
+ * @return The user data last set with \c usb_SetEndpointData.
+ */
+usb_endpoint_data_t *usb_GetEndpointData(usb_endpoint_t endpoint);
 
 /**
  * Gets the maximum packet size of an endpoint.
@@ -673,7 +742,7 @@ usb_error_t usb_ScheduleControlTransfer(usb_endpoint_t endpoint,
                                         const usb_control_setup_t *setup,
                                         void *buffer,
                                         usb_transfer_callback_t handler,
-                                        void *data);
+                                        usb_transfer_data_t *data);
 
 /**
  * Schedules a control transfer to the default control pipe of \p device, in
@@ -696,7 +765,7 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
                                    /*const usb_control_setup_t **/setup,       \
                                    /*void **/buffer,                           \
                                    /*usb_transfer_callback_t */handler,        \
-                                   /*void **/data)/*;*/                        \
+                                   /*usb_transfer_data_t **/data)/*;*/         \
   usb_ScheduleControlTransfer(usb_GetDeviceEndpoint(device, 0), setup, buffer, \
                               handler, data)
 
@@ -723,7 +792,8 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  */
 usb_error_t usb_ScheduleTransfer(usb_device_t device, uint8_t endpoint,
                                  void *buffer, size_t length,
-                                 usb_transfer_callback_t handler, void *data);
+                                 usb_transfer_callback_t handler,
+                                 usb_transfer_data_t *data);
 #define usb_ScheduleBulkTransfer usb_ScheduleTransfer
 #define usb_ScheduleInterruptTransfer usb_ScheduleTransfer
 #define usb_ScheduleIsochronousTransfer usb_ScheduleTransfer
