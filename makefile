@@ -32,7 +32,7 @@ QUOTE_ARG  = "$(subst ",',$1)"#'
 APPEND     = @echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
 else
 NATIVEPATH = $(subst \,/,$1)
-RM         = rm -f
+RM         = rm -f $1
 RMDIR      = rm -rf $1
 MKDIR      = mkdir -p $1
 PREFIX    ?= $(HOME)
