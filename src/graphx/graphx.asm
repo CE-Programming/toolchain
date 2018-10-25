@@ -239,13 +239,6 @@ gfx_Begin:
 ;  arg0: bpp mode to start in
 ; Returns:
 ;  None
-	ld	hl,_LargeFontJump
-	ld	a,(hl)
-	or	a,a
-	jr	nz,.alreadyset
-	ld	(UseLargeFont),a	; store the jump offset for later
-.alreadyset:
-	ld	(hl),0			; jump nowhere if false
 	call	_boot_ClearVRAM		; clear the screen
 lcdGraphxMode := lcdWatermark+lcdIntFront+lcdPwr+lcdBgr+lcdBpp8
 	ld	de,lcdGraphxMode
@@ -3020,8 +3013,7 @@ gfx_SetTextScale:
 	or	a,a
 	ret	z			; null check
 	ld	(_TextHeightScale),a
-	ld	(hl),0			; modified at boot to SM the jump
-UseLargeFont := $-1
+	ld	(hl),_PrintLargeFont - _PrintNormalFont
 	ret
 .bothone:
 	ld	(hl),a			; store a 0, which means no (literal) jump
@@ -3110,7 +3102,7 @@ _TextYPos := $-3
 smcByte _TextHeight
 	wait_quick
 	jr	_PrintLargeFont		; SMC the jump
-_LargeFontJump := $-1
+_PrintNormalFont:
 .loop:
 	ld	c,(hl)			; c = 8 pixels
 	add	iy,de			; get draw location
