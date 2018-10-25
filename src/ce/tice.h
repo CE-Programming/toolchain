@@ -51,6 +51,64 @@ void srandom(uint32_t seed);
 void delay(uint16_t msec);
 
 /**
+ * "Atomically" loads from a volatile 32-bit value.
+ *
+ * @remarks
+ * The hardware does not provide a mechanism to truly atomically load from a
+ * 32-bit value. This "atomic" load is implemented by non-atomically reading the
+ * value twice and retrying if the values read differ.
+ *
+ * @attention
+ * If the maximum period between two value changes is 1us or less (assuming a
+ * CPU clock speed of 48MHz), then this function may never complete. For
+ * instance, the counter of a timer ticking at 1MHz or more should not be read
+ * using this function. In such a case of a purely increasing or decreasing
+ * value, atomic_load_increasing_32() or atomic_load_decreasing_32() may be
+ * appropriate instead.
+ *
+ * @param p pointer to 32-bit value
+ */
+uint32_t atomic_load_32(volatile uint32_t *p);
+
+/**
+ * "Atomically" loads from a volatile, increasing 32-bit value.
+ *
+ * @remarks
+ * The hardware does not provide a mechanism to truly atomically load from a
+ * 32-bit value. This "atomic" load is implemented by temporarily disabling
+ * interrupts while non-atomically reading the value twice and then returning
+ * the lesser of the two values read.
+ *
+ * @attention
+ * If the minimum period between two value changes is 5us or less and the
+ * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
+ * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
+ * note may be the fact that a 48MHz counter does not exceed this limit.
+ *
+ * @param p pointer to 32-bit value
+ */
+uint32_t atomic_load_increasing_32(volatile uint32_t *p);
+
+/**
+ * "Atomically" loads from a volatile, decreasing 32-bit value.
+ *
+ * @remarks
+ * The hardware does not provide a mechanism to truly atomically load from a
+ * 32-bit value. This "atomic" load is implemented by temporarily disabling
+ * interrupts while non-atomically reading the value twice and then returning
+ * the greater of the two values read.
+ *
+ * @attention
+ * If the minimum period between two value changes is 5us or less and the
+ * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
+ * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
+ * note may be the fact that a 48MHz counter does not exceed this limit.
+ *
+ * @param p pointer to 32-bit value
+ */
+uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
+
+/**
  * Gets a combination of the RTC time; useful for srand()
  */
 #define rtc_Time()              (*(volatile uint32_t*)0xF30044)
@@ -114,6 +172,15 @@ void delay(uint16_t msec);
 #define TIMER2_UP                (1<<10) /* Timer 2 counts up                                      */
 #define TIMER2_DOWN              (0<<10) /* Timer 2 counts down                                    */
 
+#define TIMER3_ENABLE            (1<<6)  /* Enables Timer 3                                        */
+#define TIMER3_DISABLE           (0<<6)  /* Disables Timer 3                                       */
+#define TIMER3_32K               (1<<7)  /* Use the 32K clock for timer 3                          */
+#define TIMER3_CPU               (0<<7)  /* Use the CPU clock rate for timer 3                     */
+#define TIMER3_0INT              (1<<8)  /* Enable an interrupt when 0 is reached for the timer 3  */
+#define TIMER3_NOINT             (0<<8)  /* Disable interrupts for the timer 3                     */
+#define TIMER3_UP                (1<<11) /* Timer 3 counts up                                      */
+#define TIMER3_DOWN              (0<<11) /* Timer 3 counts down                                    */
+
 /* These defines can be used to check the status of the timer */
 #define TIMER1_MATCH1            (1<<0)  /* Timer 1 hit the first match value                      */
 #define TIMER1_MATCH2            (1<<1)  /* Timer 1 hit the second match value                     */
@@ -123,35 +190,43 @@ void delay(uint16_t msec);
 #define TIMER2_MATCH2            (1<<4)  /* Timer 2 hit the second match value                     */
 #define TIMER2_RELOADED          (1<<5)  /* Timer 2 was reloaded (Needs TIMER2_0INT enabled)       */
 
+#define TIMER3_MATCH1            (1<<6)  /* Timer 3 hit the first match value                      */
+#define TIMER3_MATCH2            (1<<7)  /* Timer 3 hit the second match value                     */
+#define TIMER3_RELOADED          (1<<8)  /* Timer 3 was reloaded (Needs TIMER3_0INT enabled)       */
+
 /* Timer registers */
 #define timer_1_Counter          (*(volatile uint32_t*)0xF20000)
-#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)
 #define timer_1_ReloadValue      (*(uint32_t*)0xF20004)
-#define timer_2_ReloadValue      (*(uint32_t*)0xF20014)
 #define timer_1_MatchValue_1     (*(uint32_t*)0xF20008)
 #define timer_1_MatchValue_2     (*(uint32_t*)0xF2000C)
+#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)
+#define timer_2_ReloadValue      (*(uint32_t*)0xF20014)
 #define timer_2_MatchValue_1     (*(uint32_t*)0xF20018)
 #define timer_2_MatchValue_2     (*(uint32_t*)0xF2001C)
-#define timer_Control            (*(uint32_t*)0xF20030)
-#define timer_EnableInt          (*(uint16_t*)0xF20038)
+#define timer_3_Counter          (*(volatile uint32_t*)0xF20020)
+#define timer_3_ReloadValue      (*(uint32_t*)0xF20024)
+#define timer_3_MatchValue_1     (*(uint32_t*)0xF20028)
+#define timer_3_MatchValue_2     (*(uint32_t*)0xF2002C)
+#define timer_Control            (*(uint16_t*)0xF20030)
 #define timer_IntStatus          (*(volatile uint16_t*)0xF20034)
 #define timer_IntAcknowledge     (*(volatile uint16_t*)0xF20034)
+#define timer_EnableInt          (*(uint16_t*)0xF20038)
 
 /* LCD defines */
 #define lcd_BacklightLevel       (*(uint8_t*)0xF60024)
 #define lcd_Timing0              (*(uint32_t*)0xE30000)
 #define lcd_Timing1              (*(uint32_t*)0xE30004)
 #define lcd_Timing2              (*(uint32_t*)0xE30008)
-#define lcd_Timing3              (*(uint32_t*)0xE3000C)
+#define lcd_Timing3              (*(uint24_t*)0xE3000C)
 #define lcd_UpBase               (*(uint32_t*)0xE30010)
 #define lcd_LpBase               (*(uint32_t*)0xE30014)
-#define lcd_Control              (*(uint32_t*)0xE30018)
-#define lcd_EnableInt            (*(uint32_t*)0xE3001C)
-#define lcd_IntStatus            (*(uint32_t*)0xE30020)
-#define lcd_IntStatusMasked      (*(uint32_t*)0xE30024)
-#define lcd_IntAcknowledge       (*(uint32_t*)0xE30028)
-#define lcd_UpBaseCurr           (*(uint32_t*)0xE3002C)
-#define lcd_LpBaseCurr           (*(uint32_t*)0xE30030)
+#define lcd_Control              (*(uint24_t*)0xE30018)
+#define lcd_EnableInt            (*(uint8_t*)0xE3001C)
+#define lcd_IntStatus            (*(uint8_t*)0xE30020)
+#define lcd_IntStatusMasked      (*(uint8_t*)0xE30024)
+#define lcd_IntAcknowledge       (*(volatile uint8_t*)0xE30028)
+#define lcd_UpBaseCurr           (*(volatile uint32_t*)0xE3002C)
+#define lcd_LpBaseCurr           (*(volatile uint32_t*)0xE30030)
 #define lcd_Palette              ((uint16_t*)0xE30200)
 #define lcd_Ram                  ((uint16_t*)0xD40000)
 
