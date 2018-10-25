@@ -13,11 +13,20 @@ library 'USBDRVCE', 0
 ;-------------------------------------------------------------------------------
 	export usb_Init
 	export usb_Cleanup
+	export usb_HandleEvents
+	export usb_WaitForEvents
+	export usb_WaitForInterrupt
 	export usb_GetDeviceHub
-	export usb_SetDeviceUserData
-	export usb_GetDeviceUserData
+	export usb_SetDeviceData
+	export usb_GetDeviceData
+	export usb_FindDevice
+	export usb_ResetDevice
 	export usb_GetDeviceAddress
 	export usb_GetDeviceSpeed
+	export usb_GetDeviceEndpoint
+	export usb_GetEndpointDevice
+	export usb_SetEndpointData
+	export usb_GetEndpointData
 	export usb_GetEndpointMaxPacketSize
 	export usb_GetEndpointTransferType
 ;-------------------------------------------------------------------------------
@@ -26,8 +35,7 @@ library 'USBDRVCE', 0
 ; memory structures
 ;-------------------------------------------------------------------------------
 struc transfer			; transfer structure
-	local size
-	label .: size
+	label .: 32
 	.next		rd 1	; pointer to next transfer structure
 	.altNext	rd 1	; pointer to alternate next transfer structure
 	.status		rb 1	; transfer status
@@ -40,11 +48,10 @@ struc transfer			; transfer structure
 	.length		rd 1	; original transfer length
 	.endpoint	rd 1	; pointer to endpoint structure
 			rw 1
-	size := $-.
+	assert $-. = 32
 end struc
 struc endpoint			; endpoint structure
-	local size
-	label .: size at $-2
+	label .: 64 at $-2
 	.next		rd 1	; link to next endpoint structure
 	.addr		rb 1	; device addr or cancel shl 7
 	.info		rb 1	; ep or speed shl 4 or dtc shl 6
@@ -55,11 +62,10 @@ struc endpoint			; endpoint structure
 	.last		rl 1	; pointer to last dummy transfer
 	.device		rl 1	; pointer to device
 	.data		rl 1	; user data
-	size := $-.
+	assert $-. <= 64
 end struc
 struc device			; device structure
-	local size
-	label .: size
+	label .: 64
 	.hub		rl 1	; hub this device is connected to
 	.hubPorts	rb 1	; number of ports in this hub
 	.addr		rb 1	; device addr
@@ -70,7 +76,7 @@ struc device			; device structure
 	.child		rl 1	; first device connected to this hub
 	.sibling	rl 1	; next device connected to the same hub
 	.data		rl 1	; user data
-	size := $-.
+	assert $-. <= 64
 end struc
 iterate type, endpoint, device
 	iterate <base,name>, 0,, ix,x, iy,y
@@ -197,6 +203,21 @@ usb_Cleanup:
 	ret
 
 ;-------------------------------------------------------------------------------
+usb_HandleEvents:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+usb_WaitForEvents:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+usb_WaitForInterrupt:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
 usb_GetDeviceHub:
 	pop	de
 	ex	(sp),iy
@@ -211,7 +232,7 @@ usb_GetDeviceHub:
 	ret
 
 ;-------------------------------------------------------------------------------
-usb_SetDeviceUserData:
+usb_SetDeviceData:
 	pop	de
 	pop	iy
 	ex	(sp),hl
@@ -221,11 +242,21 @@ usb_SetDeviceUserData:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
-usb_GetDeviceUserData:
+usb_GetDeviceData:
 	pop	de
 	ex	(sp),iy
 	push	de
 	ld	hl,(ydevice.data)
+	ret
+
+;-------------------------------------------------------------------------------
+usb_FindDevice:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+usb_ResetDevice:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -248,6 +279,26 @@ usb_GetDeviceSpeed:
 	rrca
 	rrca
 	ld	l,a
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetDeviceEndpoint:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetEndpointDevice:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+usb_SetEndpointData:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetEndpointData:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
 	ret
 
 ;-------------------------------------------------------------------------------
