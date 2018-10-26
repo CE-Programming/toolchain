@@ -21,6 +21,7 @@ library 'USBDRVCE', 0
 	export usb_GetDeviceData
 	export usb_FindDevice
 	export usb_ResetDevice
+	export usb_DisconnectDevice
 	export usb_GetDeviceAddress
 	export usb_GetDeviceSpeed
 	export usb_GetDeviceEndpoint
@@ -58,6 +59,7 @@ struc endpoint			; endpoint structure
 	.maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
 	.cur		rd 1	; current transfer pointer
 	.overlay	transfer; current transfer
+
 	.first		rl 1	; pointer to first scheduled transfer
 	.last		rl 1	; pointer to last dummy transfer
 	.device		rl 1	; pointer to device
@@ -65,8 +67,9 @@ struc endpoint			; endpoint structure
 	assert $-. <= 64
 end struc
 struc device			; device structure
-	label .: 64
+	label .: 32
 	.hub		rl 1	; hub this device is connected to
+	.find		rb 1	; find flags
 	.hubPorts	rb 1	; number of ports in this hub
 	.addr		rb 1	; device addr
 	.speed		rb 1	; device speed shl 4
@@ -76,7 +79,7 @@ struc device			; device structure
 	.child		rl 1	; first device connected to this hub
 	.sibling	rl 1	; next device connected to the same hub
 	.data		rl 1	; user data
-	assert $-. <= 64
+	assert $-. <= 32
 end struc
 iterate type, endpoint, device
 	iterate <base,name>, 0,, ix,x, iy,y
@@ -128,6 +131,13 @@ virtual at 0
 	USB_ERROR_NOT_SUPPORTED	rb 1
 	USB_ERROR_TIMEOUT	rb 1
 end virtual
+
+USB_SKIP_NONE     := 0
+USB_SKIP_DISABLED := 1 shl 0
+USB_SKIP_ENABLED  := 1 shl 1
+USB_SKIP_DEVICES  := 1 shl 2
+USB_SKIP_HUBS     := 1 shl 3
+USB_SKIP_ATTACHED := 1 shl 4
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -141,6 +151,8 @@ usb_Init:
 	ld	(hl),a
 	dec	l;usbDevCtrl and $FF
 	ld	(hl),bmUsbDevReset or bmUsbDevEn
+	ld	hl,rootDevice.find
+	ld	(hl),USB_SKIP_HUBS or USB_SKIP_ENABLED
 	sbc	hl,hl
 	ld	(rootDevice.data),hl
 	ld	l,3
@@ -176,7 +188,7 @@ usb_Init:
 	sub	a,-32
 	ld	l,a
 	call	c,_Free32Align32
-	jr	c,.inner
+	jq	c,.inner
 	inc	h
 	djnz	.outer
 	sbc	hl,hl
@@ -194,7 +206,7 @@ usb_Cleanup:
 	ld	l,usbSts+1
 .wait:
 	bit	bUsbHcHalted-8,(hl)
-	jr	z,.wait
+	jq	z,.wait
 	scf
 	sbc	hl,hl
 	add	hl,de
@@ -251,11 +263,52 @@ usb_GetDeviceData:
 
 ;-------------------------------------------------------------------------------
 usb_FindDevice:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
+	pop	de, hl, iy, bc
+	push	bc, hl, hl, de
+	ld	de,-1
+	add	iy,de
+	inc	iy
+	ex	de,hl
+	jq	c,.child
+	add	hl,de
+	jq	c,.forceChild
+	ld	iy,rootDevice
+	jq	.check
+.child:
+	bit	bsf USB_SKIP_ATTACHED,c
+	jq	nz,.sibling
+.forceChild:
+	bit	0,(ydevice.child)
+	jq	nz,.sibling
+	lea	iy,ydevice.child-device.sibling
+	jq	.forceSibling
+.hub:
+	ld	iy,(ydevice.hub)
+	lea	hl,iy
+	ld	a,l
+	rrca
+	jq	c,usb_GetDeviceHub.returnZero
+	sbc	hl,de
+	ret	z
+.sibling:
+	bit	0,(ydevice.sibling)
+	jq	nz,.hub
+.forceSibling:
+	ld	iy,(ydevice.sibling)
+.check:
+	ld	a,(ydevice.find)
+	and	a,c
+	jq	nz,.child
+	lea	hl,iy
 	ret
 
 ;-------------------------------------------------------------------------------
 usb_ResetDevice:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+usb_DisconnectDevice:
 	ld	hl,USB_ERROR_NOT_SUPPORTED
 	ret
 
@@ -304,7 +357,7 @@ usb_GetEndpointData:
 ;-------------------------------------------------------------------------------
 usb_GetEndpointMaxPacketSize:
 	call	_LookupDeviceEndpointFromStack
-	jr	c,usb_GetDeviceHub.returnZero
+	jq	c,usb_GetDeviceHub.returnZero
 	ld	l,endpoint.maxPktLen+1-endpoint
 	ld	a,(hl)
 	dec	l
