@@ -30,6 +30,8 @@ library 'USBDRVCE', 0
 	export usb_GetEndpointData
 	export usb_GetEndpointMaxPacketSize
 	export usb_GetEndpointTransferType
+	export usb_SetEndpointFlags
+	export usb_GetEndpointFlags
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -60,11 +62,12 @@ struc endpoint			; endpoint structure
 	.cur		rd 1	; current transfer pointer
 	.overlay	transfer; current transfer
 
+	.type		rb 1	; transfer type
+	.flags		rb 1	; endpoint flags
 	.first		rl 1	; pointer to first scheduled transfer
 	.last		rl 1	; pointer to last dummy transfer
 	.device		rl 1	; pointer to device
 	.data		rl 1	; user data
-	.type		rb 1	; transfer type
 	assert $-. <= 64
 end struc
 struc device			; device structure
@@ -400,6 +403,23 @@ usb_GetEndpointTransferType:
 	pop	hl
 	ex	(sp),iy
 	ld	a,(yendpoint.type)
+	jp	(hl)
+
+;-------------------------------------------------------------------------------
+usb_SetEndpointFlags:
+	pop	de
+	pop	iy
+	ex	(sp),hl
+	push	hl
+	ld	(yendpoint.flags),l
+	ex	de,hl
+	jp	(hl)
+
+;-------------------------------------------------------------------------------
+usb_GetEndpointFlags:
+	pop	hl
+	ex	(sp),iy
+	ld	a,(yendpoint.flags)
 	jp	(hl)
 
 _Check:
