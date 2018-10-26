@@ -387,12 +387,18 @@ typedef usb_error_t (*usb_transfer_callback_t)(usb_endpoint_t endpoint,
  * Initializes the usb driver.
  * @param handler Function to be called when a usb event happens.
  * @param data Opaque pointer to be passed to \p handler.
+ * @param full_speed_descriptors An array of pointers to descriptors, pointer to
+ * NULL for disabled, or NULL for default to be used in full speed mode.
+ * @param high_speed_descriptors An array of pointers to descriptors, pointer to
+ * NULL for disabled, or NULL for default to be used in high speed mode.
  * @param flags Which areas of memory to use.
  * @return USB_SUCCESS if initialization succeeded.
  * @note This must be called before any other function, and can be called again
  * to cancel all transfers and disable all devices.
  */
 usb_error_t usb_Init(usb_event_callback_t handler, usb_callback_data_t *data,
+                     usb_descriptor_t *const *full_speed_descriptors,
+                     usb_descriptor_t *const *high_speed_descriptors,
                      usb_init_flags_t flags);
 
 /**
@@ -400,20 +406,6 @@ usb_error_t usb_Init(usb_event_callback_t handler, usb_callback_data_t *data,
  * @note This must be called before the program exits, or TIOS gets angry.
  */
 void usb_Cleanup(void);
-
-/**
- * Sets the descriptors to use when connected to a host.  If this is not called
- * before a call to usb_connect_callback_t with (flags & USB_CONNECTED_TO_HOST)
- * returns, or is called with NULL, then the default calculator device
- * descriptors will be used.  In a passed array, the first entry points to a
- * device descriptor, and the rest to each configuration descriptor.  If the
- * first entry is NULL, then that speed is disabled.  The arrays just need
- * to be readable, but the descriptors themselves must be in RAM.
- * @param descriptors An array of pointers to descriptors, pointer to NULL for
- * disabled, or NULL for default.
- */
-void usb_SetDeviceDescriptors(usb_descriptor_t *const *full_speed_descriptors,
-                              usb_descriptor_t *const *high_speed_descriptors);
 
 /**
  * Calls any device or transfer callbacks that have triggered.
@@ -695,7 +687,7 @@ void usb_SetEndpointFlags(usb_endpoint_t endpoint, usb_endpoint_flag_t flags);
  * @param endpoint The endpoint to get the flags of.
  * @return The flags last set with \c usb_SetEndpointFlags.
  */
-usb_endpoint_flag_t usb_SetEndpointFlags(usb_endpoint_t endpoint);
+usb_endpoint_flag_t usb_GetEndpointFlags(usb_endpoint_t endpoint);
 
 /**
  * Clears an endpoint's halt condition, indicated by transfers to that endpoint

@@ -112,6 +112,8 @@ virtual at usbArea
 	fakeEndpoint		endpoint
 	eventCallback		rl 1
 	eventCallback.data	rl 1
+	fullSpeedDescriptors	rl 1
+	highSpeedDescriptors	rl 1
 	freeList32Align32	rl 1
 	freeList64Align256	rl 1
 	assert $ <= usbInited
@@ -162,9 +164,19 @@ usb_Init:
 	ld	l,3
 	add	hl,sp
 	ld	de,eventCallback
-	ld	c,6
+	ld	c,12
 	ldir
-	ld	c,(hl)
+	ld	a,(hl)
+	dec	bc
+iterate <speed,Speed>, full,Full, high,High
+	ld	hl,(speed#SpeedDescriptors)
+	add	hl,bc
+	jq	c,.nonDefault#Speed#SpeedDescriptors
+	ld	hl,_Default#Speed#SpeedDescriptors
+	ld	(speed#SpeedDescriptors),hl
+.nonDefault#Speed#SpeedDescriptors:
+end iterate
+	ld	c,a
 	ld	hl,USB_ERROR_INVALID_PARAM
 	ld	e,1
 	ld	d,a;(cHeap-$D10000) shr 8
@@ -467,3 +479,10 @@ _Free#size#Align#align:
 	ret
 
 end iterate
+
+_DefaultFullSpeedDescriptors: dl .device, .conf1, .conf2, .conf3
+.device emit $12: $1201000200000040510408E0200201020003 bswap $12
+.conf1  emit $23: $0902230001010080FA0904000002FF0100000705810240000007050202400000030903 bswap $23
+.conf2  emit $23: $09022300010200C0000904000002FF0100000705810240000007050202400000030903 bswap $23
+.conf3  emit $23: $0902230001030080320904000002FF0100000705810240000007050202400000030903 bswap $23
+_DefaultHighSpeedDescriptors dl 0
