@@ -64,6 +64,7 @@ struc endpoint			; endpoint structure
 	.last		rl 1	; pointer to last dummy transfer
 	.device		rl 1	; pointer to device
 	.data		rl 1	; user data
+	.type		rb 1	; transfer type
 	assert $-. <= 64
 end struc
 struc device			; device structure
@@ -235,6 +236,7 @@ usb_GetDeviceHub:
 	ex	(sp),iy
 	push	de
 	ld	hl,(ydevice.hub)
+.maybeReturnNull:
 	bit	0,l
 	ret	z
 .returnZero:
@@ -336,47 +338,69 @@ usb_GetDeviceSpeed:
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret
+	pop	de
+	pop	iy
+	ex	(sp),hl
+	push	hl
+	push	de
+	ld	a,l
+	ld	hl,(ydevice.endpoints)
+	bit	0,l
+	jq	nz,usb_GetDeviceHub.returnZero
+	rlca
+	and	a,$1F
+	or	a,l
+	ld	l,a
+	ld	h,(hl)
+	ld	l,endpoint
+	ld	a,h
+	inc	a
+	ret	nz
+	jq	usb_GetDeviceHub.returnCarry
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointDevice:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret
+	pop	de
+	ex	(sp),iy
+	push	de
+	ld	hl,(yendpoint.device)
+	jq	usb_GetDeviceHub.maybeReturnNull
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointData:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret
+	pop	de
+	pop	iy
+	ex	(sp),hl
+	push	hl
+	ld	(yendpoint.data),hl
+	ex	de,hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointData:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
+	pop	de
+	ex	(sp),iy
+	push	de
+	ld	hl,(yendpoint.data)
 	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointMaxPacketSize:
-	call	_LookupDeviceEndpointFromStack
-	jq	c,usb_GetDeviceHub.returnZero
-	ld	l,endpoint.maxPktLen+1-endpoint
-	ld	a,(hl)
-	dec	l
-	ld	l,(hl)
+	pop	de
+	ex	(sp),iy
+	push	de
+	ld	hl,(yendpoint.maxPktLen)
+	ld	a,h
 	and	a,111b
 	ld	h,a
 	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointTransferType:
-	call	_LookupDeviceEndpointFromStack
-	ex	de,hl
-	sbc	hl,hl
-	ret	c
-	inc	de
-	ld	a,(de)
-	and	a,11b
-	ld	l,a
-	ret
+	pop	hl
+	ex	(sp),iy
+	ld	a,(yendpoint.type)
+	jp	(hl)
 
 _Check:
 	call	.check
@@ -393,43 +417,6 @@ _Check:
 	ret	nz
 	ld	a,(usbInited)
 	dec	a
-	ret
-
-; Input:
-;  (sp+6) = device
-;  (sp+9) = endpoint
-; Output:
-;  cf = unused endpoint
-;  hl = endpoint structure
-_LookupDeviceEndpointFromStack:
-	pop	de
-	pop	bc
-	pop	iy
-	ex	(sp),hl
-	push	hl
-	push	bc
-	push	de
-	ld	a,l
-; Input:
-;  iy = device
-;  a = endpoint
-; Output:
-;  cf = unused endpoint
-;  hl = endpoint structure
-_LookupDeviceIYEndpointA:
-	and	a,$8F
-.masked:
-	ld	hl,(ydevice.endpoints)
-	bit	0,l
-	ret	nz
-	rlca
-	or	a,l
-	ld	l,a
-	ld	h,(hl)
-	ld	l,endpoint
-	ld	a,h
-	add	a,l
-	ccf
 	ret
 
 iterate <size,align>, 32,32, 64,256
