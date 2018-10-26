@@ -78,12 +78,14 @@ typedef enum usb_transfer_status {
 } usb_transfer_status_t;
 
 typedef enum usb_find_flag {
-  USB_FIND_DISABLED = 1 << 0, /**< Only return disabled devices.              */
-  USB_FIND_ENABLED  = 1 << 1, /**< Only return enabled devices.               */
-  USB_FIND_DEVICE   = 1 << 2, /**< Only return non-hubs.                      */
-  USB_FIND_HUB      = 1 << 3, /**< Only return hubs.                          */
-  USB_FIND_DIRECT   = 1 << 4, /**< Only return devices directly attached to   */
-                              /**  the specified \p root hub.                 */
+  USB_SKIP_NONE     = 0,      /**< Return all devices                         */
+  USB_SKIP_DISABLED = 1 << 0, /**< Don't return disabled devices.             */
+  USB_SKIP_ENABLED  = 1 << 1, /**< Don't return enabled devices.              */
+  USB_SKIP_DEVICES  = 1 << 2, /**< Don't return non-hubs.                     */
+  USB_SKIP_HUBS     = 1 << 3, /**< Don't return hubs.                         */
+  USB_SKIP_ATTACHED = 1 << 4, /**< Only return devices directly attached to   */
+                              /**  any of the hubs through which \c from is   */
+                              /**  connected.                                 */
 } usb_find_flag_t;
 
 typedef enum usb_speed {
@@ -432,33 +434,57 @@ usb_device_data_t *usb_GetDeviceData(usb_device_t device);
 
 /**
  * Finds the next device connected through \p root after \p from satisfying
- * flags, or NULL if no more matching devices.
- * @param root Hub below which to limit search.
- * @param from Device to start the search from.
+ * \p flags, or \c NULL if no more matching devices.
+ *
+ * To enumerate all devices, excluding all hubs:
+ * \code
+ * usb_device_t device = NULL;
+ * while ((device = usb_FindDevice(NULL, device, USB_SKIP_HUBS))) {
+ *   handle(device);
+ * }
+ * \endcode
+ *
+ * To enumerate all hubs and devices, including the root hub:
+ * \code
+ * usb_device_t device = NULL;
+ * while ((device = usb_FindDevice(NULL, device, USB_SKIP_NONE))) {
+ *   handle(device);
+ * }
+ * \endcode
+ *
+ * To enumerate all hubs and devices except the root hub:
+ * \code
+ * usb_device_t device = NULL;
+ * while ((device = usb_FindDevice(usb_RootHub, device, USB_SKIP_NONE))) {
+ *   handle(device);
+ * }
+ * \endcode
+ *
+ * To enumerate all devices below a specific hub:
+ * \code
+ * usb_device_t device = NULL;
+ * while ((device = usb_FindDevice(hub, device, USB_SKIP_NONE))) {
+ *   handle(device);
+ * }
+ * \endcode
+ *
+ * To enumerate all disabled hubs attached directly to a specific hub:
+ * usb_device_t device = NULL;
+ * while ((device = usb_FindDevice(hub, device, USB_SKIP_ENABLED |
+ *                                 USB_SKIP_DEVICES | USB_SKIP_ATTACHED))) {
+ *   handle(device);
+ * }
+ * \endcode
+ * @param root Hub below which to limit search, or \c NULL to search all
+ * devices.
+ * @param from Device to start the search from, or \c NULL to start at
+ * \p root.
  * @param flags What kinds of devices to return.
- * @return The next matching device or NULL if none.
+ * @return The next device connected through \p root after \p from satisfying
+ * \p flags or \c NULL if none.
  */
 usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
                             usb_find_flag_t flags);
-
-/**
- * Finds the first device satisfying flags.
- * @param flags What kinds of devices to return.
- * @return The first matching device, or NULL if no more matching devices.
- */
-#define /*usb_device_t */usb_FindFirstDevice(/*usb_find_flag_t */flags)/*;*/   \
-  usb_FindDevice(usb_RootHub, usb_RootHub, flags)
-
-/**
- * Finds the next device after \p from satisfying flags, or NULL if there are no
- * more devices that match.
- * @param from Device to start the search from.
- * @param flags What kinds of devices to return.
- * @return The next matching device or NULL if none.
- */
-#define /*usb_device_t */usb_FindNextDevice(/*usb_device_t */from,             \
-                                            /*usb_find_flag_t */flags)/*;*/    \
-  usb_FindDevice(usb_RootHub, from, flags)
 
 /**
  * Performs a usb reset on a device. This triggers a device enabled event when
@@ -467,6 +493,14 @@ usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_ResetDevice(usb_device_t device);
+
+/**
+ * Forces a device to disconnect. This triggers a device disabled event when the
+ * disconnect finishes.
+ * @param device The device to disconnect.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_DisconnectDevice(usb_device_t device);
 
 /**
  * Gets the usb address of a \p device, or 0 if disabled.
