@@ -231,19 +231,34 @@ usb_Cleanup:
 	ret
 
 ;-------------------------------------------------------------------------------
-usb_HandleEvents:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret
-
-;-------------------------------------------------------------------------------
 usb_WaitForEvents:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret
+	scf
+.wait:
+	ret	nc
+	ld	hl,.wait
+	push	hl
 
 ;-------------------------------------------------------------------------------
 usb_WaitForInterrupt:
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret
+	ld	hl,mpIntMask+1
+	di
+	set	bIntUsb-8,(hl)
+	ei
+	halt
+
+;-------------------------------------------------------------------------------
+usb_HandleEvents:
+	ld	hl,mpIntStat+1
+	bit	bIntUsb-8,(hl)
+	ld	hl,mpUsbIsr
+iterate type, Dev, Otg, Host
+	bit	bUsbInt#type,(hl)
+	call	nz,_Handle#type#Int
+end iterate
+	ld	hl,mpIntAck+1
+	ld	(hl),bmIntUsb
+	or	a,a
+	jq	usb_HandleEvents
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceHub:
@@ -479,6 +494,24 @@ _Free#size#Align#align:
 	ret
 
 end iterate
+
+_HandleDevInt:
+	push	hl
+	pop	hl
+	ld	(hl),bmUsbIntDev
+	ret
+
+_HandleOtgInt:
+	push	hl
+	pop	hl
+	ld	(hl),bmUsbIntOtg
+	ret
+
+_HandleHostInt:
+	push	hl
+	pop	hl
+	ld	(hl),bmUsbIntHost
+	ret
 
 _DefaultFullSpeedDescriptors: dl .device, .conf1, .conf2, .conf3
 .device emit $12: $1201000200000040510408E0200201020003 bswap $12
