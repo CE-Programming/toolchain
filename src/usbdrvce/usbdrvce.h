@@ -88,6 +88,30 @@ typedef enum usb_find_flag {
                               /**  connected.                                 */
 } usb_find_flag_t;
 
+typedef enum usb_endpoint_flag {
+  USB_AUTO_TERMINATE   = 0 << 0, /**< For transfers that are a multiple of    */
+                                 /**  the endpoint's maximum packet length,   */
+                                 /**  automatically terminate outgoing ones   */
+                                 /**  with a zero-length packet and require   */
+                                 /**  incoming ones to be terminated with a   */
+                                 /**  zero-length packet or fail with         */
+                                 /**  USB_TRANSFER_OVERFLOW.                  */
+  USB_MANUAL_TERMINATE = 1 << 0, /**< For transfers that are a multiple of    */
+                                 /**  the endpoint's maximum packet length,   */
+                                 /**  don't automatically terminate outgoing  */
+                                 /**  ones with a zero-length packet and      */
+                                 /**  don't require incoming ones to be       */
+                                 /**  terminated with a zero-length packet.   */
+                                 /**  @note This allows you to send or        */
+                                 /**  receive partial transfers in multiples  */
+                                 /**  of the endpoint's maximum packet        */
+                                 /**  length, but requires that transfers     */
+                                 /**  which are a multiple of the endpoint's  */
+                                 /**  maximum packet length to be manually    */
+                                 /**  terminated with an explicit zero-length */
+                                 /**  transfer.                               */
+} usb_endpoint_flag_t;
+
 typedef enum usb_speed {
   USB_SPEED_UNKNOWN = -1,
   USB_SPEED_FULL,             /**<  12 Mb/s                                    */
@@ -388,8 +412,8 @@ void usb_Cleanup(void);
  * @param descriptors An array of pointers to descriptors, pointer to NULL for
  * disabled, or NULL for default.
  */
-void usb_SetDeviceDescriptors(void *const *full_speed_descriptors,
-                              void *const *high_speed_descriptors);
+void usb_SetDeviceDescriptors(usb_descriptor_t *const *full_speed_descriptors,
+                              usb_descriptor_t *const *high_speed_descriptors);
 
 /**
  * Calls any device or transfer callbacks that have triggered.
@@ -564,7 +588,6 @@ usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * Gets the string descriptor at \p index.
  * @note Blocks while the descriptor is fetched.
  * @param device The device to communicate with.
- * @param type Descriptor type to fetch.
  * @param index Descriptor index to fetch.
  * @param descriptor Returns the fetched descriptor.
  * @param length The number of bytes to transfer.
@@ -572,24 +595,9 @@ usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * @param transferred Returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t type, uint8_t index,
-                                    void *descriptor, size_t length,
-                                    size_t *transferred);
-
-/**
- * Changes the descriptor at \p index, not usually supported.  Blocks while
- * the descriptor is modified.
- * @note Devices do not usually support this.
- * @param device The device to communicate with.
- * @param type Descriptor type to modify.
- * @param index Descriptor index to modify.
- * @param descriptor The new descriptor data.
- * @param length The number of bytes in the new descriptor.
- * The \p descriptor buffer must by at least this large.
- * @return USB_SUCCESS if the transfer succeeded or an error.
- */
-usb_error_t usb_SetStringDescriptor(usb_device_t device, uint8_t type, uint8_t index,
-                                    const void *descriptor, size_t length);
+usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t index,
+                                    usb_string_descriptor_t *descriptor,
+                                    size_t length, size_t *transferred);
 
 /**
  * Gets the currently active configuration of a device.
@@ -604,12 +612,13 @@ usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *index);
  * This must be called before pipes other than the default control pipe can be
  * accessed.
  * @param device The device to communicate with.
- * @param configuration_descriptor A combined configuration descriptor fetched
- * with usb_GetDescriptor().
+ * @param descriptor A complete combined configuration descriptor fetched with
+ * usb_GetDescriptor().
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetConfiguration(usb_device_t device,
-                                 const void *configuration_descriptor);
+                                 const usb_configuration_descriptor_t *
+                                 configuration_descriptor);
 
 /**
  * Gets the current alternate setting in use on the specified interface.
@@ -673,6 +682,20 @@ uint16_t usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
  * @return The usb_transfer_type for an endpoint.
  */
 usb_transfer_type_t usb_GetEndpointTransferType(usb_endpoint_t endpoint);
+
+/**
+ * Sets the flags for an endpoint.
+ * @param endpoint The endpoint to set the flags of.
+ * @param flags The \c usb_endpoint_flag_t to set.
+ */
+void usb_SetEndpointFlags(usb_endpoint_t endpoint, usb_endpoint_flag_t flags);
+
+/**
+ * Gets the flags for an endpoint.
+ * @param endpoint The endpoint to get the flags of.
+ * @return The flags last set with \c usb_SetEndpointFlags.
+ */
+usb_endpoint_flag_t usb_SetEndpointFlags(usb_endpoint_t endpoint);
 
 /**
  * Clears an endpoint's halt condition, indicated by transfers to that endpoint
