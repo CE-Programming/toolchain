@@ -86,11 +86,11 @@ struc device			; device structure
 	assert $-. <= 32
 end struc
 iterate type, endpoint, device
-	iterate <base,name>, 0,, ix,x, iy,y
-		virtual at base
-			name#type type
-		end virtual
-	end iterate
+ iterate <base,name>, 0,, ix,x, iy,y
+  virtual at base
+	name#type type
+  end virtual
+ end iterate
 end iterate
 ;-------------------------------------------------------------------------------
 
@@ -150,6 +150,13 @@ USB_SKIP_ATTACHED := 1 shl 4
 usb_Init:
 	ld	a,1
 	call	usb_Cleanup.init
+	call	_ChkIfOSInterruptAvailable
+	rrca
+	ld	hl,_DefaultFullSpeedDescriptors.str83
+	jq	nc,.gotModel
+	ld	hl,_DefaultFullSpeedDescriptors.str84
+.gotModel:
+	ld	(_DefaultFullSpeedDescriptors.model),hl
 	ld	hl,mpUsbIdle
 	ld	(hl),7
 	ld	l,(usbDevCtrl+1) and $FF
@@ -171,11 +178,16 @@ usb_Init:
 iterate <speed,Speed>, full,Full, high,High
 	ld	hl,(speed#SpeedDescriptors)
 	add	hl,bc
+ if % = 2
+	inc	hl
+ end if
 	jq	c,.nonDefault#Speed#SpeedDescriptors
 	ld	hl,_Default#Speed#SpeedDescriptors
 	ld	(speed#SpeedDescriptors),hl
 .nonDefault#Speed#SpeedDescriptors:
 end iterate
+	ld	hl,(hl)
+	add	hl,bc
 	ld	c,a
 	ld	hl,USB_ERROR_INVALID_PARAM
 	ld	e,1
@@ -256,7 +268,7 @@ iterate type, Dev, Otg, Host
 	call	nz,_Handle#type#Int
 end iterate
 	ld	hl,mpIntAck+1
-	ld	(hl),bmIntUsb
+	ld	(hl),intUsb shr 8
 	or	a,a
 	jq	usb_HandleEvents
 
@@ -277,8 +289,7 @@ usb_GetDeviceHub:
 
 ;-------------------------------------------------------------------------------
 usb_SetDeviceData:
-	pop	de
-	pop	iy
+	pop	de, iy
 	ex	(sp),hl
 	push	hl
 	ld	(ydevice.data),hl
@@ -368,11 +379,9 @@ usb_GetDeviceSpeed:
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
-	pop	de
-	pop	iy
+	pop	de, iy
 	ex	(sp),hl
-	push	hl
-	push	de
+	push	hl, de
 	ld	a,l
 	ld	hl,(ydevice.endpoints)
 	bit	0,l
@@ -398,8 +407,7 @@ usb_GetEndpointDevice:
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointData:
-	pop	de
-	pop	iy
+	pop	de, iy
 	ex	(sp),hl
 	push	hl
 	ld	(yendpoint.data),hl
@@ -434,8 +442,7 @@ usb_GetEndpointTransferType:
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointFlags:
-	pop	de
-	pop	iy
+	pop	de, iy
 	ex	(sp),hl
 	push	hl
 	ld	(yendpoint.flags),l
@@ -513,9 +520,17 @@ _HandleHostInt:
 	ld	(hl),bmUsbIntHost
 	ret
 
-_DefaultFullSpeedDescriptors: dl .device, .conf1, .conf2, .conf3
+_DefaultFullSpeedDescriptors: dl .device, .confs, .langids
+                              db 2
+                              dl .str1
+.model			      dl 0
 .device emit $12: $1201000200000040510408E0200201020003 bswap $12
-.conf1  emit $23: $0902230001010080FA0904000002FF0100000705810240000007050202400000030903 bswap $23
-.conf2  emit $23: $09022300010200C0000904000002FF0100000705810240000007050202400000030903 bswap $23
-.conf3  emit $23: $0902230001030080320904000002FF0100000705810240000007050202400000030903 bswap $23
+.confs dl .conf1, .conf2, .conf3
+.conf1 emit $23: $0902230001010080FA0904000002FF0100000705810240000007050202400000030903 bswap $23
+.conf2 emit $23: $09022300010200C0000904000002FF0100000705810240000007050202400000030903 bswap $23
+.conf3 emit $23: $0902230001030080320904000002FF0100000705810240000007050202400000030903 bswap $23
+.langids dw $0304, $0409
+.str1 dw $033E, 'T','e','x','a','s',' ','I','n','s','t','r','u','m','e','n','t','s',' ','I','n','c','o','r','p','o','r','a','t','e','d'
+.str83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
+.str84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
 _DefaultHighSpeedDescriptors dl 0
