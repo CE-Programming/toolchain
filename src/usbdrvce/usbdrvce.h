@@ -293,6 +293,24 @@ typedef struct usb_string_descriptor {
   wchar_t  bString[1];          /**< UTF-16 string, no null termination       */
 } usb_string_descriptor_t;
 
+typedef struct usb_standard_descriptors {
+  /// Pointer to device descriptor which must be in RAM
+  usb_device_descriptor_t *device;
+  /// Pointer to an array of device.bNumConfigurations pointers to complete
+  /// configuration descriptors. Each one should point to
+  /// \c{configurations[i]->wTotalLength} bytes of RAM.
+  usb_configuration_descriptor_t *const *configurations;
+  /// Array of langids, formatted like a string descriptor, with each wchar_t
+  /// storing a langid, which must be in RAM.
+  usb_string_descriptor_t *langids;
+  /// Number of strings per langid.
+  uint8_t numStrings;
+  /// Array of \c{(langids->bLength / 2 - 1) * numStrings} pointers to string
+  /// descriptors, each of which must be in RAM, starting with numStrings
+  /// pointers for the first langid, then for the next langid, etc.
+  usb_string_descriptor_t *strings[1];
+} usb_standard_descriptors_t;
+
 typedef struct usb_device   *usb_device_t;   /**< opaque  device  handle */
 typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
 
@@ -397,8 +415,8 @@ typedef usb_error_t (*usb_transfer_callback_t)(usb_endpoint_t endpoint,
  * to cancel all transfers and disable all devices.
  */
 usb_error_t usb_Init(usb_event_callback_t handler, usb_callback_data_t *data,
-                     usb_descriptor_t *const *full_speed_descriptors,
-                     usb_descriptor_t *const *high_speed_descriptors,
+                     const usb_standard_descriptors_t *full_speed_descriptors,
+                     const usb_standard_descriptors_t *high_speed_descriptors,
                      usb_init_flags_t flags);
 
 /**
