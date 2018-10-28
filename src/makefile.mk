@@ -184,7 +184,7 @@ dirs:
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	$(Q)$(CD) $(BINDIR) && \
-	$(CV) $(CVFLAGS) $(notdir $<)
+	$(CV) $(CVFLAGS) $(notdir $<) $(notdir $@)
 
 $(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(F_ICON)
 	$(Q)$(LD) $(LDFLAGS) $@
