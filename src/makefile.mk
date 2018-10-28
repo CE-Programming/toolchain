@@ -17,7 +17,7 @@ BINDIR              ?= bin
 GFXDIR              ?= src/gfx
 #----------------------------
 
-VERSION := 8.4
+VERSION := 8.5
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
