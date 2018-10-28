@@ -2997,7 +2997,7 @@ gfx_SetTextScale:
 	push	de
 	ld	a,l
 	ld	de,_TextWidthScale
-	ld	hl,_LargeFontJump
+	ld	hl,_TextScaleJump
 	cp	a,c
 	jr	z,.match
 	jr	.nomatch
@@ -3102,6 +3102,7 @@ _TextYPos := $-3
 smcByte _TextHeight
 	wait_quick
 	jr	_PrintLargeFont		; SMC the jump
+_TextScaleJump := $ - 1
 _PrintNormalFont:
 .loop:
 	ld	c,(hl)			; c = 8 pixels
