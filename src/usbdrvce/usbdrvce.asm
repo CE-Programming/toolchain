@@ -112,8 +112,7 @@ virtual at usbArea
 	fakeEndpoint		endpoint
 	eventCallback		rl 1
 	eventCallback.data	rl 1
-	fullSpeedDescriptors	rl 1
-	highSpeedDescriptors	rl 1
+	deviceDescriptors	rl 1
 	freeList32Align32	rl 1
 	freeList64Align256	rl 1
 	assert $ <= usbInited
@@ -152,61 +151,61 @@ usb_Init:
 	call	usb_Cleanup.init
 	call	_ChkIfOSInterruptAvailable
 	rrca
-	ld	hl,_DefaultFullSpeedDescriptors.str83
+	ld	hl,_DefaultDeviceDescriptors.str83
 	jq	nc,.gotModel
-	ld	hl,_DefaultFullSpeedDescriptors.str84
+	ld	hl,_DefaultDeviceDescriptors.str84
 .gotModel:
-	ld	(_DefaultFullSpeedDescriptors.model),hl
-	ld	hl,mpUsbIdle
-	ld	(hl),7
-	ld	l,(usbDevCtrl+1) and $FF
-	xor	a,a
-	ld	(hl),a
-	dec	l;usbDevCtrl and $FF
-	ld	(hl),bmUsbDevReset or bmUsbDevEn
-	ld	hl,rootDevice.find
-	ld	(hl),USB_SKIP_HUBS or USB_SKIP_ENABLED
+	ld	(_DefaultDeviceDescriptors.model),hl
+	or	a,a
 	sbc	hl,hl
 	ld	(rootDevice.data),hl
 	ld	l,3
 	add	hl,sp
 	ld	de,eventCallback
-	ld	c,12
+	ld	c,9
 	ldir
-	ld	a,(hl)
+	ld	e,(hl)
 	dec	bc
-iterate <speed,Speed>, full,Full, high,High
-	ld	hl,(speed#SpeedDescriptors)
+	ld	hl,(deviceDescriptors)
 	add	hl,bc
- if % = 2
 	inc	hl
- end if
-	jq	c,.nonDefault#Speed#SpeedDescriptors
-	ld	hl,_Default#Speed#SpeedDescriptors
-	ld	(speed#SpeedDescriptors),hl
-.nonDefault#Speed#SpeedDescriptors:
-end iterate
+	jq	c,.nonDefaultDeviceDescriptors
+	ld	hl,_DefaultDeviceDescriptors
+	ld	(deviceDescriptors),hl
+.nonDefaultDeviceDescriptors:
 	ld	hl,(hl)
 	add	hl,bc
-	ld	c,a
+	sbc	a,a
+	inc	a
+	rlca
+	ld	hl,mpUsbIdle
+	ld	(hl),7
+	ld	hl,(usbDevCtrl+1) and $FF
+	ld	(hl),a
+	dec	l;usbDevCtrl and $FF
+	ld	(hl),bmUsbDevReset or bmUsbDevEn
+	ld	hl,rootDevice.find
+	ld	(hl),USB_SKIP_HUBS or USB_SKIP_ENABLED
 	ld	hl,USB_ERROR_INVALID_PARAM
+	ld	c,e
 	ld	e,1
 	ld	d,a;(cHeap-$D10000) shr 8
 	ld	b,sizeof cHeap shr 8
-	rrc	c
-	call	c,.initFreeList
-	ld	d,(periodicList-$D10000) shr 8
-	ld	b,sizeof periodicList shr 8
 	rrc	c
 	call	c,.initFreeList
 	ld	d,(usbMem-$D10000) shr 8
 	ld	b,sizeof usbMem shr 8
 	rrc	c
 	call	c,.initFreeList
-	rrc	c
-	ret	nc
 	ld	d,(osHeap-$D10000) shr 8
 	ld	b,sizeof osHeap shr 8
+	rrc	c
+	call	c,.initFreeList
+	rrc	c
+	ret	nc
+	; TODO: disable things here
+	ld	d,(periodicList-$D10000) shr 8
+	ld	b,sizeof periodicList shr 8
 .initFreeList:
 	sbc	hl,hl
 	add	hl,de
@@ -520,12 +519,13 @@ _HandleHostInt:
 	ld	(hl),bmUsbIntHost
 	ret
 
-_DefaultFullSpeedDescriptors: dl .device, .confs, .langids
-                              db 2
-                              dl .str1
-.model			      dl 0
-.device emit $12: $1201000200000040510408E0200201020003 bswap $12
-.confs dl .conf1, .conf2, .conf3
+_DefaultDeviceDescriptors:
+	dl 0, .full, .langids
+	db 2
+	dl .str1
+.model dl 0
+.full dl .dev, .conf1, .conf2, .conf3
+.dev emit $12: $1201000200000040510408E0200201020003 bswap $12
 .conf1 emit $23: $0902230001010080FA0904000002FF0100000705810240000007050202400000030903 bswap $23
 .conf2 emit $23: $09022300010200C0000904000002FF0100000705810240000007050202400000030903 bswap $23
 .conf3 emit $23: $0902230001030080320904000002FF0100000705810240000007050202400000030903 bswap $23
@@ -533,4 +533,3 @@ _DefaultFullSpeedDescriptors: dl .device, .confs, .langids
 .str1 dw $033E, 'T','e','x','a','s',' ','I','n','s','t','r','u','m','e','n','t','s',' ','I','n','c','o','r','p','o','r','a','t','e','d'
 .str83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
 .str84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
-_DefaultHighSpeedDescriptors dl 0

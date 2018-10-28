@@ -294,12 +294,16 @@ typedef struct usb_string_descriptor {
 } usb_string_descriptor_t;
 
 typedef struct usb_standard_descriptors {
-  /// Pointer to device descriptor which must be in RAM
-  usb_device_descriptor_t *device;
-  /// Pointer to an array of device.bNumConfigurations pointers to complete
-  /// configuration descriptors. Each one should point to
-  /// \c{configurations[i]->wTotalLength} bytes of RAM.
-  usb_configuration_descriptor_t *const *configurations;
+  /// Pointer to full and high speed device and configuration descriptors.
+  /// \c highSpeed can be \c NULL to disable high-speed mode.
+  struct {
+    /// Pointer to device descriptor which must be in RAM
+    usb_device_descriptor_t *device;
+    /// Array of device.bNumConfigurations pointers to complete configuration
+    /// descriptors. Each one should point to
+    /// \c{configurations[i]->wTotalLength} bytes of RAM.
+    usb_configuration_descriptor_t *configurations[1];
+  } *highSpeed, *fullSpeed;
   /// Array of langids, formatted like a string descriptor, with each wchar_t
   /// storing a langid, which must be in RAM.
   usb_string_descriptor_t *langids;
@@ -405,18 +409,15 @@ typedef usb_error_t (*usb_transfer_callback_t)(usb_endpoint_t endpoint,
  * Initializes the usb driver.
  * @param handler Function to be called when a usb event happens.
  * @param data Opaque pointer to be passed to \p handler.
- * @param full_speed_descriptors An array of pointers to descriptors, pointer to
- * NULL for disabled, or NULL for default to be used in full speed mode.
- * @param high_speed_descriptors An array of pointers to descriptors, pointer to
- * NULL for disabled, or NULL for default to be used in high speed mode.
+ * @param device_descriptors A pointer to the device descriptors to use, or
+ * NULL to use the calculator's defaults.
  * @param flags Which areas of memory to use.
  * @return USB_SUCCESS if initialization succeeded.
  * @note This must be called before any other function, and can be called again
  * to cancel all transfers and disable all devices.
  */
 usb_error_t usb_Init(usb_event_callback_t handler, usb_callback_data_t *data,
-                     const usb_standard_descriptors_t *full_speed_descriptors,
-                     const usb_standard_descriptors_t *high_speed_descriptors,
+                     const usb_standard_descriptors_t *device_descriptors,
                      usb_init_flags_t flags);
 
 /**
