@@ -566,34 +566,34 @@ ti_Read:
 	ld	c, (iy + 12)
 	call	util_is_slot_open
 	jr	z, .ret0
-	ld	bc, (iy + 6)
-	ld	hl, (iy + 9)
-	call	__smulu
-	add	hl, de
-	xor	a, a
-	sbc	hl, de
-	jr	z, .ret0
-	push	hl			; hl = total size to read
 	call	util_get_slot_size
 	push	bc
 	call	util_get_offset
 	pop	hl
 	or	a, a
 	sbc	hl, bc			; size - offset = bytes left to read
-	pop	de			; if no bytes left, return
 	jr	z, .ret0
 	jr	c, .ret0
+	ld	bc, (iy + 6)
+	call	__sdivu			; (size - offset) / chunk_size
+	ld	de, (iy + 9)		; number of chunks to read, hl = number of chunks left
 	or	a, a
 	sbc	hl, de
-	add	hl, de			; check if left size <= read size
+	add	hl, de			; check if left <= read
 	jr	nc, .copy
-	jr	.ret0			; otherwise just return if not enough read space
+	ex	de, hl
 .copy:
-	push	de
-	call	util_get_data_offset
+	ex	de, hl
+	ld	bc, (iy + 6)
+	push	hl
+	call	__smulu
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	z, .ret0.pop
+	push	hl
 	ld	de, (iy + 3)
 	pop	bc
-	push	bc
 	ldir
 	call	util_get_offset
 	pop	hl
@@ -603,8 +603,9 @@ ti_Read:
 	call	util_get_offset_ptr
 	ld	(hl), de
 	pop	hl
-	ld	bc, (iy + 6)
-	jp	__sdivu			; return actual chunks read
+	ret				; return actual chunks read
+.ret0.pop:
+	pop	hl
 .ret0:
 	xor	a, a
 	sbc	hl, hl
