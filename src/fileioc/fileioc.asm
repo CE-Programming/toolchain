@@ -587,7 +587,7 @@ ti_Read:
 	sbc	hl, de
 	add	hl, de			; check if left size <= read size
 	jr	nc, .copy
-	ex	de, hl			; otherwise just copy remaining bytes
+	jr	.ret0			; otherwise just return if not enough read space
 .copy:
 	push	de
 	call	util_get_data_offset
