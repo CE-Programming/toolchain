@@ -492,9 +492,9 @@ ti_Write:
 	add	iy, sp
 	ld	c,(iy + 12)
 	call	util_is_slot_open
-	jr	z, util_ret_null_closer
+	jr	z, .ret0
 	call	util_is_in_ram
-	jr	z, util_ret_null_closer
+	jr	z, .ret0
 	ld	bc, (iy + 6)
 	ld	hl, (iy + 9)
 	call	__smulu
@@ -518,7 +518,7 @@ ti_Write:
 	ld	(resize_amount), hl
 	call	util_insert_mem
 	or	a, a
-	jr	z, util_ret_null_closer
+	jr	z, .ret0
 .no_core_needed:
 	call	util_get_data_offset
 	ex	de, hl
@@ -535,10 +535,7 @@ ti_Write:
 	ld	(hl), de
 	ld	hl, (iy + 9)
 	ret
-
-util_ret_null_closer_pop_hl:
-	pop	hl
-util_ret_null_closer:
+.ret0:
 	xor	a, a
 	sbc	hl, hl
 	ret
@@ -568,16 +565,31 @@ ti_Read:
 	add	iy, sp
 	ld	c, (iy + 12)
 	call	util_is_slot_open
-	jr	z, util_ret_null_closer
+	jr	z, .ret0
 	ld	bc, (iy + 6)
 	ld	hl, (iy + 9)
-	push	hl
 	call	__smulu
 	add	hl, de
 	xor	a, a
 	sbc	hl, de
-	jr	z, util_ret_null_closer_pop_hl
-	push	hl
+	jr	z, .ret0
+	push	hl			; hl = total size to read
+	call	util_get_slot_size
+	push	bc
+	call	util_get_offset
+	pop	hl
+	or	a, a
+	sbc	hl, bc			; size - offset = bytes left to read
+	pop	de			; if no bytes left, return
+	jr	z, .ret0
+	jr	c, .ret0
+	or	a, a
+	sbc	hl, de
+	add	hl, de			; check if left size <= read size
+	jr	nc, .copy
+	ex	de, hl			; otherwise just copy remaining bytes
+.copy:
+	push	de
 	call	util_get_data_offset
 	ld	de, (iy + 3)
 	pop	bc
@@ -585,11 +597,17 @@ ti_Read:
 	ldir
 	call	util_get_offset
 	pop	hl
-	add	hl,bc
-	ex	de,hl
+	push	hl
+	add	hl, bc
+	ex	de, hl
 	call	util_get_offset_ptr
 	ld	(hl), de
 	pop	hl
+	ld	bc, (iy + 6)
+	jp	__sdivu			; return actual chunks read
+.ret0:
+	xor	a, a
+	sbc	hl, hl
 	ret
 
 ;-------------------------------------------------------------------------------
