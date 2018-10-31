@@ -592,12 +592,13 @@ ti_Read:
 	sbc	hl, de
 	jr	z, .ret0.pop
 	push	hl
+	call	util_get_data_offset
 	ld	de, (iy + 3)
 	pop	bc
+	push	bc
 	ldir
 	call	util_get_offset
 	pop	hl
-	push	hl
 	add	hl, bc
 	ex	de, hl
 	call	util_get_offset_ptr
