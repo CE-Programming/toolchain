@@ -3468,6 +3468,8 @@ bUsbIntCxErr		equ 4
 bmUsbIntCxErr		equ 1 << bUsbIntCxErr
 bUsbIntCxAbort		equ 5
 bmUsbIntCxAbort		equ 1 << bUsbIntCxAbort
+bUsbIntCx		equ 0
+bmUsbIntCx		equ 01Fh << bUsbIntCx
 
 usbFifoRxImr		equ 0138h
 pUsbFifoRxImr		equ pUsbRange + usbFifoRxImr
@@ -3475,24 +3477,24 @@ mpUsbFifoRxImr		equ mpUsbRange + usbFifoRxImr
 usbFifoRxIsr		equ 0148h
 pUsbFifoRxIsr		equ pUsbRange + usbFifoRxIsr
 mpUsbFifoRxIsr		equ mpUsbRange + usbFifoRxIsr
-bUsbFifo0Out		equ 0
-bmUsbFifo0Out		equ 1 << bUsbFifo0Out
-bUsbFifo0Spk		equ 1
-bmUsbFifo0Spk		equ 1 << bUsbFifo0Spk
-bUsbFifo1Out		equ 2
-bmUsbFifo1Out		equ 1 << bUsbFifo1Out
-bUsbFifo1Spk		equ 3
-bmUsbFifo1Spk		equ 1 << bUsbFifo1Spk
-bUsbFifo2Out		equ 4
-bmUsbFifo2Out		equ 1 << bUsbFifo2Out
-bUsbFifo2Spk		equ 5
-bmUsbFifo2Spk		equ 1 << bUsbFifo2Spk
-bUsbFifo3Out		equ 6
-bmUsbFifo3Out		equ 1 << bUsbFifo3Out
-bUsbFifo3Spk		equ 7
-bmUsbFifo3Spk		equ 1 << bUsbFifo3Spk
-bUsbFifoRx		equ 0
-bmUsbFifoRx		equ 0FFh << bUsbFifoRx
+bUsbIntFifo0Out		equ 0
+bmUsbIntFifo0Out	equ 1 << bUsbIntFifo0Out
+bUsbIntFifo0Spk		equ 1
+bmUsbIntFifo0Spk	equ 1 << bUsbIntFifo0Spk
+bUsbIntFifo1Out		equ 2
+bmUsbIntFifo1Out	equ 1 << bUsbIntFifo1Out
+bUsbIntFifo1Spk		equ 3
+bmUsbIntFifo1Spk	equ 1 << bUsbIntFifo1Spk
+bUsbIntFifo2Out		equ 4
+bmUsbIntFifo2Out	equ 1 << bUsbIntFifo2Out
+bUsbIntFifo2Spk		equ 5
+bmUsbIntFifo2Spk	equ 1 << bUsbIntFifo2Spk
+bUsbIntFifo3Out		equ 6
+bmUsbIntFifo3Out	equ 1 << bUsbIntFifo3Out
+bUsbIntFifo3Spk		equ 7
+bmUsbIntFifo3Spk	equ 1 << bUsbIntFifo3Spk
+bUsbFifoRxInts		equ 0
+bmUsbFifoRxInts		equ 0FFh << bUsbFifoRxInts
 
 usbFifoTxImr		equ 013Ah
 pUsbFifoTxImr		equ pUsbRange + usbFifoTxImr
@@ -3500,16 +3502,16 @@ mpUsbFifoTxImr		equ mpUsbRange + usbFifoTxImr
 usbFifoTxIsr		equ 014Ah
 pUsbFifoTxIsr		equ pUsbRange + usbFifoTxIsr
 mpUsbFifoTxIsr		equ mpUsbRange + usbFifoTxIsr
-bUsbFifo0In		equ 0
-bmUsbFifo0In		equ 0 << bUsbFifo0In
-bUsbFifo1In		equ 0
-bmUsbFifo1In		equ 0 << bUsbFifo1In
-bUsbFifo2In		equ 0
-bmUsbFifo2In		equ 0 << bUsbFifo2In
-bUsbFifo3In		equ 0
-bmUsbFifo3In		equ 0 << bUsbFifo3In
-bUsbFifoTx		equ 0
-bmUsbFifoTx		equ 0Fh << bUsbFifoTx
+bUsbIntFifo0In		equ 0
+bmUsbIntFifo0In		equ 1 << bUsbIntFifo0In
+bUsbIntFifo1In		equ 1
+bmUsbIntFifo1In		equ 1 << bUsbIntFifo1In
+bUsbIntFifo2In		equ 2
+bmUsbIntFifo2In		equ 1 << bUsbIntFifo2In
+bUsbIntFifo3In		equ 3
+bmUsbIntFifo3In		equ 1 << bUsbIntFifo3In
+bUsbFifoTxInts		equ 0
+bmUsbFifoTxInts		equ 0Fh << bUsbFifoTxInts
 
 usbDevImr		equ 013Ch
 pUsbDevImr		equ pUsbRange + usbDevImr
@@ -3517,6 +3519,30 @@ mpUsbDevImr		equ mpUsbRange + usbDevImr
 usbDevIsr		equ 014Ch
 pUsbDevIsr		equ pUsbRange + usbDevIsr
 mpUsbDevIsr		equ mpUsbRange + usbDevIsr
+bUsbIntDevReset		equ 0
+bmUsbIntDevReset	equ 1 << bUsbIntDevReset
+bUsbIntDevSuspend	equ 1
+bmUsbIntDevSuspend	equ 1 << bUsbIntDevSuspend
+bUsbIntDevResume	equ 2
+bmUsbIntDevResume	equ 1 << bUsbIntDevResume
+bUsbIntDevIsocErr	equ 3
+bmUsbIntDevIsocErr	equ 1 << bUsbIntDevIsocErr
+bUsbIntDevIsocAbt	equ 4
+bmUsbIntDevIsocAbt	equ 1 << bUsbIntDevIsocAbt
+bUsbIntDevZlpTx		equ 5
+bmUsbIntDevZlpTx	equ 1 << bUsbIntDevZlpTx
+bUsbIntDevZlpRx		equ 6
+bmUsbIntDevZlpRx	equ 1 << bUsbIntDevZlpRx
+bUsbIntDevDmaFin	equ 7
+bmUsbIntDevDmaFin	equ 1 << bUsbIntDevDmaFin
+bUsbIntDevDmaErr	equ 8
+bmUsbIntDevDmaErr	equ 1 << bUsbIntDevDmaErr
+bUsbIntDevIdle		equ 9
+bmUsbIntDevIdle		equ 1 << bUsbIntDevIdle
+bUsbIntDevWakeup	equ 10
+bmUsbIntDevWakeup	equ 1 << bUsbIntDevWakeup
+bUsbDevInts		equ 0
+bmUsbDevInts		equ 07FFh << bUsbDevInts
 
 usbRxZlp		equ 0150h
 pUsbRxZlp		equ pUsbRange + usbRxZlp
@@ -4096,7 +4122,7 @@ keyModeScan		equ 3
 pBlLevel		equ 0B024h
 mpBlLevel		equ 0F60024h
 
-;Character Font Equates  
+;Character Font Equates
 ;-------------------------------------
 LrecurN			equ 001h
 LrecurU			equ 002h
@@ -5024,7 +5050,7 @@ kSelectA		equ kE2BT+147
 kZFitA			equ kE2BT+148
 kE2BT_End		equ kZFitA
 
-;More 2 Byte Keys 
+;More 2 Byte Keys
 ;-------------------------------------
 kE2BT2			equ 00h
 kGDB1			equ kE2BT2
@@ -5857,7 +5883,7 @@ tDrInv			equ GRCMDS+36 ;A8h 'DrInv_'
 tDrawF			equ GRCMDS+37 ;A9h 'DrawF_'
 tVarStrng		equ 0AAh
 
-;Functions with No Arguments								
+;Functions with No Arguments
 ;--------------------------------------------------
 NOARG			equ 0ABh
 tRand			equ NOARG ;ABh 'rand'
@@ -6426,7 +6452,7 @@ tLcapIAcute		equ 0CDh
 tGarbagec		equ 0CEh
 LastToken		equ 0CEh ;tLAST TOKEN IN THIS VERSION...
 
-;Data Type Equates												
+;Data Type Equates
 ;---------------------------------------------------------------------
 RealObj			equ 0
 ListObj			equ 1
@@ -6453,7 +6479,7 @@ AppVarObj		equ 15h	;application variable
 TempProgObj		equ 16h ;program, home deletes when finished
 GroupObj		equ 17h ;group.
 
-;System Error Codes												
+;System Error Codes
 ;-----------------------------------------------------------
 E_EDITF			equ 7 ;allow re-entering application
 E_EDIT			equ 1<<E_EDITF
@@ -6606,7 +6632,7 @@ E_MS			equ E_SS + FPLEN
 ;System Flags
 ;----------------------------------------------------------------------
 ioDelFlag		equ 0h
-inDelete		equ 0		;1 = DELETE SCREEN 
+inDelete		equ 0		;1 = DELETE SCREEN
 
 trigFlags		equ 0h		;Trigonometry mode settings
 trigDeg			equ 2		;1 = degrees, 0=radians
@@ -6912,7 +6938,7 @@ silentLinkHookActive	equ 7		;1 = silent link hook active
 hookflags5		equ 3Ah
 usbActivityHookActive	equ 0		;1 = USB activity hook active
 ;----------------------------------------------------------------------
-plotFlag3		equ 3Ch  
+plotFlag3		equ 3Ch
 bufferOnly		equ 0
 useFastCirc		equ 4
 ;----------------------------------------------------------------------
