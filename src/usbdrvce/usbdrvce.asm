@@ -125,6 +125,7 @@ end virtual
 ;-------------------------------------------------------------------------------
 ; usb constants
 ;-------------------------------------------------------------------------------
+; enum usb_init_flags
 virtual at 0
 	USB_SUCCESS		rb 1
 	USB_IGNORE		rb 1
@@ -137,18 +138,78 @@ virtual at 0
 	USB_ERROR_TIMEOUT	rb 1
 end virtual
 
-USB_SKIP_NONE     := 0
-USB_SKIP_DISABLED := 1 shl 0
-USB_SKIP_ENABLED  := 1 shl 1
-USB_SKIP_DEVICES  := 1 shl 2
-USB_SKIP_HUBS     := 1 shl 3
-USB_SKIP_ATTACHED := 1 shl 4
+; enum usb_event
+virtual at 0
+	USB_DEVICE_DISCONNECTED_EVENT				rb 1
+	USB_DEVICE_CONNECTED_EVENT				rb 1
+	USB_DEVICE_DISABLED_EVENT				rb 1
+	USB_DEVICE_ENABLED_EVENT				rb 1
+	USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT		rb 1
+	USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT			rb 1
+	USB_DEFAULT_SETUP_EVENT					rb 1
+	; Temp debug events:
+	USB_DEVICE_INTERRUPT					rb 1
+	USB_DEVICE_CONTEXT_INTERRUPT				rb 1
+	USB_DEVICE_FIFO_INTERRUPT				rb 1
+	USB_DEVICE_DEVICE_INTERRUPT				rb 1
+	USB_OTG_INTERRUPT					rb 1
+	USB_HOST_INTERRUPT					rb 1
+	USB_CONTEXT_SETUP_INTERRUPT				rb 1
+	USB_CONTEXT_INPUT_INTERRUPT				rb 1
+	USB_CONTEXT_OUTPUT_INTERRUPT				rb 1
+	USB_CONTEXT_END_INTERRUPT				rb 1
+	USB_CONTEXT_ERROR_INTERRUPT				rb 1
+	USB_CONTEXT_ABORT_INTERRUPT				rb 1
+	USB_FIFO0_INPUT_INTERRUPT				rb 1
+	USB_FIFO0_OUTPUT_INTERRUPT				rb 1
+	USB_FIFO0_SHORT_PACKET_INTERRUPT			rb 1
+	USB_FIFO1_INPUT_INTERRUPT				rb 1
+	USB_FIFO1_OUTPUT_INTERRUPT				rb 1
+	USB_FIFO1_SHORT_PACKET_INTERRUPT			rb 1
+	USB_FIFO2_INPUT_INTERRUPT				rb 1
+	USB_FIFO2_OUTPUT_INTERRUPT				rb 1
+	USB_FIFO2_SHORT_PACKET_INTERRUPT			rb 1
+	USB_FIFO3_INPUT_INTERRUPT				rb 1
+	USB_FIFO3_OUTPUT_INTERRUPT				rb 1
+	USB_FIFO3_SHORT_PACKET_INTERRUPT			rb 1
+	USB_DEVICE_RESET_INTERRUPT				rb 1
+	USB_DEVICE_SUSPEND_INTERRUPT				rb 1
+	USB_DEVICE_RESUME_INTERRUPT				rb 1
+	USB_DEVICE_ISOCHRONOUS_ERROR_INTERRUPT			rb 1
+	USB_DEVICE_ISOCHRONOUS_ABORT_INTERRUPT			rb 1
+	USB_DEVICE_ZERO_LENGTH_PACKET_TRANSMIT_INTERRUPT	rb 1
+	USB_DEVICE_ZERO_LENGTH_PACKET_RECEIVE_INTERRUPT		rb 1
+	USB_DEVICE_DMA_FINISH_INTERRUPT				rb 1
+	USB_DEVICE_DMA_ERROR_INTERRUPT				rb 1
+	USB_DEVICE_IDLE_INTERRUPT				rb 1
+	USB_DEVICE_WAKEUP_INTERRUPT				rb 1
+	USB_B_SRP_COMPLETE_INTERRUPT				rb 1
+	USB_B_SRP_DETECT_INTERRUPT				rb 1
+	USB_A_VBUS_ERROR_INTERRUPT				rb 1
+	USB_B_SESSION_END_INTERRUPT				rb 1
+	USB_ROLE_CHANGED_INTERRUPT				rb 1
+	USB_ID_CHANGED_INTERRUPT				rb 1
+	USB_OVERCURRENT_INTERRUPT				rb 1
+	USB_B_PLUG_REMOVED_INTERRUPT				rb 1
+	USB_A_PLUG_REMOVED_INTERRUPT				rb 1
+	USB_INTERRUPT						rb 1
+	USB_HOST_ERROR_INTERRUPT				rb 1
+	USB_HOST_PORT_CHANGE_DETECT_INTERRUPT			rb 1
+	USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT			rb 1
+	USB_HOST_SYSTEM_ERROR_INTERRUPT				rb 1
+	USB_HOST_ASYNC_ADVANCE_INTERRUPT			rb 1
+end virtual
+
+USB_SKIP_NONE		:= 0
+USB_SKIP_DISABLED	:= 1 shl 0
+USB_SKIP_ENABLED	:= 1 shl 1
+USB_SKIP_DEVICES	:= 1 shl 2
+USB_SKIP_HUBS		:= 1 shl 3
+USB_SKIP_ATTACHED	:= 1 shl 4
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
 usb_Init:
-	ld	a,1
-	call	usb_Cleanup.init
 	call	_ChkIfOSInterruptAvailable
 	rrca
 	ld	hl,_DefaultDeviceDescriptors.str83
@@ -156,6 +217,9 @@ usb_Init:
 	ld	hl,_DefaultDeviceDescriptors.str84
 .gotModel:
 	ld	(_DefaultDeviceDescriptors.model),hl
+	ld	a,1
+	call	_Init
+	set	5,(hl)
 	or	a,a
 	sbc	hl,hl
 	ld	(rootDevice.data),hl
@@ -180,10 +244,34 @@ usb_Init:
 	rlca
 	ld	hl,mpUsbIdle
 	ld	(hl),7
-	ld	hl,(usbDevCtrl+1) and $FF
+	ld	l,h;usbDevCtrl+1-$100
 	ld	(hl),a
-	dec	l;usbDevCtrl and $FF
-	ld	(hl),bmUsbDevReset or bmUsbDevEn
+	dec	l;usbDevCtrl-$100
+	ld	(hl),bmUsbDevReset or bmUsbDevEn or bmUsbGirqEn
+	xor	a,a
+	ld	l,usbPhyTmsr-$100
+	ld	(hl),a
+	ld	l,usbGimr-$100
+	ld	(hl),bmUsbDevIntFifo
+	ld	l,usbCxImr-$100
+	ld	(hl),a
+	ld	l,usbFifoRxImr-$100
+	ld	(hl),a
+	ld	l,usbFifoTxImr-$100
+	ld	(hl),a
+	ld	l,usbDevImr-$100
+	ld	(hl),a
+	inc	l;usbDevImr+1-$100
+	ld	(hl),bmUsbIntDevIdle shr 8
+	dec	h
+	ld	l,usbIntEn
+	ld	(hl),bmUsbInt or bmUsbIntErr or bmUsbIntPortChgDetect or bmUsbIntFrameListOver or bmUsbIntHostSysErr or bmUsbIntAsyncAdv
+	ld	l,usbOtgIer
+	ld	(hl),bmUsbIntBSrpComplete or bmUsbIntASrpDetect or bmUsbIntAVbusErr ;or bmUsbIntBSessEnd
+	inc	l;usbOtgIer+1
+	ld	(hl),(bmUsbIntRoleChg or bmUsbIntIdChg or bmUsbIntOvercurr or bmUsbIntBPlugRemoved or bmUsbIntAPlugRemoved) shr 8
+	ld	l,usbImr
+	ld	(hl),usbIntLevelHigh
 	ld	hl,rootDevice.find
 	ld	(hl),USB_SKIP_HUBS or USB_SKIP_ENABLED
 	ld	hl,USB_ERROR_INVALID_PARAM
@@ -224,28 +312,18 @@ usb_Init:
 ;-------------------------------------------------------------------------------
 usb_Cleanup:
 	xor	a,a
-.init:
-	ld	bc,usbInited-usbArea
-	ld	de,usbInited
-	ld	hl,mpUsbCmd
-	ld	(de),a
-	ld	(hl),h
-	ld	l,usbSts+1
-.wait:
-	bit	bUsbHcHalted-8,(hl)
-	jq	z,.wait
-	scf
-	sbc	hl,hl
-	add	hl,de
-	ex	de,hl
-	lddr
+	ld	hl,mpUsbGimr
+	ld	(hl),a
+	ld	l,usbDevImr+1-$100
+	ld	(hl),a
+	call	_Init
+	res	5,(hl)
 	ret
 
 ;-------------------------------------------------------------------------------
+usb_WaitForEvents.wait:
+	ret	nz
 usb_WaitForEvents:
-	scf
-.wait:
-	ret	nc
 	ld	hl,.wait
 	push	hl
 
@@ -259,17 +337,23 @@ usb_WaitForInterrupt:
 
 ;-------------------------------------------------------------------------------
 usb_HandleEvents:
-	ld	hl,mpIntStat+1
-	bit	bIntUsb-8,(hl)
+.loop:
+	or	a,a
+	sbc	hl,hl
+	ld	a,(mpIntStat+1)
+	and	a,intUsb shr 8
+	ret	z
 	ld	hl,mpUsbIsr
 iterate type, Dev, Otg, Host
 	bit	bUsbInt#type,(hl)
 	call	nz,_Handle#type#Int
+	ret	nz
 end iterate
-	ld	hl,mpIntAck+1
-	ld	(hl),intUsb shr 8
-	or	a,a
-	jq	usb_HandleEvents
+	ld	a,intUsb shr 8
+	ld	(mpIntAck+1),a
+	ex	de,hl	; hl = 0
+	or	a,a	; zf = 0
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceHub:
@@ -472,6 +556,24 @@ _Check:
 	dec	a
 	ret
 
+_Init:
+	ld	bc,usbInited-usbArea
+	ld	de,usbInited
+	ld	hl,mpUsbCmd
+	ld	(de),a
+	ld	(hl),h
+	ld	l,usbSts+1
+.wait:
+	bit	bUsbHcHalted-8,(hl)
+	jq	z,.wait
+	scf
+	sbc	hl,hl
+	add	hl,de
+	ex	de,hl
+	lddr
+	ld	hl,flags+$1B
+	ret
+
 iterate <size,align>, 32,32, 64,256
 
 ; Allocates an <align> byte aligned <size> byte block.
@@ -502,22 +604,342 @@ _Free#size#Align#align:
 end iterate
 
 _HandleDevInt:
-	push	hl
-	pop	hl
+	ld	l,usbGisr-$100
+	inc	h
+iterate type, Cx, Fifo, Dev
+	bit	bUsbDevInt#type,(hl)
+	call	nz,_HandleDev#type#Int
+	ret	nz
+end iterate
+	ld	l,usbIsr
+	dec	h
 	ld	(hl),bmUsbIntDev
-	ret
+	ld	a,USB_DEVICE_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevCxInt:
+	ld	l,usbCxIsr-$100
+iterate type, Setup, In, Out, End, Err, Abort
+	bit	bUsbIntCx#type,(hl)
+	call	nz,_HandleCx#type#Int
+	ret	nz
+end iterate
+	ld	l,usbGisr-$100
+	ld	(hl),bmUsbDevIntCx
+	ld	a,USB_DEVICE_CONTEXT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevFifoInt:
+	ld	l,usbFifoRxIsr-$100
+repeat 4, fifo: 0
+ iterate type, Out, Spk
+	bit	bUsbIntFifo#fifo#type,(hl)
+	call	nz,_HandleFifo#fifo#type#Int
+	ret	nz
+ end iterate
+end repeat
+	ld	l,usbFifoTxIsr-$100
+repeat 4, fifo: 0
+ iterate type, In
+	bit	bUsbIntFifo#fifo#type,(hl)
+	call	nz,_HandleFifo#fifo#type#Int
+	ret	nz
+ end iterate
+end repeat
+	ld	l,usbGisr-$100
+	ld	(hl),bmUsbDevIntFifo
+	ld	a,USB_DEVICE_FIFO_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevDevInt:
+	ld	l,usbDevIsr-$100
+iterate type, Reset, Suspend, Resume, IsocErr, IsocAbt, ZlpTx, ZlpRx, DmaFin
+	bit	bUsbIntDev#type,(hl)
+	call	nz,_HandleDev#type#Int
+	ret	nz
+end iterate
+	inc	l;usbDevIsr+1-$100
+iterate type, DmaErr, Idle, Wakeup
+	bit	bUsbIntDev#type-8,(hl)
+	call	nz,_HandleDev#type#Int
+	ret	nz
+end iterate
+	ld	l,usbGisr-$100
+	ld	(hl),bmUsbDevIntDev
+	ld	a,USB_DEVICE_DEVICE_INTERRUPT
+	jq	_DispatchEvent
 
 _HandleOtgInt:
-	push	hl
-	pop	hl
+	ld	l,usbOtgIsr
+iterate type, BSrpComplete, ASrpDetect, AVbusErr, BSessEnd
+	bit	bUsbInt#type,(hl)
+	call	nz,_Handle#type#Int
+	ret	nz
+end iterate
+	inc	l;usbOtgIsr+1
+iterate type, RoleChg, IdChg, Overcurr, BPlugRemoved, APlugRemoved
+	bit	bUsbInt#type-8,(hl)
+	call	nz,_Handle#type#Int
+	ret	nz
+end iterate
+	ld	l,usbIsr
 	ld	(hl),bmUsbIntOtg
-	ret
+	ld	a,USB_OTG_INTERRUPT
+	jq	_DispatchEvent
 
 _HandleHostInt:
-	push	hl
-	pop	hl
+	ld	l,usbSts
+iterate type, , Err, PortChgDetect, FrameListOver, HostSysErr
+	bit	bUsbInt#type,(hl)
+	call	nz,_Handle#type#Int
+	ret	nz
+end iterate
+	ld	l,usbIsr
 	ld	(hl),bmUsbIntHost
+	ld	a,USB_HOST_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleCxSetupInt:
+	ld	(hl),bmUsbIntCxSetup
+	ld	a,USB_CONTEXT_SETUP_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleCxInInt:
+	ld	(hl),bmUsbIntCxIn
+	ld	a,USB_CONTEXT_INPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleCxOutInt:
+	ld	(hl),bmUsbIntCxOut
+	ld	a,USB_CONTEXT_OUTPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleCxEndInt:
+	ld	(hl),bmUsbIntCxEnd
+	ld	a,USB_CONTEXT_END_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleCxErrInt:
+	ld	(hl),bmUsbIntCxErr
+	ld	a,USB_CONTEXT_ERROR_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleCxAbortInt:
+	ld	(hl),bmUsbIntCxAbort
+	ld	a,USB_CONTEXT_ABORT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo0OutInt:
+	ld	(hl),bmUsbIntFifo0Out
+	ld	a,USB_FIFO0_OUTPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo0SpkInt:
+	ld	(hl),bmUsbIntFifo0Spk
+	ld	a,USB_FIFO0_SHORT_PACKET_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo1OutInt:
+	ld	(hl),bmUsbIntFifo1Out
+	ld	a,USB_FIFO1_OUTPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo1SpkInt:
+	ld	(hl),bmUsbIntFifo1Spk
+	ld	a,USB_FIFO1_SHORT_PACKET_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo2OutInt:
+	ld	(hl),bmUsbIntFifo2Out
+	ld	a,USB_FIFO2_OUTPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo2SpkInt:
+	ld	(hl),bmUsbIntFifo2Spk
+	ld	a,USB_FIFO2_SHORT_PACKET_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo3OutInt:
+	ld	(hl),bmUsbIntFifo3Out
+	ld	a,USB_FIFO3_OUTPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo3SpkInt:
+	ld	(hl),bmUsbIntFifo3Spk
+	ld	a,USB_FIFO3_SHORT_PACKET_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo0InInt:
+	ld	(hl),bmUsbIntFifo0In
+	ld	a,USB_FIFO0_INPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo1InInt:
+	ld	(hl),bmUsbIntFifo1In
+	ld	a,USB_FIFO1_INPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo2InInt:
+	ld	(hl),bmUsbIntFifo2In
+	ld	a,USB_FIFO2_INPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFifo3InInt:
+	ld	(hl),bmUsbIntFifo3In
+	ld	a,USB_FIFO3_INPUT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevResetInt:
+	ld	(hl),bmUsbIntDevReset
+	ld	a,USB_DEVICE_RESET_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevSuspendInt:
+	ld	(hl),bmUsbIntDevSuspend
+	ld	a,USB_DEVICE_SUSPEND_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevResumeInt:
+	ld	(hl),bmUsbIntDevResume
+	ld	a,USB_DEVICE_RESUME_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevIsocErrInt:
+	ld	(hl),bmUsbIntDevIsocErr
+	ld	a,USB_DEVICE_ISOCHRONOUS_ERROR_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevIsocAbtInt:
+	ld	(hl),bmUsbIntDevIsocAbt
+	ld	a,USB_DEVICE_ISOCHRONOUS_ABORT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevZlpTxInt:
+	ld	(hl),bmUsbIntDevZlpTx
+	ld	a,USB_DEVICE_ZERO_LENGTH_PACKET_TRANSMIT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevZlpRxInt:
+	ld	(hl),bmUsbIntDevZlpRx
+	ld	a,USB_DEVICE_ZERO_LENGTH_PACKET_RECEIVE_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevDmaFinInt:
+	ld	(hl),bmUsbIntDevDmaFin
+	ld	a,USB_DEVICE_DMA_FINISH_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevDmaErrInt:
+	ld	(hl),bmUsbIntDevDmaErr shr 8
+	ld	a,USB_DEVICE_DMA_ERROR_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevIdleInt:
+	ld	(hl),bmUsbIntDevIdle shr 8
+	ld	a,USB_DEVICE_IDLE_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleDevWakeupInt:
+	ld	(hl),bmUsbIntDevWakeup shr 8
+	ld	a,USB_DEVICE_WAKEUP_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleBSrpCompleteInt:
+	ld	(hl),bmUsbIntBSrpComplete
+	ld	a,USB_B_SRP_COMPLETE_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleASrpDetectInt:
+	ld	(hl),bmUsbIntASrpDetect
+	ld	a,USB_B_SRP_DETECT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleAVbusErrInt:
+	ld	(hl),bmUsbIntAVbusErr
+	ld	a,USB_A_VBUS_ERROR_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleBSessEndInt:
+	ld	(hl),bmUsbIntBSessEnd
+	ld	a,USB_B_SESSION_END_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleRoleChgInt:
+	ld	(hl),bmUsbIntRoleChg shr 8
+	ld	a,USB_ROLE_CHANGED_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleIdChgInt:
+	ld	(hl),bmUsbIntIdChg shr 8
+	ld	a,USB_ID_CHANGED_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleOvercurrInt:
+	ld	(hl),bmUsbIntOvercurr shr 8
+	ld	a,USB_OVERCURRENT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleBPlugRemovedInt:
+	ld	(hl),bmUsbIntBPlugRemoved shr 8
+	ld	a,USB_B_PLUG_REMOVED_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleAPlugRemovedInt:
+	ld	(hl),bmUsbIntAPlugRemoved shr 8
+	ld	a,USB_A_PLUG_REMOVED_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleInt:
+	ld	(hl),bmUsbInt
+	ld	a,USB_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleErrInt:
+	ld	(hl),bmUsbIntErr
+	ld	a,USB_HOST_ERROR_INTERRUPT
+	jq	_DispatchEvent
+
+_HandlePortChgDetectInt:
+	ld	(hl),bmUsbIntPortChgDetect
+	ld	a,USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleFrameListOverInt:
+	ld	(hl),bmUsbIntFrameListOver
+	ld	a,USB_HOST_SYSTEM_ERROR_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleHostSysErrInt:
+	ld	(hl),bmUsbIntHostSysErr
+	ld	a,USB_HOST_ASYNC_ADVANCE_INTERRUPT
+	jq	_DispatchEvent
+
+_DispatchEvent:
+	push	hl
+	ld	hl,(eventCallback.data)
+	push	hl
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	push	hl
+	ld	l,h
+	push	hl
+	ex	de,hl
+	ld	hl,(eventCallback)
+	sbc	hl,de
+	call	nz,.dispatch
+	pop	de
+	pop	de
+	pop	de
+	pop	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ret	nz
+	ex	de,hl
 	ret
+.dispatch:
+	jp	(hl)
 
 _DefaultDeviceDescriptors:
 	dl 0, .full, .langids
