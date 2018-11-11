@@ -77,12 +77,11 @@ fat_Find:
 	ld	iy, 0
 	add	iy, sp
 	ld	hl, (iy + 3)			; fat_partition_t
-	ld	a, (iy + 6)			; maximum
-msd_mbr_parse:
-	ld	(fat32_ptrs), hl
-	ld	(fat32_max), a
+	ld	a, (iy + 6)			; maximum partitions to locate
+	ld	(fat.partitionptrs), hl
+	ld	(fat.maxpartitions), a
 	xor	a, a
-	ld	(fat32_num), a
+	ld	(fat.partitionnum), a
 	sbc	hl, hl
 	ld	(scsiRead10Lba), hl
 	ld	(scsiRead10Lba + 3), a
@@ -92,10 +91,10 @@ msd_mbr_parse:
 	or	a, a
 	sbc	hl, de
    	add	hl, de				; check if boot sector
-	jq	z, fat32_only			; this should only happen on the first one
-	call	find_fat32
+	jq	z, fat.onlypartition		; this should only happen on the first one
+	call	fat.find
 	ld	a, 0
-fat32_num := $ - 1
+fat.partitionnum := $ - 1
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -126,8 +125,8 @@ fat_Close:
 	pop	hl
 	push	hl
 	push	de
-	call	fatfindfd
-	ld	(hl),-1			; fat_fd[i].key = -1;
+	call	fat.findfd
+	ld	(hl), -1		; fat_fd[i].key = -1;
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -136,9 +135,9 @@ fat_GetFileSize:
 	pop	hl
 	push	hl
 	push	de
-	call	fatfindfd
-	ld	hl,(iy + 18)
-	ld	e,(iy + 21)		; return fat_fd[i].file_size;
+	call	fat.findfd
+	ld	hl, (iy + 18)
+	ld	e, (iy + 21)		; return fat_fd[i].file_size;
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -151,17 +150,17 @@ fat_Tell:
 	pop	hl
 	push	hl
 	push	de
-	call	fatfindfd
-	ld	hl,(iy + 14)
-	ld	e,(iy + 17)		; return fat_fd[i].fpos;
+	call	fat.findfd
+	ld	hl, (iy + 14)
+	ld	e, (iy + 17)		; return fat_fd[i].fpos;
 	ret
 
 ;-------------------------------------------------------------------------------
 fat_SetBuffer:
 	pop	de
-	ex	(sp),hl			; hl -> buffer
+	ex	(sp), hl		; hl -> buffer
 	push	de
-	ld	(fat.sectorbuffer),hl
+	ld	(fat.sectorbuffer), hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -189,15 +188,15 @@ msd_Init:
 	push	ix
 	push	iy
 	call	msdInit			; attempt to initialize mass storage device
-	jr	nc,.fail
-	xor	a,a
+	jr	nc, .fail
+	xor	a, a
 .ret:
 	pop	iy
 	pop	ix
 	ret
 .fail:
 	call	usbCleanup
-	xor	a,a
+	xor	a, a
 	inc	a
 	jr	.ret
 
@@ -211,50 +210,49 @@ msd_Select:
 
 ;-------------------------------------------------------------------------------
 msd_KeepAlive:
-	ld	hl,scsiTestUnitReady
+	ld	hl, scsiTestUnitReady
 	jp	scsiDefaultRequest
 
 ;-------------------------------------------------------------------------------
 msd_ReadSector:
 	call	__frameset0
-	ld	a,(ix+9)
-	ld	(scsiRead10Lba + 3),a
-	ld	a,(ix+10)
-	ld	(scsiRead10Lba + 2),a
-	ld	a,(ix+11)
-	ld	(scsiRead10Lba + 1),a
-	ld	a,(ix+12)
-	ld	(scsiRead10Lba + 0),a
-	ld	de,(ix+6)
+	ld	a, (ix + 9)
+	ld	(scsiRead10Lba + 3), a
+	ld	a, (ix + 10)
+	ld	(scsiRead10Lba + 2), a
+	ld	a, (ix + 11)
+	ld	(scsiRead10Lba + 1), a
+	ld	a, (ix + 12)
+	ld	(scsiRead10Lba + 0), a
+	ld	de, (ix + 6)
 	call	scsiRequestRead
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 msd_WriteSector:
 	call	__frameset0
-	ld	a,(ix+9)
-	ld	(scsiWrite10Lba + 3),a
-	ld	a,(ix+10)
-	ld	(scsiWrite10Lba + 2),a
-	ld	a,(ix+11)
-	ld	(scsiWrite10Lba + 1),a
-	ld	a,(ix+12)
-	ld	(scsiWrite10Lba + 0),a
-	ld	de,(ix+6)
+	ld	a, (ix + 9)
+	ld	(scsiWrite10Lba + 3), a
+	ld	a, (ix + 10)
+	ld	(scsiWrite10Lba + 2), a
+	ld	a, (ix + 11)
+	ld	(scsiWrite10Lba + 1), a
+	ld	a, (ix + 12)
+	ld	(scsiWrite10Lba + 0), a
+	ld	de, (ix + 6)
 	call	scsiRequestWrite
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 msd_SetJmpBuf:
-	pop	de			; remove return location
-	pop	hl
-	push	hl
+	pop	de
+	ex	(sp), hl		; hl -> buffer
 	push	de
-	ld	(fat.setjmpbuf),hl
+	ld	(fat.setjmpbuf), hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -269,14 +267,14 @@ msd_Cleanup:
 ;-------------------------------------------------------------------------------
 msd.detached:
 	call	usbCleanup		; restore setjmp buffer to return to
-	ld	hl,1			; MSD_EVENT_DETACHED
+	ld	hl, 1			; MSD_EVENT_DETACHED
 	jr	msd.event
 msd.xfererror:
 	call	usbCleanup		; restore setjmp buffer to return to
-	ld	hl,2			; MSD_EVENT_XFER_ERROR
+	ld	hl, 2			; MSD_EVENT_XFER_ERROR
 msd.event:
 	push	hl
-	ld	hl,(fat.setjmpbuf)
+	ld	hl, (fat.setjmpbuf)
 	push	hl
 	call	__longjmp
 
@@ -290,63 +288,63 @@ _cluster_to_sector:
 	dec	sp
 	push	hl
 	push	de
-	ld	de,-2
-	add	hl,de
-	adc	a,d
-	ld	c,a
-	ld	a,(_fat_state + 1)
-	jr	c,enter
-	sbc	hl,hl
-	ld	e,l
+	ld	de, -2
+	add	hl, de
+	adc	a, d
+	ld	c, a
+	ld	a, (_fat_state + 1)
+	jr	c, enter
+	sbc	hl, hl
+	ld	e, l
 	ret
 loop:
-	add	hl,hl
+	add	hl, hl
 	rl	c
 enter:
 	rrca
-	jr	nc,loop
-	ld	de,(_fat_state + 20)
-	ld	a,(_fat_state + 20 + 3)
-	add	hl,de
-	adc	a,c
-	ld	e,a
+	jr	nc, loop
+	ld	de, (_fat_state + 20)
+	ld	a, (_fat_state + 20 + 3)
+	add	hl, de
+	adc	a, c
+	ld	e, a
 	ret
 
 ;-------------------------------------------------------------------------------
 _fname_to_fatname:
-	ld	iy,0
-	add	iy,sp
-	ld	de,(iy + 3)		; de = name
-	ld	hl,(iy + 6)		; hl = fname
-	ld	b,0			; for (i = 0; i < 8 && name[i] != '.' && name[i]; i++)
+	ld	iy, 0
+	add	iy, sp
+	ld	de, (iy + 3)		; de = name
+	ld	hl, (iy + 6)		; hl = fname
+	ld	b, 0			; for (i = 0; i < 8 && name[i] != '.' && name[i]; i++)
 .loop1:
-	ld	a,b
-	cp	a,8
-	jr	nc,.done1
-	ld	a,(de)
-	cp	a,46			; '.'
-	jr	z,.done1
-	ld	a,(de)
-	or	a,a
-	jr	z,.done1
-	ld	(hl),a
+	ld	a, b
+	cp	a, 8
+	jr	nc, .done1
+	ld	a, (de)
+	cp	a, 46			; '.'
+	jr	z, .done1
+	ld	a, (de)
+	or	a, a
+	jr	z, .done1
+	ld	(hl), a
 	inc	de			; i++
 	inc	hl
 	inc	b
 	jr	.loop1
 .done1:
-	ld	a,b			; if (i < 8 && name[i])
-	cp	a,8
-	jr	nc,.elseif
-	ld	a,(de)
-	or	a,a
-	jr	z,.elseif
+	ld	a, b			; if (i < 8 && name[i])
+	cp	a, 8
+	jr	nc, .elseif
+	ld	a, (de)
+	or	a, a
+	jr	z, .elseif
 
-	ld	a,8			; for (j = i; j < 8; j++)
+	ld	a, 8			; for (j = i; j < 8; j++)
 .loop2:
-	cp	a,b
-	jr	z,.fillremaining
-	ld	(hl),32			; fname[j] = ' ';
+	cp	a, b
+	jr	z, .fillremaining
+	ld	(hl), 32		; fname[j] = ' ';
 	inc	hl
 	inc	b
 	jr	.loop2
@@ -354,97 +352,97 @@ _fname_to_fatname:
 	inc	de			; i++;
 
 .loop3456:				; for (; j < 11 && name[i]; j++, i++)
-	ld	a,b
-	cp	a,11
+	ld	a, b
+	cp	a, 11
 	ret	nc
-	ld	a,(de)
-	or	a,a
-	jr	z,.other
+	ld	a, (de)
+	or	a, a
+	jr	z, .other
 	inc	de
 .store:
-	ld	(hl),a			; fname[j] = name[i];
+	ld	(hl), a			; fname[j] = name[i];
 	inc	hl
 	inc	b
 	jr	.loop3456
 .other:
-	ld	a,32			; ' '
+	ld	a, 32			; ' '
 	jr	.store
 
 .elseif:
-	ld	a,b			; else if (i == 8 && name[i] == '.')
-	cp	a,8
-	jr	nz,.spacefill
-	ld	a,(de)
-	cp	a,46			; '.'
-	jr	nz,.spacefill
+	ld	a, b			; else if (i == 8 && name[i] == '.')
+	cp	a, 8
+	jr	nz, .spacefill
+	ld	a, (de)
+	cp	a, 46			; '.'
+	jr	nz, .spacefill
 	jr	.fillremaining
 
 .spacefill:
-	ld	a,11
+	ld	a, 11
 .spacefillloop:				; for (; j < 11; j++)
-	cp	a,b
+	cp	a, b
 	ret	z
-	ld	(hl),32			; fname[j] = ' '
+	ld	(hl), 32		; fname[j] = ' '
 	inc	hl
 	inc	b
 	jr	.spacefillloop
 
 _next_cluster:
-	ld	hl,3
-	add	hl,sp
-	ld	a,(_fat_state + 24)
-	or	a,a
-	ld	a,(hl)
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (_fat_state + 24)
+	or	a, a
+	ld	a, (hl)
 	inc	hl
-	ld	hl,(hl)
-	jr	z,.fat16.1
-	add	a,a
-	adc	hl,hl
+	ld	hl, (hl)
+	jr	z, .fat16.1
+	add	a, a
+	adc	hl, hl
 .fat16.1:
-	ex	de,hl
-	sbc	hl,hl
-	ld	l,a
-	add	hl,hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, a
+	add	hl, hl
 	push	hl
-	ld	hl,(_fat_state + 12)
-	add	hl,de
-	ld	a,(_fat_state + 12 + 3)
-	ld	e,a
+	ld	hl, (_fat_state + 12)
+	add	hl, de
+	ld	a, (_fat_state + 12 + 3)
+	ld	e, a
 	call	fat.readsector
 	pop	de
-	ld	hl,(fat.sectorbuffer)
-	add	hl,de
-	ld	a,(_fat_state + 24)
-	or	a,a
-	jr	z,.fat16.2
-	ld	de,(hl)
+	ld	hl, (fat.sectorbuffer)
+	add	hl, de
+	ld	a, (_fat_state + 24)
+	or	a, a
+	jr	z, .fat16.2
+	ld	de, (hl)
 	inc	hl
 	inc	hl
 	inc	hl
-	ld	a,(hl)
-	and	$0F
-	ld	hl,8
-	add	hl,de
-	ex	de,hl
-	ld	e,a
-	adc	a,$F0
+	ld	a, (hl)
+	and	a, $0f
+	ld	hl, 8
+	add	hl, de
+	ex	de, hl
+	ld	e, a
+	adc	a, $f0
 	ret	nc
-	ld	e,a
-	ex	de,hl
-	ld	e,a
+	ld	e, a
+	ex	de, hl
+	ld	e, a
 	ret
 
 .fat16.2:
-	ld	e,(hl)
+	ld	e, (hl)
 	inc	hl
-	ld	d,(hl)
-	ld	hl,$FF0008
-	add	hl,de
-	ex	de,hl
-	ld	e,a
+	ld	d, (hl)
+	ld	hl, $ff0008
+	add	hl, de
+	ex	de, hl
+	ld	e, a
 	ret	nc
-	ex	de,hl
-	ld	e,a
+	ex	de, hl
+	ld	e, a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -455,39 +453,39 @@ _end_of_chain_mark:
 	push	bc
 	push	hl
 	push	de
-	ld	de,8
-	ld	a,(_fat_state + 24)
-	or	a,a
-	jr	nz,.fat32
-	add.s	hl,de
-	sbc	a,a
+	ld	de, 8
+	ld	a, (_fat_state + 24)
+	or	a, a
+	jr	nz, .fat32
+	add.s	hl, de
+	sbc	a, a
 	ret
 .fat32:
-	add	hl,de
-	ld	a,c
-	adc	a,$f0
-	sbc	a,a
+	add	hl, de
+	ld	a, c
+	adc	a, $f0
+	sbc	a, a
 	ret
 
 ;-------------------------------------------------------------------------------
-fatfindfd:
-	ld	a,l
-	or	a,a
-	jp	p,.valid
+fat.findfd:
+	ld	a, l
+	or	a, a
+	jp	p, .valid
 .ret0:
 	pop	de			; pop return
-	xor	a,a
-	sbc	hl,hl			; if (fd < 0) return 0;
-	ld	e,0
+	xor	a, a
+	sbc	hl, hl			; if (fd < 0) return 0;
+	ld	e, 0
 	ret
 .valid:
-	ld	b,3			; for (i = 0; i < max_fd_open; i++)
-	ld	hl,_fat_fd
-	ld	de,23
+	ld	b, 3			; for (i = 0; i < max_fd_open; i++)
+	ld	hl, _fat_fd
+	ld	de, 23
 .find:
-	cp	a,(hl)			; if (fat_fd[i].key == fd)
-	jr	z,.found
-	add	hl,de
+	cp	a, (hl)			; if (fat_fd[i].key == fd)
+	jr	z, .found
+	add	hl, de
 	djnz	.find
 	jr	.ret0
 .found:
@@ -498,16 +496,16 @@ fatfindfd:
 ;-------------------------------------------------------------------------------
 ; euhl = sector lba
 fat.readsector:
-	ld	bc,scsiRead10Lba
-	call	add_fat.partitionlba
-	ld	de,(fat.sectorbuffer)
+	ld	bc, scsiRead10Lba
+	call	fat.addpartitionlba
+	ld	de, (fat.sectorbuffer)
 	jp	scsiRequestRead
 
 ;-------------------------------------------------------------------------------
 ; euhl = sector lba
 fat.writesector:
 	ld	bc,scsiWrite10Lba
-	call	add_fat.partitionlba
+	call	fat.addpartitionlba
 	ld	de,(fat.sectorbuffer)
 	jp	scsiRequestWrite
 
@@ -520,7 +518,7 @@ _fat_ReadSector:
 	ld	hl, (iy + 6)
 	ld	e, (iy + 9)
 	ld	bc, scsiRead10Lba
-	call	add_fat.partitionlba
+	call	fat.addpartitionlba
 ;	call	debugStr
 ;	db	'rd ', 0
 ;	ld	hl, scsiRead10Lba
@@ -541,7 +539,7 @@ _fat_WriteSector:
 	ld	hl, (iy + 6)
 	ld	e, (iy + 9)
 	ld	bc, scsiWrite10Lba
-	call	add_fat.partitionlba
+	call	fat.addpartitionlba
 ;	call	debugStr
 ;	db	'wr ', 0
 ;	ld	hl, scsiWrite10Lba
@@ -554,7 +552,7 @@ _fat_WriteSector:
 	ret
 
 ;-------------------------------------------------------------------------------
-add_fat.partitionlba:
+fat.addpartitionlba:
 	push	bc
 	ld	bc, (fat.partitionlba)
 	ld	a, (fat.partitionlba + 3)
@@ -577,9 +575,9 @@ add_fat.partitionlba:
 	ret
 
 ;-------------------------------------------------------------------------------
-find_fat32:
+fat.find:
 	call	scsiRequestDefaultRead		; read sector
-	call	check_sector_magic
+	call	fat.checkmagic
 	ret	nz
 	ld	hl, -64
 	add	hl, sp
@@ -598,13 +596,13 @@ find_fat32:
 	ld	a, (hl)
 ;	call	debugHexA
 	cp	a, $0b				; fat32 partition?
-	call	z, fat32_found
+	call	z, fat.found
 	cp	a, $0c				; fat32 partition?
-	call	z, fat32_found
+	call	z, fat.found
 	cp	a, $0f				; extended partition?
-	call	z, ebr_found
+	call	z, ebr.found
 	cp	a, $05				; extended partition? (chs)
-	call	z, ebr_found
+	call	z, ebr.found
 	pop	hl
 	ld	bc, 16
 	add	hl, bc
@@ -629,13 +627,13 @@ find_fat32:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat32_only:
-	call	check_sector_magic
+fat.onlypartition:
+	call	fat.checkmagic
 	ld	a, 0
 	ret	nz
 	inc	a
-	ld	(fat32_num), a
-	ld	hl, (fat32_ptrs)
+	ld	(fat.partitionnum), a
+	ld	hl, (fat.partitionptrs)
 	push	hl
 	pop	de
 	ld	(hl), 0
@@ -645,26 +643,26 @@ fat32_only:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat32_found:
+fat.found:
 	push	af
 ;	call	debugStr
 ;	db	'found fat', 0
 ;	call	debugNewLine
-	ld	a, (fat32_num)
+	ld	a, (fat.partitionnum)
 	cp	a, 0
-fat32_max := $ - 1
+fat.maxpartitions := $ - 1
 	jr	z, .found_max
 	ld	bc, 4				; hl -> end of lba
 	add	hl, bc
 	push	hl
 	ld	c, 8
 	ld	de, 0
-fat32_ptrs := $ - 3
+fat.partitionptrs := $ - 3
 	ldir
-	ld	(fat32_ptrs), de
+	ld	(fat.partitionptrs), de
 	pop	hl
 	ld	de, scsiRead10Lba + 3
-	call	reverse_copy
+	call	util.revcopy
 ;	call	scsiRequestDefaultRead		; read sector
 ;	ld	hl,xferDataPtrDefault
 ;	call	debugHexBlockHL
@@ -672,13 +670,13 @@ fat32_ptrs := $ - 3
 ;	call	debugNewLine
 
 .found_max:
-	ld	hl, fat32_num
+	ld	hl, fat.partitionnum
 	inc	(hl)
 	pop	af
 	ret
 
 ;-------------------------------------------------------------------------------
-ebr_found:
+ebr.found:
 	push	af
 ;	call	debugStr
 ;	db	'found ebr', 0
@@ -686,26 +684,25 @@ ebr_found:
 	ld	bc, 4				; hl -> end of lba
 	add	hl, bc
 	ld	de, scsiRead10Lba + 3
-	call	reverse_copy
-	call	find_fat32			; recursively locate fat32 partitions
+	call	util.revcopy
+	call	fat.find			; recursively locate fat32 partitions
 	pop	af
 	ret
 
 ;-------------------------------------------------------------------------------
-reverse_copy:
+util.revcopy:
 	ld	b, 4
-.loop:
+.copy:
 	ld	a, (hl)
 	ld	(de), a
 	inc	hl
 	dec	de
-	djnz	.loop
+	djnz	.copy
 	ret
 
 ;-------------------------------------------------------------------------------
-check_sector_magic:
+fat.checkmagic:
 	ld	hl, xferDataPtrDefault + 510	; offset = signature
-test_sector:
 	ld	a, (hl)
 	cp	a, $55
 	ret	nz
