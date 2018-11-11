@@ -202,7 +202,7 @@ usbWaitForConnection:
 ;	call	debugStr
 ;	db	'Waiting for connection...',0
 ;	call	debugNewLine
-	ld	hl,mpUsbPortSC
+	ld	hl,mpUsbPortStsCtrl
 .waitconn:
 	bit	0,(hl)
 	jr	z,.waitconn
@@ -306,7 +306,7 @@ usbBusReset:
 ;	call	debugStr
 ;	db	'Resetting bus...',0
 ;	call	debugNewLine
-	ld	hl,mpUsbPortSC
+	ld	hl,mpUsbPortStsCtrl
 	res	2,(hl)
 .disable:
 	bit	2,(hl)
@@ -552,7 +552,7 @@ qhRetry.retry:
 qhRetry.loop:
 	set	bQtdStatus,l
 qhRetry.wait:
-	ld	a,(mpUsbPortSC)
+	ld	a,(mpUsbPortStsCtrl)
 	rrca
 	and	1
 	jr	nz,qhRetry.error

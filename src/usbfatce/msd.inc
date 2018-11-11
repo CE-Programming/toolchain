@@ -1,7 +1,7 @@
 usbbuf := $d40000
 
 ;-------------------------------------------------------------------------------
-usbInitDevice:
+usbConfigureFirstDevice:
 	call    usbInit				; init usb
 	call    devFirst
 	ld	(device),iy			; use first device
@@ -58,7 +58,7 @@ reqClrOutStall:
 
 ;-------------------------------------------------------------------------------
 msdInit:
-	call	usbInitDevice
+	call	usbConfigureFirstDevice
 	call	findFirstMsdInterface
 	call	c,findScsiEndpoints
 	ret	nc
