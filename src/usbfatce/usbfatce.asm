@@ -20,8 +20,6 @@ library 'USBFATCE', 0
 	export fat_SetFileSize
 	export fat_Tell
 	export fat_SetBuffer
-	export fat_ReadSector
-	export fat_WriteSector
 	export fat_Delete
 	export fat_Create
 	export fat_GetAttrib
@@ -43,235 +41,7 @@ include 'msd.inc'
 
 ;-------------------------------------------------------------------------------
 fat_Init:
-	or	a,a
-	sbc	hl,hl
-	ld	e,l
-	call	fat.readsector		; read_sector(0, sector_buff);
-
-	ld	iy,(fat.sectorbuffer)
-	ld	hl,(iy + 11)
-	ld	a,h
-	sub	a,512 shr 8
-	or	a,l			; if (get16(data + 11) != 512)
-	jr	z,.goodsectsz
-	xor	a,a			; return 0;
-	ret
-
-.goodsectsz:
-	ld	a,(iy + 13)
-	ld	(_fat_state + 1),a	; fat_state.cluster_size = data[13];
-
-	ld	bc,(iy + 17)
-	ld	hl,_fat_state + 2
-	ld	(hl),c
-	inc	hl
-	ld	(hl),b			; fat_state.root_directory_size = get16(data + 17);
-
-	ld	a,(iy + 16)
-	cp	a,2			; if (data[16] != 2)
-	jr	z,.goodfatnum
-	xor	a,a			; return 0;
-	ret
-
-.goodfatnum:
-	or	a,a			; if (get16(data + 19))
-	sbc	hl,hl
-	ld	e,l
-	ld	l,(iy + 19)
-	ld	h,(iy + 20)
-	ld	a,(_fat_state + 1)
-	ld	bc,0
-	ld	c,a
-	add	hl,de
-	xor	a,a
-	sbc	hl,de
-	jr	z,.getclusters
-
-	call	__idivs			; fat_state.clusters = get16(data + 19) / fat_state.cluster_size;
-	xor	a,a
-	ld	(_fat_state + 4),hl
-	ld	e,a
-	ld	(_fat_state + 7),a
-	jr	.gotclusters
-.getclusters:				; else
-	ld	hl,(iy + 32)		; fat_state.clusters = get32(data + 32) / fat_state.cluster_size;
-	ld	e,(iy + 35)
-	call	__ldivu
-	ld	(_fat_state + 4),hl
-	ld	a,e
-	ld	(_fat_state + 7),a
-.gotclusters:				; if (fat_state.clusters < 4085)
-	xor	a,a
-	ld	bc,4085
-	call	__lcmpu
-	jr	nc,.fatvalid
-	xor	a,a			; return 0;
-	ret
-.fatvalid:				; else if (fat_state.clusters < 65525)
-	ld	a,(_fat_state + 7)
-	ld	e,a
-	ld	hl,(_fat_state + 4)
-	xor	a,a
-	ld	bc,65525
-	call	__lcmpu
-	jr	nc,.fat32
-	xor	a,a			; fat_state.type = fat_type_fat16;
-	jr	.fat16
-.fat32:
-	ld	a,1			; fat_state.type = fat_type_fat32;
-.fat16:
-	ld	(_fat_state + 24),a
-	or	a,a			; if (fat_state.type <= fat_type_fat16)
-	push	af
-	jr	nz,.getu8
-	ld	a,(iy + 38)		; tu8 = data[38];
-	jr	.gotu8
-.getu8:
-	ld	a,(iy + 66)		; tu8 = data[66];
-.gotu8:
-	cp	a,$28			; if (tu8 != 0x28 && tu8 != 0x29)
-	jr	z,.goodu8
-	cp	a,$29
-	jr	z,.goodu8
-	pop	af
-	xor	a,a			; return 0;
-	ret
-.goodu8:
-	pop	af			; if (fat_state.type <= fat_type_fat16)
-	jr	nz,.fat32size
-.fat16size:
-	xor	a,a
-	sbc	hl,hl
-	ld	l,(iy + 22)		; fat_state.fat_size = get16(data + 22);
-	ld	h,(iy + 23)
-	jr	.fatgotsize
-.fat32size:
-	ld	hl,(iy + 36)		; fat_state.fat_size = get32(data + 36);
-	ld	a,(iy + 39)
-.fatgotsize:
-	ld	(_fat_state + 8),hl
-	or	a,a
-	jr	z,.nottoobig
-	xor	a,a
-	ret
-.nottoobig:
-	push	hl
-	sbc	hl,hl			; fat_state.fat_pos = reserved_sectors;
-	ld	l,(iy + 14)
-	ld	h,(iy + 15)		; reserved_sectors = get16(data + 14);
-	ld	(_fat_state + 12),hl
-	ld	(_fat_state + 15),a
-	push	hl
-	pop	bc
-
-	pop	hl			; fat_state.root_dir_pos = fat_state.fat_pos + fat_state.fat_size * 2;
-	add	hl,hl
-	ld	e,0
-	rl	e
-;	ld	bc,(_fat_state + 12)	; done above
-;	ld	a,(_fat_state + 15)
-	add	hl,bc			; __ladd
-	adc	a,e
-	ld	(_fat_state + 16),hl
-	ld	(_fat_state + 19),a	; fat_state.root_dir_pos
-
-	ld	bc,0
-	ld	a,(_fat_state + 2)
-	ld	c,a
-	ld	a,(_fat_state + 3)	; fat_state.root_directory_size
-	ld	b,a
-
-	srl	b			; fat_state.data_region = fat_state.root_dir_pos + fat_state.root_directory_size * 32 / 512;
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-	srl	b
-	rr	c
-
-	xor	a,a
-	add	hl,bc			; __ladd
-	adc	a,e
-	ld	e,a
-	ld	(_fat_state + 20),hl
-	ld	a,e
-	ld	(_fat_state + 23),a
-
-	ld	a,(_fat_state + 24)	; if (fat_state.type == fat_type_fat32)
-	cp	a,1
-	jq	nz,.inited
-	ld	bc,(_fat_state + 16)	; fat_state.data_region = fat_state.root_dir_pos;
-	ld	a,(_fat_state + 19)
-	ld	(_fat_state + 20),bc
-	ld	(_fat_state + 23),a
-
-	ld	hl,(iy + 44)		; fat_state.root_dir_pos += + fat_state.cluster_size * (get32(data + 44) - 2);
-	ld	e,(iy + 47)
-	xor	a,a
-	ld	bc,2
-	call	__lsub
-	ld	bc,0
-	ld	a,(_fat_state + 1)
-	ld	c,a
-	call	__lmulu
-	ld	bc,(_fat_state + 16)
-	ld	a,(_fat_state + 19)
-	add	hl,bc			; __ladd
-	adc	a,e
-	ld	e,a
-	ld	(_fat_state + 16),hl
-	ld	a,e
-	ld	(_fat_state + 19),a
-
-	or	a,a			; fsinfo = get16(data + 48);
-	sbc	hl,hl
-	ld	e,l
-	ld	l,(iy + 48)
-	ld	h,(iy + 49)		; /* invalidate free space counter */
-	ld	(.fsinfo),hl
-	call	fat.readsector		; read_sector(fsinfo, data);
-
-	ld	hl,(iy + 0)		; if (get32(data + 0) == 0x41615252 && get16(data + 510) == 0xaa55)
-	ld	e,(iy + 3)
-	ld	bc,$615252
-	ld	a,$41
-	call	__lcmpu
-	jr	nz,.inited
-	ld	bc,510
-	lea	hl,iy
-	add	hl,bc
-	call	test_sector
-	jr	nz,.inited
-
-	ld	bc,488			; set32(data + 488, 0xffffffff);
-	lea	hl,iy
-	add	hl,bc
-	ld	a,255
-	ld	(hl),a
-	inc	hl
-	ld	(hl),a
-	inc	hl
-	ld	(hl),a
-	inc	hl
-	ld	(hl),a
-
-	ld	e,0
-	ld	hl,0
-.fsinfo := $ - 3
-	call	fat.writesector		; write_sector(fsinfo, data);
-.inited:
-	ld	b,3			; for (i = 0; i < max_fd_open; i++)
-	ld	hl,_fat_fd
-	ld	de,23
-.setkeys:
-	ld	(hl),-1			; fat_fd[i].key = -1;
-	add	hl,de
-	djnz	.setkeys
-
-	ld	a,1
-	ld	(_fat_state + 0),a	; fat_state.valid = true;
-	ret				; return 1;
+	jp	_init_fat
 
 ;-------------------------------------------------------------------------------
 fat_Find:
@@ -359,14 +129,10 @@ fat_Tell:
 
 ;-------------------------------------------------------------------------------
 fat_SetBuffer:
-	ret
-
-;-------------------------------------------------------------------------------
-fat_ReadSector:
-	ret
-
-;-------------------------------------------------------------------------------
-fat_WriteSector:
+	pop	de
+	ex	(sp),hl			; hl -> buffer
+	push	de
+	ld	(fat.sectorbuffer),hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -396,7 +162,6 @@ msd_Init:
 	call	msdInit			; attempt to initialize mass storage device
 	jr	nc,.fail
 	xor	a,a
-	inc	a
 .ret:
 	pop	iy
 	pop	ix
@@ -404,6 +169,7 @@ msd_Init:
 .fail:
 	call	usbCleanup
 	xor	a,a
+	inc	a
 	jr	.ret
 
 ;-------------------------------------------------------------------------------

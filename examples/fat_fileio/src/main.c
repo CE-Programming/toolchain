@@ -44,7 +44,7 @@ void fatDemo(void) {
     putString("insert drive...");
 
     /* Initialize first detected mass storage device */
-    if (!msd_Init()) {
+    if (msd_Init(5000) != 0) {
         putString("drive init failed.");
         return;
     }
@@ -70,17 +70,14 @@ void fatDemo(void) {
 
     putString("using fat partition 1.");
 
-    msd_ReadSector(sector, 0);
-    for (i = 0; i < 128; i++) {
-        sprintf(buf, "%02X", sector[i]);
-        os_PutStrFull(buf);
-    }
-/*
-    if (fat_Init() != true) {
-        putString("invalid fat partition.");
+    if (fat_Init() != 0) {
+        putString("fat error.");
         return;
     }
-*/
+
+    putString("initialized fat.");
+
+    msd_Cleanup();
 }
 
 /* Draw text on the homescreen */

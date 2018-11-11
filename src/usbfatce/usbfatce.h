@@ -47,9 +47,9 @@ extern uint8_t *fat_SectorBuffer;
  * Initializes the FAT filesystem and allows other FAT functions to be used.
  * Before calling this function, you must use \c fat_Find and \c fat_Select
  * in order to locate the correct FAT partition.
- * @return true if the FAT filesystem was initialized properly, false upon error.
+ * @return 0 on success.
  */
-bool fat_Init(void);
+uint8_t fat_Init(void);
 
 /**
  * Locates any available FAT partitions detected on the mass storage device
@@ -190,7 +190,7 @@ int fat_DirList(const char *path, fat_entry_t *list, int size, int skip);
  * Selects the first found attached Mass Storage Device (MSD).
  * This is an alternative to using \c msd_Find and \c msd_Select.
  * @param ms Timeout before erroring if no devices are detected.
- * @return 0 if initialization fails.
+ * @return 0 on success.
  */
 uint8_t msd_Init(unsigned int ms);
 
