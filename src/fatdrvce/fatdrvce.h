@@ -1,12 +1,13 @@
 /**
  * @file
+ * @author Steven "s@rdw.se" Arnow
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
- * @brief USB FAT driver
+ * @brief USB FAT Filesystem Driver
  */
 
-#ifndef H_USBFATCE
-#define H_USBFATCE
+#ifndef H_FATDRVCE
+#define H_FATDRVCE
 
 #include <setjmp.h>
 #include <stdint.h>

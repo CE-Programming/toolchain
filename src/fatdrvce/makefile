@@ -3,7 +3,7 @@
 #----------------------------
 
 # set NAME to the name of the library
-NAME :=usbsrlce
+NAME :=fatdrvce
 
 # defult locations
 FASMG ?=fasmg
