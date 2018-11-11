@@ -24,15 +24,15 @@ void main(void) {
 
 void init_msd(void) {
 
-    os_line("insert msd...");
+    printText(0, 0, "insert msd...");
 
     /* initialize mass storage device */
     if (!msd_Init()) {
-        os_line("msd init failed.");
+        printText(0, 1, "msd init failed.");
         return;
     }
 
-    os_line("locating filesystem");
+    printText(0, 1, "locating filesystem");
 }
 
 /* Draw text on the homescreen at the given X/Y location */
