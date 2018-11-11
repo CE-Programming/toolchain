@@ -35,7 +35,6 @@ library 'FATDRVCE', 0
 	export msd_Cleanup
 ;-------------------------------------------------------------------------------
 
-include 'debug.inc'
 include 'host.inc'
 include 'msd.inc'
 
@@ -251,7 +250,12 @@ msd_WriteSector:
 
 ;-------------------------------------------------------------------------------
 msd_SetJmp:
-	ret
+	pop	de			; remove return location
+	pop	hl
+	push	hl
+	push	de
+	ld	(fat.setjmpbuf),hl
+	jp	__setjmp
 
 ;-------------------------------------------------------------------------------
 msd_Cleanup:
@@ -263,9 +267,18 @@ msd_Cleanup:
 	ret
 
 ;-------------------------------------------------------------------------------
-msd_Detached:
+msd.detached:
 	call	usbCleanup		; restore setjmp buffer to return to
-	ret
+	ld	hl,1			; MSD_EVENT_DETACHED
+	jr	msd.event
+msd.xfererror:
+	call	usbCleanup		; restore setjmp buffer to return to
+	ld	hl,2			; MSD_EVENT_XFER_ERROR
+msd.event:
+	push	hl
+	ld	hl,(fat.setjmpbuf)
+	push	hl
+	jp	__longjmp
 
 ;-------------------------------------------------------------------------------
 _cluster_to_sector:
@@ -704,6 +717,8 @@ test_sector:
 fat.partitionlba:
 	db	0,0,0,0
 fat.sectorbuffer:
+	db	0,0,0
+fat.setjmpbuf:
 	db	0,0,0
 
 _fat_state:

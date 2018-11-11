@@ -231,9 +231,9 @@ xferCdbPtr := $ - 3
 	or	a,a
 	ret	z			; check the command was accepted
 	cp	a,1
-	jp	z,msd_Detached
+	jp	z,msd.detached
 	add	a,a			; check if stall
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 .resendCbw:
 	call	msdPerformResetRecovery
 	jr	msdCommandTransport
@@ -259,9 +259,9 @@ msdDataIn:
 	or	a,a
 	ret	z
 	cp	a,1
-	jp	z,msd_Detached
+	jp	z,msd.detached
 	cp	a,$80
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 	jq	msdClrInStall
 
 msdDataOut:
@@ -272,9 +272,9 @@ msdDataOut:
 	or	a,a
 	ret	z
 	cp	a,1
-	jp	z,msd_Detached
+	jp	z,msd.detached
 	add	a,a
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 	jq	msdClrOutStall
 
 msdStatusTransport:
@@ -282,18 +282,18 @@ msdStatusTransport:
 	or	a,a
 	jr	z,msdCheckValidCsw
 	cp	a,1
-	jp	z,msd_Detached
+	jp	z,msd.detached
 	add	a,a
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 msdStatusStall:
 	call	msdClrInStall		; clear stall
 	call	msdStatusXfer		; attempt to read csw again
 	or	a,a
 	jr	z,msdCheckValidCsw
 	cp	a,1
-	jp	z,msd_Detached
+	jp	z,msd.detached
 	add	a,a
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 	call	msdPerformResetRecovery
 	xor	a,a
 	inc	a
@@ -324,7 +324,7 @@ msdPhaseError:
 msdSenseError:
 	ld	hl,msdSenseCount
 	or	a,(hl)
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 	inc	(hl)
 	ld	de,xferDataPtrSense
 	ld	hl,scsiReqestSense

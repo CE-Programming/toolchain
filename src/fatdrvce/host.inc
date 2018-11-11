@@ -228,7 +228,7 @@ usbWaitForConnection:
 	call	qhInit
 	ld	hl,reqSetAddr+wValue
 	inc	(hl)
-	call	pe,debugAbort
+	call	pe,msd.xfererror
 	ld	a,ixh
 	ld	(iy+devEndpoints+0),a
 	ld	a,(hl)
@@ -408,7 +408,7 @@ devSelectConfig:
 	ex	(sp),ix
 	call	.next
 	pop	ix
-	call	c,debugAbort
+	call	c,msd.xfererror
 	jp	qhRetryMaxOrAbort
 .next:
 	or	a,a
@@ -467,7 +467,7 @@ getConfigDescTotalLength:
 qhAlloc:
 	ld	hl,(qhFreeList)
 	bit	0,l
-	call	nz,debugAbort	; could malloc, but would require 255 + sizeof qh to properly align (though you would get free qtds I guess)
+	call	nz,msd.xfererror	; could malloc, but would require 255 + sizeof qh to properly align (though you would get free qtds I guess)
 	ld	de,(hl)
 	ld	(qhFreeList),de
 	ret
@@ -500,7 +500,7 @@ qhAlloc:
 ;	ld	(ix+qhFirstQtd),hl
 ;	bit	6,a
 ;	jr	z,.wait
-;	call	debugAbort
+;	call	msd.xfererror
 
 ; Input:
 ;  ix = qh
@@ -692,7 +692,7 @@ qhInit:
 ;  bc = ?
 qhFree:
 	bit	0,l
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 	ld	bc,(qhFreeList)
 	ld	(hl),bc
 	ld	(qhFreeList),hl
@@ -705,7 +705,7 @@ qtdAlloc:
 	push	de
 	ld	hl,(qtdFreeList)
 	bit	0,l
-	call	nz,debugAbort	; could malloc more I guess, or requisition a qh (would help dynamically fix the ratio)
+	call	nz,msd.xfererror	; could malloc more I guess, or requisition a qh (would help dynamically fix the ratio)
 	ld	de,(hl)
 	ld	(qtdFreeList),de
 	pop	de
@@ -717,7 +717,7 @@ qtdAlloc:
 ;  f = ?
 qtdFree:
 	bit	0,l
-	call	nz,debugAbort
+	call	nz,msd.xfererror
 	push	de
 	ld	de,(qtdFreeList)
 	ld	(hl),de
@@ -807,8 +807,7 @@ qhRetryMaxOrAbort:
 	ld	b,0
 	call	qhRetry
 	ret	z
-	call	debugHexA
-	call	debugAbort
+	call	msd.xfererror
 
 ; Input:
 ;  de = req

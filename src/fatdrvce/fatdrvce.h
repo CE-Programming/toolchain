@@ -44,6 +44,12 @@ typedef struct {
 #define FAT_VOLLABEL  (1 << 3)  /**< Entry is a Volume Label. Only for root directory. */
 #define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or just directory). */
 
+typedef enum msd_event {
+    MSD_EVENT_NONE = 0,   /**< No event detected. */
+    MSD_EVENT_DETACHED,   /**< The MSD device was unplugged. */
+    MSD_EVENT_XFER_ERROR  /**< The MSD device encountered a transfer error. */
+} msd_event_t;
+
 /**
  * Initializes the FAT filesystem and allows other FAT functions to be used.
  * Before calling this function, you must use \c fat_Find and \c fat_Select
@@ -190,6 +196,8 @@ int fat_DirList(const char *path, fat_entry_t *list, int size, int skip);
 /**
  * Selects the first found attached Mass Storage Device (MSD).
  * This is an alternative to using \c msd_Find and \c msd_Select.
+ * Before calling this function, it is important to install an
+ * event handler using the \c msd_SetJmp function.
  * @param ms Timeout before erroring if no devices are detected.
  * @return 0 on success.
  */
@@ -237,10 +245,11 @@ void msd_ReadSector(uint8_t *buffer, uint32_t sector);
 void msd_WriteSector(uint8_t *buffer, uint32_t sector);
 
 /**
- * Implements 'setjmp' functionality to return to in the event of an
- * error or a detachment of the usb device.
+ * Internally calls the standard \c setjmp function to return to
+ * in the event of an error or a detachment of the usb device.
  * @param func Function pointer to call.
- * @return None.
+ * @return  0 if the first call, otherwise the \c msd_event_t event that
+ * occured. You can also trigger this return manually using \c longjmp.
  */
 int msd_SetJmp(jmp_buf env);
 

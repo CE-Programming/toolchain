@@ -12,6 +12,7 @@
 #define MAX_PARTITIONS 10
 
 static uint8_t sector[512];
+static jmp_buf msdenv;
 
 /* Function prototypes */
 void putString(const char *str);
@@ -37,11 +38,19 @@ void main(void) {
 void fatDemo(void) {
     int8_t fd;
     uint8_t num;
+    msd_event_t evnt;
     unsigned int i;
     fat_partition_t fat_partitions[MAX_PARTITIONS];
     char buf[128];
 
     putString("insert drive...");
+
+    /* Set up error handling */
+    if ((evnt = msd_SetJmp(msdenv)) != 0) {
+        sprintf(buf, "event: %u", evnt);
+        putString(buf);
+        return;
+    }
 
     /* Initialize first detected mass storage device */
     if (msd_Init(5000) != 0) {
@@ -76,6 +85,10 @@ void fatDemo(void) {
     }
 
     putString("initialized fat.");
+
+    for (;;) {
+        msd_ReadSector(sector, 0);
+    }
 
     msd_Cleanup();
 }
