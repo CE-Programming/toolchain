@@ -29,12 +29,23 @@ typedef enum usb_init_flags {
 } usb_init_flags_t;
 
 typedef enum usb_event {
+  /// \p event_data The usb_device_t that was disconnected.
   USB_DEVICE_DISCONNECTED_EVENT,
+  /// \p event_data The usb_device_t that was connected.
   USB_DEVICE_CONNECTED_EVENT,
+  /// \p event_data The usb_device_t that was disabled.
   USB_DEVICE_DISABLED_EVENT,
+  /// \p event_data The usb_device_t that was enabled.
   USB_DEVICE_ENABLED_EVENT,
+  /// \p event_data The usb_device_t that deactivated overcurrent condition.
   USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT,
+  /// \p event_data The usb_device_t that activated overcurrent condition.
   USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT,
+  /// This event triggers when a host sends a control setup packet.  Standard
+  /// requests are handled internally and do not trigger an event.  Return
+  /// USB_SUCCESS if you recognized the request and scheduled a corresponding
+  /// transfer, otherwise return USB_ERROR_NOT_SUPPORTED to stall.
+  /// \p event_data The usb_control_setup_t * that was sent by the host.
   USB_DEFAULT_SETUP_EVENT,
   // Temp debug events:
   USB_DEVICE_INTERRUPT,
@@ -420,9 +431,9 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
 
 /**
  * Type of the function to be called when a usb device event occurs.
- * @param device Handle for the device where the event originated.
- * @param data Opaque pointer passed to usb_Init().  By default is of type
- * void *, but that can be changed by doing:
+ * @param event_data Event specific data.
+ * @param callback_data Opaque pointer passed to usb_Init().  By default is of
+ * type void *, but that can be changed by doing:
  * \code
  * #define usb_device_callback_data_t struct mystruct
  * #include <usbdrvce.h>
@@ -431,9 +442,8 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
  * without erroring, or an error to ignore the device and to return from
  * usb_ProcessEvents().
  */
-typedef usb_error_t (*usb_event_callback_t)(usb_device_t device,
-                                            usb_event_t event,
-                                            usb_callback_data_t *data);
+typedef usb_error_t (*usb_event_callback_t)(usb_event_t event, void *event_data,
+                                            usb_callback_data_t *callback_data);
 
 /**
  * Type of the function to be called when a transfer finishes.
@@ -784,9 +794,9 @@ usb_error_t usb_ClearEndpointHalt(usb_endpoint_t endpoint);
  * If \p transferred is NULL then nothing is returned.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_ControlTransfer(usb_endpoint_t endpoint,
-                                const usb_control_setup_t *setup, void *buffer,
-                                unsigned retries, size_t *transferred);
+usb_error_t
+usb_ControlTransfer(usb_endpoint_t endpoint, const usb_control_setup_t *setup,
+                    void *buffer, unsigned retries, size_t *transferred);
 
 /**
  * Schedules a control transfer to the default control pipe of \p device, in the
@@ -857,11 +867,11 @@ usb_error_t usb_Transfer(usb_endpoint_t endpoint, void *buffer, size_t length,
  * @param transfer Returns a handle to the transfer.
  * @return USB_SUCCESS if the transfer was scheduled or an error.
  */
-usb_error_t usb_ScheduleControlTransfer(usb_endpoint_t endpoint,
-                                        const usb_control_setup_t *setup,
-                                        void *buffer,
-                                        usb_transfer_callback_t handler,
-                                        usb_transfer_data_t *data);
+usb_error_t
+usb_ScheduleControlTransfer(usb_endpoint_t endpoint,
+                            const usb_control_setup_t *setup, void *buffer,
+                            usb_transfer_callback_t handler,
+                            usb_transfer_data_t *data);
 
 /**
  * Schedules a control transfer to the default control pipe of \p device, in
@@ -909,10 +919,10 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  * @param data Opaque pointer to be passed to the \p handler.
  * @return USB_SUCCESS if the transfer was scheduled or an error.
  */
-usb_error_t usb_ScheduleTransfer(usb_device_t device, uint8_t endpoint,
-                                 void *buffer, size_t length,
-                                 usb_transfer_callback_t handler,
-                                 usb_transfer_data_t *data);
+usb_error_t
+usb_ScheduleTransfer(usb_device_t device, uint8_t endpoint, void *buffer,
+                     size_t length, usb_transfer_callback_t handler,
+                     usb_transfer_data_t *data);
 #define usb_ScheduleBulkTransfer usb_ScheduleTransfer
 #define usb_ScheduleInterruptTransfer usb_ScheduleTransfer
 #define usb_ScheduleIsochronousTransfer usb_ScheduleTransfer
