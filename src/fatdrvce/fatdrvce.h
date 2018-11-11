@@ -17,32 +17,32 @@
 extern "C" {
 #endif
 
+/*
 typedef struct {
-    unsigned int idx;
+    unsigned int dummy;
 } msd_t;
+*/
 
 typedef struct {
-    uint32_t lba;
-    uint32_t size;
+    uint32_t lba;       /**< Logical Block Address (LBA) of FAT partition */
+    uint32_t size;      /**< Size of FAT partition */
 } fat_partition_t;
 
 typedef struct {
-    char filename[13];
-    uint8_t attrib;
-    uint8_t padding[2];
+    char filename[13];  /**< Entry filename. */
+    uint8_t attrib;     /**< Entry attributes. */
+    uint8_t padding[2]; /**< Extra padding (reserved) */
 } fat_entry_t;
 
-#define	O_WRONLY      2
-#define	O_RDONLY      1
-#define	O_RDWR        (O_RDONLY | O_WRONLY)
+#define	FAT_O_WRONLY      2               /**< Open Write only mode. */
+#define	FAT_O_RDONLY      1               /**< Open Write only mode */
+#define	FAT_O_RDWR (O_RDONLY | O_WRONLY)  /**< Open in Read and Write mode. */
 
-#define FAT_RDONLY    (1 << 0)
-#define FAT_HIDDEN    (1 << 1)
-#define FAT_SYSTEM    (1 << 2)
-#define FAT_VOLLABEL  (1 << 3)
-#define FAT_SUBDIR    (1 << 4)
-
-extern uint8_t *fat_SectorBuffer;
+#define FAT_RDONLY    (1 << 0)  /**< Entry is Read-Only. */
+#define FAT_HIDDEN    (1 << 1)  /**< Entry is Hidden. */
+#define FAT_SYSTEM    (1 << 2)  /**< Entry is a System file / directory. */
+#define FAT_VOLLABEL  (1 << 3)  /**< Entry is a Volume Label. Only for root directory. */
+#define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or just directory). */
 
 /**
  * Initializes the FAT filesystem and allows other FAT functions to be used.
@@ -81,8 +81,8 @@ void fat_Select(fat_partition_t *list, uint8_t index);
  * path format. No support for long file names is given. The file must exist,
  * or be created with \c fat_Create.
  * @param path Absolute 8.3 file path name.
- * @param flags O_WRONLY, O_RDONLY, O_RDWR for write only, read only, and
- * read/write respectively.
+ * @param flags \c FAT_O_WRONLY, \c FAT_O_RDONLY, \c FAT_O_RDWR for write only,
+ * read only, and read/write respectively.
  * @return A FAT file descriptor, or a value less than 0 on error.
  */
 int8_t fat_Open(const char *path, int flags);
@@ -202,7 +202,7 @@ uint8_t msd_Init(unsigned int ms);
  * @param max The maximum number of MSD's that can be found.
  * @return The number of attached MSD's.
  */
-uint8_t msd_Find(unsigned int ms, msd_t *result, uint8_t max);
+/*uint8_t msd_Find(unsigned int ms, msd_t *result, uint8_t max);*/
 
 /**
  * Select an attached Mass Storage Devices (MSD) for use.
@@ -211,7 +211,7 @@ uint8_t msd_Find(unsigned int ms, msd_t *result, uint8_t max);
  * found Mass Storage Device.
  * @return None.
  */
-void msd_Select(msd_t *list, uint8_t index);
+/*void msd_Select(msd_t *list, uint8_t index);*/
 
 /**
  * Sends a SCSI "TEST_UNIT_READY" packet to ensure the device does not fall asleep.
