@@ -23,7 +23,8 @@ static void putIntHex(unsigned int x) {
   putByteHex(x >>  0);
 }
 
-static usb_error_t handle_usb_event(usb_device_t device, usb_event_t event, usb_callback_data_t *data) {
+static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
+				    usb_callback_data_t *callback_data) {
   static const char *usb_event_names[] = {
     "USB_DEVICE_DISCONNECTED_EVENT",
     "USB_DEVICE_CONNECTED_EVENT",
