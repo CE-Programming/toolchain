@@ -189,17 +189,19 @@ int fat_DirList(const char *path, fat_entry_t *list, int size, int skip);
 /**
  * Selects the first found attached Mass Storage Device (MSD).
  * This is an alternative to using \c msd_Find and \c msd_Select.
+ * @param ms Timeout before erroring if no devices are detected.
  * @return 0 if initialization fails.
  */
-uint8_t msd_Init(void);
+uint8_t msd_Init(unsigned int ms);
 
 /**
  * Locates any attached Mass Storage Devices (MSD).
+ * @param ms Timeout before erroring if no devices are found.
  * @param result Array of MSD's available, returned from function.
  * @param max The maximum number of MSD's that can be found.
  * @return The number of attached MSD's.
  */
-uint8_t msd_Find(msd_t *result, uint8_t max);
+uint8_t msd_Find(unsigned int ms, msd_t *result, uint8_t max);
 
 /**
  * Select an attached Mass Storage Devices (MSD) for use.

@@ -1,4 +1,6 @@
 usbbuf := $d40000
+xferDataPtrDefault := usbbuf
+xferDataPtrSense := usbbuf + 512
 
 ;-------------------------------------------------------------------------------
 usbConfigureFirstDevice:
@@ -536,7 +538,4 @@ packetCBWCBD:
 	db	$00,$00,$00,$00	; command block
 	db	$00,$00,$00,$00	; command block
 packetCBWLen := $ - packetCBW
-
-xferDataPtrDefault := usbbuf
-xferDataPtrSense := usbbuf + 512
 

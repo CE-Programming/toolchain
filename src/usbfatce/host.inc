@@ -7,7 +7,8 @@ periodicList		:= $D14000 ; 4K aligned, 1K
 alignedPoolLow		:= $D14400 ; 32b aligned
 qhHead			:= $D17702
 alignedPoolHigh		:= $D17740
-unalloc1		:= $D17740 ; 119 bytes
+devRoot			:= $D17740 ; 19 bytes
+unalloc1		:= $D17753 ; 100 bytes
 usbSillyState		:= $D177B7 ; needs to not be $55 so nothing else gets clobbered
 unalloc2		:= $D177B8 ; 4 bytes
 usbRangeHigh		:= $D177BC
@@ -138,6 +139,10 @@ bInterval		:= wMaxPacketSize+2
 descLenEndpt		:= bInterval+1
 
 usbInit:
+	ld	hl,devRootAlloc
+	ld	de,devRoot
+	ld	bc,devRootAlloc.size
+	ldir
 	ld	hl,mpTmrCtrl
 	res	bTmr3Enable,(hl)
 	xor	a,a
@@ -211,7 +216,7 @@ usbWaitForConnection:
 	jr	z,.waitconn
 	call	usbBusReset
 	ld	ix,ep0Desc
-	lea	iy,ix+devRoot-ep0Desc
+	ld	iy,devRoot
 	xor	a,a
 	ld	(reqSetAddr+wValue),a
 	ld	(iy+devAddr),a
@@ -1040,8 +1045,9 @@ reqSetConf:
 	db	$00,reqTypeSetConf,0,0,0,0,0,0
 ep0Desc:
 	db	descLenEndpt,descTypeEndpt,0,0,8,0,0
-	db	0 dup (-$ and 15)
-devRoot:
+devRootAlloc:
 	rb	devHubInfo
 	db	1 shl 7,1 shl 6
 	db	1,0,0,1,0,0,1,0,0
+.size := $ - devRootAlloc
+

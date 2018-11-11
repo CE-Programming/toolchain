@@ -9,34 +9,83 @@
 
 #include <usbfatce.h>
 
+#define MAX_PARTITIONS 10
+
+static uint8_t sector[512];
+
 /* Function prototypes */
-void printText(int8_t xpos, int8_t ypos, const char *text);
-void init_msd(void);
+void putString(const char *str);
+void fatDemo(void);
+
+void send_char(char n)
+{
+    char str[2];
+    str[0] = n;
+    str[1] = 0;
+    os_PutStrFull(str);
+}
 
 /* Main Function */
 void main(void) {
     os_ClrHome();
 
-    init_msd();
+    fatDemo();
 
     while (!os_GetCSC());
 }
 
-void init_msd(void) {
+void fatDemo(void) {
+    int8_t fd;
+    uint8_t num;
+    unsigned int i;
+    fat_partition_t fat_partitions[MAX_PARTITIONS];
+    char buf[128];
 
-    printText(0, 0, "insert msd...");
+    putString("insert drive...");
 
-    /* initialize mass storage device */
+    /* Initialize first detected mass storage device */
     if (!msd_Init()) {
-        printText(0, 1, "msd init failed.");
+        putString("drive init failed.");
         return;
     }
 
-    printText(0, 1, "locating filesystem");
+    putString("locating filesystem");
+
+    /* Set the buffer used by the FAT library */
+    fat_SetBuffer(sector);
+
+    /* Find any avaliable FAT filesystems on the device */
+    num = fat_Find(fat_partitions, MAX_PARTITIONS);
+    if (num == 0) {
+        putString("no fat partitions.");
+        return;
+    }
+
+    /* log number of partitions */
+    sprintf(buf, "total fat partitions: %u", num);
+    putString(buf);
+
+    /* Just use the first detected partition */
+    fat_Select(fat_partitions, 0);
+
+    putString("using fat partition 1.");
+
+    msd_ReadSector(sector, 0);
+    for (i = 0; i < 128; i++) {
+        sprintf(buf, "%02X", sector[i]);
+        os_PutStrFull(buf);
+    }
+/*
+    if (fat_Init() != true) {
+        putString("invalid fat partition.");
+        return;
+    }
+*/
 }
 
-/* Draw text on the homescreen at the given X/Y location */
-void printText(int8_t xpos, int8_t ypos, const char *text) {
-    os_SetCursorPos(ypos, xpos);
-    os_PutStrFull(text);
+/* Draw text on the homescreen */
+void putString(const char *str) {
+    os_PutStrFull(str);
+    os_NewLine();
 }
+
