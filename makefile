@@ -77,8 +77,8 @@ GRAPHXDIR  := $(call NATIVEPATH,$(SRCDIR)/graphx)
 KEYPADCDIR := $(call NATIVEPATH,$(SRCDIR)/keypadc)
 FILEIOCDIR := $(call NATIVEPATH,$(SRCDIR)/fileioc)
 USBDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/usbdrvce)
-fatdrvceDIR:= $(call NATIVEPATH,$(SRCDIR)/fatdrvce)
-srldrvceDIR:= $(call NATIVEPATH,$(SRCDIR)/srldrvce)
+FATDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/fatdrvce)
+SRLDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/srldrvce)
 LIBLOADDIR := $(call NATIVEPATH,$(SRCDIR)/libload)
 
 CEDEVDIR   := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME))
@@ -192,18 +192,18 @@ clean-usbdrvce:
 # fatdrvce rules
 #----------------------------
 fatdrvce: $(FASMG)
-	$(MAKE) -C $(fatdrvceDIR) FASMG=$(FASMG) BIN=$(BIN)
+	$(MAKE) -C $(FATDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-fatdrvce:
-	$(MAKE) -C $(fatdrvceDIR) clean
+	$(MAKE) -C $(FATDRVCEDIR) clean
 #----------------------------
 
 #----------------------------
 # srldrvce rules
 #----------------------------
 srldrvce: $(FASMG)
-	$(MAKE) -C $(srldrvceDIR) FASMG=$(FASMG) BIN=$(BIN)
+	$(MAKE) -C $(SRLDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-srldrvce:
-	$(MAKE) -C $(srldrvceDIR) clean
+	$(MAKE) -C $(SRLDRVCEDIR) clean
 #----------------------------
 
 #----------------------------
@@ -249,8 +249,8 @@ install: $(DIRS) chmod all linker_script
 	$(MAKE) -C $(KEYPADCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(USBDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(MAKE) -C $(fatdrvceDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(MAKE) -C $(srldrvceDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(FATDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(SRLDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(LIBLOADDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
