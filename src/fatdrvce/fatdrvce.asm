@@ -31,7 +31,7 @@ library 'FATDRVCE', 0
 	export msd_KeepAlive
 	export msd_ReadSector
 	export msd_WriteSector
-	export msd_SetJmp
+	export msd_SetJmpBuf
 	export msd_Cleanup
 ;-------------------------------------------------------------------------------
 
@@ -249,13 +249,13 @@ msd_WriteSector:
 	ret
 
 ;-------------------------------------------------------------------------------
-msd_SetJmp:
+msd_SetJmpBuf:
 	pop	de			; remove return location
 	pop	hl
 	push	hl
 	push	de
 	ld	(fat.setjmpbuf),hl
-	jp	__setjmp
+	ret
 
 ;-------------------------------------------------------------------------------
 msd_Cleanup:
@@ -278,7 +278,7 @@ msd.event:
 	push	hl
 	ld	hl,(fat.setjmpbuf)
 	push	hl
-	jp	__longjmp
+	call	__longjmp
 
 ;-------------------------------------------------------------------------------
 _cluster_to_sector:

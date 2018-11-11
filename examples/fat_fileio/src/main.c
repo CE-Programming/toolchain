@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <setjmp.h>
 #include <tice.h>
 
 #include <stdio.h>
@@ -46,11 +47,12 @@ void fatDemo(void) {
     putString("insert drive...");
 
     /* Set up error handling */
-    if ((evnt = msd_SetJmp(msdenv)) != 0) {
+    if ((evnt = setjmp(msdenv)) != 0) {
         sprintf(buf, "event: %u", evnt);
         putString(buf);
         return;
     }
+    msd_SetJmpBuf(msdenv);
 
     /* Initialize first detected mass storage device */
     if (msd_Init(5000) != 0) {

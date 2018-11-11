@@ -245,13 +245,13 @@ void msd_ReadSector(uint8_t *buffer, uint32_t sector);
 void msd_WriteSector(uint8_t *buffer, uint32_t sector);
 
 /**
- * Internally calls the standard \c setjmp function to return to
+ * Uses a buffer instantiated with \c setjmp as a handle
  * in the event of an error or a detachment of the usb device.
  * @param func Function pointer to call.
  * @return  0 if the first call, otherwise the \c msd_event_t event that
  * occured. You can also trigger this return manually using \c longjmp.
  */
-int msd_SetJmp(jmp_buf env);
+int msd_SetJmpBuf(jmp_buf env);
 
 /**
  * Cleans up the current USB state.
