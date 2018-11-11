@@ -8,6 +8,7 @@
 #ifndef H_USBFATCE
 #define H_USBFATCE
 
+#include <setjmp.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -218,19 +219,33 @@ void msd_KeepAlive(void);
 
 /**
  * Directly reads a 512 byte sector from the Mass Storage Device
- * @param data Pointer to allocated 512 byte buffer to read into.
+ * @param buffer Pointer to allocated 512 byte buffer to read into.
  * @param sector Logical Block Address (LBA) of sector to read.
- * @return false if an error occurs.
+ * @return None.
  */
-bool msd_ReadSector(uint8_t *data, uint32_t sector);
+void msd_ReadSector(uint8_t *buffer, uint32_t sector);
 
 /**
  * Directly writes a 512 byte sector to the Mass Storage Device
- * @param data Pointer to allocated 512 byte buffer to write.
+ * @param buffer Pointer to allocated 512 byte buffer to write.
  * @param sector Logical Block Address (LBA) of sector to write.
- * @return false if an error occurs.
+ * @return None.
  */
-bool msd_WriteSector(uint8_t *data, uint32_t sector);
+void msd_WriteSector(uint8_t *buffer, uint32_t sector);
+
+/**
+ * Implements 'setjmp' functionality to return to in the event of an
+ * error or a detachment of the usb device.
+ * @param func Function pointer to call.
+ * @return None.
+ */
+int msd_SetJmp(jmp_buf env);
+
+/**
+ * Cleans up the current USB state.
+ * @return None.
+ */
+void msd_Cleanup(void);
 
 #ifdef __cplusplus
 }

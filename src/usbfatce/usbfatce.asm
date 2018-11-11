@@ -33,7 +33,13 @@ library 'USBFATCE', 0
 	export msd_KeepAlive
 	export msd_ReadSector
 	export msd_WriteSector
+	export msd_SetJmp
+	export msd_Cleanup
 ;-------------------------------------------------------------------------------
+
+include 'debug.inc'
+include 'host.inc'
+include 'msd.inc'
 
 ;-------------------------------------------------------------------------------
 fat_Init:
@@ -101,7 +107,20 @@ fat_DirList:
 
 ;-------------------------------------------------------------------------------
 msd_Init:
+	push	ix
+	push	iy
+	call	msdInit			; attempt to initialize mass storage device
+	jr	nc,.fail
+	xor	a,a
+	inc	a
+.ret:
+	pop	iy
+	pop	ix
 	ret
+.fail:
+	call	usbCleanup
+	xor	a,a
+	jr	.ret
 
 ;-------------------------------------------------------------------------------
 msd_Find:
@@ -113,13 +132,58 @@ msd_Select:
 
 ;-------------------------------------------------------------------------------
 msd_KeepAlive:
-	ret
+	ld	hl,scsiTestUnitReady
+	jp	scsiDefaultRequest
 
 ;-------------------------------------------------------------------------------
 msd_ReadSector:
+	call	__frameset0
+	ld	a,(ix+9)
+	ld	(scsiRead10Lba + 3),a
+	ld	a,(ix+10)
+	ld	(scsiRead10Lba + 2),a
+	ld	a,(ix+11)
+	ld	(scsiRead10Lba + 1),a
+	ld	a,(ix+12)
+	ld	(scsiRead10Lba + 0),a
+	ld	de,(ix+6)
+	call	scsiRequestRead
+	ld	sp,ix
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 msd_WriteSector:
+	call	__frameset0
+	ld	a,(ix+9)
+	ld	(scsiWrite10Lba + 3),a
+	ld	a,(ix+10)
+	ld	(scsiWrite10Lba + 2),a
+	ld	a,(ix+11)
+	ld	(scsiWrite10Lba + 1),a
+	ld	a,(ix+12)
+	ld	(scsiWrite10Lba + 0),a
+	ld	de,(ix+6)
+	call	scsiRequestWrite
+	ld	sp,ix
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+msd_SetJmp:
+	ret
+
+;-------------------------------------------------------------------------------
+msd_Cleanup:
+	push	ix
+	push	iy
+	call	usbCleanup
+	pop	iy
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+msd_Detached:
+	call	usbCleanup		; restore setjmp buffer to return to
 	ret
 
