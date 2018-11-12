@@ -64,6 +64,7 @@ struc endpoint			; endpoint structure
 
 	.type		rb 1	; transfer type
 	.flags		rb 1	; endpoint flags
+	.internalFlags	rb 1	; internal endpoint flags
 	.first		rl 1	; pointer to first scheduled transfer
 	.last		rl 1	; pointer to last dummy transfer
 	.device		rl 1	; pointer to device
