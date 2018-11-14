@@ -17,7 +17,7 @@ static void putByteHex(unsigned char x) {
   putNibHex(x >> 4);
   putNibHex(x >> 0);
 }
-static void putIntHex(unsigned int x) {
+static void putIntHex(unsigned x) {
   putByteHex(x >> 16);
   putByteHex(x >>  8);
   putByteHex(x >>  0);
@@ -40,7 +40,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
     "USB_DEVICE_DEVICE_INT",
     "USB_OTG_INT",
     "USB_HOST_INT",
-    "USB_CONTEXT_SETUP_INT",
     "USB_CONTEXT_INPUT_INT",
     "USB_CONTEXT_OUTPUT_INT",
     "USB_CONTEXT_END_INT",
@@ -85,8 +84,19 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
     "USB_HOST_SYSTEM_ERROR_INT",
     "USB_HOST_ASYNC_ADVANCE_INT",
   };
-  os_PutStrFull(usb_event_names[event]);
-  os_NewLine();
+  switch (event) {
+    case USB_DEFAULT_SETUP_EVENT: {
+      unsigned char i;
+      for (i = 0; i < 8; i++)
+	putByteHex(((unsigned char *)event_data)[i]);
+      os_NewLine();
+      break;
+    }
+    default:
+      os_PutStrFull(usb_event_names[event]);
+      os_NewLine();
+      break;
+  }
   return USB_SUCCESS;
 }
 

@@ -54,7 +54,6 @@ typedef enum usb_event {
   USB_DEVICE_DEVICE_INTERRUPT,
   USB_OTG_INTERRUPT,
   USB_HOST_INTERRUPT,
-  USB_CONTEXT_SETUP_INTERRUPT,
   USB_CONTEXT_INPUT_INTERRUPT,
   USB_CONTEXT_OUTPUT_INTERRUPT,
   USB_CONTEXT_END_INTERRUPT,
@@ -688,9 +687,9 @@ usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *index);
  * usb_GetDescriptor().
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetConfiguration(usb_device_t device,
-                                 const usb_configuration_descriptor_t *
-                                 configuration_descriptor);
+usb_error_t
+usb_SetConfiguration(usb_device_t device, const usb_configuration_descriptor_t *
+                     configuration_descriptor);
 
 /**
  * Gets the current alternate setting in use on the specified interface.
@@ -699,8 +698,9 @@ usb_error_t usb_SetConfiguration(usb_device_t device,
  * @param alternate_setting Returns the alternate setting in use.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetInterfaceAltSetting(usb_device_t device, uint8_t interface,
-                                       uint8_t *alternate_setting);
+usb_error_t usb_GetInterfaceAlternateSetting(usb_device_t device,
+                                             uint8_t interface,
+                                             uint8_t *alternate_setting);
 
 /**
  * Sets the alternate setting in use on the specified interface.
@@ -709,8 +709,9 @@ usb_error_t usb_GetInterfaceAltSetting(usb_device_t device, uint8_t interface,
  * @param alternate_setting Alternate setting to use.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetInterfaceAltSetting(usb_device_t device, uint8_t interface,
-                                       uint8_t alternate_setting);
+usb_error_t usb_SetInterfaceAlternateSetting(usb_device_t device,
+                                             uint8_t interface,
+                                             uint8_t alternate_setting);
 
 /**
  * Gets the endpoint of a \p device with a given \p address, or NULL if that
