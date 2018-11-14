@@ -126,7 +126,7 @@ end virtual
 ;-------------------------------------------------------------------------------
 ; usb constants
 ;-------------------------------------------------------------------------------
-; enum usb_init_flags
+; enum usb_error
 virtual at 0
 	USB_SUCCESS		rb 1
 	USB_IGNORE		rb 1
@@ -155,7 +155,6 @@ virtual at 0
 	USB_DEVICE_DEVICE_INTERRUPT				rb 1
 	USB_OTG_INTERRUPT					rb 1
 	USB_HOST_INTERRUPT					rb 1
-	USB_CONTEXT_SETUP_INTERRUPT				rb 1
 	USB_CONTEXT_INPUT_INTERRUPT				rb 1
 	USB_CONTEXT_OUTPUT_INTERRUPT				rb 1
 	USB_CONTEXT_END_INTERRUPT				rb 1
@@ -201,12 +200,21 @@ virtual at 0
 	USB_HOST_ASYNC_ADVANCE_INTERRUPT			rb 1
 end virtual
 
+; enum usb_find_flag
 USB_SKIP_NONE		:= 0
 USB_SKIP_DISABLED	:= 1 shl 0
 USB_SKIP_ENABLED	:= 1 shl 1
 USB_SKIP_DEVICES	:= 1 shl 2
 USB_SKIP_HUBS		:= 1 shl 3
 USB_SKIP_ATTACHED	:= 1 shl 4
+
+; enum usb_endpoint_flag
+USB_AUTO_TERMINATE	:= 0 shl 0
+USB_MANUAL_TERMINATE	:= 1 shl 0
+
+; enum usb_internal_endpoint_flag
+USB_NON_PO2_MPS		:= 0 shl 0
+USB_PO2_MPS		:= 1 shl 0
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -248,10 +256,10 @@ usb_Init:
 	ld	l,h;usbDevCtrl+1-$100
 	ld	(hl),a
 	dec	l;usbDevCtrl-$100
-	ld	(hl),bmUsbDevReset or bmUsbDevEn or bmUsbGirqEn
+	ld	(hl),bmUsbDevReset or bmUsbDevEn or bmUsbGirqEn or bmUsbRemoteWake
 	xor	a,a
 	ld	l,usbPhyTmsr-$100
-	ld	(hl),a
+	ld	(hl),bmUsbUnplug
 	ld	l,usbGimr-$100
 	ld	(hl),bmUsbDevIntFifo
 	ld	l,usbCxImr-$100
@@ -373,7 +381,7 @@ usb_GetDeviceHub:
 
 ;-------------------------------------------------------------------------------
 usb_SetDeviceData:
-	pop	de, iy
+	pop	de,iy
 	ex	(sp),hl
 	push	hl
 	ld	(ydevice.data),hl
@@ -390,8 +398,8 @@ usb_GetDeviceData:
 
 ;-------------------------------------------------------------------------------
 usb_FindDevice:
-	pop	de, hl, iy, bc
-	push	bc, hl, hl, de
+	pop	de,hl,iy,bc
+	push	bc,hl,hl,de
 	ld	de,-1
 	add	iy,de
 	inc	iy
@@ -463,9 +471,9 @@ usb_GetDeviceSpeed:
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
-	pop	de, iy
+	pop	de,iy
 	ex	(sp),hl
-	push	hl, de
+	push	hl,de
 	ld	a,l
 	ld	hl,(ydevice.endpoints)
 	bit	0,l
@@ -491,7 +499,7 @@ usb_GetEndpointDevice:
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointData:
-	pop	de, iy
+	pop	de,iy
 	ex	(sp),hl
 	push	hl
 	ld	(yendpoint.data),hl
@@ -526,7 +534,7 @@ usb_GetEndpointTransferType:
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointFlags:
-	pop	de, iy
+	pop	de,iy
 	ex	(sp),hl
 	push	hl
 	ld	(yendpoint.flags),l
@@ -573,6 +581,20 @@ _Init:
 	ex	de,hl
 	lddr
 	ld	hl,flags+$1B
+	ret
+
+_PowerVbus:
+	call	$21B70
+	ld	hl,mpUsbOtgCsr
+	res	5,(hl)
+	set	4,(hl)
+	ret
+
+_UnpowerVbus:
+	ld	hl,mpUsbOtgCsr
+	res	7,(hl)
+	set	5,(hl)
+	res	4,(hl)
 	ret
 
 iterate <size,align>, 32,32, 64,256
@@ -701,8 +723,32 @@ end iterate
 	jq	_DispatchEvent
 
 _HandleCxSetupInt:
+	ld	iy,setupPacket
+	ld	l,usbDmaFifo-$100
+	ld	b,4
+	ld	a,i
+	di
+	ex	af,af'
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbEp0Data-$100
+.loop:
+	ld	a,(hl)
+	ld	(iy),a
+	ld	a,(hl)
+	ld	(iy+4),a
+	inc	hl
+	inc	iy
+	djnz	.loop
+	ld	l,usbDmaFifo-$100
+	ld	(hl),b;bmUsbDmaNoFifo
+	ex	af,af'
+	jp	po,.no_ei
+	ei
+.no_ei:
+	ld	l,usbCxIsr-$100
 	ld	(hl),bmUsbIntCxSetup
-	ld	a,USB_CONTEXT_SETUP_INTERRUPT
+	lea	de,iy-4
+	ld	a,USB_DEFAULT_SETUP_EVENT
 	jq	_DispatchEvent
 
 _HandleCxInInt:
@@ -841,6 +887,9 @@ _HandleDevIdleInt:
 	jq	_DispatchEvent
 
 _HandleDevWakeupInt:
+	ld	l,usbPhyTmsr-$100
+	res	bUsbUnplug,(hl)
+	ld	l,usbDevIsr+1-$100
 	ld	(hl),bmUsbIntDevWakeup shr 8
 	ld	a,USB_DEVICE_WAKEUP_INTERRUPT
 	jq	_DispatchEvent
@@ -918,21 +967,17 @@ _HandleHostSysErrInt:
 _DispatchEvent:
 	push	hl
 	ld	hl,(eventCallback.data)
-	push	hl
+	push	hl,de
 	or	a,a
 	sbc	hl,hl
 	ld	l,a
 	push	hl
 	ld	l,h
-	push	hl
 	ex	de,hl
 	ld	hl,(eventCallback)
 	sbc	hl,de
 	call	nz,.dispatch
-	pop	de
-	pop	de
-	pop	de
-	pop	de
+	pop	de,de,de,de
 	add	hl,de
 	or	a,a
 	sbc	hl,de
