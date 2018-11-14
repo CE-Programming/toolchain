@@ -3762,10 +3762,19 @@ bmUsbFifoReset		equ 1 << bUsbFifoReset
 usbDmaFifo		equ 01C0h
 pUsbDmaFifo		equ pUsbRange + usbDmaFifo
 mpUsbDmaFifo		equ mpUsbRange + usbDmaFifo
+bUsbDmaFifo0		equ 0
+bmUsbDmaFifo0		equ 1 << bUsbDmaFifo0
+bUsbDmaFifo1		equ 1
+bmUsbDmaFifo1		equ 1 << bUsbDmaFifo1
+bUsbDmaFifo2		equ 2
+bmUsbDmaFifo2		equ 1 << bUsbDmaFifo2
+bUsbDmaFifo3		equ 3
+bmUsbDmaFifo3		equ 1 << bUsbDmaFifo3
+bUsbDmaCxFifo		equ 4
+bmUsbDmaCxFifo		equ 1 << bUsbDmaCxFifo
 bUsbDmaFifo		equ 0
-bmUsbDmaFifo		equ 1 << bUsbDmaFifo
-bUsbDmaCx		equ 4
-bmUsbDmaCx		equ 1 << bUsbDmaCx
+bmUsbDmaNoFifo		equ 0 << bUsbDmaFifo
+bmUsbDmaFifo		equ 01Fh << bUsbDmaFifo
 
 usbDmaCtrl		equ 01C8h
 pUsbDmaCtrl		equ pUsbRange + usbDmaCtrl
