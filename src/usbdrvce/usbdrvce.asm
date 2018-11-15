@@ -270,9 +270,6 @@ virtual at 1
 	STRING_DESCRIPTOR			rb 1
 	INTERFACE_DESCRIPTOR			rb 1
 	ENDPOINT_DESCRIPTOR			rb 1
-	DEVICE_QUALIFIER_DESCRIPTOR		rb 1
-	OTHER_SPEED_CONFIGURATION_DESCRIPTOR	rb 1
-	INTERFACE_POWER_DESCRIPTOR		rb 1
 end virtual
 ;-------------------------------------------------------------------------------
 
@@ -280,15 +277,15 @@ end virtual
 usb_Init:
 	call	_ChkIfOSInterruptAvailable
 	rrca
-	ld	hl,_DefaultDeviceDescriptors.str83
+	ld	hl,_DefaultDeviceDescriptors.string83
 	jq	nc,.gotModel
-	ld	hl,_DefaultDeviceDescriptors.str84
+	ld	hl,_DefaultDeviceDescriptors.string84
 .gotModel:
 	ld	(_DefaultDeviceDescriptors.model),hl
 	ld	a,1
 	call	_Init
 	set	5,(hl)
-	or	a,a
+	xor	a,a
 	sbc	hl,hl
 	ld	(rootDevice.data),hl
 	ld	l,3
@@ -300,35 +297,28 @@ usb_Init:
 	dec	bc
 	ld	hl,(deviceDescriptors)
 	add	hl,bc
-	inc	hl
 	jq	c,.nonDefaultDeviceDescriptors
 	ld	hl,_DefaultDeviceDescriptors
 	ld	(deviceDescriptors),hl
 .nonDefaultDeviceDescriptors:
-	ld	hl,(hl)
-	add	hl,bc
-	sbc	a,a
-	inc	a
-	rlca
 	ld	hl,mpUsbIdle
 	ld	(hl),7
 	ld	l,h;usbDevCtrl+1-$100
-	ld	(hl),a
+	ld	(hl),bmUsbDevForceFullSpd shr 8
 	dec	l;usbDevCtrl-$100
 	ld	(hl),bmUsbDevReset or bmUsbDevEn or bmUsbGirqEn or bmUsbRemoteWake
-	xor	a,a
 	ld	l,usbPhyTmsr-$100
 	ld	(hl),bmUsbUnplug
 	ld	l,usbGimr-$100
 	ld	(hl),bmUsbDevIntFifo
 	ld	l,usbCxImr-$100
-	ld	(hl),a
+	ld	(hl),a;0
 	ld	l,usbFifoRxImr-$100
-	ld	(hl),a
+	ld	(hl),a;0
 	ld	l,usbFifoTxImr-$100
-	ld	(hl),a
+	ld	(hl),a;0
 	ld	l,usbDevImr-$100
-	ld	(hl),a
+	ld	(hl),a;0
 	inc	l;usbDevImr+1-$100
 	ld	(hl),bmUsbIntDevIdle shr 8
 	dec	h
@@ -696,11 +686,6 @@ _HandleGetDescriptor:
 .notString:
 	dec	b
 	dec	b
-	djnz	.notDeviceQualifier;DEVICE_QUALIFIER_DESCRIPTOR
-.notDeviceQualifier:
-
-	djnz	.notOtherSpeedConfiguration;OTHER_SPEED_CONFIGURATION_DESCRIPTOR
-.notOtherSpeedConfiguration:
 	jq	_UnhandledCxSetup
 
 _HandleCxSetupInt:
@@ -1108,16 +1093,17 @@ _DispatchEvent:
 	jp	(hl)
 
 _DefaultDeviceDescriptors:
-	dl 0, .full, .langids
+	dl .device, .configurations, .langids
 	db 2
-	dl .str1
-.model dl 0
-.full dl .dev, .conf1, .conf2, .conf3
-.dev emit $12: $1201000200000040510408E0200201020003 bswap $12
-.conf1 emit $23: $0902230001010080FA0904000002FF0100000705810240000007050202400000030903 bswap $23
-.conf2 emit $23: $09022300010200C0000904000002FF0100000705810240000007050202400000030903 bswap $23
-.conf3 emit $23: $0902230001030080320904000002FF0100000705810240000007050202400000030903 bswap $23
+	dl .strings
+.device emit $12: $1201000200000040510408E0200201020003 bswap $12
+.configurations dl .configuration1, .configuration2, .configuration3
+.configuration1 emit $23: $0902230001010080FA0904000002FF0100000705810240000007050202400000030903 bswap $23
+.configuration2 emit $23: $09022300010200C0000904000002FF0100000705810240000007050202400000030903 bswap $23
+.configuration3 emit $23: $0902230001030080320904000002FF0100000705810240000007050202400000030903 bswap $23
 .langids dw $0304, $0409
-.str1 dw $033E, 'T','e','x','a','s',' ','I','n','s','t','r','u','m','e','n','t','s',' ','I','n','c','o','r','p','o','r','a','t','e','d'
-.str83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
-.str84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
+.strings dl .string1
+.model dl 0
+.string1 dw $033E, 'T','e','x','a','s',' ','I','n','s','t','r','u','m','e','n','t','s',' ','I','n','c','o','r','p','o','r','a','t','e','d'
+.string83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
+.string84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
