@@ -35,16 +35,16 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
     "USB_DEFAULT_SETUP_EVENT",
     // Temp debug events:
     "USB_DEVICE_INT",
-    "USB_DEVICE_CONTEXT_INT",
+    "USB_DEVICE_CONTROL_INT",
     "USB_DEVICE_FIFO_INT",
     "USB_DEVICE_DEVICE_INT",
     "USB_OTG_INT",
     "USB_HOST_INT",
-    "USB_CONTEXT_INPUT_INT",
-    "USB_CONTEXT_OUTPUT_INT",
-    "USB_CONTEXT_END_INT",
-    "USB_CONTEXT_ERROR_INT",
-    "USB_CONTEXT_ABORT_INT",
+    "USB_CONTROL_INPUT_INT",
+    "USB_CONTROL_OUTPUT_INT",
+    "USB_CONTROL_END_INT",
+    "USB_CONTROL_ERROR_INT",
+    "USB_CONTROL_ABORT_INT",
     "USB_FIFO0_INPUT_INT",
     "USB_FIFO0_OUTPUT_INT",
     "USB_FIFO0_SHORT_PACKET_INT",
@@ -90,7 +90,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
       for (i = 0; i < 8; i++)
 	putByteHex(((unsigned char *)event_data)[i]);
       os_NewLine();
-      break;
+      return USB_IGNORE;
     }
     default:
       os_PutStrFull(usb_event_names[event]);
