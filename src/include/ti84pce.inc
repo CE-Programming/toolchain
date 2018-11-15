@@ -3408,18 +3408,18 @@ mpUsbCxsr		equ mpUsbRange + usbCxsr
 usbCxFifo		equ 0120h
 pUsbCxFifo		equ pUsbRange + usbCxFifo
 mpUsbCxFifo		equ mpUsbRange + usbCxFifo
-bTstFifoCxFin		equ 0
-bmTstFifoCxFin		equ 1 << bTstFifoCxFin
+bCxFifoFin		equ 0
+bmCxFifoFin		equ 1 << bCxFifoFin
 bTstPktFin		equ 1
 bmTstPktFin		equ 1 << bTstPktFin
-bFifoStallCx		equ 2
-bmFifoStallCx		equ 1 << bFifoStallCx
-bFifoClrCx		equ 3
-bmFifoClrCx		equ 1 << bFifoClrCx
-bFifoCxFull		equ 4
-bmFifoCxFull		equ 1 << bFifoCxFull
-bFifoCxEmpty		equ 5
-bmFifoCxEmpty		equ 1 << bFifoCxEmpty
+bCxFifoStall		equ 2
+bmCxFifoStall		equ 1 << bCxFifoStall
+bCxFifoClr		equ 3
+bmCxFifoClr		equ 1 << bCxFifoClr
+bCxFifoFull		equ 4
+bmCxFifoFull		equ 1 << bCxFifoFull
+bCxFifoEmpty		equ 5
+bmCxFifoEmpty		equ 1 << bCxFifoEmpty
 bFifo0Empty		equ 8
 bmFifo0Empty		equ 1 << bFifo0Empty
 bFifo1Empty		equ 9
