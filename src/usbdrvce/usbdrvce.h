@@ -177,8 +177,6 @@ typedef enum usb_speed {
   USB_SPEED_UNKNOWN = -1,
   USB_SPEED_FULL,             /**<  12 Mb/s                                    */
   USB_SPEED_LOW,              /**< 1.5 Mb/s                                    */
-  USB_SPEED_HIGH,             /**< 480 Mb/s                                    */
-  USB_SPEED_SUPER,            /**<   5 Gb/s                                    */
 } usb_speed_t;
 
 typedef enum usb_transfer_direction {
@@ -219,9 +217,6 @@ typedef enum usb_descriptor_type {
   USB_STRING_DESCRIPTOR,
   USB_INTERFACE_DESCRIPTOR,
   USB_ENDPOINT_DESCRIPTOR,
-  USB_DEVICE_QUALIFIER_DESCRIPTOR,
-  USB_OTHER_SPEED_CONFIGURATION_DESCRIPTOR,
-  USB_INTERFACE_POWER_DESCRIPTOR,
 } usb_descriptor_type_t;
 
 typedef enum usb_class {
@@ -362,25 +357,21 @@ typedef struct usb_string_descriptor {
 } usb_string_descriptor_t;
 
 typedef struct usb_standard_descriptors {
-  /// Pointer to full and high speed device and configuration descriptors.
-  /// \c highSpeed can be \c NULL to disable high-speed mode.
-  struct {
-    /// Pointer to device descriptor which must be in RAM
-    usb_device_descriptor_t *device;
-    /// Array of device.bNumConfigurations pointers to complete configuration
-    /// descriptors. Each one should point to
-    /// \c{configurations[i]->wTotalLength} bytes of RAM.
-    usb_configuration_descriptor_t *configurations[1];
-  } *highSpeed, *fullSpeed;
-  /// Array of langids, formatted like a string descriptor, with each wchar_t
-  /// storing a langid, which must be in RAM.
+  /// Pointer to device descriptor which must be in RAM
+  usb_device_descriptor_t *device;
+  /// Pointer to array of device->bNumConfigurations pointers to complete
+  /// configuration descriptors. Each one should point to
+  /// \c{(*configurations)[i]->wTotalLength} bytes of RAM.
+  usb_configuration_descriptor_t **configurations;
+  /// Pointer to array of langids, formatted like a string descriptor, with each
+  /// wchar_t containing a langid, and which must be in RAM.
   usb_string_descriptor_t *langids;
   /// Number of strings per langid.
   uint8_t numStrings;
-  /// Array of \c{(langids->bLength / 2 - 1) * numStrings} pointers to string
-  /// descriptors, each of which must be in RAM, starting with numStrings
-  /// pointers for the first langid, then for the next langid, etc.
-  usb_string_descriptor_t *strings[1];
+  /// Pointer to array of \c{(langids->bLength / 2 - 1) * numStrings} pointers
+  /// to string descriptors, each of which must be in RAM, starting with
+  /// numStrings pointers for the first langid, then for the next langid, etc.
+  usb_string_descriptor_t **strings;
 } usb_standard_descriptors_t;
 
 typedef struct usb_device   *usb_device_t;   /**< opaque  device  handle */
