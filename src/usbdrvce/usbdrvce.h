@@ -44,21 +44,21 @@ typedef enum usb_event {
   /// This event triggers when a host sends a control setup packet.  Standard
   /// requests are handled internally and do not trigger an event.  Return
   /// USB_SUCCESS if you recognized the request and scheduled a corresponding
-  /// transfer, otherwise return USB_ERROR_NOT_SUPPORTED to stall.
+  /// transfer, otherwise return USB_IGNORE to stall.
   /// \p event_data The usb_control_setup_t * that was sent by the host.
   USB_DEFAULT_SETUP_EVENT,
   // Temp debug events:
   USB_DEVICE_INTERRUPT,
-  USB_DEVICE_CONTEXT_INTERRUPT,
+  USB_DEVICE_CONTROL_INTERRUPT,
   USB_DEVICE_FIFO_INTERRUPT,
   USB_DEVICE_DEVICE_INTERRUPT,
   USB_OTG_INTERRUPT,
   USB_HOST_INTERRUPT,
-  USB_CONTEXT_INPUT_INTERRUPT,
-  USB_CONTEXT_OUTPUT_INTERRUPT,
-  USB_CONTEXT_END_INTERRUPT,
-  USB_CONTEXT_ERROR_INTERRUPT,
-  USB_CONTEXT_ABORT_INTERRUPT,
+  USB_CONTROL_INPUT_INTERRUPT,
+  USB_CONTROL_OUTPUT_INTERRUPT,
+  USB_CONTROL_END_INTERRUPT,
+  USB_CONTROL_ERROR_INTERRUPT,
+  USB_CONTROL_ABORT_INTERRUPT,
   USB_FIFO0_INPUT_INTERRUPT,
   USB_FIFO0_OUTPUT_INTERRUPT,
   USB_FIFO0_SHORT_PACKET_INTERRUPT,
@@ -191,6 +191,13 @@ typedef enum usb_request_type {
   USB_CLASS_REQUEST    = 1 << 5,
   USB_VENDOR_REQUEST   = 2 << 5,
 } usb_request_type_t;
+
+typedef enum usb_recipient {
+  USB_RECIPIENT_DEVICE,
+  USB_RECIPIENT_INTERFACE,
+  USB_RECIPIENT_ENDPOINT,
+  USB_RECIPIENT_OTHER,
+} usb_recipient_t;
 
 typedef enum usb_request {
   USB_GET_STATUS,

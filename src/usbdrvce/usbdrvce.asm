@@ -86,7 +86,16 @@ struc device			; device structure
 	.data		rl 1	; user data
 	assert $-. <= 32
 end struc
-iterate type, endpoint, device
+struc setup
+	label .: 8
+	.bmRequestType	rb 1
+	.bRequest	rb 1
+	.wValue		rw 1
+	.wIndex		rw 1
+	.wLength	rw 1
+	assert $-. = 8
+end struc
+iterate type, endpoint, device, setup
  iterate <base,name>, 0,, ix,x, iy,y
   virtual at base
 	name#type type
@@ -103,7 +112,7 @@ virtual at (saveSScreen+$FFFF) and not $FFFF
 end virtual
 virtual at usbArea
 				rb (-$) and 7
-	setupPacket		dbx 8: ?
+	setupPacket		setup
 				rb (-$) and 31
 	rootDevice		device
 				rb (-$) and $FFF
@@ -114,6 +123,7 @@ virtual at usbArea
 	eventCallback		rl 1
 	eventCallback.data	rl 1
 	deviceDescriptors	rl 1
+	deviceConfiguration	rb 1
 	freeList32Align32	rl 1
 	freeList64Align256	rl 1
 	assert $ <= usbInited
@@ -150,16 +160,16 @@ virtual at 0
 	USB_DEFAULT_SETUP_EVENT					rb 1
 	; Temp debug events:
 	USB_DEVICE_INTERRUPT					rb 1
-	USB_DEVICE_CONTEXT_INTERRUPT				rb 1
+	USB_DEVICE_CONTROL_INTERRUPT				rb 1
 	USB_DEVICE_FIFO_INTERRUPT				rb 1
 	USB_DEVICE_DEVICE_INTERRUPT				rb 1
 	USB_OTG_INTERRUPT					rb 1
 	USB_HOST_INTERRUPT					rb 1
-	USB_CONTEXT_INPUT_INTERRUPT				rb 1
-	USB_CONTEXT_OUTPUT_INTERRUPT				rb 1
-	USB_CONTEXT_END_INTERRUPT				rb 1
-	USB_CONTEXT_ERROR_INTERRUPT				rb 1
-	USB_CONTEXT_ABORT_INTERRUPT				rb 1
+	USB_CONTROL_INPUT_INTERRUPT				rb 1
+	USB_CONTROL_OUTPUT_INTERRUPT				rb 1
+	USB_CONTROL_END_INTERRUPT				rb 1
+	USB_CONTROL_ERROR_INTERRUPT				rb 1
+	USB_CONTROL_ABORT_INTERRUPT				rb 1
 	USB_FIFO0_INPUT_INTERRUPT				rb 1
 	USB_FIFO0_OUTPUT_INTERRUPT				rb 1
 	USB_FIFO0_SHORT_PACKET_INTERRUPT			rb 1
@@ -201,20 +211,69 @@ virtual at 0
 end virtual
 
 ; enum usb_find_flag
-USB_SKIP_NONE		:= 0
-USB_SKIP_DISABLED	:= 1 shl 0
-USB_SKIP_ENABLED	:= 1 shl 1
-USB_SKIP_DEVICES	:= 1 shl 2
-USB_SKIP_HUBS		:= 1 shl 3
-USB_SKIP_ATTACHED	:= 1 shl 4
+SKIP_NONE		:= 0
+SKIP_DISABLED		:= 1 shl 0
+SKIP_ENABLED		:= 1 shl 1
+SKIP_DEVICES		:= 1 shl 2
+SKIP_HUBS		:= 1 shl 3
+SKIP_ATTACHED		:= 1 shl 4
 
 ; enum usb_endpoint_flag
-USB_AUTO_TERMINATE	:= 0 shl 0
-USB_MANUAL_TERMINATE	:= 1 shl 0
+AUTO_TERMINATE		:= 0 shl 0
+MANUAL_TERMINATE	:= 1 shl 0
 
 ; enum usb_internal_endpoint_flag
-USB_NON_PO2_MPS		:= 0 shl 0
-USB_PO2_MPS		:= 1 shl 0
+PO2_MPS			:= 1 shl 0
+
+; enum usb_transfer_direction
+virtual at 0
+	HOST_TO_DEVICE				rb 1 shl 7
+	DEVICE_TO_HOST				rb 1 shl 7
+end virtual
+
+;enum usb_request_type
+virtual at 0
+	STANDARD_REQUEST			rb 1 shl 5
+	CLASS_REQUEST				rb 1 shl 5
+	VENDOR_REQUEST				rb 1 shl 5
+end virtual
+
+;enum usb_reciipent
+virtual at 0
+	RECIPIENT_DEVICE			rb 1 shl 0
+	RECIPIENT_INTERFACE			rb 1 shl 0
+	RECIPIENT_ENDPOINT			rb 1 shl 0
+	RECIPIENT_OTHER				rb 1 shl 0
+end virtual
+
+; enum usb_request
+virtual at 0
+	GET_STATUS				rb 1
+	CLEAR_FEATURE				rb 1
+						rb 1
+	SET_FEATURE				rb 1
+						rb 1
+	SET_ADDRESS				rb 1
+	GET_DESCRIPTOR				rb 1
+	SET_DESCRIPTOR				rb 1
+	GET_CONFIGURATION			rb 1
+	SET_CONFIGURATION			rb 1
+	GET_INTERFACE				rb 1
+	SET_INTERFACE				rb 1
+	SYNC_FRAME				rb 1
+end virtual
+
+; enum usb_descriptor_type
+virtual at 1
+	DEVICE_DESCRIPTOR			rb 1
+	CONFIGURATION_DESCRIPTOR		rb 1
+	STRING_DESCRIPTOR			rb 1
+	INTERFACE_DESCRIPTOR			rb 1
+	ENDPOINT_DESCRIPTOR			rb 1
+	DEVICE_QUALIFIER_DESCRIPTOR		rb 1
+	OTHER_SPEED_CONFIGURATION_DESCRIPTOR	rb 1
+	INTERFACE_POWER_DESCRIPTOR		rb 1
+end virtual
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -282,7 +341,7 @@ usb_Init:
 	ld	l,usbImr
 	ld	(hl),usbIntLevelHigh
 	ld	hl,rootDevice.find
-	ld	(hl),USB_SKIP_HUBS or USB_SKIP_ENABLED
+	ld	(hl),SKIP_HUBS or SKIP_ENABLED
 	ld	hl,USB_ERROR_INVALID_PARAM
 	ld	c,e
 	ld	e,1
@@ -410,7 +469,7 @@ usb_FindDevice:
 	ld	iy,rootDevice
 	jq	.check
 .child:
-	bit	bsf USB_SKIP_ATTACHED,c
+	bit	bsf SKIP_ATTACHED,c
 	jq	nz,.sibling
 .forceChild:
 	bit	0,(ydevice.child)
@@ -626,6 +685,96 @@ _Free#size#Align#align:
 
 end iterate
 
+_HandleGetDescriptor:
+	ld	bc,(ysetup.wValue)
+	djnz	.notDevice;DEVICE_DESCRIPTOR
+	
+.notDevice:
+	djnz	.notConfiguration;CONFIGURATION_DESCRIPTOR
+.notConfiguration:
+	djnz	.notString;STRING_DESCRIPTOR
+.notString:
+	dec	b
+	dec	b
+	djnz	.notDeviceQualifier;DEVICE_QUALIFIER_DESCRIPTOR
+.notDeviceQualifier:
+
+	djnz	.notOtherSpeedConfiguration;OTHER_SPEED_CONFIGURATION_DESCRIPTOR
+.notOtherSpeedConfiguration:
+	jq	_UnhandledCxSetup
+
+_HandleCxSetupInt:
+	ld	iy,setupPacket-4
+	ld	l,usbDmaFifo-$100
+	ld	b,4
+	ld	a,i
+	di
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbEp0Data-$100
+.loop:
+	ld	a,(hl)
+	ld	(iy+4),a
+	ld	a,(hl)
+	ld	(iy+8),a
+	inc	hl
+	inc	iy
+	djnz	.loop
+	ld	l,usbDmaFifo-$100
+	jp	po,.noei
+	ei
+.noei:
+	ld	(hl),b;bmUsbDmaNoFifo
+	ld	bc,(ysetup.bmRequestType)
+	inc	b
+	djnz	.notGetStatus
+	jq	_UnhandledCxSetup
+.notGetStatus:
+	djnz	.notClearFeature
+.notClearFeature:
+	dec	b
+	djnz	.notSetFeature
+.notSetFeature:
+	dec	b
+	djnz	.notSetAddress
+.notSetAddress:
+	djnz	.notGetDescriptor
+	ld	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
+	sub	a,c
+	jq	z,_HandleGetDescriptor
+.notGetDescriptor:
+	djnz	.notSetDescriptor
+.notSetDescriptor:
+	djnz	.notGetConfiguration
+.notGetConfiguration:
+	djnz	.notSetConfiguration
+.notSetConfiguration:
+	djnz	.notGetInterface
+.notGetInterface:
+	djnz	.notSetInterface
+.notSetInterface:
+_UnhandledCxSetup:
+	ld	hl,mpUsbCxIsr
+	ld	(hl),bmUsbIntCxSetup
+	lea	de,ysetup
+	ld	a,USB_DEFAULT_SETUP_EVENT
+	call	_DispatchEvent
+	jq	z,.handled
+	add	hl,de
+	scf
+	sbc	hl,de
+	inc	hl
+	ret	nz
+	add	hl,de
+	ld	l,usbCxFifo-$100
+	set	bCxFifoStall,(hl)
+	ex	de,hl
+	ret
+.handled:
+	ld	l,usbCxFifo-$100
+	set	bCxFifoFin,(hl)
+	ld	l,usbCxIsr-$100
+	ret
+
 _HandleDevInt:
 	ld	l,usbGisr-$100
 	inc	h
@@ -649,7 +798,7 @@ iterate type, Setup, In, Out, End, Err, Abort
 end iterate
 	ld	l,usbGisr-$100
 	ld	(hl),bmUsbDevIntCx
-	ld	a,USB_DEVICE_CONTEXT_INTERRUPT
+	ld	a,USB_DEVICE_CONTROL_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleDevFifoInt:
@@ -722,58 +871,29 @@ end iterate
 	ld	a,USB_HOST_INTERRUPT
 	jq	_DispatchEvent
 
-_HandleCxSetupInt:
-	ld	iy,setupPacket
-	ld	l,usbDmaFifo-$100
-	ld	b,4
-	ld	a,i
-	di
-	ex	af,af'
-	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbEp0Data-$100
-.loop:
-	ld	a,(hl)
-	ld	(iy),a
-	ld	a,(hl)
-	ld	(iy+4),a
-	inc	hl
-	inc	iy
-	djnz	.loop
-	ld	l,usbDmaFifo-$100
-	ld	(hl),b;bmUsbDmaNoFifo
-	ex	af,af'
-	jp	po,.no_ei
-	ei
-.no_ei:
-	ld	l,usbCxIsr-$100
-	ld	(hl),bmUsbIntCxSetup
-	lea	de,iy-4
-	ld	a,USB_DEFAULT_SETUP_EVENT
-	jq	_DispatchEvent
-
 _HandleCxInInt:
 	ld	(hl),bmUsbIntCxIn
-	ld	a,USB_CONTEXT_INPUT_INTERRUPT
+	ld	a,USB_CONTROL_INPUT_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleCxOutInt:
 	ld	(hl),bmUsbIntCxOut
-	ld	a,USB_CONTEXT_OUTPUT_INTERRUPT
+	ld	a,USB_CONTROL_OUTPUT_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleCxEndInt:
 	ld	(hl),bmUsbIntCxEnd
-	ld	a,USB_CONTEXT_END_INTERRUPT
+	ld	a,USB_CONTROL_END_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleCxErrInt:
 	ld	(hl),bmUsbIntCxErr
-	ld	a,USB_CONTEXT_ERROR_INTERRUPT
+	ld	a,USB_CONTROL_ERROR_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleCxAbortInt:
 	ld	(hl),bmUsbIntCxAbort
-	ld	a,USB_CONTEXT_ABORT_INTERRUPT
+	ld	a,USB_CONTROL_ABORT_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleFifo0OutInt:
