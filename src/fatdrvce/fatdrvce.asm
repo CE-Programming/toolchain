@@ -68,6 +68,23 @@ include 'msd.inc'
 ; pretty awesome library, just throwing that out there too.
 ;-------------------------------------------------------------------------------
 
+struc fatstate			; fat state structure
+	label .: 25
+	.valid			rb 1	; valid fat state
+	.cluster_size		rb 1	; size of cluster
+	.root_directory_size	rw 1	; root directory size
+	.clusters		rd 1	; clusters
+	.fat_size		rl 1	; 
+	.padding		rb 1	; 
+	.fat_pos		rd 1	; 
+	.root_dir_pos		rd 1	; 
+	.data_region		rd 1	; 
+	.type			rb 1	; 
+	assert $-. = 25
+end struc
+fatstate fatstate
+_fat_state := fatstate
+
 ;-------------------------------------------------------------------------------
 fat_Init:
 	jp	_init_fat
@@ -718,8 +735,6 @@ fat.sectorbuffer:
 fat.setjmpbuf:
 	db	0,0,0
 
-_fat_state:
-	db	0 dup 25
 _fat_fd:
 	db	0 dup 92
 _fat_key:

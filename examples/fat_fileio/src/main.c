@@ -88,10 +88,6 @@ void fatDemo(void) {
 
     putString("initialized fat.");
 
-    for (;;) {
-        msd_ReadSector(sector, 0);
-    }
-
     msd_Cleanup();
 }
 
