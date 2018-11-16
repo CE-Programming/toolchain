@@ -18,6 +18,8 @@ library 'FATDRVCE', 0
 	export fat_Close
 	export fat_GetFileSize
 	export fat_SetFileSize
+	export fat_ReadSector
+	export fat_WriteSector
 	export fat_Tell
 	export fat_SetBuffer
 	export fat_Delete
@@ -80,10 +82,17 @@ struc fatstate			; fat state structure
 	.root_dir_pos		rd 1	; 
 	.data_region		rd 1	; 
 	.type			rb 1	; 
-	assert $-. = 25
 end struc
 fatstate fatstate
 _fat_state := fatstate
+
+;-------------------------------------------------------------------------------
+fat_ReadSector:
+	jp	_fat_read_sect
+
+;-------------------------------------------------------------------------------
+fat_WriteSector:
+	jp	_fat_write_sect
 
 ;-------------------------------------------------------------------------------
 fat_Init:
@@ -134,7 +143,7 @@ fat_Select:
 
 ;-------------------------------------------------------------------------------
 fat_Open:
-	ret
+	jp	_fat_open
 
 ;-------------------------------------------------------------------------------
 fat_Close:
@@ -159,7 +168,7 @@ fat_GetFileSize:
 
 ;-------------------------------------------------------------------------------
 fat_SetFileSize:
-	ret
+	jp	_fat_set_fsize
 
 ;-------------------------------------------------------------------------------
 fat_Tell:
@@ -182,23 +191,23 @@ fat_SetBuffer:
 
 ;-------------------------------------------------------------------------------
 fat_Delete:
-	ret
+	jp	_delete_file
 
 ;-------------------------------------------------------------------------------
 fat_Create:
-	ret
+	jp	_create_file
 
 ;-------------------------------------------------------------------------------
 fat_GetAttrib:
-	ret
+	jp	_fat_get_stat
 
 ;-------------------------------------------------------------------------------
 fat_SetAttrib:
-	ret
+	jp	_fat_set_stat
 
 ;-------------------------------------------------------------------------------
 fat_DirList:
-	ret
+	jp	_fat_dirlist
 
 ;-------------------------------------------------------------------------------
 msd_Init:
