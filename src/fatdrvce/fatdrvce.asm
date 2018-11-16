@@ -305,6 +305,177 @@ msd.event:
 	call	__longjmp
 
 ;-------------------------------------------------------------------------------
+;_alloc_cluster:
+	ld iy,0
+	add iy,sp
+	ld bc,(iy+3)
+	ld a,(iy+6)
+	ld d,(iy+9)
+	ld hl,(iy+12)
+	ld e,(iy+15)
+; euhl = old_cluster
+; d = entry_index
+; aubc = entry_sector
+	push af,bc,de,hl
+	ld bc,(fatstate.fat_size)
+	ld hl,(fatstate.fat_pos)
+	ld a,(fatstate.fat_pos+3)
+	ld e,a
+.next:
+	push bc,de,hl
+	ld e,a
+	call fat.readsector
+	ld hl,(fat.sectorbuffer)
+	ld b,0
+.search:
+	ld a,(hl)
+	inc hl
+	or a,(hl)
+.notFound:
+	inc hl
+	jq z,.maybeFound
+	djnz .search
+	pop hl,de,bc
+	cpi
+	jp po,out_of_space
+	add hl,de
+	or a,a
+	sbc hl,de
+	jq nz,.next
+	inc e
+	jq .next
+.maybeFound:
+	ld a,(fatstate.type)
+	or a,a
+	jq z,.found
+	bit 0,b
+	jq nz,.search
+	ld a,(hl)
+	inc hl
+	or a,(hl)
+	jq nz,.notFound
+	ld (hl),$F
+	dec hl
+	ld (hl),$FF
+.found:
+	dec hl
+	ld (hl),$FF
+	dec hl
+	ld (hl),$FF
+	pop hl,de
+	push bc
+	call fat.writesector
+	pop bc,de
+	ld hl,(fatstate.fat_size)
+	xor a,a
+	sbc hl,de
+	jq z,.haveOldCluster
+	sub a,b
+	jq nz,.getCluster
+	inc b
+	db $0E ; ld c,
+.haveOldCluster:
+	sub a,b
+.getCluster:
+	ex de,hl
+	pop bc
+	push bc
+	inc sp
+	pop hl
+	dec sp
+	ld b,a ; udeb = cluster
+	jq z,.noOldCluster
+	push de,bc
+	ld a,(fatstate.type)
+	or a,a
+	ld a,c ; uhla = old_cluster
+	jq z,.fat16
+	add a,a
+	adc hl,hl
+.fat16:
+	ex de,hl
+	sbc hl,hl
+	ld l,a
+	add hl,hl
+	ld bc,(fat.sectorbuffer)
+	add hl,bc
+	push hl
+	ld hl,(fatstate.fat_pos)
+	add hl,de
+	ld a,(fatstate.fat_pos+3)
+	ld e,a
+	push de,hl
+	call fat.readsector
+	pop hl,de,iy,bc
+	ld (iy),b
+	pop bc
+	ld (iy+1),c
+	ld a,(fatstate.type)
+	or a,a
+	jq z,.fat16.2
+	ld (iy+1),bc
+.fat16.2:
+	push de,hl
+	call fat.writesector
+	pop de
+	ld hl,(fatstate.fat_size)
+	add hl,de
+	pop de
+	jq nc,.noCarry
+	inc e
+.noCarry:
+	call fat.writesector
+	pop hl,hl,hl
+	ld hl,(iy)
+	ld e,(iy+3)
+	ret
+.noOldCluster:
+	pop af,hl,de
+	ld e,d
+	push hl,de
+	ld bc,(iy+2)
+	push bc
+	ld bc,(iy)
+	push bc
+	push af
+	call fat.readsector
+	pop af
+	or a,a
+	sbc hl,hl
+	ld l,a
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	ld a,l
+	add a,20
+	ld l,a
+	ld de,(fat.sectorbuffer)
+	add hl,de
+	pop bc
+	ld (hl),c
+	inc hl
+	ld (hl),b
+	ld de,5
+	add hl,de
+	pop de
+	ld (hl),e
+	inc hl
+	ld (hl),d
+	ex de,hl
+	pop de
+	ex (sp),hl
+	push bc
+	call fat.writesector
+	pop de,hl
+	ld e,d
+	ret
+
+out_of_space:
+	jp	0
+
+;-------------------------------------------------------------------------------
 _cluster_to_sector:
 	pop	de
 	pop	hl
