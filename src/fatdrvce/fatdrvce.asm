@@ -337,7 +337,7 @@ fat_Close:
 	push	hl
 	push	de
 	call	fat.findfd
-	ld	(hl), -1		; fat_fd[i].key = -1;
+	ld	(hl), -1			; fat_fd[i].key = -1;
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -348,12 +348,46 @@ fat_GetFileSize:
 	push	de
 	call	fat.findfd
 	ld	hl, (iy + 18)
-	ld	e, (iy + 21)		; return fat_fd[i].file_size;
+	ld	e, (iy + 21)			; return fat_fd[i].file_size;
 	ret
 
 ;-------------------------------------------------------------------------------
 fat_SetFileSize:
-	jp	_fat_set_fsize
+	ld	iy, 0
+	add	iy, sp
+	push	iy
+	or	a, a
+	sbc	hl, hl
+	ld	de, .index
+	ld	bc, (iy + 3)
+	push	hl, de, bc
+	call	_locate_record
+	pop	bc, bc, bc
+	call	__lcmpzero			; if (!(sector = locate_record(path, &index, null)))
+	pop	iy
+	ret	z
+	push	de, hl
+	call	fat.readsector
+	ld	hl, 0				; set32(sector_buff + (index * 32 + 28), size)
+.index := $ - 3
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	bc, 28
+	add	hl, bc
+	ld	bc, (fat.sectorbuffer)
+	add	hl, bc
+	ld	bc, (iy + 6)
+	ld	a, (iy + 9)
+	ld	(hl), bc
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl), a
+	pop	hl, de
+	jp	fat.writesector		; writesector(sector)
 
 ;-------------------------------------------------------------------------------
 fat_Tell:
@@ -363,7 +397,7 @@ fat_Tell:
 	push	de
 	call	fat.findfd
 	ld	hl, (iy + 14)
-	ld	e, (iy + 17)		; return fat_fd[i].fpos;
+	ld	e, (iy + 17)		; return fat_fd[i].fpos
 	ret
 
 ;-------------------------------------------------------------------------------
