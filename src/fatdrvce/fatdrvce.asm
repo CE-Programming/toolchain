@@ -351,31 +351,9 @@ fat_GetFileSize:
 
 ;-------------------------------------------------------------------------------
 fat_SetFileSize:
-	ld	iy, 0
-	add	iy, sp
-	push	iy
-	or	a, a
-	sbc	hl, hl
-	ld	de, .index
-	ld	bc, (iy + 3)
-	push	hl, de, bc
-	call	_locate_record
-	pop	bc, bc, bc
-	call	__lcmpzero			; if (!(sector = locate_record(path, &index, null)))
-	pop	iy
+	call	fat.locaterecord
 	ret	z
-	push	de, hl
-	call	fat.readsector
-	ld	hl, 0				; set32(sector_buff + (index * 32 + 28), size)
-.index := $ - 3
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	bc, 28
-	add	hl, bc
-	ld	bc, (fat.sectorbuffer)
+	ld	bc, 28				; set32(sector_buff + (index * 32 + 28), size)
 	add	hl, bc
 	ld	bc, (iy + 6)
 	ld	a, (iy + 9)
@@ -384,8 +362,9 @@ fat_SetFileSize:
 	inc	hl
 	inc	hl
 	ld	(hl), a
-	pop	hl, de
-	jp	fat.writesector		; writesector(sector)
+	ld	hl, (fat.locaterecord.sector + 0)
+	ld	a, (fat.locaterecord.sector + 3)
+	jp	fat.writesectora		; writesector(sector)
 
 ;-------------------------------------------------------------------------------
 fat_Tell:
@@ -395,13 +374,13 @@ fat_Tell:
 	push	de
 	call	fat.findfd
 	ld	hl, (iy + 14)
-	ld	e, (iy + 17)		; return fat_fd[i].fpos
+	ld	e, (iy + 17)			; return fat_fd[i].fpos
 	ret
 
 ;-------------------------------------------------------------------------------
 fat_SetBuffer:
 	pop	de
-	ex	(sp), hl		; hl -> buffer
+	ex	(sp), hl			; hl -> buffer
 	push	de
 	ld	(fat.sectorbuffer), hl
 	ret
@@ -416,7 +395,15 @@ fat_Create:
 
 ;-------------------------------------------------------------------------------
 fat_GetAttrib:
-	jp	_fat_get_stat
+	call	fat.locaterecord
+	jr	nz, .valid
+	ld	a, 255
+	ret
+.valid:
+	ld	bc, 11
+	add	hl, bc
+	ld	a, (hl)
+	ret
 
 ;-------------------------------------------------------------------------------
 fat_SetAttrib:
@@ -427,10 +414,44 @@ fat_DirList:
 	jp	_fat_dirlist
 
 ;-------------------------------------------------------------------------------
+fat.locaterecord:
+	ld	iy, 3
+	add	iy, sp
+	push	iy
+	or	a, a
+	sbc	hl, hl
+	ld	de, .index
+	ld	bc, (iy + 3)
+	push	hl, de, bc
+	call	_locate_record
+	pop	bc, bc, bc
+	call	__lcmpzero			; if (!(sector = locate_record(path, &index, null)))
+	pop	iy
+	ret	z
+	ld	a, e
+	ld	(fat.locaterecord.sector + 0), hl
+	ld	(fat.locaterecord.sector + 3), a
+	call	fat.readsector
+	ld	hl, 0
+.index := $ - 3
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	bc, (fat.sectorbuffer)		; return sector_buffer[(index << 5) + 11];
+	add	hl, bc
+	xor	a, a
+	inc	a
+	ret
+fat.locaterecord.sector:
+	db	0,0,0,0
+
+;-------------------------------------------------------------------------------
 msd_Init:
 	push	ix
 	push	iy
-	call	msdInit			; attempt to initialize mass storage device
+	call	msdInit				; attempt to initialize mass storage device
 	jr	nc, .fail
 	xor	a, a
 .ret:

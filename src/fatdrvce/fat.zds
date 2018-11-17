@@ -3316,63 +3316,6 @@ L_287:
 	POP	IX
 	RET	
 
-;  781	uint8_t fat_get_stat(const char *path) {
-_fat_get_stat:
-	LD	HL,-7
-	CALL	__frameset
-;  782		uint32_t sector;
-;  783		unsigned int index;
-;  784		if (!(sector = locate_record(path, &index, NULL)))
-	LD	BC,0
-	PUSH	BC
-	PEA	IX+-7
-	LD	BC,(IX+6)
-	PUSH	BC
-	CALL	_locate_record
-	POP	BC
-	POP	BC
-	POP	BC
-	LD	(IX+-4),HL
-	LD	(IX+-1),E
-	LD	HL,(IX+-4)
-	LD	E,(IX+-1)
-	CALL	__lcmpzero
-	JQ	NZ,L_289
-;  785			return 0xFF;
-	LD	A,255
-	JQ	L_290
-L_289:
-;  786		read_sector(sector, sector_buff);
-	LD	C,(IX+-1)
-	LD	B,0
-	PUSH	BC
-	LD	BC,(IX+-4)
-	PUSH	BC
-	LD	BC,(fat.sectorbuffer)
-	PUSH	BC
-	CALL	_fat_ReadSector
-	POP	BC
-	POP	BC
-	POP	BC
-;  787		return sector_buff[(index << 5) + 11];
-	LD	HL,(IX+-7)
-	ADD	HL,HL
-	ADD	HL,HL
-	ADD	HL,HL
-	ADD	HL,HL
-	ADD	HL,HL
-	PUSH	HL
-	POP	IY
-	LEA	BC,IY+11
-	LD	HL,(fat.sectorbuffer)
-	ADD	HL,BC
-	LD	A,(HL)
-;  788	}
-L_290:
-	LD	SP,IX
-	POP	IX
-	RET	
-
 ;  791	bool fat_set_stat(const char *path, uint8_t stat) {
 _fat_set_stat:
 	LD	HL,-7

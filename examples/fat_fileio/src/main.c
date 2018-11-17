@@ -21,6 +21,7 @@ void fatDemo(void);
 
 const char *rdtest = "RDTEST.TXT";
 const char *wrtest = "WRTEST.TXT";
+const char *dirtest = "DIRTEST";
 #define WR_SIZE 2048
 
 void send_char(char n)
@@ -108,11 +109,17 @@ void fatDemo(void) {
 
     fat_Delete(wrtest);
 
-    putString("creating file.");
+    putString("creating file...");
 
     fat_Create(0, wrtest, 0);
 
-    putString("opening file.");
+    putString("deleting dir.");
+
+    fat_Delete(dirtest);
+
+    putString("creating dir...");
+
+    fat_Create(0, dirtest, 0x10);
 
     fd = fat_Open(wrtest, FAT_O_WRONLY);
     if (fd >= 0) {
@@ -132,11 +139,17 @@ void fatDemo(void) {
 
     fd = fat_Open(wrtest, FAT_O_RDONLY);
     if (fd >= 0) {
-        sprintf(buf, "fat_fsize: %u", (unsigned int)fat_GetFileSize(fd));
+        sprintf(buf, "size: %u", (unsigned int)fat_GetFileSize(fd));
         putString(buf);
-        sprintf(buf, "fat_ftell: %u", (unsigned int)fat_Tell(fd));
+        sprintf(buf, "tell: %u", (unsigned int)fat_Tell(fd));
         putString(buf);
+        fat_Close(fd);
     }
+
+    sprintf(buf, "wr attrib: %u", (unsigned int)fat_GetAttrib(wrtest));
+    putString(buf);
+    sprintf(buf, "dir attrib: %u", (unsigned int)fat_GetAttrib(dirtest));
+    putString(buf);
 
     msd_Cleanup();
 }
