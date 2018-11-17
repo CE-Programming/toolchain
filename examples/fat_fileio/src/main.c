@@ -22,7 +22,7 @@ void fatDemo(void);
 const char *rdtest = "RDTEST.TXT";
 const char *wrtest = "WRTEST.TXT";
 const char *dirtest = "DIRTEST";
-#define WR_SIZE 2048
+#define WR_SIZE 4096
 
 void send_char(char n)
 {

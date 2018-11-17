@@ -678,37 +678,49 @@ msd_KeepAlive:
 
 ;-------------------------------------------------------------------------------
 msd_ReadSector:
-	call	__frameset0
-	ld	a, (ix + 9)
-	ld	(scsiRead10Lba + 3), a
-	ld	a, (ix + 10)
-	ld	(scsiRead10Lba + 2), a
-	ld	a, (ix + 11)
-	ld	(scsiRead10Lba + 1), a
-	ld	a, (ix + 12)
-	ld	(scsiRead10Lba + 0), a
-	ld	de, (ix + 6)
-	call	scsiRequestRead
-	ld	sp, ix
-	pop	ix
-	ret
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, scsiRead10Lba + 3
+	lea	de, iy + 6
+	ld	a, (de)
+	ld	(hl), a
+	dec	hl
+	inc	de
+	ld	a, (de)
+	ld	(hl), a
+	dec	hl
+	inc	de
+	ld	a, (de)
+	ld	(hl), a
+	dec	hl
+	inc	de
+	ld	a, (de)
+	ld	(hl), a
+	ld	de, (iy + 3)
+	jp	scsiRequestRead
 
 ;-------------------------------------------------------------------------------
 msd_WriteSector:
-	call	__frameset0
-	ld	a, (ix + 9)
-	ld	(scsiWrite10Lba + 3), a
-	ld	a, (ix + 10)
-	ld	(scsiWrite10Lba + 2), a
-	ld	a, (ix + 11)
-	ld	(scsiWrite10Lba + 1), a
-	ld	a, (ix + 12)
-	ld	(scsiWrite10Lba + 0), a
-	ld	de, (ix + 6)
-	call	scsiRequestWrite
-	ld	sp, ix
-	pop	ix
-	ret
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, scsiWrite10Lba + 3
+	lea	de, iy + 6
+	ld	a, (de)
+	ld	(hl), a
+	dec	hl
+	inc	de
+	ld	a, (de)
+	ld	(hl), a
+	dec	hl
+	inc	de
+	ld	a, (de)
+	ld	(hl), a
+	dec	hl
+	inc	de
+	ld	a, (de)
+	ld	(hl), a
+	ld	de, (iy + 3)
+	jp	scsiRequestWrite
 
 ;-------------------------------------------------------------------------------
 msd_SetJmpBuf:
