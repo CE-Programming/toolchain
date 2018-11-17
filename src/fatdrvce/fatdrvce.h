@@ -42,7 +42,8 @@ typedef struct {
 #define FAT_HIDDEN    (1 << 1)  /**< Entry is Hidden. */
 #define FAT_SYSTEM    (1 << 2)  /**< Entry is a System file / directory. */
 #define FAT_VOLLABEL  (1 << 3)  /**< Entry is a Volume Label. Only for root directory. */
-#define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or just directory). */
+#define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or directory). */
+#define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
 
 typedef enum msd_event {
     MSD_EVENT_NONE = 0,   /**< No event detected. */

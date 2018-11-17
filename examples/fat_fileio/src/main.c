@@ -119,7 +119,7 @@ void fatDemo(void) {
 
     putString("creating dir...");
 
-    fat_Create(0, dirtest, 0x10);
+    fat_Create(0, dirtest, FAT_DIR);
 
     fd = fat_Open(wrtest, FAT_O_WRONLY);
     if (fd >= 0) {
@@ -146,6 +146,7 @@ void fatDemo(void) {
         fat_Close(fd);
     }
 
+    fat_SetAttrib(dirtest, FAT_DIR | FAT_HIDDEN);
     sprintf(buf, "wr attrib: %u", (unsigned int)fat_GetAttrib(wrtest));
     putString(buf);
     sprintf(buf, "dir attrib: %u", (unsigned int)fat_GetAttrib(dirtest));

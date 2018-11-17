@@ -362,9 +362,7 @@ fat_SetFileSize:
 	inc	hl
 	inc	hl
 	ld	(hl), a
-	ld	hl, (fat.locaterecord.sector + 0)
-	ld	a, (fat.locaterecord.sector + 3)
-	jp	fat.writesectora		; writesector(sector)
+	jp	fat.record.write		; writesector(sector)
 
 ;-------------------------------------------------------------------------------
 fat_Tell:
@@ -407,7 +405,13 @@ fat_GetAttrib:
 
 ;-------------------------------------------------------------------------------
 fat_SetAttrib:
-	jp	_fat_set_stat
+	call	fat.locaterecord
+	ret	z
+	ld	bc, 11
+	add	hl, bc
+	ld	a, (iy + 6)
+	ld	(hl), a
+	jp	fat.record.write		; writesector(sector)
 
 ;-------------------------------------------------------------------------------
 fat_DirList:
@@ -429,8 +433,8 @@ fat.locaterecord:
 	pop	iy
 	ret	z
 	ld	a, e
-	ld	(fat.locaterecord.sector + 0), hl
-	ld	(fat.locaterecord.sector + 3), a
+	ld	(fat.record.sector + 0), hl
+	ld	(fat.record.sector + 3), a
 	call	fat.readsector
 	ld	hl, 0
 .index := $ - 3
@@ -444,7 +448,11 @@ fat.locaterecord:
 	xor	a, a
 	inc	a
 	ret
-fat.locaterecord.sector:
+fat.record.write:
+	ld	hl, (fat.record.sector + 0)
+	ld	a, (fat.record.sector + 3)
+	jp	fat.writesectora		; writesector(sector)
+fat.record.sector:
 	db	0,0,0,0
 
 ;-------------------------------------------------------------------------------
