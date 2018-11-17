@@ -85,8 +85,9 @@ void fatDemo(void) {
 
     putString("using fat partition 1.");
 
-    if (fat_Init() != 0) {
-        putString("fat error.");
+    if ((num = fat_Init()) != 0) {
+        sprintf(buf, "fat error: %u", num);
+        putString(buf);
         return;
     }
 

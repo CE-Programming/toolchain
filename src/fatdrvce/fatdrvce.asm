@@ -81,10 +81,22 @@ struc fatstate			; fat state structure
 	.fat_pos		rd 1	; 
 	.root_dir_pos		rd 1	; 
 	.data_region		rd 1	; 
-	.type			rb 1	; 
+	.type			rb 1	;
 end struc
 fatstate fatstate
 _fat_state := fatstate
+
+fat.partitionlba:
+	db	0,0,0,0
+fat.sectorbuffer:
+	db	0,0,0
+fat.setjmpbuf:
+	db	0,0,0
+
+_fat_fd:
+	rb	94
+_fat_key:
+	db	0
 
 ;-------------------------------------------------------------------------------
 fat_ReadSector:
@@ -96,7 +108,180 @@ fat_WriteSector:
 
 ;-------------------------------------------------------------------------------
 fat_Init:
-	jp	_init_fat
+	ld	b, 3				; for i < max_fd_open
+	ld	hl, _fat_fd
+	ld	de, 23
+.setkeys:
+	ld	(hl), -1			; fat_fd[i].key = -1
+	add	hl, de
+	djnz	.setkeys
+	xor	a, a
+	sbc	hl, hl
+	call	fat.readsectora			; readsector(0)
+	ld	iy, (fat.sectorbuffer)
+	ld	hl, (iy + 11)
+	ld	a, h
+	sub	a, 512 shr 8
+	or	a, l				; if sect[11] != 512
+	jr	z, .validsectorsize
+	ld	a, 1				; return 1
+	ret
+.validsectorsize:
+	ld	a, (iy + 13)			; fatstate.cluster_size = sect[13]
+	ld	(_fat_state + 1), a
+	ld	a, (iy + 16)
+	cp	a, 2				; if (sect[16] != 2)
+	jr	z, .validfatnum
+	ld	a, 3				; return 3
+	ret
+.validfatnum:
+	ld	de, (iy + 19)
+	ex.s	de, hl				; if (sect[19]) (16 bits)
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	z, .nobits
+	ld	e, 0				; fatstate.clusters = sect[19] / fatstate.cluster_size
+	jr	.dodivision
+.nobits:
+	ld	hl, (iy + 32)
+	ld	e, (iy + 35)			; fatstate.clusters = sect[32] / fatstate.cluster_size
+.dodivision:
+	ld	a, (iy + 13)
+	ld	bc, 0
+	ld	c, a
+	xor	a, a
+	call	__ldivu
+	ld	a, e
+	ld	(_fat_state + 4), hl
+	ld	(_fat_state + 7), a
+	xor	a, a
+	ld	bc, 65525			; fatstate.clusters < 65525
+	call	__lcmpu
+	jr	nc, .fat32
+.fat16:
+	xor	a, a				; fatstate.type = FAT_TYPE_FAT16
+	ld	c, (iy + 38)			; u8 = sect[38]
+	ld	de, (iy + 22)
+	ex.s	de, hl				; fatstate.fat_size = sect[22]
+	jr	.fattype
+.fat32:
+	ld	c, (iy + 66)			; u8 = sect[66]
+	ld	hl, (iy + 36)			; fatstate.fat_size = sect[36]
+	ld	a, (iy + 39)
+	or	a, a
+	ld	a, 1				; fatstate.type = FAT_TYPE_FAT32
+	jr	z, .fattype			; can't support really really big drives
+	inc	a				; return 2
+	ret
+.fattype:
+	ld	(_fat_state + 24),a
+	ld	a, c
+	cp	a, $28				; check fat signature
+	jr	z, .goodsig
+	cp	a, $29
+	jr	z, .goodsig
+	ld	a, 4				; return 4
+	ret
+.goodsig:
+	ld	(_fat_state + 8), hl		; fatstate.fat_size
+	push	hl
+	xor	a, a
+	ld	hl, (iy + 14)			; reserved_sectors = sect[14]
+	ex.s	de, hl
+	ld	(_fat_state + 12), de
+	ld	(_fat_state + 15), a		; fatstate.fat_pos = reserved_sectors
+	pop	hl
+	push	de
+	ld	e, 0
+	add	hl, hl
+	rl	e				; euhl = fatstate.fat_size * 2
+	pop	bc
+	call	__ladd
+	ld	e, a
+	ld	(_fat_state + 16), hl
+	ld	(_fat_state + 19), a		; fatstate.root_dir_pos = fatstate.fat_pos + fatstate.fat_size * 2
+	push	hl
+	ld	de, (iy + 17)
+	ld	hl, _fat_state + 2
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d				; fatstate.root_directory_size = sect[17] (16 bits)
+	ex.s	de, hl
+	srl	h
+	rr	l
+	srl	h
+	rr	l
+	srl	h
+	rr	l
+	srl	h
+	rr	l				; fat_state.root_directory_size * 32 / 512;
+	ld	e, 0
+	pop	bc				; fatstate.data_region = fatstate.root_dir_pos + fatstate.root_directory_size * 32 / 512;
+	call	__ladd
+	ld	a, e
+	ld	(_fat_state + 20), hl
+	ld	(_fat_state + 23), a
+
+	ld	a, (_fat_state + 24)		; if fat32
+	or	a, a
+	jp	z, .done
+	ld	hl, (_fat_state + 16)
+	ld	a, (_fat_state + 19)
+	ld	(_fat_state + 20), hl
+	ld	(_fat_state + 23), a		; fatstate.data_region = fatstate.root_dir_pos
+	ld	hl, (iy + 44)
+	ld	e, (iy + 47)
+	xor	a, a
+	ld	bc, 2
+	call	__lsub
+	ld	a, (_fat_state + 1)
+	ld	bc, 0
+	ld	c, a
+	xor	a, a
+	call	__lmulu
+	ld	bc, (_fat_state + 16)
+	ld	a, (_fat_state + 19)
+	call	__ladd
+	ld	a, e
+	ld	(_fat_state + 16), hl
+	ld	(_fat_state + 19), a		; fatstate.root_dir_pos += fatstate.cluster_size * (sect[44] - 2)
+	ld	de, (iy + 48)			; fsinfo = sect[48] (16 bits)
+	ex.s	de, hl
+	ld	(.fsinfo), hl
+	xor	a, a
+	call	fat.readsectora			; readsector(fsinfo)
+	ld	hl, (iy + 0)			; if (sect[0] == 0x41615252 && sect[510] == 0xaa55)
+	ld	e, (iy + 3)
+	ld	bc, $615252
+	ld	a, $41
+	call	__lcmpu
+	jr	nz, .done
+	ld	bc, 510
+	lea	hl, iy
+	add	hl, bc
+	call	fat.checksectormagic
+	jr	nz, .done
+	ld	bc, 488				; sect[488] = 0xffffffff
+	lea	hl, iy
+	add	hl, bc
+	ld	a, 255
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	xor	a, a
+	ld	hl, 0
+.fsinfo := $ - 3
+	call	fat.writesectora		; writesector(fsinfo)
+.done:
+	ld	a, 1
+	ld	(_fat_state + 0), a		; fatstate.valid = true
+	dec	a				; return 0
+	ret
 
 ;-------------------------------------------------------------------------------
 fat_Find:
@@ -691,12 +876,24 @@ fat.findfd:
 	ret
 
 ;-------------------------------------------------------------------------------
+; auhl = sector lba
+fat.readsectora:
+	ld	e, a
+;	jr	fat.readsector
+
+;-------------------------------------------------------------------------------
 ; euhl = sector lba
 fat.readsector:
 	ld	bc, scsiRead10Lba
 	call	fat.addpartitionlba
 	ld	de, (fat.sectorbuffer)
 	jp	scsiRequestRead
+
+;-------------------------------------------------------------------------------
+; auhl = sector lba
+fat.writesectora:
+	ld	e, a
+;	jr	fat.writesector
 
 ;-------------------------------------------------------------------------------
 ; euhl = sector lba
@@ -774,7 +971,7 @@ fat.addpartitionlba:
 ;-------------------------------------------------------------------------------
 fat.find:
 	call	scsiRequestDefaultRead		; read sector
-	call	fat.checkmagic
+	call	fat.checkdefaultmagic
 	ret	nz
 	ld	hl, -64
 	add	hl, sp
@@ -825,7 +1022,7 @@ fat.find:
 
 ;-------------------------------------------------------------------------------
 fat.onlypartition:
-	call	fat.checkmagic
+	call	fat.checkdefaultmagic
 	ld	a, 0
 	ret	nz
 	inc	a
@@ -898,8 +1095,9 @@ util.revcopy:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat.checkmagic:
+fat.checkdefaultmagic:
 	ld	hl, xferDataPtrDefault + 510	; offset = signature
+fat.checksectormagic:
 	ld	a, (hl)
 	cp	a, $55
 	ret	nz
@@ -908,17 +1106,6 @@ fat.checkmagic:
 	cp	a, $aa
 	ret
 
-fat.partitionlba:
-	db	0,0,0,0
-fat.sectorbuffer:
-	db	0,0,0
-fat.setjmpbuf:
-	db	0,0,0
-
-_fat_fd:
-	db	0 dup 92
-_fat_key:
-	db	0
-
 include 'fat.zds'
+
 
