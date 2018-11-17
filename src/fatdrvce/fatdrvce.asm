@@ -388,9 +388,7 @@ fat_Open:
 	ld	hl, (fat.record.index)
 	ld	a, l
 	ld	(iy + 5), a			; desc->entry_index = index
-	push	iy, hl
-	call	fat.getentrycluster
-	pop	bc, iy				; desc->first_cluster = get_entry_cluster(index);
+	call	fat.getentrycluster.asm		; desc->first_cluster = get_entry_cluster(index);
 	ld	(iy + 6),hl
 	ld	(iy + 9),e
 	call	__lcmpzero
@@ -531,12 +529,13 @@ fat.getentrycluster.asm:
 	add	hl, hl
 	ld	bc, (fat.sectorbuffer)
 	add	hl, bc
-	push	hl
+	push	iy, hl
 	pop	iy
 	ld	de, (iy + 26)
 	ld	(.entclus + 0), de
 	ld	e, (iy + 20)
 	ld	a, (iy + 21)
+	pop	iy
 	ld	(.entclus + 2), a
 	ld	hl, 0
 .entclus := $ - 3
