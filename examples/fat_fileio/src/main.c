@@ -133,9 +133,12 @@ void fatDemo(void) {
 
         fat_Close(fd);
         fat_SetFileSize(wrtest, WR_SIZE);
+    } else {
+        sprintf(buf, "wr err: %d", fd);
+        putString(buf);
     }
 
-    putString("testing...");
+
 
     fd = fat_Open(wrtest, FAT_O_RDONLY);
     if (fd >= 0) {
@@ -144,6 +147,9 @@ void fatDemo(void) {
         sprintf(buf, "tell: %u", (unsigned int)fat_Tell(fd));
         putString(buf);
         fat_Close(fd);
+    } else {
+        sprintf(buf, "wr o err: %d", fd);
+        putString(buf);
     }
 
     fat_SetAttrib(dirtest, FAT_DIR | FAT_HIDDEN);

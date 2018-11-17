@@ -98,6 +98,12 @@ _fat_fd:
 _fat_key:
 	db	0
 
+MAX_OPEN_FD := 3
+FD_SIZE := 23
+FAT_DIR := 16
+FAT_O_WRONLY := 2
+FAT_O_RDONLY := 1
+
 ;-------------------------------------------------------------------------------
 fat_ReadSector:
 	jp	_fat_read_sect
@@ -108,9 +114,9 @@ fat_WriteSector:
 
 ;-------------------------------------------------------------------------------
 fat_Init:
-	ld	b, 3				; for i < max_fd_open
+	ld	b, MAX_OPEN_FD			; for i < max_fd
+	ld	de, FD_SIZE
 	ld	hl, _fat_fd
-	ld	de, 23
 .setkeys:
 	ld	(hl), -1			; fat_fd[i].key = -1
 	add	hl, de
@@ -328,7 +334,99 @@ fat_Select:
 
 ;-------------------------------------------------------------------------------
 fat_Open:
-	jp	_fat_open
+	ld	b, MAX_OPEN_FD			; for i < max_fd_open
+	ld	de, FD_SIZE
+	ld	hl, _fat_fd
+.findavailfd:
+	ld	a, (hl)				; if (desc->key < 0)
+	or	a, a
+	jp	m, .openfd
+	add	hl, de
+	djnz	.findavailfd
+	ld	a, -1
+	ret
+.openfd:
+	ld	(.desc), hl
+	call	fat.locaterecord
+	jr	nz, .foundfd
+	ld	a, -2
+	ret
+.err:
+	ld	a, -3
+	ret
+.foundfd:
+	ld	(.location), hl
+	ld	bc, 11
+	add	hl, bc
+	ld	a, (hl)
+	and	a, FAT_DIR
+	jr	nz, .err			; can't open a directory
+	ld	a, (iy + 9)
+	and	a, FAT_O_WRONLY
+	ld	a, 0
+	jr	z, .nowrite
+	inc	a
+.nowrite:
+	ld	iy, 0
+.desc := $ - 3
+	ld	(iy + 22), a			; desc->write = flags & FAT_O_WRONLY ? true : false
+	ld	hl, 0
+.location := $ - 3
+	ld	bc, 28
+	add	hl,bc
+	ld	bc, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a, (hl)
+	ld	(iy + 18), bc
+	ld	(iy + 21), a			; desc->file_size = get32(sectorbuffer + (index * 32 + 28))
+	ld	hl, (fat.record.sector + 0)
+	ld	a, (fat.record.sector + 3)
+	ld	(iy + 1),hl
+	ld	(iy + 4),a			; desc->entry_sector = sector
+	ld	hl, (fat.record.index)
+	ld	a, l
+	ld	(iy + 5), a			; desc->entry_index = index
+	push	iy, hl
+	call	_GET_ENTRY_CLUSTER
+	pop	bc, iy				; desc->first_cluster = get_entry_cluster(index);
+	ld	(iy + 6),hl
+	ld	(iy + 9),e
+	call	__lcmpzero
+	jr	nz, .hasfirstcluster
+	ld	a, (iy + 22)			; if (desc->write)
+	or	a, a
+	jq	z, .cantalloc
+	xor	a, a
+	sbc	hl, hl
+	ld	(iy + 18), hl
+	ld	(iy + 21), a			; desc->file_size = 0
+	push	iy, hl, hl
+	ld	l,(iy + 5)
+	push	hl
+	ld	de, (iy + 1)
+	ld	l, (iy + 4)
+	push	hl, de
+	call	_alloc_cluster
+	pop	bc, bc, bc, bc, bc, iy
+	ld	(iy + 6),hl
+	ld	(iy + 9),e			; desc->first_cluster = alloc_cluster(desc->entry_sector, desc->entry_index, 0)
+.cantalloc:
+.hasfirstcluster:
+	ld	hl, (iy + 6)
+	ld	a, (iy + 9)
+	ld	(iy + 10), hl
+	ld	(iy + 13), a			; desc->current_cluster = desc->first_cluster
+	xor	a, a
+	sbc	hl, hl
+	ld	(iy + 14), hl
+	ld	(iy + 17), a			; desc->fpos = 0
+	ld	hl, _fat_key
+	ld	a, (hl)
+	ld	(iy + 0), a
+	inc	(hl)				; desc->key = fat_key++
+	ret
 
 ;-------------------------------------------------------------------------------
 fat_Close:
@@ -355,7 +453,7 @@ fat_SetFileSize:
 	ret	z
 	ld	bc, 28				; set32(sector_buff + (index * 32 + 28), size)
 	add	hl, bc
-	ld	bc, (iy + 6)
+	ld	bc, (iy + 6)			; iy + 3 from fat.locaterecord
 	ld	a, (iy + 9)
 	ld	(hl), bc
 	inc	hl
@@ -409,7 +507,7 @@ fat_SetAttrib:
 	ret	z
 	ld	bc, 11
 	add	hl, bc
-	ld	a, (iy + 6)
+	ld	a, (iy + 6)			; iy + 3 from fat.locaterecord
 	ld	(hl), a
 	jp	fat.record.write		; writesector(sector)
 
@@ -424,7 +522,7 @@ fat.locaterecord:
 	push	iy
 	or	a, a
 	sbc	hl, hl
-	ld	de, .index
+	ld	de, fat.record.index
 	ld	bc, (iy + 3)
 	push	hl, de, bc
 	call	_locate_record
@@ -437,7 +535,7 @@ fat.locaterecord:
 	ld	(fat.record.sector + 3), a
 	call	fat.readsector
 	ld	hl, 0
-.index := $ - 3
+fat.record.index := $ - 3
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
