@@ -107,7 +107,9 @@ void fatDemo(void) {
 
     putString("deleting file.");
 
-    fat_Delete(wrtest);
+    if (fat_Delete(wrtest) == false) {
+        putString("error.");
+    }
 
     putString("creating file...");
 
@@ -115,7 +117,9 @@ void fatDemo(void) {
 
     putString("deleting dir.");
 
-    fat_Delete(dirtest);
+    if (fat_Delete(dirtest) == false) {
+        putString("error.");
+    }
 
     putString("creating dir...");
 

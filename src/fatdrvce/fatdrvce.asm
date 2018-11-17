@@ -574,6 +574,41 @@ fat.sectortocluster:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat.doallocentry:
+; uint32_t do_alloc_entry(uint32_t entry_sector, uint8_t entry_index, uint32_t prev_cluster)
+	ld	iy, 0
+	add	iy, sp
+	or	a, a
+	sbc	hl, hl
+	ld	l,(iy + 15)
+	push	hl
+	ld	hl,(iy + 12)
+	push	hl
+	ld	l,(iy + 9)
+	ld	h,0
+	push	hl
+	ld	l,(iy + 6)
+	push	hl
+	ld	hl,(iy + 3)
+	push	hl
+	call	_alloc_cluster
+	pop	bc, bc, bc, bc, bc
+	ld	c, e
+	ld	b, 0
+	push	bc, hl
+	call	fat.clustertosector		; sector = cluster_to_sector(alloc_cluster(entry_sector, entry_index, prev_cluster))
+	pop	bc, bc
+	ld	iy, (fat.sectorbuffer)
+	ld	(iy +  0), $e5			; sector_buff[ 0] = 0xe5;
+	ld	(iy + 11), $00			; sector_buff[11] = 0x00;
+	ld	(iy + 32), $00			; sector_buff[32] = 0x00;
+	ld	(iy + 43), $00			; sector_buff[43] = 0x00;
+	push	hl, de
+	call	fat.writesector
+	pop	de, hl
+	ret
+
+;-------------------------------------------------------------------------------
 fat.locaterecord:
 	ld	iy, 3
 	add	iy, sp
@@ -878,7 +913,7 @@ out_of_space:
 	jp	0
 
 ;-------------------------------------------------------------------------------
-_cluster_to_sector:
+fat.clustertosector:
 	pop	de
 	pop	hl
 	dec	sp
@@ -910,7 +945,7 @@ enter:
 	ret
 
 ;-------------------------------------------------------------------------------
-_fname_to_fatname:
+fat.fnametofatname:
 	ld	iy, 0
 	add	iy, sp
 	ld	de, (iy + 3)		; de = name
@@ -986,7 +1021,8 @@ _fname_to_fatname:
 	inc	b
 	jr	.spacefillloop
 
-_next_cluster:
+;-------------------------------------------------------------------------------
+fat.nextcluster:
 	ld	hl, 3
 	add	hl, sp
 	ld	a, (_fat_state + 24)
@@ -1045,7 +1081,7 @@ _next_cluster:
 	ret
 
 ;-------------------------------------------------------------------------------
-_end_of_chain_mark:
+fat.endofchainmark:
 	pop	de
 	pop	hl
 	pop	bc

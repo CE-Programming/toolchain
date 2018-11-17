@@ -33,7 +33,7 @@ L_20:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_end_of_chain_mark
+	CALL	fat.endofchainmark
 	POP	BC
 	POP	BC
 	OR	A,A
@@ -134,7 +134,7 @@ L_19:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_end_of_chain_mark
+	CALL	fat.endofchainmark
 	POP	BC
 	POP	BC
 	OR	A,A
@@ -292,7 +292,7 @@ L_28:
 	PUSH	BC
 	LD	BC,(IX+-7)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-7),HL
@@ -378,7 +378,7 @@ L_53:
 ;  307		fname_to_fatname(component, fatname);
 	PEA	IX+-37
 	PEA	IX+-50
-	CALL	_fname_to_fatname
+	CALL	fat.fnametofatname
 	POP	BC
 	POP	BC
 ;  308		for (;;) {
@@ -570,14 +570,14 @@ L_77:
 	LD	B,0
 	PUSH	BC
 	PUSH	HL
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	C,E
 	LD	B,0
 	PUSH	BC
 	PUSH	HL
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-7),HL
@@ -1065,75 +1065,7 @@ L_108:
 ;  401	}
 	LD	SP,IX
 	POP	IX
-	RET	
-
-;  403	uint32_t do_alloc_entry(uint32_t entry_sector, uint8_t entry_index, uint32_t prev_cluster) {
-_do_alloc_entry:
-	LD	HL,-4
-	CALL	__frameset
-;  404		uint32_t sector;
-;  405		sector = cluster_to_sector(alloc_cluster(entry_sector, entry_index, prev_cluster));
-	LD	C,(IX+18)
-	LD	B,0
-	PUSH	BC
-	LD	BC,(IX+15)
-	PUSH	BC
-	LD	C,(IX+12)
-	LD	B,0
-	PUSH	BC
-	LD	C,(IX+9)
-	PUSH	BC
-	LD	BC,(IX+6)
-	PUSH	BC
-	CALL	_alloc_cluster
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	LD	C,E
-	LD	B,0
-	PUSH	BC
-	PUSH	HL
-	CALL	_cluster_to_sector
-	POP	BC
-	POP	BC
-	LD	(IX+-4),HL
-	LD	(IX+-1),E
-;  406		sector_buff[0] = 0xE5;
-	LD	HL,(fat.sectorbuffer)
-	LD	(HL),229
-;  407		sector_buff[11] = 0;
-	LD	IY,(fat.sectorbuffer)
-	LEA	HL,IY+11
-	LD	(HL),0
-;  408		sector_buff[32] = 0;
-	LD	IY,(fat.sectorbuffer)
-	LEA	HL,IY+32
-	LD	(HL),0
-;  409		sector_buff[32 + 11] = 0;
-	LD	IY,(fat.sectorbuffer)
-	LEA	HL,IY+43
-	LD	(HL),0
-;  410		write_sector(sector, sector_buff);
-	LD	C,(IX+-1)
-	LD	B,0
-	PUSH	BC
-	LD	BC,(IX+-4)
-	PUSH	BC
-	LD	BC,(fat.sectorbuffer)
-	PUSH	BC
-	CALL	_fat_WriteSector
-	POP	BC
-	POP	BC
-	POP	BC
-;  411		return sector;
-	LD	HL,(IX+-4)
-	LD	E,(IX+-1)
-;  412	}
-	LD	SP,IX
-	POP	IX
-	RET	
+	RET
 
 ;  414	static uint32_t alloc_entry(uint32_t parent_entry_sector, uint8_t parent_entry_index, uint32_t first_cluster, unsigned int *index) {
 _alloc_entry:
@@ -1152,7 +1084,7 @@ _alloc_entry:
 	PUSH	BC
 	LD	BC,(IX+15)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-10),HL
@@ -1179,7 +1111,7 @@ _alloc_entry:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_do_alloc_entry
+	CALL	fat.doallocentry
 	POP	BC
 	POP	BC
 	POP	BC
@@ -1343,7 +1275,7 @@ L_124:
 	PUSH	BC
 	LD	BC,(IX+15)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	(IX+15),HL
@@ -1370,7 +1302,7 @@ L_124:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_do_alloc_entry
+	CALL	fat.doallocentry
 	POP	BC
 	POP	BC
 	POP	BC
@@ -1684,7 +1616,7 @@ L_188:
 	PUSH	BC
 	LD	BC,(IX+-20)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-27),HL
@@ -1772,7 +1704,7 @@ L_193:
 	PUSH	BC
 	LD	BC,(IX+-12)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	IY,(IX+-3)
@@ -1919,7 +1851,7 @@ L_209:
 	PUSH	BC
 	LD	BC,(IX+-12)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-8),HL
@@ -1997,7 +1929,7 @@ L_209:
 	PUSH	BC
 	LD	BC,(IX+-16)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	IY,(IX+-3)
@@ -2119,7 +2051,7 @@ L_236:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-11),HL
@@ -2246,7 +2178,7 @@ L_233:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	(IX+6),HL
@@ -2713,7 +2645,7 @@ L_273:
 	PUSH	HL
 	LD	BC,(IX+9)
 	PUSH	BC
-	CALL	_fname_to_fatname
+	CALL	fat.fnametofatname
 	POP	BC
 	POP	BC
 ;  747		sector_buff[index32 + 11] = attrib;
@@ -3113,7 +3045,7 @@ L_309:
 	PUSH	BC
 	LD	BC,(IX+-15)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-11),HL
@@ -3499,7 +3431,7 @@ L_356:
 	PUSH	BC
 	LD	BC,(IX+-15)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	(IX+-15),HL
@@ -3518,7 +3450,7 @@ L_354:
 	PUSH	BC
 	LD	BC,(IX+-15)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.clustertosector
 	POP	BC
 	POP	BC
 	LD	(IX+-11),HL
