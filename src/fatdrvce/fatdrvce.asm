@@ -333,8 +333,7 @@ fat_Open:
 ;-------------------------------------------------------------------------------
 fat_Close:
 	pop	de
-	pop	hl
-	push	hl
+	ex	(sp), hl
 	push	de
 	call	fat.findfd
 	ld	(hl), -1			; fat_fd[i].key = -1;
@@ -343,8 +342,7 @@ fat_Close:
 ;-------------------------------------------------------------------------------
 fat_GetFileSize:
 	pop	de
-	pop	hl
-	push	hl
+	ex	(sp), hl
 	push	de
 	call	fat.findfd
 	ld	hl, (iy + 18)
