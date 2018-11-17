@@ -381,8 +381,8 @@ fat_Open:
 	ld	a, (hl)
 	ld	(iy + 18), bc
 	ld	(iy + 21), a			; desc->file_size = get32(sectorbuffer + (index * 32 + 28))
-	ld	hl, (fat.record.sector + 0)
-	ld	a, (fat.record.sector + 3)
+	ld	hl, (fat.record.sector.low)
+	ld	a, (fat.record.sector.high)
 	ld	(iy + 1),hl
 	ld	(iy + 4),a			; desc->entry_sector = sector
 	ld	hl, (fat.record.index)
@@ -624,8 +624,8 @@ fat.locaterecord:
 	pop	iy
 	ret	z
 	ld	a, e
-	ld	(fat.record.sector + 0), hl
-	ld	(fat.record.sector + 3), a
+	ld	(fat.record.sector.low), hl
+	ld	(fat.record.sector.high), a
 	call	fat.readsector
 	ld	hl, 0
 fat.record.index := $ - 3
@@ -640,11 +640,11 @@ fat.record.index := $ - 3
 	inc	a
 	ret
 fat.record.write:
-	ld	hl, (fat.record.sector + 0)
-	ld	a, (fat.record.sector + 3)
+	ld	hl, 0
+fat.record.sector.low := $ - 3
+	ld	a, 0
+fat.record.sector.high := $ - 1
 	jp	fat.writesectora		; writesector(sector)
-fat.record.sector:
-	db	0,0,0,0
 
 ;-------------------------------------------------------------------------------
 msd_Init:
