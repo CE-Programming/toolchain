@@ -680,22 +680,9 @@ msd_KeepAlive:
 msd_ReadSector:
 	ld	iy, 0
 	add	iy, sp
-	ld	hl, scsiRead10Lba + 3
-	lea	de, iy + 6
-	ld	a, (de)
-	ld	(hl), a
-	dec	hl
-	inc	de
-	ld	a, (de)
-	ld	(hl), a
-	dec	hl
-	inc	de
-	ld	a, (de)
-	ld	(hl), a
-	dec	hl
-	inc	de
-	ld	a, (de)
-	ld	(hl), a
+	ld	de, scsiRead10Lba + 3
+	lea	hl, iy + 6
+	call	util.revcopy
 	ld	de, (iy + 3)
 	jp	scsiRequestRead
 
@@ -703,22 +690,9 @@ msd_ReadSector:
 msd_WriteSector:
 	ld	iy, 0
 	add	iy, sp
-	ld	hl, scsiWrite10Lba + 3
-	lea	de, iy + 6
-	ld	a, (de)
-	ld	(hl), a
-	dec	hl
-	inc	de
-	ld	a, (de)
-	ld	(hl), a
-	dec	hl
-	inc	de
-	ld	a, (de)
-	ld	(hl), a
-	dec	hl
-	inc	de
-	ld	a, (de)
-	ld	(hl), a
+	ld	de, scsiWrite10Lba + 3
+	lea	hl, iy + 6
+	call	util.revcopy
 	ld	de, (iy + 3)
 	jp	scsiRequestWrite
 
