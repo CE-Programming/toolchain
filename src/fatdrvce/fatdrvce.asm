@@ -389,7 +389,7 @@ fat_Open:
 	ld	a, l
 	ld	(iy + 5), a			; desc->entry_index = index
 	push	iy, hl
-	call	_GET_ENTRY_CLUSTER
+	call	fat.getentrycluster
 	pop	bc, iy				; desc->first_cluster = get_entry_cluster(index);
 	ld	(iy + 6),hl
 	ld	(iy + 9),e
@@ -514,6 +514,40 @@ fat_SetAttrib:
 ;-------------------------------------------------------------------------------
 fat_DirList:
 	jp	_fat_dirlist
+
+;-------------------------------------------------------------------------------
+fat.getentrycluster:
+; return (((GET16(sector_buff + ((e) * 32 + 20)) << 16) |
+;        (GET16(sector_buff + ((e) * 32 + 26)))) &
+;        (fat_state.type != FAT_TYPE_FAT32 ? 0xFFFF : ~0))
+	pop	de
+	ex	(sp), hl
+	push	de
+fat.getentrycluster.asm:
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	bc, (fat.sectorbuffer)
+	add	hl, bc
+	push	hl
+	pop	iy
+	ld	de, (iy + 26)
+	ld	(.entclus + 0), de
+	ld	e, (iy + 20)
+	ld	a, (iy + 21)
+	ld	(.entclus + 2), a
+	ld	hl, 0
+.entclus := $ - 3
+	ld	a, (_fat_state + 24)
+	or	a, a
+	ret	nz
+.fat16:
+	ld	e, 0
+	ex.s	de, hl
+	ex	de, hl
+	ret
 
 ;-------------------------------------------------------------------------------
 fat.locaterecord:

@@ -1,61 +1,3 @@
-
-;   80	uint32_t GET_ENTRY_CLUSTER(unsigned int e) {
-_GET_ENTRY_CLUSTER:
-	LD	HL,-6
-	CALL	__frameset
-;   81	    return (((GET16(sector_buff + ((e) * 32 + 20)) << 16) | (GET16(sector_buff + ((e) * 32 + 26)))) & (fat_state.type != FAT_TYPE_FAT32 ? 0xFFFF : ~0));
-	LD	A,(_fat_state+24)
-	CP	A,1
-	JQ	Z,L_2
-	LD	BC,65535
-	LD	(IX+-3),BC
-	JQ	L_3
-L_2:
-	LD	BC,16777215
-	LD	(IX+-3),BC
-L_3:
-	LD	HL,(IX+6)
-	ADD	HL,HL
-	ADD	HL,HL
-	ADD	HL,HL
-	ADD	HL,HL
-	ADD	HL,HL
-	PUSH	HL
-	POP	DE
-	PUSH	DE
-	POP	IY
-	LEA	BC,IY+20
-	LD	HL,(fat.sectorbuffer)
-	ADD	HL,BC
-	LD	BC,(HL)
-	CALL	__stoiu
-	PUSH	HL
-	POP	BC
-	LD	L,16
-	XOR	A,A
-	CALL	__lshl
-	PUSH	DE
-	POP	IY
-	LEA	DE,IY+26
-	LD	HL,(fat.sectorbuffer)
-	ADD	HL,DE
-	LD	(IX+-6),BC
-	LD	BC,(HL)
-	CALL	__stoiu
-	PUSH	HL
-	POP	BC
-	LD	E,A
-	XOR	A,A
-	LD	HL,(IX+-6)
-	CALL	__lor
-	LD	BC,(IX+-3)
-	CALL	__itol
-	CALL	__land
-;   82	}
-	LD	SP,IX
-	POP	IX
-	RET	
-
 ;  202	uint32_t sector_to_cluster(uint32_t sector) {
 _sector_to_cluster:
 	LD	HL,-3
@@ -379,7 +321,7 @@ L_28:
 ;  295			cur_sector = GET_ENTRY_CLUSTER(i);
 	LD	BC,(IX+-3)
 	PUSH	BC
-	CALL	_GET_ENTRY_CLUSTER
+	CALL	fat.getentrycluster
 	POP	BC
 	LD	(IX+-7),HL
 	LD	(IX+-4),E
@@ -2475,7 +2417,7 @@ L_246:
 ;  694			cluster = GET_ENTRY_CLUSTER(index);
 	LD	BC,(IX+-7)
 	PUSH	BC
-	CALL	_GET_ENTRY_CLUSTER
+	CALL	fat.getentrycluster
 	POP	BC
 	LD	(IX+-21),HL
 	LD	(IX+-18),E
@@ -2553,7 +2495,7 @@ L_252:
 ;  706			cluster = GET_ENTRY_CLUSTER(index);
 	LD	BC,(IX+-7)
 	PUSH	BC
-	CALL	_GET_ENTRY_CLUSTER
+	CALL	fat.getentrycluster
 	POP	BC
 	LD	(IX+-21),HL
 	LD	(IX+-18),E
@@ -2700,7 +2642,7 @@ L_265:
 ;  733			pcluster = GET_ENTRY_CLUSTER(pindex);
 	LD	BC,(IX+-16)
 	PUSH	BC
-	CALL	_GET_ENTRY_CLUSTER
+	CALL	fat.getentrycluster
 	POP	BC
 	LD	(IX+-20),HL
 	LD	(IX+-17),E
@@ -2729,7 +2671,7 @@ L_263:
 	PEA	IX+-13
 	LD	BC,(IX+-16)
 	PUSH	BC
-	CALL	_GET_ENTRY_CLUSTER
+	CALL	fat.getentrycluster
 	POP	BC
 	LD	C,E
 	LD	B,0
@@ -3189,7 +3131,7 @@ L_307:
 ;  835			cluster = GET_ENTRY_CLUSTER(index);
 	LD	BC,(IX+-52)
 	PUSH	BC
-	CALL	_GET_ENTRY_CLUSTER
+	CALL	fat.getentrycluster
 	POP	BC
 	LD	(IX+-15),HL
 	LD	(IX+-12),E
