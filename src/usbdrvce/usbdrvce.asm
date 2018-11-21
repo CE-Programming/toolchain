@@ -122,8 +122,8 @@ virtual at usbArea
 	fakeEndpoint		endpoint
 	eventCallback		rl 1
 	eventCallback.data	rl 1
-	deviceDescriptors	rl 1
-	deviceConfiguration	rb 1
+	standardDescriptors	rl 1
+	selectedConfiguration	rb 1
 	freeList32Align32	rl 1
 	freeList64Align256	rl 1
 	assert $ <= usbInited
@@ -277,11 +277,11 @@ end virtual
 usb_Init:
 	call	_ChkIfOSInterruptAvailable
 	rrca
-	ld	hl,_DefaultDeviceDescriptors.string83
+	ld	hl,_DefaultStandardDescriptors.string83
 	jq	nc,.gotModel
-	ld	hl,_DefaultDeviceDescriptors.string84
+	ld	hl,_DefaultStandardDescriptors.string84
 .gotModel:
-	ld	(_DefaultDeviceDescriptors.model),hl
+	ld	(_DefaultStandardDescriptors.model),hl
 	ld	a,1
 	call	_Init
 	set	5,(hl)
@@ -295,12 +295,12 @@ usb_Init:
 	ldir
 	ld	e,(hl)
 	dec	bc
-	ld	hl,(deviceDescriptors)
+	ld	hl,(standardDescriptors)
 	add	hl,bc
-	jq	c,.nonDefaultDeviceDescriptors
-	ld	hl,_DefaultDeviceDescriptors
-	ld	(deviceDescriptors),hl
-.nonDefaultDeviceDescriptors:
+	jq	c,.nonDefaultStandardDescriptors
+	ld	hl,_DefaultStandardDescriptors
+	ld	(standardDescriptors),hl
+.nonDefaultStandardDescriptors:
 	ld	hl,mpUsbIdle
 	ld	(hl),7
 	ld	l,h;usbDevCtrl+1-$100
@@ -675,10 +675,49 @@ _Free#size#Align#align:
 
 end iterate
 
+_HandleSetAddress:
+	ld	l,usbDevAddr-$100
+	ld	(hl),c
+	jq	_UnhandledCxSetup.handled
+
 _HandleGetDescriptor:
 	ld	bc,(ysetup.wValue)
 	djnz	.notDevice;DEVICE_DESCRIPTOR
-	
+	cp	a,c
+	jq	nz,_UnhandledCxSetup
+	ld	a,bmCxFifoClr
+	ld	(mpUsbCxFifo),a
+	ld	hl,(standardDescriptors)
+	ld	de,(hl)
+	ld	hl,(standardDescriptors)
+	ld	de,(hl)
+	ld	a,(de)
+	ld	bc,(ysetup.wLength)
+	inc	b
+	djnz	.got_length
+	cp	a,c
+	jq	c,.got_length
+	ld	a,c
+.got_length:
+	inc.s	bc
+	ld	b,a
+	ld	c,usbDmaMem2Fifo
+	ld	hl,mpUsbDmaFifo
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbDmaCtrl-$100
+	ld	(hl),bc
+	ld	l,usbDmaAddr-$100
+	ld	(hl),de
+	ld	l,usbDmaCtrl-$100
+	set	bUsbDmaStart,(hl)
+	ld	l,usbDevIsr-$100
+.wait:
+	bit	bUsbIntDevDmaFin,(hl)
+	jq	z,.wait
+	xor	a,a
+	ld	l,usbDmaFifo-$100
+	ld	(hl),a
+	jq	_UnhandledCxSetup.handled
 .notDevice:
 	djnz	.notConfiguration;CONFIGURATION_DESCRIPTOR
 .notConfiguration:
@@ -721,6 +760,17 @@ _HandleCxSetupInt:
 .notSetFeature:
 	dec	b
 	djnz	.notSetAddress
+	ld	bc,(ysetup.wValue)
+	ld	a,c
+	and	a,$80
+	or	a,b
+	ld	de,(ysetup.wIndex)
+	or	a,e
+	or	a,d
+	ld	de,(ysetup.wLength)
+	or	a,e
+	or	a,d
+	jq	z,_HandleSetAddress
 .notSetAddress:
 	djnz	.notGetDescriptor
 	ld	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
@@ -738,8 +788,6 @@ _HandleCxSetupInt:
 	djnz	.notSetInterface
 .notSetInterface:
 _UnhandledCxSetup:
-	ld	hl,mpUsbCxIsr
-	ld	(hl),bmUsbIntCxSetup
 	lea	de,ysetup
 	ld	a,USB_DEFAULT_SETUP_EVENT
 	call	_DispatchEvent
@@ -750,14 +798,15 @@ _UnhandledCxSetup:
 	inc	hl
 	ret	nz
 	add	hl,de
-	ld	l,usbCxFifo-$100
+	ld	hl,mpUsbCxFifo
 	set	bCxFifoStall,(hl)
-	ex	de,hl
-	ret
+	jq	.return
 .handled:
 	ld	l,usbCxFifo-$100
 	set	bCxFifoFin,(hl)
+.return:
 	ld	l,usbCxIsr-$100
+	ld	(hl),bmUsbIntCxSetup
 	ret
 
 _HandleDevInt:
@@ -942,6 +991,14 @@ _HandleFifo3InInt:
 	jq	_DispatchEvent
 
 _HandleDevResetInt:
+	xor	a,a
+	ld	(selectedConfiguration),a
+	ld	(mpUsbDevAddr),a
+	ld	l,usbDmaCtrl-$100
+	ld	(hl),bmUsbDmaAbort
+	ld	l,usbCxFifo-$100
+	ld	(hl),bmCxFifoClr
+	ld	l,usbDevIsr-$100
 	ld	(hl),bmUsbIntDevReset
 	ld	a,USB_DEVICE_RESET_INTERRUPT
 	jq	_DispatchEvent
@@ -1092,7 +1149,7 @@ _DispatchEvent:
 .dispatch:
 	jp	(hl)
 
-_DefaultDeviceDescriptors:
+_DefaultStandardDescriptors:
 	dl .device, .configurations, .langids
 	db 2
 	dl .strings
