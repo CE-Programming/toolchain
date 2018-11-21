@@ -103,8 +103,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 void main(void) {
   usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS);
   os_SetCursorPos(0, 0);
-  while (!os_GetCSC()) {
-    usb_WaitForInterrupt();
-  }
+  while (!os_GetCSC() && usb_WaitForInterrupt() == USB_SUCCESS);
   usb_Cleanup();
 }
