@@ -99,6 +99,12 @@ _fat_fd:
 _fat_key:
 	db	0
 
+MAX_OPEN_FD  := 3
+FD_SIZE      := 23
+FAT_DIR      := 16
+FAT_O_WRONLY := 2
+FAT_O_RDONLY := 1
+
 ;-------------------------------------------------------------------------------
 fat_ReadSector:
 	jp	_fat_read_sect
@@ -198,8 +204,8 @@ fat_Init:
 	add	hl, hl
 	rl	e				; euhl = fatstate.fat_size * 2
 	pop	bc
-	call	__ladd
-	ld	e, a
+	add	hl, bc
+	adc	a, e
 	ld	(_fat_state + 16), hl
 	ld	(_fat_state + 19), a		; fatstate.root_dir_pos = fatstate.fat_pos + fatstate.fat_size * 2
 	push	hl
@@ -219,8 +225,8 @@ fat_Init:
 	rr	l				; fat_state.root_directory_size * 32 / 512;
 	ld	e, 0
 	pop	bc				; fatstate.data_region = fatstate.root_dir_pos + fatstate.root_directory_size * 32 / 512;
-	call	__ladd
-	ld	a, e
+	add	hl, bc
+	adc	a, e
 	ld	(_fat_state + 20), hl
 	ld	(_fat_state + 23), a
 
@@ -243,8 +249,8 @@ fat_Init:
 	call	__lmulu
 	ld	bc, (_fat_state + 16)
 	ld	a, (_fat_state + 19)
-	call	__ladd
-	ld	a, e
+	add	hl, bc
+	adc	a, e
 	ld	(_fat_state + 16), hl
 	ld	(_fat_state + 19), a		; fatstate.root_dir_pos += fatstate.cluster_size * (sect[44] - 2)
 	ld	de, (iy + 48)			; fsinfo = sect[48] (16 bits)
@@ -421,6 +427,41 @@ fat_SetAttrib:
 ;-------------------------------------------------------------------------------
 fat_DirList:
 	jp	_fat_dirlist
+
+;-------------------------------------------------------------------------------
+fat.getentrycluster:
+; return (((GET16(sector_buff + ((e) * 32 + 20)) << 16) |
+;        (GET16(sector_buff + ((e) * 32 + 26)))) &
+;        (fat_state.type != FAT_TYPE_FAT32 ? 0xFFFF : ~0))
+	pop	de
+	ex	(sp), hl
+	push	de
+fat.getentrycluster.asm:
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	bc, (fat.sectorbuffer)
+	add	hl, bc
+	push	iy, hl
+	pop	iy
+	ld	de, (iy + 26)
+	ld	(.entclus + 0), de
+	ld	e, (iy + 20)
+	ld	a, (iy + 21)
+	pop	iy
+	ld	(.entclus + 2), a
+	ld	hl, 0
+.entclus := $ - 3
+	ld	a, (_fat_state + 24)
+	or	a, a
+	ret	nz
+.fat16:
+	ld	e, 0
+	ex.s	de, hl
+	ex	de, hl
+	ret
 
 ;-------------------------------------------------------------------------------
 fat.locaterecord:
