@@ -162,7 +162,8 @@ void fatDemo(void) {
     sprintf(buf, "dir attrib: %u", (unsigned int)fat_GetAttrib(dirtest));
     putString(buf);
 
-    msd_Cleanup();
+    fat_Deinit();
+    msd_Deinit();
 }
 
 /* Draw text on the homescreen */

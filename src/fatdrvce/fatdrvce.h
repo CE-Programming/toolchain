@@ -60,6 +60,16 @@ typedef enum msd_event {
 uint8_t fat_Init(void);
 
 /**
+ * Deinitializes the FAT filesystem and frees the handles to the device.
+ * This function should be called with each corresponding \c fat_Init
+ * function call. It should not be called in a device error handler,
+ * only in the case of a graceful exit, otherwise an infinite loop may
+ * occur.
+ * @return None.
+ */
+void fat_Deinit(void);
+
+/**
  * Locates any available FAT partitions detected on the mass storage device
  * (MSD), and returns setup pointers for use with \c fat_Select. You must
  * allocate space for \p result before calling this function. In addition, the
@@ -255,10 +265,10 @@ void msd_WriteSector(uint8_t *buffer, uint32_t sector);
 int msd_SetJmpBuf(jmp_buf env);
 
 /**
- * Cleans up the current USB state.
+ * Cleans up and deinitializes the current USB device.
  * @return None.
  */
-void msd_Cleanup(void);
+void msd_Deinit(void);
 
 #ifdef __cplusplus
 }

@@ -12,6 +12,7 @@ library 'FATDRVCE', 0
 ; v0 functions (not final, subject to change!)
 ;-------------------------------------------------------------------------------
 	export fat_Init
+	export fat_Deinit
 	export fat_Find
 	export fat_Select
 	export fat_Open
@@ -34,7 +35,7 @@ library 'FATDRVCE', 0
 	export msd_ReadSector
 	export msd_WriteSector
 	export msd_SetJmpBuf
-	export msd_Cleanup
+	export msd_Deinit
 ;-------------------------------------------------------------------------------
 
 include 'host.inc'
@@ -284,6 +285,10 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat_Deinit:
+	ret
+
+;-------------------------------------------------------------------------------
 fat_Find:
 	ld	iy, 0
 	add	iy, sp
@@ -528,7 +533,7 @@ msd_SetJmpBuf:
 	ret
 
 ;-------------------------------------------------------------------------------
-msd_Cleanup:
+msd_Deinit:
 	push	ix
 	push	iy
 	call	usbCleanup
