@@ -1,42 +1,3 @@
-;  202	uint32_t sector_to_cluster(uint32_t sector) {
-_sector_to_cluster:
-	LD	HL,-3
-	CALL	__frameset
-;  203		if (!sector)
-	LD	HL,(IX+6)
-	LD	E,(IX+9)
-	CALL	__lcmpzero
-	JQ	NZ,L_6
-	OR	A,A
-;  204			return 0;
-	SBC	HL,HL
-	LD	E,0
-	JQ	L_7
-L_6:
-;  205		return (sector - fat_state.data_region) / fat_state.cluster_size + 2;
-	LD	HL,(IX+6)
-	LD	E,(IX+9)
-	LD	BC,(_fat_state+20)
-	LD	A,(_fat_state+23)
-	CALL	__lsub
-	LD	(IX+-3),HL
-	OR	A,A
-	SBC	HL,HL
-	LD	A,(_fat_state+1)
-	LD	L,A
-	PUSH	HL
-	POP	BC
-	LD	A,H
-	LD	HL,(IX+-3)
-	CALL	__ldivu
-	LD	A,2
-	CALL	__ladd_b
-;  206	}
-L_7:
-	LD	SP,IX
-	POP	IX
-	RET	
-
 ;  235	static void dealloc_fat(uint32_t fat_entry) {
 _dealloc_fat:
 	LD	HL,-17
@@ -602,7 +563,7 @@ L_77:
 	PUSH	BC
 	LD	BC,(IX+-7)
 	PUSH	BC
-	CALL	_sector_to_cluster
+	CALL	fat.sector2cluster
 	POP	BC
 	POP	BC
 	LD	C,E
@@ -1380,7 +1341,7 @@ _alloc_entry_root:
 	PUSH	BC
 	LD	BC,(IX+-15)
 	PUSH	BC
-	CALL	_sector_to_cluster
+	CALL	fat.sector2cluster
 	POP	BC
 	POP	BC
 	LD	C,E
@@ -3023,7 +2984,7 @@ L_278:
 	PUSH	BC
 	LD	BC,(IX+-7)
 	PUSH	BC
-	CALL	_sector_to_cluster
+	CALL	fat.sector2cluster
 	POP	BC
 	POP	BC
 	LD	(IX+-24),HL
@@ -3341,7 +3302,7 @@ L_358:
 	PUSH	BC
 	LD	BC,(IX+-11)
 	PUSH	BC
-	CALL	_sector_to_cluster
+	CALL	fat.sector2cluster
 	POP	BC
 	POP	BC
 	LD	(IX+-15),HL
