@@ -1,5 +1,5 @@
 ;  235	static void dealloc_fat(uint32_t fat_entry) {
-_dealloc_fat:
+fat.dealloc:
 	LD	HL,-17
 	CALL	__frameset
 ;  236		uint32_t sector, index;
@@ -2369,7 +2369,7 @@ L_250:
 	PUSH	BC
 	LD	BC,(IX+-21)
 	PUSH	BC
-	CALL	_dealloc_fat
+	CALL	fat.dealloc
 	POP	BC
 	POP	BC
 ;  702			return true;
@@ -2410,7 +2410,7 @@ L_252:
 	PUSH	BC
 	LD	BC,(IX+-21)
 	PUSH	BC
-	CALL	_dealloc_fat
+	CALL	fat.dealloc
 	POP	BC
 	POP	BC
 ;  709			return true;

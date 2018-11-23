@@ -593,6 +593,7 @@ fat.doallocentry:
 	push	hl
 	call	_alloc_cluster
 	pop	bc, bc, bc, bc, bc
+	push	hl, de
 	ld	c, e
 	ld	b, 0
 	push	bc, hl
@@ -603,6 +604,7 @@ fat.doallocentry:
 	ld	(iy + 11), $00			; sector_buff[11] = 0x00;
 	ld	(iy + 32), $00			; sector_buff[32] = 0x00;
 	ld	(iy + 43), $00			; sector_buff[43] = 0x00;
+	pop	de, hl
 	push	hl, de
 	call	fat.writesector
 	pop	de, hl
@@ -645,6 +647,172 @@ fat.record.sector.low := $ - 3
 	ld	a, 0
 fat.record.sector.high := $ - 1
 	jp	fat.writesectora		; writesector(sector)
+
+;-------------------------------------------------------------------------------
+fat.nextcluster:
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (_fat_state + 24)
+	or	a, a
+	ld	a, (hl)
+	inc	hl
+	ld	hl, (hl)
+	jr	z, .fat16.1
+	add	a, a
+	adc	hl, hl
+.fat16.1:
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, a
+	add	hl, hl
+	push	hl
+	ld	hl, (_fat_state + 12)
+	add	hl, de
+	ld	a, (_fat_state + 12 + 3)
+	ld	e, a
+	call	fat.readsector
+	pop	de
+	ld	hl, (fat.sectorbuffer)
+	add	hl, de
+	ld	a, (_fat_state + 24)
+	or	a, a
+	jr	z, .fat16.2
+	ld	de, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a, (hl)
+	and	a, $0f
+	ld	hl, 8
+	add	hl, de
+	ex	de, hl
+	ld	e, a
+	adc	a, $f0
+	ret	nc
+	ld	e, a
+	ex	de, hl
+	ld	e, a
+	ret
+
+.fat16.2:
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	ld	hl, $ff0008
+	add	hl, de
+	ex	de, hl
+	ld	e, a
+	ret	nc
+	ex	de, hl
+	ld	e, a
+	ret
+
+;-------------------------------------------------------------------------------
+fat.getsectorpos:
+; input:
+;  euhl = cluster
+; output:
+;  bc = index
+;  euhl = sector
+	ld	a, (_fat_state + 24)
+	or	a, a
+	push	de
+	push	hl
+	ld	a, l
+	inc	sp
+	pop	hl
+	inc	sp
+	inc	sp
+	jr	z, .fattype
+	add	a, a
+	adc	hl, hl
+.fattype:
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, a
+	add	hl, hl
+	push	hl
+	ld	a, (_fat_state + 12 + 3)
+	ld	hl, (_fat_state + 12)
+	add	hl, de
+	ld	e, a
+	pop	bc
+	ret
+
+;-------------------------------------------------------------------------------
+;fat.dealloc:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	c, (iy + 6)
+.loop:						; for (;;)
+	call	fat.endofchainmark.asm		; cuhl input
+	ret	nz
+	ld	e, c
+	call	__lcmpzero			; if (end_of_chain_mark(fat_entry) || !fat_entry) return
+	ret	z
+	call	fat.getsectorpos		; sector = (fat_entry >> shift) + fat_state.fat_pos
+	push	de, hl, bc
+	call	fat.readsector
+	pop	bc, hl, de			; index = (fat_entry << 1) & 0x1FF
+.validsector:
+	push	de, hl
+	ld	hl, (fat.sectorbuffer)
+	add	hl, bc
+	ld	a, (_fat_state + 24)
+	or	a, a
+	jr	z, .notfat32
+	ld	bc, 0
+	ld	de, (hl)
+	ld	(hl), bc
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a, (hl)
+	ld	(hl), c
+	jr	.getentry
+.notfat32:					; fat_entry = get16/32(sector_buff + index)
+	ld	de, 0
+	ld	e, (hl)
+	ld	(hl), a
+	inc	hl
+	ld	d, (hl)
+	ld	(hl), a				; set16/32(sector_buff + index, 0);
+.getentry:
+	ex	de, hl				; auhl = fat_entry
+	ld	(fat.dealloc.entry.low), hl
+	ld	(fat.dealloc.entry.high), a
+	ld	c, a
+	call	fat.endofchainmark.asm		; cuhl = fat_entry
+	pop	hl, de				; euhl = sector
+	jr	nz, .write
+	push	de, hl
+	ld	e, c
+	call	fat.getsectorpos
+	ld	(.index), bc
+	ld	a, e
+	push	hl
+	pop	bc				; aubc = compare sector
+	pop	hl
+	pop	de				; euhl = sector
+	call	__lcmpu
+	ld	bc, 0
+.index := $ - 3					; bc = index
+	jr	z, .validsector
+.write:
+	push	de, hl
+	call	fat.writesector
+	pop	hl, de
+	xor	a, a
+	ld	bc, (_fat_state + 8)
+	call	__ladd
+	call	fat.writesector
+.nextiter:
+	ld	hl, 0
+fat.dealloc.entry.low := $ - 3
+	ld	c, 0
+fat.dealloc.entry.high := $ - 1			; cuhl = fat_entry
+	jp	.loop
 
 ;-------------------------------------------------------------------------------
 msd_Init:
@@ -1008,65 +1176,6 @@ fat.fnametofatname:
 	jr	.spacefillloop
 
 ;-------------------------------------------------------------------------------
-fat.nextcluster:
-	ld	hl, 3
-	add	hl, sp
-	ld	a, (_fat_state + 24)
-	or	a, a
-	ld	a, (hl)
-	inc	hl
-	ld	hl, (hl)
-	jr	z, .fat16.1
-	add	a, a
-	adc	hl, hl
-.fat16.1:
-	ex	de, hl
-	sbc	hl, hl
-	ld	l, a
-	add	hl, hl
-	push	hl
-	ld	hl, (_fat_state + 12)
-	add	hl, de
-	ld	a, (_fat_state + 12 + 3)
-	ld	e, a
-	call	fat.readsector
-	pop	de
-	ld	hl, (fat.sectorbuffer)
-	add	hl, de
-	ld	a, (_fat_state + 24)
-	or	a, a
-	jr	z, .fat16.2
-	ld	de, (hl)
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	a, (hl)
-	and	a, $0f
-	ld	hl, 8
-	add	hl, de
-	ex	de, hl
-	ld	e, a
-	adc	a, $f0
-	ret	nc
-	ld	e, a
-	ex	de, hl
-	ld	e, a
-	ret
-
-.fat16.2:
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	ld	hl, $ff0008
-	add	hl, de
-	ex	de, hl
-	ld	e, a
-	ret	nc
-	ex	de, hl
-	ld	e, a
-	ret
-
-;-------------------------------------------------------------------------------
 fat.endofchainmark:
 	pop	de
 	pop	hl
@@ -1074,18 +1183,24 @@ fat.endofchainmark:
 	push	bc
 	push	hl
 	push	de
+
+;-------------------------------------------------------------------------------
+fat.endofchainmark.asm:
+	push	hl
 	ld	de, 8
 	ld	a, (_fat_state + 24)
 	or	a, a
 	jr	nz, .fat32
 	add.s	hl, de
 	sbc	a, a
+	pop	hl
 	ret
 .fat32:
 	add	hl, de
 	ld	a, c
 	adc	a, $f0
 	sbc	a, a
+	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1346,5 +1461,5 @@ fat.checksectormagic:
 	ret
 
 include 'fat.zds'
-
+include 'debug.inc'
 
