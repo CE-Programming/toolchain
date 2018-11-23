@@ -72,7 +72,7 @@ L_20:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_end_of_chain_mark
+	CALL	fat.endofchainmark
 	POP	BC
 	POP	BC
 	OR	A,A
@@ -173,7 +173,7 @@ L_19:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_end_of_chain_mark
+	CALL	fat.endofchainmark
 	POP	BC
 	POP	BC
 	OR	A,A
@@ -331,7 +331,7 @@ L_28:
 	PUSH	BC
 	LD	BC,(IX+-7)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-7),HL
@@ -417,7 +417,7 @@ L_53:
 ;  307		fname_to_fatname(component, fatname);
 	PEA	IX+-37
 	PEA	IX+-50
-	CALL	_fname_to_fatname
+	CALL	fat.fname2fatname
 	POP	BC
 	POP	BC
 ;  308		for (;;) {
@@ -609,14 +609,14 @@ L_77:
 	LD	B,0
 	PUSH	BC
 	PUSH	HL
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	C,E
 	LD	B,0
 	PUSH	BC
 	PUSH	HL
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-7),HL
@@ -1134,7 +1134,7 @@ _do_alloc_entry:
 	LD	B,0
 	PUSH	BC
 	PUSH	HL
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-4),HL
@@ -1191,7 +1191,7 @@ _alloc_entry:
 	PUSH	BC
 	LD	BC,(IX+15)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-10),HL
@@ -1382,7 +1382,7 @@ L_124:
 	PUSH	BC
 	LD	BC,(IX+15)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	(IX+15),HL
@@ -1959,7 +1959,7 @@ L_188:
 	PUSH	BC
 	LD	BC,(IX+-20)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-27),HL
@@ -2047,7 +2047,7 @@ L_193:
 	PUSH	BC
 	LD	BC,(IX+-12)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	IY,(IX+-3)
@@ -2194,7 +2194,7 @@ L_209:
 	PUSH	BC
 	LD	BC,(IX+-12)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-8),HL
@@ -2272,7 +2272,7 @@ L_209:
 	PUSH	BC
 	LD	BC,(IX+-16)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	IY,(IX+-3)
@@ -2394,7 +2394,7 @@ L_236:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-11),HL
@@ -2521,7 +2521,7 @@ L_233:
 	PUSH	BC
 	LD	BC,(IX+6)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	(IX+6),HL
@@ -2988,7 +2988,7 @@ L_273:
 	PUSH	HL
 	LD	BC,(IX+9)
 	PUSH	BC
-	CALL	_fname_to_fatname
+	CALL	fat.fname2fatname
 	POP	BC
 	POP	BC
 ;  747		sector_buff[index32 + 11] = attrib;
@@ -3388,7 +3388,7 @@ L_309:
 	PUSH	BC
 	LD	BC,(IX+-15)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-11),HL
@@ -3774,7 +3774,7 @@ L_356:
 	PUSH	BC
 	LD	BC,(IX+-15)
 	PUSH	BC
-	CALL	_next_cluster
+	CALL	fat.nextcluster
 	POP	BC
 	POP	BC
 	LD	(IX+-15),HL
@@ -3793,7 +3793,7 @@ L_354:
 	PUSH	BC
 	LD	BC,(IX+-15)
 	PUSH	BC
-	CALL	_cluster_to_sector
+	CALL	fat.cluster2sector
 	POP	BC
 	POP	BC
 	LD	(IX+-11),HL

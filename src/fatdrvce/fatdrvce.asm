@@ -479,8 +479,8 @@ fat.locaterecord:
 	pop	iy
 	ret	z
 	ld	a,e
-	ld	(fat.record.sector + 0),hl
-	ld	(fat.record.sector + 3),a
+	ld	(fat.record.sector.low),hl
+	ld	(fat.record.sector.high),a
 	call	fat.readsector
 	ld	hl,0
 .index := $ - 3
@@ -495,280 +495,14 @@ fat.locaterecord:
 	inc	a
 	ret
 fat.record.write:
-	ld	hl,(fat.record.sector + 0)
-	ld	a,(fat.record.sector + 3)
+	ld	hl,0
+fat.record.sector.low := $ - 3
+	ld	a,0
+fat.record.sector.high := $ - 1
 	jp	fat.writesectora		; writesector(sector)
-fat.record.sector:
-	db	0,0,0,0
 
 ;-------------------------------------------------------------------------------
-msd_Init:
-	push	ix
-	push	iy
-	call	msdInit				; attempt to initialize mass storage device
-	jr	nc,.fail
-	xor	a,a
-.ret:
-	pop	iy
-	pop	ix
-	ret
-.fail:
-	call	usbCleanup
-	xor	a,a
-	inc	a
-	jr	.ret
-
-;-------------------------------------------------------------------------------
-msd_Find:
-	ret
-
-;-------------------------------------------------------------------------------
-msd_Select:
-	ret
-
-;-------------------------------------------------------------------------------
-msd_KeepAlive:
-	ld	hl,scsiTestUnitReady
-	jp	scsiDefaultRequest
-
-;-------------------------------------------------------------------------------
-msd_ReadSector:
-	call	__frameset0
-	ld	a,(ix + 9)
-	ld	(scsiRead10Lba + 3),a
-	ld	a,(ix + 10)
-	ld	(scsiRead10Lba + 2),a
-	ld	a,(ix + 11)
-	ld	(scsiRead10Lba + 1),a
-	ld	a,(ix + 12)
-	ld	(scsiRead10Lba + 0),a
-	ld	de,(ix + 6)
-	call	scsiRequestRead
-	ld	sp,ix
-	pop	ix
-	ret
-
-;-------------------------------------------------------------------------------
-msd_WriteSector:
-	call	__frameset0
-	ld	a,(ix + 9)
-	ld	(scsiWrite10Lba + 3),a
-	ld	a,(ix + 10)
-	ld	(scsiWrite10Lba + 2),a
-	ld	a,(ix + 11)
-	ld	(scsiWrite10Lba + 1),a
-	ld	a,(ix + 12)
-	ld	(scsiWrite10Lba + 0),a
-	ld	de,(ix + 6)
-	call	scsiRequestWrite
-	ld	sp,ix
-	pop	ix
-	ret
-
-;-------------------------------------------------------------------------------
-msd_SetJmpBuf:
-	pop	de
-	ex	(sp),hl		; hl -> buffer
-	push	de
-	ld	(fat.setjmpbuf),hl
-	ret
-
-;-------------------------------------------------------------------------------
-msd_Deinit:
-	push	ix
-	push	iy
-	call	usbCleanup
-	pop	iy
-	pop	ix
-	ret
-
-;-------------------------------------------------------------------------------
-msd.detached:
-	call	usbCleanup		; restore setjmp buffer to return to
-	ld	hl,1			; MSD_EVENT_DETACHED
-	jr	msd.event
-msd.xfererror:
-	call	usbCleanup		; restore setjmp buffer to return to
-	ld	hl,2			; MSD_EVENT_XFER_ERROR
-msd.event:
-	push	hl
-	ld	hl,(fat.setjmpbuf)
-	push	hl
-	call	__longjmp
-
-;-------------------------------------------------------------------------------
-;_alloc_cluster:
-	ld iy,0
-	add iy,sp
-	ld bc,(iy+3)
-	ld a,(iy+6)
-	ld d,(iy+9)
-	ld hl,(iy+12)
-	ld e,(iy+15)
-; euhl = old_cluster
-; d = entry_index
-; aubc = entry_sector
-	push af,bc,de,hl
-	ld bc,(fatstate.fat_size)
-	ld hl,(fatstate.fat_pos)
-	ld a,(fatstate.fat_pos+3)
-	ld e,a
-.next:
-	push bc,de,hl
-	ld e,a
-	call fat.readsector
-	ld hl,(fat.sectorbuffer)
-	ld b,0
-.search:
-	ld a,(hl)
-	inc hl
-	or a,(hl)
-.notFound:
-	inc hl
-	jq z,.maybeFound
-	djnz .search
-	pop hl,de,bc
-	cpi
-	jp po,out_of_space
-	add hl,de
-	or a,a
-	sbc hl,de
-	jq nz,.next
-	inc e
-	jq .next
-.maybeFound:
-	ld a,(fatstate.type)
-	or a,a
-	jq z,.found
-	bit 0,b
-	jq nz,.search
-	ld a,(hl)
-	inc hl
-	or a,(hl)
-	jq nz,.notFound
-	ld (hl),$F
-	dec hl
-	ld (hl),$FF
-.found:
-	dec hl
-	ld (hl),$FF
-	dec hl
-	ld (hl),$FF
-	pop hl,de
-	push bc
-	call fat.writesector
-	pop bc,de
-	ld hl,(fatstate.fat_size)
-	xor a,a
-	sbc hl,de
-	jq z,.haveOldCluster
-	sub a,b
-	jq nz,.getCluster
-	inc b
-	db $0E ; ld c,
-.haveOldCluster:
-	sub a,b
-.getCluster:
-	ex de,hl
-	pop bc
-	push bc
-	inc sp
-	pop hl
-	dec sp
-	ld b,a ; udeb = cluster
-	jq z,.noOldCluster
-	push de,bc
-	ld a,(fatstate.type)
-	or a,a
-	ld a,c ; uhla = old_cluster
-	jq z,.fat16
-	add a,a
-	adc hl,hl
-.fat16:
-	ex de,hl
-	sbc hl,hl
-	ld l,a
-	add hl,hl
-	ld bc,(fat.sectorbuffer)
-	add hl,bc
-	push hl
-	ld hl,(fatstate.fat_pos)
-	add hl,de
-	ld a,(fatstate.fat_pos+3)
-	ld e,a
-	push de,hl
-	call fat.readsector
-	pop hl,de,iy,bc
-	ld (iy),b
-	pop bc
-	ld (iy+1),c
-	ld a,(fatstate.type)
-	or a,a
-	jq z,.fat16.2
-	ld (iy+1),bc
-.fat16.2:
-	push de,hl
-	call fat.writesector
-	pop de
-	ld hl,(fatstate.fat_size)
-	add hl,de
-	pop de
-	jq nc,.noCarry
-	inc e
-.noCarry:
-	call fat.writesector
-	pop hl,hl,hl
-	ld hl,(iy)
-	ld e,(iy+3)
-	ret
-.noOldCluster:
-	pop af,hl,de
-	ld e,d
-	push hl,de
-	ld bc,(iy+2)
-	push bc
-	ld bc,(iy)
-	push bc
-	push af
-	call fat.readsector
-	pop af
-	or a,a
-	sbc hl,hl
-	ld l,a
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	add hl,hl
-	ld a,l
-	add a,20
-	ld l,a
-	ld de,(fat.sectorbuffer)
-	add hl,de
-	pop bc
-	ld (hl),c
-	inc hl
-	ld (hl),b
-	ld de,5
-	add hl,de
-	pop de
-	ld (hl),e
-	inc hl
-	ld (hl),d
-	ex de,hl
-	pop de
-	ex (sp),hl
-	push bc
-	call fat.writesector
-	pop de,hl
-	ld e,d
-	ret
-
-out_of_space:
-	jp	0
-
-;-------------------------------------------------------------------------------
-_cluster_to_sector:
+fat.cluster2sector:
 	pop	de
 	pop	hl
 	dec	sp
@@ -800,7 +534,7 @@ enter:
 	ret
 
 ;-------------------------------------------------------------------------------
-_fname_to_fatname:
+fat.fname2fatname:
 	ld	iy,0
 	add	iy,sp
 	ld	de,(iy + 3)		; de = name
@@ -876,7 +610,8 @@ _fname_to_fatname:
 	inc	b
 	jr	.spacefillloop
 
-_next_cluster:
+;-------------------------------------------------------------------------------
+fat.nextcluster:
 	ld	hl,3
 	add	hl,sp
 	ld	a,(_fat_state + 24)
@@ -935,7 +670,7 @@ _next_cluster:
 	ret
 
 ;-------------------------------------------------------------------------------
-_end_of_chain_mark:
+fat.endofchainmark:
 	pop	de
 	pop	hl
 	pop	bc

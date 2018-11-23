@@ -3,6 +3,101 @@ xferDataPtrDefault := usbbuf
 xferDataPtrSense := usbbuf + 512
 
 ;-------------------------------------------------------------------------------
+msd_Init:
+	push	ix
+	push	iy
+	call	msdInit				; attempt to initialize mass storage device
+	jr	nc,.fail
+	xor	a,a
+.ret:
+	pop	iy
+	pop	ix
+	ret
+.fail:
+	call	usbCleanup
+	xor	a,a
+	inc	a
+	jr	.ret
+
+;-------------------------------------------------------------------------------
+msd_Find:
+	ret
+
+;-------------------------------------------------------------------------------
+msd_Select:
+	ret
+
+;-------------------------------------------------------------------------------
+msd_KeepAlive:
+	ld	hl,scsiTestUnitReady
+	jp	scsiDefaultRequest
+
+;-------------------------------------------------------------------------------
+msd_ReadSector:
+	call	__frameset0
+	ld	a,(ix + 9)
+	ld	(scsiRead10Lba + 3),a
+	ld	a,(ix + 10)
+	ld	(scsiRead10Lba + 2),a
+	ld	a,(ix + 11)
+	ld	(scsiRead10Lba + 1),a
+	ld	a,(ix + 12)
+	ld	(scsiRead10Lba + 0),a
+	ld	de,(ix + 6)
+	call	scsiRequestRead
+	ld	sp,ix
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+msd_WriteSector:
+	call	__frameset0
+	ld	a,(ix + 9)
+	ld	(scsiWrite10Lba + 3),a
+	ld	a,(ix + 10)
+	ld	(scsiWrite10Lba + 2),a
+	ld	a,(ix + 11)
+	ld	(scsiWrite10Lba + 1),a
+	ld	a,(ix + 12)
+	ld	(scsiWrite10Lba + 0),a
+	ld	de,(ix + 6)
+	call	scsiRequestWrite
+	ld	sp,ix
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+msd_SetJmpBuf:
+	pop	de
+	ex	(sp),hl		; hl -> buffer
+	push	de
+	ld	(fat.setjmpbuf),hl
+	ret
+
+;-------------------------------------------------------------------------------
+msd_Deinit:
+	push	ix
+	push	iy
+	call	usbCleanup
+	pop	iy
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+msd.detached:
+	call	usbCleanup		; restore setjmp buffer to return to
+	ld	hl,1			; MSD_EVENT_DETACHED
+	jr	msd.event
+msd.xfererror:
+	call	usbCleanup		; restore setjmp buffer to return to
+	ld	hl,2			; MSD_EVENT_XFER_ERROR
+msd.event:
+	push	hl
+	ld	hl,(fat.setjmpbuf)
+	push	hl
+	call	__longjmp
+
+;-------------------------------------------------------------------------------
 usbConfigureFirstDevice:
 	call    usbInit				; init usb
 	call    devFirst
