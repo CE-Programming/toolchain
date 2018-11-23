@@ -98,12 +98,6 @@ _fat_fd:
 _fat_key:
 	db	0
 
-MAX_OPEN_FD := 3
-FD_SIZE := 23
-FAT_DIR := 16
-FAT_O_WRONLY := 2
-FAT_O_RDONLY := 1
-
 ;-------------------------------------------------------------------------------
 fat_ReadSector:
 	jp	_fat_read_sect
@@ -114,9 +108,9 @@ fat_WriteSector:
 
 ;-------------------------------------------------------------------------------
 fat_Init:
-	ld	b, MAX_OPEN_FD			; for i < max_fd
-	ld	de, FD_SIZE
+	ld	b, 3				; for i < max_fd_open
 	ld	hl, _fat_fd
+	ld	de, 23
 .setkeys:
 	ld	(hl), -1			; fat_fd[i].key = -1
 	add	hl, de
@@ -334,97 +328,7 @@ fat_Select:
 
 ;-------------------------------------------------------------------------------
 fat_Open:
-	ld	b, MAX_OPEN_FD			; for i < max_fd_open
-	ld	de, FD_SIZE
-	ld	hl, _fat_fd
-.findavailfd:
-	ld	a, (hl)				; if (desc->key < 0)
-	or	a, a
-	jp	m, .openfd
-	add	hl, de
-	djnz	.findavailfd
-	ld	a, -1
-	ret
-.openfd:
-	ld	(.desc), hl
-	call	fat.locaterecord
-	jr	nz, .foundfd
-	ld	a, -2
-	ret
-.err:
-	ld	a, -3
-	ret
-.foundfd:
-	ld	(.location), hl
-	ld	bc, 11
-	add	hl, bc
-	ld	a, (hl)
-	and	a, FAT_DIR
-	jr	nz, .err			; can't open a directory
-	ld	a, (iy + 9)
-	and	a, FAT_O_WRONLY
-	ld	a, 0
-	jr	z, .nowrite
-	inc	a
-.nowrite:
-	ld	iy, 0
-.desc := $ - 3
-	ld	(iy + 22), a			; desc->write = flags & FAT_O_WRONLY ? true : false
-	ld	hl, 0
-.location := $ - 3
-	ld	bc, 28
-	add	hl,bc
-	ld	bc, (hl)
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	a, (hl)
-	ld	(iy + 18), bc
-	ld	(iy + 21), a			; desc->file_size = get32(sectorbuffer + (index * 32 + 28))
-	ld	hl, (fat.record.sector.low)
-	ld	a, (fat.record.sector.high)
-	ld	(iy + 1),hl
-	ld	(iy + 4),a			; desc->entry_sector = sector
-	ld	hl, (fat.record.index)
-	ld	a, l
-	ld	(iy + 5), a			; desc->entry_index = index
-	call	fat.getentrycluster.asm		; desc->first_cluster = get_entry_cluster(index);
-	ld	(iy + 6),hl
-	ld	(iy + 9),e
-	call	__lcmpzero
-	jr	nz, .hasfirstcluster
-	ld	a, (iy + 22)			; if (desc->write)
-	or	a, a
-	jq	z, .cantalloc
-	xor	a, a
-	sbc	hl, hl
-	ld	(iy + 18), hl
-	ld	(iy + 21), a			; desc->file_size = 0
-	push	iy, hl, hl
-	ld	l,(iy + 5)
-	push	hl
-	ld	de, (iy + 1)
-	ld	l, (iy + 4)
-	push	hl, de
-	call	_alloc_cluster
-	pop	bc, bc, bc, bc, bc, iy
-	ld	(iy + 6),hl
-	ld	(iy + 9),e			; desc->first_cluster = alloc_cluster(desc->entry_sector, desc->entry_index, 0)
-.cantalloc:
-.hasfirstcluster:
-	ld	hl, (iy + 6)
-	ld	a, (iy + 9)
-	ld	(iy + 10), hl
-	ld	(iy + 13), a			; desc->current_cluster = desc->first_cluster
-	xor	a, a
-	sbc	hl, hl
-	ld	(iy + 14), hl
-	ld	(iy + 17), a			; desc->fpos = 0
-	ld	hl, _fat_key
-	ld	a, (hl)
-	ld	(iy + 0), a
-	inc	(hl)				; desc->key = fat_key++
-	ret
+	jp	_fat_open
 
 ;-------------------------------------------------------------------------------
 fat_Close:
@@ -451,7 +355,7 @@ fat_SetFileSize:
 	ret	z
 	ld	bc, 28				; set32(sector_buff + (index * 32 + 28), size)
 	add	hl, bc
-	ld	bc, (iy + 6)			; iy + 3 from fat.locaterecord
+	ld	bc, (iy + 6)
 	ld	a, (iy + 9)
 	ld	(hl), bc
 	inc	hl
@@ -505,7 +409,7 @@ fat_SetAttrib:
 	ret	z
 	ld	bc, 11
 	add	hl, bc
-	ld	a, (iy + 6)			; iy + 3 from fat.locaterecord
+	ld	a, (iy + 6)
 	ld	(hl), a
 	jp	fat.record.write		; writesector(sector)
 
@@ -514,110 +418,13 @@ fat_DirList:
 	jp	_fat_dirlist
 
 ;-------------------------------------------------------------------------------
-fat.getentrycluster:
-; return (((GET16(sector_buff + ((e) * 32 + 20)) << 16) |
-;        (GET16(sector_buff + ((e) * 32 + 26)))) &
-;        (fat_state.type != FAT_TYPE_FAT32 ? 0xFFFF : ~0))
-	pop	de
-	ex	(sp), hl
-	push	de
-fat.getentrycluster.asm:
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	bc, (fat.sectorbuffer)
-	add	hl, bc
-	push	iy, hl
-	pop	iy
-	ld	de, (iy + 26)
-	ld	(.entclus + 0), de
-	ld	e, (iy + 20)
-	ld	a, (iy + 21)
-	pop	iy
-	ld	(.entclus + 2), a
-	ld	hl, 0
-.entclus := $ - 3
-	ld	a, (_fat_state + 24)
-	or	a, a
-	ret	nz
-.fat16:
-	ld	e, 0
-	ex.s	de, hl
-	ex	de, hl
-	ret
-
-;-------------------------------------------------------------------------------
-fat.sectortocluster:
-; return (sector - fat_state.data_region) / fat_state.cluster_size + 2
-; this isn't really a critical routine
-	ld	iy, 0
-	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	e, (iy + 6)
-	call	__lcmpzero
-	ret	z
-	ld	bc, (_fat_state + 20)
-	ld	a, (_fat_state + 23)
-	call	__lsub
-	ld	bc, 0
-	ld	a, (_fat_state + 1)
-	ld	c, a
-	xor	a, a
-	call	__ldivu
-	xor	a, a
-	ld	bc, 2
-	add	hl, bc
-	adc	a, e
-	ld	e, a
-	ret
-
-;-------------------------------------------------------------------------------
-fat.doallocentry:
-; uint32_t do_alloc_entry(uint32_t entry_sector, uint8_t entry_index, uint32_t prev_cluster)
-	ld	iy, 0
-	add	iy, sp
-	or	a, a
-	sbc	hl, hl
-	ld	l,(iy + 15)
-	push	hl
-	ld	hl,(iy + 12)
-	push	hl
-	ld	l,(iy + 9)
-	ld	h,0
-	push	hl
-	ld	l,(iy + 6)
-	push	hl
-	ld	hl,(iy + 3)
-	push	hl
-	call	_alloc_cluster
-	pop	bc, bc, bc, bc, bc
-	push	hl, de
-	ld	c, e
-	ld	b, 0
-	push	bc, hl
-	call	fat.clustertosector		; sector = cluster_to_sector(alloc_cluster(entry_sector, entry_index, prev_cluster))
-	pop	bc, bc
-	ld	iy, (fat.sectorbuffer)
-	ld	(iy +  0), $e5			; sector_buff[ 0] = 0xe5;
-	ld	(iy + 11), $00			; sector_buff[11] = 0x00;
-	ld	(iy + 32), $00			; sector_buff[32] = 0x00;
-	ld	(iy + 43), $00			; sector_buff[43] = 0x00;
-	pop	de, hl
-	push	hl, de
-	call	fat.writesector
-	pop	de, hl
-	ret
-
-;-------------------------------------------------------------------------------
 fat.locaterecord:
 	ld	iy, 3
 	add	iy, sp
 	push	iy
 	or	a, a
 	sbc	hl, hl
-	ld	de, fat.record.index
+	ld	de, .index
 	ld	bc, (iy + 3)
 	push	hl, de, bc
 	call	_locate_record
@@ -626,11 +433,11 @@ fat.locaterecord:
 	pop	iy
 	ret	z
 	ld	a, e
-	ld	(fat.record.sector.low), hl
-	ld	(fat.record.sector.high), a
+	ld	(fat.record.sector + 0), hl
+	ld	(fat.record.sector + 3), a
 	call	fat.readsector
 	ld	hl, 0
-fat.record.index := $ - 3
+.index := $ - 3
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
@@ -642,177 +449,11 @@ fat.record.index := $ - 3
 	inc	a
 	ret
 fat.record.write:
-	ld	hl, 0
-fat.record.sector.low := $ - 3
-	ld	a, 0
-fat.record.sector.high := $ - 1
+	ld	hl, (fat.record.sector + 0)
+	ld	a, (fat.record.sector + 3)
 	jp	fat.writesectora		; writesector(sector)
-
-;-------------------------------------------------------------------------------
-fat.nextcluster:
-	ld	hl, 3
-	add	hl, sp
-	ld	a, (_fat_state + 24)
-	or	a, a
-	ld	a, (hl)
-	inc	hl
-	ld	hl, (hl)
-	jr	z, .fat16.1
-	add	a, a
-	adc	hl, hl
-.fat16.1:
-	ex	de, hl
-	sbc	hl, hl
-	ld	l, a
-	add	hl, hl
-	push	hl
-	ld	hl, (_fat_state + 12)
-	add	hl, de
-	ld	a, (_fat_state + 12 + 3)
-	ld	e, a
-	call	fat.readsector
-	pop	de
-	ld	hl, (fat.sectorbuffer)
-	add	hl, de
-	ld	a, (_fat_state + 24)
-	or	a, a
-	jr	z, .fat16.2
-	ld	de, (hl)
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	a, (hl)
-	and	a, $0f
-	ld	hl, 8
-	add	hl, de
-	ex	de, hl
-	ld	e, a
-	adc	a, $f0
-	ret	nc
-	ld	e, a
-	ex	de, hl
-	ld	e, a
-	ret
-
-.fat16.2:
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	ld	hl, $ff0008
-	add	hl, de
-	ex	de, hl
-	ld	e, a
-	ret	nc
-	ex	de, hl
-	ld	e, a
-	ret
-
-;-------------------------------------------------------------------------------
-fat.getsectorpos:
-; input:
-;  euhl = cluster
-; output:
-;  bc = index
-;  euhl = sector
-	ld	a, (_fat_state + 24)
-	or	a, a
-	push	de
-	push	hl
-	ld	a, l
-	inc	sp
-	pop	hl
-	inc	sp
-	inc	sp
-	jr	z, .fattype
-	add	a, a
-	adc	hl, hl
-.fattype:
-	ex	de, hl
-	sbc	hl, hl
-	ld	l, a
-	add	hl, hl
-	push	hl
-	ld	a, (_fat_state + 12 + 3)
-	ld	hl, (_fat_state + 12)
-	add	hl, de
-	ld	e, a
-	pop	bc
-	ret
-
-;-------------------------------------------------------------------------------
-;fat.dealloc:
-	ld	iy, 0
-	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	c, (iy + 6)
-.loop:						; for (;;)
-	call	fat.endofchainmark.asm		; cuhl input
-	ret	nz
-	ld	e, c
-	call	__lcmpzero			; if (end_of_chain_mark(fat_entry) || !fat_entry) return
-	ret	z
-	call	fat.getsectorpos		; sector = (fat_entry >> shift) + fat_state.fat_pos
-	push	de, hl, bc
-	call	fat.readsector
-	pop	bc, hl, de			; index = (fat_entry << 1) & 0x1FF
-.validsector:
-	push	de, hl
-	ld	hl, (fat.sectorbuffer)
-	add	hl, bc
-	ld	a, (_fat_state + 24)
-	or	a, a
-	jr	z, .notfat32
-	ld	bc, 0
-	ld	de, (hl)
-	ld	(hl), bc
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	a, (hl)
-	ld	(hl), c
-	jr	.getentry
-.notfat32:					; fat_entry = get16/32(sector_buff + index)
-	ld	de, 0
-	ld	e, (hl)
-	ld	(hl), a
-	inc	hl
-	ld	d, (hl)
-	ld	(hl), a				; set16/32(sector_buff + index, 0);
-.getentry:
-	ex	de, hl				; auhl = fat_entry
-	ld	(fat.dealloc.entry.low), hl
-	ld	(fat.dealloc.entry.high), a
-	ld	c, a
-	call	fat.endofchainmark.asm		; cuhl = fat_entry
-	pop	hl, de				; euhl = sector
-	jr	nz, .write
-	push	de, hl
-	ld	e, c
-	call	fat.getsectorpos
-	ld	(.index), bc
-	ld	a, e
-	push	hl
-	pop	bc				; aubc = compare sector
-	pop	hl
-	pop	de				; euhl = sector
-	call	__lcmpu
-	ld	bc, 0
-.index := $ - 3					; bc = index
-	jr	z, .validsector
-.write:
-	push	de, hl
-	call	fat.writesector
-	pop	hl, de
-	xor	a, a
-	ld	bc, (_fat_state + 8)
-	call	__ladd
-	call	fat.writesector
-.nextiter:
-	ld	hl, 0
-fat.dealloc.entry.low := $ - 3
-	ld	c, 0
-fat.dealloc.entry.high := $ - 1			; cuhl = fat_entry
-	jp	.loop
+fat.record.sector:
+	db	0,0,0,0
 
 ;-------------------------------------------------------------------------------
 msd_Init:
@@ -846,23 +487,37 @@ msd_KeepAlive:
 
 ;-------------------------------------------------------------------------------
 msd_ReadSector:
-	ld	iy, 0
-	add	iy, sp
-	ld	de, scsiRead10Lba + 3
-	lea	hl, iy + 6
-	call	util.revcopy
-	ld	de, (iy + 3)
-	jp	scsiRequestRead
+	call	__frameset0
+	ld	a, (ix + 9)
+	ld	(scsiRead10Lba + 3), a
+	ld	a, (ix + 10)
+	ld	(scsiRead10Lba + 2), a
+	ld	a, (ix + 11)
+	ld	(scsiRead10Lba + 1), a
+	ld	a, (ix + 12)
+	ld	(scsiRead10Lba + 0), a
+	ld	de, (ix + 6)
+	call	scsiRequestRead
+	ld	sp, ix
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 msd_WriteSector:
-	ld	iy, 0
-	add	iy, sp
-	ld	de, scsiWrite10Lba + 3
-	lea	hl, iy + 6
-	call	util.revcopy
-	ld	de, (iy + 3)
-	jp	scsiRequestWrite
+	call	__frameset0
+	ld	a, (ix + 9)
+	ld	(scsiWrite10Lba + 3), a
+	ld	a, (ix + 10)
+	ld	(scsiWrite10Lba + 2), a
+	ld	a, (ix + 11)
+	ld	(scsiWrite10Lba + 1), a
+	ld	a, (ix + 12)
+	ld	(scsiWrite10Lba + 0), a
+	ld	de, (ix + 6)
+	call	scsiRequestWrite
+	ld	sp, ix
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 msd_SetJmpBuf:
@@ -1067,7 +722,7 @@ out_of_space:
 	jp	0
 
 ;-------------------------------------------------------------------------------
-fat.clustertosector:
+_cluster_to_sector:
 	pop	de
 	pop	hl
 	dec	sp
@@ -1099,7 +754,7 @@ enter:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat.fnametofatname:
+_fname_to_fatname:
 	ld	iy, 0
 	add	iy, sp
 	ld	de, (iy + 3)		; de = name
@@ -1175,32 +830,84 @@ fat.fnametofatname:
 	inc	b
 	jr	.spacefillloop
 
+_next_cluster:
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (_fat_state + 24)
+	or	a, a
+	ld	a, (hl)
+	inc	hl
+	ld	hl, (hl)
+	jr	z, .fat16.1
+	add	a, a
+	adc	hl, hl
+.fat16.1:
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, a
+	add	hl, hl
+	push	hl
+	ld	hl, (_fat_state + 12)
+	add	hl, de
+	ld	a, (_fat_state + 12 + 3)
+	ld	e, a
+	call	fat.readsector
+	pop	de
+	ld	hl, (fat.sectorbuffer)
+	add	hl, de
+	ld	a, (_fat_state + 24)
+	or	a, a
+	jr	z, .fat16.2
+	ld	de, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a, (hl)
+	and	a, $0f
+	ld	hl, 8
+	add	hl, de
+	ex	de, hl
+	ld	e, a
+	adc	a, $f0
+	ret	nc
+	ld	e, a
+	ex	de, hl
+	ld	e, a
+	ret
+
+.fat16.2:
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	ld	hl, $ff0008
+	add	hl, de
+	ex	de, hl
+	ld	e, a
+	ret	nc
+	ex	de, hl
+	ld	e, a
+	ret
+
 ;-------------------------------------------------------------------------------
-fat.endofchainmark:
+_end_of_chain_mark:
 	pop	de
 	pop	hl
 	pop	bc
 	push	bc
 	push	hl
 	push	de
-
-;-------------------------------------------------------------------------------
-fat.endofchainmark.asm:
-	push	hl
 	ld	de, 8
 	ld	a, (_fat_state + 24)
 	or	a, a
 	jr	nz, .fat32
 	add.s	hl, de
 	sbc	a, a
-	pop	hl
 	ret
 .fat32:
 	add	hl, de
 	ld	a, c
 	adc	a, $f0
 	sbc	a, a
-	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1461,5 +1168,5 @@ fat.checksectormagic:
 	ret
 
 include 'fat.zds'
-include 'debug.inc'
+
 
