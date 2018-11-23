@@ -534,6 +534,38 @@ enter:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat.doallocentry:
+	ld	iy,0
+	add	iy,sp
+	xor	a,a
+	ld	l,(iy + 15)
+	ld	h,a
+	push	hl
+	ld	hl,(iy + 12)
+	push	hl
+	ld	l,(iy + 9)
+	ld	h,a
+	push	hl
+	ld	l,(iy + 6)
+	push	hl
+	ld	hl,(iy + 3)
+	push	hl
+	call	_alloc_cluster
+	pop	bc, bc, bc, bc, bc
+	push	de, hl
+	call	fat.cluster2sector	; sector = cluster_to_sector(alloc_cluster(entry_sector, entry_index, prev_cluster))
+	pop	bc, bc
+	ld	iy,(fat.sectorbuffer)
+	ld	(iy +  0), $e5
+	ld	(iy + 11), $00
+	ld	(iy + 32), $00
+	ld	(iy + 43), $00
+	push	hl, de
+	call	fat.writesectora	; write_sector(sector, sector_buff)
+	pop	de, hl			; return sector
+	ret
+
+;-------------------------------------------------------------------------------
 fat.fname2fatname:
 	ld	iy,0
 	add	iy,sp
