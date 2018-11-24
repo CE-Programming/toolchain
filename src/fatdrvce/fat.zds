@@ -1,5 +1,5 @@
 ;  235	static void dealloc_fat(uint32_t fat_entry) {
-_dealloc_fat:
+fat.dealloc:
 	LD	HL,-17
 	CALL	__frameset
 ;  236		uint32_t sector, index;
@@ -2605,7 +2605,7 @@ L_250:
 	PUSH	BC
 	LD	BC,(IX+-21)
 	PUSH	BC
-	CALL	_dealloc_fat
+	CALL	fat.dealloc
 	POP	BC
 	POP	BC
 ;  702			return true;
@@ -2646,7 +2646,7 @@ L_252:
 	PUSH	BC
 	LD	BC,(IX+-21)
 	PUSH	BC
-	CALL	_dealloc_fat
+	CALL	fat.dealloc
 	POP	BC
 	POP	BC
 ;  709			return true;
@@ -3151,27 +3151,27 @@ L_287:
 	POP	IX
 	RET	
 
-;  815	int fat_dirlist(const char *path, struct FATDirList *list, int size, int skip) {
+;  821	int fat_dirlist(const char *path, fat_entry_t *list, int size, int skip) {
 _fat_dirlist:
 	LD	HL,-64
 	CALL	__frameset
-;  816		uint32_t sector, cluster, found;
-;  817		unsigned int index, i, j, k, l;
-;  818		bool root = false;
+;  822		uint32_t sector, cluster, found;
+;  823		unsigned int index, i, j, k, l;
+;  824		bool root = false;
 	LD	(IX+-31),0
-;  819	
-;  820		if (!path);
+;  825	
+;  826		if (!path);
 	LD	HL,(IX+6)
 	CALL	__icmpzero
-	JQ	NZ,L_298
-;  821		else {
-	JQ	L_312
-;  822			while (*path == '/') path++;
-L_299:
+	JQ	NZ,L_326
+;  827		else {
+	JQ	L_340
+;  828			while (*path == '/') path++;
+L_327:
 	LD	BC,(IX+6)
 	INC	BC
 	LD	(IX+6),BC
-L_298:
+L_326:
 	LD	HL,(IX+6)
 	LD	A,(HL)
 	LD	B,A
@@ -3181,32 +3181,32 @@ L_298:
 	OR	A,A
 	LD	BC,47
 	SBC	HL,BC
-	JQ	Z,L_299
-;  823			if (!*path)
+	JQ	Z,L_327
+;  829			if (!*path)
 	LD	HL,(IX+6)
 	LD	A,(HL)
 	OR	A,A
-	JQ	NZ,L_312
-;  824				path = 0;
+	JQ	NZ,L_340
+;  830				path = 0;
 	LD	BC,0
 	LD	(IX+6),BC
-;  825		}
-L_312:
-;  826		if (!path) {
+;  831		}
+L_340:
+;  832		if (!path) {
 	LD	HL,(IX+6)
 	CALL	__icmpzero
-	JQ	NZ,L_311
-;  827			sector = fat_state.root_dir_pos;
+	JQ	NZ,L_339
+;  833			sector = fat_state.root_dir_pos;
 	LD	BC,(_fat_state+16)
 	LD	A,(_fat_state+19)
 	LD	(IX+-11),BC
 	LD	(IX+-8),A
-;  828			root = true;
+;  834			root = true;
 	LD	(IX+-31),1
-;  829		} else {
-	JQ	L_313
-L_311:
-;  830			if (!(sector = locate_record(path, &index, NULL)))
+;  835		} else {
+	JQ	L_341
+L_339:
+;  836			if (!(sector = locate_record(path, &index, NULL)))
 	LD	BC,0
 	PUSH	BC
 	PEA	IX+-52
@@ -3221,12 +3221,12 @@ L_311:
 	LD	HL,(IX+-11)
 	LD	E,(IX+-8)
 	CALL	__lcmpzero
-	JQ	NZ,L_305
-;  831				return -1;
+	JR	NZ,L_333
+;  837				return -1;
 	LD	HL,16777215
-	JQ	L_360
-L_305:
-;  832			read_sector(sector, sector_buff);
+	JP	L_388
+L_333:
+;  838			read_sector(sector, sector_buff);
 	LD	C,(IX+-8)
 	LD	B,0
 	PUSH	BC
@@ -3238,7 +3238,7 @@ L_305:
 	POP	BC
 	POP	BC
 	POP	BC
-;  833			if (!(sector_buff[index * 32 + 11] & 0x10))
+;  839			if (!(sector_buff[index * 32 + 11] & 0x10))
 	LD	HL,(IX+-52)
 	ADD	HL,HL
 	ADD	HL,HL
@@ -3252,30 +3252,30 @@ L_305:
 	ADD	HL,BC
 	LD	A,(HL)
 	AND	A,16
-	JQ	NZ,L_307
-;  834				return -1;
+	JR	NZ,L_335
+;  840				return -1;
 	LD	HL,16777215
-	JQ	L_360
-L_307:
-;  835			cluster = GET_ENTRY_CLUSTER(index);
+	JQ	L_388
+L_335:
+;  841			cluster = GET_ENTRY_CLUSTER(index);
 	LD	BC,(IX+-52)
 	PUSH	BC
 	CALL	fat.getentrycluster
 	POP	BC
 	LD	(IX+-15),HL
 	LD	(IX+-12),E
-;  836			if (fat_state.type != FAT_TYPE_FAT32)
+;  842			if (fat_state.type != FAT_TYPE_FAT32)
 	LD	A,(_fat_state+24)
 	CP	A,1
-	JQ	Z,L_309
-;  837				cluster &= 0xFFFF;
+	JR	Z,L_337
+;  843				cluster &= 0xFFFF;
 	LD	BC,(IX+-15)
 	CALL	__stoiu
 	LD	(IX+-15),HL
 	XOR	A,A
 	LD	(IX+-12),A
-L_309:
-;  838			sector = cluster_to_sector(cluster);
+L_337:
+;  844			sector = cluster_to_sector(cluster);
 	LD	C,(IX+-12)
 	LD	B,0
 	PUSH	BC
@@ -3286,17 +3286,17 @@ L_309:
 	POP	BC
 	LD	(IX+-11),HL
 	LD	(IX+-8),E
-;  839		}
-L_313:
-;  840	
-;  841		found = 0;
+;  845		}
+L_341:
+;  846	
+;  847		found = 0;
 	LD	BC,0
 	LD	(IX+-7),BC
 	XOR	A,A
 	LD	(IX+-4),A
-;  842		for (;;) {
-L_358:
-;  843			cluster = sector_to_cluster(sector);
+;  848		for (;;) {
+L_386:
+;  849			cluster = sector_to_cluster(sector);
 	LD	C,(IX+-8)
 	LD	B,0
 	PUSH	BC
@@ -3307,12 +3307,12 @@ L_358:
 	POP	BC
 	LD	(IX+-15),HL
 	LD	(IX+-12),E
-;  844			for (i = 0; i < fat_state.cluster_size; i++) {
+;  850			for (i = 0; i < fat_state.cluster_size; i++) {
 	LD	BC,0
 	LD	(IX+-21),BC
-	JQ	L_351
-L_349:
-;  845				read_sector(sector + i, sector_buff);
+	JQ	L_379
+L_377:
+;  851				read_sector(sector + i, sector_buff);
 	LD	BC,(IX+-21)
 	XOR	A,A
 	LD	HL,(IX+-11)
@@ -3328,23 +3328,23 @@ L_349:
 	POP	BC
 	POP	BC
 	POP	BC
-;  846				for (j = 0; j < 16; j++) {
+;  852				for (j = 0; j < 16; j++) {
 	LD	BC,0
 	LD	(IX+-24),BC
-	JQ	L_348
-L_346:
-;  847					if (found >= (uint32_t) size)
+	JP	L_376
+L_374:
+;  853					if (found >= (uint32_t) size)
 	LD	BC,(IX+12)
 	CALL	__itol
 	LD	HL,(IX+-7)
 	LD	E,(IX+-4)
 	CALL	__lcmpu
-	JQ	C,L_318
-;  848						return found;
+	JR	C,L_346
+;  854						return found;
 	LD	HL,(IX+-7)
-	JQ	L_360
-L_318:
-;  849					if (sector_buff[j * 32 + 11] == 0xF)
+	JQ	L_388
+L_346:
+;  855					if (sector_buff[j * 32 + 11] == 0xF)
 	LD	HL,(IX+-24)
 	ADD	HL,HL
 	ADD	HL,HL
@@ -3363,9 +3363,9 @@ L_318:
 	OR	A,A
 	LD	BC,15
 	SBC	HL,BC
-	JQ	Z,L_347
-;  850						continue;
-;  851					if (sector_buff[j * 32] == 0xE5)
+	JP	Z,L_375
+;  856						continue;
+;  857					if (sector_buff[j * 32] == 0xE5)
 	LD	BC,(IX+-30)
 	LD	(IX+-46),BC
 	LD	BC,(IX+-30)
@@ -3381,36 +3381,36 @@ L_318:
 	OR	A,A
 	LD	BC,229
 	SBC	HL,BC
-	JQ	Z,L_347
-;  852						continue;
-;  853					if (!sector_buff[j * 32])
+	JP	Z,L_375
+;  858						continue;
+;  859					if (!sector_buff[j * 32])
 	LD	HL,(IX+-49)
 	LD	A,(HL)
 	OR	A,A
-	JQ	NZ,L_325
-;  854						return found;
+	JR	NZ,L_353
+;  860						return found;
 	LD	HL,(IX+-7)
-	JQ	L_360
-L_325:
-;  855					if (skip) {
+	JQ	L_388
+L_353:
+;  861					if (skip) {
 	LD	HL,(IX+15)
 	CALL	__icmpzero
-	JQ	Z,L_332
-;  856						skip--;
+	JR	Z,L_360
+;  862						skip--;
 	LD	BC,(IX+15)
 	DEC	BC
 	LD	(IX+15),BC
-;  857						continue;
-	JQ	L_347
-;  858					}
-L_332:
-;  859	
-;  860					for (k = 0; k < 8; k++) {
+;  863						continue;
+	JP	L_375
+;  864					}
+L_360:
+;  865	
+;  866					for (k = 0; k < 8; k++) {
 	LD	BC,0
 	LD	(IX+-3),BC
-	JQ	L_331
-L_329:
-;  861						if (sector_buff[j * 32 + k] == ' ')
+	JQ	L_359
+L_357:
+;  867						if (sector_buff[j * 32 + k] == ' ')
 	LD	BC,(IX+-46)
 	LD	(IX+-27),BC
 	LD	(IX+-40),BC
@@ -3426,9 +3426,9 @@ L_329:
 	OR	A,A
 	LD	BC,32
 	SBC	HL,BC
-	JQ	Z,L_335
-;  862							break;
-;  863						list[found].filename[k] = sector_buff[j * 32 + k];
+	JQ	Z,L_363
+;  868							break;
+;  869						list[found].filename[k] = sector_buff[j * 32 + k];
 	LD	BC,(IX+-27)
 	LD	(IX+-46),BC
 	LD	BC,(IX+-27)
@@ -3460,16 +3460,16 @@ L_329:
 	LD	BC,(IX+-3)
 	INC	BC
 	LD	(IX+-3),BC
-;  864					}
-L_331:
+;  870					}
+L_359:
 	LD	BC,8
 	LD	HL,(IX+-3)
 	OR	A,A
 	SBC	HL,BC
-	JQ	C,L_329
-L_335:
-;  865	
-;  866					if (sector_buff[j * 32 + 8] != ' ') {
+	JQ	C,L_357
+L_363:
+;  871	
+;  872					if (sector_buff[j * 32 + 8] != ' ') {
 	LD	BC,(IX+-40)
 	LD	(IX+-43),BC
 	LD	IY,(IX+-43)
@@ -3486,8 +3486,8 @@ L_335:
 	OR	A,A
 	LD	BC,32
 	SBC	HL,BC
-	JQ	Z,L_343
-;  867						list[found].filename[k] = '.';
+	JQ	Z,L_371
+;  873						list[found].filename[k] = '.';
 	LD	HL,(IX+-7)
 	LD	E,(IX+-4)
 	LD	BC,16
@@ -3501,19 +3501,19 @@ L_335:
 	LEA	HL,IY+0
 	ADD	HL,BC
 	LD	(HL),46
-;  868						k++;
+;  874						k++;
 	LD	BC,(IX+-3)
 	INC	BC
 	LD	(IX+-3),BC
-;  869					}
-L_343:
-;  870	
-;  871					for (l = 0; l < 3; k++, l++) {
+;  875					}
+L_371:
+;  876	
+;  877					for (l = 0; l < 3; k++, l++) {
 	LD	BC,0
 	LD	(IX+-18),BC
-	JQ	L_342
-L_340:
-;  872						if (sector_buff[j * 32 + 8 + l] == ' ')
+	JQ	L_370
+L_368:
+;  878						if (sector_buff[j * 32 + 8 + l] == ' ')
 	LD	BC,(IX+-34)
 	LD	(IX+-37),BC
 	LD	HL,(IX+-18)
@@ -3527,9 +3527,9 @@ L_340:
 	OR	A,A
 	LD	BC,32
 	SBC	HL,BC
-	JQ	Z,L_344
-;  873							break;
-;  874						list[found].filename[k] = sector_buff[j * 32 + 8 + l];
+	JQ	Z,L_372
+;  879							break;
+;  880						list[found].filename[k] = sector_buff[j * 32 + 8 + l];
 	LD	BC,(IX+-37)
 	LD	(IX+-34),BC
 	LD	BC,(IX+-37)
@@ -3562,16 +3562,16 @@ L_340:
 	LD	BC,(IX+-18)
 	INC	BC
 	LD	(IX+-18),BC
-;  875					}
-L_342:
+;  881					}
+L_370:
 	LD	BC,3
 	LD	HL,(IX+-18)
 	OR	A,A
 	SBC	HL,BC
-	JQ	C,L_340
-L_344:
-;  876	
-;  877					list[found].filename[k] = 0;
+	JQ	C,L_368
+L_372:
+;  882	
+;  883					list[found].filename[k] = 0;
 	LD	HL,(IX+-7)
 	LD	E,(IX+-4)
 	LD	BC,16
@@ -3585,8 +3585,8 @@ L_344:
 	LD	BC,(IX+-3)
 	ADD	HL,BC
 	LD	(HL),0
-;  878	
-;  879					list[found].attrib = sector_buff[j * 32 + 11];
+;  884	
+;  885					list[found].attrib = sector_buff[j * 32 + 11];
 	LD	IY,(IX+-43)
 	LEA	BC,IY+11
 	LD	HL,(fat.sectorbuffer)
@@ -3605,30 +3605,30 @@ L_344:
 	LD	HL,(IX+-64)	; unspill
 	LD	A,(HL)
 	LD	(IY+13),A
-;  880					found++;
+;  886					found++;
 	LD	HL,(IX+-7)
 	LD	E,(IX+-4)
 	LD	A,1
 	CALL	__ladd_b
 	LD	(IX+-7),HL
 	LD	(IX+-4),E
-;  881				}
-L_347:
+;  887				}
+L_375:
 	LD	BC,(IX+-24)
 	INC	BC
 	LD	(IX+-24),BC
-L_348:
+L_376:
 	LD	BC,16
 	LD	HL,(IX+-24)
 	OR	A,A
 	SBC	HL,BC
-	JQ	C,L_346
+	JQ	C,L_374
 	LD	BC,(IX+-21)
 	INC	BC
 	LD	(IX+-21),BC
-;  882	
-;  883			}
-L_351:
+;  888	
+;  889			}
+L_379:
 	LD	A,(_fat_state+1)
 	OR	A,A
 	SBC	HL,HL
@@ -3638,16 +3638,16 @@ L_351:
 	LD	HL,(IX+-21)
 	OR	A,A
 	SBC	HL,BC
-	JQ	C,L_349
-;  884	
-;  885			if (root && fat_state.type == FAT_TYPE_FAT16) {
+	JQ	C,L_377
+;  890	
+;  891			if (root && fat_state.type == FAT_TYPE_FAT16) {
 	LD	A,(IX+-31)
 	OR	A,A
-	JQ	Z,L_356
+	JQ	Z,L_384
 	LD	A,(_fat_state+24)
 	OR	A,A
-	JQ	NZ,L_356
-;  886				sector += fat_state.cluster_size;
+	JQ	NZ,L_384
+;  892				sector += fat_state.cluster_size;
 	OR	A,A
 	SBC	HL,HL
 	LD	A,(_fat_state+1)
@@ -3658,10 +3658,10 @@ L_351:
 	CALL	__ladd
 	LD	(IX+-11),HL
 	LD	(IX+-8),E
-;  887			} else {
-	JQ	L_358
-L_356:
-;  888				if (!(cluster = next_cluster(cluster)))
+;  893			} else {
+	JQ	L_386
+L_384:
+;  894				if (!(cluster = next_cluster(cluster)))
 	LD	C,(IX+-12)
 	LD	B,0
 	PUSH	BC
@@ -3675,12 +3675,12 @@ L_356:
 	LD	HL,(IX+-15)
 	LD	E,(IX+-12)
 	CALL	__lcmpzero
-	JQ	NZ,L_354
-;  889					return found;
+	JR	NZ,L_382
+;  895					return found;
 	LD	HL,(IX+-7)
-	JQ	L_360
-L_354:
-;  890				sector = cluster_to_sector(cluster);
+	JQ	L_388
+L_382:
+;  896				sector = cluster_to_sector(cluster);
 	LD	C,(IX+-12)
 	LD	B,0
 	PUSH	BC
@@ -3691,12 +3691,13 @@ L_354:
 	POP	BC
 	LD	(IX+-11),HL
 	LD	(IX+-8),E
-;  891			}
-;  892		}
-	JQ	L_358
-;  893	}
-L_360:
+;  897			}
+;  898		}
+	JQ	L_386
+;  899	}
+L_388:
 	LD	SP,IX
 	POP	IX
 	RET
+
 

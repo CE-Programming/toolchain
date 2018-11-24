@@ -11,6 +11,7 @@
 #include <fatdrvce.h>
 
 #define MAX_PARTITIONS 10
+#define MAX_ENTRIES 10
 
 static uint8_t sector[512];
 static jmp_buf msdenv;
@@ -41,12 +42,14 @@ void main(void) {
     while (!os_GetCSC());
 }
 
+static fat_entry_t fat_entrys[MAX_ENTRIES];
+
 void fatDemo(void) {
     int8_t fd;
-    uint8_t num;
+    uint8_t num, entries;
     msd_event_t evnt;
     unsigned int i;
-    fat_partition_t fat_partitions[MAX_PARTITIONS];
+    static fat_partition_t fat_partitions[MAX_PARTITIONS];
     char buf[128];
 
     putString("insert drive...");
@@ -161,6 +164,20 @@ void fatDemo(void) {
     putString(buf);
     sprintf(buf, "dir attrib: %u", (unsigned int)fat_GetAttrib(dirtest));
     putString(buf);
+
+    entries = fat_DirList(NULL, fat_entrys, MAX_ENTRIES, 0);
+
+        for (i = 0; i < 50; i++) {
+            sprintf(buf, "%02X", sector[i]);
+            os_PutStrFull(buf);
+        }
+
+    sprintf(buf, "list num: %u", entries);
+    putString(buf);
+    for (num = 0; num < entries; num++) {
+        sprintf(buf, "%c", fat_entrys[num].filename[0]);
+        putString(buf);
+    }
 
     fat_Deinit();
     msd_Deinit();

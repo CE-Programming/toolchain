@@ -200,7 +200,7 @@ void fat_SetAttrib(const char *path, uint8_t stat);
  * @param size Number of allocated \c fat_entry_t available.
  * @param skip Number of entries to skip adding to the list. Useful for memory
  * constraints.
- * @return An error returned by a callback or USB_SUCCESS.
+ * @return Number of entries found.
  */
 int fat_DirList(const char *path, fat_entry_t *list, int size, int skip);
 

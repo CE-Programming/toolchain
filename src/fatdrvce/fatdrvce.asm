@@ -362,7 +362,7 @@ fat_GetFileSize:
 
 ;-------------------------------------------------------------------------------
 fat_SetFileSize:
-	call	fat.locaterecord
+	call	fat.locate
 	ret	z
 	ld	bc,28				; set32(sector_buff + (index * 32 + 28), size)
 	add	hl,bc
@@ -404,7 +404,7 @@ fat_Create:
 
 ;-------------------------------------------------------------------------------
 fat_GetAttrib:
-	call	fat.locaterecord
+	call	fat.locate
 	jr	nz,.valid
 	ld	a,255
 	ret
@@ -416,7 +416,7 @@ fat_GetAttrib:
 
 ;-------------------------------------------------------------------------------
 fat_SetAttrib:
-	call	fat.locaterecord
+	call	fat.locate
 	ret	z
 	ld	bc,11
 	add	hl,bc
@@ -464,7 +464,7 @@ fat.getentrycluster.asm:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat.locaterecord:
+fat.locate:
 	ld	iy,3
 	add	iy,sp
 	push	iy
@@ -1006,5 +1006,5 @@ fat.checksectormagic:
 	ret
 
 include 'fat.zds'
-
+include 'debug.inc'
 
