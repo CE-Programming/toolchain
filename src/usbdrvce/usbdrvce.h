@@ -368,7 +368,7 @@ typedef struct usb_standard_descriptors {
   usb_string_descriptor_t *langids;
   /// Number of strings per langid.
   uint8_t numStrings;
-  /// Pointer to array of \c{(langids->bLength / 2 - 1) * numStrings} pointers
+  /// Pointer to array of \c{numStrings * (langids->bLength / 2 - 1)} pointers
   /// to string descriptors, each of which must be in RAM, starting with
   /// numStrings pointers for the first langid, then for the next langid, etc.
   usb_string_descriptor_t **strings;
