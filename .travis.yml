@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 sudo: required
 
 language: cpp
@@ -6,18 +6,12 @@ language: cpp
 addons:
   apt:
     packages:
-      - gcc-6
-      - g++-6
       - wine
-    sources:
-      - ubuntu-toolchain-r-test
 
 branches:
   only:
     - master
-
-install:
-  - export CXX="g++-6" CC="gcc-6"; $CXX --version
+    - devel
 
 script:
 # Build toolchain and libs
@@ -33,8 +27,8 @@ script:
   - make -C $CEDEV/examples
 # Build CEmu core and autotester_cli
   - git clone --recursive -b latest-stable --depth 1 https://github.com/CE-Programming/CEmu.git
-  - make -C CEmu/core -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
-  - make -C CEmu/tests/autotester -j4 CC=gcc-6 CXX=g++-6 LINK=g++-6
+  - make -C CEmu/core -j4
+  - make -C CEmu/tests/autotester -j4 
   - export PATH=$(pwd)/CEmu/tests/autotester:$PATH
 # Grab ROM for tests below
   - export ROM_FILE_NAME=84pce_515_53.rom
