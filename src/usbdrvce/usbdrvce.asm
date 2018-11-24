@@ -95,7 +95,17 @@ struc setup
 	.wLength	rw 1
 	assert $-. = 8
 end struc
-iterate type, endpoint, device, setup
+struc stdDesc
+	local size
+	label .: size
+	.device		rl 1
+	.configurations	rl 1
+	.langids	rl 1
+	.numStrings	rb 1
+	.strings	rl 1
+	size := $-.
+end struc
+iterate type, endpoint, device, setup, stdDesc
  iterate <base,name>, 0,, ix,x, iy,y
   virtual at base
 	name#type type
@@ -678,35 +688,109 @@ end iterate
 _HandleSetAddress:
 	ld	l,usbDevAddr-$100
 	ld	(hl),c
-	jq	_UnhandledCxSetup.handled
+	jq	_HandleCxSetupInt.handled
 
 _HandleGetDescriptor:
+	ld	de,(ysetup.wIndex)
 	ld	bc,(ysetup.wValue)
+	inc	bc
+	dec.s	bc
+	ld	iy,(standardDescriptors)
 	djnz	.notDevice;DEVICE_DESCRIPTOR
-	cp	a,c
-	jq	nz,_UnhandledCxSetup
-	ld	a,bmCxFifoClr
-	ld	(mpUsbCxFifo),a
-	ld	hl,(standardDescriptors)
-	ld	de,(hl)
-	ld	hl,(standardDescriptors)
-	ld	de,(hl)
-	ld	a,(de)
-	ld	bc,(ysetup.wLength)
-	inc	b
-	djnz	.got_length
-	cp	a,c
-	jq	c,.got_length
-	ld	a,c
-.got_length:
-	inc.s	bc
+	or	a,c
+	or	a,e
+	or	a,d
+	jq	nz,_HandleCxSetupInt.unhandled
+.sendSingleDescriptorIYind:
 	ld	b,a
-	ld	c,usbDmaMem2Fifo
-	ld	hl,mpUsbDmaFifo
+	ld	hl,(iy);(ystdDesc.device)
+.sendSingleDescriptorHL:
+	ld	c,(hl)
+	ex	de,hl
+	jq	.sendDescriptor
+.notDevice:
+	djnz	.notConfiguration;CONFIGURATION_DESCRIPTOR
+	or	a,e
+	or	a,d
+	jq	nz,_HandleCxSetupInt.unhandled
+	ld	hl,(ystdDesc.configurations)
+	ld	iy,(ystdDesc.device)
+	ld	a,c
+	cp	a,(iy+17)
+	jq	nc,_HandleCxSetupInt.unhandled
+repeat 3
+	add	hl,bc
+end repeat
+	ld	iy,(hl)
+	ld	bc,(iy+2)
+	ld	de,(hl)
+	jq	.sendDescriptor
+.notConfiguration:
+	djnz	.notString;STRING_DESCRIPTOR
+	ld	hl,(ystdDesc.langids)
+	cp	a,c
+	jq	z,.langids
+	ld	a,(ystdDesc.numStrings)
+	cp	a,c
+	jq	c,_HandleCxSetupInt.unhandled
+	ld	iy,(ystdDesc.strings)
+	ld	a,(hl)
+	rra
+	dec	a
+	ld	b,a
+	dec	c
+	mlt	bc
+repeat 3
+	add	iy,bc
+end repeat
+	ld	b,a
+	inc	hl
+.findLangId:
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	sub	a,e
+	jq	nz,.nextLangId
+	ld	a,(hl)
+	sub	a,d
+	jq	z,.sendSingleDescriptorIYind
+.nextLangId:
+	lea	iy,iy+3
+	djnz	.findLangId
+.langids:
+	or	a,e
+	or	a,d
+	jq	z,.sendSingleDescriptorHL
+.notString:
+	jq	_HandleCxSetupInt.unhandled
+
+;	ld	hl,(standardDescriptors)
+;	ld	iy,(hl+stdDesc.device)
+;	ld	a,(iy+7);bMaxPacketSize0
+.sendDescriptor:
+	ld	hl,mpUsbCxFifo
+	set	bCxFifoClr,(hl)
+	ld	l,usbDmaFifo-$100
 	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbDmaCtrl-$100
-	ld	(hl),bc
 	ld	l,usbDmaAddr-$100
+	ld	(hl),de
+	ld	l,usbDmaCtrl-$100
+	ld	a,(setupPacket.bmRequestType)
+	rlca
+	rlca
+	xor	a,(hl)
+	and	a,usbDmaMem2Fifo
+	xor	a,(hl)
+	ld	(hl),a
+	inc	l;usbDmaLen-$100
+	ex	de,hl
+	ld	hl,(setupPacket.wLength)
+	sbc.s	hl,bc
+	jq	c,.min
+	sbc	hl,hl
+.min:
+	add.s	hl,bc
+	ex	de,hl
 	ld	(hl),de
 	ld	l,usbDmaCtrl-$100
 	set	bUsbDmaStart,(hl)
@@ -714,18 +798,11 @@ _HandleGetDescriptor:
 .wait:
 	bit	bUsbIntDevDmaFin,(hl)
 	jq	z,.wait
+	ld	(hl),bmUsbIntDevDmaFin
 	xor	a,a
 	ld	l,usbDmaFifo-$100
 	ld	(hl),a
-	jq	_UnhandledCxSetup.handled
-.notDevice:
-	djnz	.notConfiguration;CONFIGURATION_DESCRIPTOR
-.notConfiguration:
-	djnz	.notString;STRING_DESCRIPTOR
-.notString:
-	dec	b
-	dec	b
-	jq	_UnhandledCxSetup
+	jq	_HandleCxSetupInt.handled
 
 _HandleCxSetupInt:
 	ld	iy,setupPacket-4
@@ -751,7 +828,7 @@ _HandleCxSetupInt:
 	ld	bc,(ysetup.bmRequestType)
 	inc	b
 	djnz	.notGetStatus
-	jq	_UnhandledCxSetup
+	jq	_HandleCxSetupInt.unhandled
 .notGetStatus:
 	djnz	.notClearFeature
 .notClearFeature:
@@ -773,8 +850,8 @@ _HandleCxSetupInt:
 	jq	z,_HandleSetAddress
 .notSetAddress:
 	djnz	.notGetDescriptor
-	ld	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
-	sub	a,c
+	ld	a,c
+	sub	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
 	jq	z,_HandleGetDescriptor
 .notGetDescriptor:
 	djnz	.notSetDescriptor
@@ -787,7 +864,7 @@ _HandleCxSetupInt:
 .notGetInterface:
 	djnz	.notSetInterface
 .notSetInterface:
-_UnhandledCxSetup:
+.unhandled:
 	lea	de,ysetup
 	ld	a,USB_DEFAULT_SETUP_EVENT
 	call	_DispatchEvent
@@ -812,7 +889,7 @@ _UnhandledCxSetup:
 _HandleDevInt:
 	ld	l,usbGisr-$100
 	inc	h
-iterate type, Cx, Fifo, Dev
+iterate type, Dev, Fifo, Cx
 	bit	bUsbDevInt#type,(hl)
 	call	nz,_HandleDev#type#Int
 	ret	nz
@@ -995,9 +1072,9 @@ _HandleDevResetInt:
 	ld	(selectedConfiguration),a
 	ld	(mpUsbDevAddr),a
 	ld	l,usbDmaCtrl-$100
-	ld	(hl),bmUsbDmaAbort
+	ld	(hl),bmUsbDmaClrFifo or bmUsbDmaAbort
 	ld	l,usbCxFifo-$100
-	ld	(hl),bmCxFifoClr
+	set	bCxFifoClr,(hl)
 	ld	l,usbDevIsr-$100
 	ld	(hl),bmUsbIntDevReset
 	ld	a,USB_DEVICE_RESET_INTERRUPT
