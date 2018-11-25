@@ -685,11 +685,6 @@ _Free#size#Align#align:
 
 end iterate
 
-_HandleSetAddress:
-	ld	l,usbDevAddr-$100
-	ld	(hl),c
-	jq	_HandleCxSetupInt.handled
-
 _HandleGetDescriptor:
 	ld	de,(ysetup.wIndex)
 	ld	bc,(ysetup.wValue)
@@ -812,23 +807,22 @@ _HandleCxSetupInt:
 	di
 	ld	(hl),bmUsbDmaCxFifo
 	ld	l,usbEp0Data-$100
-.loop:
+.fetch:
 	ld	a,(hl)
 	ld	(iy+4),a
 	ld	a,(hl)
 	ld	(iy+8),a
 	inc	hl
 	inc	iy
-	djnz	.loop
+	djnz	.fetch
 	ld	l,usbDmaFifo-$100
-	jp	po,.noei
+	jp	po,.noEI
 	ei
-.noei:
+.noEI:
 	ld	(hl),b;bmUsbDmaNoFifo
 	ld	bc,(ysetup.bmRequestType)
 	inc	b
 	djnz	.notGetStatus
-	jq	_HandleCxSetupInt.unhandled
 .notGetStatus:
 	djnz	.notClearFeature
 .notClearFeature:
@@ -837,17 +831,21 @@ _HandleCxSetupInt:
 .notSetFeature:
 	dec	b
 	djnz	.notSetAddress
-	ld	bc,(ysetup.wValue)
-	ld	a,c
+	ld	de,(ysetup.wValue)
+	ld	a,e
 	and	a,$80
+	or	a,d
+	or	a,c
+	ld	bc,(ysetup.wIndex)
+	or	a,c
 	or	a,b
-	ld	de,(ysetup.wIndex)
-	or	a,e
-	or	a,d
-	ld	de,(ysetup.wLength)
-	or	a,e
-	or	a,d
-	jq	z,_HandleSetAddress
+	ld	bc,(ysetup.wLength)
+	or	a,c
+	or	a,b
+	jq	nz,_HandleCxSetupInt.unhandled
+	ld	l,usbDevAddr-$100
+	ld	(hl),e
+	jq	_HandleCxSetupInt.handled
 .notSetAddress:
 	djnz	.notGetDescriptor
 	ld	a,c
@@ -859,13 +857,31 @@ _HandleCxSetupInt:
 	djnz	.notGetConfiguration
 .notGetConfiguration:
 	djnz	.notSetConfiguration
+	ld	de,(ysetup.wValue)
+	ld	a,d
+	or	a,c
+	ld	bc,(ysetup.wIndex)
+	or	a,c
+	or	a,b
+	ld	bc,(ysetup.wLength)
+	or	a,c
+	or	a,b
+	jq	nz,_HandleCxSetupInt.unhandled
+	cpl
+	add	a,e
+	ld	l,usbDevAddr-$100
+	ld	a,(hl)
+	rla
+	rrca
+	ld	(hl),a
+	jq	_HandleCxSetupInt.handled
 .notSetConfiguration:
 	djnz	.notGetInterface
 .notGetInterface:
 	djnz	.notSetInterface
 .notSetInterface:
 .unhandled:
-	lea	de,ysetup
+	ld	de,setupPacket
 	ld	a,USB_DEFAULT_SETUP_EVENT
 	call	_DispatchEvent
 	jq	z,.handled
