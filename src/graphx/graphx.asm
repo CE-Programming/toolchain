@@ -4168,36 +4168,34 @@ gfx_RotateSpriteC:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	ld	iy,0
-	lea	de,iy
 	add	iy,sp
 	push	ix
-	ld	ix,(iy+3)
-	ld	a,(ix+0)		; a = width
-	ld	e,(ix+1)		; c = height
-	ld	(.width),a
-	lea	hl,ix+2
-	ld	ix,(iy+6)
-	ld	(ix+0),e
-	ld	(ix+1),a
-	lea	iy,ix+1
-	add	iy,de
-	ld	c,e
-	push	ix
-.outer:
-	ld	b,0
-.width := $-1
-	lea	ix,iy
-.inner:
-	ld	a,(hl)
-	ld	(iy),a
+	ld	hl,(iy+6)
+	ld	iy,(iy+3)
+	ld	ix,(iy+0)		; ixl = width  ,  ixh = height
+	lea	bc,ix
+	ld	(hl),b
 	inc	hl
-	add	iy,de
-	djnz	.inner
-	lea	iy,ix
+	ld	(hl),c
+	mlt	bc
+	add	hl,bc
+	ex	de,hl
+	lea	bc,ix+1
+	ld	b,0
+.outer:
+	lea	hl,iy
 	dec	iy
-	dec	c
+	ld	a,ixh
+.inner:
+	add	hl,bc
+	inc	c
+	ldd
+	dec	a
+	jr	nz,.inner
+	dec	ixl
 	jr	nz,.outer
-	pop	hl
+	dec	de
+	ex	de,hl
 	pop	ix
 	ret
 
@@ -4210,38 +4208,32 @@ gfx_RotateSpriteCC:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	ld	iy,0
-	lea	de,iy
+	lea	bc,iy
 	add	iy,sp
 	push	ix
-	ld	ix,(iy+3)
-	ld	a,(ix+0)		; a = width
-	ld	e,(ix+1)		; e = height
-	ld	(.width),a
-	lea	hl,ix+1
-	ld	ix,(iy+6)
-	ld	(ix+0),e
-	ld	(ix+1),a
+	ld	hl,(iy+6)
+	push	hl
+	ld	iy,(iy+3)
+	ld	ix,(iy+0)		; ixl = width  ,  ixh = height
+	lea	de,ix
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	inc	hl
+	dec	e
 	ld	c,e
-	ld	b,a
-	mlt	bc
-	add	hl,bc
-	lea	iy,ix+1
-	add	iy,de
-	ld	c,e
-	push	ix
+	ex	de,hl
 .outer:
-	ld	b,0
-.width := $-1
-	lea	ix,iy
-.inner:
-	ld	a,(hl)
-	ld	(iy),a
-	dec	hl
-	add	iy,de
-	djnz	.inner
-	lea	iy,ix
+	lea	hl,iy+2
 	dec	iy
-	dec	c
+	ld	a,ixh
+.inner:
+	add	hl,bc
+	inc	c
+	ldi
+	dec	a
+	jr	nz,.inner
+	dec	ixl
 	jr	nz,.outer
 	pop	hl
 	pop	ix
