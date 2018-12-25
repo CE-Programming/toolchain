@@ -4210,40 +4210,34 @@ gfx_RotateSpriteCC:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	ld	iy,0
-	lea	de,iy
 	add	iy,sp
 	push	ix
-	ld	ix,(iy+3)
-	ld	a,(ix+0)		; a = width
-	ld	e,(ix+1)		; e = height
-	ld	(.width),a
-	lea	hl,ix+1
-	ld	ix,(iy+6)
-	ld	(ix+0),e
-	ld	(ix+1),a
-	ld	c,e
-	ld	b,a
+	ld	hl,(iy+6)
+	ld	iy,(iy+3)
+	ld	ix,(iy+0)		; ixl = width  ,  ixh = height
+	lea	bc,ix
+	ld	(hl),b
+	inc	hl
+	ld	(hl),c
 	mlt	bc
 	add	hl,bc
-	lea	iy,ix+1
-	add	iy,de
-	ld	c,e
-	push	ix
-.outer:
+	ex	de,hl
 	ld	b,0
-.width := $-1
-	lea	ix,iy
-.inner:
-	ld	a,(hl)
-	ld	(iy),a
-	dec	hl
-	add	iy,de
-	djnz	.inner
-	lea	iy,ix
+	ld	c,ixl
+.outer:
+	lea	hl,iy+1
 	dec	iy
-	dec	c
+	ld	a,ixh
+.inner:
+	add	hl,bc
+	ldd
+	inc	bc
+	dec	a
+	jr	nz,.inner
+	dec	ixl
 	jr	nz,.outer
-	pop	hl
+	dec	de
+	ex	de,hl
 	pop	ix
 	ret
 
