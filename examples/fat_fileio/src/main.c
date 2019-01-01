@@ -44,6 +44,11 @@ void main(void) {
 
 static fat_entry_t fat_entrys[MAX_ENTRIES];
 
+void resetScreen(void) {
+    asm(" call $20808");
+    os_SetCursorPos(0, 0);
+}
+
 void fatDemo(void) {
     int8_t fd;
     uint8_t num, entries;
@@ -52,6 +57,7 @@ void fatDemo(void) {
     static fat_partition_t fat_partitions[MAX_PARTITIONS];
     char buf[128];
 
+    resetScreen();
     putString("insert drive...");
 
     /* Set up error handling */
@@ -116,12 +122,15 @@ void fatDemo(void) {
 
     putString("creating file...");
 
+    while (!os_GetCSC());
+    resetScreen();
+
     fat_Create(0, wrtest, 0);
 
     putString("deleting dir.");
 
     if (fat_Delete(dirtest) == false) {
-        putString("error.");
+        putString("error; check empty?");
     }
 
     putString("creating dir...");
@@ -145,8 +154,6 @@ void fatDemo(void) {
         putString(buf);
     }
 
-
-
     fd = fat_Open(wrtest, FAT_O_RDONLY);
     if (fd >= 0) {
         sprintf(buf, "size: %u", (unsigned int)fat_GetFileSize(fd));
@@ -165,17 +172,15 @@ void fatDemo(void) {
     sprintf(buf, "dir attrib: %u", (unsigned int)fat_GetAttrib(dirtest));
     putString(buf);
 
+    while (!os_GetCSC());
+    resetScreen();
+
     entries = fat_DirList(NULL, fat_entrys, MAX_ENTRIES, 0);
 
-        for (i = 0; i < 50; i++) {
-            sprintf(buf, "%02X", sector[i]);
-            os_PutStrFull(buf);
-        }
-
-    sprintf(buf, "list num: %u", entries);
+    sprintf(buf, "num: %u", entries);
     putString(buf);
-    for (num = 0; num < entries; num++) {
-        sprintf(buf, "%c", fat_entrys[num].filename[0]);
+    for (num = 0; num < entries && num < 6; num++) {
+        sprintf(buf, "%s", fat_entrys[num].filename);
         putString(buf);
     }
 

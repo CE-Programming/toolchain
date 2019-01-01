@@ -195,7 +195,7 @@ void fat_SetAttrib(const char *path, uint8_t stat);
 
 /**
  * Returns all FAT file / directory entires in a path.
- * @param path Absolute 8.3 formatted root path.
+ * @param path Absolute 8.3 formatted root path. Can be NULL for root directory.
  * @param list Storage location for directory entries. Must be pre-allocated.
  * @param size Number of allocated \c fat_entry_t available.
  * @param skip Number of entries to skip adding to the list. Useful for memory
