@@ -284,10 +284,12 @@ usbWaitForConnection:
 ;	db	8
 ;	call	debugNewLine
 	call	qtdFree
-	ld	a,0
-usbInited := $ - 1
+	ld	a,$ff
 	ld	(usbInited),a
 	ret
+
+usbInited:
+	db	0
 
 usbCleanup:
 	ld	hl,mpUsbCmd
