@@ -1,9 +1,9 @@
-usbbuf := $d40000
-xferDataPtrDefault := usbbuf
-xferDataPtrSense := usbbuf + 512
-
 ;-------------------------------------------------------------------------------
 msd_Init:
+	pop	hl
+	pop	de
+	push	de
+	push	hl
 	push	ix
 	push	iy
 	call	msdInit				; attempt to initialize mass storage device
@@ -99,41 +99,49 @@ msd.event:
 
 ;-------------------------------------------------------------------------------
 usbConfigureFirstDevice:
+; de = milliseconds to wait for plug
+; returns nz if successfull
 	call    usbInit				; init usb
+	ld	a,(usbInited)
+	or	a,a
+	ret	z				; timeout most likely
 	call    devFirst
 	ld	(device),iy			; use first device
-	ld      hl,usbbuf			; get dev desc
+	ld      hl,xferDataPtrDefault		; get dev desc
 	ld      de,reqDevDesc18
 	call    usbSetupPacket
-	ld      hl,usbbuf+18			; get langids
+	ld      hl,xferDataPtrDefault + 18	; get langids
 	ld      de,reqGetStrDesc
 	call    usbSetupPacket
-	ld      hl,usbbuf+18+2
+	ld      hl,xferDataPtrDefault + 18 + 2
 	ld      de,reqGetStrDesc+4
 	ldi
 	ldi					; use first langid
-;	ld      hl,(usbbuf+8)			; get vendor
-;	ld      hl,(usbbuf+10)			; get product
-;	ld      hl,(usbbuf+12)			; get release
-;	ld      a,(usbbuf+14)			; get manufacturer
-;	ld      a,(usbbuf+15)			; get product
-;	ld      a,(usbbuf+16)			; get serial number
+;	ld      hl,(xferDataPtrDefault + 8)	; get vendor
+;	ld      hl,(xferDataPtrDefault + 10)	; get product
+;	ld      hl,(xferDataPtrDefault + 12)	; get release
+;	ld      a,(xferDataPtrDefault + 14)	; get manufacturer
+;	ld      a,(xferDataPtrDefault + 15)	; get product
+;	ld      a,(xferDataPtrDefault + 16)	; get serial number
 	ld	iy,(device)			; get configuration descriptor
 	xor     a,a
 	call    getConfigDescTotalLength	; total length of config
 	ld      (reqConfDesc + wLength),hl
 	push    hl
-	ld      hl,usbbuf
+	ld      hl,xferDataPtrDefault
 	ld      de,reqConfDesc
 	call    usbSetupPacket
 	pop	bc
-	ld      hl,usbbuf
+	ld      hl,xferDataPtrDefault
 	ld	(msd_config_start),hl
 	add	hl,bc
 	ld	(msd_config_end),hl		; used by the msd driver
 	ld	iy,(device)			; select config
-	ld      ix,usbbuf
-	jp	devSelectConfig
+	ld      ix,xferDataPtrDefault
+	call	devSelectConfig
+	xor	a,a
+	inc	a
+	ret
 
 usbSetupPacket:
 	ld	iy,0
@@ -154,8 +162,16 @@ reqClrOutStall:
 	db	$02,1,0,0,0,0,0,0
 
 ;-------------------------------------------------------------------------------
+return_nc:
+	scf
+	ccf
+	ret
+
+;-------------------------------------------------------------------------------
 msdInit:
+; returns c if successfull
 	call	usbConfigureFirstDevice
+	jr	z,return_nc
 	call	findFirstMsdInterface
 	call	c,findScsiEndpoints
 	ret	nc
@@ -295,7 +311,7 @@ msdClrOutStall:
 msdClrInStall:
 	ld	de,reqClrInStall
 msdClrStall:
-	ld	hl,usbbuf
+	ld	hl,xferDataPtrDefault
 	ld	iy,(device)
 	jp	controlDefaultTransfer
 
@@ -633,4 +649,40 @@ packetCBWCBD:
 	db	$00,$00,$00,$00	; command block
 	db	$00,$00,$00,$00	; command block
 packetCBWLen := $ - packetCBW
+
+xferDataPtrDefault:
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+xferDataPtrSense:
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+	db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 

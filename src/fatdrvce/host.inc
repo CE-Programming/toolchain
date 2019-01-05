@@ -138,7 +138,32 @@ wMaxPacketSize		:= bmEndpointAttributes+1
 bInterval		:= wMaxPacketSize+2
 descLenEndpt		:= bInterval+1
 
+; input: de = milliseconds to abort if no usb plug
 usbInit:
+	xor	a,a
+	sbc	hl,hl
+	add	hl,de
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,de
+	add	hl,de
+	add	hl,de		; close enough
+	ex	de,hl
+	ld	hl,mptmrctrl	; disable timer
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	ld	(usbInited),a
+	ld	(mpTmr1Counter + 0),de
+	ld	(mpTmr1Counter + 3),a
+	ld	(mpTmr1Load + 0),de
+	ld	(mpTmr1Load + 3),a
+	dec	a
+	ld	(mpTmrIntStatus),a
+	dec	hl
+	ld	(hl),7		; enable 32khz timer
 	ld	hl,devRootAlloc
 	ld	de,devRoot
 	ld	bc,devRootAlloc.size
@@ -151,6 +176,9 @@ usbInit:
 ;	db	'waiting for usb...',0
 ;	call	debugNewLine
 .waitPlug:
+	ld	a,(mpTmrIntStatus)
+	and	a,4
+	ret	nz				; return if expired
 	call	_usb_SelfPowered
 	jr	nz,.waitPlug
 	call	usbChipReset
@@ -209,6 +237,9 @@ usbWaitForConnection:
 ;	call	debugNewLine
 	ld	hl,mpUsbPortStsCtrl
 .waitconn:
+	ld	a,(mpTmrIntStatus)
+	and	a,4
+	ret	nz			; return if expired
 	bit	0,(hl)
 	jr	z,.waitconn
 	ld	(hl),1 shl 1
@@ -255,7 +286,11 @@ usbWaitForConnection:
 ;	call	debugHexBlockHL
 ;	db	8
 ;	call	debugNewLine
-	jp	qtdFree
+	call	qtdFree
+	ld	a,0
+usbInited := $ - 1
+	ld	(usbInited),a
+	ret
 
 usbCleanup:
 	ld	hl,mpUsbCmd
