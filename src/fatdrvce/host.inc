@@ -146,10 +146,7 @@ usbInit:
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	add	hl,hl
-	add	hl,de
-	add	hl,de
-	add	hl,de		; close enough
+	add	hl,hl		; close enough
 	ex	de,hl
 	ld	hl,mptmrctrl	; disable timer
 	ld	(hl),a
