@@ -85,9 +85,7 @@ MKDIR      = mkdir -p $1
 QUOTE_ARG  = '$(subst ','\'',$1)'#'
 TO_LOWER   = $(shell printf %s $(call QUOTE_ARG,$1) | tr [:upper:] [:lower:])
 endif
-
-FASMG_FILES    = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
-LINKER_SCRIPT ?= $(CEDEV)/include/.linker_script
+FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -160,7 +158,7 @@ CFLAGS ?= \
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/include/fasmg-ez80/ld.fasmg)) \
-	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT)) \
+	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(CEDEV)/include/.linker_script)) \
 	$(LDDEBUGFLAG) \
 	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
