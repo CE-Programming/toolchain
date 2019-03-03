@@ -1006,5 +1006,4 @@ fat.checksectormagic:
 	ret
 
 include 'fat.zds'
-include 'debug.inc'
 
