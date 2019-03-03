@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include <fatdrvce.h>
+#include <keypadc.h>
 
 #define MAX_PARTITIONS 10
 #define MAX_ENTRIES 10
@@ -122,7 +123,7 @@ void fatDemo(void) {
 
     putString("creating file...");
 
-    while (!os_GetCSC());
+    while (!kb_AnyKey());
     resetScreen();
 
     fat_Create(0, wrtest, 0);
@@ -172,7 +173,7 @@ void fatDemo(void) {
     sprintf(buf, "dir attrib: %u", (unsigned int)fat_GetAttrib(dirtest));
     putString(buf);
 
-    while (!os_GetCSC());
+    while (!kb_AnyKey());
     resetScreen();
 
     entries = fat_DirList(NULL, fat_entrys, MAX_ENTRIES, 0);
