@@ -3612,7 +3612,7 @@ L_372:
 	JQ	NZ,L_FOUND
 	JQ	L_376
 L_ONLY_FILES:
-	AND	A,16
+	AND	A,24
 	JQ	NZ,L_376
 ;  888	                {
 ;  889					    found++;
