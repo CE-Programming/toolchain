@@ -44,6 +44,7 @@ typedef struct {
 #define FAT_VOLLABEL  (1 << 3)  /**< Entry is a Volume Label. Only for root directory. */
 #define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or directory). */
 #define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
+#define FAT_ALL       (FAT_DIR | FAT_VOLLABEL | FAT_SYSTEM | FAT_HIDDEN | FAT_RDONLY)
 
 typedef enum msd_event {
     MSD_EVENT_NONE = 0,   /**< No event detected. */
@@ -197,12 +198,13 @@ void fat_SetAttrib(const char *path, uint8_t stat);
  * Returns all FAT file / directory entires in a path.
  * @param path Absolute 8.3 formatted root path. Can be NULL for root directory.
  * @param list Storage location for directory entries. Must be pre-allocated.
+ * @param directories Only return directories if not 0.
  * @param size Number of allocated \c fat_entry_t available.
  * @param skip Number of entries to skip adding to the list. Useful for memory
  * constraints.
  * @return Number of entries found.
  */
-int fat_DirList(const char *path, fat_entry_t *list, int size, int skip);
+int fat_DirList(const char *path, fat_entry_t *list, uint8_t directories, int size, int skip);
 
 /**
  * Selects the first found attached Mass Storage Device (MSD).
