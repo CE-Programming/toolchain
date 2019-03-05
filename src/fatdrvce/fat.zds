@@ -1749,14 +1749,16 @@ L_172:
 	LD	BC,0
 	LD	(IY+14),BC
 	LD	(IY+17),0
-;  544		desc->key = fat_key++;
+;  544		desc->key = fat_key++ & 63;
 	LD	A,(_fat_key)
-	LD	(IY+0),A
+	PUSH	AF
+
 	LD	A,(_fat_key)
 	INC	A
+	AND	A,63
 	LD	(_fat_key),A
 ;  545		return desc->key;
-	LD	A,(IY+0)
+	POP	AF
 ;  546	}
 L_174:
 	LD	SP,IX
