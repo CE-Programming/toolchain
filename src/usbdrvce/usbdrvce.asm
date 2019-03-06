@@ -288,7 +288,7 @@ usb_Init:
 	call	_ChkIfOSInterruptAvailable
 	rrca
 	ld	hl,_DefaultStandardDescriptors.string83
-	jq	nc,.gotModel
+	jq	c,.gotModel
 	ld	hl,_DefaultStandardDescriptors.string84
 .gotModel:
 	ld	(_DefaultStandardDescriptors.model),hl
