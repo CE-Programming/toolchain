@@ -245,10 +245,10 @@ typedef enum usb_class {
 } usb_class_t;
 
 typedef enum usb_configuration_attributes {
-  USB_BUS_POWERED              = 0 << 6,
-  USB_SELF_POWERED             = 1 << 6,
   USB_NO_REMOTE_WAKEUP         = 0 << 5,
   USB_REMOTE_WAKEUP            = 1 << 5,
+  USB_BUS_POWERED              = 0 << 6,
+  USB_SELF_POWERED             = 1 << 6,
   USB_CONFIGURATION_ATTRIBUTES = 1 << 7,
 } usb_configuration_attributes_t;
 
@@ -379,7 +379,7 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
 
 #define USB_RETRY_FOREVER 0xFFFFFFu
 
-#define usb_RootHub ((usb_device_t)0xD13FC0) /**< Root hub device */
+#define usb_RootHub ((usb_device_t)0xD13FC0u) /**< Root hub device */
 
 /**
  * A pointer to \c usb_callback_data_t is passed to the \c usb_event_callback_t.
@@ -396,7 +396,7 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
  * A pointer to \c usb_device_data_t can be associated with devices.
  * The default is void *, but this can be changed by doing:
  * \code
- * #define usb_device_data_t struct my_usb_callback_data
+ * #define usb_device_data_t struct my_usb_device_data
  * #include <usbdrvce.h>
  * \endcode
  */
@@ -407,7 +407,7 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
  * A pointer to \c usb_endpoint_data_t can be associated with endpoints.
  * The default is void *, but this can be changed by doing:
  * \code
- * #define usb_endpoint_data_t struct my_usb_callback_data
+ * #define usb_endpoint_data_t struct my_usb_endpoint_data
  * #include <usbdrvce.h>
  * \endcode
  */
@@ -418,7 +418,7 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
  * A pointer to \c usb_transfer_data_t is passed to \c usb_transfer_callback_t.
  * The default is void *, but this can be changed by doing:
  * \code
- * #define usb_transfer_data_t struct my_usb_callback_data
+ * #define usb_transfer_data_t struct my_usb_transfer_data
  * #include <usbdrvce.h>
  * \endcode
  */
@@ -629,7 +629,7 @@ size_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
  * @param index Descriptor index to fetch.
  * @param descriptor Returns the fetched descriptor.
  * @param length The maximum number of bytes to receive.
- * The \p descriptor buffer must by at least this large.
+ * The \p descriptor buffer must be at least this large.
  * @param transferred Returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
@@ -646,7 +646,7 @@ usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * @param index The descriptor index to change..
  * @param descriptor The new descriptor.
  * @param length The number of bytes in the new descriptor.
- * The \p descriptor buffer must by at least this large.
+ * The \p descriptor buffer must be at least this large.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
@@ -660,7 +660,7 @@ usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * @param index Descriptor index to fetch.
  * @param descriptor Returns the fetched descriptor.
  * @param length The number of bytes to transfer.
- * The \p descriptor buffer must by at least this large.
+ * The \p descriptor buffer must be at least this large.
  * @param transferred Returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
@@ -782,7 +782,8 @@ usb_error_t usb_ClearEndpointHalt(usb_endpoint_t endpoint);
  * \p setup->wLength as the buffer length, and then waits for it to complete.
  * If acting as usb host and using a control pipe, \p setup is used as the setup
  * packet, otherwise all fields not mentioned above are ignored.
- * @param endpoint The endpoint to use.
+ * @param endpoint The endpoint to communicate with, which also specifies the
+ * direction for non-control transfers.
  * @param setup Indicates the transfer direction and buffer length.  If acting
  * as usb host and using a control pipe, also used as the setup packet to send.
  * @param buffer Data to transfer that must reside in RAM and have room for at
@@ -853,9 +854,8 @@ usb_error_t usb_Transfer(usb_endpoint_t endpoint, void *buffer, size_t length,
  * data buffer, and \p setup->wLength as the buffer length.  If acting as usb
  * host and using a control pipe, \p setup is used as the setup packet,
  * otherwise all fields not mentioned above are ignored.
- * @param device The device to communicate with.
- * @param endpoint Address of endpoint to communicate with.  Bit 7 indicates the
- * transfer direction for non-control transfers.
+ * @param endpoint The endpoint to communicate with, which also specifies the
+ * direction for non-control transfers.
  * @param setup Indicates the transfer direction and buffer length.  If acting
  * as usb host and using a control pipe, also used as the setup packet to send.
  * @param buffer Data to transfer that must reside in RAM.  This buffer must
@@ -902,9 +902,8 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  * transfer type.  If the endpoint is a control endpoint, schedules a control
  * transfer interpreting the beginning of buffer as the \c usb_control_setup_t
  * and using the rest of the buffer as the transfer buffer.
- * @param device The device to communicate with.
- * @param endpoint Address of endpoint to communicate with.
- * Bit 7 is ignored for control transfers, and the direction of other transfers.
+ * @param endpoint The endpoint to communicate with, which also specifies the
+ * direction for non-control transfers.
  * @param type Type of the endpoint and transfer.
  * @param buffer Data to transfer that must reside in RAM.  When acting as usb
  * host and using a control pipe, starts with a \c usb_control_setup_t.  This
@@ -919,9 +918,9 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  * @return USB_SUCCESS if the transfer was scheduled or an error.
  */
 usb_error_t
-usb_ScheduleTransfer(usb_device_t device, uint8_t endpoint, void *buffer,
-                     size_t length, usb_transfer_callback_t handler,
-                     usb_transfer_data_t *data);
+usb_ScheduleTransfer(usb_endpoint_t endpoint, void *buffer, size_t length,
+		     usb_transfer_callback_t handler,
+		     usb_transfer_data_t *data);
 #define usb_ScheduleBulkTransfer usb_ScheduleTransfer
 #define usb_ScheduleInterruptTransfer usb_ScheduleTransfer
 #define usb_ScheduleIsochronousTransfer usb_ScheduleTransfer
