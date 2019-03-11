@@ -17,11 +17,9 @@
 extern "C" {
 #endif
 
-/*
 typedef struct {
     unsigned int dummy;
 } msd_t;
-*/
 
 typedef struct {
     uint32_t lba;       /**< Logical Block Address (LBA) of FAT partition */
