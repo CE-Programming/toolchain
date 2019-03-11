@@ -56,6 +56,9 @@ typedef enum msd_event {
  * Initializes the FAT filesystem and allows other FAT functions to be used.
  * Before calling this function, you must use \c fat_Find and \c fat_Select
  * in order to locate the correct FAT partition.
+ * @warning When using the FAT library, calls to os_GetCSC() will cause USB not
+ * to work. This will probably be fixed in later revisions, but just use the
+ * \c keypadc library for now.
  * @return 0 on success.
  */
 uint8_t fat_Init(void);
