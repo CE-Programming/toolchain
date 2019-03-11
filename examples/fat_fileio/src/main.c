@@ -21,18 +21,9 @@ static jmp_buf msdenv;
 void putString(const char *str);
 void fatDemo(void);
 
-const char *rdtest = "RDTEST.TXT";
 const char *wrtest = "WRTEST.TXT";
 const char *dirtest = "DIRTEST";
 #define WR_SIZE 4096
-
-void send_char(char n)
-{
-    char str[2];
-    str[0] = n;
-    str[1] = 0;
-    os_PutStrFull(str);
-}
 
 /* Main Function */
 void main(void) {
@@ -43,9 +34,9 @@ void main(void) {
     while (!os_GetCSC());
 }
 
-static fat_entry_t fat_entrys[MAX_ENTRIES];
+static fat_entry_t fat_entries[MAX_ENTRIES];
 
-void resetScreen(void) {
+static void resetScreen(void) {
     asm(" call $20808");
     os_SetCursorPos(0, 0);
 }
@@ -70,7 +61,7 @@ void fatDemo(void) {
     msd_SetJmpBuf(msdenv);
 
     /* Initialize first detected mass storage device */
-    if (msd_Init(5000) != 0) {
+    if (msd_Init(7000) != 0) {
         putString("drive init failed.");
         return;
     }
@@ -103,40 +94,17 @@ void fatDemo(void) {
     }
 
     putString("initialized fat.");
-
-    fd = fat_Open(rdtest, FAT_O_RDONLY);
-    if (fd >= 0) {
-        putString("reading file...");
-        fat_ReadSector(fd);
-        sprintf(buf, "first char: %c", sector[0]);
-        putString(buf);
-        fat_Close(fd);
-    } else {
-	putString("cannot open file.");
-    }
-
-    putString("deleting file.");
-
-    if (fat_Delete(wrtest) == false) {
-        putString("error.");
-    }
-
-    putString("creating file...");
+    putString("press any key.");
 
     while (!kb_AnyKey());
     resetScreen();
 
+    putString("creating file...");
     fat_Create(0, wrtest, 0);
-
-    putString("deleting dir.");
-
-    if (fat_Delete(dirtest) == false) {
-        putString("error; check empty?");
-    }
-
+    putString("success.");
     putString("creating dir...");
-
     fat_Create(0, dirtest, FAT_DIR);
+    putString("success.");
 
     fd = fat_Open(wrtest, FAT_O_WRONLY);
     if (fd >= 0) {
@@ -176,12 +144,12 @@ void fatDemo(void) {
     while (!kb_AnyKey());
     resetScreen();
 
-    entries = fat_DirList(NULL, fat_entrys, MAX_ENTRIES, 0);
+    entries = fat_DirList(NULL, fat_entries, 0, MAX_ENTRIES, 0);
 
     sprintf(buf, "num: %u", entries);
     putString(buf);
     for (num = 0; num < entries && num < 6; num++) {
-        sprintf(buf, "%s", fat_entrys[num].filename);
+        sprintf(buf, "%s", fat_entries[num].filename);
         putString(buf);
     }
 
