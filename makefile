@@ -287,9 +287,7 @@ release-libs:
 	$(CONVHEX) -g 7 $(call NATIVEPATH,src/graphx/graphx.8xv) \
 	$(call NATIVEPATH,src/fileioc/fileioc.8xv) \
 	$(call NATIVEPATH,src/keypadc/keypadc.8xv) \
-	$(call NATIVEPATH,src/usbdrvce/usbdrvce.8xv) \
 	$(call NATIVEPATH,src/fatdrvce/fatdrvce.8xv) \
-	$(call NATIVEPATH,src/srldrvce/srldrvce.8xv) \
 	$(call NATIVEPATH,src/libload/libload.8xv) \
 	$(call NATIVEPATH,clibs.8xg)
 #----------------------------
