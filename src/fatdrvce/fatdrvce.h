@@ -209,12 +209,12 @@ int fat_DirList(const char *path, fat_entry_t *list, uint8_t directories, int si
 /**
  * Selects the first found attached Mass Storage Device (MSD).
  * This is an alternative to using \c msd_Find and \c msd_Select.
- * Before calling this function, it is important to install an
+ * Before calling this function, it is important to install an error
  * event handler using the \c msd_SetJmp function.
- * @param ms Timeout before erroring if no devices are detected.
+ * @param ticks Number of 32kHz ticks; timeout before erroring if no devices are detected. (5000 or higher is recommended).
  * @return 0 on success.
  */
-uint8_t msd_Init(unsigned int ms);
+uint8_t msd_Init(unsigned int ticks);
 
 /**
  * Locates any attached Mass Storage Devices (MSD).

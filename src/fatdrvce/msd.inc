@@ -170,6 +170,7 @@ return_nc:
 ;-------------------------------------------------------------------------------
 msdInit:
 ; returns c if successfull
+	di
 	call	usbConfigureFirstDevice
 	jr	z,return_nc
 	call	findFirstMsdInterface
