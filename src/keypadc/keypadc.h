@@ -15,8 +15,8 @@
 extern "C" {
 #endif
 
-typedef uint8_t kb_key_t;   ///< Normal key type
-typedef uint16_t kb_lkey_t; ///< Long key type
+typedef uint8_t kb_key_t;   /**< Normal key type */
+typedef uint16_t kb_lkey_t; /**< Long key type   */
 
 /**
  * Scans the keyboard to update data values
@@ -75,6 +75,15 @@ typedef enum {
 (*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals */
 #define kb_Config \
 (*(uint8_t*)0xF50000)          /**< Configuration of keypad controller */
+
+/**
+ * Checks if a key is pressed. This uses the long key type, which includes the group as well.
+ * It can be used in place of reading directly from \c kb_Data.
+ *
+ * Long key types have the same name as the normal key types, but are prefixed with kb_Key* rather than kb_*.
+ */
+#define kb_IsDown(lkey) \
+(kb_Data[(lkey) >> 8] & (lkey))
 
 /**
  * Keypad Data registers
