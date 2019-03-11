@@ -509,6 +509,7 @@ L_68:
 	OR	A,A
 	JQ	NZ,L_77
 ;  330					cur_sector++;	/* Lets just cross our fingers and hope we don't overrun */
+INCREMENT_SECTOR:
 	LD	HL,(IX+-7)
 	LD	E,(IX+-4)
 	LD	A,1
@@ -521,40 +522,35 @@ L_68:
 ;  333			}
 L_77:
 ;  334	
-;  335			if (cur_sector / fat_state.cluster_size != (cur_sector + 1) / fat_state.cluster_size) {
+;  335			if (sector_to_cluster(cur_sector) != sector_to_cluster(cur_sector + 1)) {
 	LD	HL,(IX+-7)
 	LD	E,(IX+-4)
 	LD	A,1
 	CALL	__ladd_b
+	LD	C,E
+	LD	B,0
+	PUSH	BC
+	PUSH	HL
+	CALL	fat.sector2cluster
+	POP	BC
+	POP	BC
+	LD	C,(IX+-4)
+	LD	B,0
+	PUSH	BC
+	LD	BC,(IX+-7)
+	PUSH	BC
 	LD	(IX+-26),HL
 	LD	(IX+-23),E
-	OR	A,A
-	SBC	HL,HL
-	LD	A,(_fat_state+1)
-	LD	L,A
-	PUSH	HL
+	CALL	fat.sector2cluster
 	POP	BC
-	LD	A,H
-	LD	HL,(IX+-7)
-	LD	E,(IX+-4)
-	CALL	__ldivu
-	LD	(IX+-54),HL
-	OR	A,A
-	SBC	HL,HL
-	LD	A,(_fat_state+1)
-	LD	L,A
-	PUSH	HL
 	POP	BC
-	LD	A,H
-	LD	(IX+-51),E
-	LD	E,(IX+-23)
-	LD	HL,(IX+-26)
-	CALL	__ldivu
 	LD	A,E
 	PUSH	HL
 	POP	BC
-	LD	HL,(IX+-54)
-	LD	E,(IX+-51)
+	PUSH	HL
+	POP	BC
+	LD	HL,(IX+-26)
+	LD	E,(IX+-23)
 	CALL	__lcmpu
 	JQ	Z,L_76
 ;  336				cur_sector = cluster_to_sector(next_cluster(sector_to_cluster(cur_sector)));
@@ -595,12 +591,7 @@ L_77:
 ;  339			} else
 L_76:
 ;  340				cur_sector++;
-	LD	BC,(IX+-26)
-	LD	A,(IX+-23)
-	LD	(IX+-7),BC
-	LD	(IX+-4),A
-;  341		}
-	JQ	L_78
+	JQ	INCREMENT_SECTOR
 ;  342	}
 L_80:
 	LD	SP,IX
