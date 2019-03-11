@@ -99,10 +99,10 @@ LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,s
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc usbdrvce fatdrvce srldrvce libload ce std startup
+all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc fatdrvce libload ce std startup
 	@echo Toolchain built.
 
-clean: clean-graphx clean-fileioc clean-keypadc clean-usbdrvce clean-fatdrvce clean-srldrvce clean-ce clean-std clean-libload clean-startup
+clean: clean-graphx clean-fileioc clean-keypadc clean-fatdrvce clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
