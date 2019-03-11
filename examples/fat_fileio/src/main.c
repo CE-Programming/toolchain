@@ -22,7 +22,6 @@ void putString(const char *str);
 void fatDemo(void);
 
 const char *wrtest = "WRTEST.TXT";
-const char *dirtest = "DIRTEST";
 #define WR_SIZE 4096
 
 /* Main Function */
@@ -99,11 +98,10 @@ void fatDemo(void) {
     while (!kb_AnyKey());
     resetScreen();
 
+    putString("deleting file...");
+    fat_Delete(wrtest);
     putString("creating file...");
     fat_Create(0, wrtest, 0);
-    putString("success.");
-    putString("creating dir...");
-    fat_Create(0, dirtest, FAT_DIR);
     putString("success.");
 
     fd = fat_Open(wrtest, FAT_O_WRONLY);
@@ -113,6 +111,8 @@ void fatDemo(void) {
         putString("writing file...");
 
         for (i = 0; i < WR_SIZE; i += 512) {
+            /* fill the file with different characters */
+            memset(sector, 'A' + (i / 512), sizeof sector);
             fat_WriteSector(fd);
         }
 
@@ -123,6 +123,7 @@ void fatDemo(void) {
         putString(buf);
     }
 
+    /* Get the file statistics */
     fd = fat_Open(wrtest, FAT_O_RDONLY);
     if (fd >= 0) {
         sprintf(buf, "size: %u", (unsigned int)fat_GetFileSize(fd));
@@ -135,15 +136,14 @@ void fatDemo(void) {
         putString(buf);
     }
 
-    fat_SetAttrib(dirtest, FAT_DIR | FAT_HIDDEN);
+    /* Get the file attributes */
     sprintf(buf, "wr attrib: %u", (unsigned int)fat_GetAttrib(wrtest));
-    putString(buf);
-    sprintf(buf, "dir attrib: %u", (unsigned int)fat_GetAttrib(dirtest));
-    putString(buf);
+    putString("press any key.");
 
     while (!kb_AnyKey());
     resetScreen();
 
+    /* Read only the files in the root directory */
     entries = fat_DirList(NULL, fat_entries, 0, MAX_ENTRIES, 0);
 
     sprintf(buf, "num: %u", entries);
@@ -153,6 +153,7 @@ void fatDemo(void) {
         putString(buf);
     }
 
+    /* Deinitialize the FAT filesystem */
     fat_Deinit();
     msd_Deinit();
 }
