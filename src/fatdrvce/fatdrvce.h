@@ -1,9 +1,65 @@
 /**
  * @file
+ * @brief USB FAT Filesystem Driver
+ *
+ * This library can be used to communicate with Mass Storage Devices (MSD) which
+ * have partitions formated as FAT32. (FAT16 support is implemented yet untested).
+ * It currently only supports drives that have a sector size of 512, which is pretty
+ * much every flash drive on the market, except for huge ones.
+ * The drive must use MBR partitioning, GUID is not supported yet.
+ *
+ * WARNING: Currently fatdrvce cannot operate in programs that use os_GetCSC().
+ * Please use an alternative such as kb_Scan(), avaiable in the keypadc library.
+ *
+ * Example program showing initialization and teardown of FAT devices:
+ * @code
+ *
+ * #define MAX_PARTITIONS 10
+ * void main(void) {
+ *     static fat_partition_t fat_partitions[MAX_PARTITIONS];
+ *     static uint8_t sector[512];
+ *     static jmp_buf msdenv;
+ *     msd_event_t evnt;
+ *     uint8_t num;
+ *
+ *     // Configure USB error handling, e.g. removal before write is finished
+ *     if ((evnt = setjmp(msdenv))) {
+ *         // Tell the user there was an error with USB here
+ *      }
+ *      msd_SetJmpBuf(msdenv);
+ *
+ *      // Initialize the first attached MSD device
+ *      if (msd_Init(10000) != 0) {
+ *         // No MSD devices found
+ *      }
+ *
+ *      // Set the buffer used by the FAT library
+ *      fat_SetBuffer(sector);
+ *
+ *      // Locate available FAT partitions on the MSD device
+ *      if ((num = fat_Find(fat_partitions, MAX_PARTITIONS) == 0) {
+ *          // No FAT partitions found
+ *      }
+ *
+ *      // Select the first (or other) FAT partition on the MSD
+ *     fat_Select(fat_partitions, 0);
+ *
+ *      // Initialize the selected FAT partition
+ *      if (fat_Init() != 0) {
+ *          // Failed to initialize FAT partition
+ *      }
+ *
+ *      // Here is where you can perform any other open/read/write operations
+ *
+ *      // Deinitialize FAT and MSD subsystems
+ *      fat_Deinit();
+ *      msd_Deinit();
+ * }
+ * @endcode
+ *
  * @author Steven "s@rdw.se" Arnow
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
- * @brief USB FAT Filesystem Driver
  */
 
 #ifndef H_FATDRVCE
@@ -18,7 +74,7 @@ extern "C" {
 #endif
 
 typedef struct {
-    unsigned int dummy;
+    uint8_t dummy;
 } msd_t;
 
 typedef struct {
