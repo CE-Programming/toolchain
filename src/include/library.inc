@@ -41,7 +41,7 @@ macro library? name*, version*, magic: <192,193>
 				offset = $-$$
 			end virtual
 			virtual lib.exports.file
-				repeat 1, string: offset
+				repeat 1, string: ((offset - 2) / 2) * 3
 					db 9, `each, 9, `function, ' ; ', `string, 10
 				end repeat
 			end virtual

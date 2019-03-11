@@ -76,6 +76,9 @@ BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
 GRAPHXDIR  := $(call NATIVEPATH,$(SRCDIR)/graphx)
 KEYPADCDIR := $(call NATIVEPATH,$(SRCDIR)/keypadc)
 FILEIOCDIR := $(call NATIVEPATH,$(SRCDIR)/fileioc)
+USBDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/usbdrvce)
+FATDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/fatdrvce)
+SRLDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/srldrvce)
 LIBLOADDIR := $(call NATIVEPATH,$(SRCDIR)/libload)
 
 CEDEVDIR   := $(call NATIVEPATH,$(INSTALLLOC)/$(RELEASE_NAME))
@@ -96,10 +99,10 @@ LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,s
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc libload ce std startup
+all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc usbdrvce fatdrvce srldrvce libload ce std startup
 	@echo Toolchain built.
 
-clean: clean-graphx clean-fileioc clean-keypadc clean-ce clean-std clean-libload clean-startup
+clean: clean-graphx clean-fileioc clean-keypadc clean-usbdrvce clean-fatdrvce clean-srldrvce clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
@@ -177,6 +180,33 @@ clean-keypadc:
 #----------------------------
 
 #----------------------------
+# usbdrvce rules
+#----------------------------
+usbdrvce: $(FASMG)
+	$(MAKE) -C $(USBDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
+clean-usbdrvce:
+	$(MAKE) -C $(USBDRVCEDIR) clean
+#----------------------------
+
+#----------------------------
+# fatdrvce rules
+#----------------------------
+fatdrvce: $(FASMG)
+	$(MAKE) -C $(FATDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
+clean-fatdrvce:
+	$(MAKE) -C $(FATDRVCEDIR) clean
+#----------------------------
+
+#----------------------------
+# srldrvce rules
+#----------------------------
+srldrvce: $(FASMG)
+	$(MAKE) -C $(SRLDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
+clean-srldrvce:
+	$(MAKE) -C $(SRLDRVCEDIR) clean
+#----------------------------
+
+#----------------------------
 # libload rules
 #----------------------------
 libload: $(FASMG)
@@ -218,6 +248,9 @@ install: $(DIRS) chmod all linker_script
 	$(MAKE) -C $(GRAPHXDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(KEYPADCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(USBDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(FATDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(SRLDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(LIBLOADDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
@@ -255,9 +288,10 @@ release-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/fileioc/fileioc.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
 	$(CP) $(call NATIVEPATH,src/keypadc/keypadc.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
 	$(CP) $(call NATIVEPATH,src/libload/libload.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
-	$(CONVHEX) -g 4 $(call NATIVEPATH,src/graphx/graphx.8xv) \
+	$(CONVHEX) -g 5 $(call NATIVEPATH,src/graphx/graphx.8xv) \
 	$(call NATIVEPATH,src/fileioc/fileioc.8xv) \
 	$(call NATIVEPATH,src/keypadc/keypadc.8xv) \
+	$(call NATIVEPATH,src/fatdrvce/fatdrvce.8xv) \
 	$(call NATIVEPATH,src/libload/libload.8xv) \
 	$(call NATIVEPATH,clibraries/clibs.8xg)
 clibraries:
@@ -304,6 +338,9 @@ help:
 	@echo graphx
 	@echo fileioc
 	@echo keypadc
+	@echo usbdrvce
+	@echo fatdrvce
+	@echo srldrvce
 	@echo clean
 	@echo clean-ce
 	@echo clean-asm
@@ -311,6 +348,9 @@ help:
 	@echo clean-graphx
 	@echo clean-fileioc
 	@echo clean-keypadc
+	@echo clean-usbdrvce
+	@echo clean-fatdrvce
+	@echo clean-srldrvce
 	@echo doxygen
 	@echo install
 	@echo uninstall
@@ -318,6 +358,4 @@ help:
 	@echo release-libs
 	@echo help
 
-#----------------------------
-.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc install uninstall help release fasmg
-
+.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc usbdrvce fatdrvce srldrvce clean-usbdrvce clean-fatdrvce clean-srldrvce install uninstall help release fasmg
