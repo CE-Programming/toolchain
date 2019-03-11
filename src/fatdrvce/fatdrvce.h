@@ -146,6 +146,16 @@ uint32_t fat_Tell(int8_t fd);
 void fat_SetBuffer(void *buffer);
 
 /**
+ * Seeks to an arbitrary sector in the flash file. If the sector is beyond
+ * the size of the file, the file allocation is extended. \p pos must be a
+ * multiple of 512, or 0. Arbitrary seek positions are not supported.
+ * @param fd File descriptor
+ * @param pos 512 byte multiple offset in file descriptor.
+ * @return false if an error occurs.
+ */
+bool fat_Seek(int8_t fd, uint32_t pos);
+
+/**
  * Reads the contents of a 512 byte sector of a file into \c fat_SectorBuffer
  * If the current file position results in less than a full 512 byte sector
  * being available, garbage may be read into the excess buffer locations.
@@ -224,18 +234,20 @@ uint8_t msd_Init(unsigned int ticks);
  * @param ms Timeout before erroring if no devices are found.
  * @param result Array of MSD's available, returned from function.
  * @param max The maximum number of MSD's that can be found.
+ * @warning This function is currently unimplemented. Use \c msd_Init for now.
  * @return The number of attached MSD's.
  */
-/*uint8_t msd_Find(unsigned int ms, msd_t *result, uint8_t max);*/
+uint8_t msd_Find(unsigned int ms, msd_t *result, uint8_t max);
 
 /**
  * Select an attached Mass Storage Devices (MSD) for use.
  * @param list Array of MSD's available, returned from \c msd_Find.
  * @param index Which attached MSD to use, i.e. '0' would select the first
  * found Mass Storage Device.
+ * @warning This function is currently unimplemented. Use \c msd_Init for now.
  * @return None.
  */
-/*void msd_Select(msd_t *list, uint8_t index);*/
+void msd_Select(msd_t *list, uint8_t index);
 
 /**
  * Sends a SCSI "TEST_UNIT_READY" packet to ensure the device does not fall asleep.

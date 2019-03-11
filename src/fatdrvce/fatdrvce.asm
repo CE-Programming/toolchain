@@ -22,6 +22,7 @@ library 'FATDRVCE',0
 	export fat_ReadSector
 	export fat_WriteSector
 	export fat_Tell
+	export fat_Seek
 	export fat_SetBuffer
 	export fat_Delete
 	export fat_Create
@@ -392,6 +393,10 @@ fat_SetBuffer:
 	ex	(sp),hl				; hl -> buffer
 	push	de
 	ld	(fat.sectorbuffer),hl
+	ret
+
+;-------------------------------------------------------------------------------
+fat_Seek:
 	ret
 
 ;-------------------------------------------------------------------------------
