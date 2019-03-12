@@ -286,13 +286,13 @@ uint8_t msd_Init(unsigned int ticks);
 
 /**
  * Locates any attached Mass Storage Devices (MSD).
- * @param ms Timeout before erroring if no devices are found.
+ * @param ms Number of 32kHz ticks; Timeout before erroring if no devices are found.
  * @param result Array of MSD's available, returned from function.
  * @param max The maximum number of MSD's that can be found.
  * @warning This function is currently unimplemented. Use \c msd_Init for now.
  * @return The number of attached MSD's.
  */
-uint8_t msd_Find(unsigned int ms, msd_t *result, uint8_t max);
+uint8_t msd_Find(unsigned int ticks, msd_t *result, uint8_t max);
 
 /**
  * Select an attached Mass Storage Devices (MSD) for use.
