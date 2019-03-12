@@ -15,7 +15,10 @@ include_library '../graphx/graphx.asm'
 ;-------------------------------------------------------------------------------
 	export fontlib_SetWindow
 	export fontlib_SetWindowFullScreen
-	export fontlib_GetWindow
+	export fontlib_GetWindowXMin
+	export fontlib_GetWindowYMin
+	export fontlib_GetWindowWidth
+	export fontlib_GetWindowHeight
 	export fontlib_SetCursorPosition
 	export fontlib_GetCursorX
 	export fontlib_GetCursorY
@@ -223,55 +226,53 @@ fontlib_SetWindow:
 
 
 ;-------------------------------------------------------------------------------
-fontlib_GetWindow:
-; Returns the bounds of the window all text will appear in
+fontlib_GetWindowXMin:
+; Returns the starting column of the current text window
 ; Arguments:
-;  arg0: Pointer to X min
-;  arg1: Pointer to Y min
-;  arg2: Pointer to width
-;  arg3: Pointer to height
+;  None
 ; Returns:
-;  Data in pointers to args
-	push	ix
-	ld	ix,_TextXMin - 3	; Just to maintain consistency
-	ld	iy,0
-	add	iy,sp
-	ld	bc,(ix + arg0)		; Fetch X min, will need in a moment
-	ld	de,(iy + arg2)
-	sbc	hl,hl
-	adc	hl,de			; Check if &width is NULL
-	jr	z,.skipWidth
-	ld	hl,(ix + arg2)		; Fetch X max
-	sbc	hl,bc
-	ex	de,hl			; Write to width
-	ld	(hl),de
-.skipWidth:
-	ld	de,(iy + arg0)
-	sbc	hl,hl			; If C was set, something weird happened
-	adc	hl,de			; (would require X min > X max)
-	jr	z,.skipXmin
-	ex	de,hl
-	ld	(hl),bc
-.skipXmin:
-	ld	b,(ix + arg0)		; Fetch Y min, will be needed shortly
-	ld	de,(iy + arg3)
-	sbc	hl,hl
-	adc	hl,de
-	jr	z,.skipHeight
-	ld	a,(ix + arg2)
-	sub	b
-	ex	de,hl
-	ld	(hl),a
-.skipHeight:
-	pop	ix
-	ld	de,(iy + arg1)
-	sbc	hl,hl
-	adc	hl,de
-	ret	z
-	ex	de,hl
-	ld	(hl),b
+;  Data
+	ld	hl,(_TextXMin)
 	ret
-	
+
+
+;-------------------------------------------------------------------------------
+fontlib_GetWindowYMin:
+; Returns the starting row of the current text window
+; Arguments:
+;  None
+; Returns:
+;  Data
+	ld	a,(_TextYMin)
+	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_GetWindowWidth:
+; Returns the width of the current text window
+; Arguments:
+;  None
+; Returns:
+;  Data
+	ld	hl,(_TextXMax)
+	ld	de,(_TextXMin)
+	or	a
+	sbc	hl, de
+	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_GetWindowHeight:
+; Returns the height of the current text window
+; Arguments:
+;  None
+; Returns:
+;  Data
+	ld	a,(_TextYMax)
+	ld	hl,(_TextYMin)
+	sub	(hl)
+	ret
+
 
 ;-------------------------------------------------------------------------------
 fontlib_SetCursorPosition:

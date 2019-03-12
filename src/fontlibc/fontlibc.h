@@ -109,14 +109,28 @@ void fontlib_SetWindowFullScreen(void);
 void fontlib_SetWindow(int x_min, uint8_t y_min, int width, uint8_t height);
 
 /**
- * Returns the current text drawing window.
- * NULL pointers are allowed if you don't want a value.
- * @param x_min Pointer to variable to store X coord into
- * @param y_min Pointer to variable to store Y coord into
- * @param width Pointer to variable to store width into
- * @param height  Pointer to variable to store height into
+ * Returns the starting column of the current text window
+ * @return Window X
  */
-void fontlib_GetWindow(int* x_min, uint8_t* y_min, int* width, uint8_t* height);
+int fontlib_GetWindowXMin(void);
+
+/**
+ * Returns the starting row of the current text window
+ * @return Window Y
+ */
+uint8_t fontlib_GetWindowYMin(void);
+
+/**
+ * Returns the width of the current text window
+ * @return Window width
+ */
+int fontlib_GetWindowWidth(void);
+
+/**
+ * Returns the height of the current text window
+ * @return Window height
+ */
+uint8_t fontlib_GetWindowHeight(void);
 
 /**
  * Sets the cursor position
