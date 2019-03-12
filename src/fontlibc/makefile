@@ -16,23 +16,21 @@ RM          =del /f 2>nul
 MKDIR       =mkdir
 CP          =xcopy /y
 PREFIX     ?=C:
-QUOTE_ARG   = "$(subst ",',$1)"#'
 else
-NATIVEPATH  ="$(subst \,/,$(1))"
+NATIVEPATH  =$(subst \,/,$(1))
 RM          =rm -f
 MKDIR       =mkdir -p
 CP          =cp
 PREFIX     ?=$(HOME)
-QUOTE_ARG   = '$(subst ','\'',$1)'#'
 endif
 
 SRC        +=$(NAME).asm
-CEDEV      ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
+DEV        ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
 BIN        ?=$(call NATIVEPATH,$(DEV)/bin)
 
-INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(CEDEV))
-H_LOC      :=$(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALLLOC)/include))
-I_LOC      :=$(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALLLOC)/lib/libload))
+INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
+H_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/include)
+I_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/lib/libload)
 
 LIB        :=$(NAME).lib
 LIB_8XV    :=$(NAME).8xv
