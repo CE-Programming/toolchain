@@ -1277,16 +1277,29 @@ fontlib_ClearWindow:
 ;  None
 ; Outputs:
 ;  None
+	ld	hl, (_TextX)
+	push	hl
+	ld	a, (_TextY)
+	push	af
 	ld	hl,(_TextXMax)
 	ld	de,(_TextXMin)
+	ld	(_TextX), de
 	or	a
 	sbc	hl,de
 	ex	de,hl
+	ld	a,(_TextYMin)
+	ld	(_TextY), a
+	ld	b, a
 	ld	a,(_TextYMax)
-	ld	hl,_TextYMin
-	sub	(hl)
+	sub	b
+	ld	b, a
 	ld	b,a
-	jr	util.ClearRect
+	call	util.ClearRect
+	pop	af
+	ld	(_TextY),a
+	pop	hl
+	ld	(_TextX),hl
+	ret
 
 
 ;-------------------------------------------------------------------------------
