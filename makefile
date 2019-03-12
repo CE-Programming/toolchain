@@ -74,6 +74,7 @@ endif
 BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
 
 GRAPHXDIR  := $(call NATIVEPATH,$(SRCDIR)/graphx)
+FONTLIBCDIR:= $(call NATIVEPATH,$(SRCDIR)/fontlibc)
 KEYPADCDIR := $(call NATIVEPATH,$(SRCDIR)/keypadc)
 FILEIOCDIR := $(call NATIVEPATH,$(SRCDIR)/fileioc)
 USBDRVCEDIR:= $(call NATIVEPATH,$(SRCDIR)/usbdrvce)
@@ -99,10 +100,10 @@ LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,s
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fileioc keypadc fatdrvce libload ce std startup
+all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) graphx fontlibc fileioc keypadc fatdrvce libload ce std startup
 	@echo Toolchain built.
 
-clean: clean-graphx clean-fileioc clean-keypadc clean-fatdrvce clean-ce clean-std clean-libload clean-startup
+clean: clean-graphx clean-fileioc clean-keypadc clean-fatdrvce clean-fontlibc clean-ce clean-std clean-libload clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
@@ -159,6 +160,15 @@ graphx: $(FASMG)
 	$(MAKE) -C $(GRAPHXDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-graphx:
 	$(MAKE) -C $(GRAPHXDIR) clean
+#----------------------------
+
+#----------------------------
+# fontlibc rules
+#----------------------------
+fontlibc: $(FASMG)
+	$(MAKE) -C $(FONTLIBCDIR) FASMG=$(FASMG) BIN=$(BIN)
+clean-fontlibc:
+	$(MAKE) -C $(FONTLIBCDIR) clean
 #----------------------------
 
 #----------------------------
@@ -246,6 +256,7 @@ install: $(DIRS) chmod all linker_script
 	$(CP) $(call NATIVEPATH,$(BIN)/*) $(INSTALLBIN)
 	$(MAKE) -C $(FASMGDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(GRAPHXDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(FONTLIBCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(KEYPADCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(FILEIOCDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(FATDRVCEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
@@ -283,10 +294,12 @@ release: install
 dist-libs: release-libs
 release-libs: clibraries
 	$(CP) $(call NATIVEPATH,src/graphx/graphx.8xv) $(call NATIVEPATH,clibraries/graphx.8xv)
+	$(CP) $(call NATIVEPATH,src/fontlibc/fontlibc.8xv) $(call NATIVEPATH,clibraries/fontlibc.8xv)
 	$(CP) $(call NATIVEPATH,src/fileioc/fileioc.8xv) $(call NATIVEPATH,clibraries/fileioc.8xv)
 	$(CP) $(call NATIVEPATH,src/keypadc/keypadc.8xv) $(call NATIVEPATH,clibraries/keypadc.8xv)
 	$(CP) $(call NATIVEPATH,src/libload/libload.8xv) $(call NATIVEPATH,clibraries/libload.8xv)
-	$(CONVHEX) -g 5 $(call NATIVEPATH,src/graphx/graphx.8xv) \
+	$(CONVHEX) -g 6 $(call NATIVEPATH,src/graphx/graphx.8xv) \
+	$(call NATIVEPATH,src/fontlibc/fontlibc.8xv) \
 	$(call NATIVEPATH,src/fileioc/fileioc.8xv) \
 	$(call NATIVEPATH,src/keypadc/keypadc.8xv) \
 	$(call NATIVEPATH,src/fatdrvce/fatdrvce.8xv) \
@@ -334,6 +347,7 @@ help:
 	@echo std
 	@echo fasmg
 	@echo graphx
+	@echo fontlibc
 	@echo fileioc
 	@echo keypadc
 	@echo usbdrvce
@@ -344,6 +358,7 @@ help:
 	@echo clean-asm
 	@echo clean-std
 	@echo clean-graphx
+	@echo clean-fontlibc
 	@echo clean-fileioc
 	@echo clean-keypadc
 	@echo clean-usbdrvce
@@ -356,4 +371,4 @@ help:
 	@echo release-libs
 	@echo help
 
-.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fileioc clean-fileioc keypadc clean-keypadc usbdrvce fatdrvce srldrvce clean-usbdrvce clean-fatdrvce clean-srldrvce install uninstall help release fasmg
+.PHONY: clean-libload libload release-libs clibraries doxygen chmod all clean graphx clean-graphx fontlibc clean-fontlibc fileioc clean-fileioc keypadc clean-keypadc usbdrvce fatdrvce srldrvce clean-usbdrvce clean-fatdrvce clean-srldrvce install uninstall help release fasmg
