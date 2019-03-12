@@ -1345,8 +1345,11 @@ fontlib_Newline:
 	ld	a,(iy + fontStruct.height)
 	add	a,(iy + fontStruct.spaceAbove)
 	add	a,(iy + fontStruct.spaceBelow)
-	add	a,(iy + textY)
+	ld	b, a
+	add	a, a
 	jr	c,.outOfSpace		; Carry = definitely went past YMax
+	add	a,(iy + textY)
+	jr	c,.outOfSpace
 	cp	(iy + textYMax)
 	jr	c,.checkPreClear
 .outOfSpace:
@@ -1358,6 +1361,7 @@ fontlib_Newline:
 	ld	a,1
 	ret
 .checkPreClear:
+	sub	a,b
 	ld	(iy + textY),a
 	xor	a
 	bit	bPreclearNewline,(iy + newlineControl)
