@@ -599,7 +599,7 @@ L_80:
 	RET	
 
 ;  345	uint32_t alloc_cluster(uint32_t entry_sector, uint8_t entry_index, uint32_t old_cluster) {
-_alloc_cluster:
+fat.alloc_cluster:
 	LD	HL,-52
 	CALL	__frameset
 ;  346		unsigned int i, j;
@@ -1689,7 +1689,7 @@ L_166:
 	LD	L,A
 	PUSH	HL
 	PUSH	BC
-	CALL	_alloc_cluster
+	CALL	fat.alloc_cluster
 	POP	BC
 	POP	BC
 	POP	BC
@@ -1964,7 +1964,7 @@ L_193:
 	LD	L,A
 	PUSH	HL
 	PUSH	BC
-	CALL	_alloc_cluster
+	CALL	fat.alloc_cluster
 	POP	BC
 	POP	BC
 	POP	BC
@@ -2189,7 +2189,7 @@ L_209:
 	LD	L,A
 	PUSH	HL
 	PUSH	BC
-	CALL	_alloc_cluster
+	CALL	fat.alloc_cluster
 	POP	BC
 	POP	BC
 	POP	BC
@@ -3704,5 +3704,302 @@ L_389:
 	LD	SP,IX
 	POP	IX
 	RET
+
+;  904	
+;  905	bool fat_seek(int fd, uint32_t pos) {
+_fat_seek:
+	LD	HL,-44
+	CALL	__frameset
+;  906	    uint8_t i;
+;  907	    uint32_t current_cluster_index, target_cluster_index, current_cluster, old_cluster;
+;  908	
+;  909		if (fd < 0)
+	LD	A,(IX+6)
+	OR	A,A
+	JP	P,L_396
+;  910			return false;
+	XOR	A,A
+	JQ	L_417
+L_396:
+;  911		for (i = 0; i < MAX_FD_OPEN; i++)
+	LD	(IX+-4),0
+	JQ	L_395
+L_393:
+;  912			if (fat_fd[i].key == fd)
+	LD	A,(IX+-4)
+	OR	A,A
+	SBC	HL,HL
+	LD	L,A
+	LD	A,23
+	CALL	__imul_b
+	LD	BC,_fat_fd
+	ADD	HL,BC
+	PUSH	HL
+	POP	IY
+	LD	A,(IY+0)
+	LD	B,(IX+6)
+	CP	A,B
+	JQ	Z,L_400
+	INC	(IX+-4)
+;  913				break;
+L_395:
+	LD	A,(IX+-4)
+	CP	A,4
+	JQ	C,L_393
+L_398:
+;  914		if (i == MAX_FD_OPEN)
+	LD	A,(IX+-4)
+	CP	A,4
+	JQ	NZ,L_400
+;  915			return false;
+	XOR	A,A
+	JQ	L_417
+L_400:
+;  916		if (!fat_fd[i].current_cluster)
+	LD	A,(IX+-4)
+	OR	A,A
+	SBC	HL,HL
+	LD	L,A
+	LD	A,23
+	CALL	__imul_b
+	LD	(IX+-15),HL
+	LD	BC,_fat_fd
+	ADD	HL,BC
+	LD	(IX+-3),HL
+	LD	IY,(IX+-3)
+	LD	HL,(IY+10)
+	LD	E,(IY+13)
+	CALL	__lcmpzero
+	JQ	NZ,L_403
+;  917			return false;
+	XOR	A,A
+	JQ	L_417
+L_403:
+;  918		if (pos >= fat_fd[i].file_size && !fat_fd[i].write)
+	LD	BC,(IX+-3)
+	LD	(IX+-21),BC
+	LD	BC,(IX+-3)
+	LD	(IX+-18),BC
+	LD	HL,(IX+9)
+	LD	E,(IX+12)
+	LD	IY,(IX+-3)
+	LD	BC,(IY+18)
+	LD	A,(IY+21)
+	CALL	__lcmpu
+	JQ	C,L_404
+	LD	BC,(IX+-3)
+	LD	(IX+-21),BC
+	LD	BC,(IX+-3)
+	LD	(IX+-18),BC
+	LD	IY,(IX+-3)
+	LD	A,(IY+22)
+	OR	A,A
+	JQ	NZ,L_404
+;  919			pos = fat_fd[i].file_size & (~0x1FF);
+	LD	BC,(IX+-3)
+	LD	(IX+-21),BC
+	LD	BC,(IX+-3)
+	LD	(IX+-18),BC
+	LD	IY,(IX+-3)
+	LD	HL,(IY+18)
+	LD	E,(IY+21)
+	LD	BC,16776704
+	LD	A,255
+	CALL	__land
+	LD	(IX+9),HL
+	LD	(IX+12),E
+L_404:
+;  920		target_cluster_index = (pos >> 9) / fat_state.cluster_size;
+	LD	BC,(IX+9)
+	LD	A,(IX+12)
+	LD	L,9
+	CALL	__lshru
+	LD	E,A
+	OR	A,A
+	SBC	HL,HL
+	LD	A,(_fat_state+1)
+	LD	L,A
+	LD	(IX+-41),BC
+	PUSH	HL
+	POP	BC
+	LD	A,H
+	LD	HL,(IX+-41)
+	CALL	__ldivu
+	LD	(IX+-25),HL
+	LD	(IX+-22),E
+;  921		current_cluster_index = (fat_fd[i].fpos >> 9) / fat_state.cluster_size;
+	LD	HL,(IX+-15)
+	LD	BC,_fat_fd
+	ADD	HL,BC
+	LD	(IX+-32),HL
+	LD	IY,(IX+-32)
+	LD	BC,(IY+14)
+	LD	A,(IY+17)
+	LD	L,9
+	CALL	__lshru
+	LD	E,A
+	OR	A,A
+	SBC	HL,HL
+	LD	A,(_fat_state+1)
+	LD	L,A
+	LD	(IX+-44),BC
+	PUSH	HL
+	POP	BC
+	LD	A,H
+	LD	HL,(IX+-44)
+	CALL	__ldivu
+	LD	(IX+-12),HL
+	LD	(IX+-9),E
+;  922		current_cluster = fat_fd[i].current_cluster;
+	LD	BC,(IY+10)
+	LD	A,(IY+13)
+	LD	(IX+-8),BC
+	LD	(IX+-5),A
+;  923	
+;  924		if (current_cluster_index == target_cluster_index) {
+	LD	HL,(IX+-12)
+	LD	E,(IX+-9)
+	LD	BC,(IX+-25)
+	LD	A,(IX+-22)
+	CALL	__lcmpu
+	JQ	NZ,L_407
+;  925			fat_fd[i].fpos = pos;
+	LD	BC,(IX+9)
+	LD	A,(IX+12)
+	LD	IY,(IX+-21)
+	LD	(IY+14),BC
+	LD	(IY+17),A
+;  926			return true;
+	LD	A,1
+	JQ	L_417
+;  927		}
+L_407:
+;  928		
+;  929		if (current_cluster_index > target_cluster_index)
+	LD	HL,(IX+-25)
+	LD	E,(IX+-22)
+	LD	BC,(IX+-12)
+	LD	A,(IX+-9)
+	CALL	__lcmpu
+	JQ	NC,L_414
+;  930			current_cluster_index = 0, current_cluster = fat_fd[i].first_cluster;
+	LD	BC,0
+	LD	(IX+-12),BC
+	XOR	A,A
+	LD	(IX+-9),A
+	LD	IY,(IX+-18)
+	LD	BC,(IY+6)
+	LD	A,(IY+9)
+	LD	(IX+-8),BC
+	LD	(IX+-5),A
+;  931		
+;  932		for (; current_cluster_index < target_cluster_index; current_cluster_index++) {
+	JQ	L_414
+L_412:
+;  933			old_cluster = current_cluster;
+	LD	BC,(IX+-8)
+	LD	A,(IX+-5)
+	LD	(IX+-29),BC
+	LD	(IX+-26),A
+;  934			if (!(current_cluster = next_cluster(current_cluster)))
+	LD	C,(IX+-5)
+	LD	B,0
+	PUSH	BC
+	LD	BC,(IX+-8)
+	PUSH	BC
+	CALL	fat.nextcluster
+	POP	BC
+	POP	BC
+	LD	(IX+-8),HL
+	LD	(IX+-5),E
+	LD	HL,(IX+-8)
+	LD	E,(IX+-5)
+	CALL	__lcmpzero
+	JQ	NZ,L_411
+;  935				current_cluster = alloc_cluster(fat_fd[i].entry_sector, fat_fd[i].entry_index, old_cluster);
+	LD	A,(IX+-4)
+	OR	A,A
+	SBC	HL,HL
+	LD	L,A
+	LD	A,23
+	CALL	__imul_b
+	LD	BC,_fat_fd
+	ADD	HL,BC
+	LD	(IX+-35),HL
+	LD	C,(IX+-26)
+	LD	B,0
+	PUSH	BC
+	LD	BC,(IX+-29)
+	PUSH	BC
+	LD	IY,(IX+-35)
+	LD	C,(IY+5)
+	LD	B,0
+	PUSH	BC
+	LD	BC,(IY+1)
+	LD	A,(IY+4)
+	LD	H,0
+	LD	L,A
+	PUSH	HL
+	PUSH	BC
+	CALL	fat.alloc_cluster
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+	LD	(IX+-8),HL
+	LD	(IX+-5),E
+L_411:
+;  936			if (!current_cluster)
+	LD	HL,(IX+-8)
+	LD	E,(IX+-5)
+	CALL	__lcmpzero
+	JQ	NZ,L_413
+;  937				return false;
+	XOR	A,A
+	JQ	L_417
+;  938		}
+L_413:
+	LD	HL,(IX+-12)
+	LD	E,(IX+-9)
+	LD	A,1
+	CALL	__ladd_b
+	LD	(IX+-12),HL
+	LD	(IX+-9),E
+L_414:
+	LD	HL,(IX+-12)
+	LD	E,(IX+-9)
+	LD	BC,(IX+-25)
+	LD	A,(IX+-22)
+	CALL	__lcmpu
+	JQ	C,L_412
+;  939	
+;  940		fat_fd[i].current_cluster = current_cluster;
+	LD	A,(IX+-4)
+	OR	A,A
+	SBC	HL,HL
+	LD	L,A
+	LD	A,23
+	CALL	__imul_b
+	LD	BC,_fat_fd
+	ADD	HL,BC
+	LD	(IX+-38),HL
+	LD	BC,(IX+-8)
+	LD	A,(IX+-5)
+	LD	IY,(IX+-38)
+	LD	(IY+10),BC
+	LD	(IY+13),A
+;  941		fat_fd[i].fpos = pos;
+	LD	DE,(IX+9)
+	LD	B,(IX+12)
+;  942		return true;
+	LD	A,1
+	LD	(IY+14),DE
+	LD	(IY+17),B
+;  943	}
+L_417:
+	LD	SP,IX
+	POP	IX
+	RET	
 
 

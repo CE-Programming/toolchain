@@ -397,7 +397,7 @@ fat_SetBuffer:
 
 ;-------------------------------------------------------------------------------
 fat_Seek:
-	ret
+	jp  _fat_seek
 
 ;-------------------------------------------------------------------------------
 fat_Delete:
@@ -580,7 +580,7 @@ fat.doallocentry:
 	push	hl
 	ld	hl,(iy + 3)
 	push	hl
-	call	_alloc_cluster
+	call	fat.alloc_cluster
 	pop	bc, bc, bc, bc, bc
 	push	de, hl
 	call	fat.cluster2sector	; sector = cluster_to_sector(alloc_cluster(entry_sector, entry_index, prev_cluster))
