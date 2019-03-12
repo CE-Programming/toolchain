@@ -1,12 +1,14 @@
 ;-------------------------------------------------------------------------------
 include '../include/library.inc'
+include '../include/include_library.inc'
 ;-------------------------------------------------------------------------------
 
 library 'FONTLIBC', 1
 
 ;-------------------------------------------------------------------------------
-; no dependencies
+; Dependencies
 ;-------------------------------------------------------------------------------
+include_library '../graphx/graphx.asm'
 
 ;-------------------------------------------------------------------------------
 ; v1 functions
@@ -417,6 +419,8 @@ DrawGlyph:
 	add	hl, de
 	ld	de, (mpLcdLpbase)
 	add	hl, de
+	; Make double-buffering happy
+	call	gfx_Wait
 	; Draw glyph
 	call	DrawGlyphRaw
 	; Update _TextX
@@ -671,6 +675,8 @@ fontlib_DrawStringL:
 ;  - arg1: Maximum number of characters have been printed
 ; Outputs:
 ;  - Stuff printed
+	; Make double-buffering happy
+	call	gfx_Wait
 	push	ix
 	; Since reentrancy isn't likely to be needed. . . .
 	; Instead of using stack locals, just access all our local and global
@@ -1413,6 +1419,8 @@ ClearRect:
 	or	d
 	ret	z
 	dec	de
+	; Make double-buffering happy
+	call	gfx_Wait
 	; Save width into IX for quick reloading during loop2
 	push	ix
 	ld	ix, 0
