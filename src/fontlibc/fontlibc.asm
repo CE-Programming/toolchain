@@ -269,7 +269,7 @@ fontlib_GetWindowHeight:
 ; Returns:
 ;  Data
 	ld	a,(_TextYMax)
-	ld	hl,(_TextYMin)
+	ld	hl,_TextYMin
 	sub	a,(hl)
 	ret
 
