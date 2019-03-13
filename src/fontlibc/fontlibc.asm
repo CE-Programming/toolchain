@@ -345,7 +345,6 @@ fontlib_SetFont:
 ;  bool:
 ;     - true if font loaded successfully
 ;     - false on failure (invalid font, or you tried to use the version byte)
-; Fetch arg0
 	ld	hl,arg0
 	add	hl,sp
 	ld	hl,(hl)
@@ -404,11 +403,9 @@ fontlib_DrawGlyph:
 ;  arg0: codepoint
 ; Returns:
 ;  Nothing
-	; Read arg0
 	ld	hl,arg0
 	add	hl,sp
 	ld	a,(hl)
-DrawGlyph:
 	push	ix			; _DrawGlyphRaw destroys IX
 ; Compute write pointer
 	ld	hl,(_TextY)
@@ -432,6 +429,9 @@ DrawGlyph:
 	sbc	hl,de
 	ld	(_TextX),hl
 	ret
+
+
+;-------------------------------------------------------------------------------
 util.DrawGlyphRaw:
 ; Handles the actual main work of drawing a glyph.
 ; Inputs:
@@ -459,6 +459,11 @@ util.DrawGlyphRaw:
 	add	hl,de
 	ld	a,(hl)
 	pop	de
+;	jp	util.DrawGlyphRawKnownWidth
+assert $ = util.DrawGlyphRawKnownWidth
+
+
+;-------------------------------------------------------------------------------
 util.DrawGlyphRawKnownWidth:
 ; Handles the actual main work of drawing a glyph.
 ; Inputs:
@@ -484,7 +489,7 @@ util.DrawGlyphRawKnownWidth:
 	inc	a
 	ld	(_TextStraightBytesPerRow),a
 	ld	a,320 and 255
-	sub	iyl
+	sub	a,iyl
 	ld	(_TextStraightRowDelta - 2),a
 ; Get pointer to bitmap
 	ld	hl,(_CurrentFontProperties.bitmapsTablePtr)
@@ -715,7 +720,7 @@ fontlib_DrawStringL:
 ; Check if control code
 	cp	a,(ix + firstPrintableCodePoint)
 	jr	nc,.notControlCode
-	or	a
+	or	a,a
 	jr	z,.exit
 	cp	a,(ix + newLineCode)
 	jr	z,.printNewline
@@ -989,7 +994,7 @@ fontlib_ValidateCodePoint:
 	jr	z,.exit
 	sub	a,(hl)
 .exit:	sbc	a,a
-	and	1
+	and	a,1
 	ret
 
 
@@ -1111,6 +1116,11 @@ fontlib_GetGlyphWidth:
 	ld	hl,arg0
 	add	hl,sp
 	ld	a,(hl)
+;	jp	util.GetGlyphWidth
+assert $ = util.GetGlyphWidth
+
+
+;-------------------------------------------------------------------------------
 util.GetGlyphWidth:
 ; Internal-use version
 ; Input:
@@ -1404,7 +1414,8 @@ util.ClearRect:
 ;  A = 0
 ; Destroys:
 ;  AF, BC, DE, HL, IY
-	; Check for trivial case
+
+; Check for trivial case
 	ld	b,a
 	or	a,a
 	ret	z
