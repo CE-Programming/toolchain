@@ -32,7 +32,7 @@ void main(void) {
     gfx_FillScreen(gfx_black);
 
     /* Disable pre-/post- line clearing */
-    fontlib_SetNewlineOptions(ENABLE_AUTO_WRAP);
+    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP);
     /* Set a font to use.  DrawString will display garbage if you don't give it a font! */
     fontlib_SetFont((fontlib_font_t *)test_font, 0);
 
