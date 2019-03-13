@@ -15,23 +15,23 @@ extern "C" {
 #endif
 
 typedef enum {
-    ENABLE_AUTO_WRAP = 0x01,
-    AUTO_CLEAR_TO_EOL = 0x02,
-    PRECLEAR_NEWLINE = 0x04
-} fontlib_newline_options;
+    FONTLIB_ENABLE_AUTO_WRAP = 0x01,
+    FONTLIB_AUTO_CLEAR_TO_EOL = 0x02,
+    FONTLIB_PRECLEAR_NEWLINE = 0x04
+} fontlib_newline_options_t;
 
 typedef enum {
     /* clear = sans-serif font */
-    SERIF = 0x01,
+    FONTLIB_SERIF = 0x01,
     /* If both are set, then assume there's no difference between oblique
      * and italic styles. */
-    OBLIQUE = 0x02,
-    ITALIC = 0x04,
+    FONTLIB_OBLIQUE = 0x02,
+    FONTLIB_ITALIC = 0x04,
     /* Chances are you're not using this library for monospaced fonts.
      * But if you are, you'll still have to provide a widths table where
      * every byte is the same. */
-    MONOSPACED = 0x08
-} fontlib_styles;
+    FONTLIB_MONOSPACED = 0x08
+} fontlib_styles_t;
 
 typedef struct {
     /* These are standard C-strings.  These pointers may be NULL. */
