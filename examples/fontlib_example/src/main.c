@@ -16,7 +16,7 @@ static const uint8_t test_font[] = {
 	#include "testfont.inc"
 };
 
-void printCentered(char* string) {
+void printCentered(const char *string) {
     /* We're just using some simple math to find the center of the text window.
     Then we find the center of the text to be displayed and use math to make
     sure it ends up in the center of the window. */
@@ -26,15 +26,15 @@ void printCentered(char* string) {
 
 /* Main Function */
 void main(void) {
-    char* title = " FONTLIBC ";
+    char *title = " FONTLIBC ";
     gfx_Begin();
     /* Erase the screen to black */
     gfx_FillScreen(gfx_black);
 
     /* Disable pre-/post- line clearing */
-    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP);
+    fontlib_SetNewlineOptions(ENABLE_AUTO_WRAP);
     /* Set a font to use.  DrawString will display garbage if you don't give it a font! */
-    fontlib_SetFont(test_font, 0);
+    fontlib_SetFont((fontlib_font_t *)test_font, 0);
 
     /* First, we'll display centered text in a window */
     /* Add some vertical padding around our text */
