@@ -61,33 +61,31 @@ include_library '../graphx/graphx.asm'
 
 
 ;-------------------------------------------------------------------------------
-LcdSize            := LcdWidth*LcdHeight
-; minimum stack size to provide for interrupts if moving the stack
-CurrentBuffer      := mpLcdLpbase
-TRASPARENT_COLOR   := 0
-TEXT_FG_COLOR      := 0
-TEXT_BG_COLOR      := 255
-TEXT_TP_COLOR      := 255
-local2 := -9
-local1 := -6
-local0 := -3
-arg00 := 0
-arg0 := 3
-arg1 := 6
-arg2 := 9
-arg3 := 12
-arg4 := 15
-arg5 := 18
-arg6 := 21
-chFirstPrintingCode	equ	16
-chNewLine	equ	0Ah
-bEnableAutoWrap := 0
-mEnableAutoWrap := 1
-bAutoClearToEOL := 1
-mAutoClearToEOL := 2
+LcdSize		:= LcdWidth*LcdHeight
+CurrentBuffer	:= mpLcdLpbase
+TEXT_FG_COLOR	:= 0
+TEXT_BG_COLOR	:= 255
+local2		:= -9
+local1		:= -6
+local0		:= -3
+arg00		:= 0
+arg0		:= 3
+arg1		:= 6
+arg2		:= 9
+arg3		:= 12
+arg4		:= 15
+arg5		:= 18
+arg6		:= 21
+chFirstPrintingCode := $10
+chNewLine	:= $0A
+bEnableAutoWrap	:= 0
+mEnableAutoWrap	:= 1 shl bEnableAutoWrap
+bAutoClearToEOL	:= 1
+mAutoClearToEOL	:= 1 shl bAutoClearToEOL
 bPreclearNewline := 2
-mPreclearNewline := 4
-bWasNewline := 7
+mPreclearNewline := 1 shl bPreclearNewline
+bWasNewline	:= 7
+mWasNewline	:= 1 shl bWasNewline
 
 
 ;-------------------------------------------------------------------------------
@@ -415,7 +413,7 @@ fontlib_DrawGlyph:
 	ld	de,(_TextX)
 	push	de
 	add	hl,de
-	ld	de,(mpLcdLpbase)
+	ld	de,(CurrentBuffer)
 	add	hl,de
 	call	util.DrawGlyphRaw	; Draw glyph
 ; Update _TextX
@@ -517,7 +515,7 @@ util.DrawGlyphRawKnownWidth:
 	ld	a,(_CurrentFontProperties.spaceAbove)
 	or	a,a
 	call	nz,util.DrawEmptyLines
-	ld	c,255			; SMCd to have correct foreground color
+	ld	c,TEXT_FG_COLOR		; SMCd to have correct foreground color
 smcByte _TextStraightForegroundColor
 	ld	a,(_CurrentFontProperties.height)
 	ld	iyh,a
@@ -574,7 +572,7 @@ smcByte _TextStraightBytesPerRow
 
 ; For unset pixels with opacity on
 .unsetColumnLoopStart:
-	ld	a,0			; SMCd to have correct background color
+	ld	a,TEXT_BG_COLOR		; SMCd to have correct background color
 smcByte _TextStraightBackgroundColor
 	ld	(de),a
 	inc	de
@@ -700,7 +698,7 @@ fontlib_DrawStringL:
 	add	hl,hl
 	ld	bc,(ix + textX)
 	add	hl,bc
-	ld	bc,(mpLcdLpbase)
+	ld	bc,(CurrentBuffer)
 	add	hl,bc
 	ex	de,hl
 .mainLoop:
@@ -1435,7 +1433,7 @@ util.ClearRect:
 	add	hl,hl
 	ld	de,(_TextX)
 	add	hl,de
-	ld	iy,(mpLcdLpbase)
+	ld	iy,(CurrentBuffer)
 	ex	de,hl
 	add	iy,de
 	lea	hl,iy + 0
