@@ -542,25 +542,25 @@ enter:
 fat.sector2cluster:
 ; return (sector - fat_state.data_region) / fat_state.cluster_size + 2
 ; this isn't really a critical routine
-	ld	iy, 0
-	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	e, (iy + 6)
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 3)
+	ld	e,(iy + 6)
 	call	__lcmpzero
 	ret	z
-	ld	bc, (_fat_state + 20)
-	ld	a, (_fat_state + 23)
+	ld	bc,(_fat_state + 20)
+	ld	a,(_fat_state + 23)
 	call	__lsub
-	ld	bc, 0
-	ld	a, (_fat_state + 1)
-	ld	c, a
-	xor	a, a
+	ld	bc,0
+	ld	a,(_fat_state + 1)
+	ld	c,a
+	xor	a,a
 	call	__ldivu
-	xor	a, a
-	ld	bc, 2
-	add	hl, bc
-	adc	a, e
-	ld	e, a
+	xor	a,a
+	ld	bc,2
+	add	hl,bc
+	adc	a,e
+	ld	e,a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -586,13 +586,13 @@ fat.doallocentry:
 	call	fat.cluster2sector	; sector = cluster_to_sector(alloc_cluster(entry_sector, entry_index, prev_cluster))
 	pop	bc, bc
 	ld	iy,(fat.sectorbuffer)
-	ld	(iy +  0), $e5
-	ld	(iy + 11), $00
-	ld	(iy + 32), $00
-	ld	(iy + 43), $00
-	push	hl, de
+	ld	(iy +  0),$e5
+	ld	(iy + 11),$00
+	ld	(iy + 32),$00
+	ld	(iy + 43),$00
+	push	hl,de
 	call	fat.writesectora	; write_sector(sector, sector_buff)
-	pop	de, hl			; return sector
+	pop	de,hl			; return sector
 	ret
 
 ;-------------------------------------------------------------------------------
