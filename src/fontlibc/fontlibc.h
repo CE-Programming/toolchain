@@ -14,84 +14,86 @@
 extern "C" {
 #endif
 
-#define FONTLIB_ENABLE_AUTO_WRAP 1
-#define FONTLIB_AUTO_CLEAR_TO_EOL 2
-#define FONTLIB_PRECLEAR_NEWLINE 4
+typedef enum {
+    ENABLE_AUTO_WRAP = 0x01,
+    AUTO_CLEAR_TO_EOL = 0x02,
+    PRECLEAR_NEWLINE = 0x04
+} fontlib_newline_options;
 
 typedef enum {
-	/* clear = sans-serif font */
-	SERIF = 0x01,
-	/* If both are set, then assume there's no difference between oblique
-	 * and italic styles. */
-	OBLIQUE = 0x02,
-	ITALIC = 0x04,
-	/* Chances are you're not using this library for monospaced fonts.
-	 * But if you are, you'll still have to provide a widths table where
-	 * every byte is the same. */
-	MONOSPACED = 0x08
-} fontlib_styles_t;
+    /* clear = sans-serif font */
+    SERIF = 0x01,
+    /* If both are set, then assume there's no difference between oblique
+     * and italic styles. */
+    OBLIQUE = 0x02,
+    ITALIC = 0x04,
+    /* Chances are you're not using this library for monospaced fonts.
+     * But if you are, you'll still have to provide a widths table where
+     * every byte is the same. */
+    MONOSPACED = 0x08
+} fontlib_styles;
 
 typedef struct {
-	/* These are standard C-strings.  These pointers may be NULL. */
-	char *font_family_name;
-	char *font_author;
-	/* NOTA BENE: TYPEFACES AND BITMAPPED FONTS CANNOT BE COPYRIGHTED UNDER U.S. LAW!
-	 * This field is therefore referred to as a pseudocopyright.  HOWEVER,
-	 * it IS is applicable in other jusrisdictions, such as Germany. */
-	char *font_pseudocopyright;
-	char *font_description;
-	char *font_version;
-	char *font_codepage;
-} fontlib_metadata;
+    /* These are standard C-strings.  These pointers may be NULL. */
+    char *font_family_name;
+    char *font_author;
+    /* NOTA BENE: TYPEFACES AND BITMAPPED FONTS CANNOT BE COPYRIGHTED UNDER U.S. LAW!
+     * This field is therefore referred to as a pseudocopyright.  HOWEVER,
+     * it IS is applicable in other jusrisdictions, such as Germany. */
+    char *font_pseudocopyright;
+    char *font_description;
+    char *font_version;
+    char *font_codepage;
+} fontlib_metadata_t;
 
 typedef struct {
-	/* Must be zero */
-	uint8_t fontVersion;
-	/* Height in pixels */
-	uint8_t height;
-	/* Total number of glyphs provided. */
-	uint8_t total_glyphs;
-	/* Number of first glyph.  If you have no codepoints below 32, for
-	   example, you can omit the first 32 bitmaps. */
-	uint8_t first_glyph;
-	/* Offset/pointer to glyph widths table.
-	 * This is an OFFSET from the fontVersion member in data format.
-	 * However, it is 24-bits long because it becomes a real pointer upon loading. */
-	void *widths_table;
-	/* Offset to a table of offsets to glyph bitmaps.
-	 * These offsets are only 16-bits each to save some space. */
-	void *bitmaps;
-	/* Specifies how much to move the cursor left after each glyph.
-	   Total movement is width - overhang.  Intended for italics. */
-	uint8_t italic_space_adjust;
-	/* These suggest adding blank space above or below each line of text.
-	   This can increase legibility. */
-	uint8_t space_above;
-	uint8_t space_below;
-	/* Specifies the boldness of the font. 
-	   0x40: light
-	   0x80: regular
-	   0x90: medium
-	   0xC0: bold*/
-	uint8_t weight;
-	/* Specifies the style of the font.  See enum font_styles */
-	uint8_t style;
-	/* For layout, allows aligning text of differing fonts vertically.
-	   These count pixels going down, i.e. 0 means the top of the glyph. */
-	uint8_t cap_height;
-	uint8_t x_height;
-	uint8_t baseline_height;
-} fontlib_font;
+    /* Must be zero */
+    uint8_t fontVersion;
+    /* Height in pixels */
+    uint8_t height;
+    /* Total number of glyphs provided. */
+    uint8_t total_glyphs;
+    /* Number of first glyph.  If you have no codepoints below 32, for
+       example, you can omit the first 32 bitmaps. */
+    uint8_t first_glyph;
+    /* Offset/pointer to glyph widths table.
+     * This is an OFFSET from the fontVersion member in data format.
+     * However, it is 24-bits long because it becomes a real pointer upon loading. */
+    void *widths_table;
+    /* Offset to a table of offsets to glyph bitmaps.
+     * These offsets are only 16-bits each to save some space. */
+    void *bitmaps;
+    /* Specifies how much to move the cursor left after each glyph.
+       Total movement is width - overhang.  Intended for italics. */
+    uint8_t italic_space_adjust;
+    /* These suggest adding blank space above or below each line of text.
+       This can increase legibility. */
+    uint8_t space_above;
+    uint8_t space_below;
+    /* Specifies the boldness of the font. 
+       0x40: light
+       0x80: regular
+       0x90: medium
+       0xC0: bold*/
+    uint8_t weight;
+    /* Specifies the style of the font.  See enum font_styles */
+    uint8_t style;
+    /* For layout, allows aligning text of differing fonts vertically.
+       These count pixels going down, i.e. 0 means the top of the glyph. */
+    uint8_t cap_height;
+    uint8_t x_height;
+    uint8_t baseline_height;
+} fontlib_font_t;
 
 typedef struct {
-	char header[8]; /* "FONTPACK" */
-	/* Offset from first byte of header */
-	fontlib_metadata *metadata;
-	/* Frankly, if you have more than 127 fonts in a pack, you have a
-	   problem. */
-	uint8_t fontCount;
-	fontlib_font font_list[1];
-} fontlib_font_pack;
+    char header[8]; /* "FONTPACK" */
+    /* Offset from first byte of header */
+    fontlib_metadata_t *metadata;
+    /* Frankly, if you have more than 127 fonts in a pack, you have a
+       problem. */
+    uint8_t fontCount;
+    fontlib_font_t font_list[1];
+} fontlib_font_pack_t;
 
 
 /**
@@ -167,7 +169,7 @@ void fontlib_ShiftCursorPosition(int x, uint8_t y);
  * WARNING: If false is returned, no valid font is currently loaded and trying
  * to print will print garbage!
  */
-bool fontlib_SetFont(const fontlib_font *font_data, unsigned int flags);
+bool fontlib_SetFont(const fontlib_font_t *font_data, unsigned int flags);
 
 /**
  * Sets the current foreground color FontLibC will use for drawing.
