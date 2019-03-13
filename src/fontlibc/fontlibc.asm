@@ -458,6 +458,7 @@ util.DrawGlyphRaw:
 	add	hl,de
 	ld	a,(hl)
 	pop	de
+	call	gfx_Wait
 ;	jp	util.DrawGlyphRawKnownWidth
 assert $ = util.DrawGlyphRawKnownWidth
 
@@ -521,7 +522,6 @@ smcByte _TextStraightForegroundColor
 	ld	a,(_CurrentFontProperties.height)
 	ld	iyh,a
 	ld	a,c
-	call	gfx_Wait
 
 ; Registers:
 ;  B: Bit counter for each row
@@ -691,6 +691,7 @@ fontlib_DrawStringL:
 	ld	(ix + strReadPtr),hl	; so we need an initial pre-decrement
 	ld	hl,(iy + arg2)
 	ld	(ix + charactersLeft),hl
+	call	gfx_Wait
 .restartX:
 ; Compute target drawing address
 	ld	hl,(_TextY)
