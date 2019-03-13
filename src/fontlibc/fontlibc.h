@@ -29,20 +29,20 @@ typedef enum {
 	 * But if you are, you'll still have to provide a widths table where
 	 * every byte is the same. */
 	MONOSPACED = 0x08
-} font_styles_t;
+} fontlib_styles_t;
 
 typedef struct {
-	/* These are standard C-strings.  These may be NULL. */
-	intptr_t font_family_name;
-	intptr_t font_author;
+	/* These are standard C-strings.  These pointers may be NULL. */
+	char *font_family_name;
+	char *font_author;
 	/* NOTA BENE: TYPEFACES AND BITMAPPED FONTS CANNOT BE COPYRIGHTED UNDER U.S. LAW!
 	 * This field is therefore referred to as a pseudocopyright.  HOWEVER,
 	 * it IS is applicable in other jusrisdictions, such as Germany. */
-	intptr_t font_pseudocopyright;
-	intptr_t font_description;
-	intptr_t font_version;
-	intptr_t font_codepage;
-} font_metadata;
+	char *font_pseudocopyright;
+	char *font_description;
+	char *font_version;
+	char *font_codepage;
+} fontlib_metadata;
 
 typedef struct {
 	/* Must be zero */
@@ -57,10 +57,10 @@ typedef struct {
 	/* Offset/pointer to glyph widths table.
 	 * This is an OFFSET from the fontVersion member in data format.
 	 * However, it is 24-bits long because it becomes a real pointer upon loading. */
-	intptr_t widths_table;
+	void *widths_table;
 	/* Offset to a table of offsets to glyph bitmaps.
 	 * These offsets are only 16-bits each to save some space. */
-	intptr_t bitmaps;
+	void *bitmaps;
 	/* Specifies how much to move the cursor left after each glyph.
 	   Total movement is width - overhang.  Intended for italics. */
 	uint8_t italic_space_adjust;
@@ -81,17 +81,17 @@ typedef struct {
 	uint8_t cap_height;
 	uint8_t x_height;
 	uint8_t baseline_height;
-} raw_font;
+} fontlib_font;
 
 typedef struct {
 	char header[8]; /* "FONTPACK" */
+	/* Offset from first byte of header */
+	fontlib_metadata *metadata;
 	/* Frankly, if you have more than 127 fonts in a pack, you have a
 	   problem. */
 	uint8_t fontCount;
-	/* Offset from first byte of header */
-	intptr_t metadata;
-	intptr_t font_list;
-} font_pack;
+	fontlib_font font_list[1];
+} fontlib_font_pack;
 
 
 /**
@@ -167,7 +167,7 @@ void fontlib_ShiftCursorPosition(int x, uint8_t y);
  * WARNING: If false is returned, no valid font is currently loaded and trying
  * to print will print garbage!
  */
-bool fontlib_SetFont(uint8_t* font_data, int flags);
+bool fontlib_SetFont(const fontlib_font *font_data, unsigned int flags);
 
 /**
  * Sets the current foreground color FontLibC will use for drawing.
@@ -345,7 +345,7 @@ uint8_t fontlib_GetGlyphWidth(char codepoint);
  * @param str Pointer to string
  * @return Width of string
  */
-uint24_t fontlib_GetStringWidth(char* str);
+uint24_t fontlib_GetStringWidth(const char *str);
 
 /**
  * Returns the width of a string printed in the current font.
@@ -356,14 +356,14 @@ uint24_t fontlib_GetStringWidth(char* str);
  * (or 0 if not needed)
  * @return Width of string
  */
-uint24_t fontlib_GetStringWidthL(char* str, int24_t max_characters);
+uint24_t fontlib_GetStringWidthL(const char *str, int24_t max_characters);
 
 /**
  * Gets the location of the last character processed by GetStringWidth or 
  * DrawString
  * @return Pointer to character
  */
-char* fontlib_GetLastCharacterRead(void);
+char *fontlib_GetLastCharacterRead(void);
 
 /**
  * Returns 0 if DrawStringL or GetStringWidthL returned because max_characters
@@ -384,7 +384,7 @@ void fontlib_DrawGlyph(uint8_t glyph);
  * THIS IS NOT REENTRANT (though if you need that, you're probably not using C)
  * @param str Pointer to string
  */
-void fontlib_DrawString(char* str);
+void fontlib_DrawString(const char *str);
 
 /**
  * Draws a string, up to a maximum number of characters
@@ -393,7 +393,7 @@ void fontlib_DrawString(char* str);
  * @param max_characters Maximum number of characters to attempt to print, may
  * return early if some other condition requires returning
  */
-void fontlib_DrawStringL(char* str, int24_t max_characters);
+void fontlib_DrawStringL(const char *str, int24_t max_characters);
 
 /**
  * Erases everything from the cursor to the right side of the text window
