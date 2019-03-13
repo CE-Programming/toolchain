@@ -417,7 +417,6 @@ fontlib_DrawGlyph:
 	add	hl,de
 	ld	de,(mpLcdLpbase)
 	add	hl,de
-	call	gfx_Wait		; Make double-buffering happy
 	call	util.DrawGlyphRaw	; Draw glyph
 ; Update _TextX
 	lea.sis	de,iy + 0
@@ -522,6 +521,7 @@ smcByte _TextStraightForegroundColor
 	ld	a,(_CurrentFontProperties.height)
 	ld	iyh,a
 	ld	a,c
+	call	gfx_Wait
 
 ; Registers:
 ;  B: Bit counter for each row
@@ -678,7 +678,6 @@ fontlib_DrawStringL:
 ;  arg1: Maximum number of characters have been printed
 ; Outputs:
 ;  Stuff printed
-	call	gfx_Wait		; Make double-buffering happy
 	push	ix
 ; Since reentrancy isn't likely to be needed. . . .
 ; Instead of using stack locals, just access all our local and global
@@ -1423,7 +1422,6 @@ util.ClearRect:
 	or	a,d
 	ret	z
 	dec	de
-	call	gfx_Wait		; Make double-buffering happy
 ; Save width into IX for quick reloading during loop2
 	push	ix
 	ld	ix,0
@@ -1444,6 +1442,7 @@ util.ClearRect:
 ; This avoid some awkwardness with loop control and running out of registers
 	ld	a,(_TextStraightBackgroundColor)
 	ld	de,LcdWidth
+	call	gfx_Wait
 .loop1:
 	ld	(hl),a
 	add	hl,de
