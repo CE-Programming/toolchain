@@ -256,8 +256,8 @@ fontlib_GetWindowWidth:
 ;  Data
 	ld	hl,(_TextXMax)
 	ld	de,(_TextXMin)
-	or	a
-	sbc	hl, de
+	or	a,a
+	sbc	hl,de
 	ret
 
 
@@ -270,7 +270,7 @@ fontlib_GetWindowHeight:
 ;  Data
 	ld	a,(_TextYMax)
 	ld	hl,(_TextYMin)
-	sub	(hl)
+	sub	a,(hl)
 	ret
 
 
@@ -352,8 +352,8 @@ fontlib_SetFont:
 ; Verify version byte is zero like it's supposed to be
 ; The literal only reason there's any validation here at all is to
 ; enforce keeping the version byte reserved.
-	xor	a
-	cp	(hl)
+	xor	a,a
+	cp	a,(hl)
 	ret	nz
 ; Load font data
 	ld	(_CurrentFontRoot),hl
@@ -365,19 +365,19 @@ fontlib_SetFont:
 	ld	iy,_CurrentFontProperties
 ; Verify height at least looks semi-reasonable
 	ld	a,(iy + fontStruct.height)
-	or	a
+	or	a,a
 	ret	z			; Also unreasonable: a zero-height font
-	and	80h
+	and	a,$80
 	jr	nz,.false
 	ld	a,63
-	cp	(iy + fontStruct.spaceAbove)
+	cp	a,(iy + fontStruct.spaceAbove)
 	jr	c,.false
-	cp	(iy + fontStruct.spaceBelow)
+	cp	a,(iy + fontStruct.spaceBelow)
 	jr	c,.false
 .validateOffsets:
 ; Now convert offsets into actual pointers
 ; Validate that offset is at least semi-reasonable
-	ld	de,0FF00h		; Maximum reasonable font data size
+	ld	de,$ff00		; Maximum reasonable font data size
 	ld	hl,(iy + fontStruct.widthsTablePtr)
 	sbc	hl,de			; Doesn't really matter if we're off-by-one here
 	ret	nc
@@ -393,7 +393,7 @@ fontlib_SetFont:
 	ld	a,1
 	ret
 .false:
-	xor	a
+	xor	a,a
 	ret
 
 
@@ -449,10 +449,10 @@ util.DrawGlyphRaw:
 	push	hl
 ; Subtract out firstGlyph
 	ld	hl,_CurrentFontProperties.firstGlyph
-	sub	(hl)
+	sub	a,(hl)
 ; Get glyph width
 	ld	c,a
-	or	a
+	or	a,a
 	sbc	hl,hl
 	ld	l,a
 	ld	de,(_CurrentFontProperties.widthsTablePtr)
@@ -713,25 +713,25 @@ fontlib_DrawStringL:
 ; Read character
 	ld	a,(hl)
 ; Check if control code
-	cp	(ix + firstPrintableCodePoint)
+	cp	a,(ix + firstPrintableCodePoint)
 	jr	nc,.notControlCode
 	or	a
 	jr	z,.exit
-	cp	(ix + newLineCode)
+	cp	a,(ix + newLineCode)
 	jr	z,.printNewline
 .exit:	pop	ix
 	ret
 .notControlCode:
-	cp	(ix + alternateStopCode)
+	cp	a,(ix + alternateStopCode)
 	jr	z,.exit
 ; Check if font has given codepoint
-	sub	(ix + fontStruct.firstGlyph)
+	sub	a,(ix + fontStruct.firstGlyph)
 	jr	c,.exit
 	sbc	hl,hl			; Zero for later
 	ld	l,a
-	sub	(ix + fontStruct.totalGlyphs)
+	sub	a,(ix + fontStruct.totalGlyphs)
 	jr	c,.definitelyValid
-	cp	l			; 0 = 256 total glyphs,so check for zero
+	cp	a,l			; 0 = 256 total glyphs,so check for zero
 	jr	nz,.exit		; Z iff L == A, which is true iff totalGlyphs == 0
 .definitelyValid:
 	ld	(ix + readCharacter),l
@@ -745,7 +745,7 @@ fontlib_DrawStringL:
 	ld	c,a
 	add	hl,bc
 	ld	bc,(ix + textXMax)
-;	or	a			; C should already be reset from ADD HL,BC
+;	or	a,a			; C should already be reset from ADD HL,BC
 	sbc	hl,bc
 	add	hl,bc
 	jr	z,.colOK
@@ -753,7 +753,7 @@ fontlib_DrawStringL:
 ; Correct for italicness
 .colOK:	ld	c,(ix + fontStruct.italicSpaceAdjust)
 	ld	b,0
-	or	a
+	or	a,a
 	sbc	hl,bc
 	ld	(ix + textX),hl
 ; OK,ready to draw the glyph
@@ -764,7 +764,7 @@ fontlib_DrawStringL:
 	ld	ix,DataBaseAddr
 ; Update write pointer
 	ld	a,iyl
-	sub	(ix + fontStruct.italicSpaceAdjust)
+	sub	a,(ix + fontStruct.italicSpaceAdjust)
 	sbc	hl,hl			; Sign-extend A for HL
 	ld	l,a
 	add	hl,de
@@ -780,7 +780,7 @@ fontlib_DrawStringL:
 	jr	z,.exit
 .doNewline:
 	call	fontlib_Newline
-	or	a
+	or	a,a
 	jr	nz,.exit
 	bit	bWasNewline,(ix + newlineControl)
 	res	bWasNewline,(ix + newlineControl)
@@ -978,7 +978,7 @@ fontlib_ValidateCodePoint:
 	add	hl,sp
 	ld	a,(hl)
 	ld	hl,_CurrentFontProperties.firstGlyph
-	sub	(hl)
+	sub	a,(hl)
 	ccf
 	jr	nc,.exit
 	ld	hl,_CurrentFontProperties.totalGlyphs
@@ -987,7 +987,7 @@ fontlib_ValidateCodePoint:
 	inc	b
 	dec	b
 	jr	z,.exit
-	sub	(hl)
+	sub	a,(hl)
 .exit:	sbc	a,a
 	and	1
 	ret
@@ -1001,11 +1001,11 @@ fontlib_GetTotalGlyphs:
 ;  None
 ; Returns:
 ;  Total number of printable glyphs
-	or	a
+	or	a,a
 	sbc	hl,hl
 	ld	a,(_CurrentFontProperties.totalGlyphs)
 	ld	l,a
-	or	a
+	or	a,a
 	ret	nz
 	inc	h
 	ret
@@ -1123,19 +1123,19 @@ util.GetGlyphWidth:
 ;  HL
 ; Subtract out firstGlyph
 	ld	hl,_CurrentFontProperties.firstGlyph
-	sub	(hl)
+	sub	a,(hl)
 ; Validate that the glyph index is actually valid
 	jr	nc,.checkMaxIndex
 .invalidIndex:
-	xor	a
+	xor	a,a
 	scf
 	ret
 .checkMaxIndex:
 	ld	hl,_CurrentFontProperties.totalGlyphs
-	cp	(hl)
+	cp	a,(hl)
 	jr	c,.invalidIndex
 ; Look up width
-	or	a
+	or	a,a
 	sbc	hl,hl
 	ld	l,a
 	ld	de,(_CurrentFontProperties.widthsTablePtr)
@@ -1189,42 +1189,42 @@ fontlib_GetStringWidthL:
 	ld	iy,0
 	ld	de,(ix + fontStruct.widthsTablePtr)
 	ld	a,(bc)
-	or	a
+	or	a,a
 	jr	z,.exitFast
 .loop:
 ; Check that we haven't exceeded our glyph printing limit
 	ld	hl,(ix + charactersLeft)
 	add	hl,bc
-	or	a
+	or	a,a
 	sbc	hl,bc
 	jr	z,.exit
 	dec	hl
 	ld	(ix + charactersLeft),hl
 ; Fetch next item
 	ld	a,(bc)
-	cp	(ix + firstPrintableCodePoint)
+	cp	a,(ix + firstPrintableCodePoint)
 	jr	c,.exit
-	or	a
+	or	a,a
 	jr	z,.exit
-	cp	(ix + alternateStopCode)
+	cp	a,(ix + alternateStopCode)
 	jr	z,.exit
-	sub	(ix + fontStruct.firstGlyph)
+	sub	a,(ix + fontStruct.firstGlyph)
 	jr	c,.exit
-	cp	(ix + fontStruct.totalGlyphs)
+	cp	a,(ix + fontStruct.totalGlyphs)
 	jr	c,.validCodepoint
 	ld	(ix + readCharacter),a
 	ld	a,(ix + fontStruct.totalGlyphs)
-	or	a
+	or	a,a
 	jr	nz,.exit
 	ld	a,(ix + readCharacter)
 .validCodepoint:
 	inc	bc
-	or	a
+	or	a,a
 	sbc	hl,hl
 	ld	l,a
 	add	hl,de
 	ld	a,(hl)
-	sub	(ix + fontStruct.italicSpaceAdjust) ; So if this results in a negative number
+	sub	a,(ix + fontStruct.italicSpaceAdjust) ; So if this results in a negative number
 	sbc	hl,hl			; then this too will become negative,
 	ld	l,a			; which gives the intended result, I guess
 	ex	de,hl
@@ -1277,22 +1277,22 @@ fontlib_ClearWindow:
 ;  None
 ; Outputs:
 ;  None
-	ld	hl, (_TextX)
+	ld	hl,(_TextX)
 	push	hl
-	ld	a, (_TextY)
+	ld	a,(_TextY)
 	push	af
 	ld	hl,(_TextXMax)
 	ld	de,(_TextXMin)
-	ld	(_TextX), de
-	or	a
+	ld	(_TextX),de
+	or	a,a
 	sbc	hl,de
 	ex	de,hl
 	ld	a,(_TextYMin)
-	ld	(_TextY), a
-	ld	b, a
+	ld	(_TextY),a
+	ld	b,a
 	ld	a,(_TextYMax)
-	sub	b
-	ld	b, a
+	sub	a,b
+	ld	b,a
 	ld	b,a
 	call	util.ClearRect
 	pop	af
@@ -1345,12 +1345,12 @@ fontlib_Newline:
 	ld	a,(iy + fontStruct.height)
 	add	a,(iy + fontStruct.spaceAbove)
 	add	a,(iy + fontStruct.spaceBelow)
-	ld	b, a
-	add	a, a
+	ld	b,a
+	add	a,a
 	jr	c,.outOfSpace		; Carry = definitely went past YMax
 	add	a,(iy + textY)
 	jr	c,.outOfSpace
-	cp	(iy + textYMax)
+	cp	a,(iy + textYMax)
 	jr	c,.checkPreClear
 .outOfSpace:
 	ld	a,1
@@ -1363,7 +1363,7 @@ fontlib_Newline:
 .checkPreClear:
 	sub	a,b
 	ld	(iy + textY),a
-	xor	a
+	xor	a,a
 	bit	bPreclearNewline,(iy + newlineControl)
 	ret	z
 ; Fall through to ClearEOL
@@ -1379,7 +1379,7 @@ fontlib_ClearEOL:
 ; Compute the rectangle size to clear
 	ld	de,(_TextX)
 	ld	hl,(_TextXMax)
-	or	a
+	or	a,a
 	sbc	hl,de
 	ret	c
 	ret	z
@@ -1406,10 +1406,10 @@ util.ClearRect:
 ;  AF, BC, DE, HL, IY
 	; Check for trivial case
 	ld	b,a
-	or	a
+	or	a,a
 	ret	z
 	ld	a,e
-	or	d
+	or	a,d
 	ret	z
 	dec	de
 	call	gfx_Wait		; Make double-buffering happy
@@ -1439,7 +1439,7 @@ util.ClearRect:
 	djnz	.loop1
 ; Check if doing just one column was enough
 	ld	a,ixl
-	or	ixh
+	or	a,ixh
 	jr	z,.exit
 ; Main loop
 	ld	a,c
