@@ -176,13 +176,13 @@ void fontlib_SetWindowFullScreen(void);
  * @param width Width
  * @param height Height
  */
-void fontlib_SetWindow(unsigned short x_min, uint8_t y_min, unsigned short width, uint8_t height);
+void fontlib_SetWindow(unsigned int x_min, uint8_t y_min, unsigned int width, uint8_t height);
 
 /**
  * Returns the starting column of the current text window
  * @return Window X
  */
-unsigned short fontlib_GetWindowXMin(void);
+unsigned int fontlib_GetWindowXMin(void);
 
 /**
  * Returns the starting row of the current text window
@@ -194,7 +194,7 @@ uint8_t fontlib_GetWindowYMin(void);
  * Returns the width of the current text window
  * @return Window width
  */
-unsigned short fontlib_GetWindowWidth(void);
+unsigned int fontlib_GetWindowWidth(void);
 
 /**
  * Returns the height of the current text window
@@ -209,13 +209,13 @@ uint8_t fontlib_GetWindowHeight(void);
  * @param x X
  * @param y Y
  */
-void fontlib_SetCursorPosition(unsigned short x, uint8_t y);
+void fontlib_SetCursorPosition(unsigned int x, uint8_t y);
 
 /**
  * Returns the cursor column.
  * @return Current cursor X
  */
-unsigned short fontlib_GetCursorX(void);
+unsigned int fontlib_GetCursorX(void);
 
 /**
  * Returns the cursor row.
@@ -224,15 +224,14 @@ unsigned short fontlib_GetCursorX(void);
 uint8_t fontlib_GetCursorY(void);
 
 /**
- * Adds the given (x,y) to the cursor position.  Both inputs are signed.
- * Behavior is undefined if adding a negative offset yields a negative final
- * coordinate.
+ * Adds the given (x,y) to the cursor position.
+ * Behavior is undefined if the resulting cursor position is offscreen.
  * 
  * Useful for tabbing, for example.
  * @param x x-shift
  * @param y y-shift
  */
-void fontlib_ShiftCursorPosition(signed short x, signed short y);
+void fontlib_ShiftCursorPosition(int x, int y);
 
 /**
  * Sets the current font
