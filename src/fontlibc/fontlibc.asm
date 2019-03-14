@@ -689,7 +689,6 @@ fontlib_DrawStringL:
 	ld	(ix + strReadPtr),hl	; so we need an initial pre-decrement
 	ld	hl,(iy + arg2)
 	ld	(ix + charactersLeft),hl
-	call	gfx_Wait
 .restartX:
 ; Compute target drawing address
 	ld	hl,(_TextY)
@@ -701,6 +700,7 @@ fontlib_DrawStringL:
 	ld	bc,(CurrentBuffer)
 	add	hl,bc
 	ex	de,hl
+	call	gfx_Wait
 .mainLoop:
 ; Check that we haven't exceeded our glyph printing limit
 	ld	bc,(ix + charactersLeft)
