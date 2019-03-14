@@ -318,20 +318,26 @@ fontlib_GetCursorY:
 ;-------------------------------------------------------------------------------
 fontlib_ShiftCursorPosition:
 ; Shifts the cursor position by a given signed delta.
+; By limiting x to 0xFFFF and y to 0xFF, the cursor can't get far enough out of
+; VRAM to cause corruption of any other regions of memory.
 ; Arguments:
 ;  arg0: delta X
 ;  arg1: delta Y
 ; Returns:
 ;  Nothing
 	pop	de			; de = return vector
-	pop	bc			; bc = delta X
-	ld	hl,(_TextX)
-	add	hl,bc
-	ld	(_TextX),hl
-	pop	bc			; bc = delta Y
-	ld	hl,(_TextY)
-	add	hl,bc
-	ld	(_TextY),hl
+; Shift x
+	pop	bc			; bc = dx
+	ld	hl,(_TextX)		; hl = x
+	add.s	hl,bc			; hl = (x + dx) & 0xFFFF
+	ld	(_TextX),hl		; x = x + dx
+; Shift y
+	pop	bc			; bc = dy
+	ld	hl,_TextY
+	ld	a,(hl)			; a = y
+	add	a,c			; a = (y + dy) & 0xFF
+	ld	(hl),a			; y = (y + dy) & 0xFF
+; Finish
 	push	hl
 	push	hl			; sp -> arg0
 	ex	de,hl			; hl = return vector
