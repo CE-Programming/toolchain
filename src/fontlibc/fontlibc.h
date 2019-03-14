@@ -351,7 +351,7 @@ bool fontlib_ValidateCodePoint(char code_point);
  * This can return 256; no valid font has 0 printable glyphs.
  * @return Total number of printable glyphs
  */
-uint24_t fontlib_GetTotalGlyphs(void);
+size_t fontlib_GetTotalGlyphs(void);
 
 /**
  * Returns the code point of the first printable glyph.
@@ -432,7 +432,7 @@ uint8_t fontlib_GetGlyphWidth(char codepoint);
  * @param str Pointer to string
  * @return Width of string
  */
-uint24_t fontlib_GetStringWidth(const char *str);
+size_t fontlib_GetStringWidth(const char *str);
 
 /**
  * Returns the width of a string printed in the current font.
@@ -441,10 +441,9 @@ uint24_t fontlib_GetStringWidth(const char *str);
  * the current font, or when max_characters have been processed.
  * @param str Pointer to string
  * @param max_characters Maximum number of characters to process
- * (or 0 if not needed)
  * @return Width of string
  */
-uint24_t fontlib_GetStringWidthL(const char *str, uint24_t max_characters);
+size_t fontlib_GetStringWidthL(const char *str, size_t max_characters);
 
 /**
  * Gets the location of the last character processed by GetStringWidth or 
@@ -459,7 +458,7 @@ char *fontlib_GetLastCharacterRead(void);
  * @return Either zero, or a non-zero number depending on the reason DrawStringL
  * or GetStringWidthL returned.
  */
-uint24_t fontlib_GetCharactersRemaining(void);
+size_t fontlib_GetCharactersRemaining(void);
 
 /**
  * Draws a glyph.  This can even draw code points less than the code point
@@ -507,7 +506,7 @@ void fontlib_DrawString(const char *str);
  * @param max_characters Maximum number of characters to attempt to print, may
  * return early if some other condition requires returning
  */
-void fontlib_DrawStringL(const char *str, uint24_t max_characters);
+void fontlib_DrawStringL(const char *str, size_t max_characters);
 
 /**
  * Erases everything from the cursor to the right side of the text window
