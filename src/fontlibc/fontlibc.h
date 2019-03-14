@@ -176,13 +176,13 @@ void fontlib_SetWindowFullScreen(void);
  * @param width Width
  * @param height Height
  */
-void fontlib_SetWindow(int x_min, uint8_t y_min, int width, uint8_t height);
+void fontlib_SetWindow(unsigned short x_min, uint8_t y_min, unsigned short width, uint8_t height);
 
 /**
  * Returns the starting column of the current text window
  * @return Window X
  */
-int fontlib_GetWindowXMin(void);
+unsigned short fontlib_GetWindowXMin(void);
 
 /**
  * Returns the starting row of the current text window
@@ -194,7 +194,7 @@ uint8_t fontlib_GetWindowYMin(void);
  * Returns the width of the current text window
  * @return Window width
  */
-int fontlib_GetWindowWidth(void);
+unsigned short fontlib_GetWindowWidth(void);
 
 /**
  * Returns the height of the current text window
@@ -209,13 +209,13 @@ uint8_t fontlib_GetWindowHeight(void);
  * @param x X
  * @param y Y
  */
-void fontlib_SetCursorPosition(int x, uint8_t y);
+void fontlib_SetCursorPosition(unsigned short x, uint8_t y);
 
 /**
  * Returns the cursor column.
  * @return Current cursor X
  */
-int fontlib_GetCursorX(void);
+unsigned short fontlib_GetCursorX(void);
 
 /**
  * Returns the cursor row.
@@ -224,13 +224,15 @@ int fontlib_GetCursorX(void);
 uint8_t fontlib_GetCursorY(void);
 
 /**
- * Adds the given (x,y) to the cursor position.
+ * Adds the given (x,y) to the cursor position.  Both inputs are signed.
+ * Behavior is undefined if adding a negative offset yields a negative final
+ * coordinate.
  * 
  * Useful for tabbing, for example.
  * @param x x-shift
  * @param y y-shift
  */
-void fontlib_ShiftCursorPosition(int x, uint8_t y);
+void fontlib_ShiftCursorPosition(signed short x, signed short y);
 
 /**
  * Sets the current font
@@ -442,7 +444,7 @@ uint24_t fontlib_GetStringWidth(const char *str);
  * (or 0 if not needed)
  * @return Width of string
  */
-uint24_t fontlib_GetStringWidthL(const char *str, int24_t max_characters);
+uint24_t fontlib_GetStringWidthL(const char *str, uint24_t max_characters);
 
 /**
  * Gets the location of the last character processed by GetStringWidth or 
@@ -457,12 +459,17 @@ char *fontlib_GetLastCharacterRead(void);
  * @return Either zero, or a non-zero number depending on the reason DrawStringL
  * or GetStringWidthL returned.
  */
-int24_t fontlib_GetCharactersRemaining(void);
+uint24_t fontlib_GetCharactersRemaining(void);
 
 /**
  * Draws a glyph.  This can even draw code points less than the code point
  * specified with fontlib_SetFirstPrintableCodePoint().  It can even draw code
  * point 0.
+ * 
+ * Nota bene: Although this does update the cursor X/Y positions, it does NOT
+ * process window bounds at all!  (Maybe this should be FIXME?  On the other
+ * hand, users may want this specifically so they can handle all their own
+ * layout without the text window settings getting in their way.)
  * @param glyph Codepoint
  */
 void fontlib_DrawGlyph(uint8_t glyph);
@@ -500,7 +507,7 @@ void fontlib_DrawString(const char *str);
  * @param max_characters Maximum number of characters to attempt to print, may
  * return early if some other condition requires returning
  */
-void fontlib_DrawStringL(const char *str, int24_t max_characters);
+void fontlib_DrawStringL(const char *str, uint24_t max_characters);
 
 /**
  * Erases everything from the cursor to the right side of the text window
