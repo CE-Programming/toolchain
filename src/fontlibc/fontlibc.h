@@ -1,7 +1,68 @@
+;-------------------------------------------------------------------------------
 /**
  * @file
  * @authors DrDnar
- * @brief Provides improved font support
+ * @brief Provides improved font support.
+ * 
+ * FontLib was designed under a "mechanism not policy" sort of philosophy.
+ * Rather than attempt to provide as many fancy features as a programmer could
+ * want, FontLib tries to provide fast, basic routines that can be used to build
+ * the additional functionality you want.  For example, word-wrap is not
+ * directly provided, but can be implemented using fontlib_SetAlternateStopCode
+ * and fontlib_GetStringWidth.  FontLib hopes to provide enough performance to
+ * be usable in games, while providing powerful enough basic features for fancy
+ * GUIs and document editors.
+ * 
+ * To assist in text layout, FontLib provides for a text window, which
+ * automatically confines text to appear in a specific rectangular area of the
+ * screen.  This feature may be useful for dialogs and scrolling large blocks of
+ * text. Use fontlib_SetWindow to set the current window bounds.  Use
+ * fontlib_SetNewlineOptions to control how fontlib_DrawString behaves when it
+ * reaches the right edge of the text window.
+ *
+ * Implementing centered text, right-aligned text, and word wrap require being
+ * able to compute the width of a word or string of text.  The routine
+ * fontlib_GetStringWidth provides this functionality.
+ * 
+ * If you call fontlib_SetAlternateStopCode(' '), GetStringWidth and DrawString
+ * will stop drawing on spaces, giving you a chance to check if the next word
+ * will fit on screen.  You can use fontlib_GetLastCharacterRead() to find out
+ * where GetStringWidth or DrawString stopped, and, after handling the space,
+ * then pass that address (plus one) again to GetStringWidth or DrawString to
+ * resume processing at where it left off before.
+ *
+ * Embedded control codes are a popular way of managing style and formatting
+ * information in string.  FontLibC only natively recognizes two types of 
+ * control code: NULL (0) as a stop code and a user-specified alternate stop
+ * code, and a user-specified newline code (defaults to 0x0A---ASCII LF and
+ * standard Linux style).  However, you can add your own control codes with
+ * fontlib_SetFirstPrintableCodePoint.  When any code point less than the
+ * first printable code point is encountered, FontLib stops string processing
+ * and returns to allow you to handle the control code yourself using
+ * fontlib_GetLastCharacterRead.
+ * 
+ * Part of providing high-performance is not painting a single pixel more than
+ * once.  To assist with this goal, FontLib provides for both transparent and
+ * opaque text backgrounds.  Use fontlib_SetTransparency(true) if you need to
+ * paint text over a background other than a solid color.  If you turn
+ * transparency off, however, FontLib will paint both background and foreground
+ * pixels for you, eliminating the time needed to erase those pixels before
+ * painting over that area.
+ *
+ * Since a block of text may not always be the same size, FontLib provides
+ * fontlib_ClearEOL for erasing the remainder of a line of text without needing
+ * to pad it with spaces.   This action can also be performed automatically
+ * after embedded newlines in text and on normal wrapping with
+ * fontlib_SetNewlineOptions.
+ *
+ * Additional blank vertical space around text can improve readability in large
+ * blocks of text.  fontlib_SetLineSpacing allows you to set this behavior.
+ * Fonts may specify default additional spacing that is automatically applied
+ * when calling fontlib_SetFont.  In GUIs and games where the benefits of
+ * legibility are outweighed by more aggressive use of vertical space, you can
+ * force the default spacing to zero after using fontlib_SetFont with
+ * fontlib_SetLineSpacing.
+ * 
  */
 
 #ifndef H_FONTLIBC
@@ -97,12 +158,20 @@ typedef struct {
 
 
 /**
- * Sets the bounds of the window all text will appear in to be the full screen
+ * Sets the bounds of the window all text will appear in to be the full screen.
+ * This is the default.
  */
 void fontlib_SetWindowFullScreen(void);
 
 /**
- * Sets the bounds of the window all text will appear in
+ * Sets the bounds of the window all text will appear in.
+ * 
+ * Clipping of partial glyphs is not supported.  If a glyph, either horizontally
+ * or vertically, does not fit in the text window, it will not be printed at all.
+ * Behavior is undefined if the text cursor is positioned outside of the current
+ * text window.
+ * 
+ * Changing this does not automatically move the text cursor into the window.
  * @param x_min X coord base
  * @param y_min Y coord base
  * @param width Width
@@ -135,7 +204,9 @@ int fontlib_GetWindowWidth(void);
 uint8_t fontlib_GetWindowHeight(void);
 
 /**
- * Sets the cursor position
+ * Sets the cursor position.
+ *
+ * Behavior is undefined if the cursor is set outside of the text window.
  * @param x X
  * @param y Y
  */
@@ -155,6 +226,7 @@ uint8_t fontlib_GetCursorY(void);
 
 /**
  * Adds the given (x,y) to the cursor position.
+ * 
  * Useful for tabbing, for example.
  * @param x x-shift
  * @param y y-shift
@@ -249,6 +321,7 @@ uint8_t fontlib_GetSpaceBelow(void);
  * Sets current spacing adjustment for italic text.  This causes the cursor to
  * be moved back a certain number of pixels after every glyph is drawn.  This
  * is only useful if transparency mode is set.
+ * NOTE: Italics is currently untested!  (I haven't designed an italic font yet.)
  * @param italic_spacing_adjustment Pixels to move cursor backward after each glyph
  */
 void fontlib_SetItalicSpacingAdjustment(uint8_t italic_spacing_adjustment);
@@ -289,7 +362,10 @@ char fontlib_GetFirstGlyph(void);
 
 /**
  * Allows you to set the code point that is recognized as being a new line code.
- * You can set this to zero to prevent new line code processing.
+ * You can set this to zero to prevent new line code processing.  Note that if
+ * FONTLIB_ENABLE_AUTO_WRAP is enabled, then wrapping will still implicitly
+ * case a newline.
+ * 
  * This defaults to 0x0A (ASCII line feed/UNIX newline)
  * @param code_point New code point to use for newline
  */
@@ -297,16 +373,21 @@ void fontlib_SetNewlineCode(char code_point);
 
 /**
  * Returns the code point that is currently recognized as being a newline.
+ * If 0, newlines in strings will not be processed.
  * @return Current newline
  */
 char fontlib_GetNewlineCode(void);
 
 /**
  * Sets an alternate code point to recognize as a stop code.
+ * 
  * For example, you can set this to space to make DrawString and GetStringWidth
  * stop processing when they reach a space.
- * Setting this to zero will cause this to be ignored.
+ * 
+ * Set this to 0 if you do not want to use the alternate stop code feature.
+ * 
  * NULL (0) will still be recognized as a stop code regardless of value.
+ * 
  * Defaults to 0.
  * @param code_point Additional code point to recognize as a stop code.
  */
@@ -320,8 +401,10 @@ char fontlib_GetAlternateStopCode(void);
 
 /**
  * Sets the first code point considered printable.
+ * 
  * All code points before this will be considered control codes.
  * Setting this to 0 (NULL) will NOT cause NULL to be ignored.
+ * 
  * This defaults 0x10.
  * @param code_point First printable code point
  */
@@ -342,6 +425,7 @@ uint8_t fontlib_GetGlyphWidth(char codepoint);
 
 /**
  * Returns the width of a string printed in the current font.
+ * 
  * Stops processing when it encounters ANY control code or a codepoint not in
  * the current font.
  * @param str Pointer to string
@@ -351,6 +435,7 @@ uint24_t fontlib_GetStringWidth(const char *str);
 
 /**
  * Returns the width of a string printed in the current font.
+ * 
  * Stops processing when it encounters ANY control code or a codepoint not in
  * the current font, or when max_characters have been processed.
  * @param str Pointer to string
@@ -376,20 +461,41 @@ char *fontlib_GetLastCharacterRead(void);
 int24_t fontlib_GetCharactersRemaining(void);
 
 /**
- * Draws a glyph
+ * Draws a glyph.  This can even draw code points less than the code point
+ * specified with fontlib_SetFirstPrintableCodePoint().  It can even draw code
+ * point 0.
  * @param glyph Codepoint
  */
 void fontlib_DrawGlyph(uint8_t glyph);
 
 /**
- * Draws a string
+ * Draws a string.
+ * 
+ * This stops drawing upon reaching NULL.  It will also stop if it encounters
+ * the character code specified with fontlib_SetAlternateStopCode().  Note that
+ * the check for the alternate stop code always takes place before drawing a
+ * glyph, so if you need to also display the stop code character, you must
+ * directly call fontlib_DrawGlyph to force display the character and increment
+ * past it.
+ * 
+ * This will return when it reaches the right edge of the text window if
+ * FONTLIB_ENABLE_AUTO_WRAP is turned off.
+ * 
+ * Newline codes will print regardless of whether FONTLIB_ENABLE_AUTO_WRAP is
+ * enabled.  To disable parsing newline codes, use fontlib_SetNewlineCode(0);
+ * 
  * THIS IS NOT REENTRANT (though if you need that, you're probably not using C)
  * @param str Pointer to string
  */
 void fontlib_DrawString(const char *str);
 
 /**
- * Draws a string, up to a maximum number of characters
+ * Draws a string, up to a maximum number of characters.
+ * 
+ * This is intended to be used if you only want a portion of a string printed,
+ * (Or if you hate null-terminated strings and want length-prefixed strings
+ * instead.  You still can't use NULLs though.)
+ * 
  * THIS IS NOT REENTRANT (though if you need that, you're probably not using C)
  * @param str Pointer to string
  * @param max_characters Maximum number of characters to attempt to print, may
@@ -405,7 +511,8 @@ void fontlib_ClearEOL(void);
 
 /**
  * Erases the entire current text window.  This ignores the transparent
- * background flag.
+ * background flag.  If background transparency is important, check
+ * fontlib_GetTransparency() before calling this routine.
  */
 void fontlib_ClearWindow(void);
 
