@@ -26,7 +26,7 @@
       "description": "More text (transparent, opaque) checks",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "D0674A47" ]
+      "expected_CRCs": [ "A0ACFB2E" ]
     },
     "3": {
       "description": "Back to the home screen (exit check)",
