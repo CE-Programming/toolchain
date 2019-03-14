@@ -89,16 +89,24 @@ mWasNewline	:= 1 shl bWasNewline
 
 
 ;-------------------------------------------------------------------------------
-fontStruct.version := 0
-fontStruct.height := fontStruct.version + 1
-fontStruct.totalGlyphs := fontStruct.height + 1
-fontStruct.firstGlyph := fontStruct.totalGlyphs + 1
-fontStruct.widthsTablePtr := fontStruct.firstGlyph + 1
-fontStruct.bitmapsTablePtr := fontStruct.widthsTablePtr + 3
-fontStruct.italicSpaceAdjust := fontStruct.bitmapsTablePtr + 3
-fontStruct.spaceAbove := fontStruct.italicSpaceAdjust + 1
-fontStruct.spaceBelow := fontStruct.spaceAbove + 1
-fontStruct.fontPropertiesSize := fontStruct.bitmapsTablePtr + 3
+; Declare the structure of a raw font
+struc strucFont
+	label .: 13
+	.version			rb	1
+	.height				rb	1
+	.totalGlyphs			rb	1
+	.firstGlyph			rb	1
+	.widthsTablePtr			rl	1
+	.bitmapsTablePtr		rl	1
+	.italicSpaceAdjust		rb	1
+	.spaceAbove			rb	1
+	.spaceBelow			rb	1
+end struc
+virtual at 0
+strucFont strucFont
+end virtual
+strucFont.fontPropertiesSize := strucFont.italicSpaceAdjust
+
 
 ;-------------------------------------------------------------------------------
 macro mIsHLLessThanDE?
@@ -356,37 +364,37 @@ fontlib_SetFont:
 	ld	(_CurrentFontRoot),hl
 	push	hl
 	ld	de,_CurrentFontProperties
-	ld	bc,fontStruct.fontPropertiesSize
+	ld	bc,strucFont.fontPropertiesSize
 	ldir
 	pop	bc
 	ld	iy,_CurrentFontProperties
 ; Verify height at least looks semi-reasonable
-	ld	a,(iy + fontStruct.height)
+	ld	a,(iy + strucFont.height)
 	or	a,a
 	ret	z			; Also unreasonable: a zero-height font
 	and	a,$80
 	jr	nz,.false
 	ld	a,63
-	cp	a,(iy + fontStruct.spaceAbove)
+	cp	a,(iy + strucFont.spaceAbove)
 	jr	c,.false
-	cp	a,(iy + fontStruct.spaceBelow)
+	cp	a,(iy + strucFont.spaceBelow)
 	jr	c,.false
 .validateOffsets:
 ; Now convert offsets into actual pointers
 ; Validate that offset is at least semi-reasonable
 	ld	de,$ff00		; Maximum reasonable font data size
-	ld	hl,(iy + fontStruct.widthsTablePtr)
+	ld	hl,(iy + strucFont.widthsTablePtr)
 	sbc	hl,de			; Doesn't really matter if we're off-by-one here
 	ret	nc
 	add	hl,de
 	add	hl,bc
-	ld	(iy + fontStruct.widthsTablePtr),hl
-	ld	hl,(iy + fontStruct.bitmapsTablePtr)
+	ld	(iy + strucFont.widthsTablePtr),hl
+	ld	hl,(iy + strucFont.bitmapsTablePtr)
 	sbc	hl,de			; C reset from ADD HL,BC above
 	ret	nc			; (we're in Crazytown if there was carry)
 	add	hl,de
 	add	hl,bc
-	ld	(iy + fontStruct.bitmapsTablePtr),hl
+	ld	(iy + strucFont.bitmapsTablePtr),hl
 	ld	a,1
 	ret
 .false:
@@ -667,7 +675,7 @@ fontlib_DrawString:
 
 ;-------------------------------------------------------------------------------
 fontlib_DrawStringL:
-; Draws a string,ending when any of the following is true:
+; Draws a string, ending when any of the following is true:
 ;  arg1 characters have been printed;
 ;  an unknown control code is encountered (or NULL); or,
 ;  there is no more space left in the window.
@@ -728,18 +736,18 @@ fontlib_DrawStringL:
 	cp	a,(ix + alternateStopCode)
 	jr	z,.exit
 ; Check if font has given codepoint
-	sub	a,(ix + fontStruct.firstGlyph)
+	sub	a,(ix + strucFont.firstGlyph)
 	jr	c,.exit
 	sbc	hl,hl			; Zero for later
 	ld	l,a
-	sub	a,(ix + fontStruct.totalGlyphs)
+	sub	a,(ix + strucFont.totalGlyphs)
 	jr	c,.definitelyValid
 	cp	a,l			; 0 = 256 total glyphs,so check for zero
 	jr	nz,.exit		; Z iff L == A, which is true iff totalGlyphs == 0
 .definitelyValid:
 	ld	(ix + readCharacter),l
 ; Look up width
-	ld	bc,(ix + fontStruct.widthsTablePtr)
+	ld	bc,(ix + strucFont.widthsTablePtr)
 	add	hl,bc
 	ld	a,(hl)
 ; Check if glyph will fit in window
@@ -754,7 +762,7 @@ fontlib_DrawStringL:
 	jr	z,.colOK
 	jr	nc,.newline
 ; Correct for italicness
-.colOK:	ld	c,(ix + fontStruct.italicSpaceAdjust)
+.colOK:	ld	c,(ix + strucFont.italicSpaceAdjust)
 	ld	b,0
 	or	a,a
 	sbc	hl,bc
@@ -767,7 +775,7 @@ fontlib_DrawStringL:
 	ld	ix,DataBaseAddr
 ; Update write pointer
 	ld	a,iyl
-	sub	a,(ix + fontStruct.italicSpaceAdjust)
+	sub	a,(ix + strucFont.italicSpaceAdjust)
 	sbc	hl,hl			; Sign-extend A for HL
 	ld	l,a
 	add	hl,de
@@ -1195,7 +1203,7 @@ fontlib_GetStringWidthL:
 	ld	hl,(hl)
 	ld	(ix + charactersLeft),hl
 	ld	iy,0
-	ld	de,(ix + fontStruct.widthsTablePtr)
+	ld	de,(ix + strucFont.widthsTablePtr)
 	ld	a,(bc)
 	or	a,a
 	jr	z,.exitFast
@@ -1216,12 +1224,12 @@ fontlib_GetStringWidthL:
 	jr	z,.exit
 	cp	a,(ix + alternateStopCode)
 	jr	z,.exit
-	sub	a,(ix + fontStruct.firstGlyph)
+	sub	a,(ix + strucFont.firstGlyph)
 	jr	c,.exit
-	cp	a,(ix + fontStruct.totalGlyphs)
+	cp	a,(ix + strucFont.totalGlyphs)
 	jr	c,.validCodepoint
 	ld	(ix + readCharacter),a
-	ld	a,(ix + fontStruct.totalGlyphs)
+	ld	a,(ix + strucFont.totalGlyphs)
 	or	a,a
 	jr	nz,.exit
 	ld	a,(ix + readCharacter)
@@ -1232,7 +1240,7 @@ fontlib_GetStringWidthL:
 	ld	l,a
 	add	hl,de
 	ld	a,(hl)
-	sub	a,(ix + fontStruct.italicSpaceAdjust) ; So if this results in a negative number
+	sub	a,(ix + strucFont.italicSpaceAdjust) ; So if this results in a negative number
 	sbc	hl,hl			; then this too will become negative,
 	ld	l,a			; which gives the intended result, I guess
 	ex	de,hl
@@ -1240,7 +1248,7 @@ fontlib_GetStringWidthL:
 	ex	de,hl
 	jr	.loop
 .exit:
-	ld	a,(ix + fontStruct.italicSpaceAdjust)
+	ld	a,(ix + strucFont.italicSpaceAdjust)
 	neg
 	jr	z,.exitFast
 	ld	de,-1
@@ -1350,9 +1358,9 @@ fontlib_Newline:
 	ld	iy,DataBaseAddr
 	ld	hl,(iy + textXMin)
 	ld	(iy + textX),hl
-	ld	a,(iy + fontStruct.height)
-	add	a,(iy + fontStruct.spaceAbove)
-	add	a,(iy + fontStruct.spaceBelow)
+	ld	a,(iy + strucFont.height)
+	add	a,(iy + strucFont.spaceAbove)
+	add	a,(iy + strucFont.spaceBelow)
 	ld	b,a
 	add	a,a
 	jr	c,.outOfSpace		; Carry = definitely went past YMax
@@ -1520,23 +1528,6 @@ _CurrentFontRoot:
 currentFontRoot := _CurrentFontRoot - DataBaseAddr
 	dl	0
 DataBaseAddr:
-_CurrentFontProperties:
-.version:
-	db	0
-.height:
-	db	0
-.totalGlyphs:
-	db	0
-.firstGlyph:
-	db	0
-.widthsTablePtr:
-	dl	0
-.bitmapsTablePtr:
-	dl	0
-.italicSpaceAdjust:
-	db	0
-.spaceAbove:
-	db	0
-.spaceBelow:
-	db	0
-;
+; Embed the current font's properties as library variables
+_CurrentFontProperties strucFont
+
