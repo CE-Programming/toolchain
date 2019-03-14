@@ -31,11 +31,9 @@ void main(void) {
     /* Erase the screen to black */
     gfx_FillScreen(gfx_black);
 
-    /* Disable pre-/post- line clearing */
-    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP);
     /* Set a font to use.  DrawString will display garbage if you don't give it a font! */
     fontlib_SetFont((fontlib_font_t *)test_font, 0);
-
+    
     /* First, we'll display centered text in a window */
     /* Add some vertical padding around our text */
     fontlib_SetLineSpacing(2, 2);
@@ -43,7 +41,19 @@ void main(void) {
     fontlib_SetCursorPosition(25, 42);
     /* Set some random (and ugly) colors */
     fontlib_SetColors(0xC0, 0x20);
+    /* This is a crazy combination of settings that you probably don't want to use in any real program, but we're using
+    it here for testing purposes. */
+    fontlib_SetTransparency(true);
+    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP | FONTLIB_AUTO_CLEAR_TO_EOL | FONTLIB_PRECLEAR_NEWLINE);
+    /* It's not as generic as Hello, world! */
     fontlib_DrawString("The quick brown fox jumps over the lazy dog.");
+    /* Let's just test fontlib_ShiftCursorPosition for funsies while we're here */
+    fontlib_ShiftCursorPosition(2, 2);
+    fontlib_DrawGlyph('X');
+    fontlib_SetTransparency(false);
+    fontlib_ShiftCursorPosition(-20, -5);
+    fontlib_DrawGlyph('Y');
+    
 
     /* Pause */
     while (!os_GetCSC());
@@ -53,11 +63,13 @@ void main(void) {
     /* . . . and move cursor back to top of text window */
     /* Note that since printCentered takes care of setting X for us, we can just set it to 0 here */
     fontlib_SetCursorPosition(0, fontlib_GetWindowYMin());
+    /* Disable pre-/post- line clearing */
+    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP);
     /* Show transparency in action */
     fontlib_SetTransparency(true);
     printCentered("[A text window]\n");
     /* Now let's try some /different/ ugly colors! */
-    fontlib_SetColors(0xF0, 0x10);
+    fontlib_SetColors(gfx_pink, gfx_blue);
     fontlib_SetTransparency(false);
     printCentered(" Opaque text ");
 

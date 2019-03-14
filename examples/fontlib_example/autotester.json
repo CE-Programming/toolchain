@@ -20,7 +20,7 @@
       "description": "Initial filler text in window check",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "D9A7AFF0" ]
+      "expected_CRCs": [ "19AF8EE2" ]
     },
     "2": {
       "description": "More text (transparent, opaque) checks",
