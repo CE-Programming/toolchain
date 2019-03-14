@@ -196,9 +196,7 @@ fontlib_SetWindowFullScreen:
 ;  Nothing
 	ld	hl,_TextDefaultWindow
 	ld	de,_TextXMin
-	ld	bc,12
-	ldir
-	ret
+	jp	_Mov8b
 
 
 ;-------------------------------------------------------------------------------
@@ -211,24 +209,23 @@ fontlib_SetWindow:
 ;  arg3: height
 ; Returns:
 ;  Nothing
-	ld	iy,0
-	add	iy,sp
-; Let's try a block copy of the first two
-	lea	hl,iy + arg0
-	ld	de,_TextXMin
-	ld	bc,6
-	ldir
-; Now HL points to the width arg, figure out X max
-	ld	bc,(hl)
-	ld	hl,(iy + arg0)
-	add	hl,bc
-	ex	de,hl
-	ld	(hl),de
-; And figure out Y max
-	ld	a,(iy + arg1)
-	add	a,(iy + arg3)
+	pop	de			; de = return vector
+	pop	hl			; hl = xmin
+	ld	(_TextXMin),hl
+	pop	bc			; c = ymin
+	ld	a,c			; a = ymin
+	ld	(_TextYMin),a
+	pop	bc			; bc = width
+	add	hl,bc			; hl = xmin + width = xmax
+	ld	(_TextXMax),hl
+	ex	(sp),hl			; l = height
+	add	a,l			; a = ymin + height = ymax
 	ld	(_TextYMax),a
-	ret
+	push	hl
+	push	hl
+	push	hl			; sp -> arg0
+	ex	de,hl			; hl = return vector
+	jp	(hl)
 
 
 ;-------------------------------------------------------------------------------
@@ -320,35 +317,25 @@ fontlib_GetCursorY:
 
 ;-------------------------------------------------------------------------------
 fontlib_ShiftCursorPosition:
-; Shifts the cursor position by a given signed delta.  This doesn't attempt to
-; entirely prevent negative coordinates, just limit the damage---observe that
-; the raw value of _TextX is used to compute a write pointer for drawing
-; operations, which could cause a write to anywhere in memory, so we try to
-; confine the damange to VRAM.
+; Shifts the cursor position by a given signed delta.
 ; Arguments:
 ;  arg0: delta X
 ;  arg1: delta Y
 ; Returns:
 ;  Nothing
-	pop	hl
-	pop	bc
-	pop	de
-	push	de
-	push	bc
-	push	hl
+	pop	de			; de = return vector
+	pop	bc			; bc = delta X
 	ld	hl,(_TextX)
-	add.sis	hl,bc
-;	ld	a,h
-;	and	a,$1
-;	ld	h,a
+	add	hl,bc
 	ld	(_TextX),hl
-	ld	a,(_TextY)
-	ld	l,a
-	ld	h,0
-	add.sis	hl,de
-	ld	h,0
+	pop	bc			; bc = delta Y
+	ld	hl,(_TextY)
+	add	hl,bc
 	ld	(_TextY),hl
-	ret
+	push	hl
+	push	hl			; sp -> arg0
+	ex	de,hl			; hl = return vector
+	jp	(hl)
 
 	
 ;-------------------------------------------------------------------------------
@@ -1491,27 +1478,27 @@ util.ClearRect:
 _TextDefaultWindow:
 textDefaultWindow := _TextDefaultWindow - DataBaseAddr
 	dl	0
-	dl	0
+	db	0
 	dl	LcdWidth
-	dl	LcdHeight
+	db	LcdHeight
 _TextXMin:
 textXMin := _TextXMin - DataBaseAddr
 	dl	0
 _TextYMin:
 textYMin := _TextYMin - DataBaseAddr
-	dl	0
+	db	0
 _TextXMax:
 textXMax := _TextXMax - DataBaseAddr
 	dl	LcdWidth
 _TextYMax:
 textYMax := _TextYMax - DataBaseAddr
-	dl	LcdHeight
+	db	LcdHeight
 _TextX:
 textX := _TextX - DataBaseAddr
 	dl	0
 _TextY:
 textY := _TextY - DataBaseAddr
-	dl	0
+	db	0
 _TextTransparentMode:
 textTransparentMode := _TextTransparentMode - DataBaseAddr
 	db	0
