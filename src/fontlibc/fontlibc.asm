@@ -320,24 +320,34 @@ fontlib_GetCursorY:
 
 ;-------------------------------------------------------------------------------
 fontlib_ShiftCursorPosition:
-; Shifts the cursor position by a given delta
+; Shifts the cursor position by a given signed delta.  This doesn't attempt to
+; entirely prevent negative coordinates, just limit the damage---observe that
+; the raw value of _TextX is used to compute a write pointer for drawing
+; operations, which could cause a write to anywhere in memory, so we try to
+; confine the damange to VRAM.
 ; Arguments:
 ;  arg0: delta X
 ;  arg1: delta Y
 ; Returns:
 ;  Nothing
-	pop	bc
 	pop	hl
+	pop	bc
 	pop	de
 	push	de
-	push	hl
 	push	bc
-	ld	bc,(_TextX)
-	add	hl,bc
+	push	hl
+	ld	hl,(_TextX)
+	add.sis	hl,bc
+;	ld	a,h
+;	and	a,$1
+;	ld	h,a
 	ld	(_TextX),hl
 	ld	a,(_TextY)
-	add	a,d
-	ld	(_TextY),a
+	ld	l,a
+	ld	h,0
+	add.sis	hl,de
+	ld	h,0
+	ld	(_TextY),hl
 	ret
 
 	
@@ -1383,6 +1393,7 @@ fontlib_Newline:
 	bit	bPreclearNewline,(iy + newlineControl)
 	ret	z
 ; Fall through to ClearEOL
+assert $ = fontlib_ClearEOL
 
 
 ;-------------------------------------------------------------------------------
@@ -1408,6 +1419,7 @@ fontlib_ClearEOL:
 	add	a,(hl)
 	ld	b,a
 ; Fall through to ClearRect
+assert $ = util.ClearRect
 
 
 ;-------------------------------------------------------------------------------
