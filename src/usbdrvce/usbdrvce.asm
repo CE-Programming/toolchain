@@ -32,6 +32,11 @@ library 'USBDRVCE', 0
 	export usb_GetEndpointTransferType
 	export usb_SetEndpointFlags
 	export usb_GetEndpointFlags
+	export usb_ClearEndpointHalt
+	export usb_ControlTransfor
+	export usb_Transfer
+	export usb_ScheduleControlTransfer
+	export usb_ScheduleTransfer
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -46,15 +51,16 @@ struc transfer			; transfer structure
 	.remaining	rw 1	; transfer remaining length
 	label .buffers: 20	; transfer buffers
 			rw 1
+	.length		rd 1	; original transfer length
 	.callback	rd 1	; user callback
 	.data		rd 1	; user callback data
-	.length		rd 1	; original transfer length
 	.endpoint	rd 1	; pointer to endpoint structure
 			rw 1
 	assert $-. = 32
 end struc
 struc endpoint			; endpoint structure
-	label .: 64 at $-2
+	label .base: 64
+	label .: 64 at $+2
 	.next		rd 1	; link to next endpoint structure
 	.addr		rb 1	; device addr or cancel shl 7
 	.info		rb 1	; ep or speed shl 4 or dtc shl 6
@@ -63,6 +69,7 @@ struc endpoint			; endpoint structure
 	.overlay	transfer; current transfer
 
 	.type		rb 1	; transfer type
+	.dir		rb 1	; transfer dir
 	.flags		rb 1	; endpoint flags
 	.internalFlags	rb 1	; internal endpoint flags
 	.first		rl 1	; pointer to first scheduled transfer
@@ -105,8 +112,8 @@ struc stdDesc
 	.strings	rl 1
 	size := $-.
 end struc
-iterate type, endpoint, device, setup, stdDesc
- iterate <base,name>, 0,, ix,x, iy,y
+iterate type, transfer, endpoint, device, setup, stdDesc
+ iterate <base,name>, 0,, ix-type,x, iy-type,y
   virtual at base
 	name#type type
   end virtual
@@ -229,8 +236,8 @@ SKIP_HUBS		:= 1 shl 3
 SKIP_ATTACHED		:= 1 shl 4
 
 ; enum usb_endpoint_flag
-AUTO_TERMINATE		:= 0 shl 0
-MANUAL_TERMINATE	:= 1 shl 0
+MANUAL_TERMINATE	:= 0 shl 0
+AUTO_TERMINATE		:= 1 shl 0
 
 ; enum usb_internal_endpoint_flag
 PO2_MPS			:= 1 shl 0
@@ -280,6 +287,14 @@ virtual at 1
 	STRING_DESCRIPTOR			rb 1
 	INTERFACE_DESCRIPTOR			rb 1
 	ENDPOINT_DESCRIPTOR			rb 1
+end virtual
+
+; enum usb_transfer_type
+virtual at 0
+	USB_CONTROL_TRANSFER			rb 1
+	USB_ISOCHRONOUS_TRANSFER		rb 1
+	USB_BULK_TRANSFER			rb 1
+	USB_INTERRUPT_TRANSFER			rb 1
 end virtual
 ;-------------------------------------------------------------------------------
 
@@ -394,6 +409,7 @@ usb_WaitForEvents.wait:
 usb_WaitForEvents:
 	ld	hl,.wait
 	push	hl
+	jq	usb_WaitForInterrupt
 
 ;-------------------------------------------------------------------------------
 usb_WaitForInterrupt:
@@ -402,6 +418,7 @@ usb_WaitForInterrupt:
 	set	bIntUsb-8,(hl)
 	ei
 	halt
+	jq	usb_HandleEvents
 
 ;-------------------------------------------------------------------------------
 usb_HandleEvents:
@@ -426,7 +443,7 @@ end iterate
 ;-------------------------------------------------------------------------------
 usb_GetDeviceHub:
 	pop	de
-	ex	(sp),iy
+	ex	(sp),ydevice
 	push	de
 	ld	hl,(ydevice.hub)
 .maybeReturnNull:
@@ -440,7 +457,7 @@ usb_GetDeviceHub:
 
 ;-------------------------------------------------------------------------------
 usb_SetDeviceData:
-	pop	de,iy
+	pop	de,ydevice
 	ex	(sp),hl
 	push	hl
 	ld	(ydevice.data),hl
@@ -450,7 +467,7 @@ usb_SetDeviceData:
 ;-------------------------------------------------------------------------------
 usb_GetDeviceData:
 	pop	de
-	ex	(sp),iy
+	ex	(sp),ydevice
 	push	de
 	ld	hl,(ydevice.data)
 	ret
@@ -509,14 +526,14 @@ usb_DisconnectDevice:
 ;-------------------------------------------------------------------------------
 usb_GetDeviceAddress:
 	pop	hl
-	ex	(sp),iy
+	ex	(sp),ydevice
 	ld	a,(ydevice.addr)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceSpeed:
 	pop	de
-	ex	(sp),iy
+	ex	(sp),ydevice
 	push	de
 	ld	a,(ydevice.speed)
 	rrca
@@ -530,15 +547,15 @@ usb_GetDeviceSpeed:
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
-	pop	de,iy
+	pop	de,ydevice
 	ex	(sp),hl
 	push	hl,de
 	ld	a,l
+	and	a,$8F
 	ld	hl,(ydevice.endpoints)
 	bit	0,l
-	jq	nz,usb_GetDeviceHub.returnZero
+	jq	nz,.returnCarry
 	rlca
-	and	a,$1F
 	or	a,l
 	ld	l,a
 	ld	h,(hl)
@@ -546,19 +563,21 @@ usb_GetDeviceEndpoint:
 	ld	a,h
 	inc	a
 	ret	nz
-	jq	usb_GetDeviceHub.returnCarry
+.returnCarry:
+	sbc	hl,hl
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointDevice:
 	pop	de
-	ex	(sp),iy
+	ex	(sp),yendpoint
 	push	de
 	ld	hl,(yendpoint.device)
 	jq	usb_GetDeviceHub.maybeReturnNull
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointData:
-	pop	de,iy
+	pop	de,yendpoint
 	ex	(sp),hl
 	push	hl
 	ld	(yendpoint.data),hl
@@ -568,7 +587,7 @@ usb_SetEndpointData:
 ;-------------------------------------------------------------------------------
 usb_GetEndpointData:
 	pop	de
-	ex	(sp),iy
+	ex	(sp),yendpoint
 	push	de
 	ld	hl,(yendpoint.data)
 	ret
@@ -576,7 +595,7 @@ usb_GetEndpointData:
 ;-------------------------------------------------------------------------------
 usb_GetEndpointMaxPacketSize:
 	pop	de
-	ex	(sp),iy
+	ex	(sp),yendpoint
 	push	de
 	ld	hl,(yendpoint.maxPktLen)
 	ld	a,h
@@ -587,13 +606,13 @@ usb_GetEndpointMaxPacketSize:
 ;-------------------------------------------------------------------------------
 usb_GetEndpointTransferType:
 	pop	hl
-	ex	(sp),iy
+	ex	(sp),yendpoint
 	ld	a,(yendpoint.type)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointFlags:
-	pop	de,iy
+	pop	de,yendpoint
 	ex	(sp),hl
 	push	hl
 	ld	(yendpoint.flags),l
@@ -603,25 +622,120 @@ usb_SetEndpointFlags:
 ;-------------------------------------------------------------------------------
 usb_GetEndpointFlags:
 	pop	hl
-	ex	(sp),iy
+	ex	(sp),yendpoint
 	ld	a,(yendpoint.flags)
 	jp	(hl)
 
+;-------------------------------------------------------------------------------
+usb_ClearEndpointHalt:
+	call	_Check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_ControlTransfor:
+	call	_Check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_Transfer:
+	call	_Check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_ScheduleControlTransfer.notControl:
+	ld	ysetup,(ix+9)
+	ld	bc,(ysetup.wLength)
+	inc	bc
+	dec.s	bc
+	ld	de,(ix+12)
+	ld	yendpoint,(ix+6)
+	jq	usb_ScheduleTransfer.notControl
+usb_ScheduleControlTransfer:
+	call	_Check
+	ld	yendpoint,(ix+6)
+	or	a,(yendpoint.type);USB_CONTROL_TRANSFER
+	jq	nz,.notControl
+.control:
+	ld	a,00001110b
+	ld	bc,8
+	ld	de,(ix+9)
+	call	.queueStage
+	ld	ysetup,(ix+9)
+	ld	a,(ysetup.bRequest)
+	and	a,1 shl 7
+	ld	bc,(ysetup.wLength)
+	inc.s	bc
+	cpi.s
+	ld	de,(ix+12)
+	rlca
+	push	af
+	call	pe,_QueueTransfer
+	pop	af
+	xor	a,10001101b
+	ld	bc,1 shl 15
+	call	.queueStage
+	pop	ix
+	ret
+.queueStage:
+	call	_AllocDummyTransfer
+	ex	de,hl
+	ld	iyl,1
+	jq	z,_FillTransfer
+	jq	_Error.NO_MEMORY
+
+;-------------------------------------------------------------------------------
+usb_ScheduleTransfer.control:
+	ld	ysetup,(ix+9)
+	lea	de,ysetup+sizeof ysetup
+	ld	(ix+12),de
+	jq	usb_ScheduleControlTransfer.control
+usb_ScheduleTransfer:
+	call	_Check
+	ld	yendpoint,(ix+6)
+	or	a,(yendpoint.type);USB_CONTROL_TRANSFER
+	jq	z,.control
+	ld	de,(ix+9)
+	ld	bc,(ix+12)
+.notControl:
+repeat USB_ISOCHRONOUS_TRANSFER
+	dec	a
+end repeat
+	jq	z,_Error.NOT_SUPPORTED
+	ld	a,(yendpoint.dir)
+	call	_QueueTransfer
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
 _Check:
-	call	.check
-	ret	z
+	ld	a,(mpIntMask)
+	and	a,intTmr3
+	jq	nz,.fail
+	ld	a,(mpUsbSts)
+	and	a,bmUsbIntHostSysErr
+	jq	nz,.fail
+	ld	a,(usbInited)
+	dec	a
+	jq	z,__frameset0
+.fail:
 	pop	hl
 	ld	hl,USB_ERROR_SYSTEM
 	ret
-.check:
-	ld	a,(mpIntMask)
-	and	a,intTmr3
-	ret	nz
-	ld	a,(mpUsbSts)
-	and	a,bmUsbIntHostSysErr
-	ret	nz
-	ld	a,(usbInited)
-	dec	a
+
+iterate error, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, NOT_SUPPORTED, TIMEOUT
+
+_Error.error:
+	ld	a,USB_ERROR_#error
+	jq	_Error
+
+end iterate
+
+_Error:
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	ld	sp,ix
+	pop	ix
 	ret
 
 _Init:
@@ -642,6 +756,7 @@ _Init:
 	ld	hl,flags+$1B
 	ret
 
+;-------------------------------------------------------------------------------
 _PowerVbus:
 	call	$21B70
 	ld	hl,mpUsbOtgCsr
@@ -649,6 +764,7 @@ _PowerVbus:
 	set	4,(hl)
 	ret
 
+;-------------------------------------------------------------------------------
 _UnpowerVbus:
 	ld	hl,mpUsbOtgCsr
 	res	7,(hl)
@@ -656,6 +772,17 @@ _UnpowerVbus:
 	res	4,(hl)
 	ret
 
+;-------------------------------------------------------------------------------
+_DefaultEventCallback:
+	ld	hl,USB_SUCCESS
+	ret
+
+;-------------------------------------------------------------------------------
+_DefaultTransferCallback:
+	ld	hl,USB_SUCCESS
+	ret
+
+;-------------------------------------------------------------------------------
 iterate <size,align>, 32,32, 64,256
 
 ; Allocates an <align> byte aligned <size> byte block.
@@ -685,6 +812,493 @@ _Free#size#Align#align:
 
 end iterate
 
+; Input:
+;  (ix+6) = endpoint
+; Output:
+;  zf = enough memory
+;  hl = transfer
+_AllocDummyTransfer:
+	ld	iy,(ix+6)
+.enter:
+	call	_Alloc32Align32
+	ret	nz
+assert ~transfer.status and (transfer.status - 1)
+	set	bsf transfer.status,hl
+	ld	(hl),1 shl 6
+	res	bsf transfer.status,hl
+	ret
+
+; Input:
+;  a = ioc shl 7 or dir
+;  bc = length
+;  de = buffer
+;  (ix+6) = endpoint
+;  (ix+15) = handler
+;  (ix+18) = data
+_QueueTransfer:
+	call	_AllocDummyTransfer
+	jq	nz,_Error.NO_MEMORY
+	ld	(.dummy),hl
+	or	a,3 shl 2
+	push	af
+	sbc	hl,hl
+	sbc	hl,bc
+	jq	z,.zlp
+.next:
+	push	de
+	ld	a,d
+	and	a,$f
+	ld	d,a
+	ld	hl,$5000
+	sbc.s	hl,de
+	sbc	hl,bc
+	jq	c,.notEnd
+	sbc	hl,hl
+	bit	bsf AUTO_TERMINATE,(yendpoint.flags)
+.notEnd:
+	add	hl,bc
+	jq	z,.last
+	bit	bsf PO2_MPS,(yendpoint.internalFlags)
+	jq	nz,.modPo2
+	ld	hl,(yendpoint.maxPktLen)
+	add	hl,hl
+	ld	a,h
+	and	a,$f
+	ld	h,a
+	or	a,l
+	jq	z,_Error.INVALID_PARAM
+	push	bc,de
+	ld	b,0
+.modShift:
+	inc	b
+	add.s	hl,hl
+	jq	nc,.modShift
+	ex	de,hl
+	rr	d
+.modLoop:
+	rr	e
+	or	a,a
+	sbc	hl,de
+	jq	nc,.modSkip
+	add	hl,de
+.modSkip:
+	srl	d
+	djnz	.modLoop
+	pop	de,bc
+	ex	de,hl
+	jq	.modDone
+.modPo2:
+	inc.s	de
+	ld	a,(yendpoint.maxPktLen+0)
+	add	a,a
+	jq	nz,.modPo2Byte
+	ld	a,(yendpoint.maxPktLen+1)
+	adc	a,a
+	and	a,$f
+	dec	a
+	and	a,h
+	ld	d,a
+	ld	e,l
+	jq	.modDone
+.modPo2Byte:
+	dec	a
+	and	a,l
+	ld	e,a
+	ld	d,0
+.modDone:
+	; hl = transfer length
+	; de = transfer length % max packet length
+	; bc = total length
+	sbc	hl,bc
+	add	hl,bc
+	jq	nz,.notLast
+	ld	a,d
+	or	a,e
+	jq	nz,.last
+.notLast:
+	or	a,a
+	sbc	hl,de
+	pop	de,af
+	push	af,bc,de,hl
+
+	call	_AllocDummyTransfer.enter
+	jq	nz,_Error.NO_MEMORY
+	and	a,00001101b
+	pop	bc
+	push	bc
+	call	.queue
+
+	pop	bc,hl,de
+	add	hl,bc
+	ex	de,hl
+	sbc	hl,bc
+	push	hl
+	pop	bc
+	jq	nz,.next
+.last:
+	pop	de
+.zlp:
+	pop	af
+	and	a,10001101b
+	push	hl
+	pop	bc
+virtual
+	ld	iy,0
+ load .iyPrefix from $$
+end virtual
+	ld	iyl,.iyPrefix
+label .queue at $-1
+	ld	hl,0
+.dummy := $-long
+	set	7,b
+	jq	_FillTransfer
+
+; Input:
+;  a = ioc shl 7 or 3 shl 2 or pid
+;  bc = dt shl 15 or length
+;  de = next
+;  hl = buffer
+;  iy = alt next
+;  (ix+6) = endpoint
+;  (ix+15) = handler
+;  (ix+18) = data
+_FillTransfer:
+	push	hl,iy
+	ld	yendpoint,(ix+6)
+	ld	hl,(yendpoint.last)
+	ld	(hl),de
+assert ~transfer.altNext and (transfer.altNext-1)
+	set	bsf transfer.altNext, hl
+	pop	de
+	ld	(hl),de
+repeat transfer.type-transfer.altNext
+	inc	hl
+end repeat
+	ld	(hl),a
+repeat transfer.remaining-transfer.type
+	inc	hl
+end repeat
+	ld	(hl),c
+	inc	hl
+	ld	(hl),b
+	inc	hl
+	pop	de
+	ld	(hl),de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl),c
+	inc	hl
+	ld	(hl),b
+	inc	hl
+	dec	sp
+	push	de
+	inc	sp
+	pop	de
+	ld	a,e
+	or	a,$f
+	ld	e,a
+	inc	de
+	ld	(hl),e
+	inc	hl
+	ld	bc,(ix+15)
+	ld	a,d
+	xor	a,c
+	and	a,$f
+	xor	a,c
+	ld	(hl),bc
+	ld	(hl),a
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,e
+	or	a,$f
+	ld	e,a
+	inc	de
+	ld	a,c
+	xor	a,e
+	and	a,$f
+	xor	a,e
+	ld	(hl),a
+	inc	hl
+	ld	bc,(ix+18)
+	ld	a,d
+	xor	a,c
+	and	a,$f
+	xor	a,c
+	ld	(hl),bc
+	ld	(hl),a
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,e
+	or	a,$f
+	ld	e,a
+	inc	de
+	ld	a,c
+	xor	a,e
+	and	a,$f
+	xor	a,e
+	ld	(hl),a
+	inc	hl
+	lea	bc,iy
+	ld	a,d
+	xor	a,c
+	and	a,$f
+	xor	a,c
+	ld	(hl),bc
+	ld	(hl),a
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,e
+	or	a,$f
+	ld	e,a
+	inc	de
+	ld	a,c
+	xor	a,e
+	ld	(hl),a
+	inc	hl
+	ld	(hl),d
+	ret
+
+;-------------------------------------------------------------------------------
+_FunData:
+repeat 256
+	db % and $FF
+end repeat
+
+_HandleTestOutRequest:
+	ld	hl,_FunData
+	ld	bc,256
+	call	_MemClear
+	ld	bc,64
+	ld	de,_FunData
+	ld	hl,mpUsbCxFifo
+	set	bCxFifoClr,(hl)
+	ld	l,usbCxIsr-$100
+.waitOut:
+	bit	bUsbIntCxOut,(hl)
+	jq	z,.waitOut
+	ld	(hl),bmUsbIntCxOut
+	ld	l,usbCxFifo+3-$100
+	ld	bc,0
+	ld	c,(hl)
+	ld	de,_FunData
+	ld	l,usbDmaCtrl-$100
+	ld	(hl),usbDmaFifo2Mem or bmUsbDmaClrFifo
+	inc	l;usbDmaLen-$100
+	ld	(hl),bc
+	ld	l,usbDmaFifo-$100
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbDmaAddr-$100
+	ld	(hl),de
+	ld	l,usbDmaCtrl-$100
+	set	bUsbDmaStart,(hl)
+	ld	l,usbDevIsr-$100
+.waitDma:
+	inc	l
+	bit	bUsbIntDevDmaErr-8,(hl)
+	jq	nz,.waitDmaDone
+	dec	l
+	bit	bUsbIntDevDmaFin,(hl)
+	jq	z,.waitDma
+.waitDmaDone:
+	ld	(hl),bmUsbIntDevDmaFin
+	inc	l
+	ld	(hl),bmUsbIntDevDmaErr shr 8
+	xor	a,a
+	ld	l,usbDmaFifo-$100
+	ld	(hl),a;bmUsbDmaNoFifo
+	ld	l,usbCxIsr-$100
+.waitEnd:
+	bit	bUsbIntCxEnd,(hl)
+	jq	nz,.waitEndDone
+	bit	bUsbIntCxErr,(hl)
+	jq	z,.waitEnd
+.waitEndDone:
+	ld	(hl),bmUsbIntCxEnd or bmUsbIntCxErr
+	ld	l,usbCxFifo-$100
+	set	bCxFifoFin,(hl)
+	ld	l,usbCxIsr-$100
+	ld	(hl),bmUsbIntCxSetup
+	ld	a,102
+	jq	_DispatchEvent
+
+_HandleTestInRequest:
+	push	ix
+	ld	ix,0
+	ld	iy,mpTmrRange
+	ld	bc,64
+	ld	de,_FunData
+	ld	hl,mpUsbCxFifo
+	set	bCxFifoClr,(hl)
+	ld	l,usbDmaCtrl-$100
+	ld	(hl),usbDmaMem2Fifo or bmUsbDmaClrFifo
+	inc	l;usbDmaLen-$100
+	ld	(hl),bc
+	ld	l,usbDmaFifo-$100
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbDmaAddr-$100
+	ld	(hl),de
+	ld	l,usbDmaCtrl-$100
+	set	bUsbDmaStart,(hl)
+	ld	l,usbDevIsr-$100
+.waitDma:
+	bit	bUsbIntDevDmaFin,(hl)
+	jq	z,.waitDma
+	ld	(hl),bmUsbIntDevDmaFin
+	xor	a,a
+	ld	l,usbDmaFifo-$100
+	ld	(hl),a;bmUsbDmaNoFifo
+if 0 ; Single packet
+	ld	l,usbCxFifo-$100
+	set	bCxFifoFin,(hl)
+else
+	ld	l,usbCxIsr-$100
+.waitIn:
+	bit	bUsbIntCxIn,(hl)
+	jq	z,.waitIn
+	ld	(hl),bmUsbIntCxIn
+	; second packet
+	ld	bc,64
+	ld	de,_FunData+64
+	ld	l,usbDmaCtrl-$100
+	ld	(hl),usbDmaMem2Fifo or bmUsbDmaClrFifo
+	inc	l;usbDmaLen-$100
+	ld	(hl),bc
+	ld	l,usbDmaFifo-$100
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbDmaAddr-$100
+	ld	(hl),de
+	ld	l,usbDmaCtrl-$100
+	set	bTmr2Enable,(iy+tmrCtrl)
+	set	bUsbDmaStart,(hl)
+	ld	l,usbDevIsr-$100
+.waitDma2:
+	bit	bUsbIntDevDmaFin,(hl)
+	jq	z,.waitDma2
+	res	bTmr2Enable,(iy+tmrCtrl)
+	ld	(hl),bmUsbIntDevDmaFin
+	ld	l,usbCxFifo-$100
+	set	bCxFifoFin,(hl)
+	xor	a,a
+	ld	l,usbDmaFifo-$100
+	ld	(hl),a;bmUsbDmaNoFifo
+;	ld	l,usbCxIsr-$100
+;.waitIn2:
+;	bit	bUsbIntCxIn,(hl)
+;	jq	z,.waitIn2
+;	ld	(hl),bmUsbIntCxIn
+end if
+	ld	l,usbCxIsr-$100
+	ld	(hl),bmUsbIntCxSetup
+	pop	ix
+	ld	a,101
+	jq	_DispatchEvent
+	ret
+
+	ld	l,usbCxIsr-$100
+.wait:
+	bit	bUsbIntCxIn,(hl)
+	jq	z,.wait
+	ld	(hl),bmUsbIntCxIn
+	ld	l,usbCxIsr-$100
+	ld	(hl),bmUsbIntCxSetup
+	xor	a,a
+	ret
+
+second:
+	ld	bc,30
+	ld	de,_FunData+64
+
+	ld	hl,mpUsbCxFifo
+	set	bCxFifoClr,(hl)
+	ld	l,usbDmaFifo-$100
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbDmaAddr-$100
+	ld	(hl),de
+	ld	l,usbDmaCtrl-$100
+	ld	a,(setupPacket.bmRequestType)
+	rlca
+	rlca
+	xor	a,(hl)
+	and	a,usbDmaMem2Fifo
+	xor	a,(hl)
+	ld	(hl),a
+	inc	l;usbDmaLen-$100
+;	ex	de,hl
+;	ld	hl,(setupPacket.wLength)
+;	sbc.s	hl,bc
+;	jq	c,.min
+;	sbc	hl,hl
+;.min:
+;	add.s	hl,bc
+;	ex	de,hl
+	ld	(hl),bc
+	dec	l;usbDmaCtrl-$100
+	set	bUsbDmaStart,(hl)
+
+	ld	l,usbCxFifo-$100
+	set	bCxFifoFin,(hl)
+	ld	l,usbCxIsr-$100
+	ld	(hl),bmUsbIntCxSetup
+	xor	a,a
+	ret
+
+	ld	l,usbCxIsr-$100
+.wait:
+	bit	bUsbIntCxIn,(hl)
+	jq	z,.wait
+	ld	(hl),bmUsbIntCxIn
+	xor	a,a
+	ld	l,usbDmaFifo-$100
+	ld	(hl),a
+
+	ld	l,usbCxFifo-$100
+	set	bCxFifoFin,(hl)
+	ld	l,usbCxIsr-$100
+	ld	(hl),bmUsbIntCxSetup
+	ret
+
+sendDescriptor:
+	ld	hl,mpUsbCxFifo
+	set	bCxFifoClr,(hl)
+	ld	l,usbDmaFifo-$100
+	ld	(hl),bmUsbDmaCxFifo
+	ld	l,usbDmaAddr-$100
+	ld	(hl),de
+	ld	l,usbDmaCtrl-$100
+	ld	a,(setupPacket.bmRequestType)
+	rlca
+	rlca
+	xor	a,(hl)
+	and	a,usbDmaMem2Fifo
+	xor	a,(hl)
+	ld	(hl),a
+	inc	l;usbDmaLen-$100
+	ex	de,hl
+	ld	hl,(setupPacket.wLength)
+	sbc.s	hl,bc
+	jq	c,.min
+	sbc	hl,hl
+.min:
+	add.s	hl,bc
+	ex	de,hl
+	ld	(hl),de
+	dec	l;usbDmaCtrl-$100
+	set	bUsbDmaStart,(hl)
+	ld	l,usbCxIsr-$100
+.wait:
+	bit	bUsbIntCxIn,(hl)
+	jq	z,.wait
+	ld	(hl),bmUsbIntCxIn
+	xor	a,a
+	ld	l,usbDmaFifo-$100
+	ld	(hl),a
+	ret
+
+;-------------------------------------------------------------------------------
 _HandleGetDescriptor:
 	ld	de,(ysetup.wIndex)
 	ld	bc,(ysetup.wValue)
@@ -787,7 +1401,7 @@ end repeat
 	add.s	hl,bc
 	ex	de,hl
 	ld	(hl),de
-	ld	l,usbDmaCtrl-$100
+	dec	l;usbDmaCtrl-$100
 	set	bUsbDmaStart,(hl)
 	ld	l,usbDevIsr-$100
 .wait:
@@ -816,13 +1430,19 @@ _HandleCxSetupInt:
 	inc	iy
 	djnz	.fetch
 	ld	l,usbDmaFifo-$100
-	jp	po,.noEI
+	jp	po,.noEi
 	ei
-.noEI:
+.noEi:
 	ld	(hl),b;bmUsbDmaNoFifo
 	ld	bc,(ysetup.bmRequestType)
 	inc	b
 	djnz	.notGetStatus
+	ld	a,c
+	sub	a,DEVICE_TO_HOST or VENDOR_REQUEST or RECIPIENT_DEVICE
+	jq	z,_HandleTestInRequest
+	ld	a,c
+	sub	a,HOST_TO_DEVICE or VENDOR_REQUEST or RECIPIENT_DEVICE
+	jq	z,_HandleTestOutRequest
 .notGetStatus:
 	djnz	.notClearFeature
 .notClearFeature:
@@ -905,7 +1525,7 @@ _HandleCxSetupInt:
 _HandleDevInt:
 	ld	l,usbGisr-$100
 	inc	h
-iterate type, Dev, Fifo, Cx
+iterate type, Cx, Dev; Dev, Fifo, Cx
 	bit	bUsbDevInt#type,(hl)
 	call	nz,_HandleDev#type#Int
 	ret	nz
@@ -1219,6 +1839,7 @@ _HandleHostSysErrInt:
 	ld	a,USB_HOST_ASYNC_ADVANCE_INTERRUPT
 	jq	_DispatchEvent
 
+;-------------------------------------------------------------------------------
 _DispatchEvent:
 	push	hl
 	ld	hl,(eventCallback.data)
@@ -1242,6 +1863,7 @@ _DispatchEvent:
 .dispatch:
 	jp	(hl)
 
+;-------------------------------------------------------------------------------
 _DefaultStandardDescriptors:
 	dl .device, .configurations, .langids
 	db 2

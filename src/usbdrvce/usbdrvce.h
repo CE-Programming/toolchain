@@ -150,14 +150,7 @@ typedef enum usb_find_flag {
 } usb_find_flag_t;
 
 typedef enum usb_endpoint_flag {
-  USB_AUTO_TERMINATE   = 0 << 0, /**< For transfers that are a multiple of    */
-                                 /**  the endpoint's maximum packet length,   */
-                                 /**  automatically terminate outgoing ones   */
-                                 /**  with a zero-length packet and require   */
-                                 /**  incoming ones to be terminated with a   */
-                                 /**  zero-length packet or fail with         */
-                                 /**  USB_TRANSFER_OVERFLOW.                  */
-  USB_MANUAL_TERMINATE = 1 << 0, /**< For transfers that are a multiple of    */
+  USB_MANUAL_TERMINATE = 0 << 0, /**< For transfers that are a multiple of    */
                                  /**  the endpoint's maximum packet length,   */
                                  /**  don't automatically terminate outgoing  */
                                  /**  ones with a zero-length packet and      */
@@ -171,6 +164,13 @@ typedef enum usb_endpoint_flag {
                                  /**  maximum packet length to be manually    */
                                  /**  terminated with an explicit zero-length */
                                  /**  transfer.                               */
+  USB_AUTO_TERMINATE   = 1 << 0, /**< For transfers that are a multiple of    */
+                                 /**  the endpoint's maximum packet length,   */
+                                 /**  automatically terminate outgoing ones   */
+                                 /**  with a zero-length packet and require   */
+                                 /**  incoming ones to be terminated with a   */
+                                 /**  zero-length packet or fail with         */
+                                 /**  USB_TRANSFER_OVERFLOW.                  */
 } usb_endpoint_flag_t;
 
 typedef enum usb_speed {
@@ -823,12 +823,12 @@ usb_ControlTransfer(usb_endpoint_t endpoint, const usb_control_setup_t *setup,
                       retries, transferred)
 
 /**
- * Schedules a transfer to the pipe connected to \p endpoint of \p device, using
- * \p length as the buffer length, and waits for it to complete. If acting as
- * usb host and using a control pipe, uses the beginning of \p buffer as the
- * setup packet to send, its \c bmRequestType for the transfer direction, and
- * the rest of \p buffer as the data buffer.  Otherwise, uses \p endpoint for
- * transfer direction and  the whole \p buffer as the data buffer.
+ * Schedules a transfer to the pipe connected to \p endpoint, using \p length as
+ * the buffer length, and waits for it to complete. If acting as usb host and
+ * using a control pipe, uses the beginning of \p buffer as the setup packet to
+ * send, its \c bmRequestType for the transfer direction, and the rest of
+ * \p buffer as the data buffer.  Otherwise, uses \p endpoint for transfer
+ * direction and  the whole \p buffer as the data buffer.
  * @param endpoint The endpoint to communicate with, which also specifies the
  * direction for non-control transfers.
  * @param buffer Data to transfer that must reside in RAM.  When acting as usb
@@ -849,11 +849,11 @@ usb_error_t usb_Transfer(usb_endpoint_t endpoint, void *buffer, size_t length,
 #define usb_IsochronousTransfer usb_Transfer
 
 /**
- * Schedules a transfer to the pipe connected to \p endpoint of \p device, in
- * the direction indicated by \p setup->bmRequestType, using \p buffer as the
- * data buffer, and \p setup->wLength as the buffer length.  If acting as usb
- * host and using a control pipe, \p setup is used as the setup packet,
- * otherwise all fields not mentioned above are ignored.
+ * Schedules a transfer to the pipe connected to \p endpoint, in the direction
+ * indicated by \p setup->bmRequestType, using \p buffer as the data buffer, and
+ * \p setup->wLength as the buffer length.  If acting as usb host and using a
+ * control pipe, \p setup is used as the setup packet, otherwise all fields not
+ * mentioned above are ignored.
  * @param endpoint The endpoint to communicate with, which also specifies the
  * direction for non-control transfers.
  * @param setup Indicates the transfer direction and buffer length.  If acting
