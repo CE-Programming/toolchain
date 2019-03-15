@@ -984,64 +984,30 @@ end repeat
 	inc	hl
 	pop	de
 	ld	(hl),de
+	dec	sp
+	push	de
+	inc	sp
+	pop	de
 	inc	hl
 	inc	hl
 	inc	hl
 	ld	(hl),c
 	inc	hl
 	ld	(hl),b
-	inc	hl
-	dec	sp
-	push	de
-	inc	sp
-	pop	de
-	ld	a,e
-	or	a,$f
-	ld	e,a
-	inc	de
-	ld	(hl),e
-	inc	hl
+	call	.packHalf
 	ld	bc,(ix+15)
-	ld	a,d
-	xor	a,c
-	and	a,$f
-	xor	a,c
-	ld	(hl),bc
-	ld	(hl),a
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	a,e
-	or	a,$f
-	ld	e,a
-	inc	de
-	ld	a,c
-	xor	a,e
-	and	a,$f
-	xor	a,e
-	ld	(hl),a
-	inc	hl
+	call	.pack
 	ld	bc,(ix+18)
-	ld	a,d
-	xor	a,c
-	and	a,$f
-	xor	a,c
-	ld	(hl),bc
-	ld	(hl),a
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	a,e
-	or	a,$f
-	ld	e,a
-	inc	de
-	ld	a,c
-	xor	a,e
-	and	a,$f
-	xor	a,e
-	ld	(hl),a
-	inc	hl
+	call	.pack
 	lea	bc,iy
+	call	.pack
+	ld	(hl),d
+	ld	a,l
+	sub	a,transfer.status-transfer.endpoint-1
+	ld	l,a
+	ld	(hl),1 shl 7
+	ret
+.pack:
 	ld	a,d
 	xor	a,c
 	and	a,$f
@@ -1050,6 +1016,7 @@ end repeat
 	ld	(hl),a
 	inc	hl
 	inc	hl
+.packHalf:
 	inc	hl
 	ld	a,e
 	or	a,$f
@@ -1057,9 +1024,10 @@ end repeat
 	inc	de
 	ld	a,c
 	xor	a,e
+	and	a,$f
+	xor	a,e
 	ld	(hl),a
 	inc	hl
-	ld	(hl),d
 	ret
 
 ;-------------------------------------------------------------------------------
