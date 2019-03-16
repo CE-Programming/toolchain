@@ -109,6 +109,7 @@ typedef enum usb_error {
   USB_ERROR_NO_MEMORY,
   USB_ERROR_NOT_SUPPORTED,
   USB_ERROR_TIMEOUT,
+  USB_ERROR_FAILED,
   USB_USER_ERROR = 100,
 } usb_error_t;
 

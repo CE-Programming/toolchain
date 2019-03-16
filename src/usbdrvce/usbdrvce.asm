@@ -24,6 +24,14 @@ library 'USBDRVCE', 0
 	export usb_DisconnectDevice
 	export usb_GetDeviceAddress
 	export usb_GetDeviceSpeed
+	export usb_GetConfigurationDescriptorTotalLength
+	export usb_GetDescriptor
+	export usb_SetDescriptor
+	export usb_GetStringDescriptor
+	export usb_GetConfiguration
+	export usb_SetConfiguration
+	export usb_GetInterfaceAlternateSetting
+	export usb_SetInterfaceAlternateSetting
 	export usb_GetDeviceEndpoint
 	export usb_GetEndpointDevice
 	export usb_SetEndpointData
@@ -164,6 +172,7 @@ virtual at 0
 	USB_ERROR_NO_MEMORY	rb 1
 	USB_ERROR_NOT_SUPPORTED	rb 1
 	USB_ERROR_TIMEOUT	rb 1
+	USB_ERROR_FAILED	rb 1
 end virtual
 
 ; enum usb_event
@@ -546,6 +555,46 @@ usb_GetDeviceSpeed:
 	ret
 
 ;-------------------------------------------------------------------------------
+usb_GetConfigurationDescriptorTotalLength:
+	call	_Error.check
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetDescriptor:
+	call	_Error.check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_SetDescriptor:
+	call	_Error.check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_GetStringDescriptor:
+	call	_Error.check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_GetConfiguration:
+	call	_Error.check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_SetConfiguration:
+	call	_Error.check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_GetInterfaceAlternateSetting:
+	call	_Error.check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
+usb_SetInterfaceAlternateSetting:
+	call	_Error.check
+	jq	_Error.NOT_SUPPORTED
+
+;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
 	pop	de,ydevice
 	ex	(sp),hl
@@ -628,18 +677,76 @@ usb_GetEndpointFlags:
 
 ;-------------------------------------------------------------------------------
 usb_ClearEndpointHalt:
-	call	_Check
+	call	_Error.check
 	jq	_Error.NOT_SUPPORTED
 
 ;-------------------------------------------------------------------------------
 usb_ControlTransfor:
-	call	_Check
+	call	_Error.check
 	jq	_Error.NOT_SUPPORTED
 
 ;-------------------------------------------------------------------------------
 usb_Transfer:
-	call	_Check
+	call	_Error.check
+	ld	hl,(ix+15)
+	push	hl
+	ld	hl,(ix+18)
+	push	hl
+	ld	hl,.callback
+	ld	(ix+15),hl
+	ld	(ix+18),ix
+	call	usb_ScheduleTransfer.enter
+load .noBreak from .break
+	ld	a,.noBreak
+	ld	(.break),a
+.wait:
+	call	usb_WaitForEvents
+	jq	.wait
+label .break at $-byte
+	ret
 	jq	_Error.NOT_SUPPORTED
+
+.callback:
+	ld	hl,12
+	add	hl,sp
+	ld	iy,(hl)
+repeat long
+	dec	hl
+end repeat
+	ld	de,(hl)
+	ld	(iy-9),de
+repeat long
+	dec	hl
+end repeat
+	ld	hl,(hl)
+	ld	de,-1
+	add	hl,de
+	jq	c,.fail
+	inc	hl
+	xor	a,a
+	ld	(.break),a
+	ret
+.fail:
+	dec	de
+	add	hl,de
+	inc	de
+	ld	a,USB_ERROR_FAILED
+	jq	c,.noRetry
+	ld	hl,(iy-6)
+	sbc	hl,de
+	ret	z
+	add	hl,de
+	add	hl,de
+	ld	(iy-6),hl
+	add	hl,de
+	sbc	a,a
+	or	a,USB_ERROR_TIMEOUT-1
+	inc	a
+.noRetry:
+	ex	de,hl
+	inc	hl
+	ld	l,a
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_ScheduleControlTransfer.notControl:
@@ -651,7 +758,7 @@ usb_ScheduleControlTransfer.notControl:
 	ld	yendpoint,(ix+6)
 	jq	usb_ScheduleTransfer.notControl
 usb_ScheduleControlTransfer:
-	call	_Check
+	call	_Error.check
 	ld	yendpoint,(ix+6)
 	or	a,(yendpoint.type);USB_CONTROL_TRANSFER
 	jq	nz,.notControl
@@ -673,9 +780,7 @@ usb_ScheduleControlTransfer:
 	pop	af
 	xor	a,10001101b
 	ld	bc,1 shl 15
-	call	.queueStage
-	pop	ix
-	ret
+	jq	.queueStage
 .queueStage:
 	call	_AllocDummyTransfer
 	ex	de,hl
@@ -690,7 +795,8 @@ usb_ScheduleTransfer.control:
 	ld	(ix+12),de
 	jq	usb_ScheduleControlTransfer.control
 usb_ScheduleTransfer:
-	call	_Check
+	call	_Error.check
+.enter:
 	ld	yendpoint,(ix+6)
 	or	a,(yendpoint.type);USB_CONTROL_TRANSFER
 	jq	z,.control
@@ -702,131 +808,7 @@ repeat USB_ISOCHRONOUS_TRANSFER
 end repeat
 	jq	z,_Error.NOT_SUPPORTED
 	ld	a,(yendpoint.dir)
-	call	_QueueTransfer
-	pop	ix
-	ret
-
-;-------------------------------------------------------------------------------
-_Check:
-	ld	a,(mpIntMask)
-	and	a,intTmr3
-	jq	nz,.fail
-	ld	a,(mpUsbSts)
-	and	a,bmUsbIntHostSysErr
-	jq	nz,.fail
-	ld	a,(usbInited)
-	dec	a
-	jq	z,__frameset0
-.fail:
-	pop	hl
-	ld	hl,USB_ERROR_SYSTEM
-	ret
-
-iterate error, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, NOT_SUPPORTED, TIMEOUT
-
-_Error.error:
-	ld	a,USB_ERROR_#error
-	jq	_Error
-
-end iterate
-
-_Error:
-	or	a,a
-	sbc	hl,hl
-	ld	l,a
-	ld	sp,ix
-	pop	ix
-	ret
-
-_Init:
-	ld	bc,usbInited-usbArea
-	ld	de,usbInited
-	ld	hl,mpUsbCmd
-	ld	(de),a
-	ld	(hl),h
-	ld	l,usbSts+1
-.wait:
-	bit	bUsbHcHalted-8,(hl)
-	jq	z,.wait
-	scf
-	sbc	hl,hl
-	add	hl,de
-	ex	de,hl
-	lddr
-	ld	hl,flags+$1B
-	ret
-
-;-------------------------------------------------------------------------------
-_PowerVbus:
-	call	$21B70
-	ld	hl,mpUsbOtgCsr
-	res	5,(hl)
-	set	4,(hl)
-	ret
-
-;-------------------------------------------------------------------------------
-_UnpowerVbus:
-	ld	hl,mpUsbOtgCsr
-	res	7,(hl)
-	set	5,(hl)
-	res	4,(hl)
-	ret
-
-;-------------------------------------------------------------------------------
-_DefaultEventCallback:
-	ld	hl,USB_SUCCESS
-	ret
-
-;-------------------------------------------------------------------------------
-_DefaultTransferCallback:
-	ld	hl,USB_SUCCESS
-	ret
-
-;-------------------------------------------------------------------------------
-iterate <size,align>, 32,32, 64,256
-
-; Allocates an <align> byte aligned <size> byte block.
-; Output:
-;  zf = enough memory
-;  hl = allocated memory
-_Alloc#size#Align#align:
-	ld	hl,(freeList#size#Align#align)
-	bit	0,l
-	ret	nz
-	push	hl
-	ld	hl,(hl)
-	ld	(freeList#size#Align#align),hl
-	pop	hl
-	ret
-
-; Frees an <align> byte aligned <size> byte block.
-; Input:
-;  hl = allocated memory to be freed.
-_Free#size#Align#align:
-	push	de
-	ld	de,(freeList#size#Align#align)
-	ld	(hl),de
-	ld	(freeList#size#Align#align),hl
-	pop	de
-	ret
-
-end iterate
-
-; Input:
-;  (ix+6) = endpoint
-; Output:
-;  zf = enough memory
-;  hl = transfer
-_AllocDummyTransfer:
-	ld	iy,(ix+6)
-.enter:
-	call	_Alloc32Align32
-	ret	nz
-assert ~transfer.status and (transfer.status - 1)
-	set	bsf transfer.status,hl
-	ld	(hl),1 shl 6
-	res	bsf transfer.status,hl
-	ret
+	jq	_QueueTransfer
 
 ; Input:
 ;  a = ioc shl 7 or dir
@@ -920,14 +902,12 @@ _QueueTransfer:
 	sbc	hl,de
 	pop	de,af
 	push	af,bc,de,hl
-
 	call	_AllocDummyTransfer.enter
 	jq	nz,_Error.NO_MEMORY
 	and	a,00001101b
 	pop	bc
 	push	bc
 	call	.queue
-
 	pop	bc,hl,de
 	add	hl,bc
 	ex	de,hl
@@ -947,7 +927,7 @@ virtual
  load .iyPrefix from $$
 end virtual
 	ld	iyl,.iyPrefix
-label .queue at $-1
+label .queue at $-byte
 	ld	hl,0
 .dummy := $-long
 	set	7,b
@@ -1028,6 +1008,131 @@ end repeat
 	xor	a,e
 	ld	(hl),a
 	inc	hl
+	ret
+
+;-------------------------------------------------------------------------------
+element error
+label _Error at error
+
+iterate error, SYSTEM, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, NOT_SUPPORTED, TIMEOUT, FAILED
+
+.error:
+	ld	a,USB_ERROR_#error
+	jq	.return
+
+end iterate
+
+.check:
+	pop	de
+	call	__frameset0
+	ld	a,(mpIntMask)
+	and	a,intTmr3
+	jq	nz,.SYSTEM
+	ld	a,(mpUsbSts)
+	and	a,bmUsbIntHostSysErr
+	jq	nz,.SYSTEM
+	ld	a,(usbInited)
+	dec	a
+	jq	nz,.SYSTEM
+	ex	de,hl
+	call	_DispatchEvent.dispatch
+	jq	.success
+
+.success:
+	xor	a,a
+	jq	.return
+
+.return:
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	ld	sp,ix
+	pop	ix
+	ret
+
+_Init:
+	ld	bc,usbInited-usbArea
+	ld	de,usbInited
+	ld	hl,mpUsbCmd
+	ld	(de),a
+	ld	(hl),h
+	ld	l,usbSts+1
+.wait:
+	bit	bUsbHcHalted-8,(hl)
+	jq	z,.wait
+	scf
+	sbc	hl,hl
+	add	hl,de
+	ex	de,hl
+	lddr
+	ld	hl,flags+$1B
+	ret
+
+;-------------------------------------------------------------------------------
+_PowerVbus:
+	call	$21B70
+	ld	hl,mpUsbOtgCsr
+	res	5,(hl)
+	set	4,(hl)
+	ret
+
+;-------------------------------------------------------------------------------
+_UnpowerVbus:
+	ld	hl,mpUsbOtgCsr
+	res	7,(hl)
+	set	5,(hl)
+	res	4,(hl)
+	ret
+
+;-------------------------------------------------------------------------------
+_DefaultEventCallback:
+	ld	hl,USB_SUCCESS
+	ret
+
+;-------------------------------------------------------------------------------
+iterate <size,align>, 32,32, 64,256
+
+; Allocates an <align> byte aligned <size> byte block.
+; Output:
+;  zf = enough memory
+;  hl = allocated memory
+_Alloc#size#Align#align:
+	ld	hl,(freeList#size#Align#align)
+	bit	0,l
+	ret	nz
+	push	hl
+	ld	hl,(hl)
+	ld	(freeList#size#Align#align),hl
+	pop	hl
+	ret
+
+; Frees an <align> byte aligned <size> byte block.
+; Input:
+;  hl = allocated memory to be freed.
+_Free#size#Align#align:
+	push	de
+	ld	de,(freeList#size#Align#align)
+	ld	(hl),de
+	ld	(freeList#size#Align#align),hl
+	pop	de
+	ret
+
+end iterate
+
+; Input:
+;  (ix+6) = endpoint
+; Output:
+;  zf = enough memory
+;  hl = transfer
+_AllocDummyTransfer:
+	ld	iy,(ix+6)
+.enter:
+	call	_Alloc32Align32
+	ret	nz
+assert ~transfer.status and (transfer.status - 1)
+	set	bsf transfer.status,hl
+	ld	(hl),1 shl 6
+	res	bsf transfer.status,hl
 	ret
 
 ;-------------------------------------------------------------------------------
