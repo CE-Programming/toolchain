@@ -682,11 +682,14 @@ usb_ClearEndpointHalt:
 
 ;-------------------------------------------------------------------------------
 usb_ControlTransfor:
-	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
+	ld	hl,usb_ScheduleControlTransfer.enter
+	jq	usb_Transfer.enter
 
 ;-------------------------------------------------------------------------------
 usb_Transfer:
+	ld	hl,usb_ScheduleTransfer.enter
+.enter:
+	ld	(.dispatch),hl
 	call	_Error.check
 	ld	hl,(ix+15)
 	push	hl
@@ -695,14 +698,15 @@ usb_Transfer:
 	ld	hl,.callback
 	ld	(ix+15),hl
 	ld	(ix+18),ix
-	call	usb_ScheduleTransfer.enter
+	call	0
+.dispatch := $-long
 load .noBreak from .break
 	ld	a,.noBreak
 	ld	(.break),a
 .wait:
 	call	usb_WaitForEvents
 	jq	.wait
-label .break at $-byte
+.break := $-byte
 	ret
 	jq	_Error.NOT_SUPPORTED
 
@@ -759,6 +763,7 @@ usb_ScheduleControlTransfer.notControl:
 	jq	usb_ScheduleTransfer.notControl
 usb_ScheduleControlTransfer:
 	call	_Error.check
+.enter:
 	ld	yendpoint,(ix+6)
 	or	a,(yendpoint.type);USB_CONTROL_TRANSFER
 	jq	nz,.notControl
