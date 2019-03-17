@@ -28,6 +28,7 @@ library 'USBDRVCE', 0
 	export usb_GetDescriptor
 	export usb_SetDescriptor
 	export usb_GetStringDescriptor
+	export usb_SetStringDescriptor
 	export usb_GetConfiguration
 	export usb_SetConfiguration
 	export usb_GetInterfaceAlternateSetting
@@ -305,6 +306,8 @@ virtual at 0
 	USB_BULK_TRANSFER			rb 1
 	USB_INTERRUPT_TRANSFER			rb 1
 end virtual
+
+USB_DEFAULT_RETRIES := 10
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -562,22 +565,213 @@ usb_GetConfigurationDescriptorTotalLength:
 ;-------------------------------------------------------------------------------
 usb_GetDescriptor:
 	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	push	hl
+	ld	bc,(ix+21)
+	push	bc
+	ld	bc,USB_DEFAULT_RETRIES
+	push	bc
+	ld	bc,(ix+15)
+	push	bc
+	push	hl
+	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	inc	l
+	ld	(hl),USB_GET_DESCRIPTOR
+	inc	l
+	ld	a,(ix+12)
+	ld	(hl),a
+	inc	l
+	ld	a,(ix+9)
+	ld	(hl),a
+	inc	l
+	xor	a,a
+	ld	(hl),a
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	bc,(ix+18)
+	ld	(hl),bc
+	ld	iy,(ix+6)
+	call	usb_GetDeviceEndpoint.enter
+	push	hl
+	call	usb_ControlTransfer
+	ex	de,hl
+	ld	hl,(ix-6)
+	call	_Free32Align32
+	ex	de,hl
+	ld	sp,ix
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_SetDescriptor:
 	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	push	hl
+	ld	bc,0
+	push	bc
+	ld	c,USB_DEFAULT_RETRIES
+	push	bc
+	ld	bc,(ix+15)
+	push	bc
+	push	hl
+	ld	(hl),USB_HOST_TO_DEVICE or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	inc	l
+	ld	(hl),USB_SET_DESCRIPTOR
+	inc	l
+	ld	a,(ix+12)
+	ld	(hl),a
+	inc	l
+	ld	a,(ix+9)
+	ld	(hl),a
+	inc	l
+	xor	a,a
+	ld	(hl),a
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	bc,(ix+18)
+	ld	(hl),bc
+	ld	iy,(ix+6)
+	call	usb_GetDeviceEndpoint.enter
+	push	hl
+	call	usb_ControlTransfer
+	ex	de,hl
+	ld	hl,(ix-6)
+	call	_Free32Align32
+	ex	de,hl
+	ld	sp,ix
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetStringDescriptor:
 	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	push	hl
+	ld	bc,(ix+21)
+	push	bc
+	ld	bc,USB_DEFAULT_RETRIES
+	push	bc
+	ld	bc,(ix+15)
+	push	bc
+	push	hl
+	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	inc	l
+	ld	(hl),USB_GET_DESCRIPTOR
+	inc	l
+	ld	a,(ix+9)
+	ld	(hl),a
+	inc	l
+	ld	a,USB_STRING_DESCRIPTOR
+	ld	(hl),a
+	inc	l
+	ld	bc,(ix+12)
+	ld	(hl),c
+	inc	l
+	ld	(hl),b
+	inc	l
+	ld	bc,(ix+18)
+	ld	(hl),bc
+	ld	iy,(ix+6)
+	xor	a,a
+	call	usb_GetDeviceEndpoint.enter
+	push	hl
+	call	usb_ControlTransfer
+	ex	de,hl
+	ld	hl,(ix-6)
+	call	_Free32Align32
+	ex	de,hl
+	ld	sp,ix
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+usb_SetStringDescriptor:
+	call	_Error.check
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	push	hl
+	ld	bc,0
+	push	bc
+	ld	c,USB_DEFAULT_RETRIES
+	push	bc
+	ld	bc,(ix+9)
+	push	bc
+	push	hl
+	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	inc	l
+	ld	(hl),USB_GET_CONFIGURATION
+	inc	l
+	xor	a,a
+	ld	(hl),a
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	(hl),1
+	inc	l
+	ld	(hl),a
+	ld	iy,(ix+6)
+	call	usb_GetDeviceEndpoint.enter
+	push	hl
+	call	usb_ControlTransfer
+	ex	de,hl
+	ld	hl,(ix-6)
+	call	_Free32Align32
+	ex	de,hl
+	ld	sp,ix
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetConfiguration:
 	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	push	hl
+	ld	bc,0
+	push	bc
+	ld	c,USB_DEFAULT_RETRIES
+	push	bc
+	ld	de,(ix+15)
+	push	de
+	push	hl
+	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	inc	l
+	ld	(hl),USB_GET_CONFIGURATION
+	inc	l
+	ld	a,(ix+9)
+	ld	(hl),a
+	inc	l
+	ld	a,USB_STRING_DESCRIPTOR
+	ld	(hl),a
+	inc	l
+	ld	bc,(ix+12)
+	ld	(hl),c
+	inc	l
+	ld	(hl),b
+	inc	l
+	ld	bc,(ix+18)
+	ld	(hl),bc
+	ld	iy,(ix+6)
+	xor	a,a
+	call	usb_GetDeviceEndpoint.enter
+	push	hl
+	call	usb_ControlTransfer
+	ex	de,hl
+	ld	hl,(ix-6)
+	call	_Free32Align32
+	ex	de,hl
+	ld	sp,ix
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_SetConfiguration:
@@ -601,6 +795,7 @@ usb_GetDeviceEndpoint:
 	push	hl,de
 	ld	a,l
 	and	a,$8F
+.enter:
 	ld	hl,(ydevice.endpoints)
 	bit	0,l
 	jq	nz,.returnCarry
@@ -699,16 +894,18 @@ usb_Transfer:
 	ld	(ix+15),hl
 	ld	(ix+18),ix
 	call	0
-.dispatch := $-long
+label .dispatch at $-long
 load .noBreak from .break
 	ld	a,.noBreak
 	ld	(.break),a
 .wait:
 	call	usb_WaitForEvents
-	jq	.wait
-.break := $-byte
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jq	z,.wait
+label .break at $-byte
 	ret
-	jq	_Error.NOT_SUPPORTED
 
 .callback:
 	ld	hl,12
@@ -717,8 +914,16 @@ load .noBreak from .break
 repeat long
 	dec	hl
 end repeat
-	ld	de,(hl)
-	ld	(iy-9),de
+	ld	bc,(hl)
+	ex	de,hl
+	ld	hl,(iy-9)
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jq	z,.null
+	ld	(hl),bc
+.null:
+	ex	de,hl
 repeat long
 	dec	hl
 end repeat
@@ -744,8 +949,8 @@ end repeat
 	ld	(iy-6),hl
 	add	hl,de
 	sbc	a,a
-	or	a,USB_ERROR_TIMEOUT-1
-	inc	a
+	cpl
+	and	a,USB_ERROR_TIMEOUT
 .noRetry:
 	ex	de,hl
 	inc	hl
@@ -934,7 +1139,7 @@ end virtual
 	ld	iyl,.iyPrefix
 label .queue at $-byte
 	ld	hl,0
-.dummy := $-long
+label .dummy at $-long
 	set	7,b
 	jq	_FillTransfer
 

@@ -640,14 +640,14 @@ usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
 
 /**
  * Changes the descriptor at \p index.
- * @note Blocks while the descriptor is modified.
+ * @note Blocks while the descriptor is changed.
  * @note Devices do not usually support this.
  * @param device The device to communicate with.
  * @param type The \c usb_descriptor_type_t to change.
- * @param index The descriptor index to change..
+ * @param index The descriptor index to change.
  * @param descriptor The new descriptor.
  * @param length The number of bytes in the new descriptor.
- * The \p descriptor buffer must be at least this large.
+ * The \p descriptor buffer must be this large.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
@@ -655,10 +655,11 @@ usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
                               size_t length);
 
 /**
- * Gets the string descriptor at \p index.
+ * Gets the string descriptor at \p index and \p langid.
  * @note Blocks while the descriptor is fetched.
  * @param device The device to communicate with.
  * @param index Descriptor index to fetch.
+ * @param langid Language ID to fetch.
  * @param descriptor Returns the fetched descriptor.
  * @param length The number of bytes to transfer.
  * The \p descriptor buffer must be at least this large.
@@ -666,8 +667,26 @@ usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t index,
+				    uint16_t langid,
                                     usb_string_descriptor_t *descriptor,
                                     size_t length, size_t *transferred);
+
+/**
+ * Sets the string descriptor at \p index and \p langid.
+ * @note Blocks while the descriptor is changed.
+ * @note Devices do not usually support this.
+ * @param device The device to communicate with.
+ * @param index Descriptor index to change.
+ * @param langid Language ID to change.
+ * @param descriptor The new descriptor.
+ * @param length The number of bytes to transfer.
+ * The \p descriptor buffer must be this large.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_SetStringDescriptor(usb_device_t device, uint8_t index,
+				    uint16_t langid,
+                                    const usb_string_descriptor_t *descriptor,
+                                    size_t length);
 
 /**
  * Gets the currently active configuration of a device.
