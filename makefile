@@ -63,6 +63,7 @@ FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
 CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
 CONVTILE   := $(call NATIVEPATH,$(CONVTILDIR)/convtile)
+FASMG_EZ80 := $(call NATIVEPATH,$(SRCDIR)/include/ez80.inc)
 
 ifeq ($(OS),Windows_NT)
 FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg.exe)
@@ -116,6 +117,7 @@ clean: clean-graphx clean-fileioc clean-keypadc clean-fatdrvce clean-fontlibc cl
 #----------------------------
 # tool rules
 #----------------------------
+$(FASMG_EZ80): fasmg
 fasmg:
 	$(MAKE) -C $(FASMGDIR)
 $(CONVHEX):
@@ -145,18 +147,9 @@ clean-std:
 #----------------------------
 
 #----------------------------
-# template rules
-#----------------------------
-template: $(FASMG)
-	$(MAKE) -C $(TEMPLATEDIR) FASMG=$(FASMG) BIN=$(BIN)
-clean-template:
-	$(MAKE) -C $(TEMPLATEDIR) clean
-#----------------------------
-
-#----------------------------
 # graphx rules
 #----------------------------
-graphx: $(FASMG)
+graphx: $(FASMG_EZ80)
 	$(MAKE) -C $(GRAPHXDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-graphx:
 	$(MAKE) -C $(GRAPHXDIR) clean
@@ -165,7 +158,7 @@ clean-graphx:
 #----------------------------
 # fontlibc rules
 #----------------------------
-fontlibc: $(FASMG)
+fontlibc: $(FASMG_EZ80)
 	$(MAKE) -C $(FONTLIBCDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-fontlibc:
 	$(MAKE) -C $(FONTLIBCDIR) clean
@@ -174,7 +167,7 @@ clean-fontlibc:
 #----------------------------
 # fileioc rules
 #----------------------------
-fileioc: $(FASMG)
+fileioc: $(FASMG_EZ80)
 	$(MAKE) -C $(FILEIOCDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-fileioc:
 	$(MAKE) -C $(FILEIOCDIR) clean
@@ -183,7 +176,7 @@ clean-fileioc:
 #----------------------------
 # keypadc rules
 #----------------------------
-keypadc: $(FASMG)
+keypadc: $(FASMG_EZ80)
 	$(MAKE) -C $(KEYPADCDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-keypadc:
 	$(MAKE) -C $(KEYPADCDIR) clean
@@ -192,7 +185,7 @@ clean-keypadc:
 #----------------------------
 # usbdrvce rules
 #----------------------------
-usbdrvce: $(FASMG)
+usbdrvce: $(FASMG_EZ80)
 	$(MAKE) -C $(USBDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-usbdrvce:
 	$(MAKE) -C $(USBDRVCEDIR) clean
@@ -201,7 +194,7 @@ clean-usbdrvce:
 #----------------------------
 # fatdrvce rules
 #----------------------------
-fatdrvce: $(FASMG)
+fatdrvce: $(FASMG_EZ80)
 	$(MAKE) -C $(FATDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-fatdrvce:
 	$(MAKE) -C $(FATDRVCEDIR) clean
@@ -210,7 +203,7 @@ clean-fatdrvce:
 #----------------------------
 # srldrvce rules
 #----------------------------
-srldrvce: $(FASMG)
+srldrvce: $(FASMG_EZ80)
 	$(MAKE) -C $(SRLDRVCEDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-srldrvce:
 	$(MAKE) -C $(SRLDRVCEDIR) clean
@@ -219,7 +212,7 @@ clean-srldrvce:
 #----------------------------
 # libload rules
 #----------------------------
-libload: $(FASMG)
+libload: $(FASMG_EZ80)
 	$(MAKE) -C $(LIBLOADDIR) FASMG=$(FASMG) BIN=$(BIN)
 clean-libload:
 	$(MAKE) -C $(LIBLOADDIR) clean
