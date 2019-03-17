@@ -21,7 +21,7 @@ script:
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
-  - make
+  - make -j4
   - make install
   - make release
   - make release-libs
@@ -30,7 +30,7 @@ script:
 # Build CEmu core and autotester_cli
   - git clone --recursive -b latest-stable --depth 1 https://github.com/CE-Programming/CEmu.git
   - make -C CEmu/core -j4
-  - make -C CEmu/tests/autotester -j4 
+  - make -C CEmu/tests/autotester -j2
   - export PATH=$(pwd)/CEmu/tests/autotester:$PATH
 # Grab ROM for tests below
   - export ROM_FILE_NAME=84pce_515_53.rom
