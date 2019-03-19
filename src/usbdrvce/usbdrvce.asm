@@ -42,7 +42,7 @@ library 'USBDRVCE', 0
 	export usb_SetEndpointFlags
 	export usb_GetEndpointFlags
 	export usb_ClearEndpointHalt
-	export usb_ControlTransfor
+	export usb_ControlTransfer
 	export usb_Transfer
 	export usb_ScheduleControlTransfer
 	export usb_ScheduleTransfer
@@ -301,13 +301,13 @@ end virtual
 
 ; enum usb_transfer_type
 virtual at 0
-	USB_CONTROL_TRANSFER			rb 1
-	USB_ISOCHRONOUS_TRANSFER		rb 1
-	USB_BULK_TRANSFER			rb 1
-	USB_INTERRUPT_TRANSFER			rb 1
+	CONTROL_TRANSFER			rb 1
+	ISOCHRONOUS_TRANSFER			rb 1
+	BULK_TRANSFER				rb 1
+	INTERRUPT_TRANSFER			rb 1
 end virtual
 
-USB_DEFAULT_RETRIES := 10
+DEFAULT_RETRIES := 10
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -570,14 +570,14 @@ usb_GetDescriptor:
 	push	hl
 	ld	bc,(ix+21)
 	push	bc
-	ld	bc,USB_DEFAULT_RETRIES
+	ld	bc,DEFAULT_RETRIES
 	push	bc
 	ld	bc,(ix+15)
 	push	bc
 	push	hl
-	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),USB_GET_DESCRIPTOR
+	ld	(hl),GET_DESCRIPTOR
 	inc	l
 	ld	a,(ix+12)
 	ld	(hl),a
@@ -612,14 +612,14 @@ usb_SetDescriptor:
 	push	hl
 	ld	bc,0
 	push	bc
-	ld	c,USB_DEFAULT_RETRIES
+	ld	c,DEFAULT_RETRIES
 	push	bc
 	ld	bc,(ix+15)
 	push	bc
 	push	hl
-	ld	(hl),USB_HOST_TO_DEVICE or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	ld	(hl),HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),USB_SET_DESCRIPTOR
+	ld	(hl),SET_DESCRIPTOR
 	inc	l
 	ld	a,(ix+12)
 	ld	(hl),a
@@ -654,19 +654,19 @@ usb_GetStringDescriptor:
 	push	hl
 	ld	bc,(ix+21)
 	push	bc
-	ld	bc,USB_DEFAULT_RETRIES
+	ld	bc,DEFAULT_RETRIES
 	push	bc
 	ld	bc,(ix+15)
 	push	bc
 	push	hl
-	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),USB_GET_DESCRIPTOR
+	ld	(hl),GET_DESCRIPTOR
 	inc	l
 	ld	a,(ix+9)
 	ld	(hl),a
 	inc	l
-	ld	a,USB_STRING_DESCRIPTOR
+	ld	a,STRING_DESCRIPTOR
 	ld	(hl),a
 	inc	l
 	ld	bc,(ix+12)
@@ -697,14 +697,14 @@ usb_SetStringDescriptor:
 	push	hl
 	ld	bc,0
 	push	bc
-	ld	c,USB_DEFAULT_RETRIES
+	ld	c,DEFAULT_RETRIES
 	push	bc
 	ld	bc,(ix+9)
 	push	bc
 	push	hl
-	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),USB_GET_CONFIGURATION
+	ld	(hl),GET_CONFIGURATION
 	inc	l
 	xor	a,a
 	ld	(hl),a
@@ -738,19 +738,19 @@ usb_GetConfiguration:
 	push	hl
 	ld	bc,0
 	push	bc
-	ld	c,USB_DEFAULT_RETRIES
+	ld	c,DEFAULT_RETRIES
 	push	bc
 	ld	de,(ix+15)
 	push	de
 	push	hl
-	ld	(hl),USB_DEVICE_TO_HOST or USB_STANDARD_REQUEST or USB_RECIPIENT_DEVICE
+	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),USB_GET_CONFIGURATION
+	ld	(hl),GET_CONFIGURATION
 	inc	l
 	ld	a,(ix+9)
 	ld	(hl),a
 	inc	l
-	ld	a,USB_STRING_DESCRIPTOR
+	ld	a,STRING_DESCRIPTOR
 	ld	(hl),a
 	inc	l
 	ld	bc,(ix+12)
@@ -876,7 +876,7 @@ usb_ClearEndpointHalt:
 	jq	_Error.NOT_SUPPORTED
 
 ;-------------------------------------------------------------------------------
-usb_ControlTransfor:
+usb_ControlTransfer:
 	ld	hl,usb_ScheduleControlTransfer.enter
 	jq	usb_Transfer.enter
 
@@ -890,21 +890,31 @@ usb_Transfer:
 	push	hl
 	ld	hl,(ix+18)
 	push	hl
+	or	a,a
+	sbc	hl,hl
+	push	hl
 	ld	hl,.callback
 	ld	(ix+15),hl
 	ld	(ix+18),ix
 	call	0
 label .dispatch at $-long
-load .noBreak from .break
-	ld	a,.noBreak
-	ld	(.break),a
+	ld	a,.jumpToWait
+	ld	(.jumpTarget),a
 .wait:
 	call	usb_WaitForEvents
 	add	hl,de
 	or	a,a
 	sbc	hl,de
+virtual
+	jq	z,.skip
+ load .jumpToSkip from $-byte
+end virtual
 	jq	z,.wait
-label .break at $-byte
+label .jumpTarget at $-byte
+load .jumpToWait from .jumpTarget
+	ret
+.skip:
+	pop	hl
 	ret
 
 .callback:
@@ -915,47 +925,45 @@ repeat long
 	dec	hl
 end repeat
 	ld	bc,(hl)
-	ex	de,hl
-	ld	hl,(iy-9)
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	jq	z,.null
-	ld	(hl),bc
-.null:
-	ex	de,hl
 repeat long
 	dec	hl
 end repeat
 	ld	hl,(hl)
-	ld	de,-1
 	add	hl,de
-	jq	c,.fail
-	inc	hl
-	xor	a,a
-	ld	(.break),a
-	ret
-.fail:
-	dec	de
-	add	hl,de
-	inc	de
+	xor	a,a;USB_SUCCESS
+	sbc	hl,de
+	jq	z,.return.c
 	ld	a,USB_ERROR_FAILED
-	jq	c,.noRetry
+	ld	de,-3
+	add	hl,de
+	jq	c,.return.nc
+	ld	e,d
 	ld	hl,(iy-6)
 	sbc	hl,de
-	ret	z
-	add	hl,de
+	jq	z,.return.inc
+	dec	a;USB_ERROR_TIMEOUT
 	add	hl,de
 	ld	(iy-6),hl
 	add	hl,de
-	sbc	a,a
-	cpl
-	and	a,USB_ERROR_TIMEOUT
-.noRetry:
-	ex	de,hl
+.return.c:
+	ccf
+.return.nc:
+	ld	(iy-12),a
+	sbc	hl,hl
+.return.inc:
 	inc	hl
-	ld	l,a
+	ret	nc
+	ld	a,.jumpToSkip
+	ld	(.jumpTarget),a
+	ld	de,(iy-9)
+	or	a,a
+	sbc	hl,de
+	ret	z
+	ld	(hl),bc
+	add	hl,de
 	ret
+
+
 
 ;-------------------------------------------------------------------------------
 usb_ScheduleControlTransfer.notControl:
@@ -970,7 +978,7 @@ usb_ScheduleControlTransfer:
 	call	_Error.check
 .enter:
 	ld	yendpoint,(ix+6)
-	or	a,(yendpoint.type);USB_CONTROL_TRANSFER
+	or	a,(yendpoint.type);CONTROL_TRANSFER
 	jq	nz,.notControl
 .control:
 	ld	a,00001110b
@@ -1008,12 +1016,12 @@ usb_ScheduleTransfer:
 	call	_Error.check
 .enter:
 	ld	yendpoint,(ix+6)
-	or	a,(yendpoint.type);USB_CONTROL_TRANSFER
+	or	a,(yendpoint.type);CONTROL_TRANSFER
 	jq	z,.control
 	ld	de,(ix+9)
 	ld	bc,(ix+12)
 .notControl:
-repeat USB_ISOCHRONOUS_TRANSFER
+repeat ISOCHRONOUS_TRANSFER
 	dec	a
 end repeat
 	jq	z,_Error.NOT_SUPPORTED
