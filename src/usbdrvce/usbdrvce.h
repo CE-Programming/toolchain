@@ -667,7 +667,7 @@ usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t index,
-				    uint16_t langid,
+                                    uint16_t langid,
                                     usb_string_descriptor_t *descriptor,
                                     size_t length, size_t *transferred);
 
@@ -684,7 +684,7 @@ usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t index,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetStringDescriptor(usb_device_t device, uint8_t index,
-				    uint16_t langid,
+                                    uint16_t langid,
                                     const usb_string_descriptor_t *descriptor,
                                     size_t length);
 
@@ -939,8 +939,8 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  */
 usb_error_t
 usb_ScheduleTransfer(usb_endpoint_t endpoint, void *buffer, size_t length,
-		     usb_transfer_callback_t handler,
-		     usb_transfer_data_t *data);
+                     usb_transfer_callback_t handler,
+                     usb_transfer_data_t *data);
 #define usb_ScheduleBulkTransfer usb_ScheduleTransfer
 #define usb_ScheduleInterruptTransfer usb_ScheduleTransfer
 #define usb_ScheduleIsochronousTransfer usb_ScheduleTransfer
