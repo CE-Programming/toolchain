@@ -21,7 +21,7 @@ install:
   #- if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost mingw-w64-%MINGW_ARCH%-libarchive"
 
 build_script:
-  - if defined MINGW_ROOT mingw32-make && mingw32-make install && mingw32-make release-libs
+  - if defined MINGW_ROOT mingw32-make -j%NUMBER_OF_PROCESSORS% install release-libs
   
   # Some environment variables for later...
   - set CEDEV=C:\CEdev
