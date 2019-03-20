@@ -6,7 +6,7 @@
 ifeq ($(OS),Windows_NT)
 SHELL      =cmd.exe
 NATIVEPATH =$(subst /,\,$(1))
-CP         =xcopy /y
+CP         =copy /y
 PREFIX    ?=C:
 else
 NATIVEPATH =$(subst \,/,$(1))

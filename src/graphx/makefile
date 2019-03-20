@@ -14,7 +14,7 @@ SHELL       =cmd.exe
 NATIVEPATH  =$(subst /,\,$(1))
 RM          =del /f 2>nul
 MKDIR       =mkdir
-CP          =xcopy /y
+CP          =copy /y
 PREFIX     ?=C:
 else
 NATIVEPATH  =$(subst \,/,$(1))
