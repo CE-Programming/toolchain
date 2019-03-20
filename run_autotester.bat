@@ -1,10 +1,11 @@
 @echo off
+setlocal enabledelayedexpansion
 echo Autotester Runner
 echo ==================
-set RESULT=0
+set failures=0
 for /d %%d in (%CEDEV%\examples\*) do (for %%f in (%%d\*.json) do (
 	echo Launching autotester on %%f
 	autotester "%%f"
-	set /a "RESULT=%RESULT% + %errorlevel%"
+	set /a failures+=!errorlevel!
 ))
-exit /b %RESULT%
+exit /b %failures%
