@@ -18,6 +18,7 @@ endef
 ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
+DIRNAME    = $(filter-out %:,$(patsubst %\,%,$(dir $1)))
 RM         = del /f 2>nul
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
 MKDIR      = call && (if not exist $1 mkdir $1)
@@ -33,6 +34,7 @@ QUOTE_ARG  = "$(subst ",',$1)"#'
 APPEND     = @echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
 else
 NATIVEPATH = $(subst \,/,$1)
+DIRNAME    = $(patsubst %/,%,$(dir $1))
 RM         = rm -f
 RMDIR      = rm -rf $1
 MKDIR      = mkdir -p $1
@@ -87,7 +89,7 @@ INSTALLIO  := $(call NATIVEPATH,$(CEDEVDIR)/lib/fileio)
 INSTALLSH  := $(call NATIVEPATH,$(CEDEVDIR)/lib/shared)
 INSTALLST  := $(call NATIVEPATH,$(CEDEVDIR)/lib/static)
 INSTALLLI  := $(call NATIVEPATH,$(CEDEVDIR)/lib/linked)
-DIRS       := $(INSTALLBIN) $(INSTALLLIB) $(INSTALLINC) $(INSTALLBF) $(INSTALLLL) $(INSTALLIO) $(INSTALLSH) $(INSTALLST) $(INSTALLLI)
+DIRS       := $(CEDEVDIR) $(INSTALLBIN) $(INSTALLLIB) $(INSTALLINC) $(INSTALLBF) $(INSTALLLL) $(INSTALLIO) $(INSTALLSH) $(INSTALLST) $(INSTALLLI)
 
 STATIC_FILES := $(wildcard src/std/static/*.src) $(patsubst src/std/static/%.c,src/std/static/build/%.src,$(wildcard src/std/static/*.c))
 LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,src/std/linked/build/%.src,$(wildcard src/std/linked/*.c))
@@ -171,7 +173,7 @@ clean-startup:
 # uninstall rule
 #----------------------------
 uninstall:
-	$(call RMDIR,$(call NATIVEPATH,$(INSTALLLOC)/CEdev))
+	$(call RMDIR,$(CEDEVDIR))
 #----------------------------
 
 #----------------------------
@@ -192,9 +194,6 @@ install: $(DIRS) chmod all linker_script
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(MAKE) -C $(STDDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(CPDIR) $(call NATIVEPATH,$(SRCDIR)/compatibility/*) $(call NATIVEPATH,$(INSTALLINC))
-
-$(DIRS):
-	$(call MKDIR,$@)
 
 chmod:
 	$(CHMOD)
@@ -268,3 +267,7 @@ help:
 	@echo help
 
 .PHONY: release-libs clibraries doxygen chmod all clean $(LIBRARIES) $(addprefix clean-,$(LIBRARIES)) install uninstall help release
+
+.SECONDEXPANSION:
+$(DIRS): $$(call DIRNAME,$$@)
+	$(call MKDIR,$@)
