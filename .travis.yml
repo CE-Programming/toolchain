@@ -10,18 +10,13 @@ addons:
       - doxygen
       - doxygen-doc
 
-branches:
-  only:
-    - master
-    - devel
-
 script:
 # Build toolchain and libs
   - export WINEDEBUG=-all
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
-  - make -j4
+  - make
   - make install
   - make release
   - make release-libs
