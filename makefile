@@ -212,16 +212,14 @@ chmod:
 #----------------------------
 # release rule
 #----------------------------
-dist: release
-release: install
+dist release: install
 	$(ARCH)
 #----------------------------
 
 #----------------------------
 # libraries release rules
 #----------------------------
-dist-libs: release-libs
-release-libs: clibraries
+dist-libs release-libs: clibraries $(CONVHEX) $(LIBRARIES)
 	$(foreach library,$(LIBRARIES),$(CP) $(call NATIVEPATH,$(call LIBRARYDIR,$(library))/$(library).8xv) $(call NATIVEPATH,clibraries/$(library).8xv)$(newline))
 	$(CONVHEX) -g $(words $(LIBRARIES)) $(foreach library,$(LIBRARIES),$(call LIBRARYDIR,$(library))/$(library).8xv )$(call NATIVEPATH,clibraries/clibs.8xg)
 clibraries:
@@ -239,7 +237,7 @@ doxygen:
 #----------------------------
 # linker script rule
 #----------------------------
-linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES) $(FILEIO_FILES)
+linker_script: std
 	$(RM) $(call QUOTE_ARG,$@)
 	@echo Generating linker script...
 	$(call APPEND,symbol __low_bss = bss.base)
