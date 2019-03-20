@@ -95,7 +95,7 @@ LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,s
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: fasmg $(CONVHEX) $(CONVPNG) $(CONVTILE) $(LIBRARIES) ce std startup
+all: $(CONVHEX) $(CONVPNG) $(CONVTILE) $(LIBRARIES) ce std startup
 	@echo Toolchain built.
 
 clean: $(addprefix clean-,$(LIBRARIES)) clean-ce clean-std clean-startup
@@ -111,8 +111,8 @@ clean: $(addprefix clean-,$(LIBRARIES)) clean-ce clean-std clean-startup
 #----------------------------
 # tool rules
 #----------------------------
-$(FASMG_EZ80): fasmg
-fasmg:
+$(FASMG_EZ80): $(FASMG)
+$(FASMG):
 	$(MAKE) -C $(FASMGDIR)
 $(CONVHEX):
 	$(MAKE) -C $(CONVHEXDIR)
@@ -278,4 +278,4 @@ help:
 	@echo release-libs
 	@echo help
 
-.PHONY: release-libs clibraries doxygen chmod all clean $(LIBRARIES) $(addprefix clean-,$(LIBRARIES)) install uninstall help release fasmg
+.PHONY: release-libs clibraries doxygen chmod all clean $(LIBRARIES) $(addprefix clean-,$(LIBRARIES)) install uninstall help release
