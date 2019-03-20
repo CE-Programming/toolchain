@@ -16,10 +16,7 @@ script:
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
-  - make -j4
-  - make install
-  - make release
-  - make release-libs
+  - make -j4 install release release-libs
 # Build examples
   - make -C $CEDEV/examples
 # Build CEmu core and autotester_cli
