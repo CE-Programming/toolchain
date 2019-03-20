@@ -16,7 +16,7 @@ script:
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
-  - make
+  - make -j4
   - make install
   - make release
   - make release-libs
