@@ -703,11 +703,13 @@ usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *index);
  * @param device The device to communicate with.
  * @param descriptor A complete combined configuration descriptor fetched with
  * usb_GetDescriptor().
+ * @param length The total length of the configuration descriptor.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t
-usb_SetConfiguration(usb_device_t device, const usb_configuration_descriptor_t *
-                     configuration_descriptor);
+usb_SetConfiguration(usb_device_t device,
+                     const usb_configuration_descriptor_t *descriptor,
+                     size_t length);
 
 /**
  * Gets the current alternate setting in use on the specified interface.
@@ -716,20 +718,21 @@ usb_SetConfiguration(usb_device_t device, const usb_configuration_descriptor_t *
  * @param alternate_setting Returns the alternate setting in use.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_GetInterfaceAlternateSetting(usb_device_t device,
-                                             uint8_t interface,
-                                             uint8_t *alternate_setting);
+usb_error_t usb_GetInterface(usb_device_t device, uint8_t interface,
+                             uint8_t *alternate_setting);
 
 /**
  * Sets the alternate setting in use on the specified interface.
  * @param device The device to communicate with.
- * @param interface Interface index to modify.
- * @param alternate_setting Alternate setting to use.
+ * @param interface_descriptor The interface descriptor describing the interface
+ * to select within a configuration descriptor.
+ * @param length The remaining length of the configuration descriptor after
+ * the beginning of the \p interface_descriptor.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_SetInterfaceAlternateSetting(usb_device_t device,
-                                             uint8_t interface,
-                                             uint8_t alternate_setting);
+usb_error_t usb_SetInterface(usb_device_t device,
+                             const usb_interface_descriptor_t *descriptor,
+                             size_t length);
 
 /**
  * Gets the endpoint of a \p device with a given \p address, or NULL if that
