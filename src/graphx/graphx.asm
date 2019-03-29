@@ -4180,15 +4180,15 @@ gfx_RotateSpriteC:
 	mlt	bc
 	add	hl,bc
 	ex	de,hl
+	lea	bc,ix+1
 	ld	b,0
-	ld	c,ixl
 .outer:
 	lea	hl,iy
 	dec	iy
 	ld	a,ixh
 .inner:
-	inc	bc
 	add	hl,bc
+	inc	c
 	ldd
 	dec	a
 	jr	nz,.inner
@@ -4220,15 +4220,16 @@ gfx_RotateSpriteCC:
 	inc	hl
 	ld	(hl),e
 	inc	hl
+	dec	e
 	ld	c,e
 	ex	de,hl
 .outer:
-	lea	hl,iy
+	lea	hl,iy+2
 	dec	iy
 	ld	a,ixh
 .inner:
-	inc	bc
 	add	hl,bc
+	inc	c
 	ldi
 	dec	a
 	jr	nz,.inner
