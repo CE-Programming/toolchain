@@ -1,4 +1,4 @@
-# CE C Programming Toolchain/SDK   [![Build Status](https://travis-ci.org/CE-Programming/toolchain.svg)](https://travis-ci.org/CE-Programming/toolchain) [![Build Status](https://ci.appveyor.com/api/projects/status/github/CE-Programming/toolchain?branch=master&svg=true)](https://ci.appveyor.com/project/adriweb/toolchain) [![IRC badge](https://img.shields.io/badge/IRC%20channel-%23ez80--dev%20on%20EFNet-blue.svg)](http://chat.efnet.org/irc.cgi?adv=1&nick=ce-dev&chan=%23ez80-dev)
+# CE C Programming Toolchain/SDK   [![Build Status](https://api.travis-ci.org/CE-Programming/toolchain.svg?branch=master)](https://travis-ci.org/CE-Programming/toolchain) [![Build Status](https://ci.appveyor.com/api/projects/status/github/CE-Programming/toolchain?branch=master&svg=true)](https://ci.appveyor.com/project/adriweb/toolchain) [![IRC badge](https://img.shields.io/badge/IRC%20channel-%23ez80--dev%20on%20EFNet-blue.svg)](http://chat.efnet.org/irc.cgi?adv=1&nick=ce-dev&chan=%23ez80-dev)
 
 The CE C Software Development Kit incorporates a wide variety of tools and documentation in order to build programs in C natively for the TI-84 Plus CE / TI-83 Premium CE calculators series.
 
@@ -6,7 +6,8 @@ The CE C Software Development Kit incorporates a wide variety of tools and docum
 
 It is recommended that you grab the latest release from [here](https://github.com/CE-Programming/toolchain/releases/latest) if you are looking to get started. Feel free to also bookmark the [wiki pages](https://github.com/CE-Programming/toolchain/wiki), as they will become quite helpful.
 
-Included you will find examples using the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These provide efficient and easy support for graphics, file I/O, keypad input, etc. Be sure to grab them if you plan to use them. The [header documentation](https://ce-programming.github.io/toolchain/files.html) will let you know about the available functions.
+Included you will find examples using the ['Standard' CE C Libraries](https://github.com/CE-Programming/libraries/releases/latest). These provide efficient and easy support for graphics, file I/O, keypad input, etc. Be sure to grab them if you plan to use them.  
+The [header documentation](https://ce-programming.github.io/toolchain/files.html) will let you know about the available functions.
 
 ## Help
 
@@ -15,4 +16,5 @@ If you don't get a response in a reasonable amount of time, feel free to ask it 
 
 ## Contributing
 
-If you want to contribute to the toolchain, feel free to open a [Pull Request](https://github.com/CE-Programming/toolchain/pulls), or submit an [issue/feature request](https://github.com/CE-Programming/toolchain/issues). If you would like to build the toolchain from scratch for your OS, visit the appropriate [wiki page](https://github.com/CE-Programming/toolchain/wiki/Building-the-toolchain). Thanks!
+If you want to contribute to the toolchain, feel free to open a [Pull Request](https://github.com/CE-Programming/toolchain/pulls), or submit an [issue/feature request](https://github.com/CE-Programming/toolchain/issues).  
+If you would like to build the toolchain from scratch for your OS, visit the appropriate [wiki page](https://github.com/CE-Programming/toolchain/wiki/Building-the-toolchain). Thanks!

@@ -14,6 +14,7 @@
 ;         hl->start of LibLoad
 ; output: once relocation of program and library dependencies is complete,
 ;         jumps to start of program block after relocation block and begins execution
+; uses:   cursorImage, saveSScreen + 19000 and up
 ; note:   updated size is added to the copy in ram of the program for libraries
 ; notes:  all code is location independent; no need to relocate to absolute address.
 ;         keeping in archive is safe.
@@ -24,27 +25,27 @@
 include '../include/library.inc'
 
 define VERSION_MAJOR       3
-define VERSION_MINOR       0
+define VERSION_MINOR       1
 
 ; global equates
-arclibrarylocations        = pixelShadow2   ; place to store locations of archived libraries
-dependencyqueuelocation    = cmdPixelShadow ; queue for keeping track of which libraries still need to be resolved
+arclibrarylocations        = cursorImage + 000 ; place to store locations of archived libraries
+dependencyqueuelocation    = cursorImage + 450 ; queue for keeping track of which libraries still need to be resolved
 
-eSP                        = pixelShadow    ; save sp for errors
-totallibsize               = pixelShadow+3  ; total size of the library appvar (not used)
-extractedsize              = pixelShadow+6  ; holds extracted size of the library
-arclocation                = pixelShadow+9  ; pointer to place to begin extraction from the archive
-ramlocation                = pixelShadow+12 ; pointer to place to extract in usermem
-endarclibrarylocations     = pixelShadow+15 ; pointer to end of archived library locations in arclibrarylocations
-enddependencyqueue         = pixelShadow+18 ; pointer to end of dependency stack
-nextlibptr                 = pixelShadow+21 ; pointer to save location of next lib place that needs to be relocated
-jumptblptr                 = pixelShadow+24 ; pointer to start of function table for each library in the program
-vectortblptr               = pixelShadow+27 ; pointer to start of archived function vector table
-relocationtblptr           = pixelShadow+30 ; pointer to start of relocation table
-endrelocationtbl           = pixelShadow+33 ; pointer to end of relocation table
-prgmstart                  = pixelShadow+36 ; pointer to start of actual program when dealing with dependencies
-appvarstartptr             = pixelShadow+39 ; pointer to start of library appvar in archive
-libnameptr                 = pixelShadow+42 ; pointer to name of library to extract
+eSP                        = cursorImage + 950 ; save sp for errors
+totallibsize               = cursorImage + 953 ; total size of the library appvar (not used)
+extractedsize              = cursorImage + 956 ; holds extracted size of the library
+arclocation                = cursorImage + 959 ; pointer to place to begin extraction from the archive
+ramlocation                = cursorImage + 962 ; pointer to place to extract in usermem
+endarclibrarylocations     = cursorImage + 965 ; pointer to end of archived library locations in arclibrarylocations
+enddependencyqueue         = cursorImage + 968 ; pointer to end of dependency stack
+nextlibptr                 = cursorImage + 971 ; pointer to save location of next lib place that needs to be relocated
+jumptblptr                 = cursorImage + 974 ; pointer to start of function table for each library in the program
+vectortblptr               = cursorImage + 977 ; pointer to start of archived function vector table
+relocationtblptr           = cursorImage + 980 ; pointer to start of relocation table
+endrelocationtbl           = cursorImage + 983 ; pointer to end of relocation table
+prgmstart                  = cursorImage + 986 ; pointer to start of actual program when dealing with dependencies
+appvarstartptr             = cursorImage + 989 ; pointer to start of library appvar in archive
+libnameptr                 = cursorImage + 992 ; pointer to name of library to extract
 
 ; macro definitions
 define lib_byte            $C0		; library signifier byte
@@ -58,6 +59,7 @@ define asmflag             $22		; flag storage
 define prevextracted       0
 define foundprgmstart      1
 define keeplibinarc        2
+define showmsgs            3
 
 macro relocate? name, address*
 	name.source? := $
@@ -86,8 +88,15 @@ disable_relocations
 	push	de
 	push	hl
 
-	ld	bc,69000
-	ld	hl,pixelShadow
+	set	showmsgs,(iy + asmflag)
+	ld	hl,$aa55aa
+	xor	a,a
+	sbc	hl,bc
+	jr	nz,.showmsgs
+	res	showmsgs,(iy + asmflag)
+.showmsgs:
+	ld	bc,1020
+	ld	hl,cursorImage
 	call	_MemClear		; initialize to wipe out past runs
 
 	ld	hl,arclibrarylocations
@@ -106,7 +115,7 @@ disable_relocations
 
 	jp	_libloadstart.destination ; jump to execution block
 
-relocate _libloadstart, plotSScreen
+relocate _libloadstart, saveSScreen + 19000
 	pop	hl			; hl->start of library jump table
 
 	ld	(eSP),sp		; save the stack pointer if we hit an error
@@ -449,9 +458,11 @@ _versionerror:
 _missingerror:				; can't find a dependent lib
 	ld	hl,_missinglibstr
 _throwerror:				; draw the error message onscreen
+	ld	sp,(eSP)
+	bit	showmsgs,(iy + asmflag)
+	ret	z
 	ld	a,lcdBpp16
 	ld	(mpLcdCtrl),a
-	ld	sp,(eSP)
 	push	hl
 	call	_DrawStatusBar
 	call	_ClrScrn		; clean up the screen a bit

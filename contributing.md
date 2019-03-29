@@ -4,23 +4,19 @@ In order to maintain consistency and neatness across files, here are the guidlin
 
 ## eZ80 Assembly Sources
 
-* Spaces are evil. Use 1 tab to the opcode, and 1 tab to the operand, with a single space in operands:
+* Spaces are evil. Use 1 tab to the opcode, and 1 tab to the operand:
 
-    	ld	iy, (iy + 6)
+    	ld	iy,(iy + 6)
 
 * Comments should be tabbed out to the same location for all comments in the same file.
 
-* Use snake_case for label and variable names.
+* Use fasmg syntax for label and variable names.
 
 * Add a space between any arithmetic operation, e.g. `(ix + 9)`, `OP1 + 1`
 
 * Use local labels.
 
-* Comments should be all lowercase, including the first letter.
-
-* Internal routines shall be prefixed with `util_`.
-
-* SMC labels shall be prefixed with `.smc_`, e.g. `.smc_label := $-3`, and always offset backwards.
+* Internal routines shall be prefixed with `util.`.
 
 * Hexadecimal literals shall be lowercase, prefixed with `$`, e.g. `$3f`
 
@@ -34,5 +30,4 @@ In order to maintain consistency and neatness across files, here are the guidlin
 
 * Comments should never be placed in line with code, always above or below.
 
-* Comments should be all lowercase, including the first letter.
 

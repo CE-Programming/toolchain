@@ -11,6 +11,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/ce
                     ${CMAKE_SOURCE_DIR}/src/fileioc
                     ${CMAKE_SOURCE_DIR}/src/graphx
                     ${CMAKE_SOURCE_DIR}/src/keypadc
+                    ${CMAKE_SOURCE_DIR}/src/usbdrvce
                     ${CMAKE_SOURCE_DIR}/src/std
                     ${CMAKE_SOURCE_DIR}/src/sub/compat)
 
