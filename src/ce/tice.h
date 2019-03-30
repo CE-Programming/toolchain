@@ -284,11 +284,12 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
  * @brief Structure of font description
  * @see os_SelectFont
  */
-typedef struct {
+struct font_t;
+typedef struct font_t {
     /**
      * Points to this font itself, yuck!
      */
-    font_t *font;
+    struct font_t *font;
     /**
      * Draws a character using this font.
      * @param c The character
