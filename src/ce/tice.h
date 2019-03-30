@@ -284,7 +284,26 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
  * @brief Structure of font description
  * @see os_SelectFont
  */
-typedef struct { int id; void (*impl[3])(void); } font_t;
+typedef struct {
+    /**
+     * Points to this font itself, yuck!
+     */
+    font_t *font;
+    /**
+     * Draws a character using this font.
+     * @param c The character
+     */
+    void (*drawChar)(char c);
+    /**
+     * Gets the width of a character in this font.
+     * @param c The character
+     */
+    uint24_t (*getWidth)(char c);
+    /**
+     * Gets the height of this font.
+     */
+    uint24_t (*getHeight)(void);
+} font_t;
 
 /**
  * Gets an element from a matrix
@@ -491,7 +510,7 @@ void os_GetCursorPos(unsigned int *curRow, unsigned int *curCol);
  * 0: small font                                      <br>
  * 1: large monospace font
  */
-void os_FontSelect(font_t *id);
+void os_FontSelect(font_t *font);
 
 /**
  * Gets the font to use when drawing on the graphscreen
@@ -500,7 +519,7 @@ void os_FontSelect(font_t *id);
  * 0: small font                                      <br>
  * 1: large monospace font
  */
-uint24_t os_FontGetID(void);
+font_t *os_FontGetID(void);
 
 /**
  * @param string String to get pixel width of
