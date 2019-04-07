@@ -7,13 +7,23 @@ DEPS = convfont.h parse_fnt.h serialize_font.h
 #OBJ = convfont.o getopt.o parse_fnt.o serialize_font.o
 OBJ = convfont.o parse_fnt.o serialize_font.o
 
+ifeq ($(OS),Windows_NT)
+RM = del /f 2>nul
+EXECUTABLE = convfont.exe
+else
+EXECUTABLE = convfont
+RM = rm -f
+endif
+
+all: $(EXECUTABLE)
+
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-convfont: $(OBJ)
+$(EXECUTABLE): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 .PHONY: clean
 
 clean:
-	rm -f *.o convfont
+	$(RM) *.o $(EXECUTABLE)
