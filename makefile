@@ -107,6 +107,7 @@ clean: $(addprefix clean-,$(LIBRARIES)) clean-ce clean-std clean-startup
 	$(MAKE) -C $(CONVHEXDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
 	$(MAKE) -C $(CONVTILDIR) clean
+	$(MAKE) -C $(CONVFNTDIR) clean
 	$(RM) linker_script
 	$(call RMDIR,release)
 	$(call RMDIR,clibraries)
@@ -124,6 +125,8 @@ $(CONVPNG):
 	$(MAKE) -C $(CONVPNGDIR)
 $(CONVTILE):
 	$(MAKE) -C $(CONVTILDIR)
+$(CONVFONT):
+	$(MAKE) -C $(CONVFNTDIR)
 #----------------------------
 
 #----------------------------
