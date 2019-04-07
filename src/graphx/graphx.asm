@@ -1987,6 +1987,9 @@ gfx_GetClipRegion:
 	ld	hl,3
 	add	hl,sp
 	ld	iy,(hl)
+	dec	iy
+	dec	iy
+	dec	iy
 	call	_ClipRegion		; get the clipping region
 	sbc	a,a			; return false if offscreen (0)
 	inc	a
