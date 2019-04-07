@@ -18,7 +18,7 @@ endif
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-convfont: $(OBJ)
+$(EXECUTABLE): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 .PHONY: clean
