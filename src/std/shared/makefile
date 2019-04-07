@@ -19,7 +19,10 @@ MKDIR      = mkdir -p $(1)
 RM         = rm -f
 CEDEV     ?= $(HOME)/CEdev
 BIN       ?= $(CEDEV)/bin
-CC         = $(call NATIVEPATH,wine $(BIN)/ez80cc.exe)
+ifeq ($(shell uname -r | grep Microsoft),)
+WINE       =wine
+endif
+CC         = $(call NATIVEPATH,$(WINE) $(BIN)/ez80cc.exe)
 endif
 
 CCFLGS    := -noasm -nodebug -nogenprint -nokeeplst -keepasm -promote -quiet -fplib -optsize -cpu:EZ80F91 -stdinc:"..\\..;..\\..\\..\\fileioc;..\\..\\..\\ce" -define:_EZ80F91 -define:_EZ80

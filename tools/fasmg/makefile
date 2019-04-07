@@ -22,7 +22,13 @@ NATIVEPATH =$(subst \,/,$(1))
 RM         =rm -f
 CP         =cp
 PREFIX    ?=$(HOME)
+# This little hack causes the Win32 executable to be copied instead, supporting WSL
+ifneq ($(shell uname -r | grep Microsoft),)
+FASMGP     =windows\$(NAME).exe
+ADDEXE     =&& mv $(NAME).exe $(NAME)
+else
 ADDEXE     =&& chmod +x $(NAME)
+endif
 endif
 
 DEV ?=$(call NATIVEPATH,$(PREFIX)/CEdev)

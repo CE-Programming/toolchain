@@ -58,6 +58,7 @@ FASMGDIR   := $(call NATIVEPATH,$(TOOLSDIR)/fasmg)
 CONVHEXDIR := $(call NATIVEPATH,$(TOOLSDIR)/convhex)
 CONVPNGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convpng)
 CONVTILDIR := $(call NATIVEPATH,$(TOOLSDIR)/convtile)
+CONVFNTDIR := $(call NATIVEPATH,$(TOOLSDIR)/convfont)
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
 STARTDIR   := $(call NATIVEPATH,$(SRCDIR)/startup)
@@ -66,6 +67,7 @@ FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
 CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
 CONVTILE   := $(call NATIVEPATH,$(CONVTILDIR)/convtile)
+CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont)
 FASMG_EZ80 := $(call NATIVEPATH,$(SRCDIR)/include/ez80.inc)
 
 ifeq ($(OS),Windows_NT)
@@ -73,6 +75,7 @@ FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg.exe)
 CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex.exe)
 CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
 CONVTILE   := $(call NATIVEPATH,$(CONVTILDIR)/convtile.exe)
+CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont.exe)
 endif
 
 BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
@@ -96,7 +99,7 @@ LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,s
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: $(CONVHEX) $(CONVPNG) $(CONVTILE) $(LIBRARIES) ce std startup
+all: $(CONVHEX) $(CONVPNG) $(CONVTILE) $(CONVFONT) $(LIBRARIES) ce std startup
 	@echo Toolchain built.
 
 clean: $(addprefix clean-,$(LIBRARIES)) clean-ce clean-std clean-startup
@@ -188,6 +191,7 @@ install: $(DIRS) chmod all linker_script
 	$(CP) $(CONVHEX) $(INSTALLBIN)
 	$(CP) $(CONVPNG) $(INSTALLBIN)
 	$(CP) $(CONVTILE) $(INSTALLBIN)
+	$(CP) $(CONVFONT) $(INSTALLBIN)
 	$(CP) $(call NATIVEPATH,$(BIN)/*) $(INSTALLBIN)
 	$(MAKE) -C $(FASMGDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(foreach library,$(LIBRARIES),$(MAKE) -C $(call LIBRARYDIR,$(library)) install PREFIX=$(call QUOTE_ARG,$(PREFIX)) DESTDIR=$(call QUOTE_ARG,$(DESTDIR))$(newline))
