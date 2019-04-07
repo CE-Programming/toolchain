@@ -15,6 +15,8 @@ EXECUTABLE = convfont
 RM = rm -f
 endif
 
+all: $(EXECUTABLE)
+
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
@@ -24,4 +26,4 @@ $(EXECUTABLE): $(OBJ)
 .PHONY: clean
 
 clean:
-	$(RM) *.o convfont
+	$(RM) *.o $(EXECUTABLE)
