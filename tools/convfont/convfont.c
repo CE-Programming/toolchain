@@ -25,6 +25,8 @@ true
 #endif
 ;
 
+#define VERSION_MAJOR 1
+#define VERSION_MINOR 0
 
 void throw_error(int code, char *string) {
     if (string != NULL)
@@ -64,37 +66,39 @@ void output_format_c_array(uint8_t byte, void *custom_data) {
 
 
 void show_help(char *name) {
-    printf("Syntax: %s -o <output format> -f <font FNT> [-metrics] [-f <font FNT 2> [-metrics]] <output file name>\n"
-        "Specifying more than one input font is only valid for the font pack output format.\n"
-        "Output formats:\n"
-        "-o fontpack: A fontpack ready to be passed to convhex\n"
-        "-o carray: A C-style array\n"
-        "-o asmarray: An assembly-style array\n"
-        "-o binary: A straight binary blob\n"
+    printf("convfont v%u.%u by drdnar\n\n"
+	"Usage:\n"
+	"\t%s -o <output format> -f <font FNT> [-metrics] [-f <font FNT 2> [-metrics]] <output file name>\n"
+        "\tSpecifying more than one input font is only valid for the font pack output format.\n"
+        "\nOutput formats:\n"
+        "\t-o fontpack: A fontpack ready to be passed to convhex\n"
+        "\t-o carray: A C-style array\n"
+        "\t-o asmarray: An assembly-style array\n"
+        "\t-o binary: A straight binary blob\n"
 #ifdef _WIN32
-        "-Z: Use CR+LF newlines (default for this platform)\n"
-        "-z: Use LR newlines instead of CR+LF newlines\n"
+        "\t-Z: Use CR+LF newlines (default for this platform)\n"
+        "\t-z: Use LR newlines instead of CR+LF newlines\n"
 #else
-        "-z: Use LF newlines (default for this platform)\n"
-        "-Z: Use CR+LF newlines instead of LF newlines\n"
+        "\t-z: Use LF newlines (default for this platform)\n"
+        "\t-Z: Use CR+LF newlines instead of LF newlines\n"
 #endif
-        "Individual font properties:\n"
-        "-f: <file name> input Font\n"
-        "-a: <n> space Above\n"
-        "-b: <n> space Below\n"
-        "-i: <n> Italic space adjust\n"
-        "-w: <n> Weight\n"
-        "-s: <n> Style\n"
-        "-c: <n> Cap height\n"
-        "-x: <n> x height\n"
-        "-l: <n> baseLine height\n"
-        " Numbers may be prefixed with 0x to specify hexadecimal instead of decimal.\n"
-        "Font pack properties:\n"
-        "-N: \"<s>\" font pack Name\n"
-        "-C: \"<s>\" pseudoCopyright\n"
-        "-D: \"<s>\" Description\n"
-        "-V: \"<s>\" Version\n"
-        "-P: \"<s>\" codePage\n", name);
+        "\nIndividual font properties:\n"
+        "\t-f: <file name> input Font\n"
+        "\t-a: <n> space Above\n"
+        "\t-b: <n> space Below\n"
+        "\t-i: <n> Italic space adjust\n"
+        "\t-w: <n> Weight\n"
+        "\t-s: <n> Style\n"
+        "\t-c: <n> Cap height\n"
+        "\t-x: <n> x height\n"
+        "\t-l: <n> baseLine height\n"
+        "\tNumbers may be prefixed with 0x to specify hexadecimal instead of decimal.\n"
+        "\nFont pack properties:\n"
+        "\t-N: \"<s>\" font pack Name\n"
+        "\t-C: \"<s>\" pseudoCopyright\n"
+        "\t-D: \"<s>\" Description\n"
+        "\t-V: \"<s>\" Version\n"
+        "\t-P: \"<s>\" codePage\n", VERSION_MAJOR, VERSION_MINOR, name);
 }
 
 
@@ -138,8 +142,11 @@ int main(int argc, char *argv[]) {
 
     int option;
 
-    while ((option = getopt(argc, argv, "o:Zf:a:b:i:w:s:c:x:l:N:C:D:V:P:")) != -1) {
+    while ((option = getopt(argc, argv, "ho:Zf:a:b:i:w:s:c:x:l:N:C:D:V:P:")) != -1) {
         switch (option) {
+            case 'h':
+                show_help(argv[0]);
+                return 0;
             case 'o':
                 if (output_format != output_unspecified)
                     throw_error(bad_options, "-o: Cannot specify more than one output format.");
