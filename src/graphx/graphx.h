@@ -332,18 +332,18 @@ typedef struct {
  * @see gfx_Tilemap
  */
 typedef struct {
-    uint8_t *map;            /**< Pointer to indexed map array */
-    gfx_sprite_t **tiles;     /**< Pointer to tiles */
+    uint8_t *map;            /**< Pointer to tilemap array */
+    gfx_sprite_t **tiles;    /**< Pointer to tileset sprites for the tilemap */
     uint8_t tile_height;     /**< Individual tile height */
     uint8_t tile_width;      /**< Individual tile width */
-    uint8_t draw_height;     /**< Number of tiles per row to draw */
-    uint8_t draw_width;      /**< Number of tile per column to draw */
+    uint8_t draw_height;     /**< Number of tilemap rows to draw */
+    uint8_t draw_width;      /**< Number of tilemap columns to draw */
     uint8_t type_width;      /**< Tile type height @see gfx_tilemap_type_t */
     uint8_t type_height;     /**< Tile type width @see gfx_tilemap_type_t */
     uint8_t height;          /**< Total number of rows in the tilemap */
     uint8_t width;           /**< Total number of columns in the tilemap */
-    uint8_t y_loc;           /**< Y pixel location of tilemap */
-    uint24_t x_loc;          /**< X pixel location to tilemap */
+    uint8_t y_loc;           /**< Y pixel location on the screen for the tilemap */
+    uint24_t x_loc;          /**< X pixel location on the screen for the tilemap */
 } gfx_tilemap_t;
 
 /**
@@ -352,14 +352,14 @@ typedef struct {
  * @see gfx_tilemap_t
  */
 typedef enum {
-    gfx_tile_no_pow2 = 0,     /**< Set when using non powers of 2 */
-    gfx_tile_2_pixel,         /**< Set when using 2 pixel tiles */
-    gfx_tile_4_pixel,         /**< Set when using 4 pixel tiles */
-    gfx_tile_8_pixel,         /**< Set when using 8 pixel tiles */
-    gfx_tile_16_pixel,        /**< Set when using 16 pixel tiles */
-    gfx_tile_32_pixel,        /**< Set when using 32 pixel tiles */
-    gfx_tile_64_pixel,        /**< Set when using 64 pixel tiles */
-    gfx_tile_128_pixel        /**< Set when using 128 pixel tiles */
+    gfx_tile_no_pow2 = 0,     /**< Use when the tile width/height is not a power of 2 */
+    gfx_tile_2_pixel,         /**< Use when the tile width/height is 2 pixels */
+    gfx_tile_4_pixel,         /**< Use when the tile width/height is 4 pixels */
+    gfx_tile_8_pixel,         /**< Use when the tile width/height is 8 pixels */
+    gfx_tile_16_pixel,        /**< Use when the tile width/height is 16 pixels */
+    gfx_tile_32_pixel,        /**< Use when the tile width/height is 32 pixels */
+    gfx_tile_64_pixel,        /**< Use when the tile width/height is 64 pixels */
+    gfx_tile_128_pixel        /**< Use when the tile width/height is 128 pixels */
 } gfx_tilemap_type_t;
 
 /**
@@ -1208,6 +1208,7 @@ gfx_sprite_t *gfx_RotateScaleSprite(gfx_sprite_t *sprite_in, gfx_sprite_t *sprit
  * This may be useful for performing rotations and other
  * operations on characters. The sprite returned is always 8x8 pixels.
  * @param c Character to generate
+ * @returns A sprite of the character data
  */
 gfx_sprite_t *gfx_GetSpriteChar(char c);
 
@@ -1251,7 +1252,7 @@ void gfx_SetFontSpacing(uint8_t *spacing);
 uint8_t gfx_SetFontHeight(uint8_t height);
 
 /**
- * Sets monospaced font
+ * Sets a monospaced font width
  *
  * @param spacing Distance between characters
  * @note To disable monospaced font, set to 0
@@ -1261,7 +1262,7 @@ void gfx_SetMonospaceFont(uint8_t spacing);
 /**
  * Gets the pixel width of the given string
  *
- * @param string Pointer to string
+ * @param string Pointer to a string
  * @note Takes into account monospacing flag
  */
 unsigned int gfx_GetStringWidth(const char *string);
@@ -1276,53 +1277,51 @@ unsigned int gfx_GetStringWidth(const char *string);
 unsigned int gfx_GetCharWidth(const char c);
 
 /**
- * Sets the clipping window
+ * Sets the dimensions of the drawing window for all clipped routines
  *
- * This window is used across all clipped routines
- * @param xmin Minimum x coordinate
- * @param ymin Minimum y coordinate
- * @param xmax Maximum x coordinate
- * @param ymax Maximum y coordinate
- * @note This routine is exclusive
+ * @param xmin Minimum x coordinate, inclusive (default 0)
+ * @param ymin Minimum y coordinate, inclusive (default 0)
+ * @param xmax Maximum x coordinate, exclusive (default 320)
+ * @param ymax Maximum y coordinate, exclusive (default 240)
  */
 void gfx_SetClipRegion(int xmin, int ymin, int xmax, int ymax);
 
 /**
- * Clips a region to fit within the window
+ * Clips a region to fit within the drawing window using Cohen-Sutherland
  *
  * @returns False if offscreen, true if onscreen
  */
 bool gfx_GetClipRegion(gfx_region_t *region);
 
 /**
- * Shifts the drawing window down
+ * Shifts/Slides the drawing window down
  *
  * @param pixels Number of pixels to shift
- * @note Data left over is undefined (Must be drawn over)
+ * @note Remnant data after a shift is undefined
  */
 void gfx_ShiftDown(uint8_t pixels);
 
 /**
- * Shifts the drawing window up
+ * Shifts/Slides the drawing window up
  *
  * @param pixels Number of pixels to shift
- * @note Data left over is undefined (Must be drawn over)
+ * @note Remnant data after a shift is undefined
  */
 void gfx_ShiftUp(uint8_t pixels);
 
 /**
- * Shifts the drawing window left
+ * Shifts/Slides the drawing window left
  *
  * @param pixels Number of pixels to shift
- * @note Data left over is undefined (Must be drawn over)
+ * @note Remnant data after a shift is undefined
  */
 void gfx_ShiftLeft(uint24_t pixels);
 
 /**
- * Shifts the drawing window right
+ * Shifts/Slides the drawing window right
  *
  * @param pixels Number of pixels to shift
- * @note Data left over is undefined (Must be drawn over)
+ * @note Remnant data after a shift is undefined
  */
 void gfx_ShiftRight(uint24_t pixels);
 
