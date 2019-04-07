@@ -38,8 +38,8 @@ kb_key_t kb_ScanGroup(uint8_t row);
 uint8_t kb_AnyKey(void);
 
 /**
- * Resets the keyboard
- * @note Only use if you modify keyboard timers or number of rows
+ * Resets the keyboard before returning to the TI-OS
+ * @note Only use the keyboard timers or number of rows have been modified
  */
 void kb_Reset(void);
 
@@ -62,7 +62,7 @@ void kb_Reset(void);
  */
 typedef enum {
     MODE_0_IDLE = 0,       /**< Keypad scanning is idle */
-    MODE_1_INDISCRIMINATE, /**< Indiscriminate key detection. Data registers are invalid, but whenever any key is pressed, interrupt KB_MODE_1_PRESS is set (and cannot be cleared until the key is released). */
+    MODE_1_INDISCRIMINATE, /**< Indiscriminate key detection. Data registers are invalid, but when any key is pressed, interrupt KB_MODE_1_PRESS is set (and cannot be cleared until the key is released). */
     MODE_2_SINGLE,         /**< Single scan. The keypad is scanned once, and then the mode returns to MODE_0_IDLE. */
     MODE_3_CONTINUOUS      /**< Continuous scan. When scanning completes, it just starts over again after a delay. */
 } kb_scan_mode_t;
