@@ -938,8 +938,6 @@ end repeat
 	add	hl,de
 	ret
 
-
-
 ;-------------------------------------------------------------------------------
 usb_ScheduleControlTransfer.notControl:
 	ld	ysetup,(ix+9)
@@ -951,6 +949,7 @@ usb_ScheduleControlTransfer.notControl:
 	jq	usb_ScheduleTransfer.notControl
 usb_ScheduleControlTransfer:
 	call	_Error.check
+	call	usb_ScheduleTransfer.check
 .enter:
 	ld	yendpoint,(ix+6)
 	or	a,(yendpoint.type);CONTROL_TRANSFER
@@ -989,6 +988,7 @@ usb_ScheduleTransfer.control:
 	jq	usb_ScheduleControlTransfer.control
 usb_ScheduleTransfer:
 	call	_Error.check
+	call	.check
 .enter:
 	ld	yendpoint,(ix+6)
 	or	a,(yendpoint.type);CONTROL_TRANSFER
@@ -1002,6 +1002,15 @@ end repeat
 	jq	z,_Error.NOT_SUPPORTED
 	ld	a,(yendpoint.dir)
 	jq	_QueueTransfer
+.check:
+	ld	hl,(ix+15)
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ret	nz
+	ld	hl,_DefaultHandler
+	ld	(ix+15),hl
+	ret
 
 ; Input:
 ;  a = ioc shl 7 or dir
@@ -1303,7 +1312,7 @@ _PowerVbusForRole:
 	jq	$21C68
 
 ;-------------------------------------------------------------------------------
-_DefaultEventCallback:
+_DefaultHandler:
 	ld	hl,USB_SUCCESS
 	ret
 
