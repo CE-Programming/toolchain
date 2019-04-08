@@ -223,7 +223,7 @@ virtual at 0
 	USB_DEVICE_IDLE_INTERRUPT				rb 1
 	USB_DEVICE_WAKEUP_INTERRUPT				rb 1
 	USB_B_SRP_COMPLETE_INTERRUPT				rb 1
-	USB_B_SRP_DETECT_INTERRUPT				rb 1
+	USB_A_SRP_DETECT_INTERRUPT				rb 1
 	USB_A_VBUS_ERROR_INTERRUPT				rb 1
 	USB_B_SESSION_END_INTERRUPT				rb 1
 	USB_OVERCURRENT_INTERRUPT				rb 1
@@ -1896,7 +1896,7 @@ end iterate
 
 _HandleHostInt:
 	ld	l,usbSts
-iterate type, , Err, PortChgDetect, FrameListOver, HostSysErr
+iterate type, , Err, PortChgDetect, FrameListOver, HostSysErr, AsyncAdv
 	bit	bUsbInt#type,(hl)
 	call	nz,_Handle#type#Int
 	ret	nz
@@ -2064,7 +2064,7 @@ _HandleBSrpCompleteInt:
 
 _HandleASrpDetectInt:
 	ld	(hl),bmUsbIntASrpDetect
-	ld	a,USB_B_SRP_DETECT_INTERRUPT
+	ld	a,USB_A_SRP_DETECT_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleAVbusErrInt:
@@ -2120,15 +2120,20 @@ _HandleErrInt:
 
 _HandlePortChgDetectInt:
 	ld	(hl),bmUsbIntPortChgDetect
-	ld	a,USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT
+	ld	a,USB_HOST_PORT_CHANGE_DETECT_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleFrameListOverInt:
 	ld	(hl),bmUsbIntFrameListOver
-	ld	a,USB_HOST_SYSTEM_ERROR_INTERRUPT
+	ld	a,USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT
 	jq	_DispatchEvent
 
 _HandleHostSysErrInt:
+	ld	(hl),bmUsbIntHostSysErr
+	ld	a,USB_HOST_SYSTEM_ERROR_INTERRUPT
+	jq	_DispatchEvent
+
+_HandleAsyncAdvInt:
 	ld	(hl),bmUsbIntHostSysErr
 	ld	a,USB_HOST_ASYNC_ADVANCE_INTERRUPT
 	jq	_DispatchEvent
