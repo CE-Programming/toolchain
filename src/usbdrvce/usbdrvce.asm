@@ -232,6 +232,10 @@ virtual at 0
 	USB_INTERRUPT						rb 1
 	USB_HOST_ERROR_INTERRUPT				rb 1
 	USB_HOST_PORT_CHANGE_DETECT_INTERRUPT			rb 1
+	USB_HOST_PORT_CONNECT_STATUS_CHANGE_INTERRUPT		rb 1
+	USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INTERRUPT		rb 1
+	USB_HOST_PORT_OVERCURRENT_CHANGE_INTERRUPT		rb 1
+	USB_HOST_PORT_FORCE_PORT_RESUME_INTERRUPT		rb 1
 	USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT			rb 1
 	USB_HOST_SYSTEM_ERROR_INTERRUPT				rb 1
 	USB_HOST_ASYNC_ADVANCE_INTERRUPT			rb 1
@@ -1246,9 +1250,9 @@ _Init:
 	ld	(de),a
 	ld	(hl),h
 	ld	l,usbSts+1
-.wait:
+.waitForHalt:
 	bit	bUsbHcHalted-8,(hl)
-	jq	z,.wait
+	jq	z,.waitForHalt
 	scf
 	sbc	hl,hl
 	add	hl,de
@@ -1284,16 +1288,15 @@ _PowerVbusForRole:
 ;	res	bUsbPeriodicSchedEn,(hl)
 ;	res	bUsbRunStop,(hl)
 ;	ld	l,usbSts
-;.waitAsync:
+;.waitForAsync:
 ;	bit	bUsbAsyncSchedSts,(hl)
-;	jq	nz,.waitAsync
-;.waitPeriodic:
+;	jq	nz,.waitForAsync
+;.waitForPeriodic:
 ;	bit	bUsbPeriodicSchedSts,(hl)
-;	jq	nz,.waitPeriodic
+;	jq	nz,.waitForPeriodic
 ;.wait:
 ;	bit	bUsbHcHalted,(hl)
 ;	jq	z,.wait
-;	jq	nz,.waitAsync
 ;	ld	l,usbOtgCsr
 	set	bUsbABusDrop,(hl)
 	res	bUsbABusReq,(hl)
@@ -2120,7 +2123,49 @@ _HandleErrInt:
 
 _HandlePortChgDetectInt:
 	ld	(hl),bmUsbIntPortChgDetect
+	ld	l,usbPortStsCtrl
+iterate type, ConnSts, PortEn, Overcurr
+	bit	bUsb#type#Chg, (hl)
+	call	nz,_HandlePort#type#Int
+	ret	nz
+end iterate
+	ld	l,usbSts
 	ld	a,USB_HOST_PORT_CHANGE_DETECT_INTERRUPT
+	jq	_DispatchEvent
+
+_HandlePortConnStsInt:
+	ld	a,(hl)
+	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg)
+	ld	(hl),a
+repeat bUsbCurConnSts
+	rrca
+end repeat
+	and	a,1
+assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
+	add	a,USB_DEVICE_DISCONNECTED_EVENT;USB_DEVICE_CONNECTED_EVENT
+	jq	_DispatchEvent
+
+_HandlePortPortEnInt:
+	ld	a,(hl)
+	and	a,not (bmUsbOvercurrChg or bmUsbConnStsChg)
+	ld	(hl),a
+repeat bUsbPortEn
+	rrca
+end repeat
+	and	a,1
+assert USB_DEVICE_DISABLED_EVENT + 1 = USB_DEVICE_ENABLED_EVENT
+	add	a,USB_DEVICE_DISABLED_EVENT;USB_DEVICE_ENABLED_EVENT
+	jq	_DispatchEvent
+
+_HandlePortOvercurrInt:
+	ld	a,(hl)
+	and	a,not (bmUsbPortEnChg or bmUsbConnStsChg)
+	ld	(hl),a
+	and	a,bmUsbOvercurrActive
+	cp	a,bmUsbOvercurrActive
+	sbc	a,a
+assert USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT - 1 = USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT
+	add	a,USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT;USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT
 	jq	_DispatchEvent
 
 _HandleFrameListOverInt:
