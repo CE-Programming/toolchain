@@ -29,6 +29,8 @@ typedef enum usb_init_flags {
 } usb_init_flags_t;
 
 typedef enum usb_event {
+  /// \p event_data Pointer to the new usb_role_t state.
+  USB_ROLE_CHANGED_EVENT,
   /// \p event_data The usb_device_t that was disconnected.
   USB_DEVICE_DISCONNECTED_EVENT,
   /// \p event_data The usb_device_t that was connected.
@@ -86,8 +88,6 @@ typedef enum usb_event {
   USB_B_SRP_DETECT_INTERRUPT,
   USB_A_VBUS_ERROR_INTERRUPT,
   USB_B_SESSION_END_INTERRUPT,
-  USB_ROLE_CHANGED_INTERRUPT,
-  USB_ID_CHANGED_INTERRUPT,
   USB_OVERCURRENT_INTERRUPT,
   USB_B_PLUG_REMOVED_INTERRUPT,
   USB_A_PLUG_REMOVED_INTERRUPT,
@@ -174,10 +174,17 @@ typedef enum usb_endpoint_flag {
                                  /**  USB_TRANSFER_OVERFLOW.                  */
 } usb_endpoint_flag_t;
 
+typedef enum usb_role {
+  USB_ROLE_HOST   = 0 << 4, /**< Acting as usb host.   */
+  USB_ROLE_DEVICE = 1 << 4, /**< Acting as usb device. */
+  USB_ROLE_A      = 0 << 5, /**< Plug A plugged in.    */
+  USB_ROLE_B      = 1 << 5, /**< Plug B plugged in.    */
+} usb_role_t;
+
 typedef enum usb_speed {
   USB_SPEED_UNKNOWN = -1,
-  USB_SPEED_FULL,             /**<  12 Mb/s                                    */
-  USB_SPEED_LOW,              /**< 1.5 Mb/s                                    */
+  USB_SPEED_FULL, /**<  12 Mb/s */
+  USB_SPEED_LOW,  /**< 1.5 Mb/s */
 } usb_speed_t;
 
 typedef enum usb_transfer_direction {

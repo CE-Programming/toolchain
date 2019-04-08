@@ -146,6 +146,7 @@ virtual at usbArea
 	usbMem			dbx usbInited and not $FF - $: ?
 				rb (-$) and 31
 	fakeEndpoint		endpoint
+	currentRole		rl 1
 	eventCallback		rl 1
 	eventCallback.data	rl 1
 	standardDescriptors	rl 1
@@ -178,6 +179,7 @@ end virtual
 
 ; enum usb_event
 virtual at 0
+	USB_ROLE_CHANGED_EVENT					rb 1
 	USB_DEVICE_DISCONNECTED_EVENT				rb 1
 	USB_DEVICE_CONNECTED_EVENT				rb 1
 	USB_DEVICE_DISABLED_EVENT				rb 1
@@ -224,8 +226,6 @@ virtual at 0
 	USB_B_SRP_DETECT_INTERRUPT				rb 1
 	USB_A_VBUS_ERROR_INTERRUPT				rb 1
 	USB_B_SESSION_END_INTERRUPT				rb 1
-	USB_ROLE_CHANGED_INTERRUPT				rb 1
-	USB_ID_CHANGED_INTERRUPT				rb 1
 	USB_OVERCURRENT_INTERRUPT				rb 1
 	USB_B_PLUG_REMOVED_INTERRUPT				rb 1
 	USB_A_PLUG_REMOVED_INTERRUPT				rb 1
@@ -252,20 +252,30 @@ AUTO_TERMINATE		:= 1 shl 0
 ; enum usb_internal_endpoint_flag
 PO2_MPS			:= 1 shl 0
 
+; enum usb_role
+virtual at 0
+	ROLE_HOST				rb 1 shl 4
+	ROLE_DEVICE				rb 1 shl 4
+end virtual
+virtual at 0
+	ROLE_A					rb 1 shl 5
+	ROLE_B					rb 1 shl 5
+end virtual
+
 ; enum usb_transfer_direction
 virtual at 0
 	HOST_TO_DEVICE				rb 1 shl 7
 	DEVICE_TO_HOST				rb 1 shl 7
 end virtual
 
-;enum usb_request_type
+; enum usb_request_type
 virtual at 0
 	STANDARD_REQUEST			rb 1 shl 5
 	CLASS_REQUEST				rb 1 shl 5
 	VENDOR_REQUEST				rb 1 shl 5
 end virtual
 
-;enum usb_reciipent
+; enum usb_recipient
 virtual at 0
 	RECIPIENT_DEVICE			rb 1 shl 0
 	RECIPIENT_INTERFACE			rb 1 shl 0
@@ -326,6 +336,7 @@ usb_Init:
 	sbc	hl,hl
 	ld	(rootDevice.data),hl
 	ld	l,3
+	ld	(currentRole),hl
 	add	hl,sp
 	ld	de,eventCallback
 	ld	c,9
@@ -1247,20 +1258,46 @@ _Init:
 	ret
 
 ;-------------------------------------------------------------------------------
-_PowerVbus:
+; Input:
+;  a = role
+;  hl = usbOtgCsr ^ (? & $FF)
+; Output:
+;  f = ?
+;  hl = usbOtgCsr
+_PowerVbusForRole:
+	ld	l,usbOtgCsr
+	bit	bsf ROLE_DEVICE,a
+	jq	nz,.unpower
+.power:
 	call	$21B70
-	ld	hl,mpUsbOtgCsr
-	res	5,(hl)
-	set	4,(hl)
+	res	bUsbABusDrop,(hl)
+	set	bUsbABusReq,(hl)
+	or	a,a;ROLE_B
+	ret	z
+	res	bUsbBHnp,(hl)
+	res	bUsbBVbusDisc,(hl)
 	ret
-
-;-------------------------------------------------------------------------------
-_UnpowerVbus:
-	ld	hl,mpUsbOtgCsr
-	res	7,(hl)
-	set	5,(hl)
-	res	4,(hl)
-	ret
+.unpower:
+	res	bUsbASrpEn,(hl)
+;	ld	l,usbCmd
+;	res	bUsbAsyncSchedEn,(hl)
+;	res	bUsbPeriodicSchedEn,(hl)
+;	res	bUsbRunStop,(hl)
+;	ld	l,usbSts
+;.waitAsync:
+;	bit	bUsbAsyncSchedSts,(hl)
+;	jq	nz,.waitAsync
+;.waitPeriodic:
+;	bit	bUsbPeriodicSchedSts,(hl)
+;	jq	nz,.waitPeriodic
+;.wait:
+;	bit	bUsbHcHalted,(hl)
+;	jq	z,.wait
+;	jq	nz,.waitAsync
+;	ld	l,usbOtgCsr
+	set	bUsbABusDrop,(hl)
+	res	bUsbABusReq,(hl)
+	jq	$21C68
 
 ;-------------------------------------------------------------------------------
 _DefaultEventCallback:
@@ -2041,13 +2078,19 @@ _HandleBSessEndInt:
 	jq	_DispatchEvent
 
 _HandleRoleChgInt:
-	ld	(hl),bmUsbIntRoleChg shr 8
-	ld	a,USB_ROLE_CHANGED_INTERRUPT
-	jq	_DispatchEvent
-
 _HandleIdChgInt:
-	ld	(hl),bmUsbIntIdChg shr 8
-	ld	a,USB_ID_CHANGED_INTERRUPT
+	ld	de,currentRole
+	ld	a,(de)
+	ld	c,a
+	ld	a,(mpUsbOtgCsr+2)
+	ld	(hl),(bmUsbIntRoleChg or bmUsbIntIdChg) shr 8
+	and	a,(bmUsbRole or bmUsbId) shr 16
+	cp	a,c
+	ret	z
+	ld	(de),a
+	call	_PowerVbusForRole
+	ld	l,usbOtgIsr+1
+	ld	a,USB_ROLE_CHANGED_EVENT
 	jq	_DispatchEvent
 
 _HandleOvercurrInt:
