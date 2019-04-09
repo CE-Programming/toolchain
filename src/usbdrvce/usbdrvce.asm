@@ -89,12 +89,12 @@ struc endpoint			; endpoint structure
 end struc
 struc device			; device structure
 	label .: 32
+	.endpoints	rl 1	; pointer to array of endpoints
 	.hub		rl 1	; hub this device is connected to
 	.find		rb 1	; find flags
 	.hubPorts	rb 1	; number of ports in this hub
 	.addr		rb 1	; device addr
 	.speed		rb 1	; device speed shl 4
-	.endpoints	rl 1	; pointer to array of endpoints
 		        rb 1
 	.info		rw 1	; hub addr or port number shl 7 or 1 shl 14
 	.child		rl 1	; first device connected to this hub
@@ -146,11 +146,11 @@ virtual at usbArea
 	usbMem			dbx usbInited and not $FF - $: ?
 				rb (-$) and 31
 	fakeEndpoint		endpoint
-	currentRole		rl 1
 	eventCallback		rl 1
 	eventCallback.data	rl 1
 	standardDescriptors	rl 1
 	selectedConfiguration	rb 1
+	currentRole		rb 1
 	freeList32Align32	rl 1
 	freeList64Align256	rl 1
 	assert $ <= usbInited
@@ -242,12 +242,12 @@ virtual at 0
 end virtual
 
 ; enum usb_find_flag
-SKIP_NONE		:= 0
-SKIP_DISABLED		:= 1 shl 0
-SKIP_ENABLED		:= 1 shl 1
-SKIP_DEVICES		:= 1 shl 2
-SKIP_HUBS		:= 1 shl 3
-SKIP_ATTACHED		:= 1 shl 4
+IS_NONE			:= 0
+IS_DISABLED		:= 1 shl 0
+IS_ENABLED		:= 1 shl 1
+IS_DEVICE		:= 1 shl 2
+IS_HUB			:= 1 shl 3
+IS_ATTACHED		:= 1 shl 4
 
 ; enum usb_endpoint_flag
 MANUAL_TERMINATE	:= 0 shl 0
@@ -340,7 +340,6 @@ usb_Init:
 	sbc	hl,hl
 	ld	(rootDevice.data),hl
 	ld	l,3
-	ld	(currentRole),hl
 	add	hl,sp
 	ld	de,eventCallback
 	ld	c,9
@@ -383,40 +382,43 @@ usb_Init:
 	ld	l,usbImr
 	ld	(hl),usbIntLevelHigh
 	ld	hl,rootDevice.find
-	ld	(hl),SKIP_HUBS or SKIP_ENABLED
-	ld	hl,USB_ERROR_INVALID_PARAM
-	ld	c,e
-	ld	e,1
-	ld	d,a;(cHeap-$D10000) shr 8
+	ld	(hl),IS_HUB or IS_ENABLED
+	ld	l,a;(cHeap-$D10000) and $FF
+	ld	h,a;(cHeap-$D10000) shr 8
 	ld	b,sizeof cHeap shr 8
-	rrc	c
+	rrc	e
 	call	c,.initFreeList
-	ld	d,(usbMem-$D10000) shr 8
+	ld	h,(usbMem-$D10000) shr 8
 	ld	b,sizeof usbMem shr 8
-	rrc	c
+	rrc	e
 	call	c,.initFreeList
-	ld	d,(osHeap-$D10000) shr 8
+	ld	h,(osHeap-$D10000) shr 8
 	ld	b,sizeof osHeap shr 8
-	rrc	c
+	rrc	e
 	call	c,.initFreeList
-	rrc	c
-	ret	nc
-	; TODO: disable things here
-	ld	d,(periodicList-$D10000) shr 8
+	ld	h,(periodicList-$D10000) shr 8
 	ld	b,sizeof periodicList shr 8
+	rrc	e
+	call	c,.initFreeList
+	ld	hl,USB_ERROR_INVALID_PARAM
+	cp	a,c
+	ret	nz
+	ld	hl,mpUsbOtgIsr+1
+	call	_HandleRoleChgInt
+	ret	nz
+	; TODO: disable disabled things
+	ex	de,hl
+	ret
 .initFreeList:
-	sbc	hl,hl
-	add	hl,de
-.outer:
 	call	_Free64Align256
-.inner:
+.loop:
 	sub	a,-32
 	ld	l,a
 	call	c,_Free32Align32
-	jq	c,.inner
+	jq	c,.loop
 	inc	h
-	djnz	.outer
-	sbc	hl,hl
+	djnz	.initFreeList
+	ld	c,a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -474,7 +476,7 @@ usb_GetDeviceHub:
 	push	de
 	ld	hl,(ydevice.hub)
 .maybeReturnNull:
-	bit	0,l
+	bit	0,hl
 	ret	z
 .returnZero:
 	or	a,a
@@ -513,7 +515,7 @@ usb_FindDevice:
 	ld	iy,rootDevice
 	jq	.check
 .child:
-	bit	bsf SKIP_ATTACHED,c
+	bit	bsf IS_ATTACHED,c
 	jq	nz,.sibling
 .forceChild:
 	bit	0,(ydevice.child)
@@ -778,7 +780,7 @@ usb_GetDeviceEndpoint:
 	and	a,$8F
 .enter:
 	ld	hl,(ydevice.endpoints)
-	bit	0,l
+	bit	0,hl
 	jq	nz,.returnCarry
 	rlca
 	or	a,l
@@ -1262,6 +1264,11 @@ _Init:
 .waitForHalt:
 	bit	bUsbHcHalted-8,(hl)
 	jq	z,.waitForHalt
+	ld	l,usbCmd
+	set	bUsbHcReset,(hl)
+.waitForReset:
+	bit	bUsbHcReset,(hl)
+	jq	nz,.waitForReset
 	scf
 	sbc	hl,hl
 	add	hl,de
@@ -1325,7 +1332,7 @@ iterate <size,align>, 32,32, 64,256
 ;  hl = allocated memory
 _Alloc#size#Align#align:
 	ld	hl,(freeList#size#Align#align)
-	bit	0,l
+	bit	0,hl
 	ret	nz
 	push	hl
 	ld	hl,(hl)
@@ -1361,6 +1368,47 @@ assert ~transfer.status and (transfer.status - 1)
 	ld	(hl),1 shl 6
 	res	bsf transfer.status,hl
 	ret
+
+; Input:
+;  c = find flags
+;  de = parent hub
+; Output:
+;  zf = enough memory
+;  iy = device
+_CreateDevice:
+	call	_Alloc32Align32
+	ret	nz
+	push	hl
+	pop	ydevice
+	call	_Alloc32Align32
+	ret	nz
+	ld	(ydevice.endpoints),hl
+	ld	(ydevice.hub),de
+	ld	(ydevice.find),c
+	ld	bc,32-1
+	ld	(ydevice.hubPorts),b
+	ld	(ydevice.addr),b
+	ld	(ydevice.speed),b
+	ld	(ydevice.info),b
+	ld	(ydevice.info+1),b
+	ld	(hl),b
+	push	hl
+	pop	de
+	inc	de
+	ldir
+	ld	(ydevice.info),bc
+	ld	(ydevice.child),bc
+	ld	(ydevice.sibling),bc
+	ld	(ydevice.data),bc
+	ret
+
+; Input:
+;  hl = device
+_DeleteDevice:
+	ld	de,(device.endpoints)
+	call	_Free32Align32
+	ex	de,hl
+	jq	_Free32Align32
 
 ;-------------------------------------------------------------------------------
 _FunData:
@@ -2101,8 +2149,23 @@ _HandleIdChgInt:
 	ret	z
 	ld	(de),a
 	call	_PowerVbusForRole
+assert ROLE_DEVICE = usbCmd & ROLE_DEVICE = bmUsbHcHalted shr 8
+	ld	l,usbCmd
+	and	a,l;bmUsbHcHalted shr 8
+	ld	c,a
+	cp	a,l;ROLE_DEVICE
+	ld	a,(hl)
+	rra
+	rlca
+	ld	(hl),a
+	ld	l,usbSts+1
+.wait:
+	ld	a,(hl)
+	and	a,bmUsbHcHalted shr 8
+	sub	a,c
+	jq	nz,.wait
 	ld	l,usbOtgIsr+1
-	ld	a,USB_ROLE_CHANGED_EVENT
+assert ~USB_ROLE_CHANGED_EVENT
 	jq	_DispatchEvent
 
 _HandleOvercurrInt:
@@ -2150,9 +2213,38 @@ repeat bUsbCurConnSts
 	rrca
 end repeat
 	and	a,1
+	ld	de,0
+	ld	hl,(rootDevice.child)
+	jq	z,.disconnect
+	ld	de,rootDevice
+	ld	c,IS_DEVICE or IS_DISABLED
+	call	_CreateDevice
+	ld	hl,USB_ERROR_NO_MEMORY
+	ret	nz ; FIXME
+	lea	hl,iy
+	ld	(rootDevice.child),hl
+.disconnect:
+	bit	0,hl
+	jq	nz,.null
+	push	hl
+	pop	de
+.null:
+	push	af
 assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	add	a,USB_DEVICE_DISCONNECTED_EVENT;USB_DEVICE_CONNECTED_EVENT
-	jq	_DispatchEvent
+	call	_DispatchEvent
+	pop	bc
+	ret	nz
+	djnz	.delete
+.done:
+	ld	hl,mpUsbPortStsCtrl
+	ret
+.delete:
+	ld	a,l
+	rrca
+	call	nc,_DeleteDevice
+	cp	a,
+	jq	.done
 
 _HandlePortPortEnInt:
 	ld	a,(hl)
@@ -2163,6 +2255,7 @@ repeat bUsbPortEn
 end repeat
 	and	a,1
 assert USB_DEVICE_DISABLED_EVENT + 1 = USB_DEVICE_ENABLED_EVENT
+	; TODO: Get Control MPS, SET_ADDRESS
 	add	a,USB_DEVICE_DISABLED_EVENT;USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 

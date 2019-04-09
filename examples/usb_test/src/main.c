@@ -88,13 +88,18 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         "USB_HOST_ASYNC_ADVANCE_INT",
     };
     switch (event) {
-        case USB_ROLE_CHANGED_EVENT: {
+        case USB_ROLE_CHANGED_EVENT:
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
             putNibHex(*(usb_role_t *)event_data >> 4);
             os_NewLine();
             break;
-        }
+        case USB_DEVICE_CONNECTED_EVENT:
+            os_PutStrFull(usb_event_names[event]);
+            putChar(':');
+            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
+            os_NewLine();
+            break;
         case USB_DEFAULT_SETUP_EVENT: {
             unsigned char i;
             for (i = 0; i < 8; i++)
@@ -102,6 +107,13 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             os_NewLine();
             return USB_IGNORE;
         }
+        case USB_DEVICE_INTERRUPT:
+        case USB_DEVICE_DEVICE_INTERRUPT:
+        case USB_DEVICE_CONTROL_INTERRUPT:
+        case USB_DEVICE_WAKEUP_INTERRUPT:
+        case USB_HOST_INTERRUPT:
+        case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT:
+            break;
         default:
             os_PutStrFull(usb_event_names[event]);
             os_NewLine();
@@ -111,8 +123,9 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 }
 
 void main(void) {
-    usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS);
     os_SetCursorPos(0, 0);
+    if (usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS) != USB_SUCCESS)
+        return;
     while (!os_GetCSC() && usb_WaitForInterrupt() == USB_SUCCESS);
     usb_Cleanup();
 }
