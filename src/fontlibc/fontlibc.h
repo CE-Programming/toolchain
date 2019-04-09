@@ -81,7 +81,7 @@ typedef enum {
 } fontlib_newline_options_t;
 
 typedef enum {
-    FONTLIB_IGNORE_LINE_SPACING = 0x01,
+    FONTLIB_IGNORE_LINE_SPACING = 0x01
 } fontlib_load_options_t;
 
 typedef enum {
