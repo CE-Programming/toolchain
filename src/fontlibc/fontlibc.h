@@ -81,6 +81,10 @@ typedef enum {
 } fontlib_newline_options_t;
 
 typedef enum {
+    FONTLIB_IGNORE_LINE_SPACING = 0x01,
+} fontlib_load_options_t;
+
+typedef enum {
     /* clear = sans-serif font */
     FONTLIB_SERIF = 0x01,
     /* If both are set, then assume there's no difference between oblique
@@ -94,6 +98,9 @@ typedef enum {
 } fontlib_styles_t;
 
 typedef struct {
+    /* Size of this struct, basically functions as a version field. 
+     * This does NOT include the lengths of the strings! */
+    uint24_t length;
     /* These are standard C-strings.  These pointers may be NULL. */
     char *font_family_name;
     char *font_author;
@@ -103,7 +110,7 @@ typedef struct {
     char *font_pseudocopyright;
     char *font_description;
     char *font_version;
-    char *font_codepage;
+    char *font_code_page;
 } fontlib_metadata_t;
 
 typedef struct {
@@ -241,7 +248,7 @@ void fontlib_ShiftCursorPosition(int x, int y);
  * WARNING: If false is returned, no valid font is currently loaded and trying
  * to print will print garbage!
  */
-bool fontlib_SetFont(const fontlib_font_t *font_data, unsigned int flags);
+bool fontlib_SetFont(const fontlib_font_t *font_data, fontlib_load_options_t flags);
 
 /**
  * Sets the current foreground color FontLibC will use for drawing.
