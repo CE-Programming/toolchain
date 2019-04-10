@@ -58,6 +58,9 @@ include_library '../graphx/graphx.asm'
 	export fontlib_Newline
 	export fontlib_SetNewlineOptions
 	export fontlib_GetNewlineOptions
+	export fontlib_GetFontPackName
+	export fontlib_GetFontByIndex
+	export fontlib_GetFontByIndexRaw
 
 
 ;-------------------------------------------------------------------------------
@@ -1646,7 +1649,7 @@ fontlib_GetFontByIndexRaw.haveAddress:
 ;-------------------------------------------------------------------------------
 ; Data
 _FontPackHeaderString:
-	.db	"FONTPACK"
+	db	"FONTPACK"
 _TextDefaultWindow:
 textDefaultWindow := _TextDefaultWindow - DataBaseAddr
 	dl	0
