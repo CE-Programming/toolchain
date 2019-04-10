@@ -1515,7 +1515,7 @@ util.GetFontPackData:
 ;  HL: Pointer to name string
 ; Outputs:
 ;  HL: Pointer to byte after "FONTPACK", or NULL on failure
-;  DE: Old value of HL
+;  DE: Pointer to start of "FONTPACK", or garbage on failure
 ;  Carry set if appvar not found, or not a font pack; NC on success
 	dec	hl
 	ld	iy,flags
@@ -1524,10 +1524,21 @@ util.GetFontPackData:
 	ld	(OP1),a
 	call	_ChkFindSym
 	jr	c,.error
-; Check header
-	inc	de
-	inc	de
 	ex	de,hl
+	ld	a,b
+	cp	a,$D0
+	jr	nc,.headerCheck
+; Sadly, TI doesn't kindly provide us with a direct pointer; we have to account
+; for the archive header ourselves.
+	ld	de,9
+	add	hl,de
+	ld	e,(hl)
+	inc	hl
+	add	hl,de
+.headerCheck:
+; Check header
+	inc	hl
+	inc	hl
 	push	hl
 	call	util.VerifyHeader
 	pop	de
@@ -1588,6 +1599,7 @@ fontlib_GetFontPackName:
 	sbc	hl,bc
 	ret	z
 	add	hl,de
+	ret
 
 
 ;-------------------------------------------------------------------------------
@@ -1601,11 +1613,15 @@ fontlib_GetFontByIndex:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + arg0)
+	push	iy
 	call	util.GetFontPackData
+	pop	iy
 	ret	c
-	ex	de,hl
-	ld	(iy + arg0),hl
-	jr	fontlib_GetFontByIndexRaw.haveAddress
+	ld	(iy + arg0),de
+; Fall through to GetFontByIndexRaw
+assert $ = fontlib_GetFontByIndexRaw
+
+
 ;-------------------------------------------------------------------------------
 fontlib_GetFontByIndexRaw:
 ; Returns a pointer to a font in a font pack, based on an index.
@@ -1620,16 +1636,14 @@ fontlib_GetFontByIndexRaw:
 ; Get font count
 	ld	de,strucFontPackHeader.fontCount
 	add	hl,de
-fontlib_GetFontByIndexRaw.haveAddress:
 	ld	a,(hl)
 	inc	hl
 ; Validate index
-	inc	a
-	cp	(iy + arg1)
-	dec	a
-	jr	nc,.error
+	ld	c, (iy + arg1)
+	cp	c
+	jr	c,.error
+	jr	z,.error
 ; Get offset to font
-	ld	c,a
 	ld	b,3
 	mlt	bc
 	add	hl,bc

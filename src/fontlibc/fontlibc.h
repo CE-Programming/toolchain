@@ -81,7 +81,7 @@ typedef enum {
 } fontlib_newline_options_t;
 
 typedef enum {
-    FONTLIB_IGNORE_LINE_SPACING = 0x01,
+    FONTLIB_IGNORE_LINE_SPACING = 0x01
 } fontlib_load_options_t;
 
 typedef enum {
@@ -579,7 +579,7 @@ fontlib_font_t *fontlib_GetFontByIndexRaw(fontlib_font_pack_t *font_pack, uint8_
  * @param index Index into font table of font pack
  * @return Direct pointer to font, or NULL if the index is invalid.
  */
-fontlib_font_t *fontlib_GetFontByIndexRaw(char *font_pack_name, uint8_t index);
+fontlib_font_t *fontlib_GetFontByIndex(char *font_pack_name, uint8_t index);
 
 
 
