@@ -100,17 +100,17 @@ typedef enum {
 typedef struct {
     /* Size of this struct, basically functions as a version field. 
      * This does NOT include the lengths of the strings! */
-    uint24_t length;
-    /* These are standard C-strings.  These pointers may be NULL. */
-    char *font_family_name;
-    char *font_author;
+    int24_t length;
+    /* These are standard C-strings.  These offsets may be NULL. */
+    int24_t font_family_name;
+    int24_t font_author;
     /* NOTA BENE: TYPEFACES AND BITMAPPED FONTS CANNOT BE COPYRIGHTED UNDER U.S. LAW!
      * This field is therefore referred to as a pseudocopyright.  HOWEVER,
      * it IS is applicable in other jusrisdictions, such as Germany. */
-    char *font_pseudocopyright;
-    char *font_description;
-    char *font_version;
-    char *font_code_page;
+    int24_t font_pseudocopyright;
+    int24_t font_description;
+    int24_t font_version;
+    int24_t font_code_page;
 } fontlib_metadata_t;
 
 typedef struct {
@@ -126,10 +126,10 @@ typedef struct {
     /* Offset/pointer to glyph widths table.
      * This is an OFFSET from the fontVersion member in data format.
      * However, it is 24-bits long because it becomes a real pointer upon loading. */
-    void *widths_table;
+    int24_t widths_table;
     /* Offset to a table of offsets to glyph bitmaps.
      * These offsets are only 16-bits each to save some space. */
-    void *bitmaps;
+    int24_t bitmaps;
     /* Specifies how much to move the cursor left after each glyph.
        Total movement is width - overhang.  Intended for italics. */
     uint8_t italic_space_adjust;
@@ -155,11 +155,11 @@ typedef struct {
 typedef struct {
     char header[8]; /* "FONTPACK" */
     /* Offset from first byte of header */
-    fontlib_metadata_t *metadata;
+    int24_t metadata;
     /* Frankly, if you have more than 127 fonts in a pack, you have a
        problem. */
     uint8_t fontCount;
-    fontlib_font_t font_list[1];
+    int24_t font_list[1];
 } fontlib_font_pack_t;
 
 
@@ -548,6 +548,39 @@ void fontlib_SetNewlineOptions(uint8_t options);
  * @return Current newline behavior options
  */
 uint8_t fontlib_GetNewlineOptions(void);
+
+/**
+ * Gets the long name associated with a font pack.  Useful in a loop with
+ * ti_Detect() when searching a typeface with a specific name.
+ * @param appvar_name Pointer to name of appvar
+ * @return Direct pointer to font's name; or NULL if no such appvar exists, the
+ * appvar isn't a font pack, or the font pack does not supply a name.
+ * NOTA BENE: Any operation that can move variables around in memory can
+ * invalidate this pointer!
+ */
+char *fontlib_GetFontPackName(char *appvar_name);
+
+/**
+ * Gets a pointer to a font, suitable for passing to SetFont(), given a font
+ * pack's address.  Useful if you know caching the font pack's address is safe.
+ * @see ti_GetDataPtr()
+ * @param font_pack Pointer to font pack
+ * @param index Index into font table of font pack
+ * @return Direct pointer to font, or NULL if the index is invalid.
+ */
+fontlib_font_t *fontlib_GetFontByIndexRaw(fontlib_font_pack_t *font_pack, uint8_t index);
+
+/**
+ * Gets a pointer to a font, suitable for passing to SetFont(), given a font
+ * pack's appvar's name.  Recommended to use after any file write, create,
+ * delete, or un/archive, as all those operations could invalidate the cached
+ * data pointers to the currently loaded font.
+ * @param font_pack_name Pointer to font pack appvar's name
+ * @param index Index into font table of font pack
+ * @return Direct pointer to font, or NULL if the index is invalid.
+ */
+fontlib_font_t *fontlib_GetFontByIndexRaw(char *font_pack_name, uint8_t index);
+
 
 
 #ifdef __cplusplus

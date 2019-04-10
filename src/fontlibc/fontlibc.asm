@@ -106,6 +106,16 @@ virtual at 0
 strucFont strucFont
 end virtual
 strucFont.fontPropertiesSize := strucFont.italicSpaceAdjust
+struc strucFontPackHeader
+	label .: 13
+	.identifier			rb	8
+	.metadatOffset			rl	1
+	.fontCount			rb	1
+	.fontList			rl	1
+end struc
+virtual at 0
+strucFontPackHeader strucFontPackHeader
+end virtual
 
 
 ;-------------------------------------------------------------------------------
@@ -1491,7 +1501,152 @@ util.ClearRect:
 
 
 ;-------------------------------------------------------------------------------
+; Font Pack Support
+;-------------------------------------------------------------------------------
+
+
+;-------------------------------------------------------------------------------
+util.GetFontPackData:
+; Attempts to get a pointer to a font pack's data based on its appvar's name.
+; Inputs:
+;  HL: Pointer to name string
+; Outputs:
+;  HL: Pointer to byte after "FONTPACK", or NULL on failure
+;  DE: Old value of HL
+;  Carry set if appvar not found, or not a font pack; NC on success
+	dec	hl
+	ld	iy,flags
+	call	_Mov9ToOP1
+	ld	a,AppVarObj
+	ld	(OP1),a
+	call	_ChkFindSym
+	jr	c,.error
+; Check header
+	inc	de
+	inc	de
+	ex	de,hl
+	push	hl
+	call	util.VerifyHeader
+	pop	de
+	jr	nz,.error
+	ret
+.error:
+	or	a,a
+	sbc	hl,hl
+	scf
+	ret
+
+
+;-------------------------------------------------------------------------------
+util.VerifyHeader:
+; Verify that HL points to something that looks somewhat like a font pack.
+; Inputs:
+;  HL: Pointer to supposed font pack
+; Ouput:
+;  Z if the check passes, NZ if not
+;  HL points to byte after 'K'
+; Destroys:
+;  A, B, DE
+	ld	de,_FontPackHeaderString
+	ld	b,8
+.loop:	ld	a,(de)
+	inc	de
+	cp	(hl)
+	inc	hl
+	ret	nz
+	djnz	.loop
+	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_GetFontPackName:
+; Returns a pointer to the font pack's name string.  Useful in a loop using
+; ti_Detect().
+; Arguments:
+;  arg0: Pointer to font pack appvar name
+; Returns:
+;  Pointer, or NULL if no name
+	ld	hl,arg0
+	add	hl,sp
+	ld	hl,(hl)
+	call	util.GetFontPackData
+	ret	c
+; Check metadata offset field
+	ld	bc,0
+	ld	hl,(hl)
+	sbc	hl,bc
+	ret	z
+; Check name field
+	add	hl,de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	hl,(hl)
+	sbc	hl,bc
+	ret	z
+	add	hl,de
+
+
+;-------------------------------------------------------------------------------
+fontlib_GetFontByIndex:
+; Returns a pointer to a font in a font pack, based on an index.
+; Arguments:
+;  arg0: Pointer to font pack's name
+;  arg1: Index
+; Returns:
+;  Pointer, or NULL if error
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + arg0)
+	call	util.GetFontPackData
+	ret	c
+	ex	de,hl
+	ld	(iy + arg0),hl
+	jr	fontlib_GetFontByIndexRaw.haveAddress
+;-------------------------------------------------------------------------------
+fontlib_GetFontByIndexRaw:
+; Returns a pointer to a font in a font pack, based on an index.
+; Arguments:
+;  arg0: Pointer to first data byte of font pack
+;  arg1: Index
+; Returns:
+;  Pointer, or NULL if error
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + arg0)
+; Get font count
+	ld	de,strucFontPackHeader.fontCount
+	add	hl,de
+fontlib_GetFontByIndexRaw.haveAddress:
+	ld	a,(hl)
+	inc	hl
+; Validate index
+	inc	a
+	cp	(iy + arg1)
+	dec	a
+	jr	nc,.error
+; Get offset to font
+	ld	c,a
+	ld	b,3
+	mlt	bc
+	add	hl,bc
+	ld	hl,(hl)
+	ld	de,(iy + arg0)
+	add	hl,de
+	ret
+.error:
+	or	a
+	sbc	hl,hl
+	ret
+
+
+
+
+
+;-------------------------------------------------------------------------------
 ; Data
+_FontPackHeaderString:
+	.db	"FONTPACK"
 _TextDefaultWindow:
 textDefaultWindow := _TextDefaultWindow - DataBaseAddr
 	dl	0
