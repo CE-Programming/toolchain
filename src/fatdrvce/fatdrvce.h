@@ -65,11 +65,11 @@ typedef struct {
 usb_error_t msd_SetupDevice(msd_device_t *msd, usb_device_t dev, void *buffer);
 
 /**
- * Locates any attached Mass Storage Devices (MSD).
+ * Checks if the usb device is a valid Mass Storage Device (MSD).
  * @param prev Previous found device, supply NULL to start the search.
- * @return A connected MSD structure.
+ * @return USB_SUCCESS if the device is a Mass Storage Device.
  */
-usb_device_t msd_Find(usb_device_t prev);
+usb_error_t msd_ValidDevice(usb_device_t dev);
 
 /**
  * Directly reads a 512 byte sector from the Mass Storage Device into the
