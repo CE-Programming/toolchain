@@ -428,6 +428,27 @@ usb_Cleanup:
 	ld	(hl),a
 	ld	l,usbDevImr+1-$100
 	ld	(hl),a
+;	ld	hl,mpUsbDevIsr
+;	ld	(hl),bmUsbIntDevResume or bmUsbIntDevSuspend
+;	ld	l,usbDevImr+1-$100
+;	set	bUsbIntDevDmaErr-8,(hl)
+;	dec	l;usbDevImr-$100
+;	set	bUsbIntDevDmaFin,(hl)
+	ld	l,usbFifoRxImr-$100
+	ld	(hl),bmUsbFifoRxInts
+	ld	l,usbFifoTxImr-$100
+	ld	(hl),bmUsbFifoTxInts
+;	ld	l,a;usbDevCtrl-$100
+;	set	bUsbDevReset,(hl)
+;	res	bUsbDevReset,(hl)
+;	ld	l,usbDevTest-$100
+;	set	bUsbTstClrFifo,(hl)
+;	ld	l,h;usbDevCtrl+1-$100
+;	set	bUsbDevForceFullSpd-8,(hl)
+;	dec	l;usbDevCtrl-$100
+;	set	bUsbGirqEn,(hl)
+;	set	bUsbDevEn,(hl)
+;	set	7,(hl)
 	call	_Init
 	res	5,(hl)
 	ret
@@ -1254,6 +1275,10 @@ end iterate
 	pop	ix
 	ret
 
+; Input:
+;  a = fill
+; Output:
+;  hl = flags+$1B
 _Init:
 	ld	bc,usbInited-usbArea
 	ld	de,usbInited
@@ -1404,6 +1429,8 @@ _CreateDevice:
 
 ; Input:
 ;  hl = device
+; Output:
+;  de = ?
 _DeleteDevice:
 	ld	de,(hl+device.endpoints)
 	call	_Free32Align32
@@ -2236,15 +2263,22 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	pop	bc
 	ret	nz
 	djnz	.delete
-.done:
 	ld	hl,mpUsbPortStsCtrl
+	ld	a,(hl)
+	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
+	ld	(hl),a
+	inc	l;usbPortStsCtrl+1
+;	set	bUsbPortReset-8,(hl)
+	dec	l;usbPortStsCtrl
+	cp	a,a
 	ret
 .delete:
 	ld	a,l
 	rrca
 	call	nc,_DeleteDevice
-	cp	a,
-	jq	.done
+	cp	a,a
+	ld	hl,mpUsbPortStsCtrl
+	ret
 
 _HandlePortPortEnInt:
 	ld	a,(hl)
