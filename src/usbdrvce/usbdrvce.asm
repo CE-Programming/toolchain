@@ -1405,7 +1405,7 @@ _CreateDevice:
 ; Input:
 ;  hl = device
 _DeleteDevice:
-	ld	de,(device.endpoints)
+	ld	de,(hl+device.endpoints)
 	call	_Free32Align32
 	ex	de,hl
 	jq	_Free32Align32
