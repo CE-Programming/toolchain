@@ -107,12 +107,20 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             os_NewLine();
             return USB_IGNORE;
         }
+        case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
+            static unsigned counter;
+            unsigned row, col;
+            os_GetCursorPos(&row, &col);
+            os_SetCursorPos(0, 8);
+            putIntHex(++counter);
+            os_SetCursorPos(row, col);
+            break;
+        }
         case USB_DEVICE_INTERRUPT:
         case USB_DEVICE_DEVICE_INTERRUPT:
         case USB_DEVICE_CONTROL_INTERRUPT:
         case USB_DEVICE_WAKEUP_INTERRUPT:
         case USB_HOST_INTERRUPT:
-        case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT:
             break;
         default:
             os_PutStrFull(usb_event_names[event]);
@@ -123,9 +131,17 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 }
 
 void main(void) {
-    os_SetCursorPos(0, 0);
-    if (usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS) != USB_SUCCESS)
+    usb_error_t error;
+    os_SetCursorPos(1, 0);
+    if ((error = usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS)) != USB_SUCCESS)
         return;
-    while (!os_GetCSC() && usb_WaitForInterrupt() == USB_SUCCESS);
+    while ((error = usb_WaitForInterrupt()) == USB_SUCCESS && !os_GetCSC()) {
+        unsigned row, col;
+        os_GetCursorPos(&row, &col);
+        os_SetCursorPos(0, 0);
+        putIntHex(usb_GetFrameNumber());
+        os_SetCursorPos(row, col);
+    }
     usb_Cleanup();
+    putIntHex(error);
 }
