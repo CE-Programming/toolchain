@@ -78,7 +78,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         "USB_A_PLUG_REMOVED_INT",
         "USB_INT",
         "USB_HOST_ERROR_INT",
-        "USB_HOST_PORT_CHANGE_DETECT_INT",
         "USB_HOST_PORT_CONNECT_STATUS_CHANGE_INT",
         "USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INT",
         "USB_HOST_PORT_OVERCURRENT_CHANGE_INT",
@@ -97,6 +96,14 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         case USB_DEVICE_CONNECTED_EVENT:
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
+            putIntHex((unsigned)event_data);
+            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
+            os_NewLine();
+            break;
+        case USB_DEVICE_ENABLED_EVENT:
+            os_PutStrFull(usb_event_names[event]);
+            putChar(':');
+            putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             os_NewLine();
             break;

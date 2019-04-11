@@ -231,7 +231,6 @@ virtual at 0
 	USB_A_PLUG_REMOVED_INTERRUPT				rb 1
 	USB_INTERRUPT						rb 1
 	USB_HOST_ERROR_INTERRUPT				rb 1
-	USB_HOST_PORT_CHANGE_DETECT_INTERRUPT			rb 1
 	USB_HOST_PORT_CONNECT_STATUS_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_OVERCURRENT_CHANGE_INTERRUPT		rb 1
@@ -472,20 +471,6 @@ usb_WaitForInterrupt:
 
 ;-------------------------------------------------------------------------------
 usb_HandleEvents:
-	jr	.skipTimeout
-label .anyActiveTimeouts: byte at $-byte
-.noActiveTimeouts := 0
-load .activeTimeouts from .anyActiveTimeouts
-	call	usb_GetFrameNumber
-	ex	de,hl
-	ld	hl,0
-.rootResetTimeout := $-long
-	sbc	hl,de
-	ld	a,h
-	and	a,$3E ; based on max timeout of 50ms = $190 delta
-	call	nz,_HandleRootResetTimeout
-	ret	nz
-.skipTimeout:
 	sbc	hl,hl
 	ld	a,(mpIntStat+1)
 	and	a,intUsb shr 8
@@ -904,6 +889,7 @@ usb_GetFrameNumber:
 	ld	a,(hl)
 	cp	a,e
 	jq	c,.load
+	ld	e,a
 	dec	h
 	ex	de,hl
 	ret	nz
@@ -1707,18 +1693,6 @@ sendDescriptor:
 	ret
 
 ;-------------------------------------------------------------------------------
-; Output:
-;  zf = success
-;  cf = 0
-;  hl = error if !zf
-_HandleRootResetTimeout:
-	ld	hl,mpUsbPortStsCtrl+1
-	res	bUsbPortReset-8,(hl)
-assert ~usb_HandleEvents.noActiveTimeouts
-	xor	a,a;usb_HandleEvents.noActiveTimeouts
-	ld	(usb_HandleEvents.anyActiveTimeouts),a
-	ret
-
 _HandleGetDescriptor:
 	ld	de,(ysetup.wIndex)
 	ld	bc,(ysetup.wValue)
@@ -2274,8 +2248,7 @@ iterate type, ConnSts, PortEn, Overcurr
 	ret	nz
 end iterate
 	ld	l,usbSts
-	ld	a,USB_HOST_PORT_CHANGE_DETECT_INTERRUPT
-	jq	_DispatchEvent
+	ret
 
 _HandlePortConnStsInt:
 	ld	a,(hl)
@@ -2314,22 +2287,19 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	ld	(hl),a
 	inc	l;usbPortStsCtrl+1
 	set	bUsbPortReset-8,(hl)
-	call	usb_GetFrameNumber
-	ld	de,50*8+1 ; 50ms
-	add	hl,de
-	ld	(usb_HandleEvents.rootResetTimeout),hl
-	ld	a,usb_HandleEvents.activeTimeouts
-	ld	(usb_HandleEvents.anyActiveTimeouts),a
-	jq	.return
-.return:
-	ld	hl,mpUsbPortStsCtrl
+	ld	a,5
+	call	_DelayTenTimesAms
+	res	bUsbPortReset-8,(hl)
+	dec	l;usbPortStsCtrl
 	cp	a,a
 	ret
 .delete:
 	ld	a,l
 	rrca
 	call	nc,_DeleteDevice
-	jq	.return
+	ld	hl,mpUsbPortStsCtrl
+	cp	a,a
+	ret
 
 _HandlePortPortEnInt:
 	ld	a,(hl)
@@ -2341,6 +2311,7 @@ end repeat
 	and	a,1
 assert USB_DEVICE_DISABLED_EVENT + 1 = USB_DEVICE_ENABLED_EVENT
 	; TODO: Get Control MPS, SET_ADDRESS
+	ld	de,(rootDevice.child)
 	add	a,USB_DEVICE_DISABLED_EVENT;USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
