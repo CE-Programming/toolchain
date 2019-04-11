@@ -2254,10 +2254,16 @@ _HandlePortConnStsInt:
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg)
 	ld	(hl),a
+	ld	a,(hl)
 repeat bUsbCurConnSts
 	rrca
 end repeat
 	and	a,1
+	jq	nz,.connect
+	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
+	ld	(hl),a
+	xor	a,a
+.connect:
 	ld	de,0
 	ld	hl,(rootDevice.child)
 	jq	z,.disconnect
@@ -2305,13 +2311,14 @@ _HandlePortPortEnInt:
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbConnStsChg)
 	ld	(hl),a
+	ld	a,(hl)
 repeat bUsbPortEn
 	rrca
 end repeat
 	and	a,1
-assert USB_DEVICE_DISABLED_EVENT + 1 = USB_DEVICE_ENABLED_EVENT
 	; TODO: Get Control MPS, SET_ADDRESS
 	ld	de,(rootDevice.child)
+assert USB_DEVICE_DISABLED_EVENT + 1 = USB_DEVICE_ENABLED_EVENT
 	add	a,USB_DEVICE_DISABLED_EVENT;USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
@@ -2319,6 +2326,7 @@ _HandlePortOvercurrInt:
 	ld	a,(hl)
 	and	a,not (bmUsbPortEnChg or bmUsbConnStsChg)
 	ld	(hl),a
+	ld	a,(hl)
 	and	a,bmUsbOvercurrActive
 	cp	a,bmUsbOvercurrActive
 	sbc	a,a

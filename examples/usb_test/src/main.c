@@ -1,5 +1,6 @@
 #include <usbdrvce.h>
 
+#include <debug.h>
 #include <tice.h>
 
 #include <stddef.h>
