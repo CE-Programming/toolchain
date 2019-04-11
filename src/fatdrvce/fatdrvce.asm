@@ -13,7 +13,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 ;-------------------------------------------------------------------------------
 ; v1 functions
 ;-------------------------------------------------------------------------------
-	export msd_Find
+	export msd_ValidDevice
 	export msd_SetupDevice
 	export msd_Read
 	export msd_Write
@@ -36,20 +36,10 @@ end macro
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
-msd_Find:
+msd_ValidDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
-	ld	bc,1 shl 3		; USB_SKIP_HUBS
-	push	bc
-	push	hl			; get previous device
-	or	a,a
-	sbc	hl,hl
-	push	hl
-	call	usb_FindDevice
-	pop	bc
-	pop	bc
-	pop	bc
 	compare_hl_zero
 	ret	z			; if no more devices, end
 	ld	bc,msd_xfer_size
