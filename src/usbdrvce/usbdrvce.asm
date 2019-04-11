@@ -42,6 +42,7 @@ library 'USBDRVCE', 0
 	export usb_SetEndpointFlags
 	export usb_GetEndpointFlags
 	export usb_ClearEndpointHalt
+	export usb_GetFrameNumber
 	export usb_ControlTransfer
 	export usb_Transfer
 	export usb_ScheduleControlTransfer
@@ -95,7 +96,6 @@ struc device			; device structure
 	.hubPorts	rb 1	; number of ports in this hub
 	.addr		rb 1	; device addr
 	.speed		rb 1	; device speed shl 4
-		        rb 1
 	.info		rw 1	; hub addr or port number shl 7 or 1 shl 14
 	.child		rl 1	; first device connected to this hub
 	.sibling	rl 1	; next device connected to the same hub
@@ -472,8 +472,20 @@ usb_WaitForInterrupt:
 
 ;-------------------------------------------------------------------------------
 usb_HandleEvents:
-.loop:
-	or	a,a
+	jr	.skipTimeout
+label .anyActiveTimeouts: byte at $-byte
+.noActiveTimeouts := 0
+load .activeTimeouts from .anyActiveTimeouts
+	call	usb_GetFrameNumber
+	ex	de,hl
+	ld	hl,0
+.rootResetTimeout := $-long
+	sbc	hl,de
+	ld	a,h
+	and	a,$3E ; based on max timeout of 50ms = $190 delta
+	call	nz,_HandleRootResetTimeout
+	ret	nz
+.skipTimeout:
 	sbc	hl,hl
 	ld	a,(mpIntStat+1)
 	and	a,intUsb shr 8
@@ -541,8 +553,14 @@ usb_FindDevice:
 .forceChild:
 	bit	0,(ydevice.child)
 	jq	nz,.sibling
-	lea	iy,ydevice.child-device.sibling
-	jq	.forceSibling
+	ld	iy,(ydevice.child)
+	jq	.check
+.check:
+	ld	a,(ydevice.find)
+	and	a,c
+	jq	nz,.child
+	lea	hl,iy
+	ret
 .hub:
 	ld	iy,(ydevice.hub)
 	lea	hl,iy
@@ -554,14 +572,8 @@ usb_FindDevice:
 .sibling:
 	bit	0,(ydevice.sibling)
 	jq	nz,.hub
-.forceSibling:
 	ld	iy,(ydevice.sibling)
-.check:
-	ld	a,(ydevice.find)
-	and	a,c
-	jq	nz,.child
-	lea	hl,iy
-	ret
+	jq	.check
 
 ;-------------------------------------------------------------------------------
 usb_ResetDevice:
@@ -880,6 +892,27 @@ usb_ClearEndpointHalt:
 	jq	_Error.NOT_SUPPORTED
 
 ;-------------------------------------------------------------------------------
+usb_GetFrameNumber:
+	ld	hl,mpUsbOtgCsr+2
+	bit	bUsbRole-16,(hl)
+	ld	l,usbFrameIdx
+	jq	z,.load
+	ld	l,usbSofFrNum-$100
+	inc	h
+.load:
+	ld	de,(hl)
+	ld	a,(hl)
+	cp	a,e
+	jq	c,.load
+	dec	h
+	ex	de,hl
+	ret	nz
+repeat bsf 8
+	add	hl,hl
+end repeat
+	ret
+
+;-------------------------------------------------------------------------------
 usb_ControlTransfer:
 	ld	hl,usb_ScheduleControlTransfer.enter
 	jq	usb_Transfer.enter
@@ -1149,7 +1182,7 @@ _QueueTransfer:
 	pop	bc
 virtual
 	ld	iy,0
- load .iyPrefix from $$
+ load .iyPrefix: byte from $$
 end virtual
 	ld	iyl,.iyPrefix
 label .queue at $-byte
@@ -1294,6 +1327,8 @@ _Init:
 .waitForReset:
 	bit	bUsbHcReset,(hl)
 	jq	nz,.waitForReset
+	res	bUsbFrameListSize+0,(hl)
+	set	bUsbFrameListSize+1,(hl)
 	scf
 	sbc	hl,hl
 	add	hl,de
@@ -1414,8 +1449,6 @@ _CreateDevice:
 	ld	(ydevice.hubPorts),b
 	ld	(ydevice.addr),b
 	ld	(ydevice.speed),b
-	ld	(ydevice.info),b
-	ld	(ydevice.info+1),b
 	ld	(hl),b
 	push	hl
 	pop	de
@@ -1674,6 +1707,18 @@ sendDescriptor:
 	ret
 
 ;-------------------------------------------------------------------------------
+; Output:
+;  zf = success
+;  cf = 0
+;  hl = error if !zf
+_HandleRootResetTimeout:
+	ld	hl,mpUsbPortStsCtrl+1
+	res	bUsbPortReset-8,(hl)
+assert ~usb_HandleEvents.noActiveTimeouts
+	xor	a,a;usb_HandleEvents.noActiveTimeouts
+	ld	(usb_HandleEvents.anyActiveTimeouts),a
+	ret
+
 _HandleGetDescriptor:
 	ld	de,(ysetup.wIndex)
 	ld	bc,(ysetup.wValue)
@@ -2268,17 +2313,23 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
 	ld	(hl),a
 	inc	l;usbPortStsCtrl+1
-;	set	bUsbPortReset-8,(hl)
-	dec	l;usbPortStsCtrl
+	set	bUsbPortReset-8,(hl)
+	call	usb_GetFrameNumber
+	ld	de,50*8+1 ; 50ms
+	add	hl,de
+	ld	(usb_HandleEvents.rootResetTimeout),hl
+	ld	a,usb_HandleEvents.activeTimeouts
+	ld	(usb_HandleEvents.anyActiveTimeouts),a
+	jq	.return
+.return:
+	ld	hl,mpUsbPortStsCtrl
 	cp	a,a
 	ret
 .delete:
 	ld	a,l
 	rrca
 	call	nc,_DeleteDevice
-	cp	a,a
-	ld	hl,mpUsbPortStsCtrl
-	ret
+	jq	.return
 
 _HandlePortPortEnInt:
 	ld	a,(hl)
