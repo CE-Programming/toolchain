@@ -46,6 +46,10 @@ __nodisp:
 	ld	(ix+6),a
 __start:
 	ld	de,(ix+9)
+	jr	__loop
+__skiploop:
+	pop	ix
+	pop	de
 __loop:
 	ld	a,' '
 	ld	(curUnder),a
@@ -59,13 +63,13 @@ __getkey:
 	call	_CursorOn
 	jr	c,__getkey
 	cp	a,kLeft
-	jr	z,__loop
+	jr	z,__skiploop
 	cp	a,kDown
-	jr	z,__loop
+	jr	z,__skiploop
 	cp	a,kRight
-	jr	z,__loop
+	jr	z,__skiploop
 	cp	a,kUp
-	jr	z,__loop
+	jr	z,__skiploop
 	cp	a,kClear
 	jr	z,__clearpop
 	cp	a,kEnter
