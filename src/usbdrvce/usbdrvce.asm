@@ -145,6 +145,7 @@ virtual at usbArea
 				rb (-$) and 31
 	rootHub			device
 				rb (-$) and $FFF
+; FIXME: 0xD141B2 is used by GetCSC :(
 	periodicList		dbx $400: ?
 	usbMem			dbx usbInited and not $FF - $: ?
 				rb (-$) and 31
@@ -156,6 +157,8 @@ virtual at usbArea
 	currentRole		rb 1
 	freeList32Align32	rl 1
 	freeList64Align256	rl 1
+	allocCount32Align32	rl 1
+	allocCount64Align256	rl 1
 	assert $ <= usbInited
 end virtual
 virtual at (ramCodeTop+$FF) and not $FF
@@ -403,16 +406,16 @@ usb_Init:
 	ld	b,sizeof cHeap shr 8
 	rrc	e
 	call	c,.initFreeList
+	ld	h,(periodicList-$D10000) shr 8
+	ld	b,sizeof periodicList shr 8
+	rrc	e
+	call	c,.initFreeList
 	ld	h,(usbMem-$D10000) shr 8
 	ld	b,sizeof usbMem shr 8
 	rrc	e
 	call	c,.initFreeList
 	ld	h,(osHeap-$D10000) shr 8
 	ld	b,sizeof osHeap shr 8
-	rrc	e
-	call	c,.initFreeList
-	ld	h,(periodicList-$D10000) shr 8
-	ld	b,sizeof periodicList shr 8
 	rrc	e
 	call	c,.initFreeList
 	ld	hl,USB_ERROR_INVALID_PARAM
@@ -426,12 +429,12 @@ usb_Init:
 	ret
 .initFreeList:
 	call	_Free64Align256
-	add	a,32
+	ld	a,32
 .loop:
-	sub	a,-32
+	add	a,32
 	ld	l,a
-	call	c,_Free32Align32
-	jq	c,.loop
+	call	nz,_Free32Align32
+	jq	nz,.loop
 	inc	h
 	djnz	.initFreeList
 	ld	c,a
@@ -1565,7 +1568,6 @@ assert (endpoint.hubInfo+1) and 1
 	ld	(yendpoint.overlay.status),a
 	ld	(yendpoint.flags),a
 	ld	(yendpoint.internalFlags),a
-	inc	hl
 	ld	b,(hl)
 	dec	hl
 	ld	c,(hl)
@@ -2428,11 +2430,12 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	call	_DispatchEvent
 	pop	bc
 	ret	nz
-	djnz	.delete
+	ex	de,hl
 	ld	hl,mpUsbPortStsCtrl
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
 	ld	(hl),a
+	djnz	.delete
 	inc	l;usbPortStsCtrl+1
 	set	bUsbPortReset-8,(hl)
 	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
@@ -2442,6 +2445,7 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	cp	a,a
 	ret
 .delete:
+	ex	de,hl
 	ld	a,l
 	rrca
 	call	nc,_DeleteDevice
