@@ -426,6 +426,7 @@ usb_Init:
 	ret
 .initFreeList:
 	call	_Free64Align256
+	add	a,32
 .loop:
 	sub	a,-32
 	ld	l,a
@@ -1474,7 +1475,7 @@ _CreateDevice:
 	cp	a,a
 	ret
 .free:
-	lea	hl,iy
+	lea	hl,ydevice
 	jq	_Free32Align32
 
 ; Input:
@@ -1555,7 +1556,7 @@ assert (endpoint.hubInfo+1) and 1
 	pop	yendpoint
 	ld	(yendpoint.overlay.altNext),l
 	call	_CreateDummyTransfer.enter
-	jq	nz,_CreateDevice.free
+	jq	nz,.free
 	ld	(yendpoint.overlay.next),hl
 	ld	(yendpoint.first),hl
 	ld	(yendpoint.last),hl
@@ -1594,6 +1595,9 @@ assert (endpoint.hubInfo+1) and 1
 	ld	(yendpoint.dir),a
 	ld	(dummyHead.next),iy
 	ret
+.free:
+	lea	hl,yendpoint.next
+	jq	_Free32Align32
 
 ;-------------------------------------------------------------------------------
 _FunData:
