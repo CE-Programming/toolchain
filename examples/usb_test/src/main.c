@@ -104,6 +104,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             putNibHex(*(usb_role_t *)event_data >> 4);
             os_NewLine();
             break;
+        case USB_DEVICE_DISCONNECTED_EVENT:
         case USB_DEVICE_CONNECTED_EVENT:
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
@@ -124,7 +125,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             putIntHex(usb_ScheduleDefaultControlTransfer(event_data, &setup, &device_descriptor,
                                                          got_device_descriptor, &device_descriptor));
             os_NewLine();
-            //dbg_Debugger();
             break;
         }
         case USB_DEFAULT_SETUP_EVENT: {
