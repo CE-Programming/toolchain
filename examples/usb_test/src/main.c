@@ -23,7 +23,17 @@ static void putIntHex(unsigned x) {
     putByteHex(x >>  8);
     putByteHex(x >>  0);
 }
+static void putBlockHex(void *block, size_t size) {
+    while (size--)
+        putByteHex(*(*(unsigned char **)&block)++);
+}
 
+static usb_error_t got_device_descriptor(usb_endpoint_t endpoint, usb_transfer_status_t status,
+                                         size_t transferred, usb_transfer_data_t *data) {
+    return USB_SUCCESS;
+}
+
+static char device_descriptor[8];
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                                     usb_callback_data_t *callback_data) {
     static const char *usb_event_names[] = {
@@ -101,13 +111,22 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             os_NewLine();
             break;
-        case USB_DEVICE_ENABLED_EVENT:
+        case USB_DEVICE_ENABLED_EVENT: {
+            static const usb_control_setup_t setup = {
+                USB_DEVICE_TO_HOST | USB_STANDARD_REQUEST | USB_RECIPIENT_DEVICE,
+                USB_GET_DESCRIPTOR,
+                USB_DEVICE_DESCRIPTOR << 8,
+                0,
+                sizeof(device_descriptor),
+            };
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
-            putIntHex((unsigned)event_data);
-            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
+            putIntHex(usb_ScheduleDefaultControlTransfer(event_data, &setup, &device_descriptor,
+                                                         got_device_descriptor, &device_descriptor));
             os_NewLine();
+            //dbg_Debugger();
             break;
+        }
         case USB_DEFAULT_SETUP_EVENT: {
             unsigned char i;
             for (i = 0; i < 8; i++)
@@ -128,6 +147,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         case USB_DEVICE_DEVICE_INTERRUPT:
         case USB_DEVICE_CONTROL_INTERRUPT:
         case USB_DEVICE_WAKEUP_INTERRUPT:
+        case USB_INTERRUPT:
         case USB_HOST_INTERRUPT:
             break;
         default:
@@ -150,6 +170,9 @@ void main(void) {
         putIntHex(usb_GetFrameNumber());
         os_SetCursorPos(row, col);
     }
-    usb_Cleanup();
     putIntHex(error);
+    os_NewLine();
+    putBlockHex(&device_descriptor, sizeof(device_descriptor));
+    usb_Cleanup();
+    os_GetKey();
 }

@@ -60,12 +60,12 @@ struc transfer			; transfer structure
 	.type		rb 1	; transfer type or 3 shl 2 or last shl 7
 	.remaining	rw 1	; transfer remaining length
 	label .buffers: 20	; transfer buffers
-			rw 1
-	.length		rd 1	; original transfer length
+			rl 1
+	.length		rl 1	; original transfer length
 	.callback	rd 1	; user callback
 	.data		rd 1	; user callback data
 	.endpoint	rd 1	; pointer to endpoint structure
-			rw 1
+	.padding	rw 1
 	assert $-. = 32
 end struc
 struc endpoint			; endpoint structure
@@ -75,6 +75,9 @@ struc endpoint			; endpoint structure
 	.addr		rb 1	; device addr or cancel shl 7
 	.info		rb 1	; ep or speed shl 4 or dtc shl 6
 	.maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
+	.smask		rb 1	; micro-frame s-mask
+	.cmask		rb 1	; micro-frame c-mask
+	.hubInfo	rw 1	; hub addr or port num shl 7 or mult shl 14
 	.cur		rd 1	; current transfer pointer
 	.overlay	transfer; current transfer
 
@@ -94,7 +97,7 @@ struc device			; device structure
 	.hub		rl 1	; hub this device is connected to
 	.find		rb 1	; find flags
 	.hubPorts	rb 1	; number of ports in this hub
-	.addr		rb 1	; device addr
+	.addr		rb 1	; device addr and $7F
 	.speed		rb 1	; device speed shl 4
 	.info		rw 1	; hub addr or port number shl 7 or 1 shl 14
 	.child		rl 1	; first device connected to this hub
@@ -140,12 +143,12 @@ virtual at usbArea
 				rb (-$) and 7
 	setupPacket		setup
 				rb (-$) and 31
-	rootDevice		device
+	rootHub			device
 				rb (-$) and $FFF
 	periodicList		dbx $400: ?
 	usbMem			dbx usbInited and not $FF - $: ?
 				rb (-$) and 31
-	fakeEndpoint		endpoint
+	dummyHead		endpoint
 	eventCallback		rl 1
 	eventCallback.data	rl 1
 	standardDescriptors	rl 1
@@ -337,7 +340,8 @@ usb_Init:
 	set	5,(hl)
 	xor	a,a
 	sbc	hl,hl
-	ld	(rootDevice.data),hl
+	ld	(rootHub.addr),a
+	ld	(rootHub.data),hl
 	ld	l,3
 	add	hl,sp
 	ld	de,eventCallback
@@ -380,7 +384,19 @@ usb_Init:
 	ld	(hl),(bmUsbIntRoleChg or bmUsbIntIdChg or bmUsbIntOvercurr or bmUsbIntBPlugRemoved or bmUsbIntAPlugRemoved) shr 8
 	ld	l,usbImr
 	ld	(hl),usbIntLevelHigh
-	ld	hl,rootDevice.find
+	ld	hl,periodicList
+	ld	(mpUsbPeriodicListBase),hl
+	ld	hl,dummyHead.next
+	ld	(mpUsbAsyncListAddr),hl
+	ld	(hl),hl
+	set	1,(hl)
+	ld	l,endpoint.info
+	ld	(hl),1 shl 7 ; head
+	ld	l,endpoint.overlay.status
+	ld	(hl),1 shl 6 ; halt
+	ld	hl,mpUsbCmd
+	ld	(hl),bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn or 2 shl bUsbFrameListSize or bmUsbRunStop
+	ld	hl,rootHub.find
 	ld	(hl),IS_HUB or IS_ENABLED
 	ld	l,a;(cHeap-$D10000) and $FF
 	ld	h,a;(cHeap-$D10000) shr 8
@@ -530,7 +546,7 @@ usb_FindDevice:
 	jq	c,.child
 	add	hl,de
 	jq	c,.forceChild
-	ld	iy,rootDevice
+	ld	iy,rootHub
 	jq	.check
 .child:
 	bit	bsf IS_ATTACHED,c
@@ -1002,7 +1018,7 @@ usb_ScheduleControlTransfer:
 	ld	de,(ix+9)
 	call	.queueStage
 	ld	ysetup,(ix+9)
-	ld	a,(ysetup.bRequest)
+	ld	a,(ysetup.bmRequestType)
 	and	a,1 shl 7
 	ld	bc,(ysetup.wLength)
 	inc.s	bc
@@ -1016,8 +1032,7 @@ usb_ScheduleControlTransfer:
 	ld	bc,1 shl 15
 	jq	.queueStage
 .queueStage:
-	call	_AllocDummyTransfer
-	ex	de,hl
+	call	_CreateDummyTransfer
 	ld	iyl,1
 	jq	z,_FillTransfer
 	jq	_Error.NO_MEMORY
@@ -1062,7 +1077,7 @@ end repeat
 ;  (ix+15) = handler
 ;  (ix+18) = data
 _QueueTransfer:
-	call	_AllocDummyTransfer
+	call	_CreateDummyTransfer
 	jq	nz,_Error.NO_MEMORY
 	ld	(.dummy),hl
 	or	a,3 shl 2
@@ -1146,7 +1161,7 @@ _QueueTransfer:
 	sbc	hl,de
 	pop	de,af
 	push	af,bc,de,hl
-	call	_AllocDummyTransfer.enter
+	call	_CreateDummyTransfer.enter
 	jq	nz,_Error.NO_MEMORY
 	and	a,00001101b
 	pop	bc
@@ -1180,43 +1195,45 @@ label .dummy at $-long
 ; Input:
 ;  a = ioc shl 7 or 3 shl 2 or pid
 ;  bc = dt shl 15 or length
-;  de = next
-;  hl = buffer
+;  de = buffer
+;  hl = next
 ;  iy = alt next
 ;  (ix+6) = endpoint
 ;  (ix+15) = handler
 ;  (ix+18) = data
 _FillTransfer:
+	ex	de,hl
 	push	hl,iy
 	ld	yendpoint,(ix+6)
 	ld	hl,(yendpoint.last)
 	ld	(hl),de
+	ld	(yendpoint.last),de
 assert ~transfer.altNext and (transfer.altNext-1)
 	set	bsf transfer.altNext, hl
 	pop	de
 	ld	(hl),de
 repeat transfer.type-transfer.altNext
-	inc	hl
+	inc	l
 end repeat
 	ld	(hl),a
 repeat transfer.remaining-transfer.type
-	inc	hl
+	inc	l
 end repeat
 	ld	(hl),c
-	inc	hl
+	inc	l;transfer.remaining+1
 	ld	(hl),b
-	inc	hl
 	pop	de
+	inc	l;transfer.buffers
 	ld	(hl),de
 	dec	sp
 	push	de
 	inc	sp
 	pop	de
-	inc	hl
-	inc	hl
-	inc	hl
+repeat transfer.length-transfer.buffers
+	inc	l
+end repeat
 	ld	(hl),c
-	inc	hl
+	inc	l;transfer.length+1
 	ld	(hl),b
 	call	.packHalf
 	ld	bc,(ix+15)
@@ -1227,7 +1244,7 @@ end repeat
 	call	.pack
 	ld	(hl),d
 	ld	a,l
-	sub	a,transfer.status-transfer.endpoint-1
+	sub	a,transfer.padding-transfer.status
 	ld	l,a
 	ld	(hl),1 shl 7
 	ret
@@ -1238,10 +1255,10 @@ end repeat
 	xor	a,c
 	ld	(hl),bc
 	ld	(hl),a
-	inc	hl
-	inc	hl
+	inc	l
+	inc	l
 .packHalf:
-	inc	hl
+	inc	l
 	ld	a,e
 	or	a,$f
 	ld	e,a
@@ -1251,7 +1268,7 @@ end repeat
 	and	a,$f
 	xor	a,e
 	ld	(hl),a
-	inc	hl
+	inc	l
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1299,26 +1316,20 @@ end iterate
 ; Output:
 ;  hl = flags+$1B
 _Init:
-	ld	bc,usbInited-usbArea
 	ld	de,usbInited
-	ld	hl,mpUsbCmd
 	ld	(de),a
-	ld	(hl),h
+	ld	hl,mpUsbCmd
+	ld	(hl),2 shl bUsbFrameListSize
+	call	_Delay10ms
 	ld	l,usbSts+1
-.waitForHalt:
 	bit	bUsbHcHalted-8,(hl)
-	jq	z,.waitForHalt
+	jq	z,.notHalted
 	ld	l,usbCmd
-	set	bUsbHcReset,(hl)
-.waitForReset:
-	bit	bUsbHcReset,(hl)
-	jq	nz,.waitForReset
-	res	bUsbFrameListSize+0,(hl)
-	set	bUsbFrameListSize+1,(hl)
-	scf
-	sbc	hl,hl
-	add	hl,de
-	ex	de,hl
+	ld	(hl),2 shl bUsbFrameListSize or bmUsbHcReset
+.notHalted: ; rip memory?
+	ld	hl,usbInited
+	dec	de
+	ld	bc,usbInited-usbArea
 	lddr
 	ld	hl,flags+$1B
 	ret
@@ -1404,7 +1415,7 @@ end iterate
 ; Output:
 ;  zf = enough memory
 ;  hl = transfer
-_AllocDummyTransfer:
+_CreateDummyTransfer:
 	ld	iy,(ix+6)
 .enter:
 	call	_Alloc32Align32
@@ -1416,10 +1427,13 @@ assert ~transfer.status and (transfer.status - 1)
 	ret
 
 ; Input:
+;  b = port or 1 shl 7
 ;  c = find flags
 ;  de = parent hub
 ; Output:
+;  a = ?
 ;  zf = enough memory
+;  hl = ?
 ;  iy = device
 _CreateDevice:
 	call	_Alloc32Align32
@@ -1427,24 +1441,41 @@ _CreateDevice:
 	push	hl
 	pop	ydevice
 	call	_Alloc32Align32
-	ret	nz
+	jq	nz,.free
 	ld	(ydevice.endpoints),hl
-	ld	(ydevice.hub),de
+	ex	de,hl
+	ld	(ydevice.hub),hl
 	ld	(ydevice.find),c
+	ld	a,l
+	add	a,device.addr
+	ld	l,a
+	ld	a,(hl)
+	srl	b
+	rla
+	rrca
+	ld	c,a
+	ld	(ydevice.info),bc ; clobber .child
+	ld	a,l
+	add	a,device.child-device.addr
+	ld	l,a
+	ld	(hl),iy
 	ld	bc,32-1
 	ld	(ydevice.hubPorts),b
 	ld	(ydevice.addr),b
 	ld	(ydevice.speed),b
-	ld	(hl),b
-	push	hl
-	pop	de
+	push	de
 	inc	de
+	pop	hl
+	ld	(hl),-1
 	ldir
-	ld	(ydevice.info),bc
-	ld	(ydevice.child),bc
-	ld	(ydevice.sibling),bc
 	ld	(ydevice.data),bc
+	ld	(ydevice.child),l
+	ld	(ydevice.sibling),l
+	cp	a,a
 	ret
+.free:
+	lea	hl,iy
+	jq	_Free32Align32
 
 ; Input:
 ;  hl = device
@@ -1455,6 +1486,114 @@ _DeleteDevice:
 	call	_Free32Align32
 	ex	de,hl
 	jq	_Free32Align32
+
+; Input:
+;  de = endpoint descriptor
+;  iy = device
+; Output:
+;  zf = enough memory
+_CreateEndpoint:
+	call	_Alloc64Align256
+	ret	nz
+	ld	bc,(dummyHead.next)
+	ld	(hl),bc
+	inc	l
+	inc	l
+	push	hl
+	ld	a,(ydevice.addr)
+	inc	l
+	inc	l;endpoint.addr
+	ld	(hl),a
+	inc	l;endpoint.info
+	inc	de
+	inc	de
+	ld	a,(de)
+	and	a,$F
+	or	a,(ydevice.speed)
+	ld	(hl),a
+	ld	bc,(ydevice.endpoints)
+	ld	a,(de)
+	and	a,$8F
+	rrca
+	or	a,c
+	ld	c,a
+	ld	a,h
+	ld	(bc),a
+	inc	de
+	ld	a,(de)
+	and	a,3
+	jq	nz,.notControl
+	ld	a,c
+	xor	a,1
+	ld	c,a
+	ld	a,h
+	ld	(bc),a
+	set	6,(hl)
+	ld	a,1 shl 3
+.notControl:
+	inc	l;endpoint.maxPktLen
+	ex	de,hl
+	inc	hl
+	ldi
+	or	a,$F0
+	xor	a,(hl)
+	and	a,$F8
+	xor	a,(hl)
+	ex	de,hl
+	ld	(hl),a
+	xor	a,a
+	inc	l;endpoint.smask
+	ld	(hl),a
+	inc	l;endpoint.cmask
+	ld	(hl),a
+	ld	bc,(ydevice.info)
+	inc	l;endpoint.hubInfo
+	ld	(hl),c
+	inc	l;endpoint.hubInfo+1
+	ld	(hl),b
+assert (endpoint.hubInfo+1) and 1
+	pop	yendpoint
+	ld	(yendpoint.overlay.altNext),l
+	call	_CreateDummyTransfer.enter
+	jq	nz,_CreateDevice.free
+	ld	(yendpoint.overlay.next),hl
+	ld	(yendpoint.first),hl
+	ld	(yendpoint.last),hl
+	ex	de,hl
+	xor	a,a
+	ld	(yendpoint.overlay.status),a
+	ld	(yendpoint.flags),a
+	ld	(yendpoint.internalFlags),a
+	inc	hl
+	ld	b,(hl)
+	dec	hl
+	ld	c,(hl)
+	ld	a,c
+	or	a,b
+	jq	z,.checkedMps
+	dec	bc
+	ld	a,c
+	and	a,(hl)
+	ld	c,a
+	inc	hl
+	ld	a,b
+	and	a,(hl)
+	or	a,c
+	dec	hl
+	jq	nz,.checkedMps
+	set	bsf PO2_MPS,(yendpoint.internalFlags)
+.checkedMps:
+	dec	hl
+	ld	a,(hl)
+	and	a,3
+	ld	(yendpoint.type),a
+	dec	hl
+	ld	a,(hl)
+	rlca
+	and	a,1
+	ld	(yendpoint.dir),a
+	ld	(dummyHead.next),iy
+	ret
 
 ;-------------------------------------------------------------------------------
 _FunData:
@@ -2188,30 +2327,33 @@ _HandleIdChgInt:
 	ld	de,currentRole
 	ld	a,(de)
 	ld	c,a
-	ld	a,(mpUsbOtgCsr+2)
 	ld	(hl),(bmUsbIntRoleChg or bmUsbIntIdChg) shr 8
+	ld	a,(mpUsbOtgCsr+2)
 	and	a,(bmUsbRole or bmUsbId) shr 16
 	cp	a,c
 	ret	z
 	ld	(de),a
 	call	_PowerVbusForRole
-assert ROLE_DEVICE = usbCmd & ROLE_DEVICE = bmUsbHcHalted shr 8
-	ld	l,usbCmd
-	and	a,l;bmUsbHcHalted shr 8
-	ld	c,a
-	cp	a,l;ROLE_DEVICE
-	ld	a,(hl)
-	rra
-	rlca
-	ld	(hl),a
-	ld	l,usbSts+1
-.wait:
-	ld	a,(hl)
-	and	a,bmUsbHcHalted shr 8
-	sub	a,c
-	jq	nz,.wait
-	ld	l,usbOtgIsr+1
+;assert ROLE_DEVICE = usbCmd & ROLE_DEVICE = bmUsbHcHalted shr 8
+;	ld	l,usbCmd
+;	and	a,l;bmUsbHcHalted shr 8
+;	ld	c,a
+;	cp	a,l;ROLE_DEVICE
+;	sbc	a,a
+;	ld	b,(hl)
+;	xor	a,b
+;	and	a,bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn or bmUsbRunStop
+;	xor	a,b
+;	ld	(hl),a
+;	ld	l,usbSts+1
+;.wait:
+;	ld	a,(hl)
+;	and	a,bmUsbHcHalted shr 8
+;	sub	a,c
+;	jq	nz,.wait
 assert ~USB_ROLE_CHANGED_EVENT
+	xor	a,a
+	ld	l,usbOtgIsr+1
 	jq	_DispatchEvent
 
 _HandleOvercurrInt:
@@ -2259,21 +2401,17 @@ repeat bUsbCurConnSts
 	rrca
 end repeat
 	and	a,1
-	jq	nz,.connect
-	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
-	ld	(hl),a
-	xor	a,a
-.connect:
 	ld	de,0
-	ld	hl,(rootDevice.child)
+	ld	hl,(rootHub.child)
 	jq	z,.disconnect
-	ld	de,rootDevice
+	ld	de,rootHub
+	ld	b,1 or 1 shl 7
 	ld	c,IS_DEVICE or IS_DISABLED
 	call	_CreateDevice
 	ld	hl,USB_ERROR_NO_MEMORY
 	ret	nz ; FIXME
 	lea	hl,iy
-	ld	(rootDevice.child),hl
+	ld	a,1
 .disconnect:
 	bit	0,hl
 	jq	nz,.null
@@ -2293,7 +2431,7 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	ld	(hl),a
 	inc	l;usbPortStsCtrl+1
 	set	bUsbPortReset-8,(hl)
-	ld	a,5
+	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
 	call	_DelayTenTimesAms
 	res	bUsbPortReset-8,(hl)
 	dec	l;usbPortStsCtrl
@@ -2316,8 +2454,17 @@ repeat bUsbPortEn
 	rrca
 end repeat
 	and	a,1
+	jq	z,.disabled
+	ld	de,_DefaultControlEndpointDescriptor
+	ld	iy,(rootHub.child)
+	call	_CreateEndpoint
+	ld	hl,USB_ERROR_NO_MEMORY
+	ret	nz ; FIXME
 	; TODO: Get Control MPS, SET_ADDRESS
-	ld	de,(rootDevice.child)
+	ld	a,1
+	ld	hl,mpUsbPortStsCtrl
+.disabled:
+	ld	de,(rootHub.child)
 assert USB_DEVICE_DISABLED_EVENT + 1 = USB_DEVICE_ENABLED_EVENT
 	add	a,USB_DEVICE_DISABLED_EVENT;USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
@@ -2374,6 +2521,10 @@ _DispatchEvent:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
+_DefaultControlEndpointDescriptor:
+	db 7, ENDPOINT_DESCRIPTOR, 0, 0
+	dw 8
+	db 0
 _DefaultStandardDescriptors:
 	dl .device, .configurations, .langids
 	db 2
