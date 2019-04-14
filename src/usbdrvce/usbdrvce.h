@@ -648,8 +648,8 @@ size_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
-                              uint8_t index, usb_descriptor_t *descriptor,
-                              size_t length, size_t *transferred);
+                              uint8_t index, void *descriptor, size_t length,
+                              size_t *transferred);
 
 /**
  * Changes the descriptor at \p index.
@@ -664,7 +664,7 @@ usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
-                              uint8_t index, const usb_descriptor_t *descriptor,
+                              uint8_t index, const void *descriptor,
                               size_t length);
 
 /**
