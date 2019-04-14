@@ -748,7 +748,7 @@ void gfx_FillTriangle_NoClip(int x0, int y0, int x1, int y1, int x2, int y2);
  * Forces all graphics routines draw location
  *
  * @param location Location routines should draw to
- * @see gfx_draw_location_t
+ * @see gfx_location_t
  */
 void gfx_SetDraw(uint8_t location);
 
@@ -758,7 +758,7 @@ void gfx_SetDraw(uint8_t location);
 typedef enum {
     gfx_screen = 0, /**< Screen */
     gfx_buffer      /**< Buffer */
-} gfx_draw_location_t;
+} gfx_location_t;
 
 /**
  * Makes the subsequent GraphX drawing routines act on the buffer
@@ -776,7 +776,7 @@ gfx_SetDraw(gfx_screen)
  * Gets current draw location
  *
  * @returns Location type enumeration
- * @see gfx_draw_location_t
+ * @see gfx_location_t
  */
 uint8_t gfx_GetDraw(void);
 
@@ -815,9 +815,9 @@ void gfx_Wait(void);
  *
  * No clipping is performed; as it is a copy not a draw
  * @param src drawing location to copy from
- * @see gfx_draw_location_t
+ * @see gfx_location_t
  */
-void gfx_Blit(uint8_t src);
+void gfx_Blit(gfx_location_t src);
 
 /**
  * Copies lines from the input buffer to the opposite buffer
@@ -826,12 +826,12 @@ void gfx_Blit(uint8_t src);
  * @param src drawing location to copy from
  * @param y_loc Y Location to begin copying at
  * @param num_lines Number of lines to copy
- * @see gfx_draw_location_t
+ * @see gfx_location_t
  */
-void gfx_BlitLines(uint8_t src, uint8_t y_loc, uint8_t num_lines);
+void gfx_BlitLines(gfx_location_t src, uint8_t y_loc, uint8_t num_lines);
 
 /**
- * Copies a rectangle from the input buffer to the opposite buffer
+ * Transfers a rectangle from the source graphics buffer to the opposite buffer.
  *
  * No clipping is performed; as it is a copy not a draw
  * @param src drawing location to copy from
@@ -839,9 +839,26 @@ void gfx_BlitLines(uint8_t src, uint8_t y_loc, uint8_t num_lines);
  * @param y Y coordinate
  * @param width Width of rectangle
  * @param height Height of rectangle
- * @see gfx_draw_location_t
+ * @see gfx_location_t
  */
-void gfx_BlitRectangle(uint8_t src, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
+void gfx_BlitRectangle(gfx_location_t src, uint24_t x, uint8_t y, uint24_t width, uint24_t height);
+
+/**
+ * Copies a rectangle between graphics buffers or to the same graphics buffer.
+ *
+ * No clipping is performed; as it is a copy not a draw.
+ * @param src Graphics buffer to copy from.
+ * @param dst Graphics buffer to copy to.
+ * @param src_x X coordinate on src.
+ * @param src_y Y coordinate on src.
+ * @param dst_x X coordinate on dst.
+ * @param dst_y Y coordinate on dst.
+ * @param width Width of rectangle.
+ * @param height Height of rectangle.
+ * @see gfx_location_t
+ */
+void gfx_CopyRectangle(gfx_location_t src, gfx_location_t dst, uint24_t src_x, uint8_t src_y,
+                       uint24_t dst_x, uint8_t dst_y, uint24_t width, uint8_t height);
 
 /**
  * Copies the screen to the buffer
