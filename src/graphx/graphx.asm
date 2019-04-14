@@ -1875,7 +1875,7 @@ gfx_BlitRectangle:
 	ret
 
 ;-------------------------------------------------------------------------------
-gfx_CopyRectangle
+gfx_CopyRectangle:
 ; Copies a rectangle between graphics buffers or to the same graphics buffer.
 ; Arguments:
 ;  arg0 : Graphics buffer to copy from.
