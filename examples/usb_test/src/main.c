@@ -103,7 +103,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
             putNibHex(*(usb_role_t *)event_data >> 4);
-            os_NewLine();
+            _OS(os_NewLine);
             break;
         case USB_DEVICE_DISCONNECTED_EVENT:
         case USB_DEVICE_CONNECTED_EVENT:
@@ -111,11 +111,11 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             putChar(':');
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            os_NewLine();
+            _OS(os_NewLine);
             break;
         case USB_DEVICE_DISABLED_EVENT:
             os_PutStrFull(usb_event_names[event]);
-            os_NewLine();
+            _OS(os_NewLine);
             memset(device_descriptor, 0, sizeof(device_descriptor));
             break;
         case USB_DEVICE_ENABLED_EVENT: {
@@ -127,7 +127,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                 sizeof(device_descriptor),
             };
             os_PutStrFull(usb_event_names[event]);
-            os_NewLine();
+            _OS(os_NewLine);
             return usb_ScheduleDefaultControlTransfer(event_data, &setup, &device_descriptor,
                                                       got_device_descriptor, &device_descriptor);
         }
@@ -135,13 +135,13 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
             putBlockHex(device_descriptor, sizeof(device_descriptor));
-            os_NewLine();
+            _OS(os_NewLine);
             break;
         case USB_DEFAULT_SETUP_EVENT: {
             unsigned char i;
             for (i = 0; i < 8; i++)
                 putByteHex(((unsigned char *)event_data)[i]);
-            os_NewLine();
+            _OS(os_NewLine);
             return USB_IGNORE;
         }
         case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
@@ -161,7 +161,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             break;
         default:
             os_PutStrFull(usb_event_names[event]);
-            os_NewLine();
+            _OS(os_NewLine);
             break;
     }
     return USB_SUCCESS;
