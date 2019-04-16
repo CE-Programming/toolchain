@@ -379,14 +379,64 @@ usb_Init:
 	inc	l;usbDevImr+1-$100
 	ld	(hl),bmUsbIntDevIdle shr 8
 	dec	h
-	ld	l,usbIntEn
-	ld	(hl),bmUsbInt or bmUsbIntErr or bmUsbIntPortChgDetect or bmUsbIntFrameListOver or bmUsbIntHostSysErr or bmUsbIntAsyncAdv
 	ld	l,usbOtgIer
 	ld	(hl),bmUsbIntBSrpComplete or bmUsbIntASrpDetect or bmUsbIntAVbusErr ;or bmUsbIntBSessEnd
 	inc	l;usbOtgIer+1
 	ld	(hl),(bmUsbIntRoleChg or bmUsbIntIdChg or bmUsbIntOvercurr or bmUsbIntBPlugRemoved or bmUsbIntAPlugRemoved) shr 8
 	ld	l,usbImr
 	ld	(hl),usbIntLevelHigh
+
+;	ld	l,usbCmd
+;	ld	(hl),bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn or 2 shl bUsbFrameListSize or bmUsbRunStop
+;	ld	l,usbSts+1
+;.waitForRun:
+;	bit	bUsbHcHalted-8,(hl)
+;	jq	nz,.waitForRun
+
+	; halt host controller (EHCI spec section 2.3)
+	ld	l,usbIntEn
+	ld	(hl),a
+	ld	l,usbCmd
+	ld	(hl),2 shl bUsbFrameListSize
+	ld	l,usbSts+1
+	ld	b,(48000000*2/1000-.haltPreCycles+.haltCycles-1)/.haltCycles
+.haltPreCycles := 16
+.waitForHalt:
+	bit	bUsbHcHalted-8,(hl)	;12
+	jq	nz,.halted		;+8
+.waitForHalt.loop:
+	dec	a			;+(4
+	jq	nz,.waitForHalt.loop	;+13)256-5
+	djnz	.waitForHalt		;+13
+.haltCycles := 12+8+(4+13)*256-5+13
+.timeout:
+	ld	hl,USB_ERROR_TIMEOUT
+	ret
+.halted:
+
+	; reset host controller (EHCI spec section 2.3)
+	ld	l,usbCmd
+	ld	(hl),2 shl bUsbFrameListSize or bmUsbHcReset
+	ld	b,(48000000*250/1000-.resetPreCycles+.resetCycles-1)/.resetCycles
+.resetPreCycles := 8
+.waitForReset:
+	bit	bUsbHcReset,(hl)	;12
+	jq	z,.reset		;+8
+.waitForReset.outer:
+	ld	d,a			;+(4
+.waitForReset.inner:
+	dec	d			;  +(4
+	jq	nz,.waitForReset.inner	;    +13)256-5
+	dec	a			;  +4
+	jq	nz,.waitForReset.outer	;  +13)256-5
+	djnz	.waitForReset		;+13
+.resetCycles := 12+8+(4+(4+13)*256-5+4+13)*256-5+13
+	jq	.timeout
+.reset:
+
+	; start host controller running from halt (EHCI spec section 4.1)
+	ld	l,usbIntEn
+	ld	(hl),bmUsbInt or bmUsbIntErr or bmUsbIntPortChgDetect or bmUsbIntFrameListOver or bmUsbIntHostSysErr or bmUsbIntAsyncAdv
 	ld	hl,periodicList
 	ld	(mpUsbPeriodicListBase),hl
 	ld	hl,dummyHead.next
@@ -398,7 +448,8 @@ usb_Init:
 	ld	l,endpoint.overlay.status
 	ld	(hl),1 shl 6 ; halt
 	ld	hl,mpUsbCmd
-	ld	(hl),bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn or 2 shl bUsbFrameListSize or bmUsbRunStop
+	ld	(hl),2 shl bUsbFrameListSize or bmUsbRunStop
+
 	ld	hl,rootHub.find
 	ld	(hl),IS_HUB or IS_ENABLED
 	ld	l,a;(cHeap-$D10000) and $FF
@@ -491,6 +542,39 @@ usb_WaitForInterrupt:
 
 ;-------------------------------------------------------------------------------
 usb_HandleEvents:
+;	xor	a,a
+;	ld	hl,mpUsbSts+1
+;	bit	bUsbHcHalted-8,(hl)
+;	jq	z,.notHalted
+;	;jq	nz,.halted
+;	;bit	bUsbRunStop,(hl)
+;	;jq	nz,.notHalted
+;;.halted:
+;	; reset host controller (EHCI spec section 2.3)
+;	ld	l,usbCmd
+;	ld	(hl),2 shl bUsbFrameListSize
+;	set	bUsbHcReset,(hl)
+;	ld	b,(48000000*250/1000-.resetPreCycles+.resetCycles-1)/.resetCycles
+;.resetPreCycles := 8
+;.waitForReset:
+;	bit	bUsbHcReset,(hl)	;12
+;	jq	z,.reset		;+8
+;.waitForReset.outer:
+;	ld	c,a			;+(4
+;.waitForReset.inner:
+;	dec	c			;  +(4
+;	jq	nz,.waitForReset.inner	;    +13)256-5
+;	dec	a			;  +4
+;	jq	nz,.waitForReset.outer	;  +13)256-5
+;	djnz	.waitForReset		;+13
+;.resetCycles := 12+8+(4+(4+13)*256-5+4+13)*256-5+13
+;	inc	a ; zf = 0
+;	jq	usb_Init.timeout
+;.reset:
+;
+;	ld	(hl),bmUsbAsyncSchedEn or 2 shl bUsbFrameListSize or bmUsbRunStop; or bmUsbPeriodicSchedEn
+;.notHalted:
+	or	a,a
 	sbc	hl,hl
 	ld	a,(mpIntStat+1)
 	and	a,intUsb shr 8
@@ -543,6 +627,7 @@ usb_GetDeviceData:
 usb_FindDevice:
 	pop	de,hl,iy,bc
 	push	bc,hl,hl,de
+.enter:
 	ld	de,-1
 	add	iy,de
 	inc	iy
@@ -1251,6 +1336,8 @@ end repeat
 	sub	a,transfer.padding-transfer.status
 	ld	l,a
 	ld	(hl),1 shl 7
+	ld	hl,mpUsbCmd
+	set	bUsbAsyncSchedEn,(hl)
 	ret
 .pack:
 	ld	a,d
@@ -1322,15 +1409,18 @@ end iterate
 _Init:
 	ld	de,usbInited
 	ld	(de),a
-	ld	hl,mpUsbCmd
-	ld	(hl),2 shl bUsbFrameListSize
-	call	_Delay10ms
-	ld	l,usbSts+1
-	bit	bUsbHcHalted-8,(hl)
-	jq	z,.notHalted
-	ld	l,usbCmd
-	ld	(hl),2 shl bUsbFrameListSize or bmUsbHcReset
-.notHalted: ; rip memory?
+;	ld	hl,mpUsbCmd
+;	ld	(hl),2 shl bUsbFrameListSize
+;	call	_Delay10ms
+;	ld	l,usbSts+1
+;	bit	bUsbHcHalted-8,(hl)
+;	jq	z,.notHalted
+;	ld	l,usbCmd
+;	ld	(hl),2 shl bUsbFrameListSize or bmUsbHcReset
+;.waitForReset:
+;	bit	bUsbHcReset,(hl)
+;	jq	nz,.waitForReset
+;.notHalted: ; rip memory?
 	ld	hl,usbInited
 	dec	de
 	ld	bc,usbInited-usbArea
@@ -1344,6 +1434,7 @@ _Init:
 ;  hl = usbOtgCsr ^ (? & $FF)
 ; Output:
 ;  f = ?
+;  bc = ?
 ;  hl = usbOtgCsr
 _PowerVbusForRole:
 	ld	l,usbOtgCsr
@@ -1353,28 +1444,60 @@ _PowerVbusForRole:
 	call	$21B70
 	res	bUsbABusDrop,(hl)
 	set	bUsbABusReq,(hl)
+	ld	l,usbSts+1
+	bit	bUsbHcHalted-8,(hl)
+	jq	z,.notHalted
+	ld	l,usbCmd
+	set	bUsbRunStop,(hl)
+.notHalted:
 	or	a,a;ROLE_B
 	ret	z
+	ld	l,usbOtgCsr
 	res	bUsbBHnp,(hl)
 	res	bUsbBVbusDisc,(hl)
 	ret
 .unpower:
 	res	bUsbASrpEn,(hl)
-;	ld	l,usbCmd
-;	res	bUsbAsyncSchedEn,(hl)
-;	res	bUsbPeriodicSchedEn,(hl)
-;	res	bUsbRunStop,(hl)
-;	ld	l,usbSts
-;.waitForAsync:
-;	bit	bUsbAsyncSchedSts,(hl)
-;	jq	nz,.waitForAsync
-;.waitForPeriodic:
-;	bit	bUsbPeriodicSchedSts,(hl)
-;	jq	nz,.waitForPeriodic
-;.wait:
-;	bit	bUsbHcHalted,(hl)
-;	jq	z,.wait
-;	ld	l,usbOtgCsr
+
+	ld	bc,0
+
+	ld	l,usbCmd
+	res	bUsbAsyncSchedEn,(hl)
+	ld	l,usbSts+1
+.waitForAsync:
+	bit	bUsbAsyncSchedSts-8,(hl)
+	jq	z,.async
+.waitForAsync.loop:
+	dec	c
+	jq	nz,.waitForAsync.loop
+	djnz	.waitForAsync
+.async:
+
+	ld	l,usbCmd
+	res	bUsbPeriodicSchedEn,(hl)
+	ld	l,usbSts+1
+.waitForPeriodic:
+	bit	bUsbPeriodicSchedSts-8,(hl)
+	jq	z,.periodic
+.waitForPeriodic.loop:
+	dec	c
+	jq	nz,.waitForPeriodic.loop
+	djnz	.waitForPeriodic
+.periodic:
+
+	ld	l,usbCmd
+	res	bUsbRunStop,(hl)
+	ld	l,usbSts+1
+.waitForHalt:
+	bit	bUsbHcHalted-8,(hl)
+	jq	nz,.halted
+.waitForHalt.loop:
+	dec	c
+	jq	nz,.waitForHalt.loop
+	djnz	.waitForHalt
+.halted:
+
+	ld	l,usbOtgCsr
 	set	bUsbABusDrop,(hl)
 	res	bUsbABusReq,(hl)
 	jq	$21C68
@@ -2340,6 +2463,16 @@ _HandleIdChgInt:
 	ret	z
 	ld	(de),a
 	call	_PowerVbusForRole
+
+;assert ROLE_DEVICE = usbCmd
+;	ld	l,usbCmd
+;	and	a,l;ROLE_DEVICE
+;	cp	a,l;ROLE_DEVICE
+;	ld	a,(hl)
+;	rra
+;	rlca
+;	ld	(hl),a
+
 ;assert ROLE_DEVICE = usbCmd & ROLE_DEVICE = bmUsbHcHalted shr 8
 ;	ld	l,usbCmd
 ;	and	a,l;bmUsbHcHalted shr 8
@@ -2357,8 +2490,9 @@ _HandleIdChgInt:
 ;	and	a,bmUsbHcHalted shr 8
 ;	sub	a,c
 ;	jq	nz,.wait
+
 assert ~USB_ROLE_CHANGED_EVENT
-	xor	a,a
+	xor	a,a;USB_ROLE_CHANGED_EVENT
 	ld	l,usbOtgIsr+1
 	jq	_DispatchEvent
 
@@ -2378,14 +2512,28 @@ _HandleAPlugRemovedInt:
 	jq	_DispatchEvent
 
 _HandleInt:
-	ld	(hl),bmUsbInt
-	ld	a,USB_INTERRUPT
-	jq	_DispatchEvent
-
 _HandleErrInt:
-	ld	(hl),bmUsbIntErr
-	ld	a,USB_HOST_ERROR_INTERRUPT
-	jq	_DispatchEvent
+	ld	(hl),bmUsbIntErr or bmUsbInt
+	ld	hl,(dummyHead.next)
+	jq	.enter
+.loop:
+	ld	l,endpoint
+	push	hl
+	pop	de
+	ld	a,USB_INTERRUPT
+	call	_DispatchEvent
+	ret	nz
+assert endpoint.next+1=endpoint-1
+	dec	l;endpoint.next+1
+	ld	h,(hl)
+.enter:
+	ld	l,endpoint.info
+	ld	a,(hl)
+	add	a,a
+	jq	nc,.loop
+	ld	hl,mpUsbSts
+;	cp	a,a
+	ret
 
 _HandlePortChgDetectInt:
 	ld	(hl),bmUsbIntPortChgDetect

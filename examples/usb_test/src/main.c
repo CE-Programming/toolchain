@@ -134,6 +134,8 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         case USB_INTERRUPT:
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
+            putIntHex((unsigned)event_data);
+            putChar(':');
             putBlockHex(device_descriptor, sizeof(device_descriptor));
             _OS(os_NewLine);
             break;
