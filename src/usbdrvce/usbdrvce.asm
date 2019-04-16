@@ -2500,7 +2500,7 @@ _HandleHostSysErrInt:
 	jq	_DispatchEvent
 
 _HandleAsyncAdvInt:
-	ld	(hl),bmUsbIntHostSysErr
+	ld	(hl),bmUsbIntAsyncAdv
 	ld	a,USB_HOST_ASYNC_ADVANCE_INTERRUPT
 	jq	_DispatchEvent
 
