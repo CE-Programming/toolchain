@@ -419,7 +419,8 @@ usb_Init:
 	call	_HandleRoleChgInt
 	ret	nz
 	; TODO: disable disabled things
-	ex	de,hl
+	or	a,a
+	sbc	hl,hl
 	ret
 .initFreeList:
 	call	_Free64Align256
@@ -1281,8 +1282,25 @@ end repeat
 	ld	l,a
 	ld	(hl),1 shl 7
 	ld	hl,mpUsbCmd
+	bit	bUsbAsyncSchedEn,(hl)
+	ret	nz
+	ld	l,usbSts+1
+	ld	b,(48000000*20/1000-.sync.cycles.pre+.sync.cycles-1)/.sync.cycles
+.sync.cycles.pre := 16+12+5+8+8
+.sync.wait:
+	bit	bUsbAsyncSchedSts-8,(hl)	;12
+	jq	nz,.sync			;+8
+	ld	l,usbCmd
 	set	bUsbAsyncSchedEn,(hl)
 	ret
+.sync:
+	xor	a,a				;+4
+.sync.loop:
+	dec	a				;+(4
+	jq	nz,.sync.loop			;  +13)*256-5
+	djnz	.sync.wait			;+13
+	jq	_Error.TIMEOUT
+.sync.cycles := 12+8+4+(4+13)*256-5+13
 .pack:
 	ld	a,d
 	xor	a,c
@@ -1374,12 +1392,12 @@ _Init:
 
 ;-------------------------------------------------------------------------------
 ; Input:
-;  hl = mpUsbRange ^ (? & $FF)
+;  hl = mpUsbRange xor (? and $FF)
 ; Output:
 ;  a = 0
 ;  b = ?
 ;  d = ?
-;  hl = dummyHead.next or error code
+;  hl = dummyHead.next | error code
 _DisableSchedulesAndResetHostController:
 	; stop schedules
 	ld	l,usbCmd
@@ -1396,31 +1414,19 @@ end repeat
 .sync.wait:
 	ld	a,(hl)							;8
 	and	a,(bmUsbAsyncSchedSts or bmUsbPeriodicSchedSts) shr 8	;+8
-	cp	a,d							;+4
-	jq	z,.sync							;+8
-	xor	a,a							;+4
-.sync.loop:
-	dec	a							;+(4
-	jq	nz,.sync.loop						;  +13)*256-5
-	djnz	.sync.wait						;+13
-	jq	_ResetHostControllerFromUnknown.timeout
-.sync.cycles := 8+8+4+8+4+(4+13)*256-5+13
-.sync:
-	ld	l,usbCmd
-	ld	a,(hl)
-	and	a,not (bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn)
-	ld	(hl),a
-	xor	a,a
+	sub	a,d							;+4
+	jq	nz,.sync						;+13
+	jq	_ResetHostControllerFromUnknown
 
 ; Input:
 ;  a = 0
-;  hl = mpUsbRange ^ (? & $FF)
+;  hl = mpUsbRange xor (? and $FF)
 ; Output:
 ;  zf = success
 ;  a = 0
 ;  b = ?
 ;  d = ?
-;  hl = dummyHead.next or error code
+;  hl = dummyHead.next | error code
 _ResetHostControllerFromUnknown:
 	; halt host controller (EHCI spec section 2.3)
 	ld	l,usbIntEn
@@ -1432,18 +1438,7 @@ _ResetHostControllerFromUnknown:
 .halt.cycles.pre := 16
 .halt.wait:
 	bit	bUsbHcHalted-8,(hl)	;12
-	jq	nz,.halt		;+8
-.halt.loop:
-	dec	a			;+(4
-	jq	nz,.halt.loop		;  +13)256-5
-	djnz	.halt.wait		;+13
-.halt.cycles := 12+8+(4+13)*256-5+13
-.timeout:
-assert USB_ERROR_TIMEOUT
-	ld	hl,USB_ERROR_TIMEOUT-1
-	inc	l
-	ret
-.halt:
+	jq	z,.halt			;+13
 
 	; reset host controller (EHCI spec section 2.3)
 	ld	l,usbCmd
@@ -1452,18 +1447,7 @@ assert USB_ERROR_TIMEOUT
 .reset.cycles.pre := 8
 .reset.wait:
 	bit	bUsbHcReset,(hl)	;12
-	jq	z,.reset		;+8
-.reset.outer:
-	ld	d,a			;+(4
-.reset.inner:
-	dec	d			;  +(4
-	jq	nz,.reset.inner		;    +13)256-5
-	dec	a			;  +4
-	jq	nz,.reset.outer		;  +13)256-5
-	djnz	.reset.wait		;+13
-.reset.cycles := 12+8+(4+(4+13)*256-5+4+13)*256-5+13
-	jq	.timeout
-.reset:
+	jq	nz,.reset		;+13
 
 	; initialize host controller from halt (EHCI spec section 4.1)
 	ld	l,usbIntEn
@@ -1474,15 +1458,48 @@ assert USB_ERROR_TIMEOUT
 	ld	(mpUsbAsyncListAddr),hl
 	ret ; defer actual start until plug
 
+namespace _DisableSchedulesAndResetHostController
+sync:
+	xor	a,a							;+4
+sync.loop:
+	dec	a							;+(4
+	jq	nz,sync.loop		;  +13)*256-5
+	djnz	sync.wait		;+13
+	jq	_ResetHostControllerFromUnknown.timeout
+sync.cycles := 8+8+4+13+4+(4+13)*256-5+13
+end namespace
+
+.halt:
+	dec	a			;+(4
+	jq	nz,.halt		;  +13)256-5
+	djnz	.halt.wait		;+13
+.halt.cycles := 12+13+(4+13)*256-5+13
+.timeout:
+assert USB_ERROR_TIMEOUT
+	ld	hl,USB_ERROR_TIMEOUT-1
+	inc	l
+	ret
+
+.reset:
+	ld	d,a			;+(4
+.reset.loop:
+	dec	d			;  +(4
+	jq	nz,.reset.loop		;    +13)256-5
+	dec	a			;  +4
+	jq	nz,.reset		;  +13)256-5
+	djnz	.reset.wait		;+13
+.reset.cycles := 12+13+(4+(4+13)*256-5+4+13)*256-5+13
+	jq	.timeout
+
 ;-------------------------------------------------------------------------------
 ; Input:
 ;  a = role
-;  hl = mpUsbRange ^ (? & $FF)
+;  hl = mpUsbRange xor (? and $FF)
 ; Output:
 ;  zf = success
+;  a = ?
 ;  bc = ?
-;  de = ?
-;  hl = usbOtgCsr or error
+;  hl = mpUsbRange xor (? and $FF) | error code
 _PowerVbusForRole:
 	ld	l,usbOtgCsr
 	bit	bsf ROLE_DEVICE,a
@@ -2473,34 +2490,6 @@ _HandleIdChgInt:
 	ret	z
 	ld	(de),a
 	call	_PowerVbusForRole
-
-;assert ROLE_DEVICE = usbCmd
-;	ld	l,usbCmd
-;	and	a,l;ROLE_DEVICE
-;	cp	a,l;ROLE_DEVICE
-;	ld	a,(hl)
-;	rra
-;	rlca
-;	ld	(hl),a
-
-;assert ROLE_DEVICE = usbCmd & ROLE_DEVICE = bmUsbHcHalted shr 8
-;	ld	l,usbCmd
-;	and	a,l;bmUsbHcHalted shr 8
-;	ld	c,a
-;	cp	a,l;ROLE_DEVICE
-;	sbc	a,a
-;	ld	b,(hl)
-;	xor	a,b
-;	and	a,bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn or bmUsbRunStop
-;	xor	a,b
-;	ld	(hl),a
-;	ld	l,usbSts+1
-;.wait:
-;	ld	a,(hl)
-;	and	a,bmUsbHcHalted shr 8
-;	sub	a,c
-;	jq	nz,.wait
-
 assert ~USB_ROLE_CHANGED_EVENT
 	xor	a,a;USB_ROLE_CHANGED_EVENT
 	ld	l,usbOtgIsr+1

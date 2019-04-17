@@ -127,6 +127,9 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                 sizeof(device_descriptor),
             };
             os_PutStrFull(usb_event_names[event]);
+            putChar(':');
+            putIntHex((unsigned)event_data);
+            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             _OS(os_NewLine);
             return usb_ScheduleDefaultControlTransfer(event_data, &setup, &device_descriptor,
                                                       got_device_descriptor, &device_descriptor);
@@ -172,14 +175,14 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 void main(void) {
     usb_error_t error;
     os_SetCursorPos(1, 0);
-    if ((error = usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS)) != USB_SUCCESS)
-        return;
-    while ((error = usb_WaitForInterrupt()) == USB_SUCCESS && !os_GetCSC()) {
-        unsigned row, col;
-        os_GetCursorPos(&row, &col);
-        os_SetCursorPos(0, 0);
-        putIntHex(usb_GetFrameNumber());
-        os_SetCursorPos(row, col);
+    if ((error = usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS)) == USB_SUCCESS) {
+        while ((error = usb_WaitForInterrupt()) == USB_SUCCESS && !os_GetCSC()) {
+            unsigned row, col;
+            os_GetCursorPos(&row, &col);
+            os_SetCursorPos(0, 0);
+            putIntHex(usb_GetFrameNumber());
+            os_SetCursorPos(row, col);
+        }
     }
     usb_Cleanup();
     putIntHex(error);
