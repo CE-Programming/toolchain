@@ -385,71 +385,14 @@ usb_Init:
 	ld	(hl),(bmUsbIntRoleChg or bmUsbIntIdChg or bmUsbIntOvercurr or bmUsbIntBPlugRemoved or bmUsbIntAPlugRemoved) shr 8
 	ld	l,usbImr
 	ld	(hl),usbIntLevelHigh
-
-;	ld	l,usbCmd
-;	ld	(hl),bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn or 2 shl bUsbFrameListSize or bmUsbRunStop
-;	ld	l,usbSts+1
-;.waitForRun:
-;	bit	bUsbHcHalted-8,(hl)
-;	jq	nz,.waitForRun
-
-	; halt host controller (EHCI spec section 2.3)
-	ld	l,usbIntEn
-	ld	(hl),a
-	ld	l,usbCmd
-	ld	(hl),2 shl bUsbFrameListSize
-	ld	l,usbSts+1
-	ld	b,(48000000*2/1000-.haltPreCycles+.haltCycles-1)/.haltCycles
-.haltPreCycles := 16
-.waitForHalt:
-	bit	bUsbHcHalted-8,(hl)	;12
-	jq	nz,.halted		;+8
-.waitForHalt.loop:
-	dec	a			;+(4
-	jq	nz,.waitForHalt.loop	;+13)256-5
-	djnz	.waitForHalt		;+13
-.haltCycles := 12+8+(4+13)*256-5+13
-.timeout:
-	ld	hl,USB_ERROR_TIMEOUT
-	ret
-.halted:
-
-	; reset host controller (EHCI spec section 2.3)
-	ld	l,usbCmd
-	ld	(hl),2 shl bUsbFrameListSize or bmUsbHcReset
-	ld	b,(48000000*250/1000-.resetPreCycles+.resetCycles-1)/.resetCycles
-.resetPreCycles := 8
-.waitForReset:
-	bit	bUsbHcReset,(hl)	;12
-	jq	z,.reset		;+8
-.waitForReset.outer:
-	ld	d,a			;+(4
-.waitForReset.inner:
-	dec	d			;  +(4
-	jq	nz,.waitForReset.inner	;    +13)256-5
-	dec	a			;  +4
-	jq	nz,.waitForReset.outer	;  +13)256-5
-	djnz	.waitForReset		;+13
-.resetCycles := 12+8+(4+(4+13)*256-5+4+13)*256-5+13
-	jq	.timeout
-.reset:
-
-	; start host controller running from halt (EHCI spec section 4.1)
-	ld	l,usbIntEn
-	ld	(hl),bmUsbInt or bmUsbIntErr or bmUsbIntPortChgDetect or bmUsbIntFrameListOver or bmUsbIntHostSysErr or bmUsbIntAsyncAdv
-	ld	hl,periodicList
-	ld	(mpUsbPeriodicListBase),hl
-	ld	hl,dummyHead.next
-	ld	(mpUsbAsyncListAddr),hl
+	call	_ResetHostControllerFromUnknown
+	ret	nz
 	ld	(hl),hl
 	set	1,(hl)
 	ld	l,endpoint.info
 	ld	(hl),1 shl 7 ; head
 	ld	l,endpoint.overlay.status
 	ld	(hl),1 shl 6 ; halt
-	ld	hl,mpUsbCmd
-	ld	(hl),2 shl bUsbFrameListSize or bmUsbRunStop
-
 	ld	hl,rootHub.find
 	ld	(hl),IS_HUB or IS_ENABLED
 	ld	l,a;(cHeap-$D10000) and $FF
@@ -1430,12 +1373,115 @@ _Init:
 
 ;-------------------------------------------------------------------------------
 ; Input:
-;  a = role
-;  hl = usbOtgCsr ^ (? & $FF)
+;  hl = mpUsbRange ^ (? & $FF)
 ; Output:
-;  f = ?
+;  a = 0
+;  b = ?
+;  d = ?
+;  hl = dummyHead.next or error code
+_DisableSchedulesAndResetHostController:
+	; stop schedules
+	ld	l,usbCmd
+	ld	a,(hl)
+	and	a,bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn
+assert bUsbAsyncSchedSts-8-bUsbAsyncSchedEn = bUsbPeriodicSchedSts-8-bUsbPeriodicSchedEn
+repeat bUsbAsyncSchedSts-8-bUsbAsyncSchedEn
+	rlca
+end repeat
+	ld	d,a
+	ld	l,usbSts+1
+	ld	b,(48000000*20/1000-.sync.cycles.pre+.sync.cycles-1)/.sync.cycles
+.sync.cycles.pre := 8+8+8+4*2+4+8+8
+.sync.wait:
+	ld	a,(hl)							;8
+	and	a,(bmUsbAsyncSchedSts or bmUsbPeriodicSchedSts) shr 8	;+8
+	cp	a,d							;+4
+	jq	z,.sync							;+8
+	xor	a,a							;+4
+.sync.loop:
+	dec	a							;+(4
+	jq	nz,.sync.loop						;  +13)*256-5
+	djnz	.sync.wait						;+13
+	jq	_ResetHostControllerFromUnknown.timeout
+.sync.cycles := 8+8+4+8+4+(4+13)*256-5+13
+.sync:
+	ld	l,usbCmd
+	ld	a,(hl)
+	and	a,not (bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn)
+	ld	(hl),a
+	xor	a,a
+
+; Input:
+;  a = 0
+;  hl = mpUsbRange ^ (? & $FF)
+; Output:
+;  zf = success
+;  a = 0
+;  b = ?
+;  d = ?
+;  hl = dummyHead.next or error code
+_ResetHostControllerFromUnknown:
+	; halt host controller (EHCI spec section 2.3)
+	ld	l,usbIntEn
+	ld	(hl),a
+	ld	l,usbCmd
+	ld	(hl),2 shl bUsbFrameListSize
+	ld	l,usbSts+1
+	ld	b,(48000000*2/1000-.halt.cycles.pre+.halt.cycles-1)/.halt.cycles
+.halt.cycles.pre := 16
+.halt.wait:
+	bit	bUsbHcHalted-8,(hl)	;12
+	jq	nz,.halt		;+8
+.halt.loop:
+	dec	a			;+(4
+	jq	nz,.halt.loop		;  +13)256-5
+	djnz	.halt.wait		;+13
+.halt.cycles := 12+8+(4+13)*256-5+13
+.timeout:
+assert USB_ERROR_TIMEOUT
+	ld	hl,USB_ERROR_TIMEOUT-1
+	inc	l
+	ret
+.halt:
+
+	; reset host controller (EHCI spec section 2.3)
+	ld	l,usbCmd
+	ld	(hl),2 shl bUsbFrameListSize or bmUsbHcReset
+	ld	b,(48000000*250/1000-.reset.cycles.pre+.reset.cycles-1)/.reset.cycles
+.reset.cycles.pre := 8
+.reset.wait:
+	bit	bUsbHcReset,(hl)	;12
+	jq	z,.reset		;+8
+.reset.outer:
+	ld	d,a			;+(4
+.reset.inner:
+	dec	d			;  +(4
+	jq	nz,.reset.inner		;    +13)256-5
+	dec	a			;  +4
+	jq	nz,.reset.outer		;  +13)256-5
+	djnz	.reset.wait		;+13
+.reset.cycles := 12+8+(4+(4+13)*256-5+4+13)*256-5+13
+	jq	.timeout
+.reset:
+
+	; initialize host controller from halt (EHCI spec section 4.1)
+	ld	l,usbIntEn
+	ld	(hl),bmUsbInt or bmUsbIntErr or bmUsbIntPortChgDetect or bmUsbIntFrameListOver or bmUsbIntHostSysErr or bmUsbIntAsyncAdv
+	ld	hl,periodicList
+	ld	(mpUsbPeriodicListBase),hl
+	ld	hl,dummyHead.next
+	ld	(mpUsbAsyncListAddr),hl
+	ret ; defer actual start until plug
+
+;-------------------------------------------------------------------------------
+; Input:
+;  a = role
+;  hl = mpUsbRange ^ (? & $FF)
+; Output:
+;  zf = success
 ;  bc = ?
-;  hl = usbOtgCsr
+;  de = ?
+;  hl = usbOtgCsr or error
 _PowerVbusForRole:
 	ld	l,usbOtgCsr
 	bit	bsf ROLE_DEVICE,a
@@ -1458,46 +1504,9 @@ _PowerVbusForRole:
 	ret
 .unpower:
 	res	bUsbASrpEn,(hl)
-
-	ld	bc,0
-
-	ld	l,usbCmd
-	res	bUsbAsyncSchedEn,(hl)
-	ld	l,usbSts+1
-.waitForAsync:
-	bit	bUsbAsyncSchedSts-8,(hl)
-	jq	z,.async
-.waitForAsync.loop:
-	dec	c
-	jq	nz,.waitForAsync.loop
-	djnz	.waitForAsync
-.async:
-
-	ld	l,usbCmd
-	res	bUsbPeriodicSchedEn,(hl)
-	ld	l,usbSts+1
-.waitForPeriodic:
-	bit	bUsbPeriodicSchedSts-8,(hl)
-	jq	z,.periodic
-.waitForPeriodic.loop:
-	dec	c
-	jq	nz,.waitForPeriodic.loop
-	djnz	.waitForPeriodic
-.periodic:
-
-	ld	l,usbCmd
-	res	bUsbRunStop,(hl)
-	ld	l,usbSts+1
-.waitForHalt:
-	bit	bUsbHcHalted-8,(hl)
-	jq	nz,.halted
-.waitForHalt.loop:
-	dec	c
-	jq	nz,.waitForHalt.loop
-	djnz	.waitForHalt
-.halted:
-
-	ld	l,usbOtgCsr
+	call	_DisableSchedulesAndResetHostController
+	ret	nz
+	ld	hl,mpUsbOtgCsr
 	set	bUsbABusDrop,(hl)
 	res	bUsbABusReq,(hl)
 	jq	$21C68
