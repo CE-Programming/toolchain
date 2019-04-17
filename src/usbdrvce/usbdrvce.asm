@@ -436,7 +436,8 @@ usb_Init:
 
 ;-------------------------------------------------------------------------------
 usb_Cleanup:
-	xor	a,a
+	call	_DisableSchedulesAndResetHostController
+;	xor	a,a
 	ld	hl,mpUsbGimr
 	ld	(hl),a
 	ld	l,usbDevImr+1-$100
@@ -1504,9 +1505,9 @@ _PowerVbusForRole:
 	ret
 .unpower:
 	res	bUsbASrpEn,(hl)
+	push	hl,de
 	call	_DisableSchedulesAndResetHostController
-	ret	nz
-	ld	hl,mpUsbOtgCsr
+	pop	de,hl
 	set	bUsbABusDrop,(hl)
 	res	bUsbABusReq,(hl)
 	jq	$21C68
@@ -1615,12 +1616,12 @@ _CreateDevice:
 
 ; Input:
 ;  hl = device
-; Output:
-;  de = ?
 _DeleteDevice:
+	push	de
 	ld	de,(hl+device.endpoints)
 	call	_Free32Align32
 	ex	de,hl
+	pop	de
 	jq	_Free32Align32
 
 ; Input:
@@ -2602,11 +2603,12 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	cp	a,a
 	ret
 .delete:
+	ld	a,1
+	ld	(rootHub.child),a
 	ex	de,hl
-	ld	a,l
-	rrca
-	call	nc,_DeleteDevice
-	ld	hl,mpUsbPortStsCtrl
+	and	a,l
+	call	z,_DeleteDevice
+	ex	de,hl
 	cp	a,a
 	ret
 
