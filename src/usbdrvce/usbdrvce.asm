@@ -113,8 +113,8 @@ struc endpoint			; endpoint structure
 	.internalFlags	rb 1	; internal endpoint flags
 	.first		rl 1	; pointer to first scheduled transfer
 	.last		rl 1	; pointer to last dummy transfer
-	.device		rl 1	; pointer to device
 	.data		rl 1	; user data
+	.device		rl 1	; pointer to device
 	assert $-. <= 64
 end struc
 struc device			; device structure
@@ -168,14 +168,16 @@ end virtual
 virtual at usbArea
 				rb (-$) and 7
 	?setupPacket		setup
-				rb (-$) and 31
+				rb (-$) and $1F
 	?rootHub		device
 				rb (-$) and $FFF
 ; FIXME: 0xD141B2 is used by GetCSC :(
 	?periodicList		dbx $400: ?
 	?usbMem			dbx usbInited and not $FF - $: ?
-				rb (-$) and 31
+				rb (-$) and $FF
 	?dummyHead		endpoint
+				rb (-$) and $1F
+	?usedAddresses		dbx 128/8: ?
 	?eventCallback		rl 1
 	?eventCallback.data	rl 1
 	?standardDescriptors	rl 1
@@ -183,8 +185,6 @@ virtual at usbArea
 	?currentRole		rb 1
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
-	?allocCount32Align32	rl 1
-	?allocCount64Align256	rl 1
 	assert $ <= usbInited
 end virtual
 virtual at (ramCodeTop+$FF) and not $FF
@@ -369,9 +369,15 @@ usb_Init:
 	sbc	hl,hl
 	ld	(rootHub.addr),a
 	ld	(rootHub.data),hl
+	ld	de,usedAddresses+1
+	ld	b,sizeof usedAddresses-1
+.freeAddresses:
+	ld	(de),a
+	inc	de
+	djnz	.freeAddresses
 	ld	l,3
 	add	hl,sp
-	ld	de,eventCallback
+;	ld	de,eventCallback;eventCallback.data,standardDescriptors
 	ld	c,9
 	ldir
 	ld	e,(hl)
@@ -1146,7 +1152,7 @@ _QueueTransfer:
 .next:
 	push	de
 	ld	a,d
-	and	a,$f
+	and	a,$F
 	ld	d,a
 	ld	hl,$5000
 	sbc.s	hl,de
@@ -1162,7 +1168,7 @@ _QueueTransfer:
 	ld	hl,(yendpoint.maxPktLen)
 	add	hl,hl
 	ld	a,h
-	and	a,$f
+	and	a,$F
 	ld	h,a
 	or	a,l
 	jq	z,_Error.INVALID_PARAM
@@ -1193,7 +1199,7 @@ _QueueTransfer:
 	jq	nz,.modPo2Byte
 	ld	a,(yendpoint.maxPktLen+1)
 	adc	a,a
-	and	a,$f
+	and	a,$F
 	dec	a
 	and	a,h
 	ld	d,a
@@ -1329,7 +1335,7 @@ end repeat
 .pack:
 	ld	a,d
 	xor	a,c
-	and	a,$f
+	and	a,$F
 	xor	a,c
 	ld	(hl),bc
 	ld	(hl),a
@@ -1338,12 +1344,12 @@ end repeat
 .packHalf:
 	inc	l
 	ld	a,e
-	or	a,$f
+	or	a,$F
 	ld	e,a
 	inc	de
 	ld	a,c
 	xor	a,e
-	and	a,$f
+	and	a,$F
 	xor	a,e
 	ld	(hl),a
 	inc	l
@@ -1559,7 +1565,28 @@ _DefaultHandler:
 	ret
 
 ;-------------------------------------------------------------------------------
+; Input:
+;  (sp+12) = block
+; Output:
+;  hl = ?
+_FreeTransferData:
+	ld	hl,3+12
+	add	hl,sp
+	ld	hl,(hl)
+	jq	_Free32Align32
+
 iterate <size,align>, 32,32, 64,256
+
+; Frees an <align> byte aligned <size> byte block.
+; Input:
+;  hl = allocated memory to be freed.
+_Free#size#Align#align:
+	push	de
+	ld	de,(freeList#size#Align#align)
+	ld	(hl),de
+	ld	(freeList#size#Align#align),hl
+	pop	de
+	ret
 
 ; Allocates an <align> byte aligned <size> byte block.
 ; Output:
@@ -1573,17 +1600,6 @@ _Alloc#size#Align#align:
 	ld	hl,(hl)
 	ld	(freeList#size#Align#align),hl
 	pop	hl
-	ret
-
-; Frees an <align> byte aligned <size> byte block.
-; Input:
-;  hl = allocated memory to be freed.
-_Free#size#Align#align:
-	push	de
-	ld	de,(freeList#size#Align#align)
-	ld	(hl),de
-	ld	(freeList#size#Align#align),hl
-	pop	de
 	ret
 
 end iterate
@@ -1620,7 +1636,7 @@ _CreateDevice:
 	push	hl
 	pop	ydevice
 	call	_Alloc32Align32
-	jq	nz,.free
+	jq	nz,.nomem
 	ld	(ydevice.endpoints),hl
 	ex	de,hl
 	ld	(ydevice.hub),hl
@@ -1652,7 +1668,7 @@ _CreateDevice:
 	ld	(ydevice.sibling),l
 	cp	a,a
 	ret
-.free:
+.nomem:
 	lea	hl,ydevice
 	jq	_Free32Align32
 
@@ -1671,6 +1687,7 @@ _DeleteDevice:
 ;  iy = device
 ; Output:
 ;  zf = enough memory
+;  iy = endpoint | ?
 _CreateEndpoint:
 	call	_Alloc64Align256
 	ret	nz
@@ -1730,11 +1747,13 @@ _CreateEndpoint:
 	ld	(hl),c
 	inc	l;endpoint.hubInfo+1
 	ld	(hl),b
-assert (endpoint.hubInfo+1) and 1
+	ld	l,endpoint.device
+	ld	(hl),ydevice
 	pop	yendpoint
+assert endpoint.device and 1
 	ld	(yendpoint.overlay.altNext),l
 	call	_CreateDummyTransfer.enter
-	jq	nz,.free
+	jq	nz,.nomem
 	ld	(yendpoint.overlay.next),hl
 	ld	(yendpoint.first),hl
 	ld	(yendpoint.last),hl
@@ -1772,9 +1791,9 @@ assert (endpoint.hubInfo+1) and 1
 	ld	(yendpoint.dir),a
 	ld	(dummyHead.next),iy
 	ret
-.free:
-	lea	hl,yendpoint.next
-	jq	_Free32Align32
+.nomem:
+	lea	hl,yendpoint.base
+	jq	_Free64Align256
 
 ;-------------------------------------------------------------------------------
 _FunData:
@@ -2236,6 +2255,107 @@ _HandleCxSetupInt:
 	ld	(hl),bmUsbIntCxSetup
 	ret
 
+_HandleDeviceDescriptor:
+	ld	hl,3
+	add	hl,sp
+	ld	yendpoint,(hl)
+repeat long
+	inc	hl
+end repeat
+	ld	b,(hl)
+repeat long
+	inc	hl
+end repeat
+	ld	a,(hl)
+	xor	a,8
+	or	a,b
+	jq	nz,.free
+repeat long
+	inc	hl
+end repeat
+	ld	de,(hl)
+	ld	(de),a
+	ld	hl,usedAddresses
+	ld	b,sizeof usedAddresses
+	scf
+.search:
+	adc	a,(hl)
+	jq	c,.next
+	dec	a
+	ld	b,a
+	ld	a,l
+repeat bsf 8
+	add	a,a
+end repeat
+	dec	a
+	ld	c,a
+	ld	a,1 shl 7
+.shift:
+	inc	c
+	rlca
+	tst	a,b
+	jq	nz,.shift
+	or	a,b
+	ld	(hl),a
+	ex	de,hl
+	ld	a,c
+	ld	bc,_HandleDeviceEnable
+	push	hl,bc,bc,hl,yendpoint
+	inc	l
+	ld	(hl),SET_ADDRESS
+	inc	l
+	ld	(hl),a
+	xor	a,a
+repeat 4
+	inc	l
+	ld	(hl),a
+end repeat
+	inc	l
+	ld	c,(hl)
+	ld	(yendpoint.maxPktLen),c
+	ld	(hl),a
+	call	usb_ScheduleControlTransfer
+	ld	a,l
+	pop	bc,bc,bc,bc,bc
+	or	a,a
+	ret	z
+virtual
+	ld	hl,0
+	load .ld_hl: byte from $$
+end virtual
+	db .ld_hl
+.next:
+	inc	l
+	djnz	.search
+.free:
+	call	_FreeTransferData
+.disableDevice:
+	call	_HandlePortPortEnInt.disableDevice
+	sbc	hl,hl
+	ret
+
+_HandleDeviceEnable:
+	ld	hl,12
+	add	hl,sp
+	ld	hl,(hl)
+	set	bsf 2,hl
+	ld	c,(hl)
+	call	_FreeTransferData
+	ld	hl,3
+	add	hl,sp
+	ld	yendpoint,(hl)
+repeat long
+	inc	hl
+end repeat
+	ld	a,(hl)
+	or	a,a
+	jq	nz,_HandleDeviceDescriptor.disableDevice
+	ld	(yendpoint.addr),c
+	sbc	hl,hl
+	ld	de,(yendpoint.device)
+	ld	a,USB_DEVICE_ENABLED_EVENT
+	jq	_DispatchEvent
+
 _HandleDevInt:
 	ld	l,usbGisr-$100
 	inc	h
@@ -2571,7 +2691,7 @@ _HandleErrInt:
 	ld	de,(ytransfer.data)
 	ld	a,(ytransfer.data+3)
 	xor	a,e
-	and	a,$f
+	and	a,$F
 	xor	a,e
 	ld	e,a
 	ld	c,(ytransfer.status)
@@ -2580,7 +2700,7 @@ _HandleErrInt:
 	ld	hl,(ytransfer.callback)
 	ld	a,(ytransfer.callback+3)
 	xor	a,l
-	and	a,$f
+	and	a,$F
 	xor	a,l
 	ld	l,a
 	call	_DispatchEvent.dispatch
@@ -2600,8 +2720,8 @@ _HandleErrInt:
 	ld	(xendpoint.first),ytransfer
 	ld	hl,1
 	add	hl,de
-	jq	nc,.error
-	jq	.inner
+	jq	c,.inner
+	jq	.error
 .restart:
 assert USB_ERROR_NOT_SUPPORTED
 	ld	hl,USB_ERROR_NOT_SUPPORTED-1
@@ -2694,24 +2814,34 @@ _HandlePortPortEnInt:
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbConnStsChg)
 	ld	(hl),a
-	ld	a,(hl)
-repeat bUsbPortEn
-	rrca
-end repeat
-	and	a,1
+	ld	iy,(rootHub.child)
+	bit	bUsbPortEn,(hl)
 	jq	z,.disabled
 	ld	de,_DefaultControlEndpointDescriptor
-	ld	iy,(rootHub.child)
 	call	_CreateEndpoint
-	ld	hl,USB_ERROR_NO_MEMORY
-	ret	nz ; FIXME
-	; TODO: Get Control MPS, SET_ADDRESS
-	ld	a,1
+	call	z,_Alloc32Align32
+	jq	nz,.disableDevice
+	ld	bc,_HandleDeviceDescriptor
+	ld	de,_GetDeviceDescriptor8
+	push	hl,bc,hl,de,yendpoint
+	call	usb_ScheduleControlTransfer
+	ld	a,l
+	pop	yendpoint,de,de,de,de
+	or	a,a
 	ld	hl,mpUsbPortStsCtrl
+	ret	z
+	ex	de,hl
+	call	_Free32Align32
+.disableDevice:
+	ld	hl,mpUsbPortStsCtrl
+	ld	a,(hl)
+	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
+	ld	(hl),a
+	cp	a,a
+	ret
 .disabled:
-	ld	de,(rootHub.child)
-assert USB_DEVICE_DISABLED_EVENT + 1 = USB_DEVICE_ENABLED_EVENT
-	add	a,USB_DEVICE_DISABLED_EVENT;USB_DEVICE_ENABLED_EVENT
+	lea	de,iy
+	ld	a,USB_DEVICE_DISABLED_EVENT
 	jq	_DispatchEvent
 
 _HandlePortOvercurrInt:
@@ -2770,6 +2900,9 @@ _DefaultControlEndpointDescriptor:
 	db 7, ENDPOINT_DESCRIPTOR, 0, 0
 	dw 8
 	db 0
+_GetDeviceDescriptor8:
+	db DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCRIPTOR, 0, DEVICE_DESCRIPTOR
+	dw 0, 8
 _DefaultStandardDescriptors:
 	dl .device, .configurations, .langids
 	db 2
