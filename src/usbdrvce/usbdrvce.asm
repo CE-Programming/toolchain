@@ -57,8 +57,27 @@ struc transfer			; transfer structure
 	.next		rd 1	; pointer to next transfer structure
 	.altNext	rd 1	; pointer to alternate next transfer structure
 	.status		rb 1	; transfer status
-	.type		rb 1	; transfer type or 3 shl 2 or last shl 7
+ namespace .status
+	?active		:= 1 shl 7
+	?halt		:= 1 shl 6
+	?bufErr		:= 1 shl 5
+	?babble		:= 1 shl 4
+	?xactErr	:= 1 shl 3
+	?ufMiss		:= 1 shl 2
+	?split		:= 1 shl 1
+	?ping		:= 1 shl 0
+ end namespace
+	.type		rb 1
+ namespace .type
+	?ioc		:= 1 shl 7
+	?cpage		:= 7 shl 4
+	?cerr		:= 3 shl 2
+	?pid		:= 3 shl 0
+ end namespace
 	.remaining	rw 1	; transfer remaining length
+ namespace .remaining
+	?dt		:= 1 shl 7
+ end namespace
 	label .buffers: 20	; transfer buffers
 			rl 1
 	.length		rl 1	; original transfer length
@@ -74,7 +93,14 @@ struc endpoint			; endpoint structure
 	.next		rd 1	; link to next endpoint structure
 	.addr		rb 1	; device addr or cancel shl 7
 	.info		rb 1	; ep or speed shl 4 or dtc shl 6
+ namespace .info
+	?head		:= 1 shl 7
+	?dtc		:= 1 shl 6
+ end namespace
 	.maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
+ namespace .maxPktLen
+	?control	:= 1 shl 11
+ end namespace
 	.smask		rb 1	; micro-frame s-mask
 	.cmask		rb 1	; micro-frame c-mask
 	.hubInfo	rw 1	; hub addr or port num shl 7 or mult shl 14
@@ -141,24 +167,24 @@ virtual at (saveSScreen+$FFFF) and not $FFFF
 end virtual
 virtual at usbArea
 				rb (-$) and 7
-	setupPacket		setup
+	?setupPacket		setup
 				rb (-$) and 31
-	rootHub			device
+	?rootHub		device
 				rb (-$) and $FFF
 ; FIXME: 0xD141B2 is used by GetCSC :(
-	periodicList		dbx $400: ?
-	usbMem			dbx usbInited and not $FF - $: ?
+	?periodicList		dbx $400: ?
+	?usbMem			dbx usbInited and not $FF - $: ?
 				rb (-$) and 31
-	dummyHead		endpoint
-	eventCallback		rl 1
-	eventCallback.data	rl 1
-	standardDescriptors	rl 1
-	selectedConfiguration	rb 1
-	currentRole		rb 1
-	freeList32Align32	rl 1
-	freeList64Align256	rl 1
-	allocCount32Align32	rl 1
-	allocCount64Align256	rl 1
+	?dummyHead		endpoint
+	?eventCallback		rl 1
+	?eventCallback.data	rl 1
+	?standardDescriptors	rl 1
+	?selectedConfiguration	rb 1
+	?currentRole		rb 1
+	?freeList32Align32	rl 1
+	?freeList64Align256	rl 1
+	?allocCount32Align32	rl 1
+	?allocCount64Align256	rl 1
 	assert $ <= usbInited
 end virtual
 virtual at (ramCodeTop+$FF) and not $FF
@@ -247,83 +273,83 @@ virtual at 0
 end virtual
 
 ; enum usb_find_flag
-IS_NONE			:= 0
-IS_DISABLED		:= 1 shl 0
-IS_ENABLED		:= 1 shl 1
-IS_DEVICE		:= 1 shl 2
-IS_HUB			:= 1 shl 3
-IS_ATTACHED		:= 1 shl 4
+?IS_NONE		:= 0
+?IS_DISABLED		:= 1 shl 0
+?IS_ENABLED		:= 1 shl 1
+?IS_DEVICE		:= 1 shl 2
+?IS_HUB			:= 1 shl 3
+?IS_ATTACHED		:= 1 shl 4
 
 ; enum usb_endpoint_flag
-MANUAL_TERMINATE	:= 0 shl 0
-AUTO_TERMINATE		:= 1 shl 0
+?MANUAL_TERMINATE	:= 0 shl 0
+?AUTO_TERMINATE		:= 1 shl 0
 
 ; enum usb_internal_endpoint_flag
-PO2_MPS			:= 1 shl 0
+?PO2_MPS		:= 1 shl 0
 
 ; enum usb_role
 virtual at 0
-	ROLE_HOST				rb 1 shl 4
-	ROLE_DEVICE				rb 1 shl 4
+	?ROLE_HOST				rb 1 shl 4
+	?ROLE_DEVICE				rb 1 shl 4
 end virtual
 virtual at 0
-	ROLE_A					rb 1 shl 5
-	ROLE_B					rb 1 shl 5
+	?ROLE_A					rb 1 shl 5
+	?ROLE_B					rb 1 shl 5
 end virtual
 
 ; enum usb_transfer_direction
 virtual at 0
-	HOST_TO_DEVICE				rb 1 shl 7
-	DEVICE_TO_HOST				rb 1 shl 7
+	?HOST_TO_DEVICE				rb 1 shl 7
+	?DEVICE_TO_HOST				rb 1 shl 7
 end virtual
 
 ; enum usb_request_type
 virtual at 0
-	STANDARD_REQUEST			rb 1 shl 5
-	CLASS_REQUEST				rb 1 shl 5
-	VENDOR_REQUEST				rb 1 shl 5
+	?STANDARD_REQUEST			rb 1 shl 5
+	?CLASS_REQUEST				rb 1 shl 5
+	?VENDOR_REQUEST				rb 1 shl 5
 end virtual
 
 ; enum usb_recipient
 virtual at 0
-	RECIPIENT_DEVICE			rb 1 shl 0
-	RECIPIENT_INTERFACE			rb 1 shl 0
-	RECIPIENT_ENDPOINT			rb 1 shl 0
-	RECIPIENT_OTHER				rb 1 shl 0
+	?RECIPIENT_DEVICE			rb 1 shl 0
+	?RECIPIENT_INTERFACE			rb 1 shl 0
+	?RECIPIENT_ENDPOINT			rb 1 shl 0
+	?RECIPIENT_OTHER			rb 1 shl 0
 end virtual
 
 ; enum usb_request
 virtual at 0
-	GET_STATUS				rb 1
-	CLEAR_FEATURE				rb 1
+	?GET_STATUS				rb 1
+	?CLEAR_FEATURE				rb 1
 						rb 1
-	SET_FEATURE				rb 1
+	?SET_FEATURE				rb 1
 						rb 1
-	SET_ADDRESS				rb 1
-	GET_DESCRIPTOR				rb 1
-	SET_DESCRIPTOR				rb 1
-	GET_CONFIGURATION			rb 1
-	SET_CONFIGURATION			rb 1
-	GET_INTERFACE				rb 1
-	SET_INTERFACE				rb 1
-	SYNC_FRAME				rb 1
+	?SET_ADDRESS				rb 1
+	?GET_DESCRIPTOR				rb 1
+	?SET_DESCRIPTOR				rb 1
+	?GET_CONFIGURATION			rb 1
+	?SET_CONFIGURATION			rb 1
+	?GET_INTERFACE				rb 1
+	?SET_INTERFACE				rb 1
+	?SYNC_FRAME				rb 1
 end virtual
 
 ; enum usb_descriptor_type
 virtual at 1
-	DEVICE_DESCRIPTOR			rb 1
-	CONFIGURATION_DESCRIPTOR		rb 1
-	STRING_DESCRIPTOR			rb 1
-	INTERFACE_DESCRIPTOR			rb 1
-	ENDPOINT_DESCRIPTOR			rb 1
+	?DEVICE_DESCRIPTOR			rb 1
+	?CONFIGURATION_DESCRIPTOR		rb 1
+	?STRING_DESCRIPTOR			rb 1
+	?INTERFACE_DESCRIPTOR			rb 1
+	?ENDPOINT_DESCRIPTOR			rb 1
 end virtual
 
 ; enum usb_transfer_type
 virtual at 0
-	CONTROL_TRANSFER			rb 1
-	ISOCHRONOUS_TRANSFER			rb 1
-	BULK_TRANSFER				rb 1
-	INTERRUPT_TRANSFER			rb 1
+	?CONTROL_TRANSFER			rb 1
+	?ISOCHRONOUS_TRANSFER			rb 1
+	?BULK_TRANSFER				rb 1
+	?INTERRUPT_TRANSFER			rb 1
 end virtual
 
 DEFAULT_RETRIES := 10
@@ -389,9 +415,9 @@ usb_Init:
 	ld	(hl),hl
 	set	1,(hl)
 	ld	l,endpoint.info
-	ld	(hl),1 shl 7 ; head
+	ld	(hl),endpoint.info.head
 	ld	l,endpoint.overlay.status
-	ld	(hl),1 shl 6 ; halt
+	ld	(hl),endpoint.overlay.status.halt
 	ld	hl,rootHub.find
 	ld	(hl),IS_HUB or IS_ENABLED
 	ld	l,a;(cHeap-$D10000) and $FF
@@ -1114,7 +1140,7 @@ _QueueTransfer:
 	call	_CreateDummyTransfer
 	jq	nz,_Error.NO_MEMORY
 	ld	(.dummy),hl
-	or	a,3 shl 2
+	or	a,transfer.type.cerr
 	push	af
 	sbc	hl,hl
 	sbc	hl,bc
@@ -1227,7 +1253,7 @@ label .dummy at $-long
 	jq	_FillTransfer
 
 ; Input:
-;  a = ioc shl 7 or 3 shl 2 or pid
+;  a = ioc shl 7 or transfer.type.cerr or pid
 ;  bc = dt shl 15 or length
 ;  de = buffer
 ;  hl = next
@@ -1280,7 +1306,7 @@ end repeat
 	ld	a,l
 	sub	a,transfer.padding-transfer.status
 	ld	l,a
-	ld	(hl),1 shl 7
+	ld	(hl),transfer.status.active
 	ld	hl,mpUsbCmd
 	bit	bUsbAsyncSchedEn,(hl)
 	ret	nz
@@ -1462,13 +1488,13 @@ _ResetHostControllerFromUnknown:
 	ret ; defer actual start until plug
 
 namespace _DisableSchedulesAndResetHostController
-sync:
+?sync:
 	xor	a,a							;+4
 .loop:
 	dec	a							;+(4
 	jq	nz,.loop						;  +13)*256-5
 	djnz	.wait							;+13
-sync.cycles := 8+8+4+13+4+(4+13)*256-5+13
+.cycles := 8+8+4+13+4+(4+13)*256-5+13
 	jq	.fail
 end namespace
 
@@ -1575,7 +1601,7 @@ _CreateDummyTransfer:
 	ret	nz
 assert ~transfer.status and (transfer.status - 1)
 	set	bsf transfer.status,hl
-	ld	(hl),1 shl 6
+	ld	(hl),transfer.status.halt
 	res	bsf transfer.status,hl
 	ret
 
@@ -1681,8 +1707,8 @@ _CreateEndpoint:
 	ld	c,a
 	ld	a,h
 	ld	(bc),a
-	set	6,(hl)
-	ld	a,1 shl 3
+	set	bsf endpoint.info.dtc,(hl)
+	ld	a,endpoint.maxPktLen.control shr 8
 .notControl:
 	inc	l;endpoint.maxPktLen
 	ex	de,hl
