@@ -261,8 +261,6 @@ virtual at 0
 	USB_OVERCURRENT_INTERRUPT				rb 1
 	USB_B_PLUG_REMOVED_INTERRUPT				rb 1
 	USB_A_PLUG_REMOVED_INTERRUPT				rb 1
-	USB_INTERRUPT						rb 1
-	USB_HOST_ERROR_INTERRUPT				rb 1
 	USB_HOST_PORT_CONNECT_STATUS_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_OVERCURRENT_CHANGE_INTERRUPT		rb 1
@@ -1190,7 +1188,7 @@ _QueueTransfer:
 	jq	.modDone
 .modPo2:
 	inc.s	de
-	ld	a,(yendpoint.maxPktLen+0)
+	ld	a,(yendpoint.maxPktLen)
 	add	a,a
 	jq	nz,.modPo2Byte
 	ld	a,(yendpoint.maxPktLen+1)
@@ -1294,6 +1292,7 @@ repeat transfer.length-transfer.buffers
 end repeat
 	ld	(hl),c
 	inc	l;transfer.length+1
+	res	bsf transfer.remaining.dt,b
 	ld	(hl),b
 	call	.packHalf
 	ld	bc,(ix+15)
@@ -1603,6 +1602,7 @@ assert ~transfer.status and (transfer.status - 1)
 	set	bsf transfer.status,hl
 	ld	(hl),transfer.status.halt
 	res	bsf transfer.status,hl
+	ld	(hl),1
 	ret
 
 ; Input:
@@ -2538,23 +2538,87 @@ _HandleAPlugRemovedInt:
 _HandleInt:
 _HandleErrInt:
 	ld	(hl),bmUsbIntErr or bmUsbInt
-	ld	hl,(dummyHead.next)
+	push	ix
+	ld	xendpoint,(dummyHead.next)
 	jq	.enter
-.loop:
-	ld	l,endpoint
-	push	hl
-	pop	de
-	ld	a,USB_INTERRUPT
-	call	_DispatchEvent
-	ret	nz
-assert endpoint.next+1=endpoint-1
-	dec	l;endpoint.next+1
-	ld	h,(hl)
+.outer:
+;	or	a,a
+	sbc	hl,hl
+	inc.s	bc
+	ld	ytransfer,(xendpoint.first)
+.inner:
+	bit	0,(ytransfer.next) ; dummy
+	jq	nz,.next
+	bit	bsf ytransfer.status.active,(ytransfer.status)
+	jq	nz,.next
+	bit	bsr ytransfer.type.pid,(ytransfer.type) ; setup
+	jq	nz,.continue
+	ld	c,(ytransfer.length)
+	ld	b,(ytransfer.length+1)
+	add	hl,bc
+	ld	c,(ytransfer.remaining)
+	ld	a,(ytransfer.remaining+1)
+	and	a,not ytransfer.remaining.dt
+	ld	b,a
+	sbc	hl,bc
+	or	a,c
+	jq	nz,.partial
+	bit	bsf ytransfer.status.halt,(ytransfer.status)
+	jq	nz,.partial
+	bit	bsf ytransfer.type.ioc,(ytransfer.type)
+	jq	z,.continue
+.partial:
+	ld	de,(ytransfer.data)
+	ld	a,(ytransfer.data+3)
+	xor	a,e
+	and	a,$f
+	xor	a,e
+	ld	e,a
+	ld	c,(ytransfer.status)
+	ld	b,0
+	push	de,hl,bc,xendpoint
+	ld	hl,(ytransfer.callback)
+	ld	a,(ytransfer.callback+3)
+	xor	a,l
+	and	a,$f
+	xor	a,l
+	ld	l,a
+	call	_DispatchEvent.dispatch
+	pop	bc,bc,bc,bc
+	add	hl,de
+	scf
+	sbc	hl,de
+	jq	z,.restart
+	ex	de,hl
+	ld	ytransfer,(xendpoint.first)
+.free:
+	lea	hl,iy
+	bit	bsf ytransfer.type.ioc,(ytransfer.type)
+	ld	ytransfer,(ytransfer.next)
+	call	_Free32Align32
+	jq	z,.free
+	ld	(xendpoint.first),ytransfer
+	ld	hl,1
+	add	hl,de
+	jq	nc,.error
+	jq	.inner
+.restart:
+assert USB_ERROR_NOT_SUPPORTED
+	ld	hl,USB_ERROR_NOT_SUPPORTED-1
+	inc	l
+.error:
+	pop	ix
+	ret
+.continue:
+	ld	ytransfer,(ytransfer.next)
+	jq	.inner
+.next:
+	ld	xendpoint,(xendpoint.next)
 .enter:
-	ld	l,endpoint.info
-	ld	a,(hl)
-	add	a,a
-	jq	nc,.loop
+	ld	a,(xendpoint.info)
+	add	a,a ; head
+	jq	nc,.outer
+	pop	ix
 	ld	hl,mpUsbSts
 ;	cp	a,a
 	ret
