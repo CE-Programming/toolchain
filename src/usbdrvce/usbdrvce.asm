@@ -76,7 +76,7 @@ struc transfer			; transfer structure
  end namespace
 	.remaining	rw 1	; transfer remaining length
  namespace .remaining
-	?dt		:= 1 shl 7
+	?dt		:= 1 shl 15
  end namespace
 	label .buffers: 20	; transfer buffers
 			rl 1
@@ -1087,7 +1087,7 @@ usb_ScheduleControlTransfer:
 	call	pe,_QueueTransfer
 	pop	af
 	xor	a,10001101b
-	ld	bc,1 shl 15
+	ld	bc,transfer.remaining.dt
 	jq	.queueStage
 .queueStage:
 	call	_CreateDummyTransfer
@@ -1292,7 +1292,7 @@ repeat transfer.length-transfer.buffers
 end repeat
 	ld	(hl),c
 	inc	l;transfer.length+1
-	res	bsf transfer.remaining.dt,b
+	res	bsf transfer.remaining.dt,bc
 	ld	(hl),b
 	call	.packHalf
 	ld	bc,(ix+15)
@@ -2558,7 +2558,7 @@ _HandleErrInt:
 	add	hl,bc
 	ld	c,(ytransfer.remaining)
 	ld	a,(ytransfer.remaining+1)
-	and	a,not ytransfer.remaining.dt
+	and	a,not (ytransfer.remaining.dt shr 8)
 	ld	b,a
 	sbc	hl,bc
 	or	a,c
