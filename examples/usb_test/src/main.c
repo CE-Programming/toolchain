@@ -38,7 +38,7 @@ static usb_error_t got_device_descriptor(usb_endpoint_t endpoint, usb_transfer_s
     putChar(':');
     putIntHex(transferred);
     putChar(':');
-    putBlockHex(data, 8);
+    putBlockHex(data, sizeof(usb_device_descriptor_t));
     _OS(os_NewLine);
     free(data);
     return USB_SUCCESS;
@@ -130,10 +130,10 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                 USB_GET_DESCRIPTOR,
                 USB_DEVICE_DESCRIPTOR << 8,
                 0,
-                8,
+                sizeof(usb_device_descriptor_t),
             };
-            void *device_descriptor = malloc(8);
-            memset(device_descriptor, -1, 8);
+            usb_device_descriptor_t *device_descriptor = malloc(sizeof(usb_device_descriptor_t));
+            memset(device_descriptor, -1, sizeof(usb_device_descriptor_t));
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
             putIntHex((unsigned)event_data);
