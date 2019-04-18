@@ -2792,6 +2792,8 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
 	ld	(hl),a
 	djnz	.delete
+	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 100ms!
+	call	_DelayTenTimesAms
 	inc	l;usbPortStsCtrl+1
 	set	bUsbPortReset-8,(hl)
 	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
