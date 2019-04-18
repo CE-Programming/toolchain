@@ -386,7 +386,6 @@ usb_Init:
 	ld	l,usbImr
 	ld	(hl),usbIntLevelHigh
 	call	_ResetHostControllerFromUnknown
-	ret	nz
 	ld	(hl),hl
 	set	1,(hl)
 	ld	l,endpoint.info
@@ -437,7 +436,8 @@ usb_Init:
 
 ;-------------------------------------------------------------------------------
 usb_Cleanup:
-	call	_DisableSchedulesAndResetHostController
+	ld	hl,mpUsbCmd
+	call	_DisableSchedulesAndResetHostController.enter
 ;	xor	a,a
 	ld	hl,mpUsbGimr
 	ld	(hl),a
@@ -1397,10 +1397,11 @@ _Init:
 ;  a = 0
 ;  b = ?
 ;  d = ?
-;  hl = dummyHead.next | error code
+;  hl = dummyHead.next
 _DisableSchedulesAndResetHostController:
 	; stop schedules
 	ld	l,usbCmd
+.enter:
 	ld	a,(hl)
 	and	a,bmUsbAsyncSchedEn or bmUsbPeriodicSchedEn
 assert bUsbAsyncSchedSts-8-bUsbAsyncSchedEn = bUsbPeriodicSchedSts-8-bUsbPeriodicSchedEn
@@ -1416,17 +1417,17 @@ end repeat
 	and	a,(bmUsbAsyncSchedSts or bmUsbPeriodicSchedSts) shr 8	;+8
 	sub	a,d							;+4
 	jq	nz,.sync						;+13
+.sync.fail:
 	jq	_ResetHostControllerFromUnknown
 
 ; Input:
 ;  a = 0
 ;  hl = mpUsbRange xor (? and $FF)
 ; Output:
-;  zf = success
 ;  a = 0
 ;  b = ?
 ;  d = ?
-;  hl = dummyHead.next | error code
+;  hl = dummyHead.next
 _ResetHostControllerFromUnknown:
 	; halt host controller (EHCI spec section 2.3)
 	ld	l,usbIntEn
@@ -1439,6 +1440,7 @@ _ResetHostControllerFromUnknown:
 .halt.wait:
 	bit	bUsbHcHalted-8,(hl)	;12
 	jq	z,.halt			;+13
+.halt.fail:
 
 	; reset host controller (EHCI spec section 2.3)
 	ld	l,usbCmd
@@ -1448,6 +1450,7 @@ _ResetHostControllerFromUnknown:
 .reset.wait:
 	bit	bUsbHcReset,(hl)	;12
 	jq	nz,.reset		;+13
+.reset.fail:
 
 	; initialize host controller from halt (EHCI spec section 4.1)
 	ld	l,usbIntEn
@@ -1461,12 +1464,12 @@ _ResetHostControllerFromUnknown:
 namespace _DisableSchedulesAndResetHostController
 sync:
 	xor	a,a							;+4
-sync.loop:
+.loop:
 	dec	a							;+(4
-	jq	nz,sync.loop		;  +13)*256-5
-	djnz	sync.wait		;+13
-	jq	_ResetHostControllerFromUnknown.timeout
+	jq	nz,.loop						;  +13)*256-5
+	djnz	.wait							;+13
 sync.cycles := 8+8+4+13+4+(4+13)*256-5+13
+	jq	.fail
 end namespace
 
 .halt:
@@ -1474,11 +1477,7 @@ end namespace
 	jq	nz,.halt		;  +13)256-5
 	djnz	.halt.wait		;+13
 .halt.cycles := 12+13+(4+13)*256-5+13
-.timeout:
-assert USB_ERROR_TIMEOUT
-	ld	hl,USB_ERROR_TIMEOUT-1
-	inc	l
-	ret
+	jq	.halt.fail
 
 .reset:
 	ld	d,a			;+(4
@@ -1489,7 +1488,7 @@ assert USB_ERROR_TIMEOUT
 	jq	nz,.reset		;  +13)256-5
 	djnz	.reset.wait		;+13
 .reset.cycles := 12+13+(4+(4+13)*256-5+4+13)*256-5+13
-	jq	.timeout
+	jq	.reset.fail
 
 ;-------------------------------------------------------------------------------
 ; Input:
