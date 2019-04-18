@@ -4,6 +4,7 @@
 #include <tice.h>
 
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 static void putChar(char c) {
@@ -31,6 +32,15 @@ static void putBlockHex(void *block, size_t size) {
 
 static usb_error_t got_device_descriptor(usb_endpoint_t endpoint, usb_transfer_status_t status,
                                          size_t transferred, usb_transfer_data_t *data) {
+    putIntHex((unsigned)endpoint);
+    putChar(':');
+    putIntHex(status);
+    putChar(':');
+    putIntHex(transferred);
+    putChar(':');
+    putBlockHex(data, 8);
+    _OS(os_NewLine);
+    free(data);
     return USB_SUCCESS;
 }
 
@@ -87,8 +97,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         "USB_OVERCURRENT_INT",
         "USB_B_PLUG_REMOVED_INT",
         "USB_A_PLUG_REMOVED_INT",
-        "USB_INT",
-        "USB_HOST_ERROR_INT",
         "USB_HOST_PORT_CONNECT_STATUS_CHANGE_INT",
         "USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INT",
         "USB_HOST_PORT_OVERCURRENT_CHANGE_INT",
@@ -97,7 +105,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         "USB_HOST_SYSTEM_ERROR_INT",
         "USB_HOST_ASYNC_ADVANCE_INT",
     };
-    static char device_descriptor[8];
     switch (event) {
         case USB_ROLE_CHANGED_EVENT:
             os_PutStrFull(usb_event_names[event]);
@@ -116,7 +123,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         case USB_DEVICE_DISABLED_EVENT:
             os_PutStrFull(usb_event_names[event]);
             _OS(os_NewLine);
-            memset(device_descriptor, 0, sizeof(device_descriptor));
             break;
         case USB_DEVICE_ENABLED_EVENT: {
             static const usb_control_setup_t setup = {
@@ -124,24 +130,18 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                 USB_GET_DESCRIPTOR,
                 USB_DEVICE_DESCRIPTOR << 8,
                 0,
-                sizeof(device_descriptor),
+                8,
             };
+            void *device_descriptor = malloc(8);
+            memset(device_descriptor, -1, 8);
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             _OS(os_NewLine);
-            return usb_ScheduleDefaultControlTransfer(event_data, &setup, &device_descriptor,
-                                                      got_device_descriptor, &device_descriptor);
+            return usb_ScheduleDefaultControlTransfer(event_data, &setup, device_descriptor,
+                                                      got_device_descriptor, device_descriptor);
         }
-        case USB_INTERRUPT:
-            os_PutStrFull(usb_event_names[event]);
-            putChar(':');
-            putIntHex((unsigned)event_data);
-            putChar(':');
-            putBlockHex(device_descriptor, sizeof(device_descriptor));
-            _OS(os_NewLine);
-            break;
         case USB_DEFAULT_SETUP_EVENT: {
             unsigned char i;
             for (i = 0; i < 8; i++)
