@@ -907,6 +907,7 @@ usb_SetConfiguration:
 	jq	nc,.loop
 	pop	ix
 	jq	nz,_Error.INVALID_PARAM
+	
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -936,7 +937,16 @@ end repeat
 ;-------------------------------------------------------------------------------
 usb_SetInterface:
 	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
+	push	ix
+	ld	hl,(ix+12)
+	ld	ydevice,(ix+6)
+	ld	xconfigurationDescriptor,(ix+9)
+	ld	c,(xinterfaceDescriptor.bAlternateSetting)
+	call	_ParseInterfaceDescriptor
+	pop	ix
+	jq	nz,_Error.INVALID_PARAM
+	
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
