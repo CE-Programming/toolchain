@@ -14,6 +14,7 @@ typedef struct global global_t;
 struct global {
     usb_device_t device;
     usb_endpoint_t in, out;
+    uint8_t type;
 };
 
 static void putChar(char c) {
@@ -158,11 +159,11 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 }
 
 static bool parseConfigurationDescriptor(global_t *const global,
-                                  usb_configuration_descriptor_t *const configuration,
-                                  const size_t length) {
+                                         const usb_device_descriptor_t *const device,
+                                         usb_configuration_descriptor_t *const configuration,
+                                         const size_t length) {
     uint8_t *current = (uint8_t *)configuration;
     size_t remaining = length;
-    bool msd = false;
     usb_error_t error;
     uint8_t in = 0, out = 0;
     while (remaining && (!in || !out)) {
@@ -171,15 +172,20 @@ static bool parseConfigurationDescriptor(global_t *const global,
         switch (descriptor->bDescriptorType) {
             case USB_INTERFACE_DESCRIPTOR: {
                 usb_interface_descriptor_t *interface = (usb_interface_descriptor_t *)descriptor;
-                msd = interface->bInterfaceClass == 0x08 &&
-                    interface->bInterfaceSubClass == 0x06 &&
-                    interface->bInterfaceProtocol == 0x50;
-                global->in = global->out = NULL;
+                if (device->idVendor == 0x451 && device->idProduct == 0xE008)
+                    global->type = 2;
+                else if (interface->bInterfaceClass == 0x08 &&
+                         interface->bInterfaceSubClass == 0x06 &&
+                         interface->bInterfaceProtocol == 0x50)
+                    global->type = 1;
+                else
+                    global->type = 0;
+                in = out = 0;
                 break;
             }
             case USB_ENDPOINT_DESCRIPTOR: {
                 usb_endpoint_descriptor_t *endpoint = (usb_endpoint_descriptor_t *)descriptor;
-                if (msd && endpoint->bmAttributes == USB_BULK_TRANSFER) {
+                if (global->type && endpoint->bmAttributes == USB_BULK_TRANSFER) {
                     uint8_t *addr = endpoint->bEndpointAddress & USB_DEVICE_TO_HOST ? &in : &out;
                     if (!*addr) *addr = endpoint->bEndpointAddress;
                 }
@@ -201,6 +207,9 @@ static bool parseConfigurationDescriptor(global_t *const global,
 }
 
 static void handleDevice(global_t *global) {
+    static const uint8_t rdy_pkt_00[] = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x04, 0x00 };
+    static const uint8_t rdy_pkt_01[] = { 0x00, 0x00, 0x00, 0x10, 0x04, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x01, 0x00, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x07, 0xd0 };
+    static uint8_t buffer[64];
     usb_error_t error;
     usb_device_descriptor_t device;
     size_t length;
@@ -225,13 +234,41 @@ static void handleDevice(global_t *global) {
         putChar(':');
         putBlockHex(configuration, length);
         _OS(os_NewLine);
-        found = parseConfigurationDescriptor(global, configuration, length);
+        found = parseConfigurationDescriptor(global, &device, configuration, length);
         free(configuration); configuration = NULL;
     }
     if (!found) goto noerr;
+    putByteHex(global->type);
     putByteHex(usb_GetEndpointAddress(global->in));
     putByteHex(usb_GetEndpointAddress(global->out));
     _OS(os_NewLine);
+    switch (global->type) {
+        case 1:
+            break;
+        case 2:
+            putIntHex(usb_BulkTransfer(global->out, rdy_pkt_00, sizeof(rdy_pkt_00), 0, &length));
+            putChar(':');
+            putIntHex(length);
+            _OS(os_NewLine);
+
+            length = 0;
+            putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
+            putChar(':');
+            putBlockHex(buffer, length);
+            _OS(os_NewLine);
+
+            putIntHex(usb_BulkTransfer(global->out, rdy_pkt_01, sizeof(rdy_pkt_01), 0, &length));
+            putChar(':');
+            putIntHex(length);
+            _OS(os_NewLine);
+
+            length = 0;
+            putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
+            putChar(':');
+            putBlockHex(buffer, length);
+            _OS(os_NewLine);
+            break;
+    }
     goto noerr;
  err:
     putIntHex(error);
