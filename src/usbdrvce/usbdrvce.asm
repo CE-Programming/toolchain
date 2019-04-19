@@ -1237,6 +1237,7 @@ repeat ISOCHRONOUS_TRANSFER
 end repeat
 	jq	z,_Error.NOT_SUPPORTED
 	ld	a,(yendpoint.dir)
+	or	a,transfer.type.ioc
 	jq	_QueueTransfer
 .check:
 	ld	hl,(ix+15)
