@@ -30,6 +30,8 @@ static void putBlockHex(void *block, size_t size) {
         putByteHex(*(*(unsigned char **)&block)++);
 }
 
+static usb_device_t device;
+
 static usb_error_t got_device_descriptor(usb_endpoint_t endpoint, usb_transfer_status_t status,
                                          size_t transferred, usb_transfer_data_t *data) {
     putIntHex((unsigned)endpoint);
@@ -37,10 +39,11 @@ static usb_error_t got_device_descriptor(usb_endpoint_t endpoint, usb_transfer_s
     putIntHex(status);
     putChar(':');
     putIntHex(transferred);
-    putChar(':');
-    putBlockHex(data, sizeof(usb_device_descriptor_t));
     _OS(os_NewLine);
+    putBlockHex(data, sizeof(usb_device_descriptor_t));
     free(data);
+    _OS(os_NewLine);
+    device = usb_GetEndpointDevice(endpoint);
     return USB_SUCCESS;
 }
 
@@ -182,6 +185,12 @@ void main(void) {
             os_SetCursorPos(0, 0);
             putIntHex(usb_GetFrameNumber());
             os_SetCursorPos(row, col);
+            if (device) {
+                dbg_Debugger();
+                putIntHex(usb_GetConfigurationDescriptorTotalLength(device, 0));
+                _OS(os_NewLine);
+                device = NULL;
+            }
         }
     }
     usb_Cleanup();
