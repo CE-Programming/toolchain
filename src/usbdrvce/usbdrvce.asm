@@ -429,18 +429,12 @@ usb_Init:
 	ld	b,sizeof cHeap shr 8
 	rrc	e
 	call	c,.initFreeList
-	ld	h,(periodicList-$D10000) shr 8
-	ld	b,sizeof periodicList shr 8
+iterate block, periodicList, usbMem, osHeap
+	ld	h,(block-$D10000) shr 8
+	ld	b,sizeof block shr 8
 	rrc	e
 	call	c,.initFreeList
-	ld	h,(usbMem-$D10000) shr 8
-	ld	b,sizeof usbMem shr 8
-	rrc	e
-	call	c,.initFreeList
-	ld	h,(osHeap-$D10000) shr 8
-	ld	b,sizeof osHeap shr 8
-	rrc	e
-	call	c,.initFreeList
+end iterate
 	ld	hl,USB_ERROR_INVALID_PARAM
 	cp	a,c
 	ret	nz
@@ -613,7 +607,7 @@ usb_FindDevice:
 	ld	iy,rootHub
 	jq	.check
 .child:
-	bit	bsf IS_ATTACHED,c
+	bit	bsr IS_ATTACHED,c
 	jq	nz,.sibling
 .forceChild:
 	bit	0,(ydevice.child)
@@ -679,33 +673,26 @@ usb_GetConfigurationDescriptorTotalLength:
 	ret	nz
 	push	hl,hl
 	ld	(hl),a
-	set	bsf 4,hl
+	set	bsr 4,hl
 	ld	de,DEFAULT_RETRIES
 	push	de,hl
-	set	bsf 12,hl
+	set	bsr 12,hl
 	push	hl
-	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
-	inc	l
-	ld	(hl),GET_DESCRIPTOR
-	inc	l
 	ld	c,(ix+9)
-	ld	(hl),c
+iterate value, DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCRIPTOR, c, CONFIGURATION_DESCRIPTOR, a, a, 4, a
+	ld	(hl),value
+ if % <> %%
 	inc	l
-	ld	(hl),CONFIGURATION_DESCRIPTOR
-	inc	l
-	ld	(hl),a
-	inc	l
-	ld	(hl),4
-	inc	l
-	ld	(hl),a
+ end if
+end iterate
 	ld	iy,(ix+6)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	call	usb_ControlTransfer
-	ld	ix,(ix-6)
-	ld	a,(ix+0)
-	ld	de,(ix+6)
-	lea	hl,ix
+	ld	iy,(ix-6)
+	ld	a,(iy+0)
+	ld	de,(iy+6)
+	lea	hl,iy
 	call	_Free32Align32
 	ex.s	de,hl
 	xor	a,4
@@ -973,7 +960,7 @@ usb_GetFrameNumber:
 	dec	h
 	ex	de,hl
 	ret	nz
-repeat bsf 8
+repeat bsr 8
 	add	hl,hl
 end repeat
 	ret
@@ -1056,6 +1043,7 @@ end repeat
 	or	a,a
 	sbc	hl,de
 	ret	z
+	ex	de,hl
 	ld	(hl),bc
 	add	hl,de
 	ret
@@ -1159,11 +1147,11 @@ _QueueTransfer:
 	sbc	hl,bc
 	jq	c,.notEnd
 	sbc	hl,hl
-	bit	bsf AUTO_TERMINATE,(yendpoint.flags)
+	bit	bsr AUTO_TERMINATE,(yendpoint.flags)
 .notEnd:
 	add	hl,bc
 	jq	z,.last
-	bit	bsf PO2_MPS,(yendpoint.internalFlags)
+	bit	bsr PO2_MPS,(yendpoint.internalFlags)
 	jq	nz,.modPo2
 	ld	hl,(yendpoint.maxPktLen)
 	add	hl,hl
@@ -1273,7 +1261,7 @@ _FillTransfer:
 	ld	(hl),de
 	ld	(yendpoint.last),de
 assert ~transfer.altNext and (transfer.altNext-1)
-	set	bsf transfer.altNext, hl
+	set	bsr transfer.altNext, hl
 	pop	de
 	ld	(hl),de
 repeat transfer.type-transfer.altNext
@@ -1298,7 +1286,7 @@ repeat transfer.length-transfer.buffers
 end repeat
 	ld	(hl),c
 	inc	l;transfer.length+1
-	res	bsf transfer.remaining.dt,bc
+	res	bsr transfer.remaining.dt,bc
 	ld	(hl),b
 	call	.packHalf
 	ld	bc,(ix+15)
@@ -1532,7 +1520,7 @@ end namespace
 ;  hl = mpUsbRange xor (? and $FF) | error code
 _PowerVbusForRole:
 	ld	l,usbOtgCsr
-	bit	bsf ROLE_DEVICE,a
+	bit	bsr ROLE_DEVICE,a
 	jq	nz,.unpower
 .power:
 	call	$21B70
@@ -1615,9 +1603,9 @@ _CreateDummyTransfer:
 	call	_Alloc32Align32
 	ret	nz
 assert ~transfer.status and (transfer.status - 1)
-	set	bsf transfer.status,hl
+	set	bsr transfer.status,hl
 	ld	(hl),transfer.status.halt
-	res	bsf transfer.status,hl
+	res	bsr transfer.status,hl
 	ld	(hl),1
 	ret
 
@@ -1724,7 +1712,7 @@ _CreateEndpoint:
 	ld	c,a
 	ld	a,h
 	ld	(bc),a
-	set	bsf endpoint.info.dtc,(hl)
+	set	bsr endpoint.info.dtc,(hl)
 	ld	a,endpoint.maxPktLen.control shr 8
 .notControl:
 	inc	l;endpoint.maxPktLen
@@ -1778,7 +1766,7 @@ assert endpoint.device and 1
 	or	a,c
 	dec	hl
 	jq	nz,.checkedMps
-	set	bsf PO2_MPS,(yendpoint.internalFlags)
+	set	bsr PO2_MPS,(yendpoint.internalFlags)
 .checkedMps:
 	dec	hl
 	ld	a,(hl)
@@ -2279,41 +2267,32 @@ end repeat
 	ld	b,sizeof usedAddresses
 	scf
 .search:
-	adc	a,(hl)
+	ld	c,(hl)
+	adc	a,c
 	jq	c,.next
-	dec	a
-	ld	b,a
-	ld	a,l
-repeat bsf 8
-	add	a,a
-end repeat
-	dec	a
-	ld	c,a
-	ld	a,1 shl 7
-.shift:
-	inc	c
-	rlca
-	tst	a,b
-	jq	nz,.shift
-	or	a,b
+	or	a,c
 	ld	(hl),a
+	xor	a,c
+	ld	c,8
+	mlt	bc
+.shift:
+	dec	c
+	rrca
+	jq	nc,.shift
+	sbc	a,c
 	ex	de,hl
-	ld	a,c
 	ld	bc,_HandleDeviceEnable
 	push	hl,bc,bc,hl,yendpoint
 	inc	l
 	ld	(hl),SET_ADDRESS
-	inc	l
-	ld	(hl),a
-	xor	a,a
-repeat 4
-	inc	l
-	ld	(hl),a
-end repeat
+	ld	b,6
+.zero:
 	inc	l
 	ld	c,(hl)
-	ld	(yendpoint.maxPktLen),c
 	ld	(hl),a
+	xor	a,a
+	djnz	.zero
+	ld	(yendpoint.maxPktLen),c
 	call	usb_ScheduleControlTransfer
 	ld	a,l
 	pop	bc,bc,bc,bc,bc
@@ -2338,7 +2317,7 @@ _HandleDeviceEnable:
 	ld	hl,12
 	add	hl,sp
 	ld	hl,(hl)
-	set	bsf 2,hl
+	set	bsr 2,hl
 	ld	c,(hl)
 	call	_FreeTransferData
 	ld	hl,3
@@ -2669,7 +2648,7 @@ _HandleErrInt:
 .inner:
 	bit	0,(ytransfer.next) ; dummy
 	jq	nz,.next
-	bit	bsf ytransfer.status.active,(ytransfer.status)
+	bit	bsr ytransfer.status.active,(ytransfer.status)
 	jq	nz,.next
 	bit	bsr ytransfer.type.pid,(ytransfer.type) ; setup
 	jq	nz,.continue
@@ -2683,9 +2662,9 @@ _HandleErrInt:
 	sbc	hl,bc
 	or	a,c
 	jq	nz,.partial
-	bit	bsf ytransfer.status.halt,(ytransfer.status)
+	bit	bsr ytransfer.status.halt,(ytransfer.status)
 	jq	nz,.partial
-	bit	bsf ytransfer.type.ioc,(ytransfer.type)
+	bit	bsr ytransfer.type.ioc,(ytransfer.type)
 	jq	z,.continue
 .partial:
 	ld	de,(ytransfer.data)
@@ -2713,7 +2692,7 @@ _HandleErrInt:
 	ld	ytransfer,(xendpoint.first)
 .free:
 	lea	hl,iy
-	bit	bsf ytransfer.type.ioc,(ytransfer.type)
+	bit	bsr ytransfer.type.ioc,(ytransfer.type)
 	ld	ytransfer,(ytransfer.next)
 	call	_Free32Align32
 	jq	z,.free
