@@ -775,18 +775,25 @@ void usb_SetEndpointData(usb_endpoint_t endpoint, usb_endpoint_data_t *data);
 usb_endpoint_data_t *usb_GetEndpointData(usb_endpoint_t endpoint);
 
 /**
- * Gets the maximum packet size of an endpoint.
- * @param endpoint The endpoint to get the maximum packet size of..
- * @return The wMaxPacketSize for an \p endpoint.
+ * Gets the address of an endpoint.
+ * @param endpoint The endpoint to get the address of.
+ * @return The address of an \p endpoint.
  */
-uint16_t usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
+uint8_t usb_GetEndpointAddress(usb_endpoint_t endpoint);
 
 /**
  * Gets the transfer type of an endpoint.
  * @param endpoint The endpoint to get the transfer type of.
- * @return The usb_transfer_type for an endpoint.
+ * @return The \c usb_transfer_type of an endpoint.
  */
 usb_transfer_type_t usb_GetEndpointTransferType(usb_endpoint_t endpoint);
+
+/**
+ * Gets the maximum packet size of an endpoint.
+ * @param endpoint The endpoint to get the maximum packet size of.
+ * @return The \c wMaxPacketSize of an \p endpoint.
+ */
+uint16_t usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
 
 /**
  * Sets the flags for an endpoint.

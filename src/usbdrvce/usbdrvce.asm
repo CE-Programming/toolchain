@@ -37,8 +37,9 @@ library 'USBDRVCE', 0
 	export usb_GetEndpointDevice
 	export usb_SetEndpointData
 	export usb_GetEndpointData
-	export usb_GetEndpointMaxPacketSize
+	export usb_GetEndpointAddress
 	export usb_GetEndpointTransferType
+	export usb_GetEndpointMaxPacketSize
 	export usb_SetEndpointFlags
 	export usb_GetEndpointFlags
 	export usb_ClearEndpointHalt
@@ -74,97 +75,96 @@ end macro
 
 struct transfer			; transfer structure
 	label .: 32
-	.next		rd 1	; pointer to next transfer structure
-	.altNext	rd 1	; pointer to alternate next transfer structure
-	.status		rb 1	; transfer status
- namespace .status
-	?active		:= 1 shl 7
-	?halt		:= 1 shl 6
-	?bufErr		:= 1 shl 5
-	?babble		:= 1 shl 4
-	?xactErr	:= 1 shl 3
-	?ufMiss		:= 1 shl 2
-	?split		:= 1 shl 1
-	?ping		:= 1 shl 0
+	next		rd 1	; pointer to next transfer structure
+	altNext		rd 1	; pointer to alternate next transfer structure
+	status		rb 1	; transfer status
+ namespace status
+	active		:= 1 shl 7
+	halted		:= 1 shl 6
+	bufErr		:= 1 shl 5
+	babble		:= 1 shl 4
+	xactErr		:= 1 shl 3
+	ufMiss		:= 1 shl 2
+	split		:= 1 shl 1
+	ping		:= 1 shl 0
  end namespace
-	.type		rb 1
- namespace .type
-	?ioc		:= 1 shl 7
-	?cpage		:= 7 shl 4
-	?cerr		:= 3 shl 2
-	?pid		:= 3 shl 0
+	type		rb 1
+ namespace type
+	ioc		:= 1 shl 7
+	cpage		:= 7 shl 4
+	cerr		:= 3 shl 2
+	pid		:= 3 shl 0
  end namespace
-	.remaining	rw 1	; transfer remaining length
- namespace .remaining
+	remaining	rw 1	; transfer remaining length
+ namespace remaining
 	?dt		:= 1 shl 15
  end namespace
-	label .buffers: 20	; transfer buffers
+	label buffers: 20	; transfer buffers
 			rl 1
-	.length		rl 1	; original transfer length
-	.callback	rd 1	; user callback
-	.data		rd 1	; user callback data
-	.endpoint	rd 1	; pointer to endpoint structure
-	.padding	rw 1
+	length		rl 1	; original transfer length
+	callback	rd 1	; user callback
+	data		rd 1	; user callback data
+	endpoint	rd 1	; pointer to endpoint structure
+	padding		rw 1
 end struct
 struct endpoint			; endpoint structure
-	label .base: 64
+	label base: 64
 	label .: 62 at $+2
-	.next		rd 1	; link to next endpoint structure
-	.addr		rb 1	; device addr or cancel shl 7
-	.info		rb 1	; ep or speed shl 4 or dtc shl 6
- namespace .info
-	?head		:= 1 shl 7
-	?dtc		:= 1 shl 6
+	next		rd 1	; link to next endpoint structure
+	addr		rb 1	; device addr or cancel shl 7
+	info		rb 1	; ep or speed shl 4 or dtc shl 6
+ namespace info
+	head		:= 1 shl 7
+	dtc		:= 1 shl 6
  end namespace
-	.maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
- namespace .maxPktLen
-	?control	:= 1 shl 11
+	maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
+ namespace maxPktLen
+	control		:= 1 shl 11
  end namespace
-	.smask		rb 1	; micro-frame s-mask
-	.cmask		rb 1	; micro-frame c-mask
-	.hubInfo	rw 1	; hub addr or port num shl 7 or mult shl 14
-	.cur		rd 1	; current transfer pointer
-	.overlay	transfer; current transfer
-
-	.type		rb 1	; transfer type
-	.dir		rb 1	; transfer dir
-	.flags		rb 1	; endpoint flags
-	.internalFlags	rb 1	; internal endpoint flags
-	.first		rl 1	; pointer to first scheduled transfer
-	.last		rl 1	; pointer to last dummy transfer
-	.data		rl 1	; user data
-	.device		rl 1	; pointer to device
+	smask		rb 1	; micro-frame s-mask
+	cmask		rb 1	; micro-frame c-mask
+	hubInfo		rw 1	; hub addr or port num shl 7 or mult shl 14
+	cur		rd 1	; current transfer pointer
+	overlay		transfer; current transfer
+	type		rb 1	; transfer type
+	dir		rb 1	; transfer dir
+	flags		rb 1	; endpoint flags
+	internalFlags	rb 1	; internal endpoint flags
+	first		rl 1	; pointer to first scheduled transfer
+	last		rl 1	; pointer to last dummy transfer
+	data		rl 1	; user data
+	device		rl 1	; pointer to device
 end struct
 struct device			; device structure
 	label .: 32
-	.endpoints	rl 1	; pointer to array of endpoints
-	.hub		rl 1	; hub this device is connected to
-	.find		rb 1	; find flags
-	.hubPorts	rb 1	; number of ports in this hub
-	.addr		rb 1	; device addr and $7F
-	.speed		rb 1	; device speed shl 4
-	.info		rw 1	; hub addr or port number shl 7 or 1 shl 14
-	.child		rl 1	; first device connected to this hub
-	.sibling	rl 1	; next device connected to the same hub
-	.data		rl 1	; user data
+	endpoints	rl 1	; pointer to array of endpoints
+	hub		rl 1	; hub this device is connected to
+	find		rb 1	; find flags
+	hubPorts	rb 1	; number of ports in this hub
+	addr		rb 1	; device addr and $7F
+	speed		rb 1	; device speed shl 4
+	info		rw 1	; hub addr or port number shl 7 or 1 shl 14
+	child		rl 1	; first device connected to this hub
+	sibling		rl 1	; next device connected to the same hub
+	data		rl 1	; user data
 			rb 11
 end struct
 struct setup
 	label .: 8
-	.bmRequestType	rb 1
-	.bRequest	rb 1
-	.wValue		rw 1
-	.wIndex		rw 1
-	.wLength	rw 1
+	bmRequestType	rb 1
+	bRequest	rb 1
+	wValue		rw 1
+	wIndex		rw 1
+	wLength		rw 1
 end struct
 struct standardDescriptors
 	local size
 	label .: size
-	.device		rl 1
-	.configurations	rl 1
-	.langids	rl 1
-	.numStrings	rb 1
-	.strings	rl 1
+	device		rl 1
+	configurations	rl 1
+	langids		rl 1
+	numStrings	rb 1
+	strings		rl 1
 	size := $-.
 end struct
 struct descriptor
@@ -493,7 +493,7 @@ usb_Init:
 	ld	l,endpoint.info
 	ld	(hl),endpoint.info.head
 	ld	l,endpoint.overlay.status
-	ld	(hl),endpoint.overlay.status.halt
+	ld	(hl),endpoint.overlay.status.halted
 	ld	hl,rootHub.find
 	ld	(hl),IS_HUB or IS_ENABLED
 	ld	l,a;(cHeap-$D10000) and $FF
@@ -859,7 +859,7 @@ usb_GetStringDescriptor:
 ;-------------------------------------------------------------------------------
 usb_SetStringDescriptor:
 	call	_Error.check
-	ld	a,SET_DESCRIPTOR
+	ld	c,SET_DESCRIPTOR
 	sbc	hl,hl
 	ex	de,hl
 	call	_Alloc32Align32
@@ -897,18 +897,41 @@ end repeat
 ;-------------------------------------------------------------------------------
 usb_SetConfiguration:
 	call	_Error.check
-	push	ix
-	ld	c,a
 	ld	hl,(ix+12)
 	ld	ydevice,(ix+6)
+	push	ix
 	ld	xconfigurationDescriptor,(ix+9)
+	ld	c,a
+	ld	b,(xconfigurationDescriptor.bConfigurationValue)
+	push	bc
 .loop:
 	call	_ParseInterfaceDescriptor
 	jq	nc,.loop
-	pop	ix
+	ld	a,SET_CONFIGURATION
+.enter:
+	pop	bc,ix
 	jq	nz,_Error.INVALID_PARAM
-	
-	ret
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	ld	e,d
+	push	hl,de
+	ld	e,DEFAULT_RETRIES
+	push	de,de,hl
+	ld	(hl),d;HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_DEVICE
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	(hl),b
+	inc	l
+	xor	a,a
+	ld	(hl),a
+	inc	l
+	ld	(hl),c
+repeat 3
+	inc	l
+	ld	(hl),a
+end repeat
+	jq	usb_GetDescriptor.endpoint
 
 ;-------------------------------------------------------------------------------
 usb_GetInterface:
@@ -937,16 +960,16 @@ end repeat
 ;-------------------------------------------------------------------------------
 usb_SetInterface:
 	call	_Error.check
-	push	ix
 	ld	hl,(ix+12)
 	ld	ydevice,(ix+6)
+	push	ix
 	ld	xconfigurationDescriptor,(ix+9)
-	ld	c,(xinterfaceDescriptor.bAlternateSetting)
+	ld	bc,(xinterfaceDescriptor.bInterfaceNumber)
+	push	bc
+	ld	c,b
 	call	_ParseInterfaceDescriptor
-	pop	ix
-	jq	nz,_Error.INVALID_PARAM
-	
-	ret
+	ld	a,SET_INTERFACE
+	jq	usb_SetConfiguration.enter
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
@@ -997,6 +1020,25 @@ usb_GetEndpointData:
 	ret
 
 ;-------------------------------------------------------------------------------
+usb_GetEndpointAddress:
+	pop	hl
+	ex	(sp),yendpoint
+	ld	a,(yendpoint.dir)
+	rrca
+	ld	a,(yendpoint.info)
+	rla
+	rrca
+	and	a,$8F
+	jp	(hl)
+
+;-------------------------------------------------------------------------------
+usb_GetEndpointTransferType:
+	pop	hl
+	ex	(sp),yendpoint
+	ld	a,(yendpoint.type)
+	jp	(hl)
+
+;-------------------------------------------------------------------------------
 usb_GetEndpointMaxPacketSize:
 	pop	de
 	ex	(sp),yendpoint
@@ -1006,13 +1048,6 @@ usb_GetEndpointMaxPacketSize:
 	and	a,111b
 	ld	h,a
 	ret
-
-;-------------------------------------------------------------------------------
-usb_GetEndpointTransferType:
-	pop	hl
-	ex	(sp),yendpoint
-	ld	a,(yendpoint.type)
-	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointFlags:
@@ -1696,7 +1731,7 @@ _CreateDummyTransfer:
 	ret	nz
 assert ~transfer.status and (transfer.status - 1)
 	set	bsr transfer.status,hl
-	ld	(hl),transfer.status.halt
+	ld	(hl),transfer.status.halted
 	res	bsr transfer.status,hl
 	ld	(hl),1
 	ret
@@ -1781,8 +1816,8 @@ _CreateEndpoint:
 	inc	l;endpoint.addr
 	ld	(hl),a
 	inc	l;endpoint.info
-	inc	de
-	inc	de
+	inc	de;endpointDescriptor.descriptor.bDescriptorType
+	inc	de;endpointDescriptor.bEndpointAddress
 	ld	a,(de)
 	and	a,$F
 	or	a,(ydevice.speed)
@@ -1790,7 +1825,7 @@ _CreateEndpoint:
 	ld	bc,(ydevice.endpoints)
 	ld	a,(de)
 	and	a,$8F
-	rrca
+	rlca
 	or	a,c
 	ld	c,a
 	ld	a,h
@@ -1838,7 +1873,6 @@ assert endpoint.device and 1
 	ld	(yendpoint.first),hl
 	ld	(yendpoint.last),hl
 	ex	de,hl
-	xor	a,a
 	ld	(yendpoint.overlay.status),a
 	ld	(yendpoint.flags),a
 	ld	(yendpoint.internalFlags),a
@@ -1870,6 +1904,7 @@ assert endpoint.device and 1
 	and	a,1
 	ld	(yendpoint.dir),a
 	ld	(dummyHead.next),iy
+	cp	a,a
 	ret
 .nomem:
 	lea	hl,yendpoint.base
@@ -1884,6 +1919,8 @@ assert endpoint.device and 1
 ; Output:
 ;  zf = success
 ;  cf = error or done
+;  a = 0 | ?
+;  de = ? and $FF
 ;  hl = remaining length
 ;  ix = next descriptor
 _ParseInterfaceDescriptor:
@@ -1898,6 +1935,8 @@ _ParseInterfaceDescriptor:
 	lea	de,xendpointDescriptor
 	call	_CreateEndpoint
 	pop	ydevice,hl,de,bc
+	scf
+	ret	nz
 .next:
 	ld	a,l
 	or	a,h
@@ -2471,9 +2510,11 @@ end repeat
 	ld	a,(hl)
 	or	a,a
 	jq	nz,_HandleDeviceDescriptor.disableDevice
-	ld	(yendpoint.addr),c
 	sbc	hl,hl
 	ld	de,(yendpoint.device)
+	ld	(yendpoint.addr),c
+	ld	ydevice,(yendpoint.device)
+	ld	(ydevice.addr),c
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
@@ -2804,7 +2845,7 @@ _HandleErrInt:
 	sbc	hl,bc
 	or	a,c
 	jq	nz,.partial
-	bit	bsr ytransfer.status.halt,(ytransfer.status)
+	bit	bsr ytransfer.status.halted,(ytransfer.status)
 	jq	nz,.partial
 	bit	bsr ytransfer.type.ioc,(ytransfer.type)
 	jq	z,.continue
