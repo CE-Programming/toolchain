@@ -52,7 +52,27 @@ library 'USBDRVCE', 0
 ;-------------------------------------------------------------------------------
 ; memory structures
 ;-------------------------------------------------------------------------------
-struc transfer			; transfer structure
+macro struct? name*
+ macro end?.struct?!
+     iterate base, ., .base
+      if defined base
+       assert base+sizeof base=$
+      end if
+     end iterate
+   end namespace
+  end struc
+  iterate <base,prefix>, 0,, ix-name,x, iy-name,y
+   virtual at base
+	prefix#name	name
+   end virtual
+  end iterate
+  purge end?.struct?
+ end macro
+ struc name
+  namespace .
+end macro
+
+struct transfer			; transfer structure
 	label .: 32
 	.next		rd 1	; pointer to next transfer structure
 	.altNext	rd 1	; pointer to alternate next transfer structure
@@ -85,11 +105,10 @@ struc transfer			; transfer structure
 	.data		rd 1	; user callback data
 	.endpoint	rd 1	; pointer to endpoint structure
 	.padding	rw 1
-	assert $-. = 32
-end struc
-struc endpoint			; endpoint structure
+end struct
+struct endpoint			; endpoint structure
 	label .base: 64
-	label .: 64 at $+2
+	label .: 62 at $+2
 	.next		rd 1	; link to next endpoint structure
 	.addr		rb 1	; device addr or cancel shl 7
 	.info		rb 1	; ep or speed shl 4 or dtc shl 6
@@ -115,9 +134,8 @@ struc endpoint			; endpoint structure
 	.last		rl 1	; pointer to last dummy transfer
 	.data		rl 1	; user data
 	.device		rl 1	; pointer to device
-	assert $-. <= 64
-end struc
-struc device			; device structure
+end struct
+struct device			; device structure
 	label .: 32
 	.endpoints	rl 1	; pointer to array of endpoints
 	.hub		rl 1	; hub this device is connected to
@@ -129,18 +147,17 @@ struc device			; device structure
 	.child		rl 1	; first device connected to this hub
 	.sibling	rl 1	; next device connected to the same hub
 	.data		rl 1	; user data
-	assert $-. <= 32
-end struc
-struc setup
+			rb 11
+end struct
+struct setup
 	label .: 8
 	.bmRequestType	rb 1
 	.bRequest	rb 1
 	.wValue		rw 1
 	.wIndex		rw 1
 	.wLength	rw 1
-	assert $-. = 8
-end struc
-struc stdDesc
+end struct
+struct standardDescriptors
 	local size
 	label .: size
 	.device		rl 1
@@ -149,14 +166,69 @@ struc stdDesc
 	.numStrings	rb 1
 	.strings	rl 1
 	size := $-.
-end struc
-iterate type, transfer, endpoint, device, setup, stdDesc
- iterate <base,name>, 0,, ix-type,x, iy-type,y
-  virtual at base
-	name#type type
-  end virtual
- end iterate
-end iterate
+end struct
+struct descriptor
+	label .: 2
+	bLength			rb 1
+	bDescriptorType		rb 1
+end struct
+struct deviceDescriptor
+	label .: 18
+	descriptor		descriptor
+	bcdUSB			rw 1
+	bDeviceClass		rb 1
+	bDeviceSubClass		rb 1
+	bDeviceProtocol		rb 1
+	bMaxPacketSize0		rb 1
+	idVendor		rw 1
+	idProduct		rw 1
+	bcdDevice		rw 1
+	iManufacturer		rb 1
+	iProduct		rb 1
+	iSerialNumber		rb 1
+	bNumConfigurations	rb 1
+end struct
+struct deviceQualifierDescriptor
+	label .: 10
+	descriptor		descriptor
+	bcdUSB			rw 1
+	bDeviceClass		rb 1
+	bDeviceSubClass		rb 1
+	bDeviceProtocol		rb 1
+	bMaxPacketSize0		rb 1
+	bNumConfigurations	rb 1
+	bReserved		rb 1
+end struct
+struct configurationDescriptor
+	label .: 9
+	descriptor		descriptor
+	wTotalLength		rw 1
+	bNumInterfaces		rb 1
+	bConfigurationValue	rb 1
+	iConfiguration		rb 1
+	bmAttributes		rb 1
+	bMaxPower		rb 1
+end struct
+otherSpeedConfigurationDescriptor equ configurationDescriptor
+struct interfaceDescriptor
+	label .: 9
+	descriptor		descriptor
+	bInterfaceNumber	rb 1
+	bAlternateSetting	rb 1
+	bNumEndpoints		rb 1
+	bInterfaceClass		rb 1
+	bInterfaceSubClass	rb 1
+	bInterfaceProtocol	rb 1
+	iInterface		rb 1
+end struct
+struct endpointDescriptor
+	label .: 7
+	descriptor		descriptor
+	bEndpointType		rb 1
+	bmAttributes		rb 1
+	wMaxPacketSize		rw 1
+	bInterval		rb 1
+end struct
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -180,7 +252,7 @@ virtual at usbArea
 	?usedAddresses		dbx 128/8: ?
 	?eventCallback		rl 1
 	?eventCallback.data	rl 1
-	?standardDescriptors	rl 1
+	?currentDescriptors	rl 1
 	?selectedConfiguration	rb 1
 	?currentRole		rb 1
 	?freeList32Align32	rl 1
@@ -377,16 +449,16 @@ usb_Init:
 	djnz	.freeAddresses
 	ld	l,3
 	add	hl,sp
-;	ld	de,eventCallback;eventCallback.data,standardDescriptors
+;	ld	de,eventCallback;eventCallback.data,currentDescriptors
 	ld	c,9
 	ldir
 	ld	e,(hl)
 	dec	bc
-	ld	hl,(standardDescriptors)
+	ld	hl,(currentDescriptors)
 	add	hl,bc
 	jq	c,.nonDefaultStandardDescriptors
 	ld	hl,_DefaultStandardDescriptors
-	ld	(standardDescriptors),hl
+	ld	(currentDescriptors),hl
 .nonDefaultStandardDescriptors:
 	ld	hl,mpUsbIdle
 	ld	(hl),7
@@ -825,7 +897,17 @@ end repeat
 ;-------------------------------------------------------------------------------
 usb_SetConfiguration:
 	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
+	push	ix
+	ld	c,a
+	ld	hl,(ix+12)
+	ld	ydevice,(ix+6)
+	ld	xconfigurationDescriptor,(ix+9)
+.loop:
+	call	_ParseInterfaceDescriptor
+	jq	nc,.loop
+	pop	ix
+	jq	nz,_Error.INVALID_PARAM
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetInterface:
@@ -1784,6 +1866,56 @@ assert endpoint.device and 1
 	jq	_Free64Align256
 
 ;-------------------------------------------------------------------------------
+; Input:
+;  c = alternate setting
+;  hl = length
+;  ix = interface descriptor followed by endpoint descriptors
+;  iy = device
+; Output:
+;  zf = success
+;  cf = error or done
+;  hl = remaining length
+;  ix = next descriptor
+_ParseInterfaceDescriptor:
+	ld	b,2
+	ld	de,0
+	jq	.next
+.endpoint:
+	ld	a,e
+	cp	a,sizeof xendpointDescriptor
+	ret	c
+	push	bc,de,hl,ydevice
+	lea	de,xendpointDescriptor
+	call	_CreateEndpoint
+	pop	ydevice,hl,de,bc
+.next:
+	ld	a,l
+	or	a,h
+	ccf
+	ret	z
+	add	xdescriptor,de
+	ld	a,(xdescriptor.bLength)
+	cp	a,sizeof xdescriptor
+	ret	c
+	ld	e,a
+	sbc	hl,de
+	ret	c
+	ld	a,(xdescriptor.bDescriptorType)
+	sub	a,ENDPOINT_DESCRIPTOR
+	jq	z,.endpoint
+assert INTERFACE_DESCRIPTOR+1 = ENDPOINT_DESCRIPTOR
+	inc	a
+	jq	nz,.next
+	ld	a,e
+	cp	a,sizeof xinterfaceDescriptor
+	ret	c
+	ld	a,(xinterfaceDescriptor.bAlternateSetting)
+	sub	a,c
+	jq	nz,.next
+	djnz	.next
+	ret
+
+;-------------------------------------------------------------------------------
 _FunData:
 repeat 256
 	db % and $FF
@@ -2025,7 +2157,7 @@ _HandleGetDescriptor:
 	ld	bc,(ysetup.wValue)
 	inc	bc
 	dec.s	bc
-	ld	iy,(standardDescriptors)
+	ld	iy,(currentDescriptors)
 	djnz	.notDevice;DEVICE_DESCRIPTOR
 	or	a,c
 	or	a,e
@@ -2033,7 +2165,7 @@ _HandleGetDescriptor:
 	jq	nz,_HandleCxSetupInt.unhandled
 .sendSingleDescriptorIYind:
 	ld	b,a
-	ld	hl,(iy);(ystdDesc.device)
+	ld	hl,(iy);(ystandardDescriptors.device)
 .sendSingleDescriptorHL:
 	ld	c,(hl)
 	ex	de,hl
@@ -2043,8 +2175,8 @@ _HandleGetDescriptor:
 	or	a,e
 	or	a,d
 	jq	nz,_HandleCxSetupInt.unhandled
-	ld	hl,(ystdDesc.configurations)
-	ld	iy,(ystdDesc.device)
+	ld	hl,(ystandardDescriptors.configurations)
+	ld	iy,(ystandardDescriptors.device)
 	ld	a,c
 	cp	a,(iy+17)
 	jq	nc,_HandleCxSetupInt.unhandled
@@ -2057,13 +2189,13 @@ end repeat
 	jq	.sendDescriptor
 .notConfiguration:
 	djnz	.notString;STRING_DESCRIPTOR
-	ld	hl,(ystdDesc.langids)
+	ld	hl,(ystandardDescriptors.langids)
 	cp	a,c
 	jq	z,.langids
-	ld	a,(ystdDesc.numStrings)
+	ld	a,(ystandardDescriptors.numStrings)
 	cp	a,c
 	jq	c,_HandleCxSetupInt.unhandled
-	ld	iy,(ystdDesc.strings)
+	ld	iy,(ystandardDescriptors.strings)
 	ld	a,(hl)
 	rra
 	dec	a
@@ -2094,8 +2226,8 @@ end repeat
 .notString:
 	jq	_HandleCxSetupInt.unhandled
 
-;	ld	hl,(standardDescriptors)
-;	ld	iy,(hl+stdDesc.device)
+;	ld	hl,(currentDescriptors)
+;	ld	iy,(hl+currentDescriptors.device)
 ;	ld	a,(iy+7);bMaxPacketSize0
 .sendDescriptor:
 	ld	hl,mpUsbCxFifo

@@ -159,7 +159,8 @@ void main(void) {
     global_t global = {NULL};
     usb_error_t error;
     os_SetCursorPos(1, 0);
-    if ((error = usb_Init(handle_usb_event, &global, NULL, USB_DEFAULT_INIT_FLAGS)) == USB_SUCCESS) {
+    if ((error = usb_Init(handle_usb_event, &global, NULL,
+                          USB_DEFAULT_INIT_FLAGS)) == USB_SUCCESS) {
         while ((error = usb_WaitForInterrupt()) == USB_SUCCESS && !os_GetCSC()) {
             unsigned row, col;
             os_GetCursorPos(&row, &col);
@@ -183,7 +184,10 @@ void main(void) {
                     if (!(configuration_descriptor = malloc(length))) goto noerr;
                     if ((error = usb_GetDescriptor(global.device, USB_CONFIGURATION_DESCRIPTOR,
                                                    index, configuration_descriptor, length,
-                                                   &length)) != USB_SUCCESS) goto err;
+                                                   &length)) != USB_SUCCESS ||
+                        (!index && (error = usb_SetConfiguration(global.device,
+                                                                 configuration_descriptor,
+                                                                 length)) != USB_SUCCESS)) goto err;
                     putByteHex(index);
                     putChar(':');
                     putBlockHex(configuration_descriptor, length);
