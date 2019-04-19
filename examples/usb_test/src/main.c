@@ -1,3 +1,6 @@
+typedef struct global global_t;
+#define usb_callback_data_t global_t
+
 #include <usbdrvce.h>
 
 #include <debug.h>
@@ -6,6 +9,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+
+struct global {
+    usb_device_t device;
+};
 
 static void putChar(char c) {
     static char str[2];
@@ -28,23 +35,6 @@ static void putIntHex(unsigned x) {
 static void putBlockHex(void *block, size_t size) {
     while (size--)
         putByteHex(*(*(unsigned char **)&block)++);
-}
-
-static usb_device_t device;
-
-static usb_error_t got_device_descriptor(usb_endpoint_t endpoint, usb_transfer_status_t status,
-                                         size_t transferred, usb_transfer_data_t *data) {
-    putIntHex((unsigned)endpoint);
-    putChar(':');
-    putIntHex(status);
-    putChar(':');
-    putIntHex(transferred);
-    _OS(os_NewLine);
-    putBlockHex(data, sizeof(usb_device_descriptor_t));
-    free(data);
-    _OS(os_NewLine);
-    device = usb_GetEndpointDevice(endpoint);
-    return USB_SUCCESS;
 }
 
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
@@ -127,24 +117,14 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             os_PutStrFull(usb_event_names[event]);
             _OS(os_NewLine);
             break;
-        case USB_DEVICE_ENABLED_EVENT: {
-            static const usb_control_setup_t setup = {
-                USB_DEVICE_TO_HOST | USB_STANDARD_REQUEST | USB_RECIPIENT_DEVICE,
-                USB_GET_DESCRIPTOR,
-                USB_DEVICE_DESCRIPTOR << 8,
-                0,
-                sizeof(usb_device_descriptor_t),
-            };
-            usb_device_descriptor_t *device_descriptor = malloc(sizeof(usb_device_descriptor_t));
-            memset(device_descriptor, -1, sizeof(usb_device_descriptor_t));
+        case USB_DEVICE_ENABLED_EVENT:
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
+            callback_data->device = event_data;
             _OS(os_NewLine);
-            return usb_ScheduleDefaultControlTransfer(event_data, &setup, device_descriptor,
-                                                      got_device_descriptor, device_descriptor);
-        }
+            break;
         case USB_DEFAULT_SETUP_EVENT: {
             unsigned char i;
             for (i = 0; i < 8; i++)
@@ -176,20 +156,48 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 }
 
 void main(void) {
+    global_t global = {NULL};
     usb_error_t error;
     os_SetCursorPos(1, 0);
-    if ((error = usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS)) == USB_SUCCESS) {
+    if ((error = usb_Init(handle_usb_event, &global, NULL, USB_DEFAULT_INIT_FLAGS)) == USB_SUCCESS) {
         while ((error = usb_WaitForInterrupt()) == USB_SUCCESS && !os_GetCSC()) {
             unsigned row, col;
             os_GetCursorPos(&row, &col);
             os_SetCursorPos(0, 0);
             putIntHex(usb_GetFrameNumber());
             os_SetCursorPos(row, col);
-            if (device) {
-                dbg_Debugger();
-                putIntHex(usb_GetConfigurationDescriptorTotalLength(device, 0));
+            if (global.device) {
+                usb_device_descriptor_t device_descriptor;
+                size_t length;
+                uint8_t index;
+                void *configuration_descriptor = NULL;
+                if ((error = usb_GetDescriptor(global.device, USB_DEVICE_DESCRIPTOR, 0,
+                                               &device_descriptor, sizeof(device_descriptor),
+                                               &length)) != USB_SUCCESS) goto err;
+                if (length < sizeof(device_descriptor)) goto noerr;
+                putBlockHex(&device_descriptor, sizeof(device_descriptor));
+                os_GetKey();
                 _OS(os_NewLine);
-                device = NULL;
+                for (index = 0; index != device_descriptor.bNumConfigurations; ++index) {
+                    length = usb_GetConfigurationDescriptorTotalLength(global.device, index);
+                    if (!(configuration_descriptor = malloc(length))) goto noerr;
+                    if ((error = usb_GetDescriptor(global.device, USB_CONFIGURATION_DESCRIPTOR,
+                                                   index, configuration_descriptor, length,
+                                                   &length)) != USB_SUCCESS) goto err;
+                    putByteHex(index);
+                    putChar(':');
+                    putBlockHex(configuration_descriptor, length);
+                    os_GetKey();
+                    _OS(os_NewLine);
+                    free(configuration_descriptor); configuration_descriptor = NULL;
+                }
+                goto noerr;
+            err:
+                putIntHex(error);
+                _OS(os_NewLine);
+            noerr:
+                if (configuration_descriptor) free(configuration_descriptor);
+                global.device = NULL;
             }
         }
     }
