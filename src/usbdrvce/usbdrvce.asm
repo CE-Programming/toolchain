@@ -897,7 +897,7 @@ end repeat
 ;-------------------------------------------------------------------------------
 usb_SetConfiguration:
 	call	_Error.check
-	ld	hl,(ix+12)
+	ld	de,(ix+12)
 	ld	ydevice,(ix+6)
 	push	ix
 	ld	xconfigurationDescriptor,(ix+9)
@@ -905,7 +905,11 @@ assert xconfigurationDescriptor.bNumInterfaces+1 = xconfigurationDescriptor.bCon
 	ld	bc,(xconfigurationDescriptor.bNumInterfaces)
 	push	bc
 	ld	b,c
-	ld	c,a
+virtual
+	sub	a,c
+	load .sub_a_c: byte from $$
+end virtual
+	ld	a,.sub_a_c
 	call	_ParseInterfaceDescriptors
 	pop	bc,ix
 	jq	nz,_Error.INVALID_PARAM
@@ -958,15 +962,19 @@ end repeat
 ;-------------------------------------------------------------------------------
 usb_SetInterface:
 	call	_Error.check
-	ld	hl,(ix+12)
+	ld	de,(ix+12)
 	ld	ydevice,(ix+6)
 	push	ix
 	ld	xconfigurationDescriptor,(ix+9)
 assert xinterfaceDescriptor.bInterfaceNumber+1 = xinterfaceDescriptor.bAlternateSetting
 	ld	bc,(xinterfaceDescriptor.bInterfaceNumber)
 	push	bc
-	ld	c,b
 	ld	b,2
+virtual
+	sub	a,a
+	load .sub_a_a: byte from $$
+end virtual
+	ld	a,.sub_a_a
 	call	_ParseInterfaceDescriptors.dec
 	pop	bc,ix
 	jq	nz,_Error.INVALID_PARAM
@@ -1929,21 +1937,27 @@ assert endpoint.device and 1
 
 ;-------------------------------------------------------------------------------
 ; Input:
+;  a = smc
 ;  b = num interfaces
-;  c = alternate setting
-;  hl = length
-;  ix = interface descriptor followed by endpoint descriptors
+;  de = length
+;  ix = descriptors
 ;  iy = device
 ; Output:
-;  zf = success
+;  zf = valid
 ;  a = 0 | ?
 ;  de = ? and $FF
 _ParseInterfaceDescriptors:
 	inc	b
 .dec:
-	ld	de,0
+	ld	(.alt),a
+	or	a,a
+	sbc	hl,hl
+	ex.s	de,hl
+	ld	c,e
 	jq	.enter
 .endpoint:
+	cp	a,c
+	jq	z,.next
 	ld	a,e
 	cp	a,sizeof xendpointDescriptor
 	ret	c
@@ -1952,11 +1966,13 @@ _ParseInterfaceDescriptors:
 	call	_CreateEndpoint
 	pop	ydevice,hl,de,bc
 	ret	nz
+	dec	c
 .next:
 	add	xdescriptor,de
 .enter:
-	ld	a,l
-	or	a,h
+	add	hl,de
+	xor	a,a
+	sbc	hl,de
 	ret	z
 	ld	a,(xdescriptor.bLength)
 	cp	a,sizeof xdescriptor
@@ -1970,12 +1986,15 @@ _ParseInterfaceDescriptors:
 assert INTERFACE_DESCRIPTOR+1 = ENDPOINT_DESCRIPTOR
 	inc	a
 	jq	nz,.next
+	ld	c,a
 	ld	a,e
 	cp	a,sizeof xinterfaceDescriptor
 	ret	c
 	ld	a,(xinterfaceDescriptor.bAlternateSetting)
 	sub	a,c
+label .alt at $-byte
 	jq	nz,.next
+	ld	c,(xinterfaceDescriptor.bNumEndpoints)
 	djnz	.next
 	ret
 
