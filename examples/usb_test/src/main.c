@@ -275,7 +275,7 @@ static void handleDevice(global_t *global) {
     _OS(asm_NewLine);
  noerr:
     if (configuration) free(configuration);
-    memset(&global, 0, sizeof(global_t));
+    memset(global, 0, sizeof(global_t));
  }
 
 void main(void) {
