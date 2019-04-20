@@ -2877,7 +2877,7 @@ _HandleErrInt:
 .free:
 	lea	hl,iy
 	bit	bsr ytransfer.type.ioc,(ytransfer.type)
-	ld	ytransfer,(ytransfer.next)
+	ld	ytransfer,(hl+transfer.next)
 	call	_Free32Align32
 	jq	z,.free
 	ld	(xendpoint.first),ytransfer
