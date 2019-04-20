@@ -901,14 +901,12 @@ usb_SetConfiguration:
 	ld	ydevice,(ix+6)
 	push	ix
 	ld	xconfigurationDescriptor,(ix+9)
-	ld	c,a
-	ld	b,(xconfigurationDescriptor.bConfigurationValue)
+assert xconfigurationDescriptor.bNumInterfaces+1 = xconfigurationDescriptor.bConfigurationValue
+	ld	bc,(xconfigurationDescriptor.bNumInterfaces)
 	push	bc
-.loop:
-	call	_ParseInterfaceDescriptor
-	jq	nc,.loop
-	ld	a,SET_CONFIGURATION
-.enter:
+	ld	b,c
+	ld	c,a
+	call	_ParseInterfaceDescriptors
 	pop	bc,ix
 	jq	nz,_Error.INVALID_PARAM
 	call	_Alloc32Align32
@@ -919,14 +917,14 @@ usb_SetConfiguration:
 	push	de,de,hl
 	ld	(hl),d;HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),a
+	ld	(hl),SET_CONFIGURATION
 	inc	l
 	ld	(hl),b
+repeat 2
 	inc	l
-	xor	a,a
 	ld	(hl),a
-	inc	l
-	ld	(hl),c
+end repeat
+.length:
 repeat 3
 	inc	l
 	ld	(hl),a
@@ -964,12 +962,30 @@ usb_SetInterface:
 	ld	ydevice,(ix+6)
 	push	ix
 	ld	xconfigurationDescriptor,(ix+9)
+assert xinterfaceDescriptor.bInterfaceNumber+1 = xinterfaceDescriptor.bAlternateSetting
 	ld	bc,(xinterfaceDescriptor.bInterfaceNumber)
 	push	bc
 	ld	c,b
-	call	_ParseInterfaceDescriptor
-	ld	a,SET_INTERFACE
-	jq	usb_SetConfiguration.enter
+	ld	b,2
+	call	_ParseInterfaceDescriptors.dec
+	pop	bc,ix
+	jq	nz,_Error.INVALID_PARAM
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	ld	e,d
+	push	hl,de
+	ld	e,DEFAULT_RETRIES
+	push	de,de,hl
+	ld	(hl),HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_INTERFACE
+	inc	l
+	ld	(hl),SET_INTERFACE
+	inc	l
+	ld	(hl),b
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	(hl),c
+	jq	usb_SetConfiguration.length
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
@@ -1913,21 +1929,20 @@ assert endpoint.device and 1
 
 ;-------------------------------------------------------------------------------
 ; Input:
+;  b = num interfaces
 ;  c = alternate setting
 ;  hl = length
 ;  ix = interface descriptor followed by endpoint descriptors
 ;  iy = device
 ; Output:
 ;  zf = success
-;  cf = error or done
 ;  a = 0 | ?
 ;  de = ? and $FF
-;  hl = remaining length
-;  ix = next descriptor
-_ParseInterfaceDescriptor:
-	ld	b,2
+_ParseInterfaceDescriptors:
+	inc	b
+.dec:
 	ld	de,0
-	jq	.next
+	jq	.enter
 .endpoint:
 	ld	a,e
 	cp	a,sizeof xendpointDescriptor
@@ -1936,14 +1951,13 @@ _ParseInterfaceDescriptor:
 	lea	de,xendpointDescriptor
 	call	_CreateEndpoint
 	pop	ydevice,hl,de,bc
-	scf
 	ret	nz
 .next:
+	add	xdescriptor,de
+.enter:
 	ld	a,l
 	or	a,h
-	ccf
 	ret	z
-	add	xdescriptor,de
 	ld	a,(xdescriptor.bLength)
 	cp	a,sizeof xdescriptor
 	ret	c
