@@ -905,11 +905,6 @@ assert xconfigurationDescriptor.bNumInterfaces+1 = xconfigurationDescriptor.bCon
 	ld	bc,(xconfigurationDescriptor.bNumInterfaces)
 	push	bc
 	ld	b,c
-virtual
-	sub	a,c
-	load .sub_a_c: byte from $$
-end virtual
-	ld	a,.sub_a_c
 	call	_ParseInterfaceDescriptors
 	pop	bc,ix
 	jq	nz,_Error.INVALID_PARAM
@@ -969,12 +964,8 @@ usb_SetInterface:
 assert xinterfaceDescriptor.bInterfaceNumber+1 = xinterfaceDescriptor.bAlternateSetting
 	ld	bc,(xinterfaceDescriptor.bInterfaceNumber)
 	push	bc
+	ld	a,b
 	ld	b,2
-virtual
-	sub	a,a
-	load .sub_a_a: byte from $$
-end virtual
-	ld	a,.sub_a_a
 	call	_ParseInterfaceDescriptors.dec
 	pop	bc,ix
 	jq	nz,_Error.INVALID_PARAM
@@ -1937,7 +1928,7 @@ assert endpoint.device and 1
 
 ;-------------------------------------------------------------------------------
 ; Input:
-;  a = smc
+;  a = alt
 ;  b = num interfaces
 ;  de = length
 ;  ix = descriptors
@@ -1991,7 +1982,7 @@ assert INTERFACE_DESCRIPTOR+1 = ENDPOINT_DESCRIPTOR
 	cp	a,sizeof xinterfaceDescriptor
 	ret	c
 	ld	a,(xinterfaceDescriptor.bAlternateSetting)
-	sub	a,c
+	sub	a,0
 label .alt at $-byte
 	jq	nz,.next
 	ld	c,(xinterfaceDescriptor.bNumEndpoints)
@@ -2861,7 +2852,9 @@ _HandleErrInt:
 ;	or	a,a
 	sbc	hl,hl
 	inc.s	bc
-	ld	ytransfer,(xendpoint.first)
+	lea	ytransfer.next,xendpoint.first
+.continue:
+	ld	ytransfer,(ytransfer.next)
 .inner:
 	bit	0,(ytransfer.next) ; dummy
 	jq	nz,.next
@@ -2925,9 +2918,6 @@ assert USB_ERROR_NOT_SUPPORTED
 .error:
 	pop	ix
 	ret
-.continue:
-	ld	ytransfer,(ytransfer.next)
-	jq	.inner
 .next:
 	ld	xendpoint,(xendpoint.next)
 .enter:
