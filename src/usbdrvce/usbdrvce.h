@@ -221,6 +221,12 @@ typedef enum usb_request {
   USB_SYNC_FRAME,
 } usb_request_t;
 
+typedef enum usb_feature {
+  USB_ENDPOINT_HALT,
+  USB_DEVICE_REMOTE_WAKEUP,
+  USB_TEST_MODE,
+} usb_feature_t;
+
 typedef enum usb_descriptor_type {
   USB_DEVICE_DESCRIPTOR = 1,
   USB_CONFIGURATION_DESCRIPTOR,
@@ -746,6 +752,14 @@ usb_error_t usb_SetInterface(usb_device_t device,
                              size_t length);
 
 /**
+ * Clears an endpoint's halt condition, indicated by transfers to that endpoint
+ * stalling.  This function blocks until the halt condition is cleared.
+ * @param endpoint The endpoint to clear the halt condition of.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_ClearEndpointHalt(usb_endpoint_t endpoint);
+
+/**
  * Gets the endpoint of a \p device with a given \p address, or NULL if that
  * address is unused.
  * @param device Device to get the user data of.
@@ -808,14 +822,6 @@ void usb_SetEndpointFlags(usb_endpoint_t endpoint, usb_endpoint_flag_t flags);
  * @return The flags last set with \c usb_SetEndpointFlags.
  */
 usb_endpoint_flag_t usb_GetEndpointFlags(usb_endpoint_t endpoint);
-
-/**
- * Clears an endpoint's halt condition, indicated by transfers to that endpoint
- * stalling.  This function blocks until the halt condition is cleared.
- * @param endpoint The endpoint to clear the halt condition of.
- * @return USB_SUCCESS if the transfer succeeded or an error.
- */
-usb_error_t usb_ClearEndpointHalt(usb_endpoint_t endpoint);
 
 /**
  * Returns the current 11-bit frame number, as last broadcast by the current
