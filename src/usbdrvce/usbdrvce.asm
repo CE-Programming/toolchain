@@ -33,6 +33,7 @@ library 'USBDRVCE', 0
 	export usb_SetConfiguration
 	export usb_GetInterface
 	export usb_SetInterface
+	export usb_ClearEndpointHalt
 	export usb_GetDeviceEndpoint
 	export usb_GetEndpointDevice
 	export usb_SetEndpointData
@@ -42,7 +43,6 @@ library 'USBDRVCE', 0
 	export usb_GetEndpointMaxPacketSize
 	export usb_SetEndpointFlags
 	export usb_GetEndpointFlags
-	export usb_ClearEndpointHalt
 	export usb_GetFrameNumber
 	export usb_ControlTransfer
 	export usb_Transfer
@@ -403,6 +403,13 @@ virtual at 0
 	?GET_INTERFACE				rb 1
 	?SET_INTERFACE				rb 1
 	?SYNC_FRAME				rb 1
+end virtual
+
+; enum usb_feature
+virtual at 0
+	?ENDPOINT_HALT				rb 1
+	?DEVICE_REMOTE_WAKEUP			rb 1
+	?TEST_MODE				rb 1
 end virtual
 
 ; enum usb_descriptor_type
@@ -806,7 +813,7 @@ usb_GetDescriptor:
 	ld	de,(ix+18)
 	ld	(hl),de
 .endpoint:
-	ld	iy,(ix+6)
+	ld	ydevice,(ix+6)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	call	usb_ControlTransfer
@@ -975,16 +982,49 @@ assert xinterfaceDescriptor.bInterfaceNumber+1 = xinterfaceDescriptor.bAlternate
 	push	hl,de
 	ld	e,DEFAULT_RETRIES
 	push	de,de,hl
-	ld	(hl),HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_INTERFACE
+iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_INTERFACE, SET_INTERFACE, b, a, c
+	ld	(hl),value
+ if % <> %%
 	inc	l
-	ld	(hl),SET_INTERFACE
-	inc	l
-	ld	(hl),b
-	inc	l
-	ld	(hl),a
-	inc	l
-	ld	(hl),c
+ end if
+end iterate
 	jq	usb_SetConfiguration.length
+
+;-------------------------------------------------------------------------------
+usb_ClearEndpointHalt:
+	call	_Error.check
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	ld	yendpoint,(ix+6)
+	call	usb_GetEndpointAddress
+	ld	de,0
+	push	hl,de
+	ld	e,DEFAULT_RETRIES
+	push	de,de,hl
+assert ~ENDPOINT_HALT
+iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_FEATURE, d, d, a, d, d, d
+	ld	(hl),value
+ if % <> %%
+	inc	l
+ end if
+end iterate
+	ld	ydevice,(yendpoint.device)
+	call	usb_GetDeviceEndpoint.enter
+	push	hl
+	call	usb_ControlTransfer
+	ld	yendpoint,(ix+6)
+	ex	de,hl
+	ld	hl,(ix-6)
+	call	_Free32Align32
+	ex	de,hl
+	ld	sp,ix
+	pop	ix
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ret	nz
+	res	bsr yendpoint.overlay.remaining.dt,(yendpoint.overlay.remaining)
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
@@ -1038,13 +1078,15 @@ usb_GetEndpointData:
 usb_GetEndpointAddress:
 	pop	hl
 	ex	(sp),yendpoint
+	push	hl
+.enter:
 	ld	a,(yendpoint.dir)
 	rrca
 	ld	a,(yendpoint.info)
 	rla
 	rrca
 	and	a,$8F
-	jp	(hl)
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointTransferType:
@@ -1079,11 +1121,6 @@ usb_GetEndpointFlags:
 	ex	(sp),yendpoint
 	ld	a,(yendpoint.flags)
 	jp	(hl)
-
-;-------------------------------------------------------------------------------
-usb_ClearEndpointHalt:
-	call	_Error.check
-	jq	_Error.NOT_SUPPORTED
 
 ;-------------------------------------------------------------------------------
 usb_GetFrameNumber:
