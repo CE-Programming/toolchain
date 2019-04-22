@@ -581,6 +581,43 @@ fontlib_font_t *fontlib_GetFontByIndexRaw(fontlib_font_pack_t *font_pack, uint8_
  */
 fontlib_font_t *fontlib_GetFontByIndex(char *font_pack_name, uint8_t index);
 
+/**
+ * Gets a pointer to a font, suitable for passing to SetFont(), given a font
+ * pack's address and a set of font properties.  Useful if you know caching the
+ * font pack's address is safe.
+ * @see ti_GetDataPtr()
+ * @param font_pack_name Pointer to font pack appvar's name
+ * @param size_min Minimum heigh, in pixels, to accept.  Space above and space
+ * below metrics are not considered.
+ * @param size_max Maximum height
+ * @param weight_min Minimum weight to accept.  0 may be used.
+ * @param weight_max Maximum weight to accept.  0xFF may be used.
+ * @param style_bits_set Mask of style bits you want set.  For example,
+ * FONTLIB_SERIF | FONTLIB_MONOSPACE to look for a monospaced serifed font.
+ * @param style_bits_reset Style bits you want RESET.  For example, pass
+ * FONTLIB_MONOSPACE to REJECT monospaced fonts.
+ * @return Direct pointer to font, or NULL if no matching font is found
+ */
+ fontlib_font_t *fontlib_GetFontByStyleRaw(fontlib_font_pack_t *font_pack, uint8_t size_min, uint8_t size_max, uint8_t weight_min, uint8_t weight_max, uint8_t style_bits_set, uint8_t style_bits_reset);
+
+/**
+ * Gets a pointer to a font, suitable for passing to SetFont(), given a font
+ * pack's appvar's name and a set of font properties.  Recommended to use after
+ * any file write, create, delete, or un/archive, as all those operations could
+ * invalidate the cached data pointers to the currently loaded font.
+ * @param font_pack_name Pointer to font pack appvar's name
+ * @param size_min Minimum heigh, in pixels, to accept.  Space above and space
+ * below metrics are not considered.
+ * @param size_max Maximum height
+ * @param weight_min Minimum weight to accept.  0 may be used.
+ * @param weight_max Maximum weight to accept.  0xFF may be used.
+ * @param style_bits_set Mask of style bits you want set.  For example,
+ * FONTLIB_SERIF | FONTLIB_MONOSPACE to look for a monospaced serifed font.
+ * @param style_bits_reset Style bits you want RESET.  For example, pass
+ * FONTLIB_MONOSPACE to REJECT monospaced fonts.
+ * @return Direct pointer to font, or NULL if no matching font is found
+ */
+fontlib_font_t *fontlib_GetFontByStyle(char *font_pack_name, uint8_t size_min, uint8_t size_max, uint8_t weight_min, uint8_t weight_max, uint8_t style_bits_set, uint8_t style_bits_reset);
 
 
 #ifdef __cplusplus

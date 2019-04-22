@@ -61,6 +61,8 @@ include_library '../graphx/graphx.asm'
 	export fontlib_GetFontPackName
 	export fontlib_GetFontByIndex
 	export fontlib_GetFontByIndexRaw
+	export fontlib_GetFontByStyle
+	export fontlib_GetFontByStyleRaw
 
 
 ;-------------------------------------------------------------------------------
@@ -94,7 +96,7 @@ mWasNewline	:= 1 shl bWasNewline
 ;-------------------------------------------------------------------------------
 ; Declare the structure of a raw font
 struc strucFont
-	label .: 13
+	label .: 15
 	.version			rb	1
 	.height				rb	1
 	.totalGlyphs			rb	1
@@ -104,6 +106,8 @@ struc strucFont
 	.italicSpaceAdjust		rb	1
 	.spaceAbove			rb	1
 	.spaceBelow			rb	1
+	.weight				rb	1
+	.style				rb	1
 end struc
 virtual at 0
 strucFont strucFont
@@ -1657,7 +1661,103 @@ fontlib_GetFontByIndexRaw:
 	ret
 
 
+;-------------------------------------------------------------------------------
+fontlib_GetFontByStyle:
+; Searches for a font in a font pack given a set of properties.
+; Arguments:
+;  arg0: Pointer to font pack's name
+;  arg1: Minimum acceptable size
+;  arg2: Maximum acceptable size
+;  arg3: Minimum acceptable weight
+;  arg4: Maximum acceptable weight
+;  arg5: Style bits that must be set
+;  arg6: Style bits that must be reset
+; Returns:
+;  Pointer, or NULL if error
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + arg0)
+	push	iy
+	call	util.GetFontPackData
+	pop	iy
+	ret	c
+	ld	(iy + arg0),de
+; Fall through to fontlib_GetFontRaw
+assert $ = fontlib_GetFontByStyleRaw
 
+
+;-------------------------------------------------------------------------------
+fontlib_GetFontByStyleRaw:
+; Searches for a font in a font pack given a set of properties.
+; Arguments:
+;  arg0: Pointer to first data byte of font pack
+;  arg1: Minimum acceptable size
+;  arg2: Maximum acceptable size
+;  arg3: Minimum acceptable weight
+;  arg4: Maximum acceptable weight
+;  arg5: Style bits that must be set
+;  arg6: Style bits that must be reset
+; Returns:
+;  Pointer, or NULL if error
+	ld	iy,0
+	add	iy,sp
+	push	ix
+; Cache pointer to font pack start
+	ld	de,(iy + arg0)
+	or	a,a
+	sbc	hl,hl
+	add	hl,de
+; Get pointer to fonts table
+	ld	bc,strucFontPackHeader.fontCount
+	add	hl,bc
+	ld	b,(hl)
+	inc	hl
+.checkLoop:
+	ld	ix,(hl)
+	add	ix,de
+	call	.checkStyle
+	jr	c,.goodFont
+	inc	hl
+	inc	hl
+	inc	hl
+	djnz	.checkLoop
+	sbc	hl,hl		; Carry must be reset from above
+	jr	.badFont
+.goodFont:
+	lea	hl,ix + 0
+.badFont:
+	pop	ix
+	ret
+.checkStyle:
+	ld	a,(ix + strucFont.height)
+	cp	(iy + arg1)
+	ccf
+	ret	nc
+	cp	(iy + arg2)
+	jr	z,.sizeOK
+	ret	nc
+.sizeOK:
+	ld	a,(ix + strucFont.weight)
+	cp	(iy + arg3)
+	ccf
+	ret	nc
+	cp	(iy + arg4)
+	jr	z,.weightOK
+	ret	nc
+.weightOK:
+	ld	a,(ix + strucFont.style)
+	ld	c,(iy + arg5)
+	and	a,c
+	cp	a,c
+	ret	nz
+	ld	a,(ix + strucFont.style)
+	ld	c,(iy + arg6)
+	and	a,c
+	xor	a,c
+	cp	a,c
+	ret	nz
+	scf
+	ret
 
 
 ;-------------------------------------------------------------------------------
