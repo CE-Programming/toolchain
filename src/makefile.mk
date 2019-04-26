@@ -153,9 +153,13 @@ else
 STATIC := 1
 endif
 
+ifneq ("$(EXTRA_CFLAGS)","")
+EXTRA_COMPILER_FLAGS := $(addprefix -define:,$(EXTRA_CFLAGS))
+endif
+
 # define the C flags used by the Zilog compiler
 CFLAGS ?= \
-    -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE)
+    -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE) $(EXTRA_COMPILER_FLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
