@@ -8,6 +8,9 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "master" ]; then
     exit 0
 fi
 
+# Only perform below actions on a tagged (release) commit
+git describe --exact-match --tags HEAD || exit 0
+
 rev=$(git rev-parse --short HEAD)
 
 git config user.name "Travis CI"
@@ -23,7 +26,7 @@ then
     git fetch upstream && git reset upstream/master
     cp ../tested-functions-list.md ./Tested-functions-list.md
     git add ./Tested-functions-list.md
-    git commit -m "Update Tested-functions-list.md"
+    git commit -m "update tested functions list"
     git push -q upstream HEAD:master
 fi
 
@@ -36,3 +39,4 @@ touch .
 git add -A .
 git commit -m "rebuild pages at ${rev}"
 git push -q upstream HEAD:gh-pages
+
