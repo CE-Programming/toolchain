@@ -165,8 +165,7 @@ FULL_PATH_NAMES        = YES
 STRIP_FROM_PATH        = ../../src/ce \
                          ../../src/keypadc \
                          ../../src/graphx \
-                         ../../src/fileioc \
-                         ../../src/fatdrvce
+                         ../../src/fileioc
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
@@ -797,7 +796,6 @@ WARN_LOGFILE           =
 INPUT                  = ../../src/graphx/graphx.h \
                          ../../src/keypadc/keypadc.h \
                          ../../src/fileioc/fileioc.h \
-                         ../../src/fatdrvce/fatdrvce.h \
                          ../../src/ce/debug.h \
                          ../../src/ce/tice.h \
                          ../../src/ce/intce.h \
