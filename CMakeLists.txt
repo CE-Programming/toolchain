@@ -8,15 +8,16 @@ project(toolchain)
 list(APPEND CMAKE_C_FLAGS "-std=c99 -W -Wall -Wno-incompatible-library-redeclaration -Wno-parentheses -Wno-pointer-sign -Wno-incompatible-pointer-types")
 
 include_directories(${CMAKE_SOURCE_DIR}/src/ce
+                    ${CMAKE_SOURCE_DIR}/src/fatdrvce
                     ${CMAKE_SOURCE_DIR}/src/fileioc
+                    ${CMAKE_SOURCE_DIR}/src/fontlibc
                     ${CMAKE_SOURCE_DIR}/src/graphx
                     ${CMAKE_SOURCE_DIR}/src/keypadc
                     ${CMAKE_SOURCE_DIR}/src/usbdrvce
-                    ${CMAKE_SOURCE_DIR}/src/fontlibc
                     ${CMAKE_SOURCE_DIR}/src/std
-                    ${CMAKE_SOURCE_DIR}/src/sub/compat)
+                    ${CMAKE_SOURCE_DIR}/src/compatibility)
 
 file(GLOB_RECURSE SOURCE_FILES   src      false *.h *.c)
 file(GLOB_RECURSE EXAMPLES_FILES examples false *.h *.c)
 
-add_executable(toolchain ${SRC_FILES} ${EXAMPLES_FILES})
+add_executable(toolchain ${SOURCE_FILES} ${EXAMPLES_FILES})
