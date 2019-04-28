@@ -97,6 +97,19 @@ typedef enum {
     FONTLIB_MONOSPACED = 0x08
 } fontlib_styles_t;
 
+typedef enum {
+    FONTLIB_THIN = 0x20,
+    FONTLIB_EXTRA_LIGHT = 0x30,
+    FONTLIB_LIGHT = 0x40,
+    FONTLIB_SEMILIGHT = 0x60,
+    FONTLIB_NORMAL = 0x80,
+    FONTLIB_MEDIUM = 0x90,
+    FONTLIB_SEMIBOLD = 0xA0,
+    FONTLIB_BOLD = 0xC0,
+    FONTLIB_EXTRA_BOLD = 0xE0,
+    FONTLIB_BLACK = 0xF0
+} fontlib_weights_t;
+
 typedef struct {
     /* Size of this struct, basically functions as a version field.
      * This does NOT include the lengths of the strings! */
