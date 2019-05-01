@@ -437,6 +437,29 @@ void fontlib_SetFirstPrintableCodePoint(char code_point);
 char fontlib_GetFirstPrintableCodePoint(void);
 
 /**
+ * Sets the code points DrawInt and DrawUInt will use for the minus symbol
+ * and digits 0-9.
+ * @param minus Minus symbol code point, defaults to '-'
+ * @param zero Zero code point, defaults to '0'; '1'-'9' are assumed to follow
+ */
+void fontlib_SetDrawIntCodePoints(char minus, char zero);
+
+/**
+ * Returns the code point DrawInt and DrawUInt will use for a minus symbol
+ * Defaults to '-'
+ * @return '-' or whatever you set it to
+ */
+char fontlib_GetDrawIntMinus(void);
+
+/**
+ * Returns the code point DrawInt and DrawUInt will use for '0'; it assumes
+ * '1'-'9' follow '0'
+ * Defaults to '0'
+ * @return '0' or whatever you set it to
+ */
+char fontlib_GetDrawIntZero(void);
+
+/**
  * Returns the width of the given glyph
  * @param codepoint Codepoint to test
  * @return Width of glyph, 0 if invalid codepoint
@@ -518,7 +541,7 @@ void fontlib_DrawString(const char *str);
  *
  * This is intended to be used if you only want a portion of a string printed,
  * (Or if you hate null-terminated strings and want length-prefixed strings
- * instead.  You still can't use NULLs though.)
+ * instead.  It still won't print NULLs though.)
  *
  * THIS IS NOT REENTRANT (though if you need that, you're probably not using C)
  * @param str Pointer to string
@@ -526,6 +549,30 @@ void fontlib_DrawString(const char *str);
  * return early if some other condition requires returning
  */
 void fontlib_DrawStringL(const char *str, size_t max_characters);
+
+/**
+ * Prints a signed integer
+ *
+ * Outputs at the current cursor position. Padded with leading zeros if
+ * necessary to satisfy the specified minimum length.
+ * @param n Integer to print
+ * @param length Minimum number of characters to print
+ * @note This does not obey window bounds like DrawString/L
+ * @note \c length must be between 1 and 8, inclusive
+ */
+void fontlib_DrawInt(int n, uint8_t length);
+
+/**
+ * Prints an unsigned integer
+ *
+ * Outputs at the current cursor position. Padded with leading zeros if
+ * necessary to satisfy the specified minimum length.
+ * @param n Unsigned integer to print
+ * @param length Minimum number of characters to print
+ * @note This does not obey window bounds like DrawString/L
+ * @note \c length must be between 1 and 8, inclusive
+ */
+void fontlib_DrawUInt(unsigned int n, uint8_t length);
 
 /**
  * Erases everything from the cursor to the right side of the text window

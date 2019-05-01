@@ -46,6 +46,9 @@ include_library '../graphx/graphx.asm'
 	export fontlib_SetAlternateStopCode
 	export fontlib_SetFirstPrintableCodePoint
 	export fontlib_GetFirstPrintableCodePoint
+	export fontlib_SetDrawIntCodePoints
+	export fontlib_GetDrawIntMinus
+	export fontlib_GetDrawIntZero
 	export fontlib_GetGlyphWidth
 	export fontlib_GetStringWidth
 	export fontlib_GetStringWidthL
@@ -53,6 +56,8 @@ include_library '../graphx/graphx.asm'
 	export fontlib_DrawGlyph
 	export fontlib_DrawString
 	export fontlib_DrawStringL
+	export fontlib_DrawInt
+	export fontlib_DrawUInt
 	export fontlib_ClearEOL
 	export fontlib_ClearWindow
 	export fontlib_Newline
@@ -834,6 +839,96 @@ fontlib_DrawStringL:
 
 
 ;-------------------------------------------------------------------------------
+fontlib_DrawInt:
+; Places an int at the current cursor position
+; Shamelessly ripped from GraphX, who probably adapted it from Z80 Bits
+; Arguments:
+;  arg0 : Number to print
+;  arg1 : Number of characters to print
+; Returns:
+;  None
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+	add	hl,hl
+	db	$3E			; xor a,a -> ld a,*
+	
+;-------------------------------------------------------------------------------
+fontlib_DrawUInt:
+; Places an unsigned int at the current cursor position
+; Arguments:
+;  arg0 : Number to print
+;  arg1 : Minimum number of characters to print
+; Returns:
+;  None
+	xor	a,a
+	pop	de
+	pop	hl			; hl = uint
+	pop	bc			; c = min num chars
+	push	bc
+	push	hl
+	push	de
+	jr	nc,.begin		; c ==> actually a negative int
+	ex	de,hl
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,de			; hl = -int
+	ld	a,'-'
+smcByte _DrawIntMinus
+	call	.printchar
+	dec	c
+	jr	nz,.begin
+	inc	c
+.begin:
+	ld	de,-10000000
+	call	.num1
+	ld	de,-1000000
+	call	.num1
+	ld	de,-100000
+	call	.num1
+	ld	de,-10000
+	call	.num1
+	ld	de,-1000
+	call	.num1
+	ld	de,-100
+	call	.num1
+	ld	de,-10
+	call	.num1
+	ld	de,-1
+.num1:
+	xor	a,a
+.num2:
+	inc	a
+	add	hl,de
+	jr	c,.num2
+	sbc	hl,de
+	dec	a			; a = next digit
+	jr	nz,.printdigit		; z ==> digit is zero, maybe don't print
+	ld	a,c
+	inc	c
+	cp	a,8
+	ret	c			; nc ==> a digit has already been
+					;        printed, or must start printing
+					;        to satisfy min num chars
+	xor	a,a
+.printdigit:
+	add	a,'0'
+smcByte _DrawIntZero
+	ld	c,a			; mark that a digit has been printed
+.printchar:
+	push	bc
+	push	hl
+	ld	c,a
+	push	bc
+	call	fontlib_DrawGlyph
+	pop	bc
+	pop	hl
+	pop	bc
+	ret
+
+
+;-------------------------------------------------------------------------------
 fontlib_SetForegroundColor:
 ; Sets the foreground color
 ; Arguments:
@@ -1139,6 +1234,45 @@ fontlib_GetFirstPrintableCodePoint:
 ;  Code point that is currently recognized as being the first printable code
 ;    point.
 	ld	a,(_TextFirstPrintableCodePoint)
+	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_SetDrawIntCodePoints:
+; Changes the code points printed using DrawInt/DrawUInt
+; Arguments:
+;  arg0: Negative symbol code point
+;  arg1: Zero glyph code point
+; Returns:
+;  Nothing
+	ld	iy,0
+	add	iy,sp
+	ld	a,(iy + arg0)
+	ld	(_DrawIntMinus),a
+	ld	a,(iy + arg1)
+	ld	(_DrawIntZero),a
+	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_GetDrawIntMinus:
+; Returns the minus code point used by DrawInt/DrawUInt
+; Arguments:
+;  None
+; Returns:
+;  Minus
+	ld	a, (_DrawIntMinus)
+	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_GetDrawIntZero:
+; Returns the '0' code point used by DrawInt/DrawUInt
+; Arguments:
+;  None
+; Returns:
+;  '0'
+	ld	a, (_DrawIntZero)
 	ret
 
 
