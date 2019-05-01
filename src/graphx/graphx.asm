@@ -3189,7 +3189,7 @@ smcByte _TextBGColor
         jr      z,TotalTransp
 .loop:
         ld      a,(de)
-        lb      b,ixh
+        ld      b,ixh
 .nextpixel:
         rla
         jr      c,.transparent
