@@ -3177,34 +3177,80 @@ smcByte _TextHeight
 	jr	_PrintLargeFont		; SMC the jump
 _TextScaleJump := $ - 1
 _PrintNormalFont:
-.loop:
-	ld	c,(hl)			; c = 8 pixels
-	add	iy,de			; get draw location
-	lea	de,iy
-	ld	b,ixh
-.nextpixel:
-	ld	a,TEXT_BG_COLOR
-smcByte _TextBGColor
-	rlc	c
-	jr	nc,.bgcolor
-	ld	a,TEXT_FG_COLOR
-smcByte _TextFGColor
-.bgcolor:
-	cp	a,TEXT_TP_COLOR		; check if transparent
+        ex      de,hl
+        ld      c,56
+        ld      a,TEXT_TP_COLOR
 smcByte _TextTPColor
-	jr	z,.transparent
-	ld	(de),a
+        cp      a,TEXT_FG_COLOR
+smcByte _TextFGColor
+        jr      nz,FGnotTP
+        cp      a,TEXT_BG_COLOR
+smcByte _TextBGColor
+        jr      z,TotalTransp
+.loop:
+        ld      a,(de)
+        ld      b,ixh
+.nextpixel:
+        rla
+        jr      c,.transparent
+        ld      (hl),TEXT_BG_COLOR
+smcByte _TextBGColor
 .transparent:
-	inc	de			; move to next pixel
-	djnz	.nextpixel
-	ld	de,LcdWidth
-	inc	hl
-	dec	ixl
-	jr	nz,.loop
-	pop	hl			; restore hl and stack pointer
-	pop	ix
-	ret
-
+        inc     hl
+        djnz    .nextpixel
+        inc     b
+        add     hl,bc
+        inc     de
+        dec     ixl
+        jr      nz,.loop
+TotalTransp:    
+        pop     hl                      ; restore hl and stack pointer
+        pop     ix
+        ret
+FGnotTP:
+        cp      a,TEXT_BG_COLOR
+smcByte _TextBGColor
+        jr      z,BGequTP
+NoTransp:
+        ld      a,(de)
+        ld      b,ixh
+.nextpixel:
+        rla
+        ld      (hl),TEXT_BG_COLOR
+smcByte _TextBGColor
+        jr      nc,.notfg
+        ld      (hl),TEXT_FG_COLOR
+smcByte _TextFGColor
+.notfg:
+        inc     hl
+        djnz    .nextpixel
+        inc     b
+        add     hl,bc
+        inc     de
+        dec     ixl
+        jr      nz,NoTransp
+        pop     hl                      ; restore hl and stack pointer
+        pop     ix
+        ret
+BGequTP:
+        ld      a,(de)
+        ld      b,ixh
+.nextpixel:
+        rla
+        jr      nc,.transparent
+        ld      (hl),TEXT_FG_COLOR
+smcByte _TextFGColor
+.transparent:
+        inc     hl
+        djnz    .nextpixel
+        inc     b
+        add     hl,bc
+        inc     de
+        dec     ixl
+        jr      nz,BGequTP
+        pop     hl                      ; restore hl and stack pointer
+        pop     ix
+        ret
 ;-------------------------------------------------------------------------------
 _PrintLargeFont:
 ; Prints in scaled font for prosperity
