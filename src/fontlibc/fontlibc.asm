@@ -841,7 +841,7 @@ fontlib_DrawStringL:
 ;-------------------------------------------------------------------------------
 fontlib_DrawInt:
 ; Places an int at the current cursor position
-; Shamelessly ripped from GraphX, who probably adapted it from Z80 Bits
+; Shamelessly ripped from GraphX, which admittedly adapted it from Z80 Bits
 ; Arguments:
 ;  arg0 : Number to print
 ;  arg1 : Number of characters to print

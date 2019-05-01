@@ -11,10 +11,7 @@
 
 #include <fileioc.h>
 #include <fontlibc.h>
-
-static const uint8_t test_font[] = {
-	#include "testfont.inc"
-};
+#include "fonts.h"
 
 void printCentered(const char *string) {
     /* We're just using some simple math to find the center of the text window.
@@ -32,7 +29,7 @@ void main(void) {
     gfx_FillScreen(gfx_black);
 
     /* Set a font to use.  DrawString will display garbage if you don't give it a font! */
-    fontlib_SetFont((fontlib_font_t *)test_font, 0);
+    fontlib_SetFont(test_font, 0);
     
     /* First, we'll display centered text in a window */
     /* Add some vertical padding around our text */
