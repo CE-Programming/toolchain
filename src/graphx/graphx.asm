@@ -3234,7 +3234,7 @@ smcByte _TextFGColor
         ret
 BGequTP:
         ld      a,(de)
-        lb      b,ixh
+        ld      b,ixh
 .nextpixel:
         rla
         jr      nc,.transparent
