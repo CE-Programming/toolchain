@@ -249,6 +249,10 @@ int ti_IsArchived(const ti_var_t slot);
 /**
  * Sends the variable into either the archive or RAM if needed
  *
+ * WARNING: Archiving a variable can cause a garbage collection cycle. There is no way to turn off the
+ * "Garbage collect?" prompt and garbage collection message. You should turn off GraphX before archiving
+ * a variable or you may get some heavy graphical corruption.
+ *
  * @param archived
  * True - Send to Archive                                                <br>
  * False - Send to RAM
