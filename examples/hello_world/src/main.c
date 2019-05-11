@@ -18,7 +18,7 @@ void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos);
 void main(void) {
     /* uint8_t is an unsigned integer that can range from 0-255. */
     /* It performs faster than just an int, so try to use it (or int8_t) when possible */
-    uint8_t count;
+    /* Example of use: uint8_t count; */
 
     /* Initialize some strings */
     const char *HelloWorld = "Hello World!";
