@@ -10,16 +10,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* uint8_t is an unsigned integer that can range from 0-255. */
+/* It performs faster than just an int, so try to use it (or int8_t) when possible */
+/*In this program uint8_t is used as the main data type*/
+
+
 /* Put function prototypes here */
 void printText(const char *text, uint8_t x, uint8_t y);
 void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos);
 
 /* Put all your code here */
 void main(void) {
-    /* uint8_t is an unsigned integer that can range from 0-255. */
-    /* It performs faster than just an int, so try to use it (or int8_t) when possible */
-    uint8_t count;
-
     /* Initialize some strings */
     const char *HelloWorld = "Hello World!";
     const char *Welcome = "Welcome to C!";
@@ -35,14 +36,14 @@ void main(void) {
     while (!os_GetCSC());
 }
 
-/* Draw text on the homescreen at the given X/Y location */
+/* Draw text on the homescreen at the given X/Y cursor location */
 void printText(const char *text, uint8_t xpos, uint8_t ypos) {
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
 
-/* Draw small text at the given X/Y location */
-void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos) {
+/* Draw small text at the given X/Y pixel location */
+void printTextSmall(const char *text, uint16_t xpos, uint8_t ypos) {
     os_FontSelect(0); // sets small font (1 == big, see docs)
     os_FontDrawText(text, xpos, ypos);
 }
