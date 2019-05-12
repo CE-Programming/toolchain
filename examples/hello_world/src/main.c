@@ -17,7 +17,7 @@
 
 /* Put function prototypes here */
 void printText(const char *text, uint8_t x, uint8_t y);
-void printTextSmall(const char *text, uint8_t xpos, uint8_t ypos);
+void printTextSmall(const char *text, uint16_t xpos, uint8_t ypos);
 
 /* Put all your code here */
 void main(void) {
