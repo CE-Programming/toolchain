@@ -12,7 +12,7 @@
 
 /* uint8_t is an unsigned integer that can range from 0-255. */
 /* It performs faster than just an int, so try to use it (or int8_t) when possible */
-/*In this program uint8_t is used as the main data type*/
+/* In this program uint8_t is used as the main data type */
 
 
 /* Put function prototypes here */
