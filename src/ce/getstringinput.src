@@ -100,7 +100,9 @@ __draw:
 __full:
 	ld	a,' '
 	ld	(curUnder),a
+	push 	de
 	call	_GetKey
+	pop	de
 	cp	a,kClear
 	jr	z,__clear
 	cp	a,kEnter
