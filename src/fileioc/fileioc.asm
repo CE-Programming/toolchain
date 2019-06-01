@@ -68,6 +68,7 @@ data_ptr3 := $d01ff3
 data_ptr4 := $d01ff9
 resize_amount := $e30c0c
 curr_slot := $e30c11
+TI_MAX_SIZE := 65505
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -194,7 +195,7 @@ ti_Resize:
 	call	util_is_in_ram
 	pop	hl
 	jp	c, util_ret_null
-	ld	de, $ffff - 30
+	ld	de, TI_MAX_SIZE
 	or	a,a
 	sbc	hl,de
 	add	hl,de

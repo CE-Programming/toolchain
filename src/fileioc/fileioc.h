@@ -31,6 +31,11 @@ extern "C" {
 #define TI_REAL_LIST_TYPE       (0x01)
 #define TI_CPLX_LIST_TYPE       (0x0D)
 
+/**
+ * Maximum object size in bytes
+ */
+#define TI_MAX_SIZE             (65505)
+
 #ifndef EOF
 #define EOF (-1)
 #endif
