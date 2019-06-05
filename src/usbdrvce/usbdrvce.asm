@@ -2059,18 +2059,19 @@ _HandleTestOutRequest:
 	ld	(hl),de
 	ld	l,usbDmaCtrl-$100
 	set	bUsbDmaStart,(hl)
-	ld	l,usbDevIsr-$100
 .waitDma:
+	ld	a,(bc)
+	ld	l,usbDevIsr-$100
+	bit	bUsbIntDevDmaFin,(hl)
+	jq	nz,.waitDmaDone
 	inc	l
 	bit	bUsbIntDevDmaErr-8,(hl)
-	jq	nz,.waitDmaDone
-	dec	l
-	bit	bUsbIntDevDmaFin,(hl)
 	jq	z,.waitDma
+	ld	(hl),bmUsbIntDevDmaErr shr 8
+	dec	l
 .waitDmaDone:
 	ld	(hl),bmUsbIntDevDmaFin
-	inc	l
-	ld	(hl),bmUsbIntDevDmaErr shr 8
+	ld	(_FunData),bc
 	xor	a,a
 	ld	l,usbDmaFifo-$100
 	ld	(hl),a;bmUsbDmaNoFifo
@@ -2115,7 +2116,7 @@ _HandleTestInRequest:
 	xor	a,a
 	ld	l,usbDmaFifo-$100
 	ld	(hl),a;bmUsbDmaNoFifo
-if 0 ; Single packet
+if 1 ; Single packet
 	ld	l,usbCxFifo-$100
 	set	bCxFifoFin,(hl)
 else
@@ -2378,35 +2379,49 @@ end repeat
 	jq	_HandleCxSetupInt.handled
 
 _HandleCxSetupInt:
-	ld	iy,setupPacket-4
-	ld	l,usbDmaFifo-$100
 	ld	b,4
+	ld	de,setupPacket+4
+	ld	l,usbDmaFifo-$100
 	ld	a,i
 	di
 	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbEp0Data-$100
+	ld	l,usbEp0Data+4-$100
 .fetch:
+	dec	hl
+	dec	de
 	ld	a,(hl)
-	ld	(iy+4),a
+	ld	(de),a
+	set	bsf 4,de
 	ld	a,(hl)
-	ld	(iy+8),a
-	inc	hl
-	inc	iy
+	ld	(de),a
+	res	bsf 4,de
 	djnz	.fetch
 	ld	l,usbDmaFifo-$100
 	jp	po,.noEi
 	ei
 .noEi:
-	ld	(hl),b;bmUsbDmaNoFifo
+	ld	a,USB_DEFAULT_SETUP_EVENT
+	call	_DispatchEvent
+	jq	z,.defaultHandler
+	add	hl,de
+	scf
+	sbc	hl,de
+	inc	hl
+	ret	nz
+	ld	hl,mpUsbCxIsr
+	ld	(hl),bmUsbIntCxSetup
+	ret
+.defaultHandler:
+	ld	iy,setupPacket
 	ld	bc,(ysetup.bmRequestType)
 	inc	b
 	djnz	.notGetStatus
-	ld	a,c
-	sub	a,DEVICE_TO_HOST or VENDOR_REQUEST or RECIPIENT_DEVICE
-	jq	z,_HandleTestInRequest
-	ld	a,c
-	sub	a,HOST_TO_DEVICE or VENDOR_REQUEST or RECIPIENT_DEVICE
-	jq	z,_HandleTestOutRequest
+;	ld	a,c
+;	sub	a,DEVICE_TO_HOST or VENDOR_REQUEST or RECIPIENT_DEVICE
+;	jq	z,_HandleTestInRequest
+;	ld	a,c
+;	sub	a,HOST_TO_DEVICE or VENDOR_REQUEST or RECIPIENT_DEVICE
+;	jq	z,_HandleTestOutRequest
 .notGetStatus:
 	djnz	.notClearFeature
 .notClearFeature:
@@ -2465,16 +2480,6 @@ _HandleCxSetupInt:
 	djnz	.notSetInterface
 .notSetInterface:
 .unhandled:
-	ld	de,setupPacket
-	ld	a,USB_DEFAULT_SETUP_EVENT
-	call	_DispatchEvent
-	jq	z,.handled
-	add	hl,de
-	scf
-	sbc	hl,de
-	inc	hl
-	ret	nz
-	add	hl,de
 	ld	hl,mpUsbCxFifo
 	set	bCxFifoStall,(hl)
 	jq	.return

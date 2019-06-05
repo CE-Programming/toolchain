@@ -43,10 +43,10 @@ typedef enum usb_event {
   USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT,
   /// \p event_data The usb_device_t that activated overcurrent condition.
   USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT,
-  /// This event triggers when a host sends a control setup packet.  Standard
-  /// requests are handled internally and do not trigger an event.  Return
-  /// USB_SUCCESS if you recognized the request and scheduled a corresponding
-  /// transfer, otherwise return USB_IGNORE to stall.
+  /// This event triggers when a host sends a control setup packet.  Return
+  /// USB_IGNORE if you scheduled a response manually.  Return USB_SUCCESS
+  /// to have standard requests handled automatically (You can modify the setup
+  /// first, but that probably isn't useful).
   /// \p event_data The usb_control_setup_t * that was sent by the host.
   USB_DEFAULT_SETUP_EVENT,
   // Temp debug events:
