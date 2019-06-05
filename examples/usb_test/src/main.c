@@ -35,6 +35,10 @@ static void putIntHex(unsigned x) {
     putByteHex(x >>  8);
     putByteHex(x >>  0);
 }
+static void putLongHex(unsigned long x) {
+    putByteHex(x >> 24);
+    putIntHex(x);
+}
 static void putBlockHex(void *block, size_t size) {
     while (size--)
         putByteHex(*(*(unsigned char **)&block)++);
@@ -101,6 +105,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         "USB_HOST_SYSTEM_ERROR_INT",
         "USB_HOST_ASYNC_ADVANCE_INT",
     };
+    unsigned char i;
     switch (event) {
         case USB_ROLE_CHANGED_EVENT:
             os_PutStrFull(usb_event_names[event]);
@@ -128,13 +133,23 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             callback_data->device = event_data;
             _OS(asm_NewLine);
             break;
-        case USB_DEFAULT_SETUP_EVENT: {
-            unsigned char i;
+        case USB_DEFAULT_SETUP_EVENT:
             for (i = 0; i < 8; i++)
                 putByteHex(((unsigned char *)event_data)[i]);
             _OS(asm_NewLine);
-            return USB_IGNORE;
-        }
+            {
+                const usb_control_setup_t *setup = event_data;
+                if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE &&
+                    !setup->bRequest && !setup->wValue && !setup->wIndex) {
+                    if (setup->bmRequestType & USB_DEVICE_TO_HOST) {
+                        os_PutStrFull("Detected test IN setup.");
+                    } else {
+                        os_PutStrFull("Detected test OUT setup.");
+                    }
+                    _OS(asm_NewLine);
+                }
+            }
+            break;
         case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
             static unsigned counter;
             unsigned row, col;
@@ -149,6 +164,20 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         case USB_DEVICE_CONTROL_INTERRUPT:
         case USB_DEVICE_WAKEUP_INTERRUPT:
         case USB_HOST_INTERRUPT:
+            break;
+        case 100:
+            putIntHex((unsigned)event_data);
+            _OS(asm_NewLine);
+            break;
+        case 101:
+            putLongHex(atomic_load_32(&timer_2_Counter));
+            os_PutStrFull(" cycles");
+            _OS(asm_NewLine);
+            timer_2_Counter = 0;
+        case 102:
+            for (i = 0; i < 64; i++)
+                putByteHex(((unsigned char *)event_data)[i]);
+            _OS(asm_NewLine);
             break;
         default:
             os_PutStrFull(usb_event_names[event]);
