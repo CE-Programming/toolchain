@@ -1474,7 +1474,6 @@ fontlib_ClearWindow:
 	ld	a,(_TextYMax)
 	sub	a,b
 	ld	b,a
-	ld	b,a
 	call	util.ClearRect
 	pop	af
 	ld	(_TextY),a
@@ -1589,7 +1588,7 @@ util.ClearRect:
 ;  AF, BC, DE, HL, IY
 
 ; Check for trivial case
-	ld	b,a
+	ld	a,b
 	or	a,a
 	ret	z
 	ld	a,e
@@ -1879,6 +1878,7 @@ fontlib_GetFontByStyleRaw:
 	jr	z,.weightOK
 	ret	nc
 .weightOK:
+; TODO: I think the CP here might sometimes SET carry when it shouldn't be?
 	ld	a,(ix + strucFont.style)
 	ld	c,(iy + arg5)
 	and	a,c
