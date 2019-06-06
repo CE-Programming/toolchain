@@ -1228,18 +1228,8 @@ end repeat
 	ret
 
 ;-------------------------------------------------------------------------------
-usb_ScheduleControlTransfer.parseSetup:
-	ld	ysetup,(ix+9)
-	ld	a,(ysetup.bmRequestType)
-	and	a,1 shl 7
-	ld	bc,(ysetup.wLength)
-	inc.s	bc
-	cpi.s
-	ld	de,(ix+12)
-	rlca
-	ret
 usb_ScheduleControlTransfer.device:
-	xor	a,a
+	cp	a,a
 usb_ScheduleControlTransfer.notControl:
 	ld	ysetup,(ix+9)
 	ld	bc,(ysetup.wLength)
@@ -1249,7 +1239,16 @@ usb_ScheduleControlTransfer.notControl:
 	ld	yendpoint,(ix+6)
 	jq	nz,usb_ScheduleTransfer.notControl
 usb_ScheduleTransfer.device:
-	call	.parseSetup
+	ld	hl,(setupPacket.wLength)
+	sbc.s	hl,de
+	res	bsf AUTO_TERMINATE,(yendpoint.flags)
+	jq	z,usb_ScheduleTransfer.complete
+	set	bsf AUTO_TERMINATE,(yendpoint.flags)
+usb_ScheduleTransfer.complete:
+	ld	a,(setupPacket.bmRequestType)
+	rlca
+	ld	a,transfer.type.ioc shr 1
+	rla
 	jq	_QueueTransfer
 	; TODO: pump fifo?
 usb_ScheduleControlTransfer:
@@ -1267,7 +1266,14 @@ usb_ScheduleControlTransfer:
 	ld	bc,8
 	ld	de,(ix+9)
 	call	.queueStage
-	call	.parseSetup
+	ld	ysetup,(ix+9)
+	ld	a,(ysetup.bmRequestType)
+	and	a,1 shl 7
+	ld	bc,(ysetup.wLength)
+	inc.s	bc
+	cpi.s
+	ld	de,(ix+12)
+	rlca
 	push	af
 	call	pe,_QueueTransfer
 	pop	af
@@ -1293,7 +1299,7 @@ usb_ScheduleControlTransfer:
 usb_ScheduleTransfer.control:
 	ld	hl,currentRole
 	bit	bUsbRole-16,(hl)
-	jq	nz,.device
+	jq	nz,usb_ScheduleTransfer.device
 	ld	ysetup,(ix+9)
 	lea	de,ysetup+sizeof ysetup
 	ld	(ix+12),de
@@ -1302,11 +1308,11 @@ usb_ScheduleTransfer:
 	call	_Error.check
 	call	usb_ScheduleControlTransfer.check
 .enter:
+	ld	bc,(ix+12)
+	ld	de,(ix+9)
 	ld	yendpoint,(ix+6)
 	or	a,(yendpoint.type);CONTROL_TRANSFER
 	jq	z,.control
-	ld	de,(ix+9)
-	ld	bc,(ix+12)
 .notControl:
 repeat ISOCHRONOUS_TRANSFER-CONTROL_TRANSFER
 	dec	a
@@ -1864,6 +1870,15 @@ _DeleteDevice:
 	ex	de,hl
 	pop	de
 	jq	_Free32Align32
+
+; Input:
+;  iy = device
+; Output:
+;  zf = enough memory
+;  iy = endpoint | ?
+_CreateDefaultControlEndpoint:
+	ld	de,_DefaultControlEndpointDescriptor
+	jq	_CreateEndpoint
 
 ; Input:
 ;  de = endpoint descriptor
@@ -2789,10 +2804,22 @@ _HandleDevResetInt:
 	ld	(hl),bmUsbDmaClrFifo or bmUsbDmaAbort
 	ld	l,usbCxFifo-$100
 	set	bCxFifoClr,(hl)
-	ld	l,usbDevIsr-$100
+	ld	de,rootHub
+	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_ENABLED
+	call	_CreateDevice
+	call	z,_CreateDefaultControlEndpoint
+	jq	nz,.nomem
+	ld	hl,(currentDescriptors)
+	ld	hl,(hl)
+	ld	de,7
+	add	hl,de
+	ld	a,(hl)
+	ld	(yendpoint.maxPktLen),a
+.nomem:
+	ld	hl,mpUsbDevIsr
 	ld	(hl),bmUsbIntDevReset
-	ld	a,USB_DEVICE_RESET_INTERRUPT
-	jq	_DispatchEvent
+	cp	a,a
+	ret
 
 _HandleDevSuspendInt:
 	ld	(hl),bmUsbIntDevSuspend
@@ -3010,8 +3037,7 @@ end repeat
 	ld	hl,(rootHub.child)
 	jq	z,.disconnect
 	ld	de,rootHub
-	ld	b,1 or 1 shl 7
-	ld	c,IS_DEVICE or IS_DISABLED
+	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_DISABLED
 	call	_CreateDevice
 	ld	hl,USB_ERROR_NO_MEMORY
 	ret	nz ; FIXME
@@ -3062,8 +3088,7 @@ _HandlePortPortEnInt:
 	ld	iy,(rootHub.child)
 	bit	bUsbPortEn,(hl)
 	jq	z,.disabled
-	ld	de,_DefaultControlEndpointDescriptor
-	call	_CreateEndpoint
+	call	_CreateDefaultControlEndpoint
 	call	z,_Alloc32Align32
 	jq	nz,.disableDevice
 	ld	bc,_HandleDeviceDescriptor
