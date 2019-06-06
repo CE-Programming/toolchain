@@ -1228,26 +1228,7 @@ end repeat
 	ret
 
 ;-------------------------------------------------------------------------------
-usb_ScheduleControlTransfer.notControl:
-	ld	ysetup,(ix+9)
-	ld	bc,(ysetup.wLength)
-	inc	bc
-	dec.s	bc
-	ld	de,(ix+12)
-	ld	yendpoint,(ix+6)
-	jq	usb_ScheduleTransfer.notControl
-usb_ScheduleControlTransfer:
-	call	_Error.check
-	call	usb_ScheduleTransfer.check
-.enter:
-	ld	yendpoint,(ix+6)
-	or	a,(yendpoint.type);CONTROL_TRANSFER
-	jq	nz,.notControl
-.control:
-	ld	a,00001110b
-	ld	bc,8
-	ld	de,(ix+9)
-	call	.queueStage
+usb_ScheduleControlTransfer.parseSetup:
 	ld	ysetup,(ix+9)
 	ld	a,(ysetup.bmRequestType)
 	and	a,1 shl 7
@@ -1256,6 +1237,37 @@ usb_ScheduleControlTransfer:
 	cpi.s
 	ld	de,(ix+12)
 	rlca
+	ret
+usb_ScheduleControlTransfer.device:
+	xor	a,a
+usb_ScheduleControlTransfer.notControl:
+	ld	ysetup,(ix+9)
+	ld	bc,(ysetup.wLength)
+	inc	bc
+	dec.s	bc
+	ld	de,(ix+12)
+	ld	yendpoint,(ix+6)
+	jq	nz,usb_ScheduleTransfer.notControl
+usb_ScheduleTransfer.device:
+	call	.parseSetup
+	jq	_QueueTransfer
+	; TODO: pump fifo?
+usb_ScheduleControlTransfer:
+	call	_Error.check
+	call	.check
+.enter:
+	ld	yendpoint,(ix+6)
+	or	a,(yendpoint.type);CONTROL_TRANSFER
+	jq	nz,.notControl
+	ld	hl,currentRole
+	bit	bUsbRole-16,(hl)
+	jq	nz,.device
+.control:
+	ld	a,00001110b
+	ld	bc,8
+	ld	de,(ix+9)
+	call	.queueStage
+	call	.parseSetup
 	push	af
 	call	pe,_QueueTransfer
 	pop	af
@@ -1267,30 +1279,6 @@ usb_ScheduleControlTransfer:
 	ld	iyl,1
 	jq	z,_FillTransfer
 	jq	_Error.NO_MEMORY
-
-;-------------------------------------------------------------------------------
-usb_ScheduleTransfer.control:
-	ld	ysetup,(ix+9)
-	lea	de,ysetup+sizeof ysetup
-	ld	(ix+12),de
-	jq	usb_ScheduleControlTransfer.control
-usb_ScheduleTransfer:
-	call	_Error.check
-	call	.check
-.enter:
-	ld	yendpoint,(ix+6)
-	or	a,(yendpoint.type);CONTROL_TRANSFER
-	jq	z,.control
-	ld	de,(ix+9)
-	ld	bc,(ix+12)
-.notControl:
-repeat ISOCHRONOUS_TRANSFER
-	dec	a
-end repeat
-	jq	z,_Error.NOT_SUPPORTED
-	ld	a,(yendpoint.dir)
-	or	a,transfer.type.ioc
-	jq	_QueueTransfer
 .check:
 	ld	hl,(ix+15)
 	add	hl,de
@@ -1300,6 +1288,33 @@ end repeat
 	ld	hl,_DefaultHandler
 	ld	(ix+15),hl
 	ret
+
+;-------------------------------------------------------------------------------
+usb_ScheduleTransfer.control:
+	ld	hl,currentRole
+	bit	bUsbRole-16,(hl)
+	jq	nz,.device
+	ld	ysetup,(ix+9)
+	lea	de,ysetup+sizeof ysetup
+	ld	(ix+12),de
+	jq	usb_ScheduleControlTransfer.control
+usb_ScheduleTransfer:
+	call	_Error.check
+	call	usb_ScheduleControlTransfer.check
+.enter:
+	ld	yendpoint,(ix+6)
+	or	a,(yendpoint.type);CONTROL_TRANSFER
+	jq	z,.control
+	ld	de,(ix+9)
+	ld	bc,(ix+12)
+.notControl:
+repeat ISOCHRONOUS_TRANSFER-CONTROL_TRANSFER
+	dec	a
+end repeat
+	jq	z,_Error.NOT_SUPPORTED
+	ld	a,(yendpoint.dir)
+	or	a,transfer.type.ioc
+	jq	_QueueTransfer
 
 ; Input:
 ;  a = ioc shl 7 or dir
