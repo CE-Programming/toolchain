@@ -964,7 +964,6 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  * and using the rest of the buffer as the transfer buffer.
  * @param endpoint The endpoint to communicate with, which also specifies the
  * direction for non-control transfers.
- * @param type Type of the endpoint and transfer.
  * @param buffer Data to transfer that must reside in RAM.  When acting as usb
  * host and using a control pipe, starts with a \c usb_control_setup_t.  This
  * buffer must remain valid until the callback is called i.e. it cannot be
