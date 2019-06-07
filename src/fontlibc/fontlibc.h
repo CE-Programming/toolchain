@@ -77,7 +77,8 @@ extern "C" {
 typedef enum {
     FONTLIB_ENABLE_AUTO_WRAP = 0x01,
     FONTLIB_AUTO_CLEAR_TO_EOL = 0x02,
-    FONTLIB_PRECLEAR_NEWLINE = 0x04
+    FONTLIB_PRECLEAR_NEWLINE = 0x04,
+    FONTLIB_AUTO_SCROLL = 0x08
 } fontlib_newline_options_t;
 
 typedef enum {
@@ -252,6 +253,16 @@ uint8_t fontlib_GetCursorY(void);
  * @param y y-shift
  */
 void fontlib_ShiftCursorPosition(int x, int y);
+
+/**
+ * Moves the cursor to the upper left corner of the text window.
+ */
+void fontlib_HomeUp();
+
+/**
+ * Moves the cursor back to the start of the current line.
+ */
+void fontlib_Home();
 
 /**
  * Sets the current font
@@ -608,6 +619,14 @@ void fontlib_SetNewlineOptions(uint8_t options);
  * @return Current newline behavior options
  */
 uint8_t fontlib_GetNewlineOptions(void);
+
+/** 
+ * Scrolls the contents of the text window down one line, i.e. everything in
+ * the window is copied UP one line, thus yielding the effect of scrolling down.
+ * The current text cursor is ignored.  The bottom line is not erased; you must
+ * erase or overwrite it yourself.
+ */
+void fontlib_ScrollWindowDown(void);
 
 /**
  * Gets the long name associated with a font pack.  Useful in a loop with

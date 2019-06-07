@@ -3,7 +3,7 @@ include '../include/library.inc'
 include '../include/include_library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'FONTLIBC',1
+library 'FONTLIBC',2
 
 ;-------------------------------------------------------------------------------
 ; Dependencies
@@ -63,11 +63,21 @@ include_library '../graphx/graphx.asm'
 	export fontlib_Newline
 	export fontlib_SetNewlineOptions
 	export fontlib_GetNewlineOptions
+;-------------------------------------------------------------------------------
+; v1 font pack functions
+;-------------------------------------------------------------------------------
 	export fontlib_GetFontPackName
 	export fontlib_GetFontByIndex
 	export fontlib_GetFontByIndexRaw
 	export fontlib_GetFontByStyle
 	export fontlib_GetFontByStyleRaw
+;-------------------------------------------------------------------------------
+; v2 functions
+;-------------------------------------------------------------------------------
+	export fontlib_ScrollWindowDown
+	export fontlib_ScrollWindowUp
+	export fontlib_Home
+	export fontlib_HomeUp
 
 
 ;-------------------------------------------------------------------------------
@@ -87,7 +97,7 @@ arg4		:= 15
 arg5		:= 18
 arg6		:= 21
 chFirstPrintingCode := $10
-chNewLine	:= $0A
+chNewline	:= $0A
 bEnableAutoWrap	:= 0
 mEnableAutoWrap	:= 1 shl bEnableAutoWrap
 bAutoClearToEOL	:= 1
@@ -96,6 +106,8 @@ bPreclearNewline := 2
 mPreclearNewline := 1 shl bPreclearNewline
 bWasNewline	:= 7
 mWasNewline	:= 1 shl bWasNewline
+bAutoScroll	:= 3
+mAutoScroll	:= 1 shl bAutoScroll
 
 
 ;-------------------------------------------------------------------------------
@@ -364,6 +376,31 @@ fontlib_ShiftCursorPosition:
 	push	hl			; sp -> arg0
 	ex	de,hl			; hl = return vector
 	jp	(hl)
+
+
+;-------------------------------------------------------------------------------
+fontlib_HomeUp:
+; Moves the cursor to the upper left corner of the text window
+; Arguments:
+;  None
+; Returns:
+;  Nothing
+	ld	a,(_TextYMin)
+	ld	(_TextY),a
+; Fall through to fontlib_Home
+assert $ = fontlib_Home
+
+
+;-------------------------------------------------------------------------------
+; Moves the cursor back to the start of the current line
+fontlib_Home:
+; Arguments:
+;  None
+; Returns:
+;  Nothing
+	ld	hl,(_TextXMin)
+	ld	(_TextX),hl
+	ret
 
 	
 ;-------------------------------------------------------------------------------
@@ -1509,7 +1546,7 @@ fontlib_GetNewlineOptions:
 
 ;-------------------------------------------------------------------------------
 fontlib_Newline:
-; Prints a newline,may trigger pre/post clear
+; Prints a newline, may trigger pre/post clear
 ; Inputs:
 ;  None
 ; Outputs:
@@ -1527,12 +1564,18 @@ fontlib_Newline:
 	add	a,(iy + strucFont.spaceBelow)
 	ld	b,a
 	add	a,a
-	jr	c,.outOfSpace		; Carry = definitely went past YMax
-	add	a,(iy + textY)
+	jr	c,.noScroll			; Carry = definitely went past YMax
+	add	a,(iy + textY)			; And scrolling is not valid if height > 127
 	jr	c,.outOfSpace
 	cp	a,(iy + textYMax)
-	jr	c,.checkPreClear
+	jr	c,.writeCursorY
 .outOfSpace:
+	bit	bAutoScroll,(iy + newlineControl)
+	jr	z,.noScroll
+	call	fontlib_ScrollWindowDown
+	ld	iy,DataBaseAddr			; Don't need to write textY---cursor 
+	jr	.checkPreClear			; didn't actually move!
+.noScroll:
 	ld	a,1
 	bit	bEnableAutoWrap,(iy + newlineControl)
 	ret	z
@@ -1540,10 +1583,10 @@ fontlib_Newline:
 	ld	(iy + textY),a
 	ld	a,1
 	ret
-.checkPreClear:
+.writeCursorY:
 	sub	a,b
 	ld	(iy + textY),a
-	xor	a,a
+.checkPreClear:
 	bit	bPreclearNewline,(iy + newlineControl)
 	ret	z
 ; Fall through to ClearEOL
@@ -1564,7 +1607,6 @@ fontlib_ClearEOL:
 	sbc	hl,de
 	ret	c
 	ret	z
-	dec	hl
 	ex	de,hl
 	ld	a,(_CurrentFontProperties.height)
 	ld	hl,_CurrentFontProperties.spaceAbove
@@ -1638,6 +1680,107 @@ util.ClearRect:
 .exit:
 	pop	ix
 	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_ScrollWindowDown:
+; Scrolls the contents of the text window down one line, i.e. everything in the
+; window is copied UP one line, thus yielding the effect of scrolling down.
+; The current text cursor is ignored.  The bottom line is not erased; you must
+; erase or overwrite it yourself.
+; Arguments:
+;  None
+; Returns:
+;  Nothing
+	call	.part1
+; Compute write pointer
+	ld	hl,(_TextYMin)
+	call	.part2
+; Compute read pointer as HL += LcdWidth * CurrentFontHeight
+	add	hl,bc
+	add	hl,bc
+.part3:
+; Compute number of lines to copy as _TextYMax - _TextYMin - CurrentFontHeight
+	ld	c,a
+	ld	a,(_TextYMin)
+	ld	b,a
+	ld	a,(_TextYMax)
+	sub	a,b
+	ret	c
+;	ret	z			; Implied by checking carry & zero flags below
+	sub	a,c
+	ret	c
+	ret	z
+	cp	c			; If window can't fit two full lines of text,
+	ret	c			; then there's no point in scrolling
+; Now copy some pixels
+	call	gfx_Wait
+.copy:	lea	bc,iy + 0
+	ldir
+	ld	bc,0			; SMC
+.delta := $ - 3
+	add	hl,bc			; Update read and write pointers
+	ex	de,hl
+	add	hl,bc
+	ex	de,hl
+	dec	a
+	jr	nz,.copy
+	ret
+
+.part1:
+; Get width loop control first
+	call	fontlib_GetWindowWidth
+	pop	bc
+	ret	c
+	ret	z
+	push	bc
+	push	hl
+	pop	iy			; Stash it in IY for quick access
+	ex	de,hl
+	ld	hl,LcdWidth
+	sbc	hl,de			; carry reset from above
+	ld	(.delta),hl
+; Now is a good time to call this internal routine
+	jp	fontlib_GetCurrentFontHeight	; A has height
+
+.part2:
+	ld	h,LcdWidth / 2
+	mlt	hl
+	add	hl,hl
+	ld	de,(_TextXMin)
+	add	hl,de
+	ld	de,(CurrentBuffer)
+	add	hl,de
+; Copy HL to DE
+	ex	de,hl
+	sbc	hl,hl			; carry should be reset or else we're vomiting all over RAM
+	add	hl,de
+; Start computing read pointer
+	ld	c,a
+	ld	b,LcdWidth / 2
+	mlt	bc
+	ret
+
+
+;-------------------------------------------------------------------------------
+fontlib_ScrollWindowUp:
+; Scrolls the contents of the text window up one line, i.e. everything in the
+; window is copied DOWN one line, thus yielding the effect of scrolling up.
+; The current text cursor is ignored.  The top line is not erased; you must
+; erase or overwrite it yourself.
+; Arguments:
+;  None
+; Returns:
+;  Nothing
+	call	fontlib_ScrollWindowDown.part1
+; Compute write pointer
+	ld	hl,(_TextYMax)
+	dec	l
+	call	fontlib_ScrollWindowDown.part2
+; Compute read pointer as HL -= LcdWidth * CurrentFontHeight
+	sbc	hl,bc
+	sbc	hl,bc
+	jr	fontlib_ScrollWindowDown.part3
 
 
 ;-------------------------------------------------------------------------------
@@ -1942,7 +2085,7 @@ firstPrintableCodePoint := _TextFirstPrintableCodePoint - DataBaseAddr
 	db	chFirstPrintingCode
 _TextNewLineCode:
 newLineCode := _TextNewLineCode - DataBaseAddr
-	db	chNewLine
+	db	chNewline
 tempRandom:
 readCharacter := tempRandom - DataBaseAddr
 	db	0

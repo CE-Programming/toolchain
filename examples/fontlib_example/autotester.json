@@ -14,6 +14,8 @@
     "hashWait|2",
     "key|enter",
     "hashWait|3"
+    "key|enter",
+    "hashWait|4"
   ],
   "hashes": {
     "1": {
@@ -29,6 +31,12 @@
       "expected_CRCs": [ "384C8C4B" ]
     },
     "3": {
+      "description": "Check ScrollWindowDown and ClearEOL",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "A327F7D4" ]
+    },
+    "4": {
       "description": "Back to the home screen (exit check)",
       "start": "vram_start",
       "size": "vram_16_size",
