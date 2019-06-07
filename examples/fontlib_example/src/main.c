@@ -78,6 +78,19 @@ void main(void) {
 
     /* Pause */
     while (!os_GetCSC());
+    
+    /* Test scrolling */
+    fontlib_SetWindow(25, 40, 150, 40);
+    fontlib_HomeUp();
+    fontlib_SetLineSpacing(2, 2);
+    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP | FONTLIB_AUTO_SCROLL);
+    fontlib_Newline();
+    fontlib_Newline();
+    fontlib_DrawString("Scrolled!");
+    fontlib_ClearEOL();
+    
+    /* Pause */
+    while (!os_GetCSC());
 
     /* Finish the graphics */
     gfx_End();
