@@ -90,7 +90,7 @@ typedef struct {
 } fat_entry_t;
 
 #define	FAT_O_WRONLY      2               /**< Open Write only mode. */
-#define	FAT_O_RDONLY      1               /**< Open Write only mode */
+#define	FAT_O_RDONLY      1               /**< Open Read only mode */
 #define	FAT_O_RDWR (O_RDONLY | O_WRONLY)  /**< Open in Read and Write mode. */
 
 #define FAT_RDONLY    (1 << 0)  /**< Entry is Read-Only. */
