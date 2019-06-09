@@ -43,7 +43,7 @@ include_library '../graphx/graphx.asm'
 	export fontlib_SetNewlineCode
 	export fontlib_GetNewlineCode
 	export fontlib_SetAlternateStopCode
-	export fontlib_SetAlternateStopCode
+	export fontlib_GetAlternateStopCode
 	export fontlib_SetFirstPrintableCodePoint
 	export fontlib_GetFirstPrintableCodePoint
 	export fontlib_SetDrawIntCodePoints
