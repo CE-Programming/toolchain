@@ -790,10 +790,21 @@ uint8_t fontlib_GetNewlineOptions(void);
 /** 
  * Scrolls the contents of the text window down one line, i.e. everything in
  * the window is copied UP one line, thus yielding the effect of scrolling down.
- * The current text cursor is ignored.  The bottom line is not erased; you must
- * erase or overwrite it yourself.
+ * The current text cursor position is ignored.
+ * @note The bottom line is not erased; you must erase or overwrite it yourself.
  */
 void fontlib_ScrollWindowDown(void);
+
+/** 
+ * Scrolls the contents of the text window up one line, i.e. everything in
+ * the window is copied DOWN one line, thus yielding the effect of scrolling up.
+ * The current text cursor position is ignored.
+ * @note The bottom line is not erased; you must erase or overwrite it yourself.
+ * @note This doesn't try to compute the location of the bottom line of text; it
+ * just blindly copies rows of pixels, so make sure the window height is an
+ * exact multiple of the font height.
+ */
+void fontlib_ScrollWindowUp(void);
 
 /**
  * Gets the long name associated with a font pack.  Useful in a loop with

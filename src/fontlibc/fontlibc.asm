@@ -291,10 +291,11 @@ fontlib_GetWindowWidth:
 ;  None
 ; Returns:
 ;  Data
+; Should preserve DE, as window scrolling needs DE preserved
 	ld	hl,(_TextXMax)
-	ld	de,(_TextXMin)
+	ld	bc,(_TextXMin)
 	or	a,a
-	sbc	hl,de
+	sbc	hl,bc
 	ret
 
 
@@ -1692,7 +1693,8 @@ fontlib_ScrollWindowDown:
 ; Arguments:
 ;  None
 ; Returns:
-;  Nothing
+;  A = 0
+	ld	de,LcdWidth
 	call	.part1
 ; Compute write pointer
 	ld	hl,(_TextYMin)
@@ -1738,7 +1740,6 @@ fontlib_ScrollWindowDown:
 	push	hl
 	pop	iy			; Stash it in IY for quick access
 	ex	de,hl
-	ld	hl,LcdWidth
 	sbc	hl,de			; carry reset from above
 	ld	(.delta),hl
 ; Now is a good time to call this internal routine
@@ -1773,6 +1774,7 @@ fontlib_ScrollWindowUp:
 ;  None
 ; Returns:
 ;  Nothing
+	ld	de,-LcdWidth
 	call	fontlib_ScrollWindowDown.part1
 ; Compute write pointer
 	ld	hl,(_TextYMax)
