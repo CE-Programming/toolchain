@@ -1590,6 +1590,7 @@ fontlib_Newline:
 	sub	a,b
 	ld	(iy + textY),a
 .checkPreClear:
+	xor	a
 	bit	bPreclearNewline,(iy + newlineControl)
 	ret	z
 ; Fall through to ClearEOL
