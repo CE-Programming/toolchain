@@ -481,7 +481,7 @@ fontlib_DrawGlyph:
 ; Arguments:
 ;  arg0: codepoint
 ; Returns:
-;  Nothing
+;  New X cursor value
 	ld	hl,arg0
 	add	hl,sp
 	ld	a,(hl)
@@ -731,8 +731,8 @@ fontlib_DrawString:
 ; Inputs:
 ;  arg0: Pointer to string
 ;  arg1: Maximum number of characters have been printed
-; Outputs:
-;  Stuff printed
+; Output:
+;  New X cursor value
 	pop	bc
 	ld	(.retter + 1),bc
 	pop	de
@@ -755,8 +755,8 @@ fontlib_DrawStringL:
 ; Inputs:
 ;  arg0: Pointer to string
 ;  arg1: Maximum number of characters have been printed
-; Outputs:
-;  Stuff printed
+; Output:
+;  New X cursor value
 	push	ix
 ; Since reentrancy isn't likely to be needed. . . .
 ; Instead of using stack locals, just access all our local and global
@@ -803,7 +803,8 @@ fontlib_DrawStringL:
 	jr	z,.exit
 	cp	a,(ix + newLineCode)
 	jr	z,.printNewline
-.exit:	pop	ix
+.exit:	ld	hl,(ix + textX)
+	pop	ix
 	ret
 .notControlCode:
 	cp	a,(ix + alternateStopCode)

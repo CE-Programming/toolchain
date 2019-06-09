@@ -689,8 +689,9 @@ size_t fontlib_GetCharactersRemaining(void);
  * hand, users may want this specifically so they can handle all their own
  * layout without the text window settings getting in their way.)
  * @param glyph Codepoint
+ * @return The new X value of the cursor
  */
-void fontlib_DrawGlyph(uint8_t glyph);
+uint24_t fontlib_DrawGlyph(uint8_t glyph);
 
 /**
  * Draws a string.
@@ -704,12 +705,15 @@ void fontlib_DrawGlyph(uint8_t glyph);
  * a glyph, so if you need to also display the stop code character, you must
  * directly call fontlib_DrawGlyph to force display the character and increment
  * past it.
- * @note Newline codes will print regardless of whether FONTLIB_ENABLE_AUTO_WRAP is
- * enabled.  To disable parsing newline codes, use fontlib_SetNewlineCode(0);
- * @note THIS IS NOT REENTRANT (though if you need that, you're probably not using C)
+ * @note Newline codes will print regardless of whether FONTLIB_ENABLE_AUTO_WRAP
+ * is enabled.  To disable parsing newline codes, use fontlib_SetNewlineCode(0);
+ * @note THIS IS NOT REENTRANT (though if you need that, you're probably not
+ * using C)
  * @param str Pointer to string
+ * @return The new X value of the cursor (probably not useful if a newline was
+ * processed.)
  */
-void fontlib_DrawString(const char *str);
+uint24_t fontlib_DrawString(const char *str);
 
 /**
  * Draws a string, up to a maximum number of characters.
@@ -722,8 +726,10 @@ void fontlib_DrawString(const char *str);
  * @param str Pointer to string
  * @param max_characters Maximum number of characters to attempt to print, may
  * return early if some other condition requires returning
+ * @return The new X value of the cursor (probably not useful if a newline was
+ * processed.)
  */
-void fontlib_DrawStringL(const char *str, size_t max_characters);
+uint24_t fontlib_DrawStringL(const char *str, size_t max_characters);
 
 /**
  * Prints a signed integer
