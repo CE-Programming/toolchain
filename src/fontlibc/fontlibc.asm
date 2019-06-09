@@ -513,11 +513,11 @@ fontlib_DrawGlyph:
 ;-------------------------------------------------------------------------------
 util.DrawGlyphRaw:
 ; Handles the actual main work of drawing a glyph.
-; Inputs:
+; Arguments:
 ;  HL: Draw pointer
 ;  A: Glyph index
 ;  Font properties variables
-; Outputs:
+; Returns:
 ;  IYL: Width of glyph (not including any italicSpaceAdjust)
 ;  IYH: Zero
 ;  IYU: Untouched
@@ -546,12 +546,12 @@ assert $ = util.DrawGlyphRawKnownWidth
 ;-------------------------------------------------------------------------------
 util.DrawGlyphRawKnownWidth:
 ; Handles the actual main work of drawing a glyph.
-; Inputs:
+; Arguments:
 ;  DE: Draw pointer
 ;  C: Glyph index, with _CurrentFontProperties.firstGlyph subtracted out
 ;  A: Glyph width
 ;  Font properties variables
-; Outputs:
+; Returns:
 ;  IYL: Width of glyph (not including any italicSpaceAdjust)
 ;  IYH: Zero
 ;  IYU: Untouched
@@ -685,13 +685,13 @@ smcByte _TextStraightRowDelta
 
 util.DrawEmptyLines:
 ; Internal routine that draws empty space for a glyph
-; Inputs:
+; Arguments:
 ;  A: Number of lines to draw (nonzero)
 ;  B: -1 = opaque, 0 = transparent
 ;  IYL: Width of line to draw
 ;  DE: Drawing target
 ;  (_TextStraightRowDelta - 2): Row delta
-; Output:
+; Returns:
 ;  Lines drawn
 ; Destroys:
 ;  AF
@@ -729,10 +729,10 @@ fontlib_DrawString:
 ; Draws a string,ending when either:
 ;  an unknown control code is encountered (or NULL), or there is no more space
 ;  left in the window.
-; Inputs:
+; Arguments:
 ;  arg0: Pointer to string
 ;  arg1: Maximum number of characters have been printed
-; Output:
+; Returns:
 ;  New X cursor value
 	pop	bc
 	ld	(.retter + 1),bc
@@ -753,10 +753,10 @@ fontlib_DrawStringL:
 ;  arg1 characters have been printed;
 ;  an unknown control code is encountered (or NULL); or,
 ;  there is no more space left in the window.
-; Inputs:
+; Arguments:
 ;  arg0: Pointer to string
 ;  arg1: Maximum number of characters have been printed
-; Output:
+; Returns:
 ;  New X cursor value
 	push	ix
 ; Since reentrancy isn't likely to be needed. . . .
@@ -1493,10 +1493,10 @@ fontlib_GetCharactersRemaining:
 ;-------------------------------------------------------------------------------
 fontlib_ClearWindow:
 ; Erases the entire text window.
-; Inputs:
+; Arguments:
 ;  None
-; Outputs:
-;  None
+; Returns:
+;  Nothing
 	ld	hl,(_TextX)
 	push	hl
 	ld	a,(_TextY)
@@ -1524,9 +1524,9 @@ fontlib_ClearWindow:
 ;-------------------------------------------------------------------------------
 fontlib_SetNewlineOptions:
 ; Sets options for controlling newline behavior
-; Inputs:
+; Arguments:
 ;  arg0: Flags for newline behavior
-; Outputs:
+; Returns:
 ;  None
 	ld	hl,arg0
 	add	hl,sp
@@ -1538,9 +1538,9 @@ fontlib_SetNewlineOptions:
 ;-------------------------------------------------------------------------------
 fontlib_GetNewlineOptions:
 ; Returns current newline flags
-; Inputs:
+; Arguments:
 ;  None
-; Outputs:
+; Returns:
 ;  Current newline flags
 	ld	a,(_TextNewlineControl)
 	ret
@@ -1548,11 +1548,12 @@ fontlib_GetNewlineOptions:
 
 ;-------------------------------------------------------------------------------
 fontlib_Newline:
-; Prints a newline, may trigger pre/post clear
-; Inputs:
+; Prints a newline, may trigger pre/post clear and scrolling
+; Arguments:
 ;  None
-; Outputs:
-;  None
+; Returns:
+;  A = 0 on success
+;  A > 0 if the text window is full
 	ld	iy,DataBaseAddr
 	bit	bAutoClearToEOL,(iy + newlineControl)
 ; I hate how nearly every time I think CALL cc or RET cc would be useful
@@ -1598,14 +1599,14 @@ assert $ = fontlib_ClearEOL
 ;-------------------------------------------------------------------------------
 fontlib_ClearEOL:
 ; Erases everything from the cursor to the right side of the text window.
-; Inputs:
+; Arguments:
 ;  None
-; Outputs:
-;  None
+; Returns:
+;  A = 0
 ; Compute the rectangle size to clear
 	ld	de,(_TextX)
 	ld	hl,(_TextXMax)
-	or	a,a
+	xor	a,a
 	sbc	hl,de
 	ret	c
 	ret	z
@@ -1794,9 +1795,9 @@ fontlib_ScrollWindowUp:
 ;-------------------------------------------------------------------------------
 util.GetFontPackData:
 ; Attempts to get a pointer to a font pack's data based on its appvar's name.
-; Inputs:
+; Arguments:
 ;  HL: Pointer to name string
-; Outputs:
+; Returns:
 ;  HL: Pointer to byte after "FONTPACK", or NULL on failure
 ;  DE: Pointer to start of "FONTPACK", or garbage on failure
 ;  Carry set if appvar not found, or not a font pack; NC on success
@@ -1837,9 +1838,9 @@ util.GetFontPackData:
 ;-------------------------------------------------------------------------------
 util.VerifyHeader:
 ; Verify that HL points to something that looks somewhat like a font pack.
-; Inputs:
+; Arguments:
 ;  HL: Pointer to supposed font pack
-; Ouput:
+; Returns:
 ;  Z if the check passes, NZ if not
 ;  HL points to byte after 'K'
 ; Destroys:
