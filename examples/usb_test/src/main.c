@@ -54,6 +54,20 @@ static usb_error_t handleTestIn(usb_endpoint_t endpoint,
     putChar(':');
     putIntHex(transferred);
     _OS(asm_NewLine);
+    return USB_SUCCESS;
+}
+
+static usb_error_t handleTestOut(usb_endpoint_t endpoint,
+                                 usb_transfer_status_t status,
+                                 size_t transferred, usb_transfer_data_t *data) {
+    putByteHex(status);
+    putChar(':');
+    putIntHex(transferred);
+    putChar(':');
+    putBlockHex(data, transferred);
+    _OS(asm_NewLine);
+    free(data);
+    return USB_SUCCESS;
 }
 
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
@@ -75,8 +89,6 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         "USB_OTG_INT",
         "USB_HOST_INT",
         "USB_CONTROL_INPUT_INT",
-        "USB_CONTROL_OUTPUT_INT",
-        "USB_CONTROL_END_INT",
         "USB_CONTROL_ERROR_INT",
         "USB_CONTROL_ABORT_INT",
         "USB_FIFO0_INPUT_INT",
@@ -91,7 +103,6 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         "USB_FIFO3_INPUT_INT",
         "USB_FIFO3_OUTPUT_INT",
         "USB_FIFO3_SHORT_PACKET_INT",
-        "USB_DEVICE_RESET_INT",
         "USB_DEVICE_SUSPEND_INT",
         "USB_DEVICE_RESUME_INT",
         "USB_DEVICE_ISOCHRONOUS_ERROR_INT",
@@ -147,35 +158,42 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             _OS(asm_NewLine);
             break;
         case USB_DEFAULT_SETUP_EVENT: {
-                const usb_control_setup_t *setup = event_data;
-                for (i = 0; i < 8; i++)
-                    putByteHex(((unsigned char *)setup)[i]);
-                _OS(asm_NewLine);
-                if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE &&
-                    !setup->bRequest && !setup->wValue && !setup->wIndex) {
-                    usb_device_t host;
-                    usb_endpoint_t control;
-                    host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
-                    if (!host) {
-                        error = USB_ERROR_NO_DEVICE;
-                        break;
-                    }
-                    control = usb_GetDeviceEndpoint(host, 0);
-                    if (!control) {
-                        error = USB_ERROR_SYSTEM;
-                        break;
-                    }
-                    if (setup->bmRequestType & USB_DEVICE_TO_HOST) {
-                        usb_ScheduleTransfer(control, "Hello World!", 13, handleTestIn, NULL);
-                        error = USB_IGNORE;
-                        os_PutStrFull("Detected test IN setup.");
-                    } else {
-                        os_PutStrFull("Detected test OUT setup.");
-                    }
-                    _OS(asm_NewLine);
+            const usb_control_setup_t *setup = event_data;
+            for (i = 0; i < 8; i++)
+                putByteHex(((unsigned char *)setup)[i]);
+            _OS(asm_NewLine);
+            if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE &&
+                !setup->bRequest && !setup->wValue && !setup->wIndex) {
+                usb_device_t host;
+                usb_endpoint_t control;
+                host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
+                if (!host) {
+                    error = USB_ERROR_NO_DEVICE;
+                    break;
                 }
+                control = usb_GetDeviceEndpoint(host, 0);
+                if (!control) {
+                    error = USB_ERROR_SYSTEM;
+                    break;
+                }
+                if (setup->bmRequestType & USB_DEVICE_TO_HOST) {
+                    error = usb_ScheduleTransfer(control, "Hello World!", 13, handleTestIn, NULL);
+                    os_PutStrFull("Detected test IN setup.");
+                } else {
+                    char *buffer = malloc(setup->wLength);
+                    if (!buffer) {
+                        error = USB_ERROR_NO_MEMORY;
+                        break;
+                    }
+                    error = usb_ScheduleControlTransfer(control, setup, buffer, handleTestOut, buffer);
+                    os_PutStrFull("Detected test OUT setup.");
+                }
+                if (error == USB_SUCCESS)
+                    error = USB_IGNORE;
+                _OS(asm_NewLine);
             }
             break;
+        }
         case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
             static unsigned counter;
             unsigned row, col;
