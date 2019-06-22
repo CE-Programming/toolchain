@@ -2119,7 +2119,7 @@ _RetireTransfers:
 	ex	de,hl
 	ld	ytransfer,(xendpoint.first)
 .free:
-	lea	hl,iy
+	lea	hl,ytransfer
 	bit	bsr ytransfer.type.ioc,(ytransfer.type)
 	ld	ytransfer,(hl+transfer.next)
 	call	_Free32Align32
@@ -2898,12 +2898,18 @@ _HandleCxEndInt:
 	ex	(sp),xendpoint
 	ld	ytransfer,(xendpoint.overlay.next)
 	res	bsr ytransfer.status.active,(ytransfer.status)
+	ld	hl,(ytransfer.altNext)
+	bit	0,hl ; term
+	jq	z,.altNext
+	ld	hl,(ytransfer.next)
+.altNext:
+	ld	(xendpoint.overlay.next),hl
 	call	_RetireTransfers
 	pop	ix
-	ret	nz
 	ld	hl,mpUsbCxFifo
 	set	bCxFifoFin,(hl)
 	ld	l,usbCxIsr-$100
+	cp	a,a
 	ret
 
 _HandleCxErrInt:
