@@ -2058,6 +2058,88 @@ label .alt at $-byte
 
 ;-------------------------------------------------------------------------------
 ; Input:
+;  bc = ? | bytes or ? shl 16
+;  hl = endpoint
+_ExecuteDma:
+	ld	b,$400 shr 8
+.bytes:
+	ld	l,endpoint.overlay.next
+	ld	ytransfer,(hl)
+	bit	bsr ytransfer.status.active,(ytransfer.status)
+	ret	z
+	ld	a,i
+	push	af
+	ld	l,endpoint.overlay.fifo
+	ld	a,(hl)
+	di
+	ld	(mpUsbDmaFifo),a
+	ld	l,endpoint.maxPktLen+1
+	ld	a,(hl)
+	dec	l;endpoint.maxPktLen
+	ld	l,(hl)
+	and	a,7
+	ld	h,a
+	ld	de,(ytransfer.remaining)
+	res	bsr ytransfer.remaining.dt,de
+	sbc.s	hl,de
+	jq	c,.notRemaining
+	sbc	hl,hl
+.notRemaining:
+	add	hl,de
+	ld	a,b
+	and	a,7
+	ld	b,a
+	sbc.s	hl,bc
+	jq	c,.notBytes
+	sbc	hl,hl
+.notBytes:
+	add.s	hl,bc
+	ld	(mpUsbDmaLen),hl
+	ex	de,hl
+	or	a,a
+	sbc	hl,de
+	ld	(ytransfer.remaining),hl
+	ld	a,l
+	or	a,h
+	jq	nz,.notDone
+	bit	0,(ytransfer.altNext)
+	jq	nz,.notDone
+	ld	hl,(ytransfer.endpoint)
+	ld	l,endpoint.overlay.next
+	ld	bc,(ytransfer.next)
+	ld	(hl),bc
+	res	bsr ytransfer.status.active,(ytransfer.status)
+.notDone:
+	ld	hl,(ytransfer.buffers)
+	ld	(mpUsbDmaAddr),hl
+	add	hl,de
+	ld	(ytransfer.buffers),hl
+	ld	hl,mpUsbDmaCtrl
+	ld	(hl),bmUsbDmaClrFifo or usbDmaFifo2Mem
+assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
+	ld	(hl),h
+.waitDma:
+	ld	a,(de) ; give dma a chance
+	ld	l,usbDevIsr-$100
+	bit	bUsbIntDevDmaFin,(hl)
+	jq	nz,.waitDmaDone
+	inc	l
+	bit	bUsbIntDevDmaErr-8,(hl)
+	jq	z,.waitDma
+	ld	(hl),bmUsbIntDevDmaErr shr 8
+	dec	l
+.waitDmaDone:
+	ld	(hl),bmUsbIntDevDmaFin
+	xor	a,a;bmUsbDmaNoFifo
+	ld	l,usbDmaFifo-$100
+	ld	(hl),a
+	pop	af
+	ret	po
+	ei
+	ret
+
+;-------------------------------------------------------------------------------
+; Input:
 ;  cf = 0
 ;  ix = endpoint
 ; Output:
@@ -2134,89 +2216,7 @@ assert USB_ERROR_NOT_SUPPORTED
 	ld	hl,USB_ERROR_NOT_SUPPORTED-1
 	inc	l
 .error:
-	pop	bc,ix ; skip immediate parent routine
-	ret
-
-;-------------------------------------------------------------------------------
-; Input:
-;  de = ? | bytes or ? shl 16
-;  hl = endpoint
-_ExecuteDma:
-	ld	d,$400 shr 8
-.bytes:
-	ld	l,endpoint.overlay.next
-	ld	ytransfer,(hl)
-	bit	bsr ytransfer.status.active,(ytransfer.status)
-	ret	z
-	ld	a,i
-	push	af
-	ld	l,endpoint.overlay.fifo
-	ld	a,(hl)
-	di
-	ld	(mpUsbDmaFifo),a
-	ld	l,endpoint.maxPktLen+1
-	ld	a,(hl)
-	dec	l;endpoint.maxPktLen
-	ld	l,(hl)
-	and	a,7
-	ld	h,a
-	ld	de,(ytransfer.remaining)
-	res	bsr ytransfer.remaining.dt,de
-	sbc.s	hl,de
-	jq	c,.notRemaining
-	sbc	hl,hl
-.notRemaining:
-	add	hl,de
-	ld	a,b
-	and	a,7
-	ld	b,a
-	sbc.s	hl,bc
-	jq	c,.notBytes
-	sbc	hl,hl
-.notBytes:
-	add.s	hl,bc
-	ld	(mpUsbDmaLen),hl
-	ex	de,hl
-	or	a,a
-	sbc	hl,de
-	ld	(ytransfer.remaining),hl
-	ld	a,l
-	or	a,h
-	jq	nz,.notDone
-	bit	0,(ytransfer.altNext)
-	jq	nz,.notDone
-	ld	hl,(ytransfer.endpoint)
-	ld	l,endpoint.overlay.next
-	ld	bc,(ytransfer.next)
-	ld	(hl),bc
-	res	bsr ytransfer.status.active,(ytransfer.status)
-.notDone:
-	ld	hl,(ytransfer.buffers)
-	ld	(mpUsbDmaAddr),hl
-	add	hl,de
-	ld	(ytransfer.buffers),hl
-	ld	hl,mpUsbDmaCtrl
-	ld	(hl),bmUsbDmaClrFifo or usbDmaFifo2Mem
-assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
-	ld	(hl),h
-.waitDma:
-	ld	a,(de) ; give dma a chance
-	ld	l,usbDevIsr-$100
-	bit	bUsbIntDevDmaFin,(hl)
-	jq	nz,.waitDmaDone
-	inc	l
-	bit	bUsbIntDevDmaErr-8,(hl)
-	jq	z,.waitDma
-	ld	(hl),bmUsbIntDevDmaErr shr 8
-	dec	l
-.waitDmaDone:
-	ld	(hl),bmUsbIntDevDmaFin
-	xor	a,a;bmUsbDmaNoFifo
-	ld	l,usbDmaFifo-$100
-	ld	(hl),a
-	pop	af
-	ret	po
-	ei
+	pop	bc,ix ; skip direct parent routine
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2878,11 +2878,11 @@ _HandleCxInInt:
 	jq	_DispatchEvent
 
 _HandleCxOutInt:
-	ld	iy,(rootHub.child)
 	ld	l,usbCxFifoBytes-$100
-	ld	e,(hl)
+	ld	c,(hl)
 	xor	a,a
-	ld	d,a
+	ld	b,a
+	ld	iy,(rootHub.child)
 	call	usb_GetDeviceEndpoint.enter
 	call	_ExecuteDma.bytes
 	ld	hl,mpUsbCxIsr
@@ -2891,8 +2891,14 @@ _HandleCxOutInt:
 	ret
 
 _HandleCxEndInt:
-	ld	iy,(rootHub.child)
+	bit	bUsbIntCxIn,(hl)
+	call	nz,_HandleCxInInt
+	ret	nz
+	bit	bUsbIntCxOut,(hl)
+	call	nz,_HandleCxOutInt
+	ret	nz
 	xor	a,a
+	ld	iy,(rootHub.child)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	ex	(sp),xendpoint

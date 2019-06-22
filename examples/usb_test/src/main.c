@@ -64,7 +64,7 @@ static usb_error_t handleTestOut(usb_endpoint_t endpoint,
     putChar(':');
     putIntHex(transferred);
     putChar(':');
-    putBlockHex(data, transferred);
+    putBlockHex((char *)data + transferred - 6, 7);
     _OS(asm_NewLine);
     free(data);
     return USB_SUCCESS;
