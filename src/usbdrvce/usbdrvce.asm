@@ -2134,7 +2134,7 @@ assert USB_ERROR_NOT_SUPPORTED
 	ld	hl,USB_ERROR_NOT_SUPPORTED-1
 	inc	l
 .error:
-	pop	ix
+	pop	bc,ix ; skip immediate parent routine
 	ret
 
 ;-------------------------------------------------------------------------------
