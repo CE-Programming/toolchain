@@ -1426,6 +1426,11 @@ _QueueTransfer:
 	push	hl
 	pop	bc
 	jq	nz,.next
+virtual
+	jr	nz,$$
+ load .jr_nz: byte from $$
+end virtual
+	db	.jr_nz
 .last:
 	pop	de
 .zlp:
