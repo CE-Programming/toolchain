@@ -88,7 +88,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         "USB_DEVICE_DEVICE_INT",
         "USB_OTG_INT",
         "USB_HOST_INT",
-        "USB_CONTROL_INPUT_INT",
+        "USB_CONTROL_END_INT",
         "USB_CONTROL_ERROR_INT",
         "USB_CONTROL_ABORT_INT",
         "USB_FIFO0_INPUT_INT",
@@ -177,8 +177,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                     break;
                 }
                 if (setup->bmRequestType & USB_DEVICE_TO_HOST) {
-                    error = usb_ScheduleTransfer(control, "Hello World!", 13, handleTestIn, NULL);
-                    os_PutStrFull("Detected test IN setup.");
+                    error = usb_ScheduleTransfer(control, "Hello World! Which must be exactly sixty-three characters?!?!1!.Hello World! Which must be exactly sixty-three characters?!?!1!.", 129, handleTestIn, NULL);
                 } else {
                     char *buffer = malloc(setup->wLength);
                     if (!buffer) {
@@ -186,11 +185,9 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                         break;
                     }
                     error = usb_ScheduleControlTransfer(control, setup, buffer, handleTestOut, buffer);
-                    os_PutStrFull("Detected test OUT setup.");
                 }
                 if (error == USB_SUCCESS)
                     error = USB_IGNORE;
-                _OS(asm_NewLine);
             }
             break;
         }
