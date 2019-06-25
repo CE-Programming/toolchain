@@ -1571,6 +1571,7 @@ fontlib_Newline:
 	add	a,(iy + textY)			; And scrolling is not valid if height > 127
 	jr	c,.outOfSpace
 	cp	a,(iy + textYMax)
+	jr	z,.writeCursorY
 	jr	c,.writeCursorY
 .outOfSpace:
 	bit	bAutoScroll,(iy + newlineControl)
