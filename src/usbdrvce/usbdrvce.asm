@@ -1237,11 +1237,14 @@ usb_ScheduleTransfer.device:
 	inc	hl
 	dec.s	hl
 	sbc	hl,bc
-	jq	nc,usb_ScheduleTransfer.noTruncate
+	jq	nc,usb_ScheduleTransfer.device.notLess
 	add	hl,bc
 	push	hl
 	pop	bc
-usb_ScheduleTransfer.noTruncate:
+usb_ScheduleTransfer.device.notLess:
+	ld	a,c
+	or	a,b
+	jq	z,usb_ScheduleTransfer.device.zlp
 	ld	a,(setupPacket.bmRequestType)
 	push	af
 	rlca
@@ -1254,7 +1257,17 @@ usb_ScheduleTransfer.noTruncate:
 	ld	hl,(ix+6)
 	call	_ExecuteDma
 	ret	nc
+usb_ScheduleTransfer.device.return:
 	jq	usb_Transfer.return
+usb_ScheduleTransfer.device.zlp:
+	ld	hl,mpUsbCxFifo
+	set	bCxFifoFin,(hl)
+	ld	de,(ix+18)
+	ld	hl,usb_Transfer.return
+	push	yendpoint,bc,bc,de,hl
+	ld	hl,(ix+15)
+_DispatchEvent.dispatch:
+	jp	(hl)
 usb_ScheduleControlTransfer:
 	call	_Error.check
 	call	.check
@@ -2266,241 +2279,6 @@ assert USB_ERROR_NOT_SUPPORTED
 	ret
 
 ;-------------------------------------------------------------------------------
-_FunData:
-repeat 256
-	db % and $FF
-end repeat
-
-_HandleTestOutRequest:
-	ld	hl,_FunData
-	ld	bc,256
-	call	_MemClear
-	ld	bc,64
-	ld	de,_FunData
-	ld	hl,mpUsbCxFifo
-	set	bCxFifoClr,(hl)
-	ld	l,usbCxIsr-$100
-.waitOut:
-	bit	bUsbIntCxOut,(hl)
-	jq	z,.waitOut
-	ld	(hl),bmUsbIntCxOut
-	ld	l,usbCxFifo+3-$100
-	ld	bc,0
-	ld	c,(hl)
-	ld	de,_FunData
-	ld	l,usbDmaCtrl-$100
-	ld	(hl),usbDmaFifo2Mem or bmUsbDmaClrFifo
-	inc	l;usbDmaLen-$100
-	ld	(hl),bc
-	ld	l,usbDmaFifo-$100
-	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbDmaAddr-$100
-	ld	(hl),de
-	ld	l,usbDmaCtrl-$100
-	set	bUsbDmaStart,(hl)
-.waitDma:
-	ld	a,(bc)
-	ld	l,usbDevIsr-$100
-	bit	bUsbIntDevDmaFin,(hl)
-	jq	nz,.waitDmaDone
-	inc	l
-	bit	bUsbIntDevDmaErr-8,(hl)
-	jq	z,.waitDma
-	ld	(hl),bmUsbIntDevDmaErr shr 8
-	dec	l
-.waitDmaDone:
-	ld	(hl),bmUsbIntDevDmaFin
-	ld	(_FunData),bc
-	xor	a,a
-	ld	l,usbDmaFifo-$100
-	ld	(hl),a;bmUsbDmaNoFifo
-	ld	l,usbCxIsr-$100
-.waitEnd:
-	bit	bUsbIntCxEnd,(hl)
-	jq	nz,.waitEndDone
-	bit	bUsbIntCxErr,(hl)
-	jq	z,.waitEnd
-.waitEndDone:
-	ld	(hl),bmUsbIntCxEnd or bmUsbIntCxErr
-	ld	l,usbCxFifo-$100
-	set	bCxFifoFin,(hl)
-	ld	l,usbCxIsr-$100
-	ld	(hl),bmUsbIntCxSetup
-	ld	a,102
-	jq	_DispatchEvent
-
-_HandleTestInRequest:
-	push	ix
-	ld	ix,0
-	ld	iy,mpTmrRange
-	ld	bc,64
-	ld	de,_FunData
-	ld	hl,mpUsbCxFifo
-	set	bCxFifoClr,(hl)
-	ld	l,usbDmaCtrl-$100
-	ld	(hl),usbDmaMem2Fifo or bmUsbDmaClrFifo
-	inc	l;usbDmaLen-$100
-	ld	(hl),bc
-	ld	l,usbDmaFifo-$100
-	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbDmaAddr-$100
-	ld	(hl),de
-	ld	l,usbDmaCtrl-$100
-	set	bUsbDmaStart,(hl)
-	ld	l,usbDevIsr-$100
-.waitDma:
-	bit	bUsbIntDevDmaFin,(hl)
-	jq	z,.waitDma
-	ld	(hl),bmUsbIntDevDmaFin
-	xor	a,a
-	ld	l,usbDmaFifo-$100
-	ld	(hl),a;bmUsbDmaNoFifo
-if 1 ; Single packet
-	ld	l,usbCxFifo-$100
-	set	bCxFifoFin,(hl)
-else
-	ld	l,usbCxIsr-$100
-.waitIn:
-	bit	bUsbIntCxIn,(hl)
-	jq	z,.waitIn
-	ld	(hl),bmUsbIntCxIn
-	; second packet
-	ld	bc,64
-	ld	de,_FunData+64
-	ld	l,usbDmaCtrl-$100
-	ld	(hl),usbDmaMem2Fifo or bmUsbDmaClrFifo
-	inc	l;usbDmaLen-$100
-	ld	(hl),bc
-	ld	l,usbDmaFifo-$100
-	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbDmaAddr-$100
-	ld	(hl),de
-	ld	l,usbDmaCtrl-$100
-	set	bTmr2Enable,(iy+tmrCtrl)
-	set	bUsbDmaStart,(hl)
-	ld	l,usbDevIsr-$100
-.waitDma2:
-	bit	bUsbIntDevDmaFin,(hl)
-	jq	z,.waitDma2
-	res	bTmr2Enable,(iy+tmrCtrl)
-	ld	(hl),bmUsbIntDevDmaFin
-	ld	l,usbCxFifo-$100
-	set	bCxFifoFin,(hl)
-	xor	a,a
-	ld	l,usbDmaFifo-$100
-	ld	(hl),a;bmUsbDmaNoFifo
-;	ld	l,usbCxIsr-$100
-;.waitIn2:
-;	bit	bUsbIntCxIn,(hl)
-;	jq	z,.waitIn2
-;	ld	(hl),bmUsbIntCxIn
-end if
-	ld	l,usbCxIsr-$100
-	ld	(hl),bmUsbIntCxSetup
-	pop	ix
-	ld	a,101
-	jq	_DispatchEvent
-	ret
-
-	ld	l,usbCxIsr-$100
-.wait:
-	bit	bUsbIntCxIn,(hl)
-	jq	z,.wait
-	ld	(hl),bmUsbIntCxIn
-	ld	l,usbCxIsr-$100
-	ld	(hl),bmUsbIntCxSetup
-	xor	a,a
-	ret
-
-second:
-	ld	bc,30
-	ld	de,_FunData+64
-
-	ld	hl,mpUsbCxFifo
-	set	bCxFifoClr,(hl)
-	ld	l,usbDmaFifo-$100
-	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbDmaAddr-$100
-	ld	(hl),de
-	ld	l,usbDmaCtrl-$100
-	ld	a,(setupPacket.bmRequestType)
-	rlca
-	rlca
-	xor	a,(hl)
-	and	a,usbDmaMem2Fifo
-	xor	a,(hl)
-	ld	(hl),a
-	inc	l;usbDmaLen-$100
-;	ex	de,hl
-;	ld	hl,(setupPacket.wLength)
-;	sbc.s	hl,bc
-;	jq	c,.min
-;	sbc	hl,hl
-;.min:
-;	add.s	hl,bc
-;	ex	de,hl
-	ld	(hl),bc
-	dec	l;usbDmaCtrl-$100
-	set	bUsbDmaStart,(hl)
-
-	ld	l,usbCxFifo-$100
-	set	bCxFifoFin,(hl)
-	ld	l,usbCxIsr-$100
-	ld	(hl),bmUsbIntCxSetup
-	xor	a,a
-	ret
-
-	ld	l,usbCxIsr-$100
-.wait:
-	bit	bUsbIntCxIn,(hl)
-	jq	z,.wait
-	ld	(hl),bmUsbIntCxIn
-	xor	a,a
-	ld	l,usbDmaFifo-$100
-	ld	(hl),a
-
-	ld	l,usbCxFifo-$100
-	set	bCxFifoFin,(hl)
-	ld	l,usbCxIsr-$100
-	ld	(hl),bmUsbIntCxSetup
-	ret
-
-sendDescriptor:
-	ld	hl,mpUsbDmaFifo
-	ld	(hl),bmUsbDmaCxFifo
-	ld	l,usbDmaAddr-$100
-	ld	(hl),de
-	ld	l,usbDmaCtrl-$100
-	ld	a,(setupPacket.bmRequestType)
-	rlca
-	rlca
-	xor	a,(hl)
-	and	a,usbDmaMem2Fifo
-	xor	a,(hl)
-	ld	(hl),a
-	inc	l;usbDmaLen-$100
-	ex	de,hl
-	ld	hl,(setupPacket.wLength)
-	sbc.s	hl,bc
-	jq	c,.min
-	sbc	hl,hl
-.min:
-	add.s	hl,bc
-	ex	de,hl
-	ld	(hl),de
-	dec	l;usbDmaCtrl-$100
-	set	bUsbDmaStart,(hl)
-	ld	l,usbCxIsr-$100
-.wait:
-	bit	bUsbIntCxIn,(hl)
-	jq	z,.wait
-	ld	(hl),bmUsbIntCxIn
-	xor	a,a
-	ld	l,usbDmaFifo-$100
-	ld	(hl),a
-	ret
-
-;-------------------------------------------------------------------------------
 _HandleGetDescriptor:
 	ld	de,(ysetup.wIndex)
 	ld	bc,(ysetup.wValue)
@@ -2653,12 +2431,6 @@ _HandleCxSetupInt:
 	ld	bc,(ysetup.bmRequestType)
 	inc	b
 	djnz	.notGetStatus
-;	ld	a,c
-;	sub	a,DEVICE_TO_HOST or VENDOR_REQUEST or RECIPIENT_DEVICE
-;	jq	z,_HandleTestInRequest
-;	ld	a,c
-;	sub	a,HOST_TO_DEVICE or VENDOR_REQUEST or RECIPIENT_DEVICE
-;	jq	z,_HandleTestOutRequest
 .notGetStatus:
 	djnz	.notClearFeature
 .notClearFeature:
@@ -3304,8 +3076,6 @@ _DispatchEvent:
 	ret	nz
 	ex	de,hl
 	ret
-.dispatch:
-	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 _DefaultControlEndpointDescriptor:
