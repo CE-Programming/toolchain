@@ -2482,6 +2482,7 @@ _HandleCxSetupInt:
 	rla
 	rrca
 	ld	(hl),a
+	; TODO: you know what
 	jq	_HandleCxSetupInt.handled
 .notSetConfiguration:
 	djnz	.notGetInterface
