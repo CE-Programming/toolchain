@@ -426,7 +426,7 @@ ti_SetArchiveStatus:
 	push	hl
 	call	util_is_slot_open
 	jp	z, util_ret_null
-	ld	a, c
+	ld	a, e
 	push	af
 	call	util_get_vat_ptr
 	ld	hl, (hl)
