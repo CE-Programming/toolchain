@@ -796,6 +796,7 @@ real_t os_StrToReal(const char *string, char **end);
  * High 8 is unsigned offset, low 8 is bits to test
  */
 int os_TestFlagBits(uint16_t offset_pattern);
+bool os_TestFlagBitsFast(uint16_t offset_pattern); /* Warning: has a bug if bits and flags are all set! */
 void os_SetFlagBits(int16_t offset_pattern);
 void os_ResetFlagBits(int16_t offset_pattern);
 

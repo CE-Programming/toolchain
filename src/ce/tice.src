@@ -102,6 +102,7 @@
 	.def _os_RealToFloat
 	.def _os_FontDrawTransText
 	.def _os_CreateAppVar
+	.def _os_TestFlagBitsFast
 
 	.def _asm_MoveDown
 	.def _asm_MoveUp
@@ -222,6 +223,7 @@ _os_FloatToReal                 equ 022170h
 _os_RealToFloat                 equ 022174h
 _os_FontDrawTransText           equ 022178h
 _os_CreateAppVar                equ 022184h
+_os_TestFlagBitsFast		equ 0222FCh
 
 ; ---
 ; directly callable asm functions
