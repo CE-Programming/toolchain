@@ -3,7 +3,7 @@
 #----------------------------
 
 RELEASE_NAME := CEdev
-LIBRARIES := libload graphx fontlibc keypadc fileioc usbdrvce fatdrvce srldrvce
+LIBRARIES := libload graphx fontlibc keypadc fileioc #usbdrvce fatdrvce srldrvce
 
 # define some common makefile things
 empty :=
