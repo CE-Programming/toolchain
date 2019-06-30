@@ -28,7 +28,7 @@ CP         = copy /y
 EXMPL_DIR  = $(call NATIVEPATH,$(INSTALLLOC)/CEdev/examples)
 CPDIR      = xcopy /e /i /q /r /y /b
 CP_EXMPLS  = $(call MKDIR,$(EXMPL_DIR)) && $(CPDIR) $(call NATIVEPATH,$(CURDIR)/examples) $(EXMPL_DIR)
-ARCH       = $(call MKDIR,release) && cd tools\installer && iscc.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
+ARCH       = $(call MKDIR,release) && cd tools\installer && ISCC.exe /DAPP_VERSION=8.4 /DDIST_PATH=$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/CEdev) installer.iss && \
              cd ..\.. && move /y tools\installer\CEdev.exe release\\
 QUOTE_ARG  = "$(subst ",',$1)"#'
 APPEND     = @echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
