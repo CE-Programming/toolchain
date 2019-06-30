@@ -21,7 +21,7 @@ install:
   #- if defined MINGW_ARCH bash -lc "pacman --needed --noconfirm -S mingw-w64-%MINGW_ARCH%-boost mingw-w64-%MINGW_ARCH%-libarchive"
 
 build_script:
-  - if defined MINGW_ROOT mingw32-make -j%NUMBER_OF_PROCESSORS% install release-libs
+  - if defined MINGW_ROOT mingw32-make -j%NUMBER_OF_PROCESSORS% install release release-libs
   
   # Some environment variables for later...
   - set CEDEV=C:\CEdev
@@ -50,4 +50,18 @@ build_script:
 
   # Test toolchain examples
   - cmd: run_autotester.bat
+
+after_build:
+  - cd %APPVEYOR_BUILD_FOLDER%
+
+on_success:
+  - cd %APPVEYOR_BUILD_FOLDER%
+
+on_failure:
+  - cd %APPVEYOR_BUILD_FOLDER%
+
+artifacts:
+ - path: release\CEdev.exe
+   name: CEdev.exe
+   type: auto
 
