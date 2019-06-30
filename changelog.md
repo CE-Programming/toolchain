@@ -8,9 +8,21 @@
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.5...v8.6)
 
-## [v8.5](https://github.com/CE-Programming/toolchain/releases/tag/v8.5)
+# [v8.5](https://github.com/CE-Programming/toolchain/releases/tag/v8.5) (2018-10-31)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.3...v8.5)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.4...v8.5)
+
+# [v8.4](https://github.com/CE-Programming/toolchain/releases/tag/v8.4) (2018-08-23)
+
+ - Fix fileioc bug not bypassing archived header in ti_SetArchiveStatus
+ - LibLoad optimizations
+ - Documentation fixes and improvements
+ - GraphX optimizations
+ - Replace NSIS by Inno for Windows installer
+ - Add a better GraphX template
+ - Improve some build-related stuff
+ 
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.3...v8.4)
   
 # [v8.3](https://github.com/CE-Programming/toolchain/releases/tag/v8.3) (2018-07-25)
 
