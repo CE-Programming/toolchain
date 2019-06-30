@@ -652,7 +652,7 @@ uint8_t fontlib_GetGlyphWidth(char codepoint);
  * @param str Pointer to string
  * @return Width of string
  */
-size_t fontlib_GetStringWidth(const char *str);
+unsigned int fontlib_GetStringWidth(const char *str);
 
 /**
  * Returns the width of a string printed in the current font.
@@ -663,7 +663,7 @@ size_t fontlib_GetStringWidth(const char *str);
  * @param max_characters Maximum number of characters to process
  * @return Width of string
  */
-size_t fontlib_GetStringWidthL(const char *str, size_t max_characters);
+unsigned int fontlib_GetStringWidthL(const char *str, size_t max_characters);
 
 /**
  * Gets the location of the last character processed by GetStringWidth or
