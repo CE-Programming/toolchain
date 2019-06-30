@@ -1,9 +1,16 @@
 # Change Log
 
-*Note: toolchain releases aren't necessarily in sync with libraries releases.*
-
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
-See full [commit list](https://github.com/CE-Programming/toolchain/compare/v8.3...HEAD)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.6...HEAD)
+
+# [v8.6](https://github.com/CE-Programming/toolchain/releases/tag/v8.6) (2019-06-30)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.5...v8.6)
+
+## [v8.5](https://github.com/CE-Programming/toolchain/releases/tag/v8.5)
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.3...v8.5)
   
 # [v8.3](https://github.com/CE-Programming/toolchain/releases/tag/v8.3) (2018-07-25)
 
