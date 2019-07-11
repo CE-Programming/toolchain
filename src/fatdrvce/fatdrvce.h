@@ -27,6 +27,8 @@ extern "C" {
 
 typedef struct {
     usb_device_t dev;   /**< USB device */
+    usb_endpoint_t in;  /**< USB bulk in endpoint */
+    usb_endpoint_t out; /**< USB bulk out endpoint */
     void *buffer;       /**< User supplied buffer address */
 } msd_device_t;
 
@@ -66,52 +68,28 @@ usb_error_t msd_SetupDevice(msd_device_t *msd, usb_device_t dev, void *buffer);
 
 /**
  * Checks if the usb device is a valid Mass Storage Device (MSD).
- * @param prev Previous found device, supply NULL to start the search.
+ * @param dev Device , supply NULL to start the search.
  * @return USB_SUCCESS if the device is a Mass Storage Device.
  */
-usb_error_t msd_ValidDevice(usb_device_t dev);
+usb_error_t msd_IsMSD(usb_device_t dev);
 
 /**
- * Directly reads a 512 byte sector from the Mass Storage Device into the
- * buffer specified by msd_SetDataBuffer().
- * @param dev MSD device returned by \c msd_Find.
+ * Directly reads a 512 byte sector from a Mass Storage Device.
+ * @param dev MSD device structure.
  * @param lba Logical Block Address (LBA) of sector to read.
+ * @param buffer Buffer to read into (must be at least 512 bytes).
  * @return USB_SUCCESS on success.
  */
 usb_error_t msd_Read(msd_device_t *dev, uint32_t lba, void *buffer);
 
 /**
-* Directly writes a 512 byte sector to the Mass Storage Device from the
-* buffer specified by msd_SetDataBuffer().
- * @param dev MSD device returned by \c msd_Find.
+* Directly writes a 512 byte sector to a Mass Storage Device.
+ * @param dev MSD device structure.
  * @param lba Logical Block Address (LBA) of sector to write.
+ * @param buffer Buffer to write to MSD.
  * @return USB_SUCCESS on success.
  */
 usb_error_t msd_Write(msd_device_t *dev, uint32_t lba, void *buffer);
-
-/**
- * Schedules a read of a 512 byte sector from the Mass Storage Device.
- * @param dev MSD device returned by \c msd_Find.
- * @param lba Logical Block Address (LBA) of sector to read.
- * @param handler Function to be called when the read finishes.
- * @param data Opaque pointer to be passed to the \p handler.
- * @return USB_SUCCESS on success.
- */
-usb_error_t msd_ScheduleRead(msd_device_t *dev, uint32_t lba, void *buffer,
-                             usb_transfer_callback_t handler,
-                             usb_transfer_data_t *data);
-
-/**
-* Schedules a write of a 512 byte sector to the Mass Storage Device.
- * @param dev MSD device returned by \c msd_Find.
- * @param lba Logical Block Address (LBA) of sector to write.
- * @param handler Function to be called when the write finishes.
- * @param data Opaque pointer to be passed to the \p handler.
- * @return USB_SUCCESS on success.
- */
-usb_error_t msd_ScheduleWrite(msd_device_t *dev, uint32_t lba, void *buffer,
-                              usb_transfer_callback_t handler,
-                              usb_transfer_data_t *data);
 
 #ifdef __cplusplus
 }
