@@ -1300,7 +1300,7 @@ usb_ScheduleControlTransfer:
 .queueStage:
 	call	_CreateDummyTransfer
 assert (endpoint-1) and 1
-	dec	iyl
+	dec	iy
 	jq	z,_FillTransfer
 	jq	_Error.NO_MEMORY
 .check:
