@@ -279,7 +279,7 @@ gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 /**
  * Initializes the graphics library setup
  */
-int gfx_Begin();
+void gfx_Begin();
 
 /**
  * Closes the graphics setup
