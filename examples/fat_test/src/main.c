@@ -17,7 +17,6 @@ struct global {
 };
 
 static uint8_t msd_buffer[512];
-static msd_device_t msd_device;
 
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                                   usb_callback_data_t *callback_data) {
@@ -49,7 +48,7 @@ void main(void) {
     memset(&global, 0, sizeof(global_t));
     os_SetCursorPos(1, 0);
 
-    error = usb_Init(handleUsbEvent, NULL, NULL, USB_DEFAULT_INIT_FLAGS);
+    error = usb_Init(handleUsbEvent, &global, NULL, USB_DEFAULT_INIT_FLAGS);
     if (error != USB_SUCCESS) {
         return;
     }
