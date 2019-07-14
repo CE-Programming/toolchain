@@ -129,7 +129,7 @@ msd_Init:
 	add	iy,sp
 	ld	hl,(iy + 6)		; usb device
 	compare_hl_zero
-	jp	z,.error
+	jq	z,.error
 	push	iy
 	ld	bc,tmp.length		; storage for size of descriptor
 	push	bc
@@ -158,7 +158,7 @@ msd_Init:
 	jr	nz,.error
 	xor	a,a
 	ld	(.configindex),a	; set starting index
-	jp	.getconfigurationcheck
+	jq	.getconfigurationcheck
 .getconfiguration:			; bc = index
 	push	iy
 	ld	c,0
@@ -173,6 +173,12 @@ msd_Init:
 	push	iy
 	ld	bc,tmp.length		; storage for length of descriptor
 	push	bc
+
+	push	iy
+	ld	iy,flags
+	call	_DispHL			; WHY IS THIS ZERO!!!???
+	pop	iy
+
 	push	hl			; length of configuration descriptor
 	ld	bc,(iy + 9 + 9)		; storage for configuration descriptor
 	push	bc
@@ -198,7 +204,7 @@ msd_Init:
 	ld	hl,tmp.descriptor + 17
 	ld	a,(.configindex)
 	cp	a,(hl)
-	jr	nz,.getconfiguration
+	jq	nz,.getconfiguration
 .parsedconfigurations:
 
 	or	a,a
