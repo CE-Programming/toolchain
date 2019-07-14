@@ -62,14 +62,16 @@ typedef struct {
  * A user-supplied buffer is needed for internal library use. This buffer must
  * be at least 512 bytes in size. It should not be the same buffer used
  * by other devices and/or functions.
- * @param dev MSD device returned by \c msd_Find.
- * @param buffer The buffer's address.
+ * @param msd MSD device structure.
+ * @param dev USB device to initialize as MSD.
+ * @param buffer The buffer's address. (must be at least 512 bytes).
  * @return USB_SUCCESS on success, otherwise error if initialization failed.
  */
 usb_error_t msd_Init(msd_device_t *msd, usb_device_t dev, void *buffer);
 
 /**
  * Gets the block size from the device.
+ * @param msd MSD device structure.
  * @param blockSize Pointer to store block size to.
  * @return USB_SUCCESS on success.
  */
@@ -77,6 +79,7 @@ usb_error_t msd_GetBlockSize(msd_device_t *msd, uint32_t *blockSize);
 
 /**
  * Gets the sector count of the device.
+ * @param msd MSD device structure.
  * @param blockSize Pointer to store block size to.
  * @return USB_SUCCESS on success.
  */
@@ -84,6 +87,7 @@ usb_error_t msd_GetSectorCount(msd_device_t *msd, uint32_t *sectorCount);
 
 /**
  * Gets the sector size of each sector on the device.
+ * @param msd MSD device structure.
  * @param blockSize Pointer to store block size to.
  * @return USB_SUCCESS on success.
  */
