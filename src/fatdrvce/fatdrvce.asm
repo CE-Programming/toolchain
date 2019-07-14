@@ -164,7 +164,7 @@ msd_Init:
 	ld	c,0
 .configindex := $ - 1
 	push	bc
-	ld	bc,(iy + 6 + 6)		; usb device
+	ld	bc,(iy + 6)		; usb device
 	push	bc
 	call	usb_GetConfigurationDescriptorTotalLength
 	pop	bc
@@ -173,14 +173,8 @@ msd_Init:
 	push	iy
 	ld	bc,tmp.length		; storage for length of descriptor
 	push	bc
-
-	push	iy
-	ld	iy,flags
-	call	_DispHL			; WHY IS THIS ZERO!!!???
-	pop	iy
-
 	push	hl			; length of configuration descriptor
-	ld	bc,(iy + 9 + 9)		; storage for configuration descriptor
+	ld	bc,(iy + 9)		; storage for configuration descriptor
 	push	bc
 	ld	hl,.configindex
 	ld	c,(hl)
@@ -188,7 +182,7 @@ msd_Init:
 	inc	(hl)
 	ld	bc,2			; USB_CONFIGURATION_DESCRIPTOR
 	push	bc
-	ld	bc,(iy + 6 + 21)	; usb device
+	ld	bc,(iy + 6)		; usb device
 	push	bc
 	call	usb_GetDescriptor
 	pop	bc
@@ -199,7 +193,10 @@ msd_Init:
 	pop	bc
 	pop	iy
 	compare_hl_zero
-	jr	nz,.printerror			; ensure success
+	ret	nz			; ensure success
+
+	; parse the configuration here for interfaces / endpoints for msd
+
 .getconfigurationcheck:
 	ld	hl,tmp.descriptor + 17
 	ld	a,(.configindex)
@@ -215,14 +212,6 @@ msd_Init:
 	ld	hl,USB_ERROR_NO_DEVICE
 	ret
 
-
-.printerror:
-	ld	a,l
-	add	a,'0'
-	ld	iy,flags
-	call	_PutC
-	ld	hl,USB_ERROR_NO_DEVICE
-	ret
 
 ;-------------------------------------------------------------------------------
 ; Gets the block size from the device.
