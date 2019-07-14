@@ -359,7 +359,14 @@ msd_Init:
 	pop	de
 	ld	(ymsdDevice.epin),de
 
+	ld	iy,flags
+	ld	hl,.sdf
+	call	_PutS
+	call	_GetKey
+
 	jq	.foundmsd
+.sdf:
+	db	'sdf',0
 
 .getconfigcheck:
 	ld	hl,tmp.descriptor + 17
