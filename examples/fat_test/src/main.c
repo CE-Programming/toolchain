@@ -45,6 +45,7 @@ void main(void) {
     msd_device_t msd;
     bool msd_inited = false;
 
+    memset(&msd, 0, sizeof msd);
     memset(&global, 0, sizeof(global_t));
     os_SetCursorPos(1, 0);
 

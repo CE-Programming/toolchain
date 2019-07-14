@@ -78,8 +78,27 @@ struct deviceDescriptor
 	iSerialNumber		rb 1
 	bNumConfigurations	rb 1
 end struct
+struct interfaceDescriptor
+	label .: 9
+	descriptor		descriptor
+	bInterfaceNumber	rb 1
+	bAlternateSetting	rb 1
+	bNumEndpoints		rb 1
+	bInterfaceClass		rb 1
+	bInterfaceSubClass	rb 1
+	bInterfaceProtocol	rb 1
+	iInterface		rb 1
+end struct
+struct endpointDescriptor
+	label .: 7
+	descriptor		descriptor
+	bEndpointAddress	rb 1
+	bmAttributes		rb 1
+	wMaxPacketSize		rw 1
+	bInterval		rb 1
+end struct
 
-struct msd_device
+struct msdDevice
 	label .: 12
 	dev		rl 1
 	epin		rl 1
@@ -92,6 +111,12 @@ struct tmp_data
 	length		rl 1
 	descriptor	rb 18
 end struct
+
+; enum usb_transfer_direction
+virtual at 0
+	?HOST_TO_DEVICE				rb 1 shl 7
+	?DEVICE_TO_HOST				rb 1 shl 7
+end virtual
 
 virtual at 0
 	USB_SUCCESS		rb 1
@@ -113,6 +138,14 @@ virtual at 1
 	?STRING_DESCRIPTOR			rb 1
 	?INTERFACE_DESCRIPTOR			rb 1
 	?ENDPOINT_DESCRIPTOR			rb 1
+end virtual
+
+; enum usb_transfer_type
+virtual at 0
+	?CONTROL_TRANSFER			rb 1
+	?ISOCHRONOUS_TRANSFER			rb 1
+	?BULK_TRANSFER				rb 1
+	?INTERRUPT_TRANSFER			rb 1
 end virtual
 ;-------------------------------------------------------------------------------
 
@@ -155,10 +188,10 @@ msd_Init:
 	ld	de,18
 	ld	hl,(tmp.length)
 	compare_hl_de			; ensure enough bytes were fetched
-	jr	nz,.error
+	jq	nz,.error
 	xor	a,a
 	ld	(.configindex),a	; set starting index
-	jq	.getconfigurationcheck
+	jq	.getconfigcheck
 .getconfiguration:			; bc = index
 	push	iy
 	ld	c,0
@@ -196,22 +229,150 @@ msd_Init:
 	ret	nz			; ensure success
 
 	; parse the configuration here for interfaces / endpoints for msd
+	; we want to just grab the first bulk endpoints and msd interface
 
-.getconfigurationcheck:
+	xor	a,a
+	ld	(.validmsd),a
+	ld	(.inep),hl
+	ld	(.outep),hl
+	ld	hl,(tmp.length)
+	ld	(.configlengthend),hl
+	ld	hl,(iy + 9)
+	ld	(.configptr),hl
+.parseinterfaces:
+	ld	hl,(.configlengthend)
+	ld	de,2			; check for end of configuration
+	compare_hl_de
+	jq	c,.parsedone		; todo: check if bLength > remaining?
+	push	iy
+	ld	iy,(.configptr)
+	ld	a,(ydescriptor.bDescriptorType)
+	cp	a,INTERFACE_DESCRIPTOR
+	jq	z,.parseinterface
+	cp	a,ENDPOINT_DESCRIPTOR
+	jq	z,.parseendpoint
+	jq	.parsenext
+.parseinterface:
+	ld	a,(yinterfaceDescriptor.bInterfaceClass)
+	cp	a,$08
+	jr	nz,.parsenext
+	ld	a,(yinterfaceDescriptor.bInterfaceSubClass)
+	cp	a,$06
+	jr	nz,.parsenext
+	ld	a,(yinterfaceDescriptor.bInterfaceProtocol)
+	cp	a,$50
+	jr	nz,.parsenext
+	ld	a,1
+	ld	(.validmsd),a
+	jq	.parsenext
+.parseendpoint:
+	ld	a,0			; mark as valid
+.validmsd := $ - 1
+	or	a,a
+	jq	z,.parsenext
+	ld	a,(yendpointDescriptor.bmAttributes)
+	cp	a,BULK_TRANSFER
+	jq	nz,.parsenext
+	ld	a,(yendpointDescriptor.bEndpointAddress)
+	ld	b,a
+	and	a,DEVICE_TO_HOST
+	ld	a,b
+	jr	z,.parseoutendpointout
+.parseoutendpointin:
+	ld	(.inep),a
+	jq	.parsenext
+.parseoutendpointout:
+	ld	(.outep),a
+.parsenext:
+	ld	de,0
+	ld	e,(ydescriptor.bLength)
+	ld	hl,0
+.configlengthend := $ - 3
+	or	a,a
+	sbc	hl,de
+	ld	(.configlengthend),hl
+	pop	iy
+	jq	z,.parsedone
+	ld	hl,0
+.configptr := $ - 3
+	add	hl,de
+	ld	(.configptr),hl		; move to next interface
+	jq	.parseinterfaces
+
+.parsedone:
+	ld	a,0
+.inep := $ - 1
+	or	a,a
+	jq	z,.getconfigcheck	; no endpoints for msd, keep parsing
+	ld	a,0
+.outep := $ - 1
+	or	a,a
+	jq	z,.getconfigcheck	; no endpoints for msd, keep parsing
+
+	; successfully found bulk endpoints for msd
+	; now get the actual endpoint addresses
+	; and set the configuration
+
+	push	iy
+	ld	bc,(tmp.length)
+	push	bc
+	ld	bc,(iy + 9)
+	push	bc
+	ld	bc,(iy + 6)
+	push	bc
+	call	usb_SetConfiguration
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	iy
+	compare_hl_zero
+	jq	nz,.getconfigcheck
+
+	push	iy
+	ld	a,(.inep)
+	ld	c,a
+	push	bc
+	ld	bc,(iy + 6)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc
+	pop	bc
+	pop	iy
+	push	hl
+	push	iy
+	ld	a,(.outep)
+	ld	c,a
+	push	bc
+	ld	bc,(iy + 6)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc
+	pop	bc
+	pop	iy
+
+	ld	de,(iy + 9)
+	ld	bc,(iy + 6)
+	ld	iy,(iy + 3)
+	ld	(ymsdDevice.buffer),de
+	ld	(ymsdDevice.dev),bc
+	ld	(ymsdDevice.epout),hl	; setup msd structure with endpoints and buffer
+	pop	de
+	ld	(ymsdDevice.epin),de
+
+	jq	.foundmsd
+
+.getconfigcheck:
 	ld	hl,tmp.descriptor + 17
 	ld	a,(.configindex)
 	cp	a,(hl)
 	jq	nz,.getconfiguration
-.parsedconfigurations:
-
-	or	a,a
-	sbc	hl,hl			; return success
-	ret
-
 .error:
 	ld	hl,USB_ERROR_NO_DEVICE
 	ret
-
+.foundmsd:
+	or	a,a
+	sbc	hl,hl			; return success
+	ret
 
 ;-------------------------------------------------------------------------------
 ; Gets the block size from the device.
