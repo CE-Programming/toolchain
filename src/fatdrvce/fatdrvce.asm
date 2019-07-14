@@ -89,7 +89,7 @@ end struct
 
 struct tmp_data
 	label .: 21
-	size		rl 1
+	length		rl 1
 	descriptor	rb 18
 end struct
 
@@ -105,6 +105,15 @@ virtual at 0
 	USB_ERROR_TIMEOUT	rb 1
 	USB_ERROR_FAILED	rb 1
 end virtual
+
+; enum usb_descriptor_type
+virtual at 1
+	?DEVICE_DESCRIPTOR			rb 1
+	?CONFIGURATION_DESCRIPTOR		rb 1
+	?STRING_DESCRIPTOR			rb 1
+	?INTERFACE_DESCRIPTOR			rb 1
+	?ENDPOINT_DESCRIPTOR			rb 1
+end virtual
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -119,8 +128,10 @@ msd_Init:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 6)		; usb device
+	compare_hl_zero
+	jp	z,.error
 	push	iy
-	ld	bc,tmp.size		; storage for size of descriptor
+	ld	bc,tmp.length		; storage for size of descriptor
 	push	bc
 	ld	bc,18			; size of device descriptor
 	push	bc
@@ -132,20 +143,79 @@ msd_Init:
 	push	bc
 	push	hl
 	call	usb_GetDescriptor
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	pop	iy
-	ld	sp,iy
-	or	a,a
+	compare_hl_zero
 	ret	nz			; return if error
 	ld	de,18
-	ld	hl,(tmp.size)
+	ld	hl,(tmp.length)
 	compare_hl_de			; ensure enough bytes were fetched
 	jr	nz,.error
+	xor	a,a
+	ld	(.configindex),a	; set starting index
+	jp	.getconfigurationcheck
+.getconfiguration:			; bc = index
+	push	iy
+	ld	c,0
+.configindex := $ - 1
+	push	bc
+	ld	bc,(iy + 6 + 6)		; usb device
+	push	bc
+	call	usb_GetConfigurationDescriptorTotalLength
+	pop	bc
+	pop	bc
+	pop	iy
+	push	iy
+	ld	bc,tmp.length		; storage for length of descriptor
+	push	bc
+	push	hl			; length of configuration descriptor
+	ld	bc,(iy + 9 + 9)		; storage for configuration descriptor
+	push	bc
+	ld	hl,.configindex
+	ld	c,(hl)
+	push	bc			; configuration index
+	inc	(hl)
+	ld	bc,2			; USB_CONFIGURATION_DESCRIPTOR
+	push	bc
+	ld	bc,(iy + 6 + 21)	; usb device
+	push	bc
+	call	usb_GetDescriptor
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	iy
+	compare_hl_zero
+	jr	nz,.printerror			; ensure success
+.getconfigurationcheck:
+	ld	hl,tmp.descriptor + 17
+	ld	a,(.configindex)
+	cp	a,(hl)
+	jr	nz,.getconfiguration
+.parsedconfigurations:
 
-	ld	a,USB_SUCCESS		; return success
+	or	a,a
+	sbc	hl,hl			; return success
 	ret
 
 .error:
-	ld	a,USB_ERROR_NO_DEVICE
+	ld	hl,USB_ERROR_NO_DEVICE
+	ret
+
+
+.printerror:
+	ld	a,l
+	add	a,'0'
+	ld	iy,flags
+	call	_PutC
+	ld	hl,USB_ERROR_NO_DEVICE
 	ret
 
 ;-------------------------------------------------------------------------------
