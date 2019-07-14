@@ -2413,6 +2413,7 @@ _HandleCxSetupInt:
 	jq	po,.noEi
 	ei
 .noEi:
+	ld	(hl),b;bmUsbDmaNoFifo
 	ld	l,usbCxFifo-$100
 	set	bCxFifoClr,(hl)
 	ld	a,USB_DEFAULT_SETUP_EVENT
