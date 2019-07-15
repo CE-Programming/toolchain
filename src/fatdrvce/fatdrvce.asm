@@ -239,12 +239,12 @@ msd_Init:
 	ld	(.configlengthend),hl
 	ld	hl,(iy + 9)
 	ld	(.configptr),hl
+	push	iy
 .parseinterfaces:
 	ld	hl,(.configlengthend)
 	ld	de,2			; check for end of configuration
 	compare_hl_de
 	jq	c,.parsedone		; todo: check if bLength > remaining?
-	push	iy
 	ld	iy,(.configptr)
 	ld	a,(ydescriptor.bDescriptorType)
 	cp	a,INTERFACE_DESCRIPTOR
@@ -291,7 +291,6 @@ msd_Init:
 	or	a,a
 	sbc	hl,de
 	ld	(.configlengthend),hl
-	pop	iy
 	jq	z,.parsedone
 	ld	hl,0
 .configptr := $ - 3
@@ -300,6 +299,7 @@ msd_Init:
 	jq	.parseinterfaces
 
 .parsedone:
+	pop	iy
 	ld	a,0
 .inep := $ - 1
 	or	a,a
