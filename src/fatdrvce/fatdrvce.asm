@@ -58,10 +58,9 @@ macro struct? name*
 end macro
 
 struct tmp_data
-	label .: 25
+	label .: 21
 	length		rl 1
 	descriptor	rb 18
-	dword		rb 4
 end struct
 
 ; msd structures
@@ -419,21 +418,13 @@ msd_Init:
 
 	call	util_ResetMsd
 	compare_hl_zero
-	jr	nz,.reporterror
+	ret	nz
 	call	util_GetMaxLunMsd
 	compare_hl_zero
-	jr	nz,.reporterror
+	ret	nz
 
 	or	a,a
 	sbc	hl,hl			; return success
-	ret
-
-.reporterror:
-	push	hl
-	ld	iy,flags
-	call	_DispHL
-	call	_NewLine
-	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -535,7 +526,6 @@ util_ResetMsd:
 	ld	(packetMSDReset + 4),a
 	ld	(packetMSDMaxLUN + 4),a	; set selected interface
 	ld	hl,packetMSDReset
-	ld	de,tmp.dword
 	jq	util_msd_ctl_packet
 
 ; iy -> msd structure
