@@ -558,8 +558,8 @@ util_msd_ctl_packet:
 	push	bc			; don't care about transfer size
 	ld	bc,50
 	push	bc			; retry 50 times
-	push	hl
-	push	de			; send setup packet
+	push	de			; send data packet
+	push	hl			; send setup packet
 	ld	bc,(ymsdDevice.epctrl)
 	push	bc
 	call	usb_ControlTransfer
