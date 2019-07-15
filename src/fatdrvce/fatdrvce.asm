@@ -57,6 +57,48 @@ macro struct? name*
   namespace .
 end macro
 
+struct tmp_data
+	label .: 25
+	length		rl 1
+	descriptor	rb 18
+	dword		rb 4
+end struct
+
+; msd structures
+struct msdDevice
+	label .: 18
+	dev		rl 1
+	epin		rl 1
+	epout		rl 1
+	epctrl		rl 1
+	interface	rb 1
+	maxlun		rb 1
+	lun		rb 1
+	buffer		rl 1
+end struct
+struct packetCSW
+	label .: 13
+	signature	rb 4
+	tag		rb 4
+	residue		rb 4
+	status		rb 1
+end struct
+struct packetCBD
+	label .: 17
+	length		rb 1
+	opcode		rb 1
+	data		rb 15
+end struct
+struct packetCBW
+	label .: 14+17
+	signature	rb 4
+	tag		rb 4
+	length		rb 4
+	flags		rb 1
+	lun		rb 1
+	cbd		packetCBD
+end struct
+
 struct descriptor
 	label .: 2
 	bLength			rb 1
@@ -96,20 +138,6 @@ struct endpointDescriptor
 	bmAttributes		rb 1
 	wMaxPacketSize		rw 1
 	bInterval		rb 1
-end struct
-
-struct msdDevice
-	label .: 12
-	dev		rl 1
-	epin		rl 1
-	epout		rl 1
-	buffer		rl 1
-end struct
-
-struct tmp_data
-	label .: 21
-	length		rl 1
-	descriptor	rb 18
 end struct
 
 ; enum usb_transfer_direction
@@ -232,9 +260,9 @@ msd_Init:
 	; we want to just grab the first bulk endpoints and msd interface
 
 	xor	a,a
-	ld	(.validmsd),a
-	ld	(.inep),hl
-	ld	(.outep),hl
+	ld	(.interfacenumber),a
+	ld	(.inep),a
+	ld	(.outep),a
 	ld	hl,(tmp.length)
 	ld	(.configlengthend),hl
 	ld	hl,(iy + 9)
@@ -262,12 +290,13 @@ msd_Init:
 	ld	a,(yinterfaceDescriptor.bInterfaceProtocol)
 	cp	a,$50
 	jr	nz,.parsenext
-	ld	a,1
-	ld	(.validmsd),a
+	ld	a,(yinterfaceDescriptor.bInterfaceNumber)
+	inc	a
+	ld	(.interfacenumber),a
 	jq	.parsenext
 .parseendpoint:
 	ld	a,0			; mark as valid
-.validmsd := $ - 1
+.interfacenumber := $ - 1
 	or	a,a
 	jq	z,.parsenext
 	ld	a,(yendpointDescriptor.bmAttributes)
@@ -358,15 +387,22 @@ msd_Init:
 	ld	(ymsdDevice.epout),hl	; setup msd structure with endpoints and buffer
 	pop	de
 	ld	(ymsdDevice.epin),de
+	ld	a,(.interfacenumber)
+	dec	a
+	ld	(ymsdDevice.interface),a
 
-	ld	iy,flags
-	ld	hl,.sdf
-	call	_PutS
-	call	_GetKey
+	push	iy			; get the control transfer pipe
+	ld	bc,0
+	push	bc
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc
+	pop	bc
+	pop	iy
+	ld	(ymsdDevice.epctrl),hl
 
 	jq	.foundmsd
-.sdf:
-	db	'sdf',0
 
 .getconfigcheck:
 	ld	hl,tmp.descriptor + 17
@@ -377,8 +413,27 @@ msd_Init:
 	ld	hl,USB_ERROR_NO_DEVICE
 	ret
 .foundmsd:
+
+	; the usb device was successfully configured
+	; now let's set up the msd device configuration
+
+	call	util_ResetMsd
+	compare_hl_zero
+	jr	nz,.reporterror
+	call	util_GetMaxLunMsd
+	compare_hl_zero
+	jr	nz,.reporterror
+
 	or	a,a
 	sbc	hl,hl			; return success
+	ret
+
+.reporterror:
+	push	hl
+	ld	iy,flags
+	call	_DispHL
+	call	_NewLine
+	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -459,9 +514,73 @@ msd_WriteSectors:
 ; utility functions
 ;-------------------------------------------------------------------------------
 
+util_ResetMsd:
+	ld	a,$55
+	ld	(msdCBW.signature + 0),a
+	ld	a,$53
+	ld	(msdCBW.signature + 1),a
+	ld	a,$42
+	ld	(msdCBW.signature + 2),a
+	ld	a,$43
+	ld	(msdCBW.signature + 3),a
+	xor	a,a
+	sbc	hl,hl
+	ld	(ymsdDevice.maxlun),a
+	ld	(ymsdDevice.lun),a
+	ld	(msdCBW.tag + 0),hl
+	ld	(msdCBW.tag + 3),a	; reset tag
+	ld	(msdCBW.flags),a
+	ld	(msdCBW.lun),a
+	ld	a,(ymsdDevice.interface)
+	ld	(packetMSDReset + 4),a
+	ld	(packetMSDMaxLUN + 4),a	; set selected interface
+	ld	hl,packetMSDReset
+	ld	de,tmp.dword
+	jq	util_msd_ctl_packet
+
+; iy -> msd structure
+util_GetMaxLunMsd:
+	ld	hl,packetMSDMaxLUN
+	ld	de,(ymsdDevice.maxlun)
+	jq	util_msd_ctl_packet
+
+; a = lun
+util_SetLunMsd:
+	ld	(msdCBW.lun),a
+	ret
+
+; iy -> msd structure
+; hl -> packet
+; de -> location to store data to
+util_msd_ctl_packet:
+	push	iy
+	ld	bc,0
+	push	bc			; don't care about transfer size
+	ld	bc,50
+	push	bc			; retry 50 times
+	push	hl
+	push	de			; send setup packet
+	ld	bc,(ymsdDevice.epctrl)
+	push	bc
+	call	usb_ControlTransfer
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	iy
+	ret
 
 ;-------------------------------------------------------------------------------
 ; library data
 ;-------------------------------------------------------------------------------
+
+packetMSDReset:
+	db	$21,$FF,$00,$00,$00,$00,$00,$00
+packetMSDMaxLUN:
+	db	$A1,$FE,$00,$00,$00,$00,$01,$00
+
+msdCSW packetCSW
+msdCBW packetCBW
 
 tmp tmp_data

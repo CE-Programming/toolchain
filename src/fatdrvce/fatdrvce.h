@@ -26,10 +26,14 @@ extern "C" {
 #endif
 
 typedef struct {
-    usb_device_t dev;   /**< USB device */
-    usb_endpoint_t in;  /**< USB bulk in endpoint */
-    usb_endpoint_t out; /**< USB bulk out endpoint */
-    void *buffer;       /**< User supplied buffer address */
+    usb_device_t dev;    /**< USB device */
+    usb_endpoint_t in;   /**< USB bulk in endpoint */
+    usb_endpoint_t out;  /**< USB bulk out endpoint */
+    usb_endpoint_t ctrl; /**< USB Control endpoint */
+    uint8_t interface;   /**< USB Interface index */
+    uint8_t maxlun;      /**< Maximum LUNs for MSD */
+    uint8_t lun;         /**< Selected LUN for MSD */
+    void *buffer;        /**< User supplied buffer address */
 } msd_device_t;
 
 typedef struct {
