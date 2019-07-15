@@ -37,7 +37,7 @@ end macro
 ;-------------------------------------------------------------------------------
 ; memory structures
 ;-------------------------------------------------------------------------------
-macro struct? name*
+macro struct? name*, parameters&
  macro end?.struct?!
      iterate base, ., .base
       if defined base
@@ -53,7 +53,7 @@ macro struct? name*
   end iterate
   purge end?.struct?
  end macro
- struc name
+ struc name parameters
   namespace .
 end macro
 
@@ -96,6 +96,15 @@ struct packetCBW
 	flags		rb 1
 	lun		rb 1
 	cbd		packetCBD
+end struct
+
+struct setup, requestType: ?, request: ?, value: ?, index: ?, length: ?
+	label .: 8
+	bmRequestType	db requestType
+	bRequest	db request
+	wValue		dw value
+	wIndex		dw index
+	wLength		dw length
 end struct
 
 struct descriptor
@@ -565,10 +574,8 @@ util_msd_ctl_packet:
 ; library data
 ;-------------------------------------------------------------------------------
 
-packetMSDReset:
-	db	$21,$FF,$00,$00,$00,$00,$00,$00
-packetMSDMaxLUN:
-	db	$A1,$FE,$00,$00,$00,$00,$01,$00
+packetMSDReset setup $21, $FF, 0, 0, 0
+packetMSDMaxLUN setup $A1, $FE, 0, 0, 1
 
 msdCSW packetCSW
 msdCBW packetCBW
