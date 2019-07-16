@@ -452,10 +452,22 @@ msd_Init:
 ; return:
 ;  a = error status
 msd_GetBlockSize:
-
-.error:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 3)
+	compare_hl_zero
+	jr	z,.error
+	ld	hl,(iy + 6)
+	compare_hl_zero
+	jr	z,.error
+	ld	iy,(iy + 3)
+	ld	de,(ymsdDevice.blocksize)
+	ld	(hl),de
 	or	a,a
 	sbc	hl,hl
+	ret
+.error:
+	ld	hl,USB_ERROR_FAILED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -840,7 +852,7 @@ packetMSDMaxLUN setup $A1, $FE, 0, 0, 1
 ; <[1] in/out>,<[3] i/o length>,<[1] cdb length>,<[n] cdb>
 
 packetSCSI_Inquiry:
-	db	$80,$24,$00,$00,$06,$12,$00,$00,$00,$24,$00
+	db	$80,$fc,$00,$00,$06,$12,$00,$00,$00,$fc,$00
 packetSCSI_TestUnitReady:
 	db	$00,$00,$00,$00,$06,$00,$00,$00,$00,$00,$00
 packetSCSI_ModeSense6:

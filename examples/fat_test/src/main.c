@@ -44,6 +44,8 @@ void main(void) {
     usb_error_t error;
     msd_device_t msd;
     bool msd_inited = false;
+    uint24_t blocksize;
+    static char buffer[212];
 
     memset(&msd, 0, sizeof msd);
     memset(&global, 0, sizeof(global_t));
@@ -86,6 +88,15 @@ void main(void) {
         usb_Cleanup();
         os_GetKey();
         return;
+    }
+
+    // print the block size
+    error = msd_GetBlockSize(&msd, &blocksize);
+    if( error == USB_SUCCESS )
+    {
+        sprintf(buffer, "blocksize: %u", blocksize);
+        os_PutStrFull(buffer);
+        _OS(asm_NewLine);
     }
 
     // cleanup and return
