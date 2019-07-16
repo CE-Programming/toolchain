@@ -97,6 +97,9 @@ struct msdDevice
 	epctrl		rl 1
 	cbw		packetCBW
 	csw		packetCSW
+	lba		rb 4
+	reserved	rb 1	; technically part of block size
+	blocksize	rl 1
 	interface	rb 1
 	maxlun		rb 1
 	lun		rb 1
@@ -437,11 +440,7 @@ msd_Init:
 	call	util_msd_get_max_lun
 	compare_hl_zero
 	ret	nz
-	call	util_scsi_init
-
-	or	a,a
-	sbc	hl,hl			; return success
-	ret
+	jq	util_scsi_init		; return success if init scsi
 
 ;-------------------------------------------------------------------------------
 ; Gets the block size from the device.
@@ -522,8 +521,38 @@ msd_WriteSectors:
 ;-------------------------------------------------------------------------------
 
 util_scsi_init:
-	ld	hl,scsiInquiry
+	push	iy
+	ld	hl,packetSCSI_Inquiry
 	call	util_scsi_request_default
+	pop	iy
+	compare_hl_zero
+	ret	nz
+.unitattention:
+	push	iy
+	ld	hl,packetSCSI_TestUnitReady
+	call	util_scsi_request_default
+	pop	iy
+	compare_hl_zero
+	ret	nz
+	and	a,$f
+	cp	a,6
+	jr	z,.unitattention
+	push	iy
+	ld	hl,packetSCSI_ReadCapacity
+	lea	de,ymsdDevice.lba
+	call	util_scsi_request	; store the logical block address/size
+	pop	iy
+	compare_hl_zero
+	ret	nz
+	push	iy
+	ld	hl,packetSCSI_TestUnitReady
+	call	util_scsi_request_default
+	pop	iy
+	compare_hl_zero
+	ret	nz
+	ld	hl,(ymsdDevice.blocksize)
+	or	a,a
+	sbc	hl,hl
 	ret
 
 ; input:
@@ -685,7 +714,7 @@ util_msd_transport_status:
 	ret	nz
 	inc	(hl)
 	ld	de,msdSenseData
-	ld	hl,scsiRequestSense
+	ld	hl,packetSCSI_RequestSense
 	call	util_scsi_request.sense
 	xor	a,a
 	ld	(msdSenseData),a
@@ -808,35 +837,35 @@ packetMSDMaxLUN setup $A1, $FE, 0, 0, 1
 ; scsi format:
 ; <[1] in/out>,<[3] i/o length>,<[1] cdb length>,<[n] cdb>
 
-scsiInquiry:
+packetSCSI_Inquiry:
 	db	$80,$24,$00,$00,$06,$12,$00,$00,$00,$24,$00
-scsiTestUnitReady:
+packetSCSI_TestUnitReady:
 	db	$00,$00,$00,$00,$06,$00,$00,$00,$00,$00,$00
-scsiModeSense6:
+packetSCSI_ModeSense6:
 	db	$80,$fc,$00,$00,$06,$1a,$00,$3f,$00,$fc,$00
-scsiRequestSense:
+packetSCSI_RequestSense:
 	db	$80,$12,$00,$00,$06,$03,$00,$00,$00,$12,$00
-scsiReadCapacity:
+packetSCSI_ReadCapacity:
 	db	$80,$08,$00,$00,$0a,$25,$00,$00,$00,$00,$00,$00,$00,$00,$00
-scsiRead10:
+packetSCSI_Read10:
 	db	$80,$00,$02,$00,$0a,$28,$00
-scsiRead10Lba:
+packetSCSI_Read10Lba:
 	db	$00,$00,$00,$00
-scsiRead10GroupNum:
+packetSCSI_Read10GroupNum:
 	db	$00
-scsiRead10Length:
+packetSCSI_Read10Length:
 	db	$00,$01
-scsiRead10Ctrl:
+packetSCSI_Read10Ctrl:
 	db	$00
-scsiWrite10:
+packetSCSI_Write10:
 	db	$00,$00,$02,$00,$0a,$2a,$00
-scsiWrite10Lba:
+packetSCSI_Write10Lba:
 	db	$00,$00,$00,$00
-scsiWrite10GroupNum:
+packetSCSI_Write10GroupNum:
 	db	$00
-scsiWrite10Length:
+packetSCSI_Write10Length:
 	db	$00,$01
-scsiWrite10Ctrl:
+packetSCSI_Write10Ctrl:
 	db	$00
 
 tmp tmp_data

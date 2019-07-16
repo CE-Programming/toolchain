@@ -54,6 +54,8 @@ typedef struct {
     usb_endpoint_t ctrl; /**< USB Control endpoint */
     msd_cbw_t cbw;       /**< MSD Command Block Wrapper */
     msd_csw_t csw;       /**< MSD Command Status Word */
+    uint32_t lba;        /**< Logical Block Address of LUN */
+    uint32_t blocksize;  /**< Block size (usually 512) */
     uint8_t interface;   /**< USB Interface index */
     uint8_t maxlun;      /**< Maximum LUNs for MSD */
     void *buffer;        /**< User supplied buffer address */
