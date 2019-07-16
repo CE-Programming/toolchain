@@ -529,13 +529,12 @@ msd_ReadSectors:
 	dec	de
 	ld	a,(hl)
 	ld	(de),a
-	ld	hl,(iy + 6)		; increment the lba
-	xor	a,a
-	ld	bc,1
-	add	hl,bc
-	adc	a,(iy + 9)
-	ld	(iy + 9),a
-	ld	(iy + 6),hl
+	inc	(iy + 6)		; increment the lba
+	jr	nz,.nocarry
+	ld	hl,(iy + 7)
+	inc	hl
+	ld	(iy + 7),hl
+.nocarry:
 	ld	de,(iy + 15)
 	push	iy
 	ld	iy,(iy + 3)
@@ -585,13 +584,12 @@ msd_WriteSectors:
 	dec	de
 	ld	a,(hl)
 	ld	(de),a
-	ld	hl,(iy + 6)		; increment the lba
-	xor	a,a
-	ld	bc,1
-	add	hl,bc
-	adc	a,(iy + 9)
-	ld	(iy + 9),a
-	ld	(iy + 6),hl
+	inc	(iy + 6)		; increment the lba
+	jr	nz,.nocarry
+	ld	hl,(iy + 7)
+	inc	hl
+	ld	(iy + 7),hl
+.nocarry:
 	ld	de,(iy + 15)
 	push	iy
 	ld	iy,(iy + 3)
