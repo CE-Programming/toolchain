@@ -540,8 +540,8 @@ util_scsi_request:
 	ld	(msdSenseCount),a
 .sense:
 	ld	(util_get_out_ep.structure),iy
-	ld	hl,(ymsdDevice.cbw)
-	ld	(util_msd_transport_command.cbw_ptr),hl
+	lea	bc,ymsdDevice.cbw
+	ld	(util_msd_transport_command.cbw_ptr),bc
 	ld	(util_msd_transport_data.ptr),de
 	ld	a,(hl)
 	ld	(util_msd_transport_data.ep),a
@@ -576,13 +576,13 @@ util_msd_reset_recovery:
 	jq	util_scsi_request.abort
 .resetsuccess:
 	call	util_msd_clr_in_stall
-;	jr	util_msd_clr_out_stall
+	jq	util_msd_clr_out_stall
 util_msd_clr_out_stall:
 	ld	bc,(ymsdDevice.epout)
-	jr	msdClrStall
+	jr	util_msd_clr_stall
 util_msd_clr_in_stall:
 	ld	bc,(ymsdDevice.epin)
-msdClrStall:
+util_msd_clr_stall:
 	push	bc
 	call	usb_ClearEndpointHalt
 	pop	bc
