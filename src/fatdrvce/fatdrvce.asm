@@ -503,15 +503,48 @@ msd_GetSectorSize:
 ; args:
 ;  sp + 3  : msd device structure
 ;  sp + 6  : lba of starting sector to read
-;  sp + 9  : number of sectors to read
-;  sp + 12 : user buffer to read into
+;  sp + 12 : number of sectors to read
+;  sp + 15 : user buffer to read into
 ; return:
 ;  a = error status
 msd_ReadSectors:
-
-.error:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 12)
+	jq	.start
+.loop:
+	lea	hl,iy + 6
+	ld	de,packetSCSI_Read10Lba + 3
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	dec	de
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	dec	de
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	dec	de
+	ld	a,(hl)
+	ld	(de),a
+	ld	de,(iy + 15)
+	push	iy
+	ld	iy,(iy + 3)
+	ld	hl,packetSCSI_Read10
+	call	util_scsi_request
+	pop	iy
+	compare_hl_zero
+	ret	nz
+	ld	hl,(iy + 12)
+	dec	hl
+.start:
+	ld	(iy + 12),hl
+	compare_hl_zero
+	jr	nz,.loop
 	or	a,a
-	sbc	hl,hl
+	sbc	hl,hl		; return success
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -524,10 +557,43 @@ msd_ReadSectors:
 ; return:
 ;  a = error status
 msd_WriteSectors:
-
-.error:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 12)
+	jq	.start
+.loop:
+	lea	hl,iy + 6
+	ld	de,packetSCSI_Write10Lba + 3
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	dec	de
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	dec	de
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	dec	de
+	ld	a,(hl)
+	ld	(de),a
+	ld	de,(iy + 15)
+	push	iy
+	ld	iy,(iy + 3)
+	ld	hl,packetSCSI_Write10
+	call	util_scsi_request
+	pop	iy
+	compare_hl_zero
+	ret	nz
+	ld	hl,(iy + 12)
+	dec	hl
+.start:
+	ld	(iy + 12),hl
+	compare_hl_zero
+	jr	nz,.loop
 	or	a,a
-	sbc	hl,hl
+	sbc	hl,hl		; return success
 	ret
 
 ;-------------------------------------------------------------------------------
