@@ -192,6 +192,8 @@ virtual at 0
 	?BULK_TRANSFER				rb 1
 	?INTERRUPT_TRANSFER			rb 1
 end virtual
+
+DEFAULT_RETRIES := 50
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -750,7 +752,7 @@ util_get_in_ep:
 util_msd_bulk_transfer:
 	ld	hl,0
 	push	hl
-	ld	l,50			; 50 retries
+	ld	l,DEFAULT_RETRIES
 	push	hl
 	push	bc
 	push	ix			; packet to send
@@ -812,8 +814,8 @@ util_msd_ctl_packet:
 	push	iy
 	ld	bc,0
 	push	bc			; don't care about transfer size
-	ld	bc,50
-	push	bc			; retry 50 times
+	ld	bc,DEFAULT_RETRIES
+	push	bc			; retry as needed
 	push	de			; send data packet
 	push	hl			; send setup packet
 	ld	bc,(ymsdDevice.epctrl)
