@@ -529,6 +529,13 @@ msd_ReadSectors:
 	dec	de
 	ld	a,(hl)
 	ld	(de),a
+	ld	hl,(iy + 6)		; increment the lba
+	xor	a,a
+	ld	bc,1
+	add	hl,bc
+	adc	a,(iy + 9)
+	ld	(iy + 9),a
+	ld	(iy + 6),hl
 	ld	de,(iy + 15)
 	push	iy
 	ld	iy,(iy + 3)
@@ -552,8 +559,8 @@ msd_ReadSectors:
 ; args:
 ;  sp + 3  : msd device structure
 ;  sp + 6  : lba of starting sector to write
-;  sp + 9  : number of sectors to write
-;  sp + 12 : user buffer to write from
+;  sp + 12 : number of sectors to write
+;  sp + 15 : user buffer to write from
 ; return:
 ;  a = error status
 msd_WriteSectors:
@@ -578,6 +585,13 @@ msd_WriteSectors:
 	dec	de
 	ld	a,(hl)
 	ld	(de),a
+	ld	hl,(iy + 6)		; increment the lba
+	xor	a,a
+	ld	bc,1
+	add	hl,bc
+	adc	a,(iy + 9)
+	ld	(iy + 9),a
+	ld	(iy + 6),hl
 	ld	de,(iy + 15)
 	push	iy
 	ld	iy,(iy + 3)
