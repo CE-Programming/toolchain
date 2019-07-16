@@ -58,23 +58,14 @@ macro struct? name*, parameters&
 end macro
 
 struct tmp_data
-	label .: 21
+	local size
+	label .: size
 	length		rl 1
 	descriptor	rb 18
+	size := $-.
 end struct
 
 ; msd structures
-struct msdDevice
-	label .: 18
-	dev		rl 1
-	epin		rl 1
-	epout		rl 1
-	epctrl		rl 1
-	interface	rb 1
-	maxlun		rb 1
-	lun		rb 1
-	buffer		rl 1
-end struct
 struct packetCSW
 	label .: 13
 	signature	rb 4
@@ -93,9 +84,24 @@ struct packetCBW
 	signature	rb 4
 	tag		rb 4
 	length		rb 4
-	flags		rb 1
+	dir		rb 1
 	lun		rb 1
 	cbd		packetCBD
+end struct
+struct msdDevice
+	local size
+	label .: size
+	dev		rl 1
+	epin		rl 1
+	epout		rl 1
+	epctrl		rl 1
+	cbw		packetCBW
+	csw		packetCSW
+	interface	rb 1
+	maxlun		rb 1
+	lun		rb 1
+	buffer		rl 1
+	size := $-.
 end struct
 
 struct setup, requestType: ?, request: ?, value: ?, index: ?, length: ?
@@ -425,12 +431,13 @@ msd_Init:
 	; the usb device was successfully configured
 	; now let's set up the msd device configuration
 
-	call	util_ResetMsd
+	call	util_msd_reset
 	compare_hl_zero
 	ret	nz
-	call	util_GetMaxLunMsd
+	call	util_msd_get_max_lun
 	compare_hl_zero
 	ret	nz
+	call	util_scsi_init
 
 	or	a,a
 	sbc	hl,hl			; return success
@@ -514,43 +521,264 @@ msd_WriteSectors:
 ; utility functions
 ;-------------------------------------------------------------------------------
 
-util_ResetMsd:
-	ld	a,$55
-	ld	(msdCBW.signature + 0),a
-	ld	a,$53
-	ld	(msdCBW.signature + 1),a
-	ld	a,$42
-	ld	(msdCBW.signature + 2),a
-	ld	a,$43
-	ld	(msdCBW.signature + 3),a
+util_scsi_init:
+	ld	hl,scsiInquiry
+	call	util_scsi_request_default
+	ret
+
+; input:
+;  hl : ptr to scsi command
+;  de : ptr to storage (non-default)
+;  iy : ptr to msd structure (for default)
+; output;
+;   z : success
+;  nz : failure
+util_scsi_request_default:
+	ld	de,(ymsdDevice.buffer)
+util_scsi_request:
+	xor	a,a
+	ld	(msdSenseCount),a
+.sense:
+	ld	(util_get_out_ep.structure),iy
+	ld	hl,(ymsdDevice.cbw)
+	ld	(util_msd_transport_command.cbw_ptr),hl
+	ld	(util_msd_transport_data.ptr),de
+	ld	a,(hl)
+	ld	(util_msd_transport_data.ep),a
+	inc	hl
+	ld	bc,(hl)
+	ld	(util_msd_transport_data.len),bc
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(util_msd_transport_command.cbd_ptr),hl
+	push	ix
+.resendCbw:
+	call	util_msd_transport_command
+	call	util_msd_transport_data
+	call	util_msd_transport_status
+	jr	nz,.resendCbw
+.abort:
+	pop	ix
+	ret
+
+; input:
+;  iy : msd structure
+; output:
+;  hopefully recovers transfer state
+util_msd_reset_recovery:
+	ld	iy,(util_get_out_ep.structure)
+	call	util_msd_reset
+	compare_hl_zero
+	jr	z,.resetsuccess
+	pop	bc			; abort if cannot reset
+	pop	bc			; pop call and top level call
+	jq	util_scsi_request.abort
+.resetsuccess:
+	call	util_msd_clr_in_stall
+;	jr	util_msd_clr_out_stall
+util_msd_clr_out_stall:
+	ld	bc,(ymsdDevice.epout)
+	jr	msdClrStall
+util_msd_clr_in_stall:
+	ld	bc,(ymsdDevice.epin)
+msdClrStall:
+	push	bc
+	call	usb_ClearEndpointHalt
+	pop	bc
+	ret
+
+; inputs:
+;  hl : data to transfer
+;  de : buffer to recieve into
+util_msd_transport_command:
+	ld	hl,0
+.cbd_ptr := $ - 3
+	ld	ix,0
+.cbw_ptr := $ - 3
+	ld	a,(util_msd_transport_data.ep)
+	ld	(xpacketCBW.dir),a	; direction flag
+	ld	bc,(util_msd_transport_data.len)
+	ld	(xpacketCBW.length),bc	; i/o length
+	ld	bc,0
+	ld	c,(hl)			; cbd length
+	inc	c
+	lea	de,xpacketCBW.cbd	; cbd location
+	ldir
+	ld	hl,(xpacketCBW.tag)	; increment tag
+	inc	hl
+	ld	(xpacketCBW.tag),hl
+	call	util_get_out_ep
+	ld	bc,sizeof packetCBW
+	call	util_msd_bulk_transfer
+	compare_hl_zero
+	ret	z			; check the command was accepted
+	call	util_msd_reset_recovery
+	jr	util_msd_transport_command
+
+; bc = length of transfer
+util_msd_transport_data:
+	ld	bc,0
+.len := $ - 3
+	sbc	hl,hl
+	adc	hl,bc
+	ret	z			; no transfer if 0 length
+	ld	ix,0
+.ptr := $ - 3
+	ld	a,0
+.ep := $ - 1
+	or	a,a
+	jr	z,.data_out
+.data_in:
+	call	util_get_in_ep
+	call	util_msd_bulk_transfer
+	compare_hl_zero
+	ret	z
+	jq	util_msd_clr_in_stall
+.data_out:
+	call	util_get_out_ep
+	call	util_msd_bulk_transfer
+	compare_hl_zero
+	ret	z
+	jq	util_msd_clr_out_stall
+
+util_msd_transport_status:
+	call	util_msd_status_xfer
+	compare_hl_zero
+	jr	z,.checkcsw
+.stall:
+	call	util_msd_clr_in_stall	; clear stall
+	call	util_msd_status_xfer	; attempt to read csw again
+	compare_hl_zero
+	jr	z,.checkcsw
+	call	util_msd_reset_recovery
+	xor	a,a
+	inc	a			; return failure code
+	ret
+.checkcsw:
+	ld	iy,(util_get_out_ep.structure)
+	ld	a,(ymsdDevice.csw.status)
+	or	a,a			; check for good status of transfer
+	jr	nz,.invalid
+.valid:
+	ld	hl,(ymsdDevice.csw.residue + 0)
+	ld	a,(ymsdDevice.csw.residue + 3)
+	add	hl,de
+	or	a,a
+	ld	a,$10
+	ret	nz
+	sbc	hl,de
+	ret	nz			; if residue != 0, fail
+	xor	a,a			; return success
+	ret
+.invalid:
+	dec	a			; check for sense error (we can recover)
+	jr	z,.senseerror		; handle command fail
+.phaseerror:
+	call	util_msd_reset_recovery
+	xor	a,a
+	inc	a
+	ret
+.senseerror:
+	ld	hl,msdSenseCount
+	or	a,(hl)
+	ret	nz
+	inc	(hl)
+	ld	de,msdSenseData
+	ld	hl,scsiRequestSense
+	call	util_scsi_request.sense
+	xor	a,a
+	ld	(msdSenseData),a
+	ld	a,(msdSenseData + 2)
+	ret
+
+msdSenseCount:
+	db	0
+
+msdSenseData:
+	rb	512
+
+util_msd_status_xfer:
+	call	util_get_in_ep
+	ld	ix,(ymsdDevice.csw)
+	ld	bc,sizeof packetCSW
+	jq	util_msd_bulk_transfer
+
+util_get_out_ep:
+	ld	iy,0
+.structure := $ - 3
+	ld	de,(ymsdDevice.epout)
+	ret
+util_get_in_ep:
+	ld	iy,(util_get_out_ep.structure)
+	ld	de,(ymsdDevice.epin)
+	ret
+
+; inputs:
+;  bc : packet len
+;  ix : data buffer
+;  de : endpoint
+util_msd_bulk_transfer:
+	ld	hl,0
+	push	hl
+	ld	l,50			; 50 retries
+	push	hl
+	push	bc
+	push	ix			; packet to send
+	push	de
+	call	usb_Transfer
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+msdLBAddr:
+	db	0,0,0,0
+	db	0		; technically part of block size, but meh
+msdBlockSize:
+	db	0,0,0
+
+; iy -> msd structure
+util_msd_reset:
+	lea	hl,ymsdDevice.cbw.signature
+	ld	(hl),$55
+	inc	hl
+	ld	(hl),$53
+	inc	hl
+	ld	(hl),$42
+	inc	hl
+	ld	(hl),$43
 	xor	a,a
 	sbc	hl,hl
-	ld	(ymsdDevice.maxlun),a
-	ld	(ymsdDevice.lun),a
-	ld	(msdCBW.tag + 0),hl
-	ld	(msdCBW.tag + 3),a	; reset tag
-	ld	(msdCBW.flags),a
-	ld	(msdCBW.lun),a
+	ld	(ymsdDevice.cbw.tag + 0),hl
+	ld	(ymsdDevice.cbw.tag + 3),a	; reset tag
 	ld	a,(ymsdDevice.interface)
 	ld	(packetMSDReset + 4),a
-	ld	(packetMSDMaxLUN + 4),a	; set selected interface
 	ld	hl,packetMSDReset
 	jq	util_msd_ctl_packet
 
-; iy -> msd structure
-util_GetMaxLunMsd:
+; inputs:
+;  iy : msd structure
+util_msd_get_max_lun:
+	ld	a,(ymsdDevice.interface)
+	ld	(packetMSDMaxLUN + 4),a
 	ld	hl,packetMSDMaxLUN
 	ld	de,(ymsdDevice.maxlun)
 	jq	util_msd_ctl_packet
 
-; a = lun
+; inputs:
+;   a : lun
+;  iy : msd structure
 util_SetLunMsd:
-	ld	(msdCBW.lun),a
+	ld	(ymsdDevice.cbw.lun),a
 	ret
 
-; iy -> msd structure
-; hl -> packet
-; de -> location to store data to
+; inputs:
+;  iy : msd structure
+;  hl : packet
+;  de : location to store data to
 util_msd_ctl_packet:
 	push	iy
 	ld	bc,0
@@ -577,7 +805,38 @@ util_msd_ctl_packet:
 packetMSDReset setup $21, $FF, 0, 0, 0
 packetMSDMaxLUN setup $A1, $FE, 0, 0, 1
 
-msdCSW packetCSW
-msdCBW packetCBW
+; scsi format:
+; <[1] in/out>,<[3] i/o length>,<[1] cdb length>,<[n] cdb>
+
+scsiInquiry:
+	db	$80,$24,$00,$00,$06,$12,$00,$00,$00,$24,$00
+scsiTestUnitReady:
+	db	$00,$00,$00,$00,$06,$00,$00,$00,$00,$00,$00
+scsiModeSense6:
+	db	$80,$fc,$00,$00,$06,$1a,$00,$3f,$00,$fc,$00
+scsiRequestSense:
+	db	$80,$12,$00,$00,$06,$03,$00,$00,$00,$12,$00
+scsiReadCapacity:
+	db	$80,$08,$00,$00,$0a,$25,$00,$00,$00,$00,$00,$00,$00,$00,$00
+scsiRead10:
+	db	$80,$00,$02,$00,$0a,$28,$00
+scsiRead10Lba:
+	db	$00,$00,$00,$00
+scsiRead10GroupNum:
+	db	$00
+scsiRead10Length:
+	db	$00,$01
+scsiRead10Ctrl:
+	db	$00
+scsiWrite10:
+	db	$00,$00,$02,$00,$0a,$2a,$00
+scsiWrite10Lba:
+	db	$00,$00,$00,$00
+scsiWrite10GroupNum:
+	db	$00
+scsiWrite10Length:
+	db	$00,$01
+scsiWrite10Ctrl:
+	db	$00
 
 tmp tmp_data

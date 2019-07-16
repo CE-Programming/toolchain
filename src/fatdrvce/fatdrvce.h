@@ -26,13 +26,36 @@ extern "C" {
 #endif
 
 typedef struct {
+    uint32_t signature;
+    uint32_t tag;
+    uint32_t length;
+    uint8_t status;
+} msd_csw_t;
+
+typedef struct {
+    uint8_t length;
+    uint8_t opcode;
+    uint8_t data[15];
+} msd_cbd_t;
+
+typedef struct {
+    uint32_t signature;
+    uint32_t tag;
+    uint32_t length;
+    uint8_t dir;
+    uint8_t lun;
+    msd_cbd_t cbd;
+} msd_cbw_t;
+
+typedef struct {
     usb_device_t dev;    /**< USB device */
     usb_endpoint_t in;   /**< USB bulk in endpoint */
     usb_endpoint_t out;  /**< USB bulk out endpoint */
     usb_endpoint_t ctrl; /**< USB Control endpoint */
+    msd_cbw_t cbw;       /**< MSD Command Block Wrapper */
+    msd_csw_t csw;       /**< MSD Command Status Word */
     uint8_t interface;   /**< USB Interface index */
     uint8_t maxlun;      /**< Maximum LUNs for MSD */
-    uint8_t lun;         /**< Selected LUN for MSD */
     void *buffer;        /**< User supplied buffer address */
 } msd_device_t;
 
@@ -48,9 +71,9 @@ typedef struct {
     uint8_t padding[2]; /**< Extra padding (reserved) */
 } fat_entry_t;
 
-#define	FAT_O_WRONLY      2               /**< Open Write only mode. */
-#define	FAT_O_RDONLY      1               /**< Open Read only mode */
-#define	FAT_O_RDWR (O_RDONLY | O_WRONLY)  /**< Open in Read and Write mode. */
+#define FAT_O_WRONLY      2               /**< Open Write only mode. */
+#define FAT_O_RDONLY      1               /**< Open Read only mode */
+#define FAT_O_RDWR (O_RDONLY | O_WRONLY)  /**< Open in Read and Write mode. */
 
 #define FAT_RDONLY    (1 << 0)  /**< Entry is Read-Only. */
 #define FAT_HIDDEN    (1 << 1)  /**< Entry is Hidden. */
