@@ -2984,6 +2984,8 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
 	call	_DelayTenTimesAms
 	res	bUsbPortReset-8,(hl)
+	ld	a,2 ; WARNING: This assumes flash wait states port is 3, to get at least 10ms!
+	call	_DelayTenTimesAms
 	dec	l;usbPortStsCtrl
 	cp	a,a
 	ret
