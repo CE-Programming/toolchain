@@ -2295,7 +2295,7 @@ _HandleGetDescriptor:
 	jq	nz,_HandleCxSetupInt.unhandled
 .sendSingleDescriptorIYind:
 	ld	b,a
-	ld	hl,(iy);(ystandardDescriptors.device)
+	ld	hl,(ystandardDescriptors.device)
 .sendSingleDescriptorHL:
 	ld	c,(hl)
 	ex	de,hl
@@ -2306,15 +2306,15 @@ _HandleGetDescriptor:
 	or	a,d
 	jq	nz,_HandleCxSetupInt.unhandled
 	ld	hl,(ystandardDescriptors.configurations)
-	ld	iy,(ystandardDescriptors.device)
+	ld	ydeviceDescriptor,(ystandardDescriptors.device)
 	ld	a,c
-	cp	a,(iy+17)
+	cp	a,(ydeviceDescriptor.bNumConfigurations)
 	jq	nc,_HandleCxSetupInt.unhandled
 repeat 3
 	add	hl,bc
 end repeat
-	ld	iy,(hl)
-	ld	bc,(iy+2)
+	ld	yconfigurationDescriptor,(hl)
+	ld	bc,(yconfigurationDescriptor.wTotalLength)
 	ld	de,(hl)
 	jq	.sendDescriptor
 .notConfiguration:
@@ -2357,8 +2357,8 @@ end repeat
 	jq	_HandleCxSetupInt.unhandled
 
 ;	ld	hl,(currentDescriptors)
-;	ld	iy,(hl+currentDescriptors.device)
-;	ld	a,(iy+7);bMaxPacketSize0
+;	ld	ydeviceDescriptor,(hl+currentDescriptors.device)
+;	ld	a,(ydeviceDescripter.bMaxPacketSize0)
 .sendDescriptor:
 	ld	hl,mpUsbDmaFifo
 	ld	(hl),bmUsbDmaCxFifo
