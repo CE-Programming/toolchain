@@ -2190,18 +2190,16 @@ assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
 	ld	e,endpoint
 	push	de
 	ex	(sp),ix
-	or	a,a
 	call	_RetireTransfers
+	ccf
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 ; Input:
-;  cf = false
 ;  ix = endpoint
 ; Output:
-;  cf = error
-;  zf = false
+;  cf = zf = success
 ;  a = ?
 ;  bc = ?
 ;  de = ?
@@ -2209,6 +2207,8 @@ assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
 ;  ix = endpoint
 ;  iy = ?
 _RetireTransfers:
+	or	a,a
+.nc:
 	sbc	hl,hl
 	inc.s	bc
 	lea	ytransfer.next,xendpoint.first
@@ -2217,8 +2217,15 @@ _RetireTransfers:
 .loop:
 	bit	0,(ytransfer.next) ; dummy
 	ret	nz
-	bit	bsr ytransfer.status.active,(ytransfer.status)
-	ret	nz
+	ld	a,(ytransfer.status)
+repeat 8-bsr ytransfer.status.active
+	rlca
+end repeat
+	ret	c
+repeat bsr ytransfer.status.active-bsr ytransfer.status.halted
+	rlca
+end repeat
+	jq	c,.partial
 	bit	bsr ytransfer.type.pid,(ytransfer.type) ; setup
 	jq	nz,.continue
 	ld	c,(ytransfer.length)
@@ -2230,8 +2237,6 @@ _RetireTransfers:
 	ld	b,a
 	sbc	hl,bc
 	or	a,c
-	jq	nz,.partial
-	bit	bsr ytransfer.status.halted,(ytransfer.status)
 	jq	nz,.partial
 	bit	bsr ytransfer.type.ioc,(ytransfer.type)
 	jq	z,.continue
@@ -2268,14 +2273,12 @@ _RetireTransfers:
 	ld	(xendpoint.first),ytransfer
 	ld	hl,1
 	add	hl,de
-	ccf
-	jq	nc,.loop
+	jq	c,.loop
 	ret
 .restart:
 assert USB_ERROR_NOT_SUPPORTED
-	ld	hl,USB_ERROR_NOT_SUPPORTED-1
-	inc	l
-	scf
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+	or	a,l
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2922,9 +2925,9 @@ _HandleErrInt:
 	ld	a,ixh
 	xor	a,dummyHead shr 8 and $FF
 	jq	z,.done
-	call	_RetireTransfers
+	call	_RetireTransfers.nc
 	ld	xendpoint,(xendpoint.next)
-	jq	nc,.loop
+	jq	c,.loop
 .done:
 	pop	ix
 	ret
