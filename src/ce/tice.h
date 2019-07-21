@@ -282,7 +282,7 @@ typedef struct { uint16_t len; char data[1]; } equ_t;
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
 /**
  * @brief Structure of font description
- * @see os_SelectFont
+ * @see os_FontSelect
  */
 typedef struct font {
     /**
@@ -327,13 +327,13 @@ typedef struct font {
 
 /**
  * TIOS small font.
- * @see os_SelectFont
+ * @see os_FontSelect
  */
 #define os_SmallFont ((font_t *)0)
 
 /**
  * TIOS large font.
- * @see os_SelectFont
+ * @see os_FontSelect
  */
 #define os_LargeFont ((font_t *)1)
 
@@ -504,11 +504,11 @@ void os_SetCursorPos(uint8_t curRow, uint8_t curCol);
 void os_GetCursorPos(unsigned int *curRow, unsigned int *curCol);
 
 /**
- * Selects the font to use when drawing on the graphscreen
+ * Selects the (monospace) font to use when drawing on the graphscreen
  *
- * @param id
- * 0: small font                                      <br>
- * 1: large monospace font
+ * @param font font id/pointer to use
+ * os_SmallFont                                       <br>
+ * os_LargeFont
  */
 void os_FontSelect(font_t *font);
 
@@ -628,7 +628,6 @@ void *os_GetSystemStats(void);
  * }
  * @endcode
  *
- * @param routine Error handling routine
  * @see os_PopErrorHandler
  */
 int os_PushErrorHandler(void);

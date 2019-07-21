@@ -843,7 +843,7 @@ fontlib_font_t *fontlib_GetFontByIndex(char *font_pack_name, uint8_t index);
  * pack's address and a set of font properties.  Useful if you know caching the
  * font pack's address is safe.
  * @see ti_GetDataPtr()
- * @param font_pack_name Pointer to font pack appvar's name
+ * @param font_pack Pointer to font pack
  * @param size_min Minimum heigh, in pixels, to accept.  Space above and space
  * below metrics are not considered.
  * @param size_max Maximum height

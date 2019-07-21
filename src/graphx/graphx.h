@@ -1101,8 +1101,9 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t
 /**
  * Helper macro to only perform rotation using gfx_RotatedScaledTransparentSprite_NoClip
  *
- * @param sprite_in Input sprite to rotate
- * @param sprite_out Pointer to where rotated sprite will be stored
+ * @param sprite Input sprite to rotate/scale
+ * @param x X coordinate position
+ * @param x Y coordinate position
  * @param angle 256 position angular integer
  * @see gfx_RotatedScaledTransparentSprite_NoClip
  */
@@ -1125,8 +1126,9 @@ uint8_t gfx_RotatedScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t
 /**
  * Helper macro to only perform rotation using gfx_RotatedScaledSprite_NoClip
  *
- * @param sprite_in Input sprite to rotate
- * @param sprite_out Pointer to where rotated sprite will be stored
+ * @param sprite Input sprite to rotate/scale
+ * @param x X coordinate position
+ * @param x Y coordinate position
  * @param angle 256 position angular integer
  * @see gfx_RotatedScaledTransparentSprite_NoClip
  */
@@ -1478,7 +1480,6 @@ gfx_rletsprite_t *gfx_ConvertToNewRLETSprite(gfx_sprite_t *sprite_in, void *(*ma
  * already-allocated gfx_rletsprite_t using gfx_ConvertToRLETSprite().
  *
  * @param sprite_in input sprite with normal transparency
- * @param malloc_routine malloc implementation to use
  * @returns a newly allocated converted sprite with RLE transparency
  * @see gfx_ConvertFromRLETSprite
  */
