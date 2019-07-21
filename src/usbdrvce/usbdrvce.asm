@@ -2019,13 +2019,16 @@ assert endpoint.device and 1
 ; Input:
 ;  a = alt
 ;  b = num interfaces
-;  de = length
+;  de = length or ? shl 16
 ;  ix = descriptors
 ;  iy = device
 ; Output:
 ;  zf = valid
 ;  a = 0 | ?
-;  de = ? and $FF
+;  bc = ?
+;  de = ? and $FFFF
+;  hl = ? and $FFFF
+;  ix = ?
 _ParseInterfaceDescriptors:
 	inc	b
 .dec:
@@ -2287,7 +2290,7 @@ _HandleGetDescriptor:
 	ld	bc,(ysetup.wValue)
 	inc	bc
 	dec.s	bc
-	ld	iy,(currentDescriptors)
+	ld	ystandardDescriptors,(currentDescriptors)
 	djnz	.notDevice;DEVICE_DESCRIPTOR
 	or	a,c
 	or	a,e
@@ -2431,7 +2434,7 @@ _HandleCxSetupInt:
 	ld	(hl),bmUsbIntCxSetup
 	ret
 .defaultHandler:
-	ld	iy,setupPacket
+	ld	ysetup,setupPacket
 	ld	bc,(ysetup.bmRequestType)
 	inc	b
 	djnz	.notGetStatus
@@ -2454,10 +2457,10 @@ _HandleCxSetupInt:
 	ld	bc,(ysetup.wLength)
 	or	a,c
 	or	a,b
-	jq	nz,_HandleCxSetupInt.unhandled
+	jq	nz,.unhandled
 	ld	l,usbDevAddr-$100
 	ld	(hl),e
-	jq	_HandleCxSetupInt.handled
+	jq	.handled
 .notSetAddress:
 	djnz	.notGetDescriptor
 	ld	a,c
@@ -2478,16 +2481,38 @@ _HandleCxSetupInt:
 	ld	bc,(ysetup.wLength)
 	or	a,c
 	or	a,b
-	jq	nz,_HandleCxSetupInt.unhandled
-	cpl
-	add	a,e
-	ld	l,usbDevAddr-$100
+	jq	nz,.unhandled
+	or	a,e
+	jq	z,.setConfigured
+	push	ix
+	ld	xstandardDescriptors,(currentDescriptors)
+	ld	ydeviceDescriptor,(xstandardDescriptors.device)
+	ld	b,(ydeviceDescriptor.bNumConfigurations)
+	ld	hl,(xstandardDescriptors.configurations)
+.findConfigurationDescriptor:
+	ld	xconfigurationDescriptor,(hl)
+	xor	a,(xconfigurationDescriptor.bConfigurationValue)
+	jq	z,.foundConfigurationDescriptor
+repeat long
+	inc	hl
+end repeat
+	ld	a,e
+	djnz	.findConfigurationDescriptor
+.foundConfigurationDescriptor:
+	ld	ydevice,(rootHub.child)
+	ld	de,(xconfigurationDescriptor.wTotalLength)
+	ld	b,(xconfigurationDescriptor.bNumInterfaces)
+	call	z,_ParseInterfaceDescriptors
+	pop	ix
+	jq	nz,.unhandled
+	scf
+.setConfigured:
+	ld	hl,mpUsbDevAddr
 	ld	a,(hl)
 	rla
 	rrca
 	ld	(hl),a
-	; TODO: you know what
-	jq	_HandleCxSetupInt.handled
+	jq	.handled
 .notSetConfiguration:
 	djnz	.notGetInterface
 .notGetInterface:
@@ -2701,7 +2726,7 @@ _HandleCxOutInt:
 	ld	c,(hl)
 	xor	a,a
 	ld	b,a
-	ld	iy,(rootHub.child)
+	ld	ydevice,(rootHub.child)
 	call	usb_GetDeviceEndpoint.enter
 	call	_ExecuteDma.bytes
 	ret	c
@@ -3006,7 +3031,7 @@ _HandlePortPortEnInt:
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbConnStsChg)
 	ld	(hl),a
-	ld	iy,(rootHub.child)
+	ld	ydevice,(rootHub.child)
 	bit	bUsbPortEn,(hl)
 	jq	z,.disabled
 	call	_CreateDefaultControlEndpoint
