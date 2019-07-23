@@ -2202,7 +2202,8 @@ assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
 ; Input:
 ;  ix = endpoint
 ; Output:
-;  cf = zf = success
+;  cf = success
+;  zf = ? | false
 ;  a = ?
 ;  bc = ?
 ;  de = ?
@@ -2218,8 +2219,9 @@ _RetireTransfers:
 .continue:
 	ld	ytransfer,(ytransfer.next)
 .loop:
-	bit	0,(ytransfer.next) ; dummy
-	ret	nz
+	ld	a,(ytransfer.next)
+	rrca ; dummy
+	ret	c
 	ld	a,(ytransfer.status)
 repeat 8-bsr ytransfer.status.active
 	rlca
