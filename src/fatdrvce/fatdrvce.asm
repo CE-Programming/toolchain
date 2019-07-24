@@ -886,7 +886,7 @@ util_msd_ctl_packet:
 setup.msdreset          setuppkt        $21,$ff,0,0,0
 setup.msdmaxlun         setuppkt        $a1,$fe,0,0,1
 
-scsi.inquiry            scsipkt         1,$00fc,  $12, $00,$00,$00,$fc,$00
+scsi.inquiry            scsipkt         1,$0005,  $12, $00,$00,$00,$05,$00
 scsi.testunitready      scsipkt         0,$0000,  $00, $00,$00,$00,$00,$00
 scsi.modesense6         scsipkt         1,$00fc,  $1a, $00,$3f,$00,$fc,$00
 scsi.requestsense       scsipkt         1,$0012,  $03, $00,$00,$00,$12,$00
