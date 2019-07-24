@@ -52,8 +52,7 @@ typedef struct {
     usb_endpoint_t in;   /**< USB bulk in endpoint */
     usb_endpoint_t out;  /**< USB bulk out endpoint */
     usb_endpoint_t ctrl; /**< USB Control endpoint */
-    msd_cbw_t cbw;       /**< MSD Command Block Wrapper */
-    msd_csw_t csw;       /**< MSD Command Status Word */
+    uint24_t tag;        /**< MSD Command Block Wrapper incrementing tag */
     uint32_t lba;        /**< Logical Block Address of LUN */
     uint32_t blocksize;  /**< Block size (usually 512) */
     uint8_t interface;   /**< USB Interface index */

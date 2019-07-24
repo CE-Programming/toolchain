@@ -56,16 +56,6 @@ macro struct? name*, parameters&
   namespace .
 end macro
 
-struct tmp_data
-	local size
-	label .: size
-	sensecount	rb 1
-	sensebuffer	rb 512	; todo: evaluate if needed
-	length		rl 1
-	descriptor	rb 18
-	size := $-.
-end struct
-
 ; msd structures
 struct packetCSW
 	label .: 13
@@ -76,7 +66,7 @@ struct packetCSW
 end struct
 struct packetCBD
 	label .: 17
-	length		rb 1
+	len		rb 1
 	opcode		rb 1
 	data		rb 15
 end struct
@@ -84,7 +74,7 @@ struct packetCBW
 	label .: 14+17
 	signature	rb 4
 	tag		rb 4
-	length		rb 4
+	len		rb 4
 	dir		rb 1
 	lun		rb 1
 	cbd		packetCBD
@@ -96,8 +86,7 @@ struct msdDevice
 	epin		rl 1
 	epout		rl 1
 	epctrl		rl 1
-	cbw		packetCBW
-	csw		packetCSW
+	tag		rl 1
 	lba		rb 4
 	reserved	rb 1	; technically part of block size
 	blocksize	rl 1
@@ -108,13 +97,41 @@ struct msdDevice
 	size := $-.
 end struct
 
-struct setup, requestType: ?, request: ?, value: ?, index: ?, length: ?
+struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
 	label .: 8
 	bmRequestType	db requestType
 	bRequest	db request
 	wValue		dw value
 	wIndex		dw index
 	wLength		dw length
+end struct
+struct scsipkt, dir, len, data
+	local size
+	label .: size
+	iterate @, data
+		db $55,$53,$42,$43
+		dw 0
+		dw len
+		db dir shl 7, 0, %%, data
+		break
+	end iterate
+	size := $-.
+end struct
+struct scsipktrw, dir, len, type
+	local size
+	label .: size
+	iterate @, data
+		db $55,$53,$42,$43
+		dw 0
+		dw 512
+		db dir shl 7, 0, 10, type, 0
+		break
+	end iterate
+	lba		dd 0
+	groupnum	db 0
+	len		dw 1
+	ctrl		db 0
+	size := $-.
 end struct
 
 struct descriptor
@@ -193,6 +210,17 @@ virtual at 0
 	?BULK_TRANSFER				rb 1
 	?INTERRUPT_TRANSFER			rb 1
 end virtual
+
+struct tmp_data
+	local size
+	label .: size
+	sensecount	rb 1
+	sensebuffer	rb 512	; todo: evaluate if needed
+	length		rl 1
+	descriptor	rb 18
+	csw		packetCSW
+	size := $-.
+end struct
 
 DEFAULT_RETRIES := 50
 ;-------------------------------------------------------------------------------
@@ -502,7 +530,7 @@ msd_ReadSectors:
 	jq	.start
 .loop:
 	lea	hl,iy + 6
-	ld	de,packetSCSI_Read10Lba + 3
+	ld	de,scsi.read10.lba + 3
 	ld	a,(hl)
 	ld	(de),a
 	inc	hl
@@ -526,7 +554,7 @@ msd_ReadSectors:
 	ld	de,(iy + 15)
 	push	iy
 	ld	iy,(iy + 3)
-	ld	hl,packetSCSI_Read10
+	ld	hl,scsi.read10
 	call	util_scsi_request
 	pop	iy
 	compare_hl_zero
@@ -557,7 +585,7 @@ msd_WriteSectors:
 	jq	.start
 .loop:
 	lea	hl,iy + 6
-	ld	de,packetSCSI_Write10Lba + 3
+	ld	de,scsi.write10.lba + 3
 	ld	a,(hl)
 	ld	(de),a
 	inc	hl
@@ -581,7 +609,7 @@ msd_WriteSectors:
 	ld	de,(iy + 15)
 	push	iy
 	ld	iy,(iy + 3)
-	ld	hl,packetSCSI_Write10
+	ld	hl,scsi.write10
 	call	util_scsi_request
 	pop	iy
 	compare_hl_zero
@@ -602,14 +630,14 @@ msd_WriteSectors:
 
 util_scsi_init:
 	push	iy
-	ld	hl,packetSCSI_Inquiry
+	ld	hl,scsi.inquiry
 	call	util_scsi_request_default
 	pop	iy
 	compare_hl_zero
 	ret	nz
 .unitattention:
 	push	iy
-	ld	hl,packetSCSI_TestUnitReady
+	ld	hl,scsi.testunitready
 	call	util_scsi_request_default
 	pop	iy
 	compare_hl_zero
@@ -618,19 +646,18 @@ util_scsi_init:
 	cp	a,6
 	jr	z,.unitattention
 	push	iy
-	ld	hl,packetSCSI_ReadCapacity
+	ld	hl,scsi.readcapacity
 	lea	de,ymsdDevice.lba
 	call	util_scsi_request	; store the logical block address/size
 	pop	iy
 	compare_hl_zero
 	ret	nz
 	push	iy
-	ld	hl,packetSCSI_TestUnitReady
+	ld	hl,scsi.testunitready
 	call	util_scsi_request_default
 	pop	iy
 	compare_hl_zero
 	ret	nz
-	ld	hl,(ymsdDevice.blocksize)
 	or	a,a
 	sbc	hl,hl
 	ret
@@ -648,21 +675,13 @@ util_scsi_request:
 	xor	a,a
 	ld	(tmp.sensecount),a
 .sense:
-	ld	(util_get_out_ep.structure),iy
+	ld	(util_scsi_request.msdstruct),iy
 	lea	bc,ymsdDevice.cbw
 	ld	(util_msd_transport_command.cbw_ptr),bc
-	ld	(util_msd_transport_data.ptr),de
-	ld	a,(hl)
-	ld	(util_msd_transport_data.ep),a
-	inc	hl
-	ld	bc,(hl)
-	ld	(util_msd_transport_data.len),bc
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(util_msd_transport_command.cbd_ptr),hl
 	push	ix
 .resendCbw:
+	ld	iy,0
+.msdstruct := $ - 3
 	call	util_msd_transport_command
 	call	util_msd_transport_data
 	call	util_msd_transport_status
@@ -701,22 +720,11 @@ util_msd_clr_stall:
 ;  hl : data to transfer
 ;  de : buffer to recieve into
 util_msd_transport_command:
-	ld	hl,0
-.cbd_ptr := $ - 3
-	ld	ix,0
-.cbw_ptr := $ - 3
-	ld	a,(util_msd_transport_data.ep)
-	ld	(xpacketCBW.dir),a	; direction flag
-	ld	bc,(util_msd_transport_data.len)
-	ld	(xpacketCBW.length),bc	; i/o length
-	ld	bc,0
-	ld	c,(hl)			; cbd length
-	inc	c
-	lea	de,xpacketCBW.cbd	; cbd location
-	ldir
-	ld	hl,(xpacketCBW.tag)	; increment tag
+	ld	iy,(util_scsi_request.msdstruct)
+	ld	hl,(ymsdDevice.tag)
 	inc	hl
-	ld	(xpacketCBW.tag),hl
+	ld	(ymsdDevice.tag),hl
+	ld	(xpacketCBW.tag),hl	; increment the tag
 	call	util_get_out_ep
 	ld	bc,sizeof packetCBW
 	call	util_msd_bulk_transfer
@@ -726,16 +734,13 @@ util_msd_transport_command:
 	jr	util_msd_transport_command
 
 ; bc = length of transfer
+; ix = cbw pointer
 util_msd_transport_data:
-	ld	bc,0
-.len := $ - 3
+	ld	bc,(xpacketCBW.len)
 	sbc	hl,hl
 	adc	hl,bc
 	ret	z			; no transfer if 0 length
-	ld	ix,0
-.ptr := $ - 3
-	ld	a,0
-.ep := $ - 1
+	ld	a,(xpacketCBW.dir)	; check direction
 	or	a,a
 	jr	z,.data_out
 .data_in:
@@ -765,13 +770,12 @@ util_msd_transport_status:
 	inc	a			; return failure code
 	ret
 .checkcsw:
-	ld	iy,(util_get_out_ep.structure)
-	ld	a,(ymsdDevice.csw.status)
+	ld	a,(tmp.csw.status)
 	or	a,a			; check for good status of transfer
 	jr	nz,.invalid
 .valid:
-	ld	hl,(ymsdDevice.csw.residue + 0)
-	ld	a,(ymsdDevice.csw.residue + 3)
+	ld	hl,(tmp.csw.residue + 0)
+	ld	a,(tmp.csw.residue + 3)
 	add	hl,de
 	or	a,a
 	ld	a,$10
@@ -794,7 +798,7 @@ util_msd_transport_status:
 	ret	nz
 	inc	(hl)
 	ld	de,tmp.sensebuffer
-	ld	hl,packetSCSI_RequestSense
+	ld	hl,scsi.requestsense
 	call	util_scsi_request.sense
 	xor	a,a
 	ld	(tmp.sensebuffer),a
@@ -803,17 +807,16 @@ util_msd_transport_status:
 
 util_msd_status_xfer:
 	call	util_get_in_ep
-	ld	ix,(ymsdDevice.csw)
+	ld	ix,tmp.csw
 	ld	bc,sizeof packetCSW
 	jq	util_msd_bulk_transfer
 
 util_get_out_ep:
-	ld	iy,0
-.structure := $ - 3
+	ld	iy,(util_scsi_request.msdstruct)
 	ld	de,(ymsdDevice.epout)
 	ret
 util_get_in_ep:
-	ld	iy,(util_get_out_ep.structure)
+	ld	iy,(util_scsi_request.msdstruct)
 	ld	de,(ymsdDevice.epin)
 	ret
 
@@ -900,41 +903,15 @@ util_msd_ctl_packet:
 ; library data
 ;-------------------------------------------------------------------------------
 
-packetMSDReset setup $21, $FF, 0, 0, 0
-packetMSDMaxLUN setup $A1, $FE, 0, 0, 1
+setup.msdreset          setuppkt        $15,$ff,0,0,0
+setup.msdmaxlun         setuppkt        $a1,$fe,0,0,1
 
-; scsi format:
-; <[1] in/out>,<[3] i/o length>,<[1] cdb length>,<[n] cdb>
-
-packetSCSI_Inquiry:
-	db	$80,$fc,$00,$00,$06,$12,$00,$00,$00,$fc,$00
-packetSCSI_TestUnitReady:
-	db	$00,$00,$00,$00,$06,$00,$00,$00,$00,$00,$00
-packetSCSI_ModeSense6:
-	db	$80,$fc,$00,$00,$06,$1a,$00,$3f,$00,$fc,$00
-packetSCSI_RequestSense:
-	db	$80,$12,$00,$00,$06,$03,$00,$00,$00,$12,$00
-packetSCSI_ReadCapacity:
-	db	$80,$08,$00,$00,$0a,$25,$00,$00,$00,$00,$00,$00,$00,$00,$00
-packetSCSI_Read10:
-	db	$80,$00,$02,$00,$0a,$28,$00
-packetSCSI_Read10Lba:
-	db	$00,$00,$00,$00
-packetSCSI_Read10GroupNum:
-	db	$00
-packetSCSI_Read10Length:
-	db	$00,$01
-packetSCSI_Read10Ctrl:
-	db	$00
-packetSCSI_Write10:
-	db	$00,$00,$02,$00,$0a,$2a,$00
-packetSCSI_Write10Lba:
-	db	$00,$00,$00,$00
-packetSCSI_Write10GroupNum:
-	db	$00
-packetSCSI_Write10Length:
-	db	$00,$01
-packetSCSI_Write10Ctrl:
-	db	$00
+scsi.inquiry            scsipkt         1,$00fc,  $12, $00,$00,$00,$fc,$00
+scsi.testunitready      scsipkt         0,$0000,  $00, $00,$00,$00,$00,$00
+scsi.modesense6         scsipkt         1,$00fc,  $1a, $00,$3f,$00,$fc,$00
+scsi.requestsense       scsipkt         1,$0012,  $03, $00,$00,$00,$12,$00
+scsi.readcapacity       scsipkt         1,$0008,  $25, $00,$00,$00,$00,$00,$00,$00,$00,$00
+scsi.read10             scsipktrw       1,$0200,  $28
+scsi.write10            scsipktrw       1,$0200,  $2a
 
 tmp tmp_data
