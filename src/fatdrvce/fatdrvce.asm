@@ -849,18 +849,8 @@ util_msd_bulk_transfer:
 
 ; iy -> msd structure
 util_msd_reset:
-	lea	hl,ymsdDevice.cbw.signature
-	ld	(hl),$55
-	inc	hl
-	ld	(hl),$53
-	inc	hl
-	ld	(hl),$42
-	inc	hl
-	ld	(hl),$43
-	xor	a,a
-	sbc	hl,hl
-	ld	(ymsdDevice.cbw.tag + 0),hl
-	ld	(ymsdDevice.cbw.tag + 3),a	; reset tag
+	ld	(ymsdDevice.tag + 0),hl
+	ld	(ymsdDevice.tag + 3),a	; reset tag
 	ld	a,(ymsdDevice.interface)
 	ld	(packetMSDReset + 4),a
 	ld	hl,packetMSDReset
@@ -874,13 +864,6 @@ util_msd_get_max_lun:
 	ld	hl,packetMSDMaxLUN
 	ld	de,(ymsdDevice.maxlun)
 	jq	util_msd_ctl_packet
-
-; inputs:
-;   a : lun
-;  iy : msd structure
-util_SetLunMsd:
-	ld	(ymsdDevice.cbw.lun),a
-	ret
 
 ; inputs:
 ;  iy : msd structure
