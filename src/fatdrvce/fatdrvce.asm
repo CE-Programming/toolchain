@@ -615,37 +615,28 @@ msd_WriteSectors:
 ;-------------------------------------------------------------------------------
 
 util_scsi_init:
-	push	iy
 	ld	hl,scsi.inquiry
 	call	util_scsi_request_default
-	pop	iy
-	compare_hl_zero
-	ret	nz
+	jr	nz,.error
 .unitattention:
-	push	iy
 	ld	hl,scsi.testunitready
 	call	util_scsi_request_default
-	pop	iy
-	compare_hl_zero
-	ret	nz
+	jr	nz,.error
 	and	a,$f
 	cp	a,6
 	jr	z,.unitattention
-	push	iy
 	ld	hl,scsi.readcapacity
 	lea	de,ymsdDevice.lba
-	call	util_scsi_request	; store the logical block address/size
-	pop	iy
-	compare_hl_zero
-	ret	nz
-	push	iy
+	call	util_scsi_request	; store the logical block address / size
+	jr	nz,.error
 	ld	hl,scsi.testunitready
 	call	util_scsi_request_default
-	pop	iy
-	compare_hl_zero
-	ret	nz
+	jr	nz,.error
 	or	a,a
 	sbc	hl,hl
+	ret
+.error:
+	ld	hl,USB_ERROR_FAILED
 	ret
 
 ; input:
@@ -658,15 +649,16 @@ util_scsi_init:
 util_scsi_request_default:
 	ld	de,(ymsdDevice.buffer)
 util_scsi_request:
+	ld	(util_msd_reset_recovery.errorsp),sp
 	ld	(tmp.msdstruct),iy
 	xor	a,a
 	ld	(tmp.sensecount),a
-.sense:
+	push	iy
 	push	ix
 	push	hl
 	pop	ix
 	ld	(util_msd_transport_data.ptr),de
-.resendCbw:
+.resendcbw:
 	push	ix
 	call	util_msd_transport_command
 	pop	ix
@@ -676,12 +668,9 @@ util_scsi_request:
 	push	ix
 	call	util_msd_transport_status
 	pop	ix
-	jr	nz,.resendCbw
+	jr	nz,.resendcbw
 	pop	ix
-	ret
-.abort:
-	pop	ix
-	pop	ix
+	pop	iy
 	ret
 
 ; input:
@@ -693,9 +682,11 @@ util_msd_reset_recovery:
 	call	util_msd_reset
 	compare_hl_zero
 	jr	z,.resetsuccess
-	pop	bc			; abort if cannot reset
-	pop	bc			; pop call and top level call
-	jq	util_scsi_request.abort
+	ld	sp,0
+.errorsp := $ - 3
+	xor	a,a
+	inc	a
+	ret
 .resetsuccess:
 	call	util_msd_clr_in_stall
 	jq	util_msd_clr_out_stall
@@ -793,8 +784,19 @@ util_msd_transport_status:
 	ret	nz
 	inc	(hl)
 	ld	de,tmp.sensebuffer
-	ld	hl,scsi.requestsense
-	call	util_scsi_request.sense
+	ld	ix,scsi.requestsense
+	ld	(util_msd_transport_data.ptr),de
+.senseresendcbw:
+	push	ix
+	call	util_msd_transport_command
+	pop	ix
+	push	ix
+	call	util_msd_transport_data
+	pop	ix
+	push	ix
+	call	util_msd_transport_status
+	pop	ix
+	jr	nz,.senseresendcbw
 	xor	a,a
 	ld	(tmp.sensebuffer),a
 	ld	a,(tmp.sensebuffer + 2)
