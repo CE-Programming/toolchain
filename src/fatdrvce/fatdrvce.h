@@ -99,14 +99,6 @@ typedef struct {
 usb_error_t msd_Init(msd_device_t *msd, usb_device_t dev, void *buffer);
 
 /**
- * Gets the block size from the device.
- * @param msd MSD device structure.
- * @param blockSize Pointer to store block size to.
- * @return USB_SUCCESS on success.
- */
-usb_error_t msd_GetBlockSize(msd_device_t *msd, uint24_t *blockSize);
-
-/**
  * Gets the sector count of the device.
  * @param msd MSD device structure.
  * @param blockSize Pointer to store block size to.

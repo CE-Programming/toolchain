@@ -14,7 +14,6 @@ include_library '../usbdrvce/usbdrvce.asm'
 ; v1 functions
 ;-------------------------------------------------------------------------------
 	export msd_Init
-	export msd_GetBlockSize
 	export msd_GetSectorCount
 	export msd_GetSectorSize
 	export msd_ReadSectors
@@ -60,6 +59,8 @@ end macro
 struct tmp_data
 	local size
 	label .: size
+	sensecount	rb 1
+	sensebuffer	rb 512	; todo: evaluate if needed
 	length		rl 1
 	descriptor	rb 18
 	size := $-.
@@ -203,7 +204,7 @@ DEFAULT_RETRIES := 50
 ;  sp + 6  : usb device to initialize as msd
 ;  sp + 9  : internal user-supplied buffer
 ; return:
-;  a = error status
+;  hl = error status
 msd_Init:
 	ld	iy,0
 	add	iy,sp
@@ -446,12 +447,13 @@ msd_Init:
 
 ;-------------------------------------------------------------------------------
 ; Gets the block size from the device.
+; The library assumes that sector size == msd block size.
 ; args:
 ;  sp + 3  : msd device structure
 ;  sp + 6  : pointer to store block size to
 ; return:
-;  a = error status
-msd_GetBlockSize:
+;  hl = error status
+msd_GetSectorSize:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 3)
@@ -476,22 +478,8 @@ msd_GetBlockSize:
 ;  sp + 3  : msd device structure
 ;  sp + 6  : pointer to store sector count to
 ; return:
-;  a = error status
+;  hl = error status
 msd_GetSectorCount:
-
-.error:
-	or	a,a
-	sbc	hl,hl
-	ret
-
-;-------------------------------------------------------------------------------
-; Gets the sector size of each sector on the device.
-; args:
-;  sp + 3  : msd device structure
-;  sp + 6  : pointer to store sector size to
-; return:
-;  a = error status
-msd_GetSectorSize:
 
 .error:
 	or	a,a
@@ -506,7 +494,7 @@ msd_GetSectorSize:
 ;  sp + 12 : number of sectors to read
 ;  sp + 15 : user buffer to read into
 ; return:
-;  a = error status
+;  hl = error status
 msd_ReadSectors:
 	ld	iy,0
 	add	iy,sp
@@ -561,7 +549,7 @@ msd_ReadSectors:
 ;  sp + 12 : number of sectors to write
 ;  sp + 15 : user buffer to write from
 ; return:
-;  a = error status
+;  hl = error status
 msd_WriteSectors:
 	ld	iy,0
 	add	iy,sp
@@ -658,7 +646,7 @@ util_scsi_request_default:
 	ld	de,(ymsdDevice.buffer)
 util_scsi_request:
 	xor	a,a
-	ld	(msdSenseCount),a
+	ld	(tmp.sensecount),a
 .sense:
 	ld	(util_get_out_ep.structure),iy
 	lea	bc,ymsdDevice.cbw
@@ -801,23 +789,17 @@ util_msd_transport_status:
 	inc	a
 	ret
 .senseerror:
-	ld	hl,msdSenseCount
+	ld	hl,tmp.sensecount
 	or	a,(hl)
 	ret	nz
 	inc	(hl)
-	ld	de,msdSenseData
+	ld	de,tmp.sensebuffer
 	ld	hl,packetSCSI_RequestSense
 	call	util_scsi_request.sense
 	xor	a,a
-	ld	(msdSenseData),a
-	ld	a,(msdSenseData + 2)
+	ld	(tmp.sensebuffer),a
+	ld	a,(tmp.sensebuffer + 2)
 	ret
-
-msdSenseCount:
-	db	0
-
-msdSenseData:
-	rb	512
 
 util_msd_status_xfer:
 	call	util_get_in_ep
@@ -840,7 +822,8 @@ util_get_in_ep:
 ;  ix : data buffer
 ;  de : endpoint
 util_msd_bulk_transfer:
-	ld	hl,0
+	or	a,a
+	sbc	hl,hl
 	push	hl
 	ld	l,DEFAULT_RETRIES
 	push	hl
@@ -854,12 +837,6 @@ util_msd_bulk_transfer:
 	pop	bc
 	pop	bc
 	ret
-
-msdLBAddr:
-	db	0,0,0,0
-	db	0		; technically part of block size, but meh
-msdBlockSize:
-	db	0,0,0
 
 ; iy -> msd structure
 util_msd_reset:
