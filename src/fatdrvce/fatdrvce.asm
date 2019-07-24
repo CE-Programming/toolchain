@@ -657,6 +657,9 @@ util_scsi_init:
 util_scsi_request_default:
 	ld	de,(ymsdDevice.buffer)
 util_scsi_request:
+	push	ix
+	push	hl
+	pop	ix
 	xor	a,a
 	ld	(tmp.sensecount),a
 .sense:
@@ -676,6 +679,7 @@ util_scsi_request:
 	pop	ix
 	jr	nz,.resendCbw
 .abort:
+	pop	ix
 	pop	ix
 	ret
 
