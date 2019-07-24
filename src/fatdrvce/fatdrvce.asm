@@ -38,11 +38,6 @@ end macro
 ;-------------------------------------------------------------------------------
 macro struct? name*, parameters&
  macro end?.struct?!
-     iterate base, ., .base
-      if defined base
-       assert base+sizeof base=$
-      end if
-     end iterate
    end namespace
   end struc
   iterate <base,prefix>, 0,, ix-name,x, iy-name,y
@@ -105,33 +100,23 @@ struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
 	wIndex		dw index
 	wLength		dw length
 end struct
-struct scsipkt, dir, length, data
-	local size
-	label .: size
-	iterate @, data
-		db $55,$53,$42,$43
-		dw 0
-		dw length
-		db dir shl 7, 0, %%, data
+struct scsipkt, dir: 0, length: 1, data: 0&
+.:	iterate @, data
+		dd 'USBC', 0, length
+		db (dir) shl 7, 0, %%, data
 		break
 	end iterate
-	size := $-.
 end struct
-struct scsipktrw, dir, type
-	local size
-	label .: size
-	iterate @, data
-		db $55,$53,$42,$43
-		dw 0
-		dw 512
-		db dir shl 7, 0, 10, type, 0
+struct scsipktrw, dir: 0, type: 0
+.:	iterate @, data
+		dd 'USBS', 0, 512
+		db (dir) shl 7, 0, 10, type, 0
 		break
 	end iterate
 	lba		dd 0
 	groupnum	db 0
 	len		dw 1
 	ctrl		db 0
-	size := $-.
 end struct
 
 struct descriptor
