@@ -105,19 +105,19 @@ struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
 	wIndex		dw index
 	wLength		dw length
 end struct
-struct scsipkt, dir, len, data
+struct scsipkt, dir, length, data
 	local size
 	label .: size
 	iterate @, data
 		db $55,$53,$42,$43
 		dw 0
-		dw len
+		dw length
 		db dir shl 7, 0, %%, data
 		break
 	end iterate
 	size := $-.
 end struct
-struct scsipktrw, dir, len, type
+struct scsipktrw, dir, type
 	local size
 	label .: size
 	iterate @, data
@@ -900,7 +900,7 @@ scsi.testunitready      scsipkt         0,$0000,  $00, $00,$00,$00,$00,$00
 scsi.modesense6         scsipkt         1,$00fc,  $1a, $00,$3f,$00,$fc,$00
 scsi.requestsense       scsipkt         1,$0012,  $03, $00,$00,$00,$12,$00
 scsi.readcapacity       scsipkt         1,$0008,  $25, $00,$00,$00,$00,$00,$00,$00,$00,$00
-scsi.read10             scsipktrw       1,$0200,  $28
-scsi.write10            scsipktrw       1,$0200,  $2a
+scsi.read10             scsipktrw       1,$28
+scsi.write10            scsipktrw       0,$2a
 
 tmp tmp_data
