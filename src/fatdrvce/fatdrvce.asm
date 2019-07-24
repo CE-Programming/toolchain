@@ -203,6 +203,7 @@ struct tmp_data
 	sensebuffer	rb 512	; todo: evaluate if needed
 	length		rl 1
 	descriptor	rb 18
+	msdstruct	rl 1
 	csw		packetCSW
 	size := $-.
 end struct
@@ -650,7 +651,7 @@ util_scsi_init:
 ; input:
 ;  hl : ptr to scsi command
 ;  de : ptr to storage (non-default)
-;  iy : ptr to msd structure (for default)
+;  iy : ptr to msd structure
 ; output;
 ;   z : success
 ;  nz : failure
@@ -663,11 +664,9 @@ util_scsi_request:
 	xor	a,a
 	ld	(tmp.sensecount),a
 .sense:
-	ld	(util_scsi_request.msdstruct),iy
+	ld	(tmp.msdstruct),iy
 	ld	(util_msd_transport_data.ptr),de
 .resendCbw:
-	ld	iy,0
-.msdstruct := $ - 3
 	push	ix
 	call	util_msd_transport_command
 	pop	ix
@@ -688,7 +687,7 @@ util_scsi_request:
 ; output:
 ;  hopefully recovers transfer state
 util_msd_reset_recovery:
-	ld	iy,(util_scsi_request.msdstruct)
+	ld	iy,(tmp.msdstruct)
 	call	util_msd_reset
 	compare_hl_zero
 	jr	z,.resetsuccess
@@ -713,12 +712,11 @@ util_msd_clr_stall:
 ;  hl : data to transfer
 ;  de : buffer to recieve into
 util_msd_transport_command:
-	ld	iy,(util_scsi_request.msdstruct)
+	call	util_get_out_ep
 	ld	hl,(ymsdDevice.tag)
 	ld	(xpacketCBW.tag),hl
 	inc	hl
 	ld	(ymsdDevice.tag),hl	; increment the tag
-	call	util_get_out_ep
 	ld	bc,sizeof packetCBW
 	call	util_msd_bulk_transfer
 	compare_hl_zero
@@ -807,11 +805,11 @@ util_msd_status_xfer:
 	jq	util_msd_bulk_transfer
 
 util_get_out_ep:
-	ld	iy,(util_scsi_request.msdstruct)
+	ld	iy,(tmp.msdstruct)
 	ld	de,(ymsdDevice.epout)
 	ret
 util_get_in_ep:
-	ld	iy,(util_scsi_request.msdstruct)
+	ld	iy,(tmp.msdstruct)
 	ld	de,(ymsdDevice.epin)
 	ret
 
