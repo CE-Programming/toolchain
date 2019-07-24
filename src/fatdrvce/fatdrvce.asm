@@ -836,6 +836,8 @@ util_msd_bulk_transfer:
 
 ; iy -> msd structure
 util_msd_reset:
+	xor	a,a
+	sbc	hl,hl
 	ld	(ymsdDevice.tag + 0),hl
 	ld	(ymsdDevice.tag + 3),a	; reset tag
 	ld	a,(ymsdDevice.interface)
