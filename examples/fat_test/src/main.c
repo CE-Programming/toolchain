@@ -75,7 +75,8 @@ void main(void) {
                 msd_inited = true;
                 break;
             } else {
-                os_PutStrFull("init msd fail");
+                sprintf(buffer, "init msd fail: %u", error);
+                os_PutStrFull(buffer);
                 _OS(asm_NewLine);
                 break;
             }

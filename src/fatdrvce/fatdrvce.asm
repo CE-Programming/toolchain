@@ -456,7 +456,11 @@ msd_Init:
 	call	util_msd_get_max_lun
 	compare_hl_zero
 	ret	nz
-	jq	util_scsi_init		; return success if init scsi
+	or	a,a
+	sbc	hl,hl
+	ret
+
+	;jq	util_scsi_init		; return success if init scsi
 
 ;-------------------------------------------------------------------------------
 ; Gets the block size from the device.
@@ -684,7 +688,7 @@ util_scsi_request:
 ; output:
 ;  hopefully recovers transfer state
 util_msd_reset_recovery:
-	ld	iy,(util_get_out_ep.structure)
+	ld	iy,(util_scsi_request.msdstruct)
 	call	util_msd_reset
 	compare_hl_zero
 	jr	z,.resetsuccess
