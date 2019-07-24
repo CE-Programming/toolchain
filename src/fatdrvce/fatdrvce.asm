@@ -726,9 +726,9 @@ util_msd_clr_stall:
 util_msd_transport_command:
 	ld	iy,(util_scsi_request.msdstruct)
 	ld	hl,(ymsdDevice.tag)
+	ld	(xpacketCBW.tag),hl
 	inc	hl
-	ld	(ymsdDevice.tag),hl
-	ld	(xpacketCBW.tag),hl	; increment the tag
+	ld	(ymsdDevice.tag),hl	; increment the tag
 	call	util_get_out_ep
 	ld	bc,sizeof packetCBW
 	call	util_msd_bulk_transfer
