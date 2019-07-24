@@ -456,11 +456,7 @@ msd_Init:
 	call	util_msd_get_max_lun
 	compare_hl_zero
 	ret	nz
-	or	a,a
-	sbc	hl,hl
-	ret
-
-	;jq	util_scsi_init		; return success if init scsi
+	jq	util_scsi_init		; return success if init scsi
 
 ;-------------------------------------------------------------------------------
 ; Gets the block size from the device.
