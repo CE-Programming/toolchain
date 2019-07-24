@@ -852,17 +852,17 @@ util_msd_reset:
 	ld	(ymsdDevice.tag + 0),hl
 	ld	(ymsdDevice.tag + 3),a	; reset tag
 	ld	a,(ymsdDevice.interface)
-	ld	(packetMSDReset + 4),a
-	ld	hl,packetMSDReset
+	ld	(setup.msdreset + 4),a
+	ld	hl,setup.msdreset
 	jq	util_msd_ctl_packet
 
 ; inputs:
 ;  iy : msd structure
 util_msd_get_max_lun:
 	ld	a,(ymsdDevice.interface)
-	ld	(packetMSDMaxLUN + 4),a
-	ld	hl,packetMSDMaxLUN
-	ld	de,(ymsdDevice.maxlun)
+	ld	(setup.msdmaxlun + 4),a
+	ld	hl,setup.msdmaxlun
+	lea	de,ymsdDevice.maxlun
 	jq	util_msd_ctl_packet
 
 ; inputs:
