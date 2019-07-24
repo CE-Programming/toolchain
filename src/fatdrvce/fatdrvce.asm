@@ -678,13 +678,18 @@ util_scsi_request:
 	ld	(util_scsi_request.msdstruct),iy
 	lea	bc,ymsdDevice.cbw
 	ld	(util_msd_transport_command.cbw_ptr),bc
-	push	ix
 .resendCbw:
 	ld	iy,0
 .msdstruct := $ - 3
+	push	ix
 	call	util_msd_transport_command
+	pop	ix
+	push	ix
 	call	util_msd_transport_data
+	pop	ix
+	push	ix
 	call	util_msd_transport_status
+	pop	ix
 	jr	nz,.resendCbw
 .abort:
 	pop	ix
