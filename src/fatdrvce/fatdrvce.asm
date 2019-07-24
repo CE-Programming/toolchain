@@ -677,6 +677,8 @@ util_scsi_request:
 	call	util_msd_transport_status
 	pop	ix
 	jr	nz,.resendCbw
+	pop	ix
+	ret
 .abort:
 	pop	ix
 	pop	ix
