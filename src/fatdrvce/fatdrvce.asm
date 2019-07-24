@@ -658,13 +658,13 @@ util_scsi_init:
 util_scsi_request_default:
 	ld	de,(ymsdDevice.buffer)
 util_scsi_request:
-	push	ix
-	push	hl
-	pop	ix
+	ld	(tmp.msdstruct),iy
 	xor	a,a
 	ld	(tmp.sensecount),a
 .sense:
-	ld	(tmp.msdstruct),iy
+	push	ix
+	push	hl
+	pop	ix
 	ld	(util_msd_transport_data.ptr),de
 .resendCbw:
 	push	ix
