@@ -24,12 +24,12 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
     switch (event) {
         case USB_DEVICE_DISCONNECTED_EVENT:
             callback_data->device = NULL;
-            os_PutStrFull("USB_DEVICE_DISCONNECTED_EVENT");
+            os_PutStrFull("usb device disconnected");
             _OS(asm_NewLine);
             break;
         case USB_DEVICE_ENABLED_EVENT:
             callback_data->device = event_data;
-            os_PutStrFull("USB_DEVICE_ENABLED_EVENT");
+            os_PutStrFull("usb device enabled");
             _OS(asm_NewLine);
             break;
         default:
@@ -91,10 +91,10 @@ void main(void) {
         return;
     }
 
-    // print the block size
-    error = msd_GetSectorSize(&msd, &sectorsize);
+    // print the sector size
     if( error == USB_SUCCESS )
     {
+        error = msd_GetSectorSize(&msd, &sectorsize);
         sprintf(buffer, "sectorsize: %u", sectorsize);
         os_PutStrFull(buffer);
         _OS(asm_NewLine);

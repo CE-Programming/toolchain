@@ -476,7 +476,13 @@ msd_GetSectorSize:
 	ld	hl,(iy + 6)
 	compare_hl_zero
 	jr	z,.error
+	push	hl
 	ld	iy,(iy + 3)
+	ld	hl,scsi.readcapacity
+	lea	de,ymsdDevice.lba
+	call	util_scsi_request	; store the logical block address / size
+	pop	hl
+	jr	nz,.error
 	ld	de,(ymsdDevice.blocksize)
 	ld	(hl),de
 	or	a,a
@@ -494,10 +500,31 @@ msd_GetSectorSize:
 ; return:
 ;  hl = error status
 msd_GetSectorCount:
-
-.error:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 3)
+	compare_hl_zero
+	jr	z,.error
+	ld	hl,(iy + 6)
+	compare_hl_zero
+	jr	z,.error
+	push	iy
+	ld	iy,(iy + 3)
+	ld	hl,scsi.readcapacity
+	lea	de,ymsdDevice.lba
+	push	de
+	call	util_scsi_request	; store the logical block address / size
+	pop	hl
+	pop	iy
+	jr	nz,.error
+	ld	de,(iy + 6)
+	ld	bc,4
+	ldir
 	or	a,a
 	sbc	hl,hl
+	ret
+.error:
+	ld	hl,USB_ERROR_FAILED
 	ret
 
 ;-------------------------------------------------------------------------------
