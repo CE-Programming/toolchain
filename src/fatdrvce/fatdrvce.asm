@@ -676,8 +676,7 @@ util_scsi_request:
 	ld	(tmp.sensecount),a
 .sense:
 	ld	(util_scsi_request.msdstruct),iy
-	lea	bc,ymsdDevice.cbw
-	ld	(util_msd_transport_command.cbw_ptr),bc
+	ld	(util_msd_transport_data.ptr),de
 .resendCbw:
 	ld	iy,0
 .msdstruct := $ - 3
@@ -746,6 +745,8 @@ util_msd_transport_data:
 	adc	hl,bc
 	ret	z			; no transfer if 0 length
 	ld	a,(xpacketCBW.dir)	; check direction
+	ld	ix,0
+.ptr := $ - 3
 	or	a,a
 	jr	z,.data_out
 .data_in:
