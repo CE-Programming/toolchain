@@ -881,7 +881,7 @@ util_msd_ctl_packet:
 ; library data
 ;-------------------------------------------------------------------------------
 
-setup.msdreset          setuppkt        $15,$ff,0,0,0
+setup.msdreset          setuppkt        $21,$ff,0,0,0
 setup.msdmaxlun         setuppkt        $a1,$fe,0,0,1
 
 scsi.inquiry            scsipkt         1,$00fc,  $12, $00,$00,$00,$fc,$00
