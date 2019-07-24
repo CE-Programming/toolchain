@@ -92,9 +92,9 @@ void main(void) {
     }
 
     // print the sector size
+    error = msd_GetSectorSize(&msd, &sectorsize);
     if( error == USB_SUCCESS )
     {
-        error = msd_GetSectorSize(&msd, &sectorsize);
         sprintf(buffer, "sectorsize: %u", sectorsize);
         os_PutStrFull(buffer);
         _OS(asm_NewLine);
