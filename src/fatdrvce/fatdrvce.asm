@@ -846,6 +846,52 @@ util_get_in_ep:
 	ld	de,(ymsdDevice.epin)
 	ret
 
+util_disp_iy:
+	push	hl
+	push	iy
+	pop	hl
+	call	util_disp_hl
+	pop	hl
+	ret
+util_disp_ix:
+	push	hl
+	push	ix
+	pop	hl
+	call	util_disp_hl
+	pop	hl
+	ret
+util_disp_bc:
+	push	hl
+	push	bc
+	pop	hl
+	call	util_disp_hl
+	pop	hl
+	ret
+util_disp_de:
+	push	hl
+	push	de
+	pop	hl
+	call	util_disp_hl
+	pop	hl
+	ret
+util_disp_hl:
+	push	iy
+	push	ix
+	push	hl
+	push	de
+	push	bc
+	push	af
+	ld	iy,flags
+	call	_DispHL
+	call	_NewLine
+	pop	af
+	pop	bc
+	pop	de
+	pop	hl
+	pop	ix
+	pop	iy
+	ret
+
 ; inputs:
 ;  bc : packet len
 ;  ix : data buffer
@@ -857,14 +903,13 @@ util_msd_bulk_transfer:
 	ld	l,DEFAULT_RETRIES
 	push	hl
 	push	bc
+	call	util_disp_bc
 	push	ix			; packet to send
+	call	util_disp_ix
 	push	de
+	call	util_disp_de
 	call	usb_Transfer
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
+	pop	bc, bc, bc, bc, bc
 	ret
 
 ; iy -> msd structure
