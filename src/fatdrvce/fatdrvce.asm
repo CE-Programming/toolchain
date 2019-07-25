@@ -676,12 +676,12 @@ util_scsi_init:
 util_scsi_request_default:
 	ld	de,(ymsdDevice.buffer)
 util_scsi_request:
-	ld	(util_msd_reset_recovery.errorsp),sp
 	ld	(tmp.msdstruct),iy
 	xor	a,a
 	ld	(tmp.sensecount),a
 	push	iy
 	push	ix
+	ld	(util_msd_reset_recovery.errorsp),sp
 	push	hl
 	pop	ix
 	ld	(util_msd_transport_data.ptr),de
@@ -713,6 +713,8 @@ util_msd_reset_recovery:
 .errorsp := $ - 3
 	xor	a,a
 	inc	a
+	pop	ix
+	pop	iy
 	ret
 .resetsuccess:
 	call	util_msd_clr_in_stall
