@@ -1091,7 +1091,7 @@ void gfx_ScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_
  * @warning This routine only accepts square input sprites
  * @param sprite Input sprite to rotate/scale
  * @param x X coordinate position
- * @param x Y coordinate position
+ * @param y Y coordinate position
  * @param angle 256 position angular integer
  * @param scale Scaling factor; range is about 1% to 400% scale
  * @returns The size of the sprite after scaling. This can be used for centering purposes.
@@ -1103,7 +1103,7 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t
  *
  * @param sprite Input sprite to rotate/scale
  * @param x X coordinate position
- * @param x Y coordinate position
+ * @param y Y coordinate position
  * @param angle 256 position angular integer
  * @see gfx_RotatedScaledTransparentSprite_NoClip
  */
@@ -1116,7 +1116,7 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t
  * @warning This routine only accepts square input sprites
  * @param sprite Input sprite to rotate/scale
  * @param x X coordinate position
- * @param x Y coordinate position
+ * @param y Y coordinate position
  * @param angle 256 position angular integer
  * @param scale Scaling factor; range is about 1% to 400% scale
  * @returns The size of the sprite after scaling. This can be used for centering purposes.
@@ -1128,7 +1128,7 @@ uint8_t gfx_RotatedScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t
  *
  * @param sprite Input sprite to rotate/scale
  * @param x X coordinate position
- * @param x Y coordinate position
+ * @param y Y coordinate position
  * @param angle 256 position angular integer
  * @see gfx_RotatedScaledTransparentSprite_NoClip
  */
