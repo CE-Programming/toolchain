@@ -438,7 +438,8 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_Str6     ("\xAA\x5\0")
 #define ti_Str7     ("\xAA\x6\0")
 #define ti_Str8     ("\xAA\x7\0")
-#define ti_Str0     ("\xAA\x8\0")
+#define ti_Str9     ("\xAA\x8\0")
+#define ti_Str0     ("\xAA\x9\0")
 #define ti_StrT     ('\xAA')
 
 /* Some equation definitions */
