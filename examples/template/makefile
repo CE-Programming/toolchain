@@ -11,5 +11,18 @@ ICON        ?= iconc.png
 DESCRIPTION ?= "C SDK Demo"
 
 # ----------------------------
+# Other Options (Advanced)
+# ----------------------------
+
+#EXTRA_CFLAGS        ?=
+#USE_FLASH_FUNCTIONS ?= YES|NO
+#OUTPUT_MAP          ?= YES|NO
+#ARCHIVED            ?= YES|NO
+#OPT_MODE            ?= -optsize|-optspeed
+#SRCDIR              ?= src
+#OBJDIR              ?= obj
+#BINDIR              ?= bin
+#GFXDIR              ?= src/gfx
+#V                   ?= 1
 
 include $(CEDEV)/include/.makefile
