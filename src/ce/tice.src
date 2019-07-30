@@ -103,6 +103,13 @@
 	.def _os_FontDrawTransText
 	.def _os_CreateAppVar
 	.def _os_TestFlagBitsFast
+	.def _os_MSDGetMaxLUN
+	.def _os_MSDReset
+	.def _os_MSDInquiry
+	.def _os_MSDTestUnitReady
+	.def _os_MSDReadCapacity
+	.def _os_MSDRead
+	.def _os_MSDWrite
 
 	.def _asm_MoveDown
 	.def _asm_MoveUp
@@ -223,7 +230,14 @@ _os_FloatToReal                 equ 022170h
 _os_RealToFloat                 equ 022174h
 _os_FontDrawTransText           equ 022178h
 _os_CreateAppVar                equ 022184h
-_os_TestFlagBitsFast		equ 0222FCh
+_os_TestFlagBitsFast            equ 0222FCh
+_os_MSDGetMaxLUN                equ 022280h
+_os_MSDReset                    equ 022284h
+_os_MSDInquiry                  equ 022288h
+_os_MSDTestUnitReady            equ 02228Ch
+_os_MSDReadCapacity             equ 022290h
+_os_MSDRead                     equ 022294h
+_os_MSDWrite                    equ 022298h
 
 ; ---
 ; directly callable asm functions
