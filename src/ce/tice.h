@@ -869,9 +869,10 @@ void os_MSDReset(uint8_t value);
 /**
  * Performs an MSD inquiry, either through the USB port or with an ARM coprocessor.
  * @param lun Logical unit number.
- * @param status Returns the status of the command.
+ * @param inquiry Buffer where the response is stored.
+ * @return Error code, 0 for success, 5 for failed command, -5 for failed transfer.
  */
-void os_MSDInquiry(uint8_t lun, uint8_t *status);
+int8_t os_MSDInquiry(uint8_t lun, uint8_t *inquiry);
 
 /**
  * Performs an MSD test unit ready command, either through the USB port or with an ARM coprocessor.
@@ -909,6 +910,12 @@ int8_t os_MSDRead(uint8_t lun, uint8_t blockCount, uint32_t lba, uint24_t blockS
  * @return Error code, 0 for success, 5 for failed command, -5 for failed transfer.
  */
 int8_t os_MSDWrite(uint8_t lun, uint8_t blockCount, uint32_t lba, uint24_t blockSize, void *buffer);
+
+/**
+ * Gets some status after a control request.
+ * @return Some status in the range [0, 3].
+ */
+int8_t os_USBGetRequestStatus(void);
 
 /**
  * Runs the calulator at 6 MHz
