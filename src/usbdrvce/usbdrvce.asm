@@ -762,7 +762,7 @@ iterate value, DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCR
 	inc	l
  end if
 end iterate
-	ld	iy,(ix+6)
+	ld	ydevice,(ix+6)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	call	usb_ControlTransfer
@@ -990,11 +990,11 @@ usb_ClearEndpointHalt:
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
 	ld	yendpoint,(ix+6)
-	call	usb_GetEndpointAddress
+	call	usb_GetEndpointAddress.enter
 	ld	de,0
 	push	hl,de
 	ld	e,DEFAULT_RETRIES
-	push	de,de,hl
+	push	de,hl,hl
 assert ~ENDPOINT_HALT
 iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_FEATURE, d, d, a, d, d, d
 	ld	(hl),value
@@ -1002,6 +1002,7 @@ iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_F
 	inc	l
  end if
 end iterate
+	xor	a,a
 	ld	ydevice,(yendpoint.device)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
