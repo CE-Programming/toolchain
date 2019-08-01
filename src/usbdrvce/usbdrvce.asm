@@ -1168,9 +1168,9 @@ label .dispatch at $-long
 	sbc	hl,de
 	jq	nz,.return
 	ld	l,(ix-12)
-	ld	a,l
-	dec	a
+	dec	l
 	jq	z,.wait
+	inc	l
 .return:
 	ld	sp,ix
 	pop	ix
@@ -2029,6 +2029,7 @@ assert endpoint.device and 1
 ;  de = ? and $FFFF
 ;  hl = ? and $FFFF
 ;  ix = ?
+;  iy = device
 _ParseInterfaceDescriptors:
 	inc	b
 .dec:
