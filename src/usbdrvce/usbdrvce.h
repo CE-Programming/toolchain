@@ -135,6 +135,9 @@ typedef enum usb_transfer_status {
   USB_TRANSFER_HOST_ERROR,   /**< The results of the transaction were         */
                              /**  missed due to host hold-off. @note This     */
                              /**  probably indicates a bug in this library.   */
+  USB_TRANSFER_UNKNOWN_ERROR,
+  USB_TRANSFER_FLUSH,        /**< Transfer cancelled because of a             */
+                             /**  user-initiated endpoint flush.              */
 } usb_transfer_status_t;
 
 typedef enum usb_find_flag {
@@ -749,8 +752,9 @@ usb_error_t usb_SetInterface(usb_device_t device,
                              size_t length);
 
 /**
- * Clears an endpoint's halt condition, indicated by transfers to that endpoint
- * stalling.  This function blocks until the halt condition is cleared.
+ * Flush \p endpoint then clears any halt condition.  A halt condition is
+ * indicated by transfers to that endpoint stalling.  This function blocks until
+ * the halt condition is cleared.
  * @param endpoint The endpoint to clear the halt condition of.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
