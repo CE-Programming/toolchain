@@ -752,9 +752,9 @@ usb_error_t usb_SetInterface(usb_device_t device,
                              size_t length);
 
 /**
- * Flush \p endpoint then clears any halt condition.  A halt condition is
- * indicated by transfers to that endpoint stalling.  This function blocks until
- * the halt condition is cleared.
+ * Clears halt condition on \p endpoint, and flushes any pending transfers if
+ * that succeeds.  A halt condition is indicated by transfers to that endpoint
+ * stalling.  This function blocks until the halt condition is cleared.
  * @param endpoint The endpoint to clear the halt condition of.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */

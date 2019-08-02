@@ -1001,9 +1001,6 @@ end iterate
 ;-------------------------------------------------------------------------------
 usb_ClearEndpointHalt:
 	call	_Error.check
-	ld	bc,USB_TRANSFER_FLUSH
-	call	_FlushEndpoint
-	jq	nc,usb_Transfer.return
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
 	ld	yendpoint,(ix+6)
@@ -1029,14 +1026,13 @@ end iterate
 	ld	hl,(ix-6)
 	call	_Free32Align32
 	ex	de,hl
-	ld	sp,ix
-	pop	ix
 	add	hl,de
 	or	a,a
 	sbc	hl,de
-	ret	nz
+	jq	nz,usb_Transfer.return
 	res	bsr yendpoint.overlay.remaining.dt,(yendpoint.overlay.remaining)
-	ret
+	ld	bc,USB_TRANSFER_FLUSH
+	jq	_FlushEndpoint
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
@@ -2288,34 +2284,34 @@ assert USB_ERROR_NOT_SUPPORTED
 ;  bc = status
 ;  (ix+6) = endpoint
 ; Output:
-;  cf = success
-;  de = ?
-;  hl = ? | error
-;  iy = ?
+;  Returns usb_error_t from innermost parent C routine.
 _FlushEndpoint:
 	push	ix
 	ld	xendpoint,(ix+6)
 	ld	ytransfer,(xendpoint.first)
+	or	a,a
+	sbc	hl,hl
 	jq	.enter
 .loop:
 	push	bc
 	call	_DispatchTransferCallback.enter
 	pop	bc
 	call	_FreeFirstTransfer
+	ex	de,hl
+	add	hl,de
 	or	a,a
-	sbc	hl,hl
-	adc	hl,de
+	sbc	hl,de
 	jq	nz,.fail
 .enter:
 	ld	a,(ytransfer.next)
 	rrca ; dummy
 	jq	nc,.loop
 	ld	(xendpoint.overlay.next),ytransfer
-	ld	(xendpoint.overlay.altNext),1
+	ld	(xendpoint.overlay.altNext),ytransfer
 	ld	(xendpoint.overlay.status),0
 .fail:
 	pop	ix
-	ret
+	jq	usb_Transfer.return
 
 ; Input:
 ;  bc = status
