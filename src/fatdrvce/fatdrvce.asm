@@ -853,6 +853,7 @@ util_get_in_ep:
 ;  ix : data buffer
 ;  de : endpoint
 util_msd_bulk_transfer:
+	push	iy
 	or	a,a
 	sbc	hl,hl
 	push	hl
@@ -863,6 +864,7 @@ util_msd_bulk_transfer:
 	push	de
 	call	usb_Transfer
 	pop	bc, bc, bc, bc, bc
+	pop	iy
 	ret
 
 ; iy -> msd structure
