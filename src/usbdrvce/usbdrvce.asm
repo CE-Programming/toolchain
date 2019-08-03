@@ -43,6 +43,7 @@ library 'USBDRVCE', 0
 	export usb_GetEndpointMaxPacketSize
 	export usb_SetEndpointFlags
 	export usb_GetEndpointFlags
+	export usb_GetRole
 	export usb_GetFrameNumber
 	export usb_ControlTransfer
 	export usb_Transfer
@@ -1129,6 +1130,14 @@ usb_GetEndpointFlags:
 	ex	(sp),yendpoint
 	ld	a,(yendpoint.flags)
 	jp	(hl)
+
+;-------------------------------------------------------------------------------
+usb_GetRole:
+	or	a,a
+	sbc	hl,hl
+	ld	a,(currentRole)
+	ld	l,a
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetFrameNumber:

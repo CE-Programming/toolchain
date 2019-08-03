@@ -825,6 +825,12 @@ void usb_SetEndpointFlags(usb_endpoint_t endpoint, usb_endpoint_flag_t flags);
 usb_endpoint_flag_t usb_GetEndpointFlags(usb_endpoint_t endpoint);
 
 /**
+ * Returns the current role the usb hardware is operating in.
+ * @return The \c usb_role_t of the current role.
+ */
+usb_role_t usb_GetRole(void);
+
+/**
  * Returns the current 11-bit frame number, as last broadcast by the current
  * host, multiplied by 8.  This value ranges from 0x0000 to 0x3FF8, increases by
  * 8 every 1 ms, is truncated to 14 bits, and is synchronized with the host usb
