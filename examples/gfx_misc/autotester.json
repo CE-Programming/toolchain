@@ -23,13 +23,13 @@
       "description": "Testing that two rectangles are drawn to the visible screen",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "5BEF2A9D" ]
+      "expected_CRCs": [ "F15C0070" ]
     },
     "2": {
-      "description": "Testing that there are now four rectangles displayed on the screen",
+      "description": "Testing that there are now four rectangles displayed on the screen, and modified text in the corner",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "6A171265" ]
+      "expected_CRCs": [ "A9AFBF51" ]
     },
     "3": {
       "description": "Back to the home screen (exit check)",

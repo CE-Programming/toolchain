@@ -1,8 +1,11 @@
 #include <tice.h>
 #include <graphx.h>
+#include <stdint.h>
 
 /* Main function */
 void main(void) {
+
+    static const uint8_t char_data[8] = { 0xaa, 0x55, 0xff, 0x00, 0xaa, 0x55, 0xff, 0x00 };
 
     /* Start the graphics canvas */
     gfx_Begin();
@@ -28,6 +31,10 @@ void main(void) {
 
     /* Copy the drawn rectangles on the visible screen to the buffer */
     gfx_CopyRectangle(gfx_screen, gfx_buffer, 30, 20, 30, 110, 90, 50);
+
+    /* Attempt to change a character */
+    gfx_SetCharData('a', char_data);
+    gfx_PrintStringXY("aaa", 0, 0);
 
     /* Wait for key input */
     while (!os_GetCSC());

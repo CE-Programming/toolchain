@@ -3576,6 +3576,7 @@ gfx_SetCharData:
 	add	hl,de
 	or	a,a
 	sbc	hl,de			; sets z flag if null
+	ret	z
 	ex	de,hl
 	or	a,a
 	sbc	hl,hl
@@ -3585,7 +3586,7 @@ gfx_SetCharData:
 	add	hl,hl
 	ld	bc,(_TextData)
 	add	hl,bc
-	ret	z
+	ex	de,hl
 	ld	bc,8
 	ldir
 	ret
