@@ -371,6 +371,17 @@ uint8_t ti_StoVar(const ti_var_t var_type_to, void *to, const ti_var_t var_type_
  */
 uint8_t ti_RclVar(const uint8_t var_type, const char *var_name, void **data_struct);
 
+
+/**
+ * Checks to see if there is room in the archive for storing \p num_bytes,
+ * without needing to execute a Garbage Collect.
+ *
+ * @param num_bytes Number of bytes to be stored to the archive.
+ * @returns true if the bytes can be stored to the archive without a
+            Garbage Collect.
+ */
+bool ti_ArchiveHasRoom(uint24_t num_bytes);
+
 /**
  * Allocates space for a real variable
  * @returns Pointer to variable

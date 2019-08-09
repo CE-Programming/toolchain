@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'FILEIOC', 4
+library 'FILEIOC', 5
 
 ;-------------------------------------------------------------------------------
 ; no dependencies
@@ -54,6 +54,10 @@ library 'FILEIOC', 4
 	export ti_GetName
 	export ti_Rename
 	export ti_RenameVar
+;-------------------------------------------------------------------------------
+; v5 functions
+;-------------------------------------------------------------------------------
+	export ti_ArchiveHasRoom
 
 ;-------------------------------------------------------------------------------
 vat_ptr0 := $d0244e
@@ -1369,6 +1373,24 @@ ti_RclVar:
 	jp	nz, util_ret_neg_one_byte
 	ld	hl, (iy + 9)
 	ld	(hl), de
+	ret
+
+;-------------------------------------------------------------------------------
+ti_ArchiveHasRoom:
+; checks if there is room in the archive before a garbage collect
+; args:
+;  sp + 3 : number of bytes to store into the archive
+; return:
+;  true if there is room, false if not
+	pop	de
+	ex	(sp),hl
+	push	de
+	ld	bc,12
+	add	hl,bc
+	call	_FindFreeArcSpot
+	ld	a,1
+	ret	nz
+	dec	a
 	ret
 
 ;-------------------------------------------------------------------------------
