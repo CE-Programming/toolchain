@@ -6,7 +6,7 @@
  * have partitions formated as FAT32. (FAT16 support is implemented yet untested).
  * It currently only supports drives that have a sector size of 512, which is pretty
  * much every flash drive on the market, except for huge ones.
- * The drive must use MBR partitioning, GUID is not supported yet.
+ * The drive must use MBR partitioning, GUID is not supported.
  *
  * @author Steven "s@rdw.se" Arnow
  * @author Matt "MateoConLechuga" Waltz
@@ -95,7 +95,9 @@ typedef struct {
  * @param buffer The buffer's address. (must be at least 512 bytes).
  * @return USB_SUCCESS on success, otherwise error if initialization failed.
  */
-usb_error_t msd_Init(msd_device_t *msd, usb_device_t dev, void *buffer);
+usb_error_t msd_Init(msd_device_t *msd,
+                     usb_device_t dev,
+                     void *buffer);
 
 /**
  * Gets the sector count of the device.
@@ -103,7 +105,8 @@ usb_error_t msd_Init(msd_device_t *msd, usb_device_t dev, void *buffer);
  * @param blockSize Pointer to store block size to.
  * @return USB_SUCCESS on success.
  */
-usb_error_t msd_GetSectorCount(msd_device_t *msd, uint32_t *sectorCount);
+usb_error_t msd_GetSectorCount(msd_device_t *msd,
+                               uint32_t *sectorCount);
 
 /**
  * Gets the sector size of each sector on the device.
@@ -111,28 +114,30 @@ usb_error_t msd_GetSectorCount(msd_device_t *msd, uint32_t *sectorCount);
  * @param blockSize Pointer to store block size to.
  * @return USB_SUCCESS on success.
  */
-usb_error_t msd_GetSectorSize(msd_device_t *msd, uint24_t *sectorSize);
+usb_error_t msd_GetSectorSize(msd_device_t *msd,
+                              uint24_t *sectorSize);
 
 /**
- * Reads sectors from a Mass Storage Device.
+ * Reads a single sector from a Mass Storage Device.
  * @param msd MSD device structure.
  * @param lba Logical Block Address (LBA) of starting sector to read.
  * @param sectors Number of sectors to read.
  * @param buffer Buffer to read into. Should be at least a sector size.
  * @return USB_SUCCESS on success.
  */
-usb_error_t msd_ReadSectors(msd_device_t *msd, uint32_t lba, uint24_t sectors,
-                            void *data);
+usb_error_t msd_ReadSector(msd_device_t *msd,
+                           uint32_t lba,
+                           void *data);
 
 /**
- * Writes sectors to a Mass Storage Device.
+ * Writes a single sector of a Mass Storage Device.
  * @param msd MSD device structure.
  * @param lba Logical Block Address (LBA) of sector to write.
- * @param sectors Number of sectors to write.
  * @param buffer Buffer to write to MSD. Should be at least one sector size.
  * @return USB_SUCCESS on success.
  */
-usb_error_t msd_WriteSectors(msd_device_t *msd, uint32_t lba, uint24_t sectors,
+usb_error_t msd_WriteSectors(msd_device_t *msd,
+                             uint32_t lba,
                              const void *data);
 
 #ifdef __cplusplus

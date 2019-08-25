@@ -17,6 +17,7 @@ struct global {
 };
 
 static uint8_t msd_buffer[512];
+static uint8_t read_buffer[512];
 
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                                   usb_callback_data_t *callback_data) {
@@ -98,6 +99,11 @@ void main(void) {
         sprintf(buffer, "sectorsize: %u", sectorsize);
         os_PutStrFull(buffer);
         _OS(asm_NewLine);
+    }
+
+    error = msd_ReadSector(&msd, 0, read_buffer);
+    if( error == USB_SUCCESS )
+    {
     }
 
     // cleanup and return

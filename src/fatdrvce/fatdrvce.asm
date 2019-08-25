@@ -16,8 +16,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export msd_Init
 	export msd_GetSectorCount
 	export msd_GetSectorSize
-	export msd_ReadSectors
-	export msd_WriteSectors
+	export msd_ReadSector
+	export msd_WriteSector
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -109,13 +109,13 @@ struct scsipkt, dir: 0, length: 1, data: 0&
 end struct
 struct scsipktrw, dir: 0, type: 0
 .:	iterate @, data
-		dd 'USBS', 0, 512
+		dd 'USBC', 0, 512
 		db (dir) shl 7, 0, 10, type, 0
 		break
 	end iterate
 	lba		dd 0
 	groupnum	db 0
-	len		dw 1
+	len		dw 2
 	ctrl		db 0
 end struct
 
@@ -528,20 +528,16 @@ msd_GetSectorCount:
 	ret
 
 ;-------------------------------------------------------------------------------
-; Reads sectors from a Mass Storage Device.
+; Reads a sector from a Mass Storage Device.
 ; args:
 ;  sp + 3  : msd device structure
-;  sp + 6  : lba of starting sector to read
-;  sp + 12 : number of sectors to read
-;  sp + 15 : user buffer to read into
+;  sp + 6  : lba of sector to read
+;  sp + 12 : user buffer to read into
 ; return:
 ;  hl = error status
-msd_ReadSectors:
+msd_ReadSector:
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy + 12)
-	jq	.start
-.loop:
 	lea	hl,iy + 6
 	ld	de,scsi.read10.lba + 3
 	ld	a,(hl)
@@ -564,39 +560,27 @@ msd_ReadSectors:
 	inc	hl
 	ld	(iy + 7),hl
 .nocarry:
-	ld	de,(iy + 15)
-	push	iy
+	ld	de,(iy + 12)
 	ld	iy,(iy + 3)
 	ld	hl,scsi.read10
 	call	util_scsi_request
-	pop	iy
-	compare_hl_zero
+	ld	hl,USB_ERROR_FAILED
 	ret	nz
-	ld	hl,(iy + 12)
-	dec	hl
-.start:
-	ld	(iy + 12),hl
-	compare_hl_zero
-	jr	nz,.loop
 	or	a,a
-	sbc	hl,hl		; return success
+	sbc	hl,hl			; return success
 	ret
 
 ;-------------------------------------------------------------------------------
-; Writes sectors to a Mass Storage Device.
+; Writes a sector to a Mass Storage Device.
 ; args:
 ;  sp + 3  : msd device structure
-;  sp + 6  : lba of starting sector to write
-;  sp + 12 : number of sectors to write
-;  sp + 15 : user buffer to write from
+;  sp + 6  : lba of sector to write
+;  sp + 12 : user buffer to write from
 ; return:
 ;  hl = error status
-msd_WriteSectors:
+msd_WriteSector:
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy + 12)
-	jq	.start
-.loop:
 	lea	hl,iy + 6
 	ld	de,scsi.write10.lba + 3
 	ld	a,(hl)
@@ -619,22 +603,14 @@ msd_WriteSectors:
 	inc	hl
 	ld	(iy + 7),hl
 .nocarry:
-	ld	de,(iy + 15)
-	push	iy
+	ld	de,(iy + 12)
 	ld	iy,(iy + 3)
 	ld	hl,scsi.write10
 	call	util_scsi_request
-	pop	iy
-	compare_hl_zero
+	ld	hl,USB_ERROR_FAILED
 	ret	nz
-	ld	hl,(iy + 12)
-	dec	hl
-.start:
-	ld	(iy + 12),hl
-	compare_hl_zero
-	jr	nz,.loop
 	or	a,a
-	sbc	hl,hl		; return success
+	sbc	hl,hl			; return success
 	ret
 
 ;-------------------------------------------------------------------------------
