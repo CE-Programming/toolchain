@@ -696,16 +696,17 @@ util_msd_reset_recovery:
 	call	util_msd_clr_in_stall
 	jq	util_msd_clr_out_stall
 util_msd_clr_out_stall:
+	ld	iy,(tmp.msdstruct)
 	ld	bc,(ymsdDevice.epout)
-	jr	util_msd_clr_stall
+	jq	util_msd_clr_stall
 util_msd_clr_in_stall:
+	ld	iy,(tmp.msdstruct)
 	ld	bc,(ymsdDevice.epin)
 util_msd_clr_stall:
-	push	iy
 	push	bc
 	call	usb_ClearEndpointHalt
 	pop	bc
-	pop	iy
+	ld	iy,(tmp.msdstruct)
 	ret
 
 ; inputs:
