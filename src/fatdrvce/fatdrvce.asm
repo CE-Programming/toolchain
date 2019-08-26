@@ -115,7 +115,7 @@ struct scsipktrw, dir: 0, type: 0
 	end iterate
 	lba		dd 0
 	groupnum	db 0
-	len		dw 2
+	len		db 0,1
 	ctrl		db 0
 end struct
 
