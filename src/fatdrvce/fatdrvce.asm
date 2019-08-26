@@ -1,7 +1,25 @@
 ;-------------------------------------------------------------------------------
+; fatdrvce: Provides MSD and FAT API functions for the TI84+CE calculators.
+; Copyright (C) 2019 MateoConLechuga, jacobly0
+;
+; This program is free software: you can redistribute it and/or modify
+; it under the terms of the GNU Lesser General Public License as published by
+; the Free Software Foundation, either version 3 of the License, or
+; (at your option) any later version.
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU Lesser General Public License for more details.
+;
+; You should have received a copy of the GNU Lesser General Public License
+; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
+; Includes
+;-------------------------------------------------------------------------------
 include '../include/library.inc'
 include '../include/include_library.inc'
-;-------------------------------------------------------------------------------
 
 library 'FATDRVCE',1
 
@@ -18,6 +36,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export msd_GetSectorSize
 	export msd_ReadSector
 	export msd_WriteSector
+	export fat_Find
+	export fat_Init
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -115,7 +135,7 @@ struct scsipktrw, dir: 0, type: 0
 	end iterate
 	lba		dd 0
 	groupnum	db 0
-	len		db 0,1
+	len		dw 1 bswap 2
 	ctrl		db 0
 end struct
 
@@ -201,6 +221,7 @@ struct tmp_data
 	label .: size
 	sensecount	rb 1
 	sensebuffer	rb 512	; todo: evaluate if needed
+	sectorbuffer	rb 512	; todo: evaluate if user-supplied
 	length		rl 1
 	descriptor	rb 18
 	msdstruct	rl 1
@@ -886,6 +907,8 @@ util_msd_ctl_packet:
 	pop	bc
 	pop	iy
 	ret
+
+include 'fat.asm'
 
 ;-------------------------------------------------------------------------------
 ; library data

@@ -12,12 +12,15 @@ typedef struct global global_t;
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_PARTITIONS 10
+
 struct global {
     usb_device_t device;
 };
 
 static uint8_t msd_buffer[512];
 static uint8_t read_buffer[512];
+static fat_partition_t fatpartitions[MAX_PARTITIONS];
 
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                                   usb_callback_data_t *callback_data) {
@@ -46,6 +49,7 @@ void main(void) {
     msd_device_t msd;
     bool msd_inited = false;
     uint24_t sectorsize;
+    uint8_t numpartitions;
     static char buffer[212];
 
     memset(&msd, 0, sizeof msd);
@@ -101,9 +105,13 @@ void main(void) {
         _OS(asm_NewLine);
     }
 
-    error = msd_ReadSector(&msd, 0, read_buffer);
+    dbg_Debugger();
+    error = fat_Find(&msd, &fatpartitions, &numpartitions, MAX_PARTITIONS);
     if( error == USB_SUCCESS )
     {
+        sprintf(buffer, "num fat partition: %u", numpartitions);
+        os_PutStrFull(buffer);
+        _OS(asm_NewLine);
     }
 
     // cleanup and return

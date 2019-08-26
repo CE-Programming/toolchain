@@ -8,7 +8,6 @@
  * much every flash drive on the market, except for huge ones.
  * The drive must use MBR partitioning, GUID is not supported.
  *
- * @author Steven "s@rdw.se" Arnow
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
  */
@@ -16,7 +15,6 @@
 #ifndef H_FATDRVCE
 #define H_FATDRVCE
 
-#include <setjmp.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <usbdrvce.h>
@@ -67,6 +65,10 @@ typedef struct {
 } fat_partition_t;
 
 typedef struct {
+    uint8_t dummy;
+} fat_t;
+
+typedef struct {
     char filename[13];  /**< Entry filename. */
     uint8_t attrib;     /**< Entry attributes. */
     uint8_t padding[2]; /**< Extra padding (reserved) */
@@ -83,6 +85,30 @@ typedef struct {
 #define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or directory). */
 #define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
 #define FAT_ALL       (FAT_DIR | FAT_VOLLABEL | FAT_SYSTEM | FAT_HIDDEN | FAT_RDONLY)
+
+/**
+ * Locates any available FAT partitions detected on the mass storage device
+ * (MSD). You must allocate space for \p partitions before calling this
+ * function, as well as passing a valid msd_device_t from the msd_Init
+ * function.
+ * @param partitions Array of FAT partitions available, returned from function.
+ * @param number The number of FAT partitions found.
+ * @param max The maximum number of FAT partitions that can be found.
+ * @return USB_SUCCESS on success, otherwise error.
+ */
+usb_error_t fat_Find(msd_device_t *msd,
+                     fat_partition_t *partitions,
+                     uint8_t *number,
+                     uint8_t max);
+
+/**
+ * Initializes the FAT filesystem and allows other FAT functions to be used.
+ * Before calling this function, you must use fat_Find in order to
+ * locate a valid FAT partition.
+ * @return USB_SUCCESS on success, otherwise error.
+ */
+usb_error_t fat_Init(fat_t *fat,
+                     fat_partition_t *partition);
 
 /**
  * Initialize a USB connected Mass Storage Device. Checks if the device is
