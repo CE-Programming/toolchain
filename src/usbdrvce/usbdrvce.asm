@@ -2256,7 +2256,7 @@ end repeat
 repeat bsr ytransfer.status.active-bsr ytransfer.status.halted
 	rlca
 end repeat
-	jq	c,.partial
+	jq	c,.halted
 	bit	bsr ytransfer.type.pid,d ; setup
 	jq	nz,.continue
 	ld	c,(ytransfer.length)
@@ -2270,8 +2270,9 @@ end repeat
 	jq	nz,.partial
 	bit	bsr ytransfer.type.ioc,d
 	jq	z,.continue
-	sbc	hl,bc
 .partial:
+	sbc	hl,bc
+.halted:
 	ld	c,(ytransfer.status)
 	call	_DispatchTransferCallback
 	add	hl,de
