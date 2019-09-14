@@ -112,32 +112,59 @@ typedef enum usb_error {
 } usb_error_t;
 
 typedef enum usb_transfer_status {
-  USB_TRANSFER_COMPLETED,    /**< Transfered successfully. @note A receive    */
-                             /**  transfer will complete when the end of a    */
-                             /**  packet is detected, or the buffer is        */
-                             /**  filled, whichever happens first.            */
-  USB_TRANSFER_ERROR,        /**< Transfer failed due to timout and/or        */
-                             /**  corruption.                                 */
-  USB_TRANSFER_TIMED_OUT,    /**< Max retry attempts exceeded.                */
-  USB_TRANSFER_STALL,        /**< Endpoint halt condition detected or control */
-                             /**  request not supported.                      */
-  USB_TRANSFER_NO_DEVICE,    /**< The device was disconnected.                */
-  USB_TRANSFER_OVERFLOW,     /**< Device sent more bytes than can be stored   */
-                             /**  in the transfer buffer, and were therefore  */
-                             /**  lost. @note This can be avoided by ensuring */
-                             /**  that receive buffer lengths are always a    */
-                             /**  multiple of the endpoint's maximum packet   */
-                             /**  length.                                     */
-  USB_TRANSFER_MEMORY_ERROR, /**< Memory could not be accessed in a timely    */
-                             /**  enough fashion to complete the transfer.    */
-                             /**  @note This probably means that non-default  */
-                             /**  cpu speed or lcd parameters are in use.     */
-  USB_TRANSFER_HOST_ERROR,   /**< The results of the transaction were         */
-                             /**  missed due to host hold-off. @note This     */
-                             /**  probably indicates a bug in this library.   */
-  USB_TRANSFER_UNKNOWN_ERROR,
-  USB_TRANSFER_FLUSH,        /**< Transfer cancelled because of a             */
-                             /**  user-initiated endpoint flush.              */
+  /**
+   * The transfer completed successfully.
+   * @note A transfer will complete when the end of a packet is detected, or the
+   * buffer is full, whichever happens first.  Therefore just because a transfer
+   * completes doesn't mean the entire buffer's worth of data was transferred.
+   */
+  USB_TRANSFER_COMPLETED  = 0,
+  /**
+   * The transfer stalled.  If this is a control transfer, then this request is
+   * not supported, and any pending requests continue as normal.  Otherwise,
+   * the endpoint's halt condition is automatically cleared and any pending
+   * transfers are cancelled.
+   */
+  USB_TRANSFER_STALLED    = 1 << 0,
+  /**
+   * Lost the connection with the device.  It was probably unplugged.  This
+   * always counts as a cancellation.
+   */
+  USB_TRANSFER_NO_DEVICE  = 1 << 1,
+  /**
+   * The results of the transaction were missed due to host hold-off.
+   * @note This probably indicates a bug in this library.
+   */
+  USB_TRANSFER_HOST_ERROR = 1 << 2,
+  /**
+   * This is caused by multiple consecutive usb bus errors.  It is reasonable
+   * in this case to keep retrying the transfer until some timeout condition
+   * occurs.
+   */
+  USB_TRANSFER_ERROR      = 1 << 3,
+  /**
+   * More bytes were received than can fit in the transfer buffer and were lost.
+   * @note This can be avoided by ensuring that receive buffer lengths are
+   * always a multiple of the endpoint's maximum packet length.
+   */
+  USB_TRANSFER_OVERFLOW   = 1 << 4,
+  /**
+   * The memory bus could not be accessed in a timely enough fashion to transfer
+   * the data.
+   * @note This probably means that non-default cpu speed or lcd parameters are
+   * in effect.
+   */
+  USB_TRANSFER_BUS_ERROR  = 1 << 5,
+  /**
+   * The transfer failed for some reason, usually indicated by another bit.
+   */
+  USB_TRANSFER_FAILED     = 1 << 6,
+  /**
+   * The transfer was cancelled.  In that case, any other set bits refer to the
+   * transfer that caused the cancellation.  If no other bits are set, then it
+   * was manually cancelled.
+   */
+  USB_TRANSFER_CANCELLED  = 1 << 7,
 } usb_transfer_status_t;
 
 typedef enum usb_find_flag {
@@ -452,8 +479,7 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
  * #include <usbdrvce.h>
  * \endcode
  * @return Return USB_SUCCESS to initialize the device, USB_IGNORE to ignore it
- * without erroring, or an error to ignore the device and to return from
- * usb_ProcessEvents().
+ * without erroring, or an error to abort and return from usb_ProcessEvents().
  */
 typedef usb_error_t (*usb_event_callback_t)(usb_event_t event, void *event_data,
                                             usb_callback_data_t *callback_data);
@@ -471,8 +497,9 @@ typedef usb_error_t (*usb_event_callback_t)(usb_event_t event, void *event_data,
  * @param data Opaque pointer passed to usb_ScheduleTransfer().
  * @param transferred The number of bytes transferred.
  * Only valid if \p status was USB_TRANSFER_COMPLETED.
- * @return Return USB_SUCCESS to free the transfer, USB_IGNORE to restart it,
- * or an error to free it and to return from usb_ProcessEvents().
+ * @return Return USB_SUCCESS to free the transfer.  Return USB_IGNORE to
+ * restart it, which is only possible if USB_TRANSFER_FAILED is set.
+ * Return any error to abort and return from usb_ProcessEvents().
  */
 typedef usb_error_t (*usb_transfer_callback_t)(usb_endpoint_t endpoint,
                                                usb_transfer_status_t status,
@@ -752,9 +779,11 @@ usb_error_t usb_SetInterface(usb_device_t device,
                              size_t length);
 
 /**
- * Clears halt condition on \p endpoint, and flushes any pending transfers if
- * that succeeds.  A halt condition is indicated by transfers to that endpoint
- * stalling.  This function blocks until the halt condition is cleared.
+ * Clears halt condition on \p endpoint.  This may only be called if there are
+ * no pending transfers.  If any non-control transfer stalls, this function is
+ * called automatically, so you only need to call this if you need to clear an
+ * endpoint halt for a reason other than a stalled transfer.  This function
+ * blocks until the halt condition is cleared.
  * @param endpoint The endpoint to clear the halt condition of.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
