@@ -112,6 +112,30 @@ struct msdDevice
 	size := $-.
 end struct
 
+struct fatPartition
+	local size
+	label .: size
+	lba		rd 1
+	msd		rl 1
+	size := $-.
+end struct
+struct fatEntry
+	local size
+	label .: size
+	filename	rb 13
+	attrib		rb 1
+	size := $-.
+end struct
+struct fatType
+	local size
+	label .: size
+	partition	rl 1
+	data_region	rd 1
+	clusters	rd 1
+	cluster_size	rb 1
+	size := $-.
+end struct
+
 struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
 	label .: 8
 	bmRequestType	db requestType
@@ -126,6 +150,7 @@ struct scsipkt, dir: 0, length: 1, data: 0&
 		db (dir) shl 7, 0, %%, data
 		break
 	end iterate
+	rb 31		; padding needed because some msd drives were built by idiots
 end struct
 struct scsipktrw, dir: 0, type: 0
 .:	iterate @, data
@@ -137,6 +162,7 @@ struct scsipktrw, dir: 0, type: 0
 	groupnum	db 0
 	len		dw 1 bswap 2
 	ctrl		db 0
+	rb 31		; padding needed because some msd drives were built by idiots
 end struct
 
 struct descriptor

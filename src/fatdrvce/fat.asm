@@ -51,16 +51,106 @@ fat_Find:
 	ld	(smc.errorsp),sp
 	call	util_find
 	xor	a,a
-	sbc	hl,hl		; return USB_SUCCESS
+	sbc	hl,hl				; return USB_SUCCESS
 	ret
 
 ;-------------------------------------------------------------------------------
 fat_Init:
 ; Initializes a FAT filesystem from a particular LBA
 ; Arguments:
-;  arg0: Non-zero for transparent mode, zero for opaque
+;  arg0: Uninitialized FAT structure type
+;  arg1: Available FAT partition returned from fat_Find
 ; Returns:
-;  Nothing
+;  USB_SUCCESS on success
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	de,(iy + 6)
+	ld	iy,(iy + 3)
+	ld	(yfatType.partition),de		; store partition pointer
+
+	xor	a,a
+	sbc	hl,hl
+	call	util_read_fat_sector		; read fat zero sector
+
+	ld	ix,tmp.sectorbuffer
+	ld	a,(ix + 12)
+	cp	a,(ix + 16)			; ensure 512 byte sectors and 2 FATs
+	jq	nz,.error
+
+	ld	de,(ix + 19)
+	ex.s	de,hl				; total logical sectors (if zero, use 4 byte value at offset 32)
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jr	z,.nobits
+	ld	e,0				; fatstate.clusters = sect[19] / fatstate.cluster_size
+	jr	.dodivision
+.nobits:
+	ld	hl,(ix + 32)
+	ld	e,(ix + 35)			; fatstate.clusters = sect[32] / fatstate.cluster_size
+.dodivision:
+	ld	bc,0
+	ld	a,(ix + 13)
+	ld	(yfatType.cluster_size),a	; get fat cluster size
+	ld	c,a
+	xor	a,a
+	call	__ldivu
+	ld	a,e
+	ld	(yfatType.clusters + 0),hl
+	ld	(yfatType.clusters + 3),a	; get total number of clusters
+
+	ld	a,(ix + 39)
+	or	a,a				; can't support reallllly big drives
+	jq	nz,.error
+
+	ld	a,(ix + 66)
+	cp	a,$28				; check fat32 signature
+	jr	z,.goodsig
+	cp	a,$29
+	jr	nz,.error
+.goodsig:
+	
+
+	or	a,a
+	sbc	hl,hl
+	pop	ix
+	ret
+.error:
+	ld	hl,USB_ERROR_FAILED
+	ret
+
+;-------------------------------------------------------------------------------
+util_read_fat_sector:
+; inputs
+;  ahl: LBA address
+;  iy: fat_t structure
+; outputs
+;  tmp.sectorbuffer: read sector
+	push	iy
+	ld	e,a
+	ld	iy,(yfatType.partition)
+	ld	bc,(yfatPartition.lba)
+	ld	a,(yfatPartition.lba + 3)
+	add	hl,bc
+	adc	a,e			; big endian
+	ld	de,scsi.read10.lba
+	ld	(de),a
+	dec	sp
+	push	hl
+	inc	sp
+	pop	af			; hlu
+	inc	de
+	ld	(de),a
+	ld	a,h
+	inc	de
+	ld	(de),a
+	ld	a,l
+	inc	de
+	ld	(de),a
+	ld	iy,(yfatPartition.msd)
+	call	util_read10
+	pop	iy
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -90,14 +180,14 @@ util_find:
 	push	af
 	push	hl
 	ld	a,(hl)
-	cp	a,$0b				; fat32 partition?
+	cp	a,$0c				; fat32 partition? (lba)
 	call	z,util_fat32_found
-	cp	a,$0c				; fat32 partition?
-	call	z,util_fat32_found
-	cp	a,$0f				; extended partition?
+	cp	a,$0b				; fat32 partition? (chs)
+	call	z,util_fat32_chs_found
+	cp	a,$0f				; extended partition? (lba)
 	call	z,util_ebr_found
 	cp	a,$05				; extended partition? (chs)
-	call	z,util_ebr_found
+	call	z,util_ebr_chs_found
 	pop	hl
 	ld	bc,16
 	add	hl,bc
@@ -123,25 +213,22 @@ smc.partitionnumptr := $ - 3
 	ret	nz
 	ld	(hl),1
 	ld	hl,(smc.partitionptrs)
+	ld	de,0
+	ld	(hl),de
+	inc	hl
+	ld	(hl),e				; lba
+	inc	hl
+	inc	hl
+	inc	hl
 	ld	bc,0
 smc.partitionmsd := $ - 3
-	ld	(hl),bc		; msd
-	ld	de,0
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(hl),de
-	inc	hl
-	ld	(hl),e		; lba
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(hl),de
-	inc	hl
-	ld	(hl),e		; size (todo: fixme)
-	xor	a,a
-	sbc	hl,hl		; return USB_SUCCESS
+	ld	(hl),bc				; msd
+	ex	de,hl				; return USB_SUCCESS
 	ret
+
+;-------------------------------------------------------------------------------
+util_fat32_chs_found:
+	jq	util_fat32_found
 
 ;-------------------------------------------------------------------------------
 util_fat32_found:
@@ -151,21 +238,17 @@ util_fat32_found:
 	cp	a,0
 smc.maxpartitions := $ - 1
 	jr	z,.found_max
-	ld	bc,4				; hl -> end of lba
+	ld	bc,4				; hl -> start of lba
 	add	hl,bc
 	push	hl
 	ld	de,0
 smc.partitionptrs := $ - 3
+	ld	bc,4
+	ldir					; copy lba
+	ld	(smc.partitionptrs),de
 	ex	de,hl
 	ld	bc,(smc.partitionmsd)
 	ld	(hl),bc
-	inc	hl
-	inc	hl
-	inc	hl
-	ex	de,hl				; store msd structure ptr
-	ld	bc,8
-	ldir					; copy lba and size
-	ld	(smc.partitionptrs),de
 	pop	hl
 	ld	de,scsi.read10.lba + 3
 	call	util_reverse_copy		; move to next read sector
@@ -177,9 +260,13 @@ smc.partitionptrs := $ - 3
 	ret
 
 ;-------------------------------------------------------------------------------
+util_ebr_chs_found:
+	jq	util_ebr_found
+
+;-------------------------------------------------------------------------------
 util_ebr_found:
 	push	af
-	ld	bc,4				; hl -> end of lba
+	ld	bc,4				; hl -> start of lba
 	add	hl,bc
 	ld	de,scsi.read10.lba + 3
 	call	util_reverse_copy

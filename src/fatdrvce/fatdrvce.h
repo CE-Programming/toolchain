@@ -59,23 +59,34 @@ typedef struct {
 } msd_device_t;
 
 typedef struct {
-    msd_device_t *msd;  /**< MSD containing FAT filesystem */
     uint32_t lba;       /**< Logical Block Address (LBA) of FAT partition */
-    uint32_t size;      /**< Size of FAT partition */
+    msd_device_t *msd;  /**< MSD containing FAT filesystem */
 } fat_partition_t;
-
-typedef struct {
-    uint8_t dummy;
-} fat_t;
 
 typedef struct {
     char filename[13];  /**< Entry filename. */
     uint8_t attrib;     /**< Entry attributes. */
-    uint8_t padding[2]; /**< Extra padding (reserved) */
 } fat_entry_t;
 
+typedef struct {
+    uint32_t cluster_base;
+    uint32_t cluster_current;
+    uint32_t sector;
+    uint32_t index;
+    uint32_t pos;
+    uint32_t size;
+    uint8_t write;
+} fat_file_t;
+
+typedef struct {
+    fat_partition_t *partition; /**< Disk partition used by FAT. */
+    uint32_t data_region;       /**< LBA of data section of FAT. */
+    uint32_t clusters;          /**< Total clusters on the disk. */
+    uint8_t cluster_size;       /**< Size of each cluster in terms of sectors. */
+} fat_t;
+
 #define FAT_O_WRONLY      2               /**< Open Write only mode. */
-#define FAT_O_RDONLY      1               /**< Open Read only mode */
+#define FAT_O_RDONLY      1               /**< Open Read only mode. */
 #define FAT_O_RDWR (O_RDONLY | O_WRONLY)  /**< Open in Read and Write mode. */
 
 #define FAT_RDONLY    (1 << 0)  /**< Entry is Read-Only. */
@@ -105,6 +116,8 @@ usb_error_t fat_Find(msd_device_t *msd,
  * Initializes the FAT filesystem and allows other FAT functions to be used.
  * Before calling this function, you must use fat_Find in order to
  * locate a valid FAT partition.
+ * @param fat Uninitialized FAT structure type.
+ * @param partition Available FAT partition returned from fat_Find.
  * @return USB_SUCCESS on success, otherwise error.
  */
 usb_error_t fat_Init(fat_t *fat,

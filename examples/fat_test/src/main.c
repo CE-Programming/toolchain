@@ -14,6 +14,8 @@ typedef struct global global_t;
 
 #define MAX_PARTITIONS 10
 
+void putstr(char *str);
+
 struct global {
     usb_device_t device;
 };
@@ -28,13 +30,11 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
     switch (event) {
         case USB_DEVICE_DISCONNECTED_EVENT:
             callback_data->device = NULL;
-            os_PutStrFull("usb device disconnected");
-            _OS(asm_NewLine);
+            putstr("usb device disconnected");
             break;
         case USB_DEVICE_ENABLED_EVENT:
             callback_data->device = event_data;
-            os_PutStrFull("usb device enabled");
-            _OS(asm_NewLine);
+            putstr("usb device enabled");
             break;
         default:
             break;
@@ -44,9 +44,10 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 }
 
 void main(void) {
-    global_t global;
+    static global_t global;
     usb_error_t error;
-    msd_device_t msd;
+    static msd_device_t msd;
+    static fat_t fat;
     bool msd_inited = false;
     uint24_t sectorsize;
     uint8_t numpartitions;
@@ -75,14 +76,12 @@ void main(void) {
             // initialize the msd device
             error = msd_Init(&msd, global.device, msd_buffer);
             if (error == USB_SUCCESS) {
-                os_PutStrFull("inited msd");
-                _OS(asm_NewLine);
+                putstr("inited msd");
                 msd_inited = true;
                 break;
             } else {
                 sprintf(buffer, "init msd fail: %u", error);
-                os_PutStrFull(buffer);
-                _OS(asm_NewLine);
+                putstr(buffer);
                 break;
             }
         }
@@ -96,25 +95,43 @@ void main(void) {
         return;
     }
 
-    // print the sector size
+    // get sector size
     error = msd_GetSectorSize(&msd, &sectorsize);
+
     if( error == USB_SUCCESS )
     {
         sprintf(buffer, "sectorsize: %u", sectorsize);
-        os_PutStrFull(buffer);
-        _OS(asm_NewLine);
+        putstr(buffer);
+
+        // find available fat partitions
+dbg_Debugger();
+        error = fat_Find(&msd, &fatpartitions, &numpartitions, MAX_PARTITIONS);
     }
 
-    dbg_Debugger();
-    error = fat_Find(&msd, &fatpartitions, &numpartitions, MAX_PARTITIONS);
-    if( error == USB_SUCCESS )
+    // attempt fat init on first fat32 partition
+    if( error == USB_SUCCESS && numpartitions > 0 )
     {
         sprintf(buffer, "num fat partition: %u", numpartitions);
-        os_PutStrFull(buffer);
-        _OS(asm_NewLine);
+        putstr(buffer);
+
+        // attempt init of fat partition
+dbg_Debugger();
+        error = fat_Init(&fat, &fatpartitions[0]);
     }
+
+    if( error == USB_SUCCESS )
+    {
+        putstr("inited fat filesystem");
+    }
+
 
     // cleanup and return
     usb_Cleanup();
     os_GetKey();
 }
+
+void putstr(char *str) {
+    os_PutStrFull(str);
+    _OS(asm_NewLine);
+}
+
