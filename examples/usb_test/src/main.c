@@ -277,6 +277,9 @@ static bool parseConfigurationDescriptor(global_t *const global,
 }
 
 static void handleDevice(global_t *global) {
+#define USB_GET_MAX_LUN 0xFE
+    static const usb_control_setup_t get_max_lun_setup = { USB_DEVICE_TO_HOST | USB_CLASS_REQUEST | USB_RECIPIENT_INTERFACE, USB_GET_MAX_LUN, 0, 0, 1 };
+    static const uint8_t inquiry_cbw[] = { 'U','S','B','C', 1,0,0,0, 0x24,0,0,0, USB_DEVICE_TO_HOST,0,6, 0x12, 0, 0, 0,0x24, 0, 0,0,0,0,0,0,0,0,0,0 };
     static const uint8_t rdy_pkt_00[] = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x04, 0x00 };
     static const uint8_t rdy_pkt_01[] = { 0x00, 0x00, 0x00, 0x10, 0x04, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x01, 0x00, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x07, 0xd0 };
     static uint8_t buffer[64];
@@ -314,6 +317,35 @@ static void handleDevice(global_t *global) {
     _OS(asm_NewLine);
     switch (global->type) {
         case 1:
+            putIntHex(usb_DefaultControlTransfer(global->device, &get_max_lun_setup, buffer, 0, &length));
+            putChar(':');
+            if (length <= 1)
+                putBlockHex(buffer, length);
+            else
+                putIntHex(length);
+            _OS(asm_NewLine);
+
+            putIntHex(usb_BulkTransfer(global->out, inquiry_cbw, sizeof(inquiry_cbw), 0, &length));
+            putChar(':');
+            putIntHex(length);
+            _OS(asm_NewLine);
+
+            putIntHex(usb_BulkTransfer(global->in, buffer, 0x24, 0, &length));
+            putChar(':');
+            if (length <= 0x24)
+                putBlockHex(buffer, length);
+            else
+                putIntHex(length);
+            _OS(asm_NewLine);
+
+            putIntHex(usb_BulkTransfer(global->in, buffer, 0xD, 0, &length));
+            putChar(':');
+            if (length <= 0xD)
+                putBlockHex(buffer, length);
+            else
+                putIntHex(length);
+            _OS(asm_NewLine);
+
             break;
         case 2:
             putIntHex(usb_BulkTransfer(global->out, rdy_pkt_00, sizeof(rdy_pkt_00), 0, &length));
@@ -324,7 +356,10 @@ static void handleDevice(global_t *global) {
             length = 0;
             putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
             putChar(':');
-            putBlockHex(buffer, length);
+            if (length <= sizeof(buffer))
+                putBlockHex(buffer, length);
+            else
+                putIntHex(length);
             _OS(asm_NewLine);
 
             putIntHex(usb_BulkTransfer(global->out, rdy_pkt_01, sizeof(rdy_pkt_01), 0, &length));
@@ -335,8 +370,12 @@ static void handleDevice(global_t *global) {
             length = 0;
             putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
             putChar(':');
-            putBlockHex(buffer, length);
+            if (length <= sizeof(buffer))
+                putBlockHex(buffer, length);
+            else
+                putIntHex(length);
             _OS(asm_NewLine);
+
             break;
     }
     goto noerr;

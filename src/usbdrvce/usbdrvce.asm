@@ -87,7 +87,7 @@ struct transfer			; transfer structure
 	xactErr		:= 1 shl 3
 	ufMiss		:= 1 shl 2
 	split		:= 1 shl 1
-	ping		:= 1 shl 0
+	stall		:= 1 shl 0
  end namespace
 	type		rb 1
  namespace type
@@ -1002,9 +1002,12 @@ end iterate
 ;-------------------------------------------------------------------------------
 usb_ClearEndpointHalt:
 	call	_Error.check
+	ld	yendpoint,(ix+6)
+	ld	hl,(yendpoint.first)
+	bit	0,(hl+transfer.next) ; dummy
+	jq	z,_Error.NOT_SUPPORTED
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
-	ld	yendpoint,(ix+6)
 	call	usb_GetEndpointAddress.enter
 	ld	de,0
 	push	hl,de
@@ -1027,13 +1030,8 @@ end iterate
 	ld	hl,(ix-6)
 	call	_Free32Align32
 	ex	de,hl
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	jq	nz,usb_Transfer.return
 	res	bsr yendpoint.overlay.remaining.dt,(yendpoint.overlay.remaining)
-	ld	bc,USB_TRANSFER_FLUSH
-	jq	_FlushEndpoint
+	jq	usb_Transfer.return
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
@@ -1210,38 +1208,35 @@ end repeat
 repeat long
 	dec	hl
 end repeat
-	ld	hl,(hl)
-	add	hl,de
-	xor	a,a;USB_SUCCESS
-	sbc	hl,de
-	jq	z,.return.c
-	ld	a,USB_ERROR_FAILED
-	ld	de,-3
-	add	hl,de
-	jq	c,.return.nc
-	ld	e,d
-	ld	hl,(iy-6)
-	sbc	hl,de
-	jq	z,.return.inc
-	dec	a;USB_ERROR_TIMEOUT
-	add	hl,de
-	ld	(iy-6),hl
-	add	hl,de
-.return.c:
-	ccf
-.return.nc:
+	ld	a,(hl)
 	sbc	hl,hl
-.return.inc:
-	inc	hl
-	ret	nc
+	or	a,a;USB_TRANSFER_COMPLETED
+	jq	z,.complete
+	and	a,transfer.status.active or transfer.status.babble or transfer.status.stall
+	ld	a,USB_ERROR_FAILED
+	jq	nz,.complete
+	ld	de,(iy-6)
+	inc	l
+	add	hl,de
+	inc	l
+	ret	c
+	sbc	hl,hl
+	dec	hl
+	adc	hl,de
+	ld	(iy-6),hl
+	ld	hl,1
+	ret	nz
+assert USB_ERROR_TIMEOUT = USB_ERROR_FAILED-1
+	dec	a;USB_ERROR_TIMEOUT
+	dec	hl
+	or	a,a
+.complete:
 	ld	(iy-12),a
 	ld	de,(iy-9)
-	or	a,a
-	sbc	hl,de
+	adc	hl,de
 	ret	z
-	ex	de,hl
 	ld	(hl),bc
-	add	hl,de
+	sbc	hl,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1533,7 +1528,6 @@ repeat transfer.length-transfer.buffers
 end repeat
 	ld	(hl),c
 	inc	l;transfer.length+1
-	res	bsr transfer.remaining.dt,bc
 	ld	(hl),b
 	call	.packHalf
 	ld	bc,(ix+15)
@@ -2231,7 +2225,7 @@ assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
 ;  a = ?
 ;  bc = ?
 ;  de = ?
-;  hl = ?
+;  hl = ? | error
 ;  ix = endpoint
 ;  iy = ?
 _RetireTransfers:
@@ -2250,7 +2244,7 @@ assert ytransfer.status+1 = ytransfer.type
 	ld	de,(ytransfer.status)
 	ld	a,e
 repeat 8-bsr ytransfer.status.active
-	rlca
+	add	a,a
 end repeat
 	ret	c
 repeat bsr ytransfer.status.active-bsr ytransfer.status.halted
@@ -2259,69 +2253,106 @@ end repeat
 	jq	c,.halted
 	bit	bsr ytransfer.type.pid,d ; setup
 	jq	nz,.continue
-	ld	c,(ytransfer.length)
+	ld	c,(ytransfer.length+0)
 	ld	b,(ytransfer.length+1)
+	res	bsr ytransfer.remaining.dt,bc
 	add	hl,bc
-	ld	c,(ytransfer.remaining)
+	ld	c,(ytransfer.remaining+0)
 	ld	a,(ytransfer.remaining+1)
 	and	a,not (ytransfer.remaining.dt shr 8)
 	ld	b,a
+	sbc	hl,bc
 	or	a,c
 	jq	nz,.partial
 	bit	bsr ytransfer.type.ioc,d
 	jq	z,.continue
 .partial:
-	sbc	hl,bc
-.halted:
-	ld	c,(ytransfer.status)
+	ld	c,0
 	call	_DispatchTransferCallback
-	add	hl,de
-	scf
-	sbc	hl,de
-	jq	z,.restart
+	dec	hl
+.free:
 	call	_FreeFirstTransfer
 	ld	hl,1
 	add	hl,de
 	jq	c,.loop
 	ret
+.halted:
+	ld	a,d
+	and	a,ytransfer.type.cerr
+	ld	c,e
+	jq	z,.noStall
+	bit	bsr ytransfer.status.babble,e
+	jq	nz,.noStall
+	inc	c
+.noStall:
+	call	_DispatchTransferCallback
+	add	hl,de
+	scf
+	sbc	hl,de
+	inc	hl
+	jq	nz,_FlushEndpoint.skip
+	ld	ytransfer,(xendpoint.first)
+	ld	(xendpoint.overlay.next),ytransfer
+	ld	(xendpoint.overlay.altNext),ytransfer
 .restart:
-assert USB_ERROR_NOT_SUPPORTED
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	or	a,l
+	ld	de,(ytransfer.length)
+	ld	(ytransfer.remaining+0),e
+	ld	(ytransfer.remaining+1),d
+	ld	a,(ytransfer.type)
+	and	a,not ytransfer.type.cpage
+	or	a,ytransfer.type.cerr
+	ld	(ytransfer.type),a
+	bit	bsr ytransfer.status.halted,(ytransfer.status)
+	ld	(ytransfer.status),ytransfer.status.active
+	ld	ytransfer,(ytransfer.next)
+	jq	z,.restart
+	ld	(xendpoint.overlay.status),h;0
+	scf
 	ret
 
 ; Input:
-;  bc = status
-;  (ix+6) = endpoint
+;  iy = endpoint
 ; Output:
-;  Returns usb_error_t from innermost parent C routine.
+;  cf = success
+;  zf = ? | false
+;  hl = 0 | error
 _FlushEndpoint:
-	push	ix
-	ld	xendpoint,(ix+6)
+	ld	bc,ytransfer.status.active
+	lea	xendpoint,yendpoint
+	res	bsr xendpoint.overlay.remaining.dt,(xendpoint.overlay.remaining)
 	ld	ytransfer,(xendpoint.first)
 	or	a,a
 	sbc	hl,hl
 	jq	.enter
 .loop:
-	push	bc
-	call	_DispatchTransferCallback.enter
-	pop	bc
+	call	_DispatchTransferCallback
+.skip:
 	call	_FreeFirstTransfer
-	ex	de,hl
-	add	hl,de
 	or	a,a
-	sbc	hl,de
-	jq	nz,.fail
+	sbc	hl,hl
+	adc	hl,de
+	ret	nz
 .enter:
 	ld	a,(ytransfer.next)
 	rrca ; dummy
 	jq	nc,.loop
 	ld	(xendpoint.overlay.next),ytransfer
 	ld	(xendpoint.overlay.altNext),ytransfer
-	ld	(xendpoint.overlay.status),0
-.fail:
-	pop	ix
-	jq	usb_Transfer.return
+	ld	(xendpoint.overlay.status),l;0
+	bit	bsr ytransfer.status.stall,bc
+	ret	z
+	ld	a,(xendpoint.type)
+	sbc	a,l;CONTROL_TRANSFER
+	ret	c
+	push	xendpoint
+	call	usb_ClearEndpointHalt
+	pop	af
+	dec	hl
+	ex	de,hl
+	sbc	hl,hl
+	inc	l
+	add	hl,de
+	ret
 
 ; Input:
 ;  bc = status
@@ -2329,13 +2360,12 @@ _FlushEndpoint:
 ;  iy = transfer
 ; Output:
 ;  af = ?
-;  bc = ?
-;  de = ?
-;  hl = ?
+;  bc = status
+;  hl = error
 ;  iy = ?
 _DispatchTransferCallback:
+	push	bc
 	ld	b,0
-.enter:
 	ld	de,(ytransfer.data)
 	ld	a,(ytransfer.data+3)
 	xor	a,e
@@ -2350,13 +2380,14 @@ _DispatchTransferCallback:
 	xor	a,l
 	ld	l,a
 	call	_DispatchEvent.dispatch
-	pop	bc,bc,bc,bc
+	pop	bc,bc,bc,bc,bc
 	ret
 
 ; Input:
 ;  ix = endpoint
 ; Output:
 ;  f = ?
+;  cf = cf
 ;  de = hl
 ;  hl = ?
 ;  ix = endpoint
