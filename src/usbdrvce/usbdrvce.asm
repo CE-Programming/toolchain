@@ -16,6 +16,8 @@ library 'USBDRVCE', 0
 	export usb_HandleEvents
 	export usb_WaitForEvents
 	export usb_WaitForInterrupt
+	export usb_RefDevice
+	export usb_UnrefDevice
 	export usb_GetDeviceHub
 	export usb_SetDeviceData
 	export usb_GetDeviceData
@@ -140,16 +142,17 @@ end struct
 struct device			; device structure
 	label .: 32
 	endpoints	rl 1	; pointer to array of endpoints
+	refcount	rl 1	; reference count
 	hub		rl 1	; hub this device is connected to
 	find		rb 1	; find flags
 	hubPorts	rb 1	; number of ports in this hub
 	addr		rb 1	; device addr and $7F
 	speed		rb 1	; device speed shl 4
 	info		rw 1	; hub addr or port number shl 7 or 1 shl 14
+	data		rl 1	; user data
 	child		rl 1	; first device connected to this hub
 	sibling		rl 1	; next device connected to the same hub
-	data		rl 1	; user data
-			rb 11
+			rb 8
 end struct
 struct setup
 	label .: 8
@@ -651,6 +654,45 @@ end iterate
 	ex	de,hl	; hl = 0
 	or	a,a	; zf = 0
 	ret
+
+;-------------------------------------------------------------------------------
+usb_RefDevice:
+	pop	de
+	ex	(sp),hl
+	push	de
+.enter:
+repeat device.refcount
+	inc	hl
+end repeat
+	ld	de,(hl)
+	inc	de
+	ld	(hl),de
+repeat device.refcount
+	dec	hl
+end repeat
+	ret
+
+;-------------------------------------------------------------------------------
+usb_UnrefDevice:
+	pop	de
+	ex	(sp),hl
+	push	de
+.enter:
+repeat device.refcount
+	inc	hl
+end repeat
+	ld	de,(hl)
+	ex	de,hl
+	add	hl,de
+	scf
+	sbc	hl,de
+	ex	de,hl
+	ld	(hl),de
+repeat device.refcount
+	dec	hl
+end repeat
+	call	z,_DeleteDevice
+	jq	usb_GetDeviceHub.returnZero
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceHub:
@@ -1891,8 +1933,10 @@ _CreateDevice:
 	ld	(hl),-1
 	ldir
 	ld	(ydevice.data),bc
-	ld	(ydevice.child),l
-	ld	(ydevice.sibling),l
+	inc	c
+	ld	(ydevice.refcount),bc
+	ld	(ydevice.child),c
+	ld	(ydevice.sibling),c
 	cp	a,a
 	ret
 .nomem:
@@ -1902,11 +1946,9 @@ _CreateDevice:
 ; Input:
 ;  hl = device
 _DeleteDevice:
-	push	de
 	ld	de,(hl+device.endpoints)
 	call	_Free32Align32
 	ex	de,hl
-	pop	de
 	jq	_Free32Align32
 
 ; Input:
@@ -3140,10 +3182,11 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 .delete:
 	ld	a,1
 	ld	(rootHub.child),a
+	push	hl
 	ex	de,hl
 	and	a,l
-	call	z,_DeleteDevice
-	ex	de,hl
+	call	z,usb_UnrefDevice.enter
+	pop	hl
 	cp	a,a
 	ret
 
