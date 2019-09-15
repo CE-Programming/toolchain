@@ -548,6 +548,26 @@ usb_error_t usb_WaitForEvents(void);
 usb_error_t usb_WaitForInterrupt(void);
 
 /**
+ * This function may be called to prevent \p device from being automatically
+ * freed after its correspending \c USB_DEVICE_DISCONNECTED_EVENT returns.
+ * This allows you to continue passing it to other API functions, although
+ * many will error with \c USB_ERROR_NO_DEVICE.
+ * @param device The device to increase the reference count of.
+ * @return device
+ */
+usb_device_t usb_RefDevice(usb_device_t device);
+
+/**
+ * Once this function has been called the same number of times that
+ * usb_RefDevice() was called on \p device and the event callback has returned
+ * from processing a corresponding \c USB_DEVICE_DISCONNECTED_EVENT, \p device
+ * becomes an invalid pointer and may no longer be passed to any API function.
+ * @param device The device to decrease the reference count of.
+ * @return NULL
+ */
+usb_device_t usb_UnrefDevice(usb_device_t device);
+
+/**
  * Gets the hub that \p device is attached to, or NULL if \p device is the root
  * hub.
  * @param device Device to get the hub of.
@@ -743,7 +763,9 @@ usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *index);
 /**
  * Selects the configuration specified by the \p configuration_descriptor.
  * This must be called before pipes other than the default control pipe can be
- * accessed.
+ * accessed.  Calling this function invalidates all \c usb_endpoint_t pointers
+ * corresponding with \p device except for any referring to its default control
+ * pipe.
  * @param device The device to communicate with.
  * @param descriptor A complete combined configuration descriptor fetched with
  * usb_GetDescriptor().
@@ -766,10 +788,12 @@ usb_error_t usb_GetInterface(usb_device_t device, uint8_t interface,
                              uint8_t *alternate_setting);
 
 /**
- * Sets the alternate setting in use on the specified interface.
+ * Sets the alternate setting to use for its corresponding interface.  Calling
+ * this function invalidates any \p usb_endpoint_t pointers corresponding with
+ * the endpoints that were part of the previously selected alternate setting.
  * @param device The device to communicate with.
- * @param interface_descriptor The interface descriptor describing the interface
- * to select within a configuration descriptor.
+ * @param interface_descriptor The interface descriptor describing the alternate
+ * setting to select within a configuration descriptor.
  * @param length The remaining length of the configuration descriptor after
  * the beginning of the \p interface_descriptor.
  * @return USB_SUCCESS if the transfer succeeded or an error.
