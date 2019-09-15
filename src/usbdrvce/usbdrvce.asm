@@ -262,6 +262,8 @@ virtual at usbArea
 	?currentRole		rb 1
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
+	?cleanupListPending	rl 1
+	?cleanupListReady	rl 1
 	assert $ <= usbInited
 end virtual
 virtual at (ramCodeTop+$FF) and not $FF
@@ -347,8 +349,6 @@ virtual at 0
 	USB_A_VBUS_ERROR_INTERRUPT				rb 1
 	USB_B_SESSION_END_INTERRUPT				rb 1
 	USB_OVERCURRENT_INTERRUPT				rb 1
-	USB_B_PLUG_REMOVED_INTERRUPT				rb 1
-	USB_A_PLUG_REMOVED_INTERRUPT				rb 1
 	USB_HOST_PORT_CONNECT_STATUS_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_OVERCURRENT_CHANGE_INTERRUPT		rb 1
@@ -1360,7 +1360,7 @@ usb_ScheduleControlTransfer:
 .queueStage:
 	call	_CreateDummyTransfer
 assert (endpoint-1) and 1
-	dec	iy
+	dec	yendpoint
 	jq	z,_FillTransfer
 	jq	_Error.NO_MEMORY
 .check:
@@ -1878,6 +1878,7 @@ end iterate
 ; Output:
 ;  zf = enough memory
 ;  hl = transfer
+;  iy = (ix+6)
 _CreateDummyTransfer:
 	ld	yendpoint,(ix+6)
 .enter:
@@ -1922,7 +1923,7 @@ _CreateDevice:
 	ld	a,l
 	add	a,device.child-device.addr
 	ld	l,a
-	ld	(hl),iy
+	ld	(hl),ydevice
 	ld	bc,32-1
 	ld	(ydevice.hubPorts),b
 	ld	(ydevice.addr),b
@@ -2067,7 +2068,7 @@ assert endpoint.device and 1
 	and	a,1
 	ld	(yendpoint.dir),a
 	ld	(yendpoint.overlay.fifo),bmUsbDmaCxFifo
-	ld	(dummyHead.next),iy
+	ld	(dummyHead.next),yendpoint
 	cp	a,a
 	ret
 .nomem:
@@ -2757,8 +2758,8 @@ end virtual
 	djnz	.search
 .free:
 	call	_FreeTransferData
-.disableDevice:
-	call	_HandlePortPortEnInt.disableDevice
+.disable:
+	call	_HandlePortPortEnInt.disable
 	sbc	hl,hl
 	ret
 
@@ -2777,7 +2778,7 @@ repeat long
 end repeat
 	ld	a,(hl)
 	or	a,a
-	jq	nz,_HandleDeviceDescriptor.disableDevice
+	jq	nz,_HandleDeviceDescriptor.disable
 	sbc	hl,hl
 	ld	de,(yendpoint.device)
 	ld	(yendpoint.addr),c
@@ -3092,15 +3093,14 @@ _HandleOvercurrInt:
 	ld	a,USB_OVERCURRENT_INTERRUPT
 	jq	_DispatchEvent
 
-_HandleBPlugRemovedInt:
-	ld	(hl),bmUsbIntBPlugRemoved shr 8
-	ld	a,USB_B_PLUG_REMOVED_INTERRUPT
-	jq	_DispatchEvent
-
 _HandleAPlugRemovedInt:
-	ld	(hl),bmUsbIntAPlugRemoved shr 8
-	ld	a,USB_A_PLUG_REMOVED_INTERRUPT
-	jq	_DispatchEvent
+_HandleBPlugRemovedInt:
+	ld	(hl),(bmUsbIntAPlugRemoved or bmUsbIntBPlugRemoved) shr 8
+	ld	l,usbPortStsCtrl
+	call	_HandlePortConnStsInt
+	ret	nz
+	ld	l,usbOtgIsr+1
+	ret
 
 _HandleInt:
 _HandleErrInt:
@@ -3131,42 +3131,37 @@ end iterate
 	ret
 
 _HandlePortConnStsInt:
-	ld	a,(hl)
-	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg)
-	ld	(hl),a
-	ld	a,(hl)
-repeat bUsbCurConnSts
-	rrca
-end repeat
-	and	a,1
-	ld	de,0
 	ld	hl,(rootHub.child)
-	jq	z,.disconnect
+	bit	0,hl
+	jq	nz,.disconnected
+	push	hl
+	pop	de
+	ld	a,USB_DEVICE_DISCONNECTED_EVENT
+	call	_DispatchEvent
+	ret	nz
+	; TODO: cleanup device in de
+	call	usb_UnrefDevice.enter
+.disconnected:
+assert ~mpUsbPortStsCtrl and 1
+	ld	hl,mpUsbPortStsCtrl+1
+	ld	(rootHub.child),hl
+	dec	l;usbPortStsCtrl
+	ld	a,(hl)
+	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn)
+	ld	(hl),a
+	bit	bUsbCurConnSts,(hl)
+	ret	z
 	ld	de,rootHub
 	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_DISABLED
 	call	_CreateDevice
 	ld	hl,USB_ERROR_NO_MEMORY
 	ret	nz ; FIXME
-	lea	hl,iy
-	ld	a,1
-.disconnect:
-	bit	0,hl
-	jq	nz,.null
-	push	hl
-	pop	de
-.null:
-	push	af
-assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
-	add	a,USB_DEVICE_DISCONNECTED_EVENT;USB_DEVICE_CONNECTED_EVENT
+	lea	de,ydevice
+	ld	a,USB_DEVICE_CONNECTED_EVENT
 	call	_DispatchEvent
-	pop	bc
 	ret	nz
 	ex	de,hl
 	ld	hl,mpUsbPortStsCtrl
-	ld	a,(hl)
-	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
-	ld	(hl),a
-	djnz	.delete
 	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 100ms!
 	call	_DelayTenTimesAms
 	inc	l;usbPortStsCtrl+1
@@ -3179,49 +3174,41 @@ assert USB_DEVICE_DISCONNECTED_EVENT + 1 = USB_DEVICE_CONNECTED_EVENT
 	dec	l;usbPortStsCtrl
 	cp	a,a
 	ret
-.delete:
-	ld	a,1
-	ld	(rootHub.child),a
-	push	hl
-	ex	de,hl
-	and	a,l
-	call	z,usb_UnrefDevice.enter
-	pop	hl
-	cp	a,a
-	ret
 
 _HandlePortPortEnInt:
+	ld	ydevice,(rootHub.child)
+	lea	de,ydevice
+	ld	a,e
+	cp	a,a
+	rrca
+	ret	c
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbConnStsChg)
 	ld	(hl),a
-	ld	ydevice,(rootHub.child)
 	bit	bUsbPortEn,(hl)
-	jq	z,.disabled
+	ld	a,USB_DEVICE_DISABLED_EVENT
+	jq	z,_DispatchEvent
 	call	_CreateDefaultControlEndpoint
 	call	z,_Alloc32Align32
-	jq	nz,.disableDevice
+	jq	nz,.disable
 	ld	bc,_HandleDeviceDescriptor
 	ld	de,_GetDeviceDescriptor8
 	push	hl,bc,hl,de,yendpoint
 	call	usb_ScheduleControlTransfer
+	pop	de,de,de,de,de
 	ld	a,l
-	pop	yendpoint,de,de,de,de
-	or	a,a
 	ld	hl,mpUsbPortStsCtrl
+	or	a,a
 	ret	z
 	ex	de,hl
 	call	_Free32Align32
-.disableDevice:
+.disable:
 	ld	hl,mpUsbPortStsCtrl
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn or bmUsbConnStsChg)
 	ld	(hl),a
 	cp	a,a
 	ret
-.disabled:
-	lea	de,iy
-	ld	a,USB_DEVICE_DISABLED_EVENT
-	jq	_DispatchEvent
 
 _HandlePortOvercurrInt:
 	ld	a,(hl)
