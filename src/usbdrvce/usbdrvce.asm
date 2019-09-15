@@ -1946,6 +1946,22 @@ _CreateDevice:
 
 ; Input:
 ;  hl = device
+; Output:
+;  zf = success
+;  hl = 0 | error
+_CleanupDevice:
+	inc	l
+.enter:
+	push	hl
+	pop	de
+	ld	a,USB_DEVICE_DISCONNECTED_EVENT
+	call	_DispatchEvent
+	ret	nz
+	; TODO: cleanup device in hl
+	jq	usb_UnrefDevice.enter
+
+; Input:
+;  hl = device
 _DeleteDevice:
 	ld	de,(hl+device.endpoints)
 	call	_Free32Align32
@@ -3096,10 +3112,22 @@ _HandleOvercurrInt:
 _HandleAPlugRemovedInt:
 _HandleBPlugRemovedInt:
 	ld	(hl),(bmUsbIntAPlugRemoved or bmUsbIntBPlugRemoved) shr 8
-	ld	l,usbPortStsCtrl
-	call	_HandlePortConnStsInt
+	jq	_CleanupRootDevice
+
+; Output:
+;  zf = success
+;  de = 0 | hl
+;  hl = hl | error
+_CleanupRootDevice:
+	push	hl
+	ld	hl,(rootDevice.child)
+	dec	l
+	call	nz,_CleanupDevice
+	pop	de
 	ret	nz
-	ld	l,usbOtgIsr+1
+	ld	a,1
+	ld	(rootHub.child),a
+	ex	de,hl
 	ret
 
 _HandleInt:
@@ -3131,21 +3159,8 @@ end iterate
 	ret
 
 _HandlePortConnStsInt:
-	ld	hl,(rootHub.child)
-	bit	0,hl
-	jq	nz,.disconnected
-	push	hl
-	pop	de
-	ld	a,USB_DEVICE_DISCONNECTED_EVENT
-	call	_DispatchEvent
+	call	_CleanupRootDevice
 	ret	nz
-	; TODO: cleanup device in de
-	call	usb_UnrefDevice.enter
-.disconnected:
-assert ~mpUsbPortStsCtrl and 1
-	ld	hl,mpUsbPortStsCtrl+1
-	ld	(rootHub.child),hl
-	dec	l;usbPortStsCtrl
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn)
 	ld	(hl),a
@@ -3160,20 +3175,16 @@ assert ~mpUsbPortStsCtrl and 1
 	ld	a,USB_DEVICE_CONNECTED_EVENT
 	call	_DispatchEvent
 	ret	nz
-	ex	de,hl
-	ld	hl,mpUsbPortStsCtrl
 	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 100ms!
 	call	_DelayTenTimesAms
-	inc	l;usbPortStsCtrl+1
+	ld	hl,mpUsbPortStsCtrl+1
 	set	bUsbPortReset-8,(hl)
 	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
 	call	_DelayTenTimesAms
 	res	bUsbPortReset-8,(hl)
+	dec	hl;mpUsbPortStsCtrl
 	ld	a,2 ; WARNING: This assumes flash wait states port is 3, to get at least 10ms!
-	call	_DelayTenTimesAms
-	dec	l;usbPortStsCtrl
-	cp	a,a
-	ret
+	jq	_DelayTenTimesAms
 
 _HandlePortPortEnInt:
 	ld	ydevice,(rootHub.child)
