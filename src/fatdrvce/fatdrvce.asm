@@ -130,9 +130,12 @@ struct fatType
 	local size
 	label .: size
 	partition	rl 1
-	data_region	rd 1
-	clusters	rd 1
-	cluster_size	rb 1
+	fat_sectors		rd 1 	; fat sectors
+	cluster_begin_lba	rd 1	; start of clusters
+	fat_begin_lba		rd 1	; start of fat lba
+	fs_info_sector		rl 1	; offset to fs info
+	root_dir_cluster	rd 1	; lba of root directory first cluster
+	cluster_size		rb 1	; sectors per cluster
 	size := $-.
 end struct
 

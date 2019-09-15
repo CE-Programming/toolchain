@@ -68,50 +68,61 @@ fat_Init:
 	ld	de,(iy + 6)
 	ld	iy,(iy + 3)
 	ld	(yfatType.partition),de		; store partition pointer
-
+	ld	ix,(yfatType.partition)
 	xor	a,a
 	sbc	hl,hl
+	ld	(yfatType.fat_begin_lba + 0),hl
+	ld	(yfatType.fat_begin_lba + 3),a
+	ld	hl,(xfatPartition.lba + 0)
+	ld	a,(xfatPartition.lba + 3)	; get fat base lba
 	call	util_read_fat_sector		; read fat zero sector
-
 	ld	ix,tmp.sectorbuffer
 	ld	a,(ix + 12)
 	cp	a,(ix + 16)			; ensure 512 byte sectors and 2 FATs
 	jq	nz,.error
-
-	ld	de,(ix + 19)
-	ex.s	de,hl				; total logical sectors (if zero, use 4 byte value at offset 32)
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	jr	z,.nobits
-	ld	e,0				; fatstate.clusters = sect[19] / fatstate.cluster_size
-	jr	.dodivision
-.nobits:
-	ld	hl,(ix + 32)
-	ld	e,(ix + 35)			; fatstate.clusters = sect[32] / fatstate.cluster_size
-.dodivision:
-	ld	bc,0
-	ld	a,(ix + 13)
-	ld	(yfatType.cluster_size),a	; get fat cluster size
-	ld	c,a
-	xor	a,a
-	call	__ldivu
-	ld	a,e
-	ld	(yfatType.clusters + 0),hl
-	ld	(yfatType.clusters + 3),a	; get total number of clusters
-
 	ld	a,(ix + 39)
 	or	a,a				; can't support reallllly big drives
 	jq	nz,.error
-
 	ld	a,(ix + 66)
 	cp	a,$28				; check fat32 signature
 	jr	z,.goodsig
 	cp	a,$29
 	jr	nz,.error
 .goodsig:
-	
-
+	ld	de,(ix + 48)
+	ex.s	de,hl
+	ld	(yfatType.fs_info_sector),hl
+	ld	a,(ix + 13)
+	ld	(yfatType.cluster_size),a	; sectors per cluster
+	ld	hl,(ix + 44 + 0)
+	ld	a,(ix + 44 + 3)			; get root directory
+	ld	(yfatType.root_dir_cluster + 0),hl
+	ld	(yfatType.root_dir_cluster + 3),a
+	ld	hl,(ix + 36 + 0)
+	ld	a,(ix + 36 + 3)			; get fat sectors
+	ld	(yfatType.fat_sectors + 0),hl
+	ld	(yfatType.fat_sectors + 3),a
+	add	hl,hl
+	adc	a,a				; * 2
+	push	hl
+	push	af
+	ld	de,(ix + 14)
+	ex.s	de,hl				; get count of reserved sectors
+	xor	a,a
+	ld	ix,(yfatType.partition)
+	ld	bc,(xfatPartition.lba + 0)
+	ld	e,(xfatPartition.lba + 3)	; get fat base lba
+	add	hl,bc
+	adc	a,e
+	ld	e,a
+	ld	(yfatType.fat_begin_lba + 0),hl
+	ld	(yfatType.fat_begin_lba + 3),e
+	pop	de
+	pop	bc
+	add	hl,bc
+	adc	a,d
+	ld	(yfatType.cluster_begin_lba + 0),hl
+	ld	(yfatType.cluster_begin_lba + 3),a
 	or	a,a
 	sbc	hl,hl
 	pop	ix
@@ -127,11 +138,8 @@ util_read_fat_sector:
 ;  iy: fat_t structure
 ; outputs
 ;  tmp.sectorbuffer: read sector
-	push	iy
-	ld	e,a
-	ld	iy,(yfatType.partition)
-	ld	bc,(yfatPartition.lba)
-	ld	a,(yfatPartition.lba + 3)
+	ld	bc,(yfatType.fat_begin_lba + 0)
+	ld	e,(yfatType.fat_begin_lba + 3)
 	add	hl,bc
 	adc	a,e			; big endian
 	ld	de,scsi.read10.lba
@@ -148,6 +156,8 @@ util_read_fat_sector:
 	ld	a,l
 	inc	de
 	ld	(de),a
+	push	iy
+	ld	iy,(yfatType.partition)
 	ld	iy,(yfatPartition.msd)
 	call	util_read10
 	pop	iy

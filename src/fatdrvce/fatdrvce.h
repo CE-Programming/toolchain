@@ -80,9 +80,12 @@ typedef struct {
 
 typedef struct {
     fat_partition_t *partition; /**< Disk partition used by FAT. */
-    uint32_t data_region;       /**< LBA of data section of FAT. */
-    uint32_t clusters;          /**< Total clusters on the disk. */
-    uint8_t cluster_size;       /**< Size of each cluster in terms of sectors. */
+    uint32_t fat_sectors;
+    uint32_t cluster_begin_lba;
+    uint32_t fat_begin_lba;
+    uint32_t root_dir_cluster;
+    uint24_t fs_info_sector;
+    uint8_t cluster_size;       /**< Sectors per cluster. */
 } fat_t;
 
 #define FAT_O_WRONLY      2               /**< Open Write only mode. */
