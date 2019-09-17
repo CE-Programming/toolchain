@@ -334,18 +334,15 @@ virtual at 0
 end virtual
 
 ; enum usb_transfer_status
-virtual at 0
-	USB_TRANSFER_COMPLETED		rb 1
-	USB_TRANSFER_ERROR		rb 1
-	USB_TRANSFER_TIMED_OUT		rb 1
-	USB_TRANSFER_STALL		rb 1
-	USB_TRANSFER_NO_DEVICE		rb 1
-	USB_TRANSFER_OVERFLOW		rb 1
-	USB_TRANSFER_MEMORY_ERROR	rb 1
-	USB_TRANSFER_HOST_ERROR		rb 1
-	USB_TRANSFER_UNKNOWN_ERROR	rb 1
-	USB_TRANSFER_FLUSH		rb 1
-end virtual
+?USB_TRANSFER_COMPLETED		:= 0
+?USB_TRANSFER_STALLED		:= 1 shl 0
+?USB_TRANSFER_NO_DEVICE		:= 1 shl 1
+?USB_TRANSFER_HOST_ERROR		:= 1 shl 2
+?USB_TRANSFER_ERROR		:= 1 shl 3
+?USB_TRANSFER_OVERFLOW		:= 1 shl 4
+?USB_TRANSFER_BUS_ERROR		:= 1 shl 5
+?USB_TRANSFER_FAILED		:= 1 shl 6
+?USB_TRANSFER_CANCELLED		:= 1 shl 7
 
 ; enum usb_event
 virtual at 0
@@ -1986,6 +1983,7 @@ end repeat
 ; Output:
 ;  zf = success
 ;  hl = 0 | error
+;  ix = ?
 _CleanupDevice:
 	inc	l
 .enter:
@@ -2003,19 +2001,28 @@ _CleanupDevice:
 	; TODO: cleanup children
 	pop	hl
 	ld	de,(hl+device.endpoints)
-	ld	yendpoint,dummyHead
+	push	hl
+	ld	xendpoint,dummyHead
+	or	a,a
+	sbc	hl,hl
 .loop:
 	ld	a,(de)
-	ld	iyh,a
+	ld	ixh,a
 	inc	a
 	jq	z,.next
-	ld	a,(yendpoint.type)
+	ld	a,(xendpoint.type)
 	or	a,a
 	jq	nz,.notControl
 	bit	0,e
 	jq	z,.skip
 .notControl:
-	; TODO: cleanup yendpoint
+	push	de
+	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_NO_DEVICE
+	; TODO: unlink transfer, link in list
+	ld	ytransfer,(xendpoint.first)
+	call	_FlushEndpoint.enter
+	pop	de
+	ret	nz
 .skip:
 	ld	a,-1
 	ld	(de),a
@@ -2024,6 +2031,8 @@ _CleanupDevice:
 	ld	a,e
 	and	a,31
 	jq	nz,.loop
+	; TODO: prepare list
+	pop	hl
 	jq	usb_UnrefDevice.enter
 
 ; Input:
@@ -2441,15 +2450,16 @@ end repeat
 	ret
 
 ; Input:
+;  bc = status
 ;  iy = endpoint
 ; Output:
 ;  cf = success
 ;  zf = ? | false
 ;  hl = 0 | error
+;  iy = ?
+;  ix = endpoint
 _FlushEndpoint:
-	ld	bc,ytransfer.status.active
 	lea	xendpoint,yendpoint
-	resmsk	xendpoint.overlay.remaining.dt
 	ld	ytransfer,(xendpoint.first)
 	or	a,a
 	sbc	hl,hl
@@ -3193,7 +3203,9 @@ _CleanupRootDevice:
 	push	hl
 	ld	hl,(rootHub.child)
 	dec	l
+	push	ix
 	call	nz,_CleanupDevice
+	pop	ix
 	pop	de
 	ret	nz
 	ld	a,1
