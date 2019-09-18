@@ -855,7 +855,7 @@ iterate value, DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCR
 	inc	l
  end if
 end iterate
-	ld	ydevice,(ix+6)
+	ld	hl,(ix+6)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	call	usb_ControlTransfer
@@ -901,7 +901,7 @@ usb_GetDescriptor:
 	ld	de,(ix+18)
 	ld	(hl),de
 .endpoint:
-	ld	ydevice,(ix+6)
+	ld	hl,(ix+6)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	call	usb_ControlTransfer
@@ -1099,7 +1099,7 @@ iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_F
  end if
 end iterate
 	xor	a,a
-	ld	ydevice,(yendpoint.device)
+	ld	hl,(yendpoint.device)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	call	usb_ControlTransfer
@@ -1113,13 +1113,12 @@ end iterate
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
-	pop	de,ydevice
-	ex	(sp),hl
-	push	hl,de
-	ld	a,l
+	pop	de,hl,bc
+	push	bc,hl,de
+	ld	a,c
 	and	a,$8F
 .enter:
-	ld	hl,(ydevice.endpoints)
+	ld	hl,(hl+device.endpoints)
 	bit	0,hl
 	jq	nz,.returnCarry
 	rlca
@@ -1290,7 +1289,7 @@ end repeat
 	sbc	hl,hl
 	or	a,a;USB_TRANSFER_COMPLETED
 	jq	z,.complete
-	and	a,transfer.status.active or transfer.status.babble or transfer.status.stall
+	and	a,USB_TRANSFER_CANCELLED or USB_TRANSFER_OVERFLOW or USB_TRANSFER_NO_DEVICE or USB_TRANSFER_STALLED
 	ld	a,USB_ERROR_FAILED
 	jq	nz,.complete
 	ld	de,(iy-6)
@@ -2986,7 +2985,7 @@ _HandleCxOutInt:
 	ld	c,(hl)
 	xor	a,a
 	ld	b,a
-	ld	ydevice,(rootHub.child)
+	ld	hl,(rootHub.child)
 	call	usb_GetDeviceEndpoint.enter
 	call	_ExecuteDma.bytes
 	ret	c
