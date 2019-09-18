@@ -121,6 +121,9 @@ end macro
 struct transfer			; transfer structure
 	label .: 32
 	next		rd 1	; pointer to next transfer structure
+ namespace next
+	dummy		:= 1 shl 0
+ end namespace
 	altNext		rd 1	; pointer to alternate next transfer structure
 	status		rb 1	; transfer status
  namespace status
@@ -719,6 +722,7 @@ usb_UnrefDevice:
 	push	de
 .enter:
 	setmsk	device.refcount,hl
+.refcount:
 	ld	de,(hl)
 	ex	de,hl
 	add	hl,de
@@ -1082,7 +1086,7 @@ usb_ClearEndpointHalt:
 	call	_Error.check
 	ld	yendpoint,(ix+6)
 	ld	hl,(yendpoint.first)
-	bit	0,(hl+transfer.next) ; dummy
+	bitmsk	transfer.next.dummy,(hl+transfer.next)
 	jq	z,_Error.NOT_SUPPORTED
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
@@ -1888,6 +1892,7 @@ _Free#size#Align#align:
 	ld	de,(freeList#size#Align#align)
 	ld	(hl),de
 	ld	(freeList#size#Align#align),hl
+.return:
 	pop	de
 	ret
 
@@ -1978,32 +1983,30 @@ end repeat
 	jq	_Free32Align32
 
 ; Input:
-;  hl = (device and not $FF) or ((device-1) and $FF)
+;  ix = device-1
 ; Output:
 ;  zf = success
+;  a = ?
+;  bc = ?
+;  de = ?
 ;  hl = 0 | error
 ;  ix = ?
+;  iy = ?
 _CleanupDevice:
-	inc	l
+	call	.enter
+	; TODO: manage cleanup list
+	ret
+.recurse:
+	call	.enter
+	pop	xdevice
 .enter:
-	push	hl
-	pop	de
-	ld	a,USB_DEVICE_DISCONNECTED_EVENT
-	call	_DispatchEvent
-	ret	nz
-	push	hl
-	setmsk	device.sibling,hl
-	ld	bc,(hl)
-	setmsk	device.back xor device.sibling,hl
-	ld	hl,(hl)
-	ld	(hl),bc
-	; TODO: cleanup children
-	pop	hl
-	ld	de,(hl+device.endpoints)
-	push	hl
+	push	xdevice
+	ld	de,(xdevice.endpoints+1)
+	ld	xdevice,(xdevice.child+1)
+	dec	ixl
+	jq	nz,.recurse
 	ld	xendpoint,dummyHead
-	or	a,a
-	sbc	hl,hl
+	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_NO_DEVICE
 .loop:
 	ld	a,(de)
 	ld	ixh,a
@@ -2012,27 +2015,54 @@ _CleanupDevice:
 	ld	a,(xendpoint.type)
 	or	a,a
 	jq	nz,.notControl
-	bit	0,e
-	jq	z,.skip
+	inc	e
 .notControl:
-	push	de
-	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_NO_DEVICE
-	; TODO: unlink transfer, link in list
 	ld	ytransfer,(xendpoint.first)
-	call	_FlushEndpoint.enter
+	jq	.check
+.flush:
+	push	de
+	call	_DispatchTransferCallback
 	pop	de
-	ret	nz
-.skip:
-	ld	a,-1
-	ld	(de),a
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jq	nz,_Free32Align32.return
+.scan:
+	bitmsk	ytransfer.type.ioc
+	ld	ytransfer,(ytransfer.next)
+	jq	z,.scan
+.check:
+	bitmsk	ytransfer.next.dummy
+	jq	z,.flush
+	lea	hl,xendpoint.next
+	ld	h,(xendpoint.prev)
+	ld	yendpoint,(xendpoint.next)
+	ld	(hl+endpoint.next),yendpoint
+	ld	(yendpoint.prev),h
+	ld	hl,cleanupListPending+1
+	ld	a,(hl)
+	ld	(xendpoint.prev),a
+	dec	hl;cleanupListPending
+	ld	(hl),xendpoint
 .next:
 	inc	e
 	ld	a,e
 	and	a,31
 	jq	nz,.loop
-	; TODO: prepare list
+	pop	de
+	inc	de
+	push	de
 	pop	hl
-	jq	usb_UnrefDevice.enter
+	ld	a,USB_DEVICE_DISCONNECTED_EVENT
+	call	_DispatchEvent
+	ret	nz
+	setmsk	device.sibling,hl
+	ld	bc,(hl)
+	setmsk	device.back xor device.sibling,hl
+	ld	hl,(hl)
+	ld	(hl),bc
+	resmsk	device.refcount xor device.back,hl
+	jq	usb_UnrefDevice.refcount
 
 ; Input:
 ;  hl = device
@@ -2062,21 +2092,25 @@ _CreateEndpoint:
 	ret	nz
 	ld	bc,(dummyHead.next)
 	ld	(hl+endpoint.next),bc
-assert endpoint+1 = endpoint.prev
+repeat endpoint.prev-endpoint
 	inc	c
+end repeat
 	ld	a,h
 	ld	(bc),a
 	ld	l,endpoint
 	push	hl
-assert endpoint+1 = endpoint.prev
+repeat endpoint.prev-endpoint
 	inc	l
+end repeat
 	ld	(hl),dummyHead shr 8 and $FF
-assert endpoint.prev+1 = endpoint.addr
+repeat endpoint.addr-endpoint.prev
 	inc	l
+end repeat
 	ld	a,(ydevice.addr)
 	ld	(hl),a
-assert endpoint.addr+1 = endpoint.info
+repeat endpoint.info-endpoint.addr
 	inc	l
+end repeat
 	inc	de;endpointDescriptor.descriptor.bDescriptorType
 	inc	de;endpointDescriptor.bEndpointAddress
 	ld	a,(de)
@@ -2222,8 +2256,9 @@ _ParseInterfaceDescriptors:
 	ld	a,(xdescriptor.bDescriptorType)
 	sub	a,ENDPOINT_DESCRIPTOR
 	jq	z,.endpoint
-assert INTERFACE_DESCRIPTOR+1 = ENDPOINT_DESCRIPTOR
+repeat ENDPOINT_DESCRIPTOR-INTERFACE_DESCRIPTOR
 	inc	a
+end repeat
 	jq	nz,.next
 	ld	c,a
 	ld	a,e
@@ -2376,7 +2411,9 @@ _RetireTransfers:
 	ld	ytransfer,(ytransfer.next)
 .loop:
 	ld	a,(ytransfer.next)
-	rrca ; dummy
+repeat bsr ytransfer.next.dummy+1
+	rrca
+end repeat
 	ret	c
 assert ytransfer.status+1 = ytransfer.type
 	ld	de,(ytransfer.status)
@@ -2473,12 +2510,14 @@ _FlushEndpoint:
 	ret	nz
 .enter:
 	ld	a,(ytransfer.next)
-	rrca ; dummy
+repeat bsr ytransfer.next.dummy+1
+	rrca
+end repeat
 	jq	nc,.loop
 	ld	(xendpoint.overlay.next),ytransfer
 	ld	(xendpoint.overlay.altNext),ytransfer
 	ld	(xendpoint.overlay.status),l;0
-	bitmsk	ytransfer.status.stall,bc
+	bitmsk	USB_TRANSFER_STALLED,bc
 	ret	z
 	ld	a,(xendpoint.type)
 	sbc	a,l;CONTROL_TRANSFER
@@ -2526,6 +2565,7 @@ _DispatchTransferCallback:
 ;  ix = endpoint
 ; Output:
 ;  f = ?
+;  zf = false
 ;  cf = cf
 ;  de = hl
 ;  hl = ?
@@ -3198,14 +3238,14 @@ _HandleBPlugRemovedInt:
 ;  zf = success
 ;  de = 0 | hl
 ;  hl = hl | error
+;  ix = ix
+;  iy = ?
 _CleanupRootDevice:
-	push	hl
-	ld	hl,(rootHub.child)
-	dec	l
-	push	ix
+	push	hl,ix
+	ld	xdevice,(rootHub.child)
+	dec	ixl
 	call	nz,_CleanupDevice
-	pop	ix
-	pop	de
+	pop	ix,de
 	ret	nz
 	ld	a,1
 	ld	(rootHub.child),a
