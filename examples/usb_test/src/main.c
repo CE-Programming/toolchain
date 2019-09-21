@@ -124,7 +124,6 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         "USB_HOST_PORT_FORCE_PORT_RESUME_INT",
         "USB_HOST_FRAME_LIST_ROLLOVER_INT",
         "USB_HOST_SYSTEM_ERROR_INT",
-        "USB_HOST_ASYNC_ADVANCE_INT",
     };
     usb_error_t error = USB_SUCCESS;
     unsigned char i;

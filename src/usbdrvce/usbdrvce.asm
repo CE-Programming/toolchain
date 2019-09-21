@@ -310,8 +310,13 @@ virtual at usbArea
 	?currentRole		rb 1
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
-	?cleanupListPending	rl 1
-	?cleanupListReady	rl 1
+assert $+1 = cleanupListReady
+				rb 1 ; clobber
+	?cleanupListReady	rb 1
+assert cleanupListReady+1 = cleanupListPending
+	?cleanupListPending	rb 1
+assert cleanupListPending+1 = $
+				rb 1 ; always -1
 	assert $ <= usbInited
 end virtual
 virtual at (ramCodeTop+$FF) and not $FF
@@ -400,7 +405,6 @@ virtual at 0
 	USB_HOST_PORT_FORCE_PORT_RESUME_INTERRUPT		rb 1
 	USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT			rb 1
 	USB_HOST_SYSTEM_ERROR_INTERRUPT				rb 1
-	USB_HOST_ASYNC_ADVANCE_INTERRUPT			rb 1
 end virtual
 
 ; enum usb_find_flag
@@ -507,6 +511,9 @@ usb_Init:
 	set	5,(hl)
 	xor	a,a
 	sbc	hl,hl
+	dec	hl
+	ld	(cleanupListReady),hl
+	inc	hl
 	ld	(rootHub.addr),a
 	ld	(rootHub.data),hl
 	ld	de,usedAddresses+1
@@ -584,6 +591,7 @@ end iterate
 	call	_HandleRoleChgInt
 	ret	nz
 	; TODO: disable disabled things
+	scf
 	or	a,a
 	sbc	hl,hl
 	ret
@@ -691,7 +699,7 @@ usb_HandleEvents:
 	and	a,intUsb shr 8
 	ret	z
 	ld	hl,mpUsbIsr
-iterate type, Dev, Otg, Host
+iterate type, Dev, Host, Otg
 	bit	bUsbInt#type,(hl)
 	call	nz,_Handle#type#Int
 	ret	nz
@@ -731,7 +739,8 @@ usb_UnrefDevice:
 	ex	de,hl
 	ld	(hl),de
 	resmsk	device.refcount,hl
-	call	z,_DeleteDevice
+	call	z,_Free32Align32
+	ld	de,mpUsbRange
 	jq	usb_GetDeviceHub.returnZero
 
 ;-------------------------------------------------------------------------------
@@ -744,7 +753,7 @@ usb_GetDeviceHub:
 	bit	0,hl
 	ret	z
 .returnZero:
-	or	a,a
+	xor	a,a
 .returnCarry:
 	sbc	hl,hl
 	ret
@@ -1837,6 +1846,7 @@ end namespace
 ;  a = ?
 ;  bc = ?
 ;  hl = mpUsbRange xor (? and $FF) | error code
+;  iy = ?
 _PowerVbusForRole:
 	ld	l,usbOtgCsr
 	bitmsk	ROLE_DEVICE,a
@@ -1861,6 +1871,9 @@ _PowerVbusForRole:
 	res	bUsbASrpEn,(hl)
 	push	hl,de
 	call	_DisableSchedulesAndResetHostController
+	ld	de,$D7FFFF ; disable doorbell
+	call	_HandleAsyncAdvInt.cleanup.de
+	call	_HandleAsyncAdvInt.cleanup
 	pop	de,hl
 	set	bUsbABusDrop,(hl)
 	res	bUsbABusReq,(hl)
@@ -1989,20 +2002,26 @@ end repeat
 ;  a = ?
 ;  bc = ?
 ;  de = ?
-;  hl = 0 | error
+;  hl = mpUsbRange | error
 ;  ix = ?
 ;  iy = ?
 _CleanupDevice:
-	call	.enter
-	; TODO: manage cleanup list
-	ret
+	ld	hl,_HandleAsyncAdvInt.scheduleCleanup
 .recurse:
-	call	.enter
+	push	hl
+virtual
+	ld	hl,0
+	load .ld_hl: byte from $$
+end virtual
+	db .ld_hl
+.recursed:
 	pop	xdevice
-.enter:
+	ret	nz
+assert $-.recursed = long
 	push	xdevice
 	ld	de,(xdevice.endpoints+1)
 	ld	xdevice,(xdevice.child+1)
+	ld	hl,.recursed
 	dec	ixl
 	jq	nz,.recurse
 	ld	xendpoint,dummyHead
@@ -2039,38 +2058,29 @@ _CleanupDevice:
 	ld	yendpoint,(xendpoint.next)
 	ld	(hl+endpoint.next),yendpoint
 	ld	(yendpoint.prev),h
-	ld	hl,cleanupListPending+1
+	ld	hl,cleanupListPending
 	ld	a,(hl)
 	ld	(xendpoint.prev),a
-	dec	hl;cleanupListPending
-	ld	(hl),xendpoint
+	ld	a,ixh
+	ld	(hl),a
 .next:
 	inc	e
 	ld	a,e
 	and	a,31
 	jq	nz,.loop
-	pop	de
-	inc	de
-	push	de
-	pop	hl
+	pop	xdevice
+	lea	de,xdevice+1
 	ld	a,USB_DEVICE_DISCONNECTED_EVENT
 	call	_DispatchEvent
 	ret	nz
-	setmsk	device.sibling,hl
-	ld	bc,(hl)
-	setmsk	device.back xor device.sibling,hl
-	ld	hl,(hl)
+	ld	bc,(xdevice.sibling+1)
+	ld	hl,(xdevice.back+1)
 	ld	(hl),bc
-	resmsk	device.refcount xor device.back,hl
-	jq	usb_UnrefDevice.refcount
-
-; Input:
-;  hl = device
-_DeleteDevice:
-	ld	de,(hl+device.endpoints)
+	ld	hl,(xdevice.endpoints+1)
+	ld	(xdevice.endpoints+1),xdevice
 	call	_Free32Align32
-	ex	de,hl
-	jq	_Free32Align32
+	lea	hl,xdevice.refcount+1
+	jq	usb_UnrefDevice.refcount
 
 ; Input:
 ;  iy = device
@@ -2542,9 +2552,14 @@ end repeat
 ;  hl = error
 ;  iy = ?
 _DispatchTransferCallback:
+	ld	de,(ytransfer.data)
+	ld	a,e
+	set	3,a
+	cp	a,e
+	jq	z,_HandleDeviceDescriptor.returnCarry
+	ld	(ytransfer.data),a
 	push	bc
 	ld	b,0
-	ld	de,(ytransfer.data)
 	ld	a,(ytransfer.data+3)
 	xor	a,e
 	and	a,$F
@@ -2889,6 +2904,7 @@ virtual
 	load .ld_hl: byte from $$
 end virtual
 	db .ld_hl
+assert .free-.next = long
 .next:
 	inc	l
 	djnz	.search
@@ -2896,6 +2912,7 @@ end virtual
 	call	_FreeTransferData
 .disable:
 	call	_HandlePortPortEnInt.disable
+.returnCarry:
 	sbc	hl,hl
 	ret
 
@@ -3236,9 +3253,8 @@ _HandleBPlugRemovedInt:
 
 ; Output:
 ;  zf = success
-;  de = 0 | hl
+;  de = ? | hl
 ;  hl = hl | error
-;  ix = ix
 ;  iy = ?
 _CleanupRootDevice:
 	push	hl,ix
@@ -3247,8 +3263,6 @@ _CleanupRootDevice:
 	call	nz,_CleanupDevice
 	pop	ix,de
 	ret	nz
-	ld	a,1
-	ld	(rootHub.child),a
 	ex	de,hl
 	ret
 
@@ -3367,8 +3381,40 @@ _HandleHostSysErrInt:
 
 _HandleAsyncAdvInt:
 	ld	(hl),bmUsbIntAsyncAdv
-	ld	a,USB_HOST_ASYNC_ADVANCE_INTERRUPT
-	jq	_DispatchEvent
+.cleanup:
+	ex	de,hl
+.cleanup.de:
+	ld	a,(cleanupListReady)
+	ld	yendpoint,dummyHead
+	jq	.enter
+.loop:
+	ld	a,(yendpoint.prev)
+	ld	hl,(yendpoint.last)
+	call	_Free32Align32
+	lea	hl,yendpoint.base
+	call	_Free64Align256
+.enter:
+	ld	iyh,a
+	inc	a
+	jq	nz,.loop
+	dec	a;-1
+.scheduleCleanup:
+	ret	nz
+	ld	hl,(cleanupListReady)
+	scf
+	adc	a,l
+	sbc	a,a
+	ret	z
+	ld	(cleanupListReady-1),hl
+	ex	de,hl
+	inc	d
+	ret	z
+	ld	a,l
+	ld	l,usbCmd
+	set	bUsbIntAsyncAdvDrbl,(hl)
+	ld	l,a
+	cp	a,a
+	ret
 
 ;-------------------------------------------------------------------------------
 _DispatchEvent:
