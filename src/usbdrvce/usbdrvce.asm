@@ -2088,6 +2088,7 @@ assert $-.recursed = long
 	jq	nz,.notControl
 	inc	e
 .notControl:
+	sbc	hl,hl
 	ld	ytransfer,(xendpoint.first)
 	jq	.check
 .flush:
