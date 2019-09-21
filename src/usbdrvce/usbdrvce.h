@@ -209,8 +209,8 @@ typedef enum usb_role {
 
 typedef enum usb_speed {
   USB_SPEED_UNKNOWN = -1,
-  USB_SPEED_FULL, /**<  12 Mb/s */
-  USB_SPEED_LOW,  /**< 1.5 Mb/s */
+  USB_SPEED_FULL    = 0 << 4, /**<  12 Mb/s */
+  USB_SPEED_LOW     = 1 << 4, /**< 1.5 Mb/s */
 } usb_speed_t;
 
 typedef enum usb_transfer_direction {
@@ -669,7 +669,7 @@ uint8_t usb_GetDeviceAddress(usb_device_t device);
  * @param device The device to communicate with.
  * @return The \c usb_speed_t.
  */
-usb_speed_t usb_GetDeviceSpeed(usb_device_t device);
+int8_t usb_GetDeviceSpeed(usb_device_t device);
 
 /**
  * Determines how large of a buffer would be required to receive the complete
