@@ -715,6 +715,10 @@ usb_RefDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ret	z
 .enter:
 	setmsk	device.refcount,hl
 	ld	de,(hl)
@@ -728,6 +732,10 @@ usb_UnrefDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ret	z
 .enter:
 	setmsk	device.refcount,hl
 .refcount:
@@ -748,7 +756,10 @@ usb_GetDeviceHub:
 	pop	de
 	ex	(sp),ydevice
 	push	de
-	ld	hl,(ydevice.hub)
+	ld	de,-1
+	add	ydevice,de
+	jq	nc,.returnCarry
+	ld	hl,(ydevice.hub+1)
 .maybeReturnNull:
 	bit	0,hl
 	ret	z
@@ -763,8 +774,12 @@ usb_SetDeviceData:
 	pop	de,ydevice
 	ex	(sp),hl
 	push	hl
-	ld	(ydevice.data),hl
+	ld	bc,-1
+	add	ydevice,bc
+	jq	nc,.dispatch
+	ld	(ydevice.data+1),hl
 	ex	de,hl
+.dispatch:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -772,7 +787,10 @@ usb_GetDeviceData:
 	pop	de
 	ex	(sp),ydevice
 	push	de
-	ld	hl,(ydevice.data)
+	ld	de,-1
+	add	ydevice,de
+	jq	nc,usb_GetDeviceHub.returnCarry
+	ld	hl,(ydevice.data+1)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -819,35 +837,51 @@ usb_FindDevice:
 
 ;-------------------------------------------------------------------------------
 usb_ResetDevice:
+	pop	de
+	ex	(sp),hl
+	push	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
 	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret	nz
+	ld	l,USB_ERROR_INVALID_PARAM
 	ret
 
 ;-------------------------------------------------------------------------------
 usb_DisconnectDevice:
+	pop	de
+	ex	(sp),hl
+	push	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
 	ld	hl,USB_ERROR_NOT_SUPPORTED
+	ret	nz
+	ld	l,USB_ERROR_INVALID_PARAM
 	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceAddress:
 	pop	hl
 	ex	(sp),ydevice
-	ld	a,(ydevice.addr)
+	ld	de,-1
+	add	ydevice,de
+	sbc	a,a
+	and	a,(ydevice.addr+1)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceSpeed:
 	pop	de
 	ex	(sp),ydevice
-	push	de
-	ld	a,(ydevice.speed)
-	rrca
-	sbc	hl,hl
-	ret	c
-	rrca
-	rrca
-	rrca
-	ld	l,a
-	ret
+	ld	bc,-1
+	add	ydevice,bc
+	ccf
+	sbc	a,a
+	or	a,(ydevice.speed+1)
+	ex	de,hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 usb_GetConfigurationDescriptorTotalLength:
@@ -1378,8 +1412,8 @@ _DispatchEvent.dispatch:
 	jp	(hl)
 usb_ScheduleControlTransfer:
 	call	_Error.check
-	call	.check
 .enter:
+	call	.check
 	ld	yendpoint,(ix+6)
 	or	a,(yendpoint.type);CONTROL_TRANSFER
 	jq	nz,.notControl
@@ -1412,6 +1446,18 @@ assert (endpoint-1) and 1
 	jq	z,_FillTransfer
 	jq	_Error.NO_MEMORY
 .check:
+	ld	hl,(ix+9)
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+.invalidParam:
+	jq	z,_Error.INVALID_PARAM
+usb_ScheduleTransfer.check:
+	ld	hl,(ix+6)
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jq	z,usb_ScheduleControlTransfer.invalidParam
 	ld	hl,(ix+15)
 	add	hl,de
 	or	a,a
@@ -1432,8 +1478,8 @@ usb_ScheduleTransfer.control:
 	jq	usb_ScheduleControlTransfer.control
 usb_ScheduleTransfer:
 	call	_Error.check
-	call	usb_ScheduleControlTransfer.check
 .enter:
+	call	.check
 	ld	bc,(ix+12)
 	ld	de,(ix+9)
 	ld	yendpoint,(ix+6)
@@ -1946,12 +1992,14 @@ _CreateDummyTransfer:
 ;  b = port or 1 shl 7
 ;  c = find flags
 ;  de = parent hub
+;  hl = pointer to device speed shl 2
 ; Output:
 ;  a = ?
 ;  zf = enough memory
 ;  hl = ?
 ;  iy = device
 _CreateDevice:
+	ld	a,(hl)
 	call	_Alloc32Align32
 	ret	nz
 	push	hl
@@ -1962,6 +2010,11 @@ _CreateDevice:
 	ex	de,hl
 	ld	(ydevice.hub),hl
 	ld	(ydevice.find),c
+assert bUsbSpd-16 = bUsbDevSpd
+	and	a,bmUsbSpd shr 16
+	rrca
+	rrca
+	ld	(ydevice.speed),a
 	setmsk	device.addr,hl
 	ld	a,(hl)
 	srl	b
@@ -1976,19 +2029,18 @@ end repeat
 	ld	(hl),ydevice
 	ld	(ydevice.back),hl
 	ld	bc,32-1
-	ld	(ydevice.hubPorts),b
-	ld	(ydevice.addr),b
-	ld	(ydevice.speed),b
 	push	de
 	inc	de
 	pop	hl
 	ld	(hl),-1
 	ldir
-	ld	(ydevice.data),bc ; unclobber
-	inc	c
-	ld	(ydevice.refcount),bc
-	ld	(ydevice.child),c
-	ld	(ydevice.sibling),c
+	ld	(ydevice.hubPorts),b;0
+	ld	(ydevice.addr),b;0
+	ld	(ydevice.data),bc;0 ; unclobber
+	inc	c;1
+	ld	(ydevice.refcount),bc;1
+	ld	(ydevice.child),c;1
+	ld	(ydevice.sibling),c;1
 	cp	a,a
 	ret
 .nomem:
@@ -3136,6 +3188,7 @@ _HandleDevResetInt:
 	set	bCxFifoClr,(hl)
 	ld	de,rootHub
 	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_ENABLED
+	ld	l,usbDevCtrl-$100
 	call	_CreateDevice
 	call	z,_CreateDefaultControlEndpoint
 	jq	nz,.nomem
@@ -3304,6 +3357,7 @@ _HandlePortConnStsInt:
 	ret	z
 	ld	de,rootHub
 	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_DISABLED
+	ld	l,usbOtgCsr+2
 	call	_CreateDevice
 	ld	hl,USB_ERROR_NO_MEMORY
 	ret	nz ; FIXME
