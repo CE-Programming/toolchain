@@ -135,6 +135,10 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             _OS(asm_NewLine);
             break;
         case USB_DEVICE_DISCONNECTED_EVENT:
+            if (callback_data->device == event_data) {
+                callback_data->device = NULL;
+                callback_data->in = callback_data->out = NULL;
+            }
         case USB_DEVICE_CONNECTED_EVENT:
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
