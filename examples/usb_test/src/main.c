@@ -400,6 +400,8 @@ void main(void) {
             os_GetCursorPos(&row, &col);
             os_SetCursorPos(0, 0);
             putIntHex(usb_GetFrameNumber());
+            putChar(':');
+            putLongHex(usb_GetCpuCounter());
             os_SetCursorPos(row, col);
             handleDevice(&global);
         }

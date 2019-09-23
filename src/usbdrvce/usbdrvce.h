@@ -2,6 +2,17 @@
  * @file
  * @author Jacob "jacobly" Young
  * @brief USB driver
+ *
+ * This is a library for interfacing with the calculator's USB port.  It is very
+ * low-level, similar to libusb, with the intention that higher-level libraries
+ * can be built on top of it.
+ * @warning This library requires general-purpose timer 2, so TIMER2 things from
+ * \c tice.h can't be used between calls to usb_Init() and usb_Cleanup().
+ * However, this library exposes a safe way to read the timer 2 counter, which
+ * is setup to count up with the CPU clock via usb_GetCpuCounter() and the like.
+ * @warning If you enable timer 3 interrupts via the interrupt controller the OS
+ * will try to do USB stuff and corrupt this library's data.  As a safety
+ * measure, many routines will return \c USB_ERROR_SYSTEM if this happens.
  */
 
 #ifndef H_USBDRVCE
@@ -529,6 +540,21 @@ void usb_Cleanup(void);
  * @return An error returned by a callback or USB_SUCCESS.
  */
 usb_error_t usb_HandleEvents(void);
+
+/**
+ * Returns a counter that increments once every cpu cycle, or 48000 times every
+ * millisecond.  This counter overflows every 90 seconds or so.
+ * @return Cpu counter.
+ */
+uint32_t usb_GetCpuCounter(void);
+
+/**
+ * Returns a counter that increments once every 256 cpu cycles, or 375 times
+ * every 2 milliseconds.  This is the high 24 bits of the same counter returned
+ * by usb_GetCpuCounter().
+ * @return Cpu counter.
+ */
+uint24_t usb_GetCpuCounterHigh(void);
 
 /**
  * Waits for any device or transfer events to occur, then calls their associated

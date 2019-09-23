@@ -13,6 +13,8 @@ library 'USBDRVCE', 0
 ;-------------------------------------------------------------------------------
 	export usb_Init
 	export usb_Cleanup
+	export usb_GetCpuCounter
+	export usb_GetCpuCounterHigh
 	export usb_HandleEvents
 	export usb_WaitForEvents
 	export usb_WaitForInterrupt
@@ -506,10 +508,18 @@ usb_Init:
 	ld	hl,_DefaultStandardDescriptors.string84
 .gotModel:
 	ld	(_DefaultStandardDescriptors.model),hl
-	ld	a,1
+	ld	a,1 ; mark pointers as invalid
 	call	_Init
 	set	5,(hl)
-	xor	a,a
+	ld	hl,mpTmr2Load
+	ld	c,12
+	call	_MemClear
+	ld	l,tmrCtrl+1
+	set	bTmr2CountUp-8,(hl)
+	dec	l;tmrCtrl
+	res	bTmr2Crystal,(hl)
+	res	bTmr2Overflow,(hl)
+	set	bTmr2Enable,(hl)
 	sbc	hl,hl
 	dec	hl
 	ld	(cleanupListReady),hl
@@ -519,7 +529,7 @@ usb_Init:
 	ld	de,usedAddresses+1
 	ld	b,sizeof usedAddresses-1
 .freeAddresses:
-	ld	(de),a
+	ld	(de),a;0
 	inc	de
 	djnz	.freeAddresses
 	ld	l,3
@@ -640,6 +650,64 @@ usb_Cleanup:
 ;	set	7,(hl)
 	call	_Init
 	res	5,(hl)
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetCpuCounter:
+	call	usb_GetCpuCounterHigh
+	dec	sp
+	dec	sp
+	push	hl
+	dec	sp
+	pop	hl,de
+	ld	l,a
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetCpuCounterHigh:
+	ld	hl,(mpIntInvert+$20) or (intLatch+$20) shl 8
+	ld	a,i
+	di
+	ld	a,(hl)
+	push	af
+	ld	(hl),.ret
+	ld	l,h;ti.intLatch+$20
+	ld	de,(hl)
+	push	de
+	ld	de,.ld_auhl_tmr2Counter
+	ld	(hl),de
+	ld	iy,mpTmr2Counter+1
+.tmrBase := iy-tmr2Counter-1
+	lea	hl,.tmrBase+tmr2Counter
+virtual at mpIntLatch+$20
+	ld	a,(hl)
+	ld	hl,(.tmrBase+tmr2Counter+1)
+ load .ld_auhl_tmr2Counter: $-$$ from $$
+ assert .ld_auhl_tmr2Counter < 1 shl 22
+end virtual
+virtual at mpIntInvert+$20
+	ret
+ load .ret: $-$$ from $$
+ assert .ret < 1 shl 8
+end virtual
+	call	mpIntLatch+$20
+	ld	iy,mpIntRange+$20
+	pop	de
+	ld	(iy+intLatch),de
+	pop	de
+	ld	(iy+intInvert),d
+	bit	2,e ; p/v flag
+	jq	z,.noEi
+	ei
+.noEi:
+	add	a,3 shl 2
+	add	a,3 shl 1
+	ret	nc
+	inc	l
+	ret	nz
+	cp	a,3 shl 0
+	ret	nc
+	inc	h
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1760,6 +1828,7 @@ end iterate
 ; Input:
 ;  a = fill
 ; Output:
+;  bc = 0
 ;  hl = flags+$1B
 _Init:
 	ld	de,usbInited
@@ -2063,7 +2132,7 @@ _CleanupDevice:
 	push	hl
 virtual
 	ld	hl,0
-	load .ld_hl: byte from $$
+ load .ld_hl: byte from $$
 end virtual
 	db .ld_hl
 .recursed:
@@ -2954,7 +3023,7 @@ end repeat
 	ret	z
 virtual
 	ld	hl,0
-	load .ld_hl: byte from $$
+ load .ld_hl: byte from $$
 end virtual
 	db .ld_hl
 assert .free-.next = long
