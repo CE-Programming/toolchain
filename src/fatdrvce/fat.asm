@@ -14,6 +14,34 @@
 ; You should have received a copy of the GNU Lesser General Public License
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;-------------------------------------------------------------------------------
+; Notes:
+; The orginal µCFAT source was used as inspiration for some of the implemented
+; file i/o function, and hand-optimized for speed. Some parts of this file are
+; related to implementations of functions available in µCFAT. The license for
+; µCFAT is provided below.
+;-------------------------------------------------------------------------------
+; Copyright (c) 2015 Steven Arnow <s@rdw.se>
+; 'fat.c' - This file is part of µCFAT
+;
+; This software is provided 'as-is', without any express or implied
+; warranty. In no event will the authors be held liable for any damages
+; arising from the use of this software.
+;
+; Permission is granted to anyone to use this software for any purpose,
+; including commercial applications, and to alter it and redistribute it
+; freely, subject to the following restrictions:
+;
+; 	1. The origin of this software must not be misrepresented; you must not
+; 	claim that you wrote the original software. If you use this software
+; 	in a product, an acknowledgment in the product documentation would be
+; 	appreciated but is not required.
+;
+; 	2. Altered source versions must be plainly marked as such, and must not be
+; 	misrepresented as being the original software.
+;
+; 	3. This notice may not be removed or altered from any source
+; 	distribution.
+;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
 fat_Find:
@@ -69,77 +97,244 @@ fat_Init:
 	ld	iy,(iy + 3)
 	ld	(yfatType.partition),de		; store partition pointer
 	ld	ix,(yfatType.partition)
-	xor	a,a
-	sbc	hl,hl
-	ld	(yfatType.fat_begin_lba + 0),hl
-	ld	(yfatType.fat_begin_lba + 3),a
 	ld	hl,(xfatPartition.lba + 0)
 	ld	a,(xfatPartition.lba + 3)	; get fat base lba
+	ld	(yfatType.fat_base_lba + 0),hl
+	ld	(yfatType.fat_base_lba + 3),a
+	or	a,a
+	sbc	hl,hl
 	call	util_read_fat_sector		; read fat zero sector
+	jq	nz,.error
 	ld	ix,tmp.sectorbuffer
 	ld	a,(ix + 12)
 	cp	a,(ix + 16)			; ensure 512 byte sectors and 2 FATs
 	jq	nz,.error
 	ld	a,(ix + 39)
-	or	a,a				; can't support reallllly big drives
+	or	a,a				; can't support reallllly big drives (BPB_FAT32_FATSz32 high)
 	jq	nz,.error
 	ld	a,(ix + 66)
 	cp	a,$28				; check fat32 signature
 	jr	z,.goodsig
 	cp	a,$29
-	jr	nz,.error
+	jq	nz,.error
 .goodsig:
+	xor	a,a
+	ld	hl,(ix + 14)
+	ex.s	de,hl
+	ld	(yfatType.fat_pos),de
+	ld	hl,(ix + 36)			; BPB_FAT32_FATSz32
+	add	hl,hl				; * num fats
+	adc	a,a
+	add	hl,de				; data region
+	adc	a,a				; get carry if needed
+	ld	(yfatType.data_region + 0),hl
+	ld	(yfatType.data_region + 3),a
+	push	af
+	ex	de,hl
+	ld	hl,(ix + 44 + 0)
+	ld	a,(ix + 44 + 3)			; BPB_FAT32_RootClus
+	ld	bc,2
+	or	a,a
+	sbc	hl,bc
+	jr	nc,.nocarry
+	dec	a
+.nocarry:
+	ld	c,(ix + 13)
+	ld	(yfatType.cluster_size),c	; sectors per cluster
+	jr	.enter
+.multiply:
+	add	hl,hl
+	adc	a,a
+.enter:
+	rr	c
+	jr	nc,.multiply
+	pop	bc
+	add	hl,de				; bude = data region
+	adc	a,b				; root directory location
+	ld	(yfatType.root_dir_pos + 0),hl
+	ld	(yfatType.root_dir_pos + 3),a
 	ld	de,(ix + 48)
 	ex.s	de,hl
-	ld	(yfatType.fs_info_sector),hl
-	ld	a,(ix + 13)
-	ld	(yfatType.cluster_size),a	; sectors per cluster
-	ld	hl,(ix + 44 + 0)
-	ld	a,(ix + 44 + 3)			; get root directory
-	ld	(yfatType.root_dir_cluster + 0),hl
-	ld	(yfatType.root_dir_cluster + 3),a
-	ld	hl,(ix + 36 + 0)
-	ld	a,(ix + 36 + 3)			; get fat sectors
-	ld	(yfatType.fat_sectors + 0),hl
-	ld	(yfatType.fat_sectors + 3),a
-	add	hl,hl
-	adc	a,a				; * 2
-	push	hl
-	push	af
-	ld	de,(ix + 14)
-	ex.s	de,hl				; get count of reserved sectors
+	ld	(yfatType.fs_info),hl
 	xor	a,a
-	ld	ix,(yfatType.partition)
-	ld	bc,(xfatPartition.lba + 0)
-	ld	e,(xfatPartition.lba + 3)	; get fat base lba
-	add	hl,bc
-	adc	a,e
-	ld	e,a
-	ld	(yfatType.fat_begin_lba + 0),hl
-	ld	(yfatType.fat_begin_lba + 3),e
-	pop	de
-	pop	bc
-	add	hl,bc
-	adc	a,d
-	ld	(yfatType.cluster_begin_lba + 0),hl
-	ld	(yfatType.cluster_begin_lba + 3),a
-	or	a,a
+	call	util_read_fat_sector
+	jq	nz,.error
+	call	util_checkmagic
+	jq	nz,.error			; uh oh!
+	ld	hl,(ix + 0)			; ix should still point to the temp sector...
+	ld	bc,$615252			; don't bother comparing $41 byte...
+	xor	a,a
+	sbc	hl,bc
+	jq	nz,.error
+	scf
 	sbc	hl,hl
+	ex	de,hl
+	ld	hl,tmp.sectorbuffer + 488	; invalidate free space
+	ld	(hl),de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl),e
+	ld	hl,(yfatType.fs_info)		; a is always zero (set from above)
+	call	util_write_fat_sector
+	jq	nz,.error
+	or	a,a
+	sbc	hl,hl				; return success
 	pop	ix
 	ret
 .error:
 	ld	hl,USB_ERROR_FAILED
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+util_get_spare_file:
+; outputs
+;  b: index of file (if needed?)
+;  hl, iy: pointer to file index
+	ld	b,MAX_FAT_FILES
+	ld	iy,fatFile4
+	ld	de,-sizeof fatFile
+.find:
+	lea	hl,iy
+	bit	BIT_OPEN,(yfatFile.flags)
+	ret	z
+	add	iy,de
+	djnz	.find
+	xor	a,a
+	sbc	hl,hl				; return null
+	ret
+
+;-------------------------------------------------------------------------------
+util_cluster_to_sector:
+; gets the base sector of the cluster
+; inputs
+;   auhl = cluster
+;   iy -> fat structure
+; outputs
+;   auhl = sector
+	ld	de,-2
+	add	hl,de
+	adc	a,d
+	ld	c,a
+	ld	a,(yfatType.cluster_size)
+	jr	c,.enter
+	xor	a,a
+	sbc	hl,hl
+	ret
+.loop:
+	add	hl,hl
+	rl	c
+.enter:
+	rrca
+	jr	nc,.loop
+	ld	de,(yfatType.data + 0)
+	ld	a,(yfatType.data + 3)
+	add	hl,de
+	adc	a,c
+	ret
+
+;-------------------------------------------------------------------------------
+util_sector_to_cluster:
+; gets sector to base cluster
+; inputs
+;   auhl = sector
+;   iy -> fat structure
+; outputs
+;   auhl = cluster
+	or	a,a
+	jr	nz,.notzero
+	compare_hl_zero
+	ret	z
+.notzero:
+	ld	bc,(yfatType.data + 0)
+	or	a,a
+	sbc	hl,bc
+	sbc	a,(yfatType.data + 3)
+	ld	de,(yfatType.cluster_size - 2)
+	ld	d,0
+	ld	e,a
+.loop:
+	add	hl,hl
+	ex	de,hl
+	adc	hl,hl
+	ex	de,hl
+	jr	nc,.loop
+	ld	a,d
+	push	de
+	push	hl
+	inc	sp
+	pop	hl
+	inc	sp
+	inc	sp
+	ld	bc,2
+	add	hl,bc
+	adc	a,b
+	ret
+
+;-------------------------------------------------------------------------------
+util_next_cluster:
+; moves to next cluster in the chain
+; inputs
+;   auhl = parent cluster
+;   iy -> fat structure
+; outputs
+;   auhl = next cluster
+	add	hl,hl
+	adc	a,a		; << 1
+	ex	de,hl
+	or	a,a
+	sbc	hl,hl
+	ld	l,e
+	add	hl,hl
+	push	hl		; hl = cluster_pos
+	push	af		; >> 8
+	inc	sp
+	push	de
+	inc	sp
+	pop	hl
+	inc	sp
+	xor	a,a
+	ld	de,(yfatType.fat_pos)
+	add	hl,de
+	adc	a,a		; auhl = cluster_sec
+	call	util_read_fat_sector
+	pop	de
+	jr	nz,.error
+	ld	hl,tmp.sectorbuffer
+	add	hl,de
+	ld	de,(hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,(hl)
+	and	a,$0f
+	ld	hl,8
+	add	hl,de
+	ex	de,hl
+	ld	e,a
+	adc	a,$f0
+	jr	nc,.found
+	ld	e,a
+	ex	de,hl
+	ret
+.found:
+	ld	a,e
+	ret
+.error:
+	xor	a,a
+	sbc	hl,hl
 	ret
 
 ;-------------------------------------------------------------------------------
 util_read_fat_sector:
 ; inputs
-;  ahl: LBA address
+;  auhl: LBA address
 ;  iy: fat_t structure
 ; outputs
-;  tmp.sectorbuffer: read sector
-	ld	bc,(yfatType.fat_begin_lba + 0)
-	ld	e,(yfatType.fat_begin_lba + 3)
+;  de: read sector
+	ld	bc,(yfatType.fat_base_lba + 0)
+	ld	e,(yfatType.fat_base_lba + 3)
 	add	hl,bc
 	adc	a,e			; big endian
 	ld	de,scsi.read10.lba
@@ -164,9 +359,46 @@ util_read_fat_sector:
 	ret
 
 ;-------------------------------------------------------------------------------
+util_write_fat_sector:
+; inputs
+;  auhl: lba address
+;  iy: fat_t structure
+; outputs
+	ld	bc,(yfatType.fat_base_lba + 0)
+	ld	e,(yfatType.fat_base_lba + 3)
+	add	hl,bc
+	adc	a,e			; big endian
+	ld	de,scsi.write10.lba
+	ld	(de),a
+	dec	sp
+	push	hl
+	inc	sp
+	pop	af			; hlu
+	inc	de
+	ld	(de),a
+	ld	a,h
+	inc	de
+	ld	(de),a
+	ld	a,l
+	inc	de
+	ld	(de),a
+	push	iy
+	ld	iy,(yfatType.partition)
+	ld	iy,(yfatPartition.msd)
+	call	util_write10
+	pop	iy
+	ret
+
+;-------------------------------------------------------------------------------
 util_read10:
 	ld	de,tmp.sectorbuffer
 	ld	hl,scsi.read10
+	jq	util_scsi_request
+
+;-------------------------------------------------------------------------------
+util_write10:
+	ld	de,tmp.sectorbuffer
+	ld	hl,scsi.write10
 	jq	util_scsi_request
 
 ;-------------------------------------------------------------------------------
@@ -306,5 +538,4 @@ util_sector_checkmagic:
 	ld	a,(hl)
 	cp	a,$aa
 	ret
-
 

@@ -64,28 +64,15 @@ typedef struct {
 } fat_partition_t;
 
 typedef struct {
-    char filename[13];  /**< Entry filename. */
-    uint8_t attrib;     /**< Entry attributes. */
-} fat_entry_t;
-
-typedef struct {
-    uint32_t cluster_base;
-    uint32_t cluster_current;
-    uint32_t sector;
-    uint32_t index;
-    uint32_t pos;
-    uint32_t size;
-    uint8_t write;
-} fat_file_t;
-
-typedef struct {
     fat_partition_t *partition; /**< Disk partition used by FAT. */
-    uint32_t fat_sectors;
-    uint32_t cluster_begin_lba;
-    uint32_t fat_begin_lba;
-    uint32_t root_dir_cluster;
-    uint24_t fs_info_sector;
-    uint8_t cluster_size;       /**< Sectors per cluster. */
+    uint8_t cluster_size;
+    uint32_t clusters;
+    uint24_t fat_pos;
+    uint24_t fs_info;
+    uint32_t fat_base_lba;
+    uint32_t root_dir_pos;
+    uint32_t data_region;
+    uint32_t fs_info_sector;
 } fat_t;
 
 #define FAT_O_WRONLY      2               /**< Open Write only mode. */

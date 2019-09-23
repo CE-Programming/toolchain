@@ -112,6 +112,21 @@ struct msdDevice
 	size := $-.
 end struct
 
+MAX_FAT_FILES := 5
+BIT_OPEN := 0
+BIT_IN_ROOT := 1
+struct fatFile
+	local size
+	label .: size
+	parentcluster	rd 1
+	startcluster	rd 1
+	currentblock	rd 1
+	bytenum		rd 1
+	filelen		rd 1
+	name		rb 11
+	flags		rb 1
+	size := $-.
+end struct
 struct fatPartition
 	local size
 	label .: size
@@ -119,23 +134,18 @@ struct fatPartition
 	msd		rl 1
 	size := $-.
 end struct
-struct fatEntry
-	local size
-	label .: size
-	filename	rb 13
-	attrib		rb 1
-	size := $-.
-end struct
 struct fatType
 	local size
 	label .: size
-	partition	rl 1
-	fat_sectors		rd 1 	; fat sectors
-	cluster_begin_lba	rd 1	; start of clusters
-	fat_begin_lba		rd 1	; start of fat lba
-	fs_info_sector		rl 1	; offset to fs info
-	root_dir_cluster	rd 1	; lba of root directory first cluster
-	cluster_size		rb 1	; sectors per cluster
+	partition		rl 1
+	cluster_size		rb 1
+	clusters		rd 1
+	fat_pos			rl 1
+	fs_info			rl 1
+	fat_base_lba		rd 1
+	root_dir_pos		rd 1
+	data_region		rd 1
+	fs_info_sector		rd 1	; lba: filesystem info
 	size := $-.
 end struct
 
@@ -254,6 +264,7 @@ struct tmp_data
 	length		rl 1
 	descriptor	rb 18
 	msdstruct	rl 1
+	string		rb 20
 	csw		packetCSW
 	size := $-.
 end struct
@@ -743,7 +754,7 @@ util_msd_reset_recovery:
 	pop	iy
 	ret
 .resetsuccess:
-	call	util_msd_clr_in_stall
+	call	util_msd_clr_in_stall		; no pending transfers at this point!
 	jq	util_msd_clr_out_stall
 util_msd_clr_out_stall:
 	ld	iy,(tmp.msdstruct)
@@ -955,3 +966,11 @@ scsi.read10             scsipktrw       1,$28
 scsi.write10            scsipktrw       0,$2a
 
 tmp tmp_data
+
+fatFile0 fatFile
+fatFile1 fatFile
+fatFile2 fatFile
+fatFile3 fatFile
+fatFile4 fatFile
+
+
