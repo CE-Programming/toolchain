@@ -98,32 +98,43 @@ void main(void) {
     // get sector size
     error = msd_GetSectorSize(&msd, &sectorsize);
 
-    if( error == USB_SUCCESS )
-    {
+    if (error == USB_SUCCESS) {
         sprintf(buffer, "sectorsize: %u", sectorsize);
         putstr(buffer);
 
         // find available fat partitions
-dbg_Debugger();
         error = fat_Find(&msd, &fatpartitions, &numpartitions, MAX_PARTITIONS);
     }
 
     // attempt fat init on first fat32 partition
-    if( error == USB_SUCCESS && numpartitions > 0 )
-    {
+    if (error == USB_SUCCESS && numpartitions > 0) {
         sprintf(buffer, "num fat partition: %u", numpartitions);
         putstr(buffer);
 
         // attempt init of fat partition
-dbg_Debugger();
         error = fat_Init(&fat, &fatpartitions[0]);
+    }
+
+    // attempt to open a file
+    if (error == USB_SUCCESS) {
+	fat_file_t *file;
+
+        putstr("inited fat filesystem");
+
+        // attempt init of fat partition
+	dbg_Debugger();
+        file = fat_Open(&fat, "/DIRA/DIRB/FILE.TXT", FAT_OPEN_RDWR);
+        if (file) {
+            putstr("located file");
+        } else {
+            putstr("no file");
+	}
     }
 
     if( error == USB_SUCCESS )
     {
-        putstr("inited fat filesystem");
+        putstr("success!");
     }
-
 
     // cleanup and return
     usb_Cleanup();

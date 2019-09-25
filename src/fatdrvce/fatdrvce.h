@@ -59,6 +59,10 @@ typedef struct {
 } msd_device_t;
 
 typedef struct {
+    uint8_t dummy;
+} fat_file_t;
+
+typedef struct {
     uint32_t lba;       /**< Logical Block Address (LBA) of FAT partition */
     msd_device_t *msd;  /**< MSD containing FAT filesystem */
 } fat_partition_t;
@@ -76,14 +80,14 @@ typedef struct {
     uint32_t working_cluster;
 } fat_t;
 
-#define FAT_O_WRONLY      2               /**< Open Write only mode. */
-#define FAT_O_RDONLY      1               /**< Open Read only mode. */
-#define FAT_O_RDWR (O_RDONLY | O_WRONLY)  /**< Open in Read and Write mode. */
+#define FAT_OPEN_WRONLY  2  /**< Open file in write-only mode. */
+#define FAT_OPEN_RDONLY  1  /**< Open file in read-only mode. */
+#define FAT_OPEN_RDWR    (FAT_OPEN_RDONLY | FAT_OPEN_WRONLY)  /**< Open file for reading and writing. */
 
-#define FAT_RDONLY    (1 << 0)  /**< Entry is Read-Only. */
-#define FAT_HIDDEN    (1 << 1)  /**< Entry is Hidden. */
-#define FAT_SYSTEM    (1 << 2)  /**< Entry is a System file / directory. */
-#define FAT_VOLLABEL  (1 << 3)  /**< Entry is a Volume Label. Only for root directory. */
+#define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
+#define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden. */
+#define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory. */
+#define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory. */
 #define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or directory). */
 #define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
 #define FAT_ALL       (FAT_DIR | FAT_VOLLABEL | FAT_SYSTEM | FAT_HIDDEN | FAT_RDONLY)
@@ -113,6 +117,17 @@ usb_error_t fat_Find(msd_device_t *msd,
  */
 usb_error_t fat_Init(fat_t *fat,
                      fat_partition_t *partition);
+
+/**
+ * Opens a file for either reading or writing, or both.
+ * @param fat Initialized FAT structure type.
+ * @param filepath File path to open or write.
+ * @return 0 if the file could not be opened, otherwise pointer
+ *         to a file handle for other functions.
+ */
+fat_file_t *fat_Open(fat_t *fat,
+                     const char *filepath,
+                     uint8_t flags);
 
 /**
  * Initialize a USB connected Mass Storage Device. Checks if the device is

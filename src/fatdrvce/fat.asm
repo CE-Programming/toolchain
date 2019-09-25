@@ -188,6 +188,37 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat_Open:
+; Attempts to open a file for reading or writing
+; Arguments:
+;  arg0: FAT structure type
+;  arg1: filename (8.3 format)
+;  arg2: open flags
+; Returns:
+;  USB_SUCCESS on success
+	ld	iy,0
+	add	iy,sp
+	ld	de,(iy + 6)
+	ld	iy,(iy + 3)
+	call	util_locate_entry
+	compare_hl_zero
+	jq	nz,.located
+	or	a,a
+	jq	z,.error
+.located:
+	push	de,hl,af
+	call	util_read_fat_sector
+	call	util_get_spare_file
+	compare_hl_zero
+	pop	af,hl,de
+	jr	z,.error		; no open slots left!
+	ret
+.error:
+	xor	a,a
+	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
 util_get_fat_name:
 ; convert name to 8.3 name (covers most cases)
 ; inputs
@@ -218,6 +249,8 @@ util_get_fat_name:
 	jr	nc,.elseif
 	ld	a,(de)
 	or	a,a
+	jr	z,.elseif
+	cp	a,'/'
 	jr	z,.elseif
 	ld	a,8
 .loop2:
@@ -290,7 +323,7 @@ util_get_next_component:
 
 ;-------------------------------------------------------------------------------
 util_locate_entry:
-; finds the file entry
+; finds the component entry
 ; inputs
 ;   iy: fat structure
 ;   de: name
@@ -328,7 +361,8 @@ util_locate_entry:
 	cp	a,$e5			; deleted entry, skip
 	jr	z,.detectname
 	or	a,a
-	jq	z,.error		; end of list, suitable entry not found
+	jq	z,.errorpopiy		; end of list, suitable entry not found
+	lea	de,iy
 	ld	hl,tmp.string
 	ld	b,11
 .cmpnames:
@@ -342,8 +376,19 @@ util_locate_entry:
 	pop	iy
 	ld	hl,(.component)
 	ld	a,(hl)
-	or	a,a			; check if end of component lookup
-	jr	z,.foundlastcomponent
+	or	a,a			; check if end of component lookup (de)
+	jq	z,.foundlastcomponent
+	push	iy
+	push	de
+	pop	iy
+	ld	a,(iy + 20 + 1)
+	ld	hl,(iy + 20 - 2)	; get hlu
+	ld	l,(iy + 26 + 0)
+	ld	h,(iy + 26 + 1)		; get the entry's cluster, and convert it to the sector
+	call	util_cluster_to_sector
+	pop	iy
+	ld	(yfatType.working_sector + 0),hl
+	ld	(yfatType.working_sector + 3),a
 	jq	.findcomponent		; found the component we were looking for (yay)
 .cmpfail:
 	dec	c
@@ -384,6 +429,8 @@ util_locate_entry:
 	jq	nz,.locateloop		; make sure we can get the next cluster
 	or	a,a
 	jq	nz,.locateloop
+.errorpopiy:
+	pop	iy
 .error:
 	xor	a,a
 	sbc	hl,hl
