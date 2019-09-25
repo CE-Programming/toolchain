@@ -188,6 +188,212 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
+util_get_fat_name:
+; convert name to 8.3 name (covers most cases)
+; inputs
+;   de: name
+;   hl: <output> name (11+1 bytes)
+	ld	hl,tmp.string
+	push	de
+	ld	b,0
+.loop1:
+	ld	a,b
+	cp	a,8
+	jr	nc,.done1
+	ld	a,(de)
+	cp	a,'.'
+	jr	z,.done1
+	cp	a,'/'
+	jr	z,.done1
+	or	a,a
+	jr	z,.done1
+	ld	(hl),a
+	inc	de
+	inc	hl
+	inc	b
+	jr	.loop1
+.done1:
+	ld	a,b
+	cp	a,8
+	jr	nc,.elseif
+	ld	a,(de)
+	or	a,a
+	jr	z,.elseif
+	ld	a,8
+.loop2:
+	cp	a,b
+	jr	z,.fillremaining
+	ld	(hl),' '
+	inc	hl
+	inc	b
+	jr	.loop2
+.fillremaining:
+	inc	de
+.loop3456:
+	ld	a,b
+	cp	a,11
+	jq	nc,.return
+	ld	a,(de)
+	or	a,a
+	jr	z,.other
+	cp	a,'/'
+	jr	z,.other
+	inc	de
+.store:
+	ld	(hl),a
+	inc	hl
+	inc	b
+	jr	.loop3456
+.other:
+	ld	a,' '
+	jr	.store
+.elseif:
+	ld	a,b
+	cp	a,8
+	jr	nz,.spacefill
+	ld	a,(de)
+	cp	a,'.'
+	jr	nz,.spacefill
+	jr	.fillremaining
+.spacefill:
+	ld	a,11
+.spacefillloop:
+	cp	a,b
+	jq	z,.return
+	ld	(hl),' '
+	inc	hl
+	inc	b
+	jq	.spacefillloop
+.return:
+	pop	de
+	ret
+
+;-------------------------------------------------------------------------------
+util_get_component_start:
+	ld	a,(de)
+	or	a,a
+	ret	z
+	cp	a,'/'
+	ret	nz
+	inc	de
+	jq	util_get_component_start
+
+;-------------------------------------------------------------------------------
+util_get_next_component:
+	ld	a,(de)
+	or	a,a
+	ret	z
+	cp	a,'/'
+	ret	z
+	inc	de
+	jq	util_get_next_component
+
+;-------------------------------------------------------------------------------
+util_locate_entry:
+; finds the file entry
+; inputs
+;   iy: fat structure
+;   de: name
+; outputs
+;   hl: sector of entry
+;   de: offset to entry in sector
+	ld	hl,(yfatType.root_dir_pos + 0)
+	ld	a,(yfatType.root_dir_pos + 3)
+	ld	(yfatType.working_sector + 0),hl
+	ld	(yfatType.working_sector + 3),a
+	ld	(.component),de
+.findcomponent:
+	ld	de,0
+.component := $-3
+	call	util_get_component_start
+	jq	z,.error
+	call	util_get_fat_name
+	call	util_get_next_component
+	ld	(.component),de
+.locateloop:
+	ld	hl,(yfatType.working_sector + 0)
+	ld	a,(yfatType.working_sector + 3)
+	call	util_read_fat_sector
+	jq	nz,.error
+	push	iy
+	ld	iy,tmp.sectorbuffer - 32
+	ld	c,16
+.detectname:
+	lea	iy,iy + 32
+	ld	a,(iy + 11)
+	and	a,$0f
+	cp	a,$0f			; long file name entry, skip
+	jr	z,.detectname
+	ld	a,(iy + 0)
+	cp	a,$e5			; deleted entry, skip
+	jr	z,.detectname
+	or	a,a
+	jq	z,.error		; end of list, suitable entry not found
+	ld	hl,tmp.string
+	ld	b,11
+.cmpnames:
+	ld	a,(de)
+	cp	a,(hl)
+	jr	nz,.cmpfail
+	inc	de
+	inc	hl
+	djnz	.cmpnames
+	lea	de,iy
+	pop	iy
+	ld	hl,(.component)
+	ld	a,(hl)
+	or	a,a			; check if end of component lookup
+	jr	z,.foundlastcomponent
+	jq	.findcomponent		; found the component we were looking for (yay)
+.cmpfail:
+	dec	c
+	jr	nz,.detectname
+	pop	iy
+.movetonextsector:
+	ld	hl,(yfatType.working_sector + 0)
+	ld	a,(yfatType.working_sector + 3)
+	call	util_sector_to_cluster
+	push	hl,af
+	ld	hl,(yfatType.working_sector + 0)
+	ld	a,(yfatType.working_sector + 3)
+	ld	bc,1
+	add	hl,bc
+	add	a,b
+	call	util_sector_to_cluster
+	pop	bc,de
+	compare_hl_de
+	jr	nz,.movetonextcluster
+	cp	a,b
+	jr	nz,.movetonextcluster
+	ld	hl,(yfatType.working_sector + 0)
+	ld	a,(yfatType.working_sector + 3)
+	ld	bc,1
+	add	hl,bc
+	adc	a,b
+	jq	.storesectorandloop
+.movetonextcluster:
+	ld	hl,(yfatType.working_sector + 0)
+	ld	a,(yfatType.working_sector + 3)
+	call	util_sector_to_cluster
+	call	util_next_cluster
+	call	util_cluster_to_sector
+.storesectorandloop:
+	ld	(yfatType.working_sector + 0),hl
+	ld	(yfatType.working_sector + 3),a
+	compare_hl_zero
+	jq	nz,.locateloop		; make sure we can get the next cluster
+	or	a,a
+	jq	nz,.locateloop
+.error:
+	xor	a,a
+	sbc	hl,hl
+	ret
+.foundlastcomponent:
+	ld	hl,(yfatType.working_sector + 0)
+	ld	a,(yfatType.working_sector + 3)
+	ret
+
+;-------------------------------------------------------------------------------
 util_get_spare_file:
 ; outputs
 ;  b: index of file (if needed?)
@@ -228,8 +434,8 @@ util_cluster_to_sector:
 .enter:
 	rrca
 	jr	nc,.loop
-	ld	de,(yfatType.data + 0)
-	ld	a,(yfatType.data + 3)
+	ld	de,(yfatType.data_region + 0)
+	ld	a,(yfatType.data_region + 3)
 	add	hl,de
 	adc	a,c
 	ret
@@ -247,10 +453,10 @@ util_sector_to_cluster:
 	compare_hl_zero
 	ret	z
 .notzero:
-	ld	bc,(yfatType.data + 0)
+	ld	bc,(yfatType.data_region + 0)
 	or	a,a
 	sbc	hl,bc
-	sbc	a,(yfatType.data + 3)
+	sbc	a,(yfatType.data_region + 3)
 	ld	de,(yfatType.cluster_size - 2)
 	ld	d,0
 	ld	e,a
