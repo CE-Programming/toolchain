@@ -199,20 +199,94 @@ fat_Open:
 	ld	iy,0
 	add	iy,sp
 	ld	de,(iy + 6)
+	push	iy
 	ld	iy,(iy + 3)
 	call	util_locate_entry
+	pop	iy
 	compare_auhl_zero
 	jq	z,.error
-	push	de,hl,af
-	call	util_read_fat_sector
+	ld	c,(iy + 9)
+	set	BIT_OPEN,c
+	push	de
+	push	af
+	push	hl
 	call	util_get_spare_file
 	compare_hl_zero
-	pop	af,hl,de
-	jr	z,.error		; no open slots left!
+	pop	hl
+	pop	af
+	pop	de
+	jq	z,.error
+	ld	(yfatFile.entry_pointer),de
+	ld	(yfatFile.first_sector + 0),hl
+	ld	(yfatFile.first_sector + 3),a
+	ld	(yfatFile.flags),c
+	call	util_get_file_first_cluster
+	ld	(yfatFile.first_cluster + 0),hl
+	ld	(yfatFile.first_cluster + 3),a
+	ld	(yfatFile.current_cluster + 0),hl
+	ld	(yfatFile.current_cluster + 3),a
+	compare_auhl_zero
+	jr	nz,.notempty
+.empty:
+	bit	BIT_WRITE,c
+	jr	z,.cantalloc
+
+	; todo: alloc cluster here
+
+.cantalloc:
+	xor	a,a
+	sbc	hl,hl
+	jq	.storesize
+.notempty:
+	call	util_get_file_size
+.storesize:
+	ld	(yfatFile.file_size + 0),hl
+	ld	(yfatFile.file_size + 3),a
+	xor	a,a
+	sbc	hl,hl
+	ld	(yfatFile.fpos + 0),hl
+	ld	(yfatFile.fpos + 3),a
+	lea	hl,iy
 	ret
 .error:
 	xor	a,a
 	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
+util_get_spare_file:
+; outputs
+;  b: index of file (if needed?)
+;  hl, iy: pointer to file index
+	ld	b,MAX_FAT_FILES
+	ld	iy,fatFile4
+.find:
+	bit	BIT_OPEN,(yfatFile.flags)
+	ret	z
+	lea	iy,iy - sizeof fatFile
+	djnz	.find
+	xor	a,a
+	sbc	hl,hl				; return null
+	ret
+
+;-------------------------------------------------------------------------------
+util_get_file_first_cluster:
+	push	iy
+	ld	iy,(yfatFile.entry_pointer)
+	ld	a,(iy + 20 + 1)
+	ld	hl,(iy + 20 - 2)
+	ld	l,(iy + 26 + 0)
+	ld	h,(iy + 26 + 1)		; first cluster
+	pop	iy
+	ret
+
+;-------------------------------------------------------------------------------
+util_get_file_size:
+	push	iy
+	ld	iy,(yfatFile.entry_pointer)
+	ld	hl,(iy + 28 + 0)
+	ld	a,(iy + 28 + 3)
+	pop	iy
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -434,24 +508,6 @@ util_locate_entry:
 .foundlastcomponent:
 	ld	hl,(yfatType.working_sector + 0)
 	ld	a,(yfatType.working_sector + 3)
-	ret
-
-;-------------------------------------------------------------------------------
-util_get_spare_file:
-; outputs
-;  b: index of file (if needed?)
-;  hl, iy: pointer to file index
-	ld	b,MAX_FAT_FILES
-	ld	iy,fatFile4
-	ld	de,-sizeof fatFile
-.find:
-	lea	hl,iy
-	bit	BIT_OPEN,(yfatFile.flags)
-	ret	z
-	add	iy,de
-	djnz	.find
-	xor	a,a
-	sbc	hl,hl				; return null
 	ret
 
 ;-------------------------------------------------------------------------------

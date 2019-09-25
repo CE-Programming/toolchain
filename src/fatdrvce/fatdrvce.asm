@@ -122,18 +122,19 @@ struct msdDevice
 end struct
 
 MAX_FAT_FILES := 5
-BIT_OPEN := 0
-BIT_IN_ROOT := 1
+BIT_READ := 0
+BIT_WRITE := 1
+BIT_OPEN := 7
 struct fatFile
 	local size
 	label .: size
-	parentcluster	rd 1
-	startcluster	rd 1
-	currentblock	rd 1
-	bytenum		rd 1
-	filelen		rd 1
-	name		rb 11
 	flags		rb 1
+	first_sector	rd 1
+	first_cluster	rd 1
+	current_cluster	rd 1
+	file_size	rd 1
+	fpos		rd 1
+	entry_pointer	rl 1
 	size := $-.
 end struct
 struct fatPartition
@@ -146,17 +147,17 @@ end struct
 struct fatType
 	local size
 	label .: size
-	partition		rl 1
-	cluster_size		rb 1
-	clusters		rd 1
-	fat_pos			rl 1
-	fs_info			rl 1
-	fat_base_lba		rd 1
-	root_dir_pos		rd 1
-	data_region		rd 1
-	working_sector		rd 1
-	working_cluster		rd 1
-	working_pointer		rl 1
+	partition	rl 1
+	cluster_size	rb 1
+	clusters	rd 1
+	fat_pos		rl 1
+	fs_info		rl 1
+	fat_base_lba	rd 1
+	root_dir_pos	rd 1
+	data_region	rd 1
+	working_sector	rd 1
+	working_cluster	rd 1
+	working_pointer	rl 1
 	size := $-.
 end struct
 

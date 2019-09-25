@@ -59,7 +59,13 @@ typedef struct {
 } msd_device_t;
 
 typedef struct {
-    uint8_t dummy;
+    uint8_t flags;
+    uint32_t first_sector;
+    uint32_t first_cluster;
+    uint32_t current_cluster;
+    uint32_t file_size;
+    uint32_t fpos;
+    uint24_t entry_pointer;
 } fat_file_t;
 
 typedef struct {
