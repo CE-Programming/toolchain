@@ -3,6 +3,7 @@
 #include <tice.h>
 
 #include <stddef.h>
+#include <stdio.h>
 
 typedef struct my_timer {
     usb_timer_t usbTimer;
@@ -15,7 +16,7 @@ usb_error_t my_timer_handler(usb_timer_t *usbTimer) {
     if (myTimer->counter != 0) {
         myTimer->counter -= 1;
     }
-    usb_RepeatTimer(&myTimer, myTimer->interval);
+    usb_RepeatTimer(usbTimer, myTimer->interval);
     return USB_SUCCESS;
 }
 
@@ -30,14 +31,14 @@ void main() {
             myTimers[i].usbTimer.handler = my_timer_handler;
             myTimers[i].interval = 1000u >> i;
             myTimers[i].counter = 10u << i;
-            usb_StartTimer(&myTimers[i], myTimers[i].interval);
+            usb_StartTimer(&myTimers[i].usbTimer, myTimers[i].interval);
         }
         while (usb_WaitForEvents() == USB_SUCCESS) {
             for (i = 0; i != N; i++) {
                 char string[3];
                 os_SetCursorPos(i, 0);
                 sprintf(string, "%2u", myTimers[i].counter);
-                os_PutStringFull(string);
+                os_PutStrFull(string);
             }
             for (i = 0; i != N; i++) {
                 if (myTimers[i].counter != 0) {
