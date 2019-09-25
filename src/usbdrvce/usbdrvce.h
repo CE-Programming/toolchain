@@ -9,7 +9,7 @@
  * @warning This library requires general-purpose timer 2, so TIMER2 things from
  * \c tice.h can't be used between calls to usb_Init() and usb_Cleanup().
  * However, this library exposes a safe way to read the timer 2 counter, which
- * is setup to count up with the CPU clock via usb_GetCpuCounter() and the like.
+ * is setup to count up with the CPU clock via usb_GetCycleCounter() et al.
  * @warning If you enable timer 3 interrupts via the interrupt controller the OS
  * will try to do USB stuff and corrupt this library's data.  As a safety
  * measure, many routines will return \c USB_ERROR_SYSTEM if this happens.
@@ -487,7 +487,8 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
  * #include <usbdrvce.h>
  * \endcode
  * @return Return USB_SUCCESS to initialize the device, USB_IGNORE to ignore it
- * without erroring, or an error to abort and return from usb_ProcessEvents().
+ * without erroring, or any other value to abort and return from
+ * usb_ProcessEvents() with that value.
  */
 typedef usb_error_t (*usb_event_callback_t)(usb_event_t event, void *event_data,
                                             usb_callback_data_t *callback_data);
@@ -507,12 +508,85 @@ typedef usb_error_t (*usb_event_callback_t)(usb_event_t event, void *event_data,
  * Only valid if \p status was USB_TRANSFER_COMPLETED.
  * @return Return USB_SUCCESS to free the transfer.  Return USB_IGNORE to
  * restart it, which is only possible if USB_TRANSFER_FAILED is set.
- * Return any error to abort and return from usb_ProcessEvents().
+ * Return any other value to abort and return from usb_ProcessEvents() with that
+ * value.
  */
 typedef usb_error_t (*usb_transfer_callback_t)(usb_endpoint_t endpoint,
                                                usb_transfer_status_t status,
                                                size_t transferred,
                                                usb_transfer_data_t *data);
+
+/**
+ * This struct represents a timed callback.  It must be allocated by the user.
+ * The only public member is handler, which must be initialized before use.
+ * If you want to access other data from the callback, allocate a larger
+ * struct with this struct as its first member and cast like in this example:
+ * \code
+ * #include <tice.h>
+ * #include <usbdrvce.h>
+ *
+ * typedef struct my_timer {
+ *     usb_timer_t usbTimer;
+ *     unsigned interval;
+ *     unsigned counter;
+ * } my_timer_t;
+ *
+ * usb_error_t my_timer_handler(usb_timer_t *usbTimer) {
+ *     my_timer_t *myTimer = (my_timer_t *)usbTimer;
+ *     if (myTimer->counter != 0) {
+ *         myTimer->counter -= 1;
+ *     }
+ *     usb_RepeatTimer(&myTimer, myTimer->interval);
+ *     return USB_SUCCESS;
+ * }
+ *
+ * #define N 4
+ *
+ * void main() {
+ *     os_ClrHomeFull();
+ *     if (usb_Init(NULL, NULL, NULL, USB_DEFAULT_INIT_FLAGS) == USB_SUCCESS) {
+ *         my_timer_t myTimers[N];
+ *         int i;
+ *         for (i = 0; i != N; i++) {
+ *             myTimers[i].usbTimer.handler = my_timer_handler;
+ *             myTimers[i].interval = 1000u >> i;
+ *             myTimers[i].counter = 10u << i;
+ *             usb_StartTimer(&myTimers[i], myTimers[i].interval);
+ *         }
+ *         while (usb_WaitForEvents() == USB_SUCCESS) {
+ *             for (i = 0; i != N; i++) {
+ *                 char string[3];
+ *                 os_SetCursorPos(i, 0);
+ *                 sprintf(string, "%2u", myTimers[i].counter);
+ *                 os_PutStringFull(string);
+ *             }
+ *             for (i = 0; i != N; i++) {
+ *                 if (myTimers[i].counter != 0) {
+ *                     continue;
+ *                 }
+ *             }
+ *             break;
+ *         }
+ *         usb_Cleanup();
+ *     }
+ * }
+ * \endcode
+ */
+typedef struct usb_timer usb_timer_t;
+
+/**
+ * Type of the function to be called when a timer expires.
+ * @param
+ * @return Return USB_SUCCESS or any other value to abort and return from
+ * usb_ProcessEvents() with that error.
+ */
+typedef usb_error_t (*usb_timer_callback_t)(usb_timer_t *timer);
+
+struct usb_timer {
+    usb_timer_callback_t handler;
+    uint32_t tick;     /**< private */
+    usb_timer_t *next; /**< private */
+};
 
 /**
  * Initializes the usb driver.
@@ -540,21 +614,6 @@ void usb_Cleanup(void);
  * @return An error returned by a callback or USB_SUCCESS.
  */
 usb_error_t usb_HandleEvents(void);
-
-/**
- * Returns a counter that increments once every cpu cycle, or 48000 times every
- * millisecond.  This counter overflows every 90 seconds or so.
- * @return Cpu counter.
- */
-uint32_t usb_GetCpuCounter(void);
-
-/**
- * Returns a counter that increments once every 256 cpu cycles, or 375 times
- * every 2 milliseconds.  This is the high 24 bits of the same counter returned
- * by usb_GetCpuCounter().
- * @return Cpu counter.
- */
-uint24_t usb_GetCpuCounterHigh(void);
 
 /**
  * Waits for any device or transfer events to occur, then calls their associated
@@ -1066,6 +1125,55 @@ usb_ScheduleTransfer(usb_endpoint_t endpoint, void *buffer, size_t length,
 #define usb_ScheduleBulkTransfer usb_ScheduleTransfer
 #define usb_ScheduleInterruptTransfer usb_ScheduleTransfer
 #define usb_ScheduleIsochronousTransfer usb_ScheduleTransfer
+
+/* Timer Functions */
+
+/**
+ * Starts a timer that expires \p timeout_ms after calling this function.
+ * @note May be called from within \c timer->handler itself.
+ * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param timeout_ms Timeout in milliseconds.
+ */
+void usb_StartTimer(usb_timer_t *timer, uint16_t timeout_ms);
+
+/**
+ * Starts a timer that expires \p interval_ms after it last expired.
+ * @note May be called from within \c timer->handler itself.
+ * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param interval_ms Repeat interval in milliseconds.
+ */
+void usb_RepeatTimer(usb_timer_t *timer, uint16_t interval_ms);
+
+/**
+ * Starts a timer that expires \p timeout_cycles after calling this function.
+ * @note May be called from within \c timer->handler itself.
+ * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param timeout_cycles Timeout in cpu cycles.
+ */
+void usb_StartCycleTimer(usb_timer_t *timer, uint32_t timeout_cycles);
+
+/**
+ * Starts a timer that expires \p interval_cycles after it last expired.
+ * @note May be called from within \c timer->handler itself.
+ * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param interval_cycles Repeat interval in cpu cycles.
+ */
+void usb_RepeatCycleTimer(usb_timer_t *timer, uint32_t interval_cycles);
+
+/**
+ * Returns a counter that increments once every cpu cycle, or 48000 times every
+ * millisecond.  This counter overflows every 90 seconds or so.
+ * @return Cpu cycle counter.
+ */
+uint32_t usb_GetCycleCounter(void);
+
+/**
+ * Returns a counter that increments once every 256 cpu cycles, or 375 times
+ * every 2 milliseconds.  This is the high 24 bits of the same counter returned
+ * by usb_GetCycleCounter().
+ * @return Cpu cycle counter >> 8.
+ */
+uint24_t usb_GetCycleCounterHigh(void);
 
 #ifdef __cplusplus
 }
