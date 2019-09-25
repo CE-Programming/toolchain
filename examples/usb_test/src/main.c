@@ -401,7 +401,7 @@ void main(void) {
             os_SetCursorPos(0, 0);
             putIntHex(usb_GetFrameNumber());
             putChar(':');
-            putLongHex(usb_GetCpuCounter());
+            putLongHex(usb_GetCycleCounter());
             os_SetCursorPos(row, col);
             handleDevice(&global);
         }

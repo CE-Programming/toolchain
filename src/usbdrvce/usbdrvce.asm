@@ -13,8 +13,6 @@ library 'USBDRVCE', 0
 ;-------------------------------------------------------------------------------
 	export usb_Init
 	export usb_Cleanup
-	export usb_GetCpuCounter
-	export usb_GetCpuCounterHigh
 	export usb_HandleEvents
 	export usb_WaitForEvents
 	export usb_WaitForInterrupt
@@ -53,6 +51,12 @@ library 'USBDRVCE', 0
 	export usb_Transfer
 	export usb_ScheduleControlTransfer
 	export usb_ScheduleTransfer
+	export usb_StartTimer
+	export usb_RepeatTimer
+	export usb_StartCycleTimer
+	export usb_RepeatCycleTimer
+	export usb_GetCycleCounter
+	export usb_GetCycleCounterHigh
 
 ;-------------------------------------------------------------------------------
 ; macros
@@ -650,64 +654,6 @@ usb_Cleanup:
 ;	set	7,(hl)
 	call	_Init
 	res	5,(hl)
-	ret
-
-;-------------------------------------------------------------------------------
-usb_GetCpuCounter:
-	call	usb_GetCpuCounterHigh
-	dec	sp
-	dec	sp
-	push	hl
-	dec	sp
-	pop	hl,de
-	ld	l,a
-	ret
-
-;-------------------------------------------------------------------------------
-usb_GetCpuCounterHigh:
-	ld	hl,(mpIntInvert+$20) or (intLatch+$20) shl 8
-	ld	a,i
-	di
-	ld	a,(hl)
-	push	af
-	ld	(hl),.ret
-	ld	l,h;ti.intLatch+$20
-	ld	de,(hl)
-	push	de
-	ld	de,.ld_auhl_tmr2Counter
-	ld	(hl),de
-	ld	iy,mpTmr2Counter+1
-.tmrBase := iy-tmr2Counter-1
-	lea	hl,.tmrBase+tmr2Counter
-virtual at mpIntLatch+$20
-	ld	a,(hl)
-	ld	hl,(.tmrBase+tmr2Counter+1)
- load .ld_auhl_tmr2Counter: $-$$ from $$
- assert .ld_auhl_tmr2Counter < 1 shl 22
-end virtual
-virtual at mpIntInvert+$20
-	ret
- load .ret: $-$$ from $$
- assert .ret < 1 shl 8
-end virtual
-	call	mpIntLatch+$20
-	ld	iy,mpIntRange+$20
-	pop	de
-	ld	(iy+intLatch),de
-	pop	de
-	ld	(iy+intInvert),d
-	bit	2,e ; p/v flag
-	jq	z,.noEi
-	ei
-.noEi:
-	add	a,3 shl 2
-	add	a,3 shl 1
-	ret	nc
-	inc	l
-	ret	nz
-	cp	a,3 shl 0
-	ret	nc
-	inc	h
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3560,6 +3506,80 @@ _DispatchEvent:
 	sbc	hl,de
 	ret	nz
 	ex	de,hl
+	ret
+
+;-------------------------------------------------------------------------------
+usb_StartTimer:
+	ret
+
+;-------------------------------------------------------------------------------
+usb_RepeatTimer:
+	ret
+
+;-------------------------------------------------------------------------------
+usb_StartCycleTimer:
+	ret
+
+;-------------------------------------------------------------------------------
+usb_RepeatCycleTimer:
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetCycleCounter:
+	call	usb_GetCycleCounterHigh
+	dec	sp
+	dec	sp
+	push	hl
+	dec	sp
+	pop	hl,de
+	ld	l,a
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetCycleCounterHigh:
+	ld	hl,(mpIntInvert+$20) or (intLatch+$20) shl 8
+	ld	a,i
+	di
+	ld	a,(hl)
+	push	af
+	ld	(hl),.ret
+	ld	l,h;ti.intLatch+$20
+	ld	de,(hl)
+	push	de
+	ld	de,.ld_auhl_tmr2Counter
+	ld	(hl),de
+	ld	iy,mpTmr2Counter+1
+.tmrBase := iy-tmr2Counter-1
+	lea	hl,.tmrBase+tmr2Counter
+virtual at mpIntLatch+$20
+	ld	a,(hl)
+	ld	hl,(.tmrBase+tmr2Counter+1)
+ load .ld_auhl_tmr2Counter: $-$$ from $$
+ assert .ld_auhl_tmr2Counter < 1 shl 22
+end virtual
+virtual at mpIntInvert+$20
+	ret
+ load .ret: $-$$ from $$
+ assert .ret < 1 shl 8
+end virtual
+	call	mpIntLatch+$20
+	ld	iy,mpIntRange+$20
+	pop	de
+	ld	(iy+intLatch),de
+	pop	de
+	ld	(iy+intInvert),d
+	bit	2,e ; p/v flag
+	jq	z,.noEi
+	ei
+.noEi:
+	add	a,3 shl 2
+	add	a,3 shl 1
+	ret	nc
+	inc	l
+	ret	nz
+	cp	a,3 shl 0
+	ret	nc
+	inc	h
 	ret
 
 ;-------------------------------------------------------------------------------
