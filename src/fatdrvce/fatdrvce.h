@@ -59,16 +59,6 @@ typedef struct {
 } msd_device_t;
 
 typedef struct {
-    uint8_t flags;
-    uint32_t first_sector;
-    uint32_t first_cluster;
-    uint32_t current_cluster;
-    uint32_t file_size;
-    uint32_t fpos;
-    uint24_t entry_pointer;
-} fat_file_t;
-
-typedef struct {
     uint32_t lba;       /**< Logical Block Address (LBA) of FAT partition */
     msd_device_t *msd;  /**< MSD containing FAT filesystem */
 } fat_partition_t;
@@ -86,6 +76,17 @@ typedef struct {
     uint32_t working_cluster;
     uint24_t working_pointer;
 } fat_t;
+
+typedef struct {
+    fat_t *fat;
+    uint8_t flags;
+    uint32_t first_sector;
+    uint32_t first_cluster;
+    uint32_t current_cluster;
+    uint32_t file_size;
+    uint32_t fpos;
+    uint24_t entry_pointer;
+} fat_file_t;
 
 #define FAT_OPEN_WRONLY  2  /**< Open file in write-only mode. */
 #define FAT_OPEN_RDONLY  1  /**< Open file in read-only mode. */
@@ -135,6 +136,27 @@ usb_error_t fat_Init(fat_t *fat,
 fat_file_t *fat_Open(fat_t *fat,
                      const char *filepath,
                      uint8_t flags);
+
+/**
+ * Closes an open file handle, freeing it for future use.
+ * @param file File handle returned from fat_Open.
+ * @return USB_SUCCESS on success, otherwise error.
+ */
+usb_error_t fat_Close(fat_file_t *file);
+
+/**
+ * Gets the size of the file.
+ * @param file File handle returned from fat_Open.
+ * @return File size in bytes.
+ */
+uint32_t fat_FileSize(fat_file_t *file);
+
+/**
+ * Gets the offset position in the file.
+ * @param file File handle returned from fat_Open.
+ * @return File offset in bytes.
+ */
+uint32_t fat_FilePos(fat_file_t *file);
 
 /**
  * Initialize a USB connected Mass Storage Device. Checks if the device is

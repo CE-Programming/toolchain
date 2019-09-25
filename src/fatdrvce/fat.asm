@@ -86,8 +86,8 @@ fat_Find:
 fat_Init:
 ; Initializes a FAT filesystem from a particular LBA
 ; Arguments:
-;  arg0: Uninitialized FAT structure type
-;  arg1: Available FAT partition returned from fat_Find
+;  sp + 3 : Uninitialized FAT structure type
+;  sp + 6 : Available FAT partition returned from fat_Find
 ; Returns:
 ;  USB_SUCCESS on success
 	ld	iy,0
@@ -189,11 +189,11 @@ fat_Init:
 
 ;-------------------------------------------------------------------------------
 fat_Open:
-; Attempts to open a file for reading or writing
+; Attempts to open a file for reading and/or writing
 ; Arguments:
-;  arg0: FAT structure type
-;  arg1: filename (8.3 format)
-;  arg2: open flags
+;  sp + 3 : FAT structure type
+;  sp + 6 : Filename (8.3 format)
+;  sp + 9 : Open flags
 ; Returns:
 ;  USB_SUCCESS on success
 	ld	iy,0
@@ -207,6 +207,7 @@ fat_Open:
 	jq	z,.error
 	ld	c,(iy + 9)
 	set	BIT_OPEN,c
+	pea	iy + 3
 	push	de
 	push	af
 	push	hl
@@ -215,11 +216,13 @@ fat_Open:
 	pop	hl
 	pop	af
 	pop	de
-	jq	z,.error
+	jq	z,.errorpop
+	ld	(yfatFile.flags),c
+	pop	bc
+	ld	(yfatFile.fat),bc
 	ld	(yfatFile.entry_pointer),de
 	ld	(yfatFile.first_sector + 0),hl
 	ld	(yfatFile.first_sector + 3),a
-	ld	(yfatFile.flags),c
 	call	util_get_file_first_cluster
 	ld	(yfatFile.first_cluster + 0),hl
 	ld	(yfatFile.first_cluster + 3),a
@@ -230,9 +233,18 @@ fat_Open:
 .empty:
 	bit	BIT_WRITE,c
 	jr	z,.cantalloc
-
-	; todo: alloc cluster here
-
+	push	iy
+	call	util_alloc_cluster
+	pop	iy
+	compare_auhl_zero
+	jq	nz,.allocedclusted
+	ld	(yfatFile.flags),a
+	jq	.error
+.allocedclusted:
+	ld	(yfatFile.first_cluster + 0),hl
+	ld	(yfatFile.first_cluster + 3),a
+	ld	(yfatFile.current_cluster + 0),hl
+	ld	(yfatFile.current_cluster + 3),a
 .cantalloc:
 	xor	a,a
 	sbc	hl,hl
@@ -248,7 +260,82 @@ fat_Open:
 	ld	(yfatFile.fpos + 3),a
 	lea	hl,iy
 	ret
+.errorpop:
+	pop	hl
 .error:
+	xor	a,a
+	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
+fat_FileSize:
+; Gets the size of the file
+; Arguments:
+;  sp + 3 : FAT File structure type
+; Returns:
+;  File size in bytes
+	pop	de
+	ex	hl,(sp)
+	push	de
+	call	util_valid_file_ptr
+	ret	z
+	ld	hl,(yfatFile.file_size + 0)
+	ld	e,(yfatFile.file_size + 3)
+	ret
+
+;-------------------------------------------------------------------------------
+fat_FilePos:
+; Gets the offset position in the file
+; Arguments:
+;  sp + 3 : FAT File structure type
+; Returns:
+;  Position in file
+	pop	de
+	ex	hl,(sp)
+	push	de
+	call	util_valid_file_ptr
+	ret	z
+	ld	hl,(yfatFile.fpos + 0)
+	ld	e,(yfatFile.fpos + 3)
+	ret
+
+;-------------------------------------------------------------------------------
+fat_Close:
+; Closes an open file handle, freeing it for future use
+; Arguments:
+;  sp + 3 : FAT File structure type
+; Returns:
+;  USB_SUCCESS on success
+	pop	de
+	ex	hl,(sp)
+	push	de
+	call	util_valid_file_ptr
+	jr	z,.error
+	;res	BIT_OPEN,(yfatFile.flags)
+	xor	a,a
+	ld	(yfatFile.flags),a
+	sbc	hl,hl
+	ret
+.error:
+	ld	hl,USB_ERROR_FAILED
+	ret
+
+;-------------------------------------------------------------------------------
+util_valid_file_ptr:
+	compare_hl_zero
+	jr	z,.invalid
+	push	hl
+	pop	iy
+	bit	BIT_OPEN,(yfatFile.flags)
+	ret	nz
+.invalid:
+	xor	a,a
+	sbc	hl,hl
+	ld	e,a
+	ret
+
+;-------------------------------------------------------------------------------
+util_alloc_cluster:
 	xor	a,a
 	sbc	hl,hl
 	ret

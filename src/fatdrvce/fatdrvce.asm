@@ -39,6 +39,9 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_Find
 	export fat_Init
 	export fat_Open
+	export fat_Close
+	export fat_FileSize
+	export fat_FilePos
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -128,6 +131,7 @@ BIT_OPEN := 7
 struct fatFile
 	local size
 	label .: size
+	fat		rl 1
 	flags		rb 1
 	first_sector	rd 1
 	first_cluster	rd 1
