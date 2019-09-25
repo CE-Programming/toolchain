@@ -1062,6 +1062,9 @@ gfx_GetSprite((sprite_buffer), (x), (y))
  * Scales an unclipped sprite
  *
  * Scaling factors must be greater than or equal to 1, and an integer factor
+ *
+ * @note Sprites are scaled by multiplying the dimenisons by the respective factors, rather than being based on multiples of 64.
+ *
  * @param sprite Pointer to initialized sprite structure
  * @param x X coordinate
  * @param y Y coordinate
@@ -1073,8 +1076,11 @@ void gfx_ScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_
 
 /**
  * Scales an unclipped transparent sprite
- *
+ * 
  * Scaling factors must be greater than or equal to 1, and an integer factor
+ *
+ * @note Sprites are scaled by multiplying the dimenisons by the respective factors, rather than being based on multiples of 64.
+ *
  * @param sprite Pointer to initialized sprite structure
  * @param x X coordinate
  * @param y Y coordinate
@@ -1085,7 +1091,7 @@ void gfx_ScaledSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_
 void gfx_ScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t x, uint8_t y, uint8_t width_scale, uint8_t height_scale);
 
 /**
- * Fixed Rotation with scaling fator for sprites
+ * Fixed Rotation with scaling factor for sprites
  *
  * @note A scale factor of 64 represents 100% scaling
  * @warning This routine only accepts square input sprites
@@ -1110,7 +1116,7 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(gfx_sprite_t *sprite, uint24_t
 #define gfx_RotatedTransparentSprite_NoClip(sprite, x, y, angle) gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle, 64)
 
 /**
- * Fixed Rotation with scaling fator for sprites without transparency
+ * Fixed Rotation with scaling factor for sprites without transparency
  *
  * @note A scale factor of 64 represents 100% scaling
  * @warning This routine only accepts square input sprites
