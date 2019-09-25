@@ -42,6 +42,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_Close
 	export fat_FileSize
 	export fat_FilePos
+	export fat_ReadSector
+	export fat_Read
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -138,6 +140,7 @@ struct fatFile
 	current_cluster	rd 1
 	file_size	rd 1
 	fpos		rd 1
+	fpossector	rl 1
 	entry_pointer	rl 1
 	size := $-.
 end struct

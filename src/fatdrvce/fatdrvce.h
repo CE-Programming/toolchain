@@ -85,6 +85,7 @@ typedef struct {
     uint32_t current_cluster;
     uint32_t file_size;
     uint32_t fpos;
+    uint24_t fpossector;
     uint24_t entry_pointer;
 } fat_file_t;
 
@@ -157,6 +158,30 @@ uint32_t fat_FileSize(fat_file_t *file);
  * @return File offset in bytes.
  */
 uint32_t fat_FilePos(fat_file_t *file);
+
+/**
+ * Reads a whole sector (512 bytes) from a file, and advances the file
+ * position offset to the next sector.
+ * @param file File handle returned from fat_Open.
+ * @param data Location to store read sector data, must be at least 512 bytes.
+ * @return USB_SUCCESS on success, otherwise error.
+ */
+usb_error_t fat_ReadSector(fat_file_t *file,
+                           void *data);
+
+/**
+ * Read bytes from a file. Will be slower than directly using
+ * fat_ReadSector, however may be suitable if a few bytes are needed.
+ * Advances the file position offset by the number of bytes read.
+ * @param file File handle returned from fat_Open.
+ * @param data Location to store read sector data, must be at least
+ *             \p numbytes in length.
+ * @param numbytes Number of bytes to read from the current file position.
+ * @return USB_SUCCESS on success, otherwise error.
+ */
+usb_error_t fat_Read(fat_file_t *file,
+                     void *data,
+                     uint24_t numbytes);
 
 /**
  * Initialize a USB connected Mass Storage Device. Checks if the device is

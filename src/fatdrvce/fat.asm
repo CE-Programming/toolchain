@@ -321,6 +321,29 @@ fat_Close:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat_ReadSector:
+; Closes an open file handle, freeing it for future use
+; Arguments:
+;  sp + 3 : FAT File structure type
+;  sp + 6 : Buffer to read into
+; Returns:
+;  USB_SUCCESS on success
+	ld	hl,USB_ERROR_FAILED
+	ret
+
+;-------------------------------------------------------------------------------
+fat_Read:
+; Closes an open file handle, freeing it for future use
+; Arguments:
+;  sp + 3 : FAT File structure type
+;  sp + 6 : Buffer to read into
+;  sp + 9 : Length of buffer
+; Returns:
+;  USB_SUCCESS on success
+	ld	hl,USB_ERROR_FAILED
+	ret
+
+;-------------------------------------------------------------------------------
 util_valid_file_ptr:
 	compare_hl_zero
 	jr	z,.invalid
