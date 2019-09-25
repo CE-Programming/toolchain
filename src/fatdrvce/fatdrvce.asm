@@ -85,6 +85,37 @@ macro struct? name*, parameters&
   namespace .
 end macro
 
+macro @ez80.size arg
+	if defined arg & arg relativeto arg element 1
+		if arg @ez80.is_reg @ez80.breg
+			arg.size = 1
+		else if arg @ez80.is_reg @ez80.wreg
+			arg.size = 2 + @ez80.l
+		end if
+	end if
+end macro
+
+macro ld? @dst, @mid*, @src
+	local dst, mid, src
+	iterate <arg,@arg>, dst,@dst, mid,@mid, src,@src
+		@ez80.classify arg, @arg
+		@ez80.size arg
+	end iterate
+	if ~defined src
+		ld? @dst, @mid
+	else if dst.ind & src.ind | mid.ind
+		err 'invalid indirection'
+	else if dst.ind & defined src.size
+		ld? (dst), src
+		ld? (dst + src.size), mid
+	else if src.ind & defined mid.size
+		ld? mid, (src)
+		ld? dst, (src + mid.size)
+	else
+		err 'invalid arguments'
+	end if
+end macro
+
 ; msd structures
 struct packetCSW
 	label .: 13

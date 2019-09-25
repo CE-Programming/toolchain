@@ -66,8 +66,7 @@ fat_Find:
 	xor	a,a
 	ld	(hl),a
 	sbc	hl,hl
-	ld	(scsi.read10.lba + 0),hl
-	ld	(scsi.read10.lba + 3),a
+	ld	(scsi.read10.lba),a,hl
 	ld	iy,(iy + 3)			; usb device
 	call	util_read10			; read zero sector
 	ld	hl,USB_ERROR_FAILED
@@ -97,10 +96,8 @@ fat_Init:
 	ld	iy,(iy + 3)
 	ld	(yfatType.partition),de		; store partition pointer
 	ld	ix,(yfatType.partition)
-	ld	hl,(xfatPartition.lba + 0)
-	ld	a,(xfatPartition.lba + 3)	; get fat base lba
-	ld	(yfatType.fat_base_lba + 0),hl
-	ld	(yfatType.fat_base_lba + 3),a
+	ld	a,hl,(xfatPartition.lba)	; get fat base lba
+	ld	(yfatType.fat_base_lba),a,hl
 	or	a,a
 	sbc	hl,hl
 	call	util_read_fat_sector		; read fat zero sector
@@ -127,12 +124,10 @@ fat_Init:
 	adc	a,a
 	add	hl,de				; data region
 	adc	a,a				; get carry if needed
-	ld	(yfatType.data_region + 0),hl
-	ld	(yfatType.data_region + 3),a
+	ld	(yfatType.data_region),a,hl
 	push	af
 	ex	de,hl
-	ld	hl,(ix + 44 + 0)
-	ld	a,(ix + 44 + 3)			; BPB_FAT32_RootClus
+	ld	a,hl,(ix + 44)			; BPB_FAT32_RootClus
 	ld	bc,2
 	or	a,a
 	sbc	hl,bc
@@ -151,8 +146,7 @@ fat_Init:
 	pop	bc
 	add	hl,de				; bude = data region
 	adc	a,b				; root directory location
-	ld	(yfatType.root_dir_pos + 0),hl
-	ld	(yfatType.root_dir_pos + 3),a
+	ld	(yfatType.root_dir_pos),a,hl
 	ld	de,(ix + 48)
 	ex.s	de,hl
 	ld	(yfatType.fs_info),hl
@@ -221,13 +215,10 @@ fat_Open:
 	pop	bc
 	ld	(yfatFile.fat),bc
 	ld	(yfatFile.entry_pointer),de
-	ld	(yfatFile.first_sector + 0),hl
-	ld	(yfatFile.first_sector + 3),a
+	ld	(yfatFile.first_sector),a,hl
 	call	util_get_file_first_cluster
-	ld	(yfatFile.first_cluster + 0),hl
-	ld	(yfatFile.first_cluster + 3),a
-	ld	(yfatFile.current_cluster + 0),hl
-	ld	(yfatFile.current_cluster + 3),a
+	ld	(yfatFile.first_cluster),a,hl
+	ld	(yfatFile.current_cluster),a,hl
 	compare_auhl_zero
 	jr	nz,.notempty
 .empty:
@@ -241,10 +232,8 @@ fat_Open:
 	ld	(yfatFile.flags),a
 	jq	.error
 .allocedclusted:
-	ld	(yfatFile.first_cluster + 0),hl
-	ld	(yfatFile.first_cluster + 3),a
-	ld	(yfatFile.current_cluster + 0),hl
-	ld	(yfatFile.current_cluster + 3),a
+	ld	(yfatFile.first_cluster),a,hl
+	ld	(yfatFile.current_cluster),a,hl
 .cantalloc:
 	xor	a,a
 	sbc	hl,hl
@@ -252,12 +241,10 @@ fat_Open:
 .notempty:
 	call	util_get_file_size
 .storesize:
-	ld	(yfatFile.file_size + 0),hl
-	ld	(yfatFile.file_size + 3),a
+	ld	(yfatFile.file_size),a,hl
 	xor	a,a
 	sbc	hl,hl
-	ld	(yfatFile.fpos + 0),hl
-	ld	(yfatFile.fpos + 3),a
+	ld	(yfatFile.fpos),a,hl
 	lea	hl,iy
 	ret
 .errorpop:
@@ -279,8 +266,7 @@ fat_FileSize:
 	push	de
 	call	util_valid_file_ptr
 	ret	z
-	ld	hl,(yfatFile.file_size + 0)
-	ld	e,(yfatFile.file_size + 3)
+	ld	e,hl,(yfatFile.file_size)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -295,8 +281,7 @@ fat_FilePos:
 	push	de
 	call	util_valid_file_ptr
 	ret	z
-	ld	hl,(yfatFile.fpos + 0)
-	ld	e,(yfatFile.fpos + 3)
+	ld	e,hl,(yfatFile.fpos)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -394,8 +379,7 @@ util_get_file_first_cluster:
 util_get_file_size:
 	push	iy
 	ld	iy,(yfatFile.entry_pointer)
-	ld	hl,(iy + 28 + 0)
-	ld	a,(iy + 28 + 3)
+	ld	a,hl,(iy + 28)
 	pop	iy
 	ret
 
@@ -511,10 +495,8 @@ util_locate_entry:
 ; outputs
 ;   hl: sector of entry
 ;   de: offset to entry in sector
-	ld	hl,(yfatType.root_dir_pos + 0)
-	ld	a,(yfatType.root_dir_pos + 3)
-	ld	(yfatType.working_sector + 0),hl
-	ld	(yfatType.working_sector + 3),a
+	ld	a,hl,(yfatType.root_dir_pos)
+	ld	(yfatType.working_sector),a,hl
 	ld	(yfatType.working_pointer),de
 .findcomponent:
 	ld	de,(yfatType.working_pointer)
@@ -524,8 +506,7 @@ util_locate_entry:
 	call	util_get_next_component
 	ld	(yfatType.working_pointer),de
 .locateloop:
-	ld	hl,(yfatType.working_sector + 0)
-	ld	a,(yfatType.working_sector + 3)
+	ld	a,hl,(yfatType.working_sector)
 	call	util_read_fat_sector
 	jq	nz,.error
 	push	iy
@@ -569,20 +550,17 @@ util_locate_entry:
 	call	util_cluster_to_sector
 	compare_auhl_zero
 	jq	z,.error		; this means it is empty... which shouldn't happen!
-	ld	(yfatType.working_sector + 0),hl
-	ld	(yfatType.working_sector + 3),a
+	ld	(yfatType.working_sector),a,hl
 	jq	.findcomponent		; found the component we were looking for (yay)
 .cmpfail:
 	dec	c
 	jr	nz,.detectname
 	pop	iy
 .movetonextsector:
-	ld	hl,(yfatType.working_sector + 0)
-	ld	a,(yfatType.working_sector + 3)
+	ld	a,hl,(yfatType.working_sector)
 	call	util_sector_to_cluster
 	push	hl,af
-	ld	hl,(yfatType.working_sector + 0)
-	ld	a,(yfatType.working_sector + 3)
+	ld	a,hl,(yfatType.working_sector)
 	ld	bc,1
 	add	hl,bc
 	add	a,b
@@ -592,21 +570,18 @@ util_locate_entry:
 	jr	nz,.movetonextcluster
 	cp	a,b
 	jr	nz,.movetonextcluster
-	ld	hl,(yfatType.working_sector + 0)
-	ld	a,(yfatType.working_sector + 3)
+	ld	a,hl,(yfatType.working_sector)
 	ld	bc,1
 	add	hl,bc
 	adc	a,b
 	jq	.storesectorandloop
 .movetonextcluster:
-	ld	hl,(yfatType.working_sector + 0)
-	ld	a,(yfatType.working_sector + 3)
+	ld	a,hl,(yfatType.working_sector)
 	call	util_sector_to_cluster
 	call	util_next_cluster
 	call	util_cluster_to_sector
 .storesectorandloop:
-	ld	(yfatType.working_sector + 0),hl
-	ld	(yfatType.working_sector + 3),a
+	ld	(yfatType.working_sector),a,hl
 	compare_auhl_zero
 	jq	nz,.locateloop		; make sure we can get the next cluster
 .errorpopiy:
@@ -616,8 +591,7 @@ util_locate_entry:
 	sbc	hl,hl
 	ret
 .foundlastcomponent:
-	ld	hl,(yfatType.working_sector + 0)
-	ld	a,(yfatType.working_sector + 3)
+	ld	a,hl,(yfatType.working_sector)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -643,8 +617,7 @@ util_cluster_to_sector:
 .enter:
 	rrca
 	jr	nc,.loop
-	ld	de,(yfatType.data_region + 0)
-	ld	a,(yfatType.data_region + 3)
+	ld	a,de,(yfatType.data_region)
 	add	hl,de
 	adc	a,c
 	ret
@@ -745,8 +718,7 @@ util_read_fat_sector:
 ;  iy: fat_t structure
 ; outputs
 ;  de: read sector
-	ld	bc,(yfatType.fat_base_lba + 0)
-	ld	e,(yfatType.fat_base_lba + 3)
+	ld	e,bc,(yfatType.fat_base_lba)
 	add	hl,bc
 	adc	a,e			; big endian
 	ld	de,scsi.read10.lba
@@ -776,8 +748,7 @@ util_write_fat_sector:
 ;  auhl: lba address
 ;  iy: fat_t structure
 ; outputs
-	ld	bc,(yfatType.fat_base_lba + 0)
-	ld	e,(yfatType.fat_base_lba + 3)
+	ld	e,bc,(yfatType.fat_base_lba)
 	add	hl,bc
 	adc	a,e			; big endian
 	ld	de,scsi.write10.lba
