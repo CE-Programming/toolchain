@@ -331,15 +331,14 @@ util_locate_entry:
 	ld	a,(yfatType.root_dir_pos + 3)
 	ld	(yfatType.working_sector + 0),hl
 	ld	(yfatType.working_sector + 3),a
-	ld	(.component),de
+	ld	(yfatType.working_pointer),de
 .findcomponent:
-	ld	de,0
-.component := $-3
+	ld	de,(yfatType.working_pointer)
 	call	util_get_component_start
 	jq	z,.error
 	call	util_get_fat_name
 	call	util_get_next_component
-	ld	(.component),de
+	ld	(yfatType.working_pointer),de
 .locateloop:
 	ld	hl,(yfatType.working_sector + 0)
 	ld	a,(yfatType.working_sector + 3)
@@ -371,7 +370,7 @@ util_locate_entry:
 	djnz	.cmpnames
 	lea	de,iy
 	pop	iy
-	ld	hl,(.component)
+	ld	hl,(yfatType.working_pointer)
 	ld	a,(hl)
 	or	a,a			; check if end of component lookup (de)
 	jq	z,.foundlastcomponent

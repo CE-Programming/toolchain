@@ -156,6 +156,7 @@ struct fatType
 	data_region		rd 1
 	working_sector		rd 1
 	working_cluster		rd 1
+	working_pointer		rl 1
 	size := $-.
 end struct
 

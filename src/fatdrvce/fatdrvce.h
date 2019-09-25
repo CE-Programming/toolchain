@@ -78,6 +78,7 @@ typedef struct {
     uint32_t data_region;
     uint32_t working_sector;
     uint32_t working_cluster;
+    uint24_t working_pointer;
 } fat_t;
 
 #define FAT_OPEN_WRONLY  2  /**< Open file in write-only mode. */
