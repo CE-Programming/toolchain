@@ -2,6 +2,7 @@
 
 #include <tice.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -25,27 +26,29 @@ usb_error_t my_timer_handler(usb_timer_t *usbTimer) {
 void main() {
     os_ClrHomeFull();
     if (usb_Init(NULL, NULL, NULL, USB_DEFAULT_INIT_FLAGS) == USB_SUCCESS) {
-        my_timer_t myTimers[N];
         int i;
+        bool done = false;
+        my_timer_t myTimers[N];
         for (i = 0; i != N; i++) {
             myTimers[i].usbTimer.handler = my_timer_handler;
             myTimers[i].interval = 1000u >> i;
             myTimers[i].counter = 10u << i;
             usb_StartTimer(&myTimers[i].usbTimer, myTimers[i].interval);
         }
-        while (usb_WaitForEvents() == USB_SUCCESS) {
+        while (usb_WaitForEvents() == USB_SUCCESS && !done) {
             for (i = 0; i != N; i++) {
                 char string[3];
                 os_SetCursorPos(i, 0);
                 sprintf(string, "%2u", myTimers[i].counter);
                 os_PutStrFull(string);
             }
+            done = true;
             for (i = 0; i != N; i++) {
                 if (myTimers[i].counter != 0) {
-                    continue;
+                    done = false;
+                    break;
                 }
             }
-            break;
         }
         usb_Cleanup();
     }
