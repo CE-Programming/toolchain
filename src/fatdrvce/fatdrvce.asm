@@ -48,6 +48,14 @@ macro compare_hl_zero?
 	sbc	hl,de
 end macro
 
+macro compare_auhl_zero?
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jr	nz,$+3
+	or	a,a
+end macro
+
 macro compare_hl_de?
 	or	a,a
 	sbc	hl,de

@@ -201,11 +201,8 @@ fat_Open:
 	ld	de,(iy + 6)
 	ld	iy,(iy + 3)
 	call	util_locate_entry
-	compare_hl_zero
-	jq	nz,.located
-	or	a,a
+	compare_auhl_zero
 	jq	z,.error
-.located:
 	push	de,hl,af
 	call	util_read_fat_sector
 	call	util_get_spare_file
@@ -387,11 +384,8 @@ util_locate_entry:
 	ld	h,(iy + 26 + 1)		; get the entry's cluster, and convert it to the sector
 	pop	iy
 	call	util_cluster_to_sector
-	compare_hl_zero
-	jq	nz,.nextcluster
-	or	a,a
+	compare_auhl_zero
 	jq	z,.error		; this means it is empty... which shouldn't happen!
-.nextcluster:
 	ld	(yfatType.working_sector + 0),hl
 	ld	(yfatType.working_sector + 3),a
 	jq	.findcomponent		; found the component we were looking for (yay)
@@ -430,10 +424,8 @@ util_locate_entry:
 .storesectorandloop:
 	ld	(yfatType.working_sector + 0),hl
 	ld	(yfatType.working_sector + 3),a
-	compare_hl_zero
+	compare_auhl_zero
 	jq	nz,.locateloop		; make sure we can get the next cluster
-	or	a,a
-	jq	nz,.locateloop
 .errorpopiy:
 	pop	iy
 .error:
@@ -500,11 +492,8 @@ util_sector_to_cluster:
 ;   iy -> fat structure
 ; outputs
 ;   auhl = cluster
-	or	a,a
-	jr	nz,.notzero
-	compare_hl_zero
+	compare_auhl_zero
 	ret	z
-.notzero:
 	ld	bc,(yfatType.data_region + 0)
 	or	a,a
 	sbc	hl,bc
