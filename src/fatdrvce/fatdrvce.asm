@@ -145,7 +145,8 @@ struct fatType
 	fat_base_lba		rd 1
 	root_dir_pos		rd 1
 	data_region		rd 1
-	fs_info_sector		rd 1	; lba: filesystem info
+	working_sector		rd 1
+	working_cluster		rd 1
 	size := $-.
 end struct
 

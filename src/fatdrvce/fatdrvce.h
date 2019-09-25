@@ -72,7 +72,8 @@ typedef struct {
     uint32_t fat_base_lba;
     uint32_t root_dir_pos;
     uint32_t data_region;
-    uint32_t fs_info_sector;
+    uint32_t working_sector;
+    uint32_t working_cluster;
 } fat_t;
 
 #define FAT_O_WRONLY      2               /**< Open Write only mode. */
