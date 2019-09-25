@@ -385,8 +385,13 @@ util_locate_entry:
 	ld	hl,(iy + 20 - 2)	; get hlu
 	ld	l,(iy + 26 + 0)
 	ld	h,(iy + 26 + 1)		; get the entry's cluster, and convert it to the sector
-	call	util_cluster_to_sector
 	pop	iy
+	call	util_cluster_to_sector
+	compare_hl_zero
+	jq	nz,.nextcluster
+	or	a,a
+	jq	z,.error		; this means it is empty... which shouldn't happen!
+.nextcluster:
 	ld	(yfatType.working_sector + 0),hl
 	ld	(yfatType.working_sector + 3),a
 	jq	.findcomponent		; found the component we were looking for (yay)
