@@ -276,16 +276,18 @@ virtual at 0
 end virtual
 
 virtual at 0
-	USB_SUCCESS		rb 1
-	USB_IGNORE		rb 1
-	USB_ERROR_SYSTEM	rb 1
-	USB_ERROR_INVALID_PARAM	rb 1
-	USB_ERROR_SCHEDULE_FULL	rb 1
-	USB_ERROR_NO_DEVICE	rb 1
-	USB_ERROR_NO_MEMORY	rb 1
-	USB_ERROR_NOT_SUPPORTED	rb 1
-	USB_ERROR_TIMEOUT	rb 1
-	USB_ERROR_FAILED	rb 1
+	FAT_SUCCESS		 rb 1
+	FAT_ERROR_INVALID_PARAM	 rb 1
+	FAT_ERROR_USB_FAILED	 rb 1
+	FAT_ERROR_NOT_SUPPORTED  rb 1
+end virtual
+
+virtual at 0
+	MSD_SUCCESS		 rb 1
+	MSD_ERROR_INVALID_PARAM	 rb 1
+	MSD_ERROR_USB_FAILED	 rb 1
+	MSD_ERROR_NOT_SUPPORTED  rb 1
+	MSD_ERROR_INVALID_DEVICE rb 1
 end virtual
 
 ; enum usb_descriptor_type
@@ -335,7 +337,7 @@ msd_Init:
 	add	iy,sp
 	ld	hl,(iy + 6)		; usb device
 	compare_hl_zero
-	jq	z,.error
+	jq	z,.paramerror
 	push	iy
 	ld	bc,tmp.length		; storage for size of descriptor
 	push	bc
@@ -555,7 +557,10 @@ msd_Init:
 	cp	a,(hl)
 	jq	nz,.getconfiguration
 .error:
-	ld	hl,USB_ERROR_NO_DEVICE
+	ld	hl,MSD_ERROR_INVALID_DEVICE
+	ret
+.paramerror:
+	ld	hl,MSD_ERROR_INVALID_PARAM
 	ret
 .foundmsd:
 
@@ -583,10 +588,10 @@ msd_GetSectorSize:
 	add	iy,sp
 	ld	hl,(iy + 3)
 	compare_hl_zero
-	jr	z,.error
+	jr	z,.paramerror
 	ld	hl,(iy + 6)
 	compare_hl_zero
-	jr	z,.error
+	jr	z,.paramerror
 	push	hl
 	ld	iy,(iy + 3)
 	ld	hl,scsi.readcapacity
@@ -599,8 +604,11 @@ msd_GetSectorSize:
 	or	a,a
 	sbc	hl,hl
 	ret
+.paramerror:
+	ld	hl,MSD_ERROR_INVALID_PARAM
+	ret
 .error:
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,MSD_ERROR_USB_FAILED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -615,10 +623,10 @@ msd_GetSectorCount:
 	add	iy,sp
 	ld	hl,(iy + 3)
 	compare_hl_zero
-	jr	z,.error
+	jr	z,.paramerror
 	ld	hl,(iy + 6)
 	compare_hl_zero
-	jr	z,.error
+	jr	z,.paramerror
 	push	iy
 	ld	iy,(iy + 3)
 	ld	hl,scsi.readcapacity
@@ -634,8 +642,11 @@ msd_GetSectorCount:
 	or	a,a
 	sbc	hl,hl
 	ret
+.paramerror:
+	ld	hl,MSD_ERROR_INVALID_PARAM
+	ret
 .error:
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,MSD_ERROR_USB_FAILED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -675,7 +686,7 @@ msd_ReadSector:
 	ld	iy,(iy + 3)
 	ld	hl,scsi.read10
 	call	util_scsi_request
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,MSD_ERROR_USB_FAILED
 	ret	nz
 	or	a,a
 	sbc	hl,hl			; return success
@@ -718,7 +729,7 @@ msd_WriteSector:
 	ld	iy,(iy + 3)
 	ld	hl,scsi.write10
 	call	util_scsi_request
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,MSD_ERROR_USB_FAILED
 	ret	nz
 	or	a,a
 	sbc	hl,hl			; return success
@@ -750,7 +761,7 @@ util_scsi_init:
 	sbc	hl,hl
 	ret
 .error:
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,MSD_ERROR_USB_FAILED
 	ret
 
 ; input:

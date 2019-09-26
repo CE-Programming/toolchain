@@ -52,6 +52,7 @@ void main(void) {
     uint24_t sectorsize;
     uint8_t numpartitions;
     static char buffer[212];
+    static char filebuffer[512];
 
     memset(&msd, 0, sizeof msd);
     memset(&global, 0, sizeof(global_t));
@@ -125,6 +126,7 @@ void main(void) {
 	dbg_Debugger();
         file = fat_Open(&fat, "/DIRA/DIRB/FILE.TXT", FAT_OPEN_RDWR);
         if (file) {
+            error = fat_ReadSector(&file, filebuffer);
             putstr("located file");
         } else {
             putstr("no file");

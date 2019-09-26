@@ -69,7 +69,7 @@ fat_Find:
 	ld	(scsi.read10.lba),a,hl
 	ld	iy,(iy + 3)			; usb device
 	call	util_read10			; read zero sector
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,FAT_ERROR_USB_FAILED
 	ret	nz				; check if error
 	ld	hl,(tmp.sectorbuffer)
 	ld	de,($90 shl 16) or ($58 shl 8) or ($eb shl 0)
@@ -177,7 +177,7 @@ fat_Init:
 	pop	ix
 	ret
 .error:
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,FAT_ERROR_USB_FAILED
 	pop	ix
 	ret
 
@@ -302,7 +302,7 @@ fat_Close:
 	sbc	hl,hl
 	ret
 .error:
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,FAT_ERROR_INVALID_PARAM
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ fat_ReadSector:
 ;  sp + 6 : Buffer to read into
 ; Returns:
 ;  USB_SUCCESS on success
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -325,7 +325,7 @@ fat_Read:
 ;  sp + 9 : Length of buffer
 ; Returns:
 ;  USB_SUCCESS on success
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -826,7 +826,7 @@ util_find:
 .error:
 	ld	sp,0
 smc.errorsp := $ - 3
-	ld	hl,USB_ERROR_FAILED
+	ld	hl,FAT_ERROR_USB_FAILED
 	ret
 
 ;-------------------------------------------------------------------------------

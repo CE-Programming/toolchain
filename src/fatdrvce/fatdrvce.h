@@ -89,6 +89,21 @@ typedef struct {
     uint24_t entry_pointer;
 } fat_file_t;
 
+typedef enum {
+    FAT_SUCCESS=0,
+    FAT_ERROR_INVALID_PARAM,
+    FAT_ERROR_USB_FAILED,
+    FAT_ERROR_NOT_SUPPORTED
+} fat_error_t;
+
+typedef enum {
+    MSD_SUCCESS=0,
+    MSD_ERROR_INVALID_PARAM,
+    MSD_ERROR_USB_FAILED,
+    MSD_ERROR_NOT_SUPPORTED,
+    MSD_ERROR_INVALID_DEVICE
+} msd_error_t;
+
 #define FAT_OPEN_WRONLY  2  /**< Open file in write-only mode. */
 #define FAT_OPEN_RDONLY  1  /**< Open file in read-only mode. */
 #define FAT_OPEN_RDWR    (FAT_OPEN_RDONLY | FAT_OPEN_WRONLY)  /**< Open file for reading and writing. */
@@ -111,7 +126,7 @@ typedef struct {
  * @param max The maximum number of FAT partitions that can be found.
  * @return USB_SUCCESS on success, otherwise error.
  */
-usb_error_t fat_Find(msd_device_t *msd,
+fat_error_t fat_Find(msd_device_t *msd,
                      fat_partition_t *partitions,
                      uint8_t *number,
                      uint8_t max);
@@ -122,9 +137,9 @@ usb_error_t fat_Find(msd_device_t *msd,
  * locate a valid FAT partition.
  * @param fat Uninitialized FAT structure type.
  * @param partition Available FAT partition returned from fat_Find.
- * @return USB_SUCCESS on success, otherwise error.
+ * @return FAT_SUCCESS on success, otherwise error.
  */
-usb_error_t fat_Init(fat_t *fat,
+fat_error_t fat_Init(fat_t *fat,
                      fat_partition_t *partition);
 
 /**
@@ -141,9 +156,9 @@ fat_file_t *fat_Open(fat_t *fat,
 /**
  * Closes an open file handle, freeing it for future use.
  * @param file File handle returned from fat_Open.
- * @return USB_SUCCESS on success, otherwise error.
+ * @return FAT_SUCCESS on success, otherwise error.
  */
-usb_error_t fat_Close(fat_file_t *file);
+fat_error_t fat_Close(fat_file_t *file);
 
 /**
  * Gets the size of the file.
@@ -164,9 +179,9 @@ uint32_t fat_FilePos(fat_file_t *file);
  * position offset to the next sector.
  * @param file File handle returned from fat_Open.
  * @param data Location to store read sector data, must be at least 512 bytes.
- * @return USB_SUCCESS on success, otherwise error.
+ * @return FAT_SUCCESS on success, otherwise error.
  */
-usb_error_t fat_ReadSector(fat_file_t *file,
+fat_error_t fat_ReadSector(fat_file_t *file,
                            void *data);
 
 /**
@@ -177,9 +192,9 @@ usb_error_t fat_ReadSector(fat_file_t *file,
  * @param data Location to store read sector data, must be at least
  *             \p numbytes in length.
  * @param numbytes Number of bytes to read from the current file position.
- * @return USB_SUCCESS on success, otherwise error.
+ * @return FAT_SUCCESS on success, otherwise error.
  */
-usb_error_t fat_Read(fat_file_t *file,
+fat_error_t fat_Read(fat_file_t *file,
                      void *data,
                      uint24_t numbytes);
 
@@ -192,9 +207,9 @@ usb_error_t fat_Read(fat_file_t *file,
  * @param msd MSD device structure.
  * @param dev USB device to initialize as MSD.
  * @param buffer The buffer's address. (must be at least 512 bytes).
- * @return USB_SUCCESS on success, otherwise error if initialization failed.
+ * @return MSD_SUCCESS on success, otherwise error if initialization failed.
  */
-usb_error_t msd_Init(msd_device_t *msd,
+msd_error_t msd_Init(msd_device_t *msd,
                      usb_device_t dev,
                      void *buffer);
 
@@ -202,18 +217,18 @@ usb_error_t msd_Init(msd_device_t *msd,
  * Gets the sector count of the device.
  * @param msd MSD device structure.
  * @param blockSize Pointer to store block size to.
- * @return USB_SUCCESS on success.
+ * @return MSD_SUCCESS on success.
  */
-usb_error_t msd_GetSectorCount(msd_device_t *msd,
+msd_error_t msd_GetSectorCount(msd_device_t *msd,
                                uint32_t *sectorCount);
 
 /**
  * Gets the sector size of each sector on the device.
  * @param msd MSD device structure.
  * @param blockSize Pointer to store block size to.
- * @return USB_SUCCESS on success.
+ * @return MSD_SUCCESS on success.
  */
-usb_error_t msd_GetSectorSize(msd_device_t *msd,
+msd_error_t msd_GetSectorSize(msd_device_t *msd,
                               uint24_t *sectorSize);
 
 /**
@@ -222,9 +237,9 @@ usb_error_t msd_GetSectorSize(msd_device_t *msd,
  * @param lba Logical Block Address (LBA) of starting sector to read.
  * @param sectors Number of sectors to read.
  * @param buffer Buffer to read into. Should be at least a sector size.
- * @return USB_SUCCESS on success.
+ * @return MSD_SUCCESS on success.
  */
-usb_error_t msd_ReadSector(msd_device_t *msd,
+msd_error_t msd_ReadSector(msd_device_t *msd,
                            uint32_t lba,
                            void *data);
 
@@ -233,9 +248,9 @@ usb_error_t msd_ReadSector(msd_device_t *msd,
  * @param msd MSD device structure.
  * @param lba Logical Block Address (LBA) of sector to write.
  * @param buffer Buffer to write to MSD. Should be at least one sector size.
- * @return USB_SUCCESS on success.
+ * @return MSD_SUCCESS on success.
  */
-usb_error_t msd_WriteSectors(msd_device_t *msd,
+msd_error_t msd_WriteSectors(msd_device_t *msd,
                              uint32_t lba,
                              const void *data);
 
