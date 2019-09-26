@@ -116,14 +116,15 @@ fat_Init:
 	jq	nz,.error
 .goodsig:
 	xor	a,a
+	ld	b,a
 	ld	hl,(ix + 14)
 	ex.s	de,hl
 	ld	(yfatType.fat_pos),de
 	ld	hl,(ix + 36)			; BPB_FAT32_FATSz32
 	add	hl,hl				; * num fats
-	adc	a,a
+	adc	a,b
 	add	hl,de				; data region
-	adc	a,a				; get carry if needed
+	adc	a,b				; get carry if needed
 	ld	(yfatType.data_region),a,hl
 	push	af
 	ex	de,hl
@@ -216,7 +217,7 @@ fat_Open:
 	pop	bc
 	ld	(yfatFile.fat),bc
 	ld	(yfatFile.entry_pointer),de
-	ld	(yfatFile.first_sector),a,hl
+	ld	(yfatFile.entry_sector),a,hl
 	call	util_get_file_first_cluster
 	ld	(yfatFile.first_cluster),a,hl
 	ld	(yfatFile.current_cluster),a,hl
@@ -244,7 +245,10 @@ fat_Open:
 .storesize:
 	ld	(yfatFile.file_size),a,hl
 	ld	a,hl,(yfatFile.current_cluster)
+	push	iy
+	ld	iy,(yfatFile.fat)
 	call	util_cluster_to_sector
+	pop	iy
 	ld	(yfatFile.current_sector),a,hl
 	xor	a,a
 	sbc	hl,hl
@@ -428,7 +432,7 @@ util_get_file_size:
 
 ;-------------------------------------------------------------------------------
 util_get_fat_name:
-; convert name to 8.3 name (covers most cases)
+; convert name to storage name (covers most cases)
 ; inputs
 ;   de: name
 ;   hl: <output> name (11+1 bytes)

@@ -165,7 +165,7 @@ struct fatFile
 	label .: size
 	fat		rl 1
 	flags		rb 1
-	first_sector	rd 1
+	entry_sector	rd 1
 	first_cluster	rd 1
 	current_cluster	rd 1
 	file_size	rd 1

@@ -80,7 +80,7 @@ typedef struct {
 typedef struct {
     fat_t *fat;
     uint8_t flags;
-    uint32_t first_sector;
+    uint32_t entry_sector;
     uint32_t first_cluster;
     uint32_t current_cluster;
     uint32_t file_size;
