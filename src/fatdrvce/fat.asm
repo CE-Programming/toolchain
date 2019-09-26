@@ -201,7 +201,8 @@ fat_Open:
 	jq	z,.error
 	ld	c,(iy + 9)
 	set	BIT_OPEN,c
-	pea	iy + 3
+	ld	iy,(iy + 3)
+	push	iy
 	push	de
 	push	af
 	push	hl
@@ -242,8 +243,12 @@ fat_Open:
 	call	util_get_file_size
 .storesize:
 	ld	(yfatFile.file_size),a,hl
+	ld	a,hl,(yfatFile.current_cluster)
+	call	util_cluster_to_sector
+	ld	(yfatFile.current_sector),a,hl
 	xor	a,a
 	sbc	hl,hl
+	ld	(yfatFile.cluster_sector),a
 	ld	(yfatFile.fpos),a,hl
 	lea	hl,iy
 	ret
@@ -313,19 +318,57 @@ fat_ReadSector:
 ;  sp + 6 : Buffer to read into
 ; Returns:
 ;  USB_SUCCESS on success
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
-	ret
-
-;-------------------------------------------------------------------------------
-fat_Read:
-; Closes an open file handle, freeing it for future use
-; Arguments:
-;  sp + 3 : FAT File structure type
-;  sp + 6 : Buffer to read into
-;  sp + 9 : Length of buffer
-; Returns:
-;  USB_SUCCESS on success
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	pop	de,iy,hl
+	push	hl,iy,de
+	ld	(util_read10.buffer),hl
+	ld	a,hl,(yfatFile.current_sector)
+	ld	bc,0
+	ld	c,(yfatFile.cluster_sector)
+	add	hl,bc
+	adc	a,b
+	push	hl
+	push	af
+	inc	c
+	push	iy
+	ld	iy,(yfatFile.fat)
+	ld	a,(yfatType.cluster_size)
+	cp	a,c
+	pop	iy
+	jr	nz,.readsector
+	ld	a,hl,(yfatFile.current_cluster)
+	push	iy
+	ld	iy,(yfatFile.fat)
+	call	util_next_cluster
+	pop	iy
+	ld	(yfatFile.current_cluster),a,hl
+	push	iy
+	ld	iy,(yfatFile.fat)
+	call	util_cluster_to_sector
+	pop	iy
+	ld	(yfatFile.current_sector),a,hl
+	ld	c,0
+.readsector:
+	ld	(yfatFile.cluster_sector),c
+	ld	hl,(yfatFile.fpossector)
+	inc	hl
+	ld	(yfatFile.fpossector),hl
+	ld	iy,(yfatFile.fat)
+	pop	af
+	pop	hl
+	call	util_read_fat_sector
+	jq	nz,.usberror
+	xor	a,a
+	sbc	hl,hl
+	jq	.restorebuffer
+.usberror:
+	ld	hl,FAT_ERROR_USB_FAILED
+	jq	.restorebuffer
+.invalidcluster:
+	ld	hl,FAT_INVALID_CLUSTER
+	jq	.restorebuffer
+.restorebuffer:
+	ld	bc,tmp.sectorbuffer
+	ld	(util_read10.buffer),bc
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -775,12 +818,14 @@ util_write_fat_sector:
 ;-------------------------------------------------------------------------------
 util_read10:
 	ld	de,tmp.sectorbuffer
+.buffer := $-3
 	ld	hl,scsi.read10
 	jq	util_scsi_request
 
 ;-------------------------------------------------------------------------------
 util_write10:
 	ld	de,tmp.sectorbuffer
+.buffer := $-3
 	ld	hl,scsi.write10
 	jq	util_scsi_request
 

@@ -84,8 +84,10 @@ typedef struct {
     uint32_t first_cluster;
     uint32_t current_cluster;
     uint32_t file_size;
-    uint32_t fpos;
-    uint24_t fpossector;
+    uint32_t fpos;           /**< File position by bytes. */
+    uint24_t fpossector;     /**< File position by sector count. */
+    uint8_t cluster_sector;  /**< Current sector in cluster. */
+    uint32_t current_sector; /**< Current sector on msd. */
     uint24_t entry_pointer;
 } fat_file_t;
 
@@ -93,7 +95,9 @@ typedef enum {
     FAT_SUCCESS=0,
     FAT_ERROR_INVALID_PARAM,
     FAT_ERROR_USB_FAILED,
-    FAT_ERROR_NOT_SUPPORTED
+    FAT_ERROR_NOT_SUPPORTED,
+    FAT_INVALID_CLUSTER,
+    FAT_EOF
 } fat_error_t;
 
 typedef enum {
@@ -183,20 +187,6 @@ uint32_t fat_FilePos(fat_file_t *file);
  */
 fat_error_t fat_ReadSector(fat_file_t *file,
                            void *data);
-
-/**
- * Read bytes from a file. Will be slower than directly using
- * fat_ReadSector, however may be suitable if a few bytes are needed.
- * Advances the file position offset by the number of bytes read.
- * @param file File handle returned from fat_Open.
- * @param data Location to store read sector data, must be at least
- *             \p numbytes in length.
- * @param numbytes Number of bytes to read from the current file position.
- * @return FAT_SUCCESS on success, otherwise error.
- */
-fat_error_t fat_Read(fat_file_t *file,
-                     void *data,
-                     uint24_t numbytes);
 
 /**
  * Initialize a USB connected Mass Storage Device. Checks if the device is

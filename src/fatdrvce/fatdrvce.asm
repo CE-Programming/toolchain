@@ -43,7 +43,6 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_FileSize
 	export fat_FilePos
 	export fat_ReadSector
-	export fat_Read
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -172,6 +171,8 @@ struct fatFile
 	file_size	rd 1
 	fpos		rd 1
 	fpossector	rl 1
+	cluster_sector  rb 1
+	current_sector	rd 1
 	entry_pointer	rl 1
 	size := $-.
 end struct
@@ -280,6 +281,7 @@ virtual at 0
 	FAT_ERROR_INVALID_PARAM	 rb 1
 	FAT_ERROR_USB_FAILED	 rb 1
 	FAT_ERROR_NOT_SUPPORTED  rb 1
+	FAT_INVALID_CLUSTER      rb 1
 end virtual
 
 virtual at 0

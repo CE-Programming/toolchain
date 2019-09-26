@@ -123,10 +123,9 @@ void main(void) {
         putstr("inited fat filesystem");
 
         // attempt init of fat partition
-	dbg_Debugger();
         file = fat_Open(&fat, "/DIRA/DIRB/FILE.TXT", FAT_OPEN_RDWR);
         if (file) {
-            error = fat_ReadSector(&file, filebuffer);
+            error = fat_ReadSector(file, filebuffer);
             putstr("located file");
         } else {
             putstr("no file");
