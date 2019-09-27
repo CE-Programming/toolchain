@@ -172,6 +172,8 @@ struct endpoint			; endpoint structure
  namespace info
 	head		:= 1 shl 7
 	dtc		:= 1 shl 6
+	eps		:= 3 shl 4
+	ep		:= $F
  end namespace
 	maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
  namespace maxPktLen
@@ -549,7 +551,22 @@ usb_Init:
 	ld	hl,_DefaultStandardDescriptors
 	ld	(currentDescriptors),hl
 .nonDefaultStandardDescriptors:
-	ld	hl,mpUsbIdle
+	ld	hl,mpUsbFifo0Cfg
+	ld	(hl),a;0
+	inc	l;usbFifo1Cfg-$100
+	inc	bc
+	ld	(hl),bc;0
+	ld	l,usbFifo0Map-$100
+	ld	(hl),$01
+	inc	l;usbFifo1Map-$100
+	ld	bc,$040302
+	ld	(hl),bc
+	ld	l,usbEp1Map-$100
+	ld	(hl),a;$00
+	inc	l;usbEp2Map-$100
+	ld	bc,$332211
+	ld	(hl),bc
+	ld	l,usbIdle-$100
 	ld	(hl),7
 	ld	l,h;usbDevCtrl+1-$100
 	ld	(hl),bmUsbDevForceFullSpd shr 8
@@ -2276,6 +2293,43 @@ assert endpoint.device and 1
 	ld	(yendpoint.dir),a
 	ld	(yendpoint.overlay.fifo),bmUsbDmaCxFifo
 	ld	(dummyHead.next),yendpoint
+	ld	a,(currentRole)
+	and	a,usbRoleDev shr 16
+	ret	z
+	ld	hl,mpUsbInEp1-1
+	ld	a,(yendpoint.dir)
+	rrca
+	jq	c,.in
+	ld	l,usbOutEp1-1-$100
+.in:
+repeat 7-bUsbFifoDir
+	rrca
+end repeat
+	ld	c,a
+	ld	a,(yendpoint.info)
+	and	a,yendpoint.info.ep
+	ld	b,a
+	add	a,l
+	ld	l,a
+	ld	de,(yendpoint.maxPktLen)
+	ld	(hl),e
+	inc	l
+	ld	(hl),bmUsbEpReset
+	ld	a,d
+	and	a,bmUsbEpMaxPktSz shr 8
+	ld	(hl),a
+	ld	a,usbFifo0Map-1-$100
+	add	a,b
+	ld	l,a
+	ld	a,(hl)
+	and	a,not bmUsbFifoDir
+	or	a,c
+	ld	(hl),a
+assert usbFifo0Map < usbFifo0Cfg
+	setmsk	usbFifo0Cfg xor usbFifo0Map,hl
+	ld	a,(yendpoint+1)
+	or	a,bmUsbFifoEn
+	ld	(hl),a
 	cp	a,a
 	ret
 .nomem:
