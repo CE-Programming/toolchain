@@ -3547,7 +3547,7 @@ _HandleAsyncAdvInt:
 	ld	iyh,a
 	inc	a
 	jq	nz,.loop
-	dec	a;-1
+	cpl	;-1
 .scheduleCleanup:
 	ret	nz
 	ld	hl,(cleanupListReady)
@@ -3556,8 +3556,8 @@ _HandleAsyncAdvInt:
 	sbc	a,a
 	ret	z
 	ld	(cleanupListReady-1),hl
+	inc	h
 	ex	de,hl
-	inc	d
 	ret	z
 	ld	a,l
 	ld	l,usbCmd
