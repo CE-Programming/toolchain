@@ -746,9 +746,8 @@ usb_RefDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
+	inc	l
+	dec	l
 	ret	z
 .enter:
 	setmsk	device.refcount,hl
@@ -763,9 +762,8 @@ usb_UnrefDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
+	inc	l
+	dec	l
 	ret	z
 .enter:
 	setmsk	device.refcount,hl
@@ -780,20 +778,6 @@ usb_UnrefDevice:
 	resmsk	device.refcount,hl
 	call	z,_Free32Align32
 	ld	de,mpUsbRange
-	jq	usb_GetDeviceHub.returnZero
-
-;-------------------------------------------------------------------------------
-usb_GetDeviceHub:
-	pop	de
-	ex	(sp),ydevice
-	push	de
-	ld	de,-1
-	add	ydevice,de
-	jq	nc,.returnCarry
-	ld	hl,(ydevice.hub+1)
-.maybeReturnNull:
-	bit	0,hl
-	ret	z
 .returnZero:
 	xor	a,a
 .returnCarry:
@@ -801,27 +785,42 @@ usb_GetDeviceHub:
 	ret
 
 ;-------------------------------------------------------------------------------
+usb_GetDeviceHub:
+	pop	de
+	ex	(sp),ydevice
+	push	de
+	xor	a,a
+	sbc	hl,hl
+	cp	a,iyl
+	ret	z
+	ld	de,(ydevice.hub+1)
+.returnDEIfValid:
+	bit	0,de
+	ret	z
+	ex	de,hl
+	ret
+
+;-------------------------------------------------------------------------------
 usb_SetDeviceData:
 	pop	de,ydevice
 	ex	(sp),hl
-	push	hl
-	ld	bc,-1
-	add	ydevice,bc
-	jq	nc,.dispatch
-	ld	(ydevice.data+1),hl
-	ex	de,hl
-.dispatch:
-	jp	(hl)
+	push	hl,de
+	xor	a,a
+	cp	a,iyl
+	ret	z
+	ld	(ydevice.data),hl
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceData:
 	pop	de
 	ex	(sp),ydevice
 	push	de
-	ld	de,-1
-	add	ydevice,de
-	jq	nc,usb_GetDeviceHub.returnCarry
-	ld	hl,(ydevice.data+1)
+	xor	a,a
+	sbc	hl,hl
+	cp	a,iyl
+	ret	z
+	ld	hl,(ydevice.data)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -857,7 +856,7 @@ usb_FindDevice:
 	lea	hl,iy
 	ld	a,l
 	rrca
-	jq	c,usb_GetDeviceHub.returnZero
+	jq	c,usb_UnrefDevice.returnZero
 	sbc	hl,de
 	ret	z
 .sibling:
@@ -871,9 +870,8 @@ usb_ResetDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
+	inc	l
+	dec	l
 	ld	hl,USB_ERROR_NOT_SUPPORTED
 	ret	nz
 	ld	l,USB_ERROR_INVALID_PARAM
@@ -884,9 +882,8 @@ usb_DisconnectDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
+	inc	l
+	dec	l
 	ld	hl,USB_ERROR_NOT_SUPPORTED
 	ret	nz
 	ld	l,USB_ERROR_INVALID_PARAM
@@ -896,22 +893,21 @@ usb_DisconnectDevice:
 usb_GetDeviceAddress:
 	pop	hl
 	ex	(sp),ydevice
-	ld	de,-1
-	add	ydevice,de
+	xor	a,a
+	cp	a,iyl
 	sbc	a,a
-	and	a,(ydevice.addr+1)
+	and	a,(ydevice.addr)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceSpeed:
-	pop	de
+	pop	hl
 	ex	(sp),ydevice
-	ld	bc,-1
-	add	ydevice,bc
-	ccf
+	xor	a,a
+	cp	a,iyl
 	sbc	a,a
-	or	a,(ydevice.speed+1)
-	ex	de,hl
+	cpl
+	or	a,(ydevice.speed)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -1165,7 +1161,7 @@ usb_ClearEndpointHalt:
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
 	call	usb_GetEndpointAddress.enter
-	ld	de,0
+	inc	de;0
 	push	hl,de
 	ld	e,DEFAULT_RETRIES
 	push	de,hl,hl
@@ -1177,7 +1173,7 @@ iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_F
  end if
 end iterate
 	xor	a,a
-	ld	hl,(yendpoint.device)
+	ld	hl,(yendpoint.device+1)
 	call	usb_GetDeviceEndpoint.enter
 	push	hl
 	call	usb_ControlTransfer
@@ -1193,6 +1189,9 @@ end iterate
 usb_GetDeviceEndpoint:
 	pop	de,hl,bc
 	push	bc,hl,de
+	inc	l
+	dec	l
+	ret	z
 	ld	a,c
 	and	a,$8F
 .enter:
@@ -1216,23 +1215,33 @@ usb_GetEndpointDevice:
 	pop	de
 	ex	(sp),yendpoint
 	push	de
-	ld	hl,(yendpoint.device)
-	jq	usb_GetDeviceHub.maybeReturnNull
+	xor	a,a
+	sbc	hl,hl
+	cp	a,iyl
+	ret	z
+	ld	de,(yendpoint.device)
+	jq	usb_GetDeviceHub.returnDEIfValid
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointData:
 	pop	de,yendpoint
 	ex	(sp),hl
-	push	hl
+	push	hl,de
+	xor	a,a
+	cp	a,iyl
+	ret	z
 	ld	(yendpoint.data),hl
-	ex	de,hl
-	jp	(hl)
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointData:
 	pop	de
 	ex	(sp),yendpoint
 	push	de
+	xor	a,a
+	sbc	hl,hl
+	cp	a,iyl
+	ret	z
 	ld	hl,(yendpoint.data)
 	ret
 
@@ -1242,9 +1251,13 @@ usb_GetEndpointAddress:
 	ex	(sp),yendpoint
 	push	hl
 .enter:
-	ld	a,(yendpoint.dir)
+	ld	de,-1
+	add	yendpoint,de
+	ld	a,e
+	ret	nc
+	ld	a,(yendpoint.dir+1)
 	rrca
-	ld	a,(yendpoint.info)
+	ld	a,(yendpoint.info+1)
 	rla
 	rrca
 	and	a,$8F
@@ -1254,7 +1267,11 @@ usb_GetEndpointAddress:
 usb_GetEndpointTransferType:
 	pop	hl
 	ex	(sp),yendpoint
-	ld	a,(yendpoint.type)
+	xor	a,a
+	cp	a,iyl
+	sbc	a,a
+	cpl
+	or	a,(yendpoint.type)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -1262,26 +1279,35 @@ usb_GetEndpointMaxPacketSize:
 	pop	de
 	ex	(sp),yendpoint
 	push	de
-	ld	hl,(yendpoint.maxPktLen)
-	ld	a,h
+	xor	a,a
+	cp	a,iyl
+	ret	z
+	ld	de,(yendpoint.maxPktLen)
+	ld	a,d
 	and	a,111b
-	ld	h,a
+	ld	d,a
+	ex.s	de,hl
 	ret
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointFlags:
 	pop	de,yendpoint
 	ex	(sp),hl
-	push	hl
+	push	hl,de
+	xor	a,a
+	cp	a,iyl
+	ret	z
 	ld	(yendpoint.flags),l
-	ex	de,hl
-	jp	(hl)
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetEndpointFlags:
 	pop	hl
 	ex	(sp),yendpoint
-	ld	a,(yendpoint.flags)
+	xor	a,a
+	cp	a,iyl
+	sbc	a,a
+	and	a,(yendpoint.flags)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -2314,7 +2340,7 @@ end repeat
 	ld	de,(yendpoint.maxPktLen)
 	ld	(hl),e
 	inc	l
-	ld	(hl),bmUsbEpReset
+	ld	(hl),bmUsbEpReset shr 8
 	ld	a,d
 	and	a,bmUsbEpMaxPktSz shr 8
 	ld	(hl),a
