@@ -324,7 +324,7 @@ fat_ReadSector:
 ;  USB_SUCCESS on success
 	pop	de,iy,hl
 	push	hl,iy,de
-	ld	(util_read10.buffer),hl
+	ld	(yfatFile.working_buffer),hl
 	ld	a,hl,(yfatFile.current_sector)
 	ld	bc,0
 	ld	c,(yfatFile.cluster_sector)
@@ -332,12 +332,12 @@ fat_ReadSector:
 	adc	a,b
 	push	hl
 	push	af
-	inc	c
 	push	iy
 	ld	iy,(yfatFile.fat)
 	ld	a,(yfatType.cluster_size)
 	cp	a,c
 	pop	iy
+	inc	c
 	jr	nz,.readsector
 	ld	a,hl,(yfatFile.current_cluster)
 	push	iy
@@ -352,6 +352,8 @@ fat_ReadSector:
 	ld	(yfatFile.current_sector),a,hl
 	ld	c,0
 .readsector:
+	ld	hl,(yfatFile.working_buffer)
+	ld	(util_read10.buffer),hl
 	ld	(yfatFile.cluster_sector),c
 	ld	hl,(yfatFile.fpossector)
 	inc	hl
@@ -712,28 +714,26 @@ util_next_cluster:
 ;   iy -> fat structure
 ; outputs
 ;   auhl = next cluster
+	ld	de,0
 	add	hl,hl
 	adc	a,a		; << 1
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	ld	l,e
-	add	hl,hl
-	push	hl		; hl = cluster_pos
+	ld	e,l		; cluster pos
 	push	af		; >> 8
 	inc	sp
-	push	de
+	push	hl
 	inc	sp
 	pop	hl
 	inc	sp
 	xor	a,a
-	ld	de,(yfatType.fat_pos)
-	add	hl,de
-	adc	a,a		; auhl = cluster_sec
+	ld	bc,(yfatType.fat_pos)
+	add	hl,bc
+	adc	a,a
+	push	de
 	call	util_read_fat_sector
-	pop	de
+	pop	hl
 	jr	nz,.error
-	ld	hl,tmp.sectorbuffer
+	add	hl,hl
+	ld	de,tmp.sectorbuffer
 	add	hl,de
 	ld	de,(hl)
 	inc	hl

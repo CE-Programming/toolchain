@@ -88,6 +88,7 @@ typedef struct {
     uint24_t fpossector;     /**< File position by sector count. */
     uint8_t cluster_sector;  /**< Current sector in cluster. */
     uint32_t current_sector; /**< Current sector on msd. */
+    uint24_t working_buffer;
     uint24_t entry_pointer;
 } fat_file_t;
 

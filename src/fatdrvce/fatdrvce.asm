@@ -173,6 +173,7 @@ struct fatFile
 	fpossector	rl 1
 	cluster_sector  rb 1
 	current_sector	rd 1
+	working_buffer  rl 1
 	entry_pointer	rl 1
 	size := $-.
 end struct
