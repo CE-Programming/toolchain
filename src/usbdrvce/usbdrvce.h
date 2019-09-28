@@ -317,6 +317,7 @@ typedef enum usb_synchronization_type {
 } usb_synchronization_type_t;
 
 typedef enum usb_transfer_type {
+  USB_UNKNOWN_TRANSFER = -1,
   USB_CONTROL_TRANSFER,
   USB_ISOCHRONOUS_TRANSFER,
   USB_BULK_TRANSFER,
@@ -878,7 +879,7 @@ usb_endpoint_data_t *usb_GetEndpointData(usb_endpoint_t endpoint);
 /**
  * Gets the address of an endpoint.
  * @param endpoint The endpoint to get the address of.
- * @return The address of an \p endpoint.
+ * @return The address of an \p endpoint or 0xFF on error.
  */
 uint8_t usb_GetEndpointAddress(usb_endpoint_t endpoint);
 
@@ -887,14 +888,14 @@ uint8_t usb_GetEndpointAddress(usb_endpoint_t endpoint);
  * @param endpoint The endpoint to get the transfer type of.
  * @return The \c usb_transfer_type of an endpoint.
  */
-usb_transfer_type_t usb_GetEndpointTransferType(usb_endpoint_t endpoint);
+int8_t usb_GetEndpointTransferType(usb_endpoint_t endpoint);
 
 /**
  * Gets the maximum packet size of an endpoint.
  * @param endpoint The endpoint to get the maximum packet size of.
  * @return The \c wMaxPacketSize of an \p endpoint.
  */
-uint16_t usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
+unsigned usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
 
 /**
  * Sets the flags for an endpoint.
