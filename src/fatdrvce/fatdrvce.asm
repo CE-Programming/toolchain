@@ -163,18 +163,19 @@ BIT_OPEN := 7
 struct fatFile
 	local size
 	label .: size
-	fat		rl 1
-	flags		rb 1
-	entry_sector	rd 1
-	first_cluster	rd 1
-	current_cluster	rd 1
-	file_size	rd 1
-	fpos		rd 1
-	fpossector	rl 1
-	cluster_sector  rb 1
-	current_sector	rd 1
-	working_buffer  rl 1
-	entry_pointer	rl 1
+	fat		  rl 1
+	flags		  rb 1
+	entry_sector	  rd 1
+	first_cluster	  rd 1
+	current_cluster	  rd 1
+	file_size	  rd 1
+	file_size_sectors rl 1
+	fpos		  rd 1
+	fpossector        rl 1
+	cluster_sector    rb 1
+	current_sector    rd 1
+	working_buffer    rl 1
+	entry_pointer     rl 1
 	size := $-.
 end struct
 struct fatPartition
@@ -190,6 +191,7 @@ struct fatType
 	partition	rl 1
 	cluster_size	rb 1
 	clusters	rd 1
+	fat_size	rl 1
 	fat_pos		rl 1
 	fs_info		rl 1
 	fat_base_lba	rd 1
@@ -197,6 +199,7 @@ struct fatType
 	data_region	rd 1
 	working_sector	rd 1
 	working_cluster	rd 1
+	working_next_cluster rd 1
 	working_pointer	rl 1
 	size := $-.
 end struct
@@ -253,43 +256,47 @@ struct deviceDescriptor
 end struct
 struct interfaceDescriptor
 	label .: 9
-	descriptor		descriptor
-	bInterfaceNumber	rb 1
-	bAlternateSetting	rb 1
-	bNumEndpoints		rb 1
-	bInterfaceClass		rb 1
-	bInterfaceSubClass	rb 1
-	bInterfaceProtocol	rb 1
-	iInterface		rb 1
+	descriptor descriptor
+	bInterfaceNumber rb 1
+	bAlternateSetting rb 1
+	bNumEndpoints rb 1
+	bInterfaceClass rb 1
+	bInterfaceSubClass rb 1
+	bInterfaceProtocol rb 1
+	iInterface rb 1
 end struct
 struct endpointDescriptor
 	label .: 7
-	descriptor		descriptor
-	bEndpointAddress	rb 1
-	bmAttributes		rb 1
-	wMaxPacketSize		rw 1
-	bInterval		rb 1
+	descriptor descriptor
+	bEndpointAddress rb 1
+	bmAttributes rb 1
+	wMaxPacketSize rw 1
+	bInterval rb 1
 end struct
 
 ; enum usb_transfer_direction
 virtual at 0
-	?HOST_TO_DEVICE				rb 1 shl 7
-	?DEVICE_TO_HOST				rb 1 shl 7
+	?HOST_TO_DEVICE rb 1 shl 7
+	?DEVICE_TO_HOST rb 1 shl 7
 end virtual
 
 virtual at 0
-	FAT_SUCCESS		 rb 1
-	FAT_ERROR_INVALID_PARAM	 rb 1
-	FAT_ERROR_USB_FAILED	 rb 1
-	FAT_ERROR_NOT_SUPPORTED  rb 1
-	FAT_INVALID_CLUSTER      rb 1
+	FAT_SUCCESS rb 1
+	FAT_ERROR_INVALID_PARAM rb 1
+	FAT_ERROR_USB_FAILED rb 1
+	FAT_ERROR_NOT_SUPPORTED rb 1
+	FAT_ERROR_INVALID_CLUSTER rb 1
+	FAT_ERROR_EOF rb 1
+	FAT_ERROR_EXISTS rb 1
+	FAT_ERROR_INVALID_PATH rb 1
+	FAT_ERROR_FAILED_ALLOC rb 1
 end virtual
 
 virtual at 0
-	MSD_SUCCESS		 rb 1
-	MSD_ERROR_INVALID_PARAM	 rb 1
-	MSD_ERROR_USB_FAILED	 rb 1
-	MSD_ERROR_NOT_SUPPORTED  rb 1
+	MSD_SUCCESS rb 1
+	MSD_ERROR_INVALID_PARAM rb 1
+	MSD_ERROR_USB_FAILED rb 1
+	MSD_ERROR_NOT_SUPPORTED rb 1
 	MSD_ERROR_INVALID_DEVICE rb 1
 end virtual
 

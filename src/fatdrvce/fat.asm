@@ -52,7 +52,7 @@ fat_Find:
 ;  sp + 9  : return number of found partitions
 ;  sp + 12 : maxium number of partitions to find
 ; Returns:
-;  USB_SUCCESS on success
+;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
 	ld	bc,(iy + 3)			; msd structure
@@ -88,7 +88,7 @@ fat_Init:
 ;  sp + 3 : Uninitialized FAT structure type
 ;  sp + 6 : Available FAT partition returned from fat_Find
 ; Returns:
-;  USB_SUCCESS on success
+;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
 	push	ix
@@ -121,6 +121,7 @@ fat_Init:
 	ex.s	de,hl
 	ld	(yfatType.fat_pos),de
 	ld	hl,(ix + 36)			; BPB_FAT32_FATSz32
+	ld	(yfatType.fat_size),hl
 	add	hl,hl				; * num fats
 	adc	a,b
 	add	hl,de				; data region
@@ -190,7 +191,7 @@ fat_Open:
 ;  sp + 6 : Filename (8.3 format)
 ;  sp + 9 : Open flags
 ; Returns:
-;  USB_SUCCESS on success
+;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
 	ld	de,(iy + 6)
@@ -243,7 +244,7 @@ fat_Open:
 .notempty:
 	call	util_get_file_size
 .storesize:
-	ld	(yfatFile.file_size),a,hl
+	call	util_set_file_size
 	ld	a,hl,(yfatFile.current_cluster)
 	push	iy
 	ld	iy,(yfatFile.fat)
@@ -299,7 +300,7 @@ fat_Close:
 ; Arguments:
 ;  sp + 3 : FAT File structure type
 ; Returns:
-;  USB_SUCCESS on success
+;  FAT_SUCCESS on success
 	pop	de
 	ex	hl,(sp)
 	push	de
@@ -316,15 +317,19 @@ fat_Close:
 
 ;-------------------------------------------------------------------------------
 fat_ReadSector:
-; Closes an open file handle, freeing it for future use
+; Reads a sector from an open file handle
 ; Arguments:
 ;  sp + 3 : FAT File structure type
 ;  sp + 6 : Buffer to read into
 ; Returns:
-;  USB_SUCCESS on success
+;  FAT_SUCCESS on success
 	pop	de,iy,hl
 	push	hl,iy,de
 	ld	(yfatFile.working_buffer),hl
+	ld	de,(yfatFile.fpossector)
+	ld	hl,(yfatFile.file_size_sectors)
+	compare_hl_de
+	jq	z,.eof
 	ld	a,hl,(yfatFile.current_sector)
 	ld	bc,0
 	ld	c,(yfatFile.cluster_sector)
@@ -370,12 +375,372 @@ fat_ReadSector:
 	ld	hl,FAT_ERROR_USB_FAILED
 	jq	.restorebuffer
 .invalidcluster:
-	ld	hl,FAT_INVALID_CLUSTER
+	ld	hl,FAT_ERROR_INVALID_CLUSTER
 	jq	.restorebuffer
 .restorebuffer:
 	ld	bc,tmp.sectorbuffer
 	ld	(util_read10.buffer),bc
 	ret
+.eof:
+	ld	hl,FAT_ERROR_EOF
+	ret
+
+;-------------------------------------------------------------------------------
+fat_WriteSector:
+; Writes a sector to an open file handle
+; Arguments:
+;  sp + 3 : FAT File structure type
+;  sp + 6 : Buffer to write
+; Returns:
+;  FAT_SUCCESS on success
+	ret
+
+;-------------------------------------------------------------------------------
+fat_Create:
+; Creates a new file or directory entry
+; Arguments:
+;  sp + 3 : FAT File structure type
+;  sp + 6 : Path
+;  sp + 9 : New name
+;  sp + 12 : Attributes
+; Returns:
+;  FAT_SUCCESS on success
+	ld	iy,0
+	add	iy,sp
+	ld	hl,-512
+	add	hl,sp
+	ld	sp,hl			; temporary space for concat
+	ex	de,hl
+	ld	hl,(iy + 6)
+	compare_hl_zero
+	jq	z,.invalidparam
+	call	_StrCopy
+	ld	hl,(iy + 9)
+	compare_hl_zero
+	jq	z,.invalidparam
+	call	_StrngCat
+	ex	de,hl
+	push	iy
+	ld	iy,(iy + 3)
+	call	util_locate_entry
+	pop	iy
+	compare_auhl_zero
+	jq	nz,.alreadyexists
+	ld	hl,(iy + 6)
+	inc	hl			; todo: check for '/' or '.'?
+	ld	a,(hl)
+	or	a,a
+	jq	nz,.notroot
+	push	iy
+	ld	iy,(iy + 3)
+	call	util_alloc_entry_root
+	pop	iy
+	jq	.createfile
+.notroot:
+	ld	de,(iy + 6)
+	push	iy
+	ld	iy,(iy + 3)
+	call	util_locate_entry
+	pop	iy
+	compare_auhl_zero
+	jq	z,.invalidpath
+	ld	(yfatType.working_pointer),de
+	ld	(yfatType.working_sector),a,hl
+	push	iy
+	ld	iy,tmp.sectorbuffer
+	ld	a,(iy + 20 + 1)
+	ld	hl,(iy + 20 - 2)	; get hlu
+	ld	l,(iy + 26 + 0)
+	ld	h,(iy + 26 + 1)		; get the entry's cluster
+	pop	iy
+	ld	(yfatType.working_cluster),a,hl
+	push	iy
+	ld	iy,(iy + 3)
+	call	util_alloc_entry
+	pop	iy
+.createfile:
+	compare_auhl_zero
+	jq	z,.failedalloc
+	ld	(yfatType.working_sector),a,hl
+	ld	de,(yfatType.working_pointer)
+	ld	hl,tmp.sectorbuffer
+	add	hl,de
+	ld	iy,(iy + 9)
+	push	ix,hl
+	call	util_get_fat_name
+	pop	ix
+	lea	ix,ix + 11
+	ld	a,(iy + 12)
+	ld	(ix),a
+	pop	ix
+	ld	a,hl,(yfatType.working_sector)
+	call	util_write_fat_sector
+	jq	nz,.usberror
+
+	; todo: create . and .. directories if a directory
+
+	ld	e,FAT_SUCCESS
+	jq	.restorestack
+.failedalloc:
+	ld	e,FAT_ERROR_FAILED_ALLOC
+	jq	.restorestack
+.invalidparam:
+	ld	e,FAT_ERROR_INVALID_PARAM
+	jq	.restorestack
+.alreadyexists:
+	ld	e,FAT_ERROR_EXISTS
+	jq	.restorestack
+.invalidpath:
+	ld	e,FAT_ERROR_INVALID_PATH
+	jq	.restorestack
+.usberror:
+	ld	e,FAT_ERROR_USB_FAILED
+	jq	.restorestack
+.restorestack:
+	ld	hl,512
+	ld	d,l
+	add	hl,sp
+	ld	sp,hl
+	ex.s	de,hl
+	ret
+
+;-------------------------------------------------------------------------------
+; inputs:
+;   iy: fat structure
+;   iy + working_cluster: previous cluster
+;   iy + working_sector: entry sector
+;   iy + working_pointer: entry in sector
+util_alloc_cluster:
+	xor	a,a
+	sbc	hl,hl
+.traversefat:
+	push	hl,af
+	ld	bc,(yfatType.fat_pos)
+	add	hl,bc
+	adc	a,0
+	call	util_read_fat_sector
+	jq	z,.readfatsector
+	pop	af,hl
+	jq	.usberror
+.readfatsector:
+	push	ix
+	ld	ix,tmp.sectorbuffer - 4
+	ld	b,128
+.traverseclusterchain:
+	lea	ix,ix + 4
+	ld	a,hl,(ix)
+	compare_auhl_zero
+	jr	z,.unallocatedcluster
+	djnz	.traverseclusterchain
+	pop	ix
+	pop	af,hl
+	jq	.traversefat
+	ret
+.unallocatedcluster:
+	ld	a,128
+	sub	a,b
+	ld	bc,0
+	ld	c,a
+	lea	de,ix
+	ld	a,$0f
+	scf
+	sbc	hl,hl
+	ld	(ix),a,hl
+	pop	ix,af,hl
+	push	af,hl
+	call	util_auhl_shl7
+	add	hl,bc
+	adc	a,b			; new cluster
+	ld	(yfatType.working_next_cluster),a,hl
+	pop	hl,af
+	ld	bc,(yfatType.fat_pos)
+	add	hl,bc
+	adc	a,0
+	push	af,hl
+	call	util_write_fat_sector
+	pop	hl,af
+	jq	nz,.usberror	; pop new cluster
+	ld	bc,(yfatType.fat_size)
+	add	hl,bc
+	adc	a,0
+	call	util_write_fat_sector
+	jq	nz,.usberror	; pop new cluster
+	ld	a,hl,(yfatType.working_cluster)
+	compare_auhl_zero
+	jq	z,.nolinkneeded
+.linkchain:
+	push	hl
+	ld	e,a
+	xor	a,a
+	ld	bc,128
+	call	__ldivu
+	ld	bc,(yfatType.fat_pos)
+	add	hl,bc
+	adc	a,e
+	push	hl,af
+	call	util_read_fat_sector
+	pop	de,bc,hl
+	jq	nz,.usberror
+	push	bc,de
+	ld	a,l
+	and	a,$7f
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	push	ix
+	ld	de,tmp.sectorbuffer
+	add	hl,de
+	push	hl
+	pop	ix
+	ld	a,hl,(yfatType.working_next_cluster)
+	ld	(ix),a,hl
+	pop	ix
+	pop	af,hl
+	push	hl,af
+	call	util_write_fat_sector
+	pop	af,hl
+	jq	nz,.usberror
+	ld	bc,(yfatType.fat_size)
+	add	hl,bc
+	adc	a,0
+	call	util_write_fat_sector
+	jq	nz,.usberror
+	ld	a,hl,(yfatType.working_cluster)
+	compare_auhl_zero
+	jq	z,.nolinkneeded
+.allocated:
+	ld	a,hl,(yfatType.working_sector)
+	call	util_read_fat_sector
+	jq	nz,.usberror
+	push	ix
+	ld	ix,(yfatType.working_pointer)
+	ld	de,(yfatType.working_next_cluster + 0)
+	ld	(ix + 26),e
+	ld	(ix + 27),d
+	ld	de,(yfatType.working_next_cluster + 2)
+	ld	(ix + 20),e
+	ld	(ix + 21),d
+	pop	ix
+	ld	a,hl,(yfatType.working_sector)
+	call	util_write_fat_sector
+	jq	nz,.usberror
+.nolinkneeded:
+	ld	a,hl,(yfatType.working_next_cluster)
+	ret
+.usberror:
+	xor	a,a
+	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
+; inputs:
+;   iy: fat structure
+;   iy + working_cluster: previous cluster
+;   iy + working_sector: entry sector
+;   iy + working_pointer: entry in sector
+; outputs:
+;   auhl: new entry sector
+;   de: offset in entry sector
+util_do_alloc_entry:
+	call	util_alloc_cluster
+	call	util_cluster_to_sector
+	ld	b,0
+	push	ix
+	ld	ix,tmp.sectorbuffer
+	ld	(ix + 0),$e5
+	ld	(ix + 11),b
+	ld	(ix + 32),b
+	ld	(ix + 43),b
+	pop	ix
+	push	hl,af
+	call	util_write_fat_sector
+	pop	af,hl
+	ret
+
+;-------------------------------------------------------------------------------
+; inputs:
+;   iy: fat structure
+;   iy + working_cluster: first cluster
+;   iy + working_sector: parent entry sector
+;   iy + working_pointer: parent entry in sector
+; outputs:
+;   auhl: new entry sector
+;   de: offset in entry sector
+util_alloc_entry:
+	ld	a,hl,(yfatType.working_cluster)
+	call	util_cluster_to_sector
+	compare_auhl_zero
+	jq	nz,.validcluster
+	call	util_do_alloc_entry
+	ld	de,0
+	ret
+.validcluster:
+	ld	b,(yfatType.cluster_size)
+.loop:
+	push	bc,hl,af
+	call	util_read_fat_sector
+	push	iy
+	ld	iy,tmp.sectorbuffer - 32
+	ld	b,16
+.findavailentry:
+	lea	iy,iy + 32
+	ld	a,(iy + 0)
+	cp	a,$e5			; deleted entry, let's use it!
+	jr	z,.foundavailentry
+	or	a,a
+	jq	z,.foundendoflist	; end of list, let's allocate here
+	djnz	.findavailentry
+	pop	iy,af,hl
+	call	util_increment_auhl
+	pop	bc
+	djnz	.loop
+.movetonextcluster:
+	ld	a,hl,(yfatType.working_cluster)
+	call	util_next_cluster
+	compare_auhl_zero
+	jq	nz,.nextclusterisvalid
+	push	af,hl
+	ld	a,hl,(yfatType.working_cluster)
+	call	util_do_alloc_entry
+	ld	de,0
+	ret
+.nextclusterisvalid:
+	ld	(yfatType.working_cluster),a,hl
+	jq	util_alloc_entry
+.foundavailentry:
+	lea	de,iy			; pointer to new entry
+	pop	iy,af,hl,bc		; auhl = sector with entry
+	ret
+.foundendoflist:
+	dec	b
+	jq	z,.movetonextcluster
+	lea	de,iy			; pointer to new entry
+	ld	iy,tmp.sectorbuffer
+	xor	a,a
+	ld	(iy + 0),a
+	ld	(iy + 11),a
+	pop	iy,af,hl,bc
+	push	hl,af
+	call	util_increment_auhl
+	call	util_write_fat_sector
+	pop	af,hl
+	ret
+
+;-------------------------------------------------------------------------------
+; inputs:
+;   iy: fat structure
+; outputs:
+;   auhl: new entry sector
+;   de: offset in entry sector
+util_alloc_entry_root:
+	xor	a,a
+	sbc	hl,hl
+	ld	(yfatType.working_sector),a,hl
+	ld	(yfatType.working_pointer),hl
+	ld	a,hl,(yfatType.root_dir_pos)
+	call	util_sector_to_cluster
+	ld	(yfatType.working_cluster),a,hl
+	jq	util_alloc_entry
 
 ;-------------------------------------------------------------------------------
 util_valid_file_ptr:
@@ -389,12 +754,6 @@ util_valid_file_ptr:
 	xor	a,a
 	sbc	hl,hl
 	ld	e,a
-	ret
-
-;-------------------------------------------------------------------------------
-util_alloc_cluster:
-	xor	a,a
-	sbc	hl,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -430,6 +789,13 @@ util_get_file_size:
 	ld	iy,(yfatFile.entry_pointer)
 	ld	a,hl,(iy + 28)
 	pop	iy
+	ret
+
+;-------------------------------------------------------------------------------
+util_set_file_size:
+	ld	(yfatFile.file_size),a,hl
+	call	util_ceil_sector_size
+	ld	(yfatFile.file_size_sectors),a,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -969,5 +1335,50 @@ util_sector_checkmagic:
 	inc	hl
 	ld	a,(hl)
 	cp	a,$aa
+	ret
+
+;-------------------------------------------------------------------------------
+util_increment_auhl:
+	ld	bc,1
+	add	hl,bc
+	adc	a,b
+	ret
+
+;-------------------------------------------------------------------------------
+util_auhl_shl7:
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	ret
+
+;-------------------------------------------------------------------------------
+util_ceil_sector_size:
+	compare_auhl_zero
+	ret	z
+	ld	e,a
+	push	hl,de
+	xor	a,a
+	ld	bc,512
+	push	bc
+	call	__lremu
+	compare_auhl_zero
+	pop	bc,de,hl
+	push	af
+	xor	a,a
+	call	__ldivu
+	pop	af
+	ret	z
+	inc	hl
 	ret
 

@@ -65,15 +65,17 @@ typedef struct {
 
 typedef struct {
     fat_partition_t *partition; /**< Disk partition used by FAT. */
-    uint8_t cluster_size;
-    uint32_t clusters;
-    uint24_t fat_pos;
-    uint24_t fs_info;
+    uint8_t cluster_size; /**< Size of each cluster in number of sectors. */
+    uint32_t clusters; /**< Number of clusters. */
+    uint24_t fat_size; /**< Logical number of sectors per file allocation table. Ignores high byte. */
+    uint24_t fat_pos; /**< Starting sector of the file allocation table. */
+    uint24_t fs_info; /**< Sector where filesystem information is stored. */
     uint32_t fat_base_lba;
     uint32_t root_dir_pos;
     uint32_t data_region;
     uint32_t working_sector;
     uint32_t working_cluster;
+    uint32_t working_next_cluster;
     uint24_t working_pointer;
 } fat_t;
 
@@ -84,6 +86,7 @@ typedef struct {
     uint32_t first_cluster;
     uint32_t current_cluster;
     uint32_t file_size;
+    uint24_t file_size_sectors;
     uint32_t fpos;           /**< File position by bytes. */
     uint24_t fpossector;     /**< File position by sector count. */
     uint8_t cluster_sector;  /**< Current sector in cluster. */
@@ -97,8 +100,11 @@ typedef enum {
     FAT_ERROR_INVALID_PARAM,
     FAT_ERROR_USB_FAILED,
     FAT_ERROR_NOT_SUPPORTED,
-    FAT_INVALID_CLUSTER,
-    FAT_EOF
+    FAT_ERROR_INVALID_CLUSTER,
+    FAT_ERROR_EOF,
+    FAT_ERROR_EXISTS,
+    FAT_ERROR_INVALID_PATH,
+    FAT_ERROR_FAILED_ALLOC
 } fat_error_t;
 
 typedef enum {
@@ -117,7 +123,6 @@ typedef enum {
 #define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden. */
 #define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory. */
 #define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory. */
-#define FAT_SUBDIR    (1 << 4)  /**< Entry is a subdirectory (or directory). */
 #define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
 #define FAT_ALL       (FAT_DIR | FAT_VOLLABEL | FAT_SYSTEM | FAT_HIDDEN | FAT_RDONLY)
 
@@ -151,6 +156,8 @@ fat_error_t fat_Init(fat_t *fat,
  * Opens a file for either reading or writing, or both.
  * @param fat Initialized FAT structure type.
  * @param filepath File path to open or write.
+ * @param flags Mode of opening, can be a mask of FAT_OPEN_WRONLY,
+                FAT_OPEN_RDONLY, and FAT_OPEN_RDWR.
  * @return 0 if the file could not be opened, otherwise pointer
  *         to a file handle for other functions.
  */
@@ -164,6 +171,20 @@ fat_file_t *fat_Open(fat_t *fat,
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Close(fat_file_t *file);
+
+/**
+ * Creates new files or directories in the filesystem.
+ * @param fat Initialized FAT structure type.
+ * @param path Path in which to create. Does not create subdirectories.
+ * @param name Name of new file or directory.
+ * @param attrib New entry attributes, can be a mask of FAT_RDONLY,
+                 FAT_HIDDEN, FAT_SYSTEM, and FAT_DIR.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_Create(fat_t *fat,
+                       const char *path,
+                       const char *name,
+                       uint8_t attrib);
 
 /**
  * Gets the size of the file.
