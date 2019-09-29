@@ -230,18 +230,19 @@ fat_file_t *fat_Open(fat_t *fat,
 fat_error_t fat_Close(fat_file_t *file);
 
 /**
- * Sets the offset position in the file.
+ * Sets the sector offset position in the file.
  * @param file File handle returned from fat_Open.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_SetFilePos(fat_file_t *file, uint32_t offset);
+fat_error_t fat_SetFilePos(fat_file_t *file, uint24_t offset);
 
 /**
- * Gets the offset position in the file.
+ * Gets the sector offset position in the file. Multiply return by the sector
+ * size (512) to get the byte offet.
  * @param file File handle returned from fat_Open.
- * @return File offset in bytes.
+ * @return File offset in number of sectors.
  */
-uint32_t fat_GetFilePos(fat_file_t *file);
+uint24_t fat_GetFilePos(fat_file_t *file);
 
 /**
  * Reads a sector (512 bytes) from a file, and advances the file

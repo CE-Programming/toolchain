@@ -254,7 +254,7 @@ fat_Open:
 	xor	a,a
 	sbc	hl,hl
 	ld	(yfatFile.cluster_sector),a
-	ld	(yfatFile.fpos),a,hl
+	ld	(yfatFile.fpossector),hl
 	lea	hl,iy
 	ret
 .errorpop:
@@ -293,11 +293,10 @@ fat_SetFilePos:
 ; Sets the offset position in the file
 ; Arguments:
 ;  sp + 3 : FAT File structure type
-;  sp + 6 : Position low
-;  sp + 9 : Position high byte
+;  sp + 6 : Position
 ; Returns:
 ;  FAT_SUCCESS on success
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ld	hl,FAT_ERROR_INVALID_PARAM
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -312,7 +311,7 @@ fat_GetFilePos:
 	push	de
 	call	util_valid_file_ptr
 	ret	z
-	ld	e,hl,(yfatFile.fpos)
+	ld	hl,(yfatFile.fpossector)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -437,6 +436,66 @@ fat_WriteSector:
 ;  sp + 6 : Buffer to write
 ; Returns:
 ;  FAT_SUCCESS on success
+	pop	de,iy,hl
+	push	hl,iy,de
+	ld	(yfatFile.working_buffer),hl
+	ld	de,(yfatFile.fpossector)
+	ld	hl,(yfatFile.file_size_sectors)
+	compare_hl_de
+	jq	z,.eof
+	ld	a,hl,(yfatFile.current_sector)
+	ld	bc,0
+	ld	c,(yfatFile.cluster_sector)
+	add	hl,bc
+	adc	a,b
+	push	hl
+	push	af
+	push	iy
+	ld	iy,(yfatFile.fat)
+	ld	a,(yfatType.cluster_size)
+	cp	a,c
+	pop	iy
+	inc	c
+	jr	nz,.writesector
+	ld	a,hl,(yfatFile.current_cluster)
+	push	iy
+	ld	iy,(yfatFile.fat)
+	call	util_next_cluster
+	pop	iy
+	ld	(yfatFile.current_cluster),a,hl
+	push	iy
+	ld	iy,(yfatFile.fat)
+	call	util_cluster_to_sector
+	pop	iy
+	ld	(yfatFile.current_sector),a,hl
+	ld	c,0
+.writesector:
+	ld	hl,(yfatFile.working_buffer)
+	ld	(util_write10.buffer),hl
+	ld	(yfatFile.cluster_sector),c
+	ld	hl,(yfatFile.fpossector)
+	inc	hl
+	ld	(yfatFile.fpossector),hl
+	ld	iy,(yfatFile.fat)
+	pop	af
+	pop	hl
+	call	util_write_fat_sector
+	jq	nz,.usberror
+	xor	a,a
+	sbc	hl,hl
+	jq	.restorebuffer
+.usberror:
+	ld	hl,FAT_ERROR_USB_FAILED
+	jq	.restorebuffer
+.invalidcluster:
+	ld	hl,FAT_ERROR_INVALID_CLUSTER
+	jq	.restorebuffer
+.restorebuffer:
+	ld	bc,tmp.sectorbuffer
+	ld	(util_write10.buffer),bc
+	ret
+.eof:
+	ld	hl,FAT_ERROR_EOF
 	ret
 
 ;-------------------------------------------------------------------------------
