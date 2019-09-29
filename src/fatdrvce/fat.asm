@@ -411,15 +411,12 @@ fat_Create:
 	add	hl,sp
 	ld	sp,hl			; temporary space for concat
 	ex	de,hl
+	push	de
 	ld	hl,(iy + 6)
-	compare_hl_zero
-	jq	z,.invalidparam
 	call	_StrCopy
 	ld	hl,(iy + 9)
-	compare_hl_zero
-	jq	z,.invalidparam
-	call	_StrngCat
-	ex	de,hl
+	call	_StrCopy
+	pop	de
 	push	iy
 	ld	iy,(iy + 3)
 	call	util_locate_entry
@@ -433,7 +430,11 @@ fat_Create:
 	jq	nz,.notroot
 	push	iy
 	ld	iy,(iy + 3)
+	push	iy
 	call	util_alloc_entry_root
+	pop	iy
+	ld	(yfatType.working_pointer),de
+	ld	(yfatType.working_sector),a,hl
 	pop	iy
 	jq	.createfile
 .notroot:
@@ -444,35 +445,42 @@ fat_Create:
 	pop	iy
 	compare_auhl_zero
 	jq	z,.invalidpath
+	push	iy
+	ld	iy,(iy + 3)
 	ld	(yfatType.working_pointer),de
 	ld	(yfatType.working_sector),a,hl
-	push	iy
 	ld	iy,tmp.sectorbuffer
 	ld	a,(iy + 20 + 1)
 	ld	hl,(iy + 20 - 2)	; get hlu
 	ld	l,(iy + 26 + 0)
 	ld	h,(iy + 26 + 1)		; get the entry's cluster
 	pop	iy
-	ld	(yfatType.working_cluster),a,hl
 	push	iy
 	ld	iy,(iy + 3)
+	ld	(yfatType.working_cluster),a,hl
 	call	util_alloc_entry
 	pop	iy
 .createfile:
 	compare_auhl_zero
 	jq	z,.failedalloc
+	push	ix
+	push	iy
+	ld	de,(iy + 9)
+	ld	iy,(iy + 3)
 	ld	(yfatType.working_sector),a,hl
-	ld	de,(yfatType.working_pointer)
-	ld	hl,tmp.sectorbuffer
-	add	hl,de
-	ld	iy,(iy + 9)
-	push	ix,hl
+	ld	hl,(yfatType.working_pointer)
+	push	hl
 	call	util_get_fat_name
 	pop	ix
-	lea	ix,ix + 11
+	pop	iy
 	ld	a,(iy + 12)
-	ld	(ix),a
+	ld	(ix + 11),a
+	ld	(ix + 28),a
+	ld	(ix + 29),a
+	ld	(ix + 30),a
+	ld	(ix + 31),a		; set initial size to zero
 	pop	ix
+	ld	iy,(iy + 3)
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector
 	jq	nz,.usberror
@@ -483,9 +491,6 @@ fat_Create:
 	jq	.restorestack
 .failedalloc:
 	ld	e,FAT_ERROR_FAILED_ALLOC
-	jq	.restorestack
-.invalidparam:
-	ld	e,FAT_ERROR_INVALID_PARAM
 	jq	.restorestack
 .alreadyexists:
 	ld	e,FAT_ERROR_EXISTS
@@ -715,15 +720,21 @@ util_alloc_entry:
 	dec	b
 	jq	z,.movetonextcluster
 	lea	de,iy			; pointer to new entry
-	ld	iy,tmp.sectorbuffer
 	xor	a,a
 	ld	(iy + 0),a
 	ld	(iy + 11),a
 	pop	iy,af,hl,bc
-	push	hl,af
+	push	af,hl,de
 	call	util_increment_auhl
 	call	util_write_fat_sector
-	pop	af,hl
+	pop	de,hl
+	jq	nz,.usberr
+	pop	af
+	ret
+.usberr:
+	pop	hl
+	xor	a,a
+	sbc	hl,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -804,7 +815,6 @@ util_get_fat_name:
 ; inputs
 ;   de: name
 ;   hl: <output> name (11+1 bytes)
-	ld	hl,tmp.string
 	push	de
 	ld	b,0
 .loop1:
@@ -917,6 +927,7 @@ util_locate_entry:
 	ld	de,(yfatType.working_pointer)
 	call	util_get_component_start
 	jq	z,.error
+	ld	hl,tmp.string
 	call	util_get_fat_name
 	call	util_get_next_component
 	ld	(yfatType.working_pointer),de

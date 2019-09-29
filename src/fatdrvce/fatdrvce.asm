@@ -43,6 +43,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_FileSize
 	export fat_FilePos
 	export fat_ReadSector
+	export fat_WriteSector
+	export fat_Create
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -55,9 +57,8 @@ end macro
 macro compare_auhl_zero?
 	add	hl,de
 	or	a,a
-	sbc	hl,de
 	jr	nz,$+3
-	or	a,a
+	sbc	hl,de
 end macro
 
 macro compare_hl_de?

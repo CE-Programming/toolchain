@@ -119,6 +119,7 @@ typedef enum {
 #define FAT_OPEN_RDONLY  1  /**< Open file in read-only mode. */
 #define FAT_OPEN_RDWR    (FAT_OPEN_RDONLY | FAT_OPEN_WRONLY)  /**< Open file for reading and writing. */
 
+#define FAT_NORMAL    (0 << 0)  /**< Entry has no attributes. */
 #define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
 #define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden. */
 #define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory. */
