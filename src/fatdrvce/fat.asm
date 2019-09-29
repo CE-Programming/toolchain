@@ -265,22 +265,43 @@ fat_Open:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_FileSize:
-; Gets the size of the file
+fat_SetSize:
+; Sets the size of the file
 ; Arguments:
-;  sp + 3 : FAT File structure type
+;  sp + 3 : FAT structure type
+;  sp + 6 : Path
+;  sp + 9 : Size low
+;  sp + 12 : Size high byte
 ; Returns:
-;  File size in bytes
-	pop	de
-	ex	hl,(sp)
-	push	de
-	call	util_valid_file_ptr
-	ret	z
-	ld	e,hl,(yfatFile.file_size)
+;  FAT_SUCCESS on success
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_FilePos:
+fat_GetSize:
+; Gets the size of the file
+; Arguments:
+;  sp + 3 : FAT structure type
+;  sp + 6 : Path
+; Returns:
+;  File size in bytes
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+fat_SetFilePos:
+; Sets the offset position in the file
+; Arguments:
+;  sp + 3 : FAT File structure type
+;  sp + 6 : Position low
+;  sp + 9 : Position high byte
+; Returns:
+;  FAT_SUCCESS on success
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+fat_GetFilePos:
 ; Gets the offset position in the file
 ; Arguments:
 ;  sp + 3 : FAT File structure type
@@ -292,6 +313,29 @@ fat_FilePos:
 	call	util_valid_file_ptr
 	ret	z
 	ld	e,hl,(yfatFile.fpos)
+	ret
+
+;-------------------------------------------------------------------------------
+fat_SetAttrib:
+; Sets the attributes of the path
+; Arguments:
+;  sp + 3 : FAT structure type
+;  sp + 6 : Path
+;  sp + 9 : File attributes byte
+; Returns:
+;  FAT_SUCCESS on success
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+fat_GetAttrib:
+; Gets the attributes of the path
+; Arguments:
+;  sp + 3 : FAT structure type
+;  sp + 6 : Path
+; Returns:
+;  File attribute byte
+	ld	a,255
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -399,10 +443,10 @@ fat_WriteSector:
 fat_Create:
 ; Creates a new file or directory entry
 ; Arguments:
-;  sp + 3 : FAT File structure type
+;  sp + 3 : FAT structure type
 ;  sp + 6 : Path
 ;  sp + 9 : New name
-;  sp + 12 : Attributes
+;  sp + 12 : File attributes
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0

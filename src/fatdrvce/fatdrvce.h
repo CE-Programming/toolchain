@@ -154,26 +154,6 @@ fat_error_t fat_Init(fat_t *fat,
                      fat_partition_t *partition);
 
 /**
- * Opens a file for either reading or writing, or both.
- * @param fat Initialized FAT structure type.
- * @param filepath File path to open or write.
- * @param flags Mode of opening, can be a mask of FAT_OPEN_WRONLY,
-                FAT_OPEN_RDONLY, and FAT_OPEN_RDWR.
- * @return 0 if the file could not be opened, otherwise pointer
- *         to a file handle for other functions.
- */
-fat_file_t *fat_Open(fat_t *fat,
-                     const char *filepath,
-                     uint8_t flags);
-
-/**
- * Closes an open file handle, freeing it for future use.
- * @param file File handle returned from fat_Open.
- * @return FAT_SUCCESS on success, otherwise error.
- */
-fat_error_t fat_Close(fat_file_t *file);
-
-/**
  * Creates new files or directories in the filesystem.
  * @param fat Initialized FAT structure type.
  * @param path Path in which to create. Does not create subdirectories.
@@ -188,28 +168,100 @@ fat_error_t fat_Create(fat_t *fat,
                        uint8_t attrib);
 
 /**
+ * Sets the attributes (read only, hidden, etc) of the file.
+ * @param fat Initialized FAT structure type.
+ * @param path File path.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_SetAttrib(fat_t *fat,
+                          const char *path,
+                          uint8_t attrib);
+
+/**
+ * Gets the attributes (read only, hidden, etc) of the file.
+ * @param fat Initialized FAT structure type.
+ * @param path File path.
+ * @return File attributes, or 255 if an error.
+ */
+uint8_t fat_GetAttrib(fat_t *fat,
+                      const char *path);
+
+/**
+ * Sets the size of the file, allocating or deallocating space as needed.
+ * This function should be called before attempting to write in a file that
+ * does not have a large enough current file size, (i.e. a newly created file),
+ * otherwise writes may always return FAT_ERROR_EOF.
+ * @param fat Initialized FAT structure type.
+ * @param path File path.
+ * @param size New file size.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_SetSize(fat_t *fat,
+                        const char *path,
+                        uint32_t size);
+
+/**
  * Gets the size of the file.
- * @param file File handle returned from fat_Open.
+ * @param fat Initialized FAT structure type.
+ * @param path File path.
  * @return File size in bytes.
  */
-uint32_t fat_FileSize(fat_file_t *file);
+uint32_t fat_GetSize(fat_t *fat,
+                     const char *path);
+
+/**
+ * Opens a file for either reading or writing, or both.
+ * @param fat Initialized FAT structure type.
+ * @param path File path to open or write.
+ * @param flags Mode of opening, can be a mask of FAT_OPEN_WRONLY,
+                FAT_OPEN_RDONLY, and FAT_OPEN_RDWR.
+ * @return 0 if the file could not be opened, otherwise pointer
+ *         to a file handle for other functions.
+ */
+fat_file_t *fat_Open(fat_t *fat,
+                     const char *path,
+                     uint8_t flags);
+
+/**
+ * Closes an open file handle, freeing it for future use.
+ * @param file File handle returned from fat_Open.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_Close(fat_file_t *file);
+
+/**
+ * Sets the offset position in the file.
+ * @param file File handle returned from fat_Open.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_SetFilePos(fat_file_t *file, uint32_t offset);
 
 /**
  * Gets the offset position in the file.
  * @param file File handle returned from fat_Open.
  * @return File offset in bytes.
  */
-uint32_t fat_FilePos(fat_file_t *file);
+uint32_t fat_GetFilePos(fat_file_t *file);
 
 /**
- * Reads a whole sector (512 bytes) from a file, and advances the file
- * position offset to the next sector.
+ * Reads a sector (512 bytes) from a file, and advances the file
+ * position to the next sector.
  * @param file File handle returned from fat_Open.
  * @param data Location to store read sector data, must be at least 512 bytes.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_ReadSector(fat_file_t *file,
                            void *data);
+
+/**
+ * Writes a sector (512 bytes) to a file, and advances the file
+ * position to the next sector.
+ * @param file File handle returned from fat_Open.
+ * @param data Location to store read sector data, must be at least 512 bytes.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_WriteSector(fat_file_t *file,
+                            const void *data);
 
 /**
  * Initialize a USB connected Mass Storage Device. Checks if the device is
