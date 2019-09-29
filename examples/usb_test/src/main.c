@@ -70,6 +70,29 @@ static usb_error_t handleTestOut(usb_endpoint_t endpoint,
     return USB_SUCCESS;
 }
 
+static usb_error_t handleBulkIn(usb_endpoint_t endpoint,
+                                usb_transfer_status_t status,
+                                size_t transferred, usb_transfer_data_t *data) {
+    putByteHex(status);
+    putChar('|');
+    putIntHex(transferred);
+    _OS(asm_NewLine);
+    return USB_SUCCESS;
+}
+
+static usb_error_t handleBulkOut(usb_endpoint_t endpoint,
+                                 usb_transfer_status_t status,
+                                 size_t transferred, usb_transfer_data_t *data) {
+    putByteHex(status);
+    putChar('|');
+    putIntHex(transferred);
+    putChar('|');
+    putBlockHex((char *)data + transferred - 6, 7);
+    _OS(asm_NewLine);
+    free(data);
+    return USB_SUCCESS;
+}
+
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                                   usb_callback_data_t *callback_data) {
     static const char *usb_event_names[] = {
@@ -81,34 +104,23 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         "USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT",
         "USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT",
         "USB_DEFAULT_SETUP_EVENT",
+        "USB_HOST_CONFIGURE_EVENT",
         // Temp debug events:
         "USB_DEVICE_INT",
         "USB_DEVICE_CONTROL_INT",
-        "USB_DEVICE_FIFO_INT",
         "USB_DEVICE_DEVICE_INT",
         "USB_OTG_INT",
         "USB_HOST_INT",
-        "USB_CONTROL_END_INT",
         "USB_CONTROL_ERROR_INT",
         "USB_CONTROL_ABORT_INT",
-        "USB_FIFO0_INPUT_INT",
-        "USB_FIFO0_OUTPUT_INT",
         "USB_FIFO0_SHORT_PACKET_INT",
-        "USB_FIFO1_INPUT_INT",
-        "USB_FIFO1_OUTPUT_INT",
         "USB_FIFO1_SHORT_PACKET_INT",
-        "USB_FIFO2_INPUT_INT",
-        "USB_FIFO2_OUTPUT_INT",
         "USB_FIFO2_SHORT_PACKET_INT",
-        "USB_FIFO3_INPUT_INT",
-        "USB_FIFO3_OUTPUT_INT",
         "USB_FIFO3_SHORT_PACKET_INT",
         "USB_DEVICE_SUSPEND_INT",
         "USB_DEVICE_RESUME_INT",
         "USB_DEVICE_ISOCHRONOUS_ERROR_INT",
         "USB_DEVICE_ISOCHRONOUS_ABORT_INT",
-        "USB_DEVICE_ZERO_LENGTH_PACKET_TRANSMIT_INT",
-        "USB_DEVICE_ZERO_LENGTH_PACKET_RECEIVE_INT",
         "USB_DEVICE_DMA_FINISH_INT",
         "USB_DEVICE_DMA_ERROR_INT",
         "USB_DEVICE_IDLE_INT",
@@ -131,7 +143,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         case USB_ROLE_CHANGED_EVENT:
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
-            putNibHex(*(usb_role_t *)event_data >> 4);
+            putNibHex(*(const usb_role_t *)event_data >> 4);
             _OS(asm_NewLine);
             break;
         case USB_DEVICE_DISCONNECTED_EVENT:
@@ -155,8 +167,8 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putChar(':');
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            callback_data->device = event_data;
             _OS(asm_NewLine);
+            callback_data->device = event_data;
             break;
         case USB_DEFAULT_SETUP_EVENT: {
             const usb_control_setup_t *setup = event_data;
@@ -180,8 +192,8 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                 if (setup->bmRequestType & USB_DEVICE_TO_HOST) {
                     error = usb_ScheduleTransfer(control, "Hello World! Which must be exactly sixty-three characters?!?!1!.Hello World! Which must be exactly sixty-three characters?!?!1!.", 129, handleTestIn, NULL);
                 } else {
-                    char *buffer = malloc(setup->wLength);
-                    if (!buffer) {
+                    void *buffer;
+                    if (!(buffer = malloc(setup->wLength))) {
                         error = USB_ERROR_NO_MEMORY;
                         break;
                     }
@@ -190,6 +202,22 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                 if (error == USB_SUCCESS)
                     error = USB_IGNORE;
             }
+            break;
+        }
+        case USB_HOST_CONFIGURE_EVENT: {
+            void *buffer;
+            os_PutStrFull(usb_event_names[event]);
+            putChar(':');
+            putIntHex((unsigned)event_data);
+            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
+            _OS(asm_NewLine);
+            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81), "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque pe", 128, handleBulkIn, NULL);
+            break;
+            if (!(buffer = malloc(256))) {
+                error = USB_ERROR_NO_MEMORY;
+                break;
+            }
+            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x02), buffer, 256, handleBulkOut, buffer);
             break;
         }
         case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
@@ -386,7 +414,7 @@ static void handleDevice(global_t *global) {
  noerr:
     if (configuration) free(configuration);
     memset(global, 0, sizeof(global_t));
- }
+}
 
 void main(void) {
     global_t global;
@@ -403,7 +431,8 @@ void main(void) {
             putChar(':');
             putLongHex(usb_GetCycleCounter());
             os_SetCursorPos(row, col);
-            handleDevice(&global);
+            if (!(usb_GetRole() & USB_ROLE_DEVICE))
+                handleDevice(&global);
         }
     }
     usb_Cleanup();

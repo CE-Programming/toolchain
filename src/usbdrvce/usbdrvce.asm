@@ -370,34 +370,23 @@ virtual at 0
 	USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT		rb 1
 	USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT			rb 1
 	USB_DEFAULT_SETUP_EVENT					rb 1
+	USB_HOST_CONFIGURE_EVENT				rb 1
 	; Temp debug events:
 	USB_DEVICE_INTERRUPT					rb 1
 	USB_DEVICE_CONTROL_INTERRUPT				rb 1
-	USB_DEVICE_FIFO_INTERRUPT				rb 1
 	USB_DEVICE_DEVICE_INTERRUPT				rb 1
 	USB_OTG_INTERRUPT					rb 1
 	USB_HOST_INTERRUPT					rb 1
-	USB_CONTROL_END_INTERRUPT				rb 1
 	USB_CONTROL_ERROR_INTERRUPT				rb 1
 	USB_CONTROL_ABORT_INTERRUPT				rb 1
-	USB_FIFO0_INPUT_INTERRUPT				rb 1
-	USB_FIFO0_OUTPUT_INTERRUPT				rb 1
 	USB_FIFO0_SHORT_PACKET_INTERRUPT			rb 1
-	USB_FIFO1_INPUT_INTERRUPT				rb 1
-	USB_FIFO1_OUTPUT_INTERRUPT				rb 1
 	USB_FIFO1_SHORT_PACKET_INTERRUPT			rb 1
-	USB_FIFO2_INPUT_INTERRUPT				rb 1
-	USB_FIFO2_OUTPUT_INTERRUPT				rb 1
 	USB_FIFO2_SHORT_PACKET_INTERRUPT			rb 1
-	USB_FIFO3_INPUT_INTERRUPT				rb 1
-	USB_FIFO3_OUTPUT_INTERRUPT				rb 1
 	USB_FIFO3_SHORT_PACKET_INTERRUPT			rb 1
 	USB_DEVICE_SUSPEND_INTERRUPT				rb 1
 	USB_DEVICE_RESUME_INTERRUPT				rb 1
 	USB_DEVICE_ISOCHRONOUS_ERROR_INTERRUPT			rb 1
 	USB_DEVICE_ISOCHRONOUS_ABORT_INTERRUPT			rb 1
-	USB_DEVICE_ZERO_LENGTH_PACKET_TRANSMIT_INTERRUPT	rb 1
-	USB_DEVICE_ZERO_LENGTH_PACKET_RECEIVE_INTERRUPT		rb 1
 	USB_DEVICE_DMA_FINISH_INTERRUPT				rb 1
 	USB_DEVICE_DMA_ERROR_INTERRUPT				rb 1
 	USB_DEVICE_IDLE_INTERRUPT				rb 1
@@ -575,13 +564,13 @@ usb_Init:
 	ld	l,usbPhyTmsr-$100
 	ld	(hl),bmUsbUnplug
 	ld	l,usbGimr-$100
-	ld	(hl),bmUsbDevIntFifo
+	ld	(hl),a;0
 	ld	l,usbCxImr-$100
 	ld	(hl),a;0
 	ld	l,usbFifoRxImr-$100
 	ld	(hl),a;0
 	ld	l,usbFifoTxImr-$100
-	ld	(hl),a;0
+	ld	(hl),bmUsbIntFifo0In or bmUsbIntFifo1In or bmUsbIntFifo2In or bmUsbIntFifo3In
 	ld	l,usbDevImr-$100
 	ld	(hl),a;0
 	inc	l;usbDevImr+1-$100
@@ -1445,22 +1434,21 @@ usb_ScheduleTransfer.device.notLess:
 	or	a,b
 	jq	z,usb_ScheduleTransfer.device.zlp
 	ld	a,(setupPacket.bmRequestType)
-	push	af
 	rlca
+	push	af
 	ld	a,transfer.type.ioc shr 1
 	rla
 	call	_QueueTransfer
 	pop	af
-	or	a,a
-	ret	p
-	ld	hl,(ix+6)
+	ret	nc
+	xor	a,a
 	call	_ExecuteDma
 	ret	nc
 usb_ScheduleTransfer.device.return:
 	jq	usb_Transfer.return
 usb_ScheduleTransfer.device.zlp:
 	ld	hl,mpUsbCxFifo
-	set	bCxFifoFin,(hl)
+	ld	(hl),bmCxFifoFin
 	ld	de,(ix+18)
 	ld	hl,usb_Transfer.return
 	push	yendpoint,bc,bc,de,hl
@@ -1526,7 +1514,6 @@ usb_ScheduleTransfer.check:
 
 ;-------------------------------------------------------------------------------
 usb_ScheduleTransfer.control:
-	ld	hl,currentRole
 	bit	bUsbRole-16,(hl)
 	jq	nz,usb_ScheduleTransfer.device
 	ld	ysetup,(ix+9)
@@ -1540,6 +1527,7 @@ usb_ScheduleTransfer:
 	ld	bc,(ix+12)
 	ld	de,(ix+9)
 	ld	yendpoint,(ix+6)
+	ld	hl,currentRole
 	or	a,(yendpoint.type);CONTROL_TRANSFER
 	jq	z,.control
 .notControl:
@@ -1548,6 +1536,17 @@ repeat ISOCHRONOUS_TRANSFER-CONTROL_TRANSFER
 end repeat
 	jq	z,_Error.NOT_SUPPORTED
 	ld	a,(yendpoint.dir)
+	or	a,a
+	jq	z,.notDeviceIn
+	bit	bUsbRole-16,(hl)
+	jq	z,.notDeviceIn
+	ld	a,(yendpoint.overlay.fifo)
+	cpl
+	ld	hl,mpUsbFifoTxImr
+	and	a,(hl)
+	ld	(hl),a
+	ld	a,1
+.notDeviceIn:
 	or	a,transfer.type.ioc
 	jq	_QueueTransfer
 
@@ -2218,8 +2217,13 @@ repeat endpoint.prev-endpoint
 end repeat
 	ld	a,h
 	ld	(bc),a
+	inc	de;endpointDescriptor.descriptor.bDescriptorType
+	inc	de;endpointDescriptor.bEndpointAddress
+	ld	a,(de)
+	and	a,endpoint.info.ep
+	or	a,(ydevice.speed)
 	ld	l,endpoint
-	push	hl
+	push	af,hl
 repeat endpoint.prev-endpoint
 	inc	l
 end repeat
@@ -2227,16 +2231,11 @@ end repeat
 repeat endpoint.addr-endpoint.prev
 	inc	l
 end repeat
-	ld	a,(ydevice.addr)
-	ld	(hl),a
+	ld	c,(ydevice.addr)
+	ld	(hl),c
 repeat endpoint.info-endpoint.addr
 	inc	l
 end repeat
-	inc	de;endpointDescriptor.descriptor.bDescriptorType
-	inc	de;endpointDescriptor.bEndpointAddress
-	ld	a,(de)
-	and	a,$F
-	or	a,(ydevice.speed)
 	ld	(hl),a
 	ld	bc,(ydevice.endpoints)
 	ld	a,(de)
@@ -2248,7 +2247,7 @@ end repeat
 	ld	(bc),a
 	inc	de
 	ld	a,(de)
-	and	a,3
+	and	a,bmUsbFifoType
 	jq	nz,.notControl
 	ld	a,c
 	xor	a,1
@@ -2282,6 +2281,7 @@ end iterate
 assert endpoint.device and 1
 	ld	(yendpoint.overlay.altNext),l
 	call	_CreateDummyTransfer.enter
+	pop	bc
 	jq	nz,.nomem
 	ld	(yendpoint.overlay.next),hl
 	ld	(yendpoint.first),hl
@@ -2290,73 +2290,81 @@ assert endpoint.device and 1
 	ld	(yendpoint.overlay.status),a
 	ld	(yendpoint.flags),a
 	ld	(yendpoint.internalFlags),a
-	ld	b,(hl)
+	ld	d,(hl)
 	dec	hl
-	ld	c,(hl)
-	ld	a,c
-	or	a,b
+	ld	e,(hl)
+	ld	a,e
+	or	a,d
 	jq	z,.checkedMps
-	dec	bc
-	ld	a,c
+	dec	de
+	ld	a,e
 	and	a,(hl)
-	ld	c,a
+	ld	e,a
 	inc	hl
-	ld	a,b
+	ld	a,d
 	and	a,(hl)
-	or	a,c
+	or	a,e
 	dec	hl
 	jq	nz,.checkedMps
 	setmsk	PO2_MPS,(yendpoint.internalFlags)
 .checkedMps:
 	dec	hl
 	ld	a,(hl)
-	and	a,3
+	and	a,bmUsbFifoType
 	ld	(yendpoint.type),a
+	or	a,bmUsbFifoEn
+	ld	e,a
 	dec	hl
 	ld	a,(hl)
+	and	a,1 shl 7
 	rlca
-	and	a,1
 	ld	(yendpoint.dir),a
-	ld	(yendpoint.overlay.fifo),bmUsbDmaCxFifo
 	ld	(dummyHead.next),yendpoint
+	sbc	hl,hl
 	ld	a,(currentRole)
-	and	a,usbRoleDev shr 16
+	and	a,bmUsbRole shr 16
 	ret	z
-	ld	hl,mpUsbInEp1-1
-	ld	a,(yendpoint.dir)
-	rrca
-	jq	c,.in
-	ld	l,usbOutEp1-1-$100
-.in:
-repeat 7-bUsbFifoDir
-	rrca
-end repeat
+	inc	b
+	dec	b
+assert bmUsbRole shr 16 = bmUsbDmaCxFifo
+	jq	z,.control
+assert bmUsbRole shr 16 = usbFifoIn
+	and	a,l
 	ld	c,a
-	ld	a,(yendpoint.info)
-	and	a,yendpoint.info.ep
-	ld	b,a
-	add	a,l
-	ld	l,a
-	ld	de,(yendpoint.maxPktLen)
-	ld	(hl),e
-	inc	l
-	ld	(hl),bmUsbEpReset shr 8
-	ld	a,d
-	and	a,bmUsbEpMaxPktSz shr 8
-	ld	(hl),a
-	ld	a,usbFifo0Map-1-$100
+	ld	hl,mpUsbFifo0Map-1
+	ld	a,l
 	add	a,b
 	ld	l,a
 	ld	a,(hl)
 	and	a,not bmUsbFifoDir
 	or	a,c
 	ld	(hl),a
-assert usbFifo0Map < usbFifo0Cfg
+assert usbFifo0Cfg > usbFifo0Map
 	setmsk	usbFifo0Cfg xor usbFifo0Map,hl
-	ld	a,(yendpoint+1)
-	or	a,bmUsbFifoEn
+	ld	(hl),e
+assert usbOutEp1 > usbInEp1
+	ld	a,usbOutEp1+1-4-$100
+repeat 2
+	sub	a,c
+end repeat
+repeat 4
+	add	a,b
+end repeat
+	ld	l,a
+	ld	(hl),bmUsbEpReset shr 8
+	ld	de,(yendpoint.maxPktLen)
+	ld	a,d
+	and	a,bmUsbEpMaxPktSz shr 8
 	ld	(hl),a
-	cp	a,a
+	dec	l
+	ld	(hl),e
+	xor	a,a
+	scf
+.shift:
+	rla
+	djnz	.shift
+.control:
+	ld	(yendpoint.overlay.fifo),a
 	ret
 .nomem:
 	lea	hl,yendpoint.base
@@ -2432,112 +2440,149 @@ label .alt at $-byte
 
 ;-------------------------------------------------------------------------------
 ; Input:
-;  cf = false
+;  a = endpoint
 ;  bc = ? | bytes or ? shl 16
-;  hl = endpoint
 ; Output:
 ;  cf = error
 ;  zf = ? | false
 _ExecuteDma:
-	ld	b,$400 shr 8
-.bytes:
+	ld	hl,(rootHub.child)
+	call	usb_GetDeviceEndpoint.enter
 	ld	l,endpoint.overlay.next
 	ld	ytransfer,(hl)
-	bitmsk	ytransfer.status.active
-	ret	z
-	ld	a,i
-	push	af
-	pop	de
-	ld	a,e
-virtual
-	ei
- load .ei: $-$$ from $$
-end virtual
-virtual
-	di
- load .di: $-$$ from $$
-end virtual
-assertpo2 .ei xor .di
-repeat bsr (.ei xor .di)-2
+	ld	a,(ytransfer.status)
+repeat 8-bsr ytransfer.status.active
 	rlca
 end repeat
-	and	a,.ei xor .di
-	or	a,.ei and .di
-	ld	(.restoreInterrupts),a
+	ret	nc
+	ld	de,(ytransfer.remaining)
+	resmsk	ytransfer.remaining.dt,de
+	ld	a,i
+	push	af
 	ld	l,endpoint.overlay.fifo
 	ld	a,(hl)
+	ld	l,endpoint.maxPktLen+1
 	di
 	ld	(mpUsbDmaFifo),a
-	ld	l,endpoint.maxPktLen+1
 	ld	a,(hl)
 	dec	l;endpoint.maxPktLen
 	ld	l,(hl)
 	and	a,7
 	ld	h,a
-	ld	de,(ytransfer.remaining)
-	resmsk	ytransfer.remaining.dt,de
+	push	hl
 	sbc.s	hl,de
-	jq	c,.notRemaining
+	jq	c,.mpsLess
 	sbc	hl,hl
-.notRemaining:
-	add	hl,de
+.mpsLess:
+	add.s	hl,de
 	ld	a,b
 	and	a,7
 	ld	b,a
-	sbc.s	hl,bc
-	jq	c,.notBytes
-	sbc	hl,hl
-.notBytes:
-	add.s	hl,bc
-	ld	(mpUsbDmaLen),hl
-	ex	de,hl
-	or	a,a
-	sbc	hl,de
-	ld	(ytransfer.remaining),hl
-	ex	de,hl
-	ld	bc,(ytransfer.buffers)
-	add	hl,bc
-	ld	(ytransfer.buffers),hl
-	ld	hl,mpUsbDmaAddr
-	ld	(hl),bc
-	ld	l,usbDmaCtrl-$100
 	ld	a,(ytransfer.type)
 repeat bUsbDmaDir-bsf ytransfer.type.pid
 	rlca
 end repeat
 	and	a,bmUsbDmaClrFifo or usbDmaMem2Fifo
+	jq	pe,.in
+	inc	bc
+	dec.s	bc
+	sbc	hl,bc
+	jq	c,.babble
+	sbc	hl,hl
+	add	hl,bc
+.in:
+	add	hl,bc
+	sbc	hl,bc
+	jq	z,.zlp
+	ld	(mpUsbDmaLen),hl
+	ex	de,hl
+	sbc	hl,de
+	ld	(ytransfer.remaining),hl
+	ex	(sp),hl
+	sbc.s	hl,de
+	ex	(sp),hl
+	ex	de,hl
+	ld	bc,(ytransfer.buffers)
+	add	hl,bc
+	ld	(ytransfer.buffers),hl
+.flush:
+	ld	hl,mpUsbDmaAddr
+	ld	(hl),bc
+	ld	l,usbDmaCtrl-$100
 	ld	(hl),a
-assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
-	ld	(hl),h
+	inc	a;bmUsbDmaStart
+	ld	(hl),a
 .waitDma:
 	ld	a,(hl)
 	ld	l,usbDevIsr-$100
 	bit	bUsbIntDevDmaFin,(hl)
-	jq	nz,.waitDmaDone
+	jq	nz,.dmaFinished
 	inc	l
 	bit	bUsbIntDevDmaErr-8,(hl)
 	jq	z,.waitDma
+	ld	a,(ytransfer.status)
+	and	a,not ytransfer.status.active
+	or	a,ytransfer.status.halted or ytransfer.status.bufErr
+	ld	(ytransfer.status),a
 	ld	(hl),bmUsbIntDevDmaErr shr 8
 	dec	l
-.waitDmaDone:
+.dmaFinished:
 	ld	(hl),bmUsbIntDevDmaFin
+.outZlp:
+	pop	bc
 	ld	a,e
 	or	a,d
-	jq	nz,.restoreInterrupts
-	ex	de,hl
-	ld	hl,(ytransfer.endpoint)
-	ld	l,endpoint.overlay.next
+	ld	de,(ytransfer.endpoint)
+	ld	a,(ytransfer.status)
+repeat 8-bsr ytransfer.status.halted
+	rlca
+end repeat
+	jq	c,.continue
+	jq	z,.next
+	ld	a,c
+	or	a,b
+	jq	z,.continue
+	ld	bc,(ytransfer.altNext)
+	bit	0,bc
+	jq	z,.alt
+.next:
 	ld	bc,(ytransfer.next)
+.alt:
+	ld	e,endpoint.overlay.next
+	ex	de,hl
 	ld	(hl),bc
 	ex	de,hl
 	resmsk	ytransfer.status.active
 	ld	a,(ytransfer.altNext)
 	rrca
-	jq	nc,.restoreInterrupts
+	jq	nc,.continue
+	ld	a,(bc+transfer.next)
+repeat bsr transfer.next.dummy+1
+	rrca
+end repeat
 	ld	l,usbCxFifo-$100
-	set	bCxFifoFin,(hl) ; Must happen before restoring interrupts!
-.restoreInterrupts:
-	di
+	ld	a,(hl)
+	ld	l,usbFifoTxImr-$100
+	bit	bUsbDmaCxFifo,a
+	jq	z,.notCx
+	ld	l,usbCxFifo-$100
+assert usbCxFifo shr 8 = bmCxFifoFin
+	ld	a,h
+	scf
+.notCx:
+	jq	nc,.chain
+	or	a,(hl)
+	ld	(hl),a ; Must happen before restoring interrupts!
+.chain:
+	scf
+.continue:
+	ld	l,usbDmaFifo-$100
+	ld	(hl),bmUsbDmaNoFifo ; Must happen before restoring interrupts!
+	pop	bc
+	bit	2,c ; p/v
+	jq	z,.noEi
+	ei
+.noEi:
 	ret	nc
 	ld	e,endpoint
 	push	de
@@ -2546,6 +2591,26 @@ assert usbDmaCtrl shr 8 = usbDmaFifo2Mem or bmUsbDmaStart
 	ccf
 	pop	ix
 	ret
+.babble:
+	ld	a,(ytransfer.status)
+	and	a,not ytransfer.status.active
+	or	a,ytransfer.status.halted or ytransfer.status.babble
+	ld	(ytransfer.status),a
+	ld	a,bmUsbDmaClrFifo or usbDmaFifo2Mem
+	ld	(mpUsbDmaLen),bc
+	ld	bc,vRamEnd
+	jq	.flush
+.zlp:
+	ld	hl,mpUsbDevIsr; or (? and $FF)
+	and	a,usbDmaMem2Fifo
+	jq	z,.outZlp
+	push	hl,de,bc,af
+repeat 4
+	pop	de
+	ld	a,100
+	call	_DispatchEvent
+end repeat
+.wut:	jq	.wut
 
 ;-------------------------------------------------------------------------------
 ; Input:
@@ -2966,6 +3031,9 @@ end repeat
 	ld	b,(xconfigurationDescriptor.bNumInterfaces)
 	call	z,_ParseInterfaceDescriptors
 	pop	ix
+	lea	de,ydevice
+	ld	a,USB_HOST_CONFIGURE_EVENT
+	call	z,_DispatchEvent
 	jq	nz,.unhandled
 	scf
 .setConfigured:
@@ -2986,7 +3054,7 @@ end repeat
 	jq	.return
 .handled:
 	ld	l,usbCxFifo-$100
-	set	bCxFifoFin,(hl)
+	ld	(hl),bmCxFifoFin
 .return:
 	ld	l,usbCxIsr-$100
 	ld	(hl),bmUsbIntCxSetup
@@ -3091,7 +3159,7 @@ end repeat
 _HandleDevInt:
 	ld	l,usbGisr-$100
 	inc	h
-iterate type, Cx, Dev; Dev, Fifo, Cx
+iterate type, Cx, Fifo, Dev
 	bit	bUsbDevInt#type,(hl)
 	call	nz,_HandleDev#type#Int
 	ret	nz
@@ -3117,24 +3185,30 @@ end iterate
 _HandleDevFifoInt:
 	ld	l,usbFifoRxIsr-$100
 repeat 4, fifo: 0
- iterate type, Out, Spk
+ iterate type, Spk, Out
 	bit	bUsbIntFifo#fifo#type,(hl)
 	call	nz,_HandleFifo#fifo#type#Int
 	ret	nz
  end iterate
 end repeat
+	ld	l,usbFifoTxImr-$100
+	ld	a,(hl)
+	cpl
 	ld	l,usbFifoTxIsr-$100
+	and	a,(hl)
+	ld	c,a
 repeat 4, fifo: 0
  iterate type, In
-	bit	bUsbIntFifo#fifo#type,(hl)
+	push	bc
+	bit	bUsbIntFifo#fifo#type,c
 	call	nz,_HandleFifo#fifo#type#Int
+	pop	bc
 	ret	nz
  end iterate
 end repeat
 	ld	l,usbGisr-$100
 	ld	(hl),bmUsbDevIntFifo
-	ld	a,USB_DEVICE_FIFO_INTERRUPT
-	jq	_DispatchEvent
+	ret
 
 _HandleDevDevInt:
 	ld	l,usbDevIsr-$100
@@ -3190,9 +3264,7 @@ _HandleCxOutInt:
 	ld	c,(hl)
 	xor	a,a
 	ld	b,a
-	ld	hl,(rootHub.child)
-	call	usb_GetDeviceEndpoint.enter
-	call	_ExecuteDma.bytes
+	call	_ExecuteDma
 	ret	c
 	ld	hl,mpUsbCxIsr
 	ld	(hl),bmUsbIntCxOut or bmUsbIntCxIn
@@ -3200,9 +3272,12 @@ _HandleCxOutInt:
 	ret
 
 _HandleCxEndInt:
+	ld	l,usbCxFifo-$100
+	ld	(hl),bmCxFifoFin
+	ld	l,usbCxIsr-$100
 	ld	(hl),bmUsbIntCxEnd
-	ld	a,USB_CONTROL_END_INTERRUPT
-	jq	_DispatchEvent
+	cp	a,a
+	ret
 
 _HandleCxErrInt:
 	ld	(hl),bmUsbIntCxErr
@@ -3214,65 +3289,32 @@ _HandleCxAbortInt:
 	ld	a,USB_CONTROL_ABORT_INTERRUPT
 	jq	_DispatchEvent
 
-_HandleFifo0OutInt:
-	ld	(hl),bmUsbIntFifo0Out
-	ld	a,USB_FIFO0_OUTPUT_INTERRUPT
+repeat 4, fifo: 0
+_HandleFifo#fifo#OutInt:
+	ld	l,usbFifo#fifo#Csr-$100
+	ld	bc,(hl)
+	ld	a,fifo+$01
+	call	_ExecuteDma
+	ret	c
+	ld	hl,mpUsbFifoRxIsr
+	ld	(hl),bmUsbIntFifo#fifo#Out
+	cp	a,a
+	ret
+
+_HandleFifo#fifo#SpkInt:
+	ld	(hl),bmUsbIntFifo#fifo#Spk
+	ld	a,USB_FIFO#fifo#_SHORT_PACKET_INTERRUPT
 	jq	_DispatchEvent
 
-_HandleFifo0SpkInt:
-	ld	(hl),bmUsbIntFifo0Spk
-	ld	a,USB_FIFO0_SHORT_PACKET_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo1OutInt:
-	ld	(hl),bmUsbIntFifo1Out
-	ld	a,USB_FIFO1_OUTPUT_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo1SpkInt:
-	ld	(hl),bmUsbIntFifo1Spk
-	ld	a,USB_FIFO1_SHORT_PACKET_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo2OutInt:
-	ld	(hl),bmUsbIntFifo2Out
-	ld	a,USB_FIFO2_OUTPUT_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo2SpkInt:
-	ld	(hl),bmUsbIntFifo2Spk
-	ld	a,USB_FIFO2_SHORT_PACKET_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo3OutInt:
-	ld	(hl),bmUsbIntFifo3Out
-	ld	a,USB_FIFO3_OUTPUT_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo3SpkInt:
-	ld	(hl),bmUsbIntFifo3Spk
-	ld	a,USB_FIFO3_SHORT_PACKET_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo0InInt:
-	ld	(hl),bmUsbIntFifo0In
-	ld	a,USB_FIFO0_INPUT_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo1InInt:
-	ld	(hl),bmUsbIntFifo1In
-	ld	a,USB_FIFO1_INPUT_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo2InInt:
-	ld	(hl),bmUsbIntFifo2In
-	ld	a,USB_FIFO2_INPUT_INTERRUPT
-	jq	_DispatchEvent
-
-_HandleFifo3InInt:
-	ld	(hl),bmUsbIntFifo3In
-	ld	a,USB_FIFO3_INPUT_INTERRUPT
-	jq	_DispatchEvent
+_HandleFifo#fifo#InInt:
+	ld	a,fifo+$81
+	call	_ExecuteDma
+	ret	c
+	ld	hl,mpUsbFifoTxIsr
+	ld	(hl),bmUsbIntFifo#fifo#In
+	cp	a,a
+	ret
+end repeat
 
 _HandleDevResetInt:
 	xor	a,a
@@ -3322,13 +3364,44 @@ _HandleDevIsocAbtInt:
 
 _HandleDevZlpTxInt:
 	ld	(hl),bmUsbIntDevZlpTx
-	ld	a,USB_DEVICE_ZERO_LENGTH_PACKET_TRANSMIT_INTERRUPT
-	jq	_DispatchEvent
+	cp	a,a
+	ret
 
 _HandleDevZlpRxInt:
+	ld	a,i
+virtual at mpLcdLpbase+1
+	ld	c,(hl)
+	ld	(hl),b
+	ret
+ load .exchange $-$$ from $$
+end virtual
+	ld	iy,mpLcdRange
+	ld	l,usbRxZlp-$100
+	ld	bc,.exchange
+	di
+	ld	de,(iy+lcdLpbase+1)
+	ld	(iy+lcdLpbase+1),bc
+	ld	b,0
+	call	mpLcdLpbase+1
+	ld	(iy+lcdLpbase+1),de
+	jq	po,.loop
+	ei
+.loop:
+	inc	b
+	srl	c
+	push	bc
+	ld	a,b
+	ld	b,0
+	ld	c,b
+	call	c,_ExecuteDma
+	pop	bc
+	ret	c
+	inc	c
+	dec	c
+	jq	nz,.loop
+	ld	hl,mpUsbDevIsr
 	ld	(hl),bmUsbIntDevZlpRx
-	ld	a,USB_DEVICE_ZERO_LENGTH_PACKET_RECEIVE_INTERRUPT
-	jq	_DispatchEvent
+	ret
 
 _HandleDevDmaFinInt:
 	ld	(hl),bmUsbIntDevDmaFin
