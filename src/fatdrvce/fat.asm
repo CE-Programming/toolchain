@@ -475,10 +475,9 @@ fat_Create:
 	pop	iy
 	ld	a,(iy + 12)
 	ld	(ix + 11),a
-	ld	(ix + 28),a
-	ld	(ix + 29),a
-	ld	(ix + 30),a
-	ld	(ix + 31),a		; set initial size to zero
+	xor	a,a
+	sbc	hl,hl
+	ld	(ix + 28),a,hl		; set initial size to zero
 	pop	ix
 	ld	iy,(iy + 3)
 	ld	a,hl,(yfatType.working_sector)
