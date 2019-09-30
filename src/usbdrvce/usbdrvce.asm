@@ -1657,6 +1657,7 @@ _QueueTransfer:
 	jq	nz,.next
 virtual
 	jr	nz,$$
+ assert $ = .zlp
  load .jr_nz: byte from $$
 end virtual
 	db	.jr_nz
@@ -1667,14 +1668,16 @@ end virtual
 	and	a,10001101b
 	push	hl
 	pop	bc
-virtual
+virtual at .queue
 	ld	iy,0
+ assert $ = .fill
  load .iyPrefix: byte from $$
 end virtual
 	ld	iyl,.iyPrefix
 label .queue at $-byte
 	ld	hl,0
 label .dummy at $-long
+.fill:
 	set	7,b
 	jq	_FillTransfer
 
@@ -2120,13 +2123,14 @@ _CleanupDevice:
 	push	hl
 virtual
 	ld	hl,0
+ assert $ = .enter
  load .ld_hl: byte from $$
 end virtual
 	db .ld_hl
 .recursed:
 	pop	xdevice
 	ret	nz
-assert $-.recursed = long
+.enter:
 	push	xdevice
 	ld	de,(xdevice.endpoints+1)
 	ld	xdevice,(xdevice.child+1)
@@ -2560,25 +2564,31 @@ end repeat
 	ld	a,(ytransfer.altNext)
 	rrca
 	jq	nc,.continue
+	ld	l,usbDmaFifo-$100
+	bit	bUsbDmaCxFifo,(hl)
+	jq	nz,.cx
+assert bsr transfer.next.dummy = bsf ytransfer.type.pid
 	ld	a,(bc+transfer.next)
+	and	a,(ytransfer.type)
 repeat bsr transfer.next.dummy+1
 	rrca
 end repeat
-	ld	l,usbCxFifo-$100
-	ld	a,(hl)
+	sbc	a,a
+	and	a,(hl)
 	ld	l,usbFifoTxImr-$100
-	bit	bUsbDmaCxFifo,a
-	jq	z,.notCx
+	or	a,(hl)
+	ld	(hl),a
+	scf
+virtual
+	jp	nc,0
+ assert $ = .continue
+ load .jp_nc: byte from $$
+end virtual
+	db	.jp_nc
+.cx:
 	ld	l,usbCxFifo-$100
 assert usbCxFifo shr 8 = bmCxFifoFin
-	ld	a,h
-	scf
-.notCx:
-	jq	nc,.chain
-	or	a,(hl)
-	ld	(hl),a ; Must happen before restoring interrupts!
-.chain:
-	scf
+	ld	(hl),h ; Must happen before restoring interrupts!
 .continue:
 	ld	l,usbDmaFifo-$100
 	ld	(hl),bmUsbDmaNoFifo ; Must happen before restoring interrupts!
@@ -3127,10 +3137,10 @@ end repeat
 	ret	z
 virtual
 	ld	hl,0
+ assert $ = .free
  load .ld_hl: byte from $$
 end virtual
 	db .ld_hl
-assert .free-.next = long
 .next:
 	inc	l
 	djnz	.search

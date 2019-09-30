@@ -211,6 +211,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             _OS(asm_NewLine);
+            usb_SetEndpointFlags(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81), USB_AUTO_TERMINATE);
             usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81),
 "000000000000000000000000000000000000000000000000000000000000000\n"
 "111111111111111111111111111111111111111111111111111111111111111\n"
@@ -221,13 +222,11 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 "666666666666666666666666666666666666666666666666666666666666666\n"
 "777777777777777777777777777777777777777777777777777777777777777"
 , 64*8, handleBulkIn, NULL);
-            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81), NULL, 0, handleBulkIn, NULL);
-            break;
-            if (!(buffer = malloc(256))) {
+            if (!(buffer = malloc(512))) {
                 error = USB_ERROR_NO_MEMORY;
                 break;
             }
-            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x02), buffer, 256, handleBulkOut, buffer);
+            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x02), buffer, 512, handleBulkOut, buffer);
             break;
         }
         case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
