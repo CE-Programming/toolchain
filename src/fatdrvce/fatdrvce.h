@@ -88,7 +88,6 @@ typedef struct {
     uint32_t current_cluster;
     uint32_t file_size;
     uint24_t file_size_sectors;
-    uint32_t fpos;           /**< File position by bytes. */
     uint24_t fpossector;     /**< File position by sector count. */
     uint8_t cluster_sector;  /**< Current sector in cluster. */
     uint32_t current_sector; /**< Current sector on msd. */
@@ -106,7 +105,8 @@ typedef enum {
     FAT_ERROR_EXISTS,
     FAT_ERROR_INVALID_PATH,
     FAT_ERROR_FAILED_ALLOC,
-    FAT_ERROR_CLUSTER_CHAIN
+    FAT_ERROR_CLUSTER_CHAIN,
+    FAT_ERROR_DIRECTORY_NOT_EMPTY
 } fat_error_t;
 
 typedef enum {
@@ -174,6 +174,7 @@ fat_error_t fat_Create(fat_t *fat,
  * @param fat Initialized FAT structure type.
  * @param path Absolute path to file or directory to delete.
  * @return FAT_SUCCESS on success, otherwise error.
+ * @note This will only delete empty directories.
  */
 fat_error_t fat_Delete(fat_t *fat,
                        const char *path);

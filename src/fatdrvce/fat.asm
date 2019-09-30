@@ -872,13 +872,20 @@ fat_Delete:
 	bit	4,a
 	jq	z,.normalfile
 .directory:
-
-	; todo: handle directory deletion
-	; need to check if empty first
-
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
-	ret
-
+	push	hl,af
+	push	ix
+	ld	a,(ix + 20 + 1)
+	ld	hl,(ix + 20 - 2)	; get hlu
+	ld	l,(ix + 26 + 0)
+	ld	h,(ix + 26 + 1)
+	call	util_is_directory_empty
+	pop	ix
+	pop	de,hl
+	ld	a,d
+	jq	nz,.dirnotempty
+	push	ix
+	call	util_read_fat_sector	; reread entry sector
+	pop	ix			; a directory can now be treated as a normal file
 .normalfile:
 	ld	(ix + 11),0
 	ld	(ix + 0),$e5
@@ -897,6 +904,9 @@ fat_Delete:
 	ret
 .usberror:
 	ld	hl,FAT_ERROR_USB_FAILED
+	ret
+.dirnotempty:
+	ld	hl,FAT_ERROR_DIRECTORY_NOT_EMPTY
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1424,10 +1434,10 @@ util_is_directory_empty:
 	compare_auhl_zero
 	ret	z
 	ld	(yfatType.working_sector),a,hl
-	ld	b,(ufatType.cluster_size)
+	ld	b,(yfatType.cluster_size)
 .next_sector:
 	push	bc
-	ld	a,hl(yfatType.working_sector)
+	ld	a,hl,(yfatType.working_sector)
 	call	util_read_fat_sector
 	jq	nz,.fail
 	push	ix
@@ -1450,12 +1460,12 @@ util_is_directory_empty:
 	jq	.failpop
 .next:
 	djnz	.loop
-	ld	a,hl(yfatType.working_sector)
+	ld	a,hl,(yfatType.working_sector)
 	call	util_increment_auhl
 	ld	(yfatType.working_sector),a,hl
 	pop	bc
 	djnz	.next_sector
-	ld	a,hl(yfatType.working_cluster)
+	ld	a,hl,(yfatType.working_cluster)
 	call	util_next_cluster
 	jq	.enter
 .successpop:

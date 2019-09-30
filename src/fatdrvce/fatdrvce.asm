@@ -130,41 +130,41 @@ end macro
 ; msd structures
 struct packetCSW
 	label .: 13
-	signature	rb 4
-	tag		rb 4
-	residue		rb 4
-	status		rb 1
+	signature rb 4
+	tag rb 4
+	residue rb 4
+	status rb 1
 end struct
 struct packetCBD
 	label .: 17
-	len		rb 1
-	opcode		rb 1
-	data		rb 15
+	len rb 1
+	opcode rb 1
+	data rb 15
 end struct
 struct packetCBW
 	label .: 14+17
-	signature	rb 4
-	tag		rb 4
-	len		rb 4
-	dir		rb 1
-	lun		rb 1
-	cbd		packetCBD
+	signature rb 4
+	tag rb 4
+	len rb 4
+	dir rb 1
+	lun rb 1
+	cbd packetCBD
 end struct
 struct msdDevice
 	local size
 	label .: size
-	dev		rl 1
-	epin		rl 1
-	epout		rl 1
-	epctrl		rl 1
-	tag		rl 1
-	lba		rb 4
-	reserved	rb 1	; technically part of block size
-	blocksize	rl 1
-	interface	rb 1
-	maxlun		rb 1
-	lun		rb 1
-	buffer		rl 1
+	dev rl 1
+	epin rl 1
+	epout rl 1
+	epctrl rl 1
+	tag rl 1
+	lba rb 4
+	reserved rb 1	; technically part of block size
+	blocksize rl 1
+	interface rb 1
+	maxlun rb 1
+	lun rb 1
+	buffer rl 1
 	size := $-.
 end struct
 
@@ -175,55 +175,54 @@ BIT_OPEN := 7
 struct fatFile
 	local size
 	label .: size
-	fat		  rl 1
-	flags		  rb 1
-	entry_sector	  rd 1
-	first_cluster	  rd 1
-	current_cluster	  rd 1
-	file_size	  rd 1
+	fat rl 1
+	flags rb 1
+	entry_sector rd 1
+	first_cluster rd 1
+	current_cluster rd 1
+	file_size rd 1
 	file_size_sectors rl 1
-	fpos		  rd 1
-	fpossector        rl 1
-	cluster_sector    rb 1
-	current_sector    rd 1
-	working_buffer    rl 1
-	entry_pointer     rl 1
+	fpossector rl 1
+	cluster_sector rb 1
+	current_sector rd 1
+	working_buffer rl 1
+	entry_pointer rl 1
 	size := $-.
 end struct
 struct fatPartition
 	local size
 	label .: size
-	lba		rd 1
-	msd		rl 1
+	lba rd 1
+	msd rl 1
 	size := $-.
 end struct
 struct fatType
 	local size
 	label .: size
-	partition	rl 1
-	cluster_size	rb 1
-	clusters	rd 1
-	fat_size	rl 1
-	fat_pos		rl 1
-	fs_info		rl 1
-	fat_base_lba	rd 1
-	root_dir_pos	rd 1
-	data_region	rd 1
-	working_sector	rd 1
-	working_cluster	rd 1
+	partition rl 1
+	cluster_size rb 1
+	clusters rd 1
+	fat_size rl 1
+	fat_pos rl 1
+	fs_info rl 1
+	fat_base_lba rd 1
+	root_dir_pos rd 1
+	data_region rd 1
+	working_sector rd 1
+	working_cluster rd 1
 	working_next_cluster rd 1
 	working_size rd 1
-	working_pointer	rl 1
+	working_pointer rl 1
 	size := $-.
 end struct
 
 struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
 	label .: 8
-	bmRequestType	db requestType
-	bRequest	db request
-	wValue		dw value
-	wIndex		dw index
-	wLength		dw length
+	bmRequestType db requestType
+	bRequest db request
+	wValue dw value
+	wIndex dw index
+	wLength dw length
 end struct
 struct scsipkt, dir: 0, length: 1, data: 0&
 .:	iterate @, data
@@ -239,33 +238,33 @@ struct scsipktrw, dir: 0, type: 0
 		db (dir) shl 7, 0, 10, type, 0
 		break
 	end iterate
-	lba		dd 0
-	groupnum	db 0
-	len		dw 1 bswap 2
-	ctrl		db 0
-	rb 31		; padding needed because some msd drives were built by idiots
+	lba dd 0
+	groupnum db 0
+	len dw 1 bswap 2
+	ctrl db 0
+	rb 31 ; padding needed because some msd drives were built by idiots
 end struct
 
 struct descriptor
 	label .: 2
-	bLength			rb 1
-	bDescriptorType		rb 1
+	bLength rb 1
+	bDescriptorType rb 1
 end struct
 struct deviceDescriptor
 	label .: 18
-	descriptor		descriptor
-	bcdUSB			rw 1
-	bDeviceClass		rb 1
-	bDeviceSubClass		rb 1
-	bDeviceProtocol		rb 1
-	bMaxPacketSize0		rb 1
-	idVendor		rw 1
-	idProduct		rw 1
-	bcdDevice		rw 1
-	iManufacturer		rb 1
-	iProduct		rb 1
-	iSerialNumber		rb 1
-	bNumConfigurations	rb 1
+	descriptor descriptor
+	bcdUSB rw 1
+	bDeviceClass rb 1
+	bDeviceSubClass rb 1
+	bDeviceProtocol rb 1
+	bMaxPacketSize0 rb 1
+	idVendor rw 1
+	idProduct rw 1
+	bcdDevice rw 1
+	iManufacturer rb 1
+	iProduct rb 1
+	iSerialNumber rb 1
+	bNumConfigurations rb 1
 end struct
 struct interfaceDescriptor
 	label .: 9
@@ -304,6 +303,7 @@ virtual at 0
 	FAT_ERROR_INVALID_PATH rb 1
 	FAT_ERROR_FAILED_ALLOC rb 1
         FAT_ERROR_CLUSTER_CHAIN rb 1
+	FAT_ERROR_DIRECTORY_NOT_EMPTY rb 1
 end virtual
 
 virtual at 0
@@ -316,32 +316,32 @@ end virtual
 
 ; enum usb_descriptor_type
 virtual at 1
-	?DEVICE_DESCRIPTOR			rb 1
-	?CONFIGURATION_DESCRIPTOR		rb 1
-	?STRING_DESCRIPTOR			rb 1
-	?INTERFACE_DESCRIPTOR			rb 1
-	?ENDPOINT_DESCRIPTOR			rb 1
+	?DEVICE_DESCRIPTOR rb 1
+	?CONFIGURATION_DESCRIPTOR rb 1
+	?STRING_DESCRIPTOR rb 1
+	?INTERFACE_DESCRIPTOR rb 1
+	?ENDPOINT_DESCRIPTOR rb 1
 end virtual
 
 ; enum usb_transfer_type
 virtual at 0
-	?CONTROL_TRANSFER			rb 1
-	?ISOCHRONOUS_TRANSFER			rb 1
-	?BULK_TRANSFER				rb 1
-	?INTERRUPT_TRANSFER			rb 1
+	?CONTROL_TRANSFER rb 1
+	?ISOCHRONOUS_TRANSFER rb 1
+	?BULK_TRANSFER rb 1
+	?INTERRUPT_TRANSFER rb 1
 end virtual
 
 struct tmp_data
 	local size
 	label .: size
-	sensecount	rb 1
-	sensebuffer	rb 512	; todo: evaluate if needed
-	sectorbuffer	rb 512	; todo: evaluate if user-supplied
-	length		rl 1
-	descriptor	rb 18
-	msdstruct	rl 1
-	string		rb 20
-	csw		packetCSW
+	sensecount rb 1
+	sensebuffer rb 512	; todo: evaluate if needed
+	sectorbuffer rb 512	; todo: evaluate if user-supplied
+	length rl 1
+	descriptor rb 18
+	msdstruct rl 1
+	string rb 20
+	csw packetCSW
 	size := $-.
 end struct
 
