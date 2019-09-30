@@ -211,7 +211,16 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             _OS(asm_NewLine);
-            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81), "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque pe", 128, handleBulkIn, NULL);
+            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81),
+"000000000000000000000000000000000000000000000000000000000000000\n"
+"111111111111111111111111111111111111111111111111111111111111111\n"
+"222222222222222222222222222222222222222222222222222222222222222\n"
+"333333333333333333333333333333333333333333333333333333333333333\n"
+"444444444444444444444444444444444444444444444444444444444444444\n"
+"555555555555555555555555555555555555555555555555555555555555555\n"
+"666666666666666666666666666666666666666666666666666666666666666\n"
+"777777777777777777777777777777777777777777777777777777777777777"
+, 64*8, handleBulkIn, NULL);
             break;
             if (!(buffer = malloc(256))) {
                 error = USB_ERROR_NO_MEMORY;
