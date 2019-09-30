@@ -77,6 +77,7 @@ struct srl_Device
 	readBufEnd	rl 1		; Last byte with data in the read buffer
 	readBufBreak	rl 1		; Last byte before the buffer "loops"
 	readBufActive	rb 1		; Whether data is being read into the read buffer
+	stopRead	rb 1		; Set when waiting for the read to stop
 	writeBuf	rl 1		; Pointer to the write buffer
 	writeBufSize	rl 1		; Size of the write buffer
 	writeBufStart	rl 1		; First byte with data in the write buffer
@@ -309,13 +310,10 @@ srl_Init:
 	ld	(xsrl_Device.writeBufEnd),hl
 	ld	hl,0				; set read buffer break to 0
 	ld	(xsrl_Device.readBufBreak),hl
-	ld	bc,(iy + 15)
-	push	bc
-	push	ix
-	call	srl_SetRate
-	pop	ix
-	pop	bc
-	call	srl_StartAsyncRead		; start async read
+	xor	a,a				; unstop read
+	ld	(xsrl_Device.stopRead),a
+	ld	(xsrl_Device.readBufActive),a	; mark read buffer as inactive
+;	call	srl_StartAsyncRead		; start async read
 	ld	hl,USB_SUCCESS
 .exit:
 	pop	ix
@@ -351,6 +349,15 @@ srl_SetRate:
 	ld	hl,setup.setlinecoding
 	jq	.sendctrl
 .ftdi:						; if a FTDI device:
+	ld	a,(xsrl_Device.readBufActive)	; check if read needs to be stopped
+	or	a,a
+	jq	z,.noStop
+	ld	(xsrl_Device.stopRead),a	; stop read
+.loop:
+	call	usb_HandleEvents		; wait for read to stop
+	ld	a,(xsrl_Device.readBufActive)
+	jq	nz,.loop
+.noStop:
 ;todo: convert the rate to whatever completely arbitrary format FTDI uses
 	ld	hl,setup.ftdisetrate
 	jq	.sendctrl
@@ -377,6 +384,11 @@ srl_SetRate:
 	pop	bc
 	pop	bc
 	pop	bc
+	push	af
+	ld	a,(xsrl_Device.readBufActive)	; check if read needs to be started
+	or	a,a
+	call	z,srl_StartAsyncRead
+	pop	af
 	jq	.exit				; return error, if any
 .exit:
 	pop	ix
@@ -753,7 +765,13 @@ srl_WriteCallback:
 ;-------------------------------------------------------------------------------
 ; ix: srl_device_t
 srl_StartAsyncRead:
-	xor	a,a				; default to no continuing transfer
+	ld	a,(xsrl_Device.stopRead)	; check if we are trying to stop
+	or	a,a
+	jq	z,.noStop			; default to no continuing transfer
+	xor	a,a
+	ld	(xsrl_Device.stopRead),a	; acknowledge that we have stopped
+	jq	.exit
+.noStop:
 	ld	hl,(xsrl_Device.readBufBreak)	; check if there is room in the buffer
 	compare_hl_zero
 	jq	nz,.break

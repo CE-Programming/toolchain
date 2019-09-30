@@ -38,6 +38,7 @@ typedef struct srl_Device {
     char *readBufEnd;       /**< Last byte with data in the read buffer */
     char *readBufBreak;     /**< Last byte before the buffer "loops" */
     bool readBufActive;     /**< Whether data is being read into the read buffer */
+    bool stopRead;          /**< Set when waiting for the read to stop */
     char *writeBuf;         /**< Pointer to the write buffer */
     size_t writeBufSize;    /**< Size of the write buffer */
     char *writeBufStart;    /**< First byte with data in the write buffer */
