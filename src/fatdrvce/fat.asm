@@ -199,7 +199,6 @@ fat_Open:
 	ld	iy,(iy + 3)
 	call	util_locate_entry
 	pop	iy
-	compare_auhl_zero
 	jq	z,.error
 	ld	c,(iy + 9)
 	set	BIT_OPEN,c
@@ -274,8 +273,120 @@ fat_SetSize:
 ;  sp + 12 : Size high byte
 ; Returns:
 ;  FAT_SUCCESS on success
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ld	iy,0
+	add	iy,sp
+	ld	de,(iy + 6)
+	push	iy
+	ld	iy,(iy + 3)
+	call	util_locate_entry
+	ld	(yfatType.working_sector),a,hl
+	ld	(yfatType.working_pointer),de
+	ld	(util_update_file_sizes.sectorlow),hl
+	ld	(util_update_file_sizes.sectorhigh),a
+	push	de
+	pop	iy
+	ld	a,(iy + 20 + 1)			; start at first cluster, and walk the chain
+	ld	hl,(iy + 20 - 2)		; until the number of clusters is allocated
+	ld	l,(iy + 26 + 0)
+	ld	h,(iy + 26 + 1)
+	ld	(.currentcluster),a,hl
+	pop	iy
+	ld	bc,(iy + 9)			; get new file size
+	ld	a,(iy + 12)
+	jq	z,.invalidpath			; check if real file
+	push	iy
+	ld	iy,(iy + 3)
+	push	iy
+	ld	iy,(yfatType.working_pointer)
+	ld	e,hl,(iy + 28)
+	ld	(iy + 28),a,bc			; otherwise, directly store new size
+	pop	iy
+	ld	(yfatType.working_size),a,bc
+	pop	iy				; get current file size
+	call	__lcmpu
+	jq	z,.success			; if same size, just return
+	jq	c,.makelarger
+.makesmaller:
+	call	.writeentry
+	push	hl
+	pop	bc
+	ld	a,hl,(.currentcluster)
+	compare_auhl_zero
+	jq	z,.success
+	push	iy
+	ld	iy,(iy + 3)
+	dec	bc
+	jq	.entertraverseclusters
+.traverseclusters:
+	push	bc
+	call	util_next_cluster
+	compare_auhl_zero
+	pop	bc
+	jq	z,.failedchain			; the filesystem is screwed up
+	dec	bc
+.entertraverseclusters:
+	compare_bc_zero
+	jq	nz,.traverseclusters
+	call	util_set_new_eoc_cluster	; mark this cluster as unused
+	call	util_dealloc_cluster_chain	; deallocate all other clusters
+	pop	iy
+	jq	nz,.usberror
+	jq	.success
+.makelarger:
+	call	.writeentry			; get number of clusters there needs to be
+	compare_hl_zero
+	jq	z,.success
+.allocateclusters:
+	push	hl
+	push	iy
+	ld	iy,(iy + 3)
+	ld	a,hl,(.currentcluster)
+	ld	(yfatType.working_cluster),a,hl
+	call	util_next_cluster
+	compare_auhl_zero
+	jq	nz,.alreadyallocated
+	call	util_alloc_cluster
+.alreadyallocated:
+	ld	(.currentcluster),a,hl
+	compare_auhl_zero
+	pop	iy
+	pop	hl
+	jq	z,.failedalloc
+	dec	hl
+	compare_hl_zero
+	jq	nz,.allocateclusters
+	jq	.success
+.writeentry:
+	push	iy
+	ld	iy,(iy + 3)
+	ld	a,hl,(yfatType.working_sector)
+	call	util_write_fat_sector		; write the new size
+	jq	z,.writegood
+	pop	iy
+.usberror:
+	ld	hl,FAT_ERROR_USB_FAILED
 	ret
+.writegood:
+	call	util_update_file_sizes		; update any file pointers as needed!
+	ld	a,hl,(yfatType.working_size)
+	call	util_ceil_byte_size_to_cluster_size
+	pop	iy
+	ret
+.success:
+	xor	a,a
+	sbc	hl,hl
+	ret
+.failedchain:
+	ld	hl,FAT_ERROR_CLUSTER_CHAIN
+	ret
+.invalidpath:
+	ld	hl,FAT_ERROR_INVALID_PATH
+	ret
+.failedalloc:
+	ld	hl,FAT_ERROR_FAILED_ALLOC
+	ret
+.currentcluster:
+	rd	0
 
 ;-------------------------------------------------------------------------------
 fat_GetSize:
@@ -285,18 +396,30 @@ fat_GetSize:
 ;  sp + 6 : Path
 ; Returns:
 ;  File size in bytes
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ld	iy,0
+	add	iy,sp
+	ld	de,(iy + 6)
+	ld	iy,(iy + 3)
+	call	util_locate_entry
+	jq	z,.invalidpath
+	push	de
+	pop	iy
+	ld	a,hl,(iy + 28)
+	ret
+.invalidpath:
+	xor	a,a
+	sbc	hl,hl
 	ret
 
 ;-------------------------------------------------------------------------------
 fat_SetFilePos:
-; Sets the offset position in the file
+; Sets the offset sector position in the file
 ; Arguments:
 ;  sp + 3 : FAT File structure type
-;  sp + 6 : Position
+;  sp + 6 : Sector offsets
 ; Returns:
 ;  FAT_SUCCESS on success
-	ld	hl,FAT_ERROR_INVALID_PARAM
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -323,7 +446,30 @@ fat_SetAttrib:
 ;  sp + 9 : File attributes byte
 ; Returns:
 ;  FAT_SUCCESS on success
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ld	iy,0
+	add	iy,sp
+	ld	de,(iy + 6)
+	push	iy
+	ld	iy,(iy + 3)
+	call	util_locate_entry
+	pop	iy
+	jq	z,.invalidpath
+	push	hl,af
+	ld	a,(iy + 9)
+	push	de
+	pop	iy
+	ld	(iy + 11),a
+	pop	af,hl
+	call	util_write_fat_sector
+	jq	nz,.usberror
+	xor	a,a
+	sbc	hl,hl
+	ret
+.usberror:
+	ld	hl,FAT_ERROR_USB_FAILED
+	ret
+.invalidpath:
+	ld	hl,FAT_ERROR_INVALID_PATH
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -334,7 +480,18 @@ fat_GetAttrib:
 ;  sp + 6 : Path
 ; Returns:
 ;  File attribute byte
-	ld	a,255
+	ld	iy,0
+	add	iy,sp
+	ld	de,(iy + 6)
+	ld	iy,(iy + 3)
+	call	util_locate_entry
+	jq	z,.invalidpath
+	push	de
+	pop	iy
+	ld	a,(iy + 11)
+	ret
+.invalidpath:
+	ld	hl,FAT_ERROR_INVALID_PATH
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -524,7 +681,6 @@ fat_Create:
 	ld	iy,(iy + 3)
 	call	util_locate_entry
 	pop	iy
-	compare_auhl_zero
 	jq	nz,.alreadyexists
 	ld	hl,(iy + 6)
 	inc	hl			; todo: check for '/' or '.'?
@@ -546,7 +702,6 @@ fat_Create:
 	ld	iy,(iy + 3)
 	call	util_locate_entry
 	pop	iy
-	compare_auhl_zero
 	jq	z,.invalidpath
 	push	iy
 	ld	iy,(iy + 3)
@@ -612,6 +767,173 @@ fat_Create:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat_Delete:
+; Deletes a file and deallocates the spaced used by it on disk
+; Arguments:
+;  sp + 3 : FAT structure type
+;  sp + 6 : Path
+; Returns:
+;  FAT_SUCCESS on success
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	call	.enter
+	pop	ix
+	ret
+.enter:
+	ld	de,(iy + 6)
+	ld	iy,(iy + 3)
+	push	iy
+	call	util_locate_entry
+	pop	iy
+	jq	z,.invalidpath
+	push	de
+	pop	ix
+	ld	a,(ix + 11)
+	bit	4,a
+	jq	z,.normalfile
+.directory:
+
+	; todo: handle directory deletion
+	; need to check if empty first
+
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ret
+
+.normalfile:
+	ld	(ix + 11),0
+	ld	(ix + 0),$e5
+	push	ix
+	call	util_write_fat_sector
+	pop	ix
+	ld	a,(ix + 20 + 1)
+	ld	hl,(ix + 20 - 2)	; get hlu
+	ld	l,(ix + 26 + 0)
+	ld	h,(ix + 26 + 1)
+	call	util_dealloc_cluster_chain
+	jq	nz,.usberror
+	ret
+.invalidpath:
+	ld	hl,FAT_ERROR_INVALID_PATH
+	ret
+.usberror:
+	ld	hl,FAT_ERROR_USB_FAILED
+	ret
+
+;-------------------------------------------------------------------------------
+util_end_of_chain:
+; inputs
+;   auhl: cluster
+; outputs
+;   flag c set if end of cluster chain
+; perserves
+;   hl, af, bc, de
+	push	de,hl,af
+	ex	de,hl
+	and	a,$0f
+	ld	hl,8
+	add	hl,de
+	ex	de,hl
+	adc	a,$f0
+	pop	de,hl
+	ld	a,d
+	pop	de
+	ret
+
+;-------------------------------------------------------------------------------
+util_set_new_eoc_cluster:
+; inputs
+;   iy: fat structure
+;   auhl: cluster entry to mark as end
+; outputs:
+;   auhl: previous contents of cluster entry
+	compare_auhl_zero
+	ret	z
+	call	util_end_of_chain
+	ret	c
+	push	af,hl
+	call	util_cluster_entry_to_sector
+	call	util_read_fat_sector
+	pop	hl,de
+	ld	a,d
+	jq	nz,.error
+	call	util_get_cluster_offset
+	ld	a,$ff			; mark new end of chain
+	ld	bc,(hl)
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	d,(hl)			; dubc = previous cluster
+	ld	(hl),$0f		; end of chain marker
+	push	bc,de
+	pop	af,hl
+	ret
+.error:
+	xor	a,a
+	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
+; inputs:
+;   iy: fat structure
+;   auhl: starting cluster to deallocate from
+; outputs:
+;   yfatType.working_cluster: ending cluster
+;   yfatType.working_sector: sector with cluster offset
+util_dealloc_cluster_chain:
+	compare_auhl_zero
+	jq	z,.success
+	call	util_end_of_chain
+	jq	c,.success
+	ld	(yfatType.working_cluster),a,hl
+	call	util_cluster_entry_to_sector
+	ld	(yfatType.working_sector),a,hl
+	call	util_read_fat_sector
+	jq	nz,.error
+.followchain:
+	ld	a,hl,(yfatType.working_cluster)
+	call	util_get_cluster_offset
+	xor	a,a
+	ld	bc,(hl)
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	ld	d,(hl)			; dubc = previous cluster
+	ld	(hl),a			; zero previous cluster
+	push	bc,de
+	pop	af,hl			; auhl = previous cluster
+	ld	(yfatType.working_cluster),a,hl
+	call	util_end_of_chain	; check if end of chain
+	jq	c,.updatepartialchain
+	compare_auhl_zero
+	jq	z,.updatepartialchain
+	call	util_cluster_entry_to_sector
+	ld	e,a
+	ld	a,bc,(yfatType.working_sector)
+	call	__lcmpu
+	jq	z,.followchain
+	jq	.updatepartialchain
+.updatepartialchain:
+	ld	a,hl,(yfatType.working_sector)
+	call	util_update_fat_table
+	ld	a,hl,(yfatType.working_cluster)
+	jq	z,util_dealloc_cluster_chain
+	jq	.error
+.error:
+	xor	a,a
+	inc	a
+	ret
+.success:
+	xor	a,a
+	ret
+
+;-------------------------------------------------------------------------------
 ; inputs:
 ;   iy: fat structure
 ;   iy + working_cluster: previous cluster
@@ -663,59 +985,32 @@ util_alloc_cluster:
 	ld	bc,(yfatType.fat_pos)
 	add	hl,bc
 	adc	a,0
-	push	af,hl
-	call	util_write_fat_sector
-	pop	hl,af
-	jq	nz,.usberror	; pop new cluster
-	ld	bc,(yfatType.fat_size)
-	add	hl,bc
-	adc	a,0
-	call	util_write_fat_sector
-	jq	nz,.usberror	; pop new cluster
+	call	util_update_fat_table
+	jq	nz,.usberror
 	ld	a,hl,(yfatType.working_cluster)
 	compare_auhl_zero
-	jq	z,.nolinkneeded
-.linkchain:
+	jq	z,.linkentrytofirstcluster
+.linkclusterchain:
 	push	hl
-	ld	e,a
-	xor	a,a
-	ld	bc,128
-	call	__ldivu
-	ld	bc,(yfatType.fat_pos)
-	add	hl,bc
-	adc	a,e
+	call	util_cluster_entry_to_sector
 	push	hl,af
 	call	util_read_fat_sector
 	pop	de,bc,hl
 	jq	nz,.usberror
 	push	bc,de
-	ld	a,l
-	and	a,$7f
-	or	a,a
-	sbc	hl,hl
-	ld	l,a
+	call	util_get_cluster_offset
 	push	ix
-	ld	de,tmp.sectorbuffer
-	add	hl,de
 	push	hl
 	pop	ix
 	ld	a,hl,(yfatType.working_next_cluster)
 	ld	(ix),a,hl
-	pop	ix
-	pop	af,hl
-	push	hl,af
-	call	util_write_fat_sector
-	pop	af,hl
-	jq	nz,.usberror
-	ld	bc,(yfatType.fat_size)
-	add	hl,bc
-	adc	a,0
-	call	util_write_fat_sector
+	pop	ix,af,hl
+	call	util_update_fat_table
 	jq	nz,.usberror
 	ld	a,hl,(yfatType.working_cluster)
 	compare_auhl_zero
-	jq	z,.nolinkneeded
-.allocated:
+	jq	nz,.nolinkneeded
+.linkentrytofirstcluster:
 	ld	a,hl,(yfatType.working_sector)
 	call	util_read_fat_sector
 	jq	nz,.usberror
@@ -742,6 +1037,24 @@ util_alloc_cluster:
 ;-------------------------------------------------------------------------------
 ; inputs:
 ;   iy: fat structure
+;   auhl: sector to update in FAT
+util_update_fat_table:
+	push	af,hl
+	call	util_write_fat_sector
+	pop	hl,de
+	ld	a,d
+	ret	nz
+	ld	bc,(yfatType.fat_size)
+	add	hl,bc
+	adc	a,0
+	call	util_write_fat_sector
+	ret	nz
+	xor	a,a
+	ret
+
+;-------------------------------------------------------------------------------
+; inputs:
+;   iy: fat structure
 ;   iy + working_cluster: previous cluster
 ;   iy + working_sector: entry sector
 ;   iy + working_pointer: entry in sector
@@ -761,7 +1074,13 @@ util_do_alloc_entry:
 	pop	ix
 	push	hl,af
 	call	util_write_fat_sector
+	jq	nz,.error
 	pop	af,hl
+	ret
+.error:
+	pop	hl,hl
+	xor	a,a
+	sbc	hl,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -907,7 +1226,7 @@ util_get_file_size:
 ;-------------------------------------------------------------------------------
 util_set_file_size:
 	ld	(yfatFile.file_size),a,hl
-	call	util_ceil_sector_size
+	call	util_ceil_byte_size_to_sector_size
 	ld	(yfatFile.file_size_sectors),a,hl
 	ret
 
@@ -1014,6 +1333,39 @@ util_get_next_component:
 	jq	util_get_next_component
 
 ;-------------------------------------------------------------------------------
+util_update_file_sizes:
+	ld	de,(yfatType.working_pointer)
+	ld	a,hl,(yfatType.working_size)
+	push	iy
+	ld	b,MAX_FAT_FILES
+	ld	iy,fatFile4
+.find:
+	bit	BIT_OPEN,(yfatFile.flags)
+	jr	z,.next
+	push	hl
+	ld	hl,(yfatFile.entry_pointer)
+	compare_hl_de
+	pop	hl
+	jr	nz,.next
+	push	hl
+	ld	a,hl,(yfatFile.entry_sector)
+	ld	c,0
+.sectorlow := $-1
+	ld	de,0
+.sectorhigh := $-1
+	compare_hl_de
+	pop	hl
+	jr	nz,.next
+	cp	a,c
+	jr	nz,.next
+	ld	(yfatFile.file_size),a,hl
+.next:
+	lea	iy,iy - sizeof fatFile
+	djnz	.find
+	pop	iy
+	ret
+
+;-------------------------------------------------------------------------------
 util_locate_entry:
 ; finds the component entry
 ; inputs
@@ -1022,6 +1374,7 @@ util_locate_entry:
 ; outputs
 ;   hl: sector of entry
 ;   de: offset to entry in sector
+;   z set if not found
 	ld	a,hl,(yfatType.root_dir_pos)
 	ld	(yfatType.working_sector),a,hl
 	ld	(yfatType.working_pointer),de
@@ -1120,6 +1473,7 @@ util_locate_entry:
 	ret
 .foundlastcomponent:
 	ld	a,hl,(yfatType.working_sector)
+	compare_auhl_zero
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1476,7 +1830,31 @@ util_auhl_shl7:
 	ret
 
 ;-------------------------------------------------------------------------------
-util_ceil_sector_size:
+util_get_cluster_offset:
+	ld	a,l
+	and	a,$7f
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	add	hl,hl
+	add	hl,hl
+	ld	de,tmp.sectorbuffer
+	add	hl,de
+	ret
+
+;-------------------------------------------------------------------------------
+util_cluster_entry_to_sector:
+	ld	e,a
+	xor	a,a
+	ld	bc,128
+	call	__ldivu
+	ld	bc,(yfatType.fat_pos)
+	add	hl,bc
+	adc	a,e
+	ret
+
+;-------------------------------------------------------------------------------
+util_ceil_byte_size_to_sector_size:
 	compare_auhl_zero
 	ret	z
 	ld	e,a
@@ -1485,7 +1863,7 @@ util_ceil_sector_size:
 	ld	bc,512
 	push	bc
 	call	__lremu
-	compare_auhl_zero
+	compare_hl_zero
 	pop	bc,de,hl
 	push	af
 	xor	a,a
@@ -1495,3 +1873,34 @@ util_ceil_sector_size:
 	inc	hl
 	ret
 
+;-------------------------------------------------------------------------------
+util_ceil_byte_size_to_cluster_size:
+	compare_auhl_zero
+	ret	z
+	push	af,hl
+	xor	a,a
+	sbc	hl,hl
+	ld	h,(yfatType.cluster_size)
+	add	hl,hl
+	push	hl
+	pop	bc
+	pop	hl,de
+	ld	e,d
+	push	hl,de,bc
+	call	__lremu
+	compare_hl_zero
+	pop	bc,de,hl
+	push	af
+	xor	a,a
+	call	__ldivu
+	pop	af
+	ret	z
+	inc	hl
+	ret
+
+;-------------------------------------------------------------------------------
+util_compare_auhl_zero:
+	compare_hl_zero
+	ret	nz
+	or	a,a
+	ret

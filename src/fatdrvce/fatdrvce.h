@@ -76,6 +76,7 @@ typedef struct {
     uint32_t working_sector;
     uint32_t working_cluster;
     uint32_t working_next_cluster;
+    uint32_t working_size;
     uint24_t working_pointer;
 } fat_t;
 
@@ -104,7 +105,8 @@ typedef enum {
     FAT_ERROR_EOF,
     FAT_ERROR_EXISTS,
     FAT_ERROR_INVALID_PATH,
-    FAT_ERROR_FAILED_ALLOC
+    FAT_ERROR_FAILED_ALLOC,
+    FAT_ERROR_CLUSTER_CHAIN
 } fat_error_t;
 
 typedef enum {
@@ -166,6 +168,15 @@ fat_error_t fat_Create(fat_t *fat,
                        const char *path,
                        const char *name,
                        uint8_t attrib);
+
+/**
+ * Deletes a file or directory and deallocates the spaced used by it on disk.
+ * @param fat Initialized FAT structure type.
+ * @param path Absolute path to file or directory to delete.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_Delete(fat_t *fat,
+                       const char *path);
 
 /**
  * Sets the attributes (read only, hidden, etc) of the file.

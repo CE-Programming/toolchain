@@ -49,6 +49,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_ReadSector
 	export fat_WriteSector
 	export fat_Create
+	export fat_Delete
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -59,16 +60,22 @@ macro compare_hl_zero?
 end macro
 
 macro compare_auhl_zero?
-	add	hl,de
-	or	a,a
+	compare_hl_zero
 	jr	nz,$+3
-	sbc	hl,de
+	or	a,a
 end macro
 
 macro compare_hl_de?
 	or	a,a
 	sbc	hl,de
 	add	hl,de
+end macro
+
+macro compare_bc_zero?
+	push	hl
+	sbc	hl,hl
+	adc	hl,bc
+	pop	hl
 end macro
 
 ;-------------------------------------------------------------------------------
@@ -205,6 +212,7 @@ struct fatType
 	working_sector	rd 1
 	working_cluster	rd 1
 	working_next_cluster rd 1
+	working_size rd 1
 	working_pointer	rl 1
 	size := $-.
 end struct
@@ -295,6 +303,7 @@ virtual at 0
 	FAT_ERROR_EXISTS rb 1
 	FAT_ERROR_INVALID_PATH rb 1
 	FAT_ERROR_FAILED_ALLOC rb 1
+        FAT_ERROR_CLUSTER_CHAIN rb 1
 end virtual
 
 virtual at 0
@@ -1048,5 +1057,3 @@ fatFile1 fatFile
 fatFile2 fatFile
 fatFile3 fatFile
 fatFile4 fatFile
-
-
