@@ -2385,6 +2385,10 @@ end repeat
 ;  hl = ? and $FFFF
 ;  ix = ?
 ;  iy = device
+_ParseInterfaceDescriptors.clear:
+	ld	hl,mpUsbDevTest
+	set	bUsbTstClrFifo,(hl)
+	res	bUsbTstClrFifo,(hl)
 _ParseInterfaceDescriptors:
 	inc	b
 .dec:
@@ -3029,7 +3033,7 @@ end repeat
 	ld	ydevice,(rootHub.child)
 	ld	de,(xconfigurationDescriptor.wTotalLength)
 	ld	b,(xconfigurationDescriptor.bNumInterfaces)
-	call	z,_ParseInterfaceDescriptors
+	call	z,_ParseInterfaceDescriptors.clear
 	pop	ix
 	lea	de,ydevice
 	ld	a,USB_HOST_CONFIGURE_EVENT
