@@ -18,6 +18,8 @@
 extern "C" {
 #endif
 
+typedef uint8_t srl_error_t; /**< Zero for no error, otherwise same as usb_error_t */
+
 enum srl_DeviceType {
     SRL_UNKNOWN, /**< Incompatible or non-serial device */
     SRL_HOST,    /**< Calc is acting as a device */
@@ -55,14 +57,14 @@ typedef struct srl_Device {
  * @param rate The baud rate to set the device to
  * @return USB_SUCCESS on success, otherwise an error.
  */
-usb_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint24_t rate);
+srl_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint24_t rate);
 
 /**
  * Set the baud rate of the device.
  * @param rate Baud rate.
  * @return USB_SUCCESS on success, otherwise an error.
  */
-usb_error_t srl_SetRate(srl_device_t *srl, uint24_t rate);
+srl_error_t srl_SetRate(srl_device_t *srl, uint24_t rate);
 
 /**
  * Get the number of bytes available in the input buffer.

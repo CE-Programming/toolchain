@@ -180,7 +180,7 @@ virtual at 0
 end virtual
 
 ;-------------------------------------------------------------------------------
-;usb_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint24_t rate);
+;srl_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint24_t rate);
 srl_Init:
 	ld	iy,0
 	add	iy,sp
@@ -323,7 +323,7 @@ srl_Init:
 	jq	.exit
 
 ;-------------------------------------------------------------------------------
-;usb_error_t srl_SetRate(srl_device_t *srl, uint24_t rate);
+;srl_error_t srl_SetRate(srl_device_t *srl, uint24_t rate);
 srl_SetRate:
 	ld	iy,0
 	add	iy,sp
@@ -696,7 +696,7 @@ srl_Write_Blocking:
 	ret
 
 ;-------------------------------------------------------------------------------
-;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
+;srl_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
 srl_ReadCallback:
 	ld	iy,0
 	add	iy,sp
@@ -734,7 +734,7 @@ srl_ReadCallback:
 	ret
 
 ;-------------------------------------------------------------------------------
-;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
+;srl_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
 srl_WriteCallback:
 	ld	iy,0
 	add	iy,sp
