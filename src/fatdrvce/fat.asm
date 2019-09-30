@@ -308,6 +308,12 @@ fat_SetSize:
 	jq	c,.makelarger
 .makesmaller:
 	call	.writeentry
+	compare_hl_zero
+	jq	nz,.notzerofile
+	push	iy
+	ld	iy,(iy + 3)
+	jq	.dealloc
+.notzerofile:
 	push	hl
 	pop	bc
 	ld	a,hl,(.currentcluster)
@@ -328,6 +334,7 @@ fat_SetSize:
 	compare_bc_zero
 	jq	nz,.traverseclusters
 	call	util_set_new_eoc_cluster	; mark this cluster as unused
+.dealloc:
 	call	util_dealloc_cluster_chain	; deallocate all other clusters
 	pop	iy
 	jq	nz,.usberror
@@ -359,6 +366,18 @@ fat_SetSize:
 .writeentry:
 	push	iy
 	ld	iy,(iy + 3)
+	ld	a,hl,(yfatType.working_size)
+	compare_auhl_zero
+	jq	nz,.writenotzero
+	push	ix
+	ld	ix,(yfatType.working_pointer)
+	xor	a,a
+	ld	(ix + 20 + 0),a			; remove first cluster if zero
+	ld	(ix + 20 + 1),a
+	ld	(ix + 26 + 0),a
+	ld	(ix + 26 + 1),a
+	pop	ix
+.writenotzero:
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector		; write the new size
 	jq	z,.writegood
