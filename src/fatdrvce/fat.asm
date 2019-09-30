@@ -1412,6 +1412,65 @@ util_get_next_component:
 	jq	util_get_next_component
 
 ;-------------------------------------------------------------------------------
+util_is_directory_empty:
+; inputs
+;   iy: FAT structure
+;   auhl: cluster
+; outputs
+;   z flag set if directory is empty
+.enter:
+	ld	(yfatType.working_cluster),a,hl
+	call	util_cluster_to_sector
+	compare_auhl_zero
+	ret	z
+	ld	(yfatType.working_sector),a,hl
+	ld	b,(ufatType.cluster_size)
+.next_sector:
+	push	bc
+	ld	a,hl(yfatType.working_sector)
+	call	util_read_fat_sector
+	jq	nz,.fail
+	push	ix
+	ld	b,16
+	ld	ix,tmp.sectorbuffer - 32
+.loop:
+	lea	ix,ix + 32
+	ld	a,(ix + 11)
+	cp	a,$0f
+	jr	z,.next
+	ld	a,(ix + 0)
+	or	a,a
+	jq	z,.successpop
+	cp	a,$e5
+	jr	z,.next
+	cp	a,'.'
+	jr	z,.next
+	cp	a,' '
+	jr	z,.next
+	jq	.failpop
+.next:
+	djnz	.loop
+	ld	a,hl(yfatType.working_sector)
+	call	util_increment_auhl
+	ld	(yfatType.working_sector),a,hl
+	pop	bc
+	djnz	.next_sector
+	ld	a,hl(yfatType.working_cluster)
+	call	util_next_cluster
+	jq	.enter
+.successpop:
+	pop	bc,bc
+.success:
+	xor	a,a
+	ret
+.failpop:
+	pop	bc,bc
+.fail:
+	xor	a,a
+	inc	a
+	ret
+
+;-------------------------------------------------------------------------------
 util_update_file_sizes:
 	ld	de,(yfatType.working_pointer)
 	ld	a,hl,(yfatType.working_size)
