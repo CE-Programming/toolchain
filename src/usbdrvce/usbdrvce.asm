@@ -2532,7 +2532,7 @@ end repeat
 	dec	l
 .dmaFinished:
 	ld	(hl),bmUsbIntDevDmaFin
-.outZlp:
+.finishZlp:
 	pop	bc
 	ld	a,e
 	or	a,d
@@ -2605,16 +2605,22 @@ assert usbCxFifo shr 8 = bmCxFifoFin
 	ld	bc,vRamEnd
 	jq	.flush
 .zlp:
-	ld	hl,mpUsbDevIsr; or (? and $FF)
+	ld	hl,mpUsbCxFifo
 	and	a,usbDmaMem2Fifo
-	jq	z,.outZlp
-	push	hl,de,bc,af
-repeat 4
-	pop	de
-	ld	a,100
-	call	_DispatchEvent
+	jq	z,.finishZlp
+	bit	bUsbDmaCxFifo,(hl)
+	jq	nz,.finishZlp
+	ld	bc,(ytransfer.endpoint)
+	ld	c,endpoint.info
+	ld	a,(bc)
+	and	a,endpoint.info.ep
+repeat bsr (usbInEp2-usbInEp1)
+	add	a,a
 end repeat
-.wut:	jq	.wut
+	add	a,usbInEp1 shl 1-usbInEp2+1-$100
+	ld	l,a
+	set	bUsbInEpSendZlp-8,(hl)
+	jq	.finishZlp
 
 ;-------------------------------------------------------------------------------
 ; Input:
@@ -3367,29 +3373,16 @@ _HandleDevIsocAbtInt:
 	jq	_DispatchEvent
 
 _HandleDevZlpTxInt:
+	ld	l,usbTxZlp-$100
+	xor	a,a
+	ld	(hl),a
+	ld	l,usbDevIsr-$100
 	ld	(hl),bmUsbIntDevZlpTx
-	cp	a,a
 	ret
 
 _HandleDevZlpRxInt:
-	ld	a,i
-virtual at mpLcdLpbase+1
-	ld	c,(hl)
-	ld	(hl),b
-	ret
- load .exchange $-$$ from $$
-end virtual
-	ld	iy,mpLcdRange
 	ld	l,usbRxZlp-$100
-	ld	bc,.exchange
-	di
-	ld	de,(iy+lcdLpbase+1)
-	ld	(iy+lcdLpbase+1),bc
-	ld	b,0
-	call	mpLcdLpbase+1
-	ld	(iy+lcdLpbase+1),de
-	jq	po,.loop
-	ei
+	call	.almostMostAtomicExchangePossible
 .loop:
 	inc	b
 	srl	c
@@ -3405,6 +3398,26 @@ end virtual
 	jq	nz,.loop
 	ld	hl,mpUsbDevIsr
 	ld	(hl),bmUsbIntDevZlpRx
+	ret
+
+.almostMostAtomicExchangePossible:
+	ld	a,i
+virtual at mpLcdLpbase+1
+	ld	c,(hl)
+	ld	(hl),b
+	ret
+ load .exchange $-$$ from $$
+end virtual
+	ld	iy,mpLcdRange
+	ld	bc,.exchange
+	di
+	ld	de,(iy+lcdLpbase+1)
+	ld	(iy+lcdLpbase+1),bc
+	ld	b,0
+	call	mpLcdLpbase+1
+	ld	(iy+lcdLpbase+1),de
+	ret	po
+	ei
 	ret
 
 _HandleDevDmaFinInt:

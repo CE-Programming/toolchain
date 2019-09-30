@@ -221,6 +221,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 "666666666666666666666666666666666666666666666666666666666666666\n"
 "777777777777777777777777777777777777777777777777777777777777777"
 , 64*8, handleBulkIn, NULL);
+            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81), NULL, 0, handleBulkIn, NULL);
             break;
             if (!(buffer = malloc(256))) {
                 error = USB_ERROR_NO_MEMORY;
