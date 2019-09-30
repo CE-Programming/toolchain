@@ -438,8 +438,68 @@ fat_SetFilePos:
 ;  sp + 6 : Sector offsets
 ; Returns:
 ;  FAT_SUCCESS on success
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	pop	hl,iy,de
+	push	de,iy,hl
+	ld	(yfatFile.fpossector),de
+	ld	hl,(yfatFile.file_size_sectors)
+	compare_hl_de
+	jq	c,.eof
+	ex	de,hl		; determine cluster offset
+	ld	bc,0
+	push	iy
+	ld	iy,(yfatFile.fat)
+	ld	c,(yfatType.cluster_size)
+	xor	a,a
+	ld	e,a
+	push	bc,hl
+	call	__lremu		; get sector offset in cluster
+	ld	(.clusteroffset),hl
+	pop	hl,bc
+	xor	a,a
+	ld	e,a
+	call	__ldivu
+	pop	iy
+	push	hl
+	pop	bc
+	ld	a,hl,(yfatFile.first_cluster)
+	ld	(yfatFile.current_cluster),a,hl
+.getclusterpos:
+	push	bc
+	ld	a,hl,(yfatFile.current_cluster)
+	push	iy
+	ld	iy,(yfatFile.fat)
+	call	util_next_cluster
+	pop	iy
+	ld	(yfatFile.current_cluster),a,hl
+	pop	bc
+	compare_hl_zero
+	jq	z,.chainfailed
+	dec	bc
+	compare_bc_zero
+	jr	nz,.getclusterpos
+	push	iy
+	ld	iy,(yfatFile.fat)
+	call	util_cluster_to_sector
+	pop	iy
+	ld	de,0
+.clusteroffset := $-3
+	add	hl,de
+	adc	a,0
+	ld	(yfatFile.current_sector),a,hl
+.success:
+	xor	a,a
+	sbc	hl,hl
 	ret
+.usberror:
+	ld	hl,FAT_ERROR_USB_FAILED
+	ret
+.eof:
+	ld	hl,FAT_ERROR_EOF
+	ret
+.chainfailed:
+	ld	hl,FAT_ERROR_CLUSTER_CHAIN
+	ret
+
 
 ;-------------------------------------------------------------------------------
 fat_GetFilePos:
