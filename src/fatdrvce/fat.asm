@@ -771,8 +771,8 @@ fat_Create:
 	push	iy
 	call	util_alloc_entry_root
 	pop	iy
+	ld	(yfatType.working_prev_pointer),de
 	ld	(yfatType.working_pointer),de
-	ld	(yfatType.working_sector),a,hl
 	ld	bc,0
 	ld	(yfatType.working_prev_cluster),c,bc
 	pop	iy
@@ -786,7 +786,7 @@ fat_Create:
 	jq	z,.invalidpath
 	push	iy
 	ld	iy,(iy + 3)
-	ld	(yfatType.working_pointer),de
+	ld	(yfatType.working_prev_pointer),de
 	ld	(yfatType.working_sector),a,hl
 	ld	iy,tmp.sectorbuffer
 	ld	a,(iy + 20 + 1)
@@ -799,9 +799,9 @@ fat_Create:
 	ld	(yfatType.working_cluster),a,hl
 	ld	(yfatType.working_prev_cluster),a,hl
 	call	util_alloc_entry
+	ld	(yfatType.working_pointer),de
 	pop	iy
 .createfile:
-	ld	(yfatType.working_prev_pointer),de
 	compare_auhl_zero
 	jq	z,.failedalloc
 	push	ix
@@ -829,6 +829,7 @@ fat_Create:
 	ld	a,(iy + 12)
 	bit	4,a
 	jq	z,.notdirectory
+.createdirectory:
 	push	iy
 	ld	iy,(iy + 3)
 	xor	a,a
@@ -837,12 +838,13 @@ fat_Create:
 	call	util_alloc_entry
 	ld	(yfatType.working_next_pointer),de
 	ld	(yfatType.working_sector),a,hl
-	call	util_read_fat_sector
-	jq	nz,.usberrorpop
-	ld	a,hl,(yfatType.working_sector)
+	push	hl,af
 	call	util_sector_to_cluster
 	ld	(yfatType.working_cluster),a,hl
-	ex	de,hl
+	pop	af,hl
+	call	util_read_fat_sector
+	jq	nz,.usberrorpop
+	ld	hl,(yfatType.working_next_pointer)
 	ld	(hl),'.'
 	ld	b,10
 .setsingledot:
@@ -861,8 +863,6 @@ fat_Create:
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector
 	jq	nz,.usberrorpop
-	ld	a,hl,(yfatType.working_prev_cluster)
-	ld	(yfatType.working_cluster),a,hl
 	ld	de,(yfatType.working_prev_pointer)
 	ld	(yfatType.working_pointer),de
 	call	util_alloc_entry
@@ -873,7 +873,7 @@ fat_Create:
 	ld	a,hl,(yfatType.working_sector)
 	call	util_sector_to_cluster
 	ld	(yfatType.working_cluster),a,hl
-	ex	de,hl
+	ld	hl,(yfatType.working_next_pointer)
 	ld	(hl),'.'
 	inc	hl
 	ld	(hl),'.'
@@ -1098,12 +1098,14 @@ util_dealloc_cluster_chain:
 	ret
 
 ;-------------------------------------------------------------------------------
+util_alloc_cluster:
 ; inputs:
 ;   iy: fat structure
 ;   iy + working_cluster: previous cluster
 ;   iy + working_sector: entry sector
 ;   iy + working_pointer: entry in sector
-util_alloc_cluster:
+; outputs:
+;   auhl: allocated cluster number
 	xor	a,a
 	sbc	hl,hl
 .traversefat:
@@ -1262,7 +1264,7 @@ util_alloc_entry:
 	compare_auhl_zero
 	jq	nz,.validcluster
 	call	util_do_alloc_entry
-	ld	de,0
+	ld	de,tmp.sectorbuffer
 	ret
 .validcluster:
 	ld	b,(yfatType.cluster_size)

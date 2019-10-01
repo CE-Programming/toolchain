@@ -120,10 +120,6 @@ typedef enum {
     MSD_ERROR_INVALID_DEVICE
 } msd_error_t;
 
-#define FAT_WRONLY    2  /**< Open file in write-only mode. */
-#define FAT_RDONLY    1  /**< Open file in read-only mode. */
-#define FAT_RDWR      (FAT_RDONLY | FAT_WRONLY)  /**< Open file for reading and writing. */
-
 #define FAT_NORMAL    (0 << 0)  /**< Entry has no attributes. */
 #define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
 #define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden. */
@@ -131,6 +127,11 @@ typedef enum {
 #define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory. */
 #define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
 #define FAT_ALL       (FAT_DIR | FAT_VOLLABEL | FAT_SYSTEM | FAT_HIDDEN | FAT_RDONLY)
+
+#define FAT_WRONLY    (1 << 1) /**< Open file in write-only mode. */
+//#define FAT_RDONLY  (1 << 0) /**< Open file in read-only mode. */
+#define FAT_RDWR      (FAT_RDONLY | FAT_WRONLY)  /**< Open file for reading and writing. */
+
 
 /**
  * Locates any available FAT partitions detected on the mass storage device
