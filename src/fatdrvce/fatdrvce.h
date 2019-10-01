@@ -46,16 +46,16 @@ typedef struct {
 } msd_cbw_t;
 
 typedef struct {
-    usb_device_t dev;    /**< USB device */
-    usb_endpoint_t in;   /**< USB bulk in endpoint */
-    usb_endpoint_t out;  /**< USB bulk out endpoint */
+    usb_device_t dev; /**< USB device */
+    usb_endpoint_t in; /**< USB bulk in endpoint */
+    usb_endpoint_t out; /**< USB bulk out endpoint */
     usb_endpoint_t ctrl; /**< USB Control endpoint */
-    uint24_t tag;        /**< MSD Command Block Wrapper incrementing tag */
-    uint32_t lba;        /**< Logical Block Address of LUN */
-    uint32_t blocksize;  /**< Block size (usually 512) */
-    uint8_t interface;   /**< USB Interface index */
-    uint8_t maxlun;      /**< Maximum LUNs for MSD */
-    void *buffer;        /**< User supplied buffer address */
+    uint24_t tag; /**< MSD Command Block Wrapper incrementing tag */
+    uint32_t lba; /**< Logical Block Address of LUN */
+    uint32_t blocksize; /**< Block size (usually 512) */
+    uint8_t interface; /**< USB Interface index */
+    uint8_t maxlun; /**< Maximum LUNs for MSD */
+    void *buffer; /**< User supplied buffer address */
 } msd_device_t;
 
 typedef struct {
@@ -76,23 +76,26 @@ typedef struct {
     uint32_t working_sector;
     uint32_t working_cluster;
     uint32_t working_next_cluster;
+    uint32_t working_prev_cluster;
     uint32_t working_size;
     uint24_t working_pointer;
+    uint24_t working_next_pointer;
+    uint24_t working_prev_pointer;
 } fat_t;
 
 typedef struct {
     fat_t *fat;
-    uint8_t flags;
-    uint32_t entry_sector;
-    uint32_t first_cluster;
-    uint32_t current_cluster;
-    uint32_t file_size;
-    uint24_t file_size_sectors;
-    uint24_t fpossector;     /**< File position by sector count. */
-    uint8_t cluster_sector;  /**< Current sector in cluster. */
+    uint8_t flags; /**< Opening flags.  */
+    uint32_t entry_sector; /**< Sector where file information is stored. */
+    uint32_t first_cluster; /**< First cluster of the file. */
+    uint32_t current_cluster; /**< Current cluster derived from offset. */
+    uint32_t file_size; /**< Size of file in bytes. */
+    uint24_t file_size_sectors; /**< Size of file in sectors */
+    uint24_t fpossector; /**< File position by sector count. */
+    uint8_t cluster_sector; /**< Current sector in cluster. */
     uint32_t current_sector; /**< Current sector on msd. */
-    uint24_t working_buffer;
-    uint24_t entry_pointer;
+    uint24_t working_buffer; /**< Buffer used by the library. */
+    uint24_t entry_pointer; /**< Pointer to buffer index for entry. */
 } fat_file_t;
 
 typedef enum {
@@ -117,9 +120,9 @@ typedef enum {
     MSD_ERROR_INVALID_DEVICE
 } msd_error_t;
 
-#define FAT_OPEN_WRONLY  2  /**< Open file in write-only mode. */
-#define FAT_OPEN_RDONLY  1  /**< Open file in read-only mode. */
-#define FAT_OPEN_RDWR    (FAT_OPEN_RDONLY | FAT_OPEN_WRONLY)  /**< Open file for reading and writing. */
+#define FAT_WRONLY    2  /**< Open file in write-only mode. */
+#define FAT_RDONLY    1  /**< Open file in read-only mode. */
+#define FAT_RDWR      (FAT_RDONLY | FAT_WRONLY)  /**< Open file for reading and writing. */
 
 #define FAT_NORMAL    (0 << 0)  /**< Entry has no attributes. */
 #define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
@@ -225,8 +228,8 @@ uint32_t fat_GetSize(fat_t *fat,
  * Opens a file for either reading or writing, or both.
  * @param fat Initialized FAT structure type.
  * @param path File path to open or write.
- * @param flags Mode of opening, can be a mask of FAT_OPEN_WRONLY,
-                FAT_OPEN_RDONLY, and FAT_OPEN_RDWR.
+ * @param flags Mode of opening, can be a mask of FAT_WRONLY,
+                FAT_RDONLY, or just FAT_RDWR.
  * @return 0 if the file could not be opened, otherwise pointer
  *         to a file handle for other functions.
  */

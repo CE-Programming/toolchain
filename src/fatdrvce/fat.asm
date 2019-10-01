@@ -773,6 +773,8 @@ fat_Create:
 	pop	iy
 	ld	(yfatType.working_pointer),de
 	ld	(yfatType.working_sector),a,hl
+	ld	bc,0
+	ld	(yfatType.working_prev_cluster),c,bc
 	pop	iy
 	jq	.createfile
 .notroot:
@@ -795,9 +797,11 @@ fat_Create:
 	push	iy
 	ld	iy,(iy + 3)
 	ld	(yfatType.working_cluster),a,hl
+	ld	(yfatType.working_prev_cluster),a,hl
 	call	util_alloc_entry
 	pop	iy
 .createfile:
+	ld	(yfatType.working_prev_pointer),de
 	compare_auhl_zero
 	jq	z,.failedalloc
 	push	ix
@@ -816,13 +820,82 @@ fat_Create:
 	sbc	hl,hl
 	ld	(ix + 28),a,hl		; set initial size to zero
 	pop	ix
+	push	iy
 	ld	iy,(iy + 3)
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector
+	pop	iy
 	jq	nz,.usberror
-
-	; todo: create . and .. directories if a directory
-
+	ld	a,(iy + 12)
+	bit	4,a
+	jq	z,.notdirectory
+	push	iy
+	ld	iy,(iy + 3)
+	xor	a,a
+	sbc	hl,hl
+	ld	(yfatType.working_cluster),a,hl
+	call	util_alloc_entry
+	ld	(yfatType.working_next_pointer),de
+	ld	(yfatType.working_sector),a,hl
+	call	util_read_fat_sector
+	jq	nz,.usberrorpop
+	ld	a,hl,(yfatType.working_sector)
+	call	util_sector_to_cluster
+	ld	(yfatType.working_cluster),a,hl
+	ex	de,hl
+	ld	(hl),'.'
+	ld	b,10
+.setsingledot:
+	inc	hl
+	ld	(hl),' '
+	djnz	.setsingledot
+	push	ix
+	ld	ix,(yfatType.working_next_pointer)
+	ld	de,(yfatType.working_cluster + 0)
+	ld	(ix + 26),e
+	ld	(ix + 27),d
+	ld	de,(yfatType.working_cluster + 2)
+	ld	(ix + 20),e
+	ld	(ix + 21),d
+	pop	ix
+	ld	a,hl,(yfatType.working_sector)
+	call	util_write_fat_sector
+	jq	nz,.usberrorpop
+	ld	a,hl,(yfatType.working_prev_cluster)
+	ld	(yfatType.working_cluster),a,hl
+	ld	de,(yfatType.working_prev_pointer)
+	ld	(yfatType.working_pointer),de
+	call	util_alloc_entry
+	ld	(yfatType.working_next_pointer),de
+	ld	(yfatType.working_sector),a,hl
+	call	util_read_fat_sector
+	jq	nz,.usberrorpop
+	ld	a,hl,(yfatType.working_sector)
+	call	util_sector_to_cluster
+	ld	(yfatType.working_cluster),a,hl
+	ex	de,hl
+	ld	(hl),'.'
+	inc	hl
+	ld	(hl),'.'
+	ld	b,9
+.setdoubledot:
+	inc	hl
+	ld	(hl),' '
+	djnz	.setdoubledot
+	push	ix
+	ld	ix,(yfatType.working_next_pointer)
+	ld	de,(yfatType.working_prev_cluster + 0)
+	ld	(ix + 26),e
+	ld	(ix + 27),d
+	ld	de,(yfatType.working_prev_cluster + 2)
+	ld	(ix + 20),e
+	ld	(ix + 21),d
+	pop	ix
+	ld	a,hl,(yfatType.working_sector)
+	call	util_write_fat_sector
+	jq	nz,.usberrorpop
+	pop	iy
+.notdirectory:
 	ld	e,FAT_SUCCESS
 	jq	.restorestack
 .failedalloc:
@@ -834,6 +907,8 @@ fat_Create:
 .invalidpath:
 	ld	e,FAT_ERROR_INVALID_PATH
 	jq	.restorestack
+.usberrorpop:
+	pop	hl
 .usberror:
 	ld	e,FAT_ERROR_USB_FAILED
 	jq	.restorestack

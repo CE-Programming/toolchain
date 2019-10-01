@@ -211,8 +211,11 @@ struct fatType
 	working_sector rd 1
 	working_cluster rd 1
 	working_next_cluster rd 1
+	working_prev_cluster rd 1
 	working_size rd 1
 	working_pointer rl 1
+	working_next_pointer rl 1
+	working_prev_pointer rl 1
 	size := $-.
 end struct
 
@@ -302,7 +305,7 @@ virtual at 0
 	FAT_ERROR_EXISTS rb 1
 	FAT_ERROR_INVALID_PATH rb 1
 	FAT_ERROR_FAILED_ALLOC rb 1
-        FAT_ERROR_CLUSTER_CHAIN rb 1
+	FAT_ERROR_CLUSTER_CHAIN rb 1
 	FAT_ERROR_DIRECTORY_NOT_EMPTY rb 1
 end virtual
 
