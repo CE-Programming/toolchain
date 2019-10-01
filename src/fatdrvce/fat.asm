@@ -851,6 +851,8 @@ fat_Create:
 	inc	hl
 	ld	(hl),' '
 	djnz	.setsingledot
+	inc	hl
+	ld	(hl),$10
 	push	ix
 	ld	ix,(yfatType.working_next_pointer)
 	ld	de,(yfatType.working_cluster + 0)
@@ -882,6 +884,8 @@ fat_Create:
 	inc	hl
 	ld	(hl),' '
 	djnz	.setdoubledot
+	inc	hl
+	ld	(hl),$10
 	push	ix
 	ld	ix,(yfatType.working_next_pointer)
 	ld	de,(yfatType.working_prev_cluster + 0)
