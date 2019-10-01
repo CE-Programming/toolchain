@@ -2,13 +2,48 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.6...HEAD)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.7...HEAD)
+
+# [v8.7](https://github.com/CE-Programming/toolchain/releases/tag/v8.7) (2019-08-25)
+
+ - Documentation fixes
+ - Fix `gfx_Begin` signature
+ - Fix `gfx_RotateSpriteC`
+ - Fix `ti_Str0` value and add missing `ti_Str9`
+ - Fix `gfx_SetCharData` (#221)
+ - Improve build
+ - Add `ti_ArchiveHasRoom`
+ 
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.6...v8.7)
 
 # [v8.6](https://github.com/CE-Programming/toolchain/releases/tag/v8.6) (2019-06-30)
+
+ - New libray: FontLib by DrDnar
+ - Add `kb_IsDown` keypadc macro
+ - Add `gfx_CopyRectangle`
+ - Add `os_TestFlagBitsFast`
+ - Fix `gfx_GetClipRegion`
+ - Fix `getstringinput`
+ - Fix `strncasecmp`
+ - Fix `ti_SetArchiveStatus` ignoring archived argument
+ - Improve comments and `printTextSmall` function
+ - Improve `gfx_Wait`
+ - Improve CI
+ - Improve build files in general, more parallel and portability support
+ - More documentation
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.5...v8.6)
 
 # [v8.5](https://github.com/CE-Programming/toolchain/releases/tag/v8.5) (2018-10-31)
+
+ - LibLoad and linker improvements
+ - AppVeyor CI support
+ - Fix `ti_RclVar`
+ - Improve and fix tests in general
+ - Optimize a few graphx routines (SetPalette, SetClipRegion, RLETSprite)
+ - Add `os_NewLine`
+ - Fix MMIO defines (size/volatility) in tice.h
+ - Add 32-bit "atomic" load functions and stopwatch example
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.4...v8.5)
 
