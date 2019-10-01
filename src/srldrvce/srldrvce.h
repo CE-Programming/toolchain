@@ -29,11 +29,27 @@ enum srl_DeviceType {
 
 typedef uint8_t srl_deviceType_t;
 
+enum srl_SubType_FTDI {
+    FTDI_UNKNOWN = 0,
+    SIO,
+    FT8U232AM,
+    FT232BM,
+    FT2232C,
+    FT232RL,
+    FT2232H,
+    FT4232H,
+    FT232H,
+    FTX,
+};
+
+typedef uint8_t srl_subType_t;
+
 typedef struct srl_Device {
     usb_device_t dev;       /**< USB device */
     usb_endpoint_t in;      /**< USB bulk in endpoint */
     usb_endpoint_t out;     /**< USB bulk out endpoint */
     srl_deviceType_t type;  /**< Device type */
+    srl_subType_t subType;  /**< Device sub-type */
     char *readBuf;          /**< Pointer to the read buffer */
     size_t readBufSize;     /**< Size of the read buffer */
     char *readBufStart;     /**< First byte with data in the read buffer */

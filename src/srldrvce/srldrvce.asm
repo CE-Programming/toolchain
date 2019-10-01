@@ -71,6 +71,7 @@ struct srl_Device
 	?in		rl 1		; USB bulk in endpoint
 	?out		rl 1		; USB bulk out endpoint
 	type		rb 1		; Device type
+	subType		rb 1		; Device sub-type
 	readBuf		rl 1		; Pointer to the read buffer
 	readBufSize	rl 1		; Size of the read buffer
 	readBufStart	rl 1		; First byte with data in the read buffer
@@ -91,6 +92,20 @@ virtual at 0
 	SRL_HOST	rb 1		; Calc is acting as a device
 	SRL_CDC		rb 1		; CDC device
 	SRL_FTDI	rb 1		; FTDI device
+end virtual
+
+; enum srl_SubType_FTDI
+virtual at 0
+	FTDI_UNKNOWN	rb 1
+	SIO		rb 1
+	FT8U232AM	rb 1
+	FT232BM		rb 1
+	FT2232C		rb 1
+	FT232RL		rb 1
+	FT2232H		rb 1
+	FT4232H		rb 1
+	FT232H		rb 1
+	FTX		rb 1
 end virtual
 
 struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
@@ -122,6 +137,16 @@ struct deviceDescriptor
 	iProduct		rb 1
 	iSerialNumber		rb 1
 	bNumConfigurations	rb 1
+end struct
+struct configurationDescriptor
+	label .: 9
+	descriptor		descriptor
+	wTotalLength		rw 1
+	bNumInterfaces		rb 1
+	bConfigurationValue	rb 1
+	iConfiguration		rb 1
+	bmAttributes		rb 1
+	bMaxPower		rb 1
 end struct
 struct interfaceDescriptor
 	label .: 9
@@ -219,31 +244,19 @@ srl_Init:
 	ld	hl,(tmp.length)
 	compare_hl_de				; ensure enough bytes were fetched
 	jq	nz,.err_nd
-;look for CDC interfaces
-;if found:
-; set configuration
-; set device type
-;else:
-; scan device list for matching FTDI device
-; set configuration 0
-; set device type
-;find in/out endpoints
-;convert endpoints to usb_endpoint_t
 
-;some temp code to avoid the above
-;assume ftdi device, config 0, endpoints in: $81 and out: $02
 	push	iy
-	ld	a,SRL_FTDI
-	ld	(xsrl_Device.type),a
-	ld	bc,0
+	ld	bc,0				; get config length
 	push	bc
 	ld	bc,(xsrl_Device.dev)
 	push	bc
 	call	usb_GetConfigurationDescriptorTotalLength
 	pop	bc
 	pop	bc
+	ld	(configSize),hl
+; todo: error if not enough space
 
-	pop	iy
+	pop	iy				; get config into buffer
 	push	iy
 	ld	bc,tmp.length
 	push	bc
@@ -263,17 +276,106 @@ srl_Init:
 	pop	bc
 	pop	hl
 	pop	hl
+	pop	iy
+; todo: check if device is configured
 
-	ld	hl,(hl)
+	ld	hl,tmp.descriptor + deviceDescriptor.idVendor		; check if device is an FTDI
+	ld	a,(hl)
+	cp	a,$03				; check if idVendor is $0403
+	jq	nz,.nonFTDI
+	inc	hl
+	ld	a,(hl)
+	cp	a,$04
+	jq	nz,.nonFTDI
+
+	ld	a,SRL_FTDI			; set device type
+	ld	(xsrl_Device.type),a
+
+	; todo: replace with reading descriptors
+	ld	a,$81
+	ld	(epOut),a
+	ld	a,$02
+	ld	(epIn),a
+
+	ld	hl,configurationDescriptor.bNumInterfaces		; check if device has multiple interfaces
+	ld	de,(iy + 9)
+	add	hl,de
+	ld	a,(hl)
+	dec	a
+	ld	hl,(tmp.descriptor + deviceDescriptor.bcdDevice)	; get device version in de
+	ex.s	hl,de
+	jq	z,.singleInterface
+
+	xor	a,a
+	ld	hl,$0800			; check each version number for multi-interface devices
+	sbc	hl,de
+	ld	a,FT4232H
+	jq	z,.ftdiSubtypeSet
+	ld	hl,$0700
+	sbc	hl,de
+	ld	a,FT2232H
+	jq	z,.ftdiSubtypeSet
+	ld	a,FT2232C			; default to FT2232C
+	jq	.ftdiSubtypeSet
+
+.singleInterface:
+	scf
+	ld	hl,$0200
+	sbc	hl,de
+	ld	a,SIO
+	jq	nc,.ftdiSubtypeSet
+	ld	hl,$0400
+	sbc	hl,de
+	ld	a,FT8U232AM
+	jq	nc,.ftdiSubtypeSet
+	ld	hl,$0600
+	sbc	hl,de
+	ld	a,FT232BM
+	jq	nc,.ftdiSubtypeSet
+	ld	hl,$0900
+	sbc	hl,de
+	ld	a,FT232RL
+	jq	nc,.ftdiSubtypeSet
+	ld	hl,$1000
+	sbc	hl,de
+	ld	a,FT232H
+	jq	nc,.ftdiSubtypeSet
+	ld	a,FTX
+	jq	.ftdiSubtypeSet
+
+.ftdiSubtypeSet:
+	ld	(xsrl_Device.subType),a
+
+.nonFTDI:
+;look for CDC interfaces
+;if found:
+; set configuration
+; set device type
+; find in/out endpoints
+; convert endpoints to usb_endpoint_t
+
+;some temp code to avoid the above
+;assume config 0, endpoints in: $81 and out: $02
+
+	ld	a,SRL_CDC				; temp
+	ld	(xsrl_Device.type),a
+
+	push	iy
+
+	ld	hl,0
+	configSize = $-3
 	push	hl
+	ld	bc,(iy + 9)
 	push	bc
-	push	de
+	ld	bc,(xsrl_Device.dev)
+	push	bc
 	call	usb_SetConfiguration
 	pop	de
 	pop	bc
 	pop	bc
 
-	ld	bc,$81				; get endpoint
+	ld	bc,$83;1				; get endpoint
+	epOut = $-3
 	push	bc
 	push	de
 	call	usb_GetDeviceEndpoint
@@ -281,7 +383,8 @@ srl_Init:
 	pop	bc
 	ld	(xsrl_Device.in),hl
 
-	ld	bc,$02				; get endpoint
+	ld	bc,$04;2				; get endpoint
+	epIn = $-3
 	push	bc
 	ld	de,(xsrl_Device.dev)
 	push	de
@@ -292,6 +395,7 @@ srl_Init:
 	pop	iy
 ;end temp code
 
+.deviceConfigured:
 	ld	hl,(iy + 9)			; set read buffer pointer, start, and end
 	ld	(xsrl_Device.readBuf),hl
 	ld	(xsrl_Device.readBufStart),hl
@@ -313,13 +417,12 @@ srl_Init:
 	xor	a,a				; unstop read
 	ld	(xsrl_Device.stopRead),a
 	ld	(xsrl_Device.readBufActive),a	; mark read buffer as inactive
-;	call	srl_StartAsyncRead		; start async read
-	ld	hl,USB_SUCCESS
+	ld	a,USB_SUCCESS
 .exit:
 	pop	ix
 	ret
 .err_nd:
-	ld	hl,USB_ERROR_NO_DEVICE
+	ld	a,USB_ERROR_NO_DEVICE
 	jq	.exit
 
 ;-------------------------------------------------------------------------------
@@ -855,9 +958,11 @@ srl_StartAsyncWrite:
 
 ;temp
 openDebug:
+	push	hl
 	scf					; open debugger
 	sbc	hl,hl
 	ld	(hl),2
+	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
