@@ -187,6 +187,19 @@ virtual at 0
 	USB_ERROR_FAILED			rb 1
 end virtual
 
+virtual at 0
+	SRL_SUCCESS				rb 1
+	SRL_IGNORE				rb 1
+	SRL_ERROR_SYSTEM			rb 1
+	SRL_ERROR_INVALID_PARAM			rb 1
+	SRL_ERROR_SCHEDULE_FULL			rb 1
+	SRL_ERROR_NO_DEVICE			rb 1
+	SRL_ERROR_NO_MEMORY			rb 1
+	SRL_ERROR_NOT_SUPPORTED			rb 1
+	SRL_ERROR_TIMEOUT			rb 1
+	SRL_ERROR_FAILED			rb 1
+end virtual
+
 ; enum usb_descriptor_type
 virtual at 1
 	?DEVICE_DESCRIPTOR			rb 1
@@ -417,12 +430,12 @@ srl_Init:
 	xor	a,a				; unstop read
 	ld	(xsrl_Device.stopRead),a
 	ld	(xsrl_Device.readBufActive),a	; mark read buffer as inactive
-	ld	a,USB_SUCCESS
+	ld	a,SRL_SUCCESS
 .exit:
 	pop	ix
 	ret
 .err_nd:
-	ld	a,USB_ERROR_NO_DEVICE
+	ld	a,SRL_ERROR_NO_DEVICE
 	jq	.exit
 
 ;-------------------------------------------------------------------------------

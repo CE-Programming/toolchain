@@ -18,7 +18,20 @@
 extern "C" {
 #endif
 
-typedef uint8_t srl_error_t; /**< Zero for no error, otherwise same as usb_error_t */
+typedef uint8_t srl_error_t;
+enum srl_error {
+    SRL_SUCCESS,
+    SRL_IGNORE,
+    SRL_ERROR_SYSTEM,
+    SRL_ERROR_INVALID_PARAM,
+    SRL_ERROR_SCHEDULE_FULL,
+    SRL_ERROR_NO_DEVICE,
+    SRL_ERROR_NO_MEMORY,
+    SRL_ERROR_NOT_SUPPORTED,
+    SRL_ERROR_TIMEOUT,
+    SRL_ERROR_FAILED,
+    SRL_USER_ERROR = 100,
+};
 
 enum srl_DeviceType {
     SRL_UNKNOWN, /**< Incompatible or non-serial device */
