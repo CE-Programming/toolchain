@@ -979,8 +979,7 @@ fat_Delete:
 	jq	z,.invalidpath
 	push	de
 	pop	ix
-	ld	a,(ix + 11)
-	bit	4,a
+	bit	4,(ix + 11)
 	jq	z,.normalfile
 .directory:
 	push	hl,af
