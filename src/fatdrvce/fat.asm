@@ -855,12 +855,28 @@ fat_Create:
 	ld	(hl),$10
 	push	ix
 	ld	ix,(yfatType.working_next_pointer)
-	ld	de,(yfatType.working_cluster + 0)
-	ld	(ix + 26),e
-	ld	(ix + 27),d
+	ld	(ix + 12),$00
+	ld	(ix + 13),$64
+	ld	(ix + 14),$07
+	ld	(ix + 15),$1e
+	ld	(ix + 16),$41
+	ld	(ix + 17),$4f
+	ld	(ix + 18),$41
+	ld	(ix + 19),$4f
 	ld	de,(yfatType.working_cluster + 2)
 	ld	(ix + 20),e
 	ld	(ix + 21),d
+	ld	(ix + 22),$07
+	ld	(ix + 23),$1e
+	ld	(ix + 24),$41
+	ld	(ix + 25),$4f
+	ld	de,(yfatType.working_cluster + 0)
+	ld	(ix + 26),e
+	ld	(ix + 27),d
+	ld	(ix + 28),$00
+	ld	(ix + 29),$00
+	ld	(ix + 30),$00
+	ld	(ix + 31),$00
 	pop	ix
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector
@@ -888,12 +904,28 @@ fat_Create:
 	ld	(hl),$10
 	push	ix
 	ld	ix,(yfatType.working_next_pointer)
-	ld	de,(yfatType.working_prev_cluster + 0)
-	ld	(ix + 26),e
-	ld	(ix + 27),d
+	ld	(ix + 12),$00
+	ld	(ix + 13),$64
+	ld	(ix + 14),$07
+	ld	(ix + 15),$1e
+	ld	(ix + 16),$41
+	ld	(ix + 17),$4f
+	ld	(ix + 18),$41
+	ld	(ix + 19),$4f
 	ld	de,(yfatType.working_prev_cluster + 2)
 	ld	(ix + 20),e
 	ld	(ix + 21),d
+	ld	(ix + 22),$07
+	ld	(ix + 23),$1e
+	ld	(ix + 24),$41
+	ld	(ix + 25),$4f
+	ld	de,(yfatType.working_prev_cluster + 0)
+	ld	(ix + 26),e
+	ld	(ix + 27),d
+	ld	(ix + 28),$00
+	ld	(ix + 29),$00
+	ld	(ix + 30),$00
+	ld	(ix + 31),$00
 	pop	ix
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector
@@ -1241,6 +1273,10 @@ util_do_alloc_entry:
 	ld	(ix + 11),b
 	ld	(ix + 32),b
 	ld	(ix + 43),b
+	ld	(ix + 28),b
+	ld	(ix + 29),b
+	ld	(ix + 30),b
+	ld	(ix + 31),b
 	pop	ix
 	push	hl,af
 	call	util_write_fat_sector
@@ -1263,6 +1299,11 @@ util_do_alloc_entry:
 ;   auhl: new entry sector
 ;   de: offset in entry sector
 util_alloc_entry:
+	ld	a,hl,(yfatType.working_cluster)
+	call	util_cluster_to_sector
+	ld	(.sectorhigh),a
+	ld	(.sectorlow),hl
+.enter:
 	ld	a,hl,(yfatType.working_cluster)
 	call	util_cluster_to_sector
 	compare_auhl_zero
@@ -1302,7 +1343,7 @@ util_alloc_entry:
 	ret
 .nextclusterisvalid:
 	ld	(yfatType.working_cluster),a,hl
-	jq	util_alloc_entry
+	jq	.enter
 .foundavailentry:
 	lea	de,iy			; pointer to new entry
 	pop	iy,af,hl,bc		; auhl = sector with entry
@@ -1312,11 +1353,15 @@ util_alloc_entry:
 	jq	z,.movetonextcluster
 	lea	de,iy			; pointer to new entry
 	xor	a,a
+	lea	iy,iy + 32
 	ld	(iy + 0),a
 	ld	(iy + 11),a
 	pop	iy,af,hl,bc
 	push	af,hl,de
-	call	util_increment_auhl
+	ld	a,0
+.sectorhigh := $-1
+	ld	hl,0
+.sectorlow := $-3
 	call	util_write_fat_sector
 	pop	de,hl
 	jq	nz,.usberr
