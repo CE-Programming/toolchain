@@ -198,6 +198,7 @@ virtual at 0
 	SRL_ERROR_NOT_SUPPORTED			rb 1
 	SRL_ERROR_TIMEOUT			rb 1
 	SRL_ERROR_FAILED			rb 1
+	SRL_ERROR_INVALID_INTERFACE		rb 1
 end virtual
 
 ; enum usb_descriptor_type
@@ -218,7 +219,7 @@ virtual at 0
 end virtual
 
 ;-------------------------------------------------------------------------------
-;srl_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint24_t rate);
+;srl_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint8_t interface);
 srl_Init:
 	ld	iy,0
 	add	iy,sp
@@ -304,11 +305,11 @@ srl_Init:
 	ld	a,SRL_FTDI			; set device type
 	ld	(xsrl_Device.type),a
 
-	; todo: replace with reading descriptors
-	ld	a,$81
-	ld	(epOut),a
-	ld	a,$02
-	ld	(epIn),a
+	ld	a,(iy + 15)			; if interface == -1, interface = 0
+	inc	a
+	jq	nz,.specificInterface
+	ld	(iy + 15),a
+.specificInterface:
 
 	ld	hl,configurationDescriptor.bNumInterfaces		; check if device has multiple interfaces
 	ld	de,(iy + 9)
@@ -318,6 +319,21 @@ srl_Init:
 	ld	hl,(tmp.descriptor + deviceDescriptor.bcdDevice)	; get device version in de
 	ex.s	hl,de
 	jq	z,.singleInterface
+
+	ld	b,(iy + 15)			; error if interface >= nNumInterfaces
+	cp	a,b
+	ld	a,SRL_ERROR_INVALID_INTERFACE
+	jq	c,.exit
+
+	sla	b				; multiply interface by 2
+	ld	a,$81				; add $81 to get in endpoint
+	add	a,b
+	ld	(.epIn),a
+	xor	a,a				; add $02 to get out endpoint
+	inc	a
+	inc	a
+	add	a,b
+	ld	(.epOut),a
 
 	xor	a,a
 	ld	hl,$0800			; check each version number for multi-interface devices
@@ -332,6 +348,16 @@ srl_Init:
 	jq	.ftdiSubtypeSet
 
 .singleInterface:
+	ld	a,(iy + 15)			; if interface is non-zero, error
+	or	a,a
+	ld	a,SRL_ERROR_INVALID_INTERFACE
+	jq	nz,.exit
+
+	ld	a,$81
+	ld	(.epOut),a
+	ld	a,$02
+	ld	(.epIn),a
+
 	scf
 	ld	hl,$0200
 	sbc	hl,de
@@ -358,6 +384,7 @@ srl_Init:
 
 .ftdiSubtypeSet:
 	ld	(xsrl_Device.subType),a
+	jq	.shared
 
 .nonFTDI:
 ;look for CDC interfaces
@@ -368,10 +395,12 @@ srl_Init:
 ; convert endpoints to usb_endpoint_t
 
 ;some temp code to avoid the above
-;assume config 0, endpoints in: $81 and out: $02
+;assume endpoints in: $83 and out: $04
 
 	ld	a,SRL_CDC				; temp
 	ld	(xsrl_Device.type),a
+
+.shared:
 
 	push	iy
 
@@ -387,8 +416,8 @@ srl_Init:
 	pop	bc
 	pop	bc
 
-	ld	bc,$83;1				; get endpoint
-	epOut = $-3
+	ld	bc,$83				; get endpoint
+	.epOut = $-3
 	push	bc
 	push	de
 	call	usb_GetDeviceEndpoint
@@ -396,8 +425,8 @@ srl_Init:
 	pop	bc
 	ld	(xsrl_Device.in),hl
 
-	ld	bc,$04;2				; get endpoint
-	epIn = $-3
+	ld	bc,$04				; get endpoint
+	.epIn = $-3
 	push	bc
 	ld	de,(xsrl_Device.dev)
 	push	de

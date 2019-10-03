@@ -30,6 +30,7 @@ enum srl_error {
     SRL_ERROR_NOT_SUPPORTED,
     SRL_ERROR_TIMEOUT,
     SRL_ERROR_FAILED,
+    SRL_ERROR_INVALID_INTERFACE,
     SRL_USER_ERROR = 100,
 };
 
@@ -76,6 +77,8 @@ typedef struct srl_Device {
     char *writeBufEnd;      /**< Last byte with data in the write buffer */
 } srl_device_t;
 
+#define SRL_INTERFACE_ANY 0xFF
+
 
 /**
  * Initializes a serial device and assigns it a buffer.
@@ -84,9 +87,10 @@ typedef struct srl_Device {
  * @param buf The buffer's address.
  * @param size The size of the buffer
  * @param rate The baud rate to set the device to
+ * @param interface The interface number to use, or SRL_INTERFACE_ANY for the first available interface
  * @return USB_SUCCESS on success, otherwise an error.
  */
-srl_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint24_t rate);
+srl_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint8_t interface);
 
 /**
  * Set the baud rate of the device.
