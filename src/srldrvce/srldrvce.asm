@@ -500,13 +500,12 @@ srl_SetRate:
 	pop	bc
 	pop	bc
 	pop	bc
-	push	af
 	ld	a,(xsrl_Device.readBufActive)	; check if read needs to be started
 	or	a,a
 	call	z,srl_StartAsyncRead
-	pop	af
 	jq	.exit				; return error, if any
 .exit:
+	ld	a,l
 	pop	ix
 	ret
 
@@ -812,7 +811,7 @@ srl_Write_Blocking:
 	ret
 
 ;-------------------------------------------------------------------------------
-;srl_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
+;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
 srl_ReadCallback:
 	ld	iy,0
 	add	iy,sp
@@ -847,10 +846,11 @@ srl_ReadCallback:
 .exit:
 	call	srl_StartAsyncRead
 	pop	ix
+	ld	hl,USB_SUCCESS
 	ret
 
 ;-------------------------------------------------------------------------------
-;srl_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
+;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
 srl_WriteCallback:
 	ld	iy,0
 	add	iy,sp
@@ -876,6 +876,7 @@ srl_WriteCallback:
 	call	srl_StartAsyncWrite
 .exit:
 	pop	ix
+	ld	hl,USB_SUCCESS
 	ret
 
 ;-------------------------------------------------------------------------------
