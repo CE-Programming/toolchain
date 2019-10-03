@@ -496,10 +496,12 @@ DEFAULT_RETRIES := 10
 
 ;-------------------------------------------------------------------------------
 usb_Init:
-	call	_ChkIfOSInterruptAvailable
-	rrca
+	call	_os_GetSystemInfo
+	ld	de,4
+	add	hl,de
+	bit	0,(hl)
 	ld	hl,_DefaultStandardDescriptors.string83
-	jq	c,.gotModel
+	jq	nz,.gotModel
 	ld	hl,_DefaultStandardDescriptors.string84
 .gotModel:
 	ld	(_DefaultStandardDescriptors.model),hl
