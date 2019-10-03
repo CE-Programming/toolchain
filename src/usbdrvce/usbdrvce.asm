@@ -3080,6 +3080,7 @@ end repeat
 .return:
 	ld	l,usbCxIsr-$100
 	ld	(hl),bmUsbIntCxSetup
+	cp	a,a
 	ret
 
 _HandleDeviceDescriptor:
