@@ -401,20 +401,20 @@ typedef struct usb_string_descriptor {
 
 typedef struct usb_standard_descriptors {
   /// Pointer to device descriptor which must be in RAM
-  usb_device_descriptor_t *device;
+  const usb_device_descriptor_t *device;
   /// Pointer to array of device->bNumConfigurations pointers to complete
   /// configuration descriptors. Each one should point to
   /// \c{(*configurations)[i]->wTotalLength} bytes of RAM.
-  usb_configuration_descriptor_t **configurations;
+  const usb_configuration_descriptor_t *const *configurations;
   /// Pointer to array of langids, formatted like a string descriptor, with each
   /// wchar_t containing a langid, and which must be in RAM.
-  usb_string_descriptor_t *langids;
+  const usb_string_descriptor_t *langids;
   /// Number of strings per langid.
   uint8_t numStrings;
   /// Pointer to array of \c{numStrings * (langids->bLength / 2 - 1)} pointers
   /// to string descriptors, each of which must be in RAM, starting with
   /// numStrings pointers for the first langid, then for the next langid, etc.
-  usb_string_descriptor_t **strings;
+  const usb_string_descriptor_t *const *strings;
 } usb_standard_descriptors_t;
 
 typedef struct usb_device   *usb_device_t;   /**< opaque  device  handle */
@@ -526,9 +526,9 @@ typedef struct usb_timer usb_timer_t;
 typedef usb_error_t (*usb_timer_callback_t)(usb_timer_t *timer);
 
 struct usb_timer {
-    usb_timer_callback_t handler;
-    uint32_t tick;     /**< private */
-    usb_timer_t *next; /**< private */
+  usb_timer_callback_t handler;
+  uint32_t tick;     /**< private */
+  usb_timer_t *next; /**< private */
 };
 
 /**
