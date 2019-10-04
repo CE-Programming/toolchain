@@ -280,7 +280,7 @@ fat_SetSize:
 	ld	iy,(iy + 3)
 	call	util_locate_entry
 	ld	(yfatType.working_sector),a,hl
-	ld	(yfatType.working_pointer),de
+	ld	(yfatType.working_entry),de
 	ld	(util_update_file_sizes.sectorlow),hl
 	ld	(util_update_file_sizes.sectorhigh),a
 	push	de
@@ -297,7 +297,7 @@ fat_SetSize:
 	push	iy
 	ld	iy,(iy + 3)
 	push	iy
-	ld	iy,(yfatType.working_pointer)
+	ld	iy,(yfatType.working_entry)
 	ld	e,hl,(iy + 28)
 	ld	(iy + 28),a,bc			; otherwise, directly store new size
 	pop	iy
@@ -370,7 +370,7 @@ fat_SetSize:
 	compare_auhl_zero
 	jq	nz,.writenotzero
 	push	ix
-	ld	ix,(yfatType.working_pointer)
+	ld	ix,(yfatType.working_entry)
 	xor	a,a
 	ld	(ix + 20 + 0),a			; remove first cluster if zero
 	ld	(ix + 20 + 1),a
@@ -735,6 +735,51 @@ fat_WriteSector:
 	ret
 
 ;-------------------------------------------------------------------------------
+util_zerocluster:
+; okay, so I just want to rant about this function. ever since msdos 1.25 (!!),
+; the zero byte has been the marker for the end of entry chain. *however*, in
+; order to support everything and be "backwards compatible", no one actually
+; uses this byte, requiring an entire cluster to be zeroed when a directory is
+; created. this is dumb. this is stupid. screw backwards compatibily, anyone
+; still using msdos 1.25 in 2019 is literally insane or really sad because
+; they are supporting some legacy system.
+; anyway, this function just writes zeros to an entire cluster.
+; inputs:
+;   iy: fat structure
+;   auhl: cluster to zero
+; outputs:
+;   a stupid zeroed cluster
+	push	hl
+	ld	hl,tmp.sectorbuffer
+	ld	(hl),0
+	push	hl
+	pop	de
+	inc	de
+	ld	bc,512
+	ldir
+	pop	hl
+	call	util_cluster_to_sector
+	ld	b,(yfatType.cluster_size)
+.zerome:
+	push	bc
+	push	af
+	push	hl
+	call	util_write_fat_sector
+	pop	hl
+	jq	nz,.error
+	pop	af
+	call	util_increment_auhl
+	pop	bc
+	djnz	.zerome
+	xor	a,a
+	ret
+.error:
+	pop	hl,hl
+	xor	a,a
+	inc	a
+	ret
+
+;-------------------------------------------------------------------------------
 fat_Create:
 ; Creates a new file or directory entry
 ; Arguments:
@@ -752,7 +797,13 @@ fat_Create:
 	ex	de,hl
 	push	de
 	ld	hl,(iy + 6)
+	compare_hl_zero
+	jq	z,.rootdirpath
 	call	_StrCopy
+.rootdirpath:
+	ld	a,'/'
+	ld	(de),a
+	inc	de
 	ld	hl,(iy + 9)
 	call	_StrCopy
 	pop	de
@@ -771,8 +822,8 @@ fat_Create:
 	push	iy
 	call	util_alloc_entry_root
 	pop	iy
-	ld	(yfatType.working_prev_pointer),de
-	ld	(yfatType.working_pointer),de
+	ld	(yfatType.working_prev_entry),de
+	ld	(yfatType.working_entry),de
 	ld	bc,0
 	ld	(yfatType.working_prev_cluster),c,bc
 	pop	iy
@@ -786,9 +837,10 @@ fat_Create:
 	jq	z,.invalidpath
 	push	iy
 	ld	iy,(iy + 3)
-	ld	(yfatType.working_prev_pointer),de
+	ld	(yfatType.working_prev_entry),de
 	ld	(yfatType.working_sector),a,hl
-	ld	iy,tmp.sectorbuffer
+	push	de
+	pop	iy
 	ld	a,(iy + 20 + 1)
 	ld	hl,(iy + 20 - 2)	; get hlu
 	ld	l,(iy + 26 + 0)
@@ -799,7 +851,7 @@ fat_Create:
 	ld	(yfatType.working_cluster),a,hl
 	ld	(yfatType.working_prev_cluster),a,hl
 	call	util_alloc_entry
-	ld	(yfatType.working_pointer),de
+	ld	(yfatType.working_entry),de
 	pop	iy
 .createfile:
 	compare_auhl_zero
@@ -809,7 +861,7 @@ fat_Create:
 	ld	de,(iy + 9)
 	ld	iy,(iy + 3)
 	ld	(yfatType.working_sector),a,hl
-	ld	hl,(yfatType.working_pointer)
+	ld	hl,(yfatType.working_entry)
 	push	hl
 	call	util_get_fat_name
 	pop	ix
@@ -826,8 +878,7 @@ fat_Create:
 	call	util_write_fat_sector
 	pop	iy
 	jq	nz,.usberror
-	ld	a,(iy + 12)
-	bit	4,a
+	bit	4,(iy + 12)
 	jq	z,.notdirectory
 .createdirectory:
 	push	iy
@@ -836,16 +887,14 @@ fat_Create:
 	sbc	hl,hl
 	ld	(yfatType.working_cluster),a,hl
 	call	util_alloc_entry
-	ld	(yfatType.working_next_pointer),de
+	ld	(yfatType.working_next_entry),de
 	ld	(yfatType.working_sector),a,hl
-	push	hl,af
 	call	util_sector_to_cluster
 	ld	(yfatType.working_cluster),a,hl
-	pop	af,hl
-	call	util_read_fat_sector
+	call	util_zerocluster	; zero the damn cluster
 	jq	nz,.usberrorpop
-	ld	hl,(yfatType.working_next_pointer)
-	ld	(hl),'.'
+	ld	hl,(yfatType.working_next_entry)
+	ld	(hl),'.'		; sectorbuffer is zero from cluster zeroing
 	ld	b,10
 .setsingledot:
 	inc	hl
@@ -854,44 +903,33 @@ fat_Create:
 	inc	hl
 	ld	(hl),$10
 	push	ix
-	ld	ix,(yfatType.working_next_pointer)
-	ld	(ix + 12),$00
-	ld	(ix + 13),$64
-	ld	(ix + 14),$07
-	ld	(ix + 15),$1e
-	ld	(ix + 16),$41
-	ld	(ix + 17),$4f
-	ld	(ix + 18),$41
-	ld	(ix + 19),$4f
+	ld	ix,(yfatType.working_next_entry)
+	xor	a,a
+	sbc	hl,hl
+	ld	(ix + 12),a
 	ld	de,(yfatType.working_cluster + 2)
 	ld	(ix + 20),e
 	ld	(ix + 21),d
-	ld	(ix + 22),$07
-	ld	(ix + 23),$1e
-	ld	(ix + 24),$41
-	ld	(ix + 25),$4f
 	ld	de,(yfatType.working_cluster + 0)
 	ld	(ix + 26),e
 	ld	(ix + 27),d
-	ld	(ix + 28),$00
-	ld	(ix + 29),$00
-	ld	(ix + 30),$00
-	ld	(ix + 31),$00
+	ld	(ix + 28),hl
+	ld	(ix + 31),a
 	pop	ix
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector
 	jq	nz,.usberrorpop
-	ld	de,(yfatType.working_prev_pointer)
-	ld	(yfatType.working_pointer),de
+	ld	de,(yfatType.working_prev_entry)
+	ld	(yfatType.working_entry),de
 	call	util_alloc_entry
-	ld	(yfatType.working_next_pointer),de
+	ld	(yfatType.working_next_entry),de
 	ld	(yfatType.working_sector),a,hl
 	call	util_read_fat_sector
 	jq	nz,.usberrorpop
 	ld	a,hl,(yfatType.working_sector)
 	call	util_sector_to_cluster
 	ld	(yfatType.working_cluster),a,hl
-	ld	hl,(yfatType.working_next_pointer)
+	ld	hl,(yfatType.working_next_entry)
 	ld	(hl),'.'
 	inc	hl
 	ld	(hl),'.'
@@ -903,29 +941,20 @@ fat_Create:
 	inc	hl
 	ld	(hl),$10
 	push	ix
-	ld	ix,(yfatType.working_next_pointer)
+	ld	ix,(yfatType.working_next_entry)
+	xor	a,a
+	sbc	hl,hl
 	ld	(ix + 12),$00
-	ld	(ix + 13),$64
-	ld	(ix + 14),$07
-	ld	(ix + 15),$1e
-	ld	(ix + 16),$41
-	ld	(ix + 17),$4f
-	ld	(ix + 18),$41
-	ld	(ix + 19),$4f
 	ld	de,(yfatType.working_prev_cluster + 2)
 	ld	(ix + 20),e
 	ld	(ix + 21),d
-	ld	(ix + 22),$07
-	ld	(ix + 23),$1e
-	ld	(ix + 24),$41
-	ld	(ix + 25),$4f
 	ld	de,(yfatType.working_prev_cluster + 0)
 	ld	(ix + 26),e
 	ld	(ix + 27),d
-	ld	(ix + 28),$00
-	ld	(ix + 29),$00
-	ld	(ix + 30),$00
-	ld	(ix + 31),$00
+	ld	(ix + 28),hl
+	ld	(ix + 31),a
+	ld	(ix + 32 + 0),a
+	ld	(ix + 32 + 11),a		; zero next entry, mark as eoc
 	pop	ix
 	ld	a,hl,(yfatType.working_sector)
 	call	util_write_fat_sector
@@ -994,14 +1023,19 @@ fat_Delete:
 	ld	a,d
 	jq	nz,.dirnotempty
 	push	ix
+	push	hl,af
 	call	util_read_fat_sector	; reread entry sector
+	pop	de,hl
+	ld	a,d
 	pop	ix			; a directory can now be treated as a normal file
+	jq	nz,.usberror
 .normalfile:
 	ld	(ix + 11),0
 	ld	(ix + 0),$e5
 	push	ix
 	call	util_write_fat_sector
 	pop	ix
+	jq	nz,.usberror
 	ld	a,(ix + 20 + 1)
 	ld	hl,(ix + 20 - 2)	; get hlu
 	ld	l,(ix + 26 + 0)
@@ -1138,7 +1172,7 @@ util_alloc_cluster:
 ;   iy: fat structure
 ;   iy + working_cluster: previous cluster
 ;   iy + working_sector: entry sector
-;   iy + working_pointer: entry in sector
+;   iy + working_entry: entry in sector
 ; outputs:
 ;   auhl: allocated cluster number
 	xor	a,a
@@ -1216,7 +1250,7 @@ util_alloc_cluster:
 	call	util_read_fat_sector
 	jq	nz,.usberror
 	push	ix
-	ld	ix,(yfatType.working_pointer)
+	ld	ix,(yfatType.working_entry)
 	ld	de,(yfatType.working_next_cluster + 0)
 	ld	(ix + 26),e
 	ld	(ix + 27),d
@@ -1258,7 +1292,7 @@ util_update_fat_table:
 ;   iy: fat structure
 ;   iy + working_cluster: previous cluster
 ;   iy + working_sector: entry sector
-;   iy + working_pointer: entry in sector
+;   iy + working_entry: entry in sector
 ; outputs:
 ;   auhl: new entry sector
 ;   de: offset in entry sector
@@ -1293,7 +1327,7 @@ util_do_alloc_entry:
 ;   iy: fat structure
 ;   iy + working_cluster: first cluster
 ;   iy + working_sector: parent entry sector
-;   iy + working_pointer: parent entry in sector
+;   iy + working_entry: parent entry in sector
 ; outputs:
 ;   auhl: new entry sector
 ;   de: offset in entry sector
@@ -1351,10 +1385,6 @@ util_alloc_entry:
 	dec	b
 	jq	z,.movetonextcluster
 	lea	de,iy			; pointer to new entry
-	xor	a,a
-	lea	iy,iy + 32
-	ld	(iy + 0),a
-	ld	(iy + 11),a
 	pop	iy,af,hl,bc
 	push	af,hl,de
 	ld	a,0
@@ -1382,7 +1412,8 @@ util_alloc_entry_root:
 	xor	a,a
 	sbc	hl,hl
 	ld	(yfatType.working_sector),a,hl
-	ld	(yfatType.working_pointer),hl
+	ld	hl,tmp.sectorbuffer
+	ld	(yfatType.working_entry),hl
 	ld	a,hl,(yfatType.root_dir_pos)
 	call	util_sector_to_cluster
 	ld	(yfatType.working_cluster),a,hl
@@ -1607,7 +1638,7 @@ util_is_directory_empty:
 
 ;-------------------------------------------------------------------------------
 util_update_file_sizes:
-	ld	de,(yfatType.working_pointer)
+	ld	de,(yfatType.working_entry)
 	ld	a,hl,(yfatType.working_size)
 	push	iy
 	ld	b,MAX_FAT_FILES

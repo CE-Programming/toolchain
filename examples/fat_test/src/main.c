@@ -3,8 +3,6 @@ typedef struct global global_t;
 
 #include <usbdrvce.h>
 #include <fatdrvce.h>
-
-#include <debug.h>
 #include <tice.h>
 
 #include <stdbool.h>
@@ -122,14 +120,33 @@ void main(void) {
 
         putstr("inited fat filesystem");
 
-        // attempt init of fat partition
-        file = fat_Open(&fat, "/DIRA/DIRB/FILE.TXT", FAT_OPEN_RDWR);
-        if (file) {
-            error = fat_ReadSector(file, filebuffer);
-            putstr("located file");
-        } else {
-            putstr("no file");
-	}
+        // create some directories and files
+	fat_Create(&fat, "/", "FATTEST", FAT_DIR);
+	fat_Create(&fat, "/FATTEST", "DIR1", FAT_DIR);
+	fat_Create(&fat, "/FATTEST", "DIR2", FAT_DIR);
+	fat_Create(&fat, "/FATTEST", "DIR3", FAT_DIR);
+
+	fat_Create(&fat, "/FATTEST/DIR1", "FILE.TXT", FAT_FILE);
+	fat_Create(&fat, "/FATTEST/DIR2", "FILE1.TXT", FAT_FILE);
+	fat_Create(&fat, "/FATTEST/DIR2", "FILE2.TXT", FAT_FILE);
+
+	// change the size of the first file
+	fat_SetSize(&fat, "/FATTEST/DIR1/FILE.TXT", 512 * 1024);
+	fat_SetSize(&fat, "/FATTEST/DIR1/FILE.TXT", 512 * 0);
+	fat_SetSize(&fat, "/FATTEST/DIR1/FILE.TXT", 512 * 10);
+
+	// change the size of the other files
+	fat_SetSize(&fat, "/FATTEST/DIR2/FILE1.TXT", 512 * 2 + 16);
+	fat_SetSize(&fat, "/FATTEST/DIR2/FILE2.TXT", 512 * 2 + 32);
+
+	// should not delete, nonempty directory
+	fat_Delete(&fat, "/FATTEST/DIR2");
+
+	// should delete, empty directory
+	fat_Delete(&fat, "/FATTEST/DIR3");
+
+	// delete file
+	fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
     }
 
     if( error == USB_SUCCESS )

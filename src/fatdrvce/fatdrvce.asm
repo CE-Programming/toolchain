@@ -214,8 +214,9 @@ struct fatType
 	working_prev_cluster rd 1
 	working_size rd 1
 	working_pointer rl 1
-	working_next_pointer rl 1
-	working_prev_pointer rl 1
+	working_entry rl 1
+	working_next_entry rl 1
+	working_prev_entry rl 1
 	size := $-.
 end struct
 
@@ -339,7 +340,7 @@ struct tmp_data
 	label .: size
 	sensecount rb 1
 	sensebuffer rb 512	; todo: evaluate if needed
-	sectorbuffer rb 512	; todo: evaluate if user-supplied
+	sectorbuffer rb 576	; todo: evaluate if user-supplied
 	length rl 1
 	descriptor rb 18
 	msdstruct rl 1

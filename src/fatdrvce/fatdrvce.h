@@ -79,8 +79,9 @@ typedef struct {
     uint32_t working_prev_cluster;
     uint32_t working_size;
     uint24_t working_pointer;
-    uint24_t working_next_pointer;
-    uint24_t working_prev_pointer;
+    uint24_t working_entry;
+    uint24_t working_next_entry;
+    uint24_t working_prev_entry;
 } fat_t;
 
 typedef struct {
@@ -120,7 +121,7 @@ typedef enum {
     MSD_ERROR_INVALID_DEVICE
 } msd_error_t;
 
-#define FAT_NORMAL    (0 << 0)  /**< Entry has no attributes. */
+#define FAT_FILE      (0 << 0)  /**< Entry has no attributes. */
 #define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
 #define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden. */
 #define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory. */
