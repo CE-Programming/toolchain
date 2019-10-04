@@ -142,6 +142,11 @@ size_t srl_Read_Blocking(srl_device_t *srl, void *buffer, size_t length, uint24_
  */
 size_t srl_Write_Blocking(srl_device_t *srl, const void *buffer, size_t length, uint24_t timeout);
 
+/**
+ * Returns a pointer to CDC ACM descriptors, to be used with usb_Init
+ */
+usb_standard_descriptors_t *srl_GetCDCStandardDescriptors(void);
+
 #ifdef __cplusplus
 }
 #endif

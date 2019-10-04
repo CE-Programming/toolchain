@@ -20,6 +20,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export srl_Write
 	export srl_Read_Blocking
 	export srl_Write_Blocking
+	export srl_GetCDCStandardDescriptors
 ;-------------------------------------------------------------------------------
 macro compare_hl_zero?
 	add	hl,de
@@ -232,6 +233,20 @@ srl_Init:
 	ex	hl,de
 	ld	hl,(iy + 3)
 	ld	(hl),de
+
+	call	usb_GetRole			; check if calc is acting as device
+	or	a,a
+	jq	z,.host
+
+	ld	a,SRL_HOST			; calc is acting as device
+	ld	(xsrl_Device.type),a
+	ld	a,$83				; set endpoints
+	ld	(.epIn),a
+	ld	a,$04
+	ld	(.epOut),a
+	jq	.getEndpoints
+
+.host:
 	push	iy				; get descriptor
 	ld	bc,tmp.length			; storage for size of descriptor
 	push	bc
@@ -416,6 +431,10 @@ srl_Init:
 	pop	bc
 	pop	bc
 
+	pop	iy				; needed to keep stack balanced
+
+.getEndpoints:
+	push	iy
 	ld	bc,$83				; get endpoint
 	.epOut = $-3
 	push	bc
@@ -424,6 +443,8 @@ srl_Init:
 	pop	de
 	pop	bc
 	ld	(xsrl_Device.in),hl
+	dec	hl
+	jq	c,.err_nd
 
 	ld	bc,$04				; get endpoint
 	.epIn = $-3
@@ -434,6 +455,8 @@ srl_Init:
 	pop	bc
 	pop	bc
 	ld	(xsrl_Device.out),hl
+	dec	hl
+	jq	c,.err_nd
 	pop	iy
 ;end temp code
 
@@ -477,7 +500,7 @@ srl_SetRate:
 	ld	a,SRL_UNKNOWN			; check device type
 	cp	a,(xsrl_Device.type)
 	jq	z,.exit
-	inc	a
+	inc	a				; SRL_HOST
 	cp	a,(xsrl_Device.type)
 	jq	z,.exit
 	inc	a
@@ -499,7 +522,7 @@ srl_SetRate:
 	jq	z,.noStop
 	ld	(xsrl_Device.stopRead),a	; stop read
 .loop:
-	call	usb_HandleEvents		; wait for read to stop
+	call	usb_WaitForEvents		; wait for read to stop
 	ld	a,(xsrl_Device.readBufActive)
 	jq	nz,.loop
 .noStop:
@@ -1008,6 +1031,27 @@ openDebug:
 	pop	hl
 	ret
 
+;temp: device in ix, byte in a
+dbg_WriteByte:
+	push	hl,bc,de,ix,iy
+	ld	(.byte),a
+	ld	bc,0
+	push	bc		; transferred
+	dec	bc
+	push	bc		; retries
+	inc	bc
+	inc	bc
+	push	bc		; length
+	ld	bc,.byte	; data
+	push	bc
+	ld	bc,(xsrl_Device.out)
+	push	bc
+	call	usb_Transfer
+	pop	bc,bc,bc,bc,bc,iy,ix,de,bc,hl
+	ret
+.byte:
+	rb	1
+
 ;-------------------------------------------------------------------------------
 ; library data
 ;-------------------------------------------------------------------------------
@@ -1019,3 +1063,20 @@ defaultlinecoding:
 db	$80,$25,0,0,0,0,8
 
 tmp tmp_data
+
+srl_GetCDCStandardDescriptors:
+	ld	hl,.descriptors
+	ret
+.descriptors:
+	dl .device, .configurations, .langids
+	db 2
+	dl .strings
+.device emit $12: $1201000200000040510408E0200201020001 bswap $12
+.configurations dl .configuration1
+.configuration1 emit $3e: $09023e00020100c0320904000001020200000524000110042402000524060001070582030800ff09040100020a0000000705040240000107058302400001 bswap $3e
+.langids dw $0304, $0409
+.strings dl .string1
+.model dl .string84
+.string1 dw $033E, 'T','e','x','a','s',' ','I','n','s','t','r','u','m','e','n','t','s',' ','I','n','c','o','r','p','o','r','a','t','e','d'
+.string83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
+.string84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
