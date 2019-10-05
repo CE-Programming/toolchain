@@ -452,16 +452,16 @@ fat_SetFilePos:
 	push	iy
 	ld	iy,(yfatFile.fat)
 	ld	c,(yfatType.cluster_size)
+	pop	iy
 	xor	a,a
 	ld	e,a
 	push	bc,hl
 	call	__lremu		; get sector offset in cluster
-	ld	(.clusteroffset),hl
+	ld	(yfatFile.cluster_sector),l
 	pop	hl,bc
 	xor	a,a
 	ld	e,a
 	call	__ldivu
-	pop	iy
 	push	hl
 	pop	bc
 	ld	a,hl,(yfatFile.first_cluster)
@@ -487,9 +487,9 @@ fat_SetFilePos:
 	call	util_cluster_to_sector
 	pop	iy
 	ld	de,0
-.clusteroffset := $-3
+	ld	e,(yfatFile.cluster_sector)
 	add	hl,de
-	adc	a,0
+	adc	a,d
 	ld	(yfatFile.current_sector),a,hl
 .success:
 	xor	a,a
@@ -610,10 +610,10 @@ fat_ReadSector:
 	pop	de,iy,hl
 	push	hl,iy,de
 	ld	(yfatFile.working_buffer),hl
-	ld	de,(yfatFile.fpossector)
-	ld	hl,(yfatFile.file_size_sectors)
+	ld	hl,(yfatFile.fpossector)
+	ld	de,(yfatFile.file_size_sectors)
 	compare_hl_de
-	jq	z,.eof
+	jq	nc,.eof
 	ld	a,hl,(yfatFile.current_sector)
 	ld	bc,0
 	ld	c,(yfatFile.cluster_sector)
