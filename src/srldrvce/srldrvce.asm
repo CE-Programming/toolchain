@@ -269,7 +269,25 @@ srl_Init:
 	jq	nz,.err_nd
 
 	push	iy
+	ld	bc,.configNum			; get current configuration number
+	push	bc
+	ld	bc,(xsrl_Device.dev)
+	push	bc
+	call	usb_GetConfiguration
+	pop	bc,bc,iy
+
+	ld	a,(.configNum)
+	or	a,a
+	ld	(.prevConfig),a
+	jr	nz,.configSet
+	ld	a,1
+.configSet:
+	ld	(.configNum),a
+
+	push	iy
 	ld	bc,0				; get config length
+	.configNum = $-3
+	dec	bc
 	push	bc
 	ld	bc,(xsrl_Device.dev)
 	push	bc
@@ -277,16 +295,23 @@ srl_Init:
 	pop	bc
 	pop	bc
 	ld	(.configSize),hl
-; todo: error if not enough space
 
-	pop	iy				; get config into buffer
-	push	iy
+	pop	iy
+
+	ld	de,(iy + 12)			; error if not enough space
+	ex	hl,de
+	compare_hl_de
+	ld	a,SRL_ERROR_NO_MEMORY
+	jq	c,.exit
+
+	push	iy				; get config into buffer
 	ld	bc,tmp.length
 	push	bc
 	push	hl				; descriptor length
 	ld	bc,(iy + 9)
 	push	bc
-	ld	bc,0
+	ld	bc,(.configNum)
+	dec	bc
 	push	bc
 	ld	bc,CONFIGURATION_DESCRIPTOR
 	push	bc
@@ -294,7 +319,6 @@ srl_Init:
 	push	bc
 	call	usb_GetDescriptor
 	pop	de,hl,hl,bc,hl,hl,iy
-; todo: check if device is configured
 
 	ld	hl,tmp.descriptor + deviceDescriptor.idVendor		; check if device is an FTDI
 	ld	a,(hl)
@@ -404,6 +428,10 @@ srl_Init:
 	ld	(xsrl_Device.type),a
 
 .shared:
+	ld	a,0				; check if configuration is already set
+	.prevConfig = $-1
+	or	a,a
+	jr	nz,.getEndpoints
 
 	push	iy
 
