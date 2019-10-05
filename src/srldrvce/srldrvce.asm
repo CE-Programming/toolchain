@@ -260,13 +260,7 @@ srl_Init:
 	push	bc
 	push	de
 	call	usb_GetDescriptor
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	iy
+	pop	bc,bc,bc,bc,bc,bc,iy
 	compare_hl_zero
 	jq	nz,.exit			; return if error
 	ld	de,18
@@ -282,7 +276,7 @@ srl_Init:
 	call	usb_GetConfigurationDescriptorTotalLength
 	pop	bc
 	pop	bc
-	ld	(configSize),hl
+	ld	(.configSize),hl
 ; todo: error if not enough space
 
 	pop	iy				; get config into buffer
@@ -299,13 +293,7 @@ srl_Init:
 	ld	bc,(xsrl_Device.dev)
 	push	bc
 	call	usb_GetDescriptor
-	pop	de
-	pop	hl
-	pop	hl
-	pop	bc
-	pop	hl
-	pop	hl
-	pop	iy
+	pop	de,hl,hl,bc,hl,hl,iy
 ; todo: check if device is configured
 
 	ld	hl,tmp.descriptor + deviceDescriptor.idVendor		; check if device is an FTDI
@@ -420,16 +408,14 @@ srl_Init:
 	push	iy
 
 	ld	hl,0
-	configSize = $-3
+	.configSize = $-3
 	push	hl
 	ld	bc,(iy + 9)
 	push	bc
 	ld	bc,(xsrl_Device.dev)
 	push	bc
 	call	usb_SetConfiguration
-	pop	de
-	pop	bc
-	pop	bc
+	pop	de,bc,bc
 
 	pop	iy				; needed to keep stack balanced
 
@@ -547,11 +533,7 @@ srl_SetRate:
 	pop	bc
 	push	hl
 	call	usb_ControlTransfer		; send control request
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
+	pop	bc,bc,bc,bc,bc
 	ld	a,(xsrl_Device.readBufActive)	; check if read needs to be started
 	or	a,a
 	call	z,srl_StartAsyncRead
@@ -809,15 +791,11 @@ srl_Read_Blocking:
 	push	hl
 	push	ix
 	call	srl_Read			; srl_Read(srl, buffer + total, length - total)
-	pop	de
-	pop	de
-	pop	de
-	pop	bc
+	pop	de,de,de,bc
 	add	hl,bc				; total += len
 	push	hl
 	call	usb_HandleEvents
-	pop	bc
-	pop	iy
+	pop	bc,iy
 	xor	a,a
 	ld	hl,(iy + 9)
 	sbc	hl,bc
@@ -846,10 +824,7 @@ srl_Write_Blocking:
 	push	hl
 	push	ix
 	call	srl_Write			; srl_Write(srl, buffer + total, length - total)
-	pop	de
-	pop	de
-	pop	de
-	pop	bc
+	pop	de,de,de,bc
 	add	hl,bc				; total += len
 	push	hl
 	call	usb_HandleEvents
@@ -978,11 +953,7 @@ srl_StartAsyncRead:
 	ld	bc,(xsrl_Device.in)
 	push	bc
 	call	usb_ScheduleTransfer
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
+	pop	bc,bc,bc,bc,bc
 	ld	a,1				; set readBufActive
 .exit:
 	ld	(xsrl_Device.readBufActive),a
@@ -1015,11 +986,7 @@ srl_StartAsyncWrite:
 	ld	bc,(xsrl_Device.out)
 	push	bc
 	call	usb_ScheduleTransfer
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
+	pop	bc,bc,bc,bc,bc
 	ret
 
 ;temp
