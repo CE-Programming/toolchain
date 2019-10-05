@@ -312,7 +312,11 @@ fat_SetSize:
 	jq	nz,.notzerofile
 	push	iy
 	ld	iy,(iy + 3)
-	jq	.dealloc
+	ld	a,hl,(.currentcluster)
+	call	util_dealloc_cluster_chain	; deallocate all clusters
+	pop	iy
+	jq	nz,.usberror
+	jq	.success
 .notzerofile:
 	push	hl
 	pop	bc
@@ -334,7 +338,6 @@ fat_SetSize:
 	compare_bc_zero
 	jq	nz,.traverseclusters
 	call	util_set_new_eoc_cluster	; mark this cluster as unused
-.dealloc:
 	call	util_dealloc_cluster_chain	; deallocate all other clusters
 	pop	iy
 	jq	nz,.usberror
@@ -463,6 +466,7 @@ fat_SetFilePos:
 	pop	bc
 	ld	a,hl,(yfatFile.first_cluster)
 	ld	(yfatFile.current_cluster),a,hl
+	jq	.entergetpos
 .getclusterpos:
 	push	bc
 	ld	a,hl,(yfatFile.current_cluster)
@@ -475,6 +479,7 @@ fat_SetFilePos:
 	compare_hl_zero
 	jq	z,.chainfailed
 	dec	bc
+.entergetpos:
 	compare_bc_zero
 	jr	nz,.getclusterpos
 	push	iy
@@ -751,11 +756,11 @@ util_zerocluster:
 ;   a stupid zeroed cluster
 	push	hl
 	ld	hl,tmp.sectorbuffer
-	ld	(hl),0
 	push	hl
 	pop	de
 	inc	de
 	ld	bc,512
+	ld	(hl),c
 	ldir
 	pop	hl
 	call	util_cluster_to_sector

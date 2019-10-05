@@ -133,6 +133,7 @@ typedef enum {
 //#define FAT_RDONLY  (1 << 0) /**< Open file in read-only mode. */
 #define FAT_RDWR      (FAT_RDONLY | FAT_WRONLY)  /**< Open file for reading and writing. */
 
+#define MSD_SECTOR_SIZE 512 /**< Size of device sector, library only supports 512 bytes. */
 
 /**
  * Locates any available FAT partitions detected on the mass storage device
