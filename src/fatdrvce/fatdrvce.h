@@ -99,6 +99,14 @@ typedef struct {
     uint24_t entry_pointer; /**< Pointer to buffer index for entry. */
 } fat_file_t;
 
+typedef struct {
+    char filename[13];
+    uint8_t attrib;
+    uint32_t size;
+} fat_dir_entry_t;
+
+typedef uint24_t fat_dir_pos_t;
+
 typedef enum {
     FAT_SUCCESS=0,
     FAT_ERROR_INVALID_PARAM,
@@ -111,6 +119,8 @@ typedef enum {
     FAT_ERROR_FAILED_ALLOC,
     FAT_ERROR_CLUSTER_CHAIN,
     FAT_ERROR_DIRECTORY_NOT_EMPTY,
+    FAT_ERROR_NO_MORE_ENTRIES,
+    FAT_ERROR_NO_VOLUME_LABEL,
     FAT_USER_ERROR=1000
 } fat_error_t;
 
@@ -162,6 +172,44 @@ fat_error_t fat_Find(msd_device_t *msd,
  */
 fat_error_t fat_Init(fat_t *fat,
                      fat_partition_t *partition);
+
+/**
+ * Parses a directory and returns the list of files and subdirectories in it.
+ * @param dir Directory to get list from.
+ * @param pos Current position in parser. Set to 0 to start the parser.
+ * @param entry Single entry returned.
+ * pos should be 0 to begin the parser, and is updated with each call.
+ *
+ * @code
+ *  #define MAX_ENTRIES 10
+ *
+ *  fat_error_t error = FAT_SUCCESS;
+ *  fat_dir_entry_t entry[MAX_ENTRIES];
+ *  fat_dir_pos_t pos = 0;
+ *  uint8_t i = 0;
+ *
+ *  while (error == FAT_SUCCESS && i < MAX_ENTRIES)
+ *      error = fat_DirEntry("/DIR", &pos, &entry[i]);
+ *      if (error == FAT_SUCCESS)
+ *      {
+ *          i++;
+ *      }
+ *  };
+ * @endcode
+ *
+ * @return FAT_SUCCESS on success, and FAT_ERROR_NO_MORE_ENTRIES if no more
+ *         directory entries are available.
+ */
+fat_error_t fat_DirEntry(const char *dir, fat_dir_pos_t *pos, fat_dir_entry_t *entry);
+
+/**
+ * Returns the volume label of the drive if it exists.
+ * @param fat Initialized FAT structure type.
+ * @param label Storage for returning label, must be >= 13 bytes.
+ * @retuns FAT_SUCCESS on success, FAT_ERROR_NO_VOLUME_LABEL if no label,
+ *         otherwise a different error.
+ */
+fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
 
 /**
  * Creates new files or directories in the filesystem.
@@ -336,9 +384,9 @@ msd_error_t msd_ReadSector(msd_device_t *msd,
  * @param buffer Buffer to write to MSD. Should be at least one sector size.
  * @return MSD_SUCCESS on success.
  */
-msd_error_t msd_WriteSectors(msd_device_t *msd,
-                             uint32_t lba,
-                             const void *data);
+msd_error_t msd_WriteSector(msd_device_t *msd,
+                            uint32_t lba,
+                            const void *data);
 
 #ifdef __cplusplus
 }

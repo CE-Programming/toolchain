@@ -38,6 +38,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export msd_WriteSector
 	export fat_Find
 	export fat_Init
+	export fat_DirEntry
+	export fat_GetVolumeLabel
 	export fat_Open
 	export fat_Close
 	export fat_SetSize
@@ -308,6 +310,8 @@ virtual at 0
 	FAT_ERROR_FAILED_ALLOC rb 1
 	FAT_ERROR_CLUSTER_CHAIN rb 1
 	FAT_ERROR_DIRECTORY_NOT_EMPTY rb 1
+	FAT_ERROR_NO_MORE_ENTRIES rb 1
+	FAT_ERROR_NO_VOLUME_LABEL rb 1
 end virtual
 
 virtual at 0

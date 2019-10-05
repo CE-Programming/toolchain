@@ -184,6 +184,29 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat_DirEntry:
+; Parses directory entires for files and subdirectories
+; Arguments:
+;  sp + 3 : FAT structure type
+;  sp + 6 : Current search position
+;  sp + 9 : Pointer to store directory entry to
+; Returns:
+;  FAT_SUCCESS on success
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
+fat_GetVolumeLabel:
+; Returns the volume label if it exists
+; Arguments:
+;  sp + 3 : FAT structure type
+;  sp + 6 : Volume label (8.3 format) storage
+; Returns:
+;  FAT_SUCCESS on success, and FAT_ERROR_NO_VOLUME_LABEL
+	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ret
+
+;-------------------------------------------------------------------------------
 fat_Open:
 ; Attempts to open a file for reading and/or writing
 ; Arguments:
