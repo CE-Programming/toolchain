@@ -789,10 +789,10 @@ usb_GetDeviceHub:
 	sbc	hl,hl
 	cp	a,iyl
 	ret	z
-	ld	de,(ydevice.hub+1)
+	ld	de,(ydevice.hub)
 .returnDEIfValid:
 	bit	0,de
-	ret	z
+	ret	nz
 	ex	de,hl
 	ret
 
