@@ -315,6 +315,8 @@ virtual at usbArea
 	?eventCallback.data	rl 1
 	?currentDescriptors	rl 1
 	?selectedConfiguration	rb 1
+	?deviceStatus		rb 1
+	?tempEndpointStatus	rw 1
 	?currentRole		rb 1
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
@@ -518,6 +520,8 @@ usb_Init:
 	res	bTmr2Overflow,(hl)
 	set	bTmr2Enable,(hl)
 	sbc	hl,hl
+assert deviceStatus+1 = tempEndpointStatus
+	ld	(deviceStatus),hl
 	dec	hl
 	ld	(cleanupListReady),hl
 	inc	hl
@@ -572,7 +576,7 @@ usb_Init:
 	ld	l,usbFifoRxImr-$100
 	ld	(hl),a;0
 	ld	l,usbFifoTxImr-$100
-	ld	(hl),bmUsbIntFifo0In or bmUsbIntFifo1In or bmUsbIntFifo2In or bmUsbIntFifo3In
+	ld	(hl),bmUsbFifoTxInts
 	ld	l,usbDevImr-$100
 	ld	(hl),a;0
 	inc	l;usbDevImr+1-$100
@@ -1064,7 +1068,7 @@ assert xconfigurationDescriptor.bNumInterfaces+1 = xconfigurationDescriptor.bCon
 	ld	bc,(xconfigurationDescriptor.bNumInterfaces)
 	push	bc
 	ld	b,c
-	call	_ParseInterfaceDescriptors
+	call	_ParseInterfaceDescriptors.host
 	pop	bc,ix
 	jq	nz,_Error.INVALID_PARAM
 	call	_Alloc32Align32
@@ -2348,8 +2352,8 @@ assert bmUsbRole shr 16 = usbFifoIn
 assert usbFifo0Cfg > usbFifo0Map
 	setmsk	usbFifo0Cfg xor usbFifo0Map,hl
 	ld	(hl),e
-assert usbOutEp1 > usbInEp1
 	ld	a,usbOutEp1+1-4-$100
+assert usbOutEp1 > usbInEp1
 repeat 2
 	sub	a,c
 end repeat
@@ -2391,11 +2395,11 @@ end repeat
 ;  hl = ? and $FFFF
 ;  ix = ?
 ;  iy = device
-_ParseInterfaceDescriptors.clear:
+_ParseInterfaceDescriptors:
 	ld	hl,mpUsbDevTest
 	set	bUsbTstClrFifo,(hl)
 	res	bUsbTstClrFifo,(hl)
-_ParseInterfaceDescriptors:
+.host:
 	inc	b
 .dec:
 	ld	(.alt),a
@@ -2987,6 +2991,57 @@ _HandleCxSetupInt:
 	ld	bc,(ysetup.bmRequestType)
 	inc	b
 	djnz	.notGetStatus
+	ld	a,c
+	sub	a,DEVICE_TO_HOST or STANDARD_REQUEST-1
+	ld	b,a
+	ld	c,2
+	ld	de,(ysetup.wLength)
+	ld	a,e
+	xor	a,c
+	or	a,d
+	ld	de,(ysetup.wValue)
+	or	a,e
+	or	a,d
+	ld	de,(ysetup.wIndex)
+	or	a,d
+	jq	nz,.unhandled
+	or	a,e
+	ld	de,tempEndpointStatus
+	djnz	.notGetDeviceStatus
+	jq	nz,.unhandled
+	ld	(de),a
+assert tempEndpointStatus-1 = deviceStatus
+	dec	de
+	jq	_HandleGetDescriptor.sendDescriptor
+.notGetDeviceStatus:
+	djnz	.notGetInterfaceStatus
+	xor	a,a
+.sendStatus:
+	ld	(de),a
+	jq	_HandleGetDescriptor.sendDescriptor
+.notGetInterfaceStatus:
+	djnz	.notGetEndpointStatus
+	add	a,a
+	jq	z,.sendStatus
+	ld	hl,mpUsbOutEp1+2-4
+	jq	nc,.out
+assert usbInEp1 < usbOutEp1
+	resmsk	(usbInEp1-2) xor (usbOutEp1-2),hl
+.out:
+	cp	a,(8+1) shl 1
+	jq	nc,.unhandled
+repeat 2
+	add	a,l
+end repeat
+	ld	l,a
+	ld	a,(hl)
+repeat bUsbEpStall-8
+	rrca
+end repeat
+	and	a,1
+	jq	.sendStatus
+.notGetEndpointStatus:
+	jq	.unhandled
 .notGetStatus:
 	djnz	.notClearFeature
 .notClearFeature:
@@ -3013,12 +3068,28 @@ _HandleCxSetupInt:
 .notSetAddress:
 	djnz	.notGetDescriptor
 	ld	a,c
-	sub	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
+	xor	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
 	jq	z,_HandleGetDescriptor
 .notGetDescriptor:
 	djnz	.notSetDescriptor
 .notSetDescriptor:
 	djnz	.notGetConfiguration
+	ld	a,c
+	xor	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
+	ld	bc,(ysetup.wValue)
+	or	a,c
+	ld	a,b
+	ld	bc,(ysetup.wIndex)
+	or	a,c
+	or	a,b
+	ld	bc,(ysetup.wLength)
+	dec	c
+	or	a,c
+	inc	c
+	or	a,b
+	ld	de,selectedConfiguration
+	jq	z,_HandleGetDescriptor.sendDescriptor
+	ld	b,a
 .notGetConfiguration:
 	djnz	.notSetConfiguration
 	ld	de,(ysetup.wValue)
@@ -3051,14 +3122,16 @@ end repeat
 	ld	ydevice,(rootHub.child)
 	ld	de,(xconfigurationDescriptor.wTotalLength)
 	ld	b,(xconfigurationDescriptor.bNumInterfaces)
-	call	z,_ParseInterfaceDescriptors.clear
+	call	z,_ParseInterfaceDescriptors
 	pop	ix
 	lea	de,ydevice
 	ld	a,USB_HOST_CONFIGURE_EVENT
 	call	z,_DispatchEvent
 	jq	nz,.unhandled
+	ld	a,(setupPacket.wValue)
 	scf
 .setConfigured:
+	ld	(selectedConfiguration),a
 	ld	hl,mpUsbDevAddr
 	ld	a,(hl)
 	rla
@@ -3341,8 +3414,11 @@ end repeat
 
 _HandleDevResetInt:
 	xor	a,a
+	ld	l,usbDevAddr-$100
+	ld	(hl),a
 	ld	(selectedConfiguration),a
-	ld	(mpUsbDevAddr),a
+	inc	a
+	ld	(deviceStatus),a
 	ld	l,usbDmaCtrl-$100
 	ld	(hl),bmUsbDmaClrFifo or bmUsbDmaAbort
 	ld	l,usbCxFifo-$100
