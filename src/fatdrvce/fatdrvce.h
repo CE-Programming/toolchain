@@ -134,7 +134,10 @@ typedef enum {
 #define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory. */
 #define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory. */
 #define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
-#define FAT_ALL       (FAT_DIR | FAT_VOLLABEL | FAT_SYSTEM | FAT_HIDDEN | FAT_RDONLY)
+#define FAT_ARCHIVE   (1 << 5)  /**< Entry is a directory (or subdirectory). */
+#define FAT_FILEONLY  (FAT_FILE | FAT_RDONLY | FAT_ARCHIVE) /**< For listing only files */
+#define FAT_NORMAL    (FAT_DIR | FAT_FILEONLY) /**< For listing directories and files */
+#define FAT_ALL       (FAT_NORMAL | FAT_HIDDEN | FAT_SYSTEM) /**< For listing all entry types */
 
 #define FAT_WRONLY    (1 << 1) /**< Open file in write-only mode. */
 //#define FAT_RDONLY  (1 << 0) /**< Open file in read-only mode. */
@@ -182,6 +185,7 @@ fat_error_t fat_Deinit(fat_t *fat);
  * Parses a directory and returns a list of files and subdirectories in it.
  * @param fat Initialized FAT structure type.
  * @param dir Directory path to get list from.
+ * @param mask Mask to find entries of a particular type (e.g. FAT_NORMAL)
  * @param entries Location to store found entries.
  * @param size Number of avaiable entries to store to in the entries argument.
  *             Must be greater than or equal to 1.
@@ -192,13 +196,14 @@ fat_error_t fat_Deinit(fat_t *fat);
  *  #define MAX_ENTRIES 10
  *
  *  fat_dir_entry_t entries[MAX_ENTRIES];
- *  int24_t count = fat_DirList("/DIR", entries, MAX_ENTRIES, 0);
+ *  int24_t count = fat_DirList("/DIR", FAT_DIR, entries, MAX_ENTRIES, 0);
  * @endcode
  *
  * @return Number of entries found, or -1 if an error occurred.
  */
 int24_t fat_DirList(fat_t *fat,
                     const char *path,
+                    uint8_t mask,
                     fat_dir_entry_t *entries,
                     uint24_t size,
                     uint24_t skip);

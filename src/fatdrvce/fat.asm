@@ -216,20 +216,24 @@ fat_DirList:
 ; Arguments:
 ;  sp + 3 : FAT structure type
 ;  sp + 6 : Directory path
-;  sp + 9 : Storage for entries
-;  sp + 12 : Storage for entries number of entries
-;  sp + 15 : Amount of entries to skip
+;  sp + 9 : Mask for filtering entries
+;  sp + 12 : Storage for entries
+;  sp + 15 : Storage for entries number of entries
+;  sp + 18 : Amount of entries to skip
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	ld	(.foundnum),iy
 	add	iy,sp
-	ld	de,(iy + 15)
+	ld	de,(iy + 18)
 	ld	(.skipnum),de
-	ld	de,(iy + 12)
+	ld	de,(iy + 15)
 	ld	(.maxnum),de
-	ld	de,(iy + 9)
+	ld	de,(iy + 12)
 	ld	(.storage),de
+	ld	a,(iy + 9)
+	cpl
+	ld	(.mask),a
 	ld	de,(iy + 6)
 	ld	iy,(iy + 3)
 	push	iy
@@ -266,7 +270,10 @@ fat_DirList:
 	jq	z,.skip
 	cp	a,' '
 	ld	a,(iy + 11)
-	and	a,8
+	tst	a,8
+	jq	nz,.skip
+	and	a,0
+.mask := $-1
 	call	z,.foundentry
 .skip:
 	pop	bc
