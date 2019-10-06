@@ -21,7 +21,6 @@
 	.def _boot_SetTime
 	.def _boot_IsAfterNoon
 
-	.def _os_NewLine
 	.def _os_PushErrorHandler
 	.def _os_PopErrorHandler
 	.def _os_ThrowError
@@ -82,25 +81,38 @@
 	.def _os_SetDrawBGColor
 	.def _os_SetDrawFGColor
 	.def _os_FontSelect
-	.def _os_RclAns
+	.def _os_GetAnsData
 	.def _os_SetTimer1
 	.def _os_DisableTimer1
-	.def _os_GetSystemStats
+	.def _os_GetSystemInfo
 	.def _os_GetDrawBGColor
 	.def _os_GetDrawFGColor
 	.def _os_FontGetID
 	.def _os_RealToInt24
 	.def _os_Int24ToReal
 	.def _os_ForceCmdNoChar
+	.def _os_DelSymEntry
 	.def _os_GetSymTablePtr
 	.def _os_NextSymEntry
 	.def _os_ChkFindSym
+	.def _os_GetVarSize
+	.def _os_GetMatrixDims
+	.def _os_GetRealListElement
+	.def _os_GetMatrixElement
+	.def _os_GetRealVar
+	.def _os_SetListDim
+	.def _os_SetMatrixDims
+	.def _os_SetRealListElement
+	.def _os_SetMatrixElement
+	.def _os_SetRealVar
 	.def _os_MemChk
 	.def _os_SetTimer2
 	.def _os_DisableTimer2
 	.def _os_FloatToReal
 	.def _os_RealToFloat
 	.def _os_FontDrawTransText
+	.def _os_DelAppVar
+	.def _os_GetAppVarData
 	.def _os_CreateAppVar
 	.def _os_TestFlagBitsFast
 	.def _os_MSDGetMaxLUN
@@ -112,6 +124,7 @@
 	.def _os_MSDWrite
         .def _os_USBGetRequestStatus
 
+	.def _asm_NewLine
 	.def _asm_MoveDown
 	.def _asm_MoveUp
 	.def _asm_ClrLCDFull
@@ -125,7 +138,6 @@
 	.def _asm_EnableAPD
 	.def _asm_DrawStatusBar
 	.def _asm_ArcChk
-	.assume adl=1
 
 ; ---
 ; locations
@@ -150,7 +162,6 @@ _boot_GetTime                   equ 0005B0h
 _boot_SetTime                   equ 0005B4h
 _boot_IsAfterNoon               equ 0005C8h
 
-_os_NewLine                     equ 0207F0h
 _os_PushErrorHandler            equ 021C78h
 _os_PopErrorHandler             equ 021C7Ch
 _os_ThrowError                  equ 021C80h
@@ -211,25 +222,38 @@ _os_InitDrawing                 equ 021E1Ch
 _os_SetDrawBGColor              equ 021E20h
 _os_SetDrawFGColor              equ 021E24h
 _os_FontSelect                  equ 021E28h
-_os_RclAns                      equ 021E70h
+_os_GetAnsData                  equ 021E70h
 _os_SetTimer1                   equ 021EC8h
 _os_DisableTimer1               equ 021ECCh
-_os_GetSystemStats              equ 021ED4h
+_os_GetSystemInfo               equ 021ED4h
 _os_GetDrawBGColor              equ 021EE4h
 _os_GetDrawFGColor              equ 021EE8h
 _os_FontGetID                   equ 021EECh
 _os_RealToInt24                 equ 021EF4h
 _os_Int24ToReal                 equ 021EF8h
 _os_ForceCmdNoChar              equ 021FA8h
+_os_DelSymEntry                 equ 021FACh
 _os_GetSymTablePtr              equ 021FB0h
 _os_NextSymEntry                equ 021FB4h
 _os_ChkFindSym                  equ 021FB8h
+_os_GetVarSize                  equ 021FBCh
+_os_GetMatrixDims               equ 021FC0h
+_os_GetRealListElement          equ 021FC4h
+_os_GetMatrixElement            equ 021FC8h
+_os_GetRealVar                  equ 021FCCh
+_os_SetListDim                  equ 021FD0h
+_os_SetMatrixDims               equ 021FD4h
+_os_SetRealListElement          equ 021FD8h
+_os_SetMatrixElement            equ 021FDCh
+_os_SetRealVar                  equ 021FE0h
 _os_MemChk                      equ 021FF0h
 _os_SetTimer2                   equ 022080h
 _os_DisableTimer2               equ 022084h
 _os_FloatToReal                 equ 022170h
 _os_RealToFloat                 equ 022174h
 _os_FontDrawTransText           equ 022178h
+_os_DelAppVar                   equ 02217Ch
+_os_GetAppVarData               equ 022180h
 _os_CreateAppVar                equ 022184h
 _os_TestFlagBitsFast            equ 0222FCh
 _os_MSDGetMaxLUN                equ 022280h
@@ -244,6 +268,7 @@ _os_USBGetRequestStatus         equ 0222D0h
 ; ---
 ; directly callable asm functions
 ; ---
+_asm_NewLine                    equ 0207F0h
 _asm_MoveDown                   equ 0207F4h
 _asm_MoveUp                     equ 020800h
 _asm_ClrLCDFull                 equ 020808h

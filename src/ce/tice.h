@@ -446,12 +446,6 @@ void boot_WaitShort(void);
  */
 
 /**
- * Inserts a new line at the current cursor posistion on the homescreen
- * Does scroll.
- */
-void os_NewLine(void);
-
-/**
  * Disables the OS cursor
  */
 void os_DisableCursor(void);
@@ -599,18 +593,31 @@ size_t os_MemChk(void **free);
  */
 void os_ThrowError(uint8_t error);
 
+typedef struct system_info {
+    size_t size;                 /**< number of valid bytes after this field */
+    uint8_t hardwareVersion;     /**< 7 on CE                                */
+    uint8_t hardwareType;        /**< 0 on TI84+CE,  1 on TI83PCE            */
+    uint8_t hardwareType2;       /**< 9 on TI84+CE, 12 on TI83PCE            */
+    uint8_t osMajorVersion;      /**< e.g.  5 on OS 5.4.0.0034               */
+    uint8_t osMinorVersion;      /**< e.g.  4 on OS 5.4.0.0034               */
+    uint8_t osRevisionVersion;   /**< e.g.  0 on OS 5.4.0.0034               */
+    unsigned osBuildVersion;     /**< e.g. 34 on OS 5.4.0.0034               */
+    uint8_t bootMajorVersion;    /**< e.g.  5 on boot 5.3.6.0017             */
+    uint8_t bootMinorVersion;    /**< e.g.  3 on boot 5.3.6.0017             */
+    uint8_t bootRevisionVersion; /**< e.g.  6 on boot 5.3.6.0017             */
+    unsigned bootBuildVersion;   /**< e.g. 17 on boot 5.3.6.0017             */
+    uint8_t unknown[10];         /**< 400100f0000010300000 on CE             */
+    uint8_t calcid[8];           /**< From certificate                       */
+    char ti[2];                  /**< First part of device name, "TI"        */
+    uint16_t language;           /**< Localization language                  */
+} system_info_t;
+
 /**
- * Gets a pointer to the system stats
+ * Gets the system info
  *
- * @returns
- * [3]     - Hardware version                       <br>
- * [12-13] - Boot Version Major                     <br>
- * [14]    - Boot Version Minor                     <br>
- * [15-16] - Boot Version Build                     <br>
- * [28-37] - Calc ID (From certificate if exists)   <br>
- * [38-39] - Appears to be localization language
+ * @returns A pointer to system_info_t
  */
-void *os_GetSystemStats(void);
+const system_info_t *os_GetSystemInfo(void);
 
 /**
  * This function can return twice (like setjmp).
@@ -641,14 +648,27 @@ int os_PushErrorHandler(void);
 void os_PopErrorHandler(void);
 
 /**
- * @returns A pointer to symtable of the OS
+ * @return A pointer to symtable of the OS
  */
 void *os_GetSymTablePtr(void);
 
 /**
- * Creates an AppVar
+ * @return next entry or NULL if no more entries, pass os_GetSymTablePtr() as first entry
+ */
+void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *name, void **data);
+
+/**
+ * Delete a var from RAM.
  *
- * @param name Pointer to name of AppVar to create
+ * @param entry An entry as returned from os_NextSymEntry().
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_DelSymEntry(void *entry);
+
+/**
+ * Creates an AppVar.
+ *
+ * @param name Name of the AppVar to create.
  * @param size Size of AppVar to create
  * @returns A pointer to the AppVar data
  * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
@@ -656,9 +676,23 @@ void *os_GetSymTablePtr(void);
 var_t *os_CreateAppVar(const char *name, uint16_t size);
 
 /**
- * Returns next entry or NULL if no more entries, pass os_GetSymTablePtr() as first entry
+ * Gets a pointer to an AppVar's data, which may be in archive.
+ *
+ * @param name Name of the AppVar to lookup.
+ * @param archived Set to 1 if the AppVar is archived, otherwise 0, may be NULL if you don't need it.
+ * @returns A pointer to the AppVar data
+ * @note Returns NULL if the AppVar doesn't exist, otherwise a pointer to the size bytes
  */
-void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *name, void **data);
+var_t *os_GetAppVarData(const char *name, int *archived);
+
+/**
+ * Deletes an AppVar from RAM.
+ *
+ * @param name Name of the AppVar to delete.
+ * @returns A pointer to the AppVar data
+ * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
+ */
+var_t *os_DelAppVar(const char *name, uint16_t size);
 
 /**
  * Locates a symbol in the symtable
@@ -667,9 +701,100 @@ void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *n
  * @param name Pointer to name of symbol to find
  * @param entry Can be NULL if you don't care
  * @param data Can be NULL if you don't care
- * @returns If file exists, returns 1 and sets entry and data, otherwise returns 0.
+ * @return If file exists, returns 1 and sets entry and data, otherwise returns 0.
  */
 int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
+
+/**
+ * Gets the size of sized vars such as equations, string, programs, appvars,
+ * or the dimension of a list.
+ *
+ * @param name Name of the var to lookup.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_GetVarSize(const char *name, size_t *size);
+
+/**
+ * Gets the dimensions of a matrix.
+ *
+ * @param name Name of the matrix to lookup.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_GetMatrixDims(const char *name, int *rows, int *cols);
+
+/**
+ * Gets a real value from a real list or a complex list where the selected
+ * element has no imaginary component.
+ * @param name Name of the list.
+ * @param index Element index (1-based).
+ * @param value Set tto the value of the selected element.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_GetRealListElement(const char *name, int index, real_t *value);
+
+/**
+ * Gets a real value from a matrix.
+ * @param name Name of the matrix.
+ * @param row Element row (1-based).
+ * @param col Element col (1-based).
+ * @param value Set to the value of the selected element.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_GetMatrixElement(const char *name, int row, int col, real_t *value);
+
+/**
+ * Gets the real value of a real variable or a complex variable with
+ * no imaginary component.
+ * @param value Set to the value of the variable.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_GetRealVar(const char *name, real_t *value);
+
+/**
+ * If list \p name doesn't exist, create it with \p dim elements, otherwise
+ * resize the list, with new elements being set to 0.
+ * @param name Name of the list to resize.
+ * @param rows New list dimension.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_SetListDim(const char *name, int dim);
+
+/**
+ * If matrix \p name doesn't exist, create it with dimensions \p rows and
+ * \p cols, otherwise resize the matrix, with new elements being set to 0.
+ * @param name Name of the matrix to resize.
+ * @param rows New row dimension.
+ * @param cols New col dimension.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_SetMatrixDims(const char *name, int rows, int cols);
+
+/**
+ * Sets a list element to a real value.  If the list doesn't exist, then index
+ * must be 1 and it creates a 1 element list.
+ * @param name Name of the list.
+ * @param index Element index (1-based).
+ * @param value The value to set to the selected element.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_SetRealListElement(const char *name, int index, const real_t *value);
+
+/**
+ * Sets a matrix element to a real value.
+ * @param name Name of the matrix.
+ * @param row Element row (1-based).
+ * @param col Element col (1-based).
+ * @param value The value to set to the selected element.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_SetMatrixElement(const char *name, int row, int col, const real_t *value);
+
+/**
+ * Sets a variable to a real value, creating it if it doesn't exist.
+ * @param value The value to set the variable to.
+ * @return TIOS System Error Code or 0 on success.
+ */
+int os_SetRealVar(const char *name, const real_t *value);
 
 /**
  * Gets the Ans variable
@@ -678,7 +803,7 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
  * @returns Pointer to the data
  * @note Returns NULL if Ans doesn't exist or type is NULL
  */
-void *os_RclAns(uint8_t *type);
+void *os_GetAnsData(uint8_t *type);
 
 /**
  * Copies a real_t type
@@ -761,7 +886,8 @@ float os_RealToFloat(const real_t *arg);
  */
 real_t os_FloatToReal(float arg);
 
-/** This converts a ti-float to a ti-ascii string.
+/**
+ * This converts a ti-float to a ti-ascii string.
  *
  * @param result Zero terminated string copied to this address
  * @param arg Real to convert
@@ -947,6 +1073,12 @@ void os_ForceCmdNoChar(void);
  * i.e. _OS( asm_ArcChk );
  */
 void _OS(void (*function)(void));
+
+/**
+ * Inserts a new line at the current cursor posistion on the homescreen
+ * Does scroll.
+ */
+void asm_NewLine(void);
 
 /**
  * Assembly routine to scroll homescreen up
