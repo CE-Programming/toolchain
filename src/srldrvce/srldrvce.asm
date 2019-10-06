@@ -414,6 +414,7 @@ srl_Init:
 	jq	.shared
 
 .nonFTDI:
+; todo:
 ;look for CDC interfaces
 ;if found:
 ; set configuration
@@ -452,6 +453,7 @@ srl_Init:
 	ld	bc,$83				; get endpoint
 	.epOut = $-3
 	push	bc
+	ld	de,(xsrl_Device.dev)
 	push	de
 	call	usb_GetDeviceEndpoint
 	pop	de
