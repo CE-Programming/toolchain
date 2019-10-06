@@ -188,12 +188,119 @@ fat_DirList:
 ; Parses directory entires for files and subdirectories
 ; Arguments:
 ;  sp + 3 : FAT structure type
-;  sp + 6 : Storage for entries
-;  sp + 9 : Storage for entries number of entries
-;  sp + 12 : Amount of entries to skip
+;  sp + 6 : Directory path
+;  sp + 9 : Storage for entries
+;  sp + 12 : Storage for entries number of entries
+;  sp + 15 : Amount of entries to skip
 ; Returns:
 ;  FAT_SUCCESS on success
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	ld	iy,0
+	ld	(.foundnum),iy
+	add	iy,sp
+	ld	de,(iy + 15)
+	ld	(.skipnum),de
+	ld	de,(iy + 12)
+	ld	(.maxnum),de
+	ld	de,(iy + 9)
+	ld	(.storage),de
+	ld	de,(iy + 6)
+	ld	iy,(iy + 3)
+	push	iy
+	call	util_locate_entry
+	jq	z,.error
+	push	de
+	pop	iy
+	call	util_get_entry_first_cluster
+	pop	iy
+	compare_auhl_zero
+	jq	z,.nomoreentries
+.findcluster:
+	ld	(yfatType.working_cluster),a,hl
+	call	util_cluster_to_sector
+	ld	(yfatType.working_sector),a,hl
+	ld	b,(yfatType.cluster_size)
+.findsector:
+	push	bc
+	ld	(yfatType.working_sector),a,hl
+	call	util_read_fat_sector
+	jq	nz,.usberror
+	push	iy
+	ld	iy,tmp.sectorbuffer - 32
+	ld	b,16
+.findentry:
+	push	bc
+	lea	iy,iy + 32
+	ld	a,(iy)
+	or	a,a
+	jq	z,.endofentriesmaybe
+	cp	a,$e5
+	jq	z,.skip
+	or	a,a
+	jq	z,.skip
+	cp	a,' '
+	ld	a,(iy + 11)
+	and	a,8
+	call	z,.foundentry
+.skip:
+	pop	bc
+	djnz	.findentry
+	pop	iy
+	ld	a,hl,(yfatType.working_sector)
+	call	util_increment_auhl
+	pop	bc
+	djnz	.findsector
+	ld	a,hl,(yfatType.working_cluster)
+	call	util_next_cluster
+	compare_auhl_zero
+	jq	nz,.findcluster
+	ld	hl,(.foundnum)
+	ret
+.endofentriesmaybe:
+	pop	bc,bc,bc
+	ld	hl,(.foundnum)
+	ret
+.foundentry:
+	ld	hl,0
+.skipnum := $-3
+	compare_hl_zero
+	jq	z,.skipgood
+	dec	hl
+	ld	(.skipnum),hl
+	ret
+.skipgood:
+	push	ix
+	ld	ix,0
+.storage := $-3
+	lea	de,ix + 0
+	lea	hl,iy + 0
+	call	util_get_name
+	ld	a,(iy + 11)
+	ld	(xfatDirEntry.attrib),a
+	ld	a,hl,(iy + 28)
+	ld	(xfatDirEntry.entrysize),a,hl
+	lea	ix,ix + sizeof fatDirEntry
+	ld	(.storage),ix
+	pop	ix
+	ld	hl,0
+.foundnum := $-3
+	inc	hl
+	ld	(.foundnum),hl
+	ld	de,0
+.maxnum := $-3
+	compare_hl_de
+	ret	nz
+.foundmax:
+	pop	bc,bc,bc,bc		; remove call, iy, bc, bc from stack
+	ret
+.nomoreentries:
+	xor	a,a
+	sbc	hl,hl
+	ret
+.usberror:
+	pop	hl
+.error:
+	scf
+	sbc	hl,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -234,8 +341,10 @@ fat_GetVolumeLabel:
 	ld	a,hl,(yfatType.working_cluster)
 	call	util_next_cluster
 	compare_auhl_zero
-	jq	z,.notfound
-	jq	.findcluster
+	jq	nz,.findcluster
+.notfound:
+	ld	hl,FAT_ERROR_NO_VOLUME_LABEL
+	ret
 .foundlabel:
 	pop	bc
 	ld	de,-11
@@ -261,9 +370,6 @@ fat_GetVolumeLabel:
 .usberror:
 	pop	bc
 	ld	hl,FAT_ERROR_USB_FAILED
-	ret
-.notfound:
-	ld	hl,FAT_ERROR_NO_VOLUME_LABEL
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1142,6 +1248,14 @@ fat_Delete:
 	ret
 
 ;-------------------------------------------------------------------------------
+util_get_entry_first_cluster:
+	ld	a,(iy + 20 + 1)
+	ld	hl,(iy + 20 - 2)	; get hlu
+	ld	l,(iy + 26 + 0)
+	ld	h,(iy + 26 + 1)		; get the entry's cluster
+	ret
+
+;-------------------------------------------------------------------------------
 util_end_of_chain:
 ; inputs
 ;   auhl: cluster
@@ -1565,6 +1679,9 @@ util_set_file_size:
 
 ;-------------------------------------------------------------------------------
 util_get_name:
+	ld	a,'.'
+	cp	a,(hl)
+	jq	z,.special
 	push	hl
 	ld	b,8
 .name8:
@@ -1577,15 +1694,14 @@ util_get_name:
 	djnz	.name8
 .next:
 	pop	hl
-	ld	de,8
-	add	hl,de
+	ld	bc,8
+	add	hl,bc
 	ld	a,(hl)
 	cp	a,' '
-	jq	nz,.nodot
+	jq	z,.done		; no extension
 	ld	a,'.'
 	ld	(de),a
 	inc	de
-.nodot:
 	ld	b,3
 .name3:
 	ld	a,(hl)
@@ -1599,6 +1715,15 @@ util_get_name:
 	xor	a,a
 	ld	(de),a
 	ret
+.special:
+	ld	(de),a
+	inc	hl
+	inc	de
+	cp	a,(hl)
+	jq	nz,.done
+	ld	(de),a
+	inc	de
+	jq	.done
 
 ;-------------------------------------------------------------------------------
 util_get_fat_name:
@@ -1852,10 +1977,7 @@ util_locate_entry:
 	push	iy
 	push	de
 	pop	iy
-	ld	a,(iy + 20 + 1)
-	ld	hl,(iy + 20 - 2)	; get hlu
-	ld	l,(iy + 26 + 0)
-	ld	h,(iy + 26 + 1)		; get the entry's cluster, and convert it to the sector
+	call	util_get_entry_first_cluster
 	pop	iy
 	call	util_cluster_to_sector
 	compare_auhl_zero

@@ -117,7 +117,6 @@ typedef enum {
     FAT_ERROR_FAILED_ALLOC,
     FAT_ERROR_CLUSTER_CHAIN,
     FAT_ERROR_DIRECTORY_NOT_EMPTY,
-    FAT_ERROR_NO_MORE_ENTRIES,
     FAT_ERROR_NO_VOLUME_LABEL,
     FAT_USER_ERROR=1000
 } fat_error_t;
@@ -173,9 +172,11 @@ fat_error_t fat_Init(fat_t *fat,
 
 /**
  * Parses a directory and returns a list of files and subdirectories in it.
+ * @param fat Initialized FAT structure type.
  * @param dir Directory path to get list from.
  * @param entries Location to store found entries.
  * @param size Number of avaiable entries to store to in the entries argument.
+ *             Must be greater than or equal to 1.
  * @param skip If this function has previously been called, use this function to
  *        start parsing after this many entries.
  *
@@ -188,7 +189,11 @@ fat_error_t fat_Init(fat_t *fat,
  *
  * @return Number of entries found, or -1 if an error occurred.
  */
-int24_t fat_DirList(const char *path, fat_dir_entry_t *entries, uint24_t size, uint24_t skip);
+int24_t fat_DirList(fat_t *fat,
+                    const char *path,
+                    fat_dir_entry_t *entries,
+                    uint24_t size,
+                    uint24_t skip);
 
 /**
  * Returns the volume label of the drive if it exists.
@@ -197,7 +202,8 @@ int24_t fat_DirList(const char *path, fat_dir_entry_t *entries, uint24_t size, u
  * @retuns FAT_SUCCESS on success, FAT_ERROR_NO_VOLUME_LABEL if no label,
  *         otherwise a different error.
  */
-fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
+fat_error_t fat_GetVolumeLabel(fat_t *fat,
+                               char *label);
 
 /**
  * Creates new files or directories in the filesystem.

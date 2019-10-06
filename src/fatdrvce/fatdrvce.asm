@@ -221,6 +221,14 @@ struct fatType
 	working_prev_entry rl 1
 	size := $-.
 end struct
+struct fatDirEntry
+	local size
+	label .: size
+	name rb 13
+	attrib rb 1
+	entrysize rd 1
+	size := $-.
+end struct
 
 struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
 	label .: 8
@@ -310,7 +318,6 @@ virtual at 0
 	FAT_ERROR_FAILED_ALLOC rb 1
 	FAT_ERROR_CLUSTER_CHAIN rb 1
 	FAT_ERROR_DIRECTORY_NOT_EMPTY rb 1
-	FAT_ERROR_NO_MORE_ENTRIES rb 1
 	FAT_ERROR_NO_VOLUME_LABEL rb 1
 end virtual
 
