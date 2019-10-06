@@ -117,8 +117,7 @@ typedef enum {
     FAT_ERROR_FAILED_ALLOC,
     FAT_ERROR_CLUSTER_CHAIN,
     FAT_ERROR_DIRECTORY_NOT_EMPTY,
-    FAT_ERROR_NO_VOLUME_LABEL,
-    FAT_USER_ERROR=1000
+    FAT_ERROR_NO_VOLUME_LABEL
 } fat_error_t;
 
 typedef enum {
@@ -126,8 +125,7 @@ typedef enum {
     MSD_ERROR_INVALID_PARAM,
     MSD_ERROR_USB_FAILED,
     MSD_ERROR_NOT_SUPPORTED,
-    MSD_ERROR_INVALID_DEVICE,
-    MSD_USER_ERROR=1000
+    MSD_ERROR_INVALID_DEVICE
 } msd_error_t;
 
 #define FAT_FILE      (0 << 0)  /**< Entry has no attributes. */
