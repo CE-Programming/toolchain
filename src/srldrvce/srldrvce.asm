@@ -226,7 +226,13 @@ srl_Init:
 	add	iy,sp
 	push	ix
 	ld	ix,(iy + 3)
-;todo: check if buffer is large enough
+
+	ld	hl,(iy + 12)			; check if buffer is large enough
+	ld	de,128
+	compare_hl_de
+	ld	a,SRL_ERROR_NO_MEMORY
+	jq	c,.exit
+
 	ld	hl,(iy + 6)			; usb device
 	compare_hl_zero
 	jq	z,.err_nd
