@@ -105,8 +105,6 @@ typedef struct {
     uint32_t size;
 } fat_dir_entry_t;
 
-typedef uint24_t fat_dir_pos_t;
-
 typedef enum {
     FAT_SUCCESS=0,
     FAT_ERROR_INVALID_PARAM,
@@ -174,33 +172,23 @@ fat_error_t fat_Init(fat_t *fat,
                      fat_partition_t *partition);
 
 /**
- * Parses a directory and returns the list of files and subdirectories in it.
- * @param dir Directory to get list from.
- * @param pos Current position in parser. Set to 0 to start the parser.
- * @param entry Single entry returned.
- * pos should be 0 to begin the parser, and is updated with each call.
+ * Parses a directory and returns a list of files and subdirectories in it.
+ * @param dir Directory path to get list from.
+ * @param entries Location to store found entries.
+ * @param size Number of avaiable entries to store to in the entries argument.
+ * @param skip If this function has previously been called, use this function to
+ *        start parsing after this many entries.
  *
  * @code
  *  #define MAX_ENTRIES 10
  *
- *  fat_error_t error = FAT_SUCCESS;
- *  fat_dir_entry_t entry[MAX_ENTRIES];
- *  fat_dir_pos_t pos = 0;
- *  uint8_t i = 0;
- *
- *  while (error == FAT_SUCCESS && i < MAX_ENTRIES)
- *      error = fat_DirEntry("/DIR", &pos, &entry[i]);
- *      if (error == FAT_SUCCESS)
- *      {
- *          i++;
- *      }
- *  };
+ *  fat_dir_entry_t entries[MAX_ENTRIES];
+ *  int24_t count = fat_DirList("/DIR", entries, MAX_ENTRIES, 0);
  * @endcode
  *
- * @return FAT_SUCCESS on success, and FAT_ERROR_NO_MORE_ENTRIES if no more
- *         directory entries are available.
+ * @return Number of entries found, or -1 if an error occurred.
  */
-fat_error_t fat_DirEntry(const char *dir, fat_dir_pos_t *pos, fat_dir_entry_t *entry);
+int24_t fat_DirList(const char *path, fat_dir_entry_t *entries, uint24_t size, uint24_t skip);
 
 /**
  * Returns the volume label of the drive if it exists.

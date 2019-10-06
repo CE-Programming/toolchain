@@ -184,12 +184,13 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_DirEntry:
+fat_DirList:
 ; Parses directory entires for files and subdirectories
 ; Arguments:
 ;  sp + 3 : FAT structure type
-;  sp + 6 : Current search position
-;  sp + 9 : Pointer to store directory entry to
+;  sp + 6 : Storage for entries
+;  sp + 9 : Storage for entries number of entries
+;  sp + 12 : Amount of entries to skip
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	hl,FAT_ERROR_NOT_SUPPORTED
@@ -203,7 +204,66 @@ fat_GetVolumeLabel:
 ;  sp + 6 : Volume label (8.3 format) storage
 ; Returns:
 ;  FAT_SUCCESS on success, and FAT_ERROR_NO_VOLUME_LABEL
-	ld	hl,FAT_ERROR_NOT_SUPPORTED
+	pop	de,iy
+	push	iy,de
+	ld	a,hl,(yfatType.root_dir_pos)
+	call	util_sector_to_cluster
+.findcluster:
+	ld	(yfatType.working_cluster),a,hl
+	call	util_cluster_to_sector
+	ld	(yfatType.working_sector),a,hl
+	ld	b,(yfatType.cluster_size)
+.findsector:
+	push	bc
+	ld	(yfatType.working_sector),a,hl
+	call	util_read_fat_sector
+	jq	nz,.usberror
+	ld	hl,tmp.sectorbuffer + 11
+	ld	b,16
+	ld	de,32
+.findentry:
+	ld	a,(hl)
+	and	a,8
+	jr	nz,.foundlabel
+	add	hl,de
+	djnz	.findentry
+	ld	a,hl,(yfatType.working_sector)
+	call	util_increment_auhl
+	pop	bc
+	djnz	.findsector
+	ld	a,hl,(yfatType.working_cluster)
+	call	util_next_cluster
+	compare_auhl_zero
+	jq	z,.notfound
+	jq	.findcluster
+.foundlabel:
+	pop	bc
+	ld	de,-11
+	add	hl,de
+	pop	bc,iy,de
+	push	de,iy,bc
+	ld	bc,11
+	ldir
+	jq	.enterremovetrailingspaces
+.removetrailingspaces:
+	ld	a,(de)
+	cp	a,' '
+	jq	nz,.done
+.enterremovetrailingspaces:
+	xor	a,a
+	ld	(de),a
+	dec	de
+	jq	.removetrailingspaces
+.done:
+	xor	a,a
+	sbc	hl,hl
+	ret
+.usberror:
+	pop	bc
+	ld	hl,FAT_ERROR_USB_FAILED
+	ret
+.notfound:
+	ld	hl,FAT_ERROR_NO_VOLUME_LABEL
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1501,6 +1561,43 @@ util_set_file_size:
 	ld	(yfatFile.file_size),a,hl
 	call	util_ceil_byte_size_to_sector_size
 	ld	(yfatFile.file_size_sectors),a,hl
+	ret
+
+;-------------------------------------------------------------------------------
+util_get_name:
+	push	hl
+	ld	b,8
+.name8:
+	ld	a,(hl)
+	cp	a,' '
+	jr	z,.next
+	ld	(de),a
+	inc	hl
+	inc	de
+	djnz	.name8
+.next:
+	pop	hl
+	ld	de,8
+	add	hl,de
+	ld	a,(hl)
+	cp	a,' '
+	jq	nz,.nodot
+	ld	a,'.'
+	ld	(de),a
+	inc	de
+.nodot:
+	ld	b,3
+.name3:
+	ld	a,(hl)
+	cp	a,' '
+	jr	z,.done
+	ld	(de),a
+	inc	hl
+	inc	de
+	djnz	.name3
+.done:
+	xor	a,a
+	ld	(de),a
 	ret
 
 ;-------------------------------------------------------------------------------

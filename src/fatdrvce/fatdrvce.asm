@@ -38,7 +38,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export msd_WriteSector
 	export fat_Find
 	export fat_Init
-	export fat_DirEntry
+	export fat_DirList
 	export fat_GetVolumeLabel
 	export fat_Open
 	export fat_Close
