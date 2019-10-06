@@ -184,6 +184,33 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
+fat_Deinit:
+; Deinitialize the FAT filesystem
+; Arguments:
+;  sp + 3 : FAT structure type
+; Returns:
+;  FAT_SUCCESS on success
+	pop	de,iy
+	push	iy,de
+	xor	a,a
+	sbc	hl,hl
+	call	util_read_fat_sector
+	jq	nz,.usberror
+	ld	a,(tmp.sectorbuffer + $41)	; clear dirty bit
+	and	a,$fe
+	ld	(tmp.sectorbuffer + $41),a
+	xor	a,a
+	sbc	hl,hl
+	call	util_write_fat_sector
+	jq	nz,.usberror
+	xor	a,a
+	sbc	hl,hl
+	ret
+.usberror:
+	ld	hl,FAT_ERROR_USB_FAILED
+	ret
+
+;-------------------------------------------------------------------------------
 fat_DirList:
 ; Parses directory entires for files and subdirectories
 ; Arguments:

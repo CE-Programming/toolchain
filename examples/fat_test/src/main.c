@@ -4,14 +4,15 @@ typedef struct global global_t;
 #include <usbdrvce.h>
 #include <fatdrvce.h>
 #include <tice.h>
-#include <debug.h>
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define MAX_PARTITIONS 10
+#define MAX_ENTRIES 10
 #define FAT_BUFFER_SIZE (MSD_SECTOR_SIZE / sizeof(uint16_t))
 
 void putstr(char *str);
@@ -52,9 +53,9 @@ void main(void) {
     bool msd_inited = false;
     uint24_t sectorsize;
     uint8_t numpartitions;
-    usb_error_t usberror = USB_USER_ERROR;
-    msd_error_t msderror = MSD_USER_ERROR;
-    fat_error_t faterror = FAT_USER_ERROR;
+    usb_error_t usberror = USB_ERROR_INVALID_PARAM;
+    msd_error_t msderror = MSD_ERROR_INVALID_PARAM;
+    fat_error_t faterror = FAT_ERROR_INVALID_PARAM;
 
     memset(&msd, 0, sizeof msd);
     memset(&global, 0, sizeof(global_t));
@@ -130,11 +131,13 @@ void main(void) {
     // attempt to open a file
     if (faterror == FAT_SUCCESS)
     {
+        static fat_dir_entry_t entries[MAX_ENTRIES];
         static uint16_t fatbuffer[FAT_BUFFER_SIZE];
         static const char *str = "/FATTEST/DIR1/FILE.TXT";
         fat_file_t *file;
         uint24_t i;
         uint16_t j;
+        int24_t count;
 
         putstr("inited fat filesystem");
 
@@ -149,7 +152,7 @@ void main(void) {
         fat_Create(&fat, "/FATTEST/DIR2", "FILE2.TXT", FAT_FILE);
 
         // change the size of the first file
-        fat_SetSize(&fat, str, 512 * 64);
+        fat_SetSize(&fat, str, 512 * 1024);
         fat_SetSize(&fat, str, 512 * 0);
         fat_SetSize(&fat, str, 512 * 10);
 
@@ -162,6 +165,14 @@ void main(void) {
 
         // should delete, empty directory
         fat_Delete(&fat, "/FATTEST/DIR3");
+
+        // get directory contents (should be 4)
+        count = fat_DirList(&fat, "/FATTEST/DIR2", entries, MAX_ENTRIES, 0);
+        if (count >= 0)
+        {
+            sprintf(buffer, "num entries: %d", count);
+            putstr(buffer);
+        }
 
         // delete file
         fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
@@ -204,6 +215,9 @@ void main(void) {
         }
 
         faterror = fat_Close(file);
+
+        // close the filesystem
+        fat_Deinit(&fat);
     }
 
     if( faterror == USB_SUCCESS )

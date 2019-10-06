@@ -169,6 +169,16 @@ fat_error_t fat_Init(fat_t *fat,
                      fat_partition_t *partition);
 
 /**
+ * Deinitialize the FAT filesystem. This is not required to be called, however
+ * it will clear the filesystem dirty bit so other OSes don't see the drive as
+ * having potential errors. You cannot use the FAT structure after this call,
+ * and should call fat_Init if you need to modify the filesystem again.
+ * @param fat Initialized FAT structure type.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_Deinit(fat_t *fat);
+
+/**
  * Parses a directory and returns a list of files and subdirectories in it.
  * @param fat Initialized FAT structure type.
  * @param dir Directory path to get list from.
