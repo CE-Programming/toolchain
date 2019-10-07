@@ -526,7 +526,7 @@ srl_Init:
 	ld	a,0				; check if configuration is already set
 	.prevConfig = $-1
 	or	a,a
-	;jr	nz,.getEndpoints		; todo: uncomment - was causing usb_GetDeviceEndpoint to return null
+	jr	nz,.getEndpoints
 
 	push	iy
 
