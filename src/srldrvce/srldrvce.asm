@@ -109,6 +109,8 @@ virtual at 0
 	FTX		rb 1
 end virtual
 
+SRL_INTERFACE_ANY := $FF
+
 struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
 	label .: 8
 	bmRequestType		db requestType
@@ -420,25 +422,111 @@ srl_Init:
 	jq	.shared
 
 .nonFTDI:
-; todo:
-;look for CDC interfaces
-;if found:
-; set configuration
-; set device type
-; find in/out endpoints
-; convert endpoints to usb_endpoint_t
+	ld	de,(iy + 9)			; address of configuration descriptor
+	ld	hl,(.configSize)
+	add	hl,de
+	ex	hl,de
 
-;some temp code to avoid the above
-;assume endpoints in: $83 and out: $04
+	xor	a,a				; reset endpoints to zero
+	ld	(.epIn),a
+	ld	(.epOut),a
 
-	ld	a,SRL_CDC				; temp
+	ld	a,(iy + 15)			; check for CDC interface
+	cp	a,SRL_INTERFACE_ANY
+	jq	z,.findAnyInterface
+
+.findSpecificInterface:
+	ld	bc,.loopFindSpecificInterface
+	ld	(.retVect),bc
+.loopFindSpecificInterface:
+	inc	hl
+	ld	a,(hl)
+	dec	hl
+	cp	a,INTERFACE_DESCRIPTOR		; check if interface descriptor
+	jq	nz,.nextDescriptor
+	inc	hl
+	inc	hl
+	ld	a,(hl)
+	cp	a,(iy + 15)
+	dec	hl
+	dec	hl
+	jq	nz,.nextDescriptor
+	ld	bc,5
+	add	hl,bc
+	ld	a,(hl)
+	sbc	hl,bc
+	cp	a,10
+	ld	a,SRL_ERROR_INVALID_INTERFACE
+	jq	nz,.exit
+	jq	.findEndpoints
+
+.findAnyInterface:
+	ld	bc,.loopFindAnyInterface
+	ld	(.retVect),bc
+.loopFindAnyInterface:
+	inc	hl
+	ld	a,(hl)
+	dec	hl
+	cp	a,INTERFACE_DESCRIPTOR		; check if interface descriptor
+	jq	nz,.nextDescriptor
+	ld	bc,5
+	add	hl,bc
+	ld	a,(hl)
+	sbc	hl,bc
+	cp	a,10
+	jq	nz,.nextDescriptor
+	jq	.findEndpoints
+
+.findEndpoints:
+	ld	bc,.loopFindEndpoints
+	ld	(.retVect),bc
+	jq	.nextDescriptor
+.loopFindEndpoints:
+	inc	hl
+	ld	a,(hl)
+	cp	a,INTERFACE_DESCRIPTOR
+	jq	z,.cdcCheckDone
+	cp	a,ENDPOINT_DESCRIPTOR
+	jq	nz,.nextDescriptor
+	inc	hl
+	ld	a,(hl)
+	dec	hl
+	dec	hl
+	bit	7,a				; check endpoint direction
+	jq	z,.foundEpIn
+	ld	(.epOut),a
+	jq	.nextDescriptor
+.foundEpIn:
+	ld	(.epIn),a
+	jq	.nextDescriptor
+
+.nextDescriptor:
+	ld	bc,0
+	ld	c,(hl)
+	add	hl,bc
+	compare_hl_de
+	jq	nc,.cdcCheckDone
+	jq	.err_nd
+	.retVect = $-3
+
+.cdcCheckDone:
+	ld	a,(.epIn)			; check if any endpoints were found
+	or	a,a
+	jq	nz,.cdcFound
+	ld	a,(.epOut)
+	or	a,a
+	jq	z,.err_nd
+	jq	.cdcFound
+
+.cdcFound:
+	ld	a,SRL_CDC
 	ld	(xsrl_Device.type),a
 
 .shared:
 	ld	a,0				; check if configuration is already set
 	.prevConfig = $-1
 	or	a,a
-	jr	nz,.getEndpoints
+	;jr	nz,.getEndpoints		; todo: uncomment - was causing usb_GetDeviceEndpoint to return null
 
 	push	iy
 
@@ -480,7 +568,6 @@ srl_Init:
 	dec	hl
 	jq	c,.err_nd
 	pop	iy
-;end temp code
 
 .deviceConfigured:
 	ld	hl,(iy + 9)			; set read buffer pointer, start, and end
