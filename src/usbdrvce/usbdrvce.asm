@@ -498,6 +498,7 @@ DEFAULT_RETRIES := 10
 
 ;-------------------------------------------------------------------------------
 usb_Init:
+	call	_usb_DisableTimer
 	call	_os_GetSystemInfo
 	ld	de,4
 	add	hl,de
