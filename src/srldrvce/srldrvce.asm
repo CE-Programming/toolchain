@@ -787,7 +787,8 @@ end repeat
 	ld	de,$40				; check if $00004001
 	compare_hl_de
 	jq	nz,.noSpecialCase
-	ld	a,(iy + FT8U232AM)		; if AM ignore this
+	ld	a,(xsrl_Device.subType)		; if AM ignore this
+	cp	a,FT8U232AM
 	jq	z,.noSpecialCase
 	ld	a,1
 	ld	(setup.ftdisetrate + setuppkt.wIndex + 1),a
