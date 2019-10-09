@@ -50,10 +50,10 @@ enum srl_SubType_FTDI {
     FT232BM,
     FT2232C,
     FT232RL,
+    FTX,
     FT2232H,
     FT4232H,
     FT232H,
-    FTX,
 };
 
 typedef uint8_t srl_subType_t;

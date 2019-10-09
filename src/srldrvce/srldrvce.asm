@@ -103,10 +103,10 @@ virtual at 0
 	FT232BM		rb 1
 	FT2232C		rb 1
 	FT232RL		rb 1
+	FTX		rb 1
 	FT2232H		rb 1
 	FT4232H		rb 1
 	FT232H		rb 1
-	FTX		rb 1
 end virtual
 
 SRL_INTERFACE_ANY := $FF
@@ -635,7 +635,199 @@ srl_SetRate:
 	ld	a,(xsrl_Device.readBufActive)
 	jq	nz,.loop
 .noStop:
-;todo: convert the rate to whatever completely arbitrary format FTDI uses
+	ld	a,(xsrl_Device.subType)		; check device type
+	cp	a,SIO
+	jq	nz,.nonSIO
+
+	ld	de,(iy + 6)			; get SIO data
+	ld	c,0
+	ld	hl,300
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	ld	hl,57600
+	compare_hl_de
+	jq	.sioPrepTransfer
+	inc	bc
+	add	hl,hl
+	compare_hl_de
+	jq	.sioPrepTransfer
+	
+	ld	l,SRL_ERROR_NOT_SUPPORTED	; invalid SIO baud rate
+	jq	.exit
+
+.sioPrepTransfer:
+	ld	a,c
+	ld	(setup.ftdisetrate + setuppkt.wValue),a
+	xor	a,a
+	ld	(setup.ftdisetrate + setuppkt.wValue + 1),a
+	jq	.sendFTDICtrl
+
+.nonSIO:
+	xor	a,a
+	ld	(.highSpeed),a
+	ld	bc,1200				; high speed is set for FT*232H if baud > 1200
+	ld	hl,(iy + 6)			; hl = baud rate
+	sbc	hl,bc
+	add	hl,bc
+	jq	c,.lowSpeed
+	ld	a,(xsrl_Device.subType)
+	cp	a,FT2232H
+	jq	c,.lowSpeed
+
+	ld	a,1				; high-speed specific stuff
+	ld	(.highSpeed),a
+	xor	a,a
+	add	hl,hl				; multiply baud by 8
+	rl	a
+	add	hl,hl
+	rl	a
+	push	hl
+	pop	bc				; half of baud rate
+	ld	d,a
+	add	hl,hl
+	rl	a
+	push	hl,af
+
+	ld	e,1200000000 shr 24		; base = 120000000
+	ld	hl,1200000000 and $FFFFFF
+
+	jq	.speedIndep
+
+.lowSpeed:
+	xor	a,a
+	push	hl
+	pop	bc				; half of divisor
+	ld	d,a
+	add	hl,hl				; double baud rate
+	rl	a
+	push	hl,af
+
+	ld	e,48000000 shr 24		; base = 48000000
+	ld	hl,48000000 and $FFFFFF
+
+	; divide base by baud * 2, round to nearest integer
+.speedIndep:
+	add	hl,bc				; add half of divisor so that result is rounded
+	ld	a,e
+	adc	a,d
+	ld	e,a
+
+	pop	af,bc
+
+	call	__ldivu				; euhl / aubc -> euhl
+
+	ld	bc,.bmNums
+
+	ld	a,(xsrl_Device.subType)
+	cp	a,FT8U232AM
+	jq	nz,.nonAM
+	
+
+	ld	bc,.amNums			; device is an AM
+	ld	a,l
+	and	a,$07
+	cp	a,$07
+	jq	nz,.nonAM			; if FT232AM and last 3 bits are set, increment result
+	xor	a,a
+	inc	hl
+	adc	a,e
+	ld	e,a
+
+.nonAM:
+	ld	a,e
+	ld	(setup.ftdisetrate + setuppkt.wIndex + 1),a
+	ld	(setup.ftdisetrate + setuppkt.wValue),hl
+	ld	a,l
+	and	a,$07				; div3 & 7
+
+	ld	e,3
+.shiftLoop:
+	ld	hl,setup.ftdisetrate + setuppkt.wIndex + 1
+	rr	(hl)
+	dec	hl
+	rr	(hl)
+	dec	hl
+	rr	(hl)
+	dec	hl
+	rr	(hl)
+	dec	e
+	jq	nz,.shiftLoop			; div = div3 >> 3
+
+	ld	hl,0
+	ld	l,a
+	add	hl,bc
+	ld	a,(hl)				; divnums[div3 & 7]
+	sla	a
+
+	ld	hl,setup.ftdisetrate + setuppkt.wValue + 1
+	jq	nc,.noExtraBit
+
+	inc	hl				; set 17th bit, in index field
+	set	0,(hl)
+	dec	hl
+
+.noExtraBit:
+	or	a,(hl)
+	ld	(hl),a				; div |= divnums[div3 & 7] << 14
+	
+	dec	hl
+	ld	a,(hl)
+	dec	a
+	jq	nz,.noSpecialCase
+	inc	hl
+	ld	hl,(hl)				; check if $00000001
+	compare_hl_zero
+	jq	nz,.divNonZero
+	xor	a,a
+	ld	(setup.ftdisetrate + setuppkt.wIndex),a
+	jq	.noSpecialCase
+.divNonZero:
+	ld	de,$40				; check if $00004001
+	compare_hl_de
+	jq	nz,.noSpecialCase
+	ld	a,(iy + FT8U232AM)		; if AM ignore this
+	jq	z,.noSpecialCase
+	ld	a,1
+	ld	(setup.ftdisetrate + setuppkt.wIndex + 1),a
+.noSpecialCase:
+	ld	a,0				; check if high speed device
+	.highSpeed = $-1
+	or	a,a
+	jq	z,.sendFTDICtrl
+
+	ld	hl,setup.ftdisetrate + setuppkt.wIndex
+	set	1,(hl)				; for high speed div |= 0x00020000;
+
+.sendFTDICtrl:
 	ld	hl,setup.ftdisetrate
 	jq	.sendctrl
 
@@ -665,6 +857,11 @@ srl_SetRate:
 	ld	a,l
 	pop	ix
 	ret
+
+.amNums:
+	db	0 shl 5, 3 shl 5, 0 shl 5, 0 shl 5, 1 shl 5, 1 shl 5, 1 shl 5
+.bmNums:
+	db	0 shl 5, 3 shl 5, 2 shl 5, 4 shl 5, 1 shl 5, 5 shl 5, 6 shl 5, 7 shl 5
 
 ;-------------------------------------------------------------------------------
 ;size_t srl_Available(srl_device_t *srl);
@@ -1146,8 +1343,8 @@ dbg_WriteByte:
 ; library data
 ;-------------------------------------------------------------------------------
 
-setup.setlinecoding	setuppkt	$21,$20,0,0,7
-setup.ftdisetrate	setuppkt	$40,3,$1a,0,0
+setup.setlinecoding	setuppkt	$21,$20,$0000,$0000,7
+setup.ftdisetrate	setuppkt	$40,$03,$0000,$0000,0
 
 defaultlinecoding:
 db	$80,$25,0,0,0,0,8
