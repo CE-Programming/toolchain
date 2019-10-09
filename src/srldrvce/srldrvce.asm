@@ -641,45 +641,18 @@ srl_SetRate:
 
 	ld	de,(iy + 6)			; get SIO data
 	ld	c,0
+repeat 10
+if %=1
 	ld	hl,300
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
-	add	hl,hl
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
-	add	hl,hl
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
-	add	hl,hl
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
-	add	hl,hl
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
-	add	hl,hl
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
-	add	hl,hl
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
-	add	hl,hl
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
+else if %=9
 	ld	hl,57600
-	compare_hl_de
-	jq	.sioPrepTransfer
-	inc	bc
+else
 	add	hl,hl
+end if
 	compare_hl_de
-	jq	.sioPrepTransfer
+	jq	z,.sioPrepTransfer
+	inc	bc
+end repeat
 	
 	ld	l,SRL_ERROR_NOT_SUPPORTED	; invalid SIO baud rate
 	jq	.exit
