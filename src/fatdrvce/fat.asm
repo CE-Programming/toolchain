@@ -221,7 +221,7 @@ fat_DirList:
 ;  sp + 15 : Storage for entries number of entries
 ;  sp + 18 : Amount of entries to skip
 ; Returns:
-;  FAT_SUCCESS on success
+;  Number of found entries, otherwise -1
 	ld	iy,0
 	ld	(.foundnum),iy
 	add	iy,sp
@@ -232,10 +232,30 @@ fat_DirList:
 	ld	de,(iy + 12)
 	ld	(.storage),de
 	ld	a,(iy + 9)
-	cpl
-	ld	(.mask),a
+	ld	b,$CC
+	or	a,a;FAT_LIST_FILEONLY
+	jq	z,.gotjump
+	ld	b,$C4
+	dec	a;FAT_LIST_DIRONLY
+	jq	z,.gotjump
+	dec	b
+.gotjump:
+	ld	a,b
+	ld	(.change_jump),a
 	ld	de,(iy + 6)
 	ld	iy,(iy + 3)
+	ld	a,(de)
+	cp	a,'/'
+	jq	nz,.error
+	inc	de
+	ld	a,(de)
+	dec	de
+	or	a,a
+	jq	nz,.notroot
+	ld	a,hl,(yfatType.root_dir_pos)
+	call	util_sector_to_cluster
+	jq	.gotcluster
+.notroot:
 	push	iy
 	call	util_locate_entry
 	jq	z,.error
@@ -243,6 +263,7 @@ fat_DirList:
 	pop	iy
 	call	util_get_entry_first_cluster
 	pop	iy
+.gotcluster:
 	compare_auhl_zero
 	jq	z,.nomoreentries
 .findcluster:
@@ -272,9 +293,9 @@ fat_DirList:
 	ld	a,(iy + 11)
 	tst	a,8
 	jq	nz,.skip
-	and	a,0
-.mask := $-1
+	bit	4,a
 	call	z,.foundentry
+.change_jump := $-4
 .skip:
 	pop	bc
 	djnz	.findentry
@@ -1960,12 +1981,22 @@ util_locate_entry:
 ;   iy: fat structure
 ;   de: name
 ; outputs
-;   hl: sector of entry
+;   auhl: sector of entry
 ;   de: offset to entry in sector
 ;   z set if not found
 	ld	a,hl,(yfatType.root_dir_pos)
 	ld	(yfatType.working_sector),a,hl
 	ld	(yfatType.working_pointer),de
+	ld	a,(de)
+	cp	a,'/'
+	jq	nz,.error
+	inc	de
+	ld	a,(de)
+	or	a,a
+	jq	nz,.findcomponent			; root directory
+	ld	de,tmp.sectorbuffer
+	inc	a
+	ret
 .findcomponent:
 	ld	de,(yfatType.working_pointer)
 	call	util_get_component_start

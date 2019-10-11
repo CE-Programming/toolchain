@@ -330,6 +330,12 @@ virtual at 0
 	MSD_ERROR_INVALID_DEVICE rb 1
 end virtual
 
+virtual at 0
+	FAT_LIST_FILEONLY rb 1
+	FAT_LIST_DIRONLY rb 1
+	FAT_LIST_ALL rb 1
+end virtual
+
 ; enum usb_descriptor_type
 virtual at 1
 	?DEVICE_DESCRIPTOR rb 1
