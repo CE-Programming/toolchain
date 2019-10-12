@@ -1280,7 +1280,7 @@ fat_Delete:
 	jq	nz,.usberror
 .normalfile:
 	ld	(ix + 11),0
-	ld	(ix + 0),$e5
+	ld	(ix + 0),$e5		; mark entry as deleted
 	push	ix
 	call	util_write_fat_sector
 	pop	ix
@@ -2368,10 +2368,13 @@ smc.maxpartitions := $ - 1
 smc.partitionptrs := $ - 3
 	ld	bc,4
 	ldir					; copy lba
-	ld	(smc.partitionptrs),de
 	ex	de,hl
 	ld	bc,(smc.partitionmsd)
 	ld	(hl),bc
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(smc.partitionptrs),hl
 	pop	hl
 	ld	de,scsi.read10.lba + 3
 	call	util_reverse_copy		; move to next read sector
