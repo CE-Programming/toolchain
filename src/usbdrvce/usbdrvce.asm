@@ -503,11 +503,12 @@ usb_Init:
 	ld	de,4
 	add	hl,de
 	bit	0,(hl)
+	jq	z,.84pce
+	ld	a,$60
+	ld	(_DefaultStandardDescriptors.device+deviceDescriptor.bcdDevice),a
 	ld	hl,_DefaultStandardDescriptors.string83
-	jq	nz,.gotModel
-	ld	hl,_DefaultStandardDescriptors.string84
-.gotModel:
 	ld	(_DefaultStandardDescriptors.model),hl
+.84pce:
 	ld	a,1 ; mark pointers as invalid
 	call	_Init
 	set	5,(hl)
@@ -3861,7 +3862,7 @@ _DefaultStandardDescriptors:
 .configuration3 emit $23: $0902230001030080320904000002FF0100000705810240000007050202400000030903 bswap $23
 .langids dw $0304, $0409
 .strings dl .string1
-.model dl 0
+.model dl .string84
 .string1 dw $033E, 'T','e','x','a','s',' ','I','n','s','t','r','u','m','e','n','t','s',' ','I','n','c','o','r','p','o','r','a','t','e','d'
 .string83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
 .string84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
