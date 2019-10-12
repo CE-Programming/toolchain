@@ -2017,10 +2017,10 @@ util_locate_entry:
 	ld	a,(iy + 11)
 	and	a,$0f
 	cp	a,$0f			; long file name entry, skip
-	jr	z,.detectname
+	jr	z,.skipentry
 	ld	a,(iy + 0)
 	cp	a,$e5			; deleted entry, skip
-	jr	z,.detectname
+	jr	z,.skipentry
 	or	a,a
 	jq	z,.errorpopiy		; end of list, suitable entry not found
 	lea	de,iy
@@ -2029,7 +2029,7 @@ util_locate_entry:
 .cmpnames:
 	ld	a,(de)
 	cp	a,(hl)
-	jr	nz,.cmpfail
+	jr	nz,.skipentry
 	inc	de
 	inc	hl
 	djnz	.cmpnames
@@ -2049,7 +2049,7 @@ util_locate_entry:
 	jq	z,.error		; this means it is empty... which shouldn't happen!
 	ld	(yfatType.working_sector),a,hl
 	jq	.findcomponent		; found the component we were looking for (yay)
-.cmpfail:
+.skipentry:
 	dec	c
 	jr	nz,.detectname
 	pop	iy
