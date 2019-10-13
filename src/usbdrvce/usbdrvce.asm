@@ -3126,10 +3126,11 @@ end repeat
 	ld	b,(xconfigurationDescriptor.bNumInterfaces)
 	call	z,_ParseInterfaceDescriptors
 	pop	ix
+	jq	nz,.unhandled
 	lea	de,ydevice
 	ld	a,USB_HOST_CONFIGURE_EVENT
-	call	z,_DispatchEvent
-	jq	nz,.unhandled
+	call	_DispatchEvent
+	ret	nz
 	ld	a,(setupPacket.wValue)
 	scf
 .setConfigured:
