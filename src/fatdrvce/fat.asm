@@ -870,7 +870,6 @@ fat_ReadSector:
 	ld	a,(yfatType.cluster_size)
 	cp	a,c
 	pop	iy
-	inc	c
 	jr	nz,.readsector
 	ld	a,hl,(yfatFile.current_cluster)
 	push	iy
@@ -885,6 +884,7 @@ fat_ReadSector:
 	ld	(yfatFile.current_sector),a,hl
 	ld	c,0
 .readsector:
+	inc	c
 	ld	hl,(yfatFile.working_buffer)
 	ld	(util_read10.buffer),hl
 	ld	(yfatFile.cluster_sector),c
@@ -940,7 +940,6 @@ fat_WriteSector:
 	ld	a,(yfatType.cluster_size)
 	cp	a,c
 	pop	iy
-	inc	c
 	jr	nz,.writesector
 	ld	a,hl,(yfatFile.current_cluster)
 	push	iy
@@ -955,6 +954,7 @@ fat_WriteSector:
 	ld	(yfatFile.current_sector),a,hl
 	ld	c,0
 .writesector:
+	inc	c
 	ld	hl,(yfatFile.working_buffer)
 	ld	(util_write10.buffer),hl
 	ld	(yfatFile.cluster_sector),c
