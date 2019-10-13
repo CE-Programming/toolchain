@@ -852,7 +852,7 @@ util_scsi_request:
 ; output:
 ;  hopefully recovers transfer state
 util_msd_reset_recovery:
-	call	debug_screen
+	call	debug_screen_1
 	ld	iy,(tmp.msdstruct)
 	call	util_msd_reset
 	compare_hl_zero
@@ -1005,7 +1005,6 @@ util_msd_status_xfer:
 	call	util_get_in_ep
 	ld	ix,tmp.csw
 	ld	bc,sizeof packetCSW
-	call	debug_screen_4
 	jq	util_msd_bulk_transfer
 
 util_get_out_ep:
@@ -1023,11 +1022,10 @@ util_get_in_ep:
 ;  de : endpoint
 util_msd_bulk_transfer:
 	push	iy
-	or	a,a
+	xor	a,a
 	sbc	hl,hl
 	push	hl
-	ld	l,DEFAULT_RETRIES
-	push	hl
+	push	hl			; zero retries (handled by states)
 	push	bc
 	push	ix			; packet to send
 	push	de
