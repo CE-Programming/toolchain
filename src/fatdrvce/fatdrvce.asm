@@ -849,6 +849,7 @@ util_scsi_request:
 ; output:
 ;  hopefully recovers transfer state
 util_msd_reset_recovery:
+	call	debug_screen
 	ld	iy,(tmp.msdstruct)
 	call	util_msd_reset
 	compare_hl_zero
@@ -875,6 +876,18 @@ util_msd_clr_stall:
 	call	usb_ClearEndpointHalt
 	pop	bc
 	ld	iy,(tmp.msdstruct)
+	ret
+
+debug_screen:
+	push	bc,hl,de
+	ld	hl,$ffff
+	ld	($E30200),hl
+	ld	de,$d40001
+	ld	hl,$d40000
+	ld	(hl),0
+	ld	bc,320*240
+	ldir
+	pop	de,hl,bc
 	ret
 
 ; inputs:
@@ -907,23 +920,16 @@ util_msd_transport_data:
 	jr	z,.data_out
 .data_in:
 	call	util_get_in_ep
-	call	util_msd_bulk_transfer
-	compare_hl_zero
-	ret	z
-	jq	util_msd_clr_in_stall
+	jq	util_msd_bulk_transfer
 .data_out:
 	call	util_get_out_ep
-	call	util_msd_bulk_transfer
-	compare_hl_zero
-	ret	z
-	jq	util_msd_clr_out_stall
+	jq	util_msd_bulk_transfer
 
 util_msd_transport_status:
 	call	util_msd_status_xfer
 	compare_hl_zero
 	jr	z,.checkcsw
 .stall:
-	call	util_msd_clr_in_stall	; clear stall
 	call	util_msd_status_xfer	; attempt to read csw again
 	compare_hl_zero
 	jr	z,.checkcsw
