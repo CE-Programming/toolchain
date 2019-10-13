@@ -1539,22 +1539,21 @@ usb_ScheduleTransfer:
 	or	a,(yendpoint.type);CONTROL_TRANSFER
 	jq	z,.control
 .notControl:
-repeat ISOCHRONOUS_TRANSFER-CONTROL_TRANSFER
-	dec	a
-end repeat
-	jq	z,_Error.NOT_SUPPORTED
-	ld	a,(yendpoint.dir)
-	or	a,a
-	jq	z,.notDeviceIn
+	cp	a,ISOCHRONOUS_TRANSFER-CONTROL_TRANSFER+1
 	bit	bUsbRole-16,(hl)
-	jq	z,.notDeviceIn
+	ld	a,(yendpoint.dir)
+	jq	z,.host
+	or	a,a
+	jq	z,.out
 	ld	a,(yendpoint.overlay.fifo)
 	cpl
 	ld	hl,mpUsbFifoTxImr
 	and	a,(hl)
 	ld	(hl),a
 	ld	a,1
-.notDeviceIn:
+.host:
+	jq	c,_Error.NOT_SUPPORTED
+.out:
 	or	a,transfer.type.ioc
 	jq	_QueueTransfer
 
@@ -1588,57 +1587,52 @@ _QueueTransfer:
 .notEnd:
 	add	hl,bc
 	jq	z,.last
+	ld	de,(yendpoint.maxPktLen)
+	ex.s	de,hl
 	bitmsk	PO2_MPS,(yendpoint.internalFlags)
 	jq	nz,.modPo2
-	ld	hl,(yendpoint.maxPktLen)
-	add	hl,hl
 	ld	a,h
-	and	a,$F
+	and	a,7
 	ld	h,a
 	or	a,l
 	jq	z,_Error.INVALID_PARAM
 	push	bc,de
-	ld	b,0
+	ld	b,-1
 .modShift:
 	inc	b
 	add.s	hl,hl
 	jq	nc,.modShift
 	ex	de,hl
-	rr	d
 .modLoop:
+	rr	d
 	rr	e
-	or	a,a
 	sbc	hl,de
 	jq	nc,.modSkip
 	add	hl,de
+	or	a,a
 .modSkip:
-	srl	d
 	djnz	.modLoop
 	pop	de,bc
-	ex	de,hl
 	jq	.modDone
 .modPo2:
-	inc.s	de
-	ld	a,(yendpoint.maxPktLen)
+	ld	a,l
 	add	a,a
 	jq	nz,.modPo2Byte
-	ld	a,(yendpoint.maxPktLen+1)
+	ld	a,h
 	adc	a,a
 	and	a,$F
 	dec	a
-	and	a,h
-	ld	d,a
-	ld	e,l
+	and	a,d
+	ld	h,a
+	ld	l,e
 	jq	.modDone
 .modPo2Byte:
 	dec	a
-	and	a,l
-	ld	e,a
-	ld	d,0
+	and	a,e
+	ld	l,a
+	ld	h,0
 .modDone:
-	; hl = transfer length
-	; de = transfer length % max packet length
-	; bc = total length
+	ex	de,hl
 	sbc	hl,bc
 	add	hl,bc
 	jq	nz,.notLast
