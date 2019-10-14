@@ -830,15 +830,12 @@ util_scsi_request:
 	pop	ix
 	ld	(util_msd_transport_data.ptr),de
 .resendcbw:
-	call	debug_screen_1
 	push	ix
 	call	util_msd_transport_command
 	pop	ix
-	call	debug_screen_2
 	push	ix
 	call	util_msd_transport_data
 	pop	ix
-	call	debug_screen_3
 	push	ix
 	call	util_msd_transport_status
 	pop	ix
@@ -852,7 +849,6 @@ util_scsi_request:
 ; output:
 ;  hopefully recovers transfer state
 util_msd_reset_recovery:
-	call	debug_screen_1
 	ld	iy,(tmp.msdstruct)
 	call	util_msd_reset
 	compare_hl_zero
@@ -879,32 +875,6 @@ util_msd_clr_stall:
 	call	usb_ClearEndpointHalt
 	pop	bc
 	ld	iy,(tmp.msdstruct)
-	ret
-
-debug_screen_1:
-	push	bc,hl,de
-	ld	hl,31
-	jq	debug_screen
-debug_screen_2:
-	push	bc,hl,de
-	ld	hl,33760
-	jq	debug_screen
-debug_screen_3:
-	push	bc,hl,de
-	ld	hl,31744
-	jq	debug_screen
-debug_screen_4:
-	push	bc,hl,de
-	ld	hl,$ffff
-	jq	debug_screen
-debug_screen:
-	ld	($E30200),hl
-	ld	de,$d40001
-	ld	hl,$d40000
-	ld	(hl),0
-	ld	bc,320*10
-	ldir
-	pop	de,hl,bc
 	ret
 
 ; inputs:
