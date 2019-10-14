@@ -874,9 +874,14 @@ srl_Read:
 	push	ix
 	ld	ix,(iy + 3)
 	ld	de,(iy + 9)			; set remaining to length
+	ld	hl,0
+	xor	a,a
+	sbc	hl,de
+	jq	z,.exit
 .rec:
 	ld	hl,(xsrl_Device.readBufStart)	; check if buffer has *any* data
 	ld	bc,(xsrl_Device.readBufEnd)
+	xor	a,a
 	sbc	hl,bc				
 	jq	z,.sched
 	ld	hl,(xsrl_Device.readBufBreak)	; if readBufBreak
@@ -964,6 +969,7 @@ srl_Read:
 	xor	a,a				; get number of bytes transferred
 	ld	hl,(iy + 9)
 	sbc	hl,de
+.exit:
 	pop	ix
 	ret
 
@@ -1071,29 +1077,48 @@ srl_Read_Blocking:
 	add	iy,sp
 	push	ix
 	ld	ix,(iy + 3)
+	call	usb_GetFrameNumber
+	ex	hl,de
 	ld	bc,0				; total
 .loop:
-;todo: check timeout
+	ld	a,(iy + 12)
+	or	a,a
+	jq	z,.noTimeout
+	push	de
+	call	usb_GetFrameNumber
+	pop	de
 	xor	a,a
+	sbc	hl,de				; frame_new - frame_init - timeout
+	push	bc
+	ld	bc,(iy + 12)
+	sbc	hl,bc
+	pop	bc
+	jq	nc,.exit
+.noTimeout:
+	push	de
 	push	iy
 	push	bc
-	ld	hl,(iy + 9)
+	xor	a,a
+	ld	hl,(iy + 9)			; length - total
 	sbc	hl,bc
 	push	hl
-	ld	hl,(iy + 6)
+	ld	hl,(iy + 6)			; buffer + total
 	add	hl,bc
 	push	hl
 	push	ix
 	call	srl_Read			; srl_Read(srl, buffer + total, length - total)
-	pop	de,de,de,bc
+	pop	bc,bc,bc,bc
 	add	hl,bc				; total += len
 	push	hl
 	call	usb_HandleEvents
-	pop	bc,iy
+	pop	bc,iy,de
 	xor	a,a
 	ld	hl,(iy + 9)
 	sbc	hl,bc
-	jq	c,.loop
+	jq	nz,.loop
+.exit:
+	push	bc
+	pop	hl
 	pop	ix
 	ret
 
