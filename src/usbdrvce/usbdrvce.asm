@@ -2155,9 +2155,9 @@ end virtual
 	ld	ytransfer,(xendpoint.first)
 	jq	.check
 .flush:
-	push	de
+	push	ytransfer,de
 	call	_DispatchTransferCallback
-	pop	de
+	pop	de,ytransfer
 	add	hl,de
 	or	a,a
 	sbc	hl,de
