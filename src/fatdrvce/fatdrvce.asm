@@ -34,8 +34,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export msd_Init
 	export msd_GetSectorCount
 	export msd_GetSectorSize
-	export msd_ReadSector
-	export msd_WriteSector
+	export msd_ReadSectors
+	export msd_WriteSectors
 	export fat_Find
 	export fat_Init
 	export fat_Deinit
@@ -696,14 +696,15 @@ msd_GetSectorCount:
 	ret
 
 ;-------------------------------------------------------------------------------
-; Reads a sector from a Mass Storage Device.
-; args:
-;  sp + 3  : msd device structure
-;  sp + 6  : lba of sector to read
-;  sp + 12 : user buffer to read into
-; return:
-;  hl = error status
-msd_ReadSector:
+msd_ReadSectors:
+; Reads sectors from a Mass Storage Device
+; inputs:
+;  sp + 3: msd device structure
+;  sp + 6 & 9: first lba
+;  sp + 12: number of sectors
+;  sp + 15: user buffer to read into
+; outputs:
+;  hl: error status
 	ld	iy,0
 	add	iy,sp
 	lea	hl,iy + 6
@@ -722,13 +723,39 @@ msd_ReadSector:
 	dec	de
 	ld	a,(hl)
 	ld	(de),a
-	inc	(iy + 6)		; increment the lba
-	jr	nz,.nocarry
-	ld	hl,(iy + 7)
-	inc	hl
-	ld	(iy + 7),hl
-.nocarry:
+	ld	hl,scsi.read10.len
 	ld	de,(iy + 12)
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	ex	de,hl
+	xor	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	ex	de,hl
+	ld	hl,scsi.read10 + 8
+	ld	(hl),de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl),a
+	ld	de,(iy + 15)
 	ld	iy,(iy + 3)
 	ld	hl,scsi.read10
 	call	util_scsi_request
@@ -739,14 +766,15 @@ msd_ReadSector:
 	ret
 
 ;-------------------------------------------------------------------------------
-; Writes a sector to a Mass Storage Device.
-; args:
-;  sp + 3  : msd device structure
-;  sp + 6  : lba of sector to write
-;  sp + 12 : user buffer to write from
-; return:
-;  hl = error status
-msd_WriteSector:
+msd_WriteSectors:
+; Writes sectors to a Mass Storage Device
+; inputs:
+;  sp + 3: msd device structure
+;  sp + 6 & 9: first lba
+;  sp + 12: number of sectors
+;  sp + 15: user buffer to write from
+; outputs:
+;  hl: error status
 	ld	iy,0
 	add	iy,sp
 	lea	hl,iy + 6
@@ -765,13 +793,39 @@ msd_WriteSector:
 	dec	de
 	ld	a,(hl)
 	ld	(de),a
-	inc	(iy + 6)		; increment the lba
-	jr	nz,.nocarry
-	ld	hl,(iy + 7)
-	inc	hl
-	ld	(iy + 7),hl
-.nocarry:
+	ld	hl,scsi.write10.len
 	ld	de,(iy + 12)
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	ex	de,hl
+	xor	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	add	hl,hl
+	adc	a,a
+	ex	de,hl
+	ld	hl,scsi.write10 + 8
+	ld	(hl),de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl),a
+	ld	de,(iy + 15)
 	ld	iy,(iy + 3)
 	ld	hl,scsi.write10
 	call	util_scsi_request

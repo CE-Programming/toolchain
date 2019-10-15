@@ -138,7 +138,7 @@ typedef enum {
 
 typedef enum {
     FAT_LIST_FILEONLY, /**< For listing only files. */
-    FAT_LIST_DIRONLY /**< For listing only directories. */
+    FAT_LIST_DIRONLY, /**< For listing only directories. */
     FAT_LIST_ALL /**< For listing files and directories. */
 } fat_list_option_t;
 
@@ -376,27 +376,30 @@ msd_error_t msd_GetSectorSize(msd_device_t *msd,
                               uint24_t *sectorSize);
 
 /**
- * Reads a single sector from a Mass Storage Device.
+ * Reads sectors from a Mass Storage Device.
  * @param msd MSD device structure.
  * @param lba Logical Block Address (LBA) of starting sector to read.
- * @param sectors Number of sectors to read.
- * @param buffer Buffer to read into. Should be at least a sector size.
+ * @param num Number of sectors to read.
+ * @param data Buffer to read into. Should be the size of a sector multiplied by num.
  * @return MSD_SUCCESS on success.
  */
-msd_error_t msd_ReadSector(msd_device_t *msd,
-                           uint32_t lba,
-                           void *data);
+msd_error_t msd_ReadSectors(msd_device_t *msd,
+                            uint32_t lba,
+                            uint24_t num,
+                            void *data);
 
 /**
- * Writes a single sector of a Mass Storage Device.
+ * Writes sectors of a Mass Storage Device.
  * @param msd MSD device structure.
- * @param lba Logical Block Address (LBA) of sector to write.
- * @param buffer Buffer to write to MSD. Should be at least one sector size.
+ * @param lba Logical Block Address (LBA) of first sector.
+ * @param num Number of sectors to write.
+ * @param data Data to write to MSD. Should be the size of a sector multiplied by num.
  * @return MSD_SUCCESS on success.
  */
-msd_error_t msd_WriteSector(msd_device_t *msd,
-                            uint32_t lba,
-                            const void *data);
+msd_error_t msd_WriteSectors(msd_device_t *msd,
+                             uint32_t lba,
+                             uint24_t num,
+                             const void *data);
 
 #ifdef __cplusplus
 }
