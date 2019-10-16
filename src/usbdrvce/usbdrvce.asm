@@ -13,6 +13,7 @@ library 'USBDRVCE', 0
 ;-------------------------------------------------------------------------------
 	export usb_Init
 	export usb_Cleanup
+	export usb_PollTransfers
 	export usb_HandleEvents
 	export usb_WaitForEvents
 	export usb_WaitForInterrupt
@@ -3349,6 +3350,7 @@ label .hack at $-byte
 	and	a,bmUsbIntErr or bmUsbInt
 	call	nz,_HandleCompletionInt
 	ret	nz
+	ld	hl,mpUsbSts
 iterate type, PortChgDetect, FrameListOver, HostSysErr, AsyncAdv
 	bit	bUsbInt#type,(hl)
 	call	nz,_Handle#type#Int
@@ -3601,10 +3603,12 @@ _CleanupRootDevice:
 
 _HandleCompletionInt:
 	ld	(hl),a
+usb_PollTransfers:
 	push	ix
 	ld	xendpoint,(dummyHead.next)
 .loop:
-	ld	hl,mpUsbSts
+	or	a,a
+	sbc	hl,hl
 	ld	a,ixh
 	xor	a,dummyHead shr 8 and $FF
 	jq	z,.done
