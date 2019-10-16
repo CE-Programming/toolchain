@@ -553,6 +553,18 @@ usb_error_t usb_Init(usb_event_callback_t handler, usb_callback_data_t *data,
 void usb_Cleanup(void);
 
 /**
+ * This calls any transfer callbacks that have triggered.
+ * It is not necessary to call this function, because
+ * completed transfers will trigger in any other event
+ * dispatch function at the end of the frame.  However,
+ * this function may be useful for polling for transfers
+ * that may complete early in a frame, without having to wait
+ * for the frame to end.  For reference, a frame lasts 1ms.
+ * @return An error returned by a callback or USB_SUCCESS.
+ */
+usb_error_t usb_PollTransfers(void);
+
+/**
  * Calls any device or transfer callbacks that have triggered.
  * @return An error returned by a callback or USB_SUCCESS.
  */
