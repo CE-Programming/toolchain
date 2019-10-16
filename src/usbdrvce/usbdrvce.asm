@@ -726,7 +726,10 @@ usb_HandleEvents:
 	ld	a,(mpIntStat+1)
 	and	a,intUsb shr 8
 	ret	z
-	ld	hl,mpUsbIsr
+	ld	hl,mpUsbSts
+	ld	a,(hl)
+	ld	(_HandleHostInt.hack),a
+	ld	l,usbIsr
 iterate type, Dev, Host, Otg
 	bit	bUsbInt#type,(hl)
 	call	nz,_Handle#type#Int
@@ -3341,7 +3344,8 @@ end iterate
 
 _HandleHostInt:
 	ld	l,usbSts
-	ld	a,(hl)
+	ld	a,0
+label .hack at $-byte
 	and	a,bmUsbIntErr or bmUsbInt
 	call	nz,_HandleCompletionInt
 	ret	nz
@@ -3597,7 +3601,6 @@ _CleanupRootDevice:
 
 _HandleCompletionInt:
 	ld	(hl),a
-usb_Hack:
 	push	ix
 	ld	xendpoint,(dummyHead.next)
 .loop:
@@ -3605,14 +3608,7 @@ usb_Hack:
 	ld	a,ixh
 	xor	a,dummyHead shr 8 and $FF
 	jq	z,.done
-; We would like to skip the first instruction
-; [or a,a] in _RetireTransfers but if we do so
-; then the [ld (hl),a] above and the
-; [ld a,(ytransfer.next)] in _RetireTransfers
-; are 4 (!) cycles too close together and
-; cause random hangs, so re-optimize if we
-; find anything else to do for those 4 cycles.
-	call	_RetireTransfers;.nc
+	call	_RetireTransfers.nc
 	ld	xendpoint,(xendpoint.next)
 	jq	c,.loop
 .done:
