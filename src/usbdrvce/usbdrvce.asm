@@ -24,7 +24,7 @@ library 'USBDRVCE', 0
 	export usb_GetDeviceData
 	export usb_FindDevice
 	export usb_ResetDevice
-	export usb_DisconnectDevice
+	export usb_DisableDevice
 	export usb_GetDeviceAddress
 	export usb_GetDeviceSpeed
 	export usb_GetConfigurationDescriptorTotalLength
@@ -780,7 +780,7 @@ usb_UnrefDevice:
 	call	z,_Free32Align32
 	ld	de,mpUsbRange
 .returnZero:
-	xor	a,a
+	or	a,a
 .returnCarry:
 	sbc	hl,hl
 	ret
@@ -868,27 +868,35 @@ usb_FindDevice:
 
 ;-------------------------------------------------------------------------------
 usb_ResetDevice:
-	pop	de
-	ex	(sp),hl
-	push	de
-	inc	l
-	dec	l
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret	nz
-	ld	l,USB_ERROR_INVALID_PARAM
-	ret
+	call	_Error.check
+	ld	de,(ix+6)
+	ld	a,e
+	or	a,a
+	jq	z,_Error.INVALID_PARAM
+	ld	hl,(rootHub.child)
+	sbc	hl,de
+	jq	nz,_Error.NOT_SUPPORTED
+	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 100ms!
+	call	_DelayTenTimesAms
+	ld	hl,mpUsbPortStsCtrl+1
+	set	bUsbPortReset-8,(hl)
+	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
+	call	_DelayTenTimesAms
+	res	bUsbPortReset-8,(hl)
+	ld	a,2 ; WARNING: This assumes flash wait states port is 3, to get at least 10ms!
+	jq	_DelayTenTimesAms
 
 ;-------------------------------------------------------------------------------
-usb_DisconnectDevice:
-	pop	de
-	ex	(sp),hl
-	push	de
-	inc	l
-	dec	l
-	ld	hl,USB_ERROR_NOT_SUPPORTED
-	ret	nz
-	ld	l,USB_ERROR_INVALID_PARAM
-	ret
+usb_DisableDevice:
+	call	_Error.check
+	ld	de,(ix+6)
+	ld	a,e
+	or	a,a
+	jq	z,_Error.INVALID_PARAM
+	ld	hl,(rootHub.child)
+	sbc	hl,de
+	jq	z,_HandlePortPortEnInt.disable
+	jq	_Error.NOT_SUPPORTED
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceAddress:
@@ -1364,8 +1372,20 @@ usb_Transfer:
 	ld	(ix+18),ix
 	call	0
 label .dispatch at $-long
+.bad:
+	ld	bc,1000
 .wait:
+	dec	bc
+	ld	a,b
+	or	a,c
+	jq	nz,.good
+	ld	a,98
+	call	_DispatchEvent
+	jq	.bad
+.good:
+	push	bc
 	call	usb_WaitForEvents
+	pop	bc
 	add	hl,de
 	or	a,a
 	sbc	hl,de
@@ -2123,26 +2143,25 @@ end repeat
 ;  hl = mpUsbRange | error
 ;  ix = ?
 ;  iy = ?
-_CleanupDevice:
+_DeviceDisabled:
 	ld	hl,_HandleAsyncAdvInt.scheduleCleanup
-.recurse:
 	push	hl
 virtual
 	ld	hl,0
- assert $ = .enter
+ assert $ = .recurse
  load .ld_hl: byte from $$
 end virtual
-	db .ld_hl
+	db	.ld_hl
 .recursed:
 	pop	xdevice
 	ret	nz
-.enter:
+.recurse:
 	push	xdevice
 	ld	de,(xdevice.endpoints+1)
 	ld	xdevice,(xdevice.child+1)
 	ld	hl,.recursed
 	dec	ixl
-	jq	nz,.recurse
+	jq	nz,_DeviceDisconnected.recurse
 	ld	xendpoint,dummyHead
 	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_NO_DEVICE
 .loop:
@@ -2152,8 +2171,11 @@ end virtual
 	jq	z,.next
 	ld	a,(xendpoint.type)
 	or	a,a
+	ld	a,-1
+	ld	(de),a
 	jq	nz,.notControl
 	inc	e
+	ld	(de),a
 .notControl:
 	sbc	hl,hl
 	ld	ytransfer,(xendpoint.first)
@@ -2189,6 +2211,26 @@ end virtual
 	and	a,31
 	jq	nz,.loop
 	pop	xdevice
+	lea	de,xdevice+1
+	ld	a,USB_DEVICE_DISABLED_EVENT
+	jq	_DispatchEvent
+
+; Input:
+;  ix = device-1
+; Output:
+;  zf = success
+;  a = ?
+;  bc = ?
+;  de = ?
+;  hl = mpUsbRange | error
+;  ix = ?
+;  iy = ?
+_DeviceDisconnected:
+	ld	hl,_HandleAsyncAdvInt.scheduleCleanup
+.recurse:
+	push	hl
+	call	_DeviceDisabled.recurse
+	ret	nz
 	lea	de,xdevice+1
 	ld	a,USB_DEVICE_DISCONNECTED_EVENT
 	call	_DispatchEvent
@@ -3217,7 +3259,7 @@ virtual
  assert $ = .free
  load .ld_hl: byte from $$
 end virtual
-	db .ld_hl
+	db	.ld_hl
 .next:
 	inc	l
 	djnz	.search
@@ -3584,21 +3626,25 @@ _HandleOvercurrInt:
 _HandleAPlugRemovedInt:
 _HandleBPlugRemovedInt:
 	ld	(hl),(bmUsbIntAPlugRemoved or bmUsbIntBPlugRemoved) shr 8
-	jq	_CleanupRootDevice
+	jq	_RootDeviceDisconnected
 
 ; Output:
 ;  zf = success
 ;  de = ? | hl
 ;  hl = hl | error
 ;  iy = ?
-_CleanupRootDevice:
-	push	hl,ix
+_RootDeviceDisconnected:
+	ld	de,_DeviceDisconnected
+.enter:
+	ex	de,hl
+	push	de,ix
 	ld	xdevice,(rootHub.child)
 	dec	ixl
-	call	nz,_CleanupDevice
+	call	nz,_DispatchEvent.dispatch
 	pop	ix,de
 	ret	nz
 	ex	de,hl
+	ld	hl,mpUsbPortStsCtrl
 	ret
 
 _HandleCompletionInt:
@@ -3631,7 +3677,7 @@ end iterate
 	ret
 
 _HandlePortConnStsInt:
-	call	_CleanupRootDevice
+	call	_RootDeviceDisconnected
 	ret	nz
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbPortEnChg or bmUsbPortEn)
@@ -3644,34 +3690,23 @@ _HandlePortConnStsInt:
 	call	_CreateDevice
 	ld	hl,USB_ERROR_NO_MEMORY
 	ret	nz ; FIXME
+	ld	hl,mpUsbPortStsCtrl
 	lea	de,ydevice
 	ld	a,USB_DEVICE_CONNECTED_EVENT
-	call	_DispatchEvent
-	ret	nz
-	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 100ms!
-	call	_DelayTenTimesAms
-	ld	hl,mpUsbPortStsCtrl+1
-	set	bUsbPortReset-8,(hl)
-	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
-	call	_DelayTenTimesAms
-	res	bUsbPortReset-8,(hl)
-	dec	hl;mpUsbPortStsCtrl
-	ld	a,2 ; WARNING: This assumes flash wait states port is 3, to get at least 10ms!
-	jq	_DelayTenTimesAms
+	jq	_DispatchEvent
 
 _HandlePortPortEnInt:
-	ld	ydevice,(rootHub.child)
-	lea	de,ydevice
-	ld	a,e
-	cp	a,a
-	rrca
-	ret	c
 	ld	a,(hl)
 	and	a,not (bmUsbOvercurrChg or bmUsbConnStsChg)
 	ld	(hl),a
+	ld	de,_DeviceDisabled
 	bit	bUsbPortEn,(hl)
-	ld	a,USB_DEVICE_DISABLED_EVENT
-	jq	z,_DispatchEvent
+	jq	z,_RootDeviceDisconnected.enter
+	ld	ydevice,(rootHub.child)
+	ld	a,iyl
+	cp	a,a
+	rrca
+	ret	c
 	call	_CreateDefaultControlEndpoint
 	call	z,_Alloc32Align32
 	jq	nz,.disable
@@ -3734,9 +3769,10 @@ _HandleAsyncAdvInt:
 	ld	iyh,a
 	inc	a
 	jq	nz,.loop
-	cpl	;-1
+	scf
 .scheduleCleanup:
 	ret	nz
+	sbc	a,a
 	ld	hl,(cleanupListReady)
 	scf
 	adc	a,l
