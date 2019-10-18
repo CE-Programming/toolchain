@@ -1535,6 +1535,10 @@ usb_ScheduleTransfer.check:
 	or	a,a
 	sbc	hl,de
 	jq	z,usb_ScheduleControlTransfer.invalidParam
+	ld	l,endpoint.device
+	ld	ydevice,(hl)
+	bitmsk	IS_ENABLED,(ydevice.find)
+	jq	z,_Error.NO_DEVICE
 	ld	hl,(ix+15)
 	add	hl,de
 	or	a,a
@@ -2158,6 +2162,7 @@ end virtual
 .recurse:
 	push	xdevice
 	ld	de,(xdevice.endpoints+1)
+	resmsk	IS_ENABLED,(xdevice.find+1)
 	ld	xdevice,(xdevice.child+1)
 	ld	hl,.recursed
 	dec	ixl
@@ -2826,6 +2831,7 @@ end repeat
 ; Input:
 ;  bc = status
 ;  hl = transferred
+;  ix = endpoint
 ;  iy = transfer
 ; Output:
 ;  af = ?
@@ -3707,6 +3713,7 @@ _HandlePortPortEnInt:
 	cp	a,a
 	rrca
 	ret	c
+	setmsk	IS_ENABLED,(ydevice.find)
 	call	_CreateDefaultControlEndpoint
 	call	z,_Alloc32Align32
 	jq	nz,.disable
