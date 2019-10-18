@@ -22,6 +22,7 @@ library 'USBDRVCE', 0
 	export usb_GetDeviceHub
 	export usb_SetDeviceData
 	export usb_GetDeviceData
+	export usb_GetDeviceFlags
 	export usb_FindDevice
 	export usb_ResetDevice
 	export usb_DisableDevice
@@ -822,6 +823,18 @@ usb_GetDeviceData:
 	cp	a,iyl
 	ret	z
 	ld	hl,(ydevice.data)
+	ret
+
+;-------------------------------------------------------------------------------
+usb_GetDeviceFlags:
+	pop	de
+	ex	(sp),ydevice
+	push	de
+	xor	a,a
+	sbc	hl,hl
+	cp	a,iyl
+	ret	z
+	ld	l,(ydevice.find)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2162,6 +2175,7 @@ end virtual
 .recurse:
 	push	xdevice
 	ld	de,(xdevice.endpoints+1)
+	setmsk	IS_DISABLED,(xdevice.find+1)
 	resmsk	IS_ENABLED,(xdevice.find+1)
 	ld	xdevice,(xdevice.child+1)
 	ld	hl,.recursed
@@ -3713,6 +3727,7 @@ _HandlePortPortEnInt:
 	cp	a,a
 	rrca
 	ret	c
+	resmsk	IS_DISABLED,(ydevice.find)
 	setmsk	IS_ENABLED,(ydevice.find)
 	call	_CreateDefaultControlEndpoint
 	call	z,_Alloc32Align32

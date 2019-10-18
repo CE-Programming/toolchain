@@ -166,7 +166,14 @@ typedef enum usb_transfer_status {
   USB_TRANSFER_CANCELLED  = 1 << 7,
 } usb_transfer_status_t;
 
-typedef enum usb_find_flag {
+typedef enum usb_device_flags {
+  USB_IS_DISABLED = 1 << 0, /**< Device is disabled.                          */
+  USB_IS_ENABLED  = 1 << 1, /**< Device is enabled.                           */
+  USB_IS_DEVICES  = 1 << 2, /**< Device is not a hub.                         */
+  USB_IS_HUBS     = 1 << 3, /**< Device is a hub.                             */
+} usb_device_flags_t;
+
+typedef enum usb_find_device_flags {
   USB_SKIP_NONE     = 0,      /**< Return all devices                         */
   USB_SKIP_DISABLED = 1 << 0, /**< Don't return disabled devices.             */
   USB_SKIP_ENABLED  = 1 << 1, /**< Don't return enabled devices.              */
@@ -176,9 +183,9 @@ typedef enum usb_find_flag {
                               /**  any of the hubs through which \c from is   */
                               /**  connected.  This skips recursing over      */
                               /**  devices attached to other hubs.            */
-} usb_find_flag_t;
+} usb_find_device_flags_t;
 
-typedef enum usb_endpoint_flag {
+typedef enum usb_endpoint_flags {
   USB_MANUAL_TERMINATE = 0 << 0, /**< For transfers that are a multiple of    */
                                  /**  the endpoint's maximum packet length,   */
                                  /**  don't automatically terminate outgoing  */
@@ -200,7 +207,7 @@ typedef enum usb_endpoint_flag {
                                  /**  incoming ones to be terminated with a   */
                                  /**  zero-length packet or fail with         */
                                  /**  USB_TRANSFER_OVERFLOW.                  */
-} usb_endpoint_flag_t;
+} usb_endpoint_flags_t;
 
 typedef enum usb_role {
   USB_ROLE_HOST   = 0 << 4, /**< Acting as usb host.   */
@@ -626,6 +633,14 @@ void usb_SetDeviceData(usb_device_t device, usb_device_data_t *data);
 usb_device_data_t *usb_GetDeviceData(usb_device_t device);
 
 /**
+ * This returns the same flags that are used by usb_FindDevice() for a given
+ * \p device.  Note that \c USB_SKIP_ATTACHED is not part of these flags.
+ * @param device The device to get the flags of.
+ * @return The \c usb_device_flags_t flags associated with \p device.
+ */
+usb_device_flags_t usb_GetDeviceFlags(usb_device_t device);
+
+/**
  * Finds the next device connected through \p root after \p from satisfying
  * \p flags, or \c NULL if no more matching devices.
  *
@@ -672,14 +687,14 @@ usb_device_data_t *usb_GetDeviceData(usb_device_t device);
  * \endcode
  * @param root Hub below which to limit search, or \c NULL to search all
  * devices including the root hub.
- * @param from Device to start the search from, or \c NULL to start from
+ * @param from The device to start the search from, or \c NULL to start from
  * \p root and include devices attached to root even with \c USB_SKIP_ATTACHED.
  * @param flags What kinds of devices to return.
  * @return The next device connected through \p root after \p from satisfying
  * \p flags or \c NULL if none.
  */
 usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
-                            usb_find_flag_t flags);
+                            usb_find_device_flags_t flags);
 
 /**
  * Performs a usb reset on a device. This triggers a device enabled event when
@@ -903,16 +918,16 @@ unsigned usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
 /**
  * Sets the flags for an endpoint.
  * @param endpoint The endpoint to set the flags of.
- * @param flags The \c usb_endpoint_flag_t to set.
+ * @param flags The \c usb_endpoint_flags_t to set.
  */
-void usb_SetEndpointFlags(usb_endpoint_t endpoint, usb_endpoint_flag_t flags);
+void usb_SetEndpointFlags(usb_endpoint_t endpoint, usb_endpoint_flags_t flags);
 
 /**
  * Gets the flags for an endpoint.
  * @param endpoint The endpoint to get the flags of.
- * @return The flags last set with \c usb_SetEndpointFlags.
+ * @return The \c usb_endpoint_flags_t last set with \c usb_SetEndpointFlags.
  */
-usb_endpoint_flag_t usb_GetEndpointFlags(usb_endpoint_t endpoint);
+usb_endpoint_flags_t usb_GetEndpointFlags(usb_endpoint_t endpoint);
 
 /**
  * Returns the current role the usb hardware is operating in.
