@@ -705,65 +705,9 @@ msd_ReadSectors:
 ;  sp + 15: user buffer to read into
 ; outputs:
 ;  hl: error status
-	ld	iy,0
-	add	iy,sp
-	lea	hl,iy + 6
-	ld	de,scsi.read10.lba + 3
-	ld	a,(hl)
-	ld	(de),a
-	inc	hl
-	dec	de
-	ld	a,(hl)
-	ld	(de),a
-	inc	hl
-	dec	de
-	ld	a,(hl)
-	ld	(de),a
-	inc	hl
-	dec	de
-	ld	a,(hl)
-	ld	(de),a
-	ld	hl,scsi.read10.len
-	ld	de,(iy + 12)
-	ld	(hl),d
-	inc	hl
-	ld	(hl),e
-	ex	de,hl
-	xor	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	ex	de,hl
-	ld	hl,scsi.read10 + 8
-	ld	(hl),de
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(hl),a
-	ld	de,(iy + 15)
-	ld	iy,(iy + 3)
-	ld	hl,scsi.read10
-	call	util_scsi_request
-	ld	hl,MSD_ERROR_USB_FAILED
-	ret	nz
-	or	a,a
-	sbc	hl,hl			; return success
-	ret
+	push	ix
+	ld	ix,scsi.read10
+	jq	util_msd_read_write_sectors
 
 ;-------------------------------------------------------------------------------
 msd_WriteSectors:
@@ -775,10 +719,19 @@ msd_WriteSectors:
 ;  sp + 15: user buffer to write from
 ; outputs:
 ;  hl: error status
-	ld	iy,0
+	push	ix
+	ld	ix,scsi.write10
+	jq	util_msd_read_write_sectors
+
+;-------------------------------------------------------------------------------
+; utility functions
+;-------------------------------------------------------------------------------
+
+util_msd_read_write_sectors:
+	ld	iy,3
 	add	iy,sp
 	lea	hl,iy + 6
-	ld	de,scsi.write10.lba + 3
+	lea	de,xscsipktrw.lba + 3
 	ld	a,(hl)
 	ld	(de),a
 	inc	hl
@@ -793,51 +746,24 @@ msd_WriteSectors:
 	dec	de
 	ld	a,(hl)
 	ld	(de),a
-	ld	hl,scsi.write10.len
+	lea	hl,xscsipktrw.len
 	ld	de,(iy + 12)
 	ld	(hl),d
 	inc	hl
 	ld	(hl),e
 	ex	de,hl
-	xor	a,a
 	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	add	hl,hl
-	adc	a,a
-	ex	de,hl
-	ld	hl,scsi.write10 + 8
-	ld	(hl),de
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(hl),a
+	ld	(xscsipktrw + 9),hl
 	ld	de,(iy + 15)
 	ld	iy,(iy + 3)
-	ld	hl,scsi.write10
+	lea	hl,xscsipktrw
 	call	util_scsi_request
+	pop	ix
 	ld	hl,MSD_ERROR_USB_FAILED
 	ret	nz
 	or	a,a
 	sbc	hl,hl			; return success
 	ret
-
-;-------------------------------------------------------------------------------
-; utility functions
-;-------------------------------------------------------------------------------
 
 util_scsi_init:
 	ld	hl,scsi.inquiry
@@ -874,170 +800,129 @@ util_scsi_init:
 util_scsi_request_default:
 	ld	de,(ymsdDevice.buffer)
 util_scsi_request:
-	ld	(tmp.msdstruct),iy
+	push	ix
+	ld	(.msdstruct),iy
 	xor	a,a
 	ld	(tmp.sensecount),a
-	push	iy
-	push	ix
 	ld	(util_msd_reset_recovery.errorsp),sp
-	push	hl
-	pop	ix
-	ld	(util_msd_transport_data.ptr),de
+	ld	(util_msd_xfer_cbw.cbw),hl
+	ld	(util_msd_xfer_data.data),de
 .resendcbw:
-	push	ix
-	call	util_msd_transport_command
+	call	util_msd_xfer_cbw
+	call	util_msd_xfer_data
+	call	util_msd_xfer_csw
 	pop	ix
-	push	ix
-	call	util_msd_transport_data
-	pop	ix
-	push	ix
-	call	util_msd_transport_status
-	pop	ix
-	jr	nz,.resendcbw
-	pop	ix
-	pop	iy
+	ld	iy,0
+.msdstruct = $-3
 	ret
 
-; input:
-;  iy : msd structure
-; output:
-;  hopefully recovers transfer state
-util_msd_reset_recovery:
-	ld	iy,(tmp.msdstruct)
-	call	util_msd_reset
-	compare_hl_zero
-	jr	z,.resetsuccess
-	ld	sp,0
-.errorsp := $ - 3
-	xor	a,a
-	inc	a
-	pop	ix
-	pop	iy
-	ret
-.resetsuccess:
-	call	util_msd_clr_in_stall		; no pending transfers at this point!
-	jq	util_msd_clr_out_stall
-util_msd_clr_out_stall:
-	ld	iy,(tmp.msdstruct)
-	ld	bc,(ymsdDevice.epout)
-	jq	util_msd_clr_stall
-util_msd_clr_in_stall:
-	ld	iy,(tmp.msdstruct)
-	ld	bc,(ymsdDevice.epin)
-util_msd_clr_stall:
-	push	bc
-	call	usb_ClearEndpointHalt
-	pop	bc
-	ld	iy,(tmp.msdstruct)
-	ret
-
-; inputs:
-;  hl : data to transfer
-;  de : buffer to recieve into
-util_msd_transport_command:
-	call	util_get_out_ep
-	ld	hl,(ymsdDevice.tag)
-	ld	(xpacketCBW.tag),hl
-	inc	hl
-	ld	(ymsdDevice.tag),hl	; increment the tag
+util_msd_xfer_cbw:
+	ld	iy,(util_scsi_request.msdstruct)
+	ld	de,(ymsdDevice.epout)
+	ld	bc,(ymsdDevice.tag)
+	ld	ix,0
+.cbw := $-3
+	ld	(xpacketCBW.tag),bc
+	inc	bc
+	ld	(ymsdDevice.tag),bc	; increment the tag
 	ld	bc,sizeof packetCBW
 	call	util_msd_bulk_transfer
-	compare_hl_zero
 	ret	z			; check the command was accepted
+.retry:
 	call	util_msd_reset_recovery
-	jr	util_msd_transport_command
+	jq	util_msd_xfer_cbw
 
-; bc = length of transfer
-; ix = cbw pointer
-util_msd_transport_data:
+util_msd_xfer_data:
 	ld	bc,(xpacketCBW.len)
 	sbc	hl,hl
 	adc	hl,bc
-	ret	z			; no transfer if 0 length
+	ret	z			; no transfer if 0 len
 	ld	a,(xpacketCBW.dir)	; check direction
+	ld	iy,(util_scsi_request.msdstruct)
 	ld	ix,0
-.ptr := $ - 3
+.data := $ - 3
 	or	a,a
-	jr	z,.data_out
-.data_in:
-	call	util_get_in_ep
-	jq	util_msd_bulk_transfer
-.data_out:
-	call	util_get_out_ep
-	jq	util_msd_bulk_transfer
+	ld	de,(ymsdDevice.epin)
+	jr	nz,.xfer
+	ld	de,(ymsdDevice.epout)
+.xfer:
+	call	util_msd_bulk_transfer
+	ret	z
+	call	util_msd_xfer_cbw.retry
+	jq	util_msd_xfer_data
 
-util_msd_transport_status:
+util_msd_xfer_csw:
+	ld	iy,(util_scsi_request.msdstruct)
 	call	util_msd_status_xfer
-	compare_hl_zero
 	jr	z,.checkcsw
-.stall:
 	call	util_msd_status_xfer	; attempt to read csw again
-	compare_hl_zero
 	jr	z,.checkcsw
-	call	util_msd_reset_recovery
-	xor	a,a
-	inc	a			; return failure code
-	ret
+.retry:
+	call	util_msd_xfer_cbw.retry
+	call	util_msd_xfer_data
+	jq	util_msd_xfer_csw
 .checkcsw:
 	ld	a,(tmp.csw.status)
 	or	a,a			; check for good status of transfer
 	jr	nz,.invalid
 .valid:
-	ld	hl,(tmp.csw.residue + 0)
-	ld	a,(tmp.csw.residue + 3)
+	ld	a,hl,(tmp.csw.residue)
 	add	hl,de
 	or	a,a
-	ld	a,$10
+	ld	a,16
 	ret	nz
 	sbc	hl,de
-	ret	nz			; if residue != 0, fail
+	ret	nz			; if residue != 0, retry transfer
 	xor	a,a			; return success
 	ret
 .invalid:
 	dec	a			; check for sense error (we can recover)
-	jr	z,.senseerror		; handle command fail
-.phaseerror:
-	call	util_msd_reset_recovery
-	xor	a,a
-	inc	a
-	ret
+	jr	nz,.retry		; handle command fail (phase error)
 .senseerror:
 	ld	hl,tmp.sensecount
 	or	a,(hl)
 	ret	nz
 	inc	(hl)
 	ld	de,tmp.sensebuffer
-	ld	ix,scsi.requestsense
-	ld	(util_msd_transport_data.ptr),de
+	ld	hl,scsi.requestsense
+	ld	(util_msd_xfer_cbw.cbw),hl
+	ld	(util_msd_xfer_data.data),de
 .senseresendcbw:
-	push	ix
-	call	util_msd_transport_command
-	pop	ix
-	push	ix
-	call	util_msd_transport_data
-	pop	ix
-	push	ix
-	call	util_msd_transport_status
-	pop	ix
-	jr	nz,.senseresendcbw
+	call	util_msd_xfer_cbw
+	call	util_msd_xfer_data
+	call	util_msd_xfer_csw
 	xor	a,a
 	ld	(tmp.sensebuffer),a
 	ld	a,(tmp.sensebuffer + 2)
 	ret
 
 util_msd_status_xfer:
-	call	util_get_in_ep
+	ld	de,(ymsdDevice.epin)
 	ld	ix,tmp.csw
 	ld	bc,sizeof packetCSW
 	jq	util_msd_bulk_transfer
 
-util_get_out_ep:
-	ld	iy,(tmp.msdstruct)
-	ld	de,(ymsdDevice.epout)
+;  hopefully recovers transfer state
+util_msd_reset_recovery:
+	ld	iy,(util_scsi_request.msdstruct)
+	call	util_msd_reset
+	compare_hl_zero
+	jr	z,.resetsuccess
+	ld	sp,0
+.errorsp := $ - 3
+	pop	ix
+	xor	a,a
+	inc	a
 	ret
-util_get_in_ep:
-	ld	iy,(tmp.msdstruct)
-	ld	de,(ymsdDevice.epin)
+.resetsuccess:
+	ld	iy,(util_scsi_request.msdstruct)
+	ld	bc,(ymsdDevice.epin)
+	call	util_ep_stall
+	ld	bc,(ymsdDevice.epout)
+util_ep_stall:
+	push	iy,bc
+	call	usb_ClearEndpointHalt
+	pop	bc,iy
 	ret
 
 ; inputs:
@@ -1054,8 +939,9 @@ util_msd_bulk_transfer:
 	push	ix			; packet to send
 	push	de
 	call	usb_Transfer
-	pop	bc, bc, bc, bc, bc
+	pop	bc,bc,bc,bc,bc
 	pop	iy
+	compare_hl_zero
 	ret
 
 ; iy -> msd structure
