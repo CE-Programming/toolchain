@@ -221,6 +221,13 @@ virtual at 0
 	?INTERRUPT_TRANSFER			rb 1
 end virtual
 
+virtual at 0
+  USB_IS_DISABLED				rb 1
+  USB_IS_ENABLED				rb 1
+  USB_IS_DEVICES				rb 1
+  USB_IS_HUBS					rb 1
+end virtual
+
 ;-------------------------------------------------------------------------------
 ;srl_error_t srl_Init(srl_device_t *srl, usb_device_t dev, void *buf, size_t size, uint8_t interface);
 srl_Init:
@@ -255,7 +262,22 @@ srl_Init:
 	jq	.getEndpoints
 
 .host:
-	push	iy				; get descriptor
+	push	iy
+	ld	bc,(xsrl_Device.dev)
+	push	bc
+	call	usb_GetDeviceFlags		; check if device is enabled
+	pop	bc
+	bit	USB_IS_ENABLED,l
+	jq	nz,.enabled
+
+	ld	bc,(xsrl_Device.dev)
+	push	bc				; enable device
+	call	usb_ResetDevice
+	pop	bc
+
+	call	usb_WaitForEvents
+
+.enabled:					; get descriptor
 	ld	bc,tmp.length			; storage for size of descriptor
 	push	bc
 	ld	bc,18				; size of device descriptor
@@ -266,7 +288,8 @@ srl_Init:
 	push	bc
 	inc	bc				; USB_DEVICE_DESCRIPTOR = 1
 	push	bc
-	push	de
+	ld	bc,(xsrl_Device.dev)
+	push	bc
 	call	usb_GetDescriptor
 	pop	bc,bc,bc,bc,bc,bc,iy
 	compare_hl_zero
