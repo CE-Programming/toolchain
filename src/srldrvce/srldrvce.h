@@ -38,7 +38,7 @@ enum srl_DeviceType {
     SRL_UNKNOWN, /**< Incompatible or non-serial device */
     SRL_HOST,    /**< Calc is acting as a device */
     SRL_CDC,     /**< CDC device */
-    SRL_FTDI     /**< FTDI device */
+    SRL_FTDI,    /**< FTDI device */
     SRL_PL2303   /**< PL2303 device */
 };
 
