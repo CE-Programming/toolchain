@@ -39,6 +39,7 @@ enum srl_DeviceType {
     SRL_HOST,    /**< Calc is acting as a device */
     SRL_CDC,     /**< CDC device */
     SRL_FTDI     /**< FTDI device */
+    SRL_PL2303   /**< PL2303 device */
 };
 
 typedef uint8_t srl_deviceType_t;
@@ -54,6 +55,11 @@ enum srl_SubType_FTDI {
     FT2232H,
     FT4232H,
     FT232H,
+};
+
+enum srl_SubType_PL2303{
+    PL2303_01 = 0,
+    PL2303_HX,
 };
 
 typedef uint8_t srl_subType_t;

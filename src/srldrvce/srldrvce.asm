@@ -93,6 +93,7 @@ virtual at 0
 	SRL_HOST	rb 1		; Calc is acting as a device
 	SRL_CDC		rb 1		; CDC device
 	SRL_FTDI	rb 1		; FTDI device
+	SRL_PL2303	rb 1		; PL2303 device
 end virtual
 
 ; enum srl_SubType_FTDI
@@ -107,6 +108,11 @@ virtual at 0
 	FT2232H		rb 1
 	FT4232H		rb 1
 	FT232H		rb 1
+end virtual
+
+virtual at 0
+	PL2303_01	rb 1
+	PL2303_HX	rb 1
 end virtual
 
 SRL_INTERFACE_ANY := $FF
@@ -445,6 +451,94 @@ srl_Init:
 	jq	.shared
 
 .nonFTDI:
+	ld	hl,tmp.descriptor + deviceDescriptor.idVendor
+	ld	a,(hl)				; check if device is a PL2303
+	cp	a,$7b
+	jq	nz,.nonPL2303
+	inc	hl
+	ld	a,(hl)
+	cp	a,$06
+	jq	nz,.nonPL2303
+	inc	hl
+	ld	hl,(hl)
+	ex.s	hl,de
+	xor	a,a
+iterate pid, $2303, $2304, $04bb, $1234, $aaa0, $aaa2, $aaa8, $0611, $0612, $0609, $331a, $0307, $e1f1
+	ld	hl,#pid
+	sbc	hl,de
+	jq	z,.pl2303
+end iterate
+	jq	.nonPL2303
+
+.pl2303:
+	ld	a,SRL_PL2303
+	ld	(xsrl_Device.type),a
+
+	ld	a,(tmp.descriptor + deviceDescriptor.bDeviceClass)
+	cp	a,2				; get subtype
+	ld	a,PL2303_01
+	jq	z,.plTypeFound
+	ld	a,(tmp.descriptor + deviceDescriptor.bMaxPacketSize0)
+	cp	a,$40
+	ld	a,PL2303_HX
+	jq	z,.plTypeFound
+	ld	a,PL2303_01
+
+.plTypeFound:
+	ld	(xsrl_Device.subType),a
+
+	ld	a,$02				; set endpoints
+	ld	(.epIn),a
+	ld	a,$83
+	ld	(.epOut),a
+
+	ld	hl,$8484			; neither the datasheet nor any driver I've found has explained what this does
+	call	pl2303VendorRead
+	ld	hl,$0404
+	ld	de,0
+	call	pl2303VendorWrite
+	ld	hl,$8484
+	call	pl2303VendorRead
+	ld	hl,$8383
+	call	pl2303VendorRead
+	ld	hl,$8484
+	call	pl2303VendorRead
+	ld	hl,$0404
+	ld	de,1
+	call	pl2303VendorWrite
+	ld	hl,$8484
+	call	pl2303VendorRead
+	ld	hl,$8383
+	call	pl2303VendorRead
+	ld	hl,0
+	ld	de,1
+	call	pl2303VendorWrite
+	ld	hl,1
+	ld	de,0
+	call	pl2303VendorWrite
+
+	ld	hl,2				; magic values are slightly different for older versions
+	ld	de,$24
+	ld	a,(xsrl_Device.subType)
+	or	a,a
+	jq	z,.plVersionLegacy
+	ld	e,$44				; device is a HX
+	call	pl2303VendorWrite
+	ld	hl,8
+	ld	de,0
+	call	pl2303VendorWrite
+	ld	hl,9
+	ld	de,0
+	call	pl2303VendorWrite
+
+	jq	.shared
+
+.plVersionLegacy:
+	call	pl2303VendorWrite
+
+	jq	.shared
+
+.nonPL2303:
 	ld	de,(iy + 9)			; address of configuration descriptor
 	ld	hl,(.configSize)
 	add	hl,de
@@ -641,6 +735,9 @@ srl_SetRate:
 	inc	a
 	cp	a,(xsrl_Device.type)
 	jq	z,.ftdi
+	inc	a
+	cp	a,(xsrl_Device.type)
+	jq	z,.cdc
 	jq	.exit
 .cdc:						; if a CDC device:
 	ld	hl,(iy + 6)			; change the rate of the default line coding
@@ -1330,6 +1427,70 @@ srl_StartAsyncWrite:
 	call	usb_ScheduleTransfer
 	pop	bc,bc,bc,bc,bc
 	ret
+
+; hl: value
+pl2303VendorRead:
+	push	iy
+
+	ex.s	de,hl
+	ld	(.setup + setuppkt.wValue),de
+
+	ld	bc,0
+	push	bc
+	ld	bc,50
+	push	bc
+	ld	bc,.byte
+	push	bc
+	ld	bc,.setup
+	push	bc
+
+	ld	bc,0				; get the default control endpoint
+	push	bc
+	ld	bc,(xsrl_Device.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+
+	push	hl
+	call	usb_ControlTransfer
+	pop	bc,bc,bc,bc,bc
+	pop	iy
+	ld	a,0
+.byte=$-1
+	ret
+.setup	setuppkt	$c0,$01,$0000,$0000,1
+
+; hl: value
+; de: index
+pl2303VendorWrite:
+	push	iy
+
+	ld	(.setup + setuppkt.wValue),hl
+	ex.s	de,hl
+	ld	(.setup + setuppkt.wIndex),hl
+
+	ld	bc,0
+	push	bc
+	ld	bc,50
+	push	bc
+	ld	bc,0
+	push	bc
+	ld	bc,.setup
+	push	bc
+
+	ld	bc,0				; get the default control endpoint
+	push	bc
+	ld	bc,(xsrl_Device.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+
+	push	hl
+	call	usb_ControlTransfer
+	pop	bc,bc,bc,bc,bc
+	pop	iy
+	ret
+.setup	setuppkt	$40,$01,$0000,$0000,0
 
 ;temp
 openDebug:
