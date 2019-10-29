@@ -911,6 +911,7 @@ fat_ReadSectors:
 	ld	hl,(iy + 6)
 	or	a,a
 	sbc	hl,de
+	ld	(iy + 6),hl
 	jq	.getnextcluster
 .alternateflow:
 	ld	de,(iy + 6)
@@ -1043,6 +1044,7 @@ fat_WriteSectors:
 	ld	hl,(iy + 6)
 	or	a,a
 	sbc	hl,de
+	ld	(iy + 6),hl
 	jq	.getnextcluster
 .alternateflow:
 	ld	de,(iy + 6)
