@@ -49,8 +49,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_GetAttrib
 	export fat_SetFilePos
 	export fat_GetFilePos
-	export fat_ReadSector
-	export fat_WriteSector
+	export fat_ReadSectors
+	export fat_WriteSectors
 	export fat_Create
 	export fat_Delete
 ;-------------------------------------------------------------------------------

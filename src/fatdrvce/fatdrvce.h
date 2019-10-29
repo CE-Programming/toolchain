@@ -312,7 +312,7 @@ fat_error_t fat_Close(fat_file_t *file);
  * @param file File handle returned from fat_Open.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_SetFilePos(fat_file_t *file, uint24_t offset);
+fat_error_t fat_SetFilePos(fat_file_t *file, uint24_t sector);
 
 /**
  * Gets the sector offset position in the file. Multiply return by the sector
@@ -323,24 +323,26 @@ fat_error_t fat_SetFilePos(fat_file_t *file, uint24_t offset);
 uint24_t fat_GetFilePos(fat_file_t *file);
 
 /**
- * Reads a sector (512 bytes) from a file, and advances the file
- * position to the next sector.
+ * Reads multiple sectors (512 bytes each), and advances the file position.
  * @param file File handle returned from fat_Open.
- * @param data Location to store read sector data, must be at least 512 bytes.
+ * @param num Number of sectors to read.
+ * @param data Location to store read sector data.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_ReadSector(fat_file_t *file,
-                           void *data);
+fat_error_t fat_ReadSectors(fat_file_t *file,
+                            uint24_t num,
+                            void *data);
 
 /**
- * Writes a sector (512 bytes) to a file, and advances the file
- * position to the next sector.
+ * Writes multiple sectors (512 bytes each), and advances the file position.
  * @param file File handle returned from fat_Open.
- * @param data Location to store read sector data, must be at least 512 bytes.
+ * @param num Number of sectors to write to file.
+ * @param data Location of writing sector data.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_WriteSector(fat_file_t *file,
-                            const void *data);
+fat_error_t fat_WriteSectors(fat_file_t *file,
+                             uint24_t num,
+                             const void *data);
 
 /**
  * Initialize a USB connected Mass Storage Device. Checks if the device is
@@ -350,7 +352,7 @@ fat_error_t fat_WriteSector(fat_file_t *file,
  * by other devices and/or functions.
  * @param msd MSD device structure.
  * @param dev USB device to initialize as MSD.
- * @param buffer The buffer's address. (must be at least 512 bytes).
+ * @param buffer The buffer's address. (must be 512 bytes).
  * @return MSD_SUCCESS on success, otherwise error if initialization failed.
  */
 msd_error_t msd_Init(msd_device_t *msd,

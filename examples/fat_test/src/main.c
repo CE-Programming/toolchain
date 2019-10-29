@@ -34,6 +34,9 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             callback_data->device = NULL;
             putstr("usb device disconnected");
             break;
+        case USB_DEVICE_CONNECTED_EVENT:
+            usb_ResetDevice(event_data);
+            break;
         case USB_DEVICE_ENABLED_EVENT:
             callback_data->device = event_data;
             putstr("usb device enabled");
@@ -154,7 +157,7 @@ void main(void) {
         // change the size of the first file
         fat_SetSize(&fat, str, 512 * 1024);
         fat_SetSize(&fat, str, 512 * 0);
-        fat_SetSize(&fat, str, 512 * 10);
+        fat_SetSize(&fat, str, 512 * 32);
 
         // change the size of the other files
         fat_SetSize(&fat, "/FATTEST/DIR2/FILE1.TXT", 512 * 2 + 16);
@@ -167,7 +170,8 @@ void main(void) {
         fat_Delete(&fat, "/FATTEST/DIR3");
 
         // get directory contents (should be 4)
-        count = fat_DirList(&fat, "/FATTEST/DIR2", entries, MAX_ENTRIES, 0);
+        count = fat_DirList(&fat, "/FATTEST/DIR2", FAT_LIST_ALL,
+                            entries, MAX_ENTRIES, 0);
         if (count >= 0)
         {
             sprintf(buffer, "num entries: %d", count);
@@ -178,23 +182,23 @@ void main(void) {
         fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
 
         // write bytes to file
-        file = fat_Open(&fat, "/FATTEST/DIR1/FILE.TXT", FAT_RDWR);
-        for (i = 0; i < 10; ++i)
+        file = fat_Open(&fat, str, FAT_RDWR);
+        for (i = 0; i < 32; ++i)
         {
             uint24_t offset = i * FAT_BUFFER_SIZE;
             for (j = offset; j < offset + FAT_BUFFER_SIZE; ++j)
             {
                 fatbuffer[j - offset] = j;
             }
-            fat_WriteSector(file, fatbuffer);
+            fat_WriteSectors(file, 1, fatbuffer);
         }
 
         // read back file, and compare read to written bytes
         fat_SetFilePos(file, 0);
-        for (i = 0; i < 10; ++i)
+        for (i = 0; i < 32; ++i)
         {
             uint24_t offset = i * FAT_BUFFER_SIZE;
-            fat_ReadSector(file, fatbuffer);
+            fat_ReadSectors(file, 1, fatbuffer);
             for (j = offset; j < offset + FAT_BUFFER_SIZE; ++j)
             {
                 if (fatbuffer[j - offset] != j)
@@ -208,7 +212,7 @@ void main(void) {
         }
 
         // verify that this read returns EOF
-        faterror = fat_ReadSector(file, fatbuffer);
+        faterror = fat_ReadSectors(file, 1, fatbuffer);
         if (faterror == FAT_ERROR_EOF)
         {
             putstr("detected eof.");
@@ -234,4 +238,3 @@ void putstr(char *str) {
     os_PutStrFull(str);
     _OS(asm_NewLine);
 }
-

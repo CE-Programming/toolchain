@@ -15,7 +15,7 @@
 ; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ;-------------------------------------------------------------------------------
 ; Notes:
-; The orginal µCFAT source was used as inspiration for some of the implemented
+; The original µCFAT source was used as inspiration for some of the implemented
 ; file i/o function, and hand-optimized for speed. Some parts of this file are
 ; related to implementations of functions available in µCFAT. The license for
 ; µCFAT is provided below.
@@ -50,7 +50,7 @@ fat_Find:
 ;  sp + 3  : msd device structure
 ;  sp + 6  : storage for found partitions
 ;  sp + 9  : return number of found partitions
-;  sp + 12 : maxium number of partitions to find
+;  sp + 12 : maximum number of partitions to find
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -691,7 +691,7 @@ fat_SetFilePos:
 	ld	hl,(yfatFile.file_size_sectors)
 	compare_hl_de
 	jq	c,.eof
-	ex	de,hl		; determine cluster offset
+	ex	de,hl				; determine cluster offset
 	ld	bc,0
 	push	iy
 	ld	iy,(yfatFile.fat)
@@ -700,7 +700,7 @@ fat_SetFilePos:
 	xor	a,a
 	ld	e,a
 	push	bc,hl
-	call	__lremu		; get sector offset in cluster
+	call	__lremu				; get sector offset in cluster
 	ld	(yfatFile.cluster_sector),l
 	pop	hl,bc
 	xor	a,a
@@ -844,58 +844,119 @@ fat_Close:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_ReadSector:
-; Reads a sector from an open file handle
+fat_ReadSectors:
+; Reads sectors from an open file handle
 ; Arguments:
 ;  sp + 3 : FAT File structure type
-;  sp + 6 : Buffer to read into
+;  sp + 6 : Number of sectors to read
+;  sp + 9 : Buffer to read into
 ; Returns:
 ;  FAT_SUCCESS on success
-	pop	de,iy,hl
-	push	hl,iy,de
-	ld	(yfatFile.working_buffer),hl
-	ld	hl,(yfatFile.fpossector)
-	ld	de,(yfatFile.file_size_sectors)
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy + 3)
+	ld	ix,(xfatFile.fat)
+	ld	a,(xfatType.cluster_size)
+	ld	(.cluster_size),a
+	ld	ix,(iy + 3)
+	ld	hl,(xfatFile.fpossector)
+	ld	de,(xfatFile.file_size_sectors)
 	compare_hl_de
 	jq	nc,.eof
-	ld	a,hl,(yfatFile.current_sector)
+	ex	de,hl
+	or	a,a
+	sbc	hl,de
+	ld	de,(iy + 6)
+	compare_hl_de
+	jq	nc,.loop
+	ld	(iy + 6),hl			; total number of sectors
+.loop:
+	ld	hl,(iy + 6)
+	compare_hl_zero
+	jq	z,.done
+	ex	de,hl
+	ld	a,(.cluster_size)
+	sub	a,(xfatFile.cluster_sector)
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	compare_hl_de
+	jq	nc,.alternateflow
+	ex	de,hl
+	ld	hl,(iy + 9)
+	ld	(util_read10.buffer),hl
+	ld	a,hl,(xfatFile.current_sector)
+	compare_auhl_zero
+	jq	z,.invalidcluster
 	ld	bc,0
-	ld	c,(yfatFile.cluster_sector)
+	ld	c,(xfatFile.cluster_sector)
 	add	hl,bc
 	adc	a,b
-	push	hl
-	push	af
+	push	de
 	push	iy
-	ld	iy,(yfatFile.fat)
-	ld	a,(yfatType.cluster_size)
-	cp	a,c
+	ld	iy,(xfatFile.fat)
+	call	util_read_fat_multiple_sectors
 	pop	iy
-	jr	nz,.readsector
-	ld	a,hl,(yfatFile.current_cluster)
+	pop	hl
+	jq	nz,.usberror
+	push	hl
+	ld	h,l
+	ld	l,0
+	add	hl,hl
+	ld	de,(iy + 9)
+	add	hl,de
+	ld	(iy + 9),hl
+	pop	de
+	ld	hl,(iy + 6)
+	or	a,a
+	sbc	hl,de
+	jq	.getnextcluster
+.alternateflow:
+	ld	de,(iy + 6)
+	ld	hl,(iy + 9)
+	ld	(util_read10.buffer),hl
+	ld	a,hl,(xfatFile.current_sector)
+	compare_auhl_zero
+	jq	z,.invalidcluster
+	ld	bc,0
+	ld	c,(xfatFile.cluster_sector)
+	add	hl,bc
+	adc	a,b
+	push	de
 	push	iy
-	ld	iy,(yfatFile.fat)
+	ld	iy,(xfatFile.fat)
+	call	util_read_fat_multiple_sectors
+	pop	iy
+	pop	de
+	jq	nz,.usberror
+	or	a,a
+	sbc	hl,hl
+	ld	(iy + 6),hl
+	ld	a,(xfatFile.cluster_sector)
+	add	a,e
+	ld	(xfatFile.cluster_sector),a
+	cp	a,0
+.cluster_size := $-1
+	jq	nz,.loop
+.getnextcluster:
+	ld	de,tmp.sectorbuffer
+	ld	(util_read10.buffer),de
+	ld	a,hl,(xfatFile.current_cluster)
+	push	iy
+	ld	iy,(xfatFile.fat)
 	call	util_next_cluster
 	pop	iy
-	ld	(yfatFile.current_cluster),a,hl
+	ld	(xfatFile.current_cluster),a,hl
 	push	iy
-	ld	iy,(yfatFile.fat)
+	ld	iy,(xfatFile.fat)
 	call	util_cluster_to_sector
 	pop	iy
-	ld	(yfatFile.current_sector),a,hl
-	ld	c,0
-.readsector:
-	inc	c
-	ld	hl,(yfatFile.working_buffer)
-	ld	(util_read10.buffer),hl
-	ld	(yfatFile.cluster_sector),c
-	ld	hl,(yfatFile.fpossector)
-	inc	hl
-	ld	(yfatFile.fpossector),hl
-	ld	iy,(yfatFile.fat)
-	pop	af
-	pop	hl
-	call	util_read_fat_sector
-	jq	nz,.usberror
+	ld	(xfatFile.current_sector),a,hl
+	xor	a,a
+	ld	(xfatFile.cluster_sector),a
+	jq	.loop
+.done:
 	xor	a,a
 	sbc	hl,hl
 	jq	.restorebuffer
@@ -905,67 +966,129 @@ fat_ReadSector:
 .invalidcluster:
 	ld	hl,FAT_ERROR_INVALID_CLUSTER
 	jq	.restorebuffer
-.restorebuffer:
-	ld	bc,tmp.sectorbuffer
-	ld	(util_read10.buffer),bc
-	ret
 .eof:
 	ld	hl,FAT_ERROR_EOF
+	jq	.restorebuffer
+.restorebuffer:
+	ld	de,tmp.sectorbuffer
+	ld	(util_read10.buffer),de
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_WriteSector:
+fat_WriteSectors:
 ; Writes a sector to an open file handle
 ; Arguments:
 ;  sp + 3 : FAT File structure type
-;  sp + 6 : Buffer to write
+;  sp + 6 : Number of sectors to write
+;  sp + 9 : Buffer to write
 ; Returns:
 ;  FAT_SUCCESS on success
-	pop	de,iy,hl
-	push	hl,iy,de
-	ld	(yfatFile.working_buffer),hl
-	ld	de,(yfatFile.fpossector)
-	ld	hl,(yfatFile.file_size_sectors)
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy + 3)
+	ld	ix,(xfatFile.fat)
+	ld	a,(xfatType.cluster_size)
+	ld	(.cluster_size),a
+	ld	ix,(iy + 3)
+	ld	hl,(xfatFile.fpossector)
+	ld	de,(xfatFile.file_size_sectors)
 	compare_hl_de
-	jq	z,.eof
-	ld	a,hl,(yfatFile.current_sector)
+	jq	nc,.eof
+	ex	de,hl
+	or	a,a
+	sbc	hl,de
+	ld	de,(iy + 6)
+	compare_hl_de
+	jq	nc,.loop
+	ld	(iy + 6),hl			; total number of sectors
+.loop:
+	ld	hl,(iy + 6)
+	compare_hl_zero
+	jq	z,.done
+	ex	de,hl
+	ld	a,(.cluster_size)
+	sub	a,(xfatFile.cluster_sector)
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	compare_hl_de
+	jq	nc,.alternateflow
+	ex	de,hl
+	ld	hl,(iy + 9)
+	ld	(util_write10.buffer),hl
+	ld	a,hl,(xfatFile.current_sector)
+	compare_auhl_zero
+	jq	z,.invalidcluster
 	ld	bc,0
-	ld	c,(yfatFile.cluster_sector)
+	ld	c,(xfatFile.cluster_sector)
 	add	hl,bc
 	adc	a,b
-	push	hl
-	push	af
+	push	de
 	push	iy
-	ld	iy,(yfatFile.fat)
-	ld	a,(yfatType.cluster_size)
-	cp	a,c
+	ld	iy,(xfatFile.fat)
+	call	util_write_fat_multiple_sectors
 	pop	iy
-	jr	nz,.writesector
-	ld	a,hl,(yfatFile.current_cluster)
+	pop	hl
+	jq	nz,.usberror
+	push	hl
+	ld	h,l
+	ld	l,0
+	add	hl,hl
+	ld	de,(iy + 9)
+	add	hl,de
+	ld	(iy + 9),hl
+	pop	de
+	ld	hl,(iy + 6)
+	or	a,a
+	sbc	hl,de
+	jq	.getnextcluster
+.alternateflow:
+	ld	de,(iy + 6)
+	ld	hl,(iy + 9)
+	ld	(util_write10.buffer),hl
+	ld	a,hl,(xfatFile.current_sector)
+	compare_auhl_zero
+	jq	z,.invalidcluster
+	ld	bc,0
+	ld	c,(xfatFile.cluster_sector)
+	add	hl,bc
+	adc	a,b
+	push	de
 	push	iy
-	ld	iy,(yfatFile.fat)
+	ld	iy,(xfatFile.fat)
+	call	util_write_fat_multiple_sectors
+	pop	iy
+	pop	de
+	jq	nz,.usberror
+	or	a,a
+	sbc	hl,hl
+	ld	(iy + 6),hl
+	ld	a,(xfatFile.cluster_sector)
+	add	a,e
+	ld	(xfatFile.cluster_sector),a
+	cp	a,0
+.cluster_size := $-1
+	jq	nz,.loop
+.getnextcluster:
+	ld	de,tmp.sectorbuffer
+	ld	(util_write10.buffer),de
+	ld	a,hl,(xfatFile.current_cluster)
+	push	iy
+	ld	iy,(xfatFile.fat)
 	call	util_next_cluster
 	pop	iy
-	ld	(yfatFile.current_cluster),a,hl
+	ld	(xfatFile.current_cluster),a,hl
 	push	iy
-	ld	iy,(yfatFile.fat)
+	ld	iy,(xfatFile.fat)
 	call	util_cluster_to_sector
 	pop	iy
-	ld	(yfatFile.current_sector),a,hl
-	ld	c,0
-.writesector:
-	inc	c
-	ld	hl,(yfatFile.working_buffer)
-	ld	(util_write10.buffer),hl
-	ld	(yfatFile.cluster_sector),c
-	ld	hl,(yfatFile.fpossector)
-	inc	hl
-	ld	(yfatFile.fpossector),hl
-	ld	iy,(yfatFile.fat)
-	pop	af
-	pop	hl
-	call	util_write_fat_sector
-	jq	nz,.usberror
+	ld	(xfatFile.current_sector),a,hl
+	xor	a,a
+	ld	(xfatFile.cluster_sector),a
+	jq	.loop
+.done:
 	xor	a,a
 	sbc	hl,hl
 	jq	.restorebuffer
@@ -975,12 +1098,13 @@ fat_WriteSector:
 .invalidcluster:
 	ld	hl,FAT_ERROR_INVALID_CLUSTER
 	jq	.restorebuffer
-.restorebuffer:
-	ld	bc,tmp.sectorbuffer
-	ld	(util_write10.buffer),bc
-	ret
 .eof:
 	ld	hl,FAT_ERROR_EOF
+	jq	.restorebuffer
+.restorebuffer:
+	ld	de,tmp.sectorbuffer
+	ld	(util_write10.buffer),de
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2214,23 +2338,43 @@ util_read_fat_sector:
 ;  iy: fat_t structure
 ; outputs
 ;  de: read sector
+	ld	de,1
+	jq	util_read_fat_multiple_sectors
+
+;-------------------------------------------------------------------------------
+util_read_fat_multiple_sectors:
+; inputs
+;  auhl: LBA address
+;  de: number of sectors
+;  iy: fat_t structure
+; outputs
+;  de: read sector
+	push	hl
+	ld	hl,scsi.read10.len
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	ex	de,hl
+	add	hl,hl
+	ld	(scsi.read10 + 9),hl
+	pop	hl
 	ld	e,bc,(yfatType.fat_base_lba)
 	add	hl,bc
 	adc	a,e			; big endian
-	ld	de,scsi.read10.lba
-	ld	(de),a
+	ld	bc,scsi.read10.lba
+	ld	(bc),a
 	dec	sp
 	push	hl
 	inc	sp
 	pop	af			; hlu
-	inc	de
-	ld	(de),a
+	inc	bc
+	ld	(bc),a
 	ld	a,h
-	inc	de
-	ld	(de),a
+	inc	bc
+	ld	(bc),a
 	ld	a,l
-	inc	de
-	ld	(de),a
+	inc	bc
+	ld	(bc),a
 	push	iy
 	ld	iy,(yfatType.partition)
 	ld	iy,(yfatPartition.msd)
@@ -2244,23 +2388,43 @@ util_write_fat_sector:
 ;  auhl: lba address
 ;  iy: fat_t structure
 ; outputs
+	ld	de,1
+	jq	util_write_fat_multiple_sectors
+
+;-------------------------------------------------------------------------------
+util_write_fat_multiple_sectors:
+; inputs
+;  auhl: LBA address
+;  de: number of sectors
+;  iy: fat_t structure
+; outputs
+;  de: read sector
+	push	hl
+	ld	hl,scsi.write10.len
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	ex	de,hl
+	add	hl,hl
+	ld	(scsi.write10 + 9),hl
+	pop	hl
 	ld	e,bc,(yfatType.fat_base_lba)
 	add	hl,bc
 	adc	a,e			; big endian
-	ld	de,scsi.write10.lba
-	ld	(de),a
+	ld	bc,scsi.write10.lba
+	ld	(bc),a
 	dec	sp
 	push	hl
 	inc	sp
 	pop	af			; hlu
-	inc	de
-	ld	(de),a
+	inc	bc
+	ld	(bc),a
 	ld	a,h
-	inc	de
-	ld	(de),a
+	inc	bc
+	ld	(bc),a
 	ld	a,l
-	inc	de
-	ld	(de),a
+	inc	bc
+	ld	(bc),a
 	push	iy
 	ld	iy,(yfatType.partition)
 	ld	iy,(yfatPartition.msd)
