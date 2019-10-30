@@ -438,6 +438,9 @@ fat_Open:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
+	ld	a,(iy + 9)
+	and	a,3
+	ld	(iy + 9),a
 	ld	de,(iy + 6)
 	push	iy
 	ld	iy,(iy + 3)
@@ -447,15 +450,10 @@ fat_Open:
 	ld	c,(iy + 9)
 	set	BIT_OPEN,c
 	ld	iy,(iy + 3)
-	push	iy
-	push	de
-	push	af
-	push	hl
+	push	iy,de,af,hl
 	call	util_get_spare_file
 	compare_hl_zero
-	pop	hl
-	pop	af
-	pop	de
+	pop	hl,af,de
 	jq	z,.errorpop
 	ld	(yfatFile.flags),c
 	pop	bc
@@ -466,27 +464,7 @@ fat_Open:
 	ld	(yfatFile.first_cluster),a,hl
 	ld	(yfatFile.current_cluster),a,hl
 	compare_auhl_zero
-	jr	nz,.notempty
-.empty:
-	bit	BIT_WRITE,c
-	jr	z,.cantalloc
-	push	iy
-	call	util_alloc_cluster
-	pop	iy
-	compare_auhl_zero
-	jq	nz,.allocedclusted
-	ld	(yfatFile.flags),a
-	jq	.error
-.allocedclusted:
-	ld	(yfatFile.first_cluster),a,hl
-	ld	(yfatFile.current_cluster),a,hl
-.cantalloc:
-	xor	a,a
-	sbc	hl,hl
-	jq	.storesize
-.notempty:
-	call	util_get_file_size
-.storesize:
+	call	nz,util_get_file_size
 	call	util_set_file_size
 	ld	a,hl,(yfatFile.current_cluster)
 	push	iy
@@ -856,6 +834,12 @@ fat_ReadSectors:
 	add	iy,sp
 	push	ix
 	ld	ix,(iy + 3)
+	bit	BIT_READ,(xfatFile.flags)
+	jq	nz,.allowread
+	pop	ix
+	ld	hl,FAT_ERROR_WRONLY
+	ret
+.allowread:
 	ld	ix,(xfatFile.fat)
 	ld	a,(xfatType.cluster_size)
 	ld	(.cluster_size),a
@@ -989,6 +973,12 @@ fat_WriteSectors:
 	add	iy,sp
 	push	ix
 	ld	ix,(iy + 3)
+	bit	BIT_WRITE,(xfatFile.flags)
+	jq	nz,.allowwrite
+	pop	ix
+	ld	hl,FAT_ERROR_RDONLY
+	ret
+.allowwrite:
 	ld	ix,(xfatFile.fat)
 	ld	a,(xfatType.cluster_size)
 	ld	(.cluster_size),a
@@ -1246,6 +1236,10 @@ fat_Create:
 	xor	a,a
 	sbc	hl,hl
 	ld	(ix + 28),a,hl		; set initial size to zero
+	ld	(ix + 20),a
+	ld	(ix + 21),a
+	ld	(ix + 26),a
+	ld	(ix + 27),a
 	pop	ix
 	push	iy
 	ld	iy,(iy + 3)
@@ -1581,6 +1575,9 @@ util_alloc_cluster:
 	djnz	.traverseclusterchain
 	pop	ix
 	pop	af,hl
+	ld	bc,1
+	add	hl,bc
+	adc	a,b
 	jq	.traversefat
 	ret
 .unallocatedcluster:
@@ -1687,20 +1684,24 @@ util_do_alloc_entry:
 	ld	ix,tmp.sectorbuffer
 	ld	(ix + 0),$e5
 	ld	(ix + 11),b
-	ld	(ix + 32),b
-	ld	(ix + 43),b
+	ld	(ix + 20),b
+	ld	(ix + 21),b
+	ld	(ix + 26),b
+	ld	(ix + 27),b
 	ld	(ix + 28),b
 	ld	(ix + 29),b
 	ld	(ix + 30),b
 	ld	(ix + 31),b
+	ld	(ix + 32),b
 	pop	ix
-	push	hl,af
+	push	af,hl
 	call	util_write_fat_sector
+	pop	hl
 	jq	nz,.error
-	pop	af,hl
+	pop	af
 	ret
 .error:
-	pop	hl,hl
+	pop	hl
 	xor	a,a
 	sbc	hl,hl
 	ret

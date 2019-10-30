@@ -22,9 +22,6 @@ struct global
     usb_device_t device;
 };
 
-static uint8_t msd_buffer[MSD_SECTOR_SIZE];
-static fat_partition_t fatpartitions[MAX_PARTITIONS];
-
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                                   usb_callback_data_t *callback_data) {
 
@@ -49,6 +46,8 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 }
 
 void main(void) {
+    static uint8_t msd_buffer[MSD_SECTOR_SIZE];
+    static fat_partition_t fatpartitions[MAX_PARTITIONS];
     static char buffer[212];
     static global_t global;
     static msd_device_t msd;
@@ -182,7 +181,7 @@ void main(void) {
         fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
 
         // write bytes to file
-        file = fat_Open(&fat, str, FAT_RDWR);
+        file = fat_Open(&fat, str, FAT_O_RDWR);
         for (i = 0; i < 32; ++i)
         {
             uint24_t offset = i * FAT_BUFFER_SIZE;

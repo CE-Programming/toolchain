@@ -117,7 +117,9 @@ typedef enum {
     FAT_ERROR_FAILED_ALLOC,
     FAT_ERROR_CLUSTER_CHAIN,
     FAT_ERROR_DIRECTORY_NOT_EMPTY,
-    FAT_ERROR_NO_VOLUME_LABEL
+    FAT_ERROR_NO_VOLUME_LABEL,
+    FAT_ERROR_RDONLY,
+    FAT_ERROR_WRONLY
 } fat_error_t;
 
 typedef enum {
@@ -142,9 +144,9 @@ typedef enum {
     FAT_LIST_ALL /**< For listing files and directories. */
 } fat_list_option_t;
 
-#define FAT_WRONLY    (1 << 1) /**< Open file in write-only mode. */
-//#define FAT_RDONLY  (1 << 0) /**< Open file in read-only mode. */
-#define FAT_RDWR      (FAT_RDONLY | FAT_WRONLY)  /**< Open file for reading and writing. */
+#define FAT_O_RDONLY  (1 << 0) /**< Open file in read-only mode. */
+#define FAT_O_WRONLY  (1 << 1) /**< Open file in write-only mode. */
+#define FAT_O_RDWR    (FAT_O_RDONLY | FAT_O_WRONLY)  /**< Open file for reading and writing. */
 
 #define MSD_SECTOR_SIZE 512 /**< Size of device sector, library only supports 512 bytes. */
 
@@ -291,8 +293,8 @@ uint32_t fat_GetSize(fat_t *fat,
  * Opens a file for either reading or writing, or both.
  * @param fat Initialized FAT structure type.
  * @param path File path to open or write.
- * @param flags Mode of opening, can be a mask of FAT_WRONLY,
-                FAT_RDONLY, or just FAT_RDWR.
+ * @param flags Mode of opening, can be a mask of FAT_O_WDONLY,
+                FAT_O_RDONLY, or just FAT_O_RDWR.
  * @return 0 if the file could not be opened, otherwise pointer
  *         to a file handle for other functions.
  */
