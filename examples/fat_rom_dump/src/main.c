@@ -38,6 +38,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             break;
         case USB_DEVICE_CONNECTED_EVENT:
             usb_ResetDevice(event_data);
+            putstr("usb device connected");
             break;
         case USB_DEVICE_ENABLED_EVENT:
             callback_data->device = event_data;
@@ -86,12 +87,16 @@ void main(void)
         // if a device is plugged, initialize it
         if (!msd_inited && global.device)
         {
-
             // initialize the msd device
             msderror = msd_Init(&msd, global.device, msd_buffer);
             if (msderror == MSD_SUCCESS)
             {
                 msd_inited = true;
+                putstr("inited msd");
+            }
+            else
+            {
+                putstr("init msd fail");
             }
             break;
         }

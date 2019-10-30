@@ -7,7 +7,7 @@
  * allocation size at least 4KiB, however 64KiB will provide the best
  * performance.
  *
- * Currently only drives with a hardware sector size of 512 bytes are supported,
+ * Currently only drives with a logical sector size of 512 bytes are supported,
  * which is the most common sector size available. Larger drives and SSDs may
  * not work.
  *

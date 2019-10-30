@@ -87,16 +87,14 @@ void main(void) {
             msderror = msd_Init(&msd, global.device, msd_buffer);
             if (msderror == MSD_SUCCESS)
             {
-                putstr("inited msd");
                 msd_inited = true;
-                break;
+                putstr("inited msd");
             }
             else
             {
-                sprintf(buffer, "init msd fail: %u", msderror);
-                putstr(buffer);
-                break;
+                putstr("init msd fail");
             }
+            break;
         }
 
     } while (!os_GetCSC());
