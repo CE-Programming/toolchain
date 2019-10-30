@@ -238,7 +238,7 @@ fat_DirList:
 	ld	b,$C4
 	dec	a;FAT_LIST_DIRONLY
 	jq	z,.gotjump
-	dec	b
+	ld	b,$CD
 .gotjump:
 	ld	a,b
 	ld	(.change_jump),a
