@@ -3,10 +3,15 @@
  * @brief USB FAT Filesystem Driver
  *
  * This library can be used to communicate with Mass Storage Devices (MSD) which
- * have partitions formated as FAT32. (FAT16 support is implemented yet untested).
- * It currently only supports drives that have a sector size of 512, which is pretty
- * much every flash drive on the market, except for huge ones.
- * The drive must use MBR partitioning, GUID is not supported.
+ * have partitions formated as FAT32. It is recommended to make the cluster
+ * allocation size at least 4KiB, however 64KiB will provide the best
+ * performance.
+ *
+ * Currently only drives with a hardware sector size of 512 bytes are supported,
+ * which is the most common sector size available. Larger drives and SSDs may
+ * not work.
+ *
+ * The drive must use MBR partitioning, GUID and others are not supported.
  *
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
