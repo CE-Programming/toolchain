@@ -52,9 +52,9 @@ typedef struct {
 
 typedef struct {
     usb_device_t dev; /**< USB device */
-    usb_endpoint_t in; /**< USB bulk in endpoint */
-    usb_endpoint_t out; /**< USB bulk out endpoint */
-    usb_endpoint_t ctrl; /**< USB Control endpoint */
+    uint8_t bulkinaddr; /**< USB bulk in endpoint address */
+    uint8_t bulkoutaddr; /**< USB bulk out endpoint address */
+    uint8_t configindex; /**< USB config descriptor index */
     uint24_t tag; /**< MSD Command Block Wrapper incrementing tag */
     uint32_t lba; /**< Logical Block Address of LUN */
     uint32_t blocksize; /**< Block size (usually 512) */
@@ -360,11 +360,21 @@ fat_error_t fat_WriteSectors(fat_file_t *file,
  * @param msd MSD device structure.
  * @param dev USB device to initialize as MSD.
  * @param buffer The buffer's address. (must be 512 bytes).
- * @return MSD_SUCCESS on success, otherwise error if initialization failed.
+ * @return MSD_SUCCESS on success, otherwise error if
+ *         initialization failed.
  */
 msd_error_t msd_Init(msd_device_t *msd,
                      usb_device_t dev,
                      void *buffer);
+
+/**
+ * Attempts to reset and restore normal working order of the
+ * Mass Storage Device in the event of bus babble or other
+ * errors.
+ * @param msd MSD device structure.
+ * @return MSD_SUCCESS on success, otherwise error.
+ */
+msd_error_t msd_Reset(msd_device_t *msd);
 
 /**
  * Gets the sector count of the device.

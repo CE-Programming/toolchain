@@ -32,6 +32,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 ; v1 functions
 ;-------------------------------------------------------------------------------
 	export msd_Init
+	export msd_Reset
 	export msd_GetSectorCount
 	export msd_GetSectorSize
 	export msd_ReadSectors
@@ -157,9 +158,9 @@ struct msdDevice
 	local size
 	label .: size
 	dev rl 1
-	epin rl 1
-	epout rl 1
-	epctrl rl 1
+	bulkinaddr rb 1
+	bulkoutaddr rb 1
+	configindex rb 1
 	tag rl 1
 	lba rb 4
 	reserved rb 1	; technically part of block size
@@ -411,7 +412,7 @@ msd_Init:
 	ld	de,18
 	ld	hl,(tmp.length)
 	compare_hl_de			; ensure enough bytes were fetched
-	jq	nz,.error
+	jq	nz,.msddeverror
 	xor	a,a
 	ld	(.configindex),a	; set starting index
 	jq	.getconfigcheck
@@ -456,8 +457,8 @@ msd_Init:
 
 	xor	a,a
 	ld	(.interfacenumber),a
-	ld	(.inep),a
-	ld	(.outep),a
+	ld	(.bulkinaddr),a
+	ld	(.bulkoutaddr),a
 	ld	hl,(tmp.length)
 	ld	(.configlengthend),hl
 	ld	hl,(iy + 9)
@@ -503,10 +504,10 @@ msd_Init:
 	ld	a,b
 	jr	z,.parseoutendpointout
 .parseoutendpointin:
-	ld	(.inep),a
+	ld	(.bulkinaddr),a
 	jq	.parsenext
 .parseoutendpointout:
-	ld	(.outep),a
+	ld	(.bulkoutaddr),a
 .parsenext:
 	ld	de,0
 	ld	e,(ydescriptor.bLength)
@@ -525,24 +526,92 @@ msd_Init:
 .parsedone:
 	pop	iy
 	ld	a,0
-.inep := $ - 1
+.bulkinaddr := $ - 1
 	or	a,a
 	jq	z,.getconfigcheck	; no endpoints for msd, keep parsing
 	ld	a,0
-.outep := $ - 1
+.bulkoutaddr := $ - 1
 	or	a,a
 	jq	z,.getconfigcheck	; no endpoints for msd, keep parsing
 
-	; successfully found bulk endpoints for msd
-	; now get the actual endpoint addresses
-	; and set the configuration
+	ld	de,(iy + 9)
+	ld	bc,(iy + 6)
+	ld	iy,(iy + 3)		; setup msd structure with endpoints and buffer
+	ld	(ymsdDevice.buffer),de
+	ld	(ymsdDevice.dev),bc
+	ld	a,(.bulkoutaddr)
+	ld	(ymsdDevice.bulkoutaddr),a
+	ld	a,(.bulkinaddr)
+	ld	(ymsdDevice.bulkinaddr),a
+	ld	a,(.configindex)
+	dec	a
+	ld	(ymsdDevice.configindex),a
+	ld	a,(.interfacenumber)
+	dec	a
+	ld	(ymsdDevice.interface),a
 
+	; successfully found bulk endpoints for msd
+	; now reset the device
+
+	jq	msd_Reset.enter
+
+.getconfigcheck:
+	ld	hl,tmp.descriptor + 17
+	ld	a,(.configindex)
+	cp	a,(hl)
+	jq	nz,.getconfiguration
+.msddeverror:
+	ld	hl,MSD_ERROR_INVALID_DEVICE
+	ret
+.paramerror:
+	ld	hl,MSD_ERROR_INVALID_PARAM
+	ret
+
+;-------------------------------------------------------------------------------
+; Attempts to reset and restore normal working order.
+; args:
+;  sp + 3  : msd device structure
+; return:
+;  hl = error status
+msd_Reset:
+	pop	de,iy
+	push	iy,de
+.enter:
+	push	iy
+	ld	bc,0
+	ld	c,(ymsdDevice.configindex)
+	push	bc
+	ld	bc,(ymsdDevice.dev)	; usb device
+	push	bc
+	call	usb_GetConfigurationDescriptorTotalLength
+	pop	bc,bc
+	pop	iy
+	compare_hl_zero
+	jq	z,.usberror
+	push	iy
+	ld	bc,tmp.length		; storage for length of descriptor
+	push	bc
+	push	hl			; length of configuration descriptor
+	ld	bc,(ymsdDevice.buffer)
+	push	bc
+	ld	bc,0
+	ld	c,(ymsdDevice.configindex)
+	push	bc			; configuration index
+	ld	bc,2			; USB_CONFIGURATION_DESCRIPTOR
+	push	bc
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_GetDescriptor
+	pop	bc,bc,bc,bc,bc,bc
+	pop	iy
+	compare_hl_zero
+	ret	nz			; ensure success
 	push	iy
 	ld	bc,(tmp.length)
 	push	bc
-	ld	bc,(iy + 9)
+	ld	bc,(ymsdDevice.buffer)
 	push	bc
-	ld	bc,(iy + 6)
+	ld	bc,(ymsdDevice.dev)
 	push	bc
 	call	usb_SetConfiguration
 	pop	bc
@@ -550,71 +619,11 @@ msd_Init:
 	pop	bc
 	pop	iy
 	compare_hl_zero
-	jq	nz,.getconfigcheck
-
-	push	iy
-	ld	a,(.inep)
-	ld	c,a
-	push	bc
-	ld	bc,(iy + 6)
-	push	bc
-	call	usb_GetDeviceEndpoint
-	pop	bc
-	pop	bc
-	pop	iy
-	push	hl
-	push	iy
-	ld	a,(.outep)
-	ld	c,a
-	push	bc
-	ld	bc,(iy + 6)
-	push	bc
-	call	usb_GetDeviceEndpoint
-	pop	bc
-	pop	bc
-	pop	iy
-
-	ld	de,(iy + 9)
-	ld	bc,(iy + 6)
-	ld	iy,(iy + 3)
-	ld	(ymsdDevice.buffer),de
-	ld	(ymsdDevice.dev),bc
-	ld	(ymsdDevice.epout),hl	; setup msd structure with endpoints and buffer
-	pop	de
-	ld	(ymsdDevice.epin),de
-	ld	a,(.interfacenumber)
-	dec	a
-	ld	(ymsdDevice.interface),a
-
-	push	iy			; get the control transfer pipe
-	ld	bc,0
-	push	bc
-	ld	bc,(ymsdDevice.dev)
-	push	bc
-	call	usb_GetDeviceEndpoint
-	pop	bc
-	pop	bc
-	pop	iy
-	ld	(ymsdDevice.epctrl),hl
-
-	jq	.foundmsd
-
-.getconfigcheck:
-	ld	hl,tmp.descriptor + 17
-	ld	a,(.configindex)
-	cp	a,(hl)
-	jq	nz,.getconfiguration
-.error:
-	ld	hl,MSD_ERROR_INVALID_DEVICE
+	jq	z,.configuredmsd
+.usberror:
+	ld	hl,MSD_ERROR_USB_FAILED
 	ret
-.paramerror:
-	ld	hl,MSD_ERROR_INVALID_PARAM
-	ret
-.foundmsd:
-
-	; the usb device was successfully configured
-	; now let's set up the msd device configuration
-
+.configuredmsd:
 	call	util_msd_reset
 	compare_hl_zero
 	ret	nz
@@ -820,7 +829,7 @@ util_scsi_request:
 
 util_msd_xfer_cbw:
 	ld	iy,(util_scsi_request.msdstruct)
-	ld	de,(ymsdDevice.epout)
+	ld	a,(ymsdDevice.bulkoutaddr)
 	ld	bc,(ymsdDevice.tag)
 	ld	ix,0
 .cbw := $-3
@@ -844,9 +853,9 @@ util_msd_xfer_data:
 	ld	ix,0
 .data := $ - 3
 	or	a,a
-	ld	de,(ymsdDevice.epin)
+	ld	a,(ymsdDevice.bulkinaddr)
 	jr	nz,.xfer
-	ld	de,(ymsdDevice.epout)
+	ld	a,(ymsdDevice.bulkoutaddr)
 .xfer:
 	call	util_msd_bulk_transfer
 	ret	z
@@ -899,7 +908,7 @@ util_msd_xfer_csw:
 	ret
 
 util_msd_status_xfer:
-	ld	de,(ymsdDevice.epin)
+	ld	a,(ymsdDevice.bulkinaddr)
 	ld	ix,tmp.csw
 	ld	bc,sizeof packetCSW
 	jq	util_msd_bulk_transfer
@@ -910,6 +919,7 @@ util_msd_reset_recovery:
 	call	util_msd_reset
 	compare_hl_zero
 	jr	z,.resetsuccess
+.fatalerror:
 	ld	sp,0
 .errorsp := $ - 3
 	pop	ix
@@ -918,28 +928,47 @@ util_msd_reset_recovery:
 	ret
 .resetsuccess:
 	ld	iy,(util_scsi_request.msdstruct)
-	ld	bc,(ymsdDevice.epin)
+	ld	a,(ymsdDevice.bulkinaddr)
 	call	util_ep_stall
-	ld	bc,(ymsdDevice.epout)
+	ld	a,(ymsdDevice.bulkoutaddr)
 util_ep_stall:
-	push	iy,bc
+	push	iy
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	push	hl
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	compare_hl_zero
+	jq	z,util_msd_reset_recovery.fatalerror
+	pop	bc
+	pop	bc
+	push	hl
 	call	usb_ClearEndpointHalt
-	pop	bc,iy
+	pop	bc
+	pop	iy
 	ret
 
 ; inputs:
+;   a : bulk endpoint address
 ;  bc : packet len
 ;  ix : data buffer
-;  de : endpoint
 util_msd_bulk_transfer:
 	push	iy
-	xor	a,a
+	or	a,a
 	sbc	hl,hl
 	push	hl
 	push	hl			; zero retries (handled by states)
 	push	bc
 	push	ix			; packet to send
-	push	de
+	ld	l,a
+	push	hl
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+	push	hl
 	call	usb_Transfer
 	pop	bc,bc,bc,bc,bc
 	pop	iy
@@ -978,8 +1007,14 @@ util_msd_ctl_packet:
 	push	bc			; retry as needed
 	push	de			; send data packet
 	push	hl			; send setup packet
-	ld	bc,(ymsdDevice.epctrl)
+	ld	bc,0
 	push	bc
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc
+	pop	bc
+	push	hl
 	call	usb_ControlTransfer
 	pop	bc
 	pop	bc
