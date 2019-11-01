@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from pyclibrary import CParser
 
 libraries = ['graphx', 'fileioc', 'keypadc', 'fontlibc']
@@ -32,7 +30,7 @@ def get_bytes_type(param):
 
 def create_dev_file(name):
     path = '../' + name.lower() + '/' + name.lower() + '.h'
-    devpath = '../' + name.lower() + '/' + name.lower() + '-dev.asm'
+    devpath = '../' + name.lower() + '/' + name.lower() + '.devlib'
     libpath = '../' + name.lower() + '/' + name.lower() + '.lib'
     funcnames = []
 
@@ -111,18 +109,18 @@ Create concatenated library file
 Convert with fasmg
 '''
 def append_dev_file(name):
-    devpath = '../' + name.lower() + '/' + name.lower() + '-dev.asm'
+    devpath = '../' + name.lower() + '/' + name.lower() + '.devlib'
     f = open(devpath, "r")
     devlibrary.write(f.read())
     f.close()
 
-devlibrary = open('devlibs.asm', 'w')
+devlibrary = open('devlib.asm', 'w')
 devlibrary.write('include \'../include/ez80.inc\'\n')
 devlibrary.write('include \'../include/ti84pceg.inc\'\n')
 devlibrary.write('include \'../include/tiformat.inc\'\n')
-devlibrary.write('format ti archived appvar \'DEVLIBS\'\n')
+devlibrary.write('format ti archived appvar \'DEVLIB\'\n')
 devlibrary.write('\n')
-devlibrary.write('\tdb "DEVLIBS",0\n')
+devlibrary.write('\tdb "DEVLIB",0\n')
 for lib in libraries:
     devlibrary.write('\tdl lib_%s\n' % lib.lower())
 devlibrary.write('\tdl 0\n')
