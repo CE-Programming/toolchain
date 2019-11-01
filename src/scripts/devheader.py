@@ -122,7 +122,7 @@ devlibrary.write('\n')
 devlibrary.write('\tdb "DEVLIBS",0\n')
 for lib in libraries:
     devlibrary.write('\tdl lib_%s\n' % lib.lower())
+devlibrary.write('\tdl 0\n')
 for lib in libraries:
     append_dev_file(lib)
-devlibrary.write('\tdl 0\n')
 devlibrary.close()
