@@ -1385,17 +1385,7 @@ usb_Transfer:
 	ld	(ix+18),ix
 	call	0
 label .dispatch at $-long
-.bad:
-	ld	bc,1000
 .wait:
-	dec	bc
-	ld	a,b
-	or	a,c
-	jq	nz,.good
-	ld	a,98
-	call	_DispatchEvent
-	jq	.bad
-.good:
 	push	bc
 	call	usb_WaitForEvents
 	pop	bc
@@ -2022,7 +2012,7 @@ _PowerVbusForRole:
 	call	_DisableSchedulesAndResetHostController
 	ld	de,$D7FFFF ; disable doorbell
 	call	_HandleAsyncAdvInt.cleanup.de
-	call	_HandleAsyncAdvInt.cleanup
+	call	_HandleAsyncAdvInt.cleanup.hl
 	pop	de,hl
 	set	bUsbABusDrop,(hl)
 	res	bUsbABusReq,(hl)
@@ -2161,7 +2151,7 @@ end repeat
 ;  ix = ?
 ;  iy = ?
 _DeviceDisabled:
-	ld	hl,_HandleAsyncAdvInt.scheduleCleanup
+	ld	hl,_HandleAsyncAdvInt.scheduleCleanup.hl
 	push	hl
 virtual
 	ld	hl,0
@@ -2230,6 +2220,7 @@ end virtual
 	and	a,31
 	jq	nz,.loop
 	pop	xdevice
+	ld	hl,mpUsbRange
 	lea	de,xdevice+1
 	ld	a,USB_DEVICE_DISABLED_EVENT
 	jq	_DispatchEvent
@@ -2245,7 +2236,7 @@ end virtual
 ;  ix = ?
 ;  iy = ?
 _DeviceDisconnected:
-	ld	hl,_HandleAsyncAdvInt.scheduleCleanup
+	ld	hl,_HandleAsyncAdvInt.scheduleCleanup.de
 .recurse:
 	push	hl
 	call	_DeviceDisabled.recurse
@@ -3664,7 +3655,6 @@ _RootDeviceDisconnected:
 	pop	ix,de
 	ret	nz
 	ex	de,hl
-	ld	hl,mpUsbPortStsCtrl
 	ret
 
 _HandleCompletionInt:
@@ -3775,7 +3765,7 @@ _HandleHostSysErrInt:
 
 _HandleAsyncAdvInt:
 	ld	(hl),bmUsbIntAsyncAdv
-.cleanup:
+.cleanup.hl:
 	ex	de,hl
 .cleanup.de:
 	ld	a,(cleanupListReady)
@@ -3792,17 +3782,18 @@ _HandleAsyncAdvInt:
 	inc	a
 	jq	nz,.loop
 	scf
-.scheduleCleanup:
+.scheduleCleanup.de:
+	ex	de,hl
+.scheduleCleanup.hl:
 	ret	nz
 	sbc	a,a
-	ld	hl,(cleanupListReady)
+	ld	de,(cleanupListReady)
 	scf
-	adc	a,l
+	adc	a,e
 	sbc	a,a
 	ret	z
-	ld	(cleanupListReady-1),hl
-	inc	h
-	ex	de,hl
+	ld	(cleanupListReady-1),de
+	inc	d
 	ret	z
 	ld	a,l
 	ld	l,usbCmd
