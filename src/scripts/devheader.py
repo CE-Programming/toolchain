@@ -40,7 +40,10 @@ def create_dev_file(name):
     Determine order of functions
     '''
     libfile = open(libpath, 'r')
-    libfile.readline()
+    line = libfile.readline().strip()
+    columns = line.split()
+    lib_name = columns[1]
+    lib_version = columns[2]
     line = libfile.readline().strip()
 
     while line:
@@ -52,7 +55,7 @@ def create_dev_file(name):
     parser = CParser([path])
     functions = parser.defs['functions']
     devfile.write('lib_%s:\n' % name.lower())
-    devfile.write('\tdb "%s",0 ; library name\n' % name.upper())
+    devfile.write('\tdb %s0,%s ; library name / version\n' % (lib_name, lib_version))
     devfile.write('\tdb %d ; number of functions\n' % len(funcnames))
     index = 0
     for i in range(len(funcnames)):
