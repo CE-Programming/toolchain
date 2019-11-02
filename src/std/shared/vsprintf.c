@@ -20,6 +20,6 @@
 *	-1 if an error occured.
 *
 *************************************************/
-int vsprintf(char *string,char *fmt,va_list args) {
+int vsprintf(char *string, const char *fmt, va_list args) {
     return(_u_print(string, fmt, args));
 }

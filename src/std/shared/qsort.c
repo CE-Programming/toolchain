@@ -40,11 +40,12 @@ struct stk {
   char *r;
 };
 
-void qsort(     char *base,
+void qsort(     void *ptr,
 		size_t nel,
 		size_t size,
                 int (*compar)(void *,void *))
 {
+  char *base = ptr;
   char *i;
   char *j;
   char *x;

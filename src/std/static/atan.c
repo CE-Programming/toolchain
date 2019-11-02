@@ -54,23 +54,6 @@ double atan(double arg) {
 
 
 /**
- * satan reduces its argument (known to be positive)
- * to the range [0,0.414...] and calls xatan.
- */
-
-double satan(double arg) {
-	double	xatan(double);
-
-	if(arg < sq2m1) {
-		return(xatan(arg));
-	} else if(arg > sq2p1) {
-		return(pio2 - xatan(1.0/arg));
-	} else {
-		return(pio4 + xatan((arg-1.0)/(arg+1.0)));
-	}
-}
-
-/**
  * xatan evaluates a series valid in the
  * range [-0.414...,+0.414...].
  */
@@ -83,4 +66,19 @@ static double xatan(double arg) {
 	value = ((((p4*argsq + p3)*argsq + p2)*argsq + p1)*argsq + p0);
 	value = value/(((((argsq + q4)*argsq + q3)*argsq + q2)*argsq + q1)*argsq + q0);
 	return(value*arg);
+}
+
+/**
+ * satan reduces its argument (known to be positive)
+ * to the range [0,0.414...] and calls xatan.
+ */
+
+double satan(double arg) {
+	if(arg < sq2m1) {
+		return(xatan(arg));
+	} else if(arg > sq2p1) {
+		return(pio2 - xatan(1.0/arg));
+	} else {
+		return(pio4 + xatan((arg-1.0)/(arg+1.0)));
+	}
 }

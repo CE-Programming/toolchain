@@ -9,7 +9,7 @@ INIT_LOC            ?= D1A87F
 USE_FLASH_FUNCTIONS ?= YES
 OUTPUT_MAP          ?= YES
 ARCHIVED            ?= NO
-OPT_MODE            ?= -optsize
+OPT_MODE            ?= -Oz
 #----------------------------
 SRCDIR              ?= src
 OBJDIR              ?= obj
@@ -33,7 +33,7 @@ comma := ,
 TARGET ?= $(NAME)
 ICONPNG ?= $(ICON)
 DEBUGMODE = NDEBUG
-CCDEBUGFLAG = -nodebug
+CCDEBUGFLAG = -g0
 
 # verbosity
 V ?= 0
@@ -54,7 +54,6 @@ RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
-CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
 PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
 CD         = cd
@@ -73,7 +72,6 @@ WINRELPATH = $(subst /,\,$1)
 RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
-CC         = $(call NATIVEPATH,wine "$(BIN)/ez80cc.exe")
 LD         = $(call NATIVEPATH,$(BIN)/fasmg)
 CV         = $(call NATIVEPATH,$(BIN)/convhex)
 PG         = $(call NATIVEPATH,$(BIN)/convpng)
@@ -85,6 +83,7 @@ MKDIR      = mkdir -p $1
 QUOTE_ARG  = '$(subst ','\'',$1)'#'
 TO_LOWER   = $(shell printf %s $(call QUOTE_ARG,$1) | tr [:upper:] [:lower:])
 endif
+CC         = ez80-clang
 
 FASMG_FILES    = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 LINKER_SCRIPT ?= $(CEDEV)/include/.linker_script
@@ -154,12 +153,11 @@ STATIC := 1
 endif
 
 ifneq ("$(EXTRA_CFLAGS)","")
-EXTRA_COMPILER_FLAGS := $(addprefix -define:,$(EXTRA_CFLAGS))
+EXTRA_COMPILER_FLAGS := $(addprefix -D,$(EXTRA_CFLAGS))
 endif
 
-# define the C flags used by the Zilog compiler
-CFLAGS ?= \
-    -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE) $(EXTRA_COMPILER_FLAGS)
+# define the C flags used by Clang
+CFLAGS ?= -S -ffreestanding -isystem $(CEDEV)/include $(CCDEBUGFLAG) $(OPT_MODE) -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_COMPILER_FLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
@@ -180,7 +178,7 @@ all: dirs $(BINDIR)/$(TARGET8XP) ;
 # this rule is trigged to build debug everything
 debug: LDDEBUGFLAG = -i dbg
 debug: DEBUGMODE = DEBUG
-debug: CCDEBUGFLAG = -debug
+debug: CCDEBUGFLAG = -g
 debug: dirs $(BINDIR)/$(TARGET8XP) ;
 
 dirs:
@@ -199,11 +197,10 @@ $(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(F_ICON)
 $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 	$(Q)$(ICON_CONV)
 
-# these rules compile the source files into object files
+# these rules compile the source files into assembly files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
-	$(CC) $(CFLAGS) $(call QUOTE_ARG,$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))) && \
-	$(MV) $(call QUOTE_ARG,$(call TO_LOWER,$(@F))) $(call QUOTE_ARG,$@)
+	$(CC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR))
