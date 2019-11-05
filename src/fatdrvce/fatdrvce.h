@@ -51,21 +51,22 @@ typedef struct {
 } msd_cbw_t;
 
 typedef struct {
-    usb_device_t dev; /**< USB device */
-    uint8_t bulkinaddr; /**< USB bulk in endpoint address */
-    uint8_t bulkoutaddr; /**< USB bulk out endpoint address */
-    uint8_t configindex; /**< USB config descriptor index */
-    uint24_t tag; /**< MSD Command Block Wrapper incrementing tag */
-    uint32_t lba; /**< Logical Block Address of LUN */
-    uint32_t blocksize; /**< Block size (usually 512) */
-    uint8_t interface; /**< USB Interface index */
-    uint8_t maxlun; /**< Maximum LUNs for MSD */
-    void *buffer; /**< User supplied buffer address */
+    usb_device_t dev; /**< USB device. */
+    uint8_t bulkinaddr; /**< USB bulk in endpoint address. */
+    uint8_t bulkoutaddr; /**< USB bulk out endpoint address. */
+    uint8_t configindex; /**< USB config descriptor index. */
+    uint24_t tag; /**< MSD Command Block Wrapper incrementing tag. */
+    uint32_t lba; /**< Logical Block Address of LUN. */
+    uint32_t blocksize; /**< Block size (usually 512). */
+    uint8_t interface; /**< USB Interface index. */
+    uint8_t maxlun; /**< Maximum LUNs for MSD. */
+    uint8_t flags; /**< Working MSD flags. */
+    void *buffer; /**< User supplied buffer address. */
 } msd_device_t;
 
 typedef struct {
-    uint32_t lba;       /**< Logical Block Address (LBA) of FAT partition */
-    msd_device_t *msd;  /**< MSD containing FAT filesystem */
+    uint32_t lba;       /**< Logical Block Address (LBA) of FAT partition. */
+    msd_device_t *msd;  /**< MSD containing FAT filesystem. */
 } fat_partition_t;
 
 typedef struct {
@@ -132,7 +133,8 @@ typedef enum {
     MSD_ERROR_INVALID_PARAM,
     MSD_ERROR_USB_FAILED,
     MSD_ERROR_NOT_SUPPORTED,
-    MSD_ERROR_INVALID_DEVICE
+    MSD_ERROR_INVALID_DEVICE,
+    MSD_ERROR_NOT_INITIALIZED
 } msd_error_t;
 
 #define FAT_FILE      (0 << 0)  /**< Entry has no attributes. */
@@ -366,6 +368,20 @@ fat_error_t fat_WriteSectors(fat_file_t *file,
 msd_error_t msd_Init(msd_device_t *msd,
                      usb_device_t dev,
                      void *buffer);
+
+/**
+ * Checks if a MSD device structure is initialized.
+ * @param msd MSD device structure.
+ * @return MSD_SUCCESS if the device structure is initialized.
+ */
+msd_error_t msd_IsInit(msd_device_t *msd);
+
+/**
+ * Deinitializes a MSD device structure.
+ * @param msd MSD device structure.
+ * @return MSD_SUCCESS if the structure is deinitialized.
+ */
+msd_error_t msd_Deinit(msd_device_t *msd);
 
 /**
  * Attempts to reset and restore normal working order of the
