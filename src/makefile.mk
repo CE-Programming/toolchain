@@ -152,12 +152,8 @@ else
 STATIC := 1
 endif
 
-ifneq ("$(EXTRA_CFLAGS)","")
-EXTRA_COMPILER_FLAGS := $(addprefix -D,$(EXTRA_CFLAGS))
-endif
-
 # define the C flags used by Clang
-CFLAGS ?= -S -ffreestanding -isystem $(CEDEV)/include $(CCDEBUGFLAG) $(OPT_MODE) -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_COMPILER_FLAGS)
+CFLAGS ?= -S -ffreestanding -isystem $(CEDEV)/include $(CCDEBUGFLAG) $(OPT_MODE) -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_CFLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
