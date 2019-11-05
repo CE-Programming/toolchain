@@ -1,28 +1,24 @@
 # ----------------------------
-# Set NAME to the program name
-# Set ICON to the png icon file name
-# Set DESCRIPTION to display within a compatible shell
-# Set COMPRESSED to "YES" to create a compressed program
+# Program Options
 # ----------------------------
 
-NAME        ?= DEMO
-COMPRESSED  ?= NO
-ICON        ?= iconc.png
-DESCRIPTION ?= "C SDK Demo"
+NAME         ?= DEMO
+ICON         ?= iconc.png
+DESCRIPTION  ?= "C SDK Demo"
+COMPRESSED   ?= NO
+ARCHIVED     ?= NO
 
 # ----------------------------
-# Other Options (Advanced)
+# Compile Options
 # ----------------------------
 
-#EXTRA_CFLAGS        ?=
-#USE_FLASH_FUNCTIONS ?= YES|NO
-#OUTPUT_MAP          ?= YES|NO
-#ARCHIVED            ?= YES|NO
-#OPT_MODE            ?= -optsize|-optspeed
-#SRCDIR              ?= src
-#OBJDIR              ?= obj
-#BINDIR              ?= bin
-#GFXDIR              ?= src/gfx
-#V                   ?= 1
+OPT_MODE     ?= -Oz
+EXTRA_CFLAGS ?= -Wall -Wextra
+
+# ----------------------------
+# Debug Options
+# ----------------------------
+
+OUTPUT_MAP   ?= NO
 
 include $(CEDEV)/include/.makefile

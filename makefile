@@ -172,9 +172,9 @@ $(addprefix clean-,$(LIBRARIES)):
 #----------------------------
 devlib: $(LIBRARIES)
 	$(MAKE) -C $(DEVLIBDIR) all
-
 clean-devlib:
 	$(MAKE) -C $(DEVLIBDIR) clean
+#----------------------------
 
 #----------------------------
 # startup rules

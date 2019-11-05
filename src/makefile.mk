@@ -7,9 +7,10 @@ BSSHEAP_HIGH        ?= D13FD6
 STACK_HIGH          ?= D1A87E
 INIT_LOC            ?= D1A87F
 USE_FLASH_FUNCTIONS ?= YES
-OUTPUT_MAP          ?= YES
+OUTPUT_MAP          ?= NO
 ARCHIVED            ?= NO
 OPT_MODE            ?= -Oz
+EXTRA_CFLAGS        ?=
 #----------------------------
 SRCDIR              ?= src
 OBJDIR              ?= obj
