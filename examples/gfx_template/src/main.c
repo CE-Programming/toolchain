@@ -57,6 +57,7 @@ void end() {
 
 bool step() {
     /* Implement me! */
+    return true;
 }
 
 void draw() {

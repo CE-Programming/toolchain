@@ -16,8 +16,8 @@
 
 /* Function for drawing the main sprite */
 void draw_sprite(int x, int y) {
-    /* Fill the screen with color index 0
-    /* Note that this is a super inefficient way to
+    /* Fill the screen with color index 0 */
+    /* Note that this is a super inefficient way to */
     /* redraw, but it demonstrates a simple way of clearing past data */
     gfx_FillScreen(0);
 

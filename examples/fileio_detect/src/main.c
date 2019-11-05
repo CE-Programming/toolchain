@@ -15,12 +15,11 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 /* Main Function */
 void main(void) {
     /* Declare some variables -- search_pos must be NULL to begin with */
-    uint8_t *search_pos = NULL;
-    int8_t y = 0;
-    ti_var_t myVar;
+    void *search_pos = NULL;
     char *var_name;
+    int8_t y = 0;
 
-    /* First couple bytes of the LibLoad AppVar, which is known to exist *
+    /* First couple bytes of the LibLoad AppVar, which is known to exist */
     /* Technically is a null-terminated string, if an odd looking one */
     const char search_string[] = { 0xBF, 0xFE, 0x00 };
 

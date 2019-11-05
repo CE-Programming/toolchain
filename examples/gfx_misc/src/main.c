@@ -5,7 +5,7 @@
 /* Main function */
 void main(void) {
 
-    static const uint8_t char_data[8] = { 0xaa, 0x55, 0xff, 0x00, 0xaa, 0x55, 0xff, 0x00 };
+    static uint8_t char_data[8] = { 0xaa, 0x55, 0xff, 0x00, 0xaa, 0x55, 0xff, 0x00 };
 
     /* Start the graphics canvas */
     gfx_Begin();
@@ -48,4 +48,3 @@ void main(void) {
     /* End the graphics canvas */
     gfx_End();
 }
-

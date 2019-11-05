@@ -30,7 +30,6 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 void main(void) {
     char nameBuffer[10];
     ti_var_t myAppVar;
-    int x;
 
     /* Clear the homescreen */
     os_ClrHome();

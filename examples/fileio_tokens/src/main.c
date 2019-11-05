@@ -18,8 +18,7 @@ void printText(int8_t xpos, int8_t ypos, const char *text);
 /* Main Function */
 void main(void) {
     ti_var_t prgm;
-    char *text;
-    uint8_t *data_ptr;
+    void *data_ptr;
     uint8_t token_length;
     uint16_t size;
     int8_t y = 0;

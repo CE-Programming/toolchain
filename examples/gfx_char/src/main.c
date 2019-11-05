@@ -17,7 +17,7 @@
 /* Function prototypes */
 void printu(char *str, int x, int y);
 
-const char *my_str = "!!DEPPILF si txet sihT";
+static char *my_str = "!!DEPPILF si txet sihT";
 
 void main(void) {
     /* Initialize the 8bpp graphics */
