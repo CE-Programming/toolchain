@@ -88,13 +88,13 @@ extern void _u_itoa(int);
 extern void _u_uitoa(unsigned int);
 extern void _u_ltoa(long);
 extern void _u_ultoa(unsigned long);
-extern int  _u_print(char _PTR_ src,char _PTR_ fmt,va_list);
-extern int  _u_scan(char _PTR_ src,char _PTR_ fmt,va_list ap);
+extern int  _u_print(char _PTR_ src, char _PTR_ fmt, va_list);
+extern int  _u_scan(char _PTR_ src, char _PTR_ fmt, va_list ap);
 extern void _u_dtof(double);
 extern void _u_dtog(double);
 
-extern char _PTR_ _u_pscan(char _PTR_ fmt,struct fmt_type _PTR_ str, va_list _PTR_ argp);
-extern char _PTR_ _u_sscan (char _PTR_ fmt,struct fmt_type _PTR_ str);
+extern char _PTR_ _u_pscan(char _PTR_ fmt, struct fmt_type _PTR_ str, va_list _PTR_ argp);
+extern char _PTR_ _u_sscan (char _PTR_ fmt, struct fmt_type _PTR_ str);
 
 extern void _u_reverse(char _PTR_ s);
 extern char _PTR_ _u_dtoe(double);

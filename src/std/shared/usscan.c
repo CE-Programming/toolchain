@@ -122,20 +122,20 @@ char *_u_sscan(char *fmt, struct fmt_type *str) {
     }
 
     pstate = state;
-    state = sscan_fsa[state][class];
+    state = sscan_fsa[(unsigned char)state][class];
 
     switch (state) {
       case ACC:
 		str->status = FMT_OK;
-		return(fmt-1);
+		return fmt-1;
       case ERR:
 		str->status = FMT_ERR;
-		return(fmt-1);
+		return fmt-1;
       case 1:
       case 8:
 		str->status = FMT_PASS_THRU;
 		str->chr = ch;
-		return(fmt);
+		return fmt;
       case 3:
 		str->flags |= FMT_FLAG_IGNORE;
 		break;
@@ -149,7 +149,7 @@ char *_u_sscan(char *fmt, struct fmt_type *str) {
 		if (pstate != state) {
 		  str->flags |= FMT_FLAG_SET;
 		  str->set_begin = fmt;
-                  // Check for sets that start with [] or [^]
+                  /* Check for sets that start with [] or [^] */
                   if (*fmt == '^')
                      fmt++;
                   if (*fmt == ']')

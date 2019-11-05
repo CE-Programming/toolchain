@@ -33,9 +33,7 @@ static char isunget;
 
 int getchar(void);
 
-/****************************************/
-/* get a character
-/****************************************/
+/* get a character */
 static int get(void)
 {
   ++len;
@@ -43,24 +41,20 @@ static int get(void)
     return(*(bptr++));
   else if (isunget==1) {
     	isunget = 0;
-		return prev_ch;	
+		return prev_ch;
   }
   return(prev_ch = getchar());
 }
 
-/****************************************/
-/* unget a character
-/****************************************/
+/* unget a character */
 static void unget(void) {
   --len;
   isunget = 1;
   if (bptr)
-    --bptr; 
+    --bptr;
 }
 
-/****************************************/
-/* Handle pointer conversions
-/****************************************/
+/* Handle pointer conversions */
 static unsigned char pointer(void)
 {
   unsigned char i;
@@ -69,7 +63,7 @@ static unsigned char pointer(void)
   char *bp = buffer;
   unsigned int addr;
 
-  if (fmt_str.field_width == 0 || fmt_str.field_width > sizeof(buffer)-1)
+  if (fmt_str.field_width == 0 || (unsigned int)fmt_str.field_width > sizeof(buffer)-1)
     fmt_str.field_width = sizeof(buffer)-1;
   if ((ch = get()) == EOF)
     return FALSE;
@@ -97,9 +91,7 @@ static unsigned char pointer(void)
   return TRUE;
 }
 
-/****************************************/
-/* Handle string conversions
-/****************************************/
+/* Handle string conversions */
 static unsigned char string(void)
 {
   unsigned char i;
@@ -136,9 +128,7 @@ static unsigned char string(void)
   return TRUE;
 }
 
-/****************************************/
-/* Handle character conversions
-/****************************************/
+/* Handle character conversions */
 static unsigned char character(void)
 {
   unsigned char i;
@@ -160,9 +150,7 @@ static unsigned char character(void)
   return TRUE;
 }
 
-/****************************************/
-/* Floating point conversions
-/****************************************/
+/* Floating point conversions */
 static unsigned char fpoint(void)
 {
   unsigned char i;
@@ -174,7 +162,7 @@ static unsigned char fpoint(void)
   unsigned char takeDot=TRUE;
   unsigned char takeSign=TRUE;
 
-  if (fmt_str.field_width == 0 || fmt_str.field_width > sizeof(buffer)-1)
+  if (fmt_str.field_width == 0 || (unsigned int)fmt_str.field_width > sizeof(buffer)-1)
     fmt_str.field_width = sizeof(buffer)-1;
   do {
     if ((ch = get()) == EOF)
@@ -220,9 +208,7 @@ static unsigned char fpoint(void)
   return TRUE;
 }
 
-/****************************************/
-/* Handle scalar conversions
-/****************************************/
+/* Handle scalar conversions */
 #ifndef _MULTI_THREAD
 static unsigned char scalar(int radix)
 #else
@@ -235,7 +221,7 @@ static unsigned char scalar(va_list argp,int len,unsigned char fields,struct fmt
   char *bp = buffer;
   long val;
 
-  if (fmt_str.field_width == 0 || fmt_str.field_width > sizeof(buffer)-1)
+  if (fmt_str.field_width == 0 || (unsigned int)fmt_str.field_width > sizeof(buffer)-1)
     fmt_str.field_width = sizeof(buffer)-1;
   do {
     if ((ch = get()) == EOF)
@@ -244,9 +230,9 @@ static unsigned char scalar(va_list argp,int len,unsigned char fields,struct fmt
   unget();
   if ((ch = get()) == EOF)
     return FALSE;
-  for (i=0;radix == 10 && isdigit(ch) ||
-	   radix == 16 && isxdigit(ch) ||
-	   radix == 8 && ch >= '0' && ch <= '7' ||
+  for (i=0;(radix == 10 && isdigit(ch)) ||
+	   (radix == 16 && isxdigit(ch)) ||
+	   (radix == 8 && ch >= '0' && ch <= '7') ||
 	   ch == '-' ||
 	   ch == '+';) {
     *(bp++) = ch;
@@ -279,9 +265,7 @@ static unsigned char scalar(va_list argp,int len,unsigned char fields,struct fmt
   return TRUE;
 }
 
-/****************************************/
-/* Handle set conversions
-/****************************************/
+/* Handle set conversions */
 static unsigned char set(void)
 {
   char *p2;
@@ -294,7 +278,7 @@ static unsigned char set(void)
   if (!(fmt_str.flags & FMT_FLAG_IGNORE))
     p = va_arg(argp,char*);
 
-  if (neg = (*fmt_str.set_begin == '^'))
+  if ((neg = (*fmt_str.set_begin == '^')))
     fmt_str.set_begin++;
 
   width = fmt_str.field_width;
@@ -355,7 +339,6 @@ static unsigned char set(void)
 *************************************************/
 int _u_scan(char *src,char *fmt,va_list ap)
 {
-  int i;
   int ch;
   unsigned char ok=TRUE;
 
@@ -435,10 +418,12 @@ int _u_scan(char *src,char *fmt,va_list ap)
       }
     }
   }
-  // ISO Spec:  Return EOF if an input error occurs before any conversion.
-  // Otherwise return the number of input items assigned.
-  // A sucessfull passthrough counts as a conversion, so we look at len,
-  // which will be 1 for a unsucessfull call to get on the first try.
+  /*
+   * ISO Spec:  Return EOF if an input error occurs before any conversion.
+   * Otherwise return the number of input items assigned.
+   * A sucessfull passthrough counts as a conversion, so we look at len,
+   * which will be 1 for a unsucessfull call to get on the first try.
+   */
   if (prev_ch == EOF && len<=1)
      return EOF;
   return fields;

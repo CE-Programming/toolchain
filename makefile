@@ -64,22 +64,9 @@ STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
 STARTDIR   := $(call NATIVEPATH,$(SRCDIR)/startup)
 DEVLIBDIR  := $(call NATIVEPATH,$(SRCDIR)/devlib)
 
-FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg)
-CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
-CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
-CONVCSV    := $(call NATIVEPATH,$(CONVCSVDIR)/convcsv)
-CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont)
 FASMG_EZ80 := $(call NATIVEPATH,$(SRCDIR)/include/ez80.inc)
 
-ifeq ($(OS),Windows_NT)
-FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg.exe)
-CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex.exe)
-CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
-CONVCSV    := $(call NATIVEPATH,$(CONVCSVDIR)/convcsv.exe)
-CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont.exe)
-endif
-
-BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
+BIN        := $(call NATIVEPATH,$(TOOLSDIR))
 
 LIBRARYDIR  = $(call NATIVEPATH,$(SRCDIR)/$1)
 
@@ -94,6 +81,24 @@ INSTALLSH  := $(call NATIVEPATH,$(CEDEVDIR)/lib/shared)
 INSTALLST  := $(call NATIVEPATH,$(CEDEVDIR)/lib/static)
 INSTALLLI  := $(call NATIVEPATH,$(CEDEVDIR)/lib/linked)
 DIRS       := $(CEDEVDIR) $(INSTALLBIN) $(INSTALLLIB) $(INSTALLINC) $(INSTALLBF) $(INSTALLLL) $(INSTALLIO) $(INSTALLSH) $(INSTALLST) $(INSTALLLI)
+
+ifeq ($(OS),Windows_NT)
+FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg.exe)
+CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex.exe)
+CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
+CONVCSV    := $(call NATIVEPATH,$(CONVCSVDIR)/convcsv.exe)
+CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont.exe)
+MAKEBIN    := $(call NATIVEPATH,$(TOOLSDIR)/make/make.exe)
+CPMAKE     := $(CP) $(MAKEBIN) $(INSTALLBIN)
+else
+FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg)
+CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
+CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
+CONVCSV    := $(call NATIVEPATH,$(CONVCSVDIR)/convcsv)
+CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont)
+MAKEBIN    :=
+CPMAKE     :=
+endif
 
 STATIC_FILES := $(wildcard src/std/static/*.src) $(patsubst src/std/static/%.c,src/std/static/build/%.src,$(wildcard src/std/static/*.c))
 LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,src/std/linked/build/%.src,$(wildcard src/std/linked/*.c))
@@ -205,7 +210,7 @@ install: $(DIRS) chmod all linker_script
 	$(CP) $(CONVPNG) $(INSTALLBIN)
 	$(CP) $(CONVCSV) $(INSTALLBIN)
 	$(CP) $(CONVFONT) $(INSTALLBIN)
-	$(CP) $(call NATIVEPATH,$(BIN)/*) $(INSTALLBIN)
+	$(CPMAKE)
 	$(MAKE) -C $(FASMGDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	$(foreach library,$(LIBRARIES),$(MAKE) -C $(call LIBRARYDIR,$(library)) install PREFIX=$(call QUOTE_ARG,$(PREFIX)) DESTDIR=$(call QUOTE_ARG,$(DESTDIR))$(newline))
 	$(MAKE) -C $(CEDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)

@@ -21,5 +21,5 @@
 *
 *************************************************/
 int vsprintf(char *string, const char *fmt, va_list args) {
-    return(_u_print(string, fmt, args));
+    return _u_print(string, (char*)fmt, args);
 }

@@ -100,4 +100,3 @@ int _u_print(char *dest, char *fmt, va_list argp) {
     }
     return __print_len;
 }
-

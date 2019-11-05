@@ -21,7 +21,7 @@ BIN       ?= $(CEDEV)/bin
 endif
 CC         = ez80-clang
 
-CFLAGS    := -S -Oz -ffreestanding -isystem .. -isystem ../../fileioc -isystem ../../ce -Dinterrupt="__attribute__((__interrupt__))" -D__rom=const -Dreentrant= -D_EZ80
+CFLAGS    := -S -Wall -Wextra -Oz -ffreestanding -isystem .. -isystem ../../fileioc -isystem ../../ce -Dinterrupt="__attribute__((__interrupt__))" -D__rom=const -Dreentrant= -D_EZ80
 
 EZC       := $(wildcard *.c)
 EZSRC     := $(addprefix build/,$(EZC:%.c=%.src))

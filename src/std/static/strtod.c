@@ -40,7 +40,6 @@ double strtod(char * str,char ** endptr)
   int exp = 0;
   signed char sign = 1;
   signed char exp_sign = 1;
-  double temp;
 
   while (isspace(*str))
     ++str;
@@ -106,7 +105,7 @@ double strtod(char * str,char ** endptr)
     {
        val.d  *= .1;
        if (val.s[1] == 0)
-       { 
+       {
          errno = ERANGE;
          break;
        }
