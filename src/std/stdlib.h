@@ -86,8 +86,8 @@ void *bsearch(void * key,void * base, size_t nmemb, size_t size, int (*compar)(v
 void qsort(void * base,size_t nmemb,size_t size, int (*compar)(void * ,void * ));
 
 /* Exit and abort */
-void abort(void);
-void exit(int status);
+void __attribute__((noreturn)) abort(void);
+void __attribute__((noreturn)) exit(int status);
 
 /* Absolutes and division */
 int abs(int j);
