@@ -33,6 +33,7 @@ H_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/include)
 I_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/lib/libload)
 
 LIB        :=$(NAME).lib
+DEVLIB     :=$(NAME).devlib
 LIB_8XV    :=$(NAME).8xv
 LIB_H      :=$(NAME).h
 
@@ -42,7 +43,7 @@ $(LIB_8XV): $(SRC)
 	$(FASMG) $< $@
 
 clean:
-	$(RM) $(LIB) $(LIB_8XV)
+	$(RM) $(LIB) $(DEVLIB) $(LIB_8XV)
 
 install:
 	$(CP) $(LIB_H) $(H_LOC)
