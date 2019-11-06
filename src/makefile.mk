@@ -179,9 +179,9 @@ debug: CCDEBUGFLAG = -g
 debug: dirs $(BINDIR)/$(TARGET8XP) ;
 
 dirs:
-	@echo C CE SDK Version $(VERSION) && \
-	$(call MKDIR,$(BINDIR)) && \
-	$(call MKDIR,$(OBJDIR))
+	@echo C CE SDK Version $(VERSION)
+	$(Q)$(call MKDIR,$(BINDIR))
+	$(Q)$(call MKDIR,$(OBJDIR))
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	$(Q)$(CD) $(BINDIR) && \
@@ -196,8 +196,9 @@ $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
-	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D))) && \
-	$(CC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
+	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D)))
+	$(Q)@echo $(addprefix $(MAKEDIR)/,$<)
+	$(Q)$(CC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR))
