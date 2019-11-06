@@ -1,7 +1,7 @@
 /**
  * @file
  * @author Matt "MateoConLechuga" Waltz
- * @brief Contains useful debugging features for use with the integrated CEmu debugger
+ * @brief Contains debugging features for use with a compatible debugger
  */
 
 #include <stdio.h>
@@ -10,113 +10,124 @@
 extern "C" {
 #endif
 
-/**
- * void dbg_sprintf(out, const char *format, ...)
- *
- * @brief Use to print to the emulator console.
- *
- * See the syntax for 'printf' for more information
- * @param out Can be dbgout (black) or dbgerr (red)
- * @param format Uses printf-formated specifier string
- * @def dbg_sprintf
- */
-
-/**
- * void dbg_ClearConsole(void)
- *
- * @brief Clears the emulator's console screen.
- * @def dbg_ClearConsole
- */
-
 #ifndef NDEBUG
 
-/**
- * Opens the emulator debugger
- */
-void dbg_Debugger(void);
+#define dbgout ((char*)0xFB0000) /**< Standard debug output. */
+#define dbgerr ((char*)0xFC0000) /**< Error debug output. */
+
+#define DBG_WATCHPOINT_READ (1 << 0)  /**< Break on read. */
+#define DBG_WATCHPOINT_WRITE (1 << 1)  /**< Break on write. */
+#define DBG_WATCHPOINT_RW ((1 << 0) | (1 << 1))  /**< Break on read or write. */
 
 /**
- * Sets an emulated breakpoint at a particular address
+ * Used to print to the emulator console.
  *
- * @param address The address of the breakpoint to remove
+ * See the syntax for 'printf' for more information.
+ * @param ... Uses printf-formated specifier string.
  */
-void dbg_SetBreakpoint(void *address);
+#define dbg_printf(...) sprintf(dbgout, ##__VA_ARGS__)
 
 /**
- * Removes an emulated breakpoint at a particular address
+ * Used to print to the emulator console.
  *
- * @param address The address of the breakpoint to remove
+ * See the syntax for 'printf' for more information.
+ * @param out Can be dbgout (black) or dbgerr (red).
+ * @param ... Uses printf-formated specifier string.
  */
-void dbg_RemoveBreakpoint(void *address);
+#define dbg_sprintf(out, ...) sprintf(out, ##__VA_ARGS__)
 
 /**
- * Sets an emulated empty watchpoint at a particular address
+ * Clears the emulation console
+ */
+#define dbg_ClearConsole() \
+do { \
+    *(unsigned char*)0xFD0000 = 1; \
+} while (0)
+
+/**
+ * Opens the emulator's debugger.
+ */
+#define dbg_Debugger() \
+do { \
+    *(unsigned char*)0xFFFFFF = (unsigned char)~0; \
+} while (0)
+
+/**
+ * Sets an emulated breakpoint.
  *
- * @param address The address of the watchpoint to set
- * @param length The size of the data at the address (values 1-4)
+ * @param address Breakpoint address to set.
  */
-void dbg_SetWatchpoint(void *address, unsigned int length);
+#define dbg_SetBreakpoint(address) \
+do { \
+    *(unsigned int*)0xFFFFF0 = (unsigned int)(address); \
+    *(unsigned char*)0xFFFFFF = 1; \
+} while (0)
 
 /**
- * Sets an emulated read watchpoint at a particular address
+ * Removes an emulated breakpoint.
  *
- * @param address The address of the watchpoint to set
- * @param length The size of the data at the address (values 1-4)
+ * @param address Breakpoint address to remove.
  */
-void dbg_SetReadWatchpoint(void *address, unsigned int length);
+#define dbg_RemoveBreakpoint(address) \
+do { \
+    *(unsigned int*)0xFFFFF0 = (address); \
+    *(unsigned char*)0xFFFFFF = 2; \
+} while (0)
 
 /**
- * Sets an emulated write watchpoint at a particular address
+ * Sets an emulated watchpoint.
  *
- * @param address The address of the watchpoint to set
- * @param length The size of the data at the address (values 1-4)
+ * @param address Watchpoint address to set.
+ * @param length The size of the data at the address.
+ * @param flags DBG_WATCHPOINT_READ, DBG_WATCHPOINT_WRITE, or
+ *              DBG_WATCHPOINT_RW. (or 0 to disable).
  */
-void dbg_SetWriteWatchpoint(void *address, unsigned int length);
+#define dbg_SetWatchpoint(address_low, length, flags) \
+do { \
+    *(unsigned int*)0xFFFFF0 = (unsigned int)(address_low); \
+    *(unsigned int*)0xFFFFF4 = ((unsigned int)(address_low) + (length)); \
+    *(unsigned char*)0xFFFFF8 = (unsigned char)(flags); \
+    *(unsigned char*)0xFFFFFF = 3; \
+} while (0)
 
 /**
- * Sets an emulated read/write watchpoint at a particular address
+ * Removes an emulated watchpoint.
  *
- * @param address The address of the watchpoint to set
- * @param length The size of the data at the address (values 1-4)
+ * @param address Watchpoint address to remove.
  */
-void dbg_SetReadWriteWatchpoint(void *address, unsigned int length);
+#define dbg_RemoveWatchpoint(address) \
+do { \
+    *(unsigned int*)0xFFFFF0 = (unsigned int)(address); \
+    *(unsigned char*)0xFFFFFF = 4; \
+} while (0)
 
 /**
- * Removes an emulated watchpoint at a particular address
- *
- * @param address The address of the watchpoint to remove
+ * Removes all emulated breakpoints.
  */
-void dbg_RemoveWatchpoint(void *address);
+#define dbg_RemoveAllBreakpoints() \
+do { \
+    *(unsigned char*)0xFFFFFF = 6; \
+} while (0)
 
 /**
- * Removes all emulated watchpoints
+ * Removes all emulated watchpoints.
  */
-void dbg_RemoveAllWatchpoints(void);
+#define dbg_RemoveAllWatchpoints() \
+do { \
+    *(unsigned char*)0xFFFFFF = 5; \
+} while (0)
 
-/**
- * Removes all emulated breakpoints
- */
-void dbg_RemoveAllBreakpoints(void);
-
-#define dbgout ((char*)0xFB0000) /**< Standard debug output */
-#define dbgerr ((char*)0xFC0000) /**< Error debug output */
-#define dbg_sprintf sprintf
-#define dbg_ClearConsole() (*(unsigned char*)0xFD0000 = 1)
 #else
-#define dbg_Debugger(ignore) ((void)0)
-#define dbg_SetBreakpoint(ignore) ((void)0)
-#define dbg_RemoveBreakpoint(ignore) ((void)0)
-#define dbg_SetWatchpoint(ignore,ignore1) ((void)0)
-#define dbg_SetReadWatchpoint(ignore,ignore1) ((void)0)
-#define dbg_SetWriteWatchpoint(ignore,ignore1) ((void)0)
-#define dbg_SetReadWriteWatchpoint(ignore,ignore1) ((void)0)
-#define dbg_RemoveWatchpoint(ignore) ((void)0)
-#define dbg_RemoveAllWatchpoints(ignore) ((void)0)
-#define dbg_RemoveAllBreakpoints(ignore) ((void)0)
-#define dbg_sprintf if(0)(void)
-#define dbg_ClearConsole(ignore) ((void)0)
-#define dbgout (NULL)
-#define dbgerr (NULL)
+#define dbg_printf(...) ((void)0)
+#define dbg_sprintf(...) ((void)0)
+#define dbg_ClearConsole(...) ((void)0)
+#define dbg_Debugger(...) ((void)0)
+#define dbg_SetBreakpoint(...) ((void)0)
+#define dbg_RemoveBreakpoint(...) ((void)0)
+#define dbg_SetWatchpoint(...) ((void)0)
+#define dbg_RemoveWatchpoint(...) ((void)0)
+#define dbg_RemoveAllBreakpoints(...) ((void)0)
+#define dbg_RemoveAllWatchpoints(...) ((void)0)
 #endif
 
 #ifdef __cplusplus
