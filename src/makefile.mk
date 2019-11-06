@@ -175,7 +175,7 @@ all: dirs $(BINDIR)/$(TARGET8XP) ;
 # this rule is trigged to build debug everything
 debug: LDDEBUGFLAG = -i dbg
 debug: DEBUGMODE = DEBUG
-debug: CCDEBUGFLAG = -g
+#debug: CCDEBUGFLAG = -g
 debug: dirs $(BINDIR)/$(TARGET8XP) ;
 
 dirs:
