@@ -1,5 +1,5 @@
-#ifndef _INTTYPES_H
-#define _INTTYPES_H
+#ifndef _CDEFS_H
+#define _CDEFS_H
 
 #ifndef __cplusplus
 # define __BEGIN_DECLS
@@ -11,4 +11,4 @@
 # define __NOTHROW     throw()
 #endif
 
-#endif /* _INTTYPES_H */
+#endif /* _CDEFS_H */
