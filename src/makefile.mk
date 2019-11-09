@@ -84,7 +84,7 @@ MKDIR      = mkdir -p $1
 QUOTE_ARG  = '$(subst ','\'',$1)'#'
 TO_LOWER   = $(shell printf %s $(call QUOTE_ARG,$1) | tr [:upper:] [:lower:])
 endif
-CC         = ez80-clang
+EZCC     = ez80-clang
 
 FASMG_FILES    = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 LINKER_SCRIPT ?= $(CEDEV)/include/.linker_script
@@ -198,7 +198,7 @@ $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D)))
 	$(Q)@echo $(addprefix $(MAKEDIR)/,$<)
-	$(Q)$(CC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
+	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR))

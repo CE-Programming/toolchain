@@ -19,9 +19,9 @@ RM         = rm -f
 CEDEV     ?= $(HOME)/CEdev
 BIN       ?= $(CEDEV)/bin
 endif
-CC         = ez80-clang
+EZCC       = ez80-clang
 
-CFLAGS    := -S -Wall -Wextra -Oz -ffreestanding -isystem .. -isystem ../../fileioc -isystem ../../ce -Dinterrupt="__attribute__((__interrupt__))" -D__rom=const -Dreentrant= -D_EZ80
+EZCFLAGS  := -S -Wall -Wextra -Oz -ffreestanding -isystem .. -isystem ../../fileioc -isystem ../../ce -Dinterrupt="__attribute__((__interrupt__))" -D__rom=const -Dreentrant= -D_EZ80
 
 EZC       := $(wildcard *.c)
 EZSRC     := $(addprefix build/,$(EZC:%.c=%.src))
@@ -30,7 +30,7 @@ all: $(EZSRC)
 
 build/%.src: %.c
 	@$(call MKDIR,build)
-	@$(CC) $(CFLAGS) $< -o $@
+	@$(EZCC) $(EZCFLAGS) $< -o $@
 
 clean:
 	$(call RMDIR,build)
