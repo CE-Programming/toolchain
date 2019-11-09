@@ -1,23 +1,18 @@
-/*
- *  Copyright (C) 1999-2008 by  Zilog, Inc.
- *  All Rights Reserved
- *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
- */
-#ifndef STDBOOL_H
-#define STDBOOL_H
-
-#ifndef __bool_true_false_are_defined
-#define __bool_true_false_are_defined
+#ifndef _STDBOOL_H
+#define _STDBOOL_H
 
 #ifndef __cplusplus
 
-typedef unsigned char bool;
+#define bool  _Bool
+#define false 0
+#define true  1
 
-#define _Bool   bool
-#define false   0
-#define true    1
+#else /* __cplusplus */
 
-#endif
+#define _Bool bool
 
-#endif
-#endif
+#endif /* __cplusplus */
+
+#define __bool_true_false_are_defined 1
+
+#endif /* _STDBOOL_H */

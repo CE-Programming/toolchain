@@ -139,9 +139,17 @@ typedef      __UINTPTR_TYPE__      uintptr_t;
 #define        UINTPTR_MAX       __UINTPTR_MAX__
 #define        UINTPTR_WIDTH     __UINTPTR_WIDTH__
 
+#define        PTRDIFF_MIN      ~__PTRDIFF_MAX__
+#define        PTRDIFF_MAX       __PTRDIFF_MAX__
 #define        PTRDIFF_WIDTH     __PTRDIFF_WIDTH__
+
+#define           SIZE_MAX          __SIZE_MAX__
 #define           SIZE_WIDTH        __SIZE_WIDTH__
+
 #define          WCHAR_WIDTH       __WCHAN_WIDTH__
+
+#define           WINT_MIN         ~__WINT_MAX__
+#define           WINT_MAX          __WINT_MAX__
 #define           WINT_WIDTH        __WINT_WIDTH__
 
 #endif /* _STDINT_H */
