@@ -22,3 +22,6 @@ EXTRA_CFLAGS ?= -Wall -Wextra
 OUTPUT_MAP   ?= NO
 
 include $(CEDEV)/include/.makefile
+
+tilemap: src/tilemap/tilemap.csv
+	cd src && cd tilemap && convcsv --format c --name tilemap_map --input tilemap.csv --output tilemap.c

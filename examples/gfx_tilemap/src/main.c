@@ -14,7 +14,7 @@
 #include "gfx/tiles_gfx.h"
 
 /* Include the external map data */
-extern uint8_t tilemap_map[];
+extern unsigned char tilemap_map[];
 
 /* Tilemap defines */
 #define TILE_WIDTH          16

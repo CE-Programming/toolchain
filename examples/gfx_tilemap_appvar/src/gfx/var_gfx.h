@@ -1,4 +1,4 @@
-// convpng
+// convpng v7.3
 // this file contains all the graphics sources for easy inclusion in a project
 #ifndef __var_gfx__
 #define __var_gfx__
@@ -9,6 +9,8 @@
 #define var_gfx_num 2
 
 extern uint8_t *var_gfx[2];
+#define tileset_width 256
+#define tileset_height 128
 #define tileset ((gfx_sprite_t*)var_gfx[0])
 #define tileset_tiles_num 128
 extern uint8_t *tileset_tiles_data[128];

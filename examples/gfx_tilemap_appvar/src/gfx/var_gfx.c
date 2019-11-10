@@ -1,4 +1,4 @@
-// convpng
+// convpng v7.3
 #include <stdint.h>
 #include "var_gfx.h"
 

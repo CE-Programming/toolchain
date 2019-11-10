@@ -12,7 +12,6 @@
 
 /* Include the graphics */
 #include "gfx/tiles_gfx.h"
-#include "tilemapdata.h"
 
 /* Tilemap defines */
 #define TILE_WIDTH          (16)
@@ -30,6 +29,9 @@
 
 /* This is where the decompressed tilemap data is to be stored */
 uint8_t tilemap_map[TILEMAP_WIDTH * TILEMAP_HEIGHT];
+
+/* External compressed tilemap */
+extern unsigned char tilemap_map_compressed[];
 
 /* Place to hold decompressed tile pointers */
 gfx_sprite_t *tileset_tiles[128];
@@ -50,7 +52,7 @@ void main(void) {
         tileset_tiles[i] = tmp_ptr;
     }
 
-    zx7_Decompress(tilemap_map, tilemap_compressed);
+    zx7_Decompress(tilemap_map, tilemap_map_compressed);
 
     /* Initialize the tilemap structure */
     tilemap.map         = tilemap_map;
