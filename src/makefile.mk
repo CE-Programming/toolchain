@@ -57,7 +57,9 @@ LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVPNG    = $(call NATIVEPATH,$(BIN)/convpng.exe)
 CD         = cd
-RM         = del /q /f >nul 2>&1
+NOSTDOUT  := >nul
+NOSTDERR  := 2>&1
+RM         = del /q /f $(NOSTDOUT) $(NOSTDERR)
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
 MKDIR      = call && (if not exist $1 mkdir $1)
 QUOTE_ARG  = "$(subst ",',$1)"#'
@@ -71,6 +73,8 @@ BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 LD         = $(call NATIVEPATH,$(BIN)/fasmg)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin)
 CONVPNG    = $(call NATIVEPATH,$(BIN)/convpng)
+NOSTDOUT  := 1> /dev/null
+NOSTDERR  := 2> /dev/null
 CD         = cd
 RM         = rm -f
 RMDIR      = rm -rf $1
@@ -186,7 +190,8 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 
 $(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(F_ICON)
 	$(Q)$(call MKDIR_NATIVE,$(@D))
-	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
+	$(Q)echo "[linking] $@"
+	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@) $(NOSTDOUT)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
@@ -196,7 +201,7 @@ $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR_NATIVE,$(@D))
-	$(Q)echo $(addprefix $(MAKEDIR)/,$<)
+	$(Q)echo "[compiling] $<"
 	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
