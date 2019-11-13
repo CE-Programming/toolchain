@@ -18,7 +18,7 @@ BINDIR              ?= bin
 GFXDIR              ?= src/gfx
 #----------------------------
 
-VERSION := 8.6
+VERSION := 8.6-devel
 
 #----------------------------
 # try not to edit anything below these lines unless you know what you are doing
@@ -51,42 +51,37 @@ MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst /,\,$1)
 WINPATH    = $(NATIVEPATH)
 WINRELPATH = $(subst /,\,$1)
-RM         = del /q /f 2>nul
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
-CV         = $(call NATIVEPATH,$(BIN)/convhex.exe)
-PG         = $(call NATIVEPATH,$(BIN)/convpng.exe)
+CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin.exe)
+CONVPNG    = $(call NATIVEPATH,$(BIN)/convpng.exe)
 CD         = cd
-CP         = copy /y
-MV         = move /y >nul
-NULL       = >nul 2>&1
+RM         = del /q /f >nul 2>&1
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
 MKDIR      = call && (if not exist $1 mkdir $1)
 QUOTE_ARG  = "$(subst ",',$1)"#'
-TO_LOWER   = $1
 else
 MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst \,/,$1)
 WINPATH    = $(shell winepath -w $1)
 WINRELPATH = $(subst /,\,$1)
-RM         = rm -f
 CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 LD         = $(call NATIVEPATH,$(BIN)/fasmg)
-CV         = $(call NATIVEPATH,$(BIN)/convhex)
-PG         = $(call NATIVEPATH,$(BIN)/convpng)
+CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin)
+CONVPNG    = $(call NATIVEPATH,$(BIN)/convpng)
 CD         = cd
-CP         = cp
-MV         = mv
+RM         = rm -f
 RMDIR      = rm -rf $1
 MKDIR      = mkdir -p $1
 QUOTE_ARG  = '$(subst ','\'',$1)'#'
-TO_LOWER   = $(shell printf %s $(call QUOTE_ARG,$1) | tr [:upper:] [:lower:])
 endif
-EZCC     = ez80-clang
+EZCC = ez80-clang
 
-FASMG_FILES    = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
+MKDIR_NATIVE = $(call MKDIR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
+
+FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 LINKER_SCRIPT ?= $(CEDEV)/include/.linker_script
 
 # ensure native paths
@@ -127,21 +122,28 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 
 # check if there is an icon present that we can convert; if so, generate a recipe to build it properly
 ifneq ("$(wildcard $(ICONPNG))","")
-F_ICON     := $(OBJDIR)/$(ICON_ASM)
-ICON_CONV  := $(PG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(F_ICON))$(comma)$(DESCRIPTION)
-LINK_ICON   = , $(call FASMG_FILES,$(F_ICON)) used
+F_ICON := $(OBJDIR)/$(ICON_ASM)
+ICON_CONV := $(CONVPNG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(F_ICON))$(comma)$(DESCRIPTION)
+LINK_ICON = , $(call FASMG_FILES,$(F_ICON)) used
 endif
 
-# determine if output should be archived or compressed
+# determine output target flags
 ifeq ($(ARCHIVED),YES)
-CVFLAGS += -a
+CONVBINFLAGS += --archive
 endif
 ifeq ($(COMPRESSED),YES)
-CVFLAGS += -x
+CONVBINFLAGS += --oformat 8xp-auto-decompress
+else
+CONVBINFLAGS += --oformat 8xp
 endif
+CONVBINFLAGS += --name $(TARGET)
+
+# link cleanup source
 ifeq ($(CLEANUP),YES)
 LINK_CLEANUP = , $(call FASMG_FILES,$(F_CLEANUP)) used
 endif
+
+# output debug map file
 ifeq ($(OUTPUT_MAP),YES)
 LDMAPFLAG = -i map
 endif
@@ -170,45 +172,42 @@ LDFLAGS ?= \
 	-i $(call QUOTE_ARG,libs $(call FASMG_FILES,$(LINK_LIBLOAD)) used if libs.length$(comma) $(call FASMG_FILES,$(LINK_LIBS)))
 
 # this rule is trigged to build everything
-all: dirs $(BINDIR)/$(TARGET8XP) ;
+all: $(BINDIR)/$(TARGET8XP) ;
 
 # this rule is trigged to build debug everything
 debug: LDDEBUGFLAG = -i dbg
 debug: DEBUGMODE = DEBUG
 #debug: CCDEBUGFLAG = -g
-debug: dirs $(BINDIR)/$(TARGET8XP) ;
-
-dirs:
-	@echo C CE SDK Version $(VERSION)
-	$(Q)$(call MKDIR,$(BINDIR))
-	$(Q)$(call MKDIR,$(OBJDIR))
+debug: $(BINDIR)/$(TARGET8XP) ;
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
-	$(Q)$(CD) $(BINDIR) && \
-	$(CV) $(CVFLAGS) $(notdir $<) $(notdir $@)
+	$(Q)$(call MKDIR_NATIVE,$(@D))
+	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
 $(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(F_ICON)
-	$(Q)$(LD) $(LDFLAGS) $@
+	$(Q)$(call MKDIR_NATIVE,$(@D))
+	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(OBJDIR)/$(ICON_ASM): $(ICONPNG)
+	$(Q)$(call MKDIR_NATIVE,$(@D))
 	$(Q)$(ICON_CONV)
 
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
-	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D)))
-	$(Q)@echo $(addprefix $(MAKEDIR)/,$<)
+	$(Q)$(call MKDIR_NATIVE,$(@D))
+	$(Q)echo $(addprefix $(MAKEDIR)/,$<)
 	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR))
 	$(Q)$(call RMDIR,$(BINDIR))
-	@echo Cleaned build files.
+	@echo Removed build objects and binaries.
 
 gfx:
-	$(Q)$(CD) $(GFXDIR) && convpng
+	$(Q)$(CD) $(GFXDIR) && $(CONVPNG)
 
 version:
-	@echo C SDK Version $(VERSION)
+	$(Q)echo CE C SDK Version $(VERSION)
 
-.PHONY: all clean version gfx dirs debug
+.PHONY: all clean version gfx debug
