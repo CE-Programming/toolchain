@@ -55,9 +55,8 @@ APPEND_FILES = $(foreach file,$(addprefix ../../lib/$2/,$(notdir $3)),$(call APP
 TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)
 SRCDIR     := $(call NATIVEPATH,$(CURDIR)/src)
 FASMGDIR   := $(call NATIVEPATH,$(TOOLSDIR)/fasmg)
-CONVHEXDIR := $(call NATIVEPATH,$(TOOLSDIR)/convhex)
+CONVBINDIR := $(call NATIVEPATH,$(TOOLSDIR)/convbin)
 CONVPNGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convpng)
-CONVCSVDIR := $(call NATIVEPATH,$(TOOLSDIR)/convcsv)
 CONVFNTDIR := $(call NATIVEPATH,$(TOOLSDIR)/convfont)
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
@@ -65,19 +64,9 @@ STARTDIR   := $(call NATIVEPATH,$(SRCDIR)/startup)
 DEVLIBDIR  := $(call NATIVEPATH,$(SRCDIR)/devlib)
 
 FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg)
-CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex)
 CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
-CONVCSV    := $(call NATIVEPATH,$(CONVCSVDIR)/convcsv)
 CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont)
 FASMG_EZ80 := $(call NATIVEPATH,$(SRCDIR)/include/ez80.inc)
-
-ifeq ($(OS),Windows_NT)
-FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg.exe)
-CONVHEX    := $(call NATIVEPATH,$(CONVHEXDIR)/convhex.exe)
-CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
-CONVCSV    := $(call NATIVEPATH,$(CONVCSVDIR)/convcsv.exe)
-CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont.exe)
-endif
 
 BIN        := $(call NATIVEPATH,$(TOOLSDIR)/zds)
 
@@ -95,19 +84,34 @@ INSTALLST  := $(call NATIVEPATH,$(CEDEVDIR)/lib/static)
 INSTALLLI  := $(call NATIVEPATH,$(CEDEVDIR)/lib/linked)
 DIRS       := $(CEDEVDIR) $(INSTALLBIN) $(INSTALLLIB) $(INSTALLINC) $(INSTALLBF) $(INSTALLLL) $(INSTALLIO) $(INSTALLSH) $(INSTALLST) $(INSTALLLI)
 
+ifeq ($(OS),Windows_NT)
+FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg.exe)
+CONVBIN    := $(call NATIVEPATH,$(CONVBINDIR)/bin/convbin.exe)
+CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
+CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont.exe)
+MAKEBIN    := $(call NATIVEPATH,$(TOOLSDIR)/make/make.exe)
+CPMAKE     := $(CP) $(MAKEBIN) $(INSTALLBIN)
+else
+FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg)
+CONVBIN    := $(call NATIVEPATH,$(CONVBINDIR)/bin/convbin)
+CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
+CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont)
+MAKEBIN    :=
+CPMAKE     :=
+endif
+
 STATIC_FILES := $(wildcard src/std/static/*.src) $(patsubst src/std/static/%.c,src/std/static/build/%.src,$(wildcard src/std/static/*.c))
 LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,src/std/linked/build/%.src,$(wildcard src/std/linked/*.c))
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: $(CONVHEX) $(CONVPNG) $(CONVCSV) $(CONVFONT) $(LIBRARIES) ce std startup
+all: $(CONVBIN) $(CONVPNG) $(CONVFONT) $(LIBRARIES) ce std startup
 	@echo Toolchain built.
 
 clean: $(addprefix clean-,$(LIBRARIES)) clean-devlib clean-ce clean-std clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
-	$(MAKE) -C $(CONVHEXDIR) clean
+	$(MAKE) -C $(CONVBINDIR) clean
 	$(MAKE) -C $(CONVPNGDIR) clean
-	$(MAKE) -C $(CONVCSVDIR) clean
 	$(MAKE) -C $(CONVFNTDIR) clean
 	$(RM) linker_script
 	$(call RMDIR,release)
@@ -120,12 +124,10 @@ clean: $(addprefix clean-,$(LIBRARIES)) clean-devlib clean-ce clean-std clean-st
 $(FASMG_EZ80): $(FASMG)
 $(FASMG):
 	$(MAKE) -C $(FASMGDIR)
-$(CONVHEX):
-	$(MAKE) -C $(CONVHEXDIR)
+$(CONVBIN):
+	$(MAKE) -C $(CONVBINDIR) release
 $(CONVPNG):
 	$(MAKE) -C $(CONVPNGDIR)
-$(CONVCSV):
-	$(MAKE) -C $(CONVCSVDIR)
 $(CONVFONT):
 	$(MAKE) -C $(CONVFNTDIR)
 #----------------------------
@@ -201,9 +203,8 @@ install: $(DIRS) chmod all linker_script
 	$(CP) $(call NATIVEPATH,$(SRCDIR)/makefile.mk) $(call NATIVEPATH,$(INSTALLINC)/.makefile)
 	$(CP) $(call NATIVEPATH,linker_script) $(call NATIVEPATH,$(INSTALLINC)/.linker_script)
 	$(CP) $(FASMG) $(INSTALLBIN)
-	$(CP) $(CONVHEX) $(INSTALLBIN)
+	$(CP) $(CONVBIN) $(INSTALLBIN)
 	$(CP) $(CONVPNG) $(INSTALLBIN)
-	$(CP) $(CONVCSV) $(INSTALLBIN)
 	$(CP) $(CONVFONT) $(INSTALLBIN)
 	$(CP) $(call NATIVEPATH,$(BIN)/*) $(INSTALLBIN)
 	$(MAKE) -C $(FASMGDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
@@ -226,9 +227,9 @@ dist release: install
 #----------------------------
 # libraries release rules
 #----------------------------
-dist-libs release-libs: clibraries $(CONVHEX) $(LIBRARIES)
+dist-libs release-libs: clibraries $(CONVBIN) $(LIBRARIES)
 	$(foreach library,$(LIBRARIES),$(CP) $(call NATIVEPATH,$(call LIBRARYDIR,$(library))/$(library).8xv) $(call NATIVEPATH,clibraries/$(library).8xv)$(newline))
-	$(CONVHEX) -g $(words $(LIBRARIES)) $(foreach library,$(LIBRARIES),$(call LIBRARYDIR,$(library))/$(library).8xv )$(call NATIVEPATH,clibraries/clibs.8xg)
+	$(CONVBIN) --oformat 8xg-auto-extract $(foreach library,$(LIBRARIES),$(addprefix --input ,$(call LIBRARYDIR,$(library))/$(library).8xv)) --output $(call NATIVEPATH,clibraries/clibs.8xg)
 clibraries:
 	$(call MKDIR,clibraries)
 

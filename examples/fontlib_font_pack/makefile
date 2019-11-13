@@ -28,7 +28,7 @@ $(BINDIR)/$(FONTPACKNAME).bin: $(SRCDIR)/drsans-06-bold.fnt $(SRCDIR)/drsans-06-
 	$(BINDIR)/$(FONTPACKNAME).bin
 
 $(BINDIR)/$(FONTPACKNAME).8xv: $(BINDIR)/$(FONTPACKNAME).bin
-	convhex -a -v -n $(FONTPACKNAME) $(BINDIR)/$(FONTPACKNAME).bin $(BINDIR)/$(FONTPACKNAME).8xv
+	convbin --iformat bin --input $(BINDIR)/$(FONTPACKNAME).bin --oformat 8xv --output $(BINDIR)/$(FONTPACKNAME).8xv --archive --name $(FONTPACKNAME)
 
 all: $(BINDIR)/$(FONTPACKNAME).8xv
 
