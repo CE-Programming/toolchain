@@ -5,12 +5,19 @@
 # define NULL ((void *)0)
 #else /* __cplusplus */
 # define NULL 0
-#endif
+#endif /* __cplusplus */
 
 #define offsetof(type, member) __builtin_offsetof(type, member)
 
 typedef    __SIZE_TYPE__    size_t;
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
+
+#ifndef _WCHAR_T_DEFINED
+#define _WCHAR_T_DEFINED
+#ifndef __cplusplus
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* __cplusplus */
+#endif /* _WCHAR_T_DEFINED */
 
 typedef struct {
     long long    __max_align_ll __attribute__((__aligned__(__alignof__(  long long))));

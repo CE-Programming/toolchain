@@ -15,12 +15,12 @@ extern "C" {
 
 typedef int onexit_t;
 
+#ifndef _WCHAR_T_DEFINED
+#define _WCHAR_T_DEFINED
 #ifndef __cplusplus
-#ifndef WCHAR_T_DEFINED
-#define WCHAR_T_DEFINED
-typedef unsigned short wchar_t;
-#endif
-#endif
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* __cplusplus */
+#endif /* _WCHAR_T_DEFINED */
 
 typedef struct {
   int quot;

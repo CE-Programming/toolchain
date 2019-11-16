@@ -3,7 +3,6 @@
 
 #include <stdarg.h>
 #include <format.h>
-#include <fileioc.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +35,10 @@ typedef struct __stdio_file {
 } FILE;
 
 extern FILE __stdio_files[FOPEN_MAX];
+extern FILE *stdin, *stdout, *stderr;
 
+int printf(const char *format, ...);
+int fprintf(FILE *f, const char *format, ...);
 int sprintf(char *s, const char *format, ...);
 int vprintf(const char *format, va_list arg);
 int vsprintf(char *s, const char *format, va_list arg);
