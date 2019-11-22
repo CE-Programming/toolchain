@@ -2,7 +2,7 @@
 # This makefile builds all the example projects
 #-----------------------------------------------
 
-DIRS = $(wildcard */makefile)
+DIRS = $(wildcard */*/makefile)
 
 all clean gfx .PHONY: $(DIRS)
 
