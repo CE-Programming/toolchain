@@ -514,7 +514,7 @@ void gfx_SetDefaultPalette(gfx_mode_t mode);
  * @param size Size of palette to store
  * @param offset Offset in bytes to start at (Generally set to 0).
  */
-void gfx_SetPalette(uint16_t *palette,
+void gfx_SetPalette(void *palette,
                     uint24_t size,
                     uint8_t offset);
 
