@@ -1,8 +1,6 @@
 ### Hello World Demo
 
-This is a simple demo to demonstrate displaying text using the TI-OS rotuines.
-
-![Screenshot](screenshot.png)
+This example displays the text "Hello, World!" on the calculator.
 
 ---
 
