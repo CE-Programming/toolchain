@@ -32,7 +32,6 @@ space := $(empty) $(empty)
 comma := ,
 
 TARGET ?= $(NAME)
-ICONPNG ?= $(ICON)
 DEBUGMODE = NDEBUG
 CCDEBUGFLAG = -g0
 
@@ -55,7 +54,7 @@ CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin.exe)
-CONVPNG    = $(call NATIVEPATH,$(BIN)/convpng.exe)
+CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg.exe)
 CD         = cd
 NOSTDOUT  := >nul
 NOSTDERR  := 2>&1
@@ -72,7 +71,7 @@ CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
 BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 LD         = $(call NATIVEPATH,$(BIN)/fasmg)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin)
-CONVPNG    = $(call NATIVEPATH,$(BIN)/convpng)
+CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg)
 NOSTDOUT  := 1> /dev/null
 NOSTDERR  := 2> /dev/null
 CD         = cd
@@ -98,7 +97,8 @@ GFXDIR := $(call NATIVEPATH,$(GFXDIR))
 TARGETBIN     := $(TARGET).bin
 TARGETMAP     := $(TARGET).map
 TARGET8XP     := $(TARGET).8xp
-ICON_ASM      := iconc.src
+ICONIMG       := $(wildcard $(call NATIVEPATH,$(ICON)))
+ICONSRC       := $(call NATIVEPATH,$(OBJDIR)/icon.src)
 
 # init conditionals
 F_STARTUP     := $(call NATIVEPATH,$(CEDEV)/lib/cstartup.src)
@@ -124,11 +124,11 @@ LINK_FILES   := $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
 LINK_LIBS    := $(wildcard $(CEDEV)/lib/libload/*.lib)
 LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 
-# check if there is an icon present that we can convert; if so, generate a recipe to build it properly
-ifneq ("$(wildcard $(ICONPNG))","")
-F_ICON := $(OBJDIR)/$(ICON_ASM)
-ICON_CONV := $(CONVPNG) -c $(ICONPNG)$(comma)$(call NATIVEPATH,$(F_ICON))$(comma)$(DESCRIPTION)
-LINK_ICON = , $(call FASMG_FILES,$(F_ICON)) used
+# check if there is an icon present that we can convert
+# if so, generate a recipe to build it
+ifneq ("$(ICONIMG)","")
+ICON_CONV := @echo "[convimg] $(ICONIMG)" && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+LINK_ICON = , $(call FASMG_FILES,$(ICONSRC)) used
 endif
 
 # determine output target flags
@@ -188,13 +188,13 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	$(Q)$(call MKDIR_NATIVE,$(@D))
 	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
-$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(F_ICON)
+$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(ICONSRC)
 	$(Q)$(call MKDIR_NATIVE,$(@D))
 	$(Q)echo "[linking] $@"
 	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@) $(NOSTDOUT)
 
 # this rule handles conversion of the icon, if it is ever updated
-$(OBJDIR)/$(ICON_ASM): $(ICONPNG)
+$(ICONSRC): $(ICONIMG)
 	$(Q)$(call MKDIR_NATIVE,$(@D))
 	$(Q)$(ICON_CONV)
 
@@ -210,7 +210,7 @@ clean:
 	@echo Removed build objects and binaries.
 
 gfx:
-	$(Q)$(CD) $(GFXDIR) && $(CONVPNG)
+	$(Q)$(CD) $(GFXDIR) && $(CONVIMG)
 
 version:
 	$(Q)echo CE C SDK Version $(VERSION)

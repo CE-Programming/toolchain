@@ -56,7 +56,7 @@ TOOLSDIR   := $(call NATIVEPATH,$(CURDIR)/tools)
 SRCDIR     := $(call NATIVEPATH,$(CURDIR)/src)
 FASMGDIR   := $(call NATIVEPATH,$(TOOLSDIR)/fasmg)
 CONVBINDIR := $(call NATIVEPATH,$(TOOLSDIR)/convbin)
-CONVPNGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convpng)
+CONVIMGDIR := $(call NATIVEPATH,$(TOOLSDIR)/convimg)
 CONVFNTDIR := $(call NATIVEPATH,$(TOOLSDIR)/convfont)
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
@@ -84,14 +84,14 @@ DIRS       := $(CEDEVDIR) $(INSTALLBIN) $(INSTALLLIB) $(INSTALLINC) $(INSTALLBF)
 ifeq ($(OS),Windows_NT)
 FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg.exe)
 CONVBIN    := $(call NATIVEPATH,$(CONVBINDIR)/bin/convbin.exe)
-CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng.exe)
+CONVIMG    := $(call NATIVEPATH,$(CONVIMGDIR)/bin/convimg.exe)
 CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont.exe)
 MAKEBIN    := $(call NATIVEPATH,$(TOOLSDIR)/make/make.exe)
 CPMAKE     := $(CP) $(MAKEBIN) $(INSTALLBIN)
 else
 FASMG      := $(call NATIVEPATH,$(FASMGDIR)/fasmg)
 CONVBIN    := $(call NATIVEPATH,$(CONVBINDIR)/bin/convbin)
-CONVPNG    := $(call NATIVEPATH,$(CONVPNGDIR)/convpng)
+CONVIMG    := $(call NATIVEPATH,$(CONVIMGDIR)/bin/convimg)
 CONVFONT   := $(call NATIVEPATH,$(CONVFNTDIR)/convfont)
 MAKEBIN    :=
 CPMAKE     :=
@@ -102,13 +102,13 @@ LINKED_FILES := $(wildcard src/std/linked/*.src) $(patsubst src/std/linked/%.c,s
 SHARED_FILES := $(wildcard src/ce/*.src src/std/shared/*.src) $(patsubst src/std/shared/%.c,src/std/shared/build/%.src,$(wildcard src/std/shared/*.c))
 FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,src/std/fileio/build/%.src,$(wildcard src/std/fileio/*.c))
 
-all: $(CONVBIN) $(CONVPNG) $(CONVFONT) $(LIBRARIES) ce std startup
+all: $(CONVBIN) $(CONVIMG) $(CONVFONT) $(LIBRARIES) ce std startup
 	@echo Toolchain built.
 
 clean: $(addprefix clean-,$(LIBRARIES)) clean-devlib clean-ce clean-std clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
 	$(MAKE) -C $(CONVBINDIR) clean
-	$(MAKE) -C $(CONVPNGDIR) clean
+	$(MAKE) -C $(CONVIMGDIR) clean
 	$(MAKE) -C $(CONVFNTDIR) clean
 	$(RM) linker_script
 	$(call RMDIR,release)
@@ -123,8 +123,8 @@ $(FASMG):
 	$(MAKE) -C $(FASMGDIR)
 $(CONVBIN):
 	$(MAKE) -C $(CONVBINDIR) release
-$(CONVPNG):
-	$(MAKE) -C $(CONVPNGDIR)
+$(CONVIMG):
+	$(MAKE) -C $(CONVIMGDIR) release
 $(CONVFONT):
 	$(MAKE) -C $(CONVFNTDIR)
 #----------------------------
@@ -201,7 +201,7 @@ install: $(DIRS) chmod all linker_script
 	$(CP) $(call NATIVEPATH,linker_script) $(call NATIVEPATH,$(INSTALLINC)/.linker_script)
 	$(CP) $(FASMG) $(INSTALLBIN)
 	$(CP) $(CONVBIN) $(INSTALLBIN)
-	$(CP) $(CONVPNG) $(INSTALLBIN)
+	$(CP) $(CONVIMG) $(INSTALLBIN)
 	$(CP) $(CONVFONT) $(INSTALLBIN)
 	$(CPMAKE)
 	$(MAKE) -C $(FASMGDIR) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
