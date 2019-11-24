@@ -1,10 +1,7 @@
 ### Real Time Clock Demo
 
-This demo demonstrates how to use the basics of the real time clock (RTC)
-
-![Screenshot](screenshot.gif)
+Demonstrates the basics of the real time clock (RTC).
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
-
+This demo is part of the CE C SDK Toolchain.

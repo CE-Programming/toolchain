@@ -1,10 +1,7 @@
 ### Second Counter 2 Demo
 
-This demo demonstrates using more uses of the timers
-
-![Screenshot](screenshot.gif)
+Uses the hardware timers to make a simple second counter a different way.
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
-
+This demo is part of the CE C SDK Toolchain.
