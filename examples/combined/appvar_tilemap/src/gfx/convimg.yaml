@@ -1,0 +1,18 @@
+output: appvar
+  name: vargfx
+  source-format: c
+  include-file: vargfx.h
+  palettes:
+    - global_palette
+  converts:
+    - tileset
+
+palette: global_palette
+  fixed-color: {index:0, r:255, g:255, b:255}
+  fixed-color: {index:1, r:255, g:216, b:0}
+  images: automatic
+
+convert: tileset
+  palette: global_palette
+  tilesets: {tile-width:16, tile-height:16}
+    - tileset.png

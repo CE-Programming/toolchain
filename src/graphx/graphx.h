@@ -1214,6 +1214,7 @@ gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle, 64)
  * @param y Y coordinate position.
  * @param angle 256 position angular integer.
  * @param scale Scaling factor; range is about 1% to 400% scale.
+ *        64 reprsents 100% scaling.
  * @returns The size of the sprite after scaling.
  *          This can be used for centering purposes.
  */
@@ -1234,7 +1235,7 @@ uint8_t gfx_RotatedScaledSprite_NoClip(gfx_sprite_t *sprite,
  * @see gfx_RotatedScaledTransparentSprite_NoClip.
  */
 #define gfx_RotatedSprite_NoClip(sprite, x, y, angle) \
-gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle, 64)
+gfx_RotatedScaledSprite_NoClip(sprite, x, y, angle, 64)
 
 /**
  * Flips a sprite along the X axis.

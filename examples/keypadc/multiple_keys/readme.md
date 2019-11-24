@@ -1,10 +1,7 @@
-### Keypad Multiple Keys Demo
+### Multiple Keypad Keys Demo
 
-This demo shows how to interpret multiple keypresses at the same time
-
-![Screenshot](screenshot.gif)
+This demo shows how to register multiple keypresses at the same time.
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
-
+This demo is part of the CE C SDK Toolchain.
