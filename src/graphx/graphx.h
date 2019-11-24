@@ -1640,7 +1640,7 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 ((test_y) < ((master_y) + (master_height))) && \
 (((test_y) + (test_height)) > (master_y)))
 
-/* Color definitions (try to avoid) */
+/* Old Color definitions (avoid using in new programs!) */
 #define gfx_black       0x00
 #define gfx_red         0xE0
 #define gfx_orange      0xE3

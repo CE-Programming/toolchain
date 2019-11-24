@@ -3,8 +3,8 @@
 # ----------------------------
 
 NAME         ?= DEMO
-ICON         ?= iconc.png
-DESCRIPTION  ?= "C SDK Demo"
+ICON         ?= icon.png
+DESCRIPTION  ?= "CE C SDK Demo"
 COMPRESSED   ?= NO
 ARCHIVED     ?= NO
 

@@ -3,8 +3,8 @@
 # ----------------------------
 
 NAME         ?= DEMO
-ICON         ?= iconc.png
-DESCRIPTION  ?= "C SDK Demo"
+ICON         ?= icon.png
+DESCRIPTION  ?= "CE C SDK Demo"
 COMPRESSED   ?= NO
 ARCHIVED     ?= NO
 
@@ -21,11 +21,18 @@ EXTRA_CFLAGS ?= -Wall -Wextra
 
 OUTPUT_MAP   ?= NO
 
+# ----------------------------
+# FontLib Options
+# ----------------------------
+
+FONTDIR ?= $(SRCDIR)/fonts
+
 include $(CEDEV)/include/.makefile
 
 # This is a roundabout way to tell make that fonts.c depends on testfont.inc.
 # It does it by saying the compiled object code depends on the .inc file.
-$(OBJDIR)/fonts.src: $(SRCDIR)/testfont.inc
+$(OBJDIR)/fonts.src: $(FONTDIR)/testfont.inc
 
-$(SRCDIR)/testfont.inc: $(SRCDIR)/testfont.fnt
-	convfont -o carray -f $(SRCDIR)/testfont.fnt -a 1 -b 1 -w bold -c 2 -x 9 -l 0x0B -Z $(SRCDIR)/testfont.inc
+$(FONTDIR)/testfont.inc: $(FONTDIR)/testfont.fnt
+	$(call MKDIR,$(@D))
+	convfont -o carray -f $^ -a 1 -b 1 -w bold -c 2 -x 9 -l 0x0B -Z $@

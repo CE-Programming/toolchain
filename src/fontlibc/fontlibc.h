@@ -69,6 +69,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -567,7 +568,7 @@ char fontlib_GetFirstGlyph(void);
 
 /**
  * Allows you to set the code point that is recognized as being a new line code.
- * You can set this to zero to prevent new line code processing.  
+ * You can set this to zero to prevent new line code processing.
  * @note If FONTLIB_ENABLE_AUTO_WRAP is enabled, then wrapping will still
  * implicitly case a newline.
  * @note This defaults to 0x0A (ASCII line feed/UNIX newline)
@@ -681,7 +682,7 @@ char *fontlib_GetLastCharacterRead(void);
 size_t fontlib_GetCharactersRemaining(void);
 
 /**
- * Draws a glyph.  
+ * Draws a glyph.
  * @note This can even draw code points less than the code point specified with
  * fontlib_SetFirstPrintableCodePoint().  It can even draw code point 0.
  * @note Although this does update the cursor X/Y positions, it does NOT
@@ -787,7 +788,7 @@ void fontlib_SetNewlineOptions(uint8_t options);
  */
 uint8_t fontlib_GetNewlineOptions(void);
 
-/** 
+/**
  * Scrolls the contents of the text window down one line, i.e. everything in
  * the window is copied UP one line, thus yielding the effect of scrolling down.
  * The current text cursor position is ignored.
@@ -795,7 +796,7 @@ uint8_t fontlib_GetNewlineOptions(void);
  */
 void fontlib_ScrollWindowDown(void);
 
-/** 
+/**
  * Scrolls the contents of the text window up one line, i.e. everything in
  * the window is copied DOWN one line, thus yielding the effect of scrolling up.
  * The current text cursor position is ignored.

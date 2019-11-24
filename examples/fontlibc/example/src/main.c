@@ -1,36 +1,24 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <tice.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <graphx.h>
-
-#include <fileioc.h>
 #include <fontlibc.h>
-#include "fonts.h"
 
-void printCentered(const char *string) {
-    /* We're just using some simple math to find the center of the text window.
-    Then we find the center of the text to be displayed and use math to make
-    sure it ends up in the center of the window. */
-    fontlib_SetCursorPosition(fontlib_GetWindowWidth() / 2 + fontlib_GetWindowXMin() - (fontlib_GetStringWidth(string) / 2), fontlib_GetCursorY());
-    fontlib_DrawString(string);
-}
+#include "fonts/fonts.h"
 
-/* Main Function */
-void main(void) {
-    char *title = " FONTLIBC ";
+void PrintCentered(const char *string);
+
+int main(void)
+{
+    const char *title = " FONTLIBC ";
+
+    /* Initialize graphics drawing */
     gfx_Begin();
+
     /* Erase the screen to black */
-    gfx_FillScreen(gfx_black);
+    gfx_ZeroScreen();
 
     /* Set a font to use.  DrawString will display garbage if you don't give it a font! */
     fontlib_SetFont(test_font, 0);
-    
+
     /* First, we'll display centered text in a window */
     /* Add some vertical padding around our text */
     fontlib_SetLineSpacing(2, 2);
@@ -50,35 +38,34 @@ void main(void) {
     fontlib_SetTransparency(false);
     fontlib_ShiftCursorPosition(-20, -5);
     fontlib_DrawGlyph('Y');
-    
 
-    /* Pause */
+    /* Waits for a key */
     while (!os_GetCSC());
 
     /* Now erase everything in the text window so you don't see that dumb filler text! */
     fontlib_ClearWindow();
     /* . . . and move cursor back to top of text window */
-    /* Note that since printCentered takes care of setting X for us, we can just set it to 0 here */
+    /* Note that since PrintCentered takes care of setting X for us, we can just set it to 0 here */
     fontlib_SetCursorPosition(0, fontlib_GetWindowYMin());
     /* Disable pre-/post- line clearing */
     fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP);
     /* Show transparency in action */
     fontlib_SetTransparency(true);
-    printCentered("[A text window]\n");
+    PrintCentered("[A text window]\n");
     /* Now let's try some /different/ ugly colors! */
-    fontlib_SetColors(gfx_pink, gfx_blue);
+    fontlib_SetColors(240, 16);
     fontlib_SetTransparency(false);
-    printCentered(" Opaque text ");
+    PrintCentered(" Opaque text ");
 
     /* Now print some text in the exact center of the screen */
     fontlib_SetWindowFullScreen();
     fontlib_SetLineSpacing(0, 0);
     fontlib_SetCursorPosition(0, fontlib_GetWindowHeight() / 2 - fontlib_GetCurrentFontHeight() / 2);
-    printCentered(title);
+    PrintCentered(title);
 
-    /* Pause */
+    /* Waits for a key */
     while (!os_GetCSC());
-    
+
     /* Test scrolling */
     fontlib_SetWindow(25, 40, 150, 40);
     fontlib_HomeUp();
@@ -88,10 +75,21 @@ void main(void) {
     fontlib_Newline();
     fontlib_DrawString("Scrolled!");
     fontlib_ClearEOL();
-    
-    /* Pause */
+
+    /* Waits for a key */
     while (!os_GetCSC());
 
-    /* Finish the graphics */
+    /* End graphics drawing */
     gfx_End();
+
+    return 0;
+}
+
+void PrintCentered(const char *string)
+{
+    /* We're just using some simple math to find the center of the text window.
+    Then we find the center of the text to be displayed and use math to make
+    sure it ends up in the center of the window. */
+    fontlib_SetCursorPosition(fontlib_GetWindowWidth() / 2 + fontlib_GetWindowXMin() - (fontlib_GetStringWidth(string) / 2), fontlib_GetCursorY());
+    fontlib_DrawString(string);
 }

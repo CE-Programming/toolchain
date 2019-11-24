@@ -9,7 +9,7 @@ int main(void)
     /* Print a string */
     os_PutStrFull("Hello, World!");
 
-    /* Waits for a keypress */
+    /* Waits for a key */
     while (!os_GetCSC());
 
     /* Return 0 for success */

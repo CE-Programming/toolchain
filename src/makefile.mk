@@ -60,7 +60,7 @@ NOSTDOUT  := >nul
 NOSTDERR  := 2>&1
 RM         = del /q /f $(NOSTDOUT) $(NOSTDERR)
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
-MKDIR      = call && (if not exist $1 mkdir $1)
+NATIVEMKDR = call && (if not exist $1 mkdir $1)
 QUOTE_ARG  = "$(subst ",',$1)"#'
 else
 MAKEDIR   := $(CURDIR)
@@ -77,12 +77,12 @@ NOSTDERR  := 2> /dev/null
 CD         = cd
 RM         = rm -f
 RMDIR      = rm -rf $1
-MKDIR      = mkdir -p $1
+NATIVEMKDR = mkdir -p $1
 QUOTE_ARG  = '$(subst ','\'',$1)'#'
 endif
 EZCC = ez80-clang
 
-MKDIR_NATIVE = $(call MKDIR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
+MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
 
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 LINKER_SCRIPT ?= $(CEDEV)/include/.linker_script
@@ -185,22 +185,22 @@ debug: DEBUGMODE = DEBUG
 debug: $(BINDIR)/$(TARGET8XP) ;
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
-	$(Q)$(call MKDIR_NATIVE,$(@D))
+	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
 $(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(ICONSRC)
-	$(Q)$(call MKDIR_NATIVE,$(@D))
+	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo "[linking] $@"
 	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@) $(NOSTDOUT)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(ICONSRC): $(ICONIMG)
-	$(Q)$(call MKDIR_NATIVE,$(@D))
+	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(ICON_CONV)
 
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
-	$(Q)$(call MKDIR_NATIVE,$(@D))
+	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo "[compiling] $<"
 	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
