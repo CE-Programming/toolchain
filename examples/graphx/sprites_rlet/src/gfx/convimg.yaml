@@ -1,0 +1,18 @@
+output: c
+  include-file: gfx.h
+  palettes:
+    - global_palette
+  converts:
+    - sprites
+
+palette: global_palette
+  fixed-color: {index:0, r:255, g:255, b:255}
+  images: automatic
+
+convert: sprites
+  palette: global_palette
+  transparent-color-index: 0
+  style: rlet
+  images:
+    - ubuntu.png
+

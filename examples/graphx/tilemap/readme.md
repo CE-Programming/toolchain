@@ -1,9 +1,7 @@
-### GraphX Simple Tilemap Demo
+### Tilemap Demo
 
 An example of tilemaping using a tileset, tilemap, and the keypad.
 
-![Screenshot](screenshot.png)
-
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
+This demo is part of the CE C SDK Toolchain.
