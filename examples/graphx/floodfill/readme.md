@@ -1,10 +1,7 @@
-### GraphX Flood Fill Demo
+### Flood Fill Demo
 
-This example demonstrates using the flood fill algorithim implemented in GraphX
-
-![Screenshot](screenshot.gif)
+Fills a polygon image with a color using the flood fill function.
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
-
+This demo is part of the CE C SDK Toolchain.

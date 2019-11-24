@@ -1,17 +1,11 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <tice.h>
-
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include <tice.h>
 #include <graphx.h>
 
-void main(void) {
-    int pts[10], i;
+int main(void)
+{
+    int pts[10];
+    int i;
 
     int rx = 100;
     int ry = 100;
@@ -21,30 +15,42 @@ void main(void) {
     /* Build the coordinates of the polygon */
     double theta = -M_PI / 2;
     double dtheta = 4 * M_PI / 5;
-    for (i = 0; i < 10; i += 2) {
+    for (i = 0; i < 10; i += 2)
+    {
         pts[i+0] = (int)(cx + rx * cos(theta)),
         pts[i+1] = (int)(cy + ry * sin(theta));
         theta += dtheta;
     }
 
-    /* Initialize the 8bpp graphics */
+    /* Initialize graphics drawing */
     gfx_Begin();
 
-    /* Set up the palette */
-    gfx_SetColor(gfx_black);
+    /* Use the default palettes, this is already set by gfx_Begin */
+    gfx_SetDefaultPalette();
 
-    /* Draw a polygon on the buffer */
+    /* Set the outline color */
+    gfx_SetColor(0);
+
+    /* Draw a polygon */
     gfx_Polygon(pts, 5);
 
-    /* Pause */
-    while (!os_GetCSC()); 
+    /* Waits for a key */
+    while (!os_GetCSC());
 
-    /* Flood fill the rest of the screen */
-    gfx_FloodFill(0, 0, 0);
+    /* Flood fill the inside of the polygon */
+    gfx_FloodFill(LCD_WIDTH / 2, LCD_HEIGHT / 2, 229);
 
-    /* Pause */
-    while (!os_GetCSC()); 
+    /* Waits for a key */
+    while (!os_GetCSC());
 
-    /* Close the graphics */
+    /* Flood fill the outside of the polygon */
+    gfx_FloodFill(0, 0, 9);
+
+    /* Waits for a key */
+    while (!os_GetCSC());
+
+    /* End graphics drawing */
     gfx_End();
+
+    return 0;
 }

@@ -1,18 +1,11 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <tice.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <keypadc.h>
 
 /* Function prototypes */
-void printText(int8_t xpos, int8_t ypos, const char *text);
+void PrintText(int8_t xpos, int8_t ypos, const char *text);
 
-void main(void) {
+int main(void)
+{
     /* Key variable */
     kb_key_t key;
     const char *erase_string = "     ";
@@ -21,40 +14,30 @@ void main(void) {
     os_ClrHome();
 
     /* Loop until 2nd is pressed */
-    do {
-
+    do
+    {
         /* Update kb_Data */
         kb_Scan();
 
         key = kb_Data[7];
 
         /* Print the current arrow key input */
-        if (key & kb_Down) {
-            printText(0, 0, "Down");
-        } else {
-            printText(0, 0, erase_string);
-        }
-        if (key & kb_Up) {
-            printText(0, 1, "Up");
-        } else {
-            printText(0, 1, erase_string);
-        }
-        if (key & kb_Left) {
-            printText(0, 2, "Left");
-        } else {
-            printText(0, 2, erase_string);
-        }
-        if (key & kb_Right) {
-            printText(0, 3, "Right");
-        } else {
-            printText(0, 3, erase_string);
-        }
+        PrintText(0, 0, key & kb_Down ? "Down" : erase_string);
+
+        PrintText(0, 1, key & kb_Up ? "Up" : erase_string);
+
+        PrintText(0, 2, key & kb_Left ? "Left" : erase_string);
+
+        PrintText(0, 3, key & kb_Right ? "Right" : erase_string);
 
     } while (kb_Data[1] != kb_2nd);
+
+    return 0;
 }
 
 /* Draw text on the homescreen at the given X/Y location */
-void printText(int8_t xpos, int8_t ypos, const char *text) {
+void PrintText(int8_t xpos, int8_t ypos, const char *text)
+{
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }

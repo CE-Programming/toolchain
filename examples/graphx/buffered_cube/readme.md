@@ -1,10 +1,7 @@
-### GraphX Cube Buffer Demo
+### Cube Buffer Demo
 
-Draws a rotating cube which demonstartes the line and double buffering routines
-
-![Screenshot](screenshot.gif)
+Draws a rotating cube, where drawing is performed on the hidden back buffer.
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
-
+This demo is part of the CE C SDK Toolchain.

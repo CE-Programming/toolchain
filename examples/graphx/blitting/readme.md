@@ -1,7 +1,7 @@
-### GraphX Blitting Demo
+### Blitting Demo
 
-This example demonstrates blitting to manually copy data from the drawing buffer to the screen buffer
+This example demonstrates blitting to manually copy data from the  hidden drawing buffer to the visible screen buffer.
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
+This demo is part of the CE C SDK Toolchain.

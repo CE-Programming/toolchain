@@ -3,8 +3,8 @@
 # ----------------------------
 
 NAME         ?= DEMO
-ICON         ?= iconc.png
-DESCRIPTION  ?= "C SDK Demo"
+ICON         ?= icon.png
+DESCRIPTION  ?= "CE C SDK Demo"
 COMPRESSED   ?= NO
 ARCHIVED     ?= NO
 
@@ -24,4 +24,4 @@ OUTPUT_MAP   ?= NO
 include $(CEDEV)/include/.makefile
 
 tilemap: src/tilemap/tilemap.csv
-	cd src && cd tilemap && convcsv --format c --name tilemap_map --input tilemap.csv --output tilemap.c
+	cd src && cd tilemap && convbin --iformat csv -i tilemap.csv -o tilemap.c --oformat c --name tilemap_map

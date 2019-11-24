@@ -1,0 +1,17 @@
+output: c
+  include-file: gfx.h
+  palettes:
+    - global_palette
+  converts:
+    - apple_image
+
+palette: global_palette
+  max-entries: 48
+  fixed-color: {index:0, r:255, g:255, b:255}
+  images: automatic
+
+convert: apple_image
+  palette: global_palette
+  compress: zx7
+  images:
+    - apple.png
