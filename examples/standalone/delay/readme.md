@@ -2,8 +2,6 @@
 
 Demonstrates using the millisecond delay function in tice.h.
 
-![Screenshot](screenshot.gif)
-
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
+This demo is part of the CE C SDK Toolchain.

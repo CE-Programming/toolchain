@@ -7,8 +7,8 @@
 
 NAME        ?= DEMO
 COMPRESSED  ?= NO
-ICON        ?= iconc.png
-DESCRIPTION ?= "C SDK Demo"
+ICON        ?= icon.png
+DESCRIPTION ?= "CE C SDK Demo"
 
 # ----------------------------
 
