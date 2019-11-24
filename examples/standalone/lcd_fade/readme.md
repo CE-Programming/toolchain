@@ -1,8 +1,7 @@
 ### LCD Fade Demo
 
-This demo demonstrates controlling the LCD backlight by fading in and out
+Controls the LCD backlight by fading in and out.
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
-
+This demo is part of the CE C SDK Toolchain.
