@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#define tiflags __attribute__((__tiflags__))
+
 /*
  * Hardware & custom macros/functions
  */
@@ -332,12 +334,12 @@ typedef struct font {
 /**
  * Resets the OS homescreen; accounts for split screen
  */
-#define os_ClrHome() do { _OS(asm_ClrLCD); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
+#define os_ClrHome() do { asm_ClrLCD(); asm_HomeUp(); asm_DrawStatusBar(); } while (0)
 
 /**
  * Resets the OS homescreen fully
  */
-#define os_ClrHomeFull() do { _OS(asm_ClrLCDFull); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
+#define os_ClrHomeFull() do { asm_ClrLCDFull(); asm_HomeUp(); asm_DrawStatusBar(); } while (0)
 
 /**
  * TIOS small font.
@@ -458,6 +460,12 @@ void boot_WaitShort(void);
 /*
  * OS Routines
  */
+
+/**
+ * Inserts a new line at the current cursor posistion on the homescreen
+ * Does scroll.
+ */
+tiflags void os_NewLine(void);
 
 /**
  * Disables the OS cursor
@@ -886,7 +894,7 @@ int24_t os_RealToInt24(const real_t *arg);
  * Converts an integer to a real_t
  * @note Saturates on overflow
  */
-real_t os_Int24ToReal(int24_t arg);
+tiflags real_t os_Int24ToReal(int24_t arg);
 
 /**
  * Converts a real_t to a float
@@ -1058,6 +1066,83 @@ int8_t os_MSDWrite(uint8_t lun, uint8_t blockCount, uint32_t lba, uint24_t block
 int8_t os_USBGetRequestStatus(void);
 
 /**
+ * Executes the assembly routine _ForceCmdNoChar
+ */
+void os_ForceCmdNoChar(void);
+
+/**
+ * Inserts a new line at the current cursor posistion on the homescreen
+ * Does scroll.
+ */
+tiflags void os_NewLine(void);
+
+/**
+ * Routine to scroll homescreen up
+ */
+tiflags void os_MoveUp(void);
+
+/**
+ * Routine to scroll homescreen down
+ */
+tiflags void os_MoveDown(void);
+
+/**
+ * Routine to move row and column posistion to (0,0)
+ */
+tiflags void os_HomeUp(void);
+
+/**
+ * Routine to turn on the Run Indicator
+ */
+tiflags void os_RunIndicOn(void);
+
+/**
+ * Routine to turn off the Run Indicator
+ */
+tiflags void os_RunIndicOff(void);
+
+/**
+ * Routine to turn off APD
+ */
+tiflags void os_DisableAPD(void);
+
+/**
+ * Routine to turn on APD
+ */
+tiflags void os_EnableAPD(void);
+
+/**
+ * Routine checks the amount of free archive
+ */
+tiflags void os_ArcChk(void);
+
+/**
+ * Routine to clear the homescreen lcd
+ */
+tiflags void os_ClrLCDFull(void);
+
+/**
+ * Routine to clear the homescreen lcd.
+ * Accounts for split screen
+ */
+tiflags void os_ClrLCD(void);
+
+/**
+ * Routine to redraw the status bar
+ */
+tiflags void os_DrawStatusBar(void);
+
+/**
+ * Invalidate and clear stat variables
+ */
+tiflags void os_DelRes(void);
+
+/**
+ * Invalidate and clear text shadow area
+ */
+tiflags void os_ClrTxtShd(void);
+
+/**
  * Runs the calulator at 6 MHz
  */
 void boot_Set6MHzMode(void);
@@ -1077,88 +1162,7 @@ void boot_Set6MHzModeI(void);
  */
 void boot_Set48MHzModeI(void);
 
-/**
- * Executes the assembly routine _ForceCmdNoChar
- */
-void os_ForceCmdNoChar(void);
-
-/**
- * Use this function to call assembly functions in the OS and Bootcode
- * i.e. _OS( asm_ArcChk );
- */
-void _OS(void (*function)(void));
-
-/**
- * Inserts a new line at the current cursor posistion on the homescreen
- * Does scroll.
- */
-void asm_NewLine(void);
-
-/**
- * Assembly routine to scroll homescreen up
- */
-void asm_MoveUp(void);
-
-/**
- * Assembly routine to scroll homescreen down
- */
-void asm_MoveDown(void);
-
-/**
- * Assembly routine to move row and column posistion to (0,0)
- */
-void asm_HomeUp(void);
-
-/**
- * Assembly routine to turn on the Run Indicator
- */
-void asm_RunIndicOn(void);
-
-/**
- * Assembly routine to turn off the Run Indicator
- */
-void asm_RunIndicOff(void);
-
-/**
- * Assembly routine to turn off APD
- */
-void asm_DisableAPD(void);
-
-/**
- * Assembly routine to turn on APD
- */
-void asm_EnableAPD(void);
-
-/**
- * Assembly routine checks the amount of free archive
- */
-void asm_ArcChk(void);
-
-/**
- * Assembly routine to clear the homescreen lcd
- */
-void asm_ClrLCDFull(void);
-
-/**
- * Assembly routine to clear the homescreen lcd.
- * Accounts for split screen
- */
-void asm_ClrLCD(void);
-
-/**
- * Assembly routine to redraw the status bar
- */
-void asm_DrawStatusBar(void);
-
-/**
- * Invalidate and clear stat variables
- */
-void asm_DelRes(void);
-
-/**
- * Invalidate and clear text shadow area
- */
-void asm_ClrTxtShd(void);
+#undef tiflags
 
 /**
  * Colors used by the OS
@@ -2319,6 +2323,21 @@ typedef enum {
 #define prgm_CleanUp()
 #define pgrm_CleanUp()
 #define memset_fast memset
+#define _OS(function) function()
+#define asm_NewLine os_NewLine
+#define asm_MoveUp os_MoveUp
+#define asm_MoveDown os_MoveDown
+#define asm_HomeUp os_HomeUp
+#define asm_RunIndicOn os_RunIndicOn
+#define asm_RunIndicOff os_RunIndicOff
+#define asm_DisableAPD os_DisableAPD
+#define asm_EnableAPD os_EnableAPD
+#define asm_ArcChk os_ArcChk
+#define asm_ClrLCDFull os_ClrLCDFull
+#define asm_ClrLCD os_ClrLCD
+#define asm_DrawStatusBar os_DrawStatusBar
+#define asm_DelRes os_DelRes
+#define asm_ClrTxtShd os_ClrTxtShd
 
 #ifdef __cplusplus
 }

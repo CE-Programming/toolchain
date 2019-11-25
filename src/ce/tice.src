@@ -123,21 +123,20 @@
 	.def _os_MSDRead
 	.def _os_MSDWrite
         .def _os_USBGetRequestStatus
-
-	.def _asm_NewLine
-	.def _asm_MoveDown
-	.def _asm_MoveUp
-	.def _asm_ClrLCDFull
-	.def _asm_ClrLCD
-	.def _asm_ClrTxtShd
-	.def _asm_HomeUp
-	.def _asm_RunIndicOn
-	.def _asm_RunIndicOff
-	.def _asm_DelRes
-	.def _asm_DisableAPD
-	.def _asm_EnableAPD
-	.def _asm_DrawStatusBar
-	.def _asm_ArcChk
+	.def _os_NewLine
+	.def _os_MoveDown
+	.def _os_MoveUp
+	.def _os_ClrLCDFull
+	.def _os_ClrLCD
+	.def _os_ClrTxtShd
+	.def _os_HomeUp
+	.def _os_RunIndicOn
+	.def _os_RunIndicOff
+	.def _os_DelRes
+	.def _os_DisableAPD
+	.def _os_EnableAPD
+	.def _os_DrawStatusBar
+	.def _os_ArcChk
 
 ; ---
 ; locations
@@ -264,21 +263,17 @@ _os_MSDReadCapacity             equ 022290h
 _os_MSDRead                     equ 022294h
 _os_MSDWrite                    equ 022298h
 _os_USBGetRequestStatus         equ 0222D0h
-
-; ---
-; directly callable asm functions
-; ---
-_asm_NewLine                    equ 0207F0h
-_asm_MoveDown                   equ 0207F4h
-_asm_MoveUp                     equ 020800h
-_asm_ClrLCDFull                 equ 020808h
-_asm_ClrLCD                     equ 02080Ch
-_asm_ClrTxtShd                  equ 020818h
-_asm_HomeUp                     equ 020828h
-_asm_RunIndicOn                 equ 020844h
-_asm_RunIndicOff                equ 020848h
-_asm_DelRes                     equ 020E5Ch
-_asm_DisableAPD                 equ 021134h
-_asm_EnableAPD                  equ 021138h
-_asm_DrawStatusBar              equ 021A3Ch
-_asm_ArcChk                     equ 022040h
+_os_NewLine                     equ 0207F0h
+_os_MoveDown                    equ 0207F4h
+_os_MoveUp                      equ 020800h
+_os_ClrLCDFull                  equ 020808h
+_os_ClrLCD                      equ 02080Ch
+_os_ClrTxtShd                   equ 020818h
+_os_HomeUp                      equ 020828h
+_os_RunIndicOn                  equ 020844h
+_os_RunIndicOff                 equ 020848h
+_os_DelRes                      equ 020E5Ch
+_os_DisableAPD                  equ 021134h
+_os_EnableAPD                   equ 021138h
+_os_DrawStatusBar               equ 021A3Ch
+_os_ArcChk                      equ 022040h
