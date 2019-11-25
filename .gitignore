@@ -46,7 +46,7 @@ relocation_table
 *.8xv
 *.8xg
 *.8xp
-!*var_gfx.8xv
+!*vargfx.8xv
 
 # debug files
 *.dSYM/
