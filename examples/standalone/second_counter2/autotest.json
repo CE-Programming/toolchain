@@ -1,0 +1,54 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|500",
+    "hashWait|1",
+    "delay|1000",
+    "hashWait|2",
+    "delay|1000",
+    "hashWait|3",
+    "delay|1000",
+    "hashWait|4"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test show 1",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "DD128F6E" ]
+    },
+    "2":
+    {
+      "description": "Test show 2",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "B6D5C74A" ]
+    },
+    "3":
+    {
+      "description": "Test show 3",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "508B20F7" ]
+    },
+    "4":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}
