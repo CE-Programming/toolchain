@@ -816,7 +816,7 @@ void fontlib_ScrollWindowUp(void);
  * NOTA BENE: Any operation that can move variables around in memory can
  * invalidate this pointer!
  */
-char *fontlib_GetFontPackName(char *appvar_name);
+char *fontlib_GetFontPackName(const char *appvar_name);
 
 /**
  * Gets a pointer to a font, suitable for passing to SetFont(), given a font
@@ -826,7 +826,7 @@ char *fontlib_GetFontPackName(char *appvar_name);
  * @param index Index into font table of font pack
  * @return Direct pointer to font, or NULL if the index is invalid.
  */
-fontlib_font_t *fontlib_GetFontByIndexRaw(fontlib_font_pack_t *font_pack, uint8_t index);
+fontlib_font_t *fontlib_GetFontByIndexRaw(const fontlib_font_pack_t *font_pack, uint8_t index);
 
 /**
  * Gets a pointer to a font, suitable for passing to SetFont(), given a font
@@ -837,7 +837,7 @@ fontlib_font_t *fontlib_GetFontByIndexRaw(fontlib_font_pack_t *font_pack, uint8_
  * @param index Index into font table of font pack
  * @return Direct pointer to font, or NULL if the index is invalid.
  */
-fontlib_font_t *fontlib_GetFontByIndex(char *font_pack_name, uint8_t index);
+fontlib_font_t *fontlib_GetFontByIndex(const char *font_pack_name, uint8_t index);
 
 /**
  * Gets a pointer to a font, suitable for passing to SetFont(), given a font
@@ -856,7 +856,7 @@ fontlib_font_t *fontlib_GetFontByIndex(char *font_pack_name, uint8_t index);
  * FONTLIB_MONOSPACE to REJECT monospaced fonts.
  * @return Direct pointer to font, or NULL if no matching font is found
  */
- fontlib_font_t *fontlib_GetFontByStyleRaw(fontlib_font_pack_t *font_pack, uint8_t size_min, uint8_t size_max, uint8_t weight_min, uint8_t weight_max, uint8_t style_bits_set, uint8_t style_bits_reset);
+ fontlib_font_t *fontlib_GetFontByStyleRaw(const fontlib_font_pack_t *font_pack, uint8_t size_min, uint8_t size_max, uint8_t weight_min, uint8_t weight_max, uint8_t style_bits_set, uint8_t style_bits_reset);
 
 /**
  * Gets a pointer to a font, suitable for passing to SetFont(), given a font
@@ -875,7 +875,7 @@ fontlib_font_t *fontlib_GetFontByIndex(char *font_pack_name, uint8_t index);
  * FONTLIB_MONOSPACE to REJECT monospaced fonts.
  * @return Direct pointer to font, or NULL if no matching font is found
  */
-fontlib_font_t *fontlib_GetFontByStyle(char *font_pack_name, uint8_t size_min, uint8_t size_max, uint8_t weight_min, uint8_t weight_max, uint8_t style_bits_set, uint8_t style_bits_reset);
+fontlib_font_t *fontlib_GetFontByStyle(const char *font_pack_name, uint8_t size_min, uint8_t size_max, uint8_t weight_min, uint8_t weight_max, uint8_t style_bits_set, uint8_t style_bits_reset);
 
 
 #ifdef __cplusplus
