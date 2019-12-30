@@ -26,7 +26,7 @@ int main(void)
     gfx_Begin();
 
     /* Use the default palettes, this is already set by gfx_Begin */
-    gfx_SetDefaultPalette();
+    gfx_SetDefaultPalette(gfx_8bpp);
 
     /* Set the outline color */
     gfx_SetColor(0);
