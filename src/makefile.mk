@@ -10,6 +10,8 @@ USE_FLASH_FUNCTIONS ?= YES
 OUTPUT_MAP          ?= YES
 ARCHIVED            ?= NO
 OPT_MODE            ?= -optsize
+EXTRA_CFLAGS        ?=
+EXTRA_CXXFLAGS      ?=
 #----------------------------
 SRCDIR              ?= src
 OBJDIR              ?= obj
@@ -56,12 +58,15 @@ CC         = $(call NATIVEPATH,$(BIN)/ez80cc.exe)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg.exe)
 CD         = cd
+CP         = copy /y
+MV         = move /y >nul
 NOSTDOUT  := >nul
 NOSTDERR  := 2>&1
 RM         = del /q /f $(NOSTDOUT) $(NOSTDERR)
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
 MKDIR      = call && (if not exist $1 mkdir $1)
 QUOTE_ARG  = "$(subst ",',$1)"#'
+TO_LOWER   = $1
 else
 MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst \,/,$1)
@@ -76,10 +81,13 @@ CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg)
 NOSTDOUT  := 1> /dev/null
 NOSTDERR  := 2> /dev/null
 CD         = cd
+CP         = cp
+MV         = mv
 RM         = rm -f
 RMDIR      = rm -rf $1
 MKDIR      = mkdir -p $1
 QUOTE_ARG  = '$(subst ','\'',$1)'#'
+TO_LOWER   = $(shell printf %s $(call QUOTE_ARG,$1) | tr [:upper:] [:lower:])
 endif
 
 MKDIR_NATIVE = $(call MKDIR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
@@ -116,7 +124,7 @@ ASMSOURCES    := $(call rwildcard,$(SRCDIR),*.asm)
 
 # create links for later
 LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.src)
-LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%=$(OBJDIR)/%.src)
+LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
@@ -163,9 +171,11 @@ ifneq ("$(EXTRA_CFLAGS)","")
 EXTRA_COMPILER_FLAGS := $(addprefix -define:,$(EXTRA_CFLAGS))
 endif
 
-# define the C flags used by the Zilog compiler
+# define the C/C++ flags used by the Zilog compiler
 CFLAGS ?= \
     -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE) $(EXTRA_COMPILER_FLAGS)
+#CFLAGS := $(CFLAGS) -Wno-main-return-type
+CXXFLAGS := $(CFLAGS) -fno-exceptions
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
@@ -206,9 +216,14 @@ $(ICONSRC): $(ICONIMG)
 # these rules compile the source files into object files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR_NATIVE,$(@D))
-	$(Q)echo "[compiling] $<"
-	$(CC) $(CFLAGS) $(call QUOTE_ARG,$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))) && \
+	$(Q)echo "[compiling C]   $<"
+	$(Q)$(CC) $(CFLAGS) $(call QUOTE_ARG,$(call WINPATH,$(addprefix $(MAKEDIR)/,$<))) && \
 	$(MV) $(call QUOTE_ARG,$(call TO_LOWER,$(@F))) $(call QUOTE_ARG,$@)
+
+$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo "[compiling C++] $<"
+	$(Q)$(EZCC) $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR))
