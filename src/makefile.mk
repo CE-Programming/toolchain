@@ -116,7 +116,7 @@ ASMSOURCES    := $(call rwildcard,$(SRCDIR),*.asm)
 
 # create links for later
 LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.src)
-LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%=$(OBJDIR)/%.src)
+LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
@@ -159,8 +159,10 @@ else
 STATIC := 1
 endif
 
-# define the C flags used by Clang
+# define the C/C++ flags used by Clang
 CFLAGS ?= -S -nostdinc -isystem $(CEDEV)/include $(CCDEBUGFLAG) $(OPT_MODE) -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_CFLAGS)
+CFLAGS := $(CFLAGS) -Wno-main-return-type
+CXXFLAGS := $(CFLAGS) -fno-exceptions
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
@@ -201,8 +203,13 @@ $(ICONSRC): $(ICONIMG)
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo "[compiling] $<"
+	$(Q)echo "[compiling C] $<"
 	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
+
+$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo "[compiling C++] $<"
+	$(Q)$(EZCC) $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR))
