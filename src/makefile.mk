@@ -1,5 +1,5 @@
 #----------------------------
-# Core C Makefile
+# Core C/C++ Makefile
 #----------------------------
 CLEANUP             ?= YES
 BSSHEAP_LOW         ?= D031F6
@@ -9,7 +9,7 @@ INIT_LOC            ?= D1A87F
 USE_FLASH_FUNCTIONS ?= YES
 OUTPUT_MAP          ?= NO
 ARCHIVED            ?= NO
-OPT_MODE            ?= -Oz
+OPT_MODE            ?= -O3
 EXTRA_CFLAGS        ?=
 EXTRA_CXXFLAGS      ?=
 #----------------------------
