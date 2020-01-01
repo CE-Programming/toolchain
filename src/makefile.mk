@@ -115,7 +115,7 @@ USERHEADERS   := $(call rwildcard,$(SRCDIR),*.h *.hpp)
 ASMSOURCES    := $(call rwildcard,$(SRCDIR),*.asm)
 
 # create links for later
-LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.src)
+LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.c.src)
 LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
 LINK_ASMSOURCES := $(ASMSOURCES)
 
@@ -201,9 +201,9 @@ $(ICONSRC): $(ICONIMG)
 	$(Q)$(ICON_CONV)
 
 # these rules compile the source files into assembly files
-$(OBJDIR)/%.src: $(SRCDIR)/%.c $(USERHEADERS)
+$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo "[compiling C] $<"
+	$(Q)echo "[compiling C]   $<"
 	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 $(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
