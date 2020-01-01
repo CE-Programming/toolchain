@@ -175,7 +175,7 @@ endif
 CFLAGS ?= \
     -noasm $(CCDEBUGFLAG) -nogenprint -keepasm -quiet $(OPT_MODE) -cpu:EZ80F91 -noreduceopt -nolistinc -nomodsect -define:_EZ80F91 -define:_EZ80 -define:$(DEBUGMODE) $(EXTRA_COMPILER_FLAGS)
 #CFLAGS := $(CFLAGS) -Wno-main-return-type
-CXXFLAGS := $(CFLAGS) -fno-exceptions
+CXXFLAGS := $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
