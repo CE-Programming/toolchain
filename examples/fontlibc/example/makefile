@@ -31,7 +31,7 @@ include $(CEDEV)/include/.makefile
 
 # This is a roundabout way to tell make that fonts.c depends on testfont.inc.
 # It does it by saying the compiled object code depends on the .inc file.
-$(OBJDIR)/fonts.src: $(FONTDIR)/testfont.inc
+$(OBJDIR)/fonts/fonts.c.src: $(FONTDIR)/testfont.inc
 
 $(FONTDIR)/testfont.inc: $(FONTDIR)/testfont.fnt
 	$(call MKDIR,$(@D))
