@@ -11,6 +11,7 @@ OUTPUT_MAP          ?= NO
 ARCHIVED            ?= NO
 OPT_MODE            ?= -Oz
 EXTRA_CFLAGS        ?=
+EXTRA_CXXFLAGS      ?=
 #----------------------------
 SRCDIR              ?= src
 OBJDIR              ?= obj
@@ -162,7 +163,7 @@ endif
 # define the C/C++ flags used by Clang
 CFLAGS ?= -S -nostdinc -isystem $(CEDEV)/include $(CCDEBUGFLAG) $(OPT_MODE) -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_CFLAGS)
 CFLAGS := $(CFLAGS) -Wno-main-return-type
-CXXFLAGS := $(CFLAGS) -fno-exceptions
+CXXFLAGS := $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
