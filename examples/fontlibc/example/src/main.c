@@ -11,7 +11,7 @@
 
 #include <fileioc.h>
 #include <fontlibc.h>
-#include "fonts.h"
+#include "fonts/fonts.h"
 
 void printCentered(const char *string) {
     /* We're just using some simple math to find the center of the text window.
