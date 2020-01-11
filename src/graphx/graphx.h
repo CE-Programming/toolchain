@@ -416,7 +416,8 @@ void gfx_TransparentTilemap_NoClip(gfx_tilemap_t *tilemap,
 
 /**
  * Gets a pointer to a particular tile given an initialized tilemap
- * structure and pixel offsets.
+ * structure and pixel offsets. Measurement is done from the actual
+ * tilemap, not the drawn offset location.
  *
  * @param tilemap Pointer to initialized tilemap structure.
  * @param x_offset Offset in pixels from the left of the tilemap.
