@@ -1,0 +1,82 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|100",
+    "hashWait|1",
+    "key|enter",
+    "hashWait|2",
+    "key|enter",
+    "hashWait|3",
+    "key|enter",
+    "hashWait|4",
+    "key|enter",
+    "hashWait|5",
+    "key|enter",
+    "delay|2000",
+    "hashWait|6",
+    "key|enter",
+    "hashWait|7"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test circle display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "8DE8E699" ]
+    },
+    "2":
+    {
+      "description": "Test rectangle outline display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "6390F38B" ]
+    },
+    "3":
+    {
+      "description": "Test rectangle fill display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "163F3B60" ]
+    },
+    "4":
+    {
+      "description": "Test triangle fill display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "A1154AE5" ]
+    },
+    "5":
+    {
+      "description": "Test line display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "08AE93E1" ]
+    },
+    "6":
+    {
+      "description": "Test pixel display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "B6CCDD04" ]
+    },
+    "7":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}

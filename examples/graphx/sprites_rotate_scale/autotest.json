@@ -11,20 +11,14 @@
   "sequence":
   [
     "action|launch",
-    "hashWait|1",
-    "delay|5000",
-    "hashWait|2"
+    "delay|500",
+    "key|enter",
+    "delay|100",
+    "hashWait|1"
   ],
   "hashes":
   {
     "1":
-    {
-      "description": "Test show Waiting for 5000 ms...",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "690F0EEC" ]
-    },
-    "2":
     {
       "description": "Test program exit",
       "start": "vram_start",

@@ -11,20 +11,30 @@
   "sequence":
   [
     "action|launch",
+    "delay|300",
     "hashWait|1",
-    "delay|5000",
-    "hashWait|2"
+    "key|enter",
+    "hashWait|2",
+    "key|enter",
+    "hashWait|3"
   ],
   "hashes":
   {
     "1":
     {
-      "description": "Test show Waiting for 5000 ms...",
+      "description": "Test custom font display",
       "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "690F0EEC" ]
+      "size": "vram_8_size",
+      "expected_CRCs": [ "F717BF65" ]
     },
     "2":
+    {
+      "description": "Test hidden font display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "EDA09A59" ]
+    },
+    "3":
     {
       "description": "Test program exit",
       "start": "vram_start",
