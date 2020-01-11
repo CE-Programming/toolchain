@@ -167,5 +167,5 @@ unsigned char vargfx_init(void)
     }
 
     return 1;
-};
+}
 
