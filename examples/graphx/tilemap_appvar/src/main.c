@@ -68,6 +68,8 @@ int main(void)
     /* Wait for the enter key to quit */
     do
     {
+        uint8_t block_mapped;
+        uint8_t block_ptr;
 
         /* Get the key */
         key = os_GetCSC();
@@ -75,10 +77,19 @@ int main(void)
         /* Draw tilemap and coords */
         gfx_Tilemap(&tilemap, x_offset, y_offset);
         gfx_FillRectangle(0, 0, 320, 16);
-        gfx_PrintStringXY("x offset:", 48, 4);
-        gfx_PrintUInt(x_offset, 4);
-        gfx_PrintString(" y offset:");
-        gfx_PrintUInt(y_offset, 4);
+        gfx_PrintStringXY("x:", 64, 4);
+        gfx_PrintInt(x_offset, 3);
+        gfx_PrintString(" y:");
+        gfx_PrintInt(y_offset, 3);
+        gfx_PrintString(" block:");
+
+        /* Or use gfx_GetTileMapped() and gfx_GetTile() */
+        block_mapped = *gfx_TilePtrMapped(&tilemap, x_offset / TILE_WIDTH, y_offset / TILE_HEIGHT);
+        block_ptr = *gfx_TilePtr(&tilemap, x_offset, y_offset);
+
+        gfx_PrintUInt(block_mapped, 3);
+        gfx_PrintString("/");
+        gfx_PrintUInt(block_ptr, 3);
 
         /* Do something based on the keypress */
         switch (key)

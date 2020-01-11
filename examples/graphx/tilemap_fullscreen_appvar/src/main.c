@@ -21,6 +21,7 @@ int main(void)
     }
 
     /* Allocate storage for temporary decompression */
+    /* Same as gfx_AllocSprite() */
     tile = gfx_MallocSprite(image_tile_width, image_tile_height);
 
     /* Start the graphics */
