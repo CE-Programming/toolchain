@@ -2927,10 +2927,9 @@ gfx_TilePtrMapped:
 	pop	de			; return vector
 	pop	iy			; tilemap struct
 	pop	bc			; x offset
-	pop	hl			; y offset
-	push	hl
-	push	bc
-	push	iy
+	ex	(sp),hl			; y offset
+	push	de
+	push	de
 	push	de
 	ld	h,(iy+13)		; tilemap width
 	mlt	hl
