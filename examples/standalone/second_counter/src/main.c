@@ -1,9 +1,9 @@
 #include <tice.h>
 #include <stdio.h>
 
-#define ONE_SECOND         32768/1
-#define HALF_SECOND        32768/2
-#define QUARTER_SECOND     32768/4
+#define ONE_SECOND      (32768/1)
+#define HALF_SECOND     (32768/2)
+#define QUARTER_SECOND  (32768/4)
 
 int main(void)
 {
