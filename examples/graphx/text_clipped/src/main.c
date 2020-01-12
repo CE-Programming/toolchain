@@ -54,4 +54,6 @@ int main(void)
 
     /* End graphics drawing */
     gfx_End();
+
+    return 0;
 }

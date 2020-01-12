@@ -1,3 +1,4 @@
+#include <string.h>
 #include <tice.h>
 
 void FillScreen(uint8_t color);
