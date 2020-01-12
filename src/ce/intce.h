@@ -81,10 +81,10 @@ void int_SetVector(uint8_t ivect, void (*handler)(void));
 
 #define int_RawStatus       (*(volatile uint24_t*)0x0F00000) /**< State of interrupt signals        */
 #define int_MaskedStatus    (*(volatile uint24_t*)0x0F00014) /**< Masked state of interrupt signals */
-#define int_EnableConfig    (*(uint24_t*)0x0F00004)          /**< Enabled interrupt signals         */
-#define int_LatchConfig     (*(uint24_t*)0x0F0000C)          /**< Latchable interrupt signals       */
-#define int_InvertConfig    (*(uint24_t*)0x0F00010)          /**< Invertable interrupt signals      */
-#define int_Acknowledge     (*(uint24_t*)0x0F00008)          /**< Acknowledge interrupt signals     */
+#define int_EnableConfig    (*(volatile uint24_t*)0x0F00004) /**< Enabled interrupt signals         */
+#define int_LatchConfig     (*(volatile uint24_t*)0x0F0000C) /**< Latchable interrupt signals       */
+#define int_InvertConfig    (*(volatile uint24_t*)0x0F00010) /**< Invertable interrupt signals      */
+#define int_Acknowledge     (*(volatile uint24_t*)0x0F00008) /**< Acknowledge interrupt signals     */
 
 #ifdef __cplusplus
 }

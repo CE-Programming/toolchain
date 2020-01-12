@@ -12,8 +12,8 @@ extern "C" {
 
 #ifndef NDEBUG
 
-#define dbgout ((char*)0xFB0000) /**< Standard debug output. */
-#define dbgerr ((char*)0xFC0000) /**< Error debug output. */
+#define dbgout ((volatile char*)0xFB0000) /**< Standard debug output */
+#define dbgerr ((volatile char*)0xFC0000) /**< Error debug output */
 
 #define DBG_WATCHPOINT_READ (1 << 0)  /**< Break on read. */
 #define DBG_WATCHPOINT_WRITE (1 << 1)  /**< Break on write. */
@@ -41,7 +41,7 @@ extern "C" {
  */
 #define dbg_ClearConsole() \
 do { \
-    *(unsigned char*)0xFD0000 = 1; \
+    *(volatile unsigned char*)0xFD0000 = 1; \
 } while (0)
 
 /**
@@ -49,7 +49,7 @@ do { \
  */
 #define dbg_Debugger() \
 do { \
-    *(unsigned char*)0xFFFFFF = (unsigned char)~0; \
+    *(volatile unsigned char*)0xFFFFFF = (unsigned char)~0; \
 } while (0)
 
 /**
@@ -59,8 +59,8 @@ do { \
  */
 #define dbg_SetBreakpoint(address) \
 do { \
-    *(unsigned int*)0xFFFFF0 = (unsigned int)(address); \
-    *(unsigned char*)0xFFFFFF = 1; \
+    *(volatile unsigned int*)0xFFFFF0 = (unsigned int)(address); \
+    *(volatile unsigned char*)0xFFFFFF = 1; \
 } while (0)
 
 /**
@@ -70,8 +70,8 @@ do { \
  */
 #define dbg_RemoveBreakpoint(address) \
 do { \
-    *(unsigned int*)0xFFFFF0 = (address); \
-    *(unsigned char*)0xFFFFFF = 2; \
+    *(volatile unsigned int*)0xFFFFF0 = (address); \
+    *(volatile unsigned char*)0xFFFFFF = 2; \
 } while (0)
 
 /**
@@ -84,10 +84,10 @@ do { \
  */
 #define dbg_SetWatchpoint(address_low, length, flags) \
 do { \
-    *(unsigned int*)0xFFFFF0 = (unsigned int)(address_low); \
-    *(unsigned int*)0xFFFFF4 = ((unsigned int)(address_low) + (length)); \
-    *(unsigned char*)0xFFFFF8 = (unsigned char)(flags); \
-    *(unsigned char*)0xFFFFFF = 3; \
+    *(volatile unsigned int*)0xFFFFF0 = (unsigned int)(address_low); \
+    *(volatile unsigned int*)0xFFFFF4 = ((unsigned int)(address_low) + (length)); \
+    *(volatile unsigned char*)0xFFFFF8 = (unsigned char)(flags); \
+    *(volatile unsigned char*)0xFFFFFF = 3; \
 } while (0)
 
 /**
@@ -97,8 +97,8 @@ do { \
  */
 #define dbg_RemoveWatchpoint(address) \
 do { \
-    *(unsigned int*)0xFFFFF0 = (unsigned int)(address); \
-    *(unsigned char*)0xFFFFFF = 4; \
+    *(volatile unsigned int*)0xFFFFF0 = (unsigned int)(address); \
+    *(volatile unsigned char*)0xFFFFFF = 4; \
 } while (0)
 
 /**
@@ -106,7 +106,7 @@ do { \
  */
 #define dbg_RemoveAllBreakpoints() \
 do { \
-    *(unsigned char*)0xFFFFFF = 6; \
+    *(volatile unsigned char*)0xFFFFFF = 6; \
 } while (0)
 
 /**
@@ -114,7 +114,7 @@ do { \
  */
 #define dbg_RemoveAllWatchpoints() \
 do { \
-    *(unsigned char*)0xFFFFFF = 5; \
+    *(volatile unsigned char*)0xFFFFFF = 5; \
 } while (0)
 
 #else

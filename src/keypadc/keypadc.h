@@ -244,8 +244,8 @@ typedef enum {
 #define kb_KeyUp       ((kb_lkey_t)(7 << 8 | 1<<3))
 
 /* Compatibility defines */
-#define kb_DataArray    ((uint16_t*)0xF50010)
-#define kb_dataArray    ((uint16_t*)0xF50010)
+#define kb_DataArray    ((volatile uint16_t*)0xF50010)
+#define kb_dataArray    ((volatile uint16_t*)0xF50010)
 #define kb_Store        kb_Sto
 #define kb_KeyPgrm      kb_KeyPrgm
 #define kb_group_0      0

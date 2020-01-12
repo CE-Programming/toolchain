@@ -243,8 +243,8 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define lcd_CrsrIntAcknowledge   (*(volatile uint8_t*)0xE30C24)
 #define lcd_CrsrIntStatus        (*(volatile uint8_t*)0xE30C28)
 #define lcd_CrsrIntStatusMasked  (*(volatile uint8_t*)0xE30C2C)
-#define lcd_Ram                  ((uint16_t*)0xD40000)
-#define lcd_Palette              ((uint16_t*)0xE30200)
+#define lcd_Palette              ((volatile uint16_t*)0xE30200)
+#define lcd_Ram                  ((volatile uint16_t*)0xD40000)
 
 /**
  * Width of LCD in pixels
