@@ -26,7 +26,7 @@
 /* power approximates a positive floating point number in the  */
 /* range of representable values.                              */
 
-#define FLT_MIN_EXP	-125
+#define FLT_MIN_EXP	(-125)
 #define DBL_MIN_EXP	FLT_MIN_EXP
 #define LDBL_MIN_EXP	FLT_MIN_EXP
 
@@ -42,7 +42,7 @@
 /* approximates a floating point number in the range of */
 /* representable value ((int)log10(FLT_MAX),etc)        */
 
-#define FLT_MAX_10_EXP	+38
+#define FLT_MAX_10_EXP	(+38)
 #define DBL_MAX_10_EXP	FLT_MAX_10_EXP
 #define LDBL_MAX_10_EXP FLT_MAX_10_EXP
 
@@ -50,7 +50,7 @@
 /* approximates a positive floating point number in the range */
 /* of representable values ((int)log10(FLT_MIN),etc.)         */
 
-#define FLT_MIN_10_EXP	-37
+#define FLT_MIN_10_EXP	(-37)
 #define DBL_MIN_10_EXP	FLT_MIN_10_EXP
 #define LDBL_MIN_10_EXP FLT_MIN_10_EXP
 

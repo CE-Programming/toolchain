@@ -69,15 +69,15 @@ void int_SetVector(uint8_t ivect, void (*handler)(void));
 #define RTC_IVECT       12 /**< Real Time Clock interrupt source */
 #define USB_IVECT       13 /**< USB interrupt source             */
 
-#define INT_ON          1<<ON_IVECT        /**< [on] key interrupt source mask        */
-#define INT_TIMER1      1<<TIMER1_IVECT    /**< Timer 1 interrupt source mask         */
-#define INT_TIMER2      1<<TIMER2_IVECT    /**< Timer 2 interrupt source mask         */
-#define INT_TIMER3      1<<TIMER3_IVECT    /**< Timer 3 interrupt source mask         */
-#define INT_TIMEROS     1<<TIMEROS_IVECT   /**< Timer OS interrupt source mask        */
-#define INT_KEYBOARD	1<<KEYBOARD_IVECT  /**< Keyboard interrupt source mask        */
-#define INT_LCD         1<<LCD_IVECT       /**< LCD interrupt source mask             */
-#define INT_RTC         1<<RTC_IVECT       /**< Real Time Clock interrupt source mask */
-#define INT_USB         1<<USB_IVECT       /**< USB interrupt source mask             */
+#define INT_ON          (1<<ON_IVECT)       /**< [on] key interrupt source mask        */
+#define INT_TIMER1      (1<<TIMER1_IVECT)   /**< Timer 1 interrupt source mask         */
+#define INT_TIMER2      (1<<TIMER2_IVECT)   /**< Timer 2 interrupt source mask         */
+#define INT_TIMER3      (1<<TIMER3_IVECT)   /**< Timer 3 interrupt source mask         */
+#define INT_TIMEROS     (1<<TIMEROS_IVECT)  /**< Timer OS interrupt source mask        */
+#define INT_KEYBOARD    (1<<KEYBOARD_IVECT) /**< Keyboard interrupt source mask        */
+#define INT_LCD         (1<<LCD_IVECT)      /**< LCD interrupt source mask             */
+#define INT_RTC         (1<<RTC_IVECT)      /**< Real Time Clock interrupt source mask */
+#define INT_USB         (1<<USB_IVECT)      /**< USB interrupt source mask             */
 
 #define int_RawStatus       (*(volatile uint24_t*)0x0F00000) /**< State of interrupt signals        */
 #define int_MaskedStatus    (*(volatile uint24_t*)0x0F00014) /**< Masked state of interrupt signals */
