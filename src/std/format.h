@@ -20,7 +20,7 @@ extern "C" {
 /* Note: 24 bits times log(2) is 7.224 decimal digits.
    We only need 14 if and when we support doubles. <THH> */
 #define MAXDIGITS 10
-#define MINEXP -4
+#define MINEXP (-4)
 #define DEFAULT_PRECISION 6
 
 /* format status codes */

@@ -117,7 +117,7 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define RTC_UNFREEZE            (1<<7)
 #define RTC_FREEZE              (0<<7)
 #define RTC_LOAD                (1<<6)
-#define RTC_ENABLE              ((1<<0)|(RTC_UNFREEZE))
+#define RTC_ENABLE              ((1<<0)|RTC_UNFREEZE)
 #define RTC_DISABLE             (0<<0)
 
 /* RTC registers */

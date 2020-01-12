@@ -235,7 +235,7 @@ gfx_sprite_t *name = (gfx_sprite_t *)name##_data
  * @return pointer to the allocated sprite
  */
 #define gfx_AllocRLETSprite(data_size, malloc_routine) \
-(gfx_rletsprite_t *)(malloc_routine)(data_size)
+((gfx_rletsprite_t *)(malloc_routine)(data_size))
 
 /**
  * Dynamically allocates memory for a sprite with RLE transparency using \c
