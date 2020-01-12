@@ -2,8 +2,19 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.8...HEAD)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v9.0...HEAD)
 
+
+# [v9.0](https://github.com/CE-Programming/toolchain/releases/tag/v9.0) (2020-??-??)
+
+ - The toolchain is now powered by LLVM instead of ZDS
+ - Headers updated to more recent C with better macros etc.
+ - Standard includes are now more correct
+ - Some "hacks" like `_OS` and `_asm` aren't needed anymore
+ - The makefile supports C++ correctly now (at your own risk)
+ - Improved autotests for the examples
+ - fasmg got a speed boost thanks to CALM instructions.
+ - Submodules updates
 
 # [v8.8](https://github.com/CE-Programming/toolchain/releases/tag/v8.8) (2020-01-??)
 
