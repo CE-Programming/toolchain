@@ -29,4 +29,6 @@ int main(void)
             rtc_IntAcknowledge = rtc_IntStatus;
         }
     }
+
+    return 0;
 }
