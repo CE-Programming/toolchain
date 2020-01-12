@@ -98,8 +98,8 @@ void dbg_RemoveAllWatchpoints(void);
  */
 void dbg_RemoveAllBreakpoints(void);
 
-#define dbgout ((char*)0xFB0000) /**< Standard debug output */
-#define dbgerr ((char*)0xFC0000) /**< Error debug output */
+#define dbgout ((volatile char*)0xFB0000) /**< Standard debug output */
+#define dbgerr ((volatile char*)0xFC0000) /**< Error debug output */
 #define dbg_sprintf sprintf
 #define dbg_ClearConsole() (*(unsigned char*)0xFD0000 = 1)
 #else
