@@ -215,7 +215,7 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define timer_EnableInt          (*(volatile uint16_t*)0xF20038)
 
 /* LCD defines */
-#define lcd_BacklightLevel       (*(volatile uint8_t*)0xF60024) /* Current backlight level of the LCD. 0 is bright. 255 is dark. */
+#define lcd_Ram                  ((volatile uint16_t*)0xD40000)
 #define lcd_Timing0              (*(volatile uint32_t*)0xE30000)
 #define lcd_Timing1              (*(volatile uint32_t*)0xE30004)
 #define lcd_Timing2              (*(volatile uint32_t*)0xE30008)
@@ -229,6 +229,7 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define lcd_IntAcknowledge       (*(volatile uint8_t*)0xE30028)
 #define lcd_UpBaseCurr           (*(volatile uint32_t*)0xE3002C)
 #define lcd_LpBaseCurr           (*(volatile uint32_t*)0xE30030)
+#define lcd_Palette              ((volatile uint16_t*)0xE30200)
 #define lcd_CrsrCtrl             (*(volatile uint8_t*)0xE30C00)
 #define lcd_CrsrConfig           (*(volatile uint8_t*)0xE30C04)
 #define lcd_CrsrPalette0         (*(volatile uint24_t*)0xE30C08)
@@ -243,8 +244,7 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define lcd_CrsrIntAcknowledge   (*(volatile uint8_t*)0xE30C24)
 #define lcd_CrsrIntStatus        (*(volatile uint8_t*)0xE30C28)
 #define lcd_CrsrIntStatusMasked  (*(volatile uint8_t*)0xE30C2C)
-#define lcd_Palette              ((volatile uint16_t*)0xE30200)
-#define lcd_Ram                  ((volatile uint16_t*)0xD40000)
+#define lcd_BacklightLevel       (*(volatile uint8_t*)0xF60024) /* Current backlight level of the LCD. 0 is bright. 255 is dark. */
 
 /**
  * Width of LCD in pixels
