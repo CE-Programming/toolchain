@@ -13,9 +13,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def __bdivu
-	.assume adl=1
+        assume  adl=1
 
+	public	__bdivu
 __bdivu:
 	push	bc
 	push	hl

@@ -38,8 +38,9 @@ INC ?=$(call NATIVEPATH,$(DEV)/include/fasmg-ez80/)
 INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
 
 INCDIR     :=$(call NATIVEPATH,../../src/include/)
-FILES      :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
-INCFILES   :=$(addprefix $(INC),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
+INCLUDES   :=commands.alm ez80.alm ez80.inc ld.alm ti84pceg.inc tiformat.inc
+FILES      :=$(addprefix $(INCDIR),$(INCLUDES))
+INCFILES   :=$(addprefix $(INC),$(INCLUDES))
 
 all: $(FILES)
 	$(CP) $(call NATIVEPATH,$(FASMGP)) . $(ADDEXE)

@@ -1,11 +1,11 @@
 ;-------------------------------------------------------------------------------
 ; Libload launcher for shared libraries
 ;-------------------------------------------------------------------------------
-	.def	__findlibload
+	assume	adl=1
 
-	segment	launcher
-	.assume	adl=1
+	section	.launcher
 
+	public	__findlibload
 __findlibload:
 	call	020628h		; _pushop1 to save running program name
 	jr	__tryfind
@@ -38,18 +38,19 @@ __notfound:
 	call	0207C0h		; _puts
 	jp	020D8Ch		; _getkey
 
-	segment	libs
-__relocationstart:		; relocation data will be placed here
-	;...
-	;...
-	;...
+        extern  __relocationstart
 
-	segment	data
+	section	.rodata
+
+        private __missingappvar
 __missingappvar:
 	db	"Need "
+        private __libloadname
 __libloadname:
 	db	"LibLoad"
+        private __libloadnamelen
 __libloadnamelen := $-__libloadname
 	db	0
+        private __webaddress
 __webaddress:
 	db	"http://tiny.cc/clibs",0

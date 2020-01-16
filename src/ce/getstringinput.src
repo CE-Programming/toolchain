@@ -1,31 +1,30 @@
 ; ---
 ; void os_GetStringInput(char *string, char *buf, size_t size)
 ; ---
+	assume	adl=1
 
-	.def	_os_GetStringInput
-	.assume adl=1
-
-kUp := 3
-kLeft := 2
-kDown := 4
-kEnter := 5
-kClear := 9
-kRight := 1
-curLock := 4
-flags := $D00080
-curRow := $D00595
-curUnder := $D00599
-_PutS := $207C0
-_PutC := $207B8
-_PutPS := $207C8
-_GetKey := $20D8C
-_CursorOn := $208B0
-_CursorOff := $208A8
-_PullDownChk := $208BC
+kUp           := 3
+kLeft         := 2
+kDown         := 4
+kEnter        := 5
+kClear        := 9
+kRight        := 1
+curLock       := 4
+flags         := $D00080
+curRow        := $D00595
+curUnder      := $D00599
+_PutS         := $207C0
+_PutC         := $207B8
+_PutPS        := $207C8
+_GetKey       := $20D8C
+_CursorOn     := $208B0
+_CursorOff    := $208A8
+_PullDownChk  := $208BC
 _ConvKeyToTok := $20E40
 _GetTokString := $20874
 _PutTokString := $20D74
 
+	public	_os_GetStringInput
 _os_GetStringInput:
 	push	ix
 	ld	ix,0
@@ -127,7 +126,7 @@ __clearloop:
 	djnz	__clearloop
 	ld	hl,(__savecur)
 	ld	(curRow),hl
-	jr	__start
+	jp	__start
 __done:
 	pop	ix
 	pop	de

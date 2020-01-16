@@ -245,18 +245,20 @@ doxygen:
 linker_script: std
 	$(RM) $(call QUOTE_ARG,$@)
 	@echo Generating linker script...
-	$(call APPEND,symbol __low_bss = bss.base)
-	$(call APPEND,symbol __len_bss = bss.length)
-	$(call APPEND,symbol __heaptop = bss.high)
-	$(call APPEND,symbol __heapbot = bss.top)
-	$(call APPEND,order $(subst $(space),$(comma) ,header icon launcher libs startup cleanup exit code data strsect text))
+	$(call APPEND,require __init$(comma) __startup$(comma) _exit$(comma) __findlibload if .libs.length)
+	$(call APPEND,provide __low_bss = .bss.base)
+	$(call APPEND,provide __len_bss = .bss.length)
+	$(call APPEND,provide __heaptop = .bss.high)
+	$(call APPEND,provide __heapbot = .bss.top)
+	$(call APPEND,provide __relocationstart = .libs.base)
+	$(call APPEND,order $(subst $(space),$(comma) ,.header .icon .launcher .libs .startup .cleanup .exit .text .data .rodata))
 	$(call APPEND,if STATIC)
-	$(call APPEND_FILES,	srcs ,static,$(STATIC_FILES))
+	$(call APPEND_FILES,	source ,static,$(STATIC_FILES))
 	$(call APPEND,else)
-	$(call APPEND_FILES,	srcs ,linked,$(LINKED_FILES))
+	$(call APPEND_FILES,	source ,linked,$(LINKED_FILES))
 	$(call APPEND,end if)
-	$(call APPEND_FILES,srcs ,shared,$(SHARED_FILES))
-	$(call APPEND_FILES,srcs ,fileio,$(FILEIO_FILES))
+	$(call APPEND_FILES,source ,shared,$(SHARED_FILES))
+	$(call APPEND_FILES,source ,fileio,$(FILEIO_FILES))
 
 #----------------------------
 # makefile help rule

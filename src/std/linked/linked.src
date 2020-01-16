@@ -1,0 +1,27 @@
+	public	__u_flt_info, __u_flt_rnd, _acos, _asin, _atan, _atan2, _atof, _ceil, _cos, _cosh, _exp, _fabs, _floor, _fmod, _frexp, _ldexp, _log, _log10, _modf, _pow, _sin, _sinh, _sqrt, _strtod, _tan, _tanh
+__u_flt_info := 022128h
+__u_flt_rnd  := 02212Ch
+_acos        := 022100h
+_asin        := 022104h
+_atan        := 022108h
+_atan2       := 02210Ch
+_atof        := 022110h
+_ceil        := 022114h
+_cos         := 02211Ch
+_cosh        := 022134h
+_exp         := 022124h
+_fabs        := 0220F0h
+_floor       := 0220F4h
+_fmod        := 0220FCh
+_frexp       := 0220D8h
+_ldexp       := 0220DCh
+_log         := 0220E4h
+_log10       := 0220E8h
+_modf        := 0220ECh
+_pow         := 0220F8h
+_sin         := 022118h
+_sinh        := 022130h
+_sqrt        := 02213Ch
+_strtod      := 0220E0h
+_tan         := 022120h
+_tanh        := 022138h

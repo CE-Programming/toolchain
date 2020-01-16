@@ -1,8 +1,7 @@
-	.def _fabs
-	.assume adl=1
-	
 ; double fabs(double j);
+	assume	adl=1
 
+	public	_fabs
 _fabs:
 	pop	bc
 	pop	hl

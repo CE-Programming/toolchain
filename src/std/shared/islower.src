@@ -1,14 +1,12 @@
-	.def	_islower
-	.ref	___maptab
-	.assume adl=1
-
 ; original source
 ; int islower(int c) {
 ; 	if( (unsigned char)c & (unsigned char)0x80 )
 ;		return (0);
 ;	return(__maptab[c] & (unsigned char)(LC));
 ; }
+	assume	adl=1
 
+	public	_islower
 _islower:
 	pop	hl
 	pop	de
@@ -27,3 +25,5 @@ _islower:
 	sbc	hl,hl
 	ld	l,a
 	ret
+
+	extern	___maptab

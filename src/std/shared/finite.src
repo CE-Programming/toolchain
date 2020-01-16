@@ -1,8 +1,7 @@
-	.def _finite
-	.assume adl=1
-
 ; int finite(double n);
+        assume  adl=1
 
+	public	_finite
 _finite:
 	pop	bc
 	pop	hl

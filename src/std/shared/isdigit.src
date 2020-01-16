@@ -1,13 +1,11 @@
-	.def	_isdigit
-	.ref	___maptab
-	.assume adl=1
-
 ;int isdigit(int c) {
 ;	if( (unsigned char)c & (unsigned char)0x80 )
 ;		return (0);
 ;	return(__maptab[c] & (unsigned char)(DIG));
 ;}
+	assume	adl=1
 
+	public	_isdigit
 _isdigit:
 	pop	hl
 	pop	de
@@ -25,3 +23,5 @@ _isdigit:
 	sbc	hl,hl
 	ld	l,a
 	ret
+
+	extern	___maptab

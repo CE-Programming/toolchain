@@ -1,12 +1,6 @@
-	.def _round
-	.ref __frameset0
-	.ref __fcmp
-	.ref __fadd
-	.ref __fsub
-	.ref _floor
-	.ref _ceil
-	.assume adl=1
-	
+	assume	adl=1
+
+	public	_round
 _round:
 	call	__frameset0
 	ld	hl,(ix+6)
@@ -42,3 +36,10 @@ Finish:
 	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	__frameset0
+	extern	__fcmp
+	extern	__fadd
+	extern	__fsub
+	extern	_floor
+	extern	_ceil

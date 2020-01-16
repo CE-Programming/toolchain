@@ -13,7 +13,6 @@ cd ..
 mkdir -p .tmp
 wget --no-verbose https://flatassembler.net/fasmg.zip --output-document=.tmp/fasmg.zip
 unzip -od .tmp/fasmg .tmp/fasmg.zip
-patch -p0 -d .tmp/fasmg < fasmg-ez80/fasmg.patch
 chmod +x .tmp/fasmg/fasmg
 
 build_fasmg linux   fasmg

@@ -7,20 +7,13 @@
 ; Output:
 ;       Result:   HL:	 24 bit address of memory allocated 
 ;		         HL = 0 if no memory available
-		        
+;		        
 ; Registers Used:
 ;       
 ;-------------------------------------------------------------------------
-	.assume adl=1
-	.ref	__heapbot
-	.ref	__heaptop
-	.def    __s_sbrk
+	assume	adl=1
 
-	SEGMENT DATA
-__sbrkbase:
-	.trio	__heapbot
-
-	SEGMENT CODE
+	public	__s_sbrk
 __s_sbrk:
 	ld	hl,3
 	add	hl,sp
@@ -47,3 +40,11 @@ _fail:
 	or	a,a
 	sbc	hl,hl
 	ret
+
+	extern	__heapbot
+	extern	__heaptop
+
+	section	.data
+        private	__sbrkbase
+__sbrkbase:
+	dl	__heapbot

@@ -1,11 +1,11 @@
 ;-------------------------------------------------------------------------------
 ; Standard C Cleanup module
 ;-------------------------------------------------------------------------------
-	.def	__ccleanup
+	assume	adl=1
 
-	segment	cleanup
-	.assume	adl=1
+	section	.cleanup
 
+	public	__ccleanup
 __ccleanup:
 	res	4,(iy+9)	; onInterrupt,(iy+onFlags)
 	set	0,(iy+3)	; graphDraw,(iy+graphFlags)

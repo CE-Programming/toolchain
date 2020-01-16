@@ -1,11 +1,7 @@
-	.ref __frameset0
-	.ref __fneg
-	.ref _floor
-	.def _ceil
-	.assume adl=1
-
 ; double ceil(double d);
+	assume	adl=1
 
+	public	_ceil
 _ceil:
 	call	__frameset0
 	ld	bc,(ix+6)
@@ -28,4 +24,7 @@ _ceil:
 	ld	sp,ix
 	pop	ix
 	ret
-	
+
+	extern	__frameset0
+	extern	__fneg
+	extern	_floor

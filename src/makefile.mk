@@ -129,7 +129,8 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 # if so, generate a recipe to build it
 ifneq ("$(ICONIMG)","")
 ICON_CONV := @echo "[convimg] $(ICONIMG)" && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
-LINK_ICON = , $(call FASMG_FILES,$(ICONSRC)) used
+LINK_REQUIRE += -i 'require ___icon'
+LINK_ICON     = , $(call FASMG_FILES,$(ICONSRC))
 endif
 
 # determine output target flags
@@ -145,7 +146,8 @@ CONVBINFLAGS += --name $(TARGET)
 
 # link cleanup source
 ifeq ($(CLEANUP),YES)
-LINK_CLEANUP = , $(call FASMG_FILES,$(F_CLEANUP)) used
+LINK_REQUIRE += -i 'require __ccleanup'
+LINK_CLEANUP  = , $(call FASMG_FILES,$(F_CLEANUP))
 endif
 
 # output debug map file
@@ -167,16 +169,17 @@ CXXFLAGS := $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
-	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/include/fasmg-ez80/ld.fasmg)) \
+	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/include/fasmg-ez80/ld.alm)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
 	$(LDDEBUGFLAG) \
 	$(LDMAPFLAG) \
-	-i $(call QUOTE_ARG,range bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
-	-i $(call QUOTE_ARG,symbol __stack = $$$(STACK_HIGH)) \
-	-i $(call QUOTE_ARG,locate header at $$$(INIT_LOC)) \
+	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
+	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
+	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
 	-i $(call QUOTE_ARG,STATIC := $(STATIC)) \
-	-i $(call QUOTE_ARG,srcs $(call FASMG_FILES,$(F_LAUNCHER)) used if libs.length$(LINK_ICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP)) used$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
-	-i $(call QUOTE_ARG,libs $(call FASMG_FILES,$(LINK_LIBLOAD)) used if libs.length$(comma) $(call FASMG_FILES,$(LINK_LIBS)))
+	$(LINK_REQUIRE) \
+	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LINK_ICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP))$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
+	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LINK_LIBLOAD))$(comma) $(call FASMG_FILES,$(LINK_LIBS)))
 
 # this rule is trigged to build everything
 all: $(BINDIR)/$(TARGET8XP) ;

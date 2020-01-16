@@ -1,34 +1,24 @@
 ;-------------------------------------------------------------------------------
 ; Standard CE startup module definitions and references
 ;-------------------------------------------------------------------------------
+	assume	adl=1
 
-	.ref	_main
-	.ref	__low_bss
-	.ref	__len_bss
-	.ref	_os_DisableHomeTextBuffer
-	.ref	_os_EnableHomeTextBuffer
-
-	.def	_errno
-	.def	_init
-	.def	_exit
-	.def	__exit
-	.def	__exitsp
-	.def	__errsp
-
-	.assume	adl=1
-
-_errno  equ 0D008DCh
+        public _errno
+_errno := 0D008DCh
 
 ;-------------------------------------------------------------------------------
-	segment header
-	db	0efh
-	db	07bh
+	section	.header
+	db	0EFh
+	db	07Bh
 	db	0		; Magic byte recognition for C programs
-_init:
+        public __init
+__init:
 
 ;-------------------------------------------------------------------------------
-	segment startup
+	section	.startup
 
+	public  __startup
+__startup:
 	call	0020848h	; _RunInicOff, assumes iy = flags
 	call	00004F4h	; _usb_DisableTimer
 	di			; disable interrupts
@@ -48,8 +38,11 @@ _init:
 	call	0000B0h		; __memclear, clear BSS
 				; args will get removed from stack on exit
 	call	_main
+        public	__exit
 __exit:
+        public	__exitsp
 __exitsp:
+        public	__errsp
 __errsp:
 	ld	sp,0
 	pop	iy		; iy = flags
@@ -60,16 +53,21 @@ __errsp:
 	call	00004F0h	; _usb_ResetTimer
 	call	_os_EnableHomeTextBuffer
 
-;-------------------------------------------------------------------------------
-	segment exit
+	extern	_main
+	extern	__low_bss
+	extern	__len_bss
+	extern	_os_DisableHomeTextBuffer
+	extern	_os_EnableHomeTextBuffer
 
+;-------------------------------------------------------------------------------
+	section	.exit
 	pop	hl		; hl = exit code
 	ret
 
+        public	_exit
 _exit:
 	pop	hl
 	pop	hl
 	jr	__exit
 
 ;-------------------------------------------------------------------------------
-	segment code

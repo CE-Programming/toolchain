@@ -1,9 +1,7 @@
-	.ref __frameset0
-	.def _isnan
-	.assume adl=1
-	
 ; int isnan(double n);
+	assume	adl=1
 
+	public	_isnan
 _isnan:	
 	call	__frameset0
 	ld	hl,(ix+6)
@@ -18,3 +16,5 @@ l_1:	inc	h
 l_2:	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	__frameset0

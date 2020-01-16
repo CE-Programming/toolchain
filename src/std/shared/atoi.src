@@ -1,9 +1,7 @@
-	.ref _strtol
-	.def _atoi
-	.assume adl=1
-
 ; int atoi(char *cp);
+        assume  adl=1
 
+	public	_atoi
 _atoi:
 	pop	bc
 	pop	de
@@ -20,3 +18,4 @@ _atoi:
 	pop	bc
 	ret
 
+	extern	_strtol

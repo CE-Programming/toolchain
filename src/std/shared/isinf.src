@@ -1,9 +1,7 @@
-	.ref __frameset0
-	.def _isinf
-	.assume adl=1
-	
 ; int isinf(double n);
+	assume	adl=1
 
+	public	_isinf
 _isinf:
 	call	__frameset0
 	ld	hl,(ix+6)
@@ -18,3 +16,5 @@ l_1:	ld	hl,0
 l_2:	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	__frameset0

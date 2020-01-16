@@ -1,5 +1,5 @@
-	.def __indcallhl
-	.assume adl=1
+	assume	adl=1
 
+	public	__indcallhl
 __indcallhl:
 	jp	(hl)

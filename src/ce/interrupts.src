@@ -1,28 +1,25 @@
-	.def _int_Initialize
-	.def _int_Handler
-	.def _int_SetVector
-	.def _int_Reset
-	.assume adl=1
+	assume	adl=1
 
 ;-------------------------------------------------------------------------------
 ; Interrupts equates
-mpIntStatus             equ 0F00000h
-mpIntMask               equ 0F00004h
-mpIntAck                equ 0F00008h
-mpIntLachEnable         equ 0F0000Ch
-mpIntXor                equ 0F00010h
-mpIntStatusMasked       equ 0F00014h
+mpIntStatus       := 0F00000h
+mpIntMask         := 0F00004h
+mpIntAck          := 0F00008h
+mpIntLachEnable   := 0F0000Ch
+mpIntXor          := 0F00010h
+mpIntStatusMasked := 0F00014h
 
-intOnKey                equ 1
-intTimer1               equ 2
-intTimer2               equ 4
-intTimer3               equ 8
-intOsTimer              equ 10h
-intKbd                  equ 400h
-intLcd                  equ 800h
-intRtc                  equ 1000h
+intOnKey          := 1
+intTimer1         := 2
+intTimer2         := 4
+intTimer3         := 8
+intOsTimer        := 10h
+intKbd            := 400h
+intLcd            := 800h
+intRtc            := 1000h
 
 ;-------------------------------------------------------------------------------
+	public	_int_Initialize
 _int_Initialize:
 	di
 	ld	de,lconf
@@ -56,6 +53,10 @@ _int_Initialize:
 	ld	d,3
 	ret
 
+        section	.code
+
+;-------------------------------------------------------------------------------
+	public	_int_Handler
 _int_Handler:
 	ex	af,af'
 	exx
@@ -104,7 +105,10 @@ unhandledInt:
 	ei
 	ret
 
+        section	.code
+
 ;-------------------------------------------------------------------------------
+	public	_int_SetVector
 _int_SetVector:
 	ld	iy,0
 	add	iy,sp
@@ -120,7 +124,10 @@ _int_SetVector:
 	ld	(hl),de
 	ret
 
+        section	.code
+
 ;-------------------------------------------------------------------------------
+	public	_int_Reset
 _int_Reset:
 	di
 	ld	hl, lconf
@@ -129,14 +136,18 @@ _int_Reset:
 	ldir
 	im	1
 	ret
-	segment bss
-lconf:	ds	16
-	segment data
-cconf:	; Mask
-	db 000h,000h,000h,000h
+
+	section	.bss
+
+lconf	rb	16
+
+	section	.data
+
+	; Mask
+cconf	db	000h,000h,000h,000h
 	; ACK
-	db 0FFh,0FFh,0FFh,0FFh
+	db	0FFh,0FFh,0FFh,0FFh
 	; Latch
-	db 000h,000h,000h,000h
+	db	000h,000h,000h,000h
 	; Invert
-	db 000h,000h,000h,000h
+	db	000h,000h,000h,000h
