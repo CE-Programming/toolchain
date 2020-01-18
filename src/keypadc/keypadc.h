@@ -243,20 +243,6 @@ typedef enum {
 #define kb_KeyRight    ((kb_lkey_t)(7 << 8 | 1<<2))
 #define kb_KeyUp       ((kb_lkey_t)(7 << 8 | 1<<3))
 
-/* Compatibility defines */
-#define kb_DataArray    ((volatile uint16_t*)0xF50010)
-#define kb_dataArray    ((volatile uint16_t*)0xF50010)
-#define kb_Store        kb_Sto
-#define kb_KeyPgrm      kb_KeyPrgm
-#define kb_group_0      0
-#define kb_group_1      1
-#define kb_group_2      2
-#define kb_group_3      3
-#define kb_group_4      4
-#define kb_group_5      5
-#define kb_group_6      6
-#define kb_group_7      7
-
 #ifdef __cplusplus
 }
 #endif

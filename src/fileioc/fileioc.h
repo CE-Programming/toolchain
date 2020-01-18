@@ -517,12 +517,6 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_L6        ("\x5D\x5\0")
 #define ti_LT        ('\x5D')
 
-/* Compatibility defines */
-#define ti_Program             TI_PRGM_TYPE
-#define ti_ProtectedProgram    TI_PPRGM_TYPE
-#define ti_TempProgram         TI_TPRGM_TYPE
-#define ti_AppVar              TI_APPVAR_TYPE
-
 #ifdef __cplusplus
 }
 #endif
