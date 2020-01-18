@@ -517,6 +517,12 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_L6        ("\x5D\x5\0")
 #define ti_LT        ('\x5D')
 
+/* Compatibility defines */
+#define ti_Program             _Pragma("GCC warning \"'ti_Program' is deprecated, use 'TI_PRGM_TYPE' instead\"") TI_PRGM_TYPE
+#define ti_ProtectedProgram    _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'TI_PPRGM_TYPE' instead\"") TI_PPRGM_TYPE
+#define ti_TempProgram         _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
+#define ti_AppVar              _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
+
 #ifdef __cplusplus
 }
 #endif

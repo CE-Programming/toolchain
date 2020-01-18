@@ -243,6 +243,20 @@ typedef enum {
 #define kb_KeyRight    ((kb_lkey_t)(7 << 8 | 1<<2))
 #define kb_KeyUp       ((kb_lkey_t)(7 << 8 | 1<<3))
 
+/* Compatibility defines */
+#define kb_DataArray    _Pragma("GCC warning \"'kb_DataArray' is deprecated, check if you can use 'kb_Data' instead\"") ((volatile uint16_t*)0xF50010)
+#define kb_dataArray    kb_DataArray
+#define kb_Store        _Pragma("GCC warning \"'kb_Store' is deprecated, use 'kb_Sto' instead\"") kb_Sto
+#define kb_KeyPgrm      _Pragma("GCC warning \"'kb_KeyPgrm' is deprecated, use 'kb_KeyPrgm' instead\"") kb_KeyPrgm
+#define kb_group_0      _Pragma("GCC warning \"'kb_group_0' is deprecated, use '0' instead\"") 0
+#define kb_group_1      _Pragma("GCC warning \"'kb_group_1' is deprecated, use '1' instead\"") 1
+#define kb_group_2      _Pragma("GCC warning \"'kb_group_2' is deprecated, use '2' instead\"") 2
+#define kb_group_3      _Pragma("GCC warning \"'kb_group_3' is deprecated, use '3' instead\"") 3
+#define kb_group_4      _Pragma("GCC warning \"'kb_group_4' is deprecated, use '4' instead\"") 4
+#define kb_group_5      _Pragma("GCC warning \"'kb_group_5' is deprecated, use '5' instead\"") 5
+#define kb_group_6      _Pragma("GCC warning \"'kb_group_6' is deprecated, use '6' instead\"") 6
+#define kb_group_7      _Pragma("GCC warning \"'kb_group_7' is deprecated, use '7' instead\"") 7
+
 #ifdef __cplusplus
 }
 #endif
