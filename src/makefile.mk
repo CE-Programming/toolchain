@@ -130,7 +130,7 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 ifneq ("$(ICONIMG)","")
 ICON_CONV := @echo "[convimg] $(ICONIMG)" && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LINK_REQUIRE += -i 'require ___icon'
-LINK_ICON     = , $(call FASMG_FILES,$(ICONSRC))
+LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 endif
 
 # determine output target flags
@@ -194,10 +194,10 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
-$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(ICONSRC)
+$(BINDIR)/$(TARGETBIN): $(ICONSRC) $(LINK_FILES)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo "[linking] $@"
-	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@) $(NOSTDOUT)
+	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(ICONSRC): $(ICONIMG)
