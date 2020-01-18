@@ -197,7 +197,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 $(BINDIR)/$(TARGETBIN): $(ICONSRC) $(LINK_FILES)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo "[linking] $@"
-	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
+	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@) $(NOSTDOUT)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(ICONSRC): $(ICONIMG)
