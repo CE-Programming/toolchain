@@ -131,6 +131,8 @@ ifneq ("$(ICONIMG)","")
 ICON_CONV := @echo "[convimg] $(ICONIMG)" && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LINK_REQUIRE += -i 'require ___icon'
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
+else
+ICONSRC :=
 endif
 
 # determine output target flags
