@@ -11,9 +11,9 @@ library 'GRAPHX', 11
 ;-------------------------------------------------------------------------------
 ; v1 functions
 ;-------------------------------------------------------------------------------
-	export 0b gfx_Begin(0b)
+	export gfx_Begin
 	export gfx_End
-	export 0b gfx_SetColor(1b)
+	export gfx_SetColor
 	export gfx_SetDefaultPalette
 	export gfx_SetPalette
 	export gfx_FillScreen
