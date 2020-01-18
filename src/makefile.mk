@@ -207,12 +207,12 @@ $(ICONSRC): $(ICONIMG)
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo "[compiling C]   $<"
+	$(Q)echo "[compiling] $<"
 	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 $(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo "[compiling C++] $<"
+	$(Q)echo "[compiling] $<"
 	$(Q)$(EZCC) $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
