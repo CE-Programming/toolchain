@@ -32,7 +32,6 @@ INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
 I_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/lib)
 
 LIB        :=$(NAME).lib
-DEVLIB     :=$(NAME).devlib
 LIB_8XV    :=$(NAME).8xv
 
 all: $(LIB_8XV)
@@ -41,7 +40,7 @@ $(LIB_8XV): $(SRC)
 	$(FASMG) $< $@
 
 clean:
-	$(RM) $(LIB) $(DEVLIB) $(LIB_8XV)
+	$(RM) $(LIB) $(LIB_8XV)
 
 install:
 	$(CP) $(LIB) $(I_LOC)

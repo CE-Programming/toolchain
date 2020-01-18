@@ -61,7 +61,6 @@ CONVFNTDIR := $(call NATIVEPATH,$(TOOLSDIR)/convfont)
 CEDIR      := $(call NATIVEPATH,$(SRCDIR)/ce)
 STDDIR     := $(call NATIVEPATH,$(SRCDIR)/std)
 STARTDIR   := $(call NATIVEPATH,$(SRCDIR)/startup)
-DEVLIBDIR  := $(call NATIVEPATH,$(SRCDIR)/devlib)
 
 FASMG_EZ80 := $(call NATIVEPATH,$(SRCDIR)/include/ez80.inc)
 
@@ -105,7 +104,7 @@ FILEIO_FILES := $(wildcard src/std/fileio/*.src) $(patsubst src/std/fileio/%.c,s
 all: $(CONVBIN) $(CONVIMG) $(CONVFONT) $(LIBRARIES) ce std startup
 	@echo Toolchain built.
 
-clean: $(addprefix clean-,$(LIBRARIES)) clean-devlib clean-ce clean-std clean-startup
+clean: $(addprefix clean-,$(LIBRARIES)) clean-ce clean-std clean-startup
 	$(MAKE) -C $(FASMGDIR) clean
 	$(MAKE) -C $(CONVBINDIR) clean
 	$(MAKE) -C $(CONVIMGDIR) clean
@@ -165,15 +164,6 @@ $(LIBRARIES): $(FASMG)
 
 $(addprefix clean-,$(LIBRARIES)):
 	$(MAKE) -C $(call LIBRARYDIR,$(patsubst clean-%,%,$@)) clean
-
-#----------------------------
-# development library rules
-#----------------------------
-devlib: $(LIBRARIES)
-	$(MAKE) -C $(DEVLIBDIR) all
-clean-devlib:
-	$(MAKE) -C $(DEVLIBDIR) clean
-#----------------------------
 
 #----------------------------
 # startup rules
