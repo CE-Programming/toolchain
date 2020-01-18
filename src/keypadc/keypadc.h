@@ -106,7 +106,7 @@ typedef enum {
  * @endcode
  */
 #define kb_Data \
-(uint8_t)((uint16_t*)0xF50010)
+(uint8_t)((volatile uint16_t*)0xF50010)
 
 /**
  * Different available interrupt signals
