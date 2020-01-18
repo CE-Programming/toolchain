@@ -1936,7 +1936,7 @@ _SetPolarEquToOP1          equ 0021E8Ch
 _os_SetTimer1              equ 0021EC8h
 _os_DisableTimer1          equ 0021ECCh
 _os_SetKbdKey              equ 0021ED0h
-_os_GetSystemStats         equ 0021ED4h
+_os_GetSystemInfo          equ 0021ED4h
 ;                          equ 0021ED8h
 ;                          equ 0021EDCh
 _DispHL                    equ 0021EE0h

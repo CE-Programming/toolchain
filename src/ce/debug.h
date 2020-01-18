@@ -98,18 +98,18 @@ void dbg_RemoveAllWatchpoints(void);
  */
 void dbg_RemoveAllBreakpoints(void);
 
-#define dbgout ((char*)0xFB0000) /**< Standard debug output */
-#define dbgerr ((char*)0xFC0000) /**< Error debug output */
+#define dbgout ((volatile char*)0xFB0000) /**< Standard debug output */
+#define dbgerr ((volatile char*)0xFC0000) /**< Error debug output */
 #define dbg_sprintf sprintf
 #define dbg_ClearConsole() (*(unsigned char*)0xFD0000 = 1)
 #else
 #define dbg_Debugger(ignore) ((void)0)
 #define dbg_SetBreakpoint(ignore) ((void)0)
 #define dbg_RemoveBreakpoint(ignore) ((void)0)
-#define dbg_SetWatchpoint(ignore,ignore) ((void)0)
-#define dbg_SetReadWatchpoint(ignore,ignore) ((void)0)
-#define dbg_SetWriteWatchpoint(ignore,ignore) ((void)0)
-#define dbg_SetReadWriteWatchpoint(ignore,ignore) ((void)0)
+#define dbg_SetWatchpoint(ignore,ignore1) ((void)0)
+#define dbg_SetReadWatchpoint(ignore,ignore1) ((void)0)
+#define dbg_SetWriteWatchpoint(ignore,ignore1) ((void)0)
+#define dbg_SetReadWriteWatchpoint(ignore,ignore1) ((void)0)
 #define dbg_RemoveWatchpoint(ignore) ((void)0)
 #define dbg_RemoveAllWatchpoints(ignore) ((void)0)
 #define dbg_RemoveAllBreakpoints(ignore) ((void)0)

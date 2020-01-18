@@ -29,7 +29,7 @@ script:
   - curl -s https://tiplanet.org/scripts/travis/$ROM_FILE_NAME 2>/dev/null > $ROM_FILE_NAME
   - export AUTOTESTER_ROM=$(pwd)/$ROM_FILE_NAME
 # Test toolchain examples
-  - RESULT=0; for f in $CEDEV/examples/*/*.json; do echo "Launching autotester on $f"; autotester "$f"; RESULT=`expr $RESULT + $?`; done; return $RESULT
+  - RESULT=0; for f in $CEDEV/examples/*/*/*.json; do echo "Launching autotester on $f"; autotester "$f"; RESULT=`expr $RESULT + $?`; done; return $RESULT
 
 after_success:
 # Update the funcs_tested file (WIP)

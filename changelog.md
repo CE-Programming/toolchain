@@ -2,7 +2,23 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.7...HEAD)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.8...HEAD)
+
+
+# [v8.8](https://github.com/CE-Programming/toolchain/releases/tag/v8.8) (2020-01-??)
+
+ - Documentation fixes and headers cleanup
+ - Fix `gfx_TilePtr` and `gfx_TilePtrMapped`
+ - Expose more OS functions (see `tice.h`)
+ - Add LCD cursor defines
+ - MMIO defines are all volatile
+ - Submodules update
+ - "development library" generation
+ - Examples folders hierarchy improved
+ - Prepare makefile for future changes
+ - Fix warnings
+ 
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.7...v8.8)
 
 # [v8.7](https://github.com/CE-Programming/toolchain/releases/tag/v8.7) (2019-08-25)
 

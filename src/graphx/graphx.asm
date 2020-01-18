@@ -2873,7 +2873,7 @@ gfx_TilePtr:
 	ld	ix,0
 	add	ix,sp
 	ld	iy,(ix+6)
-	ld	hl,(ix+x_offset)
+	ld	hl,(ix+9)
 	ld	a,(iy+t_type_width)
 	or	a,a
 	jr	nz,.fastdiv0
@@ -2890,7 +2890,7 @@ gfx_TilePtr:
 	djnz	.div0
 .widthnotpow2:
 	ex	de,hl
-	ld	hl,(ix+y_offset)
+	ld	hl,(ix+12)
 	ld	a,(iy+t_type_height)
 	or	a,a
 	jr	nz,.fastdiv1
@@ -2928,16 +2928,16 @@ gfx_TilePtrMapped:
 	pop	iy			; tilemap struct
 	pop	bc			; x offset
 	ex	(sp),hl			; y offset
-	push	bc
-	push	bc
+	push	de
+	push	de
+	push	de
 	ld	h,(iy+13)		; tilemap width
 	mlt	hl
 	ld	b,0
 	add.s	hl,bc
 	ld	bc,(iy+0)		; tilemap data
 	add	hl,bc
-	ex	de,hl
-	jp	(hl)
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_GetTextX:

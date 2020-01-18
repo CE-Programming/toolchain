@@ -44,8 +44,9 @@ relocation_table
 # executables
 *.hex
 *.8xv
+*.8xg
 *.8xp
-!*var_gfx.8xv
+!*vargfx.8xv
 
 # debug files
 *.dSYM/
