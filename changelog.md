@@ -18,7 +18,7 @@
  - Prepare makefile for future changes
  - Fix warnings
  
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.6...v8.7)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.7...v8.8)
 
 # [v8.7](https://github.com/CE-Programming/toolchain/releases/tag/v8.7) (2019-08-25)
 
