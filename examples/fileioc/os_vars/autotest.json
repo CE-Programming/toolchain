@@ -1,0 +1,62 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|1000",
+    "key|clear",
+    "delay|300",
+    "key|2nd",
+    "key|(-)",
+    "key|enter",
+    "delay|300",
+    "key|alpha",
+    "key|math",
+    "key|enter",
+    "delay|600",
+    "key|vars",
+    "delay|600",
+    "key|right",
+    "delay|600",
+    "key|enter",
+    "delay|600",
+    "key|enter",
+    "delay|600",
+    "key|enter",
+    "delay|600",
+    "key|2nd",
+    "delay|600",
+    "key|1",
+    "key|enter",
+    "delay|300",
+    "hashWait|1",
+    "key|clear",
+    "delay|300",
+    "hashWait|2"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test show [2.5, 2.5], 1.5, 4, {1.5, 2.5, 3.5}",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "C4618B65", "45606B9F" ]
+    },
+    "2":
+    {
+      "description": "Test homescreen cleared",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}
