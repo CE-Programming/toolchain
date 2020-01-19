@@ -1643,6 +1643,24 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 ((test_y) < ((master_y) + (master_height))) && \
 (((test_y) + (test_height)) > (master_y)))
 
+/* Color definitions (try to avoid) */
+#define gfx_black       _Pragma("GCC warning \"'gfx_black' is not palette-safe, try to avoid it\"")  0x00
+#define gfx_red         _Pragma("GCC warning \"'gfx_red' is not palette-safe, try to avoid it\"")    0xE0
+#define gfx_orange      _Pragma("GCC warning \"'gfx_orange' is not palette-safe, try to avoid it\"") 0xE3
+#define gfx_green       _Pragma("GCC warning \"'gfx_green' is not palette-safe, try to avoid it\"")  0x03
+#define gfx_blue        _Pragma("GCC warning \"'gfx_blue' is not palette-safe, try to avoid it\"")   0x10
+#define gfx_purple      _Pragma("GCC warning \"'gfx_purple' is not palette-safe, try to avoid it\"") 0x50
+#define gfx_yellow      _Pragma("GCC warning \"'gfx_yellow' is not palette-safe, try to avoid it\"") 0xE7
+#define gfx_pink        _Pragma("GCC warning \"'gfx_pink' is not palette-safe, try to avoid it\"")   0xF0
+#define gfx_white       _Pragma("GCC warning \"'gfx_white' is not palette-safe, try to avoid it\"")  0xFF
+
+/* Compatability defines (don't use please) */
+#define gfx_image_t     _Pragma("GCC warning \"'gfx_image_t' is deprecated, use 'gfx_sprite_t' instead\"") gfx_sprite_t;
+#define gfx_BlitArea    _Pragma("GCC warning \"'gfx_BlitArea' is deprecated, use 'gfx_BlitRectangle' instead\"") gfx_BlitRectangle
+
+#define gfx_lcdWidth    (320)
+#define gfx_lcdHeight   (240)
+
 #ifdef __cplusplus
 }
 #endif
