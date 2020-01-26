@@ -11,7 +11,7 @@
   "sequence":
   [
     "action|launch",
-    "delay|200",
+    "delay|300",
     "hashWait|1",
     "key|enter",
     "delay|1000",

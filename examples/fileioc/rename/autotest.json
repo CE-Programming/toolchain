@@ -24,7 +24,7 @@
       "description": "Test show old file and new file",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "3782E185" ]
+      "expected_CRCs": [ "94538693" ]
     },
     "2":
     {
