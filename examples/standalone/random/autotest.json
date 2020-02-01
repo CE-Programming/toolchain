@@ -12,20 +12,12 @@
   [
     "action|launch",
     "delay|1000",
-    "hash|1",
     "key|enter",
-    "hashWait|2"
+    "hashWait|1"
   ],
   "hashes":
   {
     "1":
-    {
-      "description": "Test random colors",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "81F776A1" ]
-    },
-    "2":
     {
       "description": "Test program exit",
       "start": "vram_start",

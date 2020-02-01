@@ -1,6 +1,6 @@
 ### Factorize Ans Demo
 
-Computes the factors of a input number in Ans, and stores the result in Ans.
+Computes the prime factors of the input number in Ans. Result stored as a List in Ans.
 
 ---
 
