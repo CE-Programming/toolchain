@@ -1438,7 +1438,7 @@ void gfx_SetClipRegion(int xmin, int ymin, int xmax, int ymax);
  *
  * @returns False if offscreen, true if onscreen.
  */
-bool gfx_GetClipRegion(const gfx_region_t *region);
+bool gfx_GetClipRegion(gfx_region_t *region);
 
 /**
  * Shifts/Slides the drawing window down.
