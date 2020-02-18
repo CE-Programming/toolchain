@@ -26,7 +26,8 @@ _div:
 	ex	de,hl 		; de= quotient
 	pop	hl		; hl=val of numerator
 	call	__irems
-	ld	bc,hl
+	push	hl
+	pop	bc
 
 	ld	hl,15
 	add	hl,sp

@@ -43,7 +43,8 @@ l_2:	push	de
 	ld	bc,13176795
 	ld	a,63
 	call	__fsub
-	ld	hl,bc
+	push	bc
+	pop	hl
 	ld	e,a
 	ret
 
