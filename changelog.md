@@ -16,7 +16,7 @@
  - fasmg got a speed boost thanks to CALM instructions.
  - Submodules updates
 
-# [v8.8](https://github.com/CE-Programming/toolchain/releases/tag/v8.8) (2020-01-??)
+# [v8.8](https://github.com/CE-Programming/toolchain/releases/tag/v8.8) (2020-01-19)
 
  - Documentation fixes and headers cleanup
  - Fix `gfx_TilePtr` and `gfx_TilePtrMapped`
