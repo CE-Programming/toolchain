@@ -7,6 +7,7 @@ BSSHEAP_HIGH        ?= D13FD6
 STACK_HIGH          ?= D1A87E
 INIT_LOC            ?= D1A87F
 USE_FLASH_FUNCTIONS ?= YES
+UPPERCASE_NAME      ?= YES
 OUTPUT_MAP          ?= NO
 ARCHIVED            ?= NO
 OPT_MODE            ?= -O3
@@ -143,6 +144,9 @@ ifeq ($(COMPRESSED),YES)
 CONVBINFLAGS += --oformat 8xp-auto-decompress
 else
 CONVBINFLAGS += --oformat 8xp
+endif
+ifeq ($(UPPERCASE_NAME),YES)
+CONVBINFLAGS += --uppercase
 endif
 CONVBINFLAGS += --name $(TARGET)
 
