@@ -133,7 +133,14 @@ ICON_CONV := @echo "[convimg] $(ICONIMG)" && $(CONVIMG) --icon $(call QUOTE_ARG,
 LINK_REQUIRE += -i 'require ___icon'
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 else
+ifneq ("$(DESCRIPTION)","")
+ICON_CONV := @echo "[convimg] description" && $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+LINK_REQUIRE += -i 'require ___description'
+LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
+ICONIMG :=
+else
 ICONSRC :=
+endif
 endif
 
 # determine output target flags
