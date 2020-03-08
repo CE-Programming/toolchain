@@ -206,7 +206,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 
 $(BINDIR)/$(TARGETBIN): $(ICONSRC) $(LINK_FILES)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo "[linking] $@"
+	$(Q)echo [linking] $(call NATIVEPATH,$@)
 	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
 
 # this rule handles conversion of the icon, if it is ever updated
@@ -217,12 +217,12 @@ $(ICONSRC): $(ICONIMG)
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo "[compiling] $<"
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
 	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 $(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo "[compiling] $<"
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
 	$(Q)$(EZCC) $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
