@@ -58,9 +58,7 @@ LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg.exe)
 CD         = cd
-NOSTDOUT  := >nul
-NOSTDERR  := 2>&1
-RM         = del /q /f $(NOSTDOUT) $(NOSTDERR)
+RM         = del /q /f 2>nul
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
 NATIVEMKDR = call && (if not exist $1 mkdir $1)
 QUOTE_ARG  = "$(subst ",',$1)"#'
@@ -74,8 +72,6 @@ BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
 LD         = $(call NATIVEPATH,$(BIN)/fasmg)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin)
 CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg)
-NOSTDOUT  := 1> /dev/null
-NOSTDERR  := 2> /dev/null
 CD         = cd
 RM         = rm -f
 RMDIR      = rm -rf $1
@@ -128,14 +124,14 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 
 # check if there is an icon present that we can convert
 # if so, generate a recipe to build it
-ifneq ("$(ICONIMG)","")
+ifneq ($(ICONIMG),)
 ICON_CONV := @echo "[convimg] $(ICONIMG)" && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
-LINK_REQUIRE += -i 'require ___icon'
+LINK_REQUIRE += -i $(call QUOTE_ARG,require ___icon)
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 else
-ifneq ("$(DESCRIPTION)","")
+ifneq ($(DESCRIPTION),)
 ICON_CONV := @echo "[convimg] description" && $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
-LINK_REQUIRE += -i 'require ___description'
+LINK_REQUIRE += -i $(call QUOTE_ARG,require ___description)
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 ICONIMG :=
 else
@@ -159,7 +155,7 @@ CONVBINFLAGS += --name $(TARGET)
 
 # link cleanup source
 ifeq ($(CLEANUP),YES)
-LINK_REQUIRE += -i 'require __ccleanup'
+LINK_REQUIRE += -i $(call QUOTE_ARG,require __ccleanup)
 LINK_CLEANUP  = , $(call FASMG_FILES,$(F_CLEANUP))
 endif
 
@@ -182,6 +178,7 @@ CXXFLAGS := $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
+	-n \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/include/fasmg-ez80/ld.alm)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
 	$(LDDEBUGFLAG) \
@@ -210,7 +207,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 $(BINDIR)/$(TARGETBIN): $(ICONSRC) $(LINK_FILES)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo "[linking] $@"
-	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@) $(NOSTDOUT)
+	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
 
 # this rule handles conversion of the icon, if it is ever updated
 $(ICONSRC): $(ICONIMG)
