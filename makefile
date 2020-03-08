@@ -19,7 +19,7 @@ ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
 DIRNAME    = $(filter-out %:,$(patsubst %\,%,$(dir $1)))
-RM         = del /f 2>nul
+RM         = del /f /q 2>nul
 RMDIR      = call && (if exist $1 rmdir /s /q $1)
 MKDIR      = call && (if not exist $1 mkdir $1)
 PREFIX    ?= C:

@@ -12,7 +12,7 @@ FASMG ?=fasmg
 ifeq ($(OS),Windows_NT)
 SHELL       =cmd.exe
 NATIVEPATH  =$(subst /,\,$(1))
-RM          =del /f 2>nul
+RM          =del /f /q 2>nul
 MKDIR       =mkdir
 CP          =copy /y
 PREFIX     ?=C:

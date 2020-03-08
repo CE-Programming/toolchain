@@ -8,7 +8,7 @@ SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$(1))
 RMDIR      = call && (if exist $(1) rmdir /s /q $(1))
 MKDIR      = call && (if not exist $(1) mkdir $(1))
-RM         = del /f 2>nul
+RM         = del /f /q 2>nul
 CEDEV     ?= C:\CEdev
 BIN       ?= $(CEDEV)/bin
 else
