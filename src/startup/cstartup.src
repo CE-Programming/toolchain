@@ -126,31 +126,19 @@ else if __len_bss = 3
 	or	a,a
 	sbc	hl,hl
 	ld	(__low_bss),hl
-else if __len_bss <= 6
-	or	a,a
-	sbc	hl,hl
-	ld	(__low_bss),hl
-	ld	(__low_bss+__len_bss-3),hl
-else if __len_bss = 8
-	ld	hl,__low_bss
-	call	0020368h	; _Zero16D
-else if __len_bss = 9
-	ld	hl,__low_bss
-	ld	(hl),0
-	inc	hl
-	call	0020368h	; _Zero16D
-else if __len_bss = 11
-	ld	hl,__low_bss
-	call	0020390h	; _ZeroOP
-else if __len_bss = 12
-	ld	hl,__low_bss
-	ld	(hl),0
-	inc	hl
-	call	0020390h	; _ZeroOP
 else
 	ld	hl,__low_bss
+if __len_bss = 8
+	call	0020368h	; _Zero16D
+else if __len_bss = 11
+	call	0020390h	; _ZeroOP
+else if __len_bss < 256
+	ld	b,__len_bss
+	call	0020394h	; _ClrLp
+else
 	ld	bc,__len_bss
 	call	00210DCh	; _MemClear
+end if
 end if
 end if
 	call	_main
