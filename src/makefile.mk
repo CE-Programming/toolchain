@@ -1,7 +1,7 @@
 #----------------------------
 # Core C/C++ Makefile
 #----------------------------
-NARGS               ?= YES
+MAIN_ARGS           ?= NO
 CLEANUP             ?= YES
 BSSHEAP_LOW         ?= D031F6
 BSSHEAP_HIGH        ?= D13FD6
@@ -154,9 +154,9 @@ CONVBINFLAGS += --uppercase
 endif
 CONVBINFLAGS += --name $(TARGET)
 
-# pass NARGS flag for cstartup
-ifeq ($(NARGS),YES)
-LINK_DEFINITIONS += -i __NARGS=1
+# support main args?
+ifeq ($(MAIN_ARGS),YES)
+LINK_DEFINITIONS += -i __MAIN_ARGS=1
 endif
 
 # link cleanup source
