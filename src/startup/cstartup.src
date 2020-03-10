@@ -79,18 +79,21 @@ __parseansnext:
 	jr	nz,__parseansloop
 __parseansdone:
 	ld	bc,0
-	ld	hl,__argstemp+3
+	ld	hl,__argstemp
 	sbc	hl,de
 	add	hl,sp
 	ld	sp,hl
 	ld	hl,(__exitsp)
+	push	bc
+	db	03Eh		; ld a,*
+__argvloop:
+	push	hl
+	inc	bc
 __skipspacesloop:
 	dec	de
 	ld	a,(de)
 	cp	a,020h		; Lspace
 	jr	z,__skipspacesloop
-	inc	bc
-	push	hl
 	dec	hl
 	ld	(hl),0
 __argcopyloop:
@@ -99,7 +102,7 @@ __argcopyloop:
 	dec	de
 	ld	a,(de)
 	cp	a,020h		; Lspace
-	jr	z,__skipspacesloop
+	jr	z,__argvloop
 	cp	a,0D6h		; lenter
 	jr	nz,__argcopyloop
 	push	hl
