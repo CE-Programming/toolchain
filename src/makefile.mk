@@ -156,7 +156,7 @@ CONVBINFLAGS += --name $(TARGET)
 
 # pass NARGS flag for cstartup
 ifeq ($(NARGS),YES)
-LINK_DEFINITIONS += -i NARGS=1
+LINK_DEFINITIONS += -i __NARGS=1
 endif
 
 # link cleanup source

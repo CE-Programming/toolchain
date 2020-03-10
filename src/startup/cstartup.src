@@ -31,7 +31,7 @@ __startup:
 				; too low for some calcs, 2 is untested
 	push	iy		; save iy (flags)
 	ld	(__exitsp),sp	; save sp for exiting
-if ~defined NARGS
+if ~defined __NARGS
 __argstemp := 0D120D6h		; saveSScreen+14007
 	call	0020614h	; _PushRealO1
 	ld	de,__argstemp
