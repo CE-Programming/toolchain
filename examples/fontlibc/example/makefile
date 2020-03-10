@@ -5,6 +5,7 @@
 NAME         ?= DEMO
 ICON         ?= icon.png
 DESCRIPTION  ?= "CE C SDK Demo"
+NARGS        ?= YES
 COMPRESSED   ?= NO
 ARCHIVED     ?= NO
 

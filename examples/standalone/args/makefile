@@ -5,7 +5,7 @@
 NAME         ?= DEMO
 ICON         ?= icon.png
 DESCRIPTION  ?= "CE C SDK Demo"
-NARGS        ?= YES
+NARGS        ?= NO
 COMPRESSED   ?= NO
 ARCHIVED     ?= NO
 
@@ -23,6 +23,3 @@ EXTRA_CFLAGS ?= -Wall -Wextra
 OUTPUT_MAP   ?= NO
 
 include $(CEDEV)/include/.makefile
-
-tilemap: src/tilemap/tilemap.csv
-	cd src && cd tilemap && convbin --iformat csv -i tilemap.csv --compress zx7 -o tilemap.c --oformat c --name tilemap_map_compressed

@@ -5,6 +5,7 @@
 NAME         ?= DEMO
 ICON         ?= iconc.png
 DESCRIPTION  ?= "C SDK Demo"
+NARGS        ?= YES
 COMPRESSED   ?= NO
 ARCHIVED     ?= NO
 

@@ -1,6 +1,7 @@
 #----------------------------
 # Core C/C++ Makefile
 #----------------------------
+NARGS               ?= YES
 CLEANUP             ?= YES
 BSSHEAP_LOW         ?= D031F6
 BSSHEAP_HIGH        ?= D13FD6
@@ -153,6 +154,11 @@ CONVBINFLAGS += --uppercase
 endif
 CONVBINFLAGS += --name $(TARGET)
 
+# pass NARGS flag for cstartup
+ifeq ($(NARGS),YES)
+LINK_DEFINITIONS += -i NARGS=1
+endif
+
 # link cleanup source
 ifeq ($(CLEANUP),YES)
 LINK_REQUIRE += -i $(call QUOTE_ARG,require __ccleanup)
@@ -187,6 +193,7 @@ LDFLAGS ?= \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
 	-i $(call QUOTE_ARG,STATIC := $(STATIC)) \
+	$(LINK_DEFINITIONS) \
 	$(LINK_REQUIRE) \
 	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LINK_ICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP))$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
 	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LINK_LIBLOAD))$(comma) $(call FASMG_FILES,$(LINK_LIBS)))
