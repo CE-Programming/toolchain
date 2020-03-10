@@ -135,6 +135,16 @@ else if __len_bss = 11
 else if __len_bss < 256
 	ld	b,__len_bss
 	call	0020394h	; _ClrLp
+else if __len_bss = 256 | __len_bss = 257
+	xor	a,a
+	ld	b,a
+__clearbssloop:
+	ld	(hl),a
+	inc	hl
+	djnz	__clearbssloop
+if __len_bss = 257
+	ld	(hl),a
+end if
 else
 	ld	bc,__len_bss
 	call	00210DCh	; _MemClear
