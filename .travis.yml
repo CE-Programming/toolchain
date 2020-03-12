@@ -6,6 +6,7 @@ addons:
   apt:
     packages:
       - libc6-i386
+      - libstdc++6
 
 script:
 #  - sudo apt install -y doxygen doxygen-doc
