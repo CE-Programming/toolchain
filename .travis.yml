@@ -5,12 +5,13 @@ language: cpp
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
       - libc6-i386
       - libstdc++6
 
 script:
-  - apt show libstdc++6
 #  - sudo apt install -y doxygen doxygen-doc
 # Build toolchain and libs
   - export WINEDEBUG=-all
