@@ -9,6 +9,7 @@ addons:
       - libstdc++6
 
 script:
+  -  objdump -T /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep -o GLIBCXX_[0-9.]* | sort -V -u
 #  - sudo apt install -y doxygen doxygen-doc
 # Build toolchain and libs
   - export WINEDEBUG=-all
