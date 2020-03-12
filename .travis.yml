@@ -4,6 +4,9 @@ dist: bionic
 language: cpp
 
 script:
+  - file tools/fasmg/linux/fasmg
+  - chmod +x tools/fasmg/linux/fasmg
+  - tools/fasmg/linux/fasmg
 #  - sudo apt install -y doxygen doxygen-doc
 # Build toolchain and libs
   - export WINEDEBUG=-all
