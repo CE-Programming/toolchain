@@ -1,16 +1,10 @@
-dist: xenial
-sudo: required
+dist: bionic
+#sudo: required
 
 language: cpp
 
-addons:
-  apt:
-    packages:
-      - wine
-      - doxygen
-      - doxygen-doc
-
 script:
+#  - sudo apt install -y doxygen doxygen-doc
 # Build toolchain and libs
   - export WINEDEBUG=-all
   - export CEDEV=~/CEdev
@@ -20,7 +14,7 @@ script:
   - mkdir -p $CEDEV/bin
   - unzip ez80-clang-LinuxRelease.zip -d $CEDEV/bin
   - chmod +x $CEDEV/bin/ez80-clang
-  - make -j4 install release release-libs
+  - make install release release-libs
 # Build examples
   - make -C $CEDEV/examples
 # Build CEmu core and autotester_cli
@@ -39,14 +33,6 @@ after_success:
 # Update the funcs_tested file (WIP)
   - ./tools/funcs_tested/gen_list.sh
 # Build the doxygen
-  - make doxygen
+#  - make doxygen
 # Update repo files
-  - bash .deploy.sh
-
-notifications:
-  irc:
-    channels:
-      - "irc.choopa.net#ez80-dev"
-    on_success: change
-    on_failure: always
-    skip_join: true
+#  - bash .deploy.sh
