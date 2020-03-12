@@ -16,6 +16,10 @@ script:
   - export CEDEV=~/CEdev
   - export PATH=$CEDEV/bin/:$PATH
   - export AUTOTESTER_LIBS_DIR=$(pwd)/clibraries
+  - wget https://jacobly.com/llvm/ez80-clang-LinuxRelease.zip
+  - mkdir -p $CEDEV/bin
+  - unzip ez80-clang-LinuxRelease.zip -d $CEDEV/bin
+  - chmod +x $CEDEV/bin/ez80-clang
   - make -j4 install release release-libs
 # Build examples
   - make -C $CEDEV/examples
