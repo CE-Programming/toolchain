@@ -96,7 +96,9 @@ macro ?!
      end match
     end while
    end match
-	op	bsr idx,val
+   match v, val
+	op	bsr idx,v
+   end match
   end macro
  end iterate
 
