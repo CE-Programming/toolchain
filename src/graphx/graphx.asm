@@ -2967,13 +2967,15 @@ gfx_SetTextXY:
 ;  arg1 : Text Y Pos
 ; Returns:
 ;  None
-	pop	de			; de=return address, sp=&xpos
-	pop	hl			; hl=xpos, sp=&ypos
-	ld	(_TextXPos),hl
-	ex	(sp),hl			; hl=ypos, ypos=don't care
-	ld	(_TextYPos),hl
-	push	hl			; xpos=don't care, sp=&xpos
-	ex	de,hl			; hl=return address
+	ld	hl,3
+	add	hl,sp
+	ld	de,_TextXPos
+	ldi
+	ldi
+	inc	hl
+	ld	a,(hl)
+	ld	(_TextYPos),a
+	ret
 ;-------------------------------------------------------------------------------
 _indcallHL:
 ; Calls HL
