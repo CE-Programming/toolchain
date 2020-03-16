@@ -3325,10 +3325,9 @@ gfx_PrintInt:
 ;  arg1 : Number of characters to print
 ; Returns:
 ;  None
-	pop	de
-	pop	hl
-	push	hl
-	push	de
+	ld	hl,3
+	add	hl,sp
+	ld	hl,(hl)
 	add	hl,hl
 	db	$3E			; xor a,a -> ld a,*
 
