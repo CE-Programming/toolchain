@@ -61,7 +61,7 @@ kb_ScanGroup:
 	cp	a,8
 	jr	nc,.found
 	add	a,a
-	add	a,$0E
+	add	a,$10
 	ld	c,a
 	di
 	ld	hl,$f50200		; DI_Mode = $f5xx00
