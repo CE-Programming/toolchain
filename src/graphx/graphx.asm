@@ -3177,34 +3177,58 @@ smcByte _TextHeight
 	jr	_PrintLargeFont		; SMC the jump
 _TextScaleJump := $ - 1
 _PrintNormalFont:
-.loop:
-	ld	c,(hl)			; c = 8 pixels
-	add	iy,de			; get draw location
-	lea	de,iy
-	ld	b,ixh
-.nextpixel:
-	ld	a,TEXT_BG_COLOR
-smcByte _TextBGColor
-	rlc	c
-	jr	nc,.bgcolor
-	ld	a,TEXT_FG_COLOR
+	ex      de,hl			; hl = draw location
+        add	iy,de			; iy = character data location
+        ld      e,TEXT_FG_COLOR
 smcByte _TextFGColor
-.bgcolor:
-	cp	a,TEXT_TP_COLOR		; check if transparent
+        ld      d,TEXT_BG_COLOR
+smcByte _TextBGColor
+        lb	bc,$30F9		; b="JR NC" code ; c=djnz relative jump value (toward rla)
+        ld      a,TEXT_TP_COLOR
 smcByte _TextTPColor
-	jr	z,.transparent
-	ld	(de),a
-.transparent:
-	inc	de			; move to next pixel
-	djnz	.nextpixel
-	ld	de,LcdWidth
-	inc	hl
-	dec	ixl
-	jr	nz,.loop
-	pop	hl			; restore hl and stack pointer
-	pop	ix
-	ret
-
+        cp      a,e
+        jr      nz,FGnotTP
+        cp      a,d
+        jr      z,TotalTransp
+        ld	b,$38			; "JR C" code needed
+        ld	e,d			; BG_COLOR instead of FG_COLOR
+        xor	a,a			; we need a "nop" instead of "ld (hl),d"
+        jr	BGequTP			; (a shortened djnz' relative jump's not enough!)
+FGnotTP:
+        xor	a,d			; better than "cp" as we need a null "nop" value if a=d
+        jr      z,BGequTP
+        dec	c			; djnz relative jump value will point toward .nextpixel
+        ld	a,$72			; code of "ld (hl),d"
+BGequTP:
+	ld	(.nextpixel),a		; "nop" or "ld (hl),d"
+	ld	a,c
+	ld	(.notfg+2),a		; modify the relative jump of djnz
+        ld	a,b
+        ld	(.nextpixel+2),a	; "jr c,..." or "jr nc,..."
+        ld      a,64
+        sub     a,ixh
+        ld      c,a
+.loop:       
+        ld      a,(iy+0)
+        ld      b,ixh
+.nextpixel:
+        ld      (hl),d
+        rla
+        jr      nc,.notfg
+        ld      (hl),e
+.notfg:
+        inc     hl
+        djnz    .nextpixel
+        inc     b
+        add     hl,bc
+        inc     iy
+        dec     ixl
+        jr      nz,.loop
+TotalTransp:
+        pop     hl                      ; restore hl and stack pointer
+        pop     ix
+        ret
+	
 ;-------------------------------------------------------------------------------
 _PrintLargeFont:
 ; Prints in scaled font for prosperity
