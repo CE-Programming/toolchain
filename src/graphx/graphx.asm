@@ -3203,10 +3203,10 @@ BGequTP:
 	ld	(.nextpixel),a		; "nop" or "ld (hl),d"
 	ld	a,c
 	ld	(.notfg+2),a		; modify the relative jump of djnz
-        ld	a,b
-        ld	(.nextpixel+2),a	; "jr c,..." or "jr nc,..."
-        ld      a,64
-        sub     a,ixh
+	ld	a,b
+	ld	(.nextpixel+2),a	; "jr c,..." or "jr nc,..."
+	ld	a,64
+	sub	a,ixh
         ld      c,a
 .loop:       
         ld      a,(iy+0)
