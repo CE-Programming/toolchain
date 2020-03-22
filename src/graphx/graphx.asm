@@ -3191,43 +3191,43 @@ smcByte _TextTPColor
 	cp	a,d
 	jr	z,TotalTransp
 	ld	b,$38			; "JR C" code needed
-        ld	e,d			; BG_COLOR instead of FG_COLOR
-        xor	a,a			; we need a "nop" instead of "ld (hl),d"
-        jr	BGequTP			; (a shortened djnz' relative jump's not enough!)
+	ld	e,d			; BG_COLOR instead of FG_COLOR
+	xor	a,a			; we need a "nop" instead of "ld (hl),d"
+	jr	BGequTP			; (a shortened djnz' relative jump's not enough!)
 FGnotTP:
-        xor	a,d			; better than "cp" as we need a null "nop" value if a=d
-        jr      z,BGequTP
-        dec	c			; djnz relative jump value will point toward .nextpixel
-        ld	a,$72			; code of "ld (hl),d"
+	xor	a,d			; better than "cp" as we need a null "nop" value if a=d
+	jr      z,BGequTP
+	dec	c			; djnz relative jump value will point toward .nextpixel
+	ld	a,$72			; code of "ld (hl),d"
 BGequTP:
-        ld	(.nextpixel),a		; "nop" or "ld (hl),d"
+	ld	(.nextpixel),a		; "nop" or "ld (hl),d"
 	ld	a,c
 	ld	(.notfg+2),a		; modify the relative jump of djnz
 	ld	a,b
 	ld	(.nextpixel+2),a	; "jr c,..." or "jr nc,..."
 	ld	a,64
 	sub	a,ixh
-        ld      c,a
+	ld      c,a
 .loop:       
-        ld      a,(iy+0)
-        ld      b,ixh
+	ld      a,(iy+0)
+	ld      b,ixh
 .nextpixel:
-        ld      (hl),d
-        rla
-        jr      nc,.notfg
-        ld      (hl),e
+	ld      (hl),d
+	rla
+	jr      nc,.notfg
+	ld      (hl),e
 .notfg:
-        inc     hl
-        djnz    .nextpixel
-        inc     b
-        add     hl,bc
-        inc     iy
-        dec     ixl
-        jr      nz,.loop
+	inc     hl
+	djnz    .nextpixel
+	inc     b
+	add     hl,bc
+	inc     iy
+	dec     ixl
+	jr      nz,.loop
 TotalTransp:
-        pop     hl                      ; restore hl and stack pointer
-        pop     ix
-        ret
+	pop     hl                      ; restore hl and stack pointer
+	pop     ix
+	ret
 	
 ;-------------------------------------------------------------------------------
 _PrintLargeFont:
