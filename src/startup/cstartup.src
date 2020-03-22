@@ -30,20 +30,132 @@ __startup:
 	ld	(hl),h		; set flash wait states to 3; 1 was definitely
 				; too low for some calcs, 2 is untested
 	push	iy		; save iy (flags)
-	ld	(__exitsp+1),sp	; save sp for exiting
-	ld	bc,__len_bss
-	ld	hl,__low_bss
-	push	bc
+	ld	(__exitsp),sp	; save sp for exiting
+if defined __MAIN_ARGS
+__argstemp := 0D120D6h		; saveSScreen+14007
+	call	0020614h	; _PushRealO1
+	ld	de,__argstemp
+	ld	a,e		; Lenter
+	ld	(de),a
+	inc	de
+	ld	hl,0D005F8h+1	; OP1+1
+	call	0020304h	; _Mov8b
+	ld	a,d		; Lspace
+	ld	(de),a
+	inc	de
+	push	de
+	call	0020FF4h	; _AnsName
+	call	002050Ch	; _FindSym
+	ex	de,hl
+	pop	de
+	xor	a,4		; StrngObj
+	jr	nz,__parseansdone
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	jr	__parseansnext
+__parseansloop:
+	inc	hl
+	dec	bc
 	push	hl
-	call	0000B0h		; __memclear, clear BSS
-				; args will get removed from stack on exit
+	push	bc
+	push	de
+	call	0020870h	; _Get_Tok_Strng
+	pop	de
+	ld	hl,0D0060Eh	; OP3
+	ldir
+	pop	bc
+	pop	hl
+	bit	2,d
+	jr	nz,__parseansdone
+	ld	a,(hl)
+	call	00204ACh	; _Isa2ByteTok
+	jr	nz,__parseansnext
+	inc	hl
+	dec	bc
+__parseansnext:
+	ld	a,c
+	or	a,b
+	jr	nz,__parseansloop
+__parseansdone:
+	ld	bc,0
+	ld	hl,__argstemp
+	sbc	hl,de
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,(__exitsp)
+	push	bc
+	db	03Eh		; ld a,*
+__argvloop:
+	push	hl
+	inc	bc
+__skipspacesloop:
+	dec	de
+	ld	a,(de)
+	cp	a,020h		; Lspace
+	jr	z,__skipspacesloop
+	dec	hl
+	ld	(hl),0
+__argcopyloop:
+	dec	hl
+	ld	(hl),a
+	dec	de
+	ld	a,(de)
+	cp	a,020h		; Lspace
+	jr	z,__argvloop
+	cp	a,0D6h		; lenter
+	jr	nz,__argcopyloop
+	push	hl
+	sbc	hl,hl
+	add	hl,sp
+	push	hl
+	push	bc
+	call	00205DCh	; _PopRealO1
+end if
+if __len_bss > 0
+if __len_bss = 1
+	xor	a,a
+	ld	(__low_bss),a
+else if __len_bss = 2
+	ld	hl,__low_bss
+	xor	a,a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+else if __len_bss = 3
+	or	a,a
+	sbc	hl,hl
+	ld	(__low_bss),hl
+else
+	ld	hl,__low_bss
+if __len_bss = 8
+	call	0020368h	; _Zero16D
+else if __len_bss = 11
+	call	0020390h	; _ZeroOP
+else if __len_bss < 256
+	ld	b,__len_bss
+	call	0020394h	; _ClrLp
+else if __len_bss = 256 | __len_bss = 257
+	xor	a,a
+	ld	b,a
+__clearbssloop:
+	ld	(hl),a
+	inc	hl
+	djnz	__clearbssloop
+if __len_bss = 257
+	ld	(hl),a
+end if
+else
+	ld	bc,__len_bss
+	call	00210DCh	; _MemClear
+end if
+end if
+end if
 	call	_main
         public	__exit
 __exit:
         public	__exitsp
-__exitsp:
-        public	__errsp
-__errsp:
+__exitsp := $+1
 	ld	sp,0
 	pop	iy		; iy = flags
 	pop	af		; a = original flash wait states
