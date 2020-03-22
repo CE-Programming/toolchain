@@ -3200,7 +3200,7 @@ FGnotTP:
         dec	c			; djnz relative jump value will point toward .nextpixel
         ld	a,$72			; code of "ld (hl),d"
 BGequTP:
-	ld	(.nextpixel),a		; "nop" or "ld (hl),d"
+        ld	(.nextpixel),a		; "nop" or "ld (hl),d"
 	ld	a,c
 	ld	(.notfg+2),a		; modify the relative jump of djnz
 	ld	a,b
