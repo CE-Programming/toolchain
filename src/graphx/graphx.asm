@@ -3177,20 +3177,20 @@ smcByte _TextHeight
 	jr	_PrintLargeFont		; SMC the jump
 _TextScaleJump := $ - 1
 _PrintNormalFont:
-	ex      de,hl			; hl = draw location
-        add	iy,de			; iy = character data location
-        ld      e,TEXT_FG_COLOR
+	ex	de,hl			; hl = draw location
+	add	iy,de			; iy = character data location
+	ld	e,TEXT_FG_COLOR
 smcByte _TextFGColor
-        ld      d,TEXT_BG_COLOR
+	ld	d,TEXT_BG_COLOR
 smcByte _TextBGColor
-        lb	bc,$30F9		; b="JR NC" code ; c=djnz relative jump value (toward rla)
-        ld      a,TEXT_TP_COLOR
+	lb	bc,$30F9		; b="JR NC" code ; c=djnz relative jump value (toward rla)
+	ld	a,TEXT_TP_COLOR
 smcByte _TextTPColor
-        cp      a,e
-        jr      nz,FGnotTP
-        cp      a,d
-        jr      z,TotalTransp
-        ld	b,$38			; "JR C" code needed
+	cp	a,e
+	jr	nz,FGnotTP
+	cp	a,d
+	jr	z,TotalTransp
+	ld	b,$38			; "JR C" code needed
         ld	e,d			; BG_COLOR instead of FG_COLOR
         xor	a,a			; we need a "nop" instead of "ld (hl),d"
         jr	BGequTP			; (a shortened djnz' relative jump's not enough!)
