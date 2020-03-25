@@ -84,30 +84,25 @@ kb_AnyKey:
 ; Returns:
 ;  0 if no key is pressed
 	di
-	ld	hl,$f50200		; DI_Mode = $f5xx00
-	ld	(hl),h
+	ld	bc,2
+	ld	hl,$f51200		; DI_Mode = $f5xx00
+	ld	(hl),c
 	xor	a,a
 .loop:
 	cp	a,(hl)
 	jr	nz,.loop
-	ld	l,$12			; kbdG1 = $f5xx12
+	ld	l,h			; kbdG1 = $f5xx12
 	or	a,(hl)
-	inc	hl
-	inc	hl
+	add	hl,bc
 	or	a,(hl)
-	inc	hl
-	inc	hl
+	add	hl,bc
 	or	a,(hl)
-	inc	hl
-	inc	hl
+	add	hl,bc
 	or	a,(hl)
-	inc	hl
-	inc	hl
+	add	hl,bc
 	or	a,(hl)
-	inc	hl
-	inc	hl
+	add	hl,bc
 	or	a,(hl)
-	inc	hl
-	inc	hl
+	add	hl,bc
 	or	a,(hl)
 	ret
