@@ -3228,7 +3228,7 @@ TotalTransp:
 	pop	hl			; restore hl and stack pointer
 	pop	ix
 	ret
-	
+
 ;-------------------------------------------------------------------------------
 _PrintLargeFont:
 ; Prints in scaled font for prosperity
