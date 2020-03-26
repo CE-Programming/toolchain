@@ -22,6 +22,7 @@ script:
   - mkdir -p $CEDEV/bin
   - unzip ez80-clang-LinuxRelease.zip -d $CEDEV/bin
   - chmod +x $CEDEV/bin/ez80-clang
+  - ez80-clang -v
   - make install release release-libs
 # Build examples
   - make -C $CEDEV/examples
