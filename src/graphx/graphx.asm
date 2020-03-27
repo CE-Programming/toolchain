@@ -3183,7 +3183,7 @@ _PrintNormalFont:
 smcByte _TextFGColor
 	ld	d,TEXT_BG_COLOR
 smcByte _TextBGColor
-	lb	bc,$30F9		; b="JR NC" code ; c=djnz relative jump value (toward rla)
+	ld	bc,$30F9		; b="JR NC" code ; c=djnz relative jump value (toward rla)
 	ld	a,TEXT_TP_COLOR
 smcByte _TextTPColor
 	cp	a,e
