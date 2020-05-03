@@ -9,7 +9,10 @@
 
 #define offsetof(type, member) __builtin_offsetof(type, member)
 
-typedef    __SIZE_TYPE__    size_t;
+#ifndef SIZE_T_DEFINED
+#define SIZE_T_DEFINED
+typedef __SIZE_TYPE__ size_t;
+#endif
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
 
 #ifndef _WCHAR_T_DEFINED

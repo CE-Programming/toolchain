@@ -12,7 +12,7 @@ extern "C" {
 
 #ifndef SIZE_T_DEFINED
 #define SIZE_T_DEFINED
-typedef unsigned int size_t;
+typedef __SIZE_TYPE__ size_t;
 #endif
 
 void *memcpy(void *, const void *, size_t);
