@@ -19,7 +19,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/ce
                     ${CMAKE_SOURCE_DIR}/src/usbdrvce
                     ${CMAKE_SOURCE_DIR}/src/std)
 
-file(GLOB_RECURSE SOURCE_FILES   src      false *.h *.hpp *.c *.cpp)
-file(GLOB_RECURSE EXAMPLES_FILES examples false *.h *.hpp *.c *.cpp)
+file(GLOB_RECURSE SOURCE_FILES   src      true  *.h *.hpp *.c *.cpp)
+file(GLOB_RECURSE EXAMPLES_FILES examples true  *.h *.hpp *.c *.cpp)
 
 add_executable(toolchain ${SOURCE_FILES} ${EXAMPLES_FILES})
