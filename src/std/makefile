@@ -22,11 +22,11 @@ BIN        ?= $(PREFIX)/CEdev/bin
 
 LIB_LOC    := $(DESTDIR)$(DEV)/lib
 LOC_H      := $(DESTDIR)$(DEV)/include
-LIB_H       = $(wildcard *.h)
+LIB_H       = $(wildcard *.h *.hpp)
 
 # windows is trash at copying files, so just do it manually
 ifeq ($(OS),Windows_NT)
-COPY_HEADERS   = xcopy /y *.h $(call NATIVEPATH,$(LOC_H))
+COPY_HEADERS   = xcopy /y *.h* $(call NATIVEPATH,$(LOC_H))
 COPY_LIBFILEIO = cd $(call NATIVEPATH,$(FILEIODIR)/build) && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/fileio)
 COPY_LIBSTATIC = cd $(call NATIVEPATH,$(STATICDIR)) && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/static) && \
                  cd build && xcopy /y *.src $(call NATIVEPATH,$(LIB_LOC)/static)

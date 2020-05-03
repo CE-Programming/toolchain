@@ -21,7 +21,7 @@ INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
 LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib/shared)
 LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include)
 
-LIB_H      := $(wildcard *.h)
+LIB_H      := $(wildcard *.h *.hpp)
 SRC        := $(wildcard *.src)
 
 ifeq ($(OS),Windows_NT)
