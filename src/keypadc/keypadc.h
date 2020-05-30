@@ -1,7 +1,7 @@
 /**
  * @file
  * @authors Matt "MateoConLechuga" Waltz
- * @authors Shaun "Methsoft" McFall
+ * @authors Shaun "Merthsoft" McFall
  * @brief Simple direct input keypad library
  */
 
