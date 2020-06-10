@@ -117,6 +117,7 @@ typedef enum {
     KB_MODE_1_PRESS = 4   /**< Interrupt set when a key is pressed in MODE_1_INDISCRIMINATE */
 } kb_int_signal_t;
 
+
 /* Keyboard group 1 */
 #define kb_Graph    (1<<0)
 #define kb_Trace    (1<<1)
@@ -127,6 +128,12 @@ typedef enum {
 #define kb_Mode     (1<<6)
 #define kb_Del      (1<<7)
 
+/* Keyboard group 1 - 83 Premium CE key names */
+#define kb_Fenetre  (1<<3)
+#define kb_Fx       (1<<4)
+#define kb_Suppr    (1<<7)
+
+
 /* Keyboard group 2 */
 #define kb_Sto      (1<<1)
 #define kb_Ln       (1<<2)
@@ -135,6 +142,10 @@ typedef enum {
 #define kb_Recip    (1<<5)
 #define kb_Math     (1<<6)
 #define kb_Alpha    (1<<7)
+
+/* Keyboard group 2 - 83 Premium CE key names */  
+#define kb_TglExact (1<<5)
+
 
 /* Keyboard group 3 */
 #define kb_0        (1<<0)
@@ -146,6 +157,11 @@ typedef enum {
 #define kb_Apps     (1<<6)
 #define kb_GraphVar (1<<7)
 
+/* Keyboard group 3 - 83 Premium CE key names */
+#define kb_Trig     (1<<5)
+#define kb_Matrice  (1<<6)
+
+
 /* Keyboard group 4 */
 #define kb_DecPnt   (1<<0)
 #define kb_2        (1<<1)
@@ -156,6 +172,10 @@ typedef enum {
 #define kb_Prgm     (1<<6)
 #define kb_Stat     (1<<7)
 
+/* Keyboard group 4 - 83 Premium CE key names */
+#define kb_Resol    (1<<5)
+
+
 /* Keyboard group 5 */
 #define kb_Chs      (1<<0)
 #define kb_3        (1<<1)
@@ -164,6 +184,10 @@ typedef enum {
 #define kb_RParen   (1<<4)
 #define kb_Tan      (1<<5)
 #define kb_Vars     (1<<6)
+
+/* Keyboard group 5 - 83 Premium CE key names */
+#define kb_Frac     (1<<5)
+
 
 /* Keyboard group 6 */
 #define kb_Enter    (1<<0)
@@ -174,11 +198,16 @@ typedef enum {
 #define kb_Power    (1<<5)
 #define kb_Clear    (1<<6)
 
+/* Keyboard group 5 - 83 Premium CE key names */
+#define kb_Annul    (1<<6)
+
+
 /* Keyboard group 7 */
 #define kb_Down     (1<<0)
 #define kb_Left     (1<<1)
 #define kb_Right    (1<<2)
 #define kb_Up       (1<<3)
+
 
 /* Keyboard group 1 */
 #define kb_KeyGraph     ((kb_lkey_t)(1 << 8 | 1<<0))
@@ -190,6 +219,12 @@ typedef enum {
 #define kb_KeyMode      ((kb_lkey_t)(1 << 8 | 1<<6))
 #define kb_KeyDel       ((kb_lkey_t)(1 << 8 | 1<<7))
 
+/* Keyboard group 1 - 83 Premium CE key names */
+#define kb_KeyFenetre   ((kb_lkey_t)(1 << 8 | 1<<3))
+#define kb_KeyFx        ((kb_lkey_t)(1 << 8 | 1<<4))
+#define kb_KeySuppr     ((kb_lkey_t)(1 << 8 | 1<<7))
+
+
 /* Keyboard group 2 */
 #define kb_KeyStore     ((kb_lkey_t)(2 << 8 | 1<<1))
 #define kb_KeyLn        ((kb_lkey_t)(2 << 8 | 1<<2))
@@ -198,6 +233,10 @@ typedef enum {
 #define kb_KeyRecip     ((kb_lkey_t)(2 << 8 | 1<<5))
 #define kb_KeyMath      ((kb_lkey_t)(2 << 8 | 1<<6))
 #define kb_KeyAlpha     ((kb_lkey_t)(2 << 8 | 1<<7))
+
+/* Keyboard group 2 - 83 Premium CE key names */
+#define kb_TglExact     ((kb_lkey_t)(2 << 8 | 1<<5))
+
 
 /* Keyboard group 3 */
 #define kb_Key0         ((kb_lkey_t)(3 << 8 | 1<<0))
@@ -209,6 +248,11 @@ typedef enum {
 #define kb_KeyApps      ((kb_lkey_t)(3 << 8 | 1<<6))
 #define kb_KeyGraphVar  ((kb_lkey_t)(3 << 8 | 1<<7))
 
+/* Keyboard group 3 - 83 Premium CE key names */
+#define kb_KeyTrig      ((kb_lkey_t)(3 << 8 | 1<<5))
+#define kb_KeyMatrice   ((kb_lkey_t)(3 << 8 | 1<<6))
+
+
 /* Keyboard group 4 */
 #define kb_KeyDecPnt    ((kb_lkey_t)(4 << 8 | 1<<0))
 #define kb_Key2         ((kb_lkey_t)(4 << 8 | 1<<1))
@@ -219,6 +263,10 @@ typedef enum {
 #define kb_KeyPrgm      ((kb_lkey_t)(4 << 8 | 1<<6))
 #define kb_KeyStat      ((kb_lkey_t)(4 << 8 | 1<<7))
 
+/* Keyboard group 4 - 83 Premium CE key names */
+#define kb_KeyResol     ((kb_lkey_t)(4 << 8 | 1<<5))
+
+
 /* Keyboard group 5 */
 #define kb_KeyChs      ((kb_lkey_t)(5 << 8 | 1<<0))
 #define kb_Key3        ((kb_lkey_t)(5 << 8 | 1<<1))
@@ -227,6 +275,10 @@ typedef enum {
 #define kb_KeyRParen   ((kb_lkey_t)(5 << 8 | 1<<4))
 #define kb_KeyTan      ((kb_lkey_t)(5 << 8 | 1<<5))
 #define kb_KeyVars     ((kb_lkey_t)(5 << 8 | 1<<6))
+
+/* Keyboard group 5 - 83 Premium CE key names */
+#define kb_KeyFrac     ((kb_lkey_t)(5 << 8 | 1<<5))
+
 
 /* Keyboard group 6 */
 #define kb_KeyEnter    ((kb_lkey_t)(6 << 8 | 1<<0))
@@ -237,11 +289,15 @@ typedef enum {
 #define kb_KeyPower    ((kb_lkey_t)(6 << 8 | 1<<5))
 #define kb_KeyClear    ((kb_lkey_t)(6 << 8 | 1<<6))
 
+/* Keyboard group 5 - 83 Premium CE key names */
+#define kb_KeyAnnul    ((kb_lkey_t)(6 << 8 | 1<<6))
+
 /* Keyboard group 7 */
 #define kb_KeyDown     ((kb_lkey_t)(7 << 8 | 1<<0))
 #define kb_KeyLeft     ((kb_lkey_t)(7 << 8 | 1<<1))
 #define kb_KeyRight    ((kb_lkey_t)(7 << 8 | 1<<2))
 #define kb_KeyUp       ((kb_lkey_t)(7 << 8 | 1<<3))
+
 
 /* Compatibility defines */
 #define kb_DataArray    ((volatile uint16_t*)0xF50010)
