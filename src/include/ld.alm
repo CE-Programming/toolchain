@@ -1,0 +1,395 @@
+macro ?! $              : $              , \
+         $$             : $$             , \
+         $@             : $@             , \
+         @ez80          : @ez80          , \
+         calminstruction: calminstruction, \
+         defined        : defined        , \
+         definite       : definite       , \
+         else           : else           , \
+         end            : end            , \
+         equ            : equ            , \
+         err            : err            , \
+         if             : if             , \
+         irpv           : irpv           , \
+         iterate        : iterate        , \
+         namespace      : namespace      , \
+         rawmatch       : rawmatch       , \
+         used           : used           , \
+         virtual        : virtual
+	local endscript, script, read, required, makesection, sections, \
+	      globals, sources, libraries, offset, defers, output
+	element endscript
+
+	include 'commands.alm'
+	include 'ez80.alm'
+
+	required equ required.0
+	offset = endscript
+
+	iterate name, locate, order, range, library, source, require, provide, map
+		macro name? line&
+			if definite endscript
+				err 'linker script command in source'
+			else
+				namespace sections
+					rawmatch raw, line
+						script equ name raw
+					else
+						script equ name
+					end rawmatch
+				end namespace
+			end if
+		end macro
+	end iterate
+
+	calminstruction makesection name*, base*
+		proxy sections
+		local @base, symbol
+		arrange symbol, @sections.name?
+		stringify name
+		publish symbol:, name
+		publish :@sections, symbol
+		arrange @base, symbol.=base?
+		compute base, base
+		publish @base:, base
+		execute =virtual =at @base
+		execute symbol.=area?::
+		execute =end =virtual
+	end calminstruction
+
+	calminstruction script.locate expression*
+		proxy makesection, expression
+		match name =at? base, expression
+		jno errsyntax
+		execute @makesection name, base
+		exit
+	errsyntax:
+		stringify expression
+		err 'invalid syntax in linker command: locate ', @expression
+	end calminstruction
+
+	calminstruction script.order names*&
+		proxy makesection, sections
+		split previous, names
+		jno done
+	loop:
+		split name, names
+		execute @makesection name, previous.=base? + previous.=length?
+		arrange previous, name
+		jyes loop
+	done:
+	end calminstruction
+
+	calminstruction script.range expression*
+		proxy makesection, sections, expression
+		local name, base, high, @high
+		match name= base : high, expression
+		jno errsyntax
+		execute @makesection name, base
+		arrange @high, @sections.name?.=high?
+		compute high, high
+		publish @high, high
+		exit
+	errsyntax:
+		stringify expression
+		err 'invalid syntax in linker command: range ', @expression
+	end calminstruction
+
+	iterate <name*,list*>, library,libraries, source,sources
+		calminstruction script.name files*&
+			proxy list, file
+		loop:
+			split file, files
+			compute file, file
+			publish :@#list, file
+			jyes loop
+			exit
+		end calminstruction
+	end iterate
+
+	calminstruction script.require symbols*&
+		proxy globals
+		local condition
+	loop:
+		split symbol, symbols
+		match symbol =if? condition, symbol
+		jno unconditional
+		check condition
+		jno notrequired
+	unconditional:
+		arrange symbol, @globals.symbol
+		compute symbol, symbol
+	notrequired:
+		match , symbols
+		jno loop
+	end calminstruction
+
+	calminstruction script.provide expressions*&
+		proxy globals, expression
+	loop:
+		split expression, expressions
+		match symbol == value, expression
+		jno errsyntax
+		arrange symbol, @globals.symbol
+		compute value, value
+		publish symbol:, value
+		match , expressions
+		jno loop
+		exit
+	errsyntax:
+		stringify expression
+		err 'invalid syntax in linker command: provide ', @expression
+	end calminstruction
+
+	calminstruction script.map
+		proxy output
+		execute =virtual? =as? 'map'
+		execute @output.=map::
+		execute =end? =virtual?
+	end calminstruction
+
+	irpv line, script
+		script.line
+	end irpv
+
+	calminstruction read?! file*
+		proxy include
+		match ., file
+		jno ignore
+		execute @include! file
+	ignore:
+	end calminstruction
+
+	calminstruction section?! name*
+		proxy sections
+		next required
+		execute =end =virtual
+		execute =end =if
+		execute =if =defined required
+		execute =virtual @sections.name?.=area?
+	end calminstruction
+
+	calminstruction public?! symbols*&
+		proxy globals
+		local global
+	loop:
+		split symbol, symbols
+		arrange global, @globals.symbol
+		check used symbol | used global
+		jno notrequired
+		compute symbol, symbol
+		publish global:, symbol
+		check definite required
+		jyes notrequired
+		publish required:, offset
+	notrequired:
+		match , symbols
+		jno loop
+	end calminstruction
+
+	calminstruction weak?! symbols*&
+		proxy globals
+		local global
+	loop:
+		split symbol, symbols
+		arrange global, @globals.symbol
+		check used symbol | used global
+		jno notrequired
+		check definite global
+		jno required
+		compute global, global
+		publish symbol:, global
+		jump notrequired
+	required:
+		compute symbol, symbol
+		publish global:, symbol
+		check definite required
+		jyes notrequired
+		publish required:, offset
+	notrequired:
+		match , symbols
+		jno loop
+	end calminstruction
+
+	calminstruction private?! symbols*&
+	loop:
+		split symbol, symbols
+		check used symbol
+		jno notrequired
+		check definite required
+		jyes notrequired
+		publish required:, offset
+	notrequired:
+		match , symbols
+		jno loop
+	end calminstruction
+
+	calminstruction extern?! symbols*&
+		proxy globals
+		local value
+	loop:
+		split symbol, symbols
+		check used symbol
+		jno notrequired
+		arrange value, @globals.symbol
+		compute value, value
+		publish symbol:, value
+	notrequired:
+		match , symbols
+		jno loop
+	end calminstruction
+
+	irpv source, sources
+		namespace ?%
+			if 0
+				virtual
+					section .text
+					read source
+				end virtual
+			end if
+		end namespace
+	end irpv
+
+	if defined libraries
+		namespace libraries
+			calminstruction library?! name*, version*
+				proxy defers
+				next required
+				local defer
+				compute offset, 0
+				check defined required
+				jno unused
+				arrange defer, =emit =byte?: $C0, name, 0, version
+				publish :@defers, defer
+			unused:
+			end calminstruction
+
+			iterate name, export, export_pointer
+				calminstruction name?! symbol*
+					proxy globals, defers
+					local global, defer
+					arrange symbol, _#symbol
+					arrange global, @globals.symbol
+					check used global
+					jno unused
+					arrange defer, =public symbol
+					publish :@defers, defer
+					arrange defer, symbol :== $ + %-1
+					publish :@defers, defer
+					arrange defer, =jp offset
+					publish :@defers, defer
+					check definite required
+					jyes unused
+					publish required:, offset
+				unused:
+					compute offset, offset + @ez80.ws
+				end calminstruction
+			end iterate
+
+			irpv library, libraries
+				if 0
+					read library
+				end if
+			end irpv
+		end namespace
+
+		namespace ?0
+			virtual sections..libs?.area?
+				irpv defer, defers
+					defer
+				end irpv
+			end virtual
+		end namespace
+	end if
+
+	irpv section, sections
+		virtual section.area?
+			section.top? := $
+			section.length? := $ - $$
+			section.initialized? := $@ - $$
+		end virtual
+
+		if ~defined section.high?
+			if ~definite output.base | output.base > section.base?
+				output.base = section.base?
+			end if
+			if ~definite output.top | output.top < section.top?
+				output.top = section.top?
+			end if
+		end if
+	end irpv
+
+	org output.base
+	rb output.top - $
+	postpone ?
+		irpv section, sections
+			if ~defined section.high?
+				load output.data: section.initialized? from section.area?: section.base?
+				store output.data: section.initialized? at section.base?
+			else if section.top? > section.high?
+				repeat 1, length: section.length?,            \
+				          more: section.top? - section.high?, \
+				          maximum: section.high? - section.base?
+					err 'section ', section, ' is ', `length, ' bytes, ', `more,      \
+              ' bytes larger than the maximum size of ', `maximum, ' bytes'
+				end repeat
+			end if
+		end irpv
+
+		if defined output.map
+			calminstruction output.hex value*, leading: '0', digits: 6
+				local digit, char
+				execute =emit? =byte?: ' '
+				compute value, value
+			loop:
+				compute digits, digits - 1
+				compute digit, value shr? (digits shl? 2) and? 0Fh
+				check digit < 10
+				jno let
+				compute char, '0' + digit
+				jump char
+			let:
+				compute char, 'A' + digit - 10
+			char:
+				check digit
+				jno zero
+				arrange leading, '0'
+				jump cont
+			zero:
+				check digits
+				jno cont
+				arrange char, leading
+			cont:
+				execute =emit? =byte?: char
+				check digits
+				jyes loop
+			end calminstruction
+
+			output.longest = lengthof 'Section'
+			irpv section, sections
+				if output.longest < lengthof section
+					output.longest = lengthof section
+				end if
+			end irpv
+			virtual output.map
+				emit byte?: 'Section', output.longest - lengthof 'Section' + 1 dup? ' ', \
+				           'Base   Top    High   Length', 10, output.longest dup? '-',  \
+				           4 dup? ' ------', '-', 10
+				irpv section, sections
+					emit byte?: section, output.longest - lengthof section dup? ' '
+					output.hex section.base?
+					output.hex section.top?
+					if defined section.high?
+						output.hex section.high?
+					else
+						emit byte?: 7 dup? ' '
+					end if
+					output.hex section.length?, ' '
+					emit byte?: 'h', 10
+				end irpv
+			end virtual
+		end if
+	end postpone
+
+	purge ?
+end macro
