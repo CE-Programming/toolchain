@@ -60,6 +60,13 @@ library 'FILEIOC', 5
 	export ti_ArchiveHasRoom
 
 ;-------------------------------------------------------------------------------
+; v6 functions
+;-------------------------------------------------------------------------------
+	export ti_SetPostGCHandler
+
+
+
+;-------------------------------------------------------------------------------
 vat_ptr0 := $d0244e
 vat_ptr1 := $d0257b
 vat_ptr2 := $d0257e
@@ -461,7 +468,7 @@ ti_SetArchiveStatus:
 .set_archived:
 	push	bc
 	pop	af
-	call	z, _Arc_Unarc
+	call	z, util_Arc_Unarc
 	jr	.relocate_var
 .set_not_archived:
 	push	bc
@@ -1206,7 +1213,7 @@ ti_Rename:
 	inc	de
 	call	_Mov8b
 	call	_PushOP1		; save old name
-	ld	hl, _Arc_Unarc
+	ld	hl, util_Arc_Unarc
 	ld	(.smc_archive), hl
 	pop	hl			; new name
 	ld	de, OP1 + 1
@@ -1224,7 +1231,7 @@ ti_Rename:
 	ld	hl, $f8			; $f8 = ret
 	ld	(.smc_archive), hl
 	call	_PushOP1
-	call	_Arc_Unarc
+	call	util_Arc_Unarc
 	call	_PopOP1
 	jr	.locate_program
 .in_archive:
@@ -1257,7 +1264,7 @@ ti_Rename:
 	ldir
 .is_zero:
 	call	_PopOP1
-	call	_Arc_Unarc
+	call	util_Arc_Unarc
 .smc_archive := $-3
 	call	_PopOP1
 	call	_ChkFindSym
@@ -1392,6 +1399,26 @@ ti_ArchiveHasRoom:
 	ret	nz
 	dec	a
 	ret
+
+;-------------------------------------------------------------------------------
+ti_SetPostGCHandler:
+;Set handler for setting up the screen after a garbage collect
+; args:
+;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
+; return:
+;   None
+	pop de
+	ex (sp),hl
+	push de
+	add hl,de
+	or a,a
+	sbc hl,de
+	jr nz,.notdefault
+	ld hl,util_gfx_restore_default_handler
+.notdefault:
+	ld (util_gfx_restore_handler),hl
+	ex hl,de
+	jp (hl)
 
 ;-------------------------------------------------------------------------------
 ; internal library routines
@@ -1571,6 +1598,67 @@ util_get_offset:
 util_set_offset:
 	call	util_get_offset_ptr
 	ld	(hl), bc
+	ret
+
+util_Arc_Unarc: ;properly handle garbage collects :P
+	call _ChkFindSym
+	push hl
+	call _ChkInRAM
+	pop hl
+	jr nz,.arc_unarc ;if the file is already in archive, we won't trigger a gc
+	call _LoadDEInd_s
+	ld hl,12
+	add hl,de
+	call _FindFreeArcSpot ;check if we will trigger a gc
+	jr nz,.arc_unarc ;gc will not be triggered
+	ld a,(mpLcdCtrl)
+	cp a,lcdBpp16
+	jr z,.arc_unarc ;already in OS 16bpp graphics mode
+	push af ;save lcd mode
+	call _ClrLCDFull
+	call _DrawStatusBar
+	ld a,lcdBpp16
+	ld (mpLcdCtrl),a
+	call _Arc_Unarc
+	pop af ;restore lcd mode
+	ld (mpLcdCtrl),a
+	jp util_gfx_restore_default_handler
+util_gfx_restore_handler:=$-3
+.arc_unarc:
+	jp _Arc_Unarc
+
+
+util_gfx_restore_default_handler:
+	call	_RunIndicOff
+	di					; turn off indicator
+	ld hl,$D40000
+	ld (hl),l
+	ld bc,320*240
+	push hl
+	pop de
+	inc de
+	ldir
+.setup:
+	ld	a,lcdBpp8
+	ld	(mpLcdCtrl),a		; operate in 8bpp
+	ld	hl,mpLcdPalette
+	ld	b,0
+.loop:
+	ld	d,b
+	ld	a,b
+	and	a,192
+	srl	d
+	rra
+	ld	e,a
+	ld	a,31
+	and	a,b
+	or	a,e
+	ld	(hl),a
+	inc	hl
+	ld	(hl),d
+	inc	hl
+	inc	b
+	jr	nz,.loop
 	ret
 
 ;-------------------------------------------------------------------------------
