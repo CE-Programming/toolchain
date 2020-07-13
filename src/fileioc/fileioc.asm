@@ -1407,23 +1407,18 @@ ti_SetPostGCHandler:
 ;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
 ; return:
 ;   None
-	pop bc
-	pop hl
-	push hl
-	push bc
-	add hl,bc
+	pop de
+	ex (sp),hl
+	push de
+	add hl,de
 	or a,a
-	sbc hl,bc
+	sbc hl,de
+	jr nz,.notdefault
+	ld hl,util_gfx_restore_default_handler
+.notdefault:
+	ld (util_gfx_restore_handler),hl
 	ex hl,de
-	ld hl,util_gfx_restore_handler
-	jr z,.default
-	ld (hl),de
-	ret
-.default:
-	ld de,util_gfx_restore_default_handler
-	ld (hl),de
-	ret
-
+	jp (hl)
 
 ;-------------------------------------------------------------------------------
 ; internal library routines
@@ -1604,6 +1599,7 @@ util_set_offset:
 	call	util_get_offset_ptr
 	ld	(hl), bc
 	ret
+
 util_Arc_Unarc: ;properly handle garbage collects :P
 	call _ChkFindSym
 	push hl
