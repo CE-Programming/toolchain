@@ -1,0 +1,1428 @@
+define @ez80 @ez80
+element @ez80.dummy
+@ez80.unique = 0
+
+element @ez80.breg
+element   b?: @ez80.breg * 003o + 030o
+element  nz?: @ez80.breg * 010o + 001o
+element   z?: @ez80.breg * 010o + 011o
+element  nc?: @ez80.breg * 010o + 021o
+element   c?: @ez80.breg * 003o + 031o
+element  po?: @ez80.breg * 010o + 041o
+element  pe?: @ez80.breg * 010o + 051o
+nv? = po?
+v? = pe?
+element   p?: @ez80.breg * 010o + 061o
+element   m?: @ez80.breg * 010o + 071o
+element   d?: @ez80.breg * 003o + 032o
+element   e?: @ez80.breg * 003o + 033o
+element   h?: @ez80.breg * 003o + 034o
+element ixh?: @ez80.breg * 335o + 034o
+element iyh?: @ez80.breg * 375o + 034o
+element   l?: @ez80.breg * 003o + 035o
+element ixl?: @ez80.breg * 335o + 035o
+element iyl?: @ez80.breg * 375o + 035o
+element   f?: @ez80.breg * 002o + 036o
+element   a?: @ez80.breg * 003o + 037o
+
+element @ez80.irmb
+element   i?: @ez80.irmb * 107o + 127o
+element   r?: @ez80.irmb * 117o + 137o
+element  mb?: @ez80.irmb * 155o + 156o
+
+element @ez80.wreg
+element bc?: @ez80.wreg * 007o + 000o
+element de?: @ez80.wreg * 007o + 020o
+element hl?: @ez80.wreg * 007o + 040o
+element ix?: @ez80.wreg * 335o + 040o
+element iy?: @ez80.wreg * 375o + 040o
+element sp?: @ez80.wreg * 006o + 060o
+element af?: @ez80.wreg * 001o + 060o
+element af'? ;'
+
+calminstruction assume? value&
+	match =adl? == value, value
+	jno chain
+	compute value, value
+	check value and not 1
+	jyes errassume
+	compute @ez80.l, value * 11o
+	compute @ez80.il, value * 22o
+	compute @ez80.ws, value + word?
+	compute @ez80.adl, value
+	exit
+errassume:
+	err 'invalid assume adl, expected 0 or 1'
+chain:
+	execute =assume? value
+end calminstruction
+assume? adl = 1
+
+?long? = 3
+iterate <name,size,cond>, w,word,no, l,long,yes
+	calminstruction d#name? data*&
+		proxy current
+		local count, sequence, duplicate
+		check @ez80.adl
+		j#cond repeatend
+		emit =size?: data
+		exit
+	loop:
+		arrange count, current, 0
+		arrange sequence,
+		arrange data,
+		match count =dup? sequence, current, ()
+		match sequence =, data, sequence, ()
+		match current =, count, count, ()
+		jno splitend
+	splitloop:
+		execute =@ez80.=word =size?, @current
+		match current =, count, count, ()
+		jyes splitloop
+	splitend:
+		compute count, count
+		check count
+		jno repeatend
+	repeatloop:
+		arrange duplicate, sequence
+		match ( duplicate ), sequence
+	repeatsplitloop:
+		split current, duplicate
+		execute =@ez80.=word =size?, @current
+		jyes repeatsplitloop
+		compute count, count - 1
+		check count
+		jyes repeatloop
+	repeatend:
+		match current, data
+		jyes loop
+	end calminstruction
+
+	calminstruction r#name? count*
+		emit =size?: count =dup ?
+	end calminstruction
+
+	iterate type, d, r
+		calminstruction (label) type#name? parameters&
+			execute =label label: =size?
+			execute =type#=name parameters
+		end calminstruction
+	end iterate
+end iterate
+
+calminstruction @ez80.word size*, value*
+	proxy size, value
+	compute size, size
+	compute value, value
+	emit @size: @value
+end calminstruction
+
+calminstruction @ez80.calminstruction name&
+	local suffix, parameters, instructions
+	once arrange instructions, @ez80.instructions
+	match name suffix, name
+	arrange name, name=?
+	check definite name
+	jyes definite
+	publish name, @ez80.dummy
+definite:
+	arrange parameters,
+	match suffix= parameters, suffix
+	match ., suffix
+	jyes nosuffix
+	arrange name, name#suffix
+nosuffix:
+	publish :instructions, name
+	execute =calminstruction name parameters
+end calminstruction
+
+macro ?! isreg: metadata 1 element 1 eq @ez80
+	local size, value
+
+	macro calminstruction?.isindirect? argument*
+		unique done
+		local isindirect
+		match ( isindirect ), argument
+		bno done
+		match isindirect, isindirect, ()
+		label done
+	end macro
+
+	macro calminstruction?.indexprefix? argument*
+		unique done
+		proxy index
+		compute index, argument metadata 1 scale 1
+		check index > 300o
+		bno done
+		emit 1: @index
+		label done
+	end macro
+
+	macro calminstruction?.indexoffset? argument*
+		unique errrange, index, done
+		proxy offset
+		compute offset, argument scale 0
+		byes index
+		check offset
+		bno done
+		err 'invalid offset'
+		label errrange
+		err 'offset out of range'
+		label index
+		check offset >= -200o & offset < 200o
+		bno errrange
+		emit 1: @offset
+		label done
+	end macro
+
+	iterate <suffixsize: 2,suffixname,suffixencoding,suffixadjustment,wordsize: =@ez80.=ws>, \
+	                     3,        s?,          100o,              il,                     , \
+	                     3,        l?,          111o,              il,                     , \
+	                     3,       is?,          100o,              l ,               =word?, \
+	                     3,       il?,          122o,              l ,               =long?, \
+	                     3,      sis?,          100o,                ,               =word?, \
+	                     3,      lis?,          111o,                ,               =word?, \
+	                     3,      sil?,          122o,                ,               =long?, \
+	                     3,      lil?,          133o,                ,               =long?,
+		match adjustment, suffixadjustment
+			macro calminstruction?.emitsuffix?
+				local suffix
+				compute suffix, suffixencoding or @ez80.adjustment
+				emit 1: suffix
+			end macro
+		else match encoding, suffixencoding
+			macro calminstruction?.emitsuffix?
+				emit 1: suffixencoding
+			end macro
+		else
+			macro calminstruction?.emitsuffix?
+			end macro
+		end match
+		iterate <name*,  encoding*>, \
+		        nop   ,<      000o>, \
+		        rlca  ,<      007o>, \
+		        rrca  ,<      017o>, \
+		        rla   ,<      027o>, \
+		        rra   ,<      037o>, \
+		        daa   ,<      047o>, \
+		        cpl   ,<      057o>, \
+		        scf   ,<      067o>, \
+		        ccf   ,<      077o>, \
+		        halt  ,<      166o>, \
+		        exx   ,<      331o>, \
+		        di    ,<      363o>, \
+		        ei    ,<      373o>, \
+		        neg   ,<355o, 104o>, \
+		        retn  ,<355o, 105o>, \
+		        reti  ,<355o, 115o>, \
+		        rrd   ,<355o, 147o>, \
+		        rld   ,<355o, 157o>, \
+		        slp   ,<355o, 166o>, \
+		        stmix ,<355o, 175o>, \
+		        rsmix ,<355o, 176o>, \
+		        inim  ,<355o, 202o>, \
+		        otim  ,<355o, 203o>, \
+		        ini2  ,<355o, 204o>, \
+		        indm  ,<355o, 212o>, \
+		        otdm  ,<355o, 213o>, \
+		        ind2  ,<355o, 214o>, \
+		        inimr ,<355o, 222o>, \
+		        otimr ,<355o, 223o>, \
+		        ini2r ,<355o, 224o>, \
+		        indmr ,<355o, 232o>, \
+		        otdmr ,<355o, 233o>, \
+		        ind2r ,<355o, 234o>, \
+		        ldi   ,<355o, 240o>, \
+		        cpi   ,<355o, 241o>, \
+		        ini   ,<355o, 242o>, \
+		        outi  ,<355o, 243o>, \
+		        outi2 ,<355o, 244o>, \
+		        ldd   ,<355o, 250o>, \
+		        cpd   ,<355o, 251o>, \
+		        ind   ,<355o, 252o>, \
+		        outd  ,<355o, 253o>, \
+		        outd2 ,<355o, 254o>, \
+		        ldir  ,<355o, 260o>, \
+		        cpir  ,<355o, 261o>, \
+		        inir  ,<355o, 262o>, \
+		        otir  ,<355o, 263o>, \
+		        oti2r ,<355o, 264o>, \
+		        lddr  ,<355o, 270o>, \
+		        cpdr  ,<355o, 271o>, \
+		        indr  ,<355o, 272o>, \
+		        otdr  ,<355o, 273o>, \
+		        otd2r ,<355o, 274o>, \
+		        inirx ,<355o, 302o>, \
+		        otirx ,<355o, 303o>, \
+		        indrx ,<355o, 312o>, \
+		        otdrx ,<355o, 313o>
+			virtual
+				match suffix, suffixencoding
+					emit 1: suffix
+				end match
+				emit 1: encoding
+				size = $ - $$
+				load value: size from $$
+			end virtual
+			repeat 1, size: size, value: value
+				match adjustment, suffixadjustment
+					@ez80.calminstruction name.suffixname
+						emit size: value =or? =@ez80.=adjustment
+					end calminstruction
+				else
+					@ez80.calminstruction name.suffixname
+						emit size: value
+					end calminstruction
+				end match
+			end repeat
+		end iterate
+
+		iterate name, inc, dec
+			repeat 1, wordencoding: % shl 3 - 005o, byteencoding: % + 003o, \
+			          indirectencoding: % + 063o
+				@ez80.calminstruction name.suffixname lhs*
+					proxy opcode
+					isindirect lhs
+					compute lhs, lhs
+					jyes indirect
+					emitsuffix
+					indexprefix lhs
+					check lhs isreg.wreg & lhs metadata 1 scale 1 and 004o
+					jno byte
+					compute opcode, lhs metadata 1 scale 0 + wordencoding
+					emit 1: @opcode
+					exit
+				byte:
+					check lhs isreg.breg & lhs metadata 1 scale 1 and 001o
+					jno errarguments
+					compute opcode, lhs metadata 1 scale 0 shl 3 and 070o or byteencoding
+					emit 1: @opcode
+					exit
+				indirect:
+					check lhs relativeto lhs element 1 & lhs isreg.wreg & \
+					      lhs metadata 1 scale 0 = 040o
+					jno errarguments
+					emitsuffix
+					indexprefix lhs
+					emit 1: indirectencoding
+					indexoffset lhs
+					exit
+				errarguments:
+					err 'invalid arguments'
+				end calminstruction
+			end repeat
+		end iterate
+
+		@ez80.calminstruction ex.suffixname lhs*, rhs*
+			local lhsvalue, rhsvalue
+			isindirect lhs
+			jyes memory
+			isindirect rhs
+			jyes swap
+			compute lhsvalue, lhs
+			compute rhsvalue, rhs
+			check (lhsvalue eq de? & rhsvalue eq hl?) | \
+			      (rhsvalue eq de? & lhsvalue eq hl?)
+			jno notdehl
+			emitsuffix
+			emit 1: 353o
+			exit
+		notdehl:
+			check (lhsvalue eq af? & rhsvalue eq af'?) | \
+			      (rhsvalue eq af? & lhsvalue eq af'?)
+			jno errarguments
+			emitsuffix
+			emit 1: 010o
+			exit
+		swap:
+			compute rhsvalue, lhs
+			compute lhsvalue, rhs
+			jump swapped
+		memory:
+			isindirect rhs
+			jyes errindirection
+			compute lhsvalue, lhs
+			compute rhsvalue, rhs
+		swapped:
+			check lhsvalue eq sp? & rhsvalue eq rhsvalue element 1 & \
+			      rhsvalue metadata 1 scale 0 = 040o
+			jno errarguments
+			emitsuffix
+			indexprefix rhsvalue
+			emit 1: 343o
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction djnz.suffixname lhs*
+			proxy offset
+			isindirect lhs
+			jyes errindirection
+			compute offset, lhs - $ - suffixsize
+			check -200o <= offset & offset < 200o
+			jno errrange
+			emitsuffix
+			emit 1: 020o, @offset
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errrange:
+			err 'offset out of range'
+		end calminstruction
+
+		@ez80.calminstruction jr.suffixname lhs*, rhs
+			proxy opcode, offset
+			isindirect lhs
+			jyes errindirection
+			match , rhs
+			jyes unconditional
+			isindirect rhs
+			jyes errindirection
+			compute lhs, lhs
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 0 and 047o = 001o
+			jno errcondition
+			compute offset, rhs - $ - suffixsize
+			check -200o <= offset & offset < 200o
+			jno errrange
+			compute opcode, lhs metadata 1 scale 0 and 030o or 040o
+			emitsuffix
+			emit 1: @opcode, @offset
+			exit
+		unconditional:
+			compute offset, lhs - $ - suffixsize
+			check -200o <= offset & offset < 200o
+			jno errrange
+			emitsuffix
+			emit 1: 030o, @offset
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errcondition:
+			err 'invalid condition'
+		errrange:
+			err 'offset out of range'
+		end calminstruction
+
+		@ez80.calminstruction jq.suffixname lhs*, rhs
+			local after, address
+			proxy opcode, offset, rhs
+			compute after, @ez80.unique
+			compute @ez80.unique, after + 1
+			arrange after, =@ez80.=unique#after
+			match , rhs
+			jno conditional
+			arrange rhs, lhs
+			arrange lhs,
+		conditional:
+			isindirect rhs
+			jyes errindirection
+			check rhs relativeto after
+			jno far
+			compute offset, rhs - after
+			check offset | definite rhs
+			jno after
+			check -200o <= offset & offset < 200o
+			jno far
+			match , lhs
+			jyes nearunconditional
+			compute lhs, lhs
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 0 and 047o = 001o
+			jno farconditional
+			compute opcode, lhs metadata 1 scale 0 and 030o or 040o
+			emitsuffix
+			emit 1: @opcode, @offset
+			jump after
+		nearunconditional:
+			emitsuffix
+			emit 1: 030o, @offset
+			jump after
+		far:
+			match , lhs
+			jyes farunconditional
+			compute lhs, lhs
+		farconditional:
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 0 and 007o = 001o
+			jno errcondition
+			compute opcode, lhs metadata 1 scale 0 and 070o or 302o
+			emitsuffix
+			emit 1: @opcode
+			execute =@ez80.=word wordsize, @rhs
+			jump after
+		farunconditional:
+			emitsuffix
+			emit 1: 303o
+			execute =@ez80.=word wordsize, @rhs
+		after:
+			compute address, $?
+			publish after:, address
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errcondition:
+			err 'invalid condition'
+		end calminstruction
+
+		@ez80.calminstruction ld.suffixname lhs*, rhs*
+			proxy opcode, prefix, lhs, rhs
+			isindirect lhs
+			compute lhs, +lhs
+			jyes store
+			isindirect rhs
+			compute rhs, +rhs
+			jyes load
+			check lhs eq lhs element 1
+			jno errarguments
+			check lhs isreg.breg
+			jno notbyte
+			check rhs eq rhs element 1 & rhs isreg.breg &                       \
+			      lhs metadata 1 scale 1 and rhs metadata 1 scale 1 and 001o &  \
+			      (lhs metadata 1 scale 0 xor rhs metadata 1 scale 0 and 006o | \
+			       lhs metadata 1 scale 1 = rhs metadata 1 scale 1) &           \
+			      (~lhs eq rhs | lhs metadata 1 scale 0 > 033o)
+			jno notgetsetbyte
+			emitsuffix
+			compute prefix, lhs metadata 1 scale 1
+			check prefix > 300o
+			jyes byteindex
+			compute prefix, rhs metadata 1 scale 1
+			check prefix > 300o
+			jno notbyteindex
+		byteindex:
+			emit 1: @prefix
+		notbyteindex:
+			compute opcode, lhs metadata 1 scale 0 shl 3 and 070o + \
+			                rhs metadata 1 scale 0 and 007o or 100o
+			emit 1: @opcode
+			exit
+		notgetsetbyte:
+			check lhs eq a? & rhs eq rhs element 1 & rhs isreg.irmb
+			jno notgetirmb
+			compute opcode, rhs metadata 1 scale 0
+			emitsuffix
+			emit 1: 355o, @opcode
+			exit
+		notgetirmb:
+			check lhs metadata 1 scale 1 and 001o
+			jno errarguments
+			emitsuffix
+			indexprefix lhs
+			compute opcode, lhs metadata 1 scale 0 shl 3 and 070o or 006o
+			emit 1: @opcode, @rhs
+			exit
+		notbyte:
+			check lhs isreg.wreg & lhs metadata 1 scale 1 and 004o
+			jno notword
+			check lhs eq sp? & rhs eq rhs element 1 & rhs isreg.wreg & \
+			      rhs metadata 1 scale 0 = 040o
+			jno notsetsp
+			emitsuffix
+			indexprefix rhs
+			emit 1: 371o
+			exit
+		notsetsp:
+			check lhs eq hl? & rhs eq i?
+			jno setwordimmediate
+			emitsuffix
+			emit 1: 355o, 327o
+			exit
+		setwordimmediate:
+			emitsuffix
+			indexprefix lhs
+			compute opcode, lhs metadata 1 scale 0 or 001o
+			emit 1: @opcode
+			execute =@ez80.=word wordsize, @rhs
+			exit
+		notword:
+			check lhs isreg.irmb & rhs eq a?
+			jno notsetirmb
+			compute opcode, lhs metadata 1 scale 1
+			emitsuffix
+			emit 1: 355o, @opcode
+			exit
+		notsetirmb:
+			check lhs eq i? & rhs eq hl?
+			jno errarguments
+			emitsuffix
+			emit 1: 355o, 307o
+			exit
+		store:
+			isindirect rhs
+			jyes errindirection
+			compute rhs, +rhs
+			check lhs relativeto lhs element 1 & lhs isreg.wreg
+			jno notstoretowordregister
+			check lhs metadata 1 scale 0 = 040o
+			jno notstoretowordaccumulator
+			check rhs eq rhs element 1 & rhs isreg.breg & \
+			      rhs metadata 1 scale 1 = 003o
+			jno notstoretowordaccumulatorfrombyte
+			compute opcode, rhs metadata 1 scale 0 and 007o or 160o
+			emitsuffix
+			indexprefix lhs
+			emit 1: @opcode
+			indexoffset lhs
+			exit
+		notstoretowordaccumulatorfrombyte:
+			check rhs eq rhs element 1 & rhs isreg.wreg & \
+			      rhs metadata 1 scale 1 and 005o = 005o
+			jno storetowordaccumulatorfrombyte
+			compute opcode, rhs metadata 1 scale 0 or 017o
+			check rhs metadata 1 scale 1 > 300o
+			jno storetowordaccumulator
+			check lhs metadata 1 scale 1 xor rhs metadata 1 scale 1 and 040o
+			jno notstorematchingindex
+			compute opcode, opcode + 017o
+			jump storetowordaccumulator
+		notstorematchingindex:
+			compute opcode, opcode + 020o
+		storetowordaccumulator:
+			check lhs metadata 1 scale 1 > 300o
+			jno notstoretoindex
+			emitsuffix
+			indexprefix lhs
+			emit 1: @opcode
+			indexoffset lhs
+			exit
+		notstoretoindex:
+			check lhs scale 0
+			jyes errarguments
+			emitsuffix
+			emit 1: 355o, @opcode
+			exit
+		storetowordaccumulatorfrombyte:
+			emitsuffix
+			indexprefix lhs
+			emit 1: 066o
+			indexoffset lhs
+			emit 1: @rhs
+			exit
+		notstoretowordaccumulator:
+			check lhs metadata 1 scale 0 < 040o & rhs eq a?
+			jno errarguments
+			compute opcode, lhs metadata 1 scale 0 or 002o
+			emitsuffix
+			emit 1: @opcode
+			exit
+		notstoretowordregister:
+			check rhs eq a?
+			jno notstorefroma
+			emitsuffix
+			emit 1: 062o
+			execute =@ez80.=word wordsize, @lhs
+			exit
+		notstorefroma:
+			check rhs eq rhs element 1 & rhs isreg.wreg & \
+			      rhs metadata 1 scale 1 and 004o
+			jno errarguments
+			check rhs metadata 1 scale 0 = 040o
+			jno notstorefromindex
+			emitsuffix
+			indexprefix rhs
+			emit 1: 042o
+			execute =@ez80.=word wordsize, @lhs
+			exit
+		notstorefromindex:
+			compute opcode, rhs metadata 1 scale 0 or 103o
+			emitsuffix
+			emit 1: 355o, @opcode
+			execute =@ez80.=word wordsize, @lhs
+			exit
+		load:
+			check lhs eq lhs element 1
+			jno errarguments
+			check rhs relativeto rhs element 1 & rhs isreg.wreg
+			jno notloadwordregister
+			check rhs metadata 1 scale 0 = 040o
+			jno loadotherwordregister
+			check lhs isreg.breg & lhs metadata 1 scale 1 = 003o
+			jno notloadbyte
+			emitsuffix
+			indexprefix rhs
+			compute opcode, lhs metadata 1 scale 0 shl 3 and 070o or 106o
+			emit 1: @opcode
+			indexoffset rhs
+			exit
+		notloadbyte:
+			check lhs isreg.wreg & lhs metadata 1 scale 1 and 005o = 005o
+			jno errarguments
+			compute opcode, lhs metadata 1 scale 0 or 007o
+			check lhs metadata 1 scale 1 > 300o
+			jno notloadindex
+			check lhs metadata 1 scale 1 xor rhs metadata 1 scale 1 and 040o
+			jno loadsameindex
+			compute opcode, opcode + 012o
+			jump notloadindex
+		loadsameindex:
+			compute opcode, opcode + 020o
+		notloadindex:
+			compute prefix, rhs metadata 1 scale 1
+			emitsuffix
+			check prefix > 300o
+			jno notloadfromindex
+			emit 1: @prefix, @opcode
+			; assume yes
+			indexoffset rhs
+			exit
+		notloadfromindex:
+			check rhs scale 0
+			jyes errarguments
+			emit 1: 355o, @opcode
+			exit
+		loadotherwordregister:
+			check lhs eq a? & rhs metadata 1 scale 0 < 040o
+			jno errarguments
+			compute opcode, rhs metadata 1 scale 0 or 012o
+			emitsuffix
+			emit 1: @opcode
+			exit
+		notloadwordregister:
+			check lhs eq a?
+			jno notloadaimmediate
+			emitsuffix
+			emit 1: 072o
+			execute =@ez80.=word wordsize, @rhs
+			exit
+		notloadaimmediate:
+			check lhs isreg.wreg & lhs metadata 1 scale 1 and 004o
+			jno errarguments
+			check lhs metadata 1 scale 0 = 040o
+			jno loadotherwordimmediate
+			emitsuffix
+			indexprefix lhs
+			emit 1: 052o
+			execute =@ez80.=word wordsize, @rhs
+			exit
+		loadotherwordimmediate:
+			compute opcode, lhs metadata 1 scale 0 or 113o
+			emitsuffix
+			emit 1: 355o, @opcode
+			execute =@ez80.=word wordsize, @rhs
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction add.suffixname lhs*, rhs
+			proxy opcode, rhs
+			match , rhs
+			jyes implicit
+			isindirect lhs
+			jyes errindirection
+			compute lhs, lhs
+			check lhs eq a?
+			jyes byte
+			isindirect rhs
+			jyes errindirection
+			compute rhs, rhs
+			check lhs eq lhs element 1 & lhs isreg.wreg &                           \
+			      rhs eq rhs element 1 & lhs isreg.wreg &                           \
+			      lhs metadata 1 scale 0 = 040o & rhs metadata 1 scale 1 and 004o & \
+			      (lhs metadata 1 scale 0 <> rhs metadata 1 scale 0 |               \
+			       lhs metadata 1 scale 1 =  rhs metadata 1 scale 1)
+			jno errarguments
+			compute opcode, rhs metadata 1 scale 0 or 011o
+			emitsuffix
+			indexprefix lhs
+			emit 1: @opcode
+			exit
+		implicit:
+			arrange rhs, lhs
+		byte:
+			isindirect rhs
+			compute rhs, +rhs
+			jyes indirect
+			check rhs eq rhs element 1 & rhs isreg.breg & \
+			      rhs metadata 1 scale 1 and 001o
+			jno immediate
+			compute opcode, rhs metadata 1 scale 0 and 007o or 200o
+			emitsuffix
+			indexprefix rhs
+			emit 1: @opcode
+			exit
+		indirect:
+			check rhs relativeto rhs element 1 & rhs isreg.wreg & \
+			      rhs metadata 1 scale 0 = 040o
+			jno errarguments
+			emitsuffix
+			indexprefix rhs
+			emit 1: 206o
+			indexoffset rhs
+			exit
+		immediate:
+			emitsuffix
+			emit 1: 306o, @rhs
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		iterate name, adc, sbc
+			repeat 1, byteencoding: 170o + % shl 4, \
+			      indirectencoding: 176o + % shl 4, \
+			          wordencoding: 122o - % shl 3, \
+			     immediateencoding: 276o + % shl 4
+				@ez80.calminstruction name.suffixname lhs*, rhs
+					proxy opcode, rhs
+					match , rhs
+					jyes implicit
+					isindirect lhs
+					jyes errindirection
+					compute lhs, lhs
+					check lhs eq a?
+					jyes byte
+					isindirect rhs
+					jyes errindirection
+					compute rhs, rhs
+					check lhs eq hl? & rhs eq rhs element 1 & rhs isreg.wreg & \
+					      rhs metadata 1 scale 1 and 002o
+					jno errarguments
+					compute opcode, rhs metadata 1 scale 0 or wordencoding
+					emitsuffix
+					emit 1: 355o, @opcode
+					exit
+				implicit:
+					arrange rhs, lhs
+				byte:
+					isindirect rhs
+					compute rhs, +rhs
+					jyes indirect
+					check rhs eq rhs element 1 & rhs isreg.breg & \
+					      rhs metadata 1 scale 1 and 001o
+					jno immediate
+					compute opcode, rhs metadata 1 scale 0 and 007o or byteencoding
+					emitsuffix
+					indexprefix rhs
+					emit 1: @opcode
+					exit
+				indirect:
+					check rhs relativeto rhs element 1 & rhs isreg.wreg & \
+					      rhs metadata 1 scale 0 = 040o
+					jno errarguments
+					emitsuffix
+					indexprefix rhs
+					emit 1: indirectencoding
+					indexoffset rhs
+					exit
+				immediate:
+					emitsuffix
+					emit 1: immediateencoding, @rhs
+					exit
+				errindirection:
+					err 'invalid indirection'
+				errarguments:
+					err 'invalid arguments'
+				end calminstruction
+			end repeat
+		end iterate
+
+		iterate <name*,encoding*>, sub,220o, and,240o, xor,250o, or,260o, cp,270o
+			repeat 1, indirectencoding: encoding or 006o, \
+			         immediateencoding: encoding or 106o
+				@ez80.calminstruction name.suffixname lhs*, rhs
+					proxy opcode, lhs
+					match , rhs
+					jyes implicit
+					isindirect lhs
+					jyes errindirection
+					check lhs eq a?
+					jno errarguments
+					arrange lhs, rhs
+				implicit:
+					isindirect lhs
+					compute lhs, +lhs
+					jyes indirect
+					check lhs relativeto lhs element 1 & lhs isreg.breg & \
+					      lhs metadata 1 scale 1 and 001o
+					jno immediate
+					compute opcode, lhs metadata 1 scale 0 and 007o or encoding
+					emitsuffix
+					indexprefix lhs
+					emit 1: @opcode
+					exit
+				indirect:
+					check lhs relativeto lhs element 1 & lhs isreg.wreg & \
+					      lhs metadata 1 scale 0 = 040o
+					jno errarguments
+					emitsuffix
+					indexprefix lhs
+					emit 1: indirectencoding
+					indexoffset lhs
+					exit
+				immediate:
+					emitsuffix
+					emit 1: immediateencoding, @lhs
+					exit
+				errindirection:
+					err 'invalid indirection'
+				errarguments:
+					err 'invalid arguments'
+				end calminstruction
+			end repeat
+		end iterate
+
+		@ez80.calminstruction tst.suffixname lhs*, rhs
+				proxy opcode, lhs
+				match , rhs
+				jyes implicit
+				isindirect lhs
+				jyes errindirection
+				check lhs eq a?
+				jno errarguments
+				arrange lhs, rhs
+			implicit:
+				isindirect lhs
+				jyes indirect
+				compute lhs, +lhs
+				check lhs eq lhs element 1 & lhs isreg.breg & \
+				      lhs metadata 1 scale 1 = 003o
+				jno immediate
+				compute opcode, lhs metadata 1 scale 0 shl 3 and 070o or 004o
+				emitsuffix
+				indexprefix lhs
+				emit 1: 355o, @opcode
+				exit
+			indirect:
+				check lhs eq hl?
+				jno errarguments
+				emitsuffix
+				emit 1: 355o, 064o
+				exit
+			immediate:
+				emitsuffix
+				emit 1: 355o, 144o, @lhs
+				exit
+			errindirection:
+				err 'invalid indirection'
+			errarguments:
+				err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction ret.suffixname lhs
+			proxy opcode
+			match , lhs
+			jyes unconditional
+			isindirect lhs
+			jyes errindirection
+			compute lhs, lhs
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 0 and 007o = 001o
+			jno errarguments
+			compute opcode, lhs metadata 1 scale 0 and 070o or 300o
+			emitsuffix
+			emit 1: @opcode
+			exit
+		unconditional:
+			emitsuffix
+			emit 1: 311o
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		iterate name, pop, push
+			repeat 1, wordencoding: 275o + % shl 2
+				@ez80.calminstruction name.suffixname rhs&
+					proxy opcode
+				loop:
+					split lhs, rhs
+					isindirect lhs
+					jyes errindirection
+					compute lhs, lhs
+					check lhs eq lhs element 1 & lhs isreg.wreg & \
+					      lhs metadata 1 scale 1 and 001o
+					jno effective
+					compute opcode, lhs metadata 1 scale 0 + wordencoding
+					emitsuffix
+					indexprefix lhs
+					emit 1: @opcode
+					match , rhs
+					jno loop
+					exit
+				effective:
+					check lhs relativeto lhs element 1 & lhs isreg.wreg & \
+					      lhs metadata 1 scale 1 > 300o
+					jno errarguments
+					compute opcode, lhs metadata 1 scale 1 shr 5 and 001o + 145o
+					emitsuffix
+					emit 1: 355o, @opcode
+					indexoffset lhs
+					match , rhs
+					jno loop
+					exit
+				errindirection:
+					err 'invalid indirection'
+				errarguments:
+					err 'invalid arguments'
+				end calminstruction
+			end repeat
+		end iterate
+
+		@ez80.calminstruction jp.suffixname lhs*, rhs
+			proxy opcode, lhs, rhs
+			isindirect lhs
+			compute lhs, +lhs
+			jyes register
+			match , rhs
+			jyes unconditional
+			isindirect rhs
+			jyes errindirection
+			compute rhs, +rhs
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 0 and 007o = 001o
+			jno errcondition
+			compute opcode, lhs metadata 1 scale 0 and 070o or 302o
+			emitsuffix
+			emit 1: @opcode
+			execute =@ez80.=word wordsize, @rhs
+			exit
+		unconditional:
+			emitsuffix
+			emit 1: 303o
+			execute =@ez80.=word wordsize, @lhs
+			exit
+		register:
+			match , rhs
+			jno errindirection
+			check lhs eq lhs element 1 & lhs isreg.wreg & \
+			      lhs metadata 1 scale 0 = 040o
+			jno errarguments
+			emitsuffix
+			indexprefix lhs
+			emit 1: 351o
+			exit
+		errcondition:
+			err 'invalid condition'
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction call.suffixname lhs*, rhs
+			proxy opcode, lhs, rhs
+			isindirect lhs
+			jyes errindirection
+			compute lhs, +lhs
+			match , rhs
+			jyes unconditional
+			isindirect rhs
+			jyes errindirection
+			compute rhs, +rhs
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 0 and 007o = 001o
+			jno errcondition
+			compute opcode, lhs metadata 1 scale 0 and 070o or 304o
+			emitsuffix
+			emit 1: @opcode
+			execute =@ez80.=word wordsize, @rhs
+			exit
+		unconditional:
+			emitsuffix
+			emit 1: 315o
+			execute =@ez80.=word wordsize, @lhs
+			exit
+		errcondition:
+			err 'invalid condition'
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction rst.suffixname lhs*
+			proxy opcode
+			isindirect lhs
+			jyes errindirection
+			compute lhs, lhs
+			check lhs = lhs and 070o
+			jno errtarget
+			compute opcode, lhs or 307o
+			emitsuffix
+			emit 1: @opcode
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errtarget:
+			err 'invalid rst target'
+		end calminstruction
+
+		iterate <name*,encoding*>, \
+		         rlc  ,000o      , \
+		         rrc  ,010o      , \
+		         rr   ,030o      , \
+		         sla  ,040o      , \
+		         sra  ,050o      , \
+		         srl  ,070o
+			repeat 1, indirectencoding: encoding or 006o
+				@ez80.calminstruction name.suffixname lhs*
+					proxy opcode
+					isindirect lhs
+					compute lhs, lhs
+					jyes indirect
+					check lhs eq lhs element 1 & lhs isreg.breg & \
+					      lhs metadata 1 scale 1 = 003o
+					jno errarguments
+					compute opcode, lhs metadata 1 scale 0 and 007o or encoding
+					emitsuffix
+					emit 1: 313o, @opcode
+					exit
+				indirect:
+					check lhs relativeto lhs element 1 & lhs isreg.wreg & \
+					      lhs metadata 1 scale 0 = 040o
+					jno errarguments
+					compute opcode, indirectencoding
+					emitsuffix
+					indexprefix lhs
+					emit 1: 313o
+					indexoffset lhs
+					emit 1: @opcode
+					exit
+				errarguments:
+					err 'invalid arguments'
+				end calminstruction
+			end repeat
+		end iterate
+
+		@ez80.calminstruction rl.suffixname lhs*
+			proxy opcode
+			isindirect lhs
+			compute lhs, lhs
+			jyes indirect
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 1 = 003o
+			jno reserve
+			compute opcode, lhs metadata 1 scale 0 and 007o or 020o
+			emitsuffix
+			emit 1: 313o, @opcode
+			exit
+		indirect:
+			check lhs relativeto lhs element 1 & lhs isreg.wreg & \
+			      lhs metadata 1 scale 0 = 040o
+			jno reserve
+			compute opcode, 026o
+			emitsuffix
+			indexprefix lhs
+			emit 1: 313o
+			indexoffset lhs
+			emit 1: @opcode
+			exit
+		reserve:
+			check elementsof lhs
+			jyes errarguments
+			compute opcode, long? * lhs
+			emit @opcode: ?
+			exit
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		iterate name, bit, res, set
+			repeat 1, byteencoding: % shl 6, indirectencoding: % shl 6 or 006o
+				@ez80.calminstruction name.suffixname lhs*, rhs*
+					proxy opcode
+					isindirect lhs
+					jyes errindirection
+					compute lhs, lhs
+					check elementsof lhs
+					jyes errarguments
+					isindirect rhs
+					compute rhs, rhs
+					jyes indirect
+					check rhs eq rhs element 1
+					jno errarguments
+					check lhs = lhs and 007o & rhs isreg.breg & \
+					      rhs metadata 1 scale 1 = 003o
+					jno notbyte
+					compute opcode, rhs metadata 1 scale 0 and 007o or lhs shl 3 or \
+					                byteencoding
+				done:
+					emitsuffix
+					emit 1: 313o, @opcode
+					exit
+				notbyte:
+					check lhs = lhs and 017o & rhs isreg.wreg & \
+					      rhs metadata 1 scale 1 = 007o
+					jno errarguments
+					compute opcode, lhs shl 3 and 070o or              \
+					                rhs metadata 1 scale 0 shr 3 or    \
+					                byteencoding or lhs shr 3 xor 001o
+					jump done
+				indirect:
+					check rhs relativeto rhs element 1 & rhs isreg.wreg & \
+					      rhs metadata 1 scale 0 = 040o
+					jno errarguments
+					compute opcode, lhs shl 3 and 070o or indirectencoding
+					emitsuffix
+					indexprefix rhs
+					emit 1: 313o
+					indexoffset lhs shr 3 + rhs
+					emit 1: @opcode
+					exit
+				errindirection:
+					err 'invalid indirection'
+				errarguments:
+					err 'invalid arguments'
+				end calminstruction
+			end repeat
+		end iterate
+
+		@ez80.calminstruction out.suffixname lhs*, rhs*
+			proxy opcode, lhs
+			isindirect lhs
+			jno errindirection
+			isindirect rhs
+			jyes errindirection
+			compute lhs, +lhs
+			compute rhs, rhs
+			check lhs eq bc? | lhs eq c?
+			jno immediate
+			check rhs eq rhs element 1
+			jno errarguments
+			check rhs isreg.breg & rhs metadata 1 scale 1 = 003o
+			jno notbyteregister
+			compute opcode, rhs metadata 1 scale 0 shl 3 and 070o or 101o
+			emitsuffix
+			emit 1: 355o, @opcode
+			exit
+		notbyteregister:
+			check elementsof rhs
+			jyes errarguments
+			emitsuffix
+			emit 1: 355o, 161o
+			exit
+		immediate:
+			check rhs eq a?
+			jno errarguments
+			emitsuffix
+			emit 1: 323o, @lhs
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction in.suffixname lhs*, rhs
+			proxy opcode, rhs
+			match , rhs
+			jyes implicit
+			isindirect lhs
+			jyes errindirection
+		implicitreturn:
+			isindirect rhs
+			jno errindirection
+			compute lhs, lhs
+			compute rhs, +rhs
+			check rhs eq bc? | rhs eq c? & lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 1 and 002o
+			jno immediate
+			compute opcode, lhs metadata 1 scale 0 shl 3 and 070o or 100o
+			emitsuffix
+			emit 1: 355o, @opcode
+			exit
+		implicit:
+			arrange rhs, lhs
+			compute lhs, f?
+			jump implicitreturn
+		immediate:
+			check lhs eq a?
+			jno errarguments
+			emitsuffix
+			emit 1: 333o, @rhs
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction in0.suffixname lhs*, rhs
+			proxy opcode, rhs
+			match , rhs
+			jyes implicit
+			isindirect lhs
+			jyes errindirection
+		implicitreturn:
+			isindirect rhs
+			jno errindirection
+			compute lhs, lhs
+			compute rhs, +rhs
+			check lhs eq lhs element 1 & lhs isreg.breg & \
+			      lhs metadata 1 scale 1 and 002o
+			jno errarguments
+			compute opcode, lhs metadata 1 scale 0 shl 3 and 070o
+			emitsuffix
+			emit 1: 355o, @opcode, @rhs
+			exit
+		implicit:
+			arrange rhs, lhs
+			compute lhs, f?
+			jump implicitreturn
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction out0.suffixname lhs*, rhs*
+			proxy opcode, lhs
+			isindirect lhs
+			jno errindirection
+			isindirect rhs
+			jyes errindirection
+			compute lhs, +lhs
+			compute rhs, rhs
+			check rhs eq rhs element 1 & rhs isreg.breg & \
+			      rhs metadata 1 scale 1 = 003o
+			jno errarguments
+			compute opcode, rhs metadata 1 scale 0 shl 3 and 070o or 001o
+			emitsuffix
+			emit 1: 355o, @opcode, @lhs
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction tstio.suffixname lhs*
+			proxy lhs
+			isindirect lhs
+			jyes errindirection
+			compute lhs, +lhs
+			emitsuffix
+			emit 1: 355o, 164o, @lhs
+			exit
+		errindirection:
+			err 'invalid indirection'
+		end calminstruction
+
+		@ez80.calminstruction lea.suffixname lhs*, rhs*
+			proxy opcode, offset
+			isindirect lhs
+			jyes errindirection
+			isindirect rhs
+			jyes errindirection
+			compute lhs, lhs
+			compute rhs, rhs
+			check lhs eq lhs element 1 & lhs isreg.wreg &         \
+			      lhs metadata 1 scale 0 <> 060o &                \
+			      rhs relativeto rhs element 1 & rhs isreg.wreg & \
+			      rhs metadata 1 scale 1 > 300o
+			jno errarguments
+			compute offset, rhs scale 0
+			check -200o <= offset & offset < 200o
+			jno errrange
+			check lhs metadata 1 scale 1 = 007o
+			jno index
+			compute opcode, rhs metadata 1 scale 1 shr 5 and 001o or \
+			                lhs metadata 1 scale 0 or 002o
+		done:
+			emitsuffix
+			emit 1: 355o, @opcode, @offset
+			exit
+		index:
+			check lhs relativeto rhs
+			jno different
+			compute opcode, lhs metadata 1 scale 1 shr 5 and 001o or 062o
+			jump done
+		different:
+			compute opcode, lhs metadata 1 scale 1 shr 5 and 001o or 124o
+			jump done
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		errrange:
+			err 'offset out of range'
+		end calminstruction
+
+		@ez80.calminstruction pea.suffixname lhs*
+			proxy opcode, offset
+			isindirect lhs
+			jyes errindirection
+			compute lhs, lhs
+			check lhs relativeto lhs element 1 & lhs isreg.wreg & \
+			      lhs metadata 1 scale 1 > 300o
+			jno errarguments
+			compute opcode, lhs metadata 1 scale 1 shr 5 and 001o + 145o
+			compute offset, lhs scale 0
+			check -200o <= offset & offset < 200o
+			jno errrange
+			emitsuffix
+			emit 1: 355o, @opcode, @offset
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		errrange:
+			err 'offset out of range'
+		end calminstruction
+
+		@ez80.calminstruction im.suffixname lhs*
+			isindirect lhs
+			jyes errindirection
+			compute lhs, lhs
+			check lhs = 1
+			jyes one
+			check lhs = 2
+			jyes two
+			check lhs
+			jyes errarguments
+			emitsuffix
+			emit 1: 355o, 106o
+			exit
+		one:
+			emitsuffix
+			emit 1: 355o, 126o
+			exit
+		two:
+			emitsuffix
+			emit 1: 355o, 136o
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		@ez80.calminstruction mlt.suffixname lhs*
+			proxy opcode
+			isindirect lhs
+			jyes errindirection
+			compute lhs, lhs
+			check lhs eq lhs element 1 & lhs isreg.wreg & \
+			      lhs metadata 1 scale 1 and 002o
+			jno errarguments
+			compute opcode, lhs metadata 1 scale 0 or 114o
+			emitsuffix
+			emit 1: 355o, @opcode
+			exit
+		errindirection:
+			err 'invalid indirection'
+		errarguments:
+			err 'invalid arguments'
+		end calminstruction
+
+		purge calminstruction?.emitsuffix?
+	end iterate
+
+	iterate command, isindirect, indexprefix, indexoffset
+		purge calminstruction?.command?
+	end iterate
+
+	purge ?
+end macro

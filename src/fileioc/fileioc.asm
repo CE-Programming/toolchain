@@ -1572,6 +1572,69 @@ util_set_offset:
 	call	util_get_offset_ptr
 	ld	(hl), bc
 	ret
+<<<<<<< HEAD
+=======
+util_Arc_Unarc: ;properly handle garbage collects :P
+	call _ChkFindSym
+	push hl
+	call _ChkInRAM
+	pop hl
+	jr nz,.arc_unarc ;if the file is already in archive, we won't trigger a gc
+	call _LoadDEInd_s
+	ld hl,12
+	add hl,de
+	call _FindFreeArcSpot ;check if we will trigger a gc
+	jr nz,.arc_unarc ;gc will not be triggered
+	ld a,(mpLcdCtrl)
+	cp a,lcdBpp16
+	jr z,.arc_unarc ;already in OS 16bpp graphics mode
+	push af ;save lcd mode
+	call _ClrLCDFull
+	call _DrawStatusBar
+	ld a,lcdBpp16
+	ld (mpLcdCtrl),a
+	call _Arc_Unarc
+	pop af ;restore lcd mode
+	ld (mpLcdCtrl),a
+	jp util_gfx_restore_default_handler
+util_gfx_restore_handler:=$-3
+.arc_unarc:
+	jp _Arc_Unarc
+
+
+util_gfx_restore_default_handler:
+	call	_RunIndicOff
+	di					; turn off indicator
+	ld hl,$D40000
+	ld (hl),l
+	ld bc,320*240
+	push hl
+	pop de
+	inc de
+	ldir
+.setup:
+	ld	a,lcdBpp8
+	ld	(mpLcdCtrl),a		; operate in 8bpp
+	ld	hl,mpLcdPalette
+	ld	b,0
+.loop:
+	ld	d,b
+	ld	a,b
+	and	a,192
+	srl	d
+	rra
+	ld	e,a
+	ld	a,31
+	and	a,b
+	or	a,e
+	ld	(hl),a
+	inc	hl
+	ld	(hl),d
+	inc	hl
+	inc	b
+	jr	nz,.loop
+	ret
+>>>>>>> 5dc5b1f4... Complete fileioc gc handling
 
 ;-------------------------------------------------------------------------------
 ; Internal library data
