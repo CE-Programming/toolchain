@@ -60,6 +60,13 @@ library 'FILEIOC', 5
 	export ti_ArchiveHasRoom
 
 ;-------------------------------------------------------------------------------
+; v6 functions
+;-------------------------------------------------------------------------------
+	export ti_SetPostGCHandler
+
+
+
+;-------------------------------------------------------------------------------
 vat_ptr0 := $d0244e
 vat_ptr1 := $d0257b
 vat_ptr2 := $d0257e
@@ -461,7 +468,7 @@ ti_SetArchiveStatus:
 .set_archived:
 	push	bc
 	pop	af
-	call	z, _Arc_Unarc
+	call	z, util_Arc_Unarc
 	jr	.relocate_var
 .set_not_archived:
 	push	bc
@@ -1206,7 +1213,7 @@ ti_Rename:
 	inc	de
 	call	_Mov8b
 	call	_PushOP1		; save old name
-	ld	hl, _Arc_Unarc
+	ld	hl, util_Arc_Unarc
 	ld	(.smc_archive), hl
 	pop	hl			; new name
 	ld	de, OP1 + 1
@@ -1224,7 +1231,7 @@ ti_Rename:
 	ld	hl, $f8			; $f8 = ret
 	ld	(.smc_archive), hl
 	call	_PushOP1
-	call	_Arc_Unarc
+	call	util_Arc_Unarc
 	call	_PopOP1
 	jr	.locate_program
 .in_archive:
@@ -1257,7 +1264,7 @@ ti_Rename:
 	ldir
 .is_zero:
 	call	_PopOP1
-	call	_Arc_Unarc
+	call	util_Arc_Unarc
 .smc_archive := $-3
 	call	_PopOP1
 	call	_ChkFindSym
@@ -1392,6 +1399,31 @@ ti_ArchiveHasRoom:
 	ret	nz
 	dec	a
 	ret
+
+;-------------------------------------------------------------------------------
+ti_SetPostGCHandler:
+;Set handler for setting up the screen after a garbage collect
+; args:
+;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
+; return:
+;   None
+	pop bc
+	pop hl
+	push hl
+	push bc
+	add hl,bc
+	or a,a
+	sbc hl,bc
+	ex hl,de
+	ld hl,util_gfx_restore_handler
+	jr z,.default
+	ld (hl),de
+	ret
+.default:
+	ld de,util_gfx_restore_default_handler
+	ld (hl),de
+	ret
+
 
 ;-------------------------------------------------------------------------------
 ; internal library routines
@@ -1572,8 +1604,6 @@ util_set_offset:
 	call	util_get_offset_ptr
 	ld	(hl), bc
 	ret
-<<<<<<< HEAD
-=======
 util_Arc_Unarc: ;properly handle garbage collects :P
 	call _ChkFindSym
 	push hl
@@ -1634,7 +1664,6 @@ util_gfx_restore_default_handler:
 	inc	b
 	jr	nz,.loop
 	ret
->>>>>>> 5dc5b1f4... Complete fileioc gc handling
 
 ;-------------------------------------------------------------------------------
 ; Internal library data
