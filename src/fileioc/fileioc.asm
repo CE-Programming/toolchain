@@ -1606,26 +1606,26 @@ util_set_offset:
 	ret
 util_Arc_Unarc: ;properly handle garbage collects :P
 	call _ChkFindSym
-	call _LoadDEInd_s
-	push de
+	push hl
 	call _ChkInRAM
-	pop de
+	pop hl
 	jr nz,.arc_unarc ;if the file is already in archive, we won't trigger a gc
-	push de
-	call ti_ArchiveHasRoom ;check if we will trigger a gc
-	pop bc
-	or a,a
+	call _LoadDEInd_s
+	ld hl,12
+	add hl,de
+	call _FindFreeArcSpot ;check if we will trigger a gc
 	jr nz,.arc_unarc ;gc will not be triggered
-	ld a,(_mpLcdCtrl)
+	ld a,(mpLcdCtrl)
 	cp a,lcdBpp16
 	jr z,.arc_unarc ;already in OS 16bpp graphics mode
 	push af ;save lcd mode
 	call _ClrLCDFull
+	call _DrawStatusBar
 	ld a,lcdBpp16
-	ld (_mpLcdCtrl),a
+	ld (mpLcdCtrl),a
 	call _Arc_Unarc
 	pop af ;restore lcd mode
-	ld (_mpLcdCtrl),a
+	ld (mpLcdCtrl),a
 	jp util_gfx_restore_default_handler
 util_gfx_restore_handler:=$-3
 .arc_unarc:
@@ -1635,11 +1635,17 @@ util_gfx_restore_handler:=$-3
 util_gfx_restore_default_handler:
 	call	_RunIndicOff
 	di					; turn off indicator
-	call	_ClrLCD
+	ld hl,$D40000
+	ld (hl),l
+	ld bc,320*240
+	push hl
+	pop de
+	inc de
+	ldir
 .setup:
-	ld	a,_lcdBpp8
-	ld	(_mpLcdCtrl),a		; operate in 8bpp
-	ld	hl,_mpLcdPalette
+	ld	a,lcdBpp8
+	ld	(mpLcdCtrl),a		; operate in 8bpp
+	ld	hl,mpLcdPalette
 	ld	b,0
 .loop:
 	ld	d,b

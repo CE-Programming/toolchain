@@ -1,0 +1,110 @@
+macro ?!
+	local debug, name, temp
+	name equ debug
+	macro calminstruction?.debug? pattern&
+		arrange temp, pattern
+		stringify temp
+		publish :name, temp
+	end macro
+	postpone ?
+		irpv debug, debug
+			display debug, 10
+		end irpv
+	end postpone
+
+	macro calminstruction?.debugexecute? pattern&
+		debug pattern
+		arrange temp, pattern
+		assemble temp
+	end macro
+
+	macro calminstruction?.execute? pattern&
+		arrange temp, pattern
+		assemble temp
+	end macro
+
+	macro calminstruction?.next? symbol*
+		local counter
+		match symbol.counter, symbol
+		compute counter, counter + 1
+		arrange symbol, symbol.counter
+	end macro
+
+	macro calminstruction?.split? current, rest*, split: <=,>
+		local current
+		arrange current, rest
+		arrange rest,
+		match current split rest, current
+	end macro
+
+	iterate command, display, emit
+		macro calminstruction?.command? arguments&
+			execute =command? arguments
+		end macro
+	end iterate
+
+	macro calminstruction?.err? message&
+		execute =err? message
+		exit
+	end macro
+
+	macro calminstruction?.labels? labels*&
+		local labels
+		arrange temp, =unique labels
+		execute temp
+	end macro
+
+	purge ?
+end macro
+
+calminstruction calminstruction?.evaluate? command&
+	transform command
+	assemble command
+end calminstruction
+
+calminstruction calminstruction?.once? variable*, value&
+	local name
+	match =arrange? variable, variable
+	jyes symbolic
+	match =compute? variable, variable
+	jno unsupported
+	compute value, value
+symbolic:
+	arrange name, variable
+	match name:, name
+	match :name, name
+	execute =local name
+	publish variable, value
+	exit
+unsupported:
+	err 'unsupported command in once'
+end calminstruction
+
+calminstruction calminstruction?.proxy? variables*&
+	local proxy
+	execute =local variables
+loop:
+	split variable, variables
+	execute =once =arrange =@#variable, variable
+	jyes loop
+end calminstruction
+
+calminstruction calminstruction?.unique? variables*&
+	local unique
+	once compute counter, 0
+	execute =local variables
+loop:
+	split variable, variables
+	arrange unique, variable#counter
+	publish variable, unique
+	compute counter, counter + 1
+	jyes loop
+end calminstruction
+
+iterate <name,pattern*>, label,label:, branch,=jump label, byes,=jyes label, bno,=jno label
+	calminstruction calminstruction?.name? label*
+		transform label
+		arrange label, pattern
+		assemble label
+	end calminstruction
+end iterate
