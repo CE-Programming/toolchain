@@ -382,6 +382,14 @@ uint8_t ti_RclVar(const uint8_t var_type, const char *var_name, void **data_stru
  */
 bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
+
+/**
+ * Set routine to run after a garbage collect.
+ * @param routine Routine to run following a garbage collect
+ * @note Useful for setting up the graphics palette.
+ * */
+void ti_SetPostGCHandler((void)(*routine)(void));
+
 /**
  * Allocates space for a real variable
  * @returns Pointer to variable
