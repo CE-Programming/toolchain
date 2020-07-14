@@ -385,10 +385,18 @@ bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
 /**
  * Set routine to run after a garbage collect.
- * @param routine Routine to run following a garbage collect. If this is 0, the default handler will be used.
+ * @param routine Routine to run following a garbage collect. NULL sets it to do nothing.
  * @note Useful for setting up the graphics palette.
  * */
-void ti_SetPostGCHandler((void)(*routine)(void));
+void ti_SetPostGCHandler(void (*routine)(void));
+
+/**
+ * Set routine to run before a garbage collect.
+ * @param routine Routine to run preceeding a garbage collect. NULL sets it to do nothing.
+ * @note Useful for cleanup. Make sure to set OS graphics mode during.
+ * */
+void ti_SetPreGCHandler(void (*routine)(void));
+
 
 /**
  * Allocates space for a real variable

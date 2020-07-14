@@ -63,7 +63,7 @@ library 'FILEIOC', 5
 ; v6 functions
 ;-------------------------------------------------------------------------------
 	export ti_SetPostGCHandler
-
+	export ti_SetPreGCHandler
 
 
 ;-------------------------------------------------------------------------------
@@ -1414,11 +1414,34 @@ ti_SetPostGCHandler:
 	or a,a
 	sbc hl,de
 	jr nz,.notdefault
-	ld hl,util_gfx_restore_default_handler
+	ld hl,util_post_gc_default_handler
 .notdefault:
-	ld (util_gfx_restore_handler),hl
+	ld (util_post_gc_handler),hl
 	ex hl,de
 	jp (hl)
+util_post_gc_default_handler:=$F8
+
+;-------------------------------------------------------------------------------
+ti_SetPreGCHandler:
+;Set handler for setting up the screen after a garbage collect
+; args:
+;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
+; return:
+;   None
+	pop de
+	ex (sp),hl
+	push de
+	add hl,de
+	or a,a
+	sbc hl,de
+	jr nz,.notdefault
+	ld hl,util_pre_gc_default_handler
+.notdefault:
+	ld (util_pre_gc_handler),hl
+	ex hl,de
+	jp (hl)
+util_pre_gc_default_handler:=$F8
+
 
 ;-------------------------------------------------------------------------------
 ; internal library routines
@@ -1611,55 +1634,15 @@ util_Arc_Unarc: ;properly handle garbage collects :P
 	add hl,de
 	call _FindFreeArcSpot ;check if we will trigger a gc
 	jr nz,.arc_unarc ;gc will not be triggered
-	ld a,(mpLcdCtrl)
-	cp a,lcdBpp16
-	jr z,.arc_unarc ;already in OS 16bpp graphics mode
-	push af ;save lcd mode
-	call _ClrLCDFull
-	call _DrawStatusBar
-	ld a,lcdBpp16
-	ld (mpLcdCtrl),a
+	call util_pre_gc_default_handler
+util_pre_gc_handler:=$-3
 	call _Arc_Unarc
-	pop af ;restore lcd mode
-	ld (mpLcdCtrl),a
-	jp util_gfx_restore_default_handler
-util_gfx_restore_handler:=$-3
+	jp util_post_gc_default_handler
+util_post_gc_handler:=$-3
 .arc_unarc:
 	jp _Arc_Unarc
 
 
-util_gfx_restore_default_handler:
-	call	_RunIndicOff
-	di					; turn off indicator
-	ld hl,$D40000
-	ld (hl),l
-	ld bc,320*240
-	push hl
-	pop de
-	inc de
-	ldir
-.setup:
-	ld	a,lcdBpp8
-	ld	(mpLcdCtrl),a		; operate in 8bpp
-	ld	hl,mpLcdPalette
-	ld	b,0
-.loop:
-	ld	d,b
-	ld	a,b
-	and	a,192
-	srl	d
-	rra
-	ld	e,a
-	ld	a,31
-	and	a,b
-	or	a,e
-	ld	(hl),a
-	inc	hl
-	ld	(hl),d
-	inc	hl
-	inc	b
-	jr	nz,.loop
-	ret
 
 ;-------------------------------------------------------------------------------
 ; Internal library data
