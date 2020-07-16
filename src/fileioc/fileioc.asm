@@ -1440,7 +1440,9 @@ ti_SetPreGCHandler:
 	ld (util_pre_gc_handler),hl
 	ex hl,de
 	jp (hl)
-util_pre_gc_default_handler:=$F8
+util_pre_gc_default_handler:
+	xor a,a
+	ret
 
 
 ;-------------------------------------------------------------------------------
@@ -1636,6 +1638,8 @@ util_Arc_Unarc: ;properly handle garbage collects :P
 	jr nz,.arc_unarc ;gc will not be triggered
 	call util_pre_gc_default_handler
 util_pre_gc_handler:=$-3
+	or a,a
+	ret nz ;exit if the handler returns a non-zero value
 	call _Arc_Unarc
 	jp util_post_gc_default_handler
 util_post_gc_handler:=$-3
