@@ -392,12 +392,12 @@ void ti_SetPostGCHandler(void (*routine)(void));
 
 /**
  * Set routine to run before a garbage collect.
- * @param routine Routine to run preceeding a garbage collect. NULL sets it to do nothing. If this routine returns true, the variable will not be archived.
+ * @param routine Routine to run preceeding a garbage collect. NULL sets it to do nothing. If this routine returns true, the GC will not occur, and the post-GC handler will not be executed.
  * @note Useful for cleanup. If your program uses graphx, run gfx_End inside the passed function to set OS graphics mode to avoid corrupted graphics during the garbage collect.
  * @code
  *    bool pre_gc_handler(void){
  *          gfx_End();
- *          return 0;
+ *          return false;
  *    }
  *    int main(void){
  *          gfx_Begin();
