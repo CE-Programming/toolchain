@@ -1228,7 +1228,7 @@ ti_Rename:
 	jr	c, .return_2
 	call	_ChkInRam
 	jr	nz, .in_archive
-	ld	hl, $f8			; $f8 = ret
+	ld	hl, util_no_op			; no-op routine instead of assuming $F8 points to a ret instruction lol
 	ld	(.smc_archive), hl
 	call	_PushOP1
 	call	util_Arc_Unarc
@@ -1419,7 +1419,7 @@ ti_SetPostGCHandler:
 	ld (util_post_gc_handler),hl
 	ex hl,de
 	jp (hl)
-util_post_gc_default_handler:=$F8
+util_post_gc_default_handler:=util_no_op
 
 ;-------------------------------------------------------------------------------
 ti_SetPreGCHandler:
@@ -1442,6 +1442,7 @@ ti_SetPreGCHandler:
 	jp (hl)
 util_pre_gc_default_handler:
 	xor a,a
+util_no_op:
 	ret
 
 
