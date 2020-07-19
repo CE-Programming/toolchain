@@ -2,6 +2,10 @@
  * @file
  * @author Matt "MateoConLechuga" Waltz
  * @brief Contains debugging features for use with a compatible debugger
+ *
+ * These debug functions are provided to help in the process of debugging
+ * an application. To enable them, use 'make debug' when compiling a program.
+ * More information can be found here: https://github.com/CE-Programming/toolchain/wiki/Debugging
  */
 
 #include <stdio.h>
@@ -41,7 +45,7 @@ extern "C" {
  */
 #define dbg_ClearConsole() \
 do { \
-    *(volatile unsigned char*)0xFD0000 = 1; \
+    *(volatile unsigned char*)0xFFFFE0 = 10; \
 } while (0)
 
 /**
@@ -49,7 +53,7 @@ do { \
  */
 #define dbg_Debugger() \
 do { \
-    *(volatile unsigned char*)0xFFFFFF = (unsigned char)~0; \
+    *(volatile unsigned char*)0xFFFFE0 = (unsigned char)~0; \
 } while (0)
 
 /**
@@ -59,8 +63,8 @@ do { \
  */
 #define dbg_SetBreakpoint(address) \
 do { \
-    *(volatile unsigned int*)0xFFFFF0 = (unsigned int)(address); \
-    *(volatile unsigned char*)0xFFFFFF = 1; \
+    *(volatile unsigned int*)0xFFFFE4 = (unsigned int)(address); \
+    *(volatile unsigned char*)0xFFFFE0 = 1; \
 } while (0)
 
 /**
@@ -70,8 +74,8 @@ do { \
  */
 #define dbg_RemoveBreakpoint(address) \
 do { \
-    *(volatile unsigned int*)0xFFFFF0 = (address); \
-    *(volatile unsigned char*)0xFFFFFF = 2; \
+    *(volatile unsigned int*)0xFFFFE4 = (address); \
+    *(volatile unsigned char*)0xFFFFE0 = 2; \
 } while (0)
 
 /**
@@ -84,10 +88,10 @@ do { \
  */
 #define dbg_SetWatchpoint(address_low, length, flags) \
 do { \
-    *(volatile unsigned int*)0xFFFFF0 = (unsigned int)(address_low); \
-    *(volatile unsigned int*)0xFFFFF4 = ((unsigned int)(address_low) + (length)); \
-    *(volatile unsigned char*)0xFFFFF8 = (unsigned char)(flags); \
-    *(volatile unsigned char*)0xFFFFFF = 3; \
+    *(volatile unsigned int*)0xFFFFE4 = (unsigned int)(address_low); \
+    *(volatile unsigned int*)0xFFFFE8 = ((unsigned int)(address_low) + (length)); \
+    *(volatile unsigned char*)0xFFFFEC = (unsigned char)(flags); \
+    *(volatile unsigned char*)0xFFFFE0 = 3; \
 } while (0)
 
 /**
@@ -97,8 +101,8 @@ do { \
  */
 #define dbg_RemoveWatchpoint(address) \
 do { \
-    *(volatile unsigned int*)0xFFFFF0 = (unsigned int)(address); \
-    *(volatile unsigned char*)0xFFFFFF = 4; \
+    *(volatile unsigned int*)0xFFFFE4 = (unsigned int)(address); \
+    *(volatile unsigned char*)0xFFFFE0 = 4; \
 } while (0)
 
 /**
@@ -106,7 +110,7 @@ do { \
  */
 #define dbg_RemoveAllBreakpoints() \
 do { \
-    *(volatile unsigned char*)0xFFFFFF = 6; \
+    *(volatile unsigned char*)0xFFFFE0 = 5; \
 } while (0)
 
 /**
@@ -114,7 +118,7 @@ do { \
  */
 #define dbg_RemoveAllWatchpoints() \
 do { \
-    *(volatile unsigned char*)0xFFFFFF = 5; \
+    *(volatile unsigned char*)0xFFFFE0 = 6; \
 } while (0)
 
 #else
