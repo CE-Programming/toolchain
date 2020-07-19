@@ -1407,18 +1407,18 @@ ti_SetPostGCHandler:
 ;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
 ; return:
 ;   None
-	pop de
-	ex (sp),hl
-	push de
-	add hl,de
-	or a,a
-	sbc hl,de
-	jr nz,.notdefault
-	ld hl,util_post_gc_default_handler
+	pop	de
+	ex	(sp),hl
+	push	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jr	nz,.notdefault
+	ld	hl,util_post_gc_default_handler
 .notdefault:
-	ld (util_post_gc_handler),hl
-	ex hl,de
-	jp (hl)
+	ld	(util_post_gc_handler),hl
+	ex	hl,de
+	jp	(hl)
 util_post_gc_default_handler:=util_no_op
 
 ;-------------------------------------------------------------------------------
@@ -1428,20 +1428,20 @@ ti_SetPreGCHandler:
 ;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
 ; return:
 ;   None
-	pop de
-	ex (sp),hl
-	push de
-	add hl,de
-	or a,a
-	sbc hl,de
-	jr nz,.notdefault
-	ld hl,util_pre_gc_default_handler
+	pop	de
+	ex	(sp),hl
+	push	de
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jr	nz,.notdefault
+	ld	hl,util_pre_gc_default_handler
 .notdefault:
-	ld (util_pre_gc_handler),hl
-	ex hl,de
-	jp (hl)
+	ld	(util_pre_gc_handler),hl
+	ex	hl,de
+	jp	(hl)
 util_pre_gc_default_handler:
-	xor a,a
+	xor	a,a
 util_no_op:
 	ret
 
@@ -1627,25 +1627,25 @@ util_set_offset:
 	ret
 
 util_Arc_Unarc: ;properly handle garbage collects :P
-	call _ChkFindSym
-	push hl
-	call _ChkInRAM
-	pop hl
-	jr nz,.arc_unarc ;if the file is already in archive, we won't trigger a gc
-	call _LoadDEInd_s
-	ld hl,12
-	add hl,de
-	call _FindFreeArcSpot ;check if we will trigger a gc
-	jr nz,.arc_unarc ;gc will not be triggered
-	call util_pre_gc_default_handler
+	call	_ChkFindSym
+	push	hl
+	call	_ChkInRAM
+	pop	hl
+	jr	nz,.arc_unarc ;if the file is already in archive, we won't trigger a gc
+	call	_LoadDEInd_s
+	ld	hl,12
+	add	hl,de
+	call	_FindFreeArcSpot ;check if we will trigger a gc
+	jr	nz,.arc_unarc ;gc will not be triggered
+	call	util_pre_gc_default_handler
 util_pre_gc_handler:=$-3
-	or a,a
-	ret nz ;exit if the handler returns a non-zero value
-	call _Arc_Unarc
-	jp util_post_gc_default_handler
+	or	a,a
+	ret	nz ;exit if the handler returns a non-zero value
+	call	_Arc_Unarc
+	jp	util_post_gc_default_handler
 util_post_gc_handler:=$-3
 .arc_unarc:
-	jp _Arc_Unarc
+	jp	_Arc_Unarc
 
 
 
