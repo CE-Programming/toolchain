@@ -23,7 +23,7 @@
       "description": "Test sprite rotate and flip display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "59FD1670" ]
+      "expected_CRCs": [ "0E6BC9E8" ]
     },
     "2":
     {

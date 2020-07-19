@@ -24,7 +24,7 @@
       "description": "Test tilemap fullscreen image display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "F3BB755F" ]
+      "expected_CRCs": [ "F9D77829" ]
     },
     "2":
     {

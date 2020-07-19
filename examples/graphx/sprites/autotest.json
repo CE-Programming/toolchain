@@ -23,7 +23,7 @@
       "description": "Test sprite display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "B12D90C1" ]
+      "expected_CRCs": [ "B9FFC80D" ]
     },
     "2":
     {
