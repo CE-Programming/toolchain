@@ -1,17 +1,22 @@
-output: appvar
-  name: vargfx
-  source-format: c
-  include-file: vargfx.h
-  palettes:
-    - global_palette
-  converts:
-    - tileset
+palettes:
+  - name: global_palette
+    images: automatic
 
-palette: global_palette
-  images: automatic
+converts:
+  - name: tileset
+    palette: global_palette
+    compress: zx7
+    tilesets: {tile-width:80, tile-height:80}
+      - image.png
 
-convert: tileset
-  palette: global_palette
-  compress: zx7
-  tilesets: {tile-width:80, tile-height:80}
-    - image.png
+outputs:
+  - type: appvar
+    name: vargfx
+    source-format: c
+    include-file: vargfx.h
+    header-string: THIS_IS_SOME_TEST_THAT_I_HOPE_WORKS
+    palettes:
+      - global_palette
+    converts:
+      - tileset
+

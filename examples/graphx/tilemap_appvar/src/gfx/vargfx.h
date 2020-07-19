@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define sizeof_global_palette 154
+#define sizeof_global_palette 150
 #define global_palette (vargfx_appvar[0])
 #define tileset_tile_width 16
 #define tileset_tile_height 16

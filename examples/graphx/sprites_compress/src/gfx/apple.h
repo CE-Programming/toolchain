@@ -7,8 +7,8 @@ extern "C" {
 
 #define apple_width 220
 #define apple_height 240
-#define apple_size 9663
-extern unsigned char apple_compressed[9663];
+#define apple_size 9622
+extern unsigned char apple_compressed[9622];
 
 #ifdef __cplusplus
 }

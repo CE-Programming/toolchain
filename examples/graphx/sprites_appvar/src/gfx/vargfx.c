@@ -1,6 +1,8 @@
 #include "vargfx.h"
 #include <fileioc.h>
 
+#define vargfx_HEADER_SIZE 0
+
 unsigned char *vargfx_appvar[3] =
 {
     (unsigned char*)0,
@@ -21,7 +23,7 @@ unsigned char vargfx_init(void)
         return 0;
     }
 
-    data = (unsigned int)ti_GetDataPtr(appvar) - (unsigned int)vargfx_appvar[0];
+    data = (unsigned int)ti_GetDataPtr(appvar) - (unsigned int)vargfx_appvar[0] + vargfx_HEADER_SIZE;
     for (i = 0; i < 3; i++)
     {
         vargfx_appvar[i] += data;
@@ -30,5 +32,5 @@ unsigned char vargfx_init(void)
     ti_CloseAll();
 
     return 1;
-};
+}
 
