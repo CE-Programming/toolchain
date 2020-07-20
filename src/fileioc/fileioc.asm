@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'FILEIOC', 5
+library 'FILEIOC', 6
 
 ;-------------------------------------------------------------------------------
 ; no dependencies
@@ -62,8 +62,7 @@ library 'FILEIOC', 5
 ;-------------------------------------------------------------------------------
 ; v6 functions
 ;-------------------------------------------------------------------------------
-	export ti_SetPostGCHandler
-	export ti_SetPreGCHandler
+	export ti_SetGCBehavior
 
 
 ;-------------------------------------------------------------------------------
@@ -1401,49 +1400,36 @@ ti_ArchiveHasRoom:
 	ret
 
 ;-------------------------------------------------------------------------------
-ti_SetPostGCHandler:
-;Set handler for setting up the screen after a garbage collect
+ti_SetGCBehavior:
+;Set routines to run before and after a garbage collect would be triggered.
 ; args:
-;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
+;   sp + 3 : pointer to routine to be run before. Set to 0 to use default handler.
+;	sp + 6 : pointer to routine to be run after. Set to 0 to use default handler.
 ; return:
 ;   None
+	pop	bc
 	pop	de
 	ex	(sp),hl
 	push	de
+	push	bc
 	add	hl,de
 	or	a,a
 	sbc	hl,de
-	jr	nz,.notdefault
-	ld	hl,util_post_gc_default_handler
-.notdefault:
-	ld	(util_post_gc_handler),hl
-	ex	hl,de
-	jp	(hl)
-util_post_gc_default_handler:=util_no_op
-
-;-------------------------------------------------------------------------------
-ti_SetPreGCHandler:
-;Set handler for setting up the screen after a garbage collect
-; args:
-;   sp + 3 : pointer to handler. Set to 0 to use default handler (xlibc palette)
-; return:
-;   None
-	pop	de
-	ex	(sp),hl
-	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	jr	nz,.notdefault
+	jr	nz,.notdefault1
 	ld	hl,util_pre_gc_default_handler
-.notdefault:
+.notdefault1:
 	ld	(util_pre_gc_handler),hl
-	ex	hl,de
-	jp	(hl)
-util_pre_gc_default_handler:
-	xor	a,a
-util_no_op:
+	ex hl,de
+	add hl,bc
+	or a,a
+	sbc hl,bc
+	jr	nz,.notdefault2
+	ld	hl,util_post_gc_default_handler
+.notdefault2:
+	ld	(util_post_gc_handler),hl
 	ret
+util_post_gc_default_handler:=util_no_op
+util_pre_gc_default_handler:=util_no_op
 
 
 ;-------------------------------------------------------------------------------
@@ -1463,6 +1449,7 @@ util_skip_archive_header:
 	inc	hl
 	add	hl, bc
 	ex	de, hl
+util_no_op:
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1631,21 +1618,17 @@ util_Arc_Unarc: ;properly handle garbage collects :P
 	push	hl
 	call	_ChkInRAM
 	pop	hl
-	jr	nz,.arc_unarc ;if the file is already in archive, we won't trigger a gc
+	jp	nz,_Arc_Unarc ;if the file is already in archive, we won't trigger a gc
 	call	_LoadDEInd_s
 	ld	hl,12
 	add	hl,de
 	call	_FindFreeArcSpot ;check if we will trigger a gc
-	jr	nz,.arc_unarc ;gc will not be triggered
+	jp	nz,_Arc_Unarc ;gc will not be triggered
 	call	util_pre_gc_default_handler
 util_pre_gc_handler:=$-3
-	or	a,a
-	ret	z ;exit if the handler returns false
 	call	_Arc_Unarc
 	jp	util_post_gc_default_handler
 util_post_gc_handler:=$-3
-.arc_unarc:
-	jp	_Arc_Unarc
 
 
 

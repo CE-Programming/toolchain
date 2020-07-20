@@ -384,34 +384,11 @@ bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
 
 /**
- * Set routine to run after a garbage collect.
+ * Set routines to run before and after a garbage collect would be triggered.
  * @param routine Routine to run following a garbage collect. NULL sets it to do nothing.
- * @note If your program uses graphx, pass gfx_Begin to setup graphics after the garbage collect finishes.
+ * @note If your program uses graphx, use gfx_End and gfx_Begin to reset graphics before, and setup graphics after the garbage collect.
  * */
-void ti_SetPostGCHandler(void (*routine)(void));
-
-/**
- * Set routine to run before a garbage collect.
- * @param routine Routine to run preceeding a garbage collect. NULL sets it to do nothing. If this routine returns false, the GC will not occur, and the post-GC handler will not be executed.
- * @note Useful for cleanup. If your program uses graphx, run gfx_End inside the passed function to set OS graphics mode to avoid corrupted graphics during the garbage collect.
- * @code
- *    bool pre_gc_handler(void){
- *          gfx_End();
- *          return true;
- *    }
- *    int main(void){
- *          gfx_Begin();
- *          ti_CloseAll();
- *          ti_SetPostGCHandler(gfx_Begin);
- *          ti_SetPreGCHandler(pre_gc_handler);
- *          //any garbage collect triggered in this program will now be preceeded by pre_gc_handler, and afterwards by gfx_Begin.
- *          //...
- *          ti_CloseAll();
- *          gfx_End();
- *    }
- * @endcode
- * */
-void ti_SetPreGCHandler(bool (*routine)(void));
+void ti_SetGCBehavior(void (*before)(void), void (*after)(void));
 
 
 /**
