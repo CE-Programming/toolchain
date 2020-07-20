@@ -1640,7 +1640,7 @@ util_Arc_Unarc: ;properly handle garbage collects :P
 	call	util_pre_gc_default_handler
 util_pre_gc_handler:=$-3
 	or	a,a
-	ret	nz ;exit if the handler returns a non-zero value
+	ret	z ;exit if the handler returns false
 	call	_Arc_Unarc
 	jp	util_post_gc_default_handler
 util_post_gc_handler:=$-3
