@@ -1391,6 +1391,7 @@ ti_ArchiveHasRoom:
 	pop	de
 	ex	(sp),hl
 	push	de
+util_ArchiveHasRoom:
 	ld	bc,12
 	add	hl,bc
 	call	_FindFreeArcSpot
@@ -1620,9 +1621,8 @@ util_Arc_Unarc: ;properly handle garbage collects :P
 	pop	hl
 	jp	nz,_Arc_Unarc ;if the file is already in archive, we won't trigger a gc
 	call	_LoadDEInd_s
-	ld	hl,12
-	add	hl,de
-	call	_FindFreeArcSpot ;check if we will trigger a gc
+	ex hl,de
+	call util_ArchiveHasRoom
 	jp	nz,_Arc_Unarc ;gc will not be triggered
 	call	util_pre_gc_default_handler
 util_pre_gc_handler:=$-3
