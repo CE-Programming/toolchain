@@ -1615,11 +1615,9 @@ util_set_offset:
 	ret
 
 util_Arc_Unarc: ;properly handle garbage collects :P
-	call	_ChkFindSym
-	push	hl
 	call	_ChkInRAM
-	pop	hl
 	jp	nz,_Arc_Unarc ;if the file is already in archive, we won't trigger a gc
+	ex hl,de
 	call	_LoadDEInd_s
 	ex hl,de
 	call util_ArchiveHasRoom
