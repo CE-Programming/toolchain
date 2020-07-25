@@ -141,26 +141,51 @@ macro ?!
    namespace .
  end macro
 
- macro ld? @dst, @mid*, @src
-  local dst, mid, src
-   iterate <arg,@arg>, dst,@dst, mid,@mid, src,@src
-    @ez80.classify arg, @arg
-    @ez80.size arg
-   end iterate
-   if ~defined src
-    ld? @dst, @mid
-   else if dst.ind & src.ind | mid.ind
-    err 'invalid indirection'
-   else if dst.ind & defined src.size
-    ld? (dst), src
-    ld? (dst + src.size), mid
-   else if src.ind & defined mid.size
-    ld? mid, (src)
-    ld? dst, (src + mid.size)
-   else
-    err 'invalid arguments'
-   end if
-  end macro
+ ; copied from ez80.alm
+ macro calminstruction?.isindirect? argument*
+  unique done
+  local isindirect
+  match ( isindirect ), argument
+  bno done
+  match isindirect, isindirect, ()
+  label done
+ end macro
+
+ calminstruction ld? lhs, mhs*, rhs
+  match , rhs
+  jyes plain
+  isindirect lhs
+  jyes store
+  isindirect rhs
+  jno errarguments
+ load:
+  execute =ld? mhs, (rhs)
+  check mhs metadata 1 eq @ez80.wreg
+  jyes loadword
+ loadbyte:
+  execute =ld? mhs, (rhs + =byte?)
+  exit
+ loadword:
+  execute =ld? mhs, (rhs + =@ez80.=ws)
+  exit
+ store:
+  execute =ld? (lhs), rhs
+  check rhs metadata 1 eq @ez80.wreg
+  jyes storeword
+ storebyte:
+  execute =ld? (lhs + =byte?), mhs
+  exit
+ storeword:
+  execute =ld? (lhs + =@ez80.=ws), mhs
+  exit
+ plain:
+  execute =ld? lhs, mhs
+  exit
+ errarguments:
+  err 'invalid arguments'
+ end calminstruction
+
+ purge calminstruction?.isindirect?
 
  purge ?
 end macro
