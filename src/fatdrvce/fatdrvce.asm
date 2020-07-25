@@ -87,50 +87,82 @@ end macro
 ;-------------------------------------------------------------------------------
 ; memory structures
 ;-------------------------------------------------------------------------------
-macro struct? name*, parameters&
- macro end?.struct?!
-   end namespace
-  end struc
-  iterate <base,prefix>, 0,, ix-name,x, iy-name,y
-   virtual at base
-	prefix#name	name
-   end virtual
-  end iterate
-  purge end?.struct?
+macro ?!
+ macro assertpo2? value*
+  local val
+  val = value
+  if ~val | val <> 1 shl bsr val
+   err '"', `value, '" is not a power of two'
+  end if
  end macro
- struc name parameters
-  namespace .
-end macro
 
-macro @ez80.size arg
-	if defined arg & arg relativeto arg element 1
-		if arg @ez80.is_reg @ez80.breg
-			arg.size = 1
-		else if arg @ez80.is_reg @ez80.wreg
-			arg.size = 2 + @ez80.l
-		end if
-	end if
-end macro
+ iterate op, bit, res, set
+  macro op#msk? index*, value
+   local idx, val, rest
+   idx = index
+   assertpo2 idx
+   match @, value
+    val equ value
+   else
+    val equ
+    rest equ index
+    while 1
+     match car.cdr, rest
+      match any, val
+       val equ any.car
+      else
+       val equ car
+      end match
+      rest equ cdr
+     else
+      val equ (val)
+      break
+     end match
+    end while
+   end match
+   match v, val
+	op	bsr idx,v
+   end match
+  end macro
+ end iterate
 
-macro ld? @dst, @mid*, @src
-	local dst, mid, src
-	iterate <arg,@arg>, dst,@dst, mid,@mid, src,@src
-		@ez80.classify arg, @arg
-		@ez80.size arg
-	end iterate
-	if ~defined src
-		ld? @dst, @mid
-	else if dst.ind & src.ind | mid.ind
-		err 'invalid indirection'
-	else if dst.ind & defined src.size
-		ld? (dst), src
-		ld? (dst + src.size), mid
-	else if src.ind & defined mid.size
-		ld? mid, (src)
-		ld? dst, (src + mid.size)
-	else
-		err 'invalid arguments'
-	end if
+ macro struct? name*, parameters&
+  macro end?.struct?!
+    end namespace
+   end struc
+   iterate <base,prefix>, 0,, ix-name,x, iy-name,y
+    virtual at base
+	prefix#name	name
+    end virtual
+   end iterate
+   purge end?.struct?
+  end macro
+  struc name parameters
+   namespace .
+ end macro
+
+ macro ld? @dst, @mid*, @src
+  local dst, mid, src
+   iterate <arg,@arg>, dst,@dst, mid,@mid, src,@src
+    @ez80.classify arg, @arg
+    @ez80.size arg
+   end iterate
+   if ~defined src
+    ld? @dst, @mid
+   else if dst.ind & src.ind | mid.ind
+    err 'invalid indirection'
+   else if dst.ind & defined src.size
+    ld? (dst), src
+    ld? (dst + src.size), mid
+   else if src.ind & defined mid.size
+    ld? mid, (src)
+    ld? dst, (src + mid.size)
+   else
+    err 'invalid arguments'
+   end if
+  end macro
+
+ purge ?
 end macro
 
 ; msd structures
