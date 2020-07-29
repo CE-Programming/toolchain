@@ -3308,13 +3308,13 @@ util.DivideHLBC:
 
 ; Action key defaults
 _ClearKey:
-	db	_skClear
+	db	$0f			; sk_Clear
 _BackspaceKey:
-	db	_skDel
+	db	$38			; sk_Del
 _CursorLeftKey:
-	db	_skLeft
+	db	$02			; sk_Left
 _CursorRightKey:
-	db	_skRight
+	db	$01			; sk_Right
 
 _LastVisibleCharPtr:
 	dl	0
