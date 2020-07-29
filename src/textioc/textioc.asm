@@ -1805,7 +1805,7 @@ util.GetKey:
 	call	util.DrawCursor			; Temporary arrangement for testing purposes
 
 .skipCursorDraw:
-	call	ti.GetCSC
+	call	_GetCSC
 	ld	hl,($f20020)			; Save the timer_3_Counter in case of function exit
 	ld	(_TimerCounter),hl		; This is to improve timer accuracy
 	pop	hl
