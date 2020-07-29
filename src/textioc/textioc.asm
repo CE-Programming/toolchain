@@ -3306,17 +3306,15 @@ util.DivideHLBC:
 ; Internal Library Data
 ;-------------------------------------------------------------
 
-; Key data for textio_Input()
+; Action key defaults
 _ClearKey:
-	db	ti.skClear
+	db	_skClear
 _BackspaceKey:
-	db	ti.skDel
+	db	_skDel
 _CursorLeftKey:
-	db	ti.skLeft
+	db	_skLeft
 _CursorRightKey:
-	db	ti.skRight
-_KeymapIndicatorKey:
-	db	ti.skAlpha
+	db	_skRight
 
 _LastVisibleCharPtr:
 	dl	0

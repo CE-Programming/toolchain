@@ -508,7 +508,7 @@ textio_SetPrgmNameFlag(ids, true); \
 }; } while (0)
 
 /**
- * Sets the key that activates textio_Input()'s clear action.
+ * Sets the key that activates textio_Input()'s clear action. Defaults to [clear].
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
@@ -518,7 +518,7 @@ textio_SetPrgmNameFlag(ids, true); \
 void textio_SetClearKey(sk_key_t key);
 
 /**
- * Sets the key that activates textio_Input()'s backspace action.
+ * Sets the key that activates textio_Input()'s backspace action. Defaults to [del].
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
@@ -528,7 +528,7 @@ void textio_SetClearKey(sk_key_t key);
 void textio_SetBackspaceKey(sk_key_t key);
 
 /**
- * Sets the key that moves the cursor left.
+ * Sets the key that moves the cursor left. Defaults to the left arrow key.
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
@@ -538,7 +538,7 @@ void textio_SetBackspaceKey(sk_key_t key);
 void textio_SetCursorLeftKey(sk_key_t key);
 
 /**
- * Sets the key that moves the cursor right.
+ * Sets the key that moves the cursor right. Defaults to the right arrow key.
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
