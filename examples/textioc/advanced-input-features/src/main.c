@@ -12,7 +12,6 @@ void main(void) {
 
 	uint24_t *ids_master, *ids_one, *ids_two;
 	sk_key_t key = 0;
-	char *name;
 	uint8_t color;
 
 	/* Setup the graphics */

@@ -15,7 +15,6 @@ void main(void) {
 	uint24_t *ids;
 
 	sk_key_t key = 0;
-	char *name;
 
 	/* Setup the graphics */
 	gfx_Begin();
