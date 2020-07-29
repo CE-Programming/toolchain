@@ -1,0 +1,80 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|300",
+    "hashWait|1",
+    "key|math",
+    "key|apps",
+    "key|left",
+    "key|del",
+    "hashWait|2",
+    "key|alpha",
+    "key|1",
+    "key|2",
+    "hashWait|3",
+    "key|alpha",
+    "key|4",
+    "key|5",
+    "key|6",
+    "hashWait|4",
+    "key|clear",
+    "hashWait|5",
+    "key|enter",
+    "hashWait|6"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test initial rendering",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "79E6374A", "CBADAE31" ]
+    },
+    "2":
+    {
+      "description": "Test backspace key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "AB9B8487", "19D01DFC" ]
+    },
+    "3":
+    {
+      "description": "Test second keymap",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "884E03B4", "D12D6E70" ]
+    },
+    "4":
+    {
+      "description": "Test third keymap",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "B605DFC9", "BF3AEDA8" ]
+    },
+    "5":
+    {
+      "description": "Test clear key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "AB9B8487", "19D01DFC" ]
+    },
+    "6":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}
