@@ -58,7 +58,7 @@
  *
  * @authors "Captain Calc"
  *
- * Many thanks to jacobly, Adriweb, and the other members of the CE Programming team for their
+ * Many thanks to DrDnar, jacobly, Adriweb, and the other members of the CE Programming team for their
  * help and support!
  */
 
@@ -508,47 +508,41 @@ textio_SetPrgmNameFlag(ids, true); \
 }; } while (0)
 
 /**
- * Sets up the keypad data register and key for the key that activates textio_Input()'s
- * clear action.
+ * Sets the key that activates textio_Input()'s clear action.
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
  *
- * @param kb_register Keypad data register
  * @param key Key
 */
 void textio_SetClearKey(sk_key_t key);
 
 /**
- * Sets up the keypad data register and key for the key that activates textio_Input()'s
- * backspace action.
+ * Sets the key that activates textio_Input()'s backspace action.
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
  *
- * @param kb_register Keypad data register
  * @param key Key
 */
 void textio_SetBackspaceKey(sk_key_t key);
 
 /**
- * Sets up the keypad data register and key for the key that moves the cursor left.
+ * Sets the key that moves the cursor left.
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
  *
- * @param kb_register Keypad data register
  * @param key Key
 */
 void textio_SetCursorLeftKey(sk_key_t key);
 
 /**
- * Sets up the keypad data register and key for the key that moves the cursor right.
+ * Sets the key that moves the cursor right.
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
  *
- * @param kb_register Keypad data register
  * @param key Key
 */
 void textio_SetCursorRightKey(sk_key_t key);

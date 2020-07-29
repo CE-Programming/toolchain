@@ -586,7 +586,7 @@ util.GetCursorBGColor:
 
 	call	util.GetFirstVisibleCharPtr_IDSPtr
 	dec	hl				; HL -> IDS yPos
-	ld	bc, 0
+	ld	bc,0
 	ld	c,(hl)
 	push	bc
 	ld	hl,(_CurrCursorX)
@@ -620,9 +620,9 @@ textio_SetCursorBlinkRate:
 	srl	l
 	pop	af
 	jr	nc,.return
-	ld	a, l
-	xor	a, $80				; Carry the lowest bit of H
-	ld	l, a				; into the highest bit of L
+	ld	a,l
+	xor	a,$80				; Carry the lowest bit of H
+	ld	l,a				; into the highest bit of L
 
 .return:
 	ld	(_HalfCursorDisplayTime),hl
@@ -1346,7 +1346,7 @@ textio_SetClearKey:
 ; Returns:
 ;   None
 ; Destroys:
-;   A, DE, and HL
+;   A and HL
 
 	ld	hl,arg0
 	add	hl,sp
@@ -1358,12 +1358,11 @@ textio_SetClearKey:
 ;-------------------------------------------------------------
 textio_SetBackspaceKey:
 ; Arguments:
-;   arg0 = register of desired key
-;   arg1 = key bit
+;   arg0 = key
 ; Returns:
 ;   None
 ; Destroys:
-;   A, DE, and HL
+;   A and HL
 
 	ld	hl,arg0
 	add	hl,sp
@@ -1375,12 +1374,11 @@ textio_SetBackspaceKey:
 ;-------------------------------------------------------------
 textio_SetCursorLeftKey:
 ; Arguments:
-;   arg0 = register of desired key
-;   arg1 = key bit
+;   arg0 = key
 ; Returns:
 ;   None
 ; Destroys:
-;   A, DE, and HL
+;   A and HL
 
 	ld	hl,arg0
 	add	hl,sp
@@ -1392,12 +1390,11 @@ textio_SetCursorLeftKey:
 ;-------------------------------------------------------------
 textio_SetCursorRightKey:
 ; Arguments:
-;   arg0 = register of desired key
-;   arg1 = key bit
+;   arg0 = key
 ; Returns:
 ;   None
 ; Destroys:
-;   A, DE, and HL
+;   A and HL
 
 	ld	hl,arg0
 	add	hl,sp
@@ -2664,7 +2661,7 @@ textio_GetCharWidth:
 	call	textio_GetTabSize
 	ld	h,a
 	mlt	hl
-	ld	a,l 				; This only returns L, so any tab_width * space_width that
+	ld	a,l 				; This only returns L, so any tab_size * space_width that
 	ret					; is greater than 255 will not behave as expected
 
 
@@ -2684,8 +2681,8 @@ textio_GetLineWidth:
 
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy + arg0)	; hl -> line
-	ld	bc,(iy + arg1) ; bc -> eol
+	ld	hl,(iy + arg0)			; hl -> line
+	ld	bc,(iy + arg1) 			; bc -> eol
 
 .loop:
 	push	hl
