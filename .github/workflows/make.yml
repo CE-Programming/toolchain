@@ -1,0 +1,151 @@
+name: Win/Mac/Linux
+
+on:
+  push:
+    branches:
+      - llvm
+  pull_request:
+    branches:
+      - llvm
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{matrix.runs-on}}
+    steps:
+      - name: Prepare Build Environment
+        run: |
+          cmake -E echo ::set-env name=ROM::84pce_515_53.rom
+          cmake -E echo ::set-env name=CEDEV::${{github.workspace}}/CEdev
+          cmake -E echo ::add-path::${{github.workspace}}/CEdev/bin
+          cmake -E echo ::add-path::${{github.workspace}}/CEmu/tests/autotester
+      - name: Prepare Build Environment
+        if: runner.os == 'Windows'
+        run: |
+          cmake -E echo ::set-env name=EXE::.exe
+          cmake -E echo ::set-env name=ENV::env:
+
+      - name: Install Build Dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y doxygen
+      - name: Install Build Dependencies
+        if: runner.os == 'macOS'
+        run: brew install doxygen
+
+      - name: Download ez80-clang
+        id: ez80-clang
+        uses: carlosperate/download-file-action@v1.0.3
+        with:
+          file-url: https://jacobly.com/llvm/ez80-clang${{env.EXE}}-${{runner.os}}Release.zip
+      - name: Extract ez80-clang
+        uses: DuckSoft/extract-7z-action@v1.0
+        with:
+          pathSource: ${{steps.ez80-clang.outputs.file-path}}
+          pathTarget: CEdev/bin
+      - name: Make ez80-clang Executable
+        if: runner.os != 'Windows'
+        run: chmod +x CEdev/bin/ez80-clang${{env.EXE}}
+      - name: Test ez80-clang
+        run: ez80-clang --version
+
+      - name: Checkout Toolchain
+        uses: actions/checkout@v2
+        with:
+          path: toolchain
+          submodules: recursive
+
+      - name: Build Toolchain
+        run: make -j4 -C toolchain
+      - name: Install Toolchain
+        env:
+          PREFIX: ${{github.workspace}}
+        run: make -j4 -C toolchain install release release-libs
+      - name: Build Examples
+        run: make -j4 -C ${{env.CEDEV}}/examples
+
+      - name: Checkout CEmu
+        if: github.event_name == 'push'
+        uses: actions/checkout@v2
+        with:
+          repository: CE-Programming/CEmu
+          ref: latest-stable
+          path: CEmu
+
+      - name: Build CEmu
+        if: github.event_name == 'push'
+        run: make -j4 -C CEmu/core
+      - name: Build Autotester CLI
+        if: github.event_name == 'push'
+        run: make -j4 -C CEmu/tests/autotester
+
+      - name: Download Secrets
+        if: github.event_name == 'push'
+        id: download-secrets
+        uses: carlosperate/download-file-action@v1.0.3
+        with:
+          file-url: https://jacobly.com/CE-Programming/secrets
+          location: secrets
+      - name: Decrypt Secrets
+        if: github.event_name == 'push'
+        env:
+          KEY: ${{secrets.SYMMETRIC_KEY_256}}
+        run: openssl enc -d -aes-256-cbc -iv d0583d991fcb6c3b05fb8eabc7421fb8 -K "$${{env.ENV}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out secrets/secrets.7z
+      - name: Extract Secrets
+        if: github.event_name == 'push'
+        uses: DuckSoft/extract-7z-action@v1.0
+        with:
+          pathSource: secrets/secrets.7z
+          pathTarget: secrets
+
+      - name: Test examples
+        if: github.event_name == 'push' && runner.os != 'Windows'
+        env:
+          AUTOTESTER_LIBS_DIR: ${{github.workspace}}/toolchain/clibraries
+          AUTOTESTER_ROM: ${{github.workspace}}/secrets/${{env.ROM}}
+        run: |
+          failed=0
+          find ${{env.CEDEV}}/examples -name autotest.json -print0 | while read -d '' test; do
+            cmake -E echo "Launching autotester on $test"
+            autotester "$test"
+            cmake -E true $((failed += $?))
+          done
+          exit $failed
+      - name: Test examples
+        if: github.event_name == 'push' && runner.os == 'Windows'
+        env:
+          AUTOTESTER_LIBS_DIR: ${{github.workspace}}\toolchain\clibraries
+          AUTOTESTER_ROM: ${{github.workspace}}\secrets\${{env.ROM}}
+        run: |
+          $failed = 0
+          foreach ($test in get-childitem "${{env.CEDEV}}\examples" -recurse -include autotest.json) {
+            cmake -E echo "Launching autotester on $test"
+            autotester "$test"
+            $failed += $lastexitcode
+          }
+          Exit $failed
+
+      - name: Remove Secrets
+        if: always()
+        run: cmake -E rm -rf secrets
+
+      - name: Upload CEdev
+        uses: actions/upload-artifact@v2
+        with:
+          name: CEdev-${{runner.os}}
+          path: CEdev
+
+      - name: Upload Libraries
+        uses: actions/upload-artifact@v2
+        with:
+          name: clibraries
+          path: toolchain/clibraries
+
+      - name: Upload Windows Installer
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v2
+        with:
+          name: installer-${{runner.os}}
+          path: toolchain\release\CEdev${{env.EXE}}
