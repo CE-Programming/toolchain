@@ -1,0 +1,103 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|300",
+    "hashWait|1",
+    "key|math",
+    "key|del",
+    "hashWait|2",
+    "key|alpha",
+    "key|math",
+    "hashWait|3",
+    "key|apps",
+    "key|left",
+    "key|prgm",
+    "hashWait|4",
+    "key|del",
+    "hashWait|5",
+    "key|clear",
+    "hashWait|6",
+    "key|down",
+    "hashWait|7",
+    "key|up",
+    "hashWait|8",
+    "key|enter",
+    "hashWait|9"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test initial rendering",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "1572A9CD", "2F4D4933" ]
+    },
+    "2":
+    {
+      "description": "Test backspace key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "1572A9CD", "2F4D4933" ]
+    },
+    "3":
+    {
+      "description": "Test keymap switch function",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "EAA9DAE8", "09E0F037" ]
+    },
+    "4":
+    {
+      "description": "Test character insertion",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "AD21E852", "31783319" ]
+    },
+    "5":
+    {
+      "description": "Test backspace key again",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "C57CD5E2", "2635FF3D" ]
+    },
+    "6":
+    {
+      "description": "Test clear key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "F0B2389D", "CA8DD863" ]
+    },
+    "7":
+    {
+      "description": "Test down key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "945FBDA9", "FE11E1C7" ]
+    },
+    "8":
+    {
+      "description": "Test up key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "F0B2389D", "CA8DD863" ]
+    },
+    "9":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}

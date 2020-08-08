@@ -1,0 +1,87 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|300",
+    "hashWait|1",
+    "key|alpha",
+    "hashWait|2",
+    "key|math",
+    "key|apps",
+    "key|prgm",
+    "key|-1",
+    "key|sin",
+    "key|cos",
+    "key|tan",
+    "key|^",
+    "key|^2",
+    "key|,",
+    "key|(",
+    "key|)",
+    "key|/",
+    "key|log",
+    "hashWait|3",
+    "key|left",
+    "key|clear",
+    "hashWait|4",
+    "key|math",
+    "key|del",
+    "hashWait|5",
+    "key|enter",
+    "hashWait|6"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test initial rendering",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "8C9FC97C", "B6A02982" ]
+    },
+    "2":
+    {
+      "description": "Test keymap switch function",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "29973B73", "13A8DB8D" ]
+    },
+    "3":
+    {
+      "description": "Test input scrolling",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "DBF81303", "D1CB6155" ]
+    },
+    "4":
+    {
+      "description": "Test clear key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "DF2C0BDF", "E513EB21" ]
+    },
+    "5":
+    {
+      "description": "Test backspace key",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "DF2C0BDF", "E513EB21" ]
+    },
+    "6":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}
