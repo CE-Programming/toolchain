@@ -1417,15 +1417,15 @@ ti_SetGCBehavior:
 	or	a,a
 	sbc	hl,de
 	jr	nz,.notdefault1
-	ld	hl,util_pre_gc_default_handler
+	ld	hl,util_post_gc_default_handler
 .notdefault1:
-	ld	(util_pre_gc_handler),hl
+	ld	(util_post_gc_handler),hl
 	sbc	hl,hl
 	adc	hl,bc
 	jr	nz,.notdefault2
-	ld	hl,util_post_gc_default_handler
+	ld	hl,util_pre_gc_default_handler
 .notdefault2:
-	ld	(util_post_gc_handler),hl
+	ld	(util_pre_gc_handler),hl
 	ret
 util_post_gc_default_handler := util_no_op
 util_pre_gc_default_handler := util_no_op
