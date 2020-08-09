@@ -1408,11 +1408,11 @@ ti_SetGCBehavior:
 ;	sp + 6 : pointer to routine to be run after. Set to 0 to use default handler.
 ; return:
 ;   None
-	pop	bc
 	pop	de
+	pop	bc
 	ex	(sp),hl
-	push	de
 	push	bc
+	push	de
 	add	hl,de
 	or	a,a
 	sbc	hl,de
@@ -1420,18 +1420,15 @@ ti_SetGCBehavior:
 	ld	hl,util_pre_gc_default_handler
 .notdefault1:
 	ld	(util_pre_gc_handler),hl
-	ex hl,de
-	add hl,bc
-	or a,a
-	sbc hl,bc
+	sbc	hl,hl
+	adc	hl,bc
 	jr	nz,.notdefault2
 	ld	hl,util_post_gc_default_handler
 .notdefault2:
 	ld	(util_post_gc_handler),hl
 	ret
-util_post_gc_default_handler:=util_no_op
-util_pre_gc_default_handler:=util_no_op
-
+util_post_gc_default_handler := util_no_op
+util_pre_gc_default_handler := util_no_op
 
 ;-------------------------------------------------------------------------------
 ; internal library routines
@@ -1617,10 +1614,10 @@ util_set_offset:
 util_Arc_Unarc: ;properly handle garbage collects :P
 	call	_ChkInRAM
 	jp	nz,_Arc_Unarc ;if the file is already in archive, we won't trigger a gc
-	ex hl,de
+	ex	hl,de
 	call	_LoadDEInd_s
-	ex hl,de
-	call util_ArchiveHasRoom
+	ex	hl,de
+	call	util_ArchiveHasRoom
 	jp	nz,_Arc_Unarc ;gc will not be triggered
 	call	util_pre_gc_default_handler
 util_pre_gc_handler:=$-3
