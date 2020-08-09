@@ -1408,11 +1408,11 @@ ti_SetGCBehavior:
 ;	sp + 6 : pointer to routine to be run after. Set to 0 to use default handler.
 ; return:
 ;   None
-	pop	de
 	pop	bc
+	pop	de
 	ex	(sp),hl
-	push	bc
 	push	de
+	push	bc
 	add	hl,de
 	or	a,a
 	sbc	hl,de
