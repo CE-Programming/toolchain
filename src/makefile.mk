@@ -59,9 +59,9 @@ LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg.exe)
 CD         = cd
-RM         = del /q /f 2>nul
-RMDIR      = call && (if exist $1 rmdir /s /q $1)
-NATIVEMKDR = call && (if not exist $1 mkdir $1)
+RM         = ( del /q /f $1 2>nul || call )
+RMDIR      = ( rmdir /s /q $1 2>nul || call )
+NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG  = "$(subst ",',$1)"#'
 else
 MAKEDIR   := $(CURDIR)
@@ -74,7 +74,7 @@ LD         = $(call NATIVEPATH,$(BIN)/fasmg)
 CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin)
 CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg)
 CD         = cd
-RM         = rm -f
+RM         = rm -f $1
 RMDIR      = rm -rf $1
 NATIVEMKDR = mkdir -p $1
 QUOTE_ARG  = '$(subst ','\'',$1)'#'
@@ -240,8 +240,7 @@ $(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
 	$(Q)$(EZCC) $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
-	$(Q)$(call RMDIR,$(OBJDIR))
-	$(Q)$(call RMDIR,$(BINDIR))
+	$(Q)$(call RMDIR,$(OBJDIR) $(BINDIR))
 	@echo Removed build objects and binaries.
 
 gfx:

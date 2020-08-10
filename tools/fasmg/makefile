@@ -6,7 +6,7 @@
 ifeq ($(OS),Windows_NT)
 SHELL      =cmd.exe
 NATIVEPATH =$(subst /,\,$(1))
-RM         =del /f /q 2>nul
+RM         =( del /f /q $1 2>nul || call )
 CP         =echo f|xcopy /y
 PREFIX    ?=C:
 NAME       =fasmg.exe
@@ -19,7 +19,7 @@ else
 FASMGP     =linux/$(NAME)
 endif
 NATIVEPATH =$(subst \,/,$(1))
-RM         =rm -f
+RM         =rm -f $1
 CP         =cp
 PREFIX    ?=$(HOME)
 # This little hack causes the Win32 executable to be copied instead, supporting WSL
@@ -49,8 +49,7 @@ $(FILES):
 	$(CP) $(call NATIVEPATH,fasmg-ez80/$(@F)) $(INCDIR)$(@F)
 
 clean:
-	$(RM) $(FILES)
-	$(RM) $(NAME)
+	$(call RM,$(FILES) $(NAME))
 
 install: $(INCFILES)
 	$(CP) $(NAME) $(BIN)

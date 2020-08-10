@@ -11,14 +11,14 @@ FASMG ?=fasmg
 # common/os specific things
 ifeq ($(OS),Windows_NT)
 SHELL       =cmd.exe
-NATIVEPATH  =$(subst /,\,$(1))
-RM          =del /f /q 2>nul
+NATIVEPATH  =$(subst /,\,$1)
+RM          =( del /f /q $1 2>nul || call )
 MKDIR       =mkdir
 CP          =copy /y
 PREFIX     ?=C:
 else
-NATIVEPATH  =$(subst \,/,$(1))
-RM          =rm -f
+NATIVEPATH  =$(subst \,/,$1)
+RM          =rm -f $1
 MKDIR       =mkdir -p
 CP          =cp
 PREFIX     ?=$(HOME)
@@ -42,7 +42,7 @@ $(LIB_8XV): $(SRC)
 	$(FASMG) $< $@
 
 clean:
-	$(RM) $(LIB) $(LIB_8XV)
+	$(call RM,$(LIB) $(LIB_8XV))
 
 install:
 	$(CP) $(LIB_H) $(H_LOC)

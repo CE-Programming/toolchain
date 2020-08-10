@@ -19,9 +19,9 @@ ifeq ($(OS),Windows_NT)
 SHELL      = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
 DIRNAME    = $(filter-out %:,$(patsubst %\,%,$(dir $1)))
-RM         = del /f /q 2>nul
-RMDIR      = call && (if exist $1 rmdir /s /q $1)
-MKDIR      = call && (if not exist $1 mkdir $1)
+RM         = ( del /f /q $1 2>nul || call )
+RMDIR      = ( rmdir /s /q $1 2>nul || call )
+MKDIR      = ( mkdir $1 2>nul || call )
 PREFIX    ?= C:
 INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(PREFIX))
 CP         = copy /y
@@ -35,7 +35,7 @@ APPEND     = @echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >
 else
 NATIVEPATH = $(subst \,/,$1)
 DIRNAME    = $(patsubst %/,%,$(dir $1))
-RM         = rm -f
+RM         = rm -f $1
 RMDIR      = rm -rf $1
 MKDIR      = mkdir -p $1
 PREFIX    ?= $(HOME)
@@ -109,7 +109,7 @@ clean: $(addprefix clean-,$(LIBRARIES)) clean-ce clean-std clean-startup
 	$(MAKE) -C $(CONVBINDIR) clean
 	$(MAKE) -C $(CONVIMGDIR) clean
 	$(MAKE) -C $(CONVFNTDIR) clean
-	$(RM) linker_script
+	$(call RM,linker_script)
 	$(call RMDIR,release)
 	$(call RMDIR,clibraries)
 	$(call RMDIR,doxygen)
@@ -232,7 +232,7 @@ doxygen:
 # linker script rule
 #----------------------------
 linker_script: std
-	$(RM) $(call QUOTE_ARG,$@)
+	$(call RM,$(call QUOTE_ARG,$@))
 	@echo Generating linker script...
 	$(call APPEND,require __init$(comma) __startup$(comma) _exit$(comma) __findlibload if .libs.length)
 	$(call APPEND,provide __low_bss = .bss.base)
