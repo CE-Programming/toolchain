@@ -23,7 +23,7 @@
       "description": "Test sprite rlet display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "E6C80BDC" ]
+      "expected_CRCs": [ "36380C98" ]
     },
     "2":
     {

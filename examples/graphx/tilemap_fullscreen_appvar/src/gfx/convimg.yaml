@@ -6,15 +6,18 @@ converts:
   - name: tileset
     palette: global_palette
     compress: zx7
-    tilesets: {tile-width:80, tile-height:80}
-      - image.png
+    tilesets:
+      tile-width: 80
+      tile-height: 80
+      images:
+        - image.png
 
 outputs:
   - type: appvar
     name: vargfx
     source-format: c
     include-file: vargfx.h
-    header-string: THIS_IS_SOME_TEST_THAT_I_HOPE_WORKS
+    header-string: STRING
     palettes:
       - global_palette
     converts:

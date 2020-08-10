@@ -1,7 +1,7 @@
-unsigned char global_palette[150] =
+unsigned char global_palette[154] =
 {
-    0xff, 0xff, /*   0: rgb(255, 255, 255) [exact original: rgb(255, 255, 255)] */
-    0x40, 0xff, /*   1: rgb(255, 215,   0) [exact original: rgb(255, 216,   0)] */
+    0xff, 0xff, /*   0: rgb(255, 255, 255) */
+    0x40, 0xff, /*   1: rgb(255, 215,   0) */
     0x0c, 0xc3, /*   2: rgb(132, 198,  99) */
     0x7b, 0xeb, /*   3: rgb(214, 223, 222) */
     0x8f, 0x31, /*   4: rgb( 99,  97, 123) */
@@ -75,4 +75,6 @@ unsigned char global_palette[150] =
     0xd7, 0x2d, /*  72: rgb( 90, 113, 189) */
     0x33, 0xfb, /*  73: rgb(247, 206, 156) */
     0x6c, 0xc7, /*  74: rgb(140, 223,  99) */
+    0x71, 0x77, /*  75: rgb(239, 219, 140) */
+    0x2d, 0x21, /*  76: rgb( 66,  73, 107) */
 };

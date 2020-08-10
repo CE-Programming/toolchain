@@ -1,16 +1,19 @@
 palettes:
   - name: global_palette
-    fixed-colors:
-      - color: {index:0, r:255, g:255, b:255}
-      - color: {index:1, r:255, g:216, b:0}
+    fixed-entries:
+      - color: {index: 0, r: 255, g: 255, b: 255}
+      - color: {index: 1, r: 255, g: 216, b: 0}
     images: automatic
 
 converts:
   - name: tileset
     palette: global_palette
     compress: zx7
-    tilesets: {tile-width:16, tile-height:16}
-      - tileset.png
+    tilesets:
+      tile-width: 16
+      tile-height: 16
+      images:
+        - tileset.png
 
 outputs:
   - type: c

@@ -10,3 +10,4 @@ $(DIRS):
 	$(MAKE) -C $(dir $@) $(MAKECMDGOALS)
 
 .PHONY: all clean gfx
+

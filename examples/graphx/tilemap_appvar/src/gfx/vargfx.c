@@ -6,7 +6,7 @@
 unsigned char *vargfx_appvar[2] =
 {
     (unsigned char*)0,
-    (unsigned char*)150,
+    (unsigned char*)154,
 };
 
 unsigned char *tileset_tiles_data[128] =

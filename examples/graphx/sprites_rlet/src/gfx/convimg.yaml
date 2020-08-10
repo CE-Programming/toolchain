@@ -1,7 +1,7 @@
 palettes:
   - name: global_palette
-    fixed-colors:
-      - color: {index:0, r:255, g:255, b:255}
+    fixed-entries:
+      - color: {index: 0, r: 255, g: 255, b: 255}
     images: automatic
 
 converts:

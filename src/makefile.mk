@@ -140,6 +140,13 @@ ICONSRC :=
 endif
 endif
 
+# check if gfx directory exists
+ifneq ($(wildcard $(GFXDIR)/.),)
+GFXCMD := $(CD) $(GFXDIR) && $(CONVIMG)
+else
+GFXCMD :=
+endif
+
 # determine output target flags
 ifeq ($(ARCHIVED),YES)
 CONVBINFLAGS += --archive
@@ -238,7 +245,7 @@ clean:
 	@echo Removed build objects and binaries.
 
 gfx:
-	$(Q)$(CD) $(GFXDIR) && $(CONVIMG)
+	$(Q)$(GFXCMD)
 
 version:
 	$(Q)echo CE C SDK Version $(VERSION)

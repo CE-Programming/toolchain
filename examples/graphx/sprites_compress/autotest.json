@@ -23,7 +23,7 @@
       "description": "Test sprite compression display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "8F62FBF7" ]
+      "expected_CRCs": [ "2481E42F" ]
     },
     "2":
     {
