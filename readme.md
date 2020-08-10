@@ -1,4 +1,4 @@
-# CE C Programming Toolchain/SDK   [![Build Status](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?branch=llvm)](https://github.com/CE-Programming/toolchain/actions?query=workflow%3AWin%2FMac%2FLinux) [![IRC badge](https://img.shields.io/badge/IRC%20channel-%23ez80--dev%20on%20EFNet-blue.svg)](http://chat.efnet.org/irc.cgi?adv=1&nick=ce-dev&chan=%23ez80-dev)
+# CE C Programming Toolchain/SDK  [![Build Status](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?branch=llvm&event=push)](https://github.com/CE-Programming/toolchain/actions?query=workflow%3AWin%2FMac%2FLinux+branch%3Allvm+event%3Apush) [![IRC badge](https://img.shields.io/badge/IRC%20channel-%23ez80--dev%20on%20EFNet-blue.svg)](http://chat.efnet.org/irc.cgi?adv=1&nick=ce-dev&chan=%23ez80-dev)
 
 The CE C Software Development Kit incorporates a wide variety of tools and documentation in order to build programs in C natively for the TI-84 Plus CE / TI-83 Premium CE calculators series.
 
