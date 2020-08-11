@@ -166,8 +166,7 @@ STRIP_FROM_PATH        = ../../src/ce \
                          ../../src/keypadc \
                          ../../src/graphx \
                          ../../src/fileioc \
-                         ../../src/fontlibc \
-                         ../../src/textioc
+                         ../../src/fontlibc
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
@@ -799,7 +798,6 @@ INPUT                  = ../../src/graphx/graphx.h \
                          ../../src/keypadc/keypadc.h \
                          ../../src/fileioc/fileioc.h \
                          ../../src/fontlibc/fontlibc.h \
-                         ../../src/textioc/textioc.h \
                          ../../src/ce/debug.h \
                          ../../src/ce/tice.h \
                          ../../src/ce/intce.h \
