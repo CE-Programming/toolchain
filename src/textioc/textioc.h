@@ -6,7 +6,7 @@
  *
  * The library's text input is based on the Input Data Structure (IDS) which holds the input
  * data and configuration data for the two input routines, textio_Input and textio_TimedInput.
- * Each IDS is at least 26 bytes plus the sum of the number of characters it is to hold and
+ * Each IDS is at least 27 bytes plus the sum of the number of characters it is to hold and
  * three times the number of keymaps it uses. Each IDS can use up to 255 keymaps.
  *
  * TextIOC offers four built-in keymaps for uppercase and lowercase characters, one for numerals,
@@ -200,27 +200,10 @@ static void textio_gfx_PrintChar(char codepoint) {
  *
  * @note The recommended method for using this function is shown below:
  * @code
- * textio_library_routines_t *ptr = malloc(sizeof(textio_library_routines_t));
+ * textio_library_routines_t ptr = TEXTIO_GRAPHX_ROUTINES;
+ * // Or, textio_library_routines_t ptr = TEXTIO_FONTLIB_ROUTINES;
  *
- * ptr->set_cursor_position = &gfx_SetTextXY;
- * ptr->get_cursor_x = &gfx_GetTextX;
- * ptr->get_cursor_y = &gfx_GetTextY;
- * ptr->draw_char = &gfx_PrintChar;
- * ptr->get_char_width = &gfx_GetCharWidth;
- *
- * // If you are using FontLibC, replace the above codeblock with this one:
- * // ptr->set_cursor_position = &fontlib_SetCursorPosition;
- * // ptr->get_cursor_x = &fontlib_GetCursorX;
- * // ptr->get_cursor_y = &fontlib_GetCursorY;
- * // ptr->draw_char = &fontlib_DrawGlyph;
- * // ptr->get_char_width = &fontlib_GetGlyphWidth;
- *
- * textio_SetLibraryRoutines(ptr);
- * free(ptr);
- *
- * textio_SetSourceLibrary(TEXTIO_SET_GRAPHX_AS_SRC_LIB);
- *
- * // For FontLibC, replace the above library code with the FontLibC code.
+ * textio_SetLibraryRoutines(&ptr);
  * @endcode
  * @see textio_library_routines_t
  * @see textio_source_library_codes_t
