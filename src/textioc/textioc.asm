@@ -3537,13 +3537,10 @@ util.CallHL:
 ;   None
 
 ; Return if HL == 0
-	push	bc
-	ld	bc,0
-	xor	a,a
+	add	hl,bc
+	or	a,a
 	sbc	hl,bc
-	pop	bc
 	ret	z
-
 	jp	(hl)
 	ret
 
