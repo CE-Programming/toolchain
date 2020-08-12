@@ -16,7 +16,7 @@ void main(void) {
 	sk_key_t key = 0;
 	char *name;
 
-	/* Setup the graphics */
+	/* Setup the graphics. */
 	gfx_Begin();
 
 	/* Set GraphX as TextIOC's source library. */
@@ -45,13 +45,13 @@ void main(void) {
 	textio_SetCursorDimensions(ids, 1, 9);
 	textio_SetCursorY(ids, 50);
 
-	/* Get input until the user presses [enter] */
+	/* Get input until the user presses [enter]. */
 	do {
 		display_keymap_indicator(ids);
 
 		key = textio_Input(ids);
 
-		/* Switch keymaps if the user presses [alpha] */
+		/* Switch keymaps if the user presses [alpha]. */
 		if (key == sk_Alpha)
 			switch_keymaps(ids);
 
@@ -60,16 +60,16 @@ void main(void) {
 	/* Convert the program/appvar name into a TI-OS format. */
 	name = textio_ConvertProgramAppvarName_TIOS(textio_GetDataBufferPtr(ids));
 
-	/* Draw the converted name */
+	/* Draw the converted name. */
 	gfx_SetTextXY(1, 1);
 	gfx_PrintString("Converted name: ");
 	gfx_PrintString(name);
 
 	/* Delete the IDS. It is very important to call this function
-	   when you are through with an IDS */
+	   when you are through with an IDS. */
 	textio_DeleteIDS(ids);
 
-	/* Wait for keypress */
+	/* Wait for keypress. */
 	while (!os_GetCSC());
 
 	ERROR:
@@ -91,14 +91,14 @@ void switch_keymaps(uint24_t *ids) {
 
 	uint8_t curr_keymap_num;
 
-	/* Get the current keymap number */
+	/* Get the current keymap number. */
 	curr_keymap_num = textio_GetCurrKeymapNum(ids);
 
-	/* Go to the next keymap */
+	/* Go to the next keymap. */
 	if (curr_keymap_num < textio_GetNumKeymaps(ids)) {
 		curr_keymap_num++;
 	} else {
-		/* The number of the first IDS keymap is 0 */
+		/* The number of the first IDS keymap is 0. */
 		curr_keymap_num = 0;
 	};
 
@@ -132,7 +132,7 @@ void display_keymap_indicator(uint24_t *ids) {
 	else
 		gfx_PrintChar(indicator);
 
-	/* Reset the font colors */
+	/* Reset the font colors. */
 	gfx_SetTextBGColor(0xFF);
 	gfx_SetTextFGColor(0x00);
 	gfx_SetTextTransparentColor(0xFF);

@@ -20,7 +20,7 @@ void main(void) {
 	/* Setup the graphics */
 	gfx_Begin();
 
-	/* Setup our custom FontLibC font */
+	/* Setup our custom FontLibC font. */
 	fontlib_SetFont(test_font, 0);
 	fontlib_SetColors(0x00, 0xFF);
 
@@ -64,10 +64,10 @@ void main(void) {
 	} while (key != sk_Enter && textio_GetIDSTimer(ids) > 0);
 
 	/* Delete the IDS. It is very important to call this function
-	   when you are through with an IDS */
+	   when you are through with an IDS. */
 	textio_DeleteIDS(ids);
 
-	/* Wait for keypress */
+	/* Wait for keypress. */
 	while (!os_GetCSC());
 
 	ERROR:
@@ -118,7 +118,7 @@ void display_keymap_indicator(uint24_t *ids) {
 	fontlib_SetCursorPosition(154 - fontlib_GetGlyphWidth(indicator) - 4, cursor_y);
 	fontlib_DrawGlyph(indicator);
 
-	/* Reset the font colors */
+	/* Reset the font colors. */
 	fontlib_SetColors(0x00, 0xFF);
 
 	return;

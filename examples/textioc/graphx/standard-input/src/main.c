@@ -37,6 +37,7 @@ void main(void) {
 	textio_SetCursorDimensions(ids, 1, 9);
 	textio_SetCursorY(ids, 50);
 
+	/* Get input until the user presses [enter]. */
 	do {
 		key = textio_Input(ids);
 
@@ -68,14 +69,14 @@ void switch_keymaps(uint24_t *ids) {
 
 	uint8_t curr_keymap_num;
 
-	/* Get the current keymap number */
+	/* Get the current keymap number. */
 	curr_keymap_num = textio_GetCurrKeymapNum(ids);
 
-	/* Go to the next keymap */
+	/* Go to the next keymap. */
 	if (curr_keymap_num < textio_GetNumKeymaps(ids)) {
 		curr_keymap_num++;
 	} else {
-		/* The number of the first IDS keymap is 0 */
+		/* The number of the first IDS keymap is 0. */
 		curr_keymap_num = 0;
 	};
 
@@ -119,7 +120,7 @@ void display_keymap_indicator(uint24_t *ids) {
 	/* Erase the indicator. */
 	gfx_FillRectangle_NoClip(cursor_x, cursor_y, gfx_GetCharWidth(indicator) + 4, 9);
 
-	/* Reset the font colors */
+	/* Reset the font colors. */
 	gfx_SetTextBGColor(0xFF);
 	gfx_SetTextFGColor(0x00);
 	gfx_SetTextTransparentColor(0xFF);

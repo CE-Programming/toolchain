@@ -23,7 +23,7 @@ void main(void) {
 	/* Setup TextIOC to use FontLibC. */
 	setup_fontlib_textio();
 
-	/* Setup our custom FontLibC font */
+	/* Setup our custom FontLibC font. */
 	fontlib_SetFont(test_font, 0);
 	fontlib_SetColors(0x00, 0xFF);
 
@@ -50,18 +50,18 @@ void main(void) {
 	/* Set the cursor y-position. */
 	textio_SetCursorY(ids, textio_GetIDSY(ids));
 
-	/* Get input until the user presses [enter] */
+	/* Get input until the user presses [enter]. */
 	do {
 		key = textio_Input(ids);
 
-		/* Switch keymaps if the user presses [alpha] */
+		/* Switch keymaps if the user presses [alpha]. */
 		if (key == sk_Alpha)
 			switch_keymaps(ids);
 
 	} while (key != sk_Enter);
 
 	/* Delete the IDS. It is very important to call this function
-	   when you are through with an IDS */
+	   when you are through with an IDS. */
 	textio_DeleteIDS(ids);
 
 	ERROR:
@@ -90,7 +90,7 @@ void switch_keymaps(uint24_t *ids) {
 	if (curr_keymap_num < textio_GetNumKeymaps(ids)) {
 		curr_keymap_num++;
 	} else {
-		/* The number of the first IDS keymap is 0 */
+		/* The number of the first IDS keymap is 0. */
 		curr_keymap_num = 0;
 	};
 

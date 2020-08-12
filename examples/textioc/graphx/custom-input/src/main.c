@@ -17,7 +17,7 @@ void main(void) {
 	/* Pointers to the custom keymaps. */
 	char *keymap1, *keymap2;
 
-	/* Setup the graphics */
+	/* Setup the graphics. */
 	gfx_Begin();
 
 	/* Instruct TextIOC to use the GraphX library. */
@@ -49,20 +49,20 @@ void main(void) {
 	textio_SetCursorDimensions(ids, 1, 9);
 	textio_SetCursorY(ids, 50);
 
-	/* Get input until the user presses [enter] */
+	/* Get input until the user presses [enter]. */
 	do {
 		display_keymap_indicator(ids);
 
 		key = textio_Input(ids);
 
-		/* Switch keymaps if the user presses [alpha] */
+		/* Switch keymaps if the user presses [alpha]. */
 		if (key == sk_Alpha)
 			switch_keymaps(ids);
 
 	} while (key != sk_Enter);
 
 	/* Delete the IDS. It is very important to call this function
-	   when you are through with an IDS */
+	   when you are through with an IDS. */
 	textio_DeleteIDS(ids);
 
 	ERROR:
@@ -84,14 +84,14 @@ void switch_keymaps(uint24_t *ids) {
 
 	uint8_t curr_keymap_num;
 
-	/* Get the current keymap number */
+	/* Get the current keymap number. */
 	curr_keymap_num = textio_GetCurrKeymapNum(ids);
 
 	/* Go to the next keymap. */
 	if (curr_keymap_num < textio_GetNumKeymaps(ids)) {
 		curr_keymap_num++;
 	} else {
-		/* The number of the first IDS keymap is 0 */
+		/* The number of the first IDS keymap is 0. */
 		curr_keymap_num = 0;
 	};
 
@@ -121,7 +121,7 @@ void display_keymap_indicator(uint24_t *ids) {
 	gfx_SetTextXY(154 - gfx_GetCharWidth(indicator) - 4, cursor_y + 1);
 	gfx_PrintChar(indicator);
 
-	/* Reset the font colors */
+	/* Reset the font colors. */
 	gfx_SetTextBGColor(0xFF);
 	gfx_SetTextFGColor(0x00);
 	gfx_SetTextTransparentColor(0xFF);

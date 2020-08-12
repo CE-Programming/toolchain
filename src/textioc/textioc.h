@@ -2,28 +2,31 @@
  * @file
  * @brief Contains text-wrapping and text input routines for GraphX and FontLibC.
  *
- * TextIOC is a general-purpose text I/O library, supporting both GraphX and FontLibC.
+ * TextIOC is a general-purpose text I/O library, supporting both GraphX and FontLibC. *Please
+ * note that the OS homescreen is not supported in version 2.0 of this library.*
  *
  * The library's text input is based on the Input Data Structure (IDS) which holds the input
  * data and configuration data for the two input routines, textio_Input and textio_TimedInput.
  * Each IDS is at least 27 bytes plus the sum of the number of characters it is to hold and
- * three times the number of keymaps it uses. Each IDS can use up to 255 keymaps.
+ * the number of keymaps it uses times three. Each IDS can use up to 255 keymaps although it is
+ * recommended for the sake of saving memory that a much lower number of keymaps be allocated at
+ * any one time.
  *
- * TextIOC offers four built-in keymaps for uppercase and lowercase characters, one for numerals,
+ * TextIOC offers four built-in keymaps, two for uppercase and lowercase characters, one for numerals,
  * and one for program/appvar names. It also supports custom keymaps created by the programmer.
  *
  * Each keymap is 57 bytes long. The first character of the keymap acts as the "keymap indicator,"
  * a special character that represents the keymap. The keymap data format is identical to the one
- * used as an example for os_GetCSC in the tice.h documentation.
+ * used as an example for os_GetCSC in the *tice.h* documentation.
  *
  * The first keymap in an IDS has an index of zero. The next one has an index of one, and so on.
  * Thus, the number of keymaps in the IDS is the actual number of keymaps minus one. This is
  * important to remember when changing keymaps.
  *
  * Both input routines automatically exit after each keypress, so in order to get more than one
- * character of input, it is necessary to put them inside of a while(){...} or do {...} while loop.
- * The textio_TimedInput function automatically exits after each second as well which allows the
- * programmer to print the timer or whatever else he wishes to do with the timer.
+ * character of input, it is necessary to put them inside of a *while {...}* or *do {...} while* loop.
+ * The textio_TimedInput function also automatically exits after each second which allows the
+ * programmer to print or to check the timer's status.
  *
  * The general outline of an textio_Input call resembles the following:
  * @code
@@ -55,15 +58,15 @@
  * textio_DeleteKeymap(keymap);
  * @endcode
  *
- * TextIOC uses a text window for displaying text output, like FontLibC. This window and its associated
+ * TextIOC uses a text window for displaying text output like FontLibC. This window and its associated
  * functions, such as textio_SetNewlineCode and textio_SetLineSpacing, are **completely** seperate from
  * the FontLib text window. Thus, if the programmer is using FontLibC, he will need to setup the TextIOC
  * text window as he would the FontLibC window. This also means that it is safe to use both a TextIOC text
  * window and and FontLib text window on the same screen simultaneously.
  *
  * TextIOC offers a SetLineSpacing function that acts exactly like its FontLib counterpart. The FontLib
- * function, fontlib_SetLineSpacing, does not affect the TextIOC text window. One FontLib function, however,
- * does apply to the TextIOC window, fontlib_SetFirstPrintableCodePoint.
+ * function, fontlib_SetLineSpacing, does not affect the TextIOC text window. fontlib_SetFirstPrintableCodePoint,
+ * however, does apply to the TextIOC text window if TextIOC is setup to use the FontLib library.
  *
  *
  * @authors "Captain Calc"
@@ -86,43 +89,21 @@ extern "C" {
 #endif
 
 /**
- * This structure holds the pointers to the source library's text functions.
+ * This structure holds the pointers to the external text functions as well as the library version data.
  *
  * @see textio_SetLibraryRoutines
 */
 typedef struct {
-	/**
-	 * Library version
-	*/
 	uint8_t library_version;
-	/**
-	 * Pointer to either gfx_SetTextXY or fontlib_SetCursorPosition
-	*/
 	void *set_text_position;
-
-	/**
-	 * Pointer to either gfx_GetTextX or fontlib_GetCursorX
-	*/
 	void *get_text_x;
-
-	/**
-	 * Pointer to either gfx_GetTextY or fontlib_GetCursorY
-	*/
 	void *get_text_y;
-
-	/**
-	 * Pointer to gfx_PrintChar or fontlib_DrawGlyph
-	*/
 	void *draw_char;
-
-	/**
-	 * Pointer to gfx_GetCharWidth or fontlib_GetGlyphWidth
-	*/
 	void *get_char_width;
 } textio_library_routines_t;
 
 /**
- * Function typecasts for FontLibC
+ * Function wrappers for FontLibC.
 */
 static void textio_fontlib_SetCursorPosition(uint24_t xPos, uint8_t yPos) {
 	fontlib_SetCursorPosition((unsigned int)xPos, yPos);
@@ -137,17 +118,17 @@ static uint24_t textio_fontlib_GetCursorY(void) {
 	return (uint24_t)fontlib_GetCursorY();
 }
 
-static uint24_t textio_fontlib_GetGlyphWidth(char codepoint) {
-	return (uint24_t)fontlib_GetGlyphWidth(codepoint);
-}
-
 static void textio_fontlib_DrawGlyph(char codepoint) {
 	fontlib_DrawGlyph((uint8_t)codepoint);
 	return;
 }
 
+static uint24_t textio_fontlib_GetGlyphWidth(char codepoint) {
+	return (uint24_t)fontlib_GetGlyphWidth(codepoint);
+}
+
 /**
- * Function typecasts for GraphX
+ * Function wrappers for GraphX.
  */
 static void textio_gfx_SetTextXY(uint24_t xPos, uint8_t yPos) {
 	gfx_SetTextXY((int)xPos, (int)yPos);
@@ -162,17 +143,17 @@ static uint24_t textio_gfx_GetTextY(void) {
 	return (uint24_t)gfx_GetTextY();
 }
 
-static uint24_t textio_gfx_GetCharWidth(char codepoint) {
-	return (uint24_t)gfx_GetCharWidth((const char)codepoint);
-}
-
 static void textio_gfx_PrintChar(char codepoint) {
 	gfx_PrintChar((const char)codepoint);
 	return;
 }
 
+static uint24_t textio_gfx_GetCharWidth(char codepoint) {
+	return (uint24_t)gfx_GetCharWidth((const char)codepoint);
+}
+
 /**
- * Default external function pointers for FontLibC
+ * Default external function pointers for FontLibC.
 */
 #define TEXTIO_FONTLIB_ROUTINES { \
 				2, \
@@ -184,7 +165,7 @@ static void textio_gfx_PrintChar(char codepoint) {
 				};
 
 /**
- * Default external function pointers for GraphX
+ * Default external function pointers for GraphX.
 */
 #define TEXTIO_GRAPHX_ROUTINES { \
 				2, \
@@ -196,40 +177,39 @@ static void textio_gfx_PrintChar(char codepoint) {
 				};
 
 /**
- * Provides the source library's text function pointers to TextIOC.
+ * Provides the external text function pointers to TextIOC.
  *
  * @note The recommended method for using this function is shown below:
  * @code
- * textio_library_routines_t ptr = TEXTIO_GRAPHX_ROUTINES;
- * // Or, textio_library_routines_t ptr = TEXTIO_FONTLIB_ROUTINES;
- *
- * textio_SetLibraryRoutines(&ptr);
+ * textio_library_routines_t routines = TEXTIO_GRAPHX_ROUTINES;
+ * // Or, textio_library_routines_t routines = TEXTIO_FONTLIB_ROUTINES;
+ * 
+ * textio_SetLibraryRoutines(&routines);
  * @endcode
  * @see textio_library_routines_t
- * @see textio_source_library_codes_t
- *
+ * 
  * @param ptr Pointer to routine structure
 */
 void textio_SetLibraryRoutines(textio_library_routines_t *ptr);
 
 /**
- * Allocates memory for a \c Input \c Data \c Structure \c (IDS).
+ * Allocates memory for a *Input Data Structure (IDS)*.
  *
  * @note
  * Unless a different memory allocation routine other than \c malloc()
  * needs to be used, textio_CreateIDS should be used.
  *
  * @note
- * \c num_keymaps should be at least 1, otherwise undefined behavior will result.
+ * \p num_keymaps should be at least 1; otherwise, undefined behavior will result.
  *
  * @param xPos Starting x-position of the cursor
  * @param yPos y-position of the cursor
- * @param visible_width Width of visible input (in pixels)
+ * @param visible_input_width Width of visible input (in pixels)
  * @param num_keymaps Number of keymaps
  * @param malloc_routine Malloc implementation to use
  * @return Pointer to IDS, if successful; \c NULL, otherwise
  */
-uint24_t *textio_AllocIDS(size_t size, uint24_t xPos, uint8_t yPos, uint24_t visible_buffer_width, uint8_t num_keymaps, void *(malloc_routine)(size_t));
+uint24_t *textio_AllocIDS(size_t size, uint24_t xPos, uint8_t yPos, uint24_t visible_input_width, uint8_t num_keymaps, void *(malloc_routine)(size_t));
 
 /**
  * Allocates memory for a \i Input \i Data \i Structure \i (IDS).
@@ -246,12 +226,12 @@ uint24_t *textio_AllocIDS(size_t size, uint24_t xPos, uint8_t yPos, uint24_t vis
  *
  * @param xPos Starting x-position of the cursor
  * @param yPos y-position of the cursor
- * @param visible_width Width of visible input (in pixels)
+ * @param visible_input_width Width of visible input (in pixels)
  * @param num_keymaps Number of keymaps
  * @return Pointer to IDS, if successful; \c NULL, otherwise
  */
-#define textio_CreateIDS(size, xPos, yPos, visible_buffer_width, num_keymaps) \
-textio_AllocIDS(size, xPos, yPos, visible_buffer_width, num_keymaps, malloc)
+#define textio_CreateIDS(size, xPos, yPos, visible_input_width, num_keymaps) \
+textio_AllocIDS(size, xPos, yPos, visible_input_width, num_keymaps, malloc)
 
 /**
  * Frees the memory allocated for the specified \p IDS.
@@ -290,7 +270,7 @@ uint24_t textio_GetDataBufferSize(uint24_t *IDS);
 char *textio_GetDataBufferPtr(uint24_t *IDS);
 
 /**
- * Gets a pointer to the last character textio_Input processed in
+ * Gets a pointer to the last character that the input function processed in
  * the specified \p IDS.
  * @see textio_Input
  *
@@ -384,12 +364,12 @@ uint8_t textio_GetCursorY(uint24_t *IDS);
  * @param IDS Pointer to IDS
  * @param width Width of cursor
  * @param height Height of cursor
- * @return True if dimensions set; False, otherwise
+ * @return True if dimensions were set; False, otherwise
  */
 bool textio_SetCursorDimensions(uint24_t *IDS, uint8_t width, uint8_t height);
 
 /**
- * Gets cursor's width.
+ * Gets the cursor's width.
  *
  * @param IDS Pointer to IDS
  * @return Cursor width
@@ -397,7 +377,7 @@ bool textio_SetCursorDimensions(uint24_t *IDS, uint8_t width, uint8_t height);
 uint8_t textio_GetCursorWidth(uint24_t *IDS);
 
 /**
- * Gets cursor's height.
+ * Gets the cursor's height.
  *
  * @param IDS Pointer to IDS
  * @return Cursor height
@@ -426,9 +406,8 @@ uint24_t textio_GetIDSTimer(uint24_t *IDS);
 /**
  * Sets the state of the \c PRGM_NAME flag.
  *
- * @note
- * This flag determines if the textio_Input will accept a number as
- * a the first character of input.
+ * @note This flag determines if the textio_Input will accept a number as
+ * the first character of input.
  *
  * @param IDS Pointer to IDS
  * @param state State of flag
@@ -436,7 +415,7 @@ uint24_t textio_GetIDSTimer(uint24_t *IDS);
 void textio_SetPrgmNameFlag(uint24_t *IDS, bool state);
 
 /**
- * Sets the state of the \c IDS_Lock flag. When this flag is on, \c textio_Input(),
+ * Sets the state of the \c IDS_LOCK flag. When this flag is on, the input functions
  * will not accept input for the specified IDS.
  *
  * @param IDS Pointer to IDS
@@ -445,7 +424,7 @@ void textio_SetPrgmNameFlag(uint24_t *IDS, bool state);
 void textio_LockIDS(uint24_t *IDS, bool state);
 
 /**
- * Gets the state of the \c IDS_Lock flag.
+ * Gets the state of the \c IDS_LOCK flag.
  *
  * @param IDS Pointer to IDS
  * @return State of flag
@@ -453,11 +432,11 @@ void textio_LockIDS(uint24_t *IDS, bool state);
 bool textio_GetIDSLock(uint24_t *IDS);
 
 /**
- * Gets the state of the buffer_full flag. This flag is set if the data buffer of the specified IDS
+ * Gets the state of the \c BUFFER_FULL flag. This flag is set if the data buffer of the specified IDS
  * is full. The flag is reset, otherwise.
  *
  * @param IDS Pointer to IDS
- * @return State of buffer_full flag
+ * @return State of flag
 */
 bool textio_GetBufferFullFlag(uint24_t *IDS);
 
@@ -475,7 +454,7 @@ void textio_ClearDataBuffer(uint24_t *IDS);
  * Unless a different memory allocation routine other than \c malloc()
  * needs to be used, textio_CreateKeymap should be used.
  *
- * @param indicator Symbol that indicating the keymap's type
+ * @param indicator Symbol that represents the keymap
  * @param keymap_data 50-byte character array
  * @param malloc_routine Malloc implementation to use
  * @return Pointer to keymap, if successful; \c NULL, otherwise
@@ -485,10 +464,10 @@ char *textio_AllocKeymap(uint8_t indicator, const char *keymap_data, void *(mall
 /**
  * Allocates memory for a new keymap.
  *
- * @note The \p keymap_data is the same string format used in the GraphX os_GetCSC example.
- * E.G. \0\0\0\0\0\0\0\0\0\0\"WRMH\0\0?[VQLG\0\0:ZUPKFC\0 YTOJEB\0\0XSNIDA\0\0\0\0\0\0\0\0
+ * @note The \p keymap_data is the same string format used in the os_GetCSC example contained in
+ * the *tice.h* documentation. E.G. \c \0\0\0\0\0\0\0\0\0\0\"WRMH\0\0?[VQLG\0\0:ZUPKFC\0 YTOJEB\0\0XSNIDA\0\0\0\0\0\0\0\0
  *
- * @param indicator Symbol that indicating the keymap's type
+ * @param indicator Symbol that represents the keymap
  * @param keymap_data 50-byte character array
  * @return Pointer to keymap, if successful; \c NULL, otherwise
  */
@@ -529,7 +508,7 @@ void textio_SetKeymaps(uint24_t *IDS, uint8_t num_keymaps, char *keymap0, ...);
  * Gets the number of available keymaps for the specified IDS.
  *
  * @note The number returned will be one less than the actual number of keymaps
- * in the IDS. There is no need to compensate for this (see introductory documentation).
+ * in the IDS (see introductory documentation).
  *
  * @param IDS Pointer to IDS
  * @return Number of keymaps
@@ -601,7 +580,7 @@ char *textio_GetNumericalKeymap(void);
  *
  * @note If the IDS memory allocation fails, \p name will be equal to \c NULL.
  *
- * @param name Name of the new IDS
+ * @param name Pointer to the new IDS
  * @param xPos Starting x-position of the cursor
  * @param yPos y-position of the cursor
  * @param visible_width Width of visible input (in pixels)
@@ -617,7 +596,7 @@ textio_SetKeymaps(name, 2, textio_GetUppercaseLettersKeymap(), textio_GetLowerca
  *
  * @note If the IDS memory allocation fails, \p name will be equal to \c NULL.
  *
- * @param name Name of the new IDS
+ * @param name Pointer to the new IDS
  * @param xPos Starting x-position of the cursor
  * @param yPos y-position of the cursor
  * @param visible_width Width of visible input (in pixels)
@@ -634,7 +613,7 @@ textio_SetKeymaps(name, 1, textio_GetNumericalKeymap()); \
  *
  * @note If the IDS memory allocation fails, \p name will be equal to \c NULL.
  *
- * @param name Name of the new IDS
+ * @param name Pointer to the new IDS
  * @param xPos Starting x-position of the cursor
  * @param yPos y-position of the cursor
  * @param visible_width Width of visible input (in pixels)
@@ -651,7 +630,7 @@ textio_SetKeymaps(name, 3, textio_GetUppercaseLettersKeymap(), textio_GetLowerca
  *
  * @note If the IDS memory allocation fails, \p name will be equal to \c NULL.
  *
- * @param name Name of the new IDS
+ * @param name Pointer to the new IDS
  * @param xPos Starting x-position of the cursor
  * @param yPos y-position of the cursor
  * @param visible_width Width of visible input (in pixels)
@@ -664,7 +643,7 @@ textio_SetPrgmNameFlag(ids, true); \
 }; } while (0)
 
 /**
- * Sets the key that activates textio_Input()'s clear action. Defaults to [clear].
+ * Sets the key that activates the input function's clear action. Defaults to [clear].
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
@@ -674,7 +653,7 @@ textio_SetPrgmNameFlag(ids, true); \
 void textio_SetClearKey(sk_key_t key);
 
 /**
- * Sets the key that activates textio_Input()'s backspace action. Defaults to [del].
+ * Sets the key that activates the input function's backspace action. Defaults to [del].
  *
  * @note This function is not IDS-specific. The action will remain linked to the given key for all IDSes
  * until it is changed by the programmer.
@@ -707,6 +686,8 @@ void textio_SetCursorRightKey(sk_key_t key);
  * Gets input from user and stores it in the data buffer of the specified IDS. The user is only
  * allowed to give input for the amount of time assigned to the IDS by textio_SetIDSTimer.
  *
+ * @see textio_SetIDSTimer
+ *
  * @param IDS Pointer to IDS
  * @return Code of key pressed
 */
@@ -731,10 +712,7 @@ sk_key_t textio_Input(uint24_t *IDS);
 void textio_SetThetaCodepoint(uint8_t codepoint);
 
 /**
- * Gets the codepoint for the theta character.
- *
- * @note This codepoint is not IDS-specific. It sets the theta character's codepoint for the
- * font in use.
+ * Gets the current codepoint for the theta character.
  *
  * @return Codepoint for theta character
 */
@@ -775,22 +753,22 @@ char *textio_ConvertProgramAppvarName_TextIOC(char *name);
  * @see textio_SetPrintFormat
 */
 typedef enum {
-
+	
 	/**
 	 * Enables left-margin-flush printing.
 	*/
 	TEXTIOC_PRINT_LEFT_MARGIN_FLUSH = 0x01,
-
+	
 	/**
 	 * Enables centered printing.
 	*/
 	TEXTIOC_PRINT_CENTERED = 0x02,
-
+	
 	/**
 	 * Enables right-margin-flush printing.
 	*/
 	TEXTIOC_PRINT_RIGHT_MARGIN_FLUSH = 0x03
-
+	
 } textio_print_format_options_t;
 
 /**

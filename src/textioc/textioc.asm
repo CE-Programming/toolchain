@@ -131,16 +131,6 @@
 	bPrintRightMarginFlush	:= 3
 
 
-
-macro mOpenDebugger
-	push	hl
-	scf
-	sbc	hl,hl
-	ld	(hl),2
-	pop	hl
-end macro
-
-
 ;=============================================================;
 ;                                                             ;
 ;                Library Setup Functions                      ;
@@ -773,7 +763,7 @@ textio_SetCursorDimensions:
 ;   arg1 = cursor width
 ;   arg2 = cursor height
 ; Returns:
-;   True if dimensions set; False, otherwise
+;   A = 1 if dimensions set; A = 0, otherwise
 ; Destroys:
 ;   BC, DE, and HL
 
@@ -995,7 +985,7 @@ textio_GetIDSLock:
 ; Arguments:
 ;   arg0 = IDS pointer
 ; Returns:
-;   A = state of IDS_Lock flag
+;   A = state of IDS_LOCK flag
 ; Destroys:
 ;   A, BC, DE, and HL
 
@@ -1010,7 +1000,7 @@ util.GetIDSLock:
 ; Arguments:
 ;   HL = IDS pointer
 ; Returns:
-;   A = state of IDS_Lock flag
+;   A = state of IDS_LOCK flag
 ; Destroys:
 ;   A, BC, DE, and HL
 
@@ -1067,7 +1057,7 @@ textio_GetBufferFullFlag:
 ; Arguments:
 ;   arg0 = IDS pointer
 ; Returns:
-;   A = state of buffer_full flag
+;   A = state of BUFFER_FULL flag
 ; Destroys:
 ;   BC, DE, and HL
 
@@ -1082,7 +1072,7 @@ util.GetBufferFullFlag:
 ; Arguments:
 ;   HL = IDS pointer
 ; Returns:
-;   A = state of buffer_full flag
+;   A = state of BUFFER_FULL flag
 ; Destroys:
 ;   BC, DE, and HL
 
@@ -1162,7 +1152,7 @@ textio_AllocKeymap:
 ;   arg1 = keymap data pointer
 ;   arg2 = pointer to malloc routine
 ; Returns:
-;   Pointer to keymap, if successful; NULL, otherwise
+;   HL = pointer to keymap, if successful; HL == NULL, otherwise
 ; Destroys:
 ;   All
 
@@ -1175,6 +1165,7 @@ textio_AllocKeymap:
 	call	util.CallHL			; Call malloc routine
 	pop	bc
 	add	hl,bc
+	or	a,a
 	sbc	hl,bc
 	ret	z				; Return if malloc routine returned NULL
 
@@ -1809,6 +1800,8 @@ util.UpdateCursorBlinkCounter:
 ;   None
 ; Returns:
 ;   C if first part of counter has expired; NC otherwise
+; Destroys:
+;   A, DE, and HL
 
 
 	ld	hl,(_CursorDisplayCounter)
@@ -1944,7 +1937,7 @@ util.GetKey:
 .drawCursor:
 	pop	hl
 	push	hl
-	call	util.DrawCursor			; Temporary arrangement for testing purposes
+	call	util.DrawCursor
 
 .skipCursorDraw:
 	call	_GetCSC
@@ -2118,10 +2111,10 @@ util.InsertChar:
 
 ;-------------------------------------------------------------
 util.ClearKeyHandler:
-;      If curr_char_ptr > data buffer start, all chars left of the curr_char_ptr
-;   are deleted and any chars to the right of the curr_char_ptr are shifted left
-;      If curr_char_ptr = data buffer start, all chars right of the curr_char_ptr
-;   are deleted
+; If curr_char_ptr > data buffer start, all chars left of the curr_char_ptr
+; are deleted and any chars to the right of the curr_char_ptr are shifted left
+; If curr_char_ptr = data buffer start, all chars right of the curr_char_ptr
+; are deleted.
 ; Arguments:
 ;   HL -> IDS
 ; Returns:
@@ -2191,8 +2184,8 @@ util.ClearKeyHandler:
 
 ;-------------------------------------------------------------
 util.BackspaceKeyHandler:
-;   Shifts chars in front of target char left one byte and zeros the trailing
-;   char after the shift is complete
+; Shifts chars in front of target char left one byte and zeros the trailing
+; char after the shift is complete
 ; Arguments:
 ;   HL -> IDS
 ; Returns:
@@ -2270,7 +2263,7 @@ util.BackspaceKeyHandler:
 
 ;-------------------------------------------------------------
 util.CursorLeftKeyHandler:
-;   Moves cursor left (decrements curr_char_ptr)
+; Moves cursor left (decrements curr_char_ptr)
 ; Arguments:
 ;   HL = IDS pointer
 ; Returns:
@@ -2390,7 +2383,7 @@ util.ScrollVisibleCharsRight:
 
 ;-------------------------------------------------------------
 util.CursorRightKeyHandler:
-;   Moves cursor right (increments curr_char_ptr)
+; Moves cursor right (increments curr_char_ptr)
 ; Arguments:
 ;   HL = IDS pointer
 ; Returns:
@@ -2818,7 +2811,7 @@ textio_SetPrintFormat:
 ; Arguments:
 ;   arg0 = format code
 ; Returns:
-;   A = 0 if invalid format code passed; A > 0 otherwise
+;   A = 0 if invalid format code passed; A > 0, otherwise
 ; Destroys:
 ;   A
 ;   DE
@@ -2846,7 +2839,7 @@ textio_GetPrintFormat:
 ; Arguments:
 ;   None
 ; Returns:
-;   Current print format code
+;   A = current print format code
 ; Destroys:
 ;   None
 
@@ -2897,7 +2890,7 @@ textio_SetTabSize:
 	ld	a,(hl)
 	cp	a,0
 	ret	z
-	ld	(_TabWidth),a
+	ld	(_TabSize),a
 	ret
 
 
@@ -2906,11 +2899,11 @@ textio_GetTabSize:
 ; Arguments:
 ;   None
 ; Returns:
-;   A = width of tab
+;   A = tab size
 ; Destroys:
 ;   None
 
-	ld	a,(_TabWidth)
+	ld	a,(_TabSize)
 	ret
 
 
@@ -3887,7 +3880,7 @@ _CursorBGColor:
 _CurrCursorX:
 	dl	0
 
-; Initially set to 1 so the counter will reset immediately when it is first called
+; Initially set to 1 so the counter will reset immediately when it is first called.
 _CursorDisplayCounter:
 	dl	1
 
@@ -3942,7 +3935,7 @@ _NumericalKeymap:
 	db	0,0,0,0,0,0,0,0
 
 ; Data for text output functions
-_TabWidth:
+_TabSize:
 	db	4
 _PrintFormat:
 	db	1

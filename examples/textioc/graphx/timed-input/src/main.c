@@ -14,7 +14,7 @@ void main(void) {
 
 	sk_key_t key = 0;
 
-	/* Setup the graphics */
+	/* Setup the graphics. */
 	gfx_Begin();
 
 	/* Set the TextIOC source library to GraphX. */
@@ -52,10 +52,10 @@ void main(void) {
 	} while (key != sk_Enter && textio_GetIDSTimer(ids) > 0);
 
 	/* Delete the IDS. It is very important to call this function
-	   when you are through with an IDS */
+	   when you are through with an IDS. */
 	textio_DeleteIDS(ids);
 
-	/* Wait for keypress */
+	/* Wait for keypress. */
 	while (!os_GetCSC());
 
 	ERROR:
@@ -112,7 +112,7 @@ void display_keymap_indicator(uint24_t *ids) {
 	gfx_SetTextXY(150 - gfx_GetCharWidth(indicator), cursor_y + 1);
 	gfx_PrintChar(indicator);
 
-	/* Reset the font colors */
+	/* Reset the font colors. */
 	gfx_SetTextBGColor(0xFF);
 	gfx_SetTextFGColor(0x00);
 	gfx_SetTextTransparentColor(0xFF);

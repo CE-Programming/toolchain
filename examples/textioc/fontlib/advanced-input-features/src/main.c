@@ -27,7 +27,7 @@ void main(void) {
 	/* Set FontLibC as TextIOC's source library. */
 	setup_fontlib_textio();
 
-	/* Create two new IDS that will each hold 10 characters and will
+	/* Create two new IDSes that will each hold 10 characters and will
 	   use TextIOC's uppercase and lowercase keymaps. */
 	textio_CreateAlphaIDS(ids_one, 10, 50, 50, 80);
 	textio_CreateAlphaIDS(ids_two, 10, 50, 100, 80);
@@ -56,7 +56,7 @@ void main(void) {
 	ids_master = ids_one;
 	textio_LockIDS(ids_two, true);
 
-	/* Get input until the user presses [enter] */
+	/* Get input until the user presses [enter]. */
 	do {
 		/* Draw boxes around the input fields and the keymap indicators
 		   based on the IDS_Lock status for each IDS. */
@@ -76,7 +76,7 @@ void main(void) {
 
 		key = textio_Input(ids_master);
 
-		/* Switch keymaps if the user presses [alpha] */
+		/* Switch keymaps if the user presses [alpha]. */
 		if (key == sk_Alpha)
 			switch_keymaps(ids_master);
 

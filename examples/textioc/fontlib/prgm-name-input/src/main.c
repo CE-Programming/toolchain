@@ -57,13 +57,13 @@ void main(void) {
 	/* Set cursor y-position. */
 	textio_SetCursorY(ids, textio_GetIDSY(ids));
 
-	/* Get input until the user presses [enter] */
+	/* Get input until the user presses [enter]. */
 	do {
 		display_keymap_indicator(ids);
 
 		key = textio_Input(ids);
 
-		/* Switch keymaps if the user presses [alpha] */
+		/* Switch keymaps if the user presses [alpha]. */
 		if (key == sk_Alpha)
 			switch_keymaps(ids);
 
@@ -72,13 +72,13 @@ void main(void) {
 	/* Convert the program/appvar name into a TI-OS format. */
 	name = textio_ConvertProgramAppvarName_TIOS(textio_GetDataBufferPtr(ids));
 
-	/* Draw the converted name */
+	/* Draw the converted name. */
 	fontlib_SetCursorPosition(1, 1);
 	fontlib_DrawString("Converted name: ");
 	fontlib_DrawString(name);
 
 	/* Delete the IDS. It is very important to call this function
-	   when you are through with an IDS */
+	   when you are through with an IDS. */
 	textio_DeleteIDS(ids);
 
 	/* Wait for keypress */
