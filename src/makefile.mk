@@ -126,12 +126,12 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 # check if there is an icon present that we can convert
 # if so, generate a recipe to build it
 ifneq ($(ICONIMG),)
-ICON_CONV := @echo "[convimg] $(ICONIMG)" && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+ICON_CONV := @echo [convimg] $(ICONIMG) && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LINK_REQUIRE += -i $(call QUOTE_ARG,require ___icon)
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 else
 ifneq ($(DESCRIPTION),)
-ICON_CONV := @echo "[convimg] description" && $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+ICON_CONV := @echo [convimg] description && $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LINK_REQUIRE += -i $(call QUOTE_ARG,require ___description)
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 ICONIMG :=
