@@ -19,7 +19,7 @@
     "delay|200",
     "key|enter",
     "delay|200",
-    "hashWait|3"
+    "hashWait|2"
   ],
   "hashes":
   {
