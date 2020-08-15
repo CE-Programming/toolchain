@@ -1,19 +1,19 @@
-; int atoi(char *cp);
-        assume  adl=1
+	assume	adl=1
 
-	public	_atoi
+	public	_atoi, _atol, _atos
+_atos := _atoi
+_atol := _atoi
 _atoi:
 	pop	bc
-	pop	de
-	push	de
+	ex	(sp),hl
 	push	bc
 	ld	bc,10
 	push	bc
 	ld	c,b
 	push	bc
-	push	de
+	push	hl
 	call	_strtol
-	pop	de
+	pop	bc
 	pop	bc
 	pop	bc
 	ret
