@@ -17,7 +17,6 @@
     "delay|1000",
     "key|enter",
     "delay|200",
-    "hashWait|2",
     "key|enter",
     "delay|200",
     "hashWait|3"
@@ -32,13 +31,6 @@
       "expected_CRCs": [ "071EBEE5" ]
     },
     "2":
-    {
-      "description": "Test stopped new time",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "380301DB" ]
-    },
-    "3":
     {
       "description": "Test program exit",
       "start": "vram_start",
