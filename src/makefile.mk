@@ -185,9 +185,9 @@ STATIC := 1
 endif
 
 # define the C/C++ flags used by Clang
-CFLAGS ?= -S -nostdinc -isystem $(CEDEV)/include $(CCDEBUGFLAG) $(OPT_MODE) -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_CFLAGS)
-CFLAGS := $(CFLAGS) -Wno-main-return-type
-CXXFLAGS := $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
+CFLAGS ?= -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_CFLAGS)
+CFLAGS += -Wno-main-return-type $(CCDEBUGFLAG) $(OPT_MODE)
+CXXFLAGS += -fno-exceptions $(EXTRA_CXXFLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
 LDFLAGS ?= \
@@ -211,7 +211,7 @@ all: $(BINDIR)/$(TARGET8XP) ;
 # this rule is trigged to build debug everything
 debug: LDDEBUGFLAG = -i dbg
 debug: DEBUGMODE = DEBUG
-#debug: CCDEBUGFLAG = -g
+debug: CCDEBUGFLAG = -g
 debug: $(BINDIR)/$(TARGET8XP) ;
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
@@ -232,12 +232,12 @@ $(ICONSRC): $(ICONIMG)
 $(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
+	$(Q)$(EZCC) -S $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 $(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
+	$(Q)$(EZCC) -S $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR) $(BINDIR))
