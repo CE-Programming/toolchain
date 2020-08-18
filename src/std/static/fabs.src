@@ -1,7 +1,7 @@
-; double fabs(double j);
 	assume	adl=1
 
-	public	_fabs
+	public	_fabs, _fabsf
+_fabsf := _fabs
 _fabs:
 	pop	bc
 	pop	hl

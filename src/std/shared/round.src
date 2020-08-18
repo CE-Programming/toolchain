@@ -1,6 +1,7 @@
 	assume	adl=1
 
-	public	_round
+	public	_round, _roundf
+_roundf := _round
 _round:
 	call	__frameset0
 	ld	hl,(ix+6)

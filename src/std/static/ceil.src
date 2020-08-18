@@ -1,7 +1,7 @@
-; double ceil(double d);
 	assume	adl=1
 
-	public	_ceil
+	public	_ceil, _ceilf
+_ceilf := _ceil
 _ceil:
 	call	__frameset0
 	ld	bc,(ix+6)
