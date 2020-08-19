@@ -126,12 +126,12 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 # check if there is an icon present that we can convert
 # if so, generate a recipe to build it
 ifneq ($(ICONIMG),)
-ICON_CONV := @echo [convimg] $(ICONIMG) && $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LINK_REQUIRE += -i $(call QUOTE_ARG,require ___icon)
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 else
 ifneq ($(DESCRIPTION),)
-ICON_CONV := @echo [convimg] description && $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+ICON_CONV := $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LINK_REQUIRE += -i $(call QUOTE_ARG,require ___description)
 LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
 ICONIMG :=
@@ -218,15 +218,11 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
-$(BINDIR)/$(TARGETBIN): $(ICONSRC) $(LINK_FILES)
-	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [linking] $(call NATIVEPATH,$@)
-	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
-
-# this rule handles conversion of the icon, if it is ever updated
-$(ICONSRC): $(ICONIMG)
+$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(ICONIMG)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(ICON_CONV)
+	$(Q)echo [linking] $(call NATIVEPATH,$@)
+	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
 
 # these rules compile the source files into assembly files
 $(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS)
