@@ -1,0 +1,7 @@
+	assume	adl=1
+
+	public	_floorf
+_floorf := _floor
+
+	extern	_floor
+
