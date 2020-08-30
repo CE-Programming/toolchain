@@ -1171,12 +1171,14 @@ srl_Write:
 	sbc	hl,de
 	push	hl
 	pop	bc				; length - transferred
+	jq	z,.zero
 	push	bc
 	ld	hl,(iy + 6)
 	add	hl,de
 	ld	de,(xsrl_Device.writeBufEnd)
 	ldir
 	pop	bc
+.zero:
 	ld	hl,(xsrl_Device.writeBufEnd)	; writeBufEnd += length - transferred
 	add	hl,bc
 	ld	(xsrl_Device.writeBufEnd),hl
