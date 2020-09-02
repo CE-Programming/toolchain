@@ -1,15 +1,7 @@
-; #define pio2  1.57079632679490
-;
-; double acos(double arg) {
-; 	if((arg > 1.) || (arg < -1.)) {
-; 		errno = EDOM;
-; 		return(0.);
-; 	}
-; 	return(pio2 - asin(arg));
-; }
 	assume	adl=1
 
-        public  _acos
+	public	_acos, _acosf
+_acosf := _acos
 _acos:
 	pop	hl
 	pop	de
@@ -53,3 +45,4 @@ l_2:	push	de
 	extern	__fsub
 	extern	_asin
 	extern	_errno
+

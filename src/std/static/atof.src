@@ -1,8 +1,8 @@
-; double atof(char *str);
 	assume	adl=1
 
-	public	_atof
-_atof:
+	public	_atoff, _atof
+_atof := _atoff
+_atoff:
 	pop	hl
 	pop	bc
 	push	bc
@@ -18,3 +18,4 @@ _atof:
 
 	extern	__frameset0
 	extern	_strtod
+

@@ -30,34 +30,24 @@
 #define q1  0.152151737879002e+5
 #define q2  -0.173678953558234e+3
 
-double sinh(double arg) {
-    return sinhf(arg);
+double cosh(double arg) {
+    return coshf(arg);
 }
 
-float sinhf(float arg) {
-	float temp, argsq;
-	register int sign;
+float coshf(float arg) {
+	float val;
 
-	sign = 1;
 	if(arg < 0) {
 		arg = -arg;
-		sign = -1;
 	}
+
+	val = expf(arg);
 
 	if(arg > 21.) {
-		temp = expf(arg)/2;
-		if (sign>0)
-			return(temp);
-		else
-			return(-temp);
+		return val/2;
 	}
 
-	if(arg > 0.5) {
-		return(sign*(expf(arg) - expf(-arg))/2);
-	}
-
-	argsq = arg*arg;
-	temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0)*arg;
-	temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
-	return(sign*temp);
+	val += expf(-arg);
+	val /= 2;
+	return val;
 }

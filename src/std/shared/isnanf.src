@@ -1,20 +1,22 @@
-; int isnan(double n);
 	assume	adl=1
 
-	public	_isnan
-_isnan:	
+	public	__isnanf
+__isnanf:
 	call	__frameset0
 	ld	hl,(ix+6)
 	adc	hl,hl
-	jr	z,l_1
+	jr	z,.nxt
 	ld	hl,(ix+8)
 	add	hl,hl
-l_1:	inc	h
+.nxt:
+	inc	h
 	ld	hl,0
-	jr	nz,l_2
+	jr	nz,.ret
 	inc	hl
-l_2:	ld	sp,ix
+.ret:
+	ld	sp,ix
 	pop	ix
 	ret
 
 	extern	__frameset0
+

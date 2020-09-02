@@ -5,11 +5,11 @@
 extern "C" {
 #endif
 
-#define NAN          (0.0f/0.0f)
-#define INFINITY     1e5000f
+#define NAN          __builtin_nanf()
+#define INFINITY     __builtin_inff()
 
-#define HUGE_VALF    INFINITY
-#define HUGE_VAL     ((double)INFINITY)
+#define HUGE_VALF    __builtin_inff()
+#define HUGE_VAL     __builtin_inf()
 
 #define M_E           2.71828182845904523536     /* e              */
 #define M_LOG2E       1.44269504088896340736     /* log2(e)        */
@@ -26,10 +26,10 @@ extern "C" {
 #define M_SQRT1_2     0.707106781186547524401    /* 1/sqrt(2)      */
 #define M_LOG_2M_PI   1.83787706640934548        /* log2(M_PI)     */
 
-unsigned char __isinff(float n);
-unsigned char __isnanf(float n);
-unsigned char __isnormalf(float n);
-unsigned char __isfinitef(float n);
+int __isinff(float n);
+int __isnanf(float n);
+int __isnormalf(float n);
+int __isfinitef(float n);
 
 #define isinf(x) ( \
 	sizeof((x)) == sizeof(float) ? __isinff((x)) : \

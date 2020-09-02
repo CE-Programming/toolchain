@@ -23,19 +23,23 @@
 #define q2	  0.946309610153821e4
 #define q3	  0.132653490878614e3
 
-double sinus(double,int);
+float sinus(float,int);
 
 double sin(double arg) {
-	return(sinus(arg, 0));
+	return sinf(arg);
 }
 
-double sinus(double arg, int quad)
+float sinf(float arg) {
+	return sinus(arg, 0);
+}
+
+float sinus(float arg, int quad)
 {
-	double e, f;
+	float e, f;
 	int k;
-	double ysq;
-	double x,y;
-	double temp1, temp2;
+	float ysq;
+	float x,y;
+	float temp1, temp2;
 
 	x = arg;
 	if(x<0) {
@@ -44,9 +48,9 @@ double sinus(double arg, int quad)
 	}
 	x = x*twoopi;	/*underflow?*/
 	if(x>32764){
-		y = modf(x,&e);
+		y = modff(x,&e);
 		e = e + quad;
-		modf(0.25*e,&f);
+		modff(0.25*e,&f);
 		quad = e - 4*f;
 	}else{
 		k = x;

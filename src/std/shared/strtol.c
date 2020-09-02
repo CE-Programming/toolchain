@@ -26,7 +26,7 @@
 *    the value of the number
 *
 *************************************************/
-long strtol(char *cp,char **endptr,int base)
+long strtol(const char *cp,char **endptr,int base)
 {
   register long sum,psum;
   register char sign;
@@ -89,7 +89,7 @@ long strtol(char *cp,char **endptr,int base)
          *cp == (char)'l' || *cp == (char)'L')
     ++cp;
     }
-    *endptr = cp;
+    *endptr = (char*)cp;
   }
   return(sign ? -sum : sum);
 }

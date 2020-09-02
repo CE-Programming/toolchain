@@ -24,8 +24,12 @@
 #define	maxf	10000
 
 double exp(double arg) {
-	double fraction;
-	double temp1, temp2, xsq;
+	return expf(arg);
+}
+
+float expf(float arg) {
+	float fraction;
+	float temp1, temp2, xsq;
 	int ent;
 
 	if ( arg == 0.0 ){
@@ -36,7 +40,7 @@ double exp(double arg) {
 	}
 	if ( arg > maxf ){
 		errno = ERANGE;
-		return HUGE_VAL ;
+		return HUGE_VALF;
 	}
 	arg *= log2e;
 	ent = floor( arg );

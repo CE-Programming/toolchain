@@ -1,8 +1,7 @@
-; int finite(double n);
-        assume  adl=1
+	assume	adl=1
 
-	public	_finite
-_finite:
+	public	__isfinitef
+__isfinitef:
 	pop	bc
 	pop	hl
 	pop	de
@@ -16,3 +15,4 @@ _finite:
 	sbc	hl,hl
 	inc	hl
 	ret
+

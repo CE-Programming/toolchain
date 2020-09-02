@@ -13,7 +13,7 @@
  * 
  * coefficients are #5077 from Hart & Cheney. (19.56D)
  */
-
+#include <math.h>
 
 #define sq2p1	2.41421356237309e0
 #define sq2m1	0.414213562373095e0
@@ -31,13 +31,17 @@
 #define q0	0.896785974036639e3
 
 
+double atan(double arg) {
+    return atanf(arg);
+}
+
 /**
  * atan makes its argument positive and
  * calls the inner routine satan.
  */
 
-double atan(double arg) {
-	double satan(double);
+float atanf(float arg) {
+	float satan(float);
 
 	if(arg>0) {
 		return(satan(arg));
@@ -58,9 +62,9 @@ double atan(double arg) {
  * range [-0.414...,+0.414...].
  */
 
-static double xatan(double arg) {
-	double argsq;
-	double value;
+static float xatan(float arg) {
+	float argsq;
+	float value;
 
 	argsq = arg*arg;
 	value = ((((p4*argsq + p3)*argsq + p2)*argsq + p1)*argsq + p0);
@@ -73,7 +77,7 @@ static double xatan(double arg) {
  * to the range [0,0.414...] and calls xatan.
  */
 
-double satan(double arg) {
+float satan(float arg) {
 	if(arg < sq2m1) {
 		return(xatan(arg));
 	} else if(arg > sq2p1) {

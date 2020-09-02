@@ -15,6 +15,10 @@
 #include <errno.h>
 //#include <float.h>
 
+double strtod(const char * str,char ** endptr)
+{
+    return strtof(str, endptr);
+}
 
 /*************************************************
 *
@@ -29,11 +33,11 @@
 *	the value of the number
 *
 *************************************************/
-double strtod(char * str,char ** endptr)
+float strtof(const char * str,char ** endptr)
 {
   union
   {
-    double d;
+    float d;
     unsigned short s[2];
   }val;
   int frac = 0;
@@ -83,7 +87,7 @@ double strtod(char * str,char ** endptr)
   }
 
   if (endptr)
-    *endptr = str;
+    *endptr = (char*)str;
 
   if (exp_sign < 0 )
      exp = -exp;

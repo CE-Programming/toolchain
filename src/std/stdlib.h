@@ -73,8 +73,9 @@ void free(void *);
 double atof(char * nptr);
 int atoi(char * nptr);
 long atol(char * nptr);
-double strtod(char * nptr,char ** endptr);
-long strtol(char *nptr,char ** endptr,int base);
+float strtof (const char* str, char** endptr);
+double strtod(const char * nptr,char ** endptr);
+long strtol(const char *nptr,char ** endptr,int base);
 unsigned long strtoul(char *nptr,char ** endptr,int base);
 
 /* Random routines */
