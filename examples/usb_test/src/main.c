@@ -173,7 +173,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             for (i = 0; i < 8; i++)
                 putByteHex(((unsigned char *)setup)[i]);
             _OS(asm_NewLine);
-            if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE &&
+            if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == (USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE) &&
                 !setup->bRequest && !setup->wValue && !setup->wIndex) {
                 usb_device_t host;
                 usb_endpoint_t control;
@@ -361,7 +361,7 @@ static void handleDevice(global_t *global) {
                 putIntHex(length);
             _OS(asm_NewLine);
 
-            putIntHex(usb_BulkTransfer(global->out, inquiry_cbw, sizeof(inquiry_cbw), 0, &length));
+            putIntHex(usb_BulkTransfer(global->out, (uint8_t *)inquiry_cbw, sizeof(inquiry_cbw), 0, &length));
             putChar(':');
             putIntHex(length);
             _OS(asm_NewLine);
@@ -384,7 +384,7 @@ static void handleDevice(global_t *global) {
 
             break;
         case 2:
-            putIntHex(usb_BulkTransfer(global->out, rdy_pkt_00, sizeof(rdy_pkt_00), 0, &length));
+            putIntHex(usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_00, sizeof(rdy_pkt_00), 0, &length));
             putChar(':');
             putIntHex(length);
             _OS(asm_NewLine);
@@ -398,7 +398,7 @@ static void handleDevice(global_t *global) {
                 putIntHex(length);
             _OS(asm_NewLine);
 
-            putIntHex(usb_BulkTransfer(global->out, rdy_pkt_01, sizeof(rdy_pkt_01), 0, &length));
+            putIntHex(usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_01, sizeof(rdy_pkt_01), 0, &length));
             putChar(':');
             putIntHex(length);
             _OS(asm_NewLine);
