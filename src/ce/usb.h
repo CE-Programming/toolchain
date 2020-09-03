@@ -16,6 +16,11 @@ extern "C" {
 #endif
 
 /**
+ * @returns Nonzero if the battery is being charged.
+ */
+uint8_t usb_BatteryCharging(void);
+
+/**
  * @returns True if the usb bus line is powered, i.e. connected to a another calc
  */
 bool usb_BusPowered(void);

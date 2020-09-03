@@ -11,10 +11,11 @@
 ; ---
 ; Location Equates
 ; ---
-_usb_BusPowered    := 0003E4h
-_usb_SelfPowered   := 0003E8h
-_usb_ResetChip     := 0003F4h
-_usb_DisableTimers := 0004F4h
-_usb_EnableTimers  := 0004F8h
-_usb_ResetTimers   := 0004F0h
+_usb_BatteryCharging := 0003CCh
+_usb_BusPowered      := 0003E4h
+_usb_SelfPowered     := 0003E8h
+_usb_ResetChip       := 0003F4h
+_usb_DisableTimers   := 0004F4h
+_usb_EnableTimers    := 0004F8h
+_usb_ResetTimers     := 0004F0h
 ; ---
