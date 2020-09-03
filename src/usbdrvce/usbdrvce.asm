@@ -2084,65 +2084,6 @@ _CreateDummyTransfer:
 	ret
 
 ; Input:
-;  b = port or 1 shl 7
-;  c = find flags
-;  de = parent hub
-;  hl = pointer to device speed shl 2
-; Output:
-;  a = ?
-;  zf = enough memory
-;  hl = ?
-;  iy = device
-_CreateDevice:
-	ld	a,(hl)
-	call	_Alloc32Align32
-	ret	nz
-	push	hl
-	pop	ydevice
-	call	_Alloc32Align32
-	jq	nz,.nomem
-	ld	(ydevice.endpoints),hl
-	ex	de,hl
-	ld	(ydevice.hub),hl
-	ld	(ydevice.find),c
-assert bUsbSpd-16 = bUsbDevSpd
-	and	a,bmUsbSpd shr 16
-	rrca
-	rrca
-	ld	(ydevice.speed),a
-	setmsk	device.addr,hl
-	ld	a,(hl)
-	srl	b
-	rla
-	rrca
-	ld	c,a
-assert ydevice.info+2 = ydevice.data ; clobber
-	ld	(ydevice.info),bc
-repeat device.child-device.addr
-	inc	l
-end repeat
-	ld	(hl),ydevice
-	ld	(ydevice.back),hl
-	ld	bc,32-1
-	push	de
-	inc	de
-	pop	hl
-	ld	(hl),-1
-	ldir
-	ld	(ydevice.hubPorts),b;0
-	ld	(ydevice.addr),b;0
-	ld	(ydevice.data),bc;0 ; unclobber
-	inc	c;1
-	ld	(ydevice.refcount),bc;1
-	ld	(ydevice.child),c;1
-	ld	(ydevice.sibling),c;1
-	cp	a,a
-	ret
-.nomem:
-	lea	hl,ydevice
-	jq	_Free32Align32
-
-; Input:
 ;  ix = device-1
 ; Output:
 ;  zf = success
@@ -3475,6 +3416,8 @@ _HandleFifo#fifo#InInt:
 end repeat
 
 _HandleDevResetInt:
+	call	_RootDeviceDisconnected
+	ret	nz
 	xor	a,a
 	ld	l,usbDevAddr-$100
 	ld	(hl),a
@@ -3490,17 +3433,15 @@ _HandleDevResetInt:
 	ld	l,usbDevCtrl-$100
 	call	_CreateDevice
 	call	z,_CreateDefaultControlEndpoint
-	jq	nz,.nomem
+	ret	nz
 	ld	hl,(currentDescriptors)
 	ld	hl,(hl)
 	ld	de,7
 	add	hl,de
 	ld	a,(hl)
 	ld	(yendpoint.maxPktLen),a
-.nomem:
 	ld	hl,mpUsbDevIsr
 	ld	(hl),bmUsbIntDevReset
-	cp	a,a
 	ret
 
 _HandleDevSuspendInt:
@@ -3699,13 +3640,74 @@ _HandlePortConnStsInt:
 	ld	de,rootHub
 	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_DISABLED
 	ld	l,usbOtgCsr+2
-	call	_CreateDevice
-	ld	hl,USB_ERROR_NO_MEMORY
-	ret	nz ; FIXME
+	jq	_CreateDevice
+
+; Input:
+;  b = port or 1 shl 7
+;  c = find flags
+;  de = parent hub
+;  hl = pointer to device speed shl 2
+; Output:
+;  zf = success
+;  a = ?
+;  hl = mpUsbPortStsCtrl | error
+;  iy = device
+_CreateDevice:
+	ld	a,(hl)
+	call	_Alloc32Align32
+	jq	nz,.error
+	push	hl
+	pop	ydevice
+	call	_Alloc32Align32
+	jq	nz,.nomem
+	ld	(ydevice.endpoints),hl
+	ex	de,hl
+	ld	(ydevice.hub),hl
+	ld	(ydevice.find),c
+assert bUsbSpd-16 = bUsbDevSpd
+	and	a,bmUsbSpd shr 16
+	rrca
+	rrca
+	ld	(ydevice.speed),a
+	setmsk	device.addr,hl
+	ld	a,(hl)
+	srl	b
+	rla
+	rrca
+	ld	c,a
+assert ydevice.info+2 = ydevice.data ; clobber
+	ld	(ydevice.info),bc
+repeat device.child-device.addr
+	inc	l
+end repeat
+	ld	(hl),ydevice
+	ld	(ydevice.back),hl
+	ld	bc,32-1
+	push	de
+	inc	de
+	pop	hl
+	ld	(hl),-1
+	ldir
+	ld	(ydevice.hubPorts),b;0
+	ld	(ydevice.addr),b;0
+	ld	(ydevice.data),bc;0 ; unclobber
+	inc	c;1
+	ld	(ydevice.refcount),bc;1
+	ld	(ydevice.child),c;1
+	ld	(ydevice.sibling),c;1
 	ld	hl,mpUsbPortStsCtrl
 	lea	de,ydevice
+	push	de
 	ld	a,USB_DEVICE_CONNECTED_EVENT
-	jq	_DispatchEvent
+	call	_DispatchEvent
+	pop	ydevice
+	ret
+.nomem:
+	lea	hl,ydevice
+	call	_Free32Align32
+.error:
+	ld	hl,USB_ERROR_NO_MEMORY
+	ret
 
 _HandlePortPortEnInt:
 	ld	a,(hl)
@@ -3805,6 +3807,17 @@ _HandleAsyncAdvInt:
 	ret
 
 ;-------------------------------------------------------------------------------
+; Dispatch a global usb event.
+; Input:
+;  a = event
+;  de = event data
+; Output:
+;  zf = success
+;  a = ?
+;  bc = ?
+;  de = 0 | hl
+;  hl = hl | error
+;  iy = ?
 _DispatchEvent:
 	push	hl
 	ld	hl,(eventCallback.data)

@@ -158,7 +158,8 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             _OS(asm_NewLine);
-            error = usb_ResetDevice(event_data);
+            if (event != USB_DEVICE_DISCONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE))
+                error = usb_ResetDevice(event_data);
             break;
         case USB_DEVICE_ENABLED_EVENT:
             os_PutStrFull(usb_event_names[event]);
