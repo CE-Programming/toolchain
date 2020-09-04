@@ -24,6 +24,7 @@ extern unsigned char *image_tiles_compressed[12];
 #define image_tile_9_compressed image_tiles_compressed[9]
 #define image_tile_10_compressed image_tiles_compressed[10]
 #define image_tile_11_compressed image_tiles_compressed[11]
+#define vargfx_entries_num 2
 extern unsigned char *vargfx_appvar[2];
 unsigned char vargfx_init(void);
 

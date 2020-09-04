@@ -141,6 +141,7 @@ extern unsigned char *tileset_tiles_data[128];
 #define tileset_tile_125 ((gfx_sprite_t*)tileset_tiles_data[125])
 #define tileset_tile_126 ((gfx_sprite_t*)tileset_tiles_data[126])
 #define tileset_tile_127 ((gfx_sprite_t*)tileset_tiles_data[127])
+#define vargfx_entries_num 2
 extern unsigned char *vargfx_appvar[2];
 unsigned char vargfx_init(void);
 
