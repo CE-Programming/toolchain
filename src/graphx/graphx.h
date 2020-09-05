@@ -1659,7 +1659,7 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 #define gfx_white       _Pragma("GCC warning \"'gfx_white' is not palette-safe, try to avoid it\"")  0xFF
 
 /* Compatibility defines (don't use please) */
-#define gfx_image_t     _Pragma("GCC warning \"'gfx_image_t' is deprecated, use 'gfx_sprite_t' instead\"") gfx_sprite_t;
+#define gfx_image_t     _Pragma("GCC warning \"'gfx_image_t' is deprecated, use 'gfx_sprite_t' instead\"") gfx_sprite_t
 #define gfx_BlitArea    _Pragma("GCC warning \"'gfx_BlitArea' is deprecated, use 'gfx_BlitRectangle' instead\"") gfx_BlitRectangle
 
 #define gfx_lcdWidth    (320)
