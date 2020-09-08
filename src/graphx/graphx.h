@@ -1652,6 +1652,19 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 #define gfx_pink        0xF0
 #define gfx_white       0xFF
 
+/**
+ * Reads width and height bytes of a zx7-compressed image.
+ * Byte 0 is literal (width), byte 1 is flag, byte 2 might be height.
+ * If bit 7 of byte 1 is reset, byte 2 is a literal
+ * Otherwise it's an LZ sequence which repeats byte 0 (height is also width)
+*/
+#define gfx_GetZX7ImageWidth(adr) \
+  (((uint8_t*)adr)[0])
+#define gfx_GetZX7ImageHeight(adr) \
+(((((uint8_t*)adr)[1])&0x80) ? \
+  (((uint8_t*)adr)[0]) : \
+  (((uint8_t*)adr)[2]))
+
 /* Compatability defines (don't use please) */
 typedef gfx_sprite_t gfx_image_t;
 #define gfx_BlitArea gfx_BlitRectangle
