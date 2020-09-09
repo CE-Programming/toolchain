@@ -1652,18 +1652,31 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 #define gfx_pink        0xF0
 #define gfx_white       0xFF
 
-/**
- * Reads width and height bytes of a zx7-compressed image.
- * Byte 0 is literal (width), byte 1 is flag, byte 2 might be height.
- * If bit 7 of byte 1 is reset, byte 2 is a literal
- * Otherwise it's an LZ sequence which repeats byte 0 (height is also width)
-*/
-#define gfx_GetZX7ImageWidth(adr) \
+/* byte 0 of compressed data is always literal. Is width */
+#define gfx_GetZX7SpriteWidth(adr) \
   (((uint8_t*)adr)[0])
-#define gfx_GetZX7ImageHeight(adr) \
+/* byte 1 of compressed data is flag. If bit 7 set, copy byte 0, else byte 2 */
+#define gfx_GetZX7SpriteHeight(adr) \
 (((((uint8_t*)adr)[1])&0x80) ? \
   (((uint8_t*)adr)[0]) : \
   (((uint8_t*)adr)[2]))
+/**
+ * Calculates the amount of memory that a zx7-compressed
+ * sprite would use when decompressed.
+ *
+ * Sprite size is calculated as 2 + (width * height).
+ *
+ * ZX7 data always starts with a literal, which is the sprite's width. The next
+ * byte contains flags, which indicates if the following bytes are literals or
+ * codewords. If bit 7 of that is zero, the byte immediately after it is a
+ * literal and can be read in as sprite height. Otherwise, the bits that follows
+ * indicates a codeword, making sprite height the same as width.
+ * 
+ * @param zx7_sprite ZX7-compressed sprite
+ * @return Size, in bytes, of decompressed sprite
+*/
+#define gfx_GetZX7SpriteSize(zx7_sprite) \
+  (2+gfx_GetZX7SpriteWidth(zx7_sprite)*gfx_GetZX7SpriteHeight(zx7_sprite))
 
 /* Compatability defines (don't use please) */
 typedef gfx_sprite_t gfx_image_t;
