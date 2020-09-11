@@ -443,7 +443,7 @@ uint8_t *gfx_TilePtr(const gfx_tilemap_t *tilemap,
  * Gets a particular tile's value given an initialized tilemap
  * structure and pixel offsets.
  *
- * @param tilemap Pointer to initialized tilemap structure.
+ * @param tilemap Pointer to an initialized tilemap structure.
  * @param x_offset Offset in pixels from the left of the tilemap.
  * @param y_offset Offset in pixels from the top of the tilemap.
  */
@@ -454,34 +454,36 @@ uint8_t *gfx_TilePtr(const gfx_tilemap_t *tilemap,
  * Gets a pointer to a particular tile given an initialized tilemap
  * structure and mapped offsets.
  *
- * @param tilemap Pointer to initialized tilemap structure.
- * @param row Offset in bytes in the row.
- * @param col Offset in bytes in the column.
+ * @param tilemap Pointer to an initialized tilemap structure.
+ * @param col Column of tile in tilemap.
+ * @param row Row of tile in tilemap.
  */
 uint8_t *gfx_TilePtrMapped(const gfx_tilemap_t *tilemap,
-                           uint8_t row,
-                           uint8_t col);
+                           uint8_t col,
+                           uint8_t row);
 
 /**
- * Sets a particular tile's value given an initialized tilemap structure and mapped offsets
+ * Sets a particular tile's value given an initialized tilemap structure
+ * and mapped offsets.
  *
- * @param tilemap Pointer to initialized tilemap structure
- * @param row Offset in bytes in the row
- * @param col Offset in bytes in the column
- * @param value Value to set tile to
+ * @param tilemap Pointer to initialized tilemap structure.
+ * @param col Column of tile in tilemap.
+ * @param row Row of tile in tilemap.
+ * @param value Value to set tile to.
  */
-#define gfx_SetTileMapped(tilemap, row, col, value) \
-(*(gfx_TilePtrMapped((tilemap), (row), (col))) = (uint8_t)(value))
+#define gfx_SetTileMapped(tilemap, col, row, value) \
+(*(gfx_TilePtrMapped((tilemap), (col), (row))) = (uint8_t)(value))
 
 /**
- * Gets a particular tile's value given an initialized tilemap structure and mapped offsets
+ * Gets a particular tile's value given an initialized tilemap structure
+ * and mapped offsets.
  *
- * @param tilemap Pointer to initialized tilemap structure
- * @param row Offset in bytes in the row
- * @param col Offset in bytes in the column
+ * @param tilemap Pointer to an initialized tilemap structure.
+ * @param col Column of tile in tilemap.
+ * @param row Row of tile in tilemap.
  */
-#define gfx_GetTileMapped(tilemap, row, col) \
-(*(gfx_TilePtrMapped((tilemap), (row), (col))))
+#define gfx_GetTileMapped(tilemap, col, row) \
+(*(gfx_TilePtrMapped((tilemap), (col), (row))))
 
 /**
  * Sets the color index that drawing routines will use
