@@ -67,7 +67,7 @@ extern "C" {
  *
  * @remarks
  * Create at compile-time with a tool like
- * <a href="https://github.com/mateoconlechuga/convpng" target="_blank">convpng</a>.
+ * <a href="https://github.com/mateoconlechuga/convimg" target="_blank">convimg</a>.
  * Create at runtime (with uninitialized data) with gfx_MallocSprite(),
  * gfx_UninitedSprite(), or gfx_TempSprite().
  */
@@ -90,7 +90,7 @@ typedef struct {
  *
  * @remarks
  * Create at compile-time with a tool like
- * <a href="https://github.com/mateoconlechuga/convpng" target="_blank">convpng</a>.
+ * <a href="https://github.com/mateoconlechuga/convimg" target="_blank">convimg</a>.
  */
 typedef struct {
     uint8_t width;   /**< Width of the image  */
