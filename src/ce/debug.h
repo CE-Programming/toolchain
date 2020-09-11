@@ -86,10 +86,10 @@ do { \
  * @param flags DBG_WATCHPOINT_READ, DBG_WATCHPOINT_WRITE, or
  *              DBG_WATCHPOINT_RW. (or 0 to disable).
  */
-#define dbg_SetWatchpoint(address_low, length, flags) \
+#define dbg_SetWatchpoint(address, length, flags) \
 do { \
-    *(volatile unsigned int*)0xFFFFE4 = (unsigned int)(address_low); \
-    *(volatile unsigned int*)0xFFFFE8 = ((unsigned int)(address_low) + (length)); \
+    *(volatile unsigned int*)0xFFFFE4 = (unsigned int)(address); \
+    *(volatile unsigned int*)0xFFFFE8 = ((unsigned int)(address) + (length) - 1); \
     *(volatile unsigned char*)0xFFFFEC = (unsigned char)(flags); \
     *(volatile unsigned char*)0xFFFFE0 = 3; \
 } while (0)

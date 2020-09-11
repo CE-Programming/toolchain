@@ -711,10 +711,8 @@ var_t *os_GetAppVarData(const char *name, int *archived);
  * Deletes an AppVar from RAM.
  *
  * @param name Name of the AppVar to delete.
- * @returns A pointer to the AppVar data
- * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
  */
-var_t *os_DelAppVar(const char *name, uint16_t size);
+void os_DelAppVar(const char *name);
 
 /**
  * Locates a symbol in the symtable
@@ -732,6 +730,7 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
  * or the dimension of a list.
  *
  * @param name Name of the var to lookup.
+ * @param size Pointer to store size of variable.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetVarSize(const char *name, size_t *size);
@@ -740,6 +739,8 @@ int os_GetVarSize(const char *name, size_t *size);
  * Gets the dimensions of a matrix.
  *
  * @param name Name of the matrix to lookup.
+ * @param rows Pointer to store number of rows.
+ * @param cols Pointer to store number of columns.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetMatrixDims(const char *name, int *rows, int *cols);
@@ -747,6 +748,7 @@ int os_GetMatrixDims(const char *name, int *rows, int *cols);
 /**
  * Gets a real value from a real list or a complex list where the selected
  * element has no imaginary component.
+ *
  * @param name Name of the list.
  * @param index Element index (1-based).
  * @param value Set tto the value of the selected element.
@@ -756,6 +758,7 @@ int os_GetRealListElement(const char *name, int index, real_t *value);
 
 /**
  * Gets a real value from a matrix.
+ *
  * @param name Name of the matrix.
  * @param row Element row (1-based).
  * @param col Element col (1-based).
@@ -767,6 +770,8 @@ int os_GetMatrixElement(const char *name, int row, int col, real_t *value);
 /**
  * Gets the real value of a real variable or a complex variable with
  * no imaginary component.
+ *
+ * @param name Name of TIOS variable.
  * @param value Set to the value of the variable.
  * @return TIOS System Error Code or 0 on success.
  */
@@ -775,8 +780,9 @@ int os_GetRealVar(const char *name, real_t *value);
 /**
  * If list \p name doesn't exist, create it with \p dim elements, otherwise
  * resize the list, with new elements being set to 0.
+ *
  * @param name Name of the list to resize.
- * @param rows New list dimension.
+ * @param dim New list dimension.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_SetListDim(const char *name, int dim);
@@ -784,6 +790,7 @@ int os_SetListDim(const char *name, int dim);
 /**
  * If matrix \p name doesn't exist, create it with dimensions \p rows and
  * \p cols, otherwise resize the matrix, with new elements being set to 0.
+ *
  * @param name Name of the matrix to resize.
  * @param rows New row dimension.
  * @param cols New col dimension.
@@ -794,6 +801,7 @@ int os_SetMatrixDims(const char *name, int rows, int cols);
 /**
  * Sets a list element to a real value.  If the list doesn't exist, then index
  * must be 1 and it creates a 1 element list.
+ *
  * @param name Name of the list.
  * @param index Element index (1-based).
  * @param value The value to set to the selected element.
@@ -803,6 +811,7 @@ int os_SetRealListElement(const char *name, int index, const real_t *value);
 
 /**
  * Sets a matrix element to a real value.
+ *
  * @param name Name of the matrix.
  * @param row Element row (1-based).
  * @param col Element col (1-based).
@@ -813,6 +822,8 @@ int os_SetMatrixElement(const char *name, int row, int col, const real_t *value)
 
 /**
  * Sets a variable to a real value, creating it if it doesn't exist.
+ *
+ * @param name Name of variable to lookup.
  * @param value The value to set the variable to.
  * @return TIOS System Error Code or 0 on success.
  */
@@ -873,6 +884,8 @@ real_t os_RealSub(const real_t *arg1, const real_t *arg2);
 /**
  * Rounds a real_t
  *
+ * @param arg Real variable.
+ * @param digits Number of digits to round to.
  * @note digits must be in the range 0 - 9
  */
 real_t os_RealRound(const real_t *arg, char digits);
@@ -880,30 +893,40 @@ real_t os_RealRound(const real_t *arg, char digits);
 /**
  * Compares two real_t
  *
+ * @param arg1 Real variable 1.
+ * @param arg2 Real variable 2.
  * @returns -1, 0, or 1 depending on the comparison
  */
 int os_RealCompare(const real_t *arg1, const real_t *arg2);
 
 /**
  * Converts a real_t to an integer
+ *
+ * @param arg Real variable.
  * @note Saturates on overflow
  */
 int24_t os_RealToInt24(const real_t *arg);
 
 /**
  * Converts an integer to a real_t
+ *
+ * @param arg Integer value.
  * @note Saturates on overflow
  */
 tiflags real_t os_Int24ToReal(int24_t arg);
 
 /**
  * Converts a real_t to a float
+ *
+ * @param arg Real variable.
  * @note Saturates on overflow
  */
 float os_RealToFloat(const real_t *arg);
 
 /**
  * Converts an float to a real_t
+ *
+ * @param arg Float value.
  * @note Saturates on overflow
  */
 real_t os_FloatToReal(float arg);

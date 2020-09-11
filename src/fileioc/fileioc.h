@@ -385,7 +385,9 @@ bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
 /**
  * Set routines to run before and after a garbage collect would be triggered.
- * @param routine Routine to run following a garbage collect. NULL sets it to do nothing.
+ *
+ * @param before Routine to run before a garbage collect. NULL sets it to do nothing.
+ * @param after Routine to run following a garbage collect. NULL sets it to do nothing.
  * @note If your program uses graphx, use gfx_End and gfx_Begin to reset graphics before, and setup graphics after the garbage collect.
  * */
 void ti_SetGCBehavior(void (*before)(void), void (*after)(void));
