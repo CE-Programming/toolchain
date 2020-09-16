@@ -1650,12 +1650,12 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 
 /* byte 0 of compressed data is always literal. Is width */
 #define gfx_GetZX7SpriteWidth(adr) \
-  (((uint8_t*)adr)[0])
+  (((uint8_t*)(adr))[0])
 /* byte 1 of compressed data is flag. If bit 7 set, copy byte 0, else byte 2 */
 #define gfx_GetZX7SpriteHeight(adr) \
-(((((uint8_t*)adr)[1])&0x80) ? \
-  (((uint8_t*)adr)[0]) : \
-  (((uint8_t*)adr)[2]))
+(((((uint8_t*)(adr))[1])&0x80) ? \
+  (((uint8_t*)(adr))[0]) : \
+  (((uint8_t*)(adr))[2]))
 /**
  * Calculates the amount of memory that a zx7-compressed
  * sprite would use when decompressed.
