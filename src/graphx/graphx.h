@@ -1649,13 +1649,19 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 
 
 /* byte 0 of compressed data is always literal. Is width */
-#define gfx_GetZX7SpriteWidth(adr) \
-  (((uint8_t*)(adr))[0])
+#define gfx_GetZX7SpriteWidth(zx7_sprite)                     \
+    __extension__({                                           \
+        const uint8_t *_Data = (const uint8_t *)(zx7_sprite); \
+        _Data[0];                                             \
+    })
+
 /* byte 1 of compressed data is flag. If bit 7 set, copy byte 0, else byte 2 */
-#define gfx_GetZX7SpriteHeight(adr) \
-(((((uint8_t*)(adr))[1])&0x80) ? \
-  (((uint8_t*)(adr))[0]) : \
-  (((uint8_t*)(adr))[2]))
+#define gfx_GetZX7SpriteHeight(zx7_sprite)                    \
+    __extension__({                                           \
+        const uint8_t *_Data = (const uint8_t *)(zx7_sprite); \
+        _Data[_Data[1] & 0x80 ? 0 : 2];                       \
+    })
+
 /**
  * Calculates the amount of memory that a zx7-compressed
  * sprite would use when decompressed.
@@ -1671,8 +1677,11 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
  * @param zx7_sprite ZX7-compressed sprite
  * @return Size, in bytes, of decompressed sprite
 */
-#define gfx_GetZX7SpriteSize(zx7_sprite) \
-  (2+gfx_GetZX7SpriteWidth(zx7_sprite)*gfx_GetZX7SpriteHeight(zx7_sprite))
+#define gfx_GetZX7SpriteSize(zx7_sprite)                                      \
+    __extension__({                                                           \
+        const void *_Sprite = (const void *)(zx7_sprite);                     \
+        2 + gfx_GetZX7SpriteWidth(_Sprite) * gfx_GetZX7SpriteHeight(_Sprite); \
+    })
 
 /* Color definitions (try to avoid) */
 #define gfx_black       _Pragma("GCC warning \"'gfx_black' is not palette-safe, try to avoid it\"")  0x00
