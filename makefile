@@ -234,6 +234,9 @@ doxygen:
 linker_script: std
 	$(call RM,$(call QUOTE_ARG,$@))
 	@echo Generating linker script...
+	$(call APPEND,if definite DEBUG)
+	$(call APPEND,	dbg)
+	$(call APPEND,end if)
 	$(call APPEND,require __init$(comma) __startup$(comma) _exit$(comma) __findlibload if .libs.length)
 	$(call APPEND,provide __low_bss = .bss.base)
 	$(call APPEND,provide __len_bss = .bss.length)

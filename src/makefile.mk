@@ -13,6 +13,7 @@ OUTPUT_MAP          ?= NO
 ARCHIVED            ?= NO
 OPT_MODE            ?= -O3
 EXTRA_CFLAGS        ?=
+EXTRA_LDFLAGS       ?=
 EXTRA_CXXFLAGS      ?=
 #----------------------------
 SRCDIR              ?= src
@@ -36,6 +37,7 @@ comma := ,
 
 TARGET ?= $(NAME)
 DEBUGMODE = NDEBUG
+LDDEBUG = 0
 CCDEBUGFLAG = -g0
 
 # verbosity
@@ -193,24 +195,25 @@ CXXFLAGS += $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
 LDFLAGS ?= \
 	-n \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/include/fasmg-ez80/ld.alm)) \
+	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
+	-i $(call QUOTE_ARG,STATIC := $(STATIC)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
-	$(LDDEBUGFLAG) \
-	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
-	-i $(call QUOTE_ARG,STATIC := $(STATIC)) \
 	$(LINK_DEFINITIONS) \
 	$(LINK_REQUIRE) \
+	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LINK_ICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP))$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
-	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LINK_LIBLOAD))$(comma) $(call FASMG_FILES,$(LINK_LIBS)))
+	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LINK_LIBLOAD))$(comma) $(call FASMG_FILES,$(LINK_LIBS))) \
+	$(EXTRA_LDFLAGS)
 
 # this rule is trigged to build everything
 all: $(BINDIR)/$(TARGET8XP) ;
 
 # this rule is trigged to build debug everything
-debug: LDDEBUGFLAG = -i dbg
 debug: DEBUGMODE = DEBUG
+debug: LDDEBUG = 1
 debug: CCDEBUGFLAG = -g
 debug: $(BINDIR)/$(TARGET8XP) ;
 
