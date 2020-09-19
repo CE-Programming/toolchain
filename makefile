@@ -112,7 +112,8 @@ clean: $(addprefix clean-,$(LIBRARIES)) clean-ce clean-std clean-startup
 	$(call RM,linker_script)
 	$(call RMDIR,release)
 	$(call RMDIR,clibraries)
-	$(call RMDIR,doxygen)
+	$(call RMDIR,docs/build)
+	$(call RMDIR,docs/doxygen)
 
 #----------------------------
 # tool rules
@@ -222,10 +223,13 @@ clibraries:
 #----------------------------
 
 #----------------------------
-# doxygen rule
+# docs rules
 #----------------------------
-doxygen:
-	cd $(call NATIVEPATH,tools/doxygen) && doxygen config
+docs-pdf:
+	cd $(call NATIVEPATH,docs) && $(MAKE) latexpdf
+
+docs-html:
+	cd $(call NATIVEPATH,docs) && $(MAKE) html
 #----------------------------
 
 #----------------------------
@@ -256,26 +260,18 @@ linker_script: std
 # makefile help rule
 #----------------------------
 help:
-	@echo Available targets:
+	@echo Helpful targets:
 	@echo all
-	@echo ce
-	@echo asm
-	@echo std
-	@echo fasmg
-	$(foreach library,$(LIBRARIES),@echo $(library)$(newline))
+	@echo docs-html
+	@echo docs-pdf
 	@echo clean
-	@echo clean-ce
-	@echo clean-asm
-	@echo clean-std
-	$(foreach library,$(LIBRARIES),@echo clean-$(library)$(newline))
-	@echo doxygen
 	@echo install
 	@echo uninstall
 	@echo release
 	@echo release-libs
 	@echo help
 
-.PHONY: release-libs clibraries doxygen chmod all clean $(LIBRARIES) $(addprefix clean-,$(LIBRARIES)) install uninstall help release
+.PHONY: release-libs clibraries docs-pdf docs-html chmod all clean $(LIBRARIES) $(addprefix clean-,$(LIBRARIES)) install uninstall help release
 
 .SECONDEXPANSION:
 $(DIRS): $$(call DIRNAME,$$@)
