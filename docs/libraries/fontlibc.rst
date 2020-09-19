@@ -26,7 +26,7 @@ Use :code:`fontlib_SetNewlineOptions` to control how :code:`fontlib_DrawString` 
 Aligning Text
 -------------
 
-Implementing centered text, right-aligned text, and word wrap require being able to compute the width of a word or string of text.
+Implementing centered text, right-aligned text, and word wrap requires being able to compute the width of a word or string of text.
 The routine :code:`fontlib_GetStringWidth` provides this functionality.
 
 If you call :code:`fontlib_SetAlternateStopCode(' ')`, :code:`fontlib_GetStringWidth` and :code:`fontlib_DrawString` will stop drawing on spaces, giving you a chance to check if the next word will fit on screen.
