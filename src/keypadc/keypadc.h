@@ -1,12 +1,13 @@
 /**
  * @file
- * @authors Matt "MateoConLechuga" Waltz
- * @authors Shaun "Merthsoft" McFall
- * @brief Simple direct input keypad library
+ * @brief keypadc is a simple direct-input keypad library.
+ *
+ * @author Matt "MateoConLechuga" Waltz
+ * @author Shaun "Merthsoft" McFall
  */
 
-#ifndef H_KEYPADC
-#define H_KEYPADC
+#ifndef _KEYPADC_H
+#define _KEYPADC_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -15,66 +16,66 @@
 extern "C" {
 #endif
 
-typedef uint8_t kb_key_t;   /**< Normal key type */
-typedef uint16_t kb_lkey_t; /**< Long key type   */
+typedef uint8_t kb_key_t;   /**< Normal key type. */
+typedef uint16_t kb_lkey_t; /**< Long key type.   */
 
 /**
- * Scans the keyboard to update data values
- * @note Disables interrupts
+ * Scans the keyboard to update data values.
+ * @note Disables interrupts.
  */
 void kb_Scan(void);
 
 /**
- * Scans the given keyboard row and returns the row value
- * @param row Row to scan
- * @note Disables interrupts
+ * Scans the given keyboard row and returns the row value.
+ * @param row Row to scan.
+ * @note Disables interrupts.
  */
 kb_key_t kb_ScanGroup(uint8_t row);
 
 /**
- * Scans the keyboard quickly to tell if any key was pressed
- * @note Disables interrupts
+ * Scans the keyboard quickly to tell if any key was pressed.
+ * @note Disables interrupts.
  */
 uint8_t kb_AnyKey(void);
 
 /**
- * Resets the keyboard before returning to the TI-OS
- * @note Only use the keyboard timers or number of rows have been modified
+ * Resets the keyboard before returning to the OS.
+ * @note Only use the keyboard timers or number of rows have been modified.
  */
 void kb_Reset(void);
 
 /**
- * @brief Sets the keypad scanning mode
+ * @brief Sets the keypad scanning mode.
  * @see kb_scan_mode_t
  */
 #define kb_SetMode(mode) \
 (kb_Config = ((kb_Config & ~3)|(mode)))
 
 /**
- * @brief Gets the keypad scanning mode
+ * @brief Gets the keypad scanning mode.
  * @see kb_scan_mode_t
  */
 #define kb_GetMode() \
 (kb_Config & 3)
 
 /**
- * Different available scanning modes
+ * Different available scanning modes.
  */
 typedef enum {
-    MODE_0_IDLE = 0,       /**< Keypad scanning is idle */
+    MODE_0_IDLE = 0,       /**< Keypad scanning is idle. */
     MODE_1_INDISCRIMINATE, /**< Indiscriminate key detection. Data registers are invalid, but when any key is pressed, interrupt KB_MODE_1_PRESS is set (and cannot be cleared until the key is released). */
     MODE_2_SINGLE,         /**< Single scan. The keypad is scanned once, and then the mode returns to MODE_0_IDLE. */
     MODE_3_CONTINUOUS      /**< Continuous scan. When scanning completes, it just starts over again after a delay. */
 } kb_scan_mode_t;
 
 #define kb_EnableInt \
-(*(uint8_t*)0xF5000C)          /**< Enabled keypad interrupt signals */
+(*(uint8_t*)0xF5000C)          /**< Enabled keypad interrupt signals. */
 #define kb_IntAcknowledge \
-(*(volatile uint8_t*)0xF50008) /**< Acknowledege keypad interrupt signals */
+(*(volatile uint8_t*)0xF50008) /**< Acknowledege keypad interrupt signals. */
 #define kb_IntStatus \
-(*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals */
+(*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals. */
 #define kb_Config \
-(*(uint8_t*)0xF50000)          /**< Configuration of keypad controller */
+(*(uint8_t*)0xF50000)          /**< Configuration of keypad controller. */
 
 /**
  * Checks if a key is pressed. This uses the long key type, which includes the group as well.
@@ -117,8 +118,8 @@ typedef enum {
     KB_MODE_1_PRESS = 4   /**< Interrupt set when a key is pressed in MODE_1_INDISCRIMINATE */
 } kb_int_signal_t;
 
-
 /* Keyboard group 1 */
+/* @cond */
 #define kb_Graph    (1<<0)
 #define kb_Trace    (1<<1)
 #define kb_Zoom     (1<<2)
@@ -312,6 +313,7 @@ typedef enum {
 #define kb_group_5      _Pragma("GCC warning \"'kb_group_5' is deprecated, use '5' instead\"") 5
 #define kb_group_6      _Pragma("GCC warning \"'kb_group_6' is deprecated, use '6' instead\"") 6
 #define kb_group_7      _Pragma("GCC warning \"'kb_group_7' is deprecated, use '7' instead\"") 7
+/* @endcond */
 
 #ifdef __cplusplus
 }

@@ -1,71 +1,12 @@
 /**
  * @file
- * @authors DrDnar
  * @brief Provides improved font support.
  *
- * FontLib was designed under a "mechanism not policy" sort of philosophy.
- * Rather than attempt to provide as many fancy features as a programmer could
- * want, FontLib tries to provide fast, basic routines that can be used to build
- * the additional functionality you want.  For example, word-wrap is not
- * directly provided, but can be implemented using fontlib_SetAlternateStopCode
- * and fontlib_GetStringWidth.  FontLib hopes to provide enough performance to
- * be usable in games, while providing powerful enough basic features for fancy
- * GUIs and document editors.
- *
- * To assist in text layout, FontLib provides for a text window, which
- * automatically confines text to appear in a specific rectangular area of the
- * screen.  This feature may be useful for dialogs and scrolling large blocks of
- * text. Use fontlib_SetWindow to set the current window bounds.  Use
- * fontlib_SetNewlineOptions to control how fontlib_DrawString behaves when it
- * reaches the right edge of the text window.
- *
- * Implementing centered text, right-aligned text, and word wrap require being
- * able to compute the width of a word or string of text.  The routine
- * fontlib_GetStringWidth provides this functionality.
- *
- * If you call fontlib_SetAlternateStopCode(' '), GetStringWidth and DrawString
- * will stop drawing on spaces, giving you a chance to check if the next word
- * will fit on screen.  You can use fontlib_GetLastCharacterRead() to find out
- * where GetStringWidth or DrawString stopped, and, after handling the space,
- * then pass that address (plus one) again to GetStringWidth or DrawString to
- * resume processing at where it left off before.
- *
- * Embedded control codes are a popular way of managing style and formatting
- * information in string.  FontLibC only natively recognizes two types of
- * control code: NULL (0) as a stop code and a user-specified alternate stop
- * code, and a user-specified newline code (defaults to 0x0A---ASCII LF and
- * standard Linux style).  However, you can add your own control codes with
- * fontlib_SetFirstPrintableCodePoint.  When any code point less than the
- * first printable code point is encountered, FontLib stops string processing
- * and returns to allow you to handle the control code yourself using
- * fontlib_GetLastCharacterRead.
- *
- * Part of providing high-performance is not painting a single pixel more than
- * once.  To assist with this goal, FontLib provides for both transparent and
- * opaque text backgrounds.  Use fontlib_SetTransparency(true) if you need to
- * paint text over a background other than a solid color.  If you turn
- * transparency off, however, FontLib will paint both background and foreground
- * pixels for you, eliminating the time needed to erase those pixels before
- * painting over that area.
- *
- * Since a block of text may not always be the same size, FontLib provides
- * fontlib_ClearEOL for erasing the remainder of a line of text without needing
- * to pad it with spaces.   This action can also be performed automatically
- * after embedded newlines in text and on normal wrapping with
- * fontlib_SetNewlineOptions.
- *
- * Additional blank vertical space around text can improve readability in large
- * blocks of text.  fontlib_SetLineSpacing allows you to set this behavior.
- * Fonts may specify default additional spacing that is automatically applied
- * when calling fontlib_SetFont.  In GUIs and games where the benefits of
- * legibility are outweighed by more aggressive use of vertical space, you can
- * force the default spacing to zero after using fontlib_SetFont with
- * fontlib_SetLineSpacing.
- *
+ * @author DrDnar
  */
 
-#ifndef H_FONTLIBC
-#define H_FONTLIBC
+#ifndef _FONTLIBC_H
+#define _FONTLIBC_H
 
 #include <stdint.h>
 #include <stdbool.h>

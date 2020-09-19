@@ -14,6 +14,13 @@
 	public _boot_Set48MHzModeI
 	public _boot_GetBatteryStatus
 	public _boot_WaitShort
+	public _boot_USBBatteryCharging
+	public _boot_USBBusPowered
+	public _boot_USBSelfPowered
+	public _boot_USBResetChip
+	public _boot_USBDisableTimers
+	public _boot_USBEnableTimers
+	public _boot_USBResetTimers
 	public _boot_CheckOnPressed
 	public _boot_SetDate
 	public _boot_GetDate
@@ -122,7 +129,7 @@
 	public _os_MSDReadCapacity
 	public _os_MSDRead
 	public _os_MSDWrite
-        public _os_USBGetRequestStatus
+	public _os_USBGetRequestStatus
 	public _os_NewLine
 	public _os_MoveDown
 	public _os_MoveUp
@@ -154,6 +161,13 @@ _boot_Set6MHzModeI              := 0003A4h
 _boot_Set48MHzModeI             := 0003A8h
 _boot_GetBatteryStatus          := 0003B0h
 _boot_WaitShort                 := 0003B4h
+_boot_USBBatteryCharging        := 0003CCh
+_boot_USBBusPowered             := 0003E4h
+_boot_USBSelfPowered            := 0003E8h
+_boot_USBResetChip              := 0003F4h
+_boot_USBDisableTimers          := 0004F4h
+_boot_USBEnableTimers           := 0004F8h
+_boot_USBResetTimers            := 0004F0h
 _boot_CheckOnPressed            := 00057Ch
 _boot_SetDate                   := 000598h
 _boot_GetDate                   := 0005A8h

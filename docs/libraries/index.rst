@@ -3,8 +3,10 @@
 CE C Libraries
 ==============
 
+The CE C Libraries are used to aid in rapid development by implementing optimized routines for graphics, file I/O, fonts, keypad input, and more.
+
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :glob:
 
     *
