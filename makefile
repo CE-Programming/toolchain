@@ -238,7 +238,7 @@ docs-html:
 linker_script: std
 	$(call RM,$(call QUOTE_ARG,$@))
 	@echo Generating linker script...
-	$(call APPEND,if definite DEBUG)
+	$(call APPEND,if DEBUG)
 	$(call APPEND,	dbg)
 	$(call APPEND,end if)
 	$(call APPEND,require __init$(comma) __startup$(comma) _exit$(comma) __findlibload if .libs.length)
