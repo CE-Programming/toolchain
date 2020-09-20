@@ -1,22 +1,24 @@
-;-------------------------------------------------------------------------------
-; Standard CE startup module definitions and references
-;-------------------------------------------------------------------------------
 	assume	adl=1
 
-        public _errno
+	public _errno
 _errno := 0D008DCh
 
 ;-------------------------------------------------------------------------------
 	section	.header
 	db	$ef,$7b,$00
-        public __init
+	public __init
 __init:
 
 ;-------------------------------------------------------------------------------
 	section	.startup
 
-	weak_extern	_main
-	weak_extern	___main_argc_argv
+ifextern ___main_argc_argv
+	extern	___main_argc_argv
+	__main := ___main_argc_argv
+else
+	extern	_main
+	__main := _main
+end if
 
 	public  __startup
 __startup:
@@ -32,7 +34,7 @@ __startup:
 				; too low for some calcs, 2 is untested
 	push	iy		; save iy (flags)
 	ld	(__exitsp),sp	; save sp for exiting
-if ___main_argc_argv
+if defined ___main_argc_argv
 __argstemp := 0D120D6h		; saveSScreen+14007
 	call	0020614h	; _PushRealO1
 	ld	de,__argstemp
@@ -152,14 +154,10 @@ else
 end if
 end if
 end if
-if ___main_argc_argv
-	call	___main_argc_argv
-else
-	call	_main
-end if
-        public	__exit
+	call	__main
+	public	__exit
 __exit:
-        public	__exitsp
+	public	__exitsp
 __exitsp := $+1
 	ld	sp,0
 	pop	iy		; iy = flags
@@ -180,10 +178,8 @@ __exitsp := $+1
 	pop	hl		; hl = exit code
 	ret
 
-        public	_exit
+	public	_exit
 _exit:
 	pop	hl
 	pop	hl
 	jr	__exit
-
-;-------------------------------------------------------------------------------
