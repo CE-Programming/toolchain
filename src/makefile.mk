@@ -1,7 +1,6 @@
 #----------------------------
 # Core C/C++ Makefile
 #----------------------------
-MAIN_ARGS           ?= NO
 CLEANUP             ?= YES
 BSSHEAP_LOW         ?= D031F6
 BSSHEAP_HIGH        ?= D13FD6
@@ -129,13 +128,13 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 # if so, generate a recipe to build it
 ifneq ($(ICONIMG),)
 ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
-LINK_REQUIRE += -i $(call QUOTE_ARG,require ___icon)
-LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
+LDREQUIRE += -i $(call QUOTE_ARG,require ___icon)
+LDICON = , $(call FASMG_FILES,$(ICONSRC))
 else
 ifneq ($(DESCRIPTION),)
 ICON_CONV := $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
-LINK_REQUIRE += -i $(call QUOTE_ARG,require ___description)
-LINK_ICON = , $(call FASMG_FILES,$(ICONSRC))
+LDREQUIRE += -i $(call QUOTE_ARG,require ___description)
+LDICON = , $(call FASMG_FILES,$(ICONSRC))
 ICONIMG :=
 else
 ICONSRC :=
@@ -163,14 +162,9 @@ CONVBINFLAGS += --uppercase
 endif
 CONVBINFLAGS += --name $(TARGET)
 
-# support main args?
-ifeq ($(MAIN_ARGS),YES)
-LINK_DEFINITIONS += -i __MAIN_ARGS=1
-endif
-
 # link cleanup source
 ifeq ($(CLEANUP),YES)
-LINK_REQUIRE += -i $(call QUOTE_ARG,require __ccleanup)
+LDREQUIRE += -i $(call QUOTE_ARG,require __ccleanup)
 LINK_CLEANUP  = , $(call FASMG_FILES,$(F_CLEANUP))
 endif
 
@@ -201,10 +195,10 @@ LDFLAGS ?= \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
-	$(LINK_DEFINITIONS) \
-	$(LINK_REQUIRE) \
+	-i $(call QUOTE_ARG,__main_args := 0) \
+	$(LDREQUIRE) \
 	$(LDMAPFLAG) \
-	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LINK_ICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP))$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
+	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LDICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP))$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
 	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LINK_LIBLOAD))$(comma) $(call FASMG_FILES,$(LINK_LIBS))) \
 	$(EXTRA_LDFLAGS)
 
