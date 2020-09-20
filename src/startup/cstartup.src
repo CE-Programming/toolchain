@@ -8,14 +8,15 @@ _errno := 0D008DCh
 
 ;-------------------------------------------------------------------------------
 	section	.header
-	db	0EFh
-	db	07Bh
-	db	0		; Magic byte recognition for C programs
+	db	$ef,$7b,$00
         public __init
 __init:
 
 ;-------------------------------------------------------------------------------
 	section	.startup
+
+	weak_extern	_main
+	weak_extern	___main_argc_argv
 
 	public  __startup
 __startup:
@@ -31,7 +32,7 @@ __startup:
 				; too low for some calcs, 2 is untested
 	push	iy		; save iy (flags)
 	ld	(__exitsp),sp	; save sp for exiting
-if defined ___main_argc_argv
+if ___main_argc_argv
 __argstemp := 0D120D6h		; saveSScreen+14007
 	call	0020614h	; _PushRealO1
 	ld	de,__argstemp
@@ -151,7 +152,7 @@ else
 end if
 end if
 end if
-if defined ___main_argc_argv
+if ___main_argc_argv
 	call	___main_argc_argv
 else
 	call	_main
@@ -169,8 +170,6 @@ __exitsp := $+1
 	call	00004F0h	; _usb_ResetTimer
 	call	_os_EnableHomeTextBuffer
 
-	extern	_main
-	extern	___main_argc_argv
 	extern	__low_bss
 	extern	__len_bss
 	extern	_os_DisableHomeTextBuffer

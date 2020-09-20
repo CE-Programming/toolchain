@@ -38,6 +38,7 @@ TARGET ?= $(NAME)
 DEBUGMODE = NDEBUG
 LDDEBUG = 0
 CCDEBUGFLAG = -g0
+MAKEFILE_FILE := $(lastword $(MAKEFILE_LIST))
 
 # verbosity
 V ?= 0
@@ -120,7 +121,7 @@ LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
-LINK_FILES   := $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
+LDFILES   := $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
 LINK_LIBS    := $(wildcard $(CEDEV)/lib/libload/*.lib)
 LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 
@@ -129,12 +130,12 @@ LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
 ifneq ($(ICONIMG),)
 ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDREQUIRE += -i $(call QUOTE_ARG,require ___icon)
-LDICON = , $(call FASMG_FILES,$(ICONSRC))
+LDICON := $(comma)$(space)$(call FASMG_FILES,$(ICONSRC))
 else
 ifneq ($(DESCRIPTION),)
 ICON_CONV := $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDREQUIRE += -i $(call QUOTE_ARG,require ___description)
-LDICON = , $(call FASMG_FILES,$(ICONSRC))
+LDICON := $(comma)$(space)$(call FASMG_FILES,$(ICONSRC))
 ICONIMG :=
 else
 ICONSRC :=
@@ -165,7 +166,7 @@ CONVBINFLAGS += --name $(TARGET)
 # link cleanup source
 ifeq ($(CLEANUP),YES)
 LDREQUIRE += -i $(call QUOTE_ARG,require __ccleanup)
-LINK_CLEANUP  = , $(call FASMG_FILES,$(F_CLEANUP))
+LDCLEANUP  = , $(call FASMG_FILES,$(F_CLEANUP))
 endif
 
 # output debug map file
@@ -197,7 +198,7 @@ LDFLAGS ?= \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
 	$(LDREQUIRE) \
 	$(LDMAPFLAG) \
-	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LDICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP))$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
+	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LDICON)$(LDCLEANUP)$(comma) $(call FASMG_FILES,$(LDFILES))$(comma) $(call FASMG_FILES,$(F_STARTUP))) \
 	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LINK_LIBLOAD))$(comma) $(call FASMG_FILES,$(LINK_LIBS))) \
 	$(EXTRA_LDFLAGS)
 
@@ -210,23 +211,23 @@ debug: LDDEBUG = 1
 debug: CCDEBUGFLAG = -g
 debug: $(BINDIR)/$(TARGET8XP) ;
 
-$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN)
+$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_FILE)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
-$(BINDIR)/$(TARGETBIN): $(LINK_FILES) $(ICONIMG)
+$(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONIMG) $(MAKEFILE_FILE)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(ICON_CONV)
 	$(Q)echo [linking] $(call NATIVEPATH,$@)
 	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
 
 # these rules compile the source files into assembly files
-$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS)
+$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_FILE)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
 	$(Q)$(EZCC) -S $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
 
-$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS)
+$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_FILE)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
 	$(Q)$(EZCC) -S $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
