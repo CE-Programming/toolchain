@@ -31,7 +31,7 @@ __startup:
 				; too low for some calcs, 2 is untested
 	push	iy		; save iy (flags)
 	ld	(__exitsp),sp	; save sp for exiting
-if __main_args
+if defined ___main_argc_argv
 __argstemp := 0D120D6h		; saveSScreen+14007
 	call	0020614h	; _PushRealO1
 	ld	de,__argstemp
@@ -151,7 +151,11 @@ else
 end if
 end if
 end if
+if defined ___main_argc_argv
+	call	___main_argc_argv
+else
 	call	_main
+end if
         public	__exit
 __exit:
         public	__exitsp
@@ -166,6 +170,7 @@ __exitsp := $+1
 	call	_os_EnableHomeTextBuffer
 
 	extern	_main
+	extern	___main_argc_argv
 	extern	__low_bss
 	extern	__len_bss
 	extern	_os_DisableHomeTextBuffer

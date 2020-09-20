@@ -182,7 +182,7 @@ endif
 
 # define the C/C++ flags used by Clang
 CFLAGS ?= -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_CFLAGS)
-CFLAGS += -Wno-main-return-type $(CCDEBUGFLAG) $(OPT_MODE)
+CFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv $(CCDEBUGFLAG) $(OPT_MODE)
 CXXFLAGS += $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
 
 # these are the linker flags, basically organized to properly set up the environment
@@ -195,7 +195,6 @@ LDFLAGS ?= \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
-	-i $(call QUOTE_ARG,__main_args := 0) \
 	$(LDREQUIRE) \
 	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LDICON)$(LINK_CLEANUP)$(comma) $(call FASMG_FILES,$(F_STARTUP))$(comma) $(call FASMG_FILES,$(LINK_FILES))) \
