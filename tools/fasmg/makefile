@@ -33,8 +33,8 @@ endif
 endif
 
 INCLUDE_DIR := $(call NATIVEPATH,../../src/include)
-INCLUDE_SRC := $(addprefix fasmg-ez80/, commands.alm ez80.alm ez80.inc tiformat.inc)
-INSTALL_SRC := $(addprefix fasmg-ez80/, commands.alm ez80.alm ld.alm)
+INCLUDE_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ez80.inc tiformat.inc)
+INSTALL_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ld.alm)
 
 all:
 	$(Q)$(call COPY,$(INCLUDE_SRC),$(INCLUDE_DIR))

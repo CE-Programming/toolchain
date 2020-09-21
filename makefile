@@ -19,9 +19,11 @@ include $(CURDIR)/src/common.mk
 LIBS := libload graphx fontlibc keypadc fileioc
 
 ifeq ($(OS),Windows_NT)
-RELEASE_CMD := tools/installer/ISCC.exe /DAPP_VERSION=$(CEDEV_VERSION) /DDIST_PATH=$(INSTALL_DIR) installer.iss /O../../release
+RELEASE_CMD := ISCC.exe /Orelease /DAPP_VERSION=$(CEDEV_VERSION) /DDIST_PATH=$(INSTALL_DIR) tools\installer\installer.iss
+COPY_MAKE := $(call COPY,tools\make\make.exe,$(INSTALL_BIN))
 else
 RELEASE_CMD := cd $(INSTALL_PATH) && zip -r $(CURDIR)/release/$(RELEASE_NAME).zip $(CEDEV_DIR)
+COPY_MAKE :=
 endif
 
 LIB_DIR = $(call NATIVEPATH,src/$1)
@@ -56,12 +58,14 @@ install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
 	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIB))
 	$(Q)$(call MKDIR,$(INSTALL_META))
-	$(Q)$(call COPYDIR,examples,$(INSTALL_DIR))
-	$(Q)$(call COPY,$(call NATIVEPATH,src/makefile.mk),$(call NATIVEPATH,$(INSTALL_META)/makefile.mk))
-	$(Q)$(call COPY,$(call NATIVEPATH,src/linker_script) $(call NATIVEPATH,$(INSTALL_META)/linker_script))
+	$(Q)$(call MKDIR,$(INSTALL_EXAMPLES))
+	$(Q)$(call COPYDIR,$(call NATIVEPATH,examples/*),$(INSTALL_EXAMPLES))
+	$(Q)$(call COPY,$(call NATIVEPATH,src/makefile.mk),$(INSTALL_META))
+	$(Q)$(call COPY,$(call NATIVEPATH,src/linker_script),$(INSTALL_META))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convfont/convfont),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convimg/bin/convimg),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convbin/bin/convbin),$(INSTALL_BIN))
+	$(Q)$(COPY_MAKE)
 
 $(addprefix install-,$(LIBS)):
 	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) V=$(V)

@@ -59,7 +59,7 @@ jobs:
 
       - name: Setup Fasmg
         if: runner.os == 'Windows'
-        run: copy /B /Y toolchain/tools/fasmg/windows/fasmg.exe CEdev/bin
+        run: cmake -E copy toolchain/tools/fasmg/windows/fasmg.exe CEdev/bin
       - name: Setup Fasmg
         if: runner.os == 'Linux'
         run: |
@@ -72,13 +72,13 @@ jobs:
           chmod +x CEdev/bin/fasmg
 
       - name: Build Toolchain
-        run: make -j4 -C toolchain
+        run: make -j4 -C toolchain V=1
       - name: Install Toolchain
         env:
           PREFIX: ${{github.workspace}}
-        run: make -j4 -C toolchain install release release-libs
+        run: make -j4 -C toolchain install release release-libs V=1
       - name: Build Examples
-        run: make -j4 -C ${{env.CEDEV}}/examples
+        run: make -j4 -C ${{env.CEDEV}}/examples V=1
 
       - name: Checkout CEmu
         if: github.event_name == 'push'

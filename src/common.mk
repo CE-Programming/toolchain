@@ -21,6 +21,21 @@ LINUX := 0
 MACOS := 0
 WINDOWS := 0
 
+empty :=
+space := $(empty) $(empty)
+comma := ,
+define newline
+
+$(empty)
+endef
+
+V ?= 0
+ifeq ($(V),0)
+Q = @
+else
+Q =
+endif
+
 ifeq ($(OS),Windows_NT)
 WINDOWS := 1
 SHELL := cmd.exe
@@ -31,8 +46,8 @@ NATIVEEXE ?= $(subst /,\,$(1)).exe
 MKDIR ?= ( mkdir $1 2>nul || call )
 REMOVE ?= ( del /f /q $1 2>nul || call )
 RMDIR ?= ( rmdir /s /q $1 2>nul || call )
-COPY ?= (robocopy . $(2) $(1) /njh /njs /ndl /nc /ns) ^& exit 0
-COPYDIR ?= (robocopy . $(2) $(1) /njh /njs /ndl /nc /ns) ^& exit 0
+COPY ?= ( for %%a in ($(subst $(space),$(comma) ,$1)) do xcopy %%a $2 /Q /Y /I /K 1>nul 2>nul || call )
+COPYDIR ?= ( xcopy $1 $2 /S /Q /Y /I /K 1>nul 2>nul || call )
 DESTDIR ?=
 PREFIX ?= C:
 QUOTE_ARG  ?= "$(subst ",',$1)"#'
@@ -61,23 +76,9 @@ RELEASE_NAME = linux
 endif
 endif
 
-empty :=
-space := $(empty) $(empty)
-comma := ,
-define newline
-
-$(empty)
-endef
-
-V ?= 0
-ifeq ($(V),0)
-Q = @
-else
-Q =
-endif
-
 INSTALL_PATH := $(call QUOTE_ARG,$(call NATIVEPATH,$(DESTDIR)$(PREFIX)))
 INSTALL_DIR := $(call QUOTE_ARG,$(call NATIVEPATH,$(DESTDIR)$(PREFIX)/$(CEDEV_DIR)))
+INSTALL_EXAMPLES := $(call NATIVEPATH,$(INSTALL_DIR)/examples)
 INSTALL_LIB := $(call NATIVEPATH,$(INSTALL_DIR)/lib/libload)
 INSTALL_SHARED := $(call NATIVEPATH,$(INSTALL_DIR)/lib/shared)
 INSTALL_STATIC := $(call NATIVEPATH,$(INSTALL_DIR)/lib/static)
@@ -85,4 +86,3 @@ INSTALL_LINKED := $(call NATIVEPATH,$(INSTALL_DIR)/lib/linked)
 INSTALL_BIN := $(call NATIVEPATH,$(INSTALL_DIR)/bin)
 INSTALL_H := $(call NATIVEPATH,$(INSTALL_DIR)/include)
 INSTALL_META := $(call NATIVEPATH,$(INSTALL_DIR)/meta)
-
