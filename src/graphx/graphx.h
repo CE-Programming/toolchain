@@ -1657,6 +1657,41 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 ((test_y) < ((master_y) + (master_height))) && \
 (((test_y) + (test_height)) > (master_y)))
 
+/* byte 0 of compressed data is always literal. Is width */
+#define gfx_GetZX7SpriteWidth(zx7_sprite)                     \
+    __extension__({                                           \
+        const uint8_t *_Data = (const uint8_t *)(zx7_sprite); \
+        _Data[0];                                             \
+    })
+
+/* byte 1 of compressed data is flag. If bit 7 set, copy byte 0, else byte 2 */
+#define gfx_GetZX7SpriteHeight(zx7_sprite)                    \
+    __extension__({                                           \
+        const uint8_t *_Data = (const uint8_t *)(zx7_sprite); \
+        _Data[_Data[1] & 0x80 ? 0 : 2];                       \
+    })
+
+/**
+ * Calculates the amount of memory that a zx7-compressed
+ * sprite would use when decompressed.
+ *
+ * Sprite size is calculated as 2 + (width * height).
+ *
+ * ZX7 data always starts with a literal, which is the sprite's width. The next
+ * byte contains flags, which indicates if the following bytes are literals or
+ * codewords. If bit 7 of that is zero, the byte immediately after it is a
+ * literal and can be read in as sprite height. Otherwise, the bits that follows
+ * indicates a codeword, making sprite height the same as width.
+ * 
+ * @param zx7_sprite ZX7-compressed sprite
+ * @return Size, in bytes, of decompressed sprite
+*/
+#define gfx_GetZX7SpriteSize(zx7_sprite)                                      \
+    __extension__({                                                           \
+        const void *_Sprite = (const void *)(zx7_sprite);                     \
+        2 + gfx_GetZX7SpriteWidth(_Sprite) * gfx_GetZX7SpriteHeight(_Sprite); \
+    })
+
 /* Compatibility defines (don't use please) */
 /* @cond */
 #define gfx_black       _Pragma("GCC warning \"'gfx_black' is not palette-safe, try to avoid it\"")  0x00
