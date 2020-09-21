@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	public	__ipopcnt
+__ipopcnt:
+	push	hl
+	ld	a,l
+    	call	__bpopcnt
+	ld	l,a
+	ld	a,h
+	call	__bpopcnt
+	ld	h,a
+	call	$21D5C
+	call	__bpopcnt
+	add	a,l
+	add	a,h
+	pop	hl
+	ret
+
+	extern	__bpopcnt
+

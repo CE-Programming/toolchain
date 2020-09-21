@@ -97,7 +97,7 @@ ti_AllocEqu:
 	push	hl
 	inc	hl
 	inc	hl
-	call	__indcall
+	call	ti._indcall
 	pop	de
 	ld	(hl), e
 	inc	hl
@@ -153,11 +153,11 @@ ti_AllocMatrix:
 	push	hl
 	mlt	hl
 util_alloc_var:
-	call	_HLTimes9
+	call	ti.HLTimes9
 	inc	hl
 	inc	hl
 	push	hl
-	call	__indcall
+	call	ti._indcall
 	pop	de
 	pop	de
 	add	hl, de
@@ -224,7 +224,7 @@ ti_Resize:
 	jr	z, .no_resize
 	jr	c, .decrease
 .increase:
-	call	_EnoughMem
+	call	ti.EnoughMem
 	jp	c, util_ret_null
 	ex	de, hl
 	call	util_insert_mem
@@ -283,8 +283,8 @@ ti_OpenVar:
 	add	iy, sp
 	ld	a, (iy + 9)
 ;	jr	ti_Open.start		; emulated by dummifying next instruction
-	db	$fe			; ld a,appVarObj -> cp a,$3e \ dec d
-assert appVarObj = $15
+	db	$fe			; ld a,ti.AppVarObj -> cp a,$3e \ dec d
+assert ti.AppVarObj = $15
 
 ;-------------------------------------------------------------------------------
 ti_Open:
@@ -294,11 +294,11 @@ ti_Open:
 ;  sp + 6 : open flags
 ; return:
 ;  a = slot index if no error
-	ld	a, appVarObj
+	ld	a, ti.AppVarObj
 .start:
 	ld	(.smc_type), a
-	ld	(OP1), a
-	ld	iy, flags
+	ld	(ti.OP1), a
+	ld	iy,ti.flags
 	push	ix
 	ld	ix, 0
 	add	ix, sp
@@ -326,37 +326,37 @@ ti_Open:
 .slot:
 	ld	(curr_slot), a
 	ld	hl, (ix + 6)
-	ld	de, OP1 + 1
-	call	_Mov8b
+	ld	de, ti.OP1 + 1
+	call	ti.Mov8b
 	xor	a, a
 	ld	(de), a
 	ld	hl, (ix + 9)
 	ld	a, (hl)
 	cp	a, 'w'
-	ld	iy, flags
+	ld	iy, ti.flags
 	jr	nz, .no_overwite
-	call	_PushOP1
-	call	_ChkFindSym
-	call	nc, _DelVarArc
-	call	_PopOP1
+	call	ti.PushOP1
+	call	ti.ChkFindSym
+	call	nc, ti.DelVarArc
+	call	ti.PopOP1
 .no_overwite:
-	ld	hl, (ix + 9)
-	ld	a, (hl)
-	cp	a, 'r'
-	jr	z, .mode
-	cp	a, 'a'
-	jr	z, .mode
-	cp	a, 'w'
-	jp	nz, util_ret_null_pop_ix
+	ld	hl,(ix + 9)
+	ld	a,(hl)
+	cp	a,'r'
+	jr	z,.mode
+	cp	a,'a'
+	jr	z,.mode
+	cp	a,'w'
+	jp	nz,util_ret_null_pop_ix
 .mode:
 	inc	hl
-	ld	a, (hl)
-	cp	a, '+'
-	jr	nz, .no_append
+	ld	a,(hl)
+	cp	a,'+'
+	jr	nz,.no_append
 .archive_var:
-	call	_PushOP1
-	call	_ChkFindSym
-	call	_ChkInRam
+	call	ti.PushOP1
+	call	ti.ChkFindSym
+	call	ti.ChkInRam
 	jr	z, .in_ram
 	or	a, a
 	sbc	hl, hl
@@ -365,21 +365,21 @@ ti_Open:
 	inc	hl
 	ld	d, (hl)
 	ex	de, hl
-	call	_EnoughMem
+	call	ti.EnoughMem
 	push	af
-	call	_PopOP1
+	call	ti.PopOP1
 	pop	af
 	jp	c, util_ret_null_pop_ix
-	call	_PushOP1
-	call	_Arc_Unarc
-	call	_PopOP1
+	call	ti.PushOP1
+	call	ti.Arc_Unarc
+	call	ti.PopOP1
 	jr	.archive_var
 .in_ram:
-	call	_PopOP1
+	call	ti.PopOP1
 .no_append:
-	call	_ChkFindSym
+	call	ti.ChkFindSym
 	jr	c, .not_found
-	call	_ChkInRam
+	call	ti.ChkInRam
 	jr	z, .save_ptrs
 	push	hl
 	ld	hl, (ix + 9)
@@ -398,8 +398,8 @@ ti_Open:
 	sbc	hl, hl
 	ld	a, 0
 .smc_type := $-1
-	ld	iy, flags
-	call	_CreateVar
+	ld	iy, ti.flags
+	call	ti.CreateVar
 .save_ptrs:
 	push	hl
 	call	util_get_vat_ptr
@@ -441,11 +441,11 @@ ti_SetArchiveStatus:
 	call	util_get_vat_ptr
 	ld	hl, (hl)
 	ld	a, (hl)
-	ld	(OP1), a
+	ld	(ti.OP1), a
 	ld	bc, -6
 	add	hl, bc
 	ld	b, (hl)
-	ld	de, OP1 + 1
+	ld	de, ti.OP1 + 1
 	dec	hl
 .copy_name:
 	ld	a, (hl)
@@ -455,10 +455,10 @@ ti_SetArchiveStatus:
 	djnz	.copy_name
 	xor	a, a
 	ld	(de), a
-	call	_PushOP1
-	ld	iy, flags
-	call	_ChkFindSym
-	call	_ChkInRam
+	call	ti.PushOP1
+	ld	iy, ti.flags
+	call	ti.ChkFindSym
+	call	ti.ChkInRam
 	push	af
 	pop	bc
 	pop	af
@@ -472,12 +472,12 @@ ti_SetArchiveStatus:
 .set_not_archived:
 	push	bc
 	pop	af
-	call	nz, _Arc_Unarc
+	call	nz, ti.Arc_Unarc
 .relocate_var:
-	call	_PopOP1
-	call	_ChkFindSym
+	call	ti.PopOP1
+	call	ti.ChkFindSym
 	jp	c, util_ret_neg_one
-	call	_ChkInRam
+	call	ti.ChkInRam
 	jr	z, .save_ptrs
 	call	util_skip_archive_header
 .save_ptrs:
@@ -508,7 +508,7 @@ ti_Write:
 	jr	z, .ret0
 	ld	bc, (iy + 6)
 	ld	hl, (iy + 9)
-	call	__smulu
+	call	ti._smulu
 	add	hl, de
 	xor	a, a
 	sbc	hl, de
@@ -586,7 +586,7 @@ ti_Read:
 	jr	z, .ret0
 	jr	c, .ret0
 	ld	bc, (iy + 6)
-	call	__sdivu			; (size - offset) / chunk_size
+	call	ti._sdivu			; (size - offset) / chunk_size
 	ld	de, (iy + 9)		; number of chunks to read, hl = number of chunks left
 	or	a, a
 	sbc	hl, de
@@ -597,7 +597,7 @@ ti_Read:
 	ex	de, hl
 	ld	bc, (iy + 6)
 	push	hl
-	call	__smulu
+	call	ti._smulu
 	add	hl, de
 	or	a, a
 	sbc	hl, de
@@ -693,7 +693,7 @@ _PutChar:
 	push	bc
 	inc	hl
 	ld	(resize_amount), hl
-	call	_EnoughMem
+	call	ti.EnoughMem
 	pop	bc
 	jp	c, util_ret_neg_one
 	push	bc
@@ -780,8 +780,8 @@ ti_DeleteVar:
 	push	hl
 	ld	a, c
 ;	jr	ti_Delete.start		; emulated by dummifying next instruction:
-	db	$fe			; ld a,appVarObj -> cp a,$3E \ dec d
-assert appVarObj = $15
+	db	$fe			; ld a,ti.AppVarObj -> cp a,$3E \ dec d
+assert ti.AppVarObj = $15
 
 ;-------------------------------------------------------------------------------
 ti_Delete:
@@ -790,7 +790,7 @@ ti_Delete:
 ;  sp + 3 : pointer to appvar name
 ; return:
 ;  hl = 0 if failure
-	ld	a,appVarObj
+	ld	a,ti.AppVarObj
 .start:
 	pop	de
 	pop	hl
@@ -798,13 +798,13 @@ ti_Delete:
 	push	de
 	dec	hl
 	push	af
-	call	_Mov9ToOP1
+	call	ti.Mov9ToOP1
 	pop	af
-	ld	(OP1), a
-	call	_ChkFindSym
+	ld	(ti.OP1), a
+	call	ti.ChkFindSym
 	jp	c, util_ret_null
-	ld	iy, flags
-	call	_DelVarArc
+	ld	iy, ti.flags
+	call	ti.DelVarArc
 	scf
 	sbc	hl, hl
 	ret
@@ -909,8 +909,8 @@ ti_DetectVar:
 	add	hl,sp
 	ld	a,(hl)
 ;	jr	ti_Detect.start		; emulated by dummifying next instruction:
-	db	$fe			; ld a,appVarObj -> cp a,$3E \ dec d
-assert appVarObj = $15
+	db	$fe			; ld a,ti.AppVarObj -> cp a,$3E \ dec d
+assert ti.AppVarObj = $15
 
 ;-------------------------------------------------------------------------------
 ti_Detect:
@@ -919,7 +919,7 @@ ti_Detect:
 ;  sp + 6 : pointer to null terminated string of data to search for
 ; return:
 ;  hl -> name of variable
-	ld	a,appVarObj
+	ld	a,ti.AppVarObj
 .start:
 	ld	(.smc_type), a
 	xor	a,a
@@ -947,9 +947,9 @@ ti_Detect:
 	sbc	hl, bc
 	jr	nz, .fdetect
 .fstart:
-	ld	hl, (progPtr)
+	ld	hl, (ti.progPtr)
 .fdetect:
-	ld	de, (pTemp)
+	ld	de, (ti.pTemp)
 	or	a, a
 	sbc	hl, de
 	jr	c, .finish
@@ -974,7 +974,7 @@ ti_Detect:
 	ld	(de), a
 	jr	.fgoodtype
 .fdetectnormal:
-	cp	a, appVarObj
+	cp	a, ti.AppVarObj
 .smc_type := $-1
 	jr	nz, .fskip
 .fgoodtype:
@@ -986,7 +986,7 @@ ti_Detect:
 	ld	d, (hl)
 	dec	hl
 	ld	a, (hl)
-	call	_SetDEUToA
+	call	ti.SetDEUToA
 	ex	de,hl
 	cp	a, $d0
 	jr	nc, .finram
@@ -1024,12 +1024,12 @@ ti_Detect:
 	jr	z, .isnull
 	ld	(hl), de
 .isnull:
-	ld	hl, OP6
+	ld	hl, ti.OP6
 	pop	ix
 	ret
 
 .fbypassname:				; bypass the name in the vat
-	ld	de, OP6
+	ld	de, ti.OP6
 	ld	bc, -6
 	add	hl, bc
 	ld	b, (hl)
@@ -1062,7 +1062,7 @@ ti_GetTokenString:
 	ld	hl, (hl)
 	push	hl
 	ld	a, (hl)
-	call	_Isa2ByteTok
+	call	ti.Isa2ByteTok
 	ex	de, hl
 	jr	nz, .not2byte
 	inc	de
@@ -1074,8 +1074,8 @@ ti_GetTokenString:
 	ld	(hl), de
 	pop	hl
 	push	iy
-	ld	iy, flags
-	call	_Get_Tok_Strng
+	ld	iy, ti.flags
+	call	ti.Get_Tok_Strng
 	pop	iy
 	ld	hl, (iy + 9)
 	add	hl, bc
@@ -1092,7 +1092,7 @@ ti_GetTokenString:
 	ld	(hl), 1
 .smc_length := $-1
 .skipstore:
-	ld	hl, OP3
+	ld	hl, ti.OP3
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1182,7 +1182,7 @@ ti_RenameVar:
 	ld	iy, 0
 	add	iy, sp
 	ld	a, (iy + 9)
-	ld	iy, flags		; probably not needed
+	ld	iy, ti.flags		; probably not needed
 ;	jr	ti_Rename.start		; emulated by dummifying next instruction
 	db	$fe			; ld a,appVarObj -> cp a,$3E \ dec d
 
@@ -1197,7 +1197,7 @@ ti_Rename:
 ;  a = 1 if new file already exists
 ;  a = 2 if old file does not exist
 ;  a = 3 if other error
-	ld	a,appVarObj		; file type
+	ld	a,ti.AppVarObj		; file type
 .start:
 	pop	bc
 	pop	hl
@@ -1207,31 +1207,31 @@ ti_Rename:
 	push	bc
 	push	de			; new
 	push	de			; new
-	ld	de, OP1
+	ld	de, ti.OP1
 	ld	(de), a
 	inc	de
-	call	_Mov8b
-	call	_PushOP1		; save old name
+	call	ti.Mov8b
+	call	ti.PushOP1		; save old name
 	ld	hl, util_Arc_Unarc
 	ld	(.smc_archive), hl
 	pop	hl			; new name
-	ld	de, OP1 + 1
-	call	_Mov8b
-	call	_ChkFindSym
+	ld	de, ti.OP1 + 1
+	call	ti.Mov8b
+	call	ti.ChkFindSym
 	push	af
-	call	_PopOP1
+	call	ti.PopOP1
 	pop	af
 	jr	nc, .return_1		; check if name already exists
 .locate_program:
-	call	_ChkFindSym		; find old name
+	call	ti.ChkFindSym		; find old name
 	jr	c, .return_2
-	call	_ChkInRam
+	call	ti.ChkInRam
 	jr	nz, .in_archive
 	ld	hl, util_no_op			; no-op routine instead of assuming $F8 points to a ret instruction lol
 	ld	(.smc_archive), hl
-	call	_PushOP1
+	call	ti.PushOP1
 	call	util_Arc_Unarc
-	call	_PopOP1
+	call	ti.PopOP1
 	jr	.locate_program
 .in_archive:
 	ex	de, hl
@@ -1240,34 +1240,34 @@ ti_Rename:
 	ld	e, (hl)
 	add	hl, de
 	inc	hl			; size of name
-	call	_LoadDEInd_s
+	call	ti.LoadDEInd_s
 	pop	bc			; bc -> new name
 	push	hl
 	push	de
 	push	bc
-	call	_PushOP1		; old name
+	call	ti.PushOP1		; old name
 	pop	hl
-	ld	de, OP1 + 1
-	call	_Mov8b
-	call	_PushOP1		; new name
+	ld	de, ti.OP1 + 1
+	call	ti.Mov8b
+	call	ti.PushOP1		; new name
 	pop	hl
 	push	hl
-	ld	a, (OP1)
-	call	_CreateVar
+	ld	a, (ti.OP1)
+	call	ti.CreateVar
 	inc	de
 	inc	de
 	pop	bc
 	pop	hl
-	call	_ChkBCIs0
+	call	ti.ChkBCIs0
 	jr	z, .is_zero
 	ldir
 .is_zero:
-	call	_PopOP1
+	call	ti.PopOP1
 	call	util_Arc_Unarc
 .smc_archive := $-3
-	call	_PopOP1
-	call	_ChkFindSym
-	call	_DelVarArc
+	call	ti.PopOP1
+	call	ti.ChkFindSym
+	call	ti.DelVarArc
 	xor	a, a
 	ret
 .return_1:
@@ -1294,18 +1294,18 @@ ti_SetVar:
 	ld	hl, (ix + 9)		; pointer to data
 	ld	a, (ix + 6)
 	call	util_set_var_str
-	call	_ChkFindSym
-	call	nc, _DelVarArc
+	call	ti.ChkFindSym
+	call	nc, ti.DelVarArc
 	ld	a, (ix + 6)
 	ld	hl, (ix + 12)
 	and	a, $3f
-	call	_DataSize
+	call	ti.DataSize
 	pop	ix
 	push	hl
 	ex	de, hl
 	dec	hl
 	dec	hl
-	call	_CreateVar
+	call	ti.CreateVar
 	inc	bc
 	inc	bc
 	pop	hl
@@ -1333,21 +1333,21 @@ ti_StoVar:
 	cp	a, $0c			; if cplx look up the variable
 	jr	nz, .notcr
 .iscr:
-	call	_FindSym
+	call	ti.FindSym
 	jp	c, .notcr		; fill it with zeros
 	and	a, $3f
 	ex	de, hl
-	call	_Mov9OP1OP2
+	call	ti.Mov9OP1OP2
 .notcr:
-	call	_PushOP1
+	call	ti.PushOP1
 	ld	hl, (iy + 6)		; pointer to var string
 	ld	a, (iy + 3)
 	call	util_set_var_str
-	ld	iy, flags
+	ld	iy, ti.flags
 	ld	hl, util_ret_neg_one_byte
-	call	_PushErrorHandler
-	call	_StoOther
-	call	_PopErrorHandler
+	call	ti.PushErrorHandler
+	call	ti.StoOther
+	call	ti.PopErrorHandler
 	xor	a, a
 	ret
 
@@ -1363,12 +1363,12 @@ ti_RclVar:
 	add	iy, sp
 	ld	hl, (iy + 6)		; pointer to data
 	ld	a, (iy + 3)		; var type
-	ld	iy, flags
+	ld	iy,ti.flags
 	call	util_set_var_str
-	call	_FindSym
+	call	ti.FindSym
 	jp	c, util_ret_neg_one_byte
 	push	af
-	call	_ChkInRAM
+	call	ti.ChkInRam
 	pop	bc
 	ld	a, b
 	jp	nz, util_ret_neg_one_byte
@@ -1394,7 +1394,7 @@ ti_ArchiveHasRoom:
 util_ArchiveHasRoom:
 	ld	bc,12
 	add	hl,bc
-	call	_FindFreeArcSpot
+	call	ti.FindFreeArcSpot
 	ld	a,1
 	ret	nz
 	dec	a
@@ -1457,10 +1457,10 @@ util_set_var_str:
 ;  a = type
 ; out:
 ;  OP1 = variable combo
-	ld	de, OP1 + 1
-	call	_Mov8b
+	ld	de, ti.OP1 + 1
+	call	ti.Mov8b
 	and	a, $3f
-	ld	(OP1), a
+	ld	(ti.OP1), a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1478,11 +1478,11 @@ util_insert_mem:
 	ld	hl, (resize_amount)
 	push	hl
 	push	de
-	call	_EnoughMem
+	call	ti.EnoughMem
 	pop	de
 	pop	hl
 	jr	c, util_ret_null_byte
-	call	_InsertMem
+	call	ti.InsertMem
 	pop	hl
 	ld	hl, (hl)
 	push	hl
@@ -1505,7 +1505,7 @@ util_delete_mem:
 	inc	hl
 	inc	hl
 	ld	de, (resize_amount)
-	call	_DelMem
+	call	ti.DelMem
 	pop	hl
 	ld	hl, (hl)
 	push	hl
@@ -1611,21 +1611,19 @@ util_set_offset:
 	ld	(hl), bc
 	ret
 
-util_Arc_Unarc: ;properly handle garbage collects :P
-	call	_ChkInRAM
-	jp	nz,_Arc_Unarc ;if the file is already in archive, we won't trigger a gc
+util_Arc_Unarc:				; properly handle garbage collects
+	call	ti.ChkInRam
+	jp	nz,ti.Arc_Unarc		; if the file is already in archive, we won't trigger a gc
 	ex	hl,de
-	call	_LoadDEInd_s
+	call	ti.LoadDEInd_s
 	ex	hl,de
 	call	util_ArchiveHasRoom
-	jp	nz,_Arc_Unarc ;gc will not be triggered
+	jp	nz,ti.Arc_Unarc		; gc will not be triggered
 	call	util_pre_gc_default_handler
-util_pre_gc_handler:=$-3
-	call	_Arc_Unarc
+util_pre_gc_handler := $-3
+	call	ti.Arc_Unarc
 	jp	util_post_gc_default_handler
-util_post_gc_handler:=$-3
-
-
+util_post_gc_handler := $-3
 
 ;-------------------------------------------------------------------------------
 ; Internal library data

@@ -28,24 +28,24 @@ define VERSION_MAJOR       3
 define VERSION_MINOR       1
 
 ; global equates
-arclibrarylocations        = cursorImage + 000 ; place to store locations of archived libraries
-dependencyqueuelocation    = cursorImage + 450 ; queue for keeping track of which libraries still need to be resolved
+arclibrarylocations        = ti.cursorImage + 000 ; place to store locations of archived libraries
+dependencyqueuelocation    = ti.cursorImage + 450 ; queue for keeping track of which libraries still need to be resolved
 
-eSP                        = cursorImage + 950 ; save sp for errors
-totallibsize               = cursorImage + 953 ; total size of the library appvar (not used)
-extractedsize              = cursorImage + 956 ; holds extracted size of the library
-arclocation                = cursorImage + 959 ; pointer to place to begin extraction from the archive
-ramlocation                = cursorImage + 962 ; pointer to place to extract in usermem
-endarclibrarylocations     = cursorImage + 965 ; pointer to end of archived library locations in arclibrarylocations
-enddependencyqueue         = cursorImage + 968 ; pointer to end of dependency stack
-nextlibptr                 = cursorImage + 971 ; pointer to save location of next lib place that needs to be relocated
-jumptblptr                 = cursorImage + 974 ; pointer to start of function table for each library in the program
-vectortblptr               = cursorImage + 977 ; pointer to start of archived function vector table
-relocationtblptr           = cursorImage + 980 ; pointer to start of relocation table
-endrelocationtbl           = cursorImage + 983 ; pointer to end of relocation table
-prgmstart                  = cursorImage + 986 ; pointer to start of actual program when dealing with dependencies
-appvarstartptr             = cursorImage + 989 ; pointer to start of library appvar in archive
-libnameptr                 = cursorImage + 992 ; pointer to name of library to extract
+eSP                        = ti.cursorImage + 950 ; save sp for errors
+totallibsize               = ti.cursorImage + 953 ; total size of the library appvar (not used)
+extractedsize              = ti.cursorImage + 956 ; holds extracted size of the library
+arclocation                = ti.cursorImage + 959 ; pointer to place to begin extraction from the archive
+ramlocation                = ti.cursorImage + 962 ; pointer to place to extract in usermem
+endarclibrarylocations     = ti.cursorImage + 965 ; pointer to end of archived library locations in arclibrarylocations
+enddependencyqueue         = ti.cursorImage + 968 ; pointer to end of dependency stack
+nextlibptr                 = ti.cursorImage + 971 ; pointer to save location of next lib place that needs to be relocated
+jumptblptr                 = ti.cursorImage + 974 ; pointer to start of function table for each library in the program
+vectortblptr               = ti.cursorImage + 977 ; pointer to start of archived function vector table
+relocationtblptr           = ti.cursorImage + 980 ; pointer to start of relocation table
+endrelocationtbl           = ti.cursorImage + 983 ; pointer to end of relocation table
+prgmstart                  = ti.cursorImage + 986 ; pointer to start of actual program when dealing with dependencies
+appvarstartptr             = ti.cursorImage + 989 ; pointer to start of library appvar in archive
+libnameptr                 = ti.cursorImage + 992 ; pointer to name of library to extract
 
 ; macro definitions
 define lib_byte            $C0		; library signifier byte
@@ -84,7 +84,7 @@ library 'LibLoad', VERSION_MAJOR*10+VERSION_MINOR, <libmagic1alt,libmagic2alt>
 ; We *are* the relocator, so we can't use relocations here. Set origin to 0
 ; (shifted by library stuff before this) and perform any relocations manually.
 disable_relocations
-	ld	iy,flags		; make sure iy is correct
+	ld	iy,ti.flags		; make sure iy is correct
 	push	de
 	push	hl
 
@@ -96,8 +96,8 @@ disable_relocations
 	res	showmsgs,(iy + asmflag)
 .showmsgs:
 	ld	bc,1020
-	ld	hl,cursorImage
-	call	_MemClear		; initialize to wipe out past runs
+	ld	hl,ti.cursorImage
+	call	ti.MemClear		; initialize to wipe out past runs
 
 	ld	hl,arclibrarylocations
 	ld	(endarclibrarylocations),hl
@@ -111,11 +111,11 @@ disable_relocations
 	ld	bc,_libloadstart.length
 	ldir				; relocate the actual LibLoad
 
-	res	foundprgmstart,(iy+asmflag)
+	res	foundprgmstart,(iy + asmflag)
 
 	jp	_libloadstart.destination ; jump to execution block
 
-relocate _libloadstart, saveSScreen + 19000
+relocate _libloadstart, ti.saveSScreen + 19000
 	pop	hl			; hl->start of library jump table
 
 	ld	(eSP),sp		; save the stack pointer if we hit an error
@@ -126,15 +126,15 @@ relocate _libloadstart, saveSScreen + 19000
 	jp	(hl)			; return to execution if there are no libs
 _startrelocating:
 	push	hl
-	call	_PushOP1		; save program name
+	call	ti.PushOP1		; save program name
 	pop	hl
 _extractlib:				; hl->NULL terminated libray name string -> $C0,"LIBNAME",0
-	ld	(hl),appVarObj		; change $C0 byte to mark as extracted
+	ld	(hl),ti.AppVarObj	; change $C0 byte to mark as extracted
 	push	hl
-	call	_Mov9ToOP1		; move name of library to op1
+	call	ti.Mov9ToOP1		; move name of library to op1
 	pop	hl
 	inc	hl
-	res	prevextracted,(iy+asmflag)
+	res	prevextracted,(iy + asmflag)
 	ld	(libnameptr),hl
 
 _isextracted:				; check if the current library has already been extracted
@@ -154,7 +154,7 @@ _searchextractedtbl:
 _nomatch:
 	pop	de
 	ld	hl,(endarclibrarylocations)
-	call	_CpHLDE			; have we reached the end of the table?
+	call	ti.CpHLDE		; have we reached the end of the table?
 	push	af
 	ex	de,hl
 	ld	de,15			; size of search entry (9=name, 3=ram ptr, 3=arc vec ptr)
@@ -164,8 +164,8 @@ _nomatch:
 	pop	hl
 	jr	z,_notextracted		; hasn't been extracted yet
 	jr	_checkextractedloop
-_match:
-	set	prevextracted,(iy+asmflag) ; set the flag that this library was previously extracted, so we don't resolve absolutes
+_match:					; set the flag that this library was previously extracted, so we don't resolve absolutes
+	set	prevextracted,(iy + asmflag)
 	pop	hl
 	ld	de,9
 	add	hl,de
@@ -187,7 +187,7 @@ _donesearch:				; hl->location of library in ram, hl+3->location of library vect
 _notextracted:
 	ld	hl,(libnameptr)
 	ld	de,(endarclibrarylocations)
-	call	_Mov8b			; copy the string. it shouldn't be bigger than this
+	call	ti.Mov8b		; copy the string. it shouldn't be bigger than this
 	xor	a
 	ld	(de),a
 	inc	de
@@ -197,15 +197,15 @@ _notextracted:
 	call	_movetostrngend
 	push	hl			; save the location in the program we are on
 _findbinary:
-	call	_ChkFindSym
+	call	ti.ChkFindSym
 	jr	nc,_foundlibrary	; throw an error if the library doesn't exist
 	jp	_missingerror		; jump to the lib missing handler
 _foundlibrary:
-	call	_chkinram
+	call	ti.ChkInRam
 	jr	nz,_libinarc		; if the library is found in ram, archive the library and search again
-	call	_PushOP1
-	call	_Arc_Unarc
-	call	_PopOP1
+	call	ti.PushOP1
+	call	ti.Arc_Unarc
+	call	ti.PopOP1
 	jr	_findbinary
 _libinarc:
 	ex	de,hl
@@ -214,7 +214,7 @@ _libinarc:
 	ld	e,(hl)
 	add	hl,de
 	inc	hl			; hl->size bytes
-	call	_LoadDEInd_s		; de=total size of library
+	call	ti.LoadDEInd_s		; de=total size of library
 	push	de
 	pop	bc			; bc=total size of library
 ;	ld	(totallibsize),bc
@@ -267,24 +267,24 @@ _goodversion:
 	inc	hl
 	ld	(endarclibrarylocations),hl
 
-	ld	hl,usermem		; this is where programs are extracted to
-	ld	de,(asm_prgm_size)
+	ld	hl,ti.userMem		; this is where programs are extracted to
+	ld	de,(ti.asm_prgm_size)
 	add	hl,de			; hl->end of program+libaries
 	ex	de,hl			; de->location to extract to
 
 	ld	(ramlocation),de	; save this pointer
 
-	res	keeplibinarc,(iy+asmflag)
+	res	keeplibinarc,(iy + asmflag)
 	ld	hl,(arclocation)	; hl->start of library code in archive
 	ld	de,(extractedsize)
 	add	hl,de			; hl->start of library relocation table
 	ld	(relocationtblptr),hl	; store this
 	ld	de,(endrelocationtbl)
-	call	_CpHLDE			; check and see if they match -- if so, this library is going to remain in the archive
+	call	ti.CpHLDE		; check and see if they match -- if so, this library is going to remain in the archive
 	jr	nz,_needtoextractlib
 	ld	hl,(arclocation)
 	ld	(ramlocation),hl	; okay, not a ram location, but it's use is still the same
-	set	keeplibinarc,(iy+asmflag)
+	set	keeplibinarc,(iy + asmflag)
 _needtoextractlib:
 
 	ld	de,(ramlocation)
@@ -295,24 +295,24 @@ _needtoextractlib:
 	inc	hl
 	ld	(endarclibrarylocations),hl
 
-	bit	keeplibinarc,(iy+asmflag)
+	bit	keeplibinarc,(iy + asmflag)
 	jr	nz,_resloveentrypoints	; only need to resolve entry points if in the archive
 
 	ld	hl,(extractedsize)
 	push	hl
 	push	de
 	push	bc
-	call	_EnoughMem		; hl=size of library
+	call	ti.EnoughMem		; hl=size of library
 	pop	bc
 	pop	de
 	pop	hl
-	jp	c,_errmemory		; throw a memory error -- need more ram!
-	call	_InsertMem		; insert memory for the relocated library (de)
+	jp	c,ti.ErrMemory		; throw a memory error -- need more ram!
+	call	ti.InsertMem		; insert memory for the relocated library (de)
 
 	ld	hl,(extractedsize)	; extracted size = dependency jumps + library code
-	ld	de,(asm_prgm_size)
+	ld	de,(ti.asm_prgm_size)
 	add	hl,de
-	ld	(asm_prgm_size),hl	; store new size of program+libraries
+	ld	(ti.asm_prgm_size),hl	; store new size of program+libraries
 
 	ld	hl,(arclocation)	; hl->start of library code
 	ld	de,(ramlocation)	; de->insertion place
@@ -330,11 +330,11 @@ _resloveentrypointsloop:
 	push	hl
 	ld	hl,(hl)			; offset in vector table (0,3,6, etc.)
 	ld	bc,3
-	call	__idivs			; originally the offset was just added because vectors were stored in three bytes, now it is just 2 to save space
+	call	ti._idivs		; originally the offset was just added because vectors were stored in three bytes, now it is just 2 to save space
 	add	hl,hl			; (offset/3) * 2
 	ld	de,(vectortblptr)	; hl->start of vector table
 	add	hl,de			; hl->correct vector entry
-	call	_loaddeind_s		; de=offest in lib for function
+	call	ti.LoadDEInd_s		; de=offest in lib for function
 	ld	hl,(ramlocation)
 	add	hl,de			; hl->function in ram
 	ex	de,hl			; de->function in ram
@@ -347,24 +347,26 @@ _resloveentrypointsloop:
 _doneresloveentrypoints:		; finished resolving entry points
 	ld	(nextlibptr),hl		; hl->next library in program (if there is one)
 
-	bit	prevextracted,(iy+asmflag) ; have we already resolved the absolute addresses for the library?
+					; have we already resolved the absolute addresses for the library?
+	bit	prevextracted,(iy + asmflag)
 	jr	nz,_donerelocateabsolutes
 
-	bit	keeplibinarc,(iy+asmflag) ; we don't need to store anything if we are here
+					; we don't need to store anything if we are here
+	bit	keeplibinarc,(iy + asmflag)
 	jr	nz,_donerelocateabsolutes ; really, this is just a precautionary check -- should work fine without this
 
 _relocateabsolutes:
 	ld	hl,(relocationtblptr)	; restore this
 _relocateabsolutesloop:
 	ld	de,(endrelocationtbl)
-	call	_CpHLDE			; have we reached the end of the relocation table
+	call	ti.CpHLDE			; have we reached the end of the relocation table
 	jr	z,_donerelocateabsolutes
 	push	hl			; save pointer to relocation table current
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
 	ld	l,a			; hl->offset in ram library to relocate
-	call	_SetHLUTo0
+	call	ti.SetHLUTo0
 	ld	de,(ramlocation)
 	add	hl,de			; hl->location in library to relocate
 	push	hl
@@ -380,7 +382,8 @@ _relocateabsolutesloop:
 	jr	_relocateabsolutesloop
 _donerelocateabsolutes:
 
-	bit	foundprgmstart,(iy+asmflag) ; have we found the start of the program?
+					; have we found the start of the program?
+	bit	foundprgmstart,(iy + asmflag)
 	jr	nz,_nosetstart
 
 	ld	hl,(nextlibptr)
@@ -389,14 +392,14 @@ _donerelocateabsolutes:
 	jp	z,_extractlib		; extract the next library
 
 _checkifdependencies:			; the first time we hit this, we have all the dependencies placed onto the queue that the libraries use.
-	bit	foundprgmstart,(iy+asmflag)
+	bit	foundprgmstart,(iy + asmflag)
 	jr	nz,_nosetstart
 	ld	(prgmstart),hl
-	set	foundprgmstart,(iy+asmflag)
+	set	foundprgmstart,(iy + asmflag)
 _nosetstart:
 	ld	hl,(enddependencyqueue)
 	ld	de,dependencyqueuelocation
-	call	_CpHLDE			; make sure we are done parsing the dependency queue
+	call	ti.CpHLDE		; make sure we are done parsing the dependency queue
 					; now we need to parse the libraries like they are programs. this will be fun.
 	jr	z,_runpgrm
 	dec	hl
@@ -407,12 +410,12 @@ _nosetstart:
 	jp	_extractlib		; extract current dependency if needed, or resolve entry points
 
 _runpgrm:
-	call	_PopOP1			; restore program name
+	call	ti.PopOP1		; restore program name
 	ld	hl,(prgmstart)
 	jp	(hl)			; passed all the checks; let's start execution! :)
 
-_enqueuealldependencies:
-	bit	keeplibinarc,(iy+asmflag) ; we don't need to store anything if we are here
+_enqueuealldependencies:		; we don't need to store anything if we are here
+	bit	keeplibinarc,(iy + asmflag)
 	ret	nz			; really, this is just a precautionary check -- should work fine without
 _enqueuealldependenciesloop:
 	ld	a,(hl)
@@ -442,7 +445,7 @@ _movetonextjump:
 	inc	hl			; jp address
 	jr	_movetonextjump
 _checkextracteddependent:
-	cp	a,appVarObj
+	cp	a,ti.AppVarObj
 	jr	z,_skipdependencystore	; keep going
 	ret
 
@@ -461,45 +464,45 @@ _throwerror:				; draw the error message onscreen
 	ld	sp,(eSP)
 	bit	showmsgs,(iy + asmflag)
 	ret	z
-	ld	a,lcdBpp16
-	ld	(mpLcdCtrl),a
+	ld	a,ti.lcdBpp16
+	ld	(ti.mpLcdCtrl),a
 	push	hl
-	call	_DrawStatusBar
-	call	_ClrScrn		; clean up the screen a bit
-	call	_HomeUp			; if we encounter an error
+	call	ti.DrawStatusBar
+	call	ti.ClrScrn		; clean up the screen a bit
+	call	ti.HomeUp			; if we encounter an error
 	pop	hl
-	set	textInverse,(iy+textFlags)
+	set	ti.textInverse,(iy + ti.textFlags)
 	ld	a,2
-	ld	(curcol),a
-	call	_PutS
-	res	textInverse,(iy+textFlags)
-	call	_NewLine
-	call	_NewLine		; make it look pretty
+	ld	(ti.curCol),a
+	call	ti.PutS
+	res	ti.textInverse,(iy + ti.textFlags)
+	call	ti.NewLine
+	call	ti.NewLine		; make it look pretty
 	ld	hl,_libnamestr
-	call	_PutS
-	ld	hl,OP1+1+8
+	call	ti.PutS
+	ld	hl,ti.OP1+1+8
 	ld	(hl),0
-	ld	hl,OP1+1
-	call	_PutS
-	call	_NewLine
-	call	_NewLine
+	ld	hl,ti.OP1+1
+	call	ti.PutS
+	call	ti.NewLine
+	call	ti.NewLine
 	ld	hl,_downloadstr
-	call	_PutS
+	call	ti.PutS
 	push	hl
-	call	_NewLine
+	call	ti.NewLine
 	pop	hl
-	call	_PutS
+	call	ti.PutS
 _waitkeyloop:
-	call	_GetCSC
-	cp	a,skEnter
+	call	ti.GetCSC
+	cp	a,ti.skEnter
 	jr	z,_exitwaitloop
-	cp	a,skClear
+	cp	a,ti.skClear
 	jr	z,_exitwaitloop
 	jr	_waitkeyloop
 _exitwaitloop:
-	call	_ClrScrn
-	call	_HomeUp			; stop execution of the program
-	jp	_PopOP1			; restore program name
+	call	ti.ClrScrn
+	call	ti.HomeUp		; stop execution of the program
+	jp	ti.PopOP1		; restore program name
 
 _versionlibstr:				; strings for LibLoad Errors
 	db	"ERROR: Library Version",0

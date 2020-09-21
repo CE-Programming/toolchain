@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	public	__sbitrev
+__sbitrev:
+	push	af
+	ld	a,l
+    	call	__bbitrev
+	ld	l,a
+	ld	a,h
+	call	__bbitrev
+	ld	h,a
+	pop	af
+	ret
+
+	extern	__bbitrev

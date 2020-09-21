@@ -42,9 +42,9 @@ kb_Reset:
 ; Returns:
 ;  None
 	ld	hl,$000f00		; 0/Wait 15*256 APB cycles before scanning each row/Mode 0/
-	ld	(DI_Mode),hl
+	ld	(ti.DI_Mode),hl
 	ld	hl,$08080f		; (nb of columns,nb of row) to scan/Wait 15 APB cycles before each scan
-	ld	(DI_Mode+3),hl
+	ld	(ti.DI_Mode+3),hl
 	ret
 
 ;-------------------------------------------------------------------------------

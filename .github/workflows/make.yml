@@ -57,14 +57,28 @@ jobs:
           path: toolchain
           submodules: recursive
 
+      - name: Setup Fasmg
+        if: runner.os == 'Windows'
+        run: cmake -E copy toolchain/tools/fasmg/windows/fasmg.exe CEdev/bin
+      - name: Setup Fasmg
+        if: runner.os == 'Linux'
+        run: |
+          cp toolchain/tools/fasmg/linux/fasmg CEdev/bin
+          chmod +x CEdev/bin/fasmg
+      - name: Setup Fasmg
+        if: runner.os == 'macOS'
+        run: |
+          cp toolchain/tools/fasmg/macos/fasmg CEdev/bin
+          chmod +x CEdev/bin/fasmg
+
       - name: Build Toolchain
-        run: make -j4 -C toolchain
+        run: make -j4 -C toolchain V=1
       - name: Install Toolchain
         env:
           PREFIX: ${{github.workspace}}
-        run: make -j4 -C toolchain install release release-libs
+        run: make -j4 -C toolchain install release release-libs V=1
       - name: Build Examples
-        run: make -j4 -C ${{env.CEDEV}}/examples
+        run: make -j4 -C ${{env.CEDEV}}/examples V=1
 
       - name: Checkout CEmu
         if: github.event_name == 'push'
@@ -103,7 +117,7 @@ jobs:
       - name: Test examples
         if: github.event_name == 'push' && runner.os != 'Windows'
         env:
-          AUTOTESTER_LIBS_DIR: ${{github.workspace}}/toolchain/clibraries
+          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
           AUTOTESTER_ROM: ${{github.workspace}}/secrets/${{env.ROM}}
         run: |
           failed=0
@@ -116,7 +130,7 @@ jobs:
       - name: Test examples
         if: github.event_name == 'push' && runner.os == 'Windows'
         env:
-          AUTOTESTER_LIBS_DIR: ${{github.workspace}}\toolchain\clibraries
+          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}\toolchain\clibs.8xg
           AUTOTESTER_ROM: ${{github.workspace}}\secrets\${{env.ROM}}
         run: |
           $failed = 0

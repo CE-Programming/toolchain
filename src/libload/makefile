@@ -1,48 +1,36 @@
-#----------------------------
-# Makefile
-#----------------------------
+# Copyright (C) 2015-2020
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# set NAME to the name of the library
-NAME :=libload
+include $(CURDIR)/../common.mk
 
-# defult locations
-FASMG ?=fasmg
-
-# common/os specific things
-ifeq ($(OS),Windows_NT)
-SHELL       =cmd.exe
-NATIVEPATH  =$(subst /,\,$1)
-RM          =( del /f /q $1 2>nul || call )
-MKDIR       =mkdir
-CP          =copy /y
-PREFIX     ?=C:
-else
-NATIVEPATH  =$(subst \,/,$1)
-RM          =rm -f $1
-MKDIR       =mkdir -p
-CP          =cp
-PREFIX     ?=$(HOME)
-endif
-
-SRC        +=$(NAME).asm
-DEV        ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
-BIN        ?=$(call NATIVEPATH,$(DEV)/bin)
-
-INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
-I_LOC      :=$(call NATIVEPATH,$(INSTALLLOC)/lib)
-
-LIB        :=$(NAME).lib
-LIB_8XV    :=$(NAME).8xv
+LIB_SRC := libload.asm
+LIB_LIB := libload.lib
+LIB_8XV := libload.8xv
 
 all: $(LIB_8XV)
 
-$(LIB_8XV): $(SRC)
-	$(FASMG) $< $@
+$(LIB_8XV): $(LIB_SRC)
+	$(Q)$(FASMG) $< $@
 
 clean:
-	$(call RM,$(LIB) $(LIB_8XV))
+	$(Q)$(call REMOVE,$(LIB_LIB) $(LIB_8XV))
 
-install:
-	$(CP) $(LIB) $(I_LOC)
+install: all
+	$(Q)$(call MKDIR,$(INSTALL_LIB))
+	$(Q)$(call COPY,$(LIB_LIB),$(INSTALL_LIB))
 
 .PHONY: all clean install
+
