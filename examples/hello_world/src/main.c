@@ -1,4 +1,5 @@
 #include <tice.h>
+#include <stdlib.h>
 
 /* Main function, called first */
 int main(void)
@@ -11,6 +12,8 @@ int main(void)
 
     /* Waits for a key */
     while (!os_GetCSC());
+
+    exit(0);
 
     /* Return 0 for success */
     return 0;

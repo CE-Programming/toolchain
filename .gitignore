@@ -12,6 +12,7 @@ doxygen/
 *.obj
 *.elf
 *.bin
+*.inc
 obj/
 release/
 build/
@@ -23,9 +24,6 @@ linker_script
 # precompiled headers
 *.gch
 *.pch
-relocation_table
-*_header.asm
-*_equates.asm
 
 # libraries
 *.lib

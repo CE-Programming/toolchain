@@ -1,32 +1,43 @@
-#----------------------------
-# Core C/C++ Makefile
-#----------------------------
-CLEANUP             ?= YES
-BSSHEAP_LOW         ?= D031F6
-BSSHEAP_HIGH        ?= D13FD6
-STACK_HIGH          ?= D1A87E
-INIT_LOC            ?= D1A87F
-USE_FLASH_FUNCTIONS ?= YES
-UPPERCASE_NAME      ?= YES
-OUTPUT_MAP          ?= NO
-ARCHIVED            ?= NO
-OPT_MODE            ?= -O3
-EXTRA_CFLAGS        ?=
-EXTRA_LDFLAGS       ?=
-EXTRA_CXXFLAGS      ?=
-#----------------------------
-SRCDIR              ?= src
-OBJDIR              ?= obj
-BINDIR              ?= bin
-GFXDIR              ?= src/gfx
-#----------------------------
+# Copyright (C) 2015-2020
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#----------------------------
 VERSION := 9.0-devel
-
 #----------------------------
-# try not to edit anything below these lines unless you know what you are doing
-#----------------------------
-
+NAME ?= DEMO
+ICON ?=
+DESCRIPTION ?=
+COMPRESSED ?= NO
+ARCHIVED ?= NO
+CLEANUP ?= YES
+BSSHEAP_LOW ?= D031F6
+BSSHEAP_HIGH ?= D13FD6
+STACK_HIGH ?= D1A87E
+INIT_LOC ?= D1A87F
+USE_FLASH_FUNCTIONS ?= YES
+UPPERCASE_NAME ?= YES
+OUTPUT_MAP ?= NO
+CFLAGS ?= -Wall -Wextra -Oz
+CXXFLAGS ?=
+LDFLAGS ?=
+SRCDIR ?= src
+OBJDIR ?= obj
+BINDIR ?= bin
+GFXDIR ?= src/gfx
+DEPS ?=
 #----------------------------
 
 # define some common makefile things
@@ -34,11 +45,10 @@ empty :=
 space := $(empty) $(empty)
 comma := ,
 
-TARGET ?= $(NAME)
+# configure defaults
 DEBUGMODE = NDEBUG
 LDDEBUG = 0
-CCDEBUGFLAG = -g0
-MAKEFILE_FILE := $(lastword $(MAKEFILE_LIST))
+LDSTATIC = 0
 
 # verbosity
 V ?= 0
@@ -50,43 +60,35 @@ endif
 
 # get the os specific items
 ifeq ($(OS),Windows_NT)
-SHELL     := cmd.exe
-MAKEDIR   := $(CURDIR)
+SHELL := cmd.exe
 NATIVEPATH = $(subst /,\,$1)
-WINPATH    = $(NATIVEPATH)
-WINRELPATH = $(subst /,\,$1)
-CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
-BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
-LD         = $(call NATIVEPATH,$(BIN)/fasmg.exe)
-CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin.exe)
-CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg.exe)
-CD         = cd
-RM         = ( del /q /f $1 2>nul || call )
-RMDIR      = ( rmdir /s /q $1 2>nul || call )
+BIN ?= $(call NATIVEPATH,$(CEDEV)/bin)
+FASMLD := $(call NATIVEPATH,$(BIN)/fasmg.exe)
+CONVBIN := $(call NATIVEPATH,$(BIN)/convbin.exe)
+CONVIMG := $(call NATIVEPATH,$(BIN)/convimg.exe)
+EZCC := $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
+RM = ( del /q /f $1 2>nul || call )
+RMDIR = ( rmdir /s /q $1 2>nul || call )
 NATIVEMKDR = ( mkdir $1 2>nul || call )
-QUOTE_ARG  = "$(subst ",',$1)"#'
+QUOTE_ARG = "$(subst ",',$1)"#'
 else
-MAKEDIR   := $(CURDIR)
 NATIVEPATH = $(subst \,/,$1)
-WINPATH    = $(shell winepath -w $1)
-WINRELPATH = $(subst /,\,$1)
-CEDEV     ?= $(call NATIVEPATH,$(realpath ..\..))
-BIN       ?= $(call NATIVEPATH,$(CEDEV)/bin)
-LD         = $(call NATIVEPATH,$(BIN)/fasmg)
-CONVBIN    = $(call NATIVEPATH,$(BIN)/convbin)
-CONVIMG    = $(call NATIVEPATH,$(BIN)/convimg)
-CD         = cd
-RM         = rm -f $1
-RMDIR      = rm -rf $1
+BIN ?= $(call NATIVEPATH,$(CEDEV)/bin)
+FASMLD := fasmg
+CONVBIN := convbin
+CONVIMG := convimg
+EZCC := ez80-clang
+RM = rm -f $1
+RMDIR = rm -rf $1
 NATIVEMKDR = mkdir -p $1
-QUOTE_ARG  = '$(subst ','\'',$1)'#'
+QUOTE_ARG = '$(subst ','\'',$1)'#'
 endif
-EZCC = ez80-clang
 
+MAKEFILE_FILE := $(lastword $(MAKEFILE_LIST))
 MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
 
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
-LINKER_SCRIPT ?= $(CEDEV)/include/.linker_script
+LINKER_SCRIPT ?= $(CEDEV)/meta/linker_script
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -95,25 +97,23 @@ BINDIR := $(call NATIVEPATH,$(BINDIR))
 GFXDIR := $(call NATIVEPATH,$(GFXDIR))
 
 # generate default names
-TARGETBIN     := $(TARGET).bin
-TARGETMAP     := $(TARGET).map
-TARGET8XP     := $(TARGET).8xp
-ICONIMG       := $(wildcard $(call NATIVEPATH,$(ICON)))
-ICONSRC       := $(call NATIVEPATH,$(OBJDIR)/icon.src)
+TARGETBIN := $(NAME).bin
+TARGETMAP := $(NAME).map
+TARGET8XP := $(NAME).8xp
+ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
+ICONSRC := $(call NATIVEPATH,$(OBJDIR)/icon.src)
 
-# init conditionals
-F_STARTUP     := $(call NATIVEPATH,$(CEDEV)/lib/cstartup.src)
-F_LAUNCHER    := $(call NATIVEPATH,$(CEDEV)/lib/libheader.src)
-F_CLEANUP     := $(call NATIVEPATH,$(CEDEV)/lib/ccleanup.src)
+# startup routines
+LDCRT0 := $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
 
-# find all of the available C, H and ASM files (Remember, you can create C <-> assembly routines easily this way)
-CSOURCES      := $(call rwildcard,$(SRCDIR),*.c)
-CPPSOURCES    := $(call rwildcard,$(SRCDIR),*.cpp)
-USERHEADERS   := $(call rwildcard,$(SRCDIR),*.h *.hpp)
-ASMSOURCES    := $(call rwildcard,$(SRCDIR),*.asm)
+# find source files
+CSOURCES := $(call rwildcard,$(SRCDIR),*.c)
+CPPSOURCES := $(call rwildcard,$(SRCDIR),*.cpp)
+USERHEADERS := $(call rwildcard,$(SRCDIR),*.h *.hpp)
+ASMSOURCES := $(call rwildcard,$(SRCDIR),*.asm)
 
 # create links for later
 LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.c.src)
@@ -121,32 +121,30 @@ LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
 LINK_ASMSOURCES := $(ASMSOURCES)
 
 # files created to be used for linking
-LDFILES   := $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
-LINK_LIBS    := $(wildcard $(CEDEV)/lib/libload/*.lib)
-LINK_LIBLOAD := $(CEDEV)/lib/libload.lib
+LDFILES := $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
+LDLIBS := $(wildcard $(CEDEV)/lib/libload/*.lib)
 
-# check if there is an icon present that we can convert
-# if so, generate a recipe to build it
+# check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
 ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDREQUIRE += -i $(call QUOTE_ARG,require ___icon)
-LDICON := $(comma)$(space)$(call FASMG_FILES,$(ICONSRC))
+LDICON := $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 else
 ifneq ($(DESCRIPTION),)
 ICON_CONV := $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDREQUIRE += -i $(call QUOTE_ARG,require ___description)
-LDICON := $(comma)$(space)$(call FASMG_FILES,$(ICONSRC))
-ICONIMG :=
-else
-ICONSRC :=
+LDICON := $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 endif
+endif
+
+# check if default cleanup code should be added
+ifeq ($(CLEANUP),YES)
+LDREQUIRE += -i $(call QUOTE_ARG,require __cleanup)
 endif
 
 # check if gfx directory exists
 ifneq ($(wildcard $(GFXDIR)/.),)
-GFXCMD := $(CD) $(GFXDIR) && $(CONVIMG)
-else
-GFXCMD :=
+GFXCMD := cd $(GFXDIR) && $(CONVIMG)
 endif
 
 # determine output target flags
@@ -161,85 +159,77 @@ endif
 ifeq ($(UPPERCASE_NAME),YES)
 CONVBINFLAGS += --uppercase
 endif
-CONVBINFLAGS += --name $(TARGET)
-
-# link cleanup source
-ifeq ($(CLEANUP),YES)
-LDREQUIRE += -i $(call QUOTE_ARG,require __ccleanup)
-LDCLEANUP  = , $(call FASMG_FILES,$(F_CLEANUP))
-endif
+CONVBINFLAGS += --name $(NAME)
 
 # output debug map file
 ifeq ($(OUTPUT_MAP),YES)
-LDMAPFLAG = -i map
+LDMAPFLAG := -i map
 endif
 
 # choose static or linked flash functions
 ifeq ($(USE_FLASH_FUNCTIONS),YES)
-STATIC := 0
-else
-STATIC := 1
+LDSTATIC := 1
 endif
 
-# define the C/C++ flags used by Clang
-CFLAGS ?= -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant= -D_EZ80 -D$(DEBUGMODE) $(EXTRA_CFLAGS)
-CFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv $(CCDEBUGFLAG) $(OPT_MODE)
-CXXFLAGS += $(CFLAGS) -fno-exceptions $(EXTRA_CXXFLAGS)
+# define the c/c++ flags used by clang
+EZCFLAGS := -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant=
+EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -D_EZ80 -D$(DEBUGMODE)
+EZCXXFLAGS += $(EZ_CFLAGS) -fno-exceptions $(CXXFLAGS)
+EZCFLAGS += $(CFLAGS)
 
-# these are the linker flags, basically organized to properly set up the environment
-LDFLAGS ?= \
+# these are the fasmg linker flags
+FASMFLAGS := \
 	-n \
-	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/include/fasmg-ez80/ld.alm)) \
+	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
-	-i $(call QUOTE_ARG,STATIC := $(STATIC)) \
+	-i $(call QUOTE_ARG,STATIC := $(LDSTATIC)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
 	$(LDREQUIRE) \
 	$(LDMAPFLAG) \
-	-i $(call QUOTE_ARG,source $(call FASMG_FILES,$(F_LAUNCHER))$(LDICON)$(LDCLEANUP)$(comma) $(call FASMG_FILES,$(LDFILES))$(comma) $(call FASMG_FILES,$(F_STARTUP))) \
-	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LINK_LIBLOAD))$(comma) $(call FASMG_FILES,$(LINK_LIBS))) \
-	$(EXTRA_LDFLAGS)
+	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
+	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LDLIBS))) \
+	$(LDFLAGS)
 
 # this rule is trigged to build everything
-all: $(BINDIR)/$(TARGET8XP) ;
+all: $(BINDIR)/$(TARGET8XP)
 
 # this rule is trigged to build debug everything
 debug: DEBUGMODE = DEBUG
 debug: LDDEBUG = 1
-debug: CCDEBUGFLAG = -g
-debug: $(BINDIR)/$(TARGET8XP) ;
+debug: $(BINDIR)/$(TARGET8XP)
 
-$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_FILE)
+$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_FILE) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
-$(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONIMG) $(MAKEFILE_FILE)
+$(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONIMG) $(MAKEFILE_FILE) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(ICON_CONV)
 	$(Q)echo [linking] $(call NATIVEPATH,$@)
-	$(Q)$(LD) $(LDFLAGS) $(call NATIVEPATH,$@)
+	$(Q)$(FASMLD) $(FASMFLAGS) $(call NATIVEPATH,$@)
 
 # these rules compile the source files into assembly files
-$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_FILE)
+$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_FILE) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) -S $(CFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
+	$(Q)$(EZCC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
-$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_FILE)
+$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_FILE) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) -S $(CXXFLAGS) $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(MAKEDIR)/,$@))
+	$(Q)$(EZCC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 clean:
 	$(Q)$(call RMDIR,$(OBJDIR) $(BINDIR))
-	@echo Removed build objects and binaries.
+	$(Q)echo Removed built objects and binaries.
 
 gfx:
 	$(Q)$(GFXCMD)
 
 version:
-	$(Q)echo CE C SDK Version $(VERSION)
+	$(Q)echo CE C Toolchain v$(VERSION)
 
 .PHONY: all clean version gfx debug

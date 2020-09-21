@@ -1,38 +1,35 @@
 # ----------------------------
-# Program Options
+# Makefile Options
 # ----------------------------
 
-NAME         ?= DEMO
-ICON         ?= icon.png
-DESCRIPTION  ?= "CE C SDK Demo"
-COMPRESSED   ?= NO
-ARCHIVED     ?= NO
+NAME ?= DEMO
+ICON ?= icon.png
+DESCRIPTION ?= "CE C Toolchain Demo"
+COMPRESSED ?= NO
+ARCHIVED ?= NO
 
-# ----------------------------
-# Compile Options
-# ----------------------------
+CFLAGS ?= -Wall -Wextra -Oz
+CXXFLAGS ?= -Wall -Wextra -Oz
 
-OPT_MODE     ?= -Oz
-EXTRA_CFLAGS ?= -Wall -Wextra
-
-# ----------------------------
-# Debug Options
-# ----------------------------
-
-OUTPUT_MAP   ?= NO
-
-# ----------------------------
-# FontLib Options
-# ----------------------------
-
+# font options
 FONTPACKNAME ?= DRSANS
 FONTDIR ?= $(SRCDIR)/fonts
 
-include $(CEDEV)/include/.makefile
+DEPS ?= $(BINDIR)/$(FONTPACKNAME).bin $(BINDIR)/$(FONTPACKNAME).8xv
+
+# ----------------------------
+
+ifndef CEDEV
+$(error CEDEV environment path variable is not set)
+endif
+
+include $(CEDEV)/meta/makefile.mk
+
+# ----------------------------
 
 $(BINDIR)/$(FONTPACKNAME).bin: $(FONTDIR)/drsans-06-bold.fnt $(FONTDIR)/drsans-06-normal.fnt $(FONTDIR)/drsans-07-bold.fnt $(FONTDIR)/drsans-07-normal.fnt $(FONTDIR)/drsans-09-bold.fnt $(FONTDIR)/drsans-09-normal.fnt
-	$(call MKDIR,$(@D))
-	convfont -o fontpack -N "Dr. Sans" -P "Calculator 1252" \
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)convfont -o fontpack -N "Dr. Sans" -P "Calculator 1252" \
 	-D "A font designed for maximum readability" \
 	-V "15 April 2019" \
 	-f $(FONTDIR)/drsans-09-bold.fnt   -l 11 -x 5 -c 2 -a 1 -b 1 -w bold -s sans-serif -s upright -s proportional \
@@ -44,9 +41,6 @@ $(BINDIR)/$(FONTPACKNAME).bin: $(FONTDIR)/drsans-06-bold.fnt $(FONTDIR)/drsans-0
 	$(BINDIR)/$(FONTPACKNAME).bin
 
 $(BINDIR)/$(FONTPACKNAME).8xv: $(BINDIR)/$(FONTPACKNAME).bin
-	$(call MKDIR,$(@D))
-	convbin --iformat bin --input $(BINDIR)/$(FONTPACKNAME).bin --oformat 8xv --output $(BINDIR)/$(FONTPACKNAME).8xv --archive --name $(FONTPACKNAME)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)convbin --iformat bin --input $(BINDIR)/$(FONTPACKNAME).bin --oformat 8xv --output $(BINDIR)/$(FONTPACKNAME).8xv --archive --name $(FONTPACKNAME)
 
-all: $(BINDIR)/$(FONTPACKNAME).8xv
-
-.PHONY: clean

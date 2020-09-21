@@ -1,28 +1,20 @@
 # ----------------------------
-# Program Options
+# Makefile Options
 # ----------------------------
 
-NAME         ?= DEMO
-ICON         ?= icon.png
-DESCRIPTION  ?= "CE C SDK Demo"
-COMPRESSED   ?= NO
-ARCHIVED     ?= NO
+NAME ?= DEMO
+ICON ?= icon.png
+DESCRIPTION ?= "CE C Toolchain Demo"
+COMPRESSED ?= NO
+ARCHIVED ?= NO
+
+CFLAGS ?= -Wall -Wextra -Oz
+CXXFLAGS ?= -Wall -Wextra -Oz
 
 # ----------------------------
-# Compile Options
-# ----------------------------
 
-OPT_MODE     ?= -Oz
-EXTRA_CFLAGS ?= -Wall -Wextra
+ifndef CEDEV
+$(error CEDEV environment path variable is not set)
+endif
 
-# ----------------------------
-# Debug Options
-# ----------------------------
-
-OUTPUT_MAP   ?= NO
-
-include $(CEDEV)/include/.makefile
-
-tilemap: src/tilemap/tilemap.csv
-	cd src && cd tilemap && convbin --iformat csv -i tilemap.csv -o tilemap.c --oformat c --name tilemap_map
-
+include $(CEDEV)/meta/makefile.mk

@@ -18,7 +18,7 @@
 #define PUN	0x02	/* punctuation */
 #define DIG	0x01	/* decimal digit (0-9) */
 
-__rom unsigned char __maptab[128] = {
+const unsigned char __maptab[128] = {
 /*  0 */ CTL,PUN,PUN,PUN,PUN,PUN,PUN,PUN,
 /*  8 */ PUN,PUN,PUN,PUN,PUN,PUN,PUN,PUN,
 /* 10 */ PUN,PUN,PUN,PUN,PUN,PUN,PUN,PUN,

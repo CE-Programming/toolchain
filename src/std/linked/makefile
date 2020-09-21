@@ -14,26 +14,29 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-include $(CURDIR)/../common.mk
+include $(CURDIR)/../../common.mk
 
-LIB_SRC := keypadc.asm
-LIB_LIB := keypadc.lib
-LIB_8XV := keypadc.8xv
-LIB_H := keypadc.h
+WILDCARD_H := $(wildcard *.h *.hpp)
+WILDCARD_C := $(wildcard *.c)
+BUILD_SRC := $(addprefix build/,$(WILDCARD_C:%.c=%.src))
 
-all: $(LIB_8XV)
+EZCFLAGS := -S -ffreestanding -Wall -Wextra -Oz
+EZCFLAGS += -Dreentrant= -D_EZ80 -isystem ..
 
-$(LIB_8XV): $(LIB_SRC)
-	$(Q)$(FASMG) $< $@
+WILDCARD_SRC = $(wildcard *.src) $(patsubst %.c,build/%.src,$(wildcard *.c))
+
+all: $(BUILD_SRC)
+
+build/%.src: %.c
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCFLAGS) $< -o $@
 
 clean:
-	$(Q)$(call REMOVE,$(LIB_LIB) $(LIB_8XV))
+	$(Q)$(call RMDIR,build)
 
 install: all
-	$(Q)$(call MKDIR,$(INSTALL_LIB))
-	$(Q)$(call MKDIR,$(INSTALL_H))
-	$(Q)$(call COPY,$(LIB_LIB),$(INSTALL_LIB))
-	$(Q)$(call COPY,$(LIB_H),$(INSTALL_H))
+	$(Q)$(call MKDIR,$(INSTALL_LINKED))
+	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_LINKED))
 
-.PHONY: all clean install
+.PHONY: all clean
 

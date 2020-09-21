@@ -1,38 +1,34 @@
 # ----------------------------
-# Program Options
+# Makefile Options
 # ----------------------------
 
-NAME         ?= DEMO
-ICON         ?= icon.png
-DESCRIPTION  ?= "CE C SDK Demo"
-COMPRESSED   ?= NO
-ARCHIVED     ?= NO
+NAME ?= DEMO
+ICON ?= icon.png
+DESCRIPTION ?= "CE C Toolchain Demo"
+COMPRESSED ?= NO
+ARCHIVED ?= NO
 
-# ----------------------------
-# Compile Options
-# ----------------------------
+CFLAGS ?= -Wall -Wextra -Oz
+CXXFLAGS ?= -Wall -Wextra -Oz
 
-OPT_MODE     ?= -Oz
-EXTRA_CFLAGS ?= -Wall -Wextra
-
-# ----------------------------
-# Debug Options
-# ----------------------------
-
-OUTPUT_MAP   ?= NO
-
-# ----------------------------
-# FontLib Options
-# ----------------------------
-
+# fonts.c depends on testfont.inc, which is built from testfont.fnt
 FONTDIR ?= $(SRCDIR)/fonts
+FONT ?= $(FONTDIR)/testfont.fnt
+FONT_INC ?= $(FONTDIR)/testfont.inc
 
-include $(CEDEV)/include/.makefile
+DEPS ?= $(FONT_INC)
 
-# This is a roundabout way to tell make that fonts.c depends on testfont.inc.
-# It does it by saying the compiled object code depends on the .inc file.
-$(OBJDIR)/fonts/fonts.c.src: $(FONTDIR)/testfont.inc
+# ----------------------------
 
-$(FONTDIR)/testfont.inc: $(FONTDIR)/testfont.fnt
-	$(call MKDIR,$(@D))
-	convfont -o carray -f $^ -a 1 -b 1 -w bold -c 2 -x 9 -l 0x0B -Z $@
+ifndef CEDEV
+$(error CEDEV environment path variable is not set)
+endif
+
+include $(CEDEV)/meta/makefile.mk
+
+# ----------------------------
+
+$(FONT_INC): $(FONT)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)convfont -o carray -f $< -a 1 -b 1 -w bold -c 2 -x 9 -l 0x0B -Z $@
+

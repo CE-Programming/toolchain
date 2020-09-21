@@ -1,16 +1,67 @@
 	assume	adl=1
 
+	section	.text
 	public _errno
-_errno := 0D008DCh
+_errno := $d008dc
 
-;-------------------------------------------------------------------------------
 	section	.header
-	db	$ef,$7b,$00
+	db	$ef,$7b
 	public __init
 __init:
+	db	$00		; C program identifier (nop)
 
-;-------------------------------------------------------------------------------
-	section	.startup
+	section	.launcher
+	public	__init_libload
+__init_libload:
+	call	020628h		; _pushop1 to save running program name
+	jr	__tryfind
+__inram:
+	call	021448h		; _arc_unarc
+__tryfind:
+	ld	hl,__libloadname-1
+	call	020320h		; _mov9toop1
+	ld	a,015h		; appvarobj
+	ld	(0D005F8h),a	; op1
+	call	02050Ch		; _chkfindsym
+	jr	c,__notfound
+	call	021F98h		; _chkinram
+	jr	z,__inram	; if in ram, archive libload and search again
+	ld	hl,9+1+__libloadnamelen+2
+	add	hl,de
+	push	hl
+	call	0205C4h		; _popop1 to restore running program name
+	pop	hl		; start of loader (required to be in hl)
+	ld	de,__relocationstart ; start of relocation data
+	jp	(hl)		; jump to the loader -- it should take care of everything else
+__notfound:
+	call	0205C4h		; _popop1 to restore running program name
+	call	020814h		; _clrscrn
+	call	020828h		; _homeup
+	ld	hl,__missingappvar
+	call	0207C0h		; _puts
+	call 	0207F0h		; _newline
+	ld	hl,__webaddress
+	call	0207C0h		; _puts
+	jp	020D8Ch		; _getkey
+
+	extern	__relocationstart
+
+	section	.rodata
+
+	private	__missingappvar
+__missingappvar:
+	db	"Need "
+	private	__libloadname
+__libloadname:
+	db	"LibLoad"
+	private	__libloadnamelen
+__libloadnamelen := $-__libloadname
+	db	0
+	private	__webaddress
+__webaddress:
+	db	"http://tiny.cc/clibs",0
+
+	section	.start
 
 ifextern ___main_argc_argv
 	extern	___main_argc_argv
@@ -20,8 +71,8 @@ else
 	__main := _main
 end if
 
-	public  __startup
-__startup:
+	public __start
+__start:
 	call	0020848h	; _RunInicOff, assumes iy = flags
 	call	00004F4h	; _usb_DisableTimer
 	di			; disable interrupts
@@ -155,25 +206,32 @@ end if
 end if
 end if
 	call	__main
-	public	__exit
 __exit:
-	public	__exitsp
-__exitsp := $+1
 	ld	sp,0
+__exitsp := $-3
 	pop	iy		; iy = flags
 	pop	af		; a = original flash wait states
 	ex	(sp),hl		; hl = flash wait state control port,
 				; save exit code
 	ld	(hl),a		; restore flash wait states
 	call	00004F0h	; _usb_ResetTimer
-	call	_os_EnableHomeTextBuffer
 
 	extern	__low_bss
 	extern	__len_bss
 	extern	_os_DisableHomeTextBuffer
+
+	section	.cleanup
+	public	__cleanup
+__cleanup:
+	call	_os_EnableHomeTextBuffer
+	res	4,(iy+9)	; onInterrupt,(iy+onFlags)
+	set	0,(iy+3)	; graphDraw,(iy+graphFlags)
+	call	020808h		; _ClrLCDFull
+	call	020828h		; _HomeUp
+	call	021A3Ch		; _DrawStatusBar
+
 	extern	_os_EnableHomeTextBuffer
 
-;-------------------------------------------------------------------------------
 	section	.exit
 	pop	hl		; hl = exit code
 	ret
@@ -182,4 +240,5 @@ __exitsp := $+1
 _exit:
 	pop	hl
 	pop	hl
-	jr	__exit
+	jq	__exit
+
