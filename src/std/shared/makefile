@@ -36,7 +36,7 @@ clean:
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_SHARED))
-	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_SHARED))
+	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_SHARED))
 
 .PHONY: all clean
 

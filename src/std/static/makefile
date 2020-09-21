@@ -36,7 +36,7 @@ clean:
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_STATIC))
-	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_STATIC))
+	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_STATIC))
 
 .PHONY: all clean
 
