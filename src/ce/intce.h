@@ -1,12 +1,16 @@
 /**
  * @file
- * @authors Matt "MateoConLechuga" Waltz
- * @authors Jacob "jacobly" Young
- * @brief Interrupt configuring and setting
+ * @brief Interrupt configuring and setting.
+ * @author Matt "MateoConLechuga" Waltz
+ * @author Jacob "jacobly" Young
+ *
+ * This file provides routines for setting custom interrupt vectors
+ * for your program. Note that TI broke interrupt support in hardware
+ * revisions >= I, and they will not work. Use at your own risk.
  */
 
-#ifndef INTCE_H
-#define INTCE_H
+#ifndef _INTCE_H
+#define _INTCE_H
 
 #include <stdint.h>
 
@@ -33,27 +37,30 @@ asm("di")
 asm("halt")
 
 #ifdef FORCE_INTERRUPTS
-#warning TI has removed custom interrupt support on CE models with hardware revision >= I. Please check that this is acceptable.
+#warning TI broke interrupt support on CE models with hardware revision >= I. Use at your own risk.
 
 /**
- * Initizalize to use custom interrupts
- * @note Saves status of current interrupt state
- * @warning TI has removed custom interrupt support on CE models with hardware revision >= I.
+ * Initizalize to use custom interrupts.
+ *
+ * @note Saves status of current interrupt state.
+ * @warning TI broke interrupt support on CE models with hardware revision >= I.
  */
 void int_Initialize(void);
 
 /**
- * Resets interrupts back to the OS expected values
- * @warning Must have called int_Initialize before using
- * @warning TI has removed custom interrupt support on CE models with hardware revision >= I.
+ * Resets interrupts back to the OS expected values.
+ *
+ * @warning Must have called int_Initialize before using.
+ * @warning TI broke interrupt support on CE models with hardware revision >= I.
  */
 void int_Reset(void);
 
 /**
- * Sets up an interrupt vector given an ISR
- * @param ivect Interrupt vector to set
- * @param handler Handler to interrupt service routine
- * @warning TI has removed custom interrupt support on CE models with hardware revision >= I.
+ * Sets up an interrupt vector given an ISR.
+ *
+ * @param ivect Interrupt vector to set.
+ * @param handler Handler to interrupt service routine.
+ * @warning TI broke interrupt support on CE models with hardware revision >= I.
  */
 void int_SetVector(uint8_t ivect, void (*handler)(void));
 

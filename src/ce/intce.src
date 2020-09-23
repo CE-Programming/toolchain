@@ -1,59 +1,55 @@
 	assume	adl=1
 
-;-------------------------------------------------------------------------------
-; Interrupts equates
-mpIntStatus       := 0F00000h
-mpIntMask         := 0F00004h
-mpIntAck          := 0F00008h
-mpIntLachEnable   := 0F0000Ch
-mpIntXor          := 0F00010h
-mpIntStatusMasked := 0F00014h
+mpIntStatus := $F00000
+mpIntMask := $F00004
+mpIntAck := $F00008
+mpIntLachEnable := $F0000C
+mpIntXor := $F00010
+mpIntStatusMasked := $F00014
 
-intOnKey          := 1
-intTimer1         := 2
-intTimer2         := 4
-intTimer3         := 8
-intOsTimer        := 10h
-intKbd            := 400h
-intLcd            := 800h
-intRtc            := 1000h
+intOnKey := 1
+intTimer1 := 2
+intTimer2 := 4
+intTimer3 := 8
+intOsTimer := $10
+intKbd := $400
+intLcd := $800
+intRtc := $1000
 
 ;-------------------------------------------------------------------------------
 	public	_int_Initialize
 _int_Initialize:
 	di
-	ld	de,lconf
+	ld	de,_lconf
 	ld	hl,mpIntMask
 	ld	bc,16
 	ldir
-	ld	hl,cconf
+	ld	hl,_cconf
 	ld	de,mpIntMask
 	ld	bc,16
 	ldir
-	ld	hl,0D18879h
-	ld	de,0C90611h
+	ld	hl,$D18879
+	ld	de,$C90611
 	ld	(hl),de
 	dec	hl
-	ld	(hl),0EDh
+	ld	(hl),$ED
 	push	hl
 	inc	d
-	call	0D18878h
-	ld	hl, 0E10010h | ((_int_Handler >> 8) & 000FF00h)
-	ld	de, 0C3h | ((_int_Handler << 8) & 0FFFF00h)
+	call	$D18878
+	ld	hl,$E10010 or ((_int_Handler shr 8) and $00FF00)
+	ld	de,$C3 or ((_int_Handler shl 8) and $FFFF00)
 	ld	(hl),h
 	inc	hl
 	ld	(hl),de
-	ld	hl,0E30800h
-	ld	bc,0401h
-	ld	a,0E1h
-	call	00210E0h ; _Memset
-	ld	hl,0E308h
+	ld	hl,$E30800
+	ld	bc,$401
+	ld	a,$E1
+	call	$0210E0		; _Memset
+	ld	hl,$E308
 	ld	i,hl
 	im	2
 	ld	d,3
 	ret
-
-        section	.code
 
 ;-------------------------------------------------------------------------------
 	public	_int_Handler
@@ -73,7 +69,7 @@ identified:
 	dec	a
 	add	a,a
 	add	a,a
-	ld	(isr_dispatch_smc+1),a
+	ld	(isr_dispatch_smc + 1),a
 	exx
 	ex	af, af'
 isr_dispatch_smc:
@@ -105,49 +101,45 @@ unhandledInt:
 	ei
 	ret
 
-        section	.code
-
 ;-------------------------------------------------------------------------------
 	public	_int_SetVector
 _int_SetVector:
 	ld	iy,0
 	add	iy,sp
 	ld	a,21
-	ld	l,(iy+3)
+	ld	l,(iy + 3)
 	sub	a,l
 	ld	l,a
 	ld	h,4
 	mlt	hl
-	ld	de,iv_list+1
+	ld	de,iv_list + 1
 	add	hl,de
-	ld	de,(iy+6)
+	ld	de,(iy + 6)
 	ld	(hl),de
 	ret
-
-        section	.code
 
 ;-------------------------------------------------------------------------------
 	public	_int_Reset
 _int_Reset:
 	di
-	ld	hl, lconf
-	ld	de, mpIntMask
-	ld	bc, 16
+	ld	hl,_lconf
+	ld	de,mpIntMask
+	ld	bc,16
 	ldir
 	im	1
 	ret
 
 	section	.bss
 
-lconf	rb	16
+	private	_lconf
+_lconf:
+	rb	16
 
 	section	.data
 
-	; Mask
-cconf	db	000h,000h,000h,000h
-	; ACK
-	db	0FFh,0FFh,0FFh,0FFh
-	; Latch
-	db	000h,000h,000h,000h
-	; Invert
-	db	000h,000h,000h,000h
+	private	_cconf
+_cconf:
+	db	$00,$00,$00,$00	; mask
+	db	$ff,$ff,$ff,$ff	; ack
+	db	$00,$00,$00,$00	; latch
+	db	$00,$00,$00,$00	; invert
