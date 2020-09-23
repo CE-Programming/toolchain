@@ -29,7 +29,8 @@ Getting Started
 To build programs with the CE C toolchain, the :code:`make` command/exectuable is used.
 This tutorial will guide you through building your first program.
 
-Locate the `CEdev` folder that you installed. There should be an `examples` folder which contains multiple projects for you to use for getting familiar with the CE C Toolchain.
+Locate the `CEdev` folder that you installed.
+There should be an `examples` folder which contains multiple projects for you to use for getting familiar with the CE C Toolchain.
 Navigate to the `hello_world` example inside this folder.
 
 Building is done by using a command terminal.
@@ -50,7 +51,7 @@ The following briefly describes the folder structure and files present throughou
 Folders
 --------
 
-* **src**: This is the directory where all of your source files are. Sources are built automatically if they end in a `.c` extension, and can be edited with any text editor (not Word).
+* **src**: This is the directory where all of your source files are. Sources are built automatically if they end in a `.c`/`.cpp` extension, and can be edited with any text editor (not Word).
 
 * **bin**: This is where the compiled program will be placed.
 

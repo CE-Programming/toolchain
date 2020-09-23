@@ -22,11 +22,11 @@ ICON
 
 Icons make a more polished program that can be displayed in shells such as `Cesium <https://github.com/mateoconlechuga/cesium/releases/latest>`_.
 
-Place a 16x16 PNG image in the same directory as the makefile with the name of whatever `ICON` is defined as, e.g. `iconc.png`.
+Place a 16x16 image in the same directory as the makefile with the name of whatever `ICON` is defined as, e.g. `icon.png`.
 
 .. code-block:: makefile
 
-    ICON ?= iconc.png
+    ICON ?= icon.png
 
 DESCRIPTION
 -----------
@@ -63,16 +63,6 @@ To enable this feature, open the project's makefile and change the line:
 
     ARCHIVED ?= YES
 
-OPT_MODE
---------
-
-This is the optimization level used for compiling the program.
-The default clang optimizations flags are avaible here, e.g. -O(1|2|3|s|z|fast). 
-
-.. code-block:: makefile
-
-    OPT_MODE ?= -Oz
-
 EXTRA_CFLAGS
 ------------
 
@@ -80,5 +70,5 @@ These flags are passed to the clang compiler.
 
 .. code-block:: makefile
 
-    EXTRA_CFLAGS ?= -Wall -Wextra
+    EXTRA_CFLAGS ?= -Wall -Wextra -Oz
 

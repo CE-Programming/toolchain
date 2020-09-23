@@ -15,6 +15,7 @@ Overview
 --------
 
 .. toctree::
+    :caption: Overview
     :maxdepth: 1
 
     self
@@ -25,6 +26,7 @@ Toolchain Documentation
 -----------------------
 
 .. toctree::
+    :caption: Toolchain Documentation
     :maxdepth: 1
 
     libraries/index
@@ -42,6 +44,7 @@ Contributing
 ------------
 
 .. toctree::
+    :caption: Contributing
     :maxdepth: 1
 
     static/building
