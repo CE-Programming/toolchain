@@ -28,7 +28,7 @@ endif
 
 LIB_DIR = $(call NATIVEPATH,src/$1)
 
-all: fasmg convbin convimg convfont $(LIBS) std
+all: convbin convimg convfont $(LIBS) std
 
 std:
 	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) V=$(V)
@@ -45,7 +45,7 @@ convimg:
 convfont:
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) V=$(V)
 
-$(LIBS):
+$(LIBS): fasmg
 	$(Q)$(MAKE) -C $(call LIB_DIR,$@) V=$(V)
 
 $(addprefix clean-,$(LIBS)):
