@@ -47,6 +47,7 @@ comma := ,
 
 # configure defaults
 DEBUGMODE = NDEBUG
+CCDEBUG = -g0
 LDDEBUG = 0
 LDSTATIC = 0
 
@@ -172,13 +173,13 @@ LDSTATIC := 1
 endif
 
 # define the c/c++ flags used by clang
-EZCFLAGS := -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant=
-EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -D_EZ80 -D$(DEBUGMODE)
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions $(CXXFLAGS)
+EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant=
+EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -D_EZ80 -D$(DEBUGMODE) $(CCDEBUG)
+EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
 
 # these are the fasmg linker flags
-FASMFLAGS := \
+FASMFLAGS = \
 	-n \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
@@ -199,6 +200,7 @@ all: $(BINDIR)/$(TARGET8XP)
 # this rule is trigged to build debug everything
 debug: DEBUGMODE = DEBUG
 debug: LDDEBUG = 1
+debug: CCDEBUG = -g
 debug: $(BINDIR)/$(TARGET8XP)
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_FILE) $(DEPS)
