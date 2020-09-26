@@ -17,7 +17,7 @@
  * void main() {
  *     begin(); // No rendering allowed!
  *     gfx_Begin();
- *     gfx_SetDrawBuffer(); // Draw to the buffer to avoid rendering artifats
+ *     gfx_SetDrawBuffer(); // Draw to the buffer to avoid rendering artifacts
  *
  *     while (step()) { // No rendering allowed in step!
  *         if (partial_redraw) // Only want to redraw part of the previous frame?
