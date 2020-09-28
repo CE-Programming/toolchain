@@ -154,8 +154,8 @@ jobs:
       - name: Upload Libraries
         uses: actions/upload-artifact@v2
         with:
-          name: clibraries
-          path: toolchain/clibraries
+          name: clibs
+          path: toolchain/clibs.8xg
 
       - name: Upload Windows Installer
         if: runner.os == 'Windows'
