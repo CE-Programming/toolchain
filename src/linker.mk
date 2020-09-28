@@ -26,12 +26,12 @@ SHARED_FILES := $(filter-out ce/crt0.src,$(wildcard ce/*.src)) $(wildcard std/sh
 linker_script:
 	$(Q)$(call REMOVE,$(call QUOTE_ARG,$@))
 	$(Q)$(call APPEND,if DEBUG)
-	$(Q)$(call APPEND,	iterate sections$(comma) <.debug_abbrev$(comma) .debug_addr$(comma) .debug_aranges$(comma) .debug_frame$(comma) \)
-	$(Q)$(call APPEND,	                   .debug_info$(comma) .debug_line$(comma) .debug_line_str$(comma) .debug_loc$(comma)    \)
-	$(Q)$(call APPEND,	                   .debug_loclists$(comma) .debug_macinfo$(comma) .debug_macro$(comma)            \)
-	$(Q)$(call APPEND,	                   .debug_names$(comma) .debug_pubnames$(comma) .debug_pubtypes$(comma)           \)
-	$(Q)$(call APPEND,	                   .debug_ranges$(comma) .debug_rnglists$(comma) .debug_str$(comma)               \)
-	$(Q)$(call APPEND,	                   .debug_str_offsets$(comma) .debug_sup$(comma) .debug_types$(comma)             \)
+	$(Q)$(call APPEND,	iterate sections$(comma) <.comment$(comma) .debug_abbrev$(comma) .debug_addr$(comma) .debug_aranges$(comma)     \)
+	$(Q)$(call APPEND,	                   .debug_frame$(comma) .debug_info$(comma) .debug_line$(comma) .debug_line_str$(comma)  \)
+	$(Q)$(call APPEND,	                   .debug_loc$(comma) .debug_loclists$(comma) .debug_macinfo$(comma)              \)
+	$(Q)$(call APPEND,	                   .debug_macro$(comma) .debug_names$(comma) .debug_pubnames$(comma)              \)
+	$(Q)$(call APPEND,	                   .debug_pubtypes$(comma) .debug_ranges$(comma) .debug_rnglists$(comma)          \)
+	$(Q)$(call APPEND,	                   .debug_str$(comma) .debug_str_offsets$(comma) .debug_sup$(comma) .debug_types$(comma) \)
 	$(Q)$(call APPEND,	                   .debug_abbrev.dwo$(comma) .debug_info.dwo$(comma) .debug_line.dwo$(comma)      \)
 	$(Q)$(call APPEND,	                   .debug_loclists.dwo$(comma) .debug_macro.dwo$(comma)                    \)
 	$(Q)$(call APPEND,	                   .debug_rnglists.dwo$(comma) .debug_str.dwo$(comma)                      \)
@@ -53,5 +53,3 @@ linker_script:
 	$(Q)$(call APPEND_FILES,	source ,linked,$(LINKED_FILES))
 	$(Q)$(call APPEND,end if)
 	$(Q)$(call APPEND_FILES,source ,shared,$(SHARED_FILES))
-
-.PHONY: linker_script
