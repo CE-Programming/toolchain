@@ -100,7 +100,7 @@ clean: $(addprefix clean-,$(LIBS)) clean-std
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) V=$(V) clean
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) V=$(V) clean
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) V=$(V) clean
-	$(Q)$(call REMOVE,linker_script)
+	$(Q)$(call REMOVE,src/linker_script)
 	$(Q)$(call REMOVE,clibs.8xg)
 	$(Q)$(call RMDIR,release)
 	$(Q)$(call RMDIR,docs/build)
