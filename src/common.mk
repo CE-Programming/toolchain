@@ -51,7 +51,7 @@ COPYDIR ?= ( xcopy $1 $2 /S /Q /Y /I /K 1>nul 2>nul || call )
 DESTDIR ?=
 PREFIX ?= C:
 QUOTE_ARG  ?= "$(subst ",',$1)"#'
-APPEND ?= @echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
+APPEND ?= echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
 RELEASE_NAME = windows
 else
 FASMG ?= fasmg
@@ -66,7 +66,7 @@ COPYDIR ?= cp -r $1 $2
 DESTDIR ?=
 PREFIX ?= $(HOME)
 QUOTE_ARG ?= '$(subst ','\'',$1)'#'
-APPEND ?= @echo $(call QUOTE_ARG,$1) >>$@
+APPEND ?= echo $(call QUOTE_ARG,$1) >>$@
 ifeq ($(shell uname -s),Darwin)
 MACOS := 1
 RELEASE_NAME = macos

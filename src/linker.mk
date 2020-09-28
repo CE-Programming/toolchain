@@ -23,7 +23,7 @@ STATIC_FILES := $(wildcard std/static/*.src) $(patsubst std/static/%.c,std/stati
 LINKED_FILES := $(wildcard std/linked/*.src) $(patsubst std/linked/%.c,std/linked/build/%.src,$(wildcard std/linked/*.c))
 SHARED_FILES := $(filter-out ce/crt0.src,$(wildcard ce/*.src)) $(wildcard std/shared/*.src) $(patsubst std/shared/%.c,std/shared/build/%.src,$(wildcard std/shared/*.c))
 
-linker_script:
+linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(Q)$(call REMOVE,$(call QUOTE_ARG,$@))
 	$(Q)$(call APPEND,if DEBUG)
 	$(Q)$(call APPEND,	iterate sections$(comma) <.comment$(comma) .debug_abbrev$(comma) .debug_addr$(comma) .debug_aranges$(comma)     \)

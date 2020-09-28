@@ -31,28 +31,28 @@ LIB_DIR = $(call NATIVEPATH,src/$1)
 all: convbin convimg convfont $(LIBS) std
 
 std:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) V=$(V)
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std)
 
 fasmg:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg) V=$(V)
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg)
 
 convbin:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) V=$(V) release
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) release
 
 convimg:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) V=$(V) release
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) release
 
 convfont:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) V=$(V)
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont)
 
 $(LIBS): fasmg
-	$(Q)$(MAKE) -C $(call LIB_DIR,$@) V=$(V)
+	$(Q)$(MAKE) -C $(call LIB_DIR,$@)
 
 $(addprefix clean-,$(LIBS)):
-	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst clean-%,%,$@)) V=$(V) clean
+	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst clean-%,%,$@)) clean
 
 install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
-	$(Q)$(MAKE) -f linker.mk -C src V=$(V)
+	$(Q)$(MAKE) -f linker.mk -C src
 	$(Q)$(call MKDIR,$(INSTALL_DIR))
 	$(Q)$(call MKDIR,$(INSTALL_BIN))
 	$(Q)$(call MKDIR,$(INSTALL_H))
@@ -68,16 +68,16 @@ install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
 	$(Q)$(COPY_MAKE)
 
 $(addprefix install-,$(LIBS)):
-	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) V=$(V)
+	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 install-fasmg:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) V=$(V)
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 install-std:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) V=$(V)
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 install-ce:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/ce) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) V=$(V)
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/ce) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 uninstall:
 	$(Q)$(call RMDIR,$(INSTALL_DIR))
@@ -97,9 +97,9 @@ docs-html:
 	$(Q)$(MAKE) -C docs html
 
 clean: $(addprefix clean-,$(LIBS)) clean-std
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) V=$(V) clean
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) V=$(V) clean
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) V=$(V) clean
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) clean
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) clean
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) clean
 	$(Q)$(call REMOVE,src/linker_script)
 	$(Q)$(call REMOVE,clibs.8xg)
 	$(Q)$(call RMDIR,release)
@@ -107,7 +107,7 @@ clean: $(addprefix clean-,$(LIBS)) clean-std
 	$(Q)$(call RMDIR,docs/doxygen)
 
 clean-std:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) V=$(V) clean
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) clean
 
 help:
 	@echo Helpful targets:
