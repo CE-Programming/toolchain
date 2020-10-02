@@ -200,7 +200,7 @@ all: $(BINDIR)/$(TARGET8XP)
 # this rule is trigged to build debug everything
 debug: DEBUGMODE = DEBUG
 debug: LDDEBUG = 1
-debug: CCDEBUG = -g
+debug: CCDEBUG = -gdwarf-5 -g3
 debug: $(BINDIR)/$(TARGET8XP)
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_FILE) $(DEPS)
