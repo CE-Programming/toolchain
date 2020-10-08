@@ -1,13 +1,7 @@
-; ---
-; triggers open debugger
-; ---
 	assume	adl=1
 
 	public	_abort
 _abort:
-	scf
-	sbc	hl,hl
-	ld	(hl),1
 	jp	__exit
 
 	extern	__exit

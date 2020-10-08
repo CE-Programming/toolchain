@@ -206,8 +206,10 @@ end if
 end if
 end if
 	call	__main
+	public	__exit
 __exit:
 	ld	sp,0
+	public	__exitsp
 __exitsp := $-3
 	pop	iy		; iy = flags
 	pop	af		; a = original flash wait states
