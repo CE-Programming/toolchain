@@ -3,10 +3,9 @@
 
 #include <stdarg.h>
 #include <format.h>
+#include <cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 #ifndef SIZE_T_DEFINED
 #define SIZE_T_DEFINED
@@ -31,13 +30,16 @@ typedef __SIZE_TYPE__ size_t;
 #define SEEK_SET  0
 #endif
 
-int printf(const char *format, ...);
-int sprintf(char *s, const char *format, ...);
-int vprintf(const char *format, va_list arg);
-int vsprintf(char *s, const char *format, va_list arg);
+int printf(const char *__restrict format, ...);
 
-#ifdef __cplusplus
-}
-#endif
+int sprintf(char *__restrict str,
+            const char *__restrict format, ...);
+
+int vprintf(const char *__restrict format, va_list __arg);
+
+int vsprintf(char *__restrict str, const char *__restrict format,
+             va_list __arg);
+
+__END_DECLS
 
 #endif

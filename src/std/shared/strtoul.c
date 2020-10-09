@@ -15,7 +15,7 @@
 * strtoul - string to unsigned long conversion
 *
 * Inputs:
-*	cp - pointer to the character string
+*	nptr - pointer to the character string
 *	endptr - place to put ptr to first invalid character
 *	base - radix
 *
@@ -23,12 +23,14 @@
 *	the value of the number
 *
 *************************************************/
-unsigned long strtoul(char * cp,char ** endptr,int base)
+unsigned long strtoul(const char *__restrict nptr,
+                      char **__restrict endptr, int base)
 {
-  register unsigned long sum,psum;
-  register unsigned char sign;
-  register unsigned char radix = base;
-  register unsigned char digit;
+  unsigned long sum, psum;
+  unsigned char sign;
+  unsigned char digit;
+  unsigned char radix = base;
+  char *cp = (char*)nptr;
 
   while (isspace(*cp))
     ++cp;

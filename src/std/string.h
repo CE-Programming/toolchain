@@ -1,49 +1,83 @@
-/*
- *  Copyright (C) 1999-2008 by  Zilog, Inc.
- *  All Rights Reserved
- *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
- */
-#ifndef STRING_H
-#define STRING_H
+#ifndef _STRING_H
+#define _STRING_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <cdefs.h>
+
+__BEGIN_DECLS
 
 #ifndef SIZE_T_DEFINED
 #define SIZE_T_DEFINED
 typedef __SIZE_TYPE__ size_t;
 #endif
 
-void *memcpy(void *, const void *, size_t);
-void *memchr(const void *, int, size_t);
-void *memset(void *, int, size_t);
-void *memmove(void *, const void *, size_t);
-int memcmp(const void *, const void *, size_t);
+extern void *memcpy(void *__restrict dest, const void *__restrict src,
+                    size_t n) __attribute__((nonnull(1, 2)));
 
-char *strcpy(char *, const char *);
-char *strncpy(char *, const char *, size_t);
-char *strcat(char *, const char *);
-char *strncat(char *, const char *, size_t);
-char *strchr(const char *, int);
-char *strpbrk(const char *, const char *);
-char *strrchr(const char *, int);
-char *strstr(const char *, const char *);
-char *strtok(char *, const char *);
-char *strerror(int errnum);
-char *strdup(const char *);
-char *strndup(const char *, size_t n);
-size_t strcspn(const char *, const char *);
-size_t strspn(const char *, const char *);
-size_t strlen(const char *);
-size_t strnlen(const char *, size_t);
-int strcmp(const char *, const char *);
-int strncmp(const char *, const char *, size_t);
-int strcasecmp(const char *, const char *);
-int strncasecmp(const char *, const char *, size_t);
+void *memmove(void *dest, const void *src, size_t n)
+              __attribute__((nonnull(1, 2)));
 
-#ifdef __cplusplus
-}
-#endif
+void *memset(void *s, int c, size_t n) __attribute__((nonnull(1)));
+
+int memcmp(const void *s1, const void *s2, size_t n)
+          __attribute__((nonnull(1, 2)));
+
+void *memchr(const void *s, int c, size_t n) __attribute__((nonnull(1)));
+
+char *strcpy(char *__restrict dest, const char *__restrict src)
+             __attribute__((nonnull(1, 2)));
+
+char *strncpy(char *__restrict dest, const char *__restrict src, size_t n)
+              __attribute__((nonnull(1, 2)));
+
+char *strcat(char *__restrict dest, const char *__restrict src)
+             __attribute__((nonnull(1, 2)));
+
+char *strncat(char *__restrict dest, const char *__restrict src, size_t n)
+              __attribute__((nonnull(1, 2)));
+
+char *strchr(const char *s, int c) __attribute__((nonnull(1)));
+
+char *strrchr(const char *s, int c) __attribute__((nonnull(1)));
+
+char *strpbrk(const char *s, const char *accept) __attribute__((nonnull(1, 2)));
+
+char *strstr(const char *haystack, const char *needle)
+             __attribute__((nonnull(1, 2)));
+
+char *strtok(char *__restrict s, const char *__restrict delim)
+             __attribute__((nonnull(1, 2)));
+
+char *strdup(const char *s)
+             __attribute__ ((__malloc__)) __attribute__((nonnull(1)));
+
+char *strndup(const char *s, size_t n)
+              __attribute__ ((__malloc__)) __attribute__((nonnull(1)));
+
+size_t strcspn(const char *s, const char *reject)
+               __attribute__((nonnull(1, 2)));
+
+size_t strspn(const char *s, const char *accept)
+              __attribute__((nonnull(1, 2)));
+
+size_t strlen(const char *s)
+              __attribute__((nonnull(1)));
+
+size_t strnlen(const char *s, size_t maxlen)
+               __attribute__((nonnull(1)));
+
+int strcmp(const char *s1, const char *s2)
+           __attribute__((nonnull(1, 2)));
+
+int strncmp(const char *s1, const char *s2, size_t n)
+            __attribute__((nonnull(1, 2)));
+
+int strcasecmp(const char *s1, const char *s2)
+               __attribute__((nonnull(1, 2)));
+
+int strncasecmp(const char *s1, const char *s2, size_t n)
+                __attribute__((nonnull(1, 2)));
+
+
+__END_DECLS
 
 #endif

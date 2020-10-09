@@ -26,11 +26,13 @@
 *    the value of the number
 *
 *************************************************/
-long strtol(const char *cp,char **endptr,int base)
+long strtol(const char *__restrict nptr,
+            char **__restrict endptr, int base)
 {
-  register long sum,psum;
-  register char sign;
-  register int radix = base;
+  long sum,psum;
+  char sign;
+  int radix = base;
+  char *cp = (char*)nptr;
   char digit;
 
   while (isspace(*cp))

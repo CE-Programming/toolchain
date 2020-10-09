@@ -13,11 +13,11 @@
 #include <stddef.h>
 #include <math.h>
 #include <errno.h>
-//#include <float.h>
 
-double strtod(const char * str,char ** endptr)
+double strtod(const char *__restrict nptr,
+              char **__restrict endptr)
 {
-    return strtof(str, endptr);
+    return strtof(nptr, endptr);
 }
 
 /*************************************************
@@ -33,7 +33,8 @@ double strtod(const char * str,char ** endptr)
 *	the value of the number
 *
 *************************************************/
-float strtof(const char * str,char ** endptr)
+float strtof(const char *__restrict nptr,
+             char **__restrict endptr)
 {
   union
   {
@@ -44,6 +45,7 @@ float strtof(const char * str,char ** endptr)
   int exp = 0;
   signed char sign = 1;
   signed char exp_sign = 1;
+  char *str = (char*)nptr;
 
   while (isspace(*str))
     ++str;
