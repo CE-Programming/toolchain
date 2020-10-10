@@ -12,7 +12,7 @@ git checkout calm
 git pull origin calm
 cd ..
 mkdir -p .tmp
-wget --no-verbose https://flatassembler.net/fasmg.zip --output-document=.tmp/fasmg.zip
+wget --no-verbose https://flatassembler.net/$(wget --no-verbose https://flatassembler.net/download.php --output-document=- | grep --only-matching --max-count=1 fasmg\\.[0-9a-z]\\+\.zip) --output-document=.tmp/fasmg.zip
 unzip -od .tmp/fasmg .tmp/fasmg.zip
 chmod +x .tmp/fasmg/fasmg.x64
 
