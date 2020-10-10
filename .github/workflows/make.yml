@@ -16,17 +16,19 @@ jobs:
         runs-on: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{matrix.runs-on}}
     steps:
+      - name: Bootstrap Build Environment
+        if: runner.os == 'Windows'
+        run: "cmake -E echo >> $env:GITHUB_ENV ENV=env:"
       - name: Prepare Build Environment
         run: |
-          cmake -E echo ::set-env name=ROM::84pce_515_53.rom
-          cmake -E echo ::set-env name=CEDEV::${{github.workspace}}/CEdev
-          cmake -E echo ::add-path::${{github.workspace}}/CEdev/bin
-          cmake -E echo ::add-path::${{github.workspace}}/CEmu/tests/autotester
+          cmake -E echo >> $${{env.ENV}}GITHUB_ENV ROM=84pce_515_53.rom
+          cmake -E echo >> $${{env.ENV}}GITHUB_ENV CEDEV=${{github.workspace}}/CEdev
+          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEdev/bin
+          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEmu/tests/autotester
       - name: Prepare Build Environment
         if: runner.os == 'Windows'
         run: |
-          cmake -E echo ::set-env name=EXE::.exe
-          cmake -E echo ::set-env name=ENV::env:
+          cmake -E echo >> $${{env.ENV}}GITHUB_ENV EXE=.exe
 
       - name: Install Build Dependencies
         if: runner.os == 'Linux'
