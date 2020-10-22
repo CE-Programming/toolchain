@@ -41,7 +41,7 @@ jobs:
         id: ez80-clang
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: https://jacobly.com/llvm/ez80-clang${{env.EXE}}-${{runner.os}}Release.zip
+          file-url: https://jacobly.com/a/llvm/ez80-clang${{env.EXE}}-${{runner.os}}Release.zip
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
