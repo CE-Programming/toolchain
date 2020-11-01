@@ -16,8 +16,8 @@ extern "C" {
 
 #ifndef NDEBUG
 
-#define dbgout ((volatile char*)0xFB0000) /**< Standard debug output */
-#define dbgerr ((volatile char*)0xFC0000) /**< Error debug output */
+#define dbgout ((char*)0xFB0000) /**< Standard debug output */
+#define dbgerr ((char*)0xFC0000) /**< Error debug output */
 
 #define DBG_WATCHPOINT_READ (1 << 0)  /**< Break on read. */
 #define DBG_WATCHPOINT_WRITE (1 << 1)  /**< Break on write. */
@@ -28,6 +28,7 @@ extern "C" {
  *
  * See the syntax for 'printf' for more information.
  * @param ... Uses printf-formated specifier string.
+ * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO. 
  */
 #define dbg_printf(...) sprintf(dbgout, ##__VA_ARGS__)
 
@@ -37,6 +38,7 @@ extern "C" {
  * See the syntax for 'printf' for more information.
  * @param out Can be dbgout (black) or dbgerr (red).
  * @param ... Uses printf-formated specifier string.
+ * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO. 
  */
 #define dbg_sprintf(out, ...) sprintf(out, ##__VA_ARGS__)
 
