@@ -23,7 +23,7 @@
       "description": "Test correct output",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "5031BA3C" ]
+      "expected_CRCs": [ "5031BA3C", "BD793B24" ]
     },
     "2":
     {
