@@ -187,7 +187,7 @@ size_t ti_Write(const void *data, size_t size, size_t count, const ti_var_t slot
  *
  * @returns The number of chunks read (should be equal to count).
  */
-size_t ti_Read(const void *data, size_t size, size_t count, const ti_var_t slot);
+size_t ti_Read(void *data, size_t size, size_t count, const ti_var_t slot);
 
 /**
  * Writes a character directly into the slot data pointer, and increments the offset.
