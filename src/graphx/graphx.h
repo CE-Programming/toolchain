@@ -74,7 +74,7 @@ extern "C" {
 typedef struct {
     uint8_t width;   /**< Width of the image.  */
     uint8_t height;  /**< Height of the image. */
-    uint8_t data[1]; /**< Image data array.    */
+    uint8_t data[]; /**< Image data array.    */
 } gfx_sprite_t;
 
 /**
@@ -95,7 +95,7 @@ typedef struct {
 typedef struct {
     uint8_t width;   /**< Width of the image.  */
     uint8_t height;  /**< Height of the image. */
-    uint8_t data[1]; /**< Image data array.    */
+    uint8_t data[]; /**< Image data array.    */
 } gfx_rletsprite_t;
 
 /**
