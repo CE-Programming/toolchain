@@ -17,7 +17,7 @@ extern "C" {
  * @param dest Pointer to destination for uncompressed data
  * @param src Pointer to compressed data
 */
-void zx7_Decompress(void *dest, void *src);
+void zx7_Decompress(void *dest, const void *src);
 
 #ifdef __cplusplus
 }
