@@ -346,25 +346,25 @@ void ti_GetName(char *name, const ti_var_t slot);
 /**
  * Renames an AppVar.
  *
- * @param old Old name of AppVar.
- * @param new New name of AppVar.
+ * @param old_name Old name of AppVar.
+ * @param new_name New name of AppVar.
  *
  * @returns 0 if success, 1 if AppVar already exists, 2 any other error occurs.
  * @warning It is potentially hazardous to rename an open AppVar. Close the AppVar before renaming.
  */
-uint8_t ti_Rename(const char *old, const char *new);
+uint8_t ti_Rename(const char *old_name, const char *new_name);
 
 /**
  * Renames a variable.
  *
- * @param old Old name of variable.
- * @param new New name of variable.
+ * @param old_name Old name of variable.
+ * @param new_name New name of variable.
  * @param type Type of variable.
  *
  * @returns 0 if success, 1 if variable already exists, 2 any other error occurs.
  * @warning It is potentially hazardous to rename an open variable. Close the variable before renaming.
  */
-uint8_t ti_RenameVar(const char *old, const char *new, const uint8_t type);
+uint8_t ti_RenameVar(const char *old_name, const char *new_name, const uint8_t type);
 
 /**
  * Stores data or values to an OS variable.
