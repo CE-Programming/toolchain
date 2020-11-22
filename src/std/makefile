@@ -27,7 +27,7 @@ $(TARGETS):
 
 install: $(addprefix install-,$(TARGETS))
 	$(Q)$(call MKDIR,$(INSTALL_H))
-	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_H))
+	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
 
 $(addprefix install-,$(TARGETS)):
 	$(Q)$(MAKE) -C $(patsubst install-%,%,$@) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) V=$(V)
