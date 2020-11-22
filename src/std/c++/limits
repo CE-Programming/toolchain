@@ -1,18 +1,18 @@
-#ifndef LIMITS_HPP
-#define LIMITS_HPP
+// -*- C++ -*-
+#ifndef _EZCXX_LIMITS
+#define _EZCXX_LIMITS
 
-namespace std
-{
+#pragma GCC system_header
 
-enum float_denorm_style
-{
+namespace std {
+
+enum float_denorm_style {
     denorm_indeterminate = -1,
     denorm_absent        = 0,
     denorm_present       = 1
 };
 
-enum float_round_style
-{
+enum float_round_style {
     round_indeterminate       = -1,
     round_toward_zero         = 0,
     round_to_nearest          = 1,
@@ -20,13 +20,11 @@ enum float_round_style
     round_toward_neg_infinity = 3
 };
 
-template <class T>
-class numeric_limits
-{
+template<class _Tp> class numeric_limits {
 public:
     static constexpr bool is_specialized = false;
 };
 
 } // namespace std
 
-#endif /* LIMITS_HPP */
+#endif // _EZCXX_LIMITS

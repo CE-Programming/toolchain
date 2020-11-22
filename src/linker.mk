@@ -19,9 +19,9 @@ include $(CURDIR)/common.mk
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 APPEND_FILES = $(foreach file,$(addprefix ../lib/$2/,$(notdir $3)),$(call APPEND,$1$(call FASMG_FILES,$(file)))$(newline))
 
-STATIC_FILES := $(wildcard std/static/*.src) $(patsubst std/static/%.c,std/static/build/%.src,$(wildcard std/static/*.c))
-LINKED_FILES := $(wildcard std/linked/*.src) $(patsubst std/linked/%.c,std/linked/build/%.src,$(wildcard std/linked/*.c))
-SHARED_FILES := $(filter-out ce/crt0.src,$(wildcard ce/*.src)) $(wildcard std/shared/*.src) $(patsubst std/shared/%.c,std/shared/build/%.src,$(wildcard std/shared/*.c))
+STATIC_FILES := $(wildcard std/static/*.src) $(patsubst std/static/%,std/static/build/%.src,$(wildcard std/static/*.c std/static/*.cpp))
+LINKED_FILES := $(wildcard std/linked/*.src) $(patsubst std/linked/%,std/linked/build/%.src,$(wildcard std/linked/*.c std/linked/*.cpp))
+SHARED_FILES := $(filter-out ce/crt0.src,$(wildcard ce/*.src)) $(wildcard std/shared/*.src) $(patsubst std/shared/%,std/shared/build/%.src,$(wildcard std/shared/*.c std/shared/*.cpp))
 
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(Q)$(call REMOVE,$(call QUOTE_ARG,$@))

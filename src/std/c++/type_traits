@@ -1,0 +1,316 @@
+// -*- C++ -*-
+#ifndef _EZCXX_TYPE_TRAITS
+#define _EZCXX_TYPE_TRAITS
+
+#pragma GCC system_header
+
+#include <__config>
+#include <cstddef>
+
+namespace std {
+
+// helper classes:
+template<class _Tp, _Tp __value> struct integral_constant {
+    static const _Tp value = __value;
+    using value_type = _Tp;
+    using type = integral_constant;
+    _EZCXX_INLINE constexpr operator value_type()   const noexcept { return value; }
+    _EZCXX_INLINE constexpr value_type operator()() const noexcept { return value; }
+};
+
+template<bool __value> using bool_constant = integral_constant<bool, __value>;
+using false_type = bool_constant<false>;
+using true_type  = bool_constant<true>;
+
+// helper traits:
+template<class _Tp> struct type_identity { using type = _Tp; };
+template<class _Tp> using type_identity_t = typename type_identity<_Tp>::type;
+
+template<bool, class = void> struct enable_if {};
+template<class _Tp> struct enable_if<true, _Tp> : type_identity<_Tp> {};
+template<bool _Ep, class _Tp = void> using enable_if_t = typename enable_if<_Ep, _Tp>::type;
+
+template<bool _Cp, class _Tp, class _Fp> struct conditional                  : type_identity<_Tp> {};
+template<class _Tp, class _Fp>           struct conditional<false, _Tp, _Fp> : type_identity<_Fp> {};
+template<bool _Cp, class _Tp, class _Fp> using conditional_t = typename conditional<_Cp, _Tp, _Fp>::type;
+
+template<class...> using void_t = void;
+
+template<class...> using __require = true_type;
+
+template<class, class> struct is_same           : false_type {};
+template<class _Tp>    struct is_same<_Tp, _Tp> : true_type  {};
+template<class _Lp, class _Rp> inline constexpr bool is_same_v = is_same<_Lp, _Rp>::value;
+
+// logical operator traits:
+template<class...>                struct conjunction              : true_type                                           {};
+template<class _Tp>               struct conjunction<_Tp>         : _Tp                                                 {};
+template<class _Lp, class... _Rs> struct conjunction<_Lp, _Rs...> : conditional_t<_Lp::value, conjunction<_Rs...>, _Lp> {};
+template<class... _Ts> inline constexpr bool conjunction_v = conjunction<_Ts...>::value;
+
+template<class...>                struct disjunction              : false_type                                          {};
+template<class _Tp>               struct disjunction<_Tp>         : _Tp                                                 {};
+template<class _Lp, class... _Rs> struct disjunction<_Lp, _Rs...> : conditional_t<_Lp::value, _Lp, disjunction<_Rs...>> {};
+template<class... _Ts> inline constexpr bool disjunction_v = disjunction<_Ts...>::value;
+
+template<class _Tp> inline constexpr bool negation_v = !bool(_Tp::value);
+template<class _Tp> using negation = bool_constant<negation_v<_Tp>>;
+
+// const/volatile removal traits:
+template<class _Tp> struct remove_const            : type_identity<_Tp> {};
+template<class _Tp> struct remove_const<_Tp const> : type_identity<_Tp> {};
+template<class _Tp> using remove_const_t = typename remove_const<_Tp>::type;
+
+template<class _Tp> struct remove_volatile               : type_identity<_Tp> {};
+template<class _Tp> struct remove_volatile<_Tp volatile> : type_identity<_Tp> {};
+template<class _Tp> using remove_volatile_t = typename remove_volatile<_Tp>::type;
+
+template<class _Tp> using remove_cv = remove_const<remove_volatile_t<_Tp>>;
+template<class _Tp> using remove_cv_t = typename remove_cv<_Tp>::type;
+
+// classification traits:
+template<class>     struct is_const            : false_type {};
+template<class _Tp> struct is_const<_Tp const> : true_type  {};
+template<class _Tp> inline constexpr bool is_const_v = is_const<_Tp>::value;
+
+template<class>     struct is_volatile               : false_type {};
+template<class _Tp> struct is_volatile<_Tp volatile> : true_type  {};
+template<class _Tp> inline constexpr bool is_volatile_v = is_volatile<_Tp>::value;
+
+template<class _Tp> using is_void = is_same<remove_cv_t<_Tp>, void>;
+template<class _Tp> inline constexpr bool is_void_v = is_void<_Tp>::value;
+
+template<class _Tp> using is_null_pointer = is_same<remove_cv_t<_Tp>, nullptr_t>;
+template<class _Tp> inline constexpr bool is_null_pointer_v = is_null_pointer<_Tp>::value;
+
+template<class _Tp> struct __integral                     : false_type {};
+template<>          struct __integral<              bool> : true_type  {};
+template<>          struct __integral<              char> : true_type  {};
+template<>          struct __integral<  signed      char> : true_type  {};
+template<>          struct __integral<unsigned      char> : true_type  {};
+template<>          struct __integral<           wchar_t> : true_type  {};
+template<>          struct __integral<          char16_t> : true_type  {};
+template<>          struct __integral<          char32_t> : true_type  {};
+template<>          struct __integral<             short> : true_type  {};
+template<>          struct __integral<unsigned     short> : true_type  {};
+template<>          struct __integral<  signed       int> : true_type  {};
+template<>          struct __integral<unsigned       int> : true_type  {};
+template<>          struct __integral<  signed      long> : true_type  {};
+template<>          struct __integral<unsigned      long> : true_type  {};
+template<>          struct __integral<  signed   __int48> : true_type  {};
+template<>          struct __integral<unsigned   __int48> : true_type  {};
+template<>          struct __integral<  signed long long> : true_type  {};
+template<>          struct __integral<unsigned long long> : true_type  {};
+template<class _Tp> using is_integral = __integral<remove_cv_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_integral_v = is_integral<_Tp>::value;
+
+template<class _Tp> struct __floating_point              : false_type {};
+template<>          struct __floating_point<      float> : true_type  {};
+template<>          struct __floating_point<     double> : true_type  {};
+template<>          struct __floating_point<long double> : true_type  {};
+template<class _Tp> using is_floating_point = __floating_point<remove_cv_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_floating_point_v = is_floating_point<_Tp>::value;
+
+template<class _Tp> using is_arithmetic = disjunction<is_integral<_Tp>, is_floating_point<_Tp>>;
+template<class _Tp> inline constexpr bool is_arithmetic_v = is_arithmetic<_Tp>::value;
+
+template<class _Tp> using is_fundamental = disjunction<is_void<_Tp>, is_null_pointer<_Tp>, is_arithmetic<_Tp>>;
+template<class _Tp> inline constexpr bool is_fundamental_v = is_fundamental<_Tp>::value;
+
+template<class>                 struct is_array           : false_type {};
+template<class _Tp>             struct is_array<_Tp[]>    : true_type  {};
+template<class _Tp, size_t _Np> struct is_array<_Tp[_Np]> : true_type  {};
+template<class _Tp> inline constexpr bool is_array_v = is_array<_Tp>::value;
+
+#if __has_feature(is_enum)
+template<class _Tp> inline constexpr bool is_enum_v = __is_enum(_Tp);
+template<class _Tp> using is_enum = bool_constant<is_enum_v<_Tp>>;
+#endif
+
+#if __has_feature(is_union)
+template<class _Tp> inline constexpr bool is_union_v = __is_union(_Tp);
+template<class _Tp> using is_union = bool_constant<is_union_v<_Tp>>;
+#endif
+
+#if __has_feature(is_class)
+template<class _Tp> inline constexpr bool is_class_v = __is_class(_Tp);
+template<class _Tp> using is_class = bool_constant<is_class_v<_Tp>>;
+#endif
+
+template<class>     struct is_pointer       : false_type {};
+template<class _Tp> struct is_pointer<_Tp*> : true_type  {};
+template<class _Tp> inline constexpr bool is_pointer_v = is_pointer<_Tp>::value;
+
+template<class>     struct is_lvalue_reference       : false_type {};
+template<class _Tp> struct is_lvalue_reference<_Tp&> : true_type  {};
+template<class _Tp> inline constexpr bool is_lvalue_reference_v = is_lvalue_reference<_Tp>::value;
+
+template<class>     struct is_rvalue_reference        : false_type {};
+template<class _Tp> struct is_rvalue_reference<_Tp&&> : true_type  {};
+template<class _Tp> inline constexpr bool is_rvalue_reference_v = is_rvalue_reference<_Tp>::value;
+
+template<class _Tp> using is_reference = disjunction<is_lvalue_reference<_Tp>, is_rvalue_reference<_Tp>>;
+template<class _Tp> inline constexpr bool is_reference_v = is_reference<_Tp>::value;
+
+template<class _Tp> using is_function = negation<disjunction<is_const<_Tp const>, is_reference<_Tp>>>;
+template<class _Tp> inline constexpr bool is_function_v = is_function<_Tp>::value;
+
+template<class _Tp>            struct __member_pointer             : false_type {};
+template<class _Tp, class _Cp> struct __member_pointer<_Tp _Cp::*> : true_type  {};
+template<class _Tp> using is_member_pointer = __member_pointer<remove_cv_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_member_pointer_v = is_member_pointer<_Tp>::value;
+
+template<class _Tp>            struct __member_function_pointer             : false_type       {};
+template<class _Tp, class _Cp> struct __member_function_pointer<_Tp _Cp::*> : is_function<_Tp> {};
+template<class _Tp> using is_member_function_pointer = __member_function_pointer<remove_cv_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_member_function_pointer_v = is_member_function_pointer<_Tp>::value;
+
+template<class _Tp>            struct __member_object_pointer             : false_type                 {};
+template<class _Tp, class _Cp> struct __member_object_pointer<_Tp _Cp::*> : negation<is_function<_Tp>> {};
+template<class _Tp> using is_member_object_pointer = __member_object_pointer<remove_cv_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_member_object_pointer_v = is_member_object_pointer<_Tp>::value;
+
+// const/volatile addition traits:
+template<class _Tp> using add_const = conditional<disjunction_v<is_reference<_Tp>, is_function<_Tp>, is_const<_Tp>>,
+                                                  _Tp, _Tp const>;
+template<class _Tp> using add_const_t = typename add_const<_Tp>::type;
+
+template<class _Tp> using add_volatile = conditional<disjunction_v<is_reference<_Tp>, is_function<_Tp>, is_volatile<_Tp>>,
+                                                     _Tp, _Tp volatile>;
+template<class _Tp> using add_volatile_t = typename add_volatile<_Tp>::type;
+
+template<class _Tp> using add_cv = add_const<add_volatile_t<_Tp>>;
+template<class _Tp> using add_cv_t = typename add_cv<_Tp>::type;
+
+// reference/pointer transformation traits:
+template<class _Tp> struct remove_pointer                      : type_identity<_Tp> {};
+template<class _Tp> struct remove_pointer<_Tp*>                : type_identity<_Tp> {};
+template<class _Tp> struct remove_pointer<_Tp* const>          : type_identity<_Tp> {};
+template<class _Tp> struct remove_pointer<_Tp*       volatile> : type_identity<_Tp> {};
+template<class _Tp> struct remove_pointer<_Tp* const volatile> : type_identity<_Tp> {};
+template<class _Tp> using remove_pointer_t = typename remove_pointer<_Tp>::type;
+
+template<class _Tp> struct remove_reference        : type_identity<_Tp> {};
+template<class _Tp> struct remove_reference<_Tp&>  : type_identity<_Tp> {};
+template<class _Tp> struct remove_reference<_Tp&&> : type_identity<_Tp> {};
+template<class _Tp> using remove_reference_t = typename remove_reference<_Tp>::type;
+
+template<class _Tp> auto __add_pointer(int) -> type_identity<_Tp*>;
+template<class _Tp> auto __add_pointer(...) -> type_identity<_Tp>;
+template<class _Tp> using add_pointer = decltype(__add_pointer<_Tp>(0));
+template<class _Tp> using add_pointer_t = typename add_pointer<_Tp>::type;
+
+template<class _Tp> auto __add_lvalue_reference(int) -> type_identity<_Tp&>;
+template<class _Tp> auto __add_lvalue_reference(...) -> type_identity<_Tp>;
+template<class _Tp> using add_lvalue_reference = decltype(__add_lvalue_reference<_Tp>(0));
+template<class _Tp> using add_lvalue_reference_t = typename add_lvalue_reference<_Tp>::type;
+
+template<class _Tp> auto __add_rvalue_reference(int) -> type_identity<_Tp&&>;
+template<class _Tp> auto __add_rvalue_reference(...) -> type_identity<_Tp>;
+template<class _Tp> using add_rvalue_reference = decltype(__add_rvalue_reference<_Tp>(0));
+template<class _Tp> using add_rvalue_reference_t = typename add_rvalue_reference<_Tp>::type;
+
+// <utility> functions:
+template<class _Tp> add_rvalue_reference_t<_Tp> declval() noexcept;
+
+// member classification traits:
+template<class _Tp, class... _As> auto __constructible(int) -> __require<decltype(_Tp(declval<_As>()...))>;
+template<class, class...>         auto __constructible(...) -> false_type;
+template<class _Tp, class... _As> using is_constructible = decltype(__constructible<_Tp, _As...>(0));
+template<class _Tp, class... _As> inline constexpr bool is_constructible_v = is_constructible<_Tp, _As...>::value;
+
+#if __has_feature(is_trivially_constructible)
+template<class _Tp, class... _As> inline constexpr bool is_trivially_constructible_v = __is_trivially_constructible(_Tp, _As...);
+template<class _Tp, class... _As> using is_trivially_constructible = bool_constant<is_trivially_constructible_v<_Tp, _As...>>;
+#endif
+
+template<class _Tp, class... _As> auto __nt_constructible(int) -> enable_if_t<noexcept(_Tp(declval<_As>()...)), true_type>;
+template<class, class...>         auto __nt_constructible(...) -> false_type;
+template<class _Tp, class... _As> using is_nothrow_constructible = decltype(__nt_constructible<_Tp, _As...>(0));
+template<class _Tp, class... _As> inline constexpr bool is_nothrow_constructible_v = is_nothrow_constructible<_Tp, _As...>::value;
+
+template<class _Tp> using is_default_constructible = is_constructible<_Tp>;
+template<class _Tp> inline constexpr bool is_default_constructible_v = is_default_constructible<_Tp>::value;
+
+template<class _Tp> using is_trivially_default_constructible = is_trivially_constructible<_Tp>;
+template<class _Tp> inline constexpr bool is_trivially_default_constructible_v = is_trivially_default_constructible<_Tp>::value;
+
+template<class _Tp> using is_nothrow_default_constructible = is_nothrow_constructible<_Tp>;
+template<class _Tp> inline constexpr bool is_nothrow_default_constructible_v = is_nothrow_default_constructible<_Tp>::value;
+
+template<class _Tp> using is_copy_constructible = is_constructible<_Tp, add_lvalue_reference_t<add_const_t<_Tp>>>;
+template<class _Tp> inline constexpr bool is_copy_constructible_v = is_copy_constructible<_Tp>::value;
+    
+template<class _Tp> using is_trivially_copy_constructible = is_trivially_constructible<_Tp, add_lvalue_reference_t<add_const_t<_Tp>>>;
+template<class _Tp> inline constexpr bool is_trivially_copy_constructible_v = is_trivially_copy_constructible<_Tp>::value;
+    
+template<class _Tp> using is_nothrow_copy_constructible = is_nothrow_constructible<_Tp, add_lvalue_reference_t<add_const_t<_Tp>>>;
+template<class _Tp> inline constexpr bool is_nothrow_copy_constructible_v = is_nothrow_copy_constructible<_Tp>::value;
+    
+template<class _Tp> using is_move_constructible = is_constructible<_Tp, add_rvalue_reference_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_move_constructible_v = is_move_constructible<_Tp>::value;
+
+template<class _Tp> using is_trivially_move_constructible = is_trivially_constructible<_Tp, add_rvalue_reference_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_trivially_move_constructible_v = is_trivially_move_constructible<_Tp>::value;
+
+template<class _Tp> using is_nothrow_move_constructible = is_nothrow_constructible<_Tp, add_rvalue_reference_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_nothrow_move_constructible_v = is_nothrow_move_constructible<_Tp>::value;
+
+template<class _Lp, class _Rp> auto __assignable(int) -> __require<decltype(declval<_Lp>() = declval<_Rp>())>;
+template<class, class>         auto __assignable(...) -> false_type;
+template<class _Lp, class _Rp> using is_assignable = decltype(__assignable<_Lp, _Rp>(0));
+template<class _Lp, class _Rp> inline constexpr bool is_assignable_v = is_assignable<_Lp, _Rp>::value;
+
+template<class _Lp, class _Rp> auto __nt_assignable(int) -> enable_if_t<noexcept(declval<_Lp>() = declval<_Rp>()), true_type>;
+template<class, class>         auto __nt_assignable(...) -> false_type;
+template<class _Lp, class _Rp> using is_nothrow_assignable = decltype(__nt_assignable<_Lp, _Rp>(0));
+template<class _Lp, class _Rp> inline constexpr bool is_nothrow_assignable_v = is_nothrow_assignable<_Lp, _Rp>::value;
+
+template<class _Tp> using is_copy_assignable = is_assignable<add_lvalue_reference_t<_Tp>,
+                                                             add_lvalue_reference_t<add_const_t<_Tp>>>;
+template<class _Tp> inline constexpr bool is_copy_assignable_v = is_copy_assignable<_Tp>::value;
+
+template<class _Tp> using is_nothrow_copy_assignable = is_nothrow_assignable<add_lvalue_reference_t<_Tp>,
+                                                                             add_lvalue_reference_t<add_const_t<_Tp>>>;
+template<class _Tp> inline constexpr bool is_nothrow_copy_assignable_v = is_nothrow_copy_assignable<_Tp>::value;
+
+template<class _Tp> using is_move_assignable = is_assignable<add_lvalue_reference_t<_Tp>,
+                                                             add_rvalue_reference_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_move_assignable_v = is_move_assignable<_Tp>::value;
+
+template<class _Tp> using is_nothrow_move_assignable = is_nothrow_assignable<add_lvalue_reference_t<_Tp>,
+                                                                             add_rvalue_reference_t<_Tp>>;
+template<class _Tp> inline constexpr bool is_nothrow_move_assignable_v = is_nothrow_move_assignable<_Tp>::value;
+
+#if __has_feature(has_virtual_destructor)
+template<class _Tp> inline constexpr bool has_virtual_destructor_v = __has_virtual_destructor(_Tp);
+template<class _Tp> using has_virtual_destructor = bool_constant<has_virtual_destructor_v<_Tp>>;
+#endif
+
+// more <utility> functions:
+template<class _Tp> _EZCXX_INLINE constexpr auto move(_Tp&& __value) noexcept {
+    return static_cast<remove_reference_t<_Tp>&&>(__value);
+}
+
+template<class _Tp> _EZCXX_INLINE constexpr enable_if_t<is_move_constructible_v<_Tp> && is_move_assignable_v<_Tp>>
+swap(_Tp& __lhs, _Tp& __rhs) noexcept(is_nothrow_move_constructible_v<_Tp> && is_nothrow_move_assignable_v<_Tp>) {
+    _Tp __temp(move(__lhs));
+    __lhs = move(__rhs);
+    __rhs = move(__temp);
+}
+
+// swappable classification traits:
+template<class _Lp, class _Rp> auto __swappable(int) -> __require<decltype(swap(declval<_Lp>(), declval<_Rp>()))>;
+template<class _Lp, class _Rp> auto __swappable(...) -> false_type;
+
+template<class _Lp, class _Rp> using is_swappable_with = conjunction<decltype(__swappable<_Lp, _Rp>(0)),
+                                                                     decltype(__swappable<_Rp, _Lp>(0))>;
+template<class _Lp, class _Rp> inline constexpr bool is_swappable_with_v = is_swappable_with<_Lp, _Rp>::value;
+
+template<class _Lp, class _Rp> inline constexpr bool is_nothrow_swappable_with_v =
+    noexcept(swap(declval<_Lp>(), declval<_Rp>())) && noexcept(swap(declval<_Rp>(), declval<_Lp>()));
+template<class _Lp, class _Rp> using is_nothrow_swappable_with = bool_constant<is_nothrow_swappable_with_v<_Lp, _Rp>>;
+
+} // namespace std
+
+#endif // _EZCXX_TYPE_TRAITS

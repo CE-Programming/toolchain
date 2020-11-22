@@ -16,20 +16,24 @@
 
 include $(CURDIR)/../../common.mk
 
-WILDCARD_H := $(wildcard *.h *.hpp)
-WILDCARD_C := $(wildcard *.c)
-BUILD_SRC := $(addprefix build/,$(WILDCARD_C:%.c=%.src))
+BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
 
 EZCFLAGS := -S -ffreestanding -Wall -Wextra -Oz
-EZCFLAGS += -Dreentrant= -D_EZ80 -isystem ..
+EZCFLAGS += -D_EZ80 -isystem .. -isystem ../../ce
+EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
+EZCXXFLAGS += -isystem ../c++
 
-WILDCARD_SRC = $(wildcard *.src) $(patsubst %.c,build/%.src,$(wildcard *.c))
+WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
 
 all: $(BUILD_SRC)
 
-build/%.src: %.c
+build/%.c.src: %.c
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZCC) $(EZCFLAGS) $< -o $@
+
+build/%.cpp.src: %.cpp
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCXXFLAGS) $< -o $@
 
 clean:
 	$(Q)$(call RMDIR,build)

@@ -1,0 +1,37 @@
+// -*- C++ -*-
+#ifndef _EZCXX_INITIALIZER_LIST
+#define _EZCXX_INITIALIZER_LIST
+
+#pragma GCC system_header
+
+#include <__config>
+#include <cstddef>
+
+namespace std {
+
+template<class _Ep>
+class initializer_list {
+    const _Ep __begin;
+    size_t    __size;
+
+    _EZCXX_INLINE initializer_list(const _Ep* __begin, size_t __size) noexcept : __begin(__begin), __size(__size) {}
+
+public:
+    _EZCXX_INLINE initializer_list() noexcept : initializer_list(nullptr, 0) {}
+
+    _EZCXX_INLINE size_t size() const noexcept { return __size; }
+
+    _EZCXX_INLINE const _Ep* begin() const noexcept { return __begin; }
+
+    _EZCXX_INLINE const _Ep* end() const noexcept { return __begin + __size; }
+};
+
+template<class _Ep>
+_EZCXX_INLINE constexpr const _Ep* begin(initializer_list<_Ep> __il) noexcept { return __il.begin(); }
+
+template<class _Ep>
+_EZCXX_INLINE constexpr const _Ep* end(initializer_list<_Ep> __il) noexcept { return __il.end(); }
+
+} // namespace std
+
+#endif // _EZCXX_INITIALIZER_LIST

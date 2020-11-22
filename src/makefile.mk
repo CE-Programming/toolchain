@@ -173,9 +173,9 @@ LDSTATIC := 1
 endif
 
 # define the c/c++ flags used by clang
-EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))" -Dreentrant=
+EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))"
 EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -D_EZ80 -D$(DEBUGMODE) $(CCDEBUG)
-EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions $(CXXFLAGS)
+EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-rtti $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
 
 # these are the fasmg linker flags

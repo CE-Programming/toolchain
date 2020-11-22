@@ -18,7 +18,7 @@ include $(CURDIR)/../common.mk
 
 TARGETS := static shared linked
 
-WILDCARD_H := $(wildcard *.h *.hpp)
+WILDCARD_H := $(wildcard *.h c++/*[^~\#])
 
 all: $(TARGETS)
 

@@ -1,12 +1,10 @@
 #ifndef CE_TIREAL_HPP
 #define CE_TIREAL_HPP
 
-#include "limits.hpp"
-
+#include <cstdint>
+#include <cstdlib>
+#include <limits>
 #include <tice.h>
-
-#include <stdint.h>
-#include <stdlib.h>
 
 namespace ti
 {
