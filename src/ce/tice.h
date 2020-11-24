@@ -467,7 +467,7 @@ void boot_NewLine(void);
 /**
  * @returns Current battery status
  */
-uint8_t boot_GetBatteryStatus(void);
+tiflags uint8_t boot_GetBatteryStatus(void);
 
 /**
  * Waits for ~10 ms
