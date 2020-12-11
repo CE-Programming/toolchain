@@ -40,7 +40,7 @@ uint8_t kb_AnyKey(void);
 
 /**
  * Resets the keyboard before returning to the OS.
- * @note Only use the keyboard timers or number of rows have been modified.
+ * @note Only use if the keyboard timers or number of rows have been modified.
  */
 void kb_Reset(void);
 
@@ -105,9 +105,56 @@ typedef enum {
  *      ...
  *  }
  * @endcode
+ * @see kb_On
  */
 #define kb_Data \
 (uint8_t)((volatile uint16_t*)0xF50010)
+
+/**
+ * ON key signal.
+ * @note Scanning mode does not matter.
+ * @note The ON key is not wired as part of the normal key matrix. The ON key must be checked separately from the
+ * other keys with kb_On:
+ * @code
+ *  int main(void) {
+ *      kb_DisableOnLatch();
+ *      ...
+ *      if (kb_On) {
+ *          ...
+ *      }
+ *  }
+ * @endcode
+ * @see kb_EnableOn kb_DisableOnLatch kb_EnableOnLatch kb_ClearOnLatch
+ */
+#define kb_On \
+(*(volatile uint8_t*)0xF00020 & 1)
+
+/**
+ * Causes kb_On to latch when the ON is key pressed: once the ON key is pressed, kb_On will remain true until
+ * reset with kb_ClearOnLatch(). This may be useful if you want to check the ON key occasionally, for example
+ * as a break signal.
+ * @warning This defaults to whatever the last program set this to, so be sure to set it explicitly.
+ * @see kb_DisableOnLatch kb_ClearOnLatch
+ */
+#define kb_EnableOnLatch() \
+((*(volatile uint8_t*)0xF0002C) |= 1)
+
+/**
+ * Disables ON key latching behavior.
+ * @warning This defaults to whatever the last program set this to, so be sure to set it explicitly.
+ * @see kb_EnableOnLatch
+ */
+#define kb_DisableOnLatch() \
+((*(volatile uint8_t*)0xF0002C) &= ~1)
+
+/**
+ * When ON key latching has been enabled with kb_EnableOnLatch(), this will reset kb_On back to false
+ * (assuming the user is no longer pressing ON).
+ * @note This may persist between program runs, so be to sure to 
+ * @see kb_EnableOnLatch
+ */
+#define kb_ClearOnLatch() \
+((*(volatile uint8_t*)0xF00028) = 1)
 
 /**
  * Different available interrupt signals
