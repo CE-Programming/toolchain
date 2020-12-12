@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	public	_copysignf, _copysign
+
+_copysign := _copysignf
+_copysignf:
+	pop	bc
+	pop	hl
+	pop	de
+	ld	a,e
+	pop	de
+	pop	de
+	push	de
+	push	de
+	push	de
+	push	hl
+	push	bc
+	xor	a,e
+	and	a,$7F
+	xor	a,e
+	ld	e,a
+	ret
+
