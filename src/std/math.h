@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define NAN          __builtin_nanf()
+#define NAN          __builtin_nanf("")
 #define INFINITY     __builtin_inff()
 
 #define HUGE_VALF    __builtin_inff()
