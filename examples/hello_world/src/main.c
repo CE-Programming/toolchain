@@ -1,5 +1,5 @@
 #include <tice.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 /* Main function, called first */
 int main(void)
@@ -8,7 +8,7 @@ int main(void)
     os_ClrHome();
 
     /* Print a string */
-    printf("Hello, World.");
+    os_PutStrFull("Hello, World.");
 
     /* Waits for a key */
     while (!os_GetCSC());

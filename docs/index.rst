@@ -29,6 +29,7 @@ Toolchain Documentation
     :caption: Toolchain Documentation
     :maxdepth: 1
 
+    static/printf
     libraries/index
     headers/index
     static/debugging
