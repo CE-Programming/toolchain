@@ -28,6 +28,7 @@ BSSHEAP_HIGH ?= D13FD6
 STACK_HIGH ?= D1A87E
 INIT_LOC ?= D1A87F
 USE_FLASH_FUNCTIONS ?= YES
+HAS_PRINTF ?= YES
 UPPERCASE_NAME ?= YES
 OUTPUT_MAP ?= NO
 CFLAGS ?= -Wall -Wextra -Oz
@@ -50,6 +51,7 @@ DEBUGMODE = NDEBUG
 CCDEBUG = -g0
 LDDEBUG = 0
 LDSTATIC = 0
+DEFPRINTF =
 
 # verbosity
 V ?= 0
@@ -167,6 +169,11 @@ ifeq ($(OUTPUT_MAP),YES)
 LDMAPFLAG := -i map
 endif
 
+# selectively include embedded printf functionality
+ifeq ($(HAS_PRINTF),YES)
+DEFPRINTF := -DHAS_PRINTF=1
+endif
+
 # choose static or linked flash functions
 ifeq ($(USE_FLASH_FUNCTIONS),YES)
 LDSTATIC := 1
@@ -174,7 +181,7 @@ endif
 
 # define the c/c++ flags used by clang
 EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))"
-EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -D_EZ80 -D$(DEBUGMODE) $(CCDEBUG)
+EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(CCDEBUG)
 EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-rtti $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
 

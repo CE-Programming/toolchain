@@ -1,0 +1,21 @@
+	assume	adl = 1
+
+	public	_puts
+_puts:
+	pop	de
+	ex	(sp),hl
+	push	de
+.loop:
+	ld	a,(hl)
+	or	a,a
+	jp	z,$0207F0	; ti.NewLine
+	ld	e,a
+	push	hl
+	push	de
+	call	_printchar
+	pop	de
+	pop	hl
+	inc	hl
+	jr	.loop
+
+	extern	_printchar

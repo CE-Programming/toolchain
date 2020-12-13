@@ -1,0 +1,13 @@
+	assume	adl = 1
+
+	weak	_printchar
+_printchar:
+	pop	de
+	ex	(sp),hl
+	push	de
+	ld	a,l
+	cp	a,32
+	jp	nc,$207B8	; ti.PutC
+	cp	a,10
+	jp	z,$0207F0	; ti.NewLine
+	ret

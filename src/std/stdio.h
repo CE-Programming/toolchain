@@ -30,15 +30,47 @@ typedef __SIZE_TYPE__ size_t;
 #define SEEK_SET  0
 #endif
 
-int printf(const char *__restrict format, ...);
+/* weak user-defined function */
+void printchar(char character);
 
-int sprintf(char *__restrict str,
-            const char *__restrict format, ...);
+int putchar(int character);
 
-int vprintf(const char *__restrict format, va_list __arg);
+int puts(const char *str);
 
-int vsprintf(char *__restrict str, const char *__restrict format,
-             va_list __arg);
+int printf_(const char *__restrict format, ...)
+    __attribute__ ((format (__printf__, 1, 2)));
+
+int vprintf_(const char *__restrict format, va_list __arg)
+    __attribute__ ((format (__printf__, 1, 0)));
+
+int sprintf_(char *__restrict buffer,
+    const char *__restrict format, ...)
+    __attribute__ ((format (__printf__, 2, 3)));
+
+int vsprintf_(char *__restrict buffer, const char *__restrict format,
+    va_list __arg)
+    __attribute__ ((format (__printf__, 1, 0)));
+
+int snprintf_(char* buffer, size_t count, const char *__restrict format, ...)
+    __attribute__ ((format (__printf__, 3, 4)));
+
+int vsnprintf_(char* buffer, size_t count, const char *__restrict format,
+    va_list va)
+    __attribute__ ((format (__printf__, 3, 0)));
+
+#ifdef HAS_PRINTF
+#define printf printf_
+#define vprintf vprintf_
+#define sprintf sprintf_
+#define vsprintf vsprintf_
+#define snprintf snprintf_
+#define vsnprintf vsnprintf_
+#else
+/* This function is embedded in the OS, but only supports a subset of printf */
+int sprintf(char *__restrict buffer,
+    const char *__restrict format, ...)
+    __attribute__ ((format (__printf__, 2, 3)));
+#endif
 
 __END_DECLS
 
