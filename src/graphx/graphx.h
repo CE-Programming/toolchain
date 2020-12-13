@@ -521,9 +521,9 @@ void gfx_SetDefaultPalette(gfx_mode_t mode);
 /**
  * Sets entries in the palette
  *
- * @param palette Pointer to palette to use
- * @param size Size of palette to store
- * @param offset Offset in bytes to start at (Generally set to 0).
+ * @param palette Pointer to palette to set.
+ * @param size Size of palette in bytes.
+ * @param offset Palette index to insert at.
  */
 void gfx_SetPalette(const void *palette,
                     uint24_t size,

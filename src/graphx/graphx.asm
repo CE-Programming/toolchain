@@ -559,7 +559,7 @@ gfx_SetPalette:
 ; Arguments:
 ;  arg0 : Pointer to palette
 ;  arg1 : Size of palette in bytes
-;  arg2 : Offset at which to start inserting the palette
+;  arg2 : Palette index to insert at
 ; Returns:
 ;  None
 	pop	iy			; iy = return vector
