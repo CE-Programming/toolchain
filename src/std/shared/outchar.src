@@ -1,7 +1,7 @@
 	assume	adl = 1
 
-	weak	_printchar
-_printchar:
+	weak	_outchar
+_outchar:
 	pop	de
 	ex	(sp),hl
 	push	de

@@ -12,10 +12,10 @@ _puts:
 	ld	e,a
 	push	hl
 	push	de
-	call	_printchar
+	call	_outchar
 	pop	de
 	pop	hl
 	inc	hl
 	jr	.loop
 
-	extern	_printchar
+	extern	_outchar

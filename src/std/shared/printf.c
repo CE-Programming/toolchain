@@ -129,12 +129,12 @@ static inline void _out_null(char character, void* buffer, size_t idx, size_t ma
   (void)character; (void)buffer; (void)idx; (void)maxlen;
 }
 
-// internal printchar wrapper
+// internal outchar wrapper
 static inline void _out_char(char character, void* buffer, size_t idx, size_t maxlen)
 {
   (void)buffer; (void)idx; (void)maxlen;
   if (character) {
-    printchar(character);
+    outchar(character);
   }
 }
 

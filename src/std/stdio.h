@@ -31,7 +31,12 @@ typedef __SIZE_TYPE__ size_t;
 #endif
 
 /* weak user-defined function */
-void printchar(char character);
+char inchar(void);
+
+int getchar(void);
+
+/* weak user-defined function */
+void outchar(char character);
 
 int putchar(int character);
 

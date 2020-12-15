@@ -1,9 +1,9 @@
 .. _printf:
 
-The Deal with Printf
-====================
+Using printf functions
+======================
 
-What's The Deal With printf?
+What's the deal with printf?
 ----------------------------
 
 The `printf` and related functions (`sprintf`, `vsprintf`, etc.) are based on a relatively `small implementation <https://github.com/CE-Programming/toolchain/issues>`_.
@@ -30,28 +30,28 @@ If you just need to convert a float to a string, which the OS sprintf does not s
     }
 
 
-Using The printf Functions
+Using the printf functions
 --------------------------
 
 All the `printf` and related functions are defined in the standard `stdio.h` header, and can be used just as they would in any normal C program.
 
-The output of character text is done via the `printchar` function, which is a special toolchain function that by default prints to the OS homescreen.
+The output of character text is done via the `outchar` function, which is a special toolchain function that by default prints to the OS homescreen.
 It's prototype looks like this:
 
 .. code-block:: c
 
-    void printchar(char character);
+    void outchar(char character);
 
 Reimplement this function in your program in any source file to change how characters are printed.
 For example, a horrid implementation of this function might look like the one below, which just prints to the OS homescreen.
 
 .. code-block:: c
 
-    void printchar(char character)
+    void outchar(char character)
     {
         char str[2] = { character, '\0' };
 
         os_PutStrFull(str);
     }
 
-As an additional note, the `printchar` function is used by the standard `putchar` and `puts` functions -- even if you have disabled the other printf functions, these two will still work as expected.
+As an additional note, the `outchar` function is used by the standard `putchar` and `puts` functions -- even if you have disabled the other printf functions, these two will still work as expected.
