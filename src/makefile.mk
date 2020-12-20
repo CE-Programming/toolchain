@@ -15,30 +15,31 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #----------------------------
-VERSION := 9.0-devel
+VERSION := 9.0
 #----------------------------
 NAME ?= DEMO
 ICON ?=
 DESCRIPTION ?=
 COMPRESSED ?= NO
 ARCHIVED ?= NO
-CLEANUP ?= YES
 BSSHEAP_LOW ?= D031F6
 BSSHEAP_HIGH ?= D13FD6
 STACK_HIGH ?= D1A87E
 INIT_LOC ?= D1A87F
-USE_FLASH_FUNCTIONS ?= YES
-HAS_PRINTF ?= YES
-UPPERCASE_NAME ?= YES
 OUTPUT_MAP ?= NO
 CFLAGS ?= -Wall -Wextra -Oz
-CXXFLAGS ?=
+CXXFLAGS ?= -Wall -Wextra -Oz
 LDFLAGS ?=
 SRCDIR ?= src
 OBJDIR ?= obj
 BINDIR ?= bin
 GFXDIR ?= src/gfx
 DEPS ?=
+#----------------------------
+HAS_UPPERCASE_NAME ?= YES
+HAS_CLEANUP ?= YES
+HAS_FLASH_FUNCTIONS ?= YES
+HAS_PRINTF ?= YES
 #----------------------------
 
 # define some common makefile things
@@ -141,7 +142,7 @@ endif
 endif
 
 # check if default cleanup code should be added
-ifeq ($(CLEANUP),YES)
+ifeq ($(HAS_CLEANUP),YES)
 LDREQUIRE += -i $(call QUOTE_ARG,require __cleanup)
 endif
 
@@ -159,7 +160,7 @@ CONVBINFLAGS += --oformat 8xp-auto-decompress
 else
 CONVBINFLAGS += --oformat 8xp
 endif
-ifeq ($(UPPERCASE_NAME),YES)
+ifeq ($(HAS_UPPERCASE_NAME),YES)
 CONVBINFLAGS += --uppercase
 endif
 CONVBINFLAGS += --name $(NAME)
@@ -175,7 +176,7 @@ DEFPRINTF := -DHAS_PRINTF=1
 endif
 
 # choose static or linked flash functions
-ifeq ($(USE_FLASH_FUNCTIONS),YES)
+ifeq ($(HAS_FLASH_FUNCTIONS),YES)
 LDSTATIC := 1
 endif
 
