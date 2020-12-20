@@ -27,4 +27,4 @@ html_theme_options = {
 breathe_default_project = 'CE C Toolchain'
 subprocess.call('doxygen doxyfile', shell=True)
 breathe_projects['CE C Toolchain'] = 'doxygen/xml'
-
+master_doc = 'index'
