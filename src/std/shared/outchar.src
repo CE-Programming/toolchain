@@ -5,6 +5,7 @@ _outchar:
 	pop	de
 	ex	(sp),hl
 	push	de
+	ld	iy,$d00080	; ti.flags
 	ld	a,l
 	cp	a,32
 	jp	nc,$207B8	; ti.PutC

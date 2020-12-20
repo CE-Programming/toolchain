@@ -2,9 +2,11 @@
 
 	weak	_inchar
 _inchar:
+    	ld	iy,$d00080	; ti.flags
+.getchar:
 	call	$2014C		; ti.GetCSC
 	or	a,a
-	jr	z,_inchar
+	jr	z,.getchar
 	sbc	hl,hl
 	ld	l,a
 	ld	de,.lut_char
