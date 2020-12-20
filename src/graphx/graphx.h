@@ -1682,7 +1682,7 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
  * codewords. If bit 7 of that is zero, the byte immediately after it is a
  * literal and can be read in as sprite height. Otherwise, the bits that follows
  * indicates a codeword, making sprite height the same as width.
- * 
+ *
  * @param zx7_sprite ZX7-compressed sprite
  * @return Size, in bytes, of decompressed sprite
 */
@@ -1707,7 +1707,7 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 #define gfx_BlitArea    _Pragma("GCC warning \"'gfx_BlitArea' is deprecated, use 'gfx_BlitRectangle' instead\"") gfx_BlitRectangle
 #define gfx_lcdWidth    (320)
 #define gfx_lcdHeight   (240)
-/* @cond */
+/* @endcond */
 
 #ifdef __cplusplus
 }
