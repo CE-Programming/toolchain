@@ -33,7 +33,7 @@ Below is an example assembly source file that relies on an external function:
 
 .. code-block:: asm
 
-    	public _asm_func
+    	public	_asm_func
 
     _asm_func:
     	pop	hl
@@ -43,7 +43,7 @@ Below is an example assembly source file that relies on an external function:
 	call	_external_func
     	ret
 
-    	extern _external_func
+    	extern	_external_func
 
 The C prototype is shown below:
 
@@ -67,17 +67,17 @@ This table lists the locations relative to *sp* from within the called funciton.
 +============+============+======================+
 | char       | 1 byte     | sp + [3]             |
 +------------+------------+----------------------+
-| short      | HL         | sp + [3:4]           |
+| short      | 2 bytes    | sp + [3:4]           |
 +------------+------------+----------------------+
-| int        | HL         | sp + [3:5]           |
+| int        | 3 bytes    | sp + [3:5]           |
 +------------+------------+----------------------+
-| long       | E:HL       | sp + [6]: sp + [3:5] |
+| long       | 4 bytes    | sp + [6]: sp + [3:5] |
 +------------+------------+----------------------+
-| float      | E:HL       | sp + [6]: sp + [3:5] |
+| float      | 4 bytes    | sp + [6]: sp + [3:5] |
 +------------+------------+----------------------+
-| double     | E:HL       | sp + [6]: sp + [3:5] |
+| double     | 4 bytes    | sp + [6]: sp + [3:5] |
 +------------+------------+----------------------+
-| pointer    | HL         | sp + [3:5]           |
+| pointer    | 3 bytes    | sp + [3:5]           |
 +------------+------------+----------------------+
 
 This table lists which registers are used for return values.
