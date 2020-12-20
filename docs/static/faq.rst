@@ -19,3 +19,88 @@ The following graphic breaks down the address space.
 .. image:: images/mem_layout.png
    :align: center
 
+Linking Assembly Source Files
+-----------------------------
+
+Assembly routines can be linked into a C program provided the following conditions are met:
+
+- The file's extension is **.asm**. It can be placed at any depth in the sources directory.
+- The routine should have a C prototype if it used externally in C.
+- The assembly routine must be prefixed with an underscore, and have a corresponding `public` entry in the assembly file.
+- Any external functions called from the assembly source must be listed as being `extern`.
+
+Below is an example assembly source file that relies on an external function:
+
+.. code-block:: asm
+
+    	public _asm_func
+
+    _asm_func:
+    	pop	hl
+    	pop	de
+    	push	de
+    	push	hl
+	call	_external_func
+    	ret
+
+    	extern _external_func
+
+The C prototype is shown below:
+
+C File:
+
+.. code-block:: c
+
+    void asm_func(int a);
+
+Arguments and Returns
+~~~~~~~~~~~~~~~~~~~~~
+
+Arguments are pushed from last to first corresponding to the C prototype.
+In eZ80, 3 bytes are always pushed to the stack regardless of the actual size.
+However, the assembly function must be careful to only use the valid bytes that are pushed.
+For example, if a *short* type is used, the upper byte of the value pushed on the stack will contain arbitrary data.
+This table lists the locations relative to *sp* from within the called funciton.
+
++------------+------------+----------------------+
+| C Type     | Size       | Stack Location       |
++============+============+======================+
+| char       | 1 byte     | sp + [3]             |
++------------+------------+----------------------+
+| short      | HL         | sp + [3:4]           |
++------------+------------+----------------------+
+| int        | HL         | sp + [3:5]           |
++------------+------------+----------------------+
+| long       | E:HL       | sp + [6]: sp + [3:5] |
++------------+------------+----------------------+
+| float      | E:HL       | sp + [6]: sp + [3:5] |
++------------+------------+----------------------+
+| double     | E:HL       | sp + [6]: sp + [3:5] |
++------------+------------+----------------------+
+| pointer    | HL         | sp + [3:5]           |
++------------+------------+----------------------+
+
+This table lists which registers are used for return values.
+Note that for shorts, the upper byte does not matter.
+
+**xx**: Contains data.
+
+**??**: Don't care.
+
++------------+------------+-------------------+
+| C Type     | Register   | Register Contents |
++============+============+===================+
+| char       | A          | xx                |
++------------+------------+-------------------+
+| short      | HL         | ?? xx xx          |
++------------+------------+-------------------+
+| int        | HL         | xx xx xx          |
++------------+------------+-------------------+
+| long       | E:HL       | xx: xx xx xx      |
++------------+------------+-------------------+
+| float      | E:HL       | xx: xx xx xx      |
++------------+------------+-------------------+
+| double     | E:HL       | xx: xx xx xx      |
++------------+------------+-------------------+
+| pointer    | HL         | xx xx xx          |
++------------+------------+-------------------+
