@@ -63,12 +63,13 @@ To enable this feature, open the project's makefile and change the line:
 
     ARCHIVED ?= YES
 
-EXTRA_CFLAGS
-------------
+CFLAGS / CXXFLAGS
+-----------------
 
 These flags are passed to the clang compiler.
+*CFLAGS* is used for C source files; *CXXFLAGS* is used for CPP source files.
 
 .. code-block:: makefile
 
-    EXTRA_CFLAGS ?= -Wall -Wextra -Oz
-
+    CFLAGS ?= -Wall -Wextra -Oz
+    CXXFLAGS ?= -Wall -Wextra -Oz
