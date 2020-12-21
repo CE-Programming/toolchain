@@ -11,10 +11,10 @@
 Starting with this version, the toolchain is now based on LLVM, an open-source retargetable compiler infrastructure. The [backend](https://github.com/jacobly0/llvm-project) was created by [Jacobly](https://github.com/jacobly0) and the compiler (named clang, which you may see as `ez80-clang` in the toolchain) is now able produce eZ80 assembly from C/C++ source files. This is a major milestone as it allows the CE toolchain to move away from using the legacy Zilog ZDS compiler, which is closed-source, proprietary, only worked on Windows, and contained numerous bugs. Thanks to LLVM, later standards of the C and C++ specifications are supported (you're not stuck with C89 anymore!), code optimization actually works, and the compiler is able to run natively across multiple platforms.
 
   - Lots of cleanup and improvements to the standard includes and headers in general, made possible by the compiler change mentioned above.
-  - Some "hacks" like `_OS` and `_asm` aren't needed anymore, they are now gone.
   - Various changes and improvements to the fasmg linker (written by [Jacobly](https://github.com/jacobly0) as well)
-  - Debug info is now produced in the Dwarf format
-  - The [convimg](https://github.com/mateoconlechuga/convimg) project has been updated to support a new YAML format that is easier for beginners and for creating autogeneration tools. The previous toolchain release (v8.8) also used a YAML format, however some slight modifications were made in order to make it standards compliant. Example `convimg.yaml` conversion files can be found in the examples directory.
+  - Some "hacks" like `_OS` and `_asm` aren't needed anymore, they are now gone.
+  - Debug info is now produced in the Dwarf format (and source-level debugging support within CEmu is getting closer to being ready!)
+  - The [convimg](https://github.com/mateoconlechuga/convimg) project has been updated to support a new YAML format that is easier for beginners and tooling. The previous toolchain release (v8.8) also used a YAML format, however some slight modifications were made in order to make it standard-compliant. Example `convimg.yaml` conversion files can be found in the examples.
   - New **fileioc** function: `ti_SetGCBehavior` to set routines to run before and after a garbage collect would be triggered.
   - New **keypadc** defines: many keypad key defines corresponding to the TI-83 Premium CE keypad were added for easier coding
   - New **usb.h** function: `usb_BatteryCharging` to check if the battery is currently charging.
@@ -26,9 +26,12 @@ Starting with this version, the toolchain is now based on LLVM, an open-source r
   - Improved autotests for the examples
   - fasmg got a speed boost thanks to CALM instructions.
   - Documentation improved and revamped. Available on [online here](http://ce-programming.github.io/toolchain/), which replaces the repo's wiki
-
+  - The build/CI infrastructure was migrated from Travis to Github Actions.
 
 These massive internal changes *do* mean that some programs might not compile right away anymore, but don't worry, it shouldn't be too difficult to fix your code. Check out the [v9.0 release note](https://github.com/CE-Programming/toolchain/tree/v9.0) for migration tips.
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.8...v9.0)
+
 
 # [v8.8](https://github.com/CE-Programming/toolchain/releases/tag/v8.8) (2020-01-19)
 
