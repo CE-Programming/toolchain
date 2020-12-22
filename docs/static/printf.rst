@@ -1,6 +1,6 @@
 .. _printf:
 
-Using printf functions
+Using printf Functions
 ======================
 
 What's the deal with printf?

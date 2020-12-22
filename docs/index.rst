@@ -11,9 +11,6 @@ visit the `GitHub repository <https://github.com/CE-Programming/toolchain>`_.
 
 If this is your first introduction to the CE C Toolchain, start with :ref:`getting_started`.
 
-Overview
---------
-
 .. toctree::
     :caption: Overview
     :maxdepth: 1
@@ -22,14 +19,12 @@ Overview
     static/getting-started
     static/faq
 
-Toolchain Documentation
------------------------
-
 .. toctree::
     :caption: Toolchain Documentation
     :maxdepth: 1
 
     static/printf
+    static/fileio
     libraries/index
     headers/index
     static/debugging
@@ -41,12 +36,8 @@ Helpful Resources and Bug Reports
 If you have any questions, you can join us on :code:`#ez80-dev`, via the EFNet IRC server. (`webchat link <http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login>`_).
 Feel free to open bug reports or feature requests on the `GitHub Issues <https://github.com/CE-Programming/toolchain/issues>`_ page.
 
-Contributing
-------------
-
 .. toctree::
     :caption: Contributing
     :maxdepth: 1
 
     static/building
-
