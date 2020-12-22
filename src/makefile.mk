@@ -34,12 +34,14 @@ SRCDIR ?= src
 OBJDIR ?= obj
 BINDIR ?= bin
 GFXDIR ?= src/gfx
+CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
 #----------------------------
 HAS_UPPERCASE_NAME ?= YES
 HAS_CLEANUP ?= YES
 HAS_FLASH_FUNCTIONS ?= YES
 HAS_PRINTF ?= YES
+HAS_CUSTOM_FILE ?= NO
 #----------------------------
 
 # define some common makefile things
@@ -53,6 +55,7 @@ CCDEBUG = -g0
 LDDEBUG = 0
 LDSTATIC = 0
 DEFPRINTF =
+DEFCUSTOMFILE =
 
 # verbosity
 V ?= 0
@@ -175,14 +178,19 @@ ifeq ($(HAS_PRINTF),YES)
 DEFPRINTF := -DHAS_PRINTF=1
 endif
 
+# support custom file io configuration
+ifeq ($(HAS_CUSTOM_FILE),YES)
+DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
+endif
+
 # choose static or linked flash functions
 ifeq ($(HAS_FLASH_FUNCTIONS),YES)
 LDSTATIC := 1
 endif
 
 # define the c/c++ flags used by clang
-EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -Dinterrupt="__attribute__((__interrupt__))"
-EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(CCDEBUG)
+EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -I$(SRCDIR) -Dinterrupt="__attribute__((__interrupt__))"
+EZCFLAGS += -Wno-main-return-type -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-rtti $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
 

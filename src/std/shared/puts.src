@@ -8,7 +8,7 @@ _puts:
 .loop:
 	ld	a,(hl)
 	or	a,a
-	jp	z,$0207F0	; ti.NewLine
+	jr	z,.newline
 	ld	e,a
 	push	hl
 	push	de
@@ -17,5 +17,8 @@ _puts:
 	pop	hl
 	inc	hl
 	jr	.loop
+.newline:
+	ld	a,10
+	jp	_outchar
 
 	extern	_outchar

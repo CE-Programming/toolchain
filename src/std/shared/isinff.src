@@ -19,5 +19,3 @@ __isinff:
 	ret
 
 	extern	__frameset0
-
-

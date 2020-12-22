@@ -19,7 +19,7 @@ include $(CURDIR)/../../common.mk
 BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
 
 EZCFLAGS := -S -ffreestanding -Wall -Wextra -Oz
-EZCFLAGS += -D_EZ80 -DHAS_PRINTF -isystem .. -isystem ../../ce -mllvm -profile-guided-section-prefix=false
+EZCFLAGS += -D_EZ80 -DHAS_PRINTF -isystem .. -isystem ../../ce -isystem ../../fileioc -mllvm -profile-guided-section-prefix=false
 EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
 EZCXXFLAGS += -isystem ../c++
 
@@ -43,4 +43,3 @@ install: all
 	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_SHARED))
 
 .PHONY: all clean
-

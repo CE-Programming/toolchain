@@ -12,6 +12,21 @@ __BEGIN_DECLS
 typedef __SIZE_TYPE__ size_t;
 #endif
 
+#ifdef HAS_CUSTOM_FILE
+#include CUSTOM_FILE_FILE
+#else
+typedef struct
+{
+    unsigned char slot;
+    unsigned char eof;
+    unsigned char err;
+} FILE;
+#define FOPEN_MAX  5
+#define stdin      ((FILE*)1)
+#define stdout     ((FILE*)2)
+#define stderr     ((FILE*)2)
+#endif
+
 #ifndef NULL
 #define NULL ((void*)0)
 #endif
@@ -30,38 +45,74 @@ typedef __SIZE_TYPE__ size_t;
 #define SEEK_SET  0
 #endif
 
-/* weak user-defined function */
+/* weak user-defined functions */
 char inchar(void);
 
-int getchar(void);
-
-/* weak user-defined function */
 void outchar(char character);
+
+FILE *fopen(const char *__restrict filename,
+    const char *__restrict mode);
+
+int fclose(FILE *stream);
+
+int fflush(FILE *stream);
+
+int ferror(FILE *stream);
+
+int feof(FILE *stream);
+
+void clearerr(FILE *stream);
+
+int fputs(const char *__restrict str, FILE *__restrict stream);
+
+size_t fread(void *ptr, size_t size, size_t count, FILE *__restrict stream);
+
+size_t fwrite(const void *__restrict ptr, size_t size, size_t count,
+    FILE *__restrict stream);
+
+long int ftell(FILE *stream) __attribute__((__warn_unused_result__));
+
+int fseek(FILE *stream, long int offset, int origin);
+
+int fgetc(FILE *stream);
+#define getc(...) fgetc(__VA_ARGS__)
+
+int fputc(int c, FILE *stream);
+#define putc(...) fputc(__VA_ARGS__)
+
+char *fgets(char *__restrict str, int num, FILE *__restrict stream);
+
+int remove(const char *filename);
+
+void rewind(FILE *stream);
+
+/* standard impls */
+int getchar(void);
 
 int putchar(int character);
 
 int puts(const char *str);
 
 int printf_(const char *__restrict format, ...)
-    __attribute__ ((format (__printf__, 1, 2)));
+    __attribute__((format(__printf__, 1, 2)));
 
-int vprintf_(const char *__restrict format, va_list __arg)
-    __attribute__ ((format (__printf__, 1, 0)));
+int vprintf_(const char *__restrict format, va_list va)
+    __attribute__((format(__printf__, 1, 0)));
 
 int sprintf_(char *__restrict buffer,
     const char *__restrict format, ...)
-    __attribute__ ((format (__printf__, 2, 3)));
+    __attribute__((format(__printf__, 2, 3)));
 
 int vsprintf_(char *__restrict buffer, const char *__restrict format,
-    va_list __arg)
-    __attribute__ ((format (__printf__, 1, 0)));
+    va_list va)
+    __attribute__((format(__printf__, 1, 0)));
 
 int snprintf_(char* buffer, size_t count, const char *__restrict format, ...)
-    __attribute__ ((format (__printf__, 3, 4)));
+    __attribute__((format(__printf__, 3, 4)));
 
 int vsnprintf_(char* buffer, size_t count, const char *__restrict format,
     va_list va)
-    __attribute__ ((format (__printf__, 3, 0)));
+    __attribute__((format(__printf__, 3, 0)));
 
 #ifdef HAS_PRINTF
 #define printf printf_
