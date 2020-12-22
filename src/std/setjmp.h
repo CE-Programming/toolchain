@@ -5,10 +5,10 @@
 
 __BEGIN_DECLS
 
-typedef unsigned char __jmp_buf[12];
+typedef unsigned char jmp_buf[12];
 
-int setjmp(__jmp_buf env);
-void longjmp(__jmp_buf env, int val) __attribute__((noreturn));
+int setjmp(jmp_buf env);
+void longjmp(jmp_buf env, int val) __attribute__((noreturn));
 
 __END_DECLS
 
