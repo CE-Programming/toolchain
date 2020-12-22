@@ -26,22 +26,22 @@ extern "C" {
 #define M_SQRT1_2     0.707106781186547524401    /* 1/sqrt(2)      */
 #define M_LOG_2M_PI   1.83787706640934548        /* log2(M_PI)     */
 
-int __isinff(float n);
-int __isnanf(float n);
-int __isnormalf(float n);
-int __isfinitef(float n);
+int _isinff(float n);
+int _isnanf(float n);
+int _isnormalf(float n);
+int _isfinitef(float n);
 
 #define isinf(x) ( \
-	sizeof((x)) == sizeof(float) ? __isinff((x)) : \
+	sizeof((x)) == sizeof(float) ? _isinff((x)) : \
 	0)
 #define isnan(x) ( \
-	sizeof((x)) == sizeof(float) ? __isnanf((x)) : \
+	sizeof((x)) == sizeof(float) ? _isnanf((x)) : \
 	0)
 #define isnormal(x) ( \
-	sizeof((x)) == sizeof(float) ? __isnormalf((x)) : \
+	sizeof((x)) == sizeof(float) ? _isnormalf((x)) : \
 	(x) != 0)
 #define isfinite(x) ( \
-	sizeof((x)) == sizeof(float) ? __isfinitef((x)) : \
+	sizeof((x)) == sizeof(float) ? _isfinitef((x)) : \
 	1)
 
 double      acos(double);
@@ -277,4 +277,3 @@ long double truncl(long double);
 #endif
 
 #endif
-
