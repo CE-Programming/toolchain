@@ -2,25 +2,28 @@
 #define _TIME_H
 
 #include <cdefs.h>
-#include <stdint.h>
 
 #ifndef NULL
 #define NULL ((void*)0)
-#endif
-
-#ifndef SIZE_T_DEFINED
-#define SIZE_T_DEFINED
-typedef __SIZE_TYPE__ size_t;
 #endif
 
 #ifndef LOCALTIME_GMT_OFFSET
 #define LOCALTIME_GMT_OFFSET 0
 #endif
 
+#ifndef CLOCKS_PER_SEC
+#define CLOCKS_PER_SEC 0
+#endif
+
 __BEGIN_DECLS
 
-typedef uint32_t time_t;
-typedef uint32_t clock_t;
+#ifndef SIZE_T_DEFINED
+#define SIZE_T_DEFINED
+typedef __SIZE_TYPE__ size_t;
+#endif
+
+typedef unsigned long time_t;
+typedef char clock_t;
 
 struct tm {
    int tm_sec;
