@@ -13,7 +13,7 @@ However, the CE doesn't expose any sort of standard UNIX or similar file capabil
 To mitigate this, the CE C Toolchain includes these functions as wrappers around the :ref:`fileioc library <fileioc_h>`.
 This allows native access to AppVars for read and write operations.
 
-For :code:`stdin`, :code:`stdout`, and :code:`stderr` file streams, the default implementation uses the :code:`getchar` and :code:`putchar` functions respectively.
+For :code:`stdin`, :code:`stdout`, and :code:`stderr` file streams, the default implementation uses the `getchar` and `putchar` functions respectively.
 
 Using Custom File I/O
 ---------------------

@@ -11,8 +11,8 @@ Getting Started
 * On Windows, run the executable (.exe) as an administrator.
 * On Linux or macOS:
 
-  * Extract the archive to a path **without spaces** (e.g. /home/).
-  * Add the environment variables with the install location to either `.bashrc` or `.bash_profile`:
+  * Extract the archive to a path **without spaces** (e.g. /opt/).
+  * Add the environment variables with the install location to either `.bashrc` or `.bash_profile`, using the extracted path:
 
     .. indent with spaces
     .. code-block:: bash
@@ -20,7 +20,9 @@ Getting Started
         export CEDEV=/opt/CEdev
         export PATH=$CEDEV/bin:$PATH
 
-**Note**: If you have defined/overridden the `CFLAGS` or `LDFLAGS` variables in your shell, you may want to unset those.
+.. note::
+
+    If you have defined/overridden the `CFLAGS` or `LDFLAGS` variables in your shell, you may want to unset those.
 
 -------------------
  Building Programs
@@ -55,7 +57,7 @@ Folders
 
 * **bin**: This is where the compiled program will be placed.
 
-* **obj**: Compiled C files are placed here, showing the assembly output.
+* **obj**: Compiled C/C++ files are placed here, showing the assembly output.
 
 
 Files
@@ -68,4 +70,3 @@ Files
 * **readme.md**: A brief text file that explains what the demo is.
 
 * **autotest.json**: This can be loaded into `CEmu <https://ce-programming.github.io/CEmu>`_'s Autotester to verify the example's correctness.
-
