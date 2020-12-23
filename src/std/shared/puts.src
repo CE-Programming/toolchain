@@ -18,7 +18,10 @@ _puts:
 	inc	hl
 	jr	.loop
 .newline:
-	ld	a,10
-	jp	_outchar
+	ld	l,10
+	push	hl
+	call	_outchar
+	pop	hl
+	ret
 
 	extern	_outchar
