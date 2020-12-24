@@ -8,8 +8,8 @@ build_fasmg () {
 }
 
 cd fasmg-ez80
-git checkout calm
-git pull origin calm
+git checkout main
+git pull origin main
 cd ..
 mkdir -p .tmp
 wget --no-verbose https://flatassembler.net/$(wget --no-verbose https://flatassembler.net/download.php --output-document=- | grep --only-matching --max-count=1 fasmg\\.[0-9a-z]\\+\.zip) --output-document=.tmp/fasmg.zip
@@ -21,4 +21,3 @@ build_fasmg windows fasmg.exe
 build_fasmg macos   fasmg      x64
 
 rm -rf .tmp
-
