@@ -14,9 +14,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def __frbmuls
-	.assume adl=1
+        assume  adl=1
 
+	public	__frbmuls
 __frbmuls:
 	push	hl
 	;;

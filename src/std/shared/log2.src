@@ -1,9 +1,6 @@
-	.def _log2
-	.ref _log
-	.ref __fdiv
-	.ref __frameset0
-	.assume adl=1
+	assume	adl=1
 
+	public	_log2
 _log2:
 	call	__frameset0
 	ld	c,(ix+9)
@@ -25,3 +22,6 @@ _log2:
 	pop	ix
 	ret
 
+	extern	_log
+	extern	__fdiv
+	extern	__frameset0

@@ -16,6 +16,11 @@
 extern "C" {
 #endif
 
+/**
+ * Marks a function as needing the iy register to point to the OS flags before calling.
+ */
+#define tiflags __attribute__((__tiflags__))
+
 /*
  * Hardware & custom macros/functions
  */
@@ -121,30 +126,37 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define RTC_DISABLE             (0<<0)
 
 /* RTC registers */
-#define rtc_Seconds             (*(volatile uint8_t*)0xF30000)
-#define rtc_Minutes             (*(volatile uint8_t*)0xF30004)
-#define rtc_Hours               (*(volatile uint8_t*)0xF30008)
-#define rtc_Days                (*(volatile uint16_t*)0xF3000C)
+#define rtc_Seconds             (*(volatile uint8_t*)0xF30000)    /**< Number of seconds stored in the RTC. */
+#define rtc_Minutes             (*(volatile uint8_t*)0xF30004)    /**< Number of minutes stored in the RTC. */
+#define rtc_Hours               (*(volatile uint8_t*)0xF30008)    /**< Number of hours stored in the RTC. */
+#define rtc_Days                (*(volatile uint16_t*)0xF3000C)   /**< Number of days stored in the RTC. */
+/* @cond */
 #define rtc_AlarmSeconds        (*(volatile uint8_t*)0xF30010)
 #define rtc_AlarmMinutes        (*(volatile uint8_t*)0xF30014)
 #define rtc_AlarmHours          (*(volatile uint8_t*)0xF30018)
-#define rtc_Control             (*(volatile uint8_t*)0xF30020)
+/* @endcond */
+#define rtc_Control             (*(volatile uint8_t*)0xF30020)    /**< RTC Control register. */
+/* @cond */
 #define rtc_LoadSeconds         (*(volatile uint8_t*)0xF30024)
 #define rtc_LoadMinutes         (*(volatile uint8_t*)0xF30028)
 #define rtc_LoadHours           (*(volatile uint8_t*)0xF3002C)
 #define rtc_LoadDays            (*(volatile uint16_t*)0xF30030)
-#define rtc_IntStatus           (*(volatile uint8_t*)0xF30034)
-#define rtc_IntAcknowledge      (*(volatile uint8_t*)0xF30034)
-#define rtc_IsBusy()            ((rtc_Control) & RTC_LOAD)
+/* @endcond */
+#define rtc_IntStatus           (*(volatile uint8_t*)0xF30034)    /**< RTC Interrupt Status register. */
+#define rtc_IntAcknowledge      (*(volatile uint8_t*)0xF30034)    /**< RTC Interrupt Acknowledge register. */
+#define rtc_IsBusy()            ((rtc_Control) & RTC_LOAD)        /**< Checks if the RTC is busy loading. */
 
 /* RTC interrupt masks */
+/* @cond */
 #define RTC_ALARM_INT_SOURCE    (1<<5)
 #define RTC_DAY_INT_SOURCE      (1<<4)
 #define RTC_HR_INT_SOURCE       (1<<3)
 #define RTC_MIN_INT_SOURCE      (1<<2)
 #define RTC_SEC_INT_SOURCE      (1<<1)
+/* @endcond */
 
 /* RTC interrupt statuses */
+/* @cond */
 #define RTC_LOAD_INT            (1<<5)
 #define RTC_ALARM_INT           (1<<4)
 #define RTC_DAY_INT             (1<<3)
@@ -152,82 +164,88 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define RTC_MIN_INT             (1<<1)
 #define RTC_SEC_INT             (1<<0)
 #define RTC_INT_MASK            (RTC_SEC_INT | RTC_MIN_INT | RTC_HR_INT | RTC_DAY_INT | RTC_ALARM_INT | RTC_LOAD_INT)
+/* @endcond */
 
 /* Whole bunch of useful timer functions */
-#define TIMER1_ENABLE            (1<<0)  /* Enables Timer 1                                        */
-#define TIMER1_DISABLE           (0<<0)  /* Disables Timer 1                                       */
-#define TIMER1_32K               (1<<1)  /* Use the 32K clock for timer 1                          */
-#define TIMER1_CPU               (0<<1)  /* Use the CPU clock rate for timer 1                     */
-#define TIMER1_0INT              (1<<2)  /* Enable an interrupt when 0 is reached for the timer 1  */
-#define TIMER1_NOINT             (0<<2)  /* Disable interrupts for the timer 1                     */
-#define TIMER1_UP                (1<<9)  /* Timer 1 counts up                                      */
-#define TIMER1_DOWN              (0<<9)  /* Timer 1 counts down                                    */
+#define TIMER1_ENABLE            (1<<0)  /**< Enables Timer 1                                        */
+#define TIMER1_DISABLE           (0<<0)  /**< Disables Timer 1                                       */
+#define TIMER1_32K               (1<<1)  /**< Use the 32K clock for timer 1                          */
+#define TIMER1_CPU               (0<<1)  /**< Use the CPU clock rate for timer 1                     */
+#define TIMER1_0INT              (1<<2)  /**< Enable an interrupt when 0 is reached for the timer 1  */
+#define TIMER1_NOINT             (0<<2)  /**< Disable interrupts for the timer 1                     */
+#define TIMER1_UP                (1<<9)  /**< Timer 1 counts up                                      */
+#define TIMER1_DOWN              (0<<9)  /**< Timer 1 counts down                                    */
 
-#define TIMER2_ENABLE            (1<<3)  /* Enables Timer 2                                        */
-#define TIMER2_DISABLE           (0<<3)  /* Disables Timer 2                                       */
-#define TIMER2_32K               (1<<4)  /* Use the 32K clock for timer 2                          */
-#define TIMER2_CPU               (0<<4)  /* Use the CPU clock rate for timer 2                     */
-#define TIMER2_0INT              (1<<5)  /* Enable an interrupt when 0 is reached for the timer 2  */
-#define TIMER2_NOINT             (0<<5)  /* Disable interrupts for the timer 2                     */
-#define TIMER2_UP                (1<<10) /* Timer 2 counts up                                      */
-#define TIMER2_DOWN              (0<<10) /* Timer 2 counts down                                    */
+#define TIMER2_ENABLE            (1<<3)  /**< Enables Timer 2                                        */
+#define TIMER2_DISABLE           (0<<3)  /**< Disables Timer 2                                       */
+#define TIMER2_32K               (1<<4)  /**< Use the 32K clock for timer 2                          */
+#define TIMER2_CPU               (0<<4)  /**< Use the CPU clock rate for timer 2                     */
+#define TIMER2_0INT              (1<<5)  /**< Enable an interrupt when 0 is reached for the timer 2  */
+#define TIMER2_NOINT             (0<<5)  /**< Disable interrupts for the timer 2                     */
+#define TIMER2_UP                (1<<10) /**< Timer 2 counts up                                      */
+#define TIMER2_DOWN              (0<<10) /**< Timer 2 counts down                                    */
 
-#define TIMER3_ENABLE            (1<<6)  /* Enables Timer 3                                        */
-#define TIMER3_DISABLE           (0<<6)  /* Disables Timer 3                                       */
-#define TIMER3_32K               (1<<7)  /* Use the 32K clock for timer 3                          */
-#define TIMER3_CPU               (0<<7)  /* Use the CPU clock rate for timer 3                     */
-#define TIMER3_0INT              (1<<8)  /* Enable an interrupt when 0 is reached for the timer 3  */
-#define TIMER3_NOINT             (0<<8)  /* Disable interrupts for the timer 3                     */
-#define TIMER3_UP                (1<<11) /* Timer 3 counts up                                      */
-#define TIMER3_DOWN              (0<<11) /* Timer 3 counts down                                    */
+#define TIMER3_ENABLE            (1<<6)  /**< Enables Timer 3                                        */
+#define TIMER3_DISABLE           (0<<6)  /**< Disables Timer 3                                       */
+#define TIMER3_32K               (1<<7)  /**< Use the 32K clock for timer 3                          */
+#define TIMER3_CPU               (0<<7)  /**< Use the CPU clock rate for timer 3                     */
+#define TIMER3_0INT              (1<<8)  /**< Enable an interrupt when 0 is reached for the timer 3  */
+#define TIMER3_NOINT             (0<<8)  /**< Disable interrupts for the timer 3                     */
+#define TIMER3_UP                (1<<11) /**< Timer 3 counts up                                      */
+#define TIMER3_DOWN              (0<<11) /**< Timer 3 counts down                                    */
 
 /* These defines can be used to check the status of the timer */
-#define TIMER1_MATCH1            (1<<0)  /* Timer 1 hit the first match value                      */
-#define TIMER1_MATCH2            (1<<1)  /* Timer 1 hit the second match value                     */
-#define TIMER1_RELOADED          (1<<2)  /* Timer 1 was reloaded (Needs TIMER1_0INT enabled)       */
+#define TIMER1_MATCH1            (1<<0)  /**< Timer 1 hit the first match value                      */
+#define TIMER1_MATCH2            (1<<1)  /**< Timer 1 hit the second match value                     */
+#define TIMER1_RELOADED          (1<<2)  /**< Timer 1 was reloaded (Needs TIMER1_0INT enabled)       */
 
-#define TIMER2_MATCH1            (1<<3)  /* Timer 2 hit the first match value                      */
-#define TIMER2_MATCH2            (1<<4)  /* Timer 2 hit the second match value                     */
-#define TIMER2_RELOADED          (1<<5)  /* Timer 2 was reloaded (Needs TIMER2_0INT enabled)       */
+#define TIMER2_MATCH1            (1<<3)  /**< Timer 2 hit the first match value                      */
+#define TIMER2_MATCH2            (1<<4)  /**< Timer 2 hit the second match value                     */
+#define TIMER2_RELOADED          (1<<5)  /**< Timer 2 was reloaded (Needs TIMER2_0INT enabled)       */
 
-#define TIMER3_MATCH1            (1<<6)  /* Timer 3 hit the first match value                      */
-#define TIMER3_MATCH2            (1<<7)  /* Timer 3 hit the second match value                     */
-#define TIMER3_RELOADED          (1<<8)  /* Timer 3 was reloaded (Needs TIMER3_0INT enabled)       */
+#define TIMER3_MATCH1            (1<<6)  /**< Timer 3 hit the first match value                      */
+#define TIMER3_MATCH2            (1<<7)  /**< Timer 3 hit the second match value                     */
+#define TIMER3_RELOADED          (1<<8)  /**< Timer 3 was reloaded (Needs TIMER3_0INT enabled)       */
 
 /* Timer registers */
-#define timer_1_Counter          (*(volatile uint32_t*)0xF20000)
-#define timer_1_ReloadValue      (*(volatile uint32_t*)0xF20004)
-#define timer_1_MatchValue_1     (*(volatile uint32_t*)0xF20008)
-#define timer_1_MatchValue_2     (*(volatile uint32_t*)0xF2000C)
-#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)
-#define timer_2_ReloadValue      (*(volatile uint32_t*)0xF20014)
-#define timer_2_MatchValue_1     (*(volatile uint32_t*)0xF20018)
-#define timer_2_MatchValue_2     (*(volatile uint32_t*)0xF2001C)
-#define timer_3_Counter          (*(volatile uint32_t*)0xF20020)
-#define timer_3_ReloadValue      (*(volatile uint32_t*)0xF20024)
-#define timer_3_MatchValue_1     (*(volatile uint32_t*)0xF20028)
-#define timer_3_MatchValue_2     (*(volatile uint32_t*)0xF2002C)
-#define timer_Control            (*(volatile uint16_t*)0xF20030)
-#define timer_IntStatus          (*(volatile uint16_t*)0xF20034)
-#define timer_IntAcknowledge     (*(volatile uint16_t*)0xF20034)
-#define timer_EnableInt          (*(volatile uint16_t*)0xF20038)
+#define timer_1_Counter          (*(volatile uint32_t*)0xF20000)  /**< Timer 1 current value register. */
+#define timer_1_ReloadValue      (*(volatile uint32_t*)0xF20004)  /**< Timer 1 reload value register. */
+#define timer_1_MatchValue_1     (*(volatile uint32_t*)0xF20008)  /**< Timer 1 match 1 value register. */
+#define timer_1_MatchValue_2     (*(volatile uint32_t*)0xF2000C)  /**< Timer 1 match 2 value register. */
+#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)  /**< Timer 2 current value register. */
+#define timer_2_ReloadValue      (*(volatile uint32_t*)0xF20014)  /**< Timer 2 reload value register. */
+#define timer_2_MatchValue_1     (*(volatile uint32_t*)0xF20018)  /**< Timer 2 match 1 value register. */
+#define timer_2_MatchValue_2     (*(volatile uint32_t*)0xF2001C)  /**< Timer 2 match 2 value register. */
+#define timer_3_Counter          (*(volatile uint32_t*)0xF20020)  /**< Timer 3 current value register. */
+#define timer_3_ReloadValue      (*(volatile uint32_t*)0xF20024)  /**< Timer 3 reload value register. */
+#define timer_3_MatchValue_1     (*(volatile uint32_t*)0xF20028)  /**< Timer 3 match 1 value register. */
+#define timer_3_MatchValue_2     (*(volatile uint32_t*)0xF2002C)  /**< Timer 3 match 2 value register. */
+#define timer_Control            (*(volatile uint16_t*)0xF20030)  /**< Timer Control register. */
+#define timer_IntStatus          (*(volatile uint16_t*)0xF20034)  /**< Timer Interrupt Status register. */
+#define timer_IntAcknowledge     (*(volatile uint16_t*)0xF20034)  /**< Timer Interrupt Acknowledge register. */
+#define timer_EnableInt          (*(volatile uint16_t*)0xF20038)  /**< Timer Interrupt Enable register. */
 
 /* LCD defines */
-#define lcd_Ram                  ((volatile uint16_t*)0xD40000)
+#define lcd_Ram                  ((volatile uint16_t*)0xD40000) /**< Base address of memory-mapped RAM for the LCD */
+/* @cond */
 #define lcd_Timing0              (*(volatile uint32_t*)0xE30000)
 #define lcd_Timing1              (*(volatile uint32_t*)0xE30004)
 #define lcd_Timing2              (*(volatile uint32_t*)0xE30008)
 #define lcd_Timing3              (*(volatile uint24_t*)0xE3000C)
 #define lcd_UpBase               (*(volatile uint32_t*)0xE30010)
 #define lcd_LpBase               (*(volatile uint32_t*)0xE30014)
-#define lcd_Control              (*(volatile uint24_t*)0xE30018)
+/* @endcond */
+#define lcd_Control              (*(volatile uint24_t*)0xE30018) /**< LCD Control register */
+/* @cond */
 #define lcd_EnableInt            (*(volatile uint8_t*)0xE3001C)
 #define lcd_IntStatus            (*(volatile uint8_t*)0xE30020)
 #define lcd_IntStatusMasked      (*(volatile uint8_t*)0xE30024)
 #define lcd_IntAcknowledge       (*(volatile uint8_t*)0xE30028)
 #define lcd_UpBaseCurr           (*(volatile uint32_t*)0xE3002C)
 #define lcd_LpBaseCurr           (*(volatile uint32_t*)0xE30030)
-#define lcd_Palette              ((volatile uint16_t*)0xE30200)
+/* @endcond */
+#define lcd_Palette              ((volatile uint16_t*)0xE30200) /**< LCD palette registers, 512 bytes */
+/* @cond */
 #define lcd_CrsrCtrl             (*(volatile uint8_t*)0xE30C00)
 #define lcd_CrsrConfig           (*(volatile uint8_t*)0xE30C04)
 #define lcd_CrsrPalette0         (*(volatile uint24_t*)0xE30C08)
@@ -242,7 +260,8 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define lcd_CrsrIntAcknowledge   (*(volatile uint8_t*)0xE30C24)
 #define lcd_CrsrIntStatus        (*(volatile uint8_t*)0xE30C28)
 #define lcd_CrsrIntStatusMasked  (*(volatile uint8_t*)0xE30C2C)
-#define lcd_BacklightLevel       (*(volatile uint8_t*)0xF60024) /* Current backlight level of the LCD. 0 is bright. 255 is dark. */
+/* @endcond */
+#define lcd_BacklightLevel       (*(volatile uint8_t*)0xF60024) /**< Current backlight level of the LCD. 0 is bright. 255 is dark. */
 
 /**
  * Width of LCD in pixels
@@ -332,12 +351,12 @@ typedef struct font {
 /**
  * Resets the OS homescreen; accounts for split screen
  */
-#define os_ClrHome() do { _OS(asm_ClrLCD); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
+#define os_ClrHome() do { asm_ClrLCD(); asm_HomeUp(); asm_DrawStatusBar(); } while (0)
 
 /**
  * Resets the OS homescreen fully
  */
-#define os_ClrHomeFull() do { _OS(asm_ClrLCDFull); _OS(asm_HomeUp); _OS(asm_DrawStatusBar); } while (0)
+#define os_ClrHomeFull() do { asm_ClrLCDFull(); asm_HomeUp(); asm_DrawStatusBar(); } while (0)
 
 /**
  * TIOS small font.
@@ -448,7 +467,7 @@ void boot_NewLine(void);
 /**
  * @returns Current battery status
  */
-uint8_t boot_GetBatteryStatus(void);
+tiflags uint8_t boot_GetBatteryStatus(void);
 
 /**
  * Waits for ~10 ms
@@ -458,6 +477,12 @@ void boot_WaitShort(void);
 /*
  * OS Routines
  */
+
+/**
+ * Inserts a new line at the current cursor posistion on the homescreen
+ * Does scroll.
+ */
+tiflags void os_NewLine(void);
 
 /**
  * Disables the OS cursor
@@ -703,10 +728,8 @@ var_t *os_GetAppVarData(const char *name, int *archived);
  * Deletes an AppVar from RAM.
  *
  * @param name Name of the AppVar to delete.
- * @returns A pointer to the AppVar data
- * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
  */
-var_t *os_DelAppVar(const char *name, uint16_t size);
+void os_DelAppVar(const char *name);
 
 /**
  * Locates a symbol in the symtable
@@ -724,6 +747,7 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
  * or the dimension of a list.
  *
  * @param name Name of the var to lookup.
+ * @param size Pointer to store size of variable.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetVarSize(const char *name, size_t *size);
@@ -732,6 +756,8 @@ int os_GetVarSize(const char *name, size_t *size);
  * Gets the dimensions of a matrix.
  *
  * @param name Name of the matrix to lookup.
+ * @param rows Pointer to store number of rows.
+ * @param cols Pointer to store number of columns.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetMatrixDims(const char *name, int *rows, int *cols);
@@ -739,6 +765,7 @@ int os_GetMatrixDims(const char *name, int *rows, int *cols);
 /**
  * Gets a real value from a real list or a complex list where the selected
  * element has no imaginary component.
+ *
  * @param name Name of the list.
  * @param index Element index (1-based).
  * @param value Set tto the value of the selected element.
@@ -748,6 +775,7 @@ int os_GetRealListElement(const char *name, int index, real_t *value);
 
 /**
  * Gets a real value from a matrix.
+ *
  * @param name Name of the matrix.
  * @param row Element row (1-based).
  * @param col Element col (1-based).
@@ -759,6 +787,8 @@ int os_GetMatrixElement(const char *name, int row, int col, real_t *value);
 /**
  * Gets the real value of a real variable or a complex variable with
  * no imaginary component.
+ *
+ * @param name Name of TIOS variable.
  * @param value Set to the value of the variable.
  * @return TIOS System Error Code or 0 on success.
  */
@@ -767,8 +797,9 @@ int os_GetRealVar(const char *name, real_t *value);
 /**
  * If list \p name doesn't exist, create it with \p dim elements, otherwise
  * resize the list, with new elements being set to 0.
+ *
  * @param name Name of the list to resize.
- * @param rows New list dimension.
+ * @param dim New list dimension.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_SetListDim(const char *name, int dim);
@@ -776,6 +807,7 @@ int os_SetListDim(const char *name, int dim);
 /**
  * If matrix \p name doesn't exist, create it with dimensions \p rows and
  * \p cols, otherwise resize the matrix, with new elements being set to 0.
+ *
  * @param name Name of the matrix to resize.
  * @param rows New row dimension.
  * @param cols New col dimension.
@@ -786,6 +818,7 @@ int os_SetMatrixDims(const char *name, int rows, int cols);
 /**
  * Sets a list element to a real value.  If the list doesn't exist, then index
  * must be 1 and it creates a 1 element list.
+ *
  * @param name Name of the list.
  * @param index Element index (1-based).
  * @param value The value to set to the selected element.
@@ -795,6 +828,7 @@ int os_SetRealListElement(const char *name, int index, const real_t *value);
 
 /**
  * Sets a matrix element to a real value.
+ *
  * @param name Name of the matrix.
  * @param row Element row (1-based).
  * @param col Element col (1-based).
@@ -805,6 +839,8 @@ int os_SetMatrixElement(const char *name, int row, int col, const real_t *value)
 
 /**
  * Sets a variable to a real value, creating it if it doesn't exist.
+ *
+ * @param name Name of variable to lookup.
  * @param value The value to set the variable to.
  * @return TIOS System Error Code or 0 on success.
  */
@@ -828,6 +864,7 @@ void *os_GetAnsData(uint8_t *type);
 real_t os_RealCopy(const real_t *src);
 
 /* Unary operations used to interact with the OS math functions */
+/* @cond */
 real_t os_RealAcosRad(const real_t *arg);
 real_t os_RealAsinRad(const real_t *arg);
 real_t os_RealAtanRad(const real_t *arg);
@@ -846,8 +883,10 @@ real_t os_RealSqrt(const real_t *arg);
 real_t os_RealTanRad(const real_t *arg);
 real_t os_RealInt(const real_t *arg);
 cplx_t os_CplxSquare(const cplx_t *arg);
+/* @endcond */
 
 /* Binary operations used to interact with the OS math functions */
+/* @cond */
 real_t os_RealAdd(const real_t *arg1, const real_t *arg2);
 real_t os_RealDiv(const real_t *arg1, const real_t *arg2);
 real_t os_RealGcd(const real_t *arg1, const real_t *arg2);
@@ -861,10 +900,13 @@ real_t os_RealPow(const real_t *base, const real_t *exp);
 real_t os_RealRandInt(const real_t *min, const real_t *max);
 real_t os_RealMod(const real_t *arg1, const real_t *arg2);
 real_t os_RealSub(const real_t *arg1, const real_t *arg2);
+/* @endcond */
 
 /**
  * Rounds a real_t
  *
+ * @param arg Real variable.
+ * @param digits Number of digits to round to.
  * @note digits must be in the range 0 - 9
  */
 real_t os_RealRound(const real_t *arg, char digits);
@@ -872,30 +914,40 @@ real_t os_RealRound(const real_t *arg, char digits);
 /**
  * Compares two real_t
  *
+ * @param arg1 Real variable 1.
+ * @param arg2 Real variable 2.
  * @returns -1, 0, or 1 depending on the comparison
  */
 int os_RealCompare(const real_t *arg1, const real_t *arg2);
 
 /**
  * Converts a real_t to an integer
+ *
+ * @param arg Real variable.
  * @note Saturates on overflow
  */
 int24_t os_RealToInt24(const real_t *arg);
 
 /**
  * Converts an integer to a real_t
+ *
+ * @param arg Integer value.
  * @note Saturates on overflow
  */
-real_t os_Int24ToReal(int24_t arg);
+tiflags real_t os_Int24ToReal(int24_t arg);
 
 /**
  * Converts a real_t to a float
+ *
+ * @param arg Real variable.
  * @note Saturates on overflow
  */
 float os_RealToFloat(const real_t *arg);
 
 /**
  * Converts an float to a real_t
+ *
+ * @param arg Float value.
  * @note Saturates on overflow
  */
 real_t os_FloatToReal(float arg);
@@ -1058,6 +1110,83 @@ int8_t os_MSDWrite(uint8_t lun, uint8_t blockCount, uint32_t lba, uint24_t block
 int8_t os_USBGetRequestStatus(void);
 
 /**
+ * Executes the assembly routine _ForceCmdNoChar
+ */
+void os_ForceCmdNoChar(void);
+
+/**
+ * Inserts a new line at the current cursor posistion on the homescreen
+ * Does scroll.
+ */
+tiflags void os_NewLine(void);
+
+/**
+ * Routine to scroll homescreen up
+ */
+tiflags void os_MoveUp(void);
+
+/**
+ * Routine to scroll homescreen down
+ */
+tiflags void os_MoveDown(void);
+
+/**
+ * Routine to move row and column posistion to (0,0)
+ */
+tiflags void os_HomeUp(void);
+
+/**
+ * Routine to turn on the Run Indicator
+ */
+tiflags void os_RunIndicOn(void);
+
+/**
+ * Routine to turn off the Run Indicator
+ */
+tiflags void os_RunIndicOff(void);
+
+/**
+ * Routine to turn off APD
+ */
+tiflags void os_DisableAPD(void);
+
+/**
+ * Routine to turn on APD
+ */
+tiflags void os_EnableAPD(void);
+
+/**
+ * Routine checks the amount of free archive
+ */
+tiflags void os_ArcChk(void);
+
+/**
+ * Routine to clear the homescreen lcd
+ */
+tiflags void os_ClrLCDFull(void);
+
+/**
+ * Routine to clear the homescreen lcd.
+ * Accounts for split screen
+ */
+tiflags void os_ClrLCD(void);
+
+/**
+ * Routine to redraw the status bar
+ */
+tiflags void os_DrawStatusBar(void);
+
+/**
+ * Invalidate and clear stat variables
+ */
+tiflags void os_DelRes(void);
+
+/**
+ * Invalidate and clear text shadow area
+ */
+tiflags void os_ClrTxtShd(void);
+
+/**
  * Runs the calulator at 6 MHz
  */
 void boot_Set6MHzMode(void);
@@ -1077,88 +1206,7 @@ void boot_Set6MHzModeI(void);
  */
 void boot_Set48MHzModeI(void);
 
-/**
- * Executes the assembly routine _ForceCmdNoChar
- */
-void os_ForceCmdNoChar(void);
-
-/**
- * Use this function to call assembly functions in the OS and Bootcode
- * i.e. _OS( asm_ArcChk );
- */
-void _OS(void (*function)(void));
-
-/**
- * Inserts a new line at the current cursor posistion on the homescreen
- * Does scroll.
- */
-void asm_NewLine(void);
-
-/**
- * Assembly routine to scroll homescreen up
- */
-void asm_MoveUp(void);
-
-/**
- * Assembly routine to scroll homescreen down
- */
-void asm_MoveDown(void);
-
-/**
- * Assembly routine to move row and column posistion to (0,0)
- */
-void asm_HomeUp(void);
-
-/**
- * Assembly routine to turn on the Run Indicator
- */
-void asm_RunIndicOn(void);
-
-/**
- * Assembly routine to turn off the Run Indicator
- */
-void asm_RunIndicOff(void);
-
-/**
- * Assembly routine to turn off APD
- */
-void asm_DisableAPD(void);
-
-/**
- * Assembly routine to turn on APD
- */
-void asm_EnableAPD(void);
-
-/**
- * Assembly routine checks the amount of free archive
- */
-void asm_ArcChk(void);
-
-/**
- * Assembly routine to clear the homescreen lcd
- */
-void asm_ClrLCDFull(void);
-
-/**
- * Assembly routine to clear the homescreen lcd.
- * Accounts for split screen
- */
-void asm_ClrLCD(void);
-
-/**
- * Assembly routine to redraw the status bar
- */
-void asm_DrawStatusBar(void);
-
-/**
- * Invalidate and clear stat variables
- */
-void asm_DelRes(void);
-
-/**
- * Invalidate and clear text shadow area
- */
-void asm_ClrTxtShd(void);
+#undef tiflags
 
 /**
  * Colors used by the OS
@@ -1181,6 +1229,12 @@ typedef enum {
     OS_COLOR_DARKGRAY
 } os_colors_t;
 
+#define os_TextShadow        ((uint8_t*)0xD006C0)          /**< Text buffer, 260 bytes. */
+#define os_AsmPrgmSize       (*(uint16_t*)0xD0118C)        /**< Current size of executing program. */
+#define os_PenCol            (*(uint24_t*)0xD008D2)        /**< Small font column location. */
+#define os_PenRow            (*(uint8_t*)0xD008D5)         /**< Small font row location. */
+
+/* @cond */
 #define os_RamStart          ((uint8_t*)0xD00000)
 #define os_Flags             ((uint8_t*)0xD00080)
 #define os_TextFlags         (*(uint8_t*)0xD00080)
@@ -1214,8 +1268,6 @@ typedef enum {
 #define os_ProgToEdit        ((char*)0xD0065B)
 #define os_NameBuff          ((char*)0xD00663)
 
-#define os_TextShadow        ((uint8_t*)0xD006C0)          /**< Text buffer 260 bytes */
-
 #define os_PromptRow         (*(uint8_t*)0xD00800)
 #define os_PromptCol         (*(uint8_t*)0xD00801)
 #define os_PromptIns         (*(uint8_t*)0xD00802)
@@ -1223,11 +1275,7 @@ typedef enum {
 #define os_PromptRet         (*(uint8_t*)0xD00804)
 #define os_PromptValid       (*(uint8_t*)0xD00807)
 
-#define os_PenCol            (*(uint24_t*)0xD008D2)        /**< Small font column location */
-#define os_PenRow            (*(uint8_t*)0xD008D5)         /**< Small font row location */
-
 #define os_StatVars          ((uint8_t*)0xD01191)
-#define os_AsmPrgmSize       (*(uint16_t*)0xD0118C)        /**< Current size of executing program */
 
 #define os_uXMin             (*(real_t*)0xD01D61)
 #define os_uXMax             (*(real_t*)0xD01D6A)
@@ -2319,6 +2367,22 @@ typedef enum {
 #define prgm_CleanUp()
 #define pgrm_CleanUp()
 #define memset_fast memset
+#define _OS(function) function()
+#define asm_NewLine os_NewLine
+#define asm_MoveUp os_MoveUp
+#define asm_MoveDown os_MoveDown
+#define asm_HomeUp os_HomeUp
+#define asm_RunIndicOn os_RunIndicOn
+#define asm_RunIndicOff os_RunIndicOff
+#define asm_DisableAPD os_DisableAPD
+#define asm_EnableAPD os_EnableAPD
+#define asm_ArcChk os_ArcChk
+#define asm_ClrLCDFull os_ClrLCDFull
+#define asm_ClrLCD os_ClrLCD
+#define asm_DrawStatusBar os_DrawStatusBar
+#define asm_DelRes os_DelRes
+#define asm_ClrTxtShd os_ClrTxtShd
+/* @endcond */
 
 #ifdef __cplusplus
 }

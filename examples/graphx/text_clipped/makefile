@@ -1,17 +1,20 @@
 # ----------------------------
-# Program Options
+# Makefile Options
 # ----------------------------
 
-NAME         ?= DEMO
-ICON         ?= icon.png
-DESCRIPTION  ?= "CE C SDK Demo"
-COMPRESSED   ?= NO
-ARCHIVED     ?= NO
+NAME ?= DEMO
+ICON ?= icon.png
+DESCRIPTION ?= "CE C Toolchain Demo"
+COMPRESSED ?= NO
+ARCHIVED ?= NO
+
+CFLAGS ?= -Wall -Wextra -Oz
+CXXFLAGS ?= -Wall -Wextra -Oz
 
 # ----------------------------
-# Debug Options
-# ----------------------------
 
-OUTPUT_MAP   ?= NO
+ifndef CEDEV
+$(error CEDEV environment path variable is not set)
+endif
 
-include $(CEDEV)/include/.makefile
+include $(CEDEV)/meta/makefile.mk

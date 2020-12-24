@@ -11,8 +11,11 @@
 #define pio2  1.57079632679490
 
 double asin(double arg) {
+    return asinf(arg);
+}
 
-	double sign, temp;
+float asinf(float arg) {
+	float sign, temp;
 
 	sign = 1.;
 	if(arg < 0) {

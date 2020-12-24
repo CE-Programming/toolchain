@@ -24,12 +24,11 @@
 *	nothing
 *
 *************************************************/
-void *bsearch(char *key,
-              char *base,
-              size_t num,
-              size_t width,
-              int (*comp)(void *,void *))
+void *bsearch(void *keyp, void *ptr, size_t num, size_t width,
+              int (*comp)(const void *, const void *))
 {
+  char *key = keyp;
+  char *base = ptr;
   unsigned int mid;
   unsigned int low;
   unsigned int high;

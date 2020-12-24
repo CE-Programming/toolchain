@@ -1,0 +1,28 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CSTDDEF
+#define _EZCXX_CSTDDEF
+
+#include <stddef.h>
+
+#pragma GCC system_header
+
+namespace std {
+
+using ::ptrdiff_t;
+using ::size_t;
+using ::max_align_t;
+using nullptr_t = decltype(nullptr);
+
+enum class byte : unsigned char {};
+
+constexpr byte  operator| (byte __lhs, byte __rhs) noexcept { return byte(char(__lhs) | char(__rhs)); }
+constexpr byte& operator|=(byte& __lhs, byte __rhs) noexcept { return __lhs = __lhs | __rhs; }
+constexpr byte  operator& (byte __lhs, byte __rhs) noexcept { return byte(char(__lhs) & char(__rhs)); }
+constexpr byte& operator&=(byte& __lhs, byte __rhs) noexcept { return __lhs = __lhs & __rhs; }
+constexpr byte  operator^ (byte __lhs, byte __rhs) noexcept { return byte(char(__lhs) ^ char(__rhs)); }
+constexpr byte& operator^=(byte& __lhs, byte __rhs) noexcept { return __lhs = __lhs ^ __rhs; }
+constexpr byte  operator~ (byte __rhs) noexcept { return byte(~char(__rhs)); }
+
+} // namespace std
+
+#endif // _EZCXX_CSTDDEF

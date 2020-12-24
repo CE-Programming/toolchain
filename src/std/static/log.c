@@ -26,16 +26,21 @@
 #define	q1	0.194809660700890e2
 #define	q2	-0.891110902798312e1
 
-double log( double arg )
+double log(double arg)
+{
+    return logf(arg);
+}
+
+float logf(float arg)
 {
 	double x,z, zsq, temp;
 	int exp;
 
-	if ( arg <= 0.0 ){
+	if (arg <= 0.0) {
 		errno = EDOM;
-		return -HUGE_VAL;
+		return -HUGE_VALF;
 	}
-    x = frexp( arg, & exp );
+    x = frexpf(arg, & exp);
 	if ( x < sqrto2 ){
 		x *= 2;
 		exp--;

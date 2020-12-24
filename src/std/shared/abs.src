@@ -1,8 +1,7 @@
-	.def	_abs
-	.assume adl=1
-	
-;int abs(int);
+; int abs(int);
+        assume  adl=1
 
+	public  _abs
 _abs:
 	pop	hl
 	pop	de
@@ -14,4 +13,3 @@ _abs:
 	ret	p
 	ex	de,hl
 	ret
-

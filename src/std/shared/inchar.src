@@ -1,0 +1,26 @@
+	assume	adl = 1
+
+	weak	_inchar
+_inchar:
+    	ld	iy,$d00080	; ti.flags
+.getchar:
+	call	$2014C		; ti.GetCSC
+	or	a,a
+	jr	z,.getchar
+	sbc	hl,hl
+	ld	l,a
+	ld	de,.lut_char
+    	add	hl,de
+	ld	a,(hl)
+	or	a,a
+	jr	z,_inchar
+	ret
+
+.lut_char:
+	db	0,0,0,0,0,0,0,0,0,10		;
+	db	0,'WRMH',0,0   			; + - × ÷ ^ undef
+	db	0,'Z'+ 1,'VQLG',0,0 		; (-) 3 6 9 ) TAN VARS undef
+	db	0,'ZUPKFC',0   			; . 2 5 8 ( COS PRGM STAT
+	db	' YTOJEBX',0			; 0 1 4 7 , SIN APPS XT?n undef
+	db	'XSNIDA'			; STO LN LOG x2 x-1 MATH
+	db	0,0,0,0,0,0,0,0,0,0		;

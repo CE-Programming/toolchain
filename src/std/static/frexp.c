@@ -29,6 +29,12 @@ enum
     exponent_min   = 0
 };
 
+double frexp(double value, int *pExponent)
+{
+    return frexpf(value, pExponent);
+}
+
+
 // frexp - Standard C library routine
 // frexp returns the exponent and mantissa of its floating point
 // argument.
@@ -41,7 +47,7 @@ enum
 //   - a floating point number between 0.5 and 1.0 (or zero if
 //     the input argument is zero)
 //
-double frexp( double value, int *pExponent )
+float frexpf(float value, int *pExponent)
 {
     Ieee754 floating;
     long    exponentBits = 0;

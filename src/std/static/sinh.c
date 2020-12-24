@@ -31,7 +31,11 @@
 #define q2  -0.173678953558234e+3
 
 double sinh(double arg) {
-	double temp, argsq;
+    return sinhf(arg);
+}
+
+float sinhf(float arg) {
+	float temp, argsq;
 	register int sign;
 
 	sign = 1;
@@ -41,7 +45,7 @@ double sinh(double arg) {
 	}
 
 	if(arg > 21.) {
-		temp = exp(arg)/2;
+		temp = expf(arg)/2;
 		if (sign>0)
 			return(temp);
 		else
@@ -49,29 +53,11 @@ double sinh(double arg) {
 	}
 
 	if(arg > 0.5) {
-		return(sign*(exp(arg) - exp(-arg))/2);
+		return(sign*(expf(arg) - expf(-arg))/2);
 	}
 
 	argsq = arg*arg;
 	temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0)*arg;
 	temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
 	return(sign*temp);
-}
-
-double cosh(double arg) {
-	double val;
-
-	if(arg < 0) {
-		arg = -arg;
-	}
-
-	val = exp(arg);
-
-	if(arg > 21.) {
-		return(val/2);
-	}
-
-	val += exp(-arg);
-	val /= 2;
-	return(val);
 }

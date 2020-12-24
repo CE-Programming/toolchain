@@ -1,0 +1,84 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|100",
+    "hashWait|1",
+    "hashWait|2",
+    "key|enter",
+    "delay|1000",
+    "hashWait|3",
+    "key|enter",
+    "delay|1000",
+    "hashWait|4",
+    "key|enter",
+    "delay|1000",
+    "hashWait|5",
+    "key|enter",
+    "delay|1000",
+    "hashWait|6",
+    "key|enter",
+    "hashWait|7"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test initial display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "328D511E" ]
+    },
+    "2":
+    {
+      "description": "Test lighten/darken fade, 0% progress",
+      "start": "lcdPalette",
+      "size": "8",
+      "expected_CRCs": [ "41C3BFF8" ]
+    },
+    "3":
+    {
+      "description": "Test lighten/darken fade, 25% progress",
+      "start": "lcdPalette",
+      "size": "8",
+      "expected_CRCs": [ "5F64F889" ]
+    },
+    "4":
+    {
+      "description": "Test lighten/darken fade, 50% progress",
+      "start": "lcdPalette",
+      "size": "8",
+      "expected_CRCs": [ "C48CEF7C" ]
+    },
+    "5":
+    {
+      "description": "Test lighten/darken fade, 75% progress",
+      "start": "lcdPalette",
+      "size": "8",
+      "expected_CRCs": [ "81FEDD4E" ]
+    },
+    "6":
+    {
+      "description": "Test lighten/darken fade, 100% progress",
+      "start": "lcdPalette",
+      "size": "8",
+      "expected_CRCs": [ "B451E096" ]
+    },
+    "7":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}

@@ -1,11 +1,8 @@
-	.ref __frameset0
-	.ref _strtod
-	.def _atof
-	.assume adl=1
+	assume	adl=1
 
-; double atof(char *str);
-
-_atof:
+	public	_atoff, _atof
+_atof := _atoff
+_atoff:
 	pop	hl
 	pop	bc
 	push	bc
@@ -18,3 +15,7 @@ _atof:
 	pop	bc
 	pop	hl
 	ret
+
+	extern	__frameset0
+	extern	_strtod
+

@@ -10,3 +10,4 @@
 [submodule "tools/convimg"]
 	path = tools/convimg
 	url = https://github.com/mateoconlechuga/convimg.git
+	ignore = dirty

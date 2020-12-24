@@ -5,11 +5,9 @@
 ;	div_t div(int numer,int denom);
 ; 
 ;-------------------------------------------------------------------------
-	.def _div
-	.ref __idivs
-	.ref __irems
-	.assume adl=1
+        assume  adl=1
 
+	public	_div
 _div:
 	push	af
 	push	bc
@@ -28,7 +26,8 @@ _div:
 	ex	de,hl 		; de= quotient
 	pop	hl		; hl=val of numerator
 	call	__irems
-	ld	bc,hl
+	push	hl
+	pop	bc
 
 	ld	hl,15
 	add	hl,sp
@@ -49,6 +48,5 @@ _div:
 
 	ret
 
-
-
-
+	extern	__idivs
+	extern	__irems

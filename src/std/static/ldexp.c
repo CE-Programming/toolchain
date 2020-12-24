@@ -30,6 +30,11 @@ enum
     exponent_min   = 0
 };
 
+double ldexp(double value, int power)
+{
+    return ldexpf(value, power);
+}
+
 // ldexp - Standard C library routine
 // ldexp returns the argument multiplied by an integral (positive or
 // negative) power of two.
@@ -41,7 +46,7 @@ enum
 // Returns:
 //   - the argument multiplied by an integral power of two
 //
-double ldexp( double value, int power )
+float ldexpf(float value, int power)
 {
     Ieee754 floating;
     int     exponent;
@@ -56,7 +61,7 @@ double ldexp( double value, int power )
     if ( powerplusexponent > exponent_max )
     {
 		errno = ERANGE;
-        return (floating.bits & (1L << sign_shift)) == 0 ? HUGE_VAL : - HUGE_VAL;
+        return (floating.bits & (1L << sign_shift)) == 0 ? HUGE_VALF : - HUGE_VALF;
     }
     if ( powerplusexponent <= exponent_min )		// CR 3964
     {

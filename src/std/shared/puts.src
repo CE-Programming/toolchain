@@ -1,0 +1,27 @@
+	assume	adl = 1
+
+	public	_puts
+_puts:
+	pop	de
+	ex	(sp),hl
+	push	de
+.loop:
+	ld	a,(hl)
+	or	a,a
+	jr	z,.newline
+	ld	e,a
+	push	hl
+	push	de
+	call	_outchar
+	pop	de
+	pop	hl
+	inc	hl
+	jr	.loop
+.newline:
+	ld	l,10
+	push	hl
+	call	_outchar
+	pop	hl
+	ret
+
+	extern	_outchar

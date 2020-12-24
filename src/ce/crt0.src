@@ -1,0 +1,246 @@
+	assume	adl=1
+
+	section	.text
+	public _errno
+_errno := $d008dc
+
+	section	.header
+	db	$ef,$7b
+	public __init
+__init:
+	db	$00		; C program identifier (nop)
+
+	section	.launcher
+	public	__init_libload
+__init_libload:
+	call	020628h		; _pushop1 to save running program name
+	jr	__tryfind
+__inram:
+	call	021448h		; _arc_unarc
+__tryfind:
+	ld	hl,__libloadname-1
+	call	020320h		; _mov9toop1
+	ld	a,015h		; appvarobj
+	ld	(0D005F8h),a	; op1
+	call	02050Ch		; _chkfindsym
+	jr	c,__notfound
+	call	021F98h		; _chkinram
+	jr	z,__inram	; if in ram, archive libload and search again
+	ld	hl,9+1+__libloadnamelen+2
+	add	hl,de
+	push	hl
+	call	0205C4h		; _popop1 to restore running program name
+	pop	hl		; start of loader (required to be in hl)
+	ld	de,__relocationstart ; start of relocation data
+	jp	(hl)		; jump to the loader -- it should take care of everything else
+__notfound:
+	call	0205C4h		; _popop1 to restore running program name
+	call	020814h		; _clrscrn
+	call	020828h		; _homeup
+	ld	hl,__missingappvar
+	call	0207C0h		; _puts
+	call 	0207F0h		; _newline
+	ld	hl,__webaddress
+	call	0207C0h		; _puts
+	jp	020D8Ch		; _getkey
+
+	extern	__relocationstart
+
+	section	.rodata
+
+	private	__missingappvar
+__missingappvar:
+	db	"Need "
+	private	__libloadname
+__libloadname:
+	db	"LibLoad"
+	private	__libloadnamelen
+__libloadnamelen := $-__libloadname
+	db	0
+	private	__webaddress
+__webaddress:
+	db	"http://tiny.cc/clibs",0
+
+	section	.start
+
+ifextern ___main_argc_argv
+	extern	___main_argc_argv
+	__main := ___main_argc_argv
+else
+	extern	_main
+	__main := _main
+end if
+
+	public __start
+__start:
+	call	0020848h	; _RunInicOff, assumes iy = flags
+	call	00004F4h	; _usb_DisableTimer
+	di			; disable interrupts
+	call	_os_DisableHomeTextBuffer
+	ld	hl,0E00305h
+	push	hl		; save flash wait state control port
+	ld	a,(hl)
+	push	af		; save flash wait states
+	ld	(hl),h		; set flash wait states to 3; 1 was definitely
+				; too low for some calcs, 2 is untested
+	push	iy		; save iy (flags)
+	ld	(__exitsp),sp	; save sp for exiting
+if defined ___main_argc_argv
+__argstemp := 0D120D6h		; saveSScreen+14007
+	call	0020614h	; _PushRealO1
+	ld	de,__argstemp
+	ld	a,e		; Lenter
+	ld	(de),a
+	inc	de
+	ld	hl,0D005F8h+1	; OP1+1
+	call	0020304h	; _Mov8b
+	ld	a,d		; Lspace
+	ld	(de),a
+	inc	de
+	push	de
+	call	0020FF4h	; _AnsName
+	call	002050Ch	; _FindSym
+	ex	de,hl
+	pop	de
+	xor	a,4		; StrngObj
+	jr	nz,__parseansdone
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	jr	__parseansnext
+__parseansloop:
+	inc	hl
+	dec	bc
+	push	hl
+	push	bc
+	push	de
+	call	0020870h	; _Get_Tok_Strng
+	pop	de
+	ld	hl,0D0060Eh	; OP3
+	ldir
+	pop	bc
+	pop	hl
+	bit	2,d
+	jr	nz,__parseansdone
+	ld	a,(hl)
+	call	00204ACh	; _Isa2ByteTok
+	jr	nz,__parseansnext
+	inc	hl
+	dec	bc
+__parseansnext:
+	ld	a,c
+	or	a,b
+	jr	nz,__parseansloop
+__parseansdone:
+	ld	bc,0
+	ld	hl,__argstemp
+	sbc	hl,de
+	add	hl,sp
+	ld	sp,hl
+	ld	hl,(__exitsp)
+	push	bc
+	db	03Eh		; ld a,*
+__argvloop:
+	push	hl
+	inc	bc
+__skipspacesloop:
+	dec	de
+	ld	a,(de)
+	cp	a,020h		; Lspace
+	jr	z,__skipspacesloop
+	dec	hl
+	ld	(hl),0
+__argcopyloop:
+	dec	hl
+	ld	(hl),a
+	dec	de
+	ld	a,(de)
+	cp	a,020h		; Lspace
+	jr	z,__argvloop
+	cp	a,0D6h		; lenter
+	jr	nz,__argcopyloop
+	push	hl
+	sbc	hl,hl
+	add	hl,sp
+	push	hl
+	push	bc
+	call	00205DCh	; _PopRealO1
+end if
+if __len_bss > 0
+if __len_bss = 1
+	xor	a,a
+	ld	(__low_bss),a
+else if __len_bss = 2
+	ld	hl,__low_bss
+	xor	a,a
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+else if __len_bss = 3
+	or	a,a
+	sbc	hl,hl
+	ld	(__low_bss),hl
+else
+	ld	hl,__low_bss
+if __len_bss = 8
+	call	0020368h	; _Zero16D
+else if __len_bss = 11
+	call	0020390h	; _ZeroOP
+else if __len_bss < 256
+	ld	b,__len_bss
+	call	0020394h	; _ClrLp
+else if __len_bss = 256 | __len_bss = 257
+	xor	a,a
+	ld	b,a
+__clearbssloop:
+	ld	(hl),a
+	inc	hl
+	djnz	__clearbssloop
+if __len_bss = 257
+	ld	(hl),a
+end if
+else
+	ld	bc,__len_bss
+	call	00210DCh	; _MemClear
+end if
+end if
+end if
+	call	__main
+	public	__exit
+__exit:
+	ld	sp,0
+	public	__exitsp
+__exitsp := $-3
+	pop	iy		; iy = flags
+	pop	af		; a = original flash wait states
+	ex	(sp),hl		; hl = flash wait state control port,
+				; save exit code
+	ld	(hl),a		; restore flash wait states
+	call	00004F0h	; _usb_ResetTimer
+
+	extern	__low_bss
+	extern	__len_bss
+	extern	_os_DisableHomeTextBuffer
+
+	section	.cleanup
+	public	__cleanup
+__cleanup:
+	call	_os_EnableHomeTextBuffer
+	res	4,(iy+9)	; onInterrupt,(iy+onFlags)
+	set	0,(iy+3)	; graphDraw,(iy+graphFlags)
+	call	020808h		; _ClrLCDFull
+	call	020828h		; _HomeUp
+	call	021A3Ch		; _DrawStatusBar
+
+	extern	_os_EnableHomeTextBuffer
+
+	section	.exit
+	pop	hl		; hl = exit code
+	ret
+
+	public	_exit
+_exit:
+	pop	hl
+	pop	hl
+	jq	__exit
+

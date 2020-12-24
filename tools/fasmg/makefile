@@ -1,62 +1,49 @@
-#----------------------------
-# Makefile
-#----------------------------
+# Copyright (C) 2015-2020
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# common/os specific things
+include $(CURDIR)/../../src/common.mk
+
 ifeq ($(OS),Windows_NT)
-SHELL      =cmd.exe
-NATIVEPATH =$(subst /,\,$(1))
-RM         =del /f 2>nul
-CP         =echo f|xcopy /y
-PREFIX    ?=C:
-NAME       =fasmg.exe
-FASMGP     =windows\$(NAME)
+FASMG_EXE = windows\fasmg.exe
 else
-NAME       =fasmg
+
 ifeq ($(shell uname -s),Darwin)
-FASMGP     =macos/$(NAME)
+FASMG_EXE = macos/fasmg
 else
-FASMGP     =linux/$(NAME)
+FASMG_EXE = linux/fasmg
 endif
-NATIVEPATH =$(subst \,/,$(1))
-RM         =rm -f
-CP         =cp
-PREFIX    ?=$(HOME)
-# This little hack causes the Win32 executable to be copied instead, supporting WSL
+
 ifneq ($(shell uname -r | grep Microsoft),)
-FASMGP     =windows\$(NAME).exe
-ADDEXE     =&& mv $(NAME).exe $(NAME)
-else
-ADDEXE     =&& chmod +x $(NAME)
-endif
+FASMG_EXE = windows\fasmg.exe
 endif
 
-DEV ?=$(call NATIVEPATH,$(PREFIX)/CEdev)
-BIN ?=$(call NATIVEPATH,$(DEV)/bin)
-INC ?=$(call NATIVEPATH,$(DEV)/include/fasmg-ez80/)
+endif
 
-INSTALLLOC :=$(call NATIVEPATH,$(DESTDIR)$(DEV))
+INCLUDE_DIR := $(call NATIVEPATH,../../src/include)
+INCLUDE_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ez80.inc tiformat.inc)
+INSTALL_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ld.alm)
 
-INCDIR     :=$(call NATIVEPATH,../../src/include/)
-FILES      :=$(addprefix $(INCDIR),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
-INCFILES   :=$(addprefix $(INC),ez80.inc ld.fasmg ti84pceg.inc tiformat.inc)
+all:
+	$(Q)$(call COPY,$(INCLUDE_SRC),$(INCLUDE_DIR))
 
-all: $(FILES)
-	$(CP) $(call NATIVEPATH,$(FASMGP)) . $(ADDEXE)
+install:
+	$(Q)$(call MKDIR,$(INSTALL_META))
+	$(Q)$(call MKDIR,$(INSTALL_BIN))
+	$(Q)$(call COPY,$(INSTALL_SRC),$(INSTALL_META))
+	$(Q)$(call COPY,$(FASMG_EXE),$(INSTALL_BIN))
 
-$(FILES):
-	$(CP) $(call NATIVEPATH,fasmg-ez80/$(@F)) $(INCDIR)$(@F)
+.PHONY: all install
 
-clean:
-	$(RM) $(FILES)
-	$(RM) $(NAME)
-
-install: $(INCFILES)
-	$(CP) $(NAME) $(BIN)
-
-$(INCFILES):
-	$(CP) $(call NATIVEPATH,fasmg-ez80/$(@F)) $(INC)$(@F)
-
-uninstall:
-
-.PHONY: all clean install uninstall $(FILES)

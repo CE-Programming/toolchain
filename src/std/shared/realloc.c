@@ -33,11 +33,11 @@ void *realloc(void *ptr,size_t size) {
 			return(ptr);
 		}
 
-		if (p = malloc(size)) {
+		if ((p = malloc(size))) {
 			memcpy(p,ptr,size);
 			free(ptr);
 		}
-		return(p);
+		return p;
 	}
-	return(malloc(size));
+	return malloc(size);
 }

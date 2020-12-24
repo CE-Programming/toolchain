@@ -1,5 +1,5 @@
-#ifndef __ISO646_H
-#define __ISO646_H
+#ifndef _ISO646_H
+#define _ISO646_H
 
 #ifndef __cplusplus
 #define and    &&
@@ -15,4 +15,4 @@
 #define xor_eq ^=
 #endif
 
-#endif
+#endif /* _ISO646_H */

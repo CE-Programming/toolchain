@@ -4,9 +4,7 @@
 ; Dec 2012 by Einar Saukas & Urusergi
 ; "Turbo" version (89 bytes, 25% faster)
 ; ---
-
-	.def	_zx7_Decompress
-	.assume	adl=1
+	assume	adl=1
 
 ; enter : hl = void *src
 ;         de = void *dst
@@ -15,6 +13,7 @@
 ;
 ; uses  : af, bc, de, hl
 
+	public	_zx7_Decompress
 _zx7_Decompress:
         pop     bc
         pop     de
@@ -112,6 +111,3 @@ zx7t_load_bits:
         inc     hl
         rla
         ret
-
-
-	end

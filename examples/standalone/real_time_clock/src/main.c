@@ -23,7 +23,7 @@ int main(void)
         /* Fill the screen with a new color */
         if (rtc_IntStatus & RTC_SEC_INT)
         {
-            memset(lcd_Ram, randInt(0,255), LCD_SIZE);
+            memset((void*)lcd_Ram, randInt(0,255), LCD_SIZE);
             seconds++;
 
             rtc_IntAcknowledge = rtc_IntStatus;

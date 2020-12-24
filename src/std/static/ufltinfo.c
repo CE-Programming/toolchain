@@ -7,7 +7,7 @@
 #include <format.h>
 #include <string.h>
 
-#define BIT_PACKING 0
+#define BIT_PACKING 1
 #if (BIT_PACKING == 1)
 typedef union
 {
@@ -19,6 +19,7 @@ typedef union
   } s;
   long l;
 } ieee_795_float;
+#define EXP(e) (e)
 #else
 typedef union {
   float f;
@@ -65,7 +66,7 @@ typedef unsigned long ureg_t;
 *	exponent to zero and then convert the normalized mantissa to decimal
 *	digits.
 *************************************************/
-void _u_flt_info(float val,struct flt_info * info)
+void _u_flt_info(double val,struct flt_info * info)
 {
   ieee_795_float rep;
   register reg_t exp;		// The base-2 exponent as a signed value.

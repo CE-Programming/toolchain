@@ -1,0 +1,55 @@
+	public	__u_flt_info, __u_flt_rnd, _acosf, _asinf, _atanf, _atan2f, _atoff, _ceilf, _cosf, _coshf, _expf, _fabsf, _floorf, _fmodf, _frexpf, _ldexpf, _logf, _log10f, _modff, _powf, _sinf, _sinhf, _sqrtf, _strtodf, _tanf, _tanhf, _acos, _asin, _atan, _atan2, _atof, _ceil, _cos, _cosh, _exp, _fabs, _floor, _fmod, _frexp, _ldexp, _log, _log10, _modf, _pow, _sin, _sinh, _sqrt, _strtod, _tan, _tanh
+__u_flt_info := 022128h
+__u_flt_rnd  := 02212Ch
+_acosf       := 022100h
+_asinf       := 022104h
+_atanf       := 022108h
+_atan2f      := 02210Ch
+_atoff       := 022110h
+_ceilf       := 022114h
+_cosf        := 02211Ch
+_coshf       := 022134h
+_expf        := 022124h
+_fabsf       := 0220F0h
+_floorf      := 0220F4h
+_fmodf       := 0220FCh
+_frexpf      := 0220D8h
+_ldexpf      := 0220DCh
+_logf        := 0220E4h
+_log10f      := 0220E8h
+_modff       := 0220ECh
+_powf        := 0220F8h
+_sinf        := 022118h
+_sinhf       := 022130h
+_sqrtf       := 02213Ch
+_strtodf     := 0220E0h
+_tanf        := 022120h
+_tanhf       := 022138h
+
+; as of now, floats are essentially doubles
+_acos        := 022100h
+_asin        := 022104h
+_atan        := 022108h
+_atan2       := 02210Ch
+_atof        := 022110h
+_ceil        := 022114h
+_cos         := 02211Ch
+_cosh        := 022134h
+_exp         := 022124h
+_fabs        := 0220F0h
+_floor       := 0220F4h
+_fmod        := 0220FCh
+_frexp       := 0220D8h
+_ldexp       := 0220DCh
+_log         := 0220E4h
+_log10       := 0220E8h
+_modf        := 0220ECh
+_pow         := 0220F8h
+_sin         := 022118h
+_sinh        := 022130h
+_sqrt        := 02213Ch
+_strtod      := 0220E0h
+_tan         := 022120h
+_tanh        := 022138h
+
+

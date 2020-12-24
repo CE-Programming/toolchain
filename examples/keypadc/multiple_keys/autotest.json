@@ -1,0 +1,73 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|200",
+    "hold|left",
+    "delay|500",
+    "hashWait|1",
+    "hold|up",
+    "delay|500",
+    "hashWait|2",
+    "hold|right",
+    "delay|500",
+    "hashWait|3",
+    "hold|down",
+    "delay|500",
+    "hashWait|4",
+    "release|down",
+    "release|right",
+    "release|up",
+    "release|left",
+    "key|2nd",
+    "delay|500",
+    "hashWait|5"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test left",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "BE6FB3A8" ]
+    },
+    "2":
+    {
+      "description": "Test up",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "463225DC" ]
+    },
+    "3":
+    {
+      "description": "Test right",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "AB51F0B1" ]
+    },
+    "4":
+    {
+      "description": "Test down",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "D24E8EC9" ]
+    },
+    "5":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}

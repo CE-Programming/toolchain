@@ -1,10 +1,6 @@
-	.def _strndup
-	.ref __frameset
-	.ref _strlen
-	.ref _malloc
-	.ref _memcpy
-	.assume adl=1
+	assume	adl=1
 
+	public	_strndup
 _strndup:
 	ld	hl,-6
 	call	__frameset
@@ -44,3 +40,8 @@ MallocFail:
 	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	__frameset
+	extern	_strlen
+	extern	_malloc
+	extern	_memcpy

@@ -1,0 +1,6 @@
+	assume	adl = 1
+
+	public	_clock
+_clock:
+	ld	a,-1
+	ret

@@ -1,0 +1,25 @@
+// -*- C++ -*-
+#ifndef _EZCXX_EXCEPTION
+#define _EZCXX_EXCEPTION
+
+#include <__config>
+
+#pragma GCC system_header
+
+namespace std {
+
+#define _EZCXX_EXTEND_EXCEPTION
+#define _EZCXX_DECLARE_EXCEPTION(__name)            \
+    class __name _EZCXX_EXTEND_EXCEPTION {          \
+    public:                                         \
+        _EZCXX_INLINE __name() noexcept {}          \
+        virtual ~__name() noexcept;                 \
+        virtual const char* what() const noexcept;  \
+    }
+_EZCXX_DECLARE_EXCEPTION(exception);
+#define _EZCXX_EXTEND_EXCEPTION : public exception
+_EZCXX_DECLARE_EXCEPTION(bad_exception);
+
+} // namespace std
+
+#endif // _EZCXX_EXCEPTION

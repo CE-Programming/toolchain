@@ -81,8 +81,7 @@ include_library '../graphx/graphx.asm'
 
 
 ;-------------------------------------------------------------------------------
-LcdSize		:= LcdWidth*LcdHeight
-CurrentBuffer	:= mpLcdLpbase
+CurrentBuffer	:= ti.mpLcdLpbase
 TEXT_FG_COLOR	:= 0
 TEXT_BG_COLOR	:= 255
 local2		:= -9
@@ -230,7 +229,7 @@ fontlib_SetWindowFullScreen:
 ;  Nothing
 	ld	hl,_TextDefaultWindow
 	ld	de,_TextXMin
-	jp	_Mov8b
+	jp	ti.Mov8b
 
 
 ;-------------------------------------------------------------------------------
@@ -489,7 +488,7 @@ fontlib_DrawGlyph:
 	push	ix			; _DrawGlyphRaw destroys IX
 ; Compute write pointer
 	ld	hl,(_TextY)
-	ld	h,LcdWidth / 2
+	ld	h,ti.lcdWidth / 2
 	mlt	hl
 	add	hl,hl
 	ld	de,(_TextX)
@@ -669,7 +668,7 @@ smcByte _TextStraightBackgroundColor
 	djnz	.unsetColumnLoop
 
 .columnLoopEnd:
-	ld	hl,LcdWidth - 0		; SMCd to have correct row delta
+	ld	hl,ti.lcdWidth - 0		; SMCd to have correct row delta
 smcByte _TextStraightRowDelta
 	add	hl,de
 	ex	de,hl
@@ -716,7 +715,7 @@ util.DrawEmptyLines:
 	ex	de,hl
 	ret
 .transparentLines:
-	ld	b,LcdWidth / 2
+	ld	b,ti.lcdWidth / 2
 	mlt	bc
 	add	hl,bc
 	add	hl,bc
@@ -774,7 +773,7 @@ fontlib_DrawStringL:
 .restartX:
 ; Compute target drawing address
 	ld	hl,(_TextY)
-	ld	h,LcdWidth / 2
+	ld	h,ti.lcdWidth / 2
 	mlt	hl
 	add	hl,hl
 	ld	bc,(ix + textX)
@@ -1649,7 +1648,7 @@ util.ClearRect:
 	ld	c,b
 ; Compute write pointer
 	ld	hl,(_TextY)
-	ld	h,LcdWidth / 2
+	ld	h,ti.lcdWidth / 2
 	mlt	hl
 	add	hl,hl
 	ld	de,(_TextX)
@@ -1661,7 +1660,7 @@ util.ClearRect:
 ; Do an initial first column
 ; This avoid some awkwardness with loop control and running out of registers
 	ld	a,(_TextStraightBackgroundColor)
-	ld	de,LcdWidth
+	ld	de,ti.lcdWidth
 	call	gfx_Wait
 .loop1:
 	ld	(hl),a
@@ -1678,7 +1677,7 @@ util.ClearRect:
 	lea	de,iy + 1
 	lea	hl,iy + 0
 	ldir
-	ld	de,LcdWidth
+	ld	de,ti.lcdWidth
 	add	iy,de
 	dec	a
 	jr	nz,.loop2
@@ -1697,12 +1696,12 @@ fontlib_ScrollWindowDown:
 ;  None
 ; Returns:
 ;  A = 0
-	ld	de,LcdWidth
+	ld	de,ti.lcdWidth
 	call	.part1
 ; Compute write pointer
 	ld	hl,(_TextYMin)
 	call	.part2
-; Compute read pointer as HL += LcdWidth * CurrentFontHeight
+; Compute read pointer as HL += ti.lcdWidth * CurrentFontHeight
 	add	hl,bc
 	add	hl,bc
 .part3:
@@ -1749,7 +1748,7 @@ fontlib_ScrollWindowDown:
 	jp	fontlib_GetCurrentFontHeight	; A has height
 
 .part2:
-	ld	h,LcdWidth / 2
+	ld	h,ti.lcdWidth / 2
 	mlt	hl
 	add	hl,hl
 	ld	de,(_TextXMin)
@@ -1762,7 +1761,7 @@ fontlib_ScrollWindowDown:
 	add	hl,de
 ; Start computing read pointer
 	ld	c,a
-	ld	b,LcdWidth / 2
+	ld	b,ti.lcdWidth / 2
 	mlt	bc
 	ret
 
@@ -1777,13 +1776,13 @@ fontlib_ScrollWindowUp:
 ;  None
 ; Returns:
 ;  Nothing
-	ld	de,-LcdWidth
+	ld	de,-ti.lcdWidth
 	call	fontlib_ScrollWindowDown.part1
 ; Compute write pointer
 	ld	hl,(_TextYMax)
 	dec	l
 	call	fontlib_ScrollWindowDown.part2
-; Compute read pointer as HL -= LcdWidth * CurrentFontHeight
+; Compute read pointer as HL -= ti.lcdWidth * CurrentFontHeight
 	sbc	hl,bc
 	sbc	hl,bc
 	jr	fontlib_ScrollWindowDown.part3
@@ -1804,11 +1803,11 @@ util.GetFontPackData:
 ;  DE: Pointer to start of "FONTPACK", or garbage on failure
 ;  Carry set if appvar not found, or not a font pack; NC on success
 	dec	hl
-	ld	iy,flags
-	call	_Mov9ToOP1
-	ld	a,AppVarObj
-	ld	(OP1),a
-	call	_ChkFindSym
+	ld	iy,ti.flags
+	call	ti.Mov9ToOP1
+	ld	a,ti.AppVarObj
+	ld	(ti.OP1),a
+	call	ti.ChkFindSym
 	jr	c,.error
 	ex	de,hl
 	ld	a,b
@@ -2051,8 +2050,8 @@ _TextDefaultWindow:
 textDefaultWindow := _TextDefaultWindow - DataBaseAddr
 	dl	0
 	db	0
-	dl	LcdWidth
-	db	LcdHeight
+	dl	ti.lcdWidth
+	db	ti.lcdHeight
 _TextXMin:
 textXMin := _TextXMin - DataBaseAddr
 	dl	0
@@ -2061,10 +2060,10 @@ textYMin := _TextYMin - DataBaseAddr
 	db	0
 _TextXMax:
 textXMax := _TextXMax - DataBaseAddr
-	dl	LcdWidth
+	dl	ti.lcdWidth
 _TextYMax:
 textYMax := _TextYMax - DataBaseAddr
-	db	LcdHeight
+	db	ti.lcdHeight
 _TextX:
 textX := _TextX - DataBaseAddr
 	dl	0

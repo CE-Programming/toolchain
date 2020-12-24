@@ -20,15 +20,20 @@
 *
 *************************************************/
 
+
 double fmod(double x, double y) {
-	double z;
-	double result;
+	return fmodf(x, y);
+}
+
+float fmodf(float x, float y) {
+	float z;
+	float result;
 
 	if (y == 0.0) {
 		return 0;
 	}
 
-	modf(x/y,&z);
+	modff(x/y,&z);
 	result = x - z*y;
 
 	if ((x < 0) && (result > 0)) {

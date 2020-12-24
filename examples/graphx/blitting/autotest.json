@@ -1,0 +1,54 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|300",
+    "hashWait|1",
+    "key|enter",
+    "hashWait|2",
+    "key|enter",
+    "hashWait|3",
+    "key|enter",
+    "hashWait|4"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test offscreen render",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "3132DE74" ]
+    },
+    "2":
+    {
+      "description": "Test blitting bars display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "830291D3" ]
+    },
+    "3":
+    {
+      "description": "Test blitting full display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "EA181DC1" ]
+    },
+    "4":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}

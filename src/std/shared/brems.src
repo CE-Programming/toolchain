@@ -13,10 +13,9 @@
 ; Registers Used:
 ;	
 ;-------------------------------------------------------------------------
-	.ref __bremu
-	.def __brems
-	.assume adl=1
+        assume  adl=1
 
+	public	__brems
 __brems:
 	push	bc
 	ld	b,a
@@ -38,3 +37,5 @@ skip2:
 skip3:
 	pop	bc
 	ret
+
+        extern  __bremu

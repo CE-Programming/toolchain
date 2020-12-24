@@ -13,9 +13,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def __bremu
-	.assume adl=1
+        assume  adl=1
 
+	public	__bremu
 __bremu:
 	push	bc
 	push	hl
@@ -36,4 +36,3 @@ under:
 	pop	hl
 	pop	bc
 	ret
-

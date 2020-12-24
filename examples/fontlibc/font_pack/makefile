@@ -1,35 +1,46 @@
 # ----------------------------
-# Set NAME to the program name
-# Set ICON to the png icon file name
-# Set DESCRIPTION to display within a compatible shell
-# Set COMPRESSED to "YES" to create a compressed program
+# Makefile Options
 # ----------------------------
 
-NAME        ?= DEMO
-COMPRESSED  ?= NO
-ICON        ?= iconc.png
-DESCRIPTION ?= "C SDK Demo"
-FONTPACKNAME?=DrSans
+NAME ?= DEMO
+ICON ?= icon.png
+DESCRIPTION ?= "CE C Toolchain Demo"
+COMPRESSED ?= NO
+ARCHIVED ?= NO
+
+CFLAGS ?= -Wall -Wextra -Oz
+CXXFLAGS ?= -Wall -Wextra -Oz
+
+# font options
+FONTPACKNAME ?= DRSANS
+FONTDIR ?= $(SRCDIR)/fonts
+
+DEPS ?= $(BINDIR)/$(FONTPACKNAME).bin $(BINDIR)/$(FONTPACKNAME).8xv
 
 # ----------------------------
 
-include $(CEDEV)/include/.makefile
+ifndef CEDEV
+$(error CEDEV environment path variable is not set)
+endif
 
-$(BINDIR)/$(FONTPACKNAME).bin: $(SRCDIR)/drsans-06-bold.fnt $(SRCDIR)/drsans-06-normal.fnt $(SRCDIR)/drsans-07-bold.fnt $(SRCDIR)/drsans-07-normal.fnt $(SRCDIR)/drsans-09-bold.fnt $(SRCDIR)/drsans-09-normal.fnt
-	convfont -o fontpack -N "Dr. Sans" -P "Calculator 1252" \
+include $(CEDEV)/meta/makefile.mk
+
+# ----------------------------
+
+$(BINDIR)/$(FONTPACKNAME).bin: $(FONTDIR)/drsans-06-bold.fnt $(FONTDIR)/drsans-06-normal.fnt $(FONTDIR)/drsans-07-bold.fnt $(FONTDIR)/drsans-07-normal.fnt $(FONTDIR)/drsans-09-bold.fnt $(FONTDIR)/drsans-09-normal.fnt
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)convfont -o fontpack -N "Dr. Sans" -P "Calculator 1252" \
 	-D "A font designed for maximum readability" \
 	-V "15 April 2019" \
-	-f $(SRCDIR)/drsans-09-bold.fnt   -l 11 -x 5 -c 2 -a 1 -b 1 -w bold -s sans-serif -s upright -s proportional \
-	-f $(SRCDIR)/drsans-09-normal.fnt -l 11 -x 5 -c 2 -a 1 -b 1 -w normal -s 0 \
-	-f $(SRCDIR)/drsans-07-bold.fnt   -l 8  -x 3 -c 1 -a 1 -b 1 -w bold -s 0 \
-	-f $(SRCDIR)/drsans-07-normal.fnt -l 8  -x 3 -c 1 -a 1 -b 1 -w normal -s 0 \
-	-f $(SRCDIR)/drsans-06-bold.fnt   -l 7  -x 3 -c 1 -a 1 -b 1 -w bold -s 0 \
-	-f $(SRCDIR)/drsans-06-normal.fnt -l 7  -x 3 -c 1 -a 1 -b 1 -w normal -s 0 \
+	-f $(FONTDIR)/drsans-09-bold.fnt   -l 11 -x 5 -c 2 -a 1 -b 1 -w bold -s sans-serif -s upright -s proportional \
+	-f $(FONTDIR)/drsans-09-normal.fnt -l 11 -x 5 -c 2 -a 1 -b 1 -w normal -s 0 \
+	-f $(FONTDIR)/drsans-07-bold.fnt   -l 8  -x 3 -c 1 -a 1 -b 1 -w bold -s 0 \
+	-f $(FONTDIR)/drsans-07-normal.fnt -l 8  -x 3 -c 1 -a 1 -b 1 -w normal -s 0 \
+	-f $(FONTDIR)/drsans-06-bold.fnt   -l 7  -x 3 -c 1 -a 1 -b 1 -w bold -s 0 \
+	-f $(FONTDIR)/drsans-06-normal.fnt -l 7  -x 3 -c 1 -a 1 -b 1 -w normal -s 0 \
 	$(BINDIR)/$(FONTPACKNAME).bin
 
 $(BINDIR)/$(FONTPACKNAME).8xv: $(BINDIR)/$(FONTPACKNAME).bin
-	convbin --iformat bin --input $(BINDIR)/$(FONTPACKNAME).bin --oformat 8xv --output $(BINDIR)/$(FONTPACKNAME).8xv --archive --name $(FONTPACKNAME)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)convbin --iformat bin --input $(BINDIR)/$(FONTPACKNAME).bin --oformat 8xv --output $(BINDIR)/$(FONTPACKNAME).8xv --archive --name $(FONTPACKNAME)
 
-all: $(BINDIR)/$(FONTPACKNAME).8xv
-
-.PHONY: clean

@@ -1,24 +1,14 @@
-/*
- *  Copyright (C) 1999-2008 by  Zilog, Inc.
- *  All Rights Reserved
- *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
- */
-#ifndef STDLIB_H
-#define STDLIB_H
+#ifndef _STDLIB_H
+#define _STDLIB_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <cdefs.h>
 
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
+__BEGIN_DECLS
 
-typedef int onexit_t;
-
+#ifndef _WCHAR_T_DEFINED
+#define _WCHAR_T_DEFINED
 #ifndef __cplusplus
-#ifndef WCHAR_T_DEFINED
-#define WCHAR_T_DEFINED
-typedef unsigned short wchar_t;
+typedef __WCHAR_TYPE__ wchar_t;
 #endif
 #endif
 
@@ -32,24 +22,20 @@ typedef struct {
   long rem;
 } ldiv_t;
 
-/* Heap packet header for malloc */
-
-typedef char __align;           /* alignment type */
+typedef char __align;
 union header {
   struct {
-    union header *ptr;          /* next free block */
-    unsigned int size;          /* size of block   */
+    union header *ptr;
+    unsigned int size;
   } s;
   __align x;
 };
 typedef union header _HEADER;
 
-#define EDOM    4               /* domain error */
-#define ERANGE  5               /* range error */
-extern double _huge_val;
-#define HUGE_VAL _huge_val      /* overflow error */
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
 
-#define RAND_MAX 8388607        /* maximum value returned by rand() */
+#define RAND_MAX 8388607
 
 #ifndef SIZE_T_DEFINED
 #define SIZE_T_DEFINED
@@ -60,43 +46,63 @@ typedef unsigned int size_t;
 #define NALLOC 50
 
 #ifndef NULL
-#define NULL    ((void *)0)
+#define NULL ((void *)0)
 #endif
 
-/* Dynamic memory functions */
-void *calloc(size_t, size_t);
-void *malloc(size_t);
-void *realloc(void *, size_t);
-void free(void *);
+void *calloc(size_t nmemb, size_t size) __attribute__((malloc));
 
-/* Character and string functions */
-double atof(char * nptr);
-int atoi(char * nptr);
-long atol(char * nptr);
-double strtod(char * nptr,char ** endptr);
-long strtol(char *nptr,char ** endptr,int base);
-unsigned long strtoul(char *nptr,char ** endptr,int base);
+void *malloc(size_t size) __attribute__((malloc));
 
-/* Random routines */
+void *realloc(void *ptr, size_t size) __attribute__((warn_unused_result));
+
+void free (void *ptr);
+
+double atof(const char *nptr) __attribute__((nonnull(1)));
+
+int atoi(const char *nptr) __attribute__((nonnull(1)));
+
+long atol(const char *nptr) __attribute__((nonnull(1)));
+
+float strtof(const char *__restrict nptr,
+             char **__restrict endptr) __attribute__((nonnull(1)));
+
+double strtod(const char *__restrict nptr,
+              char **__restrict endptr) __attribute__((nonnull(1)));
+
+float strtof(const char *__restrict nptr,
+             char **__restrict endptr) __attribute__((nonnull(1)));
+
+long strtol(const char *__restrict nptr,
+            char **__restrict endptr, int base) __attribute__((nonnull(1)));
+
+unsigned long strtoul(const char *__restrict nptr,
+                      char **__restrict endptr, int base)
+                      __attribute__((nonnull(1)));
+
 void srand(unsigned int seed);
+
 int rand(void);
 
-/* Binary search and quicksort */
-void *bsearch(void * key,void * base, size_t nmemb, size_t size, int (*compar)(void * ,void * ));
-void qsort(void * base,size_t nmemb,size_t size, int (*compar)(void * ,void * ));
+void *bsearch(void *key, void *base, size_t nmemb, size_t size,
+              int (*compar)(const void *, const void *))
+              __attribute__((nonnull(1, 2, 5)));
 
-/* Exit and abort */
-void abort(void);
-void exit(int status);
+void qsort(void *base, size_t nmemb, size_t size,
+           int (*compar)(const void *, const void *))
+           __attribute__((nonnull(1, 4)));
 
-/* Absolutes and division */
+void abort(void) __attribute__((noreturn));
+
+void exit(int status) __attribute__((noreturn));
+
 int abs(int j);
+
 long labs(long j);
-div_t div(int numer,int denom);
+
+div_t div(int numer, int denom);
+
 ldiv_t ldiv(long numer, long denom);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif

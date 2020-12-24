@@ -14,10 +14,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.assume adl=1
-	.def	__frsmuls
-	.ref	__frsmulu
+	assume	adl=1
 
+	public	__frsmuls
 __frsmuls:
 	push	af
 	push	de
@@ -59,3 +58,4 @@ _L2:
 	pop	af
 	ret
 
+	extern	__frsmulu

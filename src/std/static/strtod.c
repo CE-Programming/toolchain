@@ -13,8 +13,12 @@
 #include <stddef.h>
 #include <math.h>
 #include <errno.h>
-//#include <float.h>
 
+double strtod(const char *__restrict nptr,
+              char **__restrict endptr)
+{
+    return strtof(nptr, endptr);
+}
 
 /*************************************************
 *
@@ -29,18 +33,19 @@
 *	the value of the number
 *
 *************************************************/
-double strtod(char * str,char ** endptr)
+float strtof(const char *__restrict nptr,
+             char **__restrict endptr)
 {
   union
   {
-    double d;
+    float d;
     unsigned short s[2];
   }val;
   int frac = 0;
   int exp = 0;
   signed char sign = 1;
   signed char exp_sign = 1;
-  double temp;
+  char *str = (char*)nptr;
 
   while (isspace(*str))
     ++str;
@@ -84,7 +89,7 @@ double strtod(char * str,char ** endptr)
   }
 
   if (endptr)
-    *endptr = str;
+    *endptr = (char*)str;
 
   if (exp_sign < 0 )
      exp = -exp;
@@ -106,7 +111,7 @@ double strtod(char * str,char ** endptr)
     {
        val.d  *= .1;
        if (val.s[1] == 0)
-       { 
+       {
          errno = ERANGE;
          break;
        }
