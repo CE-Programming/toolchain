@@ -3,10 +3,11 @@ name: Win/Mac/Linux
 on:
   push:
     branches:
-      - llvm
+      - master
+      - devel
   pull_request:
     branches:
-      - llvm
+      - devel
 
 jobs:
   build:
