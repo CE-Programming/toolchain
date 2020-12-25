@@ -2,12 +2,11 @@ name: Win/Mac/Linux
 
 on:
   push:
-    branches:
-      - master
-      - devel
+    branches-ignore:
+      - gh-pages
   pull_request:
     branches:
-      - devel
+      - master
 
 jobs:
   build:
