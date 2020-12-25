@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  build:
+  build-and-test:
     strategy:
       fail-fast: false
       matrix:
@@ -164,3 +164,33 @@ jobs:
       - name: Remove Secrets
         if: always()
         run: cmake -E rm -rf secrets
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Install Build Dependencies
+        run: |
+          cmake -E echo >> $${{env.ENV}}GITHUB_PATH $HOME/.local/bin
+          sudo apt-get install -y doxygen
+          pip install sphinx==3.2.1 sphinx_rtd_theme breathe
+
+      - name: Checkout Toolchain
+        uses: actions/checkout@v2.3.1
+        with:
+          persist-credentials: false
+
+      - name: Build Website Documentation
+        run: |
+          cd docs
+          make html
+          cd build/html
+          touch .nojekyll
+
+      - name: Upload Website Documentation
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs/build/html
+          CLEAN: true
