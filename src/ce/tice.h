@@ -225,6 +225,37 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define timer_IntAcknowledge     (*(volatile uint16_t*)0xF20034)  /**< Timer Interrupt Acknowledge register. */
 #define timer_EnableInt          (*(volatile uint16_t*)0xF20038)  /**< Timer Interrupt Enable register. */
 
+#define TIMER_32K               1  /**< Use the 32K clock for timer                         */
+#define TIMER_CPU               0  /**< Use the CPU clock rate for timer                    */
+#define TIMER_0INT              1  /**< Enable an interrupt when 0 is reached for the timer */
+#define TIMER_NOINT             0  /**< Disable interrupts for the timer                    */
+#define TIMER_UP                1  /**< Timer counts up                                     */
+#define TIMER_DOWN              0  /**< Timer counts down                                   */
+
+#define TIMER_MATCH1            (1<<0)  /**< Timer hit the first match value                */
+#define TIMER_MATCH2            (1<<1)  /**< Timer hit the second match value               */
+#define TIMER_RELOADED          (1<<2)  /**< Timer was reloaded (Needs TIMER_0INT enabled)  */
+
+/**
+ * Enables timer \p n with the specified settings
+ */
+#define timer_Enable(n, rate, int, dir) (timer_Control = timer_Control & ~(0x7 << 3 * ((n) - 1) | 1 << ((n) + 8)) | (1 | (rate) << 1 | (int) << 2) << 3 * ((n) - 1) | (dir) << ((n) + 8))
+
+/**
+ * Disables timer \p n
+ */
+#define timer_Disable(n) (timer_Control &= ~(1 << 3 * ((n) - 1)))
+
+/**
+ * Acknowledges an interrupt for timer \p n of type \p type.
+ */
+#define timer_AckInterrupt(n, type) (timer_IntAcknowledge = (type) << 3 * ((n) - 1))
+
+/**
+ * Checks if an interrupt for timer \p n of type \p type has occurred.
+ */
+#define timer_CheckInterrupt(n, type) ((timer_IntStatus >> 3 * ((n) - 1)) & (type))
+
 /* LCD defines */
 #define lcd_Ram                  ((volatile uint16_t*)0xD40000) /**< Base address of memory-mapped RAM for the LCD */
 /* @cond */
