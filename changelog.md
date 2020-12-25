@@ -18,6 +18,8 @@ Starting with this version, the toolchain is now based on LLVM, an open-source r
   - New **fileioc** function: `ti_SetGCBehavior` to set routines to run before and after a garbage collect would be triggered.
   - New **keypadc** defines: many keypad key defines corresponding to the TI-83 Premium CE keypad were added for easier coding
   - New **usb.h** function: `usb_BatteryCharging` to check if the battery is currently charging.
+  - New **time.h** headers and functions: standard features. See [commit](https://github.com/CE-Programming/toolchain/commit/87e62890df312624a792156dadae1f82100652d2) for details.
+  - New **tice.h** defines and macros: easier ways to control timers. See [commit](https://github.com/CE-Programming/toolchain/commit/d0d2f6c65fadadf12229e3125ea10995af498e8f) for details.
   - Revamped v/s/printf functions, now available if needed thanks to a light third-party library, see [docs](https://ce-programming.github.io/toolchain/static/printf.html).
   - New C++ header-only "library" for easily manipulating "TI real" numbers (see [this PR](https://github.com/CE-Programming/toolchain/pull/258)), making some math operations easier. See examples.
   - `abort()` doesn't generate code that would make CEmu open its debugger anymore - you can use the specific debug functions for that now.
