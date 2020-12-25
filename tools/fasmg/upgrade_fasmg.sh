@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# this script currently only runs on linux.
-
-build_fasmg () {
-    .tmp/fasmg/fasmg.x64 .tmp/fasmg/source/$1/$3/fasmg.asm $1/$2
-    chmod -x $1/$2
-}
-
 cd fasmg-ez80
 git checkout main
 git pull origin main
@@ -16,8 +9,12 @@ wget --no-verbose https://flatassembler.net/$(wget --no-verbose https://flatasse
 unzip -od .tmp/fasmg .tmp/fasmg.zip
 chmod +x .tmp/fasmg/fasmg.x64
 
-build_fasmg linux   fasmg      x64
-build_fasmg windows fasmg.exe
-build_fasmg macos   fasmg      x64
+.tmp/fasmg/fasmg.x64 .tmp/fasmg/source/linux/x64/fasmg.asm linux/fasmg
+.tmp/fasmg/fasmg.x64 .tmp/fasmg/source/windows/fasmg.asm windows/fasmg.exe
+.tmp/fasmg/fasmg.x64 .tmp/fasmg/source/macos/x64/fasmg.asm macos/fasmg
+
+chmod +x windows/fasmg.exe
+chmod +x macos/fasmg
+chmod +x linux/fasmg
 
 rm -rf .tmp
