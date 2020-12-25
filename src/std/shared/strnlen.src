@@ -1,7 +1,6 @@
-	.def _strnlen
-	.ref __frameset0
-	.assume adl=1
+	assume	adl=1
 
+	public	_strnlen
 _strnlen:
 	call	__frameset0
 	ld	de,(ix+6)
@@ -25,3 +24,5 @@ ReachedMax:
 	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	__frameset0

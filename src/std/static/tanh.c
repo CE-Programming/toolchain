@@ -18,7 +18,12 @@
 
 double tanh(double arg)
 {
-	double sign;
+    return tanhf(arg);
+}
+
+float tanhf(float arg)
+{
+	float sign;
 
 	sign = 1.;
 	if(arg < 0.){
@@ -29,5 +34,5 @@ double tanh(double arg)
 	if(arg > 21.)
 		return(sign);
 
-	return(sign*sinh(arg)/cosh(arg));
+	return(sign*sinhf(arg)/coshf(arg));
 }

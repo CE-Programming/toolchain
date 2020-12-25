@@ -11,9 +11,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def __bldix
-	.assume adl=1
+        assume  adl=1
 
+	public	__bldix
 __bldix:
         push    ix
         push    af              ; Preserve flags

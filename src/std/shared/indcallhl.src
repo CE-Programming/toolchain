@@ -1,0 +1,5 @@
+	assume	adl=1
+
+	public	__indcallhl
+__indcallhl:
+	jp	(hl)

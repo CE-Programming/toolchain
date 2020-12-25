@@ -1,14 +1,12 @@
-	.def	_isspace
-	.ref	___maptab
-	.assume adl=1
-
 ; original source
 ; int isspace(int c) {
 ; 	if( (unsigned char)c & (unsigned char)0x80 )
 ;		return (0);
 ;	return(__maptab[c] & (unsigned char)(WS));
 ; }
+	assume	adl=1
 
+	public	_isspace
 _isspace:
 	pop	hl
 	pop	de
@@ -26,3 +24,5 @@ _isspace:
 	sbc	hl,hl
 	ld	l,a
 	ret
+
+	extern	___maptab

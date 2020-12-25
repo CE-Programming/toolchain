@@ -1,8 +1,7 @@
-### FileIO Rename Demo
+### Rename Demo
 
-This example demonstrates how to rename previously created files
+Renames a previously created file.
 
 ---
 
-This demo is a part of the C SDK Toolchain for use on the CE.
-
+This demo is part of the CE C SDK Toolchain.

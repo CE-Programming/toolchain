@@ -1,7 +1,8 @@
 #include "fonts.h"
 
 /* This contains the raw data for the font. */
-static const uint8_t test_font_data[] = {
+static const unsigned char test_font_data[] =
+{
 	#include "testfont.inc"
 };
 

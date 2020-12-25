@@ -1,0 +1,18 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CSTDLIB
+#define _EZCXX_CSTDLIB
+
+#include <stdlib.h>
+
+#pragma GCC system_header
+
+namespace std {
+
+using ::abort;
+
+using ::malloc;
+using ::free;
+
+} // namespace std
+
+#endif // _EZCXX_CSTDLIB

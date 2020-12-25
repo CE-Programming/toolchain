@@ -1,0 +1,44 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "hashWait|1",
+    "key|enter",
+    "hashWait|2",
+    "key|enter",
+    "hashWait|3"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test black screen",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "AF74BFCB" ]
+    },
+    "2":
+    {
+      "description": "Test red screen",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "D2E7DAC8" ]
+    },
+    "3":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}

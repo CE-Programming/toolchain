@@ -1,9 +1,7 @@
-	.ref _tolower
-	.def _strncasecmp
-	.assume adl=1
-
 ; int strncasecmp ( const char *str1 , const char *str2 , int len );
+	assume	adl=1
 
+	public	_strncasecmp
 _strncasecmp:
 	push	ix
 	ld	ix,0
@@ -45,3 +43,5 @@ done:
 	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	_tolower

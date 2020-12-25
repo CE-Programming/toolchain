@@ -48,7 +48,7 @@ macro library? name*, version*, magic: <192,193>
 		end macro
 	end iterate
 
-	macro @ez80.word @value*
+	macro @ez80.word @size*, @value*
 		local value, address
 		value = @value
 		address = $
@@ -56,9 +56,9 @@ macro library? name*, version*, magic: <192,193>
 			virtual lib.relocations.area
 				dw address-lib.base
 			end virtual
-			@ez80.word value-lib.base
+			@ez80.word @size, value-lib.base
 		else
-			@ez80.word value
+			@ez80.word @size, value
 		end if
 	end macro
 

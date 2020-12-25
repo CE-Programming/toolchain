@@ -1,0 +1,22 @@
+	assume	adl=1
+
+	public	__lbitrev
+__lbitrev:
+	push	af
+	ld	a,l
+    	call	__bbitrev
+	ld	l,a
+	ld	a,h
+	call	__bbitrev
+	ld	h,a
+	call	$21D5C
+	call	__bbitrev
+	call	$21D70
+	ld	a,e
+	call	__bbitrev
+	ld	e,a
+	pop	af
+	ret
+
+	extern	__bbitrev
+

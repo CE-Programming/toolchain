@@ -12,9 +12,9 @@
 ; Registers Used:
 ;       flags
 ;-------------------------------------------------------------------------
-        .def __bshrs
-	.assume adl=1
+        assume  adl=1
 
+        public	__bshrs
 __bshrs:
         push	bc
         inc	b

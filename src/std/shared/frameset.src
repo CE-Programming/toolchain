@@ -1,6 +1,6 @@
-	.assume adl=1
-	.def	__frameset
-	
+        assume  adl=1
+
+	public	__frameset
 __frameset:
 	pop	de
 	push	ix

@@ -1,12 +1,7 @@
-	.ref __frameset0
-	.ref __lcmpzero
-	.ref __setflag
-	.ref __lneg
-	.def _labs
-	.assume adl=1
-
 ; long labs(long j);
+	assume	adl=1
 
+	public	_labs
 _labs:
 	call	__frameset0
 	ld	hl,(ix+6)
@@ -22,3 +17,8 @@ _labs:
 l_1:	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	__frameset0
+	extern	__lcmpzero
+	extern	__setflag
+	extern	__lneg

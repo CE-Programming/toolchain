@@ -1,0 +1,37 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|300",
+    "hashWait|1",
+    "key|enter",
+    "delay|300",
+    "hashWait|2"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Test show old file and new file",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "94538693" ]
+    },
+    "2":
+    {
+      "description": "Test homescreen cleared",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}

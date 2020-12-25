@@ -1,10 +1,9 @@
 ; ---
 ; uint32_t atomic_load_increasing_32(volatile uint32_t *p)
 ; ---
+	assume	adl=1
 
-	.def	_atomic_load_increasing_32
-	.assume	adl=1
-
+	public	_atomic_load_increasing_32
 _atomic_load_increasing_32:
 	pop	hl
 	ex	(sp),iy

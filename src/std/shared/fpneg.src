@@ -16,9 +16,9 @@
 ;		AuBC:	32-bit IEEE Single Precision.
 ;
 ;--------------------------------------------------------------
-	.def __fneg
-	.assume adl=1
-	
+        assume  adl=1
+
+	public	__fneg
 __fneg:
 	or	a,a
 	jr	nz,__noexit

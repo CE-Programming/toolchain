@@ -5,11 +5,9 @@
 ;	ldiv_t ldiv(long numer, long denom); 
 ;
 ;-------------------------------------------------------------------------
-	.def _ldiv
-	.ref __ldivs
-	.ref __lrems
-	.assume adl=1
+	assume	adl=1
 
+	public	_ldiv
 _ldiv:
 
 	push	bc
@@ -77,3 +75,6 @@ _ldiv:
 	pop	bc
 
 	ret
+
+	extern	__ldivs
+	extern	__lrems

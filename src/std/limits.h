@@ -1,35 +1,32 @@
-/*
- *  Copyright (C) 1999-2008 by  Zilog, Inc.
- *  All Rights Reserved
- *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
- */
-#ifndef LIMITS_H
-#define LIMITS_H
+#ifndef _LIMITS_H
+#define _LIMITS_H
 
-#define CHAR_BIT        8                  /* number of bits in byte       */
-#define SCHAR_MAX       127                /* max value for signed char    */
-#define SCHAR_MIN       (-127-1)           /* min value for signed char    */
-#define UCHAR_MAX       0xFF               /* max value for unsigned char  */
-#ifdef __UNSIGNED_CHARS__
-#define CHAR_MAX        UCHAR_MAX          /* max value for char           */
-#define CHAR_MIN        0                  /* Min value for char           */
-#else
-#define CHAR_MAX        SCHAR_MAX          /* max value for char           */
-#define CHAR_MIN        SCHAR_MIN          /* Min value for char           */
-#endif
+#define    CHAR_BIT     __CHAR_BIT__
+#define   SCHAR_MIN   ~__SCHAR_MAX__
+#define   SCHAR_MAX    __SCHAR_MAX__
+#define   UCHAR_MAX    __UCHAR_MAX__
+#ifndef __CHAR_UNSIGNED__
+# define   CHAR_MIN   ~__SCHAR_MAX__
+# define   CHAR_MAX    __SCHAR_MAX__
+#else /* __CHAR_UNSIGNED__ */
+# define   CHAR_MIN          0
+# define   CHAR_MAX    __UCHAR_MAX__
+#endif /* __CHAR_UNSIGNED__ */
 
-#define SHRT_MAX        32767              /* max value for short int      */
-#define SHRT_MIN        (-32767-1)         /* min value for short int      */
-#define USHRT_MAX        0xFFFF            /* max value for unsigned short */
+#define    SHRT_MIN    ~__SHRT_MAX__
+#define    SHRT_MAX     __SHRT_MAX__
+#define   USHRT_MAX    __USHRT_MAX__
 
-#define INT_MAX         8388607            /* max value for int            */
-#define INT_MIN         (-8388607 - 1)     /* min value for int            */
-#define UINT_MAX        0xFFFFFF           /* max value for unsigned int   */
+#define     INT_MIN     ~__INT_MAX__
+#define     INT_MAX      __INT_MAX__
+#define    UINT_MAX     __UINT_MAX__
 
-#define LONG_MAX        2147483647L        /* max value for long int       */
-#define LONG_MIN        (-2147483647L - 1) /* min value for long int       */
-#define ULONG_MAX       0xFFFFFFFFUL       /* max value for unsigned long  */
+#define    LONG_MIN    ~__LONG_MAX__
+#define    LONG_MAX     __LONG_MAX__
+#define   ULONG_MAX    __ULONG_MAX__
 
-#define MB_LEN_MAX      1                  /* max multibyte char length    */
+#define   LLONG_MIN   ~__LLONG_MAX__
+#define   LLONG_MAX    __LLONG_MAX__
+#define  ULLONG_MAX   __ULLONG_MAX__
 
-#endif
+#endif /* _LIMITS_H */

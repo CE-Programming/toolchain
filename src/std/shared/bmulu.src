@@ -13,9 +13,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def __bmulu
-	.assume adl=1
+        assume  adl=1
 
+	public	__bmulu
 __bmulu:
 	push	bc
 	mlt	bc

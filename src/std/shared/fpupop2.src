@@ -23,9 +23,9 @@
 ; MODIFIES:
 ;		flags
 ;--------------------------------------------------------------
-	.def __fpupop2
-	.assume adl=1
+        assume  adl=1
 
+	public __fpupop2
 __fpupop2:
 	push    bc
 	ld	bc,0800000h

@@ -13,9 +13,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def __bmuls
-	.assume adl=1
+        assume  adl=1
 
+	public	__bmuls
 __bmuls:
 	push	bc
 	ld	c,a

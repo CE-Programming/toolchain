@@ -13,10 +13,9 @@
 ; Registers Used:
 ;	d, e
 ;-------------------------------------------------------------------------
-	.ref __bdivu
-	.def __bdivs
-	.assume adl=1
+        assume  adl=1
 
+	public	__bdivs	
 __bdivs:
 	push	bc
 	xor	a,a
@@ -42,3 +41,4 @@ _L2:
 	pop	hl
 	ret
 
+	extern	__bdivu

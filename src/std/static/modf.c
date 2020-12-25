@@ -29,6 +29,11 @@ enum
     exponent_min   = 0
 };
 
+double modf(double value, double *pIntegral) {
+    // bad casting, but doesn't matter
+    return modff(value, (float*)pIntegral);
+}
+
 /* modf - Standard C library routine
  * modf returns the integral and fractional components of its
  * floating point argument.
@@ -40,7 +45,7 @@ enum
  * Returns:
  *   - the fractional component
  */
-double modf( double value, double *pIntegral ) {
+float modff(float value, float *pIntegral) {
 	Ieee754 integral;
 	int     exponent;
 

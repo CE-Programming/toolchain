@@ -14,9 +14,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.assume adl=1
-	.def	__frimulu
+	assume	adl=1
 
+	public	__frimulu
 __frimulu:
 	push	af
 	push	de

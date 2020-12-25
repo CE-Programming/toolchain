@@ -14,9 +14,9 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.def __frsmulu
-	.assume adl=1
+	assume	adl=1
 
+	public	__frsmulu
 __frsmulu:
 	push	af
 	push	de

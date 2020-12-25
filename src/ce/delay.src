@@ -1,25 +1,23 @@
-
 ; ---
 ; void delay(uint16_t millis)
 ; ---
+	assume	adl=1
 
-	.def	_delay
-	.assume	adl=1
+mpTmrRange    := 0F20000h
 
-mpTmrRange		equ 0F20000h
+tmr2Counter   := 10h
+tmr2Load      := 14h
+tmr2Match1    := 18h
+tmr2Match2    := 1Ch
 
-tmr2Counter		equ 10h
-tmr2Load		equ 14h
-tmr2Match1		equ 18h
-tmr2Match2		equ 1Ch
+tmrCtrl       := 30h
 
-tmrCtrl			equ 30h
+bTmr2Enable   := 3
+bTmr2Crystal  := 4
+bTmr2Overflow := 5
+bTmr2CountUp  := 10
 
-bTmr2Enable		equ 3
-bTmr2Crystal		equ 4
-bTmr2Overflow		equ 5
-bTmr2CountUp		equ 10
-
+	public	_delay
 _delay:
 ; Read argument.
 	pop	de

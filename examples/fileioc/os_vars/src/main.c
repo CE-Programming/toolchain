@@ -1,23 +1,14 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <tice.h>
-
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <fileioc.h>
 
-/* Some function prototypes. Maybe in the future these functions will become a library */
+/* Some function prototypes. Maybe someday a library */
 cplx_t Int24sToCplx(int real, int imag);
 cplx_t FloatsToCplx(float real, float imag);
 cplx_t RealsToCplx(real_t real, real_t imag);
 cplx_t StrsToCplx(char *real, char **real_end, char *imag, char **imag_end);
 
-/* Main Function */
-void main(void) {
+int main(void)
+{
     /* Declare some variables */
     equ_t    *my_equ;
     list_t   *my_list;
@@ -58,10 +49,13 @@ void main(void) {
     matrix_element(my_matrix, 0, 1) = real_2_5;
     ti_SetVar(TI_MATRIX_TYPE, ti_Ans, my_matrix);
     free(my_matrix);
+
+    return 0;
 }
 
 /* Stores some ints to a complex variable type */
-cplx_t Int24sToCplx(int real, int imag) {
+cplx_t Int24sToCplx(int real, int imag)
+{
     cplx_t res;
     res.real = os_Int24ToReal(real);
     res.real.sign |= TI_CPLX_TYPE;
@@ -71,7 +65,8 @@ cplx_t Int24sToCplx(int real, int imag) {
 }
 
 /* Stores some floats to a complex variable type */
-cplx_t FloatsToCplx(float real, float imag) {
+cplx_t FloatsToCplx(float real, float imag)
+{
     cplx_t res;
     res.real = os_FloatToReal(real);
     res.real.sign |= TI_CPLX_TYPE;
@@ -81,7 +76,8 @@ cplx_t FloatsToCplx(float real, float imag) {
 }
 
 /* Converts a pair of reals to a complex number */
-cplx_t RealsToCplx(real_t real, real_t imag) {
+cplx_t RealsToCplx(real_t real, real_t imag)
+{
     cplx_t res;
     res.real = real;
     res.real.sign |= TI_CPLX_TYPE;
@@ -91,7 +87,8 @@ cplx_t RealsToCplx(real_t real, real_t imag) {
 }
 
 /* Converts strings to a complex variable type */
-cplx_t StrsToCplx(char *real, char **real_end, char *imag, char **imag_end) {
+cplx_t StrsToCplx(char *real, char **real_end, char *imag, char **imag_end)
+{
     cplx_t res;
     res.real = os_StrToReal(real, real_end);
     res.real.sign |= TI_CPLX_TYPE;

@@ -7,17 +7,22 @@
 /************************************************************************/
 #include <math.h>
 
+
 double floor(double d) {
-	double fraction;
+	return floorf(d);
+}
+
+float floorf(float d) {
+	float fraction;
 
 	if (d<0.0) {
 		d = -d;
-                fraction = modf(d, (double *)&d);
+                fraction = modff(d, &d);
 		if (fraction != 0.0)
 			d += 1;
 		d = -d;
 	} else {
-                fraction = modf(d, (double *)&d);
+                fraction = modff(d, &d);
 	}
 	return(d);
 }

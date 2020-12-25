@@ -10,17 +10,21 @@
 #include	<errno.h>
 #include	<math.h>
 
-double pow( double arg1, double arg2 ) {
-	double result;
+double pow(double arg1, double arg2) {
+	return powf(arg1, arg2);
+}
+
+float powf(float arg1, float arg2) {
+	float result;
 	long temp;
 
 	if ( arg1 > 0.0 ){
-		return exp( arg2 * log( arg1 ) );
+		return expf( arg2 * log( arg1 ) );
 	}
 	if ( arg1 < 0.0 ){
 		temp = arg2;
 		if ( temp == arg2 ){
-			result = exp( arg2 * log( -arg1 ) );
+			result = expf( arg2 * log( -arg1 ) );
 			return temp & 1 ? -result : result;
 		}
 		errno = EDOM;

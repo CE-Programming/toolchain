@@ -1,0 +1,22 @@
+	assume	adl=1
+
+	public	__isnanf
+__isnanf:
+	call	__frameset0
+	ld	hl,(ix+6)
+	adc	hl,hl
+	jr	z,.nxt
+	ld	hl,(ix+8)
+	add	hl,hl
+.nxt:
+	inc	h
+	ld	hl,0
+	jr	nz,.ret
+	inc	hl
+.ret:
+	ld	sp,ix
+	pop	ix
+	ret
+
+	extern	__frameset0
+

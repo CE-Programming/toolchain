@@ -1,13 +1,9 @@
-	.ref _sinus
-	.ref __frameset0
-	.ref __fcmp
-	.ref __fneg
-	.def _cos
-	.assume adl=1
-	
 ; double cos(double arg);
+	assume	adl=1
 
-_cos:
+	public	_cosf, _cos
+_cos := _cosf
+_cosf:
 	call	__frameset0
 	ld	hl,(ix+6)
 	ld	e,(ix+9)
@@ -31,3 +27,8 @@ l_1:	ld	hl,1
 	ld	sp,ix
 	pop	ix
 	ret
+
+	extern	_sinus
+	extern	__frameset0
+	extern	__fcmp
+	extern	__fneg

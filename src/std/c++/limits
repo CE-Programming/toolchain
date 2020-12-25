@@ -1,0 +1,30 @@
+// -*- C++ -*-
+#ifndef _EZCXX_LIMITS
+#define _EZCXX_LIMITS
+
+#pragma GCC system_header
+
+namespace std {
+
+enum float_denorm_style {
+    denorm_indeterminate = -1,
+    denorm_absent        = 0,
+    denorm_present       = 1
+};
+
+enum float_round_style {
+    round_indeterminate       = -1,
+    round_toward_zero         = 0,
+    round_to_nearest          = 1,
+    round_toward_infinity     = 2,
+    round_toward_neg_infinity = 3
+};
+
+template<class _Tp> class numeric_limits {
+public:
+    static constexpr bool is_specialized = false;
+};
+
+} // namespace std
+
+#endif // _EZCXX_LIMITS

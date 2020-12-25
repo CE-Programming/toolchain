@@ -1,0 +1,43 @@
+// -*- C++ -*-
+#ifndef _EZCXX_NEW
+#define _EZCXX_NEW
+
+#include <__config>
+#include <cstddef>
+#include <exception>
+
+#pragma GCC system_header
+
+namespace std {
+
+struct nothrow_t {};
+extern nothrow_t const nothrow;
+
+_EZCXX_DECLARE_EXCEPTION(bad_alloc);
+
+typedef void (*new_handler)();
+new_handler set_new_handler(new_handler) noexcept;
+new_handler get_new_handler() noexcept;
+
+[[noreturn]] void __throw_bad_alloc();
+
+} // namespace std
+
+[[nodiscard, __gnu__::__malloc__]] void* operator new  (std::size_t);
+[[nodiscard, __gnu__::__malloc__]] void* operator new  (std::size_t, std::nothrow_t const&) noexcept;
+                                   void  operator delete  (void*)                           noexcept;
+                                   void  operator delete  (void*, std::nothrow_t const&)    noexcept;
+                                   void  operator delete  (void*, std::size_t)              noexcept;
+
+[[nodiscard, __gnu__::__malloc__]] void* operator new[](std::size_t);
+[[nodiscard, __gnu__::__malloc__]] void* operator new[](std::size_t, std::nothrow_t const&) noexcept;
+                                   void  operator delete[](void*)                           noexcept;
+                                   void  operator delete[](void*, std::nothrow_t const&)    noexcept;
+                                   void  operator delete[](void*, std::size_t)              noexcept;
+
+_EZCXX_INLINE void* operator new  (std::size_t, void* __ptr) noexcept { return __ptr; }
+_EZCXX_INLINE void* operator new[](std::size_t, void* __ptr) noexcept { return __ptr; }
+_EZCXX_INLINE void  operator delete  (void*, void*)        noexcept {}
+_EZCXX_INLINE void  operator delete[](void*, void*)        noexcept {}
+
+#endif // _EZCXX_NEW

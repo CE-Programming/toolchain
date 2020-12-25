@@ -1,41 +1,31 @@
-#----------------------------
-# Makefile
-#----------------------------
+# Copyright (C) 2015-2020
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# common/os specific things
-ifeq ($(OS),Windows_NT)
-SHELL      = cmd.exe
-NATIVEPATH = $(subst /,\,$(1))
-CP         = xcopy /y
-PREFIX    ?= C:
-else
-NATIVEPATH = $(subst \,/,$(1))
-CP         = cp
-PREFIX    ?= $(HOME)
-endif
+include $(CURDIR)/../common.mk
 
-DEV        ?= $(call NATIVEPATH,$(PREFIX)/CEdev)
-BIN        ?= $(call NATIVEPATH,$(DEV)/bin)
-
-INSTALLLOC := $(call NATIVEPATH,$(DESTDIR)$(DEV))
-LIB_LOC    := $(call NATIVEPATH,$(INSTALLLOC)/lib/shared)
-LOC_H      := $(call NATIVEPATH,$(INSTALLLOC)/include)
-
-LIB_H      := $(wildcard *.h)
-SRC        := $(wildcard *.src)
-
-ifeq ($(OS),Windows_NT)
-COPY_HEADERS = (robocopy . $(LOC_H) $(notdir $(LIB_H)) /njh /njs /ndl /nc /ns) ^& exit 0
-COPY_SRCS = (robocopy . $(LIB_LOC) $(notdir $(SRC)) /njh /njs /ndl /nc /ns) ^& exit 0
-else
-COPY_HEADERS = $(CP) $(LIB_H) $(LOC_H)
-COPY_SRCS = $(CP) $(SRC) $(LIB_LOC)
-endif
+WILDCARD_SRC := $(wildcard *.src)
+WILDCARD_H := $(wildcard *.h *.hpp)
 
 all:
 
 install:
-	$(COPY_HEADERS)
-	$(COPY_SRCS)
+	$(Q)$(call MKDIR,$(INSTALL_H))
+	$(Q)$(call MKDIR,$(INSTALL_SHARED))
+	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_H))
+	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_SHARED))
 
-.PHONY: all clean install
+.PHONY: all install
+

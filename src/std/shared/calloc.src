@@ -1,9 +1,6 @@
-	.ref __imulu
-	.ref _malloc
-	.ref _memset
-	.def _calloc
-	.assume adl=1
+        assume  adl=1
 
+	public _calloc
 _calloc:
 	pop	de
 	pop	bc
@@ -25,3 +22,7 @@ _calloc:
 	pop	de
 	pop	bc
 	ret
+
+	extern	__imulu
+	extern	_malloc
+	extern	_memset

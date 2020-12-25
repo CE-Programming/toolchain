@@ -1,0 +1,16 @@
+	assume	adl = 1
+
+	public	_getchar
+_getchar:
+	call	_inchar
+	ld	l,a
+	rlc	l
+	sbc	hl,hl
+	ld	l,a
+	push	hl
+	call	_outchar
+	pop	hl
+	ret
+
+	extern	_inchar
+	extern	_outchar

@@ -1,9 +1,6 @@
-	.ref _random
-	.def _rand
-	.assume adl=1
+	assume	adl=1
 
-; int rand(void);
-
+	public _rand
 _rand:
 	call	_random
 	ld	de,8388608
@@ -11,3 +8,5 @@ _rand:
 	ret	p
 	add	hl,de
 	ret
+
+	extern  _random

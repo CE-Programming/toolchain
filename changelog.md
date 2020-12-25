@@ -2,10 +2,38 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.8...HEAD)
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v9.0...HEAD)
+
+# [v9.0](https://github.com/CE-Programming/toolchain/releases/tag/v9.0) (2020-12-2x)
+
+**Major release!** 🥂 <img src="https://llvm.org/img/DragonSmall.png" title="llvm" align="right">
+
+Starting with this version, the toolchain is now based on LLVM, an open-source retargetable compiler infrastructure. The [backend](https://github.com/jacobly0/llvm-project) was created by [Jacobly](https://github.com/jacobly0) and the compiler (named clang, which you may see as `ez80-clang` in the toolchain) is now able produce eZ80 assembly from C/C++ source files. This is a major milestone as it allows the CE toolchain to move away from using the legacy Zilog ZDS compiler, which is closed-source, proprietary, only worked on Windows, and contained numerous bugs. Thanks to LLVM, later standards of the C and C++ specifications are supported (you're not stuck with C89 anymore!), code optimization actually works, and the compiler is able to run natively across multiple platforms.
+
+  - Lots of cleanup and improvements to the standard includes and headers in general, made possible by the compiler change mentioned above.
+  - Various changes and improvements to the fasmg linker (written by [Jacobly](https://github.com/jacobly0) as well)
+  - Some "hacks" like `_OS` and `_asm` aren't needed anymore, they are now gone.
+  - Debug info is now produced in the Dwarf format (and source-level debugging support within CEmu is getting closer to being ready!)
+  - The [convimg](https://github.com/mateoconlechuga/convimg) project has been updated to support a new YAML format that is easier for beginners and tooling. The previous toolchain release (v8.8) also used a YAML format, however some slight modifications were made in order to make it standard-compliant. Example `convimg.yaml` conversion files can be found in the examples.
+  - New **fileioc** function: `ti_SetGCBehavior` to set routines to run before and after a garbage collect would be triggered.
+  - New **keypadc** defines: many keypad key defines corresponding to the TI-83 Premium CE keypad were added for easier coding
+  - New **usb.h** function: `usb_BatteryCharging` to check if the battery is currently charging.
+  - Revamped v/s/printf functions, now available if needed thanks to a light third-party library, see [docs](https://ce-programming.github.io/toolchain/static/printf.html).
+  - New C++ header-only "library" for easily manipulating "TI real" numbers (see [this PR](https://github.com/CE-Programming/toolchain/pull/258)), making some math operations easier. See examples.
+  - `abort()` doesn't generate code that would make CEmu open its debugger anymore - you can use the specific debug functions for that now.
+  - Various optimizations in library functions
+  - Various makefile improvements and cleanup (bugfixes, portability...)
+  - Improved autotests for the examples
+  - fasmg got a speed boost thanks to CALM instructions.
+  - Documentation improved and revamped. Available on [online here](http://ce-programming.github.io/toolchain/), which replaces the repo's wiki
+  - The build/CI infrastructure was migrated from Travis to Github Actions.
+
+These massive internal changes *do* mean that some programs might not compile right away anymore, but don't worry, it shouldn't be too difficult to fix your code. Check out the [v9.0 release note](https://github.com/CE-Programming/toolchain/tree/v9.0) for migration tips.
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.8...v9.0)
 
 
-# [v8.8](https://github.com/CE-Programming/toolchain/releases/tag/v8.8) (2020-01-??)
+# [v8.8](https://github.com/CE-Programming/toolchain/releases/tag/v8.8) (2020-01-19)
 
  - Documentation fixes and headers cleanup
  - Fix `gfx_TilePtr` and `gfx_TilePtrMapped`

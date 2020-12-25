@@ -14,10 +14,8 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	.assume adl=1
-	.def	__frimuls
-	.ref	__frimulu
-
+	assume	adl=1
+	public	__frimuls
 __frimuls:
 	push	af
 	push	de
@@ -44,7 +42,8 @@ _L0:
 	sbc	hl,bc
 	add	hl,hl
 _L1:
-	ld	bc,hl
+	push	hl
+	pop	bc
 	ex	de,hl
 	call	__frimulu
 	push	hl
@@ -79,3 +78,5 @@ _L2:
 	pop	de
 	pop	af
 	ret
+
+	extern	__frimulu

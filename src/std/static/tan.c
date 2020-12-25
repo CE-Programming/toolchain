@@ -28,7 +28,12 @@
 
 double tan(double arg)
 {
-	double sign, temp, e, x, xsq;
+    return tanf(arg);
+}
+
+float tanf(float arg)
+{
+	float sign, temp, e, x, xsq;
 	int flag, i;
 
 	flag = 0;
@@ -38,7 +43,7 @@ double tan(double arg)
 		sign = -1.;
 	}
 	arg = arg*invpi;   /*overflow?*/
-        x = modf(arg,(double *)&e);
+        x = modff(arg, &e);
 	i = e;
 	switch(i%4) {
 	case 1:
@@ -68,8 +73,8 @@ double tan(double arg)
 		if(temp == 0.) {
 			errno = ERANGE;
 			if (sign>0)
-				return(HUGE_VAL);
-			return(-HUGE_VAL);
+				return(HUGE_VALF);
+			return(-HUGE_VALF);
 		}
 		temp = 1./temp;
 	}

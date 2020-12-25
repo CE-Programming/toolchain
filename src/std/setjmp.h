@@ -1,21 +1,15 @@
-/*
- *  Copyright (C) 1999-2008 by  Zilog, Inc.
- *  All Rights Reserved
- */
-#ifndef __SETJMP_H
-#define __SETJMP_H
+#ifndef _SETJMP_H
+#define _SETJMP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <cdefs.h>
+
+__BEGIN_DECLS
 
 typedef unsigned char jmp_buf[12];
 
 int setjmp(jmp_buf env);
-void longjmp(jmp_buf env, int val);
+void longjmp(jmp_buf env, int val) __attribute__((noreturn));
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif

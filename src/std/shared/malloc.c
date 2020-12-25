@@ -38,12 +38,12 @@ extern void *_s_sbrk(size_t);
 static void* morecore(size_t nbytes)
 {
     register void *cp;
-    if(cp = _s_sbrk(nbytes))
+    if ((cp = _s_sbrk(nbytes)))
     {
         ((HEADER*)cp)->s.size=nbytes;
         cp = ((HEADER*)cp) + 1;
     }
-    return(cp);
+    return cp;
 }
 
 /*************************************************
@@ -64,14 +64,14 @@ void *malloc(size_t nbytes)
     size_t size = nbytes + sizeof(HEADER);
 
     if (size < nbytes)
-        return NULL;  // Happens on malloc(-1) or like stupidity
+        return NULL;  /* Happens on malloc(-1) or like stupidity */
 
-    for(p=&_alloc_base; q=p->s.ptr; p=q)
+    for(p=&_alloc_base; (q=p->s.ptr); p=q)
     {
         if (q->s.size >= size)
         {
             /* big enough */
-            if (q->s.size <= size+sizeof(HEADER)) 
+            if (q->s.size <= size+sizeof(HEADER))
             {
                 /* exactly enough */
                 p->s.ptr = q->s.ptr;
@@ -87,4 +87,3 @@ void *malloc(size_t nbytes)
     }
     return(morecore(size));
 }
-

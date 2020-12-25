@@ -1,25 +1,16 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <tice.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include <fileioc.h>
 
-/* Function prototypes */
-void printText(int8_t xpos, int8_t ypos, const char *text);
+void PrintText(int8_t xpos, int8_t ypos, const char *text);
 
-/* Main Function */
-void main(void) {
+int main(void)
+{
     /* Declare some variables */
     const char *oldName = "OldFile";
     const char *newName = "NewFile";
     char nameBuffer[10];
     ti_var_t file;
-    bool err = true;
+    bool error = true;
 
     /* Clear the homescreen */
     os_ClrHome();
@@ -31,14 +22,15 @@ void main(void) {
     ti_Delete(oldName);
     ti_Delete(newName);
 
-    do {
+    do
+    {
         /* Create a file with the old name */
         file = ti_Open(oldName, "w");
         if (!file) break;
 
         ti_GetName(nameBuffer, file);
-        printText(0, 0, "Old Name: ");
-        printText(10, 0, nameBuffer);
+        PrintText(0, 0, "Old Name: ");
+        PrintText(10, 0, nameBuffer);
 
         /* Close the old file */
         ti_CloseAll();
@@ -51,27 +43,30 @@ void main(void) {
         if (!file) break;
 
         ti_GetName(nameBuffer, file);
-        printText(0, 1, "New Name: ");
-        printText(10, 1, nameBuffer);
+        PrintText(0, 1, "New Name: ");
+        PrintText(10, 1, nameBuffer);
 
-        err = false;
+        error = false;
     } while (0);
 
     /* Close all open files */
     ti_CloseAll();
 
     /* If an error occured, inform the user */
-    if (err == true) {
-        printText(0, 2, "An error occured");
+    if (error == true)
+    {
+        PrintText(0, 2, "An error occured");
     }
 
-    /* Wait for a keypress */
+    /* Waits for a key */
     while (!os_GetCSC());
+
+    return 0;
 }
 
 /* Draw text on the homescreen at the given X/Y location */
-void printText(int8_t xpos, int8_t ypos, const char *text) {
+void PrintText(int8_t xpos, int8_t ypos, const char *text)
+{
     os_SetCursorPos(ypos, xpos);
     os_PutStrFull(text);
 }
-

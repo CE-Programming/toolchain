@@ -1,0 +1,145 @@
+	assume	adl=1
+
+mpIntStatus := $F00000
+mpIntMask := $F00004
+mpIntAck := $F00008
+mpIntLachEnable := $F0000C
+mpIntXor := $F00010
+mpIntStatusMasked := $F00014
+
+intOnKey := 1
+intTimer1 := 2
+intTimer2 := 4
+intTimer3 := 8
+intOsTimer := $10
+intKbd := $400
+intLcd := $800
+intRtc := $1000
+
+;-------------------------------------------------------------------------------
+	public	_int_Initialize
+_int_Initialize:
+	di
+	ld	de,_lconf
+	ld	hl,mpIntMask
+	ld	bc,16
+	ldir
+	ld	hl,_cconf
+	ld	de,mpIntMask
+	ld	bc,16
+	ldir
+	ld	hl,$D18879
+	ld	de,$C90611
+	ld	(hl),de
+	dec	hl
+	ld	(hl),$ED
+	push	hl
+	inc	d
+	call	$D18878
+	ld	hl,$E10010 or ((_int_Handler shr 8) and $00FF00)
+	ld	de,$C3 or ((_int_Handler shl 8) and $FFFF00)
+	ld	(hl),h
+	inc	hl
+	ld	(hl),de
+	ld	hl,$E30800
+	ld	bc,$401
+	ld	a,$E1
+	call	$0210E0		; _Memset
+	ld	hl,$E308
+	ld	i,hl
+	im	2
+	ld	d,3
+	ret
+
+;-------------------------------------------------------------------------------
+	public	_int_Handler
+_int_Handler:
+	ex	af,af'
+	exx
+	ld	hl,(mpIntStatusMasked)
+	add	hl,hl
+	inc	hl
+	add	hl,hl
+	xor	a,a
+isr_loop:
+	inc	a
+	add	hl,hl
+	jr	nc,isr_loop
+identified:
+	dec	a
+	add	a,a
+	add	a,a
+	ld	(isr_dispatch_smc + 1),a
+	exx
+	ex	af, af'
+isr_dispatch_smc:
+	jr	$+2
+iv_list:
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+	jp	unhandledInt
+unhandledInt:
+	ei
+	ret
+
+;-------------------------------------------------------------------------------
+	public	_int_SetVector
+_int_SetVector:
+	ld	iy,0
+	add	iy,sp
+	ld	a,21
+	ld	l,(iy + 3)
+	sub	a,l
+	ld	l,a
+	ld	h,4
+	mlt	hl
+	ld	de,iv_list + 1
+	add	hl,de
+	ld	de,(iy + 6)
+	ld	(hl),de
+	ret
+
+;-------------------------------------------------------------------------------
+	public	_int_Reset
+_int_Reset:
+	di
+	ld	hl,_lconf
+	ld	de,mpIntMask
+	ld	bc,16
+	ldir
+	im	1
+	ret
+
+	section	.bss
+
+	private	_lconf
+_lconf:
+	rb	16
+
+	section	.data
+
+	private	_cconf
+_cconf:
+	db	$00,$00,$00,$00	; mask
+	db	$ff,$ff,$ff,$ff	; ack
+	db	$00,$00,$00,$00	; latch
+	db	$00,$00,$00,$00	; invert

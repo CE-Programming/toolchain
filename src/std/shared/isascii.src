@@ -1,11 +1,10 @@
-	.def	_isascii
-	.assume adl=1
-	
 ; original source
 ; int isascii(int c) {
 ; 	return c >= 0 && c < 128;
 ; }
+	assume	adl=1
 
+	public	_isascii
 _isascii:
 	pop	de
 	pop	hl
