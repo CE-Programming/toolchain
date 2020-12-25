@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  build-and-test:
+  build:
     strategy:
       fail-fast: false
       matrix:
@@ -20,15 +20,10 @@ jobs:
         if: runner.os == 'Windows'
         run: "cmake -E echo >> $env:GITHUB_ENV ENV=env:"
       - name: Prepare Build Environment
-        run: |
-          cmake -E echo >> $${{env.ENV}}GITHUB_ENV ROM=84pce_515_53.rom
-          cmake -E echo >> $${{env.ENV}}GITHUB_ENV CEDEV=${{github.workspace}}/CEdev
-          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEdev/bin
-          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEmu/tests/autotester
+        run: cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEdev/bin
       - name: Prepare Build Environment
         if: runner.os == 'Windows'
-        run: |
-          cmake -E echo >> $${{env.ENV}}GITHUB_ENV EXE=.exe
+        run: cmake -E echo >> $${{env.ENV}}GITHUB_ENV EXE=.exe
 
       - name: Install Build Dependencies
         if: runner.os == 'Linux'
@@ -54,7 +49,7 @@ jobs:
         run: ez80-clang --version
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
           path: toolchain
           submodules: recursive
@@ -97,47 +92,74 @@ jobs:
           name: installer-${{runner.os}}
           path: toolchain\release\CEdev${{env.EXE}}
 
+  test:
+    needs: build
+    if: github.event_name != 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{matrix.runs-on}}
+    steps:
+      - name: Bootstrap Test Environment
+        if: runner.os == 'Windows'
+        run: "cmake -E echo >> $env:GITHUB_ENV ENV=env:"
+      - name: Prepare Test Environment
+        run: |
+          cmake -E echo >> $${{env.ENV}}GITHUB_ENV ROM=84pce_515_53.rom
+          cmake -E echo >> $${{env.ENV}}GITHUB_ENV CEDEV=${{github.workspace}}/CEdev
+          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEdev/bin
+          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEmu/tests/autotester
+
+      - name: Download CEdev
+        uses: actions/download-artifact@v2
+        with:
+          name: CEdev-${{runner.os}}
+          path: CEdev
+      - name: Download Libraries
+        uses: actions/download-artifact@v2
+        with:
+          name: clibs
+
+      - name: Make Binaries Executable
+        if: runner.os != 'Windows'
+        run: chmod +x ${{env.CEDEV}}/bin/*
+
       - name: Build Examples
         run: make -j4 -C ${{env.CEDEV}}/examples V=1
 
       - name: Checkout CEmu
-        if: github.event_name == 'push'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
           repository: CE-Programming/CEmu
           ref: latest-stable
           path: CEmu
 
       - name: Build CEmu
-        if: github.event_name == 'push'
         run: make -j4 -C CEmu/core
       - name: Build Autotester CLI
-        if: github.event_name == 'push'
         run: make -j4 -C CEmu/tests/autotester
 
       - name: Download Secrets
-        if: github.event_name == 'push'
         id: download-secrets
         uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: https://jacobly.com/CE-Programming/secrets
           location: secrets
       - name: Decrypt Secrets
-        if: github.event_name == 'push'
         env:
           KEY: ${{secrets.SYMMETRIC_KEY_256}}
         run: openssl enc -d -aes-256-cbc -iv d0583d991fcb6c3b05fb8eabc7421fb8 -K "$${{env.ENV}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out secrets/secrets.7z
       - name: Extract Secrets
-        if: github.event_name == 'push'
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           pathSource: secrets/secrets.7z
           pathTarget: secrets
 
       - name: Test examples
-        if: github.event_name == 'push' && runner.os != 'Windows'
+        if: runner.os != 'Windows'
         env:
-          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
+          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/clibs.8xg
           AUTOTESTER_ROM: ${{github.workspace}}/secrets/${{env.ROM}}
         run: |
           failed=0
@@ -148,9 +170,9 @@ jobs:
           done
           exit $failed
       - name: Test examples
-        if: github.event_name == 'push' && runner.os == 'Windows'
+        if: runner.os == 'Windows'
         env:
-          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}\toolchain\clibs.8xg
+          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}\clibs.8xg
           AUTOTESTER_ROM: ${{github.workspace}}\secrets\${{env.ROM}}
         run: |
           $failed = 0
@@ -168,15 +190,21 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
+      - name: Bootstrap Documentation Environment
+        if: runner.os == 'Windows'
+        run: "cmake -E echo >> $env:GITHUB_ENV ENV=env:"
+      - name: Prepare Documentation Environment
+        if: runner.os == 'Linux'
+        run: cmake -E echo >> $${{env.ENV}}GITHUB_PATH $HOME/.local/bin
 
-      - name: Install Build Dependencies
+      - name: Install Documentation Dependencies
+        if: runner.os == 'Linux'
         run: |
-          cmake -E echo >> $${{env.ENV}}GITHUB_PATH $HOME/.local/bin
           sudo apt-get install -y doxygen
           pip install sphinx==3.2.1 sphinx_rtd_theme breathe
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v2.3.1
+        uses: actions/checkout@v2.3.4
         with:
           persist-credentials: false
 
@@ -188,6 +216,7 @@ jobs:
           touch .nojekyll
 
       - name: Upload Website Documentation
+        if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
