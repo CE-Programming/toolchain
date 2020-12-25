@@ -40,4 +40,4 @@ Feel free to open bug reports or feature requests on the `GitHub Issues <https:/
     :caption: Contributing
     :maxdepth: 1
 
-    static/building
+    static/contributing
