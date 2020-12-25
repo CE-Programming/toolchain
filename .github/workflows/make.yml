@@ -80,6 +80,24 @@ jobs:
         env:
           PREFIX: ${{github.workspace}}
         run: make -j4 -C toolchain install release release-libs V=1
+
+      - name: Upload CEdev
+        uses: actions/upload-artifact@v2
+        with:
+          name: CEdev-${{runner.os}}
+          path: CEdev
+      - name: Upload Libraries
+        uses: actions/upload-artifact@v2
+        with:
+          name: clibs
+          path: toolchain/clibs.8xg
+      - name: Upload Windows Installer
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v2
+        with:
+          name: installer-${{runner.os}}
+          path: toolchain\release\CEdev${{env.EXE}}
+
       - name: Build Examples
         run: make -j4 -C ${{env.CEDEV}}/examples V=1
 
@@ -147,22 +165,3 @@ jobs:
       - name: Remove Secrets
         if: always()
         run: cmake -E rm -rf secrets
-
-      - name: Upload CEdev
-        uses: actions/upload-artifact@v2
-        with:
-          name: CEdev-${{runner.os}}
-          path: CEdev
-
-      - name: Upload Libraries
-        uses: actions/upload-artifact@v2
-        with:
-          name: clibs
-          path: toolchain/clibs.8xg
-
-      - name: Upload Windows Installer
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v2
-        with:
-          name: installer-${{runner.os}}
-          path: toolchain\release\CEdev${{env.EXE}}
