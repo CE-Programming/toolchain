@@ -3,30 +3,29 @@
 
 int main(void)
 {
-    unsigned int seconds = 0;
+    uint8_t seconds = 0;
 
     /* Clear the homescreen */
     os_ClrHome();
 
-    /* Configure the RTC */
-    rtc_LoadSeconds = rtc_LoadMinutes = rtc_LoadHours = rtc_LoadDays = 0;
-    rtc_Control = RTC_ENABLE | RTC_LOAD | RTC_SEC_INT_SOURCE;
+    /* Enable the RTC, and enable second change interrupts */
+    rtc_Enable(RTC_SEC_INT);
 
-    /* Wait for the RTC to load in the new values and acknowledge all the interrupts */
+    /* Wait for the RTC to not be busy and acknowledge all interrupts */
     while (rtc_IsBusy());
-    rtc_IntAcknowledge = RTC_INT_MASK;
+    rtc_AckInterrupt(RTC_INT_MASK);
 
     /* Wait until 5 seconds have passed */
     while (seconds < 5)
     {
-        /* If a second passed, increment the second counter */
-        /* Fill the screen with a new color */
-        if (rtc_IntStatus & RTC_SEC_INT)
+        /* If a second passed, increment the second counter and then */
+        /* fill the screen with a fresh color */
+        if (rtc_ChkInterrupt(RTC_SEC_INT))
         {
-            memset((void*)lcd_Ram, randInt(0,255), LCD_SIZE);
+            memset((void*)lcd_Ram, randInt(0, 255), LCD_SIZE);
             seconds++;
 
-            rtc_IntAcknowledge = rtc_IntStatus;
+            rtc_AckInterrupt(RTC_SEC_INT);
         }
     }
 

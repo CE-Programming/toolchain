@@ -1,43 +1,7 @@
 #include <tice.h>
 
-void PrintTime(float elapsed);
-
-int main(void)
-{
-    /* Clear the homescreen */
-    os_ClrHome();
-
-    /* Display an initial time of zero */
-    PrintTime(0.0f);
-
-    /* Disable the timer */
-    timer_Control = TIMER1_DISABLE;
-
-    /* Reset the timer's counter */
-    timer_1_Counter = 0;
-
-    /* Wait for a key press */
-    while (!os_GetCSC());
-
-    /* Enable the timer while setting it to 32768 KHz and making it count up */
-    timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_UP;
-
-    /* Continue running until a key is pressed */
-    do
-    {
-        /* Calculate and print the elapsed time */
-        float elapsed = (float)atomic_load_increasing_32(&timer_1_Counter) / 32768;
-        PrintTime(elapsed);
-    } while (!os_GetCSC());
-
-    /* Wait for a key */
-    while (!os_GetCSC());
-
-    return 0;
-}
-
-/* PrintTime a stopwatch value on the home screen */
-void PrintTime(float elapsed)
+/* Print a stopwatch value on the home screen */
+static void PrintTime(float elapsed)
 {
     /* Float format for printf may be unimplemented, so go through an OS real */
     real_t elapsed_real;
@@ -56,4 +20,39 @@ void PrintTime(float elapsed)
     /* print the string */
     os_SetCursorPos(0, 0);
     os_PutStrFull(str);
+}
+
+int main(void)
+{
+    /* Clear the homescreen */
+    os_ClrHome();
+
+    /* Display an initial time of zero */
+    PrintTime(0.0f);
+
+    /* Disable timer 1 so it doesn't run when setting the configuration */
+    timer_Disable(1);
+
+    /* Reset the timer's counter */
+    timer_Set(1, 0);
+
+    /* Wait for a key press */
+    while (!os_GetCSC());
+
+    /* Enable the timer while setting it to 32768 Hz and making it count up */
+    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_UP);
+
+    /* Continue running until a key is pressed */
+    do
+    {
+        /* Calculate and print the elapsed time */
+        /* timer_Get or timer_GetLow may be used in place of timer_GetSafe */
+        float elapsed = (float)timer_GetSafe(1, TIMER_UP) / 32768;
+        PrintTime(elapsed);
+    } while (!os_GetCSC());
+
+    /* Wait for a key */
+    while (!os_GetCSC());
+
+    return 0;
 }

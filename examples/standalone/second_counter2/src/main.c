@@ -1,30 +1,46 @@
 #include <tice.h>
 #include <stdio.h>
 
-#define ONE_SECOND      (32768/1)
-#define HALF_SECOND     (32768/2)
-#define QUARTER_SECOND  (32768/4)
+#define TIMER_FREQ      32768 /* Frequency of timer in Hz */
+#define ONE_SECOND      (TIMER_FREQ / 1)
+#define HALF_SECOND     (TIMER_FREQ / 2)
+#define QUARTER_SECOND  (TIMER_FREQ / 4)
 
-void reset_counter(void);
+static void reset_counter(void)
+{
+    /* Disable timer 1 so it doesn't run when setting the configuration */
+    timer_Disable(1);
+
+    /* Count for 1 second. The counter will be reloaded once it reaches 0 */
+    timer_Set(1, ONE_SECOND);
+    timer_SetReload(1, ONE_SECOND);
+
+    /* Enable timer 1 */
+    /* Set the timer to use the 32768 Hz clock */
+    /* Trigger an interrupt once the timer reaches 0 and reloads */
+    /* Set the timer to count down */
+    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_DOWN);
+}
 
 int main(void)
 {
     unsigned int count = 0;
     char str[10];
 
-    /* Set the match value to trigger the interrupt in the timer */
-    timer_1_MatchValue_1 = ONE_SECOND;
-
     /* Clear the homescreen */
     os_ClrHome();
+
+    /* Trigger an interrupt when the timer 1's match 1 count is equal to */
+    /* one second. There are 2 match count comparators per timer. */
+    timer_SetMatch(1, TIMER_MATCH(1), ONE_SECOND);
 
     /* Reset the counter */
     reset_counter();
 
     do
     {
-        /* Poll until we reach the match value */
-        if (timer_IntStatus & TIMER1_MATCH1)
+        /* Poll until the match value is detected */
+        if (timer_ChkInterrupt(1, TIMER_MATCH(1)))
         {
             /* Print the count */
             sprintf(str, "%u", count++);
@@ -35,26 +51,10 @@ int main(void)
             reset_counter();
 
             /* Acknowledge the interrupt */
-            timer_IntStatus = TIMER1_MATCH1;
+            timer_AckInterrupt(1, TIMER_MATCH(1));
         }
 
     } while (count < 5);
 
     return 0;
-}
-
-void reset_counter(void)
-{
-    /* Disable the timer so it doesn't run when setting the configuration */
-    timer_Control = TIMER1_DISABLE;
-
-    /* By using the 32768 kHz clock, we can count for a */
-    /* precise interval of time */
-    timer_1_ReloadValue = timer_1_Counter = timer_1_MatchValue_1;
-
-    /* Enable the timer */
-    /* Set the timer to use the 32768 kHz clock */
-    /* Enable an interrupt once the timer reaches 0 */
-    /* Set the timer to count down */
-    timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN;
 }

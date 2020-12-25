@@ -1,9 +1,10 @@
 #include <tice.h>
 #include <stdio.h>
 
-#define ONE_SECOND      (32768/1)
-#define HALF_SECOND     (32768/2)
-#define QUARTER_SECOND  (32768/4)
+#define TIMER_FREQ      32768 /* Frequency of timer in Hz */
+#define ONE_SECOND      (TIMER_FREQ / 1)
+#define HALF_SECOND     (TIMER_FREQ / 2)
+#define QUARTER_SECOND  (TIMER_FREQ / 4)
 
 int main(void)
 {
@@ -13,23 +14,23 @@ int main(void)
     /* Clear the homescreen */
     os_ClrHome();
 
-    /* Disable the timer so it doesn't run when setting the configuration */
-    timer_Control = TIMER1_DISABLE;
+    /* Disable timer 1 so it doesn't run when setting the configuration */
+    timer_Disable(1);
 
-    /* By using the 32768 kHz clock, we can count for exactly 1 second */
-    /* or for a more precise interval of time */
-    timer_1_ReloadValue = timer_1_Counter = ONE_SECOND;
+    /* Count for 1 second. The counter will be reloaded once it reaches 0 */
+    timer_Set(1, ONE_SECOND);
+    timer_SetReload(1, ONE_SECOND);
 
-    /* Enable the timer */
-    /* Set the timer to use the 32768 kHz clock */
-    /* Enable an interrupt once the timer reaches 0 */
+    /* Enable timer 1 */
+    /* Set the timer to use the 32768 Hz clock */
+    /* Trigger an interrupt once the timer reaches 0 and reloads */
     /* Set the timer to count down */
-    timer_Control = TIMER1_ENABLE | TIMER1_32K | TIMER1_0INT | TIMER1_DOWN;
+    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_DOWN);
 
     do
     {
         /* If the timer is reloaded, we reached 0 */
-        if (timer_IntStatus & TIMER1_RELOADED)
+        if (timer_ChkInterrupt(1, TIMER_RELOADED))
         {
             /* Increment number of counts */
             count++;
@@ -40,7 +41,7 @@ int main(void)
             os_PutStrFull(str);
 
             /* Acknowledge the reload */
-            timer_IntAcknowledge = TIMER1_RELOADED;
+            timer_AckInterrupt(1, TIMER_RELOADED);
         }
     } while (!os_GetCSC());
 

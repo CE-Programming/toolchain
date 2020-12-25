@@ -1,12 +1,13 @@
 /**
  * @file
- * @authors Matt "MateoConLechuga" Waltz
- * @authors Jacob "jacobly" Young
+ * @authors
+ * Matt "MateoConLechuga" Waltz\n
+ * Jacob "jacobly" Young
  * @brief Core CE define file
  */
 
-#ifndef H_TICE
-#define H_TICE
+#ifndef _TICE_H
+#define _TICE_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -16,247 +17,336 @@
 extern "C" {
 #endif
 
-/**
- * Marks a function as needing the iy register to point to the OS flags before calling.
- */
+/* @cond */
 #define tiflags __attribute__((__tiflags__))
-
-/*
- * Hardware & custom macros/functions
- */
-
-/**
- * Returns a pseudo-random 32-bit integer.
- *
- * @return the random integer
- */
-uint32_t random(void);
-
-/**
- * Seeds the pseudo-random number generator used by random() and rand() with the
- * value seed.
- *
- * @param seed the seed value
- */
-void srandom(uint32_t seed);
+/* @endcond */
 
 /**
  * Returns a pseudo-random integer in the range of \p min to \p max (inclusive).
  */
 #define randInt(min, max) \
-((unsigned)random() % ((max) - (min) + 1) + (min))
+    ((unsigned)random() % ((max) - (min) + 1) + (min))
 
 /**
- * Delays for a number of milliseconds.
- * <p>
- * Counts time spent while interrupted. Assumes a CPU clock speed of 48MHz.
- *
- * @param msec number of milliseconds
+ * Resets the OS homescreen; accounts for split screen.
  */
-void delay(uint16_t msec);
+#define os_ClrHome() \
+do { \
+    asm_ClrLCD(); \
+    asm_HomeUp(); \
+    asm_DrawStatusBar(); \
+} while (0)
 
 /**
- * "Atomically" loads from a volatile 32-bit value.
- *
- * @remarks
- * The hardware does not provide a mechanism to truly atomically load from a
- * 32-bit value. This "atomic" load is implemented by non-atomically reading the
- * value twice and retrying if the values read differ.
- *
- * @attention
- * If the maximum period between two value changes is 1us or less (assuming a
- * CPU clock speed of 48MHz), then this function may never complete. For
- * instance, the counter of a timer ticking at 1MHz or more should not be read
- * using this function. In such a case of a purely increasing or decreasing
- * value, atomic_load_increasing_32() or atomic_load_decreasing_32() may be
- * appropriate instead.
- *
- * @param p pointer to 32-bit value
+ * Resets the OS homescreen fully; ignores split screen mode.
  */
-uint32_t atomic_load_32(volatile uint32_t *p);
+#define os_ClrHomeFull() \
+do { \
+    asm_ClrLCDFull(); \
+    asm_HomeUp(); \
+    asm_DrawStatusBar(); \
+} while (0)
 
-/**
- * "Atomically" loads from a volatile, increasing 32-bit value.
- *
- * @remarks
- * The hardware does not provide a mechanism to truly atomically load from a
- * 32-bit value. This "atomic" load is implemented by temporarily disabling
- * interrupts while non-atomically reading the value twice and then returning
- * the lesser of the two values read.
- *
- * @attention
- * If the minimum period between two value changes is 5us or less and the
- * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
- * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
- * note may be the fact that a 48MHz counter does not exceed this limit.
- *
- * @param p pointer to 32-bit value
- */
-uint32_t atomic_load_increasing_32(volatile uint32_t *p);
-
-/**
- * "Atomically" loads from a volatile, decreasing 32-bit value.
- *
- * @remarks
- * The hardware does not provide a mechanism to truly atomically load from a
- * 32-bit value. This "atomic" load is implemented by temporarily disabling
- * interrupts while non-atomically reading the value twice and then returning
- * the greater of the two values read.
- *
- * @attention
- * If the minimum period between two value changes is 5us or less and the
- * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
- * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
- * note may be the fact that a 48MHz counter does not exceed this limit.
- *
- * @param p pointer to 32-bit value
- */
-uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
-
-/**
- * Gets a combination of the RTC time; useful for srand()
- */
-#define rtc_Time()              (*(volatile uint32_t*)0xF30044)
-
-/* RTC definitions */
-#define RTC_UNFREEZE            (1<<7)
-#define RTC_FREEZE              (0<<7)
-#define RTC_LOAD                (1<<6)
-#define RTC_ENABLE              ((1<<0)|RTC_UNFREEZE)
-#define RTC_DISABLE             (0<<0)
-
-/* RTC registers */
-#define rtc_Seconds             (*(volatile uint8_t*)0xF30000)    /**< Number of seconds stored in the RTC. */
-#define rtc_Minutes             (*(volatile uint8_t*)0xF30004)    /**< Number of minutes stored in the RTC. */
-#define rtc_Hours               (*(volatile uint8_t*)0xF30008)    /**< Number of hours stored in the RTC. */
-#define rtc_Days                (*(volatile uint16_t*)0xF3000C)   /**< Number of days stored in the RTC. */
-/* @cond */
-#define rtc_AlarmSeconds        (*(volatile uint8_t*)0xF30010)
-#define rtc_AlarmMinutes        (*(volatile uint8_t*)0xF30014)
-#define rtc_AlarmHours          (*(volatile uint8_t*)0xF30018)
-/* @endcond */
-#define rtc_Control             (*(volatile uint8_t*)0xF30020)    /**< RTC Control register. */
-/* @cond */
-#define rtc_LoadSeconds         (*(volatile uint8_t*)0xF30024)
-#define rtc_LoadMinutes         (*(volatile uint8_t*)0xF30028)
-#define rtc_LoadHours           (*(volatile uint8_t*)0xF3002C)
-#define rtc_LoadDays            (*(volatile uint16_t*)0xF30030)
-/* @endcond */
-#define rtc_IntStatus           (*(volatile uint8_t*)0xF30034)    /**< RTC Interrupt Status register. */
-#define rtc_IntAcknowledge      (*(volatile uint8_t*)0xF30034)    /**< RTC Interrupt Acknowledge register. */
-#define rtc_IsBusy()            ((rtc_Control) & RTC_LOAD)        /**< Checks if the RTC is busy loading. */
-
-/* RTC interrupt masks */
 /* @cond */
 #define RTC_ALARM_INT_SOURCE    (1<<5)
 #define RTC_DAY_INT_SOURCE      (1<<4)
 #define RTC_HR_INT_SOURCE       (1<<3)
 #define RTC_MIN_INT_SOURCE      (1<<2)
 #define RTC_SEC_INT_SOURCE      (1<<1)
+
+#define RTC_UNFREEZE            (1<<7)
+#define RTC_FREEZE              (0<<7)
+#define RTC_LOAD                (1<<6)
+#define RTC_ENABLE              ((1<<0)|RTC_UNFREEZE)
+#define RTC_DISABLE             (0<<0)
+
+#define rtc_Control             (*(volatile uint8_t*)0xF30020)
+#define rtc_LoadSeconds         (*(volatile uint8_t*)0xF30024)
+#define rtc_LoadMinutes         (*(volatile uint8_t*)0xF30028)
+#define rtc_LoadHours           (*(volatile uint8_t*)0xF3002C)
+#define rtc_LoadDays            (*(volatile uint16_t*)0xF30030)
+#define rtc_IntStatus           (*(volatile uint8_t*)0xF30034)
+#define rtc_IntAcknowledge      (*(volatile uint8_t*)0xF30034)
 /* @endcond */
-
-/* RTC interrupt statuses */
-/* @cond */
-#define RTC_LOAD_INT            (1<<5)
-#define RTC_ALARM_INT           (1<<4)
-#define RTC_DAY_INT             (1<<3)
-#define RTC_HR_INT              (1<<2)
-#define RTC_MIN_INT             (1<<1)
-#define RTC_SEC_INT             (1<<0)
-#define RTC_INT_MASK            (RTC_SEC_INT | RTC_MIN_INT | RTC_HR_INT | RTC_DAY_INT | RTC_ALARM_INT | RTC_LOAD_INT)
-/* @endcond */
-
-/* Whole bunch of useful timer functions */
-#define TIMER1_ENABLE            (1<<0)  /**< Enables Timer 1                                        */
-#define TIMER1_DISABLE           (0<<0)  /**< Disables Timer 1                                       */
-#define TIMER1_32K               (1<<1)  /**< Use the 32K clock for timer 1                          */
-#define TIMER1_CPU               (0<<1)  /**< Use the CPU clock rate for timer 1                     */
-#define TIMER1_0INT              (1<<2)  /**< Enable an interrupt when 0 is reached for the timer 1  */
-#define TIMER1_NOINT             (0<<2)  /**< Disable interrupts for the timer 1                     */
-#define TIMER1_UP                (1<<9)  /**< Timer 1 counts up                                      */
-#define TIMER1_DOWN              (0<<9)  /**< Timer 1 counts down                                    */
-
-#define TIMER2_ENABLE            (1<<3)  /**< Enables Timer 2                                        */
-#define TIMER2_DISABLE           (0<<3)  /**< Disables Timer 2                                       */
-#define TIMER2_32K               (1<<4)  /**< Use the 32K clock for timer 2                          */
-#define TIMER2_CPU               (0<<4)  /**< Use the CPU clock rate for timer 2                     */
-#define TIMER2_0INT              (1<<5)  /**< Enable an interrupt when 0 is reached for the timer 2  */
-#define TIMER2_NOINT             (0<<5)  /**< Disable interrupts for the timer 2                     */
-#define TIMER2_UP                (1<<10) /**< Timer 2 counts up                                      */
-#define TIMER2_DOWN              (0<<10) /**< Timer 2 counts down                                    */
-
-#define TIMER3_ENABLE            (1<<6)  /**< Enables Timer 3                                        */
-#define TIMER3_DISABLE           (0<<6)  /**< Disables Timer 3                                       */
-#define TIMER3_32K               (1<<7)  /**< Use the 32K clock for timer 3                          */
-#define TIMER3_CPU               (0<<7)  /**< Use the CPU clock rate for timer 3                     */
-#define TIMER3_0INT              (1<<8)  /**< Enable an interrupt when 0 is reached for the timer 3  */
-#define TIMER3_NOINT             (0<<8)  /**< Disable interrupts for the timer 3                     */
-#define TIMER3_UP                (1<<11) /**< Timer 3 counts up                                      */
-#define TIMER3_DOWN              (0<<11) /**< Timer 3 counts down                                    */
-
-/* These defines can be used to check the status of the timer */
-#define TIMER1_MATCH1            (1<<0)  /**< Timer 1 hit the first match value                      */
-#define TIMER1_MATCH2            (1<<1)  /**< Timer 1 hit the second match value                     */
-#define TIMER1_RELOADED          (1<<2)  /**< Timer 1 was reloaded (Needs TIMER1_0INT enabled)       */
-
-#define TIMER2_MATCH1            (1<<3)  /**< Timer 2 hit the first match value                      */
-#define TIMER2_MATCH2            (1<<4)  /**< Timer 2 hit the second match value                     */
-#define TIMER2_RELOADED          (1<<5)  /**< Timer 2 was reloaded (Needs TIMER2_0INT enabled)       */
-
-#define TIMER3_MATCH1            (1<<6)  /**< Timer 3 hit the first match value                      */
-#define TIMER3_MATCH2            (1<<7)  /**< Timer 3 hit the second match value                     */
-#define TIMER3_RELOADED          (1<<8)  /**< Timer 3 was reloaded (Needs TIMER3_0INT enabled)       */
-
-/* Timer registers */
-#define timer_1_Counter          (*(volatile uint32_t*)0xF20000)  /**< Timer 1 current value register. */
-#define timer_1_ReloadValue      (*(volatile uint32_t*)0xF20004)  /**< Timer 1 reload value register. */
-#define timer_1_MatchValue_1     (*(volatile uint32_t*)0xF20008)  /**< Timer 1 match 1 value register. */
-#define timer_1_MatchValue_2     (*(volatile uint32_t*)0xF2000C)  /**< Timer 1 match 2 value register. */
-#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)  /**< Timer 2 current value register. */
-#define timer_2_ReloadValue      (*(volatile uint32_t*)0xF20014)  /**< Timer 2 reload value register. */
-#define timer_2_MatchValue_1     (*(volatile uint32_t*)0xF20018)  /**< Timer 2 match 1 value register. */
-#define timer_2_MatchValue_2     (*(volatile uint32_t*)0xF2001C)  /**< Timer 2 match 2 value register. */
-#define timer_3_Counter          (*(volatile uint32_t*)0xF20020)  /**< Timer 3 current value register. */
-#define timer_3_ReloadValue      (*(volatile uint32_t*)0xF20024)  /**< Timer 3 reload value register. */
-#define timer_3_MatchValue_1     (*(volatile uint32_t*)0xF20028)  /**< Timer 3 match 1 value register. */
-#define timer_3_MatchValue_2     (*(volatile uint32_t*)0xF2002C)  /**< Timer 3 match 2 value register. */
-#define timer_Control            (*(volatile uint16_t*)0xF20030)  /**< Timer Control register. */
-#define timer_IntStatus          (*(volatile uint16_t*)0xF20034)  /**< Timer Interrupt Status register. */
-#define timer_IntAcknowledge     (*(volatile uint16_t*)0xF20034)  /**< Timer Interrupt Acknowledge register. */
-#define timer_EnableInt          (*(volatile uint16_t*)0xF20038)  /**< Timer Interrupt Enable register. */
-
-#define TIMER_32K               1  /**< Use the 32K clock for timer                         */
-#define TIMER_CPU               0  /**< Use the CPU clock rate for timer                    */
-#define TIMER_0INT              1  /**< Enable an interrupt when 0 is reached for the timer */
-#define TIMER_NOINT             0  /**< Disable interrupts for the timer                    */
-#define TIMER_UP                1  /**< Timer counts up                                     */
-#define TIMER_DOWN              0  /**< Timer counts down                                   */
-
-#define TIMER_MATCH1            (1<<0)  /**< Timer hit the first match value                */
-#define TIMER_MATCH2            (1<<1)  /**< Timer hit the second match value               */
-#define TIMER_RELOADED          (1<<2)  /**< Timer was reloaded (Needs TIMER_0INT enabled)  */
 
 /**
- * Enables timer \p n with the specified settings
+ * Enables the Real-Time-Clock (RTC).
+ *
+ * @param int Interrupt mask to enable specific RTC interrupts.
+ */
+#define rtc_Enable(int) \
+do { \
+    rtc_Control |= RTC_ENABLE | (int << 1); \
+} while (0)
+
+/**
+ * Sets the Real-Time-Clock (RTC) with new values.
+ *
+ * @param sec Second value to load.
+ * @param min Minute value to load.
+ * @param hr Hour value to load.
+ * @param day Day value to load.
+ *
+ * @note
+ * The set values do not take effect until the next RTC second.
+ * Verify the values have been loaded by waiting for rtc_IsBusy() to be false.
+ * The RTC will also need to be enabled.
+ */
+#define rtc_Set(sec, min, hr, day) \
+do { \
+    rtc_Seconds = sec; \
+    rtc_Minutes = min; \
+    rtc_Hours = hr; \
+    rtc_Days = day; \
+    rtc_Control |= RTC_LOAD; \
+} while (0)
+
+/**
+ * Sets the Real-Time-Clock (RTC) alarm with new values.
+ *
+ * @param sec Second alarm value.
+ * @param min Minute alarm value.
+ * @param hr Hour alarm value.
+ */
+#define rtc_SetAlarm(sec, min, hr) \
+do { \
+    rtc_AlarmSeconds = sec; \
+    rtc_AlarmMinutes = min; \
+    rtc_AlarmHours = hr; \
+} while (0)
+
+/**
+ * Disables the Real-Time-Clock (RTC).
+ */
+#define rtc_Disable() \
+do { \
+    rtc_Control &= ~RTC_ENABLE; \
+} while (0)
+
+/**
+ * Checks if the RTC is busy setting newly loaded values.
+ */
+#define rtc_IsBusy() ((rtc_Control) & RTC_LOAD)
+
+/**
+ * Acknowledges an RTC interrupt.
+ * This should be used to clear the condition that is causing the interrupt.
+ *
+ * @param mask RTC interrupt mask.
+ */
+#define rtc_AckInterrupt(mask) (rtc_IntAcknowledge = (mask))
+
+/**
+ * Checks if a RTC interrupt condition has occurred.
+ *
+ * @param mask RTC interrupt mask.
+ */
+#define rtc_ChkInterrupt(mask) (rtc_IntStatus & (mask))
+
+/**
+ * Gets a combination of the RTC time; useful for seeding random numbers
+ * via srand().
+ */
+#define rtc_Time()              (*(volatile uint32_t*)0xF30044)
+
+#define rtc_Seconds             (*(volatile uint8_t*)0xF30000)    /**< RTC seconds */
+#define rtc_Minutes             (*(volatile uint8_t*)0xF30004)    /**< RTC minutes */
+#define rtc_Hours               (*(volatile uint8_t*)0xF30008)    /**< RTC hours */
+#define rtc_Days                (*(volatile uint16_t*)0xF3000C)   /**< RTC days */
+#define rtc_AlarmSeconds        (*(volatile uint8_t*)0xF30010)    /**< RTC alarm seconds */
+#define rtc_AlarmMinutes        (*(volatile uint8_t*)0xF30014)    /**< RTC alarm minutes */
+#define rtc_AlarmHours          (*(volatile uint8_t*)0xF30018)    /**< RTC alarm hours */
+
+/* @cond */
+#define TIMER1_ENABLE            (1<<0)
+#define TIMER1_DISABLE           (0<<0)
+#define TIMER1_32K               (1<<1)
+#define TIMER1_CPU               (0<<1)
+#define TIMER1_0INT              (1<<2)
+#define TIMER1_NOINT             (0<<2)
+#define TIMER1_UP                (1<<9)
+#define TIMER1_DOWN              (0<<9)
+
+#define TIMER2_ENABLE            (1<<3)
+#define TIMER2_DISABLE           (0<<3)
+#define TIMER2_32K               (1<<4)
+#define TIMER2_CPU               (0<<4)
+#define TIMER2_0INT              (1<<5)
+#define TIMER2_NOINT             (0<<5)
+#define TIMER2_UP                (1<<10)
+#define TIMER2_DOWN              (0<<10)
+
+#define TIMER3_ENABLE            (1<<6)
+#define TIMER3_DISABLE           (0<<6)
+#define TIMER3_32K               (1<<7)
+#define TIMER3_CPU               (0<<7)
+#define TIMER3_0INT              (1<<8)
+#define TIMER3_NOINT             (0<<8)
+#define TIMER3_UP                (1<<11)
+#define TIMER3_DOWN              (0<<11)
+
+#define TIMER1_MATCH1            (1<<0)
+#define TIMER1_MATCH2            (1<<1)
+#define TIMER1_RELOADED          (1<<2)
+
+#define TIMER2_MATCH1            (1<<3)
+#define TIMER2_MATCH2            (1<<4)
+#define TIMER2_RELOADED          (1<<5)
+
+#define TIMER3_MATCH1            (1<<6)
+#define TIMER3_MATCH2            (1<<7)
+#define TIMER3_RELOADED          (1<<8)
+
+#define timer_1_Counter          (*(volatile uint32_t*)0xF20000)
+#define timer_1_ReloadValue      (*(volatile uint32_t*)0xF20004)
+#define timer_1_MatchValue_1     (*(volatile uint32_t*)0xF20008)
+#define timer_1_MatchValue_2     (*(volatile uint32_t*)0xF2000C)
+#define timer_2_Counter          (*(volatile uint32_t*)0xF20010)
+#define timer_2_ReloadValue      (*(volatile uint32_t*)0xF20014)
+#define timer_2_MatchValue_1     (*(volatile uint32_t*)0xF20018)
+#define timer_2_MatchValue_2     (*(volatile uint32_t*)0xF2001C)
+#define timer_3_Counter          (*(volatile uint32_t*)0xF20020)
+#define timer_3_ReloadValue      (*(volatile uint32_t*)0xF20024)
+#define timer_3_MatchValue_1     (*(volatile uint32_t*)0xF20028)
+#define timer_3_MatchValue_2     (*(volatile uint32_t*)0xF2002C)
+#define timer_Control            (*(volatile uint16_t*)0xF20030)
+#define timer_IntStatus          (*(volatile uint16_t*)0xF20034)
+#define timer_IntAcknowledge     (*(volatile uint16_t*)0xF20034)
+#define timer_EnableInt          (*(volatile uint16_t*)0xF20038)
+
+#define TIMER_COUNT_ADDR(n)      (volatile uint32_t*)(0xF20000 + (16 * ((n) - 1)))
+#define TIMER_RELOAD_ADDR(n)     (volatile uint32_t*)(0xF20004 + (16 * ((n) - 1)))
+#define TIMER_MATCH_ADDR(n, m)   (volatile uint32_t*)(0xF20008 + (16 * ((n) - 1)) + (4 * ((m) - 1)))
+/* @endcond */
+
+/**
+ * Enables timer \p n with the specified settings.
+ * The CE has 3 different timers.
+ *
+ * @param n Timer to enable (range 1 - 3 inclusive).
+ * @param rate Rate in Hz the timer ticks at. Can be TIMER_32K or TIMER_CPU.
+ * @param int Throw an interrupt when the timer reaches 0. Can be TIMER_0INT or TIMER_NOINT.
+ * @param dir Direction in which to count. Can be TIMER_UP or TIMER_DOWN.
+ *
+ * @warning Timer 3 is usually employed by USB. Use it at your own risk.
  */
 #define timer_Enable(n, rate, int, dir) (timer_Control = timer_Control & ~(0x7 << 3 * ((n) - 1) | 1 << ((n) + 8)) | (1 | (rate) << 1 | (int) << 2) << 3 * ((n) - 1) | (dir) << ((n) + 8))
 
 /**
- * Disables timer \p n
+ * Disables a timer.
+ *
+ * @param n Timer to disable (range 1 - 3 inclusive).
  */
 #define timer_Disable(n) (timer_Control &= ~(1 << 3 * ((n) - 1)))
 
 /**
- * Acknowledges an interrupt for timer \p n of type \p type.
+ * Gets the current count value of a timer.
+ *
+ * @param n Timer to get count value of (range 1 - 3 inclusive).
+ *
+ * @attention
+ * Do not use this function if the timer is configured with TIMER_CPU.
+ * Use the timer_GetSafe() function instead.
  */
-#define timer_AckInterrupt(n, type) (timer_IntAcknowledge = (type) << 3 * ((n) - 1))
+#define timer_Get(n) atomic_load_32(TIMER_COUNT_ADDR(n))
 
 /**
- * Checks if an interrupt for timer \p n of type \p type has occurred.
+ * Safely gets the current count value of a timer.
+ * This should be used if the timer is ticking at >= 1MHz.
+ *
+ * @param n Timer to get count value of (range 1 - 3 inclusive).
+ * @param dir Direction the timer is counting.
  */
-#define timer_CheckInterrupt(n, type) ((timer_IntStatus >> 3 * ((n) - 1)) & (type))
+#define timer_GetSafe(n, dir) \
+    ((dir) == TIMER_UP ? \
+        atomic_load_increasing_32(TIMER_COUNT_ADDR(n)) : \
+        atomic_load_decreasing_32(TIMER_COUNT_ADDR(n)))
 
-/* LCD defines */
+/**
+ * If the timer count value will never exceed (2^24)-1, this function can be
+ * used in place of both timer_Get and timer_GetSafe.
+ * It returns the low 24 bits value of the full 32 bit count value, and is
+ * atomic safe.
+ *
+ * @param n Timer to get count value of (range 1 - 3 inclusive).
+ */
+#define timer_GetLow(n) *TIMER_COUNT_ADDR(n)
+
+/**
+ * Sets the count value of a timer.
+ *
+ * @param n Timer to set count value of (range 1 - 3 inclusive).
+ * @param value Value to set timer count to.
+ */
+#define timer_Set(n, value) *TIMER_COUNT_ADDR(n) = (uint32_t)(value)
+
+/**
+ * Gets the current reload value of a timer.
+ * The reload value is loaded into the timer count when the timer reaches zero.
+ *
+ * @param n Timer to get count reload value of (range 1 - 3 inclusive).
+ */
+#define timer_GetReload(n) *TIMER_RELOAD_ADDR(n)
+
+/**
+ * Sets the reload value of a timer.
+ * The reload value is loaded into the timer count when the timer reaches zero.
+ *
+ * @param n Timer to set count reload value of (range 1 - 3 inclusive).
+ * @param value Value to set timer reload count to.
+ */
+#define timer_SetReload(n, value) *TIMER_RELOAD_ADDR(n) = (uint32_t)(value)
+
+/**
+ * Gets the match \p m value of a timer.
+ * There are two match value comparators per timer.
+ *
+ * @param n Timer to get match comparator value of (range 1 - 3 inclusive).
+ * @param m Match compartor index (range 1 - 2 inclusive,
+ *     recommended to use TIMER_MATCH(1) or TIMER_MATCH(2)).
+ */
+#define timer_GetMatch(n, m) *TIMER_MATCH_ADDR(n, m)
+
+/**
+ * Sets the match \p m value of a timer.
+ * There are two match value comparators per timer.
+ *
+ * @param n Timer to set match comparator value of (range 1 - 3 inclusive).
+ * @param m Match compartor index (range 1 - 2 inclusive
+ *     recommended to use TIMER_MATCH(1) or TIMER_MATCH(2)).
+ * @param value Value to set match compartor to.
+ */
+#define timer_SetMatch(n, m, value) *TIMER_MATCH_ADDR(n, m) = (uint32_t)(value)
+
+/**
+ * Acknowledges a timer interrupt.
+ * This should be used to clear the condition that is causing the interrupt.
+ *
+ * @param n Timer to acknowledge interrupt of (range 1 - 3 inclusive).
+ * @param mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
+ * or TIMER_MATCH(2).
+ */
+#define timer_AckInterrupt(n, mask) (timer_IntAcknowledge = (mask) << 3 * ((n) - 1))
+
+/**
+ * Checks if a timer interrupt condition has occurred.
+ *
+ * @param n Timer to check interrupt for (range 1 - 3 inclusive).
+ * @param mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
+ * or TIMER_MATCH(2).
+ */
+#define timer_ChkInterrupt(n, mask) ((timer_IntStatus >> 3 * ((n) - 1)) & (mask))
+
+/**
+ * Gets an element from a matrix
+ *
+ * @param matrix Structure of matrix
+ * @param row Row in matrix
+ * @param col Column in matrix
+ * @returns real_t containing element data
+ */
+#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
+
 #define lcd_Ram                  ((volatile uint16_t*)0xD40000) /**< Base address of memory-mapped RAM for the LCD */
 /* @cond */
 #define lcd_Timing0              (*(volatile uint32_t*)0xE30000)
@@ -295,22 +385,52 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 #define lcd_BacklightLevel       (*(volatile uint8_t*)0xF60024) /**< Current backlight level of the LCD. 0 is bright. 255 is dark. */
 
 /**
- * Width of LCD in pixels
+ * TIOS small font.
+ * @see os_FontSelect
  */
-#define LCD_WIDTH \
-(320)
+#define os_SmallFont ((font_t *)0)
 
 /**
- * Height of LCD in pixels
+ * TIOS large font.
+ * @see os_FontSelect
  */
-#define LCD_HEIGHT \
-(240)
+#define os_LargeFont ((font_t *)1)
 
-/**
- * Total number of pixels in LCD
- */
-#define LCD_SIZE \
-(LCD_WIDTH*LCD_HEIGHT*2)
+#define os_TextShadow           ((uint8_t*)0xD006C0)   /**< Text buffer, 260 bytes. */
+#define os_AsmPrgmSize          (*(uint16_t*)0xD0118C) /**< Current size of executing program. */
+#define os_PenCol               (*(uint24_t*)0xD008D2) /**< Small font column location. */
+#define os_PenRow               (*(uint8_t*)0xD008D5)  /**< Small font row location. */
+
+#define os_OP1                  ((uint8_t*)0xD005F8) /**< OP1 Variable */
+#define os_OP2                  ((uint8_t*)0xD00603) /**< OP2 Variable */
+#define os_OP3                  ((uint8_t*)0xD0060E) /**< OP3 Variable */
+#define os_OP4                  ((uint8_t*)0xD00619) /**< OP4 Variable */
+#define os_OP5                  ((uint8_t*)0xD00624) /**< OP5 Variable */
+#define os_OP6                  ((uint8_t*)0xD0062F) /**< OP6 Variable */
+#define os_OP7                  ((uint8_t*)0xD0063A) /**< OP7 Variable */
+
+
+#define LCD_WIDTH               (320)  /**< Width of LCD in pixels */
+#define LCD_HEIGHT              (240) /**< Height of LCD in pixels */
+#define LCD_SIZE                (LCD_WIDTH*LCD_HEIGHT*2) /**< Total number of pixels in LCD */
+
+#define TIMER_32K                1  /**< Use the 32K clock for timer */
+#define TIMER_CPU                0  /**< Use the CPU clock rate for timer */
+#define TIMER_0INT               1  /**< Enable an interrupt when 0 is reached for the timer */
+#define TIMER_NOINT              0  /**< Disable interrupts for the timer */
+#define TIMER_UP                 1  /**< Timer counts up */
+#define TIMER_DOWN               0  /**< Timer counts down */
+
+#define TIMER_MATCH(i)           (1<<((i) - 1))  /**< Timer hit the match value. There are 2 match values per timer */
+#define TIMER_RELOADED           (1<<2)  /**< Timer was reloaded (Needs TIMER_0INT enabled)  */
+
+#define RTC_LOAD_INT             (1<<5)  /**< RTC load operation complete */
+#define RTC_ALARM_INT            (1<<4)  /**< RTC alarm interrupt */
+#define RTC_DAY_INT              (1<<3)  /**< RTC interrupt on day change */
+#define RTC_HR_INT               (1<<2)  /**< RTC interrupt on hour change */
+#define RTC_MIN_INT              (1<<1)  /**< RTC interrupt on minute change */
+#define RTC_SEC_INT              (1<<0)  /**< RTC interrupt on second change */
+#define RTC_INT_MASK             (RTC_SEC_INT | RTC_MIN_INT | RTC_HR_INT | RTC_DAY_INT | RTC_ALARM_INT | RTC_LOAD_INT) /**< RTC mask for all interrupts */
 
 /**
  * @brief Structure of real variable type
@@ -370,36 +490,30 @@ typedef struct font {
 } font_t;
 
 /**
- * Gets an element from a matrix
+ * Delays for a number of milliseconds.
  *
- * @param matrix Structure of matrix
- * @param row Row in matrix
- * @param col Column in matrix
- * @returns real_t containing element data
+ * @note
+ * Counts time spent while interrupted.
+ * Assumes a CPU clock speed of 48MHz.
+ *
+ * @param msec number of milliseconds
  */
-#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
+void delay(uint16_t msec);
 
 /**
- * Resets the OS homescreen; accounts for split screen
+ * Returns a pseudo-random 32-bit integer.
+ *
+ * @return the random integer
  */
-#define os_ClrHome() do { asm_ClrLCD(); asm_HomeUp(); asm_DrawStatusBar(); } while (0)
+uint32_t random(void);
 
 /**
- * Resets the OS homescreen fully
+ * Seeds the pseudo-random number generator used by random() and rand() with the
+ * value seed.
+ *
+ * @param seed the seed value
  */
-#define os_ClrHomeFull() do { asm_ClrLCDFull(); asm_HomeUp(); asm_DrawStatusBar(); } while (0)
-
-/**
- * TIOS small font.
- * @see os_FontSelect
- */
-#define os_SmallFont ((font_t *)0)
-
-/**
- * TIOS large font.
- * @see os_FontSelect
- */
-#define os_LargeFont ((font_t *)1)
+void srandom(uint32_t seed);
 
 /*
  * Bootcode functions
@@ -510,7 +624,7 @@ void boot_WaitShort(void);
  */
 
 /**
- * Inserts a new line at the current cursor posistion on the homescreen
+ * Inserts a new line at the current cursor posistion on the homescreen.
  * Does scroll.
  */
 tiflags void os_NewLine(void);
@@ -1146,7 +1260,7 @@ int8_t os_USBGetRequestStatus(void);
 void os_ForceCmdNoChar(void);
 
 /**
- * Inserts a new line at the current cursor posistion on the homescreen
+ * Inserts a new line at the current cursor posistion on the homescreen.
  * Does scroll.
  */
 tiflags void os_NewLine(void);
@@ -1237,6 +1351,64 @@ void boot_Set6MHzModeI(void);
  */
 void boot_Set48MHzModeI(void);
 
+/**
+ * "Atomically" loads from a volatile 32-bit value.
+ *
+ * @remarks
+ * The hardware does not provide a mechanism to truly atomically load from a
+ * 32-bit value. This "atomic" load is implemented by non-atomically reading the
+ * value twice and retrying if the values read differ.
+ *
+ * @attention
+ * If the maximum period between two value changes is 1us or less (assuming a
+ * CPU clock speed of 48MHz), then this function may never complete. For
+ * instance, the counter of a timer ticking at 1MHz or more should not be read
+ * using this function. In such a case of a purely increasing or decreasing
+ * value, atomic_load_increasing_32() or atomic_load_decreasing_32() may be
+ * appropriate instead.
+ *
+ * @param p pointer to 32-bit value
+ */
+uint32_t atomic_load_32(volatile uint32_t *p);
+
+/**
+ * "Atomically" loads from a volatile, increasing 32-bit value.
+ *
+ * @remarks
+ * The hardware does not provide a mechanism to truly atomically load from a
+ * 32-bit value. This "atomic" load is implemented by temporarily disabling
+ * interrupts while non-atomically reading the value twice and then returning
+ * the lesser of the two values read.
+ *
+ * @attention
+ * If the minimum period between two value changes is 5us or less and the
+ * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
+ * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
+ * note may be the fact that a 48MHz counter does not exceed this limit.
+ *
+ * @param p pointer to 32-bit value
+ */
+uint32_t atomic_load_increasing_32(volatile uint32_t *p);
+
+/**
+ * "Atomically" loads from a volatile, decreasing 32-bit value.
+ *
+ * @remarks
+ * The hardware does not provide a mechanism to truly atomically load from a
+ * 32-bit value. This "atomic" load is implemented by temporarily disabling
+ * interrupts while non-atomically reading the value twice and then returning
+ * the greater of the two values read.
+ *
+ * @attention
+ * If the minimum period between two value changes is 5us or less and the
+ * value's maximum rate of change over a 5us period exceeds 256 (assuming a CPU
+ * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
+ * note may be the fact that a 48MHz counter does not exceed this limit.
+ *
+ * @param p pointer to 32-bit value
+ */
+uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
+
 #undef tiflags
 
 /**
@@ -1260,11 +1432,6 @@ typedef enum {
     OS_COLOR_DARKGRAY
 } os_colors_t;
 
-#define os_TextShadow        ((uint8_t*)0xD006C0)          /**< Text buffer, 260 bytes. */
-#define os_AsmPrgmSize       (*(uint16_t*)0xD0118C)        /**< Current size of executing program. */
-#define os_PenCol            (*(uint24_t*)0xD008D2)        /**< Small font column location. */
-#define os_PenRow            (*(uint8_t*)0xD008D5)         /**< Small font row location. */
-
 /* @cond */
 #define os_RamStart          ((uint8_t*)0xD00000)
 #define os_Flags             ((uint8_t*)0xD00080)
@@ -1287,14 +1454,6 @@ typedef enum {
 #define os_ApdTimer          (*(uint8_t*)0xD00591)
 #define os_CurRow            (*(uint8_t*)0xD00595)
 #define os_CurCol            (*(uint8_t*)0xD00596)
-
-#define os_OP1               ((uint8_t*)0xD005F8)
-#define os_OP2               ((uint8_t*)0xD00603)
-#define os_OP3               ((uint8_t*)0xD0060E)
-#define os_OP4               ((uint8_t*)0xD00619)
-#define os_OP5               ((uint8_t*)0xD00624)
-#define os_OP6               ((uint8_t*)0xD0062F)
-#define os_OP7               ((uint8_t*)0xD0063A)
 
 #define os_ProgToEdit        ((char*)0xD0065B)
 #define os_NameBuff          ((char*)0xD00663)
