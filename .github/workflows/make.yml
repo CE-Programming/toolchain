@@ -8,239 +8,240 @@ on:
     branches:
       - master
 
+env:
+  CEMU_PATH: ${{github.workspace}}/CEmu
+  FASMG_DOMAIN: https://flatassembler.net
+  HOST_DOMAIN: https://jacobly.com
+  INSTALL_PATH: ${{github.workspace}}/CEdev
+  ROM_FILE: 84pce_515_53.rom
+  SECRETS_PATH: ${{github.workspace}}/secrets
+  TOOLCHAIN_PATH: ${{github.workspace}}/toolchain
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{matrix.runs-on}}
+        runs-on: [ubuntu, macos, windows]
+        include:
+          - nul: /dev/null
+          - runs-on: macos
+            fasmg: /source/macos/x64
+          - runs-on: windows
+            env: "env:"
+            exe: .exe
+            nul: nul
+    runs-on: ${{matrix.runs-on}}-latest
     steps:
-      - name: Bootstrap Build Environment
-        if: runner.os == 'Windows'
-        run: "cmake -E echo >> $env:GITHUB_ENV ENV=env:"
       - name: Prepare Build Environment
-        run: cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEdev/bin
-      - name: Prepare Build Environment
-        if: runner.os == 'macOS'
-        run: cmake -E echo >> $${{env.ENV}}GITHUB_ENV FASMG_PATH=/source/macos/x64
-      - name: Prepare Build Environment
-        if: runner.os != 'Windows'
-        run: cmake -E echo >> $${{env.ENV}}GITHUB_ENV NUL=/dev/null
-      - name: Prepare Build Environment
-        if: runner.os == 'Windows'
-        run: |
-          cmake -E echo >> $${{env.ENV}}GITHUB_ENV NUL=nul
-          cmake -E echo >> $${{env.ENV}}GITHUB_ENV EXE=.exe
+        run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.INSTALL_PATH}}/bin
 
       - name: Download ez80-clang
         id: ez80-clang
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: https://jacobly.com/a/llvm/ez80-clang${{env.EXE}}-${{runner.os}}Release.zip
+          file-url: ${{env.HOST_DOMAIN}}/a/llvm/ez80-clang${{matrix.exe}}-${{runner.os}}Release.zip
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           pathSource: ${{steps.ez80-clang.outputs.file-path}}
-          pathTarget: CEdev/bin
+          pathTarget: ${{env.INSTALL_PATH}}/bin
 
       - name: Download Fasmg Download Page
-        id: flatassembler-download
+        id: fasmg-download
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: https://flatassembler.net/download.php
+          file-url: ${{env.FASMG_DOMAIN}}/download.php
       - name: Parse Fasmg Download Page
         id: fasmg-url
         uses: QwerMike/xpath-action@v1
         with:
-          filename: ${{steps.flatassembler-download.outputs.file-path}}
+          filename: ${{steps.fasmg-download.outputs.file-path}}
           expression: //a[starts-with(text(),"flat assembler g ")]/@href
       - name: Extract Fasmg Url
-        run: cmake -E echo >> $${{env.ENV}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
+        run: cmake -E echo >> $${{matrix.env}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
       - name: Download Fasmg
         id: fasmg
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: https://flatassembler.net/${{env.href}}
+          file-url: ${{env.FASMG_DOMAIN}}/${{env.href}}
       - name: Extract Fasmg
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           pathSource: ${{steps.fasmg.outputs.file-path}}
-          pathTarget: fasmg
+          pathTarget: ${{github.workspace}}/fasmg
       - name: Setup Fasmg
-        run: cmake -E copy fasmg${{env.FASMG_PATH}}/fasmg${{env.EXE}} CEdev/bin
+        run: cmake -E copy fasmg${{matrix.fasmg}}/fasmg${{matrix.exe}} ${{env.INSTALL_PATH}}/bin
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
-        run: chmod +x CEdev/bin/*
+        run: chmod +x ${{env.INSTALL_PATH}}/bin/*
       - name: Test Build Dependencies
         run: |
           ez80-clang --version
-          fasmg ${{env.NUL}} ${{env.NUL}}
+          fasmg ${{matrix.nul}} ${{matrix.nul}}
 
       - name: Checkout Toolchain
         uses: actions/checkout@v2.3.4
         with:
-          path: toolchain
+          path: ${{env.TOOLCHAIN_PATH}}
           submodules: recursive
+          persist-credentials: false
       - name: Build Toolchain
-        run: make -j4 -C toolchain V=1
+        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} V=1
       - name: Install Toolchain
         env:
           PREFIX: ${{github.workspace}}
-        run: make -j4 -C toolchain install release release-libs V=1
+        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install release release-libs V=1
 
       - name: Upload CEdev
         uses: actions/upload-artifact@v2
         with:
           name: CEdev-${{runner.os}}
-          path: CEdev
+          path: ${{env.INSTALL_PATH}}
       - name: Upload Libraries
         uses: actions/upload-artifact@v2
         with:
           name: clibs
-          path: toolchain/clibs.8xg
+          path: ${{env.TOOLCHAIN_PATH}}/clibs.8xg
       - name: Upload Windows Installer
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v2
         with:
           name: installer-${{runner.os}}
-          path: toolchain\release\CEdev${{env.EXE}}
+          path: ${{env.TOOLCHAIN_PATH}}/release/CEdev${{matrix.exe}}
 
   test:
     needs: build
-    if: github.event_name != 'pull_request'
+    environment: Autotester
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-latest, macos-latest, windows-latest]
-        installer: [CEdev]
-        include:
-          - runs-on: windows-latest
+        runs-on: [ubuntu, macos, windows]
+        installer: [CEdev, installer]
+        exclude:
+          - runs-on: ubuntu
             installer: installer
-    runs-on: ${{matrix.runs-on}}
+          - runs-on: macos
+            installer: installer
+        include:
+          - runs-on: windows
+            env: "env:"
+    runs-on: ${{matrix.runs-on}}-latest
     steps:
-      - name: Bootstrap Test Environment
-        if: runner.os == 'Windows'
-        run: "cmake -E echo >> $env:GITHUB_ENV ENV=env:"
       - name: Prepare Test Environment
         run: |
-          cmake -E echo >> $${{env.ENV}}GITHUB_ENV ROM=84pce_515_53.rom
-          cmake -E echo >> $${{env.ENV}}GITHUB_ENV CEDEV=${{github.workspace}}/CEdev
-          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEdev/bin
-          cmake -E echo >> $${{env.ENV}}GITHUB_PATH ${{github.workspace}}/CEmu/tests/autotester
+          cmake -E echo >> $${{matrix.env}}GITHUB_ENV CEDEV=${{env.INSTALL_PATH}}
+          cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.INSTALL_PATH}}/bin
+          cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEMU_PATH}}/tests/autotester
 
       - name: Download CEdev
         uses: actions/download-artifact@v2
         with:
           name: ${{matrix.installer}}-${{runner.os}}
-          path: ${{env.CEDEV}}
+          path: ${{env.INSTALL_PATH}}
       - name: Install CEdev
         if: matrix.installer == 'installer'
-        run: ${{env.CEDEV}}/CEDev${{env.EXE}} /DIR=${{env.CEDEV}} /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
-
-      - name: Download Libraries
-        uses: actions/download-artifact@v2
-        with:
-          name: clibs
+        run: ${{env.INSTALL_PATH}}/CEdev.exe /DIR=${{env.INSTALL_PATH}} /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
-        run: chmod +x ${{env.CEDEV}}/bin/*
+        run: chmod +x ${{env.INSTALL_PATH}}/bin/*
       - name: Build Examples
-        run: make -j4 -C ${{env.CEDEV}}/examples V=1
+        env:
+          CEDEV: ${{env.INSTALL_PATH}}
+        run: make -j4 -C ${{env.INSTALL_PATH}}/examples V=1
 
       - name: Checkout CEmu
         uses: actions/checkout@v2.3.4
         with:
           repository: CE-Programming/CEmu
           ref: latest-stable
-          path: CEmu
+          path: ${{env.CEMU_PATH}}
+          persist-credentials: false
       - name: Build CEmu
-        run: make -j4 -C CEmu/core
+        run: make -j4 -C ${{env.CEMU_PATH}}/core
       - name: Build Autotester CLI
-        run: make -j4 -C CEmu/tests/autotester
+        run: make -j4 -C ${{env.CEMU_PATH}}/tests/autotester
 
       - name: Download Secrets
         id: download-secrets
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: https://jacobly.com/CE-Programming/secrets
-          location: secrets
+          file-url: ${{env.HOST_DOMAIN}}/CE-Programming/secrets
+          location: ${{env.SECRETS_PATH}}
       - name: Decrypt Secrets
         env:
           KEY: ${{secrets.SYMMETRIC_KEY_256}}
-        run: openssl enc -d -aes-256-cbc -iv d0583d991fcb6c3b05fb8eabc7421fb8 -K "$${{env.ENV}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out secrets/secrets.7z
+        run: openssl enc -d -aes-256-cbc -iv 8b29a858b29556c72b861a70f26872cb -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
       - name: Extract Secrets
         uses: DuckSoft/extract-7z-action@v1.0
         with:
-          pathSource: secrets/secrets.7z
-          pathTarget: secrets
+          pathSource: ${{env.SECRETS_PATH}}/secrets.7z
+          pathTarget: ${{env.SECRETS_PATH}}
 
-      - name: Test examples
+      - name: Download Libraries
+        uses: actions/download-artifact@v2
+        with:
+          name: clibs
+      - name: Test Examples
         if: runner.os != 'Windows'
         env:
           AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/clibs.8xg
-          AUTOTESTER_ROM: ${{github.workspace}}/secrets/${{env.ROM}}
+          AUTOTESTER_ROM: ${{env.SECRETS_PATH}}/${{env.ROM_FILE}}
+          CEDEV: ${{env.INSTALL_PATH}}
         run: |
           failed=0
-          find ${{env.CEDEV}}/examples -name autotest.json -print0 | while read -d '' test; do
+          find ${{env.INSTALL_PATH}}/examples -name autotest.json -print0 | while read -d '' test; do
             cmake -E echo "Launching autotester on $test"
             autotester "$test"
             cmake -E true $((failed += $?))
           done
           exit $failed
-      - name: Test examples
+      - name: Test Examples
         if: runner.os == 'Windows'
         env:
           AUTOTESTER_LIBS_GROUP: ${{github.workspace}}\clibs.8xg
-          AUTOTESTER_ROM: ${{github.workspace}}\secrets\${{env.ROM}}
+          AUTOTESTER_ROM: ${{env.SECRETS_PATH}}\${{env.ROM_FILE}}
+          CEDEV: ${{env.INSTALL_PATH}}
         run: |
           $failed = 0
-          foreach ($test in get-childitem "${{env.CEDEV}}\examples" -recurse -include autotest.json) {
+          foreach ($test in get-childitem "${{env.INSTALL_PATH}}\examples" -recurse -include autotest.json) {
             cmake -E echo "Launching autotester on $test"
             autotester "$test"
             $failed += $lastexitcode
           }
-          Exit $failed
+          exit $failed
 
       - name: Remove Secrets
         if: always()
-        run: cmake -E rm -rf secrets
+        run: cmake -E rm -rf ${{env.SECRETS_PATH}}
 
   docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Bootstrap Documentation Environment
-        if: runner.os == 'Windows'
-        run: "cmake -E echo >> $env:GITHUB_ENV ENV=env:"
-      - name: Prepare Documentation Environment
-        if: runner.os == 'Linux'
-        run: cmake -E echo >> $${{env.ENV}}GITHUB_PATH $HOME/.local/bin
-
       - name: Install Documentation Dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y doxygen
           pip install sphinx==3.2.1 sphinx_rtd_theme breathe
+          cmake -E echo >> $${{matrix.env}}GITHUB_PATH $${{matrix.env}}HOME/.local/bin
 
       - name: Checkout Toolchain
         uses: actions/checkout@v2.3.4
         with:
+          path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
 
       - name: Build Website Documentation
-        run: |
-          cd docs
-          make html
-          cd build/html
-          touch .nojekyll
+        run: make -C ${{env.TOOLCHAIN_PATH}}/docs html
+      - name: Disable Jekyll
+        run: cmake -E touch ${{env.TOOLCHAIN_PATH}}/docs/build/html/.nojekyll
 
       - name: Upload Website Documentation
         if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           BRANCH: gh-pages
-          FOLDER: docs/build/html
+          FOLDER: ${{env.TOOLCHAIN_PATH}}/docs/build/html
           CLEAN: true
