@@ -114,6 +114,10 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [ubuntu-latest, macos-latest, windows-latest]
+        installer: [CEdev]
+        include:
+          - runs-on: windows-latest
+            installer: installer
     runs-on: ${{matrix.runs-on}}
     steps:
       - name: Bootstrap Test Environment
@@ -129,8 +133,12 @@ jobs:
       - name: Download CEdev
         uses: actions/download-artifact@v2
         with:
-          name: CEdev-${{runner.os}}
-          path: CEdev
+          name: ${{matrix.installer}}-${{runner.os}}
+          path: ${{env.CEDEV}}
+      - name: Install CEdev
+        if: matrix.installer == 'installer'
+        run: ${{env.CEDEV}}/CEDev${{env.EXE}} /DIR=${{env.CEDEV}} /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+
       - name: Download Libraries
         uses: actions/download-artifact@v2
         with:
@@ -139,7 +147,6 @@ jobs:
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
         run: chmod +x ${{env.CEDEV}}/bin/*
-
       - name: Build Examples
         run: make -j4 -C ${{env.CEDEV}}/examples V=1
 
@@ -149,7 +156,6 @@ jobs:
           repository: CE-Programming/CEmu
           ref: latest-stable
           path: CEmu
-
       - name: Build CEmu
         run: make -j4 -C CEmu/core
       - name: Build Autotester CLI
