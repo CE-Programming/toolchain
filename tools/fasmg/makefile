@@ -16,22 +16,6 @@
 
 include $(CURDIR)/../../src/common.mk
 
-ifeq ($(OS),Windows_NT)
-FASMG_EXE = windows\fasmg.exe
-else
-
-ifeq ($(shell uname -s),Darwin)
-FASMG_EXE = macos/fasmg
-else
-FASMG_EXE = linux/fasmg
-endif
-
-ifneq ($(shell uname -r | grep Microsoft),)
-FASMG_EXE = windows\fasmg.exe
-endif
-
-endif
-
 INCLUDE_DIR := $(call NATIVEPATH,../../src/include)
 INCLUDE_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ez80.inc tiformat.inc)
 INSTALL_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ld.alm)
@@ -43,7 +27,5 @@ install:
 	$(Q)$(call MKDIR,$(INSTALL_META))
 	$(Q)$(call MKDIR,$(INSTALL_BIN))
 	$(Q)$(call COPY,$(INSTALL_SRC),$(INSTALL_META))
-	$(Q)$(call COPY,$(FASMG_EXE),$(INSTALL_BIN))
 
 .PHONY: all install
-
