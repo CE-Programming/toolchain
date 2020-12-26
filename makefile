@@ -30,19 +30,19 @@ LIB_DIR = $(call NATIVEPATH,src/$1)
 
 all: convbin convimg convfont $(LIBS) std
 
-std:
+std: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std)
 
-fasmg:
+fasmg: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg)
 
-convbin:
+convbin: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) release
 
-convimg:
+convimg: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) release
 
-convfont:
+convfont: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont)
 
 $(LIBS): fasmg
@@ -109,9 +109,14 @@ clean: $(addprefix clean-,$(LIBS)) clean-std
 clean-std:
 	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) clean
 
+check:
+	$(Q)$(EZCC) --version || ( echo Please install ez80-clang && exit 1 )
+	$(Q)$(FASMG) $(NULL) $(NULL) || ( echo Please install fasmg && exit 1 )
+
 help:
 	@echo Helpful targets:
 	@echo   all
+	@echo   check
 	@echo   docs-html
 	@echo   docs-pdf
 	@echo   clean
@@ -123,7 +128,6 @@ help:
 
 .PHONY: $(LIBS)
 .PHONY: install-fasmg install-std install-ce $(addprefix install-,$(LIBS))
-.PHONY: clean clean-std $(addprefix clean-,$(LIBS)) 
+.PHONY: check clean clean-std $(addprefix clean-,$(LIBS))
 .PHONY: all help install uninstall release release-libs docs-pdf docs-html
 .PHONY: fasmg convbin convimg convfont
-

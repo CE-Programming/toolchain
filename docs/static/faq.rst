@@ -81,11 +81,12 @@ This table lists the locations relative to *sp* from within the called funciton.
 +------------+------------+----------------------+
 
 This table lists which registers are used for return values.
-Note that for shorts, the upper byte does not matter.
+The type's sign does not affect the registers used, but may affect the value returned.
 
-**xx**: Contains data.
+.. note::
 
-**??**: Don't care.
+    | **xx**: Byte must contain valid data.
+    | **??**: Byte contents don't matter.
 
 +------------+------------+-------------------+
 | C Type     | Register   | Register Contents |

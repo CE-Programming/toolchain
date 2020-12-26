@@ -9,9 +9,11 @@ intce.h
 
 This header includes defines and prototypes for working with user interrupts.
 
-**WARNING: As of hardware revision I, user interrupts are no longer supported.**
+.. warning::
 
-**Send TI a strongly worded email about removal of this feature.**
+    As of hardware revision I, user interrupt vectors are no longer supported.
+    Some functions will no longer work on the newer hardware, and are labeled as such.
+    Feel free to send TI a strongly worded email about this limitation.
 
 .. contents:: :local:
    :depth: 3

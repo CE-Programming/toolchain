@@ -41,6 +41,7 @@ WINDOWS := 1
 SHELL := cmd.exe
 FASMG ?= fasmg.exe
 EZCC ?= ez80-clang.exe
+NULL ?= nul
 NATIVEPATH ?= $(subst /,\,$1)
 NATIVEEXE ?= $(NATIVEPATH).exe
 MKDIR ?= ( mkdir $1 2>nul || call )
@@ -56,6 +57,7 @@ RELEASE_NAME = windows
 else
 FASMG ?= fasmg
 EZCC ?= ez80-clang
+NULL ?= /dev/null
 NATIVEPATH ?= $(subst \,/,$1)
 NATIVEEXE ?= $(NATIVEPATH)
 MKDIR ?= mkdir -p $1
