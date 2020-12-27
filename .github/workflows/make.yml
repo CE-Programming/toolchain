@@ -9,13 +9,19 @@ on:
       - master
 
 env:
+  AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
+  AUTOTESTER_PATH: ${{github.workspace}}/CEmu/tests/autotester
+  AUTOTESTER_ROM: ${{github.workspace}}/secrets/84pce_515_53.rom
+  CEDEV: ${{github.workspace}}/CEdev
+  CEDEV_BIN: ${{github.workspace}}/CEdev/bin
+  CEDEV_EXAMPLES: ${{github.workspace}}/CEdev/examples
   CEMU_PATH: ${{github.workspace}}/CEmu
   FASMG_DOMAIN: https://flatassembler.net
+  FASMG_PATH: ${{github.workspace}}/fasmg
   HOST_DOMAIN: https://jacobly.com
-  INSTALL_PATH: ${{github.workspace}}/CEdev
-  ROM_FILE: 84pce_515_53.rom
   SECRETS_PATH: ${{github.workspace}}/secrets
   TOOLCHAIN_PATH: ${{github.workspace}}/toolchain
+
 jobs:
   build:
     strategy:
@@ -33,7 +39,7 @@ jobs:
     runs-on: ${{matrix.runs-on}}-latest
     steps:
       - name: Prepare Build Environment
-        run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.INSTALL_PATH}}/bin
+        run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download ez80-clang
         id: ez80-clang
@@ -44,7 +50,7 @@ jobs:
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           pathSource: ${{steps.ez80-clang.outputs.file-path}}
-          pathTarget: ${{env.INSTALL_PATH}}/bin
+          pathTarget: ${{env.CEDEV_BIN}}
 
       - name: Download Fasmg Download Page
         id: fasmg-download
@@ -68,13 +74,13 @@ jobs:
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           pathSource: ${{steps.fasmg.outputs.file-path}}
-          pathTarget: ${{github.workspace}}/fasmg
+          pathTarget: ${{env.FASMG_PATH}}
       - name: Setup Fasmg
-        run: cmake -E copy fasmg${{matrix.fasmg}}/fasmg${{matrix.exe}} ${{env.INSTALL_PATH}}/bin
+        run: cmake -E copy fasmg${{matrix.fasmg}}/fasmg${{matrix.exe}} ${{env.CEDEV_BIN}}
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
-        run: chmod +x ${{env.INSTALL_PATH}}/bin/*
+        run: chmod +x ${{env.CEDEV_BIN}}/*
       - name: Test Build Dependencies
         run: |
           ez80-clang --version
@@ -97,12 +103,12 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: CEdev-${{runner.os}}
-          path: ${{env.INSTALL_PATH}}
+          path: ${{env.CEDEV}}
       - name: Upload Libraries
         uses: actions/upload-artifact@v2
         with:
           name: clibs
-          path: ${{env.TOOLCHAIN_PATH}}/clibs.8xg
+          path: ${{env.AUTOTESTER_LIBS_GROUP}}
       - name: Upload Windows Installer
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v2
@@ -129,45 +135,40 @@ jobs:
     runs-on: ${{matrix.runs-on}}-latest
     steps:
       - name: Prepare Test Environment
-        run: |
-          cmake -E echo >> $${{matrix.env}}GITHUB_ENV CEDEV=${{env.INSTALL_PATH}}
-          cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.INSTALL_PATH}}/bin
-          cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEMU_PATH}}/tests/autotester
+        run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
         uses: actions/download-artifact@v2
         with:
           name: ${{matrix.installer}}-${{runner.os}}
-          path: ${{env.INSTALL_PATH}}
+          path: ${{env.CEDEV}}
       - name: Install CEdev
         if: matrix.installer == 'installer'
-        run: ${{env.INSTALL_PATH}}/CEdev.exe /DIR=${{env.INSTALL_PATH}} /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+        run: ${{env.CEDEV}}/CEdev.exe /DIR=${{env.CEDEV}} /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
-        run: chmod +x ${{env.INSTALL_PATH}}/bin/*
+        run: chmod +x ${{env.CEDEV_BIN}}/*
       - name: Build Examples
-        env:
-          CEDEV: ${{env.INSTALL_PATH}}
-        run: make -j4 -C ${{env.INSTALL_PATH}}/examples V=1
+        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} V=1
 
       - name: Checkout CEmu
         uses: actions/checkout@v2.3.4
         with:
-          repository: CE-Programming/CEmu
+          repository: ${{github.repository_owner}}/CEmu
           ref: latest-stable
           path: ${{env.CEMU_PATH}}
           persist-credentials: false
       - name: Build CEmu
         run: make -j4 -C ${{env.CEMU_PATH}}/core
       - name: Build Autotester CLI
-        run: make -j4 -C ${{env.CEMU_PATH}}/tests/autotester
+        run: make -j4 -C ${{env.AUTOTESTER_PATH}}
 
       - name: Download Secrets
         id: download-secrets
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: ${{env.HOST_DOMAIN}}/CE-Programming/secrets
+          file-url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
           location: ${{env.SECRETS_PATH}}
       - name: Decrypt Secrets
         env:
@@ -183,33 +184,28 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: clibs
+          path: ${{env.TOOLCHAIN_PATH}}
       - name: Test Examples
         if: runner.os != 'Windows'
-        env:
-          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/clibs.8xg
-          AUTOTESTER_ROM: ${{env.SECRETS_PATH}}/${{env.ROM_FILE}}
-          CEDEV: ${{env.INSTALL_PATH}}
         run: |
           failed=0
-          find ${{env.INSTALL_PATH}}/examples -name autotest.json -print0 | while read -d '' test; do
+          find ${{env.CEDEV_EXAMPLES}} -name autotest.json -print0 | while read -d '' test; do
             cmake -E echo "Launching autotester on $test"
-            autotester "$test"
+            ${{env.AUTOTESTER_PATH}}/autotester "$test"
             cmake -E true $((failed += $?))
           done
+          cmake -E echo "$failed tests failed"
           exit $failed
       - name: Test Examples
         if: runner.os == 'Windows'
-        env:
-          AUTOTESTER_LIBS_GROUP: ${{github.workspace}}\clibs.8xg
-          AUTOTESTER_ROM: ${{env.SECRETS_PATH}}\${{env.ROM_FILE}}
-          CEDEV: ${{env.INSTALL_PATH}}
         run: |
           $failed = 0
-          foreach ($test in get-childitem "${{env.INSTALL_PATH}}\examples" -recurse -include autotest.json) {
+          foreach ($test in get-childitem "${{env.CEDEV_EXAMPLES}}" -recurse -include autotest.json) {
             cmake -E echo "Launching autotester on $test"
-            autotester "$test"
+            ${{env.AUTOTESTER_PATH}}\autotester.exe "$test"
             $failed += $lastexitcode
           }
+          cmake -E echo "$failed tests failed"
           exit $failed
 
       - name: Remove Secrets
