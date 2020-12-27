@@ -18,6 +18,9 @@ DisableWelcomePage=yes
 [Files]
 Source: {#DIST_PATH}\*; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
+[InstallDelete]
+Type: filesandordirs; Name: "{app}"
+
 [Code]
 const SystemEnvironmentKey = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';
 const UserEnvironmentKey = 'Environment';
@@ -59,8 +62,7 @@ var
     Paths: string;
     P: Integer;
 begin
-    if not RegQueryStringValue(HKEY_LOCAL_MACHINE, SystemEnvironmentKey, 'Path', Paths) then
-        exit;
+    if not RegQueryStringValue(HKEY_LOCAL_MACHINE, SystemEnvironmentKey, 'Path', Paths) then exit;
 
     P := Pos(';' + Uppercase(Path) + ';', ';' + Uppercase(Paths) + ';');
     if P = 0 then exit;
@@ -73,8 +75,7 @@ procedure EnvAddCEdev(CEdevNewPath: string);
 var
     CEdevPath: string;
 begin
-  if RegQueryStringValue(HKEY_CURRENT_USER, UserEnvironmentKey, CEDEVKey, CEdevPath) then
-    EnvRemovePath(CEdevPath + '\bin');
+  if RegQueryStringValue(HKEY_CURRENT_USER, UserEnvironmentKey, CEDEVKey, CEdevPath) then EnvRemovePath(CEdevPath + '\bin');
 
   RegWriteStringValue(HKEY_CURRENT_USER, UserEnvironmentKey, CEDEVKey, CEdevNewPath);
 end;
@@ -87,7 +88,6 @@ begin
        EnvAddPath(GetShortName(ExpandConstant('{app}') + '\bin'));
      end;
 end;
-
 
 // https://github.com/DomGries/InnoDependencyInstaller
 // code to download and install Microsoft Visual C++ Runtime as needed.
@@ -184,6 +184,16 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   I: Integer;
 begin
+
+  Result := '';
+
+  if DirExists(ExpandConstant('{app}')) then
+  begin
+    if SuppressibleMsgBox('The installer will now delete the destination folder (' + ExpandConstant('{app}') + '). It is recommended to back up any files inside, as they will be replaced by the installer. Continue?', mbConfirmation, MB_YESNO, IDYES) = IDNO
+    then
+      Result := 'Installing aborted by user.';
+  end;
+
   DelayedReboot := False;
   case InstallProducts of
     InstallError: begin
