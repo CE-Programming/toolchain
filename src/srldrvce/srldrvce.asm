@@ -179,59 +179,70 @@ end struct
 
 ; enum usb_transfer_direction
 virtual at 0
-	?HOST_TO_DEVICE				rb 1 shl 7
-	?DEVICE_TO_HOST				rb 1 shl 7
+	?HOST_TO_DEVICE			rb 1 shl 7
+	?DEVICE_TO_HOST			rb 1 shl 7
 end virtual
 
 virtual at 0
-	USB_SUCCESS				rb 1
-	USB_IGNORE				rb 1
-	USB_ERROR_SYSTEM			rb 1
-	USB_ERROR_INVALID_PARAM			rb 1
-	USB_ERROR_SCHEDULE_FULL			rb 1
-	USB_ERROR_NO_DEVICE			rb 1
-	USB_ERROR_NO_MEMORY			rb 1
-	USB_ERROR_NOT_SUPPORTED			rb 1
-	USB_ERROR_TIMEOUT			rb 1
-	USB_ERROR_FAILED			rb 1
+	USB_SUCCESS			rb 1
+	USB_IGNORE			rb 1
+	USB_ERROR_SYSTEM		rb 1
+	USB_ERROR_INVALID_PARAM		rb 1
+	USB_ERROR_SCHEDULE_FULL		rb 1
+	USB_ERROR_NO_DEVICE		rb 1
+	USB_ERROR_NO_MEMORY		rb 1
+	USB_ERROR_NOT_SUPPORTED		rb 1
+	USB_ERROR_TIMEOUT		rb 1
+	USB_ERROR_FAILED		rb 1
 end virtual
 
+; enum usb_transfer_status
+?USB_TRANSFER_COMPLETED			:= 0
+?USB_TRANSFER_STALLED			:= 1 shl 0
+?USB_TRANSFER_NO_DEVICE			:= 1 shl 1
+?USB_TRANSFER_HOST_ERROR		:= 1 shl 2
+?USB_TRANSFER_ERROR			:= 1 shl 3
+?USB_TRANSFER_OVERFLOW			:= 1 shl 4
+?USB_TRANSFER_BUS_ERROR			:= 1 shl 5
+?USB_TRANSFER_FAILED			:= 1 shl 6
+?USB_TRANSFER_CANCELLED			:= 1 shl 7
+
 virtual at 0
-	SRL_SUCCESS				rb 1
-	SRL_IGNORE				rb 1
-	SRL_ERROR_SYSTEM			rb 1
-	SRL_ERROR_INVALID_PARAM			rb 1
-	SRL_ERROR_SCHEDULE_FULL			rb 1
-	SRL_ERROR_NO_DEVICE			rb 1
-	SRL_ERROR_NO_MEMORY			rb 1
-	SRL_ERROR_NOT_SUPPORTED			rb 1
-	SRL_ERROR_TIMEOUT			rb 1
-	SRL_ERROR_FAILED			rb 1
-	SRL_ERROR_INVALID_INTERFACE		rb 1
+	SRL_SUCCESS			rb 1
+	SRL_IGNORE			rb 1
+	SRL_ERROR_SYSTEM		rb 1
+	SRL_ERROR_INVALID_PARAM		rb 1
+	SRL_ERROR_SCHEDULE_FULL		rb 1
+	SRL_ERROR_NO_DEVICE		rb 1
+	SRL_ERROR_NO_MEMORY		rb 1
+	SRL_ERROR_NOT_SUPPORTED		rb 1
+	SRL_ERROR_TIMEOUT		rb 1
+	SRL_ERROR_FAILED		rb 1
+	SRL_ERROR_INVALID_INTERFACE	rb 1
 end virtual
 
 ; enum usb_descriptor_type
 virtual at 1
-	?DEVICE_DESCRIPTOR			rb 1
-	?CONFIGURATION_DESCRIPTOR		rb 1
-	?STRING_DESCRIPTOR			rb 1
-	?INTERFACE_DESCRIPTOR			rb 1
-	?ENDPOINT_DESCRIPTOR			rb 1
+	?DEVICE_DESCRIPTOR		rb 1
+	?CONFIGURATION_DESCRIPTOR	rb 1
+	?STRING_DESCRIPTOR		rb 1
+	?INTERFACE_DESCRIPTOR		rb 1
+	?ENDPOINT_DESCRIPTOR		rb 1
 end virtual
 
 ; enum usb_transfer_type
 virtual at 0
-	?CONTROL_TRANSFER			rb 1
-	?ISOCHRONOUS_TRANSFER			rb 1
-	?BULK_TRANSFER				rb 1
-	?INTERRUPT_TRANSFER			rb 1
+	?CONTROL_TRANSFER		rb 1
+	?ISOCHRONOUS_TRANSFER		rb 1
+	?BULK_TRANSFER			rb 1
+	?INTERRUPT_TRANSFER		rb 1
 end virtual
 
 virtual at 0
-  USB_IS_DISABLED				rb 1
-  USB_IS_ENABLED				rb 1
-  USB_IS_DEVICES				rb 1
-  USB_IS_HUBS					rb 1
+  USB_IS_DISABLED			rb 1
+  USB_IS_ENABLED			rb 1
+  USB_IS_DEVICES			rb 1
+  USB_IS_HUBS				rb 1
 end virtual
 
 ;-------------------------------------------------------------------------------
@@ -1283,11 +1294,20 @@ srl_Write_Blocking:
 srl_ReadCallback:
 	ld	iy,0
 	add	iy,sp
+	
+	ld	a,(iy + 6)			; do nothing if device was disconnected
+	and	a,USB_TRANSFER_NO_DEVICE
+	jr	z,.not_disconnected
+	xor	a,a
+	ld	(xsrl_Device.readBufActive),a
+	ret
+
+.not_disconnected:
 	push	ix
 	ld	ix,(iy + 12)
 	ld	hl,(iy + 9)			; return if nothing was transferred
 	compare_hl_zero
-	jq	z,.exit
+	jq	z,.restart
 
 	ld	a,SRL_FTDI
 	cp	a,(xsrl_Device.type)
@@ -1295,7 +1315,7 @@ srl_ReadCallback:
 	dec	hl				; transferred -= 2
 	dec	hl
 	compare_hl_zero
-	jq	z,.exit				; nothing was transferred
+	jq	z,.restart			; nothing was transferred
 
 	push	hl
 	pop	bc
@@ -1311,8 +1331,9 @@ srl_ReadCallback:
 	ld	bc,(xsrl_Device.readBufEnd)	;readBufEnd += transferred
 	add	hl,bc
 	ld	(xsrl_Device.readBufEnd),hl
-.exit:
+.restart:
 	call	srl_StartAsyncRead
+.exit:
 	pop	ix
 	ld	hl,USB_SUCCESS
 	ret
@@ -1322,6 +1343,12 @@ srl_ReadCallback:
 srl_WriteCallback:
 	ld	iy,0
 	add	iy,sp
+
+	ld	a,(iy + 6)			; do nothing if device was disconnected
+	and	a,USB_TRANSFER_NO_DEVICE
+	ld	a,0
+	ret	nz
+
 	push	ix
 	ld	ix,(iy + 12)
 	ld	bc,(iy + 9)			; writeBufStart += transferred
