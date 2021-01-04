@@ -1135,14 +1135,32 @@ srl_Write:
 	add	hl,bc
 	ld	bc,(xsrl_Device.writeBufEnd)
 	sbc	hl,bc
-	push	hl
-	push	hl
+	ex	hl,de
+
+	ld	hl,(xsrl_Device.writeBufStart)
+	ld	bc,(xsrl_Device.writeBuf)
+	or	a,a
+	sbc	hl,bc
+	jq	nz,.notstart1
+
+	dec	de
+
+.notstart1:
+	push	de,de
 	pop	bc
 
 	ld	hl,(iy + 6)			; copy transferred bytes from buffer to writeBufEnd
 	ld	de,(xsrl_Device.writeBufEnd)
 	ldir
 	ld	hl,(xsrl_Device.writeBuf)	; writeBufEnd = writeBuf
+	jq	nz,.notstart2
+
+	dec	hl
+	ld	(xsrl_Device.writeBufEnd),hl
+	pop	de
+	jq	.exit
+
+.notstart2:
 	ld	(xsrl_Device.writeBufEnd),hl
 	pop	de				; transferred = writeBuf + writeBufSize - writeBufEnd
 	jq	.wrap
@@ -1159,6 +1177,7 @@ srl_Write:
 	ld	hl,(xsrl_Device.writeBufStart)
 	ld	bc,(xsrl_Device.writeBufEnd)
 	sbc	hl,bc
+	jq	z,.exit				; if the buffer is full, just return
 	push	hl
 	push	hl
 	pop	bc
