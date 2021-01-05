@@ -1094,9 +1094,9 @@ srl_Read:
 .sched:
 	ld	a,(xsrl_Device.readBufActive)	; if read is inactive
 	or	a,a
-	push	de
+	push	de,iy
 	call	z,srl_StartAsyncRead		; attempt to schedule async transfer
-	pop	de
+	pop	iy,de
 	xor	a,a				; get number of bytes transferred
 	ld	hl,(iy + 9)
 	sbc	hl,de
