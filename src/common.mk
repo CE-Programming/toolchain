@@ -15,7 +15,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 CEDEV_DIR := CEdev
-CEDEV_VERSION := 9.0
+CEDEV_VERSION := 9.1
 
 LINUX := 0
 MACOS := 0

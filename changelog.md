@@ -2,9 +2,13 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-[Full commit list](https://github.com/CE-Programming/toolchain/compare/v9.0...HEAD)
+# [v9.1](https://github.com/CE-Programming/toolchain/releases/tag/v9.1) (2021-01-1x)
 
-# [v9.0](https://github.com/CE-Programming/toolchain/releases/tag/v9.0) (2020-12-2x)
+  - Update fasmg (fix linker bug that could unnecessarily require a library)
+  - Update ez80-clang (fix compiler bug where taking the address of stack variables in simple functions was broken)
+  - Improve CI
+
+# [v9.0](https://github.com/CE-Programming/toolchain/releases/tag/v9.0) (2020-12-26)
 
 **Major release!** 🥂 <img src="https://llvm.org/img/DragonSmall.png" title="llvm" align="right">
 
