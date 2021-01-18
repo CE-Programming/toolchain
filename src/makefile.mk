@@ -91,7 +91,6 @@ NATIVEMKDR = mkdir -p $1
 QUOTE_ARG = '$(subst ','\'',$1)'#'
 endif
 
-MAKEFILE_FILE := $(lastword $(MAKEFILE_LIST))
 MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
 
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
@@ -108,7 +107,6 @@ TARGETBIN := $(NAME).bin
 TARGETMAP := $(NAME).map
 TARGET8XP := $(NAME).8xp
 ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
-ICONSRC := $(call NATIVEPATH,$(OBJDIR)/icon.src)
 
 # startup routines
 LDCRT0 := $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
@@ -133,11 +131,13 @@ LDLIBS := $(wildcard $(CEDEV)/lib/libload/*.lib)
 
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
+ICONSRC := $(call NATIVEPATH,$(OBJDIR)/icon.src)
 ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDREQUIRE += -i $(call QUOTE_ARG,require ___icon)
 LDICON := $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 else
 ifneq ($(DESCRIPTION),)
+ICONSRC := $(call NATIVEPATH,$(OBJDIR)/icon.src)
 ICON_CONV := $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDREQUIRE += -i $(call QUOTE_ARG,require ___description)
 LDICON := $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
@@ -219,23 +219,29 @@ debug: LDDEBUG = 1
 debug: CCDEBUG = -gdwarf-5 -g3
 debug: $(BINDIR)/$(TARGET8XP)
 
-$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_FILE) $(DEPS)
+$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
-$(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONIMG) $(MAKEFILE_FILE) $(DEPS)
+$(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONSRC) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(ICON_CONV)
 	$(Q)echo [linking] $(call NATIVEPATH,$@)
 	$(Q)$(FASMLD) $(FASMFLAGS) $(call NATIVEPATH,$@)
 
+ifneq ($(ICONSRC),)
+$(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [convimg] $(or $(ICONIMG),description)
+	$(Q)$(ICON_CONV)
+endif
+
 # these rules compile the source files into assembly files
-$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_FILE) $(DEPS)
+$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
 	$(Q)$(EZCC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
-$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_FILE) $(DEPS)
+$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
 	$(Q)$(EZCC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
