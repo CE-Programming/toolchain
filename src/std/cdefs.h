@@ -1,8 +1,13 @@
 #ifndef _CDEFS_H
 #define _CDEFS_H
 
-#define __CONCAT(x,y) x ## y
-#define __TOSTRING(x) #x
+#define __JOIN2(x, y)     x ## y
+#define __JOIN3(x, y, z)  x ## y ## z
+#define __CONCAT(x, y)    __JOIN2(x, y)
+#define __TOSTRING(x)     #x
+
+#define __STDINT_C(C, T)  __CONCAT(C, __##T##_C_SUFFIX__)
+#define __STDINT_WIDTH(T) (sizeof(__##T##_TYPE__)*__CHAR_BIT__)
 
 #ifndef __cplusplus
 # define __BEGIN_DECLS

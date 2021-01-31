@@ -295,7 +295,7 @@ typedef enum {
 #define kb_KeyAlpha     ((kb_lkey_t)(2 << 8 | 1<<7))
 
 /* Keyboard group 2 - 83 Premium CE key names */
-#define kb_TglExact     kb_KeyRecip
+#define kb_KeyTglExact  kb_KeyRecip
 
 
 /* Keyboard group 3 */

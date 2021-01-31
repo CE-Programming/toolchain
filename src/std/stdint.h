@@ -1,11 +1,7 @@
 #ifndef _STDINT_H
 #define _STDINT_H
 
-#define __STDINT_JOIN2(A, B)    A##B
-#define __STDINT_JOIN3(A, B, C) A##B##C
-#define __STDINT_CONCAT(A, B)   __STDINT_JOIN2(A, B)
-#define __STDINT_C(C, T)        __STDINT_CONCAT(C, __##T##_C_SUFFIX__)
-#define __STDINT_WIDTH(T)       (sizeof(__##T##_TYPE__)*__CHAR_BIT__)
+#include <cdefs.h>
 
 typedef          __INT8_TYPE__                        int8_t;
 #define            INT8_MIN                       (~__INT8_MAX__)

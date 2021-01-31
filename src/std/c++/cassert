@@ -1,0 +1,5 @@
+// -*- C++ -*-
+
+#include <assert.h>
+
+#pragma GCC system_header
