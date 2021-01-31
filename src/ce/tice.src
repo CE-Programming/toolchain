@@ -14,7 +14,7 @@
 	public _boot_Set48MHzModeI
 	public _boot_GetBatteryStatus
 	public _boot_WaitShort
-	public _boot_USBBatteryCharging
+	public _boot_BatteryCharging
 	public _boot_USBBusPowered
 	public _boot_USBSelfPowered
 	public _boot_USBResetChip
@@ -161,7 +161,7 @@ _boot_Set6MHzModeI              := 0003A4h
 _boot_Set48MHzModeI             := 0003A8h
 _boot_GetBatteryStatus          := 0003B0h
 _boot_WaitShort                 := 0003B4h
-_boot_USBBatteryCharging        := 0003CCh
+_boot_BatteryCharging           := 0003CCh
 _boot_USBBusPowered             := 0003E4h
 _boot_USBSelfPowered            := 0003E8h
 _boot_USBResetChip              := 0003F4h

@@ -605,7 +605,42 @@ void boot_NewLine(void);
 tiflags uint8_t boot_GetBatteryStatus(void);
 
 /**
- * Waits for ~10 ms
+ * @returns True if the battery is currently charging.
+ */
+bool boot_BatteryCharging(void);
+
+/**
+ * @returns True if the USB bus is powered by a host.
+ */
+bool boot_USBBusPowered(void);
+
+/**
+ * @returns True if the USB bus is self-powered.
+ */
+bool boot_USBSelfPowered(void);
+
+/**
+ * Resets the USB controller.
+ */
+void boot_USBResetChip(void);
+
+/**
+ * Disables the USB Timers.
+ */
+void boot_USBDisableTimers(void);
+
+/**
+ * Enables the USB Timers.
+ */
+void boot_USBEnableTimers(void);
+
+/**
+ * Resets the USB Timers.
+ */
+void boot_USBResetTimers(void);
+
+/**
+ * Waits for ~10 ms. In most cases it is better to use the delay() function.
  */
 void boot_WaitShort(void);
 
