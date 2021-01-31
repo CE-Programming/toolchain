@@ -2,12 +2,12 @@
 # This makefile builds all the example projects
 #-----------------------------------------------
 
-DIRS = hello_world/makefile $(wildcard */*/makefile)
+MAKEFILES = hello_world/makefile $(wildcard */*/makefile)
 
-all clean gfx .PHONY: $(DIRS)
+all clean gfx .PHONY: $(MAKEFILES)
 
-$(DIRS):
-	$(MAKE) -C $(dir $@) $(MAKECMDGOALS)
+$(MAKEFILES):
+	$(MAKE) -C $(dir $@) $(or $(MAKECMDGOALS),$(findstring debug,$@))
 
 .PHONY: all clean gfx
 
