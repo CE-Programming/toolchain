@@ -4,4 +4,4 @@ This demo tests the timer api from usbdrvce.
 
 ---
 
-This template is a part of the C SDK Toolchain for use on the CE.
+This demo is part of the CE C SDK Toolchain.
