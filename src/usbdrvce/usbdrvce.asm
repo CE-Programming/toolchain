@@ -954,7 +954,7 @@ iterate value, DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCR
  end if
 end iterate
 	ld	hl,(ix+6)
-	call	usb_GetDeviceEndpoint.enter
+	call	usb_GetDeviceEndpoint.nc
 	push	hl
 	call	usb_ControlTransfer
 	ld	iy,(ix-6)
@@ -1000,7 +1000,7 @@ usb_GetDescriptor:
 	ld	(hl),de
 .endpoint:
 	ld	hl,(ix+6)
-	call	usb_GetDeviceEndpoint.enter
+	call	usb_GetDeviceEndpoint.nc
 	push	hl
 	call	usb_ControlTransfer
 	ex	de,hl
@@ -1198,7 +1198,7 @@ iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_F
 end iterate
 	xor	a,a
 	ld	hl,(yendpoint.device+1)
-	call	usb_GetDeviceEndpoint.enter
+	call	usb_GetDeviceEndpoint.nc
 	push	hl
 	call	usb_ControlTransfer
 	ld	yendpoint,(ix+6)
@@ -1217,8 +1217,9 @@ usb_GetDeviceEndpoint:
 	dec	l
 	ret	z
 	ld	a,c
-	and	a,$8F
 .enter:
+	and	a,$8F
+.nc:
 	ld	hl,(hl+device.endpoints)
 	bit	0,hl
 	jq	nz,.returnCarry
@@ -2458,12 +2459,11 @@ _ExecuteDma:
 	ld	hl,(rootHub.child)
 	call	usb_GetDeviceEndpoint.enter
 	ld	l,endpoint.overlay.next
+	bit	0,(hl)
+	ret	nz
 	ld	ytransfer,(hl)
-	ld	a,(ytransfer.status)
-repeat 8-bsr ytransfer.status.active
-	rlca
-end repeat
-	ret	nc
+	bitmsk	ytransfer.status.active
+	ret	z
 	ld	de,(ytransfer.remaining)
 	resmsk	ytransfer.remaining.dt,de
 	ld	a,i
@@ -3276,14 +3276,6 @@ end iterate
 	jq	_DispatchEvent
 
 _HandleDevFifoInt:
-	ld	l,ti.usbFifoRxIsr-$100
-repeat 4, fifo: 0
- iterate type, Spk, Out
-	bit	ti.bUsbIntFifo#fifo#type,(hl)
-	call	nz,_HandleFifo#fifo#type#Int
-	ret	nz
- end iterate
-end repeat
 	ld	l,ti.usbFifoTxImr-$100
 	ld	a,(hl)
 	cpl
@@ -3296,6 +3288,14 @@ repeat 4, fifo: 0
 	bit	ti.bUsbIntFifo#fifo#type,c
 	call	nz,_HandleFifo#fifo#type#Int
 	pop	bc
+	ret	nz
+ end iterate
+end repeat
+	ld	l,ti.usbFifoRxIsr-$100
+repeat 4, fifo: 0
+ iterate type, Spk, Out
+	bit	ti.bUsbIntFifo#fifo#type,(hl)
+	call	nz,_HandleFifo#fifo#type#Int
 	ret	nz
  end iterate
 end repeat
