@@ -333,7 +333,7 @@ typedef struct usb_control_setup {
 typedef struct usb_descriptor {
   uint8_t  bLength;             /**< The length of this descriptor.           */
   uint8_t  bDescriptorType;     /**< A usb_descriptor_type_t.                 */
-  uint8_t  data[1];             /**< The rest of the descriptor               */
+  uint8_t  data[];              /**< The rest of the descriptor               */
 } usb_descriptor_t;
 
 typedef struct usb_device_descriptor {
@@ -403,7 +403,7 @@ typedef struct usb_endpoint_descriptor {
 typedef struct usb_string_descriptor {
   uint8_t  bLength;             /**< byte length, not character length        */
   uint8_t  bDescriptorType;     /**< USB_STRING_DESCRIPTOR                    */
-  wchar_t  bString[1];          /**< UTF-16 string, no null termination       */
+  wchar_t  bString[];           /**< UTF-16 string, no null termination       */
 } usb_string_descriptor_t;
 
 typedef struct usb_standard_descriptors {
