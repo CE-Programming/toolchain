@@ -717,9 +717,10 @@ msd_Info:
 	pop	de
 	pop	iy
 	jr	nz,.error
-	ld	bc,4
 	ld	hl,(iy + 6)
-	add	hl,bc
+	inc	hl
+	inc	hl
+	inc	hl
 	ld	a,(de)
 	ld	(hl),a
 	inc	de
@@ -734,8 +735,11 @@ msd_Info:
 	dec	hl
 	ld	a,(de)
 	ld	(hl),a
+	inc	de
 	ld	hl,(iy + 9)
-	add	hl,bc
+	inc	hl
+	inc	hl
+	inc	hl
 	ld	a,(de)
 	ld	(hl),a
 	inc	de

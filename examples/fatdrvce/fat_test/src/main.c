@@ -52,9 +52,10 @@ void main(void) {
     static global_t global;
     static msd_device_t msd;
     static fat_t fat;
-    bool msd_inited = false;
-    uint24_t sectorsize;
+    uint32_t sector_size;
+    uint32_t sector_num;
     uint8_t numpartitions;
+    bool msd_inited = false;
     usb_error_t usberror = USB_ERROR_INVALID_PARAM;
     msd_error_t msderror = MSD_ERROR_INVALID_PARAM;
     fat_error_t faterror = FAT_ERROR_INVALID_PARAM;
@@ -108,10 +109,12 @@ void main(void) {
     }
 
     // get sector size
-    msderror = msd_GetSectorSize(&msd, &sectorsize);
+    msderror = msd_Info(&msd, &sector_num, &sector_size);
     if (msderror == MSD_SUCCESS)
     {
-        sprintf(buffer, "sectorsize: %u", sectorsize);
+        sprintf(buffer, "sector size: %u", (uint24_t)sector_size);
+        putstr(buffer);
+        sprintf(buffer, "sector num: %u", (uint24_t)sector_num);
         putstr(buffer);
 
         // find available fat partitions
