@@ -113,7 +113,7 @@ void main(void)
     }
 
     // locate partitions
-    faterror = fat_Find(&msd, &fatpartitions, &numpartitions, MAX_PARTITIONS);
+    faterror = fat_Find(&msd, fatpartitions, &numpartitions, MAX_PARTITIONS);
 
     // attempt fat init on first fat32 partition
     if (faterror == FAT_SUCCESS && numpartitions > 0)
