@@ -33,8 +33,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 ;-------------------------------------------------------------------------------
 	export msd_Init
 	export msd_Reset
-	export msd_GetSectorCount
-	export msd_GetSectorSize
+	export msd_Info
 	export msd_ReadSectors
 	export msd_WriteSectors
 	export fat_Find
@@ -690,55 +689,23 @@ msd_Reset:
 	jq	util_scsi_init		; return success if init scsi
 
 ;-------------------------------------------------------------------------------
-; Gets the block size from the device.
-; The library assumes that sector size == msd block size.
-; args:
-;  sp + 3  : msd device structure
-;  sp + 6  : pointer to store block size to
-; return:
-;  hl = error status
-msd_GetSectorSize:
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy + 3)
-	compare_hl_zero
-	jr	z,.paramerror
-	ld	hl,(iy + 6)
-	compare_hl_zero
-	jr	z,.paramerror
-	push	hl
-	ld	iy,(iy + 3)
-	ld	hl,scsi.readcapacity
-	lea	de,ymsdDevice.lba
-	call	util_scsi_request	; store the logical block address / size
-	pop	hl
-	jr	nz,.error
-	ld	de,(ymsdDevice.blocksize)
-	ld	(hl),de
-	or	a,a
-	sbc	hl,hl
-	ret
-.paramerror:
-	ld	hl,MSD_ERROR_INVALID_PARAM
-	ret
-.error:
-	ld	hl,MSD_ERROR_USB_FAILED
-	ret
-
-;-------------------------------------------------------------------------------
-; Gets the sector count of the device.
+; Gets the number of and size of the device sectors.
 ; args:
 ;  sp + 3  : msd device structure
 ;  sp + 6  : pointer to store sector count to
+;  sp + 9  : pointer to store sector size to
 ; return:
 ;  hl = error status
-msd_GetSectorCount:
+msd_Info:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 3)
 	compare_hl_zero
 	jr	z,.paramerror
 	ld	hl,(iy + 6)
+	compare_hl_zero
+	jr	z,.paramerror
+	ld	hl,(iy + 9)
 	compare_hl_zero
 	jr	z,.paramerror
 	push	iy
@@ -747,12 +714,42 @@ msd_GetSectorCount:
 	lea	de,ymsdDevice.lba
 	push	de
 	call	util_scsi_request	; store the logical block address / size
-	pop	hl
+	pop	de
 	pop	iy
 	jr	nz,.error
-	ld	de,(iy + 6)
 	ld	bc,4
-	ldir
+	ld	hl,(iy + 6)
+	add	hl,bc
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	ld	hl,(iy + 9)
+	add	hl,bc
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
 	or	a,a
 	sbc	hl,hl
 	ret
@@ -844,10 +841,6 @@ util_scsi_init:
 	and	a,$f
 	cp	a,6
 	jr	z,.unitattention
-	ld	hl,scsi.readcapacity
-	lea	de,ymsdDevice.lba
-	call	util_scsi_request	; store the logical block address / size
-	jr	nz,.error
 	ld	hl,scsi.testunitready
 	call	util_scsi_request_default
 	jr	nz,.error

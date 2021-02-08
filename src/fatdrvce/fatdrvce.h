@@ -377,22 +377,15 @@ msd_error_t msd_Init(msd_device_t *msd,
 msd_error_t msd_Reset(msd_device_t *msd);
 
 /**
- * Gets the sector count of the device.
+ * Gets the number of and size of each sector on the device.
  * @param msd MSD device structure.
- * @param blockSize Pointer to store block size to.
+ * @param blockSize Pointer to store number of sectors to.
+ * @param blockSize Pointer to store sector size to.
  * @return MSD_SUCCESS on success.
  */
-msd_error_t msd_GetSectorCount(msd_device_t *msd,
-                               uint32_t *sectorCount);
-
-/**
- * Gets the sector size of each sector on the device.
- * @param msd MSD device structure.
- * @param blockSize Pointer to store block size to.
- * @return MSD_SUCCESS on success.
- */
-msd_error_t msd_GetSectorSize(msd_device_t *msd,
-                              uint24_t *sectorSize);
+msd_error_t msd_Info(msd_device_t *msd,
+                     uint32_t *sectorNum,
+                     uint32_t *sectorSize);
 
 /**
  * Reads sectors from a Mass Storage Device.
