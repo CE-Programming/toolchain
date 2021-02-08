@@ -148,7 +148,7 @@ macro ?!
   label done
  end macro
 
- calminstruction ld? lhs, mhs*, rhs
+ calminstruction ld? lhs*, mhs*, rhs
   match , rhs
   jyes plain
   isindirect lhs
@@ -157,17 +157,17 @@ macro ?!
   jno errarguments
  load:
   execute =ld? mhs, (rhs)
-  check mhs metadata 1 eq @ez80.wreg
+  check mhs metadata 1 element 1 eq @ez80.wreg
   jyes loadword
  loadbyte:
-  execute =ld? mhs, (rhs + =byte?)
+  execute =ld? lhs, (rhs + =byte?)
   exit
  loadword:
-  execute =ld? mhs, (rhs + =@ez80.=ws)
+  execute =ld? lhs, (rhs + =@ez80.=ws)
   exit
  store:
   execute =ld? (lhs), rhs
-  check rhs metadata 1 eq @ez80.wreg
+  check rhs metadata 1 element 1 eq @ez80.wreg
   jyes storeword
  storebyte:
   execute =ld? (lhs + =byte?), mhs
