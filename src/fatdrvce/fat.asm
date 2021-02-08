@@ -98,7 +98,7 @@ fat_Init:
 	ld	ix,(yfatType.partition)
 	ld	a,hl,(xfatPartition.lba)	; get fat base lba
 	ld	(yfatType.fat_base_lba),a,hl
-	or	a,a
+	xor	a,a
 	sbc	hl,hl
 	call	util_read_fat_sector		; read fat zero sector
 	jq	nz,.error
@@ -525,7 +525,7 @@ fat_SetSize:
 	pop	iy
 	ld	(yfatType.working_size),a,bc
 	pop	iy				; get current file size
-	call	__lcmpu
+	call	ti._lcmpu
 	jq	z,.success			; if same size, just return
 	jq	c,.makelarger
 .makesmaller:
@@ -678,12 +678,12 @@ fat_SetFilePos:
 	xor	a,a
 	ld	e,a
 	push	bc,hl
-	call	__lremu				; get sector offset in cluster
+	call	ti._lremu				; get sector offset in cluster
 	ld	(yfatFile.cluster_sector),l
 	pop	hl,bc
 	xor	a,a
 	ld	e,a
-	call	__ldivu
+	call	ti._ldivu
 	push	hl
 	pop	bc
 	ld	a,hl,(yfatFile.first_cluster)
@@ -1164,13 +1164,13 @@ fat_Create:
 	ld	hl,(iy + 6)
 	compare_hl_zero
 	jq	z,.rootdirpath
-	call	_StrCopy
+	call	ti.StrCopy
 .rootdirpath:
 	ld	a,'/'
 	ld	(de),a
 	inc	de
 	ld	hl,(iy + 9)
-	call	_StrCopy
+	call	ti.StrCopy
 	pop	de
 	push	iy
 	ld	iy,(iy + 3)
@@ -1526,7 +1526,7 @@ util_dealloc_cluster_chain:
 	call	util_cluster_entry_to_sector
 	ld	e,a
 	ld	a,bc,(yfatType.working_sector)
-	call	__lcmpu
+	call	ti._lcmpu
 	jq	z,.followchain
 	jq	.updatepartialchain
 .updatepartialchain:
@@ -2633,7 +2633,7 @@ util_cluster_entry_to_sector:
 	ld	e,a
 	xor	a,a
 	ld	bc,128
-	call	__ldivu
+	call	ti._ldivu
 	ld	bc,(yfatType.fat_pos)
 	add	hl,bc
 	adc	a,e
@@ -2648,12 +2648,12 @@ util_ceil_byte_size_to_sector_size:
 	xor	a,a
 	ld	bc,512
 	push	bc
-	call	__lremu
+	call	ti._lremu
 	compare_hl_zero
 	pop	bc,de,hl
 	push	af
 	xor	a,a
-	call	__ldivu
+	call	ti._ldivu
 	pop	af
 	ret	z
 	inc	hl
@@ -2673,12 +2673,12 @@ util_ceil_byte_size_to_cluster_size:
 	pop	hl,de
 	ld	e,d
 	push	hl,de,bc
-	call	__lremu
+	call	ti._lremu
 	compare_hl_zero
 	pop	bc,de,hl
 	push	af
 	xor	a,a
-	call	__ldivu
+	call	ti._ldivu
 	pop	af
 	ret	z
 	inc	hl
