@@ -53,7 +53,7 @@ static usb_error_t handleTestIn(usb_endpoint_t endpoint,
     putByteHex(status);
     putChar(':');
     putIntHex(transferred);
-    _OS(asm_NewLine);
+    os_NewLine();
     return USB_SUCCESS;
 }
 
@@ -65,7 +65,7 @@ static usb_error_t handleTestOut(usb_endpoint_t endpoint,
     putIntHex(transferred);
     putChar(':');
     putBlockHex((char *)data + transferred - 6, 7);
-    _OS(asm_NewLine);
+    os_NewLine();
     free(data);
     return USB_SUCCESS;
 }
@@ -76,7 +76,7 @@ static usb_error_t handleBulkIn(usb_endpoint_t endpoint,
     putByteHex(status);
     putChar('|');
     putIntHex(transferred);
-    _OS(asm_NewLine);
+    os_NewLine();
     return USB_SUCCESS;
 }
 
@@ -88,7 +88,7 @@ static usb_error_t handleBulkOut(usb_endpoint_t endpoint,
     putIntHex(transferred);
     putChar('|');
     putBlockHex((char *)data + transferred - 6, 7);
-    _OS(asm_NewLine);
+    os_NewLine();
     free(data);
     return USB_SUCCESS;
 }
@@ -144,7 +144,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             os_PutStrFull(usb_event_names[event]);
             putChar(':');
             putNibHex(*(const usb_role_t *)event_data >> 4);
-            _OS(asm_NewLine);
+            os_NewLine();
             break;
         case USB_DEVICE_DISCONNECTED_EVENT:
             if (callback_data->device == event_data) {
@@ -157,7 +157,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putChar(':');
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            _OS(asm_NewLine);
+            os_NewLine();
             if (event != USB_DEVICE_DISCONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE))
                 error = usb_ResetDevice(event_data);
             break;
@@ -166,14 +166,14 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putChar(':');
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            _OS(asm_NewLine);
+            os_NewLine();
             callback_data->device = event_data;
             break;
         case USB_DEFAULT_SETUP_EVENT: {
             const usb_control_setup_t *setup = event_data;
             for (i = 0; i < 8; i++)
                 putByteHex(((unsigned char *)setup)[i]);
-            _OS(asm_NewLine);
+            os_NewLine();
             if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == (USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE) &&
                 !setup->bRequest && !setup->wValue && !setup->wIndex) {
                 usb_device_t host;
@@ -209,7 +209,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putChar(':');
             putIntHex((unsigned)event_data);
             putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            _OS(asm_NewLine);
+            os_NewLine();
             usb_SetEndpointFlags(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81), USB_AUTO_TERMINATE);
             usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81),
 "000000000000000000000000000000000000000000000000000000000000000\n"
@@ -245,21 +245,21 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             break;
         case 100:
             putIntHex((unsigned)event_data);
-            _OS(asm_NewLine);
+            os_NewLine();
             break;
         case 101:
             putLongHex(atomic_load_32(&timer_2_Counter));
             os_PutStrFull(" cycles");
-            _OS(asm_NewLine);
+            os_NewLine();
             timer_2_Counter = 0;
         case 102:
             for (i = 0; i < 64; i++)
                 putByteHex(((unsigned char *)event_data)[i]);
-            _OS(asm_NewLine);
+            os_NewLine();
             break;
         default:
             os_PutStrFull(usb_event_names[event]);
-            _OS(asm_NewLine);
+            os_NewLine();
             break;
     }
     return error;
@@ -305,7 +305,7 @@ static bool parseConfigurationDescriptor(global_t *const global,
     if (!in || !out) return false;
     if ((error = usb_SetConfiguration(global->device, configuration, length)) != USB_SUCCESS) {
         putIntHex(error);
-        _OS(asm_NewLine);
+        os_NewLine();
         return false;
     }
     global->in = usb_GetDeviceEndpoint(global->device, in);
@@ -333,7 +333,7 @@ static void handleDevice(global_t *global) {
         != USB_SUCCESS) goto err;
     if (length < sizeof(device)) goto noerr;
     putBlockHex(&device, sizeof(device));
-    _OS(asm_NewLine);
+    os_NewLine();
     for (index = 0; !found && index != device.bNumConfigurations; ++index) {
         length = usb_GetConfigurationDescriptorTotalLength(global->device, index);
         if (!(configuration = malloc(length))) goto noerr;
@@ -343,7 +343,7 @@ static void handleDevice(global_t *global) {
         putByteHex(index);
         putChar(':');
         putBlockHex(configuration, length);
-        _OS(asm_NewLine);
+        os_NewLine();
         found = parseConfigurationDescriptor(global, &device, configuration, length);
         free(configuration); configuration = NULL;
     }
@@ -351,7 +351,7 @@ static void handleDevice(global_t *global) {
     putByteHex(global->type);
     putByteHex(usb_GetEndpointAddress(global->in));
     putByteHex(usb_GetEndpointAddress(global->out));
-    _OS(asm_NewLine);
+    os_NewLine();
     switch (global->type) {
         case 1:
             putIntHex(usb_DefaultControlTransfer(global->device, &get_max_lun_setup, buffer, 0, &length));
@@ -360,12 +360,12 @@ static void handleDevice(global_t *global) {
                 putBlockHex(buffer, length);
             else
                 putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             putIntHex(usb_BulkTransfer(global->out, (uint8_t *)inquiry_cbw, sizeof(inquiry_cbw), 0, &length));
             putChar(':');
             putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             putIntHex(usb_BulkTransfer(global->in, buffer, 0x24, 0, &length));
             putChar(':');
@@ -373,7 +373,7 @@ static void handleDevice(global_t *global) {
                 putBlockHex(buffer, length);
             else
                 putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             putIntHex(usb_BulkTransfer(global->in, buffer, 0xD, 0, &length));
             putChar(':');
@@ -381,14 +381,14 @@ static void handleDevice(global_t *global) {
                 putBlockHex(buffer, length);
             else
                 putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             break;
         case 2:
             putIntHex(usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_00, sizeof(rdy_pkt_00), 0, &length));
             putChar(':');
             putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             length = 0;
             putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
@@ -397,12 +397,12 @@ static void handleDevice(global_t *global) {
                 putBlockHex(buffer, length);
             else
                 putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             putIntHex(usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_01, sizeof(rdy_pkt_01), 0, &length));
             putChar(':');
             putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             length = 0;
             putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
@@ -411,14 +411,14 @@ static void handleDevice(global_t *global) {
                 putBlockHex(buffer, length);
             else
                 putIntHex(length);
-            _OS(asm_NewLine);
+            os_NewLine();
 
             break;
     }
     goto noerr;
  err:
     putIntHex(error);
-    _OS(asm_NewLine);
+    os_NewLine();
  noerr:
     if (configuration) free(configuration);
     memset(global, 0, sizeof(global_t));

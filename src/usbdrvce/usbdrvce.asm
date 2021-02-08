@@ -53,12 +53,12 @@ library USBDRVCE, 0
 	export usb_Transfer
 	export usb_ScheduleControlTransfer
 	export usb_ScheduleTransfer
-	export usb_StartTimer
-	export usb_RepeatTimer
-	export usb_StartCycleTimer
-	export usb_RepeatCycleTimer
+	export usb_MsToCycles
 	export usb_GetCycleCounter
 	export usb_GetCycleCounterHigh
+	export usb_StopTimer
+	export usb_StartTimerCycles
+	export usb_RepeatTimerCycles
 
 ;-------------------------------------------------------------------------------
 ; macros
@@ -128,6 +128,14 @@ end macro
 ;-------------------------------------------------------------------------------
 ; memory structures
 ;-------------------------------------------------------------------------------
+struct timer
+	local size
+	label .: size
+	tick		rd 1
+	next		rl 1
+	callback	rl 1
+	size := $-.
+end struct
 struct transfer			; transfer structure
 	label .: 32
 	next		rd 1	; pointer to next transfer structure
@@ -324,6 +332,7 @@ virtual at ti.usbArea
 	?currentRole		rb 1
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
+	?timerList		rl 1
 assert $+1 = cleanupListReady
 				rb 1 ; clobber
 	?cleanupListReady	rb 1
@@ -528,6 +537,7 @@ usb_Init:
 	sbc	hl,hl
 assert deviceStatus+1 = tempEndpointStatus
 	ld	(deviceStatus),hl
+	ld	(timerList),hl
 	dec	hl
 	ld	(cleanupListReady),hl
 	inc	hl
@@ -3840,19 +3850,36 @@ _DispatchEvent:
 	ret
 
 ;-------------------------------------------------------------------------------
-usb_StartTimer:
-	ret
-
-;-------------------------------------------------------------------------------
-usb_RepeatTimer:
-	ret
-
-;-------------------------------------------------------------------------------
-usb_StartCycleTimer:
-	ret
-
-;-------------------------------------------------------------------------------
-usb_RepeatCycleTimer:
+usb_MsToCycles:
+	pop	de
+	ex	(sp), hl
+	push	de
+.enter:
+assert 48000 and $FF = $80
+	dec.s	bc
+.zbcu:
+	ld	c, l
+	ld	b, h
+	xor	a, a
+	srl	b
+	rr	c
+	rra
+	ld	e, 48000 shr 8
+	ld	d, h
+	ld	h, e
+	mlt	hl
+	add	hl, bc
+	mlt	de
+	push	de
+	dec	sp
+	pop	de
+	ld	e, 0
+	add	hl, de
+	dec	sp
+	push	hl
+	dec	sp
+	pop	hl, de
+	ld	l, a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3911,6 +3938,18 @@ end virtual
 	cp	a,3 shl 0
 	ret	nc
 	inc	h
+	ret
+
+;-------------------------------------------------------------------------------
+usb_StopTimer:
+	ret
+
+;-------------------------------------------------------------------------------
+usb_StartTimerCycles:
+	ret
+
+;-------------------------------------------------------------------------------
+usb_RepeatTimerCycles:
 	ret
 
 ;-------------------------------------------------------------------------------
