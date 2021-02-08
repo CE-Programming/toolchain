@@ -32,8 +32,6 @@ include_library '../usbdrvce/usbdrvce.asm'
 ; v1 functions
 ;-------------------------------------------------------------------------------
 	export msd_Init
-	export msd_IsInit
-	export msd_Deinit
 	export msd_Reset
 	export msd_GetSectorCount
 	export msd_GetSectorSize
@@ -193,9 +191,9 @@ end macro
 ; msd structures
 struct packetCSW
 	label .: 13
-	signature rd 1
-	tag rd 1
-	residue rd 1
+	signature rb 4
+	tag rb 4
+	residue rb 4
 	status rb 1
 end struct
 struct packetCBD
@@ -206,9 +204,9 @@ struct packetCBD
 end struct
 struct packetCBW
 	label .: 14+17
-	signature rd 1
-	tag rd 1
-	len rd 1
+	signature rb 4
+	tag rb 4
+	len rb 4
 	dir rb 1
 	lun rb 1
 	cbd packetCBD
@@ -221,23 +219,20 @@ struct msdDevice
 	bulkoutaddr rb 1
 	configindex rb 1
 	tag rl 1
-	lba rd 1
+	lba rb 4
 	reserved rb 1	; technically part of block size
 	blocksize rl 1
 	interface rb 1
 	maxlun rb 1
-	flags rb 1
 	lun rb 1
 	buffer rl 1
 	size := $-.
 end struct
 
-MSD_FLAG_IS_INIT := 0
 MAX_FAT_FILES := 5
 BIT_READ := 0
 BIT_WRITE := 1
 BIT_OPEN := 7
-
 struct fatFile
 	local size
 	label .: size
@@ -308,7 +303,7 @@ struct scsipkt, dir: 0, length: 1, data: 0&
 		db (dir) shl 7, 0, %%, data
 		break
 	end iterate
-	rb 31 ; padding needed because some msd drives were built by idiots
+	rb 31		; padding needed because some msd drives were built by idiots
 end struct
 struct scsipktrw, dir: 0, type: 0
 .:	iterate @, data
@@ -393,7 +388,6 @@ virtual at 0
 	MSD_ERROR_USB_FAILED rb 1
 	MSD_ERROR_NOT_SUPPORTED rb 1
 	MSD_ERROR_INVALID_DEVICE rb 1
-	MSD_ERROR_NOT_INITIALIZED rb 1
 end virtual
 
 virtual at 0
@@ -447,10 +441,6 @@ DEFAULT_RETRIES := 50
 msd_Init:
 	ld	iy,0
 	add	iy,sp
-	push	ix
-	ld	ix,(iy + 3)
-	res	MSD_FLAG_IS_INIT,(xmsdDevice.flags)
-	pop	ix
 	ld	hl,(iy + 6)		; usb device
 	compare_hl_zero
 	jq	z,.paramerror
@@ -620,13 +610,7 @@ msd_Init:
 	; successfully found bulk endpoints for msd
 	; now reset the device
 
-	call	msd_Reset.enter
-	compare_hl_zero
-	ret	nz
-	set	MSD_FLAG_IS_INIT,(ymsdDevice.flags)
-	or	a,a
-	sbc	hl,hl
-	ret
+	jq	msd_Reset.enter
 
 .getconfigcheck:
 	ld	hl,tmp.descriptor + 17
@@ -636,63 +620,19 @@ msd_Init:
 .msddeverror:
 	ld	hl,MSD_ERROR_INVALID_DEVICE
 	ret
-.usberror:
-	ld	hl,MSD_ERROR_USB_FAILED
-	ret
 .paramerror:
 	ld	hl,MSD_ERROR_INVALID_PARAM
 	ret
 
 ;-------------------------------------------------------------------------------
-msd_IsInit:
-; Checks if the MSD has been successfully initialized.
-; args:
-;  sp + 3  : msd device structure
-; return:
-;  hl = error status
-	ld	iy,0
-	add	iy,sp
-	ld	iy,(iy + 3)
-	bit	MSD_FLAG_IS_INIT,(ymsdDevice.flags)
-	jq	z,.notinit
-	or	a,a
-	sbc	hl,hl
-	ret
-.notinit:
-	ld	hl,MSD_ERROR_NOT_INITIALIZED
-	ret
-
-;-------------------------------------------------------------------------------
-msd_Deinit:
-; Deinitializes the MSD structure as needed.
-; args:
-;  sp + 3  : msd device structure
-; return:
-;  hl = error status
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy + 3)
-	push	hl
-	pop	de
-	ld	(hl),0
-	inc	hl
-	ld	bc,sizeof msdDevice
-	ldir
-	ret
-
-;-------------------------------------------------------------------------------
-msd_Reset:
 ; Attempts to reset and restore normal working order.
 ; args:
 ;  sp + 3  : msd device structure
 ; return:
 ;  hl = error status
+msd_Reset:
 	pop	de,iy
 	push	iy,de
-	bit	MSD_FLAG_IS_INIT,(ymsdDevice.flags)
-	jq	nz,.enter
-	ld	hl,MSD_ERROR_NOT_INITIALIZED
-	ret
 .enter:
 	push	iy
 	ld	bc,0
@@ -722,7 +662,7 @@ msd_Reset:
 	pop	bc,bc,bc,bc,bc,bc
 	pop	iy
 	compare_hl_zero
-	jq	nz,.usberror			; ensure success
+	ret	nz			; ensure success
 	push	iy
 	ld	bc,(tmp.length)
 	push	bc
@@ -743,10 +683,10 @@ msd_Reset:
 .configuredmsd:
 	call	util_msd_reset
 	compare_hl_zero
-	jq	nz,.usberror
+	ret	nz
 	call	util_msd_get_max_lun
 	compare_hl_zero
-	jq	nz,.usberror
+	ret	nz
 	jq	util_scsi_init		; return success if init scsi
 
 ;-------------------------------------------------------------------------------
@@ -946,16 +886,14 @@ util_scsi_request:
 
 util_msd_xfer_cbw:
 	ld	iy,(util_scsi_request.msdstruct)
-	ld	a,hl,(ymsdDevice.tag)
+	ld	a,(ymsdDevice.bulkoutaddr)
+	ld	bc,(ymsdDevice.tag)
 	ld	ix,0
 .cbw := $-3
-	ld	(xpacketCBW.tag),a,hl
-	ld	bc,1
-	add	hl,bc
-	adc	a,b
-	ld	(ymsdDevice.tag),a,hl	; increment the tag
+	ld	(xpacketCBW.tag),bc
+	inc	bc
+	ld	(ymsdDevice.tag),bc	; increment the tag
 	ld	bc,sizeof packetCBW
-	ld	a,(ymsdDevice.bulkoutaddr)
 	call	util_msd_bulk_transfer
 	ret	z			; check the command was accepted
 .retry:
