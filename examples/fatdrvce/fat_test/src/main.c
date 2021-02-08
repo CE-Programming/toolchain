@@ -32,8 +32,8 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             putstr("usb device disconnected");
             break;
         case USB_DEVICE_CONNECTED_EVENT:
-            usb_ResetDevice(event_data);
-            break;
+            putstr("usb device connected");
+            return usb_ResetDevice(event_data);
         case USB_DEVICE_ENABLED_EVENT:
             callback_data->device = event_data;
             putstr("usb device enabled");
