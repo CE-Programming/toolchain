@@ -427,9 +427,10 @@ typedef struct usb_standard_descriptors {
 typedef struct usb_device   *usb_device_t;   /**< opaque  device  handle */
 typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
 
-#define USB_RETRY_FOREVER 0xFFFFFFu
+enum { USB_RETRY_FOREVER = 0xFFFFFFu };
 
-#define usb_RootHub() ((usb_device_t)0xD13FC0u) /**< Root hub device */
+#define /*usb_device_t */usb_RootHub(/*void*/)/*;*/ \
+    ((usb_device_t)0xD13FC0u) /**< Root hub device */
 
 /**
  * A pointer to \c usb_callback_data_t is passed to the \c usb_event_callback_t.
@@ -533,9 +534,9 @@ typedef struct usb_timer usb_timer_t;
 typedef usb_error_t (*usb_timer_callback_t)(usb_timer_t *timer);
 
 struct usb_timer {
-  usb_timer_callback_t handler;
   uint32_t tick;     /**< private */
   usb_timer_t *next; /**< private */
+  usb_timer_callback_t handler;
 };
 
 /**
@@ -987,12 +988,13 @@ usb_ControlTransfer(usb_endpoint_t endpoint, const usb_control_setup_t *setup,
  * NULL means don't return anything.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-#define usb_DefaultControlTransfer(/*usb_device_t */device,                    \
-                                   /*const usb_control_setup_t **/setup,       \
-                                   /*void **/buffer, /*unsigned */retries,     \
-                                   /*size_t **/transferred)/*;*/               \
-  usb_ControlTransfer(usb_GetDeviceEndpoint(device, 0), setup, buffer,         \
-                      retries, transferred)
+#define /*usb_error_t */                                                 \
+usb_DefaultControlTransfer(/*usb_device_t */device,                      \
+                           /*const usb_control_setup_t **/setup,         \
+                           /*void **/buffer, /*unsigned */retries,       \
+                           /*size_t **/transferred)/*;*/                 \
+    usb_ControlTransfer(usb_GetDeviceEndpoint(device, 0), setup, buffer, \
+                        retries, transferred)
 
 /**
  * Schedules a transfer to the pipe connected to \p endpoint, using \p length as
@@ -1099,36 +1101,54 @@ usb_ScheduleTransfer(usb_endpoint_t endpoint, void *buffer, size_t length,
 /* Timer Functions */
 
 /**
+ * Converts milliseconds to cpu cycles.
+ * @return ms * 48000
+ */
+uint32_t usb_MsToCycles(uint16_t ms);
+#define /*uint32_t */usb_MsToCycles(/*uint16_t */ms)                    \
+    (__builtin_constant_p(ms) ? (ms) * UINT32_C(48000) : usb_MsToCycles(ms))
+
+/**
+ * Stops a timer.
+ * @note May be called from within \c timer->handler itself.
+ */
+void usb_StopTimer(usb_timer_t *timer);
+
+/**
  * Starts a timer that expires \p timeout_ms after calling this function.
  * @note May be called from within \c timer->handler itself.
- * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param timer A user allocated struct with \c timer->handler already initialized.
  * @param timeout_ms Timeout in milliseconds.
  */
-void usb_StartTimer(usb_timer_t *timer, uint16_t timeout_ms);
+#define /*void */usb_StartTimerMs(/*usb_timer_t **/timer,        \
+                                  /*uint16_t */timeout_ms)/*;*/  \
+    usb_StartTimerCycles(timer, usb_MsToCycles(timeout_ms))
 
 /**
  * Starts a timer that expires \p interval_ms after it last expired.
  * @note May be called from within \c timer->handler itself.
- * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param timer A user allocated struct with \c timer->handler already initialized.
  * @param interval_ms Repeat interval in milliseconds.
  */
-void usb_RepeatTimer(usb_timer_t *timer, uint16_t interval_ms);
+#define /*void */usb_RepeatTimerMs(/*usb_timer_t **/timer,       \
+                                   /*uint16_t */timeout_ms)/*;*/ \
+    usb_RepeatTimerCycles(timer, usb_MsToCycles(timeout_ms))
 
 /**
  * Starts a timer that expires \p timeout_cycles after calling this function.
  * @note May be called from within \c timer->handler itself.
- * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param timer A user allocated struct with \c timer->handler already initialized.
  * @param timeout_cycles Timeout in cpu cycles.
  */
-void usb_StartCycleTimer(usb_timer_t *timer, uint32_t timeout_cycles);
+void usb_StartTimerCycles(usb_timer_t *timer, uint32_t timeout_cycles);
 
 /**
  * Starts a timer that expires \p interval_cycles after it last expired.
  * @note May be called from within \c timer->handler itself.
- * @param timer An allocated struct with \c timer->handler already initialized.
+ * @param timer A user allocated struct with \c timer->handler already initialized.
  * @param interval_cycles Repeat interval in cpu cycles.
  */
-void usb_RepeatCycleTimer(usb_timer_t *timer, uint32_t interval_cycles);
+void usb_RepeatTimerCycles(usb_timer_t *timer, uint32_t interval_cycles);
 
 /**
  * Returns a counter that increments once every cpu cycle, or 48000 times every
