@@ -1399,9 +1399,7 @@ usb_Transfer:
 	call	0
 label .dispatch at $-long
 .wait:
-	push	bc
 	call	usb_WaitForEvents
-	pop	bc
 	add	hl,de
 	or	a,a
 	sbc	hl,de
@@ -2211,8 +2209,15 @@ _DeviceDisconnected:
 ; Input:
 ;  iy = device
 ; Output:
+;  af = ?
 ;  zf = enough memory
+;  bc = ?
+;  de = ?
+;  hl = ?
 ;  iy = endpoint | ?
+_CreateDefaultControlEndpoint.enable:
+	resmsk	IS_DISABLED,(ydevice.find)
+	setmsk	IS_ENABLED,(ydevice.find)
 _CreateDefaultControlEndpoint:
 	ld	de,_DefaultControlEndpointDescriptor
 	jq	_CreateEndpoint
@@ -2221,7 +2226,11 @@ _CreateDefaultControlEndpoint:
 ;  de = endpoint descriptor
 ;  iy = device
 ; Output:
+;  af = ?
 ;  zf = enough memory
+;  bc = ?
+;  de = ?
+;  hl = ?
 ;  iy = endpoint | ?
 _CreateEndpoint:
 	call	_Alloc64Align256
@@ -2402,6 +2411,10 @@ end repeat
 ;  ix = ?
 ;  iy = device
 _ParseInterfaceDescriptors:
+	ld	c,iyl
+	bit	0,c
+	ret	nz
+.valid:
 	ld	hl,ti.mpUsbDevTest
 	set	ti.bUsbTstClrFifo,(hl)
 	res	ti.bUsbTstClrFifo,(hl)
@@ -3443,6 +3456,7 @@ _HandleDevResetInt:
 	ld	l,ti.usbDevCtrl-$100
 	call	_CreateDevice
 	call	z,_CreateDefaultControlEndpoint
+	ld	hl,USB_ERROR_NO_MEMORY
 	ret	nz
 	ld	hl,(currentDescriptors)
 	ld	hl,(hl)
@@ -3727,13 +3741,9 @@ _HandlePortPortEnInt:
 	bit	ti.bUsbPortEn,(hl)
 	jq	z,_RootDeviceDisconnected.enter
 	ld	ydevice,(rootHub.child)
-	ld	a,iyl
-	cp	a,a
-	rrca
-	ret	c
-	resmsk	IS_DISABLED,(ydevice.find)
-	setmsk	IS_ENABLED,(ydevice.find)
-	call	_CreateDefaultControlEndpoint
+	ld	c,iyl
+	bit	0,c
+	call	z,_CreateDefaultControlEndpoint.enable
 	call	z,_Alloc32Align32
 	jq	nz,.disable
 	ld	bc,_HandleDeviceDescriptor
