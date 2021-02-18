@@ -287,12 +287,9 @@ srl_Init:
 	bit	USB_IS_ENABLED,l
 	jq	nz,.enabled
 
-	ld	bc,(xsrl_Device.dev)
-	push	bc				; enable device
-	call	usb_ResetDevice
-	pop	bc
-
-	call	usb_WaitForEvents
+	ld	a,SRL_ERROR_NO_DEVICE
+	pop	hl
+	jq	.exit
 
 .enabled:					; get descriptor
 	ld	bc,tmp.length			; storage for size of descriptor

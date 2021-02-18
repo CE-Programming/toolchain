@@ -24,8 +24,13 @@ uint8_t srl_buf[512];
 /* Handle USB events */
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                                     usb_callback_data_t *callback_data __attribute__((unused))) {
+    /* Enable newly connected devices */
+    if(event == USB_DEVICE_CONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) {
+        usb_device_t device = event_data;
+        usb_ResetDevice(device);
+    }
     /* When a device is connected, or when connected to a computer */
-    if((event == USB_DEVICE_CONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) || event == USB_HOST_CONFIGURE_EVENT) {
+    if((event == USB_DEVICE_ENABLED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) || event == USB_HOST_CONFIGURE_EVENT) {
         if(!has_device) {
             usb_device_t device = event_data;
 
