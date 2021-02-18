@@ -698,8 +698,8 @@ usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
                             usb_find_device_flags_t flags);
 
 /**
- * Performs a usb reset on a device. This triggers a device enabled event when
- * the reset finishes.
+ * Performs an asynchronous usb reset on a device. This triggers a device
+ * enabled event when the reset is complete.
  * @param device The device to reset.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
