@@ -310,6 +310,7 @@ srl_Init:
 	call	usb_GetDescriptor
 	pop	bc,bc,bc,bc,bc,bc,iy
 	compare_hl_zero
+	ld	a,l
 	jq	nz,.exit			; return if error
 	ld	de,18
 	ld	hl,(tmp.length)
