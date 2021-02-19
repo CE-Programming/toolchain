@@ -678,9 +678,8 @@ end iterate
 	call	usb_GetDeviceEndpoint
 	pop	de
 	pop	bc
+	jq	z,.no_ep
 	ld	(xsrl_Device.in),hl
-	dec	hl
-	jq	c,.err_nd
 
 	ld	bc,$04				; get endpoint
 	.epIn = $-3
@@ -691,9 +690,9 @@ end iterate
 	pop	bc
 	pop	bc
 	ld	(xsrl_Device.out),hl
-	dec	hl
-	jq	c,.err_nd
+.no_ep:
 	pop	iy
+	jq	z,.err_nd
 
 .deviceConfigured:
 	ld	hl,(iy + 9)			; set read buffer pointer, start, and end
