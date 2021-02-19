@@ -314,19 +314,22 @@ srl_Init:
 	compare_hl_de				; ensure enough bytes were fetched
 	jq	nz,.err_nd
 
-	push	iy
-	ld	bc,.configNum			; get current configuration number
-	push	bc
-	ld	bc,(xsrl_Device.dev)
-	push	bc
-	call	usb_GetConfiguration
-	pop	bc,bc,iy
-
-	ld	a,(.configNum)
-	or	a,a
+	xor	a,a
 	ld	(.prevConfig),a
+
+;	this appears to be broken?
+;	push	iy
+;	ld	bc,.prevConfig			; get current configuration number
+;	push	bc
+;	ld	bc,(xsrl_Device.dev)
+;	push	bc
+;	call	usb_GetConfiguration
+;	pop	bc,bc,iy
+
+	ld	a,(.prevConfig)
+	or	a,a
 	jr	nz,.configSet
-	ld	a,1
+	inc	a				; set config 1
 .configSet:
 	ld	(.configNum),a
 
@@ -364,7 +367,11 @@ srl_Init:
 	ld	bc,(xsrl_Device.dev)
 	push	bc
 	call	usb_GetDescriptor
+	ld	a,l
 	pop	de,hl,hl,bc,hl,hl,iy
+
+	or	a,a
+	jq	nz,.exit
 
 	ld	hl,tmp.descriptor + deviceDescriptor.idVendor		; check if device is an FTDI
 	ld	a,(hl)
@@ -550,8 +557,9 @@ end iterate
 .nonPL2303:
 	ld	de,(iy + 9)			; address of configuration descriptor
 	ld	hl,(.configSize)
+
 	add	hl,de
-	ex	hl,de
+	ex	hl,de				; hl = start, de = end
 
 	xor	a,a				; reset endpoints to zero
 	ld	(.epIn),a
@@ -561,79 +569,24 @@ end iterate
 	cp	a,SRL_INTERFACE_ANY
 	jq	z,.findAnyInterface
 
-.findSpecificInterface:
-	ld	bc,.loopFindSpecificInterface
-	ld	(.retVect),bc
-.loopFindSpecificInterface:
-	inc	hl
-	ld	a,(hl)
-	dec	hl
-	cp	a,INTERFACE_DESCRIPTOR		; check if interface descriptor
-	jq	nz,.nextDescriptor
-	inc	hl
-	inc	hl
-	ld	a,(hl)
-	cp	a,(iy + 15)
-	dec	hl
-	dec	hl
-	jq	nz,.nextDescriptor
-	ld	bc,5
+	call	findSpecificInterface
+	ld	a,SRL_ERROR_INVALID_INTERFACE
+	jq	nc,.exit
+
+	ld	bc,5				; check that this is a CDC data interface
 	add	hl,bc
 	ld	a,(hl)
 	sbc	hl,bc
 	cp	a,10
 	ld	a,SRL_ERROR_INVALID_INTERFACE
 	jq	nz,.exit
-	jq	.findEndpoints
+	call	findEndpoints
+	jq	.cdcCheckDone
 
 .findAnyInterface:
-	ld	bc,.loopFindAnyInterface
-	ld	(.retVect),bc
-.loopFindAnyInterface:
-	inc	hl
-	ld	a,(hl)
-	dec	hl
-	cp	a,INTERFACE_DESCRIPTOR		; check if interface descriptor
-	jq	nz,.nextDescriptor
-	ld	bc,5
-	add	hl,bc
-	ld	a,(hl)
-	sbc	hl,bc
-	cp	a,10
-	jq	nz,.nextDescriptor
-	jq	.findEndpoints
-
-.findEndpoints:
-	ld	bc,.loopFindEndpoints
-	ld	(.retVect),bc
-	jq	.nextDescriptor
-.loopFindEndpoints:
-	inc	hl
-	ld	a,(hl)
-	cp	a,INTERFACE_DESCRIPTOR
-	jq	z,.cdcCheckDone
-	cp	a,ENDPOINT_DESCRIPTOR
-	jq	nz,.nextDescriptor
-	inc	hl
-	ld	a,(hl)
-	dec	hl
-	dec	hl
-	bit	7,a				; check endpoint direction
-	jq	z,.foundEpIn
-	ld	(.epOut),a
-	jq	.nextDescriptor
-.foundEpIn:
-	ld	(.epIn),a
-	jq	.nextDescriptor
-
-.nextDescriptor:
-	ld	bc,0
-	ld	c,(hl)
-	add	hl,bc
-	compare_hl_de
-	jq	nc,.cdcCheckDone
-	jq	.err_nd
-	.retVect = $-3
+	call	findAnyInterface
+	jq	nc,.err_nd
+	call	findEndpoints
 
 .cdcCheckDone:
 	ld	a,(.epIn)			; check if any endpoints were found
@@ -652,7 +605,7 @@ end iterate
 	ld	a,0				; check if configuration is already set
 	.prevConfig = $-1
 	or	a,a
-	jr	nz,.getEndpoints
+	jq	nz,.getEndpoints
 
 	push	iy
 
@@ -667,6 +620,10 @@ end iterate
 	pop	de,bc,bc
 
 	pop	iy				; needed to keep stack balanced
+
+	ld	a,l				; return error if config set fails
+	or	a,a
+	jq	nz,.exit
 
 .getEndpoints:
 	push	iy
@@ -692,7 +649,8 @@ end iterate
 	ld	(xsrl_Device.out),hl
 .no_ep:
 	pop	iy
-	jq	z,.err_nd
+	ld	a,SRL_ERROR_NO_DEVICE
+	jq	z,.exit
 
 .deviceConfigured:
 	ld	hl,(iy + 9)			; set read buffer pointer, start, and end
@@ -723,6 +681,91 @@ end iterate
 .err_nd:
 	ld	a,SRL_ERROR_NO_DEVICE
 	jq	.exit
+
+; hl = pointer to current descriptor
+; de = end of config descriptor
+; returns with hl = pointer to next descriptor
+; returns nc if end of config descriptor reached
+nextDescriptor:
+	ld	bc,0
+	ld	c,(hl)
+	add	hl,bc
+	compare_hl_de
+	ret
+
+; hl = config descriptor
+; de = end of config descriptor
+; iy + 15 = interface number
+; returns with hl = pointer to interface descriptor
+; returns nc if end of config descriptor reached
+findSpecificInterface:
+	inc	hl
+	ld	a,(hl)
+	dec	hl
+	cp	a,INTERFACE_DESCRIPTOR		; check if interface descriptor
+	jq	nz,.next
+	inc	hl
+	inc	hl
+	ld	a,(hl)
+	cp	a,(iy + 15)
+	dec	hl
+	dec	hl
+	scf
+	ret	z
+.next:
+	call	nextDescriptor
+	ret	nc
+	jq	findSpecificInterface
+
+; hl = config descriptor
+; de = end of config descriptor
+; returns with hl = pointer to interface descriptor
+; returns nc if end of config descriptor reached
+findAnyInterface:
+	inc	hl
+	ld	a,(hl)
+	dec	hl
+	cp	a,INTERFACE_DESCRIPTOR		; check if interface descriptor
+	jq	nz,.next
+	ld	bc,5
+	add	hl,bc
+	ld	a,(hl)
+	sbc	hl,bc
+	cp	a,10
+	scf
+	ret	z
+.next:
+	call	nextDescriptor
+	ret	nc
+	jq	findAnyInterface
+
+; hl = config descriptor
+; de = end of config descriptor
+; sets epIn/epOut to the endpoint number
+findEndpoints:
+	call	nextDescriptor
+.loop:
+	inc	hl
+	ld	a,(hl)
+	cp	a,INTERFACE_DESCRIPTOR
+	ret	z
+	cp	a,ENDPOINT_DESCRIPTOR
+	jq	nz,.findEpNext
+	inc	hl
+	ld	a,(hl)
+	dec	hl
+	dec	hl
+	bit	7,a				; check endpoint direction
+	jq	z,.foundEpIn
+	ld	(srl_Init.epOut),a
+	jq	.findEpNext
+.foundEpIn:
+	ld	(srl_Init.epIn),a
+	jq	.findEpNext
+.findEpNext:
+	call	nextDescriptor
+	jq	.loop
+
 
 ;-------------------------------------------------------------------------------
 ;srl_error_t srl_SetRate(srl_device_t *srl, uint24_t rate);
