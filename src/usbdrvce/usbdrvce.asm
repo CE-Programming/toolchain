@@ -329,7 +329,7 @@ virtual at ti.usbArea
 	?selectedConfiguration	rb 1
 	?deviceStatus		rb 1
 	?tempEndpointStatus	rw 1
-	?currentRole		rb 1
+	?currentRole		rl 1
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
 	?timerList		rl 1
@@ -368,7 +368,7 @@ end virtual
 ?USB_TRANSFER_COMPLETED		:= 0
 ?USB_TRANSFER_STALLED		:= 1 shl 0
 ?USB_TRANSFER_NO_DEVICE		:= 1 shl 1
-?USB_TRANSFER_HOST_ERROR		:= 1 shl 2
+?USB_TRANSFER_HOST_ERROR	:= 1 shl 2
 ?USB_TRANSFER_ERROR		:= 1 shl 3
 ?USB_TRANSFER_OVERFLOW		:= 1 shl 4
 ?USB_TRANSFER_BUS_ERROR		:= 1 shl 5
@@ -550,6 +550,7 @@ assert deviceStatus+1 = tempEndpointStatus
 	inc	de
 	djnz	.freeAddresses
 	ld	l,3
+	ld	(currentRole),hl
 	add	hl,sp
 ;	ld	de,eventCallback;eventCallback.data,currentDescriptors
 	ld	c,9
@@ -633,7 +634,6 @@ end iterate
 	call	_HandleRoleChgInt
 	ret	nz
 	; TODO: disable disabled things
-	scf
 	or	a,a
 	sbc	hl,hl
 	ret
@@ -898,8 +898,12 @@ usb_ResetDevice:
 	ld	a,e
 	or	a,a
 	jq	z,_Error.INVALID_PARAM
+	ld	hl,currentRole
+	bit	ti.bUsbRole-16,(hl)
+	jq	nz,.notSupported
 	ld	hl,(rootHub.child)
 	sbc	hl,de
+.notSupported:
 	jq	nz,_Error.NOT_SUPPORTED
 	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 100ms!
 	call	ti.DelayTenTimesAms
@@ -1347,10 +1351,7 @@ usb_GetEndpointFlags:
 
 ;-------------------------------------------------------------------------------
 usb_GetRole:
-	or	a,a
-	sbc	hl,hl
-	ld	a,(currentRole)
-	ld	l,a
+	ld	hl,(currentRole)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2055,7 +2056,6 @@ _Free#size#Align#align:
 	ld	de,(freeList#size#Align#align)
 	ld	(hl),de
 	ld	(freeList#size#Align#align),hl
-.return:
 	pop	de
 	ret
 
@@ -2105,17 +2105,13 @@ _CreateDummyTransfer:
 _DeviceDisabled:
 	ld	hl,_HandleAsyncAdvInt.scheduleCleanup.hl
 	push	hl
-virtual
-	ld	hl,0
- assert $ = .recurse
- load .ld_hl: byte from $$
-end virtual
-	db	.ld_hl
+	ld	b,USB_DEVICE_DISABLED_EVENT
+	jq	.recurse
 .recursed:
-	pop	xdevice
+	pop	xdevice,bc
 	ret	nz
 .recurse:
-	push	xdevice
+	push	bc,xdevice
 	ld	de,(xdevice.endpoints+1)
 	setmsk	IS_DISABLED,(xdevice.find+1)
 	resmsk	IS_ENABLED,(xdevice.find+1)
@@ -2148,7 +2144,7 @@ end virtual
 	add	hl,de
 	or	a,a
 	sbc	hl,de
-	jq	nz,_Free32Align32.return
+	jq	nz,_DispatchTransferCallback.pop2return
 .scan:
 	bitmsk	ytransfer.type.ioc
 	ld	ytransfer,(ytransfer.next)
@@ -2171,10 +2167,9 @@ end virtual
 	ld	a,e
 	and	a,31
 	jq	nz,.loop
-	pop	xdevice
+	pop	xdevice,af
 	ld	hl,ti.mpUsbRange
 	lea	de,xdevice+1
-	ld	a,USB_DEVICE_DISABLED_EVENT
 	jq	_DispatchEvent
 
 ; Input:
@@ -2191,11 +2186,8 @@ _DeviceDisconnected:
 	ld	hl,_HandleAsyncAdvInt.scheduleCleanup.de
 .recurse:
 	push	hl
+	ld	b,USB_DEVICE_DISCONNECTED_EVENT
 	call	_DeviceDisabled.recurse
-	ret	nz
-	lea	de,xdevice+1
-	ld	a,USB_DEVICE_DISCONNECTED_EVENT
-	call	_DispatchEvent
 	ret	nz
 	ld	bc,(xdevice.sibling+1)
 	ld	hl,(xdevice.back+1)
@@ -2831,7 +2823,9 @@ _DispatchTransferCallback:
 	xor	a,l
 	ld	l,a
 	call	_DispatchEvent.dispatch
-	pop	bc,bc,bc,bc,bc
+	pop	bc,bc,bc
+.pop2return:
+	pop	bc,bc
 	ret
 
 ; Input:
