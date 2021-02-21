@@ -2207,10 +2207,10 @@ _DeviceDisconnected:
 ;  iy = device
 ; Output:
 ;  af = ?
-;  zf = enough memory
+;  zf = success
 ;  bc = ?
 ;  de = ?
-;  hl = ?
+;  hl = ? | error
 ;  iy = endpoint | ?
 _CreateDefaultControlEndpoint.enable:
 	resmsk	IS_DISABLED,(ydevice.find)
@@ -2224,14 +2224,14 @@ _CreateDefaultControlEndpoint:
 ;  iy = device
 ; Output:
 ;  af = ?
-;  zf = enough memory
+;  zf = success
 ;  bc = ?
 ;  de = ?
-;  hl = ?
+;  hl = ? | error
 ;  iy = endpoint | ?
 _CreateEndpoint:
 	call	_Alloc64Align256
-	ret	nz
+	jq	nz,.nomem
 	ld	bc,(dummyHead.next)
 	ld	(hl+endpoint.next),bc
 repeat endpoint.prev-endpoint
@@ -2304,7 +2304,13 @@ assert endpoint.device and 1
 	ld	(yendpoint.overlay.altNext),l
 	call	_CreateDummyTransfer.enter
 	pop	bc
-	jq	nz,.nomem
+	jq	z,.mem
+	lea	hl,yendpoint.base
+	call	_Free64Align256
+.nomem:
+	ld	hl,USB_ERROR_NO_MEMORY
+	ret
+.mem:
 	ld	(yendpoint.overlay.next),hl
 	ld	(yendpoint.first),hl
 	ld	(yendpoint.last),hl
@@ -2388,9 +2394,6 @@ end repeat
 .control:
 	ld	(yendpoint.overlay.fifo),a
 	ret
-.nomem:
-	lea	hl,yendpoint.base
-	jq	_Free64Align256
 
 ;-------------------------------------------------------------------------------
 ; Input:
@@ -3455,7 +3458,6 @@ _HandleDevResetInt:
 	ld	l,ti.usbDevCtrl-$100
 	call	_CreateDevice
 	call	z,_CreateDefaultControlEndpoint
-	ld	hl,USB_ERROR_NO_MEMORY
 	ret	nz
 	ld	hl,(currentDescriptors)
 	ld	hl,(hl)
@@ -3673,6 +3675,8 @@ _HandlePortConnStsInt:
 ; Output:
 ;  zf = success
 ;  a = ?
+;  bc = ?
+;  de = ?
 ;  hl = ti.mpUsbPortStsCtrl | error
 ;  iy = device
 _CreateDevice:
@@ -3719,12 +3723,20 @@ end repeat
 	ld	(ydevice.child),c;1
 	ld	(ydevice.sibling),c;1
 	ld	hl,ti.mpUsbPortStsCtrl
-	lea	de,ydevice
-	push	de
 	ld	a,USB_DEVICE_CONNECTED_EVENT
+	ld	c,(ydevice.find)
+.enabled:
+	lea	de,ydevice
+	push	bc,de
 	call	_DispatchEvent
-	pop	ydevice
-	ret
+	pop	ydevice,bc
+	ret	nz
+	bitmsk	IS_ENABLED,c
+	ret	z
+	ld	a,USB_DEVICE_ENABLED_EVENT
+assert ~USB_DEVICE_ENABLED_EVENT and IS_ENABLED
+	ld	c,a
+	jq	.enabled
 .nomem:
 	lea	hl,ydevice
 	call	_Free32Align32
