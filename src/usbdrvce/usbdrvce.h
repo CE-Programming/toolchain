@@ -754,6 +754,18 @@ size_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
 usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
                               uint8_t index, void *descriptor, size_t length,
                               size_t *transferred);
+#define /*usb_error_t */                                                       \
+usb_GetDeviceDescriptor(/*usb_device_t */device,                               \
+                        /*usb_device_descriptor_t **/descriptor,               \
+                        /*size_t */length, /*size_t **/transferred)            \
+    usb_GetDescriptor(device, USB_DEVICE_DESCRIPTOR, 0, descriptor, length,    \
+                      transferred)
+#define /*usb_error_t */                                                       \
+usb_GetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,     \
+                               /*usb_configuration_descriptor_t **/descriptor, \
+                               /*size_t */length, /*size_t **/transferred)     \
+    usb_GetDescriptor(device, USB_CONFIGURATION_DESCRIPTOR, index, descriptor, \
+                      length, transferred)
 
 /**
  * Changes the descriptor at \p index.
