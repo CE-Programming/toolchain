@@ -1429,7 +1429,9 @@ end repeat
 	sbc	hl,hl
 	or	a,a;USB_TRANSFER_COMPLETED
 	jq	z,.complete
-	and	a,USB_TRANSFER_CANCELLED or USB_TRANSFER_OVERFLOW or USB_TRANSFER_NO_DEVICE or USB_TRANSFER_STALLED
+	bitmsk	USB_TRANSFER_NO_DEVICE,a
+	jq	nz,.noDevice
+	and	a,USB_TRANSFER_CANCELLED or USB_TRANSFER_OVERFLOW or USB_TRANSFER_STALLED
 	ld	a,USB_ERROR_FAILED
 	jq	nz,.complete
 	ld	de,(iy-6)
@@ -1455,6 +1457,9 @@ assert USB_ERROR_TIMEOUT = USB_ERROR_FAILED-1
 	ld	(hl),bc
 	sbc	hl,hl
 	ret
+.noDevice:
+	ld	a,USB_ERROR_NO_DEVICE
+	jq	.complete
 
 ;-------------------------------------------------------------------------------
 usb_ScheduleControlTransfer.device:
