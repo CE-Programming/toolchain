@@ -69,12 +69,12 @@ typedef struct {
 } fat_partition_t;
 
 typedef struct {
-    fat_partition_t *partition; /**< Disk partition used by FAT. */
-    uint8_t cluster_size; /**< Size of each cluster in number of sectors. */
-    uint32_t clusters; /**< Number of clusters. */
-    uint24_t fat_size; /**< Logical number of sectors per file allocation table. Ignores high byte. */
-    uint24_t fat_pos; /**< Starting sector of the file allocation table. */
-    uint24_t fs_info; /**< Sector where filesystem information is stored. */
+    fat_partition_t *partition; /**< Disk partition used by FAT */
+    uint8_t cluster_size; /**< Size of each cluster in number of sectors */
+    uint32_t clusters; /**< Number of clusters */
+    uint24_t fat_size; /**< Logical number of sectors per file allocation table; ignores high byte */
+    uint24_t fat_pos; /**< Starting sector of the file allocation table */
+    uint24_t fs_info; /**< Sector where filesystem information is stored */
     uint32_t fat_base_lba;
     uint32_t root_dir_pos;
     uint32_t data_region;
@@ -91,17 +91,17 @@ typedef struct {
 
 typedef struct {
     fat_t *fat;
-    uint8_t flags; /**< Opening flags.  */
-    uint32_t entry_sector; /**< Sector where file information is stored. */
-    uint32_t first_cluster; /**< First cluster of the file. */
-    uint32_t current_cluster; /**< Current cluster derived from offset. */
-    uint32_t file_size; /**< Size of file in bytes. */
+    uint8_t flags; /**< Opening flags */
+    uint32_t entry_sector; /**< Sector where file information is stored */
+    uint32_t first_cluster; /**< First cluster of the file */
+    uint32_t current_cluster; /**< Current cluster derived from offset */
+    uint32_t file_size; /**< Size of file in bytes */
     uint24_t file_size_sectors; /**< Size of file in sectors */
-    uint24_t fpossector; /**< File position by sector count. */
-    uint8_t cluster_sector; /**< Current sector in cluster. */
-    uint32_t current_sector; /**< Current sector on msd. */
-    uint24_t working_buffer; /**< Buffer used by the library. */
-    uint24_t entry_pointer; /**< Pointer to buffer index for entry. */
+    uint24_t fpossector; /**< File position by sector count */
+    uint8_t cluster_sector; /**< Current sector in cluster */
+    uint32_t current_sector; /**< Current sector on msd */
+    uint24_t working_buffer; /**< Buffer used by the library */
+    uint24_t entry_pointer; /**< Pointer to buffer index for entry */
 } fat_file_t;
 
 typedef struct {
@@ -149,9 +149,9 @@ typedef enum {
     FAT_LIST_ALL /**< For listing files and directories. */
 } fat_list_option_t;
 
-#define FAT_O_RDONLY  (1 << 0) /**< Open file in read-only mode. */
-#define FAT_O_WRONLY  (1 << 1) /**< Open file in write-only mode. */
-#define FAT_O_RDWR    (FAT_O_RDONLY | FAT_O_WRONLY)  /**< Open file for reading and writing. */
+#define FAT_RDONLY  (1 << 0) /**< file is read-only. */
+#define FAT_WRONLY  (1 << 1) /**< file is write-only. */
+#define FAT_RDWR    (FAT_RDONLY | FAT_WRONLY)  /**< file is read/write capable. */
 
 #define MSD_SECTOR_SIZE 512 /**< Size of device sector, library only supports 512 bytes. */
 
@@ -165,10 +165,10 @@ typedef enum {
  * @param max The maximum number of FAT partitions that can be found.
  * @return USB_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_Find(msd_device_t *msd,
-                     fat_partition_t *partitions,
-                     uint8_t *number,
-                     uint8_t max);
+fat_error_t fat_FindPartitions(msd_device_t *msd,
+                               fat_partition_t *partitions,
+                               uint8_t *number,
+                               uint8_t max);
 
 /**
  * Initializes the FAT filesystem and allows other FAT functions to be used.
@@ -178,8 +178,8 @@ fat_error_t fat_Find(msd_device_t *msd,
  * @param partition Available FAT partition returned from fat_Find.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_Init(fat_t *fat,
-                     fat_partition_t *partition);
+fat_error_t fat_OpenPartition(fat_t *fat,
+                              fat_partition_t *partition);
 
 /**
  * Deinitialize the FAT filesystem. This is not required to be called, however
@@ -189,7 +189,7 @@ fat_error_t fat_Init(fat_t *fat,
  * @param fat Initialized FAT structure type.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_Deinit(fat_t *fat);
+fat_error_t fat_ClosePartition(fat_t *fat);
 
 /**
  * Parses a directory and returns a list of files and subdirectories in it.
@@ -308,8 +308,10 @@ fat_file_t *fat_Open(fat_t *fat,
                      uint8_t flags);
 
 /**
- * Closes an open file handle, freeing it for future use.
- * @param file File handle returned from fat_Open.
+ * Closes an open file handle, freeing it for future use. This should be called
+ * for "safe" removal of a FAT-formatted drive. After calling this function,
+ * the drive can be ejected.
+ * @param file File handle returned from fat_OpenFile.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Close(fat_file_t *file);
@@ -319,7 +321,7 @@ fat_error_t fat_Close(fat_file_t *file);
  * @param file File handle returned from fat_Open.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_SetFilePos(fat_file_t *file, uint24_t sector);
+fat_error_t fat_SetPos(fat_file_t *file, uint24_t sector);
 
 /**
  * Gets the sector offset position in the file. Multiply return by the sector
@@ -327,7 +329,7 @@ fat_error_t fat_SetFilePos(fat_file_t *file, uint24_t sector);
  * @param file File handle returned from fat_Open.
  * @return File offset in number of sectors.
  */
-uint24_t fat_GetFilePos(fat_file_t *file);
+uint24_t fat_GetPos(fat_file_t *file);
 
 /**
  * Reads multiple sectors (512 bytes each), and advances the file position.
@@ -363,9 +365,16 @@ fat_error_t fat_WriteSectors(fat_file_t *file,
  * @return MSD_SUCCESS on success, otherwise error if
  *         initialization failed.
  */
-msd_error_t msd_Init(msd_device_t *msd,
+msd_error_t msd_Open(msd_device_t *msd,
                      usb_device_t dev,
                      void *buffer);
+
+/**
+ * Closes and deinitializes a Mass Storage Device. This function should be
+ * called on the \c USB_DEVICE_DISCONNECTED_EVENT in the USB handler callback.
+ * @param msd MSD device structure.
+ */
+void msd_Close(msd_device_t *msd);
 
 /**
  * Attempts to reset and restore normal working order of the

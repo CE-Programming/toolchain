@@ -31,14 +31,15 @@ include_library '../usbdrvce/usbdrvce.asm'
 ;-------------------------------------------------------------------------------
 ; v1 functions
 ;-------------------------------------------------------------------------------
-	export msd_Init
+	export msd_Open
+	export msd_Close
 	export msd_Reset
 	export msd_Info
 	export msd_ReadSectors
 	export msd_WriteSectors
-	export fat_Find
-	export fat_Init
-	export fat_Deinit
+	export fat_FindPartitions
+	export fat_OpenPartition
+	export fat_ClosePartition
 	export fat_DirList
 	export fat_GetVolumeLabel
 	export fat_Open
@@ -47,8 +48,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_GetSize
 	export fat_SetAttrib
 	export fat_GetAttrib
-	export fat_SetFilePos
-	export fat_GetFilePos
+	export fat_SetPos
+	export fat_GetPos
 	export fat_ReadSectors
 	export fat_WriteSectors
 	export fat_Create
@@ -437,7 +438,7 @@ DEFAULT_RETRIES := 50
 ;  sp + 9  : internal user-supplied buffer
 ; return:
 ;  hl = error status
-msd_Init:
+msd_Open:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 6)		; usb device
@@ -606,8 +607,12 @@ msd_Init:
 	dec	a
 	ld	(ymsdDevice.interface),a
 
+	push	bc			; holds the usbdrvce device
+	call	usb_RefDevice		; prevent random crashes if the user messes up
+	pop	bc
+
 	; successfully found bulk endpoints for msd
-	; now reset the device
+	; now reset the msd device
 
 	jq	msd_Reset.enter
 
@@ -624,6 +629,33 @@ msd_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
+msd_Close:
+; Closes and deinitializes the MSD structures.
+; args:
+;  sp + 3  : msd device structure
+; return:
+;  hl = error status
+	ld	iy,0
+	add	iy,sp
+	ld	iy,(iy + 3)
+	ld	hl,(ymsdDevice.dev)	; check if non-zero msd device
+	compare_hl_zero
+	jr	z,.invaliddev
+	push	hl
+	push	hl
+	call	usb_UnrefDevice		; should I check the return?
+	pop	hl
+	pop	hl
+.invaliddev:
+	push	hl
+	pop	de
+	ld	(hl),0
+	inc	hl
+	ld	bc,(sizeof msdDevice) - 1
+	ldir
+	ret
+
+;-------------------------------------------------------------------------------
 ; Attempts to reset and restore normal working order.
 ; args:
 ;  sp + 3  : msd device structure
@@ -633,6 +665,9 @@ msd_Reset:
 	pop	de,iy
 	push	iy,de
 .enter:
+	ld	hl,(ymsdDevice.dev)	; check if non-zero msd device
+	compare_hl_zero
+	jq	z,.invaliddev
 	push	iy
 	ld	bc,0
 	ld	c,(ymsdDevice.configindex)
@@ -676,6 +711,9 @@ msd_Reset:
 	pop	iy
 	compare_hl_zero
 	jq	z,.configuredmsd
+.invaliddev:
+	ld	hl,MSD_ERROR_INVALID_DEVICE
+	ret
 .usberror:
 	ld	hl,MSD_ERROR_USB_FAILED
 	ret

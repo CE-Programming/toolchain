@@ -44,7 +44,7 @@
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
-fat_Find:
+fat_FindPartitions:
 ; Locates FAT partitions on the MSD
 ; Arguments:
 ;  sp + 3  : msd device structure
@@ -82,11 +82,11 @@ fat_Find:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_Init:
+fat_OpenPartition:
 ; Initializes a FAT filesystem from a particular LBA
 ; Arguments:
 ;  sp + 3 : Uninitialized FAT structure type
-;  sp + 6 : Available FAT partition returned from fat_Find
+;  sp + 6 : Available FAT partition returned from fat_FindPartitions
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -184,8 +184,8 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_Deinit:
-; Deinitialize the FAT filesystem
+fat_ClosePartition:
+; Deinitialize the FAT partition
 ; Arguments:
 ;  sp + 3 : FAT structure type
 ; Returns:
@@ -656,7 +656,7 @@ fat_GetSize:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_SetFilePos:
+fat_SetPos:
 ; Sets the offset sector position in the file
 ; Arguments:
 ;  sp + 3 : FAT File structure type
@@ -729,7 +729,7 @@ fat_SetFilePos:
 
 
 ;-------------------------------------------------------------------------------
-fat_GetFilePos:
+fat_GetPos:
 ; Gets the offset position in the file
 ; Arguments:
 ;  sp + 3 : FAT File structure type
