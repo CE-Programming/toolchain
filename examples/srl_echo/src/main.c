@@ -49,6 +49,9 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
             }
         }
     }
+    if(event == USB_DEVICE_DISCONNECTED_EVENT) {
+        has_device = false;
+    }
 
     return USB_SUCCESS;
 }
