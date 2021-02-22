@@ -224,7 +224,6 @@ struct msdDevice
 	blocksize rl 1
 	interface rb 1
 	maxlun rb 1
-	lun rb 1
 	buffer rl 1
 	size := $-.
 end struct
