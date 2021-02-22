@@ -635,23 +635,17 @@ msd_Close:
 ;  sp + 3  : msd device structure
 ; return:
 ;  hl = error status
-	ld	iy,0
-	add	iy,sp
-	ld	iy,(iy + 3)
-	push	iy
-	ld	hl,(ymsdDevice.dev)	; check if non-zero msd device
-	compare_hl_zero
-	jr	z,.invaliddev
-	push	hl
-	call	usb_UnrefDevice		; should I check the return?
 	pop	hl
-.invaliddev:
-	pop	hl
+	ex	(sp),iy
+	push	hl,iy
+	ld	hl,(ymsdDevice.dev)
 	push	hl
-	pop	de
+	call	usb_UnrefDevice
+	pop	de,de
+	add	hl,de
 	ld	(hl),0
-	inc	hl
-	ld	bc,(sizeof msdDevice) - 1
+	inc	de
+	ld	bc,sizeof msdDevice - 1
 	ldir
 	ret
 
