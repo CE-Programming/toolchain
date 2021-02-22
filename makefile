@@ -16,7 +16,7 @@
 
 include $(CURDIR)/src/common.mk
 
-LIBS := libload graphx fontlibc keypadc fileioc usbdrvce
+LIBS := libload graphx fontlibc keypadc fileioc usbdrvce srldrvce
 
 ifeq ($(OS),Windows_NT)
 RELEASE_CMD := ISCC.exe /Orelease /DAPP_VERSION=$(CEDEV_VERSION) /DDIST_PATH=$(INSTALL_DIR) tools\installer\installer.iss

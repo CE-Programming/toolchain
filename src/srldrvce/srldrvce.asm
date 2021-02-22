@@ -887,7 +887,7 @@ end repeat
 
 	pop	af,bc
 
-	call	__ldivu				; euhl / aubc -> euhl
+	call	ti._ldivu			; euhl / aubc -> euhl
 
 	ld	bc,.bmNums
 
