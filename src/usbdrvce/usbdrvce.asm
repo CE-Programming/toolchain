@@ -513,8 +513,9 @@ DEFAULT_RETRIES := 10
 usb_Init:
 	call	ti.usb_DisableTimer
 	call	ti.os.GetSystemStats
-	ld	de,4
-	add	hl,de
+repeat 4
+	inc	hl
+end repeat
 	bit	0,(hl)
 	jq	z,.84pce
 	ld	a,$60
@@ -555,7 +556,9 @@ assert deviceStatus+1 = tempEndpointStatus
 ;	ld	de,eventCallback;eventCallback.data,currentDescriptors
 	ld	c,9
 	ldir
-	ld	e,(hl)
+	ld	de,(hl)
+	ld	hl,_ResetHostControllerFromUnknown.misc
+	ld	(hl),d
 	dec	bc
 	ld	hl,(currentDescriptors)
 	add	hl,bc
@@ -1929,7 +1932,6 @@ end repeat
 ; Output:
 ;  a = 0
 ;  b = ?
-;  d = ?
 ;  hl = dummyHead.next
 _ResetHostControllerFromUnknown:
 	; halt host controller (EHCI spec section 2.3)
@@ -1956,6 +1958,9 @@ _ResetHostControllerFromUnknown:
 .reset.fail:
 
 	; initialize host controller from halt (EHCI spec section 4.1)
+	ld	l,ti.usbMisc
+	ld	(hl),0
+label .misc at $-byte
 	ld	l,ti.usbIntEn
 	ld	(hl),ti.bmUsbInt or ti.bmUsbIntErr or ti.bmUsbIntPortChgDetect or ti.bmUsbIntFrameListOver or ti.bmUsbIntHostSysErr or ti.bmUsbIntAsyncAdv
 	ld	hl,periodicList
