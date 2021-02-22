@@ -26,17 +26,35 @@ extern "C" {
 #endif
 
 typedef enum usb_init_flags {
-  USB_USE_C_HEAP         = 1 << 0, /**< Use part of the default C heap.
+  USB_USE_C_HEAP        = 1 <<  0, /**< Use part of the default C heap.
                                         @warning Do not use this unless you
                                         changed your program's bss/heap to end
                                         at 0xD10000! */
-  USB_USE_PERIODIC_LIST  = 1 << 1, /**< Use space normally used for periodic.
+  USB_USE_PERIODIC_LIST = 1 <<  1, /**< Use space normally used for periodic.
                                         @warning This disables support for
                                         interrupt transfers, isochronous
                                         transfers, and hubs! */
-  USB_USE_USB_AREA       = 1 << 2, /**< Use the memory that TIOS uses for usb. */
-  USB_USE_OS_HEAP        = 1 << 3, /**< Use the application heap area. */
-  USB_DEFAULT_INIT_FLAGS = USB_USE_USB_AREA | USB_USE_OS_HEAP,
+  USB_USE_USB_AREA      = 1 <<  2, /**< Use the memory TIOS uses for usb. */
+  USB_USE_OS_HEAP       = 1 <<  3, /**< Use the application heap area. */
+#define USB_INIT_ASST(x) (((x) & 3) <<  8)
+  USB_INIT_ASST_0 = USB_INIT_ASST(0), /**< Init Async Sched Sleep Timer to 0. */
+  USB_INIT_ASST_1 = USB_INIT_ASST(1), /**< Init Async Sched Sleep Timer to 1. */
+  USB_INIT_ASST_2 = USB_INIT_ASST(2), /**< Init Async Sched Sleep Timer to 2. */
+  USB_INIT_ASST_3 = USB_INIT_ASST(3), /**< Init Async Sched Sleep Timer to 3. */
+#define USB_INIT_EOF1(x) (((x) & 3) << 10)
+  USB_INIT_EOF1_0 = USB_INIT_EOF1(0), /**< Init EOF 1 Timing to 0. */
+  USB_INIT_EOF1_1 = USB_INIT_EOF1(1), /**< Init EOF 1 Timing to 1. */
+  USB_INIT_EOF1_2 = USB_INIT_EOF1(2), /**< Init EOF 1 Timing to 2. */
+  USB_INIT_EOF1_3 = USB_INIT_EOF1(3), /**< Init EOF 1 Timing to 3. */
+#define USB_INIT_EOF2(x) (((x) & 3) << 12)
+  USB_INIT_EOF2_0 = USB_INIT_EOF2(0), /**< Init EOF 2 Timing to 0. */
+  USB_INIT_EOF2_1 = USB_INIT_EOF2(1), /**< Init EOF 2 Timing to 1. */
+  USB_INIT_EOF2_2 = USB_INIT_EOF2(2), /**< Init EOF 2 Timing to 2. */
+  USB_INIT_EOF2_3 = USB_INIT_EOF2(3), /**< Init EOF 2 Timing to 3. */
+  USB_INIT_UNKNOWN = 1 << 15,
+  USB_DEFAULT_INIT_FLAGS = USB_USE_USB_AREA | USB_USE_OS_HEAP
+                         | USB_INIT_ASST_1 | USB_INIT_EOF1_3 | USB_INIT_EOF2_0
+                         | USB_INIT_UNKNOWN,
 } usb_init_flags_t;
 
 typedef enum usb_event {
