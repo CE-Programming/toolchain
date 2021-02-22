@@ -638,15 +638,15 @@ msd_Close:
 	ld	iy,0
 	add	iy,sp
 	ld	iy,(iy + 3)
+	push	iy
 	ld	hl,(ymsdDevice.dev)	; check if non-zero msd device
 	compare_hl_zero
 	jr	z,.invaliddev
 	push	hl
-	push	hl
 	call	usb_UnrefDevice		; should I check the return?
 	pop	hl
-	pop	hl
 .invaliddev:
+	pop	hl
 	push	hl
 	pop	de
 	ld	(hl),0
