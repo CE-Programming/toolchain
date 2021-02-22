@@ -360,6 +360,7 @@ virtual at 0
 	USB_ERROR_NO_DEVICE	rb 1
 	USB_ERROR_NO_MEMORY	rb 1
 	USB_ERROR_NOT_SUPPORTED	rb 1
+	USB_ERROR_OVERFLOW	rb 1
 	USB_ERROR_TIMEOUT	rb 1
 	USB_ERROR_FAILED	rb 1
 end virtual
@@ -1432,9 +1433,14 @@ end repeat
 	sbc	hl,hl
 	or	a,a;USB_TRANSFER_COMPLETED
 	jq	z,.complete
-	bitmsk	USB_TRANSFER_NO_DEVICE,a
-	jq	nz,.noDevice
-	and	a,USB_TRANSFER_CANCELLED or USB_TRANSFER_OVERFLOW or USB_TRANSFER_STALLED
+	ld	e,a
+iterate error, NO_DEVICE, OVERFLOW
+	ld	a,USB_ERROR_#error
+	bitmsk	USB_TRANSFER_#error,e
+	jq	nz,.complete
+end iterate
+	ld	a,e
+	and	a,USB_TRANSFER_CANCELLED or USB_TRANSFER_STALLED
 	ld	a,USB_ERROR_FAILED
 	jq	nz,.complete
 	ld	de,(iy-6)
@@ -1460,9 +1466,6 @@ assert USB_ERROR_TIMEOUT = USB_ERROR_FAILED-1
 	ld	(hl),bc
 	sbc	hl,hl
 	ret
-.noDevice:
-	ld	a,USB_ERROR_NO_DEVICE
-	jq	.complete
 
 ;-------------------------------------------------------------------------------
 usb_ScheduleControlTransfer.device:
@@ -1835,7 +1838,7 @@ end repeat
 element error
 label _Error at error
 
-iterate error, SYSTEM, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, NOT_SUPPORTED, TIMEOUT, FAILED
+iterate error, SYSTEM, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, NOT_SUPPORTED, TIMEOUT, OVERFLOW, FAILED
 
 .error:
 	ld	a,USB_ERROR_#error
