@@ -469,6 +469,8 @@ srl_Init:
 .nonFTDI:
 	ld	hl,tmp.descriptor + deviceDescriptor.idVendor
 	ld	a,(hl)				; check if device is a PL2303
+	cp	a,$57
+	jq	z,.possiblyATEN
 	cp	a,$7b
 	jq	nz,.nonPL2303
 	inc	hl
@@ -485,6 +487,14 @@ iterate pid, $2303, $2304, $04bb, $1234, $aaa0, $aaa2, $aaa8, $0611, $0612, $060
 	jq	z,.pl2303
 end iterate
 	jq	.nonPL2303
+
+.possiblyATEN:
+	inc	hl
+	ld	hl,(hl)
+	ld	de,$200805
+	or	a,a
+	sbc	hl,de
+	jq	nz,.nonPL2303
 
 .pl2303:
 	ld	a,SRL_PL2303
