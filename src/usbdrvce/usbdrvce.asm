@@ -2119,15 +2119,20 @@ _DeviceDisabled:
 	ld	hl,_HandleAsyncAdvInt.scheduleCleanup.hl
 	push	hl
 	ld	b,USB_DEVICE_DISABLED_EVENT
-	jq	.recurse
+.recurse:
+	ld	a,(xdevice.find+1)
+	ld	c,a
+	and	a,not (IS_ENABLED or IS_DISABLED)
+assert IS_DISABLED = 1
+	inc	a;IS_DISABLED
+	ld	(xdevice.find+1),a
+	jq	.start
 .recursed:
 	pop	xdevice,bc
 	ret	nz
-.recurse:
+.start:
 	push	bc,xdevice
 	ld	de,(xdevice.endpoints+1)
-	setmsk	IS_DISABLED,(xdevice.find+1)
-	resmsk	IS_ENABLED,(xdevice.find+1)
 	ld	xdevice,(xdevice.child+1)
 	ld	hl,.recursed
 	dec	ixl
@@ -2183,7 +2188,10 @@ _DeviceDisabled:
 	pop	xdevice,af
 	ld	hl,ti.mpUsbRange
 	lea	de,xdevice+1
-	jq	_DispatchEvent
+assert IS_DISABLED = 1 shl 0
+	jq	nc,_DispatchEvent
+	cp	a,a
+	ret
 
 ; Input:
 ;  ix = device-1
@@ -3756,9 +3764,8 @@ _HandlePortPortEnInt:
 	ld	a,(hl)
 	and	a,not (ti.bmUsbOvercurrChg or ti.bmUsbConnStsChg)
 	ld	(hl),a
-	ld	de,_DeviceDisabled
 	bit	ti.bUsbPortEn,(hl)
-	jq	z,_RootDeviceDisconnected.enter
+	jq	z,.disabled
 	ld	ydevice,(rootHub.child)
 	ld	c,iyl
 	bit	0,c
@@ -3781,8 +3788,9 @@ _HandlePortPortEnInt:
 	ld	a,(hl)
 	and	a,not (ti.bmUsbOvercurrChg or ti.bmUsbPortEnChg or ti.bmUsbPortEn or ti.bmUsbConnStsChg)
 	ld	(hl),a
-	cp	a,a
-	ret
+.disabled:
+	ld	de,_DeviceDisabled
+	jq	_RootDeviceDisconnected.enter
 
 _HandlePortOvercurrInt:
 	ld	a,(hl)
