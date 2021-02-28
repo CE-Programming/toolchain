@@ -725,12 +725,12 @@ usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
 usb_error_t usb_ResetDevice(usb_device_t device);
 
 /**
- * Forces a device to disconnect. This triggers a device disabled event when the
- * disconnect finishes.
- * @param device The device to disconnect.
+ * Forces a device to become disabled. This triggers a device disabled event
+ * when it finishes.
+ * @param device The device to disable.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-usb_error_t usb_DisconnectDevice(usb_device_t device);
+usb_error_t usb_DisableDevice(usb_device_t device);
 
 /**
  * Gets the usb address of a \p device, or 0 if disabled.
