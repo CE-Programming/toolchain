@@ -24,6 +24,8 @@ struct global
     msd_device_t msd;
 };
 
+enum { USB_RETRY_INIT = USB_USER_ERROR };
+
 static uint8_t rombuffer[ROM_BUFFER_SIZE];
 
 static void putstr(char *str)
@@ -38,10 +40,10 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
     switch (event)
     {
         case USB_DEVICE_DISCONNECTED_EVENT:
-            // close the usb device the msd was using
-            msd_Close(&global->msd);
-            global->usb = NULL;
             putstr("usb device disconnected");
+            if (global->usb)
+                msd_Close(&global->msd);
+            global->usb = NULL;
             break;
         case USB_DEVICE_CONNECTED_EVENT:
             putstr("usb device connected");
@@ -50,6 +52,9 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             global->usb = event_data;
             putstr("usb device enabled");
             break;
+        case USB_DEVICE_DISABLED_EVENT:
+            putstr("usb device disabled");
+            return USB_RETRY_INIT;
         default:
             break;
     }
@@ -64,53 +69,55 @@ int main(void)
     static global_t global;
     static fat_t fat;
     uint8_t numparts;
-    bool valid;
     usb_error_t usberr;
     msd_error_t msderr;
     fat_error_t faterr;
 
     memset(&global, 0, sizeof(global_t));
-    valid = false;
-
     os_SetCursorPos(1, 0);
 
-    usberr = usb_Init(handleUsbEvent, &global, NULL, USB_DEFAULT_INIT_FLAGS);
-    if (usberr != USB_SUCCESS)
-    {
-        putstr("usb init error.");
-        os_GetKey();
-        return -1;
-    }
-
+    // usb initialization loop; waits for something to be plugged in
     do
     {
-        // check for any usb events
-        usberr = usb_WaitForInterrupt();
+        global.usb = NULL;
+
+        usberr = usb_Init(handleUsbEvent, &global, NULL, USB_DEFAULT_INIT_FLAGS);
         if (usberr != USB_SUCCESS)
         {
-            putstr("usb library error.");
-            os_GetKey();
-            return -1;
+            putstr("usb init error.");
+            goto error;
         }
 
-        // if a device is plugged in, initialize it
-        if (!valid && global.usb != NULL)
+        while (usberr == USB_SUCCESS)
         {
-            // initialize the msd device
-            msderr = msd_Open(&global.msd, global.usb, msd_buffer);
-            if (msderr != MSD_SUCCESS)
+            if (global.usb != NULL)
+                break;
+
+            // break out if a key is pressed
+            if (os_GetCSC())
             {
-                putstr("failed opening msd");
-                usb_Cleanup();
-                os_GetKey();
-                return -1;
+                putstr("exiting demo, press a key");
+                goto error;
             }
 
-            putstr("opened msd");
-            valid = true;
-            break;
+            usberr = usb_WaitForInterrupt();
         }
-    } while (!os_GetCSC());
+    } while (usberr == USB_RETRY_INIT);
+    if (usberr != USB_SUCCESS)
+    {
+        putstr("usb enable error.");
+        goto error;
+    }
+
+    // initialize the msd device
+    msderr = msd_Open(&global.msd, global.usb, msd_buffer);
+    if (msderr != MSD_SUCCESS)
+    {
+        putstr("failed opening msd");
+        goto error;
+    }
+
+    putstr("opened msd");
 
     // locate any fat partitions on the drive
     faterr = fat_FindPartitions(&global.msd, fatparts, &numparts, MAX_PARTITIONS);
@@ -178,4 +185,10 @@ int main(void)
     // cleanup and return
     usb_Cleanup();
     os_GetKey();
+    return 0;
+
+error:
+    usb_Cleanup();
+    os_GetKey();
+    return -1;
 }

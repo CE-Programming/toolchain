@@ -15,6 +15,8 @@ typedef struct global global_t;
 #define MAX_ENTRIES 10
 #define FAT_BUFFER_SIZE (MSD_SECTOR_SIZE / sizeof(uint16_t))
 
+enum { USB_RETRY_INIT = USB_USER_ERROR };
+
 struct global
 {
     usb_device_t usb;
@@ -33,18 +35,21 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
     switch (event)
     {
         case USB_DEVICE_DISCONNECTED_EVENT:
-            // close the usb device the msd was using
-            msd_Close(&global->msd);
-            global->usb = NULL;
             putstr("usb device disconnected");
+            if (global->usb)
+                msd_Close(&global->msd);
+            global->usb = NULL;
             break;
         case USB_DEVICE_CONNECTED_EVENT:
             putstr("usb device connected");
             return usb_ResetDevice(event_data);
         case USB_DEVICE_ENABLED_EVENT:
-            global->usb = event_data;
             putstr("usb device enabled");
+            global->usb = event_data;
             break;
+        case USB_DEVICE_DISABLED_EVENT:
+            putstr("usb device disabled");
+            return USB_RETRY_INIT;
         default:
             break;
     }
@@ -62,60 +67,62 @@ int main(void)
     uint32_t sector_size;
     uint32_t sector_num;
     uint8_t numparts;
-    bool valid;
     usb_error_t usberr;
     msd_error_t msderr;
     fat_error_t faterr;
 
     memset(&global, 0, sizeof(global_t));
-    valid = false;
-
     os_SetCursorPos(1, 0);
 
-    usberr = usb_Init(handleUsbEvent, &global, NULL, USB_DEFAULT_INIT_FLAGS);
-    if (usberr != USB_SUCCESS)
-    {
-        putstr("usb init error.");
-        os_GetKey();
-        return -1;
-    }
-
+    // usb initialization loop; waits for something to be plugged in
     do
     {
-        // check for any usb events
-        usberr = usb_WaitForInterrupt();
+        global.usb = NULL;
+
+        usberr = usb_Init(handleUsbEvent, &global, NULL, USB_DEFAULT_INIT_FLAGS);
         if (usberr != USB_SUCCESS)
         {
-            putstr("usb library error.");
-            os_GetKey();
-            return -1;
+            putstr("usb init error.");
+            goto error;
         }
 
-        // if a device is plugged in, initialize it
-        if (!valid && global.usb != NULL)
+        while (usberr == USB_SUCCESS)
         {
-            // initialize the msd device
-            msderr = msd_Open(&global.msd, global.usb, msd_buffer);
-            if (msderr != MSD_SUCCESS)
+            if (global.usb != NULL)
+                break;
+
+            // break out if a key is pressed
+            if (os_GetCSC())
             {
-                putstr("failed opening msd");
-                usb_Cleanup();
-                os_GetKey();
-                return -1;
+                putstr("exiting demo, press a key");
+                goto error;
             }
 
-            putstr("opened msd");
-            valid = true;
-            break;
+            usberr = usb_WaitForInterrupt();
         }
-    } while (!os_GetCSC());
+    } while (usberr == USB_RETRY_INIT);
+    if (usberr != USB_SUCCESS)
+    {
+        putstr("usb enable error.");
+        goto error;
+    }
+
+    // initialize the msd device
+    msderr = msd_Open(&global.msd, global.usb, msd_buffer);
+    if (msderr != MSD_SUCCESS)
+    {
+        putstr("failed opening msd");
+        goto error;
+    }
+
+    putstr("opened msd");
 
     // get sector number and size
     msderr = msd_Info(&global.msd, &sector_num, &sector_size);
     if (msderr != MSD_SUCCESS)
     {
         putstr("error getting msd info");
-        return -1;
+        goto error;
     }
 
     // print msd sector number and size
@@ -129,14 +136,14 @@ int main(void)
     if (faterr != FAT_SUCCESS)
     {
         putstr("error finding fat partitions");
-        return -1;
+        goto error;
     }
 
     // verify there is at least one fat parition
     if (numparts == 0)
     {
         putstr("no fat paritions on device");
-        return -1;
+        goto error;
     }
 
     // print number of fat partitions
@@ -148,7 +155,7 @@ int main(void)
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not open fat partition");
-        return -1;
+        goto error;
     }
 
     os_ClrHome();
@@ -234,9 +241,7 @@ int main(void)
                 if (fatbuffer[j - offset] != j)
                 {
                     putstr("read does not match!");
-                    usb_Cleanup();
-                    os_GetKey();
-                    abort();
+                    goto error;
                 }
             }
         }
@@ -263,4 +268,10 @@ int main(void)
     // cleanup and return
     usb_Cleanup();
     os_GetKey();
+    return 0;
+
+error:
+    usb_Cleanup();
+    os_GetKey();
+    return -1;
 }
