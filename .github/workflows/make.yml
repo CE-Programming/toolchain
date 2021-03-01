@@ -45,7 +45,7 @@ jobs:
         id: ez80-clang
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: ${{env.HOST_DOMAIN}}/a/llvm/ez80-clang${{matrix.exe}}-${{runner.os}}Release.zip
+          file-url: ${{env.HOST_DOMAIN}}/a/llvm/z80/ez80-clang${{matrix.exe}}-${{runner.os}}Release.zip
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
