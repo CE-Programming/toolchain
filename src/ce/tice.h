@@ -263,16 +263,6 @@ do { \
         atomic_load_decreasing_32(TIMER_COUNT_ADDR(n)))
 
 /**
- * If the timer count value will never exceed (2^24)-1, this function can be
- * used in place of both timer_Get and timer_GetSafe.
- * It returns the low 24 bits value of the full 32 bit count value, and is
- * atomic safe.
- *
- * @param n Timer to get count value of (range 1 - 3 inclusive).
- */
-#define timer_GetLow(n) *TIMER_COUNT_ADDR(n)
-
-/**
  * Sets the count value of a timer.
  *
  * @param n Timer to set count value of (range 1 - 3 inclusive).
@@ -2573,6 +2563,8 @@ typedef enum {
 #define asm_DelRes os_DelRes
 #define asm_ClrTxtShd os_ClrTxtShd
 /* @endcond */
+
+#define timer_GetLow(n) (_Pragma("GCC warning \"'timer_GetLow' is deprecated, use 'timer_Get' or 'timer_GetSafe' instead as appropriate\"") (uint24_t)time_Get(n))
 
 #ifdef __cplusplus
 }
