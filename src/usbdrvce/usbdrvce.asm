@@ -315,10 +315,9 @@ virtual at ti.usbArea
 	?setupPacket		setup
 				rb (-$) and $1F
 	?rootHub		device
+	?usbMem			dbx ti.usbInited and not $1FFF - $: ?
 				rb (-$) and $FFF
-; FIXME: 0xD141B2 is used by GetCSC :(
-	?periodicList		dbx $400: ?
-	?usbMem			dbx ti.usbInited and not $FF - $: ?
+	?periodicList		dbx ti.usbInited and not $FF - $: ?
 				rb (-$) and $FF
 	?dummyHead		endpoint
 				rb (-$) and $1F
@@ -526,7 +525,7 @@ end repeat
 .84pce:
 	ld	a,1 ; mark pointers as invalid
 	call	_Init
-	set	5,(hl)
+	set	5,(hl);ti.flags+$1B
 	ld	hl,ti.mpTmr2Load
 	ld	c,12
 	call	ti.MemClear
@@ -536,15 +535,17 @@ end repeat
 	res	ti.bTmr2Crystal,(hl)
 	res	ti.bTmr2Overflow,(hl)
 	set	ti.bTmr2Enable,(hl)
+assert ti.usbHandleKeys and $1F >= long
+	ld	(ti.usbHandleKeys),a;0
 	sbc	hl,hl
 assert deviceStatus+1 = tempEndpointStatus
-	ld	(deviceStatus),hl
-	ld	(timerList),hl
+	ld	(deviceStatus),hl;0
+	ld	(timerList),hl;0
 	dec	hl
-	ld	(cleanupListReady),hl
+	ld	(cleanupListReady),hl;not 0
 	inc	hl
-	ld	(rootHub.addr),a
-	ld	(rootHub.data),hl
+	ld	(rootHub.addr),a;0
+	ld	(rootHub.data),hl;0
 	ld	de,usedAddresses+1
 	ld	b,sizeof usedAddresses-1
 .freeAddresses:
@@ -620,17 +621,23 @@ assert deviceStatus+1 = tempEndpointStatus
 	ld	(hl),endpoint.overlay.status.halted
 	ld	hl,rootHub.find
 	ld	(hl),IS_HUB or IS_ENABLED
+assert cHeap = $D10000
 	ld	l,a;(cHeap-$D10000) and $FF
 	ld	h,a;(cHeap-$D10000) shr 8
 	ld	b,sizeof cHeap shr 8
-	rrc	e
+	srl	e
 	call	c,.initFreeList
-iterate block, periodicList, usbMem, osHeap
-	ld	h,(block-$D10000) shr 8
-	ld	b,sizeof block shr 8
-	rrc	e
+	ld	a,e
+	or	a,ti.bmUsbHcReset or ti.bmUsbRunStop
+assert ~ti.bUsbRunStop
+	dec	a;ti.bmUsbRunStop
+	ld	(_ResetHostControllerFromUnknown.frameListSize),a
+	ld	h,(osHeap-$D10000) shr 8
+	ld	b,sizeof osHeap shr 8
+	srl	e
 	call	c,.initFreeList
-end iterate
+	srl	e
+	call	c,.initUsbMemFreeList
 	ld	hl,USB_ERROR_INVALID_PARAM
 	cp	a,c
 	ret	nz
@@ -641,6 +648,26 @@ end iterate
 	or	a,a
 	sbc	hl,hl
 	ret
+.initUsbMemFreeList:
+	ld	h,(usbMem-$D10000) shr 8
+	ld	b,sizeof usbMem shr 8
+	call	.initFreeList
+assert ti.usbHandleKeys and $FF > $40
+	ld	a,(ti.usbHandleKeys and not $1F - $20) and $FF
+	ld	(ti.usbHandleKeys and not $1F + $20),a
+	ld	b,e
+	inc	b
+	ld	a,1 shl 5
+.initUsbMemFreeListShift:
+	rrca
+	djnz	.initUsbMemFreeListShift
+	res	1,a
+assert usbMem+sizeof usbMem = periodicList
+	add	a,h;(periodicList-$D10000) shr 8
+	ld	h,a
+	ld	a,(periodicList+sizeof periodicList-$D10000) shr 8
+	sub	a,h
+	ld	b,a
 .initFreeList:
 	call	_Free64Align256
 	ld	a,32
@@ -685,7 +712,7 @@ usb_Cleanup:
 ;	set	ti.bUsbDevEn,(hl)
 ;	set	7,(hl)
 	call	_Init
-	res	5,(hl)
+	res	5,(hl);ti.flags+$1B
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1939,9 +1966,9 @@ end repeat
 _ResetHostControllerFromUnknown:
 	; halt host controller (EHCI spec section 2.3)
 	ld	l,ti.usbIntEn
-	ld	(hl),a
+	ld	(hl),a;0
 	ld	l,ti.usbCmd
-	ld	(hl),2 shl ti.bUsbFrameListSize
+	ld	(hl),a;0
 	ld	l,ti.usbSts+1
 	ld	b,(48000000*2/1000-.halt.cycles.pre+.halt.cycles-1)/.halt.cycles
 .halt.cycles.pre := 16
@@ -1952,7 +1979,8 @@ _ResetHostControllerFromUnknown:
 
 	; reset host controller (EHCI spec section 2.3)
 	ld	l,ti.usbCmd
-	ld	(hl),2 shl ti.bUsbFrameListSize or ti.bmUsbHcReset
+	ld	(hl),ti.bmUsbHcReset
+label .frameListSize at $-byte
 	ld	b,(48000000*250/1000-.reset.cycles.pre+.reset.cycles-1)/.reset.cycles
 .reset.cycles.pre := 8
 .reset.wait:

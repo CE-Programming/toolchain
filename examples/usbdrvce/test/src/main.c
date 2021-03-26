@@ -424,7 +424,7 @@ static void handleDevice(global_t *global) {
     memset(global, 0, sizeof(global_t));
 }
 
-void main(void) {
+int main(void) {
     global_t global;
     usb_error_t error;
     memset(&global, 0, sizeof(global_t));

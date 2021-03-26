@@ -21,19 +21,19 @@ usb_error_t my_timer_handler(usb_timer_t *usbTimer) {
     return USB_SUCCESS;
 }
 
-#define N 4
+#define NUM_TIMERS 4
 
-void main() {
+int main() {
     int i;
     bool done;
-    my_timer_t myTimers[N];
+    my_timer_t myTimers[NUM_TIMERS];
 
     os_ClrHomeFull();
     if (usb_Init(NULL, NULL, NULL, USB_DEFAULT_INIT_FLAGS) != USB_SUCCESS) {
-        return;
+        return 1;
     }
 
-    for (i = 0; i != N; i++) {
+    for (i = 0; i != NUM_TIMERS; i++) {
         myTimers[i].usbTimer.handler = my_timer_handler;
         myTimers[i].interval = 1000u >> i;
         myTimers[i].counter = 10u << i;
@@ -42,7 +42,7 @@ void main() {
 
     do {
         done = true;
-        for (i = 0; i != N; i++) {
+        for (i = 0; i != NUM_TIMERS; i++) {
             char string[3];
             os_SetCursorPos(i, 0);
             sprintf(string, "%2u", myTimers[i].counter);
