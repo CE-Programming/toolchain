@@ -765,7 +765,7 @@ size_t os_MemChk(void **free);
  *
  * @param error Error code to throw
  */
-void os_ThrowError(uint8_t error);
+void os_ThrowError(uint8_t error) __attribute__((noreturn));
 
 typedef struct system_info {
     size_t size;                 /**< number of valid bytes after this field */
@@ -811,7 +811,7 @@ const system_info_t *os_GetSystemInfo(void);
  *
  * @see os_PopErrorHandler
  */
-int os_PushErrorHandler(void);
+int os_PushErrorHandler(void) __attribute__((returns_twice));
 
 /**
  * Restores stack state after a call to os_PushErrorHandler.  Must be called with stack in the same state
