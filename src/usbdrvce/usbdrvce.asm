@@ -189,21 +189,26 @@ struct endpoint			; endpoint structure
  end namespace
 	maxPktLen	rw 1	; max packet length or c shl 15 or 1 shl 16
  namespace maxPktLen
-	control		:= 1 shl 11
+	?msk		:= $7FF
+	?c		:= 1 shl 11
+	?rl		:= $F shl 12
  end namespace
 	smask		rb 1	; micro-frame s-mask
 	cmask		rb 1	; micro-frame c-mask
 	hubInfo		rw 1	; hub addr or port num shl 7 or mult shl 14
 	cur		rd 1	; current transfer pointer
 	overlay		transfer; current transfer
+	dir		rb 1	; transfer dir shl 7
+ namespace dir
+	?in		:= 1 shl 7
+ end namespace
 	type		rb 1	; transfer type
-	dir		rb 1	; transfer dir
 	flags		rb 1	; endpoint flags
 	internalFlags	rb 1	; internal endpoint flags
+	device		rl 1	; pointer to device
 	first		rl 1	; pointer to first scheduled transfer
 	last		rl 1	; pointer to last dummy transfer
 	data		rl 1	; user data
-	device		rl 1	; pointer to device
 end struct
 struct device			; device structure
 	label .: 32
@@ -297,7 +302,7 @@ end struct
 struct endpointDescriptor
 	label .: 7
 	descriptor		descriptor
-	bEndpointType		rb 1
+	bEndpointAddress	rb 1
 	bmAttributes		rb 1
 	wMaxPacketSize		rw 1
 	bInterval		rb 1
@@ -628,9 +633,7 @@ assert cHeap = $D10000
 	srl	e
 	call	c,.initFreeList
 	ld	a,e
-	or	a,ti.bmUsbHcReset or ti.bmUsbRunStop
-assert ~ti.bUsbRunStop
-	dec	a;ti.bmUsbRunStop
+	and	a,ti.bmUsbFrameListSize
 	ld	(_ResetHostControllerFromUnknown.frameListSize),a
 	ld	h,(osHeap-$D10000) shr 8
 	ld	b,sizeof osHeap shr 8
@@ -1325,12 +1328,9 @@ usb_GetEndpointAddress:
 	add	yendpoint,de
 	ld	a,e
 	ret	nc
-	ld	a,(yendpoint.dir+1)
-	rrca
 	ld	a,(yendpoint.info+1)
-	rla
-	rrca
-	and	a,$8F
+	and	a,endpoint.info.ep
+	or	a,(yendpoint.dir+1)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1495,7 +1495,7 @@ assert USB_ERROR_TIMEOUT = USB_ERROR_FAILED-1
 	ret
 
 ;-------------------------------------------------------------------------------
-usb_ScheduleControlTransfer.device:
+usb_ScheduleControlTransfer.deviceControl:
 	cp	a,a
 usb_ScheduleControlTransfer.notControl:
 	ld	ysetup,(ix+9)
@@ -1505,19 +1505,19 @@ usb_ScheduleControlTransfer.notControl:
 	ld	de,(ix+12)
 	ld	yendpoint,(ix+6)
 	jq	nz,usb_ScheduleTransfer.notControl
-usb_ScheduleTransfer.device:
+usb_ScheduleTransfer.deviceControl:
 	ld	hl,(setupPacket.wLength)
 	inc	hl
 	dec.s	hl
 	sbc	hl,bc
-	jq	nc,usb_ScheduleTransfer.device.notLess
+	jq	nc,usb_ScheduleControlTransfer.min
 	add	hl,bc
 	push	hl
 	pop	bc
-usb_ScheduleTransfer.device.notLess:
+usb_ScheduleControlTransfer.min:
 	ld	a,c
 	or	a,b
-	jq	z,usb_ScheduleTransfer.device.zlp
+	jq	z,usb_ScheduleControlTransfer.zlp
 	ld	a,(setupPacket.bmRequestType)
 	rlca
 	push	af
@@ -1529,9 +1529,8 @@ usb_ScheduleTransfer.device.notLess:
 	xor	a,a
 	call	_ExecuteDma
 	ret	nc
-usb_ScheduleTransfer.device.return:
 	jq	usb_Transfer.return
-usb_ScheduleTransfer.device.zlp:
+usb_ScheduleControlTransfer.zlp:
 	ld	hl,ti.mpUsbCxFifo
 	ld	(hl),ti.bmCxFifoFin
 	ld	de,(ix+18)
@@ -1549,7 +1548,7 @@ usb_ScheduleControlTransfer:
 	jq	nz,.notControl
 	ld	hl,currentRole
 	bit	ti.bUsbRole-16,(hl)
-	jq	nz,.device
+	jq	nz,.deviceControl
 .control:
 	ld	a,00001110b
 	ld	bc,8
@@ -1557,7 +1556,7 @@ usb_ScheduleControlTransfer:
 	call	.queueStage
 	ld	ysetup,(ix+9)
 	ld	a,(ysetup.bmRequestType)
-	and	a,1 shl 7
+	and	a,DEVICE_TO_HOST
 	ld	bc,(ysetup.wLength)
 	inc.s	bc
 	cpi.s
@@ -1603,8 +1602,8 @@ usb_ScheduleTransfer.check:
 
 ;-------------------------------------------------------------------------------
 usb_ScheduleTransfer.control:
-	bit	ti.bUsbRole-16,(hl)
-	jq	nz,usb_ScheduleTransfer.device
+	bit	ti.bUsbRole-16,l
+	jq	nz,usb_ScheduleTransfer.deviceControl
 	ld	ysetup,(ix+9)
 	lea	de,ysetup+sizeof ysetup
 	ld	(ix+12),de
@@ -1616,25 +1615,28 @@ usb_ScheduleTransfer:
 	ld	bc,(ix+12)
 	ld	de,(ix+9)
 	ld	yendpoint,(ix+6)
-	ld	hl,currentRole
-	or	a,(yendpoint.type);CONTROL_TRANSFER
+	ld	hl,(currentRole)
+	or	a,(yendpoint.type)
+assert ~CONTROL_TRANSFER
 	jq	z,.control
 .notControl:
-	cp	a,ISOCHRONOUS_TRANSFER-CONTROL_TRANSFER+1
-	bit	ti.bUsbRole-16,(hl)
-	ld	a,(yendpoint.dir)
-	jq	z,.host
-	or	a,a
-	jq	z,.out
+	ld	h,(yendpoint.dir)
+	rlc	h
+	bit	ti.bUsbRole-16,l
+	jq	nz,.device
+	cp	a,BULK_TRANSFER
+	jq	z,.queue
+	jq	_Error.NOT_SUPPORTED
+.device:
+	jq	nc,.queue
 	ld	a,(yendpoint.overlay.fifo)
 	cpl
 	ld	hl,ti.mpUsbFifoTxImr
 	and	a,(hl)
 	ld	(hl),a
-	ld	a,1
-.host:
-	jq	c,_Error.NOT_SUPPORTED
-.out:
+assert ti.mpUsbFifoTxImr shr 8 and $FF = 1
+.queue:
+	ld	a,h
 	or	a,transfer.type.ioc
 	jq	_QueueTransfer
 
@@ -1980,7 +1982,6 @@ _ResetHostControllerFromUnknown:
 	; reset host controller (EHCI spec section 2.3)
 	ld	l,ti.usbCmd
 	ld	(hl),ti.bmUsbHcReset
-label .frameListSize at $-byte
 	ld	b,(48000000*250/1000-.reset.cycles.pre+.reset.cycles-1)/.reset.cycles
 .reset.cycles.pre := 8
 .reset.wait:
@@ -1989,6 +1990,8 @@ label .frameListSize at $-byte
 .reset.fail:
 
 	; initialize host controller from halt (EHCI spec section 4.1)
+	ld	(hl),0
+label .frameListSize at $-byte
 	ld	l,ti.usbMisc
 	ld	(hl),0
 label .misc at $-byte
@@ -2276,44 +2279,42 @@ _CreateDefaultControlEndpoint:
 _CreateEndpoint:
 	call	_Alloc64Align256
 	jq	nz,.nomem
-	ld	bc,(dummyHead.next)
-	ld	(hl+endpoint.next),bc
-repeat endpoint.prev-endpoint
-	inc	c
+repeat endpointDescriptor.bEndpointAddress-endpointDescriptor
+	inc	de
 end repeat
-	ld	a,h
-	ld	(bc),a
-	inc	de;endpointDescriptor.descriptor.bDescriptorType
-	inc	de;endpointDescriptor.bEndpointAddress
 	ld	a,(de)
+	and	a,endpoint.dir.in or endpoint.info.ep
+	ld	c,a
 	and	a,endpoint.info.ep
-	or	a,(ydevice.speed)
-	ld	l,endpoint
-	push	af,hl
-repeat endpoint.prev-endpoint
-	inc	l
-end repeat
-	ld	(hl),dummyHead shr 8 and $FF
-repeat endpoint.addr-endpoint.prev
-	inc	l
-end repeat
-	ld	c,(ydevice.addr)
-	ld	(hl),c
-repeat endpoint.info-endpoint.addr
-	inc	l
-end repeat
+	ld	b,a
+	xor	a,c
+	ld	l,endpoint.dir
 	ld	(hl),a
-	ld	bc,(ydevice.endpoints)
+assert endpointDescriptor.bEndpointAddress+1 = endpointDescriptor.bmAttributes
+	inc	de
 	ld	a,(de)
-	and	a,$8F
+	and	a,ti.bmUsbFifoType
+	push	bc,af
+assert endpoint.dir+1 = endpoint.type
+	inc	l
+	ld	(hl),a
+	ld	a,(ydevice.addr)
+	ld	l,endpoint.addr
+	ld	(hl),a
+	ld	a,b
+	or	a,(ydevice.speed)
+assert endpoint.addr+1 = endpoint.info
+	inc	l
+	ld	(hl),a
+	ld	a,c
 	rlca
+	ld	bc,(ydevice.endpoints)
 	or	a,c
 	ld	c,a
 	ld	a,h
 	ld	(bc),a
-	inc	de
-	ld	a,(de)
-	and	a,ti.bmUsbFifoType
+	pop	af
+	ld	a,endpoint.maxPktLen.rl shr 8
 	jq	nz,.notControl
 	ld	a,c
 	xor	a,1
@@ -2321,33 +2322,41 @@ end repeat
 	ld	a,h
 	ld	(bc),a
 	setmsk	endpoint.info.dtc,(hl)
-	ld	a,endpoint.maxPktLen.control shr 8
+	ld	a,(endpoint.maxPktLen.rl or endpoint.maxPktLen.c) shr 8
 .notControl:
-repeat endpoint.maxPktLen-endpoint.info
+	ld	c,a
+assert endpointDescriptor.bmAttributes+1 = endpointDescriptor.wMaxPacketSize
+	inc	de
+	ld	a,(de)
+assert endpoint.info+1 = endpoint.maxPktLen
 	inc	l
-end repeat
-	ex	de,hl
-	inc	hl
-	ldi
-	or	a,$F0
-	xor	a,(hl)
-	and	a,$F8
-	xor	a,(hl)
-	ex	de,hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	and	a,endpoint.maxPktLen.msk shr 8
+	or	a,c
+	inc	l
 	ld	(hl),a
 	xor	a,a
 	ld	bc,(ydevice.info)
-iterate reg, a, a, c, b; endpoint.smask, endpoint.cmask, endpoint.hubInfo
+.l = endpoint.maxPktLen+1
+iterate <field,value>, smask,a, cmask,a, hubInfo,c, hubInfo+1,b, \
+                       overlay.altNext,1, overlay.status,a,      \
+                       flags,a, internalFlags,a, device,ydevice
+ if .l+1 = endpoint.field
 	inc	l
-	ld	(hl),reg
+ else
+	ld	l,endpoint.field
+ end if
+ .l = endpoint.field
+	ld	(hl),value
 end iterate
-	ld	l,endpoint.device
-	ld	(hl),ydevice
-	pop	yendpoint
-assert endpoint.device and 1
-	ld	(yendpoint.overlay.altNext),l
+	ld	l,endpoint
+	push	hl
+	pop	yendpoint,bc
+	sbc	hl,hl
+	ld	(yendpoint.data),hl
 	call	_CreateDummyTransfer.enter
-	pop	bc
 	jq	z,.mem
 	lea	hl,yendpoint.base
 	call	_Free64Align256
@@ -2359,15 +2368,12 @@ assert endpoint.device and 1
 	ld	(yendpoint.first),hl
 	ld	(yendpoint.last),hl
 	ex	de,hl
-	ld	(yendpoint.overlay.status),a
-	ld	(yendpoint.flags),a
-	ld	(yendpoint.internalFlags),a
 	ld	d,(hl)
 	dec	hl
 	ld	e,(hl)
 	ld	a,e
 	or	a,d
-	jq	z,.checkedMps
+	jq	z,.notPo2Mps
 	dec	de
 	ld	a,e
 	and	a,(hl)
@@ -2376,32 +2382,57 @@ assert endpoint.device and 1
 	ld	a,d
 	and	a,(hl)
 	or	a,e
-	dec	hl
-	jq	nz,.checkedMps
-	setmsk	PO2_MPS,(yendpoint.internalFlags)
-.checkedMps:
-	dec	hl
-	ld	a,(hl)
-	and	a,ti.bmUsbFifoType
-	ld	(yendpoint.type),a
-	or	a,ti.bmUsbFifoEn
-	ld	e,a
-	dec	hl
-	ld	a,(hl)
-	and	a,1 shl 7
-	rlca
-	ld	(yendpoint.dir),a
-	ld	(dummyHead.next),yendpoint
-	sbc	hl,hl
+	jq	nz,.notPo2Mps
+assert PO2_MPS = 1 shl 0
+	inc	(yendpoint.internalFlags)
+.notPo2Mps:
 	ld	a,(currentRole)
 	and	a,ti.bmUsbRole shr 16
+	jq	nz,.async
+	ld	a,(yendpoint.type)
+	rrca
+assert ~CONTROL_TRANSFER and 1
+assert ~BULK_TRANSFER and 1
+	jq	nc,.async
+	rrca
+assert INTERRUPT_TRANSFER and 1
+	jq	c,.intr
+; Note: (bsbt(s) = bit stuffed byte time(s))
+;  1154 schedulable bsbts per full-speed frame
+;  full-speed:
+;   out isoc: 10 + transfer_byte_length bsbts
+;   in  isoc: 11 + transfer_byte_length bsbts
+;      other: 14 + transfer_byte_length bsbts
+;   low-speed: (11 + transfer_byte_length) * 8 bsbts
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+assert INTERRUPT_TRANSFER
+	or	a,a
+	ret
+.intr:
+	ld	hl,USB_ERROR_NOT_SUPPORTED
+assert ISOCHRONOUS_TRANSFER
+	or	a,a
+	ret
+;	cp	a,a
+.async:
+	ld	hl,(dummyHead.next)
+	ld	(yendpoint.next),hl
+assert endpoint+1 = endpoint.prev
+	inc	hl
+	ld	e,iyh
+	ld	(hl),e
+	ld	(yendpoint.prev),dummyHead shr 8 and $FF
+	ld	(dummyHead.next),yendpoint
 	ret	z
 	inc	b
 	dec	b
 assert ti.bmUsbRole shr 16 = ti.bmUsbDmaCxFifo
-	jq	z,.control
+	jq	z,.defaultControl
+	rlc	c
+	ld	c,a
+	sbc	a,a
 assert ti.bmUsbRole shr 16 = ti.usbFifoIn
-	and	a,l
+	and	a,c
 	ld	c,a
 	ld	hl,ti.mpUsbFifo0Map-1
 	ld	a,l
@@ -2413,7 +2444,9 @@ assert ti.bmUsbRole shr 16 = ti.usbFifoIn
 	ld	(hl),a
 assert ti.usbFifo0Cfg > ti.usbFifo0Map
 	setmsk	ti.usbFifo0Cfg xor ti.usbFifo0Map,hl
-	ld	(hl),e
+	ld	a,(yendpoint.type)
+	or	a,ti.bmUsbFifoEn
+	ld	(hl),a
 	ld	a,ti.usbOutEp1+1-4-$100
 assert ti.usbOutEp1 > ti.usbInEp1
 repeat 2
@@ -2435,7 +2468,7 @@ end repeat
 .shift:
 	rla
 	djnz	.shift
-.control:
+.defaultControl:
 	ld	(yendpoint.overlay.fifo),a
 	ret
 
