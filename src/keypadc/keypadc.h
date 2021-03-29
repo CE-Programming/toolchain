@@ -22,6 +22,7 @@ typedef uint16_t kb_lkey_t; /**< Long key type.   */
 
 typedef struct __kb_queue_t__{
 	uint8_t keys[56]; // array of currently queued keys, indexed by keycode-1, each index containing (keygroup<<3) + keybit
+//	uint8_t times[56]; // array of keypress time remaining before repeat per key (not yet implemented)
 } kb_queue_t;
 
 /**
@@ -80,7 +81,7 @@ uint8_t kb_QueueKeys(kb_queue_t *queue);
  * Pops a keycode from a queue. Returns 0 if no more keys in buffer.
  * @param queue Queue to pop keycode from.
  */
-uint8_t kb_UnqueueKey(kb_queue_t *queue);
+kb_key_t kb_UnqueueKey(kb_queue_t *queue);
 
 /**
  * Clears all keycodes from a queue.

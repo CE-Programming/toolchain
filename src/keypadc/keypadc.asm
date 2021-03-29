@@ -160,7 +160,6 @@ kb_QueueKeys:
 	push bc
 	call kb_AnyKey
 	jq z,.returnzero ;return if no keys pressed
-	call kb_Scan
 	ld de,$F50012
 	ld b,7
 	ld c,56
@@ -170,14 +169,13 @@ kb_QueueKeys:
 .bitsloop:
 	inc ix
 	dec c
-	adc a,a
-	jq z,.next
-	jq nc,.bitsloop
-
-; key is pressed, mark it
-	ld (ix),c ;c is non-zero so I guess this works
-
-	jq .bitsloop
+	add a,a
+	jq nc,.checkisz
+	inc c
+	ld (ix),c ;c is current keycode
+	dec c
+.checkisz:
+	jq nz,.bitsloop
 .next:
 	ld a,c        ;get next row of keys' last keycode
 	and a,$F8
@@ -193,9 +191,10 @@ kb_QueueKeys:
 	ex (sp),ix
 	jp (hl)
 
+
 ;-------------------------------------------------------------------------------
 kb_UnqueueKey:
-; Scans the keypad, queuing found keycodes for later processing
+; Unqueues a key from the key buffer
 ; Arguments:
 ;  arg0: pointer to kb_queue_t queue
 	pop bc
@@ -209,8 +208,9 @@ kb_UnqueueKey:
 	cpd
 	ret po
 	jq z,.findkeyloop
+	inc hl
+	ld a,(hl)
 	ld (hl),b ;remove key from queue
-	ld a,c ;return keycode
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -220,7 +220,7 @@ kb_ClearQueue:
 ;  arg0: pointer to kb_queue_t queue to clear
 	pop de
 	ex (sp),hl
-	ld b,56
+	ld bc,56
 	xor a,a
 .clearloop:
 	ld (hl),a
@@ -229,3 +229,8 @@ kb_ClearQueue:
 	ex hl,de
 	jp (hl)
 
+;-------------------------------------------------------------------------------
+; TODO
+;kb_SetQueueRepeatDelay:
+;	
+;	ret
