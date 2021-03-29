@@ -75,13 +75,13 @@ uint8_t kb_GetKeyCode(void);
  * @param queue Queue to push keycodes to.
  * @note Disables interrupts.
  */
-uint8_t kb_QueueKeys(kb_queue_t *queue);
+uint8_t kb_EnqueueKeys(kb_queue_t *queue);
 
 /**
  * Pops a keycode from a queue. Returns 0 if no more keys in buffer.
  * @param queue Queue to pop keycode from.
  */
-kb_key_t kb_UnqueueKey(kb_queue_t *queue);
+kb_key_t kb_DequeueKey(kb_queue_t *queue);
 
 /**
  * Clears all keycodes from a queue.

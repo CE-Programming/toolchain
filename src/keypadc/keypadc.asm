@@ -20,8 +20,8 @@ library 'KEYPADC', 3
 ; v3 functions
 ;-------------------------------------------------------------------------------
 	export kb_GetKeyCode
-	export kb_QueueKeys
-	export kb_UnqueueKey
+	export kb_EnqueueKeys
+	export kb_DequeueKey
 	export kb_ClearQueue
 
 ;-------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ kb_GetKeyCode:
 	ret
 
 ;-------------------------------------------------------------------------------
-kb_QueueKeys:
+kb_EnqueueKeys:
 ; Scans the keypad, queuing found keycodes for later processing
 ; Arguments:
 ;  arg0: pointer to kb_queue_t queue
@@ -205,7 +205,7 @@ kb_QueueKeys:
 
 
 ;-------------------------------------------------------------------------------
-kb_UnqueueKey:
+kb_DequeueKey:
 ; Unqueues a key from the key buffer
 ; Arguments:
 ;  arg0: pointer to kb_queue_t queue
