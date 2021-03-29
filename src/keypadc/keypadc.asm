@@ -121,7 +121,13 @@ kb_GetKeyCode:
 ;  None
 ; Returns:
 ;  The same as GetCSC
-	call kb_Scan
+	di
+	ld	hl,$f50200		; DI_Mode = $f5xx00
+	ld	(hl),h
+	xor	a,a
+.loop:
+	cp	a,(hl)
+	jr	nz,.loop
 	ld hl,$F50012
 	ld b,7
 	ld c,49
@@ -158,7 +164,13 @@ kb_QueueKeys:
 	pop bc
 	ex (sp),ix
 	push bc
-	call kb_AnyKey
+	di
+	ld	hl,$f50200		; DI_Mode = $f5xx00
+	ld	(hl),h
+	xor	a,a
+.anykeyloop:
+	cp	a,(hl)
+	jr	nz,.anykeyloop
 	jq z,.returnzero ;return if no keys pressed
 	ld de,$F50012
 	ld b,7
