@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'KEYPADC', 2
+library 'KEYPADC', 3
 
 ;-------------------------------------------------------------------------------
 ; no dependencies
@@ -15,7 +15,14 @@ library 'KEYPADC', 2
 	export kb_ScanGroup
 	export kb_AnyKey
 	export kb_Reset
+
 ;-------------------------------------------------------------------------------
+; v3 functions
+;-------------------------------------------------------------------------------
+	export kb_GetKeyCode
+	export kb_QueueKeys
+	export kb_UnqueueKey
+	export kb_ClearQueue
 
 ;-------------------------------------------------------------------------------
 kb_Scan:
@@ -106,3 +113,119 @@ kb_AnyKey:
 	add	hl,bc
 	or	a,(hl)
 	ret
+
+;-------------------------------------------------------------------------------
+kb_GetKeyCode:
+; Scans the keypad and returns the currently pressed key's keycode
+; Arguments:
+;  None
+; Returns:
+;  The same as GetCSC
+	call kb_Scan
+	ld hl,$F50012
+	ld b,7
+	ld c,49
+.scanloop:
+	ld a,(hl)
+	or a,a
+	jr nz,.keyispressed
+	inc hl
+	inc hl
+	ld a,c
+	sub a,8
+	ld c,a
+	djnz .scanloop
+	xor a,a
+	ret
+.keyispressed:
+	ld b,8
+.keybitloop:
+	rrca
+	jr c,.this
+	inc c
+	djnz .keybitloop
+.this:
+	ld a,c
+	ret
+
+;-------------------------------------------------------------------------------
+kb_QueueKeys:
+; Scans the keypad, queuing found keycodes for later processing
+; Arguments:
+;  arg0: pointer to kb_queue_t queue
+; Returns:
+;  0 if no keys pressed
+	pop bc
+	ex (sp),ix
+	push bc
+	call kb_AnyKey
+	jq z,.returnzero ;return if no keys pressed
+	call kb_Scan
+	ld de,$F50012
+	ld b,7
+	ld c,56
+	dec ix
+.loop:
+	ld a,(de)
+.bitsloop:
+	inc ix
+	dec c
+	adc a,a
+	jq z,.next
+	jq nc,.bitsloop
+
+; key is pressed, mark it
+	ld (ix),c ;c is non-zero so I guess this works
+
+	jq .bitsloop
+.next:
+	ld a,c        ;get next row of keys' last keycode
+	and a,$F8
+	ld c,a
+	inc de   ;get next keypad group
+	inc de
+	djnz .loop
+.done:
+	db $3E ;ld a,...
+.returnzero:
+	xor a,a
+	pop hl
+	ex (sp),ix
+	jp (hl)
+
+;-------------------------------------------------------------------------------
+kb_UnqueueKey:
+; Scans the keypad, queuing found keycodes for later processing
+; Arguments:
+;  arg0: pointer to kb_queue_t queue
+	pop bc
+	ex (sp),hl
+	push bc
+	ld bc,56
+	add hl,bc
+	dec hl
+	xor a,a
+.findkeyloop:
+	cpd
+	ret po
+	jq z,.findkeyloop
+	ld (hl),b ;remove key from queue
+	ld a,c ;return keycode
+	ret
+
+;-------------------------------------------------------------------------------
+kb_ClearQueue:
+; Clears all keycodes from a queue.
+; Arguments:
+;  arg0: pointer to kb_queue_t queue to clear
+	pop de
+	ex (sp),hl
+	ld b,56
+	xor a,a
+.clearloop:
+	ld (hl),a
+	inc hl
+	djnz .clearloop
+	ex hl,de
+	jp (hl)
+

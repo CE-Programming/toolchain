@@ -4,6 +4,7 @@
  *
  * @author Matt "MateoConLechuga" Waltz
  * @author Shaun "Merthsoft" McFall
+ * @author Adam "beckadamtheinventor" Beckingham
  */
 
 #ifndef _KEYPADC_H
@@ -18,6 +19,10 @@ extern "C" {
 
 typedef uint8_t kb_key_t;   /**< Normal key type. */
 typedef uint16_t kb_lkey_t; /**< Long key type.   */
+
+typedef struct __kb_queue_t__{
+	uint8_t keys[56]; // array of currently queued keys, indexed by keycode-1, each index containing (keygroup<<3) + keybit
+} kb_queue_t;
 
 /**
  * Scans the keyboard to update data values.
@@ -57,6 +62,31 @@ void kb_Reset(void);
  */
 #define kb_GetMode() \
 (kb_Config & 3)
+
+/**
+ * Scans the keyboard, returning the currently pressed key's keycode.
+ * @note Disables interrupts.
+ */
+uint8_t kb_GetKeyCode(void);
+
+/**
+ * Scans the keypad, queuing found keycodes for later processing. Returns 0 if no keys queued.
+ * @param queue Queue to push keycodes to.
+ * @note Disables interrupts.
+ */
+uint8_t kb_QueueKeys(kb_queue_t *queue);
+
+/**
+ * Pops a keycode from a queue. Returns 0 if no more keys in buffer.
+ * @param queue Queue to pop keycode from.
+ */
+uint8_t kb_UnqueueKey(kb_queue_t *queue);
+
+/**
+ * Clears all keycodes from a queue.
+ * @param queue Queue to clear.
+ */
+void kb_ClearQueue(kb_queue_t *queue);
 
 /**
  * Different available scanning modes.
