@@ -232,7 +232,7 @@ kb_ClearQueue:
 ;  arg0: pointer to kb_queue_t queue to clear
 	pop de
 	ex (sp),hl
-	ld bc,56
+	ld b,56
 	xor a,a
 .clearloop:
 	ld (hl),a
