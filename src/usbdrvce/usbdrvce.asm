@@ -512,6 +512,15 @@ virtual at 0
 end virtual
 
 DEFAULT_RETRIES := 10
+
+; Note: (bsbt(s) = bit stuffed byte time(s))
+;  full-speed:
+;   out isoc: 10 + transfer_byte_length bsbts
+;   in  isoc: 11 + transfer_byte_length bsbts
+;      other: 14 + transfer_byte_length bsbts
+;   low-speed: (11 + transfer_byte_length) * 8 bsbts
+BSBTS_PER_FRAME := 1154 ; schedulable bsbts per full-speed frame
+
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -640,7 +649,7 @@ assert cHeap = $D10000
 	srl	e
 	call	c,.initFreeList
 	srl	e
-	call	c,.initUsbMemFreeList
+	call	c,.initFreeList.usbMem
 	ld	hl,USB_ERROR_INVALID_PARAM
 	cp	a,c
 	ret	nz
@@ -651,23 +660,31 @@ assert cHeap = $D10000
 	or	a,a
 	sbc	hl,hl
 	ret
-.initUsbMemFreeList:
+.initFreeList.usbMem:
 	ld	h,(usbMem-$D10000) shr 8
 	ld	b,sizeof usbMem shr 8
 	call	.initFreeList
 assert ti.usbHandleKeys and $FF > $40
 	ld	a,(ti.usbHandleKeys and not $1F - $20) and $FF
 	ld	(ti.usbHandleKeys and not $1F + $20),a
-	ld	b,e
-	inc	b
-	ld	a,1 shl 5
-.initUsbMemFreeListShift:
-	rrca
-	djnz	.initUsbMemFreeListShift
-	res	1,a
+	ld	a,e
+	cpl
+	and	a,3
+	jq	z,.initFreeList.usbMem.noPeriodicList
+	ld	b,a
+	ld	a,1 shl 1
+.initFreeList.usbMem.shift:
+	rlca
+	djnz	.initFreeList.usbMem.shift
 assert usbMem+sizeof usbMem = periodicList
-	add	a,h;(periodicList-$D10000) shr 8
-	ld	h,a
+	ld	b,a
+	dec.s	bc
+	ld	de,not BSBTS_PER_FRAME shl (23-bsr BSBTS_PER_FRAME)
+	inc	l
+	ld	(hl),de
+	ld	de,periodicList+1+dword
+	ldir
+.initFreeList.usbMem.noPeriodicList:
 	ld	a,(periodicList+sizeof periodicList-$D10000) shr 8
 	sub	a,h
 	ld	b,a
@@ -2397,13 +2414,6 @@ assert ~BULK_TRANSFER and 1
 	rrca
 assert INTERRUPT_TRANSFER and 1
 	jq	c,.intr
-; Note: (bsbt(s) = bit stuffed byte time(s))
-;  1154 schedulable bsbts per full-speed frame
-;  full-speed:
-;   out isoc: 10 + transfer_byte_length bsbts
-;   in  isoc: 11 + transfer_byte_length bsbts
-;      other: 14 + transfer_byte_length bsbts
-;   low-speed: (11 + transfer_byte_length) * 8 bsbts
 	ld	hl,USB_ERROR_NOT_SUPPORTED
 assert INTERRUPT_TRANSFER
 	or	a,a
