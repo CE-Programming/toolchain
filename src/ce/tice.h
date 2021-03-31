@@ -1062,7 +1062,7 @@ real_t os_RealNpr(const real_t *total, const real_t *num);
 real_t os_RealPow(const real_t *base, const real_t *exp);
 /** Returns a random real_t between min and max */
 real_t os_RealRandInt(const real_t *min, const real_t *max);
-/** Calculates the remained of two real_t values */
+/** Calculates the remainder (modulo) of two real_t values */
 real_t os_RealMod(const real_t *arg1, const real_t *arg2);
 /** Subtracts two real_t values */
 real_t os_RealSub(const real_t *arg1, const real_t *arg2);
