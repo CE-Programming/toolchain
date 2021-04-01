@@ -453,7 +453,7 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
 enum { USB_RETRY_FOREVER = 0xFFFFFFu };
 
 #define /*usb_device_t */usb_RootHub(/*void*/)/*;*/ \
-    ((usb_device_t)0xD13FC0u) /**< Root hub device */
+    ((usb_device_t)0xD13FE0u) /**< Root hub device */
 
 /**
  * A pointer to \c usb_callback_data_t is passed to the \c usb_event_callback_t.

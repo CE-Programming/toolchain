@@ -219,13 +219,11 @@ struct device			; device structure
 	sibling		rl 1	; next device connected to the same hub
 	speed		rb 1	; device speed shl 4
 	back		rl 1	; update pointer to next pointer to self
-			rb 1	; padding
 	addr		rb 1	; device addr and $7F
 	child		rl 1	; first device connected to this hub
 	hub		rl 1	; hub this device is connected to
-	info		rw 1	; hub addr or port number shl 7 or 1 shl 14
 	data		rl 1	; user data
-			rd 1
+			rb 7	; padding
 end struct
 struct setup
 	label .: 8
@@ -556,7 +554,7 @@ assert deviceStatus+1 = tempEndpointStatus
 	ld	(deviceStatus),hl;0
 	ld	(timerList),hl;0
 	dec	hl
-	ld	(cleanupListReady),hl;not 0
+	ld	(cleanupListReady),hl;-1
 	inc	hl
 	ld	(rootHub.addr),a;0
 	ld	(rootHub.data),hl;0
@@ -2353,13 +2351,13 @@ assert endpoint.info+1 = endpoint.maxPktLen
 	and	a,endpoint.maxPktLen.msk shr 8
 	or	a,c
 	inc	l
-	ld	(hl),a
-	xor	a,a
-	ld	bc,(ydevice.info)
 .l = endpoint.maxPktLen+1
-iterate <field,value>, smask,a, cmask,a, hubInfo,c, hubInfo+1,b, \
-                       overlay.altNext,1, overlay.status,a,      \
-                       flags,a, internalFlags,a, device,ydevice
+	ld	(hl),a
+	ld	bc,1 shl 22 or 1 shl 15 or 0 shl 8 or 0
+assert endpoint.cmask+1 = endpoint.hubInfo
+iterate <field,value>, smask,c, cmask,bc, \
+                       overlay.altNext,1, overlay.status,c, \
+                       flags,c, internalFlags,c, device,ydevice
  if .l+1 = endpoint.field
 	inc	l
  else
@@ -2415,12 +2413,12 @@ assert ~BULK_TRANSFER and 1
 assert INTERRUPT_TRANSFER and 1
 	jq	c,.intr
 	ld	hl,USB_ERROR_NOT_SUPPORTED
-assert INTERRUPT_TRANSFER
 	or	a,a
+assert ISOCHRONOUS_TRANSFER
 	ret
 .intr:
 	ld	hl,USB_ERROR_NOT_SUPPORTED
-assert ISOCHRONOUS_TRANSFER
+assert INTERRUPT_TRANSFER
 	or	a,a
 	ret
 ;	cp	a,a
@@ -3540,10 +3538,9 @@ _HandleDevResetInt:
 	ld	(hl),ti.bmUsbDmaClrFifo or ti.bmUsbDmaAbort
 	ld	l,ti.usbCxFifo-$100
 	set	ti.bCxFifoClr,(hl)
-	ld	de,rootHub
-	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_ENABLED
+	ld	c,IS_DEVICE or IS_ENABLED
 	ld	l,ti.usbDevCtrl-$100
-	call	_CreateDevice
+	call	_CreateDevice.root
 	call	z,_CreateDefaultControlEndpoint
 	ret	nz
 	ld	hl,(currentDescriptors)
@@ -3749,13 +3746,11 @@ _HandlePortConnStsInt:
 	ld	(hl),a
 	bit	ti.bUsbCurConnSts,(hl)
 	ret	z
-	ld	de,rootHub
-	ld	bc,(1 shl 7 or 1) shl 8 or IS_DEVICE or IS_DISABLED
+	ld	c,IS_DEVICE or IS_DISABLED
 	ld	l,ti.usbOtgCsr+2
-	jq	_CreateDevice
+	jq	_CreateDevice.root
 
 ; Input:
-;  b = port or 1 shl 7
 ;  c = find flags
 ;  de = parent hub
 ;  hl = pointer to device speed shl 2
@@ -3766,6 +3761,8 @@ _HandlePortConnStsInt:
 ;  de = ?
 ;  hl = ti.mpUsbPortStsCtrl | error
 ;  iy = device
+_CreateDevice.root:
+	ld	de,rootHub
 _CreateDevice:
 	ld	a,(hl)
 	call	_Alloc32Align32
@@ -3783,17 +3780,7 @@ assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	rrca
 	rrca
 	ld	(ydevice.speed),a
-	setmsk	device.addr,hl
-	ld	a,(hl)
-	srl	b
-	rla
-	rrca
-	ld	c,a
-assert ydevice.info+2 = ydevice.data ; clobber
-	ld	(ydevice.info),bc
-repeat device.child-device.addr
-	inc	l
-end repeat
+	setmsk	device.child,hl
 	ld	(hl),ydevice
 	ld	(ydevice.back),hl
 	ld	bc,32-1
@@ -3804,7 +3791,7 @@ end repeat
 	ldir
 	ld	(ydevice.hubPorts),b;0
 	ld	(ydevice.addr),b;0
-	ld	(ydevice.data),bc;0 ; unclobber
+	ld	(ydevice.data),bc;0
 	inc	c;1
 	ld	(ydevice.refcount),bc;1
 	ld	(ydevice.child),c;1
