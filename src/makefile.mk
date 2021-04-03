@@ -132,7 +132,11 @@ LDLIBS := $(wildcard $(CEDEV)/lib/libload/*.lib)
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
 ICONSRC := $(call NATIVEPATH,$(OBJDIR)/icon.src)
+ifneq ($(DESCRIPTION),)
 ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+else
+ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm
+endif
 LDREQUIRE += -i $(call QUOTE_ARG,require ___icon)
 LDICON := $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 else
