@@ -31,8 +31,7 @@ typedef enum usb_init_flags {
                                         changed your program's bss/heap to end
                                         at 0xD10000! */
   USB_USE_OS_HEAP       = 1 <<  1, /**< Use the application heap area. */
-  USB_USE_USB_AREA      = 1 <<  2, /**< Use the memory TIOS uses for usb. */
-#define USB_INIT_FLSZ(x) (((x) & 3) <<  3)
+#define USB_INIT_FLSZ(x) (((x) & 3) <<  2)
   USB_INIT_FLSZ_1024 = USB_INIT_FLSZ(0), /**< Init Frame List Size to 1024. */
   USB_INIT_FLSZ_512  = USB_INIT_FLSZ(1), /**< Init Frame List Size to  512. */
   USB_INIT_FLSZ_256  = USB_INIT_FLSZ(2), /**< Init Frame List Size to  256. */
@@ -56,8 +55,7 @@ typedef enum usb_init_flags {
   USB_INIT_EOF2_2 = USB_INIT_EOF2(2), /**< Init EOF 2 Timing to 2. */
   USB_INIT_EOF2_3 = USB_INIT_EOF2(3), /**< Init EOF 2 Timing to 3. */
   USB_INIT_UNKNOWN = 1 << 15,
-  USB_DEFAULT_INIT_FLAGS = USB_USE_USB_AREA | USB_USE_OS_HEAP
-                         | USB_INIT_FLSZ_256 | USB_INIT_ASST_1
+  USB_DEFAULT_INIT_FLAGS = USB_USE_OS_HEAP | USB_INIT_FLSZ_256 | USB_INIT_ASST_1
                          | USB_INIT_EOF1_3 | USB_INIT_EOF2_0 | USB_INIT_UNKNOWN,
 } usb_init_flags_t;
 
