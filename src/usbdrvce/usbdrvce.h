@@ -948,7 +948,16 @@ int8_t usb_GetEndpointTransferType(usb_endpoint_t endpoint);
  * @param endpoint The endpoint to get the maximum packet size of.
  * @return The \c wMaxPacketSize of an \p endpoint.
  */
-unsigned usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
+size_t usb_GetEndpointMaxPacketSize(usb_endpoint_t endpoint);
+
+/**
+ * Gets the interval of an endpoint.
+ * @param endpoint The endpoint to get the endpoint of.
+ * @return The actual \c bInterval of an \p endpoint, which is rounded down to
+ * the nearest power of two from the descriptor, or 0 for asynchronous
+ * endpoints.
+ */
+uint8_t usb_GetEndpointInterval(usb_endpoint_t endpoint);
 
 /**
  * Sets the flags for an endpoint.

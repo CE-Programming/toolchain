@@ -45,6 +45,7 @@ library USBDRVCE, 0
 	export usb_GetEndpointAddress
 	export usb_GetEndpointTransferType
 	export usb_GetEndpointMaxPacketSize
+	export usb_GetEndpointInterval
 	export usb_SetEndpointFlags
 	export usb_GetEndpointFlags
 	export usb_GetRole
@@ -202,7 +203,6 @@ struct endpoint			; endpoint structure
 	hubInfo		rw 1	; hub addr or port num shl 7 or mult shl 14
 	cur		rd 1	; current transfer pointer
 	overlay		transfer; current transfer
-	interval	rb 1	; transfer po2 interval
 	transferInfo	rb 1	; transfer type or transfer dir shl 7
  namespace transferInfo
 	?dir		:= 1 shl 7
@@ -210,6 +210,7 @@ struct endpoint			; endpoint structure
  end namespace
 	flags		rb 1	; endpoint flags
 	internalFlags	rb 1	; internal endpoint flags
+	interval	rb 1	; transfer po2 interval
 	device		rl 1	; pointer to device
 	first		rl 1	; pointer to first scheduled transfer
 	last		rl 1	; pointer to last dummy transfer
@@ -1367,6 +1368,16 @@ usb_GetEndpointTransferType:
 	sbc	a,a
 	cpl
 	or	a,c
+	jp	(hl)
+
+;-------------------------------------------------------------------------------
+usb_GetEndpointInterval:
+	pop	hl
+	ex	(sp),yendpoint
+	xor	a,a
+	cp	a,iyl
+	sbc	a,a
+	and	a,(yendpoint.interval)
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -2529,7 +2540,7 @@ assert endpoint.info+1 = endpoint.maxPktLen
 assert endpoint.cmask+1 = endpoint.hubInfo
 iterate <field,value>, smask,c, cmask,bc, \
                        overlay.altNext,1, overlay.status,c, \
-                       flags,c, internalFlags,c, device,ydevice
+                       flags,c, internalFlags,c, interval,c, device,ydevice
  if .l+1 = endpoint.field
 	inc	l
  else
