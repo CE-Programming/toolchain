@@ -665,9 +665,9 @@ assert ~periodicList and $FF
 	and	a,3
 	ld	de,_ScheduleEndpoint.disable
 	jq	z,.noPeriodicList
-	ld	de,($D10000 and $70000 or not HS_SBP_PER_FRAME shl (31-bsr HS_SBP_PER_FRAME)) shr 8 or 1 shl 1
+	ld	de,($D10000 and $70000 or not HS_SBP_PER_FRAME shl (31-bsr HS_SBP_PER_FRAME)) shr 8 or $FF
 	ld	b,a
-	ld	a,e
+	ld	a,1 shl 1
 .shift:
 	rlca
 	djnz	.shift
@@ -2314,9 +2314,9 @@ load .enable: long from .enabled
 	sbc	hl,hl
 	push	yendpoint,hl,hl
 	ld	b,a
-	dec	a
-	ld	(.interval),a
 	cpl
+	ld	(.notInterval),a
+	inc	a
 	ld	l,a
 	add	hl,hl
 	add	hl,hl
@@ -2331,7 +2331,7 @@ end repeat
 	ld	de,periodicList shr 8 and $FF-1
 	ld	a,e
 .sum:
-	ld	hl,(iy-4+endpoint.maxHsSbp)
+	ld	hl,(iy+endpoint.maxHsSbp)
 	ld	bc,0
 label .maxHsSbp at $-long
 	add.s	hl,bc
@@ -2358,11 +2358,12 @@ label .stride at $-long
 	pop	hl,iy,de
 	add	hl,hl
 	ret	c
-	ld	bc,4
+	ld	bc,4-1
 label .frameListSize at $-long
 	add	iy,bc
 .link:
 	push	iy,de
+	inc	iy
 	ld	bc,(iy-4+endpoint.maxHsSbp)
 	ld	hl,(.maxHsSbp)
 	add	hl,bc
@@ -2387,9 +2388,9 @@ end virtual
 	bit	0,(iy-4+endpoint.next+0)
 	jq	nz,.found
 	ld	a,(de)
-	cp	a,0
-label .interval at $-byte
-	jq	nc,.find
+	add	a,0
+label .notInterval at $-byte
+	jq	c,.find
 .found:
 	pop	hl,bc
 	ld	e,l;endpoint
