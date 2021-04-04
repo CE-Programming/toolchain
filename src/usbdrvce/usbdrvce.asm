@@ -1651,8 +1651,9 @@ assert ~CONTROL_TRANSFER
 	rlc	h
 	bit	ti.bUsbRole-16,l
 	jq	nz,.device
-	cp	a,BULK_TRANSFER
-	jq	z,.queue
+assert ~ISOCHRONOUS_TRANSFER-1
+	dec	a
+	jq	nz,.queue
 	jq	_Error.NOT_SUPPORTED
 .device:
 	jq	nc,.queue
@@ -1849,25 +1850,48 @@ end repeat
 	ld	l,a
 	ld	(hl),transfer.status.active
 	ld	hl,ti.mpUsbCmd
+	bit	bsf yendpoint.transferInfo.type,(yendpoint.transferInfo)
+assert INTERRUPT_TRANSFER and 1
+	jq	nz,.periodic
 	bit	ti.bUsbAsyncSchedEn,(hl)
 	ret	nz
 	ld	l,ti.usbSts+1
-	ld	b,(48000000*20/1000-.sync.cycles.pre+.sync.cycles-1)/.sync.cycles
-.sync.cycles.pre := 16+12+5+8+8
-.sync.wait:
+	ld	b,(48000000*20/1000-.async.sync.cycles.pre+.async.sync.cycles-1)/.async.sync.cycles
+.async.sync.cycles.pre := 16+12+5+8+8
+.async.sync.wait:
 	bit	ti.bUsbAsyncSchedSts-8,(hl)	;12
-	jq	nz,.sync			;+8
+	jq	nz,.async.sync			;+8
 	ld	l,ti.usbCmd
 	set	ti.bUsbAsyncSchedEn,(hl)
 	ret
-.sync:
+.async.sync:
 	xor	a,a				;+4
-.sync.loop:
+.async.sync.loop:
 	dec	a				;+(4
-	jq	nz,.sync.loop			;  +13)*256-5
-	djnz	.sync.wait			;+13
+	jq	nz,.async.sync.loop		;  +13)*256-5
+	djnz	.async.sync.wait		;+13
 	jq	_Error.TIMEOUT
-.sync.cycles := 12+8+4+(4+13)*256-5+13
+.async.sync.cycles := 12+8+4+(4+13)*256-5+13
+.periodic:
+	bit	ti.bUsbPeriodicSchedEn,(hl)
+	ret	nz
+	ld	l,ti.usbSts+1
+	ld	b,(48000000*20/1000-.periodic.sync.cycles.pre+.periodic.sync.cycles-1)/.periodic.sync.cycles
+.periodic.sync.cycles.pre := 16+12+5+8+8
+.periodic.sync.wait:
+	bit	ti.bUsbPeriodicSchedSts-8,(hl)	;12
+	jq	nz,.periodic.sync		;+8
+	ld	l,ti.usbCmd
+	set	ti.bUsbPeriodicSchedEn,(hl)
+	ret
+.periodic.sync:
+	xor	a,a				;+4
+.periodic.sync.loop:
+	dec	a				;+(4
+	jq	nz,.periodic.sync.loop		;  +13)*256-5
+	djnz	.periodic.sync.wait		;+13
+	jq	_Error.TIMEOUT
+.periodic.sync.cycles := 12+8+4+(4+13)*256-5+13
 .pack:
 	ld	a,d
 	xor	a,c
@@ -2594,7 +2618,7 @@ assert USB_ERROR_INVALID_PARAM
 ;  full-speed other: 4*bytes + 54 hs sbp
 ;     low-speed  in: 32*bytes + 348 hs sbp
 ;     low-speed out: 32*bytes + 350 hs sbp
-	bit	bsf endpoint.info.eps,(yendpoint.info)
+	bit	bsf yendpoint.info.eps,(yendpoint.info)
 	ld	de,54
 	jq	z,.schedule
 repeat bsr 32-bsr 4
