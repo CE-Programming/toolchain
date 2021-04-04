@@ -2283,35 +2283,35 @@ _DeviceDisconnected:
 ;  hl + de = max high-speed stuffed bit times needed
 ;  iy = endpoint
 ; Output:
-;  zf = success
+;  cf = schedule full
 ;  af = ?
 ;  bc = ?
-;  de = ?
+;  de = endpoint | ?
 ;  hl = ?
-;  iy = endpoint
+;  iy = ?
 _ScheduleEndpoint:
 label .enabled at $
-	add	hl,de
-repeat 15-bsr HS_SBP_PER_FRAME
-	add	hl,hl
-end repeat
-	ld	(.maxHsSbp),hl
-	inc	l
-	ld	(yendpoint.maxHsSbp),l
-	ld	(yendpoint.maxHsSbp),h
 virtual
-	or	a,a
+	scf
 	ret
  load .disable: $-$$ from $$
 end virtual
-load .enable: long from .enabled
 	ld	b,1
 .log:
 	rrc	b
 	rla
 	jq	nc,.log
-	ld	(yendpoint.interval),b
+load .enable: long from .enabled
+	add	hl,de
+repeat 15-bsr HS_SBP_PER_FRAME
+	add	hl,hl
+end repeat
 	push	yendpoint,bc,hl
+	ld	(yendpoint.interval),b
+	ld	(.maxHsSbp),hl
+	inc	l
+	ld	(yendpoint.maxHsSbp+0),l
+	ld	(yendpoint.maxHsSbp+1),h
 	xor	a,a
 	sub	a,b
 	add	a,a
@@ -2381,13 +2381,13 @@ label .maxHsSbp at $-3
 	push	hl
 	djnz	.check
 	pop	hl,iy,bc,af
-	add	hl,hl
-	jq	c,.full
 	ld	de,4
 label .frameListSize at $-long
 	add	iy,de
-	dec	a
 	pop	de
+	add	hl,hl
+	ret	c
+	dec	a
 .link:
 	ld	hl,(iy-4+endpoint.maxHsSbp)
 	add	hl,bc
@@ -2411,25 +2411,26 @@ end virtual
 	ld	iyh,d
 	ld	iyl,endpoint.base+4
 	ld	d,(iy-4+endpoint.next+1)
-	bit	0,(iy-4+endpoint.next)
+	bit	0,(iy-4+endpoint.next+0)
 	jq	nz,.found
 	ld	a,(de)
 	cp	a,c
 	jq	nc,.find
 .found:
 	pop	hl
+	ld	e,l;endpoint
 	ld	a,d
 	cp	a,h
-	ld	a,l;endpoint
 	jq	z,.linked
-	dec	l;endpoint.next+1
+assert endpoint-2 = endpoint.next
+	dec	l
 	ld	(hl),d
-	dec	l;endpoint.next
+	dec	l
+	ld	a,(iy-4+endpoint.next+0)
 	ld	(hl),a
-	ld	(iy-3),h
-	ld	(iy-4),a
+	ld	(iy-4+endpoint.next+1),h
+	ld	(iy-4+endpoint.next+0),e
 .linked:
-	ld	e,a
 	ld	d,h
 	pop	iy
 .dec2 rl 1
@@ -2438,11 +2439,6 @@ end virtual
 	ld	a,c
 	pop	bc
 	jq	c,.link
-	push	de
-.full:
-	pop	yendpoint
-	ld	hl,USB_ERROR_SCHEDULE_FULL
-	sbc	a,a
 	ret
 
 ; Input:
@@ -2613,7 +2609,7 @@ assert INTERRUPT_TRANSFER and 1
 	ld	de,39
 	jq	z,.schedule
 	ld	e,44
-	call	_ScheduleEndpoint
+	call	.schedule
 .invalidParam:
 assert USB_ERROR_INVALID_PARAM
 	ld	hl,USB_ERROR_INVALID_PARAM-1
@@ -2637,7 +2633,12 @@ end repeat
 	jq	z,.schedule
 	ld	e,350-$100
 .schedule:
-	jq	_ScheduleEndpoint
+	call	_ScheduleEndpoint
+	push	de
+	pop	yendpoint
+	ld	hl,USB_ERROR_SCHEDULE_FULL
+	sbc	a,a
+	ret
 .async:
 	ld	hl,(dummyHead.next)
 	ld	(yendpoint.next),hl
