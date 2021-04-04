@@ -657,6 +657,9 @@ assert cHeap = $D10000
 assert ti.usbHandleKeys and $FF > $40
 	ld	a,(ti.usbHandleKeys and not $1F - $20) and $FF
 	ld	(ti.usbHandleKeys and not $1F + $20),a
+assert usbMem+sizeof usbMem = periodicList
+assert ~periodicList and $FF
+	ld	c,l;0
 	ld	a,e
 	cpl
 	and	a,3
@@ -668,16 +671,13 @@ assert ti.usbHandleKeys and $FF > $40
 .shift:
 	rlca
 	djnz	.shift
-assert usbMem+sizeof usbMem = periodicList
+	ld	(_ScheduleEndpoint.frameListSize+1),a
 	ld	b,a
 	dec.s	bc
 	inc	l
 	ld	(hl),de
 	ld	de,periodicList+1+dword
 	ldir
-	ld	a,h
-	sub	a,(periodicList-$D10000+$80*dword) shr 8
-	ld	(_ScheduleEndpoint.frameListSize+1),a
 	ld	de,_ScheduleEndpoint.enable
 .noPeriodicList:
 	ld	(_ScheduleEndpoint.enabled),de
@@ -2279,7 +2279,7 @@ _DeviceDisconnected:
 	jq	usb_UnrefDevice.refcount
 
 ; Input:
-;  a = interval <> 0
+;  b = interval
 ;  hl + de = max high-speed stuffed bit times needed
 ;  iy = endpoint
 ; Output:
@@ -2296,81 +2296,56 @@ virtual
 	ret
  load .disable: $-$$ from $$
 end virtual
-	ld	b,1
-.log:
-	rrc	b
-	rla
-	jq	nc,.log
-load .enable: long from .enabled
 	add	hl,de
 repeat 15-bsr HS_SBP_PER_FRAME
 	add	hl,hl
 end repeat
-	push	yendpoint,bc,hl
-	ld	(yendpoint.interval),b
+load .enable: long from .enabled
 	ld	(.maxHsSbp),hl
 	inc	l
 	ld	(yendpoint.maxHsSbp+0),l
 	ld	(yendpoint.maxHsSbp+1),h
-	xor	a,a
-	sub	a,b
-	add	a,a
+	ld	a,1
+.log:
+	rrca
+	rl	b
+	jq	nc,.log
+	ld	(yendpoint.interval),a
 	sbc	hl,hl
-	push	hl,hl
-	add	a,a
-virtual
-	lea	iy,iy+0
- load .lea_iy_iy: $-$$ from $$
-end virtual
-virtual
-	dec	iyh
-	nop
- load .dec_iyh: $-$$ from $$
-end virtual
-virtual
-	ld	iyh,0
- load .ld_iyh: $-$$ from $$
-end virtual
-assert ~(.dec_iyh or .ld_iyh) shr 16
-	push	af
-	dec	sp
-	pop	hl
-	inc	sp
-	ld	a,.lea_iy_iy shr 8
-	jq	nz,.lea
-assert .ld_iyh-1 shl 8 = .dec_iyh
-	sbc	a,.lea_iy_iy shr 8-.ld_iyh shr 8
-.lea:
-	ld	h,a
-iterate smc, .lea_iy_iy, .dec_iyh, .ld_iyh
- assert ~smc shr 8 and (.ld_iyh or .dec_iyh xor .lea_iy_iy) \
-                   xor (.ld_iyh or .dec_iyh  or .lea_iy_iy) xor smc and $FF
-end iterate
-	and	a,.ld_iyh or .dec_iyh xor .lea_iy_iy and $FF
-	xor	a,.ld_iyh or .dec_iyh  or .lea_iy_iy and $FF
+	push	yendpoint,hl,hl
+	ld	b,a
+	dec	a
+	ld	(.interval),a
+	cpl
 	ld	l,a
-	ld	(.dec1),hl
-	ld	(.dec2),hl
-	ld	iy,periodicList+1 shl 7*dword
+	add	hl,hl
+	add	hl,hl
+	ld	(.stride),hl
+	ld	iy,periodicList
 .check:
+repeat (1 shl 7*dword) shr 8
+	inc	iyh
+end repeat
 	lea	iy,iy-dword
-	push	bc,iy
-	ld	bc,0
-label .maxHsSbp at $-3
+	push	bc
 	ld	de,periodicList shr 8 and $FF-1
 	ld	a,e
 .sum:
 	ld	hl,(iy-4+endpoint.maxHsSbp)
+	ld	bc,0
+label .maxHsSbp at $-long
 	add.s	hl,bc
 	jq	nc,.valid
 	ld	de,1 shl 23
 .valid:
 	add	hl,de
 	ex	de,hl
-.dec1 rl 1
+	ld	bc,0
+label .stride at $-long
+	add	iy,bc
 	cp	a,iyh
 	jq	c,.sum
-	pop	iy,bc,hl
+	pop	bc,hl
 	sbc	hl,de
 	jq	c,.min
 	pop	hl
@@ -2380,19 +2355,18 @@ label .maxHsSbp at $-3
 	add	hl,de
 	push	hl
 	djnz	.check
-	pop	hl,iy,bc,af
-	ld	de,4
-label .frameListSize at $-long
-	add	iy,de
-	pop	de
+	pop	hl,iy,de
 	add	hl,hl
 	ret	c
-	dec	a
+	ld	bc,4
+label .frameListSize at $-long
+	add	iy,bc
 .link:
-	ld	hl,(iy-4+endpoint.maxHsSbp)
+	push	iy,de
+	ld	bc,(iy-4+endpoint.maxHsSbp)
+	ld	hl,(.maxHsSbp)
 	add	hl,bc
 	ld	(iy-4+endpoint.maxHsSbp),hl
-	push	bc,iy,de
 virtual
 	ld	hl,0
  load .ld_hl: byte from $$
@@ -2404,7 +2378,6 @@ end virtual
 	ld	bc,(iy-4+endpoint.next)
 	bit	2,c
 	jq	nz,.skip
-	ld	c,a
 	ld	e,endpoint.interval
 	db	.ld_hl
 .find:
@@ -2414,10 +2387,11 @@ end virtual
 	bit	0,(iy-4+endpoint.next+0)
 	jq	nz,.found
 	ld	a,(de)
-	cp	a,c
+	cp	a,0
+label .interval at $-byte
 	jq	nc,.find
 .found:
-	pop	hl
+	pop	hl,bc
 	ld	e,l;endpoint
 	ld	a,d
 	cp	a,h
@@ -2432,12 +2406,10 @@ assert endpoint-2 = endpoint.next
 	ld	(iy-4+endpoint.next+0),e
 .linked:
 	ld	d,h
-	pop	iy
-.dec2 rl 1
+	ld	iy,(.stride)
+	add	iy,bc
 	ld	a,periodicList shr 8 and $FF-1
 	cp	a,iyh
-	ld	a,c
-	pop	bc
 	jq	c,.link
 	ret
 
@@ -2585,42 +2557,42 @@ assert PO2_MPS = 1 shl 0
 assert ~CONTROL_TRANSFER and 1
 assert ~BULK_TRANSFER and 1
 	jq	nc,.async
+assert endpointDescriptor.wMaxPacketSize+2 = endpointDescriptor.bInterval
+	inc	hl
+	ld	b,(hl)
+	inc	b
+	djnz	.validInterval
+	jq	.invalidParam
+.validInterval:
 	ex	de,hl
 	inc.s	hl
 repeat bsr 4
 	add	hl,hl
 end repeat
 	rrca
-assert endpointDescriptor.wMaxPacketSize+2 = endpointDescriptor.bInterval
-	inc	de
-	ld	a,(de)
-	inc	a
-	dec	a
-	jq	z,.invalidParam
 assert INTERRUPT_TRANSFER and 1
 	jq	c,.intr
-	dec	a
-	jq	z,.invalidParam
-	inc	a
-;  full-speed:
-;   out isoc: 4*bytes + 39 hs sbp
-;    in isoc: 4*bytes + 44 hs sbp
+	djnz	.validIsocInterval
+.invalidParam:
+	ld	hl,USB_ERROR_INVALID_PARAM
+	ret
+.validIsocInterval:
+	inc	b
+; full-speed out isoc: 4*bytes + 39 hs sbp
+; full-speed  in isoc: 4*bytes + 44 hs sbp
 	bitmsk	yendpoint.transferInfo.dir
 	ld	de,39
 	jq	z,.schedule
 	ld	e,44
 	call	.schedule
-.invalidParam:
 assert USB_ERROR_INVALID_PARAM
 	ld	hl,USB_ERROR_INVALID_PARAM-1
 	inc	l
 	ret
 .intr:
-;  full-speed:
-;      other: 4*bytes + 54 hs sbp
-;  low-speed:
-;         in: 32*bytes + 348 hs sbp
-;        out: 32*bytes + 350 hs sbp
+;  full-speed other: 4*bytes + 54 hs sbp
+;     low-speed  in: 32*bytes + 348 hs sbp
+;     low-speed out: 32*bytes + 350 hs sbp
 	bit	bsf endpoint.info.eps,(yendpoint.info)
 	ld	de,54
 	jq	z,.schedule
