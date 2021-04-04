@@ -1362,6 +1362,7 @@ usb_GetEndpointTransferType:
 	ld	a,(yendpoint.transferInfo)
 	and	a,endpoint.transferInfo.type
 	ld	c,a
+	xor	a,a
 	cp	a,iyl
 	sbc	a,a
 	cpl
