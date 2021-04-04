@@ -2279,7 +2279,7 @@ _DeviceDisconnected:
 	jq	usb_UnrefDevice.refcount
 
 ; Input:
-;  a = interval
+;  a = interval <> 0
 ;  hl + de = max high-speed stuffed bit times needed
 ;  iy = endpoint
 ; Output:
@@ -2300,7 +2300,7 @@ end repeat
 	ld	(yendpoint.maxHsSbp),l
 	ld	(yendpoint.maxHsSbp),h
 virtual
-	scf
+	or	a,a
 	ret
  load .disable: $-$$ from $$
 end virtual
@@ -2546,13 +2546,14 @@ iterate <field,value>, smask,c, cmask,bc, \
 end iterate
 	ld	l,endpoint
 	push	hl
-	pop	yendpoint,bc
+	pop	yendpoint
 	sbc	hl,hl
 	ld	(yendpoint.data),hl
 	call	_CreateDummyTransfer.enter
 	jq	z,.mem
 	lea	hl,yendpoint.base
 	call	_Free64Align256
+	pop	bc
 .nomem:
 	ld	hl,USB_ERROR_NO_MEMORY
 	ret
@@ -2566,19 +2567,20 @@ end iterate
 	ld	e,(hl)
 	ld	a,e
 	or	a,d
-	jq	z,.notPo2Mps
 	dec	de
+	jq	z,.notPo2Mps
 	ld	a,e
 	and	a,(hl)
-	ld	e,a
+	ld	c,a
 	inc	hl
 	ld	a,d
 	and	a,(hl)
-	or	a,e
+	or	a,c
 	jq	nz,.notPo2Mps
 assert PO2_MPS = 1 shl 0
 	inc	(yendpoint.internalFlags)
 .notPo2Mps:
+	pop	bc
 	ld	a,(currentRole)
 	and	a,ti.bmUsbRole shr 16
 	jq	nz,.async
