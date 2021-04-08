@@ -115,10 +115,10 @@ LDCRT0 := $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
 
 # find source files
-CSOURCES := $(call rwildcard,$(SRCDIR),*.c)
-CPPSOURCES := $(call rwildcard,$(SRCDIR),*.cpp)
-USERHEADERS := $(call rwildcard,$(SRCDIR),*.h *.hpp)
-ASMSOURCES := $(call rwildcard,$(SRCDIR),*.asm)
+CSOURCES := $(call rwildcard,$(SRCDIR),*.c) $(EXTRA_CSOURCES)
+CPPSOURCES := $(call rwildcard,$(SRCDIR),*.cpp) $(EXTRA_CPPSOURCES)
+USERHEADERS := $(call rwildcard,$(SRCDIR),*.h *.hpp) $(EXTRA_USERHEADERS)
+ASMSOURCES := $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES)
 
 # create links for later
 LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.c.src)
@@ -251,6 +251,7 @@ $(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(EZCC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 clean:
+	$(Q)$(call RM,$(EXTRA_CLEAN))
 	$(Q)$(call RMDIR,$(OBJDIR) $(BINDIR))
 	$(Q)echo Removed built objects and binaries.
 
