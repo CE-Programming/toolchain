@@ -19,6 +19,14 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	srl_Read
 	export	srl_Write
 	export	srl_GetCDCStandardDescriptors
+; temp
+	export	get_device_type_
+	export	get_endpoint_addresses_
+	export	ring_buf_avail_
+	export	ring_buf_has_consecutive_region_
+	export	ring_buf_push_
+	export	ring_buf_pop_
+	export	ring_buf_update_
 
 ;-------------------------------------------------------------------------------
 ; memory structures
@@ -277,4 +285,66 @@ start_read:
 ; Inputs:
 ;  ix: Serial device struct
 start_write:
+	ret
+
+;temp
+get_device_type_:
+	push	ix
+	pop	bc,de,ix
+	push	ix,de,bc
+	call	get_device_type
+	pop	ix
+	ret
+get_endpoint_addresses_:
+	push	ix
+	pop	bc,de,ix
+	push	ix,de,bc
+	call	get_endpoint_addresses
+	pop	ix
+	ret
+ring_buf_avail_:
+	push	ix
+	pop	bc,de,ix
+	push	ix,de,bc
+	call	ring_buf_avail
+	pop	ix
+	ret
+ring_buf_has_consecutive_region_:
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	ld	a,(ix+6)
+	ld	ix,(ix+3)
+	call	ring_buf_has_consecutive_region
+	pop	ix
+	ret
+ring_buf_push_:
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	ld	hl,(ix+6)
+	ld	bc,(ix+9)
+	ld	ix,(ix+3)
+	call	ring_buf_push
+	pop	ix
+	ret
+ring_buf_pop_:
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	ld	hl,(ix+6)
+	ld	bc,(ix+9)
+	ld	ix,(ix+3)
+	call	ring_buf_pop
+	pop	ix
+	ret
+ring_buf_update_:
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	ld	bc,(ix+6)
+	ld	a,(ix+9)
+	ld	ix,(ix+3)
+	call	ring_buf_update
+	pop	ix
 	ret
