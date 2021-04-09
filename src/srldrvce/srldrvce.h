@@ -50,7 +50,7 @@ typedef uint8_t srl_device_subtype_t;
 
 typedef struct {
     void *buf_start;
-    size_t buf_size;
+    void *buf_end;
     void *data_start;
     void *data_break;
     void *data_end;

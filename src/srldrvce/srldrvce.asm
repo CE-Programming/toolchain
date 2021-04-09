@@ -3,7 +3,7 @@ include '../include/library.inc'
 include '../include/include_library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'USBDRVCE', 0
+library 'SRLDRVCE', 0
 
 ;-------------------------------------------------------------------------------
 ; dependencies
@@ -23,10 +23,12 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	get_device_type_
 	export	get_endpoint_addresses_
 	export	ring_buf_avail_
+	export	ring_buf_contig_avail_
 	export	ring_buf_has_consecutive_region_
 	export	ring_buf_push_
 	export	ring_buf_pop_
-	export	ring_buf_update_
+	export	ring_buf_update_read_
+	export	ring_buf_update_write_
 
 ;-------------------------------------------------------------------------------
 ; memory structures
@@ -55,7 +57,7 @@ struct ring_buf_ctrl
 	local size
 	label  .: size
 	buf_start			rl 1
-	buf_size			rl 1
+	buf_end				rl 1
 	data_start			rl 1
 	data_break			rl 1
 	data_end			rl 1
@@ -228,6 +230,14 @@ set_rate_pl2303:
 ring_buf_avail:
 	ret
 
+; Checks how many contiguous bytes are available in a ring buffer
+; Inputs:
+;  ix: ring_buf_ctrl struct
+; Returns:
+;  hl: Number of available bytes
+ring_buf_contig_avail:
+	ret
+
 ; Checks if there is a consecutive region of the given size
 ; following the last available byte
 ; Inputs:
@@ -259,12 +269,21 @@ ring_buf_push:
 ring_buf_pop:
 	ret
 
-; Update a ring buffer after it's been DMA'd to
+; Update a ring buffer after it's been DMA'd into
 ; Inputs:
 ;  ix: ring_buf_ctrl struct
 ;  bc: Number of bytes written
 ;  a: Size of minimum consecutive region
-ring_buf_update:
+; Returns:
+;  nc if the remaining consecutive region is too small
+ring_buf_update_read:
+	ret
+
+; Update a ring buffer after it's been DMA'd from
+; Inputs:
+;  ix: ring_buf_ctrl struct
+;  bc: Number of bytes written
+ring_buf_update_write:
 	ret
 
 ;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
@@ -309,18 +328,27 @@ ring_buf_avail_:
 	call	ring_buf_avail
 	pop	ix
 	ret
+ring_buf_contig_avail_:
+	push	ix
+	pop	bc,de,ix
+	push	ix,de,bc
+	call	ring_buf_contig_avail
+	pop	ix
+	ret
 ring_buf_has_consecutive_region_:
 	push	ix
-	ld	ix,0
+	ld	ix,3
 	add	ix,sp
 	ld	a,(ix+6)
 	ld	ix,(ix+3)
 	call	ring_buf_has_consecutive_region
+	ld	a,0
+	adc	a,0
 	pop	ix
 	ret
 ring_buf_push_:
 	push	ix
-	ld	ix,0
+	ld	ix,3
 	add	ix,sp
 	ld	hl,(ix+6)
 	ld	bc,(ix+9)
@@ -330,7 +358,7 @@ ring_buf_push_:
 	ret
 ring_buf_pop_:
 	push	ix
-	ld	ix,0
+	ld	ix,3
 	add	ix,sp
 	ld	hl,(ix+6)
 	ld	bc,(ix+9)
@@ -338,13 +366,22 @@ ring_buf_pop_:
 	call	ring_buf_pop
 	pop	ix
 	ret
-ring_buf_update_:
+ring_buf_update_read_:
 	push	ix
-	ld	ix,0
+	ld	ix,3
 	add	ix,sp
 	ld	bc,(ix+6)
 	ld	a,(ix+9)
 	ld	ix,(ix+3)
-	call	ring_buf_update
+	call	ring_buf_update_read
+	pop	ix
+	ret
+ring_buf_update_write_:
+	push	ix
+	ld	ix,3
+	add	ix,sp
+	ld	bc,(ix+6)
+	ld	ix,(ix+3)
+	call	ring_buf_update_write
 	pop	ix
 	ret

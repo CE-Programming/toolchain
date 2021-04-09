@@ -21,26 +21,28 @@ size_t ring_buf_avail_(ring_buf_ctrl_t *rbuf);
 bool ring_buf_has_consecutive_region_(ring_buf_ctrl_t *rbuf, uint8_t size);
 size_t ring_buf_push_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
 size_t ring_buf_pop_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
-void ring_buf_update_(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region);
+bool ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region);
+void ring_buf_update_write_(ring_buf_ctrl_t *rbuf, size_t size);
+
+void print_ring_buf(const ring_buf_ctrl_t *rbuf) {
+    dbg_printf("  buf_start: %p\n", rbuf->buf_start);
+    dbg_printf("  buf_end: %p\n", rbuf->buf_end);
+    dbg_printf("  data_start: %p\n", rbuf->data_start);
+    dbg_printf("  data_break: %p\n", rbuf->data_break);
+    dbg_printf("  data_end: %p\n", rbuf->data_end);
+    dbg_printf("  dma_active: %i\n", rbuf->dma_active);
+}
 
 void print_srl_dev(const srl_device_t *srl) {
-   dbg_printf("dev: %p\n", srl->dev);
-   dbg_printf("rx_addr: %x\n", srl->rx_addr);
-   dbg_printf("tx_addr: %x\n", srl->tx_addr);
-   dbg_printf("type: %i\n", srl->type);
-   dbg_printf("subtype: %i\n", srl->subtype);
-   dbg_printf("tx_buf.buf_start: %p\n", srl->tx_buf.buf_start);
-   dbg_printf("tx_buf.buf_size: %i\n", srl->tx_buf.buf_size);
-   dbg_printf("tx_buf.data_start: %p\n", srl->tx_buf.data_start);
-   dbg_printf("tx_buf.data_break: %p\n", srl->tx_buf.data_break);
-   dbg_printf("tx_buf.data_end: %p\n", srl->tx_buf.data_end);
-   dbg_printf("tx_buf.dma_active: %i\n", srl->tx_buf.dma_active);
-   dbg_printf("rx_buf.buf_start: %p\n", srl->rx_buf.buf_start);
-   dbg_printf("rx_buf.buf_size: %i\n", srl->rx_buf.buf_size);
-   dbg_printf("rx_buf.data_start: %p\n", srl->rx_buf.data_start);
-   dbg_printf("rx_buf.data_break: %p\n", srl->rx_buf.data_break);
-   dbg_printf("rx_buf.data_end: %p\n", srl->rx_buf.data_end);
-   dbg_printf("rx_buf.dma_active: %i\n", srl->rx_buf.dma_active);
+    dbg_printf("dev: %p\n", srl->dev);
+    dbg_printf("rx_addr: %x\n", srl->rx_addr);
+    dbg_printf("tx_addr: %x\n", srl->tx_addr);
+    dbg_printf("type: %i\n", srl->type);
+    dbg_printf("subtype: %i\n", srl->subtype);
+    dbg_printf("tx_buf:\n");
+    print_ring_buf(&srl->tx_buf);
+    dbg_printf("rx_buf:\n");
+    print_ring_buf(&srl->rx_buf);
 }
 
 srl_device_t srl;
@@ -86,11 +88,97 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
    return USB_SUCCESS;
 }
 
+size_t ring_buf_avail(ring_buf_ctrl_t *rbuf) {
+    if(rbuf->data_break) {
+        return rbuf->data_break - rbuf->data_start +
+               rbuf->data_end - rbuf->buf_start;
+    } else {
+        return rbuf->data_end - rbuf->data_start;
+    }
+}
+
+size_t ring_buf_contig_avail(ring_buf_ctrl_t *rbuf) {
+    if(rbuf->data_break) {
+        return rbuf->data_break - rbuf->data_start;
+    } else {
+        return rbuf->data_end - rbuf->data_start;
+    }
+}
+
+bool ring_buf_has_consecutive_region(ring_buf_ctrl_t *rbuf, uint8_t size) {
+    if(rbuf->data_break) {
+        return size < rbuf->data_start - rbuf->data_end;
+    } else {
+        return size < rbuf->buf_end - rbuf->data_end;
+    }
+}
+
+size_t ring_buf_push(ring_buf_ctrl_t *rbuf, void *data, size_t size) {
+    if(rbuf->data_break) {
+        size_t len = rbuf->data_start - rbuf->data_end;
+        if(len > size) len = size;
+        memcpy(rbuf->data_end, data, len);
+        rbuf->data_end += len;
+        return len;
+    } else {
+        if(rbuf->data_end + size > rbuf->buf_end) {
+            size_t len = rbuf->buf_end - rbuf->data_end;
+            memcpy(rbuf->data_end, data, len);
+            rbuf->data_break = rbuf->buf_end;
+            rbuf->data_end = rbuf->buf_start;
+            return len + ring_buf_push(rbuf, data + len, size - len);
+        } else {
+            memcpy(rbuf->data_end, data, size);
+            rbuf->data_end += size;
+            return size;
+        }
+    }
+}
+
+size_t ring_buf_pop(ring_buf_ctrl_t *rbuf, void *data, size_t size) {
+    if(rbuf->data_break) {
+        if(rbuf->data_start + size > rbuf->data_break) {
+            size_t len = rbuf->data_break - rbuf->data_start;
+            memcpy(data, rbuf->data_start, len);
+            rbuf->data_start = rbuf->buf_start;
+            rbuf->data_break = NULL;
+            return len + ring_buf_pop(rbuf, data + len, size - len);
+        } else {
+            memcpy(data, rbuf->data_start, size);
+            rbuf->data_start += size;
+            return size;
+        }
+    } else {
+        size_t len = rbuf->data_end - rbuf->data_start;
+        if(len > size) len = size;
+        memcpy(data, rbuf->data_start, len);
+        rbuf->data_start += len;
+        return len;
+    }
+}
+
+bool ring_buf_update_read(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region) {
+    rbuf->data_end += size;
+    if(!rbuf->data_break && rbuf->buf_end - rbuf->data_end < region) {
+        rbuf->data_break = rbuf->data_end;
+        rbuf->data_end = rbuf->buf_start;
+    }
+    return !rbuf->data_break || rbuf->data_start - rbuf->data_end <= region;
+}
+
+void ring_buf_update_write(ring_buf_ctrl_t *rbuf, size_t size) {
+    rbuf->data_start += size;
+    if(rbuf->data_start == rbuf->data_break) {
+        rbuf->data_start = rbuf->buf_start;
+        rbuf->data_break = NULL;
+    }
+}
+
 void test_rbuf(void) {
     char buffer[500];
     ring_buf_ctrl_t ctrl = {
         buffer,
-        sizeof buffer,
+        &buffer[sizeof buffer],
         buffer,
         NULL,
         buffer,
@@ -99,6 +187,7 @@ void test_rbuf(void) {
 }
 
 int main(void) {
+    test_rbuf();
     //os_ClrHome();
     //const usb_standard_descriptors_t *default_desc = (void*)(((struct{char b; void *addr;}*)usb_RepeatTimerCycles)->addr + 16);
     const usb_standard_descriptors_t *desc = srl_GetCDCStandardDescriptors();
