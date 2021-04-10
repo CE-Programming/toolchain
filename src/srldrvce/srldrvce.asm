@@ -240,6 +240,24 @@ set_rate_pl2303:
 ; Returns:
 ;  hl: Number of available bytes
 ring_buf_avail:
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	jq	nz,.break
+.no_break:
+	ld	hl,(xring_buf_ctrl.data_end)
+	ld	bc,(xring_buf_ctrl.data_start)
+	or	a,a
+	sbc	hl,bc
+	ret
+.break:
+	ld	bc,(xring_buf_ctrl.data_start)
+	or	a,a
+	sbc	hl,bc
+	ld	bc,(xring_buf_ctrl.data_end)
+	add	hl,bc
+	ld	bc,(xring_buf_ctrl.buf_start)
+	or	a,a
+	sbc	hl,bc
 	ret
 
 ; Checks how many contiguous bytes are available in a ring buffer
@@ -248,6 +266,13 @@ ring_buf_avail:
 ; Returns:
 ;  hl: Number of available bytes
 ring_buf_contig_avail:
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	jq	z,ring_buf_avail.no_break
+
+	ld	bc,(xring_buf_ctrl.data_start)
+	or	a,a
+	sbc	hl,bc
 	ret
 
 ; Checks if there is a consecutive region of the given size
