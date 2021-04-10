@@ -29,6 +29,18 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	ring_buf_pop_
 	export	ring_buf_update_read_
 	export	ring_buf_update_write_
+;-------------------------------------------------------------------------------
+macro compare_hl_zero?
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+end macro
+
+macro compare_hl_de?
+	or	a,a
+	sbc	hl,de
+	add	hl,de
+end macro
 
 ;-------------------------------------------------------------------------------
 ; memory structures
@@ -257,6 +269,74 @@ ring_buf_has_consecutive_region:
 ; Returns:
 ;  hl: Number of bytes pushed
 ring_buf_push:
+	ex	de,hl					; de = data to push
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	jq	nz,.break
+	ld	hl,(xring_buf_ctrl.buf_end)
+	or	a,a
+	sbc	hl,bc
+	push	bc
+	ld	bc,(xring_buf_ctrl.data_end)
+	or	a,a
+	sbc	hl,bc
+	ex	de,hl					; hl = data
+	jq	nc,.pop_copy
+
+	ex	de,hl					; de = data
+	ld	hl,(xring_buf_ctrl.buf_end)
+	ld	(xring_buf_ctrl.data_break),hl
+	ld	bc,(xring_buf_ctrl.data_end)
+	or	a,a
+	sbc	hl,bc					; hl = len
+	push	hl
+	pop	bc					; bc = len
+	ex	de,hl					; hl = data
+	push	hl
+	call	.copy					; hl = len
+	ld	bc,(xring_buf_ctrl.buf_start)
+	ld	(xring_buf_ctrl.data_end),bc
+	ex	de,hl					; de = len
+	pop	iy					; iy = data
+	add	iy,de					; iy = data + len
+	pop	hl					; hl = size
+	sbc	hl,de
+	push	hl
+	pop	bc					; bc = size - len
+	lea	hl,iy
+	push	de
+	call	.break
+	pop	de
+	add	hl,de
+	ret
+.break:
+	push	bc
+	ld	hl,(xring_buf_ctrl.data_start)
+	ld	bc,(xring_buf_ctrl.data_end)
+	or	a,a
+	sbc	hl,bc					; hl = len
+	pop	bc					; bc = size
+	or	a,a
+	sbc	hl,bc
+	add	hl,bc
+	jq	nc,.copy				; bc = len = size
+	push	hl
+.pop_copy:
+	pop	bc					; bc = len
+.copy:
+	sbc	hl,hl					; check if bc is 0
+	adc	hl,bc
+	ld	hl,0
+	ret	z
+	ex	de,hl					; hl = data
+	ld	de,(xring_buf_ctrl.data_end)
+	push	bc
+	ldir
+	pop	de					; de = len
+	ld	hl,(xring_buf_ctrl.data_end)
+	add	hl,de
+	ld	(xring_buf_ctrl.data_end),hl
+	ex	de,hl					; hl = len
 	ret
 
 ; Takes bytes from a ring buffer
