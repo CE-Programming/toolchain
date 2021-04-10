@@ -283,7 +283,22 @@ ring_buf_contig_avail:
 ; Returns:
 ;  nc if the region does not exist
 ring_buf_has_consecutive_region:
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	jq	nz,.break
+	ld	hl,(xring_buf_ctrl.buf_end)
+	ld	bc,(xring_buf_ctrl.data_end)
+.compare:
+	or	a,a
+	sbc	hl,bc
+	ld	bc,0
+	ld	c,a
+	sbc	hl,bc
 	ret
+.break:
+	ld	hl,(xring_buf_ctrl.data_start)
+	ld	bc,(xring_buf_ctrl.data_end)
+	jq	.compare
 
 ; Pushes bytes to a ring buffer
 ; Assumes that this buffer does not have any consecutive byte requirements
@@ -447,8 +462,8 @@ ring_buf_has_consecutive_region_:
 	ld	a,(ix+6)
 	ld	ix,(ix+3)
 	call	ring_buf_has_consecutive_region
-	ld	a,0
-	adc	a,0
+	ld	a,1
+	sbc	a,0
 	pop	ix
 	ret
 ring_buf_push_:
