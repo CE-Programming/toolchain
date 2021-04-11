@@ -366,17 +366,13 @@ ring_buf_push:
 .copy:
 	sbc	hl,hl					; check if bc is 0
 	adc	hl,bc
-	ld	hl,0
 	ret	z
 	ex	de,hl					; hl = data
 	ld	de,(xring_buf_ctrl.data_end)
 	push	bc
-	ldir
-	pop	de					; de = len
-	ld	hl,(xring_buf_ctrl.data_end)
-	add	hl,de
-	ld	(xring_buf_ctrl.data_end),hl
-	ex	de,hl					; hl = len
+	ldir						; de = data_end + len
+	ld	(xring_buf_ctrl.data_end),de
+	pop	hl					; hl = len
 	ret
 
 ; Takes bytes from a ring buffer
@@ -387,6 +383,68 @@ ring_buf_push:
 ; Returns:
 ;  hl: Number of bytes taken
 ring_buf_pop:
+	ex	de,hl					; de = data
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	jq	nz,.break
+	push	bc
+	ld	hl,(xring_buf_ctrl.data_end)
+	ld	bc,(xring_buf_ctrl.data_start)
+	or	a,a
+	sbc	hl,bc					; hl = len
+	pop	bc					; bc = size
+	or	a,a
+	sbc	hl,bc
+	add	hl,bc
+	jq	nc,.copy				; bc = len = size
+	push	hl
+.pop_copy:
+	pop	bc					; bc = len
+.copy:
+	sbc	hl,hl					; check if bc is 0
+	adc	hl,bc
+	ret	z
+	ld	hl,(xring_buf_ctrl.data_start)
+	push	bc
+	ldir						; hl = data_start + len
+	ld	(xring_buf_ctrl.data_start),hl
+	pop	hl					; hl = len
+	ret
+.break:
+	ld	hl,(xring_buf_ctrl.data_break)
+	or	a,a
+	sbc	hl,bc
+	push	bc
+	ld	bc,(xring_buf_ctrl.data_start)
+	or	a,a
+	sbc	hl,bc
+	jq	nc,.pop_copy
+
+	ld	hl,(xring_buf_ctrl.data_break)
+	ld	bc,(xring_buf_ctrl.data_start)
+	or	a,a
+	sbc	hl,bc					; hl = len
+	push	hl
+	pop	bc					; bc = len
+	ex	de,hl					; hl = data
+	push	hl
+	call	.copy					; hl = len
+	ld	bc,(xring_buf_ctrl.buf_start)
+	ld	(xring_buf_ctrl.data_start),bc
+	ld	bc,0
+	ld	(xring_buf_ctrl.data_break),bc
+	ex	de,hl					; de = len
+	pop	iy					; iy = data
+	add	iy,de					; iy = data + len
+	pop	hl					; hl = size
+	sbc	hl,de
+	push	hl
+	pop	bc					; bc = size - len
+	lea	hl,iy
+	push	de
+	call	.break
+	pop	de
+	add	hl,de
 	ret
 
 ; Update a ring buffer after it's been DMA'd into
