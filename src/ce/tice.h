@@ -589,6 +589,11 @@ bool boot_CheckOnPressed(void);
 void boot_DebugPrintf(const char *string);
 
 /**
+ * Turns on the calculator
+ */
+void boot_TurnOn(void);
+
+/**
  * Turns off the calculator (probably not a good idea to use)
  */
 void boot_TurnOff(void);

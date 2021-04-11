@@ -6,6 +6,7 @@
 	public _boot_GetBootMinorVer
 	public _boot_DebugPrintf
 	public _boot_ClearVRAM
+	public _boot_TurnOn
 	public _boot_TurnOff
 	public _boot_NewLine
 	public _boot_Set6MHzMode
@@ -153,6 +154,7 @@ _boot_GetHardwareVer            := 000084h
 _boot_GetBootMinorVer           := 00008Ch
 _boot_DebugPrintf               := 0000B4h
 _boot_ClearVRAM                 := 000374h
+_boot_TurnOn                    := 000384h
 _boot_TurnOff                   := 000388h
 _boot_NewLine                   := 000390h
 _boot_Set6MHzMode               := 00039Ch
