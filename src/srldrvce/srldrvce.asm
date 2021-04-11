@@ -452,9 +452,25 @@ ring_buf_pop:
 ;  ix: ring_buf_ctrl struct
 ;  bc: Number of bytes written
 ;  a: Size of minimum consecutive region
-; Returns:
-;  nc if the remaining consecutive region is too small
 ring_buf_update_read:
+	ld	hl,(xring_buf_ctrl.data_end)
+	add	hl,bc
+	ld	(xring_buf_ctrl.data_end),hl
+	ex	de,hl					; de = data_end
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	ret	nz
+	ld	hl,(xring_buf_ctrl.buf_end)
+	or	a,a
+	sbc	hl,de
+	ld	bc,0
+	ld	c,a
+	or	a,a
+	sbc	hl,bc
+	ret	nc					; ret if >= region
+	ld	(xring_buf_ctrl.data_break),de		; data_break = data_end
+	ld	de,(xring_buf_ctrl.buf_start)
+	ld	(xring_buf_ctrl.data_end),de
 	ret
 
 ; Update a ring buffer after it's been DMA'd from
@@ -462,6 +478,16 @@ ring_buf_update_read:
 ;  ix: ring_buf_ctrl struct
 ;  bc: Number of bytes written
 ring_buf_update_write:
+	ld	hl,(xring_buf_ctrl.data_start)
+	add	hl,bc
+	ld	(xring_buf_ctrl.data_start),hl
+	ld	bc,(xring_buf_ctrl.data_break)
+	or	a,a
+	sbc	hl,bc
+	ret	nz
+	ld	(xring_buf_ctrl.data_break),hl		; hl = 0
+	ld	hl,(xring_buf_ctrl.buf_start)
+	ld	(xring_buf_ctrl.data_start),hl
 	ret
 
 ;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);

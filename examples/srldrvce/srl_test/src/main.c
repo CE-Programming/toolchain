@@ -21,7 +21,7 @@ size_t ring_buf_avail_(ring_buf_ctrl_t *rbuf);
 bool ring_buf_has_consecutive_region_(ring_buf_ctrl_t *rbuf, uint8_t size);
 size_t ring_buf_push_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
 size_t ring_buf_pop_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
-bool ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region);
+void ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region);
 void ring_buf_update_write_(ring_buf_ctrl_t *rbuf, size_t size);
 
 void print_ring_buf(const ring_buf_ctrl_t *rbuf) {
@@ -157,13 +157,12 @@ size_t ring_buf_pop(ring_buf_ctrl_t *rbuf, void *data, size_t size) {
     }
 }
 
-bool ring_buf_update_read(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region) {
+void ring_buf_update_read(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region) {
     rbuf->data_end += size;
     if(!rbuf->data_break && rbuf->buf_end - rbuf->data_end < region) {
         rbuf->data_break = rbuf->data_end;
         rbuf->data_end = rbuf->buf_start;
     }
-    return !rbuf->data_break || rbuf->data_start - rbuf->data_end <= region;
 }
 
 void ring_buf_update_write(ring_buf_ctrl_t *rbuf, size_t size) {
