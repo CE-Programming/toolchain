@@ -75,7 +75,7 @@ typedef enum {
 #define kb_IntStatus \
 (*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals. */
 #define kb_Config \
-(*(uint8_t*)0xF50000)          /**< Configuration of keypad controller. */
+(*(volatile uint8_t*)0xF50000) /**< Configuration of keypad controller. */
 
 /**
  * Checks if a key is pressed. This uses the long key type, which includes the group as well.
