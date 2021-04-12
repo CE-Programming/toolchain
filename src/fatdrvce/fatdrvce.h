@@ -149,9 +149,9 @@ typedef enum {
     FAT_LIST_ALL /**< For listing files and directories. */
 } fat_list_option_t;
 
-#define FAT_RDONLY  (1 << 0) /**< file is read-only. */
-#define FAT_WRONLY  (1 << 1) /**< file is write-only. */
-#define FAT_RDWR    (FAT_RDONLY | FAT_WRONLY)  /**< file is read/write capable. */
+//#define FAT_RDONLY  (1 << 0) /**< Entry is read-only. */
+#define FAT_WRONLY  (1 << 1) /**< Entry is write-only. */
+#define FAT_RDWR    (FAT_RDONLY | FAT_WRONLY)  /**< Entry is read/write capable. */
 
 #define MSD_SECTOR_SIZE 512 /**< Size of device sector, library only supports 512 bytes. */
 
@@ -160,6 +160,7 @@ typedef enum {
  * (MSD). You must allocate space for \p partitions before calling this
  * function, as well as passing a valid msd_device_t from the msd_Init
  * function.
+ * @param msd Initialized MSD structure returned from msd_Open.
  * @param partitions Array of FAT partitions available, returned from function.
  * @param number The number of FAT partitions found.
  * @param max The maximum number of FAT partitions that can be found.
@@ -194,7 +195,7 @@ fat_error_t fat_ClosePartition(fat_t *fat);
 /**
  * Parses a directory and returns a list of files and subdirectories in it.
  * @param fat Initialized FAT structure type.
- * @param dir Directory path to get list from.
+ * @param path Directory path to get list from.
  * @param option Listing option for files to find (e.g. FAT_LIST_FILEONLY)
  * @param entries Location to store found entries.
  * @param size Number of avaiable entries to store to in the entries argument.
@@ -222,8 +223,8 @@ int24_t fat_DirList(fat_t *fat,
  * Returns the volume label of the drive if it exists.
  * @param fat Initialized FAT structure type.
  * @param label Storage for returning label, must be >= 13 bytes.
- * @retuns FAT_SUCCESS on success, FAT_ERROR_NO_VOLUME_LABEL if no label,
- *         otherwise a different error.
+ * @returns FAT_SUCCESS on success, FAT_ERROR_NO_VOLUME_LABEL if no label,
+ *          otherwise a different error.
  */
 fat_error_t fat_GetVolumeLabel(fat_t *fat,
                                char *label);
@@ -256,6 +257,7 @@ fat_error_t fat_Delete(fat_t *fat,
  * Sets the attributes (read only, hidden, etc) of the file.
  * @param fat Initialized FAT structure type.
  * @param path File path.
+ * @param attrib FAT attributes to set file to.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_SetAttrib(fat_t *fat,
@@ -319,6 +321,7 @@ fat_error_t fat_Close(fat_file_t *file);
 /**
  * Sets the sector offset position in the file.
  * @param file File handle returned from fat_Open.
+ * @param sector Sector offset into file.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_SetPos(fat_file_t *file, uint24_t sector);
@@ -388,8 +391,8 @@ msd_error_t msd_Reset(msd_device_t *msd);
 /**
  * Gets the number of and size of each sector on the device.
  * @param msd MSD device structure.
- * @param blockSize Pointer to store number of sectors to.
- * @param blockSize Pointer to store sector size to.
+ * @param sectorNum Pointer to store number of sectors to.
+ * @param sectorSize Pointer to store sector size to.
  * @return MSD_SUCCESS on success.
  */
 msd_error_t msd_Info(msd_device_t *msd,

@@ -177,7 +177,8 @@ STRIP_FROM_PATH        = ../src/ce/include \
                          ../src/libload \
                          ../src/fontlibc \
                          ../src/usbdrvce \
-                         ../src/srldrvce
+                         ../src/srldrvce \
+                         ../src/fatdrvce
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
