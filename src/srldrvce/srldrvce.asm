@@ -129,6 +129,74 @@ virtual at 0
 end virtual
 
 
+struct descriptor
+	label .: 2
+	bLength			rb 1
+	bDescriptorType		rb 1
+end struct
+struct deviceDescriptor
+	label .: 18
+	descriptor		descriptor
+	bcdUSB			rw 1
+	bDeviceClass		rb 1
+	bDeviceSubClass		rb 1
+	bDeviceProtocol		rb 1
+	bMaxPacketSize0		rb 1
+	idVendor		rw 1
+	idProduct		rw 1
+	bcdDevice		rw 1
+	iManufacturer		rb 1
+	iProduct		rb 1
+	iSerialNumber		rb 1
+	bNumConfigurations	rb 1
+end struct
+struct configurationDescriptor
+	label .: 9
+	descriptor		descriptor
+	wTotalLength		rw 1
+	bNumInterfaces		rb 1
+	bConfigurationValue	rb 1
+	iConfiguration		rb 1
+	bmAttributes		rb 1
+	bMaxPower		rb 1
+end struct
+struct interfaceDescriptor
+	label .: 9
+	descriptor		descriptor
+	bInterfaceNumber	rb 1
+	bAlternateSetting	rb 1
+	bNumEndpoints		rb 1
+	bInterfaceClass		rb 1
+	bInterfaceSubClass	rb 1
+	bInterfaceProtocol	rb 1
+	iInterface		rb 1
+end struct
+struct endpointDescriptor
+	label .: 7
+	descriptor		descriptor
+	bEndpointAddress	rb 1
+	bmAttributes		rb 1
+	wMaxPacketSize		rw 1
+	bInterval		rb 1
+end struct
+
+; enum usb_find_flag
+?IS_NONE		:= 0
+?IS_DISABLED		:= 1 shl 0
+?IS_ENABLED		:= 1 shl 1
+?IS_DEVICE		:= 1 shl 2
+?IS_HUB			:= 1 shl 3
+?IS_ATTACHED		:= 1 shl 4
+
+; enum usb_descriptor_type
+virtual at 1
+	?DEVICE_DESCRIPTOR			rb 1
+	?CONFIGURATION_DESCRIPTOR		rb 1
+	?STRING_DESCRIPTOR			rb 1
+	?INTERFACE_DESCRIPTOR			rb 1
+	?ENDPOINT_DESCRIPTOR			rb 1
+end virtual
+
 ;srl_error_t srl_Open(srl_device_t *srl,
 ;                     usb_device_t dev,
 ;                     void *buffer,
@@ -136,11 +204,220 @@ end virtual
 ;                     uint8_t interface,
 ;                     uint24_t rate);
 srl_Open:
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy+3)				; ix = srl
+
+	ld	hl,(iy+6)				; hl = dev
+	compare_hl_zero					; check if device is null
+	ld	a,SRL_ERROR_INVALID_DEVICE
+	jq	z,.exit
+	ld	(xsrl_device.dev),hl
+
+	ld	hl,(iy+12)				; hl = size
+	ld	de,128					; check if buffer is large enough
+	compare_hl_de
+	ld	a,SRL_ERROR_NO_MEMORY
+	jq	c,.exit
+
+	ld	(xsrl_device.rx_buf.buf_end),hl		; divide size by 2
+	srl	(xsrl_device.rx_buf.buf_end+2)
+	rr	(xsrl_device.rx_buf.buf_end+1)
+	rr	(xsrl_device.rx_buf.buf_end)
+	ld	de,(xsrl_device.rx_buf.buf_end)		; de = size / 2
+
+	ld	hl,(iy+9)				; hl = buffer
+	ld	(xsrl_device.rx_buf.buf_start),hl
+	ld	(xsrl_device.rx_buf.data_start),hl
+	ld	(xsrl_device.rx_buf.data_end),hl
+
+	add	hl,de					; hl = buffer + size/2
+	ld	(xsrl_device.rx_buf.buf_end),hl
+	ld	(xsrl_device.tx_buf.buf_start),hl
+	ld	(xsrl_device.tx_buf.data_start),hl
+	ld	(xsrl_device.tx_buf.data_end),hl
+
+	add	hl,de					; hl = buffer + size
+	ld	(xsrl_device.tx_buf.buf_end),hl
+
+	xor	a,a					; set break positions to null
+	sbc	hl,hl
+	ld	(xsrl_device.rx_buf.data_break),hl
+	ld	(xsrl_device.tx_buf.data_break),hl
+	ld	(xsrl_device.rx_buf.dma_active),a	; reset dma_active
+	ld	(xsrl_device.tx_buf.dma_active),a
+
+	push	iy
+	call	usb_GetRole
+	pop	iy
+	bit	4,l
+	jq	z,.role_host
+
+	; calc is acting as device
+	ld	a,SRL_TYPE_HOST
+	ld	(xsrl_device.type),a
+	ld	a,$83
+	ld	(xsrl_device.tx_addr),a
+	ld	a,$04
+	ld	(xsrl_device.rx_addr),a
+	jq	.shared
+
+.role_host:
+	; check if device is enabled
+	push	iy
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_GetDeviceFlags
+	pop	bc,iy
+
+	ld	a,SRL_ERROR_INVALID_DEVICE
+	bit	IS_ENABLED,l
+	jq	z,.exit
+
+	; get descriptors
+	push	iy
+	ld	bc,.transferred
+	push	bc
+	ld	bc,18					; length
+	push	bc
+	ld	bc,(iy+9)				; descriptor = buffer
+	push	bc
+	ld	bc,0					; index = 0
+	push	bc
+	ld	bc,DEVICE_DESCRIPTOR
+	push	bc
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_GetDescriptor
+	pop	bc,bc,bc,bc,bc,bc,iy
+
+	ld	a,SRL_ERROR_USB_FAILED
+	compare_hl_zero
+	jq	nz,.exit
+
+	ld	hl,0					; check transferred == length
+.transferred = $-3
+	ld	bc,18
+	or	a,a
+	sbc	hl,bc
+	jq	nz,.exit				; a = USB_FAILED
+
+	push	iy
+	ld	bc,.current_config			; get current config
+	push	bc	
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_GetConfiguration
+	pop	bc,bc,iy
+
+	ld	a,SRL_ERROR_USB_FAILED
+	compare_hl_zero
+	jq	nz,.exit
+
+	ld	de,1
+.current_config = $-3
+
+	ld	a,e					; chech if config is 0
+	or	a,a
+	ld	a,SRL_ERROR_INVALID_DEVICE
+	jq	z,.exit
+
+	push	iy
+	dec	de
+	push	de
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_GetConfigurationDescriptorTotalLength
+	pop	bc,bc,iy
+
+	ld	a,SRL_ERROR_USB_FAILED
+	compare_hl_zero
+	jq	z,.exit
+
+	ex	de,hl					; de = desc. length
+
+	ld	hl,18					; get length of both descriptors
+	add	hl,de
+	ld	bc,(iy + 12)				; check if buffer is large enough
+	or	a,a
+	sbc	hl,bc
+	ld	a,SRL_ERROR_NO_MEMORY
+	jq	nc,.exit
+
+	push	iy,de					; de = desc. length
+	ld	bc,.config_transferred
+	push	bc
+	push	de					; length
+	ld	hl,(iy+9)				; descriptor = buffer + sizeof deviceDescriptor
+	ld	bc,18
+	add	hl,bc
+	push	hl
+	ld	bc,(.current_config)			; index = current config - 1
+	dec	bc
+	push	bc
+	ld	c,CONFIGURATION_DESCRIPTOR
+	push	bc
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_GetDescriptor
+	pop	bc, bc, bc, bc, bc, bc
+	pop	de,iy					; de = desc. length
+
+	ld	a,SRL_ERROR_USB_FAILED
+	compare_hl_zero
+	jq	nz,.exit
+
+	ld	hl,0
+.config_transferred = $-3
+	or	a,a
+	sbc	hl,de
+	jq	nz,.exit
+
+	call	get_device_type
+	ld	a,(xsrl_device.type)			; check if type is unknown
+	cp	a,SRL_TYPE_UNKNOWN
+	ld	a,SRL_ERROR_INVALID_DEVICE
+	jq	z,.exit
+
+	ld	a,(iy+15)				; a = interface number
+	call	get_endpoint_addresses
+	ld	a,l					; check for error
+	or	a,a
+	jq	nz,.exit_hl
+
+	call	init_device
+	ld	a,l					; check for error
+	or	a,a
+	jq	nz,.exit_hl
+
+	ld	hl,(iy+18)				; hl = baud rate
+	ld	c,(iy+15)				; a = interface number
+	call	set_rate
+	ld	a,l					; check for error
+	or	a,a
+	jq	nz,.exit_hl
+
+.shared:
+	ld	hl,(xsrl_device.dev)
+	push	iy,hl
+	call	usb_RefDevice
+	pop	hl,iy
+	
+	call	start_read
+
+	xor	a,a					; a = USB_SUCCESS
+.exit:
+	ld	hl,0
+	ld	l,a
+.exit_hl:
+	pop	ix
 	ret
 
 ;void srl_Close(srl_device_t *srl);
 srl_Close:
-	ret
+	; todo: cancel transfers somehow?
+	jq	usb_UnrefDevice
 
 ;size_t srl_Available(srl_device_t *srl);
 srl_Available:
@@ -150,17 +427,21 @@ srl_Available:
 ;                void *data,
 ;                size_t length);
 srl_Read:
+	ld	hl,0
 	ret
 
 ;size_t srl_Write(srl_device_t *srl,
 ;                 const void *data,
 ;                 size_t length);
 srl_Write:
+	ld	hl,0
 	ret
 
 ;usb_standard_descriptors_t *srl_GetCDCStandardDescriptors(void);
 srl_GetCDCStandardDescriptors:
+	ld	hl,0
 	ret
+
 
 ; Gets the device type and subtype based on the descriptors
 ; Inputs:
@@ -170,6 +451,9 @@ srl_GetCDCStandardDescriptors:
 ;  xsrl_device.type: Device type
 ;  xsrl_device.subtype: Device subtype
 get_device_type:
+	xor	a,a
+	ld	(xsrl_device.type),a
+	ld	(xsrl_device.subtype),a
 	ret
 
 ; Gets the endpoint addresses based on the descriptors and device type
@@ -184,6 +468,10 @@ get_device_type:
 ;  xsrl_device.tx_addr: Transmit endpoint address
 ;  hl: Error or SRL_SUCCESS
 get_endpoint_addresses:
+	xor	a,a
+	ld	(xsrl_device.rx_addr),a
+	ld	(xsrl_device.tx_addr),a
+	ld	hl,0
 	ret
 
 ; Initializes a serial device whose type has been determined
@@ -192,6 +480,7 @@ get_endpoint_addresses:
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 init_device:
+	ld	hl,0
 	ret
 
 ; Sets the baud rate of a serial device
@@ -202,6 +491,23 @@ init_device:
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate:
+	ld	a,(xsrl_device.type)
+	or	a,a
+	jq	z,.invalid_device
+	dec	a					; type == HOST
+	jq	z,.success
+	dec	a					; type == CDC
+	jq	z,set_rate_cdc
+	dec	a					; type == FTDI
+	jq	z,set_rate_ftdi
+	dec	a					; type == PL2303
+	jq	z,set_rate_cdc
+.invalid_device:
+	ld	hl,SRL_ERROR_INVALID_DEVICE
+	ret
+.success:
+	or	a,a
+	sbc	hl,hl
 	ret
 
 ; Sets the baud rate of a USB CDC device

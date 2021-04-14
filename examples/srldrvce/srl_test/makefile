@@ -6,7 +6,7 @@ NAME ?= DEMO
 ICON ?= icon.png
 DESCRIPTION ?= "CE C Toolchain Demo"
 COMPRESSED ?= NO
-ARCHIVED ?= NO
+ARCHIVED ?= YES
 OUTPUT_MAP ?= YES
 
 CFLAGS ?= -Wall -Wextra -Oz

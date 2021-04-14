@@ -87,6 +87,7 @@ typedef enum {
  * A user-supplied buffer is needed for internal library use. This buffer must
  * be at least 128 bytes in size. It should not be the same buffer used
  * by other devices and/or functions.
+ * @warning Do not call from a USB event handler.
  * @param srl Serial device structure.
  * @param dev USB device to initialize.
  * @param buffer The buffer's address. (must be at least @param size bytes).
