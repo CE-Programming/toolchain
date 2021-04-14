@@ -286,7 +286,7 @@ typedef enum {
 
 
 /* Keyboard group 2 */
-#define kb_KeyStore     ((kb_lkey_t)(2 << 8 | 1<<1))
+#define kb_KeySto       ((kb_lkey_t)(2 << 8 | 1<<1))
 #define kb_KeyLn        ((kb_lkey_t)(2 << 8 | 1<<2))
 #define kb_KeyLog       ((kb_lkey_t)(2 << 8 | 1<<3))
 #define kb_KeySquare    ((kb_lkey_t)(2 << 8 | 1<<4))
@@ -363,6 +363,7 @@ typedef enum {
 #define kb_DataArray    _Pragma("GCC warning \"'kb_DataArray' is deprecated, check if you can use 'kb_Data' instead\"") ((volatile uint16_t*)0xF50010)
 #define kb_dataArray    kb_DataArray
 #define kb_Store        _Pragma("GCC warning \"'kb_Store' is deprecated, use 'kb_Sto' instead\"") kb_Sto
+#define kb_KeyStore     _Pragma("GCC warning \"'kb_KeyStore' is deprecated, use 'kb_KeySto' instead\"") kb_KeySto
 #define kb_KeyPgrm      _Pragma("GCC warning \"'kb_KeyPgrm' is deprecated, use 'kb_KeyPrgm' instead\"") kb_KeyPrgm
 #define kb_group_0      _Pragma("GCC warning \"'kb_group_0' is deprecated, use '0' instead\"") 0
 #define kb_group_1      _Pragma("GCC warning \"'kb_group_1' is deprecated, use '1' instead\"") 1
