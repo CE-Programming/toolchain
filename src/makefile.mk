@@ -103,48 +103,48 @@ BINDIR := $(call NATIVEPATH,$(BINDIR))
 GFXDIR := $(call NATIVEPATH,$(GFXDIR))
 
 # generate default names
-TARGETBIN := $(NAME).bin
-TARGETMAP := $(NAME).map
-TARGET8XP := $(NAME).8xp
+TARGETBIN ?= $(NAME).bin
+TARGETMAP ?= $(NAME).map
+TARGET8XP ?= $(NAME).8xp
 ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
 
 # startup routines
-LDCRT0 := $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
+LDCRT0 ?= $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
 
 # find source files
-CSOURCES := $(call rwildcard,$(SRCDIR),*.c) $(EXTRA_CSOURCES)
-CPPSOURCES := $(call rwildcard,$(SRCDIR),*.cpp) $(EXTRA_CPPSOURCES)
-USERHEADERS := $(call rwildcard,$(SRCDIR),*.h *.hpp) $(EXTRA_USERHEADERS)
-ASMSOURCES := $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES)
+CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.c) $(EXTRA_CSOURCES))
+CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.cpp) $(EXTRA_CPPSOURCES))
+USERHEADERS ?= $(sort $(call rwildcard,$(SRCDIR),*.h *.hpp) $(EXTRA_USERHEADERS))
+ASMSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
 
 # create links for later
-LINK_CSOURCES := $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.c.src)
-LINK_CPPSOURCES := $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
-LINK_ASMSOURCES := $(ASMSOURCES)
+LINK_CSOURCES ?= $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.c.src)
+LINK_CPPSOURCES ?= $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
+LINK_ASMSOURCES ?= $(ASMSOURCES)
 
 # files created to be used for linking
-LDFILES := $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
-LDLIBS := $(wildcard $(CEDEV)/lib/libload/*.lib)
+LDFILES ?= $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
+LDLIBS ?= $(wildcard $(CEDEV)/lib/libload/*.lib)
 
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
-ICONSRC := $(call NATIVEPATH,$(OBJDIR)/icon.src)
+ICONSRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.src)
 ifneq ($(DESCRIPTION),)
-ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 else
-ICON_CONV := $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm
+ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm
 endif
 LDREQUIRE += -i $(call QUOTE_ARG,require ___icon)
-LDICON := $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
+LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 else
 ifneq ($(DESCRIPTION),)
-ICONSRC := $(call NATIVEPATH,$(OBJDIR)/icon.src)
-ICON_CONV := $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+ICONSRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.src)
+ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDREQUIRE += -i $(call QUOTE_ARG,require ___description)
-LDICON := $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
+LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 endif
 endif
 
@@ -155,7 +155,7 @@ endif
 
 # check if gfx directory exists
 ifneq ($(wildcard $(GFXDIR)/.),)
-GFXCMD := cd $(GFXDIR) && $(CONVIMG)
+GFXCMD ?= cd $(GFXDIR) && $(CONVIMG)
 endif
 
 # determine output target flags
