@@ -15,14 +15,12 @@ include_library '../usbdrvce/usbdrvce.asm'
 ;-------------------------------------------------------------------------------
 	export	srl_Open
 	export	srl_Close
-	export	srl_Available
 	export	srl_Read
 	export	srl_Write
 	export	srl_GetCDCStandardDescriptors
 ; temp
 	export	get_device_type_
 	export	get_endpoint_addresses_
-	export	ring_buf_avail_
 	export	ring_buf_contig_avail_
 	export	ring_buf_has_consecutive_region_
 	export	ring_buf_push_
@@ -419,10 +417,6 @@ srl_Close:
 	; todo: cancel transfers somehow?
 	jq	usb_UnrefDevice
 
-;size_t srl_Available(srl_device_t *srl);
-srl_Available:
-	ret
-
 ;size_t srl_Read(srl_device_t *srl,
 ;                void *data,
 ;                size_t length);
@@ -603,32 +597,6 @@ set_rate_ftdi:
 set_rate_pl2303:
 	ret
 
-; Checks how many bytes are available in a ring buffer
-; Inputs:
-;  ix: ring_buf_ctrl struct
-; Returns:
-;  hl: Number of available bytes
-ring_buf_avail:
-	ld	hl,(xring_buf_ctrl.data_break)
-	compare_hl_zero
-	jq	nz,.break
-.no_break:
-	ld	hl,(xring_buf_ctrl.data_end)
-	ld	bc,(xring_buf_ctrl.data_start)
-	or	a,a
-	sbc	hl,bc
-	ret
-.break:
-	ld	bc,(xring_buf_ctrl.data_start)
-	or	a,a
-	sbc	hl,bc
-	ld	bc,(xring_buf_ctrl.data_end)
-	add	hl,bc
-	ld	bc,(xring_buf_ctrl.buf_start)
-	or	a,a
-	sbc	hl,bc
-	ret
-
 ; Checks how many contiguous bytes are available in a ring buffer
 ; Inputs:
 ;  ix: ring_buf_ctrl struct
@@ -637,8 +605,13 @@ ring_buf_avail:
 ring_buf_contig_avail:
 	ld	hl,(xring_buf_ctrl.data_break)
 	compare_hl_zero
-	jq	z,ring_buf_avail.no_break
-
+	jq	z,.no_break
+	ld	bc,(xring_buf_ctrl.data_start)
+	or	a,a
+	sbc	hl,bc
+	ret
+.no_break:
+	ld	hl,(xring_buf_ctrl.data_end)
 	ld	bc,(xring_buf_ctrl.data_start)
 	or	a,a
 	sbc	hl,bc
@@ -892,13 +865,6 @@ get_endpoint_addresses_:
 	pop	bc,de,ix
 	push	ix,de,bc
 	call	get_endpoint_addresses
-	pop	ix
-	ret
-ring_buf_avail_:
-	push	ix
-	pop	bc,de,ix
-	push	ix,de,bc
-	call	ring_buf_avail
 	pop	ix
 	ret
 ring_buf_contig_avail_:

@@ -17,7 +17,7 @@
 
 void get_device_type_(srl_device_t *srl);
 void get_endpoint_addresses_(srl_device_t *srl);
-size_t ring_buf_avail_(ring_buf_ctrl_t *rbuf);
+size_t ring_buf_contig_avail_(ring_buf_ctrl_t *rbuf);
 bool ring_buf_has_consecutive_region_(ring_buf_ctrl_t *rbuf, uint8_t size);
 size_t ring_buf_push_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
 size_t ring_buf_pop_(ring_buf_ctrl_t *rbuf, void *data, size_t size);

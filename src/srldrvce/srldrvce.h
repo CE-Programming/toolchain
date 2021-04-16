@@ -114,13 +114,6 @@ srl_error_t srl_Open(srl_device_t *srl,
 void srl_Close(srl_device_t *srl);
 
 /**
- * Gets the number of bytes available in the input buffer.
- * @param srl SRL device structure.
- * @return The number of bytes available, or 0 upon error.
- */
-size_t srl_Available(srl_device_t *srl);
-
-/**
  * Reads data from a serial device.
  * This is a non-blocking buffered read - if there are less that @param length
  * bytes available in the buffer, all of the bytes in the buffer will be read.
