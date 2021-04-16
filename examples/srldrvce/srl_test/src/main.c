@@ -76,7 +76,6 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 
 int main(void) {
     os_ClrHome();
-    //const usb_standard_descriptors_t *default_desc = (void*)(((struct{char b; void *addr;}*)usb_RepeatTimerCycles)->addr + 16);
     const usb_standard_descriptors_t *desc = srl_GetCDCStandardDescriptors();
     /* Initialize the USB driver with our event handler and the serial device descriptors */
     //usb_error_t usb_error = 

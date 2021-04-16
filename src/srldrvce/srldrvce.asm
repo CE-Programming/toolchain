@@ -439,8 +439,71 @@ srl_Write:
 
 ;usb_standard_descriptors_t *srl_GetCDCStandardDescriptors(void);
 srl_GetCDCStandardDescriptors:
-	ld	hl,0
+	call	ti.os.GetSystemStats
+	ld	de,4
+	add	hl,de
+	bit	0,(hl)
+	jq	z,.84pce
+
+	ld	a,$60
+	ld	(.device+deviceDescriptor.bcdDevice),a
+	ld	hl,.string83
+	ld	(.model),hl
+.84pce:
+	ld	iy,ti.flags	; get serial number
+	call	ti.GetSerial
+	jq	nz,.noserial
+
+	ld	a,3
+	ld	hl,.device+deviceDescriptor.iSerialNumber
+	ld	(hl),a
+
+	ld	de,.stringserialnum + 2
+	ld	hl,ti.OP4
+	ld	b,5
+.loop_byte:
+	ld	a,(hl)
+	rra
+	rra
+	rra
+	rra
+	call	.conv_hex
+	ld	a,(hl)
+	call	.conv_hex
+	inc	hl
+	djnz	.loop_byte
+.noserial:
+	ld	hl,.descriptors
 	ret
+.conv_hex:
+	and	a,$f
+	add	a,'0'
+	cp	a,'9'+1
+	jq	c,.store
+	add	a,'A'-'9'-1
+.store:
+	ex	de,hl
+	ld	(hl),a
+	ex	de,hl
+	inc	de
+	inc	de
+	ret
+
+.descriptors:
+	dl .device, .configurations, .langids
+	db 3
+	dl .strings
+.device emit $12: $1201000202000040C016E105200201020001 bswap $12
+.configurations dl .configuration1
+.configuration1 emit $3e: $09023e00020100c0320904000001020200000524000110042402000524060001070582030800ff09040100020a0000000705040240000107058302400001 bswap $3e
+.langids dw $0304, $0409
+.strings dl .string1
+.model dl .string84
+.serial dl .stringserialnum
+.string1 dw $033E, 'T','e','x','a','s',' ','I','n','s','t','r','u','m','e','n','t','s',' ','I','n','c','o','r','p','o','r','a','t','e','d'
+.string83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
+.string84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
+.stringserialnum dw $0316, '0','0','0','0','0','0','0','0','0','0'
 
 
 ; Gets the device type and subtype based on the descriptors
