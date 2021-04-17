@@ -126,6 +126,16 @@ virtual at 0
 	SRL_ERROR_NO_MEMORY		rb 1
 end virtual
 
+; enum usb_transfer_status
+?USB_TRANSFER_COMPLETED		:= 0
+?USB_TRANSFER_STALLED		:= 1 shl 0
+?USB_TRANSFER_NO_DEVICE		:= 1 shl 1
+?USB_TRANSFER_HOST_ERROR	:= 1 shl 2
+?USB_TRANSFER_ERROR		:= 1 shl 3
+?USB_TRANSFER_OVERFLOW		:= 1 shl 4
+?USB_TRANSFER_BUS_ERROR		:= 1 shl 5
+?USB_TRANSFER_FAILED		:= 1 shl 6
+?USB_TRANSFER_CANCELLED		:= 1 shl 7
 
 struct descriptor
 	label .: 2
@@ -402,6 +412,7 @@ srl_Open:
 	call	usb_RefDevice
 	pop	hl,iy
 	
+	lea	ix,xsrl_device.rx_buf
 	call	start_read
 
 	xor	a,a					; a = USB_SUCCESS
@@ -421,14 +432,44 @@ srl_Close:
 ;                void *data,
 ;                size_t length);
 srl_Read:
-	ld	hl,0
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy+3)
+	ld	hl,(iy+6)
+	ld	bc,(iy+9)
+	lea	ix,xsrl_device.rx_buf
+	call	ring_buf_pop
+	ld	a,(xring_buf_ctrl.dma_active)		; check if dma active
+	or	a,a
+	jq	nz,.exit
+	push	hl
+	call	start_read
+	pop	hl
+.exit:
+	pop	ix
 	ret
 
 ;size_t srl_Write(srl_device_t *srl,
 ;                 const void *data,
 ;                 size_t length);
 srl_Write:
-	ld	hl,0
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy+3)
+	ld	hl,(iy+6)
+	ld	bc,(iy+9)
+	lea	ix,xsrl_device.tx_buf
+	call	ring_buf_push
+	ld	a,(xring_buf_ctrl.dma_active)		; check if dma active
+	or	a,a
+	jq	nz,.exit
+	push	hl
+	call	start_write
+	pop	hl
+.exit:
+	pop	ix
 	ret
 
 ;usb_standard_descriptors_t *srl_GetCDCStandardDescriptors(void);
@@ -623,7 +664,7 @@ ring_buf_contig_avail:
 ;  ix: ring_buf_ctrl struct
 ;  a: Size
 ; Returns:
-;  nc if the region does not exist
+;  c if the region does not exist
 ring_buf_has_consecutive_region:
 	ld	hl,(xring_buf_ctrl.data_break)
 	compare_hl_zero
@@ -662,10 +703,8 @@ ring_buf_push:
 	ld	bc,(xring_buf_ctrl.data_end)
 	or	a,a
 	sbc	hl,bc
-	ex	de,hl					; hl = data
 	jq	nc,.pop_copy
 
-	ex	de,hl					; de = data
 	ld	hl,(xring_buf_ctrl.buf_end)
 	ld	(xring_buf_ctrl.data_break),hl
 	ld	bc,(xring_buf_ctrl.data_end)
@@ -834,22 +873,145 @@ ring_buf_update_write:
 
 ;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
 read_callback:
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy+12)
+
+	ld	a,(iy+6)				; a = status
+	and	a,USB_TRANSFER_NO_DEVICE
+	jq	nz,.no_device
+
+	ld	bc,(iy+9)
+	ld	a,64
+	lea	ix,xsrl_device.rx_buf
+	call	ring_buf_update_read
+	call	start_read
+	pop	ix
+	xor	a,a
+	ret
+
+.no_device:
+	xor	a,a
+	ld	(xsrl_device.rx_buf.dma_active),a
+	pop	ix
 	ret
 
 ;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
 write_callback:
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy+12)
+
+	ld	a,(iy+6)				; a = status
+	and	a,USB_TRANSFER_NO_DEVICE
+	jq	nz,.no_device
+
+	ld	bc,(iy+9)
+	ld	a,64
+	lea	ix,xsrl_device.tx_buf
+	call	ring_buf_update_write
+	call	start_write
+	pop	ix
+	xor	a,a
 	ret
 
-; Starts the receive transfer
+.no_device:
+	xor	a,a
+	ld	(xsrl_device.tx_buf.dma_active),a
+	pop	ix
+	ret
+
+; Starts the receive transfer, if possible
 ; Inputs:
-;  ix: Serial device struct
+;  ix: rx_buf of a serial device struct
+; Returns:
+;  ix.dma_active: 1 if transfer was started, 0 otherwise
 start_read:
+	ld	a,64
+	call	ring_buf_has_consecutive_region
+	lea	ix,ix - srl_device.rx_buf
+	jq	c,.error
+
+	ld	c,(xsrl_device.rx_addr)			; ix = srl device
+	push	bc
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+
+	ld	a,l					; check if null
+	or	a,a
+	jq	z,.error
+
+	push	ix					; srl device
+	ld	bc,read_callback
+	push	bc					; handler
+	ld	bc,64
+	push	bc					; length
+	ld	bc,(xsrl_device.rx_buf.data_end)
+	push	bc					; buffer
+	push	hl					; endpoint
+	call	usb_ScheduleTransfer
+	pop	bc,bc,bc,bc,bc
+
+	ld	a,l
+	or	a,a
+	jq	nz,.error
+
+	inc	a					; a = 1
+	ld	(xsrl_device.rx_buf.dma_active),a
+	ret
+.error:
+	xor	a,a
+	ld	(xsrl_device.rx_buf.dma_active),a
 	ret
 
-; Starts the transmit transfer
+; Starts the transmit transfer, if possible
 ; Inputs:
-;  ix: Serial device struct
+;  ix: tx_buf of a serial device struct
+; Returns:
+;  ix.dma_active: 1 if transfer was started, 0 otherwise
 start_write:
+	call	ring_buf_contig_avail
+	lea	ix,ix - srl_device.tx_buf
+	compare_hl_zero
+	jq	z,.error
+	push	hl
+
+	ld	c,(xsrl_device.tx_addr)			; ix = srl device
+	push	bc
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+	pop	de					; de = length
+
+	ld	a,l					; check if null
+	or	a,a
+	jq	z,.error
+
+	push	ix					; srl device
+	ld	bc,write_callback
+	push	bc					; handler
+	push	de					; length
+	ld	bc,(xsrl_device.tx_buf.data_start)
+	push	bc					; buffer
+	push	hl					; endpoint
+	call	usb_ScheduleTransfer
+	pop	bc,bc,bc,bc,bc
+
+	ld	a,l
+	or	a,a
+	jq	nz,.error
+
+	inc	a					; a = 1
+	ld	(xsrl_device.tx_buf.dma_active),a
+	ret
+.error:
+	xor	a,a
+	ld	(xsrl_device.tx_buf.dma_active),a
 	ret
 
 ;temp

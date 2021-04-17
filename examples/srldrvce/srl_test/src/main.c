@@ -25,12 +25,12 @@ void ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region);
 void ring_buf_update_write_(ring_buf_ctrl_t *rbuf, size_t size);
 
 void print_ring_buf(const ring_buf_ctrl_t *rbuf) {
-    dbg_printf("  buf_start: %p\n", rbuf->buf_start);
-    dbg_printf("  buf_end: %p\n", rbuf->buf_end);
-    dbg_printf("  data_start: %p\n", rbuf->data_start);
-    dbg_printf("  data_break: %p\n", rbuf->data_break);
-    dbg_printf("  data_end: %p\n", rbuf->data_end);
-    dbg_printf("  dma_active: %i\n", rbuf->dma_active);
+    printf("  buf_start: %p\n", rbuf->buf_start);
+    printf("  buf_end: %p\n", rbuf->buf_end);
+    printf("  data_start: %p\n", rbuf->data_start);
+    printf("  data_break: %p\n", rbuf->data_break);
+    printf("  data_end: %p\n", rbuf->data_end);
+    printf("  dma_active: %i\n", rbuf->dma_active);
 }
 
 void print_srl_dev(const srl_device_t *srl) {
@@ -104,23 +104,44 @@ int main(void) {
             }
             has_srl_device = true;
 
-            for(int i = 0; i < 64; i++) {
-                printf("%02x ", srl_buf[i]);
-            }
-            printf("\n");
-
-            //print_srl_dev(&srl);
+            print_srl_dev(&srl);
         }
 
-        // if(has_device) {
-        //    char in_buf[64];
+        if(has_srl_device) {
+            char in_buf[64];
 
-        //    size_t bytes_read = srl_Read(&srl, in_buf, sizeof in_buf);
+            if(kb_IsDown(kb_KeyMath)) {
+                size_t bytes_read = srl_Read(&srl, in_buf, sizeof in_buf);
+                printf("r %u\n", bytes_read);
+                while(kb_IsDown(kb_KeyMath)) kb_Scan();
+            }
 
-        //    if(bytes_read) {
-        //        srl_Write(&srl, in_buf, bytes_read);
-        //    }
-        // }
+            if(kb_IsDown(kb_KeyApps)) {
+                srl_Write(&srl, "yeet\r\n", 6);
+                while(kb_IsDown(kb_KeyApps)) kb_Scan();
+            }
+
+            if(kb_IsDown(kb_KeyPrgm)) {
+                printf("ca %u\n", ring_buf_contig_avail_(&srl.rx_buf));
+                while(kb_IsDown(kb_KeyPrgm)) kb_Scan();
+            }
+
+            if(kb_IsDown(kb_KeyVars)) {
+                print_srl_dev(&srl);
+                while(kb_IsDown(kb_KeyVars)) kb_Scan();
+            }
+
+            if(kb_IsDown(kb_KeySin)) {
+                printf("%s\n", (char*)srl.tx_buf.data_start);
+                while(kb_IsDown(kb_KeySin)) kb_Scan();
+            }
+
+            //size_t bytes_read = srl_Read(&srl, in_buf, sizeof in_buf);
+//
+            //if(bytes_read) {
+            //    //srl_Write(&srl, in_buf, bytes_read);
+            //}
+        }
 
     } while(!kb_IsDown(kb_KeyClear));
 
