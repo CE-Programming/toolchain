@@ -358,6 +358,9 @@ end virtual
 ;-------------------------------------------------------------------------------
 ; usb constants
 ;-------------------------------------------------------------------------------
+USB_DEVICE_STATUS_SELF_POWERED  := 1 shl 0
+USB_DEVICE_STATUS_REMOTE_WAKEUP := 1 shl 1
+
 ; enum usb_error
 virtual at 0
 	USB_SUCCESS		rb 1
@@ -1022,7 +1025,7 @@ iterate value, DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCR
  end if
 end iterate
 	ld	hl,(ix+6)
-	call	usb_GetDeviceEndpoint.nc
+	call	usb_GetDeviceEndpoint.masked
 	push	hl
 	call	usb_ControlTransfer
 	ld	iy,(ix-6)
@@ -1068,7 +1071,7 @@ usb_GetDescriptor:
 	ld	(hl),de
 .endpoint:
 	ld	hl,(ix+6)
-	call	usb_GetDeviceEndpoint.nc
+	call	usb_GetDeviceEndpoint.masked
 	push	hl
 	call	usb_ControlTransfer
 	ex	de,hl
@@ -1266,7 +1269,7 @@ iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_F
 end iterate
 	xor	a,a
 	ld	hl,(yendpoint.device+1)
-	call	usb_GetDeviceEndpoint.nc
+	call	usb_GetDeviceEndpoint.masked
 	push	hl
 	call	usb_ControlTransfer
 	ld	yendpoint,(ix+6)
@@ -1279,15 +1282,16 @@ end iterate
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
-	pop	de,hl,bc
-	push	bc,hl,de
+	pop	bc,hl,de
+	push	de,hl,bc
+.check:
 	inc	l
 	dec	l
 	ret	z
-	ld	a,c
+	ld	a,e
 .enter:
-	and	a,$8F
-.nc:
+	and	a,endpoint.transferInfo.dir or endpoint.info.ep
+.masked:
 	ld	hl,(hl+device.endpoints)
 	bit	0,hl
 	jq	nz,.returnCarry
@@ -2723,6 +2727,7 @@ end repeat
 ;  ix = ?
 ;  iy = device
 _ParseInterfaceDescriptors:
+	xor	a,a
 	ld	c,iyl
 	bit	0,c
 	ret	nz
@@ -2929,7 +2934,7 @@ assert ti.usbCxFifo shr 8 = ti.bmCxFifoFin
 	ld	l,ti.usbDmaFifo-$100
 	ld	(hl),ti.bmUsbDmaNoFifo ; Must happen before restoring interrupts!
 	pop	bc
-	bit	2,c ; p/v
+	bit	2,c ; p/v flag
 	jq	z,.noEi
 	ei
 .noEi:
@@ -3066,7 +3071,7 @@ end repeat
 
 ; Input:
 ;  bc = status
-;  iy = endpoint
+;  ix = endpoint
 ; Output:
 ;  cf = success
 ;  zf = ? | false
@@ -3074,7 +3079,6 @@ end repeat
 ;  iy = ?
 ;  ix = endpoint
 _FlushEndpoint:
-	lea	xendpoint,yendpoint
 	ld	ytransfer,(xendpoint.first)
 	or	a,a
 	sbc	hl,hl
@@ -3173,41 +3177,306 @@ _FreeFirstTransfer:
 	ret
 
 ;-------------------------------------------------------------------------------
-_HandleGetDescriptor:
+_HandleCxSetupInt:
+	ld	b,4
+	ld	de,setupPacket+4
+	ld	l,ti.usbDmaFifo-$100
+	ld	a,i
+	di
+	ld	(hl),ti.bmUsbDmaCxFifo
+	ld	l,ti.usbEp0Data+4-$100
+.fetch:
+	dec	hl
+	dec	de
+	ld	a,(hl)
+	ld	(de),a
+	setmsk	4,de
+	ld	a,(hl)
+	ld	(de),a
+	resmsk	4,de
+	djnz	.fetch
+	ld	l,ti.usbDmaFifo-$100
+	jq	po,.noEi
+	ei
+.noEi:
+	ld	(hl),b;ti.bmUsbDmaNoFifo
+	ld	l,ti.usbCxFifo-$100
+	set	ti.bCxFifoClr,(hl)
+	ld	a,USB_DEFAULT_SETUP_EVENT
+	call	_DispatchEvent
+	jq	z,.defaultHandler
+	xor	a,a
+	add	hl,de
+	scf
+	sbc	hl,de
+	inc	hl
+	ex	de,hl
+	jq	.return
+.defaultHandler:
+	ld	ysetup,setupPacket
+	ld	hl,(ysetup.wValue)
 	ld	de,(ysetup.wIndex)
-	ld	bc,(ysetup.wValue)
-	inc	bc
-	dec.s	bc
+	ld	bc,(ysetup.bmRequestType)
+	ld	a,c
+	inc	b
+	djnz	.notGetStatus
+	sub	a,DEVICE_TO_HOST or STANDARD_REQUEST-1
+	ld	b,a
+	ld	a,d
+	or	a,l
+	or	a,h
+	jq	nz,.unhandled
+	ld	c,sizeof tempEndpointStatus
+	or	a,e
+	djnz	.notGetDeviceStatus
+	jq	nz,.unhandled
+	scf
+	jq	.sendStatus
+.notGetDeviceStatus:
+	djnz	.notGetInterfaceStatus
+	xor	a,a
+.sendBitStatus:
+assert sizeof tempEndpointStatus = 1 shl 1
+	and	a,c
+	rrca
+.sendStatus:
+	ld	de,tempEndpointStatus
+	ld	(de),a
+	jq	nc,.sendGetStatusDataStage
+assert tempEndpointStatus-1 = deviceStatus
+	dec	de
+.sendGetStatusDataStage:
+	jq	.sendDataStage
+.notGetInterfaceStatus:
+	djnz	.notGetEndpointStatus
+	jq	z,.sendStatus
+	call	.lookupEndpointA
+	ld	a,(hl)
+repeat ti.bUsbEpStall-8-1
+	rrca
+end repeat
+	jq	nz,.sendBitStatus
+.notGetEndpointStatus:
+.notClearDeviceRemoteWakeupFeature:
+.notClearEndpointFeature:
+.notSetDeviceTestModeFeature:
+.notSetEndpointFeature:
+	jq	.unhandled
+.notGetStatus:
+	djnz	.notClearFeature
+assert ~HOST_TO_DEVICE or STANDARD_REQUEST
+	inc	a
+	ld	b,a
+	ld	a,d
+	or	a,h
+	or	a,(ysetup.wLength+0)
+	or	a,(ysetup.wLength+1)
+	djnz	.notClearDeviceFeature
+	or	a,e
+	jq	nz,.unhandled
+	ld	b,l
+	djnz	.notClearDeviceRemoteWakeupFeature
+	ld	hl,deviceStatus
+	resmsk	USB_DEVICE_STATUS_REMOTE_WAKEUP,(hl)
+	jq	.handled
+.notClearDeviceFeature:
+	dec	b
+	djnz	.notClearEndpointFeature
+assert ~ENDPOINT_HALT
+	or	a,l
+	jq	nz,.unhandled
+	call	.lookupEndpoint
+	jq	z,.unhandled
+	ld	a,(hl)
+	or	a,ti.bmUsbEpReset shr 8
+	and	a,not ti.bmUsbEpStall shr 8
+	ld	(hl),a
+	jq	.handled
+.notClearFeature:
+	dec	b
+	djnz	.notSetFeature
+assert ~HOST_TO_DEVICE or STANDARD_REQUEST
+	inc	a
+	ld	b,a
+	ld	a,h
+	or	a,(ysetup.wLength+0)
+	or	a,(ysetup.wLength+1)
+	djnz	.notSetDeviceFeature
+	or	a,e
+	ld	b,l
+	djnz	.notSetDeviceRemoteWakeupFeature
+	or	a,d
+	jq	nz,.unhandled
+	ld	hl,deviceStatus
+	setmsk	USB_DEVICE_STATUS_REMOTE_WAKEUP,(hl)
+	jq	.handled
+.notSetDeviceRemoteWakeupFeature:
+	djnz	.notSetDeviceTestModeFeature
+	jq	nz,.unhandled
+	ld	b,d
+	ld	a,1
+.shift:
+	rlca
+	and	a,$F shl 1
+	jq	z,.unhandled
+	djnz	.shift
+	ld	hl,ti.mpUsbPhyTmsr
+	or	a,(hl)
+	ld	(hl),a
+	jq	.handled
+.notSetDeviceFeature:
+	dec	b
+	djnz	.notSetEndpointFeature
+	or	a,d
+assert ~ENDPOINT_HALT
+	or	a,l
+	jq	nz,.unhandled
+	call	.lookupEndpoint
+	jq	z,.unhandled
+	set	ti.bUsbEpStall-8,(hl)
+	call	.handled
+	push	hl,de
+	ex	(sp),ix
+assert HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT-1 = USB_TRANSFER_STALLED
+	dec	c
+	call	_FlushEndpoint
+	pop	ix,de
+	ret	nc
+	ex	de,hl
+	ret
+.notSetFeature:
+	dec	b
+	djnz	.notSetAddress
+	ld	a,l
+	and	a,$80
+	or	a,h
+	or	a,e
+	or	a,d
+assert ~HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_DEVICE
+	or	a,c
+	ld	de,(ysetup.wLength)
+	or	a,e
+	or	a,d
+	jq	nz,.unhandled
+	ld	(ti.mpUsbDevAddr),hl
+	jq	.handled
+.handled:
+	ld	a,ti.bmCxFifoFin
+	jq	.success
+.success:
+	cp	a,a
+.return:
+	ld	hl,ti.mpUsbCxFifo
+	ld	(hl),a
+	ld	l,ti.usbCxIsr-$100
+	ld	(hl),ti.bmUsbIntCxSetup
+	ret	z
+	ex	de,hl
+	ret
+.notSetAddress:
+	djnz	.notGetDescriptor
+	xor	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
+	jq	z,.getDescriptor
+.notGetDescriptor:
+	djnz	.notSetDescriptor
+.notSetDescriptor:
+	djnz	.notGetConfiguration
+	xor	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
+	or	a,l
+	or	a,h
+	or	a,e
+	or	a,d
+	jq	nz,.unhandled
+	ld	c,1
+	ld	de,selectedConfiguration
+	jq	.sendDataStage
+.notGetConfiguration:
+	djnz	.notSetConfiguration
+assert ~HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_DEVICE
+	or	a,h
+	or	a,e
+	or	a,d
+	ld	bc,(ysetup.wLength)
+	or	a,c
+	or	a,b
+	jq	nz,.unhandled
+	or	a,l
+	jq	z,.setConfigured
+	push	ix
+	ld	xstandardDescriptors,(currentDescriptors)
+	ld	ydeviceDescriptor,(xstandardDescriptors.device)
+	ld	b,(ydeviceDescriptor.bNumConfigurations)
+	ld	hl,(xstandardDescriptors.configurations)
+.findConfigurationDescriptor:
+	ld	xconfigurationDescriptor,(hl)
+	cp	a,(xconfigurationDescriptor.bConfigurationValue)
+	jq	z,.foundConfigurationDescriptor
+repeat long
+	inc	hl
+end repeat
+	ld	a,e
+	djnz	.findConfigurationDescriptor
+.foundConfigurationDescriptor:
+	ld	ydevice,(rootHub.child)
+	ld	de,(xconfigurationDescriptor.wTotalLength)
+	ld	b,(xconfigurationDescriptor.bNumInterfaces)
+	push	xconfigurationDescriptor
+	call	z,_ParseInterfaceDescriptors
+	pop	de,ix
+	jq	nz,.unhandled
+	ld	a,(setupPacket.wValue)
+	scf
+.setConfigured:
+	ld	(selectedConfiguration),a
+	ld	hl,ti.mpUsbDevAddr
+	ld	a,(hl)
+	rla
+	rrca
+	ld	(hl),a
+	call	.handled
+	ld	a,USB_HOST_CONFIGURE_EVENT
+	jq	_DispatchEvent
+.notSetConfiguration:
+	djnz	.notGetInterface
+.notGetInterface:
+	djnz	.notSetInterface
+.notSetInterface:
+.unhandled:
+	ld	a,ti.bmCxFifoStall
+	jq	.success
+.getDescriptor:
+	push	hl
+	pop	bc
 	ld	ystandardDescriptors,(currentDescriptors)
 	djnz	.notDevice;DEVICE_DESCRIPTOR
 	or	a,c
 	or	a,e
 	or	a,d
-	jq	nz,_HandleCxSetupInt.unhandled
+	jq	nz,.unhandled
 .sendSingleDescriptorIYind:
 	ld	b,a
 	ld	hl,(ystandardDescriptors.device)
 .sendSingleDescriptorHL:
 	ld	c,(hl)
 	ex	de,hl
-	jq	.sendDescriptor
+	jq	.sendDataStage
 .notDevice:
 	djnz	.notConfiguration;CONFIGURATION_DESCRIPTOR
 	or	a,e
 	or	a,d
-	jq	nz,_HandleCxSetupInt.unhandled
+	jq	nz,.unhandled
 	ld	hl,(ystandardDescriptors.configurations)
 	ld	ydeviceDescriptor,(ystandardDescriptors.device)
 	ld	a,c
 	cp	a,(ydeviceDescriptor.bNumConfigurations)
-	jq	nc,_HandleCxSetupInt.unhandled
-repeat 3
+	jq	nc,.unhandled
+repeat long
 	add	hl,bc
 end repeat
 	ld	yconfigurationDescriptor,(hl)
 	ld	bc,(yconfigurationDescriptor.wTotalLength)
 	ld	de,(hl)
-	jq	.sendDescriptor
+	jq	.sendDataStage
 .notConfiguration:
 	djnz	.notString;STRING_DESCRIPTOR
 	ld	hl,(ystandardDescriptors.langids)
@@ -3215,7 +3484,7 @@ end repeat
 	jq	z,.langids
 	ld	a,(ystandardDescriptors.numStrings)
 	cp	a,c
-	jq	c,_HandleCxSetupInt.unhandled
+	jq	c,.unhandled
 	ld	iy,(ystandardDescriptors.strings)
 	ld	a,(hl)
 	rra
@@ -3223,7 +3492,7 @@ end repeat
 	ld	b,a
 	dec	c
 	mlt	bc
-repeat 3
+repeat long
 	add	iy,bc
 end repeat
 	ld	b,a
@@ -3245,12 +3514,8 @@ end repeat
 	or	a,d
 	jq	z,.sendSingleDescriptorHL
 .notString:
-	jq	_HandleCxSetupInt.unhandled
-
-;	ld	hl,(currentDescriptors)
-;	ld	ydeviceDescriptor,(hl+currentDescriptors.device)
-;	ld	a,(ydeviceDescripter.bMaxPacketSize0)
-.sendDescriptor:
+	jq	.unhandled
+.sendDataStage:
 	ld	hl,ti.mpUsbDmaFifo
 	ld	(hl),ti.bmUsbDmaCxFifo
 	ld	l,ti.usbDmaAddr-$100
@@ -3283,213 +3548,36 @@ end repeat
 	xor	a,a
 	ld	l,ti.usbDmaFifo-$100
 	ld	(hl),a
-	jq	_HandleCxSetupInt.handled
-
-_HandleCxSetupInt:
-	ld	b,4
-	ld	de,setupPacket+4
-	ld	l,ti.usbDmaFifo-$100
-	ld	a,i
-	di
-	ld	(hl),ti.bmUsbDmaCxFifo
-	ld	l,ti.usbEp0Data+4-$100
-.fetch:
-	dec	hl
-	dec	de
-	ld	a,(hl)
-	ld	(de),a
-	setmsk	4,de
-	ld	a,(hl)
-	ld	(de),a
-	resmsk	4,de
-	djnz	.fetch
-	ld	l,ti.usbDmaFifo-$100
-	jq	po,.noEi
-	ei
-.noEi:
-	ld	(hl),b;ti.bmUsbDmaNoFifo
-	ld	l,ti.usbCxFifo-$100
-	set	ti.bCxFifoClr,(hl)
-	ld	a,USB_DEFAULT_SETUP_EVENT
-	call	_DispatchEvent
-	jq	z,.defaultHandler
-	add	hl,de
-	scf
-	sbc	hl,de
-	inc	hl
-	ret	nz
-	ld	hl,ti.mpUsbCxIsr
-	ld	(hl),ti.bmUsbIntCxSetup
-	ret
-.defaultHandler:
-	ld	ysetup,setupPacket
-	ld	bc,(ysetup.bmRequestType)
-	inc	b
-	djnz	.notGetStatus
-	ld	a,c
-	sub	a,DEVICE_TO_HOST or STANDARD_REQUEST-1
-	ld	b,a
-	ld	c,2
-	ld	de,(ysetup.wLength)
+	jq	.handled
+; Input:
+;  e = endpoint address
+; Output:
+;  zf = invalid endpoint address or default control address
+;  a = ?
+;  de = endpoint | de
+;  hl = endpoint register+1 | ?
+.lookupEndpoint:
 	ld	a,e
-	xor	a,c
-	or	a,d
-	ld	de,(ysetup.wValue)
-	or	a,e
-	or	a,d
-	ld	de,(ysetup.wIndex)
-	or	a,d
-	jq	nz,.unhandled
-	or	a,e
-	ld	de,tempEndpointStatus
-	djnz	.notGetDeviceStatus
-	jq	nz,.unhandled
-	ld	(de),a
-assert tempEndpointStatus-1 = deviceStatus
-	dec	de
-	jq	_HandleGetDescriptor.sendDescriptor
-.notGetDeviceStatus:
-	djnz	.notGetInterfaceStatus
-	xor	a,a
-.sendStatus:
-	ld	(de),a
-	jq	_HandleGetDescriptor.sendDescriptor
-.notGetInterfaceStatus:
-	djnz	.notGetEndpointStatus
+.lookupEndpointA:
 	add	a,a
-	jq	z,.sendStatus
-	ld	hl,ti.mpUsbOutEp1+2-4
-	jq	nc,.out
+	dec	a
+	cp	a,1 shl 5-1
+	sbc	a,a
+	ld	hl,(rootHub.child)
+	call	nz,usb_GetDeviceEndpoint.check
+	ret	z
+	ld	a,e
+	add	a,a
+	ld	de,ti.mpUsbOutEp1+1-4
+	jq	c,.out
 assert ti.usbInEp1 < ti.usbOutEp1
-	resmsk	(ti.usbInEp1-2) xor (ti.usbOutEp1-2),hl
+	resmsk	(ti.usbInEp1+1-4) xor (ti.usbOutEp1+1-4),de
 .out:
-	cp	a,(8+1) shl 1
-	jq	nc,.unhandled
 repeat 2
-	add	a,l
+	add	a,e
 end repeat
-	ld	l,a
-	ld	a,(hl)
-repeat ti.bUsbEpStall-8
-	rrca
-end repeat
-	and	a,1
-	jq	.sendStatus
-.notGetEndpointStatus:
-	jq	.unhandled
-.notGetStatus:
-	djnz	.notClearFeature
-.notClearFeature:
-	dec	b
-	djnz	.notSetFeature
-.notSetFeature:
-	dec	b
-	djnz	.notSetAddress
-	ld	de,(ysetup.wValue)
-	ld	a,e
-	and	a,$80
-	or	a,d
-	or	a,c
-	ld	bc,(ysetup.wIndex)
-	or	a,c
-	or	a,b
-	ld	bc,(ysetup.wLength)
-	or	a,c
-	or	a,b
-	jq	nz,.unhandled
-	ld	l,ti.usbDevAddr-$100
-	ld	(hl),e
-	jq	.handled
-.notSetAddress:
-	djnz	.notGetDescriptor
-	ld	a,c
-	xor	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
-	jq	z,_HandleGetDescriptor
-.notGetDescriptor:
-	djnz	.notSetDescriptor
-.notSetDescriptor:
-	djnz	.notGetConfiguration
-	ld	a,c
-	xor	a,DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
-	ld	bc,(ysetup.wValue)
-	or	a,c
-	ld	a,b
-	ld	bc,(ysetup.wIndex)
-	or	a,c
-	or	a,b
-	ld	bc,(ysetup.wLength)
-	dec	c
-	or	a,c
-	inc	c
-	or	a,b
-	ld	de,selectedConfiguration
-	jq	z,_HandleGetDescriptor.sendDescriptor
-	ld	b,a
-.notGetConfiguration:
-	djnz	.notSetConfiguration
-	ld	de,(ysetup.wValue)
-	ld	a,d
-	or	a,c
-	ld	bc,(ysetup.wIndex)
-	or	a,c
-	or	a,b
-	ld	bc,(ysetup.wLength)
-	or	a,c
-	or	a,b
-	jq	nz,.unhandled
-	or	a,e
-	jq	z,.setConfigured
-	push	ix
-	ld	xstandardDescriptors,(currentDescriptors)
-	ld	ydeviceDescriptor,(xstandardDescriptors.device)
-	ld	b,(ydeviceDescriptor.bNumConfigurations)
-	ld	hl,(xstandardDescriptors.configurations)
-.findConfigurationDescriptor:
-	ld	xconfigurationDescriptor,(hl)
-	xor	a,(xconfigurationDescriptor.bConfigurationValue)
-	jq	z,.foundConfigurationDescriptor
-repeat long
-	inc	hl
-end repeat
-	ld	a,e
-	djnz	.findConfigurationDescriptor
-.foundConfigurationDescriptor:
-	ld	ydevice,(rootHub.child)
-	ld	de,(xconfigurationDescriptor.wTotalLength)
-	ld	b,(xconfigurationDescriptor.bNumInterfaces)
-	call	z,_ParseInterfaceDescriptors
-	pop	ix
-	jq	nz,.unhandled
-	lea	de,ydevice
-	ld	a,USB_HOST_CONFIGURE_EVENT
-	call	_DispatchEvent
-	ret	nz
-	ld	a,(setupPacket.wValue)
-	scf
-.setConfigured:
-	ld	(selectedConfiguration),a
-	ld	hl,ti.mpUsbDevAddr
-	ld	a,(hl)
-	rla
-	rrca
-	ld	(hl),a
-	jq	.handled
-.notSetConfiguration:
-	djnz	.notGetInterface
-.notGetInterface:
-	djnz	.notSetInterface
-.notSetInterface:
-.unhandled:
-	ld	hl,ti.mpUsbCxFifo
-	set	ti.bCxFifoStall,(hl)
-	jq	.return
-.handled:
-	ld	l,ti.usbCxFifo-$100
-	ld	(hl),ti.bmCxFifoFin
-.return:
-	ld	l,ti.usbCxIsr-$100
-	ld	(hl),ti.bmUsbIntCxSetup
-	cp	a,a
+	ld	e,a
+	ex	de,hl
 	ret
 
 _HandleDeviceDescriptor:

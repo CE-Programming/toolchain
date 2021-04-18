@@ -81,7 +81,8 @@ typedef enum usb_event {
   /// \p event_data The usb_control_setup_t * that was sent by the host.
   USB_DEFAULT_SETUP_EVENT,
   /// This event triggers when the calculator is configured by a host.
-  /// \p event_data The usb_device_t of the host that configured us.
+  /// \p event_data The usb_configuration_descriptor_t * that was selected by
+  /// the host.
   USB_HOST_CONFIGURE_EVENT,
   // Temp debug events:
   USB_DEVICE_INTERRUPT,
