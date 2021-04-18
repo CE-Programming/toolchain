@@ -6,8 +6,11 @@ typedef struct global global_t;
 #include <debug.h>
 #include <tice.h>
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,55 +20,40 @@ struct global {
     uint8_t type;
 };
 
-static void putChar(char c) {
-    static char str[2];
-    str[0] = c;
-    os_PutStrFull(str);
+void outchar(char c) {
+    if (c == '\n') {
+        os_NewLine();
+        return;
+    }
+    if (c < ' ' || c > '~')
+        return;
+    if (c == '[')
+        c = 0xC1;
+    os_PutStrFull((char[]){c, '\0'});
 }
-static void putNibHex(unsigned char x) {
-    x &= 0xF;
-    putChar(x < 10 ? '0' + x : 'A' + x - 10);
-}
-static void putByteHex(unsigned char x) {
-    putNibHex(x >> 4);
-    putNibHex(x >> 0);
-}
-static void putShortHex(unsigned short x) {
-    putByteHex(x >> 8);
-    putByteHex(x >> 0);
-}
-static void putIntHex(unsigned x) {
-    putByteHex(x >> 16);
-    putShortHex(x >> 0);
-}
-static void putLongHex(unsigned long x) {
-    putByteHex(x >> 24);
-    putIntHex(x);
-}
-static void putBlockHex(void *block, size_t size) {
+
+static void putBlockHex(const void *block, size_t size) {
+    const uint8_t *pointer = block;
     while (size--)
-        putByteHex(*(*(unsigned char **)&block)++);
+        printf("%02X", *pointer++);
 }
 
 static usb_error_t handleTestIn(usb_endpoint_t endpoint,
                                 usb_transfer_status_t status,
                                 size_t transferred, usb_transfer_data_t *data) {
-    putByteHex(status);
-    putChar(':');
-    putIntHex(transferred);
-    os_NewLine();
+    (void)endpoint;
+    (void)data;
+    printf("%02X: %u\n", status, transferred);
     return USB_SUCCESS;
 }
 
 static usb_error_t handleTestOut(usb_endpoint_t endpoint,
                                  usb_transfer_status_t status,
                                  size_t transferred, usb_transfer_data_t *data) {
-    putByteHex(status);
-    putChar(':');
-    putIntHex(transferred);
-    putChar(':');
+    (void)endpoint;
+    printf("%02X: %u ", status, transferred);
     putBlockHex((char *)data + transferred - 6, 7);
-    os_NewLine();
+    printf("\n");
     free(data);
     return USB_SUCCESS;
 }
@@ -73,22 +61,19 @@ static usb_error_t handleTestOut(usb_endpoint_t endpoint,
 static usb_error_t handleBulkIn(usb_endpoint_t endpoint,
                                 usb_transfer_status_t status,
                                 size_t transferred, usb_transfer_data_t *data) {
-    putByteHex(status);
-    putChar('|');
-    putIntHex(transferred);
-    os_NewLine();
+    (void)endpoint;
+    (void)data;
+    printf("%02X| %u\n", status, transferred);
     return USB_SUCCESS;
 }
 
 static usb_error_t handleBulkOut(usb_endpoint_t endpoint,
                                  usb_transfer_status_t status,
                                  size_t transferred, usb_transfer_data_t *data) {
-    putByteHex(status);
-    putChar('|');
-    putIntHex(transferred);
-    putChar('|');
+    (void)endpoint;
+    printf("%02X| %u ", status, transferred);
     putBlockHex((char *)data + transferred - 6, 7);
-    os_NewLine();
+    printf("\n");
     free(data);
     return USB_SUCCESS;
 }
@@ -138,65 +123,51 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         "USB_HOST_SYSTEM_ERROR_INT",
     };
     usb_error_t error = USB_SUCCESS;
-    unsigned char i;
-    switch (event) {
+    switch ((unsigned)event) {
         case USB_ROLE_CHANGED_EVENT:
-            os_PutStrFull(usb_event_names[event]);
-            putChar(':');
-            putNibHex(*(const usb_role_t *)event_data >> 4);
-            os_NewLine();
+            printf("%s: %02X\n", usb_event_names[event], *(const usb_role_t *)event_data);
             break;
         case USB_DEVICE_DISCONNECTED_EVENT:
             if (callback_data->device == event_data) {
                 callback_data->device = NULL;
                 callback_data->in = callback_data->out = NULL;
             }
+            __attribute__((fallthrough));
         case USB_DEVICE_CONNECTED_EVENT:
         case USB_DEVICE_DISABLED_EVENT:
-            os_PutStrFull(usb_event_names[event]);
-            putChar(':');
-            putIntHex((unsigned)event_data);
-            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            os_NewLine();
-            if (event != USB_DEVICE_DISCONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE))
-                error = usb_ResetDevice(event_data);
-            break;
         case USB_DEVICE_ENABLED_EVENT:
-            os_PutStrFull(usb_event_names[event]);
-            putChar(':');
-            putIntHex((unsigned)event_data);
-            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            os_NewLine();
-            callback_data->device = event_data;
+            printf("%s: %06X %06X\n", usb_event_names[event], (unsigned)event_data,
+                   (unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
+            if (event == USB_DEVICE_CONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE))
+                error = usb_ResetDevice(event_data);
+            if (event == USB_DEVICE_ENABLED_EVENT)
+                callback_data->device = event_data;
             break;
         case USB_DEFAULT_SETUP_EVENT: {
             const usb_control_setup_t *setup = event_data;
-            for (i = 0; i < 8; i++)
-                putByteHex(((unsigned char *)setup)[i]);
-            os_NewLine();
+            putBlockHex(setup, sizeof(*setup));
+            printf("\n");
             if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == (USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE) &&
                 !setup->bRequest && !setup->wValue && !setup->wIndex) {
-                usb_device_t host;
-                usb_endpoint_t control;
-                host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
+                usb_device_t host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
                 if (!host) {
                     error = USB_ERROR_NO_DEVICE;
                     break;
                 }
-                control = usb_GetDeviceEndpoint(host, 0);
-                if (!control) {
+                usb_endpoint_t default_control_endpoint = usb_GetDeviceEndpoint(host, 0);
+                if (!default_control_endpoint) {
                     error = USB_ERROR_SYSTEM;
                     break;
                 }
                 if (setup->bmRequestType & USB_DEVICE_TO_HOST) {
-                    error = usb_ScheduleTransfer(control, "Hello World! Which must be exactly sixty-three characters?!?!1!.Hello World! Which must be exactly sixty-three characters?!?!1!.", 129, handleTestIn, NULL);
+                    error = usb_ScheduleTransfer(default_control_endpoint, "Hello World! Which must be exactly sixty-three characters?!?!1!.Hello World! Which must be exactly sixty-three characters?!?!1!.", 129, handleTestIn, NULL);
                 } else {
                     void *buffer;
                     if (!(buffer = malloc(setup->wLength))) {
                         error = USB_ERROR_NO_MEMORY;
                         break;
                     }
-                    error = usb_ScheduleControlTransfer(control, setup, buffer, handleTestOut, buffer);
+                    error = usb_ScheduleControlTransfer(default_control_endpoint, setup, buffer, handleTestOut, buffer);
                 }
                 if (error == USB_SUCCESS)
                     error = USB_IGNORE;
@@ -204,14 +175,22 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             break;
         }
         case USB_HOST_CONFIGURE_EVENT: {
+            usb_device_t host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
+            if (!host) {
+                error = USB_ERROR_NO_DEVICE;
+                break;
+            }
+            usb_endpoint_t in_endpoint = usb_GetDeviceEndpoint(host, 0x81);
+            usb_endpoint_t out_endpoint = usb_GetDeviceEndpoint(host, 0x02);
+            if (!in_endpoint || !out_endpoint) {
+                error = USB_ERROR_SYSTEM;
+                break;
+            }
             void *buffer;
-            os_PutStrFull(usb_event_names[event]);
-            putChar(':');
-            putIntHex((unsigned)event_data);
-            putIntHex((unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
-            os_NewLine();
-            usb_SetEndpointFlags(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81), USB_AUTO_TERMINATE);
-            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x81),
+            printf("%s: %06X %06X\n", usb_event_names[event], (unsigned)event_data,
+                   (unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
+            usb_SetEndpointFlags(in_endpoint, USB_AUTO_TERMINATE);
+            usb_ScheduleBulkTransfer(in_endpoint,
 "000000000000000000000000000000000000000000000000000000000000000\n"
 "111111111111111111111111111111111111111111111111111111111111111\n"
 "222222222222222222222222222222222222222222222222222222222222222\n"
@@ -225,7 +204,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                 error = USB_ERROR_NO_MEMORY;
                 break;
             }
-            usb_ScheduleBulkTransfer(usb_GetDeviceEndpoint((usb_device_t)event_data, 0x02), buffer, 512, handleBulkOut, buffer);
+            usb_ScheduleBulkTransfer(out_endpoint, buffer, 512, handleBulkOut, buffer);
             break;
         }
         case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
@@ -233,7 +212,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
             unsigned row, col;
             os_GetCursorPos(&row, &col);
             os_SetCursorPos(0, 8);
-            putIntHex(++counter);
+            printf("%06X", ++counter);
             os_SetCursorPos(row, col);
             break;
         }
@@ -244,22 +223,18 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         case USB_HOST_INTERRUPT:
             break;
         case 100:
-            putIntHex((unsigned)event_data);
-            os_NewLine();
+            printf("debug: %06X\n", (unsigned)event_data);
             break;
         case 101:
-            putLongHex(atomic_load_32(&timer_2_Counter));
-            os_PutStrFull(" cycles");
-            os_NewLine();
+            printf("%08" PRIX32 "cycles\n", atomic_load_32(&timer_2_Counter));
             timer_2_Counter = 0;
+            break;
         case 102:
-            for (i = 0; i < 64; i++)
-                putByteHex(((unsigned char *)event_data)[i]);
-            os_NewLine();
+            putBlockHex(event_data, 64);
+            printf("\n");
             break;
         default:
-            os_PutStrFull(usb_event_names[event]);
-            os_NewLine();
+            printf("%s\n", usb_event_names[event]);
             break;
     }
     return error;
@@ -304,8 +279,7 @@ static bool parseConfigurationDescriptor(global_t *const global,
     }
     if (!in || !out) return false;
     if ((error = usb_SetConfiguration(global->device, configuration, length)) != USB_SUCCESS) {
-        putIntHex(error);
-        os_NewLine();
+        printf("error: %X\n", error);
         return false;
     }
     global->in = usb_GetDeviceEndpoint(global->device, in);
@@ -326,99 +300,78 @@ static void handleDevice(global_t *global) {
     uint8_t index;
     bool found = false;
     usb_configuration_descriptor_t *configuration = NULL;
-    if (!global->device)
+    if ((usb_GetRole() & USB_ROLE_DEVICE) || !global->device)
         return;
     if ((error = usb_GetDescriptor(global->device, USB_DEVICE_DESCRIPTOR,
                                    0, &device, sizeof(device), &length))
         != USB_SUCCESS) goto err;
     if (length < sizeof(device)) goto noerr;
     putBlockHex(&device, sizeof(device));
-    os_NewLine();
+    printf("\n");
     for (index = 0; !found && index != device.bNumConfigurations; ++index) {
         length = usb_GetConfigurationDescriptorTotalLength(global->device, index);
         if (!(configuration = malloc(length))) goto noerr;
         if ((error = usb_GetDescriptor(global->device, USB_CONFIGURATION_DESCRIPTOR,
                                        index, configuration, length, &length))
             != USB_SUCCESS) goto err;
-        putByteHex(index);
-        putChar(':');
+        printf("%02X: ", index);
         putBlockHex(configuration, length);
-        os_NewLine();
+        printf("\n");
         found = parseConfigurationDescriptor(global, &device, configuration, length);
         free(configuration); configuration = NULL;
     }
     if (!found) goto noerr;
-    putByteHex(global->type);
-    putByteHex(usb_GetEndpointAddress(global->in));
-    putByteHex(usb_GetEndpointAddress(global->out));
-    os_NewLine();
+    printf("%02X %02X %02X\n", global->type, usb_GetEndpointAddress(global->in), usb_GetEndpointAddress(global->out));
     switch (global->type) {
         case 1:
-            putIntHex(usb_DefaultControlTransfer(global->device, &get_max_lun_setup, buffer, 0, &length));
-            putChar(':');
+            printf("%X: ", usb_DefaultControlTransfer(global->device, &get_max_lun_setup, buffer, 0, &length));
             if (length <= 1)
                 putBlockHex(buffer, length);
             else
-                putIntHex(length);
-            os_NewLine();
+                printf("%u", length);
+            printf("\n");
 
-            putIntHex(usb_BulkTransfer(global->out, (uint8_t *)inquiry_cbw, sizeof(inquiry_cbw), 0, &length));
-            putChar(':');
-            putIntHex(length);
-            os_NewLine();
+            printf("%06X: %u", usb_BulkTransfer(global->out, (uint8_t *)inquiry_cbw, sizeof(inquiry_cbw), 0, &length), length);
 
-            putIntHex(usb_BulkTransfer(global->in, buffer, 0x24, 0, &length));
-            putChar(':');
+            printf("%X: ", usb_BulkTransfer(global->in, buffer, 0x24, 0, &length));
             if (length <= 0x24)
                 putBlockHex(buffer, length);
             else
-                putIntHex(length);
-            os_NewLine();
+                printf("%u", length);
+            printf("\n");
 
-            putIntHex(usb_BulkTransfer(global->in, buffer, 0xD, 0, &length));
-            putChar(':');
+            printf("%X: ", usb_BulkTransfer(global->in, buffer, 0xD, 0, &length));
             if (length <= 0xD)
                 putBlockHex(buffer, length);
             else
-                putIntHex(length);
-            os_NewLine();
+                printf("%u", length);
+            printf("\n");
 
             break;
         case 2:
-            putIntHex(usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_00, sizeof(rdy_pkt_00), 0, &length));
-            putChar(':');
-            putIntHex(length);
-            os_NewLine();
+            printf("%X: %u\n", usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_00, sizeof(rdy_pkt_00), 0, &length), length);
 
-            length = 0;
-            putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
-            putChar(':');
+            printf("%X: ", usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
             if (length <= sizeof(buffer))
                 putBlockHex(buffer, length);
             else
-                putIntHex(length);
-            os_NewLine();
+                printf("%u", length);
+            printf("\n");
 
-            putIntHex(usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_01, sizeof(rdy_pkt_01), 0, &length));
-            putChar(':');
-            putIntHex(length);
-            os_NewLine();
+            printf("%X: %u\n", usb_BulkTransfer(global->out, (uint8_t *)rdy_pkt_01, sizeof(rdy_pkt_01), 0, &length), length);
 
-            length = 0;
-            putIntHex(usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
-            putChar(':');
+            printf("%X: ", usb_BulkTransfer(global->in, buffer, sizeof(buffer), 0, &length));
             if (length <= sizeof(buffer))
                 putBlockHex(buffer, length);
             else
-                putIntHex(length);
-            os_NewLine();
+                printf("%u", length);
+            printf("\n");
 
             break;
     }
     goto noerr;
  err:
-    putIntHex(error);
-    os_NewLine();
+    printf("error: %X\n", error);
  noerr:
     if (configuration) free(configuration);
     memset(global, 0, sizeof(global_t));
@@ -435,15 +388,12 @@ int main(void) {
             unsigned row, col;
             os_GetCursorPos(&row, &col);
             os_SetCursorPos(0, 0);
-            putIntHex(usb_GetFrameNumber());
-            putChar(':');
-            putLongHex(usb_GetCycleCounter());
+            printf("%06X: %08" PRIX32, usb_GetFrameNumber(), usb_GetCycleCounter());
             os_SetCursorPos(row, col);
-            if (!(usb_GetRole() & USB_ROLE_DEVICE))
-                handleDevice(&global);
+            handleDevice(&global);
         }
     }
     usb_Cleanup();
-    putIntHex(error);
+    printf("error: %X", error);
     os_GetKey();
 }
