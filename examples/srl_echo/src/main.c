@@ -31,9 +31,15 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
     }
     /* When a device is connected, or when connected to a computer */
     if((event == USB_DEVICE_ENABLED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) || event == USB_HOST_CONFIGURE_EVENT) {
-        if(!has_device) {
-            usb_device_t device = event_data;
+        usb_device_t device;
 
+        if(event == USB_HOST_CONFIGURE_EVENT) {
+            device = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
+        } else {
+            device = event_data;
+        }
+
+        if(device && !has_device) {
             /* Initialize the serial library with the newly attached device */
             srl_error_t error = srl_Init(&srl, device, srl_buf, sizeof srl_buf, SRL_INTERFACE_ANY);
 
