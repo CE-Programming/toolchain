@@ -70,10 +70,11 @@ static usb_error_t handleBulkIn(usb_endpoint_t endpoint,
 static usb_error_t handleBulkOut(usb_endpoint_t endpoint,
                                  usb_transfer_status_t status,
                                  size_t transferred, usb_transfer_data_t *data) {
-    (void)endpoint;
     printf("%02X| %u ", status, transferred);
     putBlockHex((char *)data + transferred - 6, 7);
     printf("\n");
+    if (status == USB_TRANSFER_COMPLETED)
+        return usb_ScheduleBulkTransfer(endpoint, data, 512, handleBulkOut, data);
     free(data);
     return USB_SUCCESS;
 }
@@ -204,7 +205,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                 error = USB_ERROR_NO_MEMORY;
                 break;
             }
-            usb_ScheduleBulkTransfer(out_endpoint, buffer, 512, handleBulkOut, buffer);
+            handleBulkOut(out_endpoint, USB_TRANSFER_COMPLETED, 0, buffer);
             break;
         }
         case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
@@ -222,14 +223,14 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         case USB_DEVICE_WAKEUP_INTERRUPT:
         case USB_HOST_INTERRUPT:
             break;
-        case 100:
+        case 99:
             printf("debug: %06X\n", (unsigned)event_data);
             break;
-        case 101:
+        case 98:
             printf("%08" PRIX32 "cycles\n", atomic_load_32(&timer_2_Counter));
             timer_2_Counter = 0;
             break;
-        case 102:
+        case 97:
             putBlockHex(event_data, 64);
             printf("\n");
             break;

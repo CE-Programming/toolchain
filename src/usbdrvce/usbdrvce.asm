@@ -787,7 +787,7 @@ usb_HandleEvents:
 ;	jq	nz,.waitForReset.outer	;  +13)256-5
 ;	djnz	.waitForReset		;+13
 ;.resetCycles := 12+8+(4+(4+13)*256-5+4+13)*256-5+13
-;	inc	a ; zf = 0
+;	inc	a ; zf = false
 ;	jq	usb_Init.timeout
 ;.reset:
 ;
@@ -810,7 +810,7 @@ end iterate
 	ld	a,ti.intUsb shr 8
 	ld	(ti.mpIntAck+1),a
 	ex	de,hl	; hl = 0
-	or	a,a	; zf = 0
+	or	a,a	; zf = false
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1258,6 +1258,8 @@ usb_ClearEndpointHalt:
 .enter:
 	call	_Error.check
 	ld	yendpoint,(ix+6)
+	bitmsk	BULK_TRANSFER and INTERRUPT_TRANSFER,(yendpoint.transferInfo)
+	jq	z,_Error.INVALID_PARAM
 	call	usb_GetEndpointAddress.enter
 	ld	hl,currentRole
 	bit	ti.bUsbRole-16,(hl)
@@ -2617,9 +2619,8 @@ assert PO2_MPS = 1 shl 0
 	and	a,ti.bmUsbRole shr 16
 	jq	nz,.async
 	ld	a,(yendpoint.transferInfo)
+assert ~(CONTROL_TRANSFER or BULK_TRANSFER) and 1
 	rrca
-assert ~CONTROL_TRANSFER and 1
-assert ~BULK_TRANSFER and 1
 	jq	nc,.async
 assert endpointDescriptor.wMaxPacketSize+2 = endpointDescriptor.bInterval
 	inc	hl
@@ -3097,7 +3098,8 @@ end repeat
 ;  ix = endpoint
 ; Output:
 ;  cf = success
-;  zf = ? | false
+;  zf = success
+;  a = ?
 ;  hl = 0 | error
 ;  iy = ?
 ;  ix = endpoint
@@ -3125,19 +3127,19 @@ end repeat
 	ld	(xendpoint.overlay.status),l;0
 	bitmsk	USB_TRANSFER_STALLED,bc
 	ret	z
-	ld	a,(xendpoint.transferInfo)
-	and	a,endpoint.transferInfo.type
-	scf
-assert ~CONTROL_TRANSFER
+	ld	a,(currentRole)
+	cpl
+	bit	ti.bUsbRole-16,a
+	ret	z
+	bitmsk	BULK_TRANSFER and INTERRUPT_TRANSFER,(xendpoint.transferInfo)
 	ret	z
 	push	xendpoint
 	call	usb_ClearEndpointHalt
 	pop	af
-	dec	hl
 	ex	de,hl
+	scf
 	sbc	hl,hl
-	inc	l
-	add	hl,de
+	adc	hl,de
 	ret
 
 ; Input:
@@ -3364,7 +3366,7 @@ assert HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT-1 = USB_TRANSFER
 	dec	c
 	call	_FlushEndpoint
 	pop	ix,de
-	ret	nc
+	ret	nz
 	ex	de,hl
 	ret
 .notSetFeature:
@@ -3592,14 +3594,13 @@ end repeat
 	ld	a,e
 .lookupEndpointRegister:
 	add	a,a
-	ld	de,ti.mpUsbOutEp1+1-4
-	jq	c,.out
+	ld	de,ti.mpUsbInEp1+1-4
+	jq	c,.in
 assert ti.usbInEp1 < ti.usbOutEp1
-	resmsk	(ti.usbInEp1+1-4) xor (ti.usbOutEp1+1-4),de
-.out:
-repeat 2
+	setmsk	(ti.usbInEp1+1-4) xor (ti.usbOutEp1+1-4),de
+.in:
+	add	a,a
 	add	a,e
-end repeat
 	ld	e,a
 	ex	de,hl
 	ret
