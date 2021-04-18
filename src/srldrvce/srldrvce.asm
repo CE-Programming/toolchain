@@ -768,6 +768,7 @@ ring_buf_pop:
 	ld	hl,(xring_buf_ctrl.data_break)
 	compare_hl_zero
 	jq	nz,.break
+.no_break:
 	push	bc
 	ld	hl,(xring_buf_ctrl.data_end)
 	ld	bc,(xring_buf_ctrl.data_start)
@@ -807,8 +808,7 @@ ring_buf_pop:
 	sbc	hl,bc					; hl = len
 	push	hl
 	pop	bc					; bc = len
-	ex	de,hl					; hl = data
-	push	hl
+	push	de					; de = data
 	call	.copy					; hl = len
 	ld	bc,(xring_buf_ctrl.buf_start)
 	ld	(xring_buf_ctrl.data_start),bc
@@ -821,9 +821,9 @@ ring_buf_pop:
 	sbc	hl,de
 	push	hl
 	pop	bc					; bc = size - len
-	lea	hl,iy
 	push	de
-	call	.break
+	lea	de,iy
+	call	.no_break
 	pop	de
 	add	hl,de
 	ret
