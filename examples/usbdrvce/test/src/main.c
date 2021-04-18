@@ -206,11 +206,10 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                 error = USB_ERROR_SYSTEM;
                 break;
             }
-            void *buffer;
             printf("%s: %06X %06X\n", usb_event_names[event], (unsigned)event_data,
                    (unsigned)usb_FindDevice(NULL, NULL, USB_SKIP_HUBS));
             usb_SetEndpointFlags(in_endpoint, USB_AUTO_TERMINATE);
-            usb_ScheduleBulkTransfer(in_endpoint,
+            error = usb_ScheduleBulkTransfer(in_endpoint,
 "000000000000000000000000000000000000000000000000000000000000000\n"
 "111111111111111111111111111111111111111111111111111111111111111\n"
 "222222222222222222222222222222222222222222222222222222222222222\n"
@@ -220,6 +219,9 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 "666666666666666666666666666666666666666666666666666666666666666\n"
 "777777777777777777777777777777777777777777777777777777777777777"
 , 64*8, handleBulkIn, NULL);
+            if (error != USB_SUCCESS)
+                break;
+            void *buffer;
             if (!(buffer = malloc(512))) {
                 error = USB_ERROR_NO_MEMORY;
                 break;

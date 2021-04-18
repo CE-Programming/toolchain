@@ -1312,7 +1312,9 @@ end iterate
 	ld	(hl),a
 	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_STALLED
 	lea	xendpoint,yendpoint
-	jq	_FlushEndpoint
+	call	_FlushEndpoint
+	pop	bc,ix
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
