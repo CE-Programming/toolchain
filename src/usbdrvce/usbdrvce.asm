@@ -359,9 +359,6 @@ end virtual
 ;-------------------------------------------------------------------------------
 ; usb constants
 ;-------------------------------------------------------------------------------
-USB_DEVICE_STATUS_SELF_POWERED  := 1 shl 0
-USB_DEVICE_STATUS_REMOTE_WAKEUP := 1 shl 1
-
 ; enum usb_error
 virtual at 0
 	USB_SUCCESS		rb 1
@@ -433,19 +430,19 @@ virtual at 0
 end virtual
 
 ; enum usb_find_flag
-?IS_NONE		:= 0
-?IS_DISABLED		:= 1 shl 0
-?IS_ENABLED		:= 1 shl 1
-?IS_DEVICE		:= 1 shl 2
-?IS_HUB			:= 1 shl 3
-?IS_ATTACHED		:= 1 shl 4
+?IS_NONE					:= 0
+?IS_DISABLED					:= 1 shl 0
+?IS_ENABLED					:= 1 shl 1
+?IS_DEVICE					:= 1 shl 2
+?IS_HUB						:= 1 shl 3
+?IS_ATTACHED					:= 1 shl 4
 
 ; enum usb_endpoint_flag
-?MANUAL_TERMINATE	:= 0 shl 0
-?AUTO_TERMINATE		:= 1 shl 0
+?MANUAL_TERMINATE				:= 0 shl 0
+?AUTO_TERMINATE					:= 1 shl 0
 
 ; enum usb_internal_endpoint_flag
-?PO2_MPS		:= 1 shl 0
+?PO2_MPS					:= 1 shl 0
 
 ; enum usb_role
 virtual at 0
@@ -480,27 +477,34 @@ end virtual
 
 ; enum usb_request
 virtual at 0
-	?GET_STATUS				rb 1
-	?CLEAR_FEATURE				rb 1
+	?GET_STATUS_REQUEST			rb 1
+	?CLEAR_FEATURE_REQUEST			rb 1
 						rb 1
-	?SET_FEATURE				rb 1
+	?SET_FEATURE_REQUEST			rb 1
 						rb 1
-	?SET_ADDRESS				rb 1
-	?GET_DESCRIPTOR				rb 1
-	?SET_DESCRIPTOR				rb 1
-	?GET_CONFIGURATION			rb 1
-	?SET_CONFIGURATION			rb 1
-	?GET_INTERFACE				rb 1
-	?SET_INTERFACE				rb 1
-	?SYNC_FRAME				rb 1
+	?SET_ADDRESS_REQUEST			rb 1
+	?GET_DESCRIPTOR_REQUEST			rb 1
+	?SET_DESCRIPTOR_REQUEST			rb 1
+	?GET_CONFIGURATION_REQUEST		rb 1
+	?SET_CONFIGURATION_REQUEST		rb 1
+	?GET_INTERFACE_REQUEST			rb 1
+	?SET_INTERFACE_REQUEST			rb 1
+	?SYNC_FRAME_REQUEST			rb 1
 end virtual
 
 ; enum usb_feature
 virtual at 0
-	?ENDPOINT_HALT				rb 1
-	?DEVICE_REMOTE_WAKEUP			rb 1
-	?TEST_MODE				rb 1
+	?ENDPOINT_HALT_FEATURE			rb 1
+	?DEVICE_REMOTE_WAKEUP_FEATURE		rb 1
+	?TEST_MODE_FEATURE			rb 1
 end virtual
+
+; enum usb_device_status
+DEVICE_SELF_POWERED_STATUS			:= 1 shl 0
+DEVICE_REMOTE_WAKEUP_STATUS			:= 1 shl 1
+
+; enum usb_endpoint_status
+ENDPOINT_HALT_STATUS				:= 1 shl 0
 
 ; enum usb_descriptor_type
 virtual at 1
@@ -1019,7 +1023,7 @@ usb_GetConfigurationDescriptorTotalLength:
 	setmsk	12 xor 4,hl
 	push	hl
 	ld	c,(ix+9)
-iterate value, DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCRIPTOR, c, CONFIGURATION_DESCRIPTOR, a, a, 4, a
+iterate value, DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCRIPTOR_REQUEST, c, CONFIGURATION_DESCRIPTOR, a, a, 4, a
 	ld	(hl),value
  if % <> %%
 	inc	l
@@ -1043,7 +1047,7 @@ end iterate
 ;-------------------------------------------------------------------------------
 usb_GetDescriptor:
 	call	_Error.check
-	ld	c,GET_DESCRIPTOR
+	ld	c,GET_DESCRIPTOR_REQUEST
 	ld	de,(ix+21)
 	call	_Alloc32Align32
 	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
@@ -1085,7 +1089,7 @@ usb_GetDescriptor:
 ;-------------------------------------------------------------------------------
 usb_SetDescriptor:
 	call	_Error.check
-	ld	c,SET_DESCRIPTOR
+	ld	c,SET_DESCRIPTOR_REQUEST
 	sbc	hl,hl
 	ex	de,hl
 	call	_Alloc32Align32
@@ -1095,7 +1099,7 @@ usb_SetDescriptor:
 ;-------------------------------------------------------------------------------
 usb_GetStringDescriptor:
 	call	_Error.check
-	ld	c,GET_DESCRIPTOR
+	ld	c,GET_DESCRIPTOR_REQUEST
 	ld	de,(ix+21)
 	call	_Alloc32Align32
 	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
@@ -1123,7 +1127,7 @@ usb_GetStringDescriptor:
 ;-------------------------------------------------------------------------------
 usb_SetStringDescriptor:
 	call	_Error.check
-	ld	c,SET_DESCRIPTOR
+	ld	c,SET_DESCRIPTOR_REQUEST
 	sbc	hl,hl
 	ex	de,hl
 	call	_Alloc32Align32
@@ -1144,7 +1148,7 @@ usb_GetConfiguration:
 	push	de,hl
 	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),GET_CONFIGURATION
+	ld	(hl),GET_CONFIGURATION_REQUEST
 repeat 3
 	inc	l
 	ld	(hl),a
@@ -1180,7 +1184,7 @@ assert xconfigurationDescriptor.bNumInterfaces+1 = xconfigurationDescriptor.bCon
 	push	de,de,hl
 	ld	(hl),d;HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_DEVICE
 	inc	l
-	ld	(hl),SET_CONFIGURATION
+	ld	(hl),SET_CONFIGURATION_REQUEST
 	inc	l
 	ld	(hl),b
 repeat 2
@@ -1208,7 +1212,7 @@ usb_GetInterface:
 	push	de,hl
 	ld	(hl),DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_INTERFACE
 	inc	l
-	ld	(hl),GET_INTERFACE
+	ld	(hl),GET_INTERFACE_REQUEST
 repeat 2
 	inc	l
 	ld	(hl),a
@@ -1239,7 +1243,7 @@ assert xinterfaceDescriptor.bInterfaceNumber+1 = xinterfaceDescriptor.bAlternate
 	push	hl,de
 	ld	e,DEFAULT_RETRIES
 	push	de,de,hl
-iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_INTERFACE, SET_INTERFACE, b, a, c
+iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_INTERFACE, SET_INTERFACE_REQUEST, b, a, c
 	ld	(hl),value
  if % <> %%
 	inc	l
@@ -1249,12 +1253,12 @@ end iterate
 
 ;-------------------------------------------------------------------------------
 usb_SetEndpointHalt:
-	ld	b,SET_FEATURE
+	ld	b,SET_FEATURE_REQUEST
 	jq	usb_ClearEndpointHalt.enter
 
 ;-------------------------------------------------------------------------------
 usb_ClearEndpointHalt:
-	ld	b,CLEAR_FEATURE
+	ld	b,CLEAR_FEATURE_REQUEST
 .enter:
 	call	_Error.check
 	ld	yendpoint,(ix+6)
@@ -1273,7 +1277,7 @@ usb_ClearEndpointHalt:
 	push	hl,de
 	ld	e,DEFAULT_RETRIES
 	push	de,hl,hl
-assert ~ENDPOINT_HALT
+assert ~ENDPOINT_HALT_FEATURE
 iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, b, d, d, a, d, d, d
 	ld	(hl),value
  if % <> %%
@@ -1301,9 +1305,14 @@ end iterate
 	or	a,(ti.bmUsbEpReset or ti.bmUsbEpStall) shr 8
 	djnz	.set
 	and	a,not ti.bmUsbEpStall shr 8
-.set:
 	ld	(hl),a
 	ret
+.set:
+	and	a,not ti.bmUsbEpReset shr 8
+	ld	(hl),a
+	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_STALLED
+	lea	xendpoint,yendpoint
+	jq	_FlushEndpoint
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
@@ -3302,12 +3311,12 @@ assert ~HOST_TO_DEVICE or STANDARD_REQUEST
 	ld	b,l
 	djnz	.notClearDeviceRemoteWakeupFeature
 	ld	hl,deviceStatus
-	resmsk	USB_DEVICE_STATUS_REMOTE_WAKEUP,(hl)
+	resmsk	DEVICE_REMOTE_WAKEUP_STATUS,(hl)
 	jq	.handled
 .notClearDeviceFeature:
 	dec	b
 	djnz	.notClearEndpointFeature
-assert ~ENDPOINT_HALT
+assert ~ENDPOINT_HALT_FEATURE
 	or	a,l
 	jq	nz,.unhandled
 	call	.lookupEndpoint
@@ -3333,7 +3342,7 @@ assert ~HOST_TO_DEVICE or STANDARD_REQUEST
 	or	a,d
 	jq	nz,.unhandled
 	ld	hl,deviceStatus
-	setmsk	USB_DEVICE_STATUS_REMOTE_WAKEUP,(hl)
+	setmsk	DEVICE_REMOTE_WAKEUP_STATUS,(hl)
 	jq	.handled
 .notSetDeviceRemoteWakeupFeature:
 	djnz	.notSetDeviceTestModeFeature
@@ -3353,12 +3362,15 @@ assert ~HOST_TO_DEVICE or STANDARD_REQUEST
 	dec	b
 	djnz	.notSetEndpointFeature
 	or	a,d
-assert ~ENDPOINT_HALT
+assert ~ENDPOINT_HALT_FEATURE
 	or	a,l
 	jq	nz,.unhandled
 	call	.lookupEndpoint
 	jq	z,.unhandled
-	set	ti.bUsbEpStall-8,(hl)
+	ld	a,(hl)
+	and	a,not ti.bmUsbEpReset shr 8
+	or	a,ti.bmUsbEpStall shr 8
+	ld	(hl),a
 	call	.handled
 	push	hl,de
 	ex	(sp),ix
@@ -3646,7 +3658,7 @@ end repeat
 	ld	bc,_HandleDeviceEnable
 	push	hl,bc,bc,hl,yendpoint
 	inc	l
-	ld	(hl),SET_ADDRESS
+	ld	(hl),SET_ADDRESS_REQUEST
 	ld	b,6
 .zero:
 	inc	l
@@ -4395,7 +4407,7 @@ _DefaultControlEndpointDescriptor:
 	dw 8
 	db 0
 _GetDeviceDescriptor8:
-	db DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCRIPTOR, 0, DEVICE_DESCRIPTOR
+	db DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCRIPTOR_REQUEST, 0, DEVICE_DESCRIPTOR
 	dw 0, 8
 _DefaultStandardDescriptors:
 	dl .device, .configurations, .langids

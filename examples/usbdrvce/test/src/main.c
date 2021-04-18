@@ -145,16 +145,35 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                 callback_data->device = event_data;
             break;
         case USB_DEFAULT_SETUP_EVENT: {
+            static const usb_control_setup_t clear_out_endpoint_halt_setup = {
+                .bmRequestType = USB_HOST_TO_DEVICE | USB_STANDARD_REQUEST | USB_RECIPIENT_ENDPOINT,
+                .bRequest = USB_CLEAR_FEATURE_REQUEST,
+                .wValue = USB_ENDPOINT_HALT_FEATURE,
+                .wIndex = 0x02,
+                .wLength = 0,
+            };
             const usb_control_setup_t *setup = event_data;
             putBlockHex(setup, sizeof(*setup));
             printf("\n");
-            if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == (USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE) &&
-                !setup->bRequest && !setup->wValue && !setup->wIndex) {
-                usb_device_t host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
-                if (!host) {
-                    error = USB_ERROR_NO_DEVICE;
+            usb_device_t host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
+            if (!host) {
+                error = USB_ERROR_NO_DEVICE;
+                break;
+            }
+            if (!memcmp(setup, &clear_out_endpoint_halt_setup, sizeof(usb_control_setup_t))) {
+                usb_endpoint_t out_endpoint = usb_GetDeviceEndpoint(host, 0x02);
+                if (!out_endpoint) {
+                    error = USB_ERROR_SYSTEM;
                     break;
                 }
+                void *buffer;
+                if (!(buffer = malloc(512))) {
+                    error = USB_ERROR_NO_MEMORY;
+                    break;
+                }
+                handleBulkOut(out_endpoint, USB_TRANSFER_COMPLETED, 0, buffer);
+            } else if ((setup->bmRequestType & ~USB_DEVICE_TO_HOST) == (USB_VENDOR_REQUEST | USB_RECIPIENT_DEVICE) &&
+                !setup->bRequest && !setup->wValue && !setup->wIndex) {
                 usb_endpoint_t default_control_endpoint = usb_GetDeviceEndpoint(host, 0);
                 if (!default_control_endpoint) {
                     error = USB_ERROR_SYSTEM;
