@@ -891,11 +891,21 @@ usb_error_t usb_SetInterface(usb_device_t device,
                              size_t length);
 
 /**
- * Clears halt condition on \p endpoint.  This may only be called if there are
- * no pending transfers.  If any non-control transfer stalls, this function is
- * called automatically, so you only need to call this if you need to clear an
- * endpoint halt for a reason other than a stalled transfer.  This function
- * blocks until the halt condition is cleared.
+ * Sets halt condition on \p endpoint.  This is not supported by the default
+ * control endpoint.  If acting as usb host, this may only be called if there
+ * are no pending transfers.
+ * @param endpoint The endpoint to set the halt condition of.
+ * @return USB_SUCCESS if the transfer succeeded or an error.
+ */
+usb_error_t usb_SetEndpointHalt(usb_endpoint_t endpoint);
+
+/**
+ * Clears halt condition on \p endpoint.  This is not supported by the default
+ * control endpoint.  If acting as usb host, this may only be called if there
+ * are no pending transfers.  If any non-control transfer stalls, this is called
+ * automatically, so you only need to call this if you need to clear an endpoint
+ * halt for a reason other than a stalled transfer. This function blocks until
+ * the halt condition is cleared.
  * @param endpoint The endpoint to clear the halt condition of.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */

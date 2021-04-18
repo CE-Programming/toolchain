@@ -37,6 +37,7 @@ library USBDRVCE, 0
 	export usb_SetConfiguration
 	export usb_GetInterface
 	export usb_SetInterface
+	export usb_SetEndpointHalt
 	export usb_ClearEndpointHalt
 	export usb_GetDeviceEndpoint
 	export usb_GetEndpointDevice
@@ -1247,21 +1248,31 @@ end iterate
 	jq	usb_SetConfiguration.length
 
 ;-------------------------------------------------------------------------------
+usb_SetEndpointHalt:
+	ld	b,SET_FEATURE
+	jq	usb_ClearEndpointHalt.enter
+
+;-------------------------------------------------------------------------------
 usb_ClearEndpointHalt:
+	ld	b,CLEAR_FEATURE
+.enter:
 	call	_Error.check
 	ld	yendpoint,(ix+6)
+	call	usb_GetEndpointAddress.enter
+	ld	hl,currentRole
+	bit	ti.bUsbRole-16,(hl)
+	jq	nz,.device
 	ld	hl,(yendpoint.first)
 	bitmsk	transfer.next.dummy,(hl+transfer.next)
 	jq	z,_Error.NOT_SUPPORTED
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
-	call	usb_GetEndpointAddress.enter
 	inc	de;0
 	push	hl,de
 	ld	e,DEFAULT_RETRIES
 	push	de,hl,hl
 assert ~ENDPOINT_HALT
-iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, CLEAR_FEATURE, d, d, a, d, d, d
+iterate value, HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT, b, d, d, a, d, d, d
 	ld	(hl),value
  if % <> %%
 	inc	l
@@ -1278,7 +1289,19 @@ end iterate
 	call	_Free32Align32
 	ex	de,hl
 	resmsk	yendpoint.overlay.remaining.dt
+.return:
 	jq	usb_Transfer.return
+.device:
+	or	a,a
+	jq	z,_Error.INVALID_PARAM
+	call	_HandleCxSetupInt.lookupEndpointRegister
+	ld	a,(hl)
+	or	a,(ti.bmUsbEpReset or ti.bmUsbEpStall) shr 8
+	djnz	.set
+	and	a,not ti.bmUsbEpStall shr 8
+.set:
+	ld	(hl),a
+	ret
 
 ;-------------------------------------------------------------------------------
 usb_GetDeviceEndpoint:
@@ -3567,6 +3590,7 @@ end repeat
 	call	nz,usb_GetDeviceEndpoint.check
 	ret	z
 	ld	a,e
+.lookupEndpointRegister:
 	add	a,a
 	ld	de,ti.mpUsbOutEp1+1-4
 	jq	c,.out
