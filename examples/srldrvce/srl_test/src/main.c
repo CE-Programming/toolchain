@@ -61,8 +61,12 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         printf("device connected\n");
         usb_ResetDevice(device);
     }
+    if(event == USB_HOST_CONFIGURE_EVENT) {
+        usb_device_t host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
+        if(host) device = host;
+    }
     /* When a device is connected, or when connected to a computer */
-    if((event == USB_DEVICE_ENABLED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) || event == USB_HOST_CONFIGURE_EVENT) {
+    if((event == USB_DEVICE_ENABLED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE))) {
         device = event_data;
     }
     if(event == USB_DEVICE_DISCONNECTED_EVENT) {
