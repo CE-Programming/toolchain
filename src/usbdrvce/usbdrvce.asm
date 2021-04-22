@@ -4,6 +4,8 @@ include '../include/library.inc'
 
 library USBDRVCE, 0
 
+DEBUG := 0
+
 ;-------------------------------------------------------------------------------
 ; no dependencies
 ;-------------------------------------------------------------------------------
@@ -349,6 +351,10 @@ assert cleanupListReady+1 = cleanupListPending
 	?cleanupListPending	rb 1
 assert cleanupListPending+1 = $
 				rb 1 ; always -1
+if DEBUG
+	?alloc32Align32		rl 1
+	?alloc64Align256	rl 1
+end if
 	assert $ <= ti.usbInited
 end virtual
 virtual at (ti.ramCodeTop+$FF) and not $FF
@@ -699,6 +705,10 @@ assert ~periodicList and $FF
 	ret	nz
 	or	a,a
 	sbc	hl,hl
+if DEBUG
+	ld	(alloc32Align32),hl;0
+	ld	(alloc64Align256),hl;0
+end if
 	ret
 .initFreeList:
 	call	_Free64Align256
@@ -714,6 +724,11 @@ assert ~periodicList and $FF
 
 ;-------------------------------------------------------------------------------
 usb_Cleanup:
+if DEBUG
+	ld	de,alloc32Align32
+	ld	a,99
+	call	_DispatchEvent
+end if
 	ld	hl,ti.mpUsbCmd
 	call	_DisableSchedulesAndResetHostController.enter
 ;	xor	a,a
@@ -2201,6 +2216,11 @@ iterate <size,align>, 32,32, 64,256
 ;  hl = allocated memory to be freed.
 _Free#size#Align#align:
 	push	de
+if DEBUG
+	ld	de,(alloc#size#Align#align)
+	dec	de
+	ld	(alloc#size#Align#align),de
+end if
 	ld	de,(freeList#size#Align#align)
 	ld	(hl),de
 	ld	(freeList#size#Align#align),hl
@@ -2218,6 +2238,11 @@ _Alloc#size#Align#align:
 	push	hl
 	ld	hl,(hl)
 	ld	(freeList#size#Align#align),hl
+if DEBUG
+	ld	hl,(alloc#size#Align#align)
+	inc	hl
+	ld	(alloc#size#Align#align),hl
+end if
 	pop	hl
 	ret
 
