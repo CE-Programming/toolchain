@@ -2312,24 +2312,10 @@ assert IS_DISABLED = 1
 	inc	e
 	ld	(de),a
 .notControl:
-	sbc	hl,hl
-	ld	ytransfer,(xendpoint.first)
-	jq	.check
-.flush:
-	push	ytransfer,de
-	call	_DispatchTransferCallback
-	pop	de,ytransfer
-	add	hl,de
-	or	a,a
-	sbc	hl,de
+	push	de
+	call	_FlushEndpoint
+	pop	de
 	jq	nz,_DispatchTransferCallback.pop2return
-.scan:
-	bitmsk	ytransfer.type.ioc
-	ld	ytransfer,(ytransfer.next)
-	jq	z,.scan
-.check:
-	bitmsk	ytransfer.next.dummy
-	jq	z,.flush
 	lea	hl,xendpoint.next
 	ld	h,(xendpoint.prev)
 	ld	yendpoint,(xendpoint.next)
@@ -3133,12 +3119,11 @@ end repeat
 ;  bc = status
 ;  ix = endpoint
 ; Output:
-;  cf = success
-;  zf = success
+;  cf = zf = success
 ;  a = ?
+;  de = ?
 ;  hl = 0 | error
 ;  iy = ?
-;  ix = endpoint
 _FlushEndpoint:
 	ld	ytransfer,(xendpoint.first)
 	or	a,a
@@ -3185,7 +3170,7 @@ end repeat
 ;  iy = transfer
 ; Output:
 ;  af = ?
-;  bc = status
+;  de = ?
 ;  hl = error
 ;  iy = ?
 _DispatchTransferCallback:
