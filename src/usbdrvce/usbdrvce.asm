@@ -2335,9 +2335,11 @@ assert IS_DISABLED = 1
 	ld	hl,ti.mpUsbRange
 	lea	de,xdevice+1
 assert IS_DISABLED = 1 shl 0
-	jq	nc,_DispatchEvent
-	cp	a,a
-	ret
+	jq	nc,.event
+	cp	a,USB_DEVICE_DISABLED_EVENT
+	ret	z
+.event:
+	jq	_DispatchEvent
 
 ; Input:
 ;  ix = device-1
