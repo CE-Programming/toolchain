@@ -3046,10 +3046,10 @@ _RetireTransfers:
 .nc:
 	sbc	hl,hl
 	inc.s	bc
+.loop:
 	lea	ytransfer.next,xendpoint.first
 .continue:
 	ld	ytransfer,(ytransfer.next)
-.loop:
 	ld	a,(ytransfer.next)
 repeat bsr ytransfer.next.dummy+1
 	rrca
@@ -3144,6 +3144,11 @@ end virtual
 ;  hl = ? | error
 ;  iy = ?
 _FlushEndpoint.loop:
+virtual
+	nop
+	load .nop: $-$$ from $$
+end virtual
+assert .nop = 0
 	xor	a,a
 	sbc	hl,hl
 	call	_RetireTransfer
@@ -3202,7 +3207,7 @@ assert endpoint.overlay.altNext+2 = endpoint.overlay.status-2
 ;  de = ?
 ;  hl = 0 | error
 ;  ix = endpoint (maybe just freed)
-;  iy = (ignored | next) transfer
+;  iy = ignored transfer | ?
 _RetireTransfer:
 	bitmsk	xendpoint.internalFlags.refCnt
 	setmsk	xendpoint.internalFlags.refCnt
