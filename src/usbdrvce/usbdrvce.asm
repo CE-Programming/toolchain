@@ -212,7 +212,13 @@ struct endpoint			; endpoint structure
 	?type		:= 3 shl 0
  end namespace
 	flags		rb 1	; endpoint flags
+ namespace flags
+	autoTerm	:= 1 shl 0
+ end namespace
 	internalFlags	rb 1	; internal endpoint flags
+ namespace internalFlags
+	po2Mps		:= 1 shl 0
+ end namespace
 	interval	rb 1	; transfer po2 interval
 	device		rl 1	; pointer to device
 	first		rl 1	; pointer to first scheduled transfer
@@ -223,7 +229,7 @@ struct device			; device structure
 	label .: 32
 	endpoints	rl 1	; pointer to array of endpoints
 	find		rb 1	; find flags
-	refcount	rl 1	; reference count
+	refcnt		rl 1	; reference count
 	hubPorts	rb 1	; number of ports in this hub
 	sibling		rl 1	; next device connected to the same hub
 	speed		rb 1	; device speed shl 4
@@ -446,9 +452,6 @@ end virtual
 ; enum usb_endpoint_flag
 ?MANUAL_TERMINATE				:= 0 shl 0
 ?AUTO_TERMINATE					:= 1 shl 0
-
-; enum usb_internal_endpoint_flag
-?PO2_MPS					:= 1 shl 0
 
 ; enum usb_role
 virtual at 0
@@ -711,12 +714,12 @@ if DEBUG
 end if
 	ret
 .initFreeList:
-	call	_Free64Align256
+	call	_Free64Align256.uninit
 	ld	a,32
 .loop:
 	add	a,32
 	ld	l,a
-	call	nz,_Free32Align32
+	call	nz,_Free32Align32.uninit
 	jq	nz,.loop
 	inc	h
 	djnz	.initFreeList
@@ -841,11 +844,11 @@ usb_RefDevice:
 	dec	l
 	ret	z
 .enter:
-	setmsk	device.refcount,hl
+	setmsk	device.refcnt,hl
 	ld	de,(hl)
 	inc	de
 	ld	(hl),de
-	resmsk	device.refcount,hl
+	resmsk	device.refcnt,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -857,8 +860,8 @@ usb_UnrefDevice:
 	dec	l
 	ret	z
 .enter:
-	setmsk	device.refcount,hl
-.refcount:
+	setmsk	device.refcnt,hl
+.refcnt:
 	ld	de,(hl)
 	ex	de,hl
 	add	hl,de
@@ -866,7 +869,7 @@ usb_UnrefDevice:
 	sbc	hl,de
 	ex	de,hl
 	ld	(hl),de
-	resmsk	device.refcount,hl
+	resmsk	device.refcnt,hl
 	call	z,_Free32Align32
 	ld	de,ti.mpUsbRange
 .returnZero:
@@ -1762,13 +1765,13 @@ _QueueTransfer:
 	sbc	hl,bc
 	jq	c,.notEnd
 	sbc	hl,hl
-	bitmsk	AUTO_TERMINATE,(yendpoint.flags)
+	bitmsk	yendpoint.flags.autoTerm
 .notEnd:
 	add	hl,bc
 	jq	z,.last
 	ld	de,(yendpoint.maxPktLen)
 	ex.s	de,hl
-	bitmsk	PO2_MPS,(yendpoint.internalFlags)
+	bitmsk	yendpoint.internalFlags.po2Mps
 	jq	nz,.modPo2
 	ld	a,h
 	and	a,7
@@ -2215,6 +2218,7 @@ iterate <size,align>, 32,32, 64,256
 ; Input:
 ;  hl = allocated memory to be freed.
 _Free#size#Align#align:
+.uninit:
 	push	de
 if DEBUG
 	ld	de,(alloc#size#Align#align)
@@ -2364,8 +2368,8 @@ _DeviceDisconnected:
 	ld	hl,(xdevice.endpoints+1)
 	ld	(xdevice.endpoints+1),xdevice
 	call	_Free32Align32
-	lea	hl,xdevice.refcount+1
-	jq	usb_UnrefDevice.refcount
+	lea	hl,xdevice.refcnt+1
+	jq	usb_UnrefDevice.refcnt
 
 ; Input:
 ;  b = interval
@@ -2379,7 +2383,7 @@ _DeviceDisconnected:
 ;  hl = ?
 ;  iy = ?
 _ScheduleEndpoint:
-label .enabled at $
+label .enabled
 virtual
 	scf
 	ret
@@ -2635,7 +2639,7 @@ end iterate
 	and	a,(hl)
 	or	a,c
 	jq	nz,.notPo2Mps
-assert PO2_MPS = 1 shl 0
+assert endpoint.internalFlags.po2Mps = 1 shl 0
 	inc	(yendpoint.internalFlags)
 .notPo2Mps:
 	pop	bc
@@ -4161,7 +4165,7 @@ assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	ld	(ydevice.addr),b;0
 	ld	(ydevice.data),bc;0
 	inc	c;1
-	ld	(ydevice.refcount),bc;1
+	ld	(ydevice.refcnt),bc;1
 	ld	(ydevice.child),c;1
 	ld	(ydevice.sibling),c;1
 	ld	hl,ti.mpUsbPortStsCtrl
