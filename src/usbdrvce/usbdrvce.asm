@@ -218,6 +218,8 @@ struct endpoint			; endpoint structure
 	internalFlags	rb 1	; internal endpoint flags
  namespace internalFlags
 	po2Mps		:= 1 shl 0
+	refCnt		:= 1 shl 1
+	freed		:= 1 shl 2
  end namespace
 	interval	rb 1	; transfer po2 interval
 	device		rl 1	; pointer to device
@@ -1331,6 +1333,8 @@ end iterate
 	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_STALLED
 	lea	xendpoint,yendpoint
 	call	_FlushEndpoint
+	ret	c
+.pop2return:
 	pop	bc,ix
 	ret
 
@@ -2295,7 +2299,7 @@ assert IS_DISABLED = 1
 	pop	xdevice,bc
 	ret	nz
 .start:
-	push	bc,xdevice
+	push	xdevice,bc
 	ld	de,(xdevice.endpoints+1)
 	ld	xdevice,(xdevice.child+1)
 	ld	hl,.recursed
@@ -2319,7 +2323,7 @@ assert IS_DISABLED = 1
 	push	de
 	call	_FlushEndpoint
 	pop	de
-	jq	nz,_DispatchTransferCallback.pop2return
+	jq	nc,usb_ClearEndpointHalt.pop2return
 	lea	hl,xendpoint.next
 	ld	h,(xendpoint.prev)
 	ld	yendpoint,(xendpoint.next)
@@ -2335,7 +2339,7 @@ assert IS_DISABLED = 1
 	ld	a,e
 	and	a,31
 	jq	nz,.loop
-	pop	xdevice,af
+	pop	af,xdevice
 	ld	hl,ti.mpUsbRange
 	lea	de,xdevice+1
 assert IS_DISABLED = 1 shl 0
@@ -3035,7 +3039,7 @@ end repeat
 ;  bc = ?
 ;  de = ?
 ;  hl = ? | error
-;  ix = endpoint
+;  ix = endpoint (maybe just freed)
 ;  iy = ?
 _RetireTransfers:
 	or	a,a
@@ -3078,15 +3082,18 @@ end repeat
 	bitmsk	ytransfer.type.ioc,d
 	jq	z,.continue
 .partial:
-	ld	c,0
-	call	_DispatchTransferCallback
-	dec	hl
-.free:
-	call	_FreeFirstTransfer
-	ld	hl,1
-	add	hl,de
-	jq	c,.loop
-	ret
+virtual
+	nop
+	load .nop: $-$$ from $$
+end virtual
+assert .nop = 0
+	xor	a,a
+	ld	c,a
+	call	_RetireTransfer
+	ret	nc
+	bitmsk	xendpoint.internalFlags.freed
+	jq	z,.loop
+	jq	.dangling
 .halted:
 	ld	a,d
 	and	a,ytransfer.type.cerr
@@ -3096,12 +3103,16 @@ end repeat
 	jq	nz,.noStall
 	inc	c
 .noStall:
-	call	_DispatchTransferCallback
-	add	hl,de
-	scf
-	sbc	hl,de
-	inc	hl
-	jq	nz,_FlushEndpoint.skip
+virtual
+	ret	z
+	load .ret_z: $-$$ from $$
+end virtual
+	ld	a,.ret_z
+	call	_RetireTransfer
+	jq	nz,_FlushEndpoint.check
+	bitmsk	xendpoint.internalFlags.freed
+.dangling:
+	jq	nz,_FlushEndpoint.dangling
 	ld	ytransfer,(xendpoint.first)
 	ld	(xendpoint.overlay.next),ytransfer
 	ld	(xendpoint.overlay.altNext),ytransfer
@@ -3122,36 +3133,36 @@ end repeat
 	ret
 
 ; Input:
-;  bc = status
+;  c = status
+;  bcu = 0
 ;  ix = endpoint
 ; Output:
-;  cf = zf = success
-;  a = ?
+;  cf = success
+;  zf = ? | false
+;  af = ?
 ;  de = ?
-;  hl = 0 | error
+;  hl = ? | error
 ;  iy = ?
+_FlushEndpoint.loop:
+	xor	a,a
+	sbc	hl,hl
+	call	_RetireTransfer
+	ret	nc
+_FlushEndpoint.check:
+	bitmsk	xendpoint.internalFlags.freed
+	jq	nz,_FlushEndpoint.dangling
+	jq	_FlushEndpoint
 _FlushEndpoint:
 	ld	ytransfer,(xendpoint.first)
-	or	a,a
-	sbc	hl,hl
-	jq	.enter
-.loop:
-	call	_DispatchTransferCallback
-.skip:
-	call	_FreeFirstTransfer
-	or	a,a
-	sbc	hl,hl
-	adc	hl,de
-	ret	nz
-.enter:
 	ld	a,(ytransfer.next)
 repeat bsr ytransfer.next.dummy+1
 	rrca
 end repeat
 	jq	nc,.loop
+assert endpoint.overlay.altNext+2 = endpoint.overlay.status-2
+	ld	(xendpoint.overlay.status-2),bc
 	ld	(xendpoint.overlay.next),ytransfer
 	ld	(xendpoint.overlay.altNext),ytransfer
-	ld	(xendpoint.overlay.status),l;0
 	bitmsk	USB_TRANSFER_STALLED,bc
 	ret	z
 	ld	a,(currentRole)
@@ -3168,64 +3179,75 @@ end repeat
 	sbc	hl,hl
 	adc	hl,de
 	ret
+.dangling:
+	bitmsk	xendpoint.internalFlags.refCnt
+	ret	nz
+	lea	yendpoint,xendpoint
+.free:
+	ld	hl,(yendpoint.last)
+	call	_Free32Align32
+	lea	hl,yendpoint.base
+	jq	_Free64Align256
 
 ; Input:
-;  bc = status
+;  a = ignorable smc
+;  c = status
+;  bcu = 0
 ;  hl = transferred
 ;  ix = endpoint
-;  iy = transfer
 ; Output:
+;  zf = ignored
+;  cf = ? | success
 ;  af = ?
 ;  de = ?
-;  hl = error
-;  iy = ?
-_DispatchTransferCallback:
-	ld	de,(ytransfer.data)
-	ld	a,e
-	set	3,a
-	cp	a,e
-	jq	z,_HandleDeviceDescriptor.returnCarry
-	ld	(ytransfer.data),a
-	push	bc
-	ld	b,0
+;  hl = 0 | error
+;  ix = endpoint (maybe just freed)
+;  iy = (ignored | next) transfer
+_RetireTransfer:
+	bitmsk	xendpoint.internalFlags.refCnt
+	setmsk	xendpoint.internalFlags.refCnt
+	ld	de,(xendpoint.first)
+	push	af,de,bc
+	ld	de,(ytransfer.altNext)
+	bit	0,de
+	jq	z,.alt
+	ld	de,(ytransfer.next)
+.alt:
+	ld	(xendpoint.first),de
+	ld	de,(ytransfer.data+0)
 	ld	a,(ytransfer.data+3)
 	xor	a,e
 	and	a,$F
 	xor	a,e
 	ld	e,a
+	ld	b,0
 	push	de,hl,bc,xendpoint
-	ld	hl,(ytransfer.callback)
+	ld	hl,(ytransfer.callback+0)
 	ld	a,(ytransfer.callback+3)
 	xor	a,l
 	and	a,$F
 	xor	a,l
 	ld	l,a
 	call	_DispatchEvent.dispatch
-	pop	bc,bc,bc
-.pop2return:
-	pop	bc,bc
-	ret
-
-; Input:
-;  ix = endpoint
-; Output:
-;  f = ?
-;  zf = false
-;  cf = cf
-;  de = hl
-;  hl = ?
-;  ix = endpoint
-;  iy = next transfer
-_FreeFirstTransfer:
+	pop	bc,bc,bc,bc,bc,ytransfer,af
+	ld	(.smc),a
+	jq	nz,.restored
+	resmsk	xendpoint.internalFlags.refCnt
+.restored:
+	add	hl,de
+	scf
+	sbc	hl,de
+label .smc
+	ret	z
 	ex	de,hl
-	ld	ytransfer,(xendpoint.first)
-.loop:
+.free:
 	lea	hl,ytransfer
 	bitmsk	ytransfer.type.ioc
 	ld	ytransfer,(hl+transfer.next)
 	call	_Free32Align32
-	jq	z,.loop
-	ld	(xendpoint.first),ytransfer
+	jq	z,.free
+	ld	hl,1
+	add	hl,de
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3396,8 +3418,9 @@ assert HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_ENDPOINT-1 = USB_TRANSFER
 	dec	c
 	call	_FlushEndpoint
 	pop	ix,de
-	ret	nz
+	ret	nc
 	ex	de,hl
+	cp	a,a
 	ret
 .notSetFeature:
 	dec	b
@@ -4085,15 +4108,18 @@ _HandleCompletionInt:
 	ld	(hl),a
 usb_PollTransfers:
 	push	ix
-	ld	xendpoint,(dummyHead.next)
+.restart:
+	ld	xendpoint,dummyHead
 .loop:
+	bitmsk	xendpoint.internalFlags.freed
+	jq	nz,.restart
+	ld	xendpoint,(xendpoint.next)
 	or	a,a
 	sbc	hl,hl
 	ld	a,ixh
 	xor	a,dummyHead shr 8 and $FF
 	jq	z,.done
 	call	_RetireTransfers.nc
-	ld	xendpoint,(xendpoint.next)
 	jq	c,.loop
 .done:
 	pop	ix
@@ -4254,10 +4280,9 @@ _HandleAsyncAdvInt:
 	jq	.enter
 .loop:
 	ld	a,(yendpoint.prev)
-	ld	hl,(yendpoint.last)
-	call	_Free32Align32
-	lea	hl,yendpoint.base
-	call	_Free64Align256
+	setmsk	yendpoint.internalFlags.freed
+	bitmsk	yendpoint.internalFlags.refCnt
+	call	z,_FlushEndpoint.free
 .enter:
 	ld	iyh,a
 	inc	a
