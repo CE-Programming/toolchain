@@ -20,6 +20,11 @@ _EZCXX_DECLARE_EXCEPTION(exception);
 #define _EZCXX_EXTEND_EXCEPTION : public exception
 _EZCXX_DECLARE_EXCEPTION(bad_exception);
 
+using terminate_handler = void (*)();
+terminate_handler set_terminate(terminate_handler) noexcept;
+terminate_handler get_terminate() noexcept;
+[[noreturn]] void terminate() noexcept;
+
 } // namespace std
 
 #endif // _EZCXX_EXCEPTION

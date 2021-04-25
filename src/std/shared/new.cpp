@@ -1,4 +1,5 @@
 #include <new>
+
 #include <cstdlib>
 #include <utility>
 
@@ -6,7 +7,11 @@ namespace std {
 
 nothrow_t const nothrow;
 
-[[clang::require_constant_initialization]] static new_handler __new_handler;
+namespace {
+
+[[clang::require_constant_initialization]] new_handler __new_handler;
+
+} // anonymous namespace
 
 new_handler set_new_handler(new_handler handler) noexcept { return exchange(__new_handler, handler); }
 new_handler get_new_handler() noexcept { return __new_handler; }
