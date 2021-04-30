@@ -1,16 +1,8 @@
 #ifndef _STDIO_H
 #define _STDIO_H
 
-#include <stdarg.h>
-#include <format.h>
 #include <cdefs.h>
-
-__BEGIN_DECLS
-
-#ifndef SIZE_T_DEFINED
-#define SIZE_T_DEFINED
-typedef __SIZE_TYPE__ size_t;
-#endif
+#include <stdarg.h>
 
 #ifdef HAS_CUSTOM_FILE
 #include CUSTOM_FILE_FILE
@@ -27,10 +19,6 @@ typedef struct
 #define stderr     ((FILE*)2)
 #endif
 
-#ifndef NULL
-#define NULL ((void*)0)
-#endif
-
 #ifndef EOF
 #define EOF (-1)
 #endif
@@ -44,6 +32,8 @@ typedef struct
 #ifndef SEEK_SET
 #define SEEK_SET  0
 #endif
+
+__BEGIN_DECLS
 
 /* weak user-defined functions */
 char inchar(void);
@@ -93,41 +83,32 @@ int putchar(int character);
 
 int puts(const char *str);
 
-int printf_(const char *__restrict format, ...)
+#ifdef HAS_PRINTF
+int printf(const char *__restrict format, ...)
     __attribute__((format(__printf__, 1, 2)));
 
-int vprintf_(const char *__restrict format, va_list va)
+int vprintf(const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 1, 0)));
 
-int sprintf_(char *__restrict buffer,
-    const char *__restrict format, ...)
-    __attribute__((format(__printf__, 2, 3)));
-
-int vsprintf_(char *__restrict buffer, const char *__restrict format,
+int vsprintf(char *__restrict buffer, const char *__restrict format,
     va_list va)
     __attribute__((format(__printf__, 1, 0)));
 
-int snprintf_(char* buffer, size_t count, const char *__restrict format, ...)
+int snprintf(char* buffer, size_t count, const char *__restrict format, ...)
     __attribute__((format(__printf__, 3, 4)));
 
-int vsnprintf_(char* buffer, size_t count, const char *__restrict format,
+int vsnprintf(char* buffer, size_t count, const char *__restrict format,
     va_list va)
     __attribute__((format(__printf__, 3, 0)));
-
-#ifdef HAS_PRINTF
-#define printf printf_
-#define vprintf vprintf_
-#define sprintf sprintf_
-#define vsprintf vsprintf_
-#define snprintf snprintf_
-#define vsnprintf vsnprintf_
 #else
+#define sprintf __sprintf
+#endif /* HAS_PRINTF */
+
 /* This function is embedded in the OS, but only supports a subset of printf */
 int sprintf(char *__restrict buffer,
     const char *__restrict format, ...)
     __attribute__ ((format (__printf__, 2, 3)));
-#endif
 
 __END_DECLS
 
-#endif
+#endif /* _STDIO_H */

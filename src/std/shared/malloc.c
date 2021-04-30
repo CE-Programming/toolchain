@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 HEADER _alloc_base;                /* empty list to get started    */
-extern void *_s_sbrk(size_t);
+extern void *sbrk(size_t);
 
 /*************************************************
 *
@@ -38,7 +38,7 @@ extern void *_s_sbrk(size_t);
 static void* morecore(size_t nbytes)
 {
     register void *cp;
-    if ((cp = _s_sbrk(nbytes)))
+    if ((cp = sbrk(nbytes)))
     {
         ((HEADER*)cp)->s.size=nbytes;
         cp = ((HEADER*)cp) + 1;

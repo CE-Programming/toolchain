@@ -5,11 +5,6 @@
 
 __BEGIN_DECLS
 
-#ifndef SIZE_T_DEFINED
-#define SIZE_T_DEFINED
-typedef __SIZE_TYPE__ size_t;
-#endif
-
 extern void *memcpy(void *__restrict dest, const void *__restrict src,
                     size_t n) __attribute__((nonnull(1, 2)));
 

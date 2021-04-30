@@ -7,12 +7,35 @@
 #pragma GCC system_header
 
 namespace std {
-
-using ::abort;
-
+using ::calloc;
 using ::malloc;
+using ::realloc;
 using ::free;
 
+using ::atof;
+using ::atoi;
+using ::atol;
+using ::strtof;
+using ::strtod;
+using ::strtol;
+using ::strtoul;
+
+using ::srand;
+using ::rand;
+
+using ::bsearch;
+using ::qsort;
+
+using ::abort;
+using ::atexit;
+using ::on_exit;
+using ::exit;
+using ::_Exit;
+
+using ::abs;
+using ::labs;
+using ::div;
+using ::ldiv;
 } // namespace std
 
 #endif // _EZCXX_CSTDLIB

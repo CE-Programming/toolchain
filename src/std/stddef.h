@@ -1,18 +1,10 @@
 #ifndef _STDDEF_H
 #define _STDDEF_H
 
-#ifndef __cplusplus
-# define NULL ((void *)0)
-#else /* __cplusplus */
-# define NULL 0
-#endif /* __cplusplus */
+#include <cdefs.h>
 
 #define offsetof(type, member) __builtin_offsetof(type, member)
 
-#ifndef SIZE_T_DEFINED
-#define SIZE_T_DEFINED
-typedef __SIZE_TYPE__ size_t;
-#endif
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
 
 #ifndef _WCHAR_T_DEFINED

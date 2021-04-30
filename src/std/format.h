@@ -33,13 +33,13 @@ extern "C" {
 #define FMT_FLAG_PLUS	0x02
 #define FMT_FLAG_SPACE	0x04
 #define FMT_FLAG_POUND	0x08
-#define FMT_FLAG_IGNORE 0x10    // scanf only.
-#define FMT_FLAG_PRECISION 0x10 // Only needed for %s, as 0 is valid precision
-#define FMT_FLAG_UPPERCASE 0x20	// Added. <THH>
+#define FMT_FLAG_IGNORE 0x10    /* scanf only. */
+#define FMT_FLAG_PRECISION 0x10 /* Only needed for %s, as 0 is valid precision */
+#define FMT_FLAG_UPPERCASE 0x20	/* Added. <THH> */
 #define FMT_FLAG_PAD_ZERO 0x40
-#define FMT_FLAG_STRIP	0x80	// Output only. <THH>
-#define FMT_FLAG_SET	0x80	// Input only; maybe not needed if
-				// set_begin != 0 is used instead. <THH>
+#define FMT_FLAG_STRIP	0x80	/* Output only. <THH> */
+#define FMT_FLAG_SET	0x80	/* Input only; maybe not needed if */
+				/* set_begin != 0 is used instead. <THH> */
 
 /*	structures and defines for format routines	                 */
 /*      NOTE: Some fields in this structure, and the bits in flags, are  */
@@ -79,7 +79,7 @@ struct flt_info {
 extern struct fmt_type __print_fmt;
 extern char __print_buff[];
 extern unsigned char __print_len;
-extern char __print_leading_char;  // Initial +, -, or space for number
+extern char __print_leading_char;  /* Initial +, -, or space for number */
 extern void __print_send();
 
 extern void _u_stoa(short);

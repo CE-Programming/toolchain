@@ -1,50 +1,27 @@
-; (c) Copyright 2001-2008 Zilog, Inc.
-;-------------------------------------------------------------------------
-; Heap allocation routine s_sbrk
-; Input:
-;                 argument : 24 bit - number of bytes requested
-;
-; Output:
-;       Result:   HL:	 24 bit address of memory allocated 
-;		         HL = 0 if no memory available
-;		        
-; Registers Used:
-;       
-;-------------------------------------------------------------------------
-	assume	adl=1
-
-	public	__s_sbrk
-__s_sbrk:
-	ld	hl,3
-	add	hl,sp
-	ld	hl,(hl)	;nbytes
+	public	_sbrk
+_sbrk:
+	pop	de
+	ex	(sp),hl
+	push	de
 	ld	de,(__sbrkbase)
 	add	hl,de
-	jr	c,_fail
-	
-        ; fail  if hl >= sp.
-        ; hl is now, or will be, the next un-allocated address = minimal value
-        ; for sp that will not corrupt allocated data or that writing to
-        ; allocated data may corrupt the stack.
-        ; Actually, if hl is anywhere close to sp we're probably in trouble :(
-	
-        push    hl
-        sbc     hl,sp
-        pop     hl
-	jr	nc,_fail
-_ok:
-	ex	hl,de
-	ld	(__sbrkbase),de
+	jq	c,.fail
+	ld	bc,not ___heaptop
+	add	hl,bc
+	jq	c,.fail
+	sbc	hl,bc
+	ld	(__sbrkbase),hl
+	ex	de,hl
 	ret
-_fail:
+.fail:
 	or	a,a
 	sbc	hl,hl
 	ret
 
-	extern	__heapbot
-	extern	__heaptop
-
 	section	.data
         private	__sbrkbase
 __sbrkbase:
-	dl	__heapbot
+	dl	___heapbot
+
+	extern	___heapbot
+	extern	___heaptop

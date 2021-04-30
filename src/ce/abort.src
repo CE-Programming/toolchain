@@ -1,7 +1,0 @@
-	assume	adl=1
-
-	public	_abort
-_abort:
-	jp	__exit
-
-	extern	__exit

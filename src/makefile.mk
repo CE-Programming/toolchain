@@ -23,7 +23,7 @@ DESCRIPTION ?=
 COMPRESSED ?= NO
 ARCHIVED ?= NO
 BSSHEAP_LOW ?= D052C6
-BSSHEAP_HIGH ?= D13FD6
+BSSHEAP_HIGH ?= D13FD8
 STACK_HIGH ?= D1A87E
 INIT_LOC ?= D1A87F
 OUTPUT_MAP ?= NO
@@ -50,12 +50,11 @@ space := $(empty) $(empty)
 comma := ,
 
 # configure defaults
-DEBUGMODE = NDEBUG
-CCDEBUG = -g0
-LDDEBUG = 0
-LDSTATIC = 0
-DEFPRINTF =
-DEFCUSTOMFILE =
+DEBUGMODE := NDEBUG
+CCDEBUG := -g0
+LDDEBUG := 0
+LDSTATIC := 0
+LDCLEANUP := 0
 
 # verbosity
 V ?= 0
@@ -65,12 +64,12 @@ else
 Q =
 endif
 
+BIN ?= $(CEDEV)/bin
 # get the os specific items
 ifeq ($(OS),Windows_NT)
 SHELL := cmd.exe
 NATIVEPATH = $(subst /,\,$1)
-BIN ?= $(call NATIVEPATH,$(CEDEV)/bin)
-FASMLD := $(call NATIVEPATH,$(BIN)/fasmg.exe)
+FASMGLD := $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN := $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG := $(call NATIVEPATH,$(BIN)/convimg.exe)
 EZCC := $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
@@ -80,11 +79,10 @@ NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG = "$(subst ",',$1)"#'
 else
 NATIVEPATH = $(subst \,/,$1)
-BIN ?= $(call NATIVEPATH,$(CEDEV)/bin)
-FASMLD := fasmg
-CONVBIN := convbin
-CONVIMG := convimg
-EZCC := ez80-clang
+FASMGLD := $(call NATIVEPATH,$(BIN)/fasmg)
+CONVBIN := $(call NATIVEPATH,$(BIN)/convbin)
+CONVIMG := $(call NATIVEPATH,$(BIN)/convimg)
+EZCC := $(call NATIVEPATH,$(BIN)/ez80-clang)
 RM = rm -f $1
 RMDIR = rm -rf $1
 NATIVEMKDR = mkdir -p $1
@@ -137,20 +135,18 @@ ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call
 else
 ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm
 endif
-LDREQUIRE += -i $(call QUOTE_ARG,require ___icon)
 LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 else
 ifneq ($(DESCRIPTION),)
 ICONSRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.src)
 ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
-LDREQUIRE += -i $(call QUOTE_ARG,require ___description)
 LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 endif
 endif
 
 # check if default cleanup code should be added
 ifeq ($(HAS_CLEANUP),YES)
-LDREQUIRE += -i $(call QUOTE_ARG,require __cleanup)
+LDCLEANUP := -i $(call QUOTE_ARG,precious .cleanup)
 endif
 
 # check if gfx directory exists
@@ -194,12 +190,12 @@ endif
 
 # define the c/c++ flags used by clang
 EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -I$(SRCDIR) -Dinterrupt="__attribute__((__interrupt__))"
-EZCFLAGS += -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(DEFCUSTOMFILE) $(CCDEBUG)
-EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-rtti $(CXXFLAGS)
+EZCFLAGS += -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(DEFCUSTOMFILE) $(CCDEBUG)
+EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
 
 # these are the fasmg linker flags
-FASMFLAGS = \
+FASMGFLAGS = \
 	-n \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
@@ -208,8 +204,7 @@ FASMFLAGS = \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
-	$(LDREQUIRE) \
-	$(LDMAPFLAG) \
+	$(LDCLEANUP) $(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
 	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LDLIBS))) \
 	$(LDFLAGS)
@@ -230,7 +225,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
 $(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONSRC) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [linking] $(call NATIVEPATH,$@)
-	$(Q)$(FASMLD) $(FASMFLAGS) $(call NATIVEPATH,$@)
+	$(Q)$(FASMGLD) $(FASMGFLAGS) $(call NATIVEPATH,$@)
 
 ifneq ($(ICONSRC),)
 $(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)

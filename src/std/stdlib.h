@@ -3,15 +3,6 @@
 
 #include <cdefs.h>
 
-__BEGIN_DECLS
-
-#ifndef _WCHAR_T_DEFINED
-#define _WCHAR_T_DEFINED
-#ifndef __cplusplus
-typedef __WCHAR_TYPE__ wchar_t;
-#endif
-#endif
-
 typedef struct {
   int quot;
   int rem;
@@ -37,17 +28,11 @@ typedef union header _HEADER;
 
 #define RAND_MAX 8388607
 
-#ifndef SIZE_T_DEFINED
-#define SIZE_T_DEFINED
-typedef unsigned int size_t;
-#endif
 #define HEADER _HEADER
 #define allocp _allocp
 #define NALLOC 50
 
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
+__BEGIN_DECLS
 
 void *calloc(size_t nmemb, size_t size) __attribute__((malloc));
 
@@ -68,9 +53,6 @@ float strtof(const char *__restrict nptr,
 
 double strtod(const char *__restrict nptr,
               char **__restrict endptr) __attribute__((nonnull(1)));
-
-float strtof(const char *__restrict nptr,
-             char **__restrict endptr) __attribute__((nonnull(1)));
 
 long strtol(const char *__restrict nptr,
             char **__restrict endptr, int base) __attribute__((nonnull(1)));
@@ -93,7 +75,13 @@ void qsort(void *base, size_t nmemb, size_t size,
 
 void abort(void) __attribute__((noreturn));
 
-void exit(int status) __attribute__((noreturn));
+int atexit(void (*)(void));
+
+int on_exit(void (*)(int, void *), void *);
+
+void exit(int) __attribute__((noreturn));
+
+void _Exit(int) __attribute__((noreturn));
 
 int abs(int j);
 

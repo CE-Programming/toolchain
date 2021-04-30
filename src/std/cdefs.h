@@ -21,4 +21,17 @@
 # define __IGNORE(expr) (static_cast<void>(expr))
 #endif /* __cplusplus */
 
+#ifndef NULL
+# ifndef __cplusplus
+#  define NULL ((void *)0)
+# else /* __cplusplus */
+#  define NULL 0
+# endif /* __cplusplus */
+#endif /* NULL */
+
+#ifndef SIZE_T_DEFINED
+#define SIZE_T_DEFINED
+typedef __SIZE_TYPE__ size_t;
+#endif /* SIZE_T_DEFINED */
+
 #endif /* _CDEFS_H */
