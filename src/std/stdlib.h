@@ -40,7 +40,7 @@ void *malloc(size_t size) __attribute__((malloc));
 
 void *realloc(void *ptr, size_t size) __attribute__((warn_unused_result));
 
-void free (void *ptr);
+void free(void *ptr) __NOEXCEPT;
 
 double atof(const char *nptr) __attribute__((nonnull(1)));
 
@@ -73,15 +73,19 @@ void qsort(void *base, size_t nmemb, size_t size,
            int (*compar)(const void *, const void *))
            __attribute__((nonnull(1, 4)));
 
-void abort(void) __attribute__((noreturn));
+void abort(void) __NOEXCEPT __attribute__((noreturn));
 
-int atexit(void (*)(void));
+int atexit(void (*)(void)) __NOEXCEPT;
 
-int on_exit(void (*)(int, void *), void *);
+int on_exit(void (*)(int, void *), void *) __NOEXCEPT;
 
-void exit(int) __attribute__((noreturn));
+void exit(int) __NOEXCEPT __attribute__((noreturn));
 
-void _Exit(int) __attribute__((noreturn));
+int at_quick_exit(void (*)(void)) __NOEXCEPT;
+
+void quick_exit(int) __NOEXCEPT __attribute__((noreturn));
+
+void _Exit(int) __NOEXCEPT __attribute__((noreturn));
 
 int abs(int j);
 

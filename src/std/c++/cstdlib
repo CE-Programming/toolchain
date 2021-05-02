@@ -30,6 +30,8 @@ using ::abort;
 using ::atexit;
 using ::on_exit;
 using ::exit;
+using ::at_quick_exit;
+using ::quick_exit;
 using ::_Exit;
 
 using ::abs;
