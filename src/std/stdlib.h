@@ -97,4 +97,4 @@ ldiv_t ldiv(long numer, long denom);
 
 __END_DECLS
 
-#endif
+#endif /* _STDLIB_H */

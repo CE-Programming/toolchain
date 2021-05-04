@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <exception>
 
-#pragma GCC system_header
+#pragma clang system_header
 
 namespace std {
 

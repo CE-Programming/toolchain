@@ -4,7 +4,7 @@
 
 #include <__config>
 
-#pragma GCC system_header
+#pragma clang system_header
 
 namespace std {
 

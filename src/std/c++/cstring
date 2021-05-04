@@ -1,0 +1,38 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CSTRING
+#define _EZCXX_CSTRING
+
+#include <string.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::size_t;
+
+using ::memcpy;
+using ::memmove;
+using ::memset;
+using ::memcmp;
+using ::memchr;
+using ::strcpy;
+using ::strncpy;
+using ::strcat;
+using ::strncat;
+using ::strchr;
+using ::strrchr;
+using ::strpbrk;
+using ::strstr;
+using ::strtok;
+using ::strdup;
+using ::strndup;
+using ::strcspn;
+using ::strspn;
+using ::strlen;
+using ::strnlen;
+using ::strcmp;
+using ::strncmp;
+using ::strcasecmp;
+using ::strncasecmp;
+} // namespace std
+
+#endif // _EZCXX_CSTRING

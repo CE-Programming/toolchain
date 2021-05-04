@@ -1,0 +1,26 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CCTYPE
+#define _EZCXX_CCTYPE
+
+#include <ctype.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::isalnum;
+using ::isalpha;
+using ::iscntrl;
+using ::isdigit;
+using ::isgraph;
+using ::islower;
+using ::isprint;
+using ::ispunct;
+using ::isspace;
+using ::isupper;
+using ::tolower;
+using ::toupper;
+using ::isascii;
+using ::isxdigit;
+} // namespace std
+
+#endif // _EZCXX_CCTYPE

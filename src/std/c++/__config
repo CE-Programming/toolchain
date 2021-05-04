@@ -2,7 +2,7 @@
 #ifndef _EZCXX_CONFIG
 #define _EZCXX_CONFIG
 
-#pragma GCC system_header
+#pragma clang system_header
 
 #define _EZCXX_INLINE [[__gnu__::__visibility__("hidden"), __gnu__::__always_inline__]] inline
 

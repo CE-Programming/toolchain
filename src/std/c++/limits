@@ -2,7 +2,7 @@
 #ifndef _EZCXX_LIMITS
 #define _EZCXX_LIMITS
 
-#pragma GCC system_header
+#pragma clang system_header
 
 namespace std {
 

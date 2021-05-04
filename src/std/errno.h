@@ -1,5 +1,5 @@
-#ifndef ERRNO_H
-#define ERRNO_H
+#ifndef _ERRNO_H
+#define _ERRNO_H
 
 #define EPERM       1   /* permission error */
 #define EINVAL      2   /* invalid argument */
@@ -9,4 +9,4 @@
 
 extern int errno;
 
-#endif
+#endif /* _ERRNO_H */

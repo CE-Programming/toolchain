@@ -1,0 +1,477 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CMATH
+#define _EZCXX_CMATH
+
+#include <math.h>
+#include <type_traits>
+
+#pragma clang system_header
+
+namespace std {
+using ::acos;
+using ::acosf;
+using ::acosl;
+inline constexpr float acos(float __x) { return acosf(__x); }
+inline constexpr long double acos(long double __x) { return acosl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+acos(_Tp __x) { return acos(__x); }
+
+using ::acos;
+using ::acoshf;
+using ::acoshl;
+inline constexpr float acosh(float __x) { return acoshf(__x); }
+inline constexpr long double acosh(long double __x) { return acoshl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+acosh(_Tp __x) { return acosh(__x); }
+
+using ::asin;
+using ::asinf;
+using ::asinl;
+inline constexpr float asin(float __x) { return asinf(__x); }
+inline constexpr long double asin(long double __x) { return asinl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+asin(_Tp __x) { return asin(__x); }
+
+using ::asinh;
+using ::asinhf;
+using ::asinhl;
+inline constexpr float asinh(float __x) { return asinhf(__x); }
+inline constexpr long double asinh(long double __x) { return asinhl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+asinh(_Tp __x) { return asinh(__x); }
+
+using ::atan;
+using ::atanf;
+using ::atanl;
+inline constexpr float atan(float __x) { return atanf(__x); }
+inline constexpr long double atan(long double __x) { return atanl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+atan(_Tp __x) { return atan(__x); }
+
+using ::atan2;
+using ::atan2f;
+using ::atan2l;
+inline constexpr float atan2(float __x, float __y) { return atan2f(__x, __y); }
+inline constexpr long double atan2(long double __x, long double __y) { return atan2l(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+atan2(_Tp __x, _Up __y) { return atan2(__x, __y); }
+
+using ::atanh;
+using ::atanhf;
+using ::atanhl;
+inline constexpr float atanh(float __x) { return atanhf(__x); }
+inline constexpr long double atanh(long double __x) { return atanhl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+atanh(_Tp __x) { return atanh(__x); }
+
+using ::cbrt;
+using ::cbrtf;
+using ::cbrtl;
+inline constexpr float cbrt(float __x) { return cbrtf(__x); }
+inline constexpr long double cbrt(long double __x) { return cbrtl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+cbrt(_Tp __x) { return cbrt(__x); }
+
+using ::ceil;
+using ::ceilf;
+using ::ceill;
+inline constexpr float ceil(float __x) { return ceilf(__x); }
+inline constexpr long double ceil(long double __x) { return ceill(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+ceil(_Tp __x) { return ceil(__x); }
+
+using ::copysign;
+using ::copysignf;
+using ::copysignl;
+inline constexpr float copysign(float __x, float __y) { return copysignf(__x, __y); }
+inline constexpr long double copysign(long double __x, long double __y) { return copysignl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+copysign(_Tp __x, _Up __y) { return copysign(__x, __y); }
+
+using ::cos;
+using ::cosf;
+using ::cosl;
+inline constexpr float cos(float __x) { return cosf(__x); }
+inline constexpr long double cos(long double __x) { return cosl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+cos(_Tp __x) { return cos(__x); }
+
+using ::cosh;
+using ::coshf;
+using ::coshl;
+inline constexpr float cosh(float __x) { return coshf(__x); }
+inline constexpr long double cosh(long double __x) { return coshl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+cosh(_Tp __x) { return cosh(__x); }
+
+using ::erf;
+using ::erff;
+using ::erfl;
+inline constexpr float erf(float __x) { return erff(__x); }
+inline constexpr long double erf(long double __x) { return erfl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+erf(_Tp __x) { return erf(__x); }
+
+using ::erfc;
+using ::erfcf;
+using ::erfcl;
+inline constexpr float erfc(float __x) { return erfcf(__x); }
+inline constexpr long double erfc(long double __x) { return erfcl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+erfc(_Tp __x) { return erfc(__x); }
+
+using ::exp;
+using ::expf;
+using ::expl;
+inline constexpr float exp(float __x) { return expf(__x); }
+inline constexpr long double exp(long double __x) { return expl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+exp(_Tp __x) { return exp(__x); }
+
+using ::exp2;
+using ::exp2f;
+using ::exp2l;
+inline constexpr float exp2(float __x) { return exp2f(__x); }
+inline constexpr long double exp2(long double __x) { return exp2l(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+exp2(_Tp __x) { return exp2(__x); }
+
+using ::expm1;
+using ::expm1f;
+using ::expm1l;
+inline constexpr float expm1(float __x) { return expm1f(__x); }
+inline constexpr long double expm1(long double __x) { return expm1l(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+expm1(_Tp __x) { return expm1(__x); }
+
+using ::fabs;
+using ::fabsf;
+using ::fabsl;
+inline constexpr float fabs(float __x) { return fabsf(__x); }
+inline constexpr long double fabs(long double __x) { return fabsl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+fabs(_Tp __x) { return fabs(__x); }
+
+using ::fdim;
+using ::fdimf;
+using ::fdiml;
+inline constexpr float fdim(float __x, float __y) { return fdimf(__x, __y); }
+inline constexpr long double fdim(long double __x, long double __y) { return fdiml(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+fdim(_Tp __x, _Up __y) { return fdim(__x, __y); }
+
+using ::floor;
+using ::floorf;
+using ::floorl;
+inline constexpr float floor(float __x) { return floorf(__x); }
+inline constexpr long double floor(long double __x) { return floorl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+floor(_Tp __x) { return floor(__x); }
+
+using ::fma;
+using ::fmaf;
+using ::fmal;
+inline constexpr float fma(float __x, float __y, float __z) { return fmaf(__x, __y, __z); }
+inline constexpr long double fma(long double __x, long double __y, long double __z) { return fmal(__x, __y, __z); }
+template<typename _Tp, typename _Up, typename _Vp> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                                is_integral_v<_Up> &&
+                                                                                is_integral_v<_Vp>, double>
+fma(_Tp __x, _Up __y, _Vp __z) { return fma(__x, __y, __z); }
+
+using ::fmax;
+using ::fmaxf;
+using ::fmaxl;
+inline constexpr float fmax(float __x, float __y) { return fmaxf(__x, __y); }
+inline constexpr long double fmax(long double __x, long double __y) { return fmaxl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+fmax(_Tp __x, _Up __y) { return fmax(__x, __y); }
+
+using ::fmin;
+using ::fminf;
+using ::fminl;
+inline constexpr float fmin(float __x, float __y) { return fminf(__x, __y); }
+inline constexpr long double fmin(long double __x, long double __y) { return fminl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+fmin(_Tp __x, _Up __y) { return fmin(__x, __y); }
+
+using ::fmod;
+using ::fmodf;
+using ::fmodl;
+inline constexpr float fmod(float __x, float __y) { return fmodf(__x, __y); }
+inline constexpr long double fmod(long double __x, long double __y) { return fmodl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+fmod(_Tp __x, _Up __y) { return fmod(__x, __y); }
+
+using ::frexp;
+using ::frexpf;
+using ::frexpl;
+inline constexpr float frexp(float __x, int *__y) { return frexpf(__x, __y); }
+inline constexpr long double frexp(long double __x, int *__y) { return frexpl(__x, __y); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+frexp(_Tp __x, int *__y) { return frexp(__x, __y); }
+
+using ::hypot;
+using ::hypotf;
+using ::hypotl;
+inline constexpr float hypot(float __x, float __y) { return hypotf(__x, __y); }
+inline constexpr long double hypot(long double __x, long double __y) { return hypotl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+hypot(_Tp __x, _Up __y) { return hypot(__x, __y); }
+
+using ::ilogb;
+using ::ilogbf;
+using ::ilogbl;
+inline constexpr int ilogb(float __x) { return ilogbf(__x); }
+inline constexpr int ilogb(long double __x) { return ilogbl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, int>
+ilogb(_Tp __x) { return ilogb(__x); }
+
+using ::ldexp;
+using ::ldexpf;
+using ::ldexpl;
+inline constexpr float ldexp(float __x, int __y) { return ldexpf(__x, __y); }
+inline constexpr long double ldexp(long double __x, int __y) { return ldexpl(__x, __y); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+ldexp(_Tp __x, int __y) { return ldexp(__x, __y); }
+
+using ::lgamma;
+using ::lgammaf;
+using ::lgammal;
+inline constexpr float lgamma(float __x) { return lgammaf(__x); }
+inline constexpr long double lgamma(long double __x) { return lgammal(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+lgamma(_Tp __x) { return lgamma(__x); }
+
+using ::llrint;
+using ::llrintf;
+using ::llrintl;
+inline constexpr long long llrint(float __x) { return llrintf(__x); }
+inline constexpr long long llrint(long double __x) { return llrintl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, long long>
+llrint(_Tp __x) { return llrint(__x); }
+
+using ::llround;
+using ::llroundf;
+using ::llroundl;
+inline constexpr long long llround(float __x) { return llroundf(__x); }
+inline constexpr long long llround(long double __x) { return llroundl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, long long>
+llround(_Tp __x) { return llround(__x); }
+
+using ::log;
+using ::logf;
+using ::logl;
+inline constexpr float log(float __x) { return logf(__x); }
+inline constexpr long double log(long double __x) { return logl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+log(_Tp __x) { return log(__x); }
+
+using ::log10;
+using ::log10f;
+using ::log10l;
+inline constexpr float log10(float __x) { return log10f(__x); }
+inline constexpr long double log10(long double __x) { return log10l(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+log10(_Tp __x) { return log10(__x); }
+
+using ::log1p;
+using ::log1pf;
+using ::log1pl;
+inline constexpr float log1p(float __x) { return log1pf(__x); }
+inline constexpr long double log1p(long double __x) { return log1pl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+log1p(_Tp __x) { return log1p(__x); }
+
+using ::log2;
+using ::log2f;
+using ::log2l;
+inline constexpr float log2(float __x) { return log2f(__x); }
+inline constexpr long double log2(long double __x) { return log2l(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+log2(_Tp __x) { return log2(__x); }
+
+using ::logb;
+using ::logbf;
+using ::logbl;
+inline constexpr float logb(float __x) { return logbf(__x); }
+inline constexpr long double logb(long double __x) { return logbl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+logb(_Tp __x) { return logb(__x); }
+
+using ::lrint;
+using ::lrintf;
+using ::lrintl;
+inline constexpr long lrint(float __x) { return lrintf(__x); }
+inline constexpr long lrint(long double __x) { return lrintl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, long>
+lrint(_Tp __x) { return lrint(__x); }
+
+using ::lround;
+using ::lroundf;
+using ::lroundl;
+inline constexpr long lround(float __x) { return lroundf(__x); }
+inline constexpr long lround(long double __x) { return lroundl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, long>
+lround(_Tp __x) { return lround(__x); }
+
+using ::modf;
+using ::modff;
+using ::modfl;
+inline constexpr float modf(float __x, float *__y) { return modff(__x, __y); }
+inline constexpr long double modf(long double __x, long double *__y) { return modfl(__x, __y); }
+
+using ::nanf;
+using ::nan;
+using ::nanl;
+
+using ::nearbyint;
+using ::nearbyintf;
+using ::nearbyintl;
+inline constexpr float nearbyint(float __x) { return nearbyintf(__x); }
+inline constexpr long double nearbyint(long double __x) { return nearbyintl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+nearbyint(_Tp __x) { return nearbyint(__x); }
+
+using ::nextafter;
+using ::nextafterf;
+using ::nextafterl;
+inline constexpr float nextafter(float __x, float __y) { return nextafterf(__x, __y); }
+inline constexpr long double nextafter(long double __x, long double __y) { return nextafterl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+nextafter(_Tp __x, _Up __y) { return nextafter(__x, __y); }
+
+using ::nexttoward;
+using ::nexttowardf;
+using ::nexttowardl;
+inline constexpr float nexttoward(float __x, float __y) { return nexttowardf(__x, __y); }
+inline constexpr long double nexttoward(long double __x, long double __y) { return nexttowardl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+nexttoward(_Tp __x, _Up __y) { return nexttoward(__x, __y); }
+
+using ::pow;
+using ::powf;
+using ::powl;
+inline constexpr float pow(float __x, float __y) { return powf(__x, __y); }
+inline constexpr long double pow(long double __x, long double __y) { return powl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+pow(_Tp __x, _Up __y) { return pow(__x, __y); }
+
+using ::remainder;
+using ::remainderf;
+using ::remainderl;
+inline constexpr float remainder(float __x, float __y) { return remainderf(__x, __y); }
+inline constexpr long double remainder(long double __x, long double __y) { return remainderl(__x, __y); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+remainder(_Tp __x, _Up __y) { return remainder(__x, __y); }
+
+using ::remquo;
+using ::remquof;
+using ::remquol;
+inline constexpr float remquo(float __x, float __y, int *__z) { return remquof(__x, __y, __z); }
+inline constexpr long double remquo(long double __x, long double __y, int *__z) { return remquol(__x, __y, __z); }
+template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
+                                                                  is_integral_v<_Up>, double>
+remquo(_Tp __x, _Up __y, int *__z) { return remquo(__x, __y, __z); }
+
+using ::rint;
+using ::rintf;
+using ::rintl;
+inline constexpr float rint(float __x) { return rintf(__x); }
+inline constexpr long double rint(long double __x) { return rintl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+rint(_Tp __x) { return rint(__x); }
+
+using ::round;
+using ::roundf;
+using ::roundl;
+inline constexpr float round(float __x) { return roundf(__x); }
+inline constexpr long double round(long double __x) { return roundl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+round(_Tp __x) { return round(__x); }
+
+using ::scalbln;
+using ::scalblnf;
+using ::scalblnl;
+inline constexpr float scalbln(float __x, long __y) { return scalblnf(__x, __y); }
+inline constexpr long double scalbln(long double __x, long __y) { return scalblnl(__x, __y); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+scalbln(_Tp __x, long __y) { return scalbln(__x, __y); }
+
+using ::scalbn;
+using ::scalbnf;
+using ::scalbnl;
+inline constexpr float scalbn(float __x, int __y) { return scalbnf(__x, __y); }
+inline constexpr long double scalbn(long double __x, int __y) { return scalbnl(__x, __y); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+scalbn(_Tp __x, int __y) { return scalbn(__x, __y); }
+
+using ::sin;
+using ::sinf;
+using ::sinl;
+inline constexpr float sin(float __x) { return sinf(__x); }
+inline constexpr long double sin(long double __x) { return sinl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+sin(_Tp __x) { return sin(__x); }
+
+using ::sinh;
+using ::sinhf;
+using ::sinhl;
+inline constexpr float sinh(float __x) { return sinhf(__x); }
+inline constexpr long double sinh(long double __x) { return sinhl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+sinh(_Tp __x) { return sinh(__x); }
+
+using ::sqrt;
+using ::sqrtf;
+using ::sqrtl;
+inline constexpr float sqrt(float __x) { return sqrtf(__x); }
+inline constexpr long double sqrt(long double __x) { return sqrtl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+sqrt(_Tp __x) { return sqrt(__x); }
+
+using ::tan;
+using ::tanf;
+using ::tanl;
+inline constexpr float tan(float __x) { return tanf(__x); }
+inline constexpr long double tan(long double __x) { return tanl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+tan(_Tp __x) { return tan(__x); }
+
+using ::tanh;
+using ::tanhf;
+using ::tanhl;
+inline constexpr float tanh(float __x) { return tanhf(__x); }
+inline constexpr long double tanh(long double __x) { return tanhl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+tanh(_Tp __x) { return tanh(__x); }
+
+using ::tgamma;
+using ::tgammaf;
+using ::tgammal;
+inline constexpr float tgamma(float __x) { return tgammaf(__x); }
+inline constexpr long double tgamma(long double __x) { return tgammal(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+tgamma(_Tp __x) { return tgamma(__x); }
+
+using ::trunc;
+using ::truncf;
+using ::truncl;
+inline constexpr float trunc(float __x) { return truncf(__x); }
+inline constexpr long double trunc(long double __x) { return truncl(__x); }
+template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+trunc(_Tp __x) { return trunc(__x); }
+
+} // namespace std
+
+#endif // _EZCXX_CMATH

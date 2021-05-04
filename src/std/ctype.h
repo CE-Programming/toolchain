@@ -1,12 +1,9 @@
-#ifndef CTYPE_H
-#define CTYPE_H
+#ifndef _CTYPE_H
+#define _CTYPE_H
 
 #include <cdefs.h>
 
 __BEGIN_DECLS
-
-#define TRUE  1
-#define FALSE 0
 
 int isalnum(int c);
 
@@ -38,4 +35,4 @@ int isxdigit(int c);
 
 __END_DECLS
 
-#endif
+#endif /* _CTYPE_H */

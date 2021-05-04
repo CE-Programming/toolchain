@@ -2,4 +2,4 @@
 
 #include <assert.h>
 
-#pragma GCC system_header
+#pragma clang system_header

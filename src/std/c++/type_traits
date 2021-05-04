@@ -2,7 +2,7 @@
 #ifndef _EZCXX_TYPE_TRAITS
 #define _EZCXX_TYPE_TRAITS
 
-#pragma GCC system_header
+#pragma clang system_header
 
 #include <__config>
 #include <cstddef>

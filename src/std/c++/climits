@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CLIMITS
+#define _EZCXX_CLIMITS
+
+#include <climits>
+
+#pragma clang system_header
+
+#endif // _EZCXX_CLIMITS

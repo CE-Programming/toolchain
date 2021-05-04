@@ -2,7 +2,7 @@
 #ifndef _EZCXX_INITIALIZER_LIST
 #define _EZCXX_INITIALIZER_LIST
 
-#pragma GCC system_header
+#pragma clang system_header
 
 #include <__config>
 #include <cstddef>

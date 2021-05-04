@@ -1,4 +1,4 @@
-#include "typeinfo.h"
+#include "cxxabi.h"
 
 #include "abort_message.h"
 
@@ -10,21 +10,11 @@ type_info::~type_info() {}
 
 namespace __cxxabiv1 {
 
-__fundamental_type_info::~__fundamental_type_info() {}
-__array_type_info::~__array_type_info() {}
-__function_type_info::~__function_type_info() {}
-__enum_type_info::~__enum_type_info() {}
-__class_type_info::~__class_type_info() {}
-__si_class_type_info::~__si_class_type_info() {}
-__vmi_class_type_info::~__vmi_class_type_info() {}
-__pointer_type_info::~__pointer_type_info() {}
-__pointer_to_member_type_info::~__pointer_to_member_type_info() {}
-
 struct __dynamic_cast_info {
     const void *static_pointer;
     const __class_type_info *static_type;
     const __class_type_info *target_type;
-    ptrdiff_t offset;
+    std::ptrdiff_t offset;
     const void *down_cast_target_pointer;
     const void *side_cast_target_pointer;
     bool public_target_to_static : 1;
@@ -36,6 +26,17 @@ struct __dynamic_cast_info {
     bool found_a_static_type : 1;
     bool done : 1;
 };
+
+__fundamental_type_info::~__fundamental_type_info() {}
+__array_type_info::~__array_type_info() {}
+__function_type_info::~__function_type_info() {}
+__enum_type_info::~__enum_type_info() {}
+__class_type_info::~__class_type_info() {}
+__si_class_type_info::~__si_class_type_info() {}
+__vmi_class_type_info::~__vmi_class_type_info() {}
+__pbase_type_info::~__pbase_type_info() {}
+__pointer_type_info::~__pointer_type_info() {}
+__pointer_to_member_type_info::~__pointer_to_member_type_info() {}
 
 void *__dynamic_cast(const void *static_pointer,
                      const __class_type_info *static_type,
@@ -66,11 +67,11 @@ void *__dynamic_cast(const void *static_pointer,
     const __class_type_info *dynamic_type = vtable->type;
     if (*dynamic_type == *target_type) {
         info.single_target_type = true;
-        dynamic_type->search_above_target(&info, dynamic_pointer, dynamic_pointer, true);
+        dynamic_type->__search_above_target(&info, dynamic_pointer, dynamic_pointer, true);
         if (info.public_target_to_static)
             target_pointer = dynamic_pointer;
     } else {
-        dynamic_type->search_below_target(&info, dynamic_pointer, true);
+        dynamic_type->__search_below_target(&info, dynamic_pointer, true);
         if (!info.down_cast_target_pointer) {
             if (info.side_cast_target_pointer != &info &&
                 info.public_dynamic_to_static && info.public_dynamic_to_target)
@@ -86,11 +87,11 @@ void *__dynamic_cast(const void *static_pointer,
     return const_cast<void *>(target_pointer);
 }
 
-void __class_type_info::search_above_target(
+void __class_type_info::__search_above_target(
         __dynamic_cast_info *info,
         const void *target_pointer,
         const void *current_pointer,
-        bool public_below) const {
+        bool public_below) const noexcept {
     if (*this != *info->static_type)
         return;
     info->found_a_static_type = true;
@@ -109,10 +110,10 @@ void __class_type_info::search_above_target(
     info->done |= info->single_target_type && info->public_target_to_static;
 }
 
-void __class_type_info::search_below_target(
+void __class_type_info::__search_below_target(
         __dynamic_cast_info *info,
         const void *current_pointer,
-        bool public_below) const {
+        bool public_below) const noexcept {
     if (*this == *info->static_type) {
         if (current_pointer == info->static_pointer)
             info->public_dynamic_to_static |= public_below;
@@ -130,24 +131,24 @@ void __class_type_info::search_below_target(
     }
 }
 
-void __si_class_type_info::search_above_target(
+void __si_class_type_info::__search_above_target(
         __dynamic_cast_info *info,
         const void *target_pointer,
         const void *current_pointer,
-        bool public_below) const {
+        bool public_below) const noexcept {
     if (*this == *info->static_type)
-        return __class_type_info::search_above_target(info, target_pointer, current_pointer, public_below);
-    __base_type->search_above_target(info, target_pointer, current_pointer, public_below);
+        return __class_type_info::__search_above_target(info, target_pointer, current_pointer, public_below);
+    __base_type->__search_above_target(info, target_pointer, current_pointer, public_below);
 }
 
-void __si_class_type_info::search_below_target(
+void __si_class_type_info::__search_below_target(
         __dynamic_cast_info *info,
         const void *current_pointer,
-        bool public_below) const {
+        bool public_below) const noexcept {
     if (*this == *info->static_type)
-        return __class_type_info::search_below_target(info, current_pointer, public_below);
+        return __class_type_info::__search_below_target(info, current_pointer, public_below);
     if (*this != *info->target_type)
-        return __base_type->search_below_target(info, current_pointer, public_below);
+        return __base_type->__search_below_target(info, current_pointer, public_below);
     if (current_pointer == info->down_cast_target_pointer ||
         current_pointer == info->side_cast_target_pointer) {
         info->public_dynamic_to_target |= public_below;
@@ -158,7 +159,7 @@ void __si_class_type_info::search_below_target(
     if (!info->target_not_derived_from_static) {
         info->found_static_pointer = false;
         info->found_a_static_type = false;
-        __base_type->search_above_target(info, current_pointer, current_pointer, true);
+        __base_type->__search_above_target(info, current_pointer, current_pointer, true);
         info->target_not_derived_from_static = !info->found_a_static_type;
         same_target_static_pointers = info->found_static_pointer && info->found_a_static_type;
     }
@@ -169,13 +170,13 @@ void __si_class_type_info::search_below_target(
     }
 }
 
-void __vmi_class_type_info::search_above_target(
+void __vmi_class_type_info::__search_above_target(
         __dynamic_cast_info *info,
         const void *target_pointer,
         const void *current_pointer,
-        bool public_below) const {
+        bool public_below) const noexcept {
     if (*this == *info->static_type)
-        return __class_type_info::search_above_target(info, target_pointer, current_pointer, public_below);
+        return __class_type_info::__search_above_target(info, target_pointer, current_pointer, public_below);
     bool found_static_pointer = info->found_static_pointer;
     bool found_a_static_type = info->found_a_static_type;
     std::size_t count = __base_count;
@@ -183,7 +184,7 @@ void __vmi_class_type_info::search_above_target(
     while (true) {
         info->found_static_pointer = false;
         info->found_a_static_type = false;
-        current_base++->search_above_target(info, target_pointer, current_pointer, public_below);
+        current_base++->__search_above_target(info, target_pointer, current_pointer, public_below);
         found_static_pointer |= info->found_static_pointer;
         found_a_static_type |= info->found_a_static_type;
         if (info->done || !--count)
@@ -200,27 +201,27 @@ void __vmi_class_type_info::search_above_target(
     info->found_a_static_type = found_a_static_type;
 }
 
-void __vmi_class_type_info::search_below_target(
+void __vmi_class_type_info::__search_below_target(
         __dynamic_cast_info *info,
         const void *current_pointer,
-        bool public_below) const {
+        bool public_below) const noexcept {
     if (*this == *info->static_type)
-        return __class_type_info::search_below_target(info, current_pointer, public_below);
+        return __class_type_info::__search_below_target(info, current_pointer, public_below);
     std::size_t count = __base_count;
     const __base_class_type_info *current_base = __base_info;
     if (*this != *info->target_type) {
         if (__flags & __diamond_shaped_mask || info->down_cast_target_pointer)
             do
-                current_base++->search_below_target(info, current_pointer, public_below);
+                current_base++->__search_below_target(info, current_pointer, public_below);
             while (!info->done && --count);
         else if (__flags & __non_diamond_repeat_mask)
             do
-                current_base++->search_below_target(info, current_pointer, public_below);
+                current_base++->__search_below_target(info, current_pointer, public_below);
             while (!info->done && --count &&
                    !(info->public_target_to_static && info->down_cast_target_pointer));
         else
             do
-                current_base++->search_below_target(info, current_pointer, public_below);
+                current_base++->__search_below_target(info, current_pointer, public_below);
             while (!info->done && --count && !info->down_cast_target_pointer);
         return;
     }
@@ -236,7 +237,7 @@ void __vmi_class_type_info::search_below_target(
         do {
             info->found_static_pointer = false;
             info->found_a_static_type = false;
-            current_base++->search_above_target(info, current_pointer, current_pointer, true);
+            current_base++->__search_above_target(info, current_pointer, current_pointer, true);
             if (info->done)
                 break;
             if (info->found_a_static_type) {
@@ -258,27 +259,27 @@ void __vmi_class_type_info::search_below_target(
     }
 }
 
-const void *__base_class_type_info::adjust_current_pointer(
-        const void *current_pointer) const {
+const void *__base_class_type_info::__adjust_current_pointer(
+        const void *current_pointer) const noexcept {
     return static_cast<const char *>(current_pointer) +
         (__offset_flags & __virtual_mask ? *reinterpret_cast<const std::ptrdiff_t *>(
-                *static_cast<const char *const *>(current_pointer) + __offset) : __offset);
+                *static_cast<const char *const *>(current_pointer) + __offset()) : __offset());
 }
 
-void __base_class_type_info::search_above_target(
+void __base_class_type_info::__search_above_target(
         __dynamic_cast_info *info,
         const void *target_pointer,
         const void *current_pointer,
-        bool public_below) const {
-    __base_type->search_above_target(info, target_pointer, adjust_current_pointer(current_pointer),
+        bool public_below) const noexcept {
+    __base_type->__search_above_target(info, target_pointer, __adjust_current_pointer(current_pointer),
                                      public_below && __offset_flags & __public_mask);
 }
 
-void __base_class_type_info::search_below_target(
+void __base_class_type_info::__search_below_target(
         __dynamic_cast_info *info,
         const void *current_pointer,
-        bool public_below) const {
-    __base_type->search_below_target(info, adjust_current_pointer(current_pointer),
+        bool public_below) const noexcept {
+    __base_type->__search_below_target(info, __adjust_current_pointer(current_pointer),
                                      public_below && __offset_flags & __public_mask);
 }
 
