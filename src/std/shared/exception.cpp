@@ -18,7 +18,7 @@ DEFINE_EXCEPTION(bad_alloc)
 namespace {
 
 [[noreturn]] void default_terminate_handler() {
-    abort_message("terminating");
+    __abort_message("terminating");
 }
 [[clang::require_constant_initialization]] terminate_handler __terminate_handler = default_terminate_handler;
 
@@ -34,13 +34,13 @@ void terminate() noexcept {
 #if __has_feature(cxx_exceptions)
     try {
 #endif
-        get_terminate()();
+        set_terminate(nullptr)();
 #if __has_feature(cxx_exceptions)
     } catch(...) {
-        abort_message("terminate_handler unexpectedly threw an exception");
+        __abort_message("terminate_handler unexpectedly threw an exception");
     }
 #endif
-    abort_message("terminate_handler unexpectedly returned");
+    __abort_message("terminate_handler unexpectedly returned");
 }
 
 } // namespace std

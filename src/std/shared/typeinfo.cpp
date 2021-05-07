@@ -284,19 +284,11 @@ void __base_class_type_info::__search_below_target(
 }
 
 void __cxa_bad_cast() {
-#if __has_feature(cxx_exceptions)
-    throw std::bad_cast();
-#else
-    abort_message("std::bad_cast");
-#endif
+    _EZCXX_MAYBE_THROW(std::bad_cast);
 }
 
 void __cxa_bad_typeid() {
-#if __has_feature(cxx_exceptions)
-    throw std::bad_typeid();
-#else
-    abort_message("std::bad_typeid");
-#endif
+    _EZCXX_MAYBE_THROW(std::bad_typeid);
 }
 
 } // namespace __cxxabiv1
