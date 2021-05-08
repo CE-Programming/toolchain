@@ -1,4 +1,5 @@
 @echo off
+title CE Toolchain
 rem Check if we're running Windows 10 or newer.
 rem Early versions of Windows 10 didn't support ANSI, but since MS is very aggressive
 rem about forcing updates, they're probably not likely to appear.
