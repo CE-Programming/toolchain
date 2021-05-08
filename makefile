@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2021
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,11 @@ include $(CURDIR)/src/common.mk
 LIBS := libload graphx fontlibc keypadc fileioc
 
 ifeq ($(OS),Windows_NT)
-RELEASE_CMD := ISCC.exe /Orelease /DAPP_VERSION=$(CEDEV_VERSION) /DDIST_PATH=$(INSTALL_DIR) tools\installer\installer.iss
-COPY_MAKE := $(call COPY,tools\make\make.exe,$(INSTALL_BIN))
+RELEASE_CMD :=  cd $(INSTALL_PATH)\ && tar.exe -acf $(CURDIR)/release/$(RELEASE_NAME).zip $(CEDEV_DIR)
+WINDOWS_COPY := $(call COPY,tools\windows\make.exe,$(INSTALL_BIN)) && $(call COPY,tools\windows\cedev.bat,$(INSTALL_DIR))
 else
-RELEASE_CMD := cd $(INSTALL_PATH) && zip -r $(CURDIR)/release/$(RELEASE_NAME).zip $(CEDEV_DIR)
-COPY_MAKE :=
+RELEASE_CMD := cd $(INSTALL_PATH) && zip -r9 $(CURDIR)/release/$(RELEASE_NAME).zip $(CEDEV_DIR)
+WINDOWS_COPY :=
 endif
 
 LIB_DIR = $(call NATIVEPATH,src/$1)
@@ -65,7 +65,7 @@ install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convfont/convfont),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convimg/bin/convimg),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convbin/bin/convbin),$(INSTALL_BIN))
-	$(Q)$(COPY_MAKE)
+	$(Q)$(WINDOWS_COPY)
 
 $(addprefix install-,$(LIBS)):
 	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)

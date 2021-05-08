@@ -109,12 +109,6 @@ jobs:
         with:
           name: clibs
           path: ${{env.AUTOTESTER_LIBS_GROUP}}
-      - name: Upload Windows Installer
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v2
-        with:
-          name: installer-${{runner.os}}
-          path: ${{env.TOOLCHAIN_PATH}}/release/CEdev${{matrix.exe}}
 
   test:
     needs: build
@@ -123,12 +117,6 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [ubuntu, macos, windows]
-        installer: [CEdev, installer]
-        exclude:
-          - runs-on: ubuntu
-            installer: installer
-          - runs-on: macos
-            installer: installer
         include:
           - runs-on: windows
             env: "env:"
@@ -140,11 +128,8 @@ jobs:
       - name: Download CEdev
         uses: actions/download-artifact@v2
         with:
-          name: ${{matrix.installer}}-${{runner.os}}
+          name: CEdev-${{runner.os}}
           path: ${{env.CEDEV}}
-      - name: Install CEdev
-        if: matrix.installer == 'installer'
-        run: ${{env.CEDEV}}/CEdev.exe /DIR=${{env.CEDEV}} /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
