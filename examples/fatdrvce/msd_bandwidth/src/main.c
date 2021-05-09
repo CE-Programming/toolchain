@@ -60,7 +60,7 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 int main(void)
 {
     static uint8_t msd_user_buffer[MSD_USER_BUFFER_SIZE];
-    static uint8_t msd_buffer[MSD_SECTOR_SIZE * NUM_SECTORS_PER_ACCESS];
+    static uint8_t msd_buffer[MSD_BLOCK_SIZE * NUM_SECTORS_PER_ACCESS];
     static char buffer[200];
     static global_t global;
     uint32_t sector_size;
@@ -117,71 +117,6 @@ int main(void)
     }
 
     putstr("detected drive");
-
-    // get sector number and size
-    msderr = msd_Info(&global.msd, &sector_num, &sector_size);
-    if (msderr != MSD_SUCCESS)
-    {
-        putstr("error getting msd info");
-        msd_Close(&global.msd);
-        goto error;
-    }
-
-    // print msd sector number and size
-    sprintf(buffer, "sector size: %u", (uint24_t)sector_size);
-    putstr(buffer);
-    sprintf(buffer, "num sectors: %u", (uint24_t)sector_num);
-    putstr(buffer);
-    putstr("executing speed test");
-    putstr("please wait...");
-
-    timer_Disable(1);
-    timer_Set(1, 0);
-    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_UP);
-
-    for (i = 0; i < NUM_ACCESSES; ++i)
-    {
-        msderr = msd_WriteSectors(&global.msd,
-                                  i * NUM_SECTORS_PER_ACCESS,
-                                  NUM_SECTORS_PER_ACCESS,
-                                  msd_buffer);
-        if (msderr != MSD_SUCCESS)
-        {
-            putstr("error writing to msd");
-            msd_Close(&global.msd);
-            goto error;
-        }
-    }
-
-    elapsed = (float)timer_GetSafe(1, TIMER_UP) / 32768.0;
-    bps = (MSD_SECTOR_SIZE * NUM_SECTORS_PER_ACCESS * NUM_ACCESSES) / elapsed;
-
-    sprintf(buffer, "write bytes/sec: %f", bps);
-    putstr(buffer);
-
-    timer_Disable(1);
-    timer_Set(1, 0);
-    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_UP);
-
-    for (i = 0; i < NUM_ACCESSES; ++i)
-    {
-        msderr = msd_ReadSectors(&global.msd,
-                                 i * NUM_SECTORS_PER_ACCESS,
-                                 NUM_SECTORS_PER_ACCESS,
-                                 msd_buffer);
-        if (msderr != MSD_SUCCESS)
-        {
-            putstr("error writing to msd");
-            msd_Close(&global.msd);
-            goto error;
-        }
-    }
-
-    elapsed = (float)timer_GetSafe(1, TIMER_UP) / 32768.0;
-    bps = (MSD_SECTOR_SIZE * NUM_SECTORS_PER_ACCESS * NUM_ACCESSES) / elapsed;
-
-    sprintf(buffer, "read bytes/sec: %f", bps);
-    putstr(buffer);
 
     // close the msd device
     msd_Close(&global.msd);

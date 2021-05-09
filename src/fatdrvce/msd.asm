@@ -175,19 +175,213 @@ end virtual
 ; Initialize a Mass Storage Device.
 ; args:
 ;  sp + 3  : msd device structure
-;  sp + 6  : usb device to initialize as msd
+;  sp + 6  : usb device structure
+;  sp + 9  : user buffer storage
 ; return:
 ;  hl = error status
 msd_Open:
+	ld	iy,0
+	add	iy,sp
+	push	iy
+	ld	bc,.descriptor_length	; storage for size of descriptor
+	push	bc
+	ld	bc,18			; size of device descriptor
+	push	bc
+	ld	hl,(iy + 9)		; storage for descriptor (user buffer)
+	push	hl
+	or	a,a
+	sbc	hl,hl
+	push	hl
+	inc	hl			; USB_DEVICE_DESCRIPTOR = 1
+	push	hl
+	ld	hl,(iy + 6)
+	push	hl
+	call	usb_GetDescriptor
+	pop	bc,bc,bc,bc,bc,bc
+	pop	iy
+	compare_hl_zero
+	ret	nz			; return if error
+	ld	de,18
+	ld	hl,0
+.descriptor_length := $-3
+	compare_hl_de			; ensure enough bytes were fetched
+	jq	nz,.msddeverror
+	ld	hl,(iy + 9)
+	ld	de,17
+	add	hl,de
+	ld	a,(hl)
+	ld	(.num_interfaces),a	; get the number of interfaces
+	xor	a,a
+	ld	(.configindex),a	; set starting index
+	jq	.getconfigcheck
+.getconfiguration:			; bc = index
+	push	iy
+	ld	c,0
+.configindex := $ - 1
+	push	bc
+	ld	bc,(iy + 6)		; usb device
+	push	bc
+	call	usb_GetConfigurationDescriptorTotalLength
+	pop	bc
+	pop	bc
+	pop	iy
+	push	iy
+	ld	bc,.config_length	; storage for length of descriptor
+	push	bc
+	push	hl			; length of configuration descriptor
+	ld	bc,(iy + 9)		; storage for configuration descriptor
+	push	bc
+	ld	hl,.configindex
+	ld	c,(hl)
+	push	bc			; configuration index
+	inc	(hl)
+	ld	bc,2			; USB_CONFIGURATION_DESCRIPTOR
+	push	bc
+	ld	bc,(iy + 6)		; usb device
+	push	bc
+	call	usb_GetDescriptor
+	pop	bc,bc,bc,bc,bc,bc
+	pop	iy
+	compare_hl_zero
+	ret	nz			; ensure success
+
+	; parse the configuration here for interfaces / endpoints for msd
+	; just grab the first bulk endpoints for a valid msd interface
+
+	xor	a,a
+	ld	(.interfacenumber),a
+	ld	(.bulkinaddr),a
+	ld	(.bulkoutaddr),a
+	ld	hl,0
+.config_length := $-3
+	ld	(.configlengthend),hl
+	ld	hl,(iy + 9)
+	ld	(.configptr),hl
+	push	iy
+.parseinterfaces:
+	ld	hl,(.configlengthend)
+	ld	de,2			; check for end of configuration
+	compare_hl_de
+	jq	c,.parsedone		; todo: check if bLength > remaining?
+	ld	iy,(.configptr)
+	ld	a,(ydescriptor.bDescriptorType)
+	cp	a,INTERFACE_DESCRIPTOR
+	jq	z,.parseinterface
+	cp	a,ENDPOINT_DESCRIPTOR
+	jq	z,.parseendpoint
+	jq	.parsenext
+.parseinterface:
+	ld	a,(yinterfaceDescriptor.bInterfaceClass)
+	cp	a,$08
+	jr	nz,.parsenext
+	ld	a,(yinterfaceDescriptor.bInterfaceSubClass)
+	cp	a,$06
+	jr	nz,.parsenext
+	ld	a,(yinterfaceDescriptor.bInterfaceProtocol)
+	cp	a,$50
+	jr	nz,.parsenext
+	ld	a,(yinterfaceDescriptor.bInterfaceNumber)
+	inc	a
+	ld	(.interfacenumber),a
+	jq	.parsenext
+.parseendpoint:
+	ld	a,0			; mark as valid
+.interfacenumber := $ - 1
+	or	a,a
+	jq	z,.parsenext
+	ld	a,(yendpointDescriptor.bmAttributes)
+	cp	a,BULK_TRANSFER
+	jq	nz,.parsenext
+	ld	a,(yendpointDescriptor.bEndpointAddress)
+	ld	b,a
+	and	a,DEVICE_TO_HOST
+	ld	a,b
+	jr	z,.parseoutendpointout
+.parseoutendpointin:
+	ld	(.bulkinaddr),a
+	jq	.parsenext
+.parseoutendpointout:
+	ld	(.bulkoutaddr),a
+.parsenext:
+	ld	de,0
+	ld	e,(ydescriptor.bLength)
+	ld	hl,0
+.configlengthend := $ - 3
+	or	a,a
+	sbc	hl,de
+	ld	(.configlengthend),hl
+	jq	z,.parsedone
+	ld	hl,0
+.configptr := $ - 3
+	add	hl,de
+	ld	(.configptr),hl		; move to next interface
+	jq	.parseinterfaces
+
+.parsedone:
+	pop	iy
+	ld	a,0
+.bulkinaddr := $ - 1
+	or	a,a
+	jq	z,.getconfigcheck	; no endpoints for msd, keep parsing
+	ld	a,0
+.bulkoutaddr := $ - 1
+	or	a,a
+	jq	z,.getconfigcheck	; no endpoints for msd, keep parsing
+
+	ld	de,(iy + 9)
+	ld	bc,(iy + 6)
+	ld	iy,(iy + 3)		; setup msd structure with endpoints and buffer
+	ld	(ymsdDevice.buffer),de
+	ld	(ymsdDevice.dev),bc
+	ld	a,(.bulkoutaddr)
+	ld	(ymsdDevice.bulkoutaddr),a
+	ld	a,(.bulkinaddr)
+	ld	(ymsdDevice.bulkinaddr),a
+	ld	a,(.configindex)
+	dec	a
+	ld	(ymsdDevice.configindex),a
+	ld	a,(.interfacenumber)
+	dec	a
+	ld	(ymsdDevice.interface),a
+
+	push	bc			; holds the usbdrvce device
+	call	usb_RefDevice		; prevent random crashes if the user messes up
+	pop	bc
+
+	; successfully found bulk endpoints for msd
+	; now reset the msd device
+
+	ld	hl,0
+	ret
+
+.getconfigcheck:
+	ld	a,(.configindex)
+	cp	a,0
+.num_interfaces := $-1
+	jq	nz,.getconfiguration
+.msddeverror:
+	ld	hl,MSD_ERROR_INVALID_DEVICE
 	ret
 
 ;-------------------------------------------------------------------------------
 msd_Close:
-; Closes and deinitializes a Mass Storage Device.
+; Closes and deinitializes the MSD structures.
 ; args:
 ;  sp + 3  : msd device structure
 ; return:
 ;  hl = error status
+	pop	hl
+	ex	(sp),iy
+	push	hl,iy
+	ld	hl,(ymsdDevice.dev)
+	push	hl
+	call	usb_UnrefDevice
+	pop	de,de
+	add	hl,de
+	ld	(hl),0
+	inc	de
+	ld	bc,sizeof msdDevice - 1
+	ldir
 	ret
 
 ;-------------------------------------------------------------------------------

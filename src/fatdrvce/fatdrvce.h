@@ -46,8 +46,8 @@ typedef struct msd_transfer_t {
     uint32_t lba; /**< Logical block address */
     void *buffer; /**< Pointer to data location to read/write */
     uint8_t count; /**< Number of blocks to transfer */
-    msd_transfer_t *next; /**< Next MSD transfer */
-    void (*callback)(msd_transfer_t *); /**< Called on last MSD transfer */
+    struct msd_transfer_t *next; /**< Next MSD transfer */
+    void (*callback)(struct msd_transfer_t *); /**< Called on last transfer */
     void *userptr; /**< Custom user data for callback (optional) */
 } msd_transfer_t;
 
