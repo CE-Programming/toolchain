@@ -145,6 +145,10 @@ struct msdDevice
 	blocksize rl 1
 	interface rb 1
 	maxlun rb 1
+	scsi_packet rl 1
+	scsi_buffer rl 1
+	scsi_offset rl 1
+	scsi_done rb 1
 	buffer rl 1
 	size := $-.
 end struct
@@ -332,6 +336,9 @@ msd_Open:
 	ld	bc,(iy + 6)
 	ld	iy,(iy + 3)		; setup msd structure with endpoints and buffer
 	ld	(ymsdDevice.buffer),de
+	ld	hl,1024
+	add	hl,de
+	ld	(ymsdDevice.scsi_offset),hl
 	ld	(ymsdDevice.dev),bc
 	ld	a,(.bulkoutaddr)
 	ld	(ymsdDevice.bulkoutaddr),a
@@ -351,8 +358,7 @@ msd_Open:
 	; successfully found bulk endpoints for msd
 	; now reset the msd device
 
-	ld	hl,0
-	ret
+	jq	msd_Reset.enter
 
 .getconfigcheck:
 	ld	a,(.configindex)
@@ -391,7 +397,68 @@ msd_Close:
 ; return:
 ;  hl = error status
 msd_Reset:
+	pop	de,iy
+	push	iy,de
+.enter:
+	ld	hl,(ymsdDevice.dev)	; check if non-zero msd device
+	compare_hl_zero
+	jq	z,.invalidparam
+	push	iy
+	ld	bc,0
+	ld	c,(ymsdDevice.configindex)
+	push	bc
+	ld	bc,(ymsdDevice.dev)	; usb device
+	push	bc
+	call	usb_GetConfigurationDescriptorTotalLength
+	pop	bc,bc
+	pop	iy
+	compare_hl_zero
+	jq	z,.usberror
+	push	iy
+	ld	bc,.length		; storage for length of descriptor
+	push	bc
+	push	hl			; length of configuration descriptor
+	ld	bc,(ymsdDevice.buffer)
+	push	bc
+	ld	bc,0
+	ld	c,(ymsdDevice.configindex)
+	push	bc			; configuration index
+	ld	bc,2			; USB_CONFIGURATION_DESCRIPTOR
+	push	bc
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_GetDescriptor
+	pop	bc,bc,bc,bc,bc,bc
+	pop	iy
+	compare_hl_zero
+	ret	nz			; ensure success
+	push	iy
+	ld	bc,0
+.length := $-3
+	push	bc
+	ld	bc,(ymsdDevice.buffer)
+	push	bc
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_SetConfiguration
+	pop	bc,bc,bc
+	pop	iy
+	compare_hl_zero
+	jq	z,.configuredmsd
+.invalidparam:
+	ld	hl,MSD_ERROR_INVALID_PARAM
 	ret
+.usberror:
+	ld	hl,MSD_ERROR_USB_FAILED
+	ret
+.configuredmsd:
+	call	util_msd_reset
+	compare_hl_zero
+	ret	nz
+	call	util_msd_get_max_lun
+	compare_hl_zero
+	ret	nz
+	jq	scsi_init		; return success if init scsi
 
 ;-------------------------------------------------------------------------------
 ; Gets the number of and size of each block (sector) on the device.
@@ -425,6 +492,184 @@ msd_WriteAsync:
 ;-------------------------------------------------------------------------------
 ; utility functions
 ;-------------------------------------------------------------------------------
+
+scsi_init:
+	ld	ix,scsi.inquiry
+	call	scsi_sync_command
+	or	a,a
+	sbc	hl,hl
+	ret
+
+; inputs:
+;  iy : msd struct
+;  ix : cbw structure
+scsi_sync_command:
+	call	scsi_async_cbw
+.wait_done:
+	push	iy
+	call	usb_HandleEvents
+	pop	iy
+	ld	a,(ymsdDevice.scsi_done)
+	or	a,a
+	jq	z,.wait_done
+	ret
+
+; inputs:
+;  iy : msd struct
+;  ix : cbw structure
+scsi_async_cbw:
+	ld	hl,(ymsdDevice.buffer)
+	ld	(ymsdDevice.scsi_buffer),hl
+.buffer:
+	xor	a,a
+	ld	(ymsdDevice.scsi_done),a
+	ld	a,(ymsdDevice.bulkoutaddr)
+	ld	bc,(xpacketCBW.len)
+	sbc	hl,hl
+	adc	hl,bc
+	ld	hl,scsi_async_data
+	jq	nz,.send
+	ld	hl,scsi_async_csw	; if zero length, csw not data
+.send:
+	ld	bc,sizeof packetCBW
+	ld	(ymsdDevice.scsi_packet),ix
+	jq	scsi_async_xfer
+
+; inputs:
+;  sp + 3 : endpoint
+;  sp + 6 : status
+;  sp + 9 : transferred size
+;  sp + 12 : data
+scsi_async_data:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 6)		; verify cbw transfer
+	compare_hl_zero
+	ld	iy,(iy + 12)		; msd struct
+	jq	nz,.cbw_failed
+	push	ix
+	ld	ix,(ymsdDevice.scsi_packet)
+	bit 	0,(xpacketCBW.dir)	; direction (0=in 1=out)
+	ld	a,(ymsdDevice.bulkinaddr)
+	jr	nz,.xfer
+	ld	a,(ymsdDevice.bulkoutaddr)
+.xfer:
+	ld	ix,(ymsdDevice.scsi_buffer)
+	ld	hl,scsi_async_csw
+	call	scsi_async_xfer
+	pop	ix
+	ret
+.cbw_failed:
+	ld	a,-1
+	ld	(ymsdDevice.scsi_done),a
+	ret
+
+scsi_async_csw:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 6)		; verify cbw transfer
+	compare_hl_zero
+	ld	iy,(iy + 12)		; msd struct
+	jq	nz,.data_failed
+	push	ix
+	ld	ix,(ymsdDevice.scsi_offset)
+	ld	a,(ymsdDevice.bulkinaddr)
+	ld	bc,sizeof packetCSW
+	ld	hl,scsi_async_done
+	call	scsi_async_xfer
+	pop	ix
+	ret
+.data_failed:
+	ld	a,-2
+	ld	(ymsdDevice.scsi_done),a
+	ret
+
+scsi_async_done:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 6)		; verify cbw transfer
+	compare_hl_zero
+	ld	iy,(iy + 12)		; msd struct
+	jq	nz,.csw_failed
+	ld	a,1
+	ld	(ymsdDevice.scsi_done),a
+	ld	hl,(ymsdDevice.scsi_buffer)
+	ret
+.csw_failed:
+	ld	a,-3
+	ld	(ymsdDevice.scsi_done),a
+	ret
+
+; inputs:
+;  a  : endpoint
+;  hl : callback
+;  bc : length
+;  ix : buffer
+;  iy : msd struct
+scsi_async_xfer:
+	push	iy
+	push	iy			; msd struct
+	push	hl			; callback
+	push	bc			; length
+	push	ix			; buffer
+	or	a,a
+	sbc	hl,hl			; todo: is this needed
+	ld	l,a			; endpoint
+	push	hl
+	ld	hl,(ymsdDevice.dev)
+	push	hl
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+	push	hl
+	call	usb_ScheduleTransfer
+	pop	bc,bc,bc,bc,bc
+	pop	iy
+	ret
+
+; inputs:
+;  iy : msd structure
+util_msd_reset:
+	xor	a,a
+	sbc	hl,hl
+	ld	(ymsdDevice.tag + 0),hl
+	ld	(ymsdDevice.tag + 3),a	; reset tag
+	ld	a,(ymsdDevice.interface)
+	ld	(setup.msdreset + 4),a
+	ld	hl,setup.msdreset
+	jq	util_msd_ctl_packet
+
+; inputs:
+;  iy : msd structure
+util_msd_get_max_lun:
+	ld	a,(ymsdDevice.interface)
+	ld	(setup.msdmaxlun + 4),a
+	ld	hl,setup.msdmaxlun
+	lea	de,ymsdDevice.maxlun
+	jq	util_msd_ctl_packet
+
+; inputs:
+;  iy : msd structure
+;  hl : packet
+;  de : location to store data to
+util_msd_ctl_packet:
+	push	iy
+	ld	bc,0
+	push	bc			; don't care about transfer size
+	ld	bc,5			; number of retries
+	push	bc
+	push	de			; send data packet
+	push	hl			; send setup packet
+	ld	bc,0
+	push	bc
+	ld	bc,(ymsdDevice.dev)
+	push	bc
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+	push	hl
+	call	usb_ControlTransfer
+	pop	bc,bc,bc,bc,bc
+	pop	iy
+	ret
 
 ;-------------------------------------------------------------------------------
 ; utility data

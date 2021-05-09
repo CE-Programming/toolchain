@@ -38,6 +38,12 @@ typedef struct {
     uint32_t blocksize; /**< Block size */
     uint8_t interface; /**< USB Interface index */
     uint8_t maxlun; /**< Maximum LUNs for MSD */
+    struct scsi {
+        uintptr_t ptr; /**< Internal pointer to scsi packet */
+        uintptr_t data; /**< Internal pointer to scsi data */
+        uintptr_t offset; /**< Internal offset for scsi use */
+	uint8_t done; /**< Internal use for tracking completion */
+    };
     void *buffer; /**< Buffer for internal library use */
 } msd_device_t;
 
