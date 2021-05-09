@@ -16,7 +16,7 @@
 
 include $(CURDIR)/../common.mk
 
-LIB_SRC := fatdrvce.asm fat.asm
+LIB_SRC := fatdrvce.asm
 LIB_LIB := fatdrvce.lib
 LIB_8XV := fatdrvce.8xv
 LIB_H := fatdrvce.h

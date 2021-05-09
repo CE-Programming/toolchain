@@ -59,8 +59,9 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 
 int main(void)
 {
+    static uint8_t msd_user_buffer[MSD_USER_BUFFER_SIZE];
     static uint8_t msd_buffer[MSD_SECTOR_SIZE * NUM_SECTORS_PER_ACCESS];
-    static char buffer[212];
+    static char buffer[200];
     static global_t global;
     uint32_t sector_size;
     uint32_t sector_num;
@@ -108,7 +109,7 @@ int main(void)
     }
 
     // initialize the msd device
-    msderr = msd_Open(&global.msd, global.usb, msd_buffer);
+    msderr = msd_Open(&global.msd, global.usb, msd_user_buffer);
     if (msderr != MSD_SUCCESS)
     {
         putstr("failed opening msd");
