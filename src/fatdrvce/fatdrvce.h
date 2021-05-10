@@ -28,27 +28,27 @@
 extern "C" {
 #endif
 
+#define MSD_BLOCK_SIZE 512 /**< Block size in bytes */
+
 typedef struct {
     usb_device_t dev; /**< USB device */
-    uint8_t bulkinaddr; /**< USB bulk in endpoint address */
-    uint8_t bulkoutaddr; /**< USB bulk out endpoint address */
-    uint8_t configindex; /**< USB config descriptor index */
-    uint24_t tag; /**< MSD Command Block Wrapper next tag */
-    uint32_t lba; /**< Logical Block Address of LUN */
-    uint32_t blocksize; /**< Block size */
+    uint8_t bulkin; /**< USB bulk in endpoint address */
+    uint8_t bulkout; /**< USB bulk out endpoint address */
+    uint8_t config; /**< USB config descriptor index */
     uint8_t interface; /**< USB Interface index */
-    uint8_t maxlun; /**< Maximum LUNs for MSD */
-    struct scsi {
-        uintptr_t ptr; /**< Internal pointer to scsi packet */
-        uintptr_t data; /**< Internal pointer to scsi data */
-        uintptr_t offset; /**< Internal offset for scsi use */
-	uint8_t done; /**< Internal use for tracking completion */
-    };
-    void *buffer; /**< Buffer for internal library use */
-} msd_device_t;
+    uint32_t tag; /**< Internal library use */
+    uint8_t sensecnt; /**< Internal library use */
+    uint8_t done; /**< Internal library use */
+    void *scsibuf; /** Internal library use */
+    uint8_t cbw[31+31]; /**< Internal library use */
+    uint8_t csw[13+31]; /**< Internal library use */
+    uint8_t userbuf[512]; /**< Internal library use */
+    uint8_t sensebuf[512]; /**< Internal library use */
+    uint8_t sectorbuf[576]; /**< Internal library use */
+} msd_t;
 
 typedef struct msd_transfer_t {
-    msd_device_t *dev; /**< Initialized MSD device */
+    msd_t *msd; /**< Initialized MSD device */
     uint32_t lba; /**< Logical block address */
     void *buffer; /**< Pointer to data location to read/write */
     uint8_t count; /**< Number of blocks to transfer */
@@ -61,38 +61,32 @@ typedef enum {
     MSD_SUCCESS = 0, /**< Operation was successful */
     MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
     MSD_ERROR_USB_FAILED, /**< An error occurred in usbdrvce */
+    MSD_ERROR_SCSI_FAILED, /**< An error occurred in scsi transfer */
     MSD_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     MSD_ERROR_INVALID_DEVICE, /**< An invalid usb device was specified */
 } msd_error_t;
 
-#define MSD_BLOCK_SIZE 512 /**< Block size of the device in bytes */
-#define MSD_USER_BUFFER_SIZE 2048 /**< User buffer size in bytes */
-
 /**
  * Initialize a Mass Storage Device.
- * A unique user buffer is needed for internal library use. This buffer must
- * be at least 2048 bytes in size. It should not be the same buffer used
- * by other devices and/or functions.
  * @param msd Uninitilaized MSD device structure.
- * @param dev Initialized USB device structure.
- * @param buffer Pointer to user buffer. (must be at least 2048 bytes)
+ * @param usb Initialized USB device structure.
  * @return MSD_SUCCESS on success, otherwise error.
  */
-msd_error_t msd_Open(msd_device_t *msd, usb_device_t dev, void *buffer);
+msd_error_t msd_Open(msd_t *msd, usb_device_t usb);
 
 /**
  * Closes and deinitializes a Mass Storage Device. This function should be
  * called in the \c USB_DEVICE_DISCONNECTED_EVENT in the USB handler callback.
  * @param msd Initialized MSD device structure.
  */
-void msd_Close(msd_device_t *msd);
+void msd_Close(msd_t *msd);
 
 /**
  * Attempts to reset and restore normal working order of the device.
  * @param msd Initialized MSD device structure.
  * @return MSD_SUCCESS on success, otherwise error.
  */
-msd_error_t msd_Reset(msd_device_t *msd);
+msd_error_t msd_Reset(msd_t *msd);
 
 /**
  * Gets the number of and size of each block (sector) on the device.
@@ -101,7 +95,7 @@ msd_error_t msd_Reset(msd_device_t *msd);
  * @param size Pointer to store sector size to.
  * @return MSD_SUCCESS on success.
  */
-msd_error_t msd_Info(msd_device_t *msd, uint32_t *num, uint32_t *size);
+msd_error_t msd_Info(msd_t *msd, uint32_t *num, uint32_t *size);
 
 /**
  * Asynchronous block read.
