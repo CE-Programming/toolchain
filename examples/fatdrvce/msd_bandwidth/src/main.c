@@ -117,6 +117,21 @@ int main(void)
 
     putstr("detected drive");
 
+    // get sector number and size
+    msderr = msd_Info(&global.msd, &sector_num, &sector_size);
+    if (msderr != MSD_SUCCESS)
+    {
+        putstr("error getting msd info");
+        msd_Close(&global.msd);
+        goto error;
+    }
+
+    // print msd sector number and size
+    sprintf(buffer, "sector size: %u", (uint24_t)sector_size);
+    putstr(buffer);
+    sprintf(buffer, "num sectors: %u", (uint24_t)sector_num);
+    putstr(buffer);
+
     // close the msd device
     msd_Close(&global.msd);
 

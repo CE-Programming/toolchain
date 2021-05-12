@@ -470,6 +470,71 @@ msd_Reset:
 ; return:
 ;  hl = error status
 msd_Info:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 3)
+	compare_hl_zero
+	jr	z,.paramerror
+	ld	hl,(iy + 6)
+	compare_hl_zero
+	jr	z,.paramerror
+	ld	hl,(iy + 9)
+	compare_hl_zero
+	jr	z,.paramerror
+	push	iy
+	ld	iy,(iy + 3)
+	ld	hl,scsi.readcapacity
+	lea	de,ymsd.userbuf
+	push	de
+	call	scsi_sync_command	; store the logical block address / size
+	pop	de
+	pop	iy
+	jr	z,.error
+	ld	hl,(iy + 6)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	ld	hl,(iy + 9)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	de
+	dec	hl
+	ld	a,(de)
+	ld	(hl),a
+	xor	a,a
+	sbc	hl,hl
+	ret
+.paramerror:
+	ld	hl,MSD_ERROR_INVALID_PARAM
+	ret
+.error:
+	ld	hl,MSD_ERROR_SCSI_FAILED
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -532,6 +597,8 @@ scsi_init:
 ;  ix : cbw structure
 ; debug : D1AED1
 scsi_sync_command:
+	lea	de,ymsd.userbuf		; use the user buffer by default
+.buf:
 	xor	a,a
 	ld	(ymsd.done),a
 	ld	(ymsd.stall),a
@@ -540,19 +607,18 @@ scsi_sync_command:
 	push	iy
 	call	usb_HandleEvents
 	pop	iy			; todo: add timeout in here
-	ld	a,(ymsd.done)
+	lea	hl,ymsd.done
+	ld	a,(hl)
 	or	a,a
 	jq	z,.wait_done
-	bit	0,(ymsd.done)		; z = fail, nz = success
+	bit	0,(hl)			; z = fail, nz = success
 	ret
 
 ; inputs:
 ;  iy : msd struct
 ;  hl : cbw structure
 scsi_async_cbw:
-	lea	de,ymsd.userbuf		; use the user buffer by default
 	ld	(ymsd.scsibuf),de
-.buf:
 	ld	bc,sizeof packetCBW	; copy cbw to local storage
 	lea	de,ymsd.cbw
 	ldir
