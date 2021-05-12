@@ -139,16 +139,15 @@ struct msd
 	bulkin rb 1
 	bulkout rb 1
 	config rb 1
-        interface rb 1
+	interface rb 1
 	tag rd 1
 	sensecnt rb 1
 	done rb 1
 	scsibuf rl 1
+        stall rb 1
 	cbw rb 31+31
 	csw rb 13+31
-	userbuf rb 512
-	sensebuf rb 512
-	sectorbuf rb 576
+	userbuf rb 1024
 	size := $-.
 end struct
 
@@ -495,25 +494,37 @@ msd_WriteAsync:
 ; utility functions
 ;-------------------------------------------------------------------------------
 
+; inputs:
+;  iy : msd struct
 scsi_init:
-	ld	hl,scsi.inquiry
+	ld	b,5			; number of inquire retries
+.inquire_loop:
+	push	bc
+	ld	hl,scsi.inquiry		; some devices are slow to start
 	call	scsi_sync_command
-	jr	nz,.error
-.unitattention:
-	ld	hl,scsi.testunitready
-	call	scsi_sync_command
-	jr	nz,.error
-	and	a,$f
-	cp	a,6
-	jr	z,.unitattention
-	ld	hl,scsi.testunitready
-	call	scsi_sync_command
-	jr	nz,.error
-	or	a,a
-	sbc	hl,hl
-	ret
-.error:
+	pop	bc
+	jq	nz,.inquire_success
+	call	util_delay_200ms
+	djnz	.inquire_loop
 	ld	hl,MSD_ERROR_SCSI_FAILED
+	ret
+.inquire_success:
+	ld	b,5			; number of sense retries
+.sense_loop:
+	push	bc
+	ld	hl,scsi.requestsense
+	call	scsi_sync_command
+	ld	hl,scsi.testunitready
+	call	scsi_sync_command
+	pop	bc
+	jq	nz,.sense_success
+	call	util_delay_200ms
+	djnz	.sense_loop
+	ld	hl,MSD_ERROR_SCSI_FAILED
+	ret
+.sense_success:
+	xor	a,a
+	sbc	hl,hl			; success
 	ret
 
 ; inputs:
@@ -523,15 +534,16 @@ scsi_init:
 scsi_sync_command:
 	xor	a,a
 	ld	(ymsd.done),a
+	ld	(ymsd.stall),a
 	call	scsi_async_cbw
 .wait_done:
 	push	iy
 	call	usb_HandleEvents
-	pop	iy
+	pop	iy			; todo: add timeout in here
 	ld	a,(ymsd.done)
 	or	a,a
 	jq	z,.wait_done
-	xor	a,a
+	bit	0,(ymsd.done)		; z = fail, nz = success
 	ret
 
 ; inputs:
@@ -545,6 +557,12 @@ scsi_async_cbw:
 	lea	de,ymsd.cbw
 	ldir
 .send:
+	inc	(ymsd.tag)		; incremet cbw tag
+	jq	nz,.skip
+	ld	hl,(ymsd.tag + 1)
+	inc	hl
+	ld	(ymsd.tag + 1),hl
+.skip:
 	ld	a,(ymsd.bulkout)
 	ld	bc,(ymsd.cbw + packetCBW.len)
 	sbc	hl,hl
@@ -579,9 +597,8 @@ scsi_async_data:
 	ld	hl,scsi_async_csw
 	jq	scsi_async_xfer
 .cbw_failed:
-	ld	a,-1
-	ld	(ymsd.done),a
-	ret
+	set	1,(ymsd.done)
+	jq	scsi_reset_recovery
 
 scsi_async_csw:
 	ld	iy,0
@@ -590,15 +607,15 @@ scsi_async_csw:
 	compare_hl_zero
 	ld	iy,(iy + 12)		; msd struct
 	jq	nz,.data_failed
+.retry:
 	ld	a,(ymsd.bulkin)
 	lea	de,ymsd.csw
 	ld	bc,sizeof packetCSW
 	ld	hl,scsi_async_done
 	jq	scsi_async_xfer
 .data_failed:
-	ld	a,-2
-	ld	(ymsd.done),a
-	ret
+	set	2,(ymsd.done)
+	jq	scsi_reset_recovery
 
 scsi_async_done:
 	ld	iy,0
@@ -606,15 +623,29 @@ scsi_async_done:
 	ld	hl,(iy + 6)		; verify cbw transfer
 	compare_hl_zero
 	ld	iy,(iy + 12)		; msd struct
-	jq	nz,.csw_failed
-	ld	a,1
-	ld	(ymsd.done),a
-	ld	hl,(ymsd.scsibuf)
+	jq	nz,.check_stall
+	ld	a,(ymsd.csw + packetCSW.status)
+	or	a,a			; check for good status of transfer
+	jr	nz,.check_stall
+.check_valid:
+	; things we could do:
+	; check residue: some devices are bad at this though
+	; check signature: but why?
+	; check tag: but why?
+	set	0,(ymsd.done)
 	ret
-.csw_failed:
-	ld	a,-3
-	ld	(ymsd.done),a
-	ret
+.check_stall:
+	bit	0,l			; USB_TRANSFER_STALLED
+	jq	z,.failed
+	bit	0,(ymsd.stall)
+	set	0,(ymsd.stall)		; retry once if stalled
+	jq	z,scsi_async_csw.retry
+.failed:
+	set	3,(ymsd.done)
+	jq	scsi_reset_recovery
+
+scsi_reset_recovery:
+	jq	util_msd_reset		; perform reset, usbdrvce clears stalls
 
 ; inputs:
 ;  a  : endpoint
@@ -685,6 +716,18 @@ util_msd_ctl_packet:
 	call	usb_ControlTransfer
 	pop	bc,bc,bc,bc,bc
 	pop	iy
+	ret
+
+util_delay_200ms:
+	ld	a,20
+.loop:
+	push	af
+	push	bc
+	call	$3B4			; waits for ~10ms
+	pop	bc
+	pop	af
+	dec	a
+	jq	nz,.loop
 	ret
 
 ;-------------------------------------------------------------------------------

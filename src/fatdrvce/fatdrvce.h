@@ -40,11 +40,10 @@ typedef struct {
     uint8_t sensecnt; /**< Internal library use */
     uint8_t done; /**< Internal library use */
     void *scsibuf; /** Internal library use */
+    uint8_t stall; /** Internal library use */
     uint8_t cbw[31+31]; /**< Internal library use */
     uint8_t csw[13+31]; /**< Internal library use */
-    uint8_t userbuf[512]; /**< Internal library use */
-    uint8_t sensebuf[512]; /**< Internal library use */
-    uint8_t sectorbuf[576]; /**< Internal library use */
+    uint8_t userbuf[1024]; /**< Internal library use */
 } msd_t;
 
 typedef struct msd_transfer_t {
