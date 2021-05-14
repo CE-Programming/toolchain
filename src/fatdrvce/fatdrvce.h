@@ -37,12 +37,7 @@ typedef struct {
     uint8_t config; /**< USB config descriptor index */
     uint8_t interface; /**< USB Interface index */
     uint32_t tag; /**< Internal library use */
-    uint8_t sensecnt; /**< Internal library use */
-    uint8_t done; /**< Internal library use */
-    void *scsibuf; /** Internal library use */
-    uint8_t stall; /** Internal library use */
-    uint8_t cbw[31+31]; /**< Internal library use */
-    uint8_t csw[13+31]; /**< Internal library use */
+    void *last; /**< Internal library use */
     uint8_t userbuf[1024]; /**< Internal library use */
 } msd_t;
 
@@ -50,10 +45,13 @@ typedef struct msd_transfer_t {
     msd_t *msd; /**< Initialized MSD device */
     uint32_t lba; /**< Logical block address */
     void *buffer; /**< Pointer to data location to read/write */
-    uint8_t count; /**< Number of blocks to transfer */
-    struct msd_transfer_t *next; /**< Next MSD transfer */
+    uint24_t count; /**< Number of blocks to transfer */
     void (*callback)(struct msd_transfer_t *); /**< Called on last transfer */
     void *userptr; /**< Custom user data for callback (optional) */
+    void *next; /**< Internal library use */
+    uint8_t stall; /**< Internal library use */
+    uint8_t cbw[31+31]; /**< Internal library use */
+    uint8_t csw[13+31]; /**< Internal library use */
 } msd_transfer_t;
 
 typedef enum {

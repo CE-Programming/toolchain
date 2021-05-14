@@ -141,25 +141,24 @@ struct msd
 	config rb 1
 	interface rb 1
 	tag rd 1
-	sensecnt rb 1
-	done rb 1
-	scsibuf rl 1
-        stall rb 1
-	cbw rb 31+31
-	csw rb 13+31
+	last rl 1		; pointer to last transfer
 	userbuf rb 1024
 	size := $-.
 end struct
 
-struct msdTransfer
+struct xfer
 	local size
 	label .: size
 	msd rl 1
 	lba rb 4
-	data rl 1
+	buffer rl 1
 	count rl 1
 	callback rl 1
+	userptr rl 1
 	next rl 1
+	stall rb 1
+	cbw rb 31+31
+	csw rb 13+31
 	size := $-.
 end struct
 
@@ -541,9 +540,51 @@ msd_Info:
 msd_ReadAsync:
 ; Asynchronous block read
 ; inputs:
-;  sp + 3: msd transfer structure
+;  sp + 3: msd transfer struct
 ; outputs:
 ;  hl: error status
+	ld	iy,0
+	add	iy,sp
+	ld	iy,(iy + 3)		; msd transfer struct
+	lea	hl,yxfer.lba
+	ld	bc,scsi.read10 + scsipktrw.lba + 3
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a			; store big endian fields
+	ld	de,(yxfer.count)
+	ld	hl,scsi.read10 + scsipktrw.len
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	ex	de,hl
+	add	hl,hl
+	ld	(scsi.read10 + 9),hl	; number of bytes in data section
+	xor	a,a
+	sbc	hl,hl
+	ld	(yxfer.next),hl		; set next to null
+	ld	de,(yxfer.buffer)
+	lea	bc,iy			; bc = xfer
+	ld	iy,(yxfer.msd)
+	ld	hl,(ymsd.last)
+	compare_hl_zero
+	jq	z,.enqueue
+	ld	(ymsd.last),bc
+	ld	hl,scsi.read10
+	jq	scsi_async_cbw
+.enqueue:
+	ld	iy,(ymsd.last)
+	ld	(yxfer.next),bc
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -553,6 +594,48 @@ msd_WriteAsync:
 ;  sp + 3: msd transfer structure
 ; outputs:
 ;  hl: error status
+	ld	iy,0
+	add	iy,sp
+	ld	iy,(iy + 3)		; msd transfer struct
+	lea	hl,yxfer.lba
+	ld	bc,scsi.write10 + scsipktrw.lba + 3
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a			; store big endian fields
+	ld	de,(yxfer.count)
+	ld	hl,scsi.write10 + scsipktrw.len
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	ex	de,hl
+	add	hl,hl
+	ld	(scsi.write10 + 9),hl	; number of bytes in data section
+	xor	a,a
+	sbc	hl,hl
+	ld	(yxfer.next),hl		; set next to null
+	ld	de,(yxfer.buffer)
+	lea	bc,iy			; bc = xfer
+	ld	iy,(yxfer.msd)
+	ld	hl,(ymsd.last)
+	compare_hl_zero
+	jq	z,.enqueue
+	ld	(ymsd.last),bc
+	ld	hl,scsi.write10
+	jq	scsi_async_cbw
+.enqueue:
+	ld	iy,(ymsd.last)
+	ld	(yxfer.next),bc
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -592,36 +675,67 @@ scsi_init:
 	sbc	hl,hl			; success
 	ret
 
+
 ; inputs:
-;  iy : msd struct
-;  ix : cbw structure
-; debug : D1AED1
-scsi_sync_command:
-	lea	de,ymsd.userbuf		; use the user buffer by default
-.buf:
-	xor	a,a
-	ld	(ymsd.done),a
-	ld	(ymsd.stall),a
-	call	scsi_async_cbw
-.wait_done:
-	push	iy
-	call	usb_HandleEvents
-	pop	iy			; todo: add timeout in here
-	lea	hl,ymsd.done
-	ld	a,(hl)
-	or	a,a
-	jq	z,.wait_done
-	bit	0,(hl)			; z = fail, nz = success
+;  sp + 3 : status
+;  sp + 6 : xfer
+scsi_sync_command_callback:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 3)		; status
+	compare_hl_zero
+	ld	iy,(iy + 6)		; xfer
+	ld	hl,(yxfer.userptr)
+	jq	z,.success
+	set	1,(hl)
+	ret
+.success:
+	set	0,(hl)
 	ret
 
 ; inputs:
 ;  iy : msd struct
 ;  hl : cbw structure
+scsi_sync_command:
+	lea	de,ymsd.userbuf		; use the user buffer by default
+.buf:
+	ld	(.xfer),iy		; first element is msd
+	ld	iy,.xfer
+	ld	(yxfer.buffer),de
+	lea	de,yxfer.cbw
+	ld	bc,sizeof packetCBW
+	ldir				; copy cbw to packet structure
+	ld	de,scsi_sync_command_callback
+	ld	(yxfer.callback),de
+	ld	hl,.done
+	ld	(hl),0
+	ld	(yxfer.userptr),hl	; done flag
+	call	scsi_async_cbw
+.wait_done:
+	push	iy
+	call	usb_HandleEvents
+	pop	iy			; todo: add timeout in here?
+	ld	hl,(yxfer.userptr)
+	ld	a,(hl)
+	or	a,a
+	jq	z,.wait_done
+	bit	0,(hl)			; z = fail, nz = success
+	ret
+.xfer:
+	rb	sizeof xfer
+.done:
+	db	0
+
+; inputs:
+;  iy : xfer struct
 scsi_async_cbw:
-	ld	(ymsd.scsibuf),de
-	ld	bc,sizeof packetCBW	; copy cbw to local storage
-	lea	de,ymsd.cbw
-	ldir
+	xor	a,a
+	sbc	hl,hl
+	ld	(yxfer.next),hl		; clear next pointer
+	ld	(yxfer.stall),a		; clear stall for csw
+	push	iy
+	ld	bc,(yxfer.cbw + packetCBW.len)
+	ld	iy,(yxfer.msd)
 .send:
 	inc	(ymsd.tag)		; incremet cbw tag
 	jq	nz,.skip
@@ -630,15 +744,15 @@ scsi_async_cbw:
 	ld	(ymsd.tag + 1),hl
 .skip:
 	ld	a,(ymsd.bulkout)
-	ld	bc,(ymsd.cbw + packetCBW.len)
 	sbc	hl,hl
-	adc	hl,bc
+	adc	hl,bc			; check if cbw length is zero
 	ld	hl,scsi_async_data
 	jq	nz,.not_zero_length
-	ld	hl,scsi_async_csw	; if zero length, no data xfer
+	ld	hl,scsi_async_csw	; if zero length, skip data callback
 .not_zero_length:
+	pop	iy
+	lea	de,yxfer.cbw		; send cbw
 	ld	bc,sizeof packetCBW
-	lea	de,ymsd.cbw
 	jq	scsi_async_xfer
 
 ; inputs:
@@ -651,77 +765,131 @@ scsi_async_data:
 	add	iy,sp
 	ld	hl,(iy + 6)		; verify cbw transfer
 	compare_hl_zero
-	ld	iy,(iy + 12)		; msd struct
-	jq	nz,.cbw_failed
+	ld	iy,(iy + 12)		; xfer struct
+	jq	nz,scsi_async_issue_callback_fail
+	bit 	7,(yxfer.cbw + packetCBW.dir)
+	push	iy
+	ld	iy,(yxfer.msd)		; get msd struct
 	ld	a,(ymsd.bulkin)
-	bit 	7,(ymsd.cbw + packetCBW.dir)
 	jr	nz,.xfer
 	ld	a,(ymsd.bulkout)
 .xfer:
-	ld	bc,(ymsd.cbw + packetCBW.len)
-	ld	de,(ymsd.scsibuf)
+	pop	iy			; restore xfer struct
 	ld	hl,scsi_async_csw
+	ld	de,(yxfer.buffer)
+	ld	bc,(yxfer.cbw + packetCBW.len)
 	jq	scsi_async_xfer
-.cbw_failed:
-	set	1,(ymsd.done)
-	jq	scsi_reset_recovery
 
+; inputs:
+;  sp + 3 : endpoint
+;  sp + 6 : status
+;  sp + 9 : transferred size
+;  sp + 12 : data
 scsi_async_csw:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 6)		; verify cbw transfer
 	compare_hl_zero
-	ld	iy,(iy + 12)		; msd struct
-	jq	nz,.data_failed
+	ld	iy,(iy + 12)		; xfer struct
+	jq	nz,scsi_async_issue_callback_fail
 .retry:
+	push	iy
+	ld	iy,(yxfer.msd)		; msd struct
 	ld	a,(ymsd.bulkin)
-	lea	de,ymsd.csw
+	pop	iy			; restore xfer struct
+	lea	de,yxfer.csw
 	ld	bc,sizeof packetCSW
 	ld	hl,scsi_async_done
 	jq	scsi_async_xfer
-.data_failed:
-	set	2,(ymsd.done)
-	jq	scsi_reset_recovery
 
+; inputs:
+;  sp + 3 : endpoint
+;  sp + 6 : status
+;  sp + 9 : transferred size
+;  sp + 12 : data
 scsi_async_done:
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 6)		; verify cbw transfer
 	compare_hl_zero
-	ld	iy,(iy + 12)		; msd struct
+	ld	iy,(iy + 12)		; xfer struct
 	jq	nz,.check_stall
-	ld	a,(ymsd.csw + packetCSW.status)
+	ld	a,(yxfer.csw + packetCSW.status)
 	or	a,a			; check for good status of transfer
 	jr	nz,.check_stall
 .check_valid:
+	; call the callback
 	; things we could do:
-	; check residue: some devices are bad at this though
+	; check residue: some devices are bad at this though?
 	; check signature: but why?
 	; check tag: but why?
-	set	0,(ymsd.done)
-	ret
+	ld	bc,0			; success
+	jq	scsi_async_issue_callback
 .check_stall:
 	bit	0,l			; USB_TRANSFER_STALLED
 	jq	z,.failed
-	bit	0,(ymsd.stall)
-	set	0,(ymsd.stall)		; retry once if stalled
+	bit	0,(yxfer.stall)
+	set	0,(yxfer.stall)		; retry once if stalled
 	jq	z,scsi_async_csw.retry
 .failed:
-	set	3,(ymsd.done)
-	jq	scsi_reset_recovery
+	jq	scsi_async_issue_callback_fail
 
+; inputs:
+;  iy : xfer struct
 scsi_reset_recovery:
+	ld	iy,(yxfer.msd)
 	jq	util_msd_reset		; perform reset, usbdrvce clears stalls
+
+; inputs:
+;  iy : xfer struct
+scsi_async_issue_callback_fail:
+	call	scsi_reset_recovery
+	ld	bc,MSD_ERROR_SCSI_FAILED
+; inputs:
+;  de : status
+;  iy : xfer struct
+scsi_async_issue_callback:
+	push	iy
+	lea	de,iy
+	ld	iy,(yxfer.msd)
+	ld	hl,(ymsd.last)
+	compare_hl_de
+	jq	nz,.dont_clear		; if xfer->msd->last == xfer
+	xor	a,a
+	sbc	hl,hl
+	ld	(ymsd.last),hl		; xfer->msd->last = NULL
+.dont_clear:
+	pop	iy
+	ld	hl,(yxfer.next)
+	push	hl
+	ld	hl,(yxfer.callback)
+	compare_hl_zero
+	jq	z,.no_callback
+	push	bc
+	ld	bc,(yxfer.userptr)
+	push	bc
+	ld	bc,.return
+	push	bc
+	jp	(hl)
+.return:
+	pop	de,de
+.no_callback:
+	pop	hl
+	compare_hl_zero			; if there's a next pointer, issue it
+	ret	z
+	push	hl
+	pop	iy
+	jq	scsi_async_cbw		; queue the next cbw
 
 ; inputs:
 ;  a  : endpoint
 ;  hl : callback
 ;  bc : length
 ;  de : buffer
-;  iy : msd struct
+;  iy : xfer struct
 scsi_async_xfer:
 	push	iy
-	push	iy			; msd struct
+	push	iy			; xfer struct
 	push	hl			; callback
 	push	bc			; length
 	push	de			; buffer
@@ -729,7 +897,8 @@ scsi_async_xfer:
 	sbc	hl,hl			; todo: is this needed
 	ld	l,a			; endpoint
 	push	hl
-	ld	hl,(ymsd.dev)
+	ld	iy,(yxfer.msd)		; msd struct
+	ld	hl,(ymsd.dev)		; usb struct
 	push	hl
 	call	usb_GetDeviceEndpoint
 	pop	bc,bc
