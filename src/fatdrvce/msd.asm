@@ -684,7 +684,7 @@ scsi_sync_command_callback:
 	add	iy,sp
 	ld	hl,(iy + 3)		; status
 	compare_hl_zero
-	ld	iy,(iy + 6)		; xfer
+	ld	iy,(iy + 6)		; xfer struct
 	ld	hl,(yxfer.userptr)
 	jq	z,.success
 	set	1,(hl)
@@ -719,6 +719,7 @@ scsi_sync_command:
 	ld	a,(hl)
 	or	a,a
 	jq	z,.wait_done
+	ld	iy,(yxfer.msd)		; restore msd struct
 	bit	0,(hl)			; z = fail, nz = success
 	ret
 .xfer:
@@ -733,19 +734,18 @@ scsi_async_cbw:
 	sbc	hl,hl
 	ld	(yxfer.next),hl		; clear next pointer
 	ld	(yxfer.stall),a		; clear stall for csw
+	ld	hl,(yxfer.cbw + packetCBW.len)
 	push	iy
-	ld	bc,(yxfer.cbw + packetCBW.len)
 	ld	iy,(yxfer.msd)
 .send:
 	inc	(ymsd.tag)		; incremet cbw tag
 	jq	nz,.skip
-	ld	hl,(ymsd.tag + 1)
-	inc	hl
-	ld	(ymsd.tag + 1),hl
+	ld	de,(ymsd.tag + 1)
+	inc	de
+	ld	(ymsd.tag + 1),de
 .skip:
 	ld	a,(ymsd.bulkout)
-	sbc	hl,hl
-	adc	hl,bc			; check if cbw length is zero
+	compare_hl_zero			; check if cbw length is zero
 	ld	hl,scsi_async_data
 	jq	nz,.not_zero_length
 	ld	hl,scsi_async_csw	; if zero length, skip data callback
@@ -865,14 +865,13 @@ scsi_async_issue_callback:
 	ld	hl,(yxfer.callback)
 	compare_hl_zero
 	jq	z,.no_callback
-	push	bc
-	ld	bc,(yxfer.userptr)
+	push	iy
 	push	bc
 	ld	bc,.return
 	push	bc
 	jp	(hl)
 .return:
-	pop	de,de
+	pop	de,iy
 .no_callback:
 	pop	hl
 	compare_hl_zero			; if there's a next pointer, issue it
