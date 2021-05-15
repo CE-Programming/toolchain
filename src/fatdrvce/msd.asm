@@ -720,12 +720,18 @@ scsi_async_cbw:
 	or	a,(ymsd.haslast)
 	jq	z,.send
 .queue:					; if currently sending, queue it
-	ld	iy,(ymsd.last)
+	lea	hl,ymsd.last
+	ld	iy,(hl)
 	ld	(yxfer.next),de		; queue the next bulk transfer
+	ld	(hl),de			; make this xfer the new last
 	pop	iy
+	xor	a,a
+	sbc	hl,hl			; return success
 	ret
 .send:
 	ld	(ymsd.last),de
+	ld	(ymsd.haslast),1
+.do_xfer:
 	inc	(ymsd.tag)		; incremet cbw tag
 	jq	nz,.skip
 	ld	de,(ymsd.tag + 1)
@@ -857,8 +863,8 @@ scsi_async_issue_callback:
 	compare_hl_zero			; if there's a next pointer, issue it
 	ret	z
 	push	hl
-	pop	iy
-	jq	scsi_async_cbw		; queue the next cbw
+	ld	iy,(hl)			; msd is first element in xfer
+	jq	scsi_async_cbw.do_xfer	; send the next cbw
 
 ; inputs:
 ;  a  : endpoint
