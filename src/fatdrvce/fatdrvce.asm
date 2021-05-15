@@ -14,6 +14,8 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export msd_Close
 	export msd_Reset
 	export msd_Info
+	export msd_Read
+	export msd_Write
 	export msd_ReadAsync
 	export msd_WriteAsync
 ;-------------------------------------------------------------------------------

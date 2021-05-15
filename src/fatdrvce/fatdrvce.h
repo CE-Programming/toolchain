@@ -7,11 +7,11 @@
  * allocation size at least 4KiB, however 64KiB will provide the best
  * performance.
  *
- * Currently only drives with a logical sector size of 512 bytes are supported,
- * which is the most common sector size available. Larger drives and SSDs may
+ * Currently only drives with a logical block size of 512 bytes are supported,
+ * which is the most common block size available. Larger drives and SSDs may
  * not work.
  *
- * The drive must use MBR partitioning, GUID and others are not yet supported.
+ * The drive must use MBR partitioning, GPT and others are not yet supported.
  *
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
@@ -64,6 +64,7 @@ typedef struct msd_transfer_t {
     uint8_t csw[13+31]; /**< Internal library use */
 } msd_transfer_t;
 
+
 /**
  * Initialize a Mass Storage Device.
  * @param msd Uninitilaized MSD device structure.
@@ -87,24 +88,56 @@ void msd_Close(msd_t *msd);
 msd_error_t msd_Reset(msd_t *msd);
 
 /**
- * Gets the number of and size of each block (sector) on the device.
+ * Gets the number of and size of each block on the device.
  * @param msd Initialized MSD device structure.
- * @param num Pointer to store number of sectors to.
- * @param size Pointer to store sector size to.
+ * @param block_count Pointer to store number of blocks to.
+ * @param block_size Pointer to store block size to.
  * @return MSD_SUCCESS on success.
  */
-msd_error_t msd_Info(msd_t *msd, uint32_t *num, uint32_t *size);
+msd_error_t msd_Info(msd_t *msd, uint32_t *block_count, uint32_t *block_size);
 
 /**
- * Asynchronous block read.
- * @param transfer Initialized transaction structure.
+ * Synchronous block read.
+ * @param msd Iniailized MSD structure.
+ * @param lba Logical Block Address (LBA) of starting block to read.
+ * @param num Number of blocks to read.
+ * @param data Buffer to read into. Must be at least block size * count bytes.
+ * @return MSD_SUCCESS on success.
+ */
+msd_error_t msd_Read(msd_t *msd, uint32_t lba,
+                     uint24_t count, void *buffer);
+
+/**
+ * Synchronous block write.
+ * @param msd Iniailized MSD structure.
+ * @param lba Logical Block Address (LBA) of starting block to read.
+ * @param num Number of blocks to read.
+ * @param data Buffer to read into. Must be at least block size * count bytes.
+ * @return MSD_SUCCESS on success.
+ */
+msd_error_t msd_Write(msd_t *msd, uint32_t lba,
+                      uint24_t count, const void *buffer);
+
+/**
+ * Asynchronous block read. You must set the following \p xfer elements:
+ * \p lba, \p buffer, \p count \p callback. The optional element \p userptr
+ * can be used to store user-defined data for access in the callback.
+ * The \p xfer argument must remain valid (cannot be free'd or lose scope)
+ * until the callback is issued. You can free \xfer inside the callback as
+ * needed.
+ * @param xfer Initialized transaction structure.
  * @return MSD_SUCCESS if the transfer has been added to the queue.
  */
 msd_error_t msd_ReadAsync(msd_transfer_t *xfer);
 
 /**
- * Asynchronous block write.
- * @param transfer Initialized transaction structure.
+ * Asynchronous block write. You must set the following \p xfer elements:
+ * \p lba, \p buffer, \p count \p callback. The optional element \p userptr
+ * can be used to store user-defined data for access in the callback.
+ * The \p xfer argument must remain valid (cannot be free'd or lose scope)
+ * until the callback is issued. You can free \xfer inside the callback as
+ * needed.
+ * @param xfer Initialized transaction structure.
  * @return MSD_SUCCESS if the transfer has been added to the queue.
  */
 msd_error_t msd_WriteAsync(msd_transfer_t *xfer);

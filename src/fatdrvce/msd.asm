@@ -538,6 +538,52 @@ msd_Info:
 	ret
 
 ;-------------------------------------------------------------------------------
+msd_Read:
+; Synchronous block read
+; inputs:
+;  sp + 3: msd struct
+;  sp + 6: lba
+;  sp + 12: count
+;  sp + 15: buffer
+; outputs:
+;  hl: error status
+	ld	iy,0
+	add	iy,sp
+	lea	hl,iy + 6		; lba
+	ld	de,(iy + 12)		; count
+	push	iy
+	ld	iy,scsi.read10
+	call	scsi_pktrw_setup
+	pop	iy
+	ld	de,(iy + 15)
+	ld	iy,(iy + 3)
+	ld	hl,scsi.read10
+	jq	scsi_sync_command.buf
+
+;-------------------------------------------------------------------------------
+msd_Write:
+; Synchronous block write
+; inputs:
+;  sp + 3: msd struct
+;  sp + 6: lba
+;  sp + 12: count
+;  sp + 15: const buffer
+; outputs:
+;  hl: error status
+	ld	iy,0
+	add	iy,sp
+	lea	hl,iy + 6		; lba
+	ld	de,(iy + 12)		; count
+	push	iy
+	ld	iy,scsi.write10
+	call	scsi_pktrw_setup
+	pop	iy
+	ld	de,(iy + 15)
+	ld	iy,(iy + 3)
+	ld	hl,scsi.write10
+	jq	scsi_sync_command.buf
+
+;-------------------------------------------------------------------------------
 msd_ReadAsync:
 ; Asynchronous block read
 ; inputs:
@@ -548,29 +594,11 @@ msd_ReadAsync:
 	add	iy,sp
 	ld	iy,(iy + 3)		; xfer struct
 	lea	hl,yxfer.lba
-	ld	bc,scsi.read10 + scsipktrw.lba + 3
-	ld	a,(hl)
-	ld	(bc),a
-	inc	hl
-	dec	bc
-	ld	a,(hl)
-	ld	(bc),a
-	inc	hl
-	dec	bc
-	ld	a,(hl)
-	ld	(bc),a
-	inc	hl
-	dec	bc
-	ld	a,(hl)
-	ld	(bc),a			; store big endian fields
 	ld	de,(yxfer.count)
-	ld	hl,scsi.read10 + scsipktrw.len
-	ld	(hl),d
-	inc	hl
-	ld	(hl),e
-	ex	de,hl
-	add	hl,hl
-	ld	(scsi.read10 + 9),hl	; number of bytes in data section
+	push	iy
+	ld	iy,scsi.read10
+	call	scsi_pktrw_setup
+	pop	iy
 	ld	hl,scsi.read10
 	lea	de,yxfer.cbw
 	ld	bc,sizeof packetCBW
@@ -588,29 +616,11 @@ msd_WriteAsync:
 	add	iy,sp
 	ld	iy,(iy + 3)		; xfer struct
 	lea	hl,yxfer.lba
-	ld	bc,scsi.write10 + scsipktrw.lba + 3
-	ld	a,(hl)
-	ld	(bc),a
-	inc	hl
-	dec	bc
-	ld	a,(hl)
-	ld	(bc),a
-	inc	hl
-	dec	bc
-	ld	a,(hl)
-	ld	(bc),a
-	inc	hl
-	dec	bc
-	ld	a,(hl)
-	ld	(bc),a			; store big endian fields
 	ld	de,(yxfer.count)
-	ld	hl,scsi.write10 + scsipktrw.len
-	ld	(hl),d
-	inc	hl
-	ld	(hl),e
-	ex	de,hl
-	add	hl,hl
-	ld	(scsi.write10 + 9),hl	; number of bytes in data section
+	push	iy
+	ld	iy,scsi.write10
+	call	scsi_pktrw_setup
+	pop	iy
 	ld	hl,scsi.write10
 	lea	de,yxfer.cbw
 	ld	bc,sizeof packetCBW
@@ -797,6 +807,33 @@ scsi_async_csw:
 	jq	scsi_async_xfer
 
 ; inputs:
+;  a  : endpoint
+;  hl : callback
+;  bc : length
+;  de : buffer
+;  iy : xfer struct
+scsi_async_xfer:
+	push	iy
+	push	iy			; xfer struct
+	push	hl			; callback
+	push	bc			; length
+	push	de			; buffer
+	or	a,a
+	sbc	hl,hl			; todo: is this needed
+	ld	l,a			; endpoint
+	push	hl
+	ld	iy,(yxfer.msd)		; msd struct
+	ld	hl,(ymsd.dev)		; usb struct
+	push	hl
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+	push	hl
+	call	usb_ScheduleTransfer
+	pop	bc,bc,bc,bc,bc
+	pop	iy
+	ret
+
+; inputs:
 ;  sp + 3 : endpoint
 ;  sp + 6 : status
 ;  sp + 9 : transferred size
@@ -867,33 +904,6 @@ scsi_async_issue_callback:
 	jq	scsi_async_cbw.do_xfer	; send the next cbw
 
 ; inputs:
-;  a  : endpoint
-;  hl : callback
-;  bc : length
-;  de : buffer
-;  iy : xfer struct
-scsi_async_xfer:
-	push	iy
-	push	iy			; xfer struct
-	push	hl			; callback
-	push	bc			; length
-	push	de			; buffer
-	or	a,a
-	sbc	hl,hl			; todo: is this needed
-	ld	l,a			; endpoint
-	push	hl
-	ld	iy,(yxfer.msd)		; msd struct
-	ld	hl,(ymsd.dev)		; usb struct
-	push	hl
-	call	usb_GetDeviceEndpoint
-	pop	bc,bc
-	push	hl
-	call	usb_ScheduleTransfer
-	pop	bc,bc,bc,bc,bc
-	pop	iy
-	ret
-
-; inputs:
 ;  iy : xfer struct
 scsi_reset_recovery:
 	ld	iy,(yxfer.msd)
@@ -945,6 +955,33 @@ util_msd_ctl_packet:
 	pop	iy
 	ret
 
+; inputs:
+;  hl : points to lba
+;  de : count
+;  iy : scsi.read10 or scsi.write10
+scsi_pktrw_setup:
+	lea	bc,yscsipktrw.lba + 3
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a
+	inc	hl
+	dec	bc
+	ld	a,(hl)
+	ld	(bc),a			; store big endian fields
+	ld	(yscsipktrw.len + 0),d
+	ld	(yscsipktrw.len + 1),e
+	ex	de,hl
+	add	hl,hl			; assume block size of 512
+	ld	(yscsipktrw + 9),hl	; number of bytes in data section
+	ret
+
 util_delay_200ms:
 	ld	a,20
 .loop:
@@ -965,9 +1002,8 @@ setup.msdreset          setuppkt        $21,$ff,0,0,0
 setup.msdmaxlun         setuppkt        $a1,$fe,0,0,1
 
 scsi.inquiry            scsipkt         1,$0005, $12, $00,$00,$00,$05,$00
-scsi.testunitready      scsipkt         0,$0000, $00, $00,$00,$00,$00,$00
-scsi.modesense6         scsipkt         1,$00fc, $1a, $00,$3f,$00,$fc,$00
 scsi.requestsense       scsipkt         1,$0012, $03, $00,$00,$00,$12,$00
+scsi.testunitready      scsipkt         0,$0000, $00, $00,$00,$00,$00,$00
 scsi.readcapacity       scsipkt         1,$0008, $25, $00,$00,$00,$00,$00,$00,$00,$00,$00
 scsi.read10             scsipktrw       1,$28
 scsi.write10            scsipktrw       0,$2a
