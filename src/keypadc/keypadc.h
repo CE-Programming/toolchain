@@ -78,10 +78,12 @@ typedef enum {
 (*(volatile uint8_t*)0xF50000) /**< Configuration of keypad controller. */
 
 /**
- * Checks if a key is pressed. This uses the long key type, which includes the group as well.
+ * Checks if a key is pressed. This uses the long key type (kb_lkey_t), which includes the group as well.
  * It can be used in place of reading directly from \c kb_Data.
  *
  * Long key types have the same name as the normal key types, but are prefixed with kb_Key* rather than kb_*.
+ *
+ * It does not call \c kb_Scan() internally, so you have to do so before calling this if you want the keyboard data to get updated.
  */
 #define kb_IsDown(lkey) \
 (kb_Data[(lkey) >> 8] & (lkey))
@@ -110,13 +112,23 @@ typedef enum {
  * +--------+------------+------------+------------+------------+------------+------------+------------+------------+
  *
  * \endverbatim
- *
+ * 
  * These data registers can be indexed as a normal array. For example, to check the status of the '2nd' key:
  * @code
  *  if (kb_Data[1] & kb_2nd) {
  *      ...
  *  }
  * @endcode
+ *
+ * Likewise, you can test keys with the following general format:
+ * @code
+ *  if (kb_Data[group] & kb_Name){
+ *      ...
+ *  }
+ *
+ *
+ * @endcode
+ *
  * @see kb_On
  */
 #define kb_Data \
