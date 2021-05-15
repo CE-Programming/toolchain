@@ -142,6 +142,7 @@ struct msd
 	interface rb 1
 	tag rd 1
 	last rl 1		; pointer to last transfer
+	haslast rb 1
 	userbuf rb 1024
 	size := $-.
 end struct
@@ -488,7 +489,7 @@ msd_Info:
 	call	scsi_sync_command	; store the logical block address / size
 	pop	de
 	pop	iy
-	jr	z,.error
+	jr	nz,.error
 	ld	hl,(iy + 6)
 	inc	hl
 	inc	hl
@@ -545,7 +546,7 @@ msd_ReadAsync:
 ;  hl: error status
 	ld	iy,0
 	add	iy,sp
-	ld	iy,(iy + 3)		; msd transfer struct
+	ld	iy,(iy + 3)		; xfer struct
 	lea	hl,yxfer.lba
 	ld	bc,scsi.read10 + scsipktrw.lba + 3
 	ld	a,(hl)
@@ -570,22 +571,11 @@ msd_ReadAsync:
 	ex	de,hl
 	add	hl,hl
 	ld	(scsi.read10 + 9),hl	; number of bytes in data section
-	xor	a,a
-	sbc	hl,hl
-	ld	(yxfer.next),hl		; set next to null
-	ld	de,(yxfer.buffer)
-	lea	bc,iy			; bc = xfer
-	ld	iy,(yxfer.msd)
-	ld	hl,(ymsd.last)
-	compare_hl_zero
-	jq	z,.enqueue
-	ld	(ymsd.last),bc
 	ld	hl,scsi.read10
+	lea	de,yxfer.cbw
+	ld	bc,sizeof packetCBW
+	ldir
 	jq	scsi_async_cbw
-.enqueue:
-	ld	iy,(ymsd.last)
-	ld	(yxfer.next),bc
-	ret
 
 ;-------------------------------------------------------------------------------
 msd_WriteAsync:
@@ -596,7 +586,7 @@ msd_WriteAsync:
 ;  hl: error status
 	ld	iy,0
 	add	iy,sp
-	ld	iy,(iy + 3)		; msd transfer struct
+	ld	iy,(iy + 3)		; xfer struct
 	lea	hl,yxfer.lba
 	ld	bc,scsi.write10 + scsipktrw.lba + 3
 	ld	a,(hl)
@@ -621,22 +611,11 @@ msd_WriteAsync:
 	ex	de,hl
 	add	hl,hl
 	ld	(scsi.write10 + 9),hl	; number of bytes in data section
-	xor	a,a
-	sbc	hl,hl
-	ld	(yxfer.next),hl		; set next to null
-	ld	de,(yxfer.buffer)
-	lea	bc,iy			; bc = xfer
-	ld	iy,(yxfer.msd)
-	ld	hl,(ymsd.last)
-	compare_hl_zero
-	jq	z,.enqueue
-	ld	(ymsd.last),bc
 	ld	hl,scsi.write10
+	lea	de,yxfer.cbw
+	ld	bc,sizeof packetCBW
+	ldir
 	jq	scsi_async_cbw
-.enqueue:
-	ld	iy,(ymsd.last)
-	ld	(yxfer.next),bc
-	ret
 
 ;-------------------------------------------------------------------------------
 ; utility functions
@@ -651,7 +630,7 @@ scsi_init:
 	ld	hl,scsi.inquiry		; some devices are slow to start
 	call	scsi_sync_command
 	pop	bc
-	jq	nz,.inquire_success
+	jq	z,.inquire_success
 	call	util_delay_200ms
 	djnz	.inquire_loop
 	ld	hl,MSD_ERROR_SCSI_FAILED
@@ -665,7 +644,7 @@ scsi_init:
 	ld	hl,scsi.testunitready
 	call	scsi_sync_command
 	pop	bc
-	jq	nz,.sense_success
+	jq	z,.sense_success
 	call	util_delay_200ms
 	djnz	.sense_loop
 	ld	hl,MSD_ERROR_SCSI_FAILED
@@ -711,21 +690,21 @@ scsi_sync_command:
 	ld	(hl),0
 	ld	(yxfer.userptr),hl	; done flag
 	call	scsi_async_cbw
+	compare_hl_zero			; make sure it succeeded
+	ret	nz
 .wait_done:
 	push	iy
 	call	usb_HandleEvents
 	pop	iy			; todo: add timeout in here?
-	ld	hl,(yxfer.userptr)
-	ld	a,(hl)
+	ld	a,0
+.done := $-1
 	or	a,a
 	jq	z,.wait_done
 	ld	iy,(yxfer.msd)		; restore msd struct
-	bit	0,(hl)			; z = fail, nz = success
+	bit	1,a			; nz = fail, z = success
 	ret
 .xfer:
 	rb	sizeof xfer
-.done:
-	db	0
 
 ; inputs:
 ;  iy : xfer struct
@@ -736,8 +715,17 @@ scsi_async_cbw:
 	ld	(yxfer.stall),a		; clear stall for csw
 	ld	hl,(yxfer.cbw + packetCBW.len)
 	push	iy
+	lea	de,iy			; de = xfer struct
 	ld	iy,(yxfer.msd)
+	or	a,(ymsd.haslast)
+	jq	z,.send
+.queue:					; if currently sending, queue it
+	ld	iy,(ymsd.last)
+	ld	(yxfer.next),de		; queue the next bulk transfer
+	pop	iy
+	ret
 .send:
+	ld	(ymsd.last),de
 	inc	(ymsd.tag)		; incremet cbw tag
 	jq	nz,.skip
 	ld	de,(ymsd.tag + 1)
@@ -836,12 +824,6 @@ scsi_async_done:
 
 ; inputs:
 ;  iy : xfer struct
-scsi_reset_recovery:
-	ld	iy,(yxfer.msd)
-	jq	util_msd_reset		; perform reset, usbdrvce clears stalls
-
-; inputs:
-;  iy : xfer struct
 scsi_async_issue_callback_fail:
 	call	scsi_reset_recovery
 	ld	bc,MSD_ERROR_SCSI_FAILED
@@ -855,9 +837,7 @@ scsi_async_issue_callback:
 	ld	hl,(ymsd.last)
 	compare_hl_de
 	jq	nz,.dont_clear		; if xfer->msd->last == xfer
-	xor	a,a
-	sbc	hl,hl
-	ld	(ymsd.last),hl		; xfer->msd->last = NULL
+	ld	(ymsd.haslast),0		; xfer->msd->last = NULL
 .dont_clear:
 	pop	iy
 	ld	hl,(yxfer.next)
@@ -908,10 +888,17 @@ scsi_async_xfer:
 	ret
 
 ; inputs:
+;  iy : xfer struct
+scsi_reset_recovery:
+	ld	iy,(yxfer.msd)
+	jq	util_msd_reset		; perform reset, usbdrvce clears stalls
+
+; inputs:
 ;  iy : msd structure
 util_msd_reset:
 	xor	a,a
 	sbc	hl,hl
+	ld	(ymsd.haslast),a
 	ld	(ymsd.tag + 0),hl
 	ld	(ymsd.tag + 3),a	; reset tag
 	ld	a,(ymsd.interface)

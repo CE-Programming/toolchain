@@ -57,17 +57,29 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
     return USB_SUCCESS;
 }
 
+void read_callback(msd_error_t error, struct msd_transfer_t *xfer)
+{
+    if (error != MSD_SUCCESS)
+    {
+        putstr("error completing read");
+    }
+
+    *(uint8_t*)xfer->userptr = 1;
+}
+
 int main(void)
 {
     static uint8_t msd_buffer[MSD_BLOCK_SIZE * NUM_SECTORS_PER_ACCESS];
     static char buffer[200];
     static global_t global;
+    static uint8_t done;
     uint32_t sector_size;
     uint32_t sector_num;
     float elapsed;
     float bps;
     usb_error_t usberr;
     msd_error_t msderr;
+    msd_transfer_t xfer;
     int i;
 
     memset(&global, 0, sizeof(global_t));
@@ -131,6 +143,32 @@ int main(void)
     putstr(buffer);
     sprintf(buffer, "num sectors: %u", (uint24_t)sector_num);
     putstr(buffer);
+
+    memset(msd_buffer, 0xAA, sizeof msd_buffer);
+
+    // attempt a read
+    done = 0;
+    xfer.msd = &global.msd;
+    xfer.lba = 0;
+    xfer.buffer = msd_buffer;
+    xfer.count = 1;
+    xfer.callback = read_callback;
+    xfer.userptr = &done;
+
+    msderr = msd_ReadAsync(&xfer);
+    if (msderr != MSD_SUCCESS)
+    {
+        putstr("error issuing read");
+        msd_Close(&global.msd);
+        goto error;
+    }
+
+    do
+    {
+        usberr = usb_HandleEvents();
+    } while (done == 0 && usberr == USB_SUCCESS);
+
+    putstr("sector read success");
 
     // close the msd device
     msd_Close(&global.msd);

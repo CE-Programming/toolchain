@@ -30,30 +30,6 @@ extern "C" {
 
 #define MSD_BLOCK_SIZE 512 /**< Block size in bytes */
 
-typedef struct {
-    usb_device_t dev; /**< USB device */
-    uint8_t bulkin; /**< USB bulk in endpoint address */
-    uint8_t bulkout; /**< USB bulk out endpoint address */
-    uint8_t config; /**< USB config descriptor index */
-    uint8_t interface; /**< USB Interface index */
-    uint32_t tag; /**< Internal library use */
-    void *last; /**< Internal library use */
-    uint8_t userbuf[1024]; /**< Internal library use */
-} msd_t;
-
-typedef struct msd_transfer_t {
-    msd_t *msd; /**< Initialized MSD device */
-    uint32_t lba; /**< Logical block address */
-    void *buffer; /**< Pointer to data location to read/write */
-    uint24_t count; /**< Number of blocks to transfer */
-    void (*callback)(struct msd_transfer_t *); /**< Called on last transfer */
-    void *userptr; /**< Custom user data for callback (optional) */
-    void *next; /**< Internal library use */
-    uint8_t stall; /**< Internal library use */
-    uint8_t cbw[31+31]; /**< Internal library use */
-    uint8_t csw[13+31]; /**< Internal library use */
-} msd_transfer_t;
-
 typedef enum {
     MSD_SUCCESS = 0, /**< Operation was successful */
     MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
@@ -62,6 +38,31 @@ typedef enum {
     MSD_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     MSD_ERROR_INVALID_DEVICE, /**< An invalid usb device was specified */
 } msd_error_t;
+
+typedef struct {
+    usb_device_t dev; /**< USB device */
+    uint8_t bulkin; /**< USB bulk in endpoint address */
+    uint8_t bulkout; /**< USB bulk out endpoint address */
+    uint8_t config; /**< USB config descriptor index */
+    uint8_t interface; /**< USB Interface index */
+    uint32_t tag; /**< Internal library use */
+    void *last; /**< Internal library use */
+    uint8_t haslast; /**< Internal library use */
+    uint8_t userbuf[1024]; /**< Internal library use */
+} msd_t;
+
+typedef struct msd_transfer_t {
+    msd_t *msd; /**< Initialized MSD device */
+    uint32_t lba; /**< Logical block address */
+    void *buffer; /**< Pointer to data location to read/write */
+    uint24_t count; /**< Number of blocks to transfer */
+    void (*callback)(msd_error_t error, struct msd_transfer_t *xfer); /**< Called when transfer completes */
+    void *userptr; /**< Custom user data for callback (optional) */
+    void *next; /**< Internal library use */
+    uint8_t stall; /**< Internal library use */
+    uint8_t cbw[31+31]; /**< Internal library use */
+    uint8_t csw[13+31]; /**< Internal library use */
+} msd_transfer_t;
 
 /**
  * Initialize a Mass Storage Device.
