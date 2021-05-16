@@ -151,7 +151,7 @@ gfx_sprite_t *gfx_AllocSprite(uint8_t width,
  *
  * @param width Sprite width.
  * @param height Sprite height.
- * @return A pointer to the allocated sprite.
+ * @return A pointer to the allocated sprite, or NULL if the allocation failed.
  * @see gfx_AllocSprite
  */
 #define gfx_MallocSprite(width, height) \
@@ -240,7 +240,7 @@ gfx_sprite_t *name = (gfx_sprite_t *)name##_data
  *
  * @param data_size (Maximum) sprite data size.
  * @param malloc_routine Malloc implementation to use.
- * @return A pointer to the allocated sprite.
+ * @return A pointer to the allocated sprite, or NULL if the allocation failed..
  */
 #define gfx_AllocRLETSprite(data_size, malloc_routine) \
 ((gfx_rletsprite_t *)(malloc_routine)(data_size))
@@ -259,7 +259,7 @@ gfx_sprite_t *name = (gfx_sprite_t *)name##_data
  * gfx_TempRLETSprite().
  *
  * @param data_size (Maximum) sprite data size.
- * @return A pointer to the allocated sprite.
+ * @return A pointer to the allocated sprite, or NULL if the allocation failed.
  * @see gfx_AllocRLETSprite
  */
 #define gfx_MallocRLETSprite(data_size) \
@@ -586,6 +586,7 @@ void gfx_Line(int x0,
  * Draws an unclipped line.
  *
  * This is measured from the top left origin of the screen.
+ * Performs faster than gfx_line, but can cause corruption if used outside the bounds of the screen.
  * @param x0 First X coordinate.
  * @param y0 First Y coordinate.
  * @param x1 Second X coordinate.
@@ -870,8 +871,8 @@ uint8_t gfx_GetDraw(void);
  * Swaps the roles of the screen and drawing buffers.
  *
  * Does not wait for the old screen buffer to finish being displayed. Instead,
- * the next invocation of a graphx drawing function will block, waiting for this
- * event. To block and wait explicitly, use gfx_Wait().
+ * the next invocation of a graphx drawing function will block, (pause program
+ * execution) waiting for this event. To block and wait explicitly, use gfx_Wait().
  *
  * The LCD driver maintains its own screen buffer pointer for the duration of a
  * refresh. The swap performed by this function will only be picked up at a
@@ -938,9 +939,9 @@ void gfx_BlitRectangle(gfx_location_t src,
 
 /**
  * Copies a rectangular region between graphics buffers or to the same graphics buffer.
- * The behavior is undefined when the rectangles overlap, so don't do it.
+ * The behavior is undefined when the rectangles overlap.
  * No clipping is performed as it is a copy not a draw.
- * @param src Graphics buffer to copy from.
+ * @param src Graphics buffer to copy from.i
  * @param dst Graphics buffer to copy to.
  * @param src_x X coordinate on src.
  * @param src_y Y coordinate on src.
@@ -1022,7 +1023,7 @@ void gfx_PrintUInt(unsigned int n, uint8_t length);
  * Prints a string.
  *
  * Outputs a string at the current cursor position.
- * @param string Pointer to string to print.
+ * @param string Pointer to string to print.n
  * @note By default, no text clipping is performed. See gfx_SetTextConfig.
  */
 void gfx_PrintString(const char *string);
@@ -1032,6 +1033,10 @@ void gfx_PrintString(const char *string);
  *
  * Outputs a string at the supplied coordinates.
  * Position is measured from top left origin of screen.
+ * This has the same effect as calling
+ * gfx_SetTextXY(x,y);
+ * then
+ * gfx_PrintString();
  * @param string Pointer to string to print.
  * @param x X coordinate.
  * @param y Y coordinate.
@@ -1076,19 +1081,21 @@ typedef enum {
 
 /**
  * Sets the text foreground color.
+ * Note that if you haven't called
  *
  * @param color Color index to set.
  * @returns Previous text foreground color index.
  * @note Default text foreground color index: 0.
+ * @note Default text background color index is 255, so if you don't change it and try to draw with color 255, nothing will happen.
  */
 uint8_t gfx_SetTextFGColor(uint8_t color);
 
 /**
- * Sets the text background color.
+ * Sets the text background (highlight) color.
  *
  * @param color Color index to set.
  * @returns Previous text background color index.
- * @note Default text background color index: 255.
+ * @note Default text background color index: 255. (default transparent color)
  */
 uint8_t gfx_SetTextBGColor(uint8_t color);
 
@@ -1116,6 +1123,7 @@ void gfx_Sprite(const gfx_sprite_t *sprite, int x, int y);
  * @param sprite Pointer to an initialized sprite structure.
  * @param x X coordinate.
  * @param y Y coordinate.
+ * @note If you call the _NoClip version, ensure the sprite is drawn withing the region of the screen. Otherwise, you risk overwriting important data with your sprite.
  */
 void gfx_Sprite_NoClip(const gfx_sprite_t *sprite, uint24_t x, uint8_t y);
 
@@ -1273,7 +1281,7 @@ gfx_RotatedScaledSprite_NoClip(sprite, x, y, angle, 64)
  * @param sprite_in Input sprite to flip.
  * @param sprite_out Pointer to where flipped sprite will be stored.
  * @returns A pointer to sprite_out.
- * @note sprite_in and sprite_out cannot be the same.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_FlipSpriteX(const gfx_sprite_t *sprite_in,
                               gfx_sprite_t *sprite_out);
@@ -1284,7 +1292,7 @@ gfx_sprite_t *gfx_FlipSpriteX(const gfx_sprite_t *sprite_in,
  * @param sprite_in Input sprite to flip.
  * @param sprite_out Pointer to where flipped sprite will be stored.
  * @returns A pointer to sprite_out.
- * @note sprite_in and sprite_out cannot be the same.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_FlipSpriteY(const gfx_sprite_t *sprite_in,
                               gfx_sprite_t *sprite_out);
@@ -1295,7 +1303,7 @@ gfx_sprite_t *gfx_FlipSpriteY(const gfx_sprite_t *sprite_in,
  * @param sprite_in Input sprite to rotate.
  * @param sprite_out Pointer to where rotated sprite will be stored.
  * @returns A pointer to sprite_out.
- * @note sprite_in and sprite_out cannot be the same.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_RotateSpriteC(const gfx_sprite_t *sprite_in,
                                 gfx_sprite_t *sprite_out);
@@ -1306,7 +1314,7 @@ gfx_sprite_t *gfx_RotateSpriteC(const gfx_sprite_t *sprite_in,
  * @param sprite_in Input sprite to rotate.
  * @param sprite_out Pointer to where rotated sprite will be stored.
  * @returns A pointer to sprite_out.
- * @note sprite_in and sprite_out cannot be the same.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_RotateSpriteCC(const gfx_sprite_t *sprite_in,
                                  gfx_sprite_t *sprite_out);
@@ -1317,6 +1325,7 @@ gfx_sprite_t *gfx_RotateSpriteCC(const gfx_sprite_t *sprite_in,
  * @param sprite_in Input sprite to rotate.
  * @param sprite_out Pointer to where rotated sprite will be stored.
  * @returns A pointer to sprite_out.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_RotateSpriteHalf(const gfx_sprite_t *sprite_in,
                                    gfx_sprite_t *sprite_out);
@@ -1329,6 +1338,7 @@ gfx_sprite_t *gfx_RotateSpriteHalf(const gfx_sprite_t *sprite_in,
  * @param sprite_in Input sprite to scale.
  * @param sprite_out Pointer to where scaled sprite will be stored.
  * @returns A pointer to \p sprite_out.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_ScaleSprite(const gfx_sprite_t *sprite_in,
                               gfx_sprite_t *sprite_out);
@@ -1349,6 +1359,7 @@ gfx_sprite_t *gfx_ScaleSprite(const gfx_sprite_t *sprite_in,
  * @param angle 256 position angular integer.
  * @param scale Scaling factor; range is about 1% to 400% scale.
  * @returns A pointer to \p sprite_out.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_RotateScaleSprite(const gfx_sprite_t *sprite_in,
                                     gfx_sprite_t *sprite_out,
@@ -1362,6 +1373,7 @@ gfx_sprite_t *gfx_RotateScaleSprite(const gfx_sprite_t *sprite_in,
  * @param sprite_out Pointer to where rotated sprite will be stored.
  * @param angle 256 position angular integer.
  * @returns A pointer to \p sprite_out.
+ * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  * @see gfx_RotateScaleSprite.
  */
 #define gfx_RotateSprite(sprite_in, sprite_out, angle) \
