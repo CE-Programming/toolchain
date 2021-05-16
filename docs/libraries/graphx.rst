@@ -32,17 +32,19 @@ Clipping is the process of checking if parts (or all) of an object to be drawn a
 This checking process takes time.
 If you can be sure that an object to be drawn is fully within the bounds of the screen, the clipping process can be safely skipped by using the **_NoClip** variant of the routine.
 
-**Do not use the _NoClip variant of a routine if you can not be sure that the object to be drawn is fully within the bounds of the screen. Doing so may result in corrupted graphics or memory.**
+**Do not use the _NoClip variant of a routine if you can not be sure that the object to be drawn is fully within the bounds of the screen. Doing so may result in corrupted graphics or memory.
+This is because the screen itself is represented as a region of memory. If you draw outside the bounds of that region, you risk overwriting other, possibly important data. This can cause corruption, and can cause crashes.**
 
 Partial Redraw
 --------------
 
-Partial redraw applies when you are moving a transparent sprite against a static background.
-This can be problematic, as you may not want to redraw the whole background each time.
-Partial redraw saves a copy of what is behind the transparent sprite, and draws it when the sprite moves again.
+Partial redraw applies when you are moving a sprite against a static background.
+Sometimes, it can be too slow to redraw the entire screen just to move a small portion of it.
+Partial redraw saves a copy of what is behind the sprite, and draws it when the sprite moves again.
+For example, in a simple Pong game, if a white ball is drawn on a black background, instead of redrawing the entire screen each frame, you can redraw a small region around the ball to erase it.
 
-The Implementation
-^^^^^^^^^^^^^^^^^^
+Sample Implementation
+^^^^^^^^^^^^^^^^^^^^^
 
 A brief summation of the paritial redraw using graphx is:
 
@@ -108,12 +110,13 @@ The simplest way is to call:
 
 Which will copy/blit the entire buffer to the screen.
 Alternatively, `gfx_BlitLines()` and `gfx_BlitRectangle()` and the other variations are used to specify the blitting bounds.
+This flickers less than normal drawing because having many small copy operations (like drawing sprites) is slower than one large copy operation (blitting the buffer to the screen). This means that a blit operation is less likely to get caught by a screen refresh than a bunch of sprite operations.
 
 Method 2 (Buffer Swapping)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Buffer swapping swaps the visible screen with an offscreen buffer, leaving the contents on both.
-Whatever is currently on the screen will become the graphics buffer, and whatever is in the graphics buffer will be displayed on the screen
+Whatever is currently on the screen will become the graphics buffer, and whatever is in the graphics buffer will be displayed on the screen.
 The code to swap the visible screen with nonvisibile buffer is:
 
 .. code-block:: c

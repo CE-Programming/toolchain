@@ -289,13 +289,17 @@ gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 
 /**
  * Initializes the graphics library setup.
+ * Among other things, this puts the screen in 8bpp mode, which is used for
+ * drawing.
  */
 void gfx_Begin();
 
 /**
  * Closes the graphics setup
  *
- * Restores the LCD to 16bpp preferred by the OS and clears the screen.
+ * Restores the LCD to 16bpp and clears the screen.
+ * 16bpp is used by the OS, so if you don't call this, the screen will look weird
+ * and won't work right.
  */
 void gfx_End(void);
 
@@ -609,7 +613,7 @@ void gfx_HorizLine(int x,
  * Draws an unclipped horizontal line.
  *
  * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_Line.
+ * Performs faster than using gfx_Line, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -635,7 +639,7 @@ void gfx_VertLine(int x,
  * Draws an unclipped vertical line.
  *
  * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_Line.
+ * Performs faster than using gfx_Line, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -662,6 +666,7 @@ void gfx_Rectangle(int x,
  * Draws an unclipped rectangle outline.
  *
  * This is measured from the top left origin of the screen.
+ * Performs faster than using gfx_Rectangle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param width Width of rectangle.
@@ -690,6 +695,7 @@ void gfx_FillRectangle(int x,
  * Draws an unclipped filled rectangle
  *
  * This is measured from the top left origin of the screen.
+ * Performs faster than using gfx_FillRectangle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
@@ -728,6 +734,7 @@ void gfx_FillCircle(int x,
  * Draws an unclipped filled circle.
  *
  * This is measured from the top left origin of the screen.
+ * Performs faster than using gfx_FillCircle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param radius The radius of the circle.
@@ -740,6 +747,7 @@ void gfx_FillCircle_NoClip(uint24_t x,
  * Draws an unclipped circle outline.
  *
  * This is measured from the top left origin of the screen.
+ * Performs faster than using gfx_Circle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param radius The radius of the circle.
@@ -777,6 +785,8 @@ void gfx_Polygon(const int *points, unsigned num_points);
  *                  };
  * num_points = 3;
  * gfx_Polygon_NoClip(points, num_points)
+ *
+ * Performs faster than gfx_Polygon, but can cause corruption if used outside the bounds of the screen.
  * @endcode
  * @param points Pointer to x and y pairs
  * @param num_points Number of x and y pairs
@@ -805,6 +815,7 @@ void gfx_FillTriangle(int x0,
  * Draws a unclipped filled triangle.
  *
  * Points are measured from the top left origin of the screen.
+ * Performs faster than gfx_Triangle, but can cause corruption if used outside the bounds of the screen.
  * @param x0 First X coordinate.
  * @param y0 First Y coordinate.
  * @param x1 Second X coordinate.
@@ -836,13 +847,13 @@ typedef enum {
 } gfx_location_t;
 
 /**
- * Makes the subsequent graphx drawing routines act on the buffer.
+ * Makes the subsequent graphx drawing routines act on the buffer instead of on the screen.
  */
 #define gfx_SetDrawBuffer() \
 gfx_SetDraw(gfx_buffer)
 
 /**
- * Makes the subsequent graphx drawing routines act on the screen.
+ * Makes the subsequent graphx drawing routines act on the screen instead of a buffer.
  */
 #define gfx_SetDrawScreen() \
 gfx_SetDraw(gfx_screen)
@@ -888,7 +899,7 @@ void gfx_Wait(void);
 /**
  * Copies the input buffer to the opposite buffer.
  *
- * No clipping is performed; as it is a copy not a draw.
+ * No clipping is performed as it is a copy not a draw.
  * @param src drawing location to copy from.
  * @see gfx_location_t
  */
@@ -897,7 +908,7 @@ void gfx_Blit(gfx_location_t src);
 /**
  * Copies lines from the input buffer to the opposite buffer.
  *
- * No clipping is performed; as it is a copy not a draw.
+ * No clipping is performed as it is a copy not a draw.
  * @param src drawing location to copy from.
  * @param y_loc Y Location to begin copying at.
  * @param num_lines Number of lines to copy.
@@ -911,7 +922,7 @@ void gfx_BlitLines(gfx_location_t src,
  * Transfers a rectangle from the source graphics buffer to the opposite
  * buffer.
  *
- * No clipping is performed; as it is a copy not a draw.
+ * No clipping is performed as it is a copy not a draw.
  * @param src drawing location to copy from.
  * @param x X coordinate.
  * @param y Y coordinate.
@@ -926,9 +937,9 @@ void gfx_BlitRectangle(gfx_location_t src,
                        uint24_t height);
 
 /**
- * Copies a rectangle between graphics buffers or to the same graphics buffer.
- *
- * No clipping is performed; as it is a copy not a draw.
+ * Copies a rectangular region between graphics buffers or to the same graphics buffer.
+ * The behavior is undefined when the rectangles overlap, so don't do it.
+ * No clipping is performed as it is a copy not a draw.
  * @param src Graphics buffer to copy from.
  * @param dst Graphics buffer to copy to.
  * @param src_x X coordinate on src.
@@ -949,13 +960,13 @@ void gfx_CopyRectangle(gfx_location_t src,
                        uint8_t height);
 
 /**
- * Copies the screen to the buffer
+ * Copies the contents of the screen to the buffer
  */
 #define gfx_BlitScreen() \
 gfx_Blit(gfx_screen)
 
 /**
- * Copies the buffer to the screen
+ * Copies the contents of the buffer to the screen
  */
 #define gfx_BlitBuffer() \
 gfx_Blit(gfx_buffer)
@@ -982,8 +993,9 @@ void gfx_PrintChar(const char c);
 /**
  * Prints a signed integer.
  *
- * Outputs at the current cursor position. Padded with leading zeros if
+ * Outputs at the current cursor position. Pads the integer with leading zeros if
  * necessary to satisfy the specified minimum length.
+ * For example, printInt(5,3) prints "005".
  *
  * @param n Integer to print.
  * @param length Minimum number of characters to print.
@@ -995,8 +1007,9 @@ void gfx_PrintInt(int n, uint8_t length);
 /**
  * Prints an unsigned integer.
  *
- * Outputs at the current cursor position. Padded with leading zeros if
+ * Outputs at the current cursor position. Pads the integer with leading zeros if
  * necessary to satisfy the specified minimum length.
+ * For example, printUInt(5,3) prints "005".
  *
  * @param n Unsigned integer to print.
  * @param length Minimum number of characters to print.
