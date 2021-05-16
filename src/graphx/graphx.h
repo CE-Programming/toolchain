@@ -996,7 +996,7 @@ void gfx_PrintChar(const char c);
  *
  * Outputs at the current cursor position. Pads the integer with leading zeros if
  * necessary to satisfy the specified minimum length.
- * For example, printInt(5,3) prints "005".
+ * For example, gfx_PrintInt(5,3) prints "005".
  *
  * @param n Integer to print.
  * @param length Minimum number of characters to print.
@@ -1010,7 +1010,7 @@ void gfx_PrintInt(int n, uint8_t length);
  *
  * Outputs at the current cursor position. Pads the integer with leading zeros if
  * necessary to satisfy the specified minimum length.
- * For example, printUInt(5,3) prints "005".
+ * For example, gfx_PrintUInt(5,3) prints "005".
  *
  * @param n Unsigned integer to print.
  * @param length Minimum number of characters to print.
@@ -1023,7 +1023,7 @@ void gfx_PrintUInt(unsigned int n, uint8_t length);
  * Prints a string.
  *
  * Outputs a string at the current cursor position.
- * @param string Pointer to string to print.n
+ * @param string Pointer to string to print.
  * @note By default, no text clipping is performed. See gfx_SetTextConfig.
  */
 void gfx_PrintString(const char *string);
@@ -1081,12 +1081,12 @@ typedef enum {
 
 /**
  * Sets the text foreground color.
- * Note that if you haven't called
- *
+ * 
  * @param color Color index to set.
  * @returns Previous text foreground color index.
  * @note Default text foreground color index: 0.
  * @note Default text background color index is 255, so if you don't change it and try to draw with color 255, nothing will happen.
+ * You can change this with gfx_SetTextTransparentColor(color).
  */
 uint8_t gfx_SetTextFGColor(uint8_t color);
 

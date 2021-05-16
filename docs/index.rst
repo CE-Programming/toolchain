@@ -29,7 +29,6 @@ If this is your first introduction to the CE C Toolchain, start with :ref:`getti
     headers/index
     static/debugging
     static/makefile-options
-    static/misc
 
 Helpful Resources and Bug Reports
 ---------------------------------
