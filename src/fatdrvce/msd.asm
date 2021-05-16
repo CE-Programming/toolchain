@@ -673,13 +673,12 @@ scsi_sync_command_callback:
 	add	iy,sp
 	ld	hl,(iy + 3)		; status
 	compare_hl_zero
-	ld	iy,(iy + 6)		; xfer struct
-	ld	hl,(yxfer.userptr)
-	jq	z,.success
-	set	1,(hl)
+	ld	hl,scsi_sync_command.done
+	jq	nz,.fail
+	set	0,(hl)			; success
 	ret
-.success:
-	set	0,(hl)
+.fail:
+	set	1,(hl)
 	ret
 
 ; inputs:
@@ -688,6 +687,7 @@ scsi_sync_command_callback:
 scsi_sync_command:
 	lea	de,ymsd.userbuf		; use the user buffer by default
 .buf:
+	push	iy
 	ld	(.xfer),iy		; first element is msd
 	ld	iy,.xfer
 	ld	(yxfer.buffer),de
@@ -696,22 +696,22 @@ scsi_sync_command:
 	ldir				; copy cbw to packet structure
 	ld	de,scsi_sync_command_callback
 	ld	(yxfer.callback),de
-	ld	hl,.done
-	ld	(hl),0
-	ld	(yxfer.userptr),hl	; done flag
+	xor	a,a
+	ld	(.done),a
 	call	scsi_async_cbw
 	compare_hl_zero			; make sure it succeeded
-	ret	nz
+	jq	nz,.fail
 .wait_done:
-	push	iy
-	call	usb_HandleEvents
-	pop	iy			; todo: add timeout in here?
+	call	usb_HandleEvents	; todo: add timeout in here?
+	compare_hl_zero
+	jq	nz,.fail
 	ld	a,0
 .done := $-1
 	or	a,a
 	jq	z,.wait_done
-	ld	iy,(yxfer.msd)		; restore msd struct
 	bit	1,a			; nz = fail, z = success
+.fail:
+	pop	iy
 	ret
 .xfer:
 	rb	sizeof xfer
@@ -938,21 +938,41 @@ util_msd_get_max_lun:
 util_msd_ctl_packet:
 	push	iy
 	ld	bc,0
-	push	bc			; don't care about transfer size
-	ld	bc,5			; number of retries
+	push	bc			; don't care about callback data
+	ld	bc,.callback		; callback
 	push	bc
 	push	de			; send data packet
 	push	hl			; send setup packet
-	ld	bc,0
-	push	bc
+	xor	a,a
+	sbc	hl,hl
+	push	hl
+	ld	(.done),a
 	ld	bc,(ymsd.dev)
 	push	bc
 	call	usb_GetDeviceEndpoint
 	pop	bc,bc
 	push	hl
-	call	usb_ControlTransfer
+	call	usb_ScheduleControlTransfer
 	pop	bc,bc,bc,bc,bc
+	compare_hl_zero
+	jq	nz,.fail
+.wait:
+	call	usb_HandleEvents	; todo: add timeout in here?
+	compare_hl_zero
+	jq	nz,.fail
+	ld	a,0
+.done := $-1
+	or	a,a
+	jq	z,.wait
+.fail:
 	pop	iy
+	ret
+.callback:
+	ld	a,1
+	ld	(.done),a
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 6)		; get transfer status
 	ret
 
 ; inputs:

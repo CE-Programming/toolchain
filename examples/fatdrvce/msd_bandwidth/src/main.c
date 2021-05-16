@@ -11,7 +11,7 @@ typedef struct global global_t;
 #include <stdlib.h>
 #include <string.h>
 
-#define NUM_SECTORS_PER_ACCESS 16
+#define NUM_BLOCKS_PER_ACCESS 16
 #define NUM_ACCESSES 64
 #define MAX_ENTRIES 10
 
@@ -57,29 +57,17 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
     return USB_SUCCESS;
 }
 
-void read_callback(msd_error_t error, struct msd_transfer_t *xfer)
-{
-    if (error != MSD_SUCCESS)
-    {
-        putstr("error completing read");
-    }
-
-    *(uint8_t*)xfer->userptr = 1;
-}
-
 int main(void)
 {
-    static uint8_t msd_buffer[MSD_BLOCK_SIZE * NUM_SECTORS_PER_ACCESS];
-    static char buffer[200];
+    static uint8_t msd_buffer[MSD_BLOCK_SIZE * NUM_BLOCKS_PER_ACCESS];
+    static char buffer[212];
     static global_t global;
-    static uint8_t done;
     uint32_t sector_size;
     uint32_t sector_num;
     float elapsed;
     float bps;
     usb_error_t usberr;
     msd_error_t msderr;
-    msd_transfer_t xfer;
     int i;
 
     memset(&global, 0, sizeof(global_t));
@@ -143,32 +131,54 @@ int main(void)
     putstr(buffer);
     sprintf(buffer, "num sectors: %u", (uint24_t)sector_num);
     putstr(buffer);
+    putstr("executing speed test");
+    putstr("please wait...");
 
-    memset(msd_buffer, 0xAA, sizeof msd_buffer);
+    timer_Disable(1);
+    timer_Set(1, 0);
+    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_UP);
 
-    // attempt a read
-    done = 0;
-    xfer.msd = &global.msd;
-    xfer.lba = 0;
-    xfer.buffer = msd_buffer;
-    xfer.count = 1;
-    xfer.callback = read_callback;
-    xfer.userptr = &done;
-
-    msderr = msd_ReadAsync(&xfer);
-    if (msderr != MSD_SUCCESS)
+    for (i = 0; i < NUM_ACCESSES; ++i)
     {
-        putstr("error issuing read");
-        msd_Close(&global.msd);
-        goto error;
+        msderr = msd_Write(&global.msd,
+                           i, NUM_BLOCKS_PER_ACCESS,
+                           msd_buffer);
+        if (msderr != MSD_SUCCESS)
+        {
+            putstr("error writing to msd");
+            msd_Close(&global.msd);
+            goto error;
+        }
     }
 
-    do
-    {
-        usberr = usb_HandleEvents();
-    } while (done == 0 && usberr == USB_SUCCESS);
+    elapsed = (float)timer_GetSafe(1, TIMER_UP) / 32768.0;
+    bps = (MSD_BLOCK_SIZE * NUM_BLOCKS_PER_ACCESS * NUM_ACCESSES) / elapsed;
 
-    putstr("sector read success");
+    sprintf(buffer, "write bytes/sec: %u", (unsigned int)bps);
+    putstr(buffer);
+
+    timer_Disable(1);
+    timer_Set(1, 0);
+    timer_Enable(1, TIMER_32K, TIMER_0INT, TIMER_UP);
+
+    for (i = 0; i < NUM_ACCESSES; ++i)
+    {
+        msderr = msd_Read(&global.msd,
+                          i, NUM_BLOCKS_PER_ACCESS,
+                          msd_buffer);
+        if (msderr != MSD_SUCCESS)
+        {
+            putstr("error writing to msd");
+            msd_Close(&global.msd);
+            goto error;
+        }
+    }
+
+    elapsed = (float)timer_GetSafe(1, TIMER_UP) / 32768.0;
+    bps = (MSD_BLOCK_SIZE * NUM_BLOCKS_PER_ACCESS * NUM_ACCESSES) / elapsed;
+
+    sprintf(buffer, "read bytes/sec: %u", (unsigned int)bps);
+    putstr(buffer);
 
     // close the msd device
     msd_Close(&global.msd);
