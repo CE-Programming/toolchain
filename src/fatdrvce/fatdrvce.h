@@ -60,10 +60,9 @@ typedef struct msd_transfer_t {
     void *userptr; /**< Custom user data for callback (optional) */
     void *next; /**< Internal library use */
     uint8_t stall; /**< Internal library use */
-    uint8_t cbw[31+31]; /**< Internal library use */
-    uint8_t csw[13+31]; /**< Internal library use */
+    uint8_t cbw[31+1]; /**< Internal library use */
+    uint8_t csw[13+19]; /**< Internal library use */
 } msd_transfer_t;
-
 
 /**
  * Initialize a Mass Storage Device.

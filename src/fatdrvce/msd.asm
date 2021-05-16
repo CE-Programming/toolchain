@@ -158,8 +158,8 @@ struct xfer
 	userptr rl 1
 	next rl 1
 	stall rb 1
-	cbw rb 31+31
-	csw rb 13+31
+	cbw rb 31+1
+	csw rb 13+19
 	size := $-.
 end struct
 
