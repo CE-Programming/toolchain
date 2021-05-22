@@ -19,7 +19,7 @@ struct scsipkt, dir: 0, length: 1, data: 0&
 		db (dir) shl 7, 0, %%, data
 		break
 	end iterate
-	rb 31		; padding needed because some msd drives were built by idiots
+	rb 31	; padding needed because some msd drives were built by idiots
 end struct
 
 struct scsipktrw, dir: 0, type: 0
@@ -32,7 +32,7 @@ struct scsipktrw, dir: 0, type: 0
 	groupnum db 0
 	len dw 1 bswap 2
 	ctrl db 0
-	rb 31 ; padding needed because some msd drives were built by idiots
+	rb 31	; padding needed because some msd drives were built by idiots
 end struct
 
 ;-------------------------------------------------------------------------------
@@ -143,11 +143,11 @@ struct msd
 	tag rd 1
 	last rl 1		; pointer to last transfer
 	haslast rb 1
-	userbuf rb 1024
+	userbuf rb 768
 	size := $-.
 end struct
 
-struct xfer
+struct msdXfer
 	local size
 	label .: size
 	msd rl 1
@@ -170,6 +170,7 @@ virtual at 0
         MSD_ERROR_SCSI_FAILED rb 1
 	MSD_ERROR_NOT_SUPPORTED rb 1
 	MSD_ERROR_INVALID_DEVICE rb 1
+	MSD_ERROR_TIMEOUT rb 1
 end virtual
 
 ;-------------------------------------------------------------------------------
@@ -186,7 +187,7 @@ msd_Open:
 	add	iy,sp
 	push	iy
 	ld	iy,(iy + 3)		; storage for descriptor (user buffer)
-	lea	hl,ymsd.userbuf		; D05343
+	lea	hl,ymsd.userbuf
 	ld	(.buffer),hl
 	pop	iy
 	push	iy
@@ -593,14 +594,14 @@ msd_ReadAsync:
 	ld	iy,0
 	add	iy,sp
 	ld	iy,(iy + 3)		; xfer struct
-	lea	hl,yxfer.lba
-	ld	de,(yxfer.count)
+	lea	hl,ymsdXfer.lba
+	ld	de,(ymsdXfer.count)
 	push	iy
 	ld	iy,scsi.read10
 	call	scsi_pktrw_setup
 	pop	iy
 	ld	hl,scsi.read10
-	lea	de,yxfer.cbw
+	lea	de,ymsdXfer.cbw
 	ld	bc,sizeof packetCBW
 	ldir
 	jq	scsi_async_cbw
@@ -615,14 +616,14 @@ msd_WriteAsync:
 	ld	iy,0
 	add	iy,sp
 	ld	iy,(iy + 3)		; xfer struct
-	lea	hl,yxfer.lba
-	ld	de,(yxfer.count)
+	lea	hl,ymsdXfer.lba
+	ld	de,(ymsdXfer.count)
 	push	iy
 	ld	iy,scsi.write10
 	call	scsi_pktrw_setup
 	pop	iy
 	ld	hl,scsi.write10
-	lea	de,yxfer.cbw
+	lea	de,ymsdXfer.cbw
 	ld	bc,sizeof packetCBW
 	ldir
 	jq	scsi_async_cbw
@@ -690,12 +691,12 @@ scsi_sync_command:
 	push	iy
 	ld	(.xfer),iy		; first element is msd
 	ld	iy,.xfer
-	ld	(yxfer.buffer),de
-	lea	de,yxfer.cbw
+	ld	(ymsdXfer.buffer),de
+	lea	de,ymsdXfer.cbw
 	ld	bc,sizeof packetCBW
 	ldir				; copy cbw to packet structure
 	ld	de,scsi_sync_command_callback
-	ld	(yxfer.callback),de
+	ld	(ymsdXfer.callback),de
 	xor	a,a
 	ld	(.done),a
 	call	scsi_async_cbw
@@ -721,18 +722,18 @@ scsi_sync_command:
 scsi_async_cbw:
 	xor	a,a
 	sbc	hl,hl
-	ld	(yxfer.next),hl		; clear next pointer
-	ld	(yxfer.stall),a		; clear stall for csw
-	ld	hl,(yxfer.cbw + packetCBW.len)
+	ld	(ymsdXfer.next),hl		; clear next pointer
+	ld	(ymsdXfer.stall),a		; clear stall for csw
+	ld	hl,(ymsdXfer.cbw + packetCBW.len)
 	push	iy
 	lea	de,iy			; de = xfer struct
-	ld	iy,(yxfer.msd)
+	ld	iy,(ymsdXfer.msd)
 	or	a,(ymsd.haslast)
 	jq	z,.send
 .queue:					; if currently sending, queue it
 	lea	hl,ymsd.last
 	ld	iy,(hl)
-	ld	(yxfer.next),de		; queue the next bulk transfer
+	ld	(ymsdXfer.next),de		; queue the next bulk transfer
 	ld	(hl),de			; make this xfer the new last
 	pop	iy
 	xor	a,a
@@ -755,7 +756,7 @@ scsi_async_cbw:
 	ld	hl,scsi_async_csw	; if zero length, skip data callback
 .not_zero_length:
 	pop	iy
-	lea	de,yxfer.cbw		; send cbw
+	lea	de,ymsdXfer.cbw		; send cbw
 	ld	bc,sizeof packetCBW
 	jq	scsi_async_xfer
 
@@ -771,17 +772,17 @@ scsi_async_data:
 	compare_hl_zero
 	ld	iy,(iy + 12)		; xfer struct
 	jq	nz,scsi_async_issue_callback_fail
-	bit 	7,(yxfer.cbw + packetCBW.dir)
+	bit 	7,(ymsdXfer.cbw + packetCBW.dir)
 	push	iy
-	ld	iy,(yxfer.msd)		; get msd struct
+	ld	iy,(ymsdXfer.msd)		; get msd struct
 	ld	a,(ymsd.bulkin)
 	jr	nz,.xfer
 	ld	a,(ymsd.bulkout)
 .xfer:
 	pop	iy			; restore xfer struct
 	ld	hl,scsi_async_csw
-	ld	de,(yxfer.buffer)
-	ld	bc,(yxfer.cbw + packetCBW.len)
+	ld	de,(ymsdXfer.buffer)
+	ld	bc,(ymsdXfer.cbw + packetCBW.len)
 	jq	scsi_async_xfer
 
 ; inputs:
@@ -798,10 +799,10 @@ scsi_async_csw:
 	jq	nz,scsi_async_issue_callback_fail
 .retry:
 	push	iy
-	ld	iy,(yxfer.msd)		; msd struct
+	ld	iy,(ymsdXfer.msd)		; msd struct
 	ld	a,(ymsd.bulkin)
 	pop	iy			; restore xfer struct
-	lea	de,yxfer.csw
+	lea	de,ymsdXfer.csw
 	ld	bc,sizeof packetCSW
 	ld	hl,scsi_async_done
 	jq	scsi_async_xfer
@@ -822,7 +823,7 @@ scsi_async_xfer:
 	sbc	hl,hl			; todo: is this needed
 	ld	l,a			; endpoint
 	push	hl
-	ld	iy,(yxfer.msd)		; msd struct
+	ld	iy,(ymsdXfer.msd)		; msd struct
 	ld	hl,(ymsd.dev)		; usb struct
 	push	hl
 	call	usb_GetDeviceEndpoint
@@ -845,7 +846,7 @@ scsi_async_done:
 	compare_hl_zero
 	ld	iy,(iy + 12)		; xfer struct
 	jq	nz,.check_stall
-	ld	a,(yxfer.csw + packetCSW.status)
+	ld	a,(ymsdXfer.csw + packetCSW.status)
 	or	a,a			; check for good status of transfer
 	jr	nz,.check_stall
 .check_valid:
@@ -859,8 +860,8 @@ scsi_async_done:
 .check_stall:
 	bit	0,l			; USB_TRANSFER_STALLED
 	jq	z,.failed
-	bit	0,(yxfer.stall)
-	set	0,(yxfer.stall)		; retry once if stalled
+	bit	0,(ymsdXfer.stall)
+	set	0,(ymsdXfer.stall)		; retry once if stalled
 	jq	z,scsi_async_csw.retry
 .failed:
 	jq	scsi_async_issue_callback_fail
@@ -876,16 +877,16 @@ scsi_async_issue_callback_fail:
 scsi_async_issue_callback:
 	push	iy
 	lea	de,iy
-	ld	iy,(yxfer.msd)
+	ld	iy,(ymsdXfer.msd)
 	ld	hl,(ymsd.last)
 	compare_hl_de
 	jq	nz,.dont_clear		; if xfer->msd->last == xfer
 	ld	(ymsd.haslast),0		; xfer->msd->last = NULL
 .dont_clear:
 	pop	iy
-	ld	hl,(yxfer.next)
+	ld	hl,(ymsdXfer.next)
 	push	hl
-	ld	hl,(yxfer.callback)
+	ld	hl,(ymsdXfer.callback)
 	compare_hl_zero
 	jq	z,.no_callback
 	push	iy
@@ -906,7 +907,7 @@ scsi_async_issue_callback:
 ; inputs:
 ;  iy : xfer struct
 scsi_reset_recovery:
-	ld	iy,(yxfer.msd)
+	ld	iy,(ymsdXfer.msd)
 	jq	util_msd_reset		; perform reset, usbdrvce clears stalls
 
 ; inputs:
@@ -956,6 +957,12 @@ util_msd_ctl_packet:
 	pop	bc,bc,bc,bc,bc
 	compare_hl_zero
 	jq	nz,.fail
+	ld	hl,48000000		; one second timeout
+	push	hl
+	ld	hl,.struct
+	push	hl
+	call	usb_StartTimerCycles	; set up timeout
+	pop	bc,bc
 .wait:
 	call	usb_HandleEvents	; todo: add timeout in here?
 	compare_hl_zero
@@ -968,12 +975,20 @@ util_msd_ctl_packet:
 	pop	iy
 	ret
 .callback:
-	ld	a,1
-	ld	(.done),a
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 6)		; get transfer status
+.complete:
+	ld	a,1
+	ld	(.done),a
 	ret
+.timeout:
+	ld	hl,MSD_ERROR_TIMEOUT
+	jq	.complete
+.struct:
+	dd	0
+	dl	0
+	dl	.timeout
 
 ; inputs:
 ;  hl : points to lba
