@@ -100,6 +100,7 @@ int main(void)
             usberr = usb_WaitForInterrupt();
         }
     } while (usberr == USB_RETRY_INIT);
+    usb_StartTimerCycles(0, 48000000);
 
     if (usberr != USB_SUCCESS)
     {

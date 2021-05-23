@@ -143,7 +143,7 @@ struct msd
 	tag rd 1
 	last rl 1		; pointer to last transfer
 	haslast rb 1
-	userbuf rb 768
+	buffer rb 768
 	size := $-.
 end struct
 
@@ -187,7 +187,7 @@ msd_Open:
 	add	iy,sp
 	push	iy
 	ld	iy,(iy + 3)		; storage for descriptor (user buffer)
-	lea	hl,ymsd.userbuf
+	lea	hl,ymsd.buffer
 	ld	(.buffer),hl
 	pop	iy
 	push	iy
@@ -419,7 +419,7 @@ msd_Reset:
 	ld	bc,.length		; storage for length of descriptor
 	push	bc
 	push	hl			; length of configuration descriptor
-	lea	hl,ymsd.userbuf
+	lea	hl,ymsd.buffer
 	push	hl
 	or	a,a
 	sbc	hl,hl
@@ -438,7 +438,7 @@ msd_Reset:
 	ld	hl,0
 .length := $-3
 	push	hl
-	lea	hl,ymsd.userbuf
+	lea	hl,ymsd.buffer
 	push	hl
 	ld	hl,(ymsd.dev)
 	push	hl
@@ -485,7 +485,7 @@ msd_Info:
 	push	iy
 	ld	iy,(iy + 3)
 	ld	hl,scsi.readcapacity
-	lea	de,ymsd.userbuf
+	lea	de,ymsd.buffer
 	push	de
 	call	scsi_sync_command	; store the logical block address / size
 	pop	de
@@ -686,7 +686,7 @@ scsi_sync_command_callback:
 ;  iy : msd struct
 ;  hl : cbw structure
 scsi_sync_command:
-	lea	de,ymsd.userbuf		; use the user buffer by default
+	lea	de,ymsd.buffer		; use the user buffer by default
 .buf:
 	push	iy
 	ld	(.xfer),iy		; first element is msd
@@ -715,7 +715,7 @@ scsi_sync_command:
 	pop	iy
 	ret
 .xfer:
-	rb	sizeof xfer
+	rb	sizeof msdXfer
 
 ; inputs:
 ;  iy : xfer struct
@@ -929,7 +929,7 @@ util_msd_get_max_lun:
 	ld	a,(ymsd.interface)
 	ld	(setup.msdmaxlun + 4),a
 	ld	hl,setup.msdmaxlun
-	lea	de,ymsd.userbuf
+	lea	de,ymsd.buffer
 	jq	util_msd_ctl_packet
 
 ; inputs:
@@ -957,7 +957,9 @@ util_msd_ctl_packet:
 	pop	bc,bc,bc,bc,bc
 	compare_hl_zero
 	jq	nz,.fail
-	ld	hl,48000000		; one second timeout
+	ld	hl,2
+	push	hl
+	ld	hl,14445568		; ~1 second timeout
 	push	hl
 	ld	hl,.struct
 	push	hl

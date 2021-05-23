@@ -43,7 +43,7 @@ typedef enum {
 } msd_error_t;
 
 typedef struct {
-    uint8_t private[1344]; /**< Internal library use */
+    uint8_t private[1024]; /**< Internal library use */
 } msd_t;
 
 typedef struct msd_transfer_t {
@@ -64,7 +64,7 @@ typedef struct msd_transfer_t {
 typedef enum {
     FAT_SUCCESS = 0, /**< Operation was successful */
     FAT_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
-    FAT_ERROR_USB_FAILED, /**< An error occurred in usbdrvce */
+    FAT_ERROR_MSD_FAILED, /**< An error occurred in a MSD request */
     FAT_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     FAT_ERROR_INVALID_CLUSTER, /**< An invalid FAT cluster was accessed */
     FAT_ERROR_EOF, /**< End-of-file was encountered */
@@ -86,7 +86,7 @@ typedef enum {
 } fat_list_option_t;
 
 typedef struct {
-    uint8_t private[512]; /**< Internal library use */
+    uint8_t private[1024]; /**< Internal library use */
 } fat_t;
 
 typedef struct {
@@ -95,17 +95,23 @@ typedef struct {
 
 typedef struct {
     uint32_t lba; /**< Logical Block Address (LBA) of FAT partition */
-    msd_device_t *msd; /**< MSD containing FAT filesystem */
+    msd_t *msd; /**< MSD containing FAT filesystem */
 } fat_partition_t;
 
+typedef struct {
+    char filename[13]; /**< Name of file in 8.3 format. */
+    uint8_t attrib; /**< File attributes */
+    uint32_t size; /**< Size of file in bytes */
+} fat_dir_entry_t;
+
 typedef struct fat_transfer_t {
-    fat_file_t *file; /**< Initialized MSD device */
+    fat_file_t *file; /**< Pointer to open file */
     uint24_t count; /**< Number of blocks to transfer */
     void *buffer; /**< Pointer to data location to read/write */
     void (*callback)(fat_error_t error, struct fat_transfer_t *xfer); /**< Called when transfer completes */
     void *userptr; /**< Custom user data for callback (optional) */
     void *next; /**< Internal library use */
-} msd_transfer_t;
+} fat_transfer_t;
 
 #define FAT_ENTRY     (0 << 0)  /**< Entry has no attributes. */
 #define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
