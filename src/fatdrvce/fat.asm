@@ -113,11 +113,12 @@ fat_FindPartitions:
 	ld	(.smc.maxpartitions),a
 	xor	a,a
 	ld	(hl),a
+	sbc	hl,hl
 	ld	(scsi.read10.lba),a,hl
 	ld	(scsi.read10.len + 0),a
 	inc	a
 	ld	(scsi.read10.len + 1),a
-	ld	l,2
+	ld	hl,2
 	ld	(scsi.read10 + 9),hl
 	lea	de,ymsd.buffer
 	call	util_msd_read			; read zero block
@@ -129,10 +130,9 @@ fat_FindPartitions:
 	jq	nz,.more_than_one
 .only_one:
 	call	.check_magic
+	jq	nz,.return
 	ld	hl,0
 .smc.partitionnumptr := $-3
-	ld	(hl),0
-	ret	nz
 	ld	(hl),1
 	ld	hl,(.smc.partitionptrs)
 	ld	de,0
@@ -150,6 +150,7 @@ fat_FindPartitions:
 .more_than_one:
 	ld	(.smc.errorsp),sp
 	call	.start
+.return:
 	xor	a,a
 	sbc	hl,hl				; return success
 	ret
@@ -284,7 +285,7 @@ fat_OpenPartition:
 	sbc	hl,hl
 	call	util_read_fat_sector		; read fat zero sector
 	jq	nz,.error
-	ld	ix,(yfat.buffer)
+	lea	ix,yfat.buffer
 	ld	a,(ix + 12)
 	cp	a,(ix + 16)			; ensure 512 byte sectors and 2 FATs
 	jq	nz,.error
@@ -355,7 +356,7 @@ fat_OpenPartition:
 	inc	hl
 	inc	hl
 	ld	(hl),e
-	ld	hl,(yfat.fs_info)		; a is always zero (set from above)
+	ld	hl,(yfat.fs_info)		; a is zero
 	call	util_write_fat_sector
 	jq	nz,.error
 	or	a,a
@@ -379,16 +380,16 @@ fat_ClosePartition:
 	xor	a,a
 	sbc	hl,hl
 	call	util_read_fat_sector
-	jq	nz,.usberror
+	jq	nz,.error
 	res	0,(yfat.buffer + $41)		; clear dirty bit
 	xor	a,a
 	sbc	hl,hl
 	call	util_write_fat_sector
-	jq	nz,.usberror
+	jq	nz,.error
 	xor	a,a
 	sbc	hl,hl
 	ret
-.usberror:
+.error:
 	ld	hl,FAT_ERROR_MSD_FAILED
 	ret
 
@@ -1643,13 +1644,13 @@ util_do_alloc_entry:
 
 ;-------------------------------------------------------------------------------
 ; inputs:
-;   iy: fat structure
+;   iy : fat struct
 ;   iy + working_cluster: first cluster
 ;   iy + working_block: parent entry sector
 ;   iy + working_entry: parent entry in sector
 ; outputs:
-;   auhl: new entry sector
-;   de: offset in entry sector
+;   auhl : new entry sector
+;   de : offset in entry sector
 util_alloc_entry:
 	ld	a,hl,(yfat.working_cluster)
 	call	util_cluster_to_sector
@@ -1712,10 +1713,10 @@ util_alloc_entry:
 .sectorlow := $-3
 	call	util_write_fat_sector
 	pop	de,hl
-	jq	nz,.usberr
+	jq	nz,.error
 	pop	af
 	ret
-.usberr:
+.error:
 	pop	hl
 	xor	a,a
 	sbc	hl,hl
@@ -2225,28 +2226,30 @@ util_next_cluster:
 
 ;-------------------------------------------------------------------------------
 util_read_fat_sector:
-; inputs
-;  auhl: LBA address
-;  iy: fat_t structure
-; outputs
-;  de: read sector
-	ld	de,1
+; inputs:
+;  auhl : lba
+;  iy : fat struct
+	lea	de,yfat.buffer
+.buffer:
+	ld	bc,1
 	jq	util_read_fat_multiple_sectors
 
 ;-------------------------------------------------------------------------------
 util_read_fat_multiple_sectors:
-; inputs
-;  auhl: LBA address
-;  de: number of sectors
-;  iy: fat_t structure
-; outputs
-;  de: read sector
+; inputs:
+;  auhl: lba
+;  de : data
+;  bc : block count
+;  iy : fat struct
+	push	iy
+	push	de
 	push	hl
 	ld	hl,scsi.read10.len
-	ld	(hl),d
+	ld	(hl),b
 	inc	hl
-	ld	(hl),e
-	ex	de,hl
+	ld	(hl),c
+	push	bc
+	pop	hl
 	add	hl,hl
 	ld	(scsi.read10 + 9),hl
 	pop	hl
@@ -2267,7 +2270,7 @@ util_read_fat_multiple_sectors:
 	ld	a,l
 	inc	bc
 	ld	(bc),a
-	push	iy
+	pop	de
 	ld	iy,(yfat.msd)
 	call	util_msd_read
 	pop	iy
@@ -2275,27 +2278,30 @@ util_read_fat_multiple_sectors:
 
 ;-------------------------------------------------------------------------------
 util_write_fat_sector:
-; inputs
-;  auhl: lba address
-;  iy: fat_t structure
-; outputs
-	ld	de,1
+; inputs:
+;  auhl : lba
+;  iy : fat struct
+	lea	de,yfat.buffer
+.buffer:
+	ld	bc,1
 	jq	util_write_fat_multiple_sectors
 
 ;-------------------------------------------------------------------------------
 util_write_fat_multiple_sectors:
-; inputs
-;  auhl: LBA address
-;  de: number of sectors
-;  iy: fat_t structure
-; outputs
-;  de: read sector
+; inputs:
+;  auhl: lba
+;  de : data
+;  bc : block count
+;  iy : fat struct
+	push	iy
+	push	de
 	push	hl
 	ld	hl,scsi.write10.len
-	ld	(hl),d
+	ld	(hl),b
 	inc	hl
-	ld	(hl),e
-	ex	de,hl
+	ld	(hl),c
+	push	bc
+	pop	hl
 	add	hl,hl
 	ld	(scsi.write10 + 9),hl
 	pop	hl
@@ -2316,7 +2322,7 @@ util_write_fat_multiple_sectors:
 	ld	a,l
 	inc	bc
 	ld	(bc),a
-	push	iy
+	pop	de
 	ld	iy,(yfat.msd)
 	call	util_msd_write
 	pop	iy

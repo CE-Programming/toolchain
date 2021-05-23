@@ -68,7 +68,7 @@ typedef enum {
     FAT_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     FAT_ERROR_INVALID_CLUSTER, /**< An invalid FAT cluster was accessed */
     FAT_ERROR_EOF, /**< End-of-file was encountered */
-    FAT_ERROR_NOT_FOUND, /**< The file or entry does not exist */
+    FAT_ERROR_NOT_FOUND, /**< The partition, file, or entry does not exist */
     FAT_ERROR_EXISTS, /**< The file or entry already exists */
     FAT_ERROR_INVALID_PATH, /**< An invalid path was provided */
     FAT_ERROR_FAILED_ALLOC, /**< Allocation of a cluster or file failed */
@@ -113,7 +113,7 @@ typedef struct fat_transfer_t {
     void *next; /**< Internal library use */
 } fat_transfer_t;
 
-#define FAT_ENTRY     (0 << 0)  /**< Entry has no attributes. */
+#define FAT_FILE      (0 << 0)  /**< Entry has no attributes. */
 #define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
 #define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden. */
 #define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory. */

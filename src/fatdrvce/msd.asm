@@ -869,7 +869,9 @@ scsi_async_done:
 ; inputs:
 ;  iy : xfer struct
 scsi_async_issue_callback_fail:
+	push	iy
 	call	scsi_reset_recovery
+	pop	iy
 	ld	bc,MSD_ERROR_SCSI_FAILED
 ; inputs:
 ;  de : status
@@ -964,7 +966,7 @@ util_msd_ctl_packet:
 	ld	hl,.struct
 	push	hl
 	call	usb_StartTimerCycles	; set up timeout
-	pop	bc,bc
+	pop	bc,bc,bc
 .wait:
 	call	usb_HandleEvents	; todo: add timeout in here?
 	compare_hl_zero

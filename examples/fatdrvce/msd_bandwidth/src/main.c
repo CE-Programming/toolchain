@@ -62,8 +62,8 @@ int main(void)
     static uint8_t msd_buffer[MSD_BLOCK_SIZE * NUM_BLOCKS_PER_ACCESS];
     static char buffer[212];
     static global_t global;
-    uint32_t sector_size;
-    uint32_t sector_num;
+    uint32_t block_size;
+    uint32_t block_count;
     float elapsed;
     float bps;
     usb_error_t usberr;
@@ -100,7 +100,6 @@ int main(void)
             usberr = usb_WaitForInterrupt();
         }
     } while (usberr == USB_RETRY_INIT);
-    usb_StartTimerCycles(0, 48000000);
 
     if (usberr != USB_SUCCESS)
     {
@@ -118,8 +117,8 @@ int main(void)
 
     putstr("detected drive");
 
-    // get sector number and size
-    msderr = msd_Info(&global.msd, &sector_num, &sector_size);
+    // get block count and size
+    msderr = msd_Info(&global.msd, &block_count, &block_size);
     if (msderr != MSD_SUCCESS)
     {
         putstr("error getting msd info");
@@ -128,9 +127,9 @@ int main(void)
     }
 
     // print msd sector number and size
-    sprintf(buffer, "sector size: %u", (uint24_t)sector_size);
+    sprintf(buffer, "block size: %u bytes", (uint24_t)block_size);
     putstr(buffer);
-    sprintf(buffer, "num sectors: %u", (uint24_t)sector_num);
+    sprintf(buffer, "num blocks: %u", (uint24_t)block_count);
     putstr(buffer);
     putstr("executing speed test");
     putstr("please wait...");
@@ -169,7 +168,7 @@ int main(void)
                           msd_buffer);
         if (msderr != MSD_SUCCESS)
         {
-            putstr("error writing to msd");
+            putstr("error reading from msd");
             msd_Close(&global.msd);
             goto error;
         }
