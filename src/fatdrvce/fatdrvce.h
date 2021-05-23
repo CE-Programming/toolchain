@@ -208,7 +208,9 @@ fat_error_t fat_Create(fat_t *fat, const char *path,
  * @param fat Initialized FAT structure type.
  * @param path Absolute path to file or directory to delete.
  * @return FAT_SUCCESS on success, otherwise error.
- * @note This will only delete empty directories.
+ * @note Directories must be empty in order to be deleted.
+ * @warning Do not use this function on open files. The file must be closed
+ *          before attempting to delete it.
  */
 fat_error_t fat_Delete(fat_t *fat, const char *path);
 
@@ -257,7 +259,7 @@ uint32_t fat_GetSize(fat_t *fat, const char *path);
  * @param fat Initialized FAT structure type.
  * @param path File path to open or write.
  * @param flags Mode of opening, can be a mask of FAT_READ,
-                FAT_WRITE, or simply FAT_RDWR.
+                FAT_WRITE, or simply FAT_RDWR for both.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Open(fat_file_t *file, fat_t *fat,

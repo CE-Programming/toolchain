@@ -614,10 +614,10 @@ fat_GetVolumeLabel:
 fat_Open:
 ; Attempts to open a file for reading and/or writing
 ; Arguments:
-;  sp + 3 : FAT file structure
-;  sp + 6 : FAT structure
-;  sp + 9 : Filename (8.3 format)
-;  sp + 12 : Open flags
+;  sp + 3 : fat file struct
+;  sp + 6 : fat struct
+;  sp + 9 : filename (8.3 format)
+;  sp + 12 : flags
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -666,10 +666,10 @@ fat_Open:
 fat_SetSize:
 ; Sets the size of the file
 ; Arguments:
-;  sp + 3 : FAT structure type
-;  sp + 6 : Path
-;  sp + 9 : Size low
-;  sp + 12 : Size high byte
+;  sp + 3 : fat struct
+;  sp + 6 : path
+;  sp + 9 : size low word
+;  sp + 12 : size high byte
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -1479,8 +1479,6 @@ util_dealloc_cluster_chain:
 	xor	a,a
 	ret
 
-;-------------------------------------------------------------------------------
-util_alloc_cluster:
 ; inputs:
 ;   iy: fat structure
 ;   iy + working_cluster: previous cluster
@@ -1488,6 +1486,7 @@ util_alloc_cluster:
 ;   iy + working_entry: entry in sector
 ; outputs:
 ;   auhl: allocated cluster number
+util_alloc_cluster:
 	xor	a,a
 	sbc	hl,hl
 .traversefat:
@@ -2172,14 +2171,12 @@ util_sector_to_cluster:
 	adc	a,b
 	ret
 
-;-------------------------------------------------------------------------------
+; inputs:
+;   auhl : parent cluster
+;   iy : fat struct
+; outputs:
+;   auhl : next cluster
 util_next_cluster:
-; moves to next cluster in the chain
-; inputs
-;   auhl = parent cluster
-;   iy -> fat structure
-; outputs
-;   auhl = next cluster
 	ld	de,0
 	add	hl,hl
 	adc	a,a		; << 1
@@ -2272,7 +2269,9 @@ util_read_fat_multiple_sectors:
 	ld	(bc),a
 	pop	de
 	ld	iy,(yfat.msd)
-	call	util_msd_read
+	ld	hl,scsi.read10
+	call	scsi_sync_command.buf		; read blocks
+	compare_hl_zero
 	pop	iy
 	ret
 
@@ -2324,7 +2323,9 @@ util_write_fat_multiple_sectors:
 	ld	(bc),a
 	pop	de
 	ld	iy,(yfat.msd)
-	call	util_msd_write
+	ld	hl,scsi.write10
+	call	scsi_sync_command.buf		; write blocks
+	compare_hl_zero
 	pop	iy
 	ret
 

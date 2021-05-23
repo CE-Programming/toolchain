@@ -72,6 +72,8 @@ int main(void)
     usb_error_t usberr;
     msd_error_t msderr;
     fat_error_t faterr;
+    fat_file_t file;
+    uintptr_t i;
 
     memset(&global, 0, sizeof(global_t));
     os_SetCursorPos(1, 0);
@@ -151,65 +153,62 @@ int main(void)
     }
 
     putstr("opened fat partition");
+    putstr("creating dump file...");
+
+    // create the rom dump file, deleting it if it exists first
+    fat_Delete(&fat, ROM_DUMP_NAME);
+    faterr = fat_Create(&fat, ROM_DUMP_PATH, ROM_DUMP_FILE, FAT_FILE);
+    if (faterr != FAT_SUCCESS)
+    {
+        putstr("could not create file!");
+        goto fat_error;
+    }
+
+    // set the size of the rom dump
+    faterr = fat_SetSize(&fat, ROM_DUMP_NAME, ROM_DUMP_SIZE);
+    if (faterr != FAT_SUCCESS)
+    {
+        putstr("could not set file size");
+        goto fat_error;
+    }
+
+    putstr("writing dump file...");
+
+    // open dump file for writing
+    faterr = fat_Open(&file, &fat, ROM_DUMP_NAME, FAT_WRITE);
+    if (faterr != FAT_SUCCESS)
+    {
+        putstr("could not open file");
+        goto fat_error;
+    }
 
     // quick return while I fix stuff
-    goto msd_error;
+    goto fat_error;
 
-    // attempt to create a file
-    if (faterr == FAT_SUCCESS)
+    // write the rom file, starting at the memory base address
+    // dma only works from ram, so copy to a temporary buffer
+    for (i = 0; i < ROM_DUMP_SIZE; i += ROM_BUFFER_SIZE)
     {
-        fat_file_t file;
-        uintptr_t i;
+        memcpy(rombuffer, (const void *)i, ROM_BUFFER_SIZE);
+    }
 
-        putstr("creating dump file...");
+    // close the file
+    faterr = fat_Close(&file);
+    if (faterr != FAT_SUCCESS)
+    {
+        putstr("could not close file");
+        goto fat_error;
+    }
 
-        // create the rom dump file, deleting it if it exists first
-        fat_Delete(&fat, ROM_DUMP_NAME);
-        faterr = fat_Create(&fat, ROM_DUMP_PATH, ROM_DUMP_FILE, FAT_FILE);
-        if (faterr != FAT_SUCCESS)
-	{
-            putstr("could not create file!");
-            goto fat_error;
-	}
-
-        // set the size of the rom dump
-        faterr = fat_SetSize(&fat, ROM_DUMP_NAME, ROM_DUMP_SIZE);
-        if (faterr != FAT_SUCCESS)
-	{
-            putstr("could not set file size");
-            goto fat_error;
-	}
-
-        putstr("writing dump file...");
-
-        // open dump file for writing
-        faterr = fat_Open(&file, &fat, ROM_DUMP_NAME, FAT_WRITE);
-        if (faterr != FAT_SUCCESS)
-	{
-            putstr("could not open file!");
-            goto fat_error;
-	}
-
-        // write the rom file, starting at the memory base address
-        // dma only works from ram, so copy to a temporary buffer
-        for (i = 0; i < ROM_DUMP_SIZE; i += ROM_BUFFER_SIZE)
-        {
-            memcpy(rombuffer, (const void *)i, ROM_BUFFER_SIZE);
-        }
-
-        // close the file
-        faterr = fat_Close(&file);
-        if (faterr != FAT_SUCCESS)
-            putstr("dumped rom!");
+    putstr("dumped rom!");
 
 fat_error:
-        // close the partition
-        fat_ClosePartition(&fat);
+    // close the partition
+    fat_ClosePartition(&fat);
 
 msd_error:
-        // close the msd device
-        msd_Close(&global.msd);
-    }
+    // close the msd device
+    msd_Close(&global.msd);
 
     // cleanup and return
 error:
