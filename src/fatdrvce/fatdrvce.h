@@ -111,6 +111,7 @@ typedef struct fat_transfer_t {
     void (*callback)(fat_error_t error, struct fat_transfer_t *xfer); /**< Called when transfer completes */
     void *userptr; /**< Custom user data for callback (optional) */
     void *next; /**< Internal library use */
+    msd_transfer_t xfer; /**< Internal library use */
 } fat_transfer_t;
 
 #define FAT_FILE      (0 << 0)  /**< Entry has no attributes. */
@@ -120,10 +121,6 @@ typedef struct fat_transfer_t {
 #define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory. */
 #define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
 #define FAT_ARCHIVE   (1 << 5)  /**< Entry is a directory (or subdirectory). */
-
-#define FAT_READ      (1 << 0) /**< Entry is read-only. */
-#define FAT_WRITE     (1 << 1) /**< Entry is write-only. */
-#define FAT_RDWR      (FAT_READ | FAT_WRITE) /**< Entry is read/write capable. */
 
 /**
  * Locates any available FAT partitions detected on the mass storage device
@@ -160,7 +157,7 @@ fat_error_t fat_ClosePartition(fat_t *fat);
 
 /**
  * Parses a directory and returns a list of files and subdirectories in it.
- * @param fat Initialized FAT structure type.
+ * @param fat Initialized FAT structure.
  * @param path Directory path to get list from.
  * @param option Listing option for files to find (e.g. FAT_LIST_FILEONLY)
  * @param entries Location to store found entries.
@@ -193,7 +190,7 @@ fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
 
 /**
  * Creates new files or directories in the filesystem.
- * @param fat Initialized FAT structure type.
+ * @param fat Initialized FAT structure.
  * @param path Path in which to create. Does not create subdirectories.
  * @param name Name of new file or directory.
  * @param attrib New entry attributes, can be a mask of FAT_RDONLY,
@@ -205,74 +202,48 @@ fat_error_t fat_Create(fat_t *fat, const char *path,
 
 /**
  * Deletes a file or directory and deallocates the spaced used by it on disk.
- * @param fat Initialized FAT structure type.
- * @param path Absolute path to file or directory to delete.
+ * @param fat Initialized FAT structure.
+ * @param filepath Absolute path to file or directory to delete.
  * @return FAT_SUCCESS on success, otherwise error.
  * @note Directories must be empty in order to be deleted.
  * @warning Do not use this function on open files. The file must be closed
  *          before attempting to delete it.
  */
-fat_error_t fat_Delete(fat_t *fat, const char *path);
+fat_error_t fat_Delete(fat_t *fat, const char *filepath);
 
 /**
  * Sets the attributes (read only, hidden, etc) of the file.
- * @param fat Initialized FAT structure type.
- * @param path File path.
+ * @param fat Initialized FAT structure.
+ * @param filepath Absolute file path.
  * @param attrib FAT attributes to set file to.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_SetAttrib(fat_t *fat, const char *path, uint8_t attrib);
+fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
 
 /**
  * Gets the attributes (read only, hidden, etc) of the file.
- * @param fat Initialized FAT structure type.
- * @param path File path.
+ * @param fat Initialized FAT structure.
+ * @param filepath Absolute file path.
  * @return File attributes, or 255 if an error.
  */
-uint8_t fat_GetAttrib(fat_t *fat, const char *path);
-
-/**
- * Sets the size of the file, allocating or deallocating space as needed.
- * This function should be called before attempting to write in a file that
- * does not have a large enough current file size, (i.e. a newly created file),
- * otherwise writes may always return FAT_ERROR_EOF.
- * @param fat Initialized FAT structure type.
- * @param path File path.
- * @param size New file size.
- * @return FAT_SUCCESS on success, otherwise error.
- * @warning Do not use this function on open files. The file must be closed
- *          before attempting to change the allocated size of the file.
- */
-fat_error_t fat_SetSize(fat_t *fat, const char *path, uint32_t size);
+uint8_t fat_GetAttrib(fat_t *fat, const char *filepath);
 
 /**
  * Gets the size of a file.
- * @param fat Initialized FAT structure type.
- * @param path File path.
+ * @param fat Initialized FAT structure.
+ * @param filepath Absolute file path.
  * @return File size in bytes.
  */
-uint32_t fat_GetSize(fat_t *fat, const char *path);
+uint32_t fat_GetSize(fat_t *fat, const char *filepath);
 
 /**
  * Opens a file for either reading or writing, or both.
  * @param file Uninitialized structure to store working file information.
- * @param fat Initialized FAT structure type.
- * @param path File path to open or write.
- * @param flags Mode of opening, can be a mask of FAT_READ,
-                FAT_WRITE, or simply FAT_RDWR for both.
+ * @param fat Initialized FAT structure.
+ * @param filepath Absolute file path.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_Open(fat_file_t *file, fat_t *fat,
-                     const char *path, uint8_t flags);
-
-/**
- * Closes an open file handle, freeing it for future use. This should be called
- * for "safe" removal of a FAT-formatted drive. After calling this function,
- * the drive can be ejected.
- * @param file File handle returned from fat_Open.
- * @return FAT_SUCCESS on success, otherwise error.
- */
-fat_error_t fat_Close(fat_file_t *file);
+fat_error_t fat_Open(fat_file_t *file, fat_t *fat, const char *filepath);
 
 /**
  * Sets the block offset position in the file.
@@ -283,12 +254,17 @@ fat_error_t fat_Close(fat_file_t *file);
 fat_error_t fat_SetPos(fat_file_t *file, uint24_t block);
 
 /**
- * Gets the block offset position in the file. Multiply return by the block
- * size (512) to get the byte offet.
- * @param file File handle returned from fat_Open.
- * @return File offset in number of blocks.
+ * Sets the size of the file, allocating or deallocating space as needed.
+ * This function should be called before attempting to write in a file that
+ * does not have a large enough current file size, (i.e. a newly created file),
+ * otherwise writes may always return FAT_ERROR_EOF.
+ * @param file FAT file structure.
+ * @param size New file size.
+ * @return FAT_SUCCESS on success, otherwise error.
+ * @note This function sets the file offset back to the first block, regardless
+ *       of the change in size.
  */
-uint24_t fat_GetPos(fat_file_t *file);
+fat_error_t fat_SetSize(fat_file_t *file, uint32_t size);
 
 /**
  * Synchronous read for multiple blocks. Advances the file position.
@@ -333,6 +309,13 @@ fat_error_t fat_ReadAsync(fat_transfer_t *xfer);
  * @return FAT_SUCCESS if the transfer was queued, otherwise error.
  */
 fat_error_t fat_WriteAsync(fat_transfer_t *xfer);
+
+/**
+ * Closes an open file handle.
+ * @param file File handle returned from fat_Open.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_Close(fat_file_t *file);
 
 /**
  * Initialize a Mass Storage Device.

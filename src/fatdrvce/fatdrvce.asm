@@ -30,7 +30,6 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export fat_SetAttrib
 	export fat_GetAttrib
 	export fat_SetPos
-	export fat_GetPos
 	export fat_Read
 	export fat_Write
 	export fat_ReadAsync

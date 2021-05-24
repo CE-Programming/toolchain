@@ -160,25 +160,25 @@ int main(void)
     faterr = fat_Create(&fat, ROM_DUMP_PATH, ROM_DUMP_FILE, FAT_FILE);
     if (faterr != FAT_SUCCESS)
     {
-        putstr("could not create file!");
-        goto fat_error;
-    }
-
-    // set the size of the rom dump
-    faterr = fat_SetSize(&fat, ROM_DUMP_NAME, ROM_DUMP_SIZE);
-    if (faterr != FAT_SUCCESS)
-    {
-        putstr("could not set file size");
+        putstr("could not create file");
         goto fat_error;
     }
 
     putstr("writing dump file...");
 
     // open dump file for writing
-    faterr = fat_Open(&file, &fat, ROM_DUMP_NAME, FAT_WRITE);
+    faterr = fat_Open(&file, &fat, ROM_DUMP_NAME);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not open file");
+        goto fat_error;
+    }
+
+    // set the size of the rom dump
+    faterr = fat_SetSize(&file, ROM_DUMP_SIZE);
+    if (faterr != FAT_SUCCESS)
+    {
+        putstr("could not set file size");
         goto fat_error;
     }
 

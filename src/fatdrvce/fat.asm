@@ -4,10 +4,6 @@
 ; fat structures
 ;-------------------------------------------------------------------------------
 
-BIT_READ := 0
-BIT_WRITE := 1
-BIT_OPEN := 7
-
 virtual at 0
 	FAT_SUCCESS rb 1
 	FAT_ERROR_INVALID_PARAM rb 1
@@ -35,17 +31,16 @@ struct fatFile
 	local size
 	label .: size
 	fat rl 1
-	flags rb 1
-	entry_sector rd 1
+	entry_block rd 1
 	first_cluster rd 1
 	current_cluster rd 1
 	file_size rd 1
-	file_size_sectors rl 1
+	file_size_blocks rl 1
 	fpossector rl 1
-	cluster_sector rb 1
-	current_sector rd 1
+	cluster_block rb 1
+	current_block rd 1
 	working_buffer rl 1
-	entry_pointer rl 1
+	entry_offset rl 1
 	size := $-.
 end struct
 struct fatPartition
@@ -268,8 +263,8 @@ fat_FindPartitions:
 fat_OpenPartition:
 ; Initializes a FAT filesystem from a particular LBA
 ; Arguments:
-;  sp + 3 : Uninitialized FAT structure type
-;  sp + 6 : Available FAT partition returned from fat_FindPartitions
+;  sp + 3 : uninitialized fat struct
+;  sp + 6 : fat partition
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -372,11 +367,12 @@ fat_OpenPartition:
 fat_ClosePartition:
 ; Deinitialize the FAT partition
 ; Arguments:
-;  sp + 3 : FAT structure type
+;  sp + 3 : fat struct
 ; Returns:
 ;  FAT_SUCCESS on success
-	pop	de,iy
-	push	iy,de
+	pop	de
+	ex	(sp),iy
+	push	de
 	xor	a,a
 	sbc	hl,hl
 	call	util_read_fat_sector
@@ -397,12 +393,12 @@ fat_ClosePartition:
 fat_DirList:
 ; Parses directory entires for files and subdirectories
 ; Arguments:
-;  sp + 3 : FAT structure type
-;  sp + 6 : Directory path
-;  sp + 9 : Mask for filtering entries
-;  sp + 12 : Storage for entries
-;  sp + 15 : Storage for entries number of entries
-;  sp + 18 : Amount of entries to skip
+;  sp + 3 : fat struct
+;  sp + 6 : directory path
+;  sp + 9 : entry filter
+;  sp + 12 : entry storage
+;  sp + 15 : number of entries storage
+;  sp + 18 : number of entries to skip
 ; Returns:
 ;  Number of found entries, otherwise -1
 	ld	iy,0
@@ -545,8 +541,8 @@ fat_DirList:
 fat_GetVolumeLabel:
 ; Returns the volume label if it exists
 ; Arguments:
-;  sp + 3 : FAT structure type
-;  sp + 6 : Volume label (8.3 format) storage
+;  sp + 3 : fat struct
+;  sp + 6 : volume label (8.3 format) storage
 ; Returns:
 ;  FAT_SUCCESS on success, and FAT_ERROR_NO_VOLUME_LABEL
 	pop	de,iy
@@ -617,30 +613,22 @@ fat_Open:
 ;  sp + 3 : fat file struct
 ;  sp + 6 : fat struct
 ;  sp + 9 : filename (8.3 format)
-;  sp + 12 : flags
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
-	ld	a,(iy + 12)
-	and	a,3
-	ld	(iy + 12),a
 	ld	de,(iy + 9)
 	push	iy
 	ld	iy,(iy + 6)
 	call	util_locate_entry
 	pop	iy
 	jq	z,.error
-	push	af
-	ld	a,(iy + 12)
-	set	BIT_OPEN,a
 	ld	bc,(iy + 6)
 	ld	iy,(iy + 3)
-	ld	(yfatFile.flags),a
 	ld	(yfatFile.fat),bc
-	pop	af
-	ld	(yfatFile.entry_pointer),de
-	ld	(yfatFile.entry_sector),a,hl
+.enter:
+	ld	(yfatFile.entry_offset),de
+	ld	(yfatFile.entry_block),a,hl
 	call	util_get_file_first_cluster
 	ld	(yfatFile.first_cluster),a,hl
 	ld	(yfatFile.current_cluster),a,hl
@@ -652,10 +640,10 @@ fat_Open:
 	ld	iy,(yfatFile.fat)
 	call	util_cluster_to_sector
 	pop	iy
-	ld	(yfatFile.current_sector),a,hl
+	ld	(yfatFile.current_block),a,hl
 	xor	a,a
 	sbc	hl,hl
-	ld	(yfatFile.cluster_sector),a
+	ld	(yfatFile.cluster_block),a
 	ld	(yfatFile.fpossector),hl	; return success
 	ret
 .error:
@@ -666,10 +654,9 @@ fat_Open:
 fat_SetSize:
 ; Sets the size of the file
 ; Arguments:
-;  sp + 3 : fat struct
-;  sp + 6 : path
-;  sp + 9 : size low word
-;  sp + 12 : size high byte
+;  sp + 3 : fat file struct
+;  sp + 6 : size low word
+;  sp + 9 : size high byte
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -677,7 +664,10 @@ fat_SetSize:
 	ld	de,(iy + 6)
 	push	iy
 	ld	iy,(iy + 3)
-	call	util_locate_entry
+	ld	a,hl,(yfatFile.entry_block)
+	ld	de,(yfatFile.entry_offset)
+	ld	(.fat_file),iy			; store working parameters
+	ld	iy,(yfatFile.fat)
 	ld	(yfat.working_block),a,hl
 	ld	(yfat.working_entry),de
 	push	de
@@ -688,11 +678,11 @@ fat_SetSize:
 	ld	h,(iy + 26 + 1)
 	ld	(.currentcluster),a,hl
 	pop	iy
-	ld	bc,(iy + 9)			; get new file size
-	ld	a,(iy + 12)
-	jq	z,.invalidpath			; check if real file
+	ld	bc,(iy + 6)			; get new file size
+	ld	a,(iy + 9)
 	push	iy
 	ld	iy,(iy + 3)
+	ld	iy,(yfatFile.fat)
 	push	iy
 	ld	iy,(yfat.working_entry)
 	ld	e,hl,(iy + 28)
@@ -709,6 +699,7 @@ fat_SetSize:
 	jq	nz,.notzerofile
 	push	iy
 	ld	iy,(iy + 3)
+	ld	iy,(yfatFile.fat)
 	ld	a,hl,(.currentcluster)
 	call	util_dealloc_cluster_chain	; deallocate all clusters
 	pop	iy
@@ -722,6 +713,7 @@ fat_SetSize:
 	jq	z,.success
 	push	iy
 	ld	iy,(iy + 3)
+	ld	iy,(yfatFile.fat)
 	dec	bc
 	jq	.entertraverseclusters
 .traverseclusters:
@@ -747,6 +739,7 @@ fat_SetSize:
 	push	hl
 	push	iy
 	ld	iy,(iy + 3)
+	ld	iy,(yfatFile.fat)
 	ld	a,hl,(.currentcluster)
 	ld	(yfat.working_cluster),a,hl
 	call	util_next_cluster
@@ -763,9 +756,16 @@ fat_SetSize:
 	compare_hl_zero
 	jq	nz,.allocateclusters
 	jq	.success
+.success:
+	ld	a,hl,(yfat.working_block)
+	ld	de,(yfat.working_entry)
+	ld	iy,0
+.fat_file := $-3
+	jq	fat_Open.enter			; reopen the file
 .writeentry:
 	push	iy
 	ld	iy,(iy + 3)
+	ld	iy,(yfatFile.fat)
 	ld	a,hl,(yfat.working_size)
 	compare_auhl_zero
 	jq	nz,.writenotzero
@@ -790,10 +790,6 @@ fat_SetSize:
 	call	util_ceil_byte_size_to_cluster_size
 	pop	iy
 	ret
-.success:
-	xor	a,a
-	sbc	hl,hl
-	ret
 .failedchain:
 	ld	hl,FAT_ERROR_CLUSTER_CHAIN
 	ret
@@ -810,8 +806,8 @@ fat_SetSize:
 fat_GetSize:
 ; Gets the size of the file
 ; Arguments:
-;  sp + 3 : FAT structure type
-;  sp + 6 : Path
+;  sp + 3 : fat struct
+;  sp + 6 : file path
 ; Returns:
 ;  File size in bytes
 	ld	iy,0
@@ -833,14 +829,14 @@ fat_GetSize:
 fat_SetPos:
 ; Sets the offset sector position in the file
 ; Arguments:
-;  sp + 3 : FAT File structure type
-;  sp + 6 : Sector offsets
+;  sp + 3 : fat file struct
+;  sp + 6 : block offset
 ; Returns:
 ;  FAT_SUCCESS on success
 	pop	hl,iy,de
 	push	de,iy,hl
 	ld	(yfatFile.fpossector),de
-	ld	hl,(yfatFile.file_size_sectors)
+	ld	hl,(yfatFile.file_size_blocks)
 	compare_hl_de
 	jq	c,.eof
 	ex	de,hl				; determine cluster offset
@@ -853,7 +849,7 @@ fat_SetPos:
 	ld	e,a
 	push	bc,hl
 	call	ti._lremu				; get sector offset in cluster
-	ld	(yfatFile.cluster_sector),l
+	ld	(yfatFile.cluster_block),l
 	pop	hl,bc
 	xor	a,a
 	ld	e,a
@@ -883,10 +879,10 @@ fat_SetPos:
 	call	util_cluster_to_sector
 	pop	iy
 	ld	de,0
-	ld	e,(yfatFile.cluster_sector)
+	ld	e,(yfatFile.cluster_block)
 	add	hl,de
 	adc	a,d
-	ld	(yfatFile.current_sector),a,hl
+	ld	(yfatFile.current_block),a,hl
 .success:
 	xor	a,a
 	sbc	hl,hl
@@ -901,29 +897,13 @@ fat_SetPos:
 	ld	hl,FAT_ERROR_CLUSTER_CHAIN
 	ret
 
-
-;-------------------------------------------------------------------------------
-fat_GetPos:
-; Gets the offset position in the file
-; Arguments:
-;  sp + 3 : FAT File structure type
-; Returns:
-;  Position in file
-	pop	de
-	ex	hl,(sp)
-	push	de
-	call	util_valid_file_ptr
-	ret	z
-	ld	hl,(yfatFile.fpossector)
-	ret
-
 ;-------------------------------------------------------------------------------
 fat_SetAttrib:
 ; Sets the attributes of the path
 ; Arguments:
-;  sp + 3 : FAT structure type
-;  sp + 6 : Path
-;  sp + 9 : File attributes byte
+;  sp + 3 : fat struct
+;  sp + 6 : file path
+;  sp + 9 : file attributes flag
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -956,8 +936,8 @@ fat_SetAttrib:
 fat_GetAttrib:
 ; Gets the attributes of the path
 ; Arguments:
-;  sp + 3 : FAT structure type
-;  sp + 6 : Path
+;  sp + 3 : fat struct
+;  sp + 6 : file path
 ; Returns:
 ;  File attribute byte
 	ld	iy,0
@@ -976,23 +956,13 @@ fat_GetAttrib:
 
 ;-------------------------------------------------------------------------------
 fat_Close:
-; Closes an open file handle, freeing it for future use
+; Closes an open file handle
 ; Arguments:
-;  sp + 3 : FAT File structure type
+;  sp + 3 : fat struct
 ; Returns:
 ;  FAT_SUCCESS on success
-	pop	de
-	ex	hl,(sp)
-	push	de
-	call	util_valid_file_ptr
-	jr	z,.error
-	;res	BIT_OPEN,(yfatFile.flags)
 	xor	a,a
-	ld	(yfatFile.flags),a
 	sbc	hl,hl
-	ret
-.error:
-	ld	hl,FAT_ERROR_INVALID_PARAM
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1739,23 +1709,9 @@ util_alloc_entry_root:
 	jq	util_alloc_entry
 
 ;-------------------------------------------------------------------------------
-util_valid_file_ptr:
-	compare_hl_zero
-	jr	z,.invalid
-	push	hl
-	pop	iy
-	bit	BIT_OPEN,(yfatFile.flags)
-	ret	nz
-.invalid:
-	xor	a,a
-	sbc	hl,hl
-	ld	e,a
-	ret
-
-;-------------------------------------------------------------------------------
 util_get_file_first_cluster:
 	push	iy
-	ld	iy,(yfatFile.entry_pointer)
+	ld	iy,(yfatFile.entry_offset)
 	ld	a,(iy + 20 + 1)
 	ld	hl,(iy + 20 - 2)
 	ld	l,(iy + 26 + 0)
@@ -1766,7 +1722,7 @@ util_get_file_first_cluster:
 ;-------------------------------------------------------------------------------
 util_get_file_size:
 	push	iy
-	ld	iy,(yfatFile.entry_pointer)
+	ld	iy,(yfatFile.entry_offset)
 	ld	a,hl,(iy + 28)
 	pop	iy
 	ret
@@ -1775,7 +1731,7 @@ util_get_file_size:
 util_set_file_size:
 	ld	(yfatFile.file_size),a,hl
 	call	util_ceil_byte_size_to_sector_size
-	ld	(yfatFile.file_size_sectors),a,hl
+	ld	(yfatFile.file_size_blocks),a,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2430,7 +2386,6 @@ util_ceil_byte_size_to_sector_size:
 	inc	hl
 	ret
 
-;-------------------------------------------------------------------------------
 util_ceil_byte_size_to_cluster_size:
 	compare_auhl_zero
 	ret	z
@@ -2455,7 +2410,6 @@ util_ceil_byte_size_to_cluster_size:
 	inc	hl
 	ret
 
-;-------------------------------------------------------------------------------
 util_compare_auhl_zero:
 	compare_hl_zero
 	ret	nz
