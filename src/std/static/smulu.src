@@ -1,5 +1,3 @@
-	assume	adl=1
-
 	public __smuls
 __smuls:
 	public __smulu
@@ -7,7 +5,7 @@ __smulu:
 
 ; Multiplies HL by BC and returns the 16-bit product hl.
 ;    I: BC=multiplier, HL=multiplicand
-;    O: a=h, ubc=C*H, ude=B*L, hl=DE*HL, hlu=0
+;    O: a=h, ubc=H*C, ude=L*B, hl=HL*DE, hlu=0
 ;   FO: sz(h), p/v=?, c=?
 ;   CC: 16*r(PC)+(ADL?3*r(SPL):2*r(SPS))+13
 			; a			ubc	ude	uhl
@@ -16,15 +14,15 @@ Mul_HL_BC_HL:		;----------------------+-------+-------+------------------------
 	ld e,l		; 				 de=BL
 	ld b,h		;			 bc=HC
 	ld h,c		;					 hl=CL
-	mlt bc		; 			ubc=C*H
-	mlt de		;				ude=B*L
-	mlt hl		;					uhl=C*L
-	ld a,h		; a=(C*L>>8)
-	add a,c		; a=(C*L>>8)+(C*H)
-	add a,e		; a=(C*L>>8)+(C*H)+(B*L)
-	ld h,a		;					 hl=C*L+((C*H)+(B*L)<<8)
+	mlt bc		; 			ubc=H*C
+	mlt de		;				ude=L*B
+	mlt hl		;					uhl=L*C
+	ld a,h		; a=L*C>>8
+	add a,c		; a=(L*C>>8)+H*C
+	add a,e		; a=(L*C>>8)+H*C+L*B
+	ld h,a		;					 hl=L*C+((H*C)+(L*B)<<8)
 	ret
 
-; (HL*BC)&0xFFFF=(C*L+((B*L)+(C*H)<<8)+(B*H<<16))&0xFFFF
-;		=((C*L)&0xFFFF)+((B*L)+(C*H)<<8&0xFFFF)+(B*H<<16&0xFFFF)
-;		=C*L+((B*L)+(C*H)<<8&0xFFFF)
+; HL*BC&0xFFFF=C*L+(H*C+B*L<<8)+(H*B<<16)&0xFFFF
+;	      =(C*L&0xFFFF)+(B*L+H*C<<8&0xFFFF)+(B*H<<16&0xFFFF)
+;	      =C*L+(B*L+H*C<<8&0xFFFF)
