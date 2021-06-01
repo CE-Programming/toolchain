@@ -409,7 +409,6 @@ fini_array::
 	extern	___libs
 	extern	___low_bss
 	extern	__indcallhl
-	extern	_exit
 	extern	_free
 ifextern ___main_argc_argv
 	extern	___main_argc_argv
