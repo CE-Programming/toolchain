@@ -1,4 +1,5 @@
 	public	__u_flt_info, __u_flt_rnd, _acosf, _asinf, _atanf, _atan2f, _atoff, _ceilf, _cosf, _coshf, _expf, _fabsf, _floorf, _fmodf, _frexpf, _ldexpf, _logf, _log10f, _modff, _powf, _sinf, _sinhf, _sqrtf, _strtodf, _tanf, _tanhf, _acos, _asin, _atan, _atan2, _atof, _ceil, _cos, _cosh, _exp, _fabs, _floor, _fmod, _frexp, _ldexp, _log, _log10, _modf, _pow, _sin, _sinh, _sqrt, _strtod, _tan, _tanh
+
 __u_flt_info := 022128h
 __u_flt_rnd  := 02212Ch
 _acosf       := 022100h
@@ -52,4 +53,8 @@ _strtod      := 0220E0h
 _tan         := 022120h
 _tanh        := 022138h
 
-
+; integer math
+	public __smuls
+__smuls      := 0000224h
+	public __smulu
+__smulu      := 0000228h
