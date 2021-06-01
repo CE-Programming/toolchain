@@ -54,6 +54,10 @@ _tan         := 022120h
 _tanh        := 022138h
 
 ; integer math
+	public __imuls
+__imuls      := 0000154h
+	public __imulu
+__imulu      := 0000158h
 	public __smuls
 __smuls      := 0000224h
 	public __smulu
