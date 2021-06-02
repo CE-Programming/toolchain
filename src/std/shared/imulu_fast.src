@@ -11,7 +11,7 @@ __imulu_fast:
 ;   FO: sz(a), vc((UHL*UBC-L*C&0xFFFFFF)+L*C)
 ;   CC: 43*r(PC)+9*r(SPL)+6*w(SPL)+25
 ;				; a		ubc		ude		uhl		u(sp)
-Mul_UHL_UBC_UHL_Fast:		;--------------+---------------+---------------+---------------+----------------
+Mul_UHL_UBC_UHL_Fast:		;--------------+---------------+---------------+---------------+------------------------
 	ld	d, b
 	ld	e, h		;				 de=BH
 	mlt	de		;				ude=H*B
