@@ -1,15 +1,15 @@
-	public __smuls
-__smuls:
-	public __smulu
-__smulu:
+	public __smuls_fast
+__smuls_fast:
+	public __smulu_fast
+__smulu_fast:
 
 ; Multiplies HL by BC and returns the 16-bit product hl.
 ;    I: BC=multiplier, HL=multiplicand
-;    O: a=h, ubc=H*C, ude=L*B, hl=HL*DE, hlu=0
+;    O: a=h, ubc=H*C, ude=L*B, hl=HL*BC, hlu=0
 ;   FO: sz(h), p/v=?, c=?
 ;   CC: 16*r(PC)+(ADL?3*r(SPL):2*r(SPS))+13
 			; a		ubc		ude		uhl
-Mul_HL_BC_HL:		;--------------+---------------+---------------+----------------
+Mul_HL_BC_HL_Fast:	;--------------+---------------+---------------+----------------
 	ld d,b
 	ld e,l		; 				 de=BL
 	ld b,h		;		 bc=HC
@@ -23,5 +23,5 @@ Mul_HL_BC_HL:		;--------------+---------------+---------------+----------------
 	ld h,a		;						 hl=L*C+((H*C)+(L*B)<<8)
 	ret
 
-; HL*BC&0xFFFF=C*L+(H*C+B*L<<8)+(H*B<<16)&0xFFFF
-;	      =C*L+(B*L+H*C<<8)&0xFFFF
+; HL*BC&0xFFFF=L*C+(H*C+L*B<<8)+(H*B<<16)&0xFFFF
+;	      =L*C+(H*C+L*B<<8)&0xFFFF
