@@ -1,0 +1,60 @@
+	assume	adl=1
+
+	public __imuls
+__imuls:
+	public __imulu
+__imulu:
+
+; Multiplies UHL by UBC and returns the 24-bit product uhl.
+;    I: UBC=multiplier, UHL=multiplicand, ABL=1
+;    O: a=UHL*UBC-L*C>>16, ubc=L*B, ude=L*C, uhl=UHL*UBC
+;   FO: --
+;   CC: 49*r(PC)+15*r(SPL)+12*w(SPL)+25
+;			; a		ude		uhl		u(sp)
+Mul_UHL_UBC_UHL:	;--------------+---------------+---------------+----------------
+	push de		;						u(sp)=UDE
+	push af		;							u(sp)=AF
+	ld d,b
+	ld e,h		;		 de=BH
+	mlt de		;		ude=H*B
+	ld a,e		; a=H*B
+	dec sp
+	push hl
+	push bc
+	inc sp		;								 (sp)=[HLU]H
+			;									 (sp)=[BCU]B
+	pop de		;		 de=[BCU]B						--
+	ld e,l		;		 de=[BCU]L
+	mlt de		;		ude=L*BCU
+	add a,e		; a=H*B+L*BCU
+	pop de		;		 de=[HLU]H					--
+	ld e,c		;		 de=[HLU]C
+	mlt de		;		ude=HLU*C
+	add a,e		; a=HLU*C+H*B+L*BCU
+	ld e,l		;		  e=L
+	ld l,c		;				 hl=HC
+	mlt hl		;				uhl=H*C
+	add a,h		; a=(H*C>>8)+HLU*C+H*B+L*BCU
+	ld h,a		;				uhl=H*C+(HLU*C+H*B+L*BCU<<8)&0xFFFF
+	ld a,e		; a=L
+	ld d,b		; 		 de=BL
+	mlt de		;		ude=L*B
+	add hl,de	;				uhl=L*B+(H*C+(HLU*C+H*B+L*BCU<<8)&0xFFFF)
+	ld d,c
+	ld e,a		;		 de=CL
+	mlt de		;		ude=L*C
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	add hl,hl	;				uhl=(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)
+	add hl,de	;				uhl=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)
+	pop af		; a=A							--
+	pop de		;		ude=UDE				--
+	ret
+
+; (UHL*UBC)&0xFFFFFF=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)+(HLU*B+H*BCU<<24)+(HLU*BCU<<32)&0xFFFFFF
+;		    =L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)&0xFFFFFF
