@@ -6,8 +6,8 @@ __imuls:
 __imulu:
 
 ; Multiplies UHL by UBC and returns the 24-bit product uhl.
-;    I: UBC=multiplier, UHL=multiplicand, ABL=1
-;    O: a=UHL*UBC-L*C>>16, ubc=L*B, ude=L*C, uhl=UHL*UBC
+;    I: UBC=multiplier, UHL=multiplicand, ADL=1
+;    O: uhl=UHL*UBC
 ;   FO: --
 ;   CC: 49*r(PC)+15*r(SPL)+12*w(SPL)+25
 ;			; a		ude		uhl		u(sp)
