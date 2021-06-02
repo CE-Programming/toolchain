@@ -18,7 +18,7 @@ Mul_EUHL_AUBC_EUHL_Fast:	;--------------+---------------+---------------+-------
 	ld	d, a		;				 d =A
 	ld	a, e		; a=E*C
 	ld	e, l		; 				 de=AL
-	ld	ixl, e		;								 ixl=L
+	ld	ixl, e		;								ixl=L
 	mlt	de		;				ude=L*A
 	add	a, e		; a=E*C+L*A
 	dec	sp
@@ -72,8 +72,8 @@ Mul_EUHL_AUBC_EUHL_Fast:	;--------------+---------------+---------------+-------
 	ld	b, ixl		;		 bc =LC
 	mlt	bc		;		ubc=L*C
 	add	hl, bc		;						uhl=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)
-	ld	e, a		;				  e=H*C+L*B+(HLU*C+H*B+L*BCU<<8)+(E*C+HLU*B+H*BCU+L*A<<16)>>16
 	pop	ix		;								uix=UIX		--
+	ld	e, a		;				  e=H*C+L*B+(HLU*C+H*B+L*BCU<<8)+(E*C+HLU*B+H*BCU+L*A<<16)>>16
 	ret	nc		; nc => e=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)+(E*C+HLU*B+H*BCU+L*A<<24)>>24
 	inc	e		; 				e=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)+(E*C+HLU*B+H*BCU+L*A<<24)>>24
 	ret

@@ -12,8 +12,8 @@ __imulu:
 ;   CC: 49*r(PC)+15*r(SPL)+12*w(SPL)+25
 ;				; a		ude		uhl		u(sp)
 Mul_UHL_UBC_UHL:		;--------------+---------------+---------------+----------------------------------------
-	push	de		;						u(sp)=UDE
-	push	af		;							u(sp)=AF
+	push	af		;						u(sp)=AF
+	push	de		;							u(sp)=UDE
 	ld	d, b
 	ld	e, h		;		 de=BH
 	mlt	de		;		ude=H*B
@@ -40,9 +40,6 @@ Mul_UHL_UBC_UHL:		;--------------+---------------+---------------+--------------
 	ld	d, b		; 		 de=BL
 	mlt	de		;		ude=L*B
 	add	hl, de		;				uhl=L*B+(H*C+(HLU*C+H*B+L*BCU<<8)&0xFFFF)
-	ld	d, c
-	ld	e, a		;		 de=CL
-	mlt	de		;		ude=L*C
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
@@ -51,9 +48,12 @@ Mul_UHL_UBC_UHL:		;--------------+---------------+---------------+--------------
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl		;				uhl=(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)
+	ld	d, a		;		 d =L
+	ld	e, c		;		 de=LC
+	mlt	de		;		ude=L*C
 	add	hl, de		;				uhl=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)
-	pop	af		; a=A							--
-	pop	de		;		ude=UDE				--
+	pop	de		;		ude=UDE					--
+	pop	af		; a=A						--
 	ret
 
 ; (UHL*UBC)&0xFFFFFF=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)+(HLU*B+H*BCU<<24)+(HLU*BCU<<32)&0xFFFFFF
