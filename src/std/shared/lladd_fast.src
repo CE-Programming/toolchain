@@ -10,10 +10,10 @@ __lladd_fast:
 	adc	hl, bc
 	ex	de, hl
 	pop	bc
-	jr	nc, .nc48
-	inc	bc
-.nc48:
-	ld	iy, (iy + 6)
-	add	iy, bc
-	lea	bc, iy
+	ld	a, c
+	adc	a, (iy + 6)
+	ld	c, a
+	ld	a, b
+	adc	a, (iy + 7)
+	ld	b, a
 	ret
