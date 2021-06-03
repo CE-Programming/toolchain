@@ -1,0 +1,17 @@
+	public	__lcmpzero
+__lcmpzero:
+	inc	e
+	dec	e
+	jr	nz, .e_nz
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ret	z
+	inc	e
+	dec	de
+	ret
+.e_nz:
+	ret	po
+	dec	e
+	inc	e
+	ret

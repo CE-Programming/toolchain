@@ -1,0 +1,8 @@
+	public	__icmpzero
+__icmpzero:
+	push	bc
+	ld	bc, 0
+	or	a, a
+	sbc	hl, bc
+	pop	bc
+	ret

@@ -1,0 +1,15 @@
+	public	__llcmpzero_fast
+__llcmpzero_fast:
+	xor	a, a
+	add	a, b
+	ret	nz
+	cp	a, c
+	jr	nz, .nz
+	mlt	bc
+	adc	hl, bc
+	jr	nz, .nz
+	adc	hl, de
+	ret	z
+.nz:
+	inc	a
+	ret

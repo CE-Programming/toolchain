@@ -1,0 +1,27 @@
+	public	__llcmpzero
+__llcmpzero:
+	inc	b
+	djnz	.b_nz
+	dec	c
+	inc	c
+	jr	nz, .c_nz
+	mlt	bc
+	adc	hl, bc
+	jr	nz, .udeuhl_nz
+	adc	hl, de
+	ret	z
+.udeuhl_nz:
+	inc	c
+	dec	bc
+	ret
+.b_nz:
+	dec	b
+	ret	po
+	dec	b
+	inc	b
+	ret
+.c_nz:
+	ret	p
+	dec	c
+	inc	bc
+	ret

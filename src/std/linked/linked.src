@@ -56,6 +56,8 @@ _tanh        := 022138h
 ; short (16-bit) math
 	public	__sand
 __sand		:= 000200h
+	public	__scmpzero
+__scmpzero	:= 000204h
 	public	__smuls
 __smuls		:= 000224h
 	public	__smulu
@@ -68,6 +70,8 @@ __sxor		:= 000268h
 ; int (24-bit) math
 	public	__iand
 __iand		:= 000134h
+	public	__icmpzero
+__icmpzero	:= 000138h
 	public	__imuls
 __imuls		:= 000154h
 	public	__imulu
@@ -80,6 +84,8 @@ __ixor		:= 000198h
 ; long (32-bit) math
 	public	__land
 __land		:= 0001A4h
+	public	__lcmpzero
+__lcmpzero	:= 0001B0h
 	public	__lmuls
 __lmuls		:= 0001C8h
 	public	__lmulu

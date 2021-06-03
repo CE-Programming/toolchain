@@ -1,0 +1,7 @@
+	public	__icmpzero_fast
+__icmpzero_fast:
+	xor	a, a
+	ld	c, a
+	mlt	bc
+	sbc	hl, bc
+	ret
