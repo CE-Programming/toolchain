@@ -82,6 +82,8 @@ __ior		:= 000168h
 __ixor		:= 000198h
 
 ; long (32-bit) math
+	public	__ladd
+__ladd		:= 00019Ch
 	public	__land
 __land		:= 0001A4h
 	public	__lcmpzero

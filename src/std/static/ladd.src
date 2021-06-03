@@ -1,0 +1,8 @@
+	public	__ladd
+__ladd:
+	push	af
+	add	hl, bc
+	add	a, e
+	ld	e, a
+	pop	af
+	ret

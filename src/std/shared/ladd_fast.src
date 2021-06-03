@@ -1,0 +1,6 @@
+	public	__ladd_fast
+__ladd_fast:
+	add	hl, bc
+	add	a, e
+	ld	e, a
+	ret

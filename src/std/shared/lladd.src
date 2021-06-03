@@ -1,0 +1,18 @@
+	public	__lladd
+__lladd:
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	ld	bc, (iy)
+	add	hl, bc
+	ex	de, hl
+	ld	bc, (iy + 3)
+	add	hl, bc
+	ex	de, hl
+	pop	bc
+	ld	iy, (iy + 6)
+	add	iy, bc
+	lea	bc, iy
+	pop	iy
+	ret
