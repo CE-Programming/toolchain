@@ -2,7 +2,7 @@
 __ladd:
 	push	af
 	add	hl, bc
-	add	a, e
+	adc	a, e
 	ld	e, a
 	pop	af
 	ret
