@@ -53,15 +53,7 @@ _strtod      := 0220E0h
 _tan         := 022120h
 _tanh        := 022138h
 
-; integer math
-	public	__imuls
-__imuls		:= 000154h
-	public	__imulu
-__imulu		:= 000158h
-	public	__lmuls
-__lmuls		:= 0001C8h
-	public	__lmulu
-__lmulu		:= 0001CCh
+; short (16-bit) math
 	public	__sand
 __sand		:= 000200h
 	public	__smuls
@@ -72,3 +64,21 @@ __smulu		:= 000228h
 __sor		:= 000234h
 	public	__sxor
 __sxor		:= 000268h
+
+; int (24-bit) math
+	public	__iand
+__iand		:= 000134h
+	public	__imuls
+__imuls		:= 000154h
+	public	__imulu
+__imulu		:= 000158h
+	public	__ior
+__ior		:= 000168h
+	public	__ixor
+__ixor		:= 000198h
+
+; long (32-bit) math
+	public	__lmuls
+__lmuls		:= 0001C8h
+	public	__lmulu
+__lmulu		:= 0001CCh
