@@ -1,9 +1,9 @@
 	public	__sand_fast
 __sand_fast:
-	ld	a, l
-	and	a, c
-	ld	l, a
 	ld	a, h
 	and	a, b
 	ld	h, a
+	ld	a, l
+	and	a, c
+	ld	l, a
 	ret
