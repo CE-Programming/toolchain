@@ -94,5 +94,7 @@ __lmuls		:= 0001C8h
 __lmulu		:= 0001CCh
 	public	__lor
 __lor		:= 0001D8h
+	public	__lsub
+__lsub		:= 0001F8h
 	public	__lxor
 __lxor		:= 0001FCh

@@ -1,0 +1,9 @@
+	public	__lsub_fast
+__lsub_fast:
+	or	a, a
+	sbc	hl, bc
+	cpl
+	ccf
+	adc	a, e
+	ld	e, a
+	ret

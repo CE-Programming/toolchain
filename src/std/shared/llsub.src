@@ -1,0 +1,20 @@
+	public	__llsub
+__llsub:
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	ld	bc, (iy)
+	sbc	hl, bc
+	ex	de, hl
+	ld	bc, (iy + 3)
+	sbc	hl, bc
+	ex	de, hl
+	ex	(sp),hl
+	ld	bc, (iy + 6)
+	adc	hl, bc
+	ld	c, l
+	ld	b, h
+	pop	hl
+	pop	iy
+	ret
