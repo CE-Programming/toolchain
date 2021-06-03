@@ -1,4 +1,4 @@
-        public  __bldiy, __bshl, __bshru, __bstix, __bstiy, __case, __case16, __case16D, __case24, __case24D, __case8, __case8D, __fadd, __fcmp, __fdiv, __fmul, __fppack, __frbtof, __frftob, __frftoi, __frftos, __frftoub, __frftoui, __frftous, __fritof, __frstof, __frubtof, __fruitof, __frustof, __fsub, __ftol, __icmpzero, __idivs, __idivu, __idvrmu, __ildix, __ildiy, __imul_b, __indcall, __ineg, __inot, __irems, __iremu, __ishl, __ishl_b, __ishrs, __ishrs_b, __ishru, __ishru_b, __istix, __istiy, __itol, __ladd, __ladd_b, __land, __lcmps, __lcmpu, __lcmpzero, __ldivs, __ldivu, __ldvrmu, __lldix, __lldiy, __lneg, __lnot, __lor, __lrems, __lremu, __lshl, __lshrs, __lshru, __lstix, __lstiy, __lsub, __ltof, __lxor, __scmpzero, __sdivs, __sdivu, __seqcase, __seqcaseD, __setflag, __sldix, __sldiy, __sneg, __snot, __srems, __sremu, __sshl, __sshl_b, __sshrs, __sshrs_b, __sshru, __sshru_b, __sstix, __sstiy, __stoi, __stoiu, __ultof, _longjmp, _memchr, _memcmp, _memcpy, _memmove, _setjmp, ___sprintf, _sqrtf, _strcasecmp, _strcat, _strchr, _strcmp, _strcpy, _strcspn, _strlen, _strncat, _strncmp, _strncpy, _strpbrk, _strrchr, _strspn, _strstr, _strtok, _tolower, _toupper
+        public  __bldiy, __bshl, __bshru, __bstix, __bstiy, __case, __case16, __case16D, __case24, __case24D, __case8, __case8D, __fadd, __fcmp, __fdiv, __fmul, __fppack, __frbtof, __frftob, __frftoi, __frftos, __frftoub, __frftoui, __frftous, __fritof, __frstof, __frubtof, __fruitof, __frustof, __fsub, __ftol, __icmpzero, __idivs, __idivu, __idvrmu, __ildix, __ildiy, __imul_b, __indcall, __ineg, __inot, __irems, __iremu, __ishl, __ishl_b, __ishrs, __ishrs_b, __ishru, __ishru_b, __istix, __istiy, __itol, __ladd, __ladd_b, __lcmps, __lcmpu, __lcmpzero, __ldivs, __ldivu, __ldvrmu, __lldix, __lldiy, __lneg, __lnot, __lrems, __lremu, __lshl, __lshrs, __lshru, __lstix, __lstiy, __lsub, __ltof, __scmpzero, __sdivs, __sdivu, __seqcase, __seqcaseD, __setflag, __sldix, __sldiy, __sneg, __snot, __srems, __sremu, __sshl, __sshl_b, __sshrs, __sshrs_b, __sshru, __sshru_b, __sstix, __sstiy, __stoi, __stoiu, __ultof, _longjmp, _memchr, _memcmp, _memcpy, _memmove, _setjmp, ___sprintf, _sqrtf, _strcasecmp, _strcat, _strchr, _strcmp, _strcpy, _strcspn, _strlen, _strncat, _strncmp, _strncpy, _strpbrk, _strrchr, _strspn, _strstr, _strtok, _tolower, _toupper
 __bldiy     := 0000FCh
 __bshl      := 000100h
 __bshru     := 000104h
@@ -53,7 +53,6 @@ __istiy     := 000190h
 __itol      := 000194h
 __ladd      := 00019Ch
 __ladd_b    := 0001A0h
-__land      := 0001A4h
 __lcmps     := 0001A8h
 __lcmpu     := 0001ACh
 __lcmpzero  := 0001B0h
@@ -66,7 +65,6 @@ __lmuls     := 0001C8h
 __lmulu     := 0001CCh
 __lneg      := 0001D0h
 __lnot      := 0001D4h
-__lor       := 0001D8h
 __lrems     := 0001DCh
 __lremu     := 0001E0h
 __lshl      := 0001E4h
@@ -76,7 +74,6 @@ __lstix     := 0001F0h
 __lstiy     := 0001F4h
 __lsub      := 0001F8h
 __ltof      := 000284h
-__lxor      := 0001FCh	
 __scmpzero  := 000204h
 __sdivs     := 000208h
 __sdivu     := 00020Ch

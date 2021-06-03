@@ -78,7 +78,13 @@ __ior		:= 000168h
 __ixor		:= 000198h
 
 ; long (32-bit) math
+	public	__land
+__land		:= 0001A4h
 	public	__lmuls
 __lmuls		:= 0001C8h
 	public	__lmulu
 __lmulu		:= 0001CCh
+	public	__lor
+__lor		:= 0001D8h
+	public	__lxor
+__lxor		:= 0001FCh
