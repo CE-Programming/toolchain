@@ -1,0 +1,9 @@
+	public	__sor_fast
+__sor_fast:
+	ld	a, l
+	or	a, c
+	ld	l, a
+	ld	a, h
+	or	a, b
+	ld	h, a
+	ret

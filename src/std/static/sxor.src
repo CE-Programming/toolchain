@@ -1,0 +1,11 @@
+	public	__sxor
+__sxor:
+	push	af
+	ld	a, l
+	xor	a, c
+	ld	l, a
+	ld	a, h
+	xor	a, b
+	ld	h, a
+	pop	af
+	ret

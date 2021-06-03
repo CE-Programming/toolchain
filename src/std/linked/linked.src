@@ -55,14 +55,20 @@ _tanh        := 022138h
 
 ; integer math
 	public	__imuls
-__imuls		:= 0000154h
+__imuls		:= 000154h
 	public	__imulu
-__imulu		:= 0000158h
+__imulu		:= 000158h
 	public	__lmuls
-__lmuls		:= 00001C8h
+__lmuls		:= 0001C8h
 	public	__lmulu
-__lmulu		:= 00001CCh
+__lmulu		:= 0001CCh
+	public	__sand
+__sand		:= 000200h
 	public	__smuls
-__smuls		:= 0000224h
+__smuls		:= 000224h
 	public	__smulu
-__smulu		:= 0000228h
+__smulu		:= 000228h
+	public	__sor
+__sor		:= 000234h
+	public	__sxor
+__sxor		:= 000268h
