@@ -2,25 +2,30 @@
 
 	public	__lpopcnt
 __lpopcnt:
+	push	bc
 	push	hl
-	ld	a,l
-	call	__bpopcnt
-	ld	l,a
-	ld	a,h
-	call	__bpopcnt
-	add	a,l
-	ld	l,a
-	dec	sp
-	push	hl
-	inc	sp
-	pop	af
-	call	__bpopcnt
-	add	a,l
-	ld	l,a
-	ld	a,e
-	call	__bpopcnt
-	add	a,l
+	xor	a, a
+	ld	c, a
+	ld	b, 4
+.loop:
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	ld	l, e
+	djnz	.loop
 	pop	hl
+	pop	bc
 	ret
-
-	extern	__bpopcnt

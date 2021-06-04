@@ -1,0 +1,48 @@
+	assume	adl=1
+
+	public	__spopcnt_fast
+__spopcnt_fast:
+	push	hl
+	xor	a, a
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	add	hl, hl
+	adc	a, l
+	pop	hl
+	ret
