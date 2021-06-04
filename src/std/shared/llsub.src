@@ -10,9 +10,9 @@ __llsub:
 	ld	bc, (iy + 9)
 	sbc	hl, bc
 	ex	de, hl
-	ex	(sp),hl
+	ex	(sp), hl
 	ld	bc, (iy + 12)
-	adc	hl, bc
+	sbc	hl, bc
 	ld	c, l
 	ld	b, h
 	pop	hl
