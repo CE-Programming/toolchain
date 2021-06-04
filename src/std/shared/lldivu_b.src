@@ -1,14 +1,16 @@
 	public	__lldivu
 __lldivu:
-	public	__lldivu_b_fast
-__lldivu_b_fast:
-; Not well-optimized
+	public	__lldivu_b
+__lldivu_b:
+; Very unoptimized
+	push	af
+	push	iy
 	ld	iy, 0
 	add	iy, sp
-	ld	iy, (iy + 3)
+	ld	iy, (iy + 9)
 	ld	iyh, 64
 .loop:
-	adc	hl, hl
+	add	hl, hl
 	ex	de, hl
 	adc	hl, hl
 	ex	de, hl
@@ -17,11 +19,13 @@ __lldivu_b_fast:
 	rla
 	jr	c, .1
 	cp	a, iyl
-	jr	nc, .0
+	jr	c, .0
 .1:
 	sub	a, iyl
 	inc	l
 .0:
 	dec	iyh
 	jr	nz, .loop
+	pop	iy
+	pop	af
 	ret
