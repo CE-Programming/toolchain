@@ -1,0 +1,45 @@
+	assume	adl=1
+
+	public	__llpopcnt
+__llpopcnt:
+	push	hl
+	ld	a, l
+	call	__bpopcnt
+	ld	l, a
+	ld	a, h
+	call	__bpopcnt
+	add	a, l
+	ld	l, a
+	dec	sp
+	push	hl
+	inc	sp
+	pop	af
+	call	__bpopcnt
+	add	a, l
+	ld	l, a
+	ld	a, e
+	call	__bpopcnt
+	add	a, l
+	ld	l, a
+	ld	a, d
+	call	__bpopcnt
+	add	a, l
+	ld	l, a
+	dec	sp
+	push	de
+	inc	sp
+	pop	af
+	call	__bpopcnt
+	add	a, l
+	ld	l, a
+	ld	a, c
+	call	__bpopcnt
+	add	a, l
+	ld	l, a
+	ld	a, b
+	call	__bpopcnt
+	add	a, l
+	pop	hl
+	ret
+
+	extern	__bpopcnt
