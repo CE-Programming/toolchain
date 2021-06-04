@@ -1,0 +1,53 @@
+	public	__llcmpu
+__llcmpu:
+if 0
+	ld	iy, 0
+	add	iy, sp
+	ld	a, b
+	sub	a, (iy + 10)
+	ret	nz
+	ld	a, c
+	sub	a, (iy + 9)
+	ret	nz
+	ex	de, hl
+	ld	bc, (iy + 6)
+	sbc	hl, bc
+	ret	nz
+	ex	de, hl
+	ld	bc, (iy + 3)
+	sbc	hl, bc
+	ret
+else
+	ld 	a, c
+	ld	iyh, b
+	pop	bc
+	or	a, a
+	sbc	hl, bc
+	ex	de, hl
+	pop	bc
+	pop	de
+	jr	nz, .ne24
+	sbc	hl, bc
+	jr	nz, .ne48
+	sbc	a, e
+	jr	nz, .ne56
+	ld	a, iyh
+	sbc	a, d
+	ld	hl, 9
+	add	hl, sp
+	ld	sp, hl
+	ret
+.ne24:
+	sbc	hl, bc
+.ne48:
+	sbc	a, e
+.ne56:
+	ld	a, iyh
+	sbc	a, d
+	ld	hl, 9
+	add	hl, sp
+	ld	sp, hl
+	ret	nz
+	inc	a
+	ret
+end if

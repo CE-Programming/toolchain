@@ -1,0 +1,27 @@
+	public	__lldivu
+__lldivu:
+	public	__lldivu_b_fast
+__lldivu_b_fast:
+; Not well-optimized
+	ld	iy, 0
+	add	iy, sp
+	ld	iy, (iy + 3)
+	ld	iyh, 64
+.loop:
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rl	b
+	rla
+	jr	c, .1
+	cp	a, iyl
+	jr	nc, .0
+.1:
+	sub	a, iyl
+	inc	l
+.0:
+	dec	iyh
+	jr	nz, .loop
+	ret

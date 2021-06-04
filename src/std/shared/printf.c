@@ -38,8 +38,8 @@
 #include <float.h>
 
 // Exclude these from printf support because no one uses them
-#define PRINTF_DISABLE_SUPPORT_PTRDIFF_T
-#define PRINTF_DISABLE_SUPPORT_LONG_LONG
+// #define PRINTF_DISABLE_SUPPORT_PTRDIFF_T
+// #define PRINTF_DISABLE_SUPPORT_LONG_LONG
 
 // 'ntoa' conversion buffer size, this must be big enough to hold one converted
 // numeric number including padded zeros (dynamically created on stack)
