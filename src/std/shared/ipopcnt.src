@@ -3,28 +3,7 @@
 	public	__ipopcnt
 __ipopcnt:
 	push	bc
-	push	hl
-	xor	a, a
-	ld	c, a
 	ld	b, 3
-.loop:
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	djnz	.loop
-	pop	hl
-	pop	bc
-	ret
+	jp	__lpopcnt.hijack1
+
+	extern	__lpopcnt.hijack1
