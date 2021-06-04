@@ -4,7 +4,7 @@
 __spopcnt:
 	push	hl
 	ld	a,l
-    	call	__bpopcnt
+	call	__bpopcnt
 	ld	l,a
 	ld	a,h
 	call	__bpopcnt

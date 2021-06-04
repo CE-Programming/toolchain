@@ -2,23 +2,25 @@
 
 	public	__lpopcnt
 __lpopcnt:
-        push	hl,de
+	push	hl
 	ld	a,l
-    	call	__bpopcnt
+	call	__bpopcnt
 	ld	l,a
 	ld	a,h
 	call	__bpopcnt
-	ld	h,a
+	add	a,l
+	ld	l,a
+	dec	sp
+	push	hl
+	inc	sp
+	pop	af
+	call	__bpopcnt
+	add	a,l
+	ld	l,a
 	ld	a,e
 	call	__bpopcnt
-	ld	e,a
-	call	$21D5C
-	call	__bpopcnt
-	add	a,e
 	add	a,l
-	add	a,h
-        pop	de,hl
+	pop	hl
 	ret
 
 	extern	__bpopcnt
-
