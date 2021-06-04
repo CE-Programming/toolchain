@@ -1,6 +1,5 @@
 	public	__llcmpu_fast
 __llcmpu_fast:
-if 1
 	ld	iy, 0
 	add	iy, sp
 	ld	a, b
@@ -17,37 +16,3 @@ if 1
 	ld	bc, (iy + 3)
 	sbc	hl, bc
 	ret
-else
-	ld 	a, c
-	ld	iyh, b
-	pop	bc
-	or	a, a
-	sbc	hl, bc
-	ex	de, hl
-	pop	bc
-	pop	de
-	jr	nz, .ne24
-	sbc	hl, bc
-	jr	nz, .ne48
-	sbc	a, e
-	jr	nz, .ne56
-	ld	a, iyh
-	sbc	a, d
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ret
-.ne24:
-	sbc	hl, bc
-.ne48:
-	sbc	a, e
-.ne56:
-	ld	a, iyh
-	sbc	a, d
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ret	nz
-	inc	a
-	ret
-end if

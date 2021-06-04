@@ -15,13 +15,12 @@ __llcmpzero:
 	dec	bc
 	ret
 .b_nz:
-	dec	b
 	ret	po
 	dec	b
 	inc	b
 	ret
 .c_nz:
 	ret	p
+	inc	c
 	dec	c
-	inc	bc
 	ret
