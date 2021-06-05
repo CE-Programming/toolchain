@@ -1,0 +1,22 @@
+	assume	adl=1
+
+	public	__llneg_fast
+__llneg_fast:
+	push	de		; *spl=UDE
+	ex	de, hl		; ude=UHL, uhl=UDE
+	xor	a, a		; a=0
+	sbc	hl, hl		; uhl=0
+	sbc	hl, de		; uhl=-UHL
+	ex	(sp), hl	; uhl=UDE, *spl=-UHL
+	ex	de, hl		; ude=UDE, uhl=UHL
+	sbc	hl, hl		; uhl=-(UHL!=0)
+	xor	a, a		; a=0
+	sbc	hl, de		; uhl=-UDE-(UHL!=0)
+	ex	de, hl		; ude=-UDE-(UHL!=0), uhl=UDE
+	sbc	a, c		; a=-C-(UDEUHL!=0)
+	ld	c, a		; c=-C-(UDEUHL!=0)
+	ld	a, 0		; a=0
+	sbc	a, b		; a=-B-(CUDEUHL!=0)
+	ld	b, a		; b=-B-(CUDEUHL!=0)
+	pop	hl		; bcudeuhl=-BCUDEUHL
+	ret

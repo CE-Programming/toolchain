@@ -1,0 +1,22 @@
+	assume	adl=1
+
+	public	__llneg
+__llneg:
+	push	de		; *spl=UDE
+	ex	de, hl		; ude=UHL, uhl=UDE
+	or	a, a
+	sbc	hl, hl		; uhl=0
+	sbc	hl, de		; uhl=-UHL
+	ex	(sp), hl	; uhl=UDE, *spl=-UHL
+	ex	de, hl		; ude=UDE, uhl=UHL
+	sbc	hl, hl		; uhl=-(UHL!=0)
+	or	a, a
+	sbc	hl, de		; uhl=-UDE-(UHL!=0)
+	ex	de, hl		; ude=-UDE-(UHL!=0), uhl=UDE
+	sbc	hl, hl		; uhl=-(UDEUHL!=0)
+	or	a, a
+	sbc	hl, bc		; uhl=-UBC-(UDEUHL!=0)
+	ld	c, l
+	ld	b, h		; bc=-BC-(UDEUHL!=0)
+	pop	hl		; bcudeuhl=-BCUDEUHL
+	ret
