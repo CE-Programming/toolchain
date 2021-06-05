@@ -1,0 +1,18 @@
+	assume	adl=1
+
+	public	__lneg
+__lneg:
+	push	af
+	xor	a, a	; a=0
+	sub	a, e	; a=-E
+	ld	e, a	; e=-E
+	pop	af
+	push	de
+	add	hl, de	; uhl=UHL+x
+	ex	de, hl	; ude=UHL+x, uhl=x
+	or	a, a
+	sbc	hl, de	; uhl=x-(UHL+x)
+			;    =x-UHL-x
+			;    =-UHL
+	pop	de
+	ret

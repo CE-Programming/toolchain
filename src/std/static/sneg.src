@@ -1,0 +1,4 @@
+	public	__sneg
+__sneg := __ineg
+
+	extern	__ineg

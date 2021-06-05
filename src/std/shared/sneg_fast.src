@@ -1,0 +1,4 @@
+	public	__sneg_fast
+__sneg_fast := __ineg_fast
+
+	extern	__ineg_fast
