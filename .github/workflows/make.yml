@@ -45,7 +45,7 @@ jobs:
         id: ez80-clang
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: ${{env.HOST_DOMAIN}}/a/llvm/z80/ez80-clang${{matrix.exe}}-${{runner.os}}Release.zip
+          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
@@ -158,7 +158,7 @@ jobs:
       - name: Decrypt Secrets
         env:
           KEY: ${{secrets.SYMMETRIC_KEY_256}}
-        run: openssl enc -d -aes-256-cbc -iv 8b29a858b29556c72b861a70f26872cb -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
+        run: openssl enc -d -aes-256-cbc -iv a581c6a54a2b51143fecad6794deb32a -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
       - name: Extract Secrets
         uses: DuckSoft/extract-7z-action@v1.0
         with:
