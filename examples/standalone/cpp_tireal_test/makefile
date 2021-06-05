@@ -2,14 +2,14 @@
 # Program Options
 # ----------------------------
 
-NAME ?= CPPREAL
-ICON ?= icon.png
-DESCRIPTION  ?= "ti::real C++ demo"
-COMPRESSED ?= NO
-ARCHIVED ?= NO
+NAME = CPPREAL
+ICON = icon.png
+DESCRIPTION  = "ti::real C++ demo"
+COMPRESSED = NO
+ARCHIVED = NO
 
-CFLAGS ?= -Wall -Wextra -Oz
-CXXFLAGS ?= -Wall -Wextra -Oz
+CFLAGS = -Wall -Wextra -Oz
+CXXFLAGS = -Wall -Wextra -Oz
 
 # ----------------------------
 

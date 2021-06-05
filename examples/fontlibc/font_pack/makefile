@@ -2,20 +2,20 @@
 # Makefile Options
 # ----------------------------
 
-NAME ?= DEMO
-ICON ?= icon.png
-DESCRIPTION ?= "CE C Toolchain Demo"
-COMPRESSED ?= NO
-ARCHIVED ?= NO
+NAME = DEMO
+ICON = icon.png
+DESCRIPTION = "CE C Toolchain Demo"
+COMPRESSED = NO
+ARCHIVED = NO
 
-CFLAGS ?= -Wall -Wextra -Oz
-CXXFLAGS ?= -Wall -Wextra -Oz
+CFLAGS = -Wall -Wextra -Oz
+CXXFLAGS = -Wall -Wextra -Oz
 
 # font options
-FONTPACKNAME ?= DRSANS
-FONTDIR ?= $(SRCDIR)/fonts
+FONTPACKNAME = DRSANS
+FONTDIR = $(SRCDIR)/fonts
 
-DEPS ?= $(BINDIR)/$(FONTPACKNAME).bin $(BINDIR)/$(FONTPACKNAME).8xv
+DEPS = $(BINDIR)/$(FONTPACKNAME).bin $(BINDIR)/$(FONTPACKNAME).8xv
 
 # ----------------------------
 
