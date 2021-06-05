@@ -1,13 +1,13 @@
 	public	__llshrs
 __llshrs:
-; Not well-optimized, but it probably works
+; Suboptimal
+	push	af
 	push	iy
 	ld	iy, 0
 	add	iy, sp
-	push	af
 	ld	a, c
 	ld	c, b
-	ld	b, (iy + 6)
+	ld	b, (iy + 9)
 	inc	b
 	dec	b
 	jr	z, .finish
@@ -23,9 +23,10 @@ __llshrs:
 	rr	h
 	rr	l
 	djnz	.loop
+	ld	sp, iy
+.finish:
 	ld	b, c
 	ld	c, a
-.finish:
-	pop	af
 	pop	iy
+	pop	af
 	ret
