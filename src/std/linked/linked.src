@@ -62,6 +62,8 @@ __scmpzero	:= 000204h
 __smuls		:= 000224h
 	public	__smulu
 __smulu		:= 000228h
+	public	__snor
+__snot		:= 000230h
 	public	__sor
 __sor		:= 000234h
 	public	__sxor
@@ -76,6 +78,8 @@ __icmpzero	:= 000138h
 __imuls		:= 000154h
 	public	__imulu
 __imulu		:= 000158h
+	public	__inot
+__inot		:= 000164h
 	public	__ior
 __ior		:= 000168h
 	public	__ixor
@@ -96,6 +100,8 @@ __lcmpzero	:= 0001B0h
 __lmuls		:= 0001C8h
 	public	__lmulu
 __lmulu		:= 0001CCh
+	public	__lnot
+__lnot		:= 0001D4h
 	public	__lor
 __lor		:= 0001D8h
 	public	__lsub

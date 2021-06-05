@@ -1,0 +1,4 @@
+	public	__snot
+__snot := __inot
+
+	extern	__inot
