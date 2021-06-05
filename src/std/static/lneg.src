@@ -3,16 +3,13 @@
 	public	__lneg
 __lneg:
 	push	af
-	xor	a, a	; a=0
-	sub	a, e	; a=-E
-	ld	e, a	; e=-E
-	pop	af
 	push	de
-	add	hl, de	; uhl=UHL+x
-	ex	de, hl	; ude=UHL+x, uhl=x
-	or	a, a
-	sbc	hl, de	; uhl=x-(UHL+x)
-			;    =x-UHL-x
-			;    =-UHL
-	pop	de
+	ex	de, hl	; ude=UHL, l=E
+	xor	a, a	; a=0
+	sbc	hl, hl	; uhl=0
+	sbc	hl, de	; uhl=-UHL
+	pop	de	; e=E
+	sbc	a, e
+	ld	e, a	; euhl=-EUHL
+	pop	af
 	ret
