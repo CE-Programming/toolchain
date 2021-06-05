@@ -3,13 +3,16 @@
 	public	__sbitrev
 __sbitrev:
 	push	af
-	ld	a,l
-    	call	__bbitrev
-	ld	l,a
-	ld	a,h
-	call	__bbitrev
-	ld	h,a
+	push	hl
+	dec	sp
+	pop	hl
+	inc	sp			; uhl=HL?
+	call	__internal_bitrev_byte	; a=H', uhl=L?0
+	ld	l, a			; uhl=L?H'
+	call	__internal_bitrev_byte	; a=L', hl=H'0
+	ld	l, h
+	ld	h, a			; hl=L'H'
 	pop	af
 	ret
 
-	extern	__bbitrev
+	extern	__internal_bitrev_byte
