@@ -204,6 +204,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y doxygen
+          pip install docutils==0.16
           pip install sphinx==3.2.1 sphinx_rtd_theme breathe
           cmake -E echo >> $${{matrix.env}}GITHUB_PATH $${{matrix.env}}HOME/.local/bin
 
