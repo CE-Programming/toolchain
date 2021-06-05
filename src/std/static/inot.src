@@ -1,6 +1,6 @@
 	public	__inot
 __inot:
-if 1
+if 0
 	push	de
 end if
 	add	hl, de	; uhl=UHL+UDE
@@ -10,7 +10,7 @@ end if
 			;    =UDE-UHL-UDE-1
 			;    =-UHL-1
 			;    =~UHL
-if 1
+if 0
 	pop	de
 else
 	ex	de, hl	; ude=~UHL, uhl=UHL+UDE
