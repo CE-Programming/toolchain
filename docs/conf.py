@@ -3,10 +3,8 @@ import subprocess, os
 breathe_projects = {}
 
 project = 'CE C Toolchain'
-copyright = '2015-2020 CE Programming'
+copyright = '2015-2021 CE Programming'
 author = 'CE Programming'
-
-release = 'v9.0-devel'
 
 extensions = ['breathe']
 exclude_patterns = ['build', 'Thumbs.db', '.DS_Store']
