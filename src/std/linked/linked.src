@@ -56,6 +56,8 @@ _tanh        := 022138h
 ; byte (8-bit) math
 	public	__bshl
 __bshl		:= 000100h
+	public	__bshru
+__bshru		:= 000104h
 
 ; short (16-bit) math
 	public	__sand
@@ -74,6 +76,10 @@ __snot		:= 000230h
 __sor		:= 000234h
 	public	__sshl
 __sshl		:= 000240h
+	public	__sshrs
+__sshrs		:= 000248h
+	public	__sshru
+__sshru		:= 000250h
 	public	__sxor
 __sxor		:= 000268h
 
@@ -94,6 +100,10 @@ __inot		:= 000164h
 __ior		:= 000168h
 	public	__ishl
 __ishl		:= 000174h
+	public	__ishrs
+__ishrs		:= 00017Ch
+	public	__ishru
+__ishru		:= 000184h
 	public	__ixor
 __ixor		:= 000198h
 
@@ -120,6 +130,10 @@ __lnot		:= 0001D4h
 __lor		:= 0001D8h
 	public	__lshl
 __lshl		:= 0001E4h
+	public	__lshrs
+__lshrs		:= 0001E8h
+	public	__lshru
+__lshru		:= 0001ECh
 	public	__lsub
 __lsub		:= 0001F8h
 	public	__lxor
