@@ -31,11 +31,14 @@ jobs:
         include:
           - nul: /dev/null
           - runs-on: macos
-            fasmg: /source/macos/x64
+            fasmg: /source/macos/x64/fasmg
           - runs-on: windows
+            fasmg: /fasmg.exe
             env: "env:"
             exe: .exe
             nul: nul
+          - runs-on: ubuntu
+            fasmg: /fasmg.x64
     runs-on: ${{matrix.runs-on}}-latest
     steps:
       - name: Prepare Build Environment
@@ -76,7 +79,7 @@ jobs:
           pathSource: ${{steps.fasmg.outputs.file-path}}
           pathTarget: ${{env.FASMG_PATH}}
       - name: Setup Fasmg
-        run: cmake -E copy fasmg${{matrix.fasmg}}/fasmg${{matrix.exe}} ${{env.CEDEV_BIN}}
+        run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
