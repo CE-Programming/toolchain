@@ -1,0 +1,4 @@
+	public	__sshl
+__sshl := __ishl
+
+	extern	__ishl

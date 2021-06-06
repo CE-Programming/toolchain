@@ -53,6 +53,10 @@ _strtod      := 0220E0h
 _tan         := 022120h
 _tanh        := 022138h
 
+; byte (8-bit) math
+	public	__bshl
+__bshl		:= 000100h
+
 ; short (16-bit) math
 	public	__sand
 __sand		:= 000200h
@@ -68,6 +72,8 @@ __sneg		:= 00022Ch
 __snot		:= 000230h
 	public	__sor
 __sor		:= 000234h
+	public	__sshl
+__sshl		:= 000240h
 	public	__sxor
 __sxor		:= 000268h
 
@@ -86,6 +92,8 @@ __ineg		:= 000160h
 __inot		:= 000164h
 	public	__ior
 __ior		:= 000168h
+	public	__ishl
+__ishl		:= 000174h
 	public	__ixor
 __ixor		:= 000198h
 
@@ -110,6 +118,8 @@ __lneg		:= 0001D0h
 __lnot		:= 0001D4h
 	public	__lor
 __lor		:= 0001D8h
+	public	__lshl
+__lshl		:= 0001E4h
 	public	__lsub
 __lsub		:= 0001F8h
 	public	__lxor

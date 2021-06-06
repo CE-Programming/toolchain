@@ -1,6 +1,6 @@
 	public	__llshl
 __llshl:
-; Suboptimal
+; Suboptimal for large shift amounts
 	push	af
 	push	iy
 	ld	iy, 0
