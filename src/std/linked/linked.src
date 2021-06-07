@@ -138,3 +138,9 @@ __lshru		:= 0001ECh
 __lsub		:= 0001F8h
 	public	__lxor
 __lxor		:= 0001FCh
+
+; C standard library
+	public	_tolower
+_tolower	:= 021E34h
+	public	_toupper
+_toupper	:= 021E38h

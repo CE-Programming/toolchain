@@ -1,0 +1,12 @@
+	public	_toupper
+_toupper:
+	push	af
+	ld	a, l
+	sub	a, 'a'
+	cp	a, 1+'z'-'a'
+	jr	nc, .not_a_z
+	add	a, 'A'
+	ld	l, a
+.not_a_z:
+	pop	af
+	ret
