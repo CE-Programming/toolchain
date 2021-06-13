@@ -29,8 +29,5 @@ __lladd_b_fast:
 	add	hl, de
 	ret	c
 				; ude=0
-	inc	c		; c=C+1
-	ret	nz
-				; c=0
-	inc	b		; b=B+1
+	inc	bc		; ubc=UBC+1
 	ret
