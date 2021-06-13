@@ -110,6 +110,8 @@ __ixor		:= 000198h
 ; long (32-bit) math
 	public	__ladd
 __ladd		:= 00019Ch
+	public	__ladd_b
+__ladd_b	:= 0001A0h
 	public	__land
 __land		:= 0001A4h
 	public	__lcmps
