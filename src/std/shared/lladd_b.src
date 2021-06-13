@@ -1,0 +1,22 @@
+	public	__lladd_b
+__lladd_b:
+	push	bc
+	inc.s	bc
+	ld	c, a
+	ld	b, 0
+	add	hl, bc
+	jr	nc, .finish
+	ld	c, 1
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	pop	bc
+	ret	nc
+	inc	c
+	ret	nz
+	inc	b
+	ret
+
+.finish:
+	pop	bc
+	ret
