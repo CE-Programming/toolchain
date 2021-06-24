@@ -384,6 +384,8 @@ _abort:
 
 	section	.cleanup
 	call	_os_EnableHomeTextBuffer
+	ld	a,1
+	ld	(0F00008h),a	; clear on interrupt
 	res	4,(iy+9)	; onInterrupt,(iy+onFlags)
 	set	0,(iy+3)	; graphDraw,(iy+graphFlags)
 	call	020808h		; _ClrLCDFull
