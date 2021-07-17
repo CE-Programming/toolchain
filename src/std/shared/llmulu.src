@@ -5,29 +5,33 @@ __llmuls:
 	public	__llmulu
 __llmulu:
 ; Really slow
-	push	af
+
 	push	ix
 	push	iy
+	push	af
 
+	ld	ix, 0
+	lea	iy, ix - 6
+	add	iy, sp		; cf=1
+
+	push	de
 	push	hl
 	ld	l, c
 	ld	h, b
 	ld.s	sp, hl
-	pop	bc
 
-	ld	iy, 8
-	lea	hl, iy + 4
-	add	hl, sp
-	xor	a, a
+	lea	hl, iy + 18
+	ld	b, 8
 .push_loop:
 	push	af
 	ld	a, (hl)
 	inc	hl
-	dec	iyl
-	jr	nz, .push_loop
+	or	a, a		; cf=0
+	djnz	.push_loop
 
-	lea	ix, iy
 	sbc	hl, hl
+	ld	e, l
+	ld	d, h
 
 .byte_loop:
 	scf
@@ -35,41 +39,37 @@ __llmulu:
 
 .bit_loop:
 	push	af
-
-	add	iy, iy
-	jr	c, .shift_c
 	add	ix, ix
-	db	$CA		; jp z, *
-.shift_c:
-	add	ix, ix
-	inc	ix
 	adc	hl, hl
-
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
 	pop	af
 
 	jr	nc, .add_end
-	add	iy, bc
-	jr	c, .add_c
-	add	ix, de
-	db	$CA		; jp z, *
-.add_c:
-	add	ix, de
-	inc	ix
+	ld	bc, (iy)
+	add	ix, bc
+	ld	bc, (iy + 3)
+	adc	hl, bc
+	ex	de, hl
 	adc.s	hl, sp
+	ex	de, hl
 .add_end:
 
 	add	a, a
 	jr	nz, .bit_loop
 
 	pop	af
-	jr 	nz, .byte_loop
+	jr 	nc, .byte_loop
 
-	ld	b, h
-	ld	c, l
-	lea	de, ix
-	lea	hl, iy
+	ld	b, d
+	ld	c, e
+	ex	de, hl
+	lea	hl, ix
 
+	pop	af
+	pop	af
+	pop	af
 	pop	iy
 	pop	ix
-	pop	af
 	ret
