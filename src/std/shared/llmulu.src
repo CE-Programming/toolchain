@@ -1,0 +1,75 @@
+	assume	adl=1
+
+	public	__llmuls
+__llmuls:
+	public	__llmulu
+__llmulu:
+; Really slow
+	push	af
+	push	ix
+	push	iy
+
+	push	hl
+	ld	l, c
+	ld	h, b
+	ld.s	sp, hl
+	pop	bc
+
+	ld	iy, 8
+	lea	hl, iy + 4
+	add	hl, sp
+	xor	a, a
+.push_loop:
+	push	af
+	ld	a, (hl)
+	inc	hl
+	dec	iyl
+	jr	nz, .push_loop
+
+	lea	ix, iy
+	sbc	hl, hl
+
+.byte_loop:
+	scf
+	adc	a, a
+
+.bit_loop:
+	push	af
+
+	add	iy, iy
+	jr	c, .shift_c
+	add	ix, ix
+	db	$CA		; jp z, *
+.shift_c:
+	add	ix, ix
+	inc	ix
+	adc	hl, hl
+
+	pop	af
+
+	jr	nc, .add_end
+	add	iy, bc
+	jr	c, .add_c
+	add	ix, de
+	db	$CA		; jp z, *
+.add_c:
+	add	ix, de
+	inc	ix
+	adc.s	hl, sp
+.add_end:
+
+	add	a, a
+	jr	nz, .bit_loop
+
+	pop	af
+	jr 	nz, .byte_loop
+
+	ld	b, h
+	ld	c, l
+	lea	de, ix
+	lea	hl, iy
+
+	pop	iy
+	pop	ix
+	pop	af
+	ret
