@@ -9,14 +9,15 @@ __llneg:
 	sbc	hl, de		; uhl=-UHL
 	ex	(sp), hl	; uhl=UDE, *spl=-UHL
 	ex	de, hl		; ude=UDE, uhl=UHL
-	sbc	hl, hl		; uhl=-(UHL!=0)
-	or	a, a
+	ld	hl, 0		; uhl=0
 	sbc	hl, de		; uhl=-UDE-(UHL!=0)
-	ex	de, hl		; ude=-UDE-(UHL!=0), uhl=UDE
+				;    =-UDEUHL>>24
+	ex	de, hl		; ude=-UDEUHL>>24, uhl=UDE
 	sbc	hl, hl		; uhl=-(UDEUHL!=0)
 	or	a, a
 	sbc	hl, bc		; uhl=-UBC-(UDEUHL!=0)
+				;    =-UBCUDEUHL>>48
 	ld	c, l
-	ld	b, h		; bc=-BC-(UDEUHL!=0)
+	ld	b, h		; bc=-BCUDEUHL>>48
 	pop	hl		; bcudeuhl=-BCUDEUHL
 	ret
