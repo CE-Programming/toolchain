@@ -67,22 +67,22 @@ endif
 BIN ?= $(CEDEV)/bin
 # get the os specific items
 ifeq ($(OS),Windows_NT)
-SHELL := cmd.exe
+SHELL = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
-FASMGLD := $(call NATIVEPATH,$(BIN)/fasmg.exe)
-CONVBIN := $(call NATIVEPATH,$(BIN)/convbin.exe)
-CONVIMG := $(call NATIVEPATH,$(BIN)/convimg.exe)
-EZCC := $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
+FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg.exe)
+CONVBIN = $(call NATIVEPATH,$(BIN)/convbin.exe)
+CONVIMG = $(call NATIVEPATH,$(BIN)/convimg.exe)
+CC = $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
 RM = ( del /q /f $1 2>nul || call )
 RMDIR = ( rmdir /s /q $1 2>nul || call )
 NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG = "$(subst ",',$1)"#'
 else
 NATIVEPATH = $(subst \,/,$1)
-FASMGLD := $(call NATIVEPATH,$(BIN)/fasmg)
-CONVBIN := $(call NATIVEPATH,$(BIN)/convbin)
-CONVIMG := $(call NATIVEPATH,$(BIN)/convimg)
-EZCC := $(call NATIVEPATH,$(BIN)/ez80-clang)
+FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg)
+CONVBIN = $(call NATIVEPATH,$(BIN)/convbin)
+CONVIMG = $(call NATIVEPATH,$(BIN)/convimg)
+CC = $(call NATIVEPATH,$(BIN)/ez80-clang)
 RM = rm -f $1
 RMDIR = rm -rf $1
 NATIVEMKDR = mkdir -p $1
@@ -110,7 +110,7 @@ ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
 LDCRT0 ?= $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
-rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
+rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filter $(subst %%,%,%$(subst *,%,$2)),$d)))
 
 # find source files
 CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.c) $(EXTRA_CSOURCES))
@@ -238,12 +238,12 @@ endif
 $(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 clean:
 	$(Q)$(call RM,$(EXTRA_CLEAN))
