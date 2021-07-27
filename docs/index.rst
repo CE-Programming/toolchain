@@ -20,6 +20,13 @@ If this is your first introduction to the CE C Toolchain, start with :ref:`getti
     static/faq
 
 .. toctree::
+    :caption: Helpful Information
+    :maxdepth: 1
+
+    static/git
+    static/coding-guidelines
+
+.. toctree::
     :caption: Toolchain Documentation
     :maxdepth: 1
 

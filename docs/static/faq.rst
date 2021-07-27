@@ -13,7 +13,11 @@ What is the C Runtime Memory Layout?
 ------------------------------------
 
 The CE has a limited amount of memory.
-The stack is roughly 4KiB bytes in size, while the bss/heap grow into each other and consume roughly 64KiB.
+
+- The stack is roughly 4KiB.
+- The code/data/rodata sections can be up to 64KiB.
+- The bss/heap occupy a shared 60KiB region of memory and grow into each other.
+
 The following graphic breaks down the address space.
 
 .. image:: images/mem_layout.png
@@ -105,5 +109,3 @@ The type's sign does not affect the registers used, but may affect the value ret
 +------------+------------+-------------------+
 | pointer    | HL         | xx xx xx          |
 +------------+------------+-------------------+
-
-
