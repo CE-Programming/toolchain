@@ -777,7 +777,7 @@ uint24_t os_PutStrFull(const char *string);
 uint24_t os_PutStrLine(const char *string);
 
 /**
- * Set a particular flag variable
+ * Set a particular OS flag
  *
  * @param offset Offset to particular flag in list
  * @param set Bitmask of flag to set
@@ -785,7 +785,7 @@ uint24_t os_PutStrLine(const char *string);
 void os_SetFlagByte(int offset, uint8_t set);
 
 /**
- * Get a particular flag variable
+ * Get a particular OS flag
  *
  * @param offset Offset to particular flag in list
  * @returns Bitmask of flag
@@ -793,10 +793,13 @@ void os_SetFlagByte(int offset, uint8_t set);
 uint8_t os_GetFlagByte(int offset);
 
 /**
- * Get amount of free ram in order to allocate extra ram
+ * Returns the size in bytes of free RAM that the user isn't using. A pointer is
+ * also returned to the start of this region; you can use it for your own
+ * purposes but do not exceed the size returned. This function is useful if you
+ * are running out of space in the bss or heap and need a little extra memory.
  *
- * @param free Set to start of free available ram
- * @returns Size of available ram
+ * @param free Set to start of free available RAM
+ * @returns Size of available RAM
  */
 size_t os_MemChk(void **free);
 
