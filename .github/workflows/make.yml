@@ -102,11 +102,26 @@ jobs:
           PREFIX: ${{github.workspace}}
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install release release-libs V=1
 
-      - name: Upload CEdev
+      - name: Tar toolchain
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x ${{env.CEDEV_BIN}}/*
+          tar -C ${{env.CEDEV}}/.. -czvf CEdev-${{runner.os}}.tar.gz CEdev
+
+      - name: Upload Linux/MacOS CEdev
+        if: runner.os != 'Windows'
+        uses: actions/upload-artifact@v2
+        with:
+          name: CEdev-${{runner.os}}
+          path: CEdev-${{runner.os}}.tar.gz
+
+      - name: Upload Windows CEdev
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v2
         with:
           name: CEdev-${{runner.os}}
           path: ${{env.CEDEV}}
+
       - name: Upload Libraries
         uses: actions/upload-artifact@v2
         with:
@@ -129,14 +144,21 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
+        if: runner.os == 'Windows'
         uses: actions/download-artifact@v2
         with:
           name: CEdev-${{runner.os}}
           path: ${{env.CEDEV}}
-
-      - name: Make Binaries Executable
+      - name: Download CEdev
         if: runner.os != 'Windows'
-        run: chmod +x ${{env.CEDEV_BIN}}/*
+        uses: actions/download-artifact@v2
+        with:
+          name: CEdev-${{runner.os}}
+          path: ${{github.workspace}}
+      - name: Extract Artifact Contents
+        if: runner.os != 'Windows'
+        run: tar -xvf CEdev-${{runner.os}}.tar.gz
+
       - name: Build Examples
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} V=1
 
