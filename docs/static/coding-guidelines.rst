@@ -41,9 +41,11 @@ Some helpful tips:
 Write comments intelligently
 ----------------------------
 
-In a perfect world, code should have a minimal number of comments in it because it should all be self-explanatory. Especially if there's a document along side that explains architecture choices, workflows etc.
+In a perfect world, code should have a minimal number of comments in it because it should all be self-explanatory.
+Especially if there's a document along side that explains architecture choices, workflows etc.
 
-Comments aren't code; they are for a human to convey what is going on and why in a particular portion of code, to another human. They should ideally be kept fairly short and to the point ("K.I.S.S" = Keep It Short and Simple").
+Comments aren't code; they are for a human to convey what is going on and why in a particular portion of code, to another human.
+They should ideally be kept fairly short and to the point ("K.I.S.S" = Keep It Short and Simple").
 Don't write comments just because you've been told to at some point: the other human in question can read just fine and doesn't want to waste time reading that "return val;" indeed "returns the value".
 
 It is much easier to read code without having to also read comments that don't convey any helpful information. Instead, provide useful information when needed, in particular when someone may be tempted to change some code that probably shouldn't be without a lot of thought first, or where some algorithm is complex to understand for someone new on the project and only reading the code to understand what is happening would take too long pointlessly (reverse-engineering source code can annoyingly take a lot of time).
@@ -52,7 +54,7 @@ As such, and especially for complex code, focus rather on explaning **why** some
 
 And remember this: having too many comments leads to issues where **a)** the comments don't match the code, **b)** they are either superfluous or useless, **c)** they are flat out incorrect or outdated, or **d)** they add noise to the code itself and make it more difficult to read.
 
-This is an example of bad comments that add no value: good self-explanatory naming and simple code provide better information than the comments do, which is how it should be:
+These are examples of bad comments that add no value: remember, good self-explanatory naming and simple code provide better information than comments do.
 
 .. code-block:: c
 
@@ -236,15 +238,6 @@ For example, the following code snippet creates a player structure:
 It is recommended to avoid "typedef" on structures.
 This is because it is hiding the underlying type, and makes it harder on readability.
 
-Use const as much as possible
------------------------------
-
-When a variable will not actually change over time, mark it as :code:`const`!
-This helps with performance (the compiler will produce better code), conveys the intent more clearly, and leads to fewer bugs.
-
-More information: https://www.cppstories.com/2016/12/please-declare-your-variables-as-const/
-
-
 Avoid Dynamic Allocation
 ------------------------
 
@@ -257,6 +250,35 @@ Since this region is a fixed known size, there is next to zero usefulness in usi
 
 Dynamic allocation can also lead to fragmentation of the heap when running, making programs be extremely unstable and prone to leaks and crashes.
 You also aren't guaranteed that you will get a valid memory pointer -- and thus have no way to recover other than to quit your program!
+
+Ways to avoid dynamic allocation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following tips can help avoid dynamic allocation.
+
+- Statically allocate variables with the :code:`static` keyword.
+- Try stack-based allocation using the :code:`alloca` function.
+- Consider why you are allocating memory at runtime in the first place.
+
+General Guidelines
+------------------
+
+Use const as much as possible
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When a variable will not actually change over time, mark it as :code:`const`!
+This helps with performance (the compiler will produce better code), conveys the intent more clearly, and leads to fewer bugs.
+
+More information: https://www.cppstories.com/2016/12/please-declare-your-variables-as-const/
+
+Avoid explicit casting
+^^^^^^^^^^^^^^^^^^^^^^
+
+A cast is nothing more than a lie to the compiler, claiming you know better than the compiler what is happening.
+Casting can do nefarious things, such as masking away a :code:`const`, strip an object of its type, and makes the code harder to understand.
+If you must use explicit casting, ensure that it is needed and you aren't trying to hack something in.
+
+More information: https://gustedt.wordpress.com/2014/04/02/dont-use-casts-i/
 
 Use Static Analysis Tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -271,4 +293,5 @@ Some common ones include:
 - Coverity
 
 Cppcheck is the easiest one to use with the CE C toolchain, but it is also fairly limited.
-Your IDE may also have a static analyer built-in. Make sure to enable warning flags on the compiler, too (:code:`-Wall -Wextra`)
+Your IDE may also have a static analyer built-in.
+Make sure to enable warning flags on the compiler, too (:code:`-Wall -Wextra`)
