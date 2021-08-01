@@ -35,7 +35,6 @@ Change `DESCRIPTION` to the program's description. It is recommended to keep thi
 
 The description will be displayed in shells such as `Cesium <https://github.com/mateoconlechuga/cesium/releases/latest>`_.
 
-
 .. code-block:: makefile
 
     DESCRIPTION ?= "My awesome program"
@@ -62,6 +61,23 @@ To enable this feature, open the project's makefile and change the line:
 .. code-block:: makefile
 
     ARCHIVED ?= YES
+
+DEPS
+----
+
+Add any files that you want to be built by the toolchain to this variable.
+Define rules for the files after including the main CEdev makefile.
+
+.. code-block:: makefile
+
+    DEPS = $(BINDIR)/levelpack.bin
+
+    include $(CEDEV)/meta/makefile.mk
+
+    $(BINDIR)/levelpack.bin:
+    	$(call MKDIR,$(@D))
+    	echo "levelpack" > $(BINDIR)/levelpack.bin
+
 
 CFLAGS / CXXFLAGS
 -----------------

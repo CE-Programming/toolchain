@@ -57,8 +57,8 @@ C File:
 
     void asm_func(int a);
 
-Arguments and Returns
-~~~~~~~~~~~~~~~~~~~~~
+Arguments
+~~~~~~~~~
 
 Arguments are pushed from last to first corresponding to the C prototype.
 In eZ80, 3 bytes are always pushed to the stack regardless of the actual size.
@@ -83,6 +83,10 @@ This table lists the locations relative to *sp* from within the called funciton.
 +------------+------------+----------------------+
 | pointer    | 3 bytes    | sp + [3:5]           |
 +------------+------------+----------------------+
+
+
+Returns
+~~~~~~~
 
 This table lists which registers are used for return values.
 The type's sign does not affect the registers used, but may affect the value returned.

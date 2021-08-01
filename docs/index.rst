@@ -17,12 +17,12 @@ If this is your first introduction to the CE C Toolchain, start with :ref:`getti
 
     self
     static/getting-started
-    static/faq
 
 .. toctree::
     :caption: Helpful Information
     :maxdepth: 1
 
+    static/faq
     static/git
     static/coding-guidelines
 
