@@ -21,12 +21,13 @@ Some additional style guidelines:
 - Use consistent bracing formats; if your braces all start on a new line, don't mix them. It is especially helpful to always use braces even on single-line conditional statements as it will avoid spurious bugs from popping up.
 - Try to keep functions at 100 lines or less. Any more and the function should be broken out, as this will increase readability and make it easier for you 6 months later to understand what you wrote.
 - It doesn't really matter *what* your style is as long as it is consistent! People will be more inclined to help and contribute to your code if you keep it neat.
+- This also applies when you are the one contributing to another project: use *their* codestyle, not yours, even if you don't like it.
 
 Use Descriptive Naming
 ^^^^^^^^^^^^^^^^^^^^^^
 
-This is a relatively minor one, but try to give functions and variables useful and unique names.
-For example, :code:`int player_x` is more descriptive than :code:`int x`, and :code:`void handle_user_input(void)` is more useful than :code:`void do_things(void)`.
+This may seem like a relatively minor one, but it's still important: try to give functions and variables useful and unique names.
+For example, :code:`int player_x` is more descriptive than :code:`int x`, and :code:`void handle_user_input(void)` is more meaningful than :code:`void do_things(void)`.
 The name should tell you why it exists, what it does, and how it is used.
 If a name requires a comment, then the name is useless.
 
@@ -34,31 +35,38 @@ Some helpful tips:
 
 - Use pronounceable names.
 - Beware of using names which vary in small ways. (e.g. "player_x" and "player_xx").
-- Use intention revealing names.
+- Use intention-revealing names.
+- Don't be afraid of using names that are a bit longer than what you may be used to. Probably not 50 chars long, sure, but you get the point.
 
-Avoid Using Comments
---------------------
+Write comments intelligently
+----------------------------
 
-Code should have a minimal number of comments in it.
-Comments aren't code; they are for a human to convey what a particular portion of code is for to another human.
-Using comments leads to issues where **a)** the comments don't match the code, **b)** they are either superfluous or useless, **c)** they are flat out incorrect or outdated, or **d)** they add noise to the code itself and make it more difficult to read.
+In a perfect world, code should have a minimal number of comments in it because it should all be self-explanatory. Especially if there's a document along side that explains architecture choices, workflows etc.
 
-It is much easier to read code without having to also read comments that don't convey any helpful information.
-Comments should be used in cases where it is difficult for someone reading the code to understand exactly what is happening.
-They should ideally describe the "what" of the code, not the "how" or the "why", or the "who".
+Comments aren't code; they are for a human to convey what is going on and why in a particular portion of code, to another human. They should ideally be kept fairly short and to the point ("K.I.S.S" = Keep It Short and Simple").
+Don't write comments just because you've been told to at some point: the other human in question can read just fine and doesn't want to waste time reading that "return val;" indeed "returns the value".
 
-Comments should ideally be kept fairly short and to the point.
-This is an example of a bad comment:
+It is much easier to read code without having to also read comments that don't convey any helpful information. Instead, provide useful information when needed, in particular when someone may be tempted to change some code that probably shouldn't be without a lot of thought first, or where some algorithm is complex to understand for someone new on the project and only reading the code to understand what is happening would take too long pointlessly (reverse-engineering source code can annoyingly take a lot of time).
+
+As such, and especially for complex code, focus rather on explaning **why** something is written that way, and even **why not** written in another way (i.e. some edgecase may not work with an alternative algorithm, some usecase may have inferior performance, etc.). Time will be saved that way for future refactors, whether it's done by you, or even more so by someone else that may now know the context of the code as much as you.
+
+And remember this: having too many comments leads to issues where **a)** the comments don't match the code, **b)** they are either superfluous or useless, **c)** they are flat out incorrect or outdated, or **d)** they add noise to the code itself and make it more difficult to read.
+
+This is an example of bad comments that add no value: good self-explanatory naming and simple code provide better information than the comments do, which is how it should be:
 
 .. code-block:: c
 
-    //functions
+    // functions
     void optix_InitializeGUIState(void) {
-
+        ...
     }
 
-The "functions" comment adds no value here.
-The name of the function provides more information than the comment does, which is how it should be.
+    // check if the string is empty
+    bool isStringEmpty(string_t* str) {
+        return str->len == 0;
+    }
+
+More food for thought about this topic: https://blog.codinghorror.com/coding-without-comments/
 
 Avoid Commenting Unused Code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -147,12 +155,12 @@ What not to put in header files
 Here are the following things that should not be put in header files in C:
 
 - Function implementations. Only function prototypes should be put in header files.
-- Variable declarations. If you need to have a "global variable" (you don't), then the global variable should be declared in a *source* file and then included in the header using the *extern* keyword (e.g. :code:`extern global_variable[100];`).
+- Variable declarations. If you need to have a "global variable" (you likely don't), then the global variable should be declared in a *source* file and then included in the header using the *extern* keyword (e.g. :code:`extern global_variable[100];`).
 
 The reason you shouldn't do the above is that the :code:`#include` preprocessor command literally performs a copy/paste of one file into another.
 If a header is used in two different source files, then the function or variable will be duplicated *twice* (include guards cannot prevent this, they only prevent inclusion in a single source file!).
 Even worse is making the function/variable "static" in the header, which makes each file has its own implementation -- it will still compile, but it most certainly is not what you intended!
-If you ever see code or variables that are defined in a header, run far away.
+If you ever see code or variables that are defined in a header, run far away... or try to fix it.
 
 Avoid Global Variables
 ----------------------
@@ -166,6 +174,7 @@ Here's why you shouldn't use them:
 - A global variable can have no access control. It can not be limited to some parts of the program.
 - Using global variables causes namespace pollution. This may lead to unnecessarily reassigning a global value.
 
+So, most of the time, and unless you have a really good excuse, don't use global variables.
 There are better alternatives to using global variables, described below:
 
 Proper Scoping
@@ -173,8 +182,8 @@ Proper Scoping
 
 "Scope" is an important part of C programming.
 Every opening brace :code:`{` is the start of a new scope, and every ending brace :code:`}` the end of the previous scope.
-You want to make sure that the variables you use only need to be in the scope they are in.
-For example, in the below code snippet a global variable is used
+You want to make sure that the variables you use only need to be in the scope they are in. The compiler will be able to provide better optimizations, too.
+For example, in the below code snippet a global variable is used, making it accessible everywhere in that file, while it likely should not be. It can also create pointless name shadowing issues.
 
 Using the static keyword
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -227,6 +236,15 @@ For example, the following code snippet creates a player structure:
 It is recommended to avoid "typedef" on structures.
 This is because it is hiding the underlying type, and makes it harder on readability.
 
+Use const as much as possible
+-----------------------------
+
+When a variable will not actually change over time, mark it as :code:`const`!
+This helps with performance (the compiler will produce better code), conveys the intent more clearly, and leads to fewer bugs.
+
+More information: https://www.cppstories.com/2016/12/please-declare-your-variables-as-const/
+
+
 Avoid Dynamic Allocation
 ------------------------
 
@@ -253,3 +271,4 @@ Some common ones include:
 - Coverity
 
 Cppcheck is the easiest one to use with the CE C toolchain, but it is also fairly limited.
+Your IDE may also have a static analyer built-in. Make sure to enable warning flags on the compiler, too (:code:`-Wall -Wextra`)
