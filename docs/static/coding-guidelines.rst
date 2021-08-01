@@ -6,6 +6,9 @@ General Coding Guidelines
 If you are new to the C language and are looking for some pointers to improve your coding style, this page is for you!
 These suggestions should help you avoid common pitfalls, and make your code easier to manage.
 
+.. image:: images/code-review.jpg
+   :align: center
+
 Style Consistency
 -----------------
 
@@ -195,7 +198,7 @@ The below example shows an array that is globally allocated by :code:`malloc`, w
 
 .. code-block:: c
 
-    char big_text_array[16000];
+    char *big_text_array;
 
     char *alloc_array(void) {
         big_text_array = malloc(16000);
