@@ -56,6 +56,9 @@ fini_functions:
 	section	.header
 	db	$ef,$7b
 	db	$00		; C program identifier (nop)
+virtual
+	jq	start
+end virtual
 
 	section	.launcher
 launcher:
@@ -105,6 +108,7 @@ launcher:
 	db	"http://tiny.cc/clibs",0
 
 	section	.start
+	private	start
 start:
 	call	0020848h	; _RunInicOff, assumes iy = flags
 	call	00004F4h	; _usb_DisableTimer
@@ -117,7 +121,7 @@ start:
 	ld	(hl),h		; set flash wait states to 3; 1 was definitely
 				; too low for some calcs, 2 is untested
 	push	iy		; save iy (flags)
-	ld	(_abort.sp),sp	; save sp for exiting
+	ld	(_exit.sp),sp	; save sp for exiting
 if defined ___main_argc_argv
 .argstemp := 0D120D6h		; saveSScreen+14007
 	call	0020614h	; _PushRealO1
@@ -170,7 +174,7 @@ if defined ___main_argc_argv
 	sbc	hl,de
 	add	hl,sp
 	ld	sp,hl
-	ld	hl,(_abort.sp)
+	ld	hl,(_exit.sp)
 	push	bc
 	db	03Eh		; ld a,*
 .argvloop:
@@ -282,7 +286,15 @@ else
 end if
 
 	call	main
+if push_exit_code <> pop_exit_code
 	push	hl
+end if
+push_exit_code:
+virtual
+	jr	skip._exit
+end virtual
+
+	section	.start
 virtual
 	ld	a,0
  load .ld_a: byte from $$
@@ -292,6 +304,10 @@ end virtual
 	public	_exit
 _exit:
 	pop	hl
+
+	section	.start
+	private	skip._exit
+skip._exit:
 if defined exit_functions
 	jq	.function_enter
 .function_loop:
@@ -355,6 +371,11 @@ else
  end if
 end if
 virtual
+	jr	skip.__Exit
+end virtual
+
+	section	.start
+virtual
 	ld	a,0
  load .ld_a: byte from $$
 end virtual
@@ -363,7 +384,19 @@ end virtual
 	public	__Exit
 __Exit:
 	pop	hl
+
+	section	.start
+	private	skip.__Exit
+skip.__Exit:
+pop_exit_code:
+if push_exit_code <> pop_exit_code
 	pop	hl
+end if
+virtual
+	jr	skip._abort
+end virtual
+
+	section	.start
 virtual
 	ld	iy,0
  load .iy_pre: byte from $$
@@ -373,8 +406,12 @@ end virtual
 	public	_abort
 _abort:
 	ld	hl,1 shl 23+6	; SIGABRT
+
+	section	.start
+	private	skip._abort
+skip._abort:
 	ld	sp,0
-.sp := $-3
+_exit.sp := $-3
 	pop	iy		; iy = flags
 	pop	af		; a = original flash wait states
 	ex	(sp),hl		; hl = flash wait state control port,
