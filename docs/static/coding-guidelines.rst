@@ -61,8 +61,8 @@ These are examples of bad comments that add no value: remember, good self-explan
 
 .. code-block:: c
 
-    // functions
-    void optix_InitializeGUIState(void) {
+    // locates the first occurance of the character in the string
+    void findFirstChar(string_t* str) {
         ...
     }
 
