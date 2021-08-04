@@ -187,8 +187,39 @@ Proper Scoping
 
 "Scope" is an important part of C programming.
 Every opening brace :code:`{` is the start of a new scope, and every ending brace :code:`}` the end of the previous scope.
-You want to make sure that the variables you use only need to be in the scope they are in. The compiler will be able to provide better optimizations, too.
-For example, in the below code snippet a global variable is used, making it accessible everywhere in that file, while it likely should not be. It can also create pointless name shadowing issues.
+Global variables, which are not inside any braces, are declared in what's known as the global or file scope.
+Variables declared in one scope can only be accessed from the same scope, or from scopes inside of it.
+You want to make sure that you declare variables are in the narrowest scope possible.
+
+Properly scoping your code instead of using globals for everything makes it easier to think about. For example, the following code uses a global variable :code:`my_var`:
+
+.. code-block:: c
+
+    void my_func(void) {
+        my_var = 0;
+        do_some_thing();
+        printf("%u\n", my_var);
+        do_some_other_thing();
+        printf("%u\n", my_var);
+    }
+
+What values of :code:`my_var` get printed? It might still be 0, or it could be 1, or 42, or -1, or the address of a string containing a proof of the Riemann hypothesis (though the latter is exceedingly unlikely). It's impossible to tell without looking at the definitions for :code:`do_some_thing` and :code:`do_some_other_thing`. If each of these functions called several other functions, you might have to dig through dozens of functions to say for certain that :code:`my_var` is not modified. Compare this to the same code written using more proper scoping:
+
+.. code-block:: c
+
+    void my_func(void) {
+        int24_t my_var = 0;
+        do_some_thing();
+        printf("%u\n", my_var);
+        do_some_other_thing(my_var);
+        printf("%u\n", my_var);
+    }
+
+In this code, it's clear that the function will print 0 both times, as :code:`my_var` is not in scope for :code:`do_some_thing`, and is only passed by value to :code:`do_some_other_thing`. It's also clear that :code:`do_some_other_thing` uses the value of :code:`my_var`.
+
+Sure, in real code, functions and variables will have more descriptive names that tell you what they do. But properly scoping your code allows you to only have to think about your program in small chunks, rather than having to think about every other function in the entire codebase that might be able to modify a variable.
+
+There are other benefits to proper scoping as well. It helps reduce namespace pollution, and the compiler will be able to provide better optimizations, too.
 
 Using the static keyword
 ^^^^^^^^^^^^^^^^^^^^^^^^
