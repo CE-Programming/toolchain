@@ -763,7 +763,7 @@ uint24_t os_FontDrawTransText(const char *string, uint16_t col, uint8_t row);
 /**
  * Puts some text at the current homescreen cursor location
  *
- * @param string Test to put on homescreen
+ * @param string Text to put on homescreen
  * @returns 1 if string fits on screen, 0 otherwise
  */
 uint24_t os_PutStrFull(const char *string);
@@ -771,7 +771,7 @@ uint24_t os_PutStrFull(const char *string);
 /**
  * Puts some text at the current homescreen cursor location
  *
- * @param string Test to put on homescreen
+ * @param string Text to put on homescreen
  * @returns 1 if string fits on line, 0 otherwise
  */
 uint24_t os_PutStrLine(const char *string);
