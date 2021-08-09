@@ -53,7 +53,7 @@ typedef uint8_t ti_var_t;
 /**
  * Closes all open slots.
  *
- * @warning Call before you use any variable functions
+ * @warning Call before you use any variable functions such as ti_Open()
  */
 void ti_CloseAll(void);
 
@@ -64,14 +64,14 @@ void ti_CloseAll(void);
  *
  * @param name Name of file to open
  * @param mode
- * "r"  - Opens a file for reading. The file must exist. Keeps file in archive if in archive.                                   <br>
+ * "r"  - Opens a file for reading. The file must exist. If the file does not exist, zero is returned. Keeps file in archive if in archive.                                   <br>
  * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
  * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
  * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
  * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                <br>
  * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
  * @returns Slot variable
- * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
+ * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned. Remember to call ti_CloseAll() when calling for the first time.
  */
 ti_var_t ti_Open(const char *name, const char *mode);
 
@@ -81,7 +81,7 @@ ti_var_t ti_Open(const char *name, const char *mode);
  * Can open any type of program or appvar variable
  * @param varname Name of variable to open
  * @param mode
- * "r"  - Opens a file for reading. The file must exist. Keeps file in archive if in archive.                                   <br>
+ * "r"  - Opens a file for reading. The file must exist. If the file does not exist, zero is returned. Keeps file in archive if in archive.                                   <br>
  * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
  * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
  * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
@@ -89,7 +89,7 @@ ti_var_t ti_Open(const char *name, const char *mode);
  * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
  * @param type Specifies the type of variable to open
  * @returns Slot variable
- * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
+ * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned.
  */
 ti_var_t ti_OpenVar(const char *varname, const char *mode, uint8_t type);
 
