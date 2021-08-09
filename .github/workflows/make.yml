@@ -163,6 +163,7 @@ jobs:
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} V=1
 
       - name: Checkout CEmu
+        if: github.event_name != 'pull_request'
         uses: actions/checkout@v2.3.4
         with:
           repository: ${{github.repository_owner}}/CEmu
@@ -170,33 +171,39 @@ jobs:
           path: ${{env.CEMU_PATH}}
           persist-credentials: false
       - name: Build CEmu
+        if: github.event_name != 'pull_request'
         run: make -j4 -C ${{env.CEMU_PATH}}/core
       - name: Build Autotester CLI
+        if: github.event_name != 'pull_request'
         run: make -j4 -C ${{env.AUTOTESTER_PATH}}
 
       - name: Download Secrets
+        if: github.event_name != 'pull_request'
         id: download-secrets
         uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
           location: ${{env.SECRETS_PATH}}
       - name: Decrypt Secrets
+        if: github.event_name != 'pull_request'
         env:
           KEY: ${{secrets.SYMMETRIC_KEY_256}}
         run: openssl enc -d -aes-256-cbc -iv a581c6a54a2b51143fecad6794deb32a -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
       - name: Extract Secrets
+        if: github.event_name != 'pull_request'
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           pathSource: ${{env.SECRETS_PATH}}/secrets.7z
           pathTarget: ${{env.SECRETS_PATH}}
 
       - name: Download Libraries
+        if: github.event_name != 'pull_request'
         uses: actions/download-artifact@v2
         with:
           name: clibs
           path: ${{env.TOOLCHAIN_PATH}}
       - name: Test Examples
-        if: runner.os != 'Windows'
+        if: github.event_name != 'pull_request' && runner.os != 'Windows'
         run: |
           failed=0
           find ${{env.CEDEV_EXAMPLES}} -name autotest.json -print0 | while read -d '' test; do
@@ -207,7 +214,7 @@ jobs:
           cmake -E echo "$failed tests failed"
           exit $failed
       - name: Test Examples
-        if: runner.os == 'Windows'
+        if: github.event_name != 'pull_request' && runner.os == 'Windows'
         run: |
           $failed = 0
           foreach ($test in get-childitem "${{env.CEDEV_EXAMPLES}}" -recurse -include autotest.json) {
