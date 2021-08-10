@@ -52,6 +52,6 @@ unsigned char vargfx_init(void)
         image_tiles_compressed[i] += data;
     }
 
-    return 1;
+    return -1;
 }
 

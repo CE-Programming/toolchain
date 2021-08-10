@@ -7,11 +7,14 @@ extern "C" {
 
 #define sizeof_global_palette 494
 #define global_palette (vargfx_appvar[0])
+#define sprites_palette_offset 0
 #define ubuntu_width 32
 #define ubuntu_height 32
+#define vargfx_sprites_ubuntu_index 1
 #define ubuntu ((gfx_sprite_t*)vargfx_appvar[1])
 #define mint_width 32
 #define mint_height 32
+#define vargfx_sprites_mint_index 2
 #define mint ((gfx_sprite_t*)vargfx_appvar[2])
 #define vargfx_entries_num 3
 extern unsigned char *vargfx_appvar[3];

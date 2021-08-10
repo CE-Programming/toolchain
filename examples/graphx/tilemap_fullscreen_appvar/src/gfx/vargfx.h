@@ -7,6 +7,7 @@ extern "C" {
 
 #define sizeof_global_palette 512
 #define global_palette (vargfx_appvar[0])
+#define tileset_palette_offset 0
 #define image_tile_width 80
 #define image_tile_height 80
 #define image_compressed vargfx_appvar[1]

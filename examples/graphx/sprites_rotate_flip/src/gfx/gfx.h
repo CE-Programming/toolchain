@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "global_palette.h"
+#define sprites_palette_offset 0
 #include "star.h"
 
 #ifdef __cplusplus

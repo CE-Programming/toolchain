@@ -168,6 +168,6 @@ unsigned char vargfx_init(void)
         tileset_tiles_data[i] += data;
     }
 
-    return 1;
+    return -1;
 }
 

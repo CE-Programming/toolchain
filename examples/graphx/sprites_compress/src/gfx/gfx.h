@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "global_palette.h"
+#define apple_image_palette_offset 0
 #include "apple.h"
 
 #ifdef __cplusplus

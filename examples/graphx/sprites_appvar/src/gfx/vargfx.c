@@ -31,6 +31,6 @@ unsigned char vargfx_init(void)
 
     ti_CloseAll();
 
-    return 1;
+    return -1;
 }
 
