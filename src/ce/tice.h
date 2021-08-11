@@ -2637,7 +2637,7 @@ typedef enum {
 #define asm_ClrTxtShd os_ClrTxtShd
 /* @endcond */
 
-#define timer_GetLow(n) (_Pragma("GCC warning \"'timer_GetLow' is deprecated, use 'timer_Get' or 'timer_GetSafe' instead as appropriate\"") (uint24_t)time_Get(n))
+#define timer_GetLow(n) (_Pragma("GCC warning \"'timer_GetLow' is deprecated, use 'timer_Get' or 'timer_GetSafe' instead as appropriate\"") (uint24_t)timer_Get(n))
 
 #ifdef __cplusplus
 }
