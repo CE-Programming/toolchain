@@ -183,6 +183,8 @@ ti_CloseAll:
 	ld	(vat_ptr2 + 2), a
 	ld	(vat_ptr3 + 2), a
 	ld	(vat_ptr4 + 2), a
+	ld	a,$37 ; scf
+	ld	(ti_Open.smc_closeall),a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -298,6 +300,9 @@ ti_Open:
 .start:
 	ld	(.smc_type), a
 	ld	(ti.OP1), a
+	or	a,a
+.smc_closeall := $-1
+	call	nc,ti_CloseAll
 	ld	iy,ti.flags
 	push	ix
 	ld	ix, 0

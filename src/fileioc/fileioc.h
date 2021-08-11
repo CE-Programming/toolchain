@@ -51,13 +51,6 @@ extern "C" {
 typedef uint8_t ti_var_t;
 
 /**
- * Closes all open slots.
- *
- * @warning Call before you use any variable functions such as ti_Open()
- */
-void ti_CloseAll(void);
-
-/**
  * Opens a file.
  *
  * An AppVar is used as default file storage.
@@ -564,6 +557,8 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_ProtectedProgram    _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'TI_PPRGM_TYPE' instead\"") TI_PPRGM_TYPE
 #define ti_TempProgram         _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
 #define ti_AppVar              _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
+
+void ti_CloseAll(void) __attribute__((deprecated ("Use ti_Close(slot) for each slot opened instead")));
 /* @endcond */
 
 #ifdef __cplusplus

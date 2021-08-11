@@ -10,9 +10,6 @@ int main(void)
     /* Clear the homescreen */
     os_ClrHome();
 
-    /* Close any files that may be open already */
-    ti_CloseAll();
-
     /* Open a new variable; deleting it if it already exists */
     var = ti_Open("AppVar", "w");
     if (var == 0)
@@ -72,9 +69,6 @@ int main(void)
 
     /* Waits for a key */
     while (!os_GetCSC());
-
-    /* Close all open files */
-    ti_CloseAll();
 
     return 0;
 }

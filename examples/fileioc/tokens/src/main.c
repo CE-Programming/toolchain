@@ -12,9 +12,6 @@ int main(void)
     /* Clears the homescreen */
     os_ClrHome();
 
-    /* Closes any open files */
-    ti_CloseAll();
-
     /* Open the "ABC" program for reading */
     prgm = ti_OpenVar("ABC", "r", TI_PRGM_TYPE);
     if (prgm == 0)
@@ -37,9 +34,6 @@ int main(void)
 
     /* Waits for a key */
     while (!os_GetCSC());
-
-    /* Closes files */
-    ti_CloseAll();
 
     return 0;
 }

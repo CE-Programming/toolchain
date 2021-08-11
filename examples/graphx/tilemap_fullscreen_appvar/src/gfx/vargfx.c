@@ -30,8 +30,6 @@ unsigned char vargfx_init(void)
     unsigned int data, i;
     ti_var_t appvar;
 
-    ti_CloseAll();
-
     appvar = ti_Open("vargfx", "r");
     if (appvar == 0)
     {
@@ -43,8 +41,6 @@ unsigned char vargfx_init(void)
     {
         vargfx_appvar[i] += data;
     }
-
-    ti_CloseAll();
 
     data = (unsigned int)vargfx_appvar[1] - (unsigned int)image_tiles_compressed[0];
     for (i = 0; i < image_tiles_num; i++)

@@ -15,8 +15,6 @@ unsigned char vargfx_init(void)
     unsigned int data, i;
     ti_var_t appvar;
 
-    ti_CloseAll();
-
     appvar = ti_Open("vargfx", "r");
     if (appvar == 0)
     {
@@ -28,8 +26,6 @@ unsigned char vargfx_init(void)
     {
         vargfx_appvar[i] += data;
     }
-
-    ti_CloseAll();
 
     return -1;
 }
