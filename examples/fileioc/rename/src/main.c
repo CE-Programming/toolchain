@@ -32,6 +32,10 @@ int main(void)
         /* Rename the old file to the new file name */
         ti_Rename(oldName, newName);
 
+        /* Ensure that the slot is closed */
+        ti_Close(file);
+        file = 0;
+
         /* Ensure the new name of the file is correct */
         file = ti_Open(newName, "r");
         if (!file) break;
@@ -39,6 +43,10 @@ int main(void)
         ti_GetName(nameBuffer, file);
         PrintText(0, 1, "New Name: ");
         PrintText(10, 1, nameBuffer);
+
+        /* Ensure that the slot is closed */
+        ti_Close(file);
+        file = 0;
 
         error = false;
     } while (0);

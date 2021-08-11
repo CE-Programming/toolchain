@@ -60,6 +60,10 @@ int main(void)
     /* Ensure the name of the AppVar is correct */
     ti_GetName(nameBuffer, var);
 
+    /* Ensure that the slot is closed */
+    ti_Close(var);
+    var = 0;
+
     os_SetCursorPos(0, 0);
     os_PutStrFull("Appvar: ");
     os_SetCursorPos(0, 8);

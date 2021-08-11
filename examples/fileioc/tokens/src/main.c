@@ -23,6 +23,10 @@ int main(void)
     data_ptr = ti_GetDataPtr(prgm);
     size = ti_GetSize(prgm);
 
+    /* Ensure that the slot is closed */
+    ti_Close(prgm);
+    prgm = 0;
+
     while (size && y < 8)
     {
         os_SetCursorPos(0, y);
