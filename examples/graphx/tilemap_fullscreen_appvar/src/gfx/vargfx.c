@@ -42,12 +42,14 @@ unsigned char vargfx_init(void)
         vargfx_appvar[i] += data;
     }
 
+    ti_Close(appvar);
+
     data = (unsigned int)vargfx_appvar[1] - (unsigned int)image_tiles_compressed[0];
     for (i = 0; i < image_tiles_num; i++)
     {
         image_tiles_compressed[i] += data;
     }
 
-    return -1;
+    return 1;
 }
 

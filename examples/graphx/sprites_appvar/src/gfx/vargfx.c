@@ -27,6 +27,8 @@ unsigned char vargfx_init(void)
         vargfx_appvar[i] += data;
     }
 
-    return -1;
+    ti_Close(appvar);
+
+    return 1;
 }
 
