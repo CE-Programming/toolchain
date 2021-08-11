@@ -309,6 +309,9 @@ ti_Open:
 ; slot closed (free): upper byte of offset > slot
 	cp	a, (hl)
 	jr	c, .slot
+	dec	hl
+	dec	hl
+	dec	hl
 	dec	a
 	jr	nz, .find_slot
 	ret
