@@ -182,7 +182,7 @@ ti_CloseAll:
 	pop	de
 	inc	de
 	ld	bc, 4 * 3
-; msb of offset = 12
+; upper byte of offset = 12
 	ld	(hl), c
 	ldir
 	ret
@@ -305,8 +305,8 @@ ti_Open:
 	ld	hl, variable_offsets + (5 * 3) - 1
 	ld	a, 5
 .find_slot:
-; slot open (in use): msb of offset == 0
-; slot closed (free): msb of offset > slot
+; slot open (in use): upper byte of offset == 0
+; slot closed (free): upper byte of offset > slot
 	cp	a, (hl)
 	jr	c, .slot
 	dec	a
@@ -872,7 +872,7 @@ ti_Close:
 	mlt	bc
 	ld	hl, variable_offsets - 1
 	add	hl, bc
-; msb of offset = slot * 3
+; upper byte of offset = slot * 3
 	ld	(hl), c
 	ex	de, hl
 	jp	(hl)
@@ -1540,7 +1540,7 @@ util_is_slot_open:
 ; out:
 ;  a = 0
 ;  ubc = slot * 3
-;  uhl = ptr to msb of slot offset
+;  uhl = pointer to upper byte of slot offset
 ;  zf = open
 	ld	b, 3
 	mlt	bc
