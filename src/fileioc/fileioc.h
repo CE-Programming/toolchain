@@ -64,7 +64,7 @@ typedef uint8_t ti_var_t;
  * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                <br>
  * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
  * @returns Slot variable
- * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned. Remember to call ti_CloseAll() when calling for the first time.
+ * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned.
  */
 ti_var_t ti_Open(const char *name, const char *mode);
 
