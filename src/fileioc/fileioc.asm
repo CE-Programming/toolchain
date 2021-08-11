@@ -64,6 +64,13 @@ library 'FILEIOC', 7
 ;-------------------------------------------------------------------------------
 	export ti_SetGCBehavior
 
+;-------------------------------------------------------------------------------
+; v7 functions
+;-------------------------------------------------------------------------------
+; No new functions, but a change was made to slot openness managemnent such that
+; it is no longer necessary to call `ti_CloseAll` in initialization. New
+; programs omitting this initialization require this change.
+
 
 ;-------------------------------------------------------------------------------
 vat_ptr0 := $d0244e
