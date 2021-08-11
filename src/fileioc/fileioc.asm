@@ -311,7 +311,7 @@ ti_Open:
 	jr	c, .slot
 	dec	a
 	jr	nz, .find_slot
-	ret	z
+	ret
 
 .slot:
 	ld	(curr_slot), a
