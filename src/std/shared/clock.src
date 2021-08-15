@@ -1,6 +1,19 @@
+mpTmrRange    := 0F20000h
+
+tmr2Counter   := 10h
+
+
 	assume	adl = 1
 
 	public	_clock
 _clock:
-	ld	a,-1
+	ld	hl, mpTmrRange + tmr2Counter
+	push	hl
+	call	_atomic_load_increasing_32
+	pop	bc
 	ret
+
+
+	extern	_atomic_load_increasing_32
+	extern	___init_clock
+_ = ___init_clock  ; reference symbol so it's linked in
