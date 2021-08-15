@@ -62,7 +62,7 @@ no_ei:
 ; first value read. (Note that this assertion can be extended to include 256
 ; because only one byte would change, making this whole case unreachable.)
 ;
-; If the third case occurred for both values read, then both are invalid. There
+; If the final case occurred for both values read, then both are invalid. There
 ; is no reasonable way to detect this, so it is assumed that this did not occur.
 ;
 ; Combining all of these cases and assumptions, the lesser of the two values
