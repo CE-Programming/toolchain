@@ -9,7 +9,7 @@
   "sequence": [
     "action|launch",
     "hashWait|1",
-    "delay|500",
+    "delay|200",
     "delay|4500",
     "hashWait|2",
     "hashWait|3"
