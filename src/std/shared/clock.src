@@ -14,6 +14,6 @@ _clock:
 	ret
 
 
-	extern	_atomic_load_increasing_32
 	extern	___init_clock
 _ = ___init_clock  ; reference symbol so it's linked in
+	extern	_atomic_load_increasing_32
