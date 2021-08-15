@@ -35,15 +35,15 @@ _delay:
 ; Convert (approx) from millis to clock ticks.
 	dec.s	hl
 	inc	hl
-	ld	e, a			; euhl = millis - 1
+	ld	e, a			; euhl = millis
 	ld	bc, (256 * 32768 + 500) / 1000
 					; aubc = round(256 * 32768 / 1e3)
-	call	__lmulu			; euhl = (millis - 1) * 
+	call	__lmulu			; euhl = millis *
 					;            round(256 * 32768 / 1e3)
 	push	de
 	push	hl
 	inc	sp
-	pop	hl			; uhl = (millis - 1) * 
+	pop	hl			; uhl = millis *
 					;           round(256 * 32768 / 1e3) /
 					;           256
 					;     = ticks
