@@ -1,7 +1,7 @@
 ### Stopwatch Demo
 
 This demo demonstrates using the hardware timers to make a simple stopwatch
-displaying millisecond precision.
+displaying hundreths precision.
 
 ![Screenshot](screenshot.png)
 
