@@ -56,9 +56,7 @@ fini_functions:
 	section	.header
 	db	$ef,$7b
 	db	$00		; C program identifier (nop)
-virtual
-	jq	start
-end virtual
+	require	start
 
 	section	.launcher
 launcher:
@@ -290,9 +288,7 @@ if push_exit_code <> pop_exit_code
 	push	hl
 end if
 push_exit_code:
-virtual
-	jr	skip._exit
-end virtual
+	require	skip._exit
 
 	section	.start
 virtual
@@ -370,9 +366,7 @@ else
   end if
  end if
 end if
-virtual
-	jr	skip.__Exit
-end virtual
+	require	skip.__Exit
 
 	section	.start
 virtual
@@ -392,9 +386,7 @@ pop_exit_code:
 if push_exit_code <> pop_exit_code
 	pop	hl
 end if
-virtual
-	jr	skip._abort
-end virtual
+	require	skip._abort
 
 	section	.start
 virtual
