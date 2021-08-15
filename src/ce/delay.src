@@ -53,7 +53,7 @@ _delay:
 	pop	de
 	pop	bc			; eubc = start
 	xor	a, a			; auhl = ticks
-	add	hl, de
+	add	hl, bc
 	adc	a, e			; auhl = start + ticks
 					;      = end
 ; Prepare.
