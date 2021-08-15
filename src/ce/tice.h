@@ -480,11 +480,7 @@ typedef struct font {
 } font_t;
 
 /**
- * Delays for a number of milliseconds.
- *
- * @note
- * Counts time spent while interrupted.
- * Assumes a CPU clock speed of 48MHz.
+ * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
  * @param msec number of milliseconds
  */
