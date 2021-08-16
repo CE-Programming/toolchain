@@ -1,6 +1,6 @@
 ### Delay Demo
 
-Demonstrates using the millisecond delay function in tice.h.
+Demonstrates using `delay()` to sleep for a number of milliseconds.
 
 ---
 
