@@ -4,11 +4,13 @@ ___sleep_common:
 ; Calculate the end time.
 	public	___sleep_common.1
 .1:
-	ld	a, e			; auhl = start or ticks
 	scf				; cf = 1
 					;    = correction
 	public	___sleep_common.2
 .2:
+	ld	a, e			; auhl = start or ticks
+	public	___sleep_common.3
+.3:
 	pop	de
 	pop	bc			; eubc = ticks or start
 	adc	hl, bc
