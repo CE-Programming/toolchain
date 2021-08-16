@@ -1,13 +1,8 @@
-; ---
 ; void delay(uint16_t millis)
-; ---
 
 	assume	adl=1
 
 virtual
-	ld	hl, 0
-	push	hl
-; ^ 26 cc (technically not required)
 	call	_delay
 ; ^ 22 cc
 end virtual
@@ -16,7 +11,7 @@ end virtual
 _delay:
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
 
-; Read argument.
+; Get millis.
 	pop	de
 	ex	(sp), hl		; hl = millis
 	push	de
@@ -29,11 +24,11 @@ _delay:
 ; Get the start time ASAP.
 	push	hl
 	call	_clock			; a = 0, euhl = start
-; ^ 32 cc self
+; ^ 32 + cc(_clock) cc
 ; 22 + 48 + 13 + 32 + 48 + 75 = 238 cc until start time captured
 	ex	(sp), hl		; hl = millis
 	push	de
-; Convert from millis to clock ticks.
+; Convert millis to clock ticks.
 	dec.s	hl
 	ld	e, a			; euhl = millis - 1
 .multiplier_fp := (256 * 32768 + 1000 - 1) / 1000
@@ -53,56 +48,17 @@ assert ($FFFF * .multiplier_fp) shr 32 = 0
 	inc	sp
 	push	hl
 	inc	sp
-	pop	hl			; uhl = ((millis - 1) *
+	pop	hl			; uhl = (millis *
 					;            ceil(256 * 32768 / 1e3) +
 					;            correction) /
 					;           256
-					;     = ticks
+					;     = ticks + correction
 	inc	sp
-; Calculate the end time.
-	pop	de
-	pop	bc			; eubc = start
-	xor	a, a			; auhl = ticks
-	add	hl, bc
-	adc	a, e			; auhl = start + ticks
-					;      = end
-; Prepare.
-	ld	e, a			; euhl = end
-	push	hl
-virtual
-	cp	a, 0
-load op_cp_a: byte from $$
-end virtual
-	db	op_cp_a
-; ^ don't care cc
-.check:
-; Get the current time.
-	push	bc
-	push	de
-	call	_clock			; euhl = now, cf = 0
-; ^ 42 + cc(_clock) cc
-; Check if the end time has been reached.
-	ld	a, e			; auhl = now
-	pop	de
-	pop	bc			; dubc = end
-; 	or	a, a
-	sbc	hl, bc
-	sbc	a, e			; auhl = now - end
-; ^ 48 cc
-; Check again if the end time has not been reached.
-	jr	c, .check
-; ^ 13 cc (conditional jr taken)
-; 42 + 48 + 202 + 31 + 48 + 13 = 384 cc check
-	ret
-; ^ 16 cc
-
-virtual
-	pop	hl
-; ^ 16 cc (technically not required)
-end virtual
-
-; 202 - 75 + 31 + 48 + 13 + 16 = 235 cc after end time captured
+	xor	a, a			; auhl = ticks + correction
+; Join common code for the rest.
+	jp	___sleep_common.2
 
 
-	extern	_clock
+	extern	___sleep_common.2
 	extern	__lmulu
+	extern	_clock

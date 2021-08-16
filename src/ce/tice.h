@@ -483,8 +483,60 @@ typedef struct font {
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
  * @param msec number of milliseconds
+ * @see sleep
+ * @see usleep
  */
 void delay(uint16_t msec);
+
+/**
+ * Sleeps until the number of real-time seconds specified in @p seconds have
+ * elapsed or until a signal arrives which is not ignored.
+ *
+ * @note
+ * Currently, signals do not exist, so this will never be interrupted.
+ *
+ * @param seconds number of seconds
+ * @return zero if the requested time has elapsed, or the number of seconds left
+ *         to sleep, if the call was interrupted by a signal handler
+ * @see delay
+ * @see usleep
+ */
+unsigned int sleep(unsigned int seconds);
+
+/**
+ * Suspends execution of the calling thread for (at least) @p ticks clock ticks.
+ *
+ * @param msec number of clock ticks
+ * @see CLOCKS_PER_SEC
+ * @see delay
+ * @see usleep
+ */
+void ticksleep(unsigned long ticks);
+
+/**
+ * An unsigned integer type capable of holding integers in the range
+ * [0,1000000].
+ *
+ * @see usleep
+ */
+typedef unsigned int useconds_t;
+
+/**
+ * Suspends execution of the calling thread for (at least) @p usec microseconds.
+ *
+ * The sleep may be lengthened slightly by any system activity or by the time
+ * spent processing the call or by the granularity of system timers.
+ *
+ * @note
+ * Currently, no errors are possible.
+ *
+ * @param usec number of microseconds
+ * @return 0 on success, or -1 on error, with ::errno set to indicate the error
+ * @see delay
+ * @see sleep
+ * @see useconds_t
+ */
+int usleep(useconds_t usec);
 
 /**
  * Returns a pseudo-random 32-bit integer.
