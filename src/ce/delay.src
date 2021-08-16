@@ -1,4 +1,4 @@
-; void delay(uint16_t millis)
+; void delay(uint16_t millis);
 
 	assume	adl=1
 

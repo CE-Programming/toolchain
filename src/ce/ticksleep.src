@@ -1,4 +1,4 @@
-; void ticksleep(unsigned long ticks)
+; void ticksleep(unsigned long ticks);
 
 	assume	adl=1
 
