@@ -3,7 +3,7 @@
 	assume	adl=1
 
 if 0
-; Minimal caller code.
+; Minimal caller code (for timing calculation).
 	call	_sleep
 ; ^ 22 cc
 end if
