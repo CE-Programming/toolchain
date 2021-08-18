@@ -511,7 +511,7 @@ unsigned int sleep(unsigned int seconds);
 /**
  * Suspends execution of the calling thread for (at least) @p ticks clock ticks.
  *
- * @param msec number of clock ticks
+ * @param ticks number of clock ticks
  * @see CLOCKS_PER_SEC
  * @see delay
  * @see usleep
