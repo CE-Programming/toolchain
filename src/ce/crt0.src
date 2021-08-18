@@ -108,22 +108,20 @@ launcher:
 
 	section .start
 
-mpTmrRange    := 0F20000h
+mpTmr2Counter := 0F20010h
+mpTmrCtrl := 0F20030h
 
-tmr2Counter   := 10h
-tmrCtrl       := 30h
-
-bTmr2Enable   := 3
-bTmr2Crystal  := 4
+bTmr2Enable := 3
+bTmr2Crystal := 4
 bTmr2Overflow := 5
-bTmr2CountUp  := 10
+bTmr2CountUp := 10
 
 	public	___init_clock
 ___init_clock:
 ; Disable the timer and configure it to use the 32768Hz crystal timer, not
 ; generate an interurrupt on overflow, and count up.
 assert bTmr2CountUp / 8 = 1
-	ld	hl, mpTmrRange + tmrCtrl + 1
+	ld	hl, mpTmrCtrl + 1
 	set	bTmr2CountUp - 8, (hl)
 	dec	hl
 assert bTmr2Enable / 8 = 0
@@ -133,16 +131,16 @@ assert bTmr2Crystal / 8 = 0
 assert bTmr2Overflow / 8 = 0
 	res	bTmr2Overflow, (hl)
 ; Set the counter to zero.
-assert (mpTmrRange + tmrCtrl) shr 8 = (mpTmrRange + tmr2Counter + 1) shr 8
-	ld	l, (mpTmrRange + tmr2Counter + 1) and $FF
+assert mpTmrCtrl shr 8 = (mpTmr2Counter + 1) shr 8
+	ld	l, (mpTmr2Counter + 1) and $FF
 	ld	de, 0
 	ld	(hl), de
 	dec	hl
 	ld	(hl), e
 ; Enable the timer.
 assert bTmr2Enable / 8 = 0
-assert (mpTmrRange + tmr2Counter) shr 8 = (mpTmrRange + tmrCtrl) shr 8
-	ld	l, (mpTmrRange + tmrCtrl) and $FF
+assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
+	ld	l, mpTmrCtrl and $FF
 	set	bTmr2Enable, (hl)
 
 
