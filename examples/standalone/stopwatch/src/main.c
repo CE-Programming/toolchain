@@ -46,8 +46,7 @@ int main(void)
     do
     {
         /* Calculate and print the elapsed time */
-        /* `timer_Get` may read an incorrect value if the counter updates */
-        /* mid-read, so use `timer_GetSafe`, which detects and corrects this */
+        /* timer_Get may be used in place of timer_GetSafe for 32768 Hz timers */
         float elapsed = (float)timer_GetSafe(1, TIMER_UP) / 32768;
         PrintTime(elapsed);
     } while (!os_GetCSC());
