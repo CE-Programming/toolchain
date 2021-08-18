@@ -1,7 +1,7 @@
 ### Stopwatch Demo 2
 
-This demo demonstrates using `clock()` to make a simple stopwatch displaying
-hundreths precision.
+This demo demonstrates using `clock()` to implement a simple stopwatch
+displaying seconds with hundreths precision.
 
 ![Screenshot](screenshot.png)
 
