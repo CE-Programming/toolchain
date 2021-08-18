@@ -228,7 +228,9 @@ do { \
  * @param int Throw an interrupt when the timer reaches 0. Can be TIMER_0INT or TIMER_NOINT.
  * @param dir Direction in which to count. Can be TIMER_UP or TIMER_DOWN.
  *
- * @warning Timer 3 is usually employed by USB. Use it at your own risk.
+ * @warning
+ * Timer 2 is needed by library functions like clock() and sleep(). Timer 3 is
+ * needed by USB.
  */
 #define timer_Enable(n, rate, int, dir) (timer_Control = timer_Control & ~(0x7 << 3 * ((n) - 1) | 1 << ((n) + 8)) | (1 | (rate) << 1 | (int) << 2) << 3 * ((n) - 1) | (dir) << ((n) + 8))
 
