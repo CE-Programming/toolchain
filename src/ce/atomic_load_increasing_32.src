@@ -5,29 +5,42 @@
 
 	public	_atomic_load_increasing_32
 _atomic_load_increasing_32:
+; CC: 202 + 9 * read_1_invalid + 3 * ie
+; Timing assumes fetching from RAM (4cc) and reading from non-RAM (3cc).
+
+; Read the argument.
 	pop	hl
-	ex	(sp),iy
+	ex	(sp),iy			; iy = p
 	push	hl
+; ^ 48 cc
 ; Temporarily disable interrupts.
 	ld	a,i
 	di
-; Read the value twice.
-; first value read = cude, second value read = auhl
+; ^ 12 cc
+; Read from the pointer twice: first into cude, second into auhl.
 					; Time between first and last byte read:
-	ld	de,(iy)			;      2R
-	ld	c,(iy+3)		; + 3F+1R
-	ld	hl,(iy)			; + 3F+3R
-	ld	a,(iy+3)		; + 3F+1R
-					; = 9F+7R
-					; = 56cc (assuming F = R = 3)
-					; ~ 1.17us (assuming 48MHz clock speed)
-					; + approximate worst-case LCD + USB DMA
-					; ~ 5us
+	ld	de,(iy)			;         2R
+; ^ 21 cc
+; 48 + 12 + 21 - 6 = 75 cc until first value captured if valid
+	ld	c,(iy+3)		;  + 3F + 1R
+	ld	hl,(iy)			;  + 3F + 3R
+; ^ 36 cc
+; 48 + 12 + 21 + 36 - 5 = 112 cc until second value captured if valid
+	ld	a,(iy+3)		;  + 3F + 1R
+					; == 9F + 7R
+					; == 57 cc
+					;  + 9 * 19 cc = 171 cc (worst-case DMA)
+					; = 228 cc
+; ^ 15 cc
 ; Re-enable interrupts if they were previously enabled.
 	jp	po,no_ei
 	ei
 no_ei:
+; ^ 17 + 3 * ie cc
 ; Compare and return the lesser of the two values read.
+;
+; If the values are the same, then the underlying value must not have changed
+; during the reads, so both values are valid.
 ;
 ; If the values differ, then the underlying value changed between reading the
 ; first byte of the first 32-bit read and the last byte of the second 32-bit
@@ -62,7 +75,7 @@ no_ei:
 ; first value read. (Note that this assertion can be extended to include 256
 ; because only one byte would change, making this whole case unreachable.)
 ;
-; If the third case occurred for both values read, then both are invalid. There
+; If the final case occurred for both values read, then both are invalid. There
 ; is no reasonable way to detect this, so it is assumed that this did not occur.
 ;
 ; Combining all of these cases and assumptions, the lesser of the two values
@@ -71,12 +84,14 @@ no_ei:
 	sbc	hl,de
 	sbc	a,c			; auhl = second value read
 					;         - first value read
+; ^ 16 cc
 	jr	c,no_swap
 ; second value read >= first value read
 ;  ==> first value read is valid
 	ex	de,hl
 	ld	e,c			; euhl = first value read
 	ret
+; ^ 37 cc
 
 no_swap:
 ; second value read < first value read
@@ -85,3 +100,4 @@ no_swap:
 	adc	a,c
 	ld	e,a			; euhl = second value read
 	ret
+; ^ 46 cc (including conditional jr into)

@@ -8,11 +8,11 @@
 #endif
 
 #ifndef CLOCKS_PER_SEC
-#define CLOCKS_PER_SEC 0
+#define CLOCKS_PER_SEC 32768
 #endif
 
 typedef unsigned long time_t;
-typedef char clock_t;
+typedef unsigned long clock_t;
 
 struct tm {
    int tm_sec;

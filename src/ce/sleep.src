@@ -1,0 +1,43 @@
+; unsigned int sleep(unsigned int seconds);
+
+	assume	adl=1
+
+if 0
+; Minimal caller code (for timing calculation).
+	call	_sleep
+; ^ 22 cc
+end if
+
+	public	_sleep
+_sleep:
+; Even though the input is 24-bit, let's just pretend that it's 16-bit.
+; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
+
+; Get seconds.
+	pop	de
+	ex	(sp), hl		; hl = seconds
+	push	de
+; ^ 48 cc
+; Abort ASAP if seconds == 0.
+	ld	a, l
+	or	a, h
+	ret	z
+; ^ 13 cc
+; Get the start time ASAP.
+	push	hl
+	call	_clock			; a = 0, euhl = start
+; ^ 32 + cc(_clock) cc
+; 22 + 48 + 13 + 32 + 48 + 75 = 238 cc until start time captured
+	ex	(sp), hl		; hl = seconds
+	push	de
+; Convert from seconds to clock ticks.
+	ld	bc, 32768
+	call	__lmulu			; euhl = seconds * 32768
+					;      = ticks
+; Join common code for the rest.
+	jp	___sleep_common.1
+
+
+	extern	___sleep_common.1
+	extern	__lmulu
+	extern	_clock

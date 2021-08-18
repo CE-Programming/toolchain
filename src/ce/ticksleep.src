@@ -1,0 +1,42 @@
+; void ticksleep(unsigned long ticks);
+
+	assume	adl=1
+
+if 0
+; Minimal caller code (for timing calculation).
+	call	_ticksleep
+; ^ 22 cc
+end if
+
+	public	_ticksleep
+_ticksleep:
+; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
+
+; Get ticks and abort ASAP if ticks == 0.
+	pop	bc
+	pop	de
+	scf
+	sbc	hl, hl			; hl = -1
+	add	hl, de			; hl = (ticks & 0xFFFFFF) - 1
+					; cf = ticks & 0xFFFFFF != 0
+	ex	(sp), hl		; l = ticks >> 24
+	push	bc
+	push	bc
+	sbc	a, a			; a = -(ticks & 0xFFFFFF != 0)
+	or	a, e			; a = -(ticks & 0xFFFFFF != 0) |
+					;         ticks >> 24
+					; zf = ticks == 0
+	ret	z
+; ^ 103 cc
+; Get the start time ASAP.
+	push	de
+	push	hl
+	call	_clock			; a = 0, euhl = start
+; ^ 42 + cc(_clock) cc
+; 22 + 103 + 42 + 48 + 75 = 290 cc until start time captured
+; Join common code for the rest.
+	jp	___sleep_common.1
+
+
+	extern	___sleep_common.1
+	extern	_clock

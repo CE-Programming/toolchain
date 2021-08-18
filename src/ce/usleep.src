@@ -1,0 +1,61 @@
+; typedef unsigned int useconds_t;
+; int usleep(useconds_t usec);
+
+	assume	adl=1
+
+if 0
+; Minimal caller code (for timing calculation).
+	call	_usleep
+; ^ 22 cc
+end if
+
+	public	_usleep
+_usleep:
+; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
+
+; Get usec.
+	pop	de
+	ex	(sp), hl		; uhl = usec
+	push	de
+; ^ 48 cc
+; Abort ASAP if usec == 0.
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ret	z
+; ^ 21 cc
+; Get the start time ASAP.
+	push	hl
+	call	_clock			; a = 0, euhl = start
+; ^ 32 + cc(_clock) cc
+; 22 + 48 + 21 + 32 + 48 + 75 = 246 cc until start time captured
+	ex	(sp), hl		; hl = usec
+	push	de
+; Convert usec to clock ticks.
+; https://docs.google.com/spreadsheets/d/1mZwDn6rEw3-uSQPuy48Ez0UWIvnggLiJxWft4u4OtcU/edit?usp=sharing
+	ld	e, a			; euhl = usec
+.multiplier := 114
+	ld	bc, .multiplier		; aubc = multiplier
+	call	__lmulu			; euhl = usec * multiplier
+.correction_scaled := 5796
+	ld	bc, .correction_scaled
+	add	hl, bc
+	adc	a, e			; auhl = usec * multiplier +
+					;            correction_scaled
+	ld	e, a			; euhl = usec * multiplier +
+					;            correction_scaled
+.divisor := 3479
+	ld	bc, .divisor
+	xor	a, a			; aubc = divisor
+	call	__ldivu			; euhl = (usec * multiplier +
+					;             correction_scaled) /
+					;            divisor
+					;      = ticks + correction
+; Join common code for the rest.
+	jp	___sleep_common.2
+
+
+	extern	___sleep_common.2
+	extern	__ldivu
+	extern	__lmulu
+	extern	_clock

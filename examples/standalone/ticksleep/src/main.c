@@ -1,4 +1,5 @@
 #include <tice.h>
+#include <time.h>
 
 int main(void)
 {
@@ -7,7 +8,7 @@ int main(void)
 
     /* Wait for 5 seconds */
     os_PutStrFull("Waiting...");
-    delay(5 * 1000);
+    ticksleep(5 * CLOCKS_PER_SEC);
     os_PutStrFull(" Done!");
     delay(100);
 

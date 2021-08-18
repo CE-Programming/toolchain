@@ -7,7 +7,7 @@ int main(void)
 
     /* Wait for 5 seconds */
     os_PutStrFull("Waiting...");
-    delay(5 * 1000);
+    sleep(5);
     os_PutStrFull(" Done!");
     delay(100);
 
