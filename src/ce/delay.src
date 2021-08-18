@@ -2,10 +2,11 @@
 
 	assume	adl=1
 
-virtual
+if 0
+; Minimal caller code.
 	call	_delay
 ; ^ 22 cc
-end virtual
+end if
 
 	public	_delay
 _delay:
