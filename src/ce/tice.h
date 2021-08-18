@@ -489,6 +489,11 @@ typedef struct font {
 void delay(uint16_t msec);
 
 /**
+ * @copybrief delay
+ */
+void msleep(uint16_t msec);
+
+/**
  * Sleeps until the number of real-time seconds specified in @p seconds have
  * elapsed or until a signal arrives which is not ignored.
  *
