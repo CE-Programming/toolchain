@@ -481,6 +481,13 @@ typedef struct font {
     uint24_t (*getHeight)(void);
 } font_t;
 
+typedef struct {
+    int ret; /**< Program return code. */
+    struct basic {
+        uint8_t error; /**< Basic program error code. */
+    };
+} prgm_run_info_t;
+
 /**
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
@@ -918,6 +925,26 @@ int os_PushErrorHandler(void) __attribute__((returns_twice));
  * @see os_PushErrorHandler
  */
 void os_PopErrorHandler(void);
+
+/**
+ * Runs a program that exists on the calculator.
+ * Note that this will destroy the currently running program, requiring you to
+ * save any data as needed. This program has an optional callback that will be
+ * executed when the called program finishes, which can be used to rebuild the
+ * program state. Additionally, program context information can be safely
+ * stored by using the extra user data arguments, which will then be delivered
+ * to the callback.
+ *
+ * @param pgrm Name of program to execute.
+ * @param ret Callback function to run when program finished executing.
+ * @param data User data that will be available in the callback function.
+ * @param size Size of user data (keep this small, it is stored on the stack!)
+ *
+ * @return This function should not return, but if it does, -1 indicates the
+ * program could not be found, -2 if not enough memory, and < 0 if some other
+ * error occurred.
+ */
+int os_RunPrgm(const char *pgrm, void (*ret)(prgm_run_info_t info, void *data), void *data, size_t size);
 
 /**
  * @return A pointer to symtable of the OS
