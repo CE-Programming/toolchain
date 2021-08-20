@@ -1,7 +1,7 @@
 	assume	adl=1
 
 	public	_errno
-_errno := $d008dc
+_errno := $D008DC
 
 	section	.text
 	public	_atexit
@@ -54,9 +54,8 @@ load functions: ___fini_array_count * long from fini_array: 0
 fini_functions:
 
 	section	.header
-	db	$ef,$7b
+	db	$EF, $7B
 	db	$00		; C program identifier (nop)
-	require	start
 
 	section	.launcher
 launcher:
@@ -105,8 +104,7 @@ launcher:
 .webaddress:
 	db	"http://tiny.cc/clibs",0
 
-
-	section .start
+	section .init
 
 mpTmr2Counter := 0F20010h
 mpTmrCtrl := 0F20030h
@@ -143,10 +141,9 @@ assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
 	ld	l, mpTmrCtrl and $FF
 	set	bTmr2Enable, (hl)
 
-
-	section	.start
-	private	start
-start:
+	section	.init
+	weak	__start
+__start:
 	call	0020848h	; _RunInicOff, assumes iy = flags
 	call	00004F4h	; _usb_DisableTimer
 	di			; disable interrupts
@@ -321,26 +318,30 @@ else
   end if
  end if
 end if
+ifextern ___main_argc_argv
+	call	___main_argc_argv
+else
+	call	_main
+end if
 
-	call	main
+	section	.fini
 if push_exit_code <> pop_exit_code
 	push	hl
 end if
 push_exit_code:
 	require	skip._exit
-
-	section	.start
 virtual
 	ld	a,0
  load .ld_a: byte from $$
 end virtual
 	db	.ld_a
 
+	section	.fini
 	public	_exit
 _exit:
 	pop	hl
 
-	section	.start
+	section	.fini
 	private	skip._exit
 skip._exit:
 if defined exit_functions
@@ -407,7 +408,7 @@ else
 end if
 	require	skip.__Exit
 
-	section	.start
+	section	.fini
 virtual
 	ld	a,0
  load .ld_a: byte from $$
@@ -418,7 +419,7 @@ end virtual
 __Exit:
 	pop	hl
 
-	section	.start
+	section	.fini
 	private	skip.__Exit
 skip.__Exit:
 pop_exit_code:
@@ -427,7 +428,7 @@ if push_exit_code <> pop_exit_code
 end if
 	require	skip._abort
 
-	section	.start
+	section	.fini
 virtual
 	ld	iy,0
  load .iy_pre: byte from $$
@@ -438,10 +439,11 @@ end virtual
 _abort:
 	ld	hl,1 shl 23+6	; SIGABRT
 
-	section	.start
+	section	.fini
 	private	skip._abort
 skip._abort:
 	ld	sp,0
+	private	_exit.sp
 _exit.sp := $-3
 	pop	iy		; iy = flags
 	pop	af		; a = original flash wait states
@@ -449,8 +451,6 @@ _exit.sp := $-3
 				; save exit code
 	ld	(hl),a		; restore flash wait states
 	call	00004F0h	; _usb_ResetTimer
-
-	section	.cleanup
 	call	_os_EnableHomeTextBuffer
 	ld	a,1
 	ld	(0F00008h),a	; clear on interrupt
@@ -471,6 +471,8 @@ dtors::
 	section .fini_array
 fini_array::
 
+	extern	_main
+	extern	___main_argc_argv
 	extern	___ctors_count
 	extern	___dtors_count
 	extern	___fini_array_count
@@ -480,13 +482,6 @@ fini_array::
 	extern	___low_bss
 	extern	__indcallhl
 	extern	_free
-ifextern ___main_argc_argv
-	extern	___main_argc_argv
-	main := ___main_argc_argv
-else
-	extern	_main
-	main := _main
-end if
 	extern	_malloc
 	extern	_os_DisableHomeTextBuffer
 	extern	_os_EnableHomeTextBuffer
