@@ -1,0 +1,326 @@
+	assume	adl=1
+
+define ti? ti
+namespace ti?
+?Mov9b                     := 00202FCh
+?Mov9ToOP1                 := 0020320h
+?MovFROP1                  := 002032Ch
+?MemChk                    := 00204FCh
+?ChkFindSym                := 002050Ch
+?InsertMem                 := 0020514h
+?EnoughMem                 := 002051Ch
+?DelMem                    := 0020590h
+?ErrNotEnoughMem           := 002072Ch
+?ErrMemory                 := 0020768h
+?PushErrorHandler          := 0020798h
+?PopErrorHandler           := 002079Ch
+?ParseInp                  := 0020F00h
+?DisableAPD                := 0021134h
+?DeleteTempPrograms        := 00214C0h
+?ForceFullScreen           := 0021528h
+?LoadDEInd_s               := 0021D9Ch
+?ChkInRam                  := 0021F98h
+?flags                     := 0D00080h
+?kbdGetKy                  := 0D0058Dh
+?OP1                       := 0D005F8h
+?pixelShadow               := 0D031F6h
+?asm_prgm_size             := 0D0118Ch
+?userMem                   := 0D1A881h
+?cursorImage               := 0E30800h
+?tExtTok                   := 0EFh
+?ProgObj                   := 005h
+?tAsm84CeCmp               := 07Bh
+?tAsm84CePrgm              := 07Ah
+
+?newDispF                  := 08h
+?allowProgTokens           := 1
+?progExecuting             := 1
+?cmdFlags                  := 0Ch
+?cmdExec                   := 6
+?onFlags                   := 09h
+?onInterrupt               := 4
+?textFlags                 := 05h
+?textEraseBelow            := 1
+?textScrolled              := 2
+?textInverse               := 3
+end namespace
+
+	public	_os_RunPrgm
+_os_RunPrgm:
+	require	___prgm_run_check
+	ld	iy,ti.flags
+	ld	hl,reloc.data
+	ld	de,ti.cursorImage
+	ld	bc,reloc.data.len
+	push	de
+	ldir
+	pop	hl
+	jp	(hl)
+
+virtual at ti.cursorImage
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+	ld	de,___prgm_to_run
+	call	ti.Mov9b
+	ld	hl,___prgm_caller
+	ld	de,stub.prgm
+	call	ti.Mov9b
+	ld	hl,___prgm_to_run
+	call	find_prgm
+	ld	(___prgm_to_run_size),de
+	jr	nc,.found
+	sbc	hl,hl
+	ret
+.found:
+	ld	a,(hl)
+	cp	a,ti.tExtTok
+	jr	nz,run_basic_prgm
+	inc	hl
+	ld	a,(hl)
+	cp	a,ti.tAsm84CeCmp
+	jr	z,run_asm_prgm
+	jr	run_basic_prgm
+
+run_basic_prgm:
+	call	copy_user_data
+	call	delete_running_prgm
+	call	setup_prgm_state
+	call	push_stub_and_data
+	set	ti.progExecuting,(iy + ti.newDispF)
+	set	ti.cmdExec,(iy + ti.cmdFlags)
+	set	ti.allowProgTokens,(iy + ti.newDispF)
+	ld	hl,___prgm_to_run
+	call	ti.Mov9ToOP1
+	jp	ti.ParseInp
+
+run_asm_prgm:
+	push	de
+	pop	hl
+	ld	de,64
+	add	hl,de
+	ld	de,(ti.asm_prgm_size)
+	sbc	hl,de
+	jr	c,.enough_mem
+	call	ti.EnoughMem
+	jr	nc,.enough_mem
+	sbc	hl,hl
+	dec	hl
+	ret
+.enough_mem:
+	call	copy_user_data
+	call	delete_running_prgm
+	call	setup_prgm_state
+	call	push_stub_and_data
+	ld	de,(___prgm_to_run_size)
+	ld	hl,ti.userMem
+	ex	hl,de
+	call	ti.InsertMem
+	ld	hl,___prgm_to_run
+	call	find_prgm
+	jr	c,.fatal
+	inc	hl
+	inc	hl
+	ld	de,ti.userMem
+	ld	bc,(___prgm_to_run_size)
+	ld	(ti.asm_prgm_size),bc
+	ldir
+	ld	hl,___prgm_to_run
+	call	ti.Mov9ToOP1
+	jp	ti.userMem
+.fatal:
+	ld	de,(___prgm_to_run_size)
+	ld	hl,ti.userMem
+	call	ti.DelMem
+	jp	ti.ErrMemory
+
+setup_prgm_state:
+	xor	a,a
+	ld	(ti.kbdGetKy),a
+	jp	ti.DisableAPD
+
+copy_user_data:
+	ld	iy,3
+	add	iy,sp
+	ld	hl,(iy + 12)
+	ld	(stub.callback),hl
+	ld	hl,(iy + 6)
+	ld	de,ti.pixelShadow	; data
+	ld	bc,(iy + 9)
+	ld	(push_stub_and_data.data_size),bc
+	ldir
+	ld	iy,ti.flags
+	ret
+
+delete_running_prgm:
+	pop	hl
+	ld	(.ret),hl
+	call	___exit_return
+	ld	iy,ti.flags
+	ld	hl,ti.userMem
+	ld	de,(ti.asm_prgm_size)
+	call	ti.DelMem
+	or	a,a
+	sbc	hl,hl
+	ld	(ti.asm_prgm_size),hl
+	jp	0
+.ret := $-3
+
+push_stub_and_data:
+	pop	hl
+	ld	(.ret),hl
+	ld	hl,stub.prgm
+	call	find_prgm
+	ld	(.stub_prgm_size),de
+	ld	(.prev_sp),sp
+	ld	hl,-9
+	add	hl,sp
+	ld	sp,hl
+	ld	(.stub_prgm),hl
+	ex	de,hl
+	ld	hl,stub.prgm
+	ld	bc,9
+	ldir
+	ld	hl,-(stub.len - 9)
+	add	hl,sp
+	ld	sp,hl
+	push	hl
+	ld	(.stub_normal),hl
+	ex	de,hl
+	ld	hl,stub
+	ld	bc,stub.len
+	ldir
+	pop	hl
+	ld	bc,0
+.data_size := $ - 3
+	or	a,a
+	sbc	hl,bc
+	ld	sp,hl
+	ex	de,hl
+	ld	hl,ti.pixelShadow
+	ldir
+	ld	hl,0
+.prev_sp := $ - 3
+	push	hl
+	ld	hl,0
+.stub_prgm := $ - 3
+	push	hl
+	ld	hl,0
+.stub_prgm_size := $ - 3
+	push	hl
+	ld	hl,0
+.stub_error_handler := $ - 3
+	call	ti.PushErrorHandler
+	ld	hl,0
+.stub_normal := $ - 3
+	push	hl
+	jp	0
+.ret := $ - 3
+
+find_prgm:
+	call	ti.Mov9ToOP1
+	call	ti.ChkFindSym
+	ret	c
+	call	ti.ChkInRam
+	ex	de,hl
+	jr	z,.in_ram
+	ld	de,9
+	add	hl,de
+	ld	e,(hl)
+	add	hl,de
+	inc	hl
+.in_ram:
+	call	ti.LoadDEInd_s
+	or	a,a
+	ret
+
+stub:
+.error_handler:
+	ld	iy,ti.flags
+	call	ti.PopErrorHandler
+	xor	a,a
+.normal:
+	ld	(ti.cursorImage),a
+	ld	iy,ti.flags
+	res	ti.progExecuting,(iy + ti.newDispF)
+	res	ti.cmdExec,(iy + ti.cmdFlags)
+	res	ti.allowProgTokens,(iy + ti.newDispF)
+	res	ti.textInverse,(iy + ti.textFlags)
+	res	ti.onInterrupt,(iy + ti.onFlags)
+	ld	hl,ti.userMem
+	ld	de,(ti.asm_prgm_size)
+	call	ti.DelMem
+	pop	de		; size of return program -- shouldn't change?
+	push	de
+	call	ti.ErrNotEnoughMem
+	pop	hl
+	ld	(ti.asm_prgm_size),hl
+	ld	de,ti.userMem
+	call	ti.InsertMem
+	pop	hl		; stub program to return
+	call	ti.Mov9ToOP1
+	call	ti.ChkFindSym
+	jr	nc,.found
+.error:
+	pop	hl
+	ld	sp,hl
+	ld	hl,ti.userMem
+	ld	de,(ti.asm_prgm_size)
+	call	ti.DelMem
+	ret
+.found:
+	call	ti.ChkInRam
+	ex	de,hl
+	jr	z,.in_ram
+	ld	de,9
+	add	hl,de
+	ld	e,(hl)
+	add	hl,de
+	inc	hl
+.in_ram:
+	inc	hl
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	bc,(ti.asm_prgm_size)
+	ld	de,ti.userMem
+	ldir
+	ld	hl,0
+.callback := $-3
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jr	z,.error		; no callback, return to caller
+	pop	hl			; get rid of real return address
+	scf
+	sbc	hl,hl
+	push	hl			; return of -1 should never occur
+	jp	ti.userMem
+
+.prgm:
+	rb	9
+.len := $ - stub
+
+___prgm_to_run:
+	rb	9
+___prgm_to_run_size:
+	dl	0
+
+load reloc_rodata: $-$$ from $$
+end virtual
+
+	section	.rodata
+	private	reloc.data
+	private	reloc.data.len
+reloc.data:
+	db	reloc_rodata
+.len := $ - .
+
+	section	.rodata
+	public	___prgm_caller
+___prgm_caller:
+	rb	9
+
+	extern	___exit_return
+	extern	___prgm_run_check

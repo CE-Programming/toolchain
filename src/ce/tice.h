@@ -481,13 +481,6 @@ typedef struct font {
     uint24_t (*getHeight)(void);
 } font_t;
 
-typedef struct {
-    int ret; /**< Program return code. */
-    struct basic {
-        uint8_t error; /**< Basic program error code. */
-    };
-} prgm_run_info_t;
-
 /**
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
@@ -935,16 +928,23 @@ void os_PopErrorHandler(void);
  * stored by using the extra user data arguments, which will then be delivered
  * to the callback.
  *
- * @param pgrm Name of program to execute.
- * @param ret Callback function to run when program finished executing.
+ * @param pgrm Name of program to execute. The type should be the first byte of
+ * the string.
  * @param data User data that will be available in the callback function.
+ * May be \c NULL.
  * @param size Size of user data (keep this small, it is stored on the stack!)
+ * @param ret Callback function to run when program finishes executing. The
+ * argument \p data will contain the provided \p data contents, and \p retval
+ * will contain the error code if a TI-BASIC program, or the exit code if a C
+ * program. Other types of programs may have an undefined \p retval. This
+ * argument may be left \c NULL if execution should not return to the calling
+ * program.
  *
  * @return This function should not return, but if it does, -1 indicates the
  * program could not be found, -2 if not enough memory, and < 0 if some other
  * error occurred.
  */
-int os_RunPrgm(const char *pgrm, void (*ret)(prgm_run_info_t info, void *data), void *data, size_t size);
+int os_RunPrgm(const char *pgrm, void *data, size_t size, int (*ret)(void *data, int retval));
 
 /**
  * @return A pointer to symtable of the OS

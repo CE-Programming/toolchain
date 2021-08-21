@@ -141,6 +141,12 @@ assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
 	ld	l, mpTmrCtrl and $FF
 	set	bTmr2Enable, (hl)
 
+	section .init
+	public	___prgm_run_check
+___prgm_run_check:
+	ld	de,___prgm_caller
+	call	002032Ch	; ti.MovFROP1
+
 	section	.init
 	weak	__start
 __start:
@@ -442,6 +448,7 @@ _abort:
 	section	.fini
 	private	skip._abort
 skip._abort:
+	pop	hl
 	ld	sp,0
 	private	_exit.sp
 _exit.sp := $-3
@@ -461,6 +468,17 @@ _exit.sp := $-3
 	call	021A3Ch		; _DrawStatusBar
 	pop	hl		; hl = exit code
 	ret
+	private	_exit.ret
+_exit.ret := $-1
+
+	section	.fini
+	public	___exit_return
+___exit_return:
+	ld	a,$E9
+	ld	(_exit.ret),a
+	pop	hl
+	push	hl
+	call	_exit
 
 	section .init_array
 init_array::
@@ -485,3 +503,4 @@ fini_array::
 	extern	_malloc
 	extern	_os_DisableHomeTextBuffer
 	extern	_os_EnableHomeTextBuffer
+	extern	___prgm_caller
