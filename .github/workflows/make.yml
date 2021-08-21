@@ -160,7 +160,7 @@ jobs:
         run: tar -xvf CEdev-${{runner.os}}.tar.gz
 
       - name: Build Examples
-        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} V=1
+        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=YES V=1
 
       - name: Checkout CEmu
         if: github.event_name != 'pull_request'
