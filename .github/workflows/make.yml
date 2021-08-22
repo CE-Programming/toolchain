@@ -135,6 +135,7 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [ubuntu, macos, windows]
+        compressed: [YES, NO]
         include:
           - runs-on: windows
             env: "env:"
@@ -159,8 +160,10 @@ jobs:
         if: runner.os != 'Windows'
         run: tar -xvf CEdev-${{runner.os}}.tar.gz
 
+      - name: Build Example Graphics
+        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1 gfx
       - name: Build Examples
-        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=YES V=1
+        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1
 
       - name: Checkout CEmu
         if: github.event_name != 'pull_request'
