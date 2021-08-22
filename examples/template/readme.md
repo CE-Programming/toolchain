@@ -6,7 +6,5 @@ To add code, fill in the `int main(void)` function in main.c. You can also creat
 your own source and header files and add them to the directory; the makefile
 will automatically find and compile the new source files.
 
----
 
 This template is a part of the C SDK Toolchain for use on the CE.
-
