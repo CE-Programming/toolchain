@@ -23,7 +23,7 @@
       "description": "Test sprite moving display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "09976710" ]
+      "expected_CRCs": [ "0B9B230F" ]
     },
     "2":
     {

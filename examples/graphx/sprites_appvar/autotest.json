@@ -24,7 +24,7 @@
       "description": "Test sprite appvar display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "9F0F94EA" ]
+      "expected_CRCs": [ "99090AE3" ]
     },
     "2":
     {

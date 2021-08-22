@@ -21,4 +21,3 @@ outputs:
       - global_palette
     converts:
       - tileset
-

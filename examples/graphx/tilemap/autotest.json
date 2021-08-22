@@ -31,35 +31,35 @@
       "description": "Test tilemap display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "7BE0219D" ]
+      "expected_CRCs": [ "18678D29" ]
     },
     "2":
     {
       "description": "Test tilemap right",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "E197BD88" ]
+      "expected_CRCs": [ "854599C0" ]
     },
     "3":
     {
       "description": "Test tilemap down",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "65BE26CE" ]
+      "expected_CRCs": [ "40E35D1E" ]
     },
     "4":
     {
       "description": "Test tilemap left",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "66C950DF" ]
+      "expected_CRCs": [ "32EAC098" ]
     },
     "5":
     {
       "description": "Test tilemap up",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "7BE0219D" ]
+      "expected_CRCs": [ "18678D29" ]
     },
     "6":
     {
