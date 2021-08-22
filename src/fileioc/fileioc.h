@@ -144,7 +144,7 @@ char *ti_DetectVar(void **curr_search_posistion, const char *detection_string, u
  *  char *var_name;
  *  uint8_t *search_pos = NULL;
  *  uint8_t type;
- *  while((var_name = ti_DetectVar(&search_pos, "my_data", &type)) != NULL) {
+ *  while((var_name = ti_DetectAny(&search_pos, "my_data", &type)) != NULL) {
  *    if (type == TI_PRGM_TYPE || type == TI_PPRGM_TYPE) {
  *     ...do something with the name or search_pos...
  *    }
