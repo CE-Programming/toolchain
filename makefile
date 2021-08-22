@@ -28,7 +28,7 @@ endif
 
 LIB_DIR = $(call NATIVEPATH,src/$1)
 
-all: convbin convimg convfont $(LIBS) std
+all: cedev-config convbin convimg convfont $(LIBS) std
 
 std: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std)
@@ -44,6 +44,9 @@ convimg: check
 
 convfont: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont)
+
+cedev-config: check
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/cedev-config)
 
 $(LIBS): fasmg
 	$(Q)$(MAKE) -C $(call LIB_DIR,$@)
@@ -65,6 +68,7 @@ install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convfont/convfont),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convimg/bin/convimg),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convbin/bin/convbin),$(INSTALL_BIN))
+	$(Q)$(call COPY,$(call NATIVEEXE,tools/cedev-config/bin/cedev-config),$(INSTALL_BIN))
 	$(Q)$(WINDOWS_COPY)
 
 $(addprefix install-,$(LIBS)):
@@ -97,6 +101,7 @@ clean: $(addprefix clean-,$(LIBS)) clean-std
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) clean
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) clean
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) clean
+	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/cedev-config) clean
 	$(Q)$(call REMOVE,src/linker_script)
 	$(Q)$(call REMOVE,clibs.8xg)
 	$(Q)$(call RMDIR,release)
