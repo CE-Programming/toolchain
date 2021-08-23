@@ -23,10 +23,7 @@ static int help(const char *prgm)
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  --version         Print CE C Toolchain version.\n");
     fprintf(stdout, "  --prefix          Print the installation prefix.\n");
-    fprintf(stdout, "  --bindir          Directory containing toolchain executables.\n");
-    fprintf(stdout, "  --includedir      Directory containing toolchain headers.\n");
-    fprintf(stdout, "  --libdir          Directory containing toolchain libraries.\n");
-    fprintf(stdout, "  --makefile        Core toolchain makefile.\n");
+    fprintf(stdout, "  --makefile        Core toolchain makefile path.\n");
     fprintf(stdout, "  --help            Show this page.\n");
 
     return 0;
@@ -45,11 +42,32 @@ static const char *executable_path(void)
     }
     else
     {
-        fprintf(stderr, "Could not find application path.\n");
+        fprintf(stderr, "Could not find CEdev installation.\n");
         exit(1);
     }
 
     return path;
+}
+
+static bool str_has_whitespace(const char *str, size_t max)
+{
+    size_t i = 0;
+
+    for (i = 0; i < max; ++i)
+    {
+        char c = str[i];
+        switch (c)
+        {
+            case '\0':
+                return false;
+            case '\t': case '\r': case '\n': case '\v': case '\f': case ' ':
+                return true;
+            default:
+                break;
+        }
+    }
+
+    return false;
 }
 
 int main(int argc, char *argv[])
@@ -73,9 +91,6 @@ int main(int argc, char *argv[])
             {"help",         no_argument, 0, 'h'},
             {"version",      no_argument, 0, 'v'},
             {"prefix",       no_argument, 0, 'p'},
-            {"bindir",       no_argument, 0, 'b'},
-            {"includedir",   no_argument, 0, 'i'},
-            {"libdir",       no_argument, 0, 'l'},
             {"makefile",     no_argument, 0, 'm'},
             {0, 0, 0, 0}
         };
@@ -96,29 +111,20 @@ int main(int argc, char *argv[])
                 fprintf(stdout, "%s\n", cedev);
                 break;
 
-            case 'b':
-                cwk_path_get_absolute(cedev, "./bin", buffer, sizeof buffer);
-                fprintf(stdout, "%s\n", buffer);
-                break;
-
-            case 'i':
-                cwk_path_get_absolute(cedev, "./include", buffer, sizeof buffer);
-                fprintf(stdout, "%s\n", buffer);
-                break;
-
-            case 'l':
-                cwk_path_get_absolute(cedev, "./lib", buffer, sizeof buffer);
-                fprintf(stdout, "%s\n", buffer);
-                break;
-
             case 'm':
                 cwk_path_get_absolute(cedev, "./meta/makefile.mk", buffer, sizeof buffer);
+                if (str_has_whitespace(buffer, sizeof buffer))
+                {
+                    fprintf(stderr, "The CE C Toolchain is installed in a directory containing\n");
+                    fprintf(stderr, "spaces. This does not work properly with the \'make\' command.\n");
+                    fprintf(stderr, "Please move the install directory to a path that does not\n");
+                    fprintf(stderr, "contain any spaces.\n");
+                    return 1;
+                }
                 fprintf(stdout, "%s\n", buffer);
                 break;
 
             case 'h':
-                return help(argv[0]);
-
             default:
                 return help(argv[0]);
         }

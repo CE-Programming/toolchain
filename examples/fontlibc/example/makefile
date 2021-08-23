@@ -20,15 +20,10 @@ DEPS = $(FONT_INC)
 
 # ----------------------------
 
-ifndef CEDEV
-$(error CEDEV environment path variable is not set)
-endif
-
-include $(CEDEV)/meta/makefile.mk
+include $(shell cedev-config --makefile)
 
 # ----------------------------
 
 $(FONT_INC): $(FONT)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)convfont -o carray -f $< -a 1 -b 1 -w bold -c 2 -x 9 -l 0x0B -Z $@
-

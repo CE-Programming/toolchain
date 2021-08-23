@@ -14,6 +14,8 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+include $(CURDIR)/../../src/common.mk
+
 CC = gcc
 CFLAGS = -Wall -Wextra -Wshadow -O3 -std=c99 -Isrc -DNDEBUG -DCEDEV_VERSION="\"$(CEDEV_VERSION)\"" -flto
 LDFLAGS = -flto
@@ -21,16 +23,9 @@ LIBRARIES :=
 
 ifeq ($(OS),Windows_NT)
   TARGET ?= cedev-config.exe
-  SHELL = cmd.exe
-  NATIVEPATH = $(subst /,\,$1)
-  RMDIR = ( rmdir /s /q $1 2>nul || call )
-  MKDIR = ( mkdir $1 2>nul || call )
   STRIP = strip --strip-all "$1"
 else
   TARGET ?= cedev-config
-  NATIVEPATH = $(subst \,/,$1)
-  MKDIR = mkdir -p $1
-  RMDIR = rm -rf $1
   ifeq ($(shell uname -s),Darwin)
     STRIP = echo "no strip available"
     CFLAGS += -D_DARWIN_C_SOURCE
@@ -41,23 +36,16 @@ else
   endif
 endif
 
-V ?= 1
-ifeq ($(V),1)
-Q =
-else
-Q = @
-endif
-
-BINDIR := ./bin
-OBJDIR := ./obj
-SRCDIR := ./src
-DEPDIR := ./src/deps
-SOURCES := \
+BINDIR = ./bin
+OBJDIR = ./obj
+SRCDIR = ./src
+DEPDIR = ./src/deps
+SOURCES = \
 	$(SRCDIR)/main.c \
 	$(SRCDIR)/cwalk.c \
 	$(SRCDIR)/whereami.c
 
-OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: $(BINDIR)/$(TARGET)
 
@@ -71,9 +59,6 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D)))
 	$(Q)$(CC) -c $(call NATIVEPATH,$<) $(CFLAGS) -o $(call NATIVEPATH,$@)
-
-test:
-	cd test && bash ./test.sh
 
 clean:
 	$(Q)$(call RMDIR,$(call NATIVEPATH,$(BINDIR)))
