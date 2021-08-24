@@ -90,10 +90,7 @@ release-libs: $(LIBS) convbin
 	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract \
 		$(foreach library,$(LIBS),$(addprefix --input ,$(call LIB_DIR,$(library))/$(library).8xv)) --output $(call NATIVEPATH,clibs.8xg)
 
-docs-pdf:
-	$(Q)$(MAKE) -C docs latexpdf
-
-docs-html:
+docs:
 	$(Q)$(MAKE) -C docs html
 
 clean: $(addprefix clean-,$(LIBS)) clean-std
@@ -117,8 +114,7 @@ help:
 	@echo Helpful targets:
 	@echo   all
 	@echo   check
-	@echo   docs-html
-	@echo   docs-pdf
+	@echo   docs
 	@echo   clean
 	@echo   install
 	@echo   uninstall
@@ -129,5 +125,5 @@ help:
 .PHONY: $(LIBS)
 .PHONY: install-fasmg install-std install-ce $(addprefix install-,$(LIBS))
 .PHONY: check clean clean-std $(addprefix clean-,$(LIBS))
-.PHONY: all help install uninstall release release-libs docs-pdf docs-html
+.PHONY: all help install uninstall release release-libs docs-html
 .PHONY: fasmg convbin convimg convfont
