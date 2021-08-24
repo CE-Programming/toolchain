@@ -21,7 +21,7 @@ html_theme_options = {
 }
 
 
-templates_path = ['_templates']
+templates_path = ['templates']
 source_suffix = '.rst'
 master_doc = 'index'
 language = None
