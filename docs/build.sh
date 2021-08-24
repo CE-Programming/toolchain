@@ -8,15 +8,14 @@ build_documentation () {
    echo "Building documentation for ${current_version}..."
 
    if [ -f 'templates/versions.html' ]; then
-     mkdir -p templates
      cp -f /tmp/versions.html templates/versions.html
      sphinx-build . $1
-     rm -rf templates
+     git checkout -- templates/versions.html
    else
      mkdir -p templates
      cp -f /tmp/versions.html templates/versions.html
      sphinx-build . $1
-     git checkout -- templates/versions.html
+     rm -rf templates
    fi
    git checkout -- conf.py
 }
