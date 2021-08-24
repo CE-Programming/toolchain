@@ -7,7 +7,7 @@ export versions
 export current_version
 
 git checkout ${current_version}
-sphinx-build . html
+sphinx-build . build/html
 
 for current_version in ${versions}; do
  
@@ -20,8 +20,6 @@ for current_version in ${versions}; do
       continue
    fi
 
-   sphinx-build . html/${current_version}
+   sphinx-build . build/html/${current_version}
 
 done
-
-
