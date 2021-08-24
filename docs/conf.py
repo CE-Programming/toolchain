@@ -39,7 +39,7 @@ html_context['current_version'] = current_version
 html_context['version'] = current_version
 html_context['versions'] = list()
 for version in versions:
-   html_context['versions'].append( (version, '/' + version + '/index.html') )
+   html_context['versions'].append( (version, '/toolchain/' + version + '/index.html') )
 
 breathe_projects = {}
 breathe_default_project = 'CE C Toolchain'
