@@ -15,8 +15,6 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #----------------------------
-VERSION := 9.2-devel
-#----------------------------
 NAME ?= DEMO
 ICON ?=
 DESCRIPTION ?=
@@ -43,6 +41,8 @@ HAS_FLASH_FUNCTIONS ?= YES
 HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
 #----------------------------
+CEDEV_TOOLCHAIN ?= $(shell cedev-config --prefix)
+#----------------------------
 
 # define some common makefile things
 empty :=
@@ -64,7 +64,7 @@ else
 Q =
 endif
 
-BIN ?= $(CEDEV)/bin
+BIN ?= $(CEDEV_TOOLCHAIN)/bin
 # get the os specific items
 ifeq ($(OS),Windows_NT)
 SHELL = cmd.exe
@@ -92,7 +92,7 @@ endif
 MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
 
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
-LINKER_SCRIPT ?= $(CEDEV)/meta/linker_script
+LINKER_SCRIPT ?= $(CEDEV_TOOLCHAIN)/meta/linker_script
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -107,7 +107,7 @@ TARGET8XP ?= $(NAME).8xp
 ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
 
 # startup routines
-LDCRT0 ?= $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
+LDCRT0 ?= $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/shared/crt0.src)
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filter $(subst %%,%,%$(subst *,%,$2)),$d)))
@@ -125,7 +125,7 @@ LINK_ASMSOURCES ?= $(ASMSOURCES)
 
 # files created to be used for linking
 LDFILES ?= $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
-LDLIBS ?= $(wildcard $(CEDEV)/lib/libload/*.lib)
+LDLIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)
 
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
@@ -189,7 +189,7 @@ LDSTATIC := 1
 endif
 
 # define the c/c++ flags used by clang
-EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -I$(SRCDIR) -Dinterrupt="__attribute__((__interrupt__))"
+EZCFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -Dinterrupt="__attribute__((__interrupt__))"
 EZCFLAGS += -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
@@ -197,7 +197,7 @@ EZCFLAGS += $(CFLAGS)
 # these are the fasmg linker flags
 FASMGFLAGS = \
 	-n \
-	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/meta/ld.alm)) \
+	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
 	-i $(call QUOTE_ARG,STATIC := $(LDSTATIC)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
@@ -254,6 +254,6 @@ gfx:
 	$(Q)$(GFXCMD)
 
 version:
-	$(Q)echo CE C Toolchain v$(VERSION)
+	$(Q)echo CE C Toolchain v$(shell cedev-config --version)
 
 .PHONY: all clean version gfx debug
