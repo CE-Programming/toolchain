@@ -10,12 +10,12 @@ build_documentation () {
    if [ -f 'templates/versions.html' ]; then
      mkdir -p templates
      cp -f /tmp/versions.html templates/versions.html
-     sphinx-build . build/html/${current_version}
+     sphinx-build . $1
      rm -rf templates
    else
      mkdir -p templates
      cp -f /tmp/versions.html templates/versions.html
-     sphinx-build . build/html/${current_version}
+     sphinx-build . $1
      git checkout -- templates/versions.html
    fi
    git checkout -- conf.py
@@ -27,7 +27,7 @@ export versions="master v9.1 v9.0"
 cp -f conf.py /tmp/conf.py
 cp -f templates/versions.html /tmp/versions.html
 
-build_documentation
+build_documentation build/html
 for current_version in ${versions}; do
-  build_documentation
+  build_documentation build/html/${current_version}
 done
