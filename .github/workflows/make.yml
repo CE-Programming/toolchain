@@ -255,6 +255,7 @@ jobs:
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Build Website Documentation
         run: make -C ${{env.TOOLCHAIN_PATH}} docs
