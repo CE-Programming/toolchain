@@ -26,8 +26,9 @@ Make sure the compiler is located in the system's PATH environment variable.
 
 Get the `fasmg assembler <https://flatassembler.net/download.php>`_.
 The download is located near the bottom of the page.
-Extract the `fasmg` executable for your operating system to either the same place
+Extract the `fasmg.x64` executable for your operating system to either the same place
 as `ez80-clang`, or in the system's PATH environment variable.
+Rename it to just `fasmg`.
 
 Clone the repo:
 
@@ -40,19 +41,21 @@ Build and install the toolchain:
 .. code-block:: bash
 
     cd toolchain
-    make
-    make install
+    make -j
+    make install -j
 
 By default, the toolchain is installed into the home (`~/CEdev`) directory.
 
 This is configurable with :code:`make install PREFIX=[LOCATION]`
+
+Finally, copy the previously downloaded `fasmg` and `ez80-clang` executables to the installed `CEdev/bin` directory.
 
 Windows
 ~~~~~~~
 
 Get `MinGW <http://www.mingw.org>`_.
 The only required pacakges are `mingw32-base` and `mingw32-gcc-g++`.
-Make sure the `MinGW/bin` directory is in the system's PATH environment variable.
+Make sure the `MinGW\bin` directory is in the system's PATH environment variable.
 
 Get the `ez80-clang LLVM compiler <https://github.com/jacobly0/llvm-project/wiki>`_.
 Make sure the compiler is located in the system's PATH environment variable.
@@ -73,9 +76,11 @@ Build and install the toolchain:
 .. code-block:: bash
 
     cd toolchain
-    mingw32-make
-    mingw32-make install
+    mingw32-make -j
+    mingw32-make install -j
 
 By default, the toolchain is installed into the root (C:\\CEdev) directory.
 
 This is configurable with :code:`mingw32-make install PREFIX=[LOCATION]`
+
+Finally, copy the previously downloaded `fasmg` and `ez80-clang` executables to the installed `CEdev\bin` directory.

@@ -20,10 +20,10 @@ Installing the CE C toolchain
 
     * Extend the PATH environment variable to point to :code:`CEdev/bin` by modifying `.bashrc`, `.zshrc`, or whatever flavor your OS uses.
 
-    .. indent with spaces
-    .. code-block:: bash
+        .. indent with spaces
+        .. code-block:: bash
 
-        export PATH=/<insert custom path here>/CEdev/bin:$PATH
+            export PATH=/<insert custom path here>/CEdev/bin:$PATH
 
 .. note::
 
@@ -36,7 +36,7 @@ Building Programs
 Programs are built with the :code:`make` command, executed from a terminal session.
 This tutorial explains how to use the CE C Toolchain to build programs using :code:`make`.
 
-Locate the installed `CEdev` folder, and open a terminal by double-clicking on :code:`cedev.bat` on Windows or launching your favorite one on Linux/macOS.
+Locate the installed `CEdev` folder, and open a session by double-clicking :code:`cedev.bat` on Windows or launching your favorite terminal on Linux/macOS.
 Navigate to the `examples` folder using the :code:`cd examples` command.
 This folder contains example projects that you can build and modify to learn how to write CE C programs.
 Navigate the to the `hello_world` example inside this folder using the command :code:`cd hello_world`.
@@ -83,5 +83,5 @@ Each CE C Toolchain project has the following folder structure:
 
 * **autotest.json**
 
-  * This file can be loaded into `CEmu <https://ce-programming.github.io/CEmu>`_'s Autotester to verify the program's correctness.
-  * It is not required, but it useful for creating testable code.
+  * This file can be loaded into `CEmu's Autotester <https://ce-programming.github.io/CEmu>`_ to test and validate the program.
+  * This feature is not required, but can be useful for creating testable code coverage.
