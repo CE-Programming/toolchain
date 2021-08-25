@@ -3,10 +3,10 @@
 Makefile Options
 ================
 
-The projects's Makefile controls different features and settings for the output program, and additionally can be added to for custom build structres if needed.
-This section highlights the avaible options.
+The project's makefile controls different features and settings for the output program.
+Additional rules can be added to build different components as well.
 
-To edit these options, open the `makefile` file inside the project's folder in a text editor.
+To edit these options, open the :code:`makefile` file inside the project's folder.
 
 NAME
 ----
@@ -83,7 +83,7 @@ CFLAGS / CXXFLAGS
 -----------------
 
 These flags are passed to the clang compiler.
-*CFLAGS* is used for C source files; *CXXFLAGS* is used for CPP source files.
+*CFLAGS* is used for C source files -- *CXXFLAGS* is used for CPP source files.
 
 .. code-block:: makefile
 

@@ -83,5 +83,5 @@ Each CE C Toolchain project has the following folder structure:
 
 * **autotest.json**
 
-  * This file can be loaded into `CEmu <https://ce-programming.github.io/CEmu>`_'s Autotester to verify the program's correctness.
-  * It is not required, but it useful for creating testable code.
+  * This file can be loaded into `CEmu's Autotester <https://ce-programming.github.io/CEmu>`_ to test and validate the program.
+  * This feature is not required, but can be useful for creating testable code coverage.
