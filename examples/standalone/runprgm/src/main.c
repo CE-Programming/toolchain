@@ -1,21 +1,13 @@
 #include <tice.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-int prgm_ret(void *data, int retval)
+void run_prgm(const char *msg, size_t msg_size, os_runprgm_callback_t callback)
 {
-    (void)data;
-    (void)retval;
-    return 0;
-}
-
-int main(void)
-{
-    const char string[] = "hello_world";
     int ret;
 
-    os_ClrHome();
-
-    ret = os_RunPrgm("\x05PRGM", (void*)string, sizeof string, prgm_ret);
+    /* attempt to run the program PRGM */
+    ret = os_RunPrgm("\x05PRGM", (void*)msg, msg_size, callback);
     switch (ret)
     {
         case -1:
@@ -30,7 +22,30 @@ int main(void)
             break;
     }
 
-    os_GetKey();
+    while (!os_GetCSC());
+}
+
+int prgm_ret(void *data, int retval)
+{
+    /* this should print "hello world" because the string context was saved */
+    printf("%s\n", (char*)data);
+    printf("retval: %d", retval);
+
+    while (!os_GetCSC());
+
+    /* run the program PRGM again, but don't use a callback this time */
+    run_prgm(NULL, 0, NULL);
+
+    return 0;
+}
+
+int main(void)
+{
+    static const char string[] = "hello world";
+
+    os_ClrHome();
+
+    run_prgm(string, sizeof string, prgm_ret);
 
     return 0;
 }

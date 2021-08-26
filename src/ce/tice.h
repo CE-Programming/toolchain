@@ -482,6 +482,12 @@ typedef struct font {
 } font_t;
 
 /**
+ * @brief Callback function pointer type for os_RunPrgm
+ * @see os_RunPrgm
+ */
+typedef int (*os_runprgm_callback_t)(void *data, int retval);
+
+/**
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
  * @param msec number of milliseconds
