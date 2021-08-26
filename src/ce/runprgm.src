@@ -85,10 +85,10 @@ virtual at ti.cursorImage
 	jr	run_basic_prgm
 
 run_basic_prgm:
-	call	copy_user_data
+	call	push_user_data
 	call	delete_running_prgm
 	call	setup_prgm_state
-	call	push_stub_and_data
+	call	push_stub
 	set	ti.progExecuting,(iy + ti.newDispF)
 	set	ti.cmdExec,(iy + ti.cmdFlags)
 	set	ti.allowProgTokens,(iy + ti.newDispF)
@@ -110,10 +110,10 @@ run_asm_prgm:
 	dec	hl
 	ret
 .enough_mem:
-	call	copy_user_data
+	call	push_user_data
 	call	delete_running_prgm
 	call	setup_prgm_state
-	call	push_stub_and_data
+	call	push_stub
 	ld	de,(___prgm_to_run_size)
 	ld	hl,ti.userMem
 	ex	hl,de
@@ -141,7 +141,7 @@ setup_prgm_state:
 	ld	(ti.kbdGetKy),a
 	jp	ti.DisableAPD
 
-copy_user_data:
+push_user_data:
 	pop	hl
 	ld	(.fakeret),hl
 	ld	iy,0			; exit() doesn't unwind stack so "safe"
@@ -154,7 +154,7 @@ copy_user_data:
 	ldir
 	di				; disable to prevent moving sp
 	ld	bc,(iy + 9)
-	ld	(push_stub_and_data.data_size),bc
+	ld	(stub.error.data_size),bc
 	or	a,a
 	sbc	hl,bc
 	push	hl
@@ -298,10 +298,10 @@ stub:
 	jr	nc,.found
 .error:
 	pop	hl
-	ld	sp,hl
-	ld	hl,ti.userMem
-	ld	de,(ti.asm_prgm_size)
-	call	ti.DelMem
+	ld	bc,0
+.error.data_size := $ - 3
+	add	hl,bc
+	ld	sp,hl		; os should delete created program
 	ret
 .found:
 	call	ti.ChkInRam
