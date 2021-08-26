@@ -141,11 +141,47 @@ assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
 	ld	l, mpTmrCtrl and $FF
 	set	bTmr2Enable, (hl)
 
+	section	.text
+	private	___runprgm_return
+	private	___runprgm_return.callback
+	private	___runprgm_return.data
+	private	___runprgm_return.retval
+___runprgm_return:
+	ld	hl,0
+.retval := $ - 3
+	push	hl
+	ld	hl,0
+.data := $ - 3
+	push	hl
+	call	0
+.callback := $ - 3
+	pop	de, de, de
+	ret
+
 	section .init
 	public	___prgm_run_check
 ___prgm_run_check:
 	ld	de,___prgm_caller
-	call	002032Ch	; ti.MovFROP1
+	call	002032Ch		; ti.MovFROP1
+	pop	hl
+	ld	de,-1
+	or	a,a
+	sbc	hl,de
+	add	hl,de
+	jr	nz,.no_return
+	ld	de,___runprgm_return
+	ld	(__start._main),de	; doesn't work for custom start?
+	pop	de			; user callback pointer
+	ld	(___runprgm_return.retval),de
+	pop	de
+	ld	(___runprgm_return.callback),de
+	or	a,a
+	sbc	hl,hl
+	add	hl,sp			; user callback data
+	ld	(___runprgm_return.data),de
+	jq	__start
+.no_return:
+	push	hl
 
 	section	.init
 	weak	__start
@@ -329,6 +365,8 @@ ifextern ___main_argc_argv
 else
 	call	_main
 end if
+	public	__start._main
+__start._main := $ - 3
 
 	section	.fini
 if push_exit_code <> pop_exit_code

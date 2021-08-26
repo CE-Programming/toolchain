@@ -10,12 +10,12 @@ int prgm_ret(void *data, int retval)
 
 int main(void)
 {
-    const char string[6] = "hello";
+    const char string[] = "hello_world";
     int ret;
 
     os_ClrHome();
 
-    ret = os_RunPrgm("\x05PRGM", (void*)string, sizeof string, NULL);
+    ret = os_RunPrgm("\x05PRGM", (void*)string, sizeof string, prgm_ret);
     switch (ret)
     {
         case -1:

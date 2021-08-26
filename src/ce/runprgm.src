@@ -23,6 +23,7 @@ namespace ti?
 ?flags                     := 0D00080h
 ?kbdGetKy                  := 0D0058Dh
 ?OP1                       := 0D005F8h
+?errNo                     := 0D008DFh
 ?appErr2                   := 0D025B6h
 ?pixelShadow               := 0D031F6h
 ?asm_prgm_size             := 0D0118Ch
@@ -46,31 +47,25 @@ namespace ti?
 ?textInverse               := 3
 end namespace
 
+reloc.base := ti.cursorImage
+reloc.offset := reloc.base - reloc.data
+
 	public	_os_RunPrgm
 _os_RunPrgm:
 	require	___prgm_run_check
 	ld	iy,ti.flags
-	ld	hl,reloc.data
-	ld	de,ti.cursorImage
-	ld	bc,reloc.data.len
-	push	de
-	ldir
-	pop	hl
-	jp	(hl)
-
-virtual at ti.cursorImage
 	pop	de
 	pop	hl
 	push	hl
 	push	de
-	ld	de,___prgm_to_run
+	ld	de,___prgm_to_run - reloc.offset
 	call	ti.Mov9b
 	ld	hl,___prgm_caller
-	ld	de,stub.prgm
+	ld	de,stub.prgm - reloc.offset
 	call	ti.Mov9b
-	ld	hl,___prgm_to_run
-	call	find_prgm
-	ld	(___prgm_to_run_size),de
+	ld	hl,___prgm_to_run - reloc.offset
+	call	find_prgm - reloc.offset
+	ld	(___prgm_to_run_size - reloc.offset),de
 	jr	nc,.found
 	sbc	hl,hl
 	ret
@@ -82,19 +77,15 @@ virtual at ti.cursorImage
 	ld	a,(hl)
 	cp	a,ti.tAsm84CeCmp
 	jr	z,run_asm_prgm
-	jr	run_basic_prgm
+	;jr	run_basic_prgm
 
 run_basic_prgm:
 	call	push_user_data
-	call	delete_running_prgm
-	call	setup_prgm_state
-	call	push_stub
-	set	ti.progExecuting,(iy + ti.newDispF)
-	set	ti.cmdExec,(iy + ti.cmdFlags)
-	set	ti.allowProgTokens,(iy + ti.newDispF)
-	ld	hl,___prgm_to_run
-	call	ti.Mov9ToOP1
-	jp	ti.ParseInp
+	ld	hl,reloc.data
+	ld	de,ti.cursorImage
+	ld	bc,reloc.data.len
+	ldir
+	jp	launch_basic_prgm
 
 run_asm_prgm:
 	push	de
@@ -111,35 +102,11 @@ run_asm_prgm:
 	ret
 .enough_mem:
 	call	push_user_data
-	call	delete_running_prgm
-	call	setup_prgm_state
-	call	push_stub
-	ld	de,(___prgm_to_run_size)
-	ld	hl,ti.userMem
-	ex	hl,de
-	call	ti.InsertMem
-	ld	hl,___prgm_to_run
-	call	find_prgm
-	jr	c,.fatal
-	inc	hl
-	inc	hl
-	ld	de,ti.userMem
-	ld	bc,(___prgm_to_run_size)
-	ld	(ti.asm_prgm_size),bc
+	ld	hl,reloc.data
+	ld	de,ti.cursorImage
+	ld	bc,reloc.data.len
 	ldir
-	ld	hl,___prgm_to_run
-	call	ti.Mov9ToOP1
-	jp	ti.userMem
-.fatal:
-	ld	de,(___prgm_to_run_size)
-	ld	hl,ti.userMem
-	call	ti.DelMem
-	jp	ti.ErrMemory
-
-setup_prgm_state:
-	xor	a,a
-	ld	(ti.kbdGetKy),a
-	jp	ti.DisableAPD
+	jp	launch_asm_prgm
 
 push_user_data:
 	pop	hl
@@ -147,14 +114,14 @@ push_user_data:
 	ld	iy,0			; exit() doesn't unwind stack so "safe"
 	add	iy,sp
 	ld	hl,(iy + 12)		; callback
-	ld	(stub.callback),hl
+	ld	(stub.callback - reloc.offset),hl
 	ld	hl,(_exit.sp)
 	ld	bc,_exit.offset
 	ld	de,ti.appErr2		; temp backup regs
 	ldir
 	di				; disable to prevent moving sp
 	ld	bc,(iy + 9)
-	ld	(stub.error.data_size),bc
+	ld	(stub.error.data_size - reloc.offset),bc
 	or	a,a
 	sbc	hl,bc
 	push	hl
@@ -199,6 +166,49 @@ push_user_data:
 	sbc	hl,hl
 	push	hl
 	call	_exit			; should return to caller
+
+virtual at ti.cursorImage
+launch_asm_prgm:
+	call	delete_running_prgm
+	call	setup_prgm_state
+	call	push_stub
+	ld	de,(___prgm_to_run_size)
+	ld	hl,ti.userMem
+	ex	hl,de
+	call	ti.InsertMem
+	ld	hl,___prgm_to_run
+	call	find_prgm
+	jr	c,.fatal
+	inc	hl
+	inc	hl
+	ld	de,ti.userMem
+	ld	bc,(___prgm_to_run_size)
+	ld	(ti.asm_prgm_size),bc
+	ldir
+	ld	hl,___prgm_to_run
+	call	ti.Mov9ToOP1
+	jp	ti.userMem
+.fatal:
+	ld	de,(___prgm_to_run_size)
+	ld	hl,ti.userMem
+	call	ti.DelMem
+	jp	ti.ErrMemory
+
+launch_basic_prgm:
+	call	delete_running_prgm
+	call	setup_prgm_state
+	call	push_stub
+	set	ti.progExecuting,(iy + ti.newDispF)
+	set	ti.cmdExec,(iy + ti.cmdFlags)
+	set	ti.allowProgTokens,(iy + ti.newDispF)
+	ld	hl,___prgm_to_run
+	call	ti.Mov9ToOP1
+	jp	ti.ParseInp
+
+setup_prgm_state:
+	xor	a,a
+	ld	(ti.kbdGetKy),a
+	jp	ti.DisableAPD
 
 delete_running_prgm:
 	ld	iy,ti.flags
@@ -270,12 +280,15 @@ find_prgm:
 	ret
 
 stub:
-.error_handler:
+.normal:
 	ld	iy,ti.flags
 	call	ti.PopErrorHandler
 	xor	a,a
-.normal:
-	ld	(ti.cursorImage),a
+.error_handler:
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	ld	(ti.cursorImage),hl
 	ld	iy,ti.flags
 	res	ti.progExecuting,(iy + ti.newDispF)
 	res	ti.cmdExec,(iy + ti.cmdFlags)
@@ -326,8 +339,11 @@ stub:
 	or	a,a
 	sbc	hl,de
 	jr	z,.error		; no callback, return to caller
-	pop	hl			; get rid of real return address
+	pop	de			; get rid of real return address
+	push	hl			; push callback address
 	scf
+	ld	hl,(ti.cursorImage)
+	push	hl			; push retval
 	sbc	hl,hl
 	push	hl			; return of -1 should never occur
 	jp	ti.userMem
