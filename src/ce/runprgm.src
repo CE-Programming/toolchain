@@ -23,6 +23,7 @@ namespace ti?
 ?flags                     := 0D00080h
 ?kbdGetKy                  := 0D0058Dh
 ?OP1                       := 0D005F8h
+?appErr2                   := 0D025B6h
 ?pixelShadow               := 0D031F6h
 ?asm_prgm_size             := 0D0118Ch
 ?userMem                   := 0D1A881h
@@ -141,22 +142,65 @@ setup_prgm_state:
 	jp	ti.DisableAPD
 
 copy_user_data:
-	ld	iy,3
+	pop	hl
+	ld	(.fakeret),hl
+	ld	iy,0			; exit() doesn't unwind stack so "safe"
 	add	iy,sp
-	ld	hl,(iy + 12)
+	ld	hl,(iy + 12)		; callback
 	ld	(stub.callback),hl
-	ld	hl,(iy + 6)
-	ld	de,ti.pixelShadow	; data
+	ld	hl,(_exit.sp)
+	ld	bc,_exit.offset
+	ld	de,ti.appErr2		; temp backup regs
+	ldir
+	di				; disable to prevent moving sp
 	ld	bc,(iy + 9)
 	ld	(push_stub_and_data.data_size),bc
-	ldir
+	or	a,a
+	sbc	hl,bc
+	push	hl
+	ld	de,-(_exit.offset + 3)
+	add	hl,de
+	ld	(_exit.sp),hl
+	pop	hl
+	ld	de,(iy + 6)
 	ld	iy,ti.flags
-	ret
+	ex	de,hl
+	push	hl
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,bc
+	pop	hl
+	jr	z,.done_move
+	push	hl
+	or	a,a
+	sbc	hl,de
+	pop	hl
+	jr	c,.lddr
+	ldir
+	jr	.done_move
+.lddr:
+	add	hl,bc
+	dec	hl
+	ex	de,hl
+	add	hl,bc
+	dec	hl
+	ex	de,hl
+	lddr 
+.done_move:
+	ld	hl,ti.appErr2
+	ld	de,(_exit.sp)
+	ld	bc,_exit.offset		; copy normal storage
+	ldir
+	ex	de,hl
+	ld	de,0			; fake return
+.fakeret := $ - 3
+	ld	(hl),de
+	or	a,a
+	sbc	hl,hl
+	push	hl
+	call	_exit			; should return to caller
 
 delete_running_prgm:
-	pop	hl
-	ld	(.ret),hl
-	call	___exit_return
 	ld	iy,ti.flags
 	ld	hl,ti.userMem
 	ld	de,(ti.asm_prgm_size)
@@ -164,10 +208,9 @@ delete_running_prgm:
 	or	a,a
 	sbc	hl,hl
 	ld	(ti.asm_prgm_size),hl
-	jp	0
-.ret := $-3
+	ret
 
-push_stub_and_data:
+push_stub:
 	pop	hl
 	ld	(.ret),hl
 	ld	hl,stub.prgm
@@ -190,15 +233,6 @@ push_stub_and_data:
 	ex	de,hl
 	ld	hl,stub
 	ld	bc,stub.len
-	ldir
-	pop	hl
-	ld	bc,0
-.data_size := $ - 3
-	or	a,a
-	sbc	hl,bc
-	ld	sp,hl
-	ex	de,hl
-	ld	hl,ti.pixelShadow
 	ldir
 	ld	hl,0
 .prev_sp := $ - 3
@@ -322,5 +356,7 @@ reloc.data:
 ___prgm_caller:
 	rb	9
 
-	extern	___exit_return
+	extern	_exit
+	extern	_exit.sp
+	extern	_exit.offset
 	extern	___prgm_run_check

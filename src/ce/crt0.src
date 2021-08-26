@@ -449,8 +449,12 @@ _abort:
 	private	skip._abort
 skip._abort:
 	pop	hl
+	public	_exit.offset
+_exit.offset := 9		; number of bytes from _exit.sp to real return
+				; make sure to update this when adding pushes
+				; to the stack that need to be restored at exit
 	ld	sp,0
-	private	_exit.sp
+	public	_exit.sp
 _exit.sp := $-3
 	pop	iy		; iy = flags
 	pop	af		; a = original flash wait states
@@ -468,17 +472,6 @@ _exit.sp := $-3
 	call	021A3Ch		; _DrawStatusBar
 	pop	hl		; hl = exit code
 	ret
-	private	_exit.ret
-_exit.ret := $-1
-
-	section	.fini
-	public	___exit_return
-___exit_return:
-	ld	a,$E9
-	ld	(_exit.ret),a
-	pop	hl
-	push	hl
-	call	_exit
 
 	section .init_array
 init_array::

@@ -13,8 +13,4 @@ CXXFLAGS = -Wall -Wextra -Oz
 
 # ----------------------------
 
-ifndef CEDEV
-$(error CEDEV environment path variable is not set)
-endif
-
-include $(CEDEV)/meta/makefile.mk
+include $(shell cedev-config --makefile)
