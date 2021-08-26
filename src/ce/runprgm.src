@@ -21,6 +21,7 @@ namespace ti?
 ?LoadDEInd_s               := 0021D9Ch
 ?ChkInRam                  := 0021F98h
 ?flags                     := 0D00080h
+?tempSP                    := 0D0053Fh
 ?kbdGetKy                  := 0D0058Dh
 ?OP1                       := 0D005F8h
 ?errNo                     := 0D008DFh
@@ -88,6 +89,13 @@ run_basic_prgm:
 	jp	launch_basic_prgm
 
 run_asm_prgm:
+	inc	hl
+	ld	a,(hl)			; if 0, indicates a C program with retval
+	or	a,a
+	jr	nz,.not_c
+	ld	hl,ti.tempSP
+	ld	(stub.basic_c_smc - reloc.offset),hl
+.not_c:
 	push	de
 	pop	hl
 	ld	de,64
@@ -291,14 +299,20 @@ find_prgm:
 
 stub:
 .normal:
+	ld	(ti.cursorImage),hl
 	ld	iy,ti.flags
 	call	ti.PopErrorHandler
 	xor	a,a
+	sbc	hl,hl
+	ld	(ti.cursorImage),hl
+.basic_c_smc := $-3
+	jr	.no_error
 .error_handler:
 	or	a,a
 	sbc	hl,hl
 	ld	l,a
 	ld	(ti.cursorImage),hl
+.no_error:
 	ld	iy,ti.flags
 	res	ti.progExecuting,(iy + ti.newDispF)
 	res	ti.cmdExec,(iy + ti.cmdFlags)
