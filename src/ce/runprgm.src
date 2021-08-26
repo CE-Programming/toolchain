@@ -114,22 +114,29 @@ push_user_data:
 	ld	iy,0			; exit() doesn't unwind stack so "safe"
 	add	iy,sp
 	ld	hl,(iy + 12)		; callback
-	ld	(stub.callback - reloc.offset),hl
-	ld	hl,(_exit.sp)
-	ld	bc,_exit.offset
-	ld	de,ti.appErr2		; temp backup regs
-	ldir
-	di				; disable to prevent moving sp
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ld	de,stub.callback - reloc.offset
+	jr	nz,.has_callback
+	dec	de
+	ld	hl,((-(stub.callback - stub.error + 1)) shl 8) or $18	; jr stub.error
+.has_callback:
+	ex	de,hl
+	ld	(hl),de
 	ld	bc,(iy + 9)
-	ld	(stub.error.data_size - reloc.offset),bc
+	ld	(push_stub.data_size - reloc.offset),bc
+	ld	hl,(_exit.sp)
 	or	a,a
 	sbc	hl,bc
+	ld	de,(iy + 6)
+	di				; disable to prevent moving sp
 	push	hl
-	ld	de,-(_exit.offset + 3)
-	add	hl,de
+	dec	hl
+	dec	hl
+	dec	hl
 	ld	(_exit.sp),hl
 	pop	hl
-	ld	de,(iy + 6)
 	ld	iy,ti.flags
 	ex	de,hl
 	push	hl
@@ -154,13 +161,9 @@ push_user_data:
 	ex	de,hl
 	lddr 
 .done_move:
-	ld	hl,ti.appErr2
-	ld	de,(_exit.sp)
-	ld	bc,_exit.offset		; copy normal storage
-	ldir
-	ex	de,hl
+	ld	hl,(_exit.sp)
 	ld	de,0			; fake return
-.fakeret := $ - 3
+.fakeret := $-3
 	ld	(hl),de
 	or	a,a
 	sbc	hl,hl
@@ -238,29 +241,36 @@ push_stub:
 	ld	hl,-(stub.len - 9)
 	add	hl,sp
 	ld	sp,hl
-	push	hl
 	ld	(.stub_normal),hl
+	push	hl
+	ld	bc,stub.error_handler - stub.normal
+	add	hl,bc
+	ld	(.stub_error_handler),hl
+	pop	hl
 	ex	de,hl
 	ld	hl,stub
 	ld	bc,stub.len
 	ldir
 	ld	hl,0
-.prev_sp := $ - 3
+.prev_sp := $-3
 	push	hl
 	ld	hl,0
-.stub_prgm := $ - 3
+.data_size := $-3
 	push	hl
 	ld	hl,0
-.stub_prgm_size := $ - 3
+.stub_prgm := $-3
 	push	hl
 	ld	hl,0
-.stub_error_handler := $ - 3
+.stub_prgm_size := $-3
+	push	hl
+	ld	hl,0
+.stub_error_handler := $-3
 	call	ti.PushErrorHandler
 	ld	hl,0
-.stub_normal := $ - 3
+.stub_normal := $-3
 	push	hl
 	jp	0
-.ret := $ - 3
+.ret := $-3
 
 find_prgm:
 	call	ti.Mov9ToOP1
@@ -310,9 +320,8 @@ stub:
 	call	ti.ChkFindSym
 	jr	nc,.found
 .error:
+	pop	bc
 	pop	hl
-	ld	bc,0
-.error.data_size := $ - 3
 	add	hl,bc
 	ld	sp,hl		; os should delete created program
 	ret
@@ -333,24 +342,23 @@ stub:
 	ld	bc,(ti.asm_prgm_size)
 	ld	de,ti.userMem
 	ldir
-	ld	hl,0
+	ld	de,0
 .callback := $-3
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	jr	z,.error		; no callback, return to caller
-	pop	de			; get rid of real return address
-	push	hl			; push callback address
+	pop	bc			; data size
+	pop	hl			; data
+	ld	sp,hl
+	push	bc
+	push	de			; push callback address
 	scf
 	ld	hl,(ti.cursorImage)
 	push	hl			; push retval
 	sbc	hl,hl
 	push	hl			; return of -1 should never occur
 	jp	ti.userMem
-
+	rb	3			; padding bytes for sp change
 .prgm:
 	rb	9
-.len := $ - stub
+.len := $-stub
 
 ___prgm_to_run:
 	rb	9
@@ -365,7 +373,7 @@ end virtual
 	private	reloc.data.len
 reloc.data:
 	db	reloc_rodata
-.len := $ - .
+.len := $-.
 
 	section	.rodata
 	public	___prgm_caller

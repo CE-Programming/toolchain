@@ -142,11 +142,16 @@ assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
 	set	bTmr2Enable, (hl)
 
 	section	.text
-	private	___runprgm_return
-	private	___runprgm_return.callback
-	private	___runprgm_return.data
-	private	___runprgm_return.retval
-___runprgm_return:
+	private	___rerun_handler
+	private	___rerun_handler.callback
+	private	___rerun_handler.data
+	private	___rerun_handler.retval
+___rerun_handler:
+	ld	hl,(_exit.sp)
+	ld	de,0
+.data_size := $ - 3
+	add	hl,de
+	ld	(_exit.sp),hl		; move exit.sp to real ret
 	ld	hl,0
 .retval := $ - 3
 	push	hl
@@ -155,7 +160,7 @@ ___runprgm_return:
 	push	hl
 	call	0
 .callback := $ - 3
-	pop	de, de, de
+	pop	de, de
 	ret
 
 	section .init
@@ -169,16 +174,18 @@ ___prgm_run_check:
 	sbc	hl,de
 	add	hl,de
 	jr	nz,.no_return
-	ld	de,___runprgm_return
+	ld	de,___rerun_handler
 	ld	(__start._main),de	; doesn't work for custom start?
-	pop	de			; user callback pointer
-	ld	(___runprgm_return.retval),de
 	pop	de
-	ld	(___runprgm_return.callback),de
+	ld	(___rerun_handler.retval),de
+	pop	de
+	ld	(___rerun_handler.callback),de
+	pop	de
+	ld	(___rerun_handler.data_size),de
 	or	a,a
 	sbc	hl,hl
 	add	hl,sp			; user callback data
-	ld	(___runprgm_return.data),de
+	ld	(___rerun_handler.data),hl
 	jq	__start
 .no_return:
 	push	hl
@@ -191,12 +198,10 @@ __start:
 	di			; disable interrupts
 	call	_os_DisableHomeTextBuffer
 	ld	hl,0E00305h
-	push	hl		; save flash wait state control port
 	ld	a,(hl)
-	push	af		; save flash wait states
+	ld	(_exit.flash_wait_states),a
 	ld	(hl),h		; set flash wait states to 3; 1 was definitely
-				; too low for some calcs, 2 is untested
-	push	iy		; save iy (flags)
+				; too low, 2 is untested
 	ld	(_exit.sp),sp	; save sp for exiting
 if defined ___main_argc_argv
 .argstemp := 0D120D6h		; saveSScreen+14007
@@ -487,18 +492,15 @@ _abort:
 	private	skip._abort
 skip._abort:
 	pop	hl
-	public	_exit.offset
-_exit.offset := 9		; number of bytes from _exit.sp to real return
-				; make sure to update this when adding pushes
-				; to the stack that need to be restored at exit
 	ld	sp,0
 	public	_exit.sp
 _exit.sp := $-3
-	pop	iy		; iy = flags
-	pop	af		; a = original flash wait states
-	ex	(sp),hl		; hl = flash wait state control port,
-				; save exit code
-	ld	(hl),a		; restore flash wait states
+	push	hl
+	ld	iy,0D00080h
+	ld	a,0
+	private	_exit.flash_wait_states
+_exit.flash_wait_states := $-1
+	ld	(0E00305h),a
 	call	00004F0h	; _usb_ResetTimer
 	call	_os_EnableHomeTextBuffer
 	ld	a,1
