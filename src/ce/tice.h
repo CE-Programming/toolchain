@@ -934,7 +934,7 @@ void os_PopErrorHandler(void);
  * stored by using the extra user data arguments, which will then be delivered
  * to the callback.
  *
- * @param pgrm Name of program to execute. The type should be the first byte of
+ * @param prgm Name of program to execute. The type should be the first byte of
  * the string.
  * @param data User data that will be available in the callback function.
  * May be \c NULL.
@@ -950,7 +950,7 @@ void os_PopErrorHandler(void);
  * program could not be found, -2 if not enough memory, and < 0 if some other
  * error occurred.
  */
-int os_RunPrgm(const char *pgrm, void *data, size_t size, int (*ret)(void *data, int retval));
+int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 
 /**
  * @return A pointer to symtable of the OS

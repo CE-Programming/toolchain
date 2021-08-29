@@ -175,8 +175,7 @@ push_user_data:
 	ld	(hl),de
 	or	a,a
 	sbc	hl,hl
-	push	hl
-	call	_exit			; should return to caller
+	jq	___exithl		; should return to caller
 
 virtual at ti.cursorImage
 launch_asm_prgm:
@@ -394,7 +393,7 @@ reloc.data:
 ___prgm_caller:
 	rb	9
 
-	extern	_exit
+	extern	___exithl
 	extern	_exit.sp
 	extern	_exit.offset
 	extern	___prgm_run_check

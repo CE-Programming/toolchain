@@ -57,8 +57,7 @@ fini_functions:
 	db	$EF, $7B
 	db	$00		; C program identifier (nop)
 
-	section	.launcher
-launcher:
+	section	.init.libs
 	call	020628h		; _pushop1 to save running program name
 	jq	.tryfind
 .inram:
@@ -104,7 +103,7 @@ launcher:
 .webaddress:
 	db	"http://tiny.cc/clibs",0
 
-	section .init
+	section .init.clock
 
 mpTmr2Counter := 0F20010h
 mpTmrCtrl := 0F20030h
@@ -146,6 +145,7 @@ assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
 	private	___rerun_handler.callback
 	private	___rerun_handler.data
 	private	___rerun_handler.retval
+	private	___rerun_handler.data_size
 ___rerun_handler:
 	ld	hl,(_exit.sp)
 	ld	de,0
@@ -154,40 +154,41 @@ ___rerun_handler:
 	ld	(_exit.sp),hl		; move exit.sp to real ret
 	ld	hl,0
 .retval := $ - 3
-	push	hl
-	ld	hl,0
+	ex	(sp),hl
+	ld	de,0
 .data := $ - 3
-	push	hl
-	call	0
+	push	de,hl
+	jp	0
 .callback := $ - 3
-	pop	de, de
-	ret
 
-	section .init
+	section	.init.reruncheck
 	public	___prgm_run_check
 ___prgm_run_check:
 	ld	de,___prgm_caller
 	call	002032Ch		; ti.MovFROP1
 	pop	hl
-	ld	de,-1
-	or	a,a
-	sbc	hl,de
+	ld	de,1
 	add	hl,de
-	jr	nz,.no_return
-	ld	de,___rerun_handler
-	ld	(__start._main),de	; doesn't work for custom start?
-	pop	de
-	ld	(___rerun_handler.retval),de
-	pop	de
-	ld	(___rerun_handler.callback),de
-	pop	de
-	ld	(___rerun_handler.data_size),de
-	or	a,a
-	sbc	hl,hl
+	dec	hl
+	jq	nc,.no_rerun
+	ld	hl,___rerun_handler
+	ld	(__start._main),hl
+	pop	hl
+	ld	(___rerun_handler.retval),hl
+	pop	hl
+	ld	(___rerun_handler.callback),hl
+	pop	hl
+	ld	(___rerun_handler.data_size),hl
+	ex	de,hl
 	add	hl,sp			; user callback data
+	dec	hl
 	ld	(___rerun_handler.data),hl
-	jq	__start
-.no_return:
+virtual
+	ld	a,0
+ load .ld_a: byte from $$
+end virtual
+	db	.ld_a
+.no_rerun:
 	push	hl
 
 	section	.init
@@ -365,6 +366,8 @@ else
   end if
  end if
 end if
+
+
 ifextern ___main_argc_argv
 	call	___main_argc_argv
 else
@@ -372,20 +375,24 @@ else
 end if
 	public	__start._main
 __start._main := $ - 3
+	require	___exithl
 
 	section	.fini
+	public	___exithl
+___exithl:
 if push_exit_code <> pop_exit_code
 	push	hl
 end if
 push_exit_code:
 	require	skip._exit
+
+	section	.fini
 virtual
 	ld	a,0
  load .ld_a: byte from $$
 end virtual
 	db	.ld_a
 
-	section	.fini
 	public	_exit
 _exit:
 	pop	hl
@@ -491,7 +498,6 @@ _abort:
 	section	.fini
 	private	skip._abort
 skip._abort:
-	pop	hl
 	ld	sp,0
 	public	_exit.sp
 _exit.sp := $-3
