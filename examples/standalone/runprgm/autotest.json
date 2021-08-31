@@ -1,8 +1,8 @@
 {
   "transfer_files": [
     "bin/DEMO.8xp",
-    "src/prgm/PRGM1.8xp",
-    "src/prgm/PRGM2.8xp"
+    "prgm/PRGM1.8xp",
+    "prgm/PRGM2.8xp"
   ],
   "target": {
     "name": "DEMO",

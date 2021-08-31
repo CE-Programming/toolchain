@@ -23,7 +23,7 @@ int prgm1_ret(void *data, int retval)
 
     while (!os_GetCSC());
 
-    ret = os_RunPrgm("\x05PRGM2", NULL, 0, prgm2_ret);
+    ret = os_RunPrgm("PRGM2", NULL, 0, prgm2_ret);
     printf("Error running prgm 2: %d\n", ret);
 
     return 0;
@@ -34,7 +34,7 @@ int main(void)
     static const char msg[] = "hello";
     int ret;
 
-    ret = os_RunPrgm("\x05PRGM1", (void*)msg, sizeof msg, prgm1_ret);
+    ret = os_RunPrgm("PRGM1", (void*)msg, sizeof msg, prgm1_ret);
     printf("Error running prgm 1: %d\n", ret);
 
     return 0;

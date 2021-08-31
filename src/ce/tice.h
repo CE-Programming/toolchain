@@ -934,8 +934,7 @@ void os_PopErrorHandler(void);
  * stored by using the extra user data arguments, which will then be delivered
  * to the callback.
  *
- * @param prgm Name of program to execute. The type should be the first byte of
- * the string.
+ * @param prgm Name of program to execute.
  * @param data User data that will be available in the callback function.
  * May be \c NULL.
  * @param size Size of user data (keep this small, it is stored on the stack!)
@@ -949,6 +948,8 @@ void os_PopErrorHandler(void);
  * @return This function should not return, but if it does, -1 indicates the
  * program could not be found, -2 if not enough memory, and < 0 if some other
  * error occurred.
+ *
+ * @note The callback return code is passed to the launcher of the original program that called this function.
  */
 int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 

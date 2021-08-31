@@ -3,6 +3,7 @@
 define ti? ti
 namespace ti?
 ?Mov9b                     := 00202FCh
+?Mov8b                     := 0020304h
 ?Mov9ToOP1                 := 0020320h
 ?MovFROP1                  := 002032Ch
 ?MemChk                    := 00204FCh
@@ -59,8 +60,11 @@ _os_RunPrgm:
 	pop	hl
 	push	hl
 	push	de
+	ld	a,ti.ProgObj
 	ld	de,___prgm_to_run - reloc.offset
-	call	ti.Mov9b
+	ld	(de),a
+	inc	de
+	call	ti.Mov8b
 	ld	hl,___prgm_caller
 	ld	de,stub.prgm - reloc.offset
 	call	ti.Mov9b
