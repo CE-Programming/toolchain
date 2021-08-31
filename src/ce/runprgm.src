@@ -208,16 +208,27 @@ launch_basic_prgm:
 	call	delete_running_prgm
 	call	setup_prgm_state
 	call	push_stub
-	set	ti.progExecuting,(iy + ti.newDispF)
-	set	ti.cmdExec,(iy + ti.cmdFlags)
-	set	ti.allowProgTokens,(iy + ti.newDispF)
 	ld	hl,___prgm_to_run
+	set	ti.allowProgTokens,(iy + ti.newDispF)
+	set	ti.cmdExec,(iy + ti.cmdFlags)
 	call	ti.Mov9ToOP1
 	jp	ti.ParseInp
 
 setup_prgm_state:
 	xor	a,a
 	ld	(ti.kbdGetKy),a
+	ld	a,$ce			; set
+	bit	ti.allowProgTokens,(iy + ti.newDispF)
+	jr	nz,.setAllowProgTokens
+	ld	a,$8e			; res
+.setAllowProgTokens:
+	ld	(stub.flags.newDispF),a
+	ld	a,$f6			; set
+	bit	ti.cmdExec,(iy + ti.cmdFlags)
+	jr	nz,.setCmdExec
+	ld	a,$b6			; res
+.setCmdExec:
+	ld	(stub.flags.cmdFlags),a
 	jp	ti.DisableAPD
 
 delete_running_prgm:
@@ -313,9 +324,10 @@ stub:
 	ld	(ti.cursorImage),hl
 .no_error:
 	ld	iy,ti.flags
-	res	ti.progExecuting,(iy + ti.newDispF)
-	res	ti.cmdExec,(iy + ti.cmdFlags)
-	res	ti.allowProgTokens,(iy + ti.newDispF)
+	set	ti.allowProgTokens,(iy + ti.newDispF)
+.flags.newDispF := $-1
+	set	ti.cmdExec,(iy + ti.cmdFlags)
+.flags.cmdFlags := $-1
 	res	ti.textInverse,(iy + ti.textFlags)
 	res	ti.onInterrupt,(iy + ti.onFlags)
 	ld	hl,ti.userMem
