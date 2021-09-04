@@ -16,6 +16,7 @@ namespace ti?
 ?PushErrorHandler          := 0020798h
 ?PopErrorHandler           := 002079Ch
 ?ParseInp                  := 0020F00h
+?SaveParse                 := 0020F10h
 ?DisableAPD                := 0021134h
 ?DeleteTempPrograms        := 00214C0h
 ?ForceFullScreen           := 0021528h
@@ -171,7 +172,7 @@ push_user_data:
 	add	hl,bc
 	dec	hl
 	ex	de,hl
-	lddr 
+	lddr
 .done_move:
 	ld	hl,(_exit.sp)
 	ld	de,0			; fake return
@@ -212,6 +213,7 @@ launch_basic_prgm:
 	call	delete_running_prgm
 	call	setup_prgm_state
 	call	push_stub
+	call	ti.SaveParse
 	ld	hl,___prgm_to_run
 	set	ti.allowProgTokens,(iy + ti.newDispF)
 	set	ti.cmdExec,(iy + ti.cmdFlags)
