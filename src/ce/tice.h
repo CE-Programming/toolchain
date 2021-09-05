@@ -482,6 +482,12 @@ typedef struct font {
 } font_t;
 
 /**
+ * @brief Callback function pointer type for os_RunPrgm
+ * @see os_RunPrgm
+ */
+typedef int (*os_runprgm_callback_t)(void *data, int retval);
+
+/**
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
  * @param msec number of milliseconds
@@ -918,6 +924,34 @@ int os_PushErrorHandler(void) __attribute__((returns_twice));
  * @see os_PushErrorHandler
  */
 void os_PopErrorHandler(void);
+
+/**
+ * Runs a program that exists on the calculator.
+ * Note that this will destroy the currently running program, requiring you to
+ * save any data as needed. This program has an optional callback that will be
+ * executed when the called program finishes, which can be used to rebuild the
+ * program state. Additionally, program context information can be safely
+ * stored by using the extra user data arguments, which will then be delivered
+ * to the callback.
+ *
+ * @param prgm Name of program to execute.
+ * @param data User data that will be available in the callback function.
+ * May be \c NULL.
+ * @param size Size of user data (keep this small, it is stored on the stack!)
+ * @param ret Callback function to run when program finishes executing. The
+ * argument \p data will contain the provided \p data contents, and \p retval
+ * will contain the error code if a TI-BASIC program, or the exit code if a C
+ * program. Other types of programs may have an undefined \p retval. This
+ * argument may be left \c NULL if execution should not return to the calling
+ * program.
+ *
+ * @return This function should not return, but if it does, -1 indicates the
+ * program could not be found, -2 if not enough memory, and < 0 if some other
+ * error occurred.
+ *
+ * @note The callback return code is passed to the launcher of the original program that called this function.
+ */
+int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 
 /**
  * @return A pointer to symtable of the OS

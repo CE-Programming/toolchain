@@ -1,0 +1,429 @@
+	assume	adl=1
+
+define ti? ti
+namespace ti?
+?Mov9b                     := 00202FCh
+?Mov8b                     := 0020304h
+?Mov9ToOP1                 := 0020320h
+?MovFROP1                  := 002032Ch
+?MemChk                    := 00204FCh
+?ChkFindSym                := 002050Ch
+?InsertMem                 := 0020514h
+?EnoughMem                 := 002051Ch
+?DelMem                    := 0020590h
+?PopRealO1                 := 00205DCh
+?ErrNotEnoughMem           := 002072Ch
+?ErrMemory                 := 0020768h
+?PushErrorHandler          := 0020798h
+?PopErrorHandler           := 002079Ch
+?ParseInp                  := 0020F00h
+?GetParse                  := 0020F0Ch
+?SaveParse                 := 0020F10h
+?DisableAPD                := 0021134h
+?DeleteTempPrograms        := 00214C0h
+?ForceFullScreen           := 0021528h
+?LoadDEInd_s               := 0021D9Ch
+?ChkInRam                  := 0021F98h
+?flags                     := 0D00080h
+?tempSP                    := 0D0053Fh
+?kbdGetKy                  := 0D0058Dh
+?OP1                       := 0D005F8h
+?errNo                     := 0D008DFh
+?appErr2                   := 0D025B6h
+?pixelShadow               := 0D031F6h
+?asm_prgm_size             := 0D0118Ch
+?userMem                   := 0D1A881h
+?cursorImage               := 0E30800h
+?tExtTok                   := 0EFh
+?ProgObj                   := 005h
+?tAsm84CeCmp               := 07Bh
+?tAsm84CePrgm              := 07Ah
+
+?ParsFlag2                 := 7h
+?numOP1                    := 0
+?newDispF                  := 08h
+?allowProgTokens           := 1
+?progExecuting             := 1
+?cmdFlags                  := 0Ch
+?cmdExec                   := 6
+?onFlags                   := 09h
+?onInterrupt               := 4
+?textFlags                 := 05h
+?textEraseBelow            := 1
+?textScrolled              := 2
+?textInverse               := 3
+end namespace
+
+reloc.base := ti.cursorImage
+reloc.offset := reloc.base - reloc.data
+
+	public	_os_RunPrgm
+_os_RunPrgm:
+	require	___prgm_run_check
+	ld	iy,ti.flags
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+	ld	a,ti.ProgObj
+	ld	de,___prgm_to_run - reloc.offset
+	ld	(de),a
+	inc	de
+	call	ti.Mov8b
+	ld	hl,___prgm_caller
+	ld	de,stub.prgm - reloc.offset
+	call	ti.Mov9b
+	ld	hl,___prgm_to_run - reloc.offset
+	call	find_prgm - reloc.offset
+	ld	(___prgm_to_run_size - reloc.offset),de
+	jr	nc,.found
+	sbc	hl,hl
+	ret
+.found:
+	ld	a,(hl)
+	cp	a,ti.tExtTok
+	jr	nz,run_basic_prgm
+	inc	hl
+	ld	a,(hl)
+	cp	a,ti.tAsm84CeCmp
+	jr	z,run_asm_prgm
+	;jr	run_basic_prgm
+
+run_basic_prgm:
+	call	push_user_data
+	ld	hl,reloc.data
+	ld	de,ti.cursorImage
+	ld	bc,reloc.data.len
+	ldir
+	jp	launch_basic_prgm
+
+run_asm_prgm:
+	inc	hl
+	ld	a,(hl)			; if 0, indicates a C program with retval
+	or	a,a
+	jr	nz,.not_c
+	sbc	hl,hl
+	ld	(stub.basic_c_smc - reloc.offset),hl
+.not_c:
+	push	de
+	pop	hl
+	ld	de,64
+	add	hl,de
+	ld	de,(ti.asm_prgm_size)
+	sbc	hl,de
+	jr	c,.enough_mem
+	call	ti.EnoughMem
+	jr	nc,.enough_mem
+	sbc	hl,hl
+	dec	hl
+	ret
+.enough_mem:
+	call	push_user_data
+	ld	hl,reloc.data
+	ld	de,ti.cursorImage
+	ld	bc,reloc.data.len
+	ldir
+	jp	launch_asm_prgm
+
+push_user_data:
+	pop	hl
+	ld	(.fakeret),hl
+	ld	iy,0			; exit() doesn't unwind stack so "safe"
+	add	iy,sp
+	ld	hl,(iy + 12)		; callback
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ld	de,stub.callback - reloc.offset
+	jr	nz,.has_callback
+	dec	de
+	ld	hl,((-(stub.callback - stub.error + 1)) shl 8) or $18	; jr stub.error
+.has_callback:
+	ex	de,hl
+	ld	(hl),de
+	ld	bc,(iy + 9)
+	ld	(push_stub.data_size - reloc.offset),bc
+	ld	hl,(_exit.sp)
+	or	a,a
+	sbc	hl,bc
+	ld	de,(iy + 6)
+	di				; disable to prevent moving sp
+	push	hl
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	(_exit.sp),hl
+	pop	hl
+	ld	iy,ti.flags
+	ex	de,hl
+	push	hl
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,bc
+	pop	hl
+	jr	z,.done_move
+	push	hl
+	or	a,a
+	sbc	hl,de
+	pop	hl
+	jr	c,.lddr
+	ldir
+	jr	.done_move
+.lddr:
+	add	hl,bc
+	dec	hl
+	ex	de,hl
+	add	hl,bc
+	dec	hl
+	ex	de,hl
+	lddr
+.done_move:
+	ld	hl,(_exit.sp)
+	ld	de,0			; fake return
+.fakeret := $-3
+	ld	(hl),de
+	or	a,a
+	sbc	hl,hl
+	jq	___exithl		; should return to caller
+
+virtual at ti.cursorImage
+launch_asm_prgm:
+	call	delete_running_prgm
+	call	setup_prgm_state
+	call	push_stub
+	ld	de,(___prgm_to_run_size)
+	ld	hl,ti.userMem
+	ex	hl,de
+	call	ti.InsertMem
+	ld	hl,___prgm_to_run
+	call	find_prgm
+	jr	c,.fatal
+	inc	hl
+	inc	hl
+	ld	de,ti.userMem
+	ld	bc,(___prgm_to_run_size)
+	ld	(ti.asm_prgm_size),bc
+	ldir
+	ld	hl,___prgm_to_run
+	call	ti.Mov9ToOP1
+	jp	ti.userMem
+.fatal:
+	ld	de,(___prgm_to_run_size)
+	ld	hl,ti.userMem
+	call	ti.DelMem
+	jp	ti.ErrMemory
+
+launch_basic_prgm:
+	call	delete_running_prgm
+	call	setup_prgm_state
+	call	push_stub
+	ld	hl,___prgm_to_run
+	set	ti.allowProgTokens,(iy + ti.newDispF)
+	set	ti.cmdExec,(iy + ti.cmdFlags)
+	call	ti.Mov9ToOP1
+	jp	ti.ParseInp
+
+setup_prgm_state:
+	xor	a,a
+	ld	(ti.kbdGetKy),a
+	ld	a,$ce			; set
+	bit	ti.allowProgTokens,(iy + ti.newDispF)
+	jr	nz,.setAllowProgTokens
+	res	ti.numOP1,(iy + ti.ParsFlag2)
+	ld	a,$8e			; res
+.setAllowProgTokens:
+	ld	(stub.flags.newDispF),a
+	ld	a,$f6			; set
+	bit	ti.cmdExec,(iy + ti.cmdFlags)
+	jr	nz,.setCmdExec
+	ld	a,$b6			; res
+.setCmdExec:
+	ld	(stub.flags.cmdFlags),a
+	jp	ti.DisableAPD
+
+delete_running_prgm:
+	ld	iy,ti.flags
+	ld	hl,ti.userMem
+	ld	de,(ti.asm_prgm_size)
+	call	ti.DelMem
+	or	a,a
+	sbc	hl,hl
+	ld	(ti.asm_prgm_size),hl
+	ret
+
+push_stub:
+	pop	hl
+	ld	(.ret),hl
+	ld	hl,stub.prgm
+	call	find_prgm
+	ld	(.stub_prgm_size),de
+	ld	(.prev_sp),sp
+	ld	hl,-9
+	add	hl,sp
+	ld	sp,hl
+	ld	(.stub_prgm),hl
+	ex	de,hl
+	ld	hl,stub.prgm
+	ld	bc,9
+	ldir
+	ld	hl,-(stub.len - 9)
+	add	hl,sp
+	ld	sp,hl
+	ld	(.stub_normal),hl
+	push	hl
+	ld	bc,stub.error_handler - stub.normal
+	add	hl,bc
+	ld	(.stub_error_handler),hl
+	pop	hl
+	ex	de,hl
+	ld	hl,stub
+	ld	bc,stub.len
+	ldir
+	ld	hl,0
+.prev_sp := $-3
+	push	hl
+	ld	hl,0
+.data_size := $-3
+	push	hl
+	ld	hl,0
+.stub_prgm := $-3
+	push	hl
+	ld	hl,0
+.stub_prgm_size := $-3
+	push	hl
+	call	ti.SaveParse
+	ld	hl,0
+.stub_error_handler := $-3
+	call	ti.PushErrorHandler
+	ld	hl,0
+.stub_normal := $-3
+	push	hl
+	jp	0
+.ret := $-3
+
+find_prgm:
+	call	ti.Mov9ToOP1
+	call	ti.ChkFindSym
+	ret	c
+	call	ti.ChkInRam
+	ex	de,hl
+	jr	z,.in_ram
+	ld	de,9
+	add	hl,de
+	ld	e,(hl)
+	add	hl,de
+	inc	hl
+.in_ram:
+	call	ti.LoadDEInd_s
+	or	a,a
+	ret
+
+stub:
+.normal:
+	xor	a,a
+	sbc	hl,hl
+.basic_c_smc := $-3
+	ld	(ti.cursorImage),hl
+	ld	iy,ti.flags
+	call	ti.PopErrorHandler
+	jr	.no_error
+.error_handler:
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	ld	(ti.cursorImage),hl
+.no_error:
+	ld	iy,ti.flags
+	set	ti.allowProgTokens,(iy + ti.newDispF)
+.flags.newDispF := $-1
+	set	ti.cmdExec,(iy + ti.cmdFlags)
+.flags.cmdFlags := $-1
+	res	ti.textInverse,(iy + ti.textFlags)
+	res	ti.onInterrupt,(iy + ti.onFlags)
+	res	ti.numOP1,(iy + ti.ParsFlag2)
+	ld	hl,(ti.asm_prgm_size)
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	ex	de,hl
+	ld	hl,ti.userMem
+	call	nz,ti.DelMem
+	call	ti.PopRealO1
+	call	ti.GetParse
+	pop	de		; size of return program -- shouldn't change?
+	push	de
+	call	ti.ErrNotEnoughMem
+	pop	hl
+	ld	(ti.asm_prgm_size),hl
+	ld	de,ti.userMem
+	call	ti.InsertMem
+	pop	hl		; stub program to return
+	call	ti.Mov9ToOP1
+	call	ti.ChkFindSym
+	jr	nc,.found
+.error:
+	pop	bc
+	pop	hl
+	add	hl,bc
+	ld	sp,hl		; os should delete created program
+	ret
+.found:
+	call	ti.ChkInRam
+	ex	de,hl
+	jr	z,.in_ram
+	ld	de,9
+	add	hl,de
+	ld	e,(hl)
+	add	hl,de
+	inc	hl
+.in_ram:
+	inc	hl
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	bc,(ti.asm_prgm_size)
+	ld	de,ti.userMem
+	ldir
+	ld	de,0
+.callback := $-3
+	pop	bc			; data size
+	pop	hl			; data
+	di
+	ld	sp,hl
+	push	bc
+	push	de			; push callback address
+	scf
+	ld	hl,(ti.cursorImage)
+	push	hl			; push retval
+	sbc	hl,hl
+	push	hl			; return of -1 should never occur
+	jp	ti.userMem
+	rb	3			; padding bytes for sp change
+.prgm:
+	rb	9
+.len := $-stub
+
+___prgm_to_run:
+	rb	9
+___prgm_to_run_size:
+	dl	0
+
+load reloc_rodata: $-$$ from $$
+end virtual
+
+	section	.rodata
+	private	reloc.data
+	private	reloc.data.len
+reloc.data:
+	db	reloc_rodata
+.len := $-.
+
+	section	.rodata
+	public	___prgm_caller
+___prgm_caller:
+	rb	9
+
+	extern	___exithl
+	extern	_exit.sp
+	extern	_exit.offset
+	extern	___prgm_run_check

@@ -1,7 +1,7 @@
 	assume	adl=1
 
 	public	_errno
-_errno := $d008dc
+_errno := $D008DC
 
 	section	.text
 	public	_atexit
@@ -54,12 +54,10 @@ load functions: ___fini_array_count * long from fini_array: 0
 fini_functions:
 
 	section	.header
-	db	$ef,$7b
+	db	$EF, $7B
 	db	$00		; C program identifier (nop)
-	require	start
 
-	section	.launcher
-launcher:
+	section	.init.libs
 	call	020628h		; _pushop1 to save running program name
 	jq	.tryfind
 .inram:
@@ -105,8 +103,7 @@ launcher:
 .webaddress:
 	db	"http://tiny.cc/clibs",0
 
-
-	section .start
+	section .init.clock
 
 mpTmr2Counter := 0F20010h
 mpTmrCtrl := 0F20030h
@@ -143,21 +140,69 @@ assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
 	ld	l, mpTmrCtrl and $FF
 	set	bTmr2Enable, (hl)
 
+	section	.text
+	private	___rerun_handler
+	private	___rerun_handler.callback
+	private	___rerun_handler.data
+	private	___rerun_handler.retval
+	private	___rerun_handler.data_size
+___rerun_handler:
+	ld	hl,(_exit.sp)
+	ld	de,0
+.data_size := $ - 3
+	add	hl,de
+	ld	(_exit.sp),hl		; move exit.sp to real ret
+	ld	hl,0
+.retval := $ - 3
+	ex	(sp),hl
+	ld	de,0
+.data := $ - 3
+	push	de,hl
+	jp	0
+.callback := $ - 3
 
-	section	.start
-	private	start
-start:
+	section	.init.reruncheck
+	public	___prgm_run_check
+___prgm_run_check:
+	ld	de,___prgm_caller
+	call	002032Ch		; ti.MovFROP1
+	pop	hl
+	ld	de,1
+	add	hl,de
+	dec	hl
+	jq	nc,.no_rerun
+	ld	hl,___rerun_handler
+	ld	(__start._main),hl
+	pop	hl
+	ld	(___rerun_handler.retval),hl
+	pop	hl
+	ld	(___rerun_handler.callback),hl
+	pop	hl
+	ld	(___rerun_handler.data_size),hl
+	ex	de,hl
+	add	hl,sp			; user callback data
+	dec	hl
+	ld	(___rerun_handler.data),hl
+virtual
+	ld	a,0
+ load .ld_a: byte from $$
+end virtual
+	db	.ld_a
+.no_rerun:
+	push	hl
+
+	section	.init
+	weak	__start
+__start:
 	call	0020848h	; _RunInicOff, assumes iy = flags
 	call	00004F4h	; _usb_DisableTimer
 	di			; disable interrupts
 	call	_os_DisableHomeTextBuffer
 	ld	hl,0E00305h
-	push	hl		; save flash wait state control port
 	ld	a,(hl)
-	push	af		; save flash wait states
+	ld	(_exit.flash_wait_states),a
 	ld	(hl),h		; set flash wait states to 3; 1 was definitely
-				; too low for some calcs, 2 is untested
-	push	iy		; save iy (flags)
+				; too low, 2 is untested
 	ld	(_exit.sp),sp	; save sp for exiting
 if defined ___main_argc_argv
 .argstemp := 0D120D6h		; saveSScreen+14007
@@ -322,14 +367,26 @@ else
  end if
 end if
 
-	call	main
+
+ifextern ___main_argc_argv
+	call	___main_argc_argv
+else
+	call	_main
+end if
+	public	__start._main
+__start._main := $ - 3
+	require	___exithl
+
+	section	.fini
+	public	___exithl
+___exithl:
 if push_exit_code <> pop_exit_code
 	push	hl
 end if
 push_exit_code:
 	require	skip._exit
 
-	section	.start
+	section	.fini
 virtual
 	ld	a,0
  load .ld_a: byte from $$
@@ -340,7 +397,7 @@ end virtual
 _exit:
 	pop	hl
 
-	section	.start
+	section	.fini
 	private	skip._exit
 skip._exit:
 if defined exit_functions
@@ -407,7 +464,7 @@ else
 end if
 	require	skip.__Exit
 
-	section	.start
+	section	.fini
 virtual
 	ld	a,0
  load .ld_a: byte from $$
@@ -418,7 +475,7 @@ end virtual
 __Exit:
 	pop	hl
 
-	section	.start
+	section	.fini
 	private	skip.__Exit
 skip.__Exit:
 pop_exit_code:
@@ -427,7 +484,7 @@ if push_exit_code <> pop_exit_code
 end if
 	require	skip._abort
 
-	section	.start
+	section	.fini
 virtual
 	ld	iy,0
  load .iy_pre: byte from $$
@@ -438,19 +495,19 @@ end virtual
 _abort:
 	ld	hl,1 shl 23+6	; SIGABRT
 
-	section	.start
+	section	.fini
 	private	skip._abort
 skip._abort:
 	ld	sp,0
+	public	_exit.sp
 _exit.sp := $-3
-	pop	iy		; iy = flags
-	pop	af		; a = original flash wait states
-	ex	(sp),hl		; hl = flash wait state control port,
-				; save exit code
-	ld	(hl),a		; restore flash wait states
+	push	hl
+	ld	iy,0D00080h
+	ld	a,0
+	private	_exit.flash_wait_states
+_exit.flash_wait_states := $-1
+	ld	(0E00305h),a
 	call	00004F0h	; _usb_ResetTimer
-
-	section	.cleanup
 	call	_os_EnableHomeTextBuffer
 	ld	a,1
 	ld	(0F00008h),a	; clear on interrupt
@@ -471,6 +528,8 @@ dtors::
 	section .fini_array
 fini_array::
 
+	extern	_main
+	extern	___main_argc_argv
 	extern	___ctors_count
 	extern	___dtors_count
 	extern	___fini_array_count
@@ -480,13 +539,7 @@ fini_array::
 	extern	___low_bss
 	extern	__indcallhl
 	extern	_free
-ifextern ___main_argc_argv
-	extern	___main_argc_argv
-	main := ___main_argc_argv
-else
-	extern	_main
-	main := _main
-end if
 	extern	_malloc
 	extern	_os_DisableHomeTextBuffer
 	extern	_os_EnableHomeTextBuffer
+	extern	___prgm_caller

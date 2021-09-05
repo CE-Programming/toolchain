@@ -36,7 +36,6 @@ CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
 #----------------------------
 HAS_UPPERCASE_NAME ?= YES
-HAS_CLEANUP ?= YES
 HAS_FLASH_FUNCTIONS ?= YES
 HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
@@ -54,7 +53,6 @@ DEBUGMODE := NDEBUG
 CCDEBUG := -g0
 LDDEBUG := 0
 LDSTATIC := 0
-LDCLEANUP := 0
 
 # verbosity
 V ?= 0
@@ -144,11 +142,6 @@ LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 endif
 endif
 
-# check if default cleanup code should be added
-ifeq ($(HAS_CLEANUP),YES)
-LDCLEANUP := -i $(call QUOTE_ARG,precious .cleanup)
-endif
-
 # check if gfx directory exists
 ifneq ($(wildcard $(GFXDIR)/.),)
 GFXCMD ?= cd $(GFXDIR) && $(CONVIMG)
@@ -204,7 +197,7 @@ FASMGFLAGS = \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
-	$(LDCLEANUP) $(LDMAPFLAG) \
+	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
 	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LDLIBS))) \
 	$(LDFLAGS)
