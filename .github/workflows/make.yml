@@ -15,6 +15,7 @@ env:
   CEDEV: ${{github.workspace}}/CEdev
   CEDEV_BIN: ${{github.workspace}}/CEdev/bin
   CEDEV_EXAMPLES: ${{github.workspace}}/CEdev/examples
+  CEDEV_TEST: ${{github.workspace}}/toolchain/test
   CEMU_PATH: ${{github.workspace}}/CEmu
   FASMG_DOMAIN: https://flatassembler.net
   FASMG_PATH: ${{github.workspace}}/fasmg
@@ -160,10 +161,30 @@ jobs:
         if: runner.os != 'Windows'
         run: tar -xvf CEdev-${{runner.os}}.tar.gz
 
+      # checkout only for testing-- contents should not be used otherwise.
+      - name: Checkout Toolchain
+        uses: actions/checkout@v2.3.4
+        with:
+          path: ${{env.TOOLCHAIN_PATH}}
+          persist-credentials: false
+
+      - name: Build Test Graphics
+        run: make -j4 -C ${{env.CEDEV_TEST}} COMPRESSED=${{matrix.compressed}} V=1 gfx
+      - name: Build Tests
+        run: make -j4 -C ${{env.CEDEV_TEST}} COMPRESSED=${{matrix.compressed}} V=1
+
+      - name: Upload Test Build Artifacts
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: tests-${{runner.os}}
+          path: ${{env.CEDEV_TEST}}
+
       - name: Build Example Graphics
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1 gfx
       - name: Build Examples
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1
+
       - name: Upload Example Build Artifacts
         uses: actions/upload-artifact@v2
         if: always()
@@ -228,6 +249,29 @@ jobs:
         run: |
           $failed = 0
           foreach ($test in get-childitem "${{env.CEDEV_EXAMPLES}}" -recurse -include autotest.json) {
+            cmake -E echo "Launching autotester on $test"
+            ${{env.AUTOTESTER_PATH}}\autotester.exe "$test"
+            $failed += $lastexitcode
+          }
+          cmake -E echo "$failed tests failed"
+          exit $failed
+      - name: Test Tests
+        if: github.event_name != 'pull_request' && runner.os != 'Windows'
+        run: |
+          find ${{env.CEDEV_TEST}} -name autotest.json -print0 | {
+            failed=0
+            while read -d '' test; do
+              cmake -E echo "Launching autotester on $test"
+              ${{env.AUTOTESTER_PATH}}/autotester "$test" || cmake -E true $((failed += $?))
+            done
+            cmake -E echo "$failed tests failed"
+            exit $failed
+          }
+      - name: Test Tests
+        if: github.event_name != 'pull_request' && runner.os == 'Windows'
+        run: |
+          $failed = 0
+          foreach ($test in get-childitem "${{env.CEDEV_TEST}}" -recurse -include autotest.json) {
             cmake -E echo "Launching autotester on $test"
             ${{env.AUTOTESTER_PATH}}\autotester.exe "$test"
             $failed += $lastexitcode
