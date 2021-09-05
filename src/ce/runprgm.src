@@ -213,7 +213,6 @@ launch_basic_prgm:
 	call	delete_running_prgm
 	call	setup_prgm_state
 	call	push_stub
-	call	ti.SaveParse
 	ld	hl,___prgm_to_run
 	set	ti.allowProgTokens,(iy + ti.newDispF)
 	set	ti.cmdExec,(iy + ti.cmdFlags)
@@ -336,9 +335,15 @@ stub:
 .flags.cmdFlags := $-1
 	res	ti.textInverse,(iy + ti.textFlags)
 	res	ti.onInterrupt,(iy + ti.onFlags)
+	ld	hl,(ti.asm_prgm_size)
+	add	hl,de
+	or	a,a
+	sbc	hl,de
+	jr	z,.nodel
+	ex	de,hl
 	ld	hl,ti.userMem
-	ld	de,(ti.asm_prgm_size)
 	call	ti.DelMem
+.nodel:
 	pop	de		; size of return program -- shouldn't change?
 	push	de
 	call	ti.ErrNotEnoughMem
@@ -377,6 +382,7 @@ stub:
 .callback := $-3
 	pop	bc			; data size
 	pop	hl			; data
+	di
 	ld	sp,hl
 	push	bc
 	push	de			; push callback address
