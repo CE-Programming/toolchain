@@ -938,7 +938,7 @@ void os_PopErrorHandler(void);
  * @param data User data that will be available in the callback function.
  * May be \c NULL.
  * @param size Size of user data (keep this small, it is stored on the stack!)
- * @param ret Callback function to run when program finishes executing. The
+ * @param callback Callback function to run when program finishes executing. The
  * argument \p data will contain the provided \p data contents, and \p retval
  * will contain the error code if a TI-BASIC program, or the exit code if a C
  * program. Other types of programs may have an undefined \p retval. This
