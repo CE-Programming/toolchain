@@ -11,11 +11,13 @@ namespace ti?
 ?InsertMem                 := 0020514h
 ?EnoughMem                 := 002051Ch
 ?DelMem                    := 0020590h
+?PopRealO1                 := 00205DCh
 ?ErrNotEnoughMem           := 002072Ch
 ?ErrMemory                 := 0020768h
 ?PushErrorHandler          := 0020798h
 ?PopErrorHandler           := 002079Ch
 ?ParseInp                  := 0020F00h
+?GetParse                  := 0020F0Ch
 ?SaveParse                 := 0020F10h
 ?DisableAPD                := 0021134h
 ?DeleteTempPrograms        := 00214C0h
@@ -37,6 +39,8 @@ namespace ti?
 ?tAsm84CeCmp               := 07Bh
 ?tAsm84CePrgm              := 07Ah
 
+?ParsFlag2                 := 7h
+?numOP1                    := 0
 ?newDispF                  := 08h
 ?allowProgTokens           := 1
 ?progExecuting             := 1
@@ -220,11 +224,13 @@ launch_basic_prgm:
 	jp	ti.ParseInp
 
 setup_prgm_state:
+	ld	iy,ti.flags
 	xor	a,a
 	ld	(ti.kbdGetKy),a
 	ld	a,$ce			; set
 	bit	ti.allowProgTokens,(iy + ti.newDispF)
 	jr	nz,.setAllowProgTokens
+	res	ti.numOP1,(iy + ti.ParsFlag2)
 	ld	a,$8e			; res
 .setAllowProgTokens:
 	ld	(stub.flags.newDispF),a
@@ -286,6 +292,7 @@ push_stub:
 	ld	hl,0
 .stub_prgm_size := $-3
 	push	hl
+	call	ti.SaveParse
 	ld	hl,0
 .stub_error_handler := $-3
 	call	ti.PushErrorHandler
@@ -335,15 +342,16 @@ stub:
 .flags.cmdFlags := $-1
 	res	ti.textInverse,(iy + ti.textFlags)
 	res	ti.onInterrupt,(iy + ti.onFlags)
+	res	ti.numOP1,(iy + ti.ParsFlag2)
 	ld	hl,(ti.asm_prgm_size)
 	add	hl,de
 	or	a,a
 	sbc	hl,de
-	jr	z,.nodel
 	ex	de,hl
 	ld	hl,ti.userMem
-	call	ti.DelMem
-.nodel:
+	call	nz,ti.DelMem
+	call	ti.PopRealO1
+	call	ti.GetParse
 	pop	de		; size of return program -- shouldn't change?
 	push	de
 	call	ti.ErrNotEnoughMem
