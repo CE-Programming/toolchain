@@ -71,7 +71,7 @@ install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/cedev-config/bin/cedev-config),$(INSTALL_BIN))
 	$(Q)$(WINDOWS_COPY)
 
-$(addprefix install-,$(LIBS)):
+$(addprefix install-,$(LIBS)): fasmg
 	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 install-fasmg:
