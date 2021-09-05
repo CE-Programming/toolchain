@@ -102,7 +102,7 @@ run_asm_prgm:
 	ld	a,(hl)			; if 0, indicates a C program with retval
 	or	a,a
 	jr	nz,.not_c
-	ld	hl,ti.tempSP
+	sbc	hl,hl
 	ld	(stub.basic_c_smc - reloc.offset),hl
 .not_c:
 	push	de
@@ -224,7 +224,6 @@ launch_basic_prgm:
 	jp	ti.ParseInp
 
 setup_prgm_state:
-	ld	iy,ti.flags
 	xor	a,a
 	ld	(ti.kbdGetKy),a
 	ld	a,$ce			; set
@@ -321,13 +320,12 @@ find_prgm:
 
 stub:
 .normal:
+	xor	a,a
+	sbc	hl,hl
+.basic_c_smc := $-3
 	ld	(ti.cursorImage),hl
 	ld	iy,ti.flags
 	call	ti.PopErrorHandler
-	xor	a,a
-	sbc	hl,hl
-	ld	(ti.cursorImage),hl
-.basic_c_smc := $-3
 	jr	.no_error
 .error_handler:
 	or	a,a
