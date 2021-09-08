@@ -15,6 +15,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #----------------------------
+MAKEFLAGS += -rR
+#----------------------------
 NAME ?= DEMO
 ICON ?=
 DESCRIPTION ?=
@@ -27,11 +29,12 @@ INIT_LOC ?= D1A87F
 OUTPUT_MAP ?= YES
 CFLAGS ?= -Wall -Wextra -Oz
 CXXFLAGS ?= -Wall -Wextra -Oz
-LDFLAGS ?=
 SRCDIR ?= src
 OBJDIR ?= obj
 BINDIR ?= bin
 GFXDIR ?= src/gfx
+CPP_EXTENSION = cpp
+C_EXTENSION = c
 CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
 #----------------------------
@@ -88,6 +91,8 @@ QUOTE_ARG = '$(subst ','\'',$1)'#'
 endif
 
 MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
+UPDIR_ADD = $(subst ../,_../,$(subst \,/,$1))
+UPDIR_RM = $(subst _../,../,$(subst \,/,$1))
 
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 LINKER_SCRIPT ?= $(CEDEV_TOOLCHAIN)/meta/linker_script
@@ -111,15 +116,15 @@ LDCRT0 ?= $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/shared/crt0.src)
 rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filter $(subst %%,%,%$(subst *,%,$2)),$d)))
 
 # find source files
-CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.c) $(EXTRA_CSOURCES))
-CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.cpp) $(EXTRA_CPPSOURCES))
+CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_CSOURCES))
+CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CPPSOURCES))
 USERHEADERS ?= $(sort $(call rwildcard,$(SRCDIR),*.h *.hpp) $(EXTRA_USERHEADERS))
 ASMSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
 
 # create links for later
-LINK_CSOURCES ?= $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.c.src)
-LINK_CPPSOURCES ?= $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
-LINK_ASMSOURCES ?= $(ASMSOURCES)
+LINK_CSOURCES ?= $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).src))
+LINK_CPPSOURCES ?= $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).src))
+LINK_ASMSOURCES ?= $(call UPDIR_ADD,$(ASMSOURCES))
 
 # files created to be used for linking
 LDFILES ?= $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
@@ -200,7 +205,9 @@ FASMGFLAGS = \
 	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
 	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LDLIBS))) \
-	$(LDFLAGS)
+	$(EXTRA_LDFLAGS)
+
+.PHONY: all clean version gfx debug
 
 # this rule is trigged to build everything
 all: $(BINDIR)/$(TARGET8XP)
@@ -227,21 +234,10 @@ $(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(ICON_CONV)
 endif
 
-# these rules compile the source files into assembly files
-$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
-	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
-
-$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
-	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
-
 clean:
 	$(Q)$(call RM,$(EXTRA_CLEAN))
 	$(Q)$(call RMDIR,$(OBJDIR) $(BINDIR))
-	$(Q)echo Removed built objects and binaries.
+	$(Q)echo Removed built binaries and objects.
 
 gfx:
 	$(Q)$(GFXCMD)
@@ -249,4 +245,13 @@ gfx:
 version:
 	$(Q)echo CE C Toolchain v$(shell cedev-config --version)
 
-.PHONY: all clean version gfx debug
+.SECONDEXPANSION:
+$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)$(CC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)$(CC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
