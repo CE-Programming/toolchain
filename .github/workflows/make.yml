@@ -305,6 +305,8 @@ jobs:
         run: make -C ${{env.TOOLCHAIN_PATH}} docs
       - name: Disable Jekyll
         run: cmake -E touch ${{env.TOOLCHAIN_PATH}}/docs/build/html/.nojekyll
+      - name: Create .gitignore
+        run: cmake -E echo >> ${{env.TOOLCHAIN_PATH}}/docs/build/html/.gitignore environment.pickle
 
       - name: Upload Website Documentation
         if: github.ref == 'refs/heads/master'
