@@ -20,8 +20,8 @@ build_documentation () {
    git checkout -- conf.py
 }
 
-current_version="v9.1"
-export versions="master v9.1 v9.0"
+current_version="v9.2"
+export versions="master v9.2 v9.1 v9.0"
 
 cp -f conf.py /tmp/conf.py
 cp -f templates/versions.html /tmp/versions.html
