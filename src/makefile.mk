@@ -243,7 +243,7 @@ gfx:
 	$(Q)$(GFXCMD)
 
 version:
-	$(Q)echo CE C Toolchain v$(shell cedev-config --version)
+	$(Q)echo CE C Toolchain $(shell cedev-config --version)
 
 .SECONDEXPANSION:
 $(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
