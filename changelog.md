@@ -1,21 +1,21 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v9.2...master)
 
-# [v9.2](https://github.com/CE-Programming/toolchain/releases/tag/v9.2) (2021-08-10)
+# [v9.2](https://github.com/CE-Programming/toolchain/releases/tag/v9.2) (2021-09-09)
 
   - Deprecate `timer_GetLow` and `ti_CloseAll` functions
-  - Remove pixelShadow from BSS to fix issue #298
+  - Remove pixelShadow from BSS to fix issue [#298](https://github.com/CE-Programming/toolchain/issues/298)
   - Bug fixes for convimg and convbin programs
   - Add more missing C++ headers and add typeinfo support (thanks [jacobly](https://github.com/jacobly0))
   - Added `clock`, `sleep`, `usleep`, `msleep`, `ticksleep`, and other clock related functions (thanks [Runer112](https://github.com/runer112))
   - Added `os_RunPrgm` function for running programs on the calculator
   - Added `boot_TurnOn` function which turns on the hardware
   - Implementation and improvements to C++ for `static_assert` and `quick_exit` (thanks [jacobly](https://github.com/jacobly0))
-  - Updates to fasmg linker files; fasmg now uses 64 release on Linux
+  - Updates to fasmg linker files; fasmg now uses 64 bit release on Linux
   - Pressing [on] doesn't throw an error on exit anymore (thanks [commandblockguy](https://github.com/commandblockguy))
   - Fix bug when compiling icon source file
-  - Remove windows installer program and use batch file instead (thanks [DrDnar](https://github.com/drdnar))
+  - Remove Windows installer program and use batch file instead (thanks [DrDnar](https://github.com/drdnar))
   - General core makefile improvements
   - Makefile now handles recursive search better and extra source files
   - Linux releases have binaries marked as executable
@@ -26,11 +26,15 @@
   - Documentation improvements (thanks [Michael0x18](https://github.com/Michael0x18))
   - Added general coding guidelines and working with Git documentation
 
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v9.1...v9.2)
+
 # [v9.1](https://github.com/CE-Programming/toolchain/releases/tag/v9.1) (2021-01-16)
 
   - Update fasmg (fix linker bug that could unnecessarily require a library)
   - Update ez80-clang (fix compiler bug where taking the address of stack variables in simple functions was broken)
   - Improve CI
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v9.0...v9.1)
 
 # [v9.0](https://github.com/CE-Programming/toolchain/releases/tag/v9.0) (2020-12-26)
 
