@@ -2,7 +2,31 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/tree/HEAD)
 
-# [v9.1](https://github.com/CE-Programming/toolchain/releases/tag/v9.1) (2021-01-1x)
+# [v9.2](https://github.com/CE-Programming/toolchain/releases/tag/v9.2) (2021-08-10)
+
+  - Deprecate `timer_GetLow` and `ti_CloseAll` functions
+  - Remove pixelShadow from BSS to fix issue #298
+  - Bug fixes for convimg and convbin programs
+  - Add more missing C++ headers and add typeinfo support (thanks [jacobly](https://github.com/jacobly0))
+  - Added `clock`, `sleep`, `usleep`, `msleep`, `ticksleep`, and other clock related functions (thanks [Runer112](https://github.com/runer112))
+  - Added `os_RunPrgm` function for running programs on the calculator
+  - Added `boot_TurnOn` function which turns on the hardware
+  - Implementation and improvements to C++ for `static_assert` and `quick_exit` (thanks [jacobly](https://github.com/jacobly0))
+  - Updates to fasmg linker files; fasmg now uses 64 release on Linux
+  - Pressing [on] doesn't throw an error on exit anymore (thanks [commandblockguy](https://github.com/commandblockguy))
+  - Fix bug when compiling icon source file
+  - Remove windows installer program and use batch file instead (thanks [DrDnar](https://github.com/drdnar))
+  - General core makefile improvements
+  - Makefile now handles recursive search better and extra source files
+  - Linux releases have binaries marked as executable
+  - Documentation is now versioned based on release
+  - Linker bug when using debug mode resolved
+  - Test toolchain with compression enabled and disabled, as well as remove convimg build artifacts
+  - Added `cedev-config` program to handle miscellaneous toolchain things
+  - Documentation improvements (thanks [Michael0x18](https://github.com/Michael0x18))
+  - Added general coding guidelines and working with Git documentation
+
+# [v9.1](https://github.com/CE-Programming/toolchain/releases/tag/v9.1) (2021-01-16)
 
   - Update fasmg (fix linker bug that could unnecessarily require a library)
   - Update ez80-clang (fix compiler bug where taking the address of stack variables in simple functions was broken)
@@ -51,7 +75,7 @@ These massive internal changes *do* mean that some programs might not compile ri
  - Examples folders hierarchy improved
  - Prepare makefile for future changes
  - Fix warnings
- 
+
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.7...v8.8)
 
 # [v8.7](https://github.com/CE-Programming/toolchain/releases/tag/v8.7) (2019-08-25)
@@ -63,7 +87,7 @@ These massive internal changes *do* mean that some programs might not compile ri
  - Fix `gfx_SetCharData` (#221)
  - Improve build
  - Add `ti_ArchiveHasRoom`
- 
+
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.6...v8.7)
 
 # [v8.6](https://github.com/CE-Programming/toolchain/releases/tag/v8.6) (2019-06-30)
@@ -106,9 +130,9 @@ These massive internal changes *do* mean that some programs might not compile ri
  - Replace NSIS by Inno for Windows installer
  - Add a better GraphX template
  - Improve some build-related stuff
- 
+
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.3...v8.4)
-  
+
 # [v8.3](https://github.com/CE-Programming/toolchain/releases/tag/v8.3) (2018-07-25)
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v8.2...v8.3)
@@ -256,7 +280,7 @@ These massive internal changes *do* mean that some programs might not compile ri
   - Implicit `prgm_CleanUp` by default - ([MateoConLechuga](https://github.com/MateoConLechuga))
   - Examples cleanup - ([MateoConLechuga](https://github.com/MateoConLechuga))
   - Fix some example screenshots - ([MateoConLechuga](https://github.com/MateoConLechuga))
-  - Routines optimizations - ([MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112)) 
+  - Routines optimizations - ([MateoConLechuga](https://github.com/MateoConLechuga)+[Runer112](https://github.com/Runer112))
 
 ### Libraries
 
@@ -281,7 +305,7 @@ These massive internal changes *do* mean that some programs might not compile ri
 #####  GRAPHX
   - Bug. fixes - ([MateoConLechuga](https://github.com/MateoConLechuga)+[PeterTillema](https://github.com/PeterTillema))
   - Optimizations - ([MateoConLechuga](https://github.com/MateoConLechuga))
-  
+
 
 # [v7.0](https://github.com/CE-Programming/toolchain/releases/tag/v7.0) (2017-04-07)
 
@@ -519,4 +543,3 @@ These massive internal changes *do* mean that some programs might not compile ri
 **Closed issues:**
 
 - No bin folder present in CEDev [\#1](https://github.com/CE-Programming/toolchain/issues/1)
-
