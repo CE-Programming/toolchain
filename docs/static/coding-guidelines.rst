@@ -182,14 +182,6 @@ Here's why you shouldn't use them:
 So, most of the time, and unless you have a really good excuse, don't use global variables.
 There are better alternatives to using global variables, described below:
 
-Limit Magic Numbers
--------------------
-
-Magic numbers are special numbers that one might put in code when it is 2AM and it's the 50th time you've recompiled just to get a pixel positioned perfectly.
-For example, :code:`x = x + 29 + 52 - 3` contains so-called "magic numbers" -- numbers that aren't tied to a variable or have any real context for why they contain the value they do.
-When updating code 6 months down the road, you won't have any clue what these numbers meant.
-A better solution is to use a macro such as :code:`#define X_OFFSET (29 + 52 - 3)` where the intent of the numbers is less obscured.
-
 Proper Scoping
 ^^^^^^^^^^^^^^
 
@@ -304,6 +296,14 @@ The following tips can help avoid dynamic allocation.
 
 General Guidelines
 ------------------
+
+Limit Magic Numbers
+^^^^^^^^^^^^^^^^^^^
+
+Magic numbers are special numbers that one might put in code when it is 2AM and it's the 50th time you've recompiled just to get a pixel positioned perfectly.
+For example, :code:`x = x + 29 + 52 - 3` contains so-called "magic numbers" -- numbers that aren't tied to a variable or have any real context for why they contain the value they do.
+When updating code 6 months down the road, you won't have any clue what these numbers meant.
+A better solution is to use a macro such as :code:`#define X_OFFSET (29 + 52 - 3)` where the intent of the numbers is less obscured.
 
 Use const as much as possible
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
