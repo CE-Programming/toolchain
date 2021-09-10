@@ -15,7 +15,7 @@ This is the name of the program variable that will be stored on the calculator.
 
 .. code-block:: makefile
 
-    NAME ?= PRGM
+    NAME = PRGM
 
 ICON
 ----
@@ -26,7 +26,7 @@ Place a 16x16 image in the same directory as the makefile with the name of whate
 
 .. code-block:: makefile
 
-    ICON ?= icon.png
+    ICON = icon.png
 
 DESCRIPTION
 -----------
@@ -37,7 +37,7 @@ The description will be displayed in shells such as `Cesium <https://github.com/
 
 .. code-block:: makefile
 
-    DESCRIPTION ?= "My awesome program"
+    DESCRIPTION = "My awesome program"
 
 COMPRESSED
 ----------
@@ -50,7 +50,7 @@ To enable this feature, open the project's makefile and edit the line:
 
 .. code-block:: makefile
 
-    COMPRESSED ?= YES
+    COMPRESSED = YES
 
 ARCHIVED
 --------
@@ -60,7 +60,7 @@ To enable this feature, open the project's makefile and change the line:
 
 .. code-block:: makefile
 
-    ARCHIVED ?= YES
+    ARCHIVED = YES
 
 DEPS
 ----
@@ -72,7 +72,7 @@ Define rules for the files after including the main CEdev makefile.
 
     DEPS = $(BINDIR)/levelpack.bin
 
-    include $(CEDEV)/meta/makefile.mk
+    include $(shell cedev-config --makefile)
 
     $(BINDIR)/levelpack.bin:
     	$(call MKDIR,$(@D))
@@ -87,5 +87,5 @@ These flags are passed to the clang compiler.
 
 .. code-block:: makefile
 
-    CFLAGS ?= -Wall -Wextra -Oz
-    CXXFLAGS ?= -Wall -Wextra -Oz
+    CFLAGS = -Wall -Wextra -Oz
+    CXXFLAGS = -Wall -Wextra -Oz

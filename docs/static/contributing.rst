@@ -55,7 +55,7 @@ Windows
 
 Get `MinGW <http://www.mingw.org>`_.
 The only required pacakges are `mingw32-base` and `mingw32-gcc-g++`.
-Make sure the `MinGW\bin` directory is in the system's PATH environment variable.
+Make sure the `MinGW\\bin` directory is in the system's PATH environment variable.
 
 Get the `ez80-clang LLVM compiler <https://github.com/jacobly0/llvm-project/wiki>`_.
 Make sure the compiler is located in the system's PATH environment variable.
@@ -83,4 +83,4 @@ By default, the toolchain is installed into the root (C:\\CEdev) directory.
 
 This is configurable with :code:`mingw32-make install PREFIX=[LOCATION]`
 
-Finally, copy the previously downloaded `fasmg` and `ez80-clang` executables to the installed `CEdev\bin` directory.
+Finally, copy the previously downloaded `fasmg` and `ez80-clang` executables to the installed `CEdev\\bin` directory.
