@@ -15,6 +15,7 @@ if %VERSION% gtr 9 echo [0m
 echo.
 
 rem Set up path variable
+set CEDEV=%~dp0
 set PATH=%~dp0bin;%PATH%
 rem set PREFIX=%~dp0
 
