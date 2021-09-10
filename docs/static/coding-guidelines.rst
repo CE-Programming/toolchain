@@ -53,7 +53,7 @@ Don't write comments just because you've been told to at some point: the other h
 
 It is much easier to read code without having to also read comments that don't convey any helpful information. Instead, provide useful information when needed, in particular when someone may be tempted to change some code that probably shouldn't be without a lot of thought first, or where some algorithm is complex to understand for someone new on the project and only reading the code to understand what is happening would take too long pointlessly (reverse-engineering source code can annoyingly take a lot of time).
 
-As such, and especially for complex code, focus rather on explaning **why** something is written that way, and even **why not** written in another way (i.e. some edgecase may not work with an alternative algorithm, some usecase may have inferior performance, etc.). Time will be saved that way for future refactors, whether it's done by you, or even more so by someone else that may now know the context of the code as much as you.
+As such, and especially for complex code, focus rather on explaining **why** something is written that way, and even **why not** written in another way (i.e. some edge case may not work with an alternative algorithm, some use case may have inferior performance, etc.). Time will be saved that way for future refactors, whether it's done by you, or even more so by someone else that may now know the context of the code as much as you.
 
 And remember this: having too many comments leads to issues where **a)** the comments don't match the code, **b)** they are either superfluous or useless, **c)** they are flat out incorrect or outdated, or **d)** they add noise to the code itself and make it more difficult to read.
 
@@ -61,7 +61,7 @@ These are examples of bad comments that add no value: remember, good self-explan
 
 .. code-block:: c
 
-    // locates the first occurance of the character in the string
+    // locates the first occurrence of the character in the string
     void findFirstChar(string_t* str) {
         ...
     }
@@ -181,6 +181,14 @@ Here's why you shouldn't use them:
 
 So, most of the time, and unless you have a really good excuse, don't use global variables.
 There are better alternatives to using global variables, described below:
+
+Limit Magic Numbers
+-------------------
+
+Magic numbers are special numbers that one might put in code when it is 2AM and it's the 50th time you've recompiled just to get a pixel positioned perfectly.
+For example, :code:`x = x + 29 + 52 - 3` contains so-called "magic numbers" -- numbers that aren't tied to a variable or have any real context for why they contain the value they do.
+When updating code 6 months down the road, you won't have any clue what these numbers meant.
+A better solution is to use a macro such as :code:`#define X_OFFSET (29 + 52 - 3)` where the intent of the numbers is less obscured.
 
 Proper Scoping
 ^^^^^^^^^^^^^^
@@ -327,5 +335,5 @@ Some common ones include:
 - Coverity
 
 Cppcheck is the easiest one to use with the CE C toolchain, but it is also fairly limited.
-Your IDE may also have a static analyer built-in.
+Your IDE may also have a static analyzer built-in.
 Make sure to enable warning flags on the compiler, too (:code:`-Wall -Wextra`)
