@@ -21,10 +21,10 @@
   {
     "1":
     {
-      "description": "Test show nothing",
+      "description": "Pass",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "349F4775" ]
+      "expected_CRCs": [ "E8F8335D" ]
     },
     "2":
     {
