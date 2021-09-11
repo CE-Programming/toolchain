@@ -7,17 +7,13 @@ int main(void)
 {
     static const char *name0 = "file0";
     static const char *name1 = "file1";
-    static const char *name2 = "file1";
+    static const char *name2 = "file2";
     ti_var_t file0;
     ti_var_t file1;
     ti_var_t file2;
     bool error;
 
     os_ClrHome();
-
-    ti_Delete(name0);
-    ti_Delete(name1);
-    ti_Delete(name2);
 
     error = true;
     do
@@ -46,7 +42,7 @@ int main(void)
         if (ti_Resize(1, file0) < 0) break;
         if (ti_GetSize(file0) != 1) break;
 
-        ti_Close(file0);
+        if (!ti_Close(file0)) break;
 
         if (ti_Resize(1, file1) < 0) break;
         if (ti_GetSize(file1) != 1) break;
@@ -55,7 +51,7 @@ int main(void)
         if (ti_Resize(1, file1) < 0) break;
         if (ti_GetSize(file1) != 1) break;
 
-        ti_Close(file1);
+        if (!ti_Close(file1)) break;
 
         file1 = ti_Open(name1, "r");
         if (!file1) break;
@@ -63,20 +59,26 @@ int main(void)
         if (ti_Resize(32768, file2) < 0) break;
         if (ti_GetSize(file2) != 32768) break;
 
-        ti_Close(file2);
+        if (!ti_Close(file2)) break;
 
         if (ti_GetSize(file1) != 1) break;
 
-        ti_Close(file1);
+        if (!ti_Close(file1)) break;
 
         error = false;
     } while (0);
 
-    while (!os_GetCSC());
+    ti_Delete(name0);
+    ti_Delete(name1);
+    ti_Delete(name2);
 
-    if (error == true)
+    if (!error)
     {
-        PrintText(0, 2, "An error occured");
+        os_PutStrFull("Pass");
+    }
+    else
+    {
+        os_PutStrFull("Fail");
     }
 
     while (!os_GetCSC());
