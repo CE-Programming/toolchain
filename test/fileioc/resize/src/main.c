@@ -76,11 +76,11 @@ int main(void)
 
     if (!error)
     {
-        os_PutStrFull("Pass");
+        puts("All tests passed");
     }
     else
     {
-        printf("Failed at test %d", test);
+        printf("Test %d failed\n", test);
     }
 
     while (!os_GetCSC());

@@ -24,7 +24,7 @@
       "description": "Pass",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "E8F8335D" ]
+      "expected_CRCs": [ "38E2AD5A" ]
     },
     "2":
     {
