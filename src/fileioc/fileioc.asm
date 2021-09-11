@@ -1549,15 +1549,15 @@ util_is_slot_open:
 ;  c = slot
 ; out:
 ;  a = 0
-;  ubc = slot * 3
-;  uhl = pointer to upper byte of slot offset
 ;  zf = open
+	push	hl, bc
 	ld	b, 3
 	mlt	bc
 	ld	hl, variable_offsets - 1
 	add	hl, bc
 	ld	a, b
 	cp	a, (hl)
+	push	bc, hl
 	ret
 
 util_get_vat_ptr:
