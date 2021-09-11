@@ -1557,7 +1557,7 @@ util_is_slot_open:
 	add	hl, bc
 	ld	a, b
 	cp	a, (hl)
-	pop	bc, hl
+	push	bc, hl
 	ret
 
 util_get_vat_ptr:
