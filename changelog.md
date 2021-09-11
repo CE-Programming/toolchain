@@ -1,6 +1,11 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v9.2...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v9.2.1...master)
+
+# [v9.2.1](https://github.com/CE-Programming/toolchain/releases/tag/v9.2.1) (2021-09-11)
+
+  - Patch for edge case where `delay()` and `usleep()` functions may freeze
+  - Minor documentation updates
 
 # [v9.2](https://github.com/CE-Programming/toolchain/releases/tag/v9.2) (2021-09-09)
 
