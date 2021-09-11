@@ -24,13 +24,14 @@ _delay:
 ; ^ 13 cc
 ; Get the start time ASAP.
 	push	hl
-	call	_clock			; a = 0, euhl = start
+	call	_clock			; euhl = start
 ; ^ 32 + cc(_clock) cc
 ; 22 + 48 + 13 + 32 + 48 + 75 = 238 cc until start time captured
 	ex	(sp), hl		; hl = millis
 	push	de
 ; Convert millis to clock ticks.
 	dec.s	hl
+	xor	a, a			; a = 0
 	ld	e, a			; euhl = millis - 1
 .multiplier_fp := (256 * 32768 + 1000 - 1) / 1000
 assert .multiplier_fp shr 24 = 0

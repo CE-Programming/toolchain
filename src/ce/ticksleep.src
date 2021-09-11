@@ -31,7 +31,7 @@ _ticksleep:
 ; Get the start time ASAP.
 	push	de
 	push	hl
-	call	_clock			; a = 0, euhl = start
+	call	_clock			; euhl = start
 ; ^ 42 + cc(_clock) cc
 ; 22 + 103 + 42 + 48 + 75 = 290 cc until start time captured
 ; Join common code for the rest.
