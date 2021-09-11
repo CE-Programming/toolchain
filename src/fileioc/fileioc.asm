@@ -202,15 +202,15 @@ ti_Resize:
 ;  sp + 6 : slot index
 ; return:
 ;  hl = new size if no failure
-	pop	de
-	pop	hl			; hl = new size
+	pop	hl
+	pop	de			; de = new size
 	pop	bc			; c = slot
 	push	bc
-	push	hl
 	push	de
+	push	hl
 	call	util_is_slot_open
 	jp	nz, util_ret_neg_one
-	push	hl
+	push	de
 	call	util_is_in_ram
 	pop	hl
 	jp	c, util_ret_null
