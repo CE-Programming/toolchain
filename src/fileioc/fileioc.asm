@@ -1599,11 +1599,10 @@ util_get_data_ptr:
 util_get_offset_ptr:
 	push	bc
 	ld	hl, (curr_slot)
-	dec	l
 	ld	h, 3
 	mlt	hl
-	ld	bc, variable_offsets
-	add	hl,bc
+	ld	bc, variable_offsets - 3
+	add	hl, bc
 	pop	bc
 	ret
 util_get_slot_size:
