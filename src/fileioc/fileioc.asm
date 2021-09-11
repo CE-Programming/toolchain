@@ -669,19 +669,17 @@ ti_PutC:
 ;  sp + 6 : Slot number
 ; return:
 ;  Character written if no failure
-	pop	de
 	pop	hl
+	pop	de
 	pop	bc
 	push	bc
-	push	hl
 	push	de
-	ld	a, l
+	push	hl
+	ld	a, e
 	ld	(char_in), a
 	call	util_is_slot_open
 	jp	nz, util_ret_neg_one
-	push	hl
 	call	util_is_in_ram
-	pop	hl
 	jp	c, util_ret_neg_one
 _PutChar:
 	call	util_get_slot_size
@@ -1144,15 +1142,13 @@ ti_GetName:
 ;  sp + 6 : slot index
 ; return:
 ;  n/a
-	pop	de
 	pop	hl
+	pop	de
 	pop	bc
 	push	bc
-	push	hl
 	push	de
 	push	hl
 	call	util_is_slot_open
-	pop	de
 	ret	nz
 	call	util_get_vat_ptr
 	ld	hl, (hl)
