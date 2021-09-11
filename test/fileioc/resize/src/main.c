@@ -5,7 +5,7 @@ int main(void)
 {
     static const char *name0 = "file0";
     static const char *name1 = "file1";
-    static const char *name2 = "file1";
+    static const char *name2 = "file2";
     ti_var_t file0;
     ti_var_t file1;
     ti_var_t file2;
