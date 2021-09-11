@@ -1552,6 +1552,9 @@ util_is_slot_open:
 ;  ubc = slot * 3
 ;  uhl = pointer to upper byte of slot offset
 ;  zf = open
+;  (curr_slot) = slot
+	ld	a, c
+	ld	(curr_slot), a
 	ld	b, 3
 	mlt	bc
 	ld	hl, variable_offsets - 1
