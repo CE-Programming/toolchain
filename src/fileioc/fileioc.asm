@@ -202,15 +202,15 @@ ti_Resize:
 ;  sp + 6 : slot index
 ; return:
 ;  hl = new size if no failure
-	pop	de
-	pop	hl			; hl = new size
+	pop	hl
+	pop	de			; de = new size
 	pop	bc			; c = slot
 	push	bc
-	push	hl
 	push	de
+	push	hl
 	call	util_is_slot_open
 	jp	nz, util_ret_neg_one
-	push	hl
+	push	de
 	call	util_is_in_ram
 	pop	hl
 	jp	c, util_ret_null
@@ -669,19 +669,17 @@ ti_PutC:
 ;  sp + 6 : Slot number
 ; return:
 ;  Character written if no failure
-	pop	de
 	pop	hl
+	pop	de
 	pop	bc
 	push	bc
-	push	hl
 	push	de
-	ld	a, l
+	push	hl
+	ld	a, e
 	ld	(char_in), a
 	call	util_is_slot_open
 	jp	nz, util_ret_neg_one
-	push	hl
 	call	util_is_in_ram
-	pop	hl
 	jp	c, util_ret_neg_one
 _PutChar:
 	call	util_get_slot_size
@@ -1144,15 +1142,13 @@ ti_GetName:
 ;  sp + 6 : slot index
 ; return:
 ;  n/a
-	pop	de
 	pop	hl
+	pop	de
 	pop	bc
 	push	bc
-	push	hl
 	push	de
 	push	hl
 	call	util_is_slot_open
-	pop	de
 	ret	nz
 	call	util_get_vat_ptr
 	ld	hl, (hl)
@@ -1549,15 +1545,18 @@ util_is_slot_open:
 ;  c = slot
 ; out:
 ;  a = 0
+;  ubc = slot * 3
+;  uhl = pointer to upper byte of slot offset
 ;  zf = open
-	push	hl, bc
+;  (curr_slot) = slot
+	ld	a, c
+	ld	(curr_slot), a
 	ld	b, 3
 	mlt	bc
 	ld	hl, variable_offsets - 1
 	add	hl, bc
 	ld	a, b
 	cp	a, (hl)
-	pop	bc, hl
 	ret
 
 util_get_vat_ptr:
@@ -1596,11 +1595,10 @@ util_get_data_ptr:
 util_get_offset_ptr:
 	push	bc
 	ld	hl, (curr_slot)
-	dec	l
 	ld	h, 3
 	mlt	hl
-	ld	bc, variable_offsets
-	add	hl,bc
+	ld	bc, variable_offsets - 3
+	add	hl, bc
 	pop	bc
 	ret
 util_get_slot_size:
