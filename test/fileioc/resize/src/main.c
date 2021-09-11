@@ -1,5 +1,7 @@
-#include <tice.h>
 #include <fileioc.h>
+#include <stdio.h>
+#include <tice.h>
+
 
 int main(void)
 {
