@@ -25,7 +25,7 @@ _sleep:
 ; ^ 13 cc
 ; Get the start time ASAP.
 	push	hl
-	call	_clock			; a = 0, euhl = start
+	call	_clock			; euhl = start
 ; ^ 32 + cc(_clock) cc
 ; 22 + 48 + 13 + 32 + 48 + 75 = 238 cc until start time captured
 	ex	(sp), hl		; hl = seconds

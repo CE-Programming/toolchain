@@ -26,13 +26,14 @@ _usleep:
 ; ^ 21 cc
 ; Get the start time ASAP.
 	push	hl
-	call	_clock			; a = 0, euhl = start
+	call	_clock			; euhl = start
 ; ^ 32 + cc(_clock) cc
 ; 22 + 48 + 21 + 32 + 48 + 75 = 246 cc until start time captured
 	ex	(sp), hl		; hl = usec
 	push	de
 ; Convert usec to clock ticks.
 ; https://docs.google.com/spreadsheets/d/1mZwDn6rEw3-uSQPuy48Ez0UWIvnggLiJxWft4u4OtcU/edit?usp=sharing
+	xor	a, a			; a = 0
 	ld	e, a			; euhl = usec
 .multiplier := 114
 	ld	bc, .multiplier		; aubc = multiplier
