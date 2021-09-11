@@ -21,7 +21,7 @@
   {
     "1":
     {
-      "description": "Pass",
+      "description": "All tests passed",
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [ "38E2AD5A" ]
