@@ -146,7 +146,7 @@ Here are the important takeaways from the above example:
 - The header includes so-called "header guards" (the :code"`#ifdef SOURCE_H` / :code:`#define SOURCE_H` lines), which are used to prevent the header from being included multiple times in the same source file.
 - The :code:`ifdef __cplusplus` lines are used to prevent a C++ compiler from mangling the names of the header functions. It is a good idea to add this, even if you are working on a C-only project as it will save you any headache if a C++ compiler tries to compile the header.
 - The external source function is represented as a "prototype" inside the header. This prototype tells the rest of the source files the arguments and return of the function, but does not define the implementation. It is the responsibility of the linker to take all the compiled source files and find the corresponding functions.
-- There should be one header file for one source file which defines the external functions/variables in the source file. Having "global" header files (i.e. a header file that includes a bunch of other headers and functions) is prone to many issues during linking, affects code modularity, and maintance, as well as adding to compile time. Putting all possible headers in one application header is as wrong as wrong can be.
+- There should be one header file for one source file which defines the external functions/variables in the source file. Having "global" header files (i.e. a header file that includes a bunch of other headers and functions) is prone to many issues during linking, affects code modularity, and maintenance, as well as adding to compile time. Putting all possible headers in one application header is as wrong as wrong can be.
 
 Proper Prototyping
 ^^^^^^^^^^^^^^^^^^
