@@ -6,6 +6,10 @@ Additionally, the CE C Libraries are used to aid in rapid development by impleme
 optimized routines for graphics, file I/O, fonts, keypad input, and more.
 
 If this is your first introduction to the CE C Toolchain, check out the :ref:`getting_started` page.
+You can join us on the :code:`CE Programming` Discord server in the :code:`#ez80-dev` channel by clicking the below invite button if you have any questions.
+
+.. image:: https://img.shields.io/discord/432891584451706892?logo=discord
+   :target: https://discord.com/invite/gkHzdGWRfG
 
 The toolchain works natively across all major OSes, and has been developed by a few
 people who find the challenge entertaining. If you are interested in contributing your expertise,
@@ -36,12 +40,6 @@ visit the `GitHub repository <https://github.com/CE-Programming/toolchain>`_.
     headers/index
     static/debugging
     static/makefile-options
-
-Helpful Resources and Bug Reports
----------------------------------
-
-If you have any questions, you can join us on :code:`#ez80-dev`, via the EFNet IRC server. (`webchat link <http://chat.efnet.org:9090/?nick=sdk-user&channels=%23ez80-dev&Login=Login>`_).
-Feel free to open bug reports or feature requests on the `GitHub Issues <https://github.com/CE-Programming/toolchain/issues>`_ page.
 
 .. toctree::
     :caption: Contributing
