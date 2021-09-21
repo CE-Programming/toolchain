@@ -876,14 +876,11 @@ ti_Close:
 	pop	de
 	pop	bc
 	push	bc
-	ld	b, 3
-	mlt	bc
-	ld	hl, variable_offsets - 1
-	add	hl, bc
-; upper byte of offset = slot * 3
-	ld	(hl), c
-	ex	de, hl
-	jp	(hl)
+	push	de
+	call	util_is_slot_open
+	jq	nz, util_ret_null
+	ld	(hl), 255
+	ret
 
 ;-------------------------------------------------------------------------------
 ti_DetectAny:
@@ -1550,6 +1547,8 @@ util_is_slot_open:
 ;  zf = open
 ;  (curr_slot) = slot
 	ld	a, c
+	cp	a, 6
+	jr	nc, .not_open
 	ld	(curr_slot), a
 	ld	b, 3
 	mlt	bc
@@ -1557,6 +1556,10 @@ util_is_slot_open:
 	add	hl, bc
 	ld	a, b
 	cp	a, (hl)
+	ret
+.not_open:
+	xor	a, a
+	inc	a
 	ret
 
 util_get_vat_ptr:
@@ -1636,5 +1639,6 @@ util_post_gc_handler := $-3
 ; Internal library data
 ;-------------------------------------------------------------------------------
 
+	db	255			; handle edge case of 0 for slot
 variable_offsets:
 	dl	-1, -1, -1, -1, -1
