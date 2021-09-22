@@ -35,8 +35,8 @@ struct fatFile
 	first_cluster rd 1
 	current_cluster rd 1
 	file_size rd 1
-	file_size_blocks rl 1
-	fpossector rl 1
+	block_count rl 1
+	block_pos rl 1
 	cluster_block rb 1
 	current_block rd 1
 	working_buffer rl 1
@@ -53,8 +53,8 @@ end struct
 struct fat
 	local size
 	label .: size
-	msd rl 1			; pointer to msd struct
-	cluster_size rb 1
+	msd rl 1
+	blocks_per_cluster rb 1
 	clusters rd 1
 	fat_size rd 1
 	fat_pos rl 1
@@ -71,6 +71,8 @@ struct fat
 	working_entry rl 1
 	working_next_entry rl 1
 	working_prev_entry rl 1
+	haslast rb 1
+	last rl 1
 	buffer rb 512
 	size := $-.
 end struct
@@ -80,6 +82,18 @@ struct fatDirEntry
 	name rb 13
 	attrib rb 1
 	entrysize rd 1
+	size := $-.
+end struct
+struct fatXfer
+	local size
+	label .: size
+	filep rl 1
+	count rl 1
+	buffer rl 1
+	callback rl 1
+	userptr rl 1
+	next rl 1
+	msdXfer rb sizeof msdXfer
 	size := $-.
 end struct
 
@@ -315,7 +329,7 @@ fat_OpenPartition:
 	dec	a
 .nocarry:
 	ld	c,(ix + 13)
-	ld	(yfat.cluster_size),c	; sectors per cluster
+	ld	(yfat.blocks_per_cluster),c	; blocks per cluster
 	jr	.enter
 .multiply:
 	add	hl,hl
@@ -377,7 +391,10 @@ fat_ClosePartition:
 	sbc	hl,hl
 	call	util_read_fat_sector
 	jq	nz,.error
-	res	0,(yfat.buffer + $41)		; clear dirty bit
+	lea	hl,yfat.buffer
+	ld	de,$41
+	add	hl,de
+	res	0,(hl)			; clear dirty bit
 	xor	a,a
 	sbc	hl,hl
 	call	util_write_fat_sector
@@ -449,7 +466,7 @@ fat_DirList:
 	ld	(yfat.working_cluster),a,hl
 	call	util_cluster_to_sector
 	ld	(yfat.working_block),a,hl
-	ld	b,(yfat.cluster_size)
+	ld	b,(yfat.blocks_per_cluster)
 .findsector:
 	push	bc
 	ld	(yfat.working_block),a,hl
@@ -553,7 +570,7 @@ fat_GetVolumeLabel:
 	ld	(yfat.working_cluster),a,hl
 	call	util_cluster_to_sector
 	ld	(yfat.working_block),a,hl
-	ld	b,(yfat.cluster_size)
+	ld	b,(yfat.blocks_per_cluster)
 .findsector:
 	push	bc
 	ld	(yfat.working_block),a,hl
@@ -644,7 +661,7 @@ fat_Open:
 	xor	a,a
 	sbc	hl,hl
 	ld	(yfatFile.cluster_block),a
-	ld	(yfatFile.fpossector),hl	; return success
+	ld	(yfatFile.block_pos),hl	; return success
 	ret
 .error:
 	ld	hl,FAT_ERROR_NOT_FOUND
@@ -787,7 +804,7 @@ fat_SetSize:
 	ret
 .writegood:
 	ld	a,hl,(yfat.working_size)
-	call	util_ceil_byte_size_to_cluster_size
+	call	util_ceil_byte_size_to_blocks_per_cluster
 	pop	iy
 	ret
 .failedchain:
@@ -800,7 +817,7 @@ fat_SetSize:
 	ld	hl,FAT_ERROR_FAILED_ALLOC
 	ret
 .currentcluster:
-	rd	0
+	dd	0
 
 ;-------------------------------------------------------------------------------
 fat_GetSize:
@@ -835,20 +852,20 @@ fat_SetPos:
 ;  FAT_SUCCESS on success
 	pop	hl,iy,de
 	push	de,iy,hl
-	ld	(yfatFile.fpossector),de
-	ld	hl,(yfatFile.file_size_blocks)
+	ld	hl,(yfatFile.block_count)
 	compare_hl_de
 	jq	c,.eof
+	ld	(yfatFile.block_pos),de
 	ex	de,hl				; determine cluster offset
 	ld	bc,0
 	push	iy
 	ld	iy,(yfatFile.fat)
-	ld	c,(yfat.cluster_size)
+	ld	c,(yfat.blocks_per_cluster)
 	pop	iy
 	xor	a,a
 	ld	e,a
 	push	bc,hl
-	call	ti._lremu				; get sector offset in cluster
+	call	ti._lremu			; get sector offset in cluster
 	ld	(yfatFile.cluster_block),l
 	pop	hl,bc
 	xor	a,a
@@ -991,18 +1008,75 @@ fat_Write:
 fat_ReadAsync:
 ; Reads blocks from an open file handle
 ; Arguments:
-;  sp + 3 : FAT transfer structure
+;  sp + 3 : fat transfer struct
 ; Returns:
 ;  FAT_SUCCESS on success
+
+	; theory of operation:
+	;  a) if not crossing a cluster boundary:
+	;     queue the transfer
+	;  b) if we are going to cross a cluster boundary:
+	;     queue the transfer and the request to get the next cluster
+
+	xor	a,a
+	sbc	hl,hl
+	ld	(yfatXfer.next),hl	; clear next pointer
+	push	iy
+	lea	de,iy			; de = xfer struct
+	ld	iy,(yfatXfer.filep)
+	ld	iy,(yfatFile.fat)
+	or	a,(yfat.haslast)
+	jq	z,.send
+.queue:					; if currently sending, queue it
+	lea	hl,yfat.last
+	ld	iy,(hl)			; transfer struct
+	ld	(yfatXfer.next),de	; queue the next bulk transfer
+	ld	(hl),de			; make this xfer the new last
+	pop	iy
+	xor	a,a
+	sbc	hl,hl			; return success
+	ret
+.send:
+	ld	(yfat.last),de
+	ld	(yfat.haslast),1
+.xfer:
+	ld	a,(yfat.blocks_per_cluster)
+	ld	(yfat.blocks_per_cluster),a
+
+	;ld	hl,(xfatFile.fpossector)
+	;ld	de,(xfatFile.file_size_sectors)
+	compare_hl_de
+	jq	nc,.eof
+
+
+	pop	iy
+	lea	de,iy
+	ld	iy,(yfatXfer.msdXfer)
+	ld	(ymsdXfer.userptr),de
+	ld	de,fat_read_callback
+	ld	(ymsdXfer.callback),de
+	; determine how many sectors can be read
+	; in one go before reaching the cluster bounds
+
+	ld	(ymsdXfer.count),bc
+	ld	(ymsdXfer.lba),hl,a
+	jq	msd_ReadAsync.enter
+.eof:
+	ret
+fat_read_callback:
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 3)
 	ret
 
 ;-------------------------------------------------------------------------------
 fat_WriteAsync:
 ; Writes blocks to an open file handle
 ; Arguments:
-;  sp + 3 : FAT transfer structure
+;  sp + 3 : fat transfer struct
 ; Returns:
 ;  FAT_SUCCESS on success
+
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1030,7 +1104,7 @@ util_zerocluster:
 	ldir
 	pop	hl
 	call	util_cluster_to_sector
-	ld	b,(yfat.cluster_size)
+	ld	b,(yfat.blocks_per_cluster)
 .zerome:
 	push	bc
 	push	af
@@ -1634,7 +1708,7 @@ util_alloc_entry:
 	lea	de,yfat.buffer
 	ret
 .validcluster:
-	ld	b,(yfat.cluster_size)
+	ld	b,(yfat.blocks_per_cluster)
 .loop:
 	push	bc,hl,af
 	call	util_read_fat_sector
@@ -1731,7 +1805,7 @@ util_get_file_size:
 util_set_file_size:
 	ld	(yfatFile.file_size),a,hl
 	call	util_ceil_byte_size_to_sector_size
-	ld	(yfatFile.file_size_blocks),a,hl
+	ld	(yfatFile.block_count),a,hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1897,7 +1971,7 @@ util_is_directory_empty:
 	compare_auhl_zero
 	ret	z
 	ld	(yfat.working_block),a,hl
-	ld	b,(yfat.cluster_size)
+	ld	b,(yfat.blocks_per_cluster)
 .next_sector:
 	push	bc
 	ld	a,hl,(yfat.working_block)
@@ -2076,7 +2150,7 @@ util_cluster_to_sector:
 	add	hl,de
 	adc	a,d
 	ld	c,a
-	ld	a,(yfat.cluster_size)
+	ld	a,(yfat.blocks_per_cluster)
 	jr	c,.enter
 	xor	a,a
 	sbc	hl,hl
@@ -2106,7 +2180,7 @@ util_sector_to_cluster:
 	or	a,a
 	sbc	hl,bc
 	sbc	a,(yfat.data_region + 3)
-	ld	de,(yfat.cluster_size - 2)
+	ld	de,(yfat.blocks_per_cluster - 2)
 	ld	d,0
 	ld	e,a
 .loop:
@@ -2386,13 +2460,13 @@ util_ceil_byte_size_to_sector_size:
 	inc	hl
 	ret
 
-util_ceil_byte_size_to_cluster_size:
+util_ceil_byte_size_to_blocks_per_cluster:
 	compare_auhl_zero
 	ret	z
 	push	af,hl
 	xor	a,a
 	sbc	hl,hl
-	ld	h,(yfat.cluster_size)
+	ld	h,(yfat.blocks_per_cluster)
 	add	hl,hl
 	push	hl
 	pop	bc

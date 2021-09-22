@@ -586,6 +586,7 @@ msd_ReadAsync:
 	ld	iy,0
 	add	iy,sp
 	ld	iy,(iy + 3)		; xfer struct
+.enter:
 	lea	hl,ymsdXfer.lba
 	ld	de,(ymsdXfer.count)
 	push	iy
