@@ -46,6 +46,11 @@ typedef struct {
     uint8_t private[1024]; /**< Internal library use */
 } msd_t;
 
+typedef struct {
+    uint32_t bsize; /**< Size of each block in bytes */
+    uint32_t bnum; /**< Number of blocks on MSD */
+} msd_info_t;
+
 typedef struct msd_transfer_t {
     msd_t *msd; /**< Initialized MSD device */
     uint32_t lba; /**< Logical block address */
@@ -340,13 +345,12 @@ void msd_Close(msd_t *msd);
 msd_error_t msd_Reset(msd_t *msd);
 
 /**
- * Gets the number of and size of each block on the device.
+ * Gets the number of and size of each logical block on the device.
  * @param msd Initialized MSD device structure.
- * @param block_count Pointer to store number of blocks to.
- * @param block_size Pointer to store block size to.
+ * @param info Pointer to store MSD information to.
  * @return MSD_SUCCESS on success.
  */
-msd_error_t msd_Info(msd_t *msd, uint32_t *block_count, uint32_t *block_size);
+msd_error_t msd_Info(msd_t *msd, msd_info_t *info);
 
 /**
  * Synchronous block read.

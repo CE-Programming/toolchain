@@ -62,10 +62,9 @@ int main(void)
     static uint8_t msd_buffer[MSD_BLOCK_SIZE * NUM_BLOCKS_PER_ACCESS];
     static char buffer[212];
     static global_t global;
-    uint32_t block_size;
-    uint32_t block_count;
     float elapsed;
     float bps;
+    msd_info_t msdinfo;
     usb_error_t usberr;
     msd_error_t msderr;
     int i;
@@ -118,7 +117,7 @@ int main(void)
     putstr("detected drive");
 
     // get block count and size
-    msderr = msd_Info(&global.msd, &block_count, &block_size);
+    msderr = msd_Info(&global.msd, &msdinfo);
     if (msderr != MSD_SUCCESS)
     {
         putstr("error getting msd info");
@@ -127,9 +126,9 @@ int main(void)
     }
 
     // print msd sector number and size
-    sprintf(buffer, "block size: %u bytes", (uint24_t)block_size);
+    sprintf(buffer, "block size: %u bytes", (uint24_t)msdinfo.bsize);
     putstr(buffer);
-    sprintf(buffer, "num blocks: %u", (uint24_t)block_count);
+    sprintf(buffer, "num blocks: %u", (uint24_t)msdinfo.bnum);
     putstr(buffer);
     putstr("executing speed test");
     putstr("please wait...");

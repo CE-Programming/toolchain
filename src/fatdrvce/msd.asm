@@ -466,8 +466,7 @@ msd_Reset:
 ; Gets the number of and size of each block (sector) on the device.
 ; args:
 ;  sp + 3  : msd device structure
-;  sp + 6  : pointer to store sector count to
-;  sp + 9  : pointer to store sector size to
+;  sp + 6  : pointer to store info to
 ; return:
 ;  hl = error status
 msd_Info:
@@ -477,9 +476,6 @@ msd_Info:
 	compare_hl_zero
 	jr	z,.paramerror
 	ld	hl,(iy + 6)
-	compare_hl_zero
-	jr	z,.paramerror
-	ld	hl,(iy + 9)
 	compare_hl_zero
 	jr	z,.paramerror
 	push	iy
@@ -492,9 +488,8 @@ msd_Info:
 	pop	iy
 	jr	nz,.error
 	ld	hl,(iy + 6)
-	inc	hl
-	inc	hl
-	inc	hl
+	ld	bc,7
+	add	hl,bc
 	ld	a,(de)
 	ld	(hl),a
 	inc	de
@@ -510,10 +505,7 @@ msd_Info:
 	ld	a,(de)
 	ld	(hl),a
 	inc	de
-	ld	hl,(iy + 9)
-	inc	hl
-	inc	hl
-	inc	hl
+	dec	hl
 	ld	a,(de)
 	ld	(hl),a
 	inc	de
