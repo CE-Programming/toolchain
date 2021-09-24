@@ -686,6 +686,7 @@ assert ~periodicList and $FF
 	ld	a,e
 	cpl
 	and	a,3
+	ld	c,usb_PollTransfers.disable
 	ld	de,_ScheduleEndpoint.disable
 	jq	z,.noPeriodicList
 	ld	de,($D10000 and $70000 or not FS_SBP_PER_FRAME shl (31-bsr FS_SBP_PER_FRAME)) shr 8 or $FF
@@ -701,8 +702,11 @@ assert ~periodicList and $FF
 	ld	(hl),de
 	ld	de,periodicList+1+dword
 	ldir
+	ld	c,usb_PollTransfers.enable
 	ld	de,_ScheduleEndpoint.enable
 .noPeriodicList:
+	ld	a,c
+	ld	(usb_PollTransfers.enabled),a
 	ld	(_ScheduleEndpoint.enabled),de
 	ld	a,(periodicList+sizeof periodicList-$D10000) shr 8
 	sub	a,h
@@ -2476,7 +2480,7 @@ end virtual
 .skip:
 	ld	iyh,b
 	ld	iyl,c
-	ld	bc,(iy-4+endpoint.next)
+	ld	bc,(iy-4)
 	bit	2,c
 	jq	nz,.skip
 	ld	e,endpoint.interval
@@ -2694,6 +2698,8 @@ assert USB_ERROR_INVALID_PARAM
 ;  full-speed other: 4*bytes + 54 fs sbp
 ;     low-speed  in: 32*bytes + 348 fs sbp
 ;     low-speed out: 32*bytes + 350 fs sbp
+	inc	(yendpoint.smask); 00000001b
+	ld	(yendpoint.cmask), 00011100b
 	bit	bsf yendpoint.info.eps,(yendpoint.info)
 	ld	de,54
 	jq	z,.schedule
@@ -4123,21 +4129,67 @@ _HandleCompletionInt:
 	ld	(hl),a
 usb_PollTransfers:
 	push	ix
-.restart:
+.async.restart:
 	ld	xendpoint,dummyHead
-.loop:
+.async:
 	bitmsk	xendpoint.internalFlags.freed
-	jq	nz,.restart
+	jq	nz,.async.restart
 	ld	xendpoint,(xendpoint.next)
 	or	a,a
 	sbc	hl,hl
 	ld	a,ixh
 	xor	a,dummyHead shr 8 and $FF
-	jq	z,.done
-	call	_RetireTransfers.nc
-	jq	c,.loop
-.done:
+	call	nz,_RetireTransfers.nc
+	jq	c,.async
 	pop	ix
+label .enabled
+	ret	nz
+load .enable: byte from .enabled
+virtual
+	ret
+ load .disable: byte from $$
+end virtual
+	push	ix
+	ld	ix,periodicList
+	ld	b,1 shl 7
+.periodic:
+	lea	ix,ix+4
+.periodic.restart:
+	push	ix
+.isoc:
+	ld	de,(ix-4)
+	ld	ixh,d
+	ld	ixl,e
+	bit	2,e
+	jq	nz,.isoc
+.intr:
+	srl	e
+	jq	c,.periodic.done
+	ld	a,(xendpoint.interval)
+	cp	a,b
+	jq	c,.periodic.done
+	push	bc
+	call	_RetireTransfers.nc
+	pop	bc
+	jq	nc,.periodic.error
+	bitmsk	xendpoint.internalFlags.freed
+	ld	xendpoint,(xendpoint.next)
+	ld	e,ixl
+	jq	z,.intr
+	or	a,a
+.periodic.done:
+	pop	ix
+	jq	nc,.periodic.restart
+	djnz	.periodic
+	or	a,a
+	sbc	hl,hl
+virtual
+	ld	a,0
+ load .ld_a: byte from $$
+end virtual
+	db	.ld_a
+.periodic.error:
+	pop	bc,ix
 	ret
 
 _HandlePortChgDetectInt:
