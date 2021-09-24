@@ -141,7 +141,7 @@ struct msd
 	config rb 1
 	interface rb 1
 	tag rd 1
-	last rl 1		; pointer to last transfer
+	last rl 1			; pointer to last transfer
 	haslast rb 1
 	buffer rb 768
 	size := $-.
@@ -715,8 +715,8 @@ scsi_sync_command:
 scsi_async_cbw:
 	xor	a,a
 	sbc	hl,hl
-	ld	(ymsdXfer.next),hl		; clear next pointer
-	ld	(ymsdXfer.stall),a		; clear stall for csw
+	ld	(ymsdXfer.next),hl	; clear next pointer
+	ld	(ymsdXfer.stall),a	; clear stall for csw
 	ld	hl,(ymsdXfer.cbw + packetCBW.len)
 	push	iy
 	lea	de,iy			; de = xfer struct
@@ -726,7 +726,7 @@ scsi_async_cbw:
 .queue:					; if currently sending, queue it
 	lea	hl,ymsd.last
 	ld	iy,(hl)
-	ld	(ymsdXfer.next),de		; queue the next bulk transfer
+	ld	(ymsdXfer.next),de	; queue the next bulk transfer
 	ld	(hl),de			; make this xfer the new last
 	pop	iy
 	xor	a,a
@@ -742,14 +742,20 @@ scsi_async_cbw:
 	inc	de
 	ld	(ymsd.tag + 1),de
 .skip:
-	ld	a,(ymsd.bulkout)
+	ld	c,(ymsd.bulkout)
 	compare_hl_zero			; check if cbw length is zero
 	ld	hl,scsi_async_data
 	jq	nz,.not_zero_length
 	ld	hl,scsi_async_csw	; if zero length, skip data callback
 .not_zero_length:
+	ld	a,de,(ymsd.tag)
+	pop	iy
+	push	iy
+	lea	iy,ymsdXfer.cbw
+	ld	(ypacketCBW.tag),a,de
 	pop	iy
 	lea	de,ymsdXfer.cbw		; send cbw
+	ld	a,c
 	ld	bc,sizeof packetCBW
 	jq	scsi_async_xfer
 
@@ -767,7 +773,7 @@ scsi_async_data:
 	jq	nz,scsi_async_issue_callback_fail
 	bit 	7,(ymsdXfer.cbw + packetCBW.dir)
 	push	iy
-	ld	iy,(ymsdXfer.msd)		; get msd struct
+	ld	iy,(ymsdXfer.msd)	; get msd struct
 	ld	a,(ymsd.bulkin)
 	jr	nz,.xfer
 	ld	a,(ymsd.bulkout)
@@ -792,7 +798,7 @@ scsi_async_csw:
 	jq	nz,scsi_async_issue_callback_fail
 .retry:
 	push	iy
-	ld	iy,(ymsdXfer.msd)		; msd struct
+	ld	iy,(ymsdXfer.msd)	; msd struct
 	ld	a,(ymsd.bulkin)
 	pop	iy			; restore xfer struct
 	lea	de,ymsdXfer.csw
@@ -816,7 +822,7 @@ scsi_async_xfer:
 	sbc	hl,hl			; todo: is this needed
 	ld	l,a			; endpoint
 	push	hl
-	ld	iy,(ymsdXfer.msd)		; msd struct
+	ld	iy,(ymsdXfer.msd)	; msd struct
 	ld	hl,(ymsd.dev)		; usb struct
 	push	hl
 	call	usb_GetDeviceEndpoint
@@ -854,7 +860,7 @@ scsi_async_done:
 	bit	0,l			; USB_TRANSFER_STALLED
 	jq	z,.failed
 	bit	0,(ymsdXfer.stall)
-	set	0,(ymsdXfer.stall)		; retry once if stalled
+	set	0,(ymsdXfer.stall)	; retry once if stalled
 	jq	z,scsi_async_csw.retry
 .failed:
 	jq	scsi_async_issue_callback_fail
@@ -876,7 +882,7 @@ scsi_async_issue_callback:
 	ld	hl,(ymsd.last)
 	compare_hl_de
 	jq	nz,.dont_clear		; if xfer->msd->last == xfer
-	ld	(ymsd.haslast),0		; xfer->msd->last = NULL
+	ld	(ymsd.haslast),0	; xfer->msd->last = NULL
 .dont_clear:
 	pop	iy
 	ld	hl,(ymsdXfer.next)

@@ -272,45 +272,45 @@ fat_error_t fat_SetPos(fat_file_t *file, uint24_t block);
 fat_error_t fat_SetSize(fat_file_t *file, uint32_t size);
 
 /**
- * Synchronous read for multiple blocks. Advances the file position.
+ * Synchronous read for multiple blocks. Advances file block offset position.
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to read.
- * @param data Read data.
+ * @param buffer Data read from FAT file.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_Read(fat_file_t *file, uint24_t count, void *data);
+fat_error_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
 
 /**
- * Synchronous write for multiple blocks. Advances the file position.
+ * Synchronous write for multiple blocks. Advances file block offset position.
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to write to file.
- * @param data Data to write.
+ * @param buffer Data to write to FAT file.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_Write(fat_file_t *file, uint24_t count, const void *data);
+fat_error_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
 
 /**
- * Asynchronous read for multiple blocks. Advances the file position.
+ * Asynchronous read for multiple blocks. Advances file block offset position.
  * You must set the following \p xfer elements:
- * \p file, \p buffer, \p count, \p callback. The optional element \p userptr
- * can be used to store user-defined data for access in the callback.
- * The \p xfer argument must remain valid (cannot be free'd or lose scope)
- * until the callback is issued. You can free \xfer inside the callback as
- * needed.
- * @param xfer Initialized FAT transfer.
+ * \p file, \p count, \p buffer, and \p callback. The optional element
+ * \p userptr  can be used to store user-defined data for access in the
+ * callback. The \p xfer argument must remain valid (cannot be free'd or
+ * lose scope) until the callback is issued. You can free \xfer inside the
+ * callback as needed.
+ * @param xfer Initialized FAT file transfer.
  * @return FAT_SUCCESS if the transfer was queued, otherwise error.
  */
 fat_error_t fat_ReadAsync(fat_transfer_t *xfer);
 
 /**
- * Asynchronous write for multiple blocks. Advances the file position.
+ * Asynchronous write for multiple blocks. Advances file block offset position.
  * You must set the following \p xfer elements:
- * \p file, \p buffer, \p count, \p callback. The optional element \p userptr
- * can be used to store user-defined data for access in the callback.
- * The \p xfer argument must remain valid (cannot be free'd or lose scope)
- * until the callback is issued. You can free \xfer inside the callback as
- * needed.
- * @param xfer Initialized FAT transfer.
+ * \p file, \p count, \p buffer, and \p callback. The optional element
+ * \p userptr  can be used to store user-defined data for access in the
+ * callback. The \p xfer argument must remain valid (cannot be free'd or
+ * lose scope) until the callback is issued. You can free \xfer inside the
+ * callback as needed.
+ * @param xfer Initialized FAT file transfer.
  * @return FAT_SUCCESS if the transfer was queued, otherwise error.
  */
 fat_error_t fat_WriteAsync(fat_transfer_t *xfer);
