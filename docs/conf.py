@@ -13,6 +13,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinx.ext.imgconverter',
 ]
 
 html_theme_options = {
@@ -20,6 +21,19 @@ html_theme_options = {
     'titles_only': False
 }
 
+latex_engine = 'pdflatex'
+latex_elements = {
+  'papersize': 'letterpaper',
+  'figure_align': 'H',
+  'extraclassoptions': 'openany,oneside',
+  'fncychap': r'\usepackage[Sonny]{fncychap}',
+  'pointsize': '11pt',
+  'preamble': r'''
+    \usepackage{charter}
+    \usepackage[defaultsans]{lato}
+    \usepackage{inconsolata}
+  ''',
+}
 
 templates_path = ['templates']
 source_suffix = '.rst'
