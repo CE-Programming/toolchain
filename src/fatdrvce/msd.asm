@@ -167,7 +167,8 @@ virtual at 0
 	MSD_SUCCESS rb 1
 	MSD_ERROR_INVALID_PARAM rb 1
 	MSD_ERROR_USB_FAILED rb 1
-        MSD_ERROR_SCSI_FAILED rb 1
+	MSD_ERROR_SCSI_FAILED rb 1
+	MSD_ERROR_SCSI_CHECK_CONDITION rb 1
 	MSD_ERROR_NOT_SUPPORTED rb 1
 	MSD_ERROR_INVALID_DEVICE rb 1
 	MSD_ERROR_TIMEOUT rb 1
@@ -481,10 +482,8 @@ msd_Info:
 	push	iy
 	ld	iy,(iy + 3)
 	ld	hl,scsi.readcapacity
-	lea	de,ymsd.buffer
-	push	de
 	call	scsi_sync_command	; store the logical block address / size
-	pop	de
+	lea	de,ymsd.buffer
 	pop	iy
 	jr	nz,.error
 	ld	hl,(iy + 6)
@@ -634,26 +633,28 @@ scsi_init:
 	ld	hl,scsi.inquiry		; some devices are slow to start
 	call	scsi_sync_command
 	pop	bc
-	jq	z,.inquire_success
+	jq	z,scsi_test_unit_ready
 	call	util_delay_200ms
 	djnz	.inquire_loop
 	ld	hl,MSD_ERROR_SCSI_FAILED
 	ret
-.inquire_success:
-	ld	b,5			; number of sense retries
-.sense_loop:
+
+scsi_test_unit_ready:
+	ld	b,5			; number of test unit retries
+.loop:
 	push	bc
-	ld	hl,scsi.requestsense
-	call	scsi_sync_command
 	ld	hl,scsi.testunitready
 	call	scsi_sync_command
-	pop	bc
 	jq	z,.sense_success
-	call	util_delay_200ms
-	djnz	.sense_loop
+	ld	hl,scsi.requestsense
+	call	scsi_sync_command
+	pop	bc
 	ld	hl,MSD_ERROR_SCSI_FAILED
-	ret
+	ret	nz			; super failure!
+	call	util_delay_200ms
+	djnz	.loop
 .sense_success:
+	pop	bc
 	xor	a,a
 	sbc	hl,hl			; success
 	ret
@@ -839,6 +840,10 @@ scsi_async_xfer:
 ;  sp + 9 : transferred size
 ;  sp + 12 : data
 scsi_async_done:
+	; things we could do:
+	; check residue: some devices are bad at this though?
+	; check signature: but why?
+	; check tag: but why?
 	ld	iy,0
 	add	iy,sp
 	ld	hl,(iy + 6)		; verify cbw transfer
@@ -846,16 +851,12 @@ scsi_async_done:
 	ld	iy,(iy + 12)		; xfer struct
 	jq	nz,.check_stall
 	ld	a,(ymsdXfer.csw + packetCSW.status)
-	or	a,a			; check for good status of transfer
-	jr	nz,.check_stall
-.check_valid:
-	; call the callback
-	; things we could do:
-	; check residue: some devices are bad at this though?
-	; check signature: but why?
-	; check tag: but why?
-	ld	bc,0			; success
-	jq	scsi_async_issue_callback
+	or	a,a			; cmd success
+	ld	bc,MSD_SUCCESS
+	jr	z,scsi_async_issue_callback
+	dec	a			; cmd failed (but valid csw)
+	ld	c,MSD_ERROR_SCSI_CHECK_CONDITION
+	jr	z,scsi_async_issue_callback
 .check_stall:
 	bit	0,l			; USB_TRANSFER_STALLED
 	jq	z,.failed
@@ -872,6 +873,11 @@ scsi_async_issue_callback_fail:
 	call	scsi_reset_recovery
 	pop	iy
 	ld	bc,MSD_ERROR_SCSI_FAILED
+	jq	scsi_async_issue_callback
+scsi_async_issue_callback_csw_fail:
+	ld	bc,MSD_ERROR_SCSI_CHECK_CONDITION
+	jq	scsi_async_issue_callback
+
 ; inputs:
 ;  de : status
 ;  iy : xfer struct
@@ -1039,9 +1045,10 @@ util_delay_200ms:
 setup.msdreset          setuppkt        $21,$ff,0,0,0
 setup.msdmaxlun         setuppkt        $a1,$fe,0,0,1
 
-scsi.inquiry            scsipkt         1,$0005, $12, $00,$00,$00,$05,$00
-scsi.requestsense       scsipkt         1,$0012, $03, $00,$00,$00,$12,$00
-scsi.testunitready      scsipkt         0,$0000, $00, $00,$00,$00,$00,$00
-scsi.readcapacity       scsipkt         1,$0008, $25, $00,$00,$00,$00,$00,$00,$00,$00,$00
+scsi.inquiry            scsipkt         1,$05, $12, $00,$00,$00,$05,$00
+scsi.modesense          scsipkt         1,$c0, $1a, $00,$3f,$00,$c0,$00
+scsi.requestsense       scsipkt         1,$12, $03, $00,$00,$00,$12,$00
+scsi.testunitready      scsipkt         0,$00, $00, $00,$00,$00,$00,$00
+scsi.readcapacity       scsipkt         1,$08, $25, $00,$00,$00,$00,$00,$00,$00,$00,$00
 scsi.read10             scsipktrw       1,$28
 scsi.write10            scsipktrw       0,$2a

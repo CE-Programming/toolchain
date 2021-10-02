@@ -37,6 +37,7 @@ typedef enum {
     MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
     MSD_ERROR_USB_FAILED, /**< An error occurred in usbdrvce */
     MSD_ERROR_SCSI_FAILED, /**< An error occurred in scsi transfer */
+    MSD_ERROR_SCSI_CHECK_CONDITION, /**< SCSI command failed */
     MSD_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     MSD_ERROR_INVALID_DEVICE, /**< An invalid usb device was specified */
     MSD_ERROR_TIMEOUT, /**< The transfer timed out */
