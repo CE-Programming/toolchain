@@ -575,6 +575,9 @@ end repeat
 assert ti.usbHandleKeys and $1F >= long
 	ld	(ti.usbHandleKeys),a;0
 	sbc	hl,hl
+assert endpoint.smask+1 = endpoint.cmask
+assert endpoint.smask+2 = endpoint.hubInfo
+	ld	(dummyHead.smask), hl
 assert deviceStatus+1 = tempEndpointStatus
 	ld	(deviceStatus),hl;0
 	ld	(timerList),hl;0
