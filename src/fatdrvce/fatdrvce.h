@@ -3,7 +3,7 @@
  * @brief MSD FAT Filesystem Driver
  *
  * This library can be used to communicate with Mass Storage Devices (MSD) which
- * have partitions formated as FAT32. It is recommended to make the cluster
+ * have partitions formatted as FAT32. It is recommended to make the cluster
  * allocation size at least 4KiB, however 64KiB will provide the best
  * performance.
  *
@@ -44,7 +44,7 @@ typedef enum {
 } msd_error_t;
 
 typedef struct {
-    uint8_t private[1024]; /**< Internal library use */
+    uint8_t priv[1024]; /**< Internal library use */
 } msd_t;
 
 typedef struct {
@@ -82,7 +82,8 @@ typedef enum {
     FAT_ERROR_DIRECTORY_NOT_EMPTY, /**< The directory is not empty */
     FAT_ERROR_NO_VOLUME_LABEL, /**< No volume label found for partition */
     FAT_ERROR_RDONLY, /**< The file or entry is read-only */
-    FAT_ERROR_WRONLY /**< The file or entry is write-only */
+    FAT_ERROR_WRONLY, /**< The file or entry is write-only */
+    FAT_ERROR_BUSY, /**< The file is currently processing an async command */
 } fat_error_t;
 
 typedef enum {
@@ -92,11 +93,11 @@ typedef enum {
 } fat_list_option_t;
 
 typedef struct {
-    uint8_t private[1024]; /**< Internal library use */
+    uint8_t priv[1024]; /**< Internal library use */
 } fat_t;
 
 typedef struct {
-    uint8_t private[64]; /**< Internal library use */
+    uint8_t priv[64]; /**< Internal library use */
 } fat_file_t;
 
 typedef struct {
@@ -167,7 +168,7 @@ fat_error_t fat_ClosePartition(fat_t *fat);
  * @param path Directory path to get list from.
  * @param option Listing option for files to find (e.g. FAT_LIST_FILEONLY)
  * @param entries Location to store found entries.
- * @param size Number of avaiable entries to store to in the entries argument.
+ * @param size Number of available entries to store to in the entries argument.
  *             Must be greater than or equal to 1.
  * @param skip If this function has previously been called, use this function to
  *        start parsing after this many entries.
@@ -298,8 +299,14 @@ fat_error_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
  * callback. The \p xfer argument must remain valid (cannot be free'd or
  * lose scope) until the callback is issued. You can free \xfer inside the
  * callback as needed.
+ * @note Only one asynchronous FAT transfer can be at a time to prevent
+ * serialization issues. The transfer must complete before the next one can be
+ * submitted.
  * @param xfer Initialized FAT file transfer.
  * @return FAT_SUCCESS if the transfer was queued, otherwise error.
+ * The function may return FAT_ERROR_BUSY if a transfer is pending and not
+ * yet completed, in which case the transfer can be retried (or just submitted
+ * in the pending transfer callback).
  */
 fat_error_t fat_ReadAsync(fat_transfer_t *xfer);
 
@@ -311,8 +318,14 @@ fat_error_t fat_ReadAsync(fat_transfer_t *xfer);
  * callback. The \p xfer argument must remain valid (cannot be free'd or
  * lose scope) until the callback is issued. You can free \xfer inside the
  * callback as needed.
+ * @note Only one asynchronous FAT transfer can be at a time to prevent
+ * serialization issues. The transfer must complete before the next one can be
+ * submitted.
  * @param xfer Initialized FAT file transfer.
  * @return FAT_SUCCESS if the transfer was queued, otherwise error.
+ * The function may return FAT_ERROR_BUSY if a transfer is pending and not
+ * yet completed, in which case the transfer can be retried (or just submitted
+ * in the pending transfer callback).
  */
 fat_error_t fat_WriteAsync(fat_transfer_t *xfer);
 
@@ -355,7 +368,7 @@ msd_error_t msd_Info(msd_t *msd, msd_info_t *info);
 
 /**
  * Synchronous block read.
- * @param msd Iniailized MSD structure.
+ * @param msd Initialized MSD structure.
  * @param lba Logical Block Address (LBA) of starting block to read.
  * @param num Number of blocks to read.
  * @param data Buffer to read into. Must be at least block size * count bytes.
