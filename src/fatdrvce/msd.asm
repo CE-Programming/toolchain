@@ -706,6 +706,8 @@ scsi_sync_command_callback:
 ; inputs:
 ;  iy : msd struct
 ;  hl : cbw structure
+; outputs:
+;   z : success
 scsi_sync_command:
 	lea	de,ymsd.buffer		; use the user buffer by default
 .buf:

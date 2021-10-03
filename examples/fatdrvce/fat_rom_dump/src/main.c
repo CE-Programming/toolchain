@@ -31,6 +31,15 @@ static void putstr(char *str)
     os_NewLine();
 }
 
+static uint8_t xferbuf[32768];
+
+void callback(uint24_t count, struct fat_transfer_t *xfer)
+{
+    static char buffer[212];
+    sprintf(buffer, "xfer count: %u", count);
+    putstr(buffer);
+}
+
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                                   usb_callback_data_t *global)
 {
@@ -64,6 +73,7 @@ int main(void)
     static uint8_t rombuffer[ROM_BUFFER_SIZE];
     static char buffer[212];
     static fat_partition_t partition;
+    fat_transfer_t xfer;
     static global_t global;
     static fat_t fat;
     uint8_t count;
@@ -174,15 +184,37 @@ int main(void)
     }
 
     // set the size of the rom dump
-    faterr = fat_SetSize(&file, ROM_DUMP_SIZE);
+    faterr = fat_SetSize(&file, 4096);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not set file size");
         goto fat_error;
     }
 
-    // quick return while I fix stuff
-    goto fat_error;
+    xfer.file = &file;
+    xfer.count = 1;
+    xfer.buffer = xferbuf;
+    xfer.callback = callback;
+    xfer.userptr = NULL;
+
+
+    for (uint8_t i = 0; i < 10; ++i)
+{
+    faterr = fat_ReadAsync(&xfer);
+    if (faterr != FAT_SUCCESS)
+    {
+        putstr("could not submit fat xfer");
+        goto fat_error;
+    }
+
+    while (!os_GetCSC())
+    {
+       usberr = usb_HandleEvents();
+       if (usberr != USB_SUCCESS)
+           break;
+    }
+	}
+    goto debug_exit;
 
     // write the rom file, starting at the memory base address
     // dma only works from ram, so copy to a temporary buffer
@@ -191,6 +223,7 @@ int main(void)
         memcpy(rombuffer, (const void *)i, ROM_BUFFER_SIZE);
     }
 
+debug_exit:
     // close the file
     faterr = fat_Close(&file);
     if (faterr != FAT_SUCCESS)

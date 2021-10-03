@@ -73,7 +73,7 @@ typedef enum {
     FAT_ERROR_MSD_FAILED, /**< An error occurred in a MSD request */
     FAT_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     FAT_ERROR_INVALID_CLUSTER, /**< An invalid FAT cluster was accessed */
-    FAT_ERROR_EOF, /**< End-of-file was encountered */
+    FAT_ERROR_INVALID_POSITION, /**< An invalid position in the file */
     FAT_ERROR_NOT_FOUND, /**< The partition, file, or entry does not exist */
     FAT_ERROR_EXISTS, /**< The file or entry already exists */
     FAT_ERROR_INVALID_PATH, /**< An invalid path was provided */
@@ -87,9 +87,9 @@ typedef enum {
 } fat_error_t;
 
 typedef enum {
-    FAT_LIST_FILEONLY, /**< For listing only files. */
-    FAT_LIST_DIRONLY, /**< For listing only directories. */
-    FAT_LIST_ALL /**< For listing files and directories. */
+    FAT_LIST_FILEONLY, /**< For listing only files */
+    FAT_LIST_DIRONLY, /**< For listing only directories */
+    FAT_LIST_ALL /**< For listing files and directories */
 } fat_list_option_t;
 
 typedef struct {
@@ -106,7 +106,7 @@ typedef struct {
 } fat_partition_t;
 
 typedef struct {
-    char filename[13]; /**< Name of file in 8.3 format. */
+    char filename[13]; /**< Name of file in 8.3 format */
     uint8_t attrib; /**< File attributes */
     uint32_t size; /**< Size of file in bytes */
 } fat_dir_entry_t;
@@ -115,19 +115,20 @@ typedef struct fat_transfer_t {
     fat_file_t *file; /**< Pointer to open file */
     uint24_t count; /**< Number of blocks to transfer */
     void *buffer; /**< Pointer to data location to read/write */
-    void (*callback)(fat_error_t error, struct fat_transfer_t *xfer); /**< Called when transfer completes */
+    /**< Called when transfer completes, \p count is number of blocks
+         read/written, while \p xfer is the transfer issued */
+    void (*callback)(uint24_t count, struct fat_transfer_t *xfer);
     void *userptr; /**< Custom user data for callback (optional) */
-    void *next; /**< Internal library use */
-    msd_transfer_t xfer; /**< Internal library use */
+    uint8_t priv[sizeof(msd_transfer_t) + 12]; /**< Internal library use */
 } fat_transfer_t;
 
-#define FAT_FILE      (0 << 0)  /**< Entry has no attributes. */
-#define FAT_RDONLY    (1 << 0)  /**< Entry is read-only. */
-#define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden. */
-#define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory. */
-#define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory. */
-#define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory). */
-#define FAT_ARCHIVE   (1 << 5)  /**< Entry is a directory (or subdirectory). */
+#define FAT_FILE      (0 << 0)  /**< Entry has no attributes */
+#define FAT_RDONLY    (1 << 0)  /**< Entry is read-only */
+#define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden */
+#define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory */
+#define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory */
+#define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory) */
+#define FAT_ARCHIVE   (1 << 5)  /**< Entry is a directory (or subdirectory) */
 
 /**
  * Locates any available FAT partitions detected on the mass storage device
@@ -278,9 +279,9 @@ fat_error_t fat_SetSize(fat_file_t *file, uint32_t size);
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to read.
  * @param buffer Data read from FAT file.
- * @return FAT_SUCCESS on success, otherwise error.
+ * @return Returns number of blocks read, should equal \p count if success.
  */
-fat_error_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
+uint24_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
 
 /**
  * Synchronous write for multiple blocks. Advances file block offset position.
@@ -288,8 +289,9 @@ fat_error_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
  * @param count Number of blocks to write to file.
  * @param buffer Data to write to FAT file.
  * @return FAT_SUCCESS on success, otherwise error.
+ * @return Returns number of blocks written, should equal \p count if success.
  */
-fat_error_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
+uint24_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
 
 /**
  * Asynchronous read for multiple blocks. Advances file block offset position.
