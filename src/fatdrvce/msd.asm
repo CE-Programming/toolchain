@@ -379,7 +379,14 @@ msd_Close:
 ;  hl = error status
 	pop	hl
 	ex	(sp),iy
-	push	hl,iy
+	push	hl
+	ld	hl,scsi.synchronizecache
+	call	scsi_sync_command
+	jq	z,.done
+	ld	hl,scsi.requestsense
+	call	scsi_sync_command
+.done:
+	push	iy
 	ld	hl,(ymsd.dev)
 	push	hl
 	call	usb_UnrefDevice
@@ -460,8 +467,6 @@ msd_Reset:
 	ld	(ymsd.haslast),a
 	ld	(ymsd.tag + 0),hl
 	ld	(ymsd.tag + 3),a	; reset tag
-	ld	a,(ymsd.interface)
-	ld	(setup.msdreset + 4),a
 ;	call	util_msd_reset		; some drives were written by idiots
 ;	compare_hl_zero			; (looking at you sandisk!) and they
 ;	ret	nz			; can't be reset -- just don't even try
@@ -1061,13 +1066,15 @@ util_delay_200ms:
 ; utility data
 ;-------------------------------------------------------------------------------
 
-setup.msdreset          setuppkt        $21,$ff,0,0,0
+;setup.msdreset          setuppkt        $21,$ff,0,0,0
 setup.msdmaxlun         setuppkt        $a1,$fe,0,0,1
 
-scsi.inquiry            scsipkt         1,$05, $12, $00,$00,$00,$05,$00
-scsi.modesense          scsipkt         1,$c0, $1a, $00,$3f,$00,$c0,$00
-scsi.requestsense       scsipkt         1,$12, $03, $00,$00,$00,$12,$00
-scsi.testunitready      scsipkt         0,$00, $00, $00,$00,$00,$00,$00
-scsi.readcapacity       scsipkt         1,$08, $25, $00,$00,$00,$00,$00,$00,$00,$00,$00
+scsi.inquiry            scsipkt         1,$05, $12,$00,$00,$00,$05,$00
+scsi.modesense          scsipkt         1,$c0, $1a,$00,$3f,$00,$c0,$00
+scsi.requestsense       scsipkt         1,$12, $03,$00,$00,$00,$12,$00
+scsi.testunitready      scsipkt         0,$00, $00,$00,$00,$00,$00,$00
+scsi.readcapacity       scsipkt         1,$08, $25,$00,$00,$00,$00,$00,$00,$00,$00,$00
+scsi.synchronizecache   scsipkt         0,$00, $35,$00,$00,$00,$00,$00,$00,$00,$00,$00
+
 scsi.read10             scsipktrw       1,$28
 scsi.write10            scsipktrw       0,$2a
