@@ -455,9 +455,16 @@ msd_Reset:
 	ld	hl,MSD_ERROR_INVALID_PARAM
 	ret
 .configured:
-	call	util_msd_reset
-	compare_hl_zero
-	ret	nz
+	xor	a,a
+	sbc	hl,hl
+	ld	(ymsd.haslast),a
+	ld	(ymsd.tag + 0),hl
+	ld	(ymsd.tag + 3),a	; reset tag
+	ld	a,(ymsd.interface)
+	ld	(setup.msdreset + 4),a
+;	call	util_msd_reset		; some drives were written by idiots
+;	compare_hl_zero			; (looking at you sandisk!) and they
+;	ret	nz			; can't be reset -- just don't even try
 	call	util_msd_get_max_lun
 	compare_hl_zero
 	ret	nz
@@ -628,37 +635,52 @@ msd_WriteAsync:
 ;  iy : msd struct
 scsi_init:
 	ld	b,5			; number of inquire retries
-.inquire_loop:
+.loop:
 	push	bc
 	ld	hl,scsi.inquiry		; some devices are slow to start
 	call	scsi_sync_command
 	pop	bc
 	jq	z,scsi_test_unit_ready
 	call	util_delay_200ms
-	djnz	.inquire_loop
+	djnz	.loop
+.error:
 	ld	hl,MSD_ERROR_SCSI_FAILED
 	ret
-
 scsi_test_unit_ready:
-	ld	b,5			; number of test unit retries
+	ld	b,15			; number of test unit retries
 .loop:
 	push	bc
 	ld	hl,scsi.testunitready
 	call	scsi_sync_command
-	jq	z,.sense_success
+	jq	z,.done
 	ld	hl,scsi.requestsense
 	call	scsi_sync_command
 	pop	bc
-	ld	hl,MSD_ERROR_SCSI_FAILED
-	ret	nz			; super failure!
+	jq	nz,scsi_init.error
 	call	util_delay_200ms
 	djnz	.loop
-.sense_success:
+	jq	scsi_init.error
+.done:
+	pop	bc
+scsi_read_capacity:
+	ld	b,5			; number of read capacitiy retries
+.loop:
+	push	bc
+	ld	hl,scsi.readcapacity
+	call	scsi_sync_command
+	jq	z,.done
+	ld	hl,scsi.requestsense
+	call	scsi_sync_command
+	pop	bc
+	jq	nz,scsi_init.error
+	call	util_delay_200ms
+	djnz	.loop
+	jq	scsi_init.error
+.done:
 	pop	bc
 	xor	a,a
 	sbc	hl,hl			; success
 	ret
-
 
 ; inputs:
 ;  sp + 3 : status
@@ -869,13 +891,10 @@ scsi_async_done:
 ; inputs:
 ;  iy : xfer struct
 scsi_async_issue_callback_fail:
-	push	iy
-	call	scsi_reset_recovery
-	pop	iy
+;	push	iy			; some drives die upon reset
+;	call	scsi_reset_recovery	; so just don't reset them, even though
+;	pop	iy			; the spec says I should
 	ld	bc,MSD_ERROR_SCSI_FAILED
-	jq	scsi_async_issue_callback
-scsi_async_issue_callback_csw_fail:
-	ld	bc,MSD_ERROR_SCSI_CHECK_CONDITION
 	jq	scsi_async_issue_callback
 
 ; inputs:
@@ -913,22 +932,22 @@ scsi_async_issue_callback:
 
 ; inputs:
 ;  iy : xfer struct
-scsi_reset_recovery:
-	ld	iy,(ymsdXfer.msd)
-	jq	util_msd_reset		; perform reset, usbdrvce clears stalls
+;scsi_reset_recovery:
+;	ld	iy,(ymsdXfer.msd)
+;	jq	util_msd_reset		; perform reset, usbdrvce clears stalls
 
 ; inputs:
 ;  iy : msd structure
-util_msd_reset:
-	xor	a,a
-	sbc	hl,hl
-	ld	(ymsd.haslast),a
-	ld	(ymsd.tag + 0),hl
-	ld	(ymsd.tag + 3),a	; reset tag
-	ld	a,(ymsd.interface)
-	ld	(setup.msdreset + 4),a
-	ld	hl,setup.msdreset
-	jq	util_msd_ctl_packet
+;util_msd_reset:
+;	xor	a,a
+;	sbc	hl,hl
+;	ld	(ymsd.haslast),a
+;	ld	(ymsd.tag + 0),hl
+;	ld	(ymsd.tag + 3),a	; reset tag
+;	ld	a,(ymsd.interface)
+;	ld	(setup.msdreset + 4),a
+;	ld	hl,setup.msdreset
+;	jq	util_msd_ctl_packet
 
 ; inputs:
 ;  iy : msd structure
