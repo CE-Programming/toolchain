@@ -3092,7 +3092,7 @@ end virtual
 assert .nop = 0
 	xor	a,a
 	ld	c,a
-	call	_RetireTransfer
+	call	_RetireFirstTransfer
 	ret	nc
 	bitmsk	xendpoint.internalFlags.freed
 	jq	z,.loop
@@ -3111,7 +3111,7 @@ virtual
 	load .ret_z: $-$$ from $$
 end virtual
 	ld	a,.ret_z
-	call	_RetireTransfer
+	call	_RetireFirstTransfer
 	jq	nz,_FlushEndpoint.check
 	bitmsk	xendpoint.internalFlags.freed
 .dangling:
@@ -3154,7 +3154,7 @@ end virtual
 assert .nop = 0
 	xor	a,a
 	sbc	hl,hl
-	call	_RetireTransfer
+	call	_RetireFirstTransfer
 	ret	nc
 _FlushEndpoint.check:
 	bitmsk	xendpoint.internalFlags.freed
@@ -3211,16 +3211,21 @@ assert endpoint.overlay.altNext+2 = endpoint.overlay.status-2
 ;  hl = 0 | error
 ;  ix = endpoint (maybe just freed)
 ;  iy = ignored transfer | ?
-_RetireTransfer:
+_RetireFirstTransfer:
 	bitmsk	xendpoint.internalFlags.refCnt
 	setmsk	xendpoint.internalFlags.refCnt
 	ld	de,(xendpoint.first)
 	push	af,de,bc
+.loop:
+	push	de
+	pop	ytransfer
 	ld	de,(ytransfer.altNext)
 	bit	0,de
 	jq	z,.alt
 	ld	de,(ytransfer.next)
 .alt:
+	bitmsk	ytransfer.type.ioc
+	jq	z,.loop
 	ld	(xendpoint.first),de
 	ld	de,(ytransfer.data+0)
 	ld	a,(ytransfer.data+3)
@@ -3734,7 +3739,8 @@ end virtual
 	call	_FreeTransferData
 .disable:
 	call	_HandlePortPortEnInt.disable
-.returnCarry:
+	ret	nz
+	or	a,a
 	sbc	hl,hl
 	ret
 
@@ -4297,6 +4303,7 @@ _HandleAsyncAdvInt:
 	jq	nz,.loop
 	scf
 .scheduleCleanup.de:
+	ret	nz
 	ex	de,hl
 .scheduleCleanup.hl:
 	ret	nz
