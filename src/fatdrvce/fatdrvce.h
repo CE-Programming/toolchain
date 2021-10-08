@@ -26,16 +26,16 @@ extern "C" {
 #define FAT_BLOCK_SIZE 512 /**< Block size in bytes */
 
 /**
- * A pointer to \c fat_callback_user_t is passed to the user-provided callback
- * functions in \c fat_ops_t.
+ * A pointer to \c fat_callback_data_t is passed to the user-provided callback
+ * functions.
  * The default is void *, but this can be changed by doing:
  * \code
- * #define fat_callback_user_t struct my_fat_callback_data
+ * #define fat_callback_data_t struct my_fat_callback_data
  * #include <fatdrvce.h>
  * \endcode
  */
-#ifndef fat_callback_user_t
-#define fat_callback_user_t void
+#ifndef fat_callback_data_t
+#define fat_callback_data_t void
 #endif
 
 typedef enum {
@@ -52,8 +52,8 @@ typedef enum {
     FAT_ERROR_DIRECTORY_NOT_EMPTY, /**< The directory is not empty */
     FAT_ERROR_NO_VOLUME_LABEL, /**< No volume label found for partition */
     FAT_ERROR_RDONLY, /**< The file or entry is read-only */
-    FAT_ERROR_BUSY, /**< The file is currently processing an async command */
-    FAT_USER_ERROR = 100, /**< Custom user error codes from callbacks start */
+    FAT_ERROR_RW_FAILED, /**< The callback read failed to read/write */
+    FAT_ERROR_INVALID_FILESYSTEM, /**< Attempted to initialize a non-FAT filesystem */
 } fat_error_t;
 
 typedef enum {
@@ -63,10 +63,11 @@ typedef enum {
 } fat_list_option_t;
 
 typedef struct {
-    uint24_t (*read)(fat_callback_user_t *user, buffer, lba, count);
-    uint24_t (*write)(fat_callback_user_t *user, buffer, lba, count);
-    uint32_t first;
-    uint32_t last;
+    uint24_t (*read)(fat_callback_data_t *usr, uint32_t lba, uint24_t count, void *buffer);
+    uint24_t (*write)(fat_callback_data_t *usr, uint32_t lba, uint24_t count, const void *buffer);
+    fat_callback_data_t *usr;
+    uint32_t lba;
+    uint32_t count;
     uint8_t priv[1024]; /**< Internal library use */
 } fat_t;
 
@@ -96,8 +97,11 @@ typedef struct {
  * Before calling this function, the following elements must be set:
  *     \p read: Callback for reading logical blocks.
  *     \p write: Callback for writing logical blocks.
- *     \p first: First Logical Block Address (LBA) in the filesystem.
- *     \p last: Last Logical Block Address (LBA) in the filesystem.
+ *     \p lba: First Logical Block Address (LBA) in the filesystem.
+ *     \p count: Number of logical blocks in the filesystem.
+ *     \p usr: Pointer to user-provided data structure that is passed to the
+ *       relevant read/write callback functions. This can be used to store
+ *       context information when working with different storage mechanisms.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Init(fat_t *fat);

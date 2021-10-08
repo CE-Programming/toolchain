@@ -18,6 +18,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export msd_Write
 	export msd_ReadAsync
 	export msd_WriteAsync
+	export msd_FindPartitions
 ;-------------------------------------------------------------------------------
 
 include 'macros.inc'

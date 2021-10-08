@@ -1,7 +1,9 @@
 typedef struct global global_t;
 #define usb_callback_data_t global_t
+#define fat_callback_data_t msd_t
 
 #include <usbdrvce.h>
+#include <msddrvce.h>
 #include <fatdrvce.h>
 #include <tice.h>
 
@@ -29,15 +31,6 @@ static void putstr(char *str)
 {
     os_PutStrFull(str);
     os_NewLine();
-}
-
-static uint8_t xferbuf[32768];
-
-void callback(uint24_t count, struct fat_transfer_t *xfer)
-{
-    static char buffer[212];
-    sprintf(buffer, "xfer count: %u", count);
-    putstr(buffer);
 }
 
 static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
@@ -72,8 +65,7 @@ int main(void)
 {
     static uint8_t rombuffer[ROM_BUFFER_SIZE];
     static char buffer[212];
-    static fat_partition_t partition;
-    fat_transfer_t xfer;
+    static msd_partition_t partitions[4];
     static global_t global;
     static fat_t fat;
     uint8_t count;
@@ -146,15 +138,22 @@ int main(void)
     putstr(buffer);
 
     // locate the first fat partition available
-    faterr = fat_FindPartitions(&global.msd, &partition, &count, 1);
-    if (faterr != FAT_SUCCESS || count < 1)
+    count = msd_FindPartitions(&global.msd, partitions, 4);
+    if (count < 1)
     {
         putstr("no paritions found");
         goto msd_error;
     }
 
     // attempt to open the first fat partition
-    faterr = fat_OpenPartition(&fat, &partition);
+    // it is not required to use a MSD to access a FAT filesystem if the
+    // appropriate callbacks are configured.
+    fat.read = &msd_Read;
+    fat.write = &msd_Write;
+    fat.usr = &global.msd;
+    fat.lba = partitions[0].lba;
+    fat.count = partitions[0].count;
+    faterr = fat_Init(&fat);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not open partition");
@@ -191,31 +190,6 @@ int main(void)
         goto fat_error;
     }
 
-    xfer.file = &file;
-    xfer.count = 1;
-    xfer.buffer = xferbuf;
-    xfer.callback = callback;
-    xfer.userptr = NULL;
-
-
-    for (uint8_t i = 0; i < 10; ++i)
-{
-    faterr = fat_ReadAsync(&xfer);
-    if (faterr != FAT_SUCCESS)
-    {
-        putstr("could not submit fat xfer");
-        goto fat_error;
-    }
-
-    while (!os_GetCSC())
-    {
-       usberr = usb_HandleEvents();
-       if (usberr != USB_SUCCESS)
-           break;
-    }
-	}
-    goto debug_exit;
-
     // write the rom file, starting at the memory base address
     // dma only works from ram, so copy to a temporary buffer
     for (i = 0; i < ROM_DUMP_SIZE; i += ROM_BUFFER_SIZE)
@@ -223,7 +197,6 @@ int main(void)
         memcpy(rombuffer, (const void *)i, ROM_BUFFER_SIZE);
     }
 
-debug_exit:
     // close the file
     faterr = fat_Close(&file);
     if (faterr != FAT_SUCCESS)
@@ -235,8 +208,8 @@ debug_exit:
     putstr("dumped rom!");
 
 fat_error:
-    // close the partition
-    fat_ClosePartition(&fat);
+    // close the filesystem
+    fat_Deinit(&fat);
 
 msd_error:
     // close the msd device

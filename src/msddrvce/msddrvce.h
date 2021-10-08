@@ -7,7 +7,7 @@
  *
  * Currently only drives with a logical block size of 512 bytes are supported,
  * which is the most common block size available. Larger drives and SSDs may
- * not work.
+ * not work. The maximum drive size is 2TiB.
  *
  * The drive must use MBR partitioning, GPT and others are not yet supported.
  *
@@ -62,8 +62,8 @@ typedef struct msd_transfer_t {
 } msd_transfer_t;
 
 typedef struct {
-    uint32_t first; /**< First Logical Block Address (LBA) of partition */
-    uint32_t last; /**< Last Logical Block Address (LBA) of partition */
+    uint32_t lba; /**< First Logical Block Address (LBA) of partition */
+    uint32_t count; /**< Number of Logical Blocks in partition */
 } msd_partition_t;
 
 /**
