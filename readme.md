@@ -1,4 +1,4 @@
-# CE C Toolchain  [![Build Status](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?branch=llvm&event=push)](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?event=push) [![Discord Chat Link](https://img.shields.io/discord/432891584451706892?logo=discord)](https://discord.com/invite/gkHzdGWRfG)
+# CE C Toolchain  [![Build Status](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?branch=llvm&event=push)](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?event=push) [![Discord Chat Link](https://img.shields.io/discord/432891584451706892?logo=discord)](https://discord.gg/TRkN5UcUzs)
 
 The CE C Toolchain incorporates a variety of tools in order to build programs in C/C++ natively for the TI-84 Plus CE calculator series.
 
@@ -9,7 +9,7 @@ This site hosts all the information for working with the toolchain.
 
 ## Getting Help
 
-You can join us on the `CE Programming` Discord server in the `#ez80-dev` channel: [Discord Chat Link](https://discord.com/invite/gkHzdGWRfG).\
+You can join us on the `CE Programming` Discord server in the `#ez80-dev` channel: [Discord Chat Link](https://discord.gg/TRkN5UcUzs).\
 If you prefer IRC, the chat is also bridged to the Efnet channel `#ez80-dev`.
 
 Depending on how active the channel is you might not get a response.\

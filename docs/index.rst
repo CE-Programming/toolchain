@@ -9,7 +9,7 @@ If this is your first introduction to the CE C Toolchain, check out the :ref:`ge
 You can join us on the :code:`CE Programming` Discord server in the :code:`#ez80-dev` channel by clicking the below invite button if you have any questions.
 
 .. image:: https://img.shields.io/discord/432891584451706892?color=blue&label=discord&style=for-the-badge
-   :target: https://discord.com/invite/gkHzdGWRfG
+   :target: https://discord.gg/TRkN5UcUzs
 
 The toolchain works natively across all major OSes, and has been developed by a few
 people who find the challenge entertaining. If you are interested in contributing your expertise,
