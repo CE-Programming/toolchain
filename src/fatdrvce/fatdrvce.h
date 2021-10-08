@@ -1,17 +1,12 @@
 /**
  * @file
- * @brief MSD FAT Filesystem Driver
+ * @brief FAT Filesystem Driver
  *
- * This library can be used to communicate with Mass Storage Devices (MSD) which
- * have partitions formatted as FAT32. It is recommended to make the cluster
- * allocation size at least 4KiB, however 64KiB will provide the best
- * performance.
+ * This library can be used to interface with a FAT32 block-based filesystem.
  *
- * Currently only drives with a logical block size of 512 bytes are supported,
- * which is the most common block size available. Larger drives and SSDs may
- * not work.
- *
- * The drive must use MBR partitioning, GPT and others are not yet supported.
+ * Only FAT filesystems with a logical block size of 512 bytes are supported.
+ * For best performance, the cluster allocation size should be set to the
+ * maxium allowed.
  *
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
@@ -28,49 +23,24 @@
 extern "C" {
 #endif
 
-/* MSD structures */
+#define FAT_BLOCK_SIZE 512 /**< Block size in bytes */
 
-#define MSD_BLOCK_SIZE 512 /**< Block size in bytes */
-
-typedef enum {
-    MSD_SUCCESS = 0, /**< Operation was successful */
-    MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
-    MSD_ERROR_USB_FAILED, /**< An error occurred in usbdrvce */
-    MSD_ERROR_SCSI_FAILED, /**< An error occurred in scsi transfer */
-    MSD_ERROR_SCSI_CHECK_CONDITION, /**< SCSI command failed */
-    MSD_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
-    MSD_ERROR_INVALID_DEVICE, /**< An invalid usb device was specified */
-    MSD_ERROR_TIMEOUT, /**< The transfer timed out */
-} msd_error_t;
-
-typedef struct {
-    uint8_t priv[1024]; /**< Internal library use */
-} msd_t;
-
-typedef struct {
-    uint32_t bsize; /**< Size of each block in bytes */
-    uint32_t bnum; /**< Number of blocks on MSD */
-} msd_info_t;
-
-typedef struct msd_transfer_t {
-    msd_t *msd; /**< Initialized MSD device */
-    uint32_t lba; /**< Logical block address */
-    void *buffer; /**< Pointer to data location to read/write */
-    uint24_t count; /**< Number of blocks to transfer */
-    void (*callback)(msd_error_t error, struct msd_transfer_t *xfer); /**< Called when transfer completes */
-    void *userptr; /**< Custom user data for callback (optional) */
-    void *next; /**< Internal library use */
-    uint8_t stall; /**< Internal library use */
-    uint8_t cbw[31+1]; /**< Internal library use */
-    uint8_t csw[13+19]; /**< Internal library use */
-} msd_transfer_t;
-
-/* FAT structures */
+/**
+ * A pointer to \c fat_callback_user_t is passed to the user-provided callback
+ * functions in \c fat_ops_t.
+ * The default is void *, but this can be changed by doing:
+ * \code
+ * #define fat_callback_user_t struct my_fat_callback_data
+ * #include <fatdrvce.h>
+ * \endcode
+ */
+#ifndef fat_callback_user_t
+#define fat_callback_user_t void
+#endif
 
 typedef enum {
     FAT_SUCCESS = 0, /**< Operation was successful */
     FAT_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
-    FAT_ERROR_MSD_FAILED, /**< An error occurred in a MSD request */
     FAT_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     FAT_ERROR_INVALID_CLUSTER, /**< An invalid FAT cluster was accessed */
     FAT_ERROR_INVALID_POSITION, /**< An invalid position in the file */
@@ -82,8 +52,8 @@ typedef enum {
     FAT_ERROR_DIRECTORY_NOT_EMPTY, /**< The directory is not empty */
     FAT_ERROR_NO_VOLUME_LABEL, /**< No volume label found for partition */
     FAT_ERROR_RDONLY, /**< The file or entry is read-only */
-    FAT_ERROR_WRONLY, /**< The file or entry is write-only */
     FAT_ERROR_BUSY, /**< The file is currently processing an async command */
+    FAT_USER_ERROR = 100, /**< Custom user error codes from callbacks start */
 } fat_error_t;
 
 typedef enum {
@@ -93,6 +63,10 @@ typedef enum {
 } fat_list_option_t;
 
 typedef struct {
+    uint24_t (*read)(fat_callback_user_t *user, buffer, lba, count);
+    uint24_t (*write)(fat_callback_user_t *user, buffer, lba, count);
+    uint32_t first;
+    uint32_t last;
     uint8_t priv[1024]; /**< Internal library use */
 } fat_t;
 
@@ -101,26 +75,10 @@ typedef struct {
 } fat_file_t;
 
 typedef struct {
-    uint32_t lba; /**< Logical Block Address (LBA) of FAT partition */
-    msd_t *msd; /**< MSD containing FAT filesystem */
-} fat_partition_t;
-
-typedef struct {
     char filename[13]; /**< Name of file in 8.3 format */
     uint8_t attrib; /**< File attributes */
     uint32_t size; /**< Size of file in bytes */
 } fat_dir_entry_t;
-
-typedef struct fat_transfer_t {
-    fat_file_t *file; /**< Pointer to open file */
-    uint24_t count; /**< Number of blocks to transfer */
-    void *buffer; /**< Pointer to data location to read/write */
-    /**< Called when transfer completes, \p count is number of blocks
-         read/written, while \p xfer is the transfer issued */
-    void (*callback)(uint24_t count, struct fat_transfer_t *xfer);
-    void *userptr; /**< Custom user data for callback (optional) */
-    uint8_t priv[sizeof(msd_transfer_t) + 12]; /**< Internal library use */
-} fat_transfer_t;
 
 #define FAT_FILE      (0 << 0)  /**< Entry has no attributes */
 #define FAT_RDONLY    (1 << 0)  /**< Entry is read-only */
@@ -131,37 +89,28 @@ typedef struct fat_transfer_t {
 #define FAT_ARCHIVE   (1 << 5)  /**< Entry is a directory (or subdirectory) */
 
 /**
- * Locates any available FAT partitions detected on the mass storage device
- * (MSD). You must allocate space for \p partitions before calling this
- * function, as well as passing a valid msd_t returned from msd_Open.
- * @param msd Initialized MSD structure returned from msd_Open.
- * @param partitions Returned array of FAT partitions available.
- * @param number Returned number of FAT partitions found.
- * @param max The maximum number of FAT partitions that can be found.
- * @return USB_SUCCESS on success, otherwise error.
- */
-fat_error_t fat_FindPartitions(msd_t *msd, fat_partition_t *partitions,
-                               uint8_t *number, uint8_t max);
-
-/**
  * Initializes the FAT filesystem and allows other FAT functions to be used.
- * Before calling this function, you must use fat_Find in order to
- * locate a valid FAT partition.
- * @param fat Uninitialized FAT structure type.
- * @param partition Available FAT partition returned from fat_Find.
+ * This function will read and verify that a valid FAT filesystem is being
+ * accessed.
+ * @param fat FAT structure type.
+ * Before calling this function, the following elements must be set:
+ *     \p read: Callback for reading logical blocks.
+ *     \p write: Callback for writing logical blocks.
+ *     \p first: First Logical Block Address (LBA) in the filesystem.
+ *     \p last: Last Logical Block Address (LBA) in the filesystem.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_OpenPartition(fat_t *fat, fat_partition_t *partition);
+fat_error_t fat_Init(fat_t *fat);
 
 /**
  * Deinitialize the FAT filesystem. This is not required to be called, however
- * it will clear the filesystem dirty bit so other OSes don't see the drive as
- * having potential errors. You cannot use the FAT structure after this call,
- * and should call fat_OpenPartition if you need to modify the filesystem again.
+ * it will clear the filesystem dirty bit so other OSes don't see the filesystem
+ * with potential errors. You cannot use the FAT structure after this call,
+ * and should call fat_Init if you need to modify the filesystem again.
  * @param fat Initialized FAT structure type.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_ClosePartition(fat_t *fat);
+fat_error_t fat_Deinit(fat_t *fat);
 
 /**
  * Parses a directory and returns a list of files and subdirectories in it.
@@ -205,8 +154,7 @@ fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
                  FAT_HIDDEN, FAT_SYSTEM, and FAT_DIR.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_Create(fat_t *fat, const char *path,
-                       const char *name, uint8_t attrib);
+fat_error_t fat_Create(fat_t *fat, const char *path, const char *name, uint8_t attrib);
 
 /**
  * Deletes a file or directory and deallocates the spaced used by it on disk.
@@ -237,6 +185,19 @@ fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
 uint8_t fat_GetAttrib(fat_t *fat, const char *filepath);
 
 /**
+ * Sets the size of the file, allocating or deallocating space as needed.
+ * This function should be called before attempting to write in a file that
+ * does not have a large enough current file size, (i.e. a newly created file),
+ * otherwise writes may always return FAT_ERROR_EOF.
+ * @param file FAT file structure.
+ * @param size New file size.
+ * @return FAT_SUCCESS on success, otherwise error.
+ * @note This function sets the file offset back to the first block, regardless
+ *       of the change in size.
+ */
+fat_error_t fat_SetSize(fat_file_t *file, uint32_t size);
+
+/**
  * Gets the size of a file.
  * @param fat Initialized FAT structure.
  * @param filepath Absolute file path.
@@ -262,19 +223,6 @@ fat_error_t fat_Open(fat_file_t *file, fat_t *fat, const char *filepath);
 fat_error_t fat_SetPos(fat_file_t *file, uint24_t block);
 
 /**
- * Sets the size of the file, allocating or deallocating space as needed.
- * This function should be called before attempting to write in a file that
- * does not have a large enough current file size, (i.e. a newly created file),
- * otherwise writes may always return FAT_ERROR_EOF.
- * @param file FAT file structure.
- * @param size New file size.
- * @return FAT_SUCCESS on success, otherwise error.
- * @note This function sets the file offset back to the first block, regardless
- *       of the change in size.
- */
-fat_error_t fat_SetSize(fat_file_t *file, uint32_t size);
-
-/**
  * Synchronous read for multiple blocks. Advances file block offset position.
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to read.
@@ -294,125 +242,11 @@ uint24_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
 uint24_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
 
 /**
- * Asynchronous read for multiple blocks. Advances file block offset position.
- * You must set the following \p xfer elements:
- * \p file, \p count, \p buffer, and \p callback. The optional element
- * \p userptr  can be used to store user-defined data for access in the
- * callback. The \p xfer argument must remain valid (cannot be free'd or
- * lose scope) until the callback is issued. You can free \xfer inside the
- * callback as needed.
- * @note Only one asynchronous FAT transfer can be at a time to prevent
- * serialization issues. The transfer must complete before the next one can be
- * submitted.
- * @param xfer Initialized FAT file transfer.
- * @return FAT_SUCCESS if the transfer was queued, otherwise error.
- * The function may return FAT_ERROR_BUSY if a transfer is pending and not
- * yet completed, in which case the transfer can be retried (or just submitted
- * in the pending transfer callback).
- */
-fat_error_t fat_ReadAsync(fat_transfer_t *xfer);
-
-/**
- * Asynchronous write for multiple blocks. Advances file block offset position.
- * You must set the following \p xfer elements:
- * \p file, \p count, \p buffer, and \p callback. The optional element
- * \p userptr  can be used to store user-defined data for access in the
- * callback. The \p xfer argument must remain valid (cannot be free'd or
- * lose scope) until the callback is issued. You can free \xfer inside the
- * callback as needed.
- * @note Only one asynchronous FAT transfer can be at a time to prevent
- * serialization issues. The transfer must complete before the next one can be
- * submitted.
- * @param xfer Initialized FAT file transfer.
- * @return FAT_SUCCESS if the transfer was queued, otherwise error.
- * The function may return FAT_ERROR_BUSY if a transfer is pending and not
- * yet completed, in which case the transfer can be retried (or just submitted
- * in the pending transfer callback).
- */
-fat_error_t fat_WriteAsync(fat_transfer_t *xfer);
-
-/**
  * Closes an open file handle.
  * @param file File handle returned from fat_Open.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Close(fat_file_t *file);
-
-/**
- * Initialize a Mass Storage Device.
- * @param msd Uninitilaized MSD device structure.
- * @param usb Initialized USB device structure.
- * @return MSD_SUCCESS on success, otherwise error.
- */
-msd_error_t msd_Open(msd_t *msd, usb_device_t usb);
-
-/**
- * Closes and deinitializes a Mass Storage Device. This function should be
- * called in the \c USB_DEVICE_DISCONNECTED_EVENT in the USB handler callback.
- * @param msd Initialized MSD device structure.
- */
-void msd_Close(msd_t *msd);
-
-/**
- * Attempts to reset and restore normal working order of the device.
- * @param msd Initialized MSD device structure.
- * @return MSD_SUCCESS on success, otherwise error.
- */
-msd_error_t msd_Reset(msd_t *msd);
-
-/**
- * Gets the number of and size of each logical block on the device.
- * @param msd Initialized MSD device structure.
- * @param info Pointer to store MSD information to.
- * @return MSD_SUCCESS on success.
- */
-msd_error_t msd_Info(msd_t *msd, msd_info_t *info);
-
-/**
- * Synchronous block read.
- * @param msd Initialized MSD structure.
- * @param lba Logical Block Address (LBA) of starting block to read.
- * @param num Number of blocks to read.
- * @param data Buffer to read into. Must be at least block size * count bytes.
- * @return MSD_SUCCESS on success.
- */
-msd_error_t msd_Read(msd_t *msd, uint32_t lba,
-                     uint24_t count, void *buffer);
-
-/**
- * Synchronous block write.
- * @param msd Iniailized MSD structure.
- * @param lba Logical Block Address (LBA) of starting block to read.
- * @param num Number of blocks to read.
- * @param data Buffer to read into. Must be at least block size * count bytes.
- * @return MSD_SUCCESS on success.
- */
-msd_error_t msd_Write(msd_t *msd, uint32_t lba,
-                      uint24_t count, const void *buffer);
-
-/**
- * Asynchronous block read. You must set the following \p xfer elements:
- * \p msd, \p lba, \p buffer, \p count, \p callback. The optional element
- * \p userptr can be used to store user-defined data for access in the callback.
- * The \p xfer argument must remain valid (cannot be free'd or lose scope)
- * until the callback is issued. You can free \xfer inside the callback as
- * needed.
- * @param xfer Initialized transaction structure.
- * @return MSD_SUCCESS if the transfer has been added to the queue.
- */
-msd_error_t msd_ReadAsync(msd_transfer_t *xfer);
-
-/**
- * Asynchronous block write. You must set the following \p xfer elements:
- * \p msd, \p lba, \p buffer, \p count, \p callback. The optional element
- * \p userptr can be used to store user-defined data for access in the callback.
- * The \p xfer argument must remain valid (cannot be free'd or lose scope)
- * until the callback is issued. You can free \xfer inside the callback as
- * needed.
- * @param xfer Initialized transaction structure.
- * @return MSD_SUCCESS if the transfer has been added to the queue.
- */
-msd_error_t msd_WriteAsync(msd_transfer_t *xfer);
 
 #ifdef __cplusplus
 }

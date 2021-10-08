@@ -1,4 +1,28 @@
-; msd driver supported using bulk-only transport via scsi
+;-------------------------------------------------------------------------------
+include '../include/library.inc'
+include '../include/include_library.inc'
+;-------------------------------------------------------------------------------
+
+library 'MSDDRVCE',1
+
+include_library '../usbdrvce/usbdrvce.asm'
+
+;-------------------------------------------------------------------------------
+; v1 functions
+;-------------------------------------------------------------------------------
+	export msd_Open
+	export msd_Close
+	export msd_Reset
+	export msd_Info
+	export msd_Read
+	export msd_Write
+	export msd_ReadAsync
+	export msd_WriteAsync
+;-------------------------------------------------------------------------------
+
+include 'macros.inc'
+
+; mass storage driver -- bulk-only transport via scsi
 
 ;-------------------------------------------------------------------------------
 ; scsi packet structures
@@ -542,52 +566,6 @@ msd_Info:
 	ret
 
 ;-------------------------------------------------------------------------------
-msd_Read:
-; Synchronous block read
-; inputs:
-;  sp + 3: msd struct
-;  sp + 6: lba
-;  sp + 12: count
-;  sp + 15: buffer
-; outputs:
-;  hl: error status
-	ld	iy,0
-	add	iy,sp
-	lea	hl,iy + 6		; lba
-	ld	de,(iy + 12)		; count
-	push	iy
-	ld	iy,scsi.read10
-	call	scsi_pktrw_setup
-	pop	iy
-	ld	de,(iy + 15)
-	ld	iy,(iy + 3)
-	ld	hl,scsi.read10
-	jq	scsi_sync_command.buf
-
-;-------------------------------------------------------------------------------
-msd_Write:
-; Synchronous block write
-; inputs:
-;  sp + 3: msd struct
-;  sp + 6: lba
-;  sp + 12: count
-;  sp + 15: const buffer
-; outputs:
-;  hl: error status
-	ld	iy,0
-	add	iy,sp
-	lea	hl,iy + 6		; lba
-	ld	de,(iy + 12)		; count
-	push	iy
-	ld	iy,scsi.write10
-	call	scsi_pktrw_setup
-	pop	iy
-	ld	de,(iy + 15)
-	ld	iy,(iy + 3)
-	ld	hl,scsi.write10
-	jq	scsi_sync_command.buf
-
-;-------------------------------------------------------------------------------
 msd_ReadAsync:
 ; Asynchronous block read
 ; inputs:
@@ -631,6 +609,220 @@ msd_WriteAsync:
 	ld	bc,sizeof packetCBW
 	ldir
 	jq	scsi_async_cbw
+
+;-------------------------------------------------------------------------------
+msd_Read:
+; Synchronous block read
+; inputs:
+;  sp + 3: msd struct
+;  sp + 6: lba
+;  sp + 12: count
+;  sp + 15: buffer
+; outputs:
+;  hl: number of blocks read
+	ld	iy,0
+	add	iy,sp
+	lea	hl,iy + 6		; lba
+	ld	de,(iy + 12)		; count
+	push	iy
+	ld	iy,scsi.read10
+	call	scsi_pktrw_setup
+	pop	iy
+	push	iy
+	ld	de,(iy + 15)
+	ld	iy,(iy + 3)
+	ld	hl,scsi.read10
+	call	scsi_sync_command.buf
+	pop	iy
+	jr	nz,.error
+	ld	hl,(iy + 12)		; if no error, return full count
+	ret
+.error:
+	xor	a,a
+	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
+msd_Write:
+; Synchronous block write
+; inputs:
+;  sp + 3: msd struct
+;  sp + 6: lba
+;  sp + 12: count
+;  sp + 15: const buffer
+; outputs:
+;  hl: number of blocks written
+	ld	iy,0
+	add	iy,sp
+	lea	hl,iy + 6		; lba
+	ld	de,(iy + 12)		; count
+	push	iy
+	ld	iy,scsi.write10
+	call	scsi_pktrw_setup
+	pop	iy
+	push	iy
+	ld	de,(iy + 15)
+	ld	iy,(iy + 3)
+	ld	hl,scsi.write10
+	call	scsi_sync_command.buf
+	pop	iy
+	jr	nz,.error
+	ld	hl,(iy + 12)		; if no error, return full count
+	ret
+.error:
+	xor	a,a
+	sbc	hl,hl
+	ret
+
+;-------------------------------------------------------------------------------
+msd_FindPartitions:
+; Locates MBR partitions on the MSD
+; Arguments:
+;  sp + 3 : msd device structure
+;  sp + 6 : storage for found partitions
+;  sp + 9 : maximum number of partitions to find
+; Returns:
+;  Number of found partitions
+	ld	iy,0
+	add	iy,sp
+	ld	bc,(iy + 3)			; msd structure
+	ld	de,(iy + 6)			; partition pointers
+	ld	hl,(iy + 9)			; maximum partitions to locate
+	ld	iy,(iy + 3)			; msd device
+	ld	(.smc.partitionptrs),de
+	ld	(.smc.maxpartitions),hl
+	xor	a,a
+	sbc	hl,hl
+	ld	(.smc.num_partitions),hl
+	ld	(scsi.read10.lba),a,hl
+	ld	(scsi.read10.len + 0),a
+	inc	a
+	ld	(scsi.read10.len + 1),a
+	ld	hl,2
+	ld	(scsi.read10 + 9),hl
+	ld	hl,scsi.read10
+	call	scsi_sync_command		; read zero block
+	jr	nz,.return			; no partitions (failed!)
+	ld	hl,(ymsd.buffer)
+	ld	de,($90 shl 16) or ($58 shl 8) or ($eb shl 0)
+	compare_hl_de				; check if a boot block
+	jr	nz,.more_than_one
+.only_one:
+	ld	hl,(.smc.partitionptrs)
+	ld	de,0
+	ld	(hl),de
+	inc	hl
+	ld	(hl),e				; first
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl),de
+	inc	hl
+	ld	(hl),e				; todo: store last lba (lun size)
+	inc	de
+	ex	de,hl				; one partition
+	ret
+.more_than_one:
+	ld	(.smc.errorsp),sp
+	call	.start
+.return:
+	ld	hl,0
+.smc.num_partitions := $-3
+	ret
+.recurse:
+	ld	hl,scsi.read10
+	call	scsi_sync_command		; read block
+	jr	z,.start
+	ld	sp,0
+.smc.errorsp := $-3
+	xor	a,a
+	sbc	hl,hl
+	ret
+.start:
+	ld	hl,-64
+	add	hl,sp
+	ld	sp,hl
+	ex	de,hl
+	lea	hl,ymsd.buffer
+	ld	bc,446 + 4
+	add	hl,bc
+	ld	bc,64
+	ldir					; copy partition table to stack
+	xor	a,a
+	sbc	hl,hl
+	add	hl,sp
+	ld	a,4
+.loop:
+	push	af
+	push	hl
+	ld	a,(hl)
+	cp	a,$0f				; extended partition? (lba)
+	call	z,.mbr_ebr_found
+	cp	a,$05				; extended partition? (chs)
+	call	z,.mbr_ebr_chs_found
+	or	a,a
+	call	z,.partition_found
+	pop	hl
+	ld	bc,16
+	add	hl,bc
+	pop	af
+	dec	a
+	jr	nz,.loop
+	ld	hl,64
+	add	hl,sp
+	ld	sp,hl
+	ret
+.partition_found:
+	push	af
+	push	hl
+	ld	de,(.smc.num_partitions)
+	ld	hl,0
+.smc.maxpartitions := $-3
+	compare_hl_de
+	pop	hl
+	jr	z,.found_max
+	ld	bc,4				; hl -> first lba
+	add	hl,bc
+	push	hl
+	ld	de,0
+.smc.partitionptrs := $-3
+	ld	bc,4
+	ldir					; copy lba
+	ex	de,hl
+	ld	(hl),bc			; todo: store last lba
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(.smc.partitionptrs),hl
+	pop	hl
+	ld	de,scsi.read10.lba + 3
+	call	.reverse_copy			; move to next read block
+	ld	de,(.smc.num_partitions)
+	inc	de
+	ld	(.smc.num_partitions),de
+.found_max:
+	pop	af
+	ret
+.mbr_ebr_chs_found:
+	jq	.mbr_ebr_found			; probably works
+.mbr_ebr_found:
+	push	af
+	ld	bc,4				; hl -> start of lba
+	add	hl,bc
+	ld	de,scsi.read10.lba + 3
+	call	.reverse_copy
+	call	.recurse			; recursively find partitions
+	pop	af
+	ret
+.reverse_copy:
+	ld	b,4
+.copy:
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	dec	de
+	djnz	.copy
+	ret
 
 ;-------------------------------------------------------------------------------
 ; utility functions

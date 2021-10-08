@@ -1,4 +1,4 @@
-; fat filesystem supported using msd
+; fat filesystem api
 
 ;-------------------------------------------------------------------------------
 ; fat structures
@@ -700,7 +700,7 @@ fat_SetSize:
 	ld	(yfat.working_entry),de
 	push	de
 	pop	iy
-	ld	a,(iy + 20 + 1)		; start at first cluster, and walk the chain
+	ld	a,(iy + 20 + 1)			; start at first cluster, and walk the chain
 	ld	hl,(iy + 20 - 2)		; until the number of clusters is allocated
 	ld	l,(iy + 26 + 0)
 	ld	h,(iy + 26 + 1)
@@ -804,7 +804,7 @@ fat_SetSize:
 	push	ix
 	ld	ix,(yfat.working_entry)
 	xor	a,a
-	ld	(ix + 20 + 0),a		; remove first cluster if zero
+	ld	(ix + 20 + 0),a			; remove first cluster if zero
 	ld	(ix + 20 + 1),a
 	ld	(ix + 26 + 0),a
 	ld	(ix + 26 + 1),a
@@ -1035,7 +1035,7 @@ fat_ReadAsync:
 	;   - in chain block callback, repeat
 
 	pop	de
-	ex	(sp),iy			; iy = xfer pointer
+	ex	(sp),iy				; iy = xfer pointer
 	push	de
 	push	iy
 	ld	iy,(yfatXfer.filep)
@@ -1048,11 +1048,6 @@ fat_ReadAsync:
 .busy:
 	ld	hl,FAT_ERROR_BUSY
 	ret
-.eof:
-	pop	ix
-	xor	a,a
-	sbc	hl,hl				; no blocks transfered
-	jq	issue_fat_callback.enter
 .not_busy:
 	push	ix
 	xor	a,a
@@ -1096,7 +1091,6 @@ fat_ReadAsync:
 	ld	a,hl,(yfatFile.current_block)
 	compare_auhl_zero
 	jq	z,.invalid_cluster
-
 	ld	(xmsdXfer.lba),a,hl
 	ld	iy,(yfatFile.fat)
 	set	0,(yfat.busy)
@@ -1113,6 +1107,11 @@ fat_ReadAsync:
 	pop	ix
 	ld	hl,FAT_ERROR_MSD_FAILED
 	ret
+.eof:
+	pop	ix
+	xor	a,a
+	sbc	hl,hl				; no blocks transfered
+	jq	issue_fat_callback.enter
 .invalid_cluster:
 	pop	hl,ix
 	ld	hl,FAT_ERROR_INVALID_CLUSTER
@@ -1144,9 +1143,13 @@ issue_fat_callback:
 	add	hl,bc
 	adc	a,0
 	ld	(yfatFile.current_block),a,hl
+	ld	a,(xfatFile.cluster_block)
+	add	a,c
+	ld	a,(xfatFile.cluster_block),a
+	ld	iy,(yfatFile.fat)
+	cp	a,(yfat.blocks_per_cluster)	; check if need to move clusters
 	ld	hl,.ret
 	push	hl
-	ld	iy,(yfatFile.fat)
 	res	0,(yfat.busy)
 	ex	de,hl
 	compare_hl_zero
@@ -1281,7 +1284,7 @@ fat_Create:
 	ld	a,(iy + 20 + 1)
 	ld	hl,(iy + 20 - 2)		; get hlu
 	ld	l,(iy + 26 + 0)
-	ld	h,(iy + 26 + 1)		; get the entry's cluster
+	ld	h,(iy + 26 + 1)			; get the entry's cluster
 	pop	iy
 	push	iy
 	ld	iy,(iy + 3)
@@ -1499,7 +1502,7 @@ util_get_entry_first_cluster:
 	ld	a,(iy + 20 + 1)
 	ld	hl,(iy + 20 - 2)		; get hlu
 	ld	l,(iy + 26 + 0)
-	ld	h,(iy + 26 + 1)		; get the entry's cluster
+	ld	h,(iy + 26 + 1)			; get the entry's cluster
 	ret
 
 ;-------------------------------------------------------------------------------
