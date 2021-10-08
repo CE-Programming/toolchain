@@ -9,7 +9,7 @@ This site hosts all the information for working with the toolchain.
 
 ## Getting Help
 
-You can join us on the `CE Programming` Discord server in the `#ez80-dev` channel: [Discord Chat Link](https://discord.com/invite/gkHzdGWRfG).\
+You can join us on the `CE Programming` Discord server in the `#ez80-dev` channel: [Discord Chat Link](https://discord.gg/PMXR8P2T).\
 If you prefer IRC, the chat is also bridged to the Efnet channel `#ez80-dev`.
 
 Depending on how active the channel is you might not get a response.\
