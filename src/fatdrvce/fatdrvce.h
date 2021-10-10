@@ -66,8 +66,8 @@ typedef struct {
     uint24_t (*read)(fat_callback_data_t *usr, uint32_t lba, uint24_t count, void *buffer);
     uint24_t (*write)(fat_callback_data_t *usr, uint32_t lba, uint24_t count, const void *buffer);
     fat_callback_data_t *usr;
-    uint32_t lba;
-    uint32_t count;
+    uint32_t first_lba;
+    uint32_t last_lba;
     uint8_t priv[1024]; /**< Internal library use */
 } fat_t;
 
@@ -233,7 +233,7 @@ fat_error_t fat_SetPos(fat_file_t *file, uint24_t block);
  * @param buffer Data read from FAT file.
  * @return Returns number of blocks read, should equal \p count if success.
  */
-uint24_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
+fat_error_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
 
 /**
  * Synchronous write for multiple blocks. Advances file block offset position.
@@ -243,7 +243,7 @@ uint24_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
  * @return FAT_SUCCESS on success, otherwise error.
  * @return Returns number of blocks written, should equal \p count if success.
  */
-uint24_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
+fat_error_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
 
 /**
  * Closes an open file handle.

@@ -13,11 +13,14 @@ typedef struct global global_t;
 #include <stdlib.h>
 #include <string.h>
 
-#define ROM_DUMP_SIZE (1024 * 1024 * 4)
 #define ROM_DUMP_FILE "ROMDUMP.ROM"
 #define ROM_DUMP_PATH "/"
 #define ROM_DUMP_NAME ROM_DUMP_PATH ROM_DUMP_FILE
 #define ROM_BUFFER_SIZE (MSD_BLOCK_SIZE * 4)
+#define ROM_BUFFER_NUM_BLOCKS (ROM_BUFFER_SIZE / MSD_BLOCK_SIZE)
+
+#define ROM_DUMP_SIZE ROM_BUFFER_SIZE
+//#define ROM_DUMP_SIZE (1024 * 1024 * 4)
 
 struct global
 {
@@ -65,16 +68,15 @@ int main(void)
 {
     static uint8_t rombuffer[ROM_BUFFER_SIZE];
     static char buffer[212];
-    static msd_partition_t partitions[4];
+    static msd_partition_t partitions[16];
     static global_t global;
     static fat_t fat;
-    uint8_t count;
+    uint8_t num_partitions;
     msd_info_t msdinfo;
     usb_error_t usberr;
     msd_error_t msderr;
     fat_error_t faterr;
     fat_file_t file;
-    uintptr_t i;
 
     memset(&global, 0, sizeof(global_t));
     os_SetCursorPos(1, 0);
@@ -138,29 +140,38 @@ int main(void)
     putstr(buffer);
 
     // locate the first fat partition available
-    count = msd_FindPartitions(&global.msd, partitions, 4);
-    if (count < 1)
+    num_partitions = msd_FindPartitions(&global.msd, partitions, 16);
+    if (num_partitions < 1)
     {
         putstr("no paritions found");
         goto msd_error;
     }
 
-    // attempt to open the first fat partition
+    // attempt to open the first found fat partition
     // it is not required to use a MSD to access a FAT filesystem if the
     // appropriate callbacks are configured.
     fat.read = &msd_Read;
     fat.write = &msd_Write;
     fat.usr = &global.msd;
-    fat.lba = partitions[0].lba;
-    fat.count = partitions[0].count;
-    faterr = fat_Init(&fat);
-    if (faterr != FAT_SUCCESS)
+    for (uint8_t p = 0;;)
     {
-        putstr("could not open partition");
-        goto msd_error;
+        fat.first_lba = partitions[p].first_lba;
+        fat.last_lba = partitions[p].last_lba;
+        faterr = fat_Init(&fat);
+        if (faterr == FAT_SUCCESS)
+        {
+            sprintf(buffer, "opened fat partition %u", p);
+            putstr(buffer);
+            break;
+        }
+        p++;
+        if (p >= num_partitions)
+        {
+            putstr("no fat32 paritions found");
+            goto msd_error;
+        }
     }
 
-    putstr("opened fat partition");
     putstr("creating dump file...");
 
     // create the rom dump file, deleting it if it exists first
@@ -183,7 +194,7 @@ int main(void)
     }
 
     // set the size of the rom dump
-    faterr = fat_SetSize(&file, 4096);
+    faterr = fat_SetSize(&file, ROM_BUFFER_SIZE);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not set file size");
@@ -192,9 +203,16 @@ int main(void)
 
     // write the rom file, starting at the memory base address
     // dma only works from ram, so copy to a temporary buffer
-    for (i = 0; i < ROM_DUMP_SIZE; i += ROM_BUFFER_SIZE)
+    for (uintptr_t i = 0; i < ROM_DUMP_SIZE; i += ROM_BUFFER_SIZE)
     {
         memcpy(rombuffer, (const void *)i, ROM_BUFFER_SIZE);
+        faterr = fat_Read(&file, ROM_BUFFER_NUM_BLOCKS, rombuffer);
+        if (faterr != FAT_SUCCESS)
+        {
+            sprintf(buffer, "error writing rom buffer %u", i);
+            putstr(buffer);
+            goto fat_error;
+        }
     }
 
     // close the file

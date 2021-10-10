@@ -684,146 +684,112 @@ msd_FindPartitions:
 ;  sp + 9 : maximum number of partitions to find
 ; Returns:
 ;  Number of found partitions
-	ld	iy,0
-	add	iy,sp
-	ld	bc,(iy + 3)			; msd structure
-	ld	de,(iy + 6)			; partition pointers
-	ld	hl,(iy + 9)			; maximum partitions to locate
-	ld	iy,(iy + 3)			; msd device
-	ld	(.smc.partitionptrs),de
-	ld	(.smc.maxpartitions),hl
-	xor	a,a
-	sbc	hl,hl
-	ld	(.smc.num_partitions),hl
-	ld	(scsi.read10.lba),a,hl
-	ld	(scsi.read10.len + 0),a
-	inc	a
-	ld	(scsi.read10.len + 1),a
-	ld	hl,2
-	ld	(scsi.read10 + 9),hl
-	ld	hl,scsi.read10
-	call	scsi_sync_command		; read zero block
-	jr	nz,.return			; no partitions (failed!)
-	ld	hl,(ymsd.buffer)
-	ld	de,($90 shl 16) or ($58 shl 8) or ($eb shl 0)
-	compare_hl_de				; check if a boot block
-	jr	nz,.more_than_one
-.only_one:
-	ld	hl,(.smc.partitionptrs)
-	ld	de,0
-	ld	(hl),de
-	inc	hl
-	ld	(hl),e				; first
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(hl),de
-	inc	hl
-	ld	(hl),e				; todo: store last lba (lun size)
-	inc	de
-	ex	de,hl				; one partition
+	call	$130			; frameset0
+	ld	a, (ix + 9 + 3)
+	ld	(.smc.max_partitions), a
+	ld	hl, (ix + 6 + 3)
+	ld	(.smc.partitions), hl
+	ld	hl, (ix + 3 + 3)
+	ld	(.smc.msd), hl
+	xor	a, a
+	ld	(.smc.num_partitions), a
+	sbc	hl, hl			; start at partition 0
+	push	hl
+	push	hl
+	call	.recursive_loop
+	ld	sp, ix
+	pop	ix
+	ld	a,0
+.smc.num_partitions := $-1
 	ret
-.more_than_one:
-	ld	(.smc.errorsp),sp
-	call	.start
+.recursive_loop:
+	ld	hl, -74
+	call	$12C			; frameset
+	ld	iy, 0
+.smc.msd := $-3
+	lea	hl, ix + 6
+	call	scsi_read_block
+	jr	nz, .return
+	call	util_check_mbr_magic
+	jr	nz, .return
+	lea	hl, ymsd.buffer
+	ld	de, 446
+	add	hl, de
+	lea	de, ix - 64
+	ld	bc, 64
+	ldir
+	ld	iy, 0
+.for_each_entry:
+	ld	de, 64
+	lea	hl, iy
+	or	a, a
+	sbc	hl, de
+	jr	nz, .no_return
 .return:
-	ld	hl,0
-.smc.num_partitions := $-3
+	ld	sp, ix
+	pop	ix
 	ret
-.recurse:
-	ld	hl,scsi.read10
-	call	scsi_sync_command		; read block
-	jr	z,.start
-	ld	sp,0
-.smc.errorsp := $-3
-	xor	a,a
-	sbc	hl,hl
-	ret
-.start:
-	ld	hl,-64
-	add	hl,sp
-	ld	sp,hl
-	ex	de,hl
-	lea	hl,ymsd.buffer
-	ld	bc,446 + 4
-	add	hl,bc
-	ld	bc,64
-	ldir					; copy partition table to stack
-	xor	a,a
-	sbc	hl,hl
-	add	hl,sp
-	ld	a,4
-.loop:
-	push	af
-	push	hl
-	ld	a,(hl)
-	cp	a,$0f				; extended partition? (lba)
-	call	z,.mbr_ebr_found
-	cp	a,$05				; extended partition? (chs)
-	call	z,.mbr_ebr_chs_found
-	or	a,a
-	call	z,.partition_found
-	pop	hl
-	ld	bc,16
-	add	hl,bc
-	pop	af
-	dec	a
-	jr	nz,.loop
-	ld	hl,64
-	add	hl,sp
-	ld	sp,hl
-	ret
-.partition_found:
-	push	af
-	push	hl
-	ld	de,(.smc.num_partitions)
-	ld	hl,0
-.smc.maxpartitions := $-3
-	compare_hl_de
-	pop	hl
-	jr	z,.found_max
-	ld	bc,4				; hl -> first lba
-	add	hl,bc
-	push	hl
-	ld	de,0
-.smc.partitionptrs := $-3
-	ld	bc,4
-	ldir					; copy lba
-	ex	de,hl
-	ld	(hl),bc			; todo: store last lba
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(.smc.partitionptrs),hl
-	pop	hl
-	ld	de,scsi.read10.lba + 3
-	call	.reverse_copy			; move to next read block
-	ld	de,(.smc.num_partitions)
-	inc	de
-	ld	(.smc.num_partitions),de
-.found_max:
-	pop	af
-	ret
-.mbr_ebr_chs_found:
-	jq	.mbr_ebr_found			; probably works
-.mbr_ebr_found:
-	push	af
-	ld	bc,4				; hl -> start of lba
-	add	hl,bc
-	ld	de,scsi.read10.lba + 3
-	call	.reverse_copy
-	call	.recurse			; recursively find partitions
-	pop	af
-	ret
-.reverse_copy:
-	ld	b,4
-.copy:
-	ld	a,(hl)
-	ld	(de),a
-	inc	hl
-	dec	de
-	djnz	.copy
-	ret
+.no_return:
+	ld	a, (.smc.num_partitions)
+	cp	a, 0
+.smc.max_partitions := $-1
+	jr	z, .return
+	ld	(ix - 70), iy
+	lea	iy, ix - 64
+	ld	hl, (iy + 8)
+	ld	e, (iy + 11)
+	call	$1B0			; check zero
+	jq	z, .continue
+	ld	de, (ix - 70)
+	lea	iy, ix - 64
+	add	iy, de
+	ld	hl, (iy + 12)
+	ld	e, (iy + 15)
+	ld	(ix - 73), hl
+	ld	(ix - 74), e
+	call	$1B0			; check zero
+	jq	z, .continue
+	ld	hl, (iy + 8)
+	ld	e, (iy + 11)
+	ld	bc, (ix + 6)
+	ld	a, (ix + 9)
+	add	hl, bc
+	adc	a, e
+	ld	e, a
+	ld	bc, (ix - 70)
+	lea	iy, ix - 64
+	add	iy, bc
+	ld	a, (iy + 4)
+	cp	a, $05
+	jr	z, .ebr
+	cp	a, $0F
+	jr	nz, .not_ebr
+.ebr:
+	push	de, hl
+	call	.recursive_loop
+	pop	hl, hl
+	jr	.continue
+.not_ebr:
+	ld	iy, 0
+.smc.partitions := $-3
+	ld	(iy + 0), hl
+	ld	(iy + 3), e
+	ld	bc, -1
+	add	hl, bc
+	adc	a, c
+	ld	bc, (ix - 73)
+	add	hl, bc
+	adc	a, (ix - 74)
+	ld	(iy + 4), hl
+	ld	(iy + 7), a
+	lea	hl, iy + 8
+	ld	(.smc.partitions), hl
+	ld	hl, .smc.num_partitions
+	inc	(hl)
+.continue:
+	ld	iy, (ix - 70)
+	lea	iy, iy + 16
+	jq	.for_each_entry
 
 ;-------------------------------------------------------------------------------
 ; utility functions
@@ -1245,6 +1211,17 @@ scsi_pktrw_setup:
 	ld	(yscsipktrw + 9),hl	; number of bytes in data section
 	ret
 
+scsi_read_block:
+	ld	de,1
+scsi_read_blocks:
+	push	iy
+	ld	iy, scsi.read10
+	push	iy
+	call	scsi_pktrw_setup
+	pop	hl
+	pop	iy
+	jp	scsi_sync_command
+
 util_delay_200ms:
 	ld	a,20
 .loop:
@@ -1255,6 +1232,19 @@ util_delay_200ms:
 	pop	af
 	dec	a
 	jq	nz,.loop
+	ret
+
+;  iy : msd struct
+util_check_mbr_magic:
+	push	hl,de
+	lea	hl,ymsd.buffer
+	ld	de,510
+	add	hl,de
+	ld	de,(hl)
+	ld	hl,$AA55
+	ex.s	de,hl
+	compare_hl_de
+	pop	de,hl
 	ret
 
 ;-------------------------------------------------------------------------------

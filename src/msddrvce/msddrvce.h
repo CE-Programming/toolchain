@@ -62,8 +62,8 @@ typedef struct msd_transfer_t {
 } msd_transfer_t;
 
 typedef struct {
-    uint32_t lba; /**< First Logical Block Address (LBA) of partition */
-    uint32_t count; /**< Number of Logical Blocks in partition */
+    uint32_t first_lba; /**< First Logical Block Address (LBA) of partition */
+    uint32_t last_lba; /**< Last Logical Block Address (LBA) of partition */
 } msd_partition_t;
 
 /**
@@ -151,7 +151,7 @@ uint24_t msd_Write(msd_t *msd, uint32_t lba, uint24_t count, const void *buffer)
  *         valid partition information up to the number detected.
  * @note Currently only MBR partition tables are supported.
  */
-uint24_t msd_FindPartitions(msd_t *msd, msd_partition_t *partitions, uint24_t max);
+uint8_t msd_FindPartitions(msd_t *msd, msd_partition_t *partitions, uint8_t max);
 
 #ifdef __cplusplus
 }

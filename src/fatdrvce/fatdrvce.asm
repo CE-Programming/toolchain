@@ -77,8 +77,8 @@ struct fat
     	read rl 1
     	write rl 1
 	user rl 1
-	fat_base_lba rd 1
-	last rd 1
+	first_lba rd 1
+	last_lba rd 1
 	blocks_per_cluster rb 1
 	clusters rd 1
 	fat_size rd 1
@@ -160,7 +160,7 @@ fat_Init:
 	dec	a
 .nocarry:
 	ld	c,(ix + 13)
-	ld	(yfat.blocks_per_cluster),c	; blocks per cluster
+	ld	(yfat.blocks_per_cluster),c
 	jr	.enter
 .multiply:
 	add	hl,hl
@@ -960,6 +960,125 @@ fat_Write:
 ;  sp + 9 : Buffer to write
 ; Returns:
 ;  FAT_SUCCESS on success
+	ld	iy,0
+	add	iy,sp
+	push	ix
+	ld	ix,(iy + 3)
+	ld	ix,(xfatFile.fat)
+	ld	a,(xfat.blocks_per_cluster)
+	ld	(.blocks_per_cluster),a
+	ld	ix,(iy + 3)
+	ld	hl,(xfatFile.block_pos)
+	ld	de,(xfatFile.block_count)
+	compare_hl_de
+	jq	nc,.eof
+	ex	de,hl
+	or	a,a
+	sbc	hl,de
+	ld	de,(iy + 6)
+	compare_hl_de
+	jq	nc,.loop
+	ld	(iy + 6),hl			; total number of blocks
+.loop:
+	ld	hl,(iy + 6)
+	compare_hl_zero
+	jq	z,.done
+	ex	de,hl
+	ld	a,(.blocks_per_cluster)
+	sub	a,(xfatFile.cluster_block)
+	or	a,a
+	sbc	hl,hl
+	ld	l,a
+	compare_hl_de
+	jq	nc,.alternateflow
+	ex	de,hl
+	ld	a,hl,(xfatFile.current_block)
+	compare_auhl_zero
+	jq	z,.invalid_cluster
+	ld	bc,0
+	ld	c,(xfatFile.cluster_block)
+	add	hl,bc
+	adc	a,b
+	push	de
+	push	de
+	pop	bc
+	ld	de,(iy + 9)
+	push	iy
+	ld	iy,(xfatFile.fat)
+	call	util_write_fat_multiple_blocks
+	pop	iy
+	pop	hl
+	jq	nz,.rw_error
+	push	hl
+	ld	h,l
+	ld	l,0
+	add	hl,hl
+	ld	de,(iy + 9)
+	add	hl,de
+	ld	(iy + 9),hl
+	pop	de
+	ld	hl,(iy + 6)
+	or	a,a
+	sbc	hl,de
+	ld	(iy + 6),hl
+	jq	.getnextcluster
+.alternateflow:
+	ld	de,(iy + 6)
+	ld	a,hl,(xfatFile.current_block)
+	compare_auhl_zero
+	jq	z,.invalid_cluster
+	ld	bc,0
+	ld	c,(xfatFile.cluster_block)
+	add	hl,bc
+	adc	a,b
+	push	de
+	push	de
+	pop	bc
+	ld	de,(iy + 9)
+	push	iy
+	ld	iy,(xfatFile.fat)
+	call	util_write_fat_multiple_blocks
+	pop	iy
+	pop	de
+	jq	nz,.rw_error
+	or	a,a
+	sbc	hl,hl
+	ld	(iy + 6),hl
+	ld	a,(xfatFile.cluster_block)
+	add	a,e
+	ld	(xfatFile.cluster_block),a
+	cp	a,0
+.blocks_per_cluster := $-1
+	jq	nz,.loop
+.getnextcluster:
+	ld	a,hl,(xfatFile.current_cluster)
+	push	iy
+	ld	iy,(xfatFile.fat)
+	call	util_next_cluster
+	pop	iy
+	ld	(xfatFile.current_cluster),a,hl
+	push	iy
+	ld	iy,(xfatFile.fat)
+	call	util_cluster_to_block
+	pop	iy
+	ld	(xfatFile.current_block),a,hl
+	xor	a,a
+	ld	(xfatFile.cluster_block),a
+	jq	.loop
+.done:
+	xor	a,a
+	sbc	hl,hl
+	jq	.popix
+.rw_error:
+	ld	hl,FAT_ERROR_RW_FAILED
+	jq	.popix
+.invalid_cluster:
+	ld	hl,FAT_ERROR_INVALID_CLUSTER
+	jq	.popix
+.eof:
+	ld	hl,FAT_ERROR_RW_FAILED
+.popix:
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2141,11 +2260,15 @@ util_read_fat_multiple_blocks:
 ;  iy : fat struct
 ; outputs:
 ;   z if success
+	push	iy
 	push	bc				; store count for checking
 	push	de
 	push	bc
-	push	hl
-	ld	l,a
+	ld	e,bc,(yfat.first_lba)
+	add	hl,bc
+	adc	a,e
+	ld	c,a
+	push	bc
 	push	hl
 	ld	hl,(yfat.user)
 	push	hl
@@ -2156,6 +2279,7 @@ util_read_fat_multiple_blocks:
 .ret:
 	pop	bc,bc,bc,bc,bc
 	pop	de				; pop count check
+	pop	iy
 	compare_hl_de
 	ret
 
@@ -2175,11 +2299,15 @@ util_write_fat_multiple_blocks:
 ;  de : data
 ;  bc : block count
 ;  iy : fat struct
+	push	iy
 	push	bc				; store count for checking
 	push	de
 	push	bc
-	push	hl
-	ld	l,a
+	ld	e,bc,(yfat.first_lba)
+	add	hl,bc
+	adc	a,e
+	ld	c,a
+	push	bc
 	push	hl
 	ld	hl,(yfat.user)
 	push	hl
