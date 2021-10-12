@@ -6,7 +6,10 @@
  *
  * Only FAT filesystems with a logical block size of 512 bytes are supported.
  * For best performance, the cluster allocation size should be set to the
- * maxium allowed.
+ * maxium allowed. On Linux this can be accomplished with the following command:
+ * \code
+ * mkfs.vfat -s 128 -S 512 -v /dev/<drive parition, e.g. sda1>
+ * \endcode
  *
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
@@ -227,13 +230,20 @@ fat_error_t fat_Open(fat_file_t *file, fat_t *fat, const char *filepath);
 fat_error_t fat_SetPos(fat_file_t *file, uint24_t block);
 
 /**
+ * Gets the sector offset position in the file.
+ * @param file File handle returned from fat_Open.
+ * @return File block offset.
+ */
+uint24_t fat_GetPos(fat_file_t *file);
+
+/**
  * Synchronous read for multiple blocks. Advances file block offset position.
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to read.
  * @param buffer Data read from FAT file.
  * @return Returns number of blocks read, should equal \p count if success.
  */
-fat_error_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
+uint24_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
 
 /**
  * Synchronous write for multiple blocks. Advances file block offset position.
@@ -243,7 +253,7 @@ fat_error_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
  * @return FAT_SUCCESS on success, otherwise error.
  * @return Returns number of blocks written, should equal \p count if success.
  */
-fat_error_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
+uint24_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);
 
 /**
  * Closes an open file handle.

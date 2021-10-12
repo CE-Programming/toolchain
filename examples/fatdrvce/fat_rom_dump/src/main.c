@@ -13,14 +13,14 @@ typedef struct global global_t;
 #include <stdlib.h>
 #include <string.h>
 
-#define ROM_DUMP_FILE "ROMDUMP.ROM"
-#define ROM_DUMP_PATH "/"
-#define ROM_DUMP_NAME ROM_DUMP_PATH ROM_DUMP_FILE
+#define ROM_FILE_FILE "ROMDUMP.ROM"
+#define ROM_FILE_PATH "/"
+#define ROM_FILE_FILE_PATH ROM_FILE_PATH ROM_FILE_FILE
 #define ROM_BUFFER_SIZE (MSD_BLOCK_SIZE * 4)
 #define ROM_BUFFER_NUM_BLOCKS (ROM_BUFFER_SIZE / MSD_BLOCK_SIZE)
 
-#define ROM_DUMP_SIZE ROM_BUFFER_SIZE
-//#define ROM_DUMP_SIZE (1024 * 1024 * 4)
+//#define ROM_FILE_SIZE ROM_BUFFER_SIZE
+#define ROM_FILE_SIZE (1024 * 1024 * 4)
 
 struct global
 {
@@ -172,44 +172,81 @@ int main(void)
         }
     }
 
-    putstr("creating dump file...");
+    putstr("press enter to dump rom!");
+    while (!os_GetCSC());
 
-    // create the rom dump file, deleting it if it exists first
-    fat_Delete(&fat, ROM_DUMP_NAME);
-    faterr = fat_Create(&fat, ROM_DUMP_PATH, ROM_DUMP_FILE, FAT_FILE);
+    os_ClrHome();
+
+    putstr("allocating rom file");
+    putstr(" - please wait...");
+
+    // create the rom file, deleting it if it exists first
+    fat_Delete(&fat, ROM_FILE_FILE_PATH);
+    faterr = fat_Create(&fat, ROM_FILE_PATH, ROM_FILE_FILE, FAT_FILE);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not create file");
         goto fat_error;
     }
 
-    putstr("writing dump file...");
-
-    // open dump file for writing
-    faterr = fat_Open(&file, &fat, ROM_DUMP_NAME);
+    // open rom file for writing
+    faterr = fat_Open(&file, &fat, ROM_FILE_FILE_PATH);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not open file");
         goto fat_error;
     }
 
-    // set the size of the rom dump
-    faterr = fat_SetSize(&file, ROM_BUFFER_SIZE);
+    // set the size of the rom file
+    faterr = fat_SetSize(&file, ROM_FILE_SIZE);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not set file size");
         goto fat_error;
     }
 
+    putstr("writing rom file");
+    putstr(" - please wait...");
+
     // write the rom file, starting at the memory base address
     // dma only works from ram, so copy to a temporary buffer
-    for (uintptr_t i = 0; i < ROM_DUMP_SIZE; i += ROM_BUFFER_SIZE)
+    for (uintptr_t i = 0; i < ROM_FILE_SIZE; i += ROM_BUFFER_SIZE)
     {
+        uint24_t count;
+
         memcpy(rombuffer, (const void *)i, ROM_BUFFER_SIZE);
-        faterr = fat_Read(&file, ROM_BUFFER_NUM_BLOCKS, rombuffer);
-        if (faterr != FAT_SUCCESS)
+        count = fat_Write(&file, ROM_BUFFER_NUM_BLOCKS, rombuffer);
+        if (count != ROM_BUFFER_NUM_BLOCKS)
         {
             sprintf(buffer, "error writing rom buffer %u", i);
+            putstr(buffer);
+            goto fat_error;
+        }
+    }
+
+    putstr("validate rom file");
+    putstr(" - please wait...");
+
+    // rewind the file back to the beginning
+    fat_SetPos(&file, 0);
+
+    // verify the rom file, starting at the memory base address
+    // dma only works from ram, so copy to a temporary buffer
+    for (uintptr_t i = 0; i < ROM_FILE_SIZE; i += ROM_BUFFER_SIZE)
+    {
+        uint24_t count;
+
+        count = fat_Read(&file, ROM_BUFFER_NUM_BLOCKS, rombuffer);
+        if (count != ROM_BUFFER_NUM_BLOCKS)
+        {
+            sprintf(buffer, "error reading rom buffer %u", i);
+            putstr(buffer);
+            goto fat_error;
+        }
+
+        if (memcmp(rombuffer, (const void *)i, ROM_BUFFER_SIZE) != 0)
+        {
+            sprintf(buffer, "validation error in rom buffer %u", i);
             putstr(buffer);
             goto fat_error;
         }
@@ -224,6 +261,7 @@ int main(void)
     }
 
     putstr("dumped rom!");
+    putstr("filename: " ROM_FILE_FILE_PATH);
 
 fat_error:
     // close the filesystem
