@@ -1,7 +1,9 @@
 typedef struct global global_t;
 #define usb_callback_data_t global_t
+#define fat_callback_data_t msd_t
 
 #include <usbdrvce.h>
+#include <msddrvce.h>
 #include <fatdrvce.h>
 #include <tice.h>
 
@@ -13,14 +15,14 @@ typedef struct global global_t;
 
 #define MAX_PARTITIONS 10
 #define MAX_ENTRIES 10
-#define FAT_BUFFER_SIZE (MSD_SECTOR_SIZE / sizeof(uint16_t))
+#define FAT_BUFFER_SIZE (FAT_BLOCK_SIZE / sizeof(uint16_t))
 
 enum { USB_RETRY_INIT = USB_USER_ERROR };
 
 struct global
 {
     usb_device_t usb;
-    msd_device_t msd;
+    msd_t msd;
 };
 
 static void putstr(char *str)
@@ -59,20 +61,19 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
 
 int main(void)
 {
-    static uint8_t msd_buffer[MSD_SECTOR_SIZE];
-    static fat_partition_t fatparts[MAX_PARTITIONS];
+    static msd_partition_t partitions[MAX_PARTITIONS];
     static char buffer[212];
     static global_t global;
     static fat_t fat;
-    uint32_t sector_size;
-    uint32_t sector_num;
-    uint8_t numparts;
+    uint8_t num_partitions;
+    msd_info_t msdinfo;
     usb_error_t usberr;
     msd_error_t msderr;
     fat_error_t faterr;
 
     memset(&global, 0, sizeof(global_t));
     os_SetCursorPos(1, 0);
+
 
     // usb initialization loop; waits for something to be plugged in
     do
@@ -83,7 +84,7 @@ int main(void)
         if (usberr != USB_SUCCESS)
         {
             putstr("usb init error.");
-            goto error;
+            goto usb_error;
         }
 
         while (usberr == USB_SUCCESS)
@@ -95,81 +96,85 @@ int main(void)
             if (os_GetCSC())
             {
                 putstr("exiting demo, press a key");
-                goto error;
+                goto usb_error;
             }
 
             usberr = usb_WaitForInterrupt();
         }
     } while (usberr == USB_RETRY_INIT);
+   
     if (usberr != USB_SUCCESS)
     {
         putstr("usb enable error.");
-        goto error;
+        goto usb_error;
     }
 
     // initialize the msd device
-    msderr = msd_Open(&global.msd, global.usb, msd_buffer);
+    msderr = msd_Open(&global.msd, global.usb);
     if (msderr != MSD_SUCCESS)
     {
         putstr("failed opening msd");
-        goto error;
+        goto usb_error;
     }
 
     putstr("opened msd");
 
-    // get sector number and size
-    msderr = msd_Info(&global.msd, &sector_num, &sector_size);
+    // get block count and size
+    msderr = msd_Info(&global.msd, &msdinfo);
     if (msderr != MSD_SUCCESS)
     {
         putstr("error getting msd info");
-        goto error;
+        goto msd_error;
     }
 
     // print msd sector number and size
-    sprintf(buffer, "sector size: %u", (uint24_t)sector_size);
+    sprintf(buffer, "block size: %u bytes", (uint24_t)msdinfo.bsize);
     putstr(buffer);
-    sprintf(buffer, "sector num: %u", (uint24_t)sector_num);
+    sprintf(buffer, "num blocks: %u", (uint24_t)msdinfo.bnum);
     putstr(buffer);
 
-    // find available fat partitions
-    faterr = fat_FindPartitions(&global.msd, fatparts, &numparts, MAX_PARTITIONS);
-    if (faterr != FAT_SUCCESS)
+    // locate the first fat partition available
+    num_partitions = msd_FindPartitions(&global.msd, partitions, MAX_PARTITIONS);
+    if (num_partitions < 1)
     {
-        putstr("error finding fat partitions");
-        goto error;
+        putstr("no paritions found");
+        goto msd_error;
     }
 
-    // verify there is at least one fat parition
-    if (numparts == 0)
+    // attempt to open the first found fat partition
+    // it is not required to use a MSD to access a FAT filesystem if the
+    // appropriate callbacks are configured.
+    fat.read = &msd_Read;
+    fat.write = &msd_Write;
+    fat.usr = &global.msd;
+    for (uint8_t p = 0;;)
     {
-        putstr("no fat paritions on device");
-        goto error;
-    }
-
-    // print number of fat partitions
-    sprintf(buffer, "num fat partition: %u", numparts);
-    putstr(buffer);
-
-    // attempt fat init on first fat partition
-    faterr = fat_OpenPartition(&fat, &fatparts[0]);
-    if (faterr != FAT_SUCCESS)
-    {
-        putstr("could not open fat partition");
-        goto error;
+        fat.first_lba = partitions[p].first_lba;
+        fat.last_lba = partitions[p].last_lba;
+        faterr = fat_Init(&fat);
+        if (faterr == FAT_SUCCESS)
+        {
+            sprintf(buffer, "opened fat partition %u", p);
+            putstr(buffer);
+            break;
+        }
+        p++;
+        if (p >= num_partitions)
+        {
+            putstr("no fat32 paritions found");
+            goto msd_error;
+        }
     }
 
     os_ClrHome();
 
     // attempt to create and open/edit a variety of files
-    if (faterr == FAT_SUCCESS)
     {
         static fat_dir_entry_t entries[MAX_ENTRIES];
         static uint16_t fatbuffer[FAT_BUFFER_SIZE];
         static const char *str = "/FATTEST/DIR1/FILE.TXT";
-        fat_file_t *file;
-        uint24_t i;
-        uint16_t j;
-        int24_t count;
+        static fat_file_t file;
+        uint24_t count;
 
         putstr("inited fat filesystem");
 
@@ -185,14 +190,84 @@ int main(void)
 
         putstr("created files");
 
-        // change the size of the first file
-        fat_SetSize(&fat, str, 512 * 1024);
-        fat_SetSize(&fat, str, 512 * 0);
-        fat_SetSize(&fat, str, 512 * 32);
+        // change the file size to test cluster allocation
+        faterr = fat_Open(&file, &fat, str);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not open file");
+            goto fat_error;
+        }
+
+        faterr = fat_SetSize(&file, 512 * 1024);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not set file size");
+            goto fat_error;
+        }
+
+        faterr = fat_SetSize(&file, 0);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not set file size");
+            goto fat_error;
+        }
+
+        faterr = fat_SetSize(&file, 512 * 32);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not set file size");
+            goto fat_error;
+        }
+
+        faterr = fat_Close(&file);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("file close error");
+            goto fat_error;
+        }
 
         // change the size of the other files
-        fat_SetSize(&fat, "/FATTEST/DIR2/FILE1.TXT", 512 * 2 + 16);
-        fat_SetSize(&fat, "/FATTEST/DIR2/FILE2.TXT", 512 * 2 + 32);
+        faterr = fat_Open(&file, &fat, "/FATTEST/DIR2/FILE1.TXT");
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not open file");
+            goto fat_error;
+        }
+
+        fat_SetSize(&file, 512 * 2 + 16);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not set file size");
+            goto fat_error;
+        }
+
+        faterr = fat_Close(&file);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("file close error");
+            goto fat_error;
+        }
+
+        faterr = fat_Open(&file, &fat, "/FATTEST/DIR2/FILE2.TXT");
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not open file");
+            goto fat_error;
+        }
+
+        fat_SetSize(&file, 512 * 2 + 32);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("could not set file size");
+            goto fat_error;
+        }
+
+        faterr = fat_Close(&file);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("file close error");
+            goto fat_error;
+        }
 
         putstr("set file sizes");
 
@@ -205,73 +280,108 @@ int main(void)
         putstr("deleted files");
 
         // get directory contents (should be 4)
-        count = fat_DirList(&fat, "/FATTEST/DIR2", FAT_LIST_ALL,
-                            entries, MAX_ENTRIES, 0);
-        if (count >= 0)
-        {
-            sprintf(buffer, "num dir entries: %d", count);
-            putstr(buffer);
-        }
+        count = fat_DirList(&fat, "/FATTEST/DIR2", FAT_LIST_ALL, entries, MAX_ENTRIES, 0);
+
+        sprintf(buffer, "num dir entries: %d", count);
+        putstr(buffer);
 
         // delete file
         fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
 
         // write bytes to file
-        file = fat_Open(&fat, str, FAT_RDWR);
-        for (i = 0; i < 32; ++i)
+        faterr = fat_Open(&file, &fat, str);
+        if (faterr != FAT_SUCCESS)
         {
-            uint24_t offset = i * FAT_BUFFER_SIZE;
-            for (j = offset; j < offset + FAT_BUFFER_SIZE; ++j)
+            putstr("could not open file");
+            goto fat_error;
+        }
+
+        for (uint8_t i = 0; i < 32; ++i)
+        {
+            uint24_t offset;
+
+            offset = i * FAT_BUFFER_SIZE;
+            for (uint24_t j = offset; j < offset + FAT_BUFFER_SIZE; ++j)
             {
                 fatbuffer[j - offset] = j;
             }
-            fat_WriteSectors(file, 1, fatbuffer);
+
+            count = fat_Write(&file, 1, fatbuffer);
+            if (count != 1)
+            {
+                putstr("write error");
+                goto fat_error;
+            }
         }
 
         putstr("wrote file bytes");
 
         // read back file, and compare read to written bytes
-        fat_SetPos(file, 0);
-        for (i = 0; i < 32; ++i)
+        faterr = fat_SetPos(&file, 0);
+        if (faterr != FAT_SUCCESS)
         {
-            uint24_t offset = i * FAT_BUFFER_SIZE;
-            fat_ReadSectors(file, 1, fatbuffer);
-            for (j = offset; j < offset + FAT_BUFFER_SIZE; ++j)
+            putstr("could not set position");
+            goto fat_error;
+        }
+
+        for (uint8_t i = 0; i < 32; ++i)
+        {
+            uint24_t offset;
+
+            offset = i * FAT_BUFFER_SIZE;
+
+            count = fat_Read(&file, 1, fatbuffer);
+            if (count != 1)
+            {
+                putstr("read error");
+                goto fat_error;
+            }
+
+            for (uint24_t j = offset; j < offset + FAT_BUFFER_SIZE; ++j)
             {
                 if (fatbuffer[j - offset] != j)
                 {
                     putstr("read does not match!");
-                    goto error;
+                    goto fat_error;
                 }
             }
         }
 
         putstr("read back file bytes");
 
-        // check if end of file
-        faterr = fat_ReadSectors(file, 1, fatbuffer);
-        if (faterr == FAT_ERROR_EOF)
-            putstr("detected eof");
+        // check if end of file -- should return 0
+        count = fat_Read(&file, 1, fatbuffer);
+        if (count != 0)
+        {
+            putstr("file read error");
+            goto fat_error;
+        }
 
-        // close the file
-        faterr = fat_Close(file);
-        if (faterr == USB_SUCCESS)
-            putstr("end of test!");
+        // close the fat file
+        faterr = fat_Close(&file);
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("file close error");
+            goto fat_error;
+        }
 
-        // close the partition
-        fat_ClosePartition(&fat);
-
-        // close the msd device
-        msd_Close(&global.msd);
+         putstr("end of test!");
     }
 
-    // cleanup and return
-    usb_Cleanup();
-    os_GetKey();
-    return 0;
 
-error:
+fat_error:
+    // release the filesystem
+    fat_Deinit(&fat);
+
+msd_error:
+    // close the msd device
+    msd_Close(&global.msd);
+
+usb_error:
+    // cleanup usb
     usb_Cleanup();
-    os_GetKey();
-    return -1;
+
+    while (!os_GetCSC());
+
+    return 0;
 }

@@ -13,6 +13,8 @@ typedef struct global global_t;
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_PARTITIONS 10
+
 #define ROM_FILE_FILE "ROMDUMP.ROM"
 #define ROM_FILE_PATH "/"
 #define ROM_FILE_FILE_PATH ROM_FILE_PATH ROM_FILE_FILE
@@ -68,7 +70,7 @@ int main(void)
 {
     static uint8_t rombuffer[ROM_BUFFER_SIZE];
     static char buffer[212];
-    static msd_partition_t partitions[16];
+    static msd_partition_t partitions[MAX_PARTITIONS];
     static global_t global;
     static fat_t fat;
     uint8_t num_partitions;
@@ -90,7 +92,7 @@ int main(void)
         if (usberr != USB_SUCCESS)
         {
             putstr("usb init error.");
-            goto error;
+            goto usb_error;
         }
 
         while (usberr == USB_SUCCESS)
@@ -102,16 +104,17 @@ int main(void)
             if (os_GetCSC())
             {
                 putstr("exiting demo, press a key");
-                goto error;
+                goto usb_error;
             }
 
             usberr = usb_WaitForInterrupt();
         }
     } while (usberr == USB_RETRY_INIT);
+   
     if (usberr != USB_SUCCESS)
     {
         putstr("usb enable error.");
-        goto error;
+        goto usb_error;
     }
 
     // initialize the msd device
@@ -119,7 +122,7 @@ int main(void)
     if (msderr != MSD_SUCCESS)
     {
         putstr("failed opening msd");
-        goto error;
+        goto usb_error;
     }
 
     putstr("opened msd");
@@ -129,7 +132,6 @@ int main(void)
     if (msderr != MSD_SUCCESS)
     {
         putstr("error getting msd info");
-        msd_Close(&global.msd);
         goto msd_error;
     }
 
@@ -140,7 +142,7 @@ int main(void)
     putstr(buffer);
 
     // locate the first fat partition available
-    num_partitions = msd_FindPartitions(&global.msd, partitions, 16);
+    num_partitions = msd_FindPartitions(&global.msd, partitions, MAX_PARTITIONS);
     if (num_partitions < 1)
     {
         putstr("no paritions found");
@@ -185,7 +187,7 @@ int main(void)
     faterr = fat_Create(&fat, ROM_FILE_PATH, ROM_FILE_FILE, FAT_FILE);
     if (faterr != FAT_SUCCESS)
     {
-        putstr("could not create file");
+        putstr("could not create file!");
         goto fat_error;
     }
 
@@ -193,7 +195,7 @@ int main(void)
     faterr = fat_Open(&file, &fat, ROM_FILE_FILE_PATH);
     if (faterr != FAT_SUCCESS)
     {
-        putstr("could not open file");
+        putstr("could not open file!");
         goto fat_error;
     }
 
@@ -201,7 +203,7 @@ int main(void)
     faterr = fat_SetSize(&file, ROM_FILE_SIZE);
     if (faterr != FAT_SUCCESS)
     {
-        putstr("could not set file size");
+        putstr("could not set file size!");
         goto fat_error;
     }
 
@@ -218,8 +220,7 @@ int main(void)
         count = fat_Write(&file, ROM_BUFFER_NUM_BLOCKS, rombuffer);
         if (count != ROM_BUFFER_NUM_BLOCKS)
         {
-            sprintf(buffer, "error writing rom buffer %u", i);
-            putstr(buffer);
+            putstr("error writing!");
             goto fat_error;
         }
     }
@@ -239,15 +240,13 @@ int main(void)
         count = fat_Read(&file, ROM_BUFFER_NUM_BLOCKS, rombuffer);
         if (count != ROM_BUFFER_NUM_BLOCKS)
         {
-            sprintf(buffer, "error reading rom buffer %u", i);
-            putstr(buffer);
+            putstr("error reading!");
             goto fat_error;
         }
 
         if (memcmp(rombuffer, (const void *)i, ROM_BUFFER_SIZE) != 0)
         {
-            sprintf(buffer, "validation error in rom buffer %u", i);
-            putstr(buffer);
+            putstr("validation error!");
             goto fat_error;
         }
     }
@@ -256,7 +255,7 @@ int main(void)
     faterr = fat_Close(&file);
     if (faterr != FAT_SUCCESS)
     {
-        putstr("could not close file");
+        putstr("could not close file!");
         goto fat_error;
     }
 
@@ -271,9 +270,10 @@ msd_error:
     // close the msd device
     msd_Close(&global.msd);
 
-    // cleanup and return
-error:
+usb_error:
+    // cleanup usb
     usb_Cleanup();
+
     while (!os_GetCSC());
 
     return 0;

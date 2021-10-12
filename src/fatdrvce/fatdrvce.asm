@@ -672,23 +672,13 @@ fat_SetSize:
 fat_GetSize:
 ; Gets the size of the file
 ; Arguments:
-;  sp + 3 : fat struct
-;  sp + 6 : file path
+;  sp + 3 : fat file struct
 ; Returns:
 ;  File size in bytes
-	ld	iy,0
-	add	iy,sp
-	ld	de,(iy + 6)
-	ld	iy,(iy + 3)
-	call	util_locate_entry
-	jq	z,.invalidpath
+	pop	de
+	ex	iy,(sp)
 	push	de
-	pop	iy
-	ld	a,hl,(iy + 28)
-	ret
-.invalidpath:
-	xor	a,a
-	sbc	hl,hl
+	ld	e,hl,(yfatFile.file_size)
 	ret
 
 ;-------------------------------------------------------------------------------

@@ -41,6 +41,7 @@ extern "C" {
 #define fat_callback_data_t void
 #endif
 
+/**< FAT Driver return codes */
 typedef enum {
     FAT_SUCCESS = 0, /**< Operation was successful */
     FAT_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
@@ -59,6 +60,7 @@ typedef enum {
     FAT_ERROR_INVALID_FILESYSTEM, /**< Attempted to initialize a non-FAT filesystem */
 } fat_error_t;
 
+/**< Directory listing options */
 typedef enum {
     FAT_LIST_FILEONLY, /**< For listing only files */
     FAT_LIST_DIRONLY, /**< For listing only directories */
@@ -66,10 +68,21 @@ typedef enum {
 } fat_list_option_t;
 
 typedef struct {
+    /** Callback for reading logical blocks. */
     uint24_t (*read)(fat_callback_data_t *usr, uint32_t lba, uint24_t count, void *buffer);
+
+    /** Callback for writing logical blocks. */
     uint24_t (*write)(fat_callback_data_t *usr, uint32_t lba, uint24_t count, const void *buffer);
+
+    /** Pointer to user-provided data structure that is passed to the
+        relevant read/write callback functions. This can be used to store
+        context information when working with different storage mechanisms. */
     fat_callback_data_t *usr;
+
+    /** First Logical Block Address (LBA) in the filesystem. */
     uint32_t first_lba;
+
+    /** Last Logical Block Address (LBA) in the filesystem. */
     uint32_t last_lba;
     uint8_t priv[1024]; /**< Internal library use */
 } fat_t;
@@ -97,14 +110,8 @@ typedef struct {
  * This function will read and verify that a valid FAT filesystem is being
  * accessed.
  * @param fat FAT structure type.
- * Before calling this function, the following elements must be set:
- *     \p read: Callback for reading logical blocks.
- *     \p write: Callback for writing logical blocks.
- *     \p lba: First Logical Block Address (LBA) in the filesystem.
- *     \p count: Number of logical blocks in the filesystem.
- *     \p usr: Pointer to user-provided data structure that is passed to the
- *       relevant read/write callback functions. This can be used to store
- *       context information when working with different storage mechanisms.
+ * Before calling this function, the following elements must be set in the
+ * \p fat structure: \p read, \p write, \p usr, \p first_lba, and \p last_lba.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Init(fat_t *fat);
@@ -137,11 +144,11 @@ fat_error_t fat_Deinit(fat_t *fat);
  *  int24_t count = fat_DirList("/DIR", FAT_LIST_ALL, entries, MAX_ENTRIES, 0);
  * @endcode
  *
- * @return Number of entries found, or -1 if an error occurred.
+ * @return Number of entries found.
  */
-int24_t fat_DirList(fat_t *fat, const char *path,
-                    fat_list_option_t option, fat_dir_entry_t *entries,
-                    uint24_t size, uint24_t skip);
+uint24_t fat_DirList(fat_t *fat, const char *path,
+                     fat_list_option_t option, fat_dir_entry_t *entries,
+                     uint24_t size, uint24_t skip);
 
 /**
  * Returns the volume label of the drive if it exists.
@@ -192,27 +199,6 @@ fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
 uint8_t fat_GetAttrib(fat_t *fat, const char *filepath);
 
 /**
- * Sets the size of the file, allocating or deallocating space as needed.
- * This function should be called before attempting to write in a file that
- * does not have a large enough current file size, (i.e. a newly created file),
- * otherwise writes may always return FAT_ERROR_EOF.
- * @param file FAT file structure.
- * @param size New file size.
- * @return FAT_SUCCESS on success, otherwise error.
- * @note This function sets the file offset back to the first block, regardless
- *       of the change in size.
- */
-fat_error_t fat_SetSize(fat_file_t *file, uint32_t size);
-
-/**
- * Gets the size of a file.
- * @param fat Initialized FAT structure.
- * @param filepath Absolute file path.
- * @return File size in bytes.
- */
-uint32_t fat_GetSize(fat_t *fat, const char *filepath);
-
-/**
  * Opens a file for either reading or writing, or both.
  * @param file Uninitialized structure to store working file information.
  * @param fat Initialized FAT structure.
@@ -220,6 +206,24 @@ uint32_t fat_GetSize(fat_t *fat, const char *filepath);
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Open(fat_file_t *file, fat_t *fat, const char *filepath);
+
+/**
+ * Sets the size of the file, allocating or deallocating space as needed.
+ * This function should be called before attempting to read/write in a file that
+ * does not have a large enough current file size, (i.e. a newly created file).
+ * @param file FAT file structure.
+ * @param size New file size.
+ * @return FAT_SUCCESS on success, otherwise error.
+ * @note This function resets the block position to 0, regardless size change.
+ */
+fat_error_t fat_SetSize(fat_file_t *file, uint32_t size);
+
+/**
+ * Gets the size of a file.
+ * @param file FAT file structure.
+ * @return File size in bytes.
+ */
+uint32_t fat_GetSize(fat_file_t *file);
 
 /**
  * Sets the block offset position in the file.

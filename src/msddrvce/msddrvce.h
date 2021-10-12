@@ -28,6 +28,7 @@ extern "C" {
 
 #define MSD_BLOCK_SIZE 512 /**< Block size in bytes */
 
+/**< Mass Storage Driver return codes */
 typedef enum {
     MSD_SUCCESS = 0, /**< Operation was successful */
     MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
