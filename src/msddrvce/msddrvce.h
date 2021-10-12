@@ -102,7 +102,7 @@ msd_error_t msd_Info(msd_t *msd, msd_info_t *info);
  * \p msd, \p lba, \p buffer, \p count, \p callback. The optional element
  * \p userptr can be used to store user-defined data for access in the callback.
  * The \p xfer argument must remain valid (cannot be free'd or lose scope)
- * until the callback is issued. You can free \xfer inside the callback as
+ * until the callback is issued. You can free \p xfer inside the callback as
  * needed.
  * @param xfer Initialized transaction structure.
  * @return MSD_SUCCESS if the transfer has been added to the queue.
@@ -114,7 +114,7 @@ msd_error_t msd_ReadAsync(msd_transfer_t *xfer);
  * \p msd, \p lba, \p buffer, \p count, \p callback. The optional element
  * \p userptr can be used to store user-defined data for access in the callback.
  * The \p xfer argument must remain valid (cannot be free'd or lose scope)
- * until the callback is issued. You can free \xfer inside the callback as
+ * until the callback is issued. You can free \p xfer inside the callback as
  * needed.
  * @param xfer Initialized transaction structure.
  * @return MSD_SUCCESS if the transfer has been added to the queue.
@@ -125,8 +125,8 @@ msd_error_t msd_WriteAsync(msd_transfer_t *xfer);
  * Synchronous block read.
  * @param msd Initialized MSD structure.
  * @param lba Logical Block Address (LBA) of starting block to read.
- * @param num Number of blocks to read.
- * @param data Buffer to read into. Must be at least block size * count bytes.
+ * @param count Number of blocks to read.
+ * @param buffer Buffer to read into. Must be at least block size * count bytes.
  * @return Number of blocks read, on success should equal \p count.
  */
 uint24_t msd_Read(msd_t *msd, uint32_t lba, uint24_t count, void *buffer);
@@ -135,8 +135,8 @@ uint24_t msd_Read(msd_t *msd, uint32_t lba, uint24_t count, void *buffer);
  * Synchronous block write.
  * @param msd Iniailized MSD structure.
  * @param lba Logical Block Address (LBA) of starting block to read.
- * @param num Number of blocks to read.
- * @param data Buffer to read into. Must be at least block size * count bytes.
+ * @param count Number of blocks to read.
+ * @param buffer Buffer to read into. Must be at least block size * count bytes.
  * @return Number of blocks written, on success should equal \p count.
  */
 uint24_t msd_Write(msd_t *msd, uint32_t lba, uint24_t count, const void *buffer);
