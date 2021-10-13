@@ -2,15 +2,6 @@
  * @file
  * @brief FAT Filesystem Driver
  *
- * This library can be used to interface with a FAT32 block-based filesystem.
- *
- * Only FAT filesystems with a logical block size of 512 bytes are supported.
- * For best performance, the cluster allocation size should be set to the
- * maxium allowed. On Linux this can be accomplished with the following command:
- * \code
- * mkfs.vfat -s 128 -S 512 -v /dev/<drive parition, e.g. sda1>
- * \endcode
- *
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
  */
@@ -41,7 +32,7 @@ extern "C" {
 #define fat_callback_data_t void
 #endif
 
-/**< FAT Driver return codes */
+/** FAT Driver return codes */
 typedef enum {
     FAT_SUCCESS = 0, /**< Operation was successful */
     FAT_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
@@ -60,7 +51,7 @@ typedef enum {
     FAT_ERROR_INVALID_FILESYSTEM, /**< Attempted to initialize a non-FAT filesystem */
 } fat_error_t;
 
-/**< Directory listing options */
+/** FAT directory listing options */
 typedef enum {
     FAT_LIST_FILEONLY, /**< For listing only files */
     FAT_LIST_DIRONLY, /**< For listing only directories */
@@ -84,11 +75,15 @@ typedef struct {
 
     /** Last Logical Block Address (LBA) in the filesystem. */
     uint32_t last_lba;
-    uint8_t priv[1024]; /**< Internal library use */
+/* @cond */
+    uint8_t priv[1024];
+/* @endcond */
 } fat_t;
 
 typedef struct {
-    uint8_t priv[64]; /**< Internal library use */
+/* @cond */
+    uint8_t priv[64];
+/* @endcond */
 } fat_file_t;
 
 typedef struct {
@@ -241,7 +236,7 @@ fat_error_t fat_SetPos(fat_file_t *file, uint24_t block);
 uint24_t fat_GetPos(fat_file_t *file);
 
 /**
- * Synchronous read for multiple blocks. Advances file block offset position.
+ * Read from a file. Advances file block offset position.
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to read.
  * @param buffer Data read from FAT file.
@@ -250,7 +245,7 @@ uint24_t fat_GetPos(fat_file_t *file);
 uint24_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
 
 /**
- * Synchronous write for multiple blocks. Advances file block offset position.
+ * Write to a file. Advances file block offset position.
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to write to file.
  * @param buffer Data to write to FAT file.

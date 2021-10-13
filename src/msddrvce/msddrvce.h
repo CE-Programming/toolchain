@@ -28,7 +28,7 @@ extern "C" {
 
 #define MSD_BLOCK_SIZE 512 /**< Block size in bytes */
 
-/**< Mass Storage Driver return codes */
+/** Mass Storage Driver return codes */
 typedef enum {
     MSD_SUCCESS = 0, /**< Operation was successful */
     MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
@@ -41,7 +41,9 @@ typedef enum {
 } msd_error_t;
 
 typedef struct {
+/* @cond */
     uint8_t priv[1024]; /**< Internal library use */
+/* @endcond */
 } msd_t;
 
 typedef struct {
@@ -49,17 +51,16 @@ typedef struct {
     uint32_t bnum; /**< Number of blocks on MSD */
 } msd_info_t;
 
-typedef struct msd_transfer_t {
+typedef struct msd_transfer {
     msd_t *msd; /**< Initialized MSD device */
     uint32_t lba; /**< Logical block address */
     void *buffer; /**< Pointer to data location to read/write */
     uint24_t count; /**< Number of blocks to transfer */
-    void (*callback)(msd_error_t error, struct msd_transfer_t *xfer); /**< Called when transfer completes */
+    void (*callback)(msd_error_t error, struct msd_transfer *xfer); /**< Called when transfer completes */
     void *userptr; /**< Custom user data for callback (optional) */
-    void *next; /**< Internal library use */
-    uint8_t stall; /**< Internal library use */
-    uint8_t cbw[31+1]; /**< Internal library use */
-    uint8_t csw[13+19]; /**< Internal library use */
+/* @cond */
+    uint8_t priv[/*next*/3+/*stall*/1+/*cbw*/31+1+/*csw*/13+19];
+/* @endcond */
 } msd_transfer_t;
 
 typedef struct {
