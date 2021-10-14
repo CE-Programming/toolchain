@@ -59,7 +59,7 @@ typedef struct msd_transfer {
     void (*callback)(msd_error_t error, struct msd_transfer *xfer); /**< Called when transfer completes */
     void *userptr; /**< Custom user data for callback (optional) */
 /* @cond */
-    uint8_t priv[/*next*/3+/*stall*/1+/*cbw*/31+1+/*csw*/13+19];
+    uint8_t priv[76];
 /* @endcond */
 } msd_transfer_t;
 
