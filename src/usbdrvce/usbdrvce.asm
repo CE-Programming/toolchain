@@ -537,12 +537,12 @@ end virtual
 DEFAULT_RETRIES := 10
 
 
-SAFE_HS_BT := 83.54e-9 ; safe high-speed bit time (USB 2.0 spec section 5.11.3)
-SAFE_HS_SBT := SAFE_HS_BT * 7 / 6 ; safe high-speed stuffed bit time
-SAFE_HS_SBPT := SAFE_HS_SBT * 2 ; safe high-speed stuffed bit pair time
-HS_FT := 1e-3 ; high-speed frame time
-HS_SFT := HS_FT * 0.90 ; high-speed schedulable frame time
-HS_SBP_PER_FRAME := trunc (HS_SFT / SAFE_HS_SBPT) ; high-speed stuffed bit pairs per frame
+SAFE_FS_BT := 83.54e-9 ; safe full-speed bit time (USB 2.0 spec section 5.11.3)
+SAFE_FS_SBT := SAFE_FS_BT * 7 / 6 ; safe full-speed stuffed bit time
+SAFE_FS_SBPT := SAFE_FS_SBT * 2 ; safe full-speed stuffed bit pair time
+FS_FT := 1e-3 ; full-speed frame time
+FS_SFT := FS_FT * 0.90 ; full-speed schedulable frame time
+FS_SBP_PER_FRAME := trunc (FS_SFT / SAFE_FS_SBPT) ; full-speed stuffed bit pairs per frame
 
 ;-------------------------------------------------------------------------------
 
@@ -688,7 +688,7 @@ assert ~periodicList and $FF
 	and	a,3
 	ld	de,_ScheduleEndpoint.disable
 	jq	z,.noPeriodicList
-	ld	de,($D10000 and $70000 or not HS_SBP_PER_FRAME shl (31-bsr HS_SBP_PER_FRAME)) shr 8 or $FF
+	ld	de,($D10000 and $70000 or not FS_SBP_PER_FRAME shl (31-bsr FS_SBP_PER_FRAME)) shr 8 or $FF
 	ld	b,a
 	ld	a,1 shl 1
 .shift:
@@ -2380,7 +2380,7 @@ _DeviceDisconnected:
 
 ; Input:
 ;  b = interval
-;  hl + de = max high-speed stuffed bit times needed
+;  hl + de = max full-speed stuffed bit times needed
 ;  iy = endpoint
 ; Output:
 ;  cf = schedule full
@@ -2397,7 +2397,7 @@ virtual
  load .disable: $-$$ from $$
 end virtual
 	add	hl,de
-repeat 15-bsr HS_SBP_PER_FRAME
+repeat 15-bsr FS_SBP_PER_FRAME
 	add	hl,hl
 end repeat
 load .enable: long from .enabled
@@ -2672,27 +2672,28 @@ end repeat
 	rrca
 assert INTERRUPT_TRANSFER and 1
 	jq	c,.intr
-	djnz	.validIsocInterval
+	djnz	.isoc.validInterval
 .invalidParam:
 	ld	hl,USB_ERROR_INVALID_PARAM
 	ret
-.validIsocInterval:
+.isoc.validInterval:
 	inc	b
-; full-speed out isoc: 4*bytes + 39 hs sbp
-; full-speed  in isoc: 4*bytes + 44 hs sbp
+; full-speed out isoc: 4*bytes + 39 fs sbp
+; full-speed  in isoc: 4*bytes + 44 fs sbp
 	bitmsk	yendpoint.transferInfo.dir
 	ld	de,39
-	jq	z,.schedule
+	jq	z,.isoc.schedule
 	ld	e,44
-	call	.schedule
+.isoc.schedule:
+;	call	.schedule
 assert USB_ERROR_INVALID_PARAM
 	ld	hl,USB_ERROR_INVALID_PARAM-1
 	inc	l
 	ret
 .intr:
-;  full-speed other: 4*bytes + 54 hs sbp
-;     low-speed  in: 32*bytes + 348 hs sbp
-;     low-speed out: 32*bytes + 350 hs sbp
+;  full-speed other: 4*bytes + 54 fs sbp
+;     low-speed  in: 32*bytes + 348 fs sbp
+;     low-speed out: 32*bytes + 350 fs sbp
 	bit	bsf yendpoint.info.eps,(yendpoint.info)
 	ld	de,54
 	jq	z,.schedule
