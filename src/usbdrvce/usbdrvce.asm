@@ -214,14 +214,12 @@ struct endpoint			; endpoint structure
 	flags		rb 1	; endpoint flags
  namespace flags
 	autoTerm	:= 1 shl 0
+	po2Mps		:= 1 shl 1
+	refCnt		:= 1 shl 2
+	freed		:= 1 shl 3
  end namespace
-	internalFlags	rb 1	; internal endpoint flags
- namespace internalFlags
-	po2Mps		:= 1 shl 0
-	refCnt		:= 1 shl 1
-	freed		:= 1 shl 2
- end namespace
-	interval	rb 1	; transfer po2 interval
+	interval	rb 1	; schedule po2 interval
+	offset		rb 1	; schedule offset shl 1
 	device		rl 1	; pointer to device
 	first		rl 1	; pointer to first scheduled transfer
 	last		rl 1	; pointer to last dummy transfer
@@ -1472,7 +1470,11 @@ usb_SetEndpointFlags:
 	xor	a,a
 	cp	a,iyl
 	ret	z
-	ld	(yendpoint.flags),l
+	ld	a,(yendpoint.flags)
+	xor	a,l
+	and	a,not endpoint.flags.autoTerm
+	xor	a,l
+	ld	(yendpoint.flags),a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1481,7 +1483,7 @@ usb_GetEndpointFlags:
 	ex	(sp),yendpoint
 	xor	a,a
 	cp	a,iyl
-	sbc	a,a
+	rla
 	and	a,(yendpoint.flags)
 	jp	(hl)
 
@@ -1782,7 +1784,7 @@ _QueueTransfer:
 	jq	z,.last
 	ld	de,(yendpoint.maxPktLen)
 	ex.s	de,hl
-	bitmsk	yendpoint.internalFlags.po2Mps
+	bitmsk	yendpoint.flags.po2Mps
 	jq	nz,.modPo2
 	ld	a,h
 	and	a,7
@@ -2319,6 +2321,7 @@ assert IS_DISABLED = 1
 	ld	ixh,a
 	inc	a
 	jq	z,.next
+	; TODO: HANDLE INTERRUPT TRANSFERS!!!
 	ld	a,(xendpoint.transferInfo)
 	and	a,endpoint.transferInfo.type
 	ld	a,-1
@@ -2388,10 +2391,12 @@ _DeviceDisconnected:
 ;  iy = endpoint
 ; Output:
 ;  cf = schedule full
-;  af = ?
+;  f = ?
+;  a = 1 - offset shr 6 | ?
 ;  bc = ?
 ;  de = endpoint | ?
 ;  hl = ?
+;  iyl = offset shl 2 | ?
 ;  iy = ?
 _ScheduleEndpoint:
 label .enabled
@@ -2464,8 +2469,11 @@ label .stride at $-long
 	ret	c
 	ld	bc,4-1
 label .frameListSize at $-long
-	add	iy,bc
 .link:
+	add	iy,bc
+	ld	a,periodicList shr 8 and $FF-1
+	sub	a,iyh
+	ret	nc
 	push	iy,de
 	inc	iy
 	ld	bc,(iy-4+endpoint.maxHsSbp)
@@ -2512,11 +2520,7 @@ assert endpoint-2 = endpoint.next
 .linked:
 	ld	d,h
 	ld	iy,(.stride)
-	add	iy,bc
-	ld	a,periodicList shr 8 and $FF-1
-	cp	a,iyh
-	jq	c,.link
-	ret
+	jq	.link
 
 ; Input:
 ;  iy = device
@@ -2608,7 +2612,7 @@ assert endpoint.info+1 = endpoint.maxPktLen
 assert endpoint.cmask+1 = endpoint.hubInfo
 iterate <field,value>, smask,c, cmask,bc, \
                        overlay.altNext,1, overlay.status,c, \
-                       flags,c, internalFlags,c, interval,c, device,ydevice
+                       flags,c, interval,c, offset,c, device,ydevice
  if .l+1 = endpoint.field
 	inc	l
  else
@@ -2650,8 +2654,7 @@ end iterate
 	and	a,(hl)
 	or	a,c
 	jq	nz,.notPo2Mps
-assert endpoint.internalFlags.po2Mps = 1 shl 0
-	inc	(yendpoint.internalFlags)
+	setmsk	yendpoint.flags.po2Mps
 .notPo2Mps:
 	pop	bc
 	ld	a,(currentRole)
@@ -2713,10 +2716,14 @@ end repeat
 	ld	e,350-$100
 .schedule:
 	call	_ScheduleEndpoint
+	rr	a
+	ld	a,iyl
+	ccf
+	rra
 	push	de
 	pop	yendpoint
+	ld	(yendpoint.offset),a
 	ld	hl,USB_ERROR_SCHEDULE_FULL
-	sbc	a,a
 	ret
 .async:
 	ld	hl,(dummyHead.next)
@@ -3101,7 +3108,7 @@ assert .nop = 0
 	ld	c,a
 	call	_RetireFirstTransfer
 	ret	nc
-	bitmsk	xendpoint.internalFlags.freed
+	bitmsk	xendpoint.flags.freed
 	jq	z,.loop
 	jq	.dangling
 .halted:
@@ -3120,7 +3127,7 @@ end virtual
 	ld	a,.ret_z
 	call	_RetireFirstTransfer
 	jq	nz,_FlushEndpoint.check
-	bitmsk	xendpoint.internalFlags.freed
+	bitmsk	xendpoint.flags.freed
 .dangling:
 	jq	nz,_FlushEndpoint.dangling
 	ld	ytransfer,(xendpoint.first)
@@ -3164,7 +3171,7 @@ assert .nop = 0
 	call	_RetireFirstTransfer
 	ret	nc
 _FlushEndpoint.check:
-	bitmsk	xendpoint.internalFlags.freed
+	bitmsk	xendpoint.flags.freed
 	jq	nz,_FlushEndpoint.dangling
 	jq	_FlushEndpoint
 _FlushEndpoint:
@@ -3195,7 +3202,7 @@ assert endpoint.overlay.altNext+2 = endpoint.overlay.status-2
 	adc	hl,de
 	ret
 .dangling:
-	bitmsk	xendpoint.internalFlags.refCnt
+	bitmsk	xendpoint.flags.refCnt
 	ret	nz
 	lea	yendpoint,xendpoint
 .free:
@@ -3219,8 +3226,8 @@ assert endpoint.overlay.altNext+2 = endpoint.overlay.status-2
 ;  ix = endpoint (maybe just freed)
 ;  iy = ignored transfer | ?
 _RetireFirstTransfer:
-	bitmsk	xendpoint.internalFlags.refCnt
-	setmsk	xendpoint.internalFlags.refCnt
+	bitmsk	xendpoint.flags.refCnt
+	setmsk	xendpoint.flags.refCnt
 	ld	de,(xendpoint.first)
 	push	af,de,bc
 .loop:
@@ -3252,7 +3259,7 @@ _RetireFirstTransfer:
 	pop	bc,bc,bc,bc,bc,ytransfer,af
 	ld	(.smc),a
 	jq	nz,.restored
-	resmsk	xendpoint.internalFlags.refCnt
+	resmsk	xendpoint.flags.refCnt
 .restored:
 	add	hl,de
 	scf
@@ -4132,7 +4139,7 @@ usb_PollTransfers:
 .async.restart:
 	ld	xendpoint,dummyHead
 .async:
-	bitmsk	xendpoint.internalFlags.freed
+	bitmsk	xendpoint.flags.freed
 	jq	nz,.async.restart
 	ld	xendpoint,(xendpoint.next)
 	or	a,a
@@ -4172,7 +4179,7 @@ end virtual
 	call	_RetireTransfers.nc
 	pop	bc
 	jq	nc,.periodic.error
-	bitmsk	xendpoint.internalFlags.freed
+	bitmsk	xendpoint.flags.freed
 	ld	xendpoint,(xendpoint.next)
 	ld	e,ixl
 	jq	z,.intr
@@ -4347,8 +4354,8 @@ _HandleAsyncAdvInt:
 	jq	.enter
 .loop:
 	ld	a,(yendpoint.prev)
-	setmsk	yendpoint.internalFlags.freed
-	bitmsk	yendpoint.internalFlags.refCnt
+	setmsk	yendpoint.flags.freed
+	bitmsk	yendpoint.flags.refCnt
 	call	z,_FlushEndpoint.free
 .enter:
 	ld	iyh,a
