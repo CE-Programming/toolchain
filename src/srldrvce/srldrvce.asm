@@ -712,8 +712,7 @@ ring_buf_push:
 	sbc	hl,bc					; hl = len
 	push	hl
 	pop	bc					; bc = len
-	ex	de,hl					; hl = data
-	push	hl
+	push	de
 	call	.copy					; hl = len
 	ld	bc,(xring_buf_ctrl.buf_start)
 	ld	(xring_buf_ctrl.data_end),bc
@@ -724,8 +723,8 @@ ring_buf_push:
 	sbc	hl,de
 	push	hl
 	pop	bc					; bc = size - len
-	lea	hl,iy
 	push	de
+	lea	de,iy
 	call	.break
 	pop	de
 	add	hl,de
