@@ -219,7 +219,7 @@ struct endpoint			; endpoint structure
 	freed		:= 1 shl 3
  end namespace
 	interval	rb 1	; schedule po2 interval
-	offset		rb 1	; schedule offset shl 1
+	offset		rb 1	; schedule offset shl 1 or 1
 	device		rl 1	; pointer to device
 	first		rl 1	; pointer to first scheduled transfer
 	last		rl 1	; pointer to last dummy transfer
@@ -350,13 +350,15 @@ virtual at ti.usbArea
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
 	?timerList		rl 1
-assert $+1 = cleanupListReady
+iterate type, async, intr
+ assert $+1 = type#CleanupReady
 				rb 1 ; clobber
-	?cleanupListReady	rb 1
-assert cleanupListReady+1 = cleanupListPending
-	?cleanupListPending	rb 1
-assert cleanupListPending+1 = $
+	?type#CleanupReady	rb 1
+ assert type#CleanupReady+1 = type#CleanupPending
+	?type#CleanupPending	rb 1
+ assert type#CleanupPending+1 = $
 				rb 1 ; always -1
+end iterate
 if DEBUG
 	?alloc32Align32		rl 1
 	?alloc64Align256	rl 1
@@ -437,7 +439,6 @@ virtual at 0
 	USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_OVERCURRENT_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_FORCE_PORT_RESUME_INTERRUPT		rb 1
-	USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT			rb 1
 	USB_HOST_SYSTEM_ERROR_INTERRUPT				rb 1
 end virtual
 
@@ -575,12 +576,13 @@ assert ti.usbHandleKeys and $1F >= long
 	sbc	hl,hl
 assert endpoint.smask+1 = endpoint.cmask
 assert endpoint.smask+2 = endpoint.hubInfo
-	ld	(dummyHead.smask), hl
+	ld	(dummyHead.smask),hl
 assert deviceStatus+1 = tempEndpointStatus
 	ld	(deviceStatus),hl;0
 	ld	(timerList),hl;0
 	dec	hl
-	ld	(cleanupListReady),hl;-1
+	ld	(asyncCleanupReady),hl;-1
+	ld	(intrCleanupReady),hl;-1
 	inc	hl
 	ld	(rootHub.addr),a;0
 	ld	(rootHub.data),hl;0
@@ -684,7 +686,7 @@ assert ~periodicList and $FF
 	ld	a,e
 	cpl
 	and	a,3
-	ld	c,usb_PollTransfers.disable
+	ld	b,usb_PollTransfers.disable
 	ld	de,_ScheduleEndpoint.disable
 	jq	z,.noPeriodicList
 	ld	de,($D10000 and $70000 or not FS_SBP_PER_FRAME shl (31-bsr FS_SBP_PER_FRAME)) shr 8 or $FF
@@ -700,10 +702,14 @@ assert ~periodicList and $FF
 	ld	(hl),de
 	ld	de,periodicList+1+dword
 	ldir
-	ld	c,usb_PollTransfers.enable
+	ld	a,h
+	dec	a
+	rrca
+	ld	(_DeviceDisabled.frameListEndSub1Shr1+1),a
+	ld	b,usb_PollTransfers.enable
 	ld	de,_ScheduleEndpoint.enable
 .noPeriodicList:
-	ld	a,c
+	ld	a,b
 	ld	(usb_PollTransfers.enabled),a
 	ld	(_ScheduleEndpoint.enabled),de
 	ld	a,(periodicList+sizeof periodicList-$D10000) shr 8
@@ -1339,7 +1345,6 @@ end iterate
 	lea	xendpoint,yendpoint
 	call	_FlushEndpoint
 	ret	c
-.pop2return:
 	pop	bc,ix
 	ret
 
@@ -2201,9 +2206,11 @@ _PowerVbusForRole:
 	res	ti.bUsbASrpEn,(hl)
 	push	hl,de
 	call	_DisableSchedulesAndResetHostController
-	ld	de,$D7FFFF ; disable doorbell
+	ld	de,ti.mpIntRange-1 ; disable doorbell
 	call	_HandleAsyncAdvInt.cleanup.de
 	call	_HandleAsyncAdvInt.cleanup.hl
+	call	_HandleFrameListOverInt.cleanup
+	call	_HandleFrameListOverInt.cleanup
 	pop	de,hl
 	set	ti.bUsbABusDrop,(hl)
 	res	ti.bUsbABusReq,(hl)
@@ -2320,8 +2327,7 @@ assert IS_DISABLED = 1
 	ld	a,(de)
 	ld	ixh,a
 	inc	a
-	jq	z,.next
-	; TODO: HANDLE INTERRUPT TRANSFERS!!!
+	jq	z,.skip
 	ld	a,(xendpoint.transferInfo)
 	and	a,endpoint.transferInfo.type
 	ld	a,-1
@@ -2332,19 +2338,88 @@ assert IS_DISABLED = 1
 .notControl:
 	push	de
 	call	_FlushEndpoint
-	pop	de
-	jq	nc,usb_ClearEndpointHalt.pop2return
+	jq	nc,.pop3return
+	ld	a,(xendpoint.transferInfo)
+	rrca
+assert ~(CONTROL_TRANSFER or BULK_TRANSFER) and 1 shl 0
+	jq	nc,.async
+	rrca
+assert ~ISOCHRONOUS_TRANSFER and 1 shl 1
+	jq	nc,.isoc
+assert endpoint.interval+1 = endpoint.offset
+	ld	bc,(xendpoint.interval)
+	sbc	hl,hl
+	xor	a,a
+	sub	a,c
+	ld	l,a
+	add	hl,hl
+	add	hl,hl
+	ex	de,hl
+	ld	iy,periodicList shr 1
+label .frameListEndSub1Shr1 at $-long
+	ld	iyl,b
+	add	iy,iy
+.intr.unlink:
+	ld	bc,(xendpoint.maxHsSbp)
+	dec.s	bc
+	ld	hl,(iy)
+	sbc	hl,bc
+	ld	(iy),hl
+	push	iy
+	lea	iy,iy+2
+virtual
+	ld	hl,0
+ load .ld_hl: byte from $$
+end virtual
+	db	.ld_hl
+.intr.skip:
+	ld	iyh,b
+	ld	iyl,c
+	ld	bc,(iy-4)
+	bit	2,c
+	jq	nz,.intr.skip
+	db	.ld_hl
+.intr.find:
+	ld	iyh,a
+	ld	iyl,endpoint.base+4
+	bit	0,(iy-4+endpoint.next+0)
+	jq	nz,.intr.gone
+	ld	a,(iy-4+endpoint.next+1)
+	cp	a,ixh
+	jq	nz,.intr.find
+	ld	hl,(xendpoint.next)
+	ld	(iy-4+endpoint.next+0),l
+	ld	(iy-4+endpoint.next+1),h
+.intr.gone:
+	pop	iy
+	add	iy,de
+	ld	a,iyh
+	cp	a,periodicList shr 8 and $FF-1
+	jq	nc,.intr.unlink
+	ld	hl,intrCleanupPending
+	jq	.cleanup
+.pop3return:
+	pop	bc,bc,ix
+	ret
+.isoc:
+	lea	hl,xendpoint.base
+	call	_Free64Align256
+	jq	.next
+.async:
 	lea	hl,xendpoint.next
 	ld	h,(xendpoint.prev)
 	ld	yendpoint,(xendpoint.next)
 	ld	(hl+endpoint.next),yendpoint
 	ld	(yendpoint.prev),h
-	ld	hl,cleanupListPending
+	ld	hl,asyncCleanupPending
+.cleanup:
 	ld	a,(hl)
 	ld	(xendpoint.prev),a
 	ld	a,ixh
 	ld	(hl),a
 .next:
+	pop	de
+.skip:
 	inc	e
 	ld	a,e
 	and	a,31
@@ -2476,10 +2551,10 @@ label .frameListSize at $-long
 	ret	nc
 	push	iy,de
 	inc	iy
-	ld	bc,(iy-4+endpoint.maxHsSbp)
+	ld	bc,(iy-2)
 	ld	hl,(.maxHsSbp)
 	add	hl,bc
-	ld	(iy-4+endpoint.maxHsSbp),hl
+	ld	(iy-2),hl
 virtual
 	ld	hl,0
  load .ld_hl: byte from $$
@@ -2701,8 +2776,8 @@ assert USB_ERROR_INVALID_PARAM
 ;  full-speed other: 4*bytes + 54 fs sbp
 ;     low-speed  in: 32*bytes + 348 fs sbp
 ;     low-speed out: 32*bytes + 350 fs sbp
-	inc	(yendpoint.smask); 00000001b
-	ld	(yendpoint.cmask), 00011100b
+	inc	(yendpoint.smask);00000001b
+	ld	(yendpoint.cmask),00011100b
 	bit	bsf yendpoint.info.eps,(yendpoint.info)
 	ld	de,54
 	jq	z,.schedule
@@ -3157,6 +3232,7 @@ end virtual
 ;  cf = success
 ;  zf = ? | false
 ;  af = ?
+;  bc = ?
 ;  de = ?
 ;  hl = ? | error
 ;  iy = ?
@@ -4203,7 +4279,7 @@ _HandlePortChgDetectInt:
 	ld	(hl),ti.bmUsbIntPortChgDetect
 	ld	l,ti.usbPortStsCtrl
 iterate type, ConnSts, PortEn, Overcurr
-	bit	ti.bUsb#type#Chg, (hl)
+	bit	ti.bUsb#type#Chg,(hl)
 	call	nz,_HandlePort#type#Int
 	ret	nz
 end iterate
@@ -4336,8 +4412,37 @@ assert USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT - 1 = USB_DEVICE_OVERCURRENT_DEACT
 
 _HandleFrameListOverInt:
 	ld	(hl),ti.bmUsbIntFrameListOver
-	ld	a,USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT
-	jq	_DispatchEvent
+	ex	de,hl
+.cleanup:
+	ld	hl,intrCleanupReady
+	ld	bc,(hl)
+	dec	hl
+	ld	(hl),bc
+	jq	_CleanupEndpoints
+
+; Input:
+;  c = cleanup list head
+; Output:
+;  zf = true
+;  cf = cf
+;  f = ?
+;  c = 0
+;  de = ?
+;  hl = de
+;  iy = ?
+_CleanupEndpoints:
+	ld	yendpoint,dummyHead
+.loop:
+	ld	iyh,c
+	ex	de,hl
+	inc	c
+	ret	z
+	ex	de,hl
+	ld	c,(yendpoint.prev)
+	setmsk	yendpoint.flags.freed
+	bitmsk	yendpoint.flags.refCnt
+	call	z,_FlushEndpoint.free
+	jq	.loop
 
 _HandleHostSysErrInt:
 	ld	(hl),ti.bmUsbIntHostSysErr
@@ -4349,37 +4454,27 @@ _HandleAsyncAdvInt:
 .cleanup.hl:
 	ex	de,hl
 .cleanup.de:
-	ld	a,(cleanupListReady)
-	ld	yendpoint,dummyHead
-	jq	.enter
-.loop:
-	ld	a,(yendpoint.prev)
-	setmsk	yendpoint.flags.freed
-	bitmsk	yendpoint.flags.refCnt
-	call	z,_FlushEndpoint.free
-.enter:
-	ld	iyh,a
-	inc	a
-	jq	nz,.loop
-	scf
+	ld	hl,asyncCleanupReady
+	ld	bc,(hl)
+	call	_CleanupEndpoints
+	jq	.ready
 .scheduleCleanup.de:
 	ret	nz
 	ex	de,hl
 .scheduleCleanup.hl:
 	ret	nz
-	sbc	a,a
-	ld	de,(cleanupListReady)
-	scf
-	adc	a,e
-	sbc	a,a
+	ld	bc,(asyncCleanupReady)
+	inc	c
+	jq	nz,.success
+.ready:
+	ld	(asyncCleanupReady-1),bc
+	inc	b
 	ret	z
-	ld	(cleanupListReady-1),de
-	inc	d
-	ret	z
-	ld	a,l
+	ld	c,l
 	ld	l,ti.usbCmd
 	set	ti.bUsbIntAsyncAdvDrbl,(hl)
-	ld	l,a
+	ld	l,c
+.success:
 	cp	a,a
 	ret
 
@@ -4419,34 +4514,34 @@ _DispatchEvent:
 ;-------------------------------------------------------------------------------
 usb_MsToCycles:
 	pop	de
-	ex	(sp), hl
+	ex	(sp),hl
 	push	de
 .enter:
 assert 48000 and $FF = $80
 	dec.s	bc
 .zbcu:
-	ld	c, l
-	ld	b, h
-	xor	a, a
+	ld	c,l
+	ld	b,h
+	xor	a,a
 	srl	b
 	rr	c
 	rra
-	ld	e, 48000 shr 8
-	ld	d, h
-	ld	h, e
+	ld	e,48000 shr 8
+	ld	d,h
+	ld	h,e
 	mlt	hl
-	add	hl, bc
+	add	hl,bc
 	mlt	de
 	push	de
 	dec	sp
 	pop	de
-	ld	e, 0
-	add	hl, de
+	ld	e,0
+	add	hl,de
 	dec	sp
 	push	hl
 	dec	sp
-	pop	hl, de
-	ld	l, a
+	pop	hl,de
+	ld	l,a
 	ret
 
 ;-------------------------------------------------------------------------------

@@ -120,7 +120,6 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
         "USB_HOST_PORT_ENABLE_DISABLE_CHANGE_INT",
         "USB_HOST_PORT_OVERCURRENT_CHANGE_INT",
         "USB_HOST_PORT_FORCE_PORT_RESUME_INT",
-        "USB_HOST_FRAME_LIST_ROLLOVER_INT",
         "USB_HOST_SYSTEM_ERROR_INT",
     };
     usb_error_t error = USB_SUCCESS;
@@ -227,15 +226,6 @@ static usb_error_t handleUsbEvent(usb_event_t event, void *event_data,
                 break;
             }
             handleBulkOut(out_endpoint, USB_TRANSFER_COMPLETED, 0, buffer);
-            break;
-        }
-        case USB_HOST_FRAME_LIST_ROLLOVER_INTERRUPT: {
-            static unsigned counter;
-            unsigned row, col;
-            os_GetCursorPos(&row, &col);
-            os_SetCursorPos(0, 8);
-            printf("%06X", ++counter);
-            os_SetCursorPos(row, col);
             break;
         }
         case USB_DEVICE_INTERRUPT:
@@ -410,7 +400,7 @@ int main(void) {
             unsigned row, col;
             os_GetCursorPos(&row, &col);
             os_SetCursorPos(0, 0);
-            printf("%06X: %08" PRIX32, usb_GetFrameNumber(), usb_GetCycleCounter());
+            printf("%06X: %08" PRIX32 " ", usb_GetFrameNumber(), usb_GetCycleCounter());
             os_SetCursorPos(row, col);
             handleDevice(&global);
         }
