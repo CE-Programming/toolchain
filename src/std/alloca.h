@@ -1,8 +1,13 @@
 #ifndef _ALLOCA_H
 #define _ALLOCA_H
 
-#include <stddef.h>
+#include <cdefs.h>
 
-void *alloca(size_t __size);
+__BEGIN_DECLS
+
+void *alloca(size_t __size) __NOEXCEPT;
+#define alloca alloca(size) __builtin_alloca(size)
+
+__END_DECLS
 
 #endif /* _ALLOCA_H */
