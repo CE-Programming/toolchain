@@ -23,6 +23,7 @@ size_t ring_buf_push_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
 size_t ring_buf_pop_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
 void ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region);
 void ring_buf_update_write_(ring_buf_ctrl_t *rbuf, size_t size);
+void set_rate_(srl_device_t *srl, uint24_t rate);
 
 void print_ring_buf(const ring_buf_ctrl_t *rbuf) {
     printf("  buf_start: %p\n", rbuf->buf_start);
@@ -146,6 +147,12 @@ int main(void) {
             if(kb_IsDown(kb_KeySin)) {
                 printf("%s\n", (char*)srl.tx_buf.data_start);
                 while(kb_IsDown(kb_KeySin)) kb_Scan();
+            }
+
+            if(kb_IsDown(kb_KeyMul)) {
+                printf("setting rate\n");
+                set_rate_(&srl, 9600);
+                printf("set rate\n");
             }
 
             size_t bytes_read = srl_Read(&srl, in_buf, sizeof in_buf);

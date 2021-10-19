@@ -26,6 +26,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	ring_buf_pop_
 	export	ring_buf_update_read_
 	export	ring_buf_update_write_
+	export	set_rate_
 ;-------------------------------------------------------------------------------
 macro compare_hl_zero?
 	add	hl,de
@@ -135,6 +136,15 @@ end virtual
 ?USB_TRANSFER_BUS_ERROR		:= 1 shl 5
 ?USB_TRANSFER_FAILED		:= 1 shl 6
 ?USB_TRANSFER_CANCELLED		:= 1 shl 7
+
+struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
+	label .: 8
+	bmRequestType		db requestType
+	bRequest		db request
+	wValue			dw value
+	wIndex			dw index
+	wLength			dw length
+end struct
 
 struct descriptor
 	label .: 2
@@ -736,7 +746,35 @@ set_rate:
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate_cdc:
+	ld	(.linecoding),hl
+	ld	bc,0
+	push	bc	; transferred
+	ld	bc,50
+	push	bc	; num retries
+	ld	bc,.linecoding
+	push	bc	; data
+	ld	bc,.setup
+	push	bc	; setup
+
+	ld	bc,0
+	push	bc	; ep addr
+	ld	bc,(xsrl_device.dev)
+	push	bc	; device
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+
+	push	hl	; endpoint
+	call	usb_ControlTransfer
+	pop	bc,bc,bc,bc,bc
+	ld	a,l
+	or	a,a
+	ret	z
+	ld	l,SRL_ERROR_USB_FAILED
 	ret
+.setup	setuppkt	$21,$20,$0000,$0000,$0007
+.linecoding:
+	db	$80,$25,0,0,0,0,8
+
 
 ; Sets the baud rate of a FTDI device
 ; Inputs:
@@ -1195,5 +1233,15 @@ ring_buf_update_write_:
 	ld	bc,(ix+6)
 	ld	ix,(ix+3)
 	call	ring_buf_update_write
+	pop	ix
+	ret
+
+set_rate_:
+	push	ix
+	ld	ix,3
+	add	ix,sp
+	ld	hl,(ix+6)
+	ld	ix,(ix+3)
+	call	set_rate
 	pop	ix
 	ret
