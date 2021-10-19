@@ -6,7 +6,7 @@
 __BEGIN_DECLS
 
 void *alloca(size_t __size) __NOEXCEPT;
-#define alloca alloca(size) __builtin_alloca(size)
+#define alloca(size) __builtin_alloca(size)
 
 __END_DECLS
 
