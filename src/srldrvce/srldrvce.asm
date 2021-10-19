@@ -908,7 +908,6 @@ write_callback:
 	jq	nz,.no_device
 
 	ld	bc,(iy+9)
-	ld	a,64
 	lea	ix,xsrl_device.tx_buf
 	call	ring_buf_update_write
 	call	start_write
