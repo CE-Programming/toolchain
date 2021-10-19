@@ -20,7 +20,6 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	srl_GetCDCStandardDescriptors
 ; temp
 	export	get_device_type_
-	export	get_endpoint_addresses_
 	export	ring_buf_contig_avail_
 	export	ring_buf_has_consecutive_region_
 	export	ring_buf_push_
@@ -404,17 +403,14 @@ srl_Open:
 	jq	nz,.exit
 
 .configured:
+	ld	a,(iy+15)				; a = interface number
+	push	iy
 	call	get_device_type
+	pop	iy
 	ld	a,(xsrl_device.type)			; check if type is unknown
 	cp	a,SRL_TYPE_UNKNOWN
 	ld	a,SRL_ERROR_INVALID_DEVICE
 	jq	z,.exit
-
-	ld	a,(iy+15)				; a = interface number
-	call	get_endpoint_addresses
-	ld	a,l					; check for error
-	or	a,a
-	jq	nz,.exit_hl
 
 	call	init_device
 	ld	a,l					; check for error
@@ -566,33 +562,135 @@ srl_GetCDCStandardDescriptors:
 ; Gets the device type and subtype based on the descriptors
 ; Inputs:
 ;  ix: Serial device struct
-;  xsrl_device.buffer: Device descriptor, followed by config descriptor
+;  a: Interface number
+;  xsrl_device.rx_buf.buf_start: Device descriptor, followed by config descriptor
 ; Returns:
 ;  xsrl_device.type: Device type
 ;  xsrl_device.subtype: Device subtype
+;  xsrl_device.rx_addr: Receive endpoint address
+;  xsrl_device.tx_addr: Transmit endpoint address
 get_device_type:
+	ld	(.expectedIntNum),a
+
+; todo: vendor-specific devices
+
+; check for CDC ACM device
+	ld	hl,(xsrl_device.rx_buf.buf_start)
+	call	next_descriptor
+	inc	hl
+	inc	hl
+	ld	de,0
+	ld	e,(hl)	; total descriptor length
+	inc	hl
+	ld	d,(hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ex	de,hl
+	add	hl,de
+	ex	de,hl	; hl, de = start, end of config desc.
+.find_int_loop:
+	call	next_interface_descriptor
+	jq	nc,.none
+.process_int:
+	push	hl
+	pop	iy
+	ld	a,0
+.expectedIntNum = $-1
+	cp	a,SRL_INTERFACE_ANY
+	jq	z,.any
+	cp	a,(yinterfaceDescriptor.bInterfaceNumber)
+	jq	nz,.find_int_loop
+.any:
+	ld	bc,0
+	ld	a,(yinterfaceDescriptor.bInterfaceClass)
+	cp	a,$a	; CDC data class
+	jq	nz,.find_int_loop
+
+.find_ep_loop:
+	push	bc
+	call	next_descriptor
+	pop	bc
+	jq	nc,.int_complete
+	push	hl
+	pop	iy
+	ld	a,(ydescriptor.bDescriptorType)
+	cp	a,INTERFACE_DESCRIPTOR
+	jq	nz,.not_int
+.int_complete:
+	; check if both EPs found
+	ld	a,b
+	or	a,a
+	jq	z,.process_int
+	ld	a,c
+	or	a,a
+	jq	z,.process_int
+	
+	ld	(xsrl_device.tx_addr),b
+	ld	(xsrl_device.rx_addr),c
+	ld	a,SRL_TYPE_CDC
+	ld	(xsrl_device.type),a
+	ret
+.not_int:
+	cp	a,ENDPOINT_DESCRIPTOR
+	jq	nz,.find_int_loop
+
+	ld	a,(yendpointDescriptor.bmAttributes)
+	cp	a,2	; bulk endpoint
+	jq	nz,.find_ep_loop
+
+	ld	a,(yendpointDescriptor.bEndpointAddress)
+	cp	a,$80
+	jq	c,.outEp
+	ld	c,a
+	jq	.find_ep_loop
+.outEp:
+	ld	b,a
+	jq	.find_ep_loop
+
+.none:
 	xor	a,a
 	ld	(xsrl_device.type),a
 	ld	(xsrl_device.subtype),a
-	ret
-
-; Gets the endpoint addresses based on the descriptors and device type
-; Inputs:
-;  ix: Serial device struct
-;  a: Interface number
-;  xsrl_device.buffer: Device descriptor, followed by config descriptor
-;  xsrl_device.type: Device type
-;  xsrl_device.subtype: Device subtype
-; Returns:
-;  xsrl_device.rx_addr: Receive endpoint address
-;  xsrl_device.tx_addr: Transmit endpoint address
-;  hl: Error or SRL_SUCCESS
-get_endpoint_addresses:
-	xor	a,a
 	ld	(xsrl_device.rx_addr),a
 	ld	(xsrl_device.tx_addr),a
-	ld	hl,0
 	ret
+
+; Skips to the next descriptor
+; Inputs:
+;  hl: The current descriptor
+;  de: The end of the config descriptor
+; Outputs:
+;  hl: The next descriptor
+;  nc if end of config descriptor was reached
+; Destroys: bc
+next_descriptor:
+	ld	bc,0
+	ld	c,(hl)
+	add	hl,bc
+	compare_hl_de
+	ret
+
+; Skips to the next interface descriptor
+; Inputs:
+;  hl: The current descriptor
+;  de: The end of the config descriptor
+; Outputs:
+;  hl: The next interface descriptor
+;  nc if end of config descriptor was reached
+; Destroys: a, bc
+next_interface_descriptor:
+	ld	a,INTERFACE_DESCRIPTOR
+.loop:
+	call	next_descriptor
+	ret	nc
+	inc	hl
+	cp	a,(hl)
+	dec	hl
+	jr	nz,.loop
+	scf
+	ret
+
 
 ; Initializes a serial device whose type has been determined
 ; Inputs:
@@ -1040,13 +1138,6 @@ get_device_type_:
 	pop	bc,de,ix
 	push	ix,de,bc
 	call	get_device_type
-	pop	ix
-	ret
-get_endpoint_addresses_:
-	push	ix
-	pop	bc,de,ix
-	push	ix,de,bc
-	call	get_endpoint_addresses
 	pop	ix
 	ret
 ring_buf_contig_avail_:
