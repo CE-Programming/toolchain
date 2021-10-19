@@ -323,16 +323,14 @@ srl_Open:
 	compare_hl_zero
 	jq	nz,.exit
 
-	ld	de,1
-.current_config = $-3
-
-	ld	a,e					; chech if config is 0
-	or	a,a
-	ld	a,SRL_ERROR_INVALID_DEVICE
-	jq	z,.exit
-
 	push	iy
+	ld	de,0
+.current_config = $-3
+	ld	a,e
+	or	a,a
+	jq	z,.noPrevConfig
 	dec	de
+.noPrevConfig:
 	push	de
 	ld	bc,(xsrl_device.dev)
 	push	bc
@@ -362,7 +360,11 @@ srl_Open:
 	add	hl,bc
 	push	hl
 	ld	bc,(.current_config)			; index = current config - 1
+	ld	a,c
+	or	a,a
+	jq	z,.noPrevConfig2
 	dec	bc
+.noPrevConfig2:
 	push	bc
 	ld	c,CONFIGURATION_DESCRIPTOR
 	push	bc
@@ -382,6 +384,26 @@ srl_Open:
 	sbc	hl,de
 	jq	nz,.exit
 
+	ld	a,(.current_config)
+	or	a,a
+	jq	nz,.configured
+
+	push	iy
+	push	de					; size of conf. descriptor
+	ld	hl,(iy+9)				; buffer
+	ld	bc,18
+	add	hl,bc
+	push	hl
+	ld	bc,(xsrl_device.dev)
+	push	bc
+	call	usb_SetConfiguration
+	pop	bc,bc,bc,iy
+
+	ld	a,SRL_ERROR_USB_FAILED
+	compare_hl_zero
+	jq	nz,.exit
+
+.configured:
 	call	get_device_type
 	ld	a,(xsrl_device.type)			; check if type is unknown
 	cp	a,SRL_TYPE_UNKNOWN
