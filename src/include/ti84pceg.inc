@@ -12,15 +12,8 @@ namespace ti?
 ;- Texas Instruments (ti83plus.inc)
 
 
-
-
-
 ; Included for Assembler Compatibility
 ;------------------------------------
-
-
-
-
 
 ; Hardware Defines
 ;------------------------------
@@ -168,7 +161,7 @@ namespace ti?
 ?Mov9ToOP1                 := 0020320h
 ?Mov9OP1OP2                := 0020324h
 ?Mov9ToOP2                 := 0020328h
-?MovFROP1                  := 002032Ch
+?MovFrOP1                  := 002032Ch
 ?OP4Set1                   := 0020330h
 ?OP3Set1                   := 0020334h
 ?OP2Set8                   := 0020338h
@@ -1898,8 +1891,8 @@ namespace ti?
 ?os.FontSelect             := 0021E28h
 ;                          equ 0021E2Ch
 ;                          equ 0021E30h
-?os.ReturnByte             := 0021E34h
-?os.ReturnByteEvenBetter   := 0021E38h
+?tolower                   := 0021E34h
+?toupper                   := 0021E38h
 ;                          equ 0021E3Ch
 ;                          equ 0021E40h
 ;                          equ 0021E44h
@@ -1938,7 +1931,7 @@ namespace ti?
 ?os.SetTimer1              := 0021EC8h
 ?os.DisableTimer1          := 0021ECCh
 ?os.SetKbdKey              := 0021ED0h
-?os.GetSystemStats         := 0021ED4h
+?os.GetSystemInfo          := 0021ED4h
 ;                          equ 0021ED8h
 ;                          equ 0021EDCh
 ?DispHL                    := 0021EE0h
@@ -2981,8 +2974,8 @@ namespace ti?
 
 ?tempFreeArc		:= 0D02655h ; set after _ArcChk call
 
-?textBGcolor		:= 0D02688h
-?textFGcolor		:= 0D0268Ah
+?textFGColor		:= 0D02688h
+?textBGColor		:= 0D0268Ah
 
 ?drawBGColor		:= 0D026AAh
 ?drawFGColor		:= 0D026ACh
@@ -3024,6 +3017,7 @@ namespace ti?
 ;semiSafeRAM Locations
 ;---------------------------------------------
 ?usbArea			:= 0D13FD8h ; 14306 bytes used for usb, probably need to disable timer3/usb interrupts to use
+?usbHandleKeys		:= 0D14091h ; zero this byte while using usbArea to keep GetCSC from affecting other parts of usbArea
 ?usbInited		:= 0D177B7h ; zero this byte while using usbArea and to reset the usb stack when interrupts are re-enabled
 ?heapBot			:= 0D1887Ch ; 1024 bytes used for flash ram routines, rest used rarely
 ?ramCodeTop		:= 0D18C7Ch
@@ -3432,6 +3426,12 @@ namespace ti?
 ?bmFifo3Empty		:= 1 shl bFifo3Empty
 ?bFifoEmpty		:= 8
 ?bmFifoEmpty		:= 0Fh shl bFifoEmpty
+
+?usbCxFifoBytes		:= 0123h
+?pUsbCxFifoBytes		:= pUsbRange + usbCxFifoBytes
+?mpUsbCxFifoBytes	:= mpUsbRange + usbCxFifoBytes
+?bUsbCxFifoBytes		:= 0
+?bmUsbCxFifoBytes	:= 07Fh
 
 ?usbIdle			:= 0124h
 ?pUsbIdle		:= pUsbRange + usbIdle
@@ -4133,6 +4133,114 @@ namespace ti?
 ?pBlLevel		:= 0B024h
 ?mpBlLevel		:= 0F60024h
 
+;SPI Ports
+;-----------------------------------
+?pSpiRange		:= 0D000h
+?mpSpiRange		:= 0F80000h
+
+?spiCtrl0		:= 000h
+?pSpiCtrl0		:= pSpiRange + spiCtrl0
+?mpSpiCtrl0		:= mpSpiRange + spiCtrl0
+?bSpiClkPolarity		:= 0
+?bmSpiClkPolarity	:= 1 shl bSpiClkPolarity
+?bSpiClkPhase		:= 1
+?bmSpiClkPhase		:= 1 shl bSpiClkPhase
+?bSpiOpMode		:= 2
+?bmSpiSlave		:= 0 shl bSpiOpMode
+?bmSpiMaster		:= 3 shl bSpiOpMode
+?bmSpiSlaveMono		:= 0 shl bSpiOpMode
+?bmSpiSlaveStereo	:= 1 shl bSpiOpMode
+?bmSpiMasterMono		:= 2 shl bSpiOpMode
+?bmSpiMasterStereo	:= 3 shl bSpiOpMode
+?bmSpiOpMode		:= 3 shl bSpiOpMode
+?bSpiFsJustify		:= 4
+?bmSpiFsJustify		:= 1 shl bSpiFsJustify
+?bSpiFsPolarity		:= 5
+?bmSpiFsPolarity		:= 1 shl bSpiFsPolarity
+?bSpiLsb			:= 6
+?bmSpiLsb		:= 1 shl bSpiLsb
+?bSpiLoopback		:= 7
+?bmSpiLoopback		:= 1 shl bSpiLoopback
+?bSpiFsDist		:= 8
+?bmSpiFsDist		:= 3 shl bSpiFsDist
+?bSpiFlash		:= 11
+?bmSpiFlash		:= 1 shl bSpiFlash
+?bSpiFrFmt		:= 12
+?spiSspFrFmt		:= 0 shl bSpiFrFmt
+?spiSpiFrFmt		:= 1 shl bSpiFrFmt
+?spiMicrowaveFrFmt	:= 2 shl bSpiFrFmt
+?spiI2sFrFmt		:= 3 shl bSpiFrFmt
+?bmSpiFrFmt		:= 3 shl bSpiFrFmt
+
+?spiCtrl1		:= 004h
+?pSpiCtrl1		:= pSpiRange + spiCtrl1
+?mpSpiCtrl1		:= mpSpiRange + spiCtrl1
+?spiClkDiv		:= spiCtrl1 + 0
+?pSpiClkDiv		:= pSpiRange + spiClkDiv
+?mpSpiClkDiv		:= mpSpiRange + spiClkDiv
+?bSpiClkDiv		:= 0
+?bmSpiClkDiv		:= 0FFFFh shl bSpiClkDiv
+?spiDataWidth		:= spiCtrl1 + 2
+?pSpiDataWidth		:= pSpiRange + spiDataWidth
+?mpSpiDataWidth		:= mpSpiRange + spiDataWidth
+?bSpiDataWidth		:= 0
+?bmSpiDataWidth		:= 01Fh shl bSpiDataWidth
+?spiPadWidth		:= spiCtrl1 + 3
+?pSpiPadWidth		:= pSpiRange + spiPadWidth
+?mpSpiPadWidth		:= mpSpiRange + spiPadWidth
+?bSpiPadWidth		:= 0
+?bmSpiPadWidth		:= 0FFh shl bSpiPadWidth
+
+?spiCtrl2		:= 008h
+?pSpiCtrl2		:= pSpiRange + spiCtrl2
+?mpSpiCtrl2		:= mpSpiRange + spiCtrl2
+?bSpiChipEn		:= 0
+?bmSpiChipEn		:= 1 shl bSpiChipEn
+?bSpiTxDataOutEn		:= 1
+?bmSpiTxDataOutEn	:= 1 shl bSpiTxDataOutEn
+?bSpiRxClr		:= 2
+?bmSpiRxClr		:= 1 shl bSpiRxClr
+?bSpiTxClr		:= 3
+?bmSpiTxClr		:= 1 shl bSpiTxClr
+?bSpiChipReset		:= 6
+?bmSpiChipReset		:= 1 shl bSpiChipReset
+?bSpiRxEn		:= 7
+?bmSpiRxEn		:= 1 shl bSpiRxEn
+?bSpiTxEn		:= 8
+?bmSpiTxEn		:= 1 shl bSpiTxEn
+?bSpiFs			:= 9
+?bmSpiFs			:= 1 shl bSpiFs
+?bSpiCs			:= 10
+?bmSpiCs			:= 3 shl bSpiCs
+
+?spiStatus		:= 00Ch
+?pSpiStatus		:= pSpiRange + spiStatus
+?mpSpiStatus		:= mpSpiRange + spiStatus
+?bSpiRxFifoFull		:= 0
+?bmSpiRxFifoFull		:= 1 shl bSpiRxFifoFull
+?bSpiTxFifoNotFull	:= 1
+?bmSpiTxFifoNotFull	:= 1 shl bSpiTxFifoNotFull
+?bSpiChipBusy		:= 2
+?bmSpiChipBusy		:= 1 shl bSpiChipBusy
+?bSpiRxFifoBytes		:= 4
+?bmSpiRxFifoBytes	:= 01Fh shl bSpiRxFifoBytes
+?bSpiTxFifoBytes		:= 12
+?bmSpiTxFifoBytes	:= 01Fh shl bSpiTxFifoBytes
+
+?spiIntCtrl		:= 010h
+?pSpiIntCtrl		:= pSpiRange + spiIntCtrl
+?mpSpiIntCtrl		:= mpSpiRange + spiIntCtrl
+
+?spiIntStatus		:= 014h
+?pSpiIntStatus		:= pSpiRange + spiIntStatus
+?mpSpiIntStatus		:= mpSpiRange + spiIntStatus
+
+?spiData			:= 018h
+?pSpiData		:= pSpiRange + spiData
+?mpSpiData		:= mpSpiRange + spiData
+?bSpiData		:= 0
+?bmSpiData		:= 0FFFFFFFFh
+
 ;Character Font Equates
 ;-------------------------------------
 ?LrecurN			:= 001h
@@ -4764,11 +4872,6 @@ namespace ti?
 ?kvnA			:= 0FAh
 ?kwnA			:= 0FBh
 
-; THIS KEY MEANS THAT IT IS A 2 BYTE KEYCODE
-; THERE ARE 2 OF THESE KEYS; BE CAREFUL WITH USAGE
-;--------------------------------------------------------
-?kExtendEcho2		:= 0FCh
-
 ; THIS KEY MEANS THAT THE KEY PRESS IS ONE THAT ECHOS
 ; INTO A BUFFER, AND IT IS A 2 BYTE KEY CODE, GO LOOK AT
 ; (EXTECHO) FOR THE KEY VALUE
@@ -5061,6 +5164,11 @@ namespace ti?
 ?kZFitA			:= kE2BT+148
 ?kE2BT_End		:= kZFitA
 
+; THIS KEY MEANS THAT IT IS A 2 BYTE KEYCODE
+; THERE ARE 3 OF THESE KEYS; BE CAREFUL WITH USAGE
+;--------------------------------------------------------
+?kExtendEcho2		:= 0FCh
+
 ;More 2 Byte Keys
 ;-------------------------------------
 ?kE2BT2			:= 00h
@@ -5319,6 +5427,44 @@ namespace ti?
 ?kLz			:= k83_00End + 98
 ?kGarbageC		:= k83_00End + 99 ;GarbageCollect
 ?kE2BT2_End		:= kGarbageC
+
+; THIS KEY MEANS THAT IT IS A 2 BYTE KEYCODE
+; UNLESS (EXTECHO) IS 0 THEN IT IS AN OLD 1 BYTE KEYCODE
+; THERE ARE 3 OF THESE KEYS; BE CAREFUL WITH USAGE
+;--------------------------------------------------------
+?kExtendEcho3		:= 0FBh
+
+;Even More 2 Byte Keys
+;-------------------------------------
+?kE2BT3			:= 00h
+?kSingleQuote		:= kE2BT3+1
+?kAt			:= kE2BT3+2
+?kHash			:= kE2BT3+3
+?kDollar			:= kE2BT3+4
+?kAmp			:= kE2BT3+5
+?kBackquote		:= kE2BT3+6
+?kSemicolon		:= kE2BT3+7
+?kBackslash		:= kE2BT3+8
+?kBar			:= kE2BT3+9
+?kUnderscore		:= kE2BT3+10
+?kTilde			:= kE2BT3+11
+?kPercent		:= kE2BT3+12
+?kEllipsis		:= kE2BT3+140
+?kAng			:= kE2BT3+141
+?kSS			:= kE2BT3+142
+?kSupX			:= kE2BT3+143
+?kSubT			:= kE2BT3+144
+?kSub0			:= kE2BT3+145
+?kSub1			:= kE2BT3+146
+?kSub2			:= kE2BT3+147
+?kSub3			:= kE2BT3+148
+?kSub4			:= kE2BT3+149
+?kSub5			:= kE2BT3+150
+?kSub6			:= kE2BT3+151
+?kSub7			:= kE2BT3+152
+?kSub8			:= kE2BT3+153
+?kSub9			:= kE2BT3+154
+?kSub10			:= kE2BT3+155
 
 ;TI-83 Plus Context Equates
 ;--------------------------------------------------------------
@@ -6992,6 +7138,4 @@ namespace ti?
 ?graphDispFlags		:= 4Bh
 ?backgroundValid		:= 4		;1 = items in graph background are still valid
 ;----------------------------------------------------------------------
-
-
 end namespace
