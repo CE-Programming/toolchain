@@ -1767,8 +1767,8 @@ typedef enum {
 
 #define os_TempFreeArc       (*(uint24_t*)0xD02655)        /**< Set after asm_ArcChk call */
 
-#define os_TextBGcolor       (*(uint16_t*)0xD02688)        /**< Large font background color */
-#define os_TextFGcolor       (*(uint16_t*)0xD0268A)        /**< Large font foreground color */
+#define os_TextFGColor       (*(uint16_t*)0xD02688)        /**< Large font foreground color */
+#define os_TextBGColor       (*(uint16_t*)0xD0268A)        /**< Large font background color */
 
 #define os_DrawBGColor       (*(uint16_t*)0xD026AA)        /**< Small font background color */
 #define os_DrawFGColor       (*(uint16_t*)0xD026AC)        /**< Small font foreground color */
