@@ -24,8 +24,6 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	ring_buf_has_consecutive_region_
 	export	ring_buf_push_
 	export	ring_buf_pop_
-	export	ring_buf_update_read_
-	export	ring_buf_update_write_
 	export	set_rate_
 ;-------------------------------------------------------------------------------
 macro compare_hl_zero?
@@ -985,33 +983,6 @@ ring_buf_pop:
 	add	hl,de
 	ret
 
-; Update a ring buffer after it's been DMA'd into
-; Inputs:
-;  ix: ring_buf_ctrl struct
-;  bc: Number of bytes written
-ring_buf_update_read:
-	ld	hl,(xring_buf_ctrl.data_end)
-	add	hl,bc
-	ld	(xring_buf_ctrl.data_end),hl
-	ret
-
-; Update a ring buffer after it's been DMA'd from
-; Inputs:
-;  ix: ring_buf_ctrl struct
-;  bc: Number of bytes written
-ring_buf_update_write:
-	ld	hl,(xring_buf_ctrl.data_start)
-	add	hl,bc
-	ld	(xring_buf_ctrl.data_start),hl
-	ld	bc,(xring_buf_ctrl.data_break)
-	or	a,a
-	sbc	hl,bc
-	ret	nz
-	ld	(xring_buf_ctrl.data_break),hl		; hl = 0
-	ld	hl,(xring_buf_ctrl.buf_start)
-	ld	(xring_buf_ctrl.data_start),hl
-	ret
-
 ;usb_error_t (usb_endpoint_t endpoint, usb_transfer_status_t status, size_t transferred, srl_device_t *data);
 read_callback:
 	ld	iy,0
@@ -1025,7 +996,9 @@ read_callback:
 
 	ld	bc,(iy+9)
 	lea	ix,xsrl_device.rx_buf
-	call	ring_buf_update_read
+	ld	hl,(xring_buf_ctrl.data_end)
+	add	hl,bc
+	ld	(xring_buf_ctrl.data_end),hl
 	call	start_read
 	pop	ix
 	xor	a,a
@@ -1050,7 +1023,9 @@ write_callback:
 
 	ld	bc,(iy+9)
 	lea	ix,xsrl_device.tx_buf
-	call	ring_buf_update_write
+	ld	hl,(xring_buf_ctrl.data_start)
+	add	hl,bc
+	ld	(xring_buf_ctrl.data_start),hl
 	call	start_write
 	pop	ix
 	xor	a,a
@@ -1129,9 +1104,25 @@ start_read:
 ;  ix.dma_active: 1 if transfer was started, 0 otherwise
 start_write:
 	call	ring_buf_contig_avail
-	lea	ix,ix - srl_device.tx_buf
 	compare_hl_zero
-	jq	z,.error
+	jq	nz,.has_data
+
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	jq	z,.error2
+
+	; has break - try removing it
+
+	ld	hl,(xring_buf_ctrl.buf_start)
+	ld	(xring_buf_ctrl.data_start),hl
+	or	a,a
+	sbc	hl,hl
+	ld	(xring_buf_ctrl.data_break),hl
+
+	jq	start_write
+
+.has_data:
+	lea	ix,ix - srl_device.tx_buf
 	push	hl
 
 	ld	c,(xsrl_device.tx_addr)			; ix = srl device
@@ -1163,6 +1154,8 @@ start_write:
 	inc	a					; a = 1
 	ld	(xsrl_device.tx_buf.dma_active),a
 	ret
+.error2:
+	lea	ix,ix - srl_device.tx_buf
 .error:
 	xor	a,a
 	ld	(xsrl_device.tx_buf.dma_active),a
@@ -1212,24 +1205,6 @@ ring_buf_pop_:
 	ld	bc,(ix+9)
 	ld	ix,(ix+3)
 	call	ring_buf_pop
-	pop	ix
-	ret
-ring_buf_update_read_:
-	push	ix
-	ld	ix,3
-	add	ix,sp
-	ld	bc,(ix+6)
-	ld	ix,(ix+3)
-	call	ring_buf_update_read
-	pop	ix
-	ret
-ring_buf_update_write_:
-	push	ix
-	ld	ix,3
-	add	ix,sp
-	ld	bc,(ix+6)
-	ld	ix,(ix+3)
-	call	ring_buf_update_write
 	pop	ix
 	ret
 

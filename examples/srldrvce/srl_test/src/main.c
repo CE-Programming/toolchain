@@ -21,8 +21,6 @@ size_t ring_buf_contig_avail_(ring_buf_ctrl_t *rbuf);
 bool ring_buf_has_consecutive_region_(ring_buf_ctrl_t *rbuf, uint8_t size);
 size_t ring_buf_push_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
 size_t ring_buf_pop_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
-void ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size);
-void ring_buf_update_write_(ring_buf_ctrl_t *rbuf, size_t size);
 void set_rate_(srl_device_t *srl, uint24_t rate);
 
 void print_ring_buf(const ring_buf_ctrl_t *rbuf) {
@@ -94,7 +92,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
     if(event == USB_DEVICE_DISCONNECTED_EVENT) {
         usb_device_t device = event_data;
         if(device == srl.dev) {
-            printf("Device disconnected\n");
+            printf("device disconnected\n");
             srl_Close(&srl);
             has_srl_device = false;
         }
