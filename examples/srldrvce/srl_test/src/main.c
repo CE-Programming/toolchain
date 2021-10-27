@@ -21,7 +21,7 @@ size_t ring_buf_contig_avail_(ring_buf_ctrl_t *rbuf);
 bool ring_buf_has_consecutive_region_(ring_buf_ctrl_t *rbuf, uint8_t size);
 size_t ring_buf_push_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
 size_t ring_buf_pop_(ring_buf_ctrl_t *rbuf, void *data, size_t size);
-void ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size, uint8_t region);
+void ring_buf_update_read_(ring_buf_ctrl_t *rbuf, size_t size);
 void ring_buf_update_write_(ring_buf_ctrl_t *rbuf, size_t size);
 void set_rate_(srl_device_t *srl, uint24_t rate);
 

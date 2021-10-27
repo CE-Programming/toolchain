@@ -989,26 +989,10 @@ ring_buf_pop:
 ; Inputs:
 ;  ix: ring_buf_ctrl struct
 ;  bc: Number of bytes written
-;  a: Size of minimum consecutive region
 ring_buf_update_read:
 	ld	hl,(xring_buf_ctrl.data_end)
 	add	hl,bc
 	ld	(xring_buf_ctrl.data_end),hl
-	ex	de,hl					; de = data_end
-	ld	hl,(xring_buf_ctrl.data_break)
-	compare_hl_zero
-	ret	nz
-	ld	hl,(xring_buf_ctrl.buf_end)
-	or	a,a
-	sbc	hl,de
-	ld	bc,0
-	ld	c,a
-	or	a,a
-	sbc	hl,bc
-	ret	nc					; ret if >= region
-	ld	(xring_buf_ctrl.data_break),de		; data_break = data_end
-	ld	de,(xring_buf_ctrl.buf_start)
-	ld	(xring_buf_ctrl.data_end),de
 	ret
 
 ; Update a ring buffer after it's been DMA'd from
@@ -1040,7 +1024,6 @@ read_callback:
 	jq	nz,.no_device
 
 	ld	bc,(iy+9)
-	ld	a,64
 	lea	ix,xsrl_device.rx_buf
 	call	ring_buf_update_read
 	call	start_read
@@ -1087,9 +1070,22 @@ write_callback:
 start_read:
 	ld	a,64
 	call	ring_buf_has_consecutive_region
-	lea	ix,ix - srl_device.rx_buf
-	jq	c,.error
+	jq	nc,.has_region
 
+	ld	hl,(xring_buf_ctrl.data_break)
+	compare_hl_zero
+	jq	nz,.error2
+
+	; no break - add one
+
+	ld	hl,(xring_buf_ctrl.data_end)
+	ld	(xring_buf_ctrl.data_break),hl
+	ld	hl,(xring_buf_ctrl.buf_start)
+	ld	(xring_buf_ctrl.data_end),hl
+	jq	start_read
+
+.has_region:
+	lea	ix,ix - srl_device.rx_buf
 	ld	c,(xsrl_device.rx_addr)			; ix = srl device
 	push	bc
 	ld	bc,(xsrl_device.dev)
@@ -1119,6 +1115,8 @@ start_read:
 	inc	a					; a = 1
 	ld	(xsrl_device.rx_buf.dma_active),a
 	ret
+.error2:
+	lea	ix,ix - srl_device.rx_buf
 .error:
 	xor	a,a
 	ld	(xsrl_device.rx_buf.dma_active),a
@@ -1221,7 +1219,6 @@ ring_buf_update_read_:
 	ld	ix,3
 	add	ix,sp
 	ld	bc,(ix+6)
-	ld	a,(ix+9)
 	ld	ix,(ix+3)
 	call	ring_buf_update_read
 	pop	ix
