@@ -230,15 +230,17 @@ struct device			; device structure
 	endpoints	rl 1	; pointer to array of endpoints
 	find		rb 1	; find flags
 	refcnt		rl 1	; reference count
-	hubPorts	rb 1	; number of ports in this hub
 	sibling		rl 1	; next device connected to the same hub
 	speed		rb 1	; device speed shl 4
 	back		rl 1	; update pointer to next pointer to self
 	addr		rb 1	; device addr and $7F
+			rb 1	; padding
 	child		rl 1	; first device connected to this hub
 	hub		rl 1	; hub this device is connected to
 	data		rl 1	; user data
-			rb 7	; padding
+	portNum		rb 1	; port number of hub this device is connected to
+	numPorts	rb 1	; number of ports in this hub
+			rb 5	; padding
 end struct
 struct setup
 	label .: 8
@@ -373,32 +375,6 @@ end virtual
 ;-------------------------------------------------------------------------------
 ; usb constants
 ;-------------------------------------------------------------------------------
-; enum usb_error
-virtual at 0
-	USB_SUCCESS		rb 1
-	USB_IGNORE		rb 1
-	USB_ERROR_SYSTEM	rb 1
-	USB_ERROR_INVALID_PARAM	rb 1
-	USB_ERROR_SCHEDULE_FULL	rb 1
-	USB_ERROR_NO_DEVICE	rb 1
-	USB_ERROR_NO_MEMORY	rb 1
-	USB_ERROR_NOT_SUPPORTED	rb 1
-	USB_ERROR_OVERFLOW	rb 1
-	USB_ERROR_TIMEOUT	rb 1
-	USB_ERROR_FAILED	rb 1
-end virtual
-
-; enum usb_transfer_status
-?USB_TRANSFER_COMPLETED		:= 0
-?USB_TRANSFER_STALLED		:= 1 shl 0
-?USB_TRANSFER_NO_DEVICE		:= 1 shl 1
-?USB_TRANSFER_HOST_ERROR	:= 1 shl 2
-?USB_TRANSFER_ERROR		:= 1 shl 3
-?USB_TRANSFER_OVERFLOW		:= 1 shl 4
-?USB_TRANSFER_BUS_ERROR		:= 1 shl 5
-?USB_TRANSFER_FAILED		:= 1 shl 6
-?USB_TRANSFER_CANCELLED		:= 1 shl 7
-
 ; enum usb_event
 virtual at 0
 	USB_ROLE_CHANGED_EVENT					rb 1
@@ -442,7 +418,33 @@ virtual at 0
 	USB_HOST_SYSTEM_ERROR_INTERRUPT				rb 1
 end virtual
 
-; enum usb_find_flag
+; enum usb_error
+virtual at 0
+	USB_SUCCESS		rb 1
+	USB_IGNORE		rb 1
+	USB_ERROR_SYSTEM	rb 1
+	USB_ERROR_INVALID_PARAM	rb 1
+	USB_ERROR_SCHEDULE_FULL	rb 1
+	USB_ERROR_NO_DEVICE	rb 1
+	USB_ERROR_NO_MEMORY	rb 1
+	USB_ERROR_NOT_SUPPORTED	rb 1
+	USB_ERROR_OVERFLOW	rb 1
+	USB_ERROR_TIMEOUT	rb 1
+	USB_ERROR_FAILED	rb 1
+end virtual
+
+; enum usb_transfer_status
+?USB_TRANSFER_COMPLETED		:= 0
+?USB_TRANSFER_STALLED		:= 1 shl 0
+?USB_TRANSFER_NO_DEVICE		:= 1 shl 1
+?USB_TRANSFER_HOST_ERROR	:= 1 shl 2
+?USB_TRANSFER_ERROR		:= 1 shl 3
+?USB_TRANSFER_OVERFLOW		:= 1 shl 4
+?USB_TRANSFER_BUS_ERROR		:= 1 shl 5
+?USB_TRANSFER_FAILED		:= 1 shl 6
+?USB_TRANSFER_CANCELLED		:= 1 shl 7
+
+; enum usb_device_flags
 ?IS_NONE					:= 0
 ?IS_DISABLED					:= 1 shl 0
 ?IS_ENABLED					:= 1 shl 1
@@ -450,7 +452,7 @@ end virtual
 ?IS_HUB						:= 1 shl 3
 ?IS_ATTACHED					:= 1 shl 4
 
-; enum usb_endpoint_flag
+; enum usb_endpoint_flags
 ?MANUAL_TERMINATE				:= 0 shl 0
 ?AUTO_TERMINATE					:= 1 shl 0
 
@@ -523,6 +525,11 @@ virtual at 1
 	?STRING_DESCRIPTOR			rb 1
 	?INTERFACE_DESCRIPTOR			rb 1
 	?ENDPOINT_DESCRIPTOR			rb 1
+end virtual
+
+; enum usb_class
+virtual at 9
+	?HUB_CLASS				rb 1
 end virtual
 
 ; enum usb_transfer_type
@@ -2683,11 +2690,14 @@ assert endpoint.info+1 = endpoint.maxPktLen
 	inc	l
 .l = endpoint.maxPktLen+1
 	ld	(hl),a
-	ld	bc,1 shl 22 or 1 shl 15 or 0 shl 8 or 0
-assert endpoint.cmask+1 = endpoint.hubInfo
-iterate <field,value>, smask,c, cmask,bc, \
+	ld	bc,0
+assert endpoint.smask+1 = endpoint.cmask
+assert endpoint.smask+2 = endpoint.hubInfo+0
+assert endpoint.flags+1 = endpoint.interval
+assert endpoint.flags+2 = endpoint.offset
+iterate <field,value>, smask,bc, hubInfo+1,1 shl 6, \
                        overlay.altNext,1, overlay.status,c, \
-                       flags,c, interval,c, offset,c, device,ydevice
+                       flags,bc, device,ydevice
  if .l+1 = endpoint.field
 	inc	l
  else
@@ -3803,14 +3813,32 @@ end repeat
 	push	hl,bc,bc,hl,yendpoint
 	inc	l
 	ld	(hl),SET_ADDRESS_REQUEST
-	ld	b,6
-.zero:
 	inc	l
-	ld	c,(hl)
 	ld	(hl),a
 	xor	a,a
-	djnz	.zero
-	ld	(yendpoint.maxPktLen),c
+	inc	l
+	ld	(hl),a
+	inc	l
+	ld	c,(hl)
+repeat 3
+	ld	(hl),a
+	inc	l
+end repeat
+	ld	b,(hl)
+	ld	(hl),a ; 13F
+	ld	(yendpoint.maxPktLen),b
+	ld	a,HUB_CLASS
+	cp	a,c
+	jq	nz,.notHub
+	ld	hl,(yendpoint.device)
+repeat device.find
+	inc	l
+end repeat
+assert HUB_CLASS shr 1 = IS_HUB-IS_DEVICE
+	rra
+	add	a,(hl)
+	ld	(hl),a
+.notHub:
 	call	usb_ScheduleControlTransfer
 	ld	a,l
 	pop	bc,bc,bc,bc,bc
@@ -4337,9 +4365,10 @@ assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	pop	hl
 	ld	(hl),-1
 	ldir
-	ld	(ydevice.hubPorts),b;0
 	ld	(ydevice.addr),b;0
 	ld	(ydevice.data),bc;0
+	ld	(ydevice.portNum),b;0
+	ld	(ydevice.numPorts),b;0
 	inc	c;1
 	ld	(ydevice.refcnt),bc;1
 	ld	(ydevice.child),c;1
