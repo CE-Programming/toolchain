@@ -225,6 +225,18 @@ struct endpoint			; endpoint structure
 	last		rl 1	; pointer to last dummy transfer
 	data		rl 1	; user data
 end struct
+struct hub			; hub structure
+	label .: 32
+	change		rb 16	; hub and port status change bitmap
+	status		rb 4	; hub or port status
+	numPorts	rb 1	; number of ports in this hub
+	flags		rb 1	; hub characteristics
+	curPort		rb 1	; current port
+	powerOnDelay	rb 1	; time in 2ms units for port to power on
+	maxCurrent	rb 1	; max current requirements in mA
+	curDevice	rl 1	; current device
+			rb 4	; padding
+end struct
 struct device			; device structure
 	label .: 32
 	endpoints	rl 1	; pointer to array of endpoints
@@ -233,14 +245,13 @@ struct device			; device structure
 	sibling		rl 1	; next device connected to the same hub
 	speed		rb 1	; device speed shl 4
 	back		rl 1	; update pointer to next pointer to self
-	addr		rb 1	; device addr and $7F
-			rb 1	; padding
-	child		rl 1	; first device connected to this hub
-	hub		rl 1	; hub this device is connected to
-	data		rl 1	; user data
 	portNum		rb 1	; port number of hub this device is connected to
-	numPorts	rb 1	; number of ports in this hub
-			rb 5	; padding
+	addr		rb 1	; device addr and $7F
+	child		rl 1	; first device connected to this hub
+	parent		rl 1	; hub this device is connected to
+	data		rl 1	; user data
+	hub		rl 1	; pointer to hub struct
+			rb 4	; padding
 end struct
 struct setup
 	label .: 8
@@ -907,7 +918,7 @@ usb_GetDeviceHub:
 	sbc	hl,hl
 	cp	a,iyl
 	ret	z
-	ld	de,(ydevice.hub)
+	ld	de,(ydevice.parent)
 .returnDEIfValid:
 	bit	0,de
 	ret	nz
@@ -978,7 +989,7 @@ usb_FindDevice:
 	lea	hl,iy
 	ret
 .hub:
-	ld	iy,(ydevice.hub)
+	ld	iy,(ydevice.parent)
 	lea	hl,iy
 	ld	a,l
 	rrca
@@ -2230,14 +2241,18 @@ _DefaultHandler:
 
 ;-------------------------------------------------------------------------------
 ; Input:
+;  zf = reuse for hub
 ;  (sp+12) = block
+;  iy = hub device | ?
 ; Output:
 ;  hl = ?
 _FreeTransferData:
 	ld	hl,3+12
 	add	hl,sp
 	ld	hl,(hl)
-	jq	_Free32Align32
+	jq	nz,_Free32Align32
+	ld	(ydevice.hub),hl
+	ret
 
 iterate <size,align>, 32,32, 64,256
 
@@ -2464,6 +2479,9 @@ _DeviceDisconnected:
 	ld	hl,(xdevice.endpoints+1)
 	ld	(xdevice.endpoints+1),xdevice
 	call	_Free32Align32
+	ld	hl,(xdevice.hub+1)
+	bit	0,hl
+	call	z,_Free32Align32
 	lea	hl,xdevice.refcnt+1
 	jq	usb_UnrefDevice.refcnt
 
@@ -3825,7 +3843,7 @@ repeat 3
 	inc	l
 end repeat
 	ld	b,(hl)
-	ld	(hl),a ; 13F
+	ld	(hl),a
 	ld	(yendpoint.maxPktLen),b
 	ld	a,HUB_CLASS
 	cp	a,c
@@ -3853,9 +3871,10 @@ end virtual
 .next:
 	inc	l
 	djnz	.search
+assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 .free:
+;	or	a,1
 	call	_FreeTransferData
-.disable:
 	call	_HandlePortPortEnInt.disable
 	ret	nz
 	or	a,a
@@ -3863,26 +3882,21 @@ end virtual
 	ret
 
 _HandleDeviceEnable:
-	ld	hl,12
-	add	hl,sp
-	ld	hl,(hl)
-	setmsk	2,hl
-	ld	c,(hl)
-	call	_FreeTransferData
-	ld	hl,3
-	add	hl,sp
-	ld	yendpoint,(hl)
-repeat long
-	inc	hl
-end repeat
-	ld	a,(hl)
+	ld	iy,0
+	add	iy,sp
+	ld	a,(iy+6)
 	or	a,a
-	jq	nz,_HandleDeviceDescriptor.disable
-	sbc	hl,hl
-	ld	de,(yendpoint.device)
-	ld	(yendpoint.addr),c
+	jq	nz,_HandleDeviceDescriptor.free
+	ld	hl,(iy+12)
+	setmsk	setup.wValue,hl
+	ld	a,(hl)
+	ld	yendpoint,(iy+3)
+	ld	(yendpoint.addr),a
 	ld	ydevice,(yendpoint.device)
-	ld	(ydevice.addr),c
+	ld	(ydevice.addr),a
+	bitmsk	IS_DEVICE,(ydevice.find)
+	call	_FreeTransferData
+	lea	de,ydevice
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
@@ -4349,7 +4363,7 @@ _CreateDevice:
 	jq	nz,.nomem
 	ld	(ydevice.endpoints),hl
 	ex	de,hl
-	ld	(ydevice.hub),hl
+	ld	(ydevice.parent),hl
 	ld	(ydevice.find),c
 assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	and	a,ti.bmUsbSpd shr 16
@@ -4365,14 +4379,14 @@ assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	pop	hl
 	ld	(hl),-1
 	ldir
+	ld	(ydevice.portNum),b;0
 	ld	(ydevice.addr),b;0
 	ld	(ydevice.data),bc;0
-	ld	(ydevice.portNum),b;0
-	ld	(ydevice.numPorts),b;0
 	inc	c;1
 	ld	(ydevice.refcnt),bc;1
-	ld	(ydevice.child),c;1
 	ld	(ydevice.sibling),c;1
+	ld	(ydevice.child),c;1
+	ld	(ydevice.hub),c;1
 	ld	hl,ti.mpUsbPortStsCtrl
 	ld	a,USB_DEVICE_CONNECTED_EVENT
 	ld	c,(ydevice.find)
