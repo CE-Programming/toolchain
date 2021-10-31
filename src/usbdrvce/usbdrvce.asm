@@ -566,7 +566,7 @@ FS_SBP_PER_FRAME := trunc (FS_SFT / SAFE_FS_SBPT) ; full-speed stuffed bit pairs
 ;-------------------------------------------------------------------------------
 usb_Init:
 	call	ti.usb_DisableTimer
-	call	ti.os.GetSystemStats
+	call	ti.os.GetSystemInfo
 repeat 4
 	inc	hl
 end repeat
