@@ -617,8 +617,7 @@ assert deviceStatus+1 = tempEndpointStatus
 	ld	c,9
 	ldir
 	ld	de,(hl)
-	ld	hl,_ResetHostControllerFromUnknown.misc
-	ld	(hl),d
+	ld	(_ResetHostControllerFromUnknown.init),de
 	dec	bc
 	ld	hl,(currentDescriptors)
 	add	hl,bc
@@ -679,9 +678,6 @@ assert deviceStatus+1 = tempEndpointStatus
 	ld	(hl),endpoint.overlay.status.halted
 	ld	hl,rootHub.find
 	ld	(hl),IS_HUB or IS_ENABLED
-	ld	a,e
-	and	a,ti.bmUsbFrameListSize
-	ld	(_ResetHostControllerFromUnknown.frameListSize),a
 assert cHeap = $D10000
 	ld	l,a;(cHeap-$D10000) and $FF
 	ld	h,a;(cHeap-$D10000) shr 8
@@ -2121,7 +2117,7 @@ _Init:
 ;  hl = ti.mpUsbRange xor (? and $FF)
 ; Output:
 ;  a = 0
-;  b = ?
+;  bc = ?
 ;  d = ?
 ;  hl = dummyHead.next
 _DisableSchedulesAndResetHostController:
@@ -2151,7 +2147,7 @@ end repeat
 ;  hl = ti.mpUsbRange xor (? and $FF)
 ; Output:
 ;  a = 0
-;  b = ?
+;  bc = ?
 ;  hl = dummyHead.next
 _ResetHostControllerFromUnknown:
 	; halt host controller (EHCI spec section 2.3)
@@ -2177,12 +2173,14 @@ _ResetHostControllerFromUnknown:
 	jq	nz,.reset		;+13
 .reset.fail:
 
+	ld	bc,0
+label .init at $-long
+	ld	a,c
+	and	a,ti.bmUsbFrameListSize
 	; initialize host controller from halt (EHCI spec section 4.1)
-	ld	(hl),0
-label .frameListSize at $-byte
+	ld	(hl),a
 	ld	l,ti.usbMisc
-	ld	(hl),0
-label .misc at $-byte
+	ld	(hl),b
 	ld	l,ti.usbIntEn
 	ld	(hl),ti.bmUsbInt or ti.bmUsbIntErr or ti.bmUsbIntPortChgDetect or ti.bmUsbIntFrameListOver or ti.bmUsbIntHostSysErr or ti.bmUsbIntAsyncAdv
 	ld	hl,periodicList
