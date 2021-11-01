@@ -228,14 +228,13 @@ end struct
 struct hub			; hub structure
 	label .: 32
 	change		rb 16	; hub and port status change bitmap
-	status		rb 4	; hub or port status
+	status		setup	; setup
 	numPorts	rb 1	; number of ports in this hub
 	flags		rb 1	; hub characteristics
-	curPort		rb 1	; current port
+	endpoint	rb 1	; status change endpoint
 	powerOnDelay	rb 1	; time in 2ms units for port to power on
 	maxCurrent	rb 1	; max current requirements in mA
 	curDevice	rl 1	; current device
-			rb 4	; padding
 end struct
 struct device			; device structure
 	label .: 32
@@ -248,10 +247,9 @@ struct device			; device structure
 	portNum		rb 1	; port number of hub this device is connected to
 	addr		rb 1	; device addr and $7F
 	child		rl 1	; first device connected to this hub
-	parent		rl 1	; hub this device is connected to
+	hub		rl 1	; hub this device is connected to
 	data		rl 1	; user data
-	hub		rl 1	; pointer to hub struct
-			rb 4	; padding
+			rb 7	; padding
 end struct
 struct setup
 	label .: 8
@@ -536,6 +534,8 @@ virtual at 1
 	?STRING_DESCRIPTOR			rb 1
 	?INTERFACE_DESCRIPTOR			rb 1
 	?ENDPOINT_DESCRIPTOR			rb 1
+						rb 35
+	?HUB_DESCRIPTOR				rb 1
 end virtual
 
 ; enum usb_class
@@ -918,7 +918,7 @@ usb_GetDeviceHub:
 	sbc	hl,hl
 	cp	a,iyl
 	ret	z
-	ld	de,(ydevice.parent)
+	ld	de,(ydevice.hub)
 .returnDEIfValid:
 	bit	0,de
 	ret	nz
@@ -989,7 +989,7 @@ usb_FindDevice:
 	lea	hl,iy
 	ret
 .hub:
-	ld	iy,(ydevice.parent)
+	ld	iy,(ydevice.hub)
 	lea	hl,iy
 	ld	a,l
 	rrca
@@ -1128,6 +1128,7 @@ usb_GetDescriptor:
 	call	usb_GetDeviceEndpoint.masked
 	push	hl
 	call	usb_ControlTransfer
+.free:
 	ex	de,hl
 	ld	hl,(ix-6)
 	call	_Free32Align32
@@ -1245,7 +1246,34 @@ repeat 3
 	inc	l
 	ld	(hl),a
 end repeat
-	jq	usb_GetDescriptor.endpoint
+	ld	hl,(ix+6)
+	call	usb_GetDeviceEndpoint.masked
+	push	hl
+	call	usb_ControlTransfer
+	add	hl,de
+	xor	a,a
+	sbc	hl,de
+	jq	nz,.free
+	ld	ydevice,(ix+6)
+	bitmsk	IS_DEVICE,(ydevice.find)
+.free:
+	jq	nz,usb_GetDescriptor.free
+	lea	hl,ydevice
+	call	usb_GetDeviceEndpoint.masked
+	ld	de,_HandleHubDescriptor
+	ld	yhub,(ix-6)
+	push	yhub,de,yhub.numPorts-2,yhub.status,hl
+	ld	b,32
+.clear:
+	ld	(iy),0
+	inc	iy
+	djnz	.clear
+	ld	(yhub.status.bmRequestType-32),DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_DEVICE
+	ld	(yhub.status.bRequest-32),GET_DESCRIPTOR_REQUEST
+	ld	(yhub.status.wValue+1-32),HUB_DESCRIPTOR
+	ld	(yhub.status.wLength+0-32),7
+	call	usb_ScheduleControlTransfer
+	jq	usb_Transfer.return
 
 ;-------------------------------------------------------------------------------
 usb_GetInterface:
@@ -2022,42 +2050,44 @@ assert INTERRUPT_TRANSFER and 1
 	ret
 
 ;-------------------------------------------------------------------------------
-element error
-label _Error at error
+element _Error
+namespace _Error
 
-iterate error, SYSTEM, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, NOT_SUPPORTED, TIMEOUT, OVERFLOW, FAILED
+ iterate error, SYSTEM, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, \
+                NOT_SUPPORTED, TIMEOUT, OVERFLOW, FAILED
 
-.error:
+error:
 	ld	a,USB_ERROR_#error
-	jq	.return
+	jq	return
 
-end iterate
+ end iterate
 
-.check:
+check:
 	pop	de
 	call	ti._frameset0
 	ld	a,(ti.mpIntMask)
 	and	a,ti.intTmr3
-	jq	nz,.SYSTEM
+	jq	nz,SYSTEM
 	ld	a,(ti.mpUsbSts)
 	and	a,ti.bmUsbIntHostSysErr
-	jq	nz,.SYSTEM
+	jq	nz,SYSTEM
 	ld	a,(ti.usbInited)
 	dec	a
-	jq	nz,.SYSTEM
+	jq	nz,SYSTEM
 	ex	de,hl
 	call	_DispatchEvent.dispatch
-	jq	.success
+	jq	success
 
-.success:
+success:
 	xor	a,a
-	jq	.return
+	jq	return
 
-.return:
+return:
 	or	a,a
 	sbc	hl,hl
 	ld	l,a
 	jq	usb_Transfer.return
+end namespace
 
 ; Input:
 ;  a = fill
@@ -2245,14 +2275,17 @@ _DefaultHandler:
 ;  (sp+12) = block
 ;  iy = hub device | ?
 ; Output:
+;  f = ?
+;  cf = false
+;  bc = ?
+;  de = ?
 ;  hl = ?
+;  iy = hub device | ?
 _FreeTransferData:
 	ld	hl,3+12
 	add	hl,sp
 	ld	hl,(hl)
-	jq	nz,_Free32Align32
-	ld	(ydevice.hub),hl
-	ret
+	jq	_Free32Align32
 
 iterate <size,align>, 32,32, 64,256
 
@@ -2479,9 +2512,6 @@ _DeviceDisconnected:
 	ld	hl,(xdevice.endpoints+1)
 	ld	(xdevice.endpoints+1),xdevice
 	call	_Free32Align32
-	ld	hl,(xdevice.hub+1)
-	bit	0,hl
-	call	z,_Free32Align32
 	lea	hl,xdevice.refcnt+1
 	jq	usb_UnrefDevice.refcnt
 
@@ -2632,8 +2662,8 @@ assert endpoint-2 = endpoint.next
 ;  hl = ? | error
 ;  iy = endpoint | ?
 _CreateDefaultControlEndpoint.enable:
-	resmsk	IS_DISABLED,(ydevice.find)
-	setmsk	IS_ENABLED,(ydevice.find)
+assert IS_DISABLED+1 = IS_ENABLED
+	inc	(ydevice.find)
 _CreateDefaultControlEndpoint:
 	ld	de,_DefaultControlEndpointDescriptor
 	jq	_CreateEndpoint
@@ -3873,7 +3903,6 @@ end virtual
 	djnz	.search
 assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 .free:
-;	or	a,1
 	call	_FreeTransferData
 	call	_HandlePortPortEnInt.disable
 	ret	nz
@@ -3894,11 +3923,26 @@ _HandleDeviceEnable:
 	ld	(yendpoint.addr),a
 	ld	ydevice,(yendpoint.device)
 	ld	(ydevice.addr),a
-	bitmsk	IS_DEVICE,(ydevice.find)
 	call	_FreeTransferData
+	sbc	hl,hl
 	lea	de,ydevice
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
+
+_HandleHubDescriptor:
+	or	a,a
+	sbc	hl,hl
+	ret
+
+_HandleHubPowerPorts:
+	or	a,a
+	sbc	hl,hl
+	ret
+
+_HandleHubChange:
+	or	a,a
+	sbc	hl,hl
+	ret
 
 _HandleDevInt:
 	ld	l,ti.usbGisr-$100
@@ -4363,7 +4407,7 @@ _CreateDevice:
 	jq	nz,.nomem
 	ld	(ydevice.endpoints),hl
 	ex	de,hl
-	ld	(ydevice.parent),hl
+	ld	(ydevice.hub),hl
 	ld	(ydevice.find),c
 assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	and	a,ti.bmUsbSpd shr 16
@@ -4386,7 +4430,6 @@ assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	ld	(ydevice.refcnt),bc;1
 	ld	(ydevice.sibling),c;1
 	ld	(ydevice.child),c;1
-	ld	(ydevice.hub),c;1
 	ld	hl,ti.mpUsbPortStsCtrl
 	ld	a,USB_DEVICE_CONNECTED_EVENT
 	ld	c,(ydevice.find)
@@ -4413,11 +4456,13 @@ _HandlePortPortEnInt:
 	ld	a,(hl)
 	and	a,not (ti.bmUsbOvercurrChg or ti.bmUsbConnStsChg)
 	ld	(hl),a
+	call	.disabled
+	ret	nz
 	bit	ti.bUsbPortEn,(hl)
-	jq	z,.disabled
+	ret	z
 	ld	ydevice,(rootHub.child)
-	ld	c,iyl
-	bit	0,c
+	ld	a,iyl
+	bit	0,a
 	call	z,_CreateDefaultControlEndpoint.enable
 	call	z,_Alloc32Align32
 	jq	nz,.disable

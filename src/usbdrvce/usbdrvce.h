@@ -296,6 +296,7 @@ typedef enum usb_descriptor_type {
   USB_STRING_DESCRIPTOR,
   USB_INTERFACE_DESCRIPTOR,
   USB_ENDPOINT_DESCRIPTOR,
+  USB_HUB_DESCRIPTOR = 0x29,
 } usb_descriptor_type_t;
 
 typedef enum usb_class {
