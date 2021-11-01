@@ -227,7 +227,7 @@ struct endpoint			; endpoint structure
 end struct
 struct hub			; hub structure
 	label .: 32
-	change		rb 16	; hub and port status change bitmap
+	change dbx $80 shr 3: ?	; hub and port status change bitmap
 	status		setup	; setup
 	numPorts	rb 1	; number of ports in this hub
 	flags		rb 1	; hub characteristics
@@ -350,7 +350,7 @@ virtual at ti.usbArea
 				rb (-$) and $FF
 	?dummyHead		endpoint
 				rb (-$) and $1F
-	?usedAddresses		dbx 128/8: ?
+	?usedAddresses		dbx $80 shr 3: ?
 	?eventCallback		rl 1
 	?eventCallback.data	rl 1
 	?currentDescriptors	rl 1
@@ -1260,7 +1260,7 @@ end repeat
 	jq	nz,usb_GetDescriptor.free
 	lea	hl,iy.device
 	call	usb_GetDeviceEndpoint.masked
-	ld	de,_HandleHubDescriptor
+	ld	de,_HubHandler.descriptor
 	ld	iy.hub,(ix-6)
 	push	iy.hub,de,iy.hub.numPorts-2,iy.hub.status,hl
 	ld	b,32
@@ -3819,7 +3819,8 @@ assert ti.usbInEp1 < ti.usbOutEp1
 	ex	de,hl
 	ret
 
-_HandleDeviceDescriptor:
+_DeviceHandler:
+.descriptor:
 	ld	hl,3
 	add	hl,sp
 	ld	iy.endpoint,(hl)
@@ -3857,7 +3858,7 @@ end repeat
 	jq	nc,.shift
 	sbc	a,c
 	ex	de,hl
-	ld	bc,_HandleDeviceEnable
+	ld	bc,.enable
 	push	hl,bc,bc,hl,iy.endpoint
 	inc	l
 	ld	(hl),SET_ADDRESS_REQUEST
@@ -3909,13 +3910,12 @@ assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 	or	a,a
 	sbc	hl,hl
 	ret
-
-_HandleDeviceEnable:
+.enable:
 	ld	iy,0
 	add	iy,sp
 	ld	a,(iy+6)
 	or	a,a
-	jq	nz,_HandleDeviceDescriptor.free
+	jq	nz,.free
 	ld	hl,(iy+12)
 	setmsk	setup.wValue,hl
 	ld	a,(hl)
@@ -3929,20 +3929,98 @@ _HandleDeviceEnable:
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
-_HandleHubDescriptor:
-	or	a,a
+_HubHandler.0:
+	xor	a,a
+_HubHandler:
+	ld	c,$FF
+.any:
+	pop	hl
+	push	ix
+	ld	ix,0
+	lea	de,ix
+	add	ix,sp
+	xor	a,(ix+12)
+	and	a,c
+	or	a,(ix+9)
+	jq	nz,.free
+	ld	iy.hub,(ix+15)
+	ld	bc,(ix+6)
+	jp	(hl)
+.free:
+	pop	ix
+	call	_FreeTransferData
 	sbc	hl,hl
 	ret
-
-_HandleHubPowerPorts:
-	or	a,a
-	sbc	hl,hl
+.descriptor:
+	ld	a,7
+	call	.
+	ld	(iy.hub.status.wLength-1),de
+	ld	d,(iy.hub.numPorts)
+	cp	a,d
+	jq	z,.free
+	ld	(iy.hub.status.wIndex-1),de
+assert iy.hub.status.bmRequestType+1 = iy.hub.status.bRequest
+assert iy.hub.status.bmRequestType+2 = iy.hub.status.wValue+0
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or SET_FEATURE_REQUEST shl 8 or 8 shl 16
+	ld	(iy.hub.status.bmRequestType),hl
+.power:
+	ld	hl,.powered
+	push	iy.hub,hl,de,iy.hub.status,bc
+	call	usb_ScheduleControlTransfer
+	ld	sp,ix
+	pop	ix
 	ret
-
-_HandleHubChange:
-	or	a,a
-	sbc	hl,hl
+.powered:
+	call	.0
+	dec	(iy.hub.status.wIndex+0)
+	jq	nz,.power
+	ex	de,hl
+	add	hl,bc
+	ld	l,endpoint.device
+	ld	hl,(hl)
+	ld	de,(hl+device.endpoints)
+	bit	0,de
+	jq	nz,.free
+	ld	l,endpoint.transferInfo
+	inc	e
+	ld	b,32-2
+.find:
+	inc	e
+	ld	a,(de)
+	ld	h,a
+	inc	a
+	jq	z,.notfound
+	ld	a,(hl)
+assert ~(INTERRUPT_TRANSFER+1) and INTERRUPT_TRANSFER
+	cpl
+	and	a,INTERRUPT_TRANSFER
+	jq	z,.found
+.notfound:
+	djnz	.find
+	jq	.free
+.found:
+	ld	(iy.hub.endpoint),h
+.change:
+	ld	l,endpoint
+	ld	de,.changed
+	ld	bc,0
+	ld	c,(iy.hub.numPorts)
+	srl	c
+	srl	c
+	srl	c
+	inc	c
+	push	iy.hub,de,bc,iy.hub.change,hl
+	call	usb_ScheduleTransfer
+	ld	sp,ix
+	pop	ix
 	ret
+.changed:
+	ld	c,0
+	call	.any
+	ex	de,hl
+	add	hl,bc
+	ld	h,(iy.hub.endpoint)
+	jq	.change
 
 _HandleDevInt:
 	ld	l,ti.usbGisr-$100
@@ -4466,7 +4544,7 @@ _HandlePortPortEnInt:
 	call	z,_CreateDefaultControlEndpoint.enable
 	call	z,_Alloc32Align32
 	jq	nz,.disable
-	ld	bc,_HandleDeviceDescriptor
+	ld	bc,_DeviceHandler.descriptor
 	ld	de,_GetDeviceDescriptor8
 	push	hl,bc,hl,de,iy.endpoint
 	call	usb_ScheduleControlTransfer
