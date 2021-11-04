@@ -203,7 +203,7 @@ struct endpoint			; endpoint structure
  end namespace
 	smask		rb 1	; micro-frame s-mask
 	cmask		rb 1	; micro-frame c-mask
-	hubInfo		rw 1	; hub addr or port num shl 7 or mult shl 14
+	hubInfo		rw 1	; hub addr or port number shl 7 or mult shl 14
 	cur		rd 1	; current transfer pointer
 	overlay		transfer; current transfer
 	transferInfo	rb 1	; transfer type or transfer dir shl 7
@@ -227,25 +227,25 @@ struct endpoint			; endpoint structure
 end struct
 struct hub			; hub structure
 	label .: 32
-	change dbx $80 shr 3: ?	; hub and port status change bitmap
-	status		setup	; setup
-	numPorts	rb 1	; number of ports in this hub
-	flags		rb 1	; hub characteristics
-	endpoint	rb 1	; status change endpoint
-	powerOnDelay	rb 1	; time in 2ms units for port to power on
-	maxCurrent	rb 1	; max current requirements in mA
-	curDevice	rl 1	; current device
+	setup		setup	; setup
+	bitmap		rb 1	; status change bitmap
+	status		rw 1	; wHubStatus or wPortStatus
+	change		rw 1	; wHubChange or wPortChange
+	endpoint	rl 1	; status change endpoint
+	device		rl 1	; current device
+	desc		hubDescriptor
+			rb 4	; padding
 end struct
 struct device			; device structure
 	label .: 32
 	endpoints	rl 1	; pointer to array of endpoints
 	find		rb 1	; find flags
 	refcnt		rl 1	; reference count
-	sibling		rl 1	; next device connected to the same hub
 	speed		rb 1	; device speed shl 4
+	sibling		rl 1	; next device connected to the same hub
 	back		rl 1	; update pointer to next pointer to self
-	portNum		rb 1	; port number of hub this device is connected to
 	addr		rb 1	; device addr and $7F
+	portNbr		rb 1	; port number of hub this device is connected to
 	child		rl 1	; first device connected to this hub
 	hub		rl 1	; hub this device is connected to
 	data		rl 1	; user data
@@ -330,6 +330,16 @@ struct endpointDescriptor
 	bmAttributes		rb 1
 	wMaxPacketSize		rw 1
 	bInterval		rb 1
+end struct
+struct hubDescriptor
+	label .: 9
+	descriptor		descriptor
+	bNbrPorts		rb 1
+	wHubCharacteristics	rw 1
+	bPwrOn2PwrGood		rb 1
+	bHubContrCurrent	rb 1
+	DeviceRemovable		rb 1 ; variable
+	PortPwrCtrlMask		rb 1 ; variable
 end struct
 ;-------------------------------------------------------------------------------
 
@@ -1258,16 +1268,16 @@ end repeat
 	call	usb_GetDeviceEndpoint.masked
 	ld	de,_HubHandler.descriptor
 	ld	iy.hub,(ix-6)
-	push	iy.hub,de,iy.hub.numPorts-2,iy.hub.status,hl
+	push	iy.hub,de,iy.hub.desc,iy.hub.setup,hl
 	ld	b,32
 .clear:
 	ld	(iy),0
 	inc	iy
 	djnz	.clear
-	ld	(iy.hub.status.bmRequestType-32),DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_DEVICE
-	ld	(iy.hub.status.bRequest-32),GET_DESCRIPTOR_REQUEST
-	ld	(iy.hub.status.wValue+1-32),HUB_DESCRIPTOR
-	ld	(iy.hub.status.wLength+0-32),7
+	ld	(iy.hub.setup.bmRequestType-32),DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_DEVICE
+	ld	(iy.hub.setup.bRequest-32),GET_DESCRIPTOR_REQUEST
+	ld	(iy.hub.setup.wValue+1-32),HUB_DESCRIPTOR
+	ld	(iy.hub.setup.wLength+0-32),sizeof iy.hub.desc
 	call	usb_ScheduleControlTransfer
 	jq	usb_Transfer.return
 
@@ -3927,10 +3937,10 @@ assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
-_HubHandler.0:
-	xor	a,a
+_HubHandler.status:
+	ld	a,sizeof iy.hub.status+sizeof iy.hub.change
 _HubHandler:
-	ld	c,$FF
+;	ld	c,$FF
 .any:
 	pop	hl
 	push	ix
@@ -3938,7 +3948,7 @@ _HubHandler:
 	lea	de,ix
 	add	ix,sp
 	xor	a,(ix+12)
-	and	a,c
+;	and	a,c
 	or	a,(ix+9)
 	jq	nz,.free
 	ld	iy.hub,(ix+15)
@@ -3950,28 +3960,30 @@ _HubHandler:
 	sbc	hl,hl
 	ret
 .descriptor:
-	ld	a,7
+	ld	a,sizeof iy.hub.desc
 	call	.
-	ld	(iy.hub.status.wLength-1),de
-	ld	d,(iy.hub.numPorts)
-	cp	a,d
-	jq	z,.free
-	ld	(iy.hub.status.wIndex-1),de
-assert iy.hub.status.bmRequestType+1 = iy.hub.status.bRequest
-assert iy.hub.status.bmRequestType+2 = iy.hub.status.wValue+0
+	ld	(iy.hub.setup.wLength-1),de
+	ld	d,(iy.hub.desc.bNbrPorts)
+	ld	a,d
+	dec	a
+	cp	a,7
+	jq	nc,.free
+	ld	(iy.hub.setup.wIndex-1),de
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or SET_FEATURE_REQUEST shl 8 or 8 shl 16
-	ld	(iy.hub.status.bmRequestType),hl
+	ld	(iy.hub.setup.bmRequestType),hl
 .power:
-	ld	hl,.powered
-	push	iy.hub,hl,de,iy.hub.status,bc
-	call	usb_ScheduleControlTransfer
-	ld	sp,ix
-	pop	ix
-	ret
-.powered:
-	call	.0
-	dec	(iy.hub.status.wIndex+0)
+	call	.control
+	xor	a,a
+	call	.
+	dec	(iy.hub.setup.wIndex+0)
 	jq	nz,.power
+	ld	a,(iy.hub.desc.bPwrOn2PwrGood)
+	add	a,3
+	rra
+	srl	a ; WARNING: This assumes flash wait states port is 3, to get at least a*8ms!
+	call	nz,ti.DelayTenTimesAms
 	ex	de,hl
 	add	hl,bc
 	ld	l,endpoint.device
@@ -3981,8 +3993,9 @@ assert iy.hub.status.bmRequestType+2 = iy.hub.status.wValue+0
 	jq	nz,.free
 	ld	l,endpoint.transferInfo
 	inc	e
-	ld	b,32-2
+	ld	b,$10-1
 .find:
+	inc	e
 	inc	e
 	ld	a,(de)
 	ld	h,a
@@ -3997,28 +4010,140 @@ assert ~(INTERRUPT_TRANSFER+1) and INTERRUPT_TRANSFER
 	djnz	.find
 	jq	.free
 .found:
-	ld	(iy.hub.endpoint),h
-.change:
 	ld	l,endpoint
+	ld	(iy.hub.endpoint),hl
+.change:
 	ld	de,.changed
-	ld	bc,0
-	ld	c,(iy.hub.numPorts)
-	srl	c
-	srl	c
-	srl	c
-	inc	c
-	push	iy.hub,de,bc,iy.hub.change,hl
+	ld	bc,1
+;	ld	c,(iy.hub.desc.bNbrPorts)
+;	srl	c
+;	srl	c
+;	srl	c
+;	inc	c
+	push	iy.hub,de,bc,iy.hub.bitmap,hl
 	call	usb_ScheduleTransfer
 	ld	sp,ix
 	pop	ix
 	ret
 .changed:
-	ld	c,0
-	call	.any
+;	ld	hl,12
+;	add	hl,sp
+;	ld	iy.hub,(hl)
+;	ld	a,(iy.hub.desc.bNbrPorts)
+;	rra
+;	srl	a
+;	srl	a
+;	inc	a
+	ld	a,1
+	call	.
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
+	ld	hl,(DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or GET_STATUS_REQUEST shl 8 or 0 shl 16
+	ld	(iy.hub.setup.bmRequestType),hl
+	ld	(iy.hub.setup.wLength+0),sizeof iy.hub.status+sizeof iy.hub.change
 	ex	de,hl
 	add	hl,bc
-	ld	h,(iy.hub.endpoint)
+	ld	l,endpoint.device
+	ld	hl,(hl)
+	ld	(iy.hub.device),hl
+	ld	hl,(hl+device.endpoints)
+	bit	0,hl
+	jq	nz,.free
+	ld	b,(hl)
+	inc	b
+	jq	z,.free
+	dec	b
+	srl	(iy.hub.bitmap)
+	jq	nc,.old
+	call	.control
+	call	.status
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or 2 shl 16
+	ld	(iy.hub.setup.bmRequestType),hl
+	ld	(iy.hub.setup.wLength+0),a
+	ld	a,2
+.hub.changed:
+	dec	(iy.hub.setup.wValue+0)
+	and	a,(iy.hub.change+0)
+	jq	z,.hub.unchanged
+	call	.control
+	xor	a,a
+	call	.
+.hub.unchanged:
+	or	a,(iy.hub.setup.wValue+0)
+	jq	nz,.hub.changed
+.old:
+	ld	hl,(iy.hub.device)
+	setmsk	device.child,hl
+	jq	.old.enter
+.old.loop:
+	ld	(iy.hub.device),hl
+	setmsk	device.child,hl
+assert device.child-1 = device.portNbr
+	dec	l
+	ld	b,(hl)
+	ld	(iy.hub.setup.wIndex+0),b
+	ld	a,$80
+.old.shift:
+	rlca
+	djnz	.old.shift
+	and	a,(iy.hub.bitmap)
+	jq	z,.old.skip
+	cpl
+	and	a,(iy.hub.bitmap)
+	ld	(iy.hub.bitmap),a
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
+	ld	hl,(DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or GET_STATUS_REQUEST shl 8 or 0 shl 16
+	ld	(iy.hub.setup.bmRequestType),hl
+	ld	(iy.hub.setup.wLength+0),sizeof iy.hub.status+sizeof iy.hub.change
+	call	.control
+	call	.status
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or 5 shl 16
+	ld	(iy.hub.setup.bmRequestType),hl
+	ld	(iy.hub.setup.wLength+0),a
+	ld	a,5
+.old.changed:
+	dec	(iy.hub.setup.wValue+0)
+	and	a,(iy.hub.change+0)
+	jq	z,.old.unchanged
+	call	.control
+	xor	a,a
+	call	.
+.old.unchanged:
+	or	a,(iy.hub.setup.wValue+0)
+	jq	nz,.old.changed
+.old.skip:
+	ld	hl,(iy.hub.device)
+	setmsk	device.sibling,hl
+.old.enter:
+	ld	hl,(hl)
+	bit	0,hl
+	jq	z,.old.loop
+	ld	(iy.hub.setup.wValue+0),a
+	ld	(iy.hub.setup.wIndex+0),a
+.new.loop:
+	inc	(iy.hub.setup.wIndex+0)
+	srl	(iy.hub.bitmap)
+	jq	nc,.new.skip
+	call	.control
+	xor	a,a
+	call	.
+	cp	a,(iy.hub.bitmap)
+.new.skip:
+	jq	nz,.new.loop
+	ld	hl,(iy.hub.endpoint)
 	jq	.change
+.control:
+	pop	hl
+	push	iy.hub,hl,iy.hub.status,iy.hub.setup,bc
+	call	usb_ScheduleControlTransfer
+	ld	sp,ix
+	pop	ix
+	ret
 
 _HandleDevInt:
 	ld	l,ti.usbGisr-$100
@@ -4499,7 +4624,7 @@ assert ti.bUsbSpd-16 = ti.bUsbDevSpd
 	pop	hl
 	ld	(hl),-1
 	ldir
-	ld	(iy.device.portNum),b;0
+	ld	(iy.device.portNbr),b;0
 	ld	(iy.device.addr),b;0
 	ld	(iy.device.data),bc;0
 	inc	c;1
