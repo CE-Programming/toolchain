@@ -4064,7 +4064,7 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	call	.status
 assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
 assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
-	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or 2 shl 16
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or (1+1) shl 16
 	ld	(iy.hub.setup.bmRequestType),hl
 	ld	(iy.hub.setup.wLength+0),a
 	ld	a,2
@@ -4107,19 +4107,18 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	call	.status
 assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
 assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
-	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or 5 shl 16
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or (16-1) shl 16
 	ld	(iy.hub.setup.bmRequestType),hl
 	ld	(iy.hub.setup.wLength+0),a
-	ld	a,5
 .old.changed:
-	dec	(iy.hub.setup.wValue+0)
-	and	a,(iy.hub.change+0)
-	jq	z,.old.unchanged
+	inc	(iy.hub.setup.wValue+0)
+	srl	(iy.hub.change+0)
+	jq	nc,.old.unchanged
 	call	.control
 	xor	a,a
 	call	.
+	inc	e
 .old.unchanged:
-	or	a,(iy.hub.setup.wValue+0)
 	jq	nz,.old.changed
 .old.skip:
 	ld	hl,(iy.hub.device)
@@ -4128,16 +4127,34 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	ld	hl,(hl)
 	bit	0,hl
 	jq	z,.old.loop
-	ld	(iy.hub.setup.wValue+0),a
 	ld	(iy.hub.setup.wIndex+0),a
 .new.loop:
 	inc	(iy.hub.setup.wIndex+0)
 	srl	(iy.hub.bitmap)
 	jq	nc,.new.skip
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
+	ld	hl,(DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or GET_STATUS_REQUEST shl 8 or 0 shl 16
+	ld	(iy.hub.setup.bmRequestType),hl
+	ld	(iy.hub.setup.wLength+0),sizeof iy.hub.status+sizeof iy.hub.change
+	call	.control
+	call	.status
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or (16-1) shl 16
+	ld	(iy.hub.setup.bmRequestType),hl
+	ld	(iy.hub.setup.wLength+0),a
+.new.changed:
+	inc	(iy.hub.setup.wValue+0)
+	srl	(iy.hub.change+0)
+	jq	nc,.new.unchanged
 	call	.control
 	xor	a,a
 	call	.
-	cp	a,(iy.hub.bitmap)
+	inc	e
+.new.unchanged:
+	jq	nz,.new.changed
+	inc	d
 .new.skip:
 	jq	nz,.new.loop
 	ld	hl,(iy.hub.endpoint)
