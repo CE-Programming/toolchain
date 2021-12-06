@@ -2721,8 +2721,8 @@ assert endpoint.addr+1 = endpoint.info
 	ld	c,a
 	ld	a,h
 	ld	(bc),a
+	ld	c,0
 	pop	af
-	ld	a,endpoint.maxPktLen.rl shr 8
 	jq	nz,.notControl
 	ld	a,c
 	xor	a,1
@@ -2730,8 +2730,13 @@ assert endpoint.addr+1 = endpoint.info
 	ld	a,h
 	ld	(bc),a
 	setmsk	endpoint.info.dtc,(hl)
-	ld	a,(endpoint.maxPktLen.rl or endpoint.maxPktLen.c) shr 8
+	ld	c,(endpoint.maxPktLen.rl or endpoint.maxPktLen.c) shr 8
 .notControl:
+	rrca
+	sbc	a,a
+	cpl
+	and	a,endpoint.maxPktLen.rl shr 8
+	or	a,c
 	ld	c,a
 assert endpointDescriptor.bmAttributes+1 = endpointDescriptor.wMaxPacketSize
 	inc	de
