@@ -4045,6 +4045,7 @@ assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
 assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	ld	hl,(DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or GET_STATUS_REQUEST shl 8 or 0 shl 16
 	ld	(iy.hub.setup.bmRequestType),hl
+	ld	(iy.hub.setup.wIndex+0),a
 	ld	(iy.hub.setup.wLength+0),sizeof iy.hub.status+sizeof iy.hub.change
 	ex	de,hl
 	add	hl,bc
