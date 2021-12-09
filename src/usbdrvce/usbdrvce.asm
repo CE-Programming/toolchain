@@ -3981,9 +3981,12 @@ _HubHandler:
 	ld	bc,(ix+6)
 	jp	(hl)
 .free:
-	pop	ix
-	call	_FreeTransferData
 	sbc	hl,hl
+.error:
+	pop	ix
+	ex	de,hl
+	call	_FreeTransferData
+	ex	de,hl
 	ret
 .descriptor:
 	ld	a,sizeof iy.hub.desc
@@ -4160,9 +4163,30 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	call	.status
 assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
 assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
-	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or (16-1) shl 16
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or 16 shl 16
 	ld	(iy.hub.setup.bmRequestType),hl
 	ld	(iy.hub.setup.wLength+0),a
+	srl	(iy.hub.change+0)
+	jq	nc,.new.unchanged
+	call	.control
+	call	.0
+	bit	0,(iy.hub.status+0)
+	jq	z,.new.changed
+	ex	de,hl
+	add	hl,bc
+	ld	l,endpoint.device
+	ld	de,(hl)
+	ld	c,IS_DEVICE or IS_DISABLED
+	ld	a,(iy.hub.status+1)
+	and	a,3 shl 1
+	rlca
+	rlca
+	rlca
+	call	_CreateDevice
+	ld	iy.hub,(ix+15)
+	ld	bc,(ix+6)
+	jq	z,.new.loop
+	jq	.error
 .new.changed:
 	inc	(iy.hub.setup.wValue+0)
 	srl	(iy.hub.change+0)
