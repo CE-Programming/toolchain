@@ -2376,7 +2376,7 @@ assert IS_DISABLED = 1
 	ld	(ix.device.find+1),a
 	jq	.start
 .recursed:
-	pop	ix.device,bc
+	pop	bc,ix.device
 	ret	nz
 .start:
 	push	ix.device,bc
