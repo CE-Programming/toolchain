@@ -435,6 +435,7 @@ virtual at 0
 	USB_HOST_PORT_OVERCURRENT_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_FORCE_PORT_RESUME_INTERRUPT		rb 1
 	USB_HOST_SYSTEM_ERROR_INTERRUPT				rb 1
+	USB_HUB_EVENTS						rb 1
 end virtual
 
 ; enum usb_error
@@ -3942,6 +3943,26 @@ assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
+_HubHandler.dispatch:
+	ld	hl,15
+	add	hl,sp
+	ld	iy.hub,(hl)
+	ld	a,long*8
+	sub	a,(iy.hub.setup.wValue+0)
+	ld	b,a
+assert iy.hub.status+2 = iy.hub.change
+	ld	hl,(iy.hub.status)
+_HubHandler.dispatch.shift:
+	add	hl,hl
+	djnz	_HubHandler.dispatch.shift
+	ld	a,(iy.hub.setup.wValue+0)
+	rla
+	add	a,USB_HUB_EVENTS
+	ld	de,(iy.hub.device)
+	call	_DispatchEvent
+_HubHandler.0:
+	xor	a,a
+	jq	_HubHandler
 _HubHandler.status:
 	ld	a,sizeof iy.hub.status+sizeof iy.hub.change
 _HubHandler:
@@ -3980,8 +4001,7 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	ld	(iy.hub.setup.bmRequestType),hl
 .power:
 	call	.control
-	xor	a,a
-	call	.
+	call	.0
 	dec	(iy.hub.setup.wIndex+0)
 	jq	nz,.power
 	ld	a,(iy.hub.desc.bPwrOn2PwrGood)
@@ -4074,8 +4094,7 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	and	a,(iy.hub.change+0)
 	jq	z,.hub.unchanged
 	call	.control
-	xor	a,a
-	call	.
+	call	.dispatch
 .hub.unchanged:
 	or	a,(iy.hub.setup.wValue+0)
 	jq	nz,.hub.changed
@@ -4116,8 +4135,7 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	srl	(iy.hub.change+0)
 	jq	nc,.old.unchanged
 	call	.control
-	xor	a,a
-	call	.
+	call	.dispatch
 	inc	e
 .old.unchanged:
 	jq	nz,.old.changed
@@ -4150,8 +4168,7 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	srl	(iy.hub.change+0)
 	jq	nc,.new.unchanged
 	call	.control
-	xor	a,a
-	call	.
+	call	.0
 	inc	e
 .new.unchanged:
 	jq	nz,.new.changed
