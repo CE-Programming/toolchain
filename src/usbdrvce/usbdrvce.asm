@@ -4366,6 +4366,8 @@ _HandleDevResetInt:
 	set	ti.bCxFifoClr,(hl)
 	ld	c,IS_DEVICE or IS_ENABLED
 	ld	l,ti.usbDevCtrl-$100
+	ld	a,(hl)
+	and	a,ti.bmUsbDevSpd
 	call	_CreateDevice.root
 	call	z,_CreateDefaultControlEndpoint
 	ret	nz
@@ -4623,12 +4625,15 @@ _HandlePortConnStsInt:
 	ret	z
 	ld	c,IS_DEVICE or IS_DISABLED
 	ld	l,ti.usbOtgCsr+2
+	ld	a,(hl)
+	and	a,ti.bmUsbSpd shr 16
+	rrca
 	jq	_CreateDevice.root
 
 ; Input:
+;  a = device speed shl 4
 ;  c = find flags
 ;  de = parent hub
-;  hl = pointer to device speed shl 2
 ; Output:
 ;  zf = success
 ;  a = ?
@@ -4637,9 +4642,9 @@ _HandlePortConnStsInt:
 ;  hl = ti.mpUsbPortStsCtrl | error
 ;  iy = device
 _CreateDevice.root:
+	rrca
 	ld	de,rootHub
 _CreateDevice:
-	ld	a,(hl)
 	call	_Alloc32Align32
 	jq	nz,.error
 	push	hl
@@ -4650,10 +4655,6 @@ _CreateDevice:
 	ex	de,hl
 	ld	(iy.device.hub),hl
 	ld	(iy.device.find),c
-assert ti.bUsbSpd-16 = ti.bUsbDevSpd
-	and	a,ti.bmUsbSpd shr 16
-	rrca
-	rrca
 	ld	(iy.device.speed),a
 	setmsk	device.child,hl
 	ld	(hl),iy.device
