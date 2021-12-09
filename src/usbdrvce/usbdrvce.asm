@@ -2520,7 +2520,8 @@ _DeviceDisconnected:
 	ld	(hl),bc
 	ld	hl,(ix.device.endpoints+1)
 	ld	(ix.device.endpoints+1),ix.device
-	call	_Free32Align32
+	bit	0,hl
+	call	z,_Free32Align32
 	lea	hl,ix.device.refcnt+1
 	jq	usb_UnrefDevice.refcnt
 
