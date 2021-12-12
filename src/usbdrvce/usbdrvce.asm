@@ -371,6 +371,7 @@ virtual at ti.usbArea
 	?freeList32Align32	rl 1
 	?freeList64Align256	rl 1
 	?timerList		rl 1
+	?resetList		rl 1
 iterate type, async, intr
  assert $+1 = type#CleanupReady
 				rb 1 ; clobber
@@ -1018,11 +1019,10 @@ usb_ResetDevice:
 	jq	z,_Error.INVALID_PARAM
 	ld	hl,currentRole
 	bit	ti.bUsbRole-16,(hl)
-	jq	nz,.notSupported
+	jq	nz,_Error.NOT_SUPPORTED
 	ld	hl,(rootHub.child)
 	sbc	hl,de
-.notSupported:
-	jq	nz,_Error.NOT_SUPPORTED
+	jq	nz,.hub
 	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 100ms!
 	call	ti.DelayTenTimesAms
 	ld	hl,ti.mpUsbPortStsCtrl+1
@@ -1032,6 +1032,37 @@ usb_ResetDevice:
 	res	ti.bUsbPortReset-8,(hl)
 	ld	a,2 ; WARNING: This assumes flash wait states port is 3, to get at least 10ms!
 	jq	ti.DelayTenTimesAms
+.hub:
+	call	_Alloc32Align32
+	jq	nz,_Error.NO_MEMORY
+	ld	bc,(resetList)
+	ld	(hl),bc
+	ld	(resetList),hl
+repeat long
+	inc	hl
+end repeat
+	ld	(hl),de
+	ex	de,hl
+	bit	0,bc
+	jq	z,usb_RefDevice.enter
+	ld	hl,(resetList)
+	ld	bc,_ResetHandler
+	push	hl,bc
+repeat long
+	inc	hl
+end repeat
+	push	hl,hl
+	ld	iy.device,(hl)
+	ld	c,(iy.device.portNbr)
+	xor	a,a
+iterate value, HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER,SET_FEATURE_REQUEST,4,a,c,a,a,a
+ if % <> 1
+	inc	l
+ end if
+	ld	(hl),value
+end iterate
+	ld	hl,(iy.device.hub)
+	jq	usb_SetConfiguration.schedule
 
 ;-------------------------------------------------------------------------------
 usb_DisableDevice:
@@ -1266,19 +1297,21 @@ end repeat
 .free:
 	jq	nz,usb_GetDescriptor.free
 	lea	hl,iy.device
-	call	usb_GetDeviceEndpoint.masked
 	ld	de,_HubHandler.descriptor
 	ld	iy.hub,(ix-6)
-	push	iy.hub,de,iy.hub.desc,iy.hub.setup,hl
+	push	iy.hub,de,iy.hub.desc,iy.hub.setup
 	ld	b,32
 .clear:
-	ld	(iy),0
+	ld	(iy),a
 	inc	iy
 	djnz	.clear
 	ld	(iy.hub.setup.bmRequestType-32),DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_DEVICE
 	ld	(iy.hub.setup.bRequest-32),GET_DESCRIPTOR_REQUEST
 	ld	(iy.hub.setup.wValue+1-32),HUB_DESCRIPTOR
 	ld	(iy.hub.setup.wLength+0-32),sizeof iy.hub.desc
+.schedule:
+	call	usb_GetDeviceEndpoint.masked
+	push	hl
 	call	usb_ScheduleControlTransfer
 	jq	usb_Transfer.return
 
@@ -3943,6 +3976,11 @@ assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 	lea	de,iy.device
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
+
+_ResetHandler:
+	call	_FreeTransferData
+	sbc	hl,hl
+	ret
 
 _HubHandler.dispatch:
 	ld	hl,15
