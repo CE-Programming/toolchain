@@ -239,12 +239,12 @@ end struct
 struct device			; device structure
 	label .: 32
 	endpoints	rl 1	; pointer to array of endpoints
-	find		rb 1	; find flags
+	addr		rb 1	; device addr and $7F
 	refcnt		rl 1	; reference count
 	speed		rb 1	; device speed shl 4
 	sibling		rl 1	; next device connected to the same hub
 	back		rl 1	; update pointer to next pointer to self
-	addr		rb 1	; device addr and $7F
+	find		rb 1	; find flags
 	portNbr		rb 1	; port number of hub this device is connected to
 	child		rl 1	; first device connected to this hub
 	hub		rl 1	; hub this device is connected to
@@ -4216,12 +4216,14 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	ld	l,endpoint.device
 	ld	de,(hl)
 	ld	c,IS_DEVICE or IS_DISABLED
+	ld	b,(iy.hub.setup.wIndex+0)
 	ld	a,(iy.hub.status+1)
 	and	a,3 shl 1
 	rlca
 	rlca
 	rlca
 	call	_CreateDevice
+	call	z,_CreateDefaultControlEndpoint
 	ld	iy.hub,(ix+15)
 	ld	bc,(ix+6)
 	jq	z,.new.loop
@@ -4696,6 +4698,7 @@ _HandlePortConnStsInt:
 ; Input:
 ;  a = device speed shl 4
 ;  c = find flags
+;  b = port
 ;  de = parent hub
 ; Output:
 ;  zf = success
@@ -4707,6 +4710,7 @@ _HandlePortConnStsInt:
 _CreateDevice.root:
 	rrca
 	ld	de,rootHub
+	ld	b,0
 _CreateDevice:
 	call	_Alloc32Align32
 	jq	nz,.error
@@ -4717,7 +4721,9 @@ _CreateDevice:
 	ld	(iy.device.endpoints),hl
 	ex	de,hl
 	ld	(iy.device.hub),hl
-	ld	(iy.device.find),c
+assert iy.device.find+1 = iy.device.portNbr
+assert iy.device.find+2 = iy.device.child
+	ld	(iy.device.find),bc
 	ld	(iy.device.speed),a
 	setmsk	device.child,hl
 	ld	(hl),iy.device
@@ -4728,7 +4734,6 @@ _CreateDevice:
 	pop	hl
 	ld	(hl),-1
 	ldir
-	ld	(iy.device.portNbr),b;0
 	ld	(iy.device.addr),b;0
 	ld	(iy.device.data),bc;0
 	inc	c;1
