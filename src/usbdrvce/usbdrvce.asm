@@ -4149,12 +4149,13 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	setmsk	device.child,hl
 assert device.child-1 = device.portNbr
 	dec	l
-	ld	b,(hl)
-	ld	(iy.hub.setup.wIndex+0),b
+	ld	e,(hl)
+	ld	(iy.hub.setup.wIndex+0),e
 	ld	a,$80
 .old.shift:
 	rlca
-	djnz	.old.shift
+	dec	e
+	jq	nz,.old.shift
 	and	a,(iy.hub.bitmap)
 	jq	z,.old.skip
 	cpl
