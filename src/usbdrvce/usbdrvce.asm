@@ -4114,13 +4114,10 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	ld	l,endpoint.device
 	ld	hl,(hl)
 	ld	(iy.hub.device),hl
-	ld	hl,(hl+device.endpoints)
-	bit	0,hl
-	jq	nz,.free
-	ld	b,(hl)
-	inc	b
+	call	usb_GetDeviceEndpoint.masked
 	jq	z,.free
-	dec	b
+	ld	b,h
+	xor	a,a
 	srl	(iy.hub.bitmap)
 	jq	nc,.old
 	call	.control
