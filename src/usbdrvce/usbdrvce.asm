@@ -992,7 +992,7 @@ usb_FindDevice:
 	jq	c,.child
 	add	hl,de
 	jq	c,.forceChild
-	ld	iy,rootHub
+	ld	iy.device,rootHub
 	jq	.check
 .child:
 	bitmsk	IS_ATTACHED,c
@@ -1000,7 +1000,7 @@ usb_FindDevice:
 .forceChild:
 	bit	0,(iy.device.child)
 	jq	nz,.sibling
-	ld	iy,(iy.device.child)
+	ld	iy.device,(iy.device.child)
 	jq	.check
 .check:
 	ld	a,(iy.device.find)
@@ -1009,8 +1009,8 @@ usb_FindDevice:
 	lea	hl,iy
 	ret
 .hub:
-	ld	iy,(iy.device.hub)
-	lea	hl,iy
+	ld	iy.device,(iy.device.hub)
+	lea	hl,iy.device
 	ld	a,l
 	rrca
 	jq	c,usb_UnrefDevice.returnZero
@@ -1019,7 +1019,7 @@ usb_FindDevice:
 .sibling:
 	bit	0,(iy.device.sibling)
 	jq	nz,.hub
-	ld	iy,(iy.device.sibling)
+	ld	iy.device,(iy.device.sibling)
 	jq	.check
 
 ;-------------------------------------------------------------------------------
