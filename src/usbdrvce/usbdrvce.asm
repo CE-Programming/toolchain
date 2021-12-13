@@ -2574,8 +2574,8 @@ assert IS_DISABLED = 1 shl 0
 ; Input:
 ;  ix = device-1
 ; Output:
+;  af = ?
 ;  zf = success
-;  a = ?
 ;  bc = ?
 ;  de = ?
 ;  hl = ti.mpUsbRange | error
@@ -2588,9 +2588,13 @@ _DeviceDisconnected:
 	ld	b,USB_DEVICE_DISCONNECTED_EVENT
 	call	_DeviceDisabled.recurse
 	ret	nz
-	ld	bc,(ix.device.sibling+1)
+	ld	iy.device,(ix.device.sibling+1)
 	ld	hl,(ix.device.back+1)
-	ld	(hl),bc
+	ld	(hl),iy.device
+	dec	iyl
+	jq	z,.sibling
+	ld	(iy.device.back+1),hl
+.sibling:
 	ld	hl,(ix.device.endpoints+1)
 	ld	(ix.device.endpoints+1),ix.device
 	bit	0,hl
@@ -4630,6 +4634,7 @@ _HandleBPlugRemovedInt:
 	jq	_RootDeviceDisconnected
 
 ; Output:
+;  af = ?
 ;  zf = success
 ;  de = ? | hl
 ;  hl = hl | error
@@ -4772,8 +4777,15 @@ assert iy.device.find+2 = iy.device.child
 	ld	(iy.device.speed),a
 	call	usb_RefDevice.enter
 	setmsk	device.child,hl
-	ld	(hl),iy.device
+	jq	.enter
+.skip:
+	ld	hl,(hl)
+	setmsk	device.sibling,hl
+.enter:
+	bit	0,(hl)
+	jq	z,.skip
 	ld	(iy.device.back),hl
+	ld	(hl),iy.device
 	ld	bc,32-1
 	push	de
 	inc	de
