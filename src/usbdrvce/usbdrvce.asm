@@ -2796,10 +2796,10 @@ assert endpoint.addr+1 = endpoint.info
 	ld	c,a
 	ld	a,h
 	ld	(bc),a
-	ld	c,0
 	pop	af
-	jq	nz,.notControl
 	ld	a,c
+	ld	c,0
+	jq	nz,.notControl
 	xor	a,1
 	ld	c,a
 	ld	a,h
