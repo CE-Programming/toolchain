@@ -500,7 +500,7 @@ srl_Write:
 
 ;usb_standard_descriptors_t *srl_GetCDCStandardDescriptors(void);
 srl_GetCDCStandardDescriptors:
-	call	ti.os.GetSystemStats
+	call	ti.os.GetSystemInfo
 	ld	de,4
 	add	hl,de
 	bit	0,(hl)
