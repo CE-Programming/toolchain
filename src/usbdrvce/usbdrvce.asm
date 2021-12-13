@@ -247,9 +247,10 @@ struct device			; device structure
 	find		rb 1	; find flags
 	portNbr		rb 1	; port number of hub this device is connected to
 	child		rl 1	; first device connected to this hub
+			rb 1	; padding
 	hub		rl 1	; hub this device is connected to
 	data		rl 1	; user data
-			rb 7	; padding
+			rb 6	; padding
 end struct
 struct setup
 	label .: 8
@@ -615,6 +616,8 @@ assert deviceStatus+1 = tempEndpointStatus
 	ld	(intrCleanupReady),hl;-1
 	inc	hl
 	ld	(rootHub.addr),a;0
+assert rootHub.refcnt+3 = rootHub.speed
+	ld	(rootHub.refcnt+1),hl;0
 	ld	(rootHub.data),hl;0
 	ld	de,usedAddresses+1
 	ld	b,sizeof usedAddresses-1
@@ -876,17 +879,17 @@ end iterate
 
 ;-------------------------------------------------------------------------------
 usb_RefDevice:
-	pop	de
+	pop	bc
 	ex	(sp),hl
-	push	de
+	push	bc
 	inc	l
 	dec	l
 	ret	z
 .enter:
 	setmsk	device.refcnt,hl
-	ld	de,(hl)
-	inc	de
-	ld	(hl),de
+	ld	bc,(hl)
+	inc	bc
+	ld	(hl),bc
 	resmsk	device.refcnt,hl
 	ret
 
@@ -895,8 +898,9 @@ usb_UnrefDevice:
 	pop	de
 	ex	(sp),hl
 	push	de
-	inc	l
 	dec	l
+.recurse:
+	inc	l
 	ret	z
 .enter:
 	setmsk	device.refcnt,hl
@@ -908,8 +912,16 @@ usb_UnrefDevice:
 	sbc	hl,de
 	ex	de,hl
 	ld	(hl),de
+	jq	nz,.return
+	setmsk	device.hub-device.refcnt,hl
+	ld	de,(hl)
+	resmsk	device.hub-device.refcnt,hl
 	resmsk	device.refcnt,hl
-	call	z,_Free32Align32
+	call	_Free32Align32
+	ex	de,hl
+	dec	l
+	jq	nz,.recurse
+.return:
 	ld	de,ti.mpUsbRange
 .returnZero:
 	or	a,a
@@ -4723,6 +4735,7 @@ assert iy.device.find+1 = iy.device.portNbr
 assert iy.device.find+2 = iy.device.child
 	ld	(iy.device.find),bc
 	ld	(iy.device.speed),a
+	call	usb_RefDevice.enter
 	setmsk	device.child,hl
 	ld	(hl),iy.device
 	ld	(iy.device.back),hl
