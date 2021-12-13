@@ -252,6 +252,13 @@ struct device			; device structure
 	data		rl 1	; user data
 			rb 6	; padding
 end struct
+struct reset			; reset structure
+	label .: 32
+	next		rl 1	; next reset
+	dev		rl 1	; device
+	setup		setup	; setup
+	desc		deviceDescriptor
+end struct
 struct setup
 	label .: 8
 	bmRequestType	rb 1
@@ -1047,24 +1054,45 @@ usb_ResetDevice:
 .hub:
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
-	ld	bc,(resetList)
-	ld	(hl),bc
-	ld	(resetList),hl
-repeat long
-	inc	hl
+	ld	iy.reset,.resetListInd-reset.next
+virtual
+	or	a,0
+	load .or_a: byte from $$
+end virtual
+	db	.or_a
+.skip:
+	scf
+load .scf: byte from $-byte
+assert .scf and 1
+	ld	iy.reset,(iy.reset.next)
+	bit	0,(iy.reset.next)
+	jq	z,.skip
+	ld	(hl),a
+	ld	(iy.reset.next),hl
+repeat reset.dev-reset.next
+	inc	l
 end repeat
 	ld	(hl),de
 	ex	de,hl
-	bit	0,bc
-	jq	z,usb_RefDevice.enter
+	call	usb_RefDevice.enter
+	ret	c
+.next:
 	ld	hl,(resetList)
+.resetListInd := $-long
+load .resetList: long from .resetListInd
+assert .resetList = resetList
+	bit	0,hl
+	ret	nz
 	ld	bc,_ResetHandler
 	push	hl,bc
-repeat long
-	inc	hl
+repeat reset.dev
+	inc	l
+end repeat
+	ld	iy.device,(hl)
+repeat reset.setup-reset.dev
+	inc	l
 end repeat
 	push	hl,hl
-	ld	iy.device,(hl)
 	ld	c,(iy.device.portNbr)
 	xor	a,a
 iterate value, HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER,SET_FEATURE_REQUEST,4,a,c,a,a,a
@@ -3990,9 +4018,16 @@ assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 	jq	_DispatchEvent
 
 _ResetHandler:
-	call	_FreeTransferData
-	sbc	hl,hl
-	ret
+	ld	hl,resetList
+	ld	iy.reset,(hl)
+	ld	de,(iy.reset.next)
+	ld	(hl),de
+	ld	hl,(iy.reset.dev)
+	call	usb_UnrefDevice.enter
+	lea	hl,iy.reset
+	call	_Free32Align32
+	call	_Error.check
+	jq	usb_ResetDevice.next
 
 _HubHandler.dispatch:
 	ld	hl,15
