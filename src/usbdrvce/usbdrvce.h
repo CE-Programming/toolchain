@@ -70,10 +70,18 @@ typedef enum usb_event {
   USB_DEVICE_DISABLED_EVENT,
   /// \p event_data The usb_device_t that was enabled.
   USB_DEVICE_ENABLED_EVENT,
+  /// \p event_data The usb_device_t for the hub that stopped using bus power.
+  USB_HUB_LOCAL_POWER_GOOD_EVENT,
+  /// \p event_data The usb_device_t for the hub that started using bus power.
+  USB_HUB_LOCAL_POWER_LOST_EVENT,
   /// \p event_data The usb_device_t that deactivated overcurrent condition.
   USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT,
   /// \p event_data The usb_device_t that activated overcurrent condition.
   USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT,
+  /// \p event_data The usb_device_t that was resumed.
+  USB_DEVICE_RESUMED_EVENT,
+  /// \p event_data The usb_device_t that was suspended.
+  USB_DEVICE_SUSPENDED_EVENT,
   /// This event triggers when a host sends a control setup packet.  Return
   /// USB_IGNORE if you scheduled a response manually.  Return USB_SUCCESS
   /// to have standard requests handled automatically (You can modify the setup
@@ -96,8 +104,6 @@ typedef enum usb_event {
   USB_FIFO1_SHORT_PACKET_INTERRUPT,
   USB_FIFO2_SHORT_PACKET_INTERRUPT,
   USB_FIFO3_SHORT_PACKET_INTERRUPT,
-  USB_DEVICE_SUSPEND_INTERRUPT,
-  USB_DEVICE_RESUME_INTERRUPT,
   USB_DEVICE_ISOCHRONOUS_ERROR_INTERRUPT,
   USB_DEVICE_ISOCHRONOUS_ABORT_INTERRUPT,
   USB_DEVICE_DMA_FINISH_INTERRUPT,

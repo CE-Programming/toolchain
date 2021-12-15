@@ -410,8 +410,12 @@ virtual at 0
 	USB_DEVICE_CONNECTED_EVENT				rb 1
 	USB_DEVICE_DISABLED_EVENT				rb 1
 	USB_DEVICE_ENABLED_EVENT				rb 1
+	USB_HUB_LOCAL_POWER_GOOD_EVENT				rb 1
+	USB_HUB_LOCAL_POWER_LOST_EVENT				rb 1
 	USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT		rb 1
 	USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT			rb 1
+	USB_DEVICE_RESUMED_EVENT				rb 1
+	USB_DEVICE_SUSPENDED_EVENT				rb 1
 	USB_DEFAULT_SETUP_EVENT					rb 1
 	USB_HOST_CONFIGURE_EVENT				rb 1
 	; Temp debug events:
@@ -426,8 +430,6 @@ virtual at 0
 	USB_FIFO1_SHORT_PACKET_INTERRUPT			rb 1
 	USB_FIFO2_SHORT_PACKET_INTERRUPT			rb 1
 	USB_FIFO3_SHORT_PACKET_INTERRUPT			rb 1
-	USB_DEVICE_SUSPEND_INTERRUPT				rb 1
-	USB_DEVICE_RESUME_INTERRUPT				rb 1
 	USB_DEVICE_ISOCHRONOUS_ERROR_INTERRUPT			rb 1
 	USB_DEVICE_ISOCHRONOUS_ABORT_INTERRUPT			rb 1
 	USB_DEVICE_DMA_FINISH_INTERRUPT				rb 1
@@ -4150,10 +4152,12 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	add	hl,bc
 	ld	l,endpoint.device
 	ld	hl,(hl)
+	call	usb_RefDevice.enter
 	ld	(iy.hub.device),hl
 	call	usb_GetDeviceEndpoint.masked
 	jq	z,.free
-	ld	b,h
+	push	hl
+	pop	bc
 	xor	a,a
 	srl	(iy.hub.bitmap)
 	jq	nc,.old
@@ -4161,26 +4165,39 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	call	.status
 assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
 assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
-	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or (1+1) shl 16
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_DEVICE) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or 0 shl 16
 	ld	(iy.hub.setup.bmRequestType),hl
 	ld	(iy.hub.setup.wLength+0),a
-	ld	a,2
-.hub.changed:
-	dec	(iy.hub.setup.wValue+0)
-	and	a,(iy.hub.change+0)
-	jq	z,.hub.unchanged
+assert USB_HUB_LOCAL_POWER_GOOD_EVENT+1 = USB_HUB_LOCAL_POWER_LOST_EVENT
+assert USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT+1 = USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT
+iterate event, HUB_LOCAL_POWER_GOOD, DEVICE_OVERCURRENT_DEACTIVATED
+ if % <> 1
+	inc	(iy.hub.setup.wValue+0)
+ end if
+	srl	(iy.hub.change+0)
+	jq	nc,.hub.%
 	call	.control
-	call	.dispatch
-.hub.unchanged:
-	or	a,(iy.hub.setup.wValue+0)
-	jq	nz,.hub.changed
+	call	.0
+	ld	a,(iy.hub.status+0)
+ repeat %-1
+	rrca
+ end repeat
+	and	a,1
+	add	a,USB_#event#_EVENT
+	ld	de,(iy.hub.device)
+	push	bc
+	call	_DispatchEvent
+	pop	bc
+	jq	nz,.error
+	ld	iy.hub,(ix+15)
+.hub.%:
+end iterate
 .old:
+	scf
+.old.loop:
 	ld	hl,(iy.hub.device)
 	setmsk	device.child,hl
-	jq	.old.enter
-.old.loop:
-	ld	(iy.hub.device),hl
-	setmsk	device.child,hl
+	jq	c,.old.enter
 assert device.child-1 = device.portNbr
 	dec	l
 	ld	e,(hl)
@@ -4195,6 +4212,7 @@ assert device.child-1 = device.portNbr
 	cpl
 	and	a,(iy.hub.bitmap)
 	ld	(iy.hub.bitmap),a
+	; TODO: clear change before getting status
 assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
 assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	ld	hl,(DEVICE_TO_HOST or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or GET_STATUS_REQUEST shl 8 or 0 shl 16
@@ -4204,24 +4222,94 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	call	.status
 assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
 assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
-	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or (16-1) shl 16
+	ld	hl,(HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER) shl 0 or CLEAR_FEATURE_REQUEST shl 8 or 16 shl 16
 	ld	(iy.hub.setup.bmRequestType),hl
 	ld	(iy.hub.setup.wLength+0),a
 .old.changed:
+	srl	(iy.hub.change+0)
+	jq	nc,.old.16
+	bit	0,(iy.hub.status+0)
+	jq	nz,.old.reconnected
+	call	.control
+	call	.0
+.old.reconnected:
+	push	bc,ix
+	ld	ix.device,(iy.hub.device)
+	dec	ixl
+	call	nz,_DeviceDisconnected
+	pop	ix,bc
+	jq	nz,.error
+	ld	iy.hub,(ix+15)
+.old.16:
 	inc	(iy.hub.setup.wValue+0)
 	srl	(iy.hub.change+0)
-	jq	nc,.old.unchanged
+	jq	nc,.old.17
 	call	.control
-	call	.dispatch
-	inc	e
-.old.unchanged:
-	jq	nz,.old.changed
+	call	.0
+	push	bc,ix
+	ld	ix.device,(iy.hub.device)
+	dec	ixl
+	call	nz,_DeviceDisabled
+	pop	ix,bc
+	jq	nz,.error
+	ld	iy.hub,(ix+15)
+.old.17:
+	inc	(iy.hub.setup.wValue+0)
+	srl	(iy.hub.change+0)
+	jq	nc,.old.18
+	call	.control
+	call	.0
+	ld	a,(iy.hub.status+0)
+ repeat 2
+	rrca
+ end repeat
+	and	a,1
+assert USB_DEVICE_RESUMED_EVENT+1 = USB_DEVICE_SUSPENDED_EVENT
+	add	a,USB_DEVICE_RESUMED_EVENT
+	ld	de,(iy.hub.device)
+	push	bc
+	call	_DispatchEvent
+	pop	bc
+	jq	nz,.error
+.old.18:
+	inc	(iy.hub.setup.wValue+0)
+	srl	(iy.hub.change+0)
+	jq	nc,.old.19
+	call	.control
+	call	.0
+ repeat 3
+	rrca
+ end repeat
+	and	a,1
+assert USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT+1 = USB_DEVICE_OVERCURRENT_ACTIVATED_EVENT
+	add	a,USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT
+	ld	de,(iy.hub.device)
+	push	bc
+	call	_DispatchEvent
+	pop	bc
+	jq	nz,.error
+.old.19:
+	inc	(iy.hub.setup.wValue+0)
+	srl	(iy.hub.change+0)
+	jq	nc,.old.20
+	call	.control
+	call	.0
+	; TODO: _DeviceHandler stuff
+.old.20:
 .old.skip:
 	ld	hl,(iy.hub.device)
 	setmsk	device.sibling,hl
 .old.enter:
+	push	bc
 	ld	hl,(hl)
 	bit	0,hl
+	call	z,usb_RefDevice.enter
+	ld	de,(iy.hub.device)
+	ld	(iy.hub.device),hl
+	ex	de,hl
+	call	usb_UnrefDevice.enter
+	pop	bc
+	bit	0,(iy.hub.device)
 	jq	z,.old.loop
 	ld	(iy.hub.setup.wIndex+0),a
 .new.loop:
@@ -4482,12 +4570,22 @@ _HandleDevResetInt:
 
 _HandleDevSuspendInt:
 	ld	(hl),ti.bmUsbIntDevSuspend
-	ld	a,USB_DEVICE_SUSPEND_INTERRUPT
+	ld	de,(rootHub.child)
+	cp	a,a
+	ld	a,e
+	rrca
+	ret	c
+	ld	a,USB_DEVICE_SUSPENDED_EVENT
 	jq	_DispatchEvent
 
 _HandleDevResumeInt:
 	ld	(hl),ti.bmUsbIntDevResume
-	ld	a,USB_DEVICE_RESUME_INTERRUPT
+	ld	de,(rootHub.child)
+	cp	a,a
+	ld	a,e
+	rrca
+	ret	c
+	ld	a,USB_DEVICE_RESUMED_EVENT
 	jq	_DispatchEvent
 
 _HandleDevIsocErrInt:
@@ -4925,8 +5023,8 @@ _HandleAsyncAdvInt:
 ;  a = event
 ;  de = event data
 ; Output:
+;  af = ?
 ;  zf = success
-;  a = ?
 ;  bc = ?
 ;  de = 0 | hl
 ;  hl = hl | error
