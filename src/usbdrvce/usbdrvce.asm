@@ -446,7 +446,6 @@ virtual at 0
 	USB_HOST_PORT_OVERCURRENT_CHANGE_INTERRUPT		rb 1
 	USB_HOST_PORT_FORCE_PORT_RESUME_INTERRUPT		rb 1
 	USB_HOST_SYSTEM_ERROR_INTERRUPT				rb 1
-	USB_HUB_EVENTS						rb 1
 end virtual
 
 ; enum usb_error
@@ -4271,6 +4270,7 @@ assert USB_DEVICE_RESUMED_EVENT+1 = USB_DEVICE_SUSPENDED_EVENT
 	call	_DispatchEvent
 	pop	bc
 	jq	nz,.error
+	ld	iy.hub,(ix+15)
 .old.18:
 	inc	(iy.hub.setup.wValue+0)
 	srl	(iy.hub.change+0)
@@ -4288,6 +4288,7 @@ assert USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT+1 = USB_DEVICE_OVERCURRENT_ACTIV
 	call	_DispatchEvent
 	pop	bc
 	jq	nz,.error
+	ld	iy.hub,(ix+15)
 .old.19:
 	inc	(iy.hub.setup.wValue+0)
 	srl	(iy.hub.change+0)
