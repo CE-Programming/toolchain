@@ -1083,7 +1083,7 @@ load .resetList: long from .resetListInd
 assert .resetList = resetList
 	bit	0,hl
 	ret	nz
-	ld	bc,_ResetHandler
+	ld	bc,.handler
 	push	hl,bc
 repeat reset.dev
 	inc	l
@@ -1103,6 +1103,21 @@ iterate value, HOST_TO_DEVICE or CLASS_REQUEST or RECIPIENT_OTHER,SET_FEATURE_RE
 end iterate
 	ld	hl,(iy.device.hub)
 	jq	usb_SetConfiguration.schedule
+.handler:
+	call	_Error.check
+	ld	a,(ix+9)
+	or	a,(ix+12)
+	ret	z
+	ld	hl,resetList
+	ld	iy.reset,(hl)
+	ld	de,(iy.reset.next)
+	ld	(hl),de
+	ld	hl,(iy.reset.dev)
+	call	usb_UnrefDevice.enter
+	lea	hl,iy.reset
+	call	_Free32Align32
+	jq	.next
+
 
 ;-------------------------------------------------------------------------------
 usb_DisableDevice:
@@ -4021,35 +4036,6 @@ assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
 	ld	a,USB_DEVICE_ENABLED_EVENT
 	jq	_DispatchEvent
 
-_ResetHandler:
-	ld	hl,resetList
-	ld	iy.reset,(hl)
-	ld	de,(iy.reset.next)
-	ld	(hl),de
-	ld	hl,(iy.reset.dev)
-	call	usb_UnrefDevice.enter
-	lea	hl,iy.reset
-	call	_Free32Align32
-	call	_Error.check
-	jq	usb_ResetDevice.next
-
-_HubHandler.dispatch:
-	ld	hl,15
-	add	hl,sp
-	ld	iy.hub,(hl)
-	ld	a,long*8
-	sub	a,(iy.hub.setup.wValue+0)
-	ld	b,a
-assert iy.hub.status+2 = iy.hub.change
-	ld	hl,(iy.hub.status)
-_HubHandler.dispatch.shift:
-	add	hl,hl
-	djnz	_HubHandler.dispatch.shift
-	ld	a,(iy.hub.setup.wValue+0)
-	rla
-	add	a,USB_HUB_EVENTS
-	ld	de,(iy.hub.device)
-	call	_DispatchEvent
 _HubHandler.0:
 	xor	a,a
 	jq	_HubHandler
@@ -4272,7 +4258,6 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	rlca
 	rlca
 	call	_CreateDevice
-	call	z,_CreateDefaultControlEndpoint
 	ld	iy.hub,(ix+15)
 	ld	bc,(ix+6)
 	jq	z,.new.loop
