@@ -1050,7 +1050,7 @@ usb_ResetDevice:
 	ld	a,6 ; WARNING: This assumes flash wait states port is 3, to get at least 50ms!
 	call	ti.DelayTenTimesAms
 	res	ti.bUsbPortReset-8,(hl)
-	ld	a,2 ; WARNING: This assumes flash wait states port is 3, to get at least 10ms!
+	ld	a,12 ; WARNING: This assumes flash wait states port is 3, to get at least 10ms per spec... jk 100ms for non-conforming devices!
 	jq	ti.DelayTenTimesAms
 .hub:
 	call	_Alloc32Align32
