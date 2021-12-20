@@ -1252,7 +1252,8 @@ real_t os_RealRound(const real_t *arg, char digits);
  *
  * @param arg1 Real variable 1.
  * @param arg2 Real variable 2.
- * @returns -1 if arg1 is less than arg2, 0 if arg1 equals arg2, and 1 if arg1 is greater than arg2.
+ * @returns -1, 0, or 1 if arg1 is less than, equal to, or greater than arg2
+ * @note \c{os_RealCompare(arg1, arg2) op 0} computes \c{arg1 op arg2} for any comparison operator \c op
  */
 int os_RealCompare(const real_t *arg1, const real_t *arg2);
 
