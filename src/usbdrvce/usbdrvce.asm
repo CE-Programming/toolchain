@@ -255,7 +255,7 @@ end struct
 struct reset			; reset structure
 	label .: 32
 	next		rl 1	; next reset
-	dev		rl 1	; device
+	device		rl 1	; device
 	setup		setup	; setup
 	desc		deviceDescriptor
 end struct
@@ -890,8 +890,8 @@ usb_RefDevice:
 	pop	bc
 	ex	(sp),hl
 	push	bc
-	inc	l
 	dec	l
+	inc	l
 	ret	z
 .enter:
 	setmsk	device.refcnt,hl
@@ -1070,12 +1070,10 @@ assert .scf and 1
 	jq	z,.skip
 	ld	(hl),a
 	ld	(iy.reset.next),hl
-repeat reset.dev-reset.next
+repeat reset.device-reset.next
 	inc	l
 end repeat
 	ld	(hl),de
-	ex	de,hl
-	call	usb_RefDevice.enter
 	ret	c
 .next:
 	ld	hl,(resetList)
@@ -1086,11 +1084,11 @@ assert .resetList = resetList
 	ret	nz
 	ld	bc,.handler
 	push	hl,bc
-repeat reset.dev
+repeat reset.device
 	inc	l
 end repeat
 	ld	iy.device,(hl)
-repeat reset.setup-reset.dev
+repeat reset.setup-reset.device
 	inc	l
 end repeat
 	push	hl,hl
@@ -1106,19 +1104,137 @@ end iterate
 	jq	usb_SetConfiguration.schedule
 .handler:
 	call	_Error.check
-	ld	a,(ix+9)
-	or	a,(ix+12)
+	ld	a,(ix+12)
+	or	a,(ix+9)
 	ret	z
-	ld	hl,resetList
-	ld	iy.reset,(hl)
-	ld	de,(iy.reset.next)
-	ld	(hl),de
-	ld	hl,(iy.reset.dev)
-	call	usb_UnrefDevice.enter
-	lea	hl,iy.reset
+.abort:
+	ld	iy,resetList
+.free:
+	call	z,_Error.check
+	ld	hl,(iy)
+	ld	de,(hl+reset.next)
+	ld	(iy),de
 	call	_Free32Align32
-	jq	.next
-
+	ld	a,iyl
+assert resetList and $1F <> reset.next
+	cp	a,resetList and $FF
+	jq	z,.next
+	ret
+; Input:
+;  cf = false
+;  de = device
+; Output:
+;  af = ?
+;  bc = ?
+;  de = ?
+;  hl = ?
+;  iy = ?
+.enabled:
+	ld	iy.reset,(resetList)
+.enabled.enter:
+	dec	iyl
+	ret	z
+	ld	hl,(iy.reset.device+1)
+	sbc	hl,de
+assert iy.hub.setup.wValue+0+1 = iy.hub.setup.wValue+1
+assert iy.hub.setup.wValue+0+2 = iy.hub.setup.wIndex+0
+	ld	h,DEVICE_DESCRIPTOR
+	ld	(iy.reset.setup.wValue+0+1),hl
+assert iy.hub.setup.wIndex+1+1 = iy.hub.setup.wLength+0
+assert iy.hub.setup.wIndex+1+2 = iy.hub.setup.wLength+1
+	ld	h,8
+	ld	(iy.reset.setup.wIndex+1+1),hl
+assert iy.hub.setup.bmRequestType+1 = iy.hub.setup.bRequest
+assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
+	ld	hl,(DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE) shl 0 or GET_DESCRIPTOR_REQUEST shl 8 or 0 shl 16
+	ld	(iy.reset.setup.bmRequestType+1),hl
+	ld	hl,.descriptor
+	push	iy.reset+1,hl,iy.reset.desc+1,iy.reset.setup+1
+	ld	iy.device,(iy.reset.device+1)
+	call	z,_CreateDefaultControlEndpoint.enable
+	push	iy.endpoint
+	call	z,usb_ScheduleControlTransfer
+	pop	bc,bc,bc,bc,bc
+	ret
+.descriptor:
+	call	_Error.check
+	ld	a,(ix+12)
+	xor	a,8
+	or	a,(ix+9)
+	jq	nz,.abort
+	ld	hl,usedAddresses
+	ld	b,sizeof usedAddresses
+	scf
+.address.search:
+	ld	c,(hl)
+	adc	a,c
+	jq	c,.address.next
+	or	a,c
+	ld	(hl),a
+	xor	a,c
+	ld	c,8
+	mlt	bc
+.address.shift:
+	dec	c
+	rrca
+	jq	nc,.address.shift
+	sbc	a,c
+	ld	iy.reset,(ix+15)
+assert ~HOST_TO_DEVICE or STANDARD_REQUEST or RECIPIENT_DEVICE
+	ld	(iy.reset.setup.bmRequestType),b
+assert GET_DESCRIPTOR_REQUEST-1 = SET_ADDRESS_REQUEST
+	dec	(iy.reset.setup.bRequest)
+	ld	(iy.reset.setup.wValue+0),a
+	ld	(iy.reset.setup.wValue+1),b
+	ld	(iy.reset.setup.wLength+0),b
+	ld	a,(iy.reset.desc.bDeviceClass)
+	ld	c,(iy.reset.desc.bMaxPacketSize0)
+	ld	hl,.enable
+	push	iy.reset,hl,hl,iy.reset.setup
+	ld	iy.endpoint,(ix+6)
+	ld	(iy.endpoint.maxPktLen),c
+	push	iy.endpoint
+	cp	a,HUB_CLASS
+	jq	nz,.notHub
+	ld	iy.device,(iy.endpoint.device)
+	lea	hl,iy.device.find
+assert HUB_CLASS shr 1 = IS_HUB-IS_DEVICE
+	rra
+	add	a,(hl)
+	ld	(hl),a
+.notHub:
+	call	usb_ScheduleControlTransfer
+	ld	a,l
+	or	a,a
+	jq	z,usb_Transfer.return
+virtual
+	ld	hl,0
+ assert $ = .address.abort
+ load .ld_hl: byte from $$
+end virtual
+	db	.ld_hl
+.address.next:
+	inc	l
+	djnz	.address.search
+.address.abort:
+	jq	.abort
+.enable:
+	call	_Error.check
+	ld	a,(ix+9)
+	or	a,a
+	jq	nz,.abort
+	ld	iy.reset,(ix+15)
+	ld	a,(iy.reset.setup.wValue+0)
+	ld	iy.endpoint,(ix+6)
+	ld	(iy.endpoint.addr),a
+	ld	iy.device,(iy.endpoint.device)
+	ld	(iy.device.addr),a
+	lea	de,iy.device
+	ld	a,USB_DEVICE_ENABLED_EVENT
+	call	_DispatchEvent
+	jq	nz,usb_Transfer.return
+	inc	e
+	jq	.abort
 
 ;-------------------------------------------------------------------------------
 usb_DisableDevice:
@@ -2465,10 +2581,10 @@ assert IS_DISABLED = 1
 	ld	(ix.device.find+1),a
 	jq	.start
 .recursed:
-	pop	bc,ix.device
+	pop	ix.device,bc
 	ret	nz
 .start:
-	push	ix.device,bc
+	push	bc,ix.device
 	ld	de,(ix.device.endpoints+1)
 	ld	ix.device,(ix.device.child+1)
 	ld	hl,.recursed
@@ -2577,7 +2693,23 @@ end virtual
 	ld	a,e
 	and	a,31
 	jq	nz,.loop
-	pop	af,ix.device
+	pop	bc
+	push	bc
+	ld	iy,resetList-1
+.reset.find:
+	lea	de,iy.reset.next+1
+	ld	iy.reset,(iy.reset.next+1)
+	dec	iyl
+	jq	z,.reset.done
+	ld	hl,(iy.reset.device+1)
+	scf
+	sbc	hl,bc
+	jq	nz,.reset.find
+	push	de
+	pop	iy
+	call	usb_ResetDevice.free
+.reset.done:
+	pop	ix.device,af
 	ld	hl,ti.mpUsbRange
 	lea	de,ix.device+1
 assert IS_DISABLED = 1 shl 0
@@ -3927,116 +4059,6 @@ assert ti.usbInEp1 < ti.usbOutEp1
 	ex	de,hl
 	ret
 
-_DeviceHandler:
-.descriptor:
-	ld	hl,3
-	add	hl,sp
-	ld	iy.endpoint,(hl)
-repeat long
-	inc	hl
-end repeat
-	ld	b,(hl)
-repeat long
-	inc	hl
-end repeat
-	ld	a,(hl)
-	xor	a,8
-	or	a,b
-	jq	nz,.free
-repeat long
-	inc	hl
-end repeat
-	ld	de,(hl)
-	ld	(de),a
-	ld	hl,usedAddresses
-	ld	b,sizeof usedAddresses
-	scf
-.search:
-	ld	c,(hl)
-	adc	a,c
-	jq	c,.next
-	or	a,c
-	ld	(hl),a
-	xor	a,c
-	ld	c,8
-	mlt	bc
-.shift:
-	dec	c
-	rrca
-	jq	nc,.shift
-	sbc	a,c
-	ex	de,hl
-	ld	bc,.enable
-	push	hl,bc,bc,hl,iy.endpoint
-	inc	l
-	ld	(hl),SET_ADDRESS_REQUEST
-	inc	l
-	ld	(hl),a
-	xor	a,a
-	inc	l
-	ld	(hl),a
-	inc	l
-	ld	c,(hl)
-repeat 3
-	ld	(hl),a
-	inc	l
-end repeat
-	ld	b,(hl)
-	ld	(hl),a
-	ld	(iy.endpoint.maxPktLen),b
-	ld	a,HUB_CLASS
-	cp	a,c
-	jq	nz,.notHub
-	ld	hl,(iy.endpoint.device)
-repeat device.find
-	inc	l
-end repeat
-assert HUB_CLASS shr 1 = IS_HUB-IS_DEVICE
-	rra
-	add	a,(hl)
-	ld	(hl),a
-.notHub:
-	call	usb_ScheduleControlTransfer
-	ld	a,l
-	pop	bc,bc,bc,bc,bc
-	or	a,a
-	ret	z
-virtual
-	ld	hl,0
- assert $ = .free
- load .ld_hl: byte from $$
-end virtual
-	db	.ld_hl
-.next:
-	inc	l
-	djnz	.search
-assert usedAddresses shr 8 = (usedAddresses+sizeof usedAddresses) shr 8
-.free:
-	call	_FreeTransferData
-	call	_HandlePortPortEnInt.disable
-	ret	nz
-	or	a,a
-	sbc	hl,hl
-	ret
-.enable:
-	ld	iy,0
-	add	iy,sp
-	ld	a,(iy+6)
-	or	a,a
-	jq	nz,.free
-	ld	hl,(iy+12)
-	setmsk	setup.wValue,hl
-	ld	a,(hl)
-	ld	iy.endpoint,(iy+3)
-	ld	(iy.endpoint.addr),a
-	ld	iy.device,(iy.endpoint.device)
-	ld	(iy.device.addr),a
-	call	_FreeTransferData
-	sbc	hl,hl
-	lea	de,iy.device
-	ld	a,USB_DEVICE_ENABLED_EVENT
-	jq	_DispatchEvent
-
 _HubHandler.0:
 	xor	a,a
 	jq	_HubHandler
@@ -4296,7 +4318,11 @@ assert USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT+1 = USB_DEVICE_OVERCURRENT_ACTIV
 	jq	nc,.old.20
 	call	.control
 	call	.0
-	; TODO: _DeviceHandler stuff
+	push	bc
+	ld	de,(iy.hub.device)
+	call	usb_ResetDevice.enabled
+	pop	bc
+	ld	iy.hub,(ix+15)
 .old.20:
 .old.skip:
 	ld	hl,(iy.hub.device)
@@ -4913,23 +4939,24 @@ _HandlePortPortEnInt:
 	ret	nz
 	bit	ti.bUsbPortEn,(hl)
 	ret	z
-	ld	iy.device,(rootHub.child)
-	ld	a,iyl
-	bit	0,a
-	call	z,_CreateDefaultControlEndpoint.enable
-	call	z,_Alloc32Align32
+	ld	de,(rootHub.child)
+	dec	e
+	jq	z,.disable
+	call	_Alloc32Align32
 	jq	nz,.disable
-	ld	bc,_DeviceHandler.descriptor
-	ld	de,_GetDeviceDescriptor8
-	push	hl,bc,hl,de,iy.endpoint
-	call	usb_ScheduleControlTransfer
-	pop	de,de,de,de,de
-	ld	a,l
-	ld	hl,ti.mpUsbPortStsCtrl
+	push	hl
+	pop	iy.reset
+	ld	hl,resetList
+	ld	bc,(hl)
+	ld	(iy.reset.next),bc
+	inc	e
+	ld	(iy.reset.device),de
+	ld	(hl),iy.reset
 	or	a,a
-	ret	z
-	ex	de,hl
-	call	_Free32Align32
+	call	usb_ResetDevice.enabled.enter
+	ld	hl,ti.mpUsbPortStsCtrl
+	cp	a,a
+	ret
 .disable:
 	ld	hl,ti.mpUsbPortStsCtrl
 	ld	a,(hl)
@@ -5160,9 +5187,6 @@ _DefaultControlEndpointDescriptor:
 	db 7, ENDPOINT_DESCRIPTOR, 0, 0
 	dw 8
 	db 0
-_GetDeviceDescriptor8:
-	db DEVICE_TO_HOST or STANDARD_REQUEST or RECIPIENT_DEVICE, GET_DESCRIPTOR_REQUEST, 0, DEVICE_DESCRIPTOR
-	dw 0, 8
 _DefaultStandardDescriptors:
 	dl .device, .configurations, .langids
 	db 2
