@@ -1056,26 +1056,21 @@ usb_ResetDevice:
 	call	_Alloc32Align32
 	jq	nz,_Error.NO_MEMORY
 	ld	iy.reset,.resetListInd-reset.next
-virtual
-	or	a,0
-	load .or_a: byte from $$
-end virtual
-	db	.or_a
 .skip:
-	scf
-load .scf: byte from $-byte
-assert .scf and 1
 	ld	iy.reset,(iy.reset.next)
 	bit	0,(iy.reset.next)
 	jq	z,.skip
-	ld	(hl),a
+	ld	(hl),1
 	ld	(iy.reset.next),hl
 repeat reset.device-reset.next
 	inc	l
 end repeat
 	ld	(hl),de
-	ret	c
 .next:
+	ld	a,iyl
+assert resetList and $1F <> reset.next
+	cp	a,resetList and $FF
+	ret	nz
 	ld	hl,(resetList)
 .resetListInd := $-long
 load .resetList: long from .resetListInd
@@ -1115,11 +1110,7 @@ end iterate
 	ld	de,(hl+reset.next)
 	ld	(iy),de
 	call	_Free32Align32
-	ld	a,iyl
-assert resetList and $1F <> reset.next
-	cp	a,resetList and $FF
-	jq	z,.next
-	ret
+	jq	.next
 ; Input:
 ;  cf = false
 ;  de = device
