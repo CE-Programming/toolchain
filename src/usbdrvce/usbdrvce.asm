@@ -4252,6 +4252,7 @@ assert iy.hub.setup.bmRequestType+2 = iy.hub.setup.wValue+0
 	pop	ix,bc
 	jq	nz,.error
 	ld	iy.hub,(ix+15)
+	jq	.old.disconnected
 .old.16:
 	inc	(iy.hub.setup.wValue+0)
 	srl	(iy.hub.change+0)
@@ -4313,6 +4314,7 @@ assert USB_DEVICE_OVERCURRENT_DEACTIVATED_EVENT+1 = USB_DEVICE_OVERCURRENT_ACTIV
 	ld	de,(iy.hub.device)
 	call	usb_ResetDevice.enabled
 	pop	bc
+.old.disconnected:
 	ld	iy.hub,(ix+15)
 .old.20:
 .old.skip:
