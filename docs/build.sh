@@ -45,7 +45,7 @@ for target_dir in "${!versions_map[@]}"
 do
 	branch_name="${versions_map[$target_dir]}"
 	git checkout "${branch_name}"
-	for format in html singlehtml latex
+	for format in html singlehtml
 	do
 		if [ "${target_dir}" = "." ]; then
 			current_version="${default_version}"
