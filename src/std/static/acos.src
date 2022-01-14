@@ -32,6 +32,8 @@ l_1:	ld	hl,4
 l_2:	push	de
 	push	hl
 	call	_asin
+	pop	bc
+	pop	bc
 	ld	bc,13176795
 	ld	a,63
 	call	__fsub
