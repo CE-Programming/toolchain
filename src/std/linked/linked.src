@@ -70,7 +70,7 @@ __smuls		:= 000224h
 __smulu		:= 000228h
 	public	__sneg
 __sneg		:= 00022Ch
-	public	__snor
+	public	__snot
 __snot		:= 000230h
 	public	__sor
 __sor		:= 000234h
