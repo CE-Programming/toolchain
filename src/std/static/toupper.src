@@ -1,12 +1,14 @@
 	public	_toupper
 _toupper:
-	push	af
+	pop	de
+	ex	(sp), hl
+	push	de
+
 	ld	a, l
 	sub	a, 'a'
 	cp	a, 1+'z'-'a'
-	jr	nc, .not_a_z
+	ret	nc
+
 	add	a, 'A'
 	ld	l, a
-.not_a_z:
-	pop	af
 	ret

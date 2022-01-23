@@ -1,12 +1,14 @@
 	public	_tolower
 _tolower:
-	push	af
+	pop	de
+	ex	(sp), hl
+	push	de
+
 	ld	a, l
 	sub	a, 'A'
 	cp	a, 1+'Z'-'A'
-	jr	nc, .not_A_Z
+	ret	nc
+
 	add	a, 'a'
 	ld	l, a
-.not_A_Z:
-	pop	af
 	ret
