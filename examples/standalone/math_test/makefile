@@ -7,7 +7,7 @@ ICON ?= icon.png
 DESCRIPTION ?= "CE C Toolchain Demo"
 COMPRESSED ?= NO
 ARCHIVED ?= NO
-# HAS_FLASH_FUNCTIONS ?= NO
+# STATIC_CRT ?= NO
 
 CFLAGS ?= -Os -mllvm -inline-threshold=100 -Wall -Wextra
 CXXFLAGS ?= -Os -mllvm -inline-threshold=100 -Wall -Wextra
