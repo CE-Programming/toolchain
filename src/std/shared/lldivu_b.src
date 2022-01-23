@@ -2,12 +2,13 @@
 __lldivu:
 	public	__lldivu_b
 __lldivu_b:
-; Very unoptimized
+; Very slow
 	push	af
 	push	iy
 	ld	iy, 0
 	add	iy, sp
 	ld	iy, (iy + 9)
+	xor	a, a
 	ld	iyh, 64
 .loop:
 	add	hl, hl
