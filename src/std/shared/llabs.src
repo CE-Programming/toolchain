@@ -1,0 +1,19 @@
+	assume	adl=1
+
+	public	_imaxabs
+_imaxabs:
+	public	_llabs
+_llabs:
+	pop	iy
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
+	push	iy
+	bit	7, b
+	ret	z
+	jp	__llneg
+
+	extern	__llneg

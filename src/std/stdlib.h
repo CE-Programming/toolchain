@@ -87,9 +87,11 @@ void quick_exit(int) __NOEXCEPT __attribute__((noreturn));
 
 void _Exit(int) __NOEXCEPT __attribute__((noreturn));
 
-int abs(int j);
+int abs(int n);
 
-long labs(long j);
+long labs(long n);
+
+long long llabs(long long n);
 
 div_t div(int numer, int denom);
 

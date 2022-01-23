@@ -1,4 +1,4 @@
-; long labs(long j);
+; long labs(long);
 	assume	adl=1
 
 	public	_labs
