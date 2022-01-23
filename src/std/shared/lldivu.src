@@ -1,0 +1,13 @@
+	assume	adl=1
+
+	public	__lldivu
+__lldivu:
+	push	iy
+	call	__lldvrmu
+	ld	hl, (iy + 12)
+	ld	de, (iy + 15)
+	ld	bc, (iy + 18)
+	pop	iy
+	ret
+
+	extern	__lldvrmu

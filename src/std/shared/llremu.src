@@ -1,0 +1,10 @@
+	assume	adl=1
+
+	public	__llremu
+__llremu:
+	push	iy
+	call	__lldvrmu
+	pop	iy
+	ret
+
+	extern	__lldvrmu
