@@ -3,10 +3,10 @@
 Makefile Options
 ================
 
-The projects's Makefile controls different features and settings for the output program, and additionally can be added to for custom build structres if needed.
-This section highlights the avaible options.
+The project's makefile controls different features and settings for the output program.
+Additional rules can be added to build different components as well.
 
-To edit these options, open the `makefile` file inside the project's folder in a text editor.
+To edit these options, open the :code:`makefile` file inside the project's folder.
 
 NAME
 ----
@@ -15,7 +15,7 @@ This is the name of the program variable that will be stored on the calculator.
 
 .. code-block:: makefile
 
-    NAME ?= PRGM
+    NAME = PRGM
 
 ICON
 ----
@@ -26,7 +26,7 @@ Place a 16x16 image in the same directory as the makefile with the name of whate
 
 .. code-block:: makefile
 
-    ICON ?= icon.png
+    ICON = icon.png
 
 DESCRIPTION
 -----------
@@ -35,10 +35,9 @@ Change `DESCRIPTION` to the program's description. It is recommended to keep thi
 
 The description will be displayed in shells such as `Cesium <https://github.com/mateoconlechuga/cesium/releases/latest>`_.
 
-
 .. code-block:: makefile
 
-    DESCRIPTION ?= "My awesome program"
+    DESCRIPTION = "My awesome program"
 
 COMPRESSED
 ----------
@@ -51,7 +50,7 @@ To enable this feature, open the project's makefile and edit the line:
 
 .. code-block:: makefile
 
-    COMPRESSED ?= YES
+    COMPRESSED = YES
 
 ARCHIVED
 --------
@@ -61,15 +60,32 @@ To enable this feature, open the project's makefile and change the line:
 
 .. code-block:: makefile
 
-    ARCHIVED ?= YES
+    ARCHIVED = YES
+
+DEPS
+----
+
+Add any files that you want to be built by the toolchain to this variable.
+Define rules for the files after including the main CEdev makefile.
+
+.. code-block:: makefile
+
+    DEPS = $(BINDIR)/levelpack.bin
+
+    include $(shell cedev-config --makefile)
+
+    $(BINDIR)/levelpack.bin:
+    	$(call MKDIR,$(@D))
+    	echo "levelpack" > $(BINDIR)/levelpack.bin
+
 
 CFLAGS / CXXFLAGS
 -----------------
 
 These flags are passed to the clang compiler.
-*CFLAGS* is used for C source files; *CXXFLAGS* is used for CPP source files.
+*CFLAGS* is used for C source files -- *CXXFLAGS* is used for CPP source files.
 
 .. code-block:: makefile
 
-    CFLAGS ?= -Wall -Wextra -Oz
-    CXXFLAGS ?= -Wall -Wextra -Oz
+    CFLAGS = -Wall -Wextra -Oz
+    CXXFLAGS = -Wall -Wextra -Oz

@@ -1,0 +1,54 @@
+___sleep_common:
+; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
+
+; Calculate the end time.
+	public	___sleep_common.1
+.1:
+	scf				; cf = 1
+					;    = correction
+	public	___sleep_common.2
+.2:
+	ld	a, e			; auhl = start or ticks
+	public	___sleep_common.3
+.3:
+	pop	de
+	pop	bc			; eubc = ticks or start
+	adc	hl, bc
+	adc	a, e			; auhl = start + ticks + correction
+					;      = end
+; Prepare.
+	ld	e, a			; euhl = end
+	push	hl
+virtual
+	cp	a, 0
+load op_cp_a: byte from $$
+end virtual
+	db	op_cp_a
+; ^ don't care cc
+.check:
+; Get the current time.
+	push	bc
+	push	de
+	call	_clock			; euhl = now, cf = 0
+; ^ 42 + cc(_clock) cc
+; Check if the end time has been reached.
+	ld	a, e			; auhl = now
+	pop	de
+	pop	bc			; dubc = end
+; 	or	a, a
+	sbc	hl, bc
+	sbc	a, e			; auhl = now - end
+; ^ 48 cc
+; Check again if the end time has not been reached.
+	jr	c, .check
+; ^ 13 cc (conditional jr taken)
+; 42 + 48 + 202 + 31 + 48 + 13 = 384 cc check
+; Return 0 to indicate success.
+	sbc	hl, hl
+	ret
+; ^ 24 cc
+
+; 202 - 75 + 31 + 48 + 13 + 24 = 243 cc after end time captured
+
+
+	extern	_clock

@@ -15,9 +15,6 @@ int main(void)
     /* Clear the homescreen */
     os_ClrHome();
 
-    /* Close any previously open files */
-    ti_CloseAll();
-
     /* Delete both the new and old files if they already exist */
     ti_Delete(oldName);
     ti_Delete(newName);
@@ -32,11 +29,12 @@ int main(void)
         PrintText(0, 0, "Old Name: ");
         PrintText(10, 0, nameBuffer);
 
-        /* Close the old file */
-        ti_CloseAll();
-
         /* Rename the old file to the new file name */
         ti_Rename(oldName, newName);
+
+        /* Ensure that the slot is closed */
+        ti_Close(file);
+        file = 0;
 
         /* Ensure the new name of the file is correct */
         file = ti_Open(newName, "r");
@@ -46,11 +44,12 @@ int main(void)
         PrintText(0, 1, "New Name: ");
         PrintText(10, 1, nameBuffer);
 
+        /* Ensure that the slot is closed */
+        ti_Close(file);
+        file = 0;
+
         error = false;
     } while (0);
-
-    /* Close all open files */
-    ti_CloseAll();
 
     /* If an error occured, inform the user */
     if (error == true)

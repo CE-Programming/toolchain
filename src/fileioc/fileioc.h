@@ -51,27 +51,20 @@ extern "C" {
 typedef uint8_t ti_var_t;
 
 /**
- * Closes all open slots.
- *
- * @warning Call before you use any variable functions
- */
-void ti_CloseAll(void);
-
-/**
  * Opens a file.
  *
  * An AppVar is used as default file storage.
  *
  * @param name Name of file to open
  * @param mode
- * "r"  - Opens a file for reading. The file must exist. Keeps file in archive if in archive.                                   <br>
+ * "r"  - Opens a file for reading. The file must exist. If the file does not exist, zero is returned. Keeps file in archive if in archive.                                   <br>
  * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
  * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
  * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
  * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                <br>
  * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
  * @returns Slot variable
- * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
+ * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned.
  */
 ti_var_t ti_Open(const char *name, const char *mode);
 
@@ -81,7 +74,7 @@ ti_var_t ti_Open(const char *name, const char *mode);
  * Can open any type of program or appvar variable
  * @param varname Name of variable to open
  * @param mode
- * "r"  - Opens a file for reading. The file must exist. Keeps file in archive if in archive.                                   <br>
+ * "r"  - Opens a file for reading. The file must exist. If the file does not exist, zero is returned. Keeps file in archive if in archive.                                   <br>
  * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
  * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
  * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
@@ -89,7 +82,7 @@ ti_var_t ti_Open(const char *name, const char *mode);
  * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
  * @param type Specifies the type of variable to open
  * @returns Slot variable
- * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned
+ * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned.
  */
 ti_var_t ti_OpenVar(const char *varname, const char *mode, uint8_t type);
 
@@ -151,7 +144,7 @@ char *ti_DetectVar(void **curr_search_posistion, const char *detection_string, u
  *  char *var_name;
  *  uint8_t *search_pos = NULL;
  *  uint8_t type;
- *  while((var_name = ti_DetectVar(&search_pos, "my_data", &type)) != NULL) {
+ *  while((var_name = ti_DetectAny(&search_pos, "my_data", &type)) != NULL) {
  *    if (type == TI_PRGM_TYPE || type == TI_PPRGM_TYPE) {
  *     ...do something with the name or search_pos...
  *    }
@@ -564,6 +557,8 @@ equ_t *ti_AllocEqu(unsigned len, void (*malloc_routine)(size_t));
 #define ti_ProtectedProgram    _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'TI_PPRGM_TYPE' instead\"") TI_PPRGM_TYPE
 #define ti_TempProgram         _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
 #define ti_AppVar              _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
+
+void ti_CloseAll(void) __attribute__((deprecated ("Use ti_Close(slot) for each slot opened instead")));
 /* @endcond */
 
 #ifdef __cplusplus

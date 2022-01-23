@@ -3,10 +3,10 @@
 ### fileioc
 | Function | Tested? | Occurrences |
 | -------- | ------- | ----------- |
-| [`ti_CloseAll`](/#L14) | YES | [in 6 files](https://github.com/search?q=ti_CloseAll+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_CloseAll`](/#L14) | ✗ |
 | [`ti_Open`](/#L15) | YES | [in 5 files](https://github.com/search?q=ti_Open+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_OpenVar`](/#L16) | YES | [in 1 file](https://github.com/search?q=ti_OpenVar+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`ti_Close`](/#L17) | ✗ |
+| [`ti_Close`](/#L17) | YES | [in 3 files](https://github.com/search?q=ti_Close+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_Write`](/#L18) | YES | [in 1 file](https://github.com/search?q=ti_Write+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_Read`](/#L19) | YES | [in 1 file](https://github.com/search?q=ti_Read+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_GetC`](/#L20) | YES | [in 1 file](https://github.com/search?q=ti_GetC+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -38,8 +38,9 @@
 | [`ti_Rename`](/#L55) | YES | [in 1 file](https://github.com/search?q=ti_Rename+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_RenameVar`](/#L56) | ✗ |
 | [`ti_ArchiveHasRoom`](/#L60) | ✗ |
+| [`ti_SetGCBehavior`](/#L65) | ✗ |
 
-**Total: 21/35 tested.**
+**Total: 21/36 tested.**
 
 ### graphx
 | Function | Tested? | Occurrences |
@@ -47,7 +48,7 @@
 | [`gfx_Begin`](/#L14) | YES | [in 27 files](https://github.com/search?q=gfx_Begin+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_End`](/#L15) | YES | [in 27 files](https://github.com/search?q=gfx_End+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_SetColor`](/#L16) | YES | [in 11 files](https://github.com/search?q=gfx_SetColor+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`gfx_SetDefaultPalette`](/#L17) | YES | [in 1 file](https://github.com/search?q=gfx_SetDefaultPalette+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`gfx_SetDefaultPalette`](/#L17) | ✗ |
 | [`gfx_SetPalette`](/#L18) | YES | [in 12 files](https://github.com/search?q=gfx_SetPalette+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_FillScreen`](/#L19) | YES | [in 11 files](https://github.com/search?q=gfx_FillScreen+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`gfx_SetPixel`](/#L20) | YES | [in 1 file](https://github.com/search?q=gfx_SetPixel+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -140,12 +141,12 @@
 | [`gfx_Wait`](/#L131) | ✗ |
 | [`gfx_CopyRectangle`](/#L135) | YES | [in 1 file](https://github.com/search?q=gfx_CopyRectangle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 
-**Total: 80/95 tested.**
+**Total: 79/95 tested.**
 
 ### keypadc
 | Function | Tested? | Occurrences |
 | -------- | ------- | ----------- |
-| [`kb_Scan`](/#L14) | YES | [in 3 files](https://github.com/search?q=kb_Scan+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`kb_Scan`](/#L14) | YES | [in 4 files](https://github.com/search?q=kb_Scan+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`kb_ScanGroup`](/#L15) | ✗ |
 | [`kb_AnyKey`](/#L16) | ✗ |
 | [`kb_Reset`](/#L17) | ✗ |

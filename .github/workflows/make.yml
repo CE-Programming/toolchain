@@ -2,6 +2,8 @@ name: Win/Mac/Linux
 
 on:
   push:
+    tags:
+      - v* # push events versioned tags
     branches-ignore:
       - gh-pages
   pull_request:
@@ -15,6 +17,7 @@ env:
   CEDEV: ${{github.workspace}}/CEdev
   CEDEV_BIN: ${{github.workspace}}/CEdev/bin
   CEDEV_EXAMPLES: ${{github.workspace}}/CEdev/examples
+  CEDEV_TEST: ${{github.workspace}}/toolchain/test
   CEMU_PATH: ${{github.workspace}}/CEmu
   FASMG_DOMAIN: https://flatassembler.net
   FASMG_PATH: ${{github.workspace}}/fasmg
@@ -31,11 +34,14 @@ jobs:
         include:
           - nul: /dev/null
           - runs-on: macos
-            fasmg: /source/macos/x64
+            fasmg: /source/macos/x64/fasmg
           - runs-on: windows
+            fasmg: /fasmg.exe
             env: "env:"
             exe: .exe
             nul: nul
+          - runs-on: ubuntu
+            fasmg: /fasmg.x64
     runs-on: ${{matrix.runs-on}}-latest
     steps:
       - name: Prepare Build Environment
@@ -45,7 +51,7 @@ jobs:
         id: ez80-clang
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: ${{env.HOST_DOMAIN}}/a/llvm/z80/ez80-clang${{matrix.exe}}-${{runner.os}}Release.zip
+          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
@@ -76,7 +82,7 @@ jobs:
           pathSource: ${{steps.fasmg.outputs.file-path}}
           pathTarget: ${{env.FASMG_PATH}}
       - name: Setup Fasmg
-        run: cmake -E copy fasmg${{matrix.fasmg}}/fasmg${{matrix.exe}} ${{env.CEDEV_BIN}}
+        run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
@@ -99,11 +105,26 @@ jobs:
           PREFIX: ${{github.workspace}}
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install release release-libs V=1
 
-      - name: Upload CEdev
+      - name: Tar toolchain
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x ${{env.CEDEV_BIN}}/*
+          tar -C ${{env.CEDEV}}/.. -czvf CEdev-${{runner.os}}.tar.gz CEdev
+
+      - name: Upload Linux/MacOS CEdev
+        if: runner.os != 'Windows'
+        uses: actions/upload-artifact@v2
+        with:
+          name: CEdev-${{runner.os}}
+          path: CEdev-${{runner.os}}.tar.gz
+
+      - name: Upload Windows CEdev
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v2
         with:
           name: CEdev-${{runner.os}}
           path: ${{env.CEDEV}}
+
       - name: Upload Libraries
         uses: actions/upload-artifact@v2
         with:
@@ -117,6 +138,7 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [ubuntu, macos, windows]
+        compressed: [YES, NO]
         include:
           - runs-on: windows
             env: "env:"
@@ -126,18 +148,54 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
+        if: runner.os == 'Windows'
         uses: actions/download-artifact@v2
         with:
           name: CEdev-${{runner.os}}
           path: ${{env.CEDEV}}
-
-      - name: Make Binaries Executable
+      - name: Download CEdev
         if: runner.os != 'Windows'
-        run: chmod +x ${{env.CEDEV_BIN}}/*
+        uses: actions/download-artifact@v2
+        with:
+          name: CEdev-${{runner.os}}
+          path: ${{github.workspace}}
+      - name: Extract Artifact Contents
+        if: runner.os != 'Windows'
+        run: tar -xvf CEdev-${{runner.os}}.tar.gz
+
+      # checkout only for testing-- contents should not be used otherwise.
+      - name: Checkout Toolchain
+        uses: actions/checkout@v2.3.4
+        with:
+          path: ${{env.TOOLCHAIN_PATH}}
+          persist-credentials: false
+
+      - name: Build Test Graphics
+        run: make -j4 -C ${{env.CEDEV_TEST}} COMPRESSED=${{matrix.compressed}} V=1 gfx
+      - name: Build Tests
+        run: make -j4 -C ${{env.CEDEV_TEST}} COMPRESSED=${{matrix.compressed}} V=1
+
+      - name: Upload Test Build Artifacts
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: tests-${{runner.os}}
+          path: ${{env.CEDEV_TEST}}
+
+      - name: Build Example Graphics
+        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1 gfx
       - name: Build Examples
-        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} V=1
+        run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1
+
+      - name: Upload Example Build Artifacts
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: examples-${{runner.os}}
+          path: ${{env.CEDEV_EXAMPLES}}
 
       - name: Checkout CEmu
+        if: github.event_name != 'pull_request'
         uses: actions/checkout@v2.3.4
         with:
           repository: ${{github.repository_owner}}/CEmu
@@ -145,47 +203,77 @@ jobs:
           path: ${{env.CEMU_PATH}}
           persist-credentials: false
       - name: Build CEmu
+        if: github.event_name != 'pull_request'
         run: make -j4 -C ${{env.CEMU_PATH}}/core
       - name: Build Autotester CLI
+        if: github.event_name != 'pull_request'
         run: make -j4 -C ${{env.AUTOTESTER_PATH}}
 
       - name: Download Secrets
+        if: github.event_name != 'pull_request'
         id: download-secrets
         uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
           location: ${{env.SECRETS_PATH}}
       - name: Decrypt Secrets
+        if: github.event_name != 'pull_request'
         env:
           KEY: ${{secrets.SYMMETRIC_KEY_256}}
-        run: openssl enc -d -aes-256-cbc -iv 8b29a858b29556c72b861a70f26872cb -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
+        run: openssl enc -d -aes-256-cbc -iv a581c6a54a2b51143fecad6794deb32a -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
       - name: Extract Secrets
+        if: github.event_name != 'pull_request'
         uses: DuckSoft/extract-7z-action@v1.0
         with:
           pathSource: ${{env.SECRETS_PATH}}/secrets.7z
           pathTarget: ${{env.SECRETS_PATH}}
 
       - name: Download Libraries
+        if: github.event_name != 'pull_request'
         uses: actions/download-artifact@v2
         with:
           name: clibs
           path: ${{env.TOOLCHAIN_PATH}}
       - name: Test Examples
-        if: runner.os != 'Windows'
+        if: github.event_name != 'pull_request' && runner.os != 'Windows'
         run: |
-          failed=0
-          find ${{env.CEDEV_EXAMPLES}} -name autotest.json -print0 | while read -d '' test; do
-            cmake -E echo "Launching autotester on $test"
-            ${{env.AUTOTESTER_PATH}}/autotester "$test"
-            cmake -E true $((failed += $?))
-          done
-          cmake -E echo "$failed tests failed"
-          exit $failed
+          find ${{env.CEDEV_EXAMPLES}} -name autotest.json -print0 | {
+            failed=0
+            while read -d '' test; do
+              cmake -E echo "Launching autotester on $test"
+              ${{env.AUTOTESTER_PATH}}/autotester "$test" || cmake -E true $((failed += $?))
+            done
+            cmake -E echo "$failed tests failed"
+            exit $failed
+          }
       - name: Test Examples
-        if: runner.os == 'Windows'
+        if: github.event_name != 'pull_request' && runner.os == 'Windows'
         run: |
           $failed = 0
           foreach ($test in get-childitem "${{env.CEDEV_EXAMPLES}}" -recurse -include autotest.json) {
+            cmake -E echo "Launching autotester on $test"
+            ${{env.AUTOTESTER_PATH}}\autotester.exe "$test"
+            $failed += $lastexitcode
+          }
+          cmake -E echo "$failed tests failed"
+          exit $failed
+      - name: Test Tests
+        if: github.event_name != 'pull_request' && runner.os != 'Windows'
+        run: |
+          find ${{env.CEDEV_TEST}} -name autotest.json -print0 | {
+            failed=0
+            while read -d '' test; do
+              cmake -E echo "Launching autotester on $test"
+              ${{env.AUTOTESTER_PATH}}/autotester "$test" || cmake -E true $((failed += $?))
+            done
+            cmake -E echo "$failed tests failed"
+            exit $failed
+          }
+      - name: Test Tests
+        if: github.event_name != 'pull_request' && runner.os == 'Windows'
+        run: |
+          $failed = 0
+          foreach ($test in get-childitem "${{env.CEDEV_TEST}}" -recurse -include autotest.json) {
             cmake -E echo "Launching autotester on $test"
             ${{env.AUTOTESTER_PATH}}\autotester.exe "$test"
             $failed += $lastexitcode
@@ -204,6 +292,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y doxygen
+          pip install docutils==0.16
           pip install sphinx==3.2.1 sphinx_rtd_theme breathe
           cmake -E echo >> $${{matrix.env}}GITHUB_PATH $${{matrix.env}}HOME/.local/bin
 
@@ -212,11 +301,14 @@ jobs:
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Build Website Documentation
-        run: make -C ${{env.TOOLCHAIN_PATH}}/docs html
+        run: make -C ${{env.TOOLCHAIN_PATH}} docs
       - name: Disable Jekyll
         run: cmake -E touch ${{env.TOOLCHAIN_PATH}}/docs/build/html/.nojekyll
+      - name: Remove .pickle files
+        run: find ${{env.TOOLCHAIN_PATH}}/docs/build/html -name '*.pickle' -delete
 
       - name: Upload Website Documentation
         if: github.ref == 'refs/heads/master'

@@ -228,7 +228,9 @@ do { \
  * @param int Throw an interrupt when the timer reaches 0. Can be TIMER_0INT or TIMER_NOINT.
  * @param dir Direction in which to count. Can be TIMER_UP or TIMER_DOWN.
  *
- * @warning Timer 3 is usually employed by USB. Use it at your own risk.
+ * @warning
+ * Timer 2 is needed by library functions like clock() and sleep(). Timer 3 is
+ * needed by USB.
  */
 #define timer_Enable(n, rate, int, dir) (timer_Control = timer_Control & ~(0x7 << 3 * ((n) - 1) | 1 << ((n) + 8)) | (1 | (rate) << 1 | (int) << 2) << 3 * ((n) - 1) | (dir) << ((n) + 8))
 
@@ -480,15 +482,74 @@ typedef struct font {
 } font_t;
 
 /**
- * Delays for a number of milliseconds.
- *
- * @note
- * Counts time spent while interrupted.
- * Assumes a CPU clock speed of 48MHz.
+ * @brief Callback function pointer type for os_RunPrgm
+ * @see os_RunPrgm
+ */
+typedef int (*os_runprgm_callback_t)(void *data, int retval);
+
+/**
+ * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
  * @param msec number of milliseconds
+ * @see sleep
+ * @see usleep
  */
 void delay(uint16_t msec);
+
+/**
+ * @copybrief delay
+ */
+void msleep(uint16_t msec);
+
+/**
+ * Sleeps until the number of real-time seconds specified in @p seconds have
+ * elapsed or until a signal arrives which is not ignored.
+ *
+ * @note
+ * Currently, signals do not exist, so this will never be interrupted.
+ *
+ * @param seconds number of seconds
+ * @return zero if the requested time has elapsed, or the number of seconds left
+ *         to sleep, if the call was interrupted by a signal handler
+ * @see delay
+ * @see usleep
+ */
+unsigned int sleep(unsigned int seconds);
+
+/**
+ * Suspends execution of the calling thread for (at least) @p ticks clock ticks.
+ *
+ * @param ticks number of clock ticks
+ * @see CLOCKS_PER_SEC
+ * @see delay
+ * @see usleep
+ */
+void ticksleep(unsigned long ticks);
+
+/**
+ * An unsigned integer type capable of holding integers in the range
+ * [0,1000000].
+ *
+ * @see usleep
+ */
+typedef unsigned int useconds_t;
+
+/**
+ * Suspends execution of the calling thread for (at least) @p usec microseconds.
+ *
+ * The sleep may be lengthened slightly by any system activity or by the time
+ * spent processing the call or by the granularity of system timers.
+ *
+ * @note
+ * Currently, no errors are possible.
+ *
+ * @param usec number of microseconds
+ * @return 0 on success, or -1 on error, with ::errno set to indicate the error
+ * @see delay
+ * @see sleep
+ * @see useconds_t
+ */
+int usleep(useconds_t usec);
 
 /**
  * Returns a pseudo-random 32-bit integer.
@@ -763,7 +824,7 @@ uint24_t os_FontDrawTransText(const char *string, uint16_t col, uint8_t row);
 /**
  * Puts some text at the current homescreen cursor location
  *
- * @param string Test to put on homescreen
+ * @param string Text to put on homescreen
  * @returns 1 if string fits on screen, 0 otherwise
  */
 uint24_t os_PutStrFull(const char *string);
@@ -771,13 +832,13 @@ uint24_t os_PutStrFull(const char *string);
 /**
  * Puts some text at the current homescreen cursor location
  *
- * @param string Test to put on homescreen
+ * @param string Text to put on homescreen
  * @returns 1 if string fits on line, 0 otherwise
  */
 uint24_t os_PutStrLine(const char *string);
 
 /**
- * Set a particular flag variable
+ * Set a particular OS flag
  *
  * @param offset Offset to particular flag in list
  * @param set Bitmask of flag to set
@@ -785,7 +846,7 @@ uint24_t os_PutStrLine(const char *string);
 void os_SetFlagByte(int offset, uint8_t set);
 
 /**
- * Get a particular flag variable
+ * Get a particular OS flag
  *
  * @param offset Offset to particular flag in list
  * @returns Bitmask of flag
@@ -793,10 +854,13 @@ void os_SetFlagByte(int offset, uint8_t set);
 uint8_t os_GetFlagByte(int offset);
 
 /**
- * Get amount of free ram in order to allocate extra ram
+ * Returns the size in bytes of free RAM that the user isn't using. A pointer is
+ * also returned to the start of this region; you can use it for your own
+ * purposes but do not exceed the size returned. This function is useful if you
+ * are running out of space in the bss or heap and need a little extra memory.
  *
- * @param free Set to start of free available ram
- * @returns Size of available ram
+ * @param free Set to start of free available RAM
+ * @returns Size of available RAM
  */
 size_t os_MemChk(void **free);
 
@@ -860,6 +924,34 @@ int os_PushErrorHandler(void) __attribute__((returns_twice));
  * @see os_PushErrorHandler
  */
 void os_PopErrorHandler(void);
+
+/**
+ * Runs a program that exists on the calculator.
+ * Note that this will destroy the currently running program, requiring you to
+ * save any data as needed. This program has an optional callback that will be
+ * executed when the called program finishes, which can be used to rebuild the
+ * program state. Additionally, program context information can be safely
+ * stored by using the extra user data arguments, which will then be delivered
+ * to the callback.
+ *
+ * @param prgm Name of program to execute.
+ * @param data User data that will be available in the callback function.
+ * May be \c NULL.
+ * @param size Size of user data (keep this small, it is stored on the stack!)
+ * @param callback Callback function to run when program finishes executing. The
+ * argument \p data will contain the provided \p data contents, and \p retval
+ * will contain the error code if a TI-BASIC program, or the exit code if a C
+ * program. Other types of programs may have an undefined \p retval. This
+ * argument may be left \c NULL if execution should not return to the calling
+ * program.
+ *
+ * @return This function should not return, but if it does, -1 indicates the
+ * program could not be found, -2 if not enough memory, and < 0 if some other
+ * error occurred.
+ *
+ * @note The callback return code is passed to the launcher of the original program that called this function.
+ */
+int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 
 /**
  * @return A pointer to symtable of the OS
@@ -2634,7 +2726,7 @@ typedef enum {
 #define asm_ClrTxtShd os_ClrTxtShd
 /* @endcond */
 
-#define timer_GetLow(n) (_Pragma("GCC warning \"'timer_GetLow' is deprecated, use 'timer_Get' or 'timer_GetSafe' instead as appropriate\"") (uint24_t)time_Get(n))
+#define timer_GetLow(n) (_Pragma("GCC warning \"'timer_GetLow' is deprecated, use 'timer_Get' or 'timer_GetSafe' instead as appropriate\"") (uint24_t)timer_Get(n))
 
 #ifdef __cplusplus
 }

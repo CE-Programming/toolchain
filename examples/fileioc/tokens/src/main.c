@@ -12,9 +12,6 @@ int main(void)
     /* Clears the homescreen */
     os_ClrHome();
 
-    /* Closes any open files */
-    ti_CloseAll();
-
     /* Open the "ABC" program for reading */
     prgm = ti_OpenVar("ABC", "r", TI_PRGM_TYPE);
     if (prgm == 0)
@@ -25,6 +22,10 @@ int main(void)
     /* Get a pointer to the data in the program */
     data_ptr = ti_GetDataPtr(prgm);
     size = ti_GetSize(prgm);
+
+    /* Ensure that the slot is closed */
+    ti_Close(prgm);
+    prgm = 0;
 
     while (size && y < 8)
     {
@@ -37,9 +38,6 @@ int main(void)
 
     /* Waits for a key */
     while (!os_GetCSC());
-
-    /* Closes files */
-    ti_CloseAll();
 
     return 0;
 }

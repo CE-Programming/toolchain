@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'FILEIOC', 6
+library 'FILEIOC', 7
 
 ;-------------------------------------------------------------------------------
 ; no dependencies
@@ -63,6 +63,13 @@ library 'FILEIOC', 6
 ; v6 functions
 ;-------------------------------------------------------------------------------
 	export ti_SetGCBehavior
+
+;-------------------------------------------------------------------------------
+; v7 functions
+;-------------------------------------------------------------------------------
+; No new functions, but a change was made to slot openness managemnent such that
+; it is no longer necessary to call `ti_CloseAll` in initialization. New
+; programs omitting this initialization require this change.
 
 
 ;-------------------------------------------------------------------------------
@@ -177,12 +184,14 @@ ti_CloseAll:
 ;  n/a
 ; return:
 ;  n/a
-	ld	a, $40
-	ld	(vat_ptr0 + 2), a
-	ld	(vat_ptr1 + 2), a
-	ld	(vat_ptr2 + 2), a
-	ld	(vat_ptr3 + 2), a
-	ld	(vat_ptr4 + 2), a
+	ld	hl, variable_offsets + 3 - 1
+	push	hl
+	pop	de
+	inc	de
+	ld	bc, 4 * 3
+; upper byte of offset = 12
+	ld	(hl), c
+	ldir
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -200,7 +209,7 @@ ti_Resize:
 	push	hl
 	push	de
 	call	util_is_slot_open
-	jp	z, util_ret_neg_one
+	jp	nz, util_ret_neg_one
 	push	hl
 	call	util_is_in_ram
 	pop	hl
@@ -253,7 +262,7 @@ ti_IsArchived:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jp	z, util_ret_null
+	jp	nz, util_ret_null
 util_is_in_ram:
 	call	util_get_vat_ptr
 	ld	hl, (hl)
@@ -298,33 +307,27 @@ ti_Open:
 .start:
 	ld	(.smc_type), a
 	ld	(ti.OP1), a
-	ld	iy,ti.flags
+	ld	iy, ti.flags
+
+	ld	hl, variable_offsets + (5 * 3) - 1
+	ld	a, 5
+.find_slot:
+; slot open (in use): upper byte of offset == 0
+; slot closed (free): upper byte of offset > slot
+	cp	a, (hl)
+	jr	c, .slot
+	dec	hl
+	dec	hl
+	dec	hl
+	dec	a
+	jr	nz, .find_slot
+	ret
+
+.slot:
+	ld	(curr_slot), a
 	push	ix
 	ld	ix, 0
 	add	ix, sp
-	xor	a, a
-	ld	hl, (vat_ptr0)
-	inc	a
-	add	hl, hl
-	jr	nc, .slot
-	ld	hl, (vat_ptr1)
-	inc	a
-	add	hl,hl
-	jr	nc, .slot
-	ld	hl, (vat_ptr2)
-	inc	a
-	add	hl, hl
-	jr	nc, .slot
-	ld	hl, (vat_ptr3)
-	inc	a
-	add	hl, hl
-	jr	nc, .slot
-	ld	hl, (vat_ptr4)
-	inc	a
-	add	hl, hl
-	jp	c, util_ret_null_pop_ix
-.slot:
-	ld	(curr_slot), a
 	ld	hl, (ix + 6)
 	ld	de, ti.OP1 + 1
 	call	ti.Mov8b
@@ -435,7 +438,7 @@ ti_SetArchiveStatus:
 	push	de
 	push	hl
 	call	util_is_slot_open
-	jp	z, util_ret_null
+	jp	nz, util_ret_null
 	ld	a, e
 	push	af
 	call	util_get_vat_ptr
@@ -503,7 +506,7 @@ ti_Write:
 	add	iy, sp
 	ld	c,(iy + 12)
 	call	util_is_slot_open
-	jr	z, .ret0
+	jr	nz, .ret0
 	call	util_is_in_ram
 	jr	z, .ret0
 	ld	bc, (iy + 6)
@@ -576,7 +579,7 @@ ti_Read:
 	add	iy, sp
 	ld	c, (iy + 12)
 	call	util_is_slot_open
-	jr	z, .ret0
+	jr	nz, .ret0
 	call	util_get_slot_size
 	push	bc
 	call	util_get_offset
@@ -635,7 +638,7 @@ ti_GetC:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jp	z, util_ret_neg_one
+	jp	nz, util_ret_neg_one
 	call	util_get_slot_size
 	push	bc
 	call	util_get_offset
@@ -675,7 +678,7 @@ ti_PutC:
 	ld	a, l
 	ld	(char_in), a
 	call	util_is_slot_open
-	jp	z, util_ret_neg_one
+	jp	nz, util_ret_neg_one
 	push	hl
 	call	util_is_in_ram
 	pop	hl
@@ -734,7 +737,7 @@ ti_Seek:
 	ld	de, (iy + 3)
 	ld	c, (iy + 9)
 	call	util_is_slot_open
-	jp	z, util_ret_neg_one
+	jp	nz, util_ret_neg_one
 	ld	a, (iy + 6)		; origin location
 	or	a, a
 	jr	z, .seek_set
@@ -821,7 +824,7 @@ ti_Rewind:
 	push	bc
 	push	hl
 	call	util_is_slot_open
-	jp	z, util_ret_neg_one
+	jp	nz, util_ret_neg_one
 .rewind:
 	ld	bc, 0
 	call	util_set_offset
@@ -841,7 +844,7 @@ ti_Tell:
 	push	bc
 	push	hl
 	call	util_is_slot_open
-	jp	z, util_ret_neg_one
+	jp	nz, util_ret_neg_one
 	call	util_get_offset
 	push	bc
 	pop	hl
@@ -859,7 +862,7 @@ ti_GetSize:
 	push	bc
 	push	hl
 	call	util_is_slot_open
-	jp	z, util_ret_neg_one
+	jp	nz, util_ret_neg_one
 	call	util_get_slot_size
 	push	bc
 	pop	hl
@@ -872,17 +875,17 @@ ti_Close:
 ;  sp + 3 : slot index
 ; return:
 ;  n/a
-	pop	hl
+	pop	de
 	pop	bc
 	push	bc
-	push	hl
-	ld	a, c
-	ld	(curr_slot), a
-	call	util_get_vat_ptr
-	inc	hl
-	inc	hl
-	ld	(hl), $40
-	ret
+	ld	b, 3
+	mlt	bc
+	ld	hl, variable_offsets - 1
+	add	hl, bc
+; upper byte of offset = slot * 3
+	ld	(hl), c
+	ex	de, hl
+	jp	(hl)
 
 ;-------------------------------------------------------------------------------
 ti_DetectAny:
@@ -1107,7 +1110,7 @@ ti_GetDataPtr:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jp	z, util_ret_null
+	jp	nz, util_ret_null
 	call	util_get_slot_size
 	inc	hl
 	push	hl
@@ -1128,7 +1131,7 @@ ti_GetVATPtr:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jp	z, util_ret_null
+	jp	nz, util_ret_null
 	call	util_get_vat_ptr
 	ld	hl, (hl)
 	ret
@@ -1150,7 +1153,7 @@ ti_GetName:
 	push	hl
 	call	util_is_slot_open
 	pop	de
-	ret	z
+	ret	nz
 	call	util_get_vat_ptr
 	ld	hl, (hl)
 	ld	bc, -6
@@ -1542,15 +1545,21 @@ util_ret_neg_one:
 	ret
 
 util_is_slot_open:
-	ld	a, c
-	ld	(curr_slot), a
-	push	hl
-	call	util_get_vat_ptr
-	inc	hl
-	inc	hl
-	bit	7, (hl)
-	pop	hl
+; in:
+;  c = slot
+; out:
+;  a = 0
+;  zf = open
+	push	hl, bc
+	ld	b, 3
+	mlt	bc
+	ld	hl, variable_offsets - 1
+	add	hl, bc
+	ld	a, b
+	cp	a, (hl)
+	pop	bc, hl
 	ret
+
 util_get_vat_ptr:
 	ld	a, (curr_slot)
 	ld	hl, vat_ptr0 		; vat_ptr0 = $d0244e
@@ -1630,4 +1639,4 @@ util_post_gc_handler := $-3
 ;-------------------------------------------------------------------------------
 
 variable_offsets:
-	dl	0, 0, 0, 0, 0
+	dl	-1, -1, -1, -1, -1

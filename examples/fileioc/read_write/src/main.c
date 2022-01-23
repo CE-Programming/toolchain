@@ -10,9 +10,6 @@ int main(void)
     /* Clear the homescreen */
     os_ClrHome();
 
-    /* Close any files that may be open already */
-    ti_CloseAll();
-
     /* Open a new variable; deleting it if it already exists */
     var = ti_Open("AppVar", "w");
     if (var == 0)
@@ -63,6 +60,10 @@ int main(void)
     /* Ensure the name of the AppVar is correct */
     ti_GetName(nameBuffer, var);
 
+    /* Ensure that the slot is closed */
+    ti_Close(var);
+    var = 0;
+
     os_SetCursorPos(0, 0);
     os_PutStrFull("Appvar: ");
     os_SetCursorPos(0, 8);
@@ -72,9 +73,6 @@ int main(void)
 
     /* Waits for a key */
     while (!os_GetCSC());
-
-    /* Close all open files */
-    ti_CloseAll();
 
     return 0;
 }

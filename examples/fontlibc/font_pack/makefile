@@ -2,28 +2,24 @@
 # Makefile Options
 # ----------------------------
 
-NAME ?= DEMO
-ICON ?= icon.png
-DESCRIPTION ?= "CE C Toolchain Demo"
-COMPRESSED ?= NO
-ARCHIVED ?= NO
+NAME = DEMO
+ICON = icon.png
+DESCRIPTION = "CE C Toolchain Demo"
+COMPRESSED = NO
+ARCHIVED = NO
 
-CFLAGS ?= -Wall -Wextra -Oz
-CXXFLAGS ?= -Wall -Wextra -Oz
+CFLAGS = -Wall -Wextra -Oz
+CXXFLAGS = -Wall -Wextra -Oz
 
 # font options
-FONTPACKNAME ?= DRSANS
-FONTDIR ?= $(SRCDIR)/fonts
+FONTPACKNAME = DRSANS
+FONTDIR = $(SRCDIR)/fonts
 
-DEPS ?= $(BINDIR)/$(FONTPACKNAME).bin $(BINDIR)/$(FONTPACKNAME).8xv
+DEPS = $(BINDIR)/$(FONTPACKNAME).bin $(BINDIR)/$(FONTPACKNAME).8xv
 
 # ----------------------------
 
-ifndef CEDEV
-$(error CEDEV environment path variable is not set)
-endif
-
-include $(CEDEV)/meta/makefile.mk
+include $(shell cedev-config --makefile)
 
 # ----------------------------
 
@@ -43,4 +39,3 @@ $(BINDIR)/$(FONTPACKNAME).bin: $(FONTDIR)/drsans-06-bold.fnt $(FONTDIR)/drsans-0
 $(BINDIR)/$(FONTPACKNAME).8xv: $(BINDIR)/$(FONTPACKNAME).bin
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)convbin --iformat bin --input $(BINDIR)/$(FONTPACKNAME).bin --oformat 8xv --output $(BINDIR)/$(FONTPACKNAME).8xv --archive --name $(FONTPACKNAME)
-

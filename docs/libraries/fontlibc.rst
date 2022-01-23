@@ -8,7 +8,7 @@ fontlibc.h
     #include <fontlibc.h>
 
 fontlibc was designed under a "mechanism not policy" sort of philosophy.
-Rather than attempt to provide as many fancy features as a programmer could want, fontlibc tries to provide fast, basic routines that can be used to build the additional functionality you want.
+Rather than attempting to provide as many fancy features as a programmer could want, fontlibc tries to provide fast, basic routines that can be used to build the additional functionality you want.
 For example, word-wrap is not directly provided, but can be implemented using :code:`fontlib_SetAlternateStopCode` and :code:`fontlib_GetStringWidth`.
 fontlib hopes to provide enough performance to be usable in games, while providing powerful enough basic features for fancy GUIs and document editors.
 

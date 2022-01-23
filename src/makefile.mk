@@ -15,7 +15,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #----------------------------
-VERSION := 9.2-devel
+MAKEFLAGS += -rR
 #----------------------------
 NAME ?= DEMO
 ICON ?=
@@ -26,22 +26,24 @@ BSSHEAP_LOW ?= D052C6
 BSSHEAP_HIGH ?= D13FD8
 STACK_HIGH ?= D1A87E
 INIT_LOC ?= D1A87F
-OUTPUT_MAP ?= NO
+OUTPUT_MAP ?= YES
 CFLAGS ?= -Wall -Wextra -Oz
 CXXFLAGS ?= -Wall -Wextra -Oz
-LDFLAGS ?=
 SRCDIR ?= src
 OBJDIR ?= obj
 BINDIR ?= bin
 GFXDIR ?= src/gfx
+CPP_EXTENSION = cpp
+C_EXTENSION = c
 CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
 #----------------------------
 HAS_UPPERCASE_NAME ?= YES
-HAS_CLEANUP ?= YES
 HAS_FLASH_FUNCTIONS ?= YES
 HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
+#----------------------------
+CEDEV_TOOLCHAIN ?= $(shell cedev-config --prefix)
 #----------------------------
 
 # define some common makefile things
@@ -54,7 +56,6 @@ DEBUGMODE := NDEBUG
 CCDEBUG := -g0
 LDDEBUG := 0
 LDSTATIC := 0
-LDCLEANUP := 0
 
 # verbosity
 V ?= 0
@@ -64,25 +65,25 @@ else
 Q =
 endif
 
-BIN ?= $(CEDEV)/bin
+BIN ?= $(CEDEV_TOOLCHAIN)/bin
 # get the os specific items
 ifeq ($(OS),Windows_NT)
-SHELL := cmd.exe
+SHELL = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
-FASMGLD := $(call NATIVEPATH,$(BIN)/fasmg.exe)
-CONVBIN := $(call NATIVEPATH,$(BIN)/convbin.exe)
-CONVIMG := $(call NATIVEPATH,$(BIN)/convimg.exe)
-EZCC := $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
+FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg.exe)
+CONVBIN = $(call NATIVEPATH,$(BIN)/convbin.exe)
+CONVIMG = $(call NATIVEPATH,$(BIN)/convimg.exe)
+CC = $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
 RM = ( del /q /f $1 2>nul || call )
 RMDIR = ( rmdir /s /q $1 2>nul || call )
 NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG = "$(subst ",',$1)"#'
 else
 NATIVEPATH = $(subst \,/,$1)
-FASMGLD := $(call NATIVEPATH,$(BIN)/fasmg)
-CONVBIN := $(call NATIVEPATH,$(BIN)/convbin)
-CONVIMG := $(call NATIVEPATH,$(BIN)/convimg)
-EZCC := $(call NATIVEPATH,$(BIN)/ez80-clang)
+FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg)
+CONVBIN = $(call NATIVEPATH,$(BIN)/convbin)
+CONVIMG = $(call NATIVEPATH,$(BIN)/convimg)
+CC = $(call NATIVEPATH,$(BIN)/ez80-clang)
 RM = rm -f $1
 RMDIR = rm -rf $1
 NATIVEMKDR = mkdir -p $1
@@ -90,9 +91,11 @@ QUOTE_ARG = '$(subst ','\'',$1)'#'
 endif
 
 MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
+UPDIR_ADD = $(subst ../,_../,$(subst \,/,$1))
+UPDIR_RM = $(subst _../,../,$(subst \,/,$1))
 
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
-LINKER_SCRIPT ?= $(CEDEV)/meta/linker_script
+LINKER_SCRIPT ?= $(CEDEV_TOOLCHAIN)/meta/linker_script
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -107,25 +110,25 @@ TARGET8XP ?= $(NAME).8xp
 ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
 
 # startup routines
-LDCRT0 ?= $(call NATIVEPATH,$(CEDEV)/lib/shared/crt0.src)
+LDCRT0 ?= $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/shared/crt0.src)
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
-rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2)$(filter $(subst *,%,$2),$d))
+rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filter $(subst %%,%,%$(subst *,%,$2)),$d)))
 
 # find source files
-CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.c) $(EXTRA_CSOURCES))
-CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.cpp) $(EXTRA_CPPSOURCES))
+CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_CSOURCES))
+CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CPPSOURCES))
 USERHEADERS ?= $(sort $(call rwildcard,$(SRCDIR),*.h *.hpp) $(EXTRA_USERHEADERS))
 ASMSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
 
 # create links for later
-LINK_CSOURCES ?= $(CSOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.c.src)
-LINK_CPPSOURCES ?= $(CPPSOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.cpp.src)
+LINK_CSOURCES ?= $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).src))
+LINK_CPPSOURCES ?= $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).src))
 LINK_ASMSOURCES ?= $(ASMSOURCES)
 
 # files created to be used for linking
 LDFILES ?= $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
-LDLIBS ?= $(wildcard $(CEDEV)/lib/libload/*.lib)
+LDLIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)
 
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
@@ -142,11 +145,6 @@ ICONSRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.src)
 ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
 LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 endif
-endif
-
-# check if default cleanup code should be added
-ifeq ($(HAS_CLEANUP),YES)
-LDCLEANUP := -i $(call QUOTE_ARG,precious .cleanup)
 endif
 
 # check if gfx directory exists
@@ -189,7 +187,7 @@ LDSTATIC := 1
 endif
 
 # define the c/c++ flags used by clang
-EZCFLAGS = -nostdinc -isystem $(CEDEV)/include -I$(SRCDIR) -Dinterrupt="__attribute__((__interrupt__))"
+EZCFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -Dinterrupt="__attribute__((__interrupt__))"
 EZCFLAGS += -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
@@ -197,17 +195,19 @@ EZCFLAGS += $(CFLAGS)
 # these are the fasmg linker flags
 FASMGFLAGS = \
 	-n \
-	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV)/meta/ld.alm)) \
+	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
 	-i $(call QUOTE_ARG,STATIC := $(LDSTATIC)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
-	$(LDCLEANUP) $(LDMAPFLAG) \
+	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
 	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LDLIBS))) \
-	$(LDFLAGS)
+	$(EXTRA_LDFLAGS)
+
+.PHONY: all clean version gfx debug
 
 # this rule is trigged to build everything
 all: $(BINDIR)/$(TARGET8XP)
@@ -234,26 +234,24 @@ $(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(ICON_CONV)
 endif
 
-# these rules compile the source files into assembly files
-$(OBJDIR)/%.c.src: $(SRCDIR)/%.c $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
-	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
-
-$(OBJDIR)/%.cpp.src: $(SRCDIR)/%.cpp $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
-	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(EZCC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
-
 clean:
 	$(Q)$(call RM,$(EXTRA_CLEAN))
 	$(Q)$(call RMDIR,$(OBJDIR) $(BINDIR))
-	$(Q)echo Removed built objects and binaries.
+	$(Q)echo Removed built binaries and objects.
 
 gfx:
 	$(Q)$(GFXCMD)
 
 version:
-	$(Q)echo CE C Toolchain v$(VERSION)
+	$(Q)echo CE C Toolchain $(shell cedev-config --version)
 
-.PHONY: all clean version gfx debug
+.SECONDEXPANSION:
+$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)$(CC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)$(CC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))

@@ -23,7 +23,7 @@
       "description": "Test sprite scaled display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "8DEF2F12" ]
+      "expected_CRCs": [ "8D44ED84" ]
     },
     "2":
     {
