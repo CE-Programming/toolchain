@@ -1,5 +1,3 @@
-	assume	adl=1
-
 	public	__internal_bitrev_byte
 __internal_bitrev_byte:
 	add	hl, hl
