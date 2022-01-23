@@ -3479,11 +3479,24 @@ assert .nop = 0
 	ld	a,d
 	and	a,iy.transfer.type.cerr
 	ld	c,e
-	jq	z,.noStall
+	jq	z,.failed
 	bitmsk	iy.transfer.status.babble,e
-	jq	nz,.noStall
+	jq	nz,.failed
+assert USB_TRANSFER_STALLED = 1
 	inc	c
-.noStall:
+	bitmsk	ix.endpoint.maxPktLen.c
+	jq	z,.failed
+	xor	a,a
+	call	_RetireFirstTransfer
+	ret	nc
+	bitmsk	ix.endpoint.flags.freed
+	jq	nz,.dangling
+	ld	(ix.endpoint.overlay.next),iy.transfer
+assert USB_TRANSFER_STALLED and 1
+	ld	(ix.endpoint.overlay.altNext),c
+	ld	(ix.endpoint.overlay.status),l;0
+	jq	.loop
+.failed:
 virtual
 	ret	z
 	load .ret_z: $-$$ from $$
