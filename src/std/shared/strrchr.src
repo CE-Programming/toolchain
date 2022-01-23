@@ -1,0 +1,21 @@
+	public	_strrchr
+_strrchr:
+	pop	bc,hl,de
+	push	de,hl,bc
+	xor	a,a
+	ld	bc,0
+	cpir
+	ld	a,e
+	ex	de,hl
+	sbc	hl,hl
+	sbc	hl,bc
+	push	hl
+	pop	bc
+	ex	de,hl
+	dec	hl
+	cpdr
+	inc	hl
+	ret	z
+	push	bc
+	pop	hl
+	ret

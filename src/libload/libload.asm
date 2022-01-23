@@ -463,7 +463,7 @@ _missingerror:				; can't find a dependent lib
 _throwerror:				; draw the error message onscreen
 	ld	sp,(eSP)
 	bit	showmsgs,(iy + asmflag)
-	ret	z
+	jr	z,_gotopop
 	ld	a,ti.lcdBpp16
 	ld	(ti.mpLcdCtrl),a
 	push	hl
@@ -502,6 +502,7 @@ _waitkeyloop:
 _exitwaitloop:
 	call	ti.ClrScrn
 	call	ti.HomeUp		; stop execution of the program
+_gotopop:
 	jp	ti.PopOP1		; restore program name
 
 _versionlibstr:				; strings for LibLoad Errors

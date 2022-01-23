@@ -40,7 +40,7 @@ char *strstr(const char *haystack, const char *needle)
              __attribute__((nonnull(1, 2)));
 
 char *strtok(char *__restrict s, const char *__restrict delim)
-             __attribute__((nonnull(1, 2)));
+             __attribute__((nonnull(2)));
 
 char *strdup(const char *s)
              __attribute__ ((__malloc__)) __attribute__((nonnull(1)));

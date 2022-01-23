@@ -17,7 +17,7 @@ int __attribute__((weak)) fclose(FILE *stream)
 
     slot = stream->slot;
 
-    _file_streams[slot].slot = 0;
+    _file_streams[slot - 1].slot = 0;
 
     return ti_Close(slot);
 }

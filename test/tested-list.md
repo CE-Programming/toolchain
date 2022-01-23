@@ -4,24 +4,24 @@
 | Function | Tested? | Occurrences |
 | -------- | ------- | ----------- |
 | [`ti_CloseAll`](/#L14) | ✗ |
-| [`ti_Open`](/#L15) | YES | [in 5 files](https://github.com/search?q=ti_Open+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_Open`](/#L15) | YES | [in 4 files](https://github.com/search?q=ti_Open+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_OpenVar`](/#L16) | YES | [in 1 file](https://github.com/search?q=ti_OpenVar+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`ti_Close`](/#L17) | YES | [in 3 files](https://github.com/search?q=ti_Close+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_Close`](/#L17) | YES | [in 5 files](https://github.com/search?q=ti_Close+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_Write`](/#L18) | YES | [in 1 file](https://github.com/search?q=ti_Write+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_Read`](/#L19) | YES | [in 1 file](https://github.com/search?q=ti_Read+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_GetC`](/#L20) | YES | [in 1 file](https://github.com/search?q=ti_GetC+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_PutC`](/#L21) | YES | [in 1 file](https://github.com/search?q=ti_PutC+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`ti_Delete`](/#L22) | YES | [in 1 file](https://github.com/search?q=ti_Delete+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_Delete`](/#L22) | YES | [in 3 files](https://github.com/search?q=ti_Delete+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_DeleteVar`](/#L23) | ✗ |
 | [`ti_Seek`](/#L24) | ✗ |
-| [`ti_Resize`](/#L25) | ✗ |
+| [`ti_Resize`](/#L25) | YES | [in 2 files](https://github.com/search?q=ti_Resize+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_IsArchived`](/#L26) | ✗ |
 | [`ti_SetArchiveStatus`](/#L27) | ✗ |
 | [`ti_Tell`](/#L28) | ✗ |
 | [`ti_Rewind`](/#L29) | YES | [in 1 file](https://github.com/search?q=ti_Rewind+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`ti_GetSize`](/#L30) | YES | [in 1 file](https://github.com/search?q=ti_GetSize+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_GetSize`](/#L30) | YES | [in 3 files](https://github.com/search?q=ti_GetSize+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_GetTokenString`](/#L34) | YES | [in 1 file](https://github.com/search?q=ti_GetTokenString+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
-| [`ti_GetDataPtr`](/#L35) | YES | [in 4 files](https://github.com/search?q=ti_GetDataPtr+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`ti_GetDataPtr`](/#L35) | YES | [in 1 file](https://github.com/search?q=ti_GetDataPtr+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_Detect`](/#L36) | YES | [in 1 file](https://github.com/search?q=ti_Detect+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`ti_DetectVar`](/#L37) | ✗ |
 | [`ti_SetVar`](/#L41) | YES | [in 2 files](https://github.com/search?q=ti_SetVar+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
@@ -40,7 +40,72 @@
 | [`ti_ArchiveHasRoom`](/#L60) | ✗ |
 | [`ti_SetGCBehavior`](/#L65) | ✗ |
 
-**Total: 21/36 tested.**
+**Total: 22/36 tested.**
+
+### fontlibc
+| Function | Tested? | Occurrences |
+| -------- | ------- | ----------- |
+| [`fontlib_SetWindow`](/#L16) | YES | [in 1 file](https://github.com/search?q=fontlib_SetWindow+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_SetWindowFullScreen`](/#L17) | YES | [in 2 files](https://github.com/search?q=fontlib_SetWindowFullScreen+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetWindowXMin`](/#L18) | YES | [in 1 file](https://github.com/search?q=fontlib_GetWindowXMin+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetWindowYMin`](/#L19) | YES | [in 1 file](https://github.com/search?q=fontlib_GetWindowYMin+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetWindowWidth`](/#L20) | YES | [in 1 file](https://github.com/search?q=fontlib_GetWindowWidth+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetWindowHeight`](/#L21) | YES | [in 1 file](https://github.com/search?q=fontlib_GetWindowHeight+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_SetCursorPosition`](/#L22) | YES | [in 2 files](https://github.com/search?q=fontlib_SetCursorPosition+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetCursorX`](/#L23) | ✗ |
+| [`fontlib_GetCursorY`](/#L24) | YES | [in 1 file](https://github.com/search?q=fontlib_GetCursorY+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_ShiftCursorPosition`](/#L25) | YES | [in 1 file](https://github.com/search?q=fontlib_ShiftCursorPosition+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_SetFont`](/#L26) | YES | [in 2 files](https://github.com/search?q=fontlib_SetFont+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_SetForegroundColor`](/#L27) | ✗ |
+| [`fontlib_SetBackgroundColor`](/#L28) | ✗ |
+| [`fontlib_SetColors`](/#L29) | YES | [in 2 files](https://github.com/search?q=fontlib_SetColors+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetForegroundColor`](/#L30) | ✗ |
+| [`fontlib_GetBackgroundColor`](/#L31) | ✗ |
+| [`fontlib_SetTransparency`](/#L32) | YES | [in 2 files](https://github.com/search?q=fontlib_SetTransparency+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetTransparency`](/#L33) | ✗ |
+| [`fontlib_SetLineSpacing`](/#L34) | YES | [in 1 file](https://github.com/search?q=fontlib_SetLineSpacing+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetSpaceAbove`](/#L35) | ✗ |
+| [`fontlib_GetSpaceBelow`](/#L36) | ✗ |
+| [`fontlib_SetItalicSpacingAdjustment`](/#L37) | ✗ |
+| [`fontlib_GetItalicSpacingAdjustment`](/#L38) | ✗ |
+| [`fontlib_GetCurrentFontHeight`](/#L39) | YES | [in 1 file](https://github.com/search?q=fontlib_GetCurrentFontHeight+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_ValidateCodePoint`](/#L40) | ✗ |
+| [`fontlib_GetTotalGlyphs`](/#L41) | ✗ |
+| [`fontlib_GetFirstGlyph`](/#L42) | ✗ |
+| [`fontlib_SetNewlineCode`](/#L43) | ✗ |
+| [`fontlib_GetNewlineCode`](/#L44) | ✗ |
+| [`fontlib_SetAlternateStopCode`](/#L45) | ✗ |
+| [`fontlib_GetAlternateStopCode`](/#L46) | ✗ |
+| [`fontlib_SetFirstPrintableCodePoint`](/#L47) | ✗ |
+| [`fontlib_GetFirstPrintableCodePoint`](/#L48) | ✗ |
+| [`fontlib_SetDrawIntCodePoints`](/#L49) | ✗ |
+| [`fontlib_GetDrawIntMinus`](/#L50) | ✗ |
+| [`fontlib_GetDrawIntZero`](/#L51) | ✗ |
+| [`fontlib_GetGlyphWidth`](/#L52) | ✗ |
+| [`fontlib_GetStringWidth`](/#L53) | YES | [in 1 file](https://github.com/search?q=fontlib_GetStringWidth+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetStringWidthL`](/#L54) | ✗ |
+| [`fontlib_GetLastCharacterRead`](/#L55) | ✗ |
+| [`fontlib_DrawGlyph`](/#L56) | YES | [in 1 file](https://github.com/search?q=fontlib_DrawGlyph+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_DrawString`](/#L57) | YES | [in 2 files](https://github.com/search?q=fontlib_DrawString+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_DrawStringL`](/#L58) | ✗ |
+| [`fontlib_DrawInt`](/#L59) | ✗ |
+| [`fontlib_DrawUInt`](/#L60) | ✗ |
+| [`fontlib_ClearEOL`](/#L61) | YES | [in 1 file](https://github.com/search?q=fontlib_ClearEOL+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_ClearWindow`](/#L62) | YES | [in 1 file](https://github.com/search?q=fontlib_ClearWindow+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_Newline`](/#L63) | YES | [in 1 file](https://github.com/search?q=fontlib_Newline+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_SetNewlineOptions`](/#L64) | YES | [in 2 files](https://github.com/search?q=fontlib_SetNewlineOptions+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetNewlineOptions`](/#L65) | ✗ |
+| [`fontlib_GetFontPackName`](/#L69) | ✗ |
+| [`fontlib_GetFontByIndex`](/#L70) | YES | [in 1 file](https://github.com/search?q=fontlib_GetFontByIndex+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetFontByIndexRaw`](/#L71) | ✗ |
+| [`fontlib_GetFontByStyle`](/#L72) | YES | [in 1 file](https://github.com/search?q=fontlib_GetFontByStyle+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`fontlib_GetFontByStyleRaw`](/#L73) | ✗ |
+| [`fontlib_ScrollWindowDown`](/#L77) | ✗ |
+| [`fontlib_ScrollWindowUp`](/#L78) | ✗ |
+| [`fontlib_Home`](/#L79) | ✗ |
+| [`fontlib_HomeUp`](/#L80) | YES | [in 1 file](https://github.com/search?q=fontlib_HomeUp+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+
+**Total: 24/59 tested.**
 
 ### graphx
 | Function | Tested? | Occurrences |
@@ -146,7 +211,7 @@
 ### keypadc
 | Function | Tested? | Occurrences |
 | -------- | ------- | ----------- |
-| [`kb_Scan`](/#L14) | YES | [in 4 files](https://github.com/search?q=kb_Scan+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
+| [`kb_Scan`](/#L14) | YES | [in 3 files](https://github.com/search?q=kb_Scan+repo%3ACE-Programming%2Ftoolchain+path%3Aexamples&type=Code)
 | [`kb_ScanGroup`](/#L15) | ✗ |
 | [`kb_AnyKey`](/#L16) | ✗ |
 | [`kb_Reset`](/#L17) | ✗ |
@@ -155,4 +220,4 @@
 
 
 ---
-*Generated by [gen_list.sh](/tools/funcs_tested/gen_list.sh)*
+*Generated by [check.sh](/test/check.sh)*

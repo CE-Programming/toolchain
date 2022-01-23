@@ -972,22 +972,61 @@ void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *n
 int os_DelSymEntry(void *entry);
 
 /**
- * Creates an AppVar.
+ * Creates an TIOS Str.
+ *
+ * @param name Name of the Str to create.
+ * @param data Initial contents of the created Str.
+ * @returns A TIOS error code, or 0 on success.
+ */
+int os_CreateString(const char *name, const string_t *data);
+
+/**
+ * Gets a pointer to an TIOS Str's data, which may be in archive.
+ *
+ * @param name Name of the Str to lookup.
+ * @param archived Set to 1 if the Str is archived, otherwise 0, may be NULL if you don't need it.
+ * @returns A pointer to the Str data
+ * @note Returns NULL if the Str doesn't exist, otherwise a pointer to the size bytes.
+ */
+string_t *os_GetStringData(const char *name, int *archived);
+
+/**
+ * Creates a TIOS Equ.
+ *
+ * @param name Name of the Equ to create.
+ * @param data Initial contents of the created Equ.
+ * @returns A TIOS error code, or 0 on success.
+ */
+int os_CreateEquation(const char *name, const equ_t *data);
+
+/**
+ * Gets a pointer to an TIOS Equ's data, which may be in archive.
+ *
+ * @param name Name of the Equ to lookup.
+ * @param archived Set to 1 if the Equ is archived, otherwise 0, may be NULL if you don't need it.
+ * @returns A pointer to the Equ data.
+ * @note Returns NULL if the Equ doesn't exist, otherwise a pointer to the size bytes.
+ */
+equ_t *os_GetEquationData(const char *name, int *archived);
+
+/**
+ * Creates a TIOS AppVar.
  *
  * @param name Name of the AppVar to create.
- * @param size Size of AppVar to create
- * @returns A pointer to the AppVar data
- * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes
+ * @param size Size of AppVar to create.
+ * @returns A pointer to the AppVar data.
+ * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes.
+ * @note If successful, the AppVar contents will be uninitialized, aka filled with random bytes.
  */
 var_t *os_CreateAppVar(const char *name, uint16_t size);
 
 /**
- * Gets a pointer to an AppVar's data, which may be in archive.
+ * Gets a pointer to a TIOS AppVar's data, which may be in archive.
  *
  * @param name Name of the AppVar to lookup.
  * @param archived Set to 1 if the AppVar is archived, otherwise 0, may be NULL if you don't need it.
- * @returns A pointer to the AppVar data
- * @note Returns NULL if the AppVar doesn't exist, otherwise a pointer to the size bytes
+ * @returns A pointer to the AppVar data.
+ * @note Returns NULL if the AppVar doesn't exist, otherwise a pointer to the size bytes.
  */
 var_t *os_GetAppVarData(const char *name, int *archived);
 
@@ -1213,7 +1252,8 @@ real_t os_RealRound(const real_t *arg, char digits);
  *
  * @param arg1 Real variable 1.
  * @param arg2 Real variable 2.
- * @returns -1, 0, or 1 depending on the comparison
+ * @returns -1, 0, or 1 if arg1 is less than, equal to, or greater than arg2
+ * @note \c{os_RealCompare(arg1, arg2) op 0} computes \c{arg1 op arg2} for any comparison operator \c op
  */
 int os_RealCompare(const real_t *arg1, const real_t *arg2);
 
@@ -1767,8 +1807,8 @@ typedef enum {
 
 #define os_TempFreeArc       (*(uint24_t*)0xD02655)        /**< Set after asm_ArcChk call */
 
-#define os_TextBGcolor       (*(uint16_t*)0xD02688)        /**< Large font background color */
-#define os_TextFGcolor       (*(uint16_t*)0xD0268A)        /**< Large font foreground color */
+#define os_TextFGColor       (*(uint16_t*)0xD02688)        /**< Large font foreground color */
+#define os_TextBGColor       (*(uint16_t*)0xD0268A)        /**< Large font background color */
 
 #define os_DrawBGColor       (*(uint16_t*)0xD026AA)        /**< Small font background color */
 #define os_DrawFGColor       (*(uint16_t*)0xD026AC)        /**< Small font foreground color */
