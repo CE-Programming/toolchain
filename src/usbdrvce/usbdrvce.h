@@ -196,8 +196,8 @@ typedef enum usb_transfer_status {
 typedef enum usb_device_flags {
   USB_IS_DISABLED = 1 << 0, /**< Device is disabled.                          */
   USB_IS_ENABLED  = 1 << 1, /**< Device is enabled.                           */
-  USB_IS_DEVICES  = 1 << 2, /**< Device is not a hub.                         */
-  USB_IS_HUBS     = 1 << 3, /**< Device is a hub.                             */
+  USB_IS_DEVICE   = 1 << 2, /**< Device is not a hub.                         */
+  USB_IS_HUB      = 1 << 3, /**< Device is a hub.                             */
 } usb_device_flags_t;
 
 typedef enum usb_find_device_flags {
