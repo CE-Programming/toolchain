@@ -8,7 +8,6 @@ DESCRIPTION ?= "CE C Toolchain Demo"
 COMPRESSED ?= NO
 ARCHIVED ?= NO
 # HAS_FLASH_FUNCTIONS ?= NO
-OUTPUT_MAP ?= YES
 
 CFLAGS ?= -Os -mllvm -inline-threshold=100 -Wall -Wextra
 CXXFLAGS ?= -Os -mllvm -inline-threshold=100 -Wall -Wextra
