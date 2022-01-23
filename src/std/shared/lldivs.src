@@ -1,10 +1,23 @@
 	assume	adl=1
 
+	public	__llrems
+__llrems:
+
+	scf
+virtual
+	jr	nc, $ + 2
+	load .jr_nc: 1 from $$
+end virtual
+	db	.jr_nc
+
 	public	__lldivs
 __lldivs:
 
-	push	af
+	or	a, a
+
 	push	iy
+	push	af
+
 	ld	iy, 2
 	add	iy, sp
 
@@ -36,22 +49,29 @@ __lldivs:
 	xor	a, b
 	ld	(iy + 15), a
 
+	pop	af
+	push	af
 	ld	a, b
+	jr	nc, .rem_save_sign_skip
+	ld	(iy + 15), a
+.rem_save_sign_skip:
+
 	add	a, a
 	call	c, __llneg
 
 	call	__lldvrmu.hijack
 
+	pop	af
+	jr	c, .div_quotient_skip
 	ld	hl, (iy + 15)
 	ld	de, (iy + 18)
 	ld	bc, (iy + 21)
+.div_quotient_skip:
 
-	ld	a, (iy + 23)
-	add	a, a
-	call	c, __llneg
+	bit	7, (iy + 23)
+	call	nz, __llneg
 
 	pop	iy
-	pop	af
 
 	ret
 

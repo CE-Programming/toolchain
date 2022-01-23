@@ -3,8 +3,8 @@
 	public	__lldivu
 __lldivu:
 
-	push	af
 	push	iy
+	push	af
 
 	call	__lldvrmu
 
@@ -12,8 +12,8 @@ __lldivu:
 	ld	de, (iy + 18)
 	ld	bc, (iy + 21)
 
-	pop	iy
 	pop	af
+	pop	iy
 
 	ret
 

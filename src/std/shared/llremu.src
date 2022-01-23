@@ -3,13 +3,13 @@
 	public	__llremu
 __llremu:
 
-	push	af
 	push	iy
+	push	af
 
 	call	__lldvrmu
 
-	pop	iy
 	pop	af
+	pop	iy
 
 	ret
 
