@@ -4,27 +4,39 @@
 __lldvrmu:
 ; Atrociously slow.
 
-	push	af
+	ld	iy, 5
+	add	iy, sp
+	public	__lldvrmu.hijack
+.hijack:
 
 	ld	a, i
 	di
-	ex	af, af'
-
-	ld	iy, 8
-	add	iy, sp
+	push	af
 
 	push	bc
 	push	de
 	push	hl
+; Stack frame:
+; iy - 17 -> divisor
+; iy - 14 -> divisor >> 24
+; iy - 11 -> divisor >> 48
+; iy -  8 -> interrupts state
+; iy -  5 -> return vector
+; iy -  2 -> ???
+; iy +  1 -> ???
+; iy +  4 -> ???
+; iy +  7 -> dividend
+; iy + 10 -> dividend >> 24
+; iy + 13 -> dividend >> 48
 
-	ld	bc, (iy + 7)
+	ld	bc, (iy + 10)
 	sbc	hl, hl
 	ex	de, hl
 	sbc	hl, hl
 	exx
-	ld	hl, (iy + 10)
+	ld	hl, (iy + 13)
 	ex.s	de, hl
-	ld	hl, (iy + 4)
+	ld	hl, (iy + 7)
 	ld	sp, hl
 	sbc	hl, hl
 
@@ -68,22 +80,28 @@ __lldvrmu:
 
 	adc	a, a
 	cpl
-	ld	(iy + 12), a
+	ld	(iy + 15), a
 
 	dec	c
 	jr	nz, .byte_loop
 
 	ld	sp, iy
+; Stack frame:
+; iy      -> interrupts state
+; iy +  3 -> return vector
+; iy +  6 -> ???
+; iy +  9 -> ???
+; iy + 12 -> ???
+; iy + 15 -> dividend
+; iy + 18 -> dividend >> 24
+; iy + 21 -> dividend >> 48
 
 	push	hl
 	exx
 	pop	bc
 
-	ex	af, af'
-	jp	po, .ei_skip
-	ei
-.ei_skip:
-
 	pop	af
+	ret	po
+	ei
 
 	ret

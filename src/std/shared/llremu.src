@@ -2,9 +2,15 @@
 
 	public	__llremu
 __llremu:
+
+	push	af
 	push	iy
+
 	call	__lldvrmu
+
 	pop	iy
+	pop	af
+
 	ret
 
 	extern	__lldvrmu
