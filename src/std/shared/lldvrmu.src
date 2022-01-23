@@ -22,7 +22,8 @@ __lldvrmu:
 	ex	de, hl
 	sbc	hl, hl
 	exx
-	ld	de, (iy + 10)
+	ld	hl, (iy + 10)
+	ex.s	de, hl
 	ld	hl, (iy + 4)
 	ld	sp, hl
 	sbc	hl, hl
