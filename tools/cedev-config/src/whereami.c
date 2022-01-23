@@ -55,7 +55,8 @@ extern "C" {
 #pragma warning(push, 3)
 #endif
 #include <windows.h>
-#include <intrin.h>
+// My build environment can't find this file. Seems to build fine without it?
+// #include <intrin.h>
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
