@@ -252,17 +252,18 @@ DEFINE_BINOP_TYPE(u)
 
 static void testUnOp(const UnOp *op, int64_t x)
 {
+    unsigned lhsLength = 8;
     unsigned nameLength = strlen(op->name);
-    unsigned prefixLength = 2;
-    unsigned lhsLength = nameLength + prefixLength;
+    unsigned prefixLength = lhsLength - nameLength;
 
-    x_printf("%*s=%016llX\n\n", lhsLength, "x", (unsigned long long)x);
+    x_printf("%*s=%016llX\n\n", lhsLength, "x", (long long)x);
 
-#define TEST_UNOP(prefix, bits)                                                                                                                         \
-    if (op->prefix)                                                                                                                                     \
-    {                                                                                                                                                   \
-        unsigned digits = (bits + 3) / 4;                                                                                                               \
-        x_printf("\n%2s%s=%*s%0*llX", #prefix, op->name, 16 - digits, "", digits, (unsigned long long)(op->prefix)(x) & ((1ULL << (bits - 1) << 1) - 1)); \
+#define TEST_UNOP(prefix, bits)                                                                          \
+    if (op->prefix)                                                                                      \
+    {                                                                                                    \
+        unsigned digits = (bits + 3) / 4;                                                                \
+        unsigned long long result = (op->prefix)(x) & ((1ULL << (bits - 1) << 1) - 1);                   \
+        x_printf("\n%*s%s=%*s%0*llX", prefixLength, #prefix, op->name, 16 - digits, "", digits, result); \
     }
 
     TEST_UNOP(b, 8)
@@ -276,17 +277,18 @@ static void testUnOp(const UnOp *op, int64_t x)
 
 static void testBinOp(const BinOp *op, int64_t x, int64_t y)
 {
+    unsigned lhsLength = 8;
     unsigned nameLength = strlen(op->name);
-    unsigned prefixLength = 2;
-    unsigned lhsLength = nameLength + prefixLength;
+    unsigned prefixLength = lhsLength - nameLength;
 
-    x_printf("%*s=%016llX\n%*s=%016llX\n", lhsLength, "x", (unsigned long long)x, lhsLength, "y", (unsigned long long)y);
+    x_printf("%*s=%016llX\n%*s=%016llX\n", lhsLength, "x", (long long)x, lhsLength, "y", (long long)y);
 
-#define TEST_BINOP(prefix, bits)                                                                                                                           \
-    if (op->prefix)                                                                                                                                        \
-    {                                                                                                                                                      \
-        unsigned digits = (bits + 3) / 4;                                                                                                                  \
-        x_printf("\n%2s%s=%*s%0*llX", #prefix, op->name, 16 - digits, "", digits, (unsigned long long)(op->prefix)(x, y) & ((1ULL << (bits - 1) << 1) - 1)); \
+#define TEST_BINOP(prefix, bits)                                                                         \
+    if (op->prefix)                                                                                      \
+    {                                                                                                    \
+        unsigned digits = (bits + 3) / 4;                                                                \
+        unsigned long long result= (op->prefix)(x, y) & ((1ULL << (bits - 1) << 1) - 1);                 \
+        x_printf("\n%*s%s=%*s%0*llX", prefixLength, #prefix, op->name, 16 - digits, "", digits, result); \
     }
 
     TEST_BINOP(b, 8)
