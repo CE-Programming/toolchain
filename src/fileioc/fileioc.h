@@ -97,7 +97,7 @@ int ti_Close(ti_var_t slot);
  * Returns the name of the file(s) that contains the string as the first part of the variable;
  * which can then be used with ti_Open and other functions.
  *
- * \p seach_pos should be set to NULL to begin a search, and is updated with each call.
+ * \p search_pos should be set to NULL to begin a search, and is updated with each call.
  *
  * @code
  *  char *var_name;
@@ -117,7 +117,7 @@ char *ti_Detect(void **curr_search_posistion, const char *detection_string);
  * Returns the name of the file(s) that contains the string as the first part of the variable;
  * which can then be used with ti_OpenVar and other functions.
  *
- * \p seach_pos should be set to NULL to begin a search, and is updated with each call.
+ * \p search_pos should be set to NULL to begin a search, and is updated with each call.
  *
  * @code
  *  char *var_name;
@@ -138,7 +138,7 @@ char *ti_DetectVar(void **curr_search_posistion, const char *detection_string, u
  * Returns the name of the file(s) that contains the string as the first part of the variable;
  * which can then be used with ti_OpenVar and other functions.
  *
- * \p seach_pos should be set to NULL to begin a search, and is updated with each call.
+ * \p search_pos should be set to NULL to begin a search, and is updated with each call.
  *
  * @code
  *  char *var_name;
