@@ -786,7 +786,7 @@ size_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
  * @param descriptor Returns the fetched descriptor.
  * @param length The maximum number of bytes to receive.
  * The \p descriptor buffer must be at least this large.
- * @param transferred Returns the number of bytes actually received.
+ * @param transferred NULL or returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
@@ -841,7 +841,7 @@ usb_SetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,     \
  * @param descriptor Returns the fetched descriptor.
  * @param length The number of bytes to transfer.
  * The \p descriptor buffer must be at least this large.
- * @param transferred Returns the number of bytes actually received.
+ * @param transferred NULL or returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t index,
@@ -1044,8 +1044,7 @@ unsigned usb_GetFrameNumber(void);
  * least \p setup->wLength bytes.
  * @param retries How many times to retry the transfer before timing out.
  * If retries is USB_RETRY_FOREVER, the transfer never times out.
- * @param transferred Returns the number of bytes actually transferred.
- * If \p transferred is NULL then nothing is returned.
+ * @param transferred NULL or returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t
@@ -1065,8 +1064,7 @@ usb_ControlTransfer(usb_endpoint_t endpoint, const usb_control_setup_t *setup,
  * setup->wLength bytes.
  * @param retries How many times to retry the transfer before timing out.
  * If retries is USB_RETRY_FOREVER, the transfer never times out.
- * @param transferred Returns the number of bytes actually transferred.
- * NULL means don't return anything.
+ * @param transferred NULL or returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 #define /*usb_error_t */                                                 \
@@ -1093,7 +1091,7 @@ usb_DefaultControlTransfer(/*usb_device_t */device,                      \
  * usb host where the \c wLength of the setup packet is used instead.
  * @param retries How many times to retry the transfer before timing out.
  * If retries is USB_RETRY_FOREVER, the transfer never times out.
- * @param transferred Returns the number of bytes actually transferred.
+ * @param transferred NULL or returns the number of bytes actually received.
  * NULL means don't return anything.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
@@ -1166,7 +1164,6 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  * @param length Number of bytes to transfer.  The \p buffer must be at least
  * this large.  However, this is ignored for control transfers when acting as
  * usb host where the \c wLength of the setup packet is used instead.
- * @param transferred Returns the number of bytes actually transferred.
  * @param handler Function to be called when the transfer finishes.
  * @param data Opaque pointer to be passed to the \p handler.
  * @return USB_SUCCESS if the transfer was scheduled or an error.
