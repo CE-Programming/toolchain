@@ -53,7 +53,7 @@ Finally, copy the previously downloaded `fasmg` and `ez80-clang` executables to 
 Windows
 ~~~~~~~
 
-Get `MinGW <http://www.mingw.org>`_.
+Get `MinGW <https://osdn.net/projects/mingw/>`_.
 The only required pacakges are `mingw32-base` and `mingw32-gcc-g++`.
 Make sure the `MinGW\\bin` directory is in the system's PATH environment variable.
 
