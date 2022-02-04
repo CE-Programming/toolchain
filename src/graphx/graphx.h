@@ -93,17 +93,17 @@ typedef struct {
  * <a href="https://github.com/mateoconlechuga/convimg" target="_blank">convimg</a>.
  */
 typedef struct {
-    uint8_t width;   /**< Width of the image.  */
-    uint8_t height;  /**< Height of the image. */
-    uint8_t data[]; /**< Image data array.    */
+    uint8_t width; /**< Width of the image. */
+    uint8_t height; /**< Height of the image. */
+    uint8_t data[]; /**< Image data array. */
 } gfx_rletsprite_t;
 
 /**
  * @brief A structure for working with 2D points.
  */
 typedef struct {
-    int x; /**< x point.  */
-    int y; /**< y point.  */
+    int x; /**< x point. */
+    int y; /**< y point. */
 } gfx_point_t;
 
 /**
@@ -174,7 +174,7 @@ gfx_AllocSprite(width, height, malloc)
  * @param name Name of declared <tt>gfx_sprite_t *</tt>.
  * @param width Sprite width.
  * @param height Sprite height.
- * @see gfx_MallocSprite
+ * @see gfx_MallocSprite()
  */
 #define gfx_UninitedSprite(name, width, height) \
 uint8_t name##_data[2 + (width) * (height)]; \
@@ -196,7 +196,7 @@ gfx_sprite_t *name = (gfx_sprite_t *)name##_data
  * @param name Name of declared <tt>gfx_sprite_t *</tt>.
  * @param width Sprite width.
  * @param height Sprite height.
- * @see gfx_MallocSprite
+ * @see gfx_MallocSprite()
  */
 #define gfx_TempSprite(name, width, height) \
 uint8_t name##_data[2 + (width) * (height)] = { (width), (height) }; \
@@ -260,7 +260,7 @@ gfx_sprite_t *name = (gfx_sprite_t *)name##_data
  *
  * @param data_size (Maximum) sprite data size.
  * @return A pointer to the allocated sprite, or NULL if the allocation failed.
- * @see gfx_AllocRLETSprite
+ * @see gfx_AllocRLETSprite()
  */
 #define gfx_MallocRLETSprite(data_size) \
 gfx_AllocRLETSprite(data_size, malloc)
@@ -281,7 +281,7 @@ gfx_AllocRLETSprite(data_size, malloc)
  *
  * @param name Name of declared <tt>gfx_rletsprite_t *</tt>.
  * @param data_size (Maximum) sprite data size.
- * @see gfx_MallocRLETSprite
+ * @see gfx_MallocRLETSprite()
  */
 #define gfx_UninitedRLETSprite(name, data_size) \
 uint8_t name##_data[2 + (data_size)]; \
