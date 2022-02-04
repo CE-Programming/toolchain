@@ -156,7 +156,7 @@ static void move_to_nearby_device(usb_device_t *device)
     }
 }
 
-__attribute__((noinline)) static void gui_draw(struct gui *gui)
+static void gui_draw(struct gui *gui)
 {
     int y = 0;
     usb_device_t device = NULL;
