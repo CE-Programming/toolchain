@@ -8,8 +8,8 @@ DESCRIPTION = "CE C Toolchain Demo"
 COMPRESSED = NO
 ARCHIVED = NO
 
-CFLAGS = -Wall -Wextra -Oz -DLINKLIB_KEY='"$(NAME)"'
-CXXFLAGS = -Wall -Wextra -Oz -DLINKLIB_KEY='"$(NAME)"'
+CFLAGS = -Wall -Wextra -Oz -DLINKLIB_KEY="\"$(NAME)\""
+CXXFLAGS = -Wall -Wextra -Oz -DLINKLIB_KEY="\"$(NAME)\""
 
 # ----------------------------
 

@@ -9,7 +9,7 @@
 #define DEFAULT_LANGID 0x0409
 
 #ifndef LINKLIB_KEY
-# warning Please add -DLINKLIB_KEY='"<unique string>"' to your makefile's CFLAGS
+# warning Please add -DLINKLIB_KEY="\"<unique string>\"" to your makefile's CFLAGS
 # define LINKLIB_KEY "LinkLib program compiled on " __DATE__ " at " __TIME__
 #endif
 
