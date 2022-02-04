@@ -36,21 +36,25 @@ Building Programs
 Programs are built with the :code:`make` command, executed from a terminal session.
 This tutorial explains how to use the CE C Toolchain to build programs using :code:`make`.
 
-.. warning::
-
-    On Windows, you may need to install the latest Microsoft Visual C++ Redistributable package if you encounter errors such as :code:`Missing vcruntime140.dll`.
-    The download can be found `at this link <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_, depending on your computer you will need to install one of *vc_redist.x86.exe*, *vc_redist.x64.exe*, or *vc_redist.arm64.exe*.
-
-    Additionally, your antivirus software (e.g. Windows Defender) may flag binaries in the :code:`CEdev/bin` directory as false positives, and either quarantine the files or prevent them from running.
-    It is recommended you whitelist or disable scanning in :code:`CEdev/bin` to prevent these false positives from occurring.
-
-Locate the installed `CEdev` folder, and open a session by double-clicking :code:`cedev.bat` on Windows or launching your favorite terminal on Linux/macOS.
+Locate the installed `CEdev` folder, and open a build session by double-clicking :code:`cedev.bat` on Windows or launching your favorite terminal on Linux/macOS.
 Navigate to the `examples` folder using the :code:`cd examples` command.
 This folder contains example projects that you can build and modify to learn how to write CE C programs.
 Navigate the to the `hello_world` example inside this folder using the command :code:`cd hello_world`.
 
 Type :code:`make` and press enter.
-This command invokes the compiler and creates a file called :code:`bin/DEMO.8xp`, which stores the program's machine code.
+This command invokes the compiler, assembler, and linker creating the file :code:`bin/DEMO.8xp`.
+The file stores the machine code of the program in a format fit for the calculator.
+
+.. note::
+
+    On Windows, you may need to install the latest Microsoft Visual C++ Redistributable package if you encounter errors such as :code:`Missing vcruntime140.dll`.
+    The download can be found `at this link <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_, depending on your computer you will need to install one of *vc_redist.x86.exe*, *vc_redist.x64.exe*, or *vc_redist.arm64.exe*.
+
+.. caution::
+
+    On Windows, your antivirus software (e.g. Windows Defender) may flag binaries in the :code:`CEdev/bin` directory as false positives, and either quarantine/remove the files or prevent them from running.
+    This may result in errors such as being unable find/run the `fasmg` program when building.
+    It is recommended you whitelist or disable scanning in :code:`CEdev/bin` to prevent these false positives from occurring.
 
 The `CEmu <https://ce-programming.github.io/CEmu>`_ emulator can be used to run the program, or you can transfer it to a real calculator using the cross-platform `TI Connect CE <https://education.ti.com/en/us/products/computer_software/connectivity-software/ti-connect-ce-software/tabs/overview>`_.
 

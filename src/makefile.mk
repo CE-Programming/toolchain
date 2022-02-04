@@ -70,7 +70,7 @@ BIN ?= $(CEDEV_TOOLCHAIN)/bin
 ifeq ($(OS),Windows_NT)
 SHELL = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
-FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg.exe)
+FASMG = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg.exe)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
@@ -80,7 +80,7 @@ NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG = "$(subst ",',$1)"#'
 else
 NATIVEPATH = $(subst \,/,$1)
-FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg)
+FASMG = $(call NATIVEPATH,$(BIN)/fasmg)
 CONVBIN = $(call NATIVEPATH,$(BIN)/convbin)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang)
@@ -225,7 +225,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
 $(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONSRC) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [linking] $(call NATIVEPATH,$@)
-	$(Q)$(FASMGLD) $(FASMGFLAGS) $(call NATIVEPATH,$@)
+	$(Q)$(FASMG) $(FASMGFLAGS) $(call NATIVEPATH,$@)
 
 ifneq ($(ICONSRC),)
 $(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)

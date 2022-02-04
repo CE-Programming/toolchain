@@ -544,7 +544,7 @@ typedef unsigned int useconds_t;
  * Currently, no errors are possible.
  *
  * @param usec number of microseconds
- * @return 0 on success, or -1 on error, with ::errno set to indicate the error
+ * @return 0 on success, or -1 on error, with \c errno set to indicate the error
  * @see delay
  * @see sleep
  * @see useconds_t
@@ -1252,8 +1252,8 @@ real_t os_RealRound(const real_t *arg, char digits);
  *
  * @param arg1 Real variable 1.
  * @param arg2 Real variable 2.
- * @returns -1, 0, or 1 if arg1 is less than, equal to, or greater than arg2
- * @note \c{os_RealCompare(arg1, arg2) op 0} computes \c{arg1 op arg2} for any comparison operator \c op
+ * @returns -1, 0, or 1 if arg1 is less than, equal to, or greater than arg2.
+ * @note <tt>os_RealCompare(arg1, arg2) op 0</tt> computes <tt>arg1 op arg2</tt> for any comparison operator \c op.
  */
 int os_RealCompare(const real_t *arg1, const real_t *arg2);
 
