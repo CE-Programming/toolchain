@@ -2,5 +2,5 @@
 
 float exp2f(float a)
 {
-    return powf(2.0, a);
+    return expf(a * M_LOG2E);
 }

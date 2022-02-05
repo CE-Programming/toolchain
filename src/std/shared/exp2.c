@@ -2,5 +2,5 @@
 
 double exp2(double a)
 {
-    return pow(2.0, a);
+    return exp(a * M_LOG2E);
 }
