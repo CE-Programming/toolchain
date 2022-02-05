@@ -49,7 +49,7 @@ Sample Implementation
 A brief summation of the paritial redraw using graphx is:
 
 * Allocate space for a temporary sprite.
-* When the background is drawn, a small copy of it is saved to the temporary spirte.
+* When the background is drawn, a small copy of it is saved to the temporary sprite.
 * After the background is drawn, the sprite is drawn as normal.
 * Upon movement, the sprite is erased using the temporary sprite and the coordinates are updated.
 * The section of background with the updated coordinates is stored to the temporary sprite and the process repeated.
