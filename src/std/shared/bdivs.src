@@ -1,44 +1,21 @@
-; (c) Copyright 2001-2008 Zilog Inc.
-;-------------------------------------------------------------------------
-; Signed Byte Division. 
-; Input:
-;	Operand1: 
-;		  B : 8 bit dividend (numerator)
-;
-;	Operand2: 
-;		  C : 8 bit divisor (denominator)
-;
-; Output:
-;	Result:   A : 8 bit quotient
-; Registers Used:
-;	d, e
-;-------------------------------------------------------------------------
-        assume  adl=1
-
-	public	__bdivs	
+	public	__bdivs
 __bdivs:
-	push	bc
-	xor	a,a
-	sub	a,b
-	jp	m,_L0
-	ld	b,a
-_L0:
-	xor	a,a
-	sub	a,c
-	jp	m,_L1
-	ld	c,a
-_L1:
-	call	__bdivu
-	pop	bc
+; I: B=dividend, C=divisor
+; O: a=B/C
+
 	push	hl
-	ld	l,a
-	ld	a,b
-	xor	a,c
-	ld	a,l
-	jp	p,_L2
-	neg
-_L2:
+
+	call	__brem_common
+
+	ld	a, c
+	xor	a, b
+
+	ld	a, l
 	pop	hl
+	ret	p
+
+	neg
 	ret
 
-	extern	__bdivu
+
+	extern	__bdvrmu

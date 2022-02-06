@@ -1,0 +1,26 @@
+	public	__brem_common
+__brem_common:
+; I: B=dividend, C=divisor
+; O: a=abs(B)%abs(C), h=?, l=abs(B)/abs(C)
+
+	push	bc
+
+	xor	a, a
+	sub	a, b
+	jp	m, .neg_dividend_skip
+	ld	b, a
+.neg_dividend_skip:
+
+	xor	a, a
+	sub	a, c
+	jp	m, .neg_divisor_skip
+	ld	b, c
+.neg_divisor_skip:
+
+	call	__bdvrmu
+
+	pop	bc
+	ret
+
+
+	extern	__bdvrmu
