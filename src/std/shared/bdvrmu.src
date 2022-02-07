@@ -4,6 +4,8 @@ __bdvrmu:
 ; O: a=B%C, b=0, h=?, l=B/C
 
 	ld	l, b
+	ld	h, 0
+
 	ld	b, 8
 
 .loop:
