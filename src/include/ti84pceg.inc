@@ -1784,8 +1784,8 @@ namespace ti?
 ?os.PopErrorHandler        := 0021C7Ch
 ?os.ThrowError             := 0021C80h
 ?os.RealCopy               := 0021C84h
-?os.RealAsinRad            := 0021C88h
-?os.RealAcosRad            := 0021C8Ch
+?os.RealAcosRad            := 0021C88h
+?os.RealAsinRad            := 0021C8Ch
 ?os.RealAtanRad            := 0021C90h
 ?os.RealAdd                := 0021C94h
 ?os.CplxAdd                := 0021C98h
@@ -2102,14 +2102,14 @@ namespace ti?
 ?os.RealToFloat            := 0022174h
 ?os.FontDrawTransText      := 0022178h
 ?os.DelAppVar              := 002217Ch
-?os.GetAppVarDataPtr       := 0022180h
+?os.GetAppVarData          := 0022180h
 ?os.CreateAppVar           := 0022184h
 ;                          equ 0022188h
 ;                          equ 002218Ch
 ;                          equ 0022190h
 ;                          equ 0022194h
 ?os.CreateString           := 0022198h
-?os.GetStringDataPtr       := 002219Ch
+?os.GetStringData          := 002219Ch
 ;                          equ 00221A0h
 ;                          equ 00221A4h
 ;                          equ 00221A8h
@@ -2133,6 +2133,25 @@ namespace ti?
 ;                          equ 00221F0h
 ;                          equ 00221F4h
 ;                          equ 00221F8h
+;                          equ 00221FCh
+;                          equ 0022200h
+;                          equ 0022204h
+;                          equ 0022208h
+;                          equ 002220Ch
+;                          equ 0022210h
+;                          equ 0022214h
+;                          equ 0022218h
+;                          equ 002221Ch
+;                          equ 0022220h
+;                          equ 0022224h
+;                          equ 0022228h
+;                          equ 002222Ch
+;                          equ 0022230h
+;                          equ 0022234h
+;                          equ 0022238h
+;                          equ 002223Ch
+?os.CreateEquation         := 0022240h
+?os.GetEquationData        := 0022244h
 
 ; Boot Calls
 ;-----------------------------------
@@ -5762,7 +5781,7 @@ namespace ti?
 ?tCubicR			:= 2Eh
 ?tQuartR			:= 2Fh
 
-;Number Tokens 
+;Number Tokens
 ;---------------------------------------
 ?NUMS			:= 30h
 ;
