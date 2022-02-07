@@ -5,7 +5,7 @@ __bdivs:
 
 	push	hl
 
-	call	__brem_common
+	call	__bdvrms_common
 
 	ld	a, c
 	xor	a, b

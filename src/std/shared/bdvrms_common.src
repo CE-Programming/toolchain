@@ -1,5 +1,5 @@
-	public	__brem_common
-__brem_common:
+	public	__bdvrms_common
+__bdvrms_common:
 ; I: B=dividend, C=divisor
 ; O: a=abs(B)%abs(C), h=?, l=abs(B)/abs(C)
 

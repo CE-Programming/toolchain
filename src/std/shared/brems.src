@@ -5,7 +5,7 @@ __brems:
 
 	push	hl
 
-	call	__brem_common
+	call	__bdvrms_common
 
 	bit	7, b
 
@@ -16,4 +16,4 @@ __brems:
 	ret
 
 
-	extern	__brem_common
+	extern	__bdvrms_common
