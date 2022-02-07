@@ -1,8 +1,9 @@
 ; double cos(double arg);
 	assume	adl=1
 
-	public	_cosf, _cos
-_cos := _cosf
+	section	.text
+	public	_cos, _cosf
+_cos:
 _cosf:
 	call	__frameset0
 	ld	hl,(ix+6)

@@ -3,6 +3,7 @@
 ; ---
 	assume	adl=1
 
+	section	.text
 	public	_atomic_load_decreasing_32
 _atomic_load_decreasing_32:
 	pop	hl

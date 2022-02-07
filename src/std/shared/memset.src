@@ -1,6 +1,7 @@
 ; void *memset(void *dest, int c, size_t count);
 	assume	adl=1
 
+	section	.text
 	public	_memset
 _memset:
 	pop	iy

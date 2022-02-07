@@ -1,8 +1,8 @@
 	assume	adl=1
 
-	public	_copysignf, _copysign
-
-_copysign := _copysignf
+	section	.text
+	public	_copysign, _copysignf
+_copysign:
 _copysignf:
 	pop	bc
 	pop	hl

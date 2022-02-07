@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	_log2
 _log2:
 	call	__frameset0

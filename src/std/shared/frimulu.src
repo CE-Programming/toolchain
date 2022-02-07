@@ -3,10 +3,10 @@
 ; fract interger Multiplication Unsigned.
 ;
 ; Input:
-;	Operand1: 
+;	Operand1:
 ;		  uHL : 24 bits
 ;
-;	Operand2: 
+;	Operand2:
 ;		  uBC : 24 bits
 ;
 ; Output:
@@ -16,6 +16,7 @@
 ;-------------------------------------------------------------------------
 	assume	adl=1
 
+	section	.text
 	public	__frimulu
 __frimulu:
 	push	af
@@ -65,7 +66,7 @@ _L1:
 	ld	l,a
 	ld	a,h
 	adc	a,0h
-	ld	h,a	
+	ld	h,a
 
 	add.s	hl,de
 	jr	nc,_L2

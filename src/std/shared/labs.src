@@ -1,6 +1,7 @@
 ; long labs(long j);
 	assume	adl=1
 
+	section	.text
 	public	_labs
 _labs:
 	call	__frameset0

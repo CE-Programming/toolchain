@@ -2,19 +2,20 @@
 ;-------------------------------------------------------------------------
 ; Signed Byte Modulus
 ; Input:
-;	Operand1: 
+;	Operand1:
 ;		  A : 8 bit dividend (numerator)
 ;
-;	Operand2: 
+;	Operand2:
 ;		  C : 8 bit divisor (denominator)
 ;
 ; Output:
 ;	Result:   A : 8 bit modulus
 ; Registers Used:
-;	
+;
 ;-------------------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	__brems
 __brems:
 	push	bc

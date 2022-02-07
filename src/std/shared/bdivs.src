@@ -1,11 +1,11 @@
 ; (c) Copyright 2001-2008 Zilog Inc.
 ;-------------------------------------------------------------------------
-; Signed Byte Division. 
+; Signed Byte Division.
 ; Input:
-;	Operand1: 
+;	Operand1:
 ;		  B : 8 bit dividend (numerator)
 ;
-;	Operand2: 
+;	Operand2:
 ;		  C : 8 bit divisor (denominator)
 ;
 ; Output:
@@ -15,7 +15,8 @@
 ;-------------------------------------------------------------------------
         assume  adl=1
 
-	public	__bdivs	
+	section	.text
+	public	__bdivs
 __bdivs:
 	push	bc
 	xor	a,a

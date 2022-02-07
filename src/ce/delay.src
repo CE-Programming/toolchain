@@ -2,12 +2,11 @@
 
 	assume	adl=1
 
-if 0
 ; Minimal caller code (for timing calculation).
 	call	_delay
 ; ^ 22 cc
-end if
 
+	section	.text
 	public	_delay
 _delay:
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.

@@ -1,5 +1,6 @@
 	assume	adl = 1
 
+	section	.text
 	public	_getchar
 _getchar:
 	call	_inchar

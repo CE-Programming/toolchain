@@ -156,7 +156,7 @@ The image :code:`oiram.png` is the sprite that wants to be converted, and :code:
 
 Open :code:`convimg.yaml` in a text editor, which contains the below lines.
 Run the command :code:`convimg --help`. This outputs the readme for convimg, and what each of the various commands do.
-You can also find the readme online, available `here <https://github.com/mateoconlechuga/convimg/blob/master/README.md>`_. 
+You can also find the readme online, available `here <https://github.com/mateoconlechuga/convimg/blob/master/README.md>`_.
 
 .. code-block:: yaml
 

@@ -2,28 +2,28 @@
 ;-------------------------------------------------------------------------
 ; Byte Shift Right Signed
 ; Input:
-;	Operand1: 
+;	Operand1:
 ;                 A : 8 bit number to shift
-;	Operand2: 
+;	Operand2:
 ;                 B : 8 bit shift count
 ;
 ; Output:
-;       Result:   A : 8 bit 
+;       Result:   A : 8 bit
 ; Registers Used:
 ;       flags
 ;-------------------------------------------------------------------------
-        assume  adl=1
+	assume  adl=1
 
-        public	__bshrs
+	public	__bshrs
 __bshrs:
-        push	bc
-        inc	b
-        jr      test
+	push	bc
+	inc	b
+	jr	test
 
 loop:
-        sra     a
+	sra	a
 test:
-       	djnz	loop
+	djnz	loop
 
 	pop	bc
 	ret

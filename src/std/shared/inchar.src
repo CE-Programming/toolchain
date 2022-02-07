@@ -1,5 +1,6 @@
 	assume	adl = 1
 
+	section	.text
 	weak	_inchar
 _inchar:
     	ld	iy,$d00080	; ti.flags

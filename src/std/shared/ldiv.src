@@ -2,11 +2,12 @@
 ;-------------------------------------------------------------------------
 ; 	ldiv function
 ;
-;	ldiv_t ldiv(long numer, long denom); 
+;	ldiv_t ldiv(long numer, long denom);
 ;
 ;-------------------------------------------------------------------------
 	assume	adl=1
 
+	section	.text
 	public	_ldiv
 _ldiv:
 

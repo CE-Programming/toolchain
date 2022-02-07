@@ -6,7 +6,8 @@
 ; }
 	assume	adl=1
 
-	public	_isgraph	
+	section	.text
+	public	_isgraph
 _isgraph:
 	pop	hl
 	pop	de

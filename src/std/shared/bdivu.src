@@ -1,11 +1,11 @@
 ; (c) Copyright 2007-2008 Zilog, Inc.
 ;-------------------------------------------------------------------------
-; Unsigned Byte Division. 
+; Unsigned Byte Division.
 ; Input:
-;	Operand1: 
+;	Operand1:
 ;		  B : 8 bit dividend (numerator x)
 ;
-;	Operand2: 
+;	Operand2:
 ;		  C : 8 bit divisor (denominator y)
 ;
 ; Output:
@@ -15,13 +15,14 @@
 ;-------------------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	__bdivu
 __bdivu:
 	push	bc
 	push	hl
 	ld	h,b
 	xor	a,a
-	ld	b,8		;i = 8 (bit counter)
+	ld	b,8		; i = 8 (bit counter)
 loop:
 	sla	h
 	rla

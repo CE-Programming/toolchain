@@ -61,7 +61,7 @@ unsigned long strtoul(const char *__restrict nptr,
 
   sum = 0;
   for (;;) {
-    digit = toupper(*(cp++));	 
+    digit = toupper(*(cp++));
     if (digit >= 'A')
       digit = digit - ('A' - 10);
     else
@@ -71,7 +71,7 @@ unsigned long strtoul(const char *__restrict nptr,
     psum = sum;
     sum = sum * radix + digit;
     if (sum < psum) {	/* overflow */
-      errno = ERANGE; 
+      errno = ERANGE;
       sum = ULONG_MAX;
     }
   }

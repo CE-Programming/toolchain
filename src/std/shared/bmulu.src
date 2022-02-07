@@ -2,11 +2,11 @@
 ;-------------------------------------------------------------------------
 ; Unsigned Byte Multiply
 ; Input:
-;	Operand1: 
-;		  B : 8 bit 
+;	Operand1:
+;		  B : 8 bit
 ;
-;	Operand2: 
-;		  C : 8 bit 
+;	Operand2:
+;		  C : 8 bit
 ;
 ; Output:
 ;	Result:   A : 8 bit product
@@ -15,6 +15,7 @@
 ;-------------------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	__bmulu
 __bmulu:
 	push	bc

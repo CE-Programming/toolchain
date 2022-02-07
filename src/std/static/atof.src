@@ -1,7 +1,8 @@
 	assume	adl=1
 
-	public	_atoff, _atof
-_atof := _atoff
+	section	.text
+	public	_atof, _atoff
+_atof:
 _atoff:
 	pop	hl
 	pop	bc

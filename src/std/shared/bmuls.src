@@ -2,11 +2,11 @@
 ;-------------------------------------------------------------------------
 ; Signed Byte Multiply
 ; Input:
-;	Operand1: 
-;                 A : 8 bit 
+;	Operand1:
+;                 A : 8 bit
 ;
-;	Operand2: 
-;                 B : 8 bit 
+;	Operand2:
+;                 B : 8 bit
 ;
 ; Output:
 ;	Result:   A : 8 bit product
@@ -15,6 +15,7 @@
 ;-------------------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	__bmuls
 __bmuls:
 	push	bc

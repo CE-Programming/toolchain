@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__isinff
 __isinff:
 	call	__frameset0

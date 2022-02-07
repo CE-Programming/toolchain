@@ -1,12 +1,13 @@
-;	        Copyright 1992-2008 Zilog, Inc. 
+;	        Copyright 1992-2008 Zilog, Inc.
 ;-------------------------------------------------------------------------
 ;   Div function
 ;
 ;	div_t div(int numer,int denom);
-; 
+;
 ;-------------------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	_div
 _div:
 	push	af
@@ -35,11 +36,11 @@ _div:
 	inc	hl
 	inc	hl
 	inc	hl
-	ld	(hl),bc		 ; remainder
+	ld	(hl),bc		; remainder
 	dec	hl
 	dec	hl
 	dec	hl
-	ld	(hl),de 	;quotient
+	ld	(hl),de		; quotient
 
 	pop	de
 	pop	bc

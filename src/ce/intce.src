@@ -17,6 +17,7 @@ intLcd := $800
 intRtc := $1000
 
 ;-------------------------------------------------------------------------------
+	section	.text
 	public	_int_Initialize
 _int_Initialize:
 	di
@@ -52,6 +53,7 @@ _int_Initialize:
 	ret
 
 ;-------------------------------------------------------------------------------
+	section	.text
 	public	_int_Handler
 _int_Handler:
 	ex	af,af'
@@ -102,6 +104,7 @@ unhandledInt:
 	ret
 
 ;-------------------------------------------------------------------------------
+	section	.text
 	public	_int_SetVector
 _int_SetVector:
 	ld	iy,0
@@ -119,6 +122,7 @@ _int_SetVector:
 	ret
 
 ;-------------------------------------------------------------------------------
+	section	.text
 	public	_int_Reset
 _int_Reset:
 	di
@@ -130,13 +134,11 @@ _int_Reset:
 	ret
 
 	section	.bss
-
 	private	_lconf
 _lconf:
 	rb	16
 
 	section	.data
-
 	private	_cconf
 _cconf:
 	db	$00,$00,$00,$00	; mask

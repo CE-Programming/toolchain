@@ -3,10 +3,10 @@
 ; fract short Multiplication signed.
 ;
 ; Input:
-;	Operand1: 
+;	Operand1:
 ;		  H : 8 bits
 ;
-;	Operand2: 
+;	Operand2:
 ;		  L : 8 bits
 ;
 ; Output:
@@ -16,6 +16,7 @@
 ;-------------------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	__frbmuls
 __frbmuls:
 	push	hl

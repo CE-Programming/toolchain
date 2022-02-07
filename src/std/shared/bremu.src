@@ -2,10 +2,10 @@
 ;-------------------------------------------------------------------------
 ; Unsigned Byte Modulus
 ; Input:
-;	Operand1: 
+;	Operand1:
 ;                 A : 8 bit dividend (numerator)
 ;
-;	Operand2: 
+;	Operand2:
 ;                 C : 8 bit divisor (denominator)
 ;
 ; Output:
@@ -15,6 +15,7 @@
 ;-------------------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	__bremu
 __bremu:
 	push	bc

@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public  _strdup
 _strdup:
 	ld	hl,-3
@@ -13,8 +14,8 @@ _strdup:
 	call	_malloc
 	pop	bc
 	ld	(ix+-3),hl
-	add	hl,de 
-	or	a,a 
+	add	hl,de
+	or	a,a
 	sbc	hl,de
 	jr	z,MallocFail
 	ld	bc,(ix+6)

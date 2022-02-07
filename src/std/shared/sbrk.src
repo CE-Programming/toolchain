@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	_sbrk
 _sbrk:
 	pop	de
@@ -19,7 +22,7 @@ _sbrk:
 	ret
 
 	section	.data
-        private	__sbrkbase
+	private	__sbrkbase
 __sbrkbase:
 	dl	___heapbot
 

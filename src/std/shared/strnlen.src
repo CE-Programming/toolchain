@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	_strnlen
 _strnlen:
 	call	__frameset0

@@ -2,7 +2,7 @@
 ;
 ;	        Code Generation Helper
 ;		For the Zilog eZ80 C Compiler
-;	        Copyright 1992-2008 Zilog, Inc. 
+;	        Copyright 1992-2008 Zilog, Inc.
 ;
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
@@ -18,6 +18,7 @@
 ;--------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public	__fneg
 __fneg:
 	or	a,a

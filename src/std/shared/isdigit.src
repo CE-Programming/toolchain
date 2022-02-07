@@ -5,6 +5,7 @@
 ;}
 	assume	adl=1
 
+	section	.text
 	public	_isdigit
 _isdigit:
 	pop	hl

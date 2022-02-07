@@ -814,7 +814,7 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
 #endif
         }
 
-        format++; 
+        format++;
         break;
       }
 

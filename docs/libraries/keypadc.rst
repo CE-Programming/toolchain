@@ -51,7 +51,7 @@ The following code sets up a simple falling edge detector to catch this.
     }
     prevkey = key;
 
-Getting GetCSC codes with keypadc 
+Getting GetCSC codes with keypadc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This code returns the same keycodes that `os_GetCSC()` produces.

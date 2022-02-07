@@ -1081,7 +1081,7 @@ typedef enum {
 
 /**
  * Sets the text foreground color.
- * 
+ *
  * @param color Color index to set.
  * @returns Previous text foreground color index.
  * @note Default text foreground color index: 0.

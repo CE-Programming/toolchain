@@ -1,5 +1,13 @@
 	assume	adl=1
 
+mpTmr2Counter := 0F20010h
+mpTmrCtrl := 0F20030h
+
+bTmr2Enable := 3
+bTmr2Crystal := 4
+bTmr2Overflow := 5
+bTmr2CountUp := 10
+
 	public	_errno
 _errno := $D008DC
 
@@ -104,15 +112,6 @@ fini_functions:
 	db	"http://tiny.cc/clibs",0
 
 	section .init.clock
-
-mpTmr2Counter := 0F20010h
-mpTmrCtrl := 0F20030h
-
-bTmr2Enable := 3
-bTmr2Crystal := 4
-bTmr2Overflow := 5
-bTmr2CountUp := 10
-
 	public	___init_clock
 ___init_clock:
 ; Disable the timer and configure it to use the 32768Hz crystal timer, not

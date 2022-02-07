@@ -4,13 +4,14 @@
 ; }
 	assume	adl=1
 
+	section	.text
 	public	_isascii
 _isascii:
 	pop	de
 	pop	hl
 	push	hl
 	push	de
-	
+
 	ld	de,-128
 	add	hl,de
 	sbc	hl,hl

@@ -5,6 +5,7 @@
 ;	return(__maptab[c] & (unsigned char)(UC|LC));
 	assume	adl=1
 
+	section	.text
 	public	_isalpha
 _isalpha:
 	pop	hl

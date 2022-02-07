@@ -11,9 +11,9 @@ float atan2f(float arg1,float arg2) {
 	float satan(float);
 
 	if((arg1+arg2)==arg1) {
-		if(arg1 >= 0.) { 
+		if(arg1 >= 0.) {
 			return(pio2);
-		} else { 
+		} else {
 			return(-pio2);
 		}
 	} else if(arg2 < 0.) {

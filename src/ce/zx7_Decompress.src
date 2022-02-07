@@ -13,6 +13,7 @@
 ;
 ; uses  : af, bc, de, hl
 
+	section	.text
 	public	_zx7_Decompress
 _zx7_Decompress:
         pop     bc

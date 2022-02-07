@@ -23,6 +23,7 @@
 ;	return result;
 ; }
 
+	section	.text
 	public	_random
 _random:
 ; Read state[0] and perform state shifting.
@@ -109,7 +110,6 @@ _random:
 _MemClear := 00210E0h
 
 	section	.text
-
 	public	_srandom
 _srandom:
 	pop	bc
@@ -132,7 +132,6 @@ __setstateloop:
 	ret
 
 	section	.data
-
 	private	__state
 __state:
 	dd	0d0e0f10h,090a0b0ch,05060708h,01020304h
