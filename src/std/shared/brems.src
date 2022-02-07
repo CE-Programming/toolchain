@@ -1,10 +1,11 @@
 	public	__brems
 __brems:
-; I: B=dividend, C=divisor
-; O: a=B%C
+; I: A=dividend, C=divisor
+; O: a=A%C
 
 	push	hl
 
+	ld	b, a
 	call	__bdvrms_common
 
 	bit	7, b

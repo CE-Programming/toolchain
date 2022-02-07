@@ -1,11 +1,12 @@
 	public	__bremu
 __bremu:
-; I: B=dividend, C=divisor
-; O: a=B%C
+; I: A=dividend, C=divisor
+; O: a=A%C
 
 	push	bc
 	push	hl
 
+	ld	b, a
 	call	__bdvrmu
 
 	pop	hl
