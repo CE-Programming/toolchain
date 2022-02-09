@@ -1,0 +1,28 @@
+	public	__idvrmu
+__idvrmu:
+; I: UHL=dividend, UBC=divisor
+; O: a=0, ude=UHL/UBC, uhl=UHL%UBC
+
+	or	a, a
+	ex	de, hl
+	sbc	hl, hl
+
+	ld	a, 24
+
+.loop:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+
+	sbc	hl, bc
+	inc	e
+
+	jr	nc, .restore_skip
+	dec	e
+	add	hl, bc
+.restore_skip:
+
+	dec	a
+	jr	nz, .loop
+
+	ret

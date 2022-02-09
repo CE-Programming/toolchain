@@ -1,4 +1,4 @@
-        public  __bldiy, __bstix, __bstiy, __case, __case16, __case16D, __case24, __case24D, __case8, __case8D, __fadd, __fcmp, __fdiv, __fmul, __fppack, __frbtof, __frftob, __frftoi, __frftos, __frftoub, __frftoui, __frftous, __fritof, __frstof, __frubtof, __fruitof, __frustof, __fsub, __ftol, __idivs, __idivu, __idvrmu, __ildix, __ildiy, __imul_b, __indcall, __irems, __iremu, __ishl_b, __ishrs_b, __ishru_b, __istix, __istiy, __itol, __ldivs, __ldivu, __ldvrmu, __lldix, __lldiy, __lrems, __lremu, __lstix, __lstiy, __ltof, __sdivs, __sdivu, __seqcase, __seqcaseD, __setflag, __sldix, __sldiy, __srems, __sremu, __sshl_b, __sshrs_b, __sshru_b, __sstix, __sstiy, __stoi, __stoiu, __ultof, _longjmp, _memchr, _memcmp, _memcpy, _memmove, _setjmp, ___sprintf, _sqrtf, _strcasecmp, _strcat, _strchr, _strcmp, _strcpy, _strcspn, _strlen, _strncat, _strncmp, _strncpy, _strpbrk, _strspn, _strstr, _strtok
+        public  __bldiy, __bstix, __bstiy, __case, __case16, __case16D, __case24, __case24D, __case8, __case8D, __fadd, __fcmp, __fdiv, __fmul, __fppack, __frbtof, __frftob, __frftoi, __frftos, __frftoub, __frftoui, __frftous, __fritof, __frstof, __frubtof, __fruitof, __frustof, __fsub, __ftol, __ildix, __ildiy, __imul_b, __indcall, __ishl_b, __ishrs_b, __ishru_b, __istix, __istiy, __itol, __ldivs, __ldivu, __ldvrmu, __lldix, __lldiy, __lrems, __lremu, __lstix, __lstiy, __ltof, __sdivs, __sdivu, __seqcase, __seqcaseD, __setflag, __sldix, __sldiy, __srems, __sremu, __sshl_b, __sshrs_b, __sshru_b, __sstix, __sstiy, __stoi, __stoiu, __ultof, _longjmp, _memchr, _memcmp, _memcpy, _memmove, _setjmp, ___sprintf, _sqrtf, _strcasecmp, _strcat, _strchr, _strcmp, _strcpy, _strcspn, _strlen, _strncat, _strncmp, _strncpy, _strpbrk, _strspn, _strstr, _strtok
 __bldiy     := 0000FCh
 __bstix     := 00010Ch
 __bstiy     := 000108h
@@ -28,15 +28,10 @@ __fruitof   := 0002BCh
 __frustof   := 0002C8h
 __fsub      := 000290h
 __ftol      := 00027Ch
-__idivs     := 00013Ch
-__idivu     := 000140h
-__idvrmu    := 000144h
 __ildix     := 000148h
 __ildiy     := 00014Ch
 __imul_b    := 000150h
 __indcall   := 00015Ch
-__irems     := 00016Ch
-__iremu     := 000170h
 __ishl_b    := 000178h
 __ishrs_b   := 000180h
 __ishru_b   := 000188h

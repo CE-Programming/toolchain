@@ -88,6 +88,12 @@ __sxor		:= 000268h
 __iand		:= 000134h
 	public	__icmpzero
 __icmpzero	:= 000138h
+	public	__idivs
+__idivs		:= 00013Ch
+	public	__idivu
+__idivu		:= 000140h
+	public	__idvrmu
+__idvrmu	:= 000144h
 	public	__imuls
 __imuls		:= 000154h
 	public	__imulu
@@ -98,6 +104,10 @@ __ineg		:= 000160h
 __inot		:= 000164h
 	public	__ior
 __ior		:= 000168h
+	public	__irems
+__irems		:= 00016Ch
+	public	__iremu
+__iremu		:= 000170h
 	public	__ishl
 __ishl		:= 000174h
 	public	__ishrs

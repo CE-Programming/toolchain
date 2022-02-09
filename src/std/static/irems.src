@@ -1,0 +1,39 @@
+	public	__irems
+__irems:
+; I: UHL=dividend, UBC=divisor
+; O: uhl=UHL%UBC
+
+	push	bc
+	push	de
+
+	ex	de, hl
+
+	or	a, a
+	sbc	hl, hl
+	sbc	hl, bc
+	jp	m, .neg_divisor_skip
+	push	hl
+	pop	bc
+.neg_divisor_skip:
+
+	sbc	hl, hl
+	ccf
+	sbc	hl, de
+	inc	hl
+	jp	p, .pos_dividend_skip
+	ex	de, hl
+.pos_dividend_skip:
+
+	push	af
+
+	call	__idvrmu
+
+	pop	af
+	pop	de
+	pop	bc
+	ret	m
+	jp	__ineg
+
+
+	extern	__idvrmu
+	extern	__ineg
