@@ -1,3 +1,5 @@
+	assume	adl=1
+
 	public	__irems
 __irems:
 ; I: UHL=dividend, UBC=divisor
