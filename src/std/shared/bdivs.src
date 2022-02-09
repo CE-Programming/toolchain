@@ -18,4 +18,4 @@ __bdivs:
 	ret
 
 
-	extern	__bdvrmu
+	extern	__bdvrms_common
