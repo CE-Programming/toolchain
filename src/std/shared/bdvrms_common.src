@@ -14,7 +14,7 @@ __bdvrms_common:
 	xor	a, a
 	sub	a, c
 	jp	m, .neg_divisor_skip
-	ld	b, c
+	ld	c, a
 .neg_divisor_skip:
 
 	call	__bdvrmu
