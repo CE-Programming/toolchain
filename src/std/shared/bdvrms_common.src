@@ -6,16 +6,16 @@ __bdvrms_common:
 	push	bc
 
 	xor	a, a
-	sub	a, b
-	jp	m, .neg_dividend_skip
-	ld	b, a
-.neg_dividend_skip:
-
-	xor	a, a
 	sub	a, c
 	jp	m, .neg_divisor_skip
 	ld	c, a
 .neg_divisor_skip:
+
+	xor	a, a
+	sub	a, b
+	jp	m, .neg_dividend_skip
+	ld	b, a
+.neg_dividend_skip:
 
 	call	__bdvrmu
 
