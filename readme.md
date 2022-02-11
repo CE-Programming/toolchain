@@ -1,10 +1,10 @@
-# CE C Toolchain  [![Build Status](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?branch=llvm&event=push)](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?event=push) [![Discord Chat Link](https://img.shields.io/discord/432891584451706892?logo=discord)](https://discord.gg/TRkN5UcUzs)
+# CE C/C++ Toolchain  [![Build Status](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?branch=llvm&event=push)](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?event=push) [![Discord Chat Link](https://img.shields.io/discord/432891584451706892?logo=discord)](https://discord.gg/TRkN5UcUzs)
 
-The CE C Toolchain incorporates a variety of tools in order to build programs in C/C++ natively for the TI-84 Plus CE calculator series.
+The CE Toolchain incorporates a variety of tools in order to build programs in C/C++ natively for the TI-84 Plus CE calculator series.
 
 ## Getting Started
 
-Visit the [CE C Toolchain documentation](https://ce-programming.github.io/toolchain).
+Visit the [CE Toolchain documentation](https://ce-programming.github.io/toolchain).
 This site hosts all the information for working with the toolchain.
 
 ## Getting Help
