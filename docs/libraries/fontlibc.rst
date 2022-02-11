@@ -302,4 +302,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: fontlibc.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

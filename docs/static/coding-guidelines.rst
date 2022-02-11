@@ -3,7 +3,7 @@
 General Coding Guidelines
 =========================
 
-If you are new to the C language and are looking for some pointers to improve your coding style, this page is for you!
+If you are new to the C/C++ language and are looking for some pointers to improve your coding style, this page is for you!
 These suggestions should help you avoid common pitfalls, and make your code easier to manage.
 
 .. image:: images/code-review.jpg

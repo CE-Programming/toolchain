@@ -1,8 +1,8 @@
-Welcome to the CE C Toolchain!
-==============================
+Welcome to the CE C/C++ Toolchain!
+==================================
 
-The CE C Toolchain allows you to create incredible programs using the standard C language.
-Additionally, the CE C Libraries are used to aid in rapid development by implementing
+The CE C/C++ Toolchain allows you to create incredible programs using the standard C/C++ language.
+Additionally, the CE Libraries are used to aid in rapid development by implementing
 optimized routines for graphics, file I/O, fonts, keypad input, and more.
 
 If this is your first introduction to the CE C Toolchain, check out the :ref:`getting_started` page.

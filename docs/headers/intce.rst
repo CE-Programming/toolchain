@@ -22,4 +22,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: intce.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

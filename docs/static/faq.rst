@@ -9,8 +9,13 @@ I Found A Bug, Help!?
 Nice work, now create an `issue report here <https://github.com/CE-Programming/toolchain/issues>`_ with details on what caused the crash.
 Uploading a zip of your code and/or a minimal reproducible example is very appreciated, and will make bug fixes faster.
 
-What is the C Runtime Memory Layout?
-------------------------------------
+What versions of C/C++ are supported?
+-------------------------------------
+
+The CE Toolchain supports the latest LLVM/Clang toolchain, and the status of each language can be found at the respective links: `C <https://clang.llvm.org/c_status.html>`_, `C++ <https://clang.llvm.org/cxx_status.html>`_
+
+What is the C/C++ Runtime Memory Layout?
+----------------------------------------
 
 The CE has a limited amount of memory.
 
@@ -51,10 +56,10 @@ Now, fasmg will execute in user mode under QEMU, allowing it to successfully com
 Linking Assembly Source Files
 -----------------------------
 
-Assembly routines can be linked into a C program provided the following conditions are met:
+Assembly routines can be linked into a C/C++ program provided the following conditions are met:
 
 - The file's extension is **.asm**. It can be placed at any depth in the sources directory.
-- The routine should have a C prototype if it used externally in C.
+- The routine should have a C/C++ prototype if it used externally.
 - The assembly routine must be prefixed with an underscore, and have a corresponding `public` entry in the assembly file.
 - Any external functions called from the assembly source must be listed as being `extern`.
 

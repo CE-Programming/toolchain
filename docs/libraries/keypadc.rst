@@ -87,4 +87,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: keypadc.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain
