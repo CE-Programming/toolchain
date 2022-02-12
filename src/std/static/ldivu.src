@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	public	__ldivu
+__ldivu:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL/AUBC
+
+	call	__ldvrmu
+	ld	a, b
+	exx
+	push	bc
+	exx
+	pop	bc
+
+	ret	z
+	ei
+	ret
+
+
+	extern	__ldvrmu

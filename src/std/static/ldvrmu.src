@@ -1,0 +1,116 @@
+	assume	adl=1
+
+;C| ldiv_t _ldvrmu(uint32_t dividend, uint32_t divisor) {
+	public	__ldvrmu
+__ldvrmu:
+if 1
+; I: EUHL=dividend, AUBC=divisor
+; O: a[uhl']=EUHL%AUBC, bcu=0, b=A, c=?, euhl=EUHL/AUBC, eubc'=AUBC, zf=!IEF2
+
+;C|     ldiv_t result;
+;C|     result.quot = dividend;
+					; euhl : result.quot
+
+	push	bc
+
+	ld	c, a			; c = A
+	ld	a, i			; a = I
+					; pf = IEF2
+	di
+
+	ld	a, c			; a = A
+	exx
+	pop	bc
+	ld	e, a			; eubc' : divisor
+
+	push	af
+
+;C|     result.rem = 0;
+	xor	a, a
+	sbc	hl, hl			; auhl' : result.rem
+
+;C|     int i = 32;
+	exx
+	ld	b, 32			; b : i
+
+;C|     do {
+.loop:
+
+;C|         bool dividendBit = result.quot >> 31;
+;C|         result.quot <<= 1;
+	add	hl, hl
+	rl	e
+;C|         result.rem = (result.rem << 1) + dividendBit;
+	exx
+	adc	hl, hl
+	adc	a, a
+
+;C|         bool quotBit = result.rem < divisor;
+;C|         result.rem -= divisor;
+	sbc	hl, bc
+	sbc	a, e
+
+;C|         if (!quotBit) {
+	jr	nc, .restore_skip
+;C|         result.rem += divisor;
+	add	hl, bc
+	adc	a, e
+;C|         }
+.restore_skip:
+
+;C|         if (quotBit) {
+	exx
+	jr	c, .1_skip
+;C|             result.quot++;
+	inc	l
+;C|         }
+.1_skip:
+
+;C|     } while (--i != 0);
+	djnz	.loop
+
+;C|     return result;
+	pop	bc
+	bit	2, c
+	ret
+;C| }
+
+else
+; I: EUHL=dividend, AUBC=divisor
+; O: a=0, ude=UHL/UBC, uhl=UHL%UBC
+
+	push	ix
+	push	hl
+	ex	(sp), iy			; euiy = dividend
+
+	ld	ixl, a				; [ixl]ubc = divisor
+
+	xor	a, a
+	sbc	hl, hl				; auhl = remainder
+
+	ld	ixh, 32
+
+.loop:
+	add	iy, iy
+	rl	e
+	adc	hl, hl
+	rla
+
+	sbc	hl, bc
+	sbc	a, ixl
+	inc	iyl
+
+	jr	nc, .restore_skip
+	add	hl, bc
+	adc	a, ixl
+	dec	iyl
+.restore_skip:
+
+	dec	ixh
+	jr	nz, .loop
+
+
+
+	ret
+
+end if
