@@ -77,39 +77,36 @@ if 1
 
 else
 ; I: EUHL=dividend, AUBC=divisor
-; O: a=0, ude=UHL/UBC, uhl=UHL%UBC
+; O: auhl=EUHL%AUBC, euix=EUHL/AUBC, iyh=A, iyl=0
 
-	push	ix
 	push	hl
-	ex	(sp), iy			; euiy = dividend
+	pop	ix			; euix = dividend
 
-	ld	ixl, a				; [ixl]ubc = divisor
+	ld	iyh, a			; [iyh]ubc = divisor
 
 	xor	a, a
-	sbc	hl, hl				; auhl = remainder
+	sbc	hl, hl			; auhl = remainder
 
-	ld	ixh, 32
+	ld	iyl, 32
 
 .loop:
-	add	iy, iy
+	add	ix, ix
 	rl	e
 	adc	hl, hl
 	rla
 
 	sbc	hl, bc
-	sbc	a, ixl
-	inc	iyl
+	sbc	a, iyh
+	inc	ixl
 
 	jr	nc, .restore_skip
 	add	hl, bc
-	adc	a, ixl
-	dec	iyl
+	adc	a, iyh
+	dec	ixl
 .restore_skip:
 
-	dec	ixh
+	dec	iyl
 	jr	nz, .loop
-
-
 
 	ret
 

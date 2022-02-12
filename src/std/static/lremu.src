@@ -5,6 +5,7 @@ __lremu:
 ; I: EUHL=dividend, AUBC=divisor
 ; O: euhl=EUHL%AUBC
 
+if 1
 	call	__ldvrmu
 	ld	e, a
 	push	de
@@ -15,6 +16,19 @@ __lremu:
 	ret	z
 	ei
 	ret
+
+else
+	push	ix
+	push	iy
+
+	call	__ldvrmu
+	ld	e, a
+	ld	a, iyh
+
+	pop	iy
+	pop	ix
+	ret
+end if
 
 
 	extern	__ldvrmu
