@@ -52,7 +52,7 @@ if 1
 
 ;;;         if (!quotBit) {
 	jr	nc, .restore_skip
-;;;         result.rem += divisor;
+;;;             result.rem += divisor;
 	add	hl, bc
 	adc	a, e
 ;;;         }
