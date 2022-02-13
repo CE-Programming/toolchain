@@ -5,7 +5,7 @@ __bdivs:
 
 	push	hl
 
-	call	__bdvrms_common
+	call	__bdvrms
 
 	ld	a, c
 	xor	a, b
@@ -18,4 +18,4 @@ __bdivs:
 	ret
 
 
-	extern	__bdvrms_common
+	extern	__bdvrms
