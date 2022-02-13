@@ -6,22 +6,10 @@ __ldivs:
 ; O: euhl=EUHL/AUBC
 
 	bit	7, e
-
 	push	af
 	push	bc
 
-	call	nz, __lneg
-
-	cp	a, $80
-	jr	c, .neg_divisor_skip
-	push	hl
-	sbc	hl, hl
-	sbc	hl, bc
-	ex	(sp), hl
-	pop	bc
-	cpl
-	sbc	a, -1
-.neg_divisor_skip:
+	call	__ldivs_lrems_common
 
 	call	__ldivu
 
@@ -38,5 +26,6 @@ __ldivs:
 	jp	__lneg
 
 
+	extern	__ldivs_lrems_common
 	extern	__ldivu
 	extern	__lneg
