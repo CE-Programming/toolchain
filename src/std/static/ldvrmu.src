@@ -1,13 +1,17 @@
 	assume	adl=1
 
-;;; ldiv_t _ldvrmu(uint32_t dividend, uint32_t divisor) {
+;;; struct u32div_t {
+;;;     uint32_t rem;
+;;;     uint32_t quot;
+;;; };
+;;; u32div_t _ldvrmu(uint32_t dividend, uint32_t divisor) {
 	public	__ldvrmu
 __ldvrmu:
 if 1
 ; I: EUHL=dividend, AUBC=divisor
 ; O: a[uhl']=EUHL%AUBC, bcu=0, b=A, c=?, euhl=EUHL/AUBC, eubc'=AUBC, zf=!IEF2
 
-;;;     ldiv_t result;
+;;;     u32div_t result;
 ;;;     result.quot = dividend;
 					; euhl : result.quot
 
@@ -45,7 +49,7 @@ if 1
 	adc	hl, hl
 	adc	a, a
 
-;;;         bool quotBit = result.rem < divisor;
+;;;         bool quotBit = result.rem >= divisor;
 ;;;         result.rem -= divisor;
 	sbc	hl, bc
 	sbc	a, e
