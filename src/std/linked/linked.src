@@ -130,6 +130,8 @@ __lcmps		:= 0001A8h
 __lcmpu		:= 0001ACh
 	public	__lcmpzero
 __lcmpzero	:= 0001B0h
+	public	__ldivs
+__ldivs		:= 0001B4h
 	public	__ldivu
 __ldivu		:= 0001B8h
 	public	__ldvrmu
@@ -144,6 +146,8 @@ __lneg		:= 0001D0h
 __lnot		:= 0001D4h
 	public	__lor
 __lor		:= 0001D8h
+	public	__lrems
+__lrems		:= 0001DCh
 	public	__lremu
 __lremu		:= 0001E0h
 	public	__lshl

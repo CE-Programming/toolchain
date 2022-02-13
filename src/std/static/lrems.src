@@ -1,0 +1,35 @@
+	assume	adl=1
+
+	public	__lrems
+__lrems:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL%AUBC
+
+	bit	7, e
+
+	push	af
+	push	bc
+
+	call	nz, __lneg
+
+	cp	a, $80
+	jr	c, .neg_divisor_skip
+	push	hl
+	sbc	hl, hl
+	sbc	hl, bc
+	ex	(sp), hl
+	pop	bc
+	cpl
+	sbc	a, -1
+.neg_divisor_skip:
+
+	call	__lremu
+
+	pop	bc
+	pop	af
+	ret	z
+	jp	__lneg
+
+
+	extern	__lneg
+	extern	__lremu

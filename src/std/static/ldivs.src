@@ -1,0 +1,42 @@
+	assume	adl=1
+
+	public	__ldivs
+__ldivs:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL/AUBC
+
+	bit	7, e
+
+	push	af
+	push	bc
+
+	call	nz, __lneg
+
+	cp	a, $80
+	jr	c, .neg_divisor_skip
+	push	hl
+	sbc	hl, hl
+	sbc	hl, bc
+	ex	(sp), hl
+	pop	bc
+	cpl
+	sbc	a, -1
+.neg_divisor_skip:
+
+	call	__ldivu
+
+	pop	bc
+	pop	af
+
+	rlca
+	rrca
+	jr	nz, .pos_dividend_skip
+	ccf
+.pos_dividend_skip:
+
+	ret	c
+	jp	__lneg
+
+
+	extern	__ldivu
+	extern	__lneg
