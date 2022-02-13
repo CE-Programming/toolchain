@@ -146,8 +146,9 @@ __lneg		:= 0001D0h
 __lnot		:= 0001D4h
 	public	__lor
 __lor		:= 0001D8h
-	public	__lrems
-__lrems		:= 0001DCh
+; Bug: Does not ensure `nc` before `sbc hl, hl` to negate divisor.
+; 	public	__lrems
+; __lrems	:= 0001DCh
 	public	__lremu
 __lremu		:= 0001E0h
 	public	__lshl
