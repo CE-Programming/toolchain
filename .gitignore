@@ -19,6 +19,8 @@ build/
 cmake-build-debug/
 tools/fasmg/fasmg
 tools/fasmg/fasmg.exe
+tools/cedev-config/bin/cedev-config
+tools/cedev-config/bin/cedev-config.exe
 linker_script
 
 # precompiled headers
