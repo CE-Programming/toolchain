@@ -375,7 +375,7 @@ uint8_t ti_RenameVar(const char *old_name, const char *new_name, uint8_t type);
  *
  * @returns 0 if success.
  */
-uint8_t ti_SetVar(ti_var_t var_type, const char *name, const void *data);
+uint8_t ti_SetVar(uint8_t var_type, const char *name, const void *data);
 
 /**
  * Stores an OS variable to another variable.
@@ -387,7 +387,7 @@ uint8_t ti_SetVar(ti_var_t var_type, const char *name, const void *data);
  *
  * @returns 0 if success.
  */
-uint8_t ti_StoVar(ti_var_t var_type_to, void *to, ti_var_t var_type_from, const void *from);
+uint8_t ti_StoVar(uint8_t var_type_to, void *to, uint8_t var_type_from, const void *from);
 
 /**
  * Recalls a variable.
