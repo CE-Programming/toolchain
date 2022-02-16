@@ -109,82 +109,82 @@ static int64_t atoll_(const char *str)
 }
 
 
-#define DEFINE_UNOP_PREFIX_FUNC(op, name, prefix, type) \
-    static type prefix##name##_(type x)                 \
-    {                                                   \
-        return (type)(op(x));                           \
+#define DEFINE_UNOP_PREFIX_FUNC(type, name, op) \
+    static type name##_(type x)                 \
+    {                                           \
+        return (type)(op(x));                   \
     }
 
-#define DEFINE_BINOP_FUNC_FUNC(type, typePrefix, name, funcPrefix, func, post) \
-    static type typePrefix##name##_(type x, type y)                            \
-    {                                                                          \
-        return (type)(funcPrefix##func(x, y)post);                             \
+#define DEFINE_BINOP_FUNC_FUNC(type, name, func, post) \
+    static type name##_(type x, type y)                \
+    {                                                  \
+        return (type)(func(x, y)post);                 \
     }
 
-#define DEFINE_BINOP_INFIX_FUNC(op, name, prefix, type) \
-    static type prefix##name##_(type x, type y)         \
-    {                                                   \
-        return (type)(x op y);                          \
+#define DEFINE_BINOP_INFIX_FUNC(type, name, op) \
+    static type name##_(type x, type y)         \
+    {                                           \
+        return (type)(x op y);                  \
     }
 
-#define DEFINE_UNOP_PREFIX_FUNC_B(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC(op, name, b, u##int8_t)
-#define DEFINE_UNOP_PREFIX_FUNC_S(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC(op, name, s, u##int16_t)
-#define DEFINE_UNOP_PREFIX_FUNC_I(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC(op, name, i, u##int24_t)
-#define DEFINE_UNOP_PREFIX_FUNC_L(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC(op, name, l, u##int32_t)
-#define DEFINE_UNOP_PREFIX_FUNC_LL(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC(op, name, ll, u##int64_t)
+#define DEFINE_UNOP_PREFIX_FUNC_B(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC(u##int8_t, b##name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_S(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC(u##int16_t, s##name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_I(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC(u##int24_t, i##name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_L(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC(u##int32_t, l##name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_LL(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC(u##int64_t, ll##name, op)
 
 #define DEFINE_BINOP_FUNC_FUNC_B(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int8_t, b, name, b, func, post)
+    DEFINE_BINOP_FUNC_FUNC(u##int8_t, b##name, b##func, post)
 #define DEFINE_BINOP_FUNC_FUNC_S(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int16_t, s, name, s, func, post)
+    DEFINE_BINOP_FUNC_FUNC(u##int16_t, s##name, s##func, post)
 #define DEFINE_BINOP_FUNC_FUNC_I(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int24_t, i, name, , func, post)
+    DEFINE_BINOP_FUNC_FUNC(u##int24_t, i##name, func, post)
 #define DEFINE_BINOP_FUNC_FUNC_L(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int32_t, l, name, l, func, post)
+    DEFINE_BINOP_FUNC_FUNC(u##int32_t, l##name, l##func, post)
 #define DEFINE_BINOP_FUNC_FUNC_LL(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int64_t, ll, name, ll, func, post)
+    DEFINE_BINOP_FUNC_FUNC(u##int64_t, ll##name, ll##func, post)
 
-#define DEFINE_BINOP_INFIX_FUNC_B(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC(op, name, b, u##int8_t)
-#define DEFINE_BINOP_INFIX_FUNC_S(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC(op, name, s, u##int16_t)
-#define DEFINE_BINOP_INFIX_FUNC_I(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC(op, name, i, u##int24_t)
-#define DEFINE_BINOP_INFIX_FUNC_L(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC(op, name, l, u##int32_t)
-#define DEFINE_BINOP_INFIX_FUNC_LL(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC(op, name, ll, u##int64_t)
+#define DEFINE_BINOP_INFIX_FUNC_B(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC(u##int8_t, b##name, op)
+#define DEFINE_BINOP_INFIX_FUNC_S(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC(u##int16_t, s##name, op)
+#define DEFINE_BINOP_INFIX_FUNC_I(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC(u##int24_t, i##name, op)
+#define DEFINE_BINOP_INFIX_FUNC_L(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC(u##int32_t, l##name, op)
+#define DEFINE_BINOP_INFIX_FUNC_LL(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC(u##int64_t, ll##name, op)
 
-#define DEFINE_UNOP_PREFIX_FUNC_B_TO_S(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC_B(op, name, u)          \
-    DEFINE_UNOP_PREFIX_FUNC_S(op, name, u)
-#define DEFINE_UNOP_PREFIX_FUNC_B_TO_I(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_S(op, name, u)     \
-    DEFINE_UNOP_PREFIX_FUNC_I(op, name, u)
-#define DEFINE_UNOP_PREFIX_FUNC_B_TO_L(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_I(op, name, u)     \
-    DEFINE_UNOP_PREFIX_FUNC_L(op, name, u)
-#define DEFINE_UNOP_PREFIX_FUNC_B_TO_LL(op, name, u) \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_L(op, name, u)      \
-    DEFINE_UNOP_PREFIX_FUNC_LL(op, name, u)
+#define DEFINE_UNOP_PREFIX_FUNC_B_TO_S(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC_B(u, name, op)          \
+    DEFINE_UNOP_PREFIX_FUNC_S(u, name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_S(u, name, op)     \
+    DEFINE_UNOP_PREFIX_FUNC_I(u, name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_B_TO_L(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, name, op)     \
+    DEFINE_UNOP_PREFIX_FUNC_L(u, name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_B_TO_LL(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_L(u, name, op)      \
+    DEFINE_UNOP_PREFIX_FUNC_LL(u, name, op)
 
-#define DEFINE_BINOP_INFIX_FUNC_B_TO_S(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC_B(op, name, u)          \
-    DEFINE_BINOP_INFIX_FUNC_S(op, name, u)
-#define DEFINE_BINOP_INFIX_FUNC_B_TO_I(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_S(op, name, u)     \
-    DEFINE_BINOP_INFIX_FUNC_I(op, name, u)
-#define DEFINE_BINOP_INFIX_FUNC_B_TO_L(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_I(op, name, u)     \
-    DEFINE_BINOP_INFIX_FUNC_L(op, name, u)
-#define DEFINE_BINOP_INFIX_FUNC_B_TO_LL(op, name, u) \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_L(op, name, u)      \
-    DEFINE_BINOP_INFIX_FUNC_LL(op, name, u)
+#define DEFINE_BINOP_INFIX_FUNC_B_TO_S(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC_B(u, name, op)          \
+    DEFINE_BINOP_INFIX_FUNC_S(u, name, op)
+#define DEFINE_BINOP_INFIX_FUNC_B_TO_I(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_S(u, name, op)     \
+    DEFINE_BINOP_INFIX_FUNC_I(u, name, op)
+#define DEFINE_BINOP_INFIX_FUNC_B_TO_L(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_I(u, name, op)     \
+    DEFINE_BINOP_INFIX_FUNC_L(u, name, op)
+#define DEFINE_BINOP_INFIX_FUNC_B_TO_LL(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_L(u, name, op)      \
+    DEFINE_BINOP_INFIX_FUNC_LL(u, name, op)
 
 #define DEFINE_BINOP_FUNC_FUNC_I_TO_L(u, name, func, post) \
     DEFINE_BINOP_FUNC_FUNC_I(u, name, func, post)          \
@@ -222,64 +222,64 @@ DEFINE_UNOP_TYPE(u)
 DEFINE_BINOP_TYPE()
 DEFINE_BINOP_TYPE(u)
 
-#define DEFINE_UNOP_STRUCT_B(name, u) \
+#define DEFINE_UNOP_STRUCT_B(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_};
-#define DEFINE_UNOP_STRUCT_B_TO_S(name, u) \
+#define DEFINE_UNOP_STRUCT_B_TO_S(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_};
-#define DEFINE_UNOP_STRUCT_B_TO_I(name, u) \
+#define DEFINE_UNOP_STRUCT_B_TO_I(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_};
-#define DEFINE_UNOP_STRUCT_B_TO_L(name, u) \
+#define DEFINE_UNOP_STRUCT_B_TO_L(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_};
-#define DEFINE_UNOP_STRUCT_B_TO_LL(name, u) \
+#define DEFINE_UNOP_STRUCT_B_TO_LL(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, ll##name##_};
 
-#define DEFINE_BINOP_STRUCT_B(name, u) \
+#define DEFINE_BINOP_STRUCT_B(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_};
-#define DEFINE_BINOP_STRUCT_B_TO_S(name, u) \
+#define DEFINE_BINOP_STRUCT_B_TO_S(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_, s##name##_};
-#define DEFINE_BINOP_STRUCT_B_TO_I(name, u) \
+#define DEFINE_BINOP_STRUCT_B_TO_I(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_};
-#define DEFINE_BINOP_STRUCT_B_TO_L(name, u) \
+#define DEFINE_BINOP_STRUCT_B_TO_L(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_};
-#define DEFINE_BINOP_STRUCT_B_TO_LL(name, u) \
+#define DEFINE_BINOP_STRUCT_B_TO_LL(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, ll##name##_};
-#define DEFINE_BINOP_STRUCT_I_TO_L(name, u) \
+#define DEFINE_BINOP_STRUCT_I_TO_L(u, name) \
     static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_};
-#define DEFINE_BINOP_STRUCT_I_TO_LL(name, u) \
+#define DEFINE_BINOP_STRUCT_I_TO_LL(u, name) \
     static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_, ll##name##_};
 
 
-#define DEFINE_UNOP_PREFIX_B(op, name, u)   \
-    DEFINE_UNOP_PREFIX_FUNC_B(op, name, u) \
-    DEFINE_UNOP_STRUCT_B(name, u)
-#define DEFINE_UNOP_PREFIX_B_TO_S(op, name, u)   \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_S(op, name, u) \
-    DEFINE_UNOP_STRUCT_B_TO_S(name, u)
-#define DEFINE_UNOP_PREFIX_B_TO_I(op, name, u)   \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_I(op, name, u) \
-    DEFINE_UNOP_STRUCT_B_TO_I(name, u)
-#define DEFINE_UNOP_PREFIX_B_TO_L(op, name, u)   \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_L(op, name, u) \
-    DEFINE_UNOP_STRUCT_B_TO_L(name, u)
-#define DEFINE_UNOP_PREFIX_B_TO_LL(op, name, u)   \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_LL(op, name, u) \
-    DEFINE_UNOP_STRUCT_B_TO_LL(name, u)
+#define DEFINE_UNOP_PREFIX_B(u, name, op)  \
+    DEFINE_UNOP_PREFIX_FUNC_B(u, name, op) \
+    DEFINE_UNOP_STRUCT_B(u, name)
+#define DEFINE_UNOP_PREFIX_B_TO_S(u, name, op)  \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_S(u, name, op) \
+    DEFINE_UNOP_STRUCT_B_TO_S(u, name)
+#define DEFINE_UNOP_PREFIX_B_TO_I(u, name, op)  \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, name, op) \
+    DEFINE_UNOP_STRUCT_B_TO_I(u, name)
+#define DEFINE_UNOP_PREFIX_B_TO_L(u, name, op)  \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_L(u, name, op) \
+    DEFINE_UNOP_STRUCT_B_TO_L(u, name)
+#define DEFINE_UNOP_PREFIX_B_TO_LL(u, name, op)  \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_LL(u, name, op) \
+    DEFINE_UNOP_STRUCT_B_TO_LL(u, name)
 
-#define DEFINE_BINOP_INFIX_B(op, name, u)   \
-    DEFINE_BINOP_INFIX_FUNC_B(op, name, u)  \
-    DEFINE_BINOP_STRUCT_B(name, u)
-#define DEFINE_BINOP_INFIX_B_TO_S(op, name, u)   \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_S(op, name, u) \
-    DEFINE_BINOP_STRUCT_B_TO_S(name, u)
-#define DEFINE_BINOP_INFIX_B_TO_I(op, name, u)   \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_I(op, name, u) \
-    DEFINE_BINOP_STRUCT_B_TO_I(name, u)
-#define DEFINE_BINOP_INFIX_B_TO_L(op, name, u)   \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_L(op, name, u) \
-    DEFINE_BINOP_STRUCT_B_TO_L(name, u)
-#define DEFINE_BINOP_INFIX_B_TO_LL(op, name, u)   \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_LL(op, name, u) \
-    DEFINE_BINOP_STRUCT_B_TO_LL(name, u)
+#define DEFINE_BINOP_INFIX_B(u, name, op)  \
+    DEFINE_BINOP_INFIX_FUNC_B(u, name, op) \
+    DEFINE_BINOP_STRUCT_B(u, name)
+#define DEFINE_BINOP_INFIX_B_TO_S(u, name, op)  \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_S(u, name, op) \
+    DEFINE_BINOP_STRUCT_B_TO_S(u, name)
+#define DEFINE_BINOP_INFIX_B_TO_I(u, name, op)  \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_I(u, name, op) \
+    DEFINE_BINOP_STRUCT_B_TO_I(u, name)
+#define DEFINE_BINOP_INFIX_B_TO_L(u, name, op)  \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_L(u, name, op) \
+    DEFINE_BINOP_STRUCT_B_TO_L(u, name)
+#define DEFINE_BINOP_INFIX_B_TO_LL(u, name, op)  \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_LL(u, name, op) \
+    DEFINE_BINOP_STRUCT_B_TO_LL(u, name)
 
 
 static void testOp(bool isBinOp, const BinOp *op, int64_t x, int64_t y)
@@ -327,47 +327,47 @@ static void testBinOp(const BinOp *op, int64_t x, int64_t y)
 }
 
 
-DEFINE_UNOP_PREFIX_B_TO_LL(~, not, )
-DEFINE_UNOP_PREFIX_B_TO_LL(-, neg, )
+DEFINE_UNOP_PREFIX_B_TO_LL( , not, ~)
+DEFINE_UNOP_PREFIX_B_TO_LL( , neg, -)
 
-DEFINE_UNOP_PREFIX_FUNC_B_TO_I(abs, abs, )
-DEFINE_UNOP_PREFIX_FUNC_L(labs, abs, )
-DEFINE_UNOP_PREFIX_FUNC_LL(llabs, abs, )
-DEFINE_UNOP_STRUCT_B_TO_LL(abs, )
+DEFINE_UNOP_PREFIX_FUNC_B_TO_I( , abs, abs)
+DEFINE_UNOP_PREFIX_FUNC_L( , abs, labs)
+DEFINE_UNOP_PREFIX_FUNC_LL( , abs, llabs)
+DEFINE_UNOP_STRUCT_B_TO_LL( , abs)
 
-DEFINE_UNOP_PREFIX_FUNC_B(__builtin_bitreverse8, bitrev, )
-DEFINE_UNOP_PREFIX_FUNC_S(__builtin_bitreverse16, bitrev, )
-DEFINE_UNOP_PREFIX_FUNC_I(__builtin_bitreverse24, bitrev, )
-DEFINE_UNOP_PREFIX_FUNC_L(__builtin_bitreverse32, bitrev, )
-DEFINE_UNOP_PREFIX_FUNC_LL(__builtin_bitreverse64, bitrev, )
-DEFINE_UNOP_STRUCT_B_TO_LL(bitrev, )
+DEFINE_UNOP_PREFIX_FUNC_B( , bitrev, __builtin_bitreverse8)
+DEFINE_UNOP_PREFIX_FUNC_S( , bitrev, __builtin_bitreverse16)
+DEFINE_UNOP_PREFIX_FUNC_I( , bitrev, __builtin_bitreverse24)
+DEFINE_UNOP_PREFIX_FUNC_L( , bitrev, __builtin_bitreverse32)
+DEFINE_UNOP_PREFIX_FUNC_LL( , bitrev, __builtin_bitreverse64)
+DEFINE_UNOP_STRUCT_B_TO_LL( , bitrev)
 
 // Needs to be unsigned to avoid extra bits from sign extension
-DEFINE_UNOP_PREFIX_FUNC_B_TO_I(__builtin_popcount, popcnt, u)
-DEFINE_UNOP_PREFIX_FUNC_L(__builtin_popcountl, popcnt, u)
-DEFINE_UNOP_PREFIX_FUNC_LL(__builtin_popcountll, popcnt, u)
-DEFINE_UNOP_STRUCT_B_TO_LL(popcnt, u)
+DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, popcnt, __builtin_popcount)
+DEFINE_UNOP_PREFIX_FUNC_L(u, popcnt, __builtin_popcountl)
+DEFINE_UNOP_PREFIX_FUNC_LL(u, popcnt, __builtin_popcountll)
+DEFINE_UNOP_STRUCT_B_TO_LL(u, popcnt)
 
-DEFINE_BINOP_INFIX_B_TO_LL(&, and, )
-DEFINE_BINOP_INFIX_B_TO_LL(|, or, )
-DEFINE_BINOP_INFIX_B_TO_LL(^, xor, )
-DEFINE_BINOP_INFIX_B_TO_LL(+, add, )
-DEFINE_BINOP_INFIX_B_TO_LL(-, sub, )
-DEFINE_BINOP_INFIX_B_TO_LL(<<, shl, )
-DEFINE_BINOP_INFIX_B_TO_LL(>>, shru, u)
-DEFINE_BINOP_INFIX_B_TO_LL(>>, shrs, )
-DEFINE_BINOP_INFIX_B_TO_LL(*, mulu, u)
-DEFINE_BINOP_INFIX_B_TO_LL(/, divu, u)
-DEFINE_BINOP_INFIX_B_TO_LL(%, remu, u)
-DEFINE_BINOP_INFIX_B_TO_LL(/, divs, )
-DEFINE_BINOP_INFIX_B_TO_LL(%, rems, )
+DEFINE_BINOP_INFIX_B_TO_LL( , and, &)
+DEFINE_BINOP_INFIX_B_TO_LL( , or, |)
+DEFINE_BINOP_INFIX_B_TO_LL( , xor, ^)
+DEFINE_BINOP_INFIX_B_TO_LL( , add, +)
+DEFINE_BINOP_INFIX_B_TO_LL( , sub, -)
+DEFINE_BINOP_INFIX_B_TO_LL( , shl, <<)
+DEFINE_BINOP_INFIX_B_TO_LL(u, shru, >>)
+DEFINE_BINOP_INFIX_B_TO_LL( , shrs, >>)
+DEFINE_BINOP_INFIX_B_TO_LL(u, mulu, *)
+DEFINE_BINOP_INFIX_B_TO_LL(u, divu, /)
+DEFINE_BINOP_INFIX_B_TO_LL(u, remu, %)
+DEFINE_BINOP_INFIX_B_TO_LL( , divs, /)
+DEFINE_BINOP_INFIX_B_TO_LL( , rems, %)
 
 
 DEFINE_BINOP_FUNC_FUNC_I_TO_L( , div_q, div, .quot)
-DEFINE_BINOP_STRUCT_I_TO_L(div_q, )
+DEFINE_BINOP_STRUCT_I_TO_L( , div_q)
 
 DEFINE_BINOP_FUNC_FUNC_I_TO_L( , div_r, div, .rem)
-DEFINE_BINOP_STRUCT_I_TO_L(div_r, )
+DEFINE_BINOP_STRUCT_I_TO_L( , div_r)
 
 
 static const UnOp *unops[] = {
