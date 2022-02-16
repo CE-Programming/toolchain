@@ -6,11 +6,11 @@ __ldivu:
 ; O: euhl=EUHL/AUBC
 
 if 1
-	call	__ldvrmu
-	ld	a, b
-	exx
 	push	bc
-	exx
+
+	call	__ldvrmu
+
+	ld	a, b
 	pop	bc
 
 	ret	z
