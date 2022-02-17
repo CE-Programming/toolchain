@@ -18,19 +18,17 @@ __lldivs:
 	push	iy
 	push	af
 
-	sbc	a, a
-
 	ld	iy, 2
 	add	iy, sp
 
 	ld	a, b
-	jr	nz, .xor_divisor_skip
+	ld	(iy), a
 	xor	a, (iy + 14)
-.xor_divisor_skip:
 	ld	(iy + 15), a
 
-	bit	7, (iy + 14)
-	jr	z, .neg_divisor_skip
+	xor	a, b
+	rla
+	jr	nc, .neg_divisor_skip
 
 	push	bc
 	push	hl
@@ -55,13 +53,14 @@ __lldivs:
 	call	__lldvrmu.hijack
 
 	pop	af
+	bit	7, (iy + 8)
 	jr	c, .div_quotient_skip
 	ld	hl, (iy + 15)
 	ld	de, (iy + 18)
 	ld	bc, (iy + 21)
+	bit	7, (iy + 23)
 .div_quotient_skip:
 
-	bit	7, (iy + 23)
 	call	nz, __llneg
 
 	pop	iy

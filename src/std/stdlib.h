@@ -13,6 +13,11 @@ typedef struct {
   long rem;
 } ldiv_t;
 
+typedef struct {
+  long long rem;
+  long long quot;
+} lldiv_t;
+
 typedef char __align;
 union header {
   struct {
@@ -96,6 +101,8 @@ long long llabs(long long n);
 div_t div(int numer, int denom);
 
 ldiv_t ldiv(long numer, long denom);
+
+lldiv_t lldiv(long long numer, long long denom);
 
 __END_DECLS
 
