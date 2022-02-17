@@ -363,11 +363,11 @@ DEFINE_BINOP_INFIX_B_TO_LL( , divs, /)
 DEFINE_BINOP_INFIX_B_TO_LL( , rems, %)
 
 
-DEFINE_BINOP_FUNC_FUNC_I_TO_L( , div_q, div, .quot)
-DEFINE_BINOP_STRUCT_I_TO_L( , div_q)
+DEFINE_BINOP_FUNC_FUNC_I_TO_LL( , div_q, div, .quot)
+DEFINE_BINOP_STRUCT_I_TO_LL( , div_q)
 
-DEFINE_BINOP_FUNC_FUNC_I_TO_L( , div_r, div, .rem)
-DEFINE_BINOP_STRUCT_I_TO_L( , div_r)
+DEFINE_BINOP_FUNC_FUNC_I_TO_LL( , div_r, div, .rem)
+DEFINE_BINOP_STRUCT_I_TO_LL( , div_r)
 
 
 static const UnOp *unops[] = {
