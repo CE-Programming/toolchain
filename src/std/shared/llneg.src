@@ -2,9 +2,11 @@
 
 	public	__llneg
 __llneg:
-	push	de		; *spl=UDE
-	ex	de, hl		; ude=UHL, uhl=UDE
 	or	a, a
+	public	__llneg.hijack_nc
+.hijack_nc:
+	ex	de, hl		; ude=UHL, uhl=UDE
+	push	hl		; *spl=UDE
 	sbc	hl, hl		; uhl=0
 	sbc	hl, de		; uhl=-UHL
 	ex	(sp), hl	; uhl=UDE, *spl=-UHL

@@ -11,9 +11,10 @@ _llabs:
 	push	bc
 	push	de
 	push	hl
-	push	iy
-	bit	7, b
-	ret	z
-	jp	__llneg
+	ld	a, b
+	or	a, a
+	call	m, __llneg.hijack_nc
+	jp	(iy)
 
-	extern	__llneg
+
+	extern	__llneg.hijack_nc
