@@ -25,25 +25,23 @@ __lldivs:
 	cp	a, $80
 	jr	c, .neg_divisor_skip
 
-	push	de
+	push	bc
 	push	hl
+	ld	c, a
 
-	ld	de, (iy + 7)
-	sbc	hl, hl
-	sbc	hl, de
-	ld	(iy + 7), hl
-	ld	de, (iy + 10)
-	ld	hl, 0
-	sbc	hl, de
-	ld	(iy + 10), hl
-	ld	de, (iy + 13)
-	sbc	hl, hl
-	or	a, a
-	sbc	hl, de
-	ld	(iy + 13), hl
+	lea	hl, iy + 7
+	ld	b, 8
 
+.neg_divisor_loop:
+	ld	a, 0
+	sbc	a, (hl)
+	ld	(hl), a
+	inc	hl
+	djnz	.neg_divisor_loop
+
+	ld	a, c
 	pop	hl
-	pop	de
+	pop	bc
 .neg_divisor_skip:
 
 	xor	a, b
