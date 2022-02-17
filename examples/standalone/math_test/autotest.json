@@ -44,6 +44,10 @@
     "key|enter",
     "hashWait|rems",
     "key|enter",
+    "hashWait|div_q",
+    "key|enter",
+    "hashWait|div_r",
+    "key|enter",
     "hashWait|done"
   ],
   "hashes": {
@@ -197,6 +201,22 @@
       "size": "vram_16_size",
       "expected_CRCs": [
         "F45969EF"
+      ]
+    },
+    "div_q": {
+      "description": "div_q",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "EAFFC6D3"
+      ]
+    },
+    "div_r": {
+      "description": "div_r",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "B9786654"
       ]
     },
     "done": {
