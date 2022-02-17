@@ -17,17 +17,17 @@ __lldvrmu:
 	push	de
 	push	hl
 ; Stack frame:
-; iy - 17 -> divisor
-; iy - 14 -> divisor >> 24
-; iy - 11 -> divisor >> 48
+; iy - 17 -> dividend
+; iy - 14 -> dividend >> 24
+; iy - 11 -> dividend >> 48
 ; iy -  8 -> interrupts state
 ; iy -  5 -> return vector
 ; iy -  2 -> ???
 ; iy +  1 -> ???
 ; iy +  4 -> ???
-; iy +  7 -> dividend
-; iy + 10 -> dividend >> 24
-; iy + 13 -> dividend >> 48
+; iy +  7 -> divisor
+; iy + 10 -> divisor >> 24
+; iy + 13 -> divisor >> 48
 
 	ld	bc, (iy + 10)
 	sbc	hl, hl
@@ -92,9 +92,9 @@ __lldvrmu:
 ; iy +  6 -> ???
 ; iy +  9 -> ???
 ; iy + 12 -> ???
-; iy + 15 -> dividend
-; iy + 18 -> dividend >> 24
-; iy + 21 -> dividend >> 48
+; iy + 15 -> quotient
+; iy + 18 -> quotient >> 24
+; iy + 21 -> quotient >> 48
 
 	push	hl
 	exx
