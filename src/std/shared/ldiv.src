@@ -5,18 +5,19 @@ _ldiv:
 
 	pop	hl
 	pop	iy
-	ld	(iy), hl
-	pop	hl
 	pop	de
 	pop	bc
+	ld	a, c
+	pop	bc
 	ex	(sp), hl
-	ld	a, l
-	ex	(sp), hl
+	ex	de, hl
 
+	ld	d, a
 	xor	a, e
 	push	af
-	xor	a, e
 
+	ld	a, e
+	ld	e, d
 	push	de
 
 	bit	7, e
@@ -28,25 +29,25 @@ _ldiv:
 	ld	e, a
 	pop	af
 	call	m, __lneg
-	ld	(iy + 7), e
 	ld	(iy + 4), hl
+	ld	(iy + 7), e
 
 	exx
 	pop	af
 	call	m, __lneg
-	ld	(iy + 3), e
-	ld	de, (iy)
 	ld	(iy), hl
+	ld	(iy + 3), e
 
-	push	de
+	ex	(sp), hl
 	push	de
 	push	de
 	push	de
 	push	de
 	bit	2, c
-	ret	z
+	jr	z, .ei_skip
 	ei
-	ret
+.ei_skip:
+	jp	(hl)
 
 
 	extern	__ldivs_lrems_common
