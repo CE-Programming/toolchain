@@ -1,80 +1,54 @@
-; Copyright (C) 1999-2008 Zilog, Inc, All Rights Reserved
-;-------------------------------------------------------------------------
-; 	ldiv function
-;
-;	ldiv_t ldiv(long numer, long denom); 
-;
-;-------------------------------------------------------------------------
 	assume	adl=1
 
 	public	_ldiv
 _ldiv:
 
-	push	bc
+	pop	hl
+	pop	iy
+	ld	(iy), hl
+	pop	hl
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	ld	a, l
+	ex	(sp), hl
+
+	xor	a, e
 	push	af
+	xor	a, e
+
 	push	de
-	push	hl
 
-	ld	hl,27
-	add	hl,sp
-	ld	a,(hl)
-	dec	hl
-	dec	hl
-	dec	hl
-	ld	bc,(hl)		; aBC : denominator
-	dec	hl
-	dec	hl
-	dec	hl
-	ld	e,(hl)
-	dec	hl
-	dec	hl
-	dec	hl
-	ld	hl,(hl)		; eHL: Numerator
-	call	__ldivs
-	push	de
-	push	hl		; eHL : quotient
+	bit	7, e
+	call	__ldivs_lrems_common
 
-	ld	hl,27
-	add	hl,sp
-	ld	e,(hl)
-	dec	hl
-	dec	hl
-	dec	hl
-	ld	hl,(hl)
-	call	__lrems
-	ld	a,e
-	ex	de,hl		;aDE :remainder
+	call	__ldvrmu
 
-	ld	hl,21
-	add	hl,sp
-	ld	hl,(hl)
-	push	hl
-
-	ld	bc, 7
-	add	hl, bc
-	ld	(hl),a
-	dec	hl
-	dec	hl
-	dec	hl
-	ld	(hl),de		; aDE : remainder
-
-	pop	hl
-	pop	bc
-	ld	(hl),bc		; bc : 3 LSB  of quotient
-	pop	bc
-	push	hl
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	(hl),c		;  c : MSB of quotient
-	pop	hl
-
-	pop	de
-	pop	de
+	exx
+	ld	e, a
 	pop	af
-	pop	bc
+	call	m, __lneg
+	ld	(iy + 7), e
+	ld	(iy + 4), hl
 
+	exx
+	pop	af
+	call	m, __lneg
+	ld	(iy + 3), e
+	ld	de, (iy)
+	ld	(iy), hl
+
+	push	de
+	push	de
+	push	de
+	push	de
+	push	de
+	bit	2, c
+	ret	z
+	ei
 	ret
 
-	extern	__ldivs
-	extern	__lrems
+
+	extern	__ldivs_lrems_common
+	extern	__ldvrmu
+	extern	__lneg
