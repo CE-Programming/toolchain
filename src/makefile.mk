@@ -118,7 +118,6 @@ rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filte
 # find source files
 CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_CSOURCES))
 CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CPPSOURCES))
-USERHEADERS ?= $(sort $(call rwildcard,$(SRCDIR),*.h *.hpp) $(EXTRA_USERHEADERS))
 ASMSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
 
 # create links for later
@@ -127,6 +126,7 @@ LINK_CPPSOURCES ?= $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.
 LINK_ASMSOURCES ?= $(ASMSOURCES)
 
 # files created to be used for linking
+DEPFILES ?= $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
 LDFILES ?= $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
 LDLIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)
 
@@ -246,12 +246,16 @@ version:
 	$(Q)echo CE C Toolchain $(shell cedev-config --version)
 
 .SECONDEXPANSION:
-$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -S -MD $(EZCFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
-$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -S -MD $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+include $(DEPFILES)
+endif
