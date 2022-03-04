@@ -404,7 +404,7 @@ do { \
 
 #define LCD_WIDTH               (320)  /**< Width of LCD in pixels */
 #define LCD_HEIGHT              (240) /**< Height of LCD in pixels */
-#define LCD_SIZE                (LCD_WIDTH*LCD_HEIGHT*2) /**< Total number of pixels in LCD */
+#define LCD_SIZE                (LCD_WIDTH*LCD_HEIGHT*2) /**< Total size of VRAM in bytes */
 
 #define TIMER_32K                1  /**< Use the 32K clock for timer */
 #define TIMER_CPU                0  /**< Use the CPU clock rate for timer */
