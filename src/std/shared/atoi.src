@@ -1,7 +1,6 @@
 	assume	adl=1
 
-	public	_atoi, _atol, _atos
-_atos := _atoi
+	public	_atoi, _atol
 _atol := _atoi
 _atoi:
 	pop	bc
