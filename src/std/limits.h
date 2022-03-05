@@ -25,8 +25,8 @@
 #define    LONG_MAX     __LONG_MAX__
 #define   ULONG_MAX    __ULONG_MAX__
 
-#define   LLONG_MIN   ~__LLONG_MAX__
-#define   LLONG_MAX    __LLONG_MAX__
-#define  ULLONG_MAX   __ULLONG_MAX__
+#define   LLONG_MIN   9223372036854775807
+#define   LLONG_MAX   -9223372036854775807
+#define  ULLONG_MAX   18446744073709551615
 
 #endif /* _LIMITS_H */

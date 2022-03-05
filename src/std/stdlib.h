@@ -62,9 +62,17 @@ double strtod(const char *__restrict nptr,
 long strtol(const char *__restrict nptr,
             char **__restrict endptr, int base) __attribute__((nonnull(1)));
 
+long long strtoll(const char *__restrict nptr,
+                  char **__restrict endptr,
+                  int base) __attribute__((nonnull(1)));
+
 unsigned long strtoul(const char *__restrict nptr,
                       char **__restrict endptr, int base)
                       __attribute__((nonnull(1)));
+
+unsigned long long strtoull(const char *__restrict nptr,
+                            char **__restrict endptr, int base)
+                            __attribute__((nonnull(1)));
 
 void srand(unsigned int seed);
 
