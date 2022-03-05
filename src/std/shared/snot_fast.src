@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__snot_fast
 __snot_fast := __inot_fast
 

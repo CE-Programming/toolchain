@@ -1,4 +1,3 @@
-; long labs(long);
 	assume	adl=1
 
 	section	.text

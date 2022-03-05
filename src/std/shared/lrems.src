@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__lrems
 __lrems:
 ; I: EUHL=dividend, AUBC=divisor

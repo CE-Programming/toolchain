@@ -1,3 +1,5 @@
+	assume	adl=1
+
 	section	.text
 	public	__brems
 __brems:

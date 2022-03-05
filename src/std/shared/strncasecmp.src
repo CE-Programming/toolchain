@@ -1,4 +1,3 @@
-; int strncasecmp ( const char *str1 , const char *str2 , int len );
 	assume	adl=1
 
 	section	.text

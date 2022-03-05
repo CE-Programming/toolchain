@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__inot_fast
 __inot_fast:
 	add	hl, de	; uhl=UHL+UDE

@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__llshru
 __llshru:
 ; Suboptimal for large shift amounts

@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__ldivs_lrems_common
 __ldivs_lrems_common:
 ; I: ZF=EUHL>=0

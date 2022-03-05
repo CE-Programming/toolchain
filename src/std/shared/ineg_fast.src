@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__ineg_fast
 __ineg_fast:
 	add	hl, de	; uhl=UHL+UDE

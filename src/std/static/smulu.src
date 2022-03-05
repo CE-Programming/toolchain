@@ -1,6 +1,8 @@
-	public	__smuls
+	assume	adl=1
+
+	section	.text
+	public	__smuls, __smulu
 __smuls:
-	public	__smulu
 __smulu:
 
 ; Multiplies HL by BC and returns the 16-bit product hl.

@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__llsub_fast
 __llsub_fast:
 	ld	iy, 0

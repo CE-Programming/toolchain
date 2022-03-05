@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__lshrs
 __lshrs:
 ; Suboptimal for large shift amounts

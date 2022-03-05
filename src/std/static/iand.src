@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__iand
 __iand:
 	push	af

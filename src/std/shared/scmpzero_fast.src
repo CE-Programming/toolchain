@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__scmpzero_fast
 __scmpzero_fast:
 	xor	a, a

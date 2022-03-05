@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__llshru_1_fast
 __llshru_1_fast:
 	push	hl

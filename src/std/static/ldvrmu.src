@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 ;;; struct u32div_t {
 ;;;     uint32_t rem;
 ;;;     uint32_t quot;

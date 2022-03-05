@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__lneg
 __lneg:
 	push	af

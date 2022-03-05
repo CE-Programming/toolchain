@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__lladd_b_fast
 __lladd_b_fast:
 	add	a, l		; a=L+A

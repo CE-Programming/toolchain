@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__land_fast
 __land_fast:
 	and	a, e

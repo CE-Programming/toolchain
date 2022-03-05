@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__sor_fast
 __sor_fast:
 	ld	a, h

@@ -1,8 +1,8 @@
 	assume	adl=1
 
-	public	__imuls
+	section	.text
+	public	__imuls, __imulu
 __imuls:
-	public	__imulu
 __imulu:
 
 ; Multiplies UHL by UBC and returns the 24-bit product uhl.

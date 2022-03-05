@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__lcmpzero_fast
 __lcmpzero_fast:
 	xor	a, a

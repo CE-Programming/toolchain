@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__lladd_b
 __lladd_b:
 	push	bc

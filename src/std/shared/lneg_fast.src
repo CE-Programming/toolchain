@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__lneg_fast
 __lneg_fast:
 	ld	c, e	; c=E

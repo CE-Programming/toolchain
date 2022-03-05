@@ -1,8 +1,8 @@
 	assume	adl=1
 
-	public	__llmuls
+	section	.text
+	public	__llmuls, __llmulu
 __llmuls:
-	public	__llmulu
 __llmulu:
 ; Really slow
 

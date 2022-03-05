@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__ladd_1
 __ladd_1:
 	inc	hl

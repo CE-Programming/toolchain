@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__idivs
 __idivs:
 ; I: UHL=dividend, UBC=divisor

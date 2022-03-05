@@ -1,8 +1,8 @@
-	assume  adl=1
+	assume	adl=1
 
-	public	_imaxdiv
+	section	.text
+	public	_imaxdiv, _lldiv
 _imaxdiv:
-	public	_lldiv
 _lldiv:
 
 	pop	hl

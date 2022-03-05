@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__lxor_fast
 __lxor_fast:
 	xor	a, e

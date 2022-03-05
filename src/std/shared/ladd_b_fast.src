@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__ladd_b_fast
 __ladd_b_fast:
 	add	a, l

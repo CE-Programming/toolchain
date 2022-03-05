@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__spopcnt_fast
 __spopcnt_fast:
 	push	hl

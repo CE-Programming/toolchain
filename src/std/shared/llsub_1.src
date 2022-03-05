@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__llsub_1
 __llsub_1:
 	add	hl, de

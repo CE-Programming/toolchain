@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__lland_fast
 __lland_fast:
 ; CC: 56*r(PC)+19*r(SPL)+8*w(SPL)+1

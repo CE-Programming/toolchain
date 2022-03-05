@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__lremu
 __lremu:
 ; I: EUHL=dividend, AUBC=divisor

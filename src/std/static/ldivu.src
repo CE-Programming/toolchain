@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__ldivu
 __ldivu:
 ; I: EUHL=dividend, AUBC=divisor

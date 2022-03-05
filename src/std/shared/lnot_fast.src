@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__lnot_fast
 __lnot_fast:
 	ld	a, e	; a=E

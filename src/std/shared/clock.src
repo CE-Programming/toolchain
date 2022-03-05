@@ -1,7 +1,7 @@
 mpTmr2Counter := 0F20010h
 
 
-	assume	adl = 1
+	assume	adl=1
 
 	section	.text
 	public	_clock

@@ -1,3 +1,6 @@
+	assume	adl=1
+
+	section	.text
 	public	__llxor
 __llxor:
 ; CC: 60*r(PC)+22*r(SPL)+11*w(SPL)+1

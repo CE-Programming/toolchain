@@ -1,8 +1,8 @@
 	assume	adl=1
 
-	public	__lmuls_fast
+	section	.text
+	public	__lmuls_fast, __lmulu_fast
 __lmuls_fast:
-	public	__lmulu_fast
 __lmulu_fast:
 
 ; Multiplies EUHL by AUBC and returns the 32-bit product euhl.

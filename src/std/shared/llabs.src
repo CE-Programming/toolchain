@@ -1,8 +1,8 @@
 	assume	adl=1
 
-	public	_imaxabs
+	section	.text
+	public	_imaxabs, _llabs
 _imaxabs:
-	public	_llabs
 _llabs:
 	pop	iy
 	pop	hl
