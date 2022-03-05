@@ -2,7 +2,7 @@
 ;
 ;	        Code Generation Helper
 ;		For the  Zilog eZ80 C Compiler
-;	        Copyright 1992-2008 Zilog, Inc. 
+;	        Copyright 1992-2008 Zilog, Inc.
 ;
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
@@ -14,17 +14,18 @@
 ;		E EEEEEEEH HHHHHHHHHHHHHHHLLLLLLLL
 ;		S EEEEEEEE FFFFFFFFFFFFFFFFFFFFFFF
 ;		0 1      8 9                    31
-; 
+;
 ; OUTPUTS:	uHL:		Mantissa
 ;		E:		Exponent
 ;		D:		Sign Bit
 ;		ZERO FLAG	Set if op was zero.
-; 
+;
 ; MODIFIES:
 ;		flags
 ;--------------------------------------------------------------
         assume  adl=1
 
+	section	.text
 	public __fpupop2
 __fpupop2:
 	push    bc

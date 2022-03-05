@@ -1,9 +1,9 @@
 .. _contributing:
 
-Contributing to the CE C Toolchain
-==================================
+Contributing to the CE Toolchain
+================================
 
-If you are brave enough to contribute source to the CE C Toolchain, this page is for you!
+If you are brave enough to contribute source to the CE Toolchain, this page is for you!
 
 Creating PRs for review
 -----------------------
@@ -15,8 +15,8 @@ Please do not make large PRs; it is better to make smaller changes in different 
 
 For information on how to fork a repo and create a PR using GitHub, see the `forking documentation <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/fork-a-repo>`_.
 
-Building the CE C Toolchain
----------------------------
+Building the CE Toolchain
+-------------------------
 
 Linux and macOS
 ~~~~~~~~~~~~~~~
@@ -53,7 +53,7 @@ Finally, copy the previously downloaded `fasmg` and `ez80-clang` executables to 
 Windows
 ~~~~~~~
 
-Get `MinGW <http://www.mingw.org>`_.
+Get `MinGW <https://osdn.net/projects/mingw/>`_.
 The only required pacakges are `mingw32-base` and `mingw32-gcc-g++`.
 Make sure the `MinGW\\bin` directory is in the system's PATH environment variable.
 

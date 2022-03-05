@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	_strndup
 _strndup:
 	ld	hl,-6
@@ -21,8 +22,8 @@ Greater:
 	push	bc
 	call	_malloc
 	ld	(ix+-6),hl
-	add	hl,bc 
-	or	a,a 
+	add	hl,bc
+	or	a,a
 	sbc	hl,bc
 	jr	z,MallocFail
 	ld	bc,(ix+-3)

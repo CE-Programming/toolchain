@@ -402,7 +402,7 @@ fontlib_Home:
 	ld	(_TextX),hl
 	ret
 
-	
+
 ;-------------------------------------------------------------------------------
 fontlib_SetFont:
 ; Sets the current font to the data at the pointer given
@@ -891,7 +891,7 @@ fontlib_DrawInt:
 	push	de
 	add	hl,hl
 	db	$3E			; xor a,a -> ld a,*
-	
+
 ;-------------------------------------------------------------------------------
 fontlib_DrawUInt:
 ; Places an unsigned int at the current cursor position
@@ -1576,7 +1576,7 @@ fontlib_Newline:
 	bit	bAutoScroll,(iy + newlineControl)
 	jr	z,.noScroll
 	call	fontlib_ScrollWindowDown
-	ld	iy,DataBaseAddr			; Don't need to write textY---cursor 
+	ld	iy,DataBaseAddr			; Don't need to write textY---cursor
 	jr	.checkPreClear			; didn't actually move!
 .noScroll:
 	ld	a,1

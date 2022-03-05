@@ -18,4 +18,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: fileioc.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

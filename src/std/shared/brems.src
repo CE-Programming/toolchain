@@ -1,3 +1,4 @@
+	section	.text
 	public	__brems
 __brems:
 ; I: A=dividend, C=divisor

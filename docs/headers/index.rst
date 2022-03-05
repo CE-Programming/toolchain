@@ -1,6 +1,6 @@
 .. _headers:
 
-CE C Toolchain Specific Headers
+CE Toolchain Specific Headers
 ===============================
 
 These headers are CE specific, and contain various defines and prototypes.

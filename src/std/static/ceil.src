@@ -1,8 +1,9 @@
 	assume	adl=1
 
+	section	.text
 	public	_ceil, _ceilf
-_ceilf := _ceil
 _ceil:
+_ceilf:
 	call	__frameset0
 	ld	bc,(ix+6)
 	ld	a,(ix+9)

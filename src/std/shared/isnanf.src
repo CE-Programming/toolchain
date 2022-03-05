@@ -1,5 +1,6 @@
 	assume	adl=1
 
+	section	.text
 	public	__isnanf
 __isnanf:
 	call	__frameset0

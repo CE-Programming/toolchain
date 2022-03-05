@@ -3,6 +3,7 @@ mpTmr2Counter := 0F20010h
 
 	assume	adl = 1
 
+	section	.text
 	public	_clock
 _clock:
 assert mpTmr2Counter shr 8 and $FF = 0

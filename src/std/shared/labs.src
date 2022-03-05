@@ -1,6 +1,7 @@
 ; long labs(long);
 	assume	adl=1
 
+	section	.text
 	public	_labs
 _labs:
 	pop	bc

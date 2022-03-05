@@ -24,6 +24,7 @@ _ConvKeyToTok := $20E40
 _GetTokString := $20874
 _PutTokString := $20D74
 
+	section	.text
 	public	_os_GetStringInput
 _os_GetStringInput:
 	push	ix

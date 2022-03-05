@@ -6,6 +6,7 @@
 ; }
 	assume	adl=1
 
+	section	.text
 	public	_ispunct
 _ispunct:
 	pop	hl

@@ -1,7 +1,7 @@
 import subprocess, os
 
-project = 'CE C Toolchain'
-copyright = '2015-2021 CE Programming'
+project = 'CE C/C++ Toolchain'
+copyright = '2015-2022 CE Programming'
 author = 'CE Programming'
 
 current_version = os.environ['current_version']
@@ -56,6 +56,6 @@ for version in versions:
    html_context['versions'].append( (version, '/toolchain/' + version + '/index.html') )
 
 breathe_projects = {}
-breathe_default_project = 'CE C Toolchain'
+breathe_default_project = 'CE C/C++ Toolchain'
 subprocess.call('doxygen doxyfile', shell=True)
-breathe_projects['CE C Toolchain'] = 'doxygen/xml'
+breathe_projects['CE C/C++ Toolchain'] = 'doxygen/xml'

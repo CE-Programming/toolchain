@@ -23,15 +23,15 @@ extern HEADER _alloc_base;
 void free(void *ap) {
     HEADER *p;
     HEADER *q;
-    
+
     if (!ap) {
         return;
     }
-    
+
     q = (HEADER*)ap - 1;
-    
+
     for (p = &_alloc_base; p->s.ptr && p->s.ptr < q; p = p->s.ptr);
-    
+
     /* join upper */
     if ((char*)p->s.ptr == ((char*)q) + q->s.size) {
         q->s.size += p->s.ptr->s.size;
@@ -39,7 +39,7 @@ void free(void *ap) {
     } else {
         q->s.ptr = p->s.ptr;
     }
-    
+
     /* join lower */
     if (((char*)p) + p->s.size == (char*)q) {
         p->s.size += q->s.size;

@@ -93,9 +93,9 @@ Finally, somewhere else in your program, you can use :code:`fontlib_SetFont`:
 .. code-block:: c
 
     void main() {
-        . . . 
+        . . .
         fontlib_SetFont(my_font_1, 0);
-        . . . 
+        . . .
     }
 
 Packaging a Font Pack
@@ -302,4 +302,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: fontlibc.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

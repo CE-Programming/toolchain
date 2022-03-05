@@ -51,13 +51,14 @@ The following code sets up a simple falling edge detector to catch this.
     }
     prevkey = key;
 
-Getting GetCSC codes with keypadc 
+Getting GetCSC codes with keypadc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This code (written by Jacobly) scans \c kb_Data 
+This code returns the same keycodes that `os_GetCSC()` produces.
 
 .. code-block:: c
 
+   // code by jacobly
    uint8_t get_single_key_pressed(void) {
        static uint8_t last_key;
        uint8_t only_key = 0;
@@ -86,4 +87,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: keypadc.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

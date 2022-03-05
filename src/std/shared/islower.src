@@ -6,6 +6,7 @@
 ; }
 	assume	adl=1
 
+	section	.text
 	public	_islower
 _islower:
 	pop	hl

@@ -112,7 +112,7 @@ typedef enum {
  * +--------+------------+------------+------------+------------+------------+------------+------------+------------+
  *
  * \endverbatim
- * 
+ *
  * These data registers can be indexed as a normal array. For example, to check the status of the '2nd' key:
  * @code
  *  if (kb_Data[1] & kb_2nd) {

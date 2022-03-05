@@ -1,7 +1,8 @@
 	assume	adl=1
 
-	public	_atoi, _atol
-_atol := _atoi
+	section	.text
+	public	_atol, _atoi
+_atol:
 _atoi:
 	pop	bc
 	ex	(sp),hl

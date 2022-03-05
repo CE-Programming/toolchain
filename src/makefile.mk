@@ -72,7 +72,7 @@ BIN ?= $(CEDEV_TOOLCHAIN)/bin
 ifeq ($(OS),Windows_NT)
 SHELL = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
-FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg.exe)
+FASMG = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg.exe)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
@@ -82,7 +82,7 @@ NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG = "$(subst ",',$1)"#'
 else
 NATIVEPATH = $(subst \,/,$1)
-FASMGLD = $(call NATIVEPATH,$(BIN)/fasmg)
+FASMG = $(call NATIVEPATH,$(BIN)/fasmg)
 CONVBIN = $(call NATIVEPATH,$(BIN)/convbin)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang)
@@ -120,7 +120,6 @@ rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filte
 # find source files
 CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_CSOURCES))
 CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CPPSOURCES))
-USERHEADERS ?= $(sort $(call rwildcard,$(SRCDIR),*.h *.hpp) $(EXTRA_USERHEADERS))
 ASMSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
 
 # create links for later
@@ -129,6 +128,7 @@ LINK_CPPSOURCES ?= $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.
 LINK_ASMSOURCES ?= $(ASMSOURCES)
 
 # files created to be used for linking
+DEPFILES ?= $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
 LDFILES ?= $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
 LDLIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)
 
@@ -227,7 +227,7 @@ $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
 $(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONSRC) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [linking] $(call NATIVEPATH,$@)
-	$(Q)$(FASMGLD) $(FASMGFLAGS) $(call NATIVEPATH,$@)
+	$(Q)$(FASMG) $(FASMGFLAGS) $(call NATIVEPATH,$@)
 
 ifneq ($(ICONSRC),)
 $(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)
@@ -248,12 +248,16 @@ version:
 	$(Q)echo CE C Toolchain $(shell cedev-config --version)
 
 .SECONDEXPANSION:
-$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -S -MD $(EZCFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
-$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -S -MD $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+include $(DEPFILES)
+endif

@@ -1,3 +1,4 @@
+	section	.text
 	public	__bdivu
 __bdivu:
 ; I: B=dividend, C=divisor

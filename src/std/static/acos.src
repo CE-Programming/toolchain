@@ -1,8 +1,9 @@
 	assume	adl=1
 
+	section	.text
 	public	_acos, _acosf
-_acosf := _acos
 _acos:
+_acosf:
 	pop	hl
 	pop	de
 	pop	bc

@@ -7,7 +7,7 @@ Implementations to use regardless of linking method. Should include:
  * Statically linked implementations that must be used because they provide
    improved/corrected behavior or substantially improved performance relative to
    the OS linked implementation.
-   
+
 #### *linked*
 
 Implementations to use when linking against the OS. Should just be equates for

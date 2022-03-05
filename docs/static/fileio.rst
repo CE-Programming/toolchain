@@ -10,7 +10,7 @@ File I/O functions are any of the standard `fopen`, `fgets`, `fread`, and relate
 These functions are meant to perform OS-level file access for reading and writing.
 However, the CE doesn't expose any sort of standard UNIX or similar file capabilities.
 
-To mitigate this, the CE C Toolchain includes these functions as wrappers around the :ref:`fileioc library <fileioc_h>`.
+To mitigate this, the CE Toolchain includes these functions as wrappers around the :ref:`fileioc library <fileioc_h>`.
 This allows native access to AppVars for read and write operations.
 
 For :code:`stdin`, :code:`stdout`, and :code:`stderr` file streams, the default implementation uses the `getchar` and `putchar` functions respectively.

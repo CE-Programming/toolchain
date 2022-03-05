@@ -2,12 +2,11 @@
 
 	assume	adl=1
 
-if 0
 ; Minimal caller code (for timing calculation).
 	call	_sleep
 ; ^ 22 cc
-end if
 
+	section	.text
 	public	_sleep
 _sleep:
 ; Even though the input is 24-bit, let's just pretend that it's 16-bit.

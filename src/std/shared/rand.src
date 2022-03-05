@@ -1,6 +1,7 @@
 	assume	adl=1
 
-	public _rand
+	section	.text
+	public	_rand
 _rand:
 	call	_random
 	ld	de,8388608

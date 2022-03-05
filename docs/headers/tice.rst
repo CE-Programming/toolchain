@@ -16,4 +16,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: tice.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

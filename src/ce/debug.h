@@ -28,7 +28,7 @@ extern "C" {
  *
  * See the syntax for 'printf' for more information.
  * @param ... Uses printf-formated specifier string.
- * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO. 
+ * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO.
  */
 #define dbg_printf(...) sprintf(dbgout, ##__VA_ARGS__)
 
@@ -38,7 +38,7 @@ extern "C" {
  * See the syntax for 'printf' for more information.
  * @param out Can be dbgout (black) or dbgerr (red).
  * @param ... Uses printf-formated specifier string.
- * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO. 
+ * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO.
  */
 #define dbg_sprintf(out, ...) sprintf(out, ##__VA_ARGS__)
 

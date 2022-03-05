@@ -3,6 +3,7 @@
 ; ---
 	assume	adl=1
 
+	section	.text
 	public	_atomic_load_increasing_32
 _atomic_load_increasing_32:
 ; CC: 202 + 9 * read_1_invalid + 3 * ie

@@ -3,6 +3,7 @@
 ; ---
 	assume	adl=1
 
+	section	.text
 	public	_os_DisableHomeTextBuffer
 _os_DisableHomeTextBuffer:
 	ld	iy,$d00080
@@ -11,8 +12,7 @@ _os_DisableHomeTextBuffer:
 	set	5,(iy + $4c)	; only display
 	ret
 
-        section	.text
-
+	section	.text
 	public	_os_EnableHomeTextBuffer
 _os_EnableHomeTextBuffer:
 	ld	iy,$d00080

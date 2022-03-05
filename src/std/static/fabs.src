@@ -1,8 +1,9 @@
 	assume	adl=1
 
+	section	.text
 	public	_fabs, _fabsf
-_fabsf := _fabs
 _fabs:
+_fabsf:
 	pop	bc
 	pop	hl
 	pop	de

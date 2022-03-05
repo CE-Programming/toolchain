@@ -6,6 +6,7 @@
 ; }
 	assume	adl=1
 
+	section	.text
 	public	_isxdigit
 _isxdigit:
 	pop	hl

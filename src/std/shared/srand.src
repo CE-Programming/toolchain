@@ -1,6 +1,7 @@
 ; void srand(unsigned int seed);
 	assume	adl=1
 
+	section	.text
 	public	_srand
 _srand:
 	pop	bc

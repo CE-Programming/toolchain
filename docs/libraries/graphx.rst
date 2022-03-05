@@ -49,7 +49,7 @@ Sample Implementation
 A brief summation of the paritial redraw using graphx is:
 
 * Allocate space for a temporary sprite.
-* When the background is drawn, a small copy of it is saved to the temporary spirte.
+* When the background is drawn, a small copy of it is saved to the temporary sprite.
 * After the background is drawn, the sprite is drawn as normal.
 * Upon movement, the sprite is erased using the temporary sprite and the coordinates are updated.
 * The section of background with the updated coordinates is stored to the temporary sprite and the process repeated.
@@ -156,7 +156,7 @@ The image :code:`oiram.png` is the sprite that wants to be converted, and :code:
 
 Open :code:`convimg.yaml` in a text editor, which contains the below lines.
 Run the command :code:`convimg --help`. This outputs the readme for convimg, and what each of the various commands do.
-You can also find the readme online, available `here <https://github.com/mateoconlechuga/convimg/blob/master/README.md>`_. 
+You can also find the readme online, available `here <https://github.com/mateoconlechuga/convimg/blob/master/README.md>`_.
 
 .. code-block:: yaml
 
@@ -204,4 +204,4 @@ API Documentation
 -----------------
 
 .. doxygenfile:: graphx.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

@@ -1,6 +1,7 @@
 ; int abs(int);
         assume  adl=1
 
+	section	.text
 	public  _abs
 _abs:
 	pop	hl

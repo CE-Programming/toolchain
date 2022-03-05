@@ -57,6 +57,7 @@ end namespace
 reloc.base := ti.cursorImage
 reloc.offset := reloc.base - reloc.data
 
+	section	.text
 	public	_os_RunPrgm
 _os_RunPrgm:
 	require	___prgm_run_check
@@ -408,6 +409,7 @@ ___prgm_to_run:
 ___prgm_to_run_size:
 	dl	0
 
+	private	reloc_rodata
 load reloc_rodata: $-$$ from $$
 end virtual
 

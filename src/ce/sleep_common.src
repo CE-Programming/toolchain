@@ -2,6 +2,7 @@ ___sleep_common:
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
 
 ; Calculate the end time.
+	section	.text
 	public	___sleep_common.1
 .1:
 	scf				; cf = 1
