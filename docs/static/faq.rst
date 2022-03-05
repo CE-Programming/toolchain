@@ -67,8 +67,11 @@ Below is an example assembly source file that relies on an external function:
 
 .. code-block:: asm
 
-    	public	_asm_func
+    	assume	adl=1
 
+	section	.text
+
+    	public	_asm_func
     _asm_func:
     	pop	hl
     	pop	de

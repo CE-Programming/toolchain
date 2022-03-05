@@ -54,9 +54,6 @@ namespace ti?
 ?textInverse               := 3
 end namespace
 
-reloc.base := ti.cursorImage
-reloc.offset := reloc.base - reloc.data
-
 	section	.text
 	public	_os_RunPrgm
 _os_RunPrgm:
@@ -419,6 +416,8 @@ end virtual
 reloc.data:
 	db	reloc_rodata
 .len := $-.
+reloc.base := ti.cursorImage
+reloc.offset := reloc.base - reloc.data
 
 	section	.rodata
 	public	___prgm_caller
