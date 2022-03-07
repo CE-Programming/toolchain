@@ -3,7 +3,6 @@
 	section	.text
 	public	__lcmps
 __lcmps:
-if 1
 	push	de
 	ld	d, a
 	ld	a, e
@@ -11,28 +10,6 @@ if 1
 	jr	nz, .finish
 	sbc	hl, bc
 	add	hl, bc
-	jr	z, .finish
-	sbc	a, a
-	scf
-	adc	a, a
-.finish:
 	ld	a, d
 	pop	de
 	ret
-else
-	push	hl
-	or	a, a
-	sbc	hl, bc
-	ld	l, a
-	ld	a, e
-	jr	z, .eq24
-	sbc	a, l
-	jr	nz, .finish
-	inc	a
-.eq24:
-	sbc	a, l
-.finish:
-	ld	a, l
-	pop	hl
-	ret
-end if

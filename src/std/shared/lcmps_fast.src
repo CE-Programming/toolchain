@@ -8,8 +8,4 @@ __lcmps_fast:
 	sub 	a, d
 	ret	nz
 	sbc	hl, bc
-	ret	z
-	sbc	a, a
-	ret	nz
-	inc	a
 	ret
