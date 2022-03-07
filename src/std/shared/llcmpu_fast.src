@@ -1,6 +1,8 @@
 	assume	adl=1
 
 	section	.text
+	public	__llcmps_fast
+__llcmps_fast:
 	public	__llcmpu_fast
 __llcmpu_fast:
 	ld	iy, 0
