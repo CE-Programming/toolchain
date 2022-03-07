@@ -62,8 +62,6 @@ __bshru		:= 000104h
 ; short (16-bit) math
 	public	__sand
 __sand		:= 000200h
-	public	__scmpzero
-__scmpzero	:= 000204h
 	public	__smuls
 __smuls		:= 000224h
 	public	__smulu
@@ -86,8 +84,6 @@ __sxor		:= 000268h
 ; int (24-bit) math
 	public	__iand
 __iand		:= 000134h
-	public	__icmpzero
-__icmpzero	:= 000138h
 	public	__idivs
 __idivs		:= 00013Ch
 	public	__idivu
@@ -128,8 +124,6 @@ __land		:= 0001A4h
 __lcmps		:= 0001A8h
 	public	__lcmpu
 __lcmpu		:= 0001ACh
-	public	__lcmpzero
-__lcmpzero	:= 0001B0h
 	public	__ldivs
 __ldivs		:= 0001B4h
 	public	__ldivu

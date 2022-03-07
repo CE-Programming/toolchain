@@ -3,13 +3,7 @@
 	section	.text
 	public	__scmpzero
 __scmpzero:
-	add	hl, bc
+	add	hl, de
 	or	a, a
-	sbc.s	hl, bc
-	ret	po
-	inc	h
-	dec	h
-	ret	po
-	dec	h
-	inc	h
+	sbc.s	hl, de
 	ret

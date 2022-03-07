@@ -4,26 +4,18 @@
 	public	__llcmpzero
 __llcmpzero:
 	inc	b
-	djnz	.b_nz
-	dec	c
-	inc	c
-	jr	nz, .c_nz
-	mlt	bc
-	adc	hl, bc
-	jr	nz, .udeuhl_nz
-	adc	hl, de
-	ret	z
-.udeuhl_nz:
-	inc	c
-	dec	bc
-	ret
-.b_nz:
-	ret	po
 	dec	b
-	inc	b
-	ret
-.c_nz:
-	ret	p
-	inc	c
+	ret	nz
+	inc.s	bc
 	dec	c
+	jr	nz, .p_nz
+	or	a, a
+	sbc	hl, bc
+	jr	nz, .p_nz
+	sbc	hl, de
+	ret	z
+	add	hl, de
+.p_nz:
+	inc	b
+	ld	b, 0
 	ret

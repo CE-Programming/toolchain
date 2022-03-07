@@ -7,12 +7,12 @@ __llcmpzero_fast:
 	add	a, b
 	ret	nz
 	cp	a, c
-	jr	nz, .nz
+	jr	nz, .p_nz
 	mlt	bc
 	adc	hl, bc
-	jr	nz, .nz
+	jr	nz, .p_nz
 	adc	hl, de
 	ret	z
-.nz:
+.p_nz:
 	inc	a
 	ret
