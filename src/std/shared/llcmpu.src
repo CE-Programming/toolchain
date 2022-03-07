@@ -17,6 +17,7 @@ __llcmpu:
 	push	bc
 	ld	bc, (iy + 6)
 	sbc	hl, bc
+	add	hl, bc
 	pop	bc
 	pop	iy
 	ret
