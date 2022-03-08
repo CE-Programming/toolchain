@@ -1219,18 +1219,18 @@ _Ellipse:
 	ld	l,a
 	ld	h,a
 	mlt	hl
-	ld	(ix - el_a2),hl			; int a2 = a * a;
+	ld	(ix - el_a2),hl		; int a2 = a * a;
 	add	hl,hl
-	ld	(ix - el_sigma_diff2),hl	; Save a2 * 2 for later
+	ld	(ix - el_sigma_diff2),hl; Save a2 * 2 for later
 	add	hl,hl
-	ld	(ix - el_fa2),hl		; int fa2 = 4 * a2;
+	ld	(ix - el_fa2),hl	; int fa2 = 4 * a2;
 	ld	a,(ix + 15)
 	or	a,a
-	jr	z,.return			; Make sure Y radius is not 0
+	jr	z,.return		; Make sure Y radius is not 0
 	ld	e,a
 	ld	d,1
 	mlt	de
-	ld	(ix - el_y),de			; int y = b;
+	ld	(ix - el_y),de		; int y = b;
 	ld	hl,(ix - el_a2)
 	ld	d,l
 	ld	l,e
@@ -1251,21 +1251,21 @@ _Ellipse:
 	ld	hl,(ix - el_fa2)
 	or	a,a
 	sbc	hl,de
-	ld	(ix - el_sigma_1),hl		; int sigma_add_1 = fa2 * (1 - b);
+	ld	(ix - el_sigma_1),hl	; int sigma_add_1 = fa2 * (1 - b);
 	ld	l,a
 	ld	h,a
 	mlt	hl
-	ld	(ix - el_b2),hl			; int b2 = b * b;
+	ld	(ix - el_b2),hl		; int b2 = b * b;
 	add	hl,hl
 	ld	(ix - el_sigma_diff1),hl	; Save b2 * 2 for later
 	add	hl,hl
-	ld	(ix - el_fb2),hl		; int fb2 = 4 * b2;
+	ld	(ix - el_fb2),hl	; int fb2 = 4 * b2;
 	ld	c,a
 	ld	b,2
 	mlt	bc
 	or	a,a
 	sbc	hl,hl
-	ld	(ix - el_x),hl			; int x = 0;
+	ld	(ix - el_x),hl		; int x = 0;
 	ld	(ix - el_comp_a),hl
 	inc	hl
 	sbc	hl,bc
@@ -1274,18 +1274,18 @@ _Ellipse:
 	ld	bc,(ix - el_b2)
 	add	hl,bc
 	add	hl,bc
-	ld	(ix - el_sigma),hl		; int sigma = 2 * b2 + a2 * (1 - 2 * b);
+	ld	(ix - el_sigma),hl	; int sigma = 2 * b2 + a2 * (1 - 2 * b);
 	ld	e,(ix + 12)
 	ld	d,1
 	mlt	de
-	ld	(ix - el_temp1),de		; Save int a for later
+	ld	(ix - el_temp1),de	; Save int a for later
 	or	a,a
 	sbc	hl,hl
 	inc	hl
 	sbc	hl,de
 	ld	bc,(ix - el_fb2)
 	call	_MultiplyHLBC
-	ld	(ix - el_sigma_2),hl		; int sigma_add_2 = fb2 * (1 - a);
+	ld	(ix - el_sigma_2),hl	; int sigma_add_2 = fb2 * (1 - a);
 
 	ld	hl,(ix - el_a2)
 	ld	bc,(ix - el_y)
@@ -1301,27 +1301,27 @@ _ellipse_loop_draw_1 := $-3
 ; Eventually change sigma and y
 	ld	hl,(ix - el_sigma)
 	add	hl,hl
-	jr	c,.loop1_jump			; if (sigma >= 0) {
+	jr	c,.loop1_jump		; if (sigma >= 0) {
 
 	call	0
 _ellipse_loop_draw_2 := $-3
 
-	ld	hl,(ix - el_sigma)		; sigma += sigma_add_1;
+	ld	hl,(ix - el_sigma)	; sigma += sigma_add_1;
 	ld	de,(ix - el_sigma_1)
 	add	hl,de
 	ld	(ix - el_sigma),hl
 	ld	hl,(ix - el_fa2)
 	add	hl,de
-	ld	(ix - el_sigma_1),hl		; sigma_add_1 += fa2;
+	ld	(ix - el_sigma_1),hl	; sigma_add_1 += fa2;
 	ld	hl, (ix - el_y)
 	dec	hl
-	ld	(ix - el_y),hl			; y--;
+	ld	(ix - el_y),hl		; y--;
 	ld	hl,(ix - el_comp_b)
 	ld	de,(ix - el_a2)
 	or	a,a
 	sbc	hl,de
 	ld	(ix - el_comp_b),hl
-.loop1_jump:					; }
+.loop1_jump:				; }
 ; Change sigma and increment x
 	ld	hl,(ix - el_sigma_diff1)
 	ld	de,(ix - el_fb2)
@@ -1329,10 +1329,10 @@ _ellipse_loop_draw_2 := $-3
 	ld	(ix - el_sigma_diff1),hl
 	ld	de,(ix - el_sigma)
 	add	hl,de
-	ld	(ix - el_sigma),hl		; sigma += b2 * (4 * x + 6);
+	ld	(ix - el_sigma),hl	; sigma += b2 * (4 * x + 6);
 	ld	hl,(ix - el_x)
 	inc	hl
-	ld	(ix - el_x),hl			; x++;
+	ld	(ix - el_x),hl		; x++;
 
 ; Update the comparison operands
 	ld	hl,(ix - el_comp_a)
@@ -1342,9 +1342,9 @@ _ellipse_loop_draw_2 := $-3
 	ld	de,(ix - el_comp_b)
 
 ; And compare
-	ld	bc,0x800000			; b2 * x <= a2 * y so hl <= de
+	ld	bc,0x800000		; b2 * x <= a2 * y so hl <= de
 	add	hl,bc
-	ex	de,hl				; de <= hl
+	ex	de,hl			; de <= hl
 	add	hl,bc
 	or	a,a
 	sbc	hl,de
@@ -1352,11 +1352,11 @@ _ellipse_loop_draw_2 := $-3
 
 ; Update few variables for the next loop
 	ld	hl, (ix - el_temp1)
-	ld	(ix - el_x),hl			; x = a
+	ld	(ix - el_x),hl		; x = a
 	ld	e,l
 	or	a,a
 	sbc	hl,hl
-	ld	(ix - el_y),hl			; y = 0
+	ld	(ix - el_y),hl		; y = 0
 	ld	(ix - el_comp_a),hl
 	ld	d,2
 	mlt	de
@@ -1381,17 +1381,17 @@ _ellipse_loop_draw_3 := $-3
 ; Eventually update sigma and x
 	ld	hl,(ix - el_sigma)
 	add	hl,hl
-	jr	c,.loop2_jump			; if (sigma >= 0) {
+	jr	c,.loop2_jump		; if (sigma >= 0) {
 	ld	hl,(ix - el_sigma)
 	ld	de,(ix - el_sigma_2)
 	add	hl,de
-	ld	(ix - el_sigma),hl		; sigma += sigma_add_2;
+	ld	(ix - el_sigma),hl	; sigma += sigma_add_2;
 	ld	hl,(ix - el_fb2)
 	add	hl,de
-	ld	(ix - el_sigma_2),hl		; sigma_add_2 += fb2;
+	ld	(ix - el_sigma_2),hl	; sigma_add_2 += fb2;
 	ld	hl, (ix - el_x)
 	dec	hl
-	ld	(ix - el_x),hl			; x--;
+	ld	(ix - el_x),hl		; x--;
 	ld	hl,(ix - el_comp_b)
 	ld	de,(ix - el_b2)
 	or	a,a
@@ -1405,10 +1405,10 @@ _ellipse_loop_draw_3 := $-3
 	ld	(ix - el_sigma_diff2),hl
 	ld	de,(ix - el_sigma)
 	add	hl,de
-	ld	(ix - el_sigma),hl		; sigma += a2 * (4 * y + 6);
+	ld	(ix - el_sigma),hl	; sigma += a2 * (4 * y + 6);
 	ld	hl,(ix - el_y)
 	inc	hl
-	ld	(ix - el_y),hl			; y++;
+	ld	(ix - el_y),hl		; y++;
 	ld	hl,(ix - el_comp_a)
 	ld	de,(ix - el_a2)
 	add	hl,de
