@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'GRAPHX', 11
+library 'GRAPHX', 12
 
 ;-------------------------------------------------------------------------------
 ; no dependencies
@@ -1210,6 +1210,7 @@ _Ellipse:
 	
 ; First, setup all the variables
 	ld	a,(ix + 12)
+	or	a,a
 	jr	nz,.valid_x_radius
 .return:
 	ld	sp,ix
@@ -1435,14 +1436,14 @@ _ellipse_draw_pixels:
 	ld	hl,(ix + 9)
 	ld	de,(ix - el_y)
 	add	hl,de
-	ex	de,hl			; yc + y
+	ex	de,hl
 	push	de
 	ld	hl,(ix + 6)
 	ld	bc,(ix - el_x)
 	add	hl,bc
 	push	hl
-	pop	bc			; xc + x
-	call	_SetPixel_NoWait
+	pop	bc
+	call	_SetPixel_NoWait	; xc + x, yc + y
 _ellipse_pixel_routine_1 := $-3
 	pop	de
 	ld	hl,(ix + 6)
@@ -1450,26 +1451,26 @@ _ellipse_pixel_routine_1 := $-3
 	or	a,a
 	sbc	hl,bc
 	push	hl
-	pop	bc			; xc - x
+	pop	bc
 	push	bc
-	call	_SetPixel_NoWait
+	call	_SetPixel_NoWait	; xc - x, yc + y
 _ellipse_pixel_routine_2 := $-3
 	pop	bc
 	ld	hl,(ix + 9)
 	ld	de,(ix - el_y)
 	or	a,a
 	sbc	hl,de
-	push	hl
-	pop	bc			; yc - y
-	push	bc
-	call	_SetPixel_NoWait
+	ex	de,hl
+	push	de
+	call	_SetPixel_NoWait	; xc - x, yc - y
 _ellipse_pixel_routine_3 := $-3
-	pop	bc
+	pop	de
 	ld	hl,(ix + 6)
-	ld	de,(ix - el_x)
-	add	hl,de
-	ex	de,hl			; xc + x
-	jp	_SetPixel_NoWait
+	ld	bc,(ix - el_x)
+	add	hl,bc
+	push	hl
+	pop	bc
+	jp	_SetPixel_NoWait	; xc + x, yc - y
 _ellipse_pixel_routine_4 := $-3
 
 _ellipse_draw_line:
