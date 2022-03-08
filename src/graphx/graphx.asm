@@ -1210,8 +1210,12 @@ _Ellipse:
 	
 ; First, setup all the variables
 	ld	a,(ix + 12)
-	or	a,a
-	ret	z				; Make sure X radius is not 0
+	jr	nz,.valid_x_radius
+.return:
+	ld	sp,ix
+	pop	ix
+	ret
+.valid_x_radius:
 	ld	l,a
 	ld	h,a
 	mlt	hl
@@ -1222,7 +1226,7 @@ _Ellipse:
 	ld	(ix - el_fa2),hl		; int fa2 = 4 * a2;
 	ld	a,(ix + 15)
 	or	a,a
-	ret	z				; Make sure Y radius is not 0
+	jr	z,.return			; Make sure Y radius is not 0
 	ld	e,a
 	ld	d,1
 	mlt	de

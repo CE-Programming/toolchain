@@ -767,10 +767,7 @@ gfx_Circle((x), (y), (radius))
  * @param a The horizontal radius of the ellipse.
  * @param b The vertical radius of the ellipse.
  */
-void gfx_FillEllipse_NoClip(int x,
-                            int y,
-                            int a,
-							int b);
+void gfx_FillEllipse_NoClip(int x, int y, int a, int b);
 
 /**
  * Draws a filled ellipse.
