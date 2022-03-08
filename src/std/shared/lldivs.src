@@ -35,10 +35,12 @@ __lldivs:
 	push	hl
 
 	lea	hl, iy + 7
+	xor	a, a
+	ld	c, a
 	ld	b, 8
 
 .neg_divisor_loop:
-	ld	a, 0
+	ld	a, c
 	sbc	a, (hl)
 	ld	(hl), a
 	inc	hl
@@ -48,8 +50,9 @@ __lldivs:
 	pop	bc
 .neg_divisor_skip:
 
-	bit	7, b
-	call	nz, __llneg
+	ld	a, b
+	or	a, a
+	call	m, __llneg
 
 	call	__lldvrmu.hijack
 
