@@ -53,6 +53,8 @@ int atoi(const char *nptr) __attribute__((nonnull(1)));
 
 long atol(const char *nptr) __attribute__((nonnull(1)));
 
+long long atoll(const char *nptr) __attribute__((nonnull(1)));
+
 float strtof(const char *__restrict nptr,
              char **__restrict endptr) __attribute__((nonnull(1)));
 

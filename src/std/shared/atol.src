@@ -1,0 +1,21 @@
+	assume	adl=1
+
+	section	.text
+	public	_atoi, _atol
+_atoi:
+_atol:
+	pop	bc
+	ex	(sp),hl
+	push	bc
+	ld	bc,10
+	push	bc
+	ld	c,b
+	push	bc
+	push	hl
+	call	_strtol
+	pop	af
+	pop	af
+	pop	af
+	ret
+
+	extern	_strtol

@@ -1,9 +1,8 @@
 	assume	adl=1
 
 	section	.text
-	public	_atol, _atoi
-_atol:
-_atoi:
+	public	_atoll
+_atoll:
 	pop	bc
 	ex	(sp),hl
 	push	bc
@@ -12,10 +11,10 @@ _atoi:
 	ld	c,b
 	push	bc
 	push	hl
-	call	_strtol
-	pop	bc
-	pop	bc
-	pop	bc
+	call	_strtoll
+	pop	af
+	pop	af
+	pop	af
 	ret
 
-	extern	_strtol
+	extern	_strtoll

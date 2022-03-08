@@ -82,33 +82,6 @@ static void finishOutput()
 }
 
 
-static uint64_t atoull_(const char *str)
-{
-    uint64_t result = 0;
-    while (isdigit(*str))
-    {
-        result = result * 10 + (unsigned)(*str++ - '0');
-    }
-
-    return result;
-}
-
-static int64_t atoll_(const char *str)
-{
-    bool negative = false;
-    if (*str == '-')
-    {
-        negative = true;
-        str++;
-    }
-
-    uint64_t x = atoull_(str);
-    int64_t result = (int64_t)(negative ? -x : x);
-
-    return result;
-}
-
-
 #define DEFINE_UNOP_PREFIX_FUNC(type, name, op) \
     static type name##_(type x)                 \
     {                                           \
@@ -399,8 +372,8 @@ static const BinOp *binops[] = {
 
 int main(int argc, char *argv[])
 {
-    int64_t x = argc > 1 ? atoll_(argv[1]) : (int64_t)0xDFA5FBC197EDB389LL;
-    int64_t y = argc > 2 ? atoll_(argv[2]) : (int64_t)0x08010A030C050E07LL;
+    int64_t x = argc > 1 ? atoll(argv[1]) : (int64_t)0xDFA5FBC197EDB389LL;
+    int64_t y = argc > 2 ? atoll(argv[2]) : (int64_t)0x08010A030C050E07LL;
 
     separateOutput();
 
