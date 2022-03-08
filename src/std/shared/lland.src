@@ -3,13 +3,14 @@
 	section	.text
 	public	__lland
 __lland:
-; CC: 60*r(PC)+22*r(SPL)+11*w(SPL)+1
+; CC: 62*r(PC)+25*r(SPL)+14*w(SPL)+1
+	push	af
 	push	iy
 	ld	iy, 0
 	add	iy, sp
 	push	hl
 	push	de
-	lea	hl, iy + 13
+	lea	hl, iy + 16
 	ld	a, b
 	and	a, (hl)
 	ld	b, a
@@ -37,10 +38,11 @@ __lland:
 	ld	(iy - 1), a
 	pop	hl
 	ld	a, h
-	and	a, (iy + 7)
+	and	a, (iy + 10)
 	ld	h, a
 	ld	a, l
-	and	a, (iy + 6)
+	and	a, (iy + 9)
 	ld	l, a
 	pop	iy
+	pop	af
 	ret
