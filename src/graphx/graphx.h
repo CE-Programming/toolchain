@@ -35,6 +35,7 @@
  * @author Jacob "jacobly" Young
  * @author Zachary "Runer112" Wassall
  * @author Patrick "tr1p1ea" Prendergast
+ * @author Peter "PT_" Tillema
  * @author "grosged"
  */
 
@@ -769,6 +770,55 @@ void gfx_FillCircle_NoClip(uint24_t x,
  */
 #define gfx_Circle_NoClip(x, y, radius) \
 gfx_Circle((x), (y), (radius))
+
+/**
+ * Draws an unclipped filled ellipse.
+ *
+ * This is measured from the top left origin of the screen.
+ * Performs faster than using gfx_FillEllipse, but can cause corruption if used outside the bounds of the screen.
+ * @param x X coordinate.
+ * @param y Y coordinate.
+ * @param a The horizontal radius of the ellipse.
+ * @param b The vertical radius of the ellipse.
+ */
+void gfx_FillEllipse_NoClip(int x,
+                            int y,
+                            int a,
+							int b);
+
+/**
+ * Draws a filled ellipse.
+ *
+ * This is measured from the top left origin of the screen.
+ * @param x X coordinate.
+ * @param y Y coordinate.
+ * @param a The horizontal radius of the ellipse.
+ * @param b The vertical radius of the ellipse.
+ */
+void gfx_FillEllipse(int x, int y, int a, int b);
+
+/**
+ * Draws an unclipped ellipse.
+ *
+ * This is measured from the top left origin of the screen.
+ * Performs faster than using gfx_FillEllipse, but can cause corruption if used outside the bounds of the screen.
+ * @param x X coordinate.
+ * @param y Y coordinate.
+ * @param a The horizontal radius of the ellipse.
+ * @param b The vertical radius of the ellipse.
+ */
+void gfx_Ellipse_NoClip(int x, int y, int a, int b);
+
+/**
+ * Draws an ellipse.
+ *
+ * This is measured from the top left origin of the screen.
+ * @param x X coordinate.
+ * @param y Y coordinate.
+ * @param a The horizontal radius of the ellipse.
+ * @param b The vertical radius of the ellipse.
+ */
+void gfx_Ellipse(int x, int y, int a, int b);
 
 /**
  * Draws a clipped polygon outline.

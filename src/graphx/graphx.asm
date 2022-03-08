@@ -133,6 +133,13 @@ library 'GRAPHX', 11
 ; v10 functions
 ;-------------------------------------------------------------------------------
 	export gfx_CopyRectangle
+;-------------------------------------------------------------------------------
+; v11 functions
+;-------------------------------------------------------------------------------
+	export gfx_Ellipse
+	export gfx_Ellipse_NoClip
+	export gfx_FillEllipse
+	export gfx_FillEllipse_NoClip
 
 ;-------------------------------------------------------------------------------
 LcdSize            := ti.lcdWidth*ti.lcdHeight
@@ -636,6 +643,7 @@ _SetPixel_NoWait:
 	ld	hl,-ti.lcdHeight
 	add	hl,de
 	ret	c			; return if out of bounds
+_SetPixel_NoClip_NoWait:
 	ld	hl,(CurrentBuffer)
 	add	hl,bc
 	ld	d,ti.lcdWidth / 2
@@ -1134,6 +1142,370 @@ assert .LcdSizeH and ti.lcdIntLNBU
 	dec	sp
 	dec	sp			; sp -= 3 to match pop hl later
 	jr	_WriteWaitQuickSMC
+
+;-------------------------------------------------------------------------------
+gfx_FillEllipse_NoClip:
+	ld	hl,gfx_HorizLine_NoClip
+	db	$FD			; ld hl,* -> ld iy,*
+
+;-------------------------------------------------------------------------------
+gfx_FillEllipse:
+	ld	hl,gfx_HorizLine
+	ld	(_ellipse_line_routine_1),hl
+	ld	(_ellipse_line_routine_2),hl
+	ld	hl,_ellipse_draw_line
+	ld	(_ellipse_loop_draw_2),hl
+	ld	(_ellipse_loop_draw_3),hl
+	ld	hl,_ellipse_ret
+	ld	(_ellipse_loop_draw_1),hl
+	jr	_Ellipse
+	
+;-------------------------------------------------------------------------------
+gfx_Ellipse_NoClip:
+	ld	hl,_SetPixel_NoClip_NoWait
+	db	$FD		; ld hl,* -> ld iy,*
+
+;-------------------------------------------------------------------------------
+gfx_Ellipse:
+	ld	hl,_SetPixel_NoWait
+	ld	(_ellipse_pixel_routine_1),hl
+	ld	(_ellipse_pixel_routine_2),hl
+	ld	(_ellipse_pixel_routine_3),hl
+	ld	(_ellipse_pixel_routine_4),hl
+	ld	hl,_ellipse_draw_pixels
+	ld	(_ellipse_loop_draw_1),hl
+	ld	(_ellipse_loop_draw_3),hl
+	ld	hl,_ellipse_ret
+	ld	(_ellipse_loop_draw_2),hl
+
+el_x		:= 3		; Current X coordinate of the ellipse
+el_y		:= 6		; Current Y coordinate of the ellipse
+el_a2		:= 9		; X radius squared
+el_b2		:= 12		; Y radius squared
+el_fa2		:= 15		; X radius squared * 4
+el_fb2		:= 18		; Y radius squared * 4
+el_sigma	:= 21		; Sigma
+el_sigma_1	:= 24		; Offset to be added to sigma in loop 1
+el_sigma_2	:= 27		; Offset to be added to sigma in loop 2
+el_temp1	:= 30		; X radius as "int" instead of "uint8_t"
+el_comp_a	:= 33		; b2 * x
+el_comp_b	:= 36		; a2 * y
+el_sigma_diff1	:= 39		; Offset to be added to sigma in loop 1
+el_sigma_diff2	:= 42		; Offset to be added to sigma in loop 2
+
+_Ellipse:
+; Draws an ellipse, either filled or not, either clipped or not
+; Arguments:
+;  arg0 : X coordinate (ix+6)
+;  arg1 : Y coordinate (ix+9)
+;  arg2 : X radius (ix+12)
+;  arg3 : Y radius (ix+15)
+; Returns:
+;  None
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	lea	hl,ix - 42
+	ld	sp,hl
+	
+; First, setup all the variables
+	ld	a,(ix + 12)
+	or	a,a
+	ret	z				; Make sure X radius is not 0
+	ld	l,a
+	ld	h,a
+	mlt	hl
+	ld	(ix - el_a2),hl			; int a2 = a * a;
+	add	hl,hl
+	ld	(ix - el_sigma_diff2),hl	; Save a2 * 2 for later
+	add	hl,hl
+	ld	(ix - el_fa2),hl		; int fa2 = 4 * a2;
+	ld	a,(ix + 15)
+	or	a,a
+	ret	z				; Make sure Y radius is not 0
+	ld	e,a
+	ld	d,1
+	mlt	de
+	ld	(ix - el_y),de			; int y = b;
+	ld	hl,(ix - el_a2)
+	ld	d,l
+	ld	l,e
+	mlt	de
+	mlt	hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,de
+	add	hl,hl
+	add	hl,hl
+	ex	de,hl
+	ld	hl,(ix - el_fa2)
+	or	a,a
+	sbc	hl,de
+	ld	(ix - el_sigma_1),hl		; int sigma_add_1 = fa2 * (1 - b);
+	ld	l,a
+	ld	h,a
+	mlt	hl
+	ld	(ix - el_b2),hl			; int b2 = b * b;
+	add	hl,hl
+	ld	(ix - el_sigma_diff1),hl	; Save b2 * 2 for later
+	add	hl,hl
+	ld	(ix - el_fb2),hl		; int fb2 = 4 * b2;
+	ld	c,a
+	ld	b,2
+	mlt	bc
+	or	a,a
+	sbc	hl,hl
+	ld	(ix - el_x),hl			; int x = 0;
+	ld	(ix - el_comp_a),hl
+	inc	hl
+	sbc	hl,bc
+	ld	bc,(ix - el_a2)
+	call	_MultiplyHLBC
+	ld	bc,(ix - el_b2)
+	add	hl,bc
+	add	hl,bc
+	ld	(ix - el_sigma),hl		; int sigma = 2 * b2 + a2 * (1 - 2 * b);
+	ld	e,(ix + 12)
+	ld	d,1
+	mlt	de
+	ld	(ix - el_temp1),de		; Save int a for later
+	or	a,a
+	sbc	hl,hl
+	inc	hl
+	sbc	hl,de
+	ld	bc,(ix - el_fb2)
+	call	_MultiplyHLBC
+	ld	(ix - el_sigma_2),hl		; int sigma_add_2 = fb2 * (1 - a);
+
+	ld	hl,(ix - el_a2)
+	ld	bc,(ix - el_y)
+	call	_MultiplyHLBC
+	ld	(ix - el_comp_b),hl
+	
+	wait_quick
+
+.main_loop1:
+	call	0
+_ellipse_loop_draw_1 := $-3
+
+; Eventually change sigma and y
+	ld	hl,(ix - el_sigma)
+	add	hl,hl
+	jr	c,.loop1_jump			; if (sigma >= 0) {
+
+	call	0
+_ellipse_loop_draw_2 := $-3
+
+	ld	hl,(ix - el_sigma)		; sigma += sigma_add_1;
+	ld	de,(ix - el_sigma_1)
+	add	hl,de
+	ld	(ix - el_sigma),hl
+	ld	hl,(ix - el_fa2)
+	add	hl,de
+	ld	(ix - el_sigma_1),hl		; sigma_add_1 += fa2;
+	ld	hl, (ix - el_y)
+	dec	hl
+	ld	(ix - el_y),hl			; y--;
+	ld	hl,(ix - el_comp_b)
+	ld	de,(ix - el_a2)
+	or	a,a
+	sbc	hl,de
+	ld	(ix - el_comp_b),hl
+.loop1_jump:					; }
+; Change sigma and increment x
+	ld	hl,(ix - el_sigma_diff1)
+	ld	de,(ix - el_fb2)
+	add	hl,de
+	ld	(ix - el_sigma_diff1),hl
+	ld	de,(ix - el_sigma)
+	add	hl,de
+	ld	(ix - el_sigma),hl		; sigma += b2 * (4 * x + 6);
+	ld	hl,(ix - el_x)
+	inc	hl
+	ld	(ix - el_x),hl			; x++;
+
+; Update the comparison operands
+	ld	hl,(ix - el_comp_a)
+	ld	de,(ix - el_b2)
+	add	hl,de
+	ld	(ix - el_comp_a),hl
+	ld	de,(ix - el_comp_b)
+
+; And compare
+	ld	bc,0x800000			; b2 * x <= a2 * y so hl <= de
+	add	hl,bc
+	ex	de,hl				; de <= hl
+	add	hl,bc
+	or	a,a
+	sbc	hl,de
+	jq	nc,.main_loop1
+
+; Update few variables for the next loop
+	ld	hl, (ix - el_temp1)
+	ld	(ix - el_x),hl			; x = a
+	ld	e,l
+	or	a,a
+	sbc	hl,hl
+	ld	(ix - el_y),hl			; y = 0
+	ld	(ix - el_comp_a),hl
+	ld	d,2
+	mlt	de
+	inc	hl
+	sbc	hl,de
+	ld	bc,(ix - el_b2)
+	call	_MultiplyHLBC
+	ld	de,(ix - el_a2)
+	add	hl,de
+	add	hl,de
+	ld	(ix - el_sigma), hl
+
+	ld	hl,(ix - el_b2)
+	ld	bc,(ix - el_temp1)
+	call	_MultiplyHLBC
+	ld	(ix - el_comp_b),hl
+
+.main_loop2:
+	call	0
+_ellipse_loop_draw_3 := $-3
+
+; Eventually update sigma and x
+	ld	hl,(ix - el_sigma)
+	add	hl,hl
+	jr	c,.loop2_jump			; if (sigma >= 0) {
+	ld	hl,(ix - el_sigma)
+	ld	de,(ix - el_sigma_2)
+	add	hl,de
+	ld	(ix - el_sigma),hl		; sigma += sigma_add_2;
+	ld	hl,(ix - el_fb2)
+	add	hl,de
+	ld	(ix - el_sigma_2),hl		; sigma_add_2 += fb2;
+	ld	hl, (ix - el_x)
+	dec	hl
+	ld	(ix - el_x),hl			; x--;
+	ld	hl,(ix - el_comp_b)
+	ld	de,(ix - el_b2)
+	or	a,a
+	sbc	hl,de
+	ld	(ix - el_comp_b),hl
+.loop2_jump:
+; Change sigma and increment y
+	ld	hl,(ix - el_sigma_diff2)
+	ld	de,(ix - el_fa2)
+	add	hl,de
+	ld	(ix - el_sigma_diff2),hl
+	ld	de,(ix - el_sigma)
+	add	hl,de
+	ld	(ix - el_sigma),hl		; sigma += a2 * (4 * y + 6);
+	ld	hl,(ix - el_y)
+	inc	hl
+	ld	(ix - el_y),hl			; y++;
+	ld	hl,(ix - el_comp_a)
+	ld	de,(ix - el_a2)
+	add	hl,de
+	ld	(ix - el_comp_a),hl
+
+; Compare the boolean operators
+	ld	de,(ix - el_comp_b)
+	ld	bc,0x800000
+	add	hl,bc
+	ex	de,hl
+	add	hl,bc
+	or	a,a
+	sbc	hl,de
+	jq	nc,.main_loop2
+
+	ld	sp,ix
+	pop	ix
+_ellipse_ret:
+	ret
+
+_ellipse_draw_pixels:
+; bc = x coordinate
+; e = y coordinate
+	ld	hl,(ix + 9)
+	ld	de,(ix - el_y)
+	add	hl,de
+	ex	de,hl			; yc + y
+	push	de
+	ld	hl,(ix + 6)
+	ld	bc,(ix - el_x)
+	add	hl,bc
+	push	hl
+	pop	bc			; xc + x
+	call	_SetPixel_NoWait
+_ellipse_pixel_routine_1 := $-3
+	pop	de
+	ld	hl,(ix + 6)
+	ld	bc,(ix - el_x)
+	or	a,a
+	sbc	hl,bc
+	push	hl
+	pop	bc			; xc - x
+	push	bc
+	call	_SetPixel_NoWait
+_ellipse_pixel_routine_2 := $-3
+	pop	bc
+	ld	hl,(ix + 9)
+	ld	de,(ix - el_y)
+	or	a,a
+	sbc	hl,de
+	push	hl
+	pop	bc			; yc - y
+	push	bc
+	call	_SetPixel_NoWait
+_ellipse_pixel_routine_3 := $-3
+	pop	bc
+	ld	hl,(ix + 6)
+	ld	de,(ix - el_x)
+	add	hl,de
+	ex	de,hl			; xc + x
+	jp	_SetPixel_NoWait
+_ellipse_pixel_routine_4 := $-3
+
+_ellipse_draw_line:
+	ld	hl,(ix - el_x)
+	add	hl,hl
+	push	hl
+	ld	hl,(ix + 9)
+	ld	de,(ix - el_y)
+	or	a,a
+	sbc	hl,de
+	push	hl
+	ld	hl,(ix + 6)
+	ld	de,(ix - el_x)
+	or	a,a
+	sbc	hl,de
+	push	hl
+	call	0
+_ellipse_line_routine_1 := $-3
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl,(ix - el_x)
+	add	hl,hl
+	push	hl
+	ld	hl,(ix + 9)
+	ld	de,(ix - el_y)
+	add	hl,de
+	push	hl
+	ld	hl,(ix + 6)
+	ld	de,(ix - el_x)
+	or	a,a
+	sbc	hl,de
+	push	hl
+	call	0
+_ellipse_line_routine_2 := $-3
+	pop	hl
+	pop	hl
+	pop	hl
+	ret
+	
 
 ;-------------------------------------------------------------------------------
 gfx_Circle:
