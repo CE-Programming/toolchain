@@ -50,10 +50,10 @@ __lldivs:
 	pop	bc
 .neg_divisor_skip:
 
-	ld	a, b
-	or	a, a
-	call	m, __llneg
+	bit	7, b
+	call	nz, __llneg
 
+	or	a, a
 	call	__lldvrmu.hijack
 
 	pop	af
