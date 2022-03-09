@@ -776,8 +776,8 @@ gfx_Circle((x), (y), (radius))
  *
  * This is measured from the top left origin of the screen.
  * Performs faster than using gfx_FillEllipse, but can cause corruption if used outside the bounds of the screen.
- * @param x X coordinate.
- * @param y Y coordinate.
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
  * @param a The horizontal radius of the ellipse.
  * @param b The vertical radius of the ellipse.
  */
@@ -787,8 +787,8 @@ void gfx_FillEllipse_NoClip(int x, int y, int a, int b);
  * Draws a filled ellipse.
  *
  * This is measured from the top left origin of the screen.
- * @param x X coordinate.
- * @param y Y coordinate.
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
  * @param a The horizontal radius of the ellipse.
  * @param b The vertical radius of the ellipse.
  */
@@ -799,8 +799,8 @@ void gfx_FillEllipse(int x, int y, int a, int b);
  *
  * This is measured from the top left origin of the screen.
  * Performs faster than using gfx_FillEllipse, but can cause corruption if used outside the bounds of the screen.
- * @param x X coordinate.
- * @param y Y coordinate.
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
  * @param a The horizontal radius of the ellipse.
  * @param b The vertical radius of the ellipse.
  */
@@ -810,8 +810,8 @@ void gfx_Ellipse_NoClip(int x, int y, int a, int b);
  * Draws an ellipse.
  *
  * This is measured from the top left origin of the screen.
- * @param x X coordinate.
- * @param y Y coordinate.
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
  * @param a The horizontal radius of the ellipse.
  * @param b The vertical radius of the ellipse.
  */
