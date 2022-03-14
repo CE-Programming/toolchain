@@ -1371,7 +1371,7 @@ ti_RclVar:
 	ld	iy, 0
 	add	iy, sp
 	and	a, $3f
-	cp	a, (iy + 3)		; var type
+	sub	a, (iy + 3)		; var type
 	jp	nz, util_ret_neg_one_byte
 	ld	hl, (iy + 9)
 	ld	(hl), de
