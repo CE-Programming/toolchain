@@ -41,6 +41,25 @@ int main(void)
 
     /* Waits for a key */
     while (!os_GetCSC());
+	
+	/* Clear the screen */
+    gfx_FillScreen(255);
+	
+	/* Ellipse Drawing */
+	gfx_SetColor(56);
+	for (i = 10; i < 50; i += 2)
+    {
+		gfx_Ellipse_NoClip(100, 100, i, 40);
+	}
+	gfx_SetColor(195);
+	gfx_Ellipse(300, 35, 140, 80);
+	gfx_SetColor(5);
+	gfx_FillEllipse_NoClip(200, 150, 120, 50);
+	gfx_SetColor(210);
+	gfx_FillEllipse(25, 200, 60, 90);
+	
+	/* Waits for a key */
+    while (!os_GetCSC());
 
     /* Clear the screen */
     gfx_FillScreen(255);
