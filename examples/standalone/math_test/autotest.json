@@ -7,6 +7,10 @@
     "isASM": true
   },
   "sequence": [
+    "key|clear",
+    "delay|1000",
+    "key|0",
+    "key|enter",
     "action|launch",
     "hashWait|not",
     "key|enter",
