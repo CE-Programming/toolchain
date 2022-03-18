@@ -11,6 +11,7 @@ __bremu:
 
 	ld	b, a
 	call	__bdvrmu
+	ld	a, h
 
 	pop	hl
 	pop	bc

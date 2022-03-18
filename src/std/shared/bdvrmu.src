@@ -4,7 +4,7 @@
 	public	__bdvrmu
 __bdvrmu:
 ; I: B=dividend, C=divisor
-; O: a=B%C, b=0, h=?, l=B/C
+; O: a=?, b=0, h=B%C, l=B/C
 
 	ld	l, b
 	ld	h, 0
