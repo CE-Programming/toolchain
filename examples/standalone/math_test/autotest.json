@@ -115,14 +115,6 @@
         "257F7002"
       ]
     },
-    "or": {
-      "description": "or",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [
-        "4E247920"
-      ]
-    },
     "add": {
       "description": "add",
       "start": "vram_start",
