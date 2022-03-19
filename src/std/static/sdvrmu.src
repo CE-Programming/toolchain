@@ -15,6 +15,7 @@ __sdvrmu:
 	inc	bc
 	dec.s	bc
 
+	push	af
 	ld	a, 16
 
 	jp	__idvrmu.hijack_a_iters_ude_dividend

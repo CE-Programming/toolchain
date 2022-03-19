@@ -34,9 +34,9 @@ __sdvrms_abs:
 	ld	b, a
 .neg_divisor_skip:
 
+	pop	af
 	call	__sdvrmu
 
-	pop	af
 	pop	bc
 	ret
 

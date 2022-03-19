@@ -30,11 +30,8 @@ __idvrms:
 	ex	de, hl
 .pos_dividend_skip:
 
-	push	af
-
 	call	__idvrmu
 
-	pop	af
 	call	p, __ineg
 
 	ld	b, a

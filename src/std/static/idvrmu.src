@@ -4,10 +4,11 @@
 	public	__idvrmu
 __idvrmu:
 ; I: UHL=dividend, UBC=divisor
-; O: a=0, ude=UHL/UBC, uhl=UHL%UBC
+; O: ude=UHL/UBC, uhl=UHL%UBC
 
 	ex	de, hl
 
+	push	af
 	ld	a, 24
 	public	__idvrmu.hijack_a_iters_ude_dividend
 .hijack_a_iters_ude_dividend:
@@ -32,4 +33,5 @@ __idvrmu:
 	dec	a
 	jr	nz, .loop
 
+	pop	af
 	ret

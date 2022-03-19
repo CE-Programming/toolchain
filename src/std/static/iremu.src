@@ -6,13 +6,11 @@ __iremu:
 ; I: UHL=dividend, UBC=divisor
 ; O: uhl=UHL%UBC
 
-	push	af
 	push	de
 
 	call	__idvrmu
 
 	pop	de
-	pop	af
 	ret
 
 
