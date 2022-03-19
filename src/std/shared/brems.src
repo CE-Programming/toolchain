@@ -9,13 +9,14 @@ __brems:
 	push	hl
 
 	ld	l, a
+	push	hl
 	call	__bdvrms.hijack_a_l_dividend
+
+	pop	af
+
 	ld	a, h
-
-	bit	7, b
-
 	pop	hl
-	ret	z
+	ret	p
 
 	neg
 	ret
