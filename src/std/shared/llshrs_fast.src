@@ -33,16 +33,16 @@ __llshrs_fast:
 	ld	b, c
 	ld	c, a
 
-	ld	a, l
-	ld	(iy - 5), h
+	ld	a, e
+	ld	(iy - 2), d
 
+	ex	de, hl
 	pop	hl
 	ld	l, e
 	ld	h, d
-	ex	de, hl
 
-	pop	hl
-	ld	l, a
+	pop	de
+	ld	e, a
 
 	ret
 
