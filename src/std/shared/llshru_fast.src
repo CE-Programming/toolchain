@@ -6,12 +6,13 @@ __llshru_fast:
 	ld	iy, 0
 	add	iy, sp
 
+	ld	a, (iy + 3)
+	or	a, a
+	ret	z
+
 	ld	a, c
 	ld	c, b
 	ld	b, (iy + 3)
-	inc	b
-	dec	b
-	ret	z
 
 	push	de
 	push	hl

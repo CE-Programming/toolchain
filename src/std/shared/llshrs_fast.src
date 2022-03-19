@@ -12,7 +12,7 @@ __llshrs_fast:
 	ld	b, (iy + 3)
 	inc	b
 	dec	b
-	ret	z
+	jr	z, .skip
 
 	push	de
 	push	hl
@@ -30,10 +30,7 @@ __llshrs_fast:
 	rr	l
 	djnz	.loop
 
-	ld	b, c
-	ld	c, a
-
-	ld	a, e
+	ld	b, e
 	ld	(iy - 2), d
 
 	ex	de, hl
@@ -42,7 +39,11 @@ __llshrs_fast:
 	ld	h, d
 
 	pop	de
-	ld	e, a
+	ld	e, b
+
+.skip:
+	ld	b, c
+	ld	c, a
 
 	ret
 
