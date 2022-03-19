@@ -13,7 +13,6 @@ __llshru:
 	jp	z, __llshrs.finish
 	push	de
 	push	hl
-.loop:
 	srl	b
 	jp	__llshrs.hijack_llshru
 

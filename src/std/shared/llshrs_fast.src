@@ -19,6 +19,8 @@ __llshrs_fast:
 
 .loop:
 	sra	c
+	public	__llshrs_fast.hijack_llshru
+.hijack_llshru:
 	rra
 	rr	(iy - 1)
 	rr	d
