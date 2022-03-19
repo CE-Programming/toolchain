@@ -10,21 +10,22 @@ __bdvrms:
 	public	__bdvrms.hijack_a_l_dividend
 .hijack_a_l_dividend:
 	rla
-	jr	nc, .neg_divisor_skip
+	jr	nc, .neg_dividend_skip
 	xor	a, a
 	sub	a, l
 	ld	l, a
-.neg_divisor_skip:
+.neg_dividend_skip:
 
 	push	bc
 
-	ld	a, b
+	ld	a, c
 	rla
-	jr	nc, .neg_dividend_skip
+	jr	nc, .neg_divisor_skip
 	xor	a, a
-	sub	a, b
-	ld	b, a
-.neg_dividend_skip:
+	sub	a, c
+	ld	c, a
+	jr	nc, .neg_dividend_skip
+.neg_divisor_skip:
 
 	call	__bdvrmu.hijack_l_dividend
 
