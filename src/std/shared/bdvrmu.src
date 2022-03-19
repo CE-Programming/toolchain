@@ -7,6 +7,8 @@ __bdvrmu:
 ; O: a=?, b=0, h=B%C, l=B/C
 
 	ld	l, b
+	public	__bdvrmu.hijack_l_dividend
+.hijack_l_dividend:
 	ld	h, 0
 
 	ld	b, 8

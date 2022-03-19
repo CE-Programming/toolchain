@@ -8,6 +8,7 @@ __bdivs:
 
 	push	hl
 
+	ld	l, b
 	call	__bdvrms
 
 	ld	a, c

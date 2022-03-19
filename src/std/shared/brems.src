@@ -8,8 +8,8 @@ __brems:
 
 	push	hl
 
-	ld	b, a
-	call	__bdvrms
+	ld	l, a
+	call	__bdvrms.hijack_a_l_dividend
 	ld	a, h
 
 	bit	7, b
@@ -21,4 +21,4 @@ __brems:
 	ret
 
 
-	extern	__bdvrms
+	extern	__bdvrms.hijack_a_l_dividend
