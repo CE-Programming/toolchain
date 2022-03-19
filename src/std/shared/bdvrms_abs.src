@@ -1,13 +1,13 @@
 	assume	adl=1
 
 	section	.text
-	public	__bdvrms
-__bdvrms:
+	public	__bdvrms_abs
+__bdvrms_abs:
 ; I: C=divisor, L=dividend
 ; O: a=?, h=abs(L)%abs(C), l=abs(L)/abs(C)
 
 	ld	a, l
-	public	__bdvrms.hijack_a_l_dividend
+	public	__bdvrms_abs.hijack_a_l_dividend
 .hijack_a_l_dividend:
 	rla
 	jr	nc, .neg_dividend_skip

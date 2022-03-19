@@ -10,7 +10,7 @@ __brems:
 
 	ld	l, a
 	push	hl
-	call	__bdvrms.hijack_a_l_dividend
+	call	__bdvrms_abs.hijack_a_l_dividend
 
 	pop	af
 
@@ -22,4 +22,4 @@ __brems:
 	ret
 
 
-	extern	__bdvrms.hijack_a_l_dividend
+	extern	__bdvrms_abs.hijack_a_l_dividend

@@ -7,10 +7,13 @@ __idvrmu:
 ; O: a=0, ude=UHL/UBC, uhl=UHL%UBC
 
 	ex	de, hl
-	or	a, a
-	sbc	hl, hl
 
 	ld	a, 24
+	public	__idvrmu.hijack_a_iters_ude_dividend
+.hijack_a_iters_ude_dividend:
+
+	or	a, a
+	sbc	hl, hl
 
 .loop:
 	ex	de, hl

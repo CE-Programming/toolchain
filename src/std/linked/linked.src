@@ -62,6 +62,10 @@ __bshru		:= 000104h
 ; short (16-bit) math
 	public	__sand
 __sand		:= 000200h
+	public	__sdivs
+__sdivs		:= 000208h
+	public	__sdivu
+__sdivu		:= 00020Ch
 	public	__smuls
 __smuls		:= 000224h
 	public	__smulu
@@ -72,6 +76,10 @@ __sneg		:= 00022Ch
 __snot		:= 000230h
 	public	__sor
 __sor		:= 000234h
+	public	__srems
+__srems		:= 000238h
+	public	__sremu
+__sremu		:= 00023Ch
 	public	__sshl
 __sshl		:= 000240h
 	public	__sshrs
