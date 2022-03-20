@@ -1,0 +1,12 @@
+	assume	adl=1
+
+	section	.text
+	public	__ineg_fast
+__ineg_fast:
+	add	hl, de	; uhl=UHL+UDE
+	ex	de, hl	; ude=UHL+UDE, uhl=UDE
+	or	a, a
+	sbc	hl, de	; uhl=UDE-(UHL+UDE)
+			;    =UDE-UHL-UDE
+			;    =-UHL
+	ret

@@ -1,0 +1,25 @@
+	assume	adl=1
+
+	section	.text
+	public	__lrems
+__lrems:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL%AUBC
+
+	bit	7, e
+	push	af
+	push	bc
+
+	call	__ldivs_lrems_common
+
+	call	__lremu
+
+	pop	bc
+	pop	af
+	ret	z
+	jp	__lneg
+
+
+	extern	__ldivs_lrems_common
+	extern	__lneg
+	extern	__lremu

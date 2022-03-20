@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	__llshru
+__llshru:
+; Suboptimal for large shift amounts
+	push	af
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy + 9)
+	or	a, a
+	jp	z, __llshrs.finish
+	push	de
+	push	hl
+	srl	b
+	jp	__llshrs.hijack_llshru
+
+	extern	__llshrs.finish
+	extern	__llshrs.hijack_llshru

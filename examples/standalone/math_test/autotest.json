@@ -1,0 +1,228 @@
+{
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "key|clear",
+    "delay|1000",
+    "key|0",
+    "key|enter",
+    "action|launch",
+    "hashWait|not",
+    "key|enter",
+    "hashWait|neg",
+    "key|enter",
+    "hashWait|abs",
+    "key|enter",
+    "hashWait|bitrev",
+    "key|enter",
+    "hashWait|popcnt",
+    "key|enter",
+    "hashWait|and",
+    "key|enter",
+    "hashWait|or",
+    "key|enter",
+    "hashWait|xor",
+    "key|enter",
+    "hashWait|add",
+    "key|enter",
+    "hashWait|sub",
+    "key|enter",
+    "hashWait|shl",
+    "key|enter",
+    "hashWait|shru",
+    "key|enter",
+    "hashWait|shrs",
+    "key|enter",
+    "hashWait|mulu",
+    "key|enter",
+    "hashWait|divu",
+    "key|enter",
+    "hashWait|remu",
+    "key|enter",
+    "hashWait|divs",
+    "key|enter",
+    "hashWait|rems",
+    "key|enter",
+    "hashWait|div_q",
+    "key|enter",
+    "hashWait|div_r",
+    "key|enter",
+    "hashWait|done"
+  ],
+  "hashes": {
+    "not": {
+      "description": "not",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "0B3D9374"
+      ]
+    },
+    "neg": {
+      "description": "neg",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "10A84E1B"
+      ]
+    },
+    "abs": {
+      "description": "abs",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "D7807035"
+      ]
+    },
+    "bitrev": {
+      "description": "bitrev",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "BBADF82E"
+      ]
+    },
+    "popcnt": {
+      "description": "popcnt",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "62628040"
+      ]
+    },
+    "and": {
+      "description": "and",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "32DEF9D5"
+      ]
+    },
+    "or": {
+      "description": "or",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "4E247920"
+      ]
+    },
+    "xor": {
+      "description": "xor",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "257F7002"
+      ]
+    },
+    "add": {
+      "description": "add",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "CD575A4D"
+      ]
+    },
+    "sub": {
+      "description": "sub",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "EE1C5453"
+      ]
+    },
+    "shl": {
+      "description": "shl",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "FD8CA2EC"
+      ]
+    },
+    "shru": {
+      "description": "shru",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "9754CB4F"
+      ]
+    },
+    "shrs": {
+      "description": "shrs",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "AB5BE5CB"
+      ]
+    },
+    "mulu": {
+      "description": "mulu",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "C6A6FF7D"
+      ]
+    },
+    "divu": {
+      "description": "divu",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "F973C020"
+      ]
+    },
+    "remu": {
+      "description": "remu",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "5196C205"
+      ]
+    },
+    "divs": {
+      "description": "divs",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "2A13A348"
+      ]
+    },
+    "rems": {
+      "description": "rems",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "F45969EF"
+      ]
+    },
+    "div_q": {
+      "description": "div_q",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "EAFFC6D3"
+      ]
+    },
+    "div_r": {
+      "description": "div_r",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "B9786654"
+      ]
+    },
+    "done": {
+      "description": "done",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "101734A5",
+        "FFAF89BA"
+      ]
+    }
+  }
+}

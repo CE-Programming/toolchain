@@ -175,7 +175,10 @@ __BEGIN_DECLS
 extern intmax_t imaxabs(intmax_t __n)
     __NOEXCEPT __attribute__((__const__));
 
-typedef struct { intmax_t quot, rem; } imaxdiv_t;
+typedef struct {
+    intmax_t rem;
+    intmax_t quot;
+} imaxdiv_t;
 extern imaxdiv_t imaxdiv(intmax_t __numer, intmax_t __denom)
     __NOEXCEPT __attribute__((__const__));
 

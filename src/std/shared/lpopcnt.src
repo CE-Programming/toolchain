@@ -3,23 +3,32 @@
 	section	.text
 	public	__lpopcnt
 __lpopcnt:
-        push	hl,de
-	ld	a,l
-    	call	__bpopcnt
-	ld	l,a
-	ld	a,h
-	call	__bpopcnt
-	ld	h,a
-	ld	a,e
-	call	__bpopcnt
-	ld	e,a
-	call	$21D5C
-	call	__bpopcnt
-	add	a,e
-	add	a,l
-	add	a,h
-        pop	de,hl
+	push	bc
+	ld	b, 4
+	public	__lpopcnt.hijack1
+.hijack1:
+	push	hl
+	xor	a, a
+	ld	c, a
+.loop:
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	add	hl, hl
+	adc	a, c
+	ld	l, e
+	djnz	.loop
+	pop	hl
+	pop	bc
 	ret
-
-	extern	__bpopcnt
-

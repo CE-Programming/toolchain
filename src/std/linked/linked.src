@@ -1,4 +1,5 @@
 	public	__u_flt_info, __u_flt_rnd, _acosf, _asinf, _atanf, _atan2f, _atoff, _ceilf, _cosf, _coshf, _expf, _fabsf, _floorf, _fmodf, _frexpf, _ldexpf, _logf, _log10f, _modff, _powf, _sinf, _sinhf, _sqrtf, _strtodf, _tanf, _tanhf, _acos, _asin, _atan, _atan2, _atof, _ceil, _cos, _cosh, _exp, _fabs, _floor, _fmod, _frexp, _ldexp, _log, _log10, _modf, _pow, _sin, _sinh, _sqrt, _strtod, _tan, _tanh
+
 __u_flt_info := 022128h
 __u_flt_rnd  := 02212Ch
 _acosf       := 022100h
@@ -52,4 +53,119 @@ _strtod      := 0220E0h
 _tan         := 022120h
 _tanh        := 022138h
 
+; byte (8-bit) math
+	public	__bshl
+__bshl		:= 000100h
+	public	__bshru
+__bshru		:= 000104h
 
+; short (16-bit) math
+	public	__sand
+__sand		:= 000200h
+	public	__sdivs
+__sdivs		:= 000208h
+	public	__sdivu
+__sdivu		:= 00020Ch
+	public	__smuls
+__smuls		:= 000224h
+	public	__smulu
+__smulu		:= 000228h
+	public	__sneg
+__sneg		:= 00022Ch
+	public	__snot
+__snot		:= 000230h
+	public	__sor
+__sor		:= 000234h
+	public	__srems
+__srems		:= 000238h
+	public	__sremu
+__sremu		:= 00023Ch
+	public	__sshl
+__sshl		:= 000240h
+	public	__sshrs
+__sshrs		:= 000248h
+	public	__sshru
+__sshru		:= 000250h
+	public	__sxor
+__sxor		:= 000268h
+
+; int (24-bit) math
+	public	__iand
+__iand		:= 000134h
+	public	__idivs
+__idivs		:= 00013Ch
+	public	__idivu
+__idivu		:= 000140h
+	public	__idvrmu
+__idvrmu	:= 000144h
+	public	__imuls
+__imuls		:= 000154h
+	public	__imulu
+__imulu		:= 000158h
+	public	__ineg
+__ineg		:= 000160h
+	public	__inot
+__inot		:= 000164h
+	public	__ior
+__ior		:= 000168h
+	public	__irems
+__irems		:= 00016Ch
+	public	__iremu
+__iremu		:= 000170h
+	public	__ishl
+__ishl		:= 000174h
+	public	__ishrs
+__ishrs		:= 00017Ch
+	public	__ishru
+__ishru		:= 000184h
+	public	__ixor
+__ixor		:= 000198h
+
+; long (32-bit) math
+	public	__ladd
+__ladd		:= 00019Ch
+	public	__ladd_b
+__ladd_b	:= 0001A0h
+	public	__land
+__land		:= 0001A4h
+	public	__lcmps
+__lcmps		:= 0001A8h
+	public	__lcmpu
+__lcmpu		:= 0001ACh
+	public	__ldivs
+__ldivs		:= 0001B4h
+	public	__ldivu
+__ldivu		:= 0001B8h
+	public	__ldvrmu
+__ldvrmu	:= 0001BCh
+	public	__lmuls
+__lmuls		:= 0001C8h
+	public	__lmulu
+__lmulu		:= 0001CCh
+	public	__lneg
+__lneg		:= 0001D0h
+	public	__lnot
+__lnot		:= 0001D4h
+	public	__lor
+__lor		:= 0001D8h
+; Bug: Does not ensure `nc` before `sbc hl, hl` to negate divisor.
+; 	public	__lrems
+; __lrems	:= 0001DCh
+	public	__lremu
+__lremu		:= 0001E0h
+	public	__lshl
+__lshl		:= 0001E4h
+	public	__lshrs
+__lshrs		:= 0001E8h
+	public	__lshru
+__lshru		:= 0001ECh
+	public	__lsub
+__lsub		:= 0001F8h
+	public	__lxor
+__lxor		:= 0001FCh
+
+; C standard library
+	public	_tolower
+_tolower	:= 021E34h
+	public	_toupper
+_toupper	:= 021E38h

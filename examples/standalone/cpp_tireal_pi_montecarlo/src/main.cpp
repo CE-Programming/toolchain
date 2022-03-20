@@ -2,54 +2,57 @@
 #include <tice.h>
 #include <tireal.hpp>
 
-#define ITER_MAX 15000
-
 using namespace ti::literals;
-
-static char buf[24] = "PI is about ";
-#define buf_offset 12
 
 int main(void)
 {
-    int count = 0; /* points in the unit circle's first quadrant */
-
     /* Clear the screen */
     os_ClrHomeFull();
 
     /* Set the random seed based off the real time clock */
     srand(rtc_Time());
 
-    os_SetCursorPos(0, 0);
+    unsigned i = 0;
+    constexpr unsigned iMax = 10'000;
+    unsigned count = 0; /* points in the unit circle's first quadrant */
 
-    for (int i = 0; i < ITER_MAX; i++)
+    auto print = [&]()
     {
-        const ti::real x = ti::real(rand()) / RAND_MAX;
-        const ti::real y = ti::real(rand()) / RAND_MAX;
-        const ti::real z = x*x + y*y;
+        const auto piApprox = ti::real(count) / i * 4;
+
+        char buf[24] = "PI is about ";
+        constexpr size_t bufOffset = 12;
+        piApprox.toCString(buf + bufOffset);
+
+        os_PutStrFull(buf);
+        os_NewLine();
+    };
+
+    while (++i <= iMax)
+    {
+        const auto x = ti::real(rand()) / RAND_MAX;
+        const auto y = ti::real(rand()) / RAND_MAX;
+        const auto z = x*x + y*y;
         if (z <= 1)
         {
             count++;
         }
-        if (i % 150 == 0) // Just to print some things along the way...
-        {
-            (ti::real(count) / ITER_MAX * 4).toCString(buf+buf_offset);
-            os_PutStrFull(buf);
-            os_NewLine();
-        }
+
         if (os_GetCSC())
         {
             break;
         }
+
+        if (i % 100 == 0)
+        {
+            print();
+        }
     }
 
-    (ti::real(count) / ITER_MAX * 4).toCString(buf+buf_offset);
-    os_PutStrFull(buf);
-    os_NewLine();
+    print();
 
-    os_NewLine();
     os_PutStrFull("Press any key to quit");
-    os_NewLine();
-
     while (!os_GetCSC());
+
     return 0;
 }

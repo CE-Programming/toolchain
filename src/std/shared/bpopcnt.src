@@ -25,4 +25,3 @@ __bpopcnt:
 	and	a,$f		; a=A+B+C+D+E+F+G+H
 	pop	bc
 	ret
-

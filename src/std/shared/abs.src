@@ -1,5 +1,4 @@
-; int abs(int);
-        assume  adl=1
+	assume	adl=1
 
 	section	.text
 	public  _abs

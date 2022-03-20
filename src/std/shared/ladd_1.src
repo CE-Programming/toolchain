@@ -1,0 +1,12 @@
+	assume	adl=1
+
+	section	.text
+	public	__ladd_1
+__ladd_1:
+	inc	hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ret	nz
+	inc	e
+	ret

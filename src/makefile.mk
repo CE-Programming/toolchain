@@ -39,7 +39,9 @@ CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
 #----------------------------
 HAS_UPPERCASE_NAME ?= YES
-HAS_FLASH_FUNCTIONS ?= YES
+# Prefer static crt functions.
+# These will increase output size but are usually faster than those from TI-OS.
+STATIC_CRT ?= YES
 HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
 #----------------------------
@@ -181,8 +183,8 @@ ifeq ($(HAS_CUSTOM_FILE),YES)
 DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
 endif
 
-# choose static or linked flash functions
-ifeq ($(HAS_FLASH_FUNCTIONS),YES)
+# prefer static crt functions
+ifeq ($(STATIC_CRT),YES)
 LDSTATIC := 1
 endif
 

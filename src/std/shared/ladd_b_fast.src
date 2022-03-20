@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+	public	__ladd_b_fast
+__ladd_b_fast:
+	add	a, l
+	ld	l, a
+	ret	nc
+	inc	h
+	ret	nz
+	ld	bc, 1 shl 16
+	add	hl, bc
+	ret	nc
+	inc	e
+	ret

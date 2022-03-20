@@ -1,29 +1,16 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
-;-------------------------------------------------------------------------
-; Byte Shift Right Signed
-; Input:
-;	Operand1:
-;                 A : 8 bit number to shift
-;	Operand2:
-;                 B : 8 bit shift count
-;
-; Output:
-;       Result:   A : 8 bit
-; Registers Used:
-;       flags
-;-------------------------------------------------------------------------
-	assume  adl=1
+	assume	adl=1
 
+	section	.text
 	public	__bshrs
 __bshrs:
-	push	bc
+; CC: if B!=0: B*(5*r(PC)+1)+6*r(PC)+(ADL?6*r(SPL)+3*w(SPL):4*r(SPS)+2*w(SPS))+1
+;     if B==0: 4*r(PC)+(ADL?3*r(SPL):2*r(SPS))+2
 	inc	b
-	jr	test
-
-loop:
+	dec	b
+	ret	z
+	push	bc
+.loop:
 	sra	a
-test:
-	djnz	loop
-
+	djnz	.loop
 	pop	bc
 	ret

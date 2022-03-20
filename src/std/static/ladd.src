@@ -1,0 +1,11 @@
+	assume	adl=1
+
+	section	.text
+	public	__ladd
+__ladd:
+	push	af
+	add	hl, bc
+	adc	a, e
+	ld	e, a
+	pop	af
+	ret

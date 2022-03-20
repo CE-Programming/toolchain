@@ -4,20 +4,17 @@
 	public	__lbitrev
 __lbitrev:
 	push	af
-	ld	a,l
-    	call	__bbitrev
-	ld	l,a
-	ld	a,h
-	call	__bbitrev
-	ld	h,a
-	call	$21D5C
-	call	__bbitrev
-	call	$21D70
-	ld	a,e
-	call	__bbitrev
-	ld	e,a
+	call	__internal_bitrev_byte	; a=HLU', UHL=HL0
+	ld	l, e			; uhl=HLE
+	ld	e, a			; e=HLU'
+	call	__internal_bitrev_byte	; a=H', uhl=LE0
+	ld	l, a			; uhl=LEH'
+	call	__internal_bitrev_byte	; a=L', uhl=EH'0
+	ld	l, e			; uhl=EH'HLU'
+	ld	e, a			; e=L'
+	call	__internal_bitrev_byte	; a=E', uhl=H'HLU'
+	ld	l, a			; uhl=H'HLU'E'
 	pop	af
 	ret
 
-	extern	__bbitrev
-
+	extern	__internal_bitrev_byte

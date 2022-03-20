@@ -1,42 +1,25 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
-;-------------------------------------------------------------------------
-; Signed Byte Modulus
-; Input:
-;	Operand1:
-;		  A : 8 bit dividend (numerator)
-;
-;	Operand2:
-;		  C : 8 bit divisor (denominator)
-;
-; Output:
-;	Result:   A : 8 bit modulus
-; Registers Used:
-;
-;-------------------------------------------------------------------------
-        assume  adl=1
+	assume	adl=1
 
 	section	.text
 	public	__brems
 __brems:
-	push	bc
-	ld	b,a
-	bit	7,c
-	jr	z,skip1
-	ld	a,c
+; I: A=dividend, C=divisor
+; O: a=A%C
+
+	push	hl
+
+	ld	l, a
+	push	hl
+	call	__bdvrms_abs.hijack_a_l_dividend
+
+	pop	af
+
+	ld	a, h
+	pop	hl
+	ret	p
+
 	neg
-	ld	c,a
-skip1:
-	ld	a,b
-	bit	7,a
-	jr	z,skip2
-	neg
-skip2:
-	call	__bremu
-	bit	7,b
-	jr	z,skip3
-	neg
-skip3:
-	pop	bc
 	ret
 
-        extern  __bremu
+
+	extern	__bdvrms_abs.hijack_a_l_dividend

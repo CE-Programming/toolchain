@@ -1,0 +1,29 @@
+	assume	adl=1
+
+	section	.text
+	public	__llcmps
+__llcmps:
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	push	hl
+	ld	l, c
+	ld	h, b
+	ld	bc, (iy + 12)
+	sbc.s	hl, bc
+	pop	hl
+	jr	nz, .ne
+	ld	bc, (iy + 9)
+	ex	de, hl
+	sbc	hl, de
+	add	hl, de
+	ex	de, hl
+	jr	nz, .ne
+	ld	bc, (iy + 6)
+	sbc	hl, bc
+	add	hl, bc
+.ne:
+	pop	bc
+	pop	iy
+	ret

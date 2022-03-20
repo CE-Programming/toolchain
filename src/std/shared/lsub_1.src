@@ -1,0 +1,12 @@
+	assume	adl=1
+
+	section	.text
+	public	__lsub_1
+__lsub_1:
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	dec	hl
+	ret	nz
+	dec	e
+	ret

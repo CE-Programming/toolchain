@@ -1,39 +1,21 @@
-; (c) Copyright 2007-2008 Zilog, Inc.
-;-------------------------------------------------------------------------
-; Unsigned Byte Modulus
-; Input:
-;	Operand1:
-;                 A : 8 bit dividend (numerator)
-;
-;	Operand2:
-;                 C : 8 bit divisor (denominator)
-;
-; Output:
-;	Result:   A : 8 bit modulus
-; Registers Used:
-;	none
-;-------------------------------------------------------------------------
-        assume  adl=1
+	assume	adl=1
 
 	section	.text
 	public	__bremu
 __bremu:
+; I: A=dividend, C=divisor
+; O: a=A%C
+
 	push	bc
 	push	hl
-	ld	h,a
-	xor	a,a
-	ld	b,8
-loop:
-	sla	h
-	rla
-	jr	c,over
-	cp	a,c
-	jr	c,under
-over:
-	sub	a,c
-	inc	h
-under:
-	djnz	loop
+
+	ld	b, a
+	call	__bdvrmu
+	ld	a, h
+
 	pop	hl
 	pop	bc
 	ret
+
+
+	extern	__bdvrmu

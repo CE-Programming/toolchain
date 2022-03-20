@@ -1,0 +1,42 @@
+	assume	adl=1
+
+	section	.text
+	public	__llbitrev
+__llbitrev:
+	push	af			;  stack: 0AF
+	call	__internal_bitrev_byte	; a=HLU', UHL=HL0
+	ld	l, b			; uhl=HLB
+	push	af			;  stack: 0AF0[HLU']?
+	call	__internal_bitrev_byte	; a=H', uhl=LB0
+	ld	l, c			; uhl=LBC
+	ld	c, a			; c=H'
+	call	__internal_bitrev_byte	; a=L', uhl=BC0
+	ld	b, a			; bc=L'H'
+	push	de			;  stack: 0AF0[HLU']?[DEU]DE
+	inc	sp			;  stack: 0AF0[HLU']?[DEU]D
+	pop	af			; a=DEU
+					;  stack: 0AF0[HLU']
+	ld	l, a			; uhl=BC[DEU]
+	call	__internal_bitrev_byte	; a=B', uhl=C[DEU]0
+	ld	l, d			; uhl=C[DEU]D
+	ld	d, a			; d=B'
+	call	__internal_bitrev_byte	; a=C', uhl=[DEU]D0
+	ld	l, e			; uhl=[DEU]DE
+	ld	e, a			; e=C'
+	call	__internal_bitrev_byte	; a=DEU', uhl=DE0
+	ld	l, a			; uhl=DE[DEU']
+	call	__internal_bitrev_byte	; a=D', uhl=E[DEU']0
+	ld	l, e			; uhl=E[DEU']C'
+	push	af			;  stack: 0AF0[HLU']0D'?
+	inc	sp			;  stack: 0AF0[HLU']0D'
+	call	__internal_bitrev_byte	; a=E', uhl=[DEU']C'0
+	ld	l, d			; uhl=[DEU]'C'B'
+	pop	de			; ude=[HLU']0D'
+					;  stack: 0AF0
+	inc	sp			;  stack: 0AF
+	ld	d, a			; ude=[HLU']E'D'
+	pop	af			; af=AF
+					;  stack:
+	ret
+
+	extern	__internal_bitrev_byte

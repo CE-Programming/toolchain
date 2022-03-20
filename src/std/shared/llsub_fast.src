@@ -1,0 +1,22 @@
+	assume	adl=1
+
+	section	.text
+	public	__llsub_fast
+__llsub_fast:
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	ld	bc, (iy + 3)
+	sbc	hl, bc
+	ex	de, hl
+	ld	bc, (iy + 6)
+	sbc	hl, bc
+	ex	de, hl
+	pop	bc
+	ld	a, c
+	sbc	a, (iy + 9)
+	ld	c, a
+	ld	a, b
+	sbc	a, (iy + 10)
+	ld	b, a
+	ret

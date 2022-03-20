@@ -13,6 +13,11 @@ typedef struct {
   long rem;
 } ldiv_t;
 
+typedef struct {
+  long long rem;
+  long long quot;
+} lldiv_t;
+
 typedef char __align;
 union header {
   struct {
@@ -48,6 +53,8 @@ int atoi(const char *nptr) __attribute__((nonnull(1)));
 
 long atol(const char *nptr) __attribute__((nonnull(1)));
 
+long long atoll(const char *nptr) __attribute__((nonnull(1)));
+
 float strtof(const char *__restrict nptr,
              char **__restrict endptr) __attribute__((nonnull(1)));
 
@@ -57,9 +64,17 @@ double strtod(const char *__restrict nptr,
 long strtol(const char *__restrict nptr,
             char **__restrict endptr, int base) __attribute__((nonnull(1)));
 
+long long strtoll(const char *__restrict nptr,
+                  char **__restrict endptr,
+                  int base) __attribute__((nonnull(1)));
+
 unsigned long strtoul(const char *__restrict nptr,
                       char **__restrict endptr, int base)
                       __attribute__((nonnull(1)));
+
+unsigned long long strtoull(const char *__restrict nptr,
+                            char **__restrict endptr, int base)
+                            __attribute__((nonnull(1)));
 
 void srand(unsigned int seed);
 
@@ -87,13 +102,17 @@ void quick_exit(int) __NOEXCEPT __attribute__((noreturn));
 
 void _Exit(int) __NOEXCEPT __attribute__((noreturn));
 
-int abs(int j);
+int abs(int n);
 
-long labs(long j);
+long labs(long n);
+
+long long llabs(long long n);
 
 div_t div(int numer, int denom);
 
 ldiv_t ldiv(long numer, long denom);
+
+lldiv_t lldiv(long long numer, long long denom);
 
 __END_DECLS
 

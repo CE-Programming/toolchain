@@ -1,0 +1,24 @@
+	assume	adl=1
+
+	section	.text
+	public	__llshru_fast
+__llshru_fast:
+	ld	iy, 0
+	add	iy, sp
+
+	ld	a, (iy + 3)
+	or	a, a
+	ret	z
+
+	ld	a, c
+	ld	c, b
+	ld	b, (iy + 3)
+
+	push	de
+	push	hl
+
+	srl	c
+	jp	__llshrs_fast.hijack_llshru
+
+
+	extern	__llshrs_fast.hijack_llshru

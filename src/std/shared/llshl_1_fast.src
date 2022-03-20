@@ -1,0 +1,12 @@
+	assume	adl=1
+
+	section	.text
+	public	__llshl_1_fast
+__llshl_1_fast:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rl	b
+	ret

@@ -1,0 +1,13 @@
+	assume	adl=1
+
+	section	.text
+	public	__inot_fast
+__inot_fast:
+	add	hl, de	; uhl=UHL+UDE
+	ex	de, hl	; ude=UHL+UDE, uhl=UDE
+	scf
+	sbc	hl, de	; uhl=UDE-(UHL+UDE)-1
+			;    =UDE-UHL-UDE-1
+			;    =-UHL-1
+			;    =~UHL
+	ret

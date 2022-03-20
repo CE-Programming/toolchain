@@ -1,0 +1,31 @@
+	assume	adl=1
+
+	section	.text
+	public	__llshl
+__llshl:
+; Suboptimal for large shift amounts
+	push	af
+	ld	a, b
+
+	push	hl
+	ld	hl, 9
+	add	hl, sp
+	ld	b, (hl)
+	pop	hl
+
+	inc	b
+	jr	.begin
+
+.loop:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rla
+.begin:
+	djnz	.loop
+
+	ld	b, a
+	pop	af
+	ret

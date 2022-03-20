@@ -1,0 +1,44 @@
+	assume	adl=1
+
+	section	.text
+	public	__llxor_fast
+__llxor_fast:
+; CC: 56*r(PC)+19*r(SPL)+8*w(SPL)+1
+	ld	iy, 0
+	add	iy, sp
+	push	hl
+	push	de
+	lea	hl, iy + 10
+	ld	a, b
+	xor	a, (hl)
+	ld	b, a
+	dec	hl
+	ld	a, c
+	xor	a, (hl)
+	ld	c, a
+	dec	hl
+	lea	de, iy - 4
+	ld	a, (de)
+	xor	a, (hl)
+	ld	(de), a
+	pop	de
+	dec	hl
+	ld	a, d
+	xor	a, (hl)
+	ld	d, a
+	dec	hl
+	ld	a, e
+	xor	a, (hl)
+	ld	e, a
+	dec	hl
+	ld	a, (iy - 1)
+	xor	a, (hl)
+	ld	(iy - 1), a
+	pop	hl
+	ld	a, h
+	xor	a, (iy + 4)
+	ld	h, a
+	ld	a, l
+	xor	a, (iy + 3)
+	ld	l, a
+	ret

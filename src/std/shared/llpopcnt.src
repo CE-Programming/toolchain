@@ -1,0 +1,19 @@
+	assume	adl=1
+
+	section	.text
+	public	__llpopcnt
+__llpopcnt:
+	call	__lpopcnt
+	push	de
+	push	hl
+	ex	de, hl
+	ld	l, b
+	ld	e, c
+	ld	d, a
+	call	__lpopcnt
+	add	a, d
+	pop	hl
+	pop	de
+	ret
+
+	extern	__lpopcnt

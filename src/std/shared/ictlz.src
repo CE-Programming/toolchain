@@ -1,0 +1,17 @@
+	assume	adl=1
+
+	section	.text
+	public	__ictlz
+__ictlz:
+	push	hl
+
+	scf
+	sbc	a, a
+
+.loop:
+	adc	hl, hl
+	inc	a
+	jr	nc, .loop
+
+	pop	hl
+	ret

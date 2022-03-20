@@ -1,0 +1,11 @@
+	assume	adl=1
+
+	section	.text
+	public	__lcmps_fast
+__lcmps_fast:
+	ld	d, a
+	ld	a, e
+	sub 	a, d
+	ret	nz
+	sbc	hl, bc
+	ret

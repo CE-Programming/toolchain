@@ -1,0 +1,26 @@
+	assume	adl=1
+
+	section	.text
+	public	__llneg_fast
+__llneg_fast:
+	push	de		; *spl=UDE
+	ex	de, hl		; ude=UHL, uhl=UDE
+	xor	a, a		; a=0
+	sbc	hl, hl		; uhl=0
+	sbc	hl, de		; uhl=-UHL
+	ex	(sp), hl	; uhl=UDE, *spl=-UHL
+	ex	de, hl		; ude=UDE, uhl=UHL
+	ld	l, a		; l=0
+	mlt	hl		; uhl=0
+	sbc	hl, de		; uhl=-UDE-(UHL!=0)
+				;    =-UDEUHL>>24
+	ex	de, hl		; ude=-UDEUHL>>24, uhl=UDE
+	sbc	a, c		; a=-C-(UDEUHL!=0)
+				;  =-CUDEUHL>>48
+	ld	c, a		; c=-CUDEUHL>>48
+	sbc	a, a		; a=-(CUDEUHL!=0)
+	sub	a, b		; a=-B-(CUDEUHL!=0)
+				;  =-BCUDEUHL>>56
+	ld	b, a		; b=-BCUDEUHL>>56
+	pop	hl		; bcudeuhl=-BCUDEUHL
+	ret

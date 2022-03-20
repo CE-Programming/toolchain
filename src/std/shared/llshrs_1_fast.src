@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+	public	__llshrs_1_fast
+__llshrs_1_fast:
+	push	hl
+	push	de
+	ld	hl, 2
+	add	hl, sp
+	sra	b
+	rr	c
+	rr	(hl)
+	pop	de
+	inc	hl
+	inc	hl
+	inc	hl
+	rr	d
+	rr	e
+	rr	(hl)
+	pop	hl
+	rr	h
+	rr	l
+	ret

@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+	public	__llsub_1
+__llsub_1:
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	dec	hl
+	ret	nz
+	ex	de, hl
+	add	hl, de
+	ex	de, hl
+	ret	c
+	dec	bc
+	ret

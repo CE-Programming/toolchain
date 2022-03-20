@@ -1,0 +1,172 @@
+	assume	adl=1
+
+	section	.text
+	public	__llshrs_fast
+__llshrs_fast:
+; Could use optimization for shifting whole bytes at a time.
+	ld	iy, 0
+	add	iy, sp
+
+	ld	a, c
+	ld	c, b
+	ld	b, (iy + 3)
+	inc	b
+	dec	b
+	jr	z, .skip
+
+	push	de
+	push	hl
+
+.loop:
+	sra	c
+	public	__llshrs_fast.hijack_llshru
+.hijack_llshru:
+	rra
+	rr	(iy - 1)
+	rr	d
+	rr	e
+	rr	(iy - 4)
+	rr	h
+	rr	l
+	djnz	.loop
+
+	ld	b, e
+	ld	(iy - 2), d
+
+	ex	de, hl
+	pop	hl
+	ld	l, e
+	ld	h, d
+
+	pop	de
+	ld	e, b
+
+.skip:
+	ld	b, c
+	ld	c, a
+
+	ret
+
+
+if 0
+	push	bc
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy + 6)
+	ld	c, a
+	dec	a
+	and	a, 00111000b
+	ld	(.byteshift_smc)
+	xor	a, a
+	sub 	a, c
+	jr	$+1
+.byteshift_smc := $-1
+.shr1_8:
+	ld	c, b
+	ld	iyh, a
+	push	de
+	push	hl
+	inc	sp
+	ld	a, l
+	pop	hl
+	pop	de
+	inc	sp
+	inc	sp
+.shr1_8_loop:
+	add	a, a
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rl	b
+	dec	iyh
+	jr	nz, .shr1_8_loop
+
+.shr9_16:
+	push	de
+	push	hl
+	inc	sp
+	inc	sp
+	ld	a, h
+	pop	hl
+	pop	de
+	inc	sp
+
+.shr17_24:
+	dec	sp
+	push	hl
+	inc	sp
+	pop	af
+	ex	de, hl
+	ld	e, c
+	ld	d, b
+
+.shr25_32:
+	push	de
+	inc	sp
+	ld	a, e
+	pop	hl
+	ld	e, b
+.shr33_40:
+.shr41_48:
+	rl	b
+	pop	bc
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, c
+	ld	h, b
+	and	a, 00000111b
+	jr	z, .shr48
+
+.shr49_56_loop:
+	add	a, a
+	adc	hl, hl
+	djnz	.shr49_56_loop
+.shr48:
+
+.shr49_56:
+	rl	b
+	pop	bc
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, b
+	and	a, 00000111b
+	jr	z, .shr56
+	ld	b, a
+	ld	a, c
+.shr49_56_loop:
+	add	a, a
+	adc	hl, hl
+	djnz	.shr49_56_loop
+.shr56:
+	ld	c, d
+	ld	b, c
+	ret
+
+.shr57_63_0:
+	and	a, 00000111b
+	jr	z, .shr0
+.shr57_63:
+	rl	b
+	pop	bc
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, b
+	ld	b, a
+.shr57_63_loop:
+	add	hl, hl
+	djnz	.shr57_63_loop
+	ld	l, h
+	ld	h, e
+	ld	c, d
+	ld	b, c
+	ret
+
+.shr0:
+	pop	bc
+	ret
+end if

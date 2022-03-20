@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_imaxabs, _llabs
+_imaxabs:
+_llabs:
+	pop	iy
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
+	ld	a, b
+	or	a, a
+	call	m, __llneg.hijack_nc
+	jp	(iy)
+
+
+	extern	__llneg.hijack_nc

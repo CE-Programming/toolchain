@@ -1,0 +1,14 @@
+	assume	adl=1
+
+	section	.text
+	public	__lshru_1_fast
+__lshru_1_fast:
+	push	hl
+	ld	hl, 2
+	add	hl, sp
+	srl	e
+	rr	(hl)
+	pop	hl
+	rr	h
+	rr	l
+	ret

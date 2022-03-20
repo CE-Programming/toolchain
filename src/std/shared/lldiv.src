@@ -1,0 +1,46 @@
+	assume	adl=1
+
+	section	.text
+	public	_imaxdiv, _lldiv
+_imaxdiv:
+_lldiv:
+
+	pop	hl
+	pop	iy
+	ld	(iy + 11), hl
+	pop	hl
+	pop	de
+	pop	bc
+
+	call	__llrems
+
+	ld	(iy), hl
+	ld	(iy + 3), de
+	ld	(iy + 6), bc
+
+	pop	hl
+	pop	de
+	ex	(sp), hl
+	push	hl
+	add	hl, hl
+	pop	bc
+	pop	hl
+	call	c, __llneg
+
+	ld	(iy + 8), hl
+
+	ld	hl, -21
+	add	hl, sp
+	ld	sp, hl
+
+	ld	hl, (iy + 11)
+
+	ld	(iy + 11), de
+	ld	(iy + 14), c
+	ld	(iy + 15), b
+
+	jp	(hl)
+
+
+	extern	__llneg
+	extern	__llrems

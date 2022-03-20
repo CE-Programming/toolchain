@@ -1,0 +1,11 @@
+	assume	adl=1
+
+	section	.text
+	public	__lcmpu_fast
+__lcmpu_fast:
+	sub	a, e
+	ccf
+	ret	nz
+	or	a, a
+	sbc	hl, bc
+	ret

@@ -1,0 +1,36 @@
+	assume	adl=1
+
+	section	.text
+	public	__lladd_b_fast
+__lladd_b_fast:
+	add	a, l		; a=L+A
+	ld	l, a		; l=L+A
+	ret	nc
+				; cf=1
+	inc	h		; h=H+1
+	ret	nz
+				; h=0
+	dec	h
+	ld	l, h		; uhl=(HLU<<16)+0xFFFF
+	inc	hl		; uhl=HLU+1<<16
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ld	l, a		; uhl=(HLU+1<<16)+(L+A&0xFF)
+	ret	nz
+				; uhl=L+A&0xFF, cf=0
+	inc	e		; e=E+1
+	ret	nz
+				; e=0
+	inc	d		; d=D+1
+	ret	nz
+				; d=0
+	dec	d
+	ld	e, d		; ude=(DEU<<16)+0xFFFF
+	inc	de		; ude=DEU+1<<16
+	sbc	hl, de
+	add	hl, de
+	ret	c
+				; ude=0
+	inc	bc		; ubc=UBC+1
+	ret

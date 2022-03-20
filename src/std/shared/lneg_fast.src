@@ -1,0 +1,13 @@
+	assume	adl=1
+
+	section	.text
+	public	__lneg_fast
+__lneg_fast:
+	ld	c, e	; c=E
+	ex	de, hl	; ude=UHL, l=E
+	xor	a, a	; a=0
+	sbc	hl, hl	; uhl=0
+	sbc	hl, de	; uhl=-UHL
+	sbc	a, c
+	ld	e, a	; euhl=-EUHL
+	ret

@@ -1,4 +1,3 @@
-; double cos(double arg);
 	assume	adl=1
 
 	section	.text

@@ -1,0 +1,33 @@
+	assume	adl=1
+
+	section	.text
+	public	__lldivu_b
+__lldivu_b:
+; Very slow
+	push	af
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	ld	iy, (iy + 9)
+	xor	a, a
+	ld	iyh, 64
+.loop:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rl	b
+	rla
+	jr	c, .1
+	cp	a, iyl
+	jr	c, .0
+.1:
+	sub	a, iyl
+	inc	l
+.0:
+	dec	iyh
+	jr	nz, .loop
+	pop	iy
+	pop	af
+	ret

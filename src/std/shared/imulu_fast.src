@@ -1,0 +1,54 @@
+	assume	adl=1
+
+	section	.text
+	public	__imuls_fast, __imulu_fast
+__imuls_fast:
+__imulu_fast:
+
+; Multiplies UHL by UBC and returns the 24-bit product uhl.
+;    I: UBC=multiplier, UHL=multiplicand, ADL=1
+;    O: a=UHL*UBC-L*C>>16, ubc=L*B, ude=L*C, uhl=UHL*UBC
+;   FO: sz(a), vc((UHL*UBC-L*C&0xFFFFFF)+L*C)
+;   CC: 43*r(PC)+9*r(SPL)+6*w(SPL)+25
+;				; a		ubc		ude		uhl		u(sp)
+Mul_UHL_UBC_UHL_Fast:		;--------------+---------------+---------------+---------------+------------------------
+	ld	d, b
+	ld	e, h		;				 de=BH
+	mlt	de		;				ude=H*B
+	ld	a, e		; a=H*B
+	dec	sp
+	push	hl
+	push	bc
+	inc	sp		;								 (sp)=[HLU]H
+				;									 (sp)=[BCU]B
+	pop	de		;				 de=[BCU]B				--
+	ld	e, l		;				 de=[BCU]L
+	mlt	de		;				ude=L*BCU
+	add	a, e		; a=H*B+L*BCU
+	pop	de		;				 de=[HLU]H			--
+	ld	e, c		;				 de=[HLU]C
+	mlt	de		;				ude=HLU*C
+	add	a, e		; a=HLU*C+H*B+L*BCU
+	ld	d, c
+	ld	e, l		;				 de=CL
+	ld	l, d		;						 hl=HC
+	ld	c, e		;		 bc=BL
+	mlt	bc		;		ubc=L*B
+	mlt	de		;				ude=L*C
+	mlt	hl		;						uhl=H*C
+	add	hl, bc		;						uhl=H*C+L*B
+	add	a, h		; a=(H*C+L*B>>8)+HLU*C+H*B+L*BCU
+	ld	h, a		;						 hl=H*C+L*B+(HLU*C+H*B+L*BCU<<8)
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl		;						uhl=(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)
+	add	hl, de		;						uhl=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)
+	ret
+
+; (UHL*UBC)&0xFFFFFF=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)+(HLU*B+H*BCU<<24)+(HLU*BCU<<32)&0xFFFFFF
+;		    =L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)&0xFFFFFF

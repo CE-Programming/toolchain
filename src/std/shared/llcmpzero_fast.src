@@ -1,0 +1,18 @@
+	assume	adl=1
+
+	section	.text
+	public	__llcmpzero_fast
+__llcmpzero_fast:
+	xor	a, a
+	add	a, b
+	ret	nz
+	cp	a, c
+	jr	nz, .p_nz
+	mlt	bc
+	adc	hl, bc
+	jr	nz, .p_nz
+	adc	hl, de
+	ret	z
+.p_nz:
+	inc	a
+	ret
