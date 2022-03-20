@@ -5959,7 +5959,7 @@ _UCDivA:
 
 ;-------------------------------------------------------------------------------
 _DivideHLBC:
-; Performs signed interger division
+; Performs signed integer division
 ; Inputs:
 ;  HL : Operand 1
 ;  BC : Operand 2
