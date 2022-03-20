@@ -1,0 +1,17 @@
+	assume	adl=1
+
+	section	.text
+	public	__sctlz
+__sctlz:
+	push	hl
+
+	scf
+	sbc	a, a
+
+.loop:
+	adc.s	hl, hl
+	inc	a
+	jr	nc, .loop
+
+	pop	hl
+	ret
