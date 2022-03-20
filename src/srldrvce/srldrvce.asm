@@ -83,6 +83,7 @@ struct srl_device
 	subtype				rb 1
 	rx_buf				ring_buf_ctrl
 	tx_buf				ring_buf_ctrl
+	error				rl 1
 	size := $-.
 end struct
 
@@ -122,6 +123,7 @@ virtual at 0
 	SRL_ERROR_INVALID_DEVICE	rb 1
 	SRL_ERROR_INVALID_INTERFACE	rb 1
 	SRL_ERROR_NO_MEMORY		rb 1
+	SRL_ERROR_DEVICE_DISCONNECTED	rb 1
 end virtual
 
 ; enum usb_transfer_status
@@ -262,6 +264,8 @@ srl_Open:
 	ld	(xsrl_device.tx_buf.data_break),hl
 	ld	(xsrl_device.rx_buf.dma_active),a	; reset dma_active
 	ld	(xsrl_device.tx_buf.dma_active),a
+
+	ld	(xsrl_device.error),hl			; reset error
 
 	push	iy
 	call	usb_GetRole
@@ -462,6 +466,17 @@ srl_Read:
 	add	iy,sp
 	push	ix
 	ld	ix,(iy+3)
+	ld	hl,(xsrl_device.error)
+	compare_hl_zero
+	jq	z,.no_error
+
+	ex	de,hl
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,de
+	jq	.exit
+
+.no_error:
 	ld	hl,(iy+6)
 	ld	bc,(iy+9)
 	lea	ix,xsrl_device.rx_buf
@@ -484,6 +499,17 @@ srl_Write:
 	add	iy,sp
 	push	ix
 	ld	ix,(iy+3)
+	ld	hl,(xsrl_device.error)
+	compare_hl_zero
+	jq	z,.no_error
+
+	ex	de,hl
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,de
+	jq	.exit
+
+.no_error:
 	ld	hl,(iy+6)
 	ld	bc,(iy+9)
 	lea	ix,xsrl_device.tx_buf
@@ -1005,6 +1031,8 @@ read_callback:
 	ret
 
 .no_device:
+	ld	a,SRL_ERROR_DEVICE_DISCONNECTED
+	ld	(xsrl_device.error),a
 	xor	a,a
 	ld	(xsrl_device.rx_buf.dma_active),a
 	pop	ix
@@ -1032,6 +1060,8 @@ write_callback:
 	ret
 
 .no_device:
+	ld	a,SRL_ERROR_DEVICE_DISCONNECTED
+	ld	(xsrl_device.error),a
 	xor	a,a
 	ld	(xsrl_device.tx_buf.dma_active),a
 	pop	ix

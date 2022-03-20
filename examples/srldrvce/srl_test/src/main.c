@@ -128,7 +128,10 @@ int main(void) {
             }
 
             if(kb_IsDown(kb_KeyApps)) {
-                srl_Write(&srl, "yeet\r\n", 6);
+                int res = srl_Write(&srl, "yeet\r\n", 6);
+                if(res < 0) {
+                    printf("error %u on srl_Write\n", -res);
+                }
                 while(kb_IsDown(kb_KeyApps)) kb_Scan();
             }
 
@@ -155,7 +158,9 @@ int main(void) {
 
             size_t bytes_read = srl_Read(&srl, in_buf, sizeof in_buf);
 
-            if(bytes_read) {
+            if(bytes_read < 0) {
+                printf("error %u on srl_Read\n", -bytes_read);
+            } else if(bytes_read > 0) {
                srl_Write(&srl, in_buf, bytes_read);
             }
         }
