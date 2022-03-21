@@ -79,7 +79,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         srl_error_t error = srl_Open(&srl, device, srl_buf, sizeof srl_buf, SRL_INTERFACE_ANY, 9600);
         if(error) {
             /* Print the error code to the homescreen */
-            printf("Error %u initting serial\n", error);
+            printf("Error %d initting serial\n", error);
             return USB_SUCCESS;
         }
 
@@ -130,7 +130,7 @@ int main(void) {
             if(kb_IsDown(kb_KeyApps)) {
                 int res = srl_Write(&srl, "yeet\r\n", 6);
                 if(res < 0) {
-                    printf("error %u on srl_Write\n", -res);
+                    printf("error %d on srl_Write\n", res);
                 }
                 while(kb_IsDown(kb_KeyApps)) kb_Scan();
             }
@@ -159,7 +159,7 @@ int main(void) {
             size_t bytes_read = srl_Read(&srl, in_buf, sizeof in_buf);
 
             if(bytes_read < 0) {
-                printf("error %u on srl_Read\n", -bytes_read);
+                printf("error %d on srl_Read\n", bytes_read);
             } else if(bytes_read > 0) {
                srl_Write(&srl, in_buf, bytes_read);
             }

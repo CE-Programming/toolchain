@@ -115,16 +115,14 @@ end virtual
 
 SRL_INTERFACE_ANY	:= $FF
 
-virtual at 0
-	SRL_SUCCESS			rb 1
-	SRL_ERROR_INVALID_PARAM		rb 1
-	SRL_ERROR_USB_FAILED		rb 1
-	SRL_ERROR_NOT_SUPPORTED		rb 1
-	SRL_ERROR_INVALID_DEVICE	rb 1
-	SRL_ERROR_INVALID_INTERFACE	rb 1
-	SRL_ERROR_NO_MEMORY		rb 1
-	SRL_ERROR_DEVICE_DISCONNECTED	rb 1
-end virtual
+SRL_SUCCESS			:= 0
+SRL_ERROR_INVALID_PARAM		:= -1
+SRL_ERROR_USB_FAILED		:= -2
+SRL_ERROR_NOT_SUPPORTED		:= -3
+SRL_ERROR_INVALID_DEVICE	:= -4
+SRL_ERROR_INVALID_INTERFACE	:= -5
+SRL_ERROR_NO_MEMORY		:= -6
+SRL_ERROR_DEVICE_DISCONNECTED	:= -7
 
 ; enum usb_transfer_status
 ?USB_TRANSFER_COMPLETED		:= 0
@@ -447,8 +445,11 @@ srl_Open:
 
 	xor	a,a					; a = USB_SUCCESS
 .exit:
-	ld	hl,0
+	scf
+	sbc	hl,hl
+	dec	a
 	ld	l,a
+	inc	hl
 .exit_hl:
 	pop	ix
 	ret
@@ -468,15 +469,8 @@ srl_Read:
 	ld	ix,(iy+3)
 	ld	hl,(xsrl_device.error)
 	compare_hl_zero
-	jq	z,.no_error
+	jq	nz,.exit
 
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,de
-	jq	.exit
-
-.no_error:
 	ld	hl,(iy+6)
 	ld	bc,(iy+9)
 	lea	ix,xsrl_device.rx_buf
@@ -501,15 +495,8 @@ srl_Write:
 	ld	ix,(iy+3)
 	ld	hl,(xsrl_device.error)
 	compare_hl_zero
-	jq	z,.no_error
+	jq	nz,.exit
 
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,de
-	jq	.exit
-
-.no_error:
 	ld	hl,(iy+6)
 	ld	bc,(iy+9)
 	lea	ix,xsrl_device.tx_buf

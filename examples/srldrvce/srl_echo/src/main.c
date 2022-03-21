@@ -50,7 +50,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         srl_error_t error = srl_Open(&srl, device, srl_buf, sizeof srl_buf, SRL_INTERFACE_ANY, 9600);
         if(error) {
             /* Print the error code to the homescreen */
-            printf("Error %u initting serial\n", error);
+            printf("Error %d initting serial\n", error);
             return USB_SUCCESS;
         }
 
@@ -96,7 +96,7 @@ int main(void) {
 
             /* Check for an error (e.g. device disconneced) */
             if(bytes_read < 0) {
-                printf("error %u on srl_Read\n", -bytes_read);
+                printf("error %d on srl_Read\n", bytes_read);
                 has_srl_device = false;
             } else if(bytes_read > 0) {
                 /* Write the data back to serial */
