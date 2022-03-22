@@ -358,23 +358,126 @@ do { \
 #define lcd_LpBaseCurr           (*(volatile uint32_t*)0xE30030)
 /* @endcond */
 #define lcd_Palette              ((volatile uint16_t*)0xE30200) /**< LCD palette registers, 512 bytes */
+
 /* @cond */
+/**
+ * Four cursors of 32 lines each, 32 pixels per line, 16 2-bit pixels per
+ * 32-bit word.  Each 32-bit word is little-endian.
+ */
+extern uint32_t lcd_CrsrImage32[4][32][2];
+/**
+ * One cursor of 64 lines, 64 pixels per line.  Each line is made of two 32-bit
+ * words, with each word containing 16 2-bit pixels.  Each 32-bit word is
+ * little-endian.
+ */
+extern uint32_t lcd_CrsrImage64[64][4]; 
+#define lcd_CrsrColor0           (0) /**< Pixel uses lcd_CrsrPalette0 */
+#define lcd_CrsrColor1           (1) /**< Pixel uses lcd_CrsrPalette1 */
+#define lcd_CrsrTransparent      (2) /**< Pixel is transparent */
+#define lcd_CrsrInverted         (3) /**< Pixel inverts whatever was under it */
+/**
+ * Cursor enable/disable, and, in 32-pixel-wide mode, cursor image selection.
+ *
+ * @see LCD_CURSOR_ENABLE, LCD_CURSOR_DISABLE, LCD_CURSOR_
+ */
 #define lcd_CrsrCtrl             (*(volatile uint8_t*)0xE30C00)
+/**
+ * Cursor size and sync settings.
+ *
+ * @see LCD_CURSOR_SIZE32, LCD_CURSOR_SIZE64, LCD_CURSOR_POS_NOSYNC, LCD_CURSOR_POS_SYNC
+ */
 #define lcd_CrsrConfig           (*(volatile uint8_t*)0xE30C04)
-#define lcd_CrsrPalette0         (*(volatile uint24_t*)0xE30C08)
-#define lcd_CrsrPalette1         (*(volatile uint24_t*)0xE30C0C)
-#define lcd_CrsrXY               (*(volatile uint32_t*)0xE30C10)
-#define lcd_CrsrX                (*(volatile uint16_t*)0xE30C10)
-#define lcd_CrsrY                (*(volatile uint16_t*)0xE30C12)
-#define lcd_CrsrClip             (*(volatile uint16_t*)0xE30C04)
+#define lcd_CrsrPalette0         (*(volatile uint24_t*)0xE30C08) /**< 0xBBGGRR format */
+#define lcd_CrsrPalette0R        (*(volatile uint8_t*)0xE30C08)
+#define lcd_CrsrPalette0G        (*(volatile uint8_t*)0xE30C09)
+#define lcd_CrsrPalette0B        (*(volatile uint8_t*)0xE30C0A)
+#define lcd_CrsrPalette1         (*(volatile uint24_t*)0xE30C0C) /**< 0xBBGGRR format */
+#define lcd_CrsrPalette1R        (*(volatile uint8_t*)0xE30C0C)
+#define lcd_CrsrPalette1G        (*(volatile uint8_t*)0xE30C0D)
+#define lcd_CrsrPalette1B        (*(volatile uint8_t*)0xE30C0E)
+/**
+ * `union { struct { uint16_t lcd_CrsrX; uint8_t lcd_CrsrY; }; uint24_t lcd_CrsrXY; };`
+ */
+#define lcd_CrsrXY               (*(volatile uint24_t*)0xE30C10)
+#define lcd_CrsrX                (*(volatile uint16_t*)0xE30C10) /**< Cursor X position */
+#define lcd_CrsrY                (*(volatile uint8_t*)0xE30C12) /**< Cursor Y position */
+#define lcd_CrsrY16              (*(volatile uint16_t*)0xE30C12) /**< Full 10-bit cursor Y position */
+/**
+ * `union { struct { uint8_t lcd_CrsrClipX; uint8_t lcd_CrsrClipY; }; uint24_t lcd_CrsrClip; };`
+ */
+#define lcd_CrsrClip             (*(volatile uint24_t*)0xE30C04)
 #define lcd_CrsrClipX            (*(volatile uint8_t*)0xE30C04)
 #define lcd_CrsrClipY            (*(volatile uint8_t*)0xE30C05)
 #define lcd_CrsrEnableInt        (*(volatile uint8_t*)0xE30C20)
 #define lcd_CrsrIntAcknowledge   (*(volatile uint8_t*)0xE30C24)
 #define lcd_CrsrIntStatus        (*(volatile uint8_t*)0xE30C28)
 #define lcd_CrsrIntStatusMasked  (*(volatile uint8_t*)0xE30C2C)
-/* @endcond */
 #define lcd_BacklightLevel       (*(volatile uint8_t*)0xF60024) /**< Current backlight level of the LCD. 0 is bright. 255 is dark. */
+
+#define LCD_CURSOR_ENABLED         (1<<0) /**< @see lcd_CrsrCtrl */
+#define LCD_CURSOR_DISABLED        (0<<0) /**< @see lcd_CrsrCtrl */
+#define LCD_CURSOR0                (0<<4) /**< Select cursor number in 32-wide mode @see lcd_CrsrCtrl */
+#define LCD_CURSOR1                (1<<4)
+#define LCD_CURSOR_INC             (1<<4) /**< How much to add to increment to the next cursor index. */
+#define LCD_CURSOR3                (2<<4)
+#define LCD_CURSOR3                (3<<4)
+#define LCD_CURSOR(n)              ((n)<<4) /**< Select cursor number n in 32-wide mode @see lcd_CrsrCtrl */
+
+#define LCD_CURSOR_SIZE32          (0<<0) /**< Cursor is 32 by 32 pixels in size, and you can select from four images  */
+#define LCD_CURSOR_SIZE64          (1<<0) /**< Cursor is 64 by 64 pixels in size */
+#define LCD_CURSOR_POS_NOSYNC      (0<<1) /**< Changes to position and clipping take place immediately. */
+#define LCD_CURSOR_POS_SYNC        (1<<1) /**< Changes won't take effect if the cursor is actively being drawn. */
+
+/**
+ * Enables the LCD controller's hardware cursor, and sets the size to 64 pixels.
+ */
+#define lcd_CrsrEnable64(void) do { \
+    lcd_CrsrConfig = LCD_CURSOR_SIZE64 | LCD_CURSOR_POS_SYNC; \
+    lcd_CrsrControl = LCD_CURSOR_ENABLED; \
+} while (0)
+
+/**
+ * Enables the LCD controller's hardware cursor, and sets the size to 32 pixels.
+ *
+ * @param n Cursor image index number
+ */
+#define lcd_CrsrEnable32(n) do { \
+    lcd_CrsrConfig = LCD_CURSOR_SIZE32 | LCD_CURSOR_POS_SYNC; \
+    lcd_CrsrControl = LCD_CURSOR_ENABLED | LCD_CURSOR(n); \
+} while (0)
+
+/**
+ * Activates a 32-pixel-size cursor.
+ *
+ * @note You must have previously used lcd_CrsrEnable32() or else the size might be incorrect.
+ * @param n Cursor image index number
+ */
+#define lcd_CrsrSelect32(n) lcd_CrsrControl = LCD_CURSOR_ENABLED | LCD_CURSOR(n)
+
+/**
+ * Disables cursor display.
+ */
+#define lcd_CrsrDisable() hwcursor_Control = HWCURSOR_DISABLED
+
+/**
+ * Sets the cursor position using signed coordinates.
+ * The is cursor clipped by hardware automatically.
+ *
+ * @warning Coordinates must be in the range specified.  If they are out-of-
+ * bounds, undefined behavior will result.
+ *
+ * @note This is slower than using unsigned coordinates.  If you know the cursor
+ * location will never need to go negative, it is faster to write to the
+ * lcd_CrsrX/Y registers directly.  (Be sure to zero out lcd_CrsrClip first.)
+ *
+ * @param x Column number, must be in the range [-63,1023]
+ * @param y Row number, must be in the range [-63,255]
+ */
+void lcd_CrsrSetPos(signed int x, signed int y);
+signed int lcd_CrsrGetXPos(void); /**< @return Cursor's X position (signed) */
+signed int lcd_CrsrGetYPos(void); /**< @return Cursor's Y position (signed) */
+/* @endcond */
+
 
 /**
  * TIOS small font.
@@ -950,6 +1053,8 @@ void os_PopErrorHandler(void);
  * error occurred.
  *
  * @note The callback return code is passed to the launcher of the original program that called this function.
+ *
+ * @warning Any data in lcd_CursorImage32/lcd_CursorImage64 will be lost.
  */
 int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 

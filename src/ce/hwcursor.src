@@ -1,0 +1,80 @@
+	assume	adl=1
+
+	public _lcd_CursorImage32
+	public _lcd_CursorImage64
+_lcd_CursorImage32 := 0E30800h
+_lcd_CursorImage64 := 0E30800h
+
+	section	.text
+; void hwcursor_SetPos(signed int x, signed int y);
+	public	_lcd_CrsrSetPos
+_lcd_CrsrSetPos:
+	push	ix
+	ld	ix, 3
+	add	ix,sp
+	ld	iy,$E30C00	; mpLcdCrsrCtrl
+	sbc	hl,hl		; Carry reset from above
+	ex	de,hl
+	sbc	hl,hl
+	; Do Y first so we can overwrite X later
+	ld	bc,(ix+6)
+	bit	7,b
+	jr	z,.ypos
+	sbc	hl,bc
+	ld	(iy+$12),de	; lcdCrsrXY (second half)
+	ld	(iy+$15),l	; lcdCrsrClip (second half)
+	jr	.dox
+.ypos:
+	ld	(iy+$12),bc
+	ld	(iy+$15),e
+.dox:
+	ex	de,hl
+	ld	bc,(ix+3)
+	bit	7,b
+	jr	z,.xpos
+	ld	(iy+$10-1),hl
+	sbc	hl,bc
+	ld	(iy+$14),l
+	jr	.exit
+.xpos:
+	ld	(iy+$10),c
+	ld	(iy+$11),b
+	ld	(iy+$14),l
+.exit:
+	pop	ix
+	ret
+
+; signed int lcd_CrsrGetXPos(void);
+	public	_lcd_CrsrGetXPos
+_lcd_CrsrGetXPos:
+	ld	hl,$E30C14
+	xor	a,a
+	sub	a,(hl)
+	jr	nz,.neg
+	ld	l,$10
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld.sis	l,a
+	ret
+.neg:	sbc	hl,hl
+	ld	l,a
+	ret
+
+; signed int lcd_CrsrGetYPos(void);
+	public	_lcd_CrsrGetYPos
+_lcd_CrsrGetYPos:
+	ld	hl,$E30C15
+	xor	a,a
+	sub	a,(hl)
+	jr	nz,.neg
+	; While the Y coordinate is technically 10 bits, the header says it must
+	; be <= 255.
+	ld	l,$12
+	ld	l,(hl)
+	ld.sis	h,a
+	ret
+.neg:	sbc	hl,hl
+	ld	l,a
+	ret
+
