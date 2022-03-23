@@ -21,7 +21,6 @@ extern "C" {
 #define randInt(min, max) \
     ((unsigned)random() % ((max) - (min) + 1) + (min))
 
-
 /**
  * Gets an element from a matrix
  *
@@ -31,7 +30,6 @@ extern "C" {
  * @returns real_t containing element data
  */
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
-
 
 /**
  * Returns a pseudo-random 32-bit integer.
@@ -47,7 +45,6 @@ uint32_t random(void);
  * @param seed the seed value
  */
 void srandom(uint32_t seed);
-
 
 /**
  * "Atomically" loads from a volatile 32-bit value.

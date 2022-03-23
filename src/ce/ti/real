@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
-#include <tice.h>
+#include <ti/real.h>
 
 namespace ti
 {

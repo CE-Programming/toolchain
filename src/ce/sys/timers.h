@@ -10,6 +10,7 @@
 #define _CETIMERS_H
 
 #include <stdint.h>
+#include <sys/util.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -260,6 +261,11 @@ typedef unsigned int useconds_t;
  * @see useconds_t
  */
 int usleep(useconds_t usec);
+
+/**
+ * Waits for ~10 ms. In most cases it is better to use the delay() function.
+ */
+void boot_WaitShort(void);
 
 #ifdef __cplusplus
 }

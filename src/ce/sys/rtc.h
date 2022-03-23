@@ -9,11 +9,78 @@
 #ifndef _CERTC_H
 #define _CERTC_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+ * Bootcode functions
+ */
+
+/**
+ * Sets the calculator's date
+ *
+ * Performs checks to ensure date is within range
+ * @param day Day to set
+ * @param month Month to set
+ * @param year Year to set
+ */
+void boot_SetDate(uint8_t day, uint8_t month, uint16_t year);
+
+/**
+ * Gets the calculator's date
+ *
+ * @param day Pointer to variable to store day
+ * @param month Pointer to variable to store month
+ * @param year Pointer to variable to store year
+ */
+void boot_GetDate(uint8_t *day, uint8_t *month, uint16_t *year);
+
+/**
+ * Sets the calculator's time
+ *
+ * Performs checks to ensure time is within range
+ * @param seconds Seconds to set
+ * @param minutes Minutes to set
+ * @param hours Hours to set
+ */
+void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
+
+/**
+ * Gets the calculator's time
+ *
+ * @note You can read \c rtc_Seconds, \c rtc_Minutes , and \c rtc_Hours directly, but you should double check
+ * that \c rtc_Seconds didn't change while reading \c rtc_Minutes and \c rtc_Hours .
+ *
+ * @param seconds Pointer to variable to store seconds
+ * @param minutes Pointer to variable to store minutes
+ * @param hours Pointer to variable to store hours
+ */
+void boot_GetTime(uint8_t *seconds, uint8_t *minutes, uint8_t *hours);
+
+/**
+ * Checks if past noon
+ *
+ * @returns True if past noon
+ */
+bool boot_IsAfterNoon(void);
+
+/*
+ * OS/bootcode variables
+ */
+
+#define os_TmpYears          (*(real_t*)0xD02B01)
+#define os_TmpMonths         (*(real_t*)0xD02B0A)
+#define os_TmpDays           (*(real_t*)0xD02B13)
+#define os_TmpHours          (*(real_t*)0xD02B1C)
+#define os_TmpMinutes        (*(real_t*)0xD02B25)
+
+/*
+ * Direct access to hardware registers
+ */
 
 /* @cond */
 #define RTC_ALARM_INT_SOURCE    (1<<5)

@@ -9,15 +9,24 @@
 #ifndef _TICE_H
 #define _TICE_H
 
-#include <ceutil.h>
-#include <tios.h>
-#include <certc.h>
-#include <cetimers.h>
-#include <celcd.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/basicusb.h>
+#include <sys/lcd.h>
+#include <sys/power.h>
+#include <sys/rtc.h>
+#include <sys/timers.h>
+#include <sys/util.h>
+#include <ti/debug.h>
+#include <ti/error.h>
+#include <ti/flags.h>
+#include <ti/graphscreen.h>
+#include <ti/homescreen.h>
+#include <ti/hooks.h>
+#include <ti/info.h>
+#include <ti/keys.h>
+#include <ti/real.h>
+#include <ti/tokens.h>
+#include <ti/ui.h>
+#include <ti/usermemory.h>
 
 /* Compatibility defines */
 #define prgm_CleanUp()
@@ -41,9 +50,5 @@ extern "C" {
 /* @endcond */
 
 #define timer_GetLow(n) (_Pragma("GCC warning \"'timer_GetLow' is deprecated, use 'timer_Get' or 'timer_GetSafe' instead as appropriate\"") (uint24_t)timer_Get(n))
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
