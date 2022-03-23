@@ -1,0 +1,140 @@
+/**
+ * @file
+ * @authors
+ * Matt "MateoConLechuga" Waltz\n
+ * Jacob "jacobly" Young
+ * @brief CE Real-Time Clock define file
+ */
+
+#ifndef _CERTC_H
+#define _CERTC_H
+
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* @cond */
+#define RTC_ALARM_INT_SOURCE    (1<<5)
+#define RTC_DAY_INT_SOURCE      (1<<4)
+#define RTC_HR_INT_SOURCE       (1<<3)
+#define RTC_MIN_INT_SOURCE      (1<<2)
+#define RTC_SEC_INT_SOURCE      (1<<1)
+
+#define RTC_UNFREEZE            (1<<7)
+#define RTC_FREEZE              (0<<7)
+#define RTC_LOAD                (1<<6)
+#define RTC_ENABLE              ((1<<0)|RTC_UNFREEZE)
+#define RTC_DISABLE             (0<<0)
+
+#define rtc_Control             (*(volatile uint8_t*)0xF30020)
+#define rtc_LoadSeconds         (*(volatile uint8_t*)0xF30024)
+#define rtc_LoadMinutes         (*(volatile uint8_t*)0xF30028)
+#define rtc_LoadHours           (*(volatile uint8_t*)0xF3002C)
+#define rtc_LoadDays            (*(volatile uint16_t*)0xF30030)
+#define rtc_IntStatus           (*(volatile uint8_t*)0xF30034)
+#define rtc_IntAcknowledge      (*(volatile uint8_t*)0xF30034)
+/* @endcond */
+
+/**
+ * Enables the Real-Time-Clock (RTC).
+ *
+ * @param int Interrupt mask to enable specific RTC interrupts.
+ */
+#define rtc_Enable(int) \
+do { \
+    rtc_Control |= RTC_ENABLE | (int << 1); \
+} while (0)
+
+/**
+ * Sets the Real-Time-Clock (RTC) with new values.
+ *
+ * @param sec Second value to load.
+ * @param min Minute value to load.
+ * @param hr Hour value to load.
+ * @param day Day value to load.
+ *
+ * @note
+ * The set values do not take effect until the next RTC second.
+ * Verify the values have been loaded by waiting for rtc_IsBusy() to be false.
+ * The RTC will also need to be enabled.
+ */
+#define rtc_Set(sec, min, hr, day) \
+do { \
+    rtc_Seconds = sec; \
+    rtc_Minutes = min; \
+    rtc_Hours = hr; \
+    rtc_Days = day; \
+    rtc_Control |= RTC_LOAD; \
+} while (0)
+
+/**
+ * Sets the Real-Time-Clock (RTC) alarm with new values.
+ *
+ * @param sec Second alarm value.
+ * @param min Minute alarm value.
+ * @param hr Hour alarm value.
+ */
+#define rtc_SetAlarm(sec, min, hr) \
+do { \
+    rtc_AlarmSeconds = sec; \
+    rtc_AlarmMinutes = min; \
+    rtc_AlarmHours = hr; \
+} while (0)
+
+/**
+ * Disables the Real-Time-Clock (RTC).
+ */
+#define rtc_Disable() \
+do { \
+    rtc_Control &= ~RTC_ENABLE; \
+} while (0)
+
+/**
+ * Checks if the RTC is busy setting newly loaded values.
+ */
+#define rtc_IsBusy() ((rtc_Control) & RTC_LOAD)
+
+/**
+ * Acknowledges an RTC interrupt.
+ * This should be used to clear the condition that is causing the interrupt.
+ *
+ * @param mask RTC interrupt mask.
+ */
+#define rtc_AckInterrupt(mask) (rtc_IntAcknowledge = (mask))
+
+/**
+ * Checks if a RTC interrupt condition has occurred.
+ *
+ * @param mask RTC interrupt mask.
+ */
+#define rtc_ChkInterrupt(mask) (rtc_IntStatus & (mask))
+
+/**
+ * Gets a combination of the RTC time; useful for seeding random numbers
+ * via srand().
+ */
+#define rtc_Time()              (*(volatile uint32_t*)0xF30044)
+
+#define rtc_Seconds             (*(volatile uint8_t*)0xF30000)    /**< RTC seconds */
+#define rtc_Minutes             (*(volatile uint8_t*)0xF30004)    /**< RTC minutes */
+#define rtc_Hours               (*(volatile uint8_t*)0xF30008)    /**< RTC hours */
+#define rtc_Days                (*(volatile uint16_t*)0xF3000C)   /**< RTC days */
+#define rtc_AlarmSeconds        (*(volatile uint8_t*)0xF30010)    /**< RTC alarm seconds */
+#define rtc_AlarmMinutes        (*(volatile uint8_t*)0xF30014)    /**< RTC alarm minutes */
+#define rtc_AlarmHours          (*(volatile uint8_t*)0xF30018)    /**< RTC alarm hours */
+
+#define RTC_LOAD_INT             (1<<5)  /**< RTC load operation complete */
+#define RTC_ALARM_INT            (1<<4)  /**< RTC alarm interrupt */
+#define RTC_DAY_INT              (1<<3)  /**< RTC interrupt on day change */
+#define RTC_HR_INT               (1<<2)  /**< RTC interrupt on hour change */
+#define RTC_MIN_INT              (1<<1)  /**< RTC interrupt on minute change */
+#define RTC_SEC_INT              (1<<0)  /**< RTC interrupt on second change */
+#define RTC_INT_MASK             (RTC_SEC_INT | RTC_MIN_INT | RTC_HR_INT | RTC_DAY_INT | RTC_ALARM_INT | RTC_LOAD_INT) /**< RTC mask for all interrupts */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

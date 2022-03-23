@@ -10,6 +10,11 @@ These headers are CE specific, and contain various defines and prototypes.
     :glob:
 
     tice
+    tios
+    celcd
+    certc
+    cetimers
+    ceutil
     intce
     compression
 
