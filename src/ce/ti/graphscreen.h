@@ -30,9 +30,7 @@ extern "C" {
 #define os_LargeFont ((font_t *)1)
 
 /**
- * @brief 
- * 
- */
+ * @brief Structure of font description
  * @see os_FontSelect
  */
 typedef struct font {
