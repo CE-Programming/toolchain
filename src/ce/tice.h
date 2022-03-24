@@ -18,11 +18,12 @@
 #include <ti/debug.h>
 #include <ti/error.h>
 #include <ti/flags.h>
+#include <ti/getcsc.h>
+#include <ti/getkey.h>
 #include <ti/graphscreen.h>
 #include <ti/homescreen.h>
 #include <ti/hooks.h>
 #include <ti/info.h>
-#include <ti/keys.h>
 #include <ti/real.h>
 #include <ti/tokens.h>
 #include <ti/ui.h>
