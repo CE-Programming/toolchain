@@ -50,6 +50,12 @@ __frustof   := 0002C8h
 __fsub      := 000290h
 	public	__ftol
 __ftol      := 00027Ch
+	public	__ftoul
+__ftoul     := __ftol
+	public	__dtol
+__dtol      := __ftol
+	public	__dtoul
+__dtoul     := __ftoul
 	public	__imul_b
 __imul_b    := 000150h
 	public	__indcall
@@ -64,6 +70,8 @@ __ishru_b   := 000188h
 __itol      := 000194h
 	public	__ltof
 __ltof      := 000284h
+	public	__ltod
+__ltod      := __ltof
 	public	__seqcase
 __seqcase   := 000210h
 	public	__seqcaseD
@@ -82,6 +90,8 @@ __stoi      := 000260h
 __stoiu     := 000264h
 	public	__ultof
 __ultof     := 000280h
+	public	__ultod
+__ultod     := __ultof
 	public	_longjmp
 _longjmp    := 000098h
 	public	_memchr

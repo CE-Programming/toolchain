@@ -36,8 +36,10 @@
 
 #define    LONG_MIN      (~__LONG_MAX__)
 #define    LONG_MAX        __LONG_MAX__
-#define   ULONG_MAX       __ULONG_MAX__
 #define    LONG_WIDTH      __LONG_WIDTH__
+
+#define   ULONG_MAX       __ULONG_MAX__
+#define   ULONG_WIDTH      __LONG_WIDTH__
 
 #define   LLONG_MIN (~__LONG_LONG_MAX__)
 #define   LLONG_MAX   __LONG_LONG_MAX__

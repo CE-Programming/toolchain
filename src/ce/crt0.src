@@ -486,9 +486,9 @@ end if
 	section	.fini
 virtual
 	ld	iy,0
- load .iy_pre: byte from $$
+ load _abort.iy_pre: byte from $$
 end virtual
-	db	.iy_pre
+	db	_abort.iy_pre
 
 	public	_abort
 _abort:
