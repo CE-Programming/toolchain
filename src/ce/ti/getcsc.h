@@ -16,18 +16,11 @@
 extern "C" {
 #endif
 
-/* @cond */
-#define tiflags __attribute__((__tiflags__))
-/* @endcond */
-
 #define os_KbdScanCode       (*(uint8_t*)0xD00587)
 #define os_KbdLGSC           (*(uint8_t*)0xD00588)
 #define os_KbdPSC            (*(uint8_t*)0xD00589)
 #define os_KbdWUR            (*(uint8_t*)0xD0058A)
 #define os_KbdDebncCnt       (*(uint8_t*)0xD0058B)
-#define os_KbdKey            (*(uint8_t*)0xD0058C)
-#define os_KbdGetKy          (*(uint8_t*)0xD0058D)
-#define os_KeyExtend         (*(uint8_t*)0xD0058E)
 
 /**
  * Checks if the [on] key was pressed
@@ -35,14 +28,6 @@ extern "C" {
  * @returns True is returned if [on] key was pressed
  */
 bool boot_CheckOnPressed(void);
-
-/**
- * Gets a key from the OS
- *
- * @returns Key code
- * @returns Extended key code in high byte
- */
-uint16_t os_GetKey(void);
 
 /**
  * @brief Scan code type
@@ -121,8 +106,6 @@ sk_key_t os_GetCSC(void);
 #define sk_Tan              0x16
 #define sk_Vars             0x17
 #define sk_Power            0x0E
-
-#undef tiflags
 
 #ifdef __cplusplus
 }

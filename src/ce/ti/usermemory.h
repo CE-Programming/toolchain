@@ -36,14 +36,6 @@ typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
 typedef struct { real_t real, imag; } cplx_t;
 #endif
 /**
- * @brief Structure of real variable type
- */
-typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
-/**
- * @brief Structure of complex variable type
- */
-typedef struct { real_t real, imag; } cplx_t;
-/**
  * @brief Structure of string variable type
  */
 typedef struct { uint16_t len; char data[1]; } string_t;
