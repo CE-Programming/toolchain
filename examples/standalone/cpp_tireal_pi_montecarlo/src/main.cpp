@@ -1,6 +1,8 @@
 #include <stdint.h>
-#include <tice.h>
-#include <tireal.hpp>
+#include <ti/homescreen.h>
+#include <ti/getcsc.h>
+#include <ti/real>
+#include <sys/rtc.h>
 
 using namespace ti::literals;
 

@@ -1,11 +1,11 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 int main(void)
 {
     /* Starting text posistion */
-    int x = LCD_WIDTH / 2;
-    int y = LCD_HEIGHT / 2;
+    int x = gfx_lcdWidth / 2;
+    int y = gfx_lcdHeight / 2;
     int movex = 1;
     int movey = 1;
 
@@ -35,11 +35,11 @@ int main(void)
         x += movex;
         y += movey;
 
-        if (x >= LCD_WIDTH || x < 0)
+        if (x >= gfx_lcdWidth || x < 0)
         {
             movex = -movex;
         }
-        if (y >= LCD_HEIGHT || y < 0)
+        if (y >= gfx_lcdHeight || y < 0)
         {
             movey = -movey;
         }

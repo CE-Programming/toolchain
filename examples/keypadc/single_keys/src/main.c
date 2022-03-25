@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <sys/lcd.h>
 #include <keypadc.h>
 #include <string.h>
 

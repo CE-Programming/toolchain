@@ -2,13 +2,11 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <tice.h>
+#include <ti/homescreen.h>
+#include <ti/getkey.h>
 
 /* static_assert is a compile time assert that can appear outside a function body ... */
 static_assert(sizeof(int) == 3, "Expecting int to be 24 bits.");
-
-#define k_Clear 0x05
-#define k_Quit  0x40
 
 int main(void)
 {

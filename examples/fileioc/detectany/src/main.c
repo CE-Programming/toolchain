@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/homescreen.h>
+#include <ti/getcsc.h>
 #include <fileioc.h>
 
 int main(void)

@@ -36,6 +36,18 @@ typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
 typedef struct { real_t real, imag; } cplx_t;
 #endif
 /**
+ * @brief Structure of list variable type
+ */
+typedef struct { uint16_t dim; real_t items[1]; } list_t;
+/**
+ * @brief Structure of complex list variable type
+ */
+typedef struct { uint16_t dim; cplx_t items[1]; } cplx_list_t;
+/**
+ * @brief Structure of matrix variable type
+ */
+typedef struct { uint8_t cols, rows; real_t items[1]; } matrix_t;
+/**
  * @brief Structure of string variable type
  */
 typedef struct { uint16_t len; char data[1]; } string_t;
@@ -47,6 +59,16 @@ typedef struct { uint16_t len; char data[1]; } equ_t;
  * @brief Structure of miscellaneous variable type
  */
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
+
+/**
+ * Gets an element from a matrix
+ *
+ * @param matrix Structure of matrix
+ * @param row Row in matrix
+ * @param col Column in matrix
+ * @returns real_t containing element data
+ */
+#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
 /**
  * Returns the size in bytes of free RAM that the user isn't using. A pointer is

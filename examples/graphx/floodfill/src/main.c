@@ -1,5 +1,5 @@
 #include <math.h>
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 int main(void)
@@ -9,8 +9,8 @@ int main(void)
 
     int rx = 100;
     int ry = 100;
-    int cx = LCD_WIDTH / 2;
-    int cy = LCD_HEIGHT / 2;
+    int cx = gfx_lcdWidth / 2;
+    int cy = gfx_lcdHeight / 2;
 
     /* Build the coordinates of the polygon */
     double theta = -M_PI / 2;
@@ -35,7 +35,7 @@ int main(void)
     while (!os_GetCSC());
 
     /* Flood fill the inside of the polygon */
-    gfx_FloodFill(LCD_WIDTH / 2, LCD_HEIGHT / 2, 229);
+    gfx_FloodFill(gfx_lcdWidth / 2, gfx_lcdHeight / 2, 229);
 
     /* Waits for a key */
     while (!os_GetCSC());

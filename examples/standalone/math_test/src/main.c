@@ -14,7 +14,8 @@
 
 #ifdef _EZ80
 #   include <debug.h>
-#   include <tice.h>
+#   include <ti/homescreen.h>
+#   include <ti/getcsc.h>
 
 #   if INTERACTIVE
 #       define x_printf printf

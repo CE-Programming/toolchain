@@ -1,5 +1,5 @@
 #include <string.h>
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 #define TEXT_FG_COLOR            247
@@ -38,8 +38,8 @@ void PrintCenteredFlippedText(char *str)
     char *string = str + strlen(str) - 1;
     gfx_TempSprite(ch, 8, 8);
 
-    x = (LCD_WIDTH - gfx_GetStringWidth(str)) / 2;
-    y = (LCD_HEIGHT - FONT_HEIGHT) / 2;
+    x = (gfx_lcdWidth - gfx_GetStringWidth(str)) / 2;
+    y = (gfx_lcdHeight - FONT_HEIGHT) / 2;
 
     while (*string)
     {

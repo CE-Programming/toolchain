@@ -22,16 +22,6 @@ extern "C" {
     ((unsigned)random() % ((max) - (min) + 1) + (min))
 
 /**
- * Gets an element from a matrix
- *
- * @param matrix Structure of matrix
- * @param row Row in matrix
- * @param col Column in matrix
- * @returns real_t containing element data
- */
-#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
-
-/**
  * Returns a pseudo-random 32-bit integer.
  *
  * @return the random integer

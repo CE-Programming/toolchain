@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/homescreen.h>
+#include <sys/timers.h>
 #include <stdio.h>
 
 #define TIMER_FREQ      32768 /* Frequency of timer in Hz */

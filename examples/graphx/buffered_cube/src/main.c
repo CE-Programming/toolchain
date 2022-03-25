@@ -1,5 +1,4 @@
 #include <math.h>
-#include <tice.h>
 #include <graphx.h>
 
 #define ORG (-50)

@@ -1,4 +1,6 @@
-#include <tice.h>
+#include <ti/homescreen.h>
+#include <sys/rtc.h>
+#include <sys/lcd.h>
 #include <string.h>
 
 int main(void)

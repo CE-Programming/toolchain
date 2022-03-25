@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/getcsc.h>
+#include <ti/homescreen.h>
 #include <stdio.h>
 
 /* Set maximum size of input and output buffers */

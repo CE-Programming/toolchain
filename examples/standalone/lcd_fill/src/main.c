@@ -1,5 +1,7 @@
 #include <string.h>
-#include <tice.h>
+#include <ti/homescreen.h>
+#include <ti/getcsc.h>
+#include <sys/lcd.h>
 
 void FillScreen(uint8_t color);
 

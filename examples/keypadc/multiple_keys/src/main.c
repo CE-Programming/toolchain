@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/homescreen.h>
 #include <keypadc.h>
 
 /* Function prototypes */

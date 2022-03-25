@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 int main(void)
@@ -16,15 +16,15 @@ int main(void)
     for (c = 0; c < 8; c++)
     {
         gfx_SetColor(c);
-        gfx_FillRectangle_NoClip(c * (LCD_WIDTH / 8), 0, LCD_WIDTH / 8, LCD_HEIGHT);
+        gfx_FillRectangle_NoClip(c * (gfx_lcdWidth / 8), 0, gfx_lcdWidth / 8, gfx_lcdHeight);
     }
 
     /* Waits for a key */
     while (!os_GetCSC());
 
     /* Copy parts of the buffer to the screen */
-    gfx_BlitLines(gfx_buffer, LCD_HEIGHT - 32, 32);
-    gfx_BlitRectangle(gfx_buffer, LCD_WIDTH / 4, LCD_HEIGHT / 4, LCD_WIDTH / 2, LCD_HEIGHT / 2);
+    gfx_BlitLines(gfx_buffer, gfx_lcdHeight - 32, 32);
+    gfx_BlitRectangle(gfx_buffer, gfx_lcdWidth / 4, gfx_lcdHeight / 4, gfx_lcdWidth / 2, gfx_lcdHeight / 2);
 
     /* Waits for a key */
     while (!os_GetCSC());

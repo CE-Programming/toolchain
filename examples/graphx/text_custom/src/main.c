@@ -1,5 +1,5 @@
 #include <string.h>
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 void PrintCentered(const char *str);
@@ -49,8 +49,8 @@ int main(void)
 void PrintCentered(const char *str)
 {
     gfx_PrintStringXY(str,
-                      (LCD_WIDTH - gfx_GetStringWidth(str)) / 2,
-                      (LCD_HEIGHT - 8) / 2);
+                      (gfx_lcdWidth - gfx_GetStringWidth(str)) / 2,
+                      (gfx_lcdHeight - 8) / 2);
 }
 
 static unsigned char font8x8_spacing[128] =

@@ -1,4 +1,7 @@
-#include <tice.h>
+#include <ti/getcsc.h>
+#include <ti/homescreen.h>
+#include <ti/real.h>
+#include <sys/timers.h>
 #include <time.h>
 
 /* Print a stopwatch value on the home screen */

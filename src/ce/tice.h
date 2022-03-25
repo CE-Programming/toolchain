@@ -27,7 +27,7 @@
 #include <ti/real.h>
 #include <ti/tokens.h>
 #include <ti/ui.h>
-#include <ti/usermemory.h>
+#include <ti/usermem.h>
 
 /* Compatibility defines */
 #define prgm_CleanUp()

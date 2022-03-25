@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <compression.h>
 #include <graphx.h>
 
@@ -41,7 +41,7 @@ int main(void)
         gfx_Sprite_NoClip(tile, x, y);
 
         x += image_tile_width;
-        if (x >= LCD_WIDTH)
+        if (x >= gfx_lcdWidth)
         {
             y += image_tile_height;
             x = 0;
