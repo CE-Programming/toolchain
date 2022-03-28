@@ -1,7 +1,7 @@
 	assume	adl=1
 
 	section	.text
-	public  _strdup
+	public	_strdup
 _strdup:
 	ld	hl,-3
 	call	__frameset

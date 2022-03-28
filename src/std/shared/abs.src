@@ -1,7 +1,7 @@
 	assume	adl=1
 
 	section	.text
-	public  _abs
+	public	_abs
 _abs:
 	pop	hl
 	pop	de

@@ -16,7 +16,7 @@
 ;		AuBC:	32-bit IEEE Single Precision.
 ;
 ;--------------------------------------------------------------
-        assume  adl=1
+	assume	adl=1
 
 	section	.text
 	public	__fneg

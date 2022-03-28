@@ -10,4 +10,4 @@ _rand:
 	add	hl,de
 	ret
 
-	extern  _random
+	extern	_random

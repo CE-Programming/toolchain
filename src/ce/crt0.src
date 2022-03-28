@@ -111,7 +111,7 @@ fini_functions:
 .webaddress:
 	db	"http://tiny.cc/clibs",0
 
-	section .init.clock
+	section	.init.clock
 	public	___init_clock
 ___init_clock:
 ; Disable the timer and configure it to use the 32768Hz crystal timer, not
@@ -518,13 +518,13 @@ _exit.flash_wait_states := $-1
 	pop	hl		; hl = exit code
 	ret
 
-	section .init_array
+	section	.init_array
 init_array::
-	section .ctors
+	section	.ctors
 ctors::
-	section .dtors
+	section	.dtors
 dtors::
-	section .fini_array
+	section	.fini_array
 fini_array::
 
 	extern	_main

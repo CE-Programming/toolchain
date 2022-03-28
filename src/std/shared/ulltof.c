@@ -1,15 +1,11 @@
 #include <limits.h>
 #include <math.h>
+#include <stdint.h>
 
-float _ulltof(unsigned long long x)
+float _ulltof_c(unsigned long long x)
 {
-    unsigned long long doubled;
-    int exponent = ULONG_WIDTH - ULLONG_WIDTH;
-    while (!__builtin_add_overflow(x, x, &doubled)) {
-        x = doubled;
-        --exponent;
-    }
-    return ldexpf((unsigned long)(x >> (ULLONG_WIDTH - ULONG_WIDTH)), exponent);
+    uint8_t exponent = x ? __builtin_clzll(x) : ULLONG_WIDTH;
+    if (exponent >= ULLONG_WIDTH - ULONG_WIDTH) return (unsigned long)x;
+    exponent = ULLONG_WIDTH - ULONG_WIDTH - exponent;
+    return ldexpf((unsigned long)(x >> exponent), exponent);
 }
-
-double _ulltod(unsigned long long) __attribute__((alias("_ulltof")));

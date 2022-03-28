@@ -1,0 +1,12 @@
+	assume	adl=1
+
+	section	.text
+	public	__ulltof, __ulltod
+__ulltof:
+__ulltod:
+	push	af, iy, bc, de, hl
+	call	__ulltof_c
+	pop	af, af, af, iy, af
+	ret
+
+	extern	__ulltof_c

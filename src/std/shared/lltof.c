@@ -1,15 +1,11 @@
 #include <limits.h>
 #include <math.h>
+#include <stdint.h>
 
-float _lltof(long long x)
+float _lltof_c(long long x)
 {
-    long long doubled;
-    int exponent = LONG_WIDTH - LLONG_WIDTH;
-    while (!__builtin_add_overflow(x, x, &doubled)) {
-        x = doubled;
-        --exponent;
-    }
-    return ldexpf((long)(x >> (LLONG_WIDTH - LONG_WIDTH)), exponent);
+    uint8_t exponent = x ? __builtin_clrsbll(x) : LLONG_WIDTH - 1;
+    if (exponent >= LLONG_WIDTH - LONG_WIDTH) return (long)x;
+    exponent = LLONG_WIDTH - LONG_WIDTH - exponent;
+    return ldexpf((long)(x >> exponent), exponent);
 }
-
-double _lltod(long long) __attribute__((alias("_lltof")));
