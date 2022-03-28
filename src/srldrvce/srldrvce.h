@@ -79,6 +79,7 @@ typedef struct {
     ring_buf_ctrl_t rx_buf;
     ring_buf_ctrl_t tx_buf;
     srl_error_t err;
+    uint8_t reserved[16];
 } srl_device_t;
 
 #define SRL_INTERFACE_ANY 0xFF
