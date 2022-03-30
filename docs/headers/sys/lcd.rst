@@ -1,11 +1,11 @@
-.. _celcd_h:
+.. _lcd_h:
 
-celcd.h
-======
+sys/lcd.h
+=========
 
 .. code-block:: c
 
-    #include <celcd.h>
+    #include <sys/lcd.h>
 
 This header includes defines for the PL111 LCD controller used in the CE.
 
@@ -15,5 +15,5 @@ This header includes defines for the PL111 LCD controller used in the CE.
 API Documentation
 -----------------
 
-.. doxygenfile:: celcd.h
+.. doxygenfile:: sys/lcd.h
    :project: CE C/C++ Toolchain

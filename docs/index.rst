@@ -1,7 +1,7 @@
 Welcome to the CE C/C++ Toolchain!
 ==================================
 
-The CE C/C++ Toolchain allows you to create incredible programs using the standard C/C++ language.
+The CE C/C++ Toolchain allows you to create incredible programs for the TI-84 Plus CE/TI-83 Premium CE (with or without Python) using the standard C/C++ language.
 Additionally, the CE Libraries are used to aid in rapid development by implementing
 optimized routines for graphics, file I/O, fonts, keypad input, and more.
 
@@ -38,8 +38,11 @@ visit the `GitHub repository <https://github.com/CE-Programming/toolchain>`_.
     static/fileio
     libraries/index
     headers/index
+    headers/sys/index
+    headers/ti/index
     static/debugging
     static/makefile-options
+    static/hardware
 
 .. toctree::
     :caption: Contributing

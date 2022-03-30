@@ -1,4 +1,4 @@
-#include <ti/usermem.h>
+#include <ti/vars.h>
 #include <stdlib.h>
 #include <stdio.h>
 

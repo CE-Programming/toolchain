@@ -1,11 +1,11 @@
-.. _cetimers_h:
+.. _timers_h:
 
-tios.h
-======
+sys/timers.h
+============
 
 .. code-block:: c
 
-    #include <cetimers.h>
+    #include <sys/timers.h>
 
 This header includes defines for the CE's hardware timers.
 There are two possible timing ("clock") sources: a 32768 Hz crystal with similar accuracy to the clock found in any
@@ -17,5 +17,5 @@ smartphone or wristwatch, and the CPU's main 48 MHz clock with likely much infer
 API Documentation
 -----------------
 
-.. doxygenfile:: cetimers.h
+.. doxygenfile:: sys/timers.h
    :project: CE C/C++ Toolchain

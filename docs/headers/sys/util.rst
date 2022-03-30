@@ -1,11 +1,11 @@
-.. _ceutil_h:
+.. _util_h:
 
-ceutil.h
-======
+sys/util.h
+==========
 
 .. code-block:: c
 
-    #include <ceutil.h>
+    #include <sys/util.h>
 
 This header includes defines for miscellaneous CE-specific things.
 
@@ -15,5 +15,5 @@ This header includes defines for miscellaneous CE-specific things.
 API Documentation
 -----------------
 
-.. doxygenfile:: ceutil.h
+.. doxygenfile:: sys/util.h
    :project: CE C/C++ Toolchain

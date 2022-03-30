@@ -63,6 +63,16 @@ The TI-84 Plus CE
 
 As mentioned, the TI-84 Plus CE's hardware is radically different from its predecessors.
 
+Versions
+^^^^^^^^
+
+From time to time, TI revises their calculator hardware.
+
+- Starting with revision code I, TI removed the CPU's interrupt vectoring feature.
+- In 2019, the TI-84 Plus CE went through a major revision that significantly improved performance by adding a cache in front of the XIP flash.
+- At the same time, TI added a serial link to allow communication with an optional Python co-processor.
+  This was originally limited to the French market, but TI has since made Python available in all markets.
+
 The 24-bit eZ80 CPU
 ^^^^^^^^^^^^^^^^^^^
 
@@ -75,11 +85,7 @@ allowing TI to add new functionality written in C to their old Z80 assembly code
 The eZ80 expands the memory space from 64 K to 16 MB, allowing easy access to all of the calculator's memory.
 Unfortunately, while the Z80 has perfectly-sensible 16-bit addresses, with an address being two bytes in size,
 the eZ80 uses 24-bit addresses, meaning each address is three bytes long.
-This is an unusual size, and it also results in the C SDK having 24-bit-size :code:`int` .
-
-Consequently, the eZ80 can natively access variables that are either 8- or 24-bits in size,
-but 16- and 32-bit variables are actually a little slower for the CPU to access.
-Furthermore, the eZ80 is a little slower at signed arithmetic, so you should use :code:`unsigned` when possible.
+This is an unusual size, and it also results in the C toolchaing having 24-bit-size :code:`int` .
 
 Consequently, the eZ80 can natively access variables that are either one byte (8 bits, :code:`char`) or three bytes (24 bits, :code:`int`) in size,
 but two-byte (16 bits, :code:`short`) and four-byte (32 bits, :code:`long`) variables are actually a little slower for the CPU to access.
@@ -89,18 +95,19 @@ Furthermore, the eZ80 is a little slower at signed arithmetic, so you should use
 The :code:`<stdint.h>` header contains declarations for the standard 8-, 16-, and 32-bit types, as well as the eZ80's 24-bit type.
 Here's a table:
 
-=============   ====================================   ===========    ============   ===========   ==========================   ==========================
-C Type          :code:`<stdint.h>` Names               CE SDK Bits    CE SDK Bytes   Common Size   CE :code:`unsigned` Range    CE :code:`signed` Range
-=============   ====================================   ===========    ============   ===========   ==========================   ==========================
-:code:`char`    :code:`uint8_t`, :code:`int8_t`        8              1              8/1           0 to 255                     -128 to 127
-:code:`short`   :code:`uint16_t`, :code:`int16_t`      16             2              16/2          0 to 65535                   -32768 to 32767
-:code:`int`     :code:`uint24_t`, :code:`int24_t`      24             3              32/4          0 to 16777215                -8388608 to 8388607
-:code:`long`    :code:`uint32_t`, :code:`int32_t`      32             4              64/8          0 to 4294967295              -2147483648 to 2147483647
-:code:`void*`   :code:`uintptr_t`, :code:`ptrdiff_t`   24             3              64/8          All of RAM and the archive   N/A
-=============   ====================================   ===========    ============   ===========   ==========================   ==========================
+==================   ====================================   =======    ========   ===========   ==========================   ==========================
+C Type               :code:`<stdint.h>` Names               CE Bits    CE Bytes   Common Size   CE :code:`unsigned` Range    CE :code:`signed` Range
+==================   ====================================   =======    ========   ===========   ==========================   ==========================
+:code:`char`         :code:`uint8_t`, :code:`int8_t`        8          1          8/1           0 to 255                     -128 to 127
+:code:`short`        :code:`uint16_t`, :code:`int16_t`      16         2          16/2          0 to 65535                   -32768 to 32767
+:code:`int`          :code:`uint24_t`, :code:`int24_t`      24         3          32/4          0 to 16777215                -8388608 to 8388607
+:code:`long`         :code:`uint32_t`, :code:`int32_t`      32         4          32/4          0 to 4294967295              -2147483648 to 2147483647
+:code:`long log`     :code:`uint64_t`, :code:`int64_t`      64         8          64/8          0 to a lot                   -negative lot to a lot
+:code:`void*`        :code:`uintptr_t`, :code:`ptrdiff_t`   24         3          64/8          All of RAM and the archive   N/A
+==================   ====================================   =======    ========   ===========   ==========================   ==========================
 
 "Common Size" is the size in bit/bytes of the type that Windows uses, as well as many other platforms;
-on some platforms, the types are larger than in this SDK.
+on some platforms, the types are larger than in this toolchain.
 
 Floating-Point Numbers
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -110,9 +117,9 @@ The circuits that modern CPUs use to handle such types is large and complicated,
 Therefore, software has to implement that functionality.
 
 Like the Z80, the eZ80 also lacks native support for float-point arithmetic, so :code:`float` is slower than :code:`int`.
-Furthermore, in the SDK, :code:`float` and :code:`double` are actually treated the same (this is allowed by the C standard).
+Furthermore, in the toolchain, :code:`float` and :code:`double` are actually treated the same (this is allowed by the C standard).
 
-In the SDK, :code:`float` is the standard IEEE 32-bit float.
+In the toolchain, :code:`float` is the standard IEEE 32-bit float.
 However, IEEE floats have limited precision and have unintuitive rouding behavior.
 So when TI designed the TI-81, they wrote their own special floating-point number format, which is much more suitable for precision scientific calculations.
 Unfortunately, it also much slower.
@@ -142,7 +149,7 @@ This means that reading from or writing to special address (pointers) won't actu
 For example, there is no RAM or flash at the address :code:`0xF60024`,
 but if you write to that address, the LCD backlight controller will know you're trying to talk it and change the LCD's brightness.
 Similarly, if you read from that address, the backlight controller will respond with the current backlight value.
-The SDK exposes these special addresses as variables you can read and write.
+The toolchain exposes these special addresses as variables you can read and write.
 
 .. code-block:: c
 
@@ -161,7 +168,7 @@ The calculator's operating system works with special hardware to enforce this re
 Consequently, the only way to store data in flash is to create a variable in RAM and then archive it.
 The :code:`fileioc` library makes this easy.
 
-Because teachers (and therefore TI's management) get very worked up by cheating, the SDK does not and will not provide any means of bypassing this restriction.
+Because teachers (and therefore TI's management) get very worked up by cheating, the toolchain does not and will not provide any means of bypassing this restriction.
 
 The LCD
 ^^^^^^^
@@ -178,7 +185,7 @@ The LCD Controller
 The LCD controller is a logic block that sends pixels from VRAM to the physical display.
 TI's operating system uses VRAM in a 16-bits-per-pixel format, but the LCD controller also supports other formats:
 
-- 24-bit color, which uses way too RAM;
+- 24-bit color, which uses way too much RAM;
 - other 16- and 15-bit color formats;
 - 8-bit palettized color, using one byte per pixel and allowing double bufferiing;
 - 4-bit palettized color, using even less RAM and packing in two pixels per byte;
@@ -229,7 +236,21 @@ USB
 ^^^^^^
 
 The calculator has a USB port, of course, but the toolchain does not yet support it.
+Work on a USB driver is ongoing in the :code:`usbdrvce` branch on the toolchain.
+
 The :code:`sys/basicusb.h` allows you to check if the battery is currently being charged, and that's about it.
+
+Protected Hardware
+^^^^^^^^^^^^^^^^^^
+
+Some of the calculator's hardware is protected, meaning normal programs cannot access it.
+The protection is linked to the protection on the flash chip (mentioned above), and the intention is that only the calculator's operating system can access protected hardware.
+
+- The calculator has an SHA accelerator block.
+  For some reason it is protected, so there isn't much useful to say about it.
+- System configuration and power control are protected.
+- In some markets, the CE comes with an additional LED on the front that blinks when the calculator is in exam mode.
+  Naturally, user programs cannot activate this LED to prevent programs from faking exam mode.
 
 Wait States
 ^^^^^^^^^^^
@@ -245,6 +266,6 @@ For the version of the TI-84 Plus CE released in 2015, this results in the eZ80 
 Yes, the CPU litterally runs as though it's only clocked at around 6 MHz (equivalent to a Z80 at around 50 MHz).
 In 2019, TI released a new version of the TI-84 Plus CE that improves this significantly: now the CPU only spends about two-thirds of its time stalled.
 
-This isn't really important for SDK users; there's nothing you can do about it.
+This isn't really important for toolchain users; there's nothing you can do about it.
 I just feel the need to tell everyone about TI Education's bad engineering in the hope that they'll one day feel enough shame to do better.
 Because TI *does* have good engineers; they just apparently weren't employed when designing the TI-84 Plus CE.
