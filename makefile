@@ -59,6 +59,8 @@ install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
 	$(Q)$(call MKDIR,$(INSTALL_DIR))
 	$(Q)$(call MKDIR,$(INSTALL_BIN))
 	$(Q)$(call MKDIR,$(INSTALL_H))
+	$(Q)$(call MKDIR,$(INSTALL_TI_H))
+	$(Q)$(call MKDIR,$(INSTALL_HW_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIB))
 	$(Q)$(call MKDIR,$(INSTALL_META))
 	$(Q)$(call MKDIR,$(INSTALL_EXAMPLES))

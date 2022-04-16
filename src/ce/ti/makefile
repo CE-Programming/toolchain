@@ -14,24 +14,13 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-include $(CURDIR)/../common.mk
-
-TARGETS := sys ti
+include $(CURDIR)/../../common.mk
 
 WILDCARD_SRC := $(wildcard *.src)
 WILDCARD_H := $(wildcard *.h *.hpp)
 
-all:
-
-$(addprefix install-,$(TARGETS)):
-	$(Q)$(MAKE) -C $(patsubst install-%,%,$@) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-
-install: $(addprefix install-,$(TARGETS))
-	$(Q)$(call MKDIR,$(INSTALL_H))
+install:
 	$(Q)$(call MKDIR,$(INSTALL_TI_H))
-	$(Q)$(call MKDIR,$(INSTALL_HW_H))
-	$(Q)$(call MKDIR,$(INSTALL_SHARED))
-	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_H))
-	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_SHARED))
+	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_TI_H))
 
-.PHONY: all install $(addprefix install-,$(TARGETS))
+.PHONY: install
