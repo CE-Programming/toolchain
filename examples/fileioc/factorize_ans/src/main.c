@@ -1,4 +1,5 @@
 #include <ti/homescreen.h>
+#include <ti/real.h>
 #include <math.h>
 #include <fileioc.h>
 

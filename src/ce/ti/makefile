@@ -18,9 +18,11 @@ include $(CURDIR)/../../common.mk
 
 WILDCARD_SRC := $(wildcard *.src)
 WILDCARD_H := $(wildcard *.h *.hpp)
+HPPS := real
 
 install:
 	$(Q)$(call MKDIR,$(INSTALL_TI_H))
 	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_TI_H))
+	$(Q)$(call COPY,$(HPPS),$(INSTALL_TI_H))
 
 .PHONY: install

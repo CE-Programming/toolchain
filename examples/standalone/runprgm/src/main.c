@@ -1,4 +1,5 @@
 #include <ti/vars.h>
+#include <ti/getcsc.h>
 #include <stdlib.h>
 #include <stdio.h>
 
