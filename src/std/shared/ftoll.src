@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+	public	__ftoll, __ftoull, __dtoll, __dtoull
+__ftoll:
+__ftoull:
+__dtoll:
+__dtoull:
+	ld      e, a
+	ld	d, a
+	push	iy, de, bc
+	call	__ftoll_c
+	pop	af, af, iy
+	ret
+
+	extern	__ftoll_c

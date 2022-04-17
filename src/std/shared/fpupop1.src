@@ -23,7 +23,7 @@
 ; MODIFIES:
 ;		flags
 ;--------------------------------------------------------------
-        assume  adl=1
+	assume	adl=1
 
 	section	.text
 	public	__fpupop1

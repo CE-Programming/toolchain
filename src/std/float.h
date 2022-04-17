@@ -1,75 +1,67 @@
-/*
- *  Copyright (C) 1999-2008 by  Zilog, Inc.
- *  All Rights Reserved
- *  Modified by Matt "MateoConLechuga" Waltz for TI84+CE platform
- */
-#ifndef FLOAT_H
-#define FLOAT_H
+#ifndef _FLOAT_H
+#define _FLOAT_H
 
-#define FLT_RADIX	2	/* radix of exponent representation */
+#define _FENV_P_ONLY
+#include <fenv.h>
 
-#define FLT_ROUNDS	0	/* addition rounds to nearest       */
+#define  FLT_RADIX        __FLT_RADIX__
 
-/* number of base-FLT_RADIX digits in the mantissa */
+#if __STDC_VERSION__ >= 199901L
+#define  FLT_EVAL_METHOD  __FLT_EVAL_METHOD__
 
-#define FLT_MANT_DIG 24
-#define DBL_MANT_DIG FLT_MANT_DIG
-#define LDBL_MANT_DIG FLT_MANT_DIG
+#define      DECIMAL_DIG      __DECIMAL_DIG__
+#endif
 
-/* number of decimal digits of precision */
+#if __STDC_VERSION__ >= 201112L
+#define  FLT_DECIMAL_DIG  __FLT_DECIMAL_DIG__
+#define  DBL_DECIMAL_DIG  __DBL_DECIMAL_DIG__
+#define LDBL_DECIMAL_DIG __LDBL_DECIMAL_DIG__
 
-#define FLT_DIG 	6
-#define DBL_DIG 	FLT_DIG
-#define LDBL_DIG	FLT_DIG
+#define  FLT_HAS_SUBNORM  __FLT_HAS_DENORM__
+#define  DBL_HAS_SUBNORM  __DBL_HAS_DENORM__
+#define LDBL_HAS_SUBNORM __LDBL_HAS_DENORM__
 
-/* minimum negative integer such that FLT_RADIX raised to that */
-/* power approximates a positive floating point number in the  */
-/* range of representable values.                              */
+#define  FLT_TRUE_MIN     __FLT_DENORM_MIN__
+#define  DBL_TRUE_MIN     __DBL_DENORM_MIN__
+#define LDBL_TRUE_MIN    __LDBL_DENORM_MIN__
+#endif
 
-#define FLT_MIN_EXP	(-125)
-#define DBL_MIN_EXP	FLT_MIN_EXP
-#define LDBL_MIN_EXP	FLT_MIN_EXP
+#define  FLT_MIN          __FLT_MIN__
+#define  DBL_MIN          __DBL_MIN__
+#define LDBL_MIN         __LDBL_MIN__
 
-/* maximum integer such that FLT_RADIX raised to that power */
-/* approximates a floating point number in the range of     */
-/* representable numbers.                                   */
+#define  FLT_MAX          __FLT_MAX__
+#define  DBL_MAX          __DBL_MAX__
+#define LDBL_MAX         __LDBL_MAX__
 
-#define FLT_MAX_EXP	128
-#define DBL_MAX_EXP	FLT_MAX_EXP
-#define LDBL_MAX_EXP	FLT_MAX_EXP
+#define  FLT_EPSILON      __FLT_EPSILON__
+#define  DBL_EPSILON      __DBL_EPSILON__
+#define LDBL_EPSILON     __LDBL_EPSILON__
 
-/* maximum integer such that 10 raised to that power    */
-/* approximates a floating point number in the range of */
-/* representable value ((int)log10(FLT_MAX),etc)        */
+#define  FLT_DIG          __FLT_DIG__
+#define  DBL_DIG          __DBL_DIG__
+#define LDBL_DIG         __LDBL_DIG__
 
-#define FLT_MAX_10_EXP	(+38)
-#define DBL_MAX_10_EXP	FLT_MAX_10_EXP
-#define LDBL_MAX_10_EXP FLT_MAX_10_EXP
+#define  FLT_MANT_DIG     __FLT_MANT_DIG__
+#define  DBL_MANT_DIG     __DBL_MANT_DIG__
+#define LDBL_MANT_DIG    __LDBL_MANT_DIG__
 
-/* minimum negative integer such that 10 raised to that power */
-/* approximates a positive floating point number in the range */
-/* of representable values ((int)log10(FLT_MIN),etc.)         */
+#define  FLT_MIN_EXP      __FLT_MIN_EXP__
+#define  DBL_MIN_EXP      __DBL_MIN_EXP__
+#define LDBL_MIN_EXP     __LDBL_MIN_EXP__
 
-#define FLT_MIN_10_EXP	(-37)
-#define DBL_MIN_10_EXP	FLT_MIN_10_EXP
-#define LDBL_MIN_10_EXP FLT_MIN_10_EXP
+#define  FLT_MIN_10_EXP   __FLT_MIN_10_EXP__
+#define  DBL_MIN_10_EXP   __DBL_MIN_10_EXP__
+#define LDBL_MIN_10_EXP  __LDBL_MIN_10_EXP__
 
-/* maximum representable floating point numbers */
+#define  FLT_MAX_EXP      __FLT_MAX_EXP__
+#define  DBL_MAX_EXP      __DBL_MAX_EXP__
+#define LDBL_MAX_EXP     __LDBL_MAX_EXP__
 
-#define FLT_MAX 	3.40282347E+38
-#define DBL_MAX 	FLT_MAX
-#define LDBL_MAX	FLT_MAX
+#define  FLT_MAX_10_EXP   __FLT_MAX_10_EXP__
+#define  DBL_MAX_10_EXP   __DBL_MAX_10_EXP__
+#define LDBL_MAX_10_EXP  __LDBL_MAX_10_EXP__
 
-/* minimum positive number x such that 1.0 + x != 1.0 (b ^ (1-p)) */
-
-#define FLT_EPSILON	1.19209290E-07
-#define DBL_EPSILON	FLT_EPSILON
-#define LDBL_EPSILON	FLT_EPSILON
-
-/* minimum representable positive floating point numbers */
-
-#define FLT_MIN 	1.17549435E-38
-#define DBL_MIN 	FLT_MIN
-#define LDBL_MIN	FLT_MIN
+#define  FLT_ROUNDS      ((__fe_cur_env ^ 1) & 3)
 
 #endif

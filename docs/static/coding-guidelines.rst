@@ -143,8 +143,8 @@ Here are the important takeaways from the above example:
 
 - The first line in the source file should be the corresponding header file for the source interface. Other headers can then be included after; with system/toolchain headers last. This ensures that the header includes all the things necessary to compile it.
 - The source file uses the **static** keyword in front of a function to indicate that it can only be used in the *source.c* file. This prevents other source files from attempting to use it. It is a good idea to get into the habit of labeling functions  in this way if they are not used anywhere except for the file they are in.
-- The header includes so-called "header guards" (the :code"`#ifdef SOURCE_H` / :code:`#define SOURCE_H` lines), which are used to prevent the header from being included multiple times in the same source file.
-- The :code:`ifdef __cplusplus` lines are used to prevent a C++ compiler from mangling the names of the header functions. It is a good idea to add this, even if you are working on a C-only project as it will save you any headache if a C++ compiler tries to compile the header.
+- The header includes so-called "header guards" (the :code:`#ifdef SOURCE_H` / :code:`#define SOURCE_H` lines), which are used to prevent the header from being included multiple times in the same source file.
+- The :code:`#ifdef __cplusplus` lines are used to prevent a C++ compiler from mangling the names of the header functions. It is a good idea to add this, even if you are working on a C-only project as it will save you any headache if a C++ compiler tries to compile the header.
 - The external source function is represented as a "prototype" inside the header. This prototype tells the rest of the source files the arguments and return of the function, but does not define the implementation. It is the responsibility of the linker to take all the compiled source files and find the corresponding functions.
 - There should be one header file for one source file which defines the external functions/variables in the source file. Having "global" header files (i.e. a header file that includes a bunch of other headers and functions) is prone to many issues during linking, affects code modularity, and maintenance, as well as adding to compile time. Putting all possible headers in one application header is as wrong as wrong can be.
 
@@ -153,7 +153,9 @@ Proper Prototyping
 
 In C, if a function takes no arguments it should be represented as :code:`foo(void);` in the prototype, not :code:`foo();`.
 Contrary to what it might seem, :code:`foo();` indicates that the function can take *any number* of arguments.
-Note that this is the opposite in C++.
+
+In C++, you should use :code:`foo();` without the `void` argument.
+In C23, :code:`foo();` is now identical to :code:`foo(void);` (it is still recommended to use :code:`foo(void);` for portability).
 
 What not to put in header files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

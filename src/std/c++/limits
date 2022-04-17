@@ -130,7 +130,7 @@ template<> struct numeric_limits<float> : __detail::numeric_limits::__floating_p
 
     static constexpr float min() noexcept { return __FLT_MIN__; }
     static constexpr float max() noexcept { return __FLT_MAX__; }
-#if __cplusplus >= 202002L
+#if __cplusplus >= 201103L
     static constexpr float lowest() noexcept { return -max(); }
 #endif
 
@@ -156,7 +156,7 @@ template<> struct numeric_limits<double> : __detail::numeric_limits::__floating_
 
     static constexpr double min() noexcept { return __DBL_MIN__; }
     static constexpr double max() noexcept { return __DBL_MAX__; }
-#if __cplusplus >= 202002L
+#if __cplusplus >= 201103L
     static constexpr double lowest() noexcept { return -max(); }
 #endif
 
@@ -182,7 +182,7 @@ template<> struct numeric_limits<long double> : __detail::numeric_limits::__floa
 
     static constexpr long double min() noexcept { return __LDBL_MIN__; }
     static constexpr long double max() noexcept { return __LDBL_MAX__; }
-#if __cplusplus >= 202002L
+#if __cplusplus >= 201103L
     static constexpr long double lowest() noexcept { return -max(); }
 #endif
 

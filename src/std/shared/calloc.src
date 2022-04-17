@@ -1,7 +1,7 @@
-        assume  adl=1
+        assume	adl=1
 
 	section	.text
-	public _calloc
+	public	_calloc
 _calloc:
 	pop	de
 	pop	bc

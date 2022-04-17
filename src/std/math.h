@@ -26,6 +26,17 @@ extern "C" {
 #define M_SQRT1_2     0.707106781186547524401    /* 1/sqrt(2)      */
 #define M_LOG_2M_PI   1.83787706640934548        /* log2(M_PI)     */
 
+#define FP_ILOGB0     (~__INT_MAX__)
+#define FP_ILOGBNAN     __INT_MAX__
+
+#define signbit(x)           __builtin_signbit(x)
+#define isgreater(x, y)      __builtin_isgreater(x, y)
+#define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
+#define isless(x, y)         __builtin_isless(x, y)
+#define islessequal(x, y)    __builtin_islessequal(x, y)
+#define islessgreater(x, y)  __builtin_islessgreater(x, y)
+#define isunordered(x, y)    __builtin_isunordered(x, y)
+
 int _isinff(float n);
 int _isnanf(float n);
 int _isnormalf(float n);
@@ -235,6 +246,10 @@ long double rintl(long double);
 double      round(double);
 float       roundf(float);
 long double roundl(long double);
+
+double      roundeven(double);
+float       roundevenf(float);
+long double roundevenl(long double);
 
 double      scalbln(double, long);
 float       scalblnf(float, long);

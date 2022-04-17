@@ -21,8 +21,8 @@
 #define B14 ( 7.0 / 6.0)
 #define B16 (-3617.0 / 510.0)
 
-static double loggamma(double x) { /* the natural logarithm of the Gamma function. */
-    double v, w;
+float lgammaf(float x) { /* the natural logarithm of the Gamma function. */
+    float v, w;
 
     v = 1;
     while (x < N) {  v *= x;  x++;  }
@@ -34,22 +34,4 @@ static double loggamma(double x) { /* the natural logarithm of the Gamma functio
                 + 0.5 * M_LOG_2M_PI - log(v) - x + (x - 0.5) * log(x);
 }
 
-double tgamma(double x) { /* Gamma function */
-    if (x == 0.0) { /* Pole Error */
-        errno = ERANGE;
-        return 1/x < 0 ? -HUGE_VAL : HUGE_VAL;
-    }
-    if (x < 0) {
-        int sign;
-	static double zero = 0.0;
-        double i, f;
-        f = modf(-x, &i);
-        if (f == 0.0) { /* Domain Error */
-            errno = EDOM;
-            return zero/zero;
-        }
-        sign = (fmod(i, 2.0) != 0.0) ? 1 : -1;
-        return sign * M_PI / (sin(M_PI * f) * exp(loggamma(1 - x)));
-    }
-    return exp(loggamma(x));
-}
+double lgamma(double) __attribute__((alias("lgammaf")));
