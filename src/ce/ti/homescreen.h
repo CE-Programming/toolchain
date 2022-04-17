@@ -44,7 +44,7 @@ void boot_NewLine(void);
 #define os_ClrHome() \
 do { \
     os_ClrLCD(); \
-    os_MoveUp(); \
+    os_HomeUp(); \
     os_DrawStatusBar(); \
 } while (0)
 
@@ -54,7 +54,7 @@ do { \
 #define os_ClrHomeFull() \
 do { \
     os_ClrLCDFull(); \
-    os_MoveUp(); \
+    os_HomeUp(); \
     os_DrawStatusBar(); \
 } while (0)
 
