@@ -3,8 +3,7 @@
  * @authors
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
- * @brief TI CE OS homescreen functions
- * 
+ * @brief TI CE OS homescreen functions.
  * If you want to print to the homescreen instead of using GraphX, this is the file.
  */
 

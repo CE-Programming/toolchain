@@ -3,8 +3,7 @@
  * @authors
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
- * @brief TI CE OS hooks
- * 
+ * @brief TI CE OS hooks.
  * The API for using hooks isn't fleshed out here, so this isn't really useful.
  */
 

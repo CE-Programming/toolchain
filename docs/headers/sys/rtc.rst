@@ -1,7 +1,7 @@
 .. _rtc.h:
 
 sys/rtc.h
-======
+=========
 
 .. code-block:: c
 

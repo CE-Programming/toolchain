@@ -4,7 +4,6 @@
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
  * @brief TI CE OS errors; this is all the `ERR:A MESSAGE` screen stuff.
- * 
  * You can use this to show custom error screens, as well as intercept errors to prevent the error screen from showing.
  */
 

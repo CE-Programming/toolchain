@@ -3,8 +3,7 @@
  * @authors
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
- * @brief TI CE OS graphscreen and small font text routines
- * 
+ * @brief TI CE OS graphscreen and small font text routines.
  * The API here isn't really fleshed out so this is of limited usefulness outside of displaying text in TI's small font.
  */
 

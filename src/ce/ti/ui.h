@@ -3,8 +3,7 @@
  * @authors
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
- * @brief TI CE OS standard TI user interface stuff
- * 
+ * @brief TI CE OS standard TI user interface stuff.
  * Has run indicator, status bar, TI colors, and user-specified brightness.
  */
 

@@ -21,8 +21,6 @@ extern "C" {
 #define tiflags __attribute__((__tiflags__))
 /* @endcond */
 
-#ifndef _TI_REAL_STRUCT /* X-ref with vars.h */
-#define _TI_REAL_STRUCT
 /**
  * @brief Structure of real variable type
  */
@@ -31,7 +29,6 @@ typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
  * @brief Structure of complex variable type
  */
 typedef struct { real_t real, imag; } cplx_t;
-#endif
 
 /**
  * Copies a real_t type

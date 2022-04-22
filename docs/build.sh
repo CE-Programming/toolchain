@@ -31,6 +31,7 @@ declare -A versions_map=(
 	[v9.1]=v9.1
 	[v9.0]=v9.0
 	[master]=master
+	[refactor-headers]=feature/refactor-headers
 )
 
 # Pointers to other versions in the output documentation
