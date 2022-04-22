@@ -6,13 +6,17 @@ Getting Started
 Installing the CE Toolchain
 ---------------------------
 
-* Download the file prefixed with your OS type from `here <https://github.com/CE-Programming/toolchain/releases/latest>`_.
-* Extract the zip archive to a path **without any spaces in it**.
+* Download the latest stable toolchain release for your OS `here <https://github.com/CE-Programming/toolchain/releases/latest>`_.
+
+  * You can optionally try the "nightly" build `here <https://github.com/CE-Programming/toolchain/releases/tag/nightly>`_ instead - this is where all current development happens, and provides the latest features and support before an official release.
+
+* Extract the archive to a location **without any spaces in it**.
 
 **On Windows**
 
-    * Double click :code:`cedev.bat` inside the extracted folder to launch the toolchain environment.
+    * Double click :code:`cedev.bat` inside the extracted :code:`CEdev` folder to launch the toolchain environment.
       You may have to allow the script to be run depending on the user account control.
+
     * If you want to avoid using the :code:`cedev.bat` script, you can extend the PATH environment variable to point to the :code:`CEdev/bin` directory.
       `Here is an example <https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/>`_ of how to do this.
 
@@ -23,7 +27,7 @@ Installing the CE Toolchain
         .. indent with spaces
         .. code-block:: bash
 
-            export PATH=/<insert custom path here>/CEdev/bin:$PATH
+            export PATH=/<insert path here>/CEdev/bin:$PATH
 
 .. note::
 

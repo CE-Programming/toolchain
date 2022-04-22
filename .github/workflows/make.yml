@@ -100,16 +100,22 @@ jobs:
           persist-credentials: false
       - name: Build Toolchain
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} V=1
+      - name: Build Libraries
+        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} libs V=1
       - name: Install Toolchain
         env:
           PREFIX: ${{github.workspace}}
-        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install release release-libs V=1
+        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install V=1
 
       - name: Tar toolchain
         if: runner.os != 'Windows'
         run: |
           chmod +x ${{env.CEDEV_BIN}}/*
           tar -C ${{env.CEDEV}}/.. -czvf CEdev-${{runner.os}}.tar.gz CEdev
+      - name: Zip toolchain
+        if: runner.os == 'Windows'
+        run: |
+          cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.zip CEdev
 
       - name: Upload Linux/MacOS CEdev
         if: runner.os != 'Windows'
@@ -123,7 +129,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: CEdev-${{runner.os}}
-          path: ${{env.CEDEV}}
+          path: CEdev-${{runner.os}}.zip
 
       - name: Upload Libraries
         uses: actions/upload-artifact@v2
@@ -148,13 +154,6 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
-        if: runner.os == 'Windows'
-        uses: actions/download-artifact@v2
-        with:
-          name: CEdev-${{runner.os}}
-          path: ${{env.CEDEV}}
-      - name: Download CEdev
-        if: runner.os != 'Windows'
         uses: actions/download-artifact@v2
         with:
           name: CEdev-${{runner.os}}
@@ -162,6 +161,10 @@ jobs:
       - name: Extract Artifact Contents
         if: runner.os != 'Windows'
         run: tar -xvf CEdev-${{runner.os}}.tar.gz
+      - name: Extract Artifact Contents
+        if: runner.os == 'Windows'
+        run: |
+         cd ${{github.workspace}} && 7z x CEdev-${{runner.os}}.zip
 
       # checkout only for testing-- contents should not be used otherwise.
       - name: Checkout Toolchain
@@ -324,3 +327,35 @@ jobs:
           BRANCH: gh-pages
           FOLDER: ${{env.TOOLCHAIN_PATH}}/docs/build/html
           CLEAN: true
+
+  nightly:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Download CEdev Linux
+        uses: actions/download-artifact@v2
+        with:
+          name: CEdev-Linux
+          path: ${{github.workspace}}
+      - name: Download CEdev Windows
+        uses: actions/download-artifact@v2
+        with:
+          name: CEdev-Windows
+          path: ${{github.workspace}}
+
+      - name: Rename Artifacts
+        run: |
+          mv CEdev-Linux.tar.gz CEdev-Linux-nightly.tar.gz
+          mv CEdev-Windows.zip CEdev-Windows-nightly.zip
+
+      - name: Update nightly release
+        uses: pyTooling/Actions/releaser@main
+        with:
+          tag: nightly
+          rm: true
+          token: ${{secrets.GITHUB_TOKEN}}
+          files: |
+            CEdev-Linux-nightly.tar.gz
+            CEdev-Windows-nightly.zip

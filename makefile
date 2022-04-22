@@ -19,10 +19,8 @@ include $(CURDIR)/src/common.mk
 LIBS := libload graphx fontlibc keypadc fileioc
 
 ifeq ($(OS),Windows_NT)
-RELEASE_CMD :=  cd $(INSTALL_PATH)\ && tar.exe -acf $(CURDIR)/release/$(RELEASE_NAME).zip $(CEDEV_DIR)
 WINDOWS_COPY := $(call COPY,tools\windows\make.exe,$(INSTALL_BIN)) && $(call COPY,tools\windows\cedev.bat,$(INSTALL_DIR))
 else
-RELEASE_CMD := cd $(INSTALL_PATH) && zip -r9 $(CURDIR)/release/$(RELEASE_NAME).zip $(CEDEV_DIR)
 WINDOWS_COPY :=
 endif
 
@@ -86,11 +84,7 @@ install-ce:
 uninstall:
 	$(Q)$(call RMDIR,$(INSTALL_DIR))
 
-release: install
-	$(Q)$(call MKDIR,release)
-	$(Q)$(RELEASE_CMD)
-
-release-libs: $(LIBS) convbin
+libs: $(LIBS) convbin
 	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract \
 		$(foreach library,$(LIBS),$(addprefix --input ,$(call LIB_DIR,$(library))/$(library).8xv)) --output $(call NATIVEPATH,clibs.8xg)
 
@@ -104,7 +98,6 @@ clean: $(addprefix clean-,$(LIBS)) clean-std
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/cedev-config) clean
 	$(Q)$(call REMOVE,src/linker_script)
 	$(Q)$(call REMOVE,clibs.8xg)
-	$(Q)$(call RMDIR,release)
 	$(Q)$(call RMDIR,docs/build)
 	$(Q)$(call RMDIR,docs/doxygen)
 
@@ -119,16 +112,15 @@ help:
 	@echo Helpful targets:
 	@echo   all
 	@echo   check
+	@echo   libs
 	@echo   docs
 	@echo   clean
 	@echo   install
 	@echo   uninstall
-	@echo   release
-	@echo   release-libs
 	@echo   help
 
 .PHONY: $(LIBS)
 .PHONY: install-fasmg install-std install-ce $(addprefix install-,$(LIBS))
 .PHONY: check clean clean-std $(addprefix clean-,$(LIBS))
-.PHONY: all help install uninstall release release-libs docs
+.PHONY: all help install uninstall libs docs
 .PHONY: fasmg convbin convimg convfont
