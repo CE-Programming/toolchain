@@ -27,6 +27,7 @@ visit the `GitHub repository <https://github.com/CE-Programming/toolchain>`_.
     :maxdepth: 1
 
     static/faq
+    static/ides
     static/git
     static/coding-guidelines
 
