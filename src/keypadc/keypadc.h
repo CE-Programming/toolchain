@@ -361,7 +361,7 @@ typedef enum {
 #define kb_KeyPower    ((kb_lkey_t)(6 << 8 | 1<<5))
 #define kb_KeyClear    ((kb_lkey_t)(6 << 8 | 1<<6))
 
-/* Keyboard group 5 - 83 Premium CE key names */
+/* Keyboard group 6 - 83 Premium CE key names */
 #define kb_KeyAnnul    kb_KeyClear
 
 /* Keyboard group 7 */
