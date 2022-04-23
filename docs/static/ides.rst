@@ -7,8 +7,7 @@ CLion
 -----
 CLion is a C/C++ IDE made by JetBrains.
 
-1. Open your project in CLion.
-If you're making a new one, make a copy of the :code:`examples/template` folder to get a boilerplate Makefile.
+1. Open your project in CLion. If you're making a new one, make a copy of the :code:`examples/template` folder to get a boilerplate Makefile.
 
 2. Open IDE settings (File > Settings)
 
