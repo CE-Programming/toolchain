@@ -14,7 +14,7 @@ CLion is a C/C++ IDE made by JetBrains.
 .. image:: images/ides_clion_1.png
    :align: center
 
-3. Set the Make executable (:code:`Build, Execution, Deployment > Build Tools > Make`) to your CEdev :code:`bin/make.exe` file.
+3. (WINDOWS ONLY) Set the Make executable (:code:`Build, Execution, Deployment > Build Tools > Make`) to your CEdev :code:`bin/make.exe` file.
 
 .. image:: images/ides_clion_2.png
    :align: center
@@ -27,6 +27,10 @@ CLion is a C/C++ IDE made by JetBrains.
    :align: center
 
 Set the "Build Tool" to :code:`CEdev/bin/make.exe` and both C compilers to :code:`CEdev/bin/ez80-clang.exe`
+
+MacOS/Linux come with their own system Make executable, so you don't need to edit that.
+
+On MacOS/Linux, executables have no file extension. Set both C compilers to :code:`CEdev/bin/ez80-clang`.
 
 .. image:: images/ides_clion_4.png
    :align: center
@@ -42,6 +46,8 @@ Code assistance should be working now.
 If you opened a demo project, you should be able to hover over the functions to see documentation/usage.
 
 6. Build
+
+Before this step, make sure you added your CEdev :code:`bin` folder to your system's PATH, otherwise Make won't be able to find the right compiler.
 
 Right click the makefile and click "Run 'makefile'"
 
