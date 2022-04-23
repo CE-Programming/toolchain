@@ -49,29 +49,16 @@ If you opened a demo project, you should be able to hover over the functions to 
 
 Before this step, make sure you added your CEdev :code:`bin` folder to your system's PATH, otherwise Make won't be able to find the right compiler.
 
-Right click the makefile and click "Run 'makefile'"
+At the top right, 5 Run Configurations were auto-generated.
 
-.. image:: images/ides_clion_6.png
-   :align: center
+Select "all" for the standard build.
 
-Your project should build and the output will be in the :code:`bin` directory.
+Select "debug" for a debug build for use with the `CEmu debugging toolchain <https://ce-programming.github.io/toolchain/static/debugging.html>`_.
 
-The makefile is saved as a "run configuration" in the top right for ease of use.
+only use the Build (the hammer icon) button with these.
+The Run icon tries to run the generated executables, which fails since .8xp files can't be run natively on PC.
 
-.. image:: images/ides_clion_7.png
-   :align: center
+Other IDEs
+----------
 
-7. Add debug configuration
-
-If you want to use the `CEmu debugging toolchain <https://ce-programming.github.io/toolchain/static/debugging.html>`_,
-click the "makefile" run configuration in the top right, then Edit Configuration
-
-.. image:: images/ides_clion_8.png
-   :align: center
-
-Then add :code:`debug` to the arguments, and rename it to distinguish it from the normal one.
-
-.. image:: images/ides_clion_9.png
-   :align: center
-
-You can now switch between the normal and debug configurations in the top right.
+If you know how to configure the toolchain to work with another IDE, raise an issue or pull request at the `GitHub <https://github.com/CE-Programming/toolchain>`_.
