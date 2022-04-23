@@ -35,7 +35,7 @@ On MacOS/Linux, executables have no file extension. Set both C compilers to :cod
 .. image:: images/ides_clion_4.png
    :align: center
 
-Since this compiler is highly unusual, CLion will warn that "Test CMake run finished with errors". This is safe to ignore.
+CLion will likely warn that "Test CMake run finished with errors". This is safe to ignore.
 
 5. Set the Makefile Toolchain (:code:`Build, Execution, Deployment > Makefile`) to your newly created toolchain.
 
@@ -74,4 +74,4 @@ Then add :code:`debug` to the arguments, and rename it to distinguish it from th
 .. image:: images/ides_clion_9.png
    :align: center
 
-You can now switch between the normal and debug configurations in the rop right.
+You can now switch between the normal and debug configurations in the top right.
