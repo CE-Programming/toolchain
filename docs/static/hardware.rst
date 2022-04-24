@@ -102,7 +102,7 @@ C Type               :code:`<stdint.h>` Names               CE Bits    CE Bytes 
 :code:`short`        :code:`uint16_t`, :code:`int16_t`      16         2          16/2          0 to 65535                   -32768 to 32767
 :code:`int`          :code:`uint24_t`, :code:`int24_t`      24         3          32/4          0 to 16777215                -8388608 to 8388607
 :code:`long`         :code:`uint32_t`, :code:`int32_t`      32         4          32/4          0 to 4294967295              -2147483648 to 2147483647
-:code:`long loog`    :code:`uint64_t`, :code:`int64_t`      64         8          64/8          0 to a lot                   -negative lot to a lot
+:code:`long long`    :code:`uint64_t`, :code:`int64_t`      64         8          64/8          0 to a lot                   -negative lot to a lot
 :code:`void*`        :code:`uintptr_t`, :code:`ptrdiff_t`   24         3          64/8          All of RAM and the archive   N/A
 ==================   ====================================   =======    ========   ===========   ==========================   ==========================
 

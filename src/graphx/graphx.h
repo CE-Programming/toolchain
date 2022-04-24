@@ -322,16 +322,16 @@ void gfx_End(void);
 
 /**
  * Number of pixels wide the screen is.
- * @see gfx_height
+ * @see GFX_LCD_HEIGHT
  */
-#define gfx_lcdWidth \
+#define GFX_LCD_WIDTH \
 (320)
 
 /**
  * Number of pixels high the screen is.
- * @see gfx_lcdWidth
+ * @see GFX_LCD_WIDTH
  */
-#define gfx_lcdHeight \
+#define GFX_LCD_HEIGHT \
 (240)
 
 /**
