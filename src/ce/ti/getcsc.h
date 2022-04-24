@@ -108,7 +108,7 @@ sk_key_t os_GetCSC(void);
 #define sk_Power            0x0E /**< [^] */
 
 /* For the TI-83 Premium CE */
-#define sk_AnsFrac          sk_Recip /**< 83PremCE: [<>].  I have no idea what TI actually calls this.  It's [x^-1] on the TI-84 Plus CE. */
+#define sk_ExactTog         sk_Recip /**< 83PremCE: [<>].  It's [x^-1] on the TI-84 Plus CE. */
 #define sk_Trig             sk_Sin /**< 83PremCE.  On the TI-84 Plus CE, this is [SIN] */
 #define sk_Matrix           sk_Apps /**< 83PremCE.  On the TI-84 Plus CE, this is [APPS] */
 #define sk_Solver           sk_Cos /**< 83PremCE.  On the TI-84 Plus CE, this is [COS] */

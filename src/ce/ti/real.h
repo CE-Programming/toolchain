@@ -9,9 +9,7 @@
 #ifndef _TI_REAL_H
 #define _TI_REAL_H
 
-#include <stdbool.h>
 #include <stdint.h>
-#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,11 +22,11 @@ extern "C" {
 /**
  * @brief Structure of real variable type
  */
-typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
+typedef struct real_t { int8_t sign, exp; uint8_t mant[7]; } real_t;
 /**
  * @brief Structure of complex variable type
  */
-typedef struct { real_t real, imag; } cplx_t;
+typedef struct cplx_t { real_t real, imag; } cplx_t;
 
 #define os_OP1                  ((uint8_t*)0xD005F8) /**< OP1 Variable */
 #define os_OP2                  ((uint8_t*)0xD00603) /**< OP2 Variable */

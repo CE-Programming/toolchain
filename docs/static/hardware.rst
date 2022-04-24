@@ -102,7 +102,7 @@ C Type               :code:`<stdint.h>` Names               CE Bits    CE Bytes 
 :code:`short`        :code:`uint16_t`, :code:`int16_t`      16         2          16/2          0 to 65535                   -32768 to 32767
 :code:`int`          :code:`uint24_t`, :code:`int24_t`      24         3          32/4          0 to 16777215                -8388608 to 8388607
 :code:`long`         :code:`uint32_t`, :code:`int32_t`      32         4          32/4          0 to 4294967295              -2147483648 to 2147483647
-:code:`long log`     :code:`uint64_t`, :code:`int64_t`      64         8          64/8          0 to a lot                   -negative lot to a lot
+:code:`long loog`    :code:`uint64_t`, :code:`int64_t`      64         8          64/8          0 to a lot                   -negative lot to a lot
 :code:`void*`        :code:`uintptr_t`, :code:`ptrdiff_t`   24         3          64/8          All of RAM and the archive   N/A
 ==================   ====================================   =======    ========   ===========   ==========================   ==========================
 
@@ -132,15 +132,17 @@ The Memory Map
 Both flash and RAM are mapped into the eZ80's address space.
 This means that a pointer may point to RAM or flash (or something else!) depending on its value.
 
-====================================    ===============
-Pointer Value                           Memory Accessed
-====================================    ===============
+====================================    ====================
+Pointer Value                           Memory Accessed [1]_
+====================================    ====================
 :code:`0x000000` to :code:`0x3FFFFF`    Flash
 :code:`0x400000` to :code:`0xCFFFFF`    Nothing
 :code:`0xD00000` to :code:`0xD3FFFF`    RAM
 :code:`0xD40000` to :code:`0xD657FF`    VRAM
 :code:`0xD65800` to :code:`0xFFFFFF`    I/O
-====================================    ===============
+====================================    ====================
+
+.. [1] WikiTI has more details at https://wikiti.brandonw.net/index.php?title=84PCE:Wait_States
 
 How does a CPU tell a USB port to send data to a device?
 Today, most CPUs use something called memory-mapped I/O.

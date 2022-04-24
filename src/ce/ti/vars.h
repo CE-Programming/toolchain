@@ -12,7 +12,6 @@
 #ifndef _TI_USER_VARIABLES_H
 #define _TI_USER_VARIABLES_H
 
-#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <ti/real.h>

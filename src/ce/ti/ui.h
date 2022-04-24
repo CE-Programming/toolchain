@@ -10,9 +10,7 @@
 #ifndef _TI_UI_H
 #define _TI_UI_H
 
-#include <stdbool.h>
 #include <stdint.h>
-#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {

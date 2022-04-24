@@ -71,12 +71,12 @@ bool boot_IsAfterNoon(void);
 /*
  * OS/bootcode variables
  */
-
-#define os_TmpYears          (*(real_t*)0xD02B01)
-#define os_TmpMonths         (*(real_t*)0xD02B0A)
-#define os_TmpDays           (*(real_t*)0xD02B13)
-#define os_TmpHours          (*(real_t*)0xD02B1C)
-#define os_TmpMinutes        (*(real_t*)0xD02B25)
+struct real_t;
+#define os_TmpYears          (*(struct real_t*)0xD02B01) /**< Temporary `real_t` variables used by OS routines, require `<ti/real.h>` */
+#define os_TmpMonths         (*(struct real_t*)0xD02B0A)
+#define os_TmpDays           (*(struct real_t*)0xD02B13)
+#define os_TmpHours          (*(struct real_t*)0xD02B1C)
+#define os_TmpMinutes        (*(struct real_t*)0xD02B25)
 
 /*
  * Direct access to hardware registers
