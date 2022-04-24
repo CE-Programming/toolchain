@@ -1,10 +1,13 @@
 /**
  * @file
+ * @author John "commandblockguy" Cesarz
  * @brief USB Serial Driver
  *
- * (todo: description)
+ * This library sits on top of usbdrvce to act as a driver for serial devices.
+ * In addition to handling USB serial devices while in host mode, srldrvce can
+ * also emulate a serial device itself, which is useful for communicating with
+ * a computer with minimal setup required on the other end.
  *
- * @author John "commandblockguy" Cesarz
  */
 
 #ifndef H_SRLDRVCE
