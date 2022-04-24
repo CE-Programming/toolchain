@@ -19,13 +19,6 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	srl_Write
 	export	srl_GetCDCStandardDescriptors
 	export	srl_UsbEventCallback
-; temp
-	export	get_device_type_
-	export	ring_buf_contig_avail_
-	export	ring_buf_has_consecutive_region_
-	export	ring_buf_push_
-	export	ring_buf_pop_
-	export	set_rate_
 ;-------------------------------------------------------------------------------
 macro compare_hl_zero?
 	add	hl,de
