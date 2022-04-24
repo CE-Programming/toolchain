@@ -270,7 +270,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define flags_hooks2_rawKey             5 /**< 1 = raw key hook active */
 #define flags_hooks2_catalog2           6 /**< 1 = catalog 2 hook active */
 #define flags_hooks2_cursor             7 /**< 1 = cursor hook active */
-#define flags_hooks3                    35h /**< FLAGS; also sysHookFlg1 */
+#define flags_hooks3                    0x35 /**< FLAGS; also sysHookFlg1 */
 #define flags_hooks3_token              0 /**< 1 = token hook active */
 #define flags_hooks3_localize           1 /**< 1 = localize hook active */
 #define flags_hooks3_window             2 /**< 1 = window hook active */
@@ -279,7 +279,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define flags_hooks3_font               5 /**< 1 = font hook active */
 #define flags_hooks3_regraph            6 /**< 1 = regraph hook active */
 #define flags_hooks3_drawing            7 /**< 1 = drawing hook active */
-#define flags_hooks4                    36h /**< FLAGS; also sysHookFlag2 */
+#define flags_hooks4                    0x36 /**< FLAGS; also sysHookFlag2 */
 #define flags_hooks4_trace              0 /**< 1 = trace hook active */
 #define flags_hooks4_parser             1 /**< 1 = parser hook active */
 #define flags_hooks4_appChange          2 /**< 1 = app change hook active */
