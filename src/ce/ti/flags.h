@@ -49,7 +49,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
  * @param GROUP Flag group name without the `FLAG_` prefix
  * @param MEMBER Flag item name without the `FLAG_GROUP_` prefix
  */
-#define FLAG_ID(GROUP, MEMBER) (((flags_ ## GROUP) << 8) | (1 << (flags_ ## GROUP ## _ ## MEMBER)))
+#define FLAG_ID(GROUP, MEMBER) (((FLAGS_ ## GROUP) << 8) | (1 << (FLAGS_ ## GROUP ## _ ## MEMBER)))
 
 /**
  * Sets an OS flag to 1.  The `flags_` prefix and group prefix are added automatically for you.

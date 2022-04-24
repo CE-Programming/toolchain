@@ -852,8 +852,7 @@ INPUT                  = ../src/graphx/graphx.h \
                          ../src/ce/ti/flags.h \
                          ../src/ce/ti/getcsc.h \
                          ../src/ce/ti/getkey.h \
-                         ../src/ce/ti/graphscreen.h \
-                         ../src/ce/ti/homescreen.h \
+                         ../src/ce/ti/screen.h \
                          ../src/ce/ti/hooks.h \
                          ../src/ce/ti/info.h \
                          ../src/ce/ti/python.h \

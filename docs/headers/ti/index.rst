@@ -20,9 +20,7 @@ whoever in the community first discovered something gave it a name following the
     flags
     getcsc
     getkey
-    graphscreen
-    homescreen
-    hooks
+    screen
     info
     python
     real

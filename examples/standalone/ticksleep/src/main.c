@@ -1,4 +1,4 @@
-#include <ti/homescreen.h>
+#include <ti/screen.h>
 #include <sys/timers.h>
 #include <time.h>
 

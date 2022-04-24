@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <ti/homescreen.h>
+#include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <ti/real>
 #include <sys/rtc.h>

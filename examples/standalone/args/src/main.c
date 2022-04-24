@@ -1,4 +1,4 @@
-#include <ti/homescreen.h>
+#include <ti/screen.h>
 #include <ti/getcsc.h>
 
 int main(int argc, char *argv[])

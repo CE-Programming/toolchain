@@ -1,5 +1,5 @@
 #include <ti/getcsc.h>
-#include <ti/homescreen.h>
+#include <ti/screen.h>
 #include <sys/timers.h>
 #include <stdio.h>
 

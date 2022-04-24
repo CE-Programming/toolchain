@@ -20,9 +20,7 @@
 #include <ti/flags.h>
 #include <ti/getcsc.h>
 #include <ti/getkey.h>
-#include <ti/graphscreen.h>
-#include <ti/homescreen.h>
-#include <ti/hooks.h>
+#include <ti/screen.h>
 #include <ti/info.h>
 #include <ti/real.h>
 #include <ti/tokens.h>

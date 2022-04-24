@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <ti/homescreen.h>
+#include <ti/screen.h>
 #include <ti/getkey.h>
 
 /* static_assert is a compile time assert that can appear outside a function body ... */

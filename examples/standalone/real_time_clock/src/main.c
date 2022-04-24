@@ -1,4 +1,4 @@
-#include <ti/homescreen.h>
+#include <ti/screen.h>
 #include <sys/rtc.h>
 #include <sys/lcd.h>
 #include <sys/util.h>
