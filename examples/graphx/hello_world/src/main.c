@@ -25,6 +25,6 @@ int main(void)
 void PrintCentered(const char *str)
 {
     gfx_PrintStringXY(str,
-                      (gfx_lcdWidth - gfx_GetStringWidth(str)) / 2,
-                      (gfx_lcdHeight - 8) / 2);
+                      (GFX_LCD_WIDTH - gfx_GetStringWidth(str)) / 2,
+                      (GFX_LCD_HEIGHT - 8) / 2);
 }

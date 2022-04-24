@@ -26,8 +26,8 @@ int main(void)
     gfx_FillScreen(0);
 
     /* Draw the sprites directly from the appvar */
-    gfx_Sprite(ubuntu, gfx_lcdWidth / 2 - 16, gfx_lcdHeight / 2 - 16);
-    gfx_Sprite(mint, gfx_lcdWidth / 2 + 16, gfx_lcdHeight / 2 - 16);
+    gfx_Sprite(ubuntu, GFX_LCD_WIDTH / 2 - 16, GFX_LCD_HEIGHT / 2 - 16);
+    gfx_Sprite(mint, GFX_LCD_WIDTH / 2 + 16, GFX_LCD_HEIGHT / 2 - 16);
 
     /* Waits for a key */
     while (!os_GetCSC());

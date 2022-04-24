@@ -41,7 +41,7 @@ int main(void)
         gfx_Sprite_NoClip(tile, x, y);
 
         x += image_tile_width;
-        if (x >= gfx_lcdWidth)
+        if (x >= GFX_LCD_WIDTH)
         {
             y += image_tile_height;
             x = 0;

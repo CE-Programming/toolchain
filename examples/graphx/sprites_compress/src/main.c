@@ -26,8 +26,8 @@ int main(void)
 
     /* Draw the decompressed sprite centered */
     gfx_Sprite(apple,
-               (gfx_lcdWidth - apple_width) / 2,
-               (gfx_lcdHeight - apple_height) / 2);
+               (GFX_LCD_WIDTH - apple_width) / 2,
+               (GFX_LCD_HEIGHT - apple_height) / 2);
 
     /* Waits for a key */
     while (!os_GetCSC());

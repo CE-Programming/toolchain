@@ -38,8 +38,8 @@ void PrintCenteredFlippedText(char *str)
     char *string = str + strlen(str) - 1;
     gfx_TempSprite(ch, 8, 8);
 
-    x = (gfx_lcdWidth - gfx_GetStringWidth(str)) / 2;
-    y = (gfx_lcdHeight - FONT_HEIGHT) / 2;
+    x = (GFX_LCD_WIDTH - gfx_GetStringWidth(str)) / 2;
+    y = (GFX_LCD_HEIGHT - FONT_HEIGHT) / 2;
 
     while (*string)
     {

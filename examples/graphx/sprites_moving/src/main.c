@@ -5,8 +5,8 @@
 /* Include the sprite data */
 #include "gfx/gfx.h"
 
-#define START_X ((gfx_lcdWidth - oiram_width) / 2)
-#define START_Y ((gfx_lcdHeight - oiram_height) / 2)
+#define START_X ((GFX_LCD_WIDTH - oiram_width) / 2)
+#define START_Y ((GFX_LCD_HEIGHT - oiram_height) / 2)
 
 /* Create a buffer to store the background behind the sprite */
 gfx_UninitedSprite(background, oiram_width, oiram_height);
