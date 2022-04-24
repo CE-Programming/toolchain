@@ -30,6 +30,47 @@ typedef struct { int8_t sign, exp; uint8_t mant[7]; } real_t;
  */
 typedef struct { real_t real, imag; } cplx_t;
 
+#define os_OP1                  ((uint8_t*)0xD005F8) /**< OP1 Variable */
+#define os_OP2                  ((uint8_t*)0xD00603) /**< OP2 Variable */
+#define os_OP3                  ((uint8_t*)0xD0060E) /**< OP3 Variable */
+#define os_OP4                  ((uint8_t*)0xD00619) /**< OP4 Variable */
+#define os_OP5                  ((uint8_t*)0xD00624) /**< OP5 Variable */
+#define os_OP6                  ((uint8_t*)0xD0062F) /**< OP6 Variable */
+#define os_OP7                  ((uint8_t*)0xD0063A) /**< OP7 Variable */
+
+/**
+ * Contains data used by the statistics package.
+ * If you use this area, mark it invalid:
+ * 
+ * @code
+ * #include <ti/vars.h>
+ * // . . .
+ * os_DelRes();
+ * @endcode
+ * 
+ * Type: `uint8_t[531]`
+ */
+#define os_StatVars          ((uint8_t*)0xD01191)
+
+/**
+ * The following are finance variables that are always allocated.
+ * 
+ * They are all `real_t`.
+ */
+#define os_Fin_N             (*(real_t*)0xD01F38)
+#define os_Fin_I             (*(real_t*)0xD01F41)
+#define os_Fin_PV            (*(real_t*)0xD01F4A)
+#define os_Fin_PMT           (*(real_t*)0xD01F53)
+#define os_Fin_FV            (*(real_t*)0xD01F5C)
+#define os_Fin_PY            (*(real_t*)0xD01F65)
+#define os_Fin_CY            (*(real_t*)0xD01F6E)
+#define os_Cal_N             (*(real_t*)0xD01F77)
+#define os_Cal_I             (*(real_t*)0xD01F80)
+#define os_Cal_PV            (*(real_t*)0xD01F89)
+#define os_Cal_PMT           (*(real_t*)0xD01F92)
+#define os_Cal_FV            (*(real_t*)0xD01F9B)
+#define os_Cal_PY            (*(real_t*)0xD01FA4)
+
 /**
  * Copies a real_t type
  *

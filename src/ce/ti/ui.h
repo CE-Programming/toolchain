@@ -80,8 +80,8 @@ typedef enum {
     OS_COLOR_DARKGRAY
 } os_colors_t;
 
-#define os_Brightness        (*(uint8_t*)0xD0058F)
-#define os_StatusBarBGColor  (*(uint16_t*)0xD02ACC)        /**< Status bar 565 color */
+#define os_Brightness        (*(uint8_t*)0xD0058F)         /**< `uint8_t`: User's configured screen brightness */
+#define os_StatusBarBGColor  (*(uint16_t*)0xD02ACC)        /**< `uint16_t`: Status bar 565 color */
 
 #undef tiflags
 

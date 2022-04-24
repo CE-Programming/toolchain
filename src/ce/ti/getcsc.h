@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-#define os_KbdScanCode       (*(uint8_t*)0xD00587)
+#define os_KbdScanCode       (*(uint8_t*)0xD00587) /**< Cached GetCSC code. Type: `sk_key_t` */
 #define os_KbdLGSC           (*(uint8_t*)0xD00588)
 #define os_KbdPSC            (*(uint8_t*)0xD00589)
 #define os_KbdWUR            (*(uint8_t*)0xD0058A)
@@ -66,7 +66,7 @@ sk_key_t os_GetCSC(void);
 #define sk_Clear            0x0F
 #define sk_Alpha            0x30
 #define sk_Add              0x0A
-#define sk_Sub              0x0B
+#define sk_Sub              0x0B /**< Subtract, not negate */
 #define sk_Mul              0x0C
 #define sk_Div              0x0D
 #define sk_Graph            0x31
@@ -80,7 +80,7 @@ sk_key_t os_GetCSC(void);
 #define sk_Ln               0x2B
 #define sk_Log              0x2C
 #define sk_Square           0x2D
-#define sk_Recip            0x2E
+#define sk_Recip            0x2E /**< 84+CE: [x^-1].  On the TI-83 Premium CE, this is [<>] */
 #define sk_Math             0x2F
 #define sk_0                0x21
 #define sk_1                0x22
@@ -93,19 +93,26 @@ sk_key_t os_GetCSC(void);
 #define sk_6                0x13
 #define sk_9                0x14
 #define sk_Comma            0x25
-#define sk_Sin              0x26
-#define sk_Apps             0x27
-#define sk_GraphVar         0x28
+#define sk_Sin              0x26 /**< 84+CE.  On the TI-83 Premium CE, this is [TRIG]  */
+#define sk_Apps             0x27 /**< 84+CE.  On the TI-83 Premium CE, this is [MATRICE] */
+#define sk_GraphVar         0x28 /**< X, T, theta, n */
 #define sk_DecPnt           0x19
 #define sk_LParen           0x1D
-#define sk_Cos              0x1E
+#define sk_Cos              0x1E /**< 84+CE.  On the TI-83 Premium CE, this is [RESOL]. */
 #define sk_Prgm             0x1F
 #define sk_Stat             0x20
-#define sk_Chs              0x11
+#define sk_Chs              0x11 /**< Unary negation, not subtraction */
 #define sk_RParen           0x15
-#define sk_Tan              0x16
+#define sk_Tan              0x16 /**< 84+CE.  On the TI-83 Premium CE, this is the fraction template. */
 #define sk_Vars             0x17
-#define sk_Power            0x0E
+#define sk_Power            0x0E /**< [^] */
+
+/* For the TI-83 Premium CE */
+#define sk_AnsFrac          sk_Recip /**< 83PremCE: [<>].  I have no idea what TI actually calls this.  It's [x^-1] on the TI-84 Plus CE. */
+#define sk_Trig             sk_Sin /**< 83PremCE.  On the TI-84 Plus CE, this is [SIN] */
+#define sk_Matrix           sk_Apps /**< 83PremCE.  On the TI-84 Plus CE, this is [APPS] */
+#define sk_Solver           sk_Cos /**< 83PremCE.  On the TI-84 Plus CE, this is [COS] */
+#define sk_Frac             sk_Tan /**< 83PremCE.  On the TI-84 Plus CE, this is [TAN] */
 
 #ifdef __cplusplus
 }

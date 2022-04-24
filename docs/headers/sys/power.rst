@@ -7,7 +7,7 @@ sys/power.h
 
     #include <sys/power.h>
 
-Power control functions are not directly accessible.
+Power control hardware registers are not directly accessible.
 However, this header provides access to OS routines that perform control functions.
 
 .. contents:: :local:
