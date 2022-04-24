@@ -148,6 +148,14 @@ int srl_Write(srl_device_t *srl,
  */
 const usb_standard_descriptors_t *srl_GetCDCStandardDescriptors(void);
 
+/**
+ * USB callback handler.
+ * Can either be passed as the handler argument to usb_Init, or be delegated to
+ * from a custom USB event handler.
+ */
+usb_error_t srl_UsbEventCallback(usb_event_t event, void *event_data,
+                                 usb_callback_data_t *callback_data);
+
 #ifdef __cplusplus
 }
 #endif

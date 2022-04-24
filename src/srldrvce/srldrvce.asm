@@ -18,6 +18,7 @@ include_library '../usbdrvce/usbdrvce.asm'
 	export	srl_Read
 	export	srl_Write
 	export	srl_GetCDCStandardDescriptors
+	export	srl_UsbEventCallback
 ; temp
 	export	get_device_type_
 	export	ring_buf_contig_avail_
@@ -569,7 +570,7 @@ srl_GetCDCStandardDescriptors:
 	dl .strings
 .device emit $12: $1201000202000040C016E105200201020001 bswap $12
 .configurations dl .configuration1
-.configuration1 emit $3e: $09023e00020100c0320904000001020200000524000110042402000524060001070582030800ff09040100020a0000000705040240000107058302400001 bswap $3e
+.configuration1 emit $3e: $09023e00020100c0320904000001020200000524000110042402000524060001070582030800ff09040100020a0200000705040240000107058302400001 bswap $3e
 .langids dw $0304, $0409
 .strings dl .string1
 .model dl .string84
@@ -578,6 +579,80 @@ srl_GetCDCStandardDescriptors:
 .string83 dw $0322, 'T','I','-','8','3',' ','P','r','e','m','i','u','m',' ','C','E'
 .string84 dw $031C, 'T','I','-','8','4',' ','P','l','u','s',' ','C','E'
 .stringserialnum dw $0316, '0','0','0','0','0','0','0','0','0','0'
+
+;usb_error_t srl_UsbEventCallback(usb_event_t event, void *event_data,
+;                                    usb_callback_data_t *callback_data) {
+;    if (event == USB_DEFAULT_SETUP_EVENT) {
+;        static uint8_t line_coding[7];
+;        usb_control_setup_t *setup = (usb_control_setup_t*)event_data;
+;        // Hack because Windows doesn't follow the damn specification
+;        if ((setup->bmRequestType == 0xA1 && setup->bRequest == 0x21) ||
+;            (setup->bmRequestType == 0x21 && setup->bRequest == 0x20)) {
+;                usb_ScheduleDefaultControlTransfer(usb_FindDevice(NULL, NULL, USB_SKIP_HUBS), setup, line_coding, NULL, NULL);
+;            return USB_IGNORE;
+;        }
+;    }
+;    return USB_SUCCESS;
+;}
+srl_UsbEventCallback:
+	call	ti._frameset0
+	ld	hl, (ix + 6)
+	ld	bc, 0
+	ld	de, 11
+	sbc	hl, de
+	jq	nz, .BB0_5
+	ld	iy, (ix + 9)
+	ld	a, (iy)
+	cp	a, -95
+	jq	nz, .BB0_2
+	ld	a, (iy + 1)
+	cp	a, 33
+	jq	z, .BB0_4
+	jq	.BB0_5
+.BB0_2:
+	cp	a, 33
+	jq	nz, .BB0_5
+	ld	a, (iy + 1)
+	cp	a, 32
+	jq	nz, .BB0_5
+.BB0_4:
+	ld	de, 0
+	ld	hl, 8
+	push	hl
+	push	de
+	push	de
+	call	usb_FindDevice
+	pop	de
+	pop	de
+	pop	de
+	ld	de, 0
+	push	de
+	push	hl
+	call	usb_GetDeviceEndpoint
+	pop	de
+	pop	de
+	ld	de, 0
+	push	de
+	push	de
+	ld	de, .line_coding
+	push	de
+	ld	de, (ix + 9)
+	push	de
+	push	hl
+	call	usb_ScheduleControlTransfer
+	ld	bc, 1
+	pop	hl
+	pop	hl
+	pop	hl
+	pop	hl
+	pop	hl
+.BB0_5:
+	push	bc
+	pop	hl
+	pop	ix
+	ret
+.line_coding:
+	rb	7
 
 
 ; Gets the device type and subtype based on the descriptors

@@ -23,6 +23,10 @@ uint8_t srl_buf[512];
 
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                                     usb_callback_data_t *callback_data __attribute__((unused))) {
+    usb_error_t err;
+    /* Delegate to srl USB callback */
+    if ((err = srl_UsbEventCallback(event, event_data, callback_data)) != USB_SUCCESS)
+        return err;
     /* Enable newly connected devices */
     if(event == USB_DEVICE_CONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) {
         usb_device_t device = event_data;
