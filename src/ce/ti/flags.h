@@ -44,10 +44,10 @@ void os_ResetFlagBits(int16_t offset_pattern);
  * Converts a flag group name and member ID to a literal.
  * The `flag_` prefix is automatically taken care of.
  * 
- * For example, `FLAG_ID(INDIC, ENABLE)` 
+ * For example, `OS_FLAG_ID(INDIC, ENABLE)` 
  * 
- * @param GROUP Flag group name without the `FLAG_` prefix
- * @param MEMBER Flag item name without the `FLAG_GROUP_` prefix
+ * @param GROUP Flag group name without the `OS_FLAG_` prefix
+ * @param MEMBER Flag item name without the `OS_FLAG_GROUP_` prefix
  */
 #define OS_FLAG_ID(GROUP, MEMBER) (((OS_FLAGS_ ## GROUP) << 8) | (1 << (OS_FLAGS_ ## GROUP ## _ ## MEMBER)))
 

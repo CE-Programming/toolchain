@@ -17,27 +17,27 @@ TI-83 Premium CE
 ----------------
 
 Some keys on the TI-83 Premium CE are labeled differently, and some have completely different functions.
-For convenience, there are duplicate equates for the five keys with different functions;
-in the table below, they are **emphasized.**
+For convenience, there are additional equates for the TI-83 Premium CE names.
+In the table below, the five keys with different functions are **emphasized.**
 
 +---------------+-------------------+-----------------------+-------------------------+
 | TI-84 Plus CE | Equate            | TI-83 Premium CE      | Equate                  |
 +===============+===================+=======================+=========================+
-| Y=            | :code:`sk_Yequ`   | f(x)                  | :code:`sk_Yequ`         |
+| Y=            | :code:`sk_Yequ`   | f(x)                  | :code:`sk_Fx`           |
 +---------------+-------------------+-----------------------+-------------------------+
-| Window        | :code:`sk_Window` | Fenetre               | :code:`sk_Window`       |
+| Window        | :code:`sk_Window` | Fenetre               | :code:`sk_Fenetre`      |
 +---------------+-------------------+-----------------------+-------------------------+
-| Del           | :code:`sk_Del`    | Suppr                 | :code:`sk_Del`          |
+| Del           | :code:`sk_Del`    | Suppr                 | :code:`sk_Suppr`        |
 +---------------+-------------------+-----------------------+-------------------------+
-| **Apps**      | :code:`sk_Apps`   | **Matrice**           | :code:`sk_Matrix`       |
+| **Apps**      | :code:`sk_Apps`   | **Matrice**           | :code:`sk_Matrice`      |
 +---------------+-------------------+-----------------------+-------------------------+
-| Clear         | :code:`sk_Clear`  | Annul                 | :code:`sk_Clear`        |
+| Clear         | :code:`sk_Clear`  | Annul                 | :code:`sk_Annul`        |
 +---------------+-------------------+-----------------------+-------------------------+
-| **x^-1**      | :code:`sk_Recip`  | **<>**                | :code:`sk_ExactTog`     |
+| **x^-1**      | :code:`sk_Recip`  | **<>**                | :code:`sk_TglExact`     |
 +---------------+-------------------+-----------------------+-------------------------+
 | **Sin**       | :code:`sk_Sin`    | **Trig**              | :code:`sk_Trig`         |
 +---------------+-------------------+-----------------------+-------------------------+
-| **Cos**       | :code:`sk_Cos`    | **Resol**             | :code:`sk_Solver`       |
+| **Cos**       | :code:`sk_Cos`    | **Resol**             | :code:`sk_Resol`        |
 +---------------+-------------------+-----------------------+-------------------------+
 | **Tan**       | :code:`sk_Tan`    | **Fraction template** | :code:`sk_Frac`         |
 +---------------+-------------------+-----------------------+-------------------------+
