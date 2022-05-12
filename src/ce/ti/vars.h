@@ -9,8 +9,8 @@
  * as well as other user-memory management routines (not the heap!), stat vars, and the RunPrgm interface.
  */
 
-#ifndef TI_USER_VARIABLES_H
-#define TI_USER_VARIABLES_H
+#ifndef TI_VARS_H
+#define TI_VARS_H
 
 #include <stdint.h>
 #include <stddef.h>

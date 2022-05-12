@@ -6,8 +6,8 @@
  * @brief CE PL111 LCD controller define file
  */
 
-#ifndef CE_LCD_H
-#define CE_LCD_H
+#ifndef SYS_LCD_H
+#define SYS_LCD_H
 
 #include <stdint.h>
 

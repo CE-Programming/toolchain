@@ -6,8 +6,8 @@
  * @brief CE hardware timers define file
  */
 
-#ifndef CE_TIMERS_H
-#define CE_TIMERS_H
+#ifndef SYS_TIMERS_H
+#define SYS_TIMERS_H
 
 #include <stdint.h>
 #include <sys/util.h>
