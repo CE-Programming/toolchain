@@ -6,8 +6,8 @@
  * @brief TI CE OS flags
  */
 
-#ifndef _TI_OS_FLAGS_H
-#define _TI_OS_FLAGS_H
+#ifndef TI_FLAGS_H
+#define TI_FLAGS_H
 
 #include <stdbool.h>
 #include <stdint.h>

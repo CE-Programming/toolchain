@@ -6,8 +6,8 @@
  * @brief Miscellaneous CE define file
  */
 
-#ifndef _CEUTIL_H
-#define _CEUTIL_H
+#ifndef CE_UTIL_H
+#define CE_UTIL_H
 
 #include <stdint.h>
 

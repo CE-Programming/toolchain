@@ -6,8 +6,8 @@
  * @brief This file is pretty much pointless.
  */
 
-#ifndef _TI_DEBUG_H
-#define _TI_DEBUG_H
+#ifndef TI_DEBUG_H
+#define TI_DEBUG_H
 
 #include <stdbool.h>
 #include <stdint.h>

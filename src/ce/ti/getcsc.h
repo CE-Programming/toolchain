@@ -6,8 +6,8 @@
  * @brief TI's keyboard interface defines
  */
 
-#ifndef _TI_GETCSC_H
-#define _TI_GETCSC_H
+#ifndef TI_GETCSC_H
+#define TI_GETCSC_H
 
 #include <stdint.h>
 #include <stdbool.h>

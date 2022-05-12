@@ -6,8 +6,8 @@
  * @brief This has something to do with TI Python.
  */
 
-#ifndef _TI_MSD_H
-#define _TI_MSD_H
+#ifndef TI_PYTHON_H
+#define TI_PYTHON_H
 
 #include <stdint.h>
 

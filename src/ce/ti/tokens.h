@@ -6,8 +6,8 @@
  * @brief TI token defines
  */
 
-#ifndef _TI_TOKENS_H
-#define _TI_TOKENS_H
+#ifndef TI_TOKENS_H
+#define TI_TOKENS_H
 
 #ifdef __cplusplus
 extern "C" {

@@ -6,8 +6,8 @@
  * @brief TI CE OS USB routines
  */
 
-#ifndef _TI_USB_H
-#define _TI_USB_H
+#ifndef CE_BASIC_USB_H
+#define CE_BASIC_USB_H
 
 #include <stdbool.h>
 #include <stdint.h>

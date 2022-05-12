@@ -6,8 +6,8 @@
  * @brief TI's keyboard interface defines
  */
 
-#ifndef _TI_GETKEY_H
-#define _TI_GETKEY_H
+#ifndef TI_GETKEY_H
+#define TI_GETKEY_H
 
 #include <stdint.h>
 

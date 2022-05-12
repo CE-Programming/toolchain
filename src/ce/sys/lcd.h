@@ -6,8 +6,8 @@
  * @brief CE PL111 LCD controller define file
  */
 
-#ifndef _CELCD_H
-#define _CELCD_H
+#ifndef CE_LCD_H
+#define CE_LCD_H
 
 #include <stdint.h>
 
@@ -35,13 +35,18 @@ extern "C" {
 /* @endcond */
 #define lcd_Palette              ((volatile uint16_t*)0xE30200) /**< LCD palette registers, 512 bytes */
 /* @cond */
+#define lcd_CrsrImageLen32       256
+#define lcd_CrsrImageLen64       1024
+#define lcd_CrsrImage            ((volatile uint8_t*)0xE30800)
 #define lcd_CrsrCtrl             (*(volatile uint8_t*)0xE30C00)
 #define lcd_CrsrConfig           (*(volatile uint8_t*)0xE30C04)
 #define lcd_CrsrPalette0         (*(volatile uint24_t*)0xE30C08)
 #define lcd_CrsrPalette1         (*(volatile uint24_t*)0xE30C0C)
-#define lcd_CrsrXY               (*(volatile uint32_t*)0xE30C10)
+#define lcd_CrsrXY               (*(volatile uint24_t*)0xE30C10)
+#define lcd_CrsrXYFull           (*(volatile uint32_t*)0xE30C10)
 #define lcd_CrsrX                (*(volatile uint16_t*)0xE30C10)
-#define lcd_CrsrY                (*(volatile uint16_t*)0xE30C12)
+#define lcd_CrsrY                (*(volatile uint8_t*)0xE30C12)
+#define lcd_CrsrYFull            (*(volatile uint16_t*)0xE30C12)
 #define lcd_CrsrClip             (*(volatile uint16_t*)0xE30C04)
 #define lcd_CrsrClipX            (*(volatile uint8_t*)0xE30C04)
 #define lcd_CrsrClipY            (*(volatile uint8_t*)0xE30C05)

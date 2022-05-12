@@ -6,8 +6,8 @@
  * @brief CE power control functions define file (APD/on/off/battery/charging)
  */
 
-#ifndef _CEPOWER_H
-#define _CEPOWER_H
+#ifndef CE_POWER_H
+#define CE_POWER_H
 
 #include <stdint.h>
 

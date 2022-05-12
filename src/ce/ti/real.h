@@ -6,8 +6,8 @@
  * @brief TI's decimal floating-point library
  */
 
-#ifndef _TI_REAL_H
-#define _TI_REAL_H
+#ifndef TI_REAL_H
+#define TI_REAL_H
 
 #include <stdint.h>
 

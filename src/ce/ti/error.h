@@ -7,8 +7,8 @@
  * You can use this to show custom error screens, as well as intercept errors to prevent the error screen from showing.
  */
 
-#ifndef _TI_ERROR_H
-#define _TI_ERROR_H
+#ifndef TI_ERROR_H
+#define TI_ERROR_H
 
 #include <stdint.h>
 

@@ -6,8 +6,8 @@
  * @brief CE Real-Time Clock define file
  */
 
-#ifndef _CERTC_H
-#define _CERTC_H
+#ifndef CE_RTC_H
+#define CE_RTC_H
 
 #include <stdbool.h>
 #include <stdint.h>

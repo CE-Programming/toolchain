@@ -8,8 +8,8 @@
  * Note that the heap uses graph screen memory, so you can't use the graph screen unless you reconfigure the heap.
  */
 
-#ifndef _TI_GRAPH_H
-#define _TI_GRAPH_H
+#ifndef TI_GRAPH_H
+#define TI_GRAPH_H
 
 #include <stdint.h>
 #include <ti/real.h>

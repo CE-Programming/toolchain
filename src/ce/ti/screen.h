@@ -7,8 +7,8 @@
  * If you want to print to the screen without using GraphX, this is the file.
  */
 
-#ifndef _TI_HOMESCREEN_H
-#define _TI_HOMESCREEN_H
+#ifndef TI_SCREEN_H
+#define TI_SCREEN_H
 
 #include <stdbool.h>
 #include <stdint.h>

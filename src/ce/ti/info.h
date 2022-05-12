@@ -6,8 +6,8 @@
  * @brief TI CE information
  */
 
-#ifndef _TI_OS_INFO_H
-#define _TI_OS_INFO_H
+#ifndef TI_INFO_H
+#define TI_INFO_H
 
 #include <stdbool.h>
 #include <stdint.h>

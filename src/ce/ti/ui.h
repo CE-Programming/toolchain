@@ -7,8 +7,8 @@
  * Has run indicator, status bar, TI colors, and user-specified brightness.
  */
 
-#ifndef _TI_UI_H
-#define _TI_UI_H
+#ifndef TI_UI_H
+#define TI_UI_H
 
 #include <stdint.h>
 
