@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <compression.h>
 #include <graphx.h>
 
@@ -26,8 +26,8 @@ int main(void)
 
     /* Draw the decompressed sprite centered */
     gfx_Sprite(apple,
-               (LCD_WIDTH - apple_width) / 2,
-               (LCD_HEIGHT - apple_height) / 2);
+               (GFX_LCD_WIDTH - apple_width) / 2,
+               (GFX_LCD_HEIGHT - apple_height) / 2);
 
     /* Waits for a key */
     while (!os_GetCSC());

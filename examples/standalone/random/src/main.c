@@ -1,5 +1,9 @@
 #include <stdlib.h>
-#include <tice.h>
+#include <ti/getcsc.h>
+#include <ti/screen.h>
+#include <sys/rtc.h>
+#include <sys/lcd.h>
+#include <sys/util.h>
 
 int main(void)
 {

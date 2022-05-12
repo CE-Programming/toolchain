@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <compression.h>
 #include <graphx.h>
 

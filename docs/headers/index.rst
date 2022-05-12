@@ -1,7 +1,7 @@
 .. _headers:
 
 CE Toolchain Specific Headers
-===============================
+=============================
 
 These headers are CE specific, and contain various defines and prototypes.
 
@@ -12,4 +12,3 @@ These headers are CE specific, and contain various defines and prototypes.
     tice
     intce
     compression
-

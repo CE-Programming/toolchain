@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 /* Include the converted image data */

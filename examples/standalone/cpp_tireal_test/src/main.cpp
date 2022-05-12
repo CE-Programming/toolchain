@@ -1,6 +1,7 @@
 #include <stdint.h>
-#include <tice.h>
-#include <tireal.hpp>
+#include <ti/screen.h>
+#include <ti/getcsc.h>
+#include <ti/real>
 
 using namespace ti::literals;
 

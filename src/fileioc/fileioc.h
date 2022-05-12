@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <tice.h>
+#include <ti/vars.h>
 
 #ifdef __cplusplus
 extern "C" {

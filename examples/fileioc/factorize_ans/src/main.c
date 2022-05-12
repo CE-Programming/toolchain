@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/screen.h>
+#include <ti/real.h>
 #include <math.h>
 #include <fileioc.h>
 

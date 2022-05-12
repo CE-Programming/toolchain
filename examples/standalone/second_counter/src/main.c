@@ -1,4 +1,6 @@
-#include <tice.h>
+#include <ti/getcsc.h>
+#include <ti/screen.h>
+#include <sys/timers.h>
 #include <stdio.h>
 
 #define TIMER_FREQ      32768 /* Frequency of timer in Hz */

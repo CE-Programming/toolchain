@@ -7,7 +7,7 @@ tice.h
 
     #include <tice.h>
 
-This header includes defines for OS memory and prototypes for OS routines.
+This header provides backwards compatibility for code written before the header files were split up.
 
 .. contents:: :local:
    :depth: 3

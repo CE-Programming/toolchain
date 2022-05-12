@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 #define COLOR gfx_RGBTo1555(34, 55, 89)

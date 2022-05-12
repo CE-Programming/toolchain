@@ -2558,7 +2558,7 @@ namespace ti?
 
 ?curUnderBackup		:= 0D003E8h		; backup of curUnder
 
-?appData			:= 0D00429h		; used for OFFSCRPT and ONSCRPT
+?appData			:= 0D00429h		; formerly used for OFFSCRPT and ONSCRPT
 
 ?arcPtrEnd		:= 0D0052Fh
 

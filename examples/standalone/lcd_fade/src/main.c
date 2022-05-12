@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <sys/lcd.h>
+#include <sys/timers.h>
 
 int main(void)
 {

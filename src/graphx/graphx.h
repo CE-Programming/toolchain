@@ -321,6 +321,20 @@ void gfx_End(void);
 ((uint8_t*)0xD40000)
 
 /**
+ * Number of pixels wide the screen is.
+ * @see GFX_LCD_HEIGHT
+ */
+#define GFX_LCD_WIDTH \
+(320)
+
+/**
+ * Number of pixels high the screen is.
+ * @see GFX_LCD_WIDTH
+ */
+#define GFX_LCD_HEIGHT \
+(240)
+
+/**
  * Array of the current drawing buffer.
  *
  * Total of 76800 bytes in size.
@@ -1730,8 +1744,6 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
 #define gfx_white       _Pragma("GCC warning \"'gfx_white' is not palette-safe, try to avoid it\"")  0xFF
 #define gfx_image_t     _Pragma("GCC warning \"'gfx_image_t' is deprecated, use 'gfx_sprite_t' instead\"") gfx_sprite_t
 #define gfx_BlitArea    _Pragma("GCC warning \"'gfx_BlitArea' is deprecated, use 'gfx_BlitRectangle' instead\"") gfx_BlitRectangle
-#define gfx_lcdWidth    (320)
-#define gfx_lcdHeight   (240)
 /* @endcond */
 
 #ifdef __cplusplus

@@ -1,6 +1,6 @@
 #include <math.h>
-#include <tice.h>
 #include <graphx.h>
+#include <ti/getcsc.h>
 
 #define ORG (-50)
 #define DEG (6.0)

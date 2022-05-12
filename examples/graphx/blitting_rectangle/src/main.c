@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 
 int main(void)
@@ -16,14 +16,14 @@ int main(void)
     for (c = 0; c < 8; c++)
     {
         gfx_SetColor(c);
-        gfx_FillRectangle_NoClip(c * (LCD_WIDTH / 8), 0, LCD_WIDTH / 8, LCD_HEIGHT);
+        gfx_FillRectangle_NoClip(c * (GFX_LCD_WIDTH / 8), 0, GFX_LCD_WIDTH / 8, GFX_LCD_HEIGHT);
     }
 
     /* Waits for a key */
     while (!os_GetCSC());
 
     /* Copy part of the drawn gradient to the visible screen */
-    gfx_CopyRectangle(gfx_buffer, gfx_screen, LCD_WIDTH / 4, LCD_HEIGHT / 4, LCD_WIDTH / 4, LCD_HEIGHT / 4, LCD_WIDTH / 2, LCD_HEIGHT / 2);
+    gfx_CopyRectangle(gfx_buffer, gfx_screen, GFX_LCD_WIDTH / 4, GFX_LCD_HEIGHT / 4, GFX_LCD_WIDTH / 4, GFX_LCD_HEIGHT / 4, GFX_LCD_WIDTH / 2, GFX_LCD_HEIGHT / 2);
 
     /* Waits for a key */
     while (!os_GetCSC());
@@ -35,18 +35,18 @@ int main(void)
     for (c = 16; c < 24; c++)
     {
         gfx_SetColor(c);
-        gfx_FillRectangle_NoClip((c - 16) * (LCD_WIDTH / 8), 0, LCD_WIDTH / 8, LCD_HEIGHT);
+        gfx_FillRectangle_NoClip((c - 16) * (GFX_LCD_WIDTH / 8), 0, GFX_LCD_WIDTH / 8, GFX_LCD_HEIGHT);
     }
 
     /* Copy part of the drawn gradient to the offscreen buffer */
-    gfx_CopyRectangle(gfx_screen, gfx_buffer, LCD_WIDTH / 4, LCD_HEIGHT / 4, LCD_WIDTH / 4, LCD_HEIGHT / 4, LCD_WIDTH / 2, LCD_HEIGHT / 2);
+    gfx_CopyRectangle(gfx_screen, gfx_buffer, GFX_LCD_WIDTH / 4, GFX_LCD_HEIGHT / 4, GFX_LCD_WIDTH / 4, GFX_LCD_HEIGHT / 4, GFX_LCD_WIDTH / 2, GFX_LCD_HEIGHT / 2);
 
     /* Waits for a key */
     while (!os_GetCSC());
 
     /* Copy the offscreen buffer to the visible screen */
     /* Same as gfx_BlitBuffer() */
-    gfx_CopyRectangle(gfx_buffer, gfx_screen, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+    gfx_CopyRectangle(gfx_buffer, gfx_screen, 0, 0, 0, 0, GFX_LCD_WIDTH, GFX_LCD_HEIGHT);
 
     /* Waits for a key */
     while (!os_GetCSC());

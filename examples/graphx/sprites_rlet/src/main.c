@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <limits.h>
 #include <graphx.h>
 
@@ -8,8 +8,8 @@
 #define w ubuntu_width
 #define h ubuntu_height
 
-#define xmin ((LCD_WIDTH-w*6)/2)
-#define ymin ((LCD_HEIGHT-h*6)/2)
+#define xmin ((GFX_LCD_WIDTH-w*6)/2)
+#define ymin ((GFX_LCD_HEIGHT-h*6)/2)
 #define xmax (xmin+w*6)
 #define ymax (ymin+h*6)
 

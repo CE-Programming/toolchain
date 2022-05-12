@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/screen.h>
+#include <ti/getcsc.h>
 #include <stdlib.h>
 
 /* Main function, called first */

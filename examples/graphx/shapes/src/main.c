@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/getcsc.h>
+#include <sys/util.h>
 #include <graphx.h>
 
 int main(void)

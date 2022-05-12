@@ -16,16 +16,22 @@
 
 include $(CURDIR)/../common.mk
 
+TARGETS := sys ti
+
 WILDCARD_SRC := $(wildcard *.src)
 WILDCARD_H := $(wildcard *.h *.hpp)
 
 all:
 
-install:
+$(addprefix install-,$(TARGETS)):
+	$(Q)$(MAKE) -C $(patsubst install-%,%,$@) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+
+install: $(addprefix install-,$(TARGETS))
 	$(Q)$(call MKDIR,$(INSTALL_H))
+	$(Q)$(call MKDIR,$(INSTALL_TI_H))
+	$(Q)$(call MKDIR,$(INSTALL_HW_H))
 	$(Q)$(call MKDIR,$(INSTALL_SHARED))
 	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_H))
 	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_SHARED))
 
-.PHONY: all install
-
+.PHONY: all install $(addprefix install-,$(TARGETS))

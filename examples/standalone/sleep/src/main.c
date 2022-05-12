@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/screen.h>
+#include <sys/timers.h>
 
 int main(void)
 {

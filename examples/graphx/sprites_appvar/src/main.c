@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 #include <fileioc.h>
 
@@ -26,8 +26,8 @@ int main(void)
     gfx_FillScreen(0);
 
     /* Draw the sprites directly from the appvar */
-    gfx_Sprite(ubuntu, LCD_WIDTH / 2 - 16, LCD_HEIGHT / 2 - 16);
-    gfx_Sprite(mint, LCD_WIDTH / 2 + 16, LCD_HEIGHT / 2 - 16);
+    gfx_Sprite(ubuntu, GFX_LCD_WIDTH / 2 - 16, GFX_LCD_HEIGHT / 2 - 16);
+    gfx_Sprite(mint, GFX_LCD_WIDTH / 2 + 16, GFX_LCD_HEIGHT / 2 - 16);
 
     /* Waits for a key */
     while (!os_GetCSC());

@@ -1,5 +1,6 @@
-#include <tice.h>
 #include <fileioc.h>
+#include <ti/real.h>
+#include <ti/tokens.h>
 
 /* Some function prototypes. Maybe someday a library */
 cplx_t Int24sToCplx(int real, int imag);

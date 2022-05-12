@@ -1,4 +1,5 @@
-#include <tice.h>
+#include <ti/screen.h>
+#include <ti/getcsc.h>
 #include <fileioc.h>
 
 void PrintText(int8_t xpos, int8_t ypos, const char *text);

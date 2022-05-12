@@ -1,4 +1,7 @@
-#include <tice.h>
+#include <ti/getcsc.h>
+#include <ti/screen.h>
+#include <ti/real.h>
+#include <sys/timers.h>
 
 /* Print a stopwatch value on the home screen */
 static void PrintTime(float elapsed)

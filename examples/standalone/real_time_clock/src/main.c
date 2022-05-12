@@ -1,4 +1,8 @@
-#include <tice.h>
+#include <ti/screen.h>
+#include <sys/rtc.h>
+#include <sys/lcd.h>
+#include <sys/util.h>
+
 #include <string.h>
 
 int main(void)

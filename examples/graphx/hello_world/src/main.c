@@ -1,4 +1,4 @@
-#include <tice.h>
+#include <ti/getcsc.h>
 #include <graphx.h>
 #include <stdlib.h>
 
@@ -25,6 +25,6 @@ int main(void)
 void PrintCentered(const char *str)
 {
     gfx_PrintStringXY(str,
-                      (LCD_WIDTH - gfx_GetStringWidth(str)) / 2,
-                      (LCD_HEIGHT - 8) / 2);
+                      (GFX_LCD_WIDTH - gfx_GetStringWidth(str)) / 2,
+                      (GFX_LCD_HEIGHT - 8) / 2);
 }
