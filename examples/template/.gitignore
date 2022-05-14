@@ -1,5 +1,0 @@
-obj/
-bin/
-src/gfx/*.c
-src/gfx/*.h
-.DS_Store
