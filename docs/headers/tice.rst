@@ -14,9 +14,6 @@ This header provides backwards compatibility for code written before the header 
     This header is provided for backwards compatibility only.
     For new projects, it is recommended that the required header be used directly.
 
-.. contents:: :local:
-   :depth: 3
-
 Included Header Files
 ---------------------
 
@@ -24,5 +21,5 @@ Included Header Files
     :maxdepth: 1
     :glob:
 
-    headers/sys/index
-    headers/ti/index
+    sys/index
+    ti/index
