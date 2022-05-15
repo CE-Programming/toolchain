@@ -11,6 +11,7 @@
   * A "nightly" automated release is now available for each new commit on the master branch, thanks to @mateoconlechuga 
   * `alloca` is now available. By @mateoconlechuga and @jacobly0  
   * More/Better support for C++ in various headers
+  * Ellipse and filled ellipse routines added to GraphX by @PeterTillema
 
 * **Bugfixes**:
   * A few bugs in the **ez80-clang** compiler were fixed by @jacobly0 
