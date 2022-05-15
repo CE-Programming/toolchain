@@ -334,9 +334,12 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          BRANCH: gh-pages
-          FOLDER: ${{env.TOOLCHAIN_PATH}}/docs/build/html
-          CLEAN: true
+          branch: gh-pages
+          folder: ${{env.TOOLCHAIN_PATH}}/docs/build/html
+          git-config-email: <>
+          git-config-name: github-pages-deploy
+          single-commit: true
+          clean: true
 
   nightly:
     runs-on: ubuntu-latest
