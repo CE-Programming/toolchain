@@ -138,13 +138,13 @@ LINK_CPPSOURCES = $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$
 LINK_ASMSOURCES = $(ASMSOURCES)
 LTOFILES = $(LINK_CSOURCES) $(LINK_CPPSOURCES)
 LDFILES = $(LDCRT0) $(LDLTO) $(LINK_ASMSOURCES)
-DEPFILES ?= $(wildcard $(LINK_CSOURCES:%.bc=%.d) $(LINK_CPPSOURCES:%.bc=%.d))
+DEPFILES = $(wildcard $(LINK_CSOURCES:%.bc=%.d) $(LINK_CPPSOURCES:%.bc=%.d))
 else
 LINK_CSOURCES = $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).src))
 LINK_CPPSOURCES = $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).src))
 LINK_ASMSOURCES = $(ASMSOURCES)
 LDFILES = $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
-DEPFILES ?= $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
+DEPFILES = $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
 endif
 
 # files created to be used for linking
@@ -301,19 +301,13 @@ $(LDBCLTO): $(LTOFILES)
 $(OBJDIR)/%.$(C_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(EXTRA_USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -MD -c -emit-llvm $(EZINC) $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -MD -c -emit-llvm $(EZINC) $(EZCFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 $(OBJDIR)/%.$(CPP_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -MD -c -emit-llvm $(EZINC) $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -MD -c -emit-llvm $(EZINC) $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
-ifeq ($(filter clean,$(MAKECMDGOALS)),)
-ifeq ($(filter test,$(MAKECMDGOALS)),)
-ifeq ($(filter gfx,$(MAKECMDGOALS)),)
-ifeq ($(filter version,$(MAKECMDGOALS)),)
-include $(DEPFILES)
-endif
-endif
-endif
+ifeq ($(filter clean gfx test version,$(MAKECMDGOALS)),)
+-include $(DEPFILES)
 endif
