@@ -27,3 +27,5 @@ whoever in the community first discovered something gave it a name following the
     tokens
     ui
     vars
+
+Click any of the above links to navigate to the header's documentation.

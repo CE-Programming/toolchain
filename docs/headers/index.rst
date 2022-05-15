@@ -3,7 +3,7 @@
 Miscellaneous Headers
 =====================
 
-These headers are CE specific, and contain various defines and prototypes.
+These headers contain various defines and prototypes, as well as any backwards compatibility definitions.
 
 .. toctree::
     :maxdepth: 1
@@ -12,3 +12,5 @@ These headers are CE specific, and contain various defines and prototypes.
     compression
     intce
     tice
+
+Click any of the above links to navigate to the header's documentation.

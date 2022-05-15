@@ -7,14 +7,15 @@ CLion
 -----
 CLion is a C/C++ IDE made by JetBrains.
 
-1. Open your project in CLion. If you're making a new one, make a copy of the :code:`examples/template` folder to get a boilerplate Makefile.
+1. Open your project in CLion.
+   If you're making a new one, make a copy of the :code:`examples/template` folder to get a boilerplate Makefile.
 
 2. Open IDE settings (:code:`File > Settings`)
 
 .. image:: images/ides_clion_1.png
    :align: center
 
-3. (WINDOWS ONLY) Set the Make executable (:code:`Build, Execution, Deployment > Build Tools > Make`) to your CEdev :code:`bin/make.exe` file.
+3. (*WINDOWS ONLY*) Set the :code:`make` executable (:code:`Build, Execution, Deployment > Build Tools > Make`) to your CEdev :code:`bin/make.exe` file.
 
 .. image:: images/ides_clion_2.png
    :align: center
@@ -26,16 +27,16 @@ CLion is a C/C++ IDE made by JetBrains.
 .. image:: images/ides_clion_3.png
    :align: center
 
-Set the "Build Tool" to :code:`CEdev/bin/make.exe` and both C compilers to :code:`CEdev/bin/ez80-clang.exe`
+On Windows, set the "Build Tool" to :code:`CEdev/bin/make.exe` and both C compilers to :code:`CEdev/bin/ez80-clang.exe`
 
-MacOS/Linux come with their own system Make executable, so you don't need to edit that.
-
-On MacOS/Linux, executables have no file extension. Set both C compilers to :code:`CEdev/bin/ez80-clang`.
+On MacOS/Linux, set both C compilers to :code:`CEdev/bin/ez80-clang`.
+MacOS/Linux come with their own system :code:`make` executable, and the default system one can be used.
 
 .. image:: images/ides_clion_4.png
    :align: center
 
-CLion will likely warn that "Test CMake run finished with errors". This is safe to ignore.
+CLion will likely warn that "Test CMake run finished with errors".
+This is safe to ignore.
 
 5. Set the Makefile Toolchain (:code:`Build, Execution, Deployment > Makefile`) to your newly created toolchain.
 
@@ -47,18 +48,18 @@ If you opened a demo project, you should be able to hover over the functions to 
 
 6. Build
 
-Before this step, make sure you added your CEdev :code:`bin` folder to your system's PATH, otherwise Make won't be able to find the right compiler.
+Before this step, make sure you added your CEdev :code:`bin` folder to your system's PATH environment variable, otherwise :code:`make` won't be able to find the compiler.
 
-At the top right, 5 Run Configurations were auto-generated.
+At the top right, 5 Run Configurations are auto-generated.
 
-Select "all" for the standard build.
+* Select "all" for the standard build.
 
-Select "debug" for a debug build for use with the `CEmu debugging toolchain <https://ce-programming.github.io/toolchain/static/debugging.html>`_.
+* Select "debug" for a debug build for use with the `CEmu debugging toolchain <https://ce-programming.github.io/toolchain/static/debugging.html>`_.
 
-only use the Build (the hammer icon) button with these.
-The Run icon tries to run the generated executables, which fails since .8xp files can't be run natively on PC.
+* Only use the Build (the hammer icon) button with these.
+  The Run icon tries to run the generated executables, which fails since .8xp files can't be run natively on PC.
 
 Other IDEs
 ----------
 
-If you know how to configure the toolchain to work with another IDE, raise an issue or pull request at the `GitHub <https://github.com/CE-Programming/toolchain>`_.
+If you know how to configure the toolchain to work with another IDE, raise an issue or pull request on `GitHub <https://github.com/CE-Programming/toolchain>`_.

@@ -15,3 +15,5 @@ These headers are specific to the calculator's hardware, and contain various def
     rtc
     timers
     util
+
+Click any of the above links to navigate to the header's documentation.
