@@ -610,7 +610,7 @@ void gfx_Line_NoClip(uint24_t x0,
 /**
  * Draws a horizontal line.
  *
- * This routine is a faster replacement for gfx_Line.
+ * This routine is a faster than gfx_Line for horizontal lines.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -622,7 +622,7 @@ void gfx_HorizLine(int x,
 /**
  * Draws an unclipped horizontal line.
  *
- * This routine is a faster replacement for gfx_Line_NoClip.
+ * This routine is a faster than gfx_Line_NoClip for horizontal lines.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -634,7 +634,7 @@ void gfx_HorizLine_NoClip(uint24_t x,
 /**
  * Draws a vertical line
  *
- * This routine is a faster replacement for gfx_Line.
+ * This routine is a faster than gfx_Line for vertical lines.
  * @param x X coordinate
  * @param y Y coordinate
  * @param length Length of line
@@ -646,7 +646,7 @@ void gfx_VertLine(int x,
 /**
  * Draws an unclipped vertical line.
  *
- * This routine is a faster replacement for gfx_Line_NoClip.
+ * This routine is a faster than gfx_Line_NoClip for vertical lines.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -759,7 +759,7 @@ gfx_Circle((x), (y), (radius))
  * @param a The horizontal radius of the ellipse (current maximum is 128).
  * @param b The vertical radius of the ellipse (current maximum is 128).
  */
-void gfx_FillEllipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
+void gfx_FillEllipse_NoClip(uint24_t x, uint24_t y, uint24_t a, uint24_t b);
 
 /**
  * Draws a filled ellipse.
@@ -769,7 +769,7 @@ void gfx_FillEllipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
  * @param a The horizontal radius of the ellipse (current maximum is 128).
  * @param b The vertical radius of the ellipse (current maximum is 128).
  */
-void gfx_FillEllipse(int24_t x, int24_t y, uint8_t a, uint8_t b);
+void gfx_FillEllipse(int24_t x, int24_t y, uint24_t a, uint24_t b);
 
 /**
  * Draws an unclipped ellipse.
@@ -779,7 +779,7 @@ void gfx_FillEllipse(int24_t x, int24_t y, uint8_t a, uint8_t b);
  * @param a The horizontal radius of the ellipse (current maximum is 128).
  * @param b The vertical radius of the ellipse (current maximum is 128).
  */
-void gfx_Ellipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
+void gfx_Ellipse_NoClip(uint24_t x, uint24_t y, uint24_t a, uint24_t b);
 
 /**
  * Draws an ellipse.
@@ -789,7 +789,7 @@ void gfx_Ellipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
  * @param a The horizontal radius of the ellipse (current maximum is 128).
  * @param b The vertical radius of the ellipse (current maximum is 128).
  */
-void gfx_Ellipse(int24_t x, int24_t y, uint8_t a, uint8_t b);
+void gfx_Ellipse(int24_t x, int24_t y, uint24_t a, uint24_t b);
 
 /**
  * Draws a clipped polygon outline.
@@ -820,7 +820,6 @@ void gfx_Polygon(const int *points, unsigned num_points);
  * num_points = 3;
  * gfx_Polygon_NoClip(points, num_points)
  *
- * Performs faster than gfx_Polygon, but can cause corruption if used outside the bounds of the clip region.
  * @endcode
  * @param points Pointer to x and y pairs
  * @param num_points Number of x and y pairs
