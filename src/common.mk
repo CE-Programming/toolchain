@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2021
+# Copyright (C) 2015-2022
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -84,9 +84,9 @@ INSTALL_PATH := $(call QUOTE_ARG,$(call NATIVEPATH,$(DESTDIR)$(PREFIX)))
 INSTALL_DIR := $(DESTDIR)$(PREFIX)/$(CEDEV_DIR)
 INSTALL_EXAMPLES := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/examples))
 INSTALL_LIB := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libload))
-INSTALL_SHARED := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/shared))
-INSTALL_STATIC := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/static))
-INSTALL_LINKED := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/linked))
+INSTALL_CRT := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/crt))
+INSTALL_LIBC := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libc))
+INSTALL_CE := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/ce))
 INSTALL_BIN := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/bin))
 INSTALL_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include))
 INSTALL_TI_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include/ti))

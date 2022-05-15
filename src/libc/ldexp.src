@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_ldexpf
+	public	_ldexp
+
+if PREFER_OS_LIBC
+
+_ldexpf := 0220DCh
+_ldexp := _ldexpf
+
+else
+
+_ldexpf := __ldexpf_c
+_ldexp := __ldexp_c
+
+	extern	__ldexpf_c
+	extern	__ldexp_c
+
+end if

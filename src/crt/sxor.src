@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+	public	__sxor
+
+if PREFER_OS_CRT
+
+__sxor := 000268h
+
+else
+
+__sxor:
+	push	af
+	ld	a, h
+	xor	a, b
+	ld	h, a
+	ld	a, l
+	xor	a, c
+	ld	l, a
+	pop	af
+	ret
+
+end if

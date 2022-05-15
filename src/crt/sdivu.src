@@ -1,0 +1,26 @@
+	assume	adl=1
+
+	section	.text
+	public	__sdivu
+
+if PREFER_OS_CRT
+
+__sdivu := 00020Ch
+
+else
+
+__sdivu:
+; I: HL=dividend, BC=divisor
+; O: uhl=HL/BC
+
+	push	de
+
+	call	__sdvrmu
+	ex	de, hl
+
+	pop	de
+	ret
+
+	extern	__sdvrmu
+
+end if

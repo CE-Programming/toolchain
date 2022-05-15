@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+	public	__sshl
+
+if PREFER_OS_CRT
+
+__sshl := 000240h
+
+else
+
+__sshl := __ishl
+
+	extern	__ishl
+
+end if

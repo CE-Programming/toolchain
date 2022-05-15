@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_atan2f
+	public	_atan2
+
+if PREFER_OS_LIBC
+
+_atan2f := 02210Ch
+_atan2 := _atan2f
+
+else
+
+_atan2f := __atan2f_c
+_atan2 := __atan2_c
+
+	extern	__atan2f_c
+	extern	__atan2_c
+
+end if

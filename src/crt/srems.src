@@ -1,0 +1,28 @@
+	assume	adl=1
+
+	section	.text
+	public	__srems
+
+if PREFER_OS_CRT
+
+__srems := 000238h
+
+else
+
+__srems:
+; I: HL=dividend, BC=divisor
+; O: uhl=HL%BC
+
+	push	de
+
+	call	__sdvrms_abs
+
+	pop	de
+	ret	nc
+
+	jp	__ineg
+
+	extern	__ineg
+	extern	__sdvrms_abs
+
+end if

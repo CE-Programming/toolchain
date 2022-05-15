@@ -1,0 +1,26 @@
+	assume	adl=1
+
+	section	.text
+	public	_tolower
+
+if PREFER_OS_LIBC
+
+_tolower := 021E34h
+
+else
+
+_tolower:
+	pop	de
+	ex	(sp), hl
+	push	de
+
+	ld	a, l
+	sub	a, 'A'
+	cp	a, 1+'Z'-'A'
+	ret	nc
+
+	add	a, 'a'
+	ld	l, a
+	ret
+
+end if

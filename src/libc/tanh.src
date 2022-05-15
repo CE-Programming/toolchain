@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_tanhf
+	public	_tanh
+
+if PREFER_OS_LIBC
+
+_tanhf := 022138h
+_tanh := _tanhf
+
+else
+
+_tanhf := __tanhf_c
+_tanh := __tanh_c
+
+	extern	__tanhf_c
+	extern	__tanh_c
+
+end if

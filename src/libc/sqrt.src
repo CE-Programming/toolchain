@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_sqrtf
+	public	_sqrt
+
+if PREFER_OS_LIBC
+
+_sqrtf := 000298h
+_sqrt := _sqrtf
+
+else
+
+_sqrtf := __sqrtf_c
+_sqrt := __sqrt_c
+
+	extern	__sqrtf_c
+	extern	__sqrt_c
+
+end if

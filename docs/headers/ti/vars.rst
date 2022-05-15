@@ -7,7 +7,7 @@ ti/vars.h
 
     #include <ti/vars.h>
 
-The TI-84 Plus CE's roots early-90s roots result in it managing files and data quite differently than how modern computers do.
+The TI-84 Plus CE's early-90s roots result in it managing files and data quite differently than how modern computers do.
 Some data in the OS, such as stat vars, are permanently allocated a fixed location in RAM;
 other data, such as user programs and strings, are not assigned a fixed location.
 The operating system's equivalent to a "file" is called a variable, and they come in many types.

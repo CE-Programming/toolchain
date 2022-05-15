@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_log10f
+	public	_log10
+
+if PREFER_OS_LIBC
+
+_log10f := 0220E8h
+_log10 := _log10f
+
+else
+
+_log10f := __log10f_c
+_log10 := __log10_c
+
+	extern	__log10f_c
+	extern	__log10_c
+
+end if

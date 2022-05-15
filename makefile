@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2021
+# Copyright (C) 2015-2022
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,13 @@ endif
 
 LIB_DIR = $(call NATIVEPATH,src/$1)
 
-all: cedev-config convbin convimg convfont $(LIBS) std
+all: cedev-config convbin convimg convfont crt libc $(LIBS)
 
-std: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std)
+crt: check
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/crt)
+
+libc: check
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/libc)
 
 fasmg: check
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg)
@@ -52,7 +55,7 @@ $(LIBS): fasmg
 $(addprefix clean-,$(LIBS)):
 	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst clean-%,%,$@)) clean
 
-install: all $(addprefix install-,$(LIBS)) install-fasmg install-std install-ce
+install: all install-fasmg install-crt install-libc install-ce $(addprefix install-,$(LIBS))
 	$(Q)$(MAKE) -f linker.mk -C src
 	$(Q)$(call MKDIR,$(INSTALL_DIR))
 	$(Q)$(call MKDIR,$(INSTALL_BIN))
@@ -77,8 +80,11 @@ $(addprefix install-,$(LIBS)): fasmg
 install-fasmg:
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
-install-std:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+install-crt:
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/crt) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+
+install-libc:
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/libc) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 install-ce:
 	$(Q)$(MAKE) -C $(call NATIVEPATH,src/ce) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
@@ -93,7 +99,7 @@ libs: $(LIBS) convbin
 docs:
 	$(Q)$(MAKE) -C docs html
 
-clean: $(addprefix clean-,$(LIBS)) clean-std
+clean: clean-crt clean-libc $(addprefix clean-,$(LIBS))
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) clean
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) clean
 	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) clean
@@ -103,8 +109,11 @@ clean: $(addprefix clean-,$(LIBS)) clean-std
 	$(Q)$(call RMDIR,docs/build)
 	$(Q)$(call RMDIR,docs/doxygen)
 
-clean-std:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/std) clean
+clean-crt:
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/crt) clean
+
+clean-libc:
+	$(Q)$(MAKE) -C $(call NATIVEPATH,src/libc) clean
 
 check:
 	$(Q)$(EZCC) --version || ( echo Please install ez80-clang && exit 1 )
@@ -122,7 +131,7 @@ help:
 	@echo   help
 
 .PHONY: $(LIBS)
-.PHONY: install-fasmg install-std install-ce $(addprefix install-,$(LIBS))
-.PHONY: check clean clean-std $(addprefix clean-,$(LIBS))
+.PHONY: install-fasmg install-crt install-libc install-ce $(addprefix install-,$(LIBS))
+.PHONY: check clean clean-crt clean-libc $(addprefix clean-,$(LIBS))
 .PHONY: all help install uninstall libs docs
 .PHONY: fasmg convbin convimg convfont

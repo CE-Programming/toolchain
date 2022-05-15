@@ -1,0 +1,7 @@
+
+	assume	adl=1
+
+	section	.text
+	public	_longjmp
+
+_longjmp    := 000098h

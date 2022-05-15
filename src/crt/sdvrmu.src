@@ -1,0 +1,24 @@
+	assume	adl=1
+
+	section	.text
+	public	__sdvrmu
+
+__sdvrmu:
+; I: HL=dividend, BC=divisor
+; O: a=0, ude=HL/BC, uhl=HL%BC
+
+	push	hl
+	dec	sp
+	pop	de
+	inc	sp
+	ld	e, 0
+
+	inc	bc
+	dec.s	bc
+
+	push	af
+	ld	a, 16
+
+	jp	__idvrmu.hijack_a_iters_ude_dividend
+
+	extern	__idvrmu.hijack_a_iters_ude_dividend

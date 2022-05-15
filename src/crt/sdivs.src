@@ -1,0 +1,29 @@
+	assume	adl=1
+
+	section	.text
+	public	__sdivs
+
+if PREFER_OS_CRT
+
+__sdivs := 000208h
+
+else
+
+__sdivs:
+; I: HL=dividend, BC=divisor
+; O: uhl=HL/BC
+
+	push	de
+
+	call	__sdvrms_abs
+	ex	de, hl
+
+	pop	de
+	ret	p
+
+	jp	__ineg
+
+	extern	__ineg
+	extern	__sdvrms_abs
+
+end if

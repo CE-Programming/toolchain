@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_sinhf
+	public	_sinh
+
+if PREFER_OS_LIBC
+
+_sinhf := 022130h
+_sinh := _sinhf
+
+else
+
+_sinhf := __sinhf_c
+_sinh := __sinh_c
+
+	extern	__sinhf_c
+	extern	__sinh_c
+
+end if

@@ -1,0 +1,25 @@
+	assume	adl=1
+
+	section	.text
+	public	__sremu
+
+if PREFER_OS_CRT
+
+__sremu := 00023Ch
+
+else
+
+__sremu:
+; I: HL=dividend, BC=divisor
+; O: uhl=HL%BC
+
+	push	de
+
+	call	__sdvrmu
+
+	pop	de
+	ret
+
+	extern	__sdvrmu
+
+end if

@@ -1,0 +1,26 @@
+	assume	adl=1
+
+	section	.text
+	public	__idivs
+
+if PREFER_OS_CRT
+
+__idivs := 00013Ch
+
+else
+
+__idivs:
+; I: UHL=dividend, UBC=divisor
+; O: uhl=UHL/UBC
+
+	push	de
+
+	call	__idvrms
+
+	pop	de
+	ret
+
+
+	extern	__idvrms
+
+end if

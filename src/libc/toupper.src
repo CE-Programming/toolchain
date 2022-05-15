@@ -1,0 +1,26 @@
+	assume	adl=1
+
+	section	.text
+	public	_toupper
+
+if PREFER_OS_LIBC
+
+_toupper := 021E38h
+
+else
+
+_toupper:
+	pop	de
+	ex	(sp), hl
+	push	de
+
+	ld	a, l
+	sub	a, 'a'
+	cp	a, 1+'z'-'a'
+	ret	nc
+
+	add	a, 'A'
+	ld	l, a
+	ret
+
+end if

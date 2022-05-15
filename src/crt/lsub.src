@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+	public	__lsub
+
+if PREFER_OS_CRT
+
+__lsub := 0001F8h
+
+else
+
+__lsub:
+	push	af
+	or	a, a
+	sbc	hl, bc
+	cpl
+	ccf
+	adc	a, e
+	ld	e, a
+	pop	af
+	ret
+
+end if

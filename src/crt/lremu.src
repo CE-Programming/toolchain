@@ -1,0 +1,43 @@
+	assume	adl=1
+
+	section	.text
+	public	__lremu
+
+if PREFER_OS_CRT
+
+__lremu := 0001E0h
+
+else
+
+__lremu:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL%AUBC
+
+if 1
+	call	__ldvrmu
+	ld	e, a
+	push	de
+	exx
+	ld	a, e
+	pop	de
+
+	ret	z
+	ei
+	ret
+
+else
+	push	ix
+	push	iy
+
+	call	__ldvrmu
+	ld	e, a
+	ld	a, iyh
+
+	pop	iy
+	pop	ix
+	ret
+end if
+
+	extern	__ldvrmu
+
+end if

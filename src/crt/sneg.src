@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+	public	__sneg
+
+if PREFER_OS_CRT
+
+__sneg := 00022Ch
+
+else
+
+__sneg := __ineg
+
+	extern	__ineg
+
+end if

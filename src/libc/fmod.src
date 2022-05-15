@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_fmodf
+	public	_fmod
+
+if PREFER_OS_LIBC
+
+_fmodf := 0220FCh
+_fmod := _fmodf
+
+else
+
+_fmodf := __fmodf_c
+_fmod := __fmod_c
+
+	extern	__fmodf_c
+	extern	__fmod_c
+
+end if

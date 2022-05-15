@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_strtof
+	public	_strtod
+
+if PREFER_OS_LIBC
+
+_strtof := 0220E0h
+_strtod := _strtof
+
+else
+
+_strtof := __strtof_c
+_strtod := __strtod_c
+
+	extern	__strtof_c
+	extern	__strtod_c
+
+end if

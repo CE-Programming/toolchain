@@ -1,0 +1,43 @@
+	assume	adl=1
+
+	section	.text
+	public	__ldivu
+
+if PREFER_OS_CRT
+
+__ldivu := 0001B8h
+
+else
+
+__ldivu:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL/AUBC
+
+if 1
+	push	bc
+
+	call	__ldvrmu
+
+	ld	a, b
+	pop	bc
+
+	ret	z
+	ei
+	ret
+
+else
+	push	ix
+	push	iy
+
+	call	__ldvrmu
+	ld	a, iyh
+	pop	iy
+	ex	(sp), ix
+	pop	hl
+
+	ret
+end if
+
+	extern	__ldvrmu
+
+end if

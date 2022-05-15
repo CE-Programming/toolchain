@@ -1,0 +1,31 @@
+	assume	adl=1
+
+	section	.text
+	public	_atof, _atoff
+
+if PREFER_OS_LIBC
+
+_atoff	:= 022110h
+_atof	:= _atoff
+
+else
+
+_atof:
+_atoff:
+	pop	hl
+	pop	bc
+	push	bc
+	push	hl
+	or	a,a
+	sbc	hl,hl
+	push	hl
+	push	bc
+	call	_strtod
+	pop	bc
+	pop	hl
+	ret
+
+	extern	__frameset0
+	extern	_strtod
+
+end if

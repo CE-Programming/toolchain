@@ -1,0 +1,41 @@
+	assume	adl=1
+
+	section	.text
+	public	__lshrs
+
+if PREFER_OS_CRT
+
+__lshrs := 0001E8h
+
+else
+
+__lshrs:
+; Suboptimal for large shift amounts
+; CC: if C!=0: C*(15*r(PC)+3*r(SPL)+3*w(SPL)+4)+13*r(PC)+9*r(SPL)+6*w(SPL)+1
+;     if C==0: 4*r(PC)+3*r(SPL)+2
+	inc	l
+	dec	l
+	ret	z
+	push	hl
+	push	bc
+	ld	b, l
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+.loop:
+	sra	a
+	public	__lshrs.hijack_lshru
+.hijack_lshru:
+	inc	hl
+	inc	hl
+	rr	(hl)
+	dec	hl
+	rr	(hl)
+	dec	hl
+	rr	(hl)
+	djnz	.loop
+	pop	bc
+	pop	hl
+	ret
+
+end if

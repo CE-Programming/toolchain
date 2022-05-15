@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+	public	__sor
+
+if PREFER_OS_CRT
+
+__sor := 000234h
+
+else
+
+__sor:
+	push	af
+	ld	a, h
+	or	a, b
+	ld	h, a
+	ld	a, l
+	or	a, c
+	ld	l, a
+	pop	af
+	ret
+
+end if

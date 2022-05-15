@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2021
+# Copyright (C) 2015-2022
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -39,11 +39,11 @@ CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
 #----------------------------
 HAS_UPPERCASE_NAME ?= YES
-# Prefer static crt functions.
-# These will increase output size but are usually faster than those from TI-OS.
-STATIC_CRT ?= YES
 HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
+HAS_LIBC ?= YES
+PREFER_OS_CRT ?= NO
+PREFER_OS_LIBC ?= YES
 #----------------------------
 CEDEV_TOOLCHAIN ?= $(shell cedev-config --prefix)
 #----------------------------
@@ -57,7 +57,9 @@ comma := ,
 DEBUGMODE := NDEBUG
 CCDEBUG := -g0
 LDDEBUG := 0
-LDSTATIC := 0
+LDPREFER_OS_CRT := 0
+LDPREFER_OS_LIBC := 0
+LDHAS_LIBC := 0
 
 # verbosity
 V ?= 0
@@ -112,7 +114,7 @@ TARGET8XP ?= $(NAME).8xp
 ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
 
 # startup routines
-LDCRT0 ?= $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/shared/crt0.src)
+LDCRT0 ?= $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/crt0.src)
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filter $(subst %%,%,%$(subst *,%,$2)),$d)))
@@ -183,9 +185,15 @@ ifeq ($(HAS_CUSTOM_FILE),YES)
 DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
 endif
 
-# prefer static crt functions
-ifeq ($(STATIC_CRT),YES)
-LDSTATIC := 1
+# convert to linker crt/libc define
+ifeq ($(PREFER_OS_CRT),YES)
+LDPREFER_OS_CRT := 1
+endif
+ifeq ($(PREFER_OS_LIBC),YES)
+LDPREFER_OS_LIBC := 1
+endif
+ifeq ($(HAS_LIBC),YES)
+LDHAS_LIBC := 1
 endif
 
 # define the c/c++ flags used by clang
@@ -199,7 +207,9 @@ FASMGFLAGS = \
 	-n \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
-	-i $(call QUOTE_ARG,STATIC := $(LDSTATIC)) \
+	-i $(call QUOTE_ARG,HAS_LIBC := $(LDHAS_LIBC)) \
+	-i $(call QUOTE_ARG,PREFER_OS_CRT := $(LDPREFER_OS_CRT)) \
+	-i $(call QUOTE_ARG,PREFER_OS_LIBC := $(LDPREFER_OS_LIBC)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \

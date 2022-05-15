@@ -1,7 +1,0 @@
-	assume	adl=1
-
-	section	.text
-	public	__sshl
-__sshl := __ishl
-
-	extern	__ishl

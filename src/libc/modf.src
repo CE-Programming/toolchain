@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_modff
+	public	_modf
+
+if PREFER_OS_LIBC
+
+_modff := 0220ECh
+_modf := _modff
+
+else
+
+_modff := __modff_c
+_modf := __modf_c
+
+	extern	__modff_c
+	extern	__modf_c
+
+end if

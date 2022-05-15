@@ -1,7 +1,0 @@
-	assume	adl=1
-
-	section	.text
-	public	__sneg
-__sneg := __ineg
-
-	extern	__ineg

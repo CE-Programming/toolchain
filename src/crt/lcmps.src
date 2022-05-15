@@ -1,0 +1,25 @@
+	assume	adl=1
+
+	section	.text
+	public	__lcmps
+
+if PREFER_OS_CRT
+
+__lcmps := 0001A8h
+
+else
+
+__lcmps:
+	push	de
+	ld	d, a
+	ld	a, e
+	sub	a, d
+	jr	nz, .finish
+	sbc	hl, bc
+	add	hl, bc
+.finish:
+	ld	a, d
+	pop	de
+	ret
+
+end if

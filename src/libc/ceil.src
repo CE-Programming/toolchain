@@ -1,0 +1,41 @@
+	assume	adl=1
+
+	section	.text
+	public	_ceil, _ceilf
+
+if PREFER_OS_LIBC
+
+_ceilf	:= 022114h
+_ceil	:= _ceilf
+
+else
+
+_ceil:
+_ceilf:
+	call	__frameset0
+	ld	bc,(ix+6)
+	ld	a,(ix+9)
+	call	__fneg
+	ld	l,a
+	ld	h,0
+	push	hl
+	push	bc
+	call	_floor
+	pop	bc
+	pop	bc
+	push	hl
+	pop	bc
+	ld	a,e
+	call	__fneg
+	ld	e,a
+	push	bc
+	pop	hl
+	ld	sp,ix
+	pop	ix
+	ret
+
+	extern	__frameset0
+	extern	__fneg
+	extern	_floor
+
+end if

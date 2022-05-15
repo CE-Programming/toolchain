@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_frexpf
+	public	_frexp
+
+if PREFER_OS_LIBC
+
+_frexpf := 0220D8h
+_frexp := _frexpf
+
+else
+
+_frexpf := __frexpf_c
+_frexp := __frexp_c
+
+	extern	__frexpf_c
+	extern	__frexp_c
+
+end if

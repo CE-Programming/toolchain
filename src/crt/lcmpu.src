@@ -1,0 +1,21 @@
+	assume	adl=1
+
+	section	.text
+	public	__lcmpu
+
+if PREFER_OS_CRT
+
+__lcmpu := 0001ACh
+
+else
+
+__lcmpu:
+	cp	a, e
+	ccf
+	ret	nz
+	or	a, a
+	sbc	hl, bc
+	add	hl, bc
+	ret
+
+end if

@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_coshf
+	public	_cosh
+
+if PREFER_OS_LIBC
+
+_coshf := 022134h
+_cosh := _coshf
+
+else
+
+_coshf := __coshf_c
+_cosh := __cosh_c
+
+	extern	__coshf_c
+	extern	__cosh_c
+
+end if

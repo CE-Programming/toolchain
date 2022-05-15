@@ -1,0 +1,35 @@
+	assume	adl=1
+
+	section	.text
+	public	__lrems
+
+;if PREFER_OS_CRT
+;
+; Bug: Does not ensure `nc` before `sbc hl, hl` to negate divisor.
+;
+; __lrems := 0001DCh
+;
+;else
+
+__lrems:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL%AUBC
+
+	bit	7, e
+	push	af
+	push	bc
+
+	call	__ldivs_lrems_common
+
+	call	__lremu
+
+	pop	bc
+	pop	af
+	ret	z
+	jp	__lneg
+
+	extern	__ldivs_lrems_common
+	extern	__lneg
+	extern	__lremu
+
+;end if

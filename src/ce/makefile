@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2022
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -30,8 +30,8 @@ install: $(addprefix install-,$(TARGETS))
 	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call MKDIR,$(INSTALL_TI_H))
 	$(Q)$(call MKDIR,$(INSTALL_HW_H))
-	$(Q)$(call MKDIR,$(INSTALL_SHARED))
+	$(Q)$(call MKDIR,$(INSTALL_CE))
 	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_H))
-	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_SHARED))
+	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_CE))
 
 .PHONY: all install $(addprefix install-,$(TARGETS))

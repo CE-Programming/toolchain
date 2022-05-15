@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+	public	__ladd_b
+
+if PREFER_OS_CRT
+
+__ladd_b := 0001A0h
+
+else
+
+__ladd_b:
+	push	bc
+	inc.s	bc
+	ld	c, a
+	ld	b, 0
+	add	hl, bc
+	pop	bc
+	ret	nc
+	inc	e
+	ret
+
+end if

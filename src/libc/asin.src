@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_asinf
+	public	_asin
+
+if PREFER_OS_LIBC
+
+_asinf := 022104h
+_asin := _asinf
+
+else
+
+_asinf := __asinf_c
+_asin := __asin_c
+
+	extern	__asinf_c
+	extern	__asin_c
+
+end if

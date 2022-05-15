@@ -1,0 +1,38 @@
+	assume	adl=1
+
+	section	.text
+	public	__lxor
+
+if PREFER_OS_CRT
+
+__lxor := 0001FCh
+
+else
+
+__lxor:
+	push	af
+	xor	a, e
+	ld	e, a
+	push	bc
+	inc	sp
+	inc	sp
+	push	hl
+	ld	hl, 2
+	add	hl, sp
+	ld	a, (hl)
+	inc	hl
+	xor	a, (hl)
+	dec	hl
+	ld	(hl), a
+	pop	hl
+	inc	sp
+	ld	a, h
+	xor	a, b
+	ld	h, a
+	ld	a, l
+	xor	a, c
+	ld	l, a
+	pop	af
+	ret
+
+end if

@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_tanf
+	public	_tan
+
+if PREFER_OS_LIBC
+
+_tanf := 022120h
+_tan := _tanf
+
+else
+
+_tanf := __tanf_c
+_tan := __tan_c
+
+	extern	__tanf_c
+	extern	__tan_c
+
+end if

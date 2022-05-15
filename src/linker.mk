@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2021
+# Copyright (C) 2015-2022
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,9 +19,9 @@ include $(CURDIR)/common.mk
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 APPEND_FILES = $(foreach file,$(addprefix ../lib/$2/,$(notdir $3)),$(call APPEND,$1$(call FASMG_FILES,$(file)))$(newline))
 
-STATIC_FILES := $(wildcard std/static/*.src) $(patsubst std/static/%,std/static/build/%.src,$(wildcard std/static/*.c std/static/*.cpp))
-LINKED_FILES := $(wildcard std/linked/*.src) $(patsubst std/linked/%,std/linked/build/%.src,$(wildcard std/linked/*.c std/linked/*.cpp))
-SHARED_FILES := $(filter-out ce/crt0.src,$(wildcard ce/*.src)) $(wildcard std/shared/*.src) $(patsubst std/shared/%,std/shared/build/%.src,$(wildcard std/shared/*.c std/shared/*.cpp))
+CRT_FILES := $(filter-out crt/crt0.src,$(wildcard crt/*.src) $(patsubst crt/%,crt/build/%.src,$(wildcard crt/*.c crt/*.cpp)))
+LIBC_FILES := $(wildcard libc/*.src) $(patsubst libc/%,libc/build/%.src,$(wildcard libc/*.c libc/*.cpp))
+CE_FILES := $(wildcard ce/*.src)
 
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(Q)$(call REMOVE,$(call QUOTE_ARG,$@))
@@ -55,9 +55,8 @@ linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(Q)$(call APPEND,provide ___fini_array_count = .fini_array.length / 3)
 	$(Q)$(call APPEND,require __start)
 	$(Q)$(call APPEND)
-	$(Q)$(call APPEND,if STATIC)
-	$(Q)$(call APPEND_FILES,	source ,static,$(sort $(STATIC_FILES)))
-	$(Q)$(call APPEND,else)
-	$(Q)$(call APPEND_FILES,	source ,linked,$(sort $(LINKED_FILES)))
+	$(Q)$(call APPEND_FILES,source ,crt,$(sort $(CRT_FILES)))
+	$(Q)$(call APPEND_FILES,source ,ce,$(sort $(CE_FILES)))
+	$(Q)$(call APPEND,if HAS_LIBC)
+	$(Q)$(call APPEND_FILES,	source ,libc,$(sort $(LIBC_FILES)))
 	$(Q)$(call APPEND,end if)
-	$(Q)$(call APPEND_FILES,source ,shared,$(sort $(SHARED_FILES)))

@@ -1,0 +1,30 @@
+	assume	adl=1
+
+	section	.text
+	public	__lshl
+
+if PREFER_OS_CRT
+
+__lshl := 0001E4h
+
+else
+
+__lshl:
+; Suboptimal for large shift amounts
+; CC: if L!=0: L*(5*r(PC)+1)+9*r(PC)+(ADL?12*r(SPL)+9*w(SPL):8*r(SPS)+6*w(SPS))+1
+;     if L==0: 4*r(PC)+(ADL?3*r(SPL):2*r(SPS))+2
+	inc	l
+	dec	l
+	ret	z
+	push	bc
+	ld	b, l
+	ex	(sp), hl
+.loop:
+	add	hl, hl
+	rla
+	djnz	.loop
+	ex	(sp), hl
+	pop	bc
+	ret
+
+end if

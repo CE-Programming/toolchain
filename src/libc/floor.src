@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_floorf
+	public	_floor
+
+if PREFER_OS_LIBC
+
+_floorf := 0220F4h
+_floor := _floorf
+
+else
+
+_floorf := __floorf_c
+_floor := __floor_c
+
+	extern	__floorf_c
+	extern	__floor_c
+
+end if

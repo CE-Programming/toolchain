@@ -27,9 +27,10 @@ visit the `GitHub repository <https://github.com/CE-Programming/toolchain>`_.
     :maxdepth: 1
 
     static/faq
-    static/ides
+    static/hardware
     static/git
     static/coding-guidelines
+    static/ides
 
 .. toctree::
     :caption: Toolchain Documentation
@@ -38,12 +39,11 @@ visit the `GitHub repository <https://github.com/CE-Programming/toolchain>`_.
     static/printf
     static/fileio
     libraries/index
-    headers/index
     headers/sys/index
     headers/ti/index
+    headers/index
     static/debugging
     static/makefile-options
-    static/hardware
 
 .. toctree::
     :caption: Contributing

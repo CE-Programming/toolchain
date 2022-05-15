@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_powf
+	public	_pow
+
+if PREFER_OS_LIBC
+
+_powf := 0220F8h
+_pow := _powf
+
+else
+
+_powf := __powf_c
+_pow := __pow_c
+
+	extern	__powf_c
+	extern	__pow_c
+
+end if
