@@ -22,6 +22,14 @@ This palette can be modified at any time with different colors.
 .. image:: images/graphx_palette.png
    :align: center
 
+Coordinate System
+-----------------
+
+The graphx library coordinate system consists of the horizontal (:code:`x`) and vertical (:code:`y`) components of the screen.
+Pixel coordinates are generally expressed as an :code:`x` and :code:`y` pair, such as (:code:`x`, :code:`y`).
+The graphx library uses the top left of the screen as pixel coordinate (0, 0), while the bottom right of the screen is pixel coordinate (319, 239).
+The defines :code:`GFX_LCD_WIDTH` and :code:`GFX_LCD_HEIGHT` can be used to get the LCD screen width and height respectively.
+
 Clipped vs. Unclipped
 ---------------------
 
@@ -46,7 +54,7 @@ For example, in a simple Pong game, if a white ball is drawn on a black backgrou
 Sample Implementation
 ^^^^^^^^^^^^^^^^^^^^^
 
-A brief summation of the paritial redraw using graphx is:
+A brief summation of the partial redraw using graphx is:
 
 * Allocate space for a temporary sprite.
 * When the background is drawn, a small copy of it is saved to the temporary sprite.
@@ -89,7 +97,7 @@ Buffering Graphics
 Buffering is a fancy method in order to prevent graphics from being displayed as they are being drawn.
 It is used primarily to eliminate visible draws which can make an application look amateurish, sluggish, or appear to flicker.
 
-When graphics routines are buffered, they draw offscreen (nonvisible) portion of memory, so the user doesn't see the partial drawing.
+When graphics routines are buffered, they draw offscreen (non-visible) portion of memory, so the user doesn't see the partial drawing.
 This is accomplished in one line with the following routine, usually placed directly after calling `gfx_Begin()`:
 
 .. code-block:: c
@@ -117,7 +125,7 @@ Method 2 (Buffer Swapping)
 
 Buffer swapping swaps the visible screen with an offscreen buffer, leaving the contents on both.
 Whatever is currently on the screen will become the graphics buffer, and whatever is in the graphics buffer will be displayed on the screen.
-The code to swap the visible screen with nonvisibile buffer is:
+The code to swap the visible screen with non-visibile buffer is:
 
 .. code-block:: c
 

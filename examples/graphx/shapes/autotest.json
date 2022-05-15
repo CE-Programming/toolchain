@@ -22,10 +22,12 @@
     "key|enter",
     "hashWait|5",
     "key|enter",
-    "delay|2000",
     "hashWait|6",
     "key|enter",
-    "hashWait|7"
+    "delay|2000",
+    "hashWait|7",
+    "key|enter",
+    "hashWait|8"
   ],
   "hashes":
   {
@@ -38,40 +40,47 @@
     },
     "2":
     {
+      "description": "Test ellipse display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "2138C183" ]
+    },
+    "3":
+    {
       "description": "Test rectangle outline display",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "6390F38B" ]
     },
-    "3":
+    "4":
     {
       "description": "Test rectangle fill display",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "163F3B60" ]
     },
-    "4":
+    "5":
     {
       "description": "Test triangle fill display",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "A1154AE5" ]
     },
-    "5":
+    "6":
     {
       "description": "Test line display",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "08AE93E1" ]
     },
-    "6":
+    "7":
     {
       "description": "Test pixel display",
       "start": "vram_start",
       "size": "vram_8_size",
       "expected_CRCs": [ "B6CCDD04" ]
     },
-    "7":
+    "8":
     {
       "description": "Test program exit",
       "start": "vram_start",

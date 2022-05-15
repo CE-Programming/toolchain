@@ -35,6 +35,7 @@
  * @author Jacob "jacobly" Young
  * @author Zachary "Runer112" Wassall
  * @author Patrick "tr1p1ea" Prendergast
+ * @author Peter "PT_" Tillema
  * @author "grosged"
  */
 
@@ -564,8 +565,7 @@ void gfx_ZeroScreen(void);
 /**
  * Sets a pixel to the global color index
  *
- * This is measured from the top left origin of the screen.
- * Pixels are only clipped within the screen boundaries
+ * @note Pixels are only clipped within the screen boundaries, not the clip region.
  * @param x X coordinate location
  * @param y Y coordinate location
  * @see gfx_SetColor
@@ -575,8 +575,7 @@ void gfx_SetPixel(uint24_t x, uint8_t y);
 /**
  * Gets a pixel's color index
  *
- * This is measured from the top left origin of the screen.
- * Pixels are only clipped within the screen boundaries
+ * @note Pixels are only clipped within the screen boundaries, not the clip region.
  * @param x X coordinate location
  * @param y Y coordinate location
  */
@@ -585,7 +584,6 @@ uint8_t gfx_GetPixel(uint24_t x, uint8_t y);
 /**
  * Draws a line
  *
- * This is measured from the top left origin of the screen.
  * @param x0 First X coordinate
  * @param y0 First Y coordinate
  * @param x1 Second X coordinate
@@ -599,8 +597,6 @@ void gfx_Line(int x0,
 /**
  * Draws an unclipped line.
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than gfx_line, but can cause corruption if used outside the bounds of the screen.
  * @param x0 First X coordinate.
  * @param y0 First Y coordinate.
  * @param x1 Second X coordinate.
@@ -614,8 +610,7 @@ void gfx_Line_NoClip(uint24_t x0,
 /**
  * Draws a horizontal line.
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_Line.
+ * This routine is a faster replacement for gfx_Line.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -627,8 +622,7 @@ void gfx_HorizLine(int x,
 /**
  * Draws an unclipped horizontal line.
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_Line, but can cause corruption if used outside the bounds of the screen.
+ * This routine is a faster replacement for gfx_Line_NoClip.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -640,8 +634,7 @@ void gfx_HorizLine_NoClip(uint24_t x,
 /**
  * Draws a vertical line
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than using @c gfx_Line
+ * This routine is a faster replacement for gfx_Line.
  * @param x X coordinate
  * @param y Y coordinate
  * @param length Length of line
@@ -653,8 +646,7 @@ void gfx_VertLine(int x,
 /**
  * Draws an unclipped vertical line.
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_Line, but can cause corruption if used outside the bounds of the screen.
+ * This routine is a faster replacement for gfx_Line_NoClip.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -666,7 +658,6 @@ void gfx_VertLine_NoClip(uint24_t x,
 /**
  * Draws a rectangle outline.
  *
- * This is measured from the top left origin of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param width Width of rectangle.
@@ -680,8 +671,6 @@ void gfx_Rectangle(int x,
 /**
  * Draws an unclipped rectangle outline.
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_Rectangle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param width Width of rectangle.
@@ -695,7 +684,6 @@ void gfx_Rectangle_NoClip(uint24_t x,
 /**
  * Draws a filled rectangle.
  *
- * This is measured from the top left origin of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param width Width of rectangle.
@@ -709,8 +697,6 @@ void gfx_FillRectangle(int x,
 /**
  * Draws an unclipped filled rectangle
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_FillRectangle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate
  * @param y Y coordinate
  * @param width Width of rectangle
@@ -724,7 +710,6 @@ void gfx_FillRectangle_NoClip(uint24_t x,
 /**
  * Draws a circle outline.
  *
- * This is measured from the top left origin of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param radius The radius of the circle.
@@ -736,7 +721,6 @@ void gfx_Circle(int x,
 /**
  * Draws a filled circle.
  *
- * This is measured from the top left origin of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param radius The radius of the circle.
@@ -748,8 +732,6 @@ void gfx_FillCircle(int x,
 /**
  * Draws an unclipped filled circle.
  *
- * This is measured from the top left origin of the screen.
- * Performs faster than using gfx_FillCircle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param radius The radius of the circle.
@@ -761,7 +743,6 @@ void gfx_FillCircle_NoClip(uint24_t x,
 /**
  * Draws an unclipped circle outline.
  *
- * This is measured from the top left origin of the screen.
  * Performs faster than using gfx_Circle, but can cause corruption if used outside the bounds of the screen.
  * @param x X coordinate.
  * @param y Y coordinate.
@@ -771,9 +752,48 @@ void gfx_FillCircle_NoClip(uint24_t x,
 gfx_Circle((x), (y), (radius))
 
 /**
+ * Draws an unclipped filled ellipse.
+ *
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
+ * @param a The horizontal radius of the ellipse (current maximum is 128).
+ * @param b The vertical radius of the ellipse (current maximum is 128).
+ */
+void gfx_FillEllipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
+
+/**
+ * Draws a filled ellipse.
+ *
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
+ * @param a The horizontal radius of the ellipse (current maximum is 128).
+ * @param b The vertical radius of the ellipse (current maximum is 128).
+ */
+void gfx_FillEllipse(int24_t x, int24_t y, uint8_t a, uint8_t b);
+
+/**
+ * Draws an unclipped ellipse.
+ *
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
+ * @param a The horizontal radius of the ellipse (current maximum is 128).
+ * @param b The vertical radius of the ellipse (current maximum is 128).
+ */
+void gfx_Ellipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
+
+/**
+ * Draws an ellipse.
+ *
+ * @param x X coordinate of the center.
+ * @param y Y coordinate of the center.
+ * @param a The horizontal radius of the ellipse (current maximum is 128).
+ * @param b The vertical radius of the ellipse (current maximum is 128).
+ */
+void gfx_Ellipse(int24_t x, int24_t y, uint8_t a, uint8_t b);
+
+/**
  * Draws a clipped polygon outline.
  *
- * Points are measured from the top left origin of the screen.
  * @code
  * int points[6] = {
  *                    160,  1,  // (x0, y0)
@@ -791,7 +811,6 @@ void gfx_Polygon(const int *points, unsigned num_points);
 /**
  * Draws an unclipped polygon outline
  *
- * Points are measured from the top left origin of the screen.
  * @code
  * int points[6] = {
  *                    160,  1,  // (x0, y0)
@@ -801,7 +820,7 @@ void gfx_Polygon(const int *points, unsigned num_points);
  * num_points = 3;
  * gfx_Polygon_NoClip(points, num_points)
  *
- * Performs faster than gfx_Polygon, but can cause corruption if used outside the bounds of the screen.
+ * Performs faster than gfx_Polygon, but can cause corruption if used outside the bounds of the clip region.
  * @endcode
  * @param points Pointer to x and y pairs
  * @param num_points Number of x and y pairs
@@ -811,7 +830,6 @@ void gfx_Polygon_NoClip(const int *points, unsigned num_points);
 /**
  * Draws a clipped filled triangle.
  *
- * Points are measured from the top left origin of the screen.
  * @param x0 First X coordinate.
  * @param y0 First Y coordinate.
  * @param x1 Second X coordinate.
@@ -829,8 +847,6 @@ void gfx_FillTriangle(int x0,
 /**
  * Draws a unclipped filled triangle.
  *
- * Points are measured from the top left origin of the screen.
- * Performs faster than gfx_Triangle, but can cause corruption if used outside the bounds of the screen.
  * @param x0 First X coordinate.
  * @param y0 First Y coordinate.
  * @param x1 Second X coordinate.
@@ -1046,7 +1062,6 @@ void gfx_PrintString(const char *string);
  * Prints a string at a specific location.
  *
  * Outputs a string at the supplied coordinates.
- * Position is measured from top left origin of screen.
  * This has the same effect as calling
  * gfx_SetTextXY(x,y);
  * then
@@ -1137,7 +1152,6 @@ void gfx_Sprite(const gfx_sprite_t *sprite, int x, int y);
  * @param sprite Pointer to an initialized sprite structure.
  * @param x X coordinate.
  * @param y Y coordinate.
- * @note If you call the _NoClip version, ensure the sprite is drawn withing the region of the screen. Otherwise, you risk overwriting important data with your sprite.
  */
 void gfx_Sprite_NoClip(const gfx_sprite_t *sprite, uint24_t x, uint8_t y);
 
