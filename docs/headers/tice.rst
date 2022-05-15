@@ -9,11 +9,20 @@ tice.h
 
 This header provides backwards compatibility for code written before the header files were split up.
 
+.. important::
+
+    This header is provided for backwards compatibility only.
+    For new projects, it is recommended that the required header be used directly.
+
 .. contents:: :local:
    :depth: 3
 
-API Documentation
------------------
+Included Header Files
+---------------------
 
-.. doxygenfile:: tice.h
-   :project: CE C/C++ Toolchain
+.. toctree::
+    :maxdepth: 1
+    :glob:
+
+    headers/sys/index
+    headers/ti/index

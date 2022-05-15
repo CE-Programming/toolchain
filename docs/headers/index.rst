@@ -1,7 +1,7 @@
 .. _headers:
 
-CE Toolchain Specific Headers
-=============================
+Miscellaneous Headers
+=====================
 
 These headers are CE specific, and contain various defines and prototypes.
 
@@ -9,6 +9,6 @@ These headers are CE specific, and contain various defines and prototypes.
     :maxdepth: 1
     :glob:
 
-    tice
-    intce
     compression
+    intce
+    tice

@@ -267,6 +267,10 @@ int usleep(useconds_t usec);
  */
 void boot_WaitShort(void);
 
+/* @cond */
+#define timer_GetLow(n) (_Pragma("GCC warning \"'timer_GetLow' is deprecated, use 'timer_Get' or 'timer_GetSafe' instead as appropriate\"") (uint24_t)timer_Get(n))
+/* @endcond */
+
 #ifdef __cplusplus
 }
 #endif
