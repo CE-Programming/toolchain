@@ -89,3 +89,36 @@ These flags are passed to the clang compiler.
 
     CFLAGS = -Wall -Wextra -Oz
     CXXFLAGS = -Wall -Wextra -Oz
+
+LTO
+---
+
+This option is used to enable link-time optimization.
+Depending on the program this can reduce the output size.
+By default this option is enabled.
+
+.. code-block:: makefile
+
+    LTO = YES
+
+PREFER_OS_CRT
+-------------
+
+Prefer the builtin OS CRT functions if they exist.
+This can help to decrease the output size in some circumstances, as a select number of CRT functions will execute from flash.
+By default this option is disabled.
+
+.. code-block:: makefile
+
+    PREFER_OS_CRT = YES
+
+PREFER_OS_LIBC
+--------------
+
+Prefer the builtin OS LIBC functions if they exist.
+This can help to decrease the output size in some circumstances, as a select number of LIBC functions will execute from flash.
+By default this option is enabled.
+
+.. code-block:: makefile
+
+    PREFER_OS_LIBC = YES
