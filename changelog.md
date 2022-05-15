@@ -1,6 +1,43 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v9.2.1...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v10.0...master)
+
+# [v10.0](https://github.com/CE-Programming/toolchain/releases/tag/v10.0) (2021-05-xx)
+
+* **New features**:
+  * Implement 64-bit math support. By @runer112 in https://github.com/CE-Programming/toolchain/pull/354
+  * LTO (link-time optimization) is now available and enabled by default - it may help generating smaller binaries.
+  * `make test` is available for the examples to launch the _autotest_ if available, which uses a now-shipped CLI-based CEmu with the autotester.
+  * A "nightly" automated release is now available for each new commit on the master branch, thanks to @mateoconlechuga 
+  * `alloca` is now available. By @mateoconlechuga and @jacobly0  
+  * More/Better support for C++ in various headers
+
+* **Bugfixes**:
+  * A few bugs in the **ez80-clang** compiler were fixed by @jacobly0 
+  * A few bugs in the tooling _(convimg, convbin...)_ and libload were fixed by @mateoconlechuga 
+  * Pop arguments after calling `_asin` by @PeterTillema in https://github.com/CE-Programming/toolchain/pull/352
+  * Implement `strrchr` since the static zilog one was broken. By @jacobly0 
+  * **std**: Fix various standard defines. By @jacobly0 
+  * Fix `NULL` argument to `strtok` (fix https://github.com/CE-Programming/toolchain/issues/348) by @commandblockguy 
+  * **FileIOC**: Fix return value for ti_RclVar. By @commandblockguy 
+  * Switch addresses of `os_RealAsinRad` and `os_RealAcosRad` by @arjvik in https://github.com/CE-Programming/toolchain/pull/358
+
+* **Improvements**:
+  * Optimize and add static math functions. By @runer112 in https://github.com/CE-Programming/toolchain/pull/354
+  * Complete refactor of the headers to simplify and better split features. By @drdnar in https://github.com/CE-Programming/toolchain/pull/378
+  * Better code generation possible with more section-ing (`section	.text` has to be added in ASM files before code, now)
+  * Two examples/templates are now [available as template repos](https://github.com/CE-Programming/?type=template#org-repositories), make it easier to start developing. Thanks @commandblockguy 
+
+* **Documentation**:
+  * Lots of improvements and details added, following the various refactors listed above, but also typos, clarifications, etc.
+  (By @drdnar mainly, but also @runer112, @tari, @mateoconlechuga, @Dragon-Hatcher, @Chr1sDev, @PeterTillema, @mrwompwomp, @Aulimaitar, @HexCodeFFF)
+  
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v9.2.2...v10.0)
+
+# [v9.2.2](https://github.com/CE-Programming/toolchain/releases/tag/v9.2.2) (2021-09-21)
+
+  - Fix an edge case when creating multiple appvars with convimg
+  - Prevent fileioc from crashing if the user provides an invalid slot
 
 # [v9.2.1](https://github.com/CE-Programming/toolchain/releases/tag/v9.2.1) (2021-09-11)
 
