@@ -57,6 +57,17 @@ jobs:
           pathSource: ${{steps.ez80-clang.outputs.file-path}}
           pathTarget: ${{env.CEDEV_BIN}}
 
+      - name: Download ez80-link
+        id: ez80-link
+        uses: carlosperate/download-file-action@v1.0.3
+        with:
+          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-link${{matrix.exe}}-${{runner.os}}Release
+      - name: Extract ez80-link
+        uses: DuckSoft/extract-7z-action@v1.0
+        with:
+          pathSource: ${{steps.ez80-link.outputs.file-path}}
+          pathTarget: ${{env.CEDEV_BIN}}
+
       - name: Download Fasmg Download Page
         id: fasmg-download
         uses: carlosperate/download-file-action@v1.0.3
@@ -107,6 +118,7 @@ jobs:
       - name: Test Build Dependencies
         run: |
           ez80-clang --version
+          ez80-link --version
           fasmg ${{matrix.nul}} ${{matrix.nul}}
 
       - name: Checkout Toolchain

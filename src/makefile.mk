@@ -29,6 +29,7 @@ INIT_LOC ?= D1A87F
 OUTPUT_MAP ?= YES
 CFLAGS ?= -Wall -Wextra -Oz
 CXXFLAGS ?= -Wall -Wextra -Oz
+LTO ?= YES
 SRCDIR ?= src
 OBJDIR ?= obj
 BINDIR ?= bin
@@ -79,6 +80,7 @@ CONVBIN = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg.exe)
 CEMUTEST = $(call NATIVEPATH,$(BIN)/cemu-autotester.exe)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
+LINK = $(call NATIVEPATH,$(BIN)/ez80-link.exe)
 RM = ( del /q /f $1 2>nul || call )
 RMDIR = ( rmdir /s /q $1 2>nul || call )
 NATIVEMKDR = ( mkdir $1 2>nul || call )
@@ -90,6 +92,7 @@ CONVBIN = $(call NATIVEPATH,$(BIN)/convbin)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg)
 CEMUTEST = $(call NATIVEPATH,$(BIN)/cemu-autotester)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang)
+LINK = $(call NATIVEPATH,$(BIN)/ez80-link)
 RM = rm -f $1
 RMDIR = rm -rf $1
 NATIVEMKDR = mkdir -p $1
@@ -116,24 +119,35 @@ TARGET8XP ?= $(NAME).8xp
 ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
 
 # startup routines
-LDCRT0 ?= $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/crt0.src)
+LDCRT0 = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/crt0.src)
+LDBCLTO = $(OBJDIR)/lto.bc
+LDLTO = $(OBJDIR)/lto.src
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filter $(subst %%,%,%$(subst *,%,$2)),$d)))
 
 # find source files
-CSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_CSOURCES))
-CPPSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CPPSOURCES))
-ASMSOURCES ?= $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
+CSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_CSOURCES))
+CPPSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CPPSOURCES))
+ASMSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
 
 # create links for later
-LINK_CSOURCES ?= $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).src))
-LINK_CPPSOURCES ?= $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).src))
-LINK_ASMSOURCES ?= $(ASMSOURCES)
+ifeq ($(LTO),YES)
+LINK_CSOURCES = $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).bc))
+LINK_CPPSOURCES = $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).bc))
+LINK_ASMSOURCES = $(ASMSOURCES)
+LTOFILES = $(LINK_CSOURCES) $(LINK_CPPSOURCES)
+LDFILES = $(LDCRT0) $(LDLTO) $(LINK_ASMSOURCES)
+DEPFILES ?= $(wildcard $(LINK_CSOURCES:%.bc=%.d) $(LINK_CPPSOURCES:%.bc=%.d))
+else
+LINK_CSOURCES = $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).src))
+LINK_CPPSOURCES = $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).src))
+LINK_ASMSOURCES = $(ASMSOURCES)
+LDFILES = $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
+DEPFILES ?= $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
+endif
 
 # files created to be used for linking
-DEPFILES ?= $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
-LDFILES ?= $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
 LDLIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)
 
 # check if there is an icon present that to convert
@@ -199,7 +213,8 @@ LDHAS_LIBC := 1
 endif
 
 # define the c/c++ flags used by clang
-EZCFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR)
+EZINC = -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR)
+EZCFLAGS = -nostdinc
 EZCFLAGS += -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
@@ -263,16 +278,42 @@ version:
 	$(Q)echo CE C Toolchain $(shell cedev-config --version)
 
 .SECONDEXPANSION:
-$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(MAKEFILE_LIST) $(DEPS)
-	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S -MD $(EZCFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
-$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(MAKEFILE_LIST) $(DEPS)
+# no lto
+$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(EXTRA_USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [compiling] $(call NATIVEPATH,$<)
-	$(Q)$(CC) -S -MD $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+	$(Q)$(CC) -S -MD $(EZINC) $(EZCFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+
+$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)$(CC) -S -MD $(EZINC) $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+
+# lto
+$(LDLTO): $(LDBCLTO)
+	$(Q)$(CC) -S $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(LDBCLTO): $(LTOFILES)
+	$(Q)echo [lto opt] $(call NATIVEPATH,$@)
+	$(Q)$(LINK) $(foreach d,$^,$(call QUOTE_ARG,$(addprefix $(CURDIR)/,$d))) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.$(C_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(EXTRA_USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)$(CC) -MD -c -emit-llvm $(EZINC) $(EZCFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.$(CPP_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_USERHEADERS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)$(CC) -MD -c -emit-llvm $(EZINC) $(EZCXXFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 ifeq ($(filter clean,$(MAKECMDGOALS)),)
+ifeq ($(filter test,$(MAKECMDGOALS)),)
+ifeq ($(filter gfx,$(MAKECMDGOALS)),)
+ifeq ($(filter version,$(MAKECMDGOALS)),)
 include $(DEPFILES)
+endif
+endif
+endif
 endif
