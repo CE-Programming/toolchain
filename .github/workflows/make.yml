@@ -12,7 +12,6 @@ on:
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
-  AUTOTESTER_PATH: ${{github.workspace}}/CEmu/tests/autotester
   AUTOTESTER_ROM: ${{github.workspace}}/secrets/84pce_515_53.rom
   CEDEV: ${{github.workspace}}/CEdev
   CEDEV_BIN: ${{github.workspace}}/CEdev/bin
@@ -83,6 +82,24 @@ jobs:
           pathTarget: ${{env.FASMG_PATH}}
       - name: Setup Fasmg
         run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
+
+      - name: Checkout CEmu
+        uses: actions/checkout@v2.3.4
+        with:
+          repository: ${{github.repository_owner}}/CEmu
+          ref: latest-stable
+          path: ${{env.CEMU_PATH}}
+          persist-credentials: false
+      - name: Build CEmu
+        run: make -j4 -C ${{env.CEMU_PATH}}/core
+      - name: Build Autotester CLI
+        run: make -j4 -C ${{github.workspace}}/CEmu/tests/autotester
+      - name: Move Autotester CLI
+        if: runner.os == 'Windows'
+        run: move ${{github.workspace}}/CEmu/tests/autotester/autotester.exe ${{env.CEDEV_BIN}}/cemu-autotester.exe
+      - name: Move Autotester CLI
+        if: runner.os != 'Windows'
+        run: mv ${{github.workspace}}/CEmu/tests/autotester/autotester ${{env.CEDEV_BIN}}/cemu-autotester
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
@@ -197,21 +214,6 @@ jobs:
           name: examples-${{runner.os}}
           path: ${{env.CEDEV_EXAMPLES}}
 
-      - name: Checkout CEmu
-        if: github.event_name != 'pull_request'
-        uses: actions/checkout@v2.3.4
-        with:
-          repository: ${{github.repository_owner}}/CEmu
-          ref: latest-stable
-          path: ${{env.CEMU_PATH}}
-          persist-credentials: false
-      - name: Build CEmu
-        if: github.event_name != 'pull_request'
-        run: make -j4 -C ${{env.CEMU_PATH}}/core
-      - name: Build Autotester CLI
-        if: github.event_name != 'pull_request'
-        run: make -j4 -C ${{env.AUTOTESTER_PATH}}
-
       - name: Download Secrets
         if: github.event_name != 'pull_request'
         id: download-secrets
@@ -243,8 +245,7 @@ jobs:
           find ${{env.CEDEV_EXAMPLES}} -name autotest.json -print0 | {
             failed=0
             while read -d '' test; do
-              cmake -E echo "Launching autotester on $test"
-              ${{env.AUTOTESTER_PATH}}/autotester "$test" || cmake -E true $((failed += $?))
+              make -C $(dirname $test) test || cmake -E true $((failed += $?))
             done
             cmake -E echo "$failed tests failed"
             exit $failed
@@ -254,8 +255,7 @@ jobs:
         run: |
           $failed = 0
           foreach ($test in get-childitem "${{env.CEDEV_EXAMPLES}}" -recurse -include autotest.json) {
-            cmake -E echo "Launching autotester on $test"
-            ${{env.AUTOTESTER_PATH}}\autotester.exe "$test"
+            make -C (split-path -path $test) test
             $failed += $lastexitcode
           }
           cmake -E echo "$failed tests failed"
@@ -266,8 +266,7 @@ jobs:
           find ${{env.CEDEV_TEST}} -name autotest.json -print0 | {
             failed=0
             while read -d '' test; do
-              cmake -E echo "Launching autotester on $test"
-              ${{env.AUTOTESTER_PATH}}/autotester "$test" || cmake -E true $((failed += $?))
+              make -C $(dirname $test) test || cmake -E true $((failed += $?))
             done
             cmake -E echo "$failed tests failed"
             exit $failed
@@ -277,8 +276,7 @@ jobs:
         run: |
           $failed = 0
           foreach ($test in get-childitem "${{env.CEDEV_TEST}}" -recurse -include autotest.json) {
-            cmake -E echo "Launching autotester on $test"
-            ${{env.AUTOTESTER_PATH}}\autotester.exe "$test"
+            make -C (split-path -path $test) test
             $failed += $lastexitcode
           }
           cmake -E echo "$failed tests failed"

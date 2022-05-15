@@ -77,6 +77,7 @@ NATIVEPATH = $(subst /,\,$1)
 FASMG = $(call NATIVEPATH,$(BIN)/fasmg.exe)
 CONVBIN = $(call NATIVEPATH,$(BIN)/convbin.exe)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg.exe)
+CEMUTEST = $(call NATIVEPATH,$(BIN)/cemu-autotester.exe)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
 RM = ( del /q /f $1 2>nul || call )
 RMDIR = ( rmdir /s /q $1 2>nul || call )
@@ -87,6 +88,7 @@ NATIVEPATH = $(subst \,/,$1)
 FASMG = $(call NATIVEPATH,$(BIN)/fasmg)
 CONVBIN = $(call NATIVEPATH,$(BIN)/convbin)
 CONVIMG = $(call NATIVEPATH,$(BIN)/convimg)
+CEMUTEST = $(call NATIVEPATH,$(BIN)/cemu-autotester)
 CC = $(call NATIVEPATH,$(BIN)/ez80-clang)
 RM = rm -f $1
 RMDIR = rm -rf $1
@@ -253,6 +255,9 @@ clean:
 
 gfx:
 	$(Q)$(GFXCMD)
+
+test:
+	$(Q)$(CEMUTEST) $(call NATIVEPATH,$(CURDIR)/autotest.json)
 
 version:
 	$(Q)echo CE C Toolchain $(shell cedev-config --version)
