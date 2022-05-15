@@ -610,7 +610,7 @@ void gfx_Line_NoClip(uint24_t x0,
 /**
  * Draws a horizontal line.
  *
- * This routine is a faster than gfx_Line for horizontal lines.
+ * This routine is faster than gfx_Line for horizontal lines.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -622,7 +622,7 @@ void gfx_HorizLine(int x,
 /**
  * Draws an unclipped horizontal line.
  *
- * This routine is a faster than gfx_Line_NoClip for horizontal lines.
+ * This routine is faster than gfx_Line_NoClip for horizontal lines.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -634,7 +634,7 @@ void gfx_HorizLine_NoClip(uint24_t x,
 /**
  * Draws a vertical line
  *
- * This routine is a faster than gfx_Line for vertical lines.
+ * This routine is faster than gfx_Line for vertical lines.
  * @param x X coordinate
  * @param y Y coordinate
  * @param length Length of line
@@ -646,7 +646,7 @@ void gfx_VertLine(int x,
 /**
  * Draws an unclipped vertical line.
  *
- * This routine is a faster than gfx_Line_NoClip for vertical lines.
+ * This routine is faster than gfx_Line_NoClip for vertical lines.
  * @param x X coordinate.
  * @param y Y coordinate.
  * @param length Length of line.
@@ -759,7 +759,7 @@ gfx_Circle((x), (y), (radius))
  * @param a The horizontal radius of the ellipse (current maximum is 128).
  * @param b The vertical radius of the ellipse (current maximum is 128).
  */
-void gfx_FillEllipse_NoClip(uint24_t x, uint24_t y, uint24_t a, uint24_t b);
+void gfx_FillEllipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
 
 /**
  * Draws a filled ellipse.
@@ -779,7 +779,7 @@ void gfx_FillEllipse(int24_t x, int24_t y, uint24_t a, uint24_t b);
  * @param a The horizontal radius of the ellipse (current maximum is 128).
  * @param b The vertical radius of the ellipse (current maximum is 128).
  */
-void gfx_Ellipse_NoClip(uint24_t x, uint24_t y, uint24_t a, uint24_t b);
+void gfx_Ellipse_NoClip(uint24_t x, uint24_t y, uint8_t a, uint8_t b);
 
 /**
  * Draws an ellipse.
