@@ -333,12 +333,12 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          github_token: ${{secrets.GITHUB_TOKEN}}
           branch: gh-pages
           folder: ${{env.TOOLCHAIN_PATH}}/docs/build/html
-          git-config-email: <>
-          git-config-name: github-pages-deploy
-          single-commit: true
+          git_config_email: <>
+          git_config_name: github-pages-deploy
+          single_commit: true
           clean: true
 
   nightly:
