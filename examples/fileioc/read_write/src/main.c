@@ -12,7 +12,7 @@ int main(void)
     os_ClrHome();
 
     /* Open a new variable; deleting it if it already exists */
-    var = ti_Open("AppVar", "w");
+    var = ti_Open("AppVar", "w+");
     if (var == 0)
     {
         return 1;
