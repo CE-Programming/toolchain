@@ -357,11 +357,17 @@ jobs:
         with:
           name: CEdev-Windows
           path: ${{github.workspace}}
+      - name: Download CE Libraries
+        uses: actions/download-artifact@v2
+        with:
+          name: clibs
+          path: ${{github.workspace}}
 
       - name: Rename Artifacts
         run: |
           mv CEdev-Linux.tar.gz CEdev-Linux-nightly.tar.gz
           mv CEdev-Windows.zip CEdev-Windows-nightly.zip
+          mv clibs.8xg clibs-nightly.8xg
 
       - name: Update nightly release
         uses: pyTooling/Actions/releaser@main
@@ -372,3 +378,4 @@ jobs:
           files: |
             CEdev-Linux-nightly.tar.gz
             CEdev-Windows-nightly.zip
+            clibs-nightly.8xg
