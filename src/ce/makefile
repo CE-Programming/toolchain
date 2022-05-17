@@ -17,9 +17,9 @@
 include $(CURDIR)/../common.mk
 
 WILDCARD_SRC = $(wildcard *.src)
-WILDCARD_H = $(wildcard include/*.h)
-WILDCARD_HW_H = $(wildcard include/sys/*.h)
-WILDCARD_TI_H = $(wildcard include/ti/*.h include/ti/real)
+WILDCARD_H = $(wildcard $(call NATIVEPATH,include/*.h))
+WILDCARD_HW_H = $(wildcard $(call NATIVEPATH,include/sys/*.h))
+WILDCARD_TI_H = $(wildcard $(call NATIVEPATH,include/ti/*.h)) $(call NATIVEPATH,include/ti/real)
 
 all:
 
