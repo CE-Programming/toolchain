@@ -54,7 +54,7 @@ COPYDIR ?= ( xcopy $1 $2 /S /Q /Y /I /K 1>nul 2>nul || call )
 DESTDIR ?=
 PREFIX ?= C:
 QUOTE_ARG  ?= "$(subst ",',$1)"#'
-APPEND ?= echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
+APPEND ?= $(Q)echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
 RELEASE_NAME = windows
 else
 FASMG ?= fasmg
@@ -70,7 +70,7 @@ COPYDIR ?= cp -r $1 $2
 DESTDIR ?=
 PREFIX ?= $(HOME)
 QUOTE_ARG ?= '$(subst ','\'',$1)'#'
-APPEND ?= echo $(call QUOTE_ARG,$1) >>$@
+APPEND ?= $(Q)echo $(call QUOTE_ARG,$1) >>$@
 ifeq ($(shell uname -s),Darwin)
 MACOS := 1
 RELEASE_NAME = macos
@@ -86,6 +86,7 @@ INSTALL_EXAMPLES := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/examples))
 INSTALL_LIB := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libload))
 INSTALL_CRT := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/crt))
 INSTALL_LIBC := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libc))
+INSTALL_LIBCXX := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libcxx))
 INSTALL_CE := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/ce))
 INSTALL_BIN := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/bin))
 INSTALL_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include))

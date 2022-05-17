@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2020
+# Copyright (C) 2015-2022
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,14 +18,11 @@ include $(CURDIR)/../../src/common.mk
 
 INCLUDE_DIR := $(call NATIVEPATH,../../src/include)
 INCLUDE_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ez80.inc tiformat.inc)
-INSTALL_SRC := $(addprefix $(call NATIVEPATH,fasmg-ez80/), commands.alm ez80.alm ld.alm)
 
 all:
 	$(Q)$(call COPY,$(INCLUDE_SRC),$(INCLUDE_DIR))
 
-install:
-	$(Q)$(call MKDIR,$(INSTALL_META))
-	$(Q)$(call MKDIR,$(INSTALL_BIN))
-	$(Q)$(call COPY,$(INSTALL_SRC),$(INSTALL_META))
+clean:
+	$(Q)$(call RMDIR,build)
 
-.PHONY: all install
+.PHONY: all install clean

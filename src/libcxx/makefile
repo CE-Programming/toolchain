@@ -24,7 +24,7 @@ EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
 EZCXXFLAGS += -isystem ../libcxx/include
 
 WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
-WILDCARD_H := $(wildcard include/*.h)
+WILDCARD_H := $(wildcard include/*)
 
 all: $(BUILD_SRC)
 
@@ -41,8 +41,8 @@ clean:
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_H))
-	$(Q)$(call MKDIR,$(INSTALL_LIBC))
-	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_LIBC))
+	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
+	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_LIBCXX))
 	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
 
 .PHONY: all clean

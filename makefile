@@ -17,6 +17,8 @@
 include $(CURDIR)/src/common.mk
 
 LIBS := libload graphx fontlibc keypadc fileioc
+SRCS := ce crt libc libcxx
+TOOLS := fasmg convbin convimg convfont cedev-config
 
 ifeq ($(OS),Windows_NT)
 WINDOWS_COPY := $(call COPY,tools\windows\make.exe,$(INSTALL_BIN)) && $(call COPY,tools\windows\cedev.bat,$(INSTALL_DIR))
@@ -24,38 +26,21 @@ else
 WINDOWS_COPY :=
 endif
 
-LIB_DIR = $(call NATIVEPATH,src/$1)
+SRCDIR = $(call NATIVEPATH,src/$1)
+TOOLSDIR = $(call NATIVEPATH,tools/$1)
 
-all: cedev-config convbin convimg convfont crt libc $(LIBS)
+all: $(TOOLS) $(SRCS) $(LIBS)
 
-crt: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/crt)
+$(TOOLS): check
+	$(Q)$(MAKE) -C $(call TOOLSDIR,$@)
 
-libc: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/libc)
-
-fasmg: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg)
-
-convbin: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) release
-
-convimg: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) release
-
-convfont: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont)
-
-cedev-config: check
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/cedev-config)
+$(SRCS):
+	$(Q)$(MAKE) -C $(call SRCDIR,$@)
 
 $(LIBS): fasmg
-	$(Q)$(MAKE) -C $(call LIB_DIR,$@)
+	$(Q)$(MAKE) -C $(call SRCDIR,$@)
 
-$(addprefix clean-,$(LIBS)):
-	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst clean-%,%,$@)) clean
-
-install: all install-fasmg install-crt install-libc install-ce $(addprefix install-,$(LIBS))
+install: all $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
 	$(Q)$(MAKE) -f linker.mk -C src
 	$(Q)$(call MKDIR,$(INSTALL_DIR))
 	$(Q)$(call MKDIR,$(INSTALL_BIN))
@@ -68,70 +53,48 @@ install: all install-fasmg install-crt install-libc install-ce $(addprefix insta
 	$(Q)$(call COPYDIR,$(call NATIVEPATH,examples/*),$(INSTALL_EXAMPLES))
 	$(Q)$(call COPY,$(call NATIVEPATH,src/makefile.mk),$(INSTALL_META))
 	$(Q)$(call COPY,$(call NATIVEPATH,src/linker_script),$(INSTALL_META))
+	$(Q)$(call COPY,$(call NATIVEPATH,tools/fasmg/fasmg-ez80/commands.alm),$(INSTALL_META))
+	$(Q)$(call COPY,$(call NATIVEPATH,tools/fasmg/fasmg-ez80/ez80.alm),$(INSTALL_META))
+	$(Q)$(call COPY,$(call NATIVEPATH,tools/fasmg/fasmg-ez80/ld.alm),$(INSTALL_META))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convfont/convfont),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convimg/bin/convimg),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convbin/bin/convbin),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/cedev-config/bin/cedev-config),$(INSTALL_BIN))
 	$(Q)$(WINDOWS_COPY)
 
-$(addprefix install-,$(LIBS)): fasmg
-	$(Q)$(MAKE) -C $(call LIB_DIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+$(addprefix install-,$(SRCS)): $(TOOLS)
+	$(Q)$(MAKE) -C $(call SRCDIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
-install-fasmg:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/fasmg) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+$(addprefix install-,$(LIBS)): $(TOOLS)
+	$(Q)$(MAKE) -C $(call SRCDIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
-install-crt:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/crt) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-
-install-libc:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/libc) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-
-install-ce:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/ce) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-
-uninstall:
-	$(Q)$(call RMDIR,$(INSTALL_DIR))
-
-libs: $(LIBS) convbin
+libs: $(LIBS) $(TOOLS)
 	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract \
-		$(foreach library,$(LIBS),$(addprefix --input ,$(call LIB_DIR,$(library))/$(library).8xv)) --output $(call NATIVEPATH,clibs.8xg)
+		$(foreach library,$(LIBS),$(addprefix --input ,$(call SRCDIR,$(library))/$(library).8xv)) --output $(call NATIVEPATH,clibs.8xg)
 
-docs:
-	$(Q)$(MAKE) -C docs html
-
-clean: clean-crt clean-libc $(addprefix clean-,$(LIBS))
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convbin) clean
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convimg) clean
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/convfont) clean
-	$(Q)$(MAKE) -C $(call NATIVEPATH,tools/cedev-config) clean
+clean: $(addprefix clean-,$(TOOLS)) $(addprefix clean-,$(SRCS)) $(addprefix clean-,$(LIBS))
 	$(Q)$(call REMOVE,src/linker_script)
 	$(Q)$(call REMOVE,clibs.8xg)
 	$(Q)$(call RMDIR,docs/build)
 	$(Q)$(call RMDIR,docs/doxygen)
 
-clean-crt:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/crt) clean
+$(addprefix clean-,$(LIBS)):
+	$(Q)$(MAKE) -C $(call SRCDIR,$(patsubst clean-%,%,$@)) clean
 
-clean-libc:
-	$(Q)$(MAKE) -C $(call NATIVEPATH,src/libc) clean
+$(addprefix clean-,$(SRCS)):
+	$(Q)$(MAKE) -C $(call SRCDIR,$(patsubst clean-%,%,$@)) clean
+
+$(addprefix clean-,$(TOOLS)):
+	$(Q)$(MAKE) -C $(call TOOLSDIR,$(patsubst clean-%,%,$@)) clean
 
 check:
 	$(Q)$(EZCC) --version || ( echo Please install ez80-clang && exit 1 )
 	$(Q)$(FASMG) $(NULL) $(NULL) || ( echo Please install fasmg && exit 1 )
 
-help:
-	@echo Helpful targets:
-	@echo   all
-	@echo   check
-	@echo   libs
-	@echo   docs
-	@echo   clean
-	@echo   install
-	@echo   uninstall
-	@echo   help
+docs:
+	$(Q)$(MAKE) -C docs html
 
-.PHONY: $(LIBS)
-.PHONY: install-fasmg install-crt install-libc install-ce $(addprefix install-,$(LIBS))
-.PHONY: check clean clean-crt clean-libc $(addprefix clean-,$(LIBS))
-.PHONY: all help install uninstall libs docs
-.PHONY: fasmg convbin convimg convfont
+.PHONY: $(LIBS) $(SRCS)
+.PHONY: $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
+.PHONY: $(addprefix clean-,$(SRCS)) $(addprefix clean-,$(LIBS))
+.PHONY: all check clean install libs docs

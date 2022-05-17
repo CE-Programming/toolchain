@@ -43,6 +43,7 @@ HAS_UPPERCASE_NAME ?= YES
 HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
 HAS_LIBC ?= YES
+HAS_LIBCXX ?= YES
 PREFER_OS_CRT ?= NO
 PREFER_OS_LIBC ?= YES
 #----------------------------
@@ -61,6 +62,7 @@ LDDEBUG := 0
 LDPREFER_OS_CRT := 0
 LDPREFER_OS_LIBC := 0
 LDHAS_LIBC := 0
+LDHAS_LIBCXX := 0
 
 # verbosity
 V ?= 0
@@ -211,6 +213,9 @@ endif
 ifeq ($(HAS_LIBC),YES)
 LDHAS_LIBC := 1
 endif
+ifeq ($(HAS_LIBCXX),YES)
+LDHAS_LIBCXX := 1
+endif
 
 # define the c/c++ flags used by clang
 EZINC = -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR)
@@ -225,6 +230,7 @@ FASMGFLAGS = \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
 	-i $(call QUOTE_ARG,HAS_LIBC := $(LDHAS_LIBC)) \
+	-i $(call QUOTE_ARG,HAS_LIBCXX := $(LDHAS_LIBCXX)) \
 	-i $(call QUOTE_ARG,PREFER_OS_CRT := $(LDPREFER_OS_CRT)) \
 	-i $(call QUOTE_ARG,PREFER_OS_LIBC := $(LDPREFER_OS_LIBC)) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \

@@ -21,6 +21,7 @@ APPEND_FILES = $(foreach file,$(addprefix ../lib/$2/,$(notdir $3)),$(call APPEND
 
 CRT_FILES := $(filter-out crt/crt0.src,$(wildcard crt/*.src) $(patsubst crt/%,crt/build/%.src,$(wildcard crt/*.c crt/*.cpp)))
 LIBC_FILES := $(wildcard libc/*.src) $(patsubst libc/%,libc/build/%.src,$(wildcard libc/*.c libc/*.cpp))
+LIBCXX_FILES := $(wildcard libcxx/*.src) $(patsubst libcxx/%,libcxx/build/%.src,$(wildcard libcxx/*.c libcxx/*.cpp))
 CE_FILES := $(wildcard ce/*.src)
 
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
@@ -59,4 +60,7 @@ linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(Q)$(call APPEND_FILES,source ,ce,$(sort $(CE_FILES)))
 	$(Q)$(call APPEND,if HAS_LIBC)
 	$(Q)$(call APPEND_FILES,	source ,libc,$(sort $(LIBC_FILES)))
+	$(Q)$(call APPEND,end if)
+	$(Q)$(call APPEND,if HAS_LIBCXX)
+	$(Q)$(call APPEND_FILES,	source ,libcxx,$(sort $(LIBCXX_FILES)))
 	$(Q)$(call APPEND,end if)

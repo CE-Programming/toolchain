@@ -16,15 +16,12 @@
 
 include $(CURDIR)/../common.mk
 
-TARGETS := sys ti
-
-WILDCARD_SRC := $(wildcard *.src)
-WILDCARD_H := $(wildcard *.h *.hpp)
+WILDCARD_SRC = $(wildcard *.src)
+WILDCARD_H = $(wildcard include/*.h)
+WILDCARD_HW_H = $(wildcard include/sys/*.h)
+WILDCARD_TI_H = $(wildcard include/ti/*.h include/ti/real)
 
 all:
-
-$(addprefix install-,$(TARGETS)):
-	$(Q)$(MAKE) -C $(patsubst install-%,%,$@) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 install: $(addprefix install-,$(TARGETS))
 	$(Q)$(call MKDIR,$(INSTALL_H))
@@ -32,6 +29,11 @@ install: $(addprefix install-,$(TARGETS))
 	$(Q)$(call MKDIR,$(INSTALL_HW_H))
 	$(Q)$(call MKDIR,$(INSTALL_CE))
 	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_H))
+	$(Q)$(call COPY,$(WILDCARD_HW_H),$(INSTALL_HW_H))
+	$(Q)$(call COPY,$(WILDCARD_TI_H),$(INSTALL_TI_H))
 	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_CE))
 
-.PHONY: all install $(addprefix install-,$(TARGETS))
+clean:
+	$(Q)$(call RMDIR,build)
+
+.PHONY: all install clean
