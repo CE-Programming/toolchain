@@ -17,9 +17,9 @@
 include $(CURDIR)/../common.mk
 
 WILDCARD_SRC = $(wildcard *.src)
-WILDCARD_H = $(wildcard $(call NATIVEPATH,include/*.h))
-WILDCARD_HW_H = $(wildcard $(call NATIVEPATH,include/sys/*.h))
-WILDCARD_TI_H = $(wildcard $(call NATIVEPATH,include/ti/*.h)) $(call NATIVEPATH,include/ti/real)
+WILDCARD_H = $(wildcard include/*.h)
+WILDCARD_HW_H = $(wildcard include/sys/*.h)
+WILDCARD_TI_H = $(wildcard include/ti/*.h) include/ti/real
 
 all:
 
@@ -28,9 +28,9 @@ install: $(addprefix install-,$(TARGETS))
 	$(Q)$(call MKDIR,$(INSTALL_TI_H))
 	$(Q)$(call MKDIR,$(INSTALL_HW_H))
 	$(Q)$(call MKDIR,$(INSTALL_CE))
-	$(Q)$(call COPY,$(WILDCARD_H),$(INSTALL_H))
-	$(Q)$(call COPY,$(WILDCARD_HW_H),$(INSTALL_HW_H))
-	$(Q)$(call COPY,$(WILDCARD_TI_H),$(INSTALL_TI_H))
+	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
+	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_HW_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_HW_H))
+	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_TI_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_TI_H))
 	$(Q)$(call COPY,$(WILDCARD_SRC),$(INSTALL_CE))
 
 clean:
