@@ -170,7 +170,7 @@ FULL_PATH_NAMES        = YES
 # will be relative from the directory where doxygen is started.
 # This tag requires that the tag FULL_PATH_NAMES is set to YES.
 
-STRIP_FROM_PATH        = ../src/ce \
+STRIP_FROM_PATH        = ../src/ce/include \
                          ../src/keypadc \
                          ../src/graphx \
                          ../src/fileioc \
@@ -837,29 +837,29 @@ INPUT                  = ../src/graphx/graphx.h \
                          ../src/keypadc/keypadc.h \
                          ../src/fileioc/fileioc.h \
                          ../src/fontlibc/fontlibc.h \
-                         ../src/ce/debug.h \
-                         ../src/ce/tice.h \
-                         ../src/ce/intce.h \
-                         ../src/ce/compression.h \
-                         ../src/ce/sys/basicusb.h \
-                         ../src/ce/sys/lcd.h \
-                         ../src/ce/sys/power.h \
-                         ../src/ce/sys/rtc.h \
-                         ../src/ce/sys/timers.h \
-                         ../src/ce/sys/util.h \
-                         ../src/ce/ti/debug.h \
-                         ../src/ce/ti/error.h \
-                         ../src/ce/ti/flags.h \
-                         ../src/ce/ti/getcsc.h \
-                         ../src/ce/ti/getkey.h \
-                         ../src/ce/ti/screen.h \
-                         ../src/ce/ti/hooks.h \
-                         ../src/ce/ti/info.h \
-                         ../src/ce/ti/python.h \
-                         ../src/ce/ti/real.h \
-                         ../src/ce/ti/tokens.h \
-                         ../src/ce/ti/ui.h \
-                         ../src/ce/ti/vars.h
+                         ../src/ce/include/debug.h \
+                         ../src/ce/include/tice.h \
+                         ../src/ce/include/intce.h \
+                         ../src/ce/include/compression.h \
+                         ../src/ce/include/sys/basicusb.h \
+                         ../src/ce/include/sys/lcd.h \
+                         ../src/ce/include/sys/power.h \
+                         ../src/ce/include/sys/rtc.h \
+                         ../src/ce/include/sys/timers.h \
+                         ../src/ce/include/sys/util.h \
+                         ../src/ce/include/ti/debug.h \
+                         ../src/ce/include/ti/error.h \
+                         ../src/ce/include/ti/flags.h \
+                         ../src/ce/include/ti/getcsc.h \
+                         ../src/ce/include/ti/getkey.h \
+                         ../src/ce/include/ti/screen.h \
+                         ../src/ce/include/ti/hooks.h \
+                         ../src/ce/include/ti/info.h \
+                         ../src/ce/include/ti/python.h \
+                         ../src/ce/include/ti/real.h \
+                         ../src/ce/include/ti/tokens.h \
+                         ../src/ce/include/ti/ui.h \
+                         ../src/ce/include/ti/vars.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
