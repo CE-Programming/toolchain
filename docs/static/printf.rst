@@ -7,7 +7,7 @@ What's the deal with printf?
 ----------------------------
 
 The `printf` and related functions (`sprintf`, `vsprintf`, etc.) are based on a relatively `small implementation <https://github.com/CE-Programming/toolchain/blob/master/src/std/shared/nanoprintf.c>`_.
-However, they contribute around 7.5KiB to the resultant program.
+However, they contribute around 8 KiB to the resultant program.
 It is highly recommended to not use `printf` and related functions at all because of this.
 If you insist on using these functions, this page details how to do so in the next section.
 

@@ -5,7 +5,7 @@
 
 if PREFER_OS_CRT
 
-__idvrmu	:= 000144h
+__idvrmu := 000144h
 
 else
 

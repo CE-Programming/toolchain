@@ -5,8 +5,8 @@
 
 if PREFER_OS_LIBC
 
-_atoff	:= 022110h
-_atof	:= _atoff
+_atoff := 022110h
+_atof := _atoff
 
 else
 

@@ -5,8 +5,8 @@
 
 if PREFER_OS_LIBC
 
-_ceilf	:= 022114h
-_ceil	:= _ceilf
+_ceilf := 022114h
+_ceil := _ceilf
 
 else
 

@@ -5,8 +5,8 @@
 
 if PREFER_OS_CRT
 
-__imuls	:= 000154h
-__imulu	:= 000158h
+__imuls := 000154h
+__imulu := 000158h
 
 else
 

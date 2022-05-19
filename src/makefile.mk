@@ -61,6 +61,7 @@ CCDEBUG := -g0
 LDDEBUG := 0
 LDPREFER_OS_CRT := 0
 LDPREFER_OS_LIBC := 0
+LDHAS_PRINTF := 0
 LDHAS_LIBC := 0
 LDHAS_LIBCXX := 0
 
@@ -193,11 +194,6 @@ ifeq ($(OUTPUT_MAP),YES)
 LDMAPFLAG := -i map
 endif
 
-# selectively include embedded printf functionality
-ifeq ($(HAS_PRINTF),YES)
-DEFPRINTF := -DHAS_PRINTF=1
-endif
-
 # support custom file io configuration
 ifeq ($(HAS_CUSTOM_FILE),YES)
 DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
@@ -216,11 +212,14 @@ endif
 ifeq ($(HAS_LIBCXX),YES)
 LDHAS_LIBCXX := 1
 endif
+ifeq ($(HAS_PRINTF),YES)
+LDHAS_PRINTF := 1
+endif
 
 # define the c/c++ flags used by clang
 EZINC = -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR)
 EZCFLAGS = -nostdinc
-EZCFLAGS += -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFPRINTF) $(DEFCUSTOMFILE) $(CCDEBUG)
+EZCFLAGS += -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D_EZ80 -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCXXFLAGS = $(EZCFLAGS) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZCFLAGS += $(CFLAGS)
 
@@ -229,6 +228,7 @@ FASMGFLAGS = \
 	-n \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
+	-i $(call QUOTE_ARG,HAS_PRINTF := $(LDHAS_PRINTF)) \
 	-i $(call QUOTE_ARG,HAS_LIBC := $(LDHAS_LIBC)) \
 	-i $(call QUOTE_ARG,HAS_LIBCXX := $(LDHAS_LIBCXX)) \
 	-i $(call QUOTE_ARG,PREFER_OS_CRT := $(LDPREFER_OS_CRT)) \

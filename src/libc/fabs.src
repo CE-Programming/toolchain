@@ -5,8 +5,8 @@
 
 if PREFER_OS_LIBC
 
-_fabsf	:= 0220F0h
-_fabs	:= _fabsf
+_fabsf := 0220F0h
+_fabs := _fabsf
 
 else
 

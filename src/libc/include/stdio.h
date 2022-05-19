@@ -83,7 +83,6 @@ int putchar(int character);
 
 int puts(const char *str);
 
-#ifdef HAS_PRINTF
 int printf(const char *__restrict format, ...)
     __attribute__((format(__printf__, 1, 2)));
 
@@ -100,11 +99,7 @@ int snprintf(char* buffer, size_t count, const char *__restrict format, ...)
 int vsnprintf(char* buffer, size_t count, const char *__restrict format,
     va_list va)
     __attribute__((format(__printf__, 3, 0)));
-#else
-#define sprintf __sprintf
-#endif /* HAS_PRINTF */
 
-/* This function is embedded in the OS, but only supports a subset of printf */
 int sprintf(char *__restrict buffer,
     const char *__restrict format, ...)
     __attribute__ ((format (__printf__, 2, 3)));

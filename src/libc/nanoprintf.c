@@ -975,7 +975,7 @@ int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
 #undef NPF_EXTRACT
 #undef NPF_WRITEBACK
 
-int printf(char const *format, ...) {
+int _printf_c(char const *format, ...) {
   va_list val;
   va_start(val, format);
   int const rv = vprintf(format, val);
@@ -983,7 +983,7 @@ int printf(char const *format, ...) {
   return rv;
 }
 
-int vsnprintf(char *buffer, size_t bufsz, char const *format, va_list vlist) {
+int _vsnprintf_c(char *buffer, size_t bufsz, char const *format, va_list vlist) {
   npf_bufputc_ctx_t bufputc_ctx;
   bufputc_ctx.dst = buffer;
   bufputc_ctx.len = bufsz;
@@ -1002,7 +1002,7 @@ int vsnprintf(char *buffer, size_t bufsz, char const *format, va_list vlist) {
   return n;
 }
 
-int snprintf(char *buffer, size_t bufsz, const char *format, ...) {
+int _snprintf_c(char *buffer, size_t bufsz, const char *format, ...) {
   va_list val;
   va_start(val, format);
   int const rv = vsnprintf(buffer, bufsz, format, val);
@@ -1010,17 +1010,17 @@ int snprintf(char *buffer, size_t bufsz, const char *format, ...) {
   return rv;
 }
 
-int vsprintf(char *buffer, const char *format, va_list vlist)
+int _vsprintf_c(char *buffer, const char *format, va_list vlist)
 {
   return vsnprintf(buffer, (size_t)-1, format, vlist);
 }
 
-int vprintf(const char *format, va_list vlist)
+int _vprintf_c(const char *format, va_list vlist)
 {
   return npf_vpprintf(npf_putc_std, NULL, format, vlist);
 }
 
-int sprintf(char *buffer, const char *format, ...)
+int _sprintf_c(char *buffer, const char *format, ...)
 {
   va_list va;
   va_start(va, format);

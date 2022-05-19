@@ -5,8 +5,8 @@
 
 if PREFER_OS_LIBC
 
-_cosf	:= 02211Ch
-_cos	:= _cosf
+_cosf := 02211Ch
+_cos := _cosf
 
 else
 

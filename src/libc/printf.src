@@ -1,0 +1,33 @@
+	assume	adl=1
+
+	section	.text
+	public	_sprintf
+
+if HAS_PRINTF
+
+	public	_printf
+	public	_vprintf
+	public	_vsprintf
+	public	_snprintf
+	public	_vsnprintf
+
+_printf := __printf_c
+_vprintf := __vprintf_c
+_vsprintf := __vsprintf_c
+_snprintf := __snprintf_c
+_vsnprintf := __vsnprintf_c
+_sprintf := __sprintf_c
+
+	extern	__printf_c
+	extern	__vprintf_c
+	extern	__vsprintf_c
+	extern	__snprintf_c
+	extern	__vsnprintf_c
+	extern	__sprintf_c
+
+else
+
+_sprintf := 0000BCh
+
+end if
+

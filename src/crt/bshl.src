@@ -5,7 +5,7 @@
 
 if PREFER_OS_CRT
 
-__bshl	:= 000100h
+__bshl := 000100h
 
 else
 

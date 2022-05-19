@@ -5,7 +5,7 @@
 
 if PREFER_OS_CRT
 
-__iand	:= 000134h
+__iand := 000134h
 
 else
 
