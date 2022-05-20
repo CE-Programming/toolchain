@@ -3,25 +3,30 @@
 	section	.text
 	public	__bpopcnt
 __bpopcnt:
-	push	bc
-	ld	c,a		; c=(A|B|C|D|E|F|G|H)
-	and	a,$aa		; a=(A|0|C|0|E|0|G|0)
-	cpl			; a=(~A|1|~C|1|~E|1|~G|1)
-	rrca			; a=(1|~A|1|~C|1|~E|1|~G), cf=1
-	adc	a,c		; a=(A+B|C+D|E+F|G+H)
-	ld	b,a		; b=(A+B|C+D|E+F|G+H)
-	and	a,$33		; a=(00|C+D|00|G+H)
-	ld	c,a		; c=(00|C+D|00|G+H)
-	xor	a,b		; a=(A+B|00|E+F|00)
-	rrca
-	rrca			; a=(00|A+B|00|E+F)
-	add	a,c		; a=(A+B+C+D|E+F+G+H)
-	ld	c,a		; c=(A+B+C+D|E+F+G+H)
-	rrca
-	rrca
-	rrca
-	rrca			; a=(E+F+G+H|A+B+C+D)
-	add	a,c		; a=(A+B+C+D+E+F+G+H|A+B+C+D+E+F+G+H)
-	and	a,$f		; a=A+B+C+D+E+F+G+H
-	pop	bc
+	push	hl
+	ld	l, a
+	ld	h, 0
+
+	; Multiplying HL by 2 increases H by H+(L>>7).
+	; Use A to track these values of H to cancel from each iteration.
+	; On the first iteration H is 0, so skip subtracting it.
+	add	hl, hl
+	sub	a, h
+	add	hl, hl
+	sub	a, h
+	add	hl, hl
+	sub	a, h
+	add	hl, hl
+	sub	a, h
+	add	hl, hl
+	sub	a, h
+	add	hl, hl
+	sub	a, h
+	add	hl, hl
+	sub	a, h
+	; Note that the value of H after the 8th shift would be equivalent to the
+	; initial value of A, so instead of shifting and adding H to A at the end,
+	; simply offset from the initial value of A from the beginning.
+
+	pop	hl
 	ret

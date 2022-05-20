@@ -3,32 +3,22 @@
 	section	.text
 	public	__lpopcnt
 __lpopcnt:
-	push	bc
-	ld	b, 4
-	public	__lpopcnt.hijack1
-.hijack1:
 	push	hl
-	xor	a, a
-	ld	c, a
-.loop:
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	add	hl, hl
-	adc	a, c
-	ld	l, e
-	djnz	.loop
+	; Calculate 8-popcount(L)-popcount(HLU), and set HLU=H
+	call	__popcnt_common_init_full
+	; Save the current count in H
+	ld	h, a
+	; Prepare to accumulate 8-popcount(E)-popcount(HLU)
+	ld	a, e
+	cpl
+	ld	l, a
+	; Subtract output carry and an additional H, the adjusted call adds H*2-L
+	sbc	a, h
+	call	__popcnt_common_iter_adjusted
+	; Subtract final value from 16, and accumulate output carry
+	cpl
+	adc	a, 17
 	pop	hl
-	pop	bc
 	ret
+
+	extern	__popcnt_common_init_full, __popcnt_common_iter_adjusted
