@@ -4,7 +4,7 @@
 	public	__ipopcnt_fast
 __ipopcnt_fast:
 	; Inlined implementation of __ipopcnt
-	push	hl
+	; Destroys: HL
 	ld	a, l
 	cpl
 	ld	l, a
@@ -46,5 +46,4 @@ __ipopcnt_fast:
 	add	hl, hl
 	cpl
 	adc	a, 9
-	pop	hl
 	ret

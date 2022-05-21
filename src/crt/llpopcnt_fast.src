@@ -3,17 +3,14 @@
 	section	.text
 	public	__llpopcnt_fast
 __llpopcnt_fast:
+	; Destroys: HL, DE
 	call	__lpopcnt_fast
-	push	de
-	push	hl
 	ex	de, hl
 	ld	l, b
 	ld	e, c
 	ld	d, a
 	call	__lpopcnt_fast
 	add	a, d
-	pop	hl
-	pop	de
 	ret
 
 	extern	__lpopcnt_fast
