@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+	public	__llpopcnt_fast
+__llpopcnt_fast:
+	; Destroys: HL, DE
+	call	__lpopcnt_fast
+	ex	de, hl
+	ld	l, b
+	ld	e, c
+	ld	d, a
+	call	__lpopcnt_fast
+	add	a, d
+	ret
+
+	extern	__lpopcnt_fast

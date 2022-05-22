@@ -1,23 +1,37 @@
 	assume	adl=1
 
 	section	.text
-	public	__spopcnt_fast
-__spopcnt_fast:
-	; Inlined implementation of __spopcnt
+	public	__lpopcnt_fast
+__lpopcnt_fast:
+	; Inlined implementation of __lpopcnt
 	; Destroys: HL
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-
-	ld	a, h
-	ld	h, l
+	ld	a, l
 	cpl
 	ld	l, a
+	sub	a, h
+	sub	a, h
+
+	add	hl, hl
+	sbc	a, h
+	add	hl, hl
+	sbc	a, h
+	add	hl, hl
+	sbc	a, h
+	add	hl, hl
+	sbc	a, h
+	add	hl, hl
+	sbc	a, h
+	add	hl, hl
+	sbc	a, h
+	add	hl, hl
+	sbc	a, h
+
+	add	hl, hl
+	ld	h, a
+	ld	a, e
+	cpl
+	ld	l, a
+	sbc	a, h
 
 	add	hl, hl
 	sbc	a, h
@@ -36,5 +50,5 @@ __spopcnt_fast:
 
 	add	hl, hl
 	cpl
-	adc	a, 9
+	adc	a, 17
 	ret
