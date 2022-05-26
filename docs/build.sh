@@ -27,6 +27,7 @@ cp -f templates/versions.html /tmp/versions.html
 
 # Maps target directory name to branch
 declare -A versions_map=(
+	[v10.0]=v10.0
 	[v9.2]=v9.2-docs
 	[v9.1]=v9.1
 	[v9.0]=v9.0
@@ -38,7 +39,7 @@ export versions="${!versions_map[@]}"
 
 # Also build the latest version at the root (which shouldn't be listed
 # in the list of versions since it duplicates the chosen one).
-default_version=v9.2
+default_version=v10.0
 versions_map[.]="${versions_map[$default_version]}"
 
 for target_dir in "${!versions_map[@]}"
