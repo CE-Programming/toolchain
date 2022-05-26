@@ -59,3 +59,4 @@ breathe_projects = {}
 breathe_default_project = 'CE C/C++ Toolchain'
 subprocess.call('doxygen doxyfile', shell=True)
 breathe_projects['CE C/C++ Toolchain'] = 'doxygen/xml'
+breathe_projects['CE C Toolchain'] = 'doxygen/xml'
