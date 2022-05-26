@@ -156,7 +156,7 @@ typedef struct {
  * only way to read a font's cap_height, x_height, and baseline_height metrics.
  *
  * For example:
- * @code
+ * @code{.cpp}
  *  unsigned char baseline;
  *  fontlib_font_t *my_font = fontlib_GetFontByStyle("FONTPACK", 12, 12,
  *      FONTLIB_NORMAL, FONTLIB_NORMAL, FONTLIB_SERIF, 0);
@@ -238,7 +238,7 @@ typedef struct {
  * This is the format of a font pack appvar.
  * Parsing this directly is the only way to get metadata other than the typeface
  * name.
- * @code
+ * @code{.cpp}
  *  FILE font_pack_file;
  *  fontlib_font_pack_t *font_pack;
  *  fontlib_metadata_t *metadata;

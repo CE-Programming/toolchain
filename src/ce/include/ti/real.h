@@ -40,7 +40,7 @@ typedef struct { real_t real, imag; } cplx_t;
  * Contains data used by the statistics package.
  * If you use this area, mark it invalid:
  * 
- * @code
+ * @code{.cpp}
  * #include <ti/vars.h>
  * // . . .
  * os_DelRes();

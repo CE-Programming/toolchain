@@ -29,7 +29,7 @@ void os_ThrowError(uint8_t error) __attribute__((noreturn));
  * Second return only happens if an error occurs before os_PopErrorHandler is called,
  * with the errNo as the return value.
  *
- * @code
+ * @code{.cpp}
  * int errno = os_PushErrorHandler();
  * if (errno) {
  *     // handle error, but no longer under the protection of the error handler so do not call os_PopErrorHandler()

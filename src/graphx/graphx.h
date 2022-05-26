@@ -3,7 +3,7 @@
  * @brief graphx contains optimized graphics operations and routines.
  *
  * The below example template shows the best graphx buffer usage pattern:
- * @code
+ * @code{.cpp}
  * // Standard #includes omitted
  *
  * bool partial_redraw;
@@ -155,7 +155,7 @@ gfx_sprite_t *gfx_AllocSprite(uint8_t width,
  * @return A pointer to the allocated sprite, or NULL if the allocation failed.
  * @see gfx_AllocSprite
  */
-#define gfx_MallocSprite(width, height) \
+#define /* gfx_sprite_t * */gfx_MallocSprite(width, height) \
 gfx_AllocSprite(width, height, malloc)
 
 /**
@@ -794,7 +794,7 @@ void gfx_Ellipse(int24_t x, int24_t y, uint24_t a, uint24_t b);
 /**
  * Draws a clipped polygon outline.
  *
- * @code
+ * @code{.cpp}
  * int points[6] = {
  *                    160,  1,  // (x0, y0)
  *                    1,  238,  // (x1, y1)
@@ -811,7 +811,7 @@ void gfx_Polygon(const int *points, unsigned num_points);
 /**
  * Draws an unclipped polygon outline
  *
- * @code
+ * @code{.cpp}
  * int points[6] = {
  *                    160,  1,  // (x0, y0)
  *                    1,  238,  // (x1, y1)

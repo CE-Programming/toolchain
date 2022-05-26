@@ -91,7 +91,7 @@ typedef enum {
 /**
  * Keypad Data registers
  *
- * \verbatim embed:rst:leading-asterisk
+ * \rst
  *
  * +--------+------------+------------+------------+------------+------------+------------+------------+------------+
  * | Offset | Bit 0      | Bit 1      | Bit 2      | Bit 3      |  Bit 4     |  Bit 5     |  Bit 6     | Bit 7      |
@@ -123,22 +123,20 @@ typedef enum {
  * | 7      | kb_Down    | kb_Left    | kb_Right   | kb_Up      |            |            |            |            |
  * +--------+------------+------------+------------+------------+------------+------------+------------+------------+
  *
- * \endverbatim
+ * \endrst
  *
  * These data registers can be indexed as a normal array. For example, to check the status of the '2nd' key:
- * @code
+ * @code{.cpp}
  *  if (kb_Data[1] & kb_2nd) {
  *      ...
  *  }
  * @endcode
  *
  * Likewise, you can test keys with the following general format:
- * @code
+ * @code{.cpp}
  *  if (kb_Data[group] & kb_Name){
  *      ...
  *  }
- *
- *
  * @endcode
  *
  * @see kb_On
@@ -151,7 +149,7 @@ typedef enum {
  * @note Scanning mode does not matter.
  * @note The ON key is not wired as part of the normal key matrix. The ON key must be checked separately from the
  * other keys with kb_On:
- * @code
+ * @code{.cpp}
  *  int main(void) {
  *      kb_DisableOnLatch();
  *      ...

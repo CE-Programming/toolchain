@@ -56,13 +56,13 @@ void os_ResetFlagBits(int16_t offset_pattern);
  * 
  * For example, instead of:
  * 
- * @code
+ * @code{.cpp}
  * os_SetFlagByte(OS_FLAGS_INDIC, OS_FLAGS_INDIC_ENABLE);
  * @endcode
  * 
  * you can do:
  * 
- * @code
+ * @code{.cpp}
  * os_SetFlag(INDIC, ENABLE);
  * @endcode
  * 

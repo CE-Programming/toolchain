@@ -1,5 +1,5 @@
 docutils==0.16
-sphinx==3.3.1
+sphinx==4.5.0
 sphinx_rtd_theme==1.0.0
-breathe==4.22.0
-Jinja2==3.0.3
+breathe==4.33.1
+Jinja2==3.1.2

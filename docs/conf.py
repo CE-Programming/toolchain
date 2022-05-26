@@ -57,6 +57,8 @@ for version in versions:
 
 breathe_projects = {}
 breathe_default_project = 'CE C/C++ Toolchain'
+breathe_show_define_initializer = True
+breathe_show_enumvalue_initializer = True
 subprocess.call('doxygen doxyfile', shell=True)
 breathe_projects['CE C/C++ Toolchain'] = 'doxygen/xml'
 breathe_projects['CE C Toolchain'] = 'doxygen/xml'

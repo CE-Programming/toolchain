@@ -85,7 +85,7 @@ allowing TI to add new functionality written in C to their old Z80 assembly code
 The eZ80 expands the memory space from 64 K to 16 MB, allowing easy access to all of the calculator's memory.
 Unfortunately, while the Z80 has perfectly-sensible 16-bit addresses, with an address being two bytes in size,
 the eZ80 uses 24-bit addresses, meaning each address is three bytes long.
-This is an unusual size, and it also results in the C toolchaing having 24-bit-size :code:`int` .
+This is an unusual size, and it also results in the toolchain having 24-bit-size :code:`int` .
 
 Consequently, the eZ80 can natively access variables that are either one byte (8 bits, :code:`char`) or three bytes (24 bits, :code:`int`) in size,
 but two-byte (16 bits, :code:`short`) and four-byte (32 bits, :code:`long`) variables are actually a little slower for the CPU to access.

@@ -46,24 +46,25 @@ extern "C" {
  * Opens an AppVar for reading, writing, and/or appending.
  * AppVars may be stored in either the archive (aka flash memory), or in RAM.
  * Depending on the mode used to open the AppVar it may be moved from archive memory into RAM.
- *
- * @param name Name of AppVar to open.
- * @param mode Documented in the below table.
- * \verbatim embed:rst:leading-asterisk
+ * \rst
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ *   | **mode**     | **Description**                                                                                                                 |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
  *   | "r"          | Read mode. If the AppVar does not exist :code:`0` is returned. The AppVar is not moved from its storage location.               |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
- *   | "w"          | Write mode. Deletes any existing AppVar and creates the AppVar.                                                                 |
+ *   | "w"          | Write mode. Deletes any existing AppVar and creates the AppVar in RAM.                                                          |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
- *   | "a"          | Append mode. Data is written to the end of the AppVar. The AppVar is created if it does not exist.                              |
+ *   | "a"          | Append mode. The AppVar is created if it does not exist. If the AppVar is stored in the archive it is moved to RAM.             |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
  *   | "r+"         | Read/Write mode. If the AppVar does not exist :code:`0` is returned. If the AppVar is stored in the archive it is moved to RAM. |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
- *   | "w+"         | Write/Read mode. Deletes any existing AppVar and creates the AppVar.                                                            |
+ *   | "w+"         | Write/Read mode. Deletes any existing AppVar and creates the AppVar in RAM.                                                     |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
- *   | "a+"         | Read/Append mode. The AppVar is created if it does not exist. If the AppVar is stored in the archive it is moved to RAM.        |
+ *   | "a+"         | Append/Read mode. The AppVar is created if it does not exist. If the AppVar is stored in the archive it is moved to RAM.        |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
- * \endverbatim
+ * \endrst
+ * @param name Name of AppVar to open.
+ * @param mode Documented in the above table.
  * @returns AppVar variable handle, or `0` (zero) on error.
  */
 uint8_t ti_Open(const char *name, const char *mode);
@@ -72,24 +73,25 @@ uint8_t ti_Open(const char *name, const char *mode);
  * Opens a variable for reading, writing, and/or appending.
  * Variables may be stored in either the archive (aka flash memory), or in RAM.
  * Depending on the mode used to open the variable it may be moved from archive memory into RAM.
- *
- * @param name Name of variable to open.
- * @param mode Documented in the below table.
- * \verbatim embed:rst:leading-asterisk
+ * \rst
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ *   | **mode**     | **Description**                                                                                                                     |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
  *   | "r"          | Read mode. If the variable does not exist :code:`0` is returned. The variable is not moved from its storage location.               |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
- *   | "w"          | Write mode. Deletes any existing variable and creates the variable.                                                                 |
+ *   | "w"          | Write mode. Deletes any existing variable and creates the variable in RAM.                                                          |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
- *   | "a"          | Append mode. Data is written to the end of the variable. The variable is created if it does not exist.                              |
+ *   | "a"          | Append mode. The variable is created if it does not exist. If the variable is stored in the archive it is moved to RAM.             |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
  *   | "r+"         | Read/Write mode. If the variable does not exist :code:`0` is returned. If the variable is stored in the archive it is moved to RAM. |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
- *   | "w+"         | Write/Read mode. Deletes any existing variable and creates the variable.                                                            |
+ *   | "w+"         | Write/Read mode. Deletes any existing variable and creates the variable in RAM.                                                     |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
- *   | "a+"         | Read/Append mode. The variable is created if it does not exist. If the variable is stored in the archive it is moved to RAM.        |
+ *   | "a+"         | Append/Read mode. The variable is created if it does not exist. If the variable is stored in the archive it is moved to RAM.        |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
- * \endverbatim
+ * \endrst
+ * @param name Name of variable to open.
+ * @param mode Documented in the above table.
  * @param type Variable type.
  * @returns AppVar variable handle, or `0` (zero) on error.
  */
@@ -108,7 +110,7 @@ int ti_Close(uint8_t handle);
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
- * @code
+ * @code{.cpp}
  * char *var_name;
  * void *vat_ptr = NULL;
  *
@@ -129,7 +131,7 @@ char *ti_Detect(void **vat_ptr, const char *detect_string);
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
- * @code
+ * @code{.cpp}
  * char *var_name;
  * void *vat_ptr = NULL;
  *
@@ -151,7 +153,7 @@ char *ti_DetectVar(void **vat_ptr, const char *detect_string, uint8_t var_type);
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
- * @code
+ * @code{.cpp}
  * uint8_t var_type;
  * char *var_name;
  * void *vat_ptr = NULL;
@@ -220,7 +222,7 @@ int ti_GetC(uint8_t handle);
  *
  * @param offset Number of bytes to offest from (can be negative).
  * @param origin Documented in the below table.
- * \verbatim embed:rst:leading-asterisk
+ * \rst
  *   +--------------+-------------------------------------------------------+
  *   | SEEK_SET (0) | Seek from beginning of AppVar/variable.               |
  *   +--------------+-------------------------------------------------------+
@@ -228,7 +230,7 @@ int ti_GetC(uint8_t handle);
  *   +--------------+-------------------------------------------------------+
  *   | SEEK_END (2) | Seek from end of AppVar/variable.                     |
  *   +--------------+-------------------------------------------------------+
- * \endverbatim
+ * \endrst
  * @param handle AppVar/variable handle.
  * @returns `EOF` on failure.
  */
