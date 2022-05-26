@@ -315,7 +315,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Sphinx Dependencies
-          pip install -r ${{env.TOOLCHAIN_PATH}}/docs/requirements.txt
+        run: pip install -r ${{env.TOOLCHAIN_PATH}}/docs/requirements.txt
 
       - name: Build Website Documentation
         run: make -C ${{env.TOOLCHAIN_PATH}} docs
