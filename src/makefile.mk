@@ -281,7 +281,7 @@ test:
 	$(Q)$(CEMUTEST) $(call NATIVEPATH,$(CURDIR)/autotest.json)
 
 version:
-	$(Q)echo CE C Toolchain $(shell cedev-config --version)
+	$(Q)echo CE C/C++ Toolchain $(shell cedev-config --version)
 
 .SECONDEXPANSION:
 
