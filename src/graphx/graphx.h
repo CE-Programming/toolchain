@@ -58,7 +58,7 @@ extern "C" {
  * are those with a certain color index, which can be set with
  * gfx_SetTransparentColor().
  *
- * @attention
+ * @note
  * Displaying a gfx_rletsprite_t (which includes transparency) is significantly
  * faster than displaying a gfx_sprite_t with transparency, and should be
  * preferred. However, gfx_rletsprite_t does not support transformations, such
@@ -155,7 +155,7 @@ gfx_sprite_t *gfx_AllocSprite(uint8_t width,
  * @return A pointer to the allocated sprite, or NULL if the allocation failed.
  * @see gfx_AllocSprite
  */
-#define /* gfx_sprite_t * */gfx_MallocSprite(width, height) \
+#define gfx_MallocSprite(width, height) \
 gfx_AllocSprite(width, height, malloc)
 
 /**

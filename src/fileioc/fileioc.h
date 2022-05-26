@@ -18,20 +18,18 @@
 extern "C" {
 #endif
 
-#define TI_PRGM_TYPE            (0x05) /**< Normal unprotect program */
-#define TI_PPRGM_TYPE           (0x06) /**< Normal protected program */
-#define TI_TPRGM_TYPE           (0x16) /**< Normal temporary program */
+#define TI_PRGM_TYPE            (0x05) /**< Unprotected program */
+#define TI_PPRGM_TYPE           (0x06) /**< Protected program */
+#define TI_TPRGM_TYPE           (0x16) /**< Temporary program */
 #define TI_APPVAR_TYPE          (0x15) /**< AppVar */
 #define TI_STRING_TYPE          (0x04) /**< String */
 #define TI_EQU_TYPE             (0x03) /**< Equation */
 #define TI_ANS_TYPE             (0x00) /**< Ans */
-/* @cond */
-#define TI_REAL_LIST_TYPE       (0x01)
-#define TI_CPLX_LIST_TYPE       (0x0D)
-#define TI_REAL_TYPE            (0x00)
-#define TI_CPLX_TYPE            (0x0C)
-#define TI_MATRIX_TYPE          (0x02)
-/* @endcond */
+#define TI_REAL_LIST_TYPE       (0x01) /**< Real variable list */
+#define TI_CPLX_LIST_TYPE       (0x0D) /**< Complex variable list */
+#define TI_REAL_TYPE            (0x00) /**< Real variable */
+#define TI_CPLX_TYPE            (0x0C) /**< Complex variable */
+#define TI_MATRIX_TYPE          (0x02) /**< Matrix variable */
 
 #define TI_MAX_SIZE             (65505) /**< Maximum variable size */
 
@@ -63,8 +61,8 @@ extern "C" {
  *   | "a+"         | Append/Read mode. The AppVar is created if it does not exist. If the AppVar is stored in the archive it is moved to RAM.        |
  *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
  * \endrst
- * @param name Name of AppVar to open.
- * @param mode Documented in the above table.
+ * @param[in] name Name of AppVar to open.
+ * @param[in] mode Documented in the above table.
  * @returns AppVar variable handle, or `0` (zero) on error.
  */
 uint8_t ti_Open(const char *name, const char *mode);
@@ -90,10 +88,10 @@ uint8_t ti_Open(const char *name, const char *mode);
  *   | "a+"         | Append/Read mode. The variable is created if it does not exist. If the variable is stored in the archive it is moved to RAM.        |
  *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
  * \endrst
- * @param name Name of variable to open.
- * @param mode Documented in the above table.
- * @param type Variable type.
- * @returns AppVar variable handle, or `0` (zero) on error.
+ * @param[in] name Name of variable to open.
+ * @param[in] mode Documented in the above table.
+ * @param[in] type Variable type.
+ * @returns Variable handle, or `0` (zero) on error.
  */
 uint8_t ti_OpenVar(const char *name, const char *mode, uint8_t type);
 
@@ -101,12 +99,15 @@ uint8_t ti_OpenVar(const char *name, const char *mode, uint8_t type);
  * Closes an open AppVar/variable handle.
  * This must be performed for every ti_Open or ti_OpenVar call.
  *
+ * @param[in] handle AppVar/variable handle.
  * @returns `0` (zero) on error.
  */
 int ti_Close(uint8_t handle);
 
 /**
- * Locates AppVars that contain the string as the first part of the variable.
+ * Locates AppVars stored in archive and RAM.
+ * This function searches for AppVars whose data section begins with a specific string.
+ * The null terminator of the string is not included in the search.
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
@@ -120,14 +121,19 @@ int ti_Close(uint8_t handle);
  * }
  * @endcode
  *
- * @param vat_ptr Current offset in the VAT.
- * @param detect_string String to search for (NULL to search for all).
+ * @param[in] vat_ptr Current offset in the VAT.
+ * @param[in] detect_string String to search for (NULL to search for all).
+ * @returns The AppVar name. This should be duplicated to another buffer
+ *          as subsequent calls of this function change the name stored at the
+ *          returned pointer's address.
  * @note If the return value is NULL, there are no more variables to find.
  */
 char *ti_Detect(void **vat_ptr, const char *detect_string);
 
 /**
- * Locates variables that contain the string as the first part of the variable.
+ * Locates variables stored in archive and RAM.
+ * This function searches for variables whose data section begins with a specific string.
+ * The null terminator of the string is not included in the search.
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
@@ -141,15 +147,20 @@ char *ti_Detect(void **vat_ptr, const char *detect_string);
  * }
  * @endcode
  *
- * @param vat_ptr Current offset in the VAT.
- * @param detect_string String to search for (NULL to search for all).
- * @param var_type Type of variable to detect.
+ * @param[in,out] vat_ptr Current offset in the VAT.
+ * @param[in] detect_string String to search for (NULL to search for all).
+ * @param[in] var_type Type of variable to detect.
+ * @returns The variable name. This should be duplicated to another buffer
+ *          as subsequent calls of this function change the name stored at the
+ *          returned pointer's address.
  * @note If the return value is NULL, there are no more variables to find.
  */
 char *ti_DetectVar(void **vat_ptr, const char *detect_string, uint8_t var_type);
 
 /**
- * Locates variables that contain the string as the first part of the variable.
+ * Locates any variables stored in archive and RAM.
+ * This function searches for variables whose data section begins with a specific string.
+ * The null terminator of the string is not included in the search.
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
@@ -167,9 +178,12 @@ char *ti_DetectVar(void **vat_ptr, const char *detect_string, uint8_t var_type);
  * }
  * @endcode
  *
- * @param vat_ptr Current offset in the VAT.
- * @param detect_string String to search for (NULL to search for all).
- * @param var_type Type of variable found.
+ * @param[in,out] vat_ptr Current offset in the VAT.
+ * @param[in] detect_string String to search for (NULL to search for all).
+ * @param[out] var_type Type of variable found.
+ * @returns The variable name. This should be duplicated to another buffer
+ *          as subsequent calls of this function change the name stored at the
+ *          returned pointer's address.
  * @note If the return value is NULL, there are no more variables to find.
  */
 char *ti_DetectAny(void **vat_ptr, const char *detect_string, uint8_t *var_type);
@@ -177,11 +191,10 @@ char *ti_DetectAny(void **vat_ptr, const char *detect_string, uint8_t *var_type)
 /**
  * Writes data to an AppVar/variable handle.
  *
- * @param data Pointer to data structure(s).
- * @param size Size (in bytes) of a single \p data structure.
- * @param count Number of \p data structures to write.
- * @param handle AppVar/variable handle.
- *
+ * @param[in] data Pointer to data structure(s).
+ * @param[in] size Size (in bytes) of a single \p data structure.
+ * @param[in] count Number of \p data structures to write.
+ * @param[in] handle AppVar/variable handle.
  * @returns Number of data structures written; equals count on success.
  */
 size_t ti_Write(const void *data, size_t size, size_t count, uint8_t handle);
@@ -189,11 +202,10 @@ size_t ti_Write(const void *data, size_t size, size_t count, uint8_t handle);
 /**
  * Reads data from an AppVar/variable handle.
  *
- * @param data Pointer to data structure(s).
- * @param size Size (in bytes) of a single \p data structure.
- * @param count Number of \p data structures to write.
- * @param handle AppVar/variable handle.
- *
+ * @param[out] data Pointer to data structure(s).
+ * @param[in] size Size (in bytes) of a single \p data structure.
+ * @param[in] count Number of \p data structures to write.
+ * @param[in] handle AppVar/variable handle.
  * @returns Number of data structures written; equals count on success.
  */
 size_t ti_Read(void *data, size_t size, size_t count, uint8_t handle);
@@ -201,9 +213,8 @@ size_t ti_Read(void *data, size_t size, size_t count, uint8_t handle);
 /**
  * Writes a character to an AppVar/variable handle.
  *
- * @param ch Character to write.
- * @param handle AppVar/variable handle.
- *
+ * @param[in] ch Character to write.
+ * @param[in] handle AppVar/variable handle.
  * @returns `EOF` on error, or \p ch.
  */
 int ti_PutC(char ch, uint8_t handle);
@@ -211,38 +222,36 @@ int ti_PutC(char ch, uint8_t handle);
 /**
  * Reads a character from an AppVar/variable handle.
  *
- * @param handle AppVar/variable handle.
- *
+ * @param[in] handle AppVar/variable handle.
  * @returns `EOF` on error, or a valid character.
  */
 int ti_GetC(uint8_t handle);
 
 /**
  * Seeks to an offset in the file.
- *
- * @param offset Number of bytes to offest from (can be negative).
- * @param origin Documented in the below table.
  * \rst
- *   +--------------+-------------------------------------------------------+
- *   | SEEK_SET (0) | Seek from beginning of AppVar/variable.               |
- *   +--------------+-------------------------------------------------------+
- *   | SEEK_CUR (1) | Seek from current AppVar/variable offset.             |
- *   +--------------+-------------------------------------------------------+
- *   | SEEK_END (2) | Seek from end of AppVar/variable.                     |
- *   +--------------+-------------------------------------------------------+
+ *   +----------------------+-------------------------------------------------------+
+ *   | **origin**           | **Description**                                       |
+ *   +----------------------+-------------------------------------------------------+
+ *   | SEEK_SET (:code:`0`) | Seek from beginning of AppVar/variable.               |
+ *   +----------------------+-------------------------------------------------------+
+ *   | SEEK_CUR (:code:`1`) | Seek from current AppVar/variable offset.             |
+ *   +----------------------+-------------------------------------------------------+
+ *   | SEEK_END (:code:`2`) | Seek from end of AppVar/variable.                     |
+ *   +----------------------+-------------------------------------------------------+
  * \endrst
- * @param handle AppVar/variable handle.
+ * @param[in] offset Number of bytes to offest from (can be negative).
+ * @param[in] origin Documented in the above table.
+ * @param[in] handle AppVar/variable handle.
  * @returns `EOF` on failure.
  */
 int ti_Seek(int offset, unsigned int origin, uint8_t handle);
 
 /**
  * Seeks to the start of an AppVar/variable's data.
+ * Functionally equivalent to <tt>ti_Seek(0, SEEK_SET, handle)</tt>
  *
- * Functionally equivalent to <tt>ti_Seek(0, SEEK_SET, slot)</tt>
- *
- * @param handle AppVar/variable handle.
- *
+ * @param[in] handle AppVar/variable handle.
  * @returns `EOF` on failure.
  */
 int ti_Rewind(uint8_t handle);
@@ -250,8 +259,7 @@ int ti_Rewind(uint8_t handle);
 /**
  * Gets the current data offset from the start of an AppVar/variable.
  *
- * @param handle AppVar/variable handle.
- *
+ * @param[in] handle AppVar/variable handle.
  * @returns The current data offset from the start of the AppVar/variable.
  */
 uint16_t ti_Tell(uint8_t handle);
@@ -259,8 +267,7 @@ uint16_t ti_Tell(uint8_t handle);
 /**
  * Gets the size of an AppVar/variable.
  *
- * @param handle AppVar/variable handle.
- *
+ * @param[in] handle AppVar/variable handle.
  * @returns The size of the AppVar/variable.
  */
 uint16_t ti_GetSize(uint8_t handle);
@@ -268,9 +275,8 @@ uint16_t ti_GetSize(uint8_t handle);
 /**
  * Resizes an AppVar/variable.
  *
- * @param handle AppVar/variable handle.
- * @param size New AppVar/variable size.
- *
+ * @param[in] handle AppVar/variable handle.
+ * @param[in] size New AppVar/variable size.
  * @returns Resized size on success, `0` on failure, or `-1` if the AppVar/variable cannot be opened.
  */
 int ti_Resize(size_t size, uint8_t handle);
@@ -278,25 +284,24 @@ int ti_Resize(size_t size, uint8_t handle);
 /**
  * Checks if an AppVar/variable is stored in archive memory.
  *
- * @param handle AppVar/variable handle.
- *
- * @returns `0` if the slot is not in the archive.
+ * @param[in] handle AppVar/variable handle.
+ * @returns `0` if the AppVar/variable is not in the archive.
  */
 int ti_IsArchived(uint8_t handle);
 
 /**
  * Moves an AppVar/variable between archive or RAM storage.
- *
- * @param archive Documented in the below table.
- * \verbatim embed:rst:leading-asterisk
- *   +-------+-----------------------------------------+
- *   | true  | Store AppVar/variable in archive.       |
- *   +-------+-----------------------------------------+
- *   | false | Store AppVar/variable in RAM.           |
- *   +-------+-----------------------------------------+
- * \endverbatim
- * @param handle AppVar/variable handle.
- *
+ * \rst
+ *   +-------------+-----------------------------------------+
+ *   | **archive** | **Description**                         |
+ *   +-------------+-----------------------------------------+
+ *   | true        | Store AppVar/variable in archive.       |
+ *   +-------------+-----------------------------------------+
+ *   | false       | Store AppVar/variable in RAM.           |
+ *   +-------------+-----------------------------------------+
+ * \endrst
+ * @param[in] archive Documented in the above table.
+ * @param[in] handle AppVar/variable handle.
  * @returns `0` on failure.
  *
  * @warning Archiving a variable can cause a garbage collection cycle.
@@ -307,8 +312,7 @@ int ti_SetArchiveStatus(bool archive, uint8_t handle);
 /**
  * Deletes an AppVar.
  *
- * @param name AppVar name.
- *
+ * @param[in] name AppVar name.
  * @returns `0` on failure.
  */
 int ti_Delete(const char *name);
@@ -316,135 +320,169 @@ int ti_Delete(const char *name);
 /**
  * Deletes a variable.
  *
- * @param name Variable name.
- * @param type Variable type.
- *
+ * @param[in] name Variable name.
+ * @param[in] type Variable type.
  * @returns `0` on failure.
  */
 int ti_DeleteVar(const char *name, uint8_t type);
 
 /**
  * Gets the string used for displaying a TI token.
+ * The TI calculators encode programs and other variables in "tokens", which are
+ * either 1 or 2 bytes in length. For example, the token :code:`0x21`
+ * corresponds to the string :code:`mean(` in TI-BASIC programs. This allows
+ * program size to be reduced as the whole string is not stored - but requires
+ * additional decoding in order to resolve the token's string representation.
  *
- * @param length_of_string Pointer to variable to hold length of resulting string (Can be NULL).
- * @param length_of_token Pointer to variable to hold length of the token, used for determining the next read location (Can be NULL).
- * @param read_pointer Address of pointer to data to read.
+ * @param[in,out] read_pointer Address of pointer to data to read.
+ * @returns A pointer to a null-terminated string used for displaying a TI token.
+ * @param[out] token_len Pointer to variable to hold length of the token,
+ * used for determining the next read location (Can be NULL if unused).
+ * @param[out] str_len Pointer to variable to hold length of resulting
+ * string (Can be NULL if unused). The returned string is static, and should be
+ * copied to another buffer as needed if it needs to be preserved across
+ * function calls.
  *
- * @returns A pointer to string used for displaying a TI token.
- * @note read_pointer is updated to the next token, depending on if it is 1 or 2 bytes in length
+ * @note \p read_pointer is automatically updated to point to the next token,
+ * incremented by the value of \p token_len.
  */
-char *ti_GetTokenString(void **read_pointer, uint8_t *length_of_token, unsigned int *length_of_string);
+char *ti_GetTokenString(void **read_pointer, uint8_t *token_len, unsigned int *str_len);
 
 /**
  * Gets a direct data pointer to the current offset in an AppVar/variable.
- * This may be used for direct reading/writing without the need for an extra copy.
- * It is easily prone to memory corruption if not used correctly, so use at your own risk.
+ * This may be used for direct reading/writing without the need for an extra
+ * copy. It is easily prone to memory corruption if not used correctly, so use
+ * at your own risk.
  *
- * @param handle AppVar/variable handle.
- *
+ * @param[in] handle AppVar/variable handle.
  * @returns Pointer to AppVar/variable data.
  *
- * @note This function is potentially unsafe to use as variables may be shifted around in memory, causing this pointer
- * to become invalid and potentially corrupt memory. Avoid creating, deleting, or modifying any variables while this
- * pointer is being used to prevent this issue.
+ * @note If the AppVar is in RAM, the direct pointer can be used to read/modify
+ * its contents directly, with the caveat that the AppVar must be large enough
+ * to consume any writes. If the AppVar is in the archive, direct reading is
+ * possible but writes will lead to a system reset.
+ *
+ * @warning This function is potentially unsafe to use as variables may be
+ * shifted around in memory, causing this pointer to become invalid and
+ * potentially corrupt memory. Avoid creating, deleting, resizing, or changing
+ * the storage location any variables while this pointer is being actively used.
  */
 void *ti_GetDataPtr(uint8_t handle);
 
 /**
  * Gets a pointer to the VAT entry of an AppVar/variable.
  *
- * @param handle AppVar/variable handle.
+ * @param[in] handle AppVar/variable handle.
+ * @returns VAT location of the variable.
  *
- * @returns VAT location of slot variable.
+ * @note If the variable is in RAM, the direct pointer can be used to
+ * read/modify its contents directly, with the caveat that the AppVar must be
+ * large enough to consume any writes. If the AppVar is in the archive, direct
+ * reading is possible but writes will lead to a system reset.
  *
- * @note This function is potentially unsafe to use as variables may be shifted around in memory, causing this pointer
- * to become invalid and potentially corrupt memory. Avoid creating, deleting, or modifying any variables while this
- * pointer is being used to prevent this issue.
+ * @warning This function is potentially unsafe to use as variables may be
+ * shifted around in memory, causing this pointer to become invalid and
+ * potentially corrupt memory. Avoid creating, deleting, resizing, or changing
+ * the storage location any variables while this pointer is being actively used.
  */
 void *ti_GetVATPtr(uint8_t handle);
 
 /**
  * Gets the AppVar/variable name of an already opened handle.
  *
- * @param handle AppVar/variable handle.
- * @param name Buffer to store name, must be at least 10 bytes in sizew.
+ * @param[in] name Buffer to store name, must be at least 10 bytes in sizew.
+ * @param[in] handle AppVar/variable handle.
  */
 void ti_GetName(char *name, uint8_t handle);
 
 /**
  * Renames an AppVar.
  *
- * @param old_name Old name of AppVar.
- * @param new_name New name of AppVar.
- *
+ * @param[in] old_name Old name of AppVar.
+ * @param[in] new_name New name of AppVar.
  * @returns `0` if success, `1` if AppVar already exists, `2` any other error occurs.
  *
- * @warning It is hazardous to rename an open AppVar. Close the AppVar before renaming.
+ * @warning It is hazardous to rename an open AppVar.
+ * Close the AppVar before renaming.
  */
 uint8_t ti_Rename(const char *old_name, const char *new_name);
 
 /**
  * Renames a variable.
  *
- * @param old_name Old name of variable.
- * @param new_name New name of variable.
- * @param type Type of variable.
- *
+ * @param[in] old_name Old name of variable.
+ * @param[in] new_name New name of variable.
+ * @param[in] type Type of variable.
  * @returns `0` if success, `1` if variable already exists, `2` any other error occurs.
- * @warning It is hazardous to rename an open AppVar. Close the AppVar before renaming.
+ *
+ * @warning It is hazardous to rename an open variable.
+ * Close the variable before renaming.
  */
 uint8_t ti_RenameVar(const char *old_name, const char *new_name, uint8_t type);
 
 /**
  * Stores data or values to an OS variable.
  *
- * @param var_type Type of variable to set.
- * @param name Pointer to name of variable.
- * @param data Pointer to data to set.
+ * @param[in] type Variable type.
+ * @param[in] name Variable name.
+ * @param[in] data Data to set variable to.
  *
  * @returns `0` if success.
  */
-uint8_t ti_SetVar(uint8_t var_type, const char *name, const void *data);
+uint8_t ti_SetVar(uint8_t type, const char *name, const void *data);
 
 /**
  * Stores an OS variable to another variable.
  *
- * @param var_type_to Type of variable to store to.
- * @param to Pointer to data to store to.
- * @param var_type_from Type of variable to get from.
- * @param from Pointer to data to get from.
- *
+ * @param[in] type_to Variable type to store data to.
+ * @param[in] to Variable name to store data to.
+ * @param[in] type_from Variable type to get data from.
+ * @param[in] from Variable name to get data from.
  * @returns `0` if success.
  */
-uint8_t ti_StoVar(uint8_t var_type_to, void *to, uint8_t var_type_from, const void *from);
+uint8_t ti_StoVar(uint8_t type_to, const char *to, uint8_t type_from, const char *from);
 
 /**
- * Recalls a variable.
+ * Recalls a OS variable.
  *
- * @param var_type Type of variable to recall.
- * @param var_name Pointer to name of variable to recall.
- * @param data_struct Address of pointer to variable structure.
+ * @param[in] type Variable type.
+ * @param[in] name Variable name.
+ * @param[out] data Address of pointer to variable structure.
  * @returns `0` if success.
  *
  * @note data_struct is set to the variable's data.
  */
-uint8_t ti_RclVar(uint8_t var_type, const char *var_name, void **data_struct);
+uint8_t ti_RclVar(uint8_t type, const char *name, void **data);
 
 /**
  * Checks to see if there is room in the archive for storing \p num_bytes,
  * without needing to execute a Garbage Collect.
  *
- * @param num_bytes Number of bytes to be stored to the archive.
- * @returns true if the bytes can be stored to the archive without a Garbage Collect.
+ * @param[in] num_bytes Number of bytes to be stored to the archive.
+ * @returns `true` if the bytes can be stored to the archive without a Garbage Collect.
  */
 bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
 /**
  * Set routines to run before and after a garbage collect would be triggered.
+ * A garbage collect is used to free up space in archive memory by reorganizing
+ * archive variable storage and removing variables marked for deletion. The OS
+ * is required to request the user if they want to perform the operation,
+ * and this request may be triggered any time a variable is moved to archive
+ * memory. This function is used to set up callbacks that are triggered when
+ * this event occurs.
  *
- * @param before Routine to run before a garbage collect. NULL sets it to do nothing.
- * @param after Routine to run following a garbage collect. NULL sets it to do nothing.
- * @note If your program uses graphx, use gfx_End and gfx_Begin to reset graphics before, and setup graphics after the garbage collect.
+ * The OS prompt requires the LCD to be in the standard 16-bit color mode, so
+ * if `graphx` or custom LCD behavior is being used `gfx_End` should be used
+ * to restore the OS to its default state in the routine run before garbage
+ * collection.
+ *
+ * In the after garbage collection rotuine, the LCD state can be restored (using
+ * `gfx_Begin` or similar as appropriate), as well as potentially reloading
+ * cached variable pointers created with ti_GetDataPtr.
+ * 
+ * @param[in] before Routine to run before a garbage collect. NULL sets it to do nothing.
+ * @param[in] after Routine to run following a garbage collect. NULL sets it to do nothing.
  * */
 void ti_SetGCBehavior(void (*before)(void), void (*after)(void));
 
@@ -553,7 +591,7 @@ equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t)) __attribute__(
 #define ti_TempProgram         _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
 #define ti_AppVar              _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
 typedef uint8_t ti_var_t;
-void ti_CloseAll(void) __attribute__((deprecated ("Use ti_Close(slot) for each slot opened instead")));
+void ti_CloseAll(void) __attribute__((deprecated ("Use ti_Close(handle) for each handle instead")));
 /* @endcond */
 
 #ifdef __cplusplus

@@ -208,7 +208,11 @@ extern "C" {
 void delay(uint16_t msec);
 
 /**
- * @copybrief delay
+ * Suspends execution of the calling thread for (at least) @p msec milliseconds.
+ *
+ * @param msec number of milliseconds
+ * @see sleep
+ * @see usleep
  */
 void msleep(uint16_t msec);
 
