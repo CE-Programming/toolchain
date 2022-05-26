@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    ti_var_t prgm;
+    uint8_t prgm;
     void *data_ptr;
     uint8_t token_length;
     uint16_t size;

@@ -5,8 +5,8 @@
 int main(void)
 {
     char nameBuffer[10];
-    ti_var_t var;
     char string[] = "AppVar string";
+    uint8_t var;
 
     /* Clear the homescreen */
     os_ClrHome();

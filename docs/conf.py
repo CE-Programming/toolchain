@@ -59,11 +59,3 @@ breathe_projects = {}
 breathe_default_project = 'CE C/C++ Toolchain'
 subprocess.call('doxygen doxyfile', shell=True)
 breathe_projects['CE C/C++ Toolchain'] = 'doxygen/xml'
-
-def check_conditional_assets(app, pagename, templatename, context, doctree):
-    if pagename != 'libraries/fileioc':
-        context["css_files"] = ['']
-
-def setup(app):
-   app.connect('html-page-context', check_conditional_assets)
-   app.add_css_file('css/tables.css')
