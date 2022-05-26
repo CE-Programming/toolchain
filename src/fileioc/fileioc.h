@@ -1,6 +1,5 @@
 /**
  * @file
- * @brief fileioc implements OS variable access routines.
  *
  * @author Matt "MateoConLechuga" Waltz
  */
@@ -19,13 +18,13 @@
 extern "C" {
 #endif
 
-/* Varible and flag definitions */
-#define TI_PRGM_TYPE            (0x05) /**< Normal unprotect program type.  */
-#define TI_PPRGM_TYPE           (0x06) /**< Normal protected program type.  */
-#define TI_TPRGM_TYPE           (0x16) /**< Normal temporary program type.  */
-#define TI_APPVAR_TYPE          (0x15) /**< AppVar type.  */
-#define TI_STRING_TYPE          (0x04) /**< String type.  */
-#define TI_EQU_TYPE             (0x03) /**< Equation type.  */
+#define TI_PRGM_TYPE            (0x05) /**< Normal unprotect program */
+#define TI_PPRGM_TYPE           (0x06) /**< Normal protected program */
+#define TI_TPRGM_TYPE           (0x16) /**< Normal temporary program */
+#define TI_APPVAR_TYPE          (0x15) /**< AppVar */
+#define TI_STRING_TYPE          (0x04) /**< String */
+#define TI_EQU_TYPE             (0x03) /**< Equation */
+#define TI_ANS_TYPE             (0x00) /**< Ans */
 /* @cond */
 #define TI_REAL_LIST_TYPE       (0x01)
 #define TI_CPLX_LIST_TYPE       (0x0D)
@@ -34,10 +33,7 @@ extern "C" {
 #define TI_MATRIX_TYPE          (0x02)
 /* @endcond */
 
-/**
- * Maximum object size in bytes
- */
-#define TI_MAX_SIZE             (65505)
+#define TI_MAX_SIZE             (65505) /**< Maximum variable size */
 
 /* @cond */
 #ifndef EOF
@@ -45,57 +41,70 @@ extern "C" {
 #endif
 /* @endcond */
 
-/**
- * @brief Variable slot type.
- */
-typedef uint8_t ti_var_t;
 
 /**
- * Opens a file.
+ * Opens an AppVar for reading, writing, and/or appending.
+ * AppVars may be stored in either the archive (aka flash memory), or in RAM.
+ * Depending on the mode used to open the AppVar it may be moved from archive memory into RAM.
  *
- * An AppVar is used as default file storage.
- *
- * @param name Name of file to open
- * @param mode
- * "r"  - Opens a file for reading. The file must exist. If the file does not exist, zero is returned. Keeps file in archive if in archive.                                   <br>
- * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
- * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
- * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
- * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                <br>
- * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
- * @returns Slot variable
- * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned.
+ * @param name Name of AppVar to open.
+ * @param mode Documented in the below table.
+ * \verbatim embed:rst:leading-asterisk
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ *   | "r"          | Read mode. If the AppVar does not exist :code:`0` is returned. The AppVar is not moved from its storage location.               |
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ *   | "w"          | Write mode. Deletes any existing AppVar and creates the AppVar.                                                                 |
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ *   | "a"          | Append mode. Data is written to the end of the AppVar. The AppVar is created if it does not exist.                              |
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ *   | "r+"         | Read/Write mode. If the AppVar does not exist :code:`0` is returned. If the AppVar is stored in the archive it is moved to RAM. |
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ *   | "w+"         | Write/Read mode. Deletes any existing AppVar and creates the AppVar.                                                            |
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ *   | "a+"         | Read/Append mode. The AppVar is created if it does not exist. If the AppVar is stored in the archive it is moved to RAM.        |
+ *   +--------------+---------------------------------------------------------------------------------------------------------------------------------+
+ * \endverbatim
+ * @returns AppVar variable handle, or `0` (zero) on error.
  */
-ti_var_t ti_Open(const char *name, const char *mode);
+uint8_t ti_Open(const char *name, const char *mode);
 
 /**
- * Opens a variable
+ * Opens a variable for reading, writing, and/or appending.
+ * Variables may be stored in either the archive (aka flash memory), or in RAM.
+ * Depending on the mode used to open the variable it may be moved from archive memory into RAM.
  *
- * Can open any type of program or appvar variable
- * @param varname Name of variable to open
- * @param mode
- * "r"  - Opens a file for reading. The file must exist. If the file does not exist, zero is returned. Keeps file in archive if in archive.                                   <br>
- * "w"  - Creates an empty file for writing. Overwrites file if already exists.                                                 <br>
- * "a"  - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.  <br>
- * "r+" - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.   <br>
- * "w+" - Creates an empty file for both reading and writing. Overwrites file if already exists.                                <br>
- * "a+" - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.
- * @param type Specifies the type of variable to open
- * @returns Slot variable
- * @note If there isn't enough memory to create the variable, or a slot isn't open, zero (0) is returned.
+ * @param name Name of variable to open.
+ * @param mode Documented in the below table.
+ * \verbatim embed:rst:leading-asterisk
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ *   | "r"          | Read mode. If the variable does not exist :code:`0` is returned. The variable is not moved from its storage location.               |
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ *   | "w"          | Write mode. Deletes any existing variable and creates the variable.                                                                 |
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ *   | "a"          | Append mode. Data is written to the end of the variable. The variable is created if it does not exist.                              |
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ *   | "r+"         | Read/Write mode. If the variable does not exist :code:`0` is returned. If the variable is stored in the archive it is moved to RAM. |
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ *   | "w+"         | Write/Read mode. Deletes any existing variable and creates the variable.                                                            |
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ *   | "a+"         | Read/Append mode. The variable is created if it does not exist. If the variable is stored in the archive it is moved to RAM.        |
+ *   +--------------+-------------------------------------------------------------------------------------------------------------------------------------+
+ * \endverbatim
+ * @param type Variable type.
+ * @returns AppVar variable handle, or `0` (zero) on error.
  */
-ti_var_t ti_OpenVar(const char *varname, const char *mode, uint8_t type);
+uint8_t ti_OpenVar(const char *name, const char *mode, uint8_t type);
 
 /**
- * Frees an open variable slot.
+ * Closes an open AppVar/variable handle.
+ * This must be performed for every ti_Open or ti_OpenVar call.
  *
- * @returns Zero if closing failed.
+ * @returns `0` (zero) on error.
  */
-int ti_Close(ti_var_t slot);
+int ti_Close(uint8_t handle);
 
 /**
- * Returns the name of the file(s) that contains the string as the first part of the variable,
- * which can then be used with ti_Open() and other functions.
+ * Locates AppVars that contain the string as the first part of the variable.
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
@@ -116,8 +125,7 @@ int ti_Close(ti_var_t slot);
 char *ti_Detect(void **vat_ptr, const char *detect_string);
 
 /**
- * Returns the name of the file(s) that contains the string as the first part of the variable,
- * which can then be used with ti_OpenVar() and other functions.
+ * Locates variables that contain the string as the first part of the variable.
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
@@ -139,8 +147,7 @@ char *ti_Detect(void **vat_ptr, const char *detect_string);
 char *ti_DetectVar(void **vat_ptr, const char *detect_string, uint8_t var_type);
 
 /**
- * Returns the name of the file(s) that contains the string as the first part of the variable,
- * which can then be used with ti_OpenVar() and other functions.
+ * Locates variables that contain the string as the first part of the variable.
  *
  * \p vat_ptr should be set to NULL to begin a search, and is updated with each call.
  *
@@ -166,150 +173,159 @@ char *ti_DetectVar(void **vat_ptr, const char *detect_string, uint8_t var_type);
 char *ti_DetectAny(void **vat_ptr, const char *detect_string, uint8_t *var_type);
 
 /**
- * Writes to the current variable slot.
+ * Writes data to an AppVar/variable handle.
  *
- * @param data Pointer to data to write.
- * @param size Size (in bytes) of a single data chunk.
- * @param count Number of data chunks to write to the variable slot.
- * @param slot Variable slot to write the data to.
+ * @param data Pointer to data structure(s).
+ * @param size Size (in bytes) of a single \p data structure.
+ * @param count Number of \p data structures to write.
+ * @param handle AppVar/variable handle.
  *
- * @returns The number of chunks written (should be equal to count)
+ * @returns Number of data structures written; equals count on success.
  */
-size_t ti_Write(const void *data, size_t size, size_t count, ti_var_t slot);
+size_t ti_Write(const void *data, size_t size, size_t count, uint8_t handle);
 
 /**
- * Reads from the current variable pointer.
+ * Reads data from an AppVar/variable handle.
  *
- * @param data Pointer to data to read into.
- * @param size Size (in bytes) of a single data chunk.
- * @param count Number of data chunks to read from the variable slot.
- * @param slot Variable slot to read the data from.
+ * @param data Pointer to data structure(s).
+ * @param size Size (in bytes) of a single \p data structure.
+ * @param count Number of \p data structures to write.
+ * @param handle AppVar/variable handle.
  *
- * @returns The number of chunks read (should be equal to count).
+ * @returns Number of data structures written; equals count on success.
  */
-size_t ti_Read(void *data, size_t size, size_t count, ti_var_t slot);
+size_t ti_Read(void *data, size_t size, size_t count, uint8_t handle);
 
 /**
- * Writes a character directly into the slot data pointer, and increments the offset.
+ * Writes a character to an AppVar/variable handle.
  *
- * @param c Character to write.
- * @param slot Variable slot to put the character to.
- * @returns The input c is returned if no error.
+ * @param ch Character to write.
+ * @param handle AppVar/variable handle.
  *
- * @returns 'EOF' if current offset is larger than file size, or memory isn't large enough.
+ * @returns `EOF` on error, or \p ch.
  */
-int ti_PutC(char c, ti_var_t slot);
+int ti_PutC(char ch, uint8_t handle);
 
 /**
- * Pulls a character directly from the slot data pointer, and increments the offset.
+ * Reads a character from an AppVar/variable handle.
  *
- * @param slot Variable slot to get the character from.
- * @returns 1 byte character at the current variable offset.
- * @returns 'EOF' if current offset is larger than file size.
+ * @param handle AppVar/variable handle.
+ *
+ * @returns `EOF` on error, or a valid character.
  */
-int ti_GetC(ti_var_t slot);
+int ti_GetC(uint8_t handle);
 
 /**
  * Seeks to an offset in the file.
  *
  * @param offset Number of bytes to offest from (can be negative).
- * @param origin
- * SEEK_SET (0) - Seek from beginning of file        <br>
- * SEEK_CUR (1) - Seek from current offset in file   <br>
- * SEEK_END (2) - Seek from end of file
- * @param slot Variable slot seeking in.
- *
- * @returns 'EOF' on seek failure.
+ * @param origin Documented in the below table.
+ * \verbatim embed:rst:leading-asterisk
+ *   +--------------+-------------------------------------------------------+
+ *   | SEEK_SET (0) | Seek from beginning of AppVar/variable.               |
+ *   +--------------+-------------------------------------------------------+
+ *   | SEEK_CUR (1) | Seek from current AppVar/variable offset.             |
+ *   +--------------+-------------------------------------------------------+
+ *   | SEEK_END (2) | Seek from end of AppVar/variable.                     |
+ *   +--------------+-------------------------------------------------------+
+ * \endverbatim
+ * @param handle AppVar/variable handle.
+ * @returns `EOF` on failure.
  */
-int ti_Seek(int offset, unsigned int origin, ti_var_t slot);
+int ti_Seek(int offset, unsigned int origin, uint8_t handle);
 
 /**
- * Seeks to the start of a slot.
+ * Seeks to the start of an AppVar/variable's data.
  *
- * Same functionality as <tt>ti_Seek(0, SEEK_SET, slot)</tt>
+ * Functionally equivalent to <tt>ti_Seek(0, SEEK_SET, slot)</tt>
  *
- * @param slot Variable slot to rewind
+ * @param handle AppVar/variable handle.
  *
- * @returns 'EOF' on rewind failure
+ * @returns `EOF` on failure.
  */
-int ti_Rewind(ti_var_t slot);
+int ti_Rewind(uint8_t handle);
 
 /**
- * Gets the offset in a slot.
+ * Gets the current data offset from the start of an AppVar/variable.
  *
- * @param slot Slot to test.
- * @returns The value of the current slot offset.
+ * @param handle AppVar/variable handle.
+ *
+ * @returns The current data offset from the start of the AppVar/variable.
  */
-uint16_t ti_Tell(ti_var_t slot);
+uint16_t ti_Tell(uint8_t handle);
 
 /**
- * Gets the size of a slot.
+ * Gets the size of an AppVar/variable.
  *
- * @param slot Slot to test.
- * @returns The size of the slot variable.
+ * @param handle AppVar/variable handle.
+ *
+ * @returns The size of the AppVar/variable.
  */
-uint16_t ti_GetSize(ti_var_t slot);
+uint16_t ti_GetSize(uint8_t handle);
 
 /**
- * Resizes the slot variable.
+ * Resizes an AppVar/variable.
  *
- * @param slot Slot to resize.
- * @param new_size New size of slot.
+ * @param handle AppVar/variable handle.
+ * @param size New AppVar/variable size.
  *
- * @returns Resized size on success, 0 on failure, or -1 if the slot cannot be opened.
- *
- * @note The variable offset is set to the beginning of the file.
+ * @returns Resized size on success, `0` on failure, or `-1` if the AppVar/variable cannot be opened.
  */
-int ti_Resize(size_t new_size, ti_var_t slot);
+int ti_Resize(size_t size, uint8_t handle);
 
 /**
- * Tests if a slot is in the archive.
+ * Checks if an AppVar/variable is stored in archive memory.
  *
- * @param slot Slot to test.
+ * @param handle AppVar/variable handle.
  *
- * @returns 0 if the slot is not in the archive.
+ * @returns `0` if the slot is not in the archive.
  */
-int ti_IsArchived(ti_var_t slot);
+int ti_IsArchived(uint8_t handle);
 
 /**
- * Sends the variable into either the archive or RAM if needed.
+ * Moves an AppVar/variable between archive or RAM storage.
+ *
+ * @param archive Documented in the below table.
+ * \verbatim embed:rst:leading-asterisk
+ *   +-------+-----------------------------------------+
+ *   | true  | Store AppVar/variable in archive.       |
+ *   +-------+-----------------------------------------+
+ *   | false | Store AppVar/variable in RAM.           |
+ *   +-------+-----------------------------------------+
+ * \endverbatim
+ * @param handle AppVar/variable handle.
+ *
+ * @returns `0` on failure.
  *
  * @warning Archiving a variable can cause a garbage collection cycle.
- * You should use ti_SetGCBehavior in the case of this event.
- *
- * @param archived
- * True - Send to Archive. <br>
- * False - Send to RAM.
- * @param slot Slot to send.
- *
- * @returns 0 if the operation fails from not enough memory.
+ * You should use ti_SetGCBehavior to catch this event.
  */
-int ti_SetArchiveStatus(bool archived, ti_var_t slot);
+int ti_SetArchiveStatus(bool archive, uint8_t handle);
 
 /**
  * Deletes an AppVar.
  *
- * @param name Name of AppVar to delete.
+ * @param name AppVar name.
  *
- * @returns 0 if an error is encountered.
+ * @returns `0` on failure.
  */
 int ti_Delete(const char *name);
 
 /**
- * Deletes a variable given the name and type.
+ * Deletes a variable.
  *
- * @param varname Name of variable to delete.
- * @param type Type of variable to delete.
+ * @param name Variable name.
+ * @param type Variable type.
  *
- * @returns 0 if an error is encountered.
+ * @returns `0` on failure.
  */
-int ti_DeleteVar(const char *varname, uint8_t type);
+int ti_DeleteVar(const char *name, uint8_t type);
 
 /**
  * Gets the string used for displaying a TI token.
  *
- * @param length_of_string Pointer to variable to hold length of resulting string (Can be NULL if you don't care).
- * @param length_of_token Pointer to variable to hold length of the token, used for determining the next read location (Can be NULL if you don't care).
+ * @param length_of_string Pointer to variable to hold length of resulting string (Can be NULL).
+ * @param length_of_token Pointer to variable to hold length of the token, used for determining the next read location (Can be NULL).
  * @param read_pointer Address of pointer to data to read.
  *
  * @returns A pointer to string used for displaying a TI token.
@@ -318,30 +334,40 @@ int ti_DeleteVar(const char *varname, uint8_t type);
 char *ti_GetTokenString(void **read_pointer, uint8_t *length_of_token, unsigned int *length_of_string);
 
 /**
- * Gets a pointer to the data located at the current posistion in the slot, a
- * good way for fast reading of data.
+ * Gets a direct data pointer to the current offset in an AppVar/variable.
+ * This may be used for direct reading/writing without the need for an extra copy.
+ * It is easily prone to memory corruption if not used correctly, so use at your own risk.
  *
- * @param slot Slot variable to get pointer of.
+ * @param handle AppVar/variable handle.
  *
- * @returns Pointer to variable data
+ * @returns Pointer to AppVar/variable data.
+ *
+ * @note This function is potentially unsafe to use as variables may be shifted around in memory, causing this pointer
+ * to become invalid and potentially corrupt memory. Avoid creating, deleting, or modifying any variables while this
+ * pointer is being used to prevent this issue.
  */
-void *ti_GetDataPtr(ti_var_t slot);
+void *ti_GetDataPtr(uint8_t handle);
 
 /**
- * Gets the VAT location of the slot.
+ * Gets a pointer to the VAT entry of an AppVar/variable.
  *
- * @param slot Slot variable to get VAT location of.
+ * @param handle AppVar/variable handle.
+ *
  * @returns VAT location of slot variable.
+ *
+ * @note This function is potentially unsafe to use as variables may be shifted around in memory, causing this pointer
+ * to become invalid and potentially corrupt memory. Avoid creating, deleting, or modifying any variables while this
+ * pointer is being used to prevent this issue.
  */
-void *ti_GetVATPtr(ti_var_t slot);
+void *ti_GetVATPtr(uint8_t handle);
 
 /**
- * Gets the variable name of an already opened slot.
+ * Gets the AppVar/variable name of an already opened handle.
  *
- * @param slot Slot variable to get name of.
- * @param name Buffer to store name in, allocate at least 10 bytes.
+ * @param handle AppVar/variable handle.
+ * @param name Buffer to store name, must be at least 10 bytes in sizew.
  */
-void ti_GetName(char *name, ti_var_t slot);
+void ti_GetName(char *name, uint8_t handle);
 
 /**
  * Renames an AppVar.
@@ -349,8 +375,9 @@ void ti_GetName(char *name, ti_var_t slot);
  * @param old_name Old name of AppVar.
  * @param new_name New name of AppVar.
  *
- * @returns 0 if success, 1 if AppVar already exists, 2 any other error occurs.
- * @warning It is potentially hazardous to rename an open AppVar. Close the AppVar before renaming.
+ * @returns `0` if success, `1` if AppVar already exists, `2` any other error occurs.
+ *
+ * @warning It is hazardous to rename an open AppVar. Close the AppVar before renaming.
  */
 uint8_t ti_Rename(const char *old_name, const char *new_name);
 
@@ -361,8 +388,8 @@ uint8_t ti_Rename(const char *old_name, const char *new_name);
  * @param new_name New name of variable.
  * @param type Type of variable.
  *
- * @returns 0 if success, 1 if variable already exists, 2 any other error occurs.
- * @warning It is potentially hazardous to rename an open variable. Close the variable before renaming.
+ * @returns `0` if success, `1` if variable already exists, `2` any other error occurs.
+ * @warning It is hazardous to rename an open AppVar. Close the AppVar before renaming.
  */
 uint8_t ti_RenameVar(const char *old_name, const char *new_name, uint8_t type);
 
@@ -373,7 +400,7 @@ uint8_t ti_RenameVar(const char *old_name, const char *new_name, uint8_t type);
  * @param name Pointer to name of variable.
  * @param data Pointer to data to set.
  *
- * @returns 0 if success.
+ * @returns `0` if success.
  */
 uint8_t ti_SetVar(uint8_t var_type, const char *name, const void *data);
 
@@ -385,7 +412,7 @@ uint8_t ti_SetVar(uint8_t var_type, const char *name, const void *data);
  * @param var_type_from Type of variable to get from.
  * @param from Pointer to data to get from.
  *
- * @returns 0 if success.
+ * @returns `0` if success.
  */
 uint8_t ti_StoVar(uint8_t var_type_to, void *to, uint8_t var_type_from, const void *from);
 
@@ -395,11 +422,11 @@ uint8_t ti_StoVar(uint8_t var_type_to, void *to, uint8_t var_type_from, const vo
  * @param var_type Type of variable to recall.
  * @param var_name Pointer to name of variable to recall.
  * @param data_struct Address of pointer to variable structure.
- * @returns 0 if success.
+ * @returns `0` if success.
+ *
  * @note data_struct is set to the variable's data.
  */
 uint8_t ti_RclVar(uint8_t var_type, const char *var_name, void **data_struct);
-
 
 /**
  * Checks to see if there is room in the archive for storing \p num_bytes,
@@ -410,7 +437,6 @@ uint8_t ti_RclVar(uint8_t var_type, const char *var_name, void **data_struct);
  */
 bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
-
 /**
  * Set routines to run before and after a garbage collect would be triggered.
  *
@@ -420,69 +446,13 @@ bool ti_ArchiveHasRoom(uint24_t num_bytes);
  * */
 void ti_SetGCBehavior(void (*before)(void), void (*after)(void));
 
-
-/**
- * Allocates space for a real variable.
- * @returns Pointer to variable.
+/** @addtogroup Variables
+ *  @{
  */
-#define ti_MallocReal() ((real_t*)malloc(sizeof(real_t)))
-
-/**
- * Allocates space for a complex variable.
- * @returns Pointer to variable.
- */
-#define ti_MallocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
-
-/**
- * Allocates space for a string variable.
- * @param len Length of string.
- * @returns Pointer to variable.
- */
-#define ti_MallocString(len) ti_AllocString((len), malloc)
-
-/**
- * Allocates space for a list variable.
- * @param dim Dimension of list.
- * @returns Pointer to variable.
- */
-#define ti_MallocList(dim) ti_AllocList((dim), malloc)
-
-/**
- * Allocates space for a matrix variable.
- * @param rows Rows in matrix.
- * @param cols Columns in matrix.
- * @returns Pointer to variable.
- */
-#define ti_MallocMatrix(rows, cols) ti_AllocMatrix((rows), (cols), malloc)
-
-/**
- * Allocates space for a complex list variable.
- * @param dim Dimension of complex list.
- * @returns Pointer to variable.
- */
-#define ti_MallocCplxList(dim) ti_AllocCplxList((dim), malloc)
-
-/**
- * Allocates space for an equation variable.
- * @param len Length of equation variable.
- * @returns Pointer to variable.
- */
-#define ti_MallocEqu(len) ti_AllocEqu((len), malloc)
 
 /* @cond */
-string_t *ti_AllocString(unsigned len, void *(*malloc_routine)(size_t));
-list_t *ti_AllocList(unsigned dim, void *(*malloc_routine)(size_t));
-matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void *(*malloc_routine)(size_t));
-cplx_list_t *ti_AllocCplxList(unsigned dim, void *(*malloc_routine)(size_t));
-equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t));
-/* @endcond */
-
-/* @cond */
-/* Some more definitions using Ans */
-#define TI_ANS_TYPE (0x00)
 #define ti_Ans      ("\x72\0")
 
-/* Some string definitions */
 #define ti_Str1     ("\xAA\x0\0")
 #define ti_Str2     ("\xAA\x1\0")
 #define ti_Str3     ("\xAA\x2\0")
@@ -558,13 +528,29 @@ equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t));
 #define ti_L5        ("\x5D\x4\0")
 #define ti_L6        ("\x5D\x5\0")
 #define ti_LT        ('\x5D')
+/* @endcond */
+
+/** @}*/
 
 /* Compatibility defines */
+/* @cond */
+string_t *ti_AllocString(unsigned len, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
+list_t *ti_AllocList(unsigned dim, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
+matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
+cplx_list_t *ti_AllocCplxList(unsigned dim, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
+equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
+#define ti_MallocReal() ((real_t*)malloc(sizeof(real_t)))
+#define ti_MallocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
+#define ti_MallocString(len) ti_AllocString((len), malloc)
+#define ti_MallocList(dim) ti_AllocList((dim), malloc)
+#define ti_MallocMatrix(rows, cols) ti_AllocMatrix((rows), (cols), malloc)
+#define ti_MallocCplxList(dim) ti_AllocCplxList((dim), malloc)
+#define ti_MallocEqu(len) ti_AllocEqu((len), malloc)
 #define ti_Program             _Pragma("GCC warning \"'ti_Program' is deprecated, use 'TI_PRGM_TYPE' instead\"") TI_PRGM_TYPE
 #define ti_ProtectedProgram    _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'TI_PPRGM_TYPE' instead\"") TI_PPRGM_TYPE
 #define ti_TempProgram         _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
 #define ti_AppVar              _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
-
+typedef uint8_t ti_var_t;
 void ti_CloseAll(void) __attribute__((deprecated ("Use ti_Close(slot) for each slot opened instead")));
 /* @endcond */
 

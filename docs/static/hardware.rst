@@ -168,9 +168,9 @@ Archived variables, the operating system, and applications, are all stored in fl
 While you can freely read any and all of flash, the calculator's hardware prevents you from writing to flash, and in fact, attempting to do so will cause a crash.
 The calculator's operating system works with special hardware to enforce this restriction in order to prevent students from patching the OS to let them cheat.
 Consequently, the only way to store data in flash is to create a variable in RAM and then archive it.
-The :code:`fileioc` library makes this easy.
+The :ref:`fileioc library <fileioc_h>` makes this easy.
 
-Because teachers (and therefore TI's management) get very worked up by cheating, the toolchain does not and will not provide any means of bypassing this restriction.
+Because teachers (and therefore TI's management) get very worked up by cheating, the toolchain does not (and will not) provide any means of bypassing this restriction.
 
 The LCD
 ^^^^^^^

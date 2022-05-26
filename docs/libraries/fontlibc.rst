@@ -7,10 +7,12 @@ fontlibc.h
 
     #include <fontlibc.h>
 
-fontlibc was designed under a "mechanism not policy" sort of philosophy.
+The :code:`fontlibc` library provides routines for displaying custom fonts and glyphs, and can be used to extend the limited font capabilities of :ref:`graphx <graphx_h>`.
+
+The :code:`fontlibc` library was designed under a "mechanism not policy" sort of philosophy.
 Rather than attempting to provide as many fancy features as a programmer could want, fontlibc tries to provide fast, basic routines that can be used to build the additional functionality you want.
 For example, word-wrap is not directly provided, but can be implemented using :code:`fontlib_SetAlternateStopCode` and :code:`fontlib_GetStringWidth`.
-fontlib hopes to provide enough performance to be usable in games, while providing powerful enough basic features for fancy GUIs and document editors.
+fontlibc hopes to provide enough performance to be usable in games, while providing powerful enough basic features for fancy GUIs and document editors.
 
 .. contents:: :local:
    :depth: 3
@@ -18,7 +20,7 @@ fontlib hopes to provide enough performance to be usable in games, while providi
 Creating Fonts
 --------------
 
-Fonts for use with FontLibC can be made with any program that can produce Windows 3.x .FNT resource files.
+Fonts for use with fontlibc can be made with any program that can produce Windows 3.x .FNT resource files.
 
 Editor Software
 ~~~~~~~~~~~~~~~

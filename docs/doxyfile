@@ -853,7 +853,6 @@ INPUT                  = ../src/graphx/graphx.h \
                          ../src/ce/include/ti/getcsc.h \
                          ../src/ce/include/ti/getkey.h \
                          ../src/ce/include/ti/screen.h \
-                         ../src/ce/include/ti/hooks.h \
                          ../src/ce/include/ti/info.h \
                          ../src/ce/include/ti/python.h \
                          ../src/ce/include/ti/real.h \

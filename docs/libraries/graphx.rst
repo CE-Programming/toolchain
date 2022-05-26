@@ -7,7 +7,7 @@ graphx.h
 
     #include <graphx.h>
 
-The graphx library implements efficient graphics routines from everything to drawing sprites, shapes, and tilemaps.
+The :code:`graphx` library implements efficient graphics routines from everything to drawing sprites, shapes, and tilemaps.
 This allows a programmer to easily add quality graphics to their program without needing to worry about the low-level implementation details.
 
 .. contents:: :local:

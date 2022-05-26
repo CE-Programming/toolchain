@@ -59,13 +59,19 @@ Linking Assembly Source Files
 Assembly routines can be linked into a C/C++ program provided the following conditions are met:
 
 - The file's extension is **.asm**. It can be placed at any depth in the sources directory.
-- The routine should have a C/C++ prototype if it used externally.
+- The appropriate section is declared - either :code:`.text` for code, :code:`.data` for initialized data, or :code:`.rodata` for read-only data.
+  This is done using the `section` keyword, whereby everything after the keyword will be added to the defined section.
 - The assembly routine must be prefixed with an underscore, and have a corresponding `public` entry in the assembly file.
 - Any external functions called from the assembly source must be listed as being `extern`.
+- A separate header file should define a C/C++ prototype for the function if it is called from C/C++ code.
 
-Below is an example assembly source file that relies on an external function:
+Below is an example C prototype followed by the assembly implementation:
 
-.. code-block:: asm
+.. code-block:: c
+
+    void asm_func(int arg);
+
+.. code-block::
 
     	assume	adl=1
 
@@ -75,20 +81,12 @@ Below is an example assembly source file that relies on an external function:
     _asm_func:
     	pop	hl
     	pop	de
-    	push	de
+    	push	de	; de = arg
     	push	hl
 	call	_external_func
     	ret
 
     	extern	_external_func
-
-The C prototype is shown below:
-
-C File:
-
-.. code-block:: c
-
-    void asm_func(int a);
 
 Arguments
 ~~~~~~~~~

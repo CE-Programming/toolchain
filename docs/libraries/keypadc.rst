@@ -7,7 +7,7 @@ keypadc.h
 
     #include <keypadc.h>
 
-The keypadc library is used for quickly polling the status of the keys in the keypad.
+The :code:`keypadc` library is used for quickly polling the status of the keys in the keypad.
 It supports multi-key presses, and can be used for extremely responsive input compared to OS routines such as :code:`os_GetCSC()`.
 
 .. contents:: :local:
