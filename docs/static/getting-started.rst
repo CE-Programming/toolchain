@@ -6,25 +6,26 @@ Getting Started
 Installing the CE Toolchain
 ---------------------------
 
-* Download the latest stable toolchain release for your OS `here <https://github.com/CE-Programming/toolchain/releases/latest>`__.
+* Download the latest stable toolchain release for your OS `by clicking here <https://github.com/CE-Programming/toolchain/releases/latest>`__.
 
-  * You can optionally try the "nightly" build `here <https://github.com/CE-Programming/toolchain/releases/tag/nightly>`__ instead - this is where all current development happens, and provides the latest features and support before an official release.
+* An additional "nightly" development build is available `here <https://github.com/CE-Programming/toolchain/releases/tag/nightly>`__, which includes the  latest features and support before an official  stable release.
 
 **On Windows**
 
-    * Extract the archive to a location **without any spaces in it**, e.g. :code:`C:\CEdev`.
+    * Extract the archive to a path **without any spaces**, e.g. :code:`C:\CEdev`.
 
-    * Double click :code:`cedev.bat` inside the extracted :code:`CEdev` folder to launch the toolchain environment.
+    * Double click :code:`cedev.bat` inside the extracted folder to launch the toolchain environment.
       You may have to allow the script to be run depending on the user account control.
 
     * If you want to avoid using the :code:`cedev.bat` script, you can extend the PATH environment variable to point to the :code:`CEdev/bin` directory.
-      `Here is an example <https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/>`_ of how to do this.
+      `Here is a description <https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/>`_.
 
-**On Linux or macOS**
+**On Linux or Mac**
 
-    * Extract the archive to a location **without any spaces in it**, e.g. :code:`/home/user/CEdev`.
+    * Extract the archive to a path **without any spaces**, e.g. :code:`/home/user/CEdev`.
 
-    * Extend the PATH environment variable to point to :code:`CEdev/bin` by modifying `.bashrc`, `.zshrc`, or whatever flavor your OS uses.
+    * Extend the PATH environment variable to point to :code:`CEdev/bin` by modifying *.bashrc*, *.zshrc*, or whatever flavor your OS uses.
+      An example command may be:
 
         .. indent with spaces
         .. code-block:: bash
@@ -34,7 +35,7 @@ Installing the CE Toolchain
 .. note::
 
     The toolchain requires the installation folder and any project folders to not contain any spaces.
-    This is a limitation of the :code:`make` command.
+    This is due to a limitation of the :code:`make` command.
 
 Building Programs
 -----------------
@@ -42,10 +43,10 @@ Building Programs
 Programs are built with the :code:`make` command, executed from a terminal session.
 This tutorial explains how to use the CE Toolchain to build programs using :code:`make`.
 
-Locate the installed `CEdev` folder, and open a build session by double-clicking :code:`cedev.bat` on Windows or launching your favorite terminal on Linux/macOS.
-Navigate to the `examples` folder using the :code:`cd examples` command.
+Locate the installed *CEdev* folder, and open a build session by double-clicking :code:`cedev.bat` on Windows or launching your favorite terminal on Linux/macOS.
+Navigate to the *examples* folder using the :code:`cd examples` command.
 This folder contains example projects that you can build and modify to learn how to write various programs.
-Navigate the to the `hello_world` example inside this folder using the command :code:`cd hello_world`.
+Navigate the to the *hello_world* example inside this folder using the command :code:`cd hello_world`.
 
 Type :code:`make` and press enter.
 This command invokes the compiler, assembler, and linker creating the file :code:`bin/DEMO.8xp`.
@@ -75,7 +76,7 @@ Each CE Toolchain project has the following folder structure:
 * **src**
 
   * This is the directory where all source files can be placed.
-  * Sources are built automatically if they end in a `.c`/`.cpp` extension, and can be edited with any text editor or IDE.
+  * Sources are built automatically if they end in a ``.c``/``.cpp`` extension, and can be edited with any text editor or IDE.
   * Subdirectories are allowed as long as they do not contain spaces.
 
 * **obj**
@@ -84,7 +85,7 @@ Each CE Toolchain project has the following folder structure:
 
 * **bin**
 
-  * This is where the final linked calculator program will be placed, ending with a `.8xp` extension.
+  * This is where the final linked calculator program will be placed, ending with a ``.8xp`` extension.
 
 * **makefile**
 

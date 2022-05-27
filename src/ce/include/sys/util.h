@@ -32,7 +32,7 @@ uint32_t random(void);
  * Seeds the pseudo-random number generator used by random() and rand() with the
  * value seed.
  *
- * @param seed the seed value
+ * @param[in] seed the seed value
  */
 void srandom(uint32_t seed);
 
@@ -52,7 +52,7 @@ void srandom(uint32_t seed);
  * value, atomic_load_increasing_32() or atomic_load_decreasing_32() may be
  * appropriate instead.
  *
- * @param p pointer to 32-bit value
+ * @param[in] p pointer to 32-bit value
  */
 uint32_t atomic_load_32(volatile uint32_t *p);
 
@@ -71,7 +71,7 @@ uint32_t atomic_load_32(volatile uint32_t *p);
  * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
  * note may be the fact that a 48MHz counter does not exceed this limit.
  *
- * @param p pointer to 32-bit value
+ * @param[in] p pointer to 32-bit value
  */
 uint32_t atomic_load_increasing_32(volatile uint32_t *p);
 
@@ -90,7 +90,7 @@ uint32_t atomic_load_increasing_32(volatile uint32_t *p);
  * clock speed of 48MHz), then the value returned may be incorrect. Of relevant
  * note may be the fact that a 48MHz counter does not exceed this limit.
  *
- * @param p pointer to 32-bit value
+ * @param[in] p pointer to 32-bit value
  */
 uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 

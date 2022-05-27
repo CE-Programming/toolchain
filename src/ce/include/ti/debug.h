@@ -20,7 +20,7 @@ extern "C" {
 /**
  * Basically a reimplemented form of printf that prints to some debugging device
  *
- * @param string String to send to debug device
+ * @param[in] string String to send to debug device
  */
 void boot_DebugPrintf(const char *string);
 

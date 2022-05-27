@@ -1,37 +1,41 @@
 .. _makefile_options:
 
+.. toctree::
+  :titlesonly:
+
 Makefile Options
 ================
 
 The project's makefile controls different features and settings for the output program.
 Additional rules can be added to build different components as well.
 
-To edit these options, open the :code:`makefile` file inside the project's folder.
+To edit these options, open the :code:`makefile` file inside the project's folder in a text editor.
 
-NAME
-----
+Output Configuration
+--------------------
 
-This is the name of the program variable that will be stored on the calculator.
+.. rubric:: NAME
+
+This is the name of the program that will be stored on the calculator.
 
 .. code-block:: makefile
 
     NAME = PRGM
 
-ICON
-----
+.. rubric:: ICON
 
 Icons make a more polished program that can be displayed in shells such as `Cesium <https://github.com/mateoconlechuga/cesium/releases/latest>`_.
 
-Place a 16x16 image in the same directory as the makefile with the name of whatever `ICON` is defined as, e.g. `icon.png`.
+Icons are a 16x16 pixel image - provide the relative path to the image from the makefile via the :code:`ICON` option.
 
 .. code-block:: makefile
 
     ICON = icon.png
 
-DESCRIPTION
------------
+.. rubric:: DESCRIPTION
 
-Change `DESCRIPTION` to the program's description. It is recommended to keep this under 25 characters.
+Change :code:`DESCRIPTION` to the program's description.
+It is recommended to keep this under 25 characters.
 
 The description will be displayed in shells such as `Cesium <https://github.com/mateoconlechuga/cesium/releases/latest>`_.
 
@@ -39,8 +43,7 @@ The description will be displayed in shells such as `Cesium <https://github.com/
 
     DESCRIPTION = "My awesome program"
 
-COMPRESSED
-----------
+.. rubric:: COMPRESSED
 
 Programs can tend to be quite large from a variety of factors such as sprites, bloated code, or other issues.
 The toolchain offers the ability to compress programs into a self-extracting executable.
@@ -52,8 +55,7 @@ To enable this feature, open the project's makefile and edit the line:
 
     COMPRESSED = YES
 
-ARCHIVED
---------
+.. rubric:: ARCHIVED
 
 Programs can be built to be stored in the archive rather than RAM.
 To enable this feature, open the project's makefile and change the line:
@@ -62,8 +64,63 @@ To enable this feature, open the project's makefile and change the line:
 
     ARCHIVED = YES
 
-DEPS
-----
+.. rubric:: OUTPUT_MAP
+
+Outputs a <name>.map file into the :code:`bin` directory that includes section, variable, and function addressing/size information of the compiled program.
+To speed up linking this step can be disabled.
+Default: :code:`YES`.
+
+.. code-block:: makefile
+
+    OUTPUT_MAP = YES
+
+Compiler Configuration
+----------------------
+
+.. rubric:: CFLAGS / CXXFLAGS
+
+These flags are passed to the compiler.
+:code:`CFLAGS` is used for C source files, :code:`CXXFLAGS` is used for C++ source files.
+
+.. code-block:: makefile
+
+    CFLAGS = -Wall -Wextra -Oz
+    CXXFLAGS = -Wall -Wextra -Oz
+
+.. rubric:: LTO
+
+This option enables link-time optimization.
+Depending on the program this can reduce the output size.
+Default: :code:`YES`.
+
+.. code-block:: makefile
+
+    LTO = YES
+
+.. rubric:: PREFER_OS_CRT
+
+Prefer the builtin OS CRT (Compiler-Run-Time) functions if they exist.
+This can help to decrease the output size in some circumstances, as a select number of CRT functions will execute from flash.
+Default: :code:`NO`.
+
+.. code-block:: makefile
+
+    PREFER_OS_CRT = NO
+
+.. rubric:: PREFER_OS_LIBC
+
+Prefer the builtin OS LIBC functions if they exist.
+This can help to decrease the output size in some circumstances, as a select number of LIBC functions will execute from flash.
+Default: :code:`YES`.
+
+.. code-block:: makefile
+
+    PREFER_OS_LIBC = YES
+
+Miscellaneous Configuration
+---------------------------
+
+.. rubric:: DEPS
 
 Add any files that you want to be built by the toolchain to this variable.
 Define rules for the files after including the main CEdev makefile.
@@ -78,47 +135,3 @@ Define rules for the files after including the main CEdev makefile.
     	$(call MKDIR,$(@D))
     	echo "levelpack" > $(BINDIR)/levelpack.bin
 
-
-CFLAGS / CXXFLAGS
------------------
-
-These flags are passed to the clang compiler.
-*CFLAGS* is used for C source files -- *CXXFLAGS* is used for CPP source files.
-
-.. code-block:: makefile
-
-    CFLAGS = -Wall -Wextra -Oz
-    CXXFLAGS = -Wall -Wextra -Oz
-
-LTO
----
-
-This option is used to enable link-time optimization.
-Depending on the program this can reduce the output size.
-By default this option is enabled.
-
-.. code-block:: makefile
-
-    LTO = YES
-
-PREFER_OS_CRT
--------------
-
-Prefer the builtin OS CRT functions if they exist.
-This can help to decrease the output size in some circumstances, as a select number of CRT functions will execute from flash.
-By default this option is disabled.
-
-.. code-block:: makefile
-
-    PREFER_OS_CRT = YES
-
-PREFER_OS_LIBC
---------------
-
-Prefer the builtin OS LIBC functions if they exist.
-This can help to decrease the output size in some circumstances, as a select number of LIBC functions will execute from flash.
-By default this option is enabled.
-
-.. code-block:: makefile
-
-    PREFER_OS_LIBC = YES

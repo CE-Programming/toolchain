@@ -36,36 +36,6 @@ asm("di")
 #define int_Wait() \
 asm("halt")
 
-#ifdef FORCE_INTERRUPTS
-#warning TI broke interrupt support on CE models with hardware revision >= I. Use at your own risk.
-
-/**
- * Initizalize to use custom interrupts.
- *
- * @note Saves status of current interrupt state.
- * @warning TI broke interrupt support on CE models with hardware revision >= I.
- */
-void int_Initialize(void);
-
-/**
- * Resets interrupts back to the OS expected values.
- *
- * @warning Must have called int_Initialize before using.
- * @warning TI broke interrupt support on CE models with hardware revision >= I.
- */
-void int_Reset(void);
-
-/**
- * Sets up an interrupt vector given an ISR.
- *
- * @param ivect Interrupt vector to set.
- * @param handler Handler to interrupt service routine.
- * @warning TI broke interrupt support on CE models with hardware revision >= I.
- */
-void int_SetVector(uint8_t ivect, void (*handler)(void));
-
-#endif
-
 #define ON_IVECT        0  /**< [on] key interrupt source        */
 #define TIMER1_IVECT    1  /**< Timer 1 interrupt source         */
 #define TIMER2_IVECT    2  /**< Timer 2 interrupt source         */
@@ -92,6 +62,36 @@ void int_SetVector(uint8_t ivect, void (*handler)(void));
 #define int_LatchConfig     (*(volatile uint24_t*)0x0F0000C) /**< Latchable interrupt signals       */
 #define int_InvertConfig    (*(volatile uint24_t*)0x0F00010) /**< Invertable interrupt signals      */
 #define int_Acknowledge     (*(volatile uint24_t*)0x0F00008) /**< Acknowledge interrupt signals     */
+
+#ifdef FORCE_INTERRUPTS
+#warning TI broke interrupt support on CE models with hardware revision >= I. Use at your own risk.
+
+/**
+ * Initizalize to use custom interrupts.
+ *
+ * @note Saves status of current interrupt state.
+ * @warning TI broke interrupt support on CE models with hardware revision >= I.
+ */
+void int_Initialize(void);
+
+/**
+ * Resets interrupts back to the OS expected values.
+ *
+ * @warning Must have called int_Initialize before using.
+ * @warning TI broke interrupt support on CE models with hardware revision >= I.
+ */
+void int_Reset(void);
+
+/**
+ * Sets up an interrupt vector given an ISR.
+ *
+ * @param[in] ivect Interrupt vector to set.
+ * @param[in] handler Handler to interrupt service routine.
+ * @warning TI broke interrupt support on CE models with hardware revision >= I.
+ */
+void int_SetVector(uint8_t ivect, void (*handler)(void));
+
+#endif
 
 #ifdef __cplusplus
 }

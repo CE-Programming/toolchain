@@ -19,15 +19,15 @@ extern "C" {
 /**
  * Set a particular OS flag
  *
- * @param offset Offset to particular flag in list
- * @param set Bitmask of flag to set
+ * @param[in] offset Offset to particular flag in list
+ * @param[in] set Bitmask of flag to set
  */
 void os_SetFlagByte(int offset, uint8_t set);
 
 /**
  * Get a particular OS flag
  *
- * @param offset Offset to particular flag in list
+ * @param[in] offset Offset to particular flag in list
  * @returns Bitmask of flag
  */
 uint8_t os_GetFlagByte(int offset);
@@ -46,8 +46,8 @@ void os_ResetFlagBits(int16_t offset_pattern);
  * 
  * For example, `OS_FLAG_ID(INDIC, ENABLE)` 
  * 
- * @param GROUP Flag group name without the `OS_FLAG_` prefix
- * @param MEMBER Flag item name without the `OS_FLAG_GROUP_` prefix
+ * @param[in] GROUP Flag group name without the `OS_FLAG_` prefix
+ * @param[in] MEMBER Flag item name without the `OS_FLAG_GROUP_` prefix
  */
 #define OS_FLAG_ID(GROUP, MEMBER) (((OS_FLAGS_ ## GROUP) << 8) | (1 << (OS_FLAGS_ ## GROUP ## _ ## MEMBER)))
 
@@ -322,7 +322,7 @@ void os_ResetFlagBits(int16_t offset_pattern);
 #define OS_FLAGS_GRAPHDISP                 0x4B /**< FLAGS */
 #define OS_FLAGS_GRAPHDISP_BACKGROUNDVALID 4 /**< 1 = items in graph background are still valid */
 
-#define os_Flags            ((uint8_t*)0xD00080)
+#define os_Flags ((uint8_t*)0xD00080)
 
 #ifdef __cplusplus
 }

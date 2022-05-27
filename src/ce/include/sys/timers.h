@@ -82,10 +82,10 @@ extern "C" {
  * Enables timer \p n with the specified settings.
  * The CE has 3 different timers.
  *
- * @param n Timer to enable (range 1 - 3 inclusive).
- * @param rate Rate in Hz the timer ticks at. Can be TIMER_32K or TIMER_CPU.
- * @param int Throw an interrupt when the timer reaches 0. Can be TIMER_0INT or TIMER_NOINT.
- * @param dir Direction in which to count. Can be TIMER_UP or TIMER_DOWN.
+ * @param[in] n Timer to enable (range 1 - 3 inclusive).
+ * @param[in] rate Rate in Hz the timer ticks at. Can be TIMER_32K or TIMER_CPU.
+ * @param[in] int Throw an interrupt when the timer reaches 0. Can be TIMER_0INT or TIMER_NOINT.
+ * @param[in] dir Direction in which to count. Can be TIMER_UP or TIMER_DOWN.
  *
  * @warning
  * Timer 2 is needed by library functions like clock() and sleep(). Timer 3 is
@@ -96,16 +96,16 @@ extern "C" {
 /**
  * Disables a timer.
  *
- * @param n Timer to disable (range 1 - 3 inclusive).
+ * @param[in] n Timer to disable (range 1 - 3 inclusive).
  */
 #define timer_Disable(n) (timer_Control &= ~(1 << 3 * ((n) - 1)))
 
 /**
  * Gets the current count value of a timer.
  *
- * @param n Timer to get count value of (range 1 - 3 inclusive).
+ * @param[in] n Timer to get count value of (range 1 - 3 inclusive).
  *
- * @attention
+ * @warning
  * Do not use this function if the timer is configured with TIMER_CPU.
  * Use the timer_GetSafe() function instead.
  */
@@ -115,8 +115,8 @@ extern "C" {
  * Safely gets the current count value of a timer.
  * This should be used if the timer is ticking at >= 1MHz.
  *
- * @param n Timer to get count value of (range 1 - 3 inclusive).
- * @param dir Direction the timer is counting.
+ * @param[in] n Timer to get count value of (range 1 - 3 inclusive).
+ * @param[in] dir Direction the timer is counting.
  */
 #define timer_GetSafe(n, dir) \
     ((dir) == TIMER_UP ? \
@@ -126,8 +126,8 @@ extern "C" {
 /**
  * Sets the count value of a timer.
  *
- * @param n Timer to set count value of (range 1 - 3 inclusive).
- * @param value Value to set timer count to.
+ * @param[in] n Timer to set count value of (range 1 - 3 inclusive).
+ * @param[in] value Value to set timer count to.
  */
 #define timer_Set(n, value) *TIMER_COUNT_ADDR(n) = (uint32_t)(value)
 
@@ -135,7 +135,7 @@ extern "C" {
  * Gets the current reload value of a timer.
  * The reload value is loaded into the timer count when the timer reaches zero.
  *
- * @param n Timer to get count reload value of (range 1 - 3 inclusive).
+ * @param[in] n Timer to get count reload value of (range 1 - 3 inclusive).
  */
 #define timer_GetReload(n) *TIMER_RELOAD_ADDR(n)
 
@@ -143,8 +143,8 @@ extern "C" {
  * Sets the reload value of a timer.
  * The reload value is loaded into the timer count when the timer reaches zero.
  *
- * @param n Timer to set count reload value of (range 1 - 3 inclusive).
- * @param value Value to set timer reload count to.
+ * @param[in] n Timer to set count reload value of (range 1 - 3 inclusive).
+ * @param[in] value Value to set timer reload count to.
  */
 #define timer_SetReload(n, value) *TIMER_RELOAD_ADDR(n) = (uint32_t)(value)
 
@@ -152,8 +152,8 @@ extern "C" {
  * Gets the match \p m value of a timer.
  * There are two match value comparators per timer.
  *
- * @param n Timer to get match comparator value of (range 1 - 3 inclusive).
- * @param m Match compartor index (range 1 - 2 inclusive,
+ * @param[in] n Timer to get match comparator value of (range 1 - 3 inclusive).
+ * @param[in] m Match compartor index (range 1 - 2 inclusive,
  *     recommended to use TIMER_MATCH(1) or TIMER_MATCH(2)).
  */
 #define timer_GetMatch(n, m) *TIMER_MATCH_ADDR(n, m)
@@ -162,10 +162,10 @@ extern "C" {
  * Sets the match \p m value of a timer.
  * There are two match value comparators per timer.
  *
- * @param n Timer to set match comparator value of (range 1 - 3 inclusive).
- * @param m Match compartor index (range 1 - 2 inclusive
+ * @param[in] n Timer to set match comparator value of (range 1 - 3 inclusive).
+ * @param[in] m Match compartor index (range 1 - 2 inclusive
  *     recommended to use TIMER_MATCH(1) or TIMER_MATCH(2)).
- * @param value Value to set match compartor to.
+ * @param[in] value Value to set match compartor to.
  */
 #define timer_SetMatch(n, m, value) *TIMER_MATCH_ADDR(n, m) = (uint32_t)(value)
 
@@ -173,8 +173,8 @@ extern "C" {
  * Acknowledges a timer interrupt.
  * This should be used to clear the condition that is causing the interrupt.
  *
- * @param n Timer to acknowledge interrupt of (range 1 - 3 inclusive).
- * @param mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
+ * @param[in] n Timer to acknowledge interrupt of (range 1 - 3 inclusive).
+ * @param[in] mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
  * or TIMER_MATCH(2).
  */
 #define timer_AckInterrupt(n, mask) (timer_IntAcknowledge = (mask) << 3 * ((n) - 1))
@@ -182,8 +182,8 @@ extern "C" {
 /**
  * Checks if a timer interrupt condition has occurred.
  *
- * @param n Timer to check interrupt for (range 1 - 3 inclusive).
- * @param mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
+ * @param[in] n Timer to check interrupt for (range 1 - 3 inclusive).
+ * @param[in] mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
  * or TIMER_MATCH(2).
  */
 #define timer_ChkInterrupt(n, mask) ((timer_IntStatus >> 3 * ((n) - 1)) & (mask))
@@ -201,7 +201,7 @@ extern "C" {
 /**
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
- * @param msec number of milliseconds
+ * @param[in] msec number of milliseconds
  * @see sleep
  * @see usleep
  */
@@ -210,7 +210,7 @@ void delay(uint16_t msec);
 /**
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
- * @param msec number of milliseconds
+ * @param[in] msec number of milliseconds
  * @see sleep
  * @see usleep
  */
@@ -223,7 +223,7 @@ void msleep(uint16_t msec);
  * @note
  * Currently, signals do not exist, so this will never be interrupted.
  *
- * @param seconds number of seconds
+ * @param[in] seconds number of seconds
  * @return zero if the requested time has elapsed, or the number of seconds left
  *         to sleep, if the call was interrupted by a signal handler
  * @see delay
@@ -234,7 +234,7 @@ unsigned int sleep(unsigned int seconds);
 /**
  * Suspends execution of the calling thread for (at least) @p ticks clock ticks.
  *
- * @param ticks number of clock ticks
+ * @param[in] ticks number of clock ticks
  * @see CLOCKS_PER_SEC
  * @see delay
  * @see usleep
@@ -258,7 +258,7 @@ typedef unsigned int useconds_t;
  * @note
  * Currently, no errors are possible.
  *
- * @param usec number of microseconds
+ * @param[in] usec number of microseconds
  * @return 0 on success, or -1 on error, with \c errno set to indicate the error
  * @see delay
  * @see sleep

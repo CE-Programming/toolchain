@@ -76,23 +76,23 @@ void os_EnableCursor(void);
 /**
  * Set the cursor posistion used on the homescreen
  *
- * @param curRow The row aligned offset
- * @param curCol The column aligned offset
+ * @param[in] curRow The row aligned offset
+ * @param[in] curCol The column aligned offset
  */
 void os_SetCursorPos(uint8_t curRow, uint8_t curCol);
 
 /**
  * Gets the cursor posistion used on the homescreen
  *
- * @param curRow Pointer to store the row aligned offset
- * @param curCol Pointer to store the column aligned offset
+ * @param[in] curRow Pointer to store the row aligned offset
+ * @param[in] curCol Pointer to store the column aligned offset
  */
 void os_GetCursorPos(unsigned int *curRow, unsigned int *curCol);
 
 /**
  * Puts some text at the current homescreen cursor location
  *
- * @param string Text to put on homescreen
+ * @param[in] string Text to put on homescreen
  * @returns 1 if string fits on screen, 0 otherwise
  */
 uint24_t os_PutStrFull(const char *string);
@@ -100,7 +100,7 @@ uint24_t os_PutStrFull(const char *string);
 /**
  * Puts some text at the current homescreen cursor location
  *
- * @param string Text to put on homescreen
+ * @param[in] string Text to put on homescreen
  * @returns 1 if string fits on line, 0 otherwise
  */
 uint24_t os_PutStrLine(const char *string);
@@ -151,9 +151,9 @@ void os_EnableHomeTextBuffer(void);
  * It is HIGHLY recommended you implement your own routine, this routine has
  * some quirks. It is good enough for getting basic input however.
  *
- * @param string Input prompt string to be displayed to the user
- * @param buf Storage location to store input string
- * @param bufsize Available storage size for input string. -1 for null termination.
+ * @param[in] string Input prompt string to be displayed to the user
+ * @param[in] buf Storage location to store input string
+ * @param[in] bufsize Available storage size for input string. -1 for null termination.
  * @returns None
  */
 void os_GetStringInput(char *string, char *buf, size_t bufsize);
@@ -198,7 +198,7 @@ typedef struct font {
 /**
  * Selects the (monospace) font to use when drawing text
  *
- * @param font font id/pointer to use
+ * @param[in] font font id/pointer to use
  * os_SmallFont                                       <br>
  * os_LargeFont
  */
@@ -214,22 +214,22 @@ void os_FontSelect(font_t *font);
 font_t *os_FontGetID(void);
 
 /**
- * @param string String to get pixel width of
+ * @param[in] string String to get pixel width of
  * @returns The width of a string in the variable-width format
  */
 uint24_t os_FontGetWidth(const char *string);
 
 /**
- * @returns The height of the font characters
+ * @returns[in] The height of the font characters
  */
 uint24_t os_FontGetHeight(void);
 
 /**
  * Draws text using the small font to the screen
  *
- * @param string String to draw
- * @param col Column to start drawing at
- * @param row Row to start drawing at
+ * @param[in] string String to draw
+ * @param[in] col Column to start drawing at
+ * @param[in] row Row to start drawing at
  * @returns The end column
  */
 uint24_t os_FontDrawText(const char *string, uint16_t col, uint8_t row);
@@ -237,16 +237,16 @@ uint24_t os_FontDrawText(const char *string, uint16_t col, uint8_t row);
 /**
  * Draws transparent text using the small font to the screen
  *
- * @param string String to draw
- * @param col Column to start drawing at
- * @param row Row to start drawing at
+ * @param[in] string String to draw
+ * @param[in] col Column to start drawing at
+ * @param[in] row Row to start drawing at
  * @returns The end column
  */
 uint24_t os_FontDrawTransText(const char *string, uint16_t col, uint8_t row);
 
 /**
  * Sets the foreground color used to draw text
- * @param color 565 BGR color to set text foreground to
+ * @param[in] color 565 BGR color to set text foreground to
  */
 void os_SetDrawFGColor(uint24_t color);
 
@@ -258,7 +258,7 @@ uint24_t os_GetDrawFGColor(void);
 
 /**
  * Sets the background color used to draw text
- * @param color 565 BGR color to set text background to
+ * @param[in] color 565 BGR color to set text background to
  */
 void os_SetDrawBGColor(uint24_t color);
 

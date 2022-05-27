@@ -24,18 +24,18 @@ extern "C" {
  * Sets the calculator's date
  *
  * Performs checks to ensure date is within range
- * @param day Day to set
- * @param month Month to set
- * @param year Year to set
+ * @param[in] day Day to set
+ * @param[in] month Month to set
+ * @param[in] year Year to set
  */
 void boot_SetDate(uint8_t day, uint8_t month, uint16_t year);
 
 /**
  * Gets the calculator's date
  *
- * @param day Pointer to variable to store day
- * @param month Pointer to variable to store month
- * @param year Pointer to variable to store year
+ * @param[out] day Pointer to variable to store day
+ * @param[out] month Pointer to variable to store month
+ * @param[out] year Pointer to variable to store year
  */
 void boot_GetDate(uint8_t *day, uint8_t *month, uint16_t *year);
 
@@ -43,9 +43,9 @@ void boot_GetDate(uint8_t *day, uint8_t *month, uint16_t *year);
  * Sets the calculator's time
  *
  * Performs checks to ensure time is within range
- * @param seconds Seconds to set
- * @param minutes Minutes to set
- * @param hours Hours to set
+ * @param[in] seconds Seconds to set
+ * @param[in] minutes Minutes to set
+ * @param[in] hours Hours to set
  */
 void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
 
@@ -55,9 +55,9 @@ void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
  * @note You can read \c rtc_Seconds, \c rtc_Minutes , and \c rtc_Hours directly, but you should double check
  * that \c rtc_Seconds didn't change while reading \c rtc_Minutes and \c rtc_Hours .
  *
- * @param seconds Pointer to variable to store seconds
- * @param minutes Pointer to variable to store minutes
- * @param hours Pointer to variable to store hours
+ * @param[out] seconds Pointer to variable to store seconds
+ * @param[out] minutes Pointer to variable to store minutes
+ * @param[out] hours Pointer to variable to store hours
  */
 void boot_GetTime(uint8_t *seconds, uint8_t *minutes, uint8_t *hours);
 

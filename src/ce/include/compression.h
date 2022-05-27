@@ -14,10 +14,10 @@ extern "C" {
 /**
  * Decompress a block of zx7 encoded data
  *
- * @param dest Pointer to destination for uncompressed data
- * @param src Pointer to compressed data
+ * @param[in] dst Pointer to destination for uncompressed data
+ * @param[in] src Pointer to compressed data
 */
-void zx7_Decompress(void *dest, const void *src);
+void zx7_Decompress(void *dst, const void *src);
 
 #ifdef __cplusplus
 }

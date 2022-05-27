@@ -72,7 +72,7 @@ typedef struct { real_t real, imag; } cplx_t;
 /**
  * Copies a real_t type
  *
- * @param src Pointer to original real_t
+ * @param[in] src Pointer to original real_t
  * @returns Copied real_t
  */
 real_t os_RealCopy(const real_t *src);
@@ -149,8 +149,8 @@ real_t os_RealSub(const real_t *arg1, const real_t *arg2);
 /**
  * Rounds a real_t
  *
- * @param arg Real variable.
- * @param digits Number of digits to round to.
+ * @param[in] arg Real variable.
+ * @param[in] digits Number of digits to round to.
  * @note digits must be in the range 0 - 9
  */
 real_t os_RealRound(const real_t *arg, char digits);
@@ -158,8 +158,8 @@ real_t os_RealRound(const real_t *arg, char digits);
 /**
  * Compares two real_t
  *
- * @param arg1 Real variable 1.
- * @param arg2 Real variable 2.
+ * @param[in] arg1 Real variable 1.
+ * @param[in] arg2 Real variable 2.
  * @returns -1, 0, or 1 if arg1 is less than, equal to, or greater than arg2.
  * @note <tt>os_RealCompare(arg1, arg2) op 0</tt> computes <tt>arg1 op arg2</tt> for any comparison operator \c op.
  */
@@ -168,7 +168,7 @@ int os_RealCompare(const real_t *arg1, const real_t *arg2);
 /**
  * Converts a real_t to an integer
  *
- * @param arg Real variable.
+ * @param[in] arg Real variable.
  * @note Saturates on overflow
  */
 int24_t os_RealToInt24(const real_t *arg);
@@ -192,7 +192,7 @@ float os_RealToFloat(const real_t *arg);
 /**
  * Converts an float to a real_t
  *
- * @param arg Float value.
+ * @param[in] arg Float value.
  * @note Saturates on overflow
  */
 real_t os_FloatToReal(float arg);
@@ -200,18 +200,18 @@ real_t os_FloatToReal(float arg);
 /**
  * This converts a ti-float to a ti-ascii string.
  *
- * @param result Zero terminated string copied to this address
- * @param arg Real to convert
- * @param maxLength
+ * @param[in] result Zero terminated string copied to this address
+ * @param[in] arg Real to convert
+ * @param[in] maxLength
  *  <=0: use default max length (14)                            <br>
  *  >0:  max length of result, minimum of 6
- * @param mode:
+ * @param[in] mode:
  *  0: Use current mode for everything (digits ignored)         <br>
  *  1: Normal mode                                              <br>
  *  2: Sci mode                                                 <br>
  *  3: Eng mode                                                 <br>
  *  >4: Use current Normal/Sci/Eng mode (digits still used)     <br>
- * @param digits
+ * @param[in] digits
  *  -1:  Float mode                                             <br>
  *  0-9: Fix # mode                                             <br>
  * @returns Length of result
@@ -222,8 +222,8 @@ int os_RealToStr(char *result, const real_t *arg, int8_t maxLength, uint8_t mode
  *  This converts a ti-ascii string to a ti-float.
  *
  *  String format regexp: / *[-\032+]?[0-9]*(\.[0-9]*)?([eE\033][-\032+]?[0-9]*)?/
- *  @param string TI-ascii string to convert
- *  @param end If non-null, pointer to end of parsed number is stored here
+ *  @param[in] string TI-ascii string to convert
+ *  @param[in] end If non-null, pointer to end of parsed number is stored here
  *  @returns resulting TI-float; on exponent overflow this is +-9.9999999999999e99
  */
 real_t os_StrToReal(const char *string, char **end);

@@ -27,7 +27,7 @@ void kb_Scan(void);
 
 /**
  * Scans the given keyboard row and returns the row value.
- * @param row Row to scan.
+ * @param[in] row Row to scan.
  * @note Disables interrupts.
  */
 kb_key_t kb_ScanGroup(uint8_t row);

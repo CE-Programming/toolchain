@@ -5,7 +5,6 @@
  *
  * These debug functions are provided to help in the process of debugging
  * an application. To enable them, use 'make debug' when compiling a program.
- * More information can be found here: https://github.com/CE-Programming/toolchain/wiki/Debugging
  */
 
 #include <stdio.h>
@@ -16,29 +15,34 @@ extern "C" {
 
 #ifndef NDEBUG
 
-#define dbgout ((char*)0xFB0000) /**< Standard debug output */
-#define dbgerr ((char*)0xFC0000) /**< Error debug output */
+/** Standard debug output */
+#define dbgout ((char*)0xFB0000)
+/** Standard error debug output */
+#define dbgerr ((char*)0xFC0000)
 
-#define DBG_WATCHPOINT_READ (1 << 0)  /**< Break on read. */
-#define DBG_WATCHPOINT_WRITE (1 << 1)  /**< Break on write. */
-#define DBG_WATCHPOINT_RW ((1 << 0) | (1 << 1))  /**< Break on read or write. */
+/** Break on read. */
+#define DBG_WATCHPOINT_READ (1 << 0) 
+/** Break on write. */
+#define DBG_WATCHPOINT_WRITE (1 << 1)
+/** Break on read or write. */
+#define DBG_WATCHPOINT_RW ((1 << 0) | (1 << 1))
 
 /**
  * Used to print to the emulator console.
  *
- * See the syntax for 'printf' for more information.
- * @param ... Uses printf-formated specifier string.
- * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO.
+ * See the syntax for 'printf' for format specifiers.
+ * @param[in] ... Uses printf-formated specifier string.
+ * @note Does not support floats unless `HAS_PRINTF = YES`.
  */
 #define dbg_printf(...) sprintf(dbgout, ##__VA_ARGS__)
 
 /**
  * Used to print to the emulator console.
  *
- * See the syntax for 'printf' for more information.
- * @param out Can be dbgout (black) or dbgerr (red).
- * @param ... Uses printf-formated specifier string.
- * @note Does not support floats unless USE_FLASH_FUNCTIONS = NO.
+ * See the syntax for 'printf' for format specifiers.
+ * @param[in] out Can be dbgout (black) or dbgerr (red).
+ * @param[in] ... Uses printf-formated specifier string.
+ * @note Does not support floats unless `HAS_PRINTF = YES`.
  */
 #define dbg_sprintf(out, ...) sprintf(out, ##__VA_ARGS__)
 
@@ -61,7 +65,7 @@ do { \
 /**
  * Sets an emulated breakpoint.
  *
- * @param address Breakpoint address to set.
+ * @param[in] address Breakpoint address to set.
  */
 #define dbg_SetBreakpoint(address) \
 do { \
@@ -72,7 +76,7 @@ do { \
 /**
  * Removes an emulated breakpoint.
  *
- * @param address Breakpoint address to remove.
+ * @param[in] address Breakpoint address to remove.
  */
 #define dbg_RemoveBreakpoint(address) \
 do { \
@@ -83,9 +87,9 @@ do { \
 /**
  * Sets an emulated watchpoint.
  *
- * @param address Watchpoint address to set.
- * @param length The size of the data at the address.
- * @param flags DBG_WATCHPOINT_READ, DBG_WATCHPOINT_WRITE, or
+ * @param[in] address Watchpoint address to set.
+ * @param[in] length The size of the data at the address.
+ * @param[in] flags DBG_WATCHPOINT_READ, DBG_WATCHPOINT_WRITE, or
  *              DBG_WATCHPOINT_RW. (or 0 to disable).
  */
 #define dbg_SetWatchpoint(address, length, flags) \
@@ -99,7 +103,7 @@ do { \
 /**
  * Removes an emulated watchpoint.
  *
- * @param address Watchpoint address to remove.
+ * @param[in] address Watchpoint address to remove.
  */
 #define dbg_RemoveWatchpoint(address) \
 do { \

@@ -19,7 +19,7 @@ extern "C" {
 /**
  * Throws an OS error
  *
- * @param error Error code to throw
+ * @param[in] error Error code to throw
  */
 void os_ThrowError(uint8_t error) __attribute__((noreturn));
 

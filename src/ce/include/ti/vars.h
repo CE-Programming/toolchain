@@ -65,7 +65,7 @@ typedef struct { uint16_t size; uint8_t data[1]; } var_t;
  * purposes but do not exceed the size returned. This function is useful if you
  * are running out of space in the bss or heap and need a little extra memory.
  *
- * @param free Set to start of free available RAM
+ * @param[out] free Set to start of free available RAM
  * @returns Size of available RAM
  */
 size_t os_MemChk(void **free);
@@ -88,7 +88,7 @@ void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *n
 /**
  * Delete a var from RAM.
  *
- * @param entry An entry as returned from os_NextSymEntry().
+ * @param[in] entry An entry as returned from os_NextSymEntry().
  * @return TIOS System Error Code or 0 on success.
  */
 int os_DelSymEntry(void *entry);
@@ -96,8 +96,8 @@ int os_DelSymEntry(void *entry);
 /**
  * Creates an TIOS Str.
  *
- * @param name Name of the Str to create.
- * @param data Initial contents of the created Str.
+ * @param[in] name Name of the Str to create.
+ * @param[in] data Initial contents of the created Str.
  * @returns A TIOS error code, or 0 on success.
  */
 int os_CreateString(const char *name, const string_t *data);
@@ -105,8 +105,8 @@ int os_CreateString(const char *name, const string_t *data);
 /**
  * Gets a pointer to an TIOS Str's data, which may be in archive.
  *
- * @param name Name of the Str to lookup.
- * @param archived Set to 1 if the Str is archived, otherwise 0, may be NULL if you don't need it.
+ * @param[in] name Name of the Str to lookup.
+ * @param[in] archived Set to 1 if the Str is archived, otherwise 0, may be NULL if you don't need it.
  * @returns A pointer to the Str data
  * @note Returns NULL if the Str doesn't exist, otherwise a pointer to the size bytes.
  */
@@ -115,8 +115,8 @@ string_t *os_GetStringData(const char *name, int *archived);
 /**
  * Creates a TIOS Equ.
  *
- * @param name Name of the Equ to create.
- * @param data Initial contents of the created Equ.
+ * @param[in] name Name of the Equ to create.
+ * @param[in] data Initial contents of the created Equ.
  * @returns A TIOS error code, or 0 on success.
  */
 int os_CreateEquation(const char *name, const equ_t *data);
@@ -124,8 +124,8 @@ int os_CreateEquation(const char *name, const equ_t *data);
 /**
  * Gets a pointer to an TIOS Equ's data, which may be in archive.
  *
- * @param name Name of the Equ to lookup.
- * @param archived Set to 1 if the Equ is archived, otherwise 0, may be NULL if you don't need it.
+ * @param[in] name Name of the Equ to lookup.
+ * @param[in] archived Set to 1 if the Equ is archived, otherwise 0, may be NULL if you don't need it.
  * @returns A pointer to the Equ data.
  * @note Returns NULL if the Equ doesn't exist, otherwise a pointer to the size bytes.
  */
@@ -134,8 +134,8 @@ equ_t *os_GetEquationData(const char *name, int *archived);
 /**
  * Creates a TIOS AppVar.
  *
- * @param name Name of the AppVar to create.
- * @param size Size of AppVar to create.
+ * @param[in] name Name of the AppVar to create.
+ * @param[in] size Size of AppVar to create.
  * @returns A pointer to the AppVar data.
  * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes.
  * @note If successful, the AppVar contents will be uninitialized, aka filled with random bytes.
@@ -145,8 +145,8 @@ var_t *os_CreateAppVar(const char *name, uint16_t size);
 /**
  * Gets a pointer to a TIOS AppVar's data, which may be in archive.
  *
- * @param name Name of the AppVar to lookup.
- * @param archived Set to 1 if the AppVar is archived, otherwise 0, may be NULL if you don't need it.
+ * @param[in] name Name of the AppVar to lookup.
+ * @param[in] archived Set to 1 if the AppVar is archived, otherwise 0, may be NULL if you don't need it.
  * @returns A pointer to the AppVar data.
  * @note Returns NULL if the AppVar doesn't exist, otherwise a pointer to the size bytes.
  */
@@ -155,17 +155,17 @@ var_t *os_GetAppVarData(const char *name, int *archived);
 /**
  * Deletes an AppVar from RAM.
  *
- * @param name Name of the AppVar to delete.
+ * @param[in] name Name of the AppVar to delete.
  */
 void os_DelAppVar(const char *name);
 
 /**
  * Locates a symbol in the symtable
  *
- * @param type Type of symbol to find
- * @param name Pointer to name of symbol to find
- * @param entry Can be NULL if you don't care
- * @param data Can be NULL if you don't care
+ * @param[in] type Type of symbol to find
+ * @param[in] name Pointer to name of symbol to find
+ * @param[out] entry Can be NULL if you don't care
+ * @param[out] data Can be NULL if you don't care
  * @return If file exists, returns 1 and sets entry and data, otherwise returns 0.
  */
 int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
@@ -174,8 +174,8 @@ int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
  * Gets the size of sized vars such as equations, string, programs, appvars,
  * or the dimension of a list.
  *
- * @param name Name of the var to lookup.
- * @param size Pointer to store size of variable.
+ * @param[in] name Name of the var to lookup.
+ * @param[out] size Pointer to store size of variable.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetVarSize(const char *name, size_t *size);
@@ -183,9 +183,9 @@ int os_GetVarSize(const char *name, size_t *size);
 /**
  * Gets the dimensions of a matrix.
  *
- * @param name Name of the matrix to lookup.
- * @param rows Pointer to store number of rows.
- * @param cols Pointer to store number of columns.
+ * @param[in] name Name of the matrix to lookup.
+ * @param[in] rows Pointer to store number of rows.
+ * @param[in] cols Pointer to store number of columns.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetMatrixDims(const char *name, int *rows, int *cols);
@@ -194,9 +194,9 @@ int os_GetMatrixDims(const char *name, int *rows, int *cols);
  * Gets a real value from a real list or a complex list where the selected
  * element has no imaginary component.
  *
- * @param name Name of the list.
- * @param index Element index (1-based).
- * @param value Set tto the value of the selected element.
+ * @param[in] name Name of the list.
+ * @param[in] index Element index (1-based).
+ * @param[out] value Set to the value of the selected element.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetRealListElement(const char *name, int index, real_t *value);
@@ -204,10 +204,10 @@ int os_GetRealListElement(const char *name, int index, real_t *value);
 /**
  * Gets a real value from a matrix.
  *
- * @param name Name of the matrix.
- * @param row Element row (1-based).
- * @param col Element col (1-based).
- * @param value Set to the value of the selected element.
+ * @param[in] name Name of the matrix.
+ * @param[in] row Element row (1-based).
+ * @param[in] col Element col (1-based).
+ * @param[out] value Set to the value of the selected element.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetMatrixElement(const char *name, int row, int col, real_t *value);
@@ -216,8 +216,8 @@ int os_GetMatrixElement(const char *name, int row, int col, real_t *value);
  * Gets the real value of a real variable or a complex variable with
  * no imaginary component.
  *
- * @param name Name of TIOS variable.
- * @param value Set to the value of the variable.
+ * @param[in] name Name of TIOS variable.
+ * @param[out] value Set to the value of the variable.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetRealVar(const char *name, real_t *value);
@@ -226,8 +226,8 @@ int os_GetRealVar(const char *name, real_t *value);
  * If list \p name doesn't exist, create it with \p dim elements, otherwise
  * resize the list, with new elements being set to 0.
  *
- * @param name Name of the list to resize.
- * @param dim New list dimension.
+ * @param[in] name Name of the list to resize.
+ * @param[in] dim New list dimension.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_SetListDim(const char *name, int dim);
@@ -236,9 +236,9 @@ int os_SetListDim(const char *name, int dim);
  * If matrix \p name doesn't exist, create it with dimensions \p rows and
  * \p cols, otherwise resize the matrix, with new elements being set to 0.
  *
- * @param name Name of the matrix to resize.
- * @param rows New row dimension.
- * @param cols New col dimension.
+ * @param[in] name Name of the matrix to resize.
+ * @param[in] rows New row dimension.
+ * @param[in] cols New col dimension.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_SetMatrixDims(const char *name, int rows, int cols);
@@ -247,9 +247,9 @@ int os_SetMatrixDims(const char *name, int rows, int cols);
  * Sets a list element to a real value.  If the list doesn't exist, then index
  * must be 1 and it creates a 1 element list.
  *
- * @param name Name of the list.
- * @param index Element index (1-based).
- * @param value The value to set to the selected element.
+ * @param[in] name Name of the list.
+ * @param[in] index Element index (1-based).
+ * @param[in] value The value to set to the selected element.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_SetRealListElement(const char *name, int index, const real_t *value);
@@ -257,10 +257,10 @@ int os_SetRealListElement(const char *name, int index, const real_t *value);
 /**
  * Sets a matrix element to a real value.
  *
- * @param name Name of the matrix.
- * @param row Element row (1-based).
- * @param col Element col (1-based).
- * @param value The value to set to the selected element.
+ * @param[in] name Name of the matrix.
+ * @param[in] row Element row (1-based).
+ * @param[in] col Element col (1-based).
+ * @param[in] value The value to set to the selected element.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_SetMatrixElement(const char *name, int row, int col, const real_t *value);
@@ -268,8 +268,8 @@ int os_SetMatrixElement(const char *name, int row, int col, const real_t *value)
 /**
  * Sets a variable to a real value, creating it if it doesn't exist.
  *
- * @param name Name of variable to lookup.
- * @param value The value to set the variable to.
+ * @param[in] name Name of variable to lookup.
+ * @param[in] value The value to set the variable to.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_SetRealVar(const char *name, const real_t *value);
@@ -277,7 +277,7 @@ int os_SetRealVar(const char *name, const real_t *value);
 /**
  * Gets the Ans variable
  *
- * @param type This is set to the current variable type in ANS
+ * @param[in] type This is set to the current variable type in ANS
  * @returns Pointer to the data
  * @note Returns NULL if Ans doesn't exist or type is NULL
  */
@@ -303,14 +303,14 @@ typedef int (*os_runprgm_callback_t)(void *data, int retval);
  * stored by using the extra user data arguments, which will then be delivered
  * to the callback.
  *
- * @param prgm Name of program to execute.
- * @param data User data that will be available in the callback function.
+ * @param[in] prgm Name of program to execute.
+ * @param[in] data User data that will be available in the callback function.
  * May be \c NULL.
- * @param size Size of user data (keep this small, it is stored on the stack!)
- * @param callback Callback function to run when program finishes executing. The
- * argument \p data will contain the provided \p data contents, and \p retval
- * will contain the error code if a TI-BASIC program, or the exit code if a C
- * program. Other types of programs may have an undefined \p retval. This
+ * @param[in] size Size of user data (keep this small, it is stored on the stack!)
+ * @param[in] callback Callback function to run when program finishes executing.
+ * The argument \p data will contain the provided \p data contents, and \p
+ * retval will contain the error code if a TI-BASIC program, or the exit code if
+ * a C program. Other types of programs may have an undefined \p retval. This
  * argument may be left \c NULL if execution should not return to the calling
  * program.
  *
