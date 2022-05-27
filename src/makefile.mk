@@ -219,7 +219,7 @@ endif
 # define the c/c++ flags used by clang
 EZCOMMONFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 
 # these are the fasmg linker flags
 FASMGFLAGS = \

@@ -41,9 +41,10 @@ clean:
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_H))
+	$(Q)$(call MKDIR,$(INSTALL_CXX_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_LIBCXX))
-	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
+	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_CXX_H))
 
 .PHONY: all clean
 
