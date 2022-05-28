@@ -29,6 +29,8 @@ INIT_LOC ?= D1A87F
 OUTPUT_MAP ?= YES
 CFLAGS ?= -Wall -Wextra -Oz
 CXXFLAGS ?= -Wall -Wextra -Oz
+EXTRA_LDFLAGS ?=
+LTOFLAGS ?= $(CFLAGS)
 LTO ?= YES
 SRCDIR ?= src
 OBJDIR ?= obj
@@ -38,7 +40,6 @@ CPP_EXTENSION = cpp
 C_EXTENSION = c
 CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
-#----------------------------
 HAS_UPPERCASE_NAME ?= YES
 HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
@@ -217,9 +218,11 @@ LDHAS_PRINTF := 1
 endif
 
 # define the c/c++ flags used by clang
-EZCOMMONFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv -mllvm -profile-guided-section-prefix=false -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
+EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false
+EZCOMMONFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
 EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 
 # these are the fasmg linker flags
 FASMGFLAGS = \
@@ -296,7 +299,7 @@ $(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA
 
 # lto
 $(LDLTO): $(LDBCLTO)
-	$(Q)$(CC) -S $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(CC) -S $(EZLTOFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(LDBCLTO): $(LTOFILES)
 	$(Q)echo [lto opt] $(call NATIVEPATH,$@)
