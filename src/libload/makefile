@@ -19,6 +19,7 @@ include $(CURDIR)/../common.mk
 LIB_SRC := libload.asm
 LIB_LIB := libload.lib
 LIB_8XV := libload.8xv
+LIB_H := libload.h
 
 all: $(LIB_8XV)
 
@@ -30,7 +31,9 @@ clean:
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_LIB))
+	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call COPY,$(LIB_LIB),$(INSTALL_LIB))
+	$(Q)$(call COPY,$(LIB_H),$(INSTALL_H))
 
 .PHONY: all clean install
 
