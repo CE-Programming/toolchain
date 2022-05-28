@@ -230,15 +230,15 @@ int ti_GetC(uint8_t handle);
 /**
  * Seeks to an offset in the file.
  * \rst
- *   +----------------------+-------------------------------------------------------+
- *   | **origin**           | **Description**                                       |
- *   +----------------------+-------------------------------------------------------+
- *   | SEEK_SET (:code:`0`) | Seek from beginning of AppVar/variable.               |
- *   +----------------------+-------------------------------------------------------+
- *   | SEEK_CUR (:code:`1`) | Seek from current AppVar/variable offset.             |
- *   +----------------------+-------------------------------------------------------+
- *   | SEEK_END (:code:`2`) | Seek from end of AppVar/variable.                     |
- *   +----------------------+-------------------------------------------------------+
+ *   +--------------+-------------------------------------------------------+
+ *   | **origin**   | **Description**                                       |
+ *   +--------------+-------------------------------------------------------+
+ *   | SEEK_SET     | Seek from beginning of AppVar/variable.               |
+ *   +--------------+-------------------------------------------------------+
+ *   | SEEK_CUR     | Seek from current AppVar/variable offset.             |
+ *   +--------------+-------------------------------------------------------+
+ *   | SEEK_END     | Seek from end of AppVar/variable.                     |
+ *   +--------------+-------------------------------------------------------+
  * \endrst
  * @param[in] offset Number of bytes to offest from (can be negative).
  * @param[in] origin Documented in the above table.
