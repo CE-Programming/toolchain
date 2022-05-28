@@ -46,7 +46,7 @@ prgm_start        := buf + 886	; pointer to start of actual program when dealing
 appvar_ptr        := buf + 889	; pointer to start of library appvar in archive
 lib_name_ptr      := buf + 892	; pointer to name of library to extract
 show_msgs         := buf + 895  ; show error messages or just exit with error
-found_prgm_start  := buf + 896  ; bool for finding program start
+flag_save         := buf + 896  ; save modified iy flag
 
 REQ_LIB_MARKER    := $C0	; required library signifier byte
 OPT_LIB_MARKER    := $C1	; optional library signifier byte
@@ -60,6 +60,7 @@ LIB_FLAGS         := $22	; flag storage
 loaded            := 0
 keep_in_arc       := 1
 optional          := 2
+is_dep            := 3
 
 macro move_string_to_end
 	ld	bc, 0
@@ -89,6 +90,10 @@ disable_relocations
 
 	ld	a, 1			; disable or enable message handling
 	ld	(show_msgs), a
+
+	ld	a, (iy + LIB_FLAGS)
+	ld	(flag_save), a
+
 	ld	hl, $AA55AA
 	xor	a, a
 	sbc	hl, bc
@@ -110,6 +115,7 @@ disable_relocations
 
 	ld	(error_sp), sp
 
+	res	is_dep, (iy + LIB_FLAGS)
 	res	optional, (iy + LIB_FLAGS)
 	ld	a, (hl)
 	cp	a, REQ_LIB_MARKER
@@ -117,6 +123,8 @@ disable_relocations
 	set	optional, (iy + LIB_FLAGS)
 	cp	a, OPT_LIB_MARKER
 	jr	z, start
+	ld	a, (flag_save)
+	ld	(iy + LIB_FLAGS), a	; restore flag bits
 	jp	(hl)			; return to execution if there are no libs
 
 macro relocate? name, address*
@@ -195,13 +203,13 @@ check_already_loaded:
 .seach_tbl:
 	ld	a, (de)			; compare characters
 	cp	a, (hl)
-	jr	nz, .no.match		; do they match?
+	jr	nz, .no_match		; do they match?
 	inc	hl
 	inc	de
 	or	a, a			; means we've reached the end of the string
 	jr	z, .match
 	jr	.seach_tbl
-.no.match:
+.no_match:
 	pop	de
 	ld	hl, (end_arc_lib_locs)
 	call	ti.CpHLDE		; have we reached the end of the table?
@@ -235,19 +243,16 @@ check_already_loaded:
 	rjump	resolve_entry_points	; need to resolve the entry points & enqueue dependencies
 .not_loaded:
 	ld	hl, (lib_name_ptr)
-	ld	de, (end_arc_lib_locs)
-	call	ti.Mov8b		; copy the string. it shouldn't be bigger than this
-	xor	a
-	ld	(de), a
-	inc	de
-	ld	(end_arc_lib_locs), de ; now we are looking after the null byte
-
-	ld	hl, (lib_name_ptr)
 	move_string_to_end
 	push	hl			; save the location in the program we are on
 findlib:
 	call	ti.ChkFindSym
 	jr	nc, .foundlib		; throw an error if the library doesn't exist
+	bit	optional,(iy + LIB_FLAGS)
+	jr	z, .missing		; if optional, zeroize marker and move on
+	pop	hl			; get version byte pointer
+	jr	optional_lib_clear
+.missing:
 	rjump	error_missing		; jump to the lib missing handler
 .foundlib:
 	call	ti.ChkInRam
@@ -281,9 +286,31 @@ assert LIB_MAGIC_1 = LIB_MAGIC_1_ALT+1
 	cp	a, LIB_MAGIC_2_ALT
 .magic_error:
 	jr	z, lib_exists
-
-	rjump	error_version		; throw an error if the library doesn't match the magic numbers
-
+	bit	optional,(iy + LIB_FLAGS)
+	jr	z, invalid_error
+	pop	hl			; get version byte pointer
+optional_lib_clear:
+	push	hl
+	ld	hl, (lib_name_ptr)
+	dec	hl			; library marker type byte
+	ld	de, 0
+	ld	(hl), e			; mark optional library as not found
+	pop	hl
+	inc	hl			; skip version byte
+.loop:
+	ld	a, (hl)
+	cp	a, JP_OPCODE		; jp byte ($C3)
+	jr	nz, .done
+	inc	hl
+	ld	(hl), de		; make the vector zero
+	inc	hl
+	inc	hl
+	inc	hl			; move to next jump
+	jr	.loop
+.done:
+	rjump	check_for_lib_marker
+invalid_error:
+	rjump	error_invalid		; throw an error if the library doesn't match the magic numbers
 lib_exists:
 	inc	hl			; hl->version byte in library
 	push	hl			; save location of version byte
@@ -305,8 +332,23 @@ lib_exists:
 	pop	hl			; hl->version of library in the program
 	cp	a, (hl)			; check if library version in program is greater than library version on-calc
 	jr	nc, good_version
+	bit	optional,(iy + LIB_FLAGS)
+	jr	z, .version_error
+	jr	optional_lib_clear
+.version_error:
 	rjump	error_version		; c flag set if on-calc lib version is less than the one used in the program
 good_version:
+	push	hl
+	push	de
+	ld	hl, (lib_name_ptr)	; store the library name as being loaded
+	ld	de, (end_arc_lib_locs)
+	call	ti.Mov8b		; copy the string. it shouldn't be bigger than this
+	xor	a, a
+	ld	(de), a
+	inc	de
+	ld	(end_arc_lib_locs), de
+	pop	de
+	pop	hl
 	inc	hl			; hl->start of program function jump table
 	inc	de			; de->start of archived function vector table
 	ld	(vector_tbl_ptr), de	; save the pointer to the archived vector table
@@ -378,7 +420,7 @@ need_to_load_lib:
 resolve_entry_points:
 	ld	hl, (ramlocation)
 	rcall	enqueue_all_deps	; get all the dependency pointers that reside in the ram lib
-	ld	hl, (jump_tbl_ptr)	; hl->start of function jump table 0C0326
+	ld	hl, (jump_tbl_ptr)	; hl->start of function jump table
 .loop:
 	ld	a, (hl)
 	cp	a, JP_OPCODE		; jp byte ($C3)
@@ -433,32 +475,27 @@ relocate_absolutes:
 	inc	hl
 	inc	hl			; move to next relocation vector
 	jr	.loop
-
 .done:					; have we found the start of the program?
-	ld	a, (found_prgm_start)
-	or	a, a
-	jr	nz, no_set_start
-
+	bit	is_dep, (iy + LIB_FLAGS)
+	jr	nz, load_next_dep	; if loading dependencies, don't check markers
 	ld	hl, (next_lib_ptr)
-	ld	a, (hl)			; hl->maybe REQ_LIB_MARKER -- If the program is using more libraries
+check_for_lib_marker:
 	res	optional, (iy + LIB_FLAGS)
+	ld	a, (hl)			; hl->maybe REQ_LIB_MARKER -- If the program is using more libraries
 	cp	a, REQ_LIB_MARKER
 	jr	z, goto_load_lib
 	set	optional, (iy + LIB_FLAGS)
 	cp	a, OPT_LIB_MARKER
 	jr	nz, check_has_deps
-
 goto_load_lib:
 	rjump	load_lib		; load the next library
-
 check_has_deps:				; the first time we hit this,  we have all the dependencies placed onto the queue that the libraries use.
-	ld	a, (found_prgm_start)
-	or	a, a
-	jr	nz, no_set_start
-	ld	(prgm_start), hl
-	ld	a, 1
-	ld	(found_prgm_start),a
-no_set_start:
+	res	optional, (iy + LIB_FLAGS)
+	bit	is_dep, (iy + LIB_FLAGS)
+	jr	nz, load_next_dep
+	ld	(prgm_start), hl	; save program start
+	set	is_dep, (iy + LIB_FLAGS)
+load_next_dep:
 	ld	hl, (end_dep_queue)
 	ld	de, dep_queue_ptr
 	call	ti.CpHLDE		; make sure we are done parsing the dependency queue
@@ -474,6 +511,8 @@ no_set_start:
 .exit:
 	call	ti.PopOP1		; restore program name
 	ld	hl, (prgm_start)
+	ld	a, (flag_save)
+	ld	(iy + LIB_FLAGS), a	; restore flag bits
 	xor	a, a
 	inc	a			; return with 1 in a
 	jp	(hl)			; passed all the checks; let's start execution! :)
@@ -482,6 +521,7 @@ enqueue_all_deps:			; we don't need to store anything if we are here
 	bit	keep_in_arc, (iy + LIB_FLAGS)
 	ret	nz			; really,  this is just a precautionary check -- should work fine without
 .loop:
+	res	optional, (iy + LIB_FLAGS)
 	ld	a, (hl)
 	cp	a, REQ_LIB_MARKER	; is there a dependency?
 	jr	nz, .check
@@ -507,9 +547,12 @@ enqueue_all_deps:			; we don't need to store anything if we are here
 	jr	.next
 .check:
 	cp	a, ti.AppVarObj
-	jr	z, .skip			; keep going
+	jr	z, .skip		; keep going
 	ret
 
+error_invalid:
+	rload	str_error_invalid
+	jr	throw_error
 error_version:
 	rload	str_error_version
 	jr	throw_error
@@ -519,10 +562,7 @@ throw_error:				; draw the error message onscreen
 	ld	sp, (error_sp)
 	ld	a, (show_msgs)
 	or	a, a
-	jr	nz, .show_msgs
-	call	ti.PopOP1
-	xor	a, a			; return with zero in a
-	ret
+	jr	z, .return
  .show_msgs:
 	ld	a, ti.lcdBpp16
 	ld	(ti.mpLcdCtrl), a
@@ -562,7 +602,10 @@ throw_error:				; draw the error message onscreen
 .exit:
 	call	ti.ClrScrn
 	call	ti.HomeUp
+.return:
 	call	ti.PopOP1
+	ld	a, (flag_save)
+	ld	(iy + LIB_FLAGS), a	; restore flag bits
 	xor	a, a			; return with zero in a
 	ret
 
@@ -570,6 +613,8 @@ str_error_version:
 	db	"ERROR: Library Version", 0
 str_error_missing:
 	db	"ERROR: Missing Library", 0
+str_error_invalid:
+	db	"ERROR: Invalid Library", 0
 str_lib_name:
 	db	"Library Name: ", 0
 str_download:
