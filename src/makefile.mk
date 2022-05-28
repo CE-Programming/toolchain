@@ -71,8 +71,10 @@ LDHAS_LIBCXX := 0
 V ?= 0
 ifeq ($(V),0)
 Q = @
+FASMG_V := -n
 else
 Q =
+FASMG_V := -v$(V)
 endif
 
 BIN ?= $(CEDEV_TOOLCHAIN)/bin
@@ -232,7 +234,7 @@ EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 
 # these are the fasmg linker flags
 FASMGFLAGS = \
-	-n \
+	$(FASMG_V) \
 	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/meta/ld.alm)) \
 	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
 	-i $(call QUOTE_ARG,HAS_PRINTF := $(LDHAS_PRINTF)) \
