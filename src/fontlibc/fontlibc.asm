@@ -3,7 +3,7 @@ include '../include/library.inc'
 include '../include/include_library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'FONTLIBC',2
+library FONTLIBC,2
 
 ;-------------------------------------------------------------------------------
 ; Dependencies

@@ -76,7 +76,7 @@ end macro
 ;	cp	a, a
 ;	cp	a, VERSION_MAJOR*10+VERSION_MINOR
 
-library 'LibLoad', VERSION_MAJOR*10+VERSION_MINOR, <LIB_MAGIC_1_ALT, LIB_MAGIC_2_ALT>
+library LibLoad, VERSION_MAJOR*10+VERSION_MINOR, <LIB_MAGIC_1_ALT, LIB_MAGIC_2_ALT>
 
 disable_relocations
 

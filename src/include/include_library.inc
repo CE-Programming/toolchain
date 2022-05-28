@@ -5,7 +5,7 @@ macro include_library? file*
 	macro library?! name*, version: 0
 		end if
 			if usedlib
-				db $C0, name, 0, version
+				db $C0, `name, 0, version
 			end if
 		if 0
 	end macro
