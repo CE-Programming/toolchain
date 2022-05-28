@@ -120,6 +120,14 @@ Default: :code:`YES`.
 Miscellaneous Configuration
 ---------------------------
 
+.. rubric:: MAKE_GFX
+
+This is the command that is run when :code:`make gfx` is executed.
+It can be overriden to perform any custom graphics conversions.
+The default command navigates to the graphics directory and runs ``convimg``.
+
+    MAKE_GFX ?= cd src/gfx && convimg
+
 .. rubric:: DEPS
 
 Add any files that you want to be built by the toolchain to this variable.

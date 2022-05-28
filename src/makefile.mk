@@ -47,6 +47,7 @@ HAS_LIBC ?= YES
 HAS_LIBCXX ?= YES
 PREFER_OS_CRT ?= NO
 PREFER_OS_LIBC ?= YES
+LIBLOAD_OPTIONAL ?=
 #----------------------------
 CEDEV_TOOLCHAIN ?= $(shell cedev-config --prefix)
 #----------------------------
@@ -151,8 +152,16 @@ LDFILES = $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
 DEPFILES = $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
 endif
 
-# files created to be used for linking
-LDLIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)
+# find all required/optional libload libraries
+LIBLOAD_LIBS := $(basename $(notdir $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)))
+REQ_LIBLOAD := $(filter-out $(LIBLOAD_OPTIONAL),$(LIBLOAD_LIBS))
+OPT_LIBLOAD := $(filter-out $(REQ_LIBLOAD),$(LIBLOAD_LIBS))
+REQ_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(addprefix $(CEDEV_TOOLCHAIN)/lib/libload/,$(addsuffix .lib,$(REQ_LIBLOAD)))))))
+OPT_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(addprefix $(CEDEV_TOOLCHAIN)/lib/libload/,$(addsuffix .lib,$(OPT_LIBLOAD)))))))
+REQ_LIBLOAD := $(foreach lib,$(REQ_LIBLOAD),$(lib))
+OPT_LIBLOAD := $(foreach lib,$(OPT_LIBLOAD),$(lib):optional)
+LDLIBS := $(subst $(space),$(comma)$(space),$(strip $(REQ_LIBLOAD)$(space)$(OPT_LIBLOAD)))
+LDLIBS := $(subst :,$(space),$(LDLIBS))
 
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
@@ -171,9 +180,9 @@ LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
 endif
 endif
 
-# check if gfx directory exists
+# set default 'make gfx' target
 ifneq ($(wildcard $(GFXDIR)/.),)
-GFXCMD ?= cd $(GFXDIR) && $(CONVIMG)
+MAKE_GFX ?= cd $(GFXDIR) && $(CONVIMG)
 endif
 
 # determine output target flags
@@ -194,8 +203,6 @@ CONVBINFLAGS += --name $(NAME)
 ifeq ($(OUTPUT_MAP),YES)
 LDMAPFLAG := -i map
 endif
-
-# support custom file io configuration
 ifeq ($(HAS_CUSTOM_FILE),YES)
 DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
 endif
@@ -240,7 +247,7 @@ FASMGFLAGS = \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
 	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
-	-i $(call QUOTE_ARG,library $(call FASMG_FILES,$(LDLIBS))) \
+	-i $(call QUOTE_ARG,library $(LDLIBS)) \
 	$(EXTRA_LDFLAGS)
 
 .PHONY: all clean version gfx debug
@@ -276,7 +283,7 @@ clean:
 	$(Q)echo Removed built binaries and objects.
 
 gfx:
-	$(Q)$(GFXCMD)
+	$(Q)$(MAKE_GFX)
 
 test:
 	$(Q)$(CEMUTEST) $(call NATIVEPATH,$(CURDIR)/autotest.json)
