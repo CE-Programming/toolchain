@@ -29,7 +29,6 @@ INIT_LOC ?= D1A87F
 OUTPUT_MAP ?= YES
 CFLAGS ?= -Wall -Wextra -Oz
 CXXFLAGS ?= -Wall -Wextra -Oz
-EXTRA_LDFLAGS ?=
 LTOFLAGS ?= $(CFLAGS)
 LTO ?= YES
 SRCDIR ?= src

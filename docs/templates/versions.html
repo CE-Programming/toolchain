@@ -10,9 +10,28 @@
       <dl>
         <dt>{{ _('Versions') }}</dt>
         {% for slug, url in versions %}
-          {% if slug == current_version %} <strong> {% endif %}
-          <dd><a href="{{ url }}">{{ slug }}</a></dd>
-          {% if slug == current_version %} </strong> {% endif %}
+          {% if slug == "nightly" %}
+            {% if slug == current_version %} <strong> {% endif %}
+            <dd><a href="{{ url }}">nightly (master)</a></dd>
+            {% if slug == current_version %} </strong> {% endif %}
+          {% endif %}
+          {% if slug == default_version %}
+            {% if slug == current_version %} <strong> {% endif %}
+              <dd><a href="index.html">latest ({{ slug }})</a></dd>
+            {% if slug == current_version %} </strong> {% endif %}
+          {% endif %}
+        {% endfor %}
+      </dl>
+      {% endif %}
+      {% if versions|length >= 1 %}
+      <dl>
+        <dt>{{ _('Old Versions') }}</dt>
+        {% for slug, url in versions %}
+          {% if slug != default_version and slug != "nightly" %}
+            {% if slug == current_version %} <strong> {% endif %}
+            <dd><a href="{{ url }}">{{ slug }}</a></dd>
+            {% if slug == current_version %} </strong> {% endif %}
+          {% endif %}
         {% endfor %}
       </dl>
       {% endif %}

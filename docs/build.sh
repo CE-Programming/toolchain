@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Default toolchain docs (should be latest release!)
+export default_version=v10.0
+
+# Maps target directory name to branch
+declare -A versions_map=(
+	[v10.0]=v10.0-docs
+	[v9.2]=v9.2-docs
+	[v9.1]=v9.1
+	[v9.0]=v9.0
+	[nightly]=master
+)
+
 build_documentation () {
   export current_version
   export versions
@@ -25,28 +37,18 @@ build_documentation () {
 cp -f conf.py /tmp/conf.py
 cp -f templates/versions.html /tmp/versions.html
 
-# Maps target directory name to branch
-declare -A versions_map=(
-	[v10.0]=v10.0-docs
-	[v9.2]=v9.2-docs
-	[v9.1]=v9.1
-	[v9.0]=v9.0
-	[master]=master
-)
-
 # Pointers to other versions in the output documentation
 export versions="${!versions_map[@]}"
 
 # Also build the latest version at the root (which shouldn't be listed
 # in the list of versions since it duplicates the chosen one).
-default_version=v10.0
 versions_map[.]="${versions_map[$default_version]}"
 
 for target_dir in "${!versions_map[@]}"
 do
 	branch_name="${versions_map[$target_dir]}"
 	git checkout "${branch_name}"
-	for format in html singlehtml
+	for format in html
 	do
 		if [ "${target_dir}" = "." ]; then
 			current_version="${default_version}"

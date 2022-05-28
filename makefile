@@ -94,7 +94,10 @@ check:
 docs:
 	$(Q)$(MAKE) -C docs html
 
+local-docs:
+	$(Q)$(MAKE) -C docs local-html
+
 .PHONY: $(LIBS) $(SRCS)
 .PHONY: $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
 .PHONY: $(addprefix clean-,$(SRCS)) $(addprefix clean-,$(LIBS))
-.PHONY: all check clean install libs docs
+.PHONY: all check clean install libs docs local-docs

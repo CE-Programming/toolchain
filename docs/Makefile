@@ -1,4 +1,7 @@
 html:
 	./build.sh
 
-.PHONY: html
+local-html:
+	./local-build.sh
+
+.PHONY: html local-html

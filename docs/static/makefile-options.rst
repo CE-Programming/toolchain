@@ -97,6 +97,14 @@ Default: :code:`YES`.
 
     LTO = YES
 
+.. rubric:: EXTRA_LDFLAGS
+
+These flags are passed directly to the fasmg linker.
+
+.. code-block:: makefile
+
+    EXTRA_LDFLAGS =
+
 .. rubric:: PREFER_OS_CRT
 
 Prefer the builtin OS CRT (Compiler-Run-Time) functions if they exist.
@@ -117,8 +125,59 @@ Default: :code:`YES`.
 
     PREFER_OS_LIBC = YES
 
+.. rubric:: LIBLOAD_OPTIONAL
+
+List of libraries that are optional in the program.
+If these libraries do not exist on the calculator, the program will still execute and not be blocked from running by ``LibLoad``.
+However, you must use the function :code:`libload_IsLibLoaded` to detect if a library has been successfully loaded before using any library functions.
+If this option is left blank, the compiler/linker will automatically mark any libraries as optional if the :code:`libload_IsLibLoaded` is used in the code - so this function is just used to override the default behavior.
+
+.. code-block:: makefile
+
+    LIBLOAD_OPTIONAL = graphx fileioc
+
 Miscellaneous Configuration
 ---------------------------
+
+.. rubric:: EXTRA_CSOURCES
+
+Extra C source files to be compiled in that are not located in the source directory.
+
+.. code-block:: makefile
+
+    EXTRA_CSOURCES = <some more sources>
+
+.. rubric:: EXTRA_CPPSOURCES
+
+Extra C++ source files to be compiled in that are not located in the source directory.
+
+.. code-block:: makefile
+
+    EXTRA_CPPSOURCES = <some more sources>
+
+.. rubric:: EXTRA_ASMSOURCES
+
+Extra assembly source files to be compiled in that are not located in the source directory.
+
+.. code-block:: makefile
+
+    EXTRA_ASMSOURCES = <some more sources>
+
+.. rubric:: EXTRA_USERHEADERS
+
+Extra header files to be used in that are not located in the source directory.
+
+.. code-block:: makefile
+
+    EXTRA_CPPSOURCES = <some more headers>
+
+.. rubric:: EXTRA_USERHEADERS
+
+Extra header files to be used in that are not located in the source directory.
+
+.. code-block:: makefile
+
+    EXTRA_CPPSOURCES = <some more headers>
 
 .. rubric:: MAKE_GFX
 
@@ -126,7 +185,9 @@ This is the command that is run when :code:`make gfx` is executed.
 It can be overriden to perform any custom graphics conversions.
 The default command navigates to the graphics directory and runs ``convimg``.
 
-    MAKE_GFX ?= cd src/gfx && convimg
+.. code-block:: makefile
+
+    MAKE_GFX = cd $(GFXDIR) && $(CONVIMG)
 
 .. rubric:: DEPS
 

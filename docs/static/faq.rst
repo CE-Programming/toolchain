@@ -8,6 +8,7 @@ I Found A Bug, Help!?
 
 Nice work, now create an `issue report here <https://github.com/CE-Programming/toolchain/issues>`_ with details on what caused the crash.
 Uploading a zip of your code and/or a minimal reproducible example is very appreciated (and is usually required).
+Additionally, including the output of the :code:`make V=1` command outputs more verbose information that helps diagnose the issue.
 
 What versions of C/C++ are supported?
 -------------------------------------
