@@ -153,15 +153,14 @@ DEPFILES = $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
 endif
 
 # find all required/optional libload libraries
-LIBLOAD_LIBS := $(basename $(notdir $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib)))
-REQ_LIBLOAD := $(filter-out $(LIBLOAD_OPTIONAL),$(LIBLOAD_LIBS))
-OPT_LIBLOAD := $(filter-out $(REQ_LIBLOAD),$(LIBLOAD_LIBS))
-REQ_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(addprefix $(CEDEV_TOOLCHAIN)/lib/libload/,$(addsuffix .lib,$(REQ_LIBLOAD)))))))
-OPT_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(addprefix $(CEDEV_TOOLCHAIN)/lib/libload/,$(addsuffix .lib,$(OPT_LIBLOAD)))))))
-REQ_LIBLOAD := $(foreach lib,$(REQ_LIBLOAD),$(lib))
-OPT_LIBLOAD := $(foreach lib,$(OPT_LIBLOAD),$(lib):optional)
+LIBLOAD_LIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib) $(EXTRA_LIBLOAD_LIBS)
+REQ_LIBLOAD := $(filter-out $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
+OPT_LIBLOAD := $(filter $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
+REQ_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(REQ_LIBLOAD)))))
+OPT_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(OPT_LIBLOAD)))))
+OPT_LIBLOAD := $(foreach lib,$(OPT_LIBLOAD),$(lib)$(space)optional)
 LDLIBS := $(subst $(space),$(comma)$(space),$(strip $(REQ_LIBLOAD)$(space)$(OPT_LIBLOAD)))
-LDLIBS := $(subst :,$(space),$(LDLIBS))
+LDLIBS := $(subst $(comma)$(space)optional,$(space)optional,$(LDLIBS))
 
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
