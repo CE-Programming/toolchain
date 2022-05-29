@@ -3,7 +3,10 @@
 
 /**
  * Verifies that a LibLoad library has been successfully relocated and loaded.
- * This function must be called before using any optionally loaded libraries.
+ * This function should be called before using any optionally loaded libraries.
+ *
+ * Using this function also causes the library argument supplied to the function
+ * to automatically be marked as optional.
  *
  * @param name On-calc name of the library, e.g. `GRAPHX`. This should
  * <b>not</b> be quoted.

@@ -127,10 +127,15 @@ Default: :code:`YES`.
 
 .. rubric:: LIBLOAD_OPTIONAL
 
-List of libraries that are optional in the program.
-If these libraries do not exist on the calculator, the program will still execute and not be blocked from running by ``LibLoad``.
-However, you must use the function :code:`libload_IsLibLoaded` to detect if a library has been successfully loaded before using any library functions.
-If this option is left blank, the compiler/linker will automatically mark any libraries as optional if the :code:`libload_IsLibLoaded` is used in the code - so this function is just used to override the default behavior.
+Space separated list of :code`libload` libraries to mark as optional in the program.
+If an optional library is not present on the device, the program will still execute and not be blocked from running by ``libload``, however calls to the library's functions will crash the program.
+
+* If this option is left blank, using the function :code:`libload_IsLibLoaded` causes the library argument supplied to the function to automatically be marked as optional.
+* Libraries specified by this option are forced to be optional, regardless if :code:`libload_IsLibLoaded` is used.
+
+.. note::
+
+    See the :ref:`libload library <libload_h>` documentation for more information.
 
 .. code-block:: makefile
 
@@ -145,7 +150,7 @@ Extra C source files to be compiled in that are not located in the source direct
 
 .. code-block:: makefile
 
-    EXTRA_CSOURCES = <some more sources>
+    EXTRA_CSOURCES = <space separated list of sources>
 
 .. rubric:: EXTRA_CPPSOURCES
 
@@ -153,7 +158,7 @@ Extra C++ source files to be compiled in that are not located in the source dire
 
 .. code-block:: makefile
 
-    EXTRA_CPPSOURCES = <some more sources>
+    EXTRA_CPPSOURCES = <space separated list of sources>
 
 .. rubric:: EXTRA_ASMSOURCES
 
@@ -161,7 +166,7 @@ Extra assembly source files to be compiled in that are not located in the source
 
 .. code-block:: makefile
 
-    EXTRA_ASMSOURCES = <some more sources>
+    EXTRA_ASMSOURCES = <space separated list of sources>
 
 .. rubric:: EXTRA_USERHEADERS
 
@@ -169,15 +174,15 @@ Extra header files to be used in that are not located in the source directory.
 
 .. code-block:: makefile
 
-    EXTRA_CPPSOURCES = <some more headers>
+    EXTRA_USERHEADERS = <space separated list of headers>
 
-.. rubric:: EXTRA_USERHEADERS
+.. rubric:: EXTRA_LIBLOAD_LIBS
 
-Extra header files to be used in that are not located in the source directory.
+Extra libload (``.lib``) libraries to be added at link time.
 
 .. code-block:: makefile
 
-    EXTRA_CPPSOURCES = <some more headers>
+    EXTRA_LIBLOAD_LIBS = <space separated list of libraries>
 
 .. rubric:: MAKE_GFX
 
