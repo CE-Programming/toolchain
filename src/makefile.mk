@@ -155,7 +155,9 @@ endif
 
 # find all required/optional libload libraries
 LIBLOAD_LIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib) $(EXTRA_LIBLOAD_LIBS)
-REQ_LIBLOAD := $(filter-out $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
+LIBLOAD_LIBS := $(filter-out %libload.lib,$(LIBLOAD_LIBS))
+REQ_LIBLOAD := $(CEDEV_TOOLCHAIN)/lib/libload/libload.lib
+REQ_LIBLOAD += $(filter-out $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
 OPT_LIBLOAD := $(filter $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
 REQ_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(REQ_LIBLOAD)))))
 OPT_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(OPT_LIBLOAD)))))
