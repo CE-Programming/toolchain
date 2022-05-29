@@ -183,7 +183,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: CEdev-${{runner.os}}
           path: ${{github.workspace}}
@@ -247,7 +247,7 @@ jobs:
 
       - name: Download Libraries
         if: github.event_name != 'pull_request'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: clibs
           path: ${{env.TOOLCHAIN_PATH}}
@@ -349,17 +349,17 @@ jobs:
 
     steps:
       - name: Download CEdev Linux
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: CEdev-Linux
           path: ${{github.workspace}}
       - name: Download CEdev Windows
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: CEdev-Windows
           path: ${{github.workspace}}
       - name: Download CE Libraries
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: clibs
           path: ${{github.workspace}}
@@ -380,3 +380,18 @@ jobs:
             CEdev-Linux-nightly.tar.gz
             CEdev-Windows-nightly.zip
             clibs-nightly.8xg
+
+  nightly-macos:
+    runs-on: macos-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Download CEdev Mac
+        uses: actions/download-artifact@v3
+        with:
+          name: CEdev-macOS
+          path: ${{github.workspace}}

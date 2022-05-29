@@ -1,4 +1,4 @@
-.. _getkey:
+.. _getkey_h:
 
 ti/getkey.h
 ===========

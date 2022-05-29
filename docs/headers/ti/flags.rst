@@ -1,4 +1,4 @@
-.. _flags:
+.. _flags_h:
 
 ti/flags.h
 ==========

@@ -1,4 +1,4 @@
-.. _tokens:
+.. _tokens_h:
 
 ti/tokens.h
 ===========

@@ -1,4 +1,4 @@
-.. _error:
+.. _error_h:
 
 ti/error.h
 ==========

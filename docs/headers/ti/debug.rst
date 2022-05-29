@@ -1,4 +1,4 @@
-.. _debug:
+.. _debug_h:
 
 ti/debug.h
 ==========

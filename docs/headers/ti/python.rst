@@ -1,4 +1,4 @@
-.. _python:
+.. _python_h:
 
 ti/python.h
 ===========

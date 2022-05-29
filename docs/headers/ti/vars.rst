@@ -1,4 +1,4 @@
-.. _vars:
+.. _vars_h:
 
 ti/vars.h
 =========
@@ -23,7 +23,7 @@ But :code:`real_t` has no explicit size; the OS infers the size.
 Meanwhile, lists store the number of elements and matrices store the number of rows and columns, so you have to compute the size.
 (Don't forget that lists--but not matrices--can be either real or complex.)
 Most other types use a simple size word.
-The :code:`fileioc` library masks all of this wackyness for you, but the OS also includes many helpful C functions.
+The :ref:`fileioc library <fileioc_h>` masks all of this wackyness for you, but the OS also includes many helpful C functions.
 
 .. contents:: :local:
    :depth: 3

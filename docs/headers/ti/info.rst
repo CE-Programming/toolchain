@@ -1,4 +1,4 @@
-.. _info:
+.. _info_h:
 
 ti/info.h
 =========

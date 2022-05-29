@@ -179,7 +179,7 @@ The TI-84 Plus CE's display is an LCD with 320 by 240 pixels.
 The LCD technically supports 18-bit color, but it has fairly mediocre color.
 The LCD is actually a portrait display, rotated 90 degrees;
 software configures the LCD controller to present the illusion of a landscape display.
-This, however, does result in the diagonal line that plagues :code:`graphx`.
+This, however, does result in the diagonal line that plagues the :ref:`graphx library <graphx_h>`.
 
 The LCD Controller
 ^^^^^^^^^^^^^^^^^^
@@ -193,12 +193,12 @@ TI's operating system uses VRAM in a 16-bits-per-pixel format, but the LCD contr
 - 4-bit palettized color, using even less RAM and packing in two pixels per byte;
 - 2-bit and 1-bit palettized color modes, packing in four or eight pixels per byte.
 
-The :code:`graphx` library puts the controller in 8-bit mode, which is faster (half as much data),
+The :ref:`graphx library <graphx_h>` puts the controller in 8-bit mode, which is faster (half as much data),
 and allows double buffering.
 There are currently no libraries for using other graphics modes.
 You'll even have to write your own routines if you want use 16-bit color mode.
 
-Direct access to the LCD controller's control registers is provided in the :code:`sys/lcd.h` header.
+Direct access to the LCD controller's control registers is provided in the :ref:`sys/lcd.h header <lcd_h>`.
 
 The LCD Driver
 ^^^^^^^^^^^^^^
@@ -213,9 +213,9 @@ The Keyboard
 ^^^^^^^^^^^^
 
 The calculator's keypad is organized as a generic key matrix.
-You can directly read the key matrix using the :code:`keypadc` library.
+You can directly read the key matrix using the :ref:`keypadc library <keypadc_h>`.
 However, for simple programs, it is often easier to let the operating system handle the keypad.
-This can be done using the :code:`ti/getcsc` or :code:`ti/getkey` headers.
+This can be done using the :ref:`ti/getcsc.h <getcsc_h>` or :ref:`ti/getkey.h <getkey_h>` headers.
 
 Real-Time Clock
 ^^^^^^^^^^^^^^^
@@ -223,7 +223,7 @@ Real-Time Clock
 The calculator has a dedicated real-time clock (RTC) circuit that keeps track of the time and date.
 Most digital devices that track real time use a 32768 Hz crystal, and the calculator is no different.
 
-The :code:`sys/rtc.h` header provides direct access to the clock hardware.
+The :ref:`sys/rtc.h header <rtc_h>` provides direct access to the clock hardware.
 While you can easily directly read the clock's time, the header also gives you access to OS
 routines that also process the time and date into more a human-readable form.
 
@@ -232,7 +232,7 @@ Timers
 
 The RTC only tracks time to the nearest second.
 If you want sub-second timing, there are also hardware timers that provide more precision.
-The :code:`sys/timers.h` header provides access to the timers.
+The :ref:`sys/timers.h header <timers_h>` provides access to the timers.
 
 USB
 ^^^^^^
@@ -240,7 +240,7 @@ USB
 The calculator has a USB port, of course, but the toolchain does not yet support it.
 Work on a USB driver is ongoing in the :code:`usbdrvce` branch on the toolchain.
 
-The :code:`sys/basicusb.h` allows you to check if the battery is currently being charged, and that's about it.
+The :ref:`sys/basicusb.h header <basicusb_h>` allows you to check if the battery is currently being charged, and that's about it.
 
 Protected Hardware
 ^^^^^^^^^^^^^^^^^^

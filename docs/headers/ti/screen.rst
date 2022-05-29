@@ -1,4 +1,4 @@
-.. _screen:
+.. _screen_h:
 
 ti/screen.h
 ===============

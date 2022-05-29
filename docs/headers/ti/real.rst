@@ -1,4 +1,4 @@
-.. _real:
+.. _real_h:
 
 ti/real.h
 =========

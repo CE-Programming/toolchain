@@ -1,4 +1,4 @@
-.. _getcsc:
+.. _getcsc_h:
 
 ti/getcsc.h
 ===========

@@ -127,11 +127,11 @@ Default: :code:`YES`.
 
 .. rubric:: LIBLOAD_OPTIONAL
 
-Space separated list of :code`libload` libraries to mark as optional in the program.
+Space separated list of ``libload`` libraries to mark as optional in the program.
 If an optional library is not present on the device, the program will still execute and not be blocked from running by ``libload``, however calls to the library's functions will crash the program.
 
-* If this option is left blank, using the function :code:`libload_IsLibLoaded` causes the library argument supplied to the function to automatically be marked as optional.
-* Libraries specified by this option are forced to be optional, regardless if :code:`libload_IsLibLoaded` is used.
+* If this option is left blank, libraries supplied to the function :code:`libload_IsLibLoaded` will be automatically marked as optional.
+* Libraries specified by this option are forced to be optional, regardless of :code:`libload_IsLibLoaded` usage.
 
 .. note::
 
@@ -187,7 +187,7 @@ Extra libload (``.lib``) libraries to be added at link time.
 .. rubric:: MAKE_GFX
 
 This is the command that is run when :code:`make gfx` is executed.
-It can be overriden to perform any custom graphics conversions.
+It can be overridden to perform any custom graphics conversions.
 The default command navigates to the graphics directory and runs ``convimg``.
 
 .. code-block:: makefile
