@@ -13,5 +13,6 @@ The CE Libraries are used to aid in rapid development by implementing optimized 
     fontlibc
     fileioc
     keypadc
+    libload
 
 Click any of the above links to navigate to the library's documentation.
