@@ -1,2 +1,4 @@
 include_rules
-run &(ex)/Examples.tup
+ifneq (@(TUP_PLATFORM),win32)
+  run &(ex)/Examples.tup
+endif

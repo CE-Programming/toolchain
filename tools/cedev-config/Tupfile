@@ -6,5 +6,5 @@ CFLAGS += -D_XOPEN_SOURCE=500
 LDFLAGS += @(LDFLAGS)
 
 : foreach src/main.c src/cwalk.c src/whereami.c |> ^ CC %f^ @(CC) -c $(CFLAGS) %f -o %o |> obj/%b.o {obj}
-: {obj} |> ^ LD %o^ @(LD) $(LDFLAGS) %f -o %o |> bin/cedev-config {bin}
+: {obj} |> ^ LD %o^ @(LD) $(LDFLAGS) %f -o %o |> bin/cedev-config$(.exe) {bin}
 : {bin} |> !copy |> $(install)/%f $(install)/<install>

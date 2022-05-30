@@ -1,6 +1,14 @@
 include_rules
-: |> ln -s \$(which @(EZCC)) %o |> $(install)/bin/ez80-clang $(install)/<install>
-: |> ln -s \$(which @(EZLINK)) %o |> $(install)/bin/ez80-link $(install)/<install>
-: |> ln -s \$(which @(FASMG)) %o |> $(install)/bin/fasmg $(install)/<install>
-: $(install)/<install> |> ^ zip %o^ zip --quiet %o %<install> |> CEdev.zip
-: src/<libs> | tools/<convbin> |> %<convbin> --oformat 8xg-auto-extract \$(printf -- --input\ %%s\  \$(printf %%s\\n %<libs> | grep \\.8xv$)) --output %o |> clibs.8xg
+convbin_args = --oformat 8xg-auto-extract --output
+ifeq (@(TUP_PLATFORM),win32)
+  : |> ^ install ez80-clang^ cmd /q /c for %%f in ("@(EZCC)$(.exe)")   do copy "%%~$PATH:f" "%o" |> $(install)/bin/ez80-clang$(.exe) $(install)/<install>
+  : |> ^ install ez80-link^  cmd /q /c for %%f in ("@(EZLINK)$(.exe)") do copy "%%~$PATH:f" "%o" |> $(install)/bin/ez80-link$(.exe)  $(install)/<install>
+  : |> ^ install fasmg^      cmd /q /c for %%f in ("@(FASMG)$(.exe)")  do copy "%%~$PATH:f" "%o" |> $(install)/bin/fasmg$(.exe)      $(install)/<install>
+  : src/<libs> | tools/<convbin> |> ^ convbin %o^ cmd /q /c for /f "tokens=*" %%a in ('for %%l in ^(%<libs>^) do @if %%~xl^=^=.8xv echo ^| set /p^=--input %%l ') do "%<convbin>" %%a$(convbin_args) %o |> clibs.8xg
+else
+  : |> ^ install ez80-clang^ ln -s "`which '@(EZCC)'`"   %o |> $(install)/bin/ez80-clang$(.exe) $(install)/<install>
+  : |> ^ install ez80-link^  ln -s "`which '@(EZLINK)'`" %o |> $(install)/bin/ez80-link$(.exe)  $(install)/<install>
+  : |> ^ install fasmg^      ln -s "`which '@(FASMG)'`"  %o |> $(install)/bin/fasmg$(.exe)      $(install)/<install>
+  : src/<libs> | tools/<convbin> |> ^ convbin %o^ %<convbin> \$(printf -- --input\ %%s\  \$(printf %%s\\n %<libs> | grep \\.8xv$))$(convbin_args) %o |> clibs.8xg
+endif
+: $(install)/<install> |> ^ zip %o^ "@(ZIP)" --quiet %o %<install> |> CEdev.zip

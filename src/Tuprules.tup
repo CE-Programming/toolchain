@@ -1,7 +1,5 @@
 .gitignore
 
-&inc = include
-
 ezcflags += -ffreestanding
 ezcflags += -Wall -Wextra
 ezcflags += -Oz
@@ -10,4 +8,5 @@ ezcppflags += $(ezcflags)
 ezcppflags += -fno-exceptions -fno-rtti
 !ezcc = |> ^ ezcc %b^ @(EZCC) -S $(ez%eflags) %f -o %o |> build/%f.src
 
-!fasmg = | &(inc)/*.inc &(inc)/*.alm |> ^ fasmg %b^ @(FASMG) -n %f %o |> %B.8xv | %B.lib ../<libs>
+incdir = $(TUP_CWD)/include
+!fasmg = | $(incdir)/* ^\\.gitignore |> ^ fasmg %b^ @(FASMG) -n %f %o |> %B.8xv | %B.lib ../<libs>

@@ -1,0 +1,4 @@
+include_rules
+ifeq (@(TUP_PLATFORM),win32)
+  : foreach * ^Tupfile |> !copy |> $(install)/bin/%f $(install)/<install>
+endif

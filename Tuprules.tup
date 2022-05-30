@@ -1,4 +1,11 @@
-&ex = examples
-
 install = $(TUP_CWD)/CEdev
-!copy = |> ^ install %b^ cp %f %o |>
+ifeq (@(TUP_PLATFORM),win32)
+  .exe = .exe
+  &make = tools/windows/make$(.exe)
+  make = &(make)
+  !copy = |> ^ install %b^ cmd /q /c for %%f in ("%f") do copy "%%~ff" "%o" >nul |>
+else
+  &ex = examples
+  make = make
+  !copy = |> ^ install %b^ cp '%f' '%o' |>
+endif
