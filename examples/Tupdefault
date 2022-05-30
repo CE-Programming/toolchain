@@ -1,4 +1,0 @@
-include_rules
-ifneq (@(TUP_PLATFORM),win32)
-  run &(ex)/Examples.tup
-endif

@@ -5,7 +5,6 @@ ifeq (@(TUP_PLATFORM),win32)
   make = &(make)
   !copy = |> ^ install %b^ cmd /q /c for %%f in ("%f") do copy "%%~ff" "%o" >nul |>
 else
-  &ex = examples
   make = make
   !copy = |> ^ install %b^ cp '%f' '%o' |>
 endif

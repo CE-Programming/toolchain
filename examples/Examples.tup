@@ -1,1 +1,0 @@
-echo ": foreach * ^Tupdefault ^Examples.tup |> !copy |> \$(install)/$(realpath --relative-to=$(dirname $0)/.. .)/%f \$(install)/<install>"
