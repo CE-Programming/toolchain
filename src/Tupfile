@@ -1,4 +1,4 @@
 include_rules
 export OS
 : |> $(make) -f linker.mk |> linker_script
-: foreach makefile.mk linker_script |> !copy |> $(install)/meta/%f $(install)/<install>
+: makefile.mk linker_script |> !copy |> $(install)/meta/%f $(install)/<install>

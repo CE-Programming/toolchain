@@ -1,5 +1,5 @@
 include_rules
 ezcppflags += -isystem ../libc/include -isystem ../ce/include -isystem ../fileioc -isystem ../libcxx/include
-: foreach include/* |> !copy |> $(install)/include/c++/%b $(install)/<install>
-: foreach *.cpp |> !ezcc |> {src}
-: foreach {src} *.src |> !copy |> $(install)/lib/libcxx/%b $(install)/<install>
+: include/* |> !copy |> $(install)/include/c++/%b $(install)/<install>
+: *.cpp |> !ezcc |> {src}
+: {src} *.src |> !copy |> $(install)/lib/libcxx/%b $(install)/<install>

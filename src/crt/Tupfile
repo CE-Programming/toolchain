@@ -1,4 +1,4 @@
 include_rules
 ezcflags += -isystem ../libc/include
-: foreach *.c |> !ezcc |> {src}
-: foreach {src} *.src |> !copy |> $(install)/lib/crt/%b $(install)/<install>
+: *.c |> !ezcc |> {src}
+: {src} *.src |> !copy |> $(install)/lib/crt/%b $(install)/<install>
