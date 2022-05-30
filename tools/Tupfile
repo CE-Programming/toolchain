@@ -1,6 +1,6 @@
 include_rules
 export OS
-: |> ^ make convbin^  $(make) -C convbin  |> convbin/bin/convbin$(.exe) ^/obj/ ^-pipe-nt- <convbin>  {bin}
+: |> ^ make convbin^  $(make) -C convbin  |> convbin/bin/convbin$(.exe) ^/obj  ^-pipe-nt- <convbin>  {bin}
 : |> ^ make convfont^ $(make) -C convfont |> convfont/convfont$(.exe)   ^\\.o$ ^-pipe-nt- <convfont> {bin}
-: |> ^ make convimg^  $(make) -C convimg  |> convimg/bin/convimg$(.exe) ^/obj/ ^-pipe-nt- <convimg>  {bin}
+: |> ^ make convimg^  $(make) -C convimg  |> convimg/bin/convimg$(.exe) ^/obj  ^-pipe-nt- <convimg>  {bin}
 : foreach {bin} |> !copy |> $(install)/bin/%b $(install)/<install>
