@@ -1,0 +1,13 @@
+.gitignore
+
+&inc = include
+
+ezcflags += -ffreestanding
+ezcflags += -Wall -Wextra
+ezcflags += -Oz
+ezcflags += -mllvm -profile-guided-section-prefix=false
+ezcppflags += $(ezcflags)
+ezcppflags += -fno-exceptions -fno-rtti
+!ezcc = |> ^ ezcc %b^ @(EZCC) -S $(ez%eflags) %f -o %o |> build/%f.src
+
+!fasmg = | &(inc)/*.inc &(inc)/*.alm |> ^ fasmg %b^ @(FASMG) -n %f %o |> %B.8xv | %B.lib ../<libs>

@@ -1,0 +1,4 @@
+&ex = examples
+
+install = $(TUP_CWD)/CEdev
+!copy = |> ^ install %b^ cp %f %o |>

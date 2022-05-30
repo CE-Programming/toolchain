@@ -1,0 +1,4 @@
+include_rules
+: *.asm |> !fasmg |>
+: *.h |> !copy |> $(install)/include/%f $(install)/<install>
+: *.lib |> !copy |> $(install)/lib/libload/%f $(install)/<install>

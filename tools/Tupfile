@@ -1,0 +1,6 @@
+include_rules
+!make = |> ^ make %O^ make -C |>
+: |> !make convbin |> convbin/bin/convbin ^obj <convbin> {bin}
+: |> !make convfont |> convfont/convfont ^\.o$ <convfont> {bin}
+: |> !make convimg |> convimg/bin/convimg ^obj <convimg> {bin}
+: foreach {bin} |> !copy |> $(install)/bin/%b $(install)/<install>
