@@ -1,4 +1,7 @@
 include_rules
-export OS
-: |> $(make) -f linker.mk |> linker_script
+ifeq (@(TUP_PLATFORM),win32)
+  : linker_script.in | <src> |> ^ gen %o^ ".\%B$.bat" %f > %o |> %B
+else
+  : linker_script.in | <src> |> ^ gen %o^ "./%B.sh" %f > %o |> %B
+endif
 : makefile.mk linker_script |> !copy |> $(install)/meta/%f $(install)/<install>

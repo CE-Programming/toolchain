@@ -1,0 +1,40 @@
+if DEBUG
+	iterate sections, <.comment, .debug_abbrev, .debug_addr, .debug_aranges,     \
+	                   .debug_frame, .debug_info, .debug_line, .debug_line_str,  \
+	                   .debug_loc, .debug_loclists, .debug_macinfo,              \
+	                   .debug_macro, .debug_names, .debug_pubnames,              \
+	                   .debug_pubtypes, .debug_ranges, .debug_rnglists,          \
+	                   .debug_str, .debug_str_offsets, .debug_sup, .debug_types, \
+	                   .debug_abbrev.dwo, .debug_info.dwo, .debug_line.dwo,      \
+	                   .debug_loclists.dwo, .debug_macro.dwo,                    \
+	                   .debug_rnglists.dwo, .debug_str.dwo,                      \
+	                   .debug_str_offsets.dwo, .debug_cu_index, .debug_tu_index>
+		split debug: sections
+		precious sections
+	end iterate
+end if
+
+order .header, .icon, .init.libs, .libs, .init.clock, .init.reruncheck, .init, .fini, .text, .data, .rodata
+split : .init_array, .ctors, .dtors, .fini_array
+precious .header, .icon, .init.libs if .libs.length, .libs, .init_array, .ctors, .dtors, .fini_array
+provide ___low_bss = .bss.base
+provide ___len_bss = .bss.length
+provide ___heaptop = .bss.high
+provide ___heapbot = .bss.top
+provide ___libs = .libs.base
+provide ___init_array_count = .init_array.length / 3
+provide ___ctors_count = .ctors.length / 3
+provide ___dtors_count = .dtors.length / 3
+provide ___fini_array_count = .fini_array.length / 3
+require __start, lib.LibLoad if .libs.length
+
+@ source crt @
+@ source ce @
+
+if HAS_LIBC
+	@ source libc @
+end if
+
+if HAS_LIBCXX
+	@ source libcxx @
+end if

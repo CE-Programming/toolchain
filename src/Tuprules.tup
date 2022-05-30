@@ -6,7 +6,7 @@ ezcflags += -Oz
 ezcflags += -mllvm -profile-guided-section-prefix=false
 ezcppflags += $(ezcflags)
 ezcppflags += -fno-exceptions -fno-rtti
-!ezcc = foreach |> ^ ezcc %b^ @(EZCC) -S $(ez%eflags) %f -o %o |> build/%f.src
+!ezcc = foreach |> ^ ezcc %b^ @(EZCC) -S $(ez%eflags) %f -o %o |>
 
 incdir = $(TUP_CWD)/include
 !fasmg = foreach | $(incdir)/* ^\\.gitignore |> ^ fasmg %b^ @(FASMG) -n %f %o |> %B.8xv | %B.lib ../<libs>
