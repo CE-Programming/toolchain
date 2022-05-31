@@ -1,5 +1,3 @@
-.gitignore
-
 ezcflags += -ffreestanding
 ezcflags += -Wall -Wextra
 ezcflags += -Oz
@@ -9,4 +7,4 @@ ezcppflags += -fno-exceptions -fno-rtti
 !ezcc = foreach |> ^ ezcc %b^ @(EZCC) -S $(ez%eflags) %f -o %o |>
 
 incdir = $(TUP_CWD)/include
-!fasmg = foreach | $(incdir)/* ^\\.gitignore |> ^ fasmg %b^ @(FASMG) -n %f %o |> %B.8xv | %B.lib ../<libs>
+!fasmg = foreach | $(incdir)/* |> ^ fasmg %b^ @(FASMG) -n %f %o |> %B.8xv | %B.lib ../<libs>

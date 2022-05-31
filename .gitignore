@@ -63,5 +63,5 @@ src/include/ti84pceg.inc
 src/include/tiformat.inc
 
 # tup
-.tup
-CEdev*
+/.tup/
+/CEdev*
