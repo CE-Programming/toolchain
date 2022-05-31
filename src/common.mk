@@ -14,7 +14,10 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+GIT_SHA = $(shell git describe --abbrev=8 --dirty --always --tags)
+
 CEDEV_DIR := CEdev
+CEDEV_VERSION := $(GIT_SHA)
 
 LINUX := 0
 MACOS := 0

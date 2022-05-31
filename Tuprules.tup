@@ -1,10 +1,15 @@
 install = $(TUP_CWD)/CEdev
+/ = /
+.sh = .sh
+make = make
 ifeq (@(TUP_PLATFORM),win32)
+  # The next line contains significant trailing whitespace!
+  / = \\ 
+  .sh = .bat
   .exe = .exe
   &make = tools/windows/make$(.exe)
   make = &(make)
   !copy = foreach |> ^ install %b^ cmd /q /c for %%f in ("%f") do copy "%%~ff" "%o" >nul |>
 else
-  make = make
   !copy = foreach |> ^ install %b^ cp '%f' '%o' |>
 endif

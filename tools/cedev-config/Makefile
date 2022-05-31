@@ -16,9 +16,6 @@
 
 include $(CURDIR)/../../src/common.mk
 
-GIT_SHA = $(shell git describe --abbrev=8 --dirty --always --tags)
-CEDEV_VERSION := $(GIT_SHA)
-
 CC = gcc
 CFLAGS = -Wall -Wextra -Wshadow -O3 -std=c99 -Isrc -DNDEBUG -DCEDEV_VERSION="\"$(CEDEV_VERSION)\"" -flto
 LDFLAGS = -flto
