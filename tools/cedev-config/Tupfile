@@ -14,12 +14,15 @@ LDFLAGS += @(LDFLAGS)
 
 CFLAGS += -Isrc
 CFLAGS += -DCEDEV_VERSION="\"@(CEDEV_VERSION)\""
-ifeq ($(TUP_PLATFORM),linux)
+ifeq (@(TUP_PLATFORM),linux)
   CFLAGS += -D_XOPEN_SOURCE=500
   LDFLAGS += -ldl
 endif
-ifeq ($(TUP_PLATFORM),macosx)
+ifeq (@(TUP_PLATFORM),macosx)
   CFLAGS += -D_DARWIN_C_SOURCE
+endif
+ifeq (@(TUP_PLATFORM),win32)
+  CFLAGS += -DWINVER=_WIN32_WINNT_WINXP -D_WIN32_WINNT=_WIN32_WINNT_WINXP
 endif
 
 : foreach src/*.c |> ^ CC %f^ $(CC) -c $(CFLAGS) %f -o %o |> obj/%b.o {obj}
