@@ -8,7 +8,7 @@ for /f "delims=" %%l in (%1) do (
       set i=
       for /f "delims=@ tokens=1,*" %%i in ("%%l") do if not x%%j == x set i=%%i
       pushd %%y
-      for /r %%f in ("*.src") do echo !i!%%x "..\lib\%%y\%%~nxf"
+      for /r %%f in ("*.src") do if not %%~nf == crt0 echo !i!%%x "..\lib\%%y\%%~nxf"
       popd
     )
   )
