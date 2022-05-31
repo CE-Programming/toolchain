@@ -1,16 +1,27 @@
 include_rules
 
-CFLAGS += @(CFLAGS)
-CFLAGS += -DCEDEV_VERSION="\"@(CEDEV_VERSION)\""
-ifeq ($(TUP_PLATFORM),macosx)
-  CFLAGS += -D_DARWIN_C_SOURCE
+CC = gcc
+ifdef CC
+  CC = @(CC)
 endif
+CFLAGS += @(CFLAGS)
+
+LD = $(CC)
+ifdef LD
+  LD = @(LD)
+endif
+LDFLAGS += @(LDFLAGS)
+
+CFLAGS += -Isrc
+CFLAGS += -DCEDEV_VERSION="\"@(CEDEV_VERSION)\""
 ifeq ($(TUP_PLATFORM),linux)
   CFLAGS += -D_XOPEN_SOURCE=500
   LDFLAGS += -ldl
 endif
-LDFLAGS += @(LDFLAGS)
+ifeq ($(TUP_PLATFORM),macosx)
+  CFLAGS += -D_DARWIN_C_SOURCE
+endif
 
-: foreach src/*.c |> ^ CC %f^ @(CC) -c $(CFLAGS) %f -o %o |> obj/%b.o {obj}
-: {obj} |> ^ LD %o^ @(LD) $(LDFLAGS) %f -o %o |> bin/cedev-config$(.exe) {bin}
+: foreach src/*.c |> ^ CC %f^ $(CC) -c $(CFLAGS) %f -o %o |> obj/%b.o {obj}
+: {obj} |> ^ LD %o^ $(LD) $(LDFLAGS) %f -o %o |> bin/cedev-config$(.exe) {bin}
 : {bin} |> !copy |> $(install)/%f $(install)/<install>
