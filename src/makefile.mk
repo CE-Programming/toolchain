@@ -137,7 +137,7 @@ CSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_CSOURCES)
 CPPSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CPPSOURCES))
 ASMSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASMSOURCES))
 
-ifeq ($(findstring debug,$(MAKECMDGOALS)),debug)
+ifneq ($(filter debug,$(MAKECMDGOALS)),)
 LTO := NO
 endif
 ifeq ($(LTO),YES)
