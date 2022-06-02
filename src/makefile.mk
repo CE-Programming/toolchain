@@ -47,6 +47,7 @@ HAS_LIBCXX ?= YES
 PREFER_OS_CRT ?= NO
 PREFER_OS_LIBC ?= YES
 LIBLOAD_OPTIONAL ?=
+COMPRESSED_MODE ?= zx7
 #----------------------------
 CEDEV_TOOLCHAIN ?= $(shell cedev-config --prefix)
 #----------------------------
@@ -191,17 +192,18 @@ endif
 
 # determine output target flags
 ifeq ($(ARCHIVED),YES)
-CONVBINFLAGS += --archive
+CONVBINFLAGS += -r
 endif
 ifeq ($(COMPRESSED),YES)
-CONVBINFLAGS += --oformat 8xp-auto-decompress
+CONVBINFLAGS += -e $(COMPRESSED_MODE)
+CONVBINFLAGS += -k 8xp-compressed
 else
-CONVBINFLAGS += --oformat 8xp
+CONVBINFLAGS += -k 8xp
 endif
 ifeq ($(HAS_UPPERCASE_NAME),YES)
-CONVBINFLAGS += --uppercase
+CONVBINFLAGS += -u
 endif
-CONVBINFLAGS += --name $(NAME)
+CONVBINFLAGS += -n $(NAME)
 
 # output debug map file
 ifeq ($(OUTPUT_MAP),YES)
@@ -267,7 +269,7 @@ debug: $(BINDIR)/$(TARGET8XP)
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(CONVBIN) $(CONVBINFLAGS) --input $(call QUOTE_ARG,$(call NATIVEPATH,$<)) --output $(call QUOTE_ARG,$(call NATIVEPATH,$@))
+	$(Q)$(CONVBIN) $(CONVBINFLAGS) -i $(call QUOTE_ARG,$(call NATIVEPATH,$<)) -o $(call QUOTE_ARG,$(call NATIVEPATH,$@))
 
 $(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONSRC) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))

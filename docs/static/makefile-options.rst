@@ -55,6 +55,16 @@ To enable this feature, open the project's makefile and edit the line:
 
     COMPRESSED = YES
 
+.. rubric:: COMPRESSED_MODE
+
+Specifies the type of program compression to perform.
+The default is ``zx7``, however ``zx0`` can also be used.
+``zx0`` takes more time to compress, but usually has better results.
+
+.. code-block:: makefile
+
+    COMPRESSED_MODE = zx7
+
 .. rubric:: ARCHIVED
 
 Programs can be built to be stored in the archive rather than RAM.
