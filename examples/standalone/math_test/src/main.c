@@ -206,6 +206,8 @@ DEFINE_BINOP_TYPE(u)
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_LL(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, ll##name##_};
+#define DEFINE_UNOP_STRUCT_S_L_LL(u, name) \
+    static const u##UnOp unop_##name = {#name, 0, s##name##_, 0, l##name##_, ll##name##_};
 
 #define DEFINE_BINOP_STRUCT_B(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_};
@@ -317,6 +319,12 @@ DEFINE_UNOP_PREFIX_FUNC_LL( , bitrev, __builtin_bitreverse64)
 DEFINE_UNOP_STRUCT_B_TO_LL( , bitrev)
 
 // Needs to be unsigned to avoid extra bits from sign extension
+DEFINE_UNOP_PREFIX_FUNC_S(u, bswap, __builtin_bswap16)
+DEFINE_UNOP_PREFIX_FUNC_L(u, bswap, __builtin_bswap32)
+DEFINE_UNOP_PREFIX_FUNC_LL(u, bswap, __builtin_bswap64)
+DEFINE_UNOP_STRUCT_S_L_LL(u, bswap)
+
+// Needs to be unsigned to avoid extra bits from sign extension
 DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, popcnt, __builtin_popcount)
 DEFINE_UNOP_PREFIX_FUNC_L(u, popcnt, __builtin_popcountl)
 DEFINE_UNOP_PREFIX_FUNC_LL(u, popcnt, __builtin_popcountll)
@@ -349,6 +357,7 @@ static const UnOp *unops[] = {
     &unop_neg,
     &unop_abs,
     &unop_bitrev,
+    (const UnOp *)&unop_bswap,
     (const UnOp *)&unop_popcnt,
 };
 
