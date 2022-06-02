@@ -20,6 +20,8 @@
     "key|enter",
     "hashWait|bitrev",
     "key|enter",
+    "hashWait|bswap",
+    "key|enter",
     "hashWait|popcnt",
     "key|enter",
     "hashWait|and",
@@ -85,6 +87,14 @@
       "size": "vram_16_size",
       "expected_CRCs": [
         "BBADF82E"
+      ]
+    },
+    "bswap": {
+      "description": "bswap",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "7709B5AE"
       ]
     },
     "popcnt": {
