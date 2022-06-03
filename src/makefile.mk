@@ -290,7 +290,7 @@ $(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)
 endif
 
 clean:
-	$(Q)$(call RM,$(EXTRA_CLEAN))
+	$(Q)$(EXTRA_CLEAN)
 	$(Q)$(call RMDIR,$(OBJDIR) $(BINDIR))
 	$(Q)echo Removed built binaries and objects.
 

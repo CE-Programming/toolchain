@@ -194,6 +194,12 @@ Extra libload (``.lib``) libraries to be added at link time.
 
     EXTRA_LIBLOAD_LIBS = <space separated list of libraries>
 
+Extra command(s) to run when :code:`make clean` is executed.
+
+.. code-block:: makefile
+
+    EXTRA_CLEAN =
+
 .. rubric:: MAKE_GFX
 
 This is the command that is run when :code:`make gfx` is executed.
