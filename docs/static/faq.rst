@@ -54,12 +54,12 @@ Now, fasmg will execute in user mode under QEMU, allowing it to successfully com
 
     FASMG = qemu-x86_64 $(call NATIVEPATH,$(BIN)/fasmg)
 
-Linking Assembly Source Files
------------------------------
+My code used to compile?!
+-------------------------
 
-See :ref:`asm`.
+But now the linker says :code:`Error: variable term used where not expected`.
+    You probably have assembly code that was not placed in a linker section, see :ref:`Assembly Constants <asm>`.
 
-My assembly code used to compile, but now the linker says  :code:`Error: variable term used where not expected.`!
------------------------------------------------------------------------------------------------------------------
-
-You probably have assembly code that was not placed in a linker section, see :ref:` <asm-consts>`.
+But now I get a bunch of warnings and errors.
+    The LLVM compiler being used is able to catch many more coding issues than the previous ZDS compiler.
+    These are real issues should be resolved.

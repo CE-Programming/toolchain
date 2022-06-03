@@ -52,7 +52,7 @@ Windows
 
 Get `MinGW <https://osdn.net/projects/mingw/>`_.
 The only required pacakges are `mingw32-base` and `mingw32-gcc-g++`.
-Make sure the ``MinGW\\bin`` directory is in the system's PATH environment variable.
+Make sure the ``MinGW\bin`` directory is in the system's PATH environment variable.
 
 Get the `ez80 LLVM compiler <https://github.com/jacobly0/llvm-project/wiki>`_.
 Make sure that ``ez80-clang.exe`` and ``ez80-link.exe`` are reachable by the system's PATH environment variable.
@@ -75,6 +75,6 @@ Build and install the toolchain:
     mingw32-make -j
     mingw32-make install -j
 
-By default, the toolchain is installed into the root (``C:\\CEdev``) directory.
+By default, the toolchain is installed into the root (``C:\CEdev``) directory.
 
 This is configurable with :code:`mingw32-make install PREFIX=[LOCATION]`
