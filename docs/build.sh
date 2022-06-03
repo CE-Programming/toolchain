@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Default toolchain docs (should be latest release!)
-export default_version=v10.0
+export default_version=v10.1
 
 # Maps target directory name to branch
 declare -A versions_map=(
+	[v10.1]=v10.1-docs
 	[v10.0]=v10.0-docs
 	[v9.2]=v9.2-docs
 	[v9.1]=v9.1
