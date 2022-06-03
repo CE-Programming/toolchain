@@ -34,7 +34,7 @@ dzx7t_len_size_loop:
 	add	a, a				; check next bit
 	call	z, dzx7t_load_bits		; no more bits left?
 	jr	nc, dzx7t_len_size_loop
-	jp	dzx7t_len_value_start
+	jr	dzx7t_len_value_start
 
 	; determine length
 
@@ -82,7 +82,7 @@ dzx7t_offset_end:
 	ldir
 dzx7t_exit:
 	pop	hl				; restore source address (compressed data)
-	jp	nc, dzx7t_main_loop
+	jr	nc, dzx7t_main_loop
 
 dzx7t_load_bits:
 	ld	a, (hl)				; load another group of 8 bits
