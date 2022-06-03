@@ -714,7 +714,7 @@ assert cHeap = $D10000
 	ld	h,(usbMem-$D10000) shr 8
 	ld	b,sizeof usbMem shr 8
 	call	.initFreeList
-assert ti.usbHandleKeys and $FF > $40
+assert ti.usbHandleKeys and $FF >= $40 + $20 & ti.usbHandleKeys and $FF < $100 - $20
 	ld	a,(ti.usbHandleKeys and not $1F - $20) and $FF
 	ld	(ti.usbHandleKeys and not $1F + $20),a
 assert usbMem+sizeof usbMem = periodicList
