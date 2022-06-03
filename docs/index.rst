@@ -47,3 +47,4 @@ If you are interested in contributing your expertise, check out the :ref:`contri
     static/coding-guidelines
     static/ides
     static/contributing
+    static/asm
