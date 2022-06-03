@@ -62,4 +62,4 @@ But now the linker says :code:`Error: variable term used where not expected`.
 
 But now I get a bunch of warnings and errors.
     The LLVM compiler being used is able to catch many more coding issues than the previous ZDS compiler.
-    These are real issues should be resolved.
+    These are real issues that should be resolved.
