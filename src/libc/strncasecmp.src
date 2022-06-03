@@ -3,12 +3,6 @@
 	section	.text
 	public	_strncasecmp
 
-if PREFER_OS_LIBC
-
-_strncasecmp := 021E3Ch
-
-else
-
 _strncasecmp:
 	push	ix
 	ld	ix,0
@@ -52,5 +46,3 @@ done:
 	ret
 
 	extern	_tolower
-
-end if
