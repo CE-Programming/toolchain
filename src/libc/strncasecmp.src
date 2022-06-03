@@ -5,7 +5,7 @@
 
 if PREFER_OS_LIBC
 
-_strcasecmp := 021E3Ch
+_strncasecmp := 021E3Ch
 
 else
 
