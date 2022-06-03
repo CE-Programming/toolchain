@@ -5,8 +5,7 @@
 _zx0_Decompress:
 	pop	bc
 	pop	de
-	pop	hl
-	push	hl
+	ex	(sp), hl
 	push	de
 	push	bc
 
