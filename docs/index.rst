@@ -6,7 +6,7 @@ The CE C/C++ Toolchain allows you to create incredible programs for the TI-84 Pl
 If this is your first introduction to the CE Toolchain, check out the :ref:`getting_started` page.
 You can join us on the :code:`CE Programming` Discord server in the :code:`#ez80-dev` channel by clicking the below invite button if you have any questions.
 
-.. image:: https://img.shields.io/discord/432891584451706892?color=blue&label=discord&style=for-the-badge
+.. image:: https://img.shields.io/discord/432891584451706892?color=%232980b9&label=discord&logoColor=%23343131&style=for-the-badge
    :target: https://discord.gg/TRkN5UcUzs
 
 The toolchain works natively across all major OSes, and has been developed by a few people who enjoy the challenge.
