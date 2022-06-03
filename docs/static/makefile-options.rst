@@ -154,37 +154,37 @@ If an optional library is not present on the device, the program will still exec
 Miscellaneous Configuration
 ---------------------------
 
-.. rubric:: EXTRA_CSOURCES
+.. rubric:: EXTRA_C_SOURCES
 
 Extra C source files to be compiled in that are not located in the source directory.
 
 .. code-block:: makefile
 
-    EXTRA_CSOURCES = <space separated list of sources>
+    EXTRA_C_SOURCES = <space separated list of sources>
 
-.. rubric:: EXTRA_CPPSOURCES
+.. rubric:: EXTRA_CXX_SOURCES
 
 Extra C++ source files to be compiled in that are not located in the source directory.
 
 .. code-block:: makefile
 
-    EXTRA_CPPSOURCES = <space separated list of sources>
+    EXTRA_CXX_SOURCES = <space separated list of sources>
 
-.. rubric:: EXTRA_ASMSOURCES
+.. rubric:: EXTRA_ASM_SOURCES
 
 Extra assembly source files to be compiled in that are not located in the source directory.
 
 .. code-block:: makefile
 
-    EXTRA_ASMSOURCES = <space separated list of sources>
+    EXTRA_ASM_SOURCES = <space separated list of sources>
 
-.. rubric:: EXTRA_USERHEADERS
+.. rubric:: EXTRA_HEADERS
 
 Extra header files to be used in that are not located in the source directory.
 
 .. code-block:: makefile
 
-    EXTRA_USERHEADERS = <space separated list of headers>
+    EXTRA_HEADERS = <space separated list of headers>
 
 .. rubric:: EXTRA_LIBLOAD_LIBS
 
