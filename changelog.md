@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v10.1...master)
 
-# [v10.0](https://github.com/CE-Programming/toolchain/releases/tag/v10.1) (2021-06-03)
+# [v10.1](https://github.com/CE-Programming/toolchain/releases/tag/v10.0) (2021-05-xx)
 
 * **New features**
   * Adds `byteswap.h` header file as standard.
