@@ -110,6 +110,7 @@ MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
 UPDIR_ADD = $(subst ../,_../,$(subst \,/,$1))
 UPDIR_RM = $(subst _../,../,$(subst \,/,$1))
 
+FASMG_LIB = $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1))))
 FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
 LINKER_SCRIPT ?= $(CEDEV_TOOLCHAIN)/meta/linker_script
 
@@ -165,11 +166,10 @@ endif
 # find all required/optional libload libraries
 LIBLOAD_LIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib) $(EXTRA_LIBLOAD_LIBS)
 LIBLOAD_LIBS := $(filter-out %libload.lib,$(LIBLOAD_LIBS))
-REQ_LIBLOAD := $(CEDEV_TOOLCHAIN)/lib/libload/libload.lib
-REQ_LIBLOAD += $(filter-out $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
+REQ_LIBLOAD := $(filter-out $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
 OPT_LIBLOAD := $(filter $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
-REQ_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(REQ_LIBLOAD)))))
-OPT_LIBLOAD := $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$(OPT_LIBLOAD)))))
+REQ_LIBLOAD := $(call FASMG_LIB,$(REQ_LIBLOAD))
+OPT_LIBLOAD := $(call FASMG_LIB,$(OPT_LIBLOAD))
 OPT_LIBLOAD := $(foreach lib,$(OPT_LIBLOAD),$(lib)$(space)optional)
 LDLIBS := $(subst $(space),$(comma)$(space),$(strip $(REQ_LIBLOAD)$(space)$(OPT_LIBLOAD)))
 LDLIBS := $(subst $(comma)$(space)optional,$(space)optional,$(LDLIBS))
