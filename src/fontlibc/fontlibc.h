@@ -713,6 +713,8 @@ void fontlib_ClearWindow(void);
 
 /**
  * Performs a newline.  Pays attention to newline flags.
+ * @return Returns true if the text window is full.  This only happens if
+ * scrolling is disabled.
  */
 void fontlib_Newline(void);
 
