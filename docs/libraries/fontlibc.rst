@@ -169,7 +169,7 @@ However, accessing fonts this way triggers a slow VAT lookup for the appvar ever
 
 .. code-block:: c
 
-    ti_var_t file;
+    uint8_t file;
     fontlib_font_pack_t *my_font_pack;
     fontlib_font_t *my_font;
     . . .
@@ -222,7 +222,7 @@ There are no other routines for processing the other metadata fields in a font p
 
 .. code-block:: c
 
-    ti_var_t file;
+    uint8_t file;
     fontlib_font_pack_t *font_pack;
     int metadata_offset;
     fontlib_metadata_t *font_pack_metadata;

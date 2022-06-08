@@ -329,8 +329,8 @@ int ti_DeleteVar(const char *name, uint8_t type);
 /**
  * Gets the string used for displaying a TI token.
  * The TI calculators encode programs and other variables in "tokens", which are
- * either 1 or 2 bytes in length. For example, the token :code:`0x21`
- * corresponds to the string :code:`mean(` in TI-BASIC programs. This allows
+ * either 1 or 2 bytes in length. For example, the token `0x21`
+ * corresponds to the string `mean(` in TI-BASIC programs. This allows
  * program size to be reduced as the whole string is not stored - but requires
  * additional decoding in order to resolve the token's string representation.
  *
