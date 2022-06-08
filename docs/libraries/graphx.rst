@@ -13,28 +13,41 @@ This allows a programmer to easily add quality graphics to their program without
 .. contents:: :local:
    :depth: 3
 
-Default Palette
----------------
+Overview
+--------
 
-This is the default palette used by graphx.
-This palette can be modified at any time with different colors.
+The graphx library places the LCD in a "palettized" mode - pixels on the screen are actually indexes into an array of colors rather than the color iself.
+What this means is that graphx is only functionally capable of displaying up to 256 colors on-screen at one time.
+This array of colors is called a "palette", and is accessed using the :code:`gfx_palette` macro variable: e.g. the code :code:`gfx_palette[16]` accesses the 17th color in the palette, and can be directly read or written with an color value.
+Alternatively, the function :code:`gfx_SetPalette` sets multiple color entries at once, which may be useful when configuring a custom color palette.
+Palette colors are stored in 1555 format (aka 565 format), and the macro :code:`gfx_RGBTo1555` can be used to convert a normal 24-bit RGB value into a palette color.
+
+However, a better option when working with graphx palettes is to utilize the `convimg <https://github.com/mateoconlechuga/convimg>`_ tool which is supplied with the toolchain.
+This tool is able to consume multiple images and sprites and to create a palette that matches as closely as possible with only 256 colors.
+The output of this tool is normal data arrays which are then automatically picked up by the compiler at build time, making the process seamless.
+Additionally, convimg allows sprite and color data to be stored in AppVars to help reduce the size of the program binary. 
+
+Default Palette
+^^^^^^^^^^^^^^^
+
+This is the default palette used by graphx, commonally known as the ``xlibc`` palette for historical reasons.
+This palette can be modified at any time with different colors, using either :code:`gfx_palette` or the output of the convimg tool.
 
 .. image:: images/graphx_palette.png
    :align: center
 
 Coordinate System
------------------
+^^^^^^^^^^^^^^^^^
 
-The graphx library coordinate system consists of the horizontal (:code:`x`) and vertical (:code:`y`) components of the screen.
-Pixel coordinates are generally expressed as an :code:`x` and :code:`y` pair, such as (:code:`x`, :code:`y`).
+The graphx library coordinate system consists of the horizontal (``x``) and vertical (``y``) components of the screen.
+Pixel coordinates are generally expressed as an ``x`` and ``y`` pair, such as (``x``, ``y``).
 The graphx library uses the top left of the screen as pixel coordinate (0, 0), while the bottom right of the screen is pixel coordinate (319, 239).
 The defines :code:`GFX_LCD_WIDTH` and :code:`GFX_LCD_HEIGHT` can be used to get the LCD screen width and height respectively.
 
 Clipped vs. Unclipped
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 The graphx library contains many similar functions, e.g. :code:`gfx_Sprite` and :code:`gfx_Sprite_NoClip`.
-
 As the name suggests, the **_NoClip** variant of a routine performs no clipping.
 Clipping is the process of checking if parts (or all) of an object to be drawn are outside the window bounds and skipping drawing these out of bounds parts.
 This checking process takes time.
@@ -42,6 +55,18 @@ If you can be sure that an object to be drawn is fully within the bounds of the 
 
 **Do not use the _NoClip variant of a routine if you can not be sure that the object to be drawn is fully within the bounds of the screen. Doing so may result in corrupted graphics or memory.
 This is because the screen itself is represented as a region of memory. If you draw outside the bounds of that region, you risk overwriting other, possibly important data. This can cause corruption, and can cause crashes.**
+
+General Usage 
+^^^^^^^^^^^^^
+
+To begin using the graphx library functions, the :code:`gfx_Begin` function must first be called.
+This will configure the LCD in the proper mode, and set the color palette to the default palette described above.
+Before the program exits, the function :code:`gfx_End` must be called in order to restore the LCD to the mode expected by the OS.
+If this is not done, the screen may appear similar to the below image, which is what the OS looks like in palettized mode:
+
+.. image:: images/graphx_oops.png
+   :align: center
+   :width: 320px
 
 Partial Redraw
 --------------

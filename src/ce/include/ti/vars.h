@@ -5,7 +5,7 @@
  * Jacob "jacobly" Young
  * @brief TI CE OS user variables and memory
  * 
- * This declares routines for low-level access to user variables (appvars, programs, Str0-9, matrix, &c.),
+ * This declares routines for low-level access to user variables (AppVars, programs, Str0-9, matrix, &c.),
  * as well as other user-memory management routines (not the heap!), stat vars, and the RunPrgm interface.
  */
 
@@ -81,7 +81,17 @@ tiflags void os_ArcChk(void);
 void *os_GetSymTablePtr(void);
 
 /**
- * @return next entry or NULL if no more entries, pass os_GetSymTablePtr() as first entry
+ * Iterates over the OS symbol table.
+ * This table stores the name and pointers to the variables (such as AppVars and programs)
+ * on the calculator. This function can be used to find all the variables on the calculator,
+ * to search for a specific variable the function os_ChkFindSym should be used instead.
+ *
+ * @param[in] entry Current iterative entry, pass the output of os_GetSymTablePtr to start the search.
+ * @param[in] type Type of variable returned.
+ * @param[in] nameLength Length of variable name. The name may not be null-terminated.
+ * @param[in] name Variable name.
+ * @param[in] data Returns a pointer to the variable's data, which may be in either RAM or flash.
+ * @return next entry to pass to the \p entry argument on subsequent calls.
  */
 void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *name, void **data);
 
@@ -296,19 +306,19 @@ typedef int (*os_runprgm_callback_t)(void *data, int retval);
 
 /**
  * Runs a program that exists on the calculator.
- * Note that this will destroy the currently running program, requiring you to
- * save any data as needed. This program has an optional callback that will be
- * executed when the called program finishes, which can be used to rebuild the
- * program state. Additionally, program context information can be safely
- * stored by using the extra user data arguments, which will then be delivered
- * to the callback.
+ * Note that this will destroy the currently running program. The function has
+ * an optional callback entry point for when a program finishes, which can be
+ * used to rebuild the program context. Additional program context information
+ * can be safely stored by using the extra \p data argument, which is
+ * delivered to the callback entry point.
  *
  * @param[in] prgm Name of program to execute.
  * @param[in] data User data that will be available in the callback function.
  * May be \c NULL.
  * @param[in] size Size of user data (keep this small, it is stored on the stack!)
- * @param[in] callback Callback function to run when program finishes executing.
- * The argument \p data will contain the provided \p data contents, and \p
+ * @param[in] callback This callback is used as the entry point to the program
+ * rather than \p main when the called program finishes.
+ * The argument \p data will contain the \p data argument, and \p
  * retval will contain the error code if a TI-BASIC program, or the exit code if
  * a C program. Other types of programs may have an undefined \p retval. This
  * argument may be left \c NULL if execution should not return to the calling
@@ -318,22 +328,29 @@ typedef int (*os_runprgm_callback_t)(void *data, int retval);
  * program could not be found, -2 if not enough memory, and < 0 if some other
  * error occurred.
  *
- * @note The callback return code is passed to the launcher of the original program that called this function.
+ * @note The integer return of the callback acts the same as the integer return
+ * of the \p main function, and is returned to the parent caller (either the OS
+ * or a shell).
  */
 int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 
-#define os_RamStart          ((uint8_t*)0xD00000) /**< Start of RAM. Type: `uint8_t[1024 * 256]`*/
+/** Start of RAM. Type: `uint8_t[1024 * 256]`*/
+#define os_RamStart        ((uint8_t*)0xD00000)
 
-#define os_RclFlags          (*(uint8_t*)0xD0008E) /**< @see `<ti/flags.h>` */
+/** @see `<ti/flags.h>` */
+#define os_RclFlags        (*(uint8_t*)0xD0008E)
 
-#define os_AppData           ((uint8_t*)0xD00429) /**< Generally unused by the OS. Type: `uint8_t[256]` */
+/** Generally unused by the OS. Type: `uint8_t[256]` */
+#define os_AppData         ((uint8_t*)0xD00429)
 
-#define os_ProgToEdit        ((char*)0xD0065B)
-#define os_NameBuff          ((char*)0xD00663)
+#define os_ProgToEdit      ((char*)0xD0065B)
+#define os_NameBuff        ((char*)0xD00663)
 
-#define os_AsmPrgmSize          (*(uint16_t*)0xD0118C) /**< Current size of executing program. Type: `uint16_t` */
+/** Current size of executing program. Type: `uint16_t` */
+#define os_AsmPrgmSize     (*(uint16_t*)0xD0118C)
 
-#define os_TempFreeArc       (*(uint24_t*)0xD02655)        /**< Set after asm_ArcChk call. Type: `uint24_t` */
+/** Set after asm_ArcChk call. Type: `uint24_t` */
+#define os_TempFreeArc     (*(uint24_t*)0xD02655)
 
 /**
  * When writing to flash, the calculator's hardware cannot read from flash.
@@ -343,7 +360,7 @@ int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t 
  * 
  * Type: `uint8_t[1023]`
  */
-#define os_RamCode           ((uint8_t*)0xD18C7C)
+#define os_RamCode         ((uint8_t*)0xD18C7C)
 
 #undef tiflags
 

@@ -444,6 +444,7 @@ fontlib_SetFont:
 .validateOffsets:
 ; Now convert offsets into actual pointers
 ; Validate that offset is at least semi-reasonable
+	xor	a,a
 	ld	de,$ff00		; Maximum reasonable font data size
 	ld	hl,(iy + strucFont.widthsTablePtr)
 	sbc	hl,de			; Doesn't really matter if we're off-by-one here
@@ -461,7 +462,7 @@ fontlib_SetFont:
 	ld	hl,arg0
 	add	hl,sp
 	ld	a,(hl)
-	or	a
+	or	a,a
 	jr	z,.true
 	lea	hl,iy + strucFont.spaceAbove
 	xor	a
@@ -1552,7 +1553,7 @@ fontlib_Newline:
 ;  None
 ; Returns:
 ;  A = 0 on success
-;  A > 0 if the text window is full
+;  A = 1 if the text window is full
 	ld	iy,DataBaseAddr
 	bit	bAutoClearToEOL,(iy + newlineControl)
 ; I hate how nearly every time I think CALL cc or RET cc would be useful
@@ -1582,9 +1583,8 @@ fontlib_Newline:
 	ld	a,1
 	bit	bEnableAutoWrap,(iy + newlineControl)
 	ret	z
-	ld	a,(iy + textYMin)
-	ld	(iy + textY),a
-	ld	a,1
+	ld	b,(iy + textYMin)
+	ld	(iy + textY),b
 	ret
 .writeCursorY:
 	sub	a,b
