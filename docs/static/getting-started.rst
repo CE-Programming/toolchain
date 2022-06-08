@@ -6,13 +6,21 @@ Getting Started
 Installing the CE Toolchain
 ---------------------------
 
-* Download the latest stable toolchain release for your OS `by clicking here <https://github.com/CE-Programming/toolchain/releases/latest>`__.
+* Download the latest stable toolchain release below:
 
-* An additional "nightly" development build is available `here <https://github.com/CE-Programming/toolchain/releases/tag/nightly>`__, which includes the  latest features and support before an official  stable release.
+..
+
+  * Windows: `CEdev-Windows.zip <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-Windows.zip>`__
+  * Linux:  `CEdev-Linux.tar.gz <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-Linux.tar.gz>`__
+  * macOS: `CEdev-macOS.dmg <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-macOS.dmg>`__
+
+..
+
+* If you would rather try the "nightly" build (which includes the latest features and bugfixes before an official release) you can find it `here <https://github.com/CE-Programming/toolchain/releases/tag/nightly>`__.
 
 **On Windows**
 
-    * Extract the archive to a path **without any spaces**, e.g. :code:`C:\CEdev`.
+    * Extract the zip to a folder **without any spaces** in the full path, e.g. :code:`C:\CEdev`.
 
     * Double click :code:`cedev.bat` inside the extracted folder to launch the toolchain environment.
       You may have to allow the script to be run depending on the user account control.
@@ -32,10 +40,9 @@ Installing the CE Toolchain
 
             export PATH=/<insert path here>/CEdev/bin:$PATH
 
-.. note::
+.. tip::
 
-    The toolchain requires the installation folder and any project folders to not contain any spaces.
-    This is due to a limitation of the :code:`make` command.
+    The toolchain update process is the exact same as installation - the only extra step is to delete the current ``CEdev`` folder if it exists beforehand.
 
 Building Programs
 -----------------
@@ -52,14 +59,13 @@ Type :code:`make` and press enter.
 This command invokes the compiler, assembler, and linker creating the file :code:`bin/DEMO.8xp`.
 The file stores the machine code of the program in a format fit for the calculator.
 
-.. note::
+.. warning::
 
-    On Windows, you may need to install the latest Microsoft Visual C++ Redistributable package if you encounter errors such as :code:`Missing vcruntime140.dll`.
-    The download can be found `at this link <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_, depending on your computer you will need to install one of *vc_redist.x86.exe*, *vc_redist.x64.exe*, or *vc_redist.arm64.exe*.
+    This warning is only for Windows users.
+    You may need to install the latest Microsoft Visual C++ Redistributable package if you encounter errors such as :code:`Missing vcruntime140.dll`.
+    The download can be found `at this link <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_, depending on your architecture you will need to install one of either *vc_redist.x86.exe* or *vc_redist.x64.exe*.
 
-.. caution::
-
-    On Windows, your antivirus software (e.g. Windows Defender) may flag binaries in the :code:`CEdev/bin` directory as false positives, and either quarantine/remove the files or prevent them from running.
+    Additionally, your antivirus software (e.g. Windows Defender) may flag binaries in the :code:`CEdev/bin` directory as false positives, and either quarantine/remove the files or prevent them from running.
     This may result in errors such as being unable find/run the `fasmg` program when building.
     It is recommended you whitelist or disable scanning in :code:`CEdev/bin` to prevent these false positives from occurring.
 
@@ -73,34 +79,27 @@ The `CEmu <https://ce-programming.github.io/CEmu>`_ emulator can be used to run 
 
 Each CE Toolchain project has the following folder structure:
 
-* **src**
+src
+  This is the directory where all source files can be placed.
+  Sources are built automatically if they end in a ``.c``/``.cpp`` extension, and can be edited with any text editor or IDE.
+  Subdirectories are allowed as long as they do not contain spaces.
 
-  * This is the directory where all source files can be placed.
-  * Sources are built automatically if they end in a ``.c``/``.cpp`` extension, and can be edited with any text editor or IDE.
-  * Subdirectories are allowed as long as they do not contain spaces.
+obj
+  Compiled C/C++ files are placed here, and contain intermediate assembly output.
 
-* **obj**
+bin
+  This is where the final linked calculator program will be placed, ending with a ``.8xp`` extension.
 
-  * Compiled C/C++ files are placed here, and contain intermediate assembly output.
+makefile
+  A text file used by :code:`make` to build the program.
+  There are options for setting the program name, description, and :ref:`more <makefile_options>`.
 
-* **bin**
+icon.png
+  This is a 16x16 icon that is displayed in shells such as `Cesium <https://github.com/mateoconlechuga/cesium/releases/latest>`_.
 
-  * This is where the final linked calculator program will be placed, ending with a ``.8xp`` extension.
+readme.md
+  A text file that describes the program's operation.
 
-* **makefile**
-
-  * A text file used by :code:`make` to build the program.
-  * There are options for setting the program name, description, and more.
-
-* **icon.png**
-
-  * This is a 16x16 icon that is displayed in shells such as `Cesium <https://github.com/mateoconlechuga/cesium/releases/latest>`_.
-
-* **readme.md**
-
-  * A text file that describes the program's operation.
-
-* **autotest.json**
-
-  * This file can be loaded into `CEmu's Autotester <https://ce-programming.github.io/CEmu>`_ to test and validate the program.
-  * This feature is not required, but can be useful for creating testable code coverage.
+autotest.json
+  This file can be loaded into `CEmu's Autotester <https://ce-programming.github.io/CEmu>`_ to test and validate the program.
+  This feature may be useful for creating testable code coverage.
