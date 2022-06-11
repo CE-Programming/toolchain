@@ -1241,7 +1241,7 @@ uint32_t usb_GetCycleCounter(void);
  * by usb_GetCycleCounter().
  * @return Cpu cycle counter >> 8.
  */
-uint24_t usb_GetCycleCounterHigh(void);
+uint24_t usb_GetCounter(void);
 
 #ifdef __cplusplus
 }

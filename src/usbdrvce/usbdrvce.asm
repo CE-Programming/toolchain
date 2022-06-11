@@ -59,7 +59,7 @@ DEBUG := 0
 	export usb_ScheduleTransfer
 	export usb_MsToCycles
 	export usb_GetCycleCounter
-	export usb_GetCycleCounterHigh
+	export usb_GetCounter
 	export usb_StopTimer
 	export usb_StartTimerCycles
 	export usb_RepeatTimerCycles
@@ -5120,7 +5120,7 @@ assert 48000 and $FF = $80
 
 ;-------------------------------------------------------------------------------
 usb_GetCycleCounter:
-	call	usb_GetCycleCounterHigh
+	call	usb_GetCounter
 	dec	sp
 	dec	sp
 	push	hl
@@ -5130,48 +5130,33 @@ usb_GetCycleCounter:
 	ret
 
 ;-------------------------------------------------------------------------------
-usb_GetCycleCounterHigh:
-	ld	hl,(ti.mpIntInvert+$20) or (ti.intLatch+$20) shl 8
+usb_GetCounter:
+	ld	iy,ti.mpTmrRange
+	lea	hl,iy+ti.tmr2Counter
+	lea	de,iy+ti.tmr2Match2
+	ld	bc,4
 	ld	a,i
 	di
-	ld	a,(hl)
-	push	af
-	ld	(hl),.ret
-	ld	l,h;ti.intLatch+$20
-	ld	de,(hl)
-	push	de
-	ld	de,.ld_auhl_tmr2Counter
-	ld	(hl),de
-	ld	iy,ti.mpTmr2Counter+1
-.tmrBase := iy-ti.tmr2Counter-1
-	lea	hl,.tmrBase+ti.tmr2Counter
-virtual at ti.mpIntLatch+$20
-	ld	a,(hl)
-	ld	hl,(.tmrBase+ti.tmr2Counter+1)
- load .ld_auhl_tmr2Counter: $-$$ from $$
- assert .ld_auhl_tmr2Counter < 1 shl 22
+	jq	pe,.ei
+	ldir
+virtual
+	ld	hl,0
+ assert $ = .di
+ load .ld_hl: byte from $$
 end virtual
-virtual at ti.mpIntInvert+$20
-	ret
- load .ret: $-$$ from $$
- assert .ret < 1 shl 8
-end virtual
-	call	ti.mpIntLatch+$20
-	ld	iy,ti.mpIntRange+$20
-	pop	de
-	ld	(iy+ti.intLatch),de
-	pop	de
-	ld	(iy+ti.intInvert),d
-	bit	2,e ; p/v flag
-	jq	z,.noEi
+	db	.ld_hl
+.ei:
+	ldir
 	ei
-.noEi:
-	add	a,3 shl 2
-	add	a,3 shl 1
+.di:
+	ld	a,(iy+ti.tmr2Match2+0)
+	ld	hl,(iy+ti.tmr2Match2+1)
+	add	a,7 shl 0
+	add	a,7 shl 1
 	ret	nc
 	inc	l
 	ret	nz
-	cp	a,3 shl 0
+	cp	a,7 shl 0
 	ret	nc
 	inc	h
 	ret
