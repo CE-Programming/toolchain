@@ -24,6 +24,171 @@ extern "C" {
 #define tiflags __attribute__((__tiflags__))
 /* @endcond */
 
+/** Start of RAM. Type: `uint8_t[1024 * 256]`*/
+#define os_RamStart        ((uint8_t*)0xD00000)
+
+/** @see `<ti/flags.h>` */
+#define os_RclFlags        (*(uint8_t*)0xD0008E)
+
+/** Generally unused by the OS. Type: `uint8_t[256]` */
+#define os_AppData         ((uint8_t*)0xD00429)
+
+#define os_ProgToEdit      ((char*)0xD0065B)
+#define os_NameBuff        ((char*)0xD00663)
+
+/** Current size of executing program. Type: `uint16_t` */
+#define os_AsmPrgmSize     (*(uint16_t*)0xD0118C)
+
+/** Set after asm_ArcChk call. Type: `uint24_t` */
+#define os_TempFreeArc     (*(uint24_t*)0xD02655)
+
+/**
+ * When writing to flash, the calculator's hardware cannot read from flash.
+ * So the flash writing code has to be copied to RAM first.
+ * It is copied here.
+ * You can use this as long as you don't attempt any flash writes.
+ * 
+ * Type: `uint8_t[1023]`
+ */
+#define os_RamCode         ((uint8_t*)0xD18C7C)
+
+/**
+ * Gets an element from a matrix
+ *
+ * @param matrix Structure of matrix
+ * @param row Row in matrix
+ * @param col Column in matrix
+ * @returns real_t containing element data
+ */
+#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
+
+/** Unprotected program */
+#define OS_PRGM_TYPE            (0x05)
+/** Protected program */
+#define OS_PPRGM_TYPE           (0x06)
+/** Temporary program */
+#define OS_TPRGM_TYPE           (0x16)
+/** AppVar */
+#define OS_APPVAR_TYPE          (0x15)
+/** String */
+#define OS_STRING_TYPE          (0x04)
+/** Equation */ 
+#define OS_EQU_TYPE             (0x03)
+/** Real variable list */
+#define OS_REAL_LIST_TYPE       (0x01)
+/** Complex variable list */
+#define OS_CPLX_LIST_TYPE       (0x0D)
+/** Real variable */
+#define OS_REAL_TYPE            (0x00)
+/** Complex variable */
+#define OS_CPLX_TYPE            (0x0C)
+/** Matrix variable */
+#define OS_MATRIX_TYPE          (0x02)
+
+/** Name of Ans variable */
+#define OS_ANS          "\x72\0"
+
+/**
+ * Name of Str1 string variable.
+ * Other Str variables follow the naming format `OS_STR?` where `?`
+ * is the value [0-9].
+ */
+#define OS_STR1         "\xAA\x0\0"
+/* @cond */
+#define OS_STR2         "\xAA\x1\0"
+#define OS_STR3         "\xAA\x2\0"
+#define OS_STR4         "\xAA\x3\0"
+#define OS_STR5         "\xAA\x4\0"
+#define OS_STR6         "\xAA\x5\0"
+#define OS_STR7         "\xAA\x6\0"
+#define OS_STR8         "\xAA\x7\0"
+#define OS_STR9         "\xAA\x8\0"
+#define OS_STR0         "\xAA\x9\0"
+/* @endcond */
+
+/**
+ * Name of Y1 equation variable.
+ * Other Y variables follow the naming format `OS_Y?` where `?` is [0-9].
+ */
+#define OS_Y1           "\x5E\x10\0"
+/* @cond */
+#define OS_Y2           "\x5E\x11\0"
+#define OS_Y3           "\x5E\x12\0"
+#define OS_Y4           "\x5E\x13\0"
+#define OS_Y5           "\x5E\x14\0"
+#define OS_Y6           "\x5E\x15\0"
+#define OS_Y7           "\x5E\x16\0"
+#define OS_Y8           "\x5E\x17\0"
+#define OS_Y9           "\x5E\x18\0"
+#define OS_Y0           "\x5E\x19\0"
+/* @endcond */
+
+/**
+ * Name of A real variable.
+ * Other real variables follow the naming format `OS_?` where `?` is [A-Z] (and THETA).
+ */
+#define OS_A            "\x41\0\0"
+/* @cond */
+#define OS_B            "\x42\0\0"
+#define OS_C            "\x43\0\0"
+#define OS_D            "\x44\0\0"
+#define OS_E            "\x45\0\0"
+#define OS_F            "\x46\0\0"
+#define OS_G            "\x47\0\0"
+#define OS_H            "\x48\0\0"
+#define OS_I            "\x49\0\0"
+#define OS_J            "\x4A\0\0"
+#define OS_K            "\x4B\0\0"
+#define OS_L            "\x4C\0\0"
+#define OS_M            "\x4D\0\0"
+#define OS_N            "\x4E\0\0"
+#define OS_O            "\x4F\0\0"
+#define OS_P            "\x50\0\0"
+#define OS_Q            "\x51\0\0"
+#define OS_R            "\x52\0\0"
+#define OS_S            "\x53\0\0"
+#define OS_T            "\x54\0\0"
+#define OS_U            "\x55\0\0"
+#define OS_V            "\x56\0\0"
+#define OS_W            "\x57\0\0"
+#define OS_X            "\x58\0\0"
+#define OS_Y            "\x59\0\0"
+#define OS_Z            "\x60\0\0"
+#define OS_THETA        "\x61\0\0"
+/* @endcond */
+
+/**
+ * Name of A matrix variable.
+ * Other matrix variables follow the naming format `OS_MATRIX_?` where `?`
+ * is value [A-J].
+ */
+#define OS_MATRIX_A     "\x5C\x0\0"
+/* @cond */
+#define OS_MATRIX_B     "\x5C\x1\0"
+#define OS_MATRIX_C     "\x5C\x2\0"
+#define OS_MATRIX_D     "\x5C\x3\0"
+#define OS_MATRIX_E     "\x5C\x4\0"
+#define OS_MATRIX_F     "\x5C\x5\0"
+#define OS_MATRIX_G     "\x5C\x6\0"
+#define OS_MATRIX_H     "\x5C\x7\0"
+#define OS_MATRIX_I     "\x5C\x8\0"
+#define OS_MATRIX_J     "\x5C\x9\0"
+/* @endcond */
+
+/**
+ * Name of L1 list variable.
+ * Other matrix variables follow the naming format `OS_LIST_?` where `?`
+ * is the value [1-6].
+ */
+#define OS_LIST_1        "\x5D\x0\0"
+/* @cond */
+#define OS_LIST_2        "\x5D\x1\0"
+#define OS_LIST_3        "\x5D\x2\0"
+#define OS_LIST_4        "\x5D\x3\0"
+#define OS_LIST_5        "\x5D\x4\0"
+#define OS_LIST_6        "\x5D\x5\0"
+/* @endcond */
+
 /**
  * @brief Structure of list variable type
  */
@@ -48,16 +213,6 @@ typedef struct { uint16_t len; char data[1]; } equ_t;
  * @brief Structure of miscellaneous variable type
  */
 typedef struct { uint16_t size; uint8_t data[1]; } var_t;
-
-/**
- * Gets an element from a matrix
- *
- * @param matrix Structure of matrix
- * @param row Row in matrix
- * @param col Column in matrix
- * @returns real_t containing element data
- */
-#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
 /**
  * Returns the size in bytes of free RAM that the user isn't using. A pointer is
@@ -334,33 +489,24 @@ typedef int (*os_runprgm_callback_t)(void *data, int retval);
  */
 int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 
-/** Start of RAM. Type: `uint8_t[1024 * 256]`*/
-#define os_RamStart        ((uint8_t*)0xD00000)
-
-/** @see `<ti/flags.h>` */
-#define os_RclFlags        (*(uint8_t*)0xD0008E)
-
-/** Generally unused by the OS. Type: `uint8_t[256]` */
-#define os_AppData         ((uint8_t*)0xD00429)
-
-#define os_ProgToEdit      ((char*)0xD0065B)
-#define os_NameBuff        ((char*)0xD00663)
-
-/** Current size of executing program. Type: `uint16_t` */
-#define os_AsmPrgmSize     (*(uint16_t*)0xD0118C)
-
-/** Set after asm_ArcChk call. Type: `uint24_t` */
-#define os_TempFreeArc     (*(uint24_t*)0xD02655)
+/**
+ * Evalutes a tokenized expression.
+ *
+ * @param data Tokenized expression to evaluate.
+ * @param len Length of tokenized data.
+ * @returns TIOS System Error Code or 0 on success, with the result stored in
+ * the Ans variable.
+ */
+int os_Eval(const void *data, size_t len);
 
 /**
- * When writing to flash, the calculator's hardware cannot read from flash.
- * So the flash writing code has to be copied to RAM first.
- * It is copied here.
- * You can use this as long as you don't attempt any flash writes.
- * 
- * Type: `uint8_t[1023]`
+ * Evalutes a tokenized equation or string variable.
+ *
+ * @param name Name of variable to evaluate.
+ * @returns TIOS System Error Code or 0 on success, with the result stored in
+ * the Ans variable.
  */
-#define os_RamCode         ((uint8_t*)0xD18C7C)
+int os_EvalVar(const char *name);
 
 #undef tiflags
 
