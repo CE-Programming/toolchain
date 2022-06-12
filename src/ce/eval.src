@@ -12,10 +12,10 @@ _os_EvalVar:
 	ld	(de), a
 	inc	de
 	call	$20304		; mov8b
+	ld	hl, ($D02596)	; tmpcnt
+	push	hl
 	ld	hl, .error
 	call	$20798		; push error handler
-	ld	hl, ($D02596)	; tmpcnt
-	ld	(.tmpcnt), hl
 	call	$20510		; findsym
 	ld	a, 141		; undefined
 	jr	c,.error
@@ -24,9 +24,8 @@ _os_EvalVar:
 	call	$2079C		; pop error handler
 	xor	a, a
 .error:
+	pop	de
 	push	af
-	ld	de,0
-.tmpcnt := $-3
 	call	$20E80		; fixtempcnt
 	pop	af
 	or	a, a
@@ -40,23 +39,17 @@ _os_EvalVar:
 _os_Eval:
 	ld	iy, 0
 	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	(.addr), hl
-	ld	hl, (iy + 6)
-	ld	(.size), hl
-	ld	iy, $D00080	; flags
+	ld	hl, ($D02596)	; tmpcnt
+	push	hl
 	ld	hl, .error
 	call	$20798		; push error handler
-	ld	hl, ($D02596)	; tmpcnt
-	ld	(.tmpcnt), hl
-	ld	hl, 0
-.addr := $-3
+	ld	hl, (iy + 3)
 	push	hl
-	ld	hl, 0
-.size := $-3
+	ld	hl, (iy + 6)
 	push	hl
 	inc	hl
 	inc	hl
+	ld	iy, $D00080	; flags
 	call	$2055C		; create temp equ
 	inc	de
 	inc	de
@@ -74,9 +67,8 @@ _os_Eval:
 	call	$2079C		; pop error handler
 	xor	a, a
 .error:
+	pop	de
 	push	af
-	ld	de,0
-.tmpcnt := $-3
 	call	$20E80		; fixtempcnt
 	pop	af
 	or	a, a
