@@ -8,10 +8,10 @@ If you are brave enough to contribute source to the CE Toolchain, this page is f
 Creating PRs for review
 -----------------------
 
-Pull Requests (PRs) should branch from git :code:`master`.
+Pull Requests (PRs) should branch from git ``master``.
 Before creating a PR, it may be a good idea to get some feedback from IRC/Discord first.
 This will increase the chances of your PR being merged in a timely fashion.
-Please do not make large PRs; it is better to make smaller changes in different PRs.
+Please do not make large PRs - it is better to make smaller changes in different PRs.
 
 For information on how to fork a repo and create a PR using GitHub, see the `forking documentation <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/fork-a-repo>`_.
 
