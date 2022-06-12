@@ -20,6 +20,7 @@ Here are some examples:
 
     int var = 10;
     unsigned code = 3;
+
     dbg_printf("Initialized some things...\n");
     dbg_printf("var value: %d\n", var);
     dbg_printf("PROGRAM ABORTED (code = %u)\n", code);

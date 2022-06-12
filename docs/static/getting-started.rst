@@ -22,17 +22,17 @@ Installing the CE Toolchain
 
     * Extract the zip to a folder **without any spaces** in the full path, e.g. :code:`C:\CEdev`.
 
-    * Double click :code:`cedev.bat` inside the extracted folder to launch the toolchain environment.
+    * Double click :code:`cedev.bat` inside the extracted *CEdev* folder to launch the toolchain environment.
       You may have to allow the script to be run depending on the user account control.
 
     * If you want to avoid using the :code:`cedev.bat` script, you can extend the PATH environment variable to point to the :code:`CEdev/bin` directory.
-      `Here is a description <https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/>`_.
+      `Here is a guide <https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/>`_.
 
 **On Linux or Mac**
 
     * Extract the archive to a path **without any spaces**, e.g. :code:`/home/user/CEdev`.
 
-    * Extend the PATH environment variable to point to :code:`CEdev/bin` by modifying *.bashrc*, *.zshrc*, or whatever flavor your OS uses.
+    * Extend the PATH environment variable to point to :code:`CEdev/bin` by modifying *.bashrc*, *.zshrc*, or whatever flavor the OS uses.
       An example command may be:
 
         .. indent with spaces
@@ -47,29 +47,14 @@ Installing the CE Toolchain
 Building Programs
 -----------------
 
-Programs are built with the :code:`make` command, executed from a terminal session.
-This tutorial explains how to use the CE Toolchain to build programs using :code:`make`.
-
-Locate the installed *CEdev* folder, and open a build session by double-clicking :code:`cedev.bat` on Windows or launching your favorite terminal on Linux/macOS.
+Open a build session by double-clicking :code:`cedev.bat` on Windows or launching a terminal session on Linux/macOS.
 Navigate to the *examples* folder using the :code:`cd examples` command.
-This folder contains example projects that you can build and modify to learn how to write various programs.
-Navigate the to the *hello_world* example inside this folder using the command :code:`cd hello_world`.
+This folder contains example projects that you can build and modify to learn how to write different programs.
+Navigate the to the *hello_world* example project using the command :code:`cd hello_world`.
 
 Type :code:`make` and press enter.
-This command invokes the compiler, assembler, and linker creating the file :code:`bin/DEMO.8xp`.
-The file stores the machine code of the program in a format fit for the calculator.
-
-.. warning::
-
-    This warning is only for Windows users.
-    You may need to install the latest Microsoft Visual C++ Redistributable package if you encounter errors such as :code:`Missing vcruntime140.dll`.
-    The download can be found `at this link <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_, depending on your architecture you will need to install one of either *vc_redist.x86.exe* or *vc_redist.x64.exe*.
-
-    Additionally, your antivirus software (e.g. Windows Defender) may flag binaries in the :code:`CEdev/bin` directory as false positives, and either quarantine/remove the files or prevent them from running.
-    This may result in errors such as being unable find/run the `fasmg` program when building.
-    It is recommended you whitelist or disable scanning in :code:`CEdev/bin` to prevent these false positives from occurring.
-
-The `CEmu <https://ce-programming.github.io/CEmu>`_ emulator can be used to run the program, or you can transfer it to a real calculator using the cross-platform `TI Connect CE <https://education.ti.com/en/us/products/computer_software/connectivity-software/ti-connect-ce-software/tabs/overview>`_.
+This command invokes the compiler, assembler, and linker creating the program :code:`bin/DEMO.8xp`.
+Use the `CEmu <https://ce-programming.github.io/CEmu>`_ emulator to run the built program, or transfer it to a real calculator using `TI Connect CE <https://education.ti.com/en/us/products/computer_software/connectivity-software/ti-connect-ce-software/tabs/overview>`_.
 
 .. figure:: images/hello_world.png
    :align: center
@@ -77,7 +62,22 @@ The `CEmu <https://ce-programming.github.io/CEmu>`_ emulator can be used to run 
 
    Building the Hello World example
 
-Each CE Toolchain project has the following folder structure:
+.. note::
+
+    If on Windows you encounter errors such as :code:`Missing vcruntime140.dll`, install the latest Microsoft Visual C++ Redistributable package.
+    The download can be found `at this link <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_, depending on the architecture you will need to install one of either *vc_redist.x86.exe* or *vc_redist.x64.exe*.
+
+.. tip::
+
+    Antivirus software (e.g. Windows Defender) may flag binaries in the :code:`CEdev/bin` directory as false positives, and either quarantine/remove the files or prevent them from running.
+    This may result in build errors such as being unable find/execute `fasmg`.
+    Please whitelist or disable scanning in :code:`CEdev/bin` to prevent these false positives from occurring.
+
+Project Structure
+-----------------
+
+Every CE Toolchain project has the following folder structure.
+It is highly recommended to keep the same structure to ensure that your project can build with future toolchain versions.
 
 src
   This is the directory where all source files can be placed.
