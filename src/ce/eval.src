@@ -15,7 +15,7 @@ _os_EvalVar:
 	call	$20798		; push error handler
 	call	$20510		; findsym
 	ld	a, 141		; undefined
-	jr	c,.error
+	jr	c, .error
 	call	$20F00		; parseinp
 	call	$20F30		; stoans
 	call	$2079C		; pop error handler
