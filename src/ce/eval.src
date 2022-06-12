@@ -7,10 +7,7 @@ _os_EvalVar:
 	ex	(sp), hl
 	push	de
 	ld	iy, $D00080	; flags
-	ld	de, $D005F8	; op1
-	xor	a, a
-	ld	(de), a
-	inc	de
+	ld	de, $D005F9	; op1m
 	call	$20304		; mov8b
 	ld	hl, ($D02596)	; tmpcnt
 	push	hl
