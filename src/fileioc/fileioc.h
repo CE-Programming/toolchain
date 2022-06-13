@@ -18,27 +18,81 @@
 extern "C" {
 #endif
 
-#define TI_PRGM_TYPE            (0x05) /**< Unprotected program */
-#define TI_PPRGM_TYPE           (0x06) /**< Protected program */
-#define TI_TPRGM_TYPE           (0x16) /**< Temporary program */
-#define TI_APPVAR_TYPE          (0x15) /**< AppVar */
-#define TI_STRING_TYPE          (0x04) /**< String */
-#define TI_EQU_TYPE             (0x03) /**< Equation */
-#define TI_ANS_TYPE             (0x00) /**< Ans */
-#define TI_REAL_LIST_TYPE       (0x01) /**< Real variable list */
-#define TI_CPLX_LIST_TYPE       (0x0D) /**< Complex variable list */
-#define TI_REAL_TYPE            (0x00) /**< Real variable */
-#define TI_CPLX_TYPE            (0x0C) /**< Complex variable */
-#define TI_MATRIX_TYPE          (0x02) /**< Matrix variable */
-
-#define TI_MAX_SIZE             (65505) /**< Maximum variable size */
-
 /* @cond */
 #ifndef EOF
 #define EOF (-1)
 #endif
 /* @endcond */
 
+/**
+ * Allocate a \p real_t variable on the C heap using malloc().
+ * Does not modify OS storage. The allocated variable should be
+ * free'd with the free() function when you are done using it.
+ * @returns Pointer to \p real_t allocated variable.
+ */
+#define ti_MallocReal() ((real_t*)malloc(sizeof(real_t)))
+
+/**
+ * Allocate a \p cplx_t variable on the C heap using malloc().
+ * Does not modify OS storage. The allocated variable should be
+ * free'd with the free() function when you are done using it.
+ * @returns Pointer to \p cplx_t allocated variable.
+ */
+#define ti_MallocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
+
+/**
+ * Allocate a \p string_t variable on the C heap using malloc().
+ * Does not modify OS storage. The allocated variable should be
+ * free'd with the free() function when you are done using it.
+ * @param[in] len Length of string to allocate in tokens/characters.
+ * @returns Pointer to \p string_t allocated variable.
+ */
+#define ti_MallocString(len) ti_AllocString((len), malloc)
+
+/**
+ * Allocate a \p list_t variable on the C heap using malloc().
+ * Does not modify OS storage. The allocated variable should be
+ * free'd with the free() function when you are done using it.
+ * @param[in] dim Dimension of list.
+ * @returns Pointer to \p list_t allocated variable.
+ */
+#define ti_MallocList(dim) ti_AllocList((dim), malloc)
+
+/**
+ * Allocate a \p matrix_t variable on the C heap using malloc().
+ * Does not modify OS storage. The allocated variable should be
+ * free'd with the free() function when you are done using it.
+ * @param[in] rows Number of rows in matrix.
+ * @param[in] cols Number of columns in matrix.
+ * @returns Pointer to \p matrix_t allocated variable.
+ */
+#define ti_MallocMatrix(rows, cols) ti_AllocMatrix((rows), (cols), malloc)
+
+/**
+ * Allocate a \p cplx_list_t variable on the C heap using malloc().
+ * Does not modify OS storage. The allocated variable should be
+ * free'd with the free() function when you are done using it.
+ * @param[in] dim Dimension of list.
+ * @returns Pointer to \p cplx_list_t  allocated variable.
+ */
+#define ti_MallocCplxList(dim) ti_AllocCplxList((dim), malloc)
+
+/**
+ * Allocate a \p equ_t variable on the C heap using malloc().
+ * Does not modify OS storage. The allocated variable should be
+ * free'd with the free() function when you are done using it.
+ * @param[in] len Length of equation to allocate in tokens/characters.
+ * @returns Pointer to \p equ_t allocated variable.
+ */
+#define ti_MallocEqu(len) ti_AllocEqu((len), malloc)
+
+/* @cond */
+string_t *ti_AllocString(unsigned len, void *(*malloc_routine)(size_t));
+list_t *ti_AllocList(unsigned dim, void *(*malloc_routine)(size_t));
+matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void *(*malloc_routine)(size_t));
+cplx_list_t *ti_AllocCplxList(unsigned dim, void *(*malloc_routine)(size_t));
+equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t));
+/* @endcond */
 
 /**
  * Opens an AppVar for reading, writing, and/or appending.
@@ -486,111 +540,97 @@ bool ti_ArchiveHasRoom(uint24_t num_bytes);
  * */
 void ti_SetGCBehavior(void (*before)(void), void (*after)(void));
 
-/** @addtogroup Variables
- *  @{
- */
-
 /* @cond */
-#define ti_Ans      ("\x72\0")
 
-#define ti_Str1     ("\xAA\x0\0")
-#define ti_Str2     ("\xAA\x1\0")
-#define ti_Str3     ("\xAA\x2\0")
-#define ti_Str4     ("\xAA\x3\0")
-#define ti_Str5     ("\xAA\x4\0")
-#define ti_Str6     ("\xAA\x5\0")
-#define ti_Str7     ("\xAA\x6\0")
-#define ti_Str8     ("\xAA\x7\0")
-#define ti_Str9     ("\xAA\x8\0")
-#define ti_Str0     ("\xAA\x9\0")
-#define ti_StrT     ('\xAA')
+/* Compatibility type macros */
+#define TI_PRGM_TYPE            _Pragma("GCC warning \"'TI_PRGM_TYPE' is deprecated, use 'OS_TYPE_PRGM' instead\"") OS_TYPE_PRGM
+#define TI_PPRGM_TYPE           _Pragma("GCC warning \"'TI_PPRGM_TYPE' is deprecated, use 'OS_TYPE_PROT_PRGM' instead\"") OS_TYPE_PROT_PRGM
+#define TI_TPRGM_TYPE           _Pragma("GCC warning \"'TI_TPRGM_TYPE' is deprecated, use 'OS_TYPE_TMP_PRGM' instead\"") OS_TYPE_TMP_PRGM
+#define TI_APPVAR_TYPE          _Pragma("GCC warning \"'TI_APPVAR_TYPE' is deprecated, use 'OS_TYPE_APPVAR' instead\"") OS_TYPE_APPVAR
+#define TI_STRING_TYPE          _Pragma("GCC warning \"'TI_STRING_TYPE' is deprecated, use 'OS_TYPE_STR' instead\"") OS_TYPE_STR
+#define TI_EQU_TYPE             _Pragma("GCC warning \"'TI_EQU_TYPE' is deprecated, use 'OS_TYPE_EQU' instead\"") OS_TYPE_EQU
+#define TI_ANS_TYPE             _Pragma("GCC warning \"'TI_ANS_TYPE' is deprecated, use the expected type instead\"") (0x00)
+#define TI_REAL_LIST_TYPE       _Pragma("GCC warning \"'TI_REAL_LIST_TYPE' is deprecated, use 'OS_TYPE_REAL_LIST' instead\"") OS_TYPE_REAL_LIST
+#define TI_CPLX_LIST_TYPE       _Pragma("GCC warning \"'TI_CPLX_LIST_TYPE' is deprecated, use 'OS_TYPE_CPLX_LIST' instead\"") OS_TYPE_CPLX_LIST
+#define TI_REAL_TYPE            _Pragma("GCC warning \"'TI_REAL_TYPE' is deprecated, use 'OS_TYPE_CPLX_LIST' instead\"") OS_TYPE_REAL
+#define TI_CPLX_TYPE            _Pragma("GCC warning \"'TI_CPLX_TYPE' is deprecated, use 'OS_TYPE_CPLX' instead\"") OS_TYPE_CPLX
+#define TI_MATRIX_TYPE          _Pragma("GCC warning \"'TI_MATRIX_TYPE' is deprecated, use 'OS_TYPE_CPLX' instead\"") OS_TYPE_MATRIX
+#define TI_MAX_SIZE             _Pragma("GCC warning \"'TI_MAX_SIZE' is deprecated, use 'OS_VAR_MAX_SIZE' instead\"") OS_VAR_MAX_SIZE
+#define ti_Program              _Pragma("GCC warning \"'ti_Program' is deprecated, use 'TI_PRGM_TYPE' instead\"") TI_PRGM_TYPE
+#define ti_ProtectedProgram     _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'TI_PPRGM_TYPE' instead\"") TI_PPRGM_TYPE
+#define ti_TempProgram          _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
+#define ti_AppVar               _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
 
-/* Some equation definitions */
-#define ti_Y1       ("\x5E\x10\0")
-#define ti_Y2       ("\x5E\x11\0")
-#define ti_Y3       ("\x5E\x12\0")
-#define ti_Y4       ("\x5E\x13\0")
-#define ti_Y5       ("\x5E\x14\0")
-#define ti_Y6       ("\x5E\x15\0")
-#define ti_Y7       ("\x5E\x16\0")
-#define ti_Y8       ("\x5E\x17\0")
-#define ti_Y9       ("\x5E\x18\0")
-#define ti_Y0       ("\x5E\x19\0")
-#define ti_EquT     ('\x5E')
+/* Compatibility variable macros */
+#define ti_Ans      _Pragma("GCC warning \"'ti_Ans' is deprecated, use 'OS_VAR_ANS' instead\"") OS_VAR_ANS
+#define ti_Str1     _Pragma("GCC warning \"'ti_Str1' is deprecated, use 'OS_VAR_STR1' instead\"") OS_VAR_STR1
+#define ti_Str2     _Pragma("GCC warning \"'ti_Str2' is deprecated, use 'OS_VAR_STR2' instead\"") OS_VAR_STR2
+#define ti_Str3     _Pragma("GCC warning \"'ti_Str3' is deprecated, use 'OS_VAR_STR3' instead\"") OS_VAR_STR3
+#define ti_Str4     _Pragma("GCC warning \"'ti_Str4' is deprecated, use 'OS_VAR_STR4' instead\"") OS_VAR_STR4
+#define ti_Str5     _Pragma("GCC warning \"'ti_Str5' is deprecated, use 'OS_VAR_STR5' instead\"") OS_VAR_STR5
+#define ti_Str6     _Pragma("GCC warning \"'ti_Str6' is deprecated, use 'OS_VAR_STR6' instead\"") OS_VAR_STR6
+#define ti_Str7     _Pragma("GCC warning \"'ti_Str7' is deprecated, use 'OS_VAR_STR7' instead\"") OS_VAR_STR7
+#define ti_Str8     _Pragma("GCC warning \"'ti_Str8' is deprecated, use 'OS_VAR_STR8' instead\"") OS_VAR_STR8
+#define ti_Str9     _Pragma("GCC warning \"'ti_Str9' is deprecated, use 'OS_VAR_STR9' instead\"") OS_VAR_STR9
+#define ti_Str0     _Pragma("GCC warning \"'ti_Str0' is deprecated, use 'OS_VAR_STR0' instead\"") OS_VAR_STR0
+#define ti_Y1       _Pragma("GCC warning \"'ti_Y1' is deprecated, use 'OS_VAR_Y1' instead\"") OS_VAR_Y1
+#define ti_Y2       _Pragma("GCC warning \"'ti_Y2' is deprecated, use 'OS_VAR_Y2' instead\"") OS_VAR_Y2
+#define ti_Y3       _Pragma("GCC warning \"'ti_Y3' is deprecated, use 'OS_VAR_Y3' instead\"") OS_VAR_Y3
+#define ti_Y4       _Pragma("GCC warning \"'ti_Y4' is deprecated, use 'OS_VAR_Y4' instead\"") OS_VAR_Y4
+#define ti_Y5       _Pragma("GCC warning \"'ti_Y5' is deprecated, use 'OS_VAR_Y5' instead\"") OS_VAR_Y5
+#define ti_Y6       _Pragma("GCC warning \"'ti_Y6' is deprecated, use 'OS_VAR_Y6' instead\"") OS_VAR_Y6
+#define ti_Y7       _Pragma("GCC warning \"'ti_Y7' is deprecated, use 'OS_VAR_Y7' instead\"") OS_VAR_Y7
+#define ti_Y8       _Pragma("GCC warning \"'ti_Y8' is deprecated, use 'OS_VAR_Y8' instead\"") OS_VAR_Y8
+#define ti_Y9       _Pragma("GCC warning \"'ti_Y9' is deprecated, use 'OS_VAR_Y9' instead\"") OS_VAR_Y9
+#define ti_Y0       _Pragma("GCC warning \"'ti_Y0' is deprecated, use 'OS_VAR_Y0' instead\"") OS_VAR_Y0
+#define ti_A        _Pragma("GCC warning \"'ti_A' is deprecated, use 'OS_VAR_A' instead\"") OS_VAR_A
+#define ti_B        _Pragma("GCC warning \"'ti_B' is deprecated, use 'OS_VAR_B' instead\"") OS_VAR_B
+#define ti_C        _Pragma("GCC warning \"'ti_C' is deprecated, use 'OS_VAR_C' instead\"") OS_VAR_C
+#define ti_D        _Pragma("GCC warning \"'ti_D' is deprecated, use 'OS_VAR_D' instead\"") OS_VAR_D
+#define ti_E        _Pragma("GCC warning \"'ti_E' is deprecated, use 'OS_VAR_E' instead\"") OS_VAR_E
+#define ti_F        _Pragma("GCC warning \"'ti_F' is deprecated, use 'OS_VAR_F' instead\"") OS_VAR_F
+#define ti_G        _Pragma("GCC warning \"'ti_G' is deprecated, use 'OS_VAR_G' instead\"") OS_VAR_G
+#define ti_H        _Pragma("GCC warning \"'ti_H' is deprecated, use 'OS_VAR_H' instead\"") OS_VAR_H
+#define ti_I        _Pragma("GCC warning \"'ti_I' is deprecated, use 'OS_VAR_I' instead\"") OS_VAR_I
+#define ti_J        _Pragma("GCC warning \"'ti_J' is deprecated, use 'OS_VAR_J' instead\"") OS_VAR_J
+#define ti_K        _Pragma("GCC warning \"'ti_K' is deprecated, use 'OS_VAR_K' instead\"") OS_VAR_K
+#define ti_L        _Pragma("GCC warning \"'ti_L' is deprecated, use 'OS_VAR_L' instead\"") OS_VAR_L
+#define ti_M        _Pragma("GCC warning \"'ti_M' is deprecated, use 'OS_VAR_M' instead\"") OS_VAR_M
+#define ti_N	    _Pragma("GCC warning \"'ti_N' is deprecated, use 'OS_VAR_N' instead\"") OS_VAR_N
+#define ti_O        _Pragma("GCC warning \"'ti_O' is deprecated, use 'OS_VAR_O' instead\"") OS_VAR_O
+#define ti_P        _Pragma("GCC warning \"'ti_P' is deprecated, use 'OS_VAR_P' instead\"") OS_VAR_P
+#define ti_Q        _Pragma("GCC warning \"'ti_Q' is deprecated, use 'OS_VAR_Q' instead\"") OS_VAR_Q
+#define ti_R        _Pragma("GCC warning \"'ti_R' is deprecated, use 'OS_VAR_R' instead\"") OS_VAR_R
+#define ti_S        _Pragma("GCC warning \"'ti_S' is deprecated, use 'OS_VAR_S' instead\"") OS_VAR_S
+#define ti_T        _Pragma("GCC warning \"'ti_T' is deprecated, use 'OS_VAR_T' instead\"") OS_VAR_T
+#define ti_U        _Pragma("GCC warning \"'ti_U' is deprecated, use 'OS_VAR_U' instead\"") OS_VAR_U
+#define ti_V        _Pragma("GCC warning \"'ti_V' is deprecated, use 'OS_VAR_V' instead\"") OS_VAR_V
+#define ti_W        _Pragma("GCC warning \"'ti_W' is deprecated, use 'OS_VAR_W' instead\"") OS_VAR_W
+#define ti_X        _Pragma("GCC warning \"'ti_X' is deprecated, use 'OS_VAR_X' instead\"") OS_VAR_X
+#define ti_Y        _Pragma("GCC warning \"'ti_Y' is deprecated, use 'OS_VAR_Y' instead\"") OS_VAR_Y
+#define ti_Z        _Pragma("GCC warning \"'ti_Z' is deprecated, use 'OS_VAR_Z' instead\"") OS_VAR_Z
+#define ti_Theta    _Pragma("GCC warning \"'ti_Theta' is deprecated, use 'OS_VAR_THETA' instead\"") OS_VAR_THETA
+#define ti_MatA     _Pragma("GCC warning \"'ti_MatA' is deprecated, use 'OS_VAR_MAT_A' instead\"") OS_VAR_MAT_A
+#define ti_MatB     _Pragma("GCC warning \"'ti_MatB' is deprecated, use 'OS_VAR_MAT_B' instead\"") OS_VAR_MAT_B
+#define ti_MatC     _Pragma("GCC warning \"'ti_MatC' is deprecated, use 'OS_VAR_MAT_C' instead\"") OS_VAR_MAT_C
+#define ti_MatD     _Pragma("GCC warning \"'ti_MatD' is deprecated, use 'OS_VAR_MAT_D' instead\"") OS_VAR_MAT_D
+#define ti_MatE     _Pragma("GCC warning \"'ti_MatE' is deprecated, use 'OS_VAR_MAT_E' instead\"") OS_VAR_MAT_E
+#define ti_MatF     _Pragma("GCC warning \"'ti_MatF' is deprecated, use 'OS_VAR_MAT_F' instead\"") OS_VAR_MAT_F
+#define ti_MatG     _Pragma("GCC warning \"'ti_MatG' is deprecated, use 'OS_VAR_MAT_G' instead\"") OS_VAR_MAT_G
+#define ti_MatH     _Pragma("GCC warning \"'ti_MatH' is deprecated, use 'OS_VAR_MAT_H' instead\"") OS_VAR_MAT_H
+#define ti_MatI     _Pragma("GCC warning \"'ti_MatI' is deprecated, use 'OS_VAR_MAT_I' instead\"") OS_VAR_MAT_I
+#define ti_MatJ     _Pragma("GCC warning \"'ti_MatJ' is deprecated, use 'OS_VAR_MAT_J' instead\"") OS_VAR_MAT_J
+#define ti_L1       _Pragma("GCC warning \"'ti_L1' is deprecated, use 'OS_VAR_L1' instead\"") OS_VAR_L1
+#define ti_L2       _Pragma("GCC warning \"'ti_L2' is deprecated, use 'OS_VAR_L2' instead\"") OS_VAR_L2
+#define ti_L3       _Pragma("GCC warning \"'ti_L3' is deprecated, use 'OS_VAR_L3' instead\"") OS_VAR_L3
+#define ti_L4       _Pragma("GCC warning \"'ti_L4' is deprecated, use 'OS_VAR_L4' instead\"") OS_VAR_L4
+#define ti_L5       _Pragma("GCC warning \"'ti_L5' is deprecated, use 'OS_VAR_L5' instead\"") OS_VAR_L5
+#define ti_L6       _Pragma("GCC warning \"'ti_L6' is deprecated, use 'OS_VAR_L6' instead\"") OS_VAR_L6
 
-/* Some real and complex defines */
-#define ti_A        ("\x41\0\0")
-#define ti_B        ("\x42\0\0")
-#define ti_C        ("\x43\0\0")
-#define ti_D        ("\x44\0\0")
-#define ti_E        ("\x45\0\0")
-#define ti_F        ("\x46\0\0")
-#define ti_G        ("\x47\0\0")
-#define ti_H        ("\x48\0\0")
-#define ti_I        ("\x49\0\0")
-#define ti_J        ("\x4A\0\0")
-#define ti_K        ("\x4B\0\0")
-#define ti_L        ("\x4C\0\0")
-#define ti_M        ("\x4D\0\0")
-#define ti_N	    ("\x4E\0\0")
-#define ti_O        ("\x4F\0\0")
-#define ti_P        ("\x50\0\0")
-#define ti_Q        ("\x51\0\0")
-#define ti_R        ("\x52\0\0")
-#define ti_S        ("\x53\0\0")
-#define ti_T        ("\x54\0\0")
-#define ti_U        ("\x55\0\0")
-#define ti_V        ("\x56\0\0")
-#define ti_W        ("\x57\0\0")
-#define ti_X        ("\x58\0\0")
-#define ti_Y        ("\x59\0\0")
-#define ti_Z        ("\x60\0\0")
-#define ti_Theta    ("\x61\0\0")
-
-/* Some matrix defines */
-#define ti_MatA     ("\x5C\x0\0")
-#define ti_MatB     ("\x5C\x1\0")
-#define ti_MatC     ("\x5C\x2\0")
-#define ti_MatD     ("\x5C\x3\0")
-#define ti_MatE     ("\x5C\x4\0")
-#define ti_MatF     ("\x5C\x5\0")
-#define ti_MatG     ("\x5C\x6\0")
-#define ti_MatH     ("\x5C\x7\0")
-#define ti_MatI     ("\x5C\x8\0")
-#define ti_MatJ     ("\x5C\x9\0")
-#define ti_MatT     ('\x5C')
-
-/*  Some list defines */
-#define ti_L1        ("\x5D\x0\0")
-#define ti_L2        ("\x5D\x1\0")
-#define ti_L3        ("\x5D\x2\0")
-#define ti_L4        ("\x5D\x3\0")
-#define ti_L5        ("\x5D\x4\0")
-#define ti_L6        ("\x5D\x5\0")
-#define ti_LT        ('\x5D')
-/* @endcond */
-
-/** @}*/
-
-/* Compatibility defines */
-/* @cond */
-string_t *ti_AllocString(unsigned len, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
-list_t *ti_AllocList(unsigned dim, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
-matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
-cplx_list_t *ti_AllocCplxList(unsigned dim, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
-equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t)) __attribute__((deprecated ("This function is deprecated")));
-#define ti_MallocReal() ((real_t*)malloc(sizeof(real_t)))
-#define ti_MallocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
-#define ti_MallocString(len) ti_AllocString((len), malloc)
-#define ti_MallocList(dim) ti_AllocList((dim), malloc)
-#define ti_MallocMatrix(rows, cols) ti_AllocMatrix((rows), (cols), malloc)
-#define ti_MallocCplxList(dim) ti_AllocCplxList((dim), malloc)
-#define ti_MallocEqu(len) ti_AllocEqu((len), malloc)
-#define ti_Program             _Pragma("GCC warning \"'ti_Program' is deprecated, use 'TI_PRGM_TYPE' instead\"") TI_PRGM_TYPE
-#define ti_ProtectedProgram    _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'TI_PPRGM_TYPE' instead\"") TI_PPRGM_TYPE
-#define ti_TempProgram         _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
-#define ti_AppVar              _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
+/* Compatibility typedefs */
 typedef uint8_t ti_var_t;
+
+/* Compatibility functions */
 void ti_CloseAll(void) __attribute__((deprecated ("Use ti_Close(handle) for each handle instead")));
 /* @endcond */
 

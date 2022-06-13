@@ -19,7 +19,7 @@ int main(void)
     os_ClrHome();
 
     /* Get the answer variable */
-    if (ti_RclVar(TI_REAL_TYPE, ti_Ans, (void**)&real_in)) return 1;
+    if (ti_RclVar(OS_TYPE_REAL, OS_VAR_ANS, (void**)&real_in)) return 1;
     if ((in = os_RealToInt24(real_in)) < 1) return 1;
 
     /* Get the prime factors of the input */
@@ -42,7 +42,10 @@ int main(void)
     }
 
     /* Set the new answer */
-    ti_SetVar(TI_REAL_LIST_TYPE, ti_Ans, list_out);
+    ti_SetVar(OS_TYPE_REAL_LIST, OS_VAR_ANS, list_out);
+
+    /* Free the allocated list */
+    free(list_out);
 
     return 0;
 }

@@ -5,16 +5,15 @@
 int main(void)
 {
     uint8_t prgm;
-    void *data_ptr;
-    uint8_t token_length;
     uint16_t size;
+    void *data_ptr;
     int8_t y = 0;
 
     /* Clears the homescreen */
     os_ClrHome();
 
     /* Open the "ABC" program for reading */
-    prgm = ti_OpenVar("ABC", "r", TI_PRGM_TYPE);
+    prgm = ti_OpenVar("ABC", "r", OS_TYPE_PRGM);
     if (prgm == 0)
     {
         return 1;
@@ -26,11 +25,13 @@ int main(void)
 
     while (size && y < 8)
     {
-        os_SetCursorPos(0, y);
-        os_PutStrFull(ti_GetTokenString(&data_ptr, &token_length, NULL));
+        uint8_t tok_len;
 
+        os_SetCursorPos(0, y);
+        os_PutStrFull(ti_GetTokenString(&data_ptr, &tok_len, NULL));
+
+        size -= tok_len;
         y++;
-        size -= token_length;
     }
 
     /* Ensure that the slot is closed */

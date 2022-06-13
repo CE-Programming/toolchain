@@ -60,32 +60,33 @@ extern "C" {
  * @param col Column in matrix
  * @returns real_t containing element data
  */
-#define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
+#define OS_MATRIX_ELEMENT(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
+/** Maximum size of OS variable */
+#define OS_VAR_MAX_SIZE      (65512)
+
+/** Real variable */
+#define OS_TYPE_REAL         (0x00)
+/** Real variable list */
+#define OS_TYPE_REAL_LIST    (0x01)
+/** Matrix variable */
+#define OS_TYPE_MATRIX       (0x02)
+/** Equation */ 
+#define OS_TYPE_EQU          (0x03)
+/** String */
+#define OS_TYPE_STR          (0x04)
 /** Unprotected program */
 #define OS_TYPE_PRGM         (0x05)
 /** Protected (uneditable) program */
 #define OS_TYPE_PROT_PRGM    (0x06)
-/** Temporary program, deleted on homescreen */
-#define OS_TYPE_TMP_PRGM     (0x16)
-/** AppVar */
-#define OS_TYPE_APPVAR       (0x15)
-/** String */
-#define OS_TYPE_STR          (0x04)
-/** Equation */ 
-#define OS_TYPE_EQU          (0x03)
-/** Real variable list */
-#define OS_TYPE_REAL_LIST    (0x01)
-/** Complex variable list */
-#define OS_TYPE_CPLX_LIST    (0x0D)
-/** Real variable */
-#define OS_TYPE_REAL         (0x00)
 /** Complex variable */
 #define OS_TYPE_CPLX         (0x0C)
-/** Matrix variable */
-#define OS_TYPE_MATRIX       (0x02)
-/** Ans variable placeholder */
-#define OS_TYPE_ANS          (0x00)
+/** Complex variable list */
+#define OS_TYPE_CPLX_LIST    (0x0D)
+/** AppVar */
+#define OS_TYPE_APPVAR       (0x15)
+/** Temporary program, deleted on homescreen */
+#define OS_TYPE_TMP_PRGM     (0x16)
 
 /** Name of Ans variable */
 #define OS_VAR_ANS      "\x72\0"

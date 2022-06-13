@@ -1,33 +1,33 @@
 #include <ti/screen.h>
-#include <ti/getcsc.h>
+#include <ti/getkey.h>
 #include <fileioc.h>
 
 int main(void)
 {
-    /* search_pos must be NULL to start the search */
+    /* Must be NULL to start the search */
     void *search_pos = NULL;
-    char *name;
-    int8_t y = 0;
 
-    /* First 2 bytes of the LibLoad AppVar, which is known to exist */
-    /* Technically a null-terminated string */
-    const char search_string[] = { 0xBF, 0xFE, 0x00 };
-
-    /* Clears the homescreen */
+    /* Clear the homescreen */
     os_ClrHome();
 
-    /* Find all of the variables that start with this string */
-    while ((name = ti_Detect(&search_pos, search_string)) != NULL)
+    for (int8_t y = 0;;++y)
     {
+        /* Find the LibLoad AppVar, which is known to exist */
+        /* The first two data bytes of LibLoad are 0xBF, 0xFE */
+        const char *name = ti_Detect(&search_pos, "\xBF\xFE");
+
+        if (name == NULL)
+        {
+            break;
+        }
+
         /* Print the name of the variable (Should be LibLoad) */
         os_SetCursorPos(0, y);
         os_PutStrFull(name);
-
-        y++;
     }
 
     /* Waits for a key */
-    while (!os_GetCSC());
+    os_GetKey();
 
     return 0;
 }
