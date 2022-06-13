@@ -8,7 +8,7 @@
 #endif
 
 #ifndef CLOCKS_PER_SEC
-#define CLOCKS_PER_SEC 32768
+#define CLOCKS_PER_SEC 32768UL
 #endif
 
 typedef unsigned long time_t;
