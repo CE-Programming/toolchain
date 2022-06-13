@@ -1,0 +1,20 @@
+palettes:
+  - name: global_palette
+    images: automatic
+
+converts:
+  - name: background
+    palette: global_palette
+    compress: zx7
+    width-and-height: false
+    images:
+      - background.png
+
+outputs:
+  - type: c
+    include-file: gfx.h
+    palettes:
+      - global_palette
+    converts:
+      - background
+
