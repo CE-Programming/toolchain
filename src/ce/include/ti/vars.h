@@ -63,130 +63,132 @@ extern "C" {
 #define matrix_element(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
 
 /** Unprotected program */
-#define OS_PRGM_TYPE            (0x05)
-/** Protected program */
-#define OS_PPRGM_TYPE           (0x06)
-/** Temporary program */
-#define OS_TPRGM_TYPE           (0x16)
+#define OS_TYPE_PRGM         (0x05)
+/** Protected (uneditable) program */
+#define OS_TYPE_PROT_PRGM    (0x06)
+/** Temporary program, deleted on homescreen */
+#define OS_TYPE_TMP_PRGM     (0x16)
 /** AppVar */
-#define OS_APPVAR_TYPE          (0x15)
+#define OS_TYPE_APPVAR       (0x15)
 /** String */
-#define OS_STRING_TYPE          (0x04)
+#define OS_TYPE_STR          (0x04)
 /** Equation */ 
-#define OS_EQU_TYPE             (0x03)
+#define OS_TYPE_EQU          (0x03)
 /** Real variable list */
-#define OS_REAL_LIST_TYPE       (0x01)
+#define OS_TYPE_REAL_LIST    (0x01)
 /** Complex variable list */
-#define OS_CPLX_LIST_TYPE       (0x0D)
+#define OS_TYPE_CPLX_LIST    (0x0D)
 /** Real variable */
-#define OS_REAL_TYPE            (0x00)
+#define OS_TYPE_REAL         (0x00)
 /** Complex variable */
-#define OS_CPLX_TYPE            (0x0C)
+#define OS_TYPE_CPLX         (0x0C)
 /** Matrix variable */
-#define OS_MATRIX_TYPE          (0x02)
+#define OS_TYPE_MATRIX       (0x02)
+/** Ans variable placeholder */
+#define OS_TYPE_ANS          (0x00)
 
 /** Name of Ans variable */
-#define OS_ANS          "\x72\0"
+#define OS_VAR_ANS      "\x72\0"
 
 /**
  * Name of Str1 string variable.
- * Other Str variables follow the naming format `OS_STR?` where `?`
+ * Other Str variables follow the naming format `OS_VAR_STR?` where `?`
  * is the value [0-9].
  */
-#define OS_STR1         "\xAA\x0\0"
+#define OS_VAR_STR1     "\xAA\x0\0"
 /* @cond */
-#define OS_STR2         "\xAA\x1\0"
-#define OS_STR3         "\xAA\x2\0"
-#define OS_STR4         "\xAA\x3\0"
-#define OS_STR5         "\xAA\x4\0"
-#define OS_STR6         "\xAA\x5\0"
-#define OS_STR7         "\xAA\x6\0"
-#define OS_STR8         "\xAA\x7\0"
-#define OS_STR9         "\xAA\x8\0"
-#define OS_STR0         "\xAA\x9\0"
+#define OS_VAR_STR2     "\xAA\x1\0"
+#define OS_VAR_STR3     "\xAA\x2\0"
+#define OS_VAR_STR4     "\xAA\x3\0"
+#define OS_VAR_STR5     "\xAA\x4\0"
+#define OS_VAR_STR6     "\xAA\x5\0"
+#define OS_VAR_STR7     "\xAA\x6\0"
+#define OS_VAR_STR8     "\xAA\x7\0"
+#define OS_VAR_STR9     "\xAA\x8\0"
+#define OS_VAR_STR0     "\xAA\x9\0"
 /* @endcond */
 
 /**
  * Name of Y1 equation variable.
- * Other Y variables follow the naming format `OS_Y?` where `?` is [0-9].
+ * Other Y variables follow the naming format `OS_VAR_Y?` where `?` is [0-9].
  */
-#define OS_Y1           "\x5E\x10\0"
+#define OS_VAR_Y1       "\x5E\x10\0"
 /* @cond */
-#define OS_Y2           "\x5E\x11\0"
-#define OS_Y3           "\x5E\x12\0"
-#define OS_Y4           "\x5E\x13\0"
-#define OS_Y5           "\x5E\x14\0"
-#define OS_Y6           "\x5E\x15\0"
-#define OS_Y7           "\x5E\x16\0"
-#define OS_Y8           "\x5E\x17\0"
-#define OS_Y9           "\x5E\x18\0"
-#define OS_Y0           "\x5E\x19\0"
+#define OS_VAR_Y2       "\x5E\x11\0"
+#define OS_VAR_Y3       "\x5E\x12\0"
+#define OS_VAR_Y4       "\x5E\x13\0"
+#define OS_VAR_Y5       "\x5E\x14\0"
+#define OS_VAR_Y6       "\x5E\x15\0"
+#define OS_VAR_Y7       "\x5E\x16\0"
+#define OS_VAR_Y8       "\x5E\x17\0"
+#define OS_VAR_Y9       "\x5E\x18\0"
+#define OS_VAR_Y0       "\x5E\x19\0"
 /* @endcond */
 
 /**
  * Name of A real variable.
- * Other real variables follow the naming format `OS_?` where `?` is [A-Z] (and THETA).
+ * Other real variables follow the naming format `OS_VAR_?` where `?` is [A-Z] (and THETA).
  */
-#define OS_A            "\x41\0\0"
+#define OS_VAR_A        "\x41\0\0"
 /* @cond */
-#define OS_B            "\x42\0\0"
-#define OS_C            "\x43\0\0"
-#define OS_D            "\x44\0\0"
-#define OS_E            "\x45\0\0"
-#define OS_F            "\x46\0\0"
-#define OS_G            "\x47\0\0"
-#define OS_H            "\x48\0\0"
-#define OS_I            "\x49\0\0"
-#define OS_J            "\x4A\0\0"
-#define OS_K            "\x4B\0\0"
-#define OS_L            "\x4C\0\0"
-#define OS_M            "\x4D\0\0"
-#define OS_N            "\x4E\0\0"
-#define OS_O            "\x4F\0\0"
-#define OS_P            "\x50\0\0"
-#define OS_Q            "\x51\0\0"
-#define OS_R            "\x52\0\0"
-#define OS_S            "\x53\0\0"
-#define OS_T            "\x54\0\0"
-#define OS_U            "\x55\0\0"
-#define OS_V            "\x56\0\0"
-#define OS_W            "\x57\0\0"
-#define OS_X            "\x58\0\0"
-#define OS_Y            "\x59\0\0"
-#define OS_Z            "\x60\0\0"
-#define OS_THETA        "\x61\0\0"
+#define OS_VAR_B        "\x42\0\0"
+#define OS_VAR_C        "\x43\0\0"
+#define OS_VAR_D        "\x44\0\0"
+#define OS_VAR_E        "\x45\0\0"
+#define OS_VAR_F        "\x46\0\0"
+#define OS_VAR_G        "\x47\0\0"
+#define OS_VAR_H        "\x48\0\0"
+#define OS_VAR_I        "\x49\0\0"
+#define OS_VAR_J        "\x4A\0\0"
+#define OS_VAR_K        "\x4B\0\0"
+#define OS_VAR_L        "\x4C\0\0"
+#define OS_VAR_M        "\x4D\0\0"
+#define OS_VAR_N        "\x4E\0\0"
+#define OS_VAR_O        "\x4F\0\0"
+#define OS_VAR_P        "\x50\0\0"
+#define OS_VAR_Q        "\x51\0\0"
+#define OS_VAR_R        "\x52\0\0"
+#define OS_VAR_S        "\x53\0\0"
+#define OS_VAR_T        "\x54\0\0"
+#define OS_VAR_U        "\x55\0\0"
+#define OS_VAR_V        "\x56\0\0"
+#define OS_VAR_W        "\x57\0\0"
+#define OS_VAR_X        "\x58\0\0"
+#define OS_VAR_Y        "\x59\0\0"
+#define OS_VAR_Z        "\x60\0\0"
+#define OS_VAR_THETA    "\x61\0\0"
 /* @endcond */
 
 /**
  * Name of A matrix variable.
- * Other matrix variables follow the naming format `OS_MATRIX_?` where `?`
+ * Other matrix variables follow the naming format `OS_VAR_MAT_?` where `?`
  * is value [A-J].
  */
-#define OS_MATRIX_A     "\x5C\x0\0"
+#define OS_VAR_MAT_A    "\x5C\x0\0"
 /* @cond */
-#define OS_MATRIX_B     "\x5C\x1\0"
-#define OS_MATRIX_C     "\x5C\x2\0"
-#define OS_MATRIX_D     "\x5C\x3\0"
-#define OS_MATRIX_E     "\x5C\x4\0"
-#define OS_MATRIX_F     "\x5C\x5\0"
-#define OS_MATRIX_G     "\x5C\x6\0"
-#define OS_MATRIX_H     "\x5C\x7\0"
-#define OS_MATRIX_I     "\x5C\x8\0"
-#define OS_MATRIX_J     "\x5C\x9\0"
+#define OS_VAR_MAT_B    "\x5C\x1\0"
+#define OS_VAR_MAT_C    "\x5C\x2\0"
+#define OS_VAR_MAT_D    "\x5C\x3\0"
+#define OS_VAR_MAT_E    "\x5C\x4\0"
+#define OS_VAR_MAT_F    "\x5C\x5\0"
+#define OS_VAR_MAT_G    "\x5C\x6\0"
+#define OS_VAR_MAT_H    "\x5C\x7\0"
+#define OS_VAR_MAT_I    "\x5C\x8\0"
+#define OS_VAR_MAT_J    "\x5C\x9\0"
 /* @endcond */
 
 /**
  * Name of L1 list variable.
- * Other matrix variables follow the naming format `OS_LIST_?` where `?`
+ * Other matrix variables follow the naming format `OS_VAR_L?` where `?`
  * is the value [1-6].
  */
-#define OS_LIST_1        "\x5D\x0\0"
+#define OS_VAR_L1       "\x5D\x0\0"
 /* @cond */
-#define OS_LIST_2        "\x5D\x1\0"
-#define OS_LIST_3        "\x5D\x2\0"
-#define OS_LIST_4        "\x5D\x3\0"
-#define OS_LIST_5        "\x5D\x4\0"
-#define OS_LIST_6        "\x5D\x5\0"
+#define OS_VAR_L2       "\x5D\x1\0"
+#define OS_VAR_L3       "\x5D\x2\0"
+#define OS_VAR_L4       "\x5D\x3\0"
+#define OS_VAR_L5       "\x5D\x4\0"
+#define OS_VAR_L6       "\x5D\x5\0"
 /* @endcond */
 
 /**

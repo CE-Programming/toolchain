@@ -1,9 +1,7 @@
 #include <ti/vars.h>
 #include <ti/real.h>
-#include <ti/getcsc.h>
 #include <ti/getkey.h>
 #include <ti/screen.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -13,19 +11,19 @@ int main(void)
 
     os_ClrHome();
 
-    ret = os_EvalVar(OS_Y1);
+    ret = os_EvalVar(OS_VAR_Y1);
 
     if (ret == 0)
     {
         uint8_t type;
         void *ans;
 
-    	ans = os_GetAnsData(&type);
-        if (ans != NULL && type == OS_REAL_TYPE)
+        ans = os_GetAnsData(&type);
+        if (ans != NULL && type == OS_TYPE_REAL)
         {
             real_t *real = ans;
 
-	        printf("result: %f\n", os_RealToFloat(real));
+            printf("result: %f\n", os_RealToFloat(real));
         }
     }
 
@@ -33,7 +31,7 @@ int main(void)
     {
         real_t real = os_FloatToReal(2.0);
 
-        ret = os_SetRealVar(OS_A, &real);
+        ret = os_SetRealVar(OS_VAR_A, &real);
     }
 
     if (ret == 0)
@@ -49,12 +47,12 @@ int main(void)
         uint8_t type;
         void *ans;
 
-    	ans = os_GetAnsData(&type);
-        if (ans != NULL && type == OS_REAL_TYPE)
+        ans = os_GetAnsData(&type);
+        if (ans != NULL && type == OS_TYPE_REAL)
         {
             real_t *real = ans;
 
-	        printf("result: %f\n", os_RealToFloat(real));
+            printf("result: %f\n", os_RealToFloat(real));
         }
     }
 
