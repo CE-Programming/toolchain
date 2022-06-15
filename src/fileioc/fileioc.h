@@ -481,7 +481,7 @@ uint8_t ti_RenameVar(const char *old_name, const char *new_name, uint8_t type);
  * @param[in] name Variable name.
  * @param[in] data Data to set variable to.
  *
- * @returns `0` if success.
+ * @returns 0 if success, otherwise TI OS Error Code.
  */
 uint8_t ti_SetVar(uint8_t type, const char *name, const void *data);
 
@@ -492,7 +492,7 @@ uint8_t ti_SetVar(uint8_t type, const char *name, const void *data);
  * @param[in] to Variable name to store data to.
  * @param[in] type_from Variable type to get data from.
  * @param[in] from Variable name to get data from.
- * @returns `0` if success.
+ * @returns 0 if success, otherwise TI OS Error Code.
  */
 uint8_t ti_StoVar(uint8_t type_to, const char *to, uint8_t type_from, const char *from);
 
@@ -502,9 +502,7 @@ uint8_t ti_StoVar(uint8_t type_to, const char *to, uint8_t type_from, const char
  * @param[in] type Variable type.
  * @param[in] name Variable name.
  * @param[out] data Address of pointer to variable structure.
- * @returns `0` if success.
- *
- * @note data_struct is set to the variable's data.
+ * @returns 0 if success, otherwise TI OS Error Code.
  */
 uint8_t ti_RclVar(uint8_t type, const char *name, void **data);
 
@@ -556,10 +554,10 @@ void ti_SetGCBehavior(void (*before)(void), void (*after)(void));
 #define TI_CPLX_TYPE            _Pragma("GCC warning \"'TI_CPLX_TYPE' is deprecated, use 'OS_TYPE_CPLX' instead\"") OS_TYPE_CPLX
 #define TI_MATRIX_TYPE          _Pragma("GCC warning \"'TI_MATRIX_TYPE' is deprecated, use 'OS_TYPE_CPLX' instead\"") OS_TYPE_MATRIX
 #define TI_MAX_SIZE             _Pragma("GCC warning \"'TI_MAX_SIZE' is deprecated, use 'OS_VAR_MAX_SIZE' instead\"") OS_VAR_MAX_SIZE
-#define ti_Program              _Pragma("GCC warning \"'ti_Program' is deprecated, use 'TI_PRGM_TYPE' instead\"") TI_PRGM_TYPE
-#define ti_ProtectedProgram     _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'TI_PPRGM_TYPE' instead\"") TI_PPRGM_TYPE
-#define ti_TempProgram          _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'TI_TPRGM_TYPE' instead\"") TI_TPRGM_TYPE
-#define ti_AppVar               _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'TI_APPVAR_TYPE' instead\"") TI_APPVAR_TYPE
+#define ti_Program              _Pragma("GCC warning \"'ti_Program' is deprecated, use 'OS_TYPE_PRGM' instead\"") OS_TYPE_PRGM
+#define ti_ProtectedProgram     _Pragma("GCC warning \"'ti_ProtectedProgram' is deprecated, use 'OS_TYPE_PROT_PRGM' instead\"") OS_TYPE_PROT_PRGM
+#define ti_TempProgram          _Pragma("GCC warning \"'ti_TempProgram' is deprecated, use 'OS_TYPE_TMP_PRGM' instead\"") OS_TYPE_TMP_PRGM
+#define ti_AppVar               _Pragma("GCC warning \"'ti_AppVar' is deprecated, use 'OS_TYPE_APPVAR' instead\"") OS_TYPE_APPVAR
 
 /* Compatibility variable macros */
 #define ti_Ans      _Pragma("GCC warning \"'ti_Ans' is deprecated, use 'OS_VAR_ANS' instead\"") OS_VAR_ANS

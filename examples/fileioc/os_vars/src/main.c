@@ -64,9 +64,9 @@ int main(void)
 
     /* Store the equation "2+2" into the Y1 variable */
     equ = ti_MallocEqu(3);
-    equ->data[0] = '2';
-    equ->data[1] = tAdd;
-    equ->data[2] = '2';
+    equ->data[0] = OS_TOK_2;
+    equ->data[1] = OS_TOK_ADD;
+    equ->data[2] = OS_TOK_2;
     ti_SetVar(OS_TYPE_EQU, OS_VAR_Y1, equ);
     free(equ);
 
