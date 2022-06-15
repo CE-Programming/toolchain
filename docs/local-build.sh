@@ -8,8 +8,8 @@ fi
 
 source venv/bin/activate
 
-export default_version='v10.0'
-export versions='v10.0 v9.2 v9.1 v9.0 nightly'
+export default_version=`git describe --abbrev=6 --dirty --always`
+export versions="$default_version v9.2 v9.1 v9.0 nightly"
 export current_version=$default_version
 
 sphinx-build -b html . build/html
