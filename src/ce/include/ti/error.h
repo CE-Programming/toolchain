@@ -53,12 +53,20 @@ int os_PushErrorHandler(void) __attribute__((returns_twice));
  */
 void os_PopErrorHandler(void);
 
-#define os_AppErr1           ((char*)0xD025A9)             /**< String [1] for custom error */
-#define os_AppErr2           ((char*)0xD025B6)             /**< String [2] for custom error */
-
-/*
- * --- TIOS System error codes ---
+/**
+ * String for custom error.
+ * Can be used by calling `os_ThrowError(OS_E_APPERR1);`.
+ * @note String must be null-terminated, maximum of 12 characters.
  */
+#define os_AppErr1           ((char*)0xD025A9)
+
+/**
+ * String for custom error.
+ * Can be used by calling `os_ThrowError(OS_E_APPERR2);`.
+ * @note String must be null-terminated, maximum of 12 characters.
+ */
+#define os_AppErr2           ((char*)0xD025B6)
+
 #define OS_E_EDIT           (1<<7)
 #define OS_E_MASK           (0x7F)
 #define OS_E_OVERFLOW       (1+OS_E_EDIT)

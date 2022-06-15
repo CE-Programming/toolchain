@@ -22,7 +22,7 @@ extern unsigned char tilemap_map[];
 
 int main(void)
 {
-    sk_key_t key;
+    uint8_t key;
     unsigned int x_offset = 0;
     unsigned int y_offset = 0;
     gfx_tilemap_t tilemap;

@@ -29,7 +29,7 @@ gfx_sprite_t *tileset_tiles[128];
 
 int main(void)
 {
-    sk_key_t key;
+    uint8_t key;
     gfx_tilemap_t tilemap;
     gfx_sprite_t *tmp_ptr;
     unsigned int i;

@@ -33,8 +33,10 @@ extern "C" {
 /** Generally unused by the OS. Type: `uint8_t[256]` */
 #define os_AppData         ((uint8_t*)0xD00429)
 
+/* @cond */
 #define os_ProgToEdit      ((char*)0xD0065B)
 #define os_NameBuff        ((char*)0xD00663)
+/* @endcond */
 
 /** Current size of executing program. Type: `uint16_t` */
 #define os_AsmPrgmSize     (*(uint16_t*)0xD0118C)
