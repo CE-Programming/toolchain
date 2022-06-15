@@ -178,7 +178,7 @@ extern "C" {
 #define OS_TOK_8 0x38
 /** 9‎ */
 #define OS_TOK_9 0x39
-/** \.‎ */
+/** ․‎ */
 #define OS_TOK_DECIMAL_POINT 0x3A
 /** ᴇ‎ */
 #define OS_TOK_EXP_10 0x3B
@@ -315,7 +315,7 @@ extern "C" {
 #define OS_TOK_TRACE 0x84
 /** ClrDraw‎ */
 #define OS_TOK_CLRDRAW 0x85
-/** ZStandard */
+/** ZStandard‎ */
 #define OS_TOK_ZSTANDARD 0x86
 /** ZTrig‎ */
 #define OS_TOK_ZTRIG 0x87
@@ -397,7 +397,7 @@ extern "C" {
 #define OS_TOK_SINGLE_QUOTE 0xAE
 /** ?‎ */
 #define OS_TOK_QUESTION 0xAF
-/** - (negative)‎ */
+/** ⁻ (negative)‎ */
 #define OS_TOK_NEGATIVE 0xB0
 /** int(‎ */
 #define OS_TOK_INT 0xB1
