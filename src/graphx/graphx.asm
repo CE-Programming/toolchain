@@ -5446,14 +5446,14 @@ gfx_FloodFill:
 	jr	nc,.badpush0		; check stack limit
 	ld	a,(_YMin)
 	ld	e,a
-	ld	a,(ix-4)
-	neg
-	add	a,(ix+9)
+	ld	a,(ix+9)
+	sub	a,(ix-4)
 	cp	a,e
 	jr	c,.badpush0
 	ld	e,a
 	ld	a,(_YMax)
-	cp	a,e
+	scf
+	sbc	a,e
 	jr	c,.badpush0		; compare y values
 	ld	a,(ix+9)
 	ld	(iy+6),a
@@ -5514,7 +5514,8 @@ gfx_FloodFill:
 	jr	c,.badpush1
 	ld	e,a
 	ld	a,(_YMax)
-	cp	a,e
+	scf
+	sbc	a,e
 	jr	c,.badpush1		; compare y values
 	dec	bc
 	ld	(iy+3),bc
@@ -5539,14 +5540,14 @@ gfx_FloodFill:
 	jr	nc,.badpush2
 	ld	a,(_YMin)
 	ld	e,a
-	ld	a,(ix-4)
-	neg
-	add	a,(ix+9)
+	ld	a,(ix+9)
+	sub	a,(ix-4)
 	cp	a,e
 	jr	c,.badpush2
 	ld	e,a
 	ld	a,(_YMax)
-	cp	a,e
+	scf
+	sbc	a,e
 	jr	c,.badpush2		; compare y values
 	dec	bc
 	ld	(iy+3),bc

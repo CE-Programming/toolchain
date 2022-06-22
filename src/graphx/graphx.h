@@ -1650,7 +1650,7 @@ uint16_t gfx_Darken(uint16_t color,
  * @note This routine performs clipping to stay within the window,
  *       but you must ensure it starts in the window.
  */
-void gfx_FloodFill(unsigned int x,
+void gfx_FloodFill(uint24_t x,
                    uint8_t y,
                    uint8_t color);
 
