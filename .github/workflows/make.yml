@@ -39,6 +39,7 @@ jobs:
             env: "env:"
             exe: .exe
             nul: nul
+            ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
           - runs-on: ubuntu
             fasmg: /fasmg.x64
     runs-on: ${{matrix.runs-on}}-latest
@@ -104,13 +105,9 @@ jobs:
       - name: Build CEmu
         run: make -j4 -C ${{env.CEMU_PATH}}/core
       - name: Build Autotester CLI
-        run: make -j4 -C ${{github.workspace}}/CEmu/tests/autotester
-      - name: Move Autotester CLI
-        if: runner.os == 'Windows'
-        run: move ${{github.workspace}}/CEmu/tests/autotester/autotester.exe ${{env.CEDEV_BIN}}/cemu-autotester.exe
-      - name: Move Autotester CLI
-        if: runner.os != 'Windows'
-        run: mv ${{github.workspace}}/CEmu/tests/autotester/autotester ${{env.CEDEV_BIN}}/cemu-autotester
+        run: make -j4 -C ${{env.CEMU_PATH}}/tests/autotester ${{matrix.ldflags}}
+      - name: Install Autotester CLI
+        run: cmake -E copy ${{env.CEMU_PATH}}/tests/autotester/autotester${{matrix.exe}} ${{env.CEDEV_BIN}}/cemu-autotester${{matrix.exe}}
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
