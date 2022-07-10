@@ -3,7 +3,7 @@ include '../include/library.inc'
 include '../include/include_library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'SRLDRVCE', 0
+library SRLDRVCE, 0
 
 ;-------------------------------------------------------------------------------
 ; dependencies
