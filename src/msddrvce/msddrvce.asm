@@ -3,7 +3,7 @@ include '../include/library.inc'
 include '../include/include_library.inc'
 ;-------------------------------------------------------------------------------
 
-library 'MSDDRVCE',1
+library MSDDRVCE, 1
 
 include_library '../usbdrvce/usbdrvce.asm'
 
