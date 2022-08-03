@@ -7,12 +7,15 @@ fontlibc.h
 
     #include <fontlibc.h>
 
-The :code:`fontlibc` library provides routines for displaying custom fonts and glyphs, and can be used to extend the limited font capabilities of :ref:`graphx <graphx_h>`.
+The :code:`fontlibc` library provides routines for displaying custom fonts and glyphs,
+and can be used to extend the limited font capabilities of :ref:`graphx <graphx_h>`.
 
 The :code:`fontlibc` library was designed under a "mechanism not policy" sort of philosophy.
-Rather than attempting to provide as many fancy features as a programmer could want, fontlibc tries to provide fast, basic routines that can be used to build the additional functionality you want.
+Rather than attempting to provide as many fancy features as a programmer could want,
+fontlibc tries to provide fast, basic routines that can be used to build the additional functionality you want.
 For example, word-wrap is not directly provided, but can be implemented using :code:`fontlib_SetAlternateStopCode` and :code:`fontlib_GetStringWidth`.
-fontlibc hopes to provide enough performance to be usable in games, while providing powerful enough basic features for fancy GUIs and document editors.
+fontlibc hopes to provide enough performance to be usable in games,
+while providing powerful enough basic features for fancy GUIs and document editors.
 
 .. contents:: :local:
    :depth: 3
@@ -20,23 +23,88 @@ fontlibc hopes to provide enough performance to be usable in games, while provid
 Creating Fonts
 --------------
 
-Fonts for use with fontlibc can be made with any program that can produce Windows 3.x .FNT resource files.
+Fonts for use with :code:`fontlibc` can be made with any program that can produce Windows 3.x .FNT resource files.
+Alternatively, the :code:`convfont` utility also supports creating fonts using a simple ASCII art format.
 
-Editor Software
-~~~~~~~~~~~~~~~
+GUI Editor Software
+~~~~~~~~~~~~~~~~~~~
 
-`Fony <http://hukka.ncn.fi/?fony>`_ is probably the most-used FNT editor available. It can open both .FNT and .FON files.
+`Fony <http://hukka.ncn.fi/?fony>`_ is probably the most-used FNT editor available.
+It can open both .FNT and .FON files.
 
-`mkwinfont <https://github.com/juanitogan/mkwinfont>`_ provides some Python code for converting a text-based format to and .FON files; it should be trivial for someone with basic Python skills to change to code to skip the .FON packaging stage and directly produce a .FNT resource file. Useful if for some reason you think graphics are best done without the aid of any kind of graphics editor.
+`mkwinfont <https://github.com/juanitogan/mkwinfont>`_ provides some Python code for converting a text-based format to and .FON files;
+it should be trivial for someone with basic Python skills to change to code to skip the .FON packaging stage and directly produce a .FNT resource file.
+Useful if for some reason you think graphics are best done without the aid of any kind of graphics editor.
 
-`VSoft's FontEdit <http://www.vsoft.nl/software/utils/win/fontedit/>`_ is mostly just the original FontEdit included with the Windows SDK for Windows 3.x, but compiled for 32-bit Windows. A notable addition, however, is the ability to import TrueType fonts, though I haven't tested it. It cannot, however, open .FON files; the FNT resource(s) embedded in a .FON file must be extracted before FontEdit can open the font(s).
+`VSoft's FontEdit <http://www.vsoft.nl/software/utils/win/fontedit/>`_ is mostly just the original FontEdit included
+with the Windows SDK for Windows 3.x, but compiled for 32-bit Windows.
+A notable addition, however, is the ability to import TrueType fonts, though I haven't tested it.
+It cannot, however, open .FON files; the FNT resource(s) embedded in a .FON file must be extracted before FontEdit can open the font(s).
 
-`MFE <https://github.com/drdnar/MFE>`_ is DrDnar's own bitmap font editor. It can export .FNT files. It has the useful feature of allowing fully custom mapping from Unicode to your font's 8-bit code page, which makes creating mock-ups with the preview function easier.
+`MFE <https://github.com/drdnar/MFE>`_ is DrDnar's own bitmap font editor.
+It can export .FNT files.
+It has the useful feature of allowing fully custom mapping from Unicode to your font's 8-bit code page,
+which makes creating mock-ups with the preview function easier.
+
+Manually Creating a Font
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can also create a font manually with your favorite text editor.
+Characters in most monospaced fonts are about twice as tall as they are wide, so a :code:`double width` mode is supported.
+If set to :code:`true`, two characters from the input file are read for each pixel, halving the width.
+
+The first line of text in the file must be :code:`convfont`.
+After that, specify metadata about the font by separating a tag from its value with a colon.
+A :code:`height` tag is required at a minimum here.
+For monospaced fonts, use the :code:`fixed width` tag to set the width.
+The metadata block is terminated with a :code:`Font data` tag.
+
+.. code-block::
+    convfont
+    Double width: true
+    Height: 8
+    Fixed width: 6
+    x-height: 2
+    Baseline: 7
+    : You can make a comment by starting a line with a colon.
+    Font data:
+
+After the metadata comes the information for each glyph.
+For variable width fonts, you should specify a :code:`width` for each glyph.
+Making the image is simple: anything that isn't a space is a set pixel.
+
+.. code-block::
+    Code point: 'A'
+    : Instead of using a character literal, you could put a number like 65 or 0x41; or use an escape sequence like '\101'.
+    : There is no need to specify a width because this is a fixed-width font.
+    Data:
+      ******
+    **      **
+    **      **
+    **********
+    **      **
+    **      **
+    **      **
+    
+    : Since B comes after A, there is no need to specify that this is B.
+    Data:
+    ########
+    ##      ##
+    ##      ##
+    ########
+    ##      ##
+    ##      ##
+    ########
+
+    : Note that comments are not accepted inside bitmaps; they would just be treated as bitmap data.
+
+For more details, consult the :code:`convfont` readme.
 
 Using Fonts in Your Project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once your .FNT file has been created, use the convfont utility included with the SDK to convert the .FNT resource file into a format usable in your project.
+Once your .FNT file has been created,
+use the convfont utility included with the SDK to convert the .FNT resource file into a format usable in your project.
 
 There are two main ways of including a font in your project:
 
@@ -46,7 +114,9 @@ There are two main ways of including a font in your project:
 Embedding a Font Directly in Your Program
 .........................................
 
-Embedding a font directly in your program ensures the font will always be available, but it prevents it from being used by any other program, and bloats your program. However, it is also the easiest way to access a custom font.
+Embedding a font directly in your program ensures the font will always be available,
+but it prevents it from being used by any other program, and bloats your program.
+However, it is also the easiest way to access a custom font.
 
 Place your .FNT font files in your source code directory. Then, create a :code:`myfonts.h` source code file:
 
@@ -75,7 +145,8 @@ Then create a :code:`myfonts.c` file:
     };
     const fontlib_font_t *my_font_2 = (fontlib_font_t *)my_font_2_data;
 
-Now you should be wondering where the :code:`myfont1.inc` file comes from. This file will get generated by your makefile, which will need to be modified to append the following:
+Now you should be wondering where the :code:`myfont1.inc` file comes from.
+This file will get generated by your makefile, which will need to be modified to append the following:
 
 .. code-block:: make
 
@@ -103,11 +174,18 @@ Finally, somewhere else in your program, you can use :code:`fontlib_SetFont`:
 Packaging a Font Pack
 .....................
 
-Font packs are an alternative to directly embedding a font in your program binary. They allow multiple related fonts to be packaged together, and FontLibC can select a font from the font pack given a requested size and style. The fonts in a font pack can be used by other programs, reducing the size of your program and saving valuable space on-calculator. They can also be archived, freeing up limited RAM.
+Font packs are an alternative to directly embedding a font in your program binary.
+They allow multiple related fonts to be packaged together,
+and FontLibC can select a font from the font pack given a requested size and style.
+The fonts in a font pack can be used by other programs, reducing the size of your program and saving valuable space on-calculator.
+They can also be archived, freeing up limited RAM.
 
-A font pack should contain related fonts, namely different sizes and styles of a typeface. It is legal for a font pack to contain only one font. Metadata fields in a font pack, such as the description, should be *short.*
+A font pack should contain related fonts, namely different sizes and styles of a typeface.
+It is legal for a font pack to contain only one font.
+Metadata fields in a font pack, such as the description, should be *short.*
 
-Font packs are easiest to make as a separate project. Create a new folder, place your :code:`.fnt` files in it, and then create a :code:`makefile` with the following contents:
+Font packs are easiest to make as a separate project.
+Create a new folder, place your :code:`.fnt` files in it, and then create a :code:`makefile` with the following contents:
 
 .. code-block:: make
 
@@ -131,9 +209,14 @@ Font packs are easiest to make as a separate project. Create a new folder, place
 Using Font Packs
 ----------------
 
-While using an embedded font is easy—just call :code:`fontlib_SetFont` directly on the pointer to the font data—, using a font pack is a bit more involved.
+While using an embedded font is easy—just call :code:`fontlib_SetFont` directly on the pointer to the font data—,
+using a font pack is a bit more involved.
 
-**WARNING: FontLibC caches a pointer to the font's data when you use** :code:`SetFont`. **If you do something that causes the font's data to move, that pointer becomes invalid and FontLibC will start displaying garbage!** For example, if a font appvar is in RAM, any operation that creates or resizes a file may invalidate the cached pointer. Simply calling :code:`SetFont` again will not suffice to fix this; you must also lookup the font's location again. This also applies if a font pack is archived, and you do something that causes a garbage collection cycle.
+**WARNING: FontLibC caches a pointer to the font's data when you use** :code:`SetFont`.
+**If you do something that causes the font's data to move, that pointer becomes invalid and FontLibC will start displaying garbage!**
+For example, if a font appvar is in RAM, any operation that creates or resizes a file may invalidate the cached pointer.
+Simply calling :code:`SetFont` again will not suffice to fix this; you must also lookup the font's location again.
+This also applies if a font pack is archived, and you do something that causes a garbage collection cycle.
 
 (The above warning does not apply to fonts embedded into your program, as data embedded in your program cannot get moved.)
 
@@ -165,7 +248,9 @@ If you require a specific font pack with a specific appvar name, then opening a 
 Caching a Font Pack's Address
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-However, accessing fonts this way triggers a slow VAT lookup for the appvar every time you call a :code:`GetFont` routine. You can avoid this overhead—provided you keep in mind the above warning about moving data around—by using the FileIOC library to get a direct pointer to the appvar's data.
+However, accessing fonts this way triggers a slow VAT lookup for the appvar every time you call a :code:`GetFont` routine.
+You can avoid this overhead—provided you keep in mind the above warning about moving data around—by
+using the FileIOC library to get a direct pointer to the appvar's data.
 
 .. code-block:: c
 
@@ -193,7 +278,9 @@ However, accessing fonts this way triggers a slow VAT lookup for the appvar ever
 Finding a Font Pack by Typeface Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In addition to opening a font pack by appvar name, FontLibC also provides the special routine :code:`fontlib_GetFontPackName` to make it easier to search for a font pack by typeface name:
+In addition to opening a font pack by appvar name,
+FontLibC also provides the special routine :code:`fontlib_GetFontPackName` to make it easier to search
+for a font pack by typeface name:
 
 .. code-block:: c
 
@@ -218,7 +305,8 @@ In addition to opening a font pack by appvar name, FontLibC also provides the sp
 Looking at Other Font Metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are no other routines for processing the other metadata fields in a font pack. However, it is not hard to process the metadata fields yourself:
+There are no other routines for processing the other metadata fields in a font pack.
+However, it is not hard to process the metadata fields yourself:
 
 .. code-block:: c
 
@@ -264,22 +352,36 @@ API Usage Notes
 Text Windowing
 ~~~~~~~~~~~~~~
 
-To assist in text layout, fontlibc provides for a text window, which automatically confines text to appear in a specific rectangular area of the screen. This feature may be useful for dialogs and scrolling large blocks of text. Use :code:`fontlib_SetWindow` to set the current window bounds. Use :code:`fontlib_SetNewlineOptions` to control how :code:`fontlib_DrawString` behaves when it reaches the right edge of the text window.
+To assist in text layout, fontlibc provides for a text window,
+which automatically confines text to appear in a specific rectangular area of the screen.
+This feature may be useful for dialogs and scrolling large blocks of text.
+Use :code:`fontlib_SetWindow` to set the current window bounds.
+Use :code:`fontlib_SetNewlineOptions` to control how :code:`fontlib_DrawString` behaves when it reaches
+the right edge of he text window.
 
 Aligning Text
 ~~~~~~~~~~~~~
 
-Implementing centered text, right-aligned text, and word wrap requires being able to compute the width of a word or string of text. The routine :code:`fontlib_GetStringWidth` provides this functionality.
+Implementing centered text, right-aligned text, and word wrap requires being able to compute the width of a word or string of text.
+The routine :code:`fontlib_GetStringWidth` provides this functionality.
 
-If you call :code:`fontlib_SetAlternateStopCode(' ')`, :code:`fontlib_GetStringWidth` and :code:`fontlib_DrawString` will stop drawing on spaces, giving you a chance to check if the next word will fit on screen. You can use :code:`fontlib_GetLastCharacterRead()` to find out where :code:`fontlib_GetStringWidth` or :code:`fontlib_DrawString` stopped, and, after handling the space, then pass that address (plus one) again to :code:`fontlib_GetStringWidth` or :code:`fontlib_DrawString` to resume processing at where it left off before.
+If you call :code:`fontlib_SetAlternateStopCode(' ')`, :code:`fontlib_GetStringWidth` and :code:`fontlib_DrawString`
+will stop drawing on spaces, giving you a chance to check if the next word will fit on screen.
+You can use :code:`fontlib_GetLastCharacterRead()` to find out where :code:`fontlib_GetStringWidth` or
+:code:`fontlib_DrawString` stopped, and, after handling the space,
+then pass that address (plus one) again to :code:`fontlib_GetStringWidth` or :code:`fontlib_DrawString`
+to resume processing at where it left off before.
 
 Text Control Codes
 ~~~~~~~~~~~~~~~~~~
 
 Embedded control codes are a popular way of managing style and formatting information in string.
-fontlibc only natively recognizes two types of control codes: NULL (0) as a stop code and a user-specified alternate stop code, and a user-specified newline code (defaults to 0x0A---ASCII LF and standard Linux style).
+fontlibc only natively recognizes two types of control codes: NULL (0) as a stop code and a user-specified alternate stop code,
+and a user-specified newline code (defaults to 0x0A---ASCII LF and standard Linux style).
 However, you can add your own control codes with :code:`fontlib_SetFirstPrintableCodePoint`.
-When any code point less than the first printable code point is encountered, fontlibc stops string processing and returns to allow you to handle the control code yourself using :code:`fontlib_GetLastCharacterRead`.
+When any code point less than the first printable code point is encountered,
+fontlibc stops string processing and returns to allow you to handle the control code yourself using
+:code:`fontlib_GetLastCharacterRead`.
 
 Transparent Text
 ~~~~~~~~~~~~~~~~
@@ -287,18 +389,22 @@ Transparent Text
 Part of providing high-performance is not painting a single pixel more than once.
 To assist with this goal, fontlibc provides for both transparent and opaque text backgrounds.
 Use :code:`fontlib_SetTransparency(true)` if you need to paint text over a background other than a solid color.
-If you turn transparency off, however, fontlibc will paint both background and foreground pixels for you, eliminating the time needed to erase those pixels before painting over that area.
+If you turn transparency off, however, fontlibc will paint both background and foreground pixels for you,
+eliminating the time needed to erase those pixels before painting over that area.
 
 Line Spacing
 ~~~~~~~~~~~~
 
-Since a block of text may not always be the same size, fontlibc provides :code:`fontlib_ClearEOL` for erasing the remainder of a line of text without needing to pad it with spaces.
-This action can also be performed automatically after embedded newlines in text and on normal wrapping with :code:`fontlib_SetNewlineOptions`.
+Since a block of text may not always be the same size,
+fontlibc provides :code:`fontlib_ClearEOL` for erasing the remainder of a line of text without needing to pad it with spaces.
+This action can also be performed automatically after embedded newlines in text and
+on normal wrapping with :code:`fontlib_SetNewlineOptions`.
 
 Additional blank vertical space around text can improve readability in large blocks of text.
 :code:`fontlib_SetLineSpacing` allows you to set this behavior.
 Fonts may specify default additional spacing that is automatically applied when calling :code:`fontlib_SetFont`.
-In GUIs and games where the benefits of legibility are outweighed by more aggressive use of vertical space, you can force the default spacing to zero after using :code:`fontlib_SetFont` with :code:`fontlib_SetLineSpacing`.
+In GUIs and games where the benefits of legibility are outweighed by more aggressive use of vertical space,
+you can force the default spacing to zero after using :code:`fontlib_SetFont` with :code:`fontlib_SetLineSpacing`.
 
 API Documentation
 -----------------
