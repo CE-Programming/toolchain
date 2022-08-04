@@ -1,8 +1,8 @@
 	assume	adl=1
 
 	section	.text
-	public	__llcmpu_fast
-__llcmpu_fast:
+	public	__llcmps_fast
+__llcmps_fast:
 	ld	iy, 0
 	add	iy, sp
 	ld	a, b
@@ -10,12 +10,14 @@ __llcmpu_fast:
 	ret	nz
 	ld	a, c
 	sub	a, (iy + 9)
-	ret	nz
+	jr	nz, .finish
 	ex	de, hl
 	ld	bc, (iy + 6)
 	sbc	hl, bc
-	ret	nz
+	jr	nz, .finish
 	ex	de, hl
 	ld	bc, (iy + 3)
 	sbc	hl, bc
+.finish:
+	sbc	a, a
 	ret
