@@ -17,6 +17,7 @@ __lcmps:
 	jr	nz, .finish
 	sbc	hl, bc
 	add	hl, bc
+	sbc	a, a
 .finish:
 	ld	a, d
 	pop	de

@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+	public	__llcmps_fast
+__llcmps_fast:
+	ld	iy, 0
+	add	iy, sp
+	ld	a, b
+	sub	a, (iy + 10)
+	ret	nz
+	ld	a, c
+	sub	a, (iy + 9)
+	jr	nz, .finish
+	ex	de, hl
+	ld	bc, (iy + 6)
+	sbc	hl, bc
+	jr	nz, .finish
+	ex	de, hl
+	ld	bc, (iy + 3)
+	sbc	hl, bc
+.finish:
+	sbc	a, a
+	ret
