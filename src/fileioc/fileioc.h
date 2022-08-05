@@ -195,7 +195,7 @@ char *ti_Detect(void **vat_ptr, const char *detect_string);
  * char *var_name;
  * void *vat_ptr = NULL;
  *
- * while ((var_name = ti_DetectVar(&vat_ptr, "my_data", TI_PRGM_TYPE)))
+ * while ((var_name = ti_DetectVar(&vat_ptr, "my_data", OS_TYPE_PRGM)))
  * {
  *     // do something with var_name or vat_ptr
  * }
@@ -225,7 +225,7 @@ char *ti_DetectVar(void **vat_ptr, const char *detect_string, uint8_t var_type);
  *
  * while ((var_name = ti_DetectAny(&vat_ptr, "my_data", &var_type)))
  * {
- *     if (var_type == TI_PRGM_TYPE || var_type == TI_PPRGM_TYPE)
+ *     if (var_type == OS_TYPE_PRGM || var_type == OS_TYPE_PROT_PRGM)
  *     {
  *         // do something with var_name or vat_ptr
  *     }
@@ -245,22 +245,22 @@ char *ti_DetectAny(void **vat_ptr, const char *detect_string, uint8_t *var_type)
 /**
  * Writes data to an AppVar/variable handle.
  *
- * @param[in] data Pointer to data structure(s).
- * @param[in] size Size (in bytes) of a single \p data structure.
- * @param[in] count Number of \p data structures to write.
+ * @param[in] data Pointer to data element(s).
+ * @param[in] size Size (in bytes) of a single \p data element.
+ * @param[in] count Number of \p data elements to write.
  * @param[in] handle AppVar/variable handle.
- * @returns Number of data structures written; equals count on success.
+ * @returns Number of data elements written; equals count on success.
  */
 size_t ti_Write(const void *data, size_t size, size_t count, uint8_t handle);
 
 /**
  * Reads data from an AppVar/variable handle.
  *
- * @param[out] data Pointer to data structure(s).
- * @param[in] size Size (in bytes) of a single \p data structure.
- * @param[in] count Number of \p data structures to write.
+ * @param[out] data Pointer to data element(s).
+ * @param[in] size Size (in bytes) of a single \p data element.
+ * @param[in] count Number of \p data elements to read.
  * @param[in] handle AppVar/variable handle.
- * @returns Number of data structures written; equals count on success.
+ * @returns Number of data elements written; equals count on success.
  */
 size_t ti_Read(void *data, size_t size, size_t count, uint8_t handle);
 
