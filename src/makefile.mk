@@ -48,6 +48,7 @@ PREFER_OS_CRT ?= NO
 PREFER_OS_LIBC ?= YES
 LIBLOAD_OPTIONAL ?=
 COMPRESSED_MODE ?= zx7
+COMMENT ?= $(shell cedev-config --comment)
 #----------------------------
 CEDEV_TOOLCHAIN ?= $(shell cedev-config --prefix)
 #----------------------------
@@ -208,6 +209,9 @@ CONVBINFLAGS += -k 8xp
 endif
 ifeq ($(HAS_UPPERCASE_NAME),YES)
 CONVBINFLAGS += -u
+endif
+ifneq ($(COMMENT),)
+CONVBINFLAGS += -b $(call QUOTE_ARG,$(COMMENT))
 endif
 CONVBINFLAGS += -n $(NAME)
 

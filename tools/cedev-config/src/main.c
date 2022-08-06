@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "cwalk.h"
 #include "whereami.h"
@@ -12,6 +13,8 @@
 #else
 #define FILENAME_MAX_LENGTH 65536
 #endif
+
+#define TIME_MAX_LENGTH 42
 
 static int help(const char *prgm)
 {
@@ -74,6 +77,9 @@ int main(int argc, char *argv[])
 {
     static char cedev[FILENAME_MAX_LENGTH];
     static char buffer[FILENAME_MAX_LENGTH];
+    static char timebuffer[TIME_MAX_LENGTH];
+    time_t rawtime;
+    struct tm * timeinfo;
 
     if (argc != 2)
     {
@@ -92,10 +98,11 @@ int main(int argc, char *argv[])
             {"version",      no_argument, 0, 'v'},
             {"prefix",       no_argument, 0, 'p'},
             {"makefile",     no_argument, 0, 'm'},
+            {"comment",      no_argument, 0, 'c'},
             {0, 0, 0, 0}
         };
 
-        c = getopt_long(argc, argv, "h", long_options, NULL);
+        c = getopt_long(argc, argv, "hvpmc", long_options, NULL);
         if (c < 0)
         {
             break;
@@ -122,6 +129,13 @@ int main(int argc, char *argv[])
                     return 1;
                 }
                 fprintf(stdout, "%s\n", buffer);
+                break;
+
+            case 'c':
+                time(&rawtime);
+                timeinfo = localtime(&rawtime);
+                strftime(timebuffer, TIME_MAX_LENGTH, "%FT%T%z", timeinfo);
+                fprintf(stdout, "%s " CEDEV_VERSION "\n", timebuffer);
                 break;
 
             case 'h':
