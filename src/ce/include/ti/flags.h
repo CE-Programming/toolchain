@@ -33,12 +33,35 @@ void os_SetFlagByte(int offset, uint8_t set);
 uint8_t os_GetFlagByte(int offset);
 
 /**
- * High 8 is unsigned offset, low 8 is bits to test
+ * Check OS flag bits
+ *
+ * @param offset_pattern High 8 is unsigned offset, low 8 is bits to test
+ * @returns 1 if set, 0 if not set
  */
 int os_TestFlagBits(uint16_t offset_pattern);
-bool os_TestFlagBitsFast(uint16_t offset_pattern); /* Warning: has a bug if bits and flags are all set! */
+
+/**
+ * Set OS flag bits
+ *
+ * @param offset_pattern High 8 is unsigned offset, low 8 is bits to test
+ */
 void os_SetFlagBits(int16_t offset_pattern);
+
+/**
+ * Clear OS flag bits
+ *
+ * @param offset_pattern High 8 is unsigned offset, low 8 is bits to test
+ */
 void os_ResetFlagBits(int16_t offset_pattern);
+
+/**
+ * Faster (and worse) test of OS flag bits
+ *
+ * @param offset_pattern High 8 is unsigned offset, low 8 is bits to test
+ * @warning Has a bug if bits and flags are all set!
+ * @note This function is only available on OS 5.3.6 or later.
+ */
+bool os_TestFlagBitsFast(uint16_t offset_pattern);
 
 /**
  * Converts a flag group name and member ID to a literal.
