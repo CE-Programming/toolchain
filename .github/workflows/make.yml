@@ -124,14 +124,32 @@ jobs:
           path: ${{env.TOOLCHAIN_PATH}}
           submodules: recursive
           persist-credentials: false
+
       - name: Build Toolchain
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} V=1
       - name: Build Libraries
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} libs V=1
+
       - name: Install Toolchain
         env:
           PREFIX: ${{github.workspace}}
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install V=1
+
+      - name: "[macOS install] CodeSign Toolchain binaries"
+        if: runner.os == 'macOS'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          MACOS_KEYCHAIN_PWD: ${{ secrets.MACOS_KEYCHAIN_PWD }}
+          MACOS_CODESIGN_IDENT: "Developer ID Application: Adrien Bertrand (Z3B7V95FNU)"
+        run: |
+          echo $MACOS_CERTIFICATE | base64 -d > certificate.p12
+          security create-keychain -p $MACOS_KEYCHAIN_PWD build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p $MACOS_KEYCHAIN_PWD build.keychain
+          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_PWD build.keychain
+          /usr/bin/codesign --deep --force --verify --verbose --sign "$MACOS_CODESIGN_IDENT" --timestamp --options runtime $CEDEV_BIN/*
 
       - name: Tar toolchain
         if: runner.os != 'Windows'
