@@ -66,9 +66,9 @@ void boot_Set48MHzModeI(void);
 tiflags uint8_t boot_GetBatteryStatus(void);
 
 /**
- * @returns True if the battery is currently charging.
+ * @returns A non-zero value if the battery is charging.
  */
-bool boot_BatteryCharging(void);
+uint8_t boot_BatteryCharging(void);
 
 
 #define os_ApdFlags          (*(uint8_t*)0xD00088)
