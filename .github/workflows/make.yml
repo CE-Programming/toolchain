@@ -34,14 +34,17 @@ jobs:
           - nul: /dev/null
           - runs-on: macos
             fasmg: /source/macos/x64/fasmg
+            install-output-ext: "dmg"
           - runs-on: windows
             fasmg: /fasmg.exe
             env: "env:"
             exe: .exe
             nul: nul
             ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
+            install-output-ext: "zip"
           - runs-on: ubuntu
             fasmg: /fasmg.x64
+            install-output-ext: "tar.gz"
     runs-on: ${{matrix.runs-on}}-latest
     steps:
       - name: Prepare Build Environment
@@ -151,29 +154,54 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_PWD build.keychain
           /usr/bin/codesign --deep --force --verify --verbose --sign "$MACOS_CODESIGN_IDENT" --timestamp --options runtime $CEDEV_BIN/*
 
-      - name: Tar toolchain
-        if: runner.os != 'Windows'
+      - name: "[macOS install] Create the DMG"
+        if: runner.os == 'macOS'
+        run: |
+          brew install create-dmg;
+          cp -a "${CEDEV}" "${TOOLCHAIN_PATH}/resources/macOS/dmg/contents/";
+          create-dmg \
+              --codesign "Developer ID Application: Adrien Bertrand (Z3B7V95FNU)" \
+              --volname "CE Programming Toolchain" \
+              --volicon "${TOOLCHAIN_PATH}/resources/macOS/dmg/icon.icns" \
+              --background "${TOOLCHAIN_PATH}/resources/macOS/dmg/background.png" \
+              --window-pos 200 120 \
+              --window-size 600 400 \
+              --icon-size 64 \
+              --icon "Readme.txt" 125 120 \
+              --icon "CEdev" 125 275 \
+              "CEdev-${{runner.os}}.${{matrix.install-output-ext}}" \
+              "${TOOLCHAIN_PATH}/resources/macOS/dmg/contents"
+
+      - name: "[macOS install] Notarize DMG (master branch push only)"
+        if: runner.os == 'macOS' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: adriweb/xcode-notarize-please@v1.1
+        with:
+          product-path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
+          appstore-connect-username: ${{ secrets.APPLE_NOTARIZATION_USERNAME }}
+          appstore-connect-password: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+          primary-bundle-id: 'com.adriweb.CEToolchain'
+
+      - name: "[macOS install] Staple DMG (master branch push only)"
+        if: runner.os == 'macOS' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: devbotsxyz/xcode-staple@v1.0.0
+        with:
+          product-path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
+
+      - name: "[Linux] Tar toolchain"
+        if: runner.os == 'Linux'
         run: |
           chmod +x ${{env.CEDEV_BIN}}/*
-          tar -C ${{env.CEDEV}}/.. -czvf CEdev-${{runner.os}}.tar.gz CEdev
-      - name: Zip toolchain
+          tar -C ${{env.CEDEV}}/.. -czvf CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
+      - name: "[Windows] Zip toolchain"
         if: runner.os == 'Windows'
         run: |
-          cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.zip CEdev
+          cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
 
-      - name: Upload Linux/MacOS CEdev
-        if: runner.os != 'Windows'
+      - name: Upload CEdev
         uses: actions/upload-artifact@v2
         with:
           name: CEdev-${{runner.os}}
-          path: CEdev-${{runner.os}}.tar.gz
-
-      - name: Upload Windows CEdev
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v2
-        with:
-          name: CEdev-${{runner.os}}
-          path: CEdev-${{runner.os}}.zip
+          path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
 
       - name: Upload Libraries
         uses: actions/upload-artifact@v2
@@ -203,8 +231,14 @@ jobs:
           name: CEdev-${{runner.os}}
           path: ${{github.workspace}}
       - name: Extract Artifact Contents
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
         run: tar -xvf CEdev-${{runner.os}}.tar.gz
+      - name: Extract Artifact Contents
+        if: runner.os == 'macOS'
+        run: |
+           hdiutil attach CEdev-${{runner.os}}.dmg
+           cp -a "/Volumes/CE Programming Toolchain/CEdev" ./
+           umount "/Volumes/CE Programming Toolchain"
       - name: Extract Artifact Contents
         if: runner.os == 'Windows'
         run: |
@@ -373,6 +407,11 @@ jobs:
         with:
           name: CEdev-Windows
           path: ${{github.workspace}}
+      - name: Download CEdev macOS
+        uses: actions/download-artifact@v3
+        with:
+          name: CEdev-macOS
+          path: ${{github.workspace}}
       - name: Download CE Libraries
         uses: actions/download-artifact@v3
         with:
@@ -383,6 +422,7 @@ jobs:
         run: |
           mv CEdev-Linux.tar.gz CEdev-Linux-nightly.tar.gz
           mv CEdev-Windows.zip CEdev-Windows-nightly.zip
+          mv CEdev-macOS.dmg CEdev-macOS-nightly.dmg
           mv clibs.8xg clibs-nightly.8xg
 
       - name: Update nightly release
@@ -394,19 +434,5 @@ jobs:
           files: |
             CEdev-Linux-nightly.tar.gz
             CEdev-Windows-nightly.zip
+            CEdev-macOS-nightly.dmg
             clibs-nightly.8xg
-
-  nightly-macos:
-    runs-on: macos-latest
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Install create-dmg
-        run: brew install create-dmg
-
-      - name: Download CEdev Mac
-        uses: actions/download-artifact@v3
-        with:
-          name: CEdev-macOS
-          path: ${{github.workspace}}
