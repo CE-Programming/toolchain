@@ -1,6 +1,30 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v10.1...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v10.2...master)
+
+# [v10.2](https://github.com/CE-Programming/toolchain/releases/tag/v10.2) (2021-08-10)
+
+* **New features**
+  * Add `os_Eval` and `os_EvalVar` for direct evalution of equations by @mateoconlechuga.
+  * Add automated DMG code signing / notarization for nightly macOS builds by @adriweb.
+  * Updated and improved `convfont` support with text-based fonts by @drdnar.
+  * Added comments for 8XP programs in `convbin` by @mateoconlechuga.
+  * Added transparent pixel support in `convimg` by @mateoconlechuga.
+
+* **Bugfixes**
+  * Fix comparison of int32_t and int64_t by @runer112.
+  * Fix `printf` when printing certain floating point values by @mateoconlechuga.
+  * Fix printing of `int32_t` by @jacobly0.
+  * Fix `gfx_FloodFill` issue on bottom on screen wrapping by @mateoconlechuga.
+  * Change the type of CLOCKS_PER_SECOND to match clock_t by @commandblockguy.
+  * Compiler fix for missing register class check by @jacobly0.
+
+* **Improvements**:
+  * Deprecate `TI_REAL_TYPE` and `ti_Ans` style of macros by @mateoconlechuga.
+  * Deprecate `sk_key_t` and `ti_var_t` typedefs by @mateoconlechuga.
+  * General documentation updates and improvements.
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v10.1...v10.2)
 
 # [v10.1](https://github.com/CE-Programming/toolchain/releases/tag/v10.1) (2021-06-03)
 
