@@ -3,13 +3,21 @@
 	section	.text
 	public	_strnlen
 _strnlen:
-	pop	hl,de,bc
-	push	bc,de,hl
-	push	de
 	pop	hl
-	xor	a,a
-	inc	bc
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
+	xor	a, a
+	sbc	hl, hl
+	sbc	hl, bc
+	ret	z
+	add	hl, bc
+	sbc	hl, de
+	ex	de, hl
 	cpir
-	scf
-	sbc	hl,de
+	add	hl, de
+	ret	z
+	inc	hl
 	ret
