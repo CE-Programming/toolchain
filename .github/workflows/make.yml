@@ -139,12 +139,12 @@ jobs:
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install V=1
 
       - name: "[macOS] CodeSign Toolchain binaries"
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && github.repository == 'CE-Programming/toolchain' # don't run on forks, since they don't have secrets
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
           MACOS_KEYCHAIN_PWD: ${{ secrets.MACOS_KEYCHAIN_PWD }}
-          MACOS_CODESIGN_IDENT: "Developer ID Application: Adrien Bertrand (Z3B7V95FNU)"
+          MACOS_CODESIGN_IDENT: ${{ secrets.MACOS_CODESIGN_IDENT }}
         run: |
           echo $MACOS_CERTIFICATE | base64 -d > certificate.p12
           security create-keychain -p $MACOS_KEYCHAIN_PWD build.keychain
@@ -157,20 +157,21 @@ jobs:
       - name: "[macOS] Create the DMG"
         if: runner.os == 'macOS'
         run: |
-          brew install create-dmg;
+          brew install create-dmg || brew install create-dmg; # we try twice because sometimes it fails...
           cp -a "${CEDEV}" "${TOOLCHAIN_PATH}/resources/macOS/dmg/contents/";
-          create-dmg \
-              --codesign "Developer ID Application: Adrien Bertrand (Z3B7V95FNU)" \
-              --volname "CE Programming Toolchain" \
-              --volicon "${TOOLCHAIN_PATH}/resources/macOS/dmg/icon.icns" \
-              --background "${TOOLCHAIN_PATH}/resources/macOS/dmg/background.png" \
+          # The codesign variable may be empty (for forks) but that's fine, create-dmg only does code-signing if it's not empty.
+          createDmgArgs="--codesign '${{ secrets.MACOS_CODESIGN_IDENT }}' \
+              --volname 'CE Programming Toolchain' \
+              --volicon '${TOOLCHAIN_PATH}/resources/macOS/dmg/icon.icns' \
+              --background '${TOOLCHAIN_PATH}/resources/macOS/dmg/background.png' \
               --window-pos 200 120 \
               --window-size 600 400 \
               --icon-size 64 \
-              --icon "Readme.txt" 125 120 \
-              --icon "CEdev" 125 275 \
-              "CEdev-${{runner.os}}.${{matrix.install-output-ext}}" \
-              "${TOOLCHAIN_PATH}/resources/macOS/dmg/contents"
+              --icon 'Readme.txt' 125 120 \
+              --icon 'CEdev' 125 275 \
+              'CEdev-${{runner.os}}.${{matrix.install-output-ext}}' \
+              '${TOOLCHAIN_PATH}/resources/macOS/dmg/contents'"
+          eval "create-dmg $createDmgArgs" || eval "create-dmg $createDmgArgs" # We also retry just in case...
 
       - name: "[macOS] Notarize DMG"
         if: runner.os == 'macOS' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
