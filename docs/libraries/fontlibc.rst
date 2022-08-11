@@ -59,7 +59,7 @@ A :code:`height` tag is required at a minimum here.
 For monospaced fonts, use the :code:`fixed width` tag to set the width.
 The metadata block is terminated with a :code:`Font data` tag.
 
-.. code-block::
+.. code-block:: none
     convfont
     Double width: true
     Height: 8
@@ -73,7 +73,7 @@ After the metadata comes the information for each glyph.
 For variable width fonts, you should specify a :code:`width` for each glyph.
 Making the image is simple: anything that isn't a space is a set pixel.
 
-.. code-block::
+.. code-block:: none
     Code point: 'A'
     : Instead of using a character literal, you could put a number like 65 or 0x41; or use an escape sequence like '\101'.
     : There is no need to specify a width because this is a fixed-width font.

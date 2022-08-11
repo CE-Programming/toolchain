@@ -1,9 +1,9 @@
 convfont
 : Font Metadata
-: Code Page: Win-1252
 : Font Properties
 Height: 10
 Double width: True
+Code page: Win-1252
 : Font Metrics
 Weight: Bold
 Style: Sans-serif
@@ -17,8 +17,8 @@ x-height: 3
 Baseline: 8
 Font Data:
 Code point: 0
-Name: Α
-Unicode: U+00000391
+Name: Blank cursor
+Unicode: U+00003000
 Width: 6
 Data:
             
@@ -32,8 +32,8 @@ Data:
             
             
 Code point: 1
-Name: ‽
-Unicode: U+0000203D
+Name: Hatched cursor
+Unicode: U+00002592
 Width: 6
 Data:
 ##  ##  ##  
@@ -47,8 +47,8 @@ Data:
 ##  ##  ##  
             
 Code point: 2
-Name: ‽
-Unicode: U+0000203D
+Name: Vertical bar cursor
+Unicode: U+0000258F
 Width: 6
 Data:
   ####      
@@ -62,8 +62,8 @@ Data:
   ####      
             
 Code point: 3
-Name: ‽
-Unicode: U+0000203D
+Name: Underline cursor
+Unicode: U+00002423
 Width: 6
 Data:
             
@@ -77,7 +77,7 @@ Data:
             
             
 Code point: 4
-Name: █
+Name: Block cursor
 Unicode: U+00002588
 Width: 6
 Data:
@@ -92,8 +92,8 @@ Data:
 ##########  
             
 Code point: 5
-Name: ‽
-Unicode: U+0000203D
+Name: 2nd cursor
+Unicode: U+000021E7
 Width: 6
 Data:
 ##########  
@@ -107,8 +107,8 @@ Data:
 ##########  
             
 Code point: 6
-Name: ‽
-Unicode: U+0000203D
+Name: ALPHA cursor
+Unicode: U+000024B6
 Width: 6
 Data:
 ##########  
@@ -122,8 +122,8 @@ Data:
 ##########  
             
 Code point: 7
-Name: ‽
-Unicode: U+0000203D
+Name: alpha cursor
+Unicode: U+000024D0
 Width: 6
 Data:
 ##########  
@@ -137,8 +137,8 @@ Data:
 ##########  
             
 Code point: 8
-Name: ‽
-Unicode: U+0000203D
+Name: Insert cursor
+Unicode: U+00002017
 Width: 6
 Data:
 ##########  
@@ -152,8 +152,8 @@ Data:
 ##########  
             
 Code point: 9
-Name: ‽
-Unicode: U+0000203D
+Name: Insert 2nd cursor
+Unicode: U+000021EA
 Width: 6
 Data:
 ##########  
@@ -167,8 +167,8 @@ Data:
 ##########  
             
 Code point: 10
-Name: ‽
-Unicode: U+0000203D
+Name: Insert ALPHA cursor
+Unicode: U+0000249C
 Width: 6
 Data:
 ##########  
@@ -182,8 +182,8 @@ Data:
 ##########  
             
 Code point: 11
-Name: ‽
-Unicode: U+0000203D
+Name: Insert alpha cursor
+Unicode: U+0000249D
 Width: 6
 Data:
 ##########  
@@ -197,7 +197,7 @@ Data:
 ##########  
             
 Code point: 12
-Name: ▴
+Name: Up arrow cursor
 Unicode: U+000025B4
 Width: 6
 Data:
@@ -212,7 +212,7 @@ Data:
             
             
 Code point: 13
-Name: ▾
+Name: Down arrow cursor
 Unicode: U+000025BE
 Width: 6
 Data:
@@ -227,7 +227,7 @@ Data:
     ##      
             
 Code point: 14
-Name: ◄
+Name: Left arrow cursor
 Unicode: U+000025C4
 Width: 6
 Data:
@@ -242,7 +242,7 @@ Data:
             
             
 Code point: 15
-Name: ►
+Name: Right arrow cursor
 Unicode: U+000025BA
 Width: 6
 Data:
@@ -257,7 +257,7 @@ Data:
             
             
 Code point: 16
-Name: ↑
+Name: Up arrow
 Unicode: U+00002191
 Width: 6
 Data:
@@ -272,7 +272,7 @@ Data:
             
             
 Code point: 17
-Name: ↓
+Name: Down arrow
 Unicode: U+00002193
 Width: 6
 Data:
@@ -287,7 +287,7 @@ Data:
             
             
 Code point: 18
-Name: ←
+Name: Left arrow
 Unicode: U+00002190
 Width: 6
 Data:
@@ -302,7 +302,7 @@ Data:
             
             
 Code point: 19
-Name: →
+Name: Right arrow
 Unicode: U+00002192
 Width: 6
 Data:
@@ -317,7 +317,7 @@ Data:
             
             
 Code point: 20
-Name: ↔
+Name: Double arrow
 Unicode: U+00002194
 Width: 6
 Data:
@@ -332,7 +332,7 @@ Data:
             
             
 Code point: 21
-Name: ○
+Name: Unfilled circle
 Unicode: U+000025CB
 Width: 6
 Data:
@@ -347,7 +347,7 @@ Data:
             
             
 Code point: 22
-Name: •
+Name: Filled circle
 Unicode: U+00002022
 Width: 6
 Data:
@@ -362,7 +362,7 @@ Data:
             
             
 Code point: 23
-Name: ∫
+Name: Integral
 Unicode: U+0000222B
 Width: 7
 Data:
@@ -377,7 +377,7 @@ Data:
 ########      
   ####        
 Code point: 24
-Name: ∃
+Name: There exists
 Unicode: U+00002203
 Width: 7
 Data:
@@ -392,7 +392,7 @@ Data:
               
               
 Code point: 25
-Name: ∀
+Name: For all
 Unicode: U+00002200
 Width: 7
 Data:
@@ -407,7 +407,7 @@ Data:
               
               
 Code point: 26
-Name: ∴
+Name: Therefore
 Unicode: U+00002234
 Width: 7
 Data:
@@ -422,7 +422,7 @@ Data:
               
               
 Code point: 27
-Name: √
+Name: Square root
 Unicode: U+0000221A
 Width: 10
 Data:
@@ -437,7 +437,7 @@ Data:
       ######        
         ##          
 Code point: 28
-Name: ≤
+Name: Less-than or equal-to
 Unicode: U+00002264
 Width: 5
 Data:
@@ -452,7 +452,7 @@ Data:
           
           
 Code point: 29
-Name: ≈
+Name: Approximately equal
 Unicode: U+00002248
 Width: 6
 Data:
@@ -467,7 +467,7 @@ Data:
             
             
 Code point: 30
-Name: ≥
+Name: Greater-than or equal-to
 Unicode: U+00002265
 Width: 5
 Data:
@@ -482,7 +482,7 @@ Data:
           
           
 Code point: 31
-Name: ≠
+Name: Not equal
 Unicode: U+00002260
 Width: 6
 Data:
@@ -496,9 +496,9 @@ Data:
   ####      
             
             
-Code point: 32
-Name:  
-Unicode: U+00000020
+Code point: ' '
+Name: Space
+Unicode: ' '
 Width: 2
 Data:
     
@@ -511,9 +511,9 @@ Data:
     
     
     
-Code point: 33
-Name: !
-Unicode: U+00000021
+Code point: '!'
+Name: Exclamation mark
+Unicode: '!'
 Width: 3
 Data:
       
@@ -526,9 +526,9 @@ Data:
 ####  
       
       
-Code point: 34
-Name: "
-Unicode: U+00000022
+Code point: '"'
+Name: Neutral quotation mark
+Unicode: '"'
 Width: 6
 Data:
             
@@ -541,9 +541,9 @@ Data:
             
             
             
-Code point: 35
-Name: #
-Unicode: U+00000023
+Code point: '#'
+Name: Number/pound
+Unicode: '#'
 Width: 8
 Data:
                 
@@ -556,9 +556,9 @@ Data:
   ####  ####    
                 
                 
-Code point: 36
-Name: $
-Unicode: U+00000024
+Code point: '$'
+Name: Dollar
+Unicode: '$'
 Width: 8
 Data:
                 
@@ -571,9 +571,9 @@ Data:
     ####        
                 
                 
-Code point: 37
-Name: %
-Unicode: U+00000025
+Code point: '%'
+Name: Percent
+Unicode: '%'
 Width: 7
 Data:
               
@@ -586,9 +586,9 @@ Data:
         ####  
               
               
-Code point: 38
-Name: &
-Unicode: U+00000026
+Code point: '&'
+Name: Ampersand
+Unicode: '&'
 Width: 8
 Data:
                 
@@ -601,9 +601,9 @@ Data:
   ######  ####  
                 
                 
-Code point: 39
-Name: '
-Unicode: U+00000027
+Code point: '\''
+Name: Apostrophe-quote
+Unicode: '\''
 Width: 3
 Data:
       
@@ -616,9 +616,9 @@ Data:
       
       
       
-Code point: 40
-Name: (
-Unicode: U+00000028
+Code point: '('
+Name: Left parenthesis
+Unicode: '('
 Width: 5
 Data:
           
@@ -631,9 +631,9 @@ Data:
     ####  
           
           
-Code point: 41
-Name: )
-Unicode: U+00000029
+Code point: ')'
+Name: Right parenthesis
+Unicode: ')'
 Width: 5
 Data:
           
@@ -646,9 +646,9 @@ Data:
 ####      
           
           
-Code point: 42
-Name: *
-Unicode: U+0000002A
+Code point: '*'
+Name: Asterisk
+Unicode: '*'
 Width: 7
 Data:
               
@@ -661,9 +661,9 @@ Data:
               
               
               
-Code point: 43
-Name: +
-Unicode: U+0000002B
+Code point: '+'
+Name: Plus
+Unicode: '+'
 Width: 5
 Data:
           
@@ -676,9 +676,9 @@ Data:
           
           
           
-Code point: 44
-Name: ,
-Unicode: U+0000002C
+Code point: ','
+Name: Comma
+Unicode: ','
 Width: 3
 Data:
       
@@ -691,9 +691,9 @@ Data:
 ####  
   ##  
 ##    
-Code point: 45
-Name: -
-Unicode: U+0000002D
+Code point: '-'
+Name: Hyphen-minus
+Unicode: '-'
 Width: 4
 Data:
         
@@ -706,9 +706,9 @@ Data:
         
         
         
-Code point: 46
-Name: .
-Unicode: U+0000002E
+Code point: '.'
+Name: Full stop
+Unicode: '.'
 Width: 3
 Data:
       
@@ -721,9 +721,9 @@ Data:
 ####  
       
       
-Code point: 47
-Name: /
-Unicode: U+0000002F
+Code point: '/'
+Name: Solidus
+Unicode: '/'
 Width: 7
 Data:
               
@@ -736,9 +736,9 @@ Data:
 ####          
               
               
-Code point: 48
-Name: 0
-Unicode: U+00000030
+Code point: '0'
+Name: Zero
+Unicode: '0'
 Width: 7
 Data:
               
@@ -751,9 +751,9 @@ Data:
   ########    
               
               
-Code point: 49
-Name: 1
-Unicode: U+00000031
+Code point: '1'
+Name: One
+Unicode: '1'
 Width: 7
 Data:
               
@@ -766,9 +766,9 @@ Data:
   ########    
               
               
-Code point: 50
-Name: 2
-Unicode: U+00000032
+Code point: '2'
+Name: Two
+Unicode: '2'
 Width: 7
 Data:
               
@@ -781,9 +781,9 @@ Data:
 ############  
               
               
-Code point: 51
-Name: 3
-Unicode: U+00000033
+Code point: '3'
+Name: Three
+Unicode: '3'
 Width: 7
 Data:
               
@@ -796,9 +796,9 @@ Data:
   ########    
               
               
-Code point: 52
-Name: 4
-Unicode: U+00000034
+Code point: '4'
+Name: Four
+Unicode: '4'
 Width: 7
 Data:
               
@@ -811,9 +811,9 @@ Data:
       ####    
               
               
-Code point: 53
-Name: 5
-Unicode: U+00000035
+Code point: '5'
+Name: Five
+Unicode: '5'
 Width: 7
 Data:
               
@@ -826,9 +826,9 @@ Data:
   ########    
               
               
-Code point: 54
-Name: 6
-Unicode: U+00000036
+Code point: '6'
+Name: Six
+Unicode: '6'
 Width: 7
 Data:
               
@@ -841,9 +841,9 @@ Data:
   ########    
               
               
-Code point: 55
-Name: 7
-Unicode: U+00000037
+Code point: '7'
+Name: Seven
+Unicode: '7'
 Width: 7
 Data:
               
@@ -856,9 +856,9 @@ Data:
     ####      
               
               
-Code point: 56
-Name: 8
-Unicode: U+00000038
+Code point: '8'
+Name: Eight
+Unicode: '8'
 Width: 7
 Data:
               
@@ -871,9 +871,9 @@ Data:
   ########    
               
               
-Code point: 57
-Name: 9
-Unicode: U+00000039
+Code point: '9'
+Name: Nine
+Unicode: '9'
 Width: 7
 Data:
               
@@ -886,9 +886,9 @@ Data:
   ######      
               
               
-Code point: 58
-Name: :
-Unicode: U+0000003A
+Code point: ':'
+Name: Colon
+Unicode: ':'
 Width: 3
 Data:
       
@@ -901,9 +901,9 @@ Data:
       
       
       
-Code point: 59
-Name: ;
-Unicode: U+0000003B
+Code point: ';'
+Name: Semicolon
+Unicode: ';'
 Width: 3
 Data:
       
@@ -916,9 +916,9 @@ Data:
   ##  
 ##    
       
-Code point: 60
-Name: <
-Unicode: U+0000003C
+Code point: '<'
+Name: Less-than
+Unicode: '<'
 Width: 5
 Data:
           
@@ -931,9 +931,9 @@ Data:
           
           
           
-Code point: 61
-Name: =
-Unicode: U+0000003D
+Code point: '='
+Name: Equal
+Unicode: '='
 Width: 6
 Data:
             
@@ -946,9 +946,9 @@ Data:
             
             
             
-Code point: 62
-Name: >
-Unicode: U+0000003E
+Code point: '>'
+Name: Greater-than
+Unicode: '>'
 Width: 5
 Data:
           
@@ -961,9 +961,9 @@ Data:
           
           
           
-Code point: 63
-Name: ?
-Unicode: U+0000003F
+Code point: '?'
+Name: Question mark
+Unicode: '?'
 Width: 6
 Data:
             
@@ -976,9 +976,9 @@ Data:
   ####      
             
             
-Code point: 64
-Name: @
-Unicode: U+00000040
+Code point: '@'
+Name: Commercial at
+Unicode: '@'
 Width: 9
 Data:
                   
@@ -991,9 +991,9 @@ Data:
   ####        ####
     ############  
                   
-Code point: 65
-Name: A
-Unicode: U+00000041
+Code point: 'A'
+Name: Capital A
+Unicode: 'A'
 Width: 7
 Data:
               
@@ -1006,9 +1006,9 @@ Data:
 ####    ####  
               
               
-Code point: 66
-Name: B
-Unicode: U+00000042
+Code point: 'B'
+Name: Capital B
+Unicode: 'B'
 Width: 7
 Data:
               
@@ -1021,9 +1021,9 @@ Data:
 ##########    
               
               
-Code point: 67
-Name: C
-Unicode: U+00000043
+Code point: 'C'
+Name: Capital C
+Unicode: 'C'
 Width: 7
 Data:
               
@@ -1036,9 +1036,9 @@ Data:
   ########    
               
               
-Code point: 68
-Name: D
-Unicode: U+00000044
+Code point: 'D'
+Name: Capital D
+Unicode: 'D'
 Width: 7
 Data:
               
@@ -1051,9 +1051,9 @@ Data:
 ########      
               
               
-Code point: 69
-Name: E
-Unicode: U+00000045
+Code point: 'E'
+Name: Capital E
+Unicode: 'E'
 Width: 7
 Data:
               
@@ -1066,9 +1066,9 @@ Data:
 ############  
               
               
-Code point: 70
-Name: F
-Unicode: U+00000046
+Code point: 'F'
+Name: Capital F
+Unicode: 'F'
 Width: 7
 Data:
               
@@ -1081,9 +1081,9 @@ Data:
 ####          
               
               
-Code point: 71
-Name: G
-Unicode: U+00000047
+Code point: 'G'
+Name: Capital G
+Unicode: 'G'
 Width: 7
 Data:
               
@@ -1096,9 +1096,9 @@ Data:
   ######  ##  
               
               
-Code point: 72
-Name: H
-Unicode: U+00000048
+Code point: 'H'
+Name: Capital H
+Unicode: 'H'
 Width: 7
 Data:
               
@@ -1111,9 +1111,9 @@ Data:
 ####    ####  
               
               
-Code point: 73
-Name: I
-Unicode: U+00000049
+Code point: 'I'
+Name: Capital I
+Unicode: 'I'
 Width: 5
 Data:
           
@@ -1126,9 +1126,9 @@ Data:
 ########  
           
           
-Code point: 74
-Name: J
-Unicode: U+0000004A
+Code point: 'J'
+Name: Capital J
+Unicode: 'J'
 Width: 6
 Data:
             
@@ -1141,9 +1141,9 @@ Data:
   ######    
             
             
-Code point: 75
-Name: K
-Unicode: U+0000004B
+Code point: 'K'
+Name: Capital K
+Unicode: 'K'
 Width: 7
 Data:
               
@@ -1156,9 +1156,9 @@ Data:
 ####    ####  
               
               
-Code point: 76
-Name: L
-Unicode: U+0000004C
+Code point: 'L'
+Name: Capital L
+Unicode: 'L'
 Width: 6
 Data:
             
@@ -1171,9 +1171,9 @@ Data:
 ##########  
             
             
-Code point: 77
-Name: M
-Unicode: U+0000004D
+Code point: 'M'
+Name: Capital M
+Unicode: 'M'
 Width: 9
 Data:
                   
@@ -1186,9 +1186,9 @@ Data:
 ####        ####  
                   
                   
-Code point: 78
-Name: N
-Unicode: U+0000004E
+Code point: 'N'
+Name: Capital N
+Unicode: 'N'
 Width: 7
 Data:
               
@@ -1201,9 +1201,9 @@ Data:
 ####    ####  
               
               
-Code point: 79
-Name: O
-Unicode: U+0000004F
+Code point: 'O'
+Name: Capital O
+Unicode: 'O'
 Width: 7
 Data:
               
@@ -1216,9 +1216,9 @@ Data:
   ########    
               
               
-Code point: 80
-Name: P
-Unicode: U+00000050
+Code point: 'P'
+Name: Capital P
+Unicode: 'P'
 Width: 7
 Data:
               
@@ -1231,9 +1231,9 @@ Data:
 ####          
               
               
-Code point: 81
-Name: Q
-Unicode: U+00000051
+Code point: 'Q'
+Name: Capital Q
+Unicode: 'Q'
 Width: 7
 Data:
               
@@ -1246,9 +1246,9 @@ Data:
   ########    
         ####  
               
-Code point: 82
-Name: R
-Unicode: U+00000052
+Code point: 'R'
+Name: Capital R
+Unicode: 'R'
 Width: 7
 Data:
               
@@ -1261,9 +1261,9 @@ Data:
 ####    ####  
               
               
-Code point: 83
-Name: S
-Unicode: U+00000053
+Code point: 'S'
+Name: Capital S
+Unicode: 'S'
 Width: 7
 Data:
               
@@ -1276,9 +1276,9 @@ Data:
   ########    
               
               
-Code point: 84
-Name: T
-Unicode: U+00000054
+Code point: 'T'
+Name: Capital T
+Unicode: 'T'
 Width: 7
 Data:
               
@@ -1291,9 +1291,9 @@ Data:
     ####      
               
               
-Code point: 85
-Name: U
-Unicode: U+00000055
+Code point: 'U'
+Name: Capital U
+Unicode: 'U'
 Width: 7
 Data:
               
@@ -1306,9 +1306,9 @@ Data:
   ########    
               
               
-Code point: 86
-Name: V
-Unicode: U+00000056
+Code point: 'V'
+Name: Capital V
+Unicode: 'V'
 Width: 8
 Data:
                 
@@ -1321,9 +1321,9 @@ Data:
       ##        
                 
                 
-Code point: 87
-Name: W
-Unicode: U+00000057
+Code point: 'W'
+Name: Capital W
+Unicode: 'W'
 Width: 9
 Data:
                   
@@ -1336,9 +1336,9 @@ Data:
   ####    ####    
                   
                   
-Code point: 88
-Name: X
-Unicode: U+00000058
+Code point: 'X'
+Name: Capital X
+Unicode: 'X'
 Width: 7
 Data:
               
@@ -1351,9 +1351,9 @@ Data:
 ####    ####  
               
               
-Code point: 89
-Name: Y
-Unicode: U+00000059
+Code point: 'Y'
+Name: Capital Y
+Unicode: 'Y'
 Width: 7
 Data:
               
@@ -1366,9 +1366,9 @@ Data:
     ####      
               
               
-Code point: 90
-Name: Z
-Unicode: U+0000005A
+Code point: 'Z'
+Name: Capital Z
+Unicode: 'Z'
 Width: 7
 Data:
               
@@ -1381,9 +1381,9 @@ Data:
 ############  
               
               
-Code point: 91
-Name: [
-Unicode: U+0000005B
+Code point: '['
+Name: Left square bracket
+Unicode: '['
 Width: 4
 Data:
         
@@ -1396,9 +1396,9 @@ Data:
 ####    
 ######  
         
-Code point: 92
-Name: \
-Unicode: U+0000005C
+Code point: '\\'
+Name: Reverse solidus
+Unicode: '\\'
 Width: 7
 Data:
               
@@ -1411,9 +1411,9 @@ Data:
         ####  
               
               
-Code point: 93
-Name: ]
-Unicode: U+0000005D
+Code point: ']'
+Name: Right square bracket
+Unicode: ']'
 Width: 4
 Data:
         
@@ -1426,9 +1426,9 @@ Data:
   ####  
 ######  
         
-Code point: 94
-Name: ^
-Unicode: U+0000005E
+Code point: '^'
+Name: Circumflex
+Unicode: '^'
 Width: 6
 Data:
             
@@ -1441,9 +1441,9 @@ Data:
             
             
             
-Code point: 95
-Name: _
-Unicode: U+0000005F
+Code point: '_'
+Name: Underscore
+Unicode: '_'
 Width: 5
 Data:
           
@@ -1456,9 +1456,9 @@ Data:
           
 ########  
           
-Code point: 96
-Name: `
-Unicode: U+00000060
+Code point: '`'
+Name: Grave accent
+Unicode: '`'
 Width: 3
 Data:
       
@@ -1471,9 +1471,9 @@ Data:
       
       
       
-Code point: 97
-Name: a
-Unicode: U+00000061
+Code point: 'a'
+Name: Lowercase a
+Unicode: 'a'
 Width: 6
 Data:
             
@@ -1486,9 +1486,9 @@ Data:
   ########  
             
             
-Code point: 98
-Name: b
-Unicode: U+00000062
+Code point: 'b'
+Name: Lowercase b
+Unicode: 'b'
 Width: 6
 Data:
             
@@ -1501,9 +1501,9 @@ Data:
 ########    
             
             
-Code point: 99
-Name: c
-Unicode: U+00000063
+Code point: 'c'
+Name: Lowercase c
+Unicode: 'c'
 Width: 5
 Data:
           
@@ -1516,9 +1516,9 @@ Data:
   ######  
           
           
-Code point: 100
-Name: d
-Unicode: U+00000064
+Code point: 'd'
+Name: Lowercase d
+Unicode: 'd'
 Width: 6
 Data:
             
@@ -1531,9 +1531,9 @@ Data:
   ########  
             
             
-Code point: 101
-Name: e
-Unicode: U+00000065
+Code point: 'e'
+Name: Lowercase e
+Unicode: 'e'
 Width: 6
 Data:
             
@@ -1546,9 +1546,9 @@ Data:
   ########  
             
             
-Code point: 102
-Name: f
-Unicode: U+00000066
+Code point: 'f'
+Name: Lowercase f
+Unicode: 'f'
 Width: 6
 Data:
             
@@ -1561,9 +1561,9 @@ Data:
   ####      
             
             
-Code point: 103
-Name: g
-Unicode: U+00000067
+Code point: 'g'
+Name: Lowercase g
+Unicode: 'g'
 Width: 6
 Data:
             
@@ -1576,9 +1576,9 @@ Data:
   ########  
       ####  
 ########    
-Code point: 104
-Name: h
-Unicode: U+00000068
+Code point: 'h'
+Name: Lowercase h
+Unicode: 'h'
 Width: 6
 Data:
             
@@ -1591,9 +1591,9 @@ Data:
 ####  ####  
             
             
-Code point: 105
-Name: i
-Unicode: U+00000069
+Code point: 'i'
+Name: Lowercase i
+Unicode: 'i'
 Width: 3
 Data:
       
@@ -1606,9 +1606,9 @@ Data:
 ####  
       
       
-Code point: 106
-Name: j
-Unicode: U+0000006A
+Code point: 'j'
+Name: Lowercase j
+Unicode: 'j'
 Width: 5
 Data:
           
@@ -1621,9 +1621,9 @@ Data:
     ####  
     ####  
 ######    
-Code point: 107
-Name: k
-Unicode: U+0000006B
+Code point: 'k'
+Name: Lowercase k
+Unicode: 'k'
 Width: 6
 Data:
             
@@ -1636,9 +1636,9 @@ Data:
 ####  ####  
             
             
-Code point: 108
-Name: l
-Unicode: U+0000006C
+Code point: 'l'
+Name: Lowercase l
+Unicode: 'l'
 Width: 3
 Data:
       
@@ -1651,9 +1651,9 @@ Data:
 ####  
       
       
-Code point: 109
-Name: m
-Unicode: U+0000006D
+Code point: 'm'
+Name: Lowercase m
+Unicode: 'm'
 Width: 9
 Data:
                   
@@ -1666,9 +1666,9 @@ Data:
 ####  ####  ####  
                   
                   
-Code point: 110
-Name: n
-Unicode: U+0000006E
+Code point: 'n'
+Name: Lowercase n
+Unicode: 'n'
 Width: 6
 Data:
             
@@ -1681,9 +1681,9 @@ Data:
 ####  ####  
             
             
-Code point: 111
-Name: o
-Unicode: U+0000006F
+Code point: 'o'
+Name: Lowercase o
+Unicode: 'o'
 Width: 6
 Data:
             
@@ -1696,9 +1696,9 @@ Data:
   ######    
             
             
-Code point: 112
-Name: p
-Unicode: U+00000070
+Code point: 'p'
+Name: Lowercase p
+Unicode: 'p'
 Width: 6
 Data:
             
@@ -1711,9 +1711,9 @@ Data:
 ########    
 ####        
 ####        
-Code point: 113
-Name: q
-Unicode: U+00000071
+Code point: 'q'
+Name: Lowercase q
+Unicode: 'q'
 Width: 6
 Data:
             
@@ -1726,9 +1726,9 @@ Data:
   ########  
       ####  
       ######
-Code point: 114
-Name: r
-Unicode: U+00000072
+Code point: 'r'
+Name: Lowercase r
+Unicode: 'r'
 Width: 6
 Data:
             
@@ -1741,9 +1741,9 @@ Data:
 ####        
             
             
-Code point: 115
-Name: s
-Unicode: U+00000073
+Code point: 's'
+Name: Lowercase s
+Unicode: 's'
 Width: 6
 Data:
             
@@ -1756,9 +1756,9 @@ Data:
 ########    
             
             
-Code point: 116
-Name: t
-Unicode: U+00000074
+Code point: 't'
+Name: Lowercase t
+Unicode: 't'
 Width: 5
 Data:
           
@@ -1771,9 +1771,9 @@ Data:
     ####  
           
           
-Code point: 117
-Name: u
-Unicode: U+00000075
+Code point: 'u'
+Name: Lowercase u
+Unicode: 'u'
 Width: 6
 Data:
             
@@ -1786,9 +1786,9 @@ Data:
   ########  
             
             
-Code point: 118
-Name: v
-Unicode: U+00000076
+Code point: 'v'
+Name: Lowercase v
+Unicode: 'v'
 Width: 6
 Data:
             
@@ -1801,9 +1801,9 @@ Data:
     ##      
             
             
-Code point: 119
-Name: w
-Unicode: U+00000077
+Code point: 'w'
+Name: Lowercase w
+Unicode: 'w'
 Width: 8
 Data:
                 
@@ -1816,9 +1816,9 @@ Data:
   ####  ####    
                 
                 
-Code point: 120
-Name: x
-Unicode: U+00000078
+Code point: 'x'
+Name: Lowercase x
+Unicode: 'x'
 Width: 7
 Data:
               
@@ -1831,9 +1831,9 @@ Data:
 ####    ####  
               
               
-Code point: 121
-Name: y
-Unicode: U+00000079
+Code point: 'y'
+Name: Lowercase y
+Unicode: 'y'
 Width: 6
 Data:
             
@@ -1846,9 +1846,9 @@ Data:
   ########  
       ####  
 ########    
-Code point: 122
-Name: z
-Unicode: U+0000007A
+Code point: 'z'
+Name: Lowercase z
+Unicode: 'z'
 Width: 5
 Data:
           
@@ -1861,9 +1861,9 @@ Data:
 ########  
           
           
-Code point: 123
-Name: {
-Unicode: U+0000007B
+Code point: '{'
+Name: Left curly bracket
+Unicode: '{'
 Width: 6
 Data:
             
@@ -1876,9 +1876,9 @@ Data:
     ######  
             
             
-Code point: 124
-Name: |
-Unicode: U+0000007C
+Code point: '|'
+Name: Vertical bar
+Unicode: '|'
 Width: 3
 Data:
       
@@ -1891,9 +1891,9 @@ Data:
 ####  
 ####  
       
-Code point: 125
-Name: }
-Unicode: U+0000007D
+Code point: '}'
+Name: Right curly bracket
+Unicode: '}'
 Width: 6
 Data:
             
@@ -1906,9 +1906,9 @@ Data:
 ######      
             
             
-Code point: 126
-Name: ~
-Unicode: U+0000007E
+Code point: '~'
+Name: Tilde
+Unicode: '~'
 Width: 7
 Data:
               
@@ -1922,7 +1922,7 @@ Data:
               
               
 Code point: 127
-Name: ∞
+Name: Infinite
 Unicode: U+0000221E
 Width: 10
 Data:
@@ -1937,7 +1937,7 @@ Data:
                     
                     
 Code point: 128
-Name: €
+Name: Euro
 Unicode: U+000020AC
 Width: 7
 Data:
@@ -1952,7 +1952,7 @@ Data:
               
               
 Code point: 129
-Name: π
+Name: Lowercase Greek pi
 Unicode: U+000003C0
 Width: 8
 Data:
@@ -1967,7 +1967,7 @@ Data:
                 
                 
 Code point: 130
-Name: ‚
+Name: Low single quote
 Unicode: U+0000201A
 Width: 4
 Data:
@@ -1982,7 +1982,7 @@ Data:
   ####  
 ####    
 Code point: 131
-Name: ε
+Name: Lowercase Greek epsilon
 Unicode: U+000003B5
 Width: 7
 Data:
@@ -1997,7 +1997,7 @@ Data:
               
               
 Code point: 132
-Name: „
+Name: Double low-9 quotation mark
 Unicode: U+0000201E
 Width: 7
 Data:
@@ -2012,7 +2012,7 @@ Data:
   ####  ####  
 ####  ####    
 Code point: 133
-Name: α
+Name: Lowercase Greek alpha
 Unicode: U+000003B1
 Width: 9
 Data:
@@ -2027,7 +2027,7 @@ Data:
                   
                   
 Code point: 134
-Name: †
+Name: Dagger
 Unicode: U+00002020
 Width: 5
 Data:
@@ -2042,7 +2042,7 @@ Data:
           
           
 Code point: 135
-Name: ‡
+Name: Double dagger
 Unicode: U+00002021
 Width: 5
 Data:
@@ -2057,7 +2057,7 @@ Data:
           
           
 Code point: 136
-Name: Γ
+Name: Capital Greek GAMMA
 Unicode: U+00000393
 Width: 6
 Data:
@@ -2072,7 +2072,7 @@ Data:
             
             
 Code point: 137
-Name: ‰
+Name: Per mille
 Unicode: U+00002030
 Width: 10
 Data:
@@ -2087,7 +2087,7 @@ Data:
                     
                     
 Code point: 138
-Name: Š
+Name: Capital S with caron
 Unicode: U+00000160
 Width: 6
 Data:
@@ -2102,7 +2102,7 @@ Data:
             
             
 Code point: 139
-Name: ‹
+Name: Single left angle quotation mark
 Unicode: U+00002039
 Width: 4
 Data:
@@ -2117,7 +2117,7 @@ Data:
         
         
 Code point: 140
-Name: Œ
+Name: Capital ligature OE
 Unicode: U+00000152
 Width: 10
 Data:
@@ -2132,7 +2132,7 @@ Data:
                     
                     
 Code point: 141
-Name: Σ
+Name: Capital Greek SIGMA
 Unicode: U+000003A3
 Width: 6
 Data:
@@ -2147,7 +2147,7 @@ Data:
             
             
 Code point: 142
-Name: Ž
+Name: Capital Z with caron
 Unicode: U+0000017D
 Width: 6
 Data:
@@ -2162,7 +2162,7 @@ Data:
             
             
 Code point: 143
-Name: φ
+Name: Lowercase Greek phi
 Unicode: U+000003C6
 Width: 9
 Data:
@@ -2177,7 +2177,7 @@ Data:
       ####        
       ####        
 Code point: 144
-Name: Π
+Name: Capital Greek PI
 Unicode: U+000003A0
 Width: 7
 Data:
@@ -2192,7 +2192,7 @@ Data:
               
               
 Code point: 145
-Name: ‘
+Name: Left single quotation mark
 Unicode: U+00002018
 Width: 4
 Data:
@@ -2207,7 +2207,7 @@ Data:
         
         
 Code point: 146
-Name: ’
+Name: Right single quotation mark
 Unicode: U+00002019
 Width: 4
 Data:
@@ -2222,7 +2222,7 @@ Data:
         
         
 Code point: 147
-Name: “
+Name: Left double quotation mark
 Unicode: U+0000201C
 Width: 7
 Data:
@@ -2237,7 +2237,7 @@ Data:
               
               
 Code point: 148
-Name: ”
+Name: Right double quotation mark
 Unicode: U+0000201D
 Width: 7
 Data:
@@ -2252,7 +2252,7 @@ Data:
               
               
 Code point: 149
-Name: •
+Name: Bullet
 Unicode: U+00002022
 Width: 5
 Data:
@@ -2267,7 +2267,7 @@ Data:
           
           
 Code point: 150
-Name: –
+Name: En dash
 Unicode: U+00002013
 Width: 6
 Data:
@@ -2282,7 +2282,7 @@ Data:
             
             
 Code point: 151
-Name: —
+Name: Em dash
 Unicode: U+00002014
 Width: 7
 Data:
@@ -2297,7 +2297,7 @@ Data:
               
               
 Code point: 152
-Name: γ
+Name: Lowercase Greek gamma
 Unicode: U+000003B3
 Width: 7
 Data:
@@ -2312,7 +2312,7 @@ Data:
     ####      
     ####      
 Code point: 153
-Name: ξ
+Name: Lowercase Greek xi
 Unicode: U+000003BE
 Width: 6
 Data:
@@ -2327,7 +2327,7 @@ Data:
         ####
       ####  
 Code point: 154
-Name: š
+Name: Lowercase s with caron
 Unicode: U+00000161
 Width: 6
 Data:
@@ -2342,7 +2342,7 @@ Data:
             
             
 Code point: 155
-Name: ›
+Name: Single right angle quotation mark
 Unicode: U+0000203A
 Width: 4
 Data:
@@ -2357,7 +2357,7 @@ Data:
         
         
 Code point: 156
-Name: œ
+Name: Lowercase ligature oe
 Unicode: U+00000153
 Width: 10
 Data:
@@ -2372,7 +2372,7 @@ Data:
                     
                     
 Code point: 157
-Name: σ
+Name: Lowercase Greek sigma
 Unicode: U+000003C3
 Width: 7
 Data:
@@ -2387,7 +2387,7 @@ Data:
               
               
 Code point: 158
-Name: ž
+Name: Lowercase z with caron
 Unicode: U+0000017E
 Width: 6
 Data:
@@ -2402,7 +2402,7 @@ Data:
             
             
 Code point: 159
-Name: Ÿ
+Name: Capital Y with diaeresis
 Unicode: U+00000178
 Width: 7
 Data:
@@ -2417,8 +2417,8 @@ Data:
               
               
 Code point: 160
-Name:  
-Unicode: U+00000020
+Name: Non-breaking space
+Unicode: ' '
 Width: 3
 Data:
       
@@ -2432,7 +2432,7 @@ Data:
       
       
 Code point: 161
-Name: ¡
+Name: Inverted exclamation mark
 Unicode: U+000000A1
 Width: 2
 Data:
@@ -2447,7 +2447,7 @@ Data:
 ####
     
 Code point: 162
-Name: ¢
+Name: Cent
 Unicode: U+000000A2
 Width: 7
 Data:
@@ -2462,7 +2462,7 @@ Data:
     ####      
               
 Code point: 163
-Name: £
+Name: Pound
 Unicode: U+000000A3
 Width: 7
 Data:
@@ -2477,7 +2477,7 @@ Data:
               
               
 Code point: 164
-Name: ¤
+Name: Currency
 Unicode: U+000000A4
 Width: 8
 Data:
@@ -2492,7 +2492,7 @@ Data:
                 
                 
 Code point: 165
-Name: Ω
+Name: Capital Greek OMEGA
 Unicode: U+000003A9
 Width: 8
 Data:
@@ -2507,7 +2507,7 @@ Data:
                 
                 
 Code point: 166
-Name: ω
+Name: Lowercase Greek omega
 Unicode: U+000003C9
 Width: 8
 Data:
@@ -2522,7 +2522,7 @@ Data:
                 
                 
 Code point: 167
-Name: §
+Name: Section
 Unicode: U+000000A7
 Width: 7
 Data:
@@ -2537,7 +2537,7 @@ Data:
               
               
 Code point: 168
-Name: Λ
+Name: Capital Greek LAMBDA
 Unicode: U+0000039B
 Width: 8
 Data:
@@ -2552,7 +2552,7 @@ Data:
                 
                 
 Code point: 169
-Name: η
+Name: Lowercase Greek eta
 Unicode: U+000003B7
 Width: 10
 Data:
@@ -2567,7 +2567,7 @@ Data:
       ####          
       ####          
 Code point: 170
-Name: ª
+Name: Feminine ordinal indicator
 Unicode: U+000000AA
 Width: 6
 Data:
@@ -2582,7 +2582,7 @@ Data:
             
             
 Code point: 171
-Name: «
+Name: Double left angle quotation mark
 Unicode: U+000000AB
 Width: 7
 Data:
@@ -2597,7 +2597,7 @@ Data:
               
               
 Code point: 172
-Name: ¬
+Name: Not
 Unicode: U+000000AC
 Width: 6
 Data:
@@ -2612,7 +2612,7 @@ Data:
             
             
 Code point: 173
-Name: −
+Name: Minus (same width as +)
 Unicode: U+00002212
 Width: 5
 Data:
@@ -2627,7 +2627,7 @@ Data:
           
           
 Code point: 174
-Name: Δ
+Name: Capital Greek DELTA
 Unicode: U+00000394
 Width: 8
 Data:
@@ -2642,7 +2642,7 @@ Data:
                 
                 
 Code point: 175
-Name: δ
+Name: Lowercase Greek delta
 Unicode: U+000003B4
 Width: 6
 Data:
@@ -2657,7 +2657,7 @@ Data:
             
             
 Code point: 176
-Name: °
+Name: Degree
 Unicode: U+000000B0
 Width: 5
 Data:
@@ -2672,7 +2672,7 @@ Data:
           
           
 Code point: 177
-Name: ±
+Name: Plus or minus
 Unicode: U+000000B1
 Width: 5
 Data:
@@ -2687,7 +2687,7 @@ Data:
           
           
 Code point: 178
-Name: ²
+Name: Superscript 2
 Unicode: U+000000B2
 Width: 5
 Data:
@@ -2702,7 +2702,7 @@ Data:
           
           
 Code point: 179
-Name: ³
+Name: Superscript 3
 Unicode: U+000000B3
 Width: 4
 Data:
@@ -2717,7 +2717,7 @@ Data:
         
         
 Code point: 180
-Name: θ
+Name: Lowercase Greek theta
 Unicode: U+000003B8
 Width: 7
 Data:
@@ -2732,7 +2732,7 @@ Data:
               
               
 Code point: 181
-Name: µ
+Name: Lowercase Greek mu
 Unicode: U+000000B5
 Width: 6
 Data:
@@ -2747,7 +2747,7 @@ Data:
 ####        
             
 Code point: 182
-Name: ¶
+Name: Pilcrow
 Unicode: U+000000B6
 Width: 8
 Data:
@@ -2762,7 +2762,7 @@ Data:
                 
                 
 Code point: 183
-Name: ·
+Name: Middle dot
 Unicode: U+000000B7
 Width: 3
 Data:
@@ -2777,7 +2777,7 @@ Data:
       
       
 Code point: 184
-Name: λ
+Name: Lowercase Greek lambda
 Unicode: U+000003BB
 Width: 7
 Data:
@@ -2792,7 +2792,7 @@ Data:
               
               
 Code point: 185
-Name: ¹
+Name: Superscript 1
 Unicode: U+000000B9
 Width: 5
 Data:
@@ -2807,7 +2807,7 @@ Data:
           
           
 Code point: 186
-Name: º
+Name: Masculine ordinal indicator
 Unicode: U+000000BA
 Width: 6
 Data:
@@ -2822,7 +2822,7 @@ Data:
             
             
 Code point: 187
-Name: »
+Name: Double right angle quotation mark
 Unicode: U+000000BB
 Width: 7
 Data:
@@ -2837,7 +2837,7 @@ Data:
               
               
 Code point: 188
-Name: ¼
+Name: Vulgar fraction one quarter
 Unicode: U+000000BC
 Width: 8
 Data:
@@ -2852,7 +2852,7 @@ Data:
                 
                 
 Code point: 189
-Name: ½
+Name: Vulgar fraction one half
 Unicode: U+000000BD
 Width: 9
 Data:
@@ -2867,7 +2867,7 @@ Data:
         ########  
                   
 Code point: 190
-Name: ¾
+Name: Vulgar fraction three quarters
 Unicode: U+000000BE
 Width: 9
 Data:
@@ -2882,7 +2882,7 @@ Data:
                   
                   
 Code point: 191
-Name: ¿
+Name: Inverted question mark
 Unicode: U+000000BF
 Width: 6
 Data:
@@ -2897,7 +2897,7 @@ Data:
   ######    
             
 Code point: 192
-Name: À
+Name: Capital A with grave
 Unicode: U+000000C0
 Width: 6
 Data:
@@ -2912,7 +2912,7 @@ Data:
             
             
 Code point: 193
-Name: Á
+Name: Capital A with accute
 Unicode: U+000000C1
 Width: 6
 Data:
@@ -2927,7 +2927,7 @@ Data:
             
             
 Code point: 194
-Name: Â
+Name: Capital A with circumflex
 Unicode: U+000000C2
 Width: 6
 Data:
@@ -2942,7 +2942,7 @@ Data:
             
             
 Code point: 195
-Name: Ã
+Name: Capital A with tilde
 Unicode: U+000000C3
 Width: 6
 Data:
@@ -2957,7 +2957,7 @@ Data:
             
             
 Code point: 196
-Name: Ä
+Name: Capital A with diaeresis
 Unicode: U+000000C4
 Width: 6
 Data:
@@ -2972,7 +2972,7 @@ Data:
             
             
 Code point: 197
-Name: Å
+Name: Capital A with ring above
 Unicode: U+000000C5
 Width: 6
 Data:
@@ -2987,7 +2987,7 @@ Data:
             
             
 Code point: 198
-Name: Æ
+Name: Capital ligature AE
 Unicode: U+000000C6
 Width: 10
 Data:
@@ -3002,7 +3002,7 @@ Data:
                     
                     
 Code point: 199
-Name: Ç
+Name: Capital C with cedilla
 Unicode: U+000000C7
 Width: 7
 Data:
@@ -3017,7 +3017,7 @@ Data:
     ####      
   ####        
 Code point: 200
-Name: È
+Name: Capital E with grave
 Unicode: U+000000C8
 Width: 6
 Data:
@@ -3032,7 +3032,7 @@ Data:
             
             
 Code point: 201
-Name: É
+Name: Capital E with accute
 Unicode: U+000000C9
 Width: 6
 Data:
@@ -3047,7 +3047,7 @@ Data:
             
             
 Code point: 202
-Name: Ê
+Name: Capital E with circumflex
 Unicode: U+000000CA
 Width: 6
 Data:
@@ -3062,7 +3062,7 @@ Data:
             
             
 Code point: 203
-Name: Ë
+Name: Capital E with diaeresis
 Unicode: U+000000CB
 Width: 6
 Data:
@@ -3077,7 +3077,7 @@ Data:
             
             
 Code point: 204
-Name: Ì
+Name: Capital I with grave
 Unicode: U+000000CC
 Width: 5
 Data:
@@ -3092,7 +3092,7 @@ Data:
           
           
 Code point: 205
-Name: Í
+Name: Capital I with accute
 Unicode: U+000000CD
 Width: 5
 Data:
@@ -3107,7 +3107,7 @@ Data:
           
           
 Code point: 206
-Name: Î
+Name: Capital I with circumflex
 Unicode: U+000000CE
 Width: 5
 Data:
@@ -3122,7 +3122,7 @@ Data:
           
           
 Code point: 207
-Name: Ï
+Name: Capital I with diaeresis
 Unicode: U+000000CF
 Width: 5
 Data:
@@ -3137,7 +3137,7 @@ Data:
           
           
 Code point: 208
-Name: Ð
+Name: Capital ETH
 Unicode: U+000000D0
 Width: 8
 Data:
@@ -3152,7 +3152,7 @@ Data:
                 
                 
 Code point: 209
-Name: Ñ
+Name: Capital N with tilde
 Unicode: U+000000D1
 Width: 7
 Data:
@@ -3167,7 +3167,7 @@ Data:
               
               
 Code point: 210
-Name: Ò
+Name: Capital O with grave
 Unicode: U+000000D2
 Width: 7
 Data:
@@ -3182,7 +3182,7 @@ Data:
               
               
 Code point: 211
-Name: Ó
+Name: Capital O with accute
 Unicode: U+000000D3
 Width: 7
 Data:
@@ -3197,7 +3197,7 @@ Data:
               
               
 Code point: 212
-Name: Ô
+Name: Capital O with circumflex
 Unicode: U+000000D4
 Width: 7
 Data:
@@ -3212,7 +3212,7 @@ Data:
               
               
 Code point: 213
-Name: Õ
+Name: Capital O with tilde
 Unicode: U+000000D5
 Width: 7
 Data:
@@ -3227,7 +3227,7 @@ Data:
               
               
 Code point: 214
-Name: Ö
+Name: Capital O with diaeresis
 Unicode: U+000000D6
 Width: 7
 Data:
@@ -3242,7 +3242,7 @@ Data:
               
               
 Code point: 215
-Name: ×
+Name: Multiplication sign
 Unicode: U+000000D7
 Width: 6
 Data:
@@ -3257,7 +3257,7 @@ Data:
             
             
 Code point: 216
-Name: Ø
+Name: Capital O with stroke
 Unicode: U+000000D8
 Width: 9
 Data:
@@ -3272,7 +3272,7 @@ Data:
 ####              
                   
 Code point: 217
-Name: Ù
+Name: Capital U with grave
 Unicode: U+000000D9
 Width: 6
 Data:
@@ -3287,7 +3287,7 @@ Data:
             
             
 Code point: 218
-Name: Ú
+Name: Capital U with accute
 Unicode: U+000000DA
 Width: 7
 Data:
@@ -3302,7 +3302,7 @@ Data:
               
               
 Code point: 219
-Name: Û
+Name: Capital U with circumflex
 Unicode: U+000000DB
 Width: 6
 Data:
@@ -3317,7 +3317,7 @@ Data:
             
             
 Code point: 220
-Name: Ü
+Name: Capital U with diaeresis
 Unicode: U+000000DC
 Width: 7
 Data:
@@ -3332,7 +3332,7 @@ Data:
               
               
 Code point: 221
-Name: Ý
+Name: Capital Y with acute
 Unicode: U+000000DD
 Width: 7
 Data:
@@ -3347,7 +3347,7 @@ Data:
               
               
 Code point: 222
-Name: Þ
+Name: Capital THORN
 Unicode: U+000000DE
 Width: 6
 Data:
@@ -3362,7 +3362,7 @@ Data:
             
             
 Code point: 223
-Name: ß
+Name: Lowercase Greek beta OR German eszett
 Unicode: U+000000DF
 Width: 7
 Data:
@@ -3377,7 +3377,7 @@ Data:
               
               
 Code point: 224
-Name: à
+Name: Lowercase a with grave
 Unicode: U+000000E0
 Width: 6
 Data:
@@ -3392,7 +3392,7 @@ Data:
             
             
 Code point: 225
-Name: á
+Name: Lowercase a with accute
 Unicode: U+000000E1
 Width: 6
 Data:
@@ -3407,7 +3407,7 @@ Data:
             
             
 Code point: 226
-Name: â
+Name: Lowercase a with circumflex
 Unicode: U+000000E2
 Width: 6
 Data:
@@ -3422,7 +3422,7 @@ Data:
             
             
 Code point: 227
-Name: ã
+Name: Lowercase a with tilde
 Unicode: U+000000E3
 Width: 6
 Data:
@@ -3437,7 +3437,7 @@ Data:
             
             
 Code point: 228
-Name: ä
+Name: Lowercase a with diaeresis
 Unicode: U+000000E4
 Width: 6
 Data:
@@ -3452,7 +3452,7 @@ Data:
             
             
 Code point: 229
-Name: å
+Name: Lowercase a with ring above
 Unicode: U+000000E5
 Width: 6
 Data:
@@ -3467,7 +3467,7 @@ Data:
             
             
 Code point: 230
-Name: æ
+Name: Lowercase ligature ae
 Unicode: U+000000E6
 Width: 11
 Data:
@@ -3482,7 +3482,7 @@ Data:
                       
                       
 Code point: 231
-Name: ç
+Name: Lowercase c with cedilla
 Unicode: U+000000E7
 Width: 6
 Data:
@@ -3497,7 +3497,7 @@ Data:
     ####    
   ####      
 Code point: 232
-Name: è
+Name: Lowercase e with grave
 Unicode: U+000000E8
 Width: 6
 Data:
@@ -3512,7 +3512,7 @@ Data:
             
             
 Code point: 233
-Name: é
+Name: Lowercase e with accute
 Unicode: U+000000E9
 Width: 6
 Data:
@@ -3527,7 +3527,7 @@ Data:
             
             
 Code point: 234
-Name: ê
+Name: Lowercase e with circumflex
 Unicode: U+000000EA
 Width: 6
 Data:
@@ -3542,7 +3542,7 @@ Data:
             
             
 Code point: 235
-Name: ë
+Name: Lowercase e with diaeresis
 Unicode: U+000000EB
 Width: 6
 Data:
@@ -3557,7 +3557,7 @@ Data:
             
             
 Code point: 236
-Name: ì
+Name: Lowercase i with grave
 Unicode: U+000000EC
 Width: 4
 Data:
@@ -3572,7 +3572,7 @@ Data:
         
         
 Code point: 237
-Name: í
+Name: Lowercase i with accute
 Unicode: U+000000ED
 Width: 3
 Data:
@@ -3587,7 +3587,7 @@ Data:
       
       
 Code point: 238
-Name: î
+Name: Lowercase i with circumflex
 Unicode: U+000000EE
 Width: 4
 Data:
@@ -3602,7 +3602,7 @@ Data:
         
         
 Code point: 239
-Name: ï
+Name: Lowercase i with diaeresis
 Unicode: U+000000EF
 Width: 5
 Data:
@@ -3617,7 +3617,7 @@ Data:
           
           
 Code point: 240
-Name: ð
+Name: Lowercase eth
 Unicode: U+000000F0
 Width: 7
 Data:
@@ -3632,7 +3632,7 @@ Data:
               
               
 Code point: 241
-Name: ñ
+Name: Lowercase n with tilde
 Unicode: U+000000F1
 Width: 7
 Data:
@@ -3647,7 +3647,7 @@ Data:
               
               
 Code point: 242
-Name: ò
+Name: Lowercase o with grave
 Unicode: U+000000F2
 Width: 6
 Data:
@@ -3662,7 +3662,7 @@ Data:
             
             
 Code point: 243
-Name: ó
+Name: Lowercase o with accute
 Unicode: U+000000F3
 Width: 6
 Data:
@@ -3677,7 +3677,7 @@ Data:
             
             
 Code point: 244
-Name: ô
+Name: Lowercase o with circumflex
 Unicode: U+000000F4
 Width: 6
 Data:
@@ -3692,7 +3692,7 @@ Data:
             
             
 Code point: 245
-Name: õ
+Name: Lowercase o with tilde
 Unicode: U+000000F5
 Width: 6
 Data:
@@ -3707,7 +3707,7 @@ Data:
             
             
 Code point: 246
-Name: ö
+Name: Lowercase o with diaeresis
 Unicode: U+000000F6
 Width: 6
 Data:
@@ -3722,7 +3722,7 @@ Data:
             
             
 Code point: 247
-Name: ÷
+Name: Division sign
 Unicode: U+000000F7
 Width: 5
 Data:
@@ -3737,7 +3737,7 @@ Data:
           
           
 Code point: 248
-Name: ø
+Name: Lowercase o with stroke
 Unicode: U+000000F8
 Width: 9
 Data:
@@ -3752,7 +3752,7 @@ Data:
   ####            
                   
 Code point: 249
-Name: ù
+Name: Lowercase u with grave
 Unicode: U+000000F9
 Width: 6
 Data:
@@ -3767,7 +3767,7 @@ Data:
             
             
 Code point: 250
-Name: ú
+Name: Lowercase u with accute
 Unicode: U+000000FA
 Width: 6
 Data:
@@ -3782,7 +3782,7 @@ Data:
             
             
 Code point: 251
-Name: û
+Name: Lowercase u with circumflex
 Unicode: U+000000FB
 Width: 6
 Data:
@@ -3797,7 +3797,7 @@ Data:
             
             
 Code point: 252
-Name: ü
+Name: Lowercase u with diaeresis
 Unicode: U+000000FC
 Width: 6
 Data:
@@ -3812,7 +3812,7 @@ Data:
             
             
 Code point: 253
-Name: ý
+Name: Lowercase y with acute
 Unicode: U+000000FD
 Width: 6
 Data:
@@ -3827,7 +3827,7 @@ Data:
       ####  
 ########    
 Code point: 254
-Name: þ
+Name: Lowercase thorn
 Unicode: U+000000FE
 Width: 6
 Data:
@@ -3842,7 +3842,7 @@ Data:
             
             
 Code point: 255
-Name: ÿ
+Name: Lowercase y with diaeresis
 Unicode: U+000000FF
 Width: 6
 Data:
