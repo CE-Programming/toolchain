@@ -2,39 +2,77 @@
 
 	section	.text
 	public	__ishrs
+	public	__ishru
 
 if PREFER_OS_LIBC
 
 __ishrs := 00017Ch
+__ishru := 000184h
 
 else
 
+__ishru:
+	push	af
+	xor	a, a
+	add	hl, hl
+	rla
+	db	$DA	; push af \ add hl,hl \ sbc a,a -> jp c,*
 __ishrs:
-; Suboptimal for large shift amounts
-; CC: if C!=0: C*(13*r(PC)+3*r(SPL)+3*w(SPL)+4)+13*r(PC)+9*r(SPL)+6*w(SPL)+1
-;     if C==0: 4*r(PC)+3*r(SPL)+2
-	inc	c
-	dec	c
-	ret	z
-	push	bc
+; CC: if 0<=C<8:   35*r(PC)+9*r(SPL)+9*w(SPL)+4+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
+;     if 8<=C<16:  34*r(PC)+9*r(SPL)+6*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
+;     if 16<=C<24: 33*r(PC)+6*r(SPL)+3*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
+	push	af
+	add	hl, hl
+	sbc	a, a
+	bit	0, c
+	jr	nz, .bit0
+	add	hl, hl
+	rla
+.bit0:
+	bit	1, c
+	jr	nz, .bit1
+	add	hl, hl
+	rla
+	add	hl, hl
+	rla
+.bit1:
+	bit	2, c
+	jr	nz, .bit2
+	add	hl, hl
+	rla
+	add	hl, hl
+	rla
+	add	hl, hl
+	rla
+	add	hl, hl
+	rla
+.bit2:
+	bit	3, c
+	jr	nz, .bit3
+	bit	4, c
+	jr	nz, .bit4
+	push	af
+	inc	sp
 	push	hl
-	ld	b, c
-	or	a, a
-	sbc	hl, hl
-	add	hl, sp
-.loop:
-	inc	hl
-	inc	hl
-	sra	(hl)
-	public	__ishrs.hijack_ishru
-.hijack_ishru:
-	dec	hl
-	rr	(hl)
-	dec	hl
-	rr	(hl)
-	djnz	.loop
+	inc	sp
 	pop	hl
-	pop	bc
+	inc	sp
+	pop	af
+	ret
+.bit3:
+	dec	sp
+	push	hl
+	sbc	hl, hl
+	ld	h, a
+	inc	sp
+	pop	af
+	ld	l, a
+	pop	af
+	ret
+.bit4:
+	sbc	hl, hl
+	ld	l, a
+	pop	af
 	ret
 
 end if
