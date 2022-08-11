@@ -1,0 +1,4882 @@
+convfont
+: Font Metadata
+: Font Properties
+Height: 14
+Double width: True
+Code page: Win-1252
+: Font Metrics
+Weight: Bold
+Style: Sans-serif
+Style: Upright
+Style: Proportional
+Italic adjust: 0
+Space above: 1
+Space below: 1
+Cap height: 2
+x-height: 5
+Baseline: 11
+Font Data:
+Code point: 0
+Name: Blank cursor
+Unicode: U+00003000
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+Code point: 1
+Name: Hatched cursor
+Unicode: U+00002592
+Width: 9
+Data:
+##  ##  ##  ##    
+  ##  ##  ##  ##  
+##  ##  ##  ##    
+  ##  ##  ##  ##  
+##  ##  ##  ##    
+  ##  ##  ##  ##  
+##  ##  ##  ##    
+  ##  ##  ##  ##  
+##  ##  ##  ##    
+  ##  ##  ##  ##  
+##  ##  ##  ##    
+  ##  ##  ##  ##  
+##  ##  ##  ##    
+                  
+Code point: 2
+Name: Vertical bar cursor
+Unicode: U+0000258F
+Width: 9
+Data:
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+  ####            
+                  
+Code point: 3
+Name: Underline cursor
+Unicode: U+00002423
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+################  
+################  
+################  
+                  
+Code point: 4
+Name: Block cursor
+Unicode: U+00002588
+Width: 9
+Data:
+################  
+################  
+################  
+################  
+################  
+################  
+################  
+################  
+################  
+################  
+################  
+################  
+################  
+                  
+Code point: 5
+Name: 2nd cursor
+Unicode: U+000021E7
+Width: 9
+Data:
+################  
+################  
+######    ######  
+####        ####  
+##            ##  
+######    ######  
+######    ######  
+######    ######  
+######    ######  
+######    ######  
+######    ######  
+################  
+################  
+                  
+Code point: 6
+Name: ALPHA cursor
+Unicode: U+000024B6
+Width: 9
+Data:
+################  
+################  
+######    ######  
+####        ####  
+##    ####    ##  
+##    ####    ##  
+##            ##  
+##    ####    ##  
+##    ####    ##  
+##    ####    ##  
+##    ####    ##  
+################  
+################  
+                  
+Code point: 7
+Name: alpha cursor
+Unicode: U+000024D0
+Width: 9
+Data:
+################  
+################  
+################  
+################  
+####        ####  
+##########    ##  
+####          ##  
+##    ####    ##  
+##    ####    ##  
+##    ####    ##  
+####          ##  
+################  
+################  
+                  
+Code point: 8
+Name: Insert cursor
+Unicode: U+00002017
+Width: 9
+Data:
+################  
+####        ####  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+####        ####  
+################  
+                  
+Code point: 9
+Name: Insert 2nd cursor
+Unicode: U+000021EA
+Width: 9
+Data:
+################  
+####        ####  
+      ####        
+    ########      
+  ############    
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+####        ####  
+################  
+                  
+Code point: 10
+Name: Insert ALPHA cursor
+Unicode: U+0000249C
+Width: 9
+Data:
+################  
+####        ####  
+      ####        
+    ########      
+  ####    ####    
+  ####    ####    
+  ############    
+  ####    ####    
+  ####    ####    
+  ####    ####    
+                  
+####        ####  
+################  
+                  
+Code point: 11
+Name: Insert alpha cursor
+Unicode: U+0000249D
+Width: 9
+Data:
+################  
+####        ####  
+                  
+                  
+    ########      
+          ####    
+    ##########    
+  ####    ####    
+  ####    ####    
+    ##########    
+                  
+####        ####  
+################  
+                  
+Code point: 12
+Name: Up arrow cursor
+Unicode: U+000025B4
+Width: 9
+Data:
+                  
+                  
+        ##        
+      ######      
+    ##########    
+  ##############  
+  ##############  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+Code point: 13
+Name: Down arrow cursor
+Unicode: U+000025BE
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+  ##############  
+  ##############  
+    ##########    
+      ######      
+        ##        
+                  
+                  
+Code point: 14
+Name: Left arrow cursor
+Unicode: U+000025C4
+Width: 9
+Data:
+                  
+                  
+            ####  
+          ######  
+        ########  
+      ##########  
+    ############  
+      ##########  
+        ########  
+          ######  
+            ####  
+                  
+                  
+                  
+Code point: 15
+Name: Right arrow cursor
+Unicode: U+000025BA
+Width: 9
+Data:
+                  
+                  
+  ####            
+  ######          
+  ########        
+  ##########      
+  ############    
+  ##########      
+  ########        
+  ######          
+  ####            
+                  
+                  
+                  
+Code point: 16
+Name: Up arrow
+Unicode: U+00002191
+Width: 9
+Data:
+                  
+                  
+      ####        
+    ########      
+  ############    
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+                  
+                  
+                  
+Code point: 17
+Name: Down arrow
+Unicode: U+00002193
+Width: 9
+Data:
+                  
+                  
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+  ############    
+    ########      
+      ####        
+                  
+                  
+                  
+Code point: 18
+Name: Left arrow
+Unicode: U+00002190
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+      ####        
+    ####          
+  ##############  
+    ####          
+      ####        
+                  
+                  
+                  
+                  
+                  
+Code point: 19
+Name: Right arrow
+Unicode: U+00002192
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+        ####      
+          ####    
+  ##############  
+          ####    
+        ####      
+                  
+                  
+                  
+                  
+                  
+Code point: 20
+Name: Double arrow
+Unicode: U+00002194
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+    ##    ##      
+  ####    ####    
+################  
+  ####    ####    
+    ##    ##      
+                  
+                  
+                  
+                  
+                  
+Code point: 21
+Name: Unfilled circle
+Unicode: U+000025CB
+Width: 9
+Data:
+                  
+                  
+                  
+      ######      
+    ##      ##    
+  ##          ##  
+  ##          ##  
+  ##          ##  
+    ##      ##    
+      ######      
+                  
+                  
+                  
+                  
+Code point: 22
+Name: Filled circle
+Unicode: U+00002022
+Width: 9
+Data:
+                  
+                  
+                  
+      ######      
+    ##########    
+  ##############  
+  ##############  
+  ##############  
+    ##########    
+      ######      
+                  
+                  
+                  
+                  
+Code point: 23
+Name: Integral
+Unicode: U+0000222B
+Width: 9
+Data:
+                  
+                  
+        ######    
+      ####  ####  
+      ####  ####  
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+####  ####        
+####  ####        
+  ######          
+Code point: 24
+Name: There exists
+Unicode: U+00002203
+Width: 8
+Data:
+                
+                
+##############  
+          ####  
+          ####  
+          ####  
+  ############  
+          ####  
+          ####  
+          ####  
+##############  
+                
+                
+                
+Code point: 25
+Name: For all
+Unicode: U+00002200
+Width: 8
+Data:
+                
+                
+####      ####  
+####      ####  
+####      ####  
+##############  
+  ####  ####    
+  ####  ####    
+  ####  ####    
+    ######      
+    ######      
+                
+                
+                
+Code point: 26
+Name: Therefore
+Unicode: U+00002234
+Width: 7
+Data:
+              
+              
+              
+              
+    ####      
+    ####      
+              
+              
+####    ####  
+####    ####  
+              
+              
+              
+              
+Code point: 27
+Name: Square root
+Unicode: U+0000221A
+Width: 11
+Data:
+                      
+                ####  
+                ####  
+              ####    
+              ####    
+              ####    
+            ####      
+######      ####      
+######      ####      
+    ####  ####        
+    ####  ####        
+      ######          
+      ######          
+                      
+Code point: 28
+Name: Less-than or equal-to
+Unicode: U+00002264
+Width: 7
+Data:
+              
+              
+              
+              
+      ######  
+  ######      
+####          
+  ######      
+      ######  
+              
+############  
+              
+              
+              
+Code point: 29
+Name: Approximately equal
+Unicode: U+00002248
+Width: 7
+Data:
+              
+              
+              
+              
+  ####        
+##  ####  ##  
+      ####    
+  ####        
+##  ####  ##  
+      ####    
+              
+              
+              
+              
+Code point: 30
+Name: Greater-than or equal-to
+Unicode: U+00002265
+Width: 7
+Data:
+              
+              
+              
+              
+######        
+    ######    
+        ####  
+    ######    
+######        
+              
+############  
+              
+              
+              
+Code point: 31
+Name: Not equal
+Unicode: U+00002260
+Width: 7
+Data:
+              
+              
+              
+      ####    
+      ####    
+############  
+    ####      
+    ####      
+############  
+  ####        
+  ####        
+              
+              
+              
+Code point: ' '
+Name: Space
+Unicode: ' '
+Width: 4
+Data:
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+Code point: '!'
+Name: Exclamation mark
+Unicode: '!'
+Width: 3
+Data:
+      
+      
+####  
+####  
+####  
+####  
+####  
+####  
+      
+####  
+####  
+      
+      
+      
+Code point: '"'
+Name: Neutral quotation mark
+Unicode: '"'
+Width: 6
+Data:
+            
+####  ####  
+####  ####  
+####  ####  
+  ##  ##    
+            
+            
+            
+            
+            
+            
+            
+            
+            
+Code point: '#'
+Name: Number/pound
+Unicode: '#'
+Width: 10
+Data:
+                    
+                    
+      ####  ####    
+      ####  ####    
+  ################  
+    ####  ####      
+    ####  ####      
+    ####  ####      
+################    
+  ####  ####        
+  ####  ####        
+                    
+                    
+                    
+Code point: '$'
+Name: Dollar
+Unicode: '$'
+Width: 8
+Data:
+      ####      
+      ####      
+  ##########    
+####  ##  ####  
+####  ##    ##  
+####  ##        
+  ##########    
+      ##  ####  
+##    ##  ####  
+####  ##  ####  
+  ##########    
+    ####        
+    ####        
+                
+Code point: '%'
+Name: Percent
+Unicode: '%'
+Width: 7
+Data:
+              
+              
+####    ####  
+####    ####  
+      ####    
+      ####    
+    ####      
+  ####        
+  ####        
+####    ####  
+####    ####  
+              
+              
+              
+Code point: '&'
+Name: Ampersand
+Unicode: '&'
+Width: 8
+Data:
+                
+                
+    ######      
+  ####  ####    
+  ####  ####    
+    ######      
+  ######  ####  
+####  ######    
+####    ####    
+####    ####    
+  ######  ####  
+                
+                
+                
+Code point: '\''
+Name: Apostrophe-quote
+Unicode: '\''
+Width: 4
+Data:
+        
+  ####  
+  ####  
+  ####  
+####    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+Code point: '('
+Name: Left parenthesis
+Unicode: '('
+Width: 5
+Data:
+          
+          
+    ####  
+  ####    
+  ####    
+####      
+####      
+####      
+####      
+  ####    
+  ####    
+    ####  
+          
+          
+Code point: ')'
+Name: Right parenthesis
+Unicode: ')'
+Width: 5
+Data:
+          
+          
+####      
+  ####    
+  ####    
+    ####  
+    ####  
+    ####  
+    ####  
+  ####    
+  ####    
+####      
+          
+          
+Code point: '*'
+Name: Asterisk
+Unicode: '*'
+Width: 6
+Data:
+            
+    ##      
+##  ##  ##  
+##########  
+  ######    
+##########  
+##  ##  ##  
+    ##      
+            
+            
+            
+            
+            
+            
+Code point: '+'
+Name: Plus
+Unicode: '+'
+Width: 7
+Data:
+              
+              
+              
+              
+    ####      
+    ####      
+############  
+    ####      
+    ####      
+              
+              
+              
+              
+              
+Code point: ','
+Name: Comma
+Unicode: ','
+Width: 4
+Data:
+        
+        
+        
+        
+        
+        
+        
+        
+        
+  ####  
+  ####  
+  ####  
+####    
+        
+Code point: '-'
+Name: Hyphen-minus
+Unicode: '-'
+Width: 5
+Data:
+          
+          
+          
+          
+          
+          
+          
+########  
+          
+          
+          
+          
+          
+          
+Code point: '.'
+Name: Full stop
+Unicode: '.'
+Width: 3
+Data:
+      
+      
+      
+      
+      
+      
+      
+      
+      
+####  
+####  
+      
+      
+      
+Code point: '/'
+Name: Solidus
+Unicode: '/'
+Width: 7
+Data:
+              
+              
+        ####  
+        ####  
+      ####    
+      ####    
+    ####      
+  ####        
+  ####        
+####          
+####          
+              
+              
+              
+Code point: '0'
+Name: Zero
+Unicode: '0'
+Width: 7
+Data:
+              
+              
+  ########    
+####    ####  
+####    ####  
+####  ######  
+############  
+######  ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: '1'
+Name: One
+Unicode: '1'
+Width: 7
+Data:
+              
+              
+    ####      
+  ######      
+########      
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+############  
+              
+              
+              
+Code point: '2'
+Name: Two
+Unicode: '2'
+Width: 7
+Data:
+              
+              
+  ########    
+####    ####  
+        ####  
+      ####    
+    ####      
+  ####        
+####          
+####    ####  
+############  
+              
+              
+              
+Code point: '3'
+Name: Three
+Unicode: '3'
+Width: 7
+Data:
+              
+              
+  ########    
+####    ####  
+        ####  
+        ####  
+    ######    
+        ####  
+        ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: '4'
+Name: Four
+Unicode: '4'
+Width: 7
+Data:
+              
+              
+      ####    
+    ######    
+  ########    
+####  ####    
+####  ####    
+############  
+      ####    
+      ####    
+      ####    
+              
+              
+              
+Code point: '5'
+Name: Five
+Unicode: '5'
+Width: 7
+Data:
+              
+              
+############  
+####          
+####          
+####          
+##########    
+        ####  
+        ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: '6'
+Name: Six
+Unicode: '6'
+Width: 7
+Data:
+              
+              
+    ######    
+  ####        
+####          
+####          
+##########    
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: '7'
+Name: Seven
+Unicode: '7'
+Width: 7
+Data:
+              
+              
+############  
+        ####  
+        ####  
+      ####    
+      ####    
+      ####    
+    ####      
+    ####      
+    ####      
+              
+              
+              
+Code point: '8'
+Name: Eight
+Unicode: '8'
+Width: 7
+Data:
+              
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+  ########    
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: '9'
+Name: Nine
+Unicode: '9'
+Width: 7
+Data:
+              
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+  ##########  
+        ####  
+        ####  
+      ####    
+  ######      
+              
+              
+              
+Code point: ':'
+Name: Colon
+Unicode: ':'
+Width: 3
+Data:
+      
+      
+      
+####  
+####  
+      
+      
+      
+####  
+####  
+      
+      
+      
+      
+Code point: ';'
+Name: Semicolon
+Unicode: ';'
+Width: 4
+Data:
+        
+        
+        
+        
+  ####  
+  ####  
+        
+        
+  ####  
+  ####  
+####    
+        
+        
+        
+Code point: '<'
+Name: Less-than
+Unicode: '<'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+      ######  
+  ######      
+####          
+  ######      
+      ######  
+              
+              
+              
+              
+Code point: '='
+Name: Equal
+Unicode: '='
+Width: 7
+Data:
+              
+              
+              
+              
+              
+############  
+              
+              
+############  
+              
+              
+              
+              
+              
+Code point: '>'
+Name: Greater-than
+Unicode: '>'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+######        
+    ######    
+        ####  
+    ######    
+######        
+              
+              
+              
+              
+Code point: '?'
+Name: Question mark
+Unicode: '?'
+Width: 8
+Data:
+                
+                
+  ##########    
+####      ####  
+####      ####  
+        ####    
+      ####      
+      ####      
+                
+      ####      
+      ####      
+                
+                
+                
+Code point: '@'
+Name: Commercial at
+Unicode: '@'
+Width: 9
+Data:
+                  
+                  
+  ############    
+####        ####  
+####        ####  
+####    ########  
+####  ####  ####  
+####  ####  ####  
+####    ######    
+####              
+  ##############  
+                  
+                  
+                  
+Code point: 'A'
+Name: Capital A
+Unicode: 'A'
+Width: 8
+Data:
+                
+                
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+  ####  ####    
+##############  
+####      ####  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 'B'
+Name: Capital B
+Unicode: 'B'
+Width: 8
+Data:
+                
+                
+############    
+####      ####  
+####      ####  
+####      ####  
+############    
+####      ####  
+####      ####  
+####      ####  
+############    
+                
+                
+                
+Code point: 'C'
+Name: Capital C
+Unicode: 'C'
+Width: 8
+Data:
+                
+                
+    ########    
+  ####    ####  
+####        ##  
+####            
+####            
+####            
+####        ##  
+  ####    ####  
+    ########    
+                
+                
+                
+Code point: 'D'
+Name: Capital D
+Unicode: 'D'
+Width: 8
+Data:
+                
+                
+##########      
+####    ####    
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+####    ####    
+##########      
+                
+                
+                
+Code point: 'E'
+Name: Capital E
+Unicode: 'E'
+Width: 8
+Data:
+                
+                
+##############  
+####            
+####            
+####            
+############    
+####            
+####            
+####            
+##############  
+                
+                
+                
+Code point: 'F'
+Name: Capital F
+Unicode: 'F'
+Width: 8
+Data:
+                
+                
+##############  
+####            
+####            
+####            
+############    
+####            
+####            
+####            
+####            
+                
+                
+                
+Code point: 'G'
+Name: Capital G
+Unicode: 'G'
+Width: 9
+Data:
+                  
+                  
+    ##########    
+  ####      ####  
+####              
+####              
+####    ########  
+####        ####  
+####        ####  
+  ####      ####  
+    ########  ##  
+                  
+                  
+                  
+Code point: 'H'
+Name: Capital H
+Unicode: 'H'
+Width: 9
+Data:
+                  
+                  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+################  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+                  
+                  
+                  
+Code point: 'I'
+Name: Capital I
+Unicode: 'I'
+Width: 7
+Data:
+              
+              
+############  
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+############  
+              
+              
+              
+Code point: 'J'
+Name: Capital J
+Unicode: 'J'
+Width: 8
+Data:
+                
+                
+      ########  
+        ####    
+        ####    
+        ####    
+        ####    
+        ####    
+####    ####    
+####    ####    
+  ########      
+                
+                
+                
+Code point: 'K'
+Name: Capital K
+Unicode: 'K'
+Width: 8
+Data:
+                
+                
+####      ####  
+####      ####  
+####    ####    
+####    ####    
+##########      
+####    ####    
+####    ####    
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 'L'
+Name: Capital L
+Unicode: 'L'
+Width: 8
+Data:
+                
+                
+####            
+####            
+####            
+####            
+####            
+####            
+####            
+####            
+##############  
+                
+                
+                
+Code point: 'M'
+Name: Capital M
+Unicode: 'M'
+Width: 11
+Data:
+                      
+                      
+####            ####  
+######        ######  
+######        ######  
+########    ########  
+####  ##    ##  ####  
+####  ########  ####  
+####    ####    ####  
+####    ####    ####  
+####            ####  
+                      
+                      
+                      
+Code point: 'N'
+Name: Capital N
+Unicode: 'N'
+Width: 9
+Data:
+                  
+                  
+####        ####  
+####        ####  
+######      ####  
+########    ####  
+####  ####  ####  
+####    ########  
+####      ######  
+####        ####  
+####        ####  
+                  
+                  
+                  
+Code point: 'O'
+Name: Capital O
+Unicode: 'O'
+Width: 9
+Data:
+                  
+                  
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 'P'
+Name: Capital P
+Unicode: 'P'
+Width: 8
+Data:
+                
+                
+############    
+####      ####  
+####      ####  
+####      ####  
+############    
+####            
+####            
+####            
+####            
+                
+                
+                
+Code point: 'Q'
+Name: Capital Q
+Unicode: 'Q'
+Width: 9
+Data:
+                  
+                  
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####  ##    ####  
+####  ####  ####  
+  ####  ######    
+    ########      
+          ####    
+            ##    
+                  
+Code point: 'R'
+Name: Capital R
+Unicode: 'R'
+Width: 8
+Data:
+                
+                
+############    
+####      ####  
+####      ####  
+####      ####  
+############    
+####    ####    
+####      ####  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 'S'
+Name: Capital S
+Unicode: 'S'
+Width: 8
+Data:
+                
+                
+  ##########    
+####      ####  
+####      ####  
+  ####          
+    ######      
+        ####    
+####      ####  
+####      ####  
+  ##########    
+                
+                
+                
+Code point: 'T'
+Name: Capital T
+Unicode: 'T'
+Width: 9
+Data:
+                  
+                  
+################  
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+      ####        
+                  
+                  
+                  
+Code point: 'U'
+Name: Capital U
+Unicode: 'U'
+Width: 9
+Data:
+                  
+                  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 'V'
+Name: Capital V
+Unicode: 'V'
+Width: 8
+Data:
+                
+                
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+  ####  ####    
+  ####  ####    
+  ####  ####    
+    ######      
+    ######      
+                
+                
+                
+Code point: 'W'
+Name: Capital W
+Unicode: 'W'
+Width: 11
+Data:
+                      
+                      
+####            ####  
+####            ####  
+####    ####    ####  
+  ####  ####  ####    
+  ####  ####  ####    
+  ####  ####  ####    
+    ############      
+    ####    ####      
+    ####    ####      
+                      
+                      
+                      
+Code point: 'X'
+Name: Capital X
+Unicode: 'X'
+Width: 9
+Data:
+                  
+                  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+      ####        
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+                  
+                  
+                  
+Code point: 'Y'
+Name: Capital Y
+Unicode: 'Y'
+Width: 9
+Data:
+                  
+                  
+####        ####  
+####        ####  
+  ####    ####    
+  ####    ####    
+    ########      
+      ####        
+      ####        
+      ####        
+      ####        
+                  
+                  
+                  
+Code point: 'Z'
+Name: Capital Z
+Unicode: 'Z'
+Width: 9
+Data:
+                  
+                  
+################  
+            ####  
+          ####    
+        ####      
+      ####        
+    ####          
+  ####            
+####              
+################  
+                  
+                  
+                  
+Code point: '['
+Name: Left square bracket
+Unicode: '['
+Width: 5
+Data:
+          
+          
+########  
+####      
+####      
+####      
+####      
+####      
+####      
+####      
+####      
+########  
+          
+          
+Code point: '\\'
+Name: Reverse solidus
+Unicode: '\\'
+Width: 7
+Data:
+              
+              
+####          
+####          
+  ####        
+  ####        
+    ####      
+      ####    
+      ####    
+        ####  
+        ####  
+              
+              
+              
+Code point: ']'
+Name: Right square bracket
+Unicode: ']'
+Width: 5
+Data:
+          
+          
+########  
+    ####  
+    ####  
+    ####  
+    ####  
+    ####  
+    ####  
+    ####  
+    ####  
+########  
+          
+          
+Code point: '^'
+Name: Circumflex
+Unicode: '^'
+Width: 8
+Data:
+      ##        
+    ######      
+  ####  ####    
+####      ####  
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+Code point: '_'
+Name: Underscore
+Unicode: '_'
+Width: 8
+Data:
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+##############  
+                
+Code point: '`'
+Name: Grave accent
+Unicode: '`'
+Width: 4
+Data:
+####    
+####    
+  ####  
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+Code point: 'a'
+Name: Lowercase a
+Unicode: 'a'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 'b'
+Name: Lowercase b
+Unicode: 'b'
+Width: 7
+Data:
+              
+              
+####          
+####          
+####          
+########      
+####  ####    
+####    ####  
+####    ####  
+####    ####  
+##########    
+              
+              
+              
+Code point: 'c'
+Name: Lowercase c
+Unicode: 'c'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ########    
+####    ####  
+####          
+####          
+####    ####  
+  ########    
+              
+              
+              
+Code point: 'd'
+Name: Lowercase d
+Unicode: 'd'
+Width: 7
+Data:
+              
+              
+        ####  
+        ####  
+        ####  
+    ########  
+  ####  ####  
+####    ####  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 'e'
+Name: Lowercase e
+Unicode: 'e'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ########    
+####    ####  
+############  
+####          
+####    ####  
+  ########    
+              
+              
+              
+Code point: 'f'
+Name: Lowercase f
+Unicode: 'f'
+Width: 6
+Data:
+            
+            
+    ######  
+  ####  ####
+  ####      
+  ####      
+########    
+  ####      
+  ####      
+  ####      
+  ####      
+            
+            
+            
+Code point: 'g'
+Name: Lowercase g
+Unicode: 'g'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ####  ####  
+####  ######  
+####    ####  
+####    ####  
+####    ####  
+  ##########  
+        ####  
+####    ####  
+  ########    
+Code point: 'h'
+Name: Lowercase h
+Unicode: 'h'
+Width: 7
+Data:
+              
+              
+####          
+####          
+####          
+####  ####    
+######  ####  
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+              
+              
+              
+Code point: 'i'
+Name: Lowercase i
+Unicode: 'i'
+Width: 3
+Data:
+      
+      
+####  
+####  
+      
+####  
+####  
+####  
+####  
+####  
+####  
+      
+      
+      
+Code point: 'j'
+Name: Lowercase j
+Unicode: 'j'
+Width: 6
+Data:
+            
+            
+      ####  
+      ####  
+            
+    ######  
+      ####  
+      ####  
+      ####  
+      ####  
+####  ####  
+####  ####  
+  ######    
+            
+Code point: 'k'
+Name: Lowercase k
+Unicode: 'k'
+Width: 7
+Data:
+              
+              
+####          
+####          
+####          
+####    ####  
+####  ####    
+########      
+####  ####    
+####    ####  
+####    ####  
+              
+              
+              
+Code point: 'l'
+Name: Lowercase l
+Unicode: 'l'
+Width: 3
+Data:
+      
+      
+####  
+####  
+####  
+####  
+####  
+####  
+####  
+####  
+####  
+      
+      
+      
+Code point: 'm'
+Name: Lowercase m
+Unicode: 'm'
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+######    ####    
+################  
+####  ####  ####  
+####  ####  ####  
+####  ####  ####  
+####  ####  ####  
+                  
+                  
+                  
+Code point: 'n'
+Name: Lowercase n
+Unicode: 'n'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+####  ####    
+######  ####  
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+              
+              
+              
+Code point: 'o'
+Name: Lowercase o
+Unicode: 'o'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 'p'
+Name: Lowercase p
+Unicode: 'p'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+####  ####    
+######  ####  
+####    ####  
+####    ####  
+####    ####  
+##########    
+####          
+####          
+####          
+Code point: 'q'
+Name: Lowercase q
+Unicode: 'q'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ####  ####  
+####  ######  
+####    ####  
+####    ####  
+####    ####  
+  ##########  
+        ####  
+        ####  
+        ######
+Code point: 'r'
+Name: Lowercase r
+Unicode: 'r'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+####  ####    
+######  ####  
+####    ####  
+####          
+####          
+####          
+              
+              
+              
+Code point: 's'
+Name: Lowercase s
+Unicode: 's'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ########    
+####    ####  
+  ####        
+      ####    
+####    ####  
+  ########    
+              
+              
+              
+Code point: 't'
+Name: Lowercase t
+Unicode: 't'
+Width: 5
+Data:
+          
+          
+  ####    
+  ####    
+  ####    
+########  
+  ####    
+  ####    
+  ####    
+  ####    
+    ####  
+          
+          
+          
+Code point: 'u'
+Name: Lowercase u
+Unicode: 'u'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####  ######  
+  ####  ####  
+              
+              
+              
+Code point: 'v'
+Name: Lowercase v
+Unicode: 'v'
+Width: 8
+Data:
+                
+                
+                
+                
+                
+####      ####  
+####      ####  
+  ####  ####    
+  ####  ####    
+    ######      
+      ##        
+                
+                
+                
+Code point: 'w'
+Name: Lowercase w
+Unicode: 'w'
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+####        ####  
+####        ####  
+####  ####  ####  
+####  ####  ####  
+################  
+  ####    ####    
+                  
+                  
+                  
+Code point: 'x'
+Name: Lowercase x
+Unicode: 'x'
+Width: 8
+Data:
+                
+                
+                
+                
+                
+####      ####  
+  ####  ####    
+    ######      
+    ######      
+  ####  ####    
+####      ####  
+                
+                
+                
+Code point: 'y'
+Name: Lowercase y
+Unicode: 'y'
+Width: 7
+Data:
+              
+              
+              
+              
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ##########  
+        ####  
+      ####    
+  ######      
+Code point: 'z'
+Name: Lowercase z
+Unicode: 'z'
+Width: 6
+Data:
+            
+            
+            
+            
+            
+##########  
+      ####  
+    ####    
+  ####      
+####        
+##########  
+            
+            
+            
+Code point: '{'
+Name: Left curly bracket
+Unicode: '{'
+Width: 6
+Data:
+            
+    ######  
+  ####      
+  ####      
+  ####      
+  ####      
+####        
+  ####      
+  ####      
+  ####      
+  ####      
+    ######  
+            
+            
+Code point: '|'
+Name: Vertical bar
+Unicode: '|'
+Width: 3
+Data:
+      
+      
+####  
+####  
+####  
+####  
+####  
+####  
+####  
+####  
+####  
+####  
+      
+      
+Code point: '}'
+Name: Right curly bracket
+Unicode: '}'
+Width: 6
+Data:
+            
+######      
+    ####    
+    ####    
+    ####    
+    ####    
+      ####  
+    ####    
+    ####    
+    ####    
+    ####    
+######      
+            
+            
+Code point: '~'
+Name: Tilde
+Unicode: '~'
+Width: 8
+Data:
+                
+                
+                
+                
+                
+  ######  ####  
+####  ######    
+                
+                
+                
+                
+                
+                
+                
+Code point: 127
+Name: Infinite
+Unicode: U+0000221E
+Width: 10
+Data:
+                    
+                    
+                    
+                    
+                    
+  ######  ######    
+####    ####  ####  
+####  ####    ####  
+  ######  ######    
+                    
+                    
+                    
+                    
+                    
+Code point: 128
+Name: Euro
+Unicode: U+000020AC
+Width: 8
+Data:
+                
+                
+      ######    
+    ####    ##  
+  ####          
+##########      
+  ####          
+##########      
+  ####          
+    ####    ##  
+      ######    
+                
+                
+                
+Code point: 129
+Name: Lowercase Greek pi
+Unicode: U+000003C0
+Width: 8
+Data:
+                
+                
+                
+                
+##############  
+  ####  ####    
+  ####  ####    
+  ####  ####    
+  ####  ####    
+  ####  ####    
+  ####  ####    
+                
+                
+                
+Code point: 130
+Name: Low single quote
+Unicode: U+0000201A
+Width: 4
+Data:
+        
+        
+        
+        
+        
+        
+        
+        
+        
+######  
+  ####  
+  ####  
+####    
+        
+Code point: 131
+Name: Lowercase Greek epsilon
+Unicode: U+000003B5
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ########    
+####      ##  
+  ######      
+####          
+####    ####  
+  ########    
+              
+              
+              
+Code point: 132
+Name: Double low-9 quotation mark
+Unicode: U+0000201E
+Width: 7
+Data:
+              
+              
+              
+              
+              
+              
+              
+              
+              
+############  
+  ####  ####  
+  ####  ####  
+####  ####    
+              
+Code point: 133
+Name: Lowercase Greek alpha
+Unicode: U+000003B1
+Width: 8
+Data:
+                
+                
+                
+                
+                
+  ######  ####  
+####    ####    
+####    ####    
+####    ####    
+####    ####    
+  ######  ####  
+                
+                
+                
+Code point: 134
+Name: Dagger
+Unicode: U+00002020
+Width: 7
+Data:
+              
+    ####      
+    ####      
+############  
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+              
+              
+              
+              
+              
+Code point: 135
+Name: Double dagger
+Unicode: U+00002021
+Width: 7
+Data:
+              
+    ####      
+    ####      
+############  
+    ####      
+    ####      
+############  
+    ####      
+    ####      
+              
+              
+              
+              
+              
+Code point: 136
+Name: Capital Greek GAMMA
+Unicode: U+00000393
+Width: 8
+Data:
+                
+                
+##############  
+####            
+####            
+####            
+####            
+####            
+####            
+####            
+####            
+                
+                
+                
+Code point: 137
+Name: Per mille
+Unicode: U+00002030
+Width: 10
+Data:
+                    
+                    
+####    ####        
+####    ####        
+      ####          
+      ####          
+    ####            
+  ####              
+  ####              
+####    ####  ####  
+####    ####  ####  
+                    
+                    
+                    
+Code point: 138
+Name: Capital S with caron
+Unicode: U+00000160
+Width: 8
+Data:
+  ####  ####    
+    ######      
+      ##        
+  ##########    
+####      ####  
+####      ####  
+  ######        
+      ######    
+####      ####  
+####      ####  
+  ##########    
+                
+                
+                
+Code point: 139
+Name: Single left angle quotation mark
+Unicode: U+00002039
+Width: 5
+Data:
+          
+          
+          
+          
+    ####  
+  ####    
+####      
+  ####    
+    ####  
+          
+          
+          
+          
+          
+Code point: 140
+Name: Capital ligature OE
+Unicode: U+00000152
+Width: 12
+Data:
+                        
+                        
+    ##################  
+  ####    ####          
+####      ####          
+####      ####          
+####      ##########    
+####      ####          
+####      ####          
+  ####    ####          
+    ##################  
+                        
+                        
+                        
+Code point: 141
+Name: Capital Greek SIGMA
+Unicode: U+000003A3
+Width: 8
+Data:
+                
+                
+##############  
+####            
+  ####          
+    ####        
+      ####      
+    ####        
+  ####          
+####            
+##############  
+                
+                
+                
+Code point: 142
+Name: Capital Z with caron
+Unicode: U+0000017D
+Width: 9
+Data:
+    ####  ####    
+      ######      
+        ##        
+################  
+            ####  
+          ####    
+        ####      
+      ####        
+    ####          
+  ####            
+################  
+                  
+                  
+                  
+Code point: 143
+Name: Lowercase Greek phi
+Unicode: U+000003C6
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+####    ######    
+####  ####  ####  
+####  ####  ####  
+####  ####  ####  
+####  ####  ####  
+  ############    
+      ####        
+      ####        
+      ####        
+Code point: 144
+Name: Capital Greek PI
+Unicode: U+000003A0
+Width: 8
+Data:
+                
+                
+##############  
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 145
+Name: Left single quotation mark
+Unicode: U+00002018
+Width: 4
+Data:
+        
+  ####  
+####    
+####    
+######  
+        
+        
+        
+        
+        
+        
+        
+        
+        
+Code point: 146
+Name: Right single quotation mark
+Unicode: U+00002019
+Width: 4
+Data:
+        
+######  
+  ####  
+  ####  
+####    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+Code point: 147
+Name: Left double quotation mark
+Unicode: U+0000201C
+Width: 7
+Data:
+              
+  ####  ####  
+####  ####    
+####  ####    
+############  
+              
+              
+              
+              
+              
+              
+              
+              
+              
+Code point: 148
+Name: Right double quotation mark
+Unicode: U+0000201D
+Width: 7
+Data:
+              
+############  
+  ####  ####  
+  ####  ####  
+####  ####    
+              
+              
+              
+              
+              
+              
+              
+              
+              
+Code point: 149
+Name: Bullet
+Unicode: U+00002022
+Width: 5
+Data:
+          
+          
+          
+          
+          
+  ####    
+########  
+########  
+  ####    
+          
+          
+          
+          
+          
+Code point: 150
+Name: En dash
+Unicode: U+00002013
+Width: 6
+Data:
+            
+            
+            
+            
+            
+            
+            
+##########  
+            
+            
+            
+            
+            
+            
+Code point: 151
+Name: Em dash
+Unicode: U+00002014
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+################  
+                  
+                  
+                  
+                  
+                  
+                  
+Code point: 152
+Name: Lowercase Greek gamma
+Unicode: U+000003B3
+Width: 8
+Data:
+                
+                
+                
+                
+                
+####      ####  
+####      ####  
+  ####  ####    
+  ####  ####    
+    ######      
+    ######      
+    ####        
+    ####        
+    ####        
+Code point: 153
+Name: Lowercase Greek xi
+Unicode: U+000003BE
+Width: 6
+Data:
+            
+            
+##########  
+  ####      
+####        
+####        
+  ########  
+####        
+####        
+####        
+  ########  
+        ####
+        ####
+    ######  
+Code point: 154
+Name: Lowercase s with caron
+Unicode: U+00000161
+Width: 7
+Data:
+              
+####    ####  
+  ########    
+    ####      
+              
+  ########    
+####    ####  
+  ####        
+      ####    
+####    ####  
+  ########    
+              
+              
+              
+Code point: 155
+Name: Single right angle quotation mark
+Unicode: U+0000203A
+Width: 5
+Data:
+          
+          
+          
+          
+####      
+  ####    
+    ####  
+  ####    
+####      
+          
+          
+          
+          
+          
+Code point: 156
+Name: Lowercase ligature oe
+Unicode: U+00000153
+Width: 11
+Data:
+                      
+                      
+                      
+                      
+                      
+  ################    
+####    ####    ####  
+####    ############  
+####    ####          
+####    ####    ####  
+  ################    
+                      
+                      
+                      
+Code point: 157
+Name: Lowercase Greek sigma
+Unicode: U+000003C3
+Width: 8
+Data:
+                
+                
+                
+                
+                
+  ##############
+####    ####    
+####    ####    
+####    ####    
+####    ####    
+  ########      
+                
+                
+                
+Code point: 158
+Name: Lowercase z with caron
+Unicode: U+0000017E
+Width: 6
+Data:
+            
+####  ####  
+  ######    
+    ##      
+            
+##########  
+      ####  
+    ####    
+  ####      
+####        
+##########  
+            
+            
+            
+Code point: 159
+Name: Capital Y with diaeresis
+Unicode: U+00000178
+Width: 9
+Data:
+  ####    ####    
+  ####    ####    
+                  
+####        ####  
+####        ####  
+  ####    ####    
+  ####    ####    
+    ########      
+      ####        
+      ####        
+      ####        
+                  
+                  
+                  
+Code point: 160
+Name: Non-breaking space
+Unicode: ' '
+Width: 4
+Data:
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+Code point: 161
+Name: Inverted exclamation mark
+Unicode: U+000000A1
+Width: 3
+Data:
+      
+      
+      
+####  
+####  
+      
+####  
+####  
+####  
+####  
+####  
+####  
+      
+      
+Code point: 162
+Name: Cent
+Unicode: U+000000A2
+Width: 8
+Data:
+                
+                
+                
+      ####      
+      ####      
+  ##########    
+####  ##  ####  
+####  ##        
+####  ##        
+####  ##  ####  
+  ##########    
+    ####        
+    ####        
+                
+Code point: 163
+Name: Pound
+Unicode: U+000000A3
+Width: 9
+Data:
+                  
+    ########      
+  ####    ####    
+  ####      ##    
+  ####            
+########          
+  ####            
+  ####            
+  ####            
+########    ####  
+####  ########    
+                  
+                  
+                  
+Code point: 164
+Name: Currency
+Unicode: U+000000A4
+Width: 9
+Data:
+                  
+                  
+                  
+####        ####  
+  ############    
+    ##    ##      
+    ##    ##      
+  ############    
+####        ####  
+                  
+                  
+                  
+                  
+                  
+Code point: 165
+Name: Capital Greek OMEGA
+Unicode: U+000003A9
+Width: 9
+Data:
+                  
+                  
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+  ####    ####    
+######    ######  
+                  
+                  
+                  
+Code point: 166
+Name: Lowercase Greek omega
+Unicode: U+000003C9
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+                  
+  ####    ####    
+####        ####  
+####  ####  ####  
+####  ####  ####  
+################  
+  ####    ####    
+                  
+                  
+                  
+Code point: 167
+Name: Section
+Unicode: U+000000A7
+Width: 8
+Data:
+                
+  ##########    
+####      ####  
+  ####          
+    ######      
+  ####  ####    
+####      ####  
+####      ####  
+  ####  ####    
+    ######      
+        ####    
+####      ####  
+  ##########    
+                
+Code point: 168
+Name: Capital Greek LAMBDA
+Unicode: U+0000039B
+Width: 8
+Data:
+                
+                
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+  ####  ####    
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 169
+Name: Lowercase Greek eta
+Unicode: U+000003B7
+Width: 7
+Data:
+              
+              
+              
+              
+              
+####  ####    
+######  ####  
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+        ####  
+        ####  
+        ####  
+Code point: 170
+Name: Feminine ordinal indicator
+Unicode: U+000000AA
+Width: 7
+Data:
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+  ##########  
+              
+############  
+              
+              
+              
+              
+              
+              
+Code point: 171
+Name: Double left angle quotation mark
+Unicode: U+000000AB
+Width: 8
+Data:
+                
+                
+                
+                
+    ####  ####  
+  ####  ####    
+####  ####      
+  ####  ####    
+    ####  ####  
+                
+                
+                
+                
+                
+Code point: 172
+Name: Not
+Unicode: U+000000AC
+Width: 7
+Data:
+              
+              
+              
+              
+              
+              
+############  
+        ####  
+        ####  
+        ####  
+              
+              
+              
+              
+Code point: 173
+Name: Minus (same width as +)
+Unicode: U+00002212
+Width: 7
+Data:
+              
+              
+              
+              
+              
+              
+############  
+              
+              
+              
+              
+              
+              
+              
+Code point: 174
+Name: Capital Greek DELTA
+Unicode: U+00000394
+Width: 8
+Data:
+                
+                
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+  ####  ####    
+####      ####  
+####      ####  
+####      ####  
+##############  
+                
+                
+                
+Code point: 175
+Name: Lowercase Greek delta
+Unicode: U+000003B4
+Width: 7
+Data:
+              
+              
+############  
+  ####        
+    ####      
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 176
+Name: Degree
+Unicode: U+000000B0
+Width: 7
+Data:
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+              
+              
+              
+              
+              
+Code point: 177
+Name: Plus or minus
+Unicode: U+000000B1
+Width: 7
+Data:
+              
+              
+              
+              
+    ####      
+    ####      
+############  
+    ####      
+    ####      
+              
+############  
+              
+              
+              
+Code point: 178
+Name: Superscript 2
+Unicode: U+000000B2
+Width: 5
+Data:
+          
+######    
+    ####  
+  ####    
+####      
+########  
+          
+          
+          
+          
+          
+          
+          
+          
+Code point: 179
+Name: Superscript 3
+Unicode: U+000000B3
+Width: 5
+Data:
+          
+######    
+    ####  
+######    
+    ####  
+######    
+          
+          
+          
+          
+          
+          
+          
+          
+Code point: 180
+Name: Lowercase Greek theta
+Unicode: U+000003B8
+Width: 8
+Data:
+                
+                
+  ##########    
+####      ####  
+####      ####  
+####      ####  
+##############  
+####      ####  
+####      ####  
+####      ####  
+  ##########    
+                
+                
+                
+Code point: 181
+Name: Lowercase Greek mu
+Unicode: U+000000B5
+Width: 8
+Data:
+                
+                
+                
+                
+                
+####    ####    
+####    ####    
+####    ####    
+####    ####    
+####    ####    
+##########  ##  
+####            
+####            
+####            
+Code point: 182
+Name: Pilcrow
+Unicode: U+000000B6
+Width: 9
+Data:
+                  
+                  
+  ##############  
+####  ####  ####  
+####  ####  ####  
+####  ####  ####  
+  ########  ####  
+      ####  ####  
+      ####  ####  
+      ####  ####  
+      ####  ####  
+                  
+                  
+                  
+Code point: 183
+Name: Middle dot
+Unicode: U+000000B7
+Width: 3
+Data:
+      
+      
+      
+      
+      
+      
+####  
+####  
+      
+      
+      
+      
+      
+      
+Code point: 184
+Name: Lowercase Greek lambda
+Unicode: U+000003BB
+Width: 8
+Data:
+                
+                
+  ######        
+  ######        
+      ####      
+      ####      
+    ########    
+  ####  ####    
+  ####  ####    
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 185
+Name: Superscript 1
+Unicode: U+000000B9
+Width: 5
+Data:
+          
+  ####    
+######    
+  ####    
+  ####    
+########  
+          
+          
+          
+          
+          
+          
+          
+          
+Code point: 186
+Name: Masculine ordinal indicator
+Unicode: U+000000BA
+Width: 7
+Data:
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+############  
+              
+              
+              
+              
+              
+              
+Code point: 187
+Name: Double right angle quotation mark
+Unicode: U+000000BB
+Width: 8
+Data:
+                
+                
+                
+                
+####  ####      
+  ####  ####    
+    ####  ####  
+  ####  ####    
+####  ####      
+                
+                
+                
+                
+                
+Code point: 188
+Name: Vulgar fraction one quarter
+Unicode: U+000000BC
+Width: 9
+Data:
+                  
+  ####            
+######            
+  ####      ####  
+  ####    ####    
+  ####  ####      
+      ####        
+    ####          
+  ########  ####  
+####  ####  ####  
+        ########  
+            ####  
+            ####  
+                  
+Code point: 189
+Name: Vulgar fraction one half
+Unicode: U+000000BD
+Width: 9
+Data:
+                  
+  ####            
+######            
+  ####      ####  
+  ####    ####    
+  ####  ####      
+      ####        
+    ####          
+  ####  ######    
+####        ####  
+          ####    
+        ####      
+        ########  
+                  
+Code point: 190
+Name: Vulgar fraction three quarters
+Unicode: U+000000BE
+Width: 9
+Data:
+                  
+######            
+    ####          
+  ####      ####  
+    ####  ####    
+######  ####      
+      ####        
+    ####          
+  ########  ####  
+####  ####  ####  
+        ########  
+            ####  
+            ####  
+                  
+Code point: 191
+Name: Inverted question mark
+Unicode: U+000000BF
+Width: 8
+Data:
+                
+                
+                
+    ####        
+    ####        
+                
+    ####        
+    ####        
+  ####          
+####      ####  
+####      ####  
+  ##########    
+                
+                
+Code point: 192
+Name: Capital A with grave
+Unicode: U+000000C0
+Width: 8
+Data:
+    ####        
+      ####      
+                
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+####      ####  
+##############  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 193
+Name: Capital A with accute
+Unicode: U+000000C1
+Width: 8
+Data:
+      ####      
+    ####        
+                
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+####      ####  
+##############  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 194
+Name: Capital A with circumflex
+Unicode: U+000000C2
+Width: 8
+Data:
+    ######      
+  ####  ####    
+####      ####  
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+####      ####  
+##############  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 195
+Name: Capital A with tilde
+Unicode: U+000000C3
+Width: 8
+Data:
+  ######  ####  
+####  ######    
+                
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+####      ####  
+##############  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 196
+Name: Capital A with diaeresis
+Unicode: U+000000C4
+Width: 8
+Data:
+  ####  ####    
+  ####  ####    
+                
+    ######      
+    ######      
+  ####  ####    
+  ####  ####    
+####      ####  
+##############  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 197
+Name: Capital A with ring above
+Unicode: U+000000C5
+Width: 8
+Data:
+    ######      
+  ####  ####    
+    ######      
+      ##        
+    ######      
+  ####  ####    
+  ####  ####    
+####      ####  
+##############  
+####      ####  
+####      ####  
+                
+                
+                
+Code point: 198
+Name: Capital ligature AE
+Unicode: U+000000C6
+Width: 12
+Data:
+                        
+                        
+      ################  
+    ####  ####          
+    ####  ####          
+  ####    ####          
+  ####    ##########    
+  ############          
+####      ####          
+####      ####          
+####      ############  
+                        
+                        
+                        
+Code point: 199
+Name: Capital C with cedilla
+Unicode: U+000000C7
+Width: 8
+Data:
+                
+                
+    ########    
+  ####    ####  
+####        ##  
+####            
+####            
+####            
+####        ##  
+  ####    ####  
+    ########    
+      ####      
+        ####    
+    ######      
+Code point: 200
+Name: Capital E with grave
+Unicode: U+000000C8
+Width: 8
+Data:
+  ####          
+    ####        
+      ####      
+                
+##############  
+####            
+####            
+############    
+####            
+####            
+##############  
+                
+                
+                
+Code point: 201
+Name: Capital E with accute
+Unicode: U+000000C9
+Width: 8
+Data:
+      ####      
+    ####        
+  ####          
+                
+##############  
+####            
+####            
+############    
+####            
+####            
+##############  
+                
+                
+                
+Code point: 202
+Name: Capital E with circumflex
+Unicode: U+000000CA
+Width: 8
+Data:
+    ####        
+  ########      
+####    ####    
+                
+##############  
+####            
+####            
+############    
+####            
+####            
+##############  
+                
+                
+                
+Code point: 203
+Name: Capital E with diaeresis
+Unicode: U+000000CB
+Width: 8
+Data:
+####      ####  
+####      ####  
+                
+##############  
+####            
+####            
+############    
+####            
+####            
+####            
+##############  
+                
+                
+                
+Code point: 204
+Name: Capital I with grave
+Unicode: U+000000CC
+Width: 7
+Data:
+  ####        
+    ####      
+      ####    
+              
+############  
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+############  
+              
+              
+              
+Code point: 205
+Name: Capital I with accute
+Unicode: U+000000CD
+Width: 7
+Data:
+      ####    
+    ####      
+  ####        
+              
+############  
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+############  
+              
+              
+              
+Code point: 206
+Name: Capital I with circumflex
+Unicode: U+000000CE
+Width: 7
+Data:
+    ####      
+  ########    
+####    ####  
+              
+############  
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+############  
+              
+              
+              
+Code point: 207
+Name: Capital I with diaeresis
+Unicode: U+000000CF
+Width: 7
+Data:
+              
+####    ####  
+####    ####  
+              
+############  
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+############  
+              
+              
+              
+Code point: 208
+Name: Capital ETH
+Unicode: U+000000D0
+Width: 9
+Data:
+                  
+                  
+  ##########      
+  ####    ####    
+  ####      ####  
+  ####      ####  
+########    ####  
+  ####      ####  
+  ####      ####  
+  ####    ####    
+  ##########      
+                  
+                  
+                  
+Code point: 209
+Name: Capital N with tilde
+Unicode: U+000000D1
+Width: 9
+Data:
+  ######    ####  
+####    ######    
+                  
+####        ####  
+######      ####  
+########    ####  
+####  ####  ####  
+####    ########  
+####      ######  
+####        ####  
+####        ####  
+                  
+                  
+                  
+Code point: 210
+Name: Capital O with grave
+Unicode: U+000000D2
+Width: 9
+Data:
+    ####          
+      ####        
+                  
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 211
+Name: Capital O with accute
+Unicode: U+000000D3
+Width: 9
+Data:
+        ####      
+      ####        
+                  
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 212
+Name: Capital O with circumflex
+Unicode: U+000000D4
+Width: 9
+Data:
+      ####        
+    ########      
+  ####    ####    
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 213
+Name: Capital O with tilde
+Unicode: U+000000D5
+Width: 9
+Data:
+  ######    ####  
+####    ######    
+                  
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 214
+Name: Capital O with diaeresis
+Unicode: U+000000D6
+Width: 9
+Data:
+  ####    ####    
+  ####    ####    
+                  
+    ########      
+  ####    ####    
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 215
+Name: Multiplication sign
+Unicode: U+000000D7
+Width: 8
+Data:
+                
+                
+                
+                
+####      ####  
+  ####  ####    
+    ######      
+  ####  ####    
+####      ####  
+                
+                
+                
+                
+                
+Code point: 216
+Name: Capital O with stroke
+Unicode: U+000000D8
+Width: 9
+Data:
+                  
+                  
+                ##
+    ########  ####
+  ####      ####  
+  ####    ######  
+  ####  ########  
+  ########  ####  
+  ######    ####  
+  ####      ####  
+####  ########    
+##                
+                  
+                  
+Code point: 217
+Name: Capital U with grave
+Unicode: U+000000D9
+Width: 9
+Data:
+    ####          
+      ####        
+####    ##  ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 218
+Name: Capital U with accute
+Unicode: U+000000DA
+Width: 9
+Data:
+        ####      
+      ####        
+####  ##    ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 219
+Name: Capital U with circumflex
+Unicode: U+000000DB
+Width: 9
+Data:
+      ####        
+    ########      
+  ####    ####    
+                  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 220
+Name: Capital U with diaeresis
+Unicode: U+000000DC
+Width: 9
+Data:
+####        ####  
+####        ####  
+                  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+####        ####  
+  ####    ####    
+    ########      
+                  
+                  
+                  
+Code point: 221
+Name: Capital Y with acute
+Unicode: U+000000DD
+Width: 9
+Data:
+        ####      
+      ####        
+####  ##    ####  
+####        ####  
+  ####    ####    
+  ####    ####    
+    ########      
+      ####        
+      ####        
+      ####        
+      ####        
+                  
+                  
+                  
+Code point: 222
+Name: Capital THORN
+Unicode: U+000000DE
+Width: 8
+Data:
+                
+                
+####            
+############    
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+####      ####  
+############    
+####            
+                
+                
+                
+Code point: 223
+Name: Lowercase Greek beta OR German eszett
+Unicode: U+000000DF
+Width: 8
+Data:
+                
+                
+  ########      
+####    ####    
+####      ####  
+####      ####  
+####  ######    
+####    ####    
+####      ####  
+######    ####  
+####  ######    
+####            
+                
+                
+Code point: 224
+Name: Lowercase a with grave
+Unicode: U+000000E0
+Width: 7
+Data:
+              
+  ####        
+    ####      
+      ####    
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 225
+Name: Lowercase a with accute
+Unicode: U+000000E1
+Width: 7
+Data:
+              
+      ####    
+    ####      
+  ####        
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 226
+Name: Lowercase a with circumflex
+Unicode: U+000000E2
+Width: 7
+Data:
+              
+    ####      
+  ########    
+####    ####  
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 227
+Name: Lowercase a with tilde
+Unicode: U+000000E3
+Width: 7
+Data:
+              
+              
+  ######  ####
+####  ######  
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 228
+Name: Lowercase a with diaeresis
+Unicode: U+000000E4
+Width: 7
+Data:
+              
+              
+####    ####  
+####    ####  
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 229
+Name: Lowercase a with ring above
+Unicode: U+000000E5
+Width: 7
+Data:
+              
+    ######    
+  ####  ####  
+    ######    
+              
+  ########    
+        ####  
+  ##########  
+####    ####  
+####    ####  
+  ##########  
+              
+              
+              
+Code point: 230
+Name: Lowercase ligature ae
+Unicode: U+000000E6
+Width: 11
+Data:
+                      
+                      
+                      
+                      
+                      
+  ################    
+        ####    ####  
+  ##################  
+####    ####          
+####    ####    ####  
+  ################    
+                      
+                      
+                      
+Code point: 231
+Name: Lowercase c with cedilla
+Unicode: U+000000E7
+Width: 7
+Data:
+              
+              
+              
+              
+              
+  ########    
+####    ####  
+####          
+####          
+####    ####  
+  ########    
+      ####    
+        ####  
+  ########    
+Code point: 232
+Name: Lowercase e with grave
+Unicode: U+000000E8
+Width: 7
+Data:
+              
+  ####        
+    ####      
+      ####    
+              
+  ########    
+####    ####  
+############  
+####          
+####    ####  
+  ########    
+              
+              
+              
+Code point: 233
+Name: Lowercase e with accute
+Unicode: U+000000E9
+Width: 7
+Data:
+              
+      ####    
+    ####      
+  ####        
+              
+  ########    
+####    ####  
+############  
+####          
+####    ####  
+  ########    
+              
+              
+              
+Code point: 234
+Name: Lowercase e with circumflex
+Unicode: U+000000EA
+Width: 7
+Data:
+              
+    ####      
+  ########    
+####    ####  
+              
+  ########    
+####    ####  
+############  
+####          
+####    ####  
+  ########    
+              
+              
+              
+Code point: 235
+Name: Lowercase e with diaeresis
+Unicode: U+000000EB
+Width: 7
+Data:
+              
+              
+####    ####  
+####    ####  
+              
+  ########    
+####    ####  
+############  
+####          
+####    ####  
+  ########    
+              
+              
+              
+Code point: 236
+Name: Lowercase i with grave
+Unicode: U+000000EC
+Width: 3
+Data:
+      
+##    
+####  
+  ####
+      
+####  
+####  
+####  
+####  
+####  
+####  
+      
+      
+      
+Code point: 237
+Name: Lowercase i with accute
+Unicode: U+000000ED
+Width: 3
+Data:
+      
+    ##
+  ####
+####  
+      
+####  
+####  
+####  
+####  
+####  
+####  
+      
+      
+      
+Code point: 238
+Name: Lowercase i with circumflex
+Unicode: U+000000EE
+Width: 5
+Data:
+          
+  ####    
+########  
+##    ##  
+          
+  ####    
+  ####    
+  ####    
+  ####    
+  ####    
+  ####    
+          
+          
+          
+Code point: 239
+Name: Lowercase i with diaeresis
+Unicode: U+000000EF
+Width: 7
+Data:
+              
+              
+####    ####  
+####    ####  
+              
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+    ####      
+              
+              
+              
+Code point: 240
+Name: Lowercase eth
+Unicode: U+000000F0
+Width: 7
+Data:
+              
+####  ##      
+  ####        
+##  ####      
+      ####    
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 241
+Name: Lowercase n with tilde
+Unicode: U+000000F1
+Width: 7
+Data:
+              
+              
+  ######  ####
+####  ######  
+              
+####  ####    
+######  ####  
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+              
+              
+              
+Code point: 242
+Name: Lowercase o with grave
+Unicode: U+000000F2
+Width: 7
+Data:
+              
+  ####        
+    ####      
+      ####    
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 243
+Name: Lowercase o with accute
+Unicode: U+000000F3
+Width: 7
+Data:
+              
+      ####    
+    ####      
+  ####        
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 244
+Name: Lowercase o with circumflex
+Unicode: U+000000F4
+Width: 7
+Data:
+              
+    ####      
+  ########    
+####    ####  
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 245
+Name: Lowercase o with tilde
+Unicode: U+000000F5
+Width: 7
+Data:
+              
+              
+  ######  ####
+####  ######  
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 246
+Name: Lowercase o with diaeresis
+Unicode: U+000000F6
+Width: 7
+Data:
+              
+              
+####    ####  
+####    ####  
+              
+  ########    
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ########    
+              
+              
+              
+Code point: 247
+Name: Division sign
+Unicode: U+000000F7
+Width: 7
+Data:
+              
+              
+              
+    ####      
+    ####      
+              
+############  
+              
+    ####      
+    ####      
+              
+              
+              
+              
+Code point: 248
+Name: Lowercase o with stroke
+Unicode: U+000000F8
+Width: 9
+Data:
+                  
+                  
+                  
+                  
+              ####
+    ######  ####  
+  ####    ######  
+  ####  ########  
+  ########  ####  
+  ######    ####  
+  ####  ######    
+####              
+                  
+                  
+Code point: 249
+Name: Lowercase u with grave
+Unicode: U+000000F9
+Width: 7
+Data:
+              
+  ####        
+    ####      
+      ####    
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####  ######  
+  ####  ####  
+              
+              
+              
+Code point: 250
+Name: Lowercase u with accute
+Unicode: U+000000FA
+Width: 7
+Data:
+              
+      ####    
+    ####      
+  ####        
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####  ######  
+  ####  ####  
+              
+              
+              
+Code point: 251
+Name: Lowercase u with circumflex
+Unicode: U+000000FB
+Width: 7
+Data:
+              
+    ####      
+  ########    
+####    ####  
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####  ######  
+  ####  ####  
+              
+              
+              
+Code point: 252
+Name: Lowercase u with diaeresis
+Unicode: U+000000FC
+Width: 7
+Data:
+              
+              
+####    ####  
+####    ####  
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####  ######  
+  ####  ####  
+              
+              
+              
+Code point: 253
+Name: Lowercase y with acute
+Unicode: U+000000FD
+Width: 7
+Data:
+              
+      ####    
+    ####      
+  ####        
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ##########  
+        ####  
+      ####    
+  ######      
+Code point: 254
+Name: Lowercase thorn
+Unicode: U+000000FE
+Width: 7
+Data:
+              
+              
+####          
+####          
+##########    
+####    ####  
+####    ####  
+####    ####  
+##########    
+####          
+####          
+              
+              
+              
+Code point: 255
+Name: Lowercase y with diaeresis
+Unicode: U+000000FF
+Width: 7
+Data:
+              
+              
+####    ####  
+####    ####  
+              
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+####    ####  
+  ##########  
+        ####  
+      ####    
+  ######      

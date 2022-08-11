@@ -1,0 +1,3602 @@
+convfont
+: Font Metadata
+: Code Page: Win-1252
+: Font Properties
+Height: 9
+Double width: True
+: Font Metrics
+Weight: Normal
+Style: Sans-serif
+Style: Upright
+Style: Proportional
+Italic adjust: 0
+Space above: 1
+Space below: 1
+Cap height: 1
+x-height: 3
+Baseline: 7
+Font Data:
+Code point: 0
+Name: Α
+Unicode: U+00000391
+Width: 6
+Data:
+            
+            
+            
+            
+            
+            
+            
+            
+            
+Code point: 1
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##  ##  ##  
+  ##  ##    
+##  ##  ##  
+  ##  ##    
+##  ##  ##  
+  ##  ##    
+##  ##  ##  
+            
+Code point: 2
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+  ####      
+  ####      
+  ####      
+  ####      
+  ####      
+  ####      
+  ####      
+            
+Code point: 3
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+            
+            
+            
+            
+            
+##########  
+##########  
+            
+Code point: 4
+Name: █
+Unicode: U+00002588
+Width: 6
+Data:
+            
+##########  
+##########  
+##########  
+##########  
+##########  
+##########  
+##########  
+            
+Code point: 5
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##########  
+####  ####  
+##      ##  
+  ##  ##    
+####  ####  
+####  ####  
+##########  
+            
+Code point: 6
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##########  
+####  ####  
+##  ##  ##  
+##      ##  
+##  ##  ##  
+##  ##  ##  
+##########  
+            
+Code point: 7
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##########  
+####  ####  
+######  ##  
+####    ##  
+##  ##  ##  
+####    ##  
+##########  
+            
+Code point: 8
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##########  
+##      ##  
+            
+            
+            
+##      ##  
+##########  
+            
+Code point: 9
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##########  
+##      ##  
+    ##      
+  ######    
+    ##      
+##  ##  ##  
+##########  
+            
+Code point: 10
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##########  
+##  ##  ##  
+  ##  ##    
+  ######    
+  ##  ##    
+##      ##  
+##########  
+            
+Code point: 11
+Name: ‽
+Unicode: U+0000203D
+Width: 6
+Data:
+            
+##########  
+##      ##  
+    ####    
+  ##  ##    
+    ####    
+##      ##  
+##########  
+            
+Code point: 12
+Name: ▴
+Unicode: U+000025B4
+Width: 6
+Data:
+            
+    ##      
+  ######    
+##########  
+##########  
+            
+            
+            
+            
+Code point: 13
+Name: ▾
+Unicode: U+000025BE
+Width: 6
+Data:
+            
+            
+            
+            
+##########  
+##########  
+  ######    
+    ##      
+            
+Code point: 14
+Name: ◄
+Unicode: U+000025C4
+Width: 6
+Data:
+            
+      ####  
+    ######  
+  ########  
+##########  
+  ########  
+    ######  
+      ####  
+            
+Code point: 15
+Name: ►
+Unicode: U+000025BA
+Width: 6
+Data:
+            
+####        
+######      
+########    
+##########  
+########    
+######      
+####        
+            
+Code point: 16
+Name: ↑
+Unicode: U+00002191
+Width: 6
+Data:
+            
+    ##      
+  ######    
+##  ##  ##  
+    ##      
+    ##      
+    ##      
+            
+            
+Code point: 17
+Name: ↓
+Unicode: U+00002193
+Width: 6
+Data:
+            
+    ##      
+    ##      
+    ##      
+##  ##  ##  
+  ######    
+    ##      
+            
+            
+Code point: 18
+Name: ←
+Unicode: U+00002190
+Width: 6
+Data:
+            
+            
+    ##      
+  ##        
+##########  
+  ##        
+    ##      
+            
+            
+Code point: 19
+Name: →
+Unicode: U+00002192
+Width: 6
+Data:
+            
+            
+    ##      
+      ##    
+##########  
+      ##    
+    ##      
+            
+            
+Code point: 20
+Name: ↔
+Unicode: U+00002194
+Width: 6
+Data:
+            
+            
+            
+  ##  ##    
+##########  
+  ##  ##    
+            
+            
+            
+Code point: 21
+Name: ○
+Unicode: U+000025CB
+Width: 6
+Data:
+            
+            
+  ######    
+##      ##  
+##      ##  
+##      ##  
+  ######    
+            
+            
+Code point: 22
+Name: •
+Unicode: U+00002022
+Width: 6
+Data:
+            
+            
+  ######    
+##########  
+##########  
+##########  
+  ######    
+            
+            
+Code point: 23
+Name: ∫
+Unicode: U+0000222B
+Width: 4
+Data:
+        
+    ##  
+  ##    
+  ##    
+  ##    
+  ##    
+  ##    
+##      
+        
+Code point: 24
+Name: ∃
+Unicode: U+00002203
+Width: 5
+Data:
+          
+########  
+      ##  
+  ######  
+      ##  
+      ##  
+########  
+          
+          
+Code point: 25
+Name: ∀
+Unicode: U+00002200
+Width: 6
+Data:
+            
+##    ##    
+##    ##    
+########    
+##    ##    
+##    ##    
+  ####      
+            
+            
+Code point: 26
+Name: ∴
+Unicode: U+00002234
+Width: 4
+Data:
+        
+        
+        
+  ##    
+        
+##  ##  
+        
+        
+        
+Code point: 27
+Name: √
+Unicode: U+0000221A
+Width: 7
+Data:
+          ##  
+          ##  
+        ##    
+        ##    
+####    ##    
+  ##  ##      
+  ##  ##      
+    ##        
+              
+Code point: 28
+Name: ≤
+Unicode: U+00002264
+Width: 4
+Data:
+        
+    ##  
+  ##    
+##      
+  ##    
+    ##  
+        
+######  
+        
+Code point: 29
+Name: ≈
+Unicode: U+00002248
+Width: 6
+Data:
+            
+            
+  ####  ##  
+##  ####    
+            
+  ####  ##  
+##  ####    
+            
+            
+Code point: 30
+Name: ≥
+Unicode: U+00002265
+Width: 4
+Data:
+        
+##      
+  ##    
+    ##  
+  ##    
+##      
+        
+######  
+        
+Code point: 31
+Name: ≠
+Unicode: U+00002260
+Width: 5
+Data:
+          
+          
+    ##    
+########  
+  ####    
+########  
+  ##      
+          
+          
+Code point: 32
+Name:  
+Unicode: U+00000020
+Width: 2
+Data:
+    
+    
+    
+    
+    
+    
+    
+    
+    
+Code point: 33
+Name: !
+Unicode: U+00000021
+Width: 2
+Data:
+    
+##  
+##  
+##  
+##  
+    
+##  
+    
+    
+Code point: 34
+Name: "
+Unicode: U+00000022
+Width: 4
+Data:
+        
+##  ##  
+##  ##  
+        
+        
+        
+        
+        
+        
+Code point: 35
+Name: #
+Unicode: U+00000023
+Width: 6
+Data:
+            
+  ##  ##    
+  ##  ##    
+##########  
+  ##  ##    
+##########  
+  ##  ##    
+  ##  ##    
+            
+Code point: 36
+Name: $
+Unicode: U+00000024
+Width: 6
+Data:
+            
+    ##      
+  ######    
+##  ##      
+  ######    
+    ##  ##  
+########    
+    ##      
+            
+Code point: 37
+Name: %
+Unicode: U+00000025
+Width: 4
+Data:
+        
+        
+##      
+##  ##  
+  ##    
+##  ##  
+    ##  
+        
+        
+Code point: 38
+Name: &
+Unicode: U+00000026
+Width: 5
+Data:
+          
+  ##      
+##  ##    
+  ##      
+##  ####  
+##  ##    
+  ##  ##  
+          
+          
+Code point: 39
+Name: '
+Unicode: U+00000027
+Width: 2
+Data:
+    
+##  
+##  
+    
+    
+    
+    
+    
+    
+Code point: 40
+Name: (
+Unicode: U+00000028
+Width: 3
+Data:
+      
+  ##  
+##    
+##    
+##    
+##    
+  ##  
+      
+      
+Code point: 41
+Name: )
+Unicode: U+00000029
+Width: 3
+Data:
+      
+##    
+  ##  
+  ##  
+  ##  
+  ##  
+##    
+      
+      
+Code point: 42
+Name: *
+Unicode: U+0000002A
+Width: 6
+Data:
+            
+    ##      
+##  ##  ##  
+  ######    
+##  ##  ##  
+    ##      
+            
+            
+            
+Code point: 43
+Name: +
+Unicode: U+0000002B
+Width: 4
+Data:
+        
+        
+        
+  ##    
+######  
+  ##    
+        
+        
+        
+Code point: 44
+Name: ,
+Unicode: U+0000002C
+Width: 3
+Data:
+      
+      
+      
+      
+      
+      
+  ##  
+  ##  
+##    
+Code point: 45
+Name: -
+Unicode: U+0000002D
+Width: 3
+Data:
+      
+      
+      
+      
+####  
+      
+      
+      
+      
+Code point: 46
+Name: .
+Unicode: U+0000002E
+Width: 2
+Data:
+    
+    
+    
+    
+    
+    
+##  
+    
+    
+Code point: 47
+Name: /
+Unicode: U+0000002F
+Width: 5
+Data:
+          
+      ##  
+      ##  
+    ##    
+  ##      
+##        
+##        
+          
+          
+Code point: 48
+Name: 0
+Unicode: U+00000030
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##  ####  
+####  ##  
+##    ##  
+  ####    
+          
+          
+Code point: 49
+Name: 1
+Unicode: U+00000031
+Width: 5
+Data:
+          
+    ##    
+  ####    
+    ##    
+    ##    
+    ##    
+  ######  
+          
+          
+Code point: 50
+Name: 2
+Unicode: U+00000032
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+      ##  
+  ####    
+##        
+########  
+          
+          
+Code point: 51
+Name: 3
+Unicode: U+00000033
+Width: 5
+Data:
+          
+######    
+      ##  
+  ####    
+      ##  
+      ##  
+######    
+          
+          
+Code point: 52
+Name: 4
+Unicode: U+00000034
+Width: 5
+Data:
+          
+    ##    
+  ####    
+##  ##    
+########  
+    ##    
+    ##    
+          
+          
+Code point: 53
+Name: 5
+Unicode: U+00000035
+Width: 5
+Data:
+          
+########  
+##        
+######    
+      ##  
+##    ##  
+  ####    
+          
+          
+Code point: 54
+Name: 6
+Unicode: U+00000036
+Width: 5
+Data:
+          
+  ####    
+##        
+######    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 55
+Name: 7
+Unicode: U+00000037
+Width: 5
+Data:
+          
+########  
+      ##  
+    ##    
+    ##    
+  ##      
+  ##      
+          
+          
+Code point: 56
+Name: 8
+Unicode: U+00000038
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 57
+Name: 9
+Unicode: U+00000039
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##    ##  
+  ######  
+      ##  
+  ####    
+          
+          
+Code point: 58
+Name: :
+Unicode: U+0000003A
+Width: 3
+Data:
+      
+      
+      
+##    
+      
+      
+##    
+      
+      
+Code point: 59
+Name: ;
+Unicode: U+0000003B
+Width: 3
+Data:
+      
+      
+      
+  ##  
+      
+      
+  ##  
+  ##  
+##    
+Code point: 60
+Name: <
+Unicode: U+0000003C
+Width: 4
+Data:
+        
+        
+    ##  
+  ##    
+##      
+  ##    
+    ##  
+        
+        
+Code point: 61
+Name: =
+Unicode: U+0000003D
+Width: 5
+Data:
+          
+          
+          
+########  
+          
+########  
+          
+          
+          
+Code point: 62
+Name: >
+Unicode: U+0000003E
+Width: 4
+Data:
+        
+        
+##      
+  ##    
+    ##  
+  ##    
+##      
+        
+        
+Code point: 63
+Name: ?
+Unicode: U+0000003F
+Width: 4
+Data:
+        
+  ##    
+##  ##  
+    ##  
+  ##    
+        
+  ##    
+        
+        
+Code point: 64
+Name: @
+Unicode: U+00000040
+Width: 6
+Data:
+            
+    ####    
+  ##    ##  
+##    ####  
+##  ##  ##  
+##  ##  ##  
+##    ##    
+  ##        
+    ####    
+Code point: 65
+Name: A
+Unicode: U+00000041
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##    ##  
+########  
+##    ##  
+##    ##  
+          
+          
+Code point: 66
+Name: B
+Unicode: U+00000042
+Width: 5
+Data:
+          
+######    
+##    ##  
+######    
+##    ##  
+##    ##  
+######    
+          
+          
+Code point: 67
+Name: C
+Unicode: U+00000043
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##        
+##        
+##    ##  
+  ####    
+          
+          
+Code point: 68
+Name: D
+Unicode: U+00000044
+Width: 5
+Data:
+          
+######    
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+######    
+          
+          
+Code point: 69
+Name: E
+Unicode: U+00000045
+Width: 5
+Data:
+          
+########  
+##        
+######    
+##        
+##        
+########  
+          
+          
+Code point: 70
+Name: F
+Unicode: U+00000046
+Width: 5
+Data:
+          
+########  
+##        
+######    
+##        
+##        
+##        
+          
+          
+Code point: 71
+Name: G
+Unicode: U+00000047
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##        
+##  ####  
+##    ##  
+  ####    
+          
+          
+Code point: 72
+Name: H
+Unicode: U+00000048
+Width: 5
+Data:
+          
+##    ##  
+##    ##  
+########  
+##    ##  
+##    ##  
+##    ##  
+          
+          
+Code point: 73
+Name: I
+Unicode: U+00000049
+Width: 4
+Data:
+        
+######  
+  ##    
+  ##    
+  ##    
+  ##    
+######  
+        
+        
+Code point: 74
+Name: J
+Unicode: U+0000004A
+Width: 4
+Data:
+        
+  ######
+    ##  
+    ##  
+    ##  
+##  ##  
+  ##    
+        
+        
+Code point: 75
+Name: K
+Unicode: U+0000004B
+Width: 5
+Data:
+          
+##    ##  
+##  ##    
+####      
+##  ##    
+##    ##  
+##    ##  
+          
+          
+Code point: 76
+Name: L
+Unicode: U+0000004C
+Width: 5
+Data:
+          
+##        
+##        
+##        
+##        
+##        
+########  
+          
+          
+Code point: 77
+Name: M
+Unicode: U+0000004D
+Width: 6
+Data:
+            
+##      ##  
+####  ####  
+##  ##  ##  
+##  ##  ##  
+##      ##  
+##      ##  
+            
+            
+Code point: 78
+Name: N
+Unicode: U+0000004E
+Width: 5
+Data:
+          
+##    ##  
+####  ##  
+##  ####  
+##    ##  
+##    ##  
+##    ##  
+          
+          
+Code point: 79
+Name: O
+Unicode: U+0000004F
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 80
+Name: P
+Unicode: U+00000050
+Width: 5
+Data:
+          
+######    
+##    ##  
+##    ##  
+######    
+##        
+##        
+          
+          
+Code point: 81
+Name: Q
+Unicode: U+00000051
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##    ##  
+####  ##  
+##  ####  
+  ####    
+      ##  
+          
+Code point: 82
+Name: R
+Unicode: U+00000052
+Width: 5
+Data:
+          
+######    
+##    ##  
+##    ##  
+######    
+##    ##  
+##    ##  
+          
+          
+Code point: 83
+Name: S
+Unicode: U+00000053
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+  ##      
+    ##    
+##    ##  
+  ####    
+          
+          
+Code point: 84
+Name: T
+Unicode: U+00000054
+Width: 4
+Data:
+        
+######  
+  ##    
+  ##    
+  ##    
+  ##    
+  ##    
+        
+        
+Code point: 85
+Name: U
+Unicode: U+00000055
+Width: 5
+Data:
+          
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 86
+Name: V
+Unicode: U+00000056
+Width: 6
+Data:
+            
+##      ##  
+##      ##  
+##      ##  
+  ##  ##    
+  ##  ##    
+    ##      
+            
+            
+Code point: 87
+Name: W
+Unicode: U+00000057
+Width: 6
+Data:
+            
+##      ##  
+##  ##  ##  
+##  ##  ##  
+##  ##  ##  
+  ##  ##    
+  ##  ##    
+            
+            
+Code point: 88
+Name: X
+Unicode: U+00000058
+Width: 5
+Data:
+          
+##    ##  
+##    ##  
+  ####    
+  ####    
+##    ##  
+##    ##  
+          
+          
+Code point: 89
+Name: Y
+Unicode: U+00000059
+Width: 6
+Data:
+            
+##      ##  
+##      ##  
+  ##  ##    
+    ##      
+    ##      
+    ##      
+            
+            
+Code point: 90
+Name: Z
+Unicode: U+0000005A
+Width: 5
+Data:
+          
+########  
+      ##  
+    ##    
+  ##      
+##        
+########  
+          
+          
+Code point: 91
+Name: [
+Unicode: U+0000005B
+Width: 3
+Data:
+      
+####  
+##    
+##    
+##    
+##    
+##    
+####  
+      
+Code point: 92
+Name: \
+Unicode: U+0000005C
+Width: 5
+Data:
+          
+##        
+##        
+  ##      
+    ##    
+      ##  
+      ##  
+          
+          
+Code point: 93
+Name: ]
+Unicode: U+0000005D
+Width: 3
+Data:
+      
+####  
+  ##  
+  ##  
+  ##  
+  ##  
+  ##  
+####  
+      
+Code point: 94
+Name: ^
+Unicode: U+0000005E
+Width: 4
+Data:
+        
+  ##    
+##  ##  
+        
+        
+        
+        
+        
+        
+Code point: 95
+Name: _
+Unicode: U+0000005F
+Width: 5
+Data:
+          
+          
+          
+          
+          
+          
+          
+########  
+          
+Code point: 96
+Name: `
+Unicode: U+00000060
+Width: 3
+Data:
+      
+##    
+  ##  
+      
+      
+      
+      
+      
+      
+Code point: 97
+Name: a
+Unicode: U+00000061
+Width: 5
+Data:
+          
+          
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 98
+Name: b
+Unicode: U+00000062
+Width: 5
+Data:
+          
+##        
+##        
+######    
+##    ##  
+##    ##  
+######    
+          
+          
+Code point: 99
+Name: c
+Unicode: U+00000063
+Width: 4
+Data:
+        
+        
+        
+  ####  
+##      
+##      
+  ####  
+        
+        
+Code point: 100
+Name: d
+Unicode: U+00000064
+Width: 5
+Data:
+          
+      ##  
+      ##  
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 101
+Name: e
+Unicode: U+00000065
+Width: 4
+Data:
+        
+        
+        
+  ##    
+##  ##  
+####    
+  ####  
+        
+        
+Code point: 102
+Name: f
+Unicode: U+00000066
+Width: 4
+Data:
+        
+    ##  
+  ##  ##
+  ##    
+######  
+  ##    
+  ##    
+        
+        
+Code point: 103
+Name: g
+Unicode: U+00000067
+Width: 5
+Data:
+          
+          
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+      ##  
+  ####    
+Code point: 104
+Name: h
+Unicode: U+00000068
+Width: 5
+Data:
+          
+##        
+##        
+######    
+##    ##  
+##    ##  
+##    ##  
+          
+          
+Code point: 105
+Name: i
+Unicode: U+00000069
+Width: 2
+Data:
+    
+##  
+    
+##  
+##  
+##  
+##  
+    
+    
+Code point: 106
+Name: j
+Unicode: U+0000006A
+Width: 4
+Data:
+        
+    ##  
+        
+    ##  
+    ##  
+    ##  
+##  ##  
+  ##    
+        
+Code point: 107
+Name: k
+Unicode: U+0000006B
+Width: 5
+Data:
+          
+##        
+##        
+##    ##  
+######    
+##  ##    
+##    ##  
+          
+          
+Code point: 108
+Name: l
+Unicode: U+0000006C
+Width: 2
+Data:
+    
+##  
+##  
+##  
+##  
+##  
+##  
+    
+    
+Code point: 109
+Name: m
+Unicode: U+0000006D
+Width: 6
+Data:
+            
+            
+            
+####  ##    
+##  ##  ##  
+##  ##  ##  
+##  ##  ##  
+            
+            
+Code point: 110
+Name: n
+Unicode: U+0000006E
+Width: 5
+Data:
+          
+          
+          
+##  ##    
+####  ##  
+##    ##  
+##    ##  
+          
+          
+Code point: 111
+Name: o
+Unicode: U+0000006F
+Width: 5
+Data:
+          
+          
+          
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 112
+Name: p
+Unicode: U+00000070
+Width: 5
+Data:
+          
+          
+          
+######    
+##    ##  
+##    ##  
+######    
+##        
+##        
+Code point: 113
+Name: q
+Unicode: U+00000071
+Width: 5
+Data:
+          
+          
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+      ##  
+      ####
+Code point: 114
+Name: r
+Unicode: U+00000072
+Width: 4
+Data:
+        
+        
+        
+##  ##  
+####    
+##      
+##      
+        
+        
+Code point: 115
+Name: s
+Unicode: U+00000073
+Width: 5
+Data:
+          
+          
+          
+  ######  
+####      
+    ####  
+######    
+          
+          
+Code point: 116
+Name: t
+Unicode: U+00000074
+Width: 4
+Data:
+        
+  ##    
+  ##    
+######  
+  ##    
+  ##    
+    ##  
+        
+        
+Code point: 117
+Name: u
+Unicode: U+00000075
+Width: 5
+Data:
+          
+          
+          
+##    ##  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 118
+Name: v
+Unicode: U+00000076
+Width: 4
+Data:
+        
+        
+        
+##  ##  
+##  ##  
+  ##    
+  ##    
+        
+        
+Code point: 119
+Name: w
+Unicode: U+00000077
+Width: 6
+Data:
+            
+            
+            
+##  ##  ##  
+##  ##  ##  
+  ##  ##    
+  ##  ##    
+            
+            
+Code point: 120
+Name: x
+Unicode: U+00000078
+Width: 4
+Data:
+        
+        
+        
+##  ##  
+  ##    
+  ##    
+##  ##  
+        
+        
+Code point: 121
+Name: y
+Unicode: U+00000079
+Width: 5
+Data:
+          
+          
+          
+##    ##  
+##    ##  
+##    ##  
+  ######  
+      ##  
+  ####    
+Code point: 122
+Name: z
+Unicode: U+0000007A
+Width: 5
+Data:
+          
+          
+          
+########  
+    ##    
+  ##      
+########  
+          
+          
+Code point: 123
+Name: {
+Unicode: U+0000007B
+Width: 5
+Data:
+          
+    ####  
+  ##      
+  ##      
+##        
+  ##      
+  ##      
+    ####  
+          
+Code point: 124
+Name: |
+Unicode: U+0000007C
+Width: 2
+Data:
+    
+##  
+##  
+##  
+##  
+##  
+##  
+##  
+    
+Code point: 125
+Name: }
+Unicode: U+0000007D
+Width: 5
+Data:
+          
+####      
+    ##    
+    ##    
+      ##  
+    ##    
+    ##    
+####      
+          
+Code point: 126
+Name: ~
+Unicode: U+0000007E
+Width: 5
+Data:
+          
+          
+          
+  ##  ##  
+##  ##    
+          
+          
+          
+          
+Code point: 127
+Name: ∞
+Unicode: U+0000221E
+Width: 6
+Data:
+            
+            
+            
+  ##  ##    
+##  ##  ##  
+  ##  ##    
+            
+            
+            
+Code point: 128
+Name: €
+Unicode: U+000020AC
+Width: 5
+Data:
+          
+    ####  
+  ##      
+######    
+  ##      
+######    
+  ##      
+    ####  
+          
+Code point: 129
+Name: π
+Unicode: U+000003C0
+Width: 6
+Data:
+            
+            
+            
+##########  
+  ##  ##    
+  ##  ##    
+  ##  ##    
+            
+            
+Code point: 130
+Name: ‚
+Unicode: U+0000201A
+Width: 3
+Data:
+      
+      
+      
+      
+      
+      
+  ##  
+  ##  
+##    
+Code point: 131
+Name: ε
+Unicode: U+000003B5
+Width: 5
+Data:
+          
+          
+  ####    
+##    ##  
+  ##      
+##    ##  
+  ####    
+          
+          
+Code point: 132
+Name: „
+Unicode: U+0000201E
+Width: 6
+Data:
+            
+            
+            
+            
+            
+            
+  ##  ##    
+  ##  ##    
+##  ##      
+Code point: 133
+Name: α
+Unicode: U+000003B1
+Width: 6
+Data:
+            
+            
+            
+  ####  ##  
+##    ##    
+##    ##    
+  ####  ##  
+            
+            
+Code point: 134
+Name: †
+Unicode: U+00002020
+Width: 4
+Data:
+  ##    
+######  
+  ##    
+  ##    
+  ##    
+        
+        
+        
+        
+Code point: 135
+Name: ‡
+Unicode: U+00002021
+Width: 4
+Data:
+  ##    
+######  
+  ##    
+######  
+  ##    
+        
+        
+        
+        
+Code point: 136
+Name: Γ
+Unicode: U+00000393
+Width: 5
+Data:
+          
+########  
+##        
+##        
+##        
+##        
+##        
+          
+          
+Code point: 137
+Name: ‰
+Unicode: U+00002030
+Width: 6
+Data:
+            
+            
+##          
+##  ##      
+  ##        
+##  ##  ##  
+    ##  ##  
+            
+            
+Code point: 138
+Name: Š
+Unicode: U+00000160
+Width: 5
+Data:
+  ##  ##  
+    ##    
+  ######  
+##        
+  ####    
+      ##  
+######    
+          
+          
+Code point: 139
+Name: ‹
+Unicode: U+00002039
+Width: 3
+Data:
+      
+      
+      
+  ##  
+##    
+  ##  
+      
+      
+      
+Code point: 140
+Name: Œ
+Unicode: U+00000152
+Width: 8
+Data:
+                
+  ############  
+##    ##        
+##    ######    
+##    ##        
+##    ##        
+  ############  
+                
+                
+Code point: 141
+Name: Σ
+Unicode: U+000003A3
+Width: 5
+Data:
+          
+########  
+##        
+  ##      
+  ##      
+##        
+########  
+          
+          
+Code point: 142
+Name: Ž
+Unicode: U+0000017D
+Width: 5
+Data:
+  ##  ##  
+    ##    
+########  
+    ##    
+  ##      
+##        
+########  
+          
+          
+Code point: 143
+Name: φ
+Unicode: U+000003C6
+Width: 6
+Data:
+            
+            
+            
+##    ##    
+##  ##  ##  
+##  ##  ##  
+  ######    
+    ##      
+    ##      
+Code point: 144
+Name: Π
+Unicode: U+000003A0
+Width: 5
+Data:
+          
+########  
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+          
+          
+Code point: 145
+Name: ‘
+Unicode: U+00002018
+Width: 3
+Data:
+      
+  ##  
+##    
+##    
+      
+      
+      
+      
+      
+Code point: 146
+Name: ’
+Unicode: U+00002019
+Width: 3
+Data:
+      
+  ##  
+  ##  
+##    
+      
+      
+      
+      
+      
+Code point: 147
+Name: “
+Unicode: U+0000201C
+Width: 5
+Data:
+          
+  ##  ##  
+##  ##    
+##  ##    
+          
+          
+          
+          
+          
+Code point: 148
+Name: ”
+Unicode: U+0000201D
+Width: 5
+Data:
+          
+  ##  ##  
+  ##  ##  
+##  ##    
+          
+          
+          
+          
+          
+Code point: 149
+Name: •
+Unicode: U+00002022
+Width: 5
+Data:
+          
+          
+          
+  ####    
+########  
+########  
+  ####    
+          
+          
+Code point: 150
+Name: –
+Unicode: U+00002013
+Width: 5
+Data:
+          
+          
+          
+          
+########  
+          
+          
+          
+          
+Code point: 151
+Name: —
+Unicode: U+00002014
+Width: 6
+Data:
+            
+            
+            
+            
+##########  
+            
+            
+            
+            
+Code point: 152
+Name: γ
+Unicode: U+000003B3
+Width: 6
+Data:
+            
+            
+            
+##      ##  
+##      ##  
+  ##  ##    
+    ##      
+    ##      
+    ##      
+Code point: 153
+Name: ξ
+Unicode: U+000003BE
+Width: 4
+Data:
+        
+######  
+  ##    
+##      
+  ####  
+##      
+  ####  
+      ##
+    ##  
+Code point: 154
+Name: š
+Unicode: U+00000161
+Width: 5
+Data:
+##  ##    
+  ##      
+          
+  ######  
+####      
+    ####  
+######    
+          
+          
+Code point: 155
+Name: ›
+Unicode: U+0000203A
+Width: 3
+Data:
+      
+      
+      
+##    
+  ##  
+##    
+      
+      
+      
+Code point: 156
+Name: œ
+Unicode: U+00000153
+Width: 6
+Data:
+            
+            
+            
+  ######    
+##  ##  ##  
+##  ####    
+  ########  
+            
+            
+Code point: 157
+Name: σ
+Unicode: U+000003C3
+Width: 5
+Data:
+          
+          
+          
+  ########
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 158
+Name: ž
+Unicode: U+0000017E
+Width: 5
+Data:
+          
+  ##  ##  
+    ##    
+########  
+    ##    
+  ##      
+########  
+          
+          
+Code point: 159
+Name: Ÿ
+Unicode: U+00000178
+Width: 6
+Data:
+  ##  ##    
+            
+##      ##  
+  ##  ##    
+    ##      
+    ##      
+    ##      
+            
+            
+Code point: 160
+Name:  
+Unicode: U+00000020
+Width: 2
+Data:
+    
+    
+    
+    
+    
+    
+    
+    
+    
+Code point: 161
+Name: ¡
+Unicode: U+000000A1
+Width: 2
+Data:
+    
+    
+##  
+    
+##  
+##  
+##  
+##  
+    
+Code point: 162
+Name: ¢
+Unicode: U+000000A2
+Width: 5
+Data:
+          
+          
+    ##    
+  ######  
+##  ##    
+##  ##    
+  ######  
+    ##    
+          
+Code point: 163
+Name: £
+Unicode: U+000000A3
+Width: 5
+Data:
+          
+    ##    
+  ##  ##  
+######    
+  ##      
+  ##  ##  
+##  ##    
+          
+          
+Code point: 164
+Name: ¤
+Unicode: U+000000A4
+Width: 6
+Data:
+            
+            
+##      ##  
+  ######    
+  ##  ##    
+  ######    
+##      ##  
+            
+            
+Code point: 165
+Name: Ω
+Unicode: U+000003A9
+Width: 6
+Data:
+            
+  ######    
+##      ##  
+##      ##  
+##      ##  
+  ##  ##    
+####  ####  
+            
+            
+Code point: 166
+Name: ω
+Unicode: U+000003C9
+Width: 6
+Data:
+            
+            
+            
+  ##  ##    
+##      ##  
+##  ##  ##  
+  ##  ##    
+            
+            
+Code point: 167
+Name: §
+Unicode: U+000000A7
+Width: 5
+Data:
+          
+  ######  
+##        
+######    
+##    ##  
+  ######  
+      ##  
+######    
+          
+Code point: 168
+Name: Λ
+Unicode: U+0000039B
+Width: 6
+Data:
+            
+    ##      
+  ##  ##    
+  ##  ##    
+##      ##  
+##      ##  
+##      ##  
+            
+            
+Code point: 169
+Name: η
+Unicode: U+000003B7
+Width: 8
+Data:
+                
+                
+                
+##  ##          
+####  ##        
+##    ##        
+##    ##        
+      ##        
+      ##        
+Code point: 170
+Name: ª
+Unicode: U+000000AA
+Width: 4
+Data:
+        
+  ####  
+##  ##  
+  ####  
+        
+######  
+        
+        
+        
+Code point: 171
+Name: «
+Unicode: U+000000AB
+Width: 5
+Data:
+          
+          
+          
+  ##  ##  
+##  ##    
+  ##  ##  
+          
+          
+          
+Code point: 172
+Name: ¬
+Unicode: U+000000AC
+Width: 4
+Data:
+        
+        
+        
+        
+######  
+    ##  
+    ##  
+        
+        
+Code point: 173
+Name: −
+Unicode: U+00002212
+Width: 4
+Data:
+        
+        
+        
+        
+######  
+        
+        
+        
+        
+Code point: 174
+Name: Δ
+Unicode: U+00000394
+Width: 6
+Data:
+            
+    ##      
+  ##  ##    
+  ##  ##    
+##      ##  
+##      ##  
+##########  
+            
+            
+Code point: 175
+Name: δ
+Unicode: U+000003B4
+Width: 5
+Data:
+          
+########  
+  ##      
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 176
+Name: °
+Unicode: U+000000B0
+Width: 4
+Data:
+        
+  ##    
+##  ##  
+  ##    
+        
+        
+        
+        
+        
+Code point: 177
+Name: ±
+Unicode: U+000000B1
+Width: 4
+Data:
+        
+        
+  ##    
+######  
+  ##    
+        
+######  
+        
+        
+Code point: 178
+Name: ²
+Unicode: U+000000B2
+Width: 4
+Data:
+  ##    
+##  ##  
+    ##  
+  ##    
+######  
+        
+        
+        
+        
+Code point: 179
+Name: ³
+Unicode: U+000000B3
+Width: 4
+Data:
+####    
+    ##  
+####    
+    ##  
+####    
+        
+        
+        
+        
+Code point: 180
+Name: θ
+Unicode: U+000003B8
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+########  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 181
+Name: µ
+Unicode: U+000000B5
+Width: 5
+Data:
+          
+          
+          
+##    ##  
+##    ##  
+##    ##  
+######  ##
+##        
+          
+Code point: 182
+Name: ¶
+Unicode: U+000000B6
+Width: 6
+Data:
+            
+  ########  
+######  ##  
+######  ##  
+  ####  ##  
+    ##  ##  
+    ##  ##  
+            
+            
+Code point: 183
+Name: ·
+Unicode: U+000000B7
+Width: 2
+Data:
+    
+    
+    
+    
+##  
+    
+    
+    
+    
+Code point: 184
+Name: λ
+Unicode: U+000003BB
+Width: 6
+Data:
+            
+####        
+    ##      
+  ##  ##    
+  ##  ##    
+##      ##  
+##      ##  
+            
+            
+Code point: 185
+Name: ¹
+Unicode: U+000000B9
+Width: 4
+Data:
+  ##    
+####    
+  ##    
+  ##    
+######  
+        
+        
+        
+        
+Code point: 186
+Name: º
+Unicode: U+000000BA
+Width: 4
+Data:
+        
+  ##    
+##  ##  
+  ##    
+        
+######  
+        
+        
+        
+Code point: 187
+Name: »
+Unicode: U+000000BB
+Width: 5
+Data:
+          
+          
+          
+##  ##    
+  ##  ##  
+##  ##    
+          
+          
+          
+Code point: 188
+Name: ¼
+Unicode: U+000000BC
+Width: 7
+Data:
+              
+  ##          
+####      ##  
+  ##    ##    
+  ##  ##  ##  
+    ##  ####  
+  ##  ######  
+          ##  
+              
+Code point: 189
+Name: ½
+Unicode: U+000000BD
+Width: 8
+Data:
+                
+  ##            
+####      ##    
+  ##    ##      
+  ##  ##  ##    
+    ##  ##  ##  
+  ##        ##  
+          ##    
+        ######  
+Code point: 190
+Name: ¾
+Unicode: U+000000BE
+Width: 8
+Data:
+                
+####            
+    ##      ##  
+  ##      ##    
+    ##  ##  ##  
+####  ##  ####  
+    ##  ######  
+            ##  
+                
+Code point: 191
+Name: ¿
+Unicode: U+000000BF
+Width: 4
+Data:
+        
+        
+  ##    
+        
+  ##    
+##      
+##  ##  
+  ##    
+        
+Code point: 192
+Name: À
+Unicode: U+000000C0
+Width: 5
+Data:
+  ##      
+    ##    
+  ####    
+##    ##  
+########  
+##    ##  
+##    ##  
+          
+          
+Code point: 193
+Name: Á
+Unicode: U+000000C1
+Width: 5
+Data:
+    ##    
+  ##      
+  ####    
+##    ##  
+########  
+##    ##  
+##    ##  
+          
+          
+Code point: 194
+Name: Â
+Unicode: U+000000C2
+Width: 5
+Data:
+    ##    
+  ##  ##  
+  ####    
+##    ##  
+########  
+##    ##  
+##    ##  
+          
+          
+Code point: 195
+Name: Ã
+Unicode: U+000000C3
+Width: 5
+Data:
+  ##  ##  
+##  ##    
+  ####    
+##    ##  
+########  
+##    ##  
+##    ##  
+          
+          
+Code point: 196
+Name: Ä
+Unicode: U+000000C4
+Width: 5
+Data:
+##    ##  
+          
+  ####    
+##    ##  
+########  
+##    ##  
+##    ##  
+          
+          
+Code point: 197
+Name: Å
+Unicode: U+000000C5
+Width: 5
+Data:
+  ####    
+##    ##  
+  ####    
+##    ##  
+########  
+##    ##  
+##    ##  
+          
+          
+Code point: 198
+Name: Æ
+Unicode: U+000000C6
+Width: 8
+Data:
+                
+  ############  
+##    ##        
+##    ######    
+########        
+##    ##        
+##    ########  
+                
+                
+Code point: 199
+Name: Ç
+Unicode: U+000000C7
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##        
+##        
+##    ##  
+  ####    
+####      
+          
+Code point: 200
+Name: È
+Unicode: U+000000C8
+Width: 5
+Data:
+  ##      
+    ##    
+########  
+##        
+######    
+##        
+########  
+          
+          
+Code point: 201
+Name: É
+Unicode: U+000000C9
+Width: 5
+Data:
+    ##    
+  ##      
+########  
+##        
+######    
+##        
+########  
+          
+          
+Code point: 202
+Name: Ê
+Unicode: U+000000CA
+Width: 5
+Data:
+    ##    
+  ##  ##  
+########  
+##        
+######    
+##        
+########  
+          
+          
+Code point: 203
+Name: Ë
+Unicode: U+000000CB
+Width: 5
+Data:
+##    ##  
+          
+########  
+##        
+######    
+##        
+########  
+          
+          
+Code point: 204
+Name: Ì
+Unicode: U+000000CC
+Width: 4
+Data:
+##      
+  ##    
+######  
+  ##    
+  ##    
+  ##    
+######  
+        
+        
+Code point: 205
+Name: Í
+Unicode: U+000000CD
+Width: 4
+Data:
+    ##  
+  ##    
+######  
+  ##    
+  ##    
+  ##    
+######  
+        
+        
+Code point: 206
+Name: Î
+Unicode: U+000000CE
+Width: 4
+Data:
+  ##    
+##  ##  
+######  
+  ##    
+  ##    
+  ##    
+######  
+        
+        
+Code point: 207
+Name: Ï
+Unicode: U+000000CF
+Width: 4
+Data:
+##  ##  
+        
+######  
+  ##    
+  ##    
+  ##    
+######  
+        
+        
+Code point: 208
+Name: Ð
+Unicode: U+000000D0
+Width: 6
+Data:
+            
+  ######    
+  ##    ##  
+######  ##  
+  ##    ##  
+  ##    ##  
+  ######    
+            
+            
+Code point: 209
+Name: Ñ
+Unicode: U+000000D1
+Width: 5
+Data:
+  ##  ##  
+##  ##    
+##    ##  
+####  ##  
+##  ####  
+##    ##  
+##    ##  
+          
+          
+Code point: 210
+Name: Ò
+Unicode: U+000000D2
+Width: 5
+Data:
+  ##      
+    ##    
+  ####    
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 211
+Name: Ó
+Unicode: U+000000D3
+Width: 5
+Data:
+    ##    
+  ##      
+  ####    
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 212
+Name: Ô
+Unicode: U+000000D4
+Width: 5
+Data:
+    ##    
+  ##  ##  
+  ####    
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 213
+Name: Õ
+Unicode: U+000000D5
+Width: 5
+Data:
+  ##  ##  
+##  ##    
+  ####    
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 214
+Name: Ö
+Unicode: U+000000D6
+Width: 5
+Data:
+##    ##  
+          
+  ####    
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 215
+Name: ×
+Unicode: U+000000D7
+Width: 4
+Data:
+        
+        
+        
+##  ##  
+  ##    
+##  ##  
+        
+        
+        
+Code point: 216
+Name: Ø
+Unicode: U+000000D8
+Width: 5
+Data:
+      ##  
+  ####    
+##  ####  
+##  ####  
+####  ##  
+####  ##  
+  ####    
+##        
+          
+Code point: 217
+Name: Ù
+Unicode: U+000000D9
+Width: 5
+Data:
+  ##      
+    ##    
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 218
+Name: Ú
+Unicode: U+000000DA
+Width: 5
+Data:
+    ##    
+  ##      
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 219
+Name: Û
+Unicode: U+000000DB
+Width: 5
+Data:
+    ##    
+  ##  ##  
+          
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 220
+Name: Ü
+Unicode: U+000000DC
+Width: 5
+Data:
+##    ##  
+          
+##    ##  
+##    ##  
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 221
+Name: Ý
+Unicode: U+000000DD
+Width: 6
+Data:
+      ##    
+    ##      
+##      ##  
+  ##  ##    
+    ##      
+    ##      
+    ##      
+            
+            
+Code point: 222
+Name: Þ
+Unicode: U+000000DE
+Width: 5
+Data:
+          
+##        
+######    
+##    ##  
+##    ##  
+######    
+##        
+          
+          
+Code point: 223
+Name: ß
+Unicode: U+000000DF
+Width: 5
+Data:
+          
+  ####    
+##    ##  
+##  ##    
+##  ##    
+##    ##  
+##  ##    
+          
+          
+Code point: 224
+Name: à
+Unicode: U+000000E0
+Width: 5
+Data:
+  ##      
+    ##    
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 225
+Name: á
+Unicode: U+000000E1
+Width: 5
+Data:
+    ##    
+  ##      
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 226
+Name: â
+Unicode: U+000000E2
+Width: 5
+Data:
+    ##    
+  ##  ##  
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 227
+Name: ã
+Unicode: U+000000E3
+Width: 5
+Data:
+  ##  ##  
+##  ##    
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 228
+Name: ä
+Unicode: U+000000E4
+Width: 5
+Data:
+          
+  ##  ##  
+          
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 229
+Name: å
+Unicode: U+000000E5
+Width: 5
+Data:
+    ##    
+  ##  ##  
+    ##    
+  ######  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 230
+Name: æ
+Unicode: U+000000E6
+Width: 7
+Data:
+              
+              
+              
+  ########    
+##    ##  ##  
+##    ####    
+  ##########  
+              
+              
+Code point: 231
+Name: ç
+Unicode: U+000000E7
+Width: 4
+Data:
+        
+        
+        
+  ####  
+##      
+##      
+  ####  
+  ##    
+        
+Code point: 232
+Name: è
+Unicode: U+000000E8
+Width: 4
+Data:
+  ##    
+    ##  
+        
+  ##    
+##  ##  
+####    
+  ####  
+        
+        
+Code point: 233
+Name: é
+Unicode: U+000000E9
+Width: 4
+Data:
+    ##  
+  ##    
+        
+  ##    
+##  ##  
+####    
+  ####  
+        
+        
+Code point: 234
+Name: ê
+Unicode: U+000000EA
+Width: 4
+Data:
+  ##    
+##  ##  
+  ##    
+  ##    
+##  ##  
+####    
+  ####  
+        
+        
+Code point: 235
+Name: ë
+Unicode: U+000000EB
+Width: 4
+Data:
+        
+##  ##  
+        
+  ##    
+##  ##  
+####    
+  ####  
+        
+        
+Code point: 236
+Name: ì
+Unicode: U+000000EC
+Width: 2
+Data:
+##  
+  ##
+    
+##  
+##  
+##  
+##  
+    
+    
+Code point: 237
+Name: í
+Unicode: U+000000ED
+Width: 2
+Data:
+  ##
+##  
+    
+##  
+##  
+##  
+##  
+    
+    
+Code point: 238
+Name: î
+Unicode: U+000000EE
+Width: 3
+Data:
+  ##  
+##  ##
+      
+  ##  
+  ##  
+  ##  
+  ##  
+      
+      
+Code point: 239
+Name: ï
+Unicode: U+000000EF
+Width: 3
+Data:
+      
+##  ##
+      
+  ##  
+  ##  
+  ##  
+  ##  
+      
+      
+Code point: 240
+Name: ð
+Unicode: U+000000F0
+Width: 5
+Data:
+##  ##    
+  ##      
+##  ##    
+      ##  
+  ######  
+##    ##  
+  ####    
+          
+          
+Code point: 241
+Name: ñ
+Unicode: U+000000F1
+Width: 5
+Data:
+  ##  ##  
+##  ##    
+          
+##  ##    
+####  ##  
+##    ##  
+##    ##  
+          
+          
+Code point: 242
+Name: ò
+Unicode: U+000000F2
+Width: 5
+Data:
+  ##      
+    ##    
+          
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 243
+Name: ó
+Unicode: U+000000F3
+Width: 5
+Data:
+    ##    
+  ##      
+          
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 244
+Name: ô
+Unicode: U+000000F4
+Width: 5
+Data:
+    ##    
+  ##  ##  
+          
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 245
+Name: õ
+Unicode: U+000000F5
+Width: 5
+Data:
+  ##  ##  
+##  ##    
+          
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 246
+Name: ö
+Unicode: U+000000F6
+Width: 5
+Data:
+          
+##    ##  
+          
+  ####    
+##    ##  
+##    ##  
+  ####    
+          
+          
+Code point: 247
+Name: ÷
+Unicode: U+000000F7
+Width: 4
+Data:
+        
+        
+  ##    
+        
+######  
+        
+  ##    
+        
+        
+Code point: 248
+Name: ø
+Unicode: U+000000F8
+Width: 5
+Data:
+          
+          
+          
+  ######  
+##  ####  
+####  ##  
+######    
+          
+          
+Code point: 249
+Name: ù
+Unicode: U+000000F9
+Width: 5
+Data:
+  ##      
+    ##    
+          
+##    ##  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 250
+Name: ú
+Unicode: U+000000FA
+Width: 5
+Data:
+    ##    
+  ##      
+          
+          
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 251
+Name: û
+Unicode: U+000000FB
+Width: 5
+Data:
+    ##    
+  ##  ##  
+          
+##    ##  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 252
+Name: ü
+Unicode: U+000000FC
+Width: 5
+Data:
+          
+##    ##  
+          
+##    ##  
+##    ##  
+##    ##  
+  ######  
+          
+          
+Code point: 253
+Name: ý
+Unicode: U+000000FD
+Width: 5
+Data:
+    ##    
+  ##      
+          
+##    ##  
+##    ##  
+##    ##  
+  ######  
+      ##  
+  ####    
+Code point: 254
+Name: þ
+Unicode: U+000000FE
+Width: 5
+Data:
+          
+          
+##        
+##        
+######    
+##    ##  
+######    
+##        
+##        
+Code point: 255
+Name: ÿ
+Unicode: U+000000FF
+Width: 5
+Data:
+          
+##    ##  
+          
+##    ##  
+##    ##  
+##    ##  
+  ######  
+      ##  
+  ####    
