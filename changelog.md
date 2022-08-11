@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v10.2...master)
 
-# [v10.2](https://github.com/CE-Programming/toolchain/releases/tag/v10.2) (2021-08-10)
+# [v10.2](https://github.com/CE-Programming/toolchain/releases/tag/v10.2) (2022-08-10)
 
 * **New features**
   * Add `os_Eval` and `os_EvalVar` for direct evalution of equations by @mateoconlechuga.
@@ -26,7 +26,7 @@
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v10.1...v10.2)
 
-# [v10.1](https://github.com/CE-Programming/toolchain/releases/tag/v10.1) (2021-06-03)
+# [v10.1](https://github.com/CE-Programming/toolchain/releases/tag/v10.1) (2022-06-03)
 
 * **New features**
   * Adds `byteswap.h` header file as standard.
@@ -48,7 +48,7 @@
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v10.0...v10.1)
 
-# [v10.0](https://github.com/CE-Programming/toolchain/releases/tag/v10.0) (2021-05-25)
+# [v10.0](https://github.com/CE-Programming/toolchain/releases/tag/v10.0) (2022-05-25)
 
 * **New features**:
   * Implement 64-bit math support. By @runer112 in https://github.com/CE-Programming/toolchain/pull/354
