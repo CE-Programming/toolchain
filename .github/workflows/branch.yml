@@ -4,6 +4,7 @@ on:
   push:
     branches-ignore:
       - gh-pages
+      - master
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
