@@ -1,11 +1,9 @@
-name: Win/Mac/Linux
+name: Win/Mac/Linux Test
 
 on:
   push:
-    tags:
-      - v* # push events versioned tags
-    branches:
-      - master
+    branches-ignore:
+      - gh-pages
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
@@ -22,26 +20,25 @@ env:
   TOOLCHAIN_PATH: ${{github.workspace}}/toolchain
 
 jobs:
-  build:
+  build-and-test:
+    environment: Autotester
     strategy:
       fail-fast: false
       matrix:
         runs-on: [ubuntu, macos, windows]
+        compressed: [YES, NO]
         include:
           - nul: /dev/null
           - runs-on: macos
             fasmg: /source/macos/x64/fasmg
-            install-output-ext: "dmg"
           - runs-on: windows
             fasmg: /fasmg.exe
             env: "env:"
             exe: .exe
             nul: nul
             ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
-            install-output-ext: "zip"
           - runs-on: ubuntu
             fasmg: /fasmg.x64
-            install-output-ext: "tar.gz"
     runs-on: ${{matrix.runs-on}}-latest
     steps:
       - name: Prepare Build Environment
@@ -139,128 +136,29 @@ jobs:
         if: runner.os != 'Windows'
         run: chmod +x ${{env.CEDEV_BIN}}/*
 
-      - name: "[macOS] CodeSign Toolchain binaries"
-        if: runner.os == 'macOS' && github.repository == 'CE-Programming/toolchain' # don't run on forks, since they don't have secrets
-        env:
-          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
-          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
-          MACOS_KEYCHAIN_PWD: ${{ secrets.MACOS_KEYCHAIN_PWD }}
-          MACOS_CODESIGN_IDENT: ${{ secrets.MACOS_CODESIGN_IDENT }}
-        run: |
-          echo $MACOS_CERTIFICATE | base64 -d > certificate.p12
-          security create-keychain -p $MACOS_KEYCHAIN_PWD build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p $MACOS_KEYCHAIN_PWD build.keychain
-          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_PWD build.keychain
-          /usr/bin/codesign --deep --force --verify --verbose --sign "$MACOS_CODESIGN_IDENT" --timestamp --options runtime $CEDEV_BIN/*
-
-      - name: "[macOS] Create the DMG"
-        if: runner.os == 'macOS'
-        run: |
-          brew install create-dmg || brew install create-dmg; # we try twice because sometimes it fails...
-          cp -a "${CEDEV}" "${TOOLCHAIN_PATH}/resources/macOS/dmg/contents/";
-          # The codesign variable may be empty (for forks) but that's fine, create-dmg only does code-signing if it's not empty.
-          createDmgArgs="--codesign '${{ secrets.MACOS_CODESIGN_IDENT }}' \
-              --volname 'CE Programming Toolchain' \
-              --volicon '${TOOLCHAIN_PATH}/resources/macOS/dmg/icon.icns' \
-              --background '${TOOLCHAIN_PATH}/resources/macOS/dmg/background.png' \
-              --window-pos 200 120 \
-              --window-size 600 400 \
-              --icon-size 64 \
-              --icon 'Readme.txt' 125 120 \
-              --icon 'CEdev' 125 275 \
-              'CEdev-${{runner.os}}.${{matrix.install-output-ext}}' \
-              '${TOOLCHAIN_PATH}/resources/macOS/dmg/contents'"
-          eval "create-dmg $createDmgArgs" || eval "create-dmg $createDmgArgs" # We also retry just in case...
-
-      - name: "[macOS] Notarize DMG"
-        if: runner.os == 'macOS'
-        uses: adriweb/xcode-notarize-please@v1.1
-        with:
-          product-path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
-          appstore-connect-username: ${{ secrets.APPLE_NOTARIZATION_USERNAME }}
-          appstore-connect-password: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
-          primary-bundle-id: 'com.adriweb.CEToolchain'
-
-      - name: "[macOS] Staple DMG"
-        if: runner.os == 'macOS'
-        uses: devbotsxyz/xcode-staple@v1.0.0
-        with:
-          product-path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
-
-      - name: "[Linux] Tar toolchain"
-        if: runner.os == 'Linux'
-        run: |
-          tar -C ${{env.CEDEV}}/.. -czvf CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
-      - name: "[Windows] Zip toolchain"
-        if: runner.os == 'Windows'
-        run: |
-          cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
-
-      - name: Upload CEdev
-        uses: actions/upload-artifact@v2
-        with:
-          name: CEdev-${{runner.os}}
-          path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
-
-      - name: Upload Libraries
-        uses: actions/upload-artifact@v2
-        with:
-          name: clibs
-          path: ${{env.AUTOTESTER_LIBS_GROUP}}
-
-  test:
-    needs: build
-    environment: Autotester
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on: [ubuntu, macos, windows]
-        compressed: [YES, NO]
-        include:
-          - runs-on: windows
-            env: "env:"
-    runs-on: ${{matrix.runs-on}}-latest
-    steps:
-      - name: Prepare Test Environment
-        run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
-
-      - name: Download CEdev
-        uses: actions/download-artifact@v3
-        with:
-          name: CEdev-${{runner.os}}
-          path: ${{github.workspace}}
-      - name: Extract Artifact Contents
-        if: runner.os == 'Linux'
-        run: tar -xvf CEdev-${{runner.os}}.tar.gz
-      - name: Extract Artifact Contents
-        if: runner.os == 'macOS'
-        run: |
-           hdiutil attach CEdev-${{runner.os}}.dmg
-           cp -a "/Volumes/CE Programming Toolchain/CEdev" ./
-           umount "/Volumes/CE Programming Toolchain"
-      - name: Extract Artifact Contents
-        if: runner.os == 'Windows'
-        run: |
-         cd ${{github.workspace}} && 7z x CEdev-${{runner.os}}.zip
-
-      # checkout only for test files -- contents should not be used otherwise.
-      - name: Checkout Toolchain
-        uses: actions/checkout@v2.3.4
-        with:
-          path: ${{env.TOOLCHAIN_PATH}}
-          persist-credentials: false
-
       - name: Build Test Graphics
         run: make -j4 -C ${{env.CEDEV_TEST}} COMPRESSED=${{matrix.compressed}} V=1 gfx
       - name: Build Tests
         run: make -j4 -C ${{env.CEDEV_TEST}} COMPRESSED=${{matrix.compressed}} V=1
 
+      - name: Upload Test Build Artifacts
+        uses: actions/upload-artifact@v2
+        if: "contains(github.event.head_commit.message, 'upload')"
+        with:
+          name: tests-${{runner.os}}-${{matrix.compressed}}
+          path: ${{env.CEDEV_TEST}}
+
       - name: Build Example Graphics
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1 gfx
       - name: Build Examples
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1
+
+      - name: Upload Example Build Artifacts
+        uses: actions/upload-artifact@v2
+        if: "contains(github.event.head_commit.message, 'upload')"
+        with:
+          name: examples-${{runner.os}}-${{matrix.compressed}}
+          path: ${{env.CEDEV_EXAMPLES}}
 
       - name: Download Secrets
         id: download-secrets
@@ -278,11 +176,6 @@ jobs:
           pathSource: ${{env.SECRETS_PATH}}/secrets.7z
           pathTarget: ${{env.SECRETS_PATH}}
 
-      - name: Download Libraries
-        uses: actions/download-artifact@v3
-        with:
-          name: clibs
-          path: ${{env.TOOLCHAIN_PATH}}
       - name: Test Examples
         if: runner.os != 'Windows'
         run: |
@@ -367,49 +260,3 @@ jobs:
           git_config_name: github-pages-deploy
           single_commit: true
           clean: true
-
-  nightly:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Download CEdev Linux
-        uses: actions/download-artifact@v3
-        with:
-          name: CEdev-Linux
-          path: ${{github.workspace}}
-      - name: Download CEdev Windows
-        uses: actions/download-artifact@v3
-        with:
-          name: CEdev-Windows
-          path: ${{github.workspace}}
-      - name: Download CEdev macOS
-        uses: actions/download-artifact@v3
-        with:
-          name: CEdev-macOS
-          path: ${{github.workspace}}
-      - name: Download CE Libraries
-        uses: actions/download-artifact@v3
-        with:
-          name: clibs
-          path: ${{github.workspace}}
-
-      - name: Rename Artifacts
-        run: |
-          mv CEdev-Linux.tar.gz CEdev-Linux-nightly.tar.gz
-          mv CEdev-Windows.zip CEdev-Windows-nightly.zip
-          mv CEdev-macOS.dmg CEdev-macOS-nightly.dmg
-          mv clibs.8xg clibs-nightly.8xg
-
-      - name: Update nightly release
-        uses: pyTooling/Actions/releaser@main
-        with:
-          tag: nightly
-          rm: true
-          token: ${{secrets.GITHUB_TOKEN}}
-          files: |
-            CEdev-Linux-nightly.tar.gz
-            CEdev-Windows-nightly.zip
-            CEdev-macOS-nightly.dmg
-            clibs-nightly.8xg
