@@ -10,18 +10,38 @@ __ishl := 000174h
 else
 
 __ishl:
-; Suboptimal for large shift amounts
-; CC: if C!=0: C*(4*r(PC)+1)+7*r(PC)+(ADL?6*r(SPL)+3*w(SPL):4*r(SPS)+2*w(SPS))+1
-;     if C==0: 4*r(PC)+(ADL?3*r(SPL):2*r(SPS))+2
-	inc	c
-	dec	c
-	ret	z
-	push	bc
-	ld	b, c
-.loop:
+; CC: if 0<=C<8:   23*r(PC)+3*r(SPL)+0*w(SPL)+4+(C&1==0)+(C&2!=0)*(1*r(PC)-1)+(C&4!=0)*(3*r(PC)-1)
+;     if 8<=C<16:  28*r(PC)+6*r(SPL)+3*w(SPL)+5+(C&1==0)+(C&2!=0)*(1*r(PC)-1)+(C&4!=0)*(3*r(PC)-1)
+;     if 16<=C<24: 33*r(PC)+6*r(SPL)+3*w(SPL)+5+(C&1==0)+(C&2!=0)*(1*r(PC)-1)+(C&4!=0)*(3*r(PC)-1)
+	bit	0, c
+	jr	z, .bit0
 	add	hl, hl
-	djnz	.loop
-	pop	bc
+.bit0:
+	bit	1, c
+	jr	z, .bit1
+	add	hl, hl
+	add	hl, hl
+.bit1:
+	bit	2, c
+	jr	z, .bit2
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+.bit2:
+	bit	3, c
+	jr	nz, __ishl_8
+	bit	4, c
+	ret	z
+__ishl_16:
+	ld	h, l
+	ld	l, 0
+__ishl_8:
+	push	hl
+	dec	sp
+	pop	hl
+	inc	sp
+	ld	l, 0
 	ret
 
 end if
