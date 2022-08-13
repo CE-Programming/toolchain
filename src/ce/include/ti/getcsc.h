@@ -33,8 +33,7 @@ extern "C" {
 bool boot_CheckOnPressed(void);
 
 /**
- * Performs an OS call to get the keypad scan code. Returns keypad scan code or 0 if no key is pressed.
- * This function does NOT block.
+ * Performs an OS call to get the keypad scan code. This function does NOT block, use os_GetKey() if you need blocking.
  *
  * This function does NOT account for 2nd/alpha modifiers. Use os_getKey() if you need to account for those
  *
@@ -51,7 +50,7 @@ bool boot_CheckOnPressed(void);
  * }
  * @endcode
  * Feel free to modify the string to suit your needs.
- * @returns Key scan code
+ * @returns Keypad scan code or 0 if no key is pressed
  */
 uint8_t os_GetCSC(void);
 
