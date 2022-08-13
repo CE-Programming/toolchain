@@ -357,7 +357,7 @@ jobs:
         run: find ${{env.TOOLCHAIN_PATH}}/docs/build/ -name '*.pickle' -delete
 
       - name: Initialize git repo for upload
-	run: git init
+        run: git init
 
       - name: Upload Website Documentation
         if: github.ref == 'refs/heads/master'
