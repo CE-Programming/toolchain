@@ -7,11 +7,12 @@ ti/getcsc.h
 
     #include <ti/getcsc.h>
 
-Naturally, TI's operating system also has its own keyboard driver.
-You can easily use it instead of the :code:`keypadc` library, and is particularly suited to non-game programs.
+Naturally, TI's operating system also has its own keyboard driver. This header is used to get the CSCs (current scan codes) from the keyboard driver.
+You can easily use this header instead of the :code:`keypadc` library, and is particularly suited to non-game programs.
 
 The OS's interrupt handler handles the keyboard driver and caches a scancode when it detects a key press.
 You can use this scancode directly without any translation of 2nd and alpha through the :code:`os_GetCSC` function.
+
 
 TI-83 Premium CE
 ----------------
