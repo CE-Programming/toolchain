@@ -363,9 +363,10 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           branch: gh-pages
           folder: ${{env.TOOLCHAIN_PATH}}/docs/build/html
-          git-config-email: <noreply@ce-programming.com>
+          git-config-email: <>
           git-config-name: gh-pages
-          commit-message: documentation 
+          commit-message: documentation
+          workspace: ${{env.TOOLCHAIN_PATH}}
           single-commit: true
           clean: true
 
