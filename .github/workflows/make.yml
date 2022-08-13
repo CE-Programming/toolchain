@@ -363,10 +363,10 @@ jobs:
           git config --global user.email '<>'
           cd ${{env.TOOLCHAIN_PATH}}/docs/build/html
           git init
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git checkout -b gh-pages
           git add .
-          git commit -m "documentation"
+          git commit -m "build documentation"
           git push -f origin gh-pages
 
   nightly:
