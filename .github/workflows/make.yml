@@ -356,6 +356,9 @@ jobs:
       - name: Remove .pickle files
         run: find ${{env.TOOLCHAIN_PATH}}/docs/build/ -name '*.pickle' -delete
 
+      - name: Initialize git repo for upload
+	run: git init
+
       - name: Upload Website Documentation
         if: github.ref == 'refs/heads/master'
         uses: JamesIves/github-pages-deploy-action@v4.4.0
@@ -366,7 +369,6 @@ jobs:
           git-config-email: <>
           git-config-name: gh-pages
           commit-message: documentation
-          workspace: ${{env.TOOLCHAIN_PATH}}
           single-commit: true
           clean: true
 
