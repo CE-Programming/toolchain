@@ -367,7 +367,8 @@ jobs:
           git checkout -b gh-pages
           git add .
           git commit -m "build documentation"
-          git push -f origin gh-pages
+          git fetch origin gh-pages
+          if [ git diff --quiet origin/gh-pages gh-pages ]; then git push -f origin gh-pages; fi
 
   nightly:
     runs-on: ubuntu-latest
