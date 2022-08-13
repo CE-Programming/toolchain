@@ -20,7 +20,7 @@ extern "C" {
 #define os_KeyExtend         (*(uint8_t*)0xD0058E)
 
 /**
- * Gets a key from the OS
+ * Gets a key from the OS. This function does block, use os_GetCSC() if you need a non-blocking variant.
  *
  * @returns Key code
  * @returns Extended key code in high byte
