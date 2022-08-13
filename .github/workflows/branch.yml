@@ -249,15 +249,3 @@ jobs:
         run: cmake -E touch ${{env.TOOLCHAIN_PATH}}/docs/build/html/.nojekyll
       - name: Remove .pickle files
         run: find ${{env.TOOLCHAIN_PATH}}/docs/build/ -name '*.pickle' -delete
-
-      - name: Upload Website Documentation
-        if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@3.7.1
-        with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          branch: gh-pages
-          folder: ${{env.TOOLCHAIN_PATH}}/docs/build/html
-          git_config_email: <>
-          git_config_name: github-pages-deploy
-          single_commit: true
-          clean: true
