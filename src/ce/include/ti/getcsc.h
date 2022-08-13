@@ -33,7 +33,10 @@ extern "C" {
 bool boot_CheckOnPressed(void);
 
 /**
- * Performs an OS call to get the keypad scan code
+ * Performs an OS call to get the keypad scan code. Returns keypad scan code or 0 if no key is pressed.
+ * This function does NOT block.
+ *
+ * This function does NOT account for 2nd/alpha modifiers. Use os_getKey() if you need to account for those
  *
  * You can also use this function to get input from the user as a string like this:
  * @code{.cpp}
