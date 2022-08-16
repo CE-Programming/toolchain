@@ -1,6 +1,30 @@
 	assume	adl=1
 
 	section	.text
+	public	__sdvrmu
+__sdvrmu:
+; I: HL=dividend, BC=divisor
+; O: a=0, ude=HL/BC, uhl=HL%BC
+
+	push	hl
+	dec	sp
+	pop	de
+	inc	sp
+	ld	e, 0
+
+	inc	bc
+	dec.s	bc
+
+	push	af
+	ld	a, 16
+
+if PREFER_OS_CRT
+	require	__idvrmu_common
+else
+	jr	__idvrmu_common
+end if
+
+	section	.text
 	public	__idvrmu
 
 if PREFER_OS_CRT
@@ -17,8 +41,13 @@ __idvrmu:
 
 	push	af
 	ld	a, 24
-	public	__idvrmu.hijack_a_iters_ude_dividend
-.hijack_a_iters_ude_dividend:
+	require	__idvrmu_common
+
+end if
+
+	section	.text
+	private	__idvrmu_common
+__idvrmu_common:
 
 	or	a, a
 	sbc	hl, hl
@@ -42,5 +71,3 @@ __idvrmu:
 
 	pop	af
 	ret
-
-end if

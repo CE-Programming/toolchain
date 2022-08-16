@@ -1,0 +1,61 @@
+	assume	adl=1
+
+	section	.text
+	public	__land
+
+if PREFER_OS_CRT
+
+__land := 0001A4h
+
+else
+
+__land:
+	push	af
+	and	a, e
+	ld	e, a
+;	jr	__iand.hijack_land
+	virtual
+		ld	a, 0
+		load .ld_a: byte from $$
+	end virtual
+	db	.ld_a	; push af -> ld a,*
+	require	__iand
+
+end if
+
+	section	.text
+	public	__iand
+
+if PREFER_OS_CRT
+
+__iand := 000134h
+
+else
+
+__iand:
+	push	af
+	private	__iand.hijack_land
+.hijack_land:
+	push	hl
+	scf
+	sbc	hl, hl
+	add	hl, sp
+	push	bc
+	ld	a, (hl)
+	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
+	and	a, (hl)
+	ld	(hl), a
+	pop	hl
+	ld	a, h
+	and	a, b
+	ld	h, a
+	ld	a, l
+	and	a, c
+	ld	l, a
+	pop	af
+	ret
+
+end if

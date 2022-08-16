@@ -1,0 +1,109 @@
+	assume	adl=1
+
+	section	.text
+	public	_labs
+_labs:
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
+	bit	7, e
+	ret	z
+
+if PREFER_OS_CRT
+	jp	__lneg
+else
+	require	__lneg
+end if
+
+	section	.text
+	public	__lneg
+
+if PREFER_OS_CRT
+
+__lneg := 0001D0h
+
+else
+
+__lneg:
+	push	af
+	push	de
+	ex	de, hl	; ude=UHL, l=E
+	xor	a, a	; a=0
+	sbc	hl, hl	; uhl=0
+	sbc	hl, de	; uhl=-UHL
+	pop	de	; e=E
+	sbc	a, e
+	ld	e, a	; euhl=-EUHL
+	pop	af
+	ret
+
+end if
+
+	section	.text
+	public	__ldivs
+
+if PREFER_OS_CRT
+
+__ldivs := 0001B4h
+
+else
+	
+__ldivs:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL/AUBC
+
+	rlc	e
+	rrc	e
+	rra
+	adc	a, a
+	push	af
+	push	bc
+
+	call	__ldivs_lrems_common
+
+	call	__ldivu
+
+	pop	bc
+	pop	af
+
+	ret	po
+	jr	__lneg
+
+end if
+
+	section	.text
+	public	__lrems
+
+;if PREFER_OS_CRT
+;
+; Bug: Does not ensure `nc` before `sbc hl, hl` to negate divisor.
+;
+; __lrems := 0001DCh
+;
+;else
+
+__lrems:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL%AUBC
+
+	bit	7, e
+	push	af
+	push	bc
+
+	call	__ldivs_lrems_common
+
+	call	__lremu
+
+	pop	bc
+	pop	af
+	ret	z
+	jq	__lneg	;jp when PREFER_OS_CRT, jr when not
+
+;end if
+
+	extern	__ldivs_lrems_common
+	extern	__ldivu
+	extern	__lremu

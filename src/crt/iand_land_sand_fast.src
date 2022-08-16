@@ -5,19 +5,29 @@
 __land_fast:
 	and	a, e
 	ld	e, a
-	push	bc
-	inc	sp
-	inc	sp
+	require	__iand_fast
+
+	section	.text
+	public	__iand_fast
+__iand_fast:
 	push	hl
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	bc
 	ld	a, (hl)
 	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
 	and	a, (hl)
-	dec	hl
 	ld	(hl), a
 	pop	hl
-	inc	sp
+	require	__sand_fast
+
+	section	.text
+	public	__sand_fast
+__sand_fast:
 	ld	a, h
 	and	a, b
 	ld	h, a

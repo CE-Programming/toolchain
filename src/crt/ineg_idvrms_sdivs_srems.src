@@ -1,0 +1,131 @@
+	assume	adl=1
+
+	section	.text
+	public	__idvrms
+__idvrms:
+; I: UHL=dividend, UBC=divisor
+; O: ude=UHL%UBC, uhl=UHL/UBC
+
+	push	bc
+	push	af
+
+	ex	de, hl
+
+	sbc	hl, hl
+	ccf
+	sbc	hl, bc
+	inc	hl
+	jp	m, .neg_divisor_skip
+	cpl
+	push	hl
+	pop	bc
+.neg_divisor_skip:
+
+	sbc	hl, hl
+	ccf
+	sbc	hl, de
+	inc	hl
+	jp	p, .pos_dividend_skip
+	cpl
+	ex	de, hl
+.pos_dividend_skip:
+
+	call	__idvrmu
+
+	call	p, __ineg
+
+	ld	b, a
+	pop	af
+	cp	a, b
+	pop	bc
+	ex	de, hl
+	ret	nz
+
+if PREFER_OS_CRT
+	jp	__ineg
+else
+	require	__ineg
+end if
+
+	section	.text
+	public	__ineg
+
+if PREFER_OS_CRT
+
+__ineg := 000160h
+
+else
+
+__ineg:
+if 0
+	push	de
+end if
+	add	hl, de	; uhl=UHL+UDE
+	ex	de, hl	; ude=UHL+UDE, uhl=UDE
+	or	a, a
+	sbc	hl, de	; uhl=UDE-(UHL+UDE)
+			;    =UDE-UHL-UDE
+			;    =-UHL
+if 0
+	pop	de
+else
+	ex	de, hl	; ude=-UHL, uhl=UHL+UDE
+	add	hl, de	; uhl=UHL+UDE+-UHL
+			;    =UDE
+	ex	de, hl	; ude=UDE, uhl=-UHL
+end if
+	ret
+
+end if
+
+	section	.text
+	public	__sdivs
+
+if PREFER_OS_CRT
+
+__sdivs := 000208h
+
+else
+
+__sdivs:
+; I: HL=dividend, BC=divisor
+; O: uhl=HL/BC
+
+	push	de
+
+	call	__sdvrms_abs
+	ex	de, hl
+
+	pop	de
+	ret	p
+
+	jr	__ineg
+
+end if
+
+	section	.text
+	public	__srems
+
+if PREFER_OS_CRT
+
+__srems := 000238h
+
+else
+
+__srems:
+; I: HL=dividend, BC=divisor
+; O: uhl=HL%BC
+
+	push	de
+
+	call	__sdvrms_abs
+
+	pop	de
+	ret	nc
+
+	jr	__ineg
+
+end if
+
+	extern	__idvrmu
+	extern	__sdvrms_abs

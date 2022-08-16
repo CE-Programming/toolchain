@@ -5,19 +5,29 @@
 __lxor_fast:
 	xor	a, e
 	ld	e, a
-	push	bc
-	inc	sp
-	inc	sp
+	require	__ixor_fast
+
+	section	.text
+	public	__ixor_fast
+__ixor_fast:
 	push	hl
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	bc
 	ld	a, (hl)
 	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
 	xor	a, (hl)
-	dec	hl
 	ld	(hl), a
 	pop	hl
-	inc	sp
+	require	__sxor_fast
+
+	section	.text
+	public	__sxor_fast
+__sxor_fast:
 	ld	a, h
 	xor	a, b
 	ld	h, a

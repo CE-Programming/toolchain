@@ -1,0 +1,73 @@
+	assume	adl=1
+
+	section	.text
+	public	__lshru
+
+if PREFER_OS_CRT
+
+__lshru := 0001ECh
+
+else
+
+__lshru:
+; Suboptimal for large shift amounts
+; CC: if C!=0: C*(15*r(PC)+3*r(SPL)+3*w(SPL)+4)+16*r(PC)+9*r(SPL)+6*w(SPL)+2
+;     if C==0: 4*r(PC)+3*r(SPL)+2
+	inc	l
+	dec	l
+	ret	z
+	push	hl
+	push	bc
+	ld	b, l
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	srl	a
+	jr	__lshr_common.hijack_lshru
+
+end if
+
+	section	.text
+	public	__lshrs
+
+if PREFER_OS_CRT
+
+__lshrs := 0001E8h
+
+else
+
+__lshrs:
+; Suboptimal for large shift amounts
+; CC: if C!=0: C*(15*r(PC)+3*r(SPL)+3*w(SPL)+4)+13*r(PC)+9*r(SPL)+6*w(SPL)+1
+;     if C==0: 4*r(PC)+3*r(SPL)+2
+	inc	l
+	dec	l
+	ret	z
+	push	hl
+	push	bc
+	ld	b, l
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	require	__lshr_common
+
+end if
+
+	section	.text
+	private	__lshr_common
+__lshr_common:
+.loop:
+	sra	a
+	private	__lshr_common.hijack_lshru
+.hijack_lshru:
+	inc	hl
+	inc	hl
+	rr	(hl)
+	dec	hl
+	rr	(hl)
+	dec	hl
+	rr	(hl)
+	djnz	.loop
+	pop	bc
+	pop	hl
+	ret

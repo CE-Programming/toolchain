@@ -5,19 +5,29 @@
 __lor_fast:
 	or	a, e
 	ld	e, a
-	push	bc
-	inc	sp
-	inc	sp
+	require	__ior_fast
+
+	section	.text
+	public	__ior_fast
+__ior_fast:
 	push	hl
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	bc
 	ld	a, (hl)
 	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
 	or	a, (hl)
-	dec	hl
 	ld	(hl), a
 	pop	hl
-	inc	sp
+	require	__sor_fast
+
+	section	.text
+	public	__sor_fast
+__sor_fast:
 	ld	a, h
 	or	a, b
 	ld	h, a

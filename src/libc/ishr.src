@@ -1,12 +1,10 @@
 	assume	adl=1
 
 	section	.text
-	public	__ishrs
 	public	__ishru
 
 if PREFER_OS_LIBC
 
-__ishrs := 00017Ch
 __ishru := 000184h
 
 else
@@ -16,7 +14,25 @@ __ishru:
 	xor	a, a
 	add	hl, hl
 	rla
-	db	$DA	; push af \ add hl,hl \ sbc a,a -> jp c,*
+;	jr	__ishrs.hijack_ishru
+	virtual
+		jp	c, 0
+		load .jp_c: byte from $$
+	end virtual
+	db	.jp_c	; push af \ add hl,hl \ sbc a,a -> jp c,*
+	require	__ishrs
+
+end if
+
+	section	.text
+	public	__ishrs
+
+if PREFER_OS_LIBC
+
+__ishrs := 00017Ch
+
+else
+
 __ishrs:
 ; CC: if 0<=C<8:   35*r(PC)+9*r(SPL)+9*w(SPL)+4+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
 ;     if 8<=C<16:  34*r(PC)+9*r(SPL)+6*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
@@ -24,6 +40,8 @@ __ishrs:
 	push	af
 	add	hl, hl
 	sbc	a, a
+	private	__ishrs.hijack_ishru
+.hijack_ishru:
 	bit	0, c
 	jr	nz, .bit0
 	add	hl, hl

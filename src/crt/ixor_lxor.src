@@ -1,0 +1,61 @@
+	assume	adl=1
+
+	section	.text
+	public	__lxor
+
+if PREFER_OS_CRT
+
+__lxor := 0001FCh
+
+else
+
+__lxor:
+	push	af
+	xor	a, e
+	ld	e, a
+;	jr	__ixor.hijack_lxor
+	virtual
+		ld	a, 0
+		load .ld_a: byte from $$
+	end virtual
+	db	.ld_a	; push af -> ld a,*
+	require	__ixor
+
+end if
+
+	section	.text
+	public	__ixor
+
+if PREFER_OS_CRT
+
+__ixor := 000198h
+
+else
+
+__ixor:
+	push	af
+	private	__ixor.hijack_lxor
+.hijack_lxor:
+	push	hl
+	scf
+	sbc	hl, hl
+	add	hl, sp
+	push	bc
+	ld	a, (hl)
+	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
+	xor	a, (hl)
+	ld	(hl), a
+	pop	hl
+	ld	a, h
+	xor	a, b
+	ld	h, a
+	ld	a, l
+	xor	a, c
+	ld	l, a
+	pop	af
+	ret
+
+end if
