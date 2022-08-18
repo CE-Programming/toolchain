@@ -5,6 +5,8 @@ on:
     branches-ignore:
       - gh-pages
       - master
+      - usbdrvce
+      - srldrvce-rewrite
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
