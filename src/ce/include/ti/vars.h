@@ -158,8 +158,8 @@ extern "C" {
 #define OS_VAR_W        "\x57\0\0"
 #define OS_VAR_X        "\x58\0\0"
 #define OS_VAR_Y        "\x59\0\0"
-#define OS_VAR_Z        "\x60\0\0"
-#define OS_VAR_THETA    "\x61\0\0"
+#define OS_VAR_Z        "\x5A\0\0"
+#define OS_VAR_THETA    "\x5B\0\0"
 /* @endcond */
 
 /**
