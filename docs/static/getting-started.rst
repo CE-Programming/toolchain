@@ -44,9 +44,27 @@ Installing the CE Toolchain
 
     The toolchain update process is the exact same as installation - the only extra step is to delete the current ``CEdev`` folder if it exists beforehand.
 
+Example Programs
+----------------
+
+The toolchain includes multiple example projects inside the :code:`examples` folder.
+Use these examples to learn how to write C/C++ code for the calculator.
+The examples are broken out into:
+
+standalone_examples
+  These examples can be compiled directly using the manner described in `Building Programs`_.
+  They do not require any external dependencies.
+
+library_examples
+  These examples use the CE Libraries, a collection of functions and macros used to make things such as graphics, filesystem access, and keypad input faster and easier.
+  They are used by many existing projects - the libraries themseleves are downloadable `here <https://github.com/CE-Programming/libraries/releases/latest>`_.
+  The examples are further subdivided into the specific library they are demonstrating.
+  For documentation on the available library functions, see the :ref:`CE Libraries <libraries>` page.
+
 Building Programs
 -----------------
 
+This section describes the standard flow for building CE toolchain projects, starting with the classing "Hello World" example.
 Open a build session by double-clicking :code:`cedev.bat` on Windows or launching a terminal session on Linux/macOS.
 Navigate to the *examples* folder using the :code:`cd examples` command.
 This folder contains example projects that you can build and modify to learn how to write different programs.
