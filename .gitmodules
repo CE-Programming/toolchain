@@ -15,3 +15,6 @@
 [submodule "examples/graphx/template"]
 	path = examples/graphx/template
 	url = https://github.com/CE-Programming/graphx-template.git
+[submodule "examples/standalone_examples/template"]
+	path = examples/standalone_examples/template
+	url = https://github.com/CE-Programming/template.git
