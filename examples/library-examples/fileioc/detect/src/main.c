@@ -10,19 +10,31 @@ int main(void)
     /* Clear the homescreen */
     os_ClrHome();
 
-    for (int8_t y = 0;;++y)
+    for (;;)
     {
         uint8_t type;
-        const char *name = ti_DetectAny(&search_pos, "\xBF\xFE", &type);
+        const char *name = ti_DetectAny(&search_pos, "", &type);
 
-        if (name == NULL || type != OS_TYPE_APPVAR)
+        if (name == NULL)
         {
             break;
         }
 
-        /* Print the name of the variable (Should be LibLoad) */
-        os_SetCursorPos(0, y);
+        /* Only show programs */
+        if (type != OS_TYPE_PROT_PRGM && type != OS_TYPE_PRGM)
+        {
+            continue;
+        }
+
+        /* System programs have first character < 'A' */
+        if (name[0] < 'A')
+        {
+            continue;
+        }
+
+        /* Print the name of the program */
         os_PutStrFull(name);
+        os_NewLine();
     }
 
     /* Waits for a key */

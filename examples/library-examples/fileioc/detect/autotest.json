@@ -20,10 +20,10 @@
   {
     "1":
     {
-      "description": "Test show LibLoad",
+      "description": "Test show DEMO",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "D874E0B0" ]
+      "expected_CRCs": [ "72BC35F8" ]
     },
     "2":
     {
