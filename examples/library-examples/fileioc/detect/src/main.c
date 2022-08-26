@@ -13,8 +13,6 @@ int main(void)
     for (int8_t y = 0;;++y)
     {
         uint8_t type;
-        /* Find the LibLoad AppVar, which is known to exist */
-        /* The first two data bytes of LibLoad are 0xBF, 0xFE */
         const char *name = ti_DetectAny(&search_pos, "\xBF\xFE", &type);
 
         if (name == NULL || type != OS_TYPE_APPVAR)
