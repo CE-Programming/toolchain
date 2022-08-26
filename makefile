@@ -21,7 +21,7 @@ SRCS := ce crt libc libcxx
 TOOLS := fasmg convbin convimg convfont cedev-config
 
 ifeq ($(OS),Windows_NT)
-WINDOWS_COPY := $(call COPY,tools\windows\make.exe,$(INSTALL_BIN)) && $(call COPY,tools\windows\cedev.bat,$(INSTALL_DIR))
+WINDOWS_COPY := $(call COPY,resources\windows\make.exe,$(INSTALL_BIN)) && $(call COPY,resources\windows\cedev.bat,$(INSTALL_DIR))
 else
 WINDOWS_COPY :=
 endif
