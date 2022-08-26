@@ -370,7 +370,7 @@ jobs:
           git add .
           git commit -m "build documentation"
           git fetch origin gh-pages
-          if git diff --name-only --quiet origin/gh-pages gh-pages; then git push -f origin gh-pages; fi
+          git diff --quiet origin/gh-pages gh-pages || git push -f origin gh-pages
 
   nightly:
     runs-on: ubuntu-latest
