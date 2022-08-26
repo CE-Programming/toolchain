@@ -159,7 +159,7 @@ CWK_PUBLIC size_t cwk_path_join_multiple(const char **paths, char *buffer,
 /**
  * @brief Determines the root of a path.
  *
- * This function determines the root of a path by finding it's length. The
+ * This function determines the root of a path by finding its length. The
  * root always starts at the submitted path. If the path has no root, the
  * length will be set to zero.
  *
@@ -222,7 +222,8 @@ CWK_PUBLIC bool cwk_path_is_relative(const char *path);
  *
  * @param path The path which will be inspected.
  * @param basename The output of the basename pointer.
- * @param length The output of the length of the basename.
+ * @param length The output of the length of the basename. This may be
+ * null if not required.
  */
 CWK_PUBLIC void cwk_path_get_basename(const char *path, const char **basename,
   size_t *length);

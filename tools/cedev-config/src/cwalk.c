@@ -122,30 +122,44 @@ static void cwk_path_terminate_output(char *buffer, size_t buffer_size,
 }
 
 static bool cwk_path_is_string_equal(const char *first, const char *second,
-  size_t n)
+  size_t first_size, size_t second_size)
 {
+  bool are_both_separators;
+
+  // The two strings are not equal if the sizes are not equal.
+  if (first_size != second_size) {
+    return false;
+  }
+
   // If the path style is UNIX, we will compare case sensitively. This can be
   // done easily using strncmp.
   if (path_style == CWK_STYLE_UNIX) {
-    return strncmp(first, second, n) == 0;
+    return strncmp(first, second, first_size) == 0;
   }
 
   // However, if this is windows we will have to compare case insensitively.
   // Since there is no standard method to do that we will have to do it on our
   // own.
-  while (*first && *second && n > 0) {
+  while (*first && *second && first_size > 0) {
     // We can consider the string to be not equal if the two lowercase
-    // characters are not equal.
-    if (tolower(*first++) != tolower(*second++)) {
+    // characters are not equal. The two chars may also be separators, which
+    // means they would be equal.
+    are_both_separators = strchr(separators[path_style], *first) != NULL &&
+                          strchr(separators[path_style], *second) != NULL;
+
+    if (tolower(*first) != tolower(*second) && !are_both_separators) {
       return false;
     }
 
-    --n;
+    first++;
+    second++;
+
+    --first_size;
   }
 
-  // We can consider the string to be equal if we either reached n == 0 or both
-  // cursors point to a null character.
-  return n == 0 || (*first == '\0' && *second == '\0');
+  // The string must be equal since they both have the same length and all the
+  // characters are the same.
+  return true;
 }
 
 static const char *cwk_path_find_next_stop(const char *c)
@@ -437,9 +451,7 @@ cwk_path_segment_will_be_removed(const struct cwk_segment_joined *sj,
   // First we check whether this is a CWK_CURRENT or CWK_BACK segment, since
   // those will always be dropped.
   type = cwk_path_get_segment_type(&sj->segment);
-  if (type == CWK_CURRENT) {
-    return true;
-  } else if (type == CWK_BACK && absolute) {
+  if (type == CWK_CURRENT || (type == CWK_BACK && absolute)) {
     return true;
   } else if (type == CWK_BACK) {
     return cwk_path_segment_back_will_be_removed(&sjc);
@@ -479,7 +491,7 @@ static void cwk_path_get_root_windows(const char *path, size_t *length)
   if (cwk_path_is_separator(c)) {
     ++c;
 
-    // Check whether the path starts with a single back slash, which means this
+    // Check whether the path starts with a single backslash, which means this
     // is not a network path - just a normal path starting with a backslash.
     if (!cwk_path_is_separator(c)) {
       // Okay, this is not a network path but we still use the backslash as a
@@ -567,6 +579,29 @@ static bool cwk_path_is_root_absolute(const char *path, size_t length)
   return cwk_path_is_separator(&path[length - 1]);
 }
 
+static void cwk_path_fix_root(char *buffer, size_t buffer_size, size_t length)
+{
+  size_t i;
+
+  // This only affects windows.
+  if (path_style != CWK_STYLE_WINDOWS) {
+    return;
+  }
+
+  // Make sure we are not writing further than we are actually allowed to.
+  if (length > buffer_size) {
+    length = buffer_size;
+  }
+
+  // Replace all forward slashes with backwards slashes. Since this is windows
+  // we can't have any forward slashes in the root.
+  for (i = 0; i < length; ++i) {
+    if (cwk_path_is_separator(&buffer[i])) {
+      buffer[i] = *separators[CWK_STYLE_WINDOWS];
+    }
+  }
+}
+
 static size_t cwk_path_join_and_normalize_multiple(const char **paths,
   char *buffer, size_t buffer_size)
 {
@@ -581,8 +616,10 @@ static size_t cwk_path_join_and_normalize_multiple(const char **paths,
   // later on whether we can remove superfluous "../" or not.
   absolute = cwk_path_is_root_absolute(paths[0], pos);
 
-  // First copy the root to the output. We will not modify the root.
+  // First copy the root to the output. After copying, we will normalize the
+  // root.
   cwk_path_output_sized(buffer, buffer_size, 0, paths[0], pos);
+  cwk_path_fix_root(buffer, buffer_size, pos);
 
   // So we just grab the first segment. If there is no segment we will always
   // output a "/", since we currently only support absolute paths here.
@@ -701,7 +738,7 @@ static void cwk_path_skip_segments_until_diverge(struct cwk_segment_joined *bsj,
     // Compare the content of both segments. We are done if they are not equal,
     // since they diverge.
     if (!cwk_path_is_string_equal(bsj->segment.begin, osj->segment.begin,
-          bsj->segment.size)) {
+          bsj->segment.size, osj->segment.size)) {
       break;
     }
 
@@ -729,7 +766,8 @@ size_t cwk_path_get_relative(const char *base_directory, const char *path,
   cwk_path_get_root(base_directory, &base_root_length);
   cwk_path_get_root(path, &path_root_length);
   if (base_root_length != path_root_length ||
-      !cwk_path_is_string_equal(base_directory, path, base_root_length)) {
+      !cwk_path_is_string_equal(base_directory, path, base_root_length,
+        path_root_length)) {
     cwk_path_terminate_output(buffer, buffer_size, pos);
     return pos;
   }
@@ -916,7 +954,9 @@ void cwk_path_get_basename(const char *path, const char **basename,
   // to NULL and the length to 0.
   if (!cwk_path_get_last_segment(path, &segment)) {
     *basename = NULL;
-    *length = 0;
+    if (length) {
+      *length = 0;
+    }
     return;
   }
 
@@ -924,7 +964,9 @@ void cwk_path_get_basename(const char *path, const char **basename,
   // There might be trailing separators after the basename, but the size does
   // not include those.
   *basename = segment.begin;
-  *length = segment.size;
+  if (length) {
+    *length = segment.size;
+  }
 }
 
 size_t cwk_path_change_basename(const char *path, const char *new_basename,
@@ -1126,7 +1168,8 @@ size_t cwk_path_get_intersection(const char *path_base, const char *path_other)
   // absolute.
   cwk_path_get_root(path_base, &base_root_length);
   cwk_path_get_root(path_other, &other_root_length);
-  if (!cwk_path_is_string_equal(path_base, path_other, base_root_length)) {
+  if (!cwk_path_is_string_equal(path_base, path_other, base_root_length,
+        other_root_length)) {
     return 0;
   }
 
@@ -1165,7 +1208,7 @@ size_t cwk_path_get_intersection(const char *path_base, const char *path_other)
     }
 
     if (!cwk_path_is_string_equal(base.segment.begin, other.segment.begin,
-          base.segment.size)) {
+          base.segment.size, other.segment.size)) {
       // So the content of those two segments are not equal. We will return the
       // size up to the beginning.
       return (size_t)(end - path_base);
