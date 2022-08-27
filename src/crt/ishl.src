@@ -3,7 +3,7 @@
 	section	.text
 	public	__ishl
 
-if PREFER_OS_LIBC
+if PREFER_OS_CRT
 
 __ishl := 000174h
 

@@ -4,7 +4,7 @@
 	public	__ishrs
 	public	__ishru
 
-if PREFER_OS_LIBC
+if PREFER_OS_CRT
 
 __ishrs := 00017Ch
 __ishru := 000184h
