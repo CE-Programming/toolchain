@@ -27,8 +27,9 @@ ifeq ($(OS),Windows_NT)
 else
   TARGET ?= cedev-config
   ifeq ($(shell uname -s),Darwin)
-    STRIP = echo "no strip available"
-    CFLAGS += -D_DARWIN_C_SOURCE
+    STRIP = strip "$1"
+    CFLAGS += -D_DARWIN_C_SOURCE -mmacosx-version-min=10.13
+    LDFLAGS += -mmacosx-version-min=10.13
   else
     STRIP = strip --strip-all "$1"
     CFLAGS += -D_XOPEN_SOURCE=500
