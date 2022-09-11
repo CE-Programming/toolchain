@@ -38,8 +38,8 @@ extern "C" {
 #define os_NameBuff        ((char*)0xD00663)
 /* @endcond */
 
-/** Current size of executing program. Type: `uint16_t` */
-#define os_AsmPrgmSize     (*(uint16_t*)0xD0118C)
+/** Current size of executing program. Type: `uint24_t` */
+#define os_AsmPrgmSize     (*(uint24_t*)0xD0118C)
 
 /** Set after asm_ArcChk call. Type: `uint24_t` */
 #define os_TempFreeArc     (*(uint24_t*)0xD02655)
