@@ -1,7 +1,7 @@
 .. _contributing:
 
-Contributing to the CE Toolchain
-================================
+Contributing/Building
+=====================
 
 If you are brave enough to contribute source to the CE Toolchain, this page is for you!
 
@@ -33,15 +33,16 @@ Clone the repo:
 
 .. code-block:: bash
 
-    git clone --recurse-submodules https://github.com/CE-Programming/toolchain.git
+    git clone https://github.com/CE-Programming/toolchain.git
+    cd toolchain
+    git submodule update --init --recursive
 
 Build and install the toolchain:
 
 .. code-block:: bash
 
-    cd toolchain
-    make -j
-    make install -j
+    make
+    make install
 
 By default, the toolchain is installed into the home (``~/CEdev``) directory.
 
@@ -65,15 +66,16 @@ Clone the repo:
 
 .. code-block:: bash
 
-    git clone --recurse-submodules https://github.com/CE-Programming/toolchain.git
+    git clone https://github.com/CE-Programming/toolchain.git
+    cd toolchain
+    git submodule update --init --recursive
 
 Build and install the toolchain:
 
 .. code-block:: bash
 
-    cd toolchain
-    mingw32-make -j
-    mingw32-make install -j
+    mingw32-make
+    mingw32-make install
 
 By default, the toolchain is installed into the root (``C:\CEdev``) directory.
 

@@ -15,3 +15,7 @@ If you prefer IRC, the chat is also bridged to the Efnet channel `#ez80-dev`.
 Depending on how active the channel is you might not get a response.\
 In that case, post your questions [here](https://github.com/CE-Programming/toolchain/discussions) or [here](https://github.com/CE-Programming/toolchain/issues), and we will get back to you as soon as possible.
 
+## Building/Contributing
+
+Documentation for contributing/building the toolchain can be found [here](https://ce-programming.github.io/toolchain/static/contributing.html).
+
