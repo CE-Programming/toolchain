@@ -1,7 +1,7 @@
 .. _contributing:
 
-Contributing/Building
-=====================
+Contributing to the CE Toolchain
+================================
 
 If you are brave enough to contribute source to the CE Toolchain, this page is for you!
 

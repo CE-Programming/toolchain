@@ -18,20 +18,19 @@ If you are interested in contributing your expertise, check out the :ref:`contri
 
     self
     static/hardware
-    static/getting-started
     static/faq
 
 .. toctree::
     :caption: Toolchain Documentation
     :maxdepth: 1
 
+    static/getting-started
     static/makefile-options
     static/printf
     static/fileio
-    static/debugging
     static/ides
+    static/debugging
     static/asm
-    static/contributing
 
 .. toctree::
     :caption: Toolchain Libraries/Headers
@@ -48,3 +47,4 @@ If you are interested in contributing your expertise, check out the :ref:`contri
 
     static/git
     static/coding-guidelines
+    static/contributing
