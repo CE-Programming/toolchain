@@ -78,6 +78,7 @@ struct srl_device
 	rx_buf				ring_buf_ctrl
 	tx_buf				ring_buf_ctrl
 	error				rl 1
+	interface			rb 1
 	size := $-.
 end struct
 
@@ -87,6 +88,7 @@ virtual at 0
 	SRL_TYPE_CDC			rb 1	; CDC device
 	SRL_TYPE_FTDI			rb 1	; FTDI device
 	SRL_TYPE_PL2303			rb 1	; PL2303 device
+	SRL_TYPE_CP210X			rb 1	; CP210X device
 end virtual
 
 virtual at 0
@@ -416,13 +418,14 @@ srl_Open:
 	ld	a,SRL_ERROR_INVALID_DEVICE
 	jq	z,.exit
 
+	push	iy
 	call	init_device
+	pop	iy
 	ld	a,l					; check for error
 	or	a,a
 	jq	nz,.exit_hl
 
 	ld	hl,(iy+18)				; hl = baud rate
-	ld	c,(iy+15)				; a = interface number
 	call	set_rate
 	ld	a,l					; check for error
 	or	a,a
@@ -651,7 +654,7 @@ srl_UsbEventCallback:
 ; Gets the device type and subtype based on the descriptors
 ; Inputs:
 ;  ix: Serial device struct
-;  a: Interface number
+;  a: Expected interface number
 ;  xsrl_device.rx_buf.buf_start: Device descriptor, followed by config descriptor
 ; Returns:
 ;  xsrl_device.type: Device type
@@ -659,11 +662,77 @@ srl_UsbEventCallback:
 ;  xsrl_device.rx_addr: Receive endpoint address
 ;  xsrl_device.tx_addr: Transmit endpoint address
 get_device_type:
-	ld	(.expectedIntNum),a
+	ld	(expectedIntNum),a
 
-; todo: vendor-specific devices
+; vendor-specific devices
+
+	push	ix
+	ld	ix,(xsrl_device.rx_buf.buf_start)
+	lea	ix,ix+8
+
+	ld	iy,device_table - 5
+	ld	de,device_table.length
+
+.loop:
+	ld	a,d
+	or	a,e
+	jr	z,.unknown
+	dec	de
+	lea	iy,iy+5
+	lea	hl,ix
+repeat 4
+	ld	a,(iy+%-1)
+	cpi
+	jr	nz,.loop
+end repeat
+	
+	pop	ix
+
+	ld	a,(iy+4)
+	ld	(xsrl_device.type),a
+
+	ld	a,$ff	; vendor class
+	call	find_interface_endpoints
+	jr	nc,.none
+	ret
+
+.unknown:
+	pop	ix
 
 ; check for CDC ACM device
+	ld	a,$a	; CDC data class
+	call	find_interface_endpoints
+	jr	nc,.none
+; ACM device found
+	ld	a,SRL_TYPE_CDC
+	ld	(xsrl_device.type),a
+	ret
+
+.none:
+	xor	a,a
+	ld	(xsrl_device.type),a
+	ld	(xsrl_device.subtype),a
+	ld	(xsrl_device.rx_addr),a
+	ld	(xsrl_device.tx_addr),a
+	ret
+
+device_table: ; VIDL VIDH PIDL PIDH TYPE
+	db	$C4, $10, $60, $ea, SRL_TYPE_CP210X
+device_table.length = ($ - device_table) / 5
+
+; Gets the device type and subtype based on the descriptors
+; Inputs:
+;  ix: Serial device struct
+;  a: Interface class
+;  xsrl_device.rx_buf.buf_start: Device descriptor, followed by config descriptor
+; Returns:
+;  c if found, nc otherwise
+;  xsrl_device.rx_addr: Receive endpoint address
+;  xsrl_device.tx_addr: Transmit endpoint address
+;  xsrl_device.interface: Interface number
+; Destroys: ???
+find_interface_endpoints:
+	ld	(.interface_class),a
 	ld	hl,(xsrl_device.rx_buf.buf_start)
 	call	next_descriptor
 	inc	hl
@@ -680,20 +749,23 @@ get_device_type:
 	ex	de,hl	; hl, de = start, end of config desc.
 .find_int_loop:
 	call	next_interface_descriptor
-	jq	nc,.none
+	ret	nc
 .process_int:
 	push	hl
 	pop	iy
+	ld	c,(yinterfaceDescriptor.bInterfaceNumber)
 	ld	a,0
-.expectedIntNum = $-1
+expectedIntNum = $-1
 	cp	a,SRL_INTERFACE_ANY
 	jq	z,.any
-	cp	a,(yinterfaceDescriptor.bInterfaceNumber)
+	cp	a,c
 	jq	nz,.find_int_loop
 .any:
+	ld	(xsrl_device.interface),c
 	ld	bc,0
 	ld	a,(yinterfaceDescriptor.bInterfaceClass)
-	cp	a,$a	; CDC data class
+	cp	a,0
+.interface_class = $ - 1
 	jq	nz,.find_int_loop
 
 .find_ep_loop:
@@ -717,8 +789,7 @@ get_device_type:
 	
 	ld	(xsrl_device.tx_addr),b
 	ld	(xsrl_device.rx_addr),c
-	ld	a,SRL_TYPE_CDC
-	ld	(xsrl_device.type),a
+	scf
 	ret
 .not_int:
 	cp	a,ENDPOINT_DESCRIPTOR
@@ -736,14 +807,6 @@ get_device_type:
 .outEp:
 	ld	b,a
 	jq	.find_ep_loop
-
-.none:
-	xor	a,a
-	ld	(xsrl_device.type),a
-	ld	(xsrl_device.subtype),a
-	ld	(xsrl_device.rx_addr),a
-	ld	(xsrl_device.tx_addr),a
-	ret
 
 ; Skips to the next descriptor
 ; Inputs:
@@ -787,14 +850,49 @@ next_interface_descriptor:
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 init_device:
+	ld	a,(xsrl_device.type)
+	cp	a,SRL_TYPE_CP210X
+	jq	z,init_cp210x
+
 	ld	hl,0
 	ret
+
+; Initializes a CP210X device
+; Inputs:
+;  ix: Serial device struct
+; Returns:
+;  hl: Error or SRL_SUCCESS
+init_cp210x:
+	ld	a,(xsrl_device.interface)
+	ld	(.setup.wIndex),a
+	ld	hl,0
+	push	hl	; transferred
+	ld	bc,50
+	push	bc	; num retries
+	push	hl	; data
+	ld	bc,.setup
+	push	bc	; setup
+
+	push	hl	; ep addr (0)
+	ld	bc,(xsrl_device.dev)
+	push	bc	; device
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+
+	push	hl	; endpoint
+	call	usb_ControlTransfer
+	pop	bc,bc,bc,bc,bc
+	ld	a,l
+	or	a,a
+	ret	z
+	ld	l,SRL_ERROR_USB_FAILED
+	ret
+.setup	setuppkt	$41,$00,$0001,$0000,$0000
 
 ; Sets the baud rate of a serial device
 ; Inputs:
 ;  ix: Serial device struct
 ;  hl: Baud rate
-;  c: Interface number
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate:
@@ -808,7 +906,9 @@ set_rate:
 	dec	a					; type == FTDI
 	jq	z,set_rate_ftdi
 	dec	a					; type == PL2303
-	jq	z,set_rate_cdc
+	jq	z,.invalid_device
+	dec	a					; type == CP210X
+	jq	z,set_rate_cp210x
 .invalid_device:
 	ld	hl,SRL_ERROR_INVALID_DEVICE
 	ret
@@ -821,10 +921,10 @@ set_rate:
 ; Inputs:
 ;  ix: Serial device struct
 ;  hl: Baud rate
-;  c: Interface number
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate_cdc:
+; todo: this should probably use the interface number
 	ld	(.linecoding),hl
 	ld	bc,0
 	push	bc	; transferred
@@ -859,7 +959,6 @@ set_rate_cdc:
 ; Inputs:
 ;  ix: Serial device struct
 ;  hl: Baud rate
-;  c: Interface number
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate_ftdi:
@@ -869,11 +968,54 @@ set_rate_ftdi:
 ; Inputs:
 ;  ix: Serial device struct
 ;  hl: Baud rate
-;  c: Interface number
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate_pl2303:
 	ret
+
+; Sets the baud rate of a CP201X device
+; Inputs:
+;  ix: Serial device struct
+;  hl: Baud rate
+; Returns:
+;  hl: Error or SRL_SUCCESS
+set_rate_cp210x:
+	push	hl
+	scf
+	sbc	hl,hl
+	ld	(hl),2
+	pop	hl
+	
+	ld	a,(xsrl_device.interface)
+	ld	(.setup.wIndex),a
+	ld	(.baudrate),hl
+	ld	bc,0
+	push	bc	; transferred
+	ld	bc,50
+	push	bc	; num retries
+	ld	bc,.baudrate
+	push	bc	; data
+	ld	bc,.setup
+	push	bc	; setup
+
+	ld	bc,0
+	push	bc	; ep addr
+	ld	bc,(xsrl_device.dev)
+	push	bc	; device
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+
+	push	hl	; endpoint
+	call	usb_ControlTransfer
+	pop	bc,bc,bc,bc,bc
+	ld	a,l
+	or	a,a
+	ret	z
+	ld	l,SRL_ERROR_USB_FAILED
+	ret
+.setup	setuppkt	$41,$1e,$0000,$0000,$0004
+.baudrate:
+	db	$80,$25,0,0
 
 ; Checks how many contiguous bytes are available in a ring buffer
 ; Inputs:

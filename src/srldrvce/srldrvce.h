@@ -26,7 +26,8 @@ enum {
     SRL_TYPE_HOST,    /**< Calc is acting as a device */
     SRL_TYPE_CDC,     /**< CDC device */
     SRL_TYPE_FTDI,    /**< FTDI device */
-    SRL_TYPE_PL2303   /**< PL2303 device */
+    SRL_TYPE_PL2303,  /**< PL2303 device */
+    SRL_TYPE_CP210X,  /**< CP210X device */
 };
 
 typedef uint8_t srl_device_type_t;
@@ -82,6 +83,7 @@ typedef struct {
     ring_buf_ctrl_t rx_buf;
     ring_buf_ctrl_t tx_buf;
     srl_error_t err;
+    uint8_t interface;
     uint8_t reserved[16];
 } srl_device_t;
 
