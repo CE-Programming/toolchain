@@ -53,6 +53,10 @@ COMMENT ?= $(shell cedev-config --comment)
 CEDEV_TOOLCHAIN ?= $(shell cedev-config --prefix)
 #----------------------------
 
+ifneq ($(words $(NAME)),1)
+$(error NAME must not contain any spaces)
+endif
+
 # define some common makefile things
 empty :=
 space := $(empty) $(empty)
