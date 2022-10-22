@@ -1453,11 +1453,11 @@ util_set_var_str:
 ;  a = type
 ; out:
 ;  OP1 = variable combo
-	ld	de, ti.OP1 + 1
-	call	ti.Mov8b
+	ld	de, ti.OP1
 	and	a, $3f
-	ld	(ti.OP1), a
-	ret
+	ld	(de), a
+	inc	de
+	jp	ti.Mov8b
 
 ;-------------------------------------------------------------------------------
 util_insert_mem:
