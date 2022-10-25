@@ -1,7 +1,7 @@
 .. _debugging:
 
-Debugging
-=========
+Debugging Features
+==================
 
 The toolchain offers the ability to debug your programs using the `CEmu emulator <https://ce-programming.github.io/CEmu>`_.
 

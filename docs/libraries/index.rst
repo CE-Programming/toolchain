@@ -1,7 +1,7 @@
 .. _libraries:
 
-CE Libraries
-==============
+CE Library Headers
+==================
 
 The CE Libraries are used to aid in rapid development by implementing optimized routines for graphics, fonts, file I/O, keypad input, and more.
 

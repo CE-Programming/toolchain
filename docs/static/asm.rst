@@ -1,7 +1,7 @@
 .. _asm:
 
-Assembly
-========
+Assembly Routines
+=================
 
 Assembly routines can be linked into a C/C++ program by putting them into the same **src** directory that your C/C++ sources are in, but with an **.asm** extension.
 These can be placed in any subdirectory of **src** just like C/C++ sources.

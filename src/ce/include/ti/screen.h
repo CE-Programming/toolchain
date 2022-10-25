@@ -220,7 +220,7 @@ font_t *os_FontGetID(void);
 uint24_t os_FontGetWidth(const char *string);
 
 /**
- * @returns[in] The height of the font characters
+ * @returns The height of the font characters
  */
 uint24_t os_FontGetHeight(void);
 

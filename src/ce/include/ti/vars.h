@@ -497,8 +497,8 @@ int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t 
 /**
  * Evalutes a tokenized expression.
  *
- * @param data Tokenized expression to evaluate.
- * @param len Length of tokenized data.
+ * @param[in] data Tokenized expression to evaluate.
+ * @param[in] len Length of tokenized data.
  * @returns TIOS System Error Code or 0 on success, with the result stored in
  * the Ans variable.
  */
@@ -507,7 +507,7 @@ int os_Eval(const void *data, size_t len);
 /**
  * Evalutes a tokenized equation or string variable.
  *
- * @param name Name of variable to evaluate.
+ * @param[in] name Name of variable to evaluate.
  * @returns TIOS System Error Code or 0 on success, with the result stored in
  * the Ans variable.
  */
