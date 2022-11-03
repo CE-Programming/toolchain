@@ -17,7 +17,7 @@ To disable all other printf functions and use this `sprintf` implementation, add
 
 .. code-block:: makefile
 
-    HAS_PRINTF := NO
+    HAS_PRINTF = NO
 
 If you just need to convert a float to a string, which the OS sprintf does not support, you can utilize the following `float2str` function instead.
 
