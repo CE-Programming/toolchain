@@ -1456,10 +1456,8 @@ _ellipse_pixel_routine_1 := $-3
 	sbc	hl,bc
 	push	hl
 	pop	bc
-	push	bc
 	call	_SetPixel_NoWait	; xc - x, yc + y
 _ellipse_pixel_routine_2 := $-3
-	pop	bc
 	ld	hl,(ix + 9)
 	ld	de,(ix - el_y)
 	or	a,a
