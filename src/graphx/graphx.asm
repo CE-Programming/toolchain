@@ -1456,10 +1456,8 @@ _ellipse_pixel_routine_1 := $-3
 	sbc	hl,bc
 	push	hl
 	pop	bc
-	push	bc
 	call	_SetPixel_NoWait	; xc - x, yc + y
 _ellipse_pixel_routine_2 := $-3
-	pop	bc
 	ld	hl,(ix + 9)
 	ld	de,(ix - el_y)
 	or	a,a
@@ -5342,7 +5340,12 @@ gfx_FloodFill:
 ;  arg2 : New Color Index
 ; Returns:
 ;  None
-	ld	hl,-3224
+	lea	iy,ix
+	ld	de,-3224
+	add	iy,de
+	ld	(.stack),iy
+
+	ex	de,hl
 	call	ti._frameset
 
 	ld	e,(ix+9)
@@ -5362,25 +5365,19 @@ gfx_FloodFill:
 	ld	hl,(_XMin)
 	ld	(.xmin),hl
 
-	lea	iy,ix
-	ld	bc,-3224
-	add	iy,bc
-	ld	(.stack),iy
-
 	ld	a,(ix+9)
 	ld	hl,(ix+6)
 	ld	(iy+0),hl		; sp->xl = x;
 	ld	(iy+3),hl		; sp->xr = x;
 	ld	(iy+6),a		; sp->y  = y;
 	ld	(iy+7),1		; sp->dy = 1;
-	lea	iy,iy+8			; sp++;
+	lea	iy,iy+16		; sp++; (twice for optimising)
 
 	inc	a
-	ld	(iy+6),a		; sp->y  = y+1;
-	ld	(iy+0),hl		; sp->xl = x;
-	ld	(iy+3),hl		; sp->xr = x;
-	ld	(iy+7),255		; sp->dy = -1;
-	lea	iy,iy+8			; sp++;
+	ld	(iy-2),a		; sp->y  = y+1;
+	ld	(iy-8),hl		; sp->xl = x;
+	ld	(iy-5),hl		; sp->xr = x;
+	ld	(iy-1),255		; sp->dy = -1;
 
 	call	gfx_Wait
 
@@ -5416,7 +5413,6 @@ gfx_FloodFill:
 .begin:
 	bit	7,b
 	jr	nz,.nonnegative
-	or	a,a
 	sbc	hl,de
 	jr	c,.nonnegative
 	add	hl,de
@@ -5440,8 +5436,7 @@ gfx_FloodFill:
 	sbc	hl,bc
 	jr	nc,.badpush0		; if (l<x1) { push(y, l, x1-1, -dy); }
 	lea	de,ix-24
-	lea	hl,iy
-	or	a,a
+	lea	hl,iy+1
 	sbc	hl,de
 	jr	nc,.badpush0		; check stack limit
 	ld	a,(_YMin)
@@ -5498,12 +5493,11 @@ gfx_FloodFill:
 	cp	a,0
 .oldcolor1 = $-1
 	jr	z,.forloop1
-
+	scf
 .ovat:
 	ld	(ix+6),bc
 	lea	de,ix-24		; push(y, l, x-1, dy);
-	lea	hl,iy
-	or	a,a
+	lea	hl,iy+1
 	sbc	hl,de
 	jr	nc,.badpush1
 	ld	a,(_YMin)
@@ -5534,8 +5528,7 @@ gfx_FloodFill:
 	sbc	hl,bc
 	jr	nc,.skip
 	lea	de,ix-24
-	lea	hl,iy
-	or	a,a
+	lea	hl,iy+1
 	sbc	hl,de
 	jr	nc,.badpush2
 	ld	a,(_YMin)
@@ -5598,8 +5591,7 @@ gfx_FloodFill:
 
 	ld	hl,0
 .stack = $-3
-	lea	de,iy
-	or	a,a
+	lea	de,iy-1
 	sbc	hl,de
 	jp	c,.dowhileloop		; } while (sp>stack);
 
