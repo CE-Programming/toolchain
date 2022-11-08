@@ -96,7 +96,7 @@ jobs:
         run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
 
       - name: Checkout CEmu
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
         with:
           repository: ${{github.repository_owner}}/CEmu
           ref: latest-stable
@@ -119,7 +119,7 @@ jobs:
           fasmg ${{matrix.nul}} ${{matrix.nul}}
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           submodules: recursive
@@ -236,7 +236,7 @@ jobs:
           cmake -E echo >> $${{matrix.env}}GITHUB_PATH $${{matrix.env}}HOME/.local/bin
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
