@@ -51,7 +51,7 @@ jobs:
 
       - name: Download ez80-clang
         id: ez80-clang
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2
         with:
           file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-clang
@@ -62,7 +62,7 @@ jobs:
 
       - name: Download ez80-link
         id: ez80-link
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2
         with:
           file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-link${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-link
@@ -73,7 +73,7 @@ jobs:
 
       - name: Download Fasmg Download Page
         id: fasmg-download
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2
         with:
           file-url: ${{env.FASMG_DOMAIN}}/download.php
       - name: Parse Fasmg Download Page
@@ -86,7 +86,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
       - name: Download Fasmg
         id: fasmg
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2
         with:
           file-url: ${{env.FASMG_DOMAIN}}/${{env.href}}
       - name: Extract Fasmg
@@ -201,13 +201,13 @@ jobs:
           cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
 
       - name: Upload CEdev
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: CEdev-${{runner.os}}
           path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
 
       - name: Upload Libraries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: clibs
           path: ${{env.AUTOTESTER_LIBS_GROUP}}
@@ -266,7 +266,7 @@ jobs:
 
       - name: Download Secrets
         id: download-secrets
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2
         with:
           file-url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
           location: ${{env.SECRETS_PATH}}
