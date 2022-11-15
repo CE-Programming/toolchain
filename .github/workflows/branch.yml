@@ -49,7 +49,7 @@ jobs:
 
       - name: Download ez80-clang
         id: ez80-clang
-        uses: carlosperate/download-file-action@v2
+        uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-clang
@@ -60,7 +60,7 @@ jobs:
 
       - name: Download ez80-link
         id: ez80-link
-        uses: carlosperate/download-file-action@v2
+        uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-link${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-link
@@ -71,7 +71,7 @@ jobs:
 
       - name: Download Fasmg Download Page
         id: fasmg-download
-        uses: carlosperate/download-file-action@v2
+        uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: ${{env.FASMG_DOMAIN}}/download.php
       - name: Parse Fasmg Download Page
@@ -84,7 +84,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
       - name: Download Fasmg
         id: fasmg
-        uses: carlosperate/download-file-action@v2
+        uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: ${{env.FASMG_DOMAIN}}/${{env.href}}
       - name: Extract Fasmg
@@ -130,12 +130,6 @@ jobs:
       - name: Build Libraries
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} libs V=1
 
-      - name: Upload Libraries
-        uses: actions/upload-artifact@v3
-        with:
-          name: clibs
-          path: ${{env.AUTOTESTER_LIBS_GROUP}}
-
       - name: Install Toolchain
         env:
           PREFIX: ${{github.workspace}}
@@ -151,7 +145,7 @@ jobs:
         run: make -j4 -C ${{env.CEDEV_TEST}} COMPRESSED=${{matrix.compressed}} V=1
 
       - name: Upload Test Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         if: "contains(github.event.head_commit.message, 'upload')"
         with:
           name: tests-${{runner.os}}-${{matrix.compressed}}
@@ -163,7 +157,7 @@ jobs:
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1
 
       - name: Upload Example Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         if: "contains(github.event.head_commit.message, 'upload')"
         with:
           name: examples-${{runner.os}}-${{matrix.compressed}}
@@ -171,7 +165,7 @@ jobs:
 
       - name: Download Secrets
         id: download-secrets
-        uses: carlosperate/download-file-action@v2
+        uses: carlosperate/download-file-action@v1.0.3
         with:
           file-url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
           location: ${{env.SECRETS_PATH}}
