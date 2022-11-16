@@ -142,7 +142,7 @@ The below example shows the proper and recommended implementation of the source 
 Here are the important takeaways from the above example:
 
 - The first line in the source file should be the corresponding header file for the source interface. Other headers can then be included after; with system/toolchain headers last. This ensures that the header includes all the things necessary to compile it.
-- The source file uses the **static** keyword in front of a function to indicate that it can only be used in the *source.c* file. This prevents other source files from attempting to use it. It is a good idea to get into the habit of labeling functions  in this way if they are not used anywhere except for the file they are in.
+- The source file uses the **static** keyword in front of a function to indicate that it can only be used in the *source.c* file. This prevents other source files from attempting to use it. It is a good idea to get into the habit of labeling functions in this way if they are not used anywhere except for the file they are in.
 - The header includes so-called "header guards" (the :code:`#ifdef SOURCE_H` / :code:`#define SOURCE_H` lines), which are used to prevent the header from being included multiple times in the same source file.
 - The :code:`#ifdef __cplusplus` lines are used to prevent a C++ compiler from mangling the names of the header functions. It is a good idea to add this, even if you are working on a C-only project as it will save you any headache if a C++ compiler tries to compile the header.
 - The external source function is represented as a "prototype" inside the header. This prototype tells the rest of the source files the arguments and return of the function, but does not define the implementation. It is the responsibility of the linker to take all the compiled source files and find the corresponding functions.
@@ -281,20 +281,22 @@ Avoid Dynamic Allocation
 Dynamic allocation (e.g. *malloc*, *calloc*, *realloc*) should be avoided as much as possible.
 This is because it is an expensive operation and uses a few kilobytes of space for the function itself.
 
-On the CE, the heap (the region of memory that the above functions allocate from) is stored in the same region of memory that uninitialized data is stored in (referred to as the "bss" section).
+On the CE, the heap (the region of memory that the above functions allocate from) is stored `in the same region <https://ce-programming.github.io/toolchain/static/faq.html#what-is-the-c-c-runtime-memory-layout>`_ of memory that uninitialized data is stored in (referred to as the "bss" section).
 This means that any uninitialized variables not on the stack will automatically use the same region of memory.
-Since this region is a fixed known size, there is next to zero usefulness in using malloc to perform memory allocation.
+Since this region is a fixed known size (which is not that large, up to ≈60KB total), there is next to zero usefulness in using malloc to perform memory allocation.
 
 Dynamic allocation can also lead to fragmentation of the heap when running, making programs be extremely unstable and prone to leaks and crashes.
 You also aren't guaranteed that you will get a valid memory pointer -- and thus have no way to recover other than to quit your program!
+
+In conclusion, avoid dynamic allocation unless you really know what you're doing. Check the paragraph below for alternatives.
 
 Ways to avoid dynamic allocation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following tips can help avoid dynamic allocation.
 
-- Statically allocate variables with the :code:`static` keyword.
-- Try stack-based allocation using the :code:`alloca` function.
+- Statically allocate variables with the :code:`static` keyword. See :ref:`here <Using the static keyword>` for more info.
+- Try stack-based allocation using the :code:`alloca` function (but watch out, the stack is only about 4KB large).
 - Consider why you are allocating memory at runtime in the first place.
 
 General Guidelines
