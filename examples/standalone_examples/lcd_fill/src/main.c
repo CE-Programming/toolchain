@@ -25,5 +25,5 @@ int main(void)
 /* Fill the screen with a given color */
 void FillScreen(uint8_t color)
 {
-    memset((void*)lcd_Ram, color, LCD_SIZE);
+    memset(lcd_Ram, color, LCD_SIZE);
 }
