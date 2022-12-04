@@ -58,7 +58,6 @@ library FILEIOC, 7
 ; v5 functions
 ;-------------------------------------------------------------------------------
 	export ti_ArchiveHasRoom
-
 ;-------------------------------------------------------------------------------
 ; v6 functions
 ;-------------------------------------------------------------------------------
@@ -1379,7 +1378,7 @@ ti_RclVar:
 
 ;-------------------------------------------------------------------------------
 ti_ArchiveHasRoom:
-; checks if there is room in the archive before a garbage collect
+; checks if there is room in the archive without triggering a garbage collect.
 ; args:
 ;  sp + 3 : number of bytes to store into the archive
 ; return:
@@ -1387,13 +1386,14 @@ ti_ArchiveHasRoom:
 	pop	de
 	ex	(sp),hl
 	push	de
-util_ArchiveHasRoom:
-	ld	bc,12
-	add	hl,bc
+.entry:
+	ex.s	de,hl
+	push	de
+	pop	bc
 	call	ti.FindFreeArcSpot
 	ld	a,1
 	ret	nz
-	dec	a
+	xor	a,a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1627,7 +1627,7 @@ util_Arc_Unarc:				; properly handle garbage collects
 	ex	hl,de
 	call	ti.LoadDEInd_s
 	ex	hl,de
-	call	util_ArchiveHasRoom
+	call	ti_ArchiveHasRoom.entry
 	jp	nz,ti.Arc_Unarc		; gc will not be triggered
 	call	util_pre_gc_default_handler
 util_pre_gc_handler := $-3

@@ -511,7 +511,7 @@ uint8_t ti_RclVar(uint8_t type, const char *name, void **data);
  * without needing to execute a Garbage Collect.
  *
  * @param[in] num_bytes Number of bytes to be stored to the archive.
- * @returns `true` if the bytes can be stored to the archive without a Garbage Collect.
+ * @returns `true` if the bytes can be stored to the archive without triggering a Garbage Collect.
  */
 bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
