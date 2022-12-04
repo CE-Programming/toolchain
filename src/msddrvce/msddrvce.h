@@ -3,13 +3,11 @@
  * @brief Mass Storage Device (MSD) Driver
  *
  * This library can be used to communicate with Mass Storage Devices (MSD).
- * Common mass storage devices are flash drives and SD cards.
+ * Common mass storage devices are flash drives, SD cards, and external SSDs.
  *
  * Currently only drives with a logical block size of 512 bytes are supported,
  * which is the most common block size available. Larger drives and SSDs may
  * not work. The maximum drive size is 2TiB.
- *
- * The drive must use MBR partitioning, GPT and others are not yet supported.
  *
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
@@ -143,15 +141,15 @@ uint24_t msd_Read(msd_t *msd, uint32_t lba, uint24_t count, void *buffer);
 uint24_t msd_Write(msd_t *msd, uint32_t lba, uint24_t count, const void *buffer);
 
 /**
- * Locates any partitions detected on the mass storage device (MSD).
+ * Returns a list of partitions detected on the device.
  * You must allocate space for \p partitions before calling this
  * function, as well as passing a valid msd_t returned from msd_Open.
  * @param msd Initialized MSD structure returned from msd_Open.
- * @param partitions Returned array of FAT partitions available.
- * @param max The maximum number of FAT partitions that can be found.
+ * @param partitions Returned array of partitions available.
+ * @param max The maximum number of partitions that can be found.
  * @return Number of partitions detected; \p partitions will be filled with
  *         valid partition information up to the number detected.
- * @note Currently only MBR partition tables are supported.
+ * @note Currently MBR (msdos) and GUID (gpt) parition tables are supported.
  */
 uint8_t msd_FindPartitions(msd_t *msd, msd_partition_t *partitions, uint8_t max);
 
