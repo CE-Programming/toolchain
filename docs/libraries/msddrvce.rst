@@ -11,17 +11,20 @@ The **msddrvce** library implements routines for writing and reading data to/fro
 Common MSDs include flash drives, SD cards, hard drives, and similar block-level storage devices.
 Both synchronous and asynchronous block read/write functions are provided by this library.
 
-.. note::
-
-    Only drives utilizing 512 byte logical blocks and Master Boot Record (MBR) partition formats are currently supported.
-
 .. contents:: :local:
    :depth: 3
+
+Known Limitations
+-----------------
+
+- The maximum drive size is 2TiB.
+- Only drives utilizing 512 byte logical blocks are supported.
 
 Supported Devices
 -----------------
 
-The following drives have been verified to work (or not work) when used with a standard OTG adapter connector.
+The following drives have been verified to work when used with a standard OTG adapter connector.
+Other devices may also work but may not have been tested.
 The **msd_bandwidth** program found in the msddrvce examples directory can be used to determine if the device is suitable.
 This program can also be used to test the bandwidth for reading/writing blocks on the device, given in the below table:
 
@@ -40,13 +43,11 @@ This program can also be used to test the bandwidth for reading/writing blocks o
 +--------------------------------------------+-------------+---------------+--------------+
 | Sandisk Ultra 32GB                         | 3.0         | 222.57        | 253.29       |
 +--------------------------------------------+-------------+---------------+--------------+
-| Sandisk Cruzer Glide 32B                   | 2.0         | 232.94        | 252.94       |
-+--------------------------------------------+-------------+---------------+--------------+
-| Cheap unamed drive                         | 2.0         | 210.00        | 252.35       |
+| Sandisk Cruzer Glide 32GB                  | 2.0         | 232.94        | 252.94       |
 +--------------------------------------------+-------------+---------------+--------------+
 
 API Documentation
 -----------------
 
 .. doxygenfile:: msddrvce.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

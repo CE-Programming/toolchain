@@ -25,5 +25,7 @@ USB Libraries:
 
     usbdrvce
     srldrvce
+    msddrvce
+    fatdrvce
 
 Click any of the above links to navigate to the library's documentation.

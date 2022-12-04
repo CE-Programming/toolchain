@@ -29,11 +29,11 @@ Known Limitations
 -----------------
 
 - The filesystem must use 512 byte logical blocks.
-- The filesystem must be formatted as FAT32 (currently no support for FAT12, FAT16, or exFAT)
-- Long name support is not yet implemented.
+- The filesystem must be formatted as FAT32 (no support for FAT12, FAT16, or exFAT)
+- Long name support is not currently implemented.
 
 API Documentation
 -----------------
 
 .. doxygenfile:: fatdrvce.h
-   :project: CE C Toolchain
+   :project: CE C/C++ Toolchain

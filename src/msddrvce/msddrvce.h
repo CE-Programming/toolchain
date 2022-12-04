@@ -2,13 +2,6 @@
  * @file
  * @brief Mass Storage Device (MSD) Driver
  *
- * This library can be used to communicate with Mass Storage Devices (MSD).
- * Common mass storage devices are flash drives, SD cards, and external SSDs.
- *
- * Currently only drives with a logical block size of 512 bytes are supported,
- * which is the most common block size available. Larger drives and SSDs may
- * not work. The maximum drive size is 2TiB.
- *
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
  */
