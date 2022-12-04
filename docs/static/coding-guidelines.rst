@@ -224,6 +224,8 @@ Sure, in real code, functions and variables will have more descriptive names tha
 
 There are other benefits to proper scoping as well. It helps reduce namespace pollution, and the compiler will be able to provide better optimizations, too.
 
+.. _using_the_static_keyword:  
+
 Using the static keyword
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -295,7 +297,7 @@ Ways to avoid dynamic allocation
 
 The following tips can help avoid dynamic allocation.
 
-- Statically allocate variables with the :code:`static` keyword. See :ref:`here <Using the static keyword>` for more info.
+- Statically allocate variables with the :code:`static` keyword. See :ref:`here<using_the_static_keyword>` for more info.
 - Try stack-based allocation using the :code:`alloca` function (but watch out, the stack is only about 4KB large).
 - Consider why you are allocating memory at runtime in the first place.
 
