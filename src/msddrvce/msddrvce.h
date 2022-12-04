@@ -149,7 +149,7 @@ uint24_t msd_Write(msd_t *msd, uint32_t lba, uint24_t count, const void *buffer)
  * @param max The maximum number of partitions that can be found.
  * @return Number of partitions detected; \p partitions will be filled with
  *         valid partition information up to the number detected.
- * @note Currently MBR (msdos) and GUID (gpt) parition tables are supported.
+ * @note Currently MBR (msdos) and GUID (gpt) partition tables are supported.
  */
 uint8_t msd_FindPartitions(msd_t *msd, msd_partition_t *partitions, uint8_t max);
 
