@@ -516,6 +516,15 @@ uint8_t ti_RclVar(uint8_t type, const char *name, void **data);
 bool ti_ArchiveHasRoom(uint24_t num_bytes);
 
 /**
+ * Checks to see if there is room in the archive for storing an AppVar/variable,
+ * without needing to execute a Garbage Collect.
+ *
+ * @param[in] handle AppVar/variable handle.
+ * @returns `true` if archiving the variable will trigger a Garbage Collect.
+ */
+bool ti_ArchiveHasRoomVar(uint8_t handle);
+
+/**
  * Set routines to run before and after a garbage collect would be triggered.
  * A garbage collect is used to free up space in archive memory by reorganizing
  * archive variable storage and removing variables marked for deletion. The OS

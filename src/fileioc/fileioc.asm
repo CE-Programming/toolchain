@@ -62,6 +62,10 @@ library FILEIOC, 7
 ; v6 functions
 ;-------------------------------------------------------------------------------
 	export ti_SetGCBehavior
+;-------------------------------------------------------------------------------
+; v7 functions
+;-------------------------------------------------------------------------------
+	export ti_ArchiveHasRoomVar
 
 ;-------------------------------------------------------------------------------
 ; v7 functions
@@ -355,11 +359,11 @@ ti_Open:
 	ld	a,(hl)
 	cp	a,'+'
 	jr	nz,.no_append
-.archive_var:
-	call	ti.PushOP1
+.unarchive_var:
 	call	ti.ChkFindSym
+	jr	c, .not_found
 	call	ti.ChkInRam
-	jr	z, .in_ram
+	jr	z, .save_ptrs
 	or	a, a
 	sbc	hl, hl
 	ex	de, hl
@@ -368,16 +372,9 @@ ti_Open:
 	ld	d, (hl)
 	ex	de, hl
 	call	ti.EnoughMem
-	push	af
-	call	ti.PopOP1
-	pop	af
 	jp	c, util_ret_null_pop_ix
-	call	ti.PushOP1
-	call	ti.Arc_Unarc
-	call	ti.PopOP1
-	jr	.archive_var
-.in_ram:
-	call	ti.PopOP1
+	call	util_unarchive
+	jr	.unarchive_var
 .no_append:
 	call	ti.ChkFindSym
 	jr	c, .not_found
@@ -457,26 +454,15 @@ ti_SetArchiveStatus:
 	djnz	.copy_name
 	xor	a, a
 	ld	(de), a
-	call	ti.PushOP1
-	ld	iy, ti.flags
-	call	ti.ChkFindSym
-	call	ti.ChkInRam
-	push	af
-	pop	bc
 	pop	af
 	or	a, a
-	jr	z, .set_not_archived
+	jr	z, .set_unarchived
 .set_archived:
-	push	bc
-	pop	af
-	call	z, util_Arc_Unarc
+	call	util_archive
 	jr	.relocate_var
-.set_not_archived:
-	push	bc
-	pop	af
-	call	nz, ti.Arc_Unarc
+.set_unarchived:
+	call	util_unarchive
 .relocate_var:
-	call	ti.PopOP1
 	call	ti.ChkFindSym
 	jp	c, util_ret_neg_one
 	call	ti.ChkInRam
@@ -1207,7 +1193,7 @@ ti_Rename:
 	inc	de
 	call	ti.Mov8b
 	call	ti.PushOP1		; save old name
-	ld	hl, util_Arc_Unarc
+	ld	hl, util_archive
 	ld	(.smc_archive), hl
 	pop	hl			; new name
 	ld	de, ti.OP1 + 1
@@ -1222,10 +1208,10 @@ ti_Rename:
 	jr	c, .return_2
 	call	ti.ChkInRam
 	jr	nz, .in_archive
-	ld	hl, util_no_op			; no-op routine instead of assuming $F8 points to a ret instruction lol
+	ld	hl, util_no_op		; no-op routine
 	ld	(.smc_archive), hl
 	call	ti.PushOP1
-	call	util_Arc_Unarc
+	call	util_archive
 	call	ti.PopOP1
 	jr	.locate_program
 .in_archive:
@@ -1258,7 +1244,7 @@ ti_Rename:
 	ldir
 .is_zero:
 	call	ti.PopOP1
-	call	util_Arc_Unarc
+	call	0
 .smc_archive := $-3
 	call	ti.PopOP1
 	call	ti.ChkFindSym
@@ -1393,6 +1379,44 @@ ti_ArchiveHasRoom:
 	call	ti.FindFreeArcSpot
 	ld	a,1
 	ret	nz
+	xor	a,a
+	ret
+
+;-------------------------------------------------------------------------------
+ti_ArchiveHasRoomVar:
+; checks if there is room in the archive without triggering a garbage collect.
+; args:
+;  sp + 3 : handle to variable
+; return:
+;  true if there is room, false if not
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	call	util_is_slot_open
+	jr	nz,.fail
+	call	util_get_vat_ptr
+	ld	hl,(hl)
+	ld	bc,-6
+	add	hl,bc
+	ld	c,(hl)			; get var size
+	call	util_get_data_ptr
+	ld	hl,(hl)
+.entry_sym:
+	ld	a,c
+	ex	de,hl
+	ld	hl,(hl)
+	ld	bc,12
+	add	hl,bc
+	ld	c,a
+	add.s	hl,bc
+	jr	c,.fail
+	ld	c,l
+	ld	b,h
+	call	ti.FindFreeArcSpot
+	ld	a,1
+	ret	nz
+.fail:
 	xor	a,a
 	ret
 
@@ -1621,19 +1645,28 @@ util_set_offset:
 	ld	(hl), bc
 	ret
 
-util_Arc_Unarc:				; properly handle garbage collects
+util_archive:				; properly handle garbage collects
+	ld	iy, ti.flags
+	call	ti.ChkFindSym
 	call	ti.ChkInRam
-	jp	nz,ti.Arc_Unarc		; if the file is already in archive, we won't trigger a gc
-	ex	hl,de
-	call	ti.LoadDEInd_s
-	ex	hl,de
-	call	ti_ArchiveHasRoom.entry
-	jp	nz,ti.Arc_Unarc		; gc will not be triggered
+	ret	nz
+	call	ti_ArchiveHasRoomVar.entry_sym
+	jp	nz,ti.Arc_Unarc
+	call	ti.PushOP1
 	call	util_pre_gc_default_handler
 util_pre_gc_handler := $-3
 	call	ti.Arc_Unarc
-	jp	util_post_gc_default_handler
+	call	util_post_gc_default_handler
 util_post_gc_handler := $-3
+	jp	ti.PopOP1
+
+util_unarchive:
+	ld	iy, ti.flags
+	call	ti.PushOP1
+	call	ti.ChkFindSym
+	call	ti.ChkInRam
+	call	nz,ti.Arc_Unarc
+	jp	ti.PopOP1
 
 ;-------------------------------------------------------------------------------
 ; Internal library data
