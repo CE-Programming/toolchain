@@ -1368,16 +1368,16 @@ ti_ArchiveHasRoom:
 ; return:
 ;  true if there is room, false if not
 	pop	de
-	ex	(sp),hl
-	push	de
-.entry:
-	ex.s	de,hl
-	push	de
 	pop	bc
-	call	ti.FindFreeArcSpot
-	ld	a,1
+	push	bc
+	push	de
+	cp	a, a			; set z flag
+	ld	hl, $FF0000
+	add	hl, bc
+	call	nc, ti.FindFreeArcSpot
+	ld	a, 1
 	ret	nz
-	xor	a,a
+	xor	a, a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1397,15 +1397,15 @@ ti_ArchiveHasRoomVar:
 	ld	hl,(hl)
 	ld	bc,-6
 	add	hl,bc
-	ld	c,(hl)			; get var size
+	ld	c,(hl)			; get var name length
 	call	util_get_data_ptr
-	ld	hl,(hl)
+	ld	de,(hl)
 .entry_sym:
 	ld	a,c
 	ex	de,hl
 	ld	hl,(hl)
 	ld	bc,12
-	add	hl,bc
+	add	a,c
 	ld	c,a
 	add.s	hl,bc
 	jr	c,.fail
@@ -1648,14 +1648,21 @@ util_archive:				; properly handle garbage collects
 	call	ti.ChkFindSym
 	call	ti.ChkInRam
 	ret	nz
-	call	ti_ArchiveHasRoomVar.entry_sym
-	jp	nz,ti.Arc_Unarc
 	call	ti.PushOP1
+	call	ti_ArchiveHasRoomVar.entry_sym
+	jr	z,.handle_gc
+	call	ti.Arc_Unarc
+	jp	ti.PopOP1
+.handle_gc:
 	call	util_pre_gc_default_handler
 util_pre_gc_handler := $-3
+	ld	iy, ti.flags
+	call	ti.PopOP1
+	call	ti.PushOP1
 	call	ti.Arc_Unarc
 	call	util_post_gc_default_handler
 util_post_gc_handler := $-3
+	ld	iy, ti.flags
 	jp	ti.PopOP1
 
 util_unarchive:
