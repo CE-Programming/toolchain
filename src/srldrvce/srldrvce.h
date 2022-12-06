@@ -1,13 +1,11 @@
 /**
  * @file
  * @author John "commandblockguy" Cesarz
- * @brief USB Serial Driver
  *
  * This library sits on top of usbdrvce to act as a driver for serial devices.
  * In addition to handling USB serial devices while in host mode, srldrvce can
  * also emulate a serial device itself, which is useful for communicating with
  * a computer with minimal setup required on the other end.
- *
  */
 
 #ifndef H_SRLDRVCE
@@ -96,7 +94,7 @@ typedef struct {
  * @warning Do not call from a USB event handler.
  * @param srl Serial device structure.
  * @param dev USB device to initialize.
- * @param buffer The buffer's address. (must be at least @param size bytes).
+ * @param buffer The buffer's address. (must be at least \p size bytes).
  * @param size The size of the buffer. Must be divisible by 2 and at least 128,
  *        but a size of 512 is recommended.
  * @param interface The USB interface number to use, or SRL_INTERFACE_ANY for
@@ -121,11 +119,11 @@ void srl_Close(srl_device_t *srl);
 
 /**
  * Reads data from a serial device.
- * This is a non-blocking buffered read - if there are less that @param length
+ * This is a non-blocking buffered read - if there are less that \p length
  * bytes available in the buffer, all of the bytes in the buffer will be read.
  * @param srl SRL device structure.
  * @param data Buffer to read into.
-          Should be at least @param length bytes long.
+          Should be at least \p length bytes long.
  * @param length Number of bytes to read.
  * @return The number of bytes read, or a negative number upon error.
  */
@@ -135,7 +133,7 @@ int srl_Read(srl_device_t *srl,
 
 /**
  * Writes data to a serial device.
- * This is a non-blocking buffered write - if there is less than @param length
+ * This is a non-blocking buffered write - if there is less than \p length
  * bytes of space in the output buffer, not all of the data may be written.
  * @param srl SRL device structure.
  * @param data Data to write to serial.
