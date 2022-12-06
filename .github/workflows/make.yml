@@ -6,8 +6,6 @@ on:
       - v* # push events versioned tags
     branches:
       - master
-      - usbdrvce
-      - srldrvce-rewrite
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
