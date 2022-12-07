@@ -249,7 +249,6 @@ uint24_t fat_Read(fat_file_t *file, uint24_t count, void *buffer);
  * @param file File handle returned from fat_Open.
  * @param count Number of blocks to write to file.
  * @param buffer Data to write to FAT file.
- * @return FAT_SUCCESS on success, otherwise error.
  * @return Returns number of blocks written, should equal \p count if success.
  */
 uint24_t fat_Write(fat_file_t *file, uint24_t count, const void *buffer);

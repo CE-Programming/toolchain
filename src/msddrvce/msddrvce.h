@@ -118,7 +118,7 @@ msd_error_t msd_WriteAsync(msd_transfer_t *xfer);
  * @param msd Initialized MSD structure.
  * @param lba Logical Block Address (LBA) of starting block to read.
  * @param count Number of blocks to read.
- * @param buffer Buffer to read into. Must be at least block size * count bytes.
+ * @param buffer Buffer to read into. Must be at least \p MSD_BLOCK_SIZE * \p count bytes.
  * @return Number of blocks read, on success should equal \p count.
  */
 uint24_t msd_Read(msd_t *msd, uint32_t lba, uint24_t count, void *buffer);
@@ -127,8 +127,8 @@ uint24_t msd_Read(msd_t *msd, uint32_t lba, uint24_t count, void *buffer);
  * Synchronous block write.
  * @param msd Iniailized MSD structure.
  * @param lba Logical Block Address (LBA) of starting block to read.
- * @param count Number of blocks to read.
- * @param buffer Buffer to read into. Must be at least block size * count bytes.
+ * @param count Number of blocks to write.
+ * @param buffer Buffer to write. Must be at least \p MSD_BLOCK_SIZE * \p count bytes.
  * @return Number of blocks written, on success should equal \p count.
  */
 uint24_t msd_Write(msd_t *msd, uint32_t lba, uint24_t count, const void *buffer);
