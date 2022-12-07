@@ -5,7 +5,7 @@ export default_version=v11.0
 
 # Maps target directory name to branch
 declare -A versions_map=(
-	[v11.0]=v11.0
+	[v11.0]=v11.0-docs
 	[v10.2]=v10.2-docs
 	[v10.1]=v10.1-docs
 	[v10.0]=v10.0-docs
