@@ -2,13 +2,27 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.0...master)
 
-# [v11.0](https://github.com/CE-Programming/toolchain/releases/tag/v11.0) (2022-12-07)
+# [v11.0](https://github.com/CE-Programming/toolchain/releases/tag/v11.0) (2022-12-06)
 
 * **New features**
+  * Add usbdrvce library for interfacing with the USB port by @jacobly0
+  * Add srldrvce library for interfacing with serial-based devices by @commandblockguy
+  * Add msddrvce and fatdrvce libraries for interfacing with mass storage devices by @mateoconlechuga
+  * Add fileioc library `ti_ArchiveHasRoomVar` function by @mateoconlechuga
+  * Update convimg to support more conversion options by @mateoconlechuga
 
 * **Bugfixes**
+  * Fix fileioc library `ti_ArchiveHasRoom` function by @mateoconlechuga
+  * Ensure spaces aren't provided in the program name by @mateoconlechuga
+  * Fix convimg option `max-entries` by @mateoconlechuga
+  * Fix defines for OS_VAR_Z and OS_VAR_THETA by @commandblockguy
 
 * **Improvements**:
+  * Optimize utility function in fileioc by @jacobly0
+  * Optimize 24-bit right shift for much lower maximum runtime by @calc84maniac
+  * Improve macOS codesigning and nightly builds by @adriweb
+  * Update documentation for `os_GetCSC` and `os_GetKey` by @RealStoneSword
+  * Optimize `__ishl` for bounded execution time for larger shifts by @calc84maniac
 
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v10.2...v11.0)
 
