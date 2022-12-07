@@ -1,6 +1,16 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v10.2...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.0...master)
+
+# [v11.0](https://github.com/CE-Programming/toolchain/releases/tag/v11.0) (2022-12-07)
+
+* **New features**
+
+* **Bugfixes**
+
+* **Improvements**:
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v10.2...v11.0)
 
 # [v10.2](https://github.com/CE-Programming/toolchain/releases/tag/v10.2) (2022-08-10)
 
