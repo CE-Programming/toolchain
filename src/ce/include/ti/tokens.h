@@ -1016,6 +1016,10 @@ extern "C" {
 
 /** @}*/
 
+/** \addtogroup graphx_tokens
+ *  @{
+ */
+
 /** First byte of Graph tokens */
 #define OS_TOK_GRAPH 0x7E
 /** Sequential‎ */
@@ -1461,9 +1465,9 @@ extern "C" {
 #define OS_TOK_TILDE 0xCF
 /** \@‎ */
 #define OS_TOK_AT 0xD1
-/** #‎ */
+/** \#‎ */
 #define OS_TOK_POUND_SYM 0xD2
-/** #‎ */
+/** \#‎ */
 #define OS_TOK_HASHTAG 0xD2
 /** $‎ */
 #define OS_TOK_DOLLAR_SYM 0xD3

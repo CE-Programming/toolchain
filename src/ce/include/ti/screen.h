@@ -154,7 +154,6 @@ void os_EnableHomeTextBuffer(void);
  * @param[in] string Input prompt string to be displayed to the user
  * @param[in] buf Storage location to store input string
  * @param[in] bufsize Available storage size for input string. -1 for null termination.
- * @returns None
  */
 void os_GetStringInput(char *string, char *buf, size_t bufsize);
 
