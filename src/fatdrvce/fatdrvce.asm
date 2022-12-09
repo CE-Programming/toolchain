@@ -9,7 +9,9 @@ library FATDRVCE, 1
 ;-------------------------------------------------------------------------------
 	export fat_Init
 	export fat_Deinit
-	export fat_DirList
+	export fat_OpenDir
+	export fat_ReadDir
+	export fat_CloseDir
 	export fat_GetVolumeLabel
 	export fat_Open
 	export fat_Close
@@ -49,6 +51,7 @@ virtual at 0
 	FAT_ERROR_RDONLY rb 1
 	FAT_ERROR_RW_FAILED rb 1
 	FAT_ERROR_INVALID_FILESYSTEM rb 1
+	FAT_ERROR_NO_MORE_ENTRIES rb 1
 end virtual
 virtual at 0
 	FAT_LIST_FILEONLY rb 1
@@ -73,6 +76,18 @@ struct fatFile
 	current_block rd 1
 	working_buffer rl 1
 	entry_pointer rl 1
+	size := $-.
+end struct
+struct fatDir
+	local size
+	label .: size
+	fat rl 1
+	open rb 1
+	block_offset rl 1
+	blocks_per_cluster rb 1
+	cluster_block rb 1
+	working_block rd 1
+	working_cluster rd 1
 	size := $-.
 end struct
 struct fat
@@ -242,42 +257,23 @@ fat_Deinit:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_DirList:
-; Parses directory entires for files and subdirectories
+fat_OpenDir:
+; Opens a directory for reading contents
 ; Arguments:
 ;  sp + 3 : fat struct
 ;  sp + 6 : directory path
-;  sp + 9 : entry filter
-;  sp + 12 : entry storage
-;  sp + 15 : number of entries storage
-;  sp + 18 : number of entries to skip
+;  sp + 9 : dir struct
 ; Returns:
-;  Number of found entries, otherwise -1
+;  FAT_SUCCESS on success
 	ld	iy,0
-	ld	(.foundnum),iy
 	add	iy,sp
-	ld	de,(iy + 18)
-	ld	(.skipnum),de
-	ld	de,(iy + 15)
-	ld	(.maxnum),de
-	ld	de,(iy + 12)
-	ld	(.storage),de
-	ld	a,(iy + 9)
-	ld	b,$CC
-	or	a,a;FAT_LIST_FILEONLY
-	jq	z,.gotjump
-	ld	b,$C4
-	dec	a;FAT_LIST_DIRONLY
-	jq	z,.gotjump
-	ld	b,$CD
-.gotjump:
-	ld	a,b
-	ld	(.change_jump),a
-	ld	de,(iy + 6)
+	ld	hl,(iy + 9)	; dir struct
+	ld	(.fatdir),hl
+	ld	de,(iy + 6)	; dir path
 	ld	iy,(iy + 3)
 	ld	a,(de)
 	cp	a,'/'
-	jq	nz,.error
+	jq	nz,.path_error
 	inc	de
 	ld	a,(de)
 	dec	de
@@ -289,74 +285,168 @@ fat_DirList:
 .notroot:
 	push	iy
 	call	util_locate_entry
-	jq	z,.error
+	jq	z,.path_error
 	push	de
 	pop	iy
 	call	util_get_entry_first_cluster
 	pop	iy
 .gotcluster:
 	compare_auhl_zero
-	jq	z,.nomoreentries
+	jr	nz,.findcluster
+	ld	hl,FAT_ERROR_INVALID_CLUSTER
+	ret
 .findcluster:
 	ld	(yfat.working_cluster),a,hl
 	call	util_cluster_to_block
 	ld	(yfat.working_block),a,hl
-	ld	b,(yfat.blocks_per_cluster)
-.findblock:
-	push	bc
-	ld	(yfat.working_block),a,hl
-	call	util_read_fat_block
-	jq	nz,.rw_error
+	call	util_read_fat_block		; read the first block for cache
+	jr	z,.success
+	ld	hl,FAT_ERROR_RW_FAILED
+	ret
+.success:
+	push	ix
+	ld	ix,0
+.fatdir := $-3
+	ld	(xfatDir.fat),iy
+	ld	a,(yfat.blocks_per_cluster)
+	ld	(xfatDir.blocks_per_cluster),a
+	ld	(xfatDir.cluster_block),a
+	ld	a,hl,(yfat.working_cluster)
+	ld	(xfatDir.working_cluster),a
+	ld	a,hl,(yfat.working_block)
+	ld	(xfatDir.working_block),a
+	ld	a,$aa
+	ld	(xfatDir.open),a		; magic number
+	xor	a,a
+	sbc	hl,hl				; return success
+	ld	(xfatDir.block_offset),hl
+	pop	ix
+	ret
+.path_error:
+	ld	hl,FAT_ERROR_INVALID_PATH
+	ret
+
+;-------------------------------------------------------------------------------
+fat_ReadDir:
+; Opens a directory for reading contents
+; Arguments:
+;  sp + 3 : dir struct
+;  sp + 6 : entry struct
+; Returns:
+;  FAT_SUCCESS on success
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy + 6)	; entry struct
+	ld	(.entry),hl
+	ld	iy,(iy + 3)	; dir struct
+	ld	a,(yfatDir.open)
+	cp	a,$aa		; check for magic open byte
+	jr	z,.open
+	ld	hl,FAT_ERROR_INVALID_PARAM
+	ret
+.open:
+
+	; for speed, check if the currently cached block is available
+
+	push	ix
+	ld	ix,(yfatDir.fat)
+	lea	hl,xfat.working_block
+	pop	ix
+	lea	de,yfatDir.working_block
+	ld	b,4
+.check_cache:
+	ld	a,(de)
+	cp	a,(hl)
+	jr	nz,.read_block
+	djnz	.check_cache
+	jr	.skip_read
+.read_block:
 	push	iy
-	lea	iy,yfat.buffer - 32
-	ld	b,16
+	ld	a,hl,(yfatDir.working_block)
+	ld	iy,(yfatDir.fat)
+	ld	(yfat.working_block),a,hl
+	call	util_read_fat_block		; read the block for cache
+	pop	iy
+	jq	z,.skip_read
+	ld	hl,FAT_ERROR_RW_FAILED
+	ret
+.skip_read:
+	ld	de,(yfatDir.block_offset)
+	ld	hl,16
+	or	a,a
+	sbc	hl,de
+	ld	b,l				; num entries left in the block
+	ex	de,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl				; shift by 32 multiple
+	push	ix
+	lea	ix,iy
+	ld	iy,(yfatDir.fat)
+	lea	de,yfat.buffer
+	add	hl,de				; pointer to entry
+	push	hl
+	pop	iy
+
 .findentry:
-	push	bc
-	lea	iy,iy + 32
 	ld	a,(iy)
 	or	a,a
-	jq	z,.endofentriesmaybe
+	jr	nz,.continue
+	ld	hl,FAT_ERROR_NO_MORE_ENTRIES
+	ret
+.continue:
+	inc	(xfatDir.block_offset)
 	cp	a,$e5
-	jq	z,.skip
-	or	a,a
-	jq	z,.skip
+	jr	z,.skip
 	cp	a,' '
 	ld	a,(iy + 11)
 	tst	a,8
-	jq	nz,.skip
+	jr	nz,.skip
 	bit	4,a
-	call	z,.foundentry
-.change_jump := $-4
+	jr	z,.foundentry
 .skip:
-	pop	bc
+	lea	iy,iy + 32
 	djnz	.findentry
-	pop	iy
-	ld	a,hl,(yfat.working_block)
+
+	lea	iy,ix
+	pop	ix
+
+	; handle the next block in the cluster
+
+	ld	a,hl,(yfatDir.working_block)
 	call	util_increment_auhl
-	pop	bc
-	djnz	.findblock
-	ld	a,hl,(yfat.working_cluster)
+	ld	(yfatDir.working_block),hl,a
+	xor	a,a
+	ld	(xfatDir.block_offset),a
+	dec	(yfatDir.cluster_block)
+	jp	nz,.read_block
+
+	; find the next cluster if at end of current cluster
+
+	ld	a,hl,(yfatDir.working_cluster)
+	push	iy
+	ld	iy,(yfatDir.fat)
 	call	util_next_cluster
+	pop	iy
 	compare_auhl_zero
-	jq	nz,.findcluster
-	ld	hl,(.foundnum)
+	jr	nz,.foundcluster
+	ld	hl,FAT_ERROR_NO_MORE_ENTRIES
 	ret
-.endofentriesmaybe:
-	pop	bc,bc,bc
-	ld	hl,(.foundnum)
-	ret
+.foundcluster:
+	ld	(yfatDir.working_cluster),a,hl
+	call	util_cluster_to_block
+	ld	(yfatDir.working_block),hl,a
+	ld	a,(yfatDir.blocks_per_cluster)
+	ld	(yfatDir.cluster_block),a
+	jp	.read_block
+
 .foundentry:
-	ld	hl,0
-.skipnum := $-3
-	compare_hl_zero
-	jq	z,.skipgood
-	dec	hl
-	ld	(.skipnum),hl
-	ret
-.skipgood:
+	pop	hl				; pop ix
 	push	ix
 	ld	ix,0
-.storage := $-3
+.entry := $-3
 	lea	de,ix + 0
 	lea	hl,iy + 0
 	call	util_get_name
@@ -364,29 +454,24 @@ fat_DirList:
 	ld	(xfatDirEntry.attrib),a
 	ld	a,hl,(iy + 28)
 	ld	(xfatDirEntry.entrysize),a,hl
-	lea	ix,ix + sizeof fatDirEntry
-	ld	(.storage),ix
 	pop	ix
-	ld	hl,0
-.foundnum := $-3
-	inc	hl
-	ld	(.foundnum),hl
-	ld	de,0
-.maxnum := $-3
-	compare_hl_de
-	ret	nz
-.foundmax:
-	pop	bc,bc,bc,bc			; remove call, iy, bc, bc from stack
-	ret
-.nomoreentries:
 	xor	a,a
-	sbc	hl,hl
+	sbc	hl,hl				; return success
 	ret
-.rw_error:
-	pop	hl
-.error:
-	scf
-	sbc	hl,hl
+
+;-------------------------------------------------------------------------------
+fat_CloseDir:
+; Closes an open directory handle
+; Arguments:
+;  sp + 3 : dir struct
+; Returns:
+;  FAT_SUCCESS on success
+	ld	iy,0
+	add	iy,sp
+	ld	iy,(iy + 3)
+	xor	a,a
+	ld	(yfatDir.open),a
+	sbc	hl,hl				; return success
 	ret
 
 ;-------------------------------------------------------------------------------

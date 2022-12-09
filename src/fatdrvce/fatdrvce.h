@@ -49,6 +49,7 @@ typedef enum {
     FAT_ERROR_RDONLY, /**< The file or entry is read-only */
     FAT_ERROR_RW_FAILED, /**< The callback read failed to read/write */
     FAT_ERROR_INVALID_FILESYSTEM, /**< Attempted to initialize a non-FAT filesystem */
+    FAT_ERROR_NO_MORE_ENTRIES, /**< No more entries in the directory */
 } fat_error_t;
 
 typedef struct {
