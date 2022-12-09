@@ -126,12 +126,12 @@ fat_error_t fat_Deinit(fat_t *fat);
 
 /**
  * Opens a directory for reading contents.
+ * @param dir Pointer to store opaque directory handle.
  * @param fat Initialized FAT structure.
  * @param path Directory path to get list from.
- * @param dir Pointer to store opaque directory handle.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_OpenDir(fat_t *fat, const char *path, fat_dir_t *dir);
+fat_error_t fat_OpenDir(fat_dir_t *dir, fat_t *fat, const char *path);
 
 /**
  * Parses a directory and returns a list of files and subdirectories in it.

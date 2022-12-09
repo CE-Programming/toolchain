@@ -260,17 +260,17 @@ fat_Deinit:
 fat_OpenDir:
 ; Opens a directory for reading contents
 ; Arguments:
-;  sp + 3 : fat struct
-;  sp + 6 : directory path
-;  sp + 9 : dir struct
+;  sp + 3 : dir struct
+;  sp + 6 : fat struct
+;  sp + 9 : directory path
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy + 9)	; dir struct
+	ld	hl,(iy + 3)	; dir struct
 	ld	(.fatdir),hl
-	ld	de,(iy + 6)	; dir path
-	ld	iy,(iy + 3)
+	ld	de,(iy + 9)	; dir path
+	ld	iy,(iy + 6)	; fat struct
 	ld	a,(de)
 	cp	a,'/'
 	jq	nz,.path_error
@@ -342,6 +342,9 @@ fat_ReadDir:
 	ld	a,(yfatDir.open)
 	cp	a,$aa		; check for magic open byte
 	jr	z,.open
+	ld	hl,FAT_ERROR_NO_MORE_ENTRIES
+	cp	a,$bb
+	ret	z
 	ld	hl,FAT_ERROR_INVALID_PARAM
 	ret
 .open:
@@ -394,6 +397,8 @@ fat_ReadDir:
 	ld	a,(iy)
 	or	a,a
 	jr	nz,.continue
+	ld	(xfatDir.open),$bb		; done marker
+	pop	ix
 	ld	hl,FAT_ERROR_NO_MORE_ENTRIES
 	ret
 .continue:
@@ -432,6 +437,7 @@ fat_ReadDir:
 	pop	iy
 	compare_auhl_zero
 	jr	nz,.foundcluster
+	ld	(yfatDir.open),$bb		; done marker
 	ld	hl,FAT_ERROR_NO_MORE_ENTRIES
 	ret
 .foundcluster:

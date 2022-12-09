@@ -14,7 +14,6 @@ typedef struct global global_t;
 #include <string.h>
 
 #define MAX_PARTITIONS 10
-#define MAX_ENTRIES 10
 #define FAT_BUFFER_SIZE (FAT_BLOCK_SIZE / sizeof(uint16_t))
 
 enum { USB_RETRY_INIT = USB_USER_ERROR };
@@ -170,10 +169,11 @@ int main(void)
 
     // attempt to create and open/edit a variety of files
     {
-        static fat_dir_entry_t entries[MAX_ENTRIES];
+        static fat_dir_entry_t entry;
         static uint16_t fatbuffer[FAT_BUFFER_SIZE];
         static const char *str = "/FATTEST/DIR1/FILE.TXT";
         static fat_file_t file;
+        static fat_dir_t dir;
         uint24_t count;
 
         putstr("inited fat filesystem");
@@ -279,11 +279,37 @@ int main(void)
 
         putstr("deleted files");
 
-        // get directory contents (should be 4)
-        count = fat_DirList(&fat, "/FATTEST/DIR2", FAT_LIST_ALL, entries, MAX_ENTRIES, 0);
+        // get directory contents
+        faterr = fat_OpenDir(&dir, &fat, "/FATTEST/DIR2");
+        if (faterr != FAT_SUCCESS)
+        {
+            putstr("file dir open error");
+            goto fat_error;
+        }
+
+        count = 0;
+
+        for (;;)
+        {
+            faterr = fat_ReadDir(&dir, &entry);
+            if (faterr == FAT_ERROR_NO_MORE_ENTRIES)
+            {
+                break;
+            }
+
+            if (faterr != FAT_SUCCESS)
+            {
+                putstr("file dir read error");
+                goto fat_error;
+            }
+
+            count++;
+        }
 
         sprintf(buffer, "num dir entries: %d", count);
         putstr(buffer);
+
+        fat_CloseDir(&dir);
 
         // delete file
         fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
