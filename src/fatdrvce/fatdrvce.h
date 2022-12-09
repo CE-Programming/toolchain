@@ -51,13 +51,6 @@ typedef enum {
     FAT_ERROR_INVALID_FILESYSTEM, /**< Attempted to initialize a non-FAT filesystem */
 } fat_error_t;
 
-/** FAT directory listing options */
-typedef enum {
-    FAT_LIST_FILEONLY, /**< For listing only files */
-    FAT_LIST_DIRONLY, /**< For listing only directories */
-    FAT_LIST_ALL /**< For listing files and directories */
-} fat_list_option_t;
-
 typedef struct {
     /** Callback for reading logical blocks. */
     uint24_t (*read)(fat_callback_data_t *usr, uint32_t lba, uint24_t count, void *buffer);
@@ -87,18 +80,27 @@ typedef struct {
 } fat_file_t;
 
 typedef struct {
+/* @cond */
+    uint8_t priv[32];
+/* @endcond */
+} fat_dir_t;
+
+typedef struct {
     char filename[13]; /**< Name of file in 8.3 format */
-    uint8_t attrib; /**< File attributes */
+    uint8_t attrib; /**< File attributes (@see fat_file_attrib) */
     uint32_t size; /**< Size of file in bytes */
 } fat_dir_entry_t;
 
-#define FAT_FILE      (0 << 0)  /**< Entry has no attributes */
-#define FAT_RDONLY    (1 << 0)  /**< Entry is read-only */
-#define FAT_HIDDEN    (1 << 1)  /**< Entry is hidden */
-#define FAT_SYSTEM    (1 << 2)  /**< Entry is a system file / directory */
-#define FAT_VOLLABEL  (1 << 3)  /**< Entry is a volume label -- only for root directory */
-#define FAT_DIR       (1 << 4)  /**< Entry is a directory (or subdirectory) */
-#define FAT_ARCHIVE   (1 << 5)  /**< Entry is a directory (or subdirectory) */
+enum fat_file_attrib
+{
+    FAT_FILE      = (0 << 0),  /**< Entry has no attributes */
+    FAT_RDONLY    = (1 << 0),  /**< Entry is read-only */
+    FAT_HIDDEN    = (1 << 1),  /**< Entry is hidden */
+    FAT_SYSTEM    = (1 << 2),  /**< Entry is a system file / directory */
+    FAT_VOLLABEL  = (1 << 3),  /**< Entry is a volume label -- only for root directory */
+    FAT_DIR       = (1 << 4),  /**< Entry is a directory (or subdirectory) */
+    FAT_ARCHIVE   = (1 << 5),  /**< Entry is a directory (or subdirectory) */
+};
 
 /**
  * Initializes the FAT filesystem and allows other FAT functions to be used.
@@ -122,28 +124,30 @@ fat_error_t fat_Init(fat_t *fat);
 fat_error_t fat_Deinit(fat_t *fat);
 
 /**
- * Parses a directory and returns a list of files and subdirectories in it.
+ * Opens a directory for reading contents.
  * @param fat Initialized FAT structure.
  * @param path Directory path to get list from.
- * @param option Listing option for files to find (e.g. FAT_LIST_FILEONLY)
- * @param entries Location to store found entries.
- * @param size Number of available entries to store to in the entries argument.
- *             Must be greater than or equal to 1.
- * @param skip If this function has previously been called, use this function to
- *        start parsing after this many entries.
- *
- * @code
- *  #define MAX_ENTRIES 10
- *
- *  fat_dir_entry_t entries[MAX_ENTRIES];
- *  int24_t count = fat_DirList("/DIR", FAT_LIST_ALL, entries, MAX_ENTRIES, 0);
- * @endcode
- *
+ * @param dir Pointer to store opaque directory handle.
+ * @return FAT_SUCCESS on success, otherwise error.
+ */
+fat_error_t fat_OpenDir(fat_t *fat, const char *path, fat_dir_t *dir);
+
+/**
+ * Parses a directory and returns a list of files and subdirectories in it.
+ * @param dir Initialized directory handle from fat_OpenDir().
+ * @param entry Location to store next entry.
+ * @param attrib Only return next entry with bits set with this mask, e.g.
+ *        FAT_FILE, FAT_DIR.
  * @return Number of entries found.
  */
-uint24_t fat_DirList(fat_t *fat, const char *path,
-                     fat_list_option_t option, fat_dir_entry_t *entries,
-                     uint24_t size, uint24_t skip);
+fat_error_t fat_ReadDir(fat_dir_t *dir, fat_dir_entry_t *entry);
+
+/**
+ * Closes an open directory handle.
+ * @param dir Directory handle.
+ * @return Number of entries found.
+ */
+fat_error_t fat_CloseDir(fat_dir_t *dir);
 
 /**
  * Returns the volume label of the drive if it exists.
@@ -180,7 +184,7 @@ fat_error_t fat_Delete(fat_t *fat, const char *filepath);
  * Sets the attributes (read only, hidden, etc) of the file.
  * @param fat Initialized FAT structure.
  * @param filepath Absolute file path.
- * @param attrib FAT attributes to set file to.
+ * @param attrib FAT attributes to set file to (@see fat_file_attrib).
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
