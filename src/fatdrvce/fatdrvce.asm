@@ -7,24 +7,24 @@ library FATDRVCE, 1
 ;-------------------------------------------------------------------------------
 ; v1 functions
 ;-------------------------------------------------------------------------------
-	export fat_Init
-	export fat_Deinit
+	export fat_Open
+	export fat_Close
 	export fat_OpenDir
 	export fat_ReadDir
 	export fat_CloseDir
-	export fat_GetVolumeLabel
-	export fat_Open
-	export fat_Close
-	export fat_SetSize
-	export fat_GetSize
+	export fat_OpenFile
+	export fat_CloseFile
+	export fat_SetFileSize
+	export fat_GetFileSize
 	export fat_SetAttrib
 	export fat_GetAttrib
-	export fat_SetPos
-	export fat_GetPos
-	export fat_Read
-	export fat_Write
+	export fat_SetFileBlockOffset
+	export fat_GetFileBlockOffset
+	export fat_ReadFile
+	export fat_WriteFile
 	export fat_Create
 	export fat_Delete
+	export fat_GetVolumeLabel
 ;-------------------------------------------------------------------------------
 
 include 'macros.inc'
@@ -96,8 +96,7 @@ struct fat
     	read rl 1
     	write rl 1
 	user rl 1
-	first_lba rd 1
-	last_lba rd 1
+	base_lba rd 1
 	blocks_per_cluster rb 1
 	clusters rd 1
 	fat_size rd 1
@@ -126,19 +125,50 @@ struct fatDirEntry
 	size := $-.
 end struct
 
+
+repeat 1, size: sizeof fat
+	display 'fat size: ', `size, 10
+end repeat
+
+repeat 1, size: sizeof fatFile
+	display 'fat file size: ', `size, 10
+end repeat
+
+repeat 1, size: sizeof fatDir
+	display 'fat dir size: ', `size, 10
+end repeat
+
+repeat 1, size: sizeof fatDirEntry
+	display 'fat dir entry size: ', `size
+end repeat
+
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
-fat_Init:
+fat_Open:
 ; Initializes a FAT filesystem from a particular LBA
 ; Arguments:
-;  sp + 3 : configured fat struct
+;  sp + 3 : uninitialized fat struct
+;  sp + 6 : read callback
+;  sp + 9 : write callback
+;  sp + 12 : user data for callbacks
+;  sp + 15 : lower 24 bits of base lba
+;  sp + 18 : upper 8 bits of base lba
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
-	ld	iy,(iy + 3)
 	push	ix
+	ld	ix,(iy + 3)
+	ld	hl,(iy + 6)
+	ld	(xfat.read),hl
+	ld	hl,(iy + 9)
+	ld	(xfat.write),hl
+	ld	hl,(iy + 12)
+	ld	(xfat.user),hl
+	ld	a,hl,(iy + 15)
+	ld	(xfat.base_lba),a,hl		; configure struct
+	lea	iy,ix
 	xor	a,a
 	sbc	hl,hl
 	call	util_read_fat_block		; read fat zero block
@@ -229,7 +259,7 @@ fat_Init:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_Deinit:
+fat_Close:
 ; Deinitialize the FAT partition
 ; Arguments:
 ;  sp + 3 : fat struct
@@ -260,17 +290,17 @@ fat_Deinit:
 fat_OpenDir:
 ; Opens a directory for reading contents
 ; Arguments:
-;  sp + 3 : dir struct
-;  sp + 6 : fat struct
-;  sp + 9 : directory path
+;  sp + 3 : fat struct
+;  sp + 6 : directory path
+;  sp + 9 : dir struct
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(iy + 3)	; dir struct
+	ld	hl,(iy + 9)	; dir struct
 	ld	(.fatdir),hl
-	ld	de,(iy + 9)	; dir path
-	ld	iy,(iy + 6)	; fat struct
+	ld	de,(iy + 6)	; dir path
+	ld	iy,(iy + 3)	; fat struct
 	ld	a,(de)
 	cp	a,'/'
 	jq	nz,.path_error
@@ -283,9 +313,9 @@ fat_OpenDir:
 	call	util_block_to_cluster
 	jq	.gotcluster
 .notroot:
-	push	iy
 	call	util_locate_entry
 	jq	z,.path_error
+	push	iy
 	push	de
 	pop	iy
 	call	util_get_entry_first_cluster
@@ -312,9 +342,9 @@ fat_OpenDir:
 	ld	(xfatDir.blocks_per_cluster),a
 	ld	(xfatDir.cluster_block),a
 	ld	a,hl,(yfat.working_cluster)
-	ld	(xfatDir.working_cluster),a
+	ld	(xfatDir.working_cluster),a,hl
 	ld	a,hl,(yfat.working_block)
-	ld	(xfatDir.working_block),a
+	ld	(xfatDir.working_block),a,hl
 	ld	a,$aa
 	ld	(xfatDir.open),a		; magic number
 	xor	a,a
@@ -351,16 +381,21 @@ fat_ReadDir:
 
 	; for speed, check if the currently cached block is available
 
+	ld	a,(yfatDir.block_offset)
 	push	ix
 	ld	ix,(yfatDir.fat)
 	lea	hl,xfat.working_block
+	cp	a,16				; get next cluster if at end
 	pop	ix
+	jq	z,.next_block
 	lea	de,yfatDir.working_block
 	ld	b,4
 .check_cache:
 	ld	a,(de)
 	cp	a,(hl)
 	jr	nz,.read_block
+	inc	hl
+	inc	de
 	djnz	.check_cache
 	jr	.skip_read
 .read_block:
@@ -398,18 +433,22 @@ fat_ReadDir:
 	or	a,a
 	jr	nz,.continue
 	ld	(xfatDir.open),$bb		; done marker
+	ld	hl,(.entry)
+	ld	bc,sizeof fatDirEntry
+	xor	a,a
+	call	ti.MemSet
+	or	a,a
+	sbc	hl,hl				; success, zeroed entry at end
 	pop	ix
-	ld	hl,FAT_ERROR_NO_MORE_ENTRIES
 	ret
 .continue:
 	inc	(xfatDir.block_offset)
 	cp	a,$e5
 	jr	z,.skip
 	cp	a,' '
+	jr	z,.skip
 	ld	a,(iy + 11)
 	tst	a,8
-	jr	nz,.skip
-	bit	4,a
 	jr	z,.foundentry
 .skip:
 	lea	iy,iy + 32
@@ -419,12 +458,12 @@ fat_ReadDir:
 	pop	ix
 
 	; handle the next block in the cluster
-
+.next_block:
 	ld	a,hl,(yfatDir.working_block)
 	call	util_increment_auhl
-	ld	(yfatDir.working_block),hl,a
+	ld	(yfatDir.working_block),a,hl
 	xor	a,a
-	ld	(xfatDir.block_offset),a
+	ld	(yfatDir.block_offset),a
 	dec	(yfatDir.cluster_block)
 	jp	nz,.read_block
 
@@ -442,15 +481,18 @@ fat_ReadDir:
 	ret
 .foundcluster:
 	ld	(yfatDir.working_cluster),a,hl
+	push	iy
+	ld	iy,(yfatDir.fat)
 	call	util_cluster_to_block
-	ld	(yfatDir.working_block),hl,a
+	pop	iy
+	ld	(yfatDir.working_block),a,hl
 	ld	a,(yfatDir.blocks_per_cluster)
 	ld	(yfatDir.cluster_block),a
 	jp	.read_block
 
 .foundentry:
 	pop	hl				; pop ix
-	push	ix
+	push	hl
 	ld	ix,0
 .entry := $-3
 	lea	de,ix + 0
@@ -550,24 +592,24 @@ fat_GetVolumeLabel:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_Open:
+fat_OpenFile:
 ; Attempts to open a file for reading and/or writing
 ; Arguments:
-;  sp + 3 : fat file struct
-;  sp + 6 : fat struct
-;  sp + 9 : filename (8.3 format)
+;  sp + 3 : fat struct
+;  sp + 6 : filename (8.3 format)
+;  sp + 9 : fat file struct
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
-	ld	de,(iy + 9)
+	ld	de,(iy + 6)
 	push	iy
-	ld	iy,(iy + 6)
+	ld	iy,(iy + 3)
 	call	util_locate_entry
 	pop	iy
 	jq	z,.error
-	ld	bc,(iy + 6)
-	ld	iy,(iy + 3)
+	ld	bc,(iy + 3)
+	ld	iy,(iy + 9)
 	ld	(yfatFile.fat),bc
 	ld	(yfatFile.entry_pointer),de
 	ld	(yfatFile.entry_block),a,hl
@@ -606,7 +648,7 @@ fat_Open:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_SetSize:
+fat_SetFileSize:
 ; Sets the size of the file
 ; Arguments:
 ;  sp + 3 : fat file struct
@@ -718,7 +760,7 @@ fat_SetSize:
 	call	util_read_fat_block
 	pop	iy
 	jr	nz,.write_error
-	jq	fat_Open.enter			; reopen the file
+	jq	fat_OpenFile.enter			; reopen the file
 .writeentry:
 	push	iy
 	ld	iy,(iy + 3)
@@ -760,7 +802,7 @@ fat_SetSize:
 	dd	0
 
 ;-------------------------------------------------------------------------------
-fat_GetSize:
+fat_GetFileSize:
 ; Gets the size of the file
 ; Arguments:
 ;  sp + 3 : fat file struct
@@ -773,7 +815,7 @@ fat_GetSize:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_SetPos:
+fat_SetFileBlockOffset:
 ; Sets the offset block position in the file
 ; Arguments:
 ;  sp + 3 : fat file struct
@@ -839,7 +881,7 @@ fat_SetPos:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_GetPos:
+fat_GetFileBlockOffset:
 ; Gets the file's block position
 ; Arguments:
 ;  sp + 3 : FAT File structure type
@@ -911,7 +953,7 @@ fat_GetAttrib:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_Close:
+fat_CloseFile:
 ; Closes an open file handle
 ; Arguments:
 ;  sp + 3 : fat struct
@@ -922,7 +964,7 @@ fat_Close:
 	ret
 
 ;-------------------------------------------------------------------------------
-fat_Read:
+fat_ReadFile:
 ; Reads blocks from an open file handle
 ; Arguments:
 ;  sp + 3 : FAT File structure type
@@ -935,7 +977,7 @@ fat_Read:
 	jq	util_fat_read_write
 
 ;-------------------------------------------------------------------------------
-fat_Write:
+fat_WriteFile:
 ; Writes a blocks to an open file handle
 ; Arguments:
 ;  sp + 3 : FAT File structure type
@@ -2244,7 +2286,7 @@ util_read_fat_multiple_blocks:
 	push	bc				; store count for checking
 	push	de
 	push	bc
-	ld	e,bc,(yfat.first_lba)
+	ld	e,bc,(yfat.base_lba)
 	add	hl,bc
 	adc	a,e
 	ld	c,a
@@ -2283,7 +2325,7 @@ util_write_fat_multiple_blocks:
 	push	bc				; store count for checking
 	push	de
 	push	bc
-	ld	e,bc,(yfat.first_lba)
+	ld	e,bc,(yfat.base_lba)
 	add	hl,bc
 	adc	a,e
 	ld	c,a

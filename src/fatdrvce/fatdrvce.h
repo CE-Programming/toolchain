@@ -101,7 +101,7 @@ typedef struct {
 
 /** FAT directory entry structure */
 typedef struct {
-    char filename[13]; /**< Name of file in 8.3 format */
+    char name[13]; /**< Name in 8.3 format */
     uint8_t attrib; /**< File attributes (@see fat_file_attrib) */
     uint32_t size; /**< Size of file in bytes */
 } fat_dir_entry_t;
