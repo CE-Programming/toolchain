@@ -13,7 +13,7 @@ typedef struct global global_t;
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_PARTITIONS 1
+#define MAX_PARTITIONS 32
 
 struct global
 {
@@ -200,8 +200,6 @@ int main(void)
         fat_callback_usr_t *usr = &global.msd;
         fat_read_callback_t read = &msd_Read;
         fat_write_callback_t write = &msd_Write;
-
-        printf("open fat @%lu\n", base_lba);
 
         faterr = fat_Open(&fat, read, write, usr, base_lba);
         if (faterr == FAT_SUCCESS)

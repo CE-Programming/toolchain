@@ -1,6 +1,6 @@
 typedef struct global global_t;
 #define usb_callback_data_t global_t
-#define fat_callback_data_t msd_t
+#define fat_callback_usr_t msd_t
 
 #include <usbdrvce.h>
 #include <msddrvce.h>
@@ -13,7 +13,7 @@ typedef struct global global_t;
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_PARTITIONS 10
+#define MAX_PARTITIONS 32
 #define FAT_BUFFER_SIZE (FAT_BLOCK_SIZE / sizeof(uint16_t))
 
 enum { USB_RETRY_INIT = USB_USER_ERROR };
@@ -143,24 +143,25 @@ int main(void)
     // attempt to open the first found fat partition
     // it is not required to use a MSD to access a FAT filesystem if the
     // appropriate callbacks are configured.
-    fat.read = &msd_Read;
-    fat.write = &msd_Write;
-    fat.usr = &global.msd;
     for (uint8_t p = 0;;)
     {
-        fat.first_lba = partitions[p].first_lba;
-        fat.last_lba = partitions[p].last_lba;
-        faterr = fat_Init(&fat);
+        uint32_t base_lba = partitions[p].first_lba;
+        fat_callback_usr_t *usr = &global.msd;
+        fat_read_callback_t read = &msd_Read;
+        fat_write_callback_t write = &msd_Write;
+
+        faterr = fat_Open(&fat, read, write, usr, base_lba);
         if (faterr == FAT_SUCCESS)
         {
-            sprintf(buffer, "opened fat partition %u", p);
+            sprintf(buffer, "opened fat partition %u", p - 1);
             putstr(buffer);
             break;
         }
+
         p++;
         if (p >= num_partitions)
         {
-            putstr("no fat32 paritions found");
+            putstr("no suitable patitions");
             goto msd_error;
         }
     }
@@ -191,35 +192,35 @@ int main(void)
         putstr("created files");
 
         // change the file size to test cluster allocation
-        faterr = fat_Open(&file, &fat, str);
+        faterr = fat_OpenFile(&fat, str, &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");
             goto fat_error;
         }
 
-        faterr = fat_SetSize(&file, 512 * 1024);
+        faterr = fat_SetFileSize(&file, 512 * 1024);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not set file size");
             goto fat_error;
         }
 
-        faterr = fat_SetSize(&file, 0);
+        faterr = fat_SetFileSize(&file, 0);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not set file size");
             goto fat_error;
         }
 
-        faterr = fat_SetSize(&file, 512 * 32);
+        faterr = fat_SetFileSize(&file, 512 * 32);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not set file size");
             goto fat_error;
         }
 
-        faterr = fat_Close(&file);
+        faterr = fat_CloseFile(&file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("file close error");
@@ -227,42 +228,42 @@ int main(void)
         }
 
         // change the size of the other files
-        faterr = fat_Open(&file, &fat, "/FATTEST/DIR2/FILE1.TXT");
+        faterr = fat_OpenFile(&fat, "/FATTEST/DIR2/FILE1.TXT", &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");
             goto fat_error;
         }
 
-        fat_SetSize(&file, 512 * 2 + 16);
+        faterr = fat_SetFileSize(&file, 512 * 2 + 16);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not set file size");
             goto fat_error;
         }
 
-        faterr = fat_Close(&file);
+        faterr = fat_CloseFile(&file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("file close error");
             goto fat_error;
         }
 
-        faterr = fat_Open(&file, &fat, "/FATTEST/DIR2/FILE2.TXT");
+        faterr = fat_OpenFile(&fat, "/FATTEST/DIR2/FILE2.TXT", &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");
             goto fat_error;
         }
 
-        fat_SetSize(&file, 512 * 2 + 32);
+        fat_SetFileSize(&file, 512 * 2 + 32);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not set file size");
             goto fat_error;
         }
 
-        faterr = fat_Close(&file);
+        faterr = fat_CloseFile(&file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("file close error");
@@ -280,7 +281,7 @@ int main(void)
         putstr("deleted files");
 
         // get directory contents
-        faterr = fat_OpenDir(&dir, &fat, "/FATTEST/DIR2");
+        faterr = fat_OpenDir(&fat, "/FATTEST/DIR2", &dir);
         if (faterr != FAT_SUCCESS)
         {
             putstr("file dir open error");
@@ -292,15 +293,15 @@ int main(void)
         for (;;)
         {
             faterr = fat_ReadDir(&dir, &entry);
-            if (faterr == FAT_ERROR_NO_MORE_ENTRIES)
-            {
-                break;
-            }
-
             if (faterr != FAT_SUCCESS)
             {
                 putstr("file dir read error");
                 goto fat_error;
+            }
+
+            if (entry.name[0] == 0)
+            {
+                break;
             }
 
             count++;
@@ -315,7 +316,7 @@ int main(void)
         fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
 
         // write bytes to file
-        faterr = fat_Open(&file, &fat, str);
+        faterr = fat_OpenFile(&fat, str, &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");
@@ -332,7 +333,7 @@ int main(void)
                 fatbuffer[j - offset] = j;
             }
 
-            count = fat_Write(&file, 1, fatbuffer);
+            count = fat_WriteFile(&file, 1, fatbuffer);
             if (count != 1)
             {
                 putstr("write error");
@@ -343,7 +344,7 @@ int main(void)
         putstr("wrote file bytes");
 
         // read back file, and compare read to written bytes
-        faterr = fat_SetPos(&file, 0);
+        faterr = fat_SetFileBlockOffset(&file, 0);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not set position");
@@ -356,7 +357,7 @@ int main(void)
 
             offset = i * FAT_BUFFER_SIZE;
 
-            count = fat_Read(&file, 1, fatbuffer);
+            count = fat_ReadFile(&file, 1, fatbuffer);
             if (count != 1)
             {
                 putstr("read error");
@@ -376,7 +377,7 @@ int main(void)
         putstr("read back file bytes");
 
         // check if end of file -- should return 0
-        count = fat_Read(&file, 1, fatbuffer);
+        count = fat_ReadFile(&file, 1, fatbuffer);
         if (count != 0)
         {
             putstr("file read error");
@@ -384,7 +385,7 @@ int main(void)
         }
 
         // close the fat file
-        faterr = fat_Close(&file);
+        faterr = fat_CloseFile(&file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("file close error");
@@ -397,7 +398,7 @@ int main(void)
 
 fat_error:
     // release the filesystem
-    fat_Deinit(&fat);
+    fat_Close(&fat);
 
 msd_error:
     // close the msd device
