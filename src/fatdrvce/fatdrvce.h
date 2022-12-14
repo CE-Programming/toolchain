@@ -102,7 +102,7 @@ typedef struct {
 /** FAT directory entry structure */
 typedef struct {
     char name[13]; /**< Name in 8.3 format */
-    uint8_t attrib; /**< File attributes (@see fat_file_attrib) */
+    uint8_t attrib; /**< File attributes @see fat_file_attrib */
     uint32_t size; /**< Size of file in bytes */
 } fat_dir_entry_t;
 
@@ -137,10 +137,10 @@ fat_error_t fat_Open(fat_t *fat,
                      const uint32_t base_lba);
 
 /**
- * Deinitialize the FAT filesystem. This is not required to be called, however
+ * Closes the FAT filesystem. This is not required to be called, however
  * it will clear the filesystem dirty bit so other OSes don't see the filesystem
  * with potential errors. You cannot use the FAT structure after this call,
- * and should call fat_Init if you need to modify the filesystem again.
+ * and should call fat_Open() if you need to modify the filesystem again.
  * @param fat[in] Initialized FAT structure type.
  * @return FAT_SUCCESS on success, otherwise error.
  */
@@ -205,7 +205,7 @@ fat_error_t fat_Delete(fat_t *fat, const char *filepath);
  * Sets the attributes (read only, hidden, etc) of the file.
  * @param fat[in] Initialized FAT structure.
  * @param filepath[in] Absolute file path.
- * @param attrib[in] FAT attributes to set file to (@see fat_file_attrib).
+ * @param attrib[in] FAT attributes to set file to. @see fat_file_attrib
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
@@ -247,7 +247,7 @@ uint32_t fat_GetFileSize(fat_file_t *file);
 
 /**
  * Sets the block offset position in the file.
- * @param file[in] File handle returned from fat_Open.
+ * @param file[in] File handle returned from fat_OpenFile().
  * @param block[in] Block offset into file.
  * @return FAT_SUCCESS on success, otherwise error.
  */
@@ -255,14 +255,14 @@ fat_error_t fat_SetFileBlockOffset(fat_file_t *file, uint24_t block);
 
 /**
  * Gets the sector offset position in the file.
- * @param file[in] File handle returned from fat_Open.
+ * @param file[in] File handle returned from fat_OpenFile().
  * @return File block offset.
  */
 uint24_t fat_GetFileBlockOffset(fat_file_t *file);
 
 /**
  * Read from a file. Advances file block offset position.
- * @param file[in] File handle returned from fat_Open.
+ * @param file[in] File handle returned from fat_OpenFile().
  * @param count[in] Number of blocks to read.
  * @param buffer[out] Data read from FAT file.
  * @return Returns number of blocks read, should equal \p count if success.
@@ -270,8 +270,9 @@ uint24_t fat_GetFileBlockOffset(fat_file_t *file);
 uint24_t fat_ReadFile(fat_file_t *file, uint24_t count, void *buffer);
 
 /**
- * Write to a file. Advances file block offset position.
- * @param file[in] File handle returned from fat_Open.
+ * Write to a file. Advances file block offset position. Does not extend file
+ * size if at last block in file, fat_SetFileSize() must be used instead.
+ * @param file[in] File handle returned from fat_OpenFile().
  * @param count[in] Number of blocks to write to file.
  * @param buffer[in] Data to write to FAT file.
  * @return Returns number of blocks written, should equal \p count if success.
@@ -280,7 +281,7 @@ uint24_t fat_WriteFile(fat_file_t *file, uint24_t count, const void *buffer);
 
 /**
  * Closes an open file handle.
- * @param file[in] File handle returned from fat_Open.
+ * @param file[in] File handle returned from fat_OpenFile().
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_CloseFile(fat_file_t *file);

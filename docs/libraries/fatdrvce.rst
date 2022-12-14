@@ -13,8 +13,8 @@ The read and write functions are implemented as user-provided callbacks, allowin
 .. contents:: :local:
    :depth: 3
 
-Typical Usage
--------------
+Physical Drive Usage
+--------------------
 
 This library can be integrated with **msddrvce** in order to access physical devices such as a flash drive.
 
@@ -23,7 +23,7 @@ On Linux this can be accomplished with the following command:
 
 .. code-block:: bash
 
-    mkfs.vfat -s 128 -S 512 -v /dev/<drive partition, e.g. sda1>
+    mkfs.vfat -F 32 -s 128 -S 512 -v /dev/<drive partition, e.g. sda1>
 
 Known Limitations
 -----------------
@@ -31,6 +31,12 @@ Known Limitations
 - The filesystem must use 512 byte logical blocks.
 - The filesystem must be formatted as FAT32 (no support for FAT12, FAT16, or exFAT)
 - Long name support is not currently implemented.
+
+General Information
+-------------------
+
+The root directory is :code:`/`.
+For example, accessing the :code:`ROOT.BIN` file in the root directory would look like :code:`fat_OpenFile(fat, "/ROOT.BIN", &file);`.
 
 API Documentation
 -----------------
