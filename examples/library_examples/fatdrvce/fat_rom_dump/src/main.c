@@ -185,7 +185,7 @@ int main(void)
 
     // create the rom file, deleting it if it exists first
     fat_Delete(&fat, ROM_FILE_FILE_PATH);
-    faterr = fat_Create(&fat, ROM_FILE_PATH, ROM_FILE_FILE, FAT_FILE);
+    faterr = fat_Create(&fat, ROM_FILE_PATH, ROM_FILE_FILE, 0);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not create file!");
@@ -193,7 +193,7 @@ int main(void)
     }
 
     // open rom file for writing
-    faterr = fat_OpenFile(&fat, ROM_FILE_FILE_PATH, &file);
+    faterr = fat_OpenFile(&fat, ROM_FILE_FILE_PATH, 0, &file);
     if (faterr != FAT_SUCCESS)
     {
         putstr("could not open file!");

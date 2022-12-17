@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library FATDRVCE, 1
+library FATDRVCE, 2
 
 ;-------------------------------------------------------------------------------
 ; v1 functions
@@ -597,7 +597,8 @@ fat_OpenFile:
 ; Arguments:
 ;  sp + 3 : fat struct
 ;  sp + 6 : filename (8.3 format)
-;  sp + 9 : fat file struct
+;  sp + 9 : flags (currently unused)
+;  sp + 12 : fat file struct
 ; Returns:
 ;  FAT_SUCCESS on success
 	ld	iy,0
@@ -609,7 +610,7 @@ fat_OpenFile:
 	pop	iy
 	jq	z,.error
 	ld	bc,(iy + 3)
-	ld	iy,(iy + 9)
+	ld	iy,(iy + 12)
 	ld	(yfatFile.fat),bc
 	ld	(yfatFile.entry_pointer),de
 	ld	(yfatFile.entry_block),a,hl
@@ -2151,9 +2152,9 @@ util_next_cluster:
 	ret
 
 ; inputs:
-;   same as fat_Read / fat_Write
+;   same as fat_ReadFile / fat_WriteFile
 ; outputs:
-;   same as fat_Read / fat_Write
+;   same as fat_ReadFile / fat_WriteFile
 util_fat_read_write:
 	ld	iy,0
 	add	iy,sp
@@ -2286,9 +2287,9 @@ util_read_fat_multiple_blocks:
 	push	bc				; store count for checking
 	push	de
 	push	bc
-	ld	e,bc,(yfat.base_lba)
+	ld	bc,(yfat.base_lba)
 	add	hl,bc
-	adc	a,e
+	adc	a,(yfat.base_lba + 3)
 	ld	c,a
 	push	bc
 	push	hl
@@ -2325,9 +2326,9 @@ util_write_fat_multiple_blocks:
 	push	bc				; store count for checking
 	push	de
 	push	bc
-	ld	e,bc,(yfat.base_lba)
+	ld	bc,(yfat.base_lba)
 	add	hl,bc
-	adc	a,e
+	adc	a,(yfat.base_lba + 3)
 	ld	c,a
 	push	bc
 	push	hl

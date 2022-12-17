@@ -185,14 +185,14 @@ int main(void)
         fat_Create(&fat, "/FATTEST", "DIR2", FAT_DIR);
         fat_Create(&fat, "/FATTEST", "DIR3", FAT_DIR);
 
-        fat_Create(&fat, "/FATTEST/DIR1", "FILE.TXT", FAT_FILE);
-        fat_Create(&fat, "/FATTEST/DIR2", "FILE1.TXT", FAT_FILE);
-        fat_Create(&fat, "/FATTEST/DIR2", "FILE2.TXT", FAT_FILE);
+        fat_Create(&fat, "/FATTEST/DIR1", "FILE.TXT", 0);
+        fat_Create(&fat, "/FATTEST/DIR2", "FILE1.TXT", 0);
+        fat_Create(&fat, "/FATTEST/DIR2", "FILE2.TXT", 0);
 
         putstr("created files");
 
         // change the file size to test cluster allocation
-        faterr = fat_OpenFile(&fat, str, &file);
+        faterr = fat_OpenFile(&fat, str, 0, &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");
@@ -228,7 +228,7 @@ int main(void)
         }
 
         // change the size of the other files
-        faterr = fat_OpenFile(&fat, "/FATTEST/DIR2/FILE1.TXT", &file);
+        faterr = fat_OpenFile(&fat, "/FATTEST/DIR2/FILE1.TXT", 0, &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");
@@ -249,7 +249,7 @@ int main(void)
             goto fat_error;
         }
 
-        faterr = fat_OpenFile(&fat, "/FATTEST/DIR2/FILE2.TXT", &file);
+        faterr = fat_OpenFile(&fat, "/FATTEST/DIR2/FILE2.TXT", 0, &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");
@@ -316,7 +316,7 @@ int main(void)
         fat_Delete(&fat, "/FATTEST/DIR2/FILE2.TXT");
 
         // write bytes to file
-        faterr = fat_OpenFile(&fat, str, &file);
+        faterr = fat_OpenFile(&fat, str, 0, &file);
         if (faterr != FAT_SUCCESS)
         {
             putstr("could not open file");

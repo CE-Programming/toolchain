@@ -108,13 +108,12 @@ typedef struct {
 
 enum fat_file_attrib
 {
-    FAT_FILE      = (0 << 0),  /**< Entry has no attributes */
     FAT_RDONLY    = (1 << 0),  /**< Entry is read-only */
     FAT_HIDDEN    = (1 << 1),  /**< Entry is hidden */
     FAT_SYSTEM    = (1 << 2),  /**< Entry is a system file / directory */
     FAT_VOLLABEL  = (1 << 3),  /**< Entry is a volume label */
     FAT_DIR       = (1 << 4),  /**< Entry is a directory (or subdirectory) */
-    FAT_ARCHIVE   = (1 << 5),  /**< Entry is a directory (or subdirectory) */
+    FAT_ARCHIVE   = (1 << 5),  /**< Entry is changed (created/modified) */
 };
 
 /**
@@ -166,7 +165,7 @@ fat_error_t fat_ReadDir(fat_dir_t *dir, fat_dir_entry_t *entry);
 /**
  * Closes an open directory handle.
  * @param dir[in] Directory handle.
- * @return Number of entries found.
+ * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_CloseDir(fat_dir_t *dir);
 
@@ -184,8 +183,7 @@ fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
  * @param fat[in] Initialized FAT structure.
  * @param path[in] Path in which to create. Does not create subdirectories.
  * @param name[in] Name of new file or directory.
- * @param attrib[in] New entry attributes, can be a mask of FAT_RDONLY,
-                     FAT_HIDDEN, FAT_SYSTEM, and FAT_DIR.
+ * @param attrib[in] New entry attributes (#fat_file_attrib mask).
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Create(fat_t *fat, const char *path, const char *name, uint8_t attrib);
@@ -205,7 +203,7 @@ fat_error_t fat_Delete(fat_t *fat, const char *filepath);
  * Sets the attributes (read only, hidden, etc) of the file.
  * @param fat[in] Initialized FAT structure.
  * @param filepath[in] Absolute file path.
- * @param attrib[in] FAT attributes to set file to. @see fat_file_attrib
+ * @param attrib[in] FAT attributes to set file to (#fat_file_attrib mask).
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
@@ -222,19 +220,22 @@ uint8_t fat_GetAttrib(fat_t *fat, const char *filepath);
  * Opens a file for either reading or writing, or both.
  * @param fat[in] Initialized FAT structure.
  * @param filepath[in] Absolute file path.
+ * @param flags[in] File open flags (currently no flags available, set to 0)
  * @param file[out] Uninitialized structure to store working file information.
  * @return FAT_SUCCESS on success, otherwise error.
  */
-fat_error_t fat_OpenFile(fat_t *fat, const char *filepath, fat_file_t *file);
+fat_error_t fat_OpenFile(fat_t *fat, const char *filepath, uint8_t flags, fat_file_t *file);
 
 /**
  * Sets the size of the file, allocating or deallocating space as needed.
  * This function should be called before attempting to read/write in a file that
  * does not have a large enough current file size, (i.e. a newly created file).
+ * This function may take a long time to run as it will allocate/deallocate the
+ * clusters required for storing to the file.
  * @param file[in] FAT file structure.
  * @param size[in] New file size.
  * @return FAT_SUCCESS on success, otherwise error.
- * @note This function resets the block position to 0, regardless size change.
+ * @note This function always resets the block position to 0.
  */
 fat_error_t fat_SetFileSize(fat_file_t *file, uint32_t size);
 
