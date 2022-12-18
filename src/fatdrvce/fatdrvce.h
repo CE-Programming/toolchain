@@ -54,10 +54,10 @@ typedef enum {
 
 /**
  * Callback for reading logical blocks
- * @param usr[in] User defined data pointer.
- * @param lba[in] Local block address (LBA) to read.
- * @param count[in] Number of logical blocks to read.
- * @param buffer[in] Buffer to store read data into.
+ * @param[in] usr User defined data pointer.
+ * @param[in] lba Local block address (LBA) to read.
+ * @param[in] count Number of logical blocks to read.
+ * @param[in] buffer Buffer to store read data into.
  * @returns Number of logical blocks read.
  */
 typedef uint24_t (*fat_read_callback_t)(fat_callback_usr_t *usr,
@@ -67,10 +67,10 @@ typedef uint24_t (*fat_read_callback_t)(fat_callback_usr_t *usr,
 
 /**
  * Callback for writing logical blocks
- * @param usr[in] User defined data pointer.
- * @param lba[in] Local block address (LBA) to write.
- * @param count[in] Number of logical blocks to write.
- * @param buffer[in] Buffer to fetch write data from.
+ * @param[in] usr User defined data pointer.
+ * @param[in] lba Local block address (LBA) to write.
+ * @param[in] count Number of logical blocks to write.
+ * @param[in] buffer Buffer to fetch write data from.
  * @returns Number of logical blocks writen.
  */
 typedef uint24_t (*fat_write_callback_t)(fat_callback_usr_t *usr,
@@ -120,13 +120,13 @@ enum fat_file_attrib
  * Initializes the FAT filesystem and allows other FAT functions to be used.
  * This function will attempt to read and verify that a valid FAT filesystem is
  * being accessed.
- * @param fat[out] Uninitialized FAT structure type.
- * @param read[in] Callback for reading logical blocks.
- * @param write[in] Callback for writing logical blocks.
- * @param usr[in] Pointer to user-provided data structure that is passed to the
+ * @param[out] fat Uninitialized FAT structure type.
+ * @param[in] read Callback for reading logical blocks.
+ * @param[in] write Callback for writing logical blocks.
+ * @param[in] usr Pointer to user-provided data structure that is passed to the
  *                relevant read/write callback functions. This can be used to
  *                store context information with different storage mechanisms.
- * @param base_lba[in] LBA added to every FAT access for ease of use.
+ * @param[in] base_lba LBA added to every FAT access for ease of use.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Open(fat_t *fat,
@@ -140,39 +140,40 @@ fat_error_t fat_Open(fat_t *fat,
  * it will clear the filesystem dirty bit so other OSes don't see the filesystem
  * with potential errors. You cannot use the FAT structure after this call,
  * and should call fat_Open() if you need to modify the filesystem again.
- * @param fat[in] Initialized FAT structure type.
+ * @param[in] fat Initialized FAT structure type.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Close(fat_t *fat);
 
 /**
  * Opens a directory for reading contents.
- * @param fat[in] Initialized FAT structure.
- * @param path[in] Directory path to get list from.
- * @param dir[out] Pointer to store opaque directory handle.
+ * @param[in] fat Initialized FAT structure.
+ * @param[in] path Directory path to get list from.
+ * @param[out] dir Pointer to store opaque directory handle.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_OpenDir(fat_t *fat, const char *path, fat_dir_t *dir);
 
 /**
- * Gets the next directory entry.
- * @param dir[in] Initialized directory handle from fat_OpenDir().
- * @param entry[out] Pointer to store entry information.
+ * Gets the next directory entry. If `entry.name[0] = 0`, then there are no more
+ * entries to fetch.
+ * @param[in] dir Initialized directory handle from fat_OpenDir().
+ * @param[out] entry Pointer to store entry information.
  * @return Number of entries found.
  */
 fat_error_t fat_ReadDir(fat_dir_t *dir, fat_dir_entry_t *entry);
 
 /**
  * Closes an open directory handle.
- * @param dir[in] Directory handle.
+ * @param[in] dir Directory handle.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_CloseDir(fat_dir_t *dir);
 
 /**
  * Returns the volume label of the drive if it exists.
- * @param fat[in] Initialized FAT structure type.
- * @param label[out] Storage for returning label, must be >= 13 bytes.
+ * @param[in] fat Initialized FAT structure type.
+ * @param[out] label Storage for returning label, must be >= 13 bytes.
  * @returns FAT_SUCCESS on success, FAT_ERROR_NO_VOLUME_LABEL if no label,
  *          otherwise a different error.
  */
@@ -180,18 +181,18 @@ fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
 
 /**
  * Creates new files or directories in the filesystem.
- * @param fat[in] Initialized FAT structure.
- * @param path[in] Path in which to create. Does not create subdirectories.
- * @param name[in] Name of new file or directory.
- * @param attrib[in] New entry attributes (#fat_file_attrib mask).
+ * @param[in] fat Initialized FAT structure.
+ * @param[in] path Path in which to create. Does not create subdirectories.
+ * @param[in] name Name of new file or directory.
+ * @param[in] attrib New entry attributes (#fat_file_attrib mask).
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Create(fat_t *fat, const char *path, const char *name, uint8_t attrib);
 
 /**
  * Deletes a file or directory and deallocates the spaced used by it on disk.
- * @param fat[in] Initialized FAT structure.
- * @param filepath[in] Absolute path to file or directory to delete.
+ * @param[in] fat Initialized FAT structure.
+ * @param[in] filepath Absolute path to file or directory to delete.
  * @return FAT_SUCCESS on success, otherwise error.
  * @note Directories must be empty in order to be deleted.
  * @warning Do not use this function on open files. The file must be closed
@@ -201,27 +202,27 @@ fat_error_t fat_Delete(fat_t *fat, const char *filepath);
 
 /**
  * Sets the attributes (read only, hidden, etc) of the file.
- * @param fat[in] Initialized FAT structure.
- * @param filepath[in] Absolute file path.
- * @param attrib[in] FAT attributes to set file to (#fat_file_attrib mask).
+ * @param[in] fat Initialized FAT structure.
+ * @param[in] filepath Absolute file path.
+ * @param[in] attrib FAT attributes to set file to (#fat_file_attrib mask).
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
 
 /**
  * Gets the attributes (read only, hidden, etc) of the file.
- * @param fat[in] Initialized FAT structure.
- * @param filepath[in] Absolute file path.
+ * @param[in] fat Initialized FAT structure.
+ * @param[in] filepath Absolute file path.
  * @return File attributes, or 255 if an error.
  */
 uint8_t fat_GetAttrib(fat_t *fat, const char *filepath);
 
 /**
  * Opens a file for either reading or writing, or both.
- * @param fat[in] Initialized FAT structure.
- * @param filepath[in] Absolute file path.
- * @param flags[in] File open flags (currently no flags available, set to 0)
- * @param file[out] Uninitialized structure to store working file information.
+ * @param[in] fat Initialized FAT structure.
+ * @param[in] filepath Absolute file path.
+ * @param[in] flags File open flags (currently no flags available, set to 0)
+ * @param[out] file Uninitialized structure to store working file information.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_OpenFile(fat_t *fat, const char *filepath, uint8_t flags, fat_file_t *file);
@@ -232,8 +233,8 @@ fat_error_t fat_OpenFile(fat_t *fat, const char *filepath, uint8_t flags, fat_fi
  * does not have a large enough current file size, (i.e. a newly created file).
  * This function may take a long time to run as it will allocate/deallocate the
  * clusters required for storing to the file.
- * @param file[in] FAT file structure.
- * @param size[in] New file size.
+ * @param[in] file FAT file structure.
+ * @param[in] size New file size.
  * @return FAT_SUCCESS on success, otherwise error.
  * @note This function always resets the block position to 0.
  */
@@ -241,31 +242,31 @@ fat_error_t fat_SetFileSize(fat_file_t *file, uint32_t size);
 
 /**
  * Gets the size of a file.
- * @param file[in] FAT file structure.
+ * @param[in] file FAT file structure.
  * @return File size in bytes.
  */
 uint32_t fat_GetFileSize(fat_file_t *file);
 
 /**
  * Sets the block offset position in the file.
- * @param file[in] File handle returned from fat_OpenFile().
- * @param block[in] Block offset into file.
+ * @param[in] file File handle returned from fat_OpenFile().
+ * @param[in] block Block offset into file.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_SetFileBlockOffset(fat_file_t *file, uint24_t block);
 
 /**
  * Gets the sector offset position in the file.
- * @param file[in] File handle returned from fat_OpenFile().
+ * @param[in] file File handle returned from fat_OpenFile().
  * @return File block offset.
  */
 uint24_t fat_GetFileBlockOffset(fat_file_t *file);
 
 /**
  * Read from a file. Advances file block offset position.
- * @param file[in] File handle returned from fat_OpenFile().
- * @param count[in] Number of blocks to read.
- * @param buffer[out] Data read from FAT file.
+ * @param[in] file File handle returned from fat_OpenFile().
+ * @param[in] count Number of blocks to read.
+ * @param[out] buffer Data read from FAT file.
  * @return Returns number of blocks read, should equal \p count if success.
  */
 uint24_t fat_ReadFile(fat_file_t *file, uint24_t count, void *buffer);
@@ -273,16 +274,16 @@ uint24_t fat_ReadFile(fat_file_t *file, uint24_t count, void *buffer);
 /**
  * Write to a file. Advances file block offset position. Does not extend file
  * size if at last block in file, fat_SetFileSize() must be used instead.
- * @param file[in] File handle returned from fat_OpenFile().
- * @param count[in] Number of blocks to write to file.
- * @param buffer[in] Data to write to FAT file.
+ * @param[in] file File handle returned from fat_OpenFile().
+ * @param[in] count Number of blocks to write to file.
+ * @param[in] buffer Data to write to FAT file.
  * @return Returns number of blocks written, should equal \p count if success.
  */
 uint24_t fat_WriteFile(fat_file_t *file, uint24_t count, const void *buffer);
 
 /**
  * Closes an open file handle.
- * @param file[in] File handle returned from fat_OpenFile().
+ * @param[in] file File handle returned from fat_OpenFile().
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_CloseFile(fat_file_t *file);
