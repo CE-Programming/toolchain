@@ -19,45 +19,6 @@
 extern "C" {
 #endif
 
-enum {
-    SRL_TYPE_UNKNOWN, /**< Incompatible or non-serial device */
-    SRL_TYPE_HOST,    /**< Calc is acting as a device */
-    SRL_TYPE_CDC,     /**< CDC device */
-    SRL_TYPE_FTDI,    /**< FTDI device */
-    SRL_TYPE_PL2303   /**< PL2303 device */
-};
-
-typedef uint8_t srl_device_type_t;
-
-enum {
-    SRL_SUBTYPE_FTDI_UNKNOWN = 0,
-    SRL_SUBTYPE_SIO,
-    SRL_SUBTYPE_FT8U232AM,
-    SRL_SUBTYPE_FT232BM,
-    SRL_SUBTYPE_FT2232C,
-    SRL_SUBTYPE_FT232RL,
-    SRL_SUBTYPE_FTX,
-    SRL_SUBTYPE_FT2232H,
-    SRL_SUBTYPE_FT4232H,
-    SRL_SUBTYPE_FT232H,
-};
-
-enum {
-    SRL_SUBTYPE_PL2303_01 = 0,
-    SRL_SUBTYPE_PL2303_HX,
-};
-
-typedef uint8_t srl_device_subtype_t;
-
-typedef struct {
-    void *buf_start;
-    void *buf_end;
-    void *data_start;
-    void *data_break;
-    void *data_end;
-    bool dma_active;
-} ring_buf_ctrl_t;
-
 typedef enum {
     SRL_SUCCESS = 0,
     SRL_ERROR_INVALID_PARAM = -1,
@@ -70,17 +31,8 @@ typedef enum {
 } srl_error_t;
 
 typedef struct {
-    usb_device_t dev; /**< USB device */
-    /**< An OUT endpoint if in device mode, an IN endpoint otherwise */
-    uint8_t rx_addr;
-    /**< An IN endpoint if in device mode, an OUT endpoint otherwise */
-    uint8_t tx_addr;
-    srl_device_type_t type;
-    srl_device_subtype_t subtype;
-    ring_buf_ctrl_t rx_buf;
-    ring_buf_ctrl_t tx_buf;
-    srl_error_t err;
-    uint8_t reserved[16];
+    usb_device_t dev;
+    uint8_t reserved[55];
 } srl_device_t;
 
 #define SRL_INTERFACE_ANY 0xFF
