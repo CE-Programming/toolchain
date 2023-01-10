@@ -1,5 +1,5 @@
 ;=========================================================================
-; Copyright (C) 2015-2022 Matt "MateoConLechuga" Waltz
+; Copyright (C) 2015-2023 Matt "MateoConLechuga" Waltz
 ; Version 4.0
 ;
 ; This library is free software; you can redistribute it and/or
