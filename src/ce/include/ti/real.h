@@ -200,7 +200,7 @@ tiflags real_t os_Int24ToReal(int24_t arg);
 float os_RealToFloat(const real_t *arg);
 
 /**
- * Converts an float to a real_t
+ * Converts a float to a real_t
  *
  * @param[in] arg Float value.
  * @note Saturates on overflow
