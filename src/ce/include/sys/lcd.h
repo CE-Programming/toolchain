@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-/**< Base address of memory-mapped RAM for the LCD */
+/** Base address of memory-mapped RAM for the LCD */
 #define lcd_Ram                  ((void*)0xD40000)
 /* @cond */
 #define lcd_Timing0              (*(volatile uint32_t*)0xE30000)
@@ -27,7 +27,7 @@ extern "C" {
 #define lcd_LpBase               (*(volatile uint24_t*)0xE30014)
 #define lcd_LpBaseFull           (*(volatile uint32_t*)0xE30014)
 /* @endcond */
-/**< LCD Control register */
+/** LCD Control register */
 #define lcd_Control              (*(volatile uint24_t*)0xE30018)
 /* @cond */
 #define lcd_EnableInt            (*(volatile uint8_t*)0xE3001C)
@@ -39,7 +39,7 @@ extern "C" {
 #define lcd_LpBaseCurr           (*(volatile uint24_t*)0xE30030)
 #define lcd_LpBaseCurrFull       (*(volatile uint32_t*)0xE30030)
 /* @endcond */
-/**< LCD palette registers, 512 bytes */
+/** LCD palette registers, 512 bytes */
 #define lcd_Palette              ((uint16_t*)0xE30200)
 /* @cond */
 #define lcd_CrsrImageLen32       256
@@ -62,14 +62,14 @@ extern "C" {
 #define lcd_CrsrIntStatus        (*(volatile uint8_t*)0xE30C28)
 #define lcd_CrsrIntStatusMasked  (*(volatile uint8_t*)0xE30C2C)
 /* @endcond */
-/**< Current backlight level of the LCD. 0 is brightest, 255 is darkest. */
+/** Current backlight level of the LCD. 0 is brightest, 255 is darkest. */
 #define lcd_BacklightLevel       (*(volatile uint8_t*)0xF60024)
 
-/**< Width of LCD in pixels */
+/** Width of LCD in pixels */
 #define LCD_WIDTH               (320)
-/**< Height of LCD in pixels */
+/** Height of LCD in pixels */
 #define LCD_HEIGHT              (240)
-/**< Total size of VRAM in bytes */
+/** Total size of VRAM in bytes */
 #define LCD_SIZE                (LCD_WIDTH*LCD_HEIGHT*2)
 
 #ifdef __cplusplus
