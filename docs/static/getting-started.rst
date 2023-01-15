@@ -6,7 +6,7 @@ Getting Started
 Installing the CE Toolchain
 ---------------------------
 
-* Download the latest stable toolchain release below:
+Download the latest stable toolchain release below:
 
 ..
 
@@ -16,7 +16,7 @@ Installing the CE Toolchain
 
 ..
 
-* If you would rather try the "nightly" build (which includes the latest features and bugfixes before an official release) you can find it `here <https://github.com/CE-Programming/toolchain/releases/tag/nightly>`__.
+If you would rather try the "nightly" build (which includes the latest features and bugfixes before an official release) you can find it `here <https://github.com/CE-Programming/toolchain/releases/tag/nightly>`__.
 
 **On Windows**
 
@@ -39,6 +39,10 @@ Installing the CE Toolchain
         .. code-block:: bash
 
             export PATH=/<insert path here>/CEdev/bin:$PATH
+
+.. caution::
+
+    Only update your calculator's OS to `5.4.0 <https://tiplanet.org/modules/archives/download.php?id=2236014>`_ or below. OS versions 5.5.0 and up remove the ability to natively execute C and assembly programs which results in an **Invalid Error** when attempting to run programs. On these later OSes use `arTIfiCE <https://yvantt.github.io/arTIfiCE/>`_ to restore functionality.
 
 .. tip::
 
