@@ -1,6 +1,8 @@
-include '../../../src/capnhook.inc'
+include '../../../../src/capnhook/capnhook.inc'
 
 _sprintf = $0000BC
+
+section .text
 
 public _hook
 _hook:

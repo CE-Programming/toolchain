@@ -1,23 +1,15 @@
 # ----------------------------
-# Program Options
+# Makefile Options
 # ----------------------------
 
-NAME         ?= HOOKLOG
-ICON         ?= icon.png
-DESCRIPTION  ?= "Cap'n Hook Test Program"
-COMPRESSED   ?= NO
-ARCHIVED     ?= NO
+NAME = DEMO
+ICON = icon.png
+DESCRIPTION = "CE C Toolchain Demo"
+COMPRESSED = NO
+
+CFLAGS = -Wall -Wextra -Oz
+CXXFLAGS = -Wall -Wextra -Oz
 
 # ----------------------------
-# Compile Options
-# ----------------------------
 
-CFLAGS ?= -Wall -Wextra -Oz
-
-# ----------------------------
-# Debug Options
-# ----------------------------
-
-OUTPUT_MAP   ?= YES
-
-include $(CEDEV)/meta/makefile.mk
+include $(shell cedev-config --makefile)
