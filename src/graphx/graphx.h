@@ -71,7 +71,7 @@ extern "C" {
  * Create at runtime (with uninitialized data) with gfx_MallocSprite(),
  * gfx_UninitedSprite(), or gfx_TempSprite().
  */
-typedef struct {
+typedef struct gfx_sprite_t {
     uint8_t width;   /**< Width of the image.  */
     uint8_t height;  /**< Height of the image. */
     uint8_t data[]; /**< Image data array.    */
@@ -92,7 +92,7 @@ typedef struct {
  * Create at compile-time with a tool like
  * <a href="https://github.com/mateoconlechuga/convimg" target="_blank">convimg</a>.
  */
-typedef struct {
+typedef struct gfx_rletsprite_t {
     uint8_t width; /**< Width of the image. */
     uint8_t height; /**< Height of the image. */
     uint8_t data[]; /**< Image data array. */
@@ -101,7 +101,7 @@ typedef struct {
 /**
  * A structure for working with 2D points.
  */
-typedef struct {
+typedef struct gfx_point_t {
     int x; /**< x point. */
     int y; /**< y point. */
 } gfx_point_t;
@@ -111,7 +111,7 @@ typedef struct {
  *
  * @see gfx_GetClipRegion
  */
-typedef struct {
+typedef struct gfx_region_t {
     int xmin; /**< Minimum x coordinate. */
     int ymin; /**< Minimum y coordinate. */
     int xmax; /**< Maximum x coordinate. */
@@ -123,7 +123,7 @@ typedef struct {
  *
  * @see gfx_Tilemap
  */
-typedef struct {
+typedef struct gfx_tilemap_t {
     uint8_t *map;            /**< Pointer to tilemap array. */
     gfx_sprite_t **tiles;    /**< Pointer to tileset sprites for the tilemap. */
     uint8_t tile_height;     /**< Individual tile height. */

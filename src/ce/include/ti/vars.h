@@ -197,27 +197,27 @@ extern "C" {
 /**
  * @brief Structure of list variable type
  */
-typedef struct { uint16_t dim; real_t items[1]; } list_t;
+typedef struct list_t { uint16_t dim; real_t items[1]; } list_t;
 /**
  * @brief Structure of complex list variable type
  */
-typedef struct { uint16_t dim; cplx_t items[1]; } cplx_list_t;
+typedef struct cplx_list_t { uint16_t dim; cplx_t items[1]; } cplx_list_t;
 /**
  * @brief Structure of matrix variable type
  */
-typedef struct { uint8_t cols, rows; real_t items[1]; } matrix_t;
+typedef struct matrix_t { uint8_t cols, rows; real_t items[1]; } matrix_t;
 /**
  * @brief Structure of string variable type
  */
-typedef struct { uint16_t len; char data[1]; } string_t;
+typedef struct string_t { uint16_t len; char data[1]; } string_t;
 /**
  * @brief Structure of equation variable type
  */
-typedef struct { uint16_t len; char data[1]; } equ_t;
+typedef struct equ_t { uint16_t len; char data[1]; } equ_t;
 /**
  * @brief Structure of miscellaneous variable type
  */
-typedef struct { uint16_t size; uint8_t data[1]; } var_t;
+typedef struct var_t { uint16_t size; uint8_t data[1]; } var_t;
 
 /**
  * Returns the size in bytes of free RAM that the user isn't using. A pointer is
