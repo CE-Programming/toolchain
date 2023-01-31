@@ -113,7 +113,7 @@ typedef enum {
  * enforced.  Check for malformed metadata!
  * @see fontlib_font_pack_t
  */
-typedef struct {
+typedef struct fontlib_metadata_t {
     /**
      * Size of this struct, basically functions as a version field.
      * This does NOT include the lengths of the strings!
@@ -169,7 +169,7 @@ typedef struct {
  * it is probably not useful for C code to parse the width or bitmap data
  * directly.
  */
-typedef struct {
+typedef struct fontlib_font_t {
     /**
      * Version ID
      * @note This must be zero or the font will be rejected as invalid.
@@ -269,7 +269,7 @@ typedef struct {
  *  ti_Close(font_pack_file);
  * @endcode
  */
-typedef struct {
+typedef struct fontlib_font_pack_t {
     /**
      * Must be "FONTPACK"
      * @note This is NOT null-terminated!
