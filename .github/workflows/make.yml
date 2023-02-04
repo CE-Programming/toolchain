@@ -49,29 +49,23 @@ jobs:
 
       - name: Download ez80-clang
         id: ez80-clang
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2.0.0
         with:
           file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-clang
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: ${{steps.ez80-clang.outputs.file-path}}
-          pathTarget: ${{env.CEDEV_BIN}}
+        run: 7z x ${{steps.ez80-clang.outputs.file-path}} -o${{env.CEDEV_BIN}}
 
       - name: Download ez80-link
         id: ez80-link
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2.0.0
         with:
           file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-link${{matrix.exe}}-${{runner.os}}Release
       - name: Extract ez80-link
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: ${{steps.ez80-link.outputs.file-path}}
-          pathTarget: ${{env.CEDEV_BIN}}
+        run: 7z x ${{steps.ez80-link.outputs.file-path}} -o${{env.CEDEV_BIN}}
 
       - name: Download Fasmg Download Page
         id: fasmg-download
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2.0.0
         with:
           file-url: ${{env.FASMG_DOMAIN}}/download.php
       - name: Parse Fasmg Download Page
@@ -84,14 +78,11 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
       - name: Download Fasmg
         id: fasmg
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2.0.0
         with:
           file-url: ${{env.FASMG_DOMAIN}}/${{env.href}}
       - name: Extract Fasmg
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: ${{steps.fasmg.outputs.file-path}}
-          pathTarget: ${{env.FASMG_PATH}}
+        run: 7z x ${{steps.fasmg.outputs.file-path}} -o${{env.FASMG_PATH}}
       - name: Setup Fasmg
         run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
 
@@ -199,13 +190,13 @@ jobs:
           cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
 
       - name: Upload CEdev
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: CEdev-${{runner.os}}
           path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
 
       - name: Upload Libraries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: clibs
           path: ${{env.AUTOTESTER_LIBS_GROUP}}
@@ -264,19 +255,16 @@ jobs:
 
       - name: Download Secrets
         id: download-secrets
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: suisei-cn/actions-download-file@v1.3.0
         with:
-          file-url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
-          location: ${{env.SECRETS_PATH}}
+          url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
+          target: ${{env.SECRETS_PATH}}
       - name: Decrypt Secrets
         env:
           KEY: ${{secrets.SYMMETRIC_KEY_256}}
         run: openssl enc -d -aes-256-cbc -iv a581c6a54a2b51143fecad6794deb32a -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
       - name: Extract Secrets
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: ${{env.SECRETS_PATH}}/secrets.7z
-          pathTarget: ${{env.SECRETS_PATH}}
+        run: 7z x ${{env.SECRETS_PATH}}/secrets.7z -o${{env.SECRETS_PATH}}
 
       - name: Download Libraries
         uses: actions/download-artifact@v3
