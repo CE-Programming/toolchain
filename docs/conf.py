@@ -10,6 +10,7 @@ versions = os.environ['versions'].split()
 
 extensions = [
     'breathe',
+    'sphinx_design',
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',

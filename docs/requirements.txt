@@ -3,3 +3,4 @@ sphinx==4.5.0
 sphinx_rtd_theme==1.0.0
 breathe==4.33.1
 Jinja2==3.1.2
+sphinx-design==0.3.0
