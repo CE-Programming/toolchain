@@ -79,51 +79,13 @@ macro ?!
    namespace .
  end macro
 
- ; copied from ez80.alm
- macro calminstruction?.isindirect? argument*
-  unique done
-  local isindirect
-  match ( isindirect ), argument
-  bno done
-  match isindirect, isindirect, ()
-  label done
- end macro
-
- calminstruction ld? lhs*, mhs*, rhs
+ macro ld? lhs*, mhs*, rhs
   match , rhs
-  jyes plain
-  isindirect lhs
-  jyes store
-  isindirect rhs
-  jno errarguments
- load:
-  execute =ld? mhs, (rhs)
-  check mhs metadata 1 element 1 eq @ez80.wreg
-  jyes loadword
- loadbyte:
-  execute =ld? lhs, (rhs + =byte?)
-  exit
- loadword:
-  execute =ld? lhs, (rhs + =@ez80.=ws)
-  exit
- store:
-  execute =ld? (lhs), rhs
-  check rhs metadata 1 element 1 eq @ez80.wreg
-  jyes storeword
- storebyte:
-  execute =ld? (lhs + =byte?), mhs
-  exit
- storeword:
-  execute =ld? (lhs + =@ez80.=ws), mhs
-  exit
- plain:
-  execute =ld? lhs, mhs
-  exit
- errarguments:
-  err 'invalid arguments'
- end calminstruction
-
- purge calminstruction?.isindirect?
+   ld lhs,mhs
+  else
+   ldp lhs,mhs,rhs
+  end match
+ end macro
 
  purge ?
 end macro
