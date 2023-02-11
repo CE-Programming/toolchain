@@ -62,7 +62,7 @@ extern "C" {
  * @param col Column in matrix
  * @returns real_t containing element data
  */
-#define OS_MATRIX_ELEMENT(matrix, row, col) ((matrix)->items[(row)+(col)*(matrix)->rows])
+#define OS_MATRIX_ELEMENT(matrix, row, col) ((matrix)->items[(col)+(row)*(matrix)->cols])
 
 /** Maximum size of OS variable */
 #define OS_VAR_MAX_SIZE      (65512)
