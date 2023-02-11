@@ -912,10 +912,11 @@ _HorizLine_NoClip_Draw:
 	ld	(hl),0
 smcByte _Color
 	cpi
-	ret	po
 	ex	de,hl
 	ld	hl,-1
 	add	hl,de
+; Delay 1-wide early return for consistent register output values.
+	ret	po
 	ldir
 	ret
 
