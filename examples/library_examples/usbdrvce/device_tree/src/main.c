@@ -267,7 +267,10 @@ static usb_error_t get_configuration_descriptor_handler(usb_endpoint_t endpoint,
     usb_device_t device = usb_GetEndpointDevice(endpoint);
     struct item *item = usb_GetDeviceData(device);
     const usb_configuration_descriptor_t *configuration_descriptor = data;
-    item->gui->dirty = true;
+    if (item && item->gui)
+    {
+        item->gui->dirty = true;
+    }
     if (item == NULL || configuration_descriptor == NULL || status != USB_TRANSFER_COMPLETED ||
         transferred != item->configuration_descriptor.wTotalLength ||
         configuration_descriptor->bLength < sizeof(usb_configuration_descriptor_t) ||
@@ -292,14 +295,20 @@ static usb_error_t get_total_length_handler(usb_endpoint_t endpoint, usb_transfe
         item->configuration_descriptor.bLength < transferred ||
         item->configuration_descriptor.bDescriptorType != USB_CONFIGURATION_DESCRIPTOR)
     {
-        item->gui->dirty = true;
+        if (item && item->gui)
+        {
+             item->gui->dirty = true;
+        }
         return USB_SUCCESS;
     }
 
     configuration_descriptor = malloc(item->configuration_descriptor.wTotalLength);
     if (configuration_descriptor == NULL)
     {
-        item->gui->dirty = true;
+        if (item && item->gui)
+        {
+             item->gui->dirty = true;
+        }
         return USB_SUCCESS;
     }
     item->setup.bmRequestType = USB_DEVICE_TO_HOST | USB_STANDARD_REQUEST | USB_RECIPIENT_DEVICE;
@@ -321,7 +330,10 @@ static usb_error_t get_serial_number_handler(usb_endpoint_t endpoint, usb_transf
         item->string_descriptor.bLength < 2 || item->string_descriptor.bLength > transferred ||
         item->string_descriptor.bDescriptorType != USB_STRING_DESCRIPTOR)
     {
-        item->gui->dirty = true;
+        if (item && item->gui)
+        {
+             item->gui->dirty = true;
+        }
         return USB_SUCCESS;
     }
     usb_string_descriptor_to_ascii(&item->string_descriptor, item->serial_number);
@@ -345,7 +357,10 @@ static usb_error_t get_product_handler(usb_endpoint_t endpoint, usb_transfer_sta
         item->string_descriptor.bLength < 2 || item->string_descriptor.bLength > transferred ||
         item->string_descriptor.bDescriptorType != USB_STRING_DESCRIPTOR)
     {
-        item->gui->dirty = true;
+        if (item && item->gui)
+        {
+             item->gui->dirty = true;
+        }
         return USB_SUCCESS;
     }
     usb_string_descriptor_to_ascii(&item->string_descriptor, item->product);
@@ -376,7 +391,10 @@ static usb_error_t get_manufacturer_handler(usb_endpoint_t endpoint, usb_transfe
         item->string_descriptor.bLength < 2 || item->string_descriptor.bLength > transferred ||
         item->string_descriptor.bDescriptorType != USB_STRING_DESCRIPTOR)
     {
-        item->gui->dirty = true;
+        if (item && item->gui)
+        {
+             item->gui->dirty = true;
+        }
         return USB_SUCCESS;
     }
     usb_string_descriptor_to_ascii(&item->string_descriptor, item->manufacturer);
@@ -415,7 +433,10 @@ static usb_error_t get_langid_handler(usb_endpoint_t endpoint, usb_transfer_stat
         item->string_descriptor.bLength < transferred ||
         item->string_descriptor.bDescriptorType != USB_STRING_DESCRIPTOR)
     {
-        item->gui->dirty = true;
+        if (item && item->gui)
+        {
+             item->gui->dirty = true;
+        }
         return USB_SUCCESS;
     }
     item->langid = item->string_descriptor.bString[0];
@@ -446,7 +467,10 @@ static usb_error_t get_device_descriptor_handler(usb_endpoint_t endpoint, usb_tr
         item->device_descriptor.bLength < transferred ||
         item->device_descriptor.bDescriptorType != USB_DEVICE_DESCRIPTOR)
     {
-        item->gui->dirty = true;
+        if (item && item->gui)
+        {
+             item->gui->dirty = true;
+        }
         return USB_SUCCESS;
     }
 
@@ -464,7 +488,6 @@ static usb_error_t enabled_handler(usb_device_t device)
     struct item *item = usb_GetDeviceData(device);
     if (item == NULL)
     {
-        item->gui->dirty = true;
         return USB_SUCCESS;
     }
     item->setup.bmRequestType = USB_DEVICE_TO_HOST | USB_STANDARD_REQUEST | USB_RECIPIENT_DEVICE;
