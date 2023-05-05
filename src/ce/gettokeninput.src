@@ -25,8 +25,8 @@ _PutTokString := $20D74
 _ClrTxtShd    := $20818
 
 	section	.text
-	public	_os_GetStringInput
-_os_GetStringInput:
+	public	_os_GetTokenInput
+_os_GetTokenInput:
 	push	ix
 	ld	ix,0
 	add	ix,sp
@@ -56,7 +56,6 @@ _os_GetStringInput:
 	pop	ix
 	ret
 .not_empty:
-	dec	hl			; subtract 1 for null pointer
 	ld	(ix+12),hl
 	ld	(ix+6),hl		; save initial size
 .start:
@@ -64,6 +63,7 @@ _os_GetStringInput:
 	ld	(ix+12),hl
 	or	a,a
 	sbc	hl,hl
+	ld	(.smc.tok_len),hl
 	ld	(.smc.str_len),hl
 .loop:
 	ld	iy,flags
@@ -95,10 +95,10 @@ _os_GetStringInput:
 	cp	a,kIns
 	jr	z,.loop
 	ld	de,(ix+9)
-	ld	hl,(.smc.str_len)
+	ld	hl,(.smc.tok_len)
 	add	hl,de
-	push	hl			; save buf pointer
 	push	ix
+	push	hl			; save buf pointer
 	cp	a,$F3			; for lists? idk something is wrong with _PullDownChk
 	jr	z,.sub_key
 	cp	a,$F4
@@ -124,30 +124,49 @@ _os_GetStringInput:
 	ld	a,$FE
 .conv_key:
 	call	_ConvKeyToTok
-	call	_GetTokString
+	pop	hl			; restore buf pointer
 	pop	ix
-	pop	de			; restore buf pointer
-	ld	b,(hl)			; token string length
-	inc	hl
-.draw_string:
+	ld	(hl),e
 	push	hl
 	ld	hl,(ix+12)
-	add	hl,de
-	xor	a,a
-	sbc	hl,de			; check if done
-	dec	hl
+	ld	bc,1
+	or	a,a
+	sbc	hl,bc
 	ld	(ix+12),hl
 	pop	hl
 	jr	z,.full
+	ld	a,d
+	or	a,a			; check if 2-byte token
+	jr	z,.one_byte_token
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+	ld	hl,(ix+12)
+	ld	bc,1
+	or	a,a
+	sbc	hl,bc
+	ld	(ix+12),hl
+	jr	z,.full
+	ld	hl,(.smc.tok_len)
+	inc	hl
+	ld	(.smc.tok_len),hl
+.one_byte_token:
+	ld	hl,(.smc.tok_len)
+	inc	hl
+	ld	(.smc.tok_len),hl
+	push	ix
+	call	_GetTokString
+	pop	ix
+	ld	b,(hl)			; token string length
+	inc	hl
+.draw_string:
 	push	hl
 	ld	hl,(.smc.str_len)
 	inc	hl
 	ld	(.smc.str_len),hl
 	pop	hl
 	ld	a,(hl)
-	ld	(de),a
 	inc	hl
-	inc	de
 	call	_PutC
 	djnz	.draw_string
 	jp	.loop
@@ -163,7 +182,8 @@ _os_GetStringInput:
 .smc.curRow := $+1
 	ld	hl,0
 	ld	(curRow),hl
-	ld	hl,(.smc.str_len)
+.smc.str_len := $+1
+	ld	hl,0
 	inc	hl
 .clear_loop:
 	push	hl
@@ -186,10 +206,7 @@ _os_GetStringInput:
 .smc.text_flag_1 := $+1
 	ld	a,0
 	ld	(iy + $4c),a
-	ld	de,(ix+9)
-.smc.str_len := $+1
+.smc.tok_len := $+1
 	ld	hl,0
-	add	hl,de
-	ld	(hl),0
 	pop	ix
 	ret

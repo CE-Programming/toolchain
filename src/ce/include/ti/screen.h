@@ -137,25 +137,37 @@ tiflags void os_ClrLCD(void);
 tiflags void os_ClrTxtShd(void);
 
 /**
- * Disable text buffering on the homescreen. C programs use this area by default for the BSS / Heap.
+ * Disable text buffering on the homescreen.
+ * C programs use this area by default for the BSS / Heap.
  */
 void os_DisableHomeTextBuffer(void);
 
 /**
- * Enables text buffering on the homescreen. C programs use this area by default for the BSS / Heap.
+ * Enables text buffering on the homescreen.
+ * C programs use this area by default for the BSS / Heap.
  */
 void os_EnableHomeTextBuffer(void);
 
 /**
- * Custom implementation input routine for use in conjunction with the TIOS.
- * It is HIGHLY recommended you implement your own routine, this routine has
- * some quirks. It is good enough for getting basic input however.
+ * Get string input using the TIOS homescreen.
  *
- * @param[in] string Input prompt string to be displayed to the user
- * @param[in] buf Storage location to store input string
- * @param[in] bufsize Available storage size for input string. -1 for null termination.
+ * @param[in] prompt Input prompt string to be displayed to the user.
+ * @param[in] buf Storage location to store input string.
+ *            The string will always be null terminated.
+ * @param[in] bufsize Available storage size for input string.
  */
-void os_GetStringInput(char *string, char *buf, size_t bufsize);
+void os_GetStringInput(const char *prompt, char *buf, size_t bufsize);
+
+/**
+ * Get tokenized input using the TIOS homescreen.
+ *
+ * @param[in] prompt Input prompt string to be displayed to the user.
+ * @param[in] buf Storage location to store input string.
+ * @param[in] bufsize Available storage size for buffer.
+ *
+ * @returns Length of tokenized input.
+ */
+size_t os_GetTokenInput(const char *prompt, void *buf, size_t bufsize);
 
 /**
  * TIOS small font.
