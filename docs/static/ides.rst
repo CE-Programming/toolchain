@@ -68,3 +68,19 @@ The below are currently supported - Raise an issue or pull request on `GitHub <h
     * Only use the Build (the hammer icon) button with these.
       The Run icon tries to run the generated executables, which fails since .8xp files can't be run natively on PC.
 
+.. dropdown:: Visual Studio Code
+
+    Open the project using :code:`File > Open Folder`.
+
+    .. rubric:: Install Extensions
+
+    From the Extensions tab, on the left, install the C/C++, C/C++ Extension Pack, and Makefile Tools extensions.
+
+    .. rubric:: Open IntelliSense Configurations Screen
+
+    Open the Command Palette (:code:`Ctrl+Shift+P`) and select :code:`C/C++: Edit configurations (UI)`.
+
+    .. rubric:: Set Compiler Options
+
+    Set the value of the "Compiler path" option to be the path to the :code:`ez80-clang` executable in the :code:`bin` directory of your toolchain installation, e.g. :code:`/home/john/CEdev/bin/ez80-clang`.
+    Also set the "Include path" option to the path to the :code:`include` directory (e.g. :code:`/home/john/CEdev/include`). Make sure to remove/replace the original value of :code:`${default}`, rather than just adding the path at the end.
