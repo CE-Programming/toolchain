@@ -36,7 +36,6 @@ extern "C" {
 typedef enum {
     FAT_SUCCESS = 0, /**< Operation was successful */
     FAT_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
-    FAT_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
     FAT_ERROR_INVALID_CLUSTER, /**< An invalid FAT cluster was accessed */
     FAT_ERROR_INVALID_POSITION, /**< An invalid position in the file */
     FAT_ERROR_NOT_FOUND, /**< The partition, file, or entry does not exist */
@@ -47,8 +46,11 @@ typedef enum {
     FAT_ERROR_DIRECTORY_NOT_EMPTY, /**< The directory is not empty */
     FAT_ERROR_NO_VOLUME_LABEL, /**< No volume label found for partition */
     FAT_ERROR_RDONLY, /**< The file or entry is read-only */
-    FAT_ERROR_RW_FAILED, /**< The callback read failed to read/write */
+    FAT_ERROR_RW_FAILED, /**< The read or write callback failed (count != return) */
     FAT_ERROR_INVALID_FILESYSTEM, /**< A non-FAT filesystem detected */
+    FAT_ERROR_INVALID_SIZE, /**< An invalid size was detected */
+    FAT_ERROR_INVALID_MAGIC, /**< Some invalid magic bytes were detected */
+    FAT_ERROR_INVALID_SIGNATURE, /**< Some invalid signature was detected */
     FAT_ERROR_NO_MORE_ENTRIES, /**< No more entries in the directory */
 } fat_error_t;
 
@@ -71,7 +73,7 @@ typedef uint24_t (*fat_read_callback_t)(fat_callback_usr_t *usr,
  * @param[in] lba Local block address (LBA) to write.
  * @param[in] count Number of logical blocks to write.
  * @param[in] buffer Buffer to fetch write data from.
- * @returns Number of logical blocks writen.
+ * @returns Number of logical blocks written.
  */
 typedef uint24_t (*fat_write_callback_t)(fat_callback_usr_t *usr,
                                          uint32_t lba,

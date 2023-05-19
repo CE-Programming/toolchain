@@ -38,7 +38,6 @@ include 'macros.inc'
 virtual at 0
 	FAT_SUCCESS rb 1
 	FAT_ERROR_INVALID_PARAM rb 1
-	FAT_ERROR_NOT_SUPPORTED rb 1
 	FAT_ERROR_INVALID_CLUSTER rb 1
 	FAT_ERROR_INVALID_POSITION rb 1
 	FAT_ERROR_NOT_FOUND rb 1
@@ -51,6 +50,9 @@ virtual at 0
 	FAT_ERROR_RDONLY rb 1
 	FAT_ERROR_RW_FAILED rb 1
 	FAT_ERROR_INVALID_FILESYSTEM rb 1
+	FAT_ERROR_INVALID_SIZE rb 1
+	FAT_ERROR_INVALID_MAGIC rb 1
+	FAT_ERROR_INVALID_SIGNATURE rb 1
 	FAT_ERROR_NO_MORE_ENTRIES rb 1
 end virtual
 virtual at 0
@@ -172,21 +174,26 @@ fat_Open:
 	xor	a,a
 	sbc	hl,hl
 	call	util_read_fat_block		; read fat zero block
+	jr	z,.read_zero_block
 	ld	hl,FAT_ERROR_RW_FAILED
-	jq	nz,.error
+	pop	ix
+	ret
+.read_zero_block:
 	lea	ix,yfat.buffer
 	ld	a,(ix + 12)
 	cp	a,(ix + 16)			; ensure 512 byte blocks and 2 FATs
-	jq	nz,.error
+	jr	z,.goodfat
+	ld	hl,FAT_ERROR_INVALID_FILESYSTEM
+	pop	ix
+	ret
+.goodfat:
 	ld	a,(ix + 39)
 	or	a,a				; can't support reallllly big drives (BPB_FAT32_FATSz32 high)
-	jq	nz,.error
-	ld	a,(ix + 66)
-	cp	a,$28				; check fat32 signature
-	jr	z,.goodsig
-	cp	a,$29
-	jq	nz,.error
-.goodsig:
+	jr	z,.goodsize
+	ld	hl,FAT_ERROR_INVALID_SIZE
+	pop	ix
+	ret
+.goodsize:
 	xor	a,a
 	ld	b,a
 	ld	hl,(ix + 14)
@@ -226,14 +233,26 @@ fat_Open:
 	ld	(yfat.fs_info),hl
 	xor	a,a
 	call	util_read_fat_block
-	jr	nz,.error
+	jr	z,.check_magic
+	ld	hl,FAT_ERROR_RW_FAILED
+	pop	ix
+	ret
+.check_magic:
 	call	util_checkmagic
-	jr	nz,.error			; uh oh!
+	jr	z,.goodmagic
+	ld	hl,FAT_ERROR_INVALID_MAGIC
+	pop	ix
+	ret
+.goodmagic:
 	ld	hl,(ix + 0)			; ix should still point to the temp block...
 	ld	bc,$615252			; don't bother comparing $41 byte...
 	xor	a,a
 	sbc	hl,bc
-	jr	nz,.error
+	jr	z,.goodsig
+	ld	hl,FAT_ERROR_INVALID_SIGNATURE
+	pop	ix
+	ret
+.goodsig:
 	scf
 	sbc	hl,hl
 	ex	de,hl
@@ -252,10 +271,6 @@ fat_Open:
 	ret	nz
 	xor	a,a
 	sbc	hl,hl				; return success
-	ret
-.error:
-	ld	hl,FAT_ERROR_INVALID_FILESYSTEM
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -540,10 +555,14 @@ fat_GetVolumeLabel:
 	ld	(yfat.working_block),a,hl
 	ld	b,(yfat.blocks_per_cluster)
 .findblock:
-	push	bc
 	ld	(yfat.working_block),a,hl
+	push	bc
 	call	util_read_fat_block
-	jq	nz,.rw_error
+	jr	z,.rd_success
+	pop	bc
+	ld	hl,FAT_ERROR_RW_FAILED
+	ret
+.rd_success:
 	lea	hl,yfat.buffer + 11
 	ld	b,16
 	ld	de,32
@@ -584,11 +603,7 @@ fat_GetVolumeLabel:
 	jq	.removetrailingspaces
 .done:
 	xor	a,a
-	sbc	hl,hl
-	ret
-.rw_error:
-	pop	bc
-	ld	hl,FAT_ERROR_RW_FAILED
+	sbc	hl,hl				; return success
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -608,7 +623,10 @@ fat_OpenFile:
 	ld	iy,(iy + 3)
 	call	util_locate_entry
 	pop	iy
-	jq	z,.error
+	jr	nz,.found
+	ld	hl,FAT_ERROR_NOT_FOUND
+	ret
+.found:
 	ld	bc,(iy + 3)
 	ld	iy,(iy + 12)
 	ld	(yfatFile.fat),bc
@@ -643,9 +661,6 @@ fat_OpenFile:
 	sbc	hl,hl
 	ld	(yfatFile.cluster_block),a
 	ld	(yfatFile.block_pos),hl		; return success
-	ret
-.error:
-	ld	hl,FAT_ERROR_NOT_FOUND
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -718,7 +733,10 @@ fat_SetFileSize:
 	call	util_next_cluster
 	compare_auhl_zero
 	pop	bc
-	jq	z,.failedchain			; the filesystem is screwed up
+	jr	nz,.goodchain			; the filesystem is screwed up
+	ld	hl,FAT_ERROR_CLUSTER_CHAIN
+	ret
+.goodchain:
 	dec	bc
 .entertraverseclusters:
 	compare_bc_zero
@@ -748,11 +766,14 @@ fat_SetFileSize:
 	compare_auhl_zero
 	pop	iy
 	pop	hl
-	jq	z,.failedalloc
+	jr	nz,.goodalloc
+	ld	hl,FAT_ERROR_FAILED_ALLOC
+	ret
+.goodalloc:
 	dec	hl
 	compare_hl_zero
 	jq	nz,.allocateclusters
-	jq	.success
+	;jq	.success
 .success:
 	ld	iy,(iy + 3)
 	ld	a,hl,(yfatFile.entry_block)	; read the entry again for open
@@ -790,15 +811,7 @@ fat_SetFileSize:
 	call	util_ceil_byte_size_to_blocks_per_cluster
 	pop	iy
 	ret
-.failedchain:
-	ld	hl,FAT_ERROR_CLUSTER_CHAIN
-	ret
-.invalidpath:
-	ld	hl,FAT_ERROR_INVALID_PATH
-	ret
-.failedalloc:
-	ld	hl,FAT_ERROR_FAILED_ALLOC
-	ret
+
 .currentcluster:
 	dd	0
 
