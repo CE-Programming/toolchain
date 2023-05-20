@@ -1,6 +1,32 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.0...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.1...master)
+
+# [v11.1](https://github.com/CE-Programming/toolchain/releases/tag/v11.1) (2023-5-19)
+
+* **New features**
+  * Changes fatdrvce API to make it easier to use by @mateoconlechuga
+  * Adds `os_GetTokenInput` to get tokenized input from the OS by @mateoconlechuga
+  * Support hex string for fixed colors in convimg by @mateoconlechuga
+
+* **Bugfixes**
+  * Fixes `os_GetStringInput` to support more menus by @mateoconlechuga
+  * Add some pointer checks to usbdrvce examples by @adriweb
+  * Change `OS_MATRIX_ELEMENT` to row-major by @Nikhil-42
+  * Fix 1-wide `gfx_Rectangle_NoClip` calls by @runer112
+  * Numerous fixes in both convbin and convimg by @mateoconlechuga
+
+* **Improvements**:
+  * Add comments for symbols to grahpx source code by @TIny-Hacker
+  * Improve error for long variable names by @mateoconlechuga
+  * Add VS Code IDE documentation by @commandblockguy
+  * Add names to some anonymous structures by @adriweb
+  * Update fasmg-ez80 support by @jacobly0
+  * Add more info about system values by @adriweb
+  * Allow for overriding of source file extensions by @mateoconlechuga
+  * Default example binaries to archive by @LogicalJoe
+
+[Full commit list](https://github.com/CE-Programming/toolchain/compare/v11.0...v11.1)
 
 # [v11.0](https://github.com/CE-Programming/toolchain/releases/tag/v11.0) (2022-12-06)
 
