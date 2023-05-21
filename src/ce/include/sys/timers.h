@@ -2,7 +2,8 @@
  * @file
  * @authors
  * Matt "MateoConLechuga" Waltz\n
- * Jacob "jacobly" Young
+ * Jacob "jacobly" Young\n
+ * Zachary "Runer112" Wassall
  * @brief CE hardware timers define file
  */
 
@@ -16,15 +17,10 @@
 extern "C" {
 #endif
 
-/* @cond */
-/* @endcond */
-
 /**
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
  * @param[in] msec number of milliseconds
- * @see sleep
- * @see usleep
  */
 void delay(uint16_t msec);
 
@@ -32,8 +28,6 @@ void delay(uint16_t msec);
  * Suspends execution of the calling thread for (at least) @p msec milliseconds.
  *
  * @param[in] msec number of milliseconds
- * @see sleep
- * @see usleep
  */
 void msleep(uint16_t msec);
 
@@ -44,11 +38,9 @@ void msleep(uint16_t msec);
  * @note
  * Currently, signals do not exist, so this will never be interrupted.
  *
- * @param[in] seconds number of seconds
+ * @param[in] seconds number of seconds (must be < 65536).
  * @return zero if the requested time has elapsed, or the number of seconds left
  *         to sleep, if the call was interrupted by a signal handler
- * @see delay
- * @see usleep
  */
 unsigned int sleep(unsigned int seconds);
 
@@ -57,8 +49,6 @@ unsigned int sleep(unsigned int seconds);
  *
  * @param[in] ticks number of clock ticks
  * @see CLOCKS_PER_SEC
- * @see delay
- * @see usleep
  */
 void ticksleep(unsigned long ticks);
 
@@ -81,9 +71,6 @@ typedef unsigned int useconds_t;
  *
  * @param[in] usec number of microseconds
  * @return 0 on success, or -1 on error, with \c errno set to indicate the error
- * @see delay
- * @see sleep
- * @see useconds_t
  */
 int usleep(useconds_t usec);
 
@@ -92,29 +79,123 @@ int usleep(useconds_t usec);
  */
 void boot_WaitShort(void);
 
-/* @cond */
+/**
+ * Enables timer \p n with the specified settings.
+ *
+ * @param[in] n Timer to enable (1,2,3).
+ * @param[in] rate Rate in Hz the timer ticks at. Can be TIMER_32K or TIMER_CPU.
+ * @param[in] int Throw an interrupt when the timer reaches 0. Can be TIMER_0INT or TIMER_NOINT.
+ * @param[in] dir Direction in which to count. Can be TIMER_UP or TIMER_DOWN.
+ */
 #define timer_Enable(n, rate, int, dir) (timer_Control = timer_Control & ~(0x7 << 3 * ((n) - 1) | 1 << ((n) + 8)) | (1 | (rate) << 1 | (int) << 2) << 3 * ((n) - 1) | (dir) << ((n) + 8))
+
+/**
+ * Disables a timer.
+ *
+ * @param[in] n Timer to disable (1,2,3).
+ */
 #define timer_Disable(n) (timer_Control &= ~(1 << 3 * ((n) - 1)))
+
+/**
+ * Gets the current count value of a timer.
+ *
+ * @param[in] n Timer to get count value of (1,2,3).
+ *
+ * @warning
+ * Do not use this function if the timer is configured with TIMER_CPU.
+ * Use the timer_GetSafe() function instead.
+ */
 #define timer_Get(n) atomic_load_32(TIMER_COUNT_ADDR(n))
+
+/**
+ * Safely gets the current count value of a timer.
+ * This should be used if the timer is ticking at >= 1MHz.
+ *
+ * @param[in] n Timer to get count value of (1,2,3).
+ * @param[in] dir Direction the timer is counting.
+ */
 #define timer_GetSafe(n, dir) \
     ((dir) == TIMER_UP ? \
         atomic_load_increasing_32(TIMER_COUNT_ADDR(n)) : \
         atomic_load_decreasing_32(TIMER_COUNT_ADDR(n)))
+
+/**
+ * Sets the count value of a timer.
+ *
+ * @param[in] n Timer to set count value of (1,2,3).
+ * @param[in] value Value to set timer count to.
+ */
 #define timer_Set(n, value) *TIMER_COUNT_ADDR(n) = (uint32_t)(value)
+
+/**
+ * Gets the current reload value of a timer.
+ * The reload value is loaded into the timer count when the timer reaches zero.
+ *
+ * @param[in] n Timer to get count reload value of (1,2,3).
+ */
 #define timer_GetReload(n) *TIMER_RELOAD_ADDR(n)
+
+/**
+ * Sets the reload value of a timer.
+ * The reload value is loaded into the timer count when the timer reaches zero.
+ *
+ * @param[in] n Timer to set count reload value of (1,2,3).
+ * @param[in] value Value to set timer reload count to.
+ */
 #define timer_SetReload(n, value) *TIMER_RELOAD_ADDR(n) = (uint32_t)(value)
+
+/**
+ * Gets the match \p m value of a timer.
+ * There are two match value comparators per timer.
+ *
+ * @param[in] n Timer to get match comparator value of (1,2,3).
+ * @param[in] m Match compartor index (1,2,3,
+ *     recommended to use TIMER_MATCH(1) or TIMER_MATCH(2)).
+ */
 #define timer_GetMatch(n, m) *TIMER_MATCH_ADDR(n, m)
+
+/**
+ * Sets the match \p m value of a timer.
+ * There are two match value comparators per timer.
+ *
+ * @param[in] n Timer to set match comparator value of (1,2,3).
+ * @param[in] m Match compartor index (1,2,3,
+ *     recommended to use TIMER_MATCH(1) or TIMER_MATCH(2)).
+ * @param[in] value Value to set match compartor to.
+ */
 #define timer_SetMatch(n, m, value) *TIMER_MATCH_ADDR(n, m) = (uint32_t)(value)
+
+/**
+ * Acknowledges a timer interrupt.
+ * This should be used to clear the condition that is causing the interrupt.
+ *
+ * @param[in] n Timer to acknowledge interrupt of (1,2,3).
+ * @param[in] mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
+ * or TIMER_MATCH(2).
+ */
 #define timer_AckInterrupt(n, mask) (timer_IntAcknowledge = (mask) << 3 * ((n) - 1))
+
+/**
+ * Checks if a timer interrupt condition has occurred.
+ *
+ * @param[in] n Timer to check interrupt for (1,2,3).
+ * @param[in] mask Interrupt mask, combination of TIMER_RELOADED, TIMER_MATCH(1),
+ * or TIMER_MATCH(2).
+ */
 #define timer_ChkInterrupt(n, mask) ((timer_IntStatus >> 3 * ((n) - 1)) & (mask))
-#define TIMER_32K                1
-#define TIMER_CPU                0
-#define TIMER_0INT               1
-#define TIMER_NOINT              0
-#define TIMER_UP                 1
-#define TIMER_DOWN               0
-#define TIMER_MATCH(i)           (1<<((i) - 1))
-#define TIMER_RELOADED           (1<<2)
+
+#define TIMER_32K                1  /**< Use the 32K clock for timer */
+#define TIMER_CPU                0  /**< Use the CPU clock rate for timer */
+#define TIMER_0INT               1  /**< Enable an interrupt when 0 is reached for the timer */
+#define TIMER_NOINT              0  /**< Disable interrupts for the timer */
+#define TIMER_UP                 1  /**< Timer counts up */
+#define TIMER_DOWN               0  /**< Timer counts down */
+
+#define TIMER_MATCH(i)           (1<<((i) - 1))  /**< Timer hit the match value. There are 2 match values per timer */
+#define TIMER_RELOADED           (1<<2)  /**< Timer was reloaded (Needs TIMER_0INT enabled)  */
+
+/* @cond */
+/* Compatibility defines (do not use in new projects) */
 #define TIMER1_ENABLE            (1<<0)
 #define TIMER1_DISABLE           (0<<0)
 #define TIMER1_32K               (1<<1)
