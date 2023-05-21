@@ -1,4 +1,4 @@
-mpTmr2Counter := 0F20010h
+mpTmr1Counter := 0F20000h
 
 
 	assume	adl=1
@@ -6,14 +6,14 @@ mpTmr2Counter := 0F20010h
 	section	.text
 	public	_clock
 _clock:
-assert mpTmr2Counter shr 8 and $FF = 0
+assert mpTmr1Counter shr 8 and $FF = 0
 ; O: euhl = ticks
-assert mpTmr2Counter and $A7 = 0
+assert mpTmr1Counter and $A7 = 0
 ; FO: s = 0, z = 0, h = 0, p/v = 0, n = 0, c = 0
 ; CC: 79 + cc(_atomic_load_increasing_32)
 	require	___init_clock
 
-	ld	hl, mpTmr2Counter
+	ld	hl, mpTmr1Counter
 	push	hl
 	call	_atomic_load_increasing_32
 ; ^ 48 + cc(_atomic_load_increasing_32) cc

@@ -1,12 +1,12 @@
 	assume	adl=1
 
-mpTmr2Counter := 0F20010h
+mpTmr1Counter := 0F20000h
 mpTmrCtrl := 0F20030h
 
-bTmr2Enable := 3
-bTmr2Crystal := 4
-bTmr2Overflow := 5
-bTmr2CountUp := 10
+bTmr1Enable := 0
+bTmr1Crystal := 1
+bTmr1Overflow := 2
+bTmr1CountUp := 9
 
 	public	_errno
 _errno := $D008DC
@@ -114,30 +114,30 @@ fini_functions:
 	section	.init.clock
 	public	___init_clock
 ___init_clock:
-; Disable the timer and configure it to use the 32768Hz crystal timer, not
+; Disable timer 1 and configure it to use the 32768Hz crystal timer, not
 ; generate an interurrupt on overflow, and count up.
-assert bTmr2CountUp / 8 = 1
+assert bTmr1CountUp / 8 = 1
 	ld	hl, mpTmrCtrl + 1
-	set	bTmr2CountUp - 8, (hl)
+	set	bTmr1CountUp - 8, (hl)
 	dec	hl
-assert bTmr2Enable / 8 = 0
-	res	bTmr2Enable, (hl)
-assert bTmr2Crystal / 8 = 0
-	set	bTmr2Crystal, (hl)
-assert bTmr2Overflow / 8 = 0
-	res	bTmr2Overflow, (hl)
+assert bTmr1Enable / 8 = 0
+	res	bTmr1Enable, (hl)
+assert bTmr1Crystal / 8 = 0
+	set	bTmr1Crystal, (hl)
+assert bTmr1Overflow / 8 = 0
+	res	bTmr1Overflow, (hl)
 ; Set the counter to zero.
-assert mpTmrCtrl shr 8 = (mpTmr2Counter + 1) shr 8
-	ld	l, (mpTmr2Counter + 1) and $FF
+assert mpTmrCtrl shr 8 = (mpTmr1Counter + 1) shr 8
+	ld	l, (mpTmr1Counter + 1) and $FF
 	ld	de, 0
 	ld	(hl), de
 	dec	hl
 	ld	(hl), e
 ; Enable the timer.
-assert bTmr2Enable / 8 = 0
-assert mpTmr2Counter shr 8 = mpTmrCtrl shr 8
+assert bTmr1Enable / 8 = 0
+assert mpTmr1Counter shr 8 = mpTmrCtrl shr 8
 	ld	l, mpTmrCtrl and $FF
-	set	bTmr2Enable, (hl)
+	set	bTmr1Enable, (hl)
 
 	section	.text
 	private	___rerun_handler
