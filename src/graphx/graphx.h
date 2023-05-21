@@ -388,20 +388,20 @@ uint8_t name##_data[2 + (data_size)]; \
 gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 
 /**
- * Sets a particular tile's value given an initialized tilemap
- * structure and pixel offsets
+ * Sets a particular tile's sprite tileset index.
+ * This function bases position on the pixel offset from the top-left of the tilemap.
  *
  * @param tilemap Pointer to initialized tilemap structure.
  * @param x_offset Offset in pixels from the left of the tilemap.
  * @param y_offset Offset in pixels from the top of the tilemap.
- * @param value Value to set tile to.
+ * @param value Sprite index in tileset.
  */
 #define gfx_SetTile(tilemap, x_offset, y_offset, value) \
 (*(gfx_TilePtr((tilemap), (x_offset), (y_offset))) = (uint8_t)(value))
 
 /**
- * Gets a particular tile's value given an initialized tilemap
- * structure and pixel offsets.
+ * Gets a particular tile's sprite tileset index.
+ * This function bases position on the pixel offset from the top-left of the tilemap.
  *
  * @param[in] tilemap Pointer to an initialized tilemap structure.
  * @param[in] x_offset Offset in pixels from the left of the tilemap.
@@ -411,20 +411,20 @@ gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 (*(gfx_TilePtr((tilemap), (x_offset), (y_offset))))
 
 /**
- * Sets a particular tile's value given an initialized tilemap structure
- * and mapped offsets.
+ * Sets a particular tile's sprite tileset index.
+ * This function uses the corrdinates from the tilemap array.
  *
  * @param[in] tilemap Pointer to initialized tilemap structure.
  * @param[in] col Column of tile in tilemap.
  * @param[in] row Row of tile in tilemap.
- * @param[in] value Value to set tile to.
+ * @param[in] value Sprite index in tileset.
  */
 #define gfx_SetTileMapped(tilemap, col, row, value) \
 (*(gfx_TilePtrMapped((tilemap), (col), (row))) = (uint8_t)(value))
 
 /**
- * Gets a particular tile's value given an initialized tilemap structure
- * and mapped offsets.
+ * Gets a particular tile's sprite tileset index.
+ * This function uses the corrdinates from the tilemap array.
  *
  * @param[in] tilemap Pointer to an initialized tilemap structure.
  * @param[in] col Column of tile in tilemap.
@@ -626,7 +626,7 @@ gfx_sprite_t *gfx_AllocSprite(uint8_t width,
                               void *(*malloc_routine)(size_t));
 
 /**
- * Draws a tilemap given an initialized tilemap structure.
+ * Draws a tilemap.
  *
  * @param[in] tilemap Pointer to initialized tilemap structure.
  * @param[in] x_offset Offset in pixels from the left of the tilemap.
@@ -638,7 +638,7 @@ void gfx_Tilemap(const gfx_tilemap_t *tilemap,
                  uint24_t y_offset);
 
 /**
- * Draws an unclipped tilemap given an initialized tilemap structure.
+ * Draws an unclipped tilemap.
  *
  * @param[in] tilemap Pointer to initialized tilemap structure.
  * @param[in] x_offset Offset in pixels from the left of the tilemap.
@@ -650,7 +650,7 @@ void gfx_Tilemap_NoClip(const gfx_tilemap_t *tilemap,
                             uint24_t y_offset);
 
 /**
- * Draws a transparent tilemap given an initialized tilemap structure.
+ * Draws a transparent tilemap.
  *
  * @param[in] tilemap Pointer to initialized tilemap structure.
  * @param[in] x_offset Offset in pixels from the left of the tilemap.
@@ -662,8 +662,7 @@ void gfx_TransparentTilemap(const gfx_tilemap_t *tilemap,
                             uint24_t y_offset);
 
 /**
- * Draws an unclipped transparent tilemap given an initialized tilemap
- * structure.
+ * Draws an unclipped transparent tilemap.
  *
  * @param[in] tilemap Pointer to initialized tilemap structure.
  * @param[in] x_offset Offset in pixels from the left of the tilemap.
@@ -675,9 +674,8 @@ void gfx_TransparentTilemap_NoClip(const gfx_tilemap_t *tilemap,
                                    uint24_t y_offset);
 
 /**
- * Gets a pointer to a particular tile given an initialized tilemap
- * structure and pixel offsets. Measurement is done from the actual
- * tilemap, not the drawn offset location.
+ * Gets a pointer to a particular sprite tileset index.
+ * This function bases position on the pixel offset from the top-left of the tilemap.
  *
  * @param[in] tilemap Pointer to initialized tilemap structure.
  * @param[in] x_offset Offset in pixels from the left of the tilemap.
@@ -688,8 +686,8 @@ uint8_t *gfx_TilePtr(const gfx_tilemap_t *tilemap,
                      uint24_t y_offset);
 
 /**
- * Gets a pointer to a particular tile given an initialized tilemap
- * structure and mapped offsets.
+ * Gets a pointer to a particular sprite tileset index.
+ * This function uses the corrdinates from the tilemap array.
  *
  * @param[in] tilemap Pointer to an initialized tilemap structure.
  * @param[in] col Column of tile in tilemap.
