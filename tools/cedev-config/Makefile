@@ -17,8 +17,8 @@
 include $(CURDIR)/../../src/common.mk
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Wshadow -O3 -std=c99 -Isrc -DNDEBUG -DCEDEV_VERSION="\"$(CEDEV_VERSION)\"" -flto
-LDFLAGS = -flto
+CFLAGS = -Wall -Wextra -Wshadow -static -O3 -std=c99 -Isrc -DNDEBUG -DCEDEV_VERSION="\"$(CEDEV_VERSION)\"" -flto
+LDFLAGS = -flto -static
 LIBRARIES :=
 
 ifeq ($(OS),Windows_NT)
