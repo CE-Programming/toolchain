@@ -17,8 +17,8 @@
 include $(CURDIR)/../../src/common.mk
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Wshadow -static -O3 -std=c99 -Isrc -DNDEBUG -DCEDEV_VERSION="\"$(CEDEV_VERSION)\"" -flto
-LDFLAGS = -flto -static
+CFLAGS = -Wall -Wextra -Wshadow -O3 -std=c99 -Isrc -DNDEBUG -DCEDEV_VERSION="\"$(CEDEV_VERSION)\"" -flto
+LDFLAGS = -flto
 LIBRARIES :=
 
 ifeq ($(OS),Windows_NT)
@@ -32,7 +32,8 @@ else
     LDFLAGS += -mmacosx-version-min=10.13
   else
     STRIP = strip --strip-all "$1"
-    CFLAGS += -D_XOPEN_SOURCE=500
+    CFLAGS += -D_XOPEN_SOURCE=500 -static
+    LDFLAGS += -static
     LIBRARIES += dl
   endif
 endif
