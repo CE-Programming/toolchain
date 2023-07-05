@@ -174,20 +174,16 @@ jobs:
               '${TOOLCHAIN_PATH}/resources/macOS/dmg/contents'"
           eval "create-dmg $createDmgArgs" || eval "create-dmg $createDmgArgs" # We also retry just in case...
 
-      - name: "[macOS] Notarize DMG"
-        if: runner.os == 'macOS'
-        uses: adriweb/xcode-notarize-please@v1.1
-        with:
-          product-path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
-          appstore-connect-username: ${{ secrets.APPLE_NOTARIZATION_USERNAME }}
-          appstore-connect-password: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
-          primary-bundle-id: 'com.adriweb.CEToolchain'
-
-      - name: "[macOS] Staple DMG"
-        if: runner.os == 'macOS'
-        uses: devbotsxyz/xcode-staple@v1.0.0
-        with:
-          product-path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
+      - name: "[macOS] Notarize and staple DMG"
+        if: runner.os == 'macOS' && github.repository == 'CE-Programming/toolchain' # don't run on forks, since they don't have secrets
+        env:
+          APPLE_NOTARIZATION_USERNAME: ${{ secrets.APPLE_NOTARIZATION_USERNAME }}
+          APPLE_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+          APPLE_NOTARIZATION_TEAMID: ${{ secrets.APPLE_NOTARIZATION_TEAMID }}
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$APPLE_NOTARIZATION_USERNAME" --team-id "$APPLE_NOTARIZATION_TEAMID" --password "$APPLE_NOTARIZATION_PASSWORD"
+          xcrun notarytool submit "CEdev-${{runner.os}}.${{matrix.install-output-ext}}" --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple "CEdev-${{runner.os}}.${{matrix.install-output-ext}}"
 
       - name: "[Linux] Tar toolchain"
         if: runner.os == 'Linux'
