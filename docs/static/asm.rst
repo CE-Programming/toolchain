@@ -110,6 +110,12 @@ Below is an example C prototype followed by the assembly implementation:
         printf("asm_func returned %d\n", ret);
     }
 
+Preserve
+^^^^^^^^
+
+Assembly routines must preserve the :code:`IX` and :code:`SP` registers.
+All other registers are free for use.
+
 Arguments
 ^^^^^^^^^
 
@@ -130,6 +136,8 @@ Note that :code:`sp + [0,2]` contains the return address.
 | int        | 3 bytes    | sp + [3,5]           |
 +------------+------------+----------------------+
 | long       | 4 bytes    | sp + [3,6]           |
++------------+------------+----------------------+
+| (u)int48_t | 6 bytes    | sp + [3,8]           |
 +------------+------------+----------------------+
 | long long  | 8 bytes    | sp + [3,10]          |
 +------------+------------+----------------------+
@@ -157,6 +165,8 @@ The LSB is located in the register on the far right of the expression, e.g. ``E:
 | int        | UHL               |
 +------------+-------------------+
 | long       | E:UHL             |
++------------+-------------------+
+| (u)int48_t | UDE:UHL           |
 +------------+-------------------+
 | long long  | BC:UDE:UHL        |
 +------------+-------------------+

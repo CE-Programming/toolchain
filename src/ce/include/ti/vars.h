@@ -182,7 +182,7 @@ extern "C" {
 
 /**
  * Name of L1 list variable.
- * Other matrix variables follow the naming format `OS_VAR_L?` where `?`
+ * Other list variables follow the naming format `OS_VAR_L?` where `?`
  * is the value [1-6].
  */
 #define OS_VAR_L1       "\x5D\x0\0"
