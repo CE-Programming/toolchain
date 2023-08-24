@@ -47,6 +47,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <limits.h>
 
 // Pick reasonable defaults if nothing's been configured.
 #if !defined(NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS) && \
@@ -1013,7 +1014,7 @@ int _snprintf_c(char *buffer, size_t bufsz, const char *format, ...) {
 
 int _vsprintf_c(char *buffer, const char *format, va_list vlist)
 {
-  return vsnprintf(buffer, (size_t)-1, format, vlist);
+  return vsnprintf(buffer, (size_t)INT_MAX, format, vlist);
 }
 
 int _vprintf_c(const char *format, va_list vlist)
@@ -1025,7 +1026,7 @@ int _sprintf_c(char *buffer, const char *format, ...)
 {
   va_list va;
   va_start(va, format);
-  const int ret = vsnprintf(buffer, (size_t)-1, format, va);
+  const int ret = vsnprintf(buffer, (size_t)INT_MAX, format, va);
   va_end(va);
   return ret;
 }
