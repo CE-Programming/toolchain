@@ -1,6 +1,22 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.1...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.2...master)
+
+# [v11.2](https://github.com/CE-Programming/toolchain/releases/tag/v11.2) (2023-8-24)
+
+* **New features**
+  * Add back dedicated timer functions by @mateoconlechuga
+  * Use timer 1 for clock and related functions by @mateoconlechuga
+
+* **Bugfixes**
+  * Fix sprintf/vsprintf/snprintf/vsprintf bounds checking by @mateoconlechuga
+  * Fixes for convimg (palette generation) by @mateoconlechuga
+
+* **Improvements**:
+  * Add framerate limiting example by @commandblockguy
+  * Ensure tools are compiled statically by @mateoconlechuga
+  * Improve macOS deployment tools by @adriweb
+  * Minor documentation improvements by @mateoconlechuga
 
 # [v11.1](https://github.com/CE-Programming/toolchain/releases/tag/v11.1) (2023-5-19)
 
