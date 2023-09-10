@@ -19,9 +19,11 @@ To disable all other printf functions and use this `sprintf` implementation, add
 
     HAS_PRINTF = NO
 
-If you just need to convert a float to a string, which the OS sprintf does not support, you can utilize the following `float2str` function by including `ti/real.h` instead.
+If you just need to convert a float to a string, which the OS sprintf does not support, you can utilize the following `float2str` function instead.
 
 .. code-block:: c
+
+    #include <ti/real.h>
 
     void float2str(float value, char *str)
     {
