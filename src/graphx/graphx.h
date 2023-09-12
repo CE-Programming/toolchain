@@ -528,12 +528,10 @@ gfx_ConvertToNewRLETSprite(sprite_in, malloc)
  * @note Conversion is not 100% perfect, but is good enough in most cases.
  */
 #define gfx_RGBTo1555(r,g,b) \
-((uint16_t)(((uint8_t)(r) >> 3) << 10) | \
-(((uint8_t)(g) >> 3) << 5) | \
-((uint8_t)(b) >> 3))
+((uint16_t)(((((r) & 255) >> 3) << 10) | ((((g) & 255) >> 3) << 5) | (((b) & 255) >> 3)))
 
 /**
- * Checks if a rectangle intersects with another rectangle.
+ * Tests if a rectangular area intersects/collides with another rectangular area.
  * @param[in] x0 Rectangle 0 X coordinate
  * @param[in] y0 Rectangle 0 Y coordinate
  * @param[in] w0 Rectangle 0 width
