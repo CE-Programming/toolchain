@@ -26,21 +26,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu, macos, windows]
+        runs-on: [ubuntu-20.04, macos-11, windows-latest]
         compressed: [YES, NO]
         include:
           - nul: /dev/null
-          - runs-on: macos
+          - runs-on: macos-11
             fasmg: /source/macos/x64/fasmg
-          - runs-on: windows
+          - runs-on: windows-latest
             fasmg: /fasmg.exe
             env: "env:"
             exe: .exe
             nul: nul
             ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
-          - runs-on: ubuntu
+          - runs-on: ubuntu-20.04
             fasmg: /fasmg.x64
-    runs-on: ${{matrix.runs-on}}-latest
+    runs-on: ${{matrix.runs-on}}
     steps:
       - name: Prepare Build Environment
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
@@ -49,7 +49,7 @@ jobs:
         id: ez80-clang
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{runner.os}}Release
+          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{matrix.runs-on}}Release
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
@@ -60,7 +60,7 @@ jobs:
         id: ez80-link
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-link${{matrix.exe}}-${{runner.os}}Release
+          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-link${{matrix.exe}}-${{matrix.runs-on}}Release
       - name: Extract ez80-link
         uses: DuckSoft/extract-7z-action@v1.0
         with:
