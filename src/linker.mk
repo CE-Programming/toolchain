@@ -22,6 +22,8 @@ APPEND_FILES = $(foreach file,$(addprefix ../lib/$2/,$(notdir $3)),$(call APPEND
 CRT_FILES := $(filter-out crt/crt0.src,$(wildcard crt/*.src) $(patsubst crt/%,crt/build/%.src,$(wildcard crt/*.c crt/*.cpp)))
 LIBC_FILES := $(wildcard libc/*.src) $(patsubst libc/%,libc/build/%.src,$(wildcard libc/*.c libc/*.cpp))
 LIBCXX_FILES := $(wildcard libcxx/*.src) $(patsubst libcxx/%,libcxx/build/%.src,$(wildcard libcxx/*.c libcxx/*.cpp))
+# TODO: atomic
+EASTL_FILES := $(filter-out EASTL/atomic.cpp.src,$(patsubst EASTL/source/%,EASTL/%.src,$(wildcard EASTL/source/*.c EASTL/source/*.cpp)))
 CE_FILES := $(wildcard ce/*.src)
 
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
@@ -65,4 +67,7 @@ linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)
 	$(Q)$(call APPEND,end if)
 	$(Q)$(call APPEND,if HAS_LIBCXX)
 	$(Q)$(call APPEND_FILES,	source ,libcxx,$(sort $(LIBCXX_FILES)))
+	$(Q)$(call APPEND,end if)
+	$(Q)$(call APPEND,if HAS_EASTL)
+	$(Q)$(call APPEND_FILES,	source ,EASTL,$(sort $(EASTL_FILES)))
 	$(Q)$(call APPEND,end if)
