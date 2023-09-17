@@ -23,7 +23,7 @@ CRT_FILES := $(filter-out crt/crt0.src,$(wildcard crt/*.src) $(patsubst crt/%,cr
 LIBC_FILES := $(wildcard libc/*.src) $(patsubst libc/%,libc/build/%.src,$(wildcard libc/*.c libc/*.cpp))
 LIBCXX_FILES := $(wildcard libcxx/*.src) $(patsubst libcxx/%,libcxx/build/%.src,$(wildcard libcxx/*.c libcxx/*.cpp))
 # TODO: atomic
-EASTL_FILES := $(filter-out EASTL/atomic.cpp.src,$(patsubst EASTL/source/%,EASTL/%.src,$(wildcard EASTL/source/*.c EASTL/source/*.cpp)))
+EASTL_FILES := $(filter-out EASTL/atomic.cpp.src,$(patsubst ea/EASTL/source/%,EASTL/%.src,$(wildcard ea/EASTL/source/*.c ea/EASTL/source/*.cpp)))
 CE_FILES := $(wildcard ce/*.src)
 
 linker_script: $(STATIC_FILES) $(LINKED_FILES) $(SHARED_FILES)

@@ -17,7 +17,7 @@
 include $(CURDIR)/src/common.mk
 
 LIBS := libload graphx fontlibc keypadc fileioc usbdrvce srldrvce msddrvce fatdrvce
-SRCS := ce crt libc libcxx EASTL
+SRCS := ce crt ea libc libcxx
 TOOLS := fasmg convbin convimg convfont cedev-config
 
 ifeq ($(OS),Windows_NT)
