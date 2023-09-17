@@ -44,6 +44,7 @@ HAS_PRINTF ?= YES
 HAS_CUSTOM_FILE ?= NO
 HAS_LIBC ?= YES
 HAS_LIBCXX ?= YES
+HAS_EASTL ?= YES
 ALLOCATOR ?= STANDARD
 PREFER_OS_CRT ?= NO
 PREFER_OS_LIBC ?= YES
@@ -73,6 +74,7 @@ LDPREFER_OS_LIBC := 0
 LDHAS_PRINTF := 0
 LDHAS_LIBC := 0
 LDHAS_LIBCXX := 0
+LDHAS_EASTL := 0
 
 # verbosity
 V ?= 0
@@ -245,6 +247,9 @@ endif
 ifeq ($(HAS_LIBCXX),YES)
 LDHAS_LIBCXX := 1
 endif
+ifeq ($(HAS_EASTL),YES)
+LDHAS_EASTL := 1
+endif
 ifeq ($(HAS_PRINTF),YES)
 LDHAS_PRINTF := 1
 endif
@@ -254,6 +259,9 @@ EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false
 EZCOMMONFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__ -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
 EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+ifeq ($(HAS_EASTL),YES)
+EZCXXFLAGS += -DEASTL_USER_CONFIG_HEADER="<__EASTL_user_config.h>"
+endif
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 
 # these are the fasmg linker flags
@@ -264,6 +272,7 @@ FASMGFLAGS = \
 	-i $(call QUOTE_ARG,HAS_PRINTF := $(LDHAS_PRINTF)) \
 	-i $(call QUOTE_ARG,HAS_LIBC := $(LDHAS_LIBC)) \
 	-i $(call QUOTE_ARG,HAS_LIBCXX := $(LDHAS_LIBCXX)) \
+	-i $(call QUOTE_ARG,HAS_EASTL := $(LDHAS_EASTL)) \
 	-i $(call QUOTE_ARG,PREFER_OS_CRT := $(LDPREFER_OS_CRT)) \
 	-i $(call QUOTE_ARG,PREFER_OS_LIBC := $(LDPREFER_OS_LIBC)) \
 	-i $(call QUOTE_ARG,ALLOCATOR_$(ALLOCATOR) := 1) \

@@ -20,7 +20,7 @@ BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
 
 EZCFLAGS := -S -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
 EZCFLAGS += -D_EZ80 -isystem ../libc/include -isystem ../ce/include -isystem ../fileioc -mllvm -profile-guided-section-prefix=false
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
+EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti -fno-use-cxa-atexit
 EZCXXFLAGS += -isystem ../libcxx/include
 
 WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
@@ -40,7 +40,6 @@ clean:
 	$(Q)$(call RMDIR,build)
 
 install: all
-	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call MKDIR,$(INSTALL_CXX_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_LIBCXX))
