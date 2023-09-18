@@ -1,0 +1,51 @@
+	assume	adl=1
+
+	section	.text
+	public	_malloc, _calloc, _free, _realloc
+
+	public	_calloc
+_calloc:
+	pop	de
+	pop	bc
+	ex	(sp),hl
+	push	bc
+	push	de
+	call	__imulu
+	push	hl
+	call	_malloc
+	add	hl,de
+	xor	a,a
+	sbc	hl,de
+	ld	e,a
+	push	de
+	push	hl
+	call	nz,_memset
+	pop	hl
+	pop	de
+	pop	bc
+	ret
+
+if defined ALLOCATOR_SIMPLE
+
+_malloc := __simple_malloc
+_free := __simple_free
+_realloc := __simple_realloc
+
+end if
+
+if defined ALLOCATOR_STANDARD
+
+_malloc := __standard_malloc
+_free := __standard_free
+_realloc := __standard_realloc
+
+end if
+
+	extern  __simple_free
+	extern  __simple_malloc
+	extern  __simple_realloc
+	extern  __standard_malloc
+	extern  __standard_free
+	extern  __standard_realloc
+	extern	__imulu
+	extern	_memset

@@ -1,0 +1,48 @@
+	assume	adl = 1
+
+	section	.text
+
+	public	__simple_malloc
+__simple_malloc:
+	pop	bc
+	ex	(sp),de
+	push	bc
+	ld	bc,(_heap_ptr)
+	push	bc
+	pop	iy
+	add	iy,de
+	lea	hl,iy
+	or	a,a
+	sbc	hl,bc
+	jr	c,.null
+	ld	de,___heaptop
+	lea	hl,iy
+	or	a,a
+	sbc	hl,de
+	jr	nc,.null
+	ld	(_heap_ptr),iy
+	push	bc
+	pop	hl
+	ret
+.null:
+	or	a,a
+	sbc	hl,hl
+	ret
+
+	public	__simple_free
+__simple_free:
+	ret
+
+	public	__simple_realloc
+__simple_realloc:
+	or	a,a
+	sbc	hl,hl
+	ret
+
+	section .data
+	private _heap_ptr
+_heap_ptr:
+	dl	___heapbot
+
+	extern	___heaptop
+	extern	___heapbot

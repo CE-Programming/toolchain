@@ -18,24 +18,12 @@ typedef struct {
   long long quot;
 } lldiv_t;
 
-typedef char __align;
-union header {
-  struct {
-    union header *ptr;
-    unsigned int size;
-  } s;
-  __align x;
-};
-typedef union header _HEADER;
-
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
 #define RAND_MAX 8388607
 
-#define HEADER _HEADER
 #define allocp _allocp
-#define NALLOC 50
 
 __BEGIN_DECLS
 
