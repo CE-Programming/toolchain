@@ -24,7 +24,7 @@
 include '../include/library.inc'
 
 define VERSION_MAJOR       4
-define VERSION_MINOR       0
+define VERSION_MINOR       1
 
 buf := ti.cursorImage
 
@@ -46,7 +46,8 @@ prgm_start        := buf + 886	; pointer to start of actual program when dealing
 appvar_ptr        := buf + 889	; pointer to start of library appvar in archive
 lib_name_ptr      := buf + 892	; pointer to name of library to extract
 show_msgs         := buf + 895  ; show error messages or just exit with error
-flag_save         := buf + 896  ; save modified iy flag
+flag_save         := buf + 896  ; save/restore modified iy flag
+ix_save           := buf + 897  ; save/restore modified ix register
 
 REQ_LIB_MARKER    := $C0	; required library signifier byte
 OPT_LIB_MARKER    := $C1	; optional library signifier byte
@@ -84,21 +85,24 @@ disable_relocations
 	push	de			; de->start of library jump table
 	push	hl
 
+	push	bc
 	ld	bc, 1020
 	ld	hl, buf
 	call	ti.MemClear
-
-	ld	a, 1			; disable or enable message handling
-	ld	(show_msgs), a
+	pop	bc
 
 	ld	a, (iy + LIB_FLAGS)
 	ld	(flag_save), a
+	ld	(ix_save), ix		; save IX since older ICE programs don't
 
+	ld	de, show_msgs		; disable or enable error printing
+	ld	a, 1
+	ld	(de), a
 	ld	hl, $AA55AA
 	xor	a, a
 	sbc	hl, bc
 	jr	nz, .show_msgs
-	ld	(show_msgs), a
+	ld	(de), a
 .show_msgs:
 
 	pop	hl
@@ -125,6 +129,7 @@ disable_relocations
 	jr	z, start
 	ld	a, (flag_save)
 	ld	(iy + LIB_FLAGS), a	; restore flag bits
+	ld	ix, (ix_save)		; restore IX register
 	jp	(hl)			; return to execution if there are no libs
 
 macro relocate? name, address*
@@ -511,10 +516,10 @@ load_next_dep:
 .exit:
 	call	ti.PopOP1		; restore program name
 	ld	hl, (prgm_start)
+	ld	ix, (ix_save)		; restore IX register
 	ld	a, (flag_save)
 	ld	(iy + LIB_FLAGS), a	; restore flag bits
-	xor	a, a
-	inc	a			; return with 1 in a
+	ld	a, 1
 	jp	(hl)			; passed all the checks; let's start execution! :)
 
 enqueue_all_deps:			; we don't need to store anything if we are here
@@ -606,6 +611,7 @@ throw_error:				; draw the error message onscreen
 	call	ti.PopOP1
 	ld	a, (flag_save)
 	ld	(iy + LIB_FLAGS), a	; restore flag bits
+	ld	ix, (ix_save)		; restore IX register
 	xor	a, a			; return with zero in a
 	ret
 
