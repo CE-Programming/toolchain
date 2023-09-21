@@ -69,10 +69,13 @@ I recommend the following .gitignore file, as it should match all non-source fil
     .. indent with spaces
     .. code-block:: bash
 
-        bin/
         obj/
+        bin/
         src/gfx/*.c
         src/gfx/*.h
+        src/gfx/*.8xv
+        .DS_Store
+        convimg.yaml.lst
 
 Now, from Git's perspective, these files basically no longer exist - you won't be asked to add them to commits and it will keep your repository clean.
 
