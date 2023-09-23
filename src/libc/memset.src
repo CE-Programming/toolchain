@@ -2,7 +2,9 @@
 
 	section	.text
 	public	_memset
+	public _memset_fast
 _memset:
+_memset_fast:
 	pop	iy
 	pop	hl
 	pop	de

@@ -34,7 +34,7 @@
 /* @cond */
 #define prgm_CleanUp()
 #define pgrm_CleanUp()
-#define memset_fast memset
+void *memset_fast(void *s, int c, size_t n) __attribute__((nonnull(1)));
 #define _OS(function) function()
 #define asm_NewLine os_NewLine
 #define asm_MoveUp os_MoveUp
