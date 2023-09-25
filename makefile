@@ -75,7 +75,6 @@ libs: $(LIBS) $(TOOLS)
 libs-zip:
 	$(Q)$(call MKDIR,clibs)
 	$(Q)$(foreach library,$(LIBS),$(call COPY,$(call NATIVEPATH,$(call SRCDIR,$(library))/$(library).8xv),clibs) &&) $(call NATIVEEXE,7z) a clibs_separately_in_zip.zip clibs
-	$(Q)$(call RMDIR,clibs)
 
 clean: $(addprefix clean-,$(TOOLS)) $(addprefix clean-,$(SRCS)) $(addprefix clean-,$(LIBS))
 	$(Q)$(call REMOVE,src/linker_script)
