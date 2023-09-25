@@ -72,6 +72,11 @@ libs: $(LIBS) $(TOOLS)
 	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract \
 		$(foreach library,$(LIBS),$(addprefix --input ,$(call SRCDIR,$(library))/$(library).8xv)) --output $(call NATIVEPATH,clibs.8xg)
 
+libs-zip:
+	$(Q)$(call MKDIR,clibs)
+	$(Q)$(foreach library,$(LIBS),$(call COPY,$(call NATIVEPATH,$(call SRCDIR,$(library))/$(library).8xv),clibs) &&) $(call NATIVEEXE,7z) a clibs_separately_in_zip.zip clibs
+	$(Q)$(call RMDIR,clibs)
+
 clean: $(addprefix clean-,$(TOOLS)) $(addprefix clean-,$(SRCS)) $(addprefix clean-,$(LIBS))
 	$(Q)$(call REMOVE,src/linker_script)
 	$(Q)$(call REMOVE,clibs.8xg)

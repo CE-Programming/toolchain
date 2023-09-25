@@ -126,7 +126,9 @@ jobs:
       - name: Build Toolchain
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} V=1
       - name: Build Libraries
-        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} libs V=1
+        run: |
+          make -j4 -C ${{env.TOOLCHAIN_PATH}} libs V=1
+          make -j4 -C ${{env.TOOLCHAIN_PATH}} libs-zip V=1
 
       - name: Install Toolchain
         env:

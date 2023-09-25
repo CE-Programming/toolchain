@@ -128,7 +128,9 @@ jobs:
       - name: Build Toolchain
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} V=1
       - name: Build Libraries
-        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} libs V=1
+        run: |
+          make -j4 -C ${{env.TOOLCHAIN_PATH}} libs V=1
+          make -j4 -C ${{env.TOOLCHAIN_PATH}} libs-zip V=1
 
       - name: Install Toolchain
         env:
@@ -205,6 +207,12 @@ jobs:
         with:
           name: clibs
           path: ${{env.AUTOTESTER_LIBS_GROUP}}
+
+      - name: Upload Libraries Zip
+        uses: actions/upload-artifact@v2
+        with:
+          name: clibs_separately_in_zip
+          path: ${{github.workspace}}/toolchain/clibs
 
   test:
     needs: build
