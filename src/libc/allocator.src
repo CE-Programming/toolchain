@@ -12,7 +12,9 @@ _calloc:
 	push	de
 	call	__imulu
 	push	hl
+	push	hl
 	call	_malloc
+	pop	de
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
@@ -20,9 +22,9 @@ _calloc:
 	push	de
 	push	hl
 	call	nz,_memset
-	pop	hl
 	pop	de
-	pop	bc
+	pop	de
+	pop	de
 	ret
 
 if defined ALLOCATOR_SIMPLE
