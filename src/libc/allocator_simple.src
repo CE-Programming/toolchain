@@ -5,24 +5,17 @@
 	public	__simple_malloc
 __simple_malloc:
 	pop	bc
-	ex	(sp),de
+	ex	(sp),hl
 	push	bc
-	ld	bc,(_heap_ptr)
-	push	bc
-	pop	iy
-	add	iy,de
-	lea	hl,iy
-	or	a,a
-	sbc	hl,bc
+	ld	de,(_heap_ptr)
+	add	hl,de
 	jr	c,.null
-	ld	de,___heaptop
-	lea	hl,iy
-	or	a,a
-	sbc	hl,de
+	ld	bc,___heaptop
+	sbc	hl,bc
 	jr	nc,.null
-	ld	(_heap_ptr),iy
-	push	bc
-	pop	hl
+	add	hl,bc
+	ld	(_heap_ptr),hl
+	ex	de,hl
 	ret
 .null:
 	or	a,a
