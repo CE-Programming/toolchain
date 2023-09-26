@@ -3,21 +3,22 @@
 	section	.text
 	public	__lxor_fast
 __lxor_fast:
+; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	xor	a, e
 	ld	e, a
-	push	bc
-	inc	sp
-	inc	sp
 	push	hl
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	bc
 	ld	a, (hl)
 	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
 	xor	a, (hl)
-	dec	hl
 	ld	(hl), a
 	pop	hl
-	inc	sp
 	ld	a, h
 	xor	a, b
 	ld	h, a

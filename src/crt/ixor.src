@@ -10,20 +10,23 @@ __ixor := 000198h
 else
 
 __ixor:
+; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
-	push	bc
-	inc	sp
-	inc	sp
+	public	__ixor.hijack_lxor
+.hijack_lxor:
 	push	hl
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	bc
 	ld	a, (hl)
 	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
 	xor	a, (hl)
-	dec	hl
 	ld	(hl), a
 	pop	hl
-	inc	sp
 	ld	a, h
 	xor	a, b
 	ld	h, a

@@ -3,19 +3,20 @@
 	section	.text
 	public	__ior_fast
 __ior_fast:
-	push	bc
-	inc	sp
-	inc	sp
+; CC: 22*r(PC)+8*r(SPL)+7*w(SPL)+1
 	push	hl
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	bc
 	ld	a, (hl)
 	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
 	or	a, (hl)
-	dec	hl
 	ld	(hl), a
 	pop	hl
-	inc	sp
 	ld	a, h
 	or	a, b
 	ld	h, a

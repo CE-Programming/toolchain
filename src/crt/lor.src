@@ -10,29 +10,12 @@ __lor := 0001D8h
 else
 
 __lor:
+; CC: 30*r(PC)+11*r(SPL)+10*w(SPL)+2
 	push	af
 	or	a, e
 	ld	e, a
-	push	bc
-	inc	sp
-	inc	sp
-	push	hl
-	ld	hl, 2
-	add	hl, sp
-	ld	a, (hl)
-	inc	hl
-	or	a, (hl)
-	dec	hl
-	ld	(hl), a
-	pop	hl
-	inc	sp
-	ld	a, h
-	or	a, b
-	ld	h, a
-	ld	a, l
-	or	a, c
-	ld	l, a
-	pop	af
-	ret
+	jp	__ior.hijack_lor
+
+	extern	__ior.hijack_lor
 
 end if
