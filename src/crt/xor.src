@@ -1,6 +1,30 @@
 	assume	adl=1
 
 	section	.text
+	public	__lxor
+
+if PREFER_OS_CRT
+
+__lxor := 0001FCh
+
+else
+
+__lxor:
+; CC: 28*r(PC)+11*r(SPL)+10*w(SPL)+1
+	push	af
+	xor	a, e
+	ld	e, a
+;	jr	__ixor.hijack_lxor
+	virtual
+		ld	a, 0
+		load .ld_a: byte from $$
+	end virtual
+	db	.ld_a	; push af -> ld a,*
+	require	__ixor
+
+end if
+
+	section	.text
 	public	__ixor
 
 if PREFER_OS_CRT
@@ -12,7 +36,7 @@ else
 __ixor:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
-	public	__ixor.hijack_lxor
+	private	__ixor.hijack_lxor
 .hijack_lxor:
 	push	hl
 	scf

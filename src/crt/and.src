@@ -1,6 +1,30 @@
 	assume	adl=1
 
 	section	.text
+	public	__land
+
+if PREFER_OS_CRT
+
+__land := 0001A4h
+
+else
+
+__land:
+; CC: 28*r(PC)+11*r(SPL)+10*w(SPL)+1
+	push	af
+	and	a, e
+	ld	e, a
+;	jr	__iand.hijack_land
+	virtual
+		ld	a, 0
+		load .ld_a: byte from $$
+	end virtual
+	db	.ld_a	; push af -> ld a,*
+	require	__iand
+
+end if
+
+	section .text
 	public	__iand
 
 if PREFER_OS_CRT
@@ -12,7 +36,7 @@ else
 __iand:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
-	public	__iand.hijack_land
+	private	__iand.hijack_land
 .hijack_land:
 	push	hl
 	scf

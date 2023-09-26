@@ -6,6 +6,12 @@ __lor_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	or	a, e
 	ld	e, a
+	require	__ior_fast
+
+	section	.text
+	public	__ior_fast
+__ior_fast:
+; CC: 22*r(PC)+8*r(SPL)+7*w(SPL)+1
 	push	hl
 	scf
 	sbc	hl, hl
@@ -19,6 +25,12 @@ __lor_fast:
 	or	a, (hl)
 	ld	(hl), a
 	pop	hl
+	require	__sor_fast
+
+	section	.text
+	public	__sor_fast
+__sor_fast:
+; CC: 8*r(PC)+3*r(SPL)+1
 	ld	a, h
 	or	a, b
 	ld	h, a
