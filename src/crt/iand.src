@@ -10,20 +10,23 @@ __iand := 000134h
 else
 
 __iand:
+; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
-	push	bc
-	inc	sp
-	inc	sp
+	public	__iand.hijack_land
+.hijack_land:
 	push	hl
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	bc
 	ld	a, (hl)
 	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
 	and	a, (hl)
-	dec	hl
 	ld	(hl), a
 	pop	hl
-	inc	sp
 	ld	a, h
 	and	a, b
 	ld	h, a
