@@ -1,6 +1,30 @@
 	assume	adl=1
 
 	section	.text
+	public	__lor
+
+if PREFER_OS_CRT
+
+__lor := 0001D8h
+
+else
+
+__lor:
+; CC: 28*r(PC)+11*r(SPL)+10*w(SPL)+1
+	push	af
+	or	a, e
+	ld	e, a
+;	jr	__ior.hijack_lor
+	virtual
+		ld	a, 0
+		load .ld_a: byte from $$
+	end virtual
+	db	.ld_a	; push af -> ld a,*
+	require	__ior
+
+end if
+
+	section	.text
 	public	__ior
 
 if PREFER_OS_CRT
@@ -12,7 +36,7 @@ else
 __ior:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
-	public	__ior.hijack_lor
+	private	__ior.hijack_lor
 .hijack_lor:
 	push	hl
 	scf
