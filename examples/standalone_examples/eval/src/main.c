@@ -2,6 +2,7 @@
 #include <ti/real.h>
 #include <ti/getkey.h>
 #include <ti/screen.h>
+#include <ti/tokens.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -37,7 +38,12 @@ int main(void)
     if (ret == 0)
     {
         /* Tokenized representation of "A+A" */
-        const char expression[] = "\x41\x70\x41";
+        const uint8_t expression[] =
+        {
+            OS_TOK_A,
+            OS_TOK_ADD,
+            OS_TOK_A,
+        };
 
         ret = os_Eval(expression, sizeof expression);
     }
