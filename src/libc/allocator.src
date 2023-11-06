@@ -1,7 +1,7 @@
 	assume	adl=1
 
 	section	.text
-	public	_malloc, _calloc, _free, _realloc
+	public	_malloc, _free, _realloc
 
 	public	_calloc
 _calloc:
