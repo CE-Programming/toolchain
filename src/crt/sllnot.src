@@ -1,0 +1,76 @@
+; Performs 48 bit ("short long long") bitwise not
+; 
+; Arguments:
+; ude = Most significant bytes of arg 1
+; uhl = Least significant bytes of arg 1
+
+
+; Returns:
+; ude:uhl = ~ude:uhl
+
+	assume	adl=1
+
+	section	.text
+	public	__sllnot
+__sllnot:
+	push de
+	ex de, hl
+	scf
+	sbc hl, hl ; hl = -1
+	or a, a ; reset carry flag
+	sbc hl, de ; hl = -1-hl
+	push hl
+
+	; -6: ~l               <-- SP
+	; -5: ~h
+	; -4: ~u[hl]
+	; -3: e
+	; -2: d
+	; -1: u[de]
+	; -0: everything else
+	
+	inc sp
+	inc sp
+	inc sp
+
+	; -6: ~l
+	; -5: ~h
+	; -4: ~u[hl]
+	; -3: e                <-- SP
+	; -2: d
+	; -1: u[de]
+	; -0: everything else
+
+	pop hl ; hl = original value of de
+
+	; -6: ~l
+	; -5: ~h
+	; -4: ~u[hl]
+	; -3: e           
+	; -2: d
+	; -1: u[de]
+	; -0: everything else  <-- SP
+
+	ex de, hl
+	scf
+	sbc hl, hl ; hl = -1
+	or a, a ; reset carry flag
+	sbc hl, de ; hl = -1-hl
+	push hl
+
+	; -6: ~l
+	; -5: ~h
+	; -4: ~u[hl]
+	; -3: ~e               <-- SP
+	; -2: ~d
+	; -1: ~u[de]
+	; -0: everything else
+
+	dec sp
+	dec sp
+	dec sp
+
+	pop hl
+	pop de
+
+    ret

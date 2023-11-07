@@ -1,0 +1,51 @@
+; Performs unsigned 48 bit ("short long long") bit shift right
+; 
+; Arguments:
+; ude = Most significant bytes of arg 1
+; uhl = Least significant bytes of arg 1
+; ubc = Amount to shift by (effectively just shift by c)
+
+
+; Returns:
+; ude:uhl = ude:uhl>>c
+
+	assume	adl=1
+
+	section	.text
+	public	__sllshru
+__sllshru:
+	push bc
+	ld b, c
+	push de
+	push hl
+	ld hl, 0
+	add hl, sp
+	
+	inc hl
+	inc hl
+	inc hl
+	inc hl
+	inc hl
+	
+	srl (hl)
+	dec hl
+	rr (hl)
+	dec hl
+	rr (hl)
+	dec hl
+	rr (hl)
+	dec hl
+	rr (hl)
+	dec hl
+	rr (hl)
+
+	or a, a
+	dec b
+	jp nz, __sllshrs.loop
+
+	pop hl
+	pop de
+	pop bc
+	ret
+
+	extern __sllshrs.loop
