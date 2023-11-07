@@ -17,8 +17,6 @@ __sllmulu:
 	di
 	;backup af
 	push af
-	exx
-	push bc
 
 	push ix
 	ld ix, 0
