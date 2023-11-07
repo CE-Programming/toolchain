@@ -1,0 +1,70 @@
+; Performs 48 bit ("short long long") unsigned comparison
+; 
+; Arguments:
+; uiy = Most significant bytes of arg 1
+; ubc = Least significant bytes of arg 1
+; ude = Most signficant bytes of arg 2
+; uhl = Least significant bytes of arg 2
+; 
+; Returns:
+; flags updated according to comparison
+
+	assume	adl=1
+
+	section	.text
+	public	__sllcmpu
+__sllcmpu:
+	push ix
+	ld ix, 0
+	add ix, sp
+
+	ld hl, (ix+18) ;hl = iy
+	sbc hl, de
+	jq nz, .ne
+	or a, a
+	ld hl, (ix+15) ;bc
+	ld bc, (ix+21) ;hl
+	sbc hl, bc
+	
+	ld hl, (ix+21)
+	ld bc, (ix+15)
+	pop ix
+	ret z ; don't compliment carry if equal
+	ccf
+	ret
+.ne:
+	ld hl, (ix+21)
+	pop ix
+	ccf
+	ret
+
+; __sllcmpu:
+; 	push ix
+; 	ld ix, 0
+; 	add ix, sp
+; 	push hl
+; 	push iy
+; 	push bc
+
+; 	ld hl, (ix-6) ;iy
+; 	sbc hl, de
+; 	jq nz, .ne
+; 	or a, a
+; 	ld hl, (ix-9) ;bc
+; 	ld bc, (ix-3) ;hl
+; 	sbc hl, bc
+	
+; 	pop bc
+; 	pop iy
+; 	pop hl
+; 	pop ix
+; 	ret z ; don't compliment carry if equal
+; 	ccf
+; 	ret
+; .ne:
+; 	pop bc
+; 	pop iy
+; 	pop hl
+; 	pop ix
+; 	ccf
+; 	ret

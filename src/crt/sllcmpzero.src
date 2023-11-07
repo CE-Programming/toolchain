@@ -1,0 +1,28 @@
+; Performs 48 bit ("short long long") comparison with 0
+; 
+; Arguments:
+; ude = Most significant bytes of arg 1
+; uhl = Least significant bytes of arg 1
+
+
+; Returns:
+; z status flag set if ude:uhl == 0
+
+	assume	adl=1
+
+	section	.text
+	public	__sllcmpzero
+__sllcmpzero:
+	;check lsb's == 0
+	add hl, bc
+	or a, a
+	sbc hl, bc
+	ret nz
+	;check msb's == 0
+	ex de, hl
+	add hl, bc
+	or a, a
+	sbc hl, bc
+	ex de, hl
+	ret
+	
