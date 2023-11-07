@@ -16,12 +16,6 @@
 __slland:
 	push af
 
-	; Set up stack  stuff for later
-
-	push ix
-	ld ix, 0
-	add ix, sp
-
 	; Low and high
 
 	ld a, d
@@ -41,28 +35,29 @@ __slland:
 	ld l, a
 
 	; Push 2/3 done values
+	push iy
+	ld iy, 0
+	add iy, sp
 	push de
 	push hl
-	push iy
 	push bc
 
 	; Deal with Upper Byte
 
-	ld a, (ix-1) ; a = u[de] (modified)
-	and a, (ix-7) ; a &= u[iy]
-	ld (ix-1), a ; u[de] (modified) = a
+	ld a, (iy-1) ; a = u[de] (modified)
+	and a, (iy+2) ; a &= u[iy]
+	ld (iy-1), a ; u[de] (modified) = a
 
-	ld a, (ix-4) ; a = u[hl] (modified)
-	and a, (ix-10) ; a &= u[bc]
-	ld (ix-4), a ; u[hl] (modified) = a
+	ld a, (iy-4) ; a = u[hl] (modified)
+	and a, (iy-7) ; a &= u[bc]
+	ld (iy-4), a ; u[hl] (modified) = a
 
 	; Load values back into registers and clean up stack
 	pop bc
-	pop iy
 	pop hl
 	pop de
+	pop iy
 
-	pop ix
 	pop af
 
 	ret
