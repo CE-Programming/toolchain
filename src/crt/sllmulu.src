@@ -14,13 +14,11 @@
 	section	.text
 	public	__sllmulu
 __sllmulu:
-	;backup af, alt bc, alt de, and alt hl
+	di
+	;backup af
 	push af
 	exx
 	push bc
-	push de
-	push hl
-	exx
 
 	push ix
 	ld ix, 0
@@ -271,10 +269,6 @@ __sllmulu:
 	pop ix
 	pop ix
 	pop ix
-	exx
-	pop hl
-	pop de
-	pop bc
-	exx
 	pop af
+	ei
 	ret
