@@ -14,8 +14,12 @@
 	section	.text
 	public	__sllmulu
 __sllmulu:
-	di
 	;backup af
+	push af
+
+	;backup interrupt
+	ld a, i ; P = IEF2
+	di
 	push af
 
 	push ix
@@ -267,6 +271,10 @@ __sllmulu:
 	pop ix
 	pop ix
 	pop ix
-	pop af
+
+	pop af ; interrupt stuff back, P/V = IEF2
+	jp po, .skipEI
 	ei
+.skipEI:
+	pop af
 	ret
