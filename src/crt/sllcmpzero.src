@@ -19,10 +19,8 @@ __sllcmpzero:
 	sbc hl, bc
 	ret nz
 	;check msb's == 0
-	ex de, hl
-	add hl, bc
 	or a, a
-	sbc hl, bc
-	ex de, hl
+	sbc hl, de ; 0 - de, z set if de = 0
+	add hl, de ; restore hl
 	ret
 	
