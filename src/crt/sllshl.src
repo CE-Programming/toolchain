@@ -14,112 +14,75 @@ assume	adl=1
 	section	.text
 	public	__sllshl
 __sllshl:
-	push iy
-	push de
-	push hl
-	pop iy ; iy will be used for least significant, hl for most going forward
-	pop hl
-
 	bit	0, c
 	jr	z, .bit0
-	add	iy, iy
+	; ude:uhl<<1
+	add hl, hl
+	ex de, hl
 	adc hl, hl
+	ex de, hl
 .bit0:
 	bit	1, c
 	jr	z, .bit1
-	add	iy, iy
+	; ude:uhl<<2
+	add hl, hl
+	ex de, hl
 	adc hl, hl
-	add	iy, iy
+	ex de, hl
+	add hl, hl
+	ex de, hl
 	adc hl, hl
+	ex de, hl
 .bit1:
 	bit	2, c
 	jr	z, .bit2
-	add	iy, iy
+	; ude:uhl<<4
+	add hl, hl
+	ex de, hl
 	adc hl, hl
-	add	iy, iy
+	ex de, hl
+	add hl, hl
+	ex de, hl
 	adc hl, hl
-	add	iy, iy
+	ex de, hl
+	add hl, hl
+	ex de, hl
 	adc hl, hl
-	add	iy, iy
+	ex de, hl
+	add hl, hl
+	ex de, hl
 	adc hl, hl
+	ex de, hl
 .bit2:
+	; set up stack stuff for later
+	push ix
+	ld ix, 0
+	push de
+	push hl
+	push ix
+	push ix
+	add ix, sp
+	
 	bit	3, c
 	jr	z, .bit3
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
+	; ude:uhl<<8
+	dec ix
 .bit3:
 	bit 4, c
 	jr z, .bit4
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
-	add	iy, iy
-	adc hl, hl
+	; ude:uhl<<16
+	lea ix, ix-2
 .bit4:
 	bit 5, c
 	jr z, .finish
-
-	; Shift least significant 8 left
-	add	iy, iy
-	add	iy, iy
-	add	iy, iy
-	add	iy, iy
-	add	iy, iy
-	add	iy, iy
-	add	iy, iy
-	add	iy, iy
-	
-	; Move least significant to most signficant
-	push iy
-	pop hl
-	ld iy, 0
-
-	; put final most significant bytes into de and fix iy
+	; ude:uhl<<32
+	lea ix, ix-4
 .finish:
-	push iy
-	push hl
-	pop de
-	pop hl
-	pop iy
+	ld de, (ix+9)
+	ld hl, (ix+6)
+	pop ix
+	pop ix
+	pop ix
+	pop ix
+	pop ix
 	ret
