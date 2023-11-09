@@ -14,38 +14,17 @@
 	section	.text
 	public	__sllshru
 __sllshru:
+	inc c
+	dec c
+	ret z
 	push bc
 	ld b, c
 	push de
 	push hl
-	ld hl, 0
+	ld hl, 5
 	add hl, sp
-	
-	inc hl
-	inc hl
-	inc hl
-	inc hl
-	inc hl
 	
 	srl (hl)
 	dec hl
-	rr (hl)
-	dec hl
-	rr (hl)
-	dec hl
-	rr (hl)
-	dec hl
-	rr (hl)
-	dec hl
-	rr (hl)
-
-	or a, a
-	dec b
-	jp nz, __sllshrs.loop
-
-	pop hl
-	pop de
-	pop bc
-	ret
-
-	extern __sllshrs.loop
+	jp nz, __sllshrs.midloop
+	extern __sllshrs.midloop

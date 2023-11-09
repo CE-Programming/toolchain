@@ -13,23 +13,22 @@
 
 	section	.text
 	public	__sllshrs
+	public __sllshrs.midloop
 __sllshrs:
+	inc c
+	dec c
+	ret z
 	push bc
 	ld b, c
 	push de
 	push hl
-	ld hl, 0
-	add hl, sp
-	public __sllshrs.loop
 .loop:
-	inc hl
-	inc hl
-	inc hl
-	inc hl
-	inc hl
+	ld hl, 5
+	add hl, sp
 	
 	sra (hl)
 	dec hl
+.midloop: ; Used to enter from sllshru
 	rr (hl)
 	dec hl
 	rr (hl)
@@ -40,7 +39,6 @@ __sllshrs:
 	dec hl
 	rr (hl)
 
-	or a, a
 	djnz .loop
 
 	pop hl
