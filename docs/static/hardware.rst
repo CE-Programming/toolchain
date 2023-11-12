@@ -237,10 +237,19 @@ The :ref:`sys/timers.h header <timers_h>` provides access to the timers.
 USB
 ^^^^^^
 
-The calculator has a USB port, of course, but the toolchain does not yet support it.
-Work on a USB driver is ongoing in the :code:`usbdrvce` branch on the toolchain.
+The calculator has a USB port which uses a Faraday FOTG210.
+A hardware driver is implemented in the  :ref:`usbdrvce <usbdrvce_h>` library; available toolchain libraries are listed below.
 
-The :ref:`sys/basicusb.h header <basicusb_h>` allows you to check if the battery is currently being charged, and that's about it.
+=============================  ====================================
+Library                        Use Case            
+=============================  ====================================
+:ref:`usbdrvce <usbdrvce_h>`   USB data/control transfers 
+:ref:`msddrvce <msddrvce_h>`   Mass Storage Device access (drives)
+:ref:`fatdrvce <fatdrvce_h>`   FAT32 filesystem support
+:ref:`srldrvce <srldrvce_h>`   Serial device/host driver
+=============================  ====================================
+
+The :ref:`sys/basicusb.h header <basicusb_h>` also allows you to check if the battery is currently being charged, and that's about it.
 
 Protected Hardware
 ^^^^^^^^^^^^^^^^^^
