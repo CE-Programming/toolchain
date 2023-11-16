@@ -26,11 +26,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-20.04, macos-11, windows-latest]
+        runs-on: [ubuntu-20.04, macos-latest, windows-latest]
         compressed: [YES, NO]
         include:
           - nul: /dev/null
-          - runs-on: macos-11
+          - runs-on: macos-latest
             fasmg: /source/macos/x64/fasmg
           - runs-on: windows-latest
             fasmg: /fasmg.exe
