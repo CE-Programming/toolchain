@@ -11,19 +11,28 @@ namespace std {
 
 template<class _Ep>
 class initializer_list {
-    const _Ep __begin;
-    size_t    __size;
+public:
+    using value_type = _Ep;
+    using reference = _Ep&;
+    using const_reference = _Ep const&;
+    using size_type = size_t;
+    using iterator = const _Ep*;
+    using const_iterator = const _Ep*;
 
-    _EZCXX_INLINE initializer_list(const _Ep* __begin, size_t __size) noexcept : __begin(__begin), __size(__size) {}
+private:
+    iterator __begin;
+    size_type __size;
+
+    _EZCXX_INLINE constexpr initializer_list(const_iterator __begin, size_type __size) noexcept : __begin(__begin), __size(__size) {}
 
 public:
-    _EZCXX_INLINE initializer_list() noexcept : initializer_list(nullptr, 0) {}
+    _EZCXX_INLINE constexpr initializer_list() noexcept : initializer_list(nullptr, 0) {}
 
-    _EZCXX_INLINE size_t size() const noexcept { return __size; }
+    _EZCXX_INLINE constexpr size_type size() const noexcept { return __size; }
 
-    _EZCXX_INLINE const _Ep* begin() const noexcept { return __begin; }
+    _EZCXX_INLINE constexpr const_iterator begin() const noexcept { return __begin; }
 
-    _EZCXX_INLINE const _Ep* end() const noexcept { return __begin + __size; }
+    _EZCXX_INLINE constexpr const_iterator end() const noexcept { return __begin + __size; }
 };
 
 template<class _Ep>
