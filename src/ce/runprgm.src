@@ -14,12 +14,15 @@ namespace ti?
 ?PopRealO1                 := 00205DCh
 ?ErrNotEnoughMem           := 002072Ch
 ?ErrMemory                 := 0020768h
+?JError                    := 0020790h
 ?PushErrorHandler          := 0020798h
 ?PopErrorHandler           := 002079Ch
 ?ParseInp                  := 0020F00h
 ?GetParse                  := 0020F0Ch
 ?SaveParse                 := 0020F10h
 ?DisableAPD                := 0021134h
+?SetParserHook             := 002149Ch
+?ClrParserHook             := 00214A0h
 ?DeleteTempPrograms        := 00214C0h
 ?ForceFullScreen           := 0021528h
 ?LoadDEInd_s               := 0021D9Ch
@@ -30,6 +33,7 @@ namespace ti?
 ?OP1                       := 0D005F8h
 ?errNo                     := 0D008DFh
 ?appErr2                   := 0D025B6h
+?parserHookPtr             := 0D025F9h
 ?pixelShadow               := 0D031F6h
 ?asm_prgm_size             := 0D0118Ch
 ?userMem                   := 0D1A881h
@@ -38,6 +42,9 @@ namespace ti?
 ?ProgObj                   := 005h
 ?tAsm84CeCmp               := 07Bh
 ?tAsm84CePrgm              := 07Ah
+
+?hookflags4                := 36h
+?parserHookActive          := 1
 
 ?ParsFlag2                 := 7h
 ?numOP1                    := 0
@@ -224,6 +231,23 @@ launch_basic_prgm:
 setup_prgm_state:
 	xor	a,a
 	ld	(ti.kbdGetKy),a
+	bit	ti.parserHookActive,(iy + ti.hookflags4)
+	jr	nz,.chain_hook
+.no_chain:
+	ld	hl,stub.chain
+	ld	(hl),$af		; xor a,a
+	inc	hl
+	ld	(hl),$c9		; ret
+	jr	.check_flags
+.chain_hook:
+	ld	hl,(ti.parserHookPtr)
+	ld	a,(hl)
+	cp	a,$83
+	jr	nz,.no_chain		; ensure the hook is valid
+	ld	(stub.chain + 1),hl
+	ld	(stub.prev_hook),hl
+	;jr	.check_flags
+.check_flags:
 	ld	a,$ce			; set
 	bit	ti.allowProgTokens,(iy + ti.newDispF)
 	jr	nz,.setAllowProgTokens
@@ -272,6 +296,11 @@ push_stub:
 	ld	bc,stub.error_handler - stub.normal
 	add	hl,bc
 	ld	(.stub_error_handler),hl
+	pop	hl
+	push	hl
+	ld	bc,stub.hook_parser - stub.normal
+	add	hl,bc
+	call	ti.SetParserHook
 	pop	hl
 	ex	de,hl
 	ld	hl,stub
@@ -339,6 +368,12 @@ stub:
 	res	ti.textInverse,(iy + ti.textFlags)
 	res	ti.onInterrupt,(iy + ti.onFlags)
 	res	ti.numOP1,(iy + ti.ParsFlag2)
+	call	ti.ClrParserHook
+	ld	hl,0
+.prev_hook := $-3
+	ld	a,(hl)
+	cp	a,$83
+	call	z,ti.SetParserHook
 	ld	hl,(ti.asm_prgm_size)
 	add	hl,de
 	or	a,a
@@ -365,6 +400,16 @@ stub:
 	add	hl,bc
 	ld	sp,hl		; os should delete created program
 	ret
+.hook_parser:
+	db	$83		; hook signifier
+	cp	a,2
+	jr	nz,.chain
+	ld	a,$d9 - $ce	; check if stop token
+	sub	a,b
+	jp	z,ti.JError
+	ld	a,2
+.chain:
+	jp	0		; xor a,a \ ret if not chaining
 .found:
 	call	ti.ChkInRam
 	ex	de,hl
