@@ -2657,6 +2657,7 @@ gfx_TransparentSprite:
 	pop	iy
 	push	ix
 	ld	ixh,a
+.transparent_color := $+1
 	ld	a,TRASPARENT_COLOR
 smcByte _TransparentColor
 	wait_quick
@@ -3573,6 +3574,7 @@ smcByte _TextBGColor
 smcByte _TextFGColor
 .bgcolor:
 	cp	a,TEXT_TP_COLOR		; check if transparent
+gfx_PrintChar.transparent_color := $-1
 smcByte _TextTPColor
 	jr	z,.transparent
 	ld	(de),a
@@ -3679,6 +3681,13 @@ smcByte _TextHeight
 	ld	iyh,a			; ixh = char width
 	ld	(_TmpCharSprite),a	; store width of character we are drawing
 	call	_GetChar		; store the character data
+
+	ld	hl,gfx_TransparentSprite.transparent_color
+	ld	a,(hl)
+	push	af
+	ld	a,(gfx_PrintChar.transparent_color)
+	ld	(hl),a
+
 	ld	bc,(_TextYPos)
 	push	bc
 	ld	bc,(_TextXPos)		; compute the new locations
@@ -3695,6 +3704,9 @@ smcByte _TextHeight
 	pop	bc
 	pop	bc
 	pop	bc
+
+	pop	af
+	ld	(gfx_TransparentSprite.transparent_color),a
 
 	pop	hl			; restore hl and stack pointer
 	ret
@@ -3912,7 +3924,7 @@ smcByte _TextTPColor
 	ret
 .transparent:
 	ld	a,0
-smcByte _TransparentColor
+smcByte _TextTPColor
 	ld	(de),a
 	inc	de			; move to next pixel
 	djnz	.nextpixel
