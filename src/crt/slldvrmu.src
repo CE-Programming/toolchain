@@ -1,0 +1,136 @@
+; Performs 48 bit ("short long long") division and modulo
+; 
+; Arguments:
+; ude = Most significant bytes of arg 1 (numerator)
+; uhl = Least significant bytes of arg 1
+; uiy = Most signficant bytes of arg 2 (denominator)
+; ubc = Least significant bytes of arg 2
+; 
+; Returns (potentially loaded into other registers by slldivuremu):
+; ude:uhl quotient as well as remainder on the stack
+
+    assume adl=1
+
+    section .data
+
+    section .text
+    public __slldvrmu
+
+__slldvrmu:
+    push ix
+    ld ix, 0
+    add ix, sp
+    ;backup af
+    push af
+    ;backup interrupt
+    ld a, i ; P = IEF2
+    di
+    push af
+
+    exx
+    push hl
+    push de
+    ld hl, 0
+    push bc
+    exx
+
+    push de
+    push hl
+    push iy
+    push bc
+
+    ;Stack Use:
+    ; ix+2 : return address
+    ; ix+1 : return address
+    ; ix   : return address
+    ; ix-1 : 0
+    ; ix-2 : a
+    ; ix-3 : f
+    ; ix-4 : 0
+    ; ix-5 : a interrupt stuff
+    ; ix-6 : f interrupt stuff
+    ; ix-7 : hlu'
+    ; ix-8 : h'
+    ; ix-9 : l'
+    ; ix-10: deu'
+    ; ix-11: d'
+    ; ix-12: e'
+    ; ix-13: bcu'
+    ; ix-14: b'
+    ; ix-15: c'
+    ; ix-16: deu n[5]
+    ; ix-17: d   n[4]
+    ; ix-18: e   n[3]
+    ; ix-19: hlu n[2]
+    ; ix-20: h   n[1]
+    ; ix-21: l   n[0]
+    ; ix-22: iyu d[5]
+    ; ix-23: iyh d[4]
+    ; ix-24: iyl d[3]
+    ; ix-25: bcu d[2]
+    ; ix-26: b   d[1]
+    ; ix-27: c   d[0]
+    
+    ; Set up for c quotient, uhl':uhl remainder, and ude':ude denom
+    ld de, (ix-27) ; ude = low denom
+    
+    exx
+    lea de, iy+0 ; ude' = iy = high denom
+    exx
+
+    ld bc, $000600 ; b = byte counter
+    ld iy, 0
+    ld hl, 0
+.byteLoop:
+    exx
+    ld b, 8 ; b' = bit counter
+    ld a, (ix-16); a = relevant numerator byte
+.bitLoop:
+    exx ; loop entered with alt registers as b' is bit counter, exx here to not be in alt
+    sla c ; q<<1
+    ; r<<1 and r[0] = n[b]
+    rla ; c = n[b]
+    adc hl, hl ; low r += low r + n[b]
+    exx
+    adc hl, hl ; high r += high r + c from low r
+    exx
+    ; r - d
+    sbc hl, de ; low r -= low d
+    exx
+    sbc hl, de ; high r -= high d
+    exx
+    jr nc, .greaterEqual
+    ; restore if r<d
+    add hl, de ; restore low
+    exx
+    adc hl, de ; restore high
+    djnz .bitLoop
+    jr .postBit
+.greaterEqual:
+    ; keep r -= d, and update quotient
+    inc c
+    exx
+    djnz .bitLoop
+.postBit:
+    exx
+    ld (ix-16), c ; now that numerator byte isn't needed, overwrite with quotient
+    dec ix
+    djnz .byteLoop
+
+    ;finish and clean up
+
+    pop bc
+    ld (ix-27), hl ; use bc's old space for remainder low
+    pop iy
+    pop hl ; hl = lower quotient
+    pop de ; de = upper quotient
+    exx
+    ld (ix-18), hl ; use de's old space for remainder high
+    pop bc
+    pop de
+    pop hl
+    exx
+
+    lea ix, ix+9 ; jump past stuff remaining on the stack
+    ld sp, ix ; sp = return address
+    ret ; cleanup finished in slldivuremu
