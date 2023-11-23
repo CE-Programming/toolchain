@@ -1,0 +1,31 @@
+    assume adl=1
+
+    section .text
+    public __slldivu
+    public __sllremu
+
+; Quotient in ude:uhl, remainder (with remu) on stack, then loaded into ude:uhl
+__slldivu:
+    call __slldvrmu
+    lea ix, ix-9
+    ld sp, ix
+    jr __slldivuremu.cleanup
+__sllremu:
+    call __slldvrmu
+    lea ix, ix-9
+    ld sp, ix
+    ld de, (ix-18)
+    ld hl, (ix-27)
+__slldivuremu.cleanup:
+    pop af
+    jp po, .skipEI
+    ei
+.skipEI:
+    pop af
+    pop ix
+    inc sp ; skip over old return address
+    inc sp
+    inc sp
+    ret
+
+    extern	__slldvrmu
