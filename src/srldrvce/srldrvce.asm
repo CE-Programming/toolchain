@@ -778,7 +778,7 @@ get_device_type:
 .any:
 	ld	bc,0
 	ld	a,(yinterfaceDescriptor.bInterfaceClass)
-	cp	$a	; CDC data class
+	cp	a,$a	; CDC data class
 	jq	z,.cdc_int_found
 	cp	$FF	; Vendor specific
 	jq	nz,.find_int_loop
@@ -1061,7 +1061,7 @@ set_rate_ch34x:
 	ld	hl,ch34x_setup
 	jq	set_rate_ct	
 
-; Sets the baud rate of a CH34x device
+; Sets the baud rate of a CP210X device
 ; Inputs:
 ;  ix: Serial device struct
 ;  hl: Baud rate
@@ -1671,17 +1671,18 @@ default_cdc_setup:
 
 ; CH34X baud settings
 ch34x_setup:
-	db	8							; number of packets to transfer
- 	setuppkt $61,$A1,$C29C,$B2B9,$0000,null				; serial init
-	setuppkt $61,$A4,$00DF,$0000,$0000,null				; modem on
-	setuppkt $61,$A4,$009F,$0000,$0000,null				; modem call
-	setuppkt $61,$9A,$2727,$0000,$0000,null				; control lines
+	db	6							; number of packets to transfer
+;	setuppkt $C0,$5F,$0000,$0000,$0002,.buf				; get vendor version
+ 	setuppkt $40,$A1,$0000,$0000,$0000,null				; serial init
 .baudFactor = $ + 4
-	setuppkt $61,$9A,$1312,$B282,$0000,null				; baud factor
+	setuppkt $40,$9A,$1312,$B282,$0000,null				; baud factor	
 .baudfOffset = $ + 4
-	setuppkt $61,$9A,$0f2c,$0008,$0000,null				; baud offset
-	setuppkt $61,$9A,$2518,$00c3,$0000,null				; baud low
-	setuppkt $61,$9A,$2727,$0000,$0000,null				; control lines
+	setuppkt $40,$9A,$0F2C,$0008,$0000,null				; baud offset
+;	setuppkt $C0,$95,$2518,$0000,$0000,.buf
+	setuppkt $40,$9A,$2518,$00C3,$0000,null				; parity
+	setuppkt $40,$9A,$2727,$0000,$0000,null				; control lines
+	setuppkt $40,$A4,$009F,$0000,$0000,null				; modem call
+;.buf:	dw 0
 
 ; FT232RL baud settings
 ft232rl_setup:
@@ -1692,11 +1693,11 @@ ft232rl_setup:
 ; CP201X baud settings
 cp210x_setup:
 	db	4
-	setuppkt $41,$00,$0001,$0000,$0000,null				; CP210X_IFC_ENABLE
-	setuppkt $41,$07,$0303,$0000,$0000,null				; CP210X_SET_MHS (RTS/DTR)
+	setuppkt $40,$00,$0001,$0000,$0000,null				; CP210X_IFC_ENABLE
+	setuppkt $40,$07,$0303,$0000,$0000,null				; CP210X_SET_MHS (RTS/DTR)
 .baudRate = $ + 2
-	setuppkt $41,$01,$0180,$0000,$0000,null				; 9600 for CP2102 (0x384000 / baudrate)
-	setuppkt $41,$03,$0800,$0000,$0000,null				; CP210X_SET_LINE_CTL ((dataBits << 8) | parity | stopBits)
+	setuppkt $40,$01,$0180,$0000,$0000,null				; 9600 for CP2102 (0x384000 / baudrate)
+	setuppkt $40,$03,$0800,$0000,$0000,null				; CP210X_SET_LINE_CTL ((dataBits << 8) | parity | stopBits)
 
 ;========================================================================
 ; Baud rate data look-up tables
