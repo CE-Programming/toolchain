@@ -1547,7 +1547,7 @@ start_write:
 ; Vendor match table
 ; Each table consists of a set of paramters to check to confirm a device
 vendor_device_match_table:
-	db	18							; total number of devices in table (8-bits for now)
+	db	19							; total number of devices in table (8-bits for now)
 	dl	.device_id_ftdi_sio
 	dl	.device_id_ftdi_ft232a
 	dl	.device_id_ftdi_ft232b
@@ -1565,6 +1565,7 @@ vendor_device_match_table:
 	dl	.device_id_ftdi_ft232hp
 	dl	.device_id_ftdi_ft4232ha
 	dl	.device_id_ch340
+	dl	.device_id_ch341
 	dl	.device_id_cp2102
 
 .device_id_ftdi_sio:
@@ -1653,6 +1654,11 @@ vendor_device_match_table:
 	devchk	srl_device.idvendor, mtEquals, $1A86			; paramter to check, match mode (equal, greater than, less than), value to check against
 	devchk	srl_device.idproduct, mtEquals, $7523
 	db	SRL_TYPE_CH34X, SRL_SUBTYPE_CH340, BAUD_TYPE_CH34X	; device data if matched: type, sub type and baud type
+.device_id_ch341:
+	db	2							; number of conditional checks to perform
+	devchk	srl_device.idvendor, mtEquals, $1A86			; paramter to check, match mode (equal, greater than, less than), value to check against
+	devchk	srl_device.idproduct, mtEquals, $5523
+	db	SRL_TYPE_CH34X, SRL_SUBTYPE_CH341, BAUD_TYPE_CH34X	; device data if matched: type, sub type and baud type
 .device_id_cp2102:
 	db	2
 	devchk	srl_device.idvendor, mtEquals, $10C4
