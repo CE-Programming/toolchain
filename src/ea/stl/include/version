@@ -1,0 +1,12 @@
+#pragma once
+
+// #define __cpp_lib_adaptor_iterator_pair_constructor 201606L
+#define __cpp_lib_addressof_constexpr 201603L
+// #define __cpp_lib_algorithm_iterator_requirements 202207L
+// #define __cpp_lib_allocate_at_least 202302L
+#define __cpp_lib_allocator_traits_is_always_equal 201411L
+// #define __cpp_lib_any 201606L
+// #define __cpp_lib_apply 201603L
+// #define __cpp_lib_array_constexpr 201811L
+
+#define __cpp_lib_constexpr_dynamic_alloc 201907L

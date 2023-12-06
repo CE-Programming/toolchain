@@ -1,0 +1,302 @@
+#pragma once
+
+#include <EASTL/internal/config.h>
+
+#include <EASTL/allocator.h>
+#include <EASTL/internal/memory_base.h>
+#include <EASTL/internal/type_detected.h> // detected_or_t
+#include <EASTL/internal/type_pod.h>  // is_empty
+#include <EASTL/internal/type_transformations.h>  // make_unsigned
+
+#include <cstddef>
+#include <type_traits>
+#include <utility>
+#include <version>
+
+
+namespace std {
+
+namespace ea {}
+
+
+template <class T>
+EA_CPP17_CONSTEXPR T* addressof(T& arg) noexcept
+{
+    return eastl::addressof(arg);
+}
+#if __cplusplus >= 201703L
+template <class T>
+const T* addressof(const T&&) = delete;
+#endif
+
+
+#if __cplusplus >= 202002L
+template <class T, class... Args> requires requires
+{
+    ::new (std::declval<void *>()) T(std::declval<Args>()...);
+}
+constexpr T *construct_at(T *p, Args &&...args)
+{
+    return ::new (static_cast<void*>(p)) T(std::forward<Args>(args)...);
+}
+#endif
+
+
+#if __cplusplus >= 202002L
+template <class T>
+constexpr void destroy_at(T* p)
+{
+    if constexpr (std::is_array_v<T>)
+    {
+        for (auto& elem : *p)
+        {
+            std::destroy_at(std::addressof(elem));
+        }
+    }
+    else
+    {
+        p->~T();
+    }
+}
+#elif __cplusplus >= 201703L
+template <class T>
+constexpr void destroy_at(T* p)
+{
+    p->~T();
+}
+#endif
+
+
+template <class Ptr>
+using pointer_traits = eastl::pointer_traits<Ptr>;
+
+
+template <class T>
+struct allocator : protected EASTLAllocatorType
+{
+private:
+    typedef EASTLAllocatorType base_type;
+
+    friend struct ea::allocator_storage<T>;
+
+  public:
+    typedef T value_type;
+#if __cplusplus < 202002L
+    typedef T* pointer;
+    typedef const T* const_pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
+#endif
+    typedef std::size_t size_type;
+    typedef std::ptrdiff_t difference_type;
+#if __cplusplus >= 201103L
+    typedef std::true_type propagate_on_container_move_assignment;
+#endif
+#if __cplusplus < 202002L
+    template <class U>
+    struct rebind
+    {
+        typedef allocator<U> other;
+    };
+#endif
+#if __cplusplus >= 201103L
+    typedef std::true_type is_always_equal;
+#endif
+
+    EA_CPP20_CONSTEXPR allocator() EA_CPP11_NOEXCEPT_THROW
+        : base_type("std::allocator")
+    {}
+    EA_CPP20_CONSTEXPR allocator(const allocator& other) EA_CPP11_NOEXCEPT_THROW
+        : base_type(other.get_eastl_allocator())
+    {}
+    template <class U>
+    EA_CPP20_CONSTEXPR allocator(const allocator<U>& other) EA_CPP11_NOEXCEPT_THROW
+        : base_type(other.get_eastl_allocator())
+    {}
+
+    EA_CPP20_CONSTEXPR ~allocator() {}
+
+#if __cplusplus < 202002L
+    pointer address(reference x) const EA_CPP11_NOEXCEPT
+    {
+        return std::addressof(x);
+    }
+    const_pointer address(const_reference x) const EA_CPP11_NOEXCEPT
+    {
+        return std::addressof(x);
+    }
+#endif
+
+#if __cplusplus < 201703L
+    pointer allocate(size_type n, const void* hint = 0)
+    {
+        return static_cast<pointer>(base_type::allocate(n * sizeof(T), hint));
+    }
+#else
+#if __cplusplus < 202002L
+    T* allocate(std::size_t n, const void* hint)
+    {
+        return static_cast<T*>(base_type::allocate(n * sizeof(T), hint));
+    }
+#endif
+    EA_CPP20_NODISCARD EA_CPP20_CONSTEXPR T* allocate(std::size_t n)
+    {
+        return static_cast<T*>(base_type::allocate(n * sizeof(T)));
+    }
+#endif
+
+    EA_CPP20_CONSTEXPR void deallocate(T* p, std::size_t n)
+    {
+        base_type::deallocate(p, n * sizeof(T));
+    }
+
+#if __cplusplus < 202002L
+    size_type max_size() const EA_CPP11_NOEXCEPT
+    {
+        // TICE
+        return 0xFFFFu / sizeof(value_type);
+    }
+#endif
+
+#if __cplusplus < 201103L
+    template <class U, class... Args>
+    void construct(U* p, Args&&... args)
+    {
+        ::new (static_cast<void*>(p)) U(std::forward<Args>(args)...);
+    }
+#elif __cplusplus < 202002L
+    void construct(pointer p, const_reference val)
+    {
+        ::new (static_cast<void*>(p)) T(val);
+    }
+#endif
+
+#if __cplusplus < 201103L
+    void destroy(pointer p)
+    {
+        p->~T();
+    }
+#elif __cplusplus < 202002L
+    template <class U>
+    void destroy(U* p)
+    {
+        p->~U();
+    }
+#endif
+
+    constexpr EASTLAllocatorType& get_eastl_allocator() noexcept { return *this; }
+    constexpr const EASTLAllocatorType& get_eastl_allocator() const noexcept { return *this; }
+};
+
+template <> struct allocator<void> = delete;
+
+template <class T1, class T2>
+EA_CPP20_CONSTEXPR bool operator==(const allocator<T1>&, const allocator<T2>&) EA_CPP11_NOEXCEPT
+{
+    return true;
+}
+#if __cplusplus < 202002L
+template <class T1, class T2>
+EA_CPP20_CONSTEXPR bool operator!=(const allocator<T1>&, const allocator<T2>&) EA_CPP11_NOEXCEPT
+{
+    return false;
+}
+#endif
+
+
+template <class Alloc>
+struct allocator_traits {
+private:
+    template <class T>
+    using detected_pointer = typename T::pointer;
+    template <class T>
+    using detected_const_pointer = typename T::const_pointer;
+    template <class T>
+    using detected_void_pointer = typename T::void_pointer;
+    template <class T>
+    using detected_const_void_pointer = typename T::const_void_pointer;
+    template <class T>
+    using detected_difference_type = typename T::difference_type;
+    template <class T>
+    using detected_size_type = typename T::size_type;
+    template <class T>
+    using detected_propagate_on_container_copy_assignment = typename T::propagate_on_container_copy_assignment;
+    template <class T>
+    using detected_propagate_on_container_move_assignment = typename T::propagate_on_container_move_assignment;
+    template <class T>
+    using detected_propagate_on_container_swap = typename T::propagate_on_container_swap;
+    template <class T>
+    using detected_is_always_equal = typename T::is_always_equal;
+
+public:
+    typedef Alloc allocator_type;
+    typedef typename Alloc::value_type value_type;
+    typedef eastl::detected_or_t<value_type*, detected_pointer, Alloc> pointer;
+    typedef eastl::detected_or_t<pointer_traits<pointer>::rebind<const value_type>, detected_const_pointer, Alloc> const_pointer;
+    typedef eastl::detected_or_t<pointer_traits<pointer>::rebind<void>, detected_void_pointer, Alloc> void_pointer;
+    typedef eastl::detected_or_t<pointer_traits<pointer>::rebind<const void>, detected_const_void_pointer, Alloc> const_void_pointer;
+    typedef eastl::detected_or_t<pointer_traits<pointer>::difference_type, detected_difference_type, Alloc> difference_type;
+    typedef eastl::detected_or_t<eastl::make_unsigned<difference_type>::type, detected_size_type, Alloc> size_type;
+    typedef eastl::detected_or_t<std::false_type, detected_propagate_on_container_copy_assignment, Alloc> propagate_on_container_copy_assignment;
+    typedef eastl::detected_or_t<std::false_type, detected_propagate_on_container_move_assignment, Alloc> propagate_on_container_move_assignment;
+    typedef eastl::detected_or_t<std::false_type, detected_propagate_on_container_swap, Alloc> propagate_on_container_swap;
+    typedef eastl::detected_or_t<std::bool_constant<eastl::is_empty<Alloc>::value>, detected_is_always_equal, Alloc> is_always_equal;
+
+    template <class T>
+    using rebind_alloc = typename Alloc::template rebind<T>::other;
+    template <class T>
+    using rebind_traits = std::allocator_traits<rebind_alloc<T>>;
+
+    EA_CPP20_NODISCARD static EA_CPP20_CONSTEXPR pointer allocate(Alloc& a, size_type n)
+    {
+        return a.allocate(n);
+    }
+    EA_CPP20_NODISCARD static EA_CPP20_CONSTEXPR pointer allocate(Alloc& a, size_type n, const_void_pointer hint)
+    {
+        return a.allocate(n, hint);
+    }
+
+    static EA_CPP20_CONSTEXPR void deallocate(Alloc& a, pointer p, size_type n)
+    {
+        a.deallocate(p, n);
+    }
+
+    template <class T, class... Args>
+    static EA_CPP20_CONSTEXPR void construct(Alloc& a, T* p, Args&&... args)
+    {
+#if __cplusplus >= 202002L
+        (void)a;
+        std::construct_at(p, std::forward<Args>(args)...)
+#else
+        a.construct(p, std::forward<Args>(args)...);
+#endif
+    }
+
+    template <class T>
+    static EA_CPP20_CONSTEXPR void destroy(Alloc& a, T* p)
+    {
+#if __cplusplus >= 202002L
+        (void)a;
+        std::destroy_at(p);
+#else
+        a.destroy(p);
+#endif
+    }
+
+    static EA_CPP20_CONSTEXPR size_type max_size(const Alloc& a) EA_CPP11_NOEXCEPT_THROW
+    {
+#if __cplusplus >= 202002L
+        // TICE
+        return 0xFFFFu / sizeof(value_type);
+#else
+        return a.max_size();
+#endif
+    }
+
+    static EA_CPP20_CONSTEXPR Alloc select_on_container_copy_construction(const Alloc& a)
+    {
+        return a;
+    }
+};
+
+}  // namespace std

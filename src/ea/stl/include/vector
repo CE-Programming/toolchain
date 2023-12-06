@@ -1,0 +1,147 @@
+#pragma once
+
+#include <EASTL/internal/config.h>
+
+#include <EASTL/vector.h>
+#include <ea/allocator_adapter.h>
+
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <utility>
+
+
+namespace std {
+
+template <class T, class Allocator = std::allocator<T>>
+class vector : protected std::ea::allocator_adapter<T>, protected eastl::vector<T, Allocator>
+{
+    typedef std::ea::allocator_adapter<T> allocator_adapter;
+    typedef eastl::vector<T, Allocator> base_type;
+
+public:
+    typedef T value_type;
+    typedef Allocator allocator_type;
+    typedef typename base_type::size_type size_type;
+    typedef typename base_type::difference_type difference_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+#if __cplusplus >= 201103L
+    typedef typename std::allocator_traits<Allocator>::pointer pointer;
+    typedef typename std::allocator_traits<Allocator>::const_pointer const_pointer;
+#else
+    typedef typename Allocator::pointer pointer;
+    typedef typename Allocator::const_pointer const_pointer;
+#endif
+    typedef typename base_type::iterator iterator;
+    typedef typename base_type::const_iterator const_iterator;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
+    EA_CPP20_CONSTEXPR vector() EA_CPP17_NOEXCEPT_IF(noexcept(Allocator()))
+        : allocator_adapter()
+        , base_type(get_eastl_allocator())
+    {}
+    EA_CPP20_CONSTEXPR explicit vector(const Allocator& alloc) EA_CPP17_NOEXCEPT
+        : allocator_adapter(alloc)
+        , base_type(get_eastl_allocator())
+    {}
+#if __cplusplus >= 201103L
+    EA_CPP20_CONSTEXPR vector(size_type count, const T& value, const Allocator& alloc = Allocator())
+#else
+    explicit vector(size_type count, const T& value = T(), const Allocator& alloc = Allocator())
+#endif
+        : allocator_adapter(alloc)
+        , base_type(count, value, get_eastl_allocator())
+    {}
+#if __cplusplus >= 201402L
+    EA_CPP20_CONSTEXPR explicit vector(size_type count, const Allocator& alloc = Allocator())
+        : allocator_adapter(alloc)
+        , base_type(count, get_eastl_allocator())
+    {}
+#elif __cplusplus >= 201103L
+    explicit vector(size_type count)
+        : allocator_adapter()
+        , base_type(count, get_eastl_allocator())
+    {}
+#endif
+    template <class InputIt>
+    EA_CPP20_CONSTEXPR vector(InputIt first, InputIt last, const Allocator& alloc = Allocator())
+        : allocator_adapter(alloc)
+        , base_type(first, last, get_eastl_allocator())
+    {}
+    EA_CPP20_CONSTEXPR vector(const vector& other)
+        : allocator_adapter(std::allocator_traits<allocator_type>::select_on_container_copy_construction(other.get_allocator()))
+        , base_type(other, get_eastl_allocator())
+    {}
+#if __cplusplus >= 201103L
+    EA_CPP20_CONSTEXPR vector(const vector& other, const Allocator& alloc)
+        : allocator_adapter(alloc)
+        , base_type(other, get_eastl_allocator())
+    {}
+    EA_CPP20_CONSTEXPR vector(vector&& other) EA_CPP17_NOEXCEPT
+        : allocator_adapter(other.get_allocator())
+        , base_type(std::move(other), get_eastl_allocator())
+    {}
+    EA_CPP20_CONSTEXPR vector(vector&& other, const Allocator& alloc)
+        : allocator_adapter(alloc)
+        , base_type(std::move(other), get_eastl_allocator())
+    {}
+    EA_CPP20_CONSTEXPR vector(std::initializer_list<T> init, const Allocator& alloc = Allocator())
+        : allocator_adapter(alloc)
+        , base_type(init, get_eastl_allocator())
+    {}
+#endif
+
+    EA_CPP20_CONSTEXPR ~vector() {}
+
+    EA_CPP20_CONSTEXPR vector& operator=(const vector& other)
+    {
+        base_type::operator=(other);
+        return *this;
+    }
+#if __cplusplus >= 201103L
+    EA_CPP20_CONSTEXPR vector& operator=(vector&& other) EA_CPP17_NOEXCEPT
+    {
+        base_type::operator=(std::move(other));
+        return *this;
+    }
+    EA_CPP20_CONSTEXPR vector& operator=(std::initializer_list<T> ilist)
+    {
+        base_type::operator=(ilist);
+        return *this;
+    }
+#endif
+
+    EA_CPP20_CONSTEXPR void assign(size_type count, const T& value)
+    {
+        base_type::assign(count, value);
+    }
+    template <class InputIt>
+    EA_CPP20_CONSTEXPR void assign(InputIt first, InputIt last)
+    {
+        base_type::assign(first, last);
+    }
+#if __cplusplus >= 201103L
+    EA_CPP20_CONSTEXPR void assign(std::initializer_list<T> ilist)
+    {
+        base_type::assign(ilist);
+    }
+#endif
+
+    EA_CPP20_CONSTEXPR allocator_type get_allocator() const EA_CPP11_NOEXCEPT
+    {
+        return get_std_allocator();
+    }
+
+    EA_CPP20_CONSTEXPR reference at(size_type pos)
+    {
+        return base_type::at(pos);
+    }
+    EA_CPP20_CONSTEXPR const_reference at(size_type pos) const
+    {
+        return base_type::at(pos);
+    }
+};
+
+} // namespace std

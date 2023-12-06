@@ -1,0 +1,120 @@
+#pragma once
+
+#include <EASTL/internal/config.h>
+
+#include <EASTL/iterator.h>
+
+#include <utility>
+
+
+namespace std {
+
+template <class Iter>
+class reverse_iterator : public eastl::reverse_iterator<Iter> {
+    typedef eastl::reverse_iterator<Iter> base_type;
+
+public:
+    typedef typename base_type::iterator_type iterator_type;
+    typedef typename base_type::value_type value_type;
+    typedef typename base_type::difference_type difference_type;
+    typedef typename base_type::pointer pointer;
+    typedef typename base_type::reference reference;
+    typedef typename base_type::iterator_category iterator_category;
+    // TODO(C++20): iterator_concept and member type changes
+
+    EA_CPP17_CONSTEXPR reverse_iterator() {}
+    EA_CPP17_CONSTEXPR explicit reverse_iterator(iterator_type x)
+        : base_type(x)
+    {}
+    template <class U>
+    EA_CPP17_CONSTEXPR reverse_iterator(const reverse_iterator<U>& other)
+        : base_type(other.base())
+    {}
+
+    template <class U>
+    EA_CPP17_CONSTEXPR reverse_iterator& operator=(const reverse_iterator<U>& other)
+    {
+        base_type::operator=(other.base());
+        return *this;
+    }
+
+    using base_type::base;
+
+    using base_type::operator*;
+    using base_type::operator->;
+
+    using base_type::operator[];
+
+    using base_type::operator++;
+    using base_type::operator+=;
+    using base_type::operator+;
+    using base_type::operator--;
+    using base_type::operator-=;
+    using base_type::operator-;
+};
+
+template <class Iterator1, class Iterator2>
+EA_CPP17_CONSTEXPR bool operator==(const std::reverse_iterator<Iterator1>& lhs, const std::reverse_iterator<Iterator2>& rhs)
+{
+    return lhs.base() == rhs.base();
+}
+template <class Iterator1, class Iterator2>
+EA_CPP17_CONSTEXPR bool operator!=(const std::reverse_iterator<Iterator1>& lhs, const std::reverse_iterator<Iterator2>& rhs)
+{
+    return lhs.base() != rhs.base();
+}
+template <class Iterator1, class Iterator2>
+EA_CPP17_CONSTEXPR bool operator<(const std::reverse_iterator<Iterator1>& lhs, const std::reverse_iterator<Iterator2>& rhs)
+{
+    return lhs.base() > rhs.base();
+}
+template <class Iterator1, class Iterator2>
+EA_CPP17_CONSTEXPR bool operator<=(const std::reverse_iterator<Iterator1>& lhs, const std::reverse_iterator<Iterator2>& rhs)
+{
+    return lhs.base() >= rhs.base();
+}
+template <class Iterator1, class Iterator2>
+EA_CPP17_CONSTEXPR bool operator>(const std::reverse_iterator<Iterator1>& lhs, const std::reverse_iterator<Iterator2>& rhs)
+{
+    return lhs.base() < rhs.base();
+}
+template <class Iterator1, class Iterator2>
+EA_CPP17_CONSTEXPR bool operator>=(const std::reverse_iterator<Iterator1>& lhs, const std::reverse_iterator<Iterator2>& rhs)
+{
+    return lhs.base() <= rhs.base();
+}
+// TODO(C++20): operator<=>
+
+template <class Iter>
+EA_CPP17_CONSTEXPR std::reverse_iterator<Iter> operator+(
+    typename std::reverse_iterator<Iter>::difference_type n,
+    const std::reverse_iterator<Iter>& it)
+{
+    return it + n;
+}
+
+template <class Iterator1, class Iterator2>
+#if __cplusplus >= 201103L
+EA_CPP17_CONSTEXPR auto
+#else
+typename std::reverse_iterator<Iterator1>::difference_type
+#endif
+operator-(const std::reverse_iterator<Iterator1>& lhs, const std::reverse_iterator<Iterator2>& rhs)
+#if __cplusplus >= 201103L
+    -> decltype(rhs.base() - lhs.base())
+#endif
+{
+    return rhs.base() - lhs.base();
+}
+
+// TODO(C++20): iter_move
+
+// TODO(C++20): iter_swap
+
+template <class Iter>
+EA_CPP17_CONSTEXPR std::reverse_iterator<Iter> make_reverse_iterator(Iter i)
+{
+    return std::reverse_iterator<Iter>(i);
+}
+
+}  // namespace std

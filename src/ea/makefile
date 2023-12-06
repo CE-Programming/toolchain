@@ -35,6 +35,7 @@ WILDCARD_EASTL_INTERNAL_H := $(wildcard EASTL/include/EASTL/internal/*.h)
 # WILDCARD_EASTL_INTERNAL_ATOMIC_H := $(wildcard EASTL/include/EASTL/internal/atomic/*.h)
 WILDCARD_EABASE_H := $(wildcard EABase/include/Common/EABase/*.h)
 WILDCARD_EABASE_CONFIG_H := $(wildcard EABase/include/Common/EABase/config/*.h)
+WILDCARD_STL_H := $(wildcard stl/include/*)
 
 all: $(BUILD_SRC)
 
@@ -66,5 +67,6 @@ install: all
 	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_EABASE_CONFIG_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_EABASE_CONFIG_H))
 	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_EABASE_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_EABASE_H))
 	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(CONFIG_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
+	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_STL_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
 
 .PHONY: all clean
