@@ -1,9 +1,9 @@
-; Performs signed 48 bit ("short long long") bit shift right
+; Performs signed 48 bit shift right
 ; 
 ; Arguments:
 ; ude = Most significant bytes of arg 1
 ; uhl = Least significant bytes of arg 1
-; ubc = Amount to shift by (effectively just shift by c)
+; c = Amount to shift by
 
 
 ; Returns:
@@ -12,9 +12,9 @@
 	assume	adl=1
 
 	section	.text
-	public	__sllshrs
-	public __sllshrs.midloop
-__sllshrs:
+	public	__i48shrs
+	public __i48shrs.midloop
+__i48shrs:
 	inc c
 	dec c
 	ret z
@@ -28,7 +28,7 @@ __sllshrs:
 	
 	sra (hl)
 	dec hl
-.midloop: ; Used to enter from sllshru
+.midloop: ; Used to enter from i48shru
 	rr (hl)
 	dec hl
 	rr (hl)

@@ -1,4 +1,4 @@
-; Performs 48 bit ("short long long") bitwise not
+; Performs 48 bit bitwise not
 ; 
 ; Arguments:
 ; ude = Most significant bytes of arg 1
@@ -11,8 +11,8 @@
 	assume	adl=1
 
 	section	.text
-	public	__sllnot
-__sllnot:
+	public	__i48not
+__i48not:
 	push de
 	ex de, hl
 	scf

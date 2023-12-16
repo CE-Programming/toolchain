@@ -1,4 +1,4 @@
-; Performs 48 bit ("short long long") unsigned comparison
+; Performs 48 bit unsigned comparison
 ; 
 ; Arguments:
 ; uiy = Most significant bytes of arg 1
@@ -15,8 +15,8 @@
 	assume	adl=1
 
 	section	.text
-	public	__sllcmpu
-__sllcmpu:
+	public	__i48cmpu
+__i48cmpu:
 	push ix
 	ld ix, 0
 	add ix, sp
@@ -40,3 +40,34 @@ __sllcmpu:
 	pop ix
 	ccf
 	ret
+
+; __sllcmpu:
+; 	push ix
+; 	ld ix, 0
+; 	add ix, sp
+; 	push hl
+; 	push iy
+; 	push bc
+
+; 	ld hl, (ix-6) ;iy
+; 	sbc hl, de
+; 	jq nz, .ne
+; 	or a, a
+; 	ld hl, (ix-9) ;bc
+; 	ld bc, (ix-3) ;hl
+; 	sbc hl, bc
+	
+; 	pop bc
+; 	pop iy
+; 	pop hl
+; 	pop ix
+; 	ret z ; don't compliment carry if equal
+; 	ccf
+; 	ret
+; .ne:
+; 	pop bc
+; 	pop iy
+; 	pop hl
+; 	pop ix
+; 	ccf
+; 	ret

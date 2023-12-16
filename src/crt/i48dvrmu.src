@@ -1,4 +1,4 @@
-; Performs 48 bit ("short long long") division and modulo
+; Performs 48 bit division and modulo
 ; 
 ; Arguments:
 ; ude = Most significant bytes of arg 1 (numerator)
@@ -6,17 +6,17 @@
 ; uiy = Most signficant bytes of arg 2 (denominator)
 ; ubc = Least significant bytes of arg 2
 ; 
-; Returns (potentially loaded into other registers by slldivuremu):
-; ude:uhl quotient as well as remainder on the stack
+; Returns (loaded into other registers by slldivu and sllremu):
+; ude:uhl quotient as wells as remainder in the listed memory areas
 
     assume adl=1
 
     section .data
 
     section .text
-    public __slldvrmu
+    public __i48dvrmu
 
-__slldvrmu:
+__i48dvrmu:
     push ix
     ld ix, 0
     add ix, sp
@@ -131,6 +131,6 @@ __slldvrmu:
     pop hl
     exx
 
-    lea ix, ix+9 ; jump past stuff remaining on the stack
+    lea ix, ix+9 ; amount of stuff remaining on the stack
     ld sp, ix ; sp = return address
-    ret ; cleanup finished in slldivuremu
+    ret ; cleanup finished in i48divu and i48remu
