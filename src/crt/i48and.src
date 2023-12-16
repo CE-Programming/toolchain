@@ -1,4 +1,4 @@
-; Performs 48 bit ("short long long") bitwise or
+; Performs 48 bit bitwise and
 ; 
 ; Arguments:
 ; uiy = Most significant bytes of arg 1
@@ -7,31 +7,31 @@
 ; uhl = Least significant bytes of arg 2
 ; 
 ; Returns:
-; ude:uhl = ude:uhl | uiy:ubc
+; ude:uhl = ude:uhl & uiy:ubc
 
 	assume	adl=1
 
 	section	.text
-	public	__sllor
-__sllor:
+	public	__i48and
+__i48and:
 	push af
 
 	; Low and high
 
 	ld a, d
-	or a, iyh
+	and a, iyh
 	ld d, a
 
 	ld a, e
-	or a, iyl
+	and a, iyl
 	ld e, a
     
 	ld a, h
-	or a, b
+	and a, b
 	ld h, a
 
 	ld a, l
-	or a, c
+	and a, c
 	ld l, a
 
 	; Push 2/3 done values
@@ -42,14 +42,27 @@ __sllor:
 	push hl
 	push bc
 
+	; -1 : iyu
+	; -2 : iyh
+	; -3 : iyl = iy
+	; -4 : ude
+	; -5 : d
+	; -6 : e
+	; -7 : uhl
+	; -8 : h
+	; -9 : l
+	;-10 : ubc
+	;-11 : b
+	;-12 : c
+
 	; Deal with Upper Byte
 
 	ld a, (iy-1) ; a = u[de] (modified)
-	or a, (iy+2) ; a &= u[iy]
+	and a, (iy+2) ; a &= u[iy]
 	ld (iy-1), a ; u[de] (modified) = a
 
 	ld a, (iy-4) ; a = u[hl] (modified)
-	or a, (iy-7) ; a &= u[bc]
+	and a, (iy-7) ; a &= u[bc]
 	ld (iy-4), a ; u[hl] (modified) = a
 
 	; Load values back into registers and clean up stack

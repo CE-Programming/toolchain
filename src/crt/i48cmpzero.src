@@ -1,4 +1,4 @@
-; Performs 48 bit ("short long long") comparison with 0
+; Performs 48 bit comparison with 0
 ; 
 ; Arguments:
 ; ude = Most significant bytes of arg 1
@@ -11,8 +11,8 @@
 	assume	adl=1
 
 	section	.text
-	public	__sllcmpzero
-__sllcmpzero:
+	public	__i48cmpzero
+__i48cmpzero:
 	;check lsb's == 0
 	add hl, bc
 	or a, a
