@@ -1,9 +1,9 @@
-; Performs 48 bit ("short long long") bit shift left
+; Performs 48 bit shift left
 ; 
 ; Arguments:
 ; ude = Most significant bytes of arg 1
 ; uhl = Least significant bytes of arg 1
-; ubc = Amount to shift by (effectively just shift by c)
+; c = Amount to shift by
 
 
 ; Returns:
@@ -12,8 +12,8 @@
 assume	adl=1
 
 	section	.text
-	public	__sllshl
-__sllshl:
+	public	__i48shl
+__i48shl:
 	bit	0, c
 	jr	z, .bit0
 	; ude:uhl<<1

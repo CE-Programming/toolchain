@@ -1,9 +1,9 @@
-; Performs unsigned 48 bit ("short long long") bit shift right
+; Performs unsigned 48 bit shift right
 ; 
 ; Arguments:
 ; ude = Most significant bytes of arg 1
 ; uhl = Least significant bytes of arg 1
-; ubc = Amount to shift by (effectively just shift by c)
+; c = Amount to shift by
 
 
 ; Returns:
@@ -12,8 +12,8 @@
 	assume	adl=1
 
 	section	.text
-	public	__sllshru
-__sllshru:
+	public	__i48shru
+__i48shru:
 	inc c
 	dec c
 	ret z
@@ -26,5 +26,5 @@ __sllshru:
 	
 	srl (hl)
 	dec hl
-	jp nz, __sllshrs.midloop
-	extern __sllshrs.midloop
+	jp nz, __i48shrs.midloop
+	extern __i48shrs.midloop

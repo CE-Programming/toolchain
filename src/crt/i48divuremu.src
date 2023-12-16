@@ -1,22 +1,22 @@
     assume adl=1
 
     section .text
-    public __slldivu
-    public __sllremu
+    public __i48divu
+    public __i48remu
 
-; Quotient in ude:uhl, remainder (with remu) on stack, then loaded into ude:uhl
-__slldivu:
-    call __slldvrmu
+; Result in ude:uhl
+__i48divu:
+    call __i48dvrmu
     lea ix, ix-9
     ld sp, ix
-    jr __slldivuremu.cleanup
-__sllremu:
-    call __slldvrmu
+    jr __i48divuremu.cleanup
+__i48remu:
+    call __i48dvrmu
     lea ix, ix-9
     ld sp, ix
     ld de, (ix-18)
     ld hl, (ix-27)
-__slldivuremu.cleanup:
+__i48divuremu.cleanup:
     pop af
     jp po, .skipEI
     ei
@@ -28,4 +28,4 @@ __slldivuremu.cleanup:
     inc sp
     ret
 
-    extern	__slldvrmu
+    extern	__i48dvrmu

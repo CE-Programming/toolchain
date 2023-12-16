@@ -1,4 +1,4 @@
-; Performs 48 bit ("short long long") multiplication
+; Performs 48 bit multiplication
 ; 
 ; Arguments:
 ; uiy = Most significant bytes of arg 1
@@ -12,8 +12,8 @@
 	assume	adl=1
 
 	section	.text
-	public	__sllmulu
-__sllmulu:
+	public	__i48mulu
+__i48mulu:
 	;backup af
 	push af
 

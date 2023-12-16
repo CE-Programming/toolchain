@@ -1,4 +1,4 @@
-; Performs 48 bit ("short long long") bitwise xor
+; Performs 48 bit bitwise xor
 ; 
 ; Arguments:
 ; uiy = Most significant bytes of arg 1
@@ -12,8 +12,8 @@
 	assume	adl=1
 
 	section	.text
-	public	__sllxor
-__sllxor:
+	public	__i48xor
+__i48xor:
 	push af
 
 	; Low and high
@@ -45,11 +45,11 @@ __sllxor:
 	; Deal with Upper Byte
 
 	ld a, (iy-1) ; a = u[de] (modified)
-	xor a, (iy+2) ; a &= u[iy]
+	xor a, (iy+2) ; a ^= u[iy]
 	ld (iy-1), a ; u[de] (modified) = a
 
 	ld a, (iy-4) ; a = u[hl] (modified)
-	xor a, (iy-7) ; a &= u[bc]
+	xor a, (iy-7) ; a ^= u[bc]
 	ld (iy-4), a ; u[hl] (modified) = a
 
 	; Load values back into registers and clean up stack
