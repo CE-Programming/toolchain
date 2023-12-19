@@ -6,9 +6,6 @@
 ; ude = Most signficant bytes of arg 2
 ; uhl = Least significant bytes of arg 2
 ;
-; Most of the values found in these are used off the stack, 
-; although they are also already in the registers 
-;
 ; Returns:
 ; flags updated according to comparison
 
@@ -20,54 +17,26 @@ __i48cmpu:
 	push ix
 	ld ix, 0
 	add ix, sp
+	push hl
+	push bc
 
-	ld hl, (ix+18) ;hl = iy
-	sbc hl, de ; most significant 1 - most significant 2
+	lea hl, iy+0 ;iy
+	sbc hl, de
 	jq nz, .ne
 	or a, a
-	ld hl, 0
-	add hl, bc ;hl = bc = least significant 1
-	ld bc, (ix+21) ;bc = hl = least significant 2
-	sbc hl, bc ; least significant 1 - least significant 2
-	ld hl, (ix+21) ; hl = hl, restored
-	ld bc, (ix+15) ; bc = bc, restored
+	ld hl, (ix-6) ;bc
+	ld bc, (ix-3) ;hl
+	sbc hl, bc
+	
+	pop bc
+	pop hl
 	pop ix
 	ret z ; don't compliment carry if equal
 	ccf
 	ret
 .ne:
-	ld hl, (ix+21) ; hl = hl, restored
+	pop bc
+	pop hl
 	pop ix
 	ccf
 	ret
-
-; __sllcmpu:
-; 	push ix
-; 	ld ix, 0
-; 	add ix, sp
-; 	push hl
-; 	push iy
-; 	push bc
-
-; 	ld hl, (ix-6) ;iy
-; 	sbc hl, de
-; 	jq nz, .ne
-; 	or a, a
-; 	ld hl, (ix-9) ;bc
-; 	ld bc, (ix-3) ;hl
-; 	sbc hl, bc
-	
-; 	pop bc
-; 	pop iy
-; 	pop hl
-; 	pop ix
-; 	ret z ; don't compliment carry if equal
-; 	ccf
-; 	ret
-; .ne:
-; 	pop bc
-; 	pop iy
-; 	pop hl
-; 	pop ix
-; 	ccf
-; 	ret
