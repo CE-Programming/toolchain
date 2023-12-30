@@ -14,29 +14,17 @@
 	section	.text
 	public	__i48cmpu
 __i48cmpu:
-	push ix
-	ld ix, 0
-	add ix, sp
 	push hl
-	push bc
 
 	lea hl, iy+0 ;iy
 	sbc hl, de
-	jq nz, .ne
-	or a, a
-	ld hl, (ix-6) ;bc
-	ld bc, (ix-3) ;hl
-	sbc hl, bc
-	
-	pop bc
+	jq nz, .ccfExit
 	pop hl
-	pop ix
-	ret z ; don't compliment carry if equal
-	ccf
-	ret
-.ne:
-	pop bc
+	push hl
+	sbc hl, bc ; subtracting operands the other way around
 	pop hl
-	pop ix
+	ret ; don't compliment carry
+.ccfExit:
+	pop hl
 	ccf
 	ret
