@@ -7,7 +7,7 @@
 ; ubc = Least significant bytes of arg 2
 ; 
 ; Returns (loaded into other registers by slldivu and sllremu):
-; ude:uhl quotient as wells as remainder in the listed memory areas
+; ude:uhl quotient, uiy:ubc remainder
 
     assume adl=1
 
@@ -40,9 +40,6 @@ __i48dvrmu:
     push bc
 
     ;Stack Use:
-    ; ix+2 : return address
-    ; ix+1 : return address
-    ; ix   : return address
     ; ix-1 : 0
     ; ix-2 : a
     ; ix-3 : f
@@ -126,11 +123,20 @@ __i48dvrmu:
     pop de ; de = upper quotient
     exx
     ld (ix-18), hl ; use de's old space for remainder high
+    ; restore alts
     pop bc
     pop de
     pop hl
     exx
 
-    lea ix, ix+9 ; amount of stuff remaining on the stack
-    ld sp, ix ; sp = return address
-    ret ; cleanup finished in i48divu and i48remu
+    ; load remainder into return registers
+    ld bc, (ix-27)
+    ld iy, (ix-18)
+
+    pop af
+    jp po, .skipEI
+    ei
+.skipEI:
+    pop af
+    pop ix
+    ret
