@@ -13,7 +13,7 @@ It supports multi-key presses, and can be used for extremely responsive input co
 .. contents:: :local:
    :depth: 3
 
-Helpful key dection
+Helpful key detection
 -------------------
 
 Handling key detection properly is a major requirement for a lot of programs.
