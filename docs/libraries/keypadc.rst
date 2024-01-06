@@ -13,13 +13,13 @@ It supports multi-key presses, and can be used for extremely responsive input co
 .. contents:: :local:
    :depth: 3
 
-Helpful key detection
+Key Detection
 -------------------
 
 Handling key detection properly is a major requirement for a lot of programs.
 Detecting a hold can be rather straightforward, but things like a press, release, can sometimes be rather confusing at first.
 
-Detecting a single press
+Detecting a Single Press
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 When a key is first pressed, we only want to trigger on that event.
@@ -35,7 +35,7 @@ The following code sets up a simple rising edge detector to catch this.
     }
     prevkey = key;
 
-Detecting a single release
+Detecting a Single Release
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When a key is released we only want to trigger on that event.
@@ -51,7 +51,7 @@ The following code sets up a simple falling edge detector to catch this.
     }
     prevkey = key;
 
-Getting GetCSC codes with keypadc
+Getting GetCSC Codes with keypadc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This code returns the same keycodes that `os_GetCSC()` produces.
