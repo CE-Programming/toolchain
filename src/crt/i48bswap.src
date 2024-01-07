@@ -1,0 +1,53 @@
+; Performs 48 byte reversal
+; 
+; Arguments:
+; ude = Most signficant bytes of arg
+; uhl = Least significant bytes of arg
+; 
+; Returns:
+; ude:uhl = ude:uhl with order of bytes reversed
+
+	assume	adl=1
+
+	section	.text
+	public	__i48bswap
+__i48bswap:
+	push bc
+
+	ld b, l ; save l for later
+
+	push hl
+	ld hl, 0
+	add hl, sp
+	push de
+	dec hl
+	; -1: u[hl]
+	; -2: h
+	; -3: l
+	; -4: u[de]   <--hl
+	; -5: d
+	; -6: e
+
+	; reverse de bytes
+	ld c, (hl) ; c = u[de]
+	ld (hl), e ; u[de] on stack = e
+	pop de ; ude = e d e
+	ld e, c ; ude = e d u[de]
+	
+	inc hl
+	inc hl
+	inc hl
+
+	; reverse hl bytes
+	; -1: u[hl]   <--hl
+	; -2: h
+	; -3: l
+	ld c, (hl) ; c = u[hl]
+	ld (hl), b ; u[hl] on stack = l
+	pop hl ; uhl = l h l
+	ld l, c ; uhl = l h u[hl]
+
+	ex de, hl
+
+	pop bc
+	ret
