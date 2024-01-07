@@ -1,0 +1,36 @@
+; Performs 48 count set bits
+; 
+; Arguments:
+; ude = Most signficant bytes of arg
+; uhl = Least significant bytes of arg
+; 
+; Returns:
+; a = number of set bits in ude:uhl
+
+	assume	adl=1
+
+	section	.text
+	public	__i48popcnt
+__i48popcnt:
+	push hl
+	push de
+	
+	call __popcnt_common_init_full ; A = 8 - popcount(L) - popcount(HLU), HLU=H, L=0
+	sbc	a, h
+	call __popcnt_common_iter ; A -= popcount(H), a, A = 8 - popcount(L) - popcount(HLU) - popcount(H)
+
+	ex de, hl
+	ld e, a ; E = 8 - popcount(L) - popcount(HLU) - popcount(H)
+
+	call __popcnt_common_init_full ; A = 8 - popcount(E) - popcount(DEU), DEU=D, E=0
+	sbc	a, h
+	call __popcnt_common_iter ; A -= popcount(D), a, A = 8 - popcount(E) - popcount(DEU) - popcount(E)
+
+	add a, e ; a = 16 - popcount(L) - popcount(HLU) - popcount(H) - popcount(E) - popcount(DEU) - popcount(E)
+	cpl
+	adc	a, 18 ; a = popcount(L) + popcount(HLU) + popcount(H) + popcount(E) + popcount(DEU) + popcount(E)
+
+	pop de
+	pop hl
+	ret
+	extern	__popcnt_common_init_full, __popcnt_common_iter
