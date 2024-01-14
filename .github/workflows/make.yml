@@ -338,7 +338,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Documentation Dependencies
-        if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y doxygen
           cmake -E echo >> $${{matrix.env}}GITHUB_PATH $${{matrix.env}}HOME/.local/bin
@@ -356,7 +355,7 @@ jobs:
       - name: Build Website Documentation
         run: make -C ${{env.TOOLCHAIN_PATH}} docs
       - name: Disable Jekyll
-        run: cmake -E touch ${{env.TOOLCHAIN_PATH}}/docs/build/html/.nojekyll
+        run: touch ${{env.TOOLCHAIN_PATH}}/docs/build/html/.nojekyll
       - name: Remove .pickle files
         run: find ${{env.TOOLCHAIN_PATH}}/docs/build/ -name '*.pickle' -delete
 

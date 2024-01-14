@@ -14,7 +14,7 @@ It supports multi-key presses, and can be used for extremely responsive input co
    :depth: 3
 
 Key Detection
--------------------
+-------------
 
 Handling key detection properly is a major requirement for a lot of programs.
 Detecting a hold can be rather straightforward, but things like a press, release, can sometimes be rather confusing at first.
