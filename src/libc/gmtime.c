@@ -9,13 +9,16 @@
 #define SECS_PER_YEAR  (365UL * SECS_PER_DAY)
 #define SECS_PER_LEAP  (SECS_PER_YEAR + SECS_PER_DAY)
 
-extern bool __isleap(int year);
-
-static bool istmleap(int year)
+static bool istmleap(unsigned int year)
 {
     year += 1900;
 
-    return __isleap(year);
+    if (year % 100 == 0)
+    {
+        return year % 400 == 0;
+    }
+
+    return year % 4 == 0;
 }
 
 struct tm *gmtime(const time_t *tp)
@@ -28,16 +31,16 @@ struct tm *gmtime(const time_t *tp)
     time_t secs_this_year;
     time_t t = *tp;
 
-    tm2.tm_sec  = 0;
-    tm2.tm_min  = 0;
+    tm2.tm_sec = 0;
+    tm2.tm_min = 0;
     tm2.tm_hour = 0;
     tm2.tm_mday = 1;
-    tm2.tm_mon  = 0;
+    tm2.tm_mon = 0;
     tm2.tm_year = 70;
-    tm2.tm_wday = (t / SECS_PER_DAY + 4 ) % 7;
+    tm2.tm_wday = (t / SECS_PER_DAY + 4) % 7;
     tm2.tm_isdst = -1;
 
-    while (t >= (secs_this_year = istmleap(tm2.tm_year) ? SECS_PER_LEAP : SECS_PER_YEAR ))
+    while (t >= (secs_this_year = istmleap(tm2.tm_year) ? SECS_PER_LEAP : SECS_PER_YEAR))
     {
         t -= secs_this_year;
         tm2.tm_year++;
@@ -50,6 +53,7 @@ struct tm *gmtime(const time_t *tp)
 
     tm2.tm_yday = t / SECS_PER_DAY;
 
+    dpm[1] = 28;
     if (istmleap(tm2.tm_year))
     {
         dpm[1] = 29;
@@ -59,8 +63,6 @@ struct tm *gmtime(const time_t *tp)
     {
         t -= dpm[tm2.tm_mon++] * SECS_PER_DAY;
     }
-
-    dpm[1] = 28;
 
     while (t >= SECS_PER_DAY)
     {

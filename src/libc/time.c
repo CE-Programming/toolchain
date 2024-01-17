@@ -13,13 +13,11 @@ time_t time(time_t *timer)
     boot_GetDate(&day, &month, &year);
     boot_GetTime(&sec, &min, &hrs);
 
-    month--;
-
     tm2.tm_sec = sec;
     tm2.tm_min = min;
     tm2.tm_hour = hrs;
     tm2.tm_mday = day;
-    tm2.tm_mon = month;
+    tm2.tm_mon = month - 1;
     tm2.tm_year = (unsigned int)year - 1900;
 
     res = mktime(&tm2);
