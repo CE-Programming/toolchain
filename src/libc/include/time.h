@@ -45,6 +45,8 @@ char *asctime(const struct tm *tmp);
 
 char *ctime(const time_t *timer);
 
+size_t strftime(char* ptr, size_t maxsize, const char* format, const struct tm* timeptr);
+
 __END_DECLS
 
 #endif /* _TIME_H */

@@ -41,7 +41,7 @@ $(LIBS): fasmg
 	$(Q)$(MAKE) -C $(call SRCDIR,$@)
 
 install: all $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
-	$(Q)$(MAKE) -f linker.mk -C src
+	$(Q)$(MAKE) -f linker.mk -C src -B
 	$(Q)$(call MKDIR,$(INSTALL_DIR))
 	$(Q)$(call MKDIR,$(INSTALL_BIN))
 	$(Q)$(call MKDIR,$(INSTALL_H))
