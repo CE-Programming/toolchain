@@ -1,5 +1,5 @@
-CE C toolchain - macOS release install notes
---------------------------------------------
+CE C/C++ toolchain - macOS release install notes
+------------------------------------------------
 
 If you're updating from a previous toolchain, back up any of your own files already present in your CEdev directory (which may be in ~/CEdev or /opt/CEdev), somewhere else temporarily.
 
