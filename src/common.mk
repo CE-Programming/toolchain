@@ -16,7 +16,6 @@
 
 GIT_SHA = $(shell git describe --abbrev=8 --dirty --always --tags)
 
-CEDEV_DIR := CEdev
 CEDEV_VERSION := $(GIT_SHA)
 
 LINUX := 0
@@ -51,8 +50,6 @@ REMOVE ?= ( del /f /q $1 2>nul || call )
 RMDIR ?= ( rmdir /s /q $1 2>nul || call )
 COPY ?= ( for %%a in ($(subst $(space),$(comma) ,$1)) do xcopy %%a $2 /Q /Y /I /K 1>nul 2>nul || call )
 COPYDIR ?= ( xcopy $1 $2 /S /Q /Y /I /K 1>nul 2>nul || call )
-DESTDIR ?=
-PREFIX ?= C:
 QUOTE_ARG  ?= "$(subst ",',$1)"#'
 APPEND ?= $(Q)echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
 RELEASE_NAME = windows
@@ -67,8 +64,6 @@ REMOVE ?= rm -f $1
 RMDIR ?= rm -rf $1
 COPY ?= cp $1 $2
 COPYDIR ?= cp -r $1 $2
-DESTDIR ?=
-PREFIX ?= $(HOME)
 QUOTE_ARG ?= '$(subst ','\'',$1)'#'
 APPEND ?= $(Q)echo $(call QUOTE_ARG,$1) >>$@
 ifeq ($(shell uname -s),Darwin)
@@ -80,8 +75,8 @@ RELEASE_NAME = linux
 endif
 endif
 
-INSTALL_PATH := $(call QUOTE_ARG,$(call NATIVEPATH,$(DESTDIR)$(PREFIX)))
-INSTALL_DIR := $(DESTDIR)$(PREFIX)/$(CEDEV_DIR)
+INSTALL_DIR := $(DESTDIR)$(PREFIX)
+INSTALL_PATH := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)))
 INSTALL_EXAMPLES := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/examples))
 INSTALL_LIB := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libload))
 INSTALL_CRT := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/crt))
