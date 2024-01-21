@@ -3611,11 +3611,11 @@ _RetireFirstTransfer:
 .loop:
 	push	de
 	pop	iy.transfer
-	ld	de,(iy.transfer.altNext)
-	bit	0,de
-	jq	z,.alt
 	ld	de,(iy.transfer.next)
-.alt:
+	bit	0,de
+	jq	z,.notalt
+	ld	de,(iy.transfer.altNext)
+.notalt:
 	bitmsk	iy.transfer.type.ioc
 	jq	z,.loop
 	ld	(ix.endpoint.first),de
