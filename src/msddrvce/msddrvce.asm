@@ -1022,9 +1022,13 @@ scsi_sync_command_callback:
 	ld	hl,scsi_sync_command.done
 	jq	nz,.fail
 	set	0,(hl)			; success
+	or	a,a
+	sbc	hl,hl
 	ret
 .fail:
 	set	1,(hl)
+	or	a,a
+	sbc	hl,hl
 	ret
 
 ; inputs:
