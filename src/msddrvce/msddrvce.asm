@@ -306,6 +306,9 @@ msd_Open:
 	jq	z,.parseendpoint
 	jq	.parsenext
 .parseinterface:
+	ld	de,(.configlengthend)
+	ld	(.interface_len_rem),de
+	ld	(.interface_ptr),iy	; store for later set of interface
 	ld	a,(yinterfaceDescriptor.bInterfaceClass)
 	cp	a,$08
 	jr	nz,.parsenext
@@ -320,7 +323,7 @@ msd_Open:
 	ld	(.interface),a
 	jq	.parsenext
 .parseendpoint:
-	ld	a,0			; mark as valid
+	ld	a,0			; check if interface set
 .interface := $ - 1
 	or	a,a
 	jq	z,.parsenext
@@ -334,9 +337,15 @@ msd_Open:
 	jr	z,.parseoutendpointout
 .parseoutendpointin:
 	ld	(.bulkin),a
-	jq	.parsenext
+	ld	a,(.bulkout)
+	or	a,a
+	jr	nz,.parsedone
+	jr	.parsenext
 .parseoutendpointout:
 	ld	(.bulkout),a
+	ld	a,(.bulkin)
+	or	a,a
+	jr	nz,.parsedone
 .parsenext:
 	ld	de,0
 	ld	e,(ydescriptor.bLength)
@@ -377,9 +386,24 @@ msd_Open:
 	dec	a
 	ld	(ymsd.interface),a
 
+	push	iy
 	push	bc			; holds the usbdrvce device
 	call	usb_RefDevice		; prevent random crashes if the user messes up
 	pop	bc
+	pop	iy
+
+	push	iy
+	ld	bc,0
+.interface_len_rem := $-3
+	push	bc
+	ld	bc,0
+.interface_ptr := $-3
+	push	bc
+	ld	bc,(ymsd.dev)		; usb device
+	push	bc
+	call	usb_SetInterface
+	pop	bc,bc,bc
+	pop	iy
 
 	; successfully found bulk endpoints for msd
 	; now reset the msd device
