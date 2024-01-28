@@ -3649,8 +3649,13 @@ _RetireFirstTransfer:
 	jq	z,.alt
 	ld	de,(iy.transfer.next)
 .alt:
+	ld	a,(ix.endpoint.transferInfo)
+	and	a,endpoint.transferInfo.type
+assert ~CONTROL_TRANSFER
+	jq	nz,.notControl
 	bitmsk	iy.transfer.type.ioc
 	jq	z,.loop
+.notControl:
 	ld	(ix.endpoint.first),de
 	ld	de,(iy.transfer.data+0)
 	ld	a,(iy.transfer.data+3)
