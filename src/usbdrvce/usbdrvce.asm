@@ -742,7 +742,7 @@ assert ~periodicList and $FF
 	ld	a,h
 	dec	a
 	rrca
-	ld	(_DeviceDisabled.frameListEndSub1Shr1+1),a
+	ld	(_CleanupEndpoint.frameListEndSub1Shr1+1),a
 	ld	b,usb_PollTransfers.enable
 	ld	de,_ScheduleEndpoint.enable
 .noPeriodicList:
@@ -2581,105 +2581,9 @@ assert IS_DISABLED = 1
 	ld	hl,.recursed
 	dec	ixl
 	jq	nz,_DeviceDisconnected.recurse
-	ld	ix.endpoint,dummyHead
-	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_NO_DEVICE
 .loop:
-	ld	a,(de)
-	ld	ixh,a
-	inc	a
-	jq	z,.skip
-	ld	a,(ix.endpoint.transferInfo)
-	and	a,endpoint.transferInfo.type
-	ld	a,-1
-	ld	(de),a
-	jq	nz,.notControl
-	inc	e
-	ld	(de),a
-.notControl:
-	push	de
-	call	_FlushEndpoint
-	jq	nc,.pop3return
-	ld	a,(ix.endpoint.transferInfo)
-	rrca
-assert ~(CONTROL_TRANSFER or BULK_TRANSFER) and 1 shl 0
-	jq	nc,.async
-	rrca
-assert ~ISOCHRONOUS_TRANSFER and 1 shl 1
-	jq	nc,.isoc
-assert endpoint.interval+1 = endpoint.offset
-	ld	bc,(ix.endpoint.interval)
-	sbc	hl,hl
-	xor	a,a
-	sub	a,c
-	ld	l,a
-	add	hl,hl
-	add	hl,hl
-	ex	de,hl
-	ld	iy,periodicList shr 1
-label .frameListEndSub1Shr1 at $-long
-	ld	iyl,b
-	add	iy,iy
-.intr.unlink:
-	ld	bc,(ix.endpoint.maxHsSbp)
-	dec.s	bc
-	ld	hl,(iy)
-	sbc	hl,bc
-	ld	(iy),hl
-	push	iy
-	lea	iy,iy+2
-virtual
-	ld	hl,0
- load .ld_hl: byte from $$
-end virtual
-	db	.ld_hl
-.intr.skip:
-	ld	iyh,b
-	ld	iyl,c
-	ld	bc,(iy-4)
-	bit	2,c
-	jq	nz,.intr.skip
-	db	.ld_hl
-.intr.find:
-	ld	iyh,a
-	ld	iyl,endpoint.base+4
-	bit	0,(iy-4+endpoint.next+0)
-	jq	nz,.intr.gone
-	ld	a,(iy-4+endpoint.next+1)
-	cp	a,ixh
-	jq	nz,.intr.find
-	ld	hl,(ix.endpoint.next)
-	ld	(iy-4+endpoint.next+0),l
-	ld	(iy-4+endpoint.next+1),h
-.intr.gone:
-	pop	iy
-	add	iy,de
-	ld	a,iyh
-	cp	a,periodicList shr 8 and $FF-1
-	jq	nc,.intr.unlink
-	ld	hl,intrCleanupPending
-	jq	.cleanup
-.pop3return:
-	pop	bc,bc,ix
-	ret
-.isoc:
-	lea	hl,ix.endpoint.base
-	call	_Free64Align256
-	jq	.next
-.async:
-	lea	hl,ix.endpoint.next
-	ld	h,(ix.endpoint.prev)
-	ld	iy.endpoint,(ix.endpoint.next)
-	ld	(hl+endpoint.next),iy.endpoint
-	ld	(iy.endpoint.prev),h
-	ld	hl,asyncCleanupPending
-.cleanup:
-	ld	a,(hl)
-	ld	(ix.endpoint.prev),a
-	ld	a,ixh
-	ld	(hl),a
-.next:
-	pop	de
-.skip:
+	call	_CleanupEndpoint
+	jq	nz,.pop2return
 	inc	e
 	ld	a,e
 	and	a,31
@@ -2709,6 +2613,9 @@ assert IS_DISABLED = 1 shl 0
 	ret	z
 .event:
 	jq	_DispatchEvent
+.pop2return:
+	pop	bc,ix
+	ret
 
 ; Input:
 ;  ix = device-1
@@ -2898,8 +2805,8 @@ _CreateDefaultControlEndpoint:
 ;  de = endpoint descriptor
 ;  iy = device
 ; Output:
-;  af = ?
 ;  zf = success
+;  af = ?
 ;  bc = ?
 ;  de = ?
 ;  hl = ? | error
@@ -2919,7 +2826,7 @@ assert endpointDescriptor.bEndpointAddress+1 = endpointDescriptor.bmAttributes
 	inc	de
 	ld	a,(de)
 	and	a,ti.bmUsbFifoType
-	push	bc,af
+	push	bc,de,af
 	rlc	c
 	rla
 	rrca
@@ -2933,20 +2840,26 @@ assert endpointDescriptor.bEndpointAddress+1 = endpointDescriptor.bmAttributes
 assert endpoint.addr+1 = endpoint.info
 	inc	l
 	ld	(hl),a
+	push	hl
+	ld	de,(iy.device.endpoints)
 	ld	a,c
-	ld	bc,(iy.device.endpoints)
-	or	a,c
-	ld	c,a
+	or	a,e
+	ld	e,a
+	push	iy
+	call	_CleanupEndpoint
+	pop	iy
+	jq	nz,.cleanupFailed
+	pop	hl
 	ld	a,h
-	ld	(bc),a
+	ld	(de),a
 	pop	af
-	ld	a,c
 	ld	c,0
 	jq	nz,.notControl
+	ld	a,e
 	xor	a,1
-	ld	c,a
+	ld	e,a
 	ld	a,h
-	ld	(bc),a
+	ld	(de),a
 	setmsk	endpoint.info.dtc,(hl)
 	ld	c,(endpoint.maxPktLen.rl or endpoint.maxPktLen.c) shr 8
 .notControl:
@@ -2957,6 +2870,7 @@ assert endpoint.addr+1 = endpoint.info
 	or	a,c
 	ld	c,a
 assert endpointDescriptor.bmAttributes+1 = endpointDescriptor.wMaxPacketSize
+	pop	de
 	inc	de
 	ld	a,(de)
 assert endpoint.info+1 = endpoint.maxPktLen
@@ -2997,6 +2911,12 @@ end iterate
 	pop	bc
 .nomem:
 	ld	hl,USB_ERROR_NO_MEMORY
+	ret
+.cleanupFailed:
+	ex	(sp),hl
+	ld	l,endpoint
+	call	_Free64Align256
+	pop	hl,bc,bc,bc
 	ret
 .mem:
 	ld	(iy.endpoint.overlay.next),hl
@@ -3146,6 +3066,119 @@ end repeat
 	djnz	.shift
 .defaultControl:
 	ld	(iy.endpoint.overlay.fifo),a
+	ret
+
+;-------------------------------------------------------------------------------
+; Input:
+;  de = endpoint pointer
+; Output:
+;  zf = success
+;  af = ?
+;  bc = ?
+;  hl = ?
+;  iy = ?
+_CleanupEndpoint:
+	ld	a,(de)
+	inc	a
+	ret	z
+	dec	a
+	ld	bc,USB_TRANSFER_CANCELLED or USB_TRANSFER_NO_DEVICE
+	push	ix
+	ld	ix.endpoint,dummyHead
+	ld	ixh,a
+	push	de
+	ld	a,(ix.endpoint.transferInfo)
+	and	a,endpoint.transferInfo.type
+	ld	a,-1
+	ld	(de),a
+	jq	nz,.notControl
+	ld	a,e
+	xor	a,1
+	ld	e,a
+	ld	a,-1
+	ld	(de),a
+.notControl:
+	call	_FlushEndpoint
+	jq	nc,.popreturn
+	ld	a,(ix.endpoint.transferInfo)
+	rrca
+assert ~(CONTROL_TRANSFER or BULK_TRANSFER) and 1 shl 0
+	jq	nc,.async
+	rrca
+assert ~ISOCHRONOUS_TRANSFER and 1 shl 1
+	jq	nc,.isoc
+assert endpoint.interval+1 = endpoint.offset
+	ld	bc,(ix.endpoint.interval)
+	sbc	hl,hl
+	xor	a,a
+	sub	a,c
+	ld	l,a
+	add	hl,hl
+	add	hl,hl
+	ex	de,hl
+	ld	iy,periodicList shr 1
+label .frameListEndSub1Shr1 at $-long
+	ld	iyl,b
+	add	iy,iy
+.intr.unlink:
+	ld	bc,(ix.endpoint.maxHsSbp)
+	dec.s	bc
+	ld	hl,(iy)
+	sbc	hl,bc
+	ld	(iy),hl
+	push	iy
+	lea	iy,iy+2
+virtual
+	ld	hl,0
+ load .ld_hl: byte from $$
+end virtual
+	db	.ld_hl
+.intr.skip:
+	ld	iyh,b
+	ld	iyl,c
+	ld	bc,(iy-4)
+	bit	2,c
+	jq	nz,.intr.skip
+	db	.ld_hl
+.intr.find:
+	ld	iyh,a
+	ld	iyl,endpoint.base+4
+	bit	0,(iy-4+endpoint.next+0)
+	jq	nz,.intr.gone
+	ld	a,(iy-4+endpoint.next+1)
+	cp	a,ixh
+	jq	nz,.intr.find
+	ld	hl,(ix.endpoint.next)
+	ld	(iy-4+endpoint.next+0),l
+	ld	(iy-4+endpoint.next+1),h
+.intr.gone:
+	pop	iy
+	add	iy,de
+	ld	a,iyh
+	cp	a,periodicList shr 8 and $FF
+	jq	nc,.intr.unlink
+	ld	hl,intrCleanupPending
+	jq	.cleanup
+.isoc:
+	cp	a,a
+	lea	hl,ix.endpoint.base
+	pop	de,ix
+	jq	_Free64Align256
+.async:
+	lea	hl,ix.endpoint.next
+	ld	h,(ix.endpoint.prev)
+	ld	iy.endpoint,(ix.endpoint.next)
+	ld	(hl+endpoint.next),iy.endpoint
+	ld	(iy.endpoint.prev),h
+	ld	hl,asyncCleanupPending
+.cleanup:
+	ld	a,(hl)
+	ld	(ix.endpoint.prev),a
+	ld	a,ixh
+	ld	(hl),a
+	cp	a,a
+.popreturn:
+	pop	de,ix
 	ret
 
 ;-------------------------------------------------------------------------------
