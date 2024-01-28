@@ -1932,7 +1932,7 @@ assert ~CONTROL_TRANSFER
 	ld	bc,transfer.remaining.dt
 	jq	.queueStage
 .queueStage:
-	call	_CreateDummiy.Transfer
+	call	_CreateDummyTransfer
 assert (endpoint-1) and 1
 	dec	iy.endpoint
 	jq	z,_FillTransfer
@@ -2014,7 +2014,7 @@ assert ti.mpUsbFifoTxImr shr 8 and $FF = 1
 ;  (ix+15) = handler
 ;  (ix+18) = data
 _QueueTransfer:
-	call	_CreateDummiy.Transfer
+	call	_CreateDummyTransfer
 	jq	nz,_Error.NO_MEMORY
 	ld	(.dummy),hl
 	or	a,transfer.type.cerr
@@ -2093,7 +2093,7 @@ _QueueTransfer:
 	sbc	hl,de
 	pop	de,af
 	push	af,bc,de,hl
-	call	_CreateDummiy.Transfer.enter
+	call	_CreateDummyTransfer.enter
 	jq	nz,_Error.NO_MEMORY
 	and	a,00001101b
 	pop	bc
@@ -2538,7 +2538,7 @@ end iterate
 ;  zf = enough memory
 ;  hl = transfer
 ;  iy = (ix+6)
-_CreateDummiy.Transfer:
+_CreateDummyTransfer:
 	ld	iy.endpoint,(ix+6)
 .enter:
 	call	_Alloc32Align32
@@ -2990,7 +2990,7 @@ end iterate
 	pop	iy.endpoint
 	sbc	hl,hl
 	ld	(iy.endpoint.data),hl
-	call	_CreateDummiy.Transfer.enter
+	call	_CreateDummyTransfer.enter
 	jq	z,.mem
 	lea	hl,iy.endpoint.base
 	call	_Free64Align256
