@@ -10,6 +10,7 @@ kQuit         := $40
 kIns          := $0B
 curLock       := 4
 flags         := $D00080
+keyExtend     := $D0058E
 curRow        := $D00595		; also includes curCol
 curUnder      := $D00599
 _PutS         := $207C0
@@ -48,15 +49,11 @@ _os_GetStringInput:
 	call	nz,_PutS
 	ld	hl,(curRow)
 	ld	(.smc.curRow),hl
-	ld	hl,(ix+12)
-	add	hl,de
-	xor	a,a
-	sbc	hl,de
-	jr	nz,.not_empty
-	pop	ix
-	ret
-.not_empty:
-	dec	hl			; subtract 1 for null pointer
+	ld	de,(ix+12)
+	scf
+	sbc	hl,hl
+	add	hl,de			; subtract 1 for null pointer
+	jp	nc,.empty
 	ld	(ix+12),hl
 	ld	(ix+6),hl		; save initial size
 .start:
@@ -99,7 +96,7 @@ _os_GetStringInput:
 	cp	a,$FB+1
 	jr	nc,.conv_key
 	sub	a,$7C
-	ld	($0D0058E),a
+	ld	(keyExtend),a
 	ld	a,$FE
 .conv_key:
 	call	_ConvKeyToTok
@@ -150,9 +147,9 @@ _os_GetStringInput:
 	ld	a,' '
 	call	_PutC
 	pop	hl
-	ld	bc,1
-	or	a,a
-	sbc	hl,bc
+	add	hl,de
+	scf
+	sbc	hl,de
 	jr	nz,.clear_loop
 	ld	hl,(.smc.curRow)
 	ld	(curRow),hl
@@ -171,5 +168,6 @@ _os_GetStringInput:
 	ld	hl,0
 	add	hl,de
 	ld	(hl),0
+.empty:
 	pop	ix
 	ret
