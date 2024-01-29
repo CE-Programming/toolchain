@@ -140,7 +140,7 @@ _os_GetStringInput:
 	ex	de,hl
 	ld	(curRow),hl
 	jp	.start
-:
+.done:
 	call	_ClrTxtShd
 	call	_CursorOff
 .smc.text_flag_0 := $+1
