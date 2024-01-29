@@ -79,33 +79,26 @@ _os_GetStringInput:
 	jr	c,.getkey
 	pop	ix
 	cp	a,kQuit
-	jp	z,.done
-	cp	a,kLeft
-	jr	z,.loop
-	cp	a,kDown
-	jr	z,.loop
-	cp	a,kRight
-	jr	z,.loop
-	cp	a,kUp
-	jr	z,.loop
-	cp	a,kClear
-	jp	z,.clear
-	cp	a,kEnter
-	jp	z,.done
+	jr	z,.done_trampoline
+	dec	a			; kRight=1
+	cp	a,kEnter-kRight		; kEnter=kDown+1
+	jr	c,.loop
+	jr	z,.done_trampoline
+	inc	a
 	cp	a,kIns
 	jr	z,.loop
+	cp	a,kClear
+	jr	z,.clear
 	ld	de,(ix+9)
 	ld	hl,(.smc.str_len)
 	add	hl,de
 	push	hl			; save buf pointer
 	push	ix
-	sub	a,$F3			; for lists? idk something is wrong with _PullDownChk
-	cp	a,$FB-$F3+1
-	jr	c,.sub_key
-	add	a,$F3
-	jr	.conv_key
-.sub_key:
-	sub	a,$7C-$F3		; (a-$F3)-($7C-$F3)=a-$7C
+	cp	a,$F3			; for lists? idk something is wrong with _PullDownChk
+	jr	c,.conv_key
+	cp	a,$FB+1
+	jr	nc,.conv_key
+	sub	a,$7C
 	ld	($0D0058E),a
 	ld	a,$FE
 .conv_key:
@@ -142,6 +135,7 @@ _os_GetStringInput:
 	call	_GetKey
 	pop	ix
 	cp	a,kEnter
+.done_trampoline:
 	jr	z,.done
 	cp	a,kClear
 	jr	nz,.full
