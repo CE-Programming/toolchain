@@ -101,7 +101,7 @@ _os_GetStringInput:
 	push	ix
 	sub	a,$F3			; for lists? idk something is wrong with _PullDownChk
 	cp	a,$FB-$F3
-	jr	nc,.sub_key
+	jr	c,.sub_key
 	add	a,$F3
 	jr	.conv_key
 .sub_key:
