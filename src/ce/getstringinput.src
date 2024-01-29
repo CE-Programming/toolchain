@@ -100,7 +100,7 @@ _os_GetStringInput:
 	push	hl			; save buf pointer
 	push	ix
 	sub	a,$F3			; for lists? idk something is wrong with _PullDownChk
-	cp	a,$FB-$F3
+	cp	a,$FB-$F3+1
 	jr	c,.sub_key
 	add	a,$F3
 	jr	.conv_key
