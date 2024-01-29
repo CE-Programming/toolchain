@@ -99,27 +99,13 @@ _os_GetStringInput:
 	add	hl,de
 	push	hl			; save buf pointer
 	push	ix
-	cp	a,$F3			; for lists? idk something is wrong with _PullDownChk
-	jr	z,.sub_key
-	cp	a,$F4
-	jr	z,.sub_key
-	cp	a,$F5
-	jr	z,.sub_key
-	cp	a,$F6
-	jr	z,.sub_key
-	cp	a,$F7
-	jr	z,.sub_key
-	cp	a,$F8
-	jr	z,.sub_key
-	cp	a,$F9
-	jr	z,.sub_key
-	cp	a,$FA
-	jr	z,.sub_key
-	cp	a,$FB
-	jr	z,.sub_key
+	sub	a,$F3			; for lists? idk something is wrong with _PullDownChk
+	cp	a,$FB-$F3
+	jr	nc,.sub_key
+	add	a,$F3
 	jr	.conv_key
 .sub_key:
-	sub	a,$7C
+	sub	a,$7C-$F3		; (a-$F3)-($7C-$F3)=a-$7C
 	ld	($0D0058E),a
 	ld	a,$FE
 .conv_key:
