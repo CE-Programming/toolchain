@@ -45,14 +45,14 @@ _os_GetStringInput:
 	sbc	hl,de
 	ld	iy,flags
 	call	nz,_PutS
-	ld	hl,(curRow)
+	ld	de,(curRow)
 .start:
-	push	hl			; save initial row/column
 	ld	hl,(ix+12)		; buffer size
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
-	jp	z,.empty
+	ret	z
+	push	de			; save initial row/column
 	push	ix
 	push	hl			; save remaining size
 	ld	de,(ix+9)
@@ -131,8 +131,7 @@ _os_GetStringInput:
 	sbc	hl,bc			; decrement and compare to buf start
 	add	hl,bc
 	jr	nz,.clear_loop
-	ex	de,hl
-	ld	(curRow),hl
+	ld	(curRow),de
 	jp	.start
 .done:
 	call	_ClrTxtShd
@@ -148,7 +147,5 @@ _os_GetStringInput:
 	pop	hl			; remaining size
 	pop	hl			; saved IX
 	pop	hl			; initial row/column
-.empty:
-	pop	hl
 	pop	ix
 	ret
