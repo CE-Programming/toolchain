@@ -30,20 +30,18 @@ _ClrTxtShd    := $20818
 _os_GetTokenInput:
 	push	ix
 	ld	iy,flags
-	ld	a,(iy + $0d)
-	ld	(.smc.text_flag_0),a
-	ld	a,(iy + $4c)
-	ld	(.smc.text_flag_1),a
+	ld	l,(iy + $0d)
+	ld	h,(iy + $4c)
+	push	hl			; save text flags
 	set	1,(iy + $0d)		; use text buffer
 	res	5,(iy + $4c)		; use text buffer
 	call	_ClrTxtShd
 	ld	ix,0
 	add	ix,sp
-	ld	hl,(ix+6)		; hl -> input string prompt
+	ld	hl,(ix+3+6)		; hl -> input string prompt
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
-	ld	iy,flags
 	call	nz,_PutS
 	ld	hl,(curRow)
 .start:
@@ -51,12 +49,11 @@ _os_GetTokenInput:
 	or	a,a
 	sbc	hl,hl
 	push	hl			; save string length
-	ld	hl,(ix+12)		; buffer size
+	ld	hl,(ix+3+12)		; buffer size
 	push	hl			; save remaining size
-	ld	hl,(ix+9)
+	ld	hl,(ix+3+9)
 	push	hl			; save buf pointer
 .loop:
-	ld	iy,flags
 	push	ix
 	call	_CursorOn
 .getkey:
@@ -92,17 +89,15 @@ _os_GetTokenInput:
 	pop	ix
 	pop	hl			; restore buf pointer
 	ex	(sp),hl
-	ld	bc,1
+	ld	bc,$80
 	xor	a,a
 	cp	a,d			; check if 2-byte token
+	rl	c			; sets carry
 	sbc	hl,bc			; subtract 1 or 2 from remaining size
 	ex	(sp),hl
 	jr	c,.full
-	or	a,d			; check if 2-byte token
-	jr	z,.one_byte_token
 	ld	(hl),d
-	inc	hl
-.one_byte_token:
+	add	hl,bc			; add 0 or 1 to buf pointer
 	ld	(hl),e
 	inc	hl
 	push	hl			; save buf pointer
@@ -110,15 +105,14 @@ _os_GetTokenInput:
 	call	_GetTokString
 	pop	ix
 	ld	b,(hl)			; token string length
-	inc	hl
-.draw_string:
 	ld	de,(ix-6)
+.draw_string:
 	inc	de			; increment string length
-	ld	(ix-6),de
-	ld	a,(hl)
 	inc	hl
+	ld	a,(hl)
 	call	_PutC
 	djnz	.draw_string
+	ld	(ix-6),de
 	jr	.loop
 .full:
 	push	hl			; save buf pointer
@@ -151,16 +145,13 @@ _os_GetTokenInput:
 .done:
 	call	_ClrTxtShd
 	call	_CursorOff
-.smc.text_flag_0 := $+1
-	ld	a,0
-	ld	(iy + $0d),a
-.smc.text_flag_1 := $+1
-	ld	a,0
-	ld	(iy + $4c),a
 	pop	hl			; restore buf pointer
-	ld	de,(ix+9)
+	ld	de,(ix+3+9)
 	or	a,a
 	sbc	hl,de
 	ld	sp,ix
+	pop	de			; restore text flags
+	ld	(iy + $0d),e
+	ld	(iy + $4c),d
 	pop	ix
 	ret
