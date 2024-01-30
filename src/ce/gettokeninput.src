@@ -44,11 +44,12 @@ _os_GetTokenInput:
 	ld	hl,(curRow)
 .start:
 	push	hl			; save initial row/column
-	push	ix
+	push	ix			; save frame pointer
+	ld	hl,(ix+9)
+	push	hl			; save buf start pointer
+	push	hl			; save buf pointer
 	ld	hl,(ix+12)		; buffer size
 	push	hl			; save remaining size
-	ld	hl,(ix+9)
-	push	hl			; save buf pointer
 .loop:
 	call	_CursorOn
 .getkey:
@@ -60,11 +61,11 @@ _os_GetTokenInput:
 	pop	af
 	jr	c,.getkey
 	cp	a,kQuit
-	jr	z,.done_trampoline
+	jr	z,.done
 	dec	a			; kRight=1
 	cp	a,kEnter-kRight		; kEnter=kDown+1
 	jr	c,.loop
-	jr	z,.done_trampoline
+	jr	z,.done
 	inc	a
 	cp	a,kIns
 	jr	z,.loop
@@ -79,37 +80,54 @@ _os_GetTokenInput:
 	ld	a,$FE
 .conv_key:
 	call	_ConvKeyToTok
-	pop	hl			; restore buf pointer
-	ex	(sp),hl
-	ld	bc,$80
+	pop	bc			; restore remaining size
 	xor	a,a
 	cp	a,d			; check if 2-byte token
-	rl	c			; sets carry
-	sbc	hl,bc			; subtract 1 or 2 from remaining size
-	ex	(sp),hl
-	jr	c,.full
+	sbc	hl,hl			; sets Z if 1-byte token
+	dec	hl
+	add	hl,bc			; subtract 1 or 2 from remaining size
+	jr	nc,.full
+	ex	(sp),hl			; restore buf pointer
+	jr	z,.one_byte_token
 	ld	(hl),d
-	add	hl,bc			; add 0 or 1 to buf pointer
+	inc	hl
+.one_byte_token:
 	ld	(hl),e
 	inc	hl
-	push	hl			; save buf pointer
+	ex	(sp),hl			; save buf pointer
+	push	hl			; save remaining size
 	call	_GetTokString
 	call	_PutPS
 	jr	.loop
+
+.done:
+	pop	de			; remaining size
+.done_full:
+	call	_ClrTxtShd
+	call	_CursorOff
+	pop	hl			; restore buf pointer
+	pop	de			; restore buf start pointer
+	or	a,a
+	sbc	hl,de
+	pop	de			; frame pointer
+	pop	de			; initial row/column
+	pop	de			; restore text flags
+	ld	(iy + $0d),e
+	ld	(iy + $4c),d
+	pop	ix
+	ret
+
 .full:
-	push	hl			; save buf pointer
-.full_loop:
 	call	_GetKey
 	cp	a,kEnter
-.done_trampoline:
-	jr	z,.done
+	jr	z,.done_full
 	cp	a,kClear
-	jr	nz,.full_loop
+	jr	nz,.full
 .clear:
 	pop	hl			; buf pointer
-	pop	hl			; remaining size
-	pop	ix
-	pop	de			; initial row/column
+	pop	hl			; buf start pointer
+	pop	ix			; restore frame pointer
+	pop	de			; restore initial row/column
 	ld	hl,curRow
 	ld	bc,(hl)
 	ld	(hl),de
@@ -125,20 +143,5 @@ _os_GetTokenInput:
 	ld	(hl),de
 	ex	de,hl
 	jp	.start
-.done:
-	call	_ClrTxtShd
-	call	_CursorOff
-	pop	hl			; restore buf pointer
-	pop	de			; remaining size
-	pop	ix
-	pop	de			; initial row/column
-	ld	de,(ix+9)
-	or	a,a
-	sbc	hl,de
-	pop	de			; restore text flags
-	ld	(iy + $0d),e
-	ld	(iy + $4c),d
-	pop	ix
-	ret
 
 	extern	__frameset0
