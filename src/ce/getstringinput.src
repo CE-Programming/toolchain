@@ -29,9 +29,6 @@ _ClrTxtShd    := $20818
 	public	_os_GetStringInput
 _os_GetStringInput:
 	push	ix
-	ld	ix,0
-	add	ix,sp
-	push	ix
 	ld	iy,flags
 	ld	a,(iy + $0d)
 	ld	(.smc.text_flag_0),a
@@ -40,7 +37,8 @@ _os_GetStringInput:
 	set	1,(iy + $0d)		; use text buffer
 	res	5,(iy + $4c)		; use text buffer
 	call	_ClrTxtShd
-	pop	ix
+	ld	ix,0
+	add	ix,sp
 	ld	hl,(ix+6)		; hl -> input string prompt
 	add	hl,de
 	xor	a,a
@@ -55,13 +53,13 @@ _os_GetStringInput:
 	xor	a,a
 	sbc	hl,de
 	jp	z,.empty
+	push	ix
 	push	hl			; save remaining size
 	ld	de,(ix+9)
 .loop_save:
 	push	de			; save buf pointer
 .loop:
 	ld	iy,flags
-	push	ix
 	call	_CursorOn
 .getkey:
 	call	_GetKey
@@ -71,7 +69,6 @@ _os_GetStringInput:
 	call	_CursorOn
 	pop	af
 	jr	c,.getkey
-	pop	ix
 	cp	a,kQuit
 	jr	z,.done_trampoline
 	dec	a			; kRight=1
@@ -83,7 +80,6 @@ _os_GetStringInput:
 	jr	z,.loop
 	cp	a,kClear
 	jr	z,.clear
-	push	ix
 	cp	a,$F3			; for lists? idk something is wrong with _PullDownChk
 	jr	c,.conv_key
 	cp	a,$FB+1
@@ -94,7 +90,6 @@ _os_GetStringInput:
 .conv_key:
 	call	_ConvKeyToTok
 	call	_GetTokString
-	pop	ix
 	pop	de			; restore buf pointer
 	ld	b,(hl)			; token string length
 	inc	hl
@@ -115,9 +110,7 @@ _os_GetStringInput:
 .full:
 	push	de			; save buf pointer
 .full_loop:
-	push	ix
 	call	_GetKey
-	pop	ix
 	cp	a,kEnter
 .done_trampoline:
 	jr	z,.done
@@ -127,6 +120,7 @@ _os_GetStringInput:
 	pop	hl			; restore buf pointer
 	inc	hl
 	pop	de			; remaining size
+	pop	ix
 	pop	de			; initial row/column
 	ld	(curRow),de
 .clear_loop:
@@ -151,7 +145,10 @@ _os_GetStringInput:
 	ld	(iy + $4c),a
 	pop	hl			; restore buf pointer
 	ld	(hl),0
+	pop	hl			; remaining size
+	pop	hl			; saved IX
+	pop	hl			; initial row/column
 .empty:
-	ld	sp,ix
+	pop	hl
 	pop	ix
 	ret
