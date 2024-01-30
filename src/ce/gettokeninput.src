@@ -29,6 +29,8 @@ _ClrTxtShd    := $20818
 	public	_os_GetTokenInput
 _os_GetTokenInput:
 	push	ix
+	ld	ix,0
+	add	ix,sp
 	ld	iy,flags
 	ld	l,(iy + $0d)
 	ld	h,(iy + $4c)
@@ -36,9 +38,7 @@ _os_GetTokenInput:
 	set	1,(iy + $0d)		; use text buffer
 	res	5,(iy + $4c)		; use text buffer
 	call	_ClrTxtShd
-	ld	ix,0
-	add	ix,sp
-	ld	hl,(ix+3+6)		; hl -> input string prompt
+	ld	hl,(ix+6)		; hl -> input string prompt
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
@@ -46,15 +46,12 @@ _os_GetTokenInput:
 	ld	hl,(curRow)
 .start:
 	push	hl			; save initial row/column
-	or	a,a
-	sbc	hl,hl
-	push	hl			; save string length
-	ld	hl,(ix+3+12)		; buffer size
+	push	ix
+	ld	hl,(ix+12)		; buffer size
 	push	hl			; save remaining size
-	ld	hl,(ix+3+9)
+	ld	hl,(ix+9)
 	push	hl			; save buf pointer
 .loop:
-	push	ix
 	call	_CursorOn
 .getkey:
 	call	_GetKey
@@ -64,7 +61,6 @@ _os_GetTokenInput:
 	call	_CursorOn
 	pop	af
 	jr	c,.getkey
-	pop	ix
 	cp	a,kQuit
 	jr	z,.done_trampoline
 	dec	a			; kRight=1
@@ -84,9 +80,7 @@ _os_GetTokenInput:
 	ld	(keyExtend),a
 	ld	a,$FE
 .conv_key:
-	push	ix
 	call	_ConvKeyToTok
-	pop	ix
 	pop	hl			; restore buf pointer
 	ex	(sp),hl
 	ld	bc,$80
@@ -101,25 +95,13 @@ _os_GetTokenInput:
 	ld	(hl),e
 	inc	hl
 	push	hl			; save buf pointer
-	push	ix
 	call	_GetTokString
-	pop	ix
-	ld	b,(hl)			; token string length
-	ld	de,(ix-6)
-.draw_string:
-	inc	de			; increment string length
-	inc	hl
-	ld	a,(hl)
-	call	_PutC
-	djnz	.draw_string
-	ld	(ix-6),de
+	call	_PutPS
 	jr	.loop
 .full:
 	push	hl			; save buf pointer
 .full_loop:
-	push	ix
 	call	_GetKey
-	pop	ix
 	cp	a,kEnter
 .done_trampoline:
 	jr	z,.done
@@ -128,28 +110,33 @@ _os_GetTokenInput:
 .clear:
 	pop	hl			; buf pointer
 	pop	hl			; remaining size
-	pop	hl			; string length
-	inc	hl
+	pop	ix
 	pop	de			; initial row/column
-	ld	(curRow),de
+	ld	hl,curRow
+	ld	bc,(hl)
+	ld	(hl),de
 .clear_loop:
+	push	hl
+	ld	hl,(hl)
 	ld	a,' '
 	call	_PutC
-	add	hl,de
-	scf
-	sbc	hl,de			; decrement and compare to zero
+	or	a,a
+	sbc	hl,bc			; check the row/column before the print
+	pop	hl
 	jr	nz,.clear_loop
+	ld	(hl),de
 	ex	de,hl
-	ld	(curRow),hl
 	jp	.start
 .done:
 	call	_ClrTxtShd
 	call	_CursorOff
 	pop	hl			; restore buf pointer
-	ld	de,(ix+3+9)
+	pop	de			; remaining size
+	pop	ix
+	pop	de			; initial row/column
+	ld	de,(ix+9)
 	or	a,a
 	sbc	hl,de
-	ld	sp,ix
 	pop	de			; restore text flags
 	ld	(iy + $0d),e
 	ld	(iy + $4c),d
