@@ -28,9 +28,7 @@ _ClrTxtShd    := $20818
 	section	.text
 	public	_os_GetTokenInput
 _os_GetTokenInput:
-	push	ix
-	ld	ix,0
-	add	ix,sp
+	call	__frameset0
 	ld	iy,flags
 	ld	l,(iy + $0d)
 	ld	h,(iy + $4c)
@@ -142,3 +140,5 @@ _os_GetTokenInput:
 	ld	(iy + $4c),d
 	pop	ix
 	ret
+
+	extern	__frameset0

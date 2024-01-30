@@ -28,9 +28,7 @@ _ClrTxtShd    := $20818
 	section	.text
 	public	_os_GetStringInput
 _os_GetStringInput:
-	push	ix
-	ld	ix,0
-	add	ix,sp
+	call	__frameset0
 	ld	iy,flags
 	ld	l,(iy + $0d)
 	ld	h,(iy + $4c)
@@ -145,3 +143,5 @@ _os_GetStringInput:
 	ex	de,hl
 	ld	(curRow),hl
 	jp	.start
+
+	extern	__frameset0
