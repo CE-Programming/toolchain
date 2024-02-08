@@ -10,6 +10,7 @@ kQuit         := $40
 kIns          := $0B
 curLock       := 4
 flags         := $D00080
+keyExtend     := $D0058E
 curRow        := $D00595		; also includes curCol
 curUnder      := $D00599
 _PutS         := $207C0
@@ -27,47 +28,33 @@ _ClrTxtShd    := $20818
 	section	.text
 	public	_os_GetStringInput
 _os_GetStringInput:
-	push	ix
-	ld	ix,0
-	add	ix,sp
-	push	ix
+	call	__frameset0
 	ld	iy,flags
-	ld	a,(iy + $0d)
-	ld	(.smc.text_flag_0),a
-	ld	a,(iy + $4c)
-	ld	(.smc.text_flag_1),a
+	ld	l,(iy + $0d)
+	ld	h,(iy + $4c)
+	push	hl			; save text flags
 	set	1,(iy + $0d)		; use text buffer
 	res	5,(iy + $4c)		; use text buffer
 	call	_ClrTxtShd
-	pop	ix
 	ld	hl,(ix+6)		; hl -> input string prompt
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
-	ld	iy,flags
 	call	nz,_PutS
 	ld	hl,(curRow)
-	ld	(.smc.curRow),hl
-	ld	hl,(ix+12)
+.start:
+	push	hl			; save initial row/column
+	ld	hl,(ix+12)		; buffer size
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
-	jr	nz,.not_empty
-	pop	ix
-	ret
-.not_empty:
-	dec	hl			; subtract 1 for null pointer
-	ld	(ix+12),hl
-	ld	(ix+6),hl		; save initial size
-.start:
-	ld	hl,(ix+6)		; restore initial size
-	ld	(ix+12),hl
-	or	a,a
-	sbc	hl,hl
-	ld	(.smc.str_len),hl
-.loop:
-	ld	iy,flags
 	push	ix
+	push	hl			; save remaining size
+	jr	z,.empty
+	ld	de,(ix+9)
+.loop_save:
+	push	de			; save buf pointer
+.loop:
 	call	_CursorOn
 .getkey:
 	call	_GetKey
@@ -77,105 +64,84 @@ _os_GetStringInput:
 	call	_CursorOn
 	pop	af
 	jr	c,.getkey
-	pop	ix
 	cp	a,kQuit
-	jp	z,.done
-	cp	a,kLeft
-	jr	z,.loop
-	cp	a,kDown
-	jr	z,.loop
-	cp	a,kRight
-	jr	z,.loop
-	cp	a,kUp
-	jr	z,.loop
-	cp	a,kClear
-	jp	z,.clear
-	cp	a,kEnter
-	jp	z,.done
+	jr	z,.done
+	dec	a			; kRight=1
+	cp	a,kEnter-kRight		; kEnter=kDown+1
+	jr	c,.loop
+	jr	z,.done
+	inc	a
 	cp	a,kIns
 	jr	z,.loop
-	ld	de,(ix+9)
-	ld	hl,(.smc.str_len)
-	add	hl,de
-	push	hl			; save buf pointer
-	push	ix
-	sub	a,$F3			; for lists? idk something is wrong with _PullDownChk
-	cp	a,$FB-$F3+1
-	jr	c,.sub_key
-	add	a,$F3
-	jr	.conv_key
-.sub_key:
-	sub	a,$7C-$F3		; (a-$F3)-($7C-$F3)=a-$7C
-	ld	($0D0058E),a
+	cp	a,kClear
+	jr	z,.clear
+	cp	a,$F3			; for lists? idk something is wrong with _PullDownChk
+	jr	c,.conv_key
+	cp	a,$FB+1
+	jr	nc,.conv_key
+	sub	a,$7C
+	ld	(keyExtend),a
 	ld	a,$FE
 .conv_key:
 	call	_ConvKeyToTok
 	call	_GetTokString
-	pop	ix
 	pop	de			; restore buf pointer
 	ld	b,(hl)			; token string length
-	inc	hl
 .draw_string:
-	push	hl
-	ld	hl,(ix+12)
+	ex	(sp),hl			; remaining size
 	add	hl,de
-	xor	a,a
-	sbc	hl,de			; check if done
-	dec	hl
-	ld	(ix+12),hl
-	pop	hl
+	scf
+	sbc	hl,de			; decrement and check if done
+	ex	(sp),hl
 	jr	z,.full
-	push	hl
-	ld	hl,(.smc.str_len)
 	inc	hl
-	ld	(.smc.str_len),hl
-	pop	hl
 	ld	a,(hl)
 	ld	(de),a
-	inc	hl
 	inc	de
 	call	_PutC
 	djnz	.draw_string
-	jp	.loop
-.full:
-	push	ix
-	call	_GetKey
+	jr	.loop_save
+
+.done:
+	pop	hl			; restore buf pointer
+	ld	(hl),0
+.empty:
+	pop	hl			; remaining size
+	pop	hl			; saved IX
+	pop	hl			; initial row/column
+	call	_ClrTxtShd
+	call	_CursorOff
+	pop	hl			; restore text flags
+	ld	(iy + $0d),l
+	ld	(iy + $4c),h
 	pop	ix
+	ret
+
+.full:
+	push	de			; save buf pointer
+.full_loop:
+	call	_GetKey
 	cp	a,kEnter
 	jr	z,.done
 	cp	a,kClear
-	jr	nz,.full
+	jr	nz,.full_loop
 .clear:
-.smc.curRow := $+1
-	ld	hl,0
-	ld	(curRow),hl
-	ld	hl,(.smc.str_len)
+	pop	hl			; restore buf pointer
 	inc	hl
+	pop	de			; remaining size
+	pop	ix
+	pop	de			; initial row/column
+	ld	(curRow),de
 .clear_loop:
-	push	hl
 	ld	a,' '
 	call	_PutC
-	pop	hl
-	ld	bc,1
-	or	a,a
-	sbc	hl,bc
+	ld	bc,(ix+9)
+	scf
+	sbc	hl,bc			; decrement and compare to buf start
+	add	hl,bc
 	jr	nz,.clear_loop
-	ld	hl,(.smc.curRow)
+	ex	de,hl
 	ld	(curRow),hl
 	jp	.start
-.done:
-	call	_ClrTxtShd
-	call	_CursorOff
-.smc.text_flag_0 := $+1
-	ld	a,0
-	ld	(iy + $0d),a
-.smc.text_flag_1 := $+1
-	ld	a,0
-	ld	(iy + $4c),a
-	ld	de,(ix+9)
-.smc.str_len := $+1
-	ld	hl,0
-	add	hl,de
-	ld	(hl),0
-	pop	ix
-	ret
+
+	extern	__frameset0

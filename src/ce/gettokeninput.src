@@ -10,6 +10,7 @@ kQuit         := $40
 kIns          := $0B
 curLock       := 4
 flags         := $D00080
+keyExtend     := $D0058E
 curRow        := $D00595		; also includes curCol
 curUnder      := $D00599
 _PutS         := $207C0
@@ -27,47 +28,29 @@ _ClrTxtShd    := $20818
 	section	.text
 	public	_os_GetTokenInput
 _os_GetTokenInput:
-	push	ix
-	ld	ix,0
-	add	ix,sp
-	push	ix
+	call	__frameset0
 	ld	iy,flags
-	ld	a,(iy + $0d)
-	ld	(.smc.text_flag_0),a
-	ld	a,(iy + $4c)
-	ld	(.smc.text_flag_1),a
+	ld	l,(iy + $0d)
+	ld	h,(iy + $4c)
+	push	hl			; save text flags
 	set	1,(iy + $0d)		; use text buffer
 	res	5,(iy + $4c)		; use text buffer
 	call	_ClrTxtShd
-	pop	ix
 	ld	hl,(ix+6)		; hl -> input string prompt
 	add	hl,de
 	xor	a,a
 	sbc	hl,de
-	ld	iy,flags
 	call	nz,_PutS
 	ld	hl,(curRow)
-	ld	(.smc.curRow),hl
-	ld	hl,(ix+12)
-	add	hl,de
-	xor	a,a
-	sbc	hl,de
-	jr	nz,.not_empty
-	pop	ix
-	ret
-.not_empty:
-	ld	(ix+12),hl
-	ld	(ix+6),hl		; save initial size
 .start:
-	ld	hl,(ix+6)		; restore initial size
-	ld	(ix+12),hl
-	or	a,a
-	sbc	hl,hl
-	ld	(.smc.tok_len),hl
-	ld	(.smc.str_len),hl
+	push	hl			; save initial row/column
+	push	ix			; save frame pointer
+	ld	hl,(ix+9)
+	push	hl			; save buf start pointer
+	push	hl			; save buf pointer
+	ld	hl,(ix+12)		; buffer size
+	push	hl			; save remaining size
 .loop:
-	ld	iy,flags
-	push	ix
 	call	_CursorOn
 .getkey:
 	call	_GetKey
@@ -77,136 +60,88 @@ _os_GetTokenInput:
 	call	_CursorOn
 	pop	af
 	jr	c,.getkey
-	pop	ix
 	cp	a,kQuit
-	jp	z,.done
-	cp	a,kLeft
-	jr	z,.loop
-	cp	a,kDown
-	jr	z,.loop
-	cp	a,kRight
-	jr	z,.loop
-	cp	a,kUp
-	jr	z,.loop
-	cp	a,kClear
-	jp	z,.clear
-	cp	a,kEnter
-	jp	z,.done
+	jr	z,.done
+	dec	a			; kRight=1
+	cp	a,kEnter-kRight		; kEnter=kDown+1
+	jr	c,.loop
+	jr	z,.done
+	inc	a
 	cp	a,kIns
 	jr	z,.loop
-	ld	de,(ix+9)
-	ld	hl,(.smc.tok_len)
-	add	hl,de
-	push	ix
-	push	hl			; save buf pointer
+	cp	a,kClear
+	jr	z,.clear
 	cp	a,$F3			; for lists? idk something is wrong with _PullDownChk
-	jr	z,.sub_key
-	cp	a,$F4
-	jr	z,.sub_key
-	cp	a,$F5
-	jr	z,.sub_key
-	cp	a,$F6
-	jr	z,.sub_key
-	cp	a,$F7
-	jr	z,.sub_key
-	cp	a,$F8
-	jr	z,.sub_key
-	cp	a,$F9
-	jr	z,.sub_key
-	cp	a,$FA
-	jr	z,.sub_key
-	cp	a,$FB
-	jr	z,.sub_key
-	jr	.conv_key
-.sub_key:
+	jr	c,.conv_key
+	cp	a,$FB+1
+	jr	nc,.conv_key
 	sub	a,$7C
-	ld	($0D0058E),a
+	ld	(keyExtend),a
 	ld	a,$FE
 .conv_key:
 	call	_ConvKeyToTok
-	pop	hl			; restore buf pointer
-	pop	ix
-	ld	(hl),e
-	push	hl
-	ld	hl,(ix+12)
-	ld	bc,1
-	or	a,a
-	sbc	hl,bc
-	ld	(ix+12),hl
-	pop	hl
-	jr	z,.full
-	ld	a,d
-	or	a,a			; check if 2-byte token
+	pop	bc			; restore remaining size
+	xor	a,a
+	cp	a,d			; check if 2-byte token
+	sbc	hl,hl			; sets Z if 1-byte token
+	dec	hl
+	add	hl,bc			; subtract 1 or 2 from remaining size
+	jr	nc,.full
+	ex	(sp),hl			; restore buf pointer
 	jr	z,.one_byte_token
 	ld	(hl),d
 	inc	hl
-	ld	(hl),e
-	ld	hl,(ix+12)
-	ld	bc,1
-	or	a,a
-	sbc	hl,bc
-	ld	(ix+12),hl
-	jr	z,.full
-	ld	hl,(.smc.tok_len)
-	inc	hl
-	ld	(.smc.tok_len),hl
 .one_byte_token:
-	ld	hl,(.smc.tok_len)
+	ld	(hl),e
 	inc	hl
-	ld	(.smc.tok_len),hl
-	push	ix
+	ex	(sp),hl			; save buf pointer
+	push	hl			; save remaining size
 	call	_GetTokString
+	call	_PutPS
+	jr	.loop
+
+.done:
+	pop	de			; remaining size
+.done_full:
+	call	_ClrTxtShd
+	call	_CursorOff
+	pop	hl			; restore buf pointer
+	pop	de			; restore buf start pointer
+	or	a,a
+	sbc	hl,de
+	pop	de			; frame pointer
+	pop	de			; initial row/column
+	pop	de			; restore text flags
+	ld	(iy + $0d),e
+	ld	(iy + $4c),d
 	pop	ix
-	ld	b,(hl)			; token string length
-	inc	hl
-.draw_string:
-	push	hl
-	ld	hl,(.smc.str_len)
-	inc	hl
-	ld	(.smc.str_len),hl
-	pop	hl
-	ld	a,(hl)
-	inc	hl
-	call	_PutC
-	djnz	.draw_string
-	jp	.loop
+	ret
+
 .full:
-	push	ix
 	call	_GetKey
-	pop	ix
 	cp	a,kEnter
-	jr	z,.done
+	jr	z,.done_full
 	cp	a,kClear
 	jr	nz,.full
 .clear:
-.smc.curRow := $+1
-	ld	hl,0
-	ld	(curRow),hl
-.smc.str_len := $+1
-	ld	hl,0
-	inc	hl
+	pop	hl			; buf pointer
+	pop	hl			; buf start pointer
+	pop	ix			; restore frame pointer
+	pop	de			; restore initial row/column
+	ld	hl,curRow
+	ld	bc,(hl)
+	ld	(hl),de
 .clear_loop:
 	push	hl
+	ld	hl,(hl)
 	ld	a,' '
 	call	_PutC
-	pop	hl
-	ld	bc,1
 	or	a,a
-	sbc	hl,bc
+	sbc	hl,bc			; check the row/column before the print
+	pop	hl
 	jr	nz,.clear_loop
-	ld	hl,(.smc.curRow)
-	ld	(curRow),hl
+	ld	(hl),de
+	ex	de,hl
 	jp	.start
-.done:
-	call	_ClrTxtShd
-	call	_CursorOff
-.smc.text_flag_0 := $+1
-	ld	a,0
-	ld	(iy + $0d),a
-.smc.text_flag_1 := $+1
-	ld	a,0
-	ld	(iy + $4c),a
-.smc.tok_len := $+1
-	ld	hl,0
-	pop	ix
-	ret
+
+	extern	__frameset0
