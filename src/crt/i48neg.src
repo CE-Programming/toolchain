@@ -1,0 +1,45 @@
+; Performs 48 bit unary minus
+; 
+; Arguments:
+; ude = Most significant bytes of arg 1
+; uhl = Least significant bytes of arg 1
+;
+; Returns:
+; ude:uhl = -ude:uhl
+
+	assume	adl=1
+
+	section	.text
+	public	__i48neg
+__i48neg:
+	push de
+	ex de, hl ; de = hl
+	or a, a
+	sbc hl, hl ; hl = 0
+	sbc hl, de ; hl = 0 - hl = -hl
+	ex hl, (sp) ; -hl on stack top, hl = de
+	ex de, hl ; de = de
+	ld hl, 0
+	sbc hl, de ; hl = 0 - de - c
+	ex de, hl
+	pop hl ; ude:uhl = -ude:uhl
+	ret
+
+;Used by i48divs and i48rems, uiy:ubc = -uiy:ubc
+	public  __uiyubcNeg
+__uiyubcNeg:
+    push hl
+    push de
+    or a, a
+    sbc hl, hl
+    sbc hl, bc ; hl = 0 - bc = -bc
+    push hl
+    pop bc ; bc = -bc
+    lea de, iy
+    ld hl, 0
+    sbc hl, de ; hl = 0 - iy - c
+    push hl
+    pop iy ; iy = -iy
+    pop de
+    pop hl
+    ret
