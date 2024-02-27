@@ -30,8 +30,6 @@ _strlen     := 0000D4h
 _strncat    := 0000D8h
 	public	_strncmp
 _strncmp    := 0000DCh
-	public	_strcasecmp
-_strcasecmp := 021E3Ch
 	public	_strncpy
 _strncpy    := 0000E0h
 	public	_strpbrk
