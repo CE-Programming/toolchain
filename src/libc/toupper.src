@@ -3,24 +3,20 @@
 	section	.text
 	public	_toupper
 
-if PREFER_OS_LIBC
-
-_toupper := 021E38h
-
-else
-
 _toupper:
 	pop	de
 	ex	(sp), hl
 	push	de
+	require	_toupper.internal
 
+	section	.text
+	public	_toupper.internal
+	; ASM interface: input/output char in L, destroys AF
+.internal:
 	ld	a, l
 	sub	a, 'a'
 	cp	a, 1+'z'-'a'
 	ret	nc
 
-	add	a, 'A'
-	ld	l, a
+	res	5, l
 	ret
-
-end if

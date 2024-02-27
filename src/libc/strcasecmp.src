@@ -1,0 +1,95 @@
+	assume	adl=1
+
+	section	.text
+	public	_strcasecmp
+
+if PREFER_OS_LIBC
+
+_strcasecmp := 021E3Ch
+
+else
+
+_strcasecmp:
+	pop	iy
+	pop	de
+	ex	(sp), hl
+	push	de
+	ld	b, 1+'z'-'a'
+	ld	c, 'a'-'A'
+	jr	.loop_entry
+.loop:
+	cp	a, (hl)
+	jr	z, .done
+.loop_nonnull:
+	inc	hl
+	inc	de
+.loop_entry:
+	ld	a, (de)
+	xor	a, (hl)
+	jr	z, .loop
+	cp	a, c
+	jr	nz, .mismatch
+	or	a, (hl)
+	sub	a, 'a'
+	cp	a, b
+	jr	c, .loop_nonnull
+
+end if
+
+	section	.text
+	public	_strcasecmp.mismatch
+	public	_strcasecmp.done
+_strcasecmp.mismatch:
+	ld	l, (hl)
+	call	_tolower.internal
+	ex	de, hl
+	ld	l, (hl)
+	call	_tolower.internal
+	ld	a, l
+	sub	a, e
+_strcasecmp.done:
+	sbc	hl, hl
+	ld	l, a
+	jp	(iy)
+
+	section	.text
+	public	_strncasecmp
+_strncasecmp:
+	pop	iy
+	pop	de
+	pop	hl
+	pop	bc
+	push	bc
+	push	de
+	push	hl
+
+	scf
+	sbc	hl, hl
+	add	hl, bc
+	ex	(sp), hl
+
+	call	c, .loop_entry
+	jr	c, _strcasecmp.mismatch
+	sbc	hl, hl
+	jp	(iy)
+
+.checkcase:
+	or	a, (hl)
+	sub	a, 'a'
+	add	a, -(1+'z'-'a')
+	ret	c
+.loop:
+	cpi
+	ret	po
+	ret	z
+	inc	de
+.loop_entry:
+	ld	a, (de)
+	xor	a, (hl)
+	jr	z, .loop
+	cp	a, 'a'-'A'
+	jr	z, .checkcase
+	scf
+	ret
+
+	extern	_tolower.internal
