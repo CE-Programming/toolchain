@@ -37,8 +37,8 @@ _strcasecmp:
 end if
 
 	section	.text
-	public	_strcasecmp.mismatch
-	public	_strcasecmp.done
+	private	_strcasecmp.mismatch
+	private	_strcasecmp.done
 _strcasecmp.mismatch:
 	ld	l, (hl)
 	call	_tolower.internal
