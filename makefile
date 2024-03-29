@@ -15,7 +15,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 DESTDIR = $(CURDIR)/
-PREFIX = CEdev
+PREFIX ?= ~/CEdev
 
 include $(CURDIR)/src/common.mk
 
