@@ -72,7 +72,7 @@ This section describes the standard flow for building CE toolchain projects, sta
 Open a build session by double-clicking :code:`cedev.bat` on Windows or launching a terminal session on Linux/macOS.
 Navigate to the *examples* folder using the :code:`cd examples` command.
 This folder contains example projects that you can build and modify to learn how to write different programs.
-Navigate the to the *hello_world* example project using the command :code:`cd hello_world`.
+Navigate to the *hello_world* example project using the command :code:`cd hello_world`.
 
 Type :code:`make` and press enter.
 This command invokes the compiler, assembler, and linker creating the program :code:`bin/DEMO.8xp`.
