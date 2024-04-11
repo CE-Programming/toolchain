@@ -41,7 +41,7 @@ end repeat
 	ex	de,hl
 	jp	(hl)
 
-	section	.rodata
+	section	.bss
 	private	exit_functions
 exit_functions rl 1
 
