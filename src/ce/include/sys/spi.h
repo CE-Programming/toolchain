@@ -1,7 +1,7 @@
 /**
  * @file
  * @authors
- * @brief FTSSP010 SPI controller define file
+ * @brief CE SPI controller define file
  */
 
 #ifndef SYS_SPI_H
@@ -36,7 +36,7 @@ extern "C" {
 /**
  * Sends a Command to the SPI controller using the 9bit FIFO protocol.
  *
- * @param[in] x 8bit parameter.
+ * @param[in] x 8bit command.
  */
 #define SPI_COMMAND(x) \
 do { \

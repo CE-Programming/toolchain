@@ -29,6 +29,7 @@ extern "C" {
 /* @endcond */
 /** LCD Control register */
 #define lcd_Control              (*(volatile uint24_t*)0xE30018)
+/* @cond */
 /** LCD RGB/BGR and Bits per pixel */
 #define lcd_VideoMode            (*(volatile uint16_t*)0xE30018)
 #define LCD_RGB1bit               (0x821) /**< RGB 1bit indexed color */
@@ -57,7 +58,6 @@ extern "C" {
 #define LCD_COLOR565              (0x2D) /**< 565 16bit */
 #define LCD_COLOR444              (0x2F) /**< 444 16bit */
 #define LCD_COLOR16               (LCD_COLOR565) /**< TI-OS Default */
-/* @cond */
 #define lcd_EnableInt            (*(volatile uint8_t*)0xE3001C)
 #define lcd_IntStatus            (*(volatile uint8_t*)0xE30020)
 #define lcd_IntStatusMasked      (*(volatile uint8_t*)0xE30024)
