@@ -18,30 +18,32 @@ __i48shrs:
 	inc c
 	dec c
 	ret z
+	push ix
+	ld ix, 0
+	add ix, sp
 	push bc
 	ld b, c
+	push af
 	push de
 	push hl
+	ld c, (ix-7)
+	ld a, (ix-10)
 .loop:
-	ld hl, 5
-	add hl, sp
-	
-	sra (hl)
-	dec hl
-.midloop: ; Used to enter from i48shru
-	rr (hl)
-	dec hl
-	rr (hl)
-	dec hl
-	rr (hl)
-	dec hl
-	rr (hl)
-	dec hl
-	rr (hl)
-
+	sra c
+.midloop:
+	rr d
+	rr e
+	rra
+	rr h
+	rr l
 	djnz .loop
-
+	ld (ix-12), hl
+	ld (ix-9), de
+	ld (ix-7), c
+	ld (ix-10), a
 	pop hl
 	pop de
+	pop af
 	pop bc
+	pop ix
 	ret

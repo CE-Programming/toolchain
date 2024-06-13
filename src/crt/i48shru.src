@@ -17,14 +17,17 @@ __i48shru:
 	inc c
 	dec c
 	ret z
+	push ix
+	ld ix, 0
+	add ix, sp
 	push bc
 	ld b, c
+	push af
 	push de
 	push hl
-	ld hl, 5
-	add hl, sp
+	ld c, (ix-7)
+	ld a, (ix-10)
+	srl c
+	jp __i48shrs.midloop
 	
-	srl (hl)
-	dec hl
-	jp nz, __i48shrs.midloop
 	extern __i48shrs.midloop
