@@ -6,7 +6,7 @@
 ; uiy = Most signficant bytes of arg 2 (denominator)
 ; ubc = Least significant bytes of arg 2
 ; 
-; Returns (loaded into other registers by slldivu and sllremu):
+; Returns (loaded into other registers by i48divu/s and i48remu/s):
 ; ude:uhl quotient, uiy:ubc remainder
 
     assume adl=1
@@ -17,59 +17,42 @@
     public __i48dvrmu
 
 __i48dvrmu:
+    ;backup af
+    push af
+
     push ix
     ld ix, 0
     add ix, sp
-    ;backup af
-    push af
     ;backup interrupt
     ld a, i ; P = IEF2
     di
     push af
 
     exx
-    push hl
-    push de
     ld hl, 0
-    push bc
     exx
 
     push de
     push hl
-    push iy
-    push bc
 
     ;Stack Use:
     ; ix-1 : 0
-    ; ix-2 : a
-    ; ix-3 : f
-    ; ix-4 : 0
-    ; ix-5 : a interrupt stuff
-    ; ix-6 : f interrupt stuff
-    ; ix-7 : hlu'
-    ; ix-8 : h'
-    ; ix-9 : l'
-    ; ix-10: deu'
-    ; ix-11: d'
-    ; ix-12: e'
-    ; ix-13: bcu'
-    ; ix-14: b'
-    ; ix-15: c'
-    ; ix-16: deu n[5]
-    ; ix-17: d   n[4]
-    ; ix-18: e   n[3]
-    ; ix-19: hlu n[2]
-    ; ix-20: h   n[1]
-    ; ix-21: l   n[0]
-    ; ix-22: iyu d[5]
-    ; ix-23: iyh d[4]
-    ; ix-24: iyl d[3]
-    ; ix-25: bcu d[2]
-    ; ix-26: b   d[1]
-    ; ix-27: c   d[0]
+    ; ix-2 : a interrupt stuff
+    ; ix-3 : f interrupt stuff
+    ; ix-4 : deu n[5]
+    ; ix-5 : d   n[4]
+    ; ix-6 : e   n[3]
+    ; ix-7 : hlu n[2]
+    ; ix-8 : h   n[1]
+    ; ix-9 : l   n[0]
     
     ; Set up for c quotient, uhl':uhl remainder, and ude':ude denom
-    ld de, (ix-27) ; ude = low denom
+
+    ; ude = low denom
+    ld de, 0
+    ex de, hl
+    add hl, bc
+    ex de, hl
     
     exx
     lea de, iy+0 ; ude' = iy = high denom
@@ -81,7 +64,7 @@ __i48dvrmu:
 .byteLoop:
     exx
     ld b, 8 ; b' = bit counter
-    ld a, (ix-16); a = relevant numerator byte
+    ld a, (ix-4); a = relevant numerator byte
 .bitLoop:
     exx ; loop entered with alt registers as b' is bit counter, exx here to not be in alt
     sla c ; q<<1
@@ -110,33 +93,30 @@ __i48dvrmu:
     djnz .bitLoop
 .postBit:
     exx
-    ld (ix-16), c ; now that numerator byte isn't needed, overwrite with quotient
+    ld (ix-4), c ; now that numerator byte isn't needed, overwrite with quotient
     dec ix
     djnz .byteLoop
 
     ;finish and clean up
 
-    pop bc
-    ld (ix-27), hl ; use bc's old space for remainder low
-    pop iy
-    pop hl ; hl = lower quotient
-    pop de ; de = upper quotient
+    ; iy = remainder high
+    ld iy, 0
     exx
-    ld (ix-18), hl ; use de's old space for remainder high
-    ; restore alts
-    pop bc
-    pop de
-    pop hl
+    ex de, hl
+    add iy, de
     exx
 
-    ; load remainder into return registers
-    ld bc, (ix-27)
-    ld iy, (ix-18)
+    ; bc = remainder low
+    push hl
+    pop bc
+
+    pop hl ; hl = lower quotient
+    pop de ; de = upper quotient
 
     pop af
     jp po, .skipEI
     ei
 .skipEI:
-    pop af
     pop ix
+    pop af
     ret
