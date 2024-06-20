@@ -4,55 +4,42 @@
     public __i48divs
 ; Result in ude:uhl
 __i48divs:
+    push ix
+    ld ix, -1
     push iy
     push bc
     
     ; iy sign check
     push hl
     lea hl, iy
-    add hl, bc
+    add hl, de
     or a, a
-    sbc hl, bc
+    sbc hl, de
     pop hl
-    jq m, .oneArgNegUiyUbc
-
-    ; de sign check
-    ex de, hl
-    add hl, de
-    or a, a
-    sbc hl, de
-    ex de, hl
-    jq m, .oneArgNegUdeUhl
-    call __i48dvrmu
-    jq .exit
-
-.oneArgNegUiyUbc:
-    ; uiyubc = -uiyubc
+    jq p, .skipNegUiyUbc
     call __uiyubcNeg
-
+    inc ixl
+.skipNegUiyUbc:
     ; de sign check
     ex de, hl
     add hl, de
     or a, a
     sbc hl, de
     ex de, hl
-    jq m, .twoArgNeg
-    call __i48dvrmu
-    call __i48neg ; result = -result
-    jq .exit
-
-.oneArgNegUdeUhl:
+    jq p, .skipi48Neg
     call __i48neg
+    inc ixl
+.skipi48Neg:
     call __i48dvrmu
-    call __i48neg ; result = -result
-    jq .exit
-
-.twoArgNeg:
-    call __i48neg
-    call __i48dvrmu
-.exit:
     pop bc
     pop iy
+
+    inc ixl
+    dec ixl
+    pop ix
+    ret nz
+
+    call __i48neg
     ret
 
     extern	__i48dvrmu

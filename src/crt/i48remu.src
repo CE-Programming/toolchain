@@ -10,8 +10,8 @@ __i48remu:
     
     call __i48dvrmu
     lea de, iy+0
-    push bc
-    pop hl
+    ld hl, 0
+    add hl, bc
 
     pop bc
     pop iy
