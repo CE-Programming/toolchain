@@ -1,0 +1,33 @@
+; Performs unsigned 48 bit shift right
+; 
+; Arguments:
+; ude = Most significant bytes of arg 1
+; uhl = Least significant bytes of arg 1
+; c = Amount to shift by
+
+
+; Returns:
+; ude:uhl = ude:uhl>>c
+
+	assume	adl=1
+
+	section	.text
+	public	__i48shru
+__i48shru:
+	inc c
+	dec c
+	ret z
+	push ix
+	ld ix, 0
+	add ix, sp
+	push bc
+	ld b, c
+	push af
+	push de
+	push hl
+	ld c, (ix-7)
+	ld a, (ix-10)
+	srl c
+	jp __i48shrs.midloop
+	
+	extern __i48shrs.midloop
