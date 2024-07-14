@@ -1,6 +1,33 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.2...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.3...master)
+
+# [v11.3](https://github.com/CE-Programming/toolchain/releases/tag/v11.3) (2023-8-24)
+
+* **New features**
+  * Added strftime implementation by @mateoconlechuga
+  * Fixed off-by-one localtime day calculation (#469) by @mateoconlechuga
+  * Added features to convimg by @mateoconlechuga
+  * Added support for different memory allocators by @mateoconlechuga
+
+* **Bugfixes**
+  * Exit functions are no longer read-only by @commandblockguy
+  * Fixed off-by-one localtime day calculation (#469) by @mateoconlechuga
+  * Fixed clipped text respecting multiple transparent colors (#353) by @mateoconlechuga
+  * Fixed stop token in os_RunPrgm by @mateoconlechuga
+  * Fixed initializer_list definition by @jacobly0
+  * Fixed write crash in fileioc (#461) by @mateoconlechuga
+  * Fixed floating point multiply bug by @calc84maniac
+  * Fixed incorrect sign compare in __lcmpzero by @calc84maniac
+
+* **Improvements**:
+  * Fixes/improvements for str[n]casecmp by @calc84maniac
+  * Fixes/improvements for GetStringInput by @calc84maniac
+  * Fix skipping of large USB transfers by @jacobly0
+  * Ensure interface is set in MSDDRVCE by @mateoconlechuga
+  * Optimize 24-bit and 32-bit and/or/xor operations by @calc84maniac
+  * Optimize malloc implementation by @calc84maniac
+  * CI macos improvements by @adriweb
 
 # [v11.2](https://github.com/CE-Programming/toolchain/releases/tag/v11.2) (2023-8-24)
 
@@ -120,31 +147,31 @@
   * Implement 64-bit math support. By @runer112 in https://github.com/CE-Programming/toolchain/pull/354
   * LTO (link-time optimization) is now available and enabled by default - it may help generating smaller binaries.
   * `make test` is available for the examples to launch the _autotest_ if available, which uses a now-shipped CLI-based CEmu with the autotester.
-  * A "nightly" automated release is now available for each new commit on the master branch, thanks to @mateoconlechuga 
-  * `alloca` is now available. By @mateoconlechuga and @jacobly0  
+  * A "nightly" automated release is now available for each new commit on the master branch, thanks to @mateoconlechuga
+  * `alloca` is now available. By @mateoconlechuga and @jacobly0
   * More/Better support for C++ in various headers
   * Ellipse and filled ellipse routines added to GraphX by @PeterTillema
 
 * **Bugfixes**:
-  * A few bugs in the **ez80-clang** compiler were fixed by @jacobly0 
-  * A few bugs in the tooling _(convimg, convbin...)_ and libload were fixed by @mateoconlechuga 
+  * A few bugs in the **ez80-clang** compiler were fixed by @jacobly0
+  * A few bugs in the tooling _(convimg, convbin...)_ and libload were fixed by @mateoconlechuga
   * Pop arguments after calling `_asin` by @PeterTillema in https://github.com/CE-Programming/toolchain/pull/352
-  * Implement `strrchr` since the static zilog one was broken. By @jacobly0 
-  * **std**: Fix various standard defines. By @jacobly0 
-  * Fix `NULL` argument to `strtok` (fix https://github.com/CE-Programming/toolchain/issues/348) by @commandblockguy 
-  * **FileIOC**: Fix return value for ti_RclVar. By @commandblockguy 
+  * Implement `strrchr` since the static zilog one was broken. By @jacobly0
+  * **std**: Fix various standard defines. By @jacobly0
+  * Fix `NULL` argument to `strtok` (fix https://github.com/CE-Programming/toolchain/issues/348) by @commandblockguy
+  * **FileIOC**: Fix return value for ti_RclVar. By @commandblockguy
   * Switch addresses of `os_RealAsinRad` and `os_RealAcosRad` by @arjvik in https://github.com/CE-Programming/toolchain/pull/358
 
 * **Improvements**:
   * Optimize and add static math functions. By @runer112 in https://github.com/CE-Programming/toolchain/pull/354
   * Complete refactor of the headers to simplify and better split features. By @drdnar in https://github.com/CE-Programming/toolchain/pull/378
   * Better code generation possible with more section-ing (`section	.text` has to be added in ASM files before code, now)
-  * Two examples/templates are now [available as template repos](https://github.com/CE-Programming/?type=template#org-repositories), make it easier to start developing. Thanks @commandblockguy 
+  * Two examples/templates are now [available as template repos](https://github.com/CE-Programming/?type=template#org-repositories), make it easier to start developing. Thanks @commandblockguy
 
 * **Documentation**:
   * Lots of improvements and details added, following the various refactors listed above, but also typos, clarifications, etc.
   (By @drdnar mainly, but also @runer112, @tari, @mateoconlechuga, @Dragon-Hatcher, @Chr1sDev, @PeterTillema, @mrwompwomp, @Aulimaitar, @HexCodeFFF)
-  
+
 [Full commit list](https://github.com/CE-Programming/toolchain/compare/v9.2.2...v10.0)
 
 # [v9.2.2](https://github.com/CE-Programming/toolchain/releases/tag/v9.2.2) (2021-09-21)
