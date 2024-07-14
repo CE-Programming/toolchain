@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.3...master)
 
-# [v11.3](https://github.com/CE-Programming/toolchain/releases/tag/v11.3) (2023-8-24)
+# [v11.3](https://github.com/CE-Programming/toolchain/releases/tag/v11.3) (2024-7-14)
 
 * **New features**
   * Added strftime implementation by @mateoconlechuga
