@@ -1,0 +1,47 @@
+    assume adl=1
+
+    section .text
+    public __i48divs
+; Result in ude:uhl
+__i48divs:
+    push ix
+    ld ix, -1
+    push iy
+    push bc
+    
+    ; iy sign check
+    push hl
+    lea hl, iy
+    add hl, de
+    or a, a
+    sbc hl, de
+    pop hl
+    jq p, .skipNegUiyUbc
+    call __uiyubcNeg
+    inc ixl
+.skipNegUiyUbc:
+    ; de sign check
+    ex de, hl
+    add hl, de
+    or a, a
+    sbc hl, de
+    ex de, hl
+    jq p, .skipi48Neg
+    call __i48neg
+    inc ixl
+.skipi48Neg:
+    call __i48dvrmu
+    pop bc
+    pop iy
+
+    inc ixl
+    dec ixl
+    pop ix
+    ret nz
+
+    call __i48neg
+    ret
+
+    extern	__i48dvrmu
+    extern  __i48neg
+    extern  __uiyubcNeg
