@@ -394,7 +394,7 @@ typedef struct lcd_lcmctrl {
 //#define LCD_CMD_VRHS        0xC3 /**< VRH set */
 //#define LCD_CMD_VDV         0xC4 /**< VDV set */
 #define LCD_CMD_VCMOFSET    0xC5 /**< VCOM offset set */
-struct lcd_vcmofset {
+typedef struct lcd_vcmofset {
     uint8_t VCMOFS : 6;
     uint8_t : 2;
 } lcd_vcmofset_t;
