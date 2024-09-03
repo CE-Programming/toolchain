@@ -231,7 +231,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: CEdev-${{runner.os}}
           path: ${{github.workspace}}
@@ -283,7 +283,7 @@ jobs:
           pathTarget: ${{env.SECRETS_PATH}}
 
       - name: Download Libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: clibs
           path: ${{env.TOOLCHAIN_PATH}}
@@ -380,22 +380,22 @@ jobs:
 
     steps:
       - name: Download CEdev Linux
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: CEdev-Linux
           path: ${{github.workspace}}
       - name: Download CEdev Windows
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: CEdev-Windows
           path: ${{github.workspace}}
       - name: Download CEdev macOS
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: CEdev-macOS
           path: ${{github.workspace}}
       - name: Download CE Libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.1.7
         with:
           name: clibs
           path: ${{github.workspace}}
