@@ -12,9 +12,9 @@
 	path = tools/convimg
 	url = https://github.com/mateoconlechuga/convimg.git
 	ignore = dirty
-[submodule "examples/graphx/template"]
-	path = examples/graphx/template
-	url = https://github.com/CE-Programming/graphx-template.git
 [submodule "examples/standalone_examples/template"]
 	path = examples/standalone_examples/template
 	url = https://github.com/CE-Programming/template.git
+[submodule "examples/library_examples/graphx/graphx-template"]
+	path = examples/library_examples/graphx/template
+	url = https://github.com/CE-Programming/graphx-template
