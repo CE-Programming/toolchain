@@ -52,6 +52,7 @@ typedef enum {
     FAT_ERROR_INVALID_MAGIC, /**< Some invalid magic bytes were detected */
     FAT_ERROR_INVALID_SIGNATURE, /**< Some invalid signature was detected */
     FAT_ERROR_NO_MORE_ENTRIES, /**< No more entries in the directory */
+    FAT_ERROR_INVALID_NAME, /**< An invalid filename was provided */
 } fat_error_t;
 
 /**

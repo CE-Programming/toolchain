@@ -2,7 +2,7 @@
 include '../include/library.inc'
 ;-------------------------------------------------------------------------------
 
-library FATDRVCE, 2
+library FATDRVCE, 3
 
 ;-------------------------------------------------------------------------------
 ; v1 functions
@@ -54,6 +54,7 @@ virtual at 0
 	FAT_ERROR_INVALID_MAGIC rb 1
 	FAT_ERROR_INVALID_SIGNATURE rb 1
 	FAT_ERROR_NO_MORE_ENTRIES rb 1
+	FAT_ERROR_INVALID_NAME rb 1
 end virtual
 virtual at 0
 	FAT_LIST_FILEONLY rb 1
@@ -1060,6 +1061,10 @@ fat_Create:
 ;  FAT_SUCCESS on success
 	ld	iy,0
 	add	iy,sp
+	ld	hl,(iy + 9)
+	call	util_validate_fat_name
+	ld	hl,FAT_ERROR_INVALID_NAME
+	ret	z
 	ld	hl,-512
 	add	hl,sp
 	ld	sp,hl				; temporary space for concat
@@ -1788,6 +1793,7 @@ util_get_fat_name:
 	jr	z,.done1
 	or	a,a
 	jr	z,.done1
+	call	util_toupper
 	ld	(hl),a
 	inc	de
 	inc	hl
@@ -1823,6 +1829,7 @@ util_get_fat_name:
 	jr	z,.other
 	inc	de
 .store:
+	call	util_toupper
 	ld	(hl),a
 	inc	hl
 	inc	b
@@ -1849,6 +1856,69 @@ util_get_fat_name:
 	jq	.spacefillloop
 .return:
 	pop	de
+	ret
+
+;-------------------------------------------------------------------------------
+util_validate_fat_name:
+; ensure none of the following characters: * ? . , ; : / \ | + = < > [ ] " \t
+; inputs:
+;   hl: pointer to null terminated string
+; outputs:
+;   z set if invalid name
+.loop:
+	ld	a,(hl)
+	or	a,a
+	jr	z,.done
+	cp	a,'*'
+	ret	z
+	cp	a,'?'
+	ret	z
+	cp	a,'.'
+	ret	z
+	cp	a,','
+	ret	z
+	cp	a,';'
+	ret	z
+	cp	a,':'
+	ret	z
+	cp	a,'/'
+	ret	z
+	cp	a,'\'
+	ret	z
+	cp	a,'|'
+	ret	z
+	cp	a,'+'
+	ret	z
+	cp	a,'='
+	ret	z
+	cp	a,'<'
+	ret	z
+	cp	a,'>'
+	ret	z
+	cp	a,'['
+	ret	z
+	cp	a,']'
+	ret	z
+	cp	a,'"'
+	ret	z
+	cp	a,'	'
+	ret	z
+	inc	hl
+	jr	.loop
+.done:
+	inc	a
+	ret
+
+;-------------------------------------------------------------------------------
+util_toupper:
+	sub	a,'a'
+	cp	a,1+'z'-'a'
+	jr	nc,.nochange
+	add	a,'a'
+	res	5,a
+	ret
+.nochange:
+	add	a,'a'
 	ret
 
 ;-------------------------------------------------------------------------------
