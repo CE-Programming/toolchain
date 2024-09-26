@@ -1873,8 +1873,6 @@ util_validate_fat_name:
 	ret	z
 	cp	a,'?'
 	ret	z
-	cp	a,'.'
-	ret	z
 	cp	a,','
 	ret	z
 	cp	a,';'
