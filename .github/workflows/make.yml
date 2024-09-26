@@ -9,7 +9,7 @@ on:
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
-  AUTOTESTER_ROM: ${{github.workspace}}/secrets/84pce_515_53.rom
+  AUTOTESTER_ROM: ${{github.workspace}}/secrets/83pce_515_530.rom
   CEDEV: ${{github.workspace}}/CEdev
   CEDEV_BIN: ${{github.workspace}}/CEdev/bin
   CEDEV_EXAMPLES: ${{github.workspace}}/CEdev/examples
@@ -17,7 +17,6 @@ env:
   CEMU_PATH: ${{github.workspace}}/CEmu
   FASMG_DOMAIN: https://flatassembler.net
   FASMG_PATH: ${{github.workspace}}/fasmg
-  HOST_DOMAIN: https://jacobly.com
   SECRETS_PATH: ${{github.workspace}}/secrets
   TOOLCHAIN_PATH: ${{github.workspace}}/toolchain
 
@@ -31,15 +30,18 @@ jobs:
           - nul: /dev/null
           - runs-on: macos-latest
             fasmg: /source/macos/x64/fasmg
+            ez80-bins-suffix: macOS_arm
             install-output-ext: "dmg"
           - runs-on: windows-latest
             fasmg: /fasmg.exe
+            ez80-bins-suffix: windows
             env: "env:"
             exe: .exe
             nul: nul
             ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
             install-output-ext: "zip"
           - runs-on: ubuntu-20.04
+            ez80-bins-suffix: ubuntu
             fasmg: /fasmg.x64
             install-output-ext: "tar.gz"
     runs-on: ${{matrix.runs-on}}
@@ -47,26 +49,15 @@ jobs:
       - name: Prepare Build Environment
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
-      - name: Download ez80-clang
-        id: ez80-clang
+      - name: Download ez80-clang and ez80-link
+        id: ez80-bins
         uses: carlosperate/download-file-action@v1.0.3
         with:
-          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-clang${{matrix.exe}}-${{matrix.runs-on}}Release
+          file-url: https://github.com/CE-Programming/llvm-project/releases/download/nightly/ez80-clang-link_${{matrix.ez80-bins-suffix}}_nightly.zip
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
-          pathSource: ${{steps.ez80-clang.outputs.file-path}}
-          pathTarget: ${{env.CEDEV_BIN}}
-
-      - name: Download ez80-link
-        id: ez80-link
-        uses: carlosperate/download-file-action@v1.0.3
-        with:
-          file-url: ${{env.HOST_DOMAIN}}/artifact?repo=llvm-project&branch=z80&file=ez80-link${{matrix.exe}}-${{matrix.runs-on}}Release
-      - name: Extract ez80-link
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: ${{steps.ez80-link.outputs.file-path}}
+          pathSource: ${{steps.ez80-bins.outputs.file-path}}
           pathTarget: ${{env.CEDEV_BIN}}
 
       - name: Download Fasmg Download Page
@@ -96,7 +87,7 @@ jobs:
         run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
 
       - name: Checkout CEmu
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{github.repository_owner}}/CEmu
           ref: latest-stable
@@ -119,7 +110,7 @@ jobs:
           fasmg ${{matrix.nul}} ${{matrix.nul}}
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           submodules: recursive
@@ -197,19 +188,21 @@ jobs:
           cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
 
       - name: Upload CEdev
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: CEdev-${{runner.os}}
           path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
 
       - name: Upload Libraries
-        uses: actions/upload-artifact@v2
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
         with:
           name: clibs
           path: ${{env.AUTOTESTER_LIBS_GROUP}}
 
       - name: Upload Libraries Zip
-        uses: actions/upload-artifact@v2
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
         with:
           name: clibs_separately_in_zip
           path: ${{github.workspace}}/toolchain/clibs
@@ -231,7 +224,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CEdev-${{runner.os}}
           path: ${{github.workspace}}
@@ -251,7 +244,7 @@ jobs:
 
       # checkout only for test files -- contents should not be used otherwise.
       - name: Checkout Toolchain
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
@@ -266,24 +259,15 @@ jobs:
       - name: Build Examples
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1
 
-      - name: Download Secrets
-        id: download-secrets
-        uses: carlosperate/download-file-action@v1.0.3
+      - name: Download CI test secrets
+        uses: actions/checkout@v4
         with:
-          file-url: ${{env.HOST_DOMAIN}}/${{github.repository_owner}}/secrets
-          location: ${{env.SECRETS_PATH}}
-      - name: Decrypt Secrets
-        env:
-          KEY: ${{secrets.SYMMETRIC_KEY_256}}
-        run: openssl enc -d -aes-256-cbc -iv a581c6a54a2b51143fecad6794deb32a -K "$${{matrix.env}}KEY" -in ${{steps.download-secrets.outputs.file-path}} -out ${{env.SECRETS_PATH}}/secrets.7z
-      - name: Extract Secrets
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: ${{env.SECRETS_PATH}}/secrets.7z
-          pathTarget: ${{env.SECRETS_PATH}}
+          repository: "CE-Programming/ci-test-secrets"
+          token: ${{ secrets.GH_PAT_CI_SECRETS }}
+          path: "secrets"
 
       - name: Download Libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: clibs
           path: ${{env.TOOLCHAIN_PATH}}
@@ -343,7 +327,7 @@ jobs:
           cmake -E echo >> $${{matrix.env}}GITHUB_PATH $${{matrix.env}}HOME/.local/bin
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
@@ -380,22 +364,22 @@ jobs:
 
     steps:
       - name: Download CEdev Linux
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CEdev-Linux
           path: ${{github.workspace}}
       - name: Download CEdev Windows
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CEdev-Windows
           path: ${{github.workspace}}
       - name: Download CEdev macOS
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: CEdev-macOS
           path: ${{github.workspace}}
       - name: Download CE Libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: clibs
           path: ${{github.workspace}}
