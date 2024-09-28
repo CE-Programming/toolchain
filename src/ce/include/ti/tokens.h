@@ -1109,7 +1109,7 @@ extern "C" {
 #define OS_TOK_T_CDF 0x12
 /** χ²cdf(‎ */
 #define OS_TOK_CHI_CDF 0x13
-/** Fcdf(‎ */
+/** 𝐅cdf(‎ */
 #define OS_TOK_F_CDF 0x14
 /** binompdf(‎ */
 #define OS_TOK_BINOM_PDF 0x15
@@ -1129,7 +1129,7 @@ extern "C" {
 #define OS_TOK_T_PDF 0x1C
 /** χ²pdf(‎ */
 #define OS_TOK_CHI_PDF 0x1D
-/** Fpdf(‎ */
+/** 𝐅pdf(‎ */
 #define OS_TOK_F_PDF 0x1E
 /** randNorm(‎ */
 #define OS_TOK_RAND_NORM 0x1F
@@ -1400,7 +1400,7 @@ extern "C" {
 /** χ‎ */
 #define OS_TOK_CHI 0xAE
 /** 𝐅‎ */
-#define OS_TOK_STAT_F 0xAF
+#define OS_TOK_F_DIST 0xAF
 /** a‎ */
 #define OS_TOK_SMALL_A 0xB0
 /** b‎ */
