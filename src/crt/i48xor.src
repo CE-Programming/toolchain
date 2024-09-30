@@ -1,11 +1,5 @@
-; Performs 48 bit bitwise xor
-; 
-; Arguments:
-; uiy = Most significant bytes of arg 1
-; ubc = Least significant bytes of arg 1
-; ude = Most signficant bytes of arg 2
-; uhl = Least significant bytes of arg 2
-; 
+; Performs 48-bit bitwise xor
+;
 ; Returns:
 ; ude:uhl = ude:uhl ^ uiy:ubc
 

@@ -1,8 +1,4 @@
-; Performs 48 bit unary minus
-; 
-; Arguments:
-; ude = Most significant bytes of arg 1
-; uhl = Least significant bytes of arg 1
+; Performs 48-bit unary minus
 ;
 ; Returns:
 ; ude:uhl = -ude:uhl

@@ -1,9 +1,5 @@
-; Performs 48 bit reversal
-; 
-; Arguments:
-; ude = Most signficant bytes of arg
-; uhl = Least significant bytes of arg
-; 
+; Performs 48-bit bit reversal
+;
 ; Returns:
 ; ude:uhl = ude:uhl bits reversed
 

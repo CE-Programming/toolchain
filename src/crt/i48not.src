@@ -1,10 +1,5 @@
-; Performs 48 bit bitwise not
-; 
-; Arguments:
-; ude = Most significant bytes of arg 1
-; uhl = Least significant bytes of arg 1
-
-
+; Performs 48-bit bitwise not
+;
 ; Returns:
 ; ude:uhl = ~ude:uhl
 
