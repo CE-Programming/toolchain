@@ -1,9 +1,5 @@
-; Performs 48 count leading zeros
-; 
-; Arguments:
-; ude = Most signficant bytes of arg
-; uhl = Least significant bytes of arg
-; 
+; Performs 48-bit count leading zeros
+;
 ; Returns:
 ; a = number of leading 0's in ude:uhl
 

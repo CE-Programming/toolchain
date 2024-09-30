@@ -1,10 +1,8 @@
-; Performs 48 bit unsigned comparison
-; 
+; Performs 48-bit unsigned comparison
+;
 ; Arguments:
-; uiy = Most significant bytes of arg 1
-; ubc = Least significant bytes of arg 1
-; ude = Most signficant bytes of arg 2
-; uhl = Least significant bytes of arg 2
+; ude:uhl = left-hand side
+; uiy:ubc = right-hand side
 ;
 ; Returns:
 ; flags updated according to comparison

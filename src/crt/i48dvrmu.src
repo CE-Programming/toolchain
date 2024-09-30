@@ -1,11 +1,9 @@
-; Performs 48 bit division and modulo
-; 
+; Performs 48-bit division and modulo
+;
 ; Arguments:
-; ude = Most significant bytes of arg 1 (numerator)
-; uhl = Least significant bytes of arg 1
-; uiy = Most signficant bytes of arg 2 (denominator)
-; ubc = Least significant bytes of arg 2
-; 
+; ude:uhl = numerator
+; uiy:ubc = denominator
+;
 ; Returns (loaded into other registers by i48divu/s and i48remu/s):
 ; ude:uhl quotient, uiy:ubc remainder
 

@@ -1,11 +1,5 @@
-; Performs unsigned 48 bit shift right
-; 
-; Arguments:
-; ude = Most significant bytes of arg 1
-; uhl = Least significant bytes of arg 1
-; c = Amount to shift by
-
-
+; Performs 48-bit unsigned shift right
+;
 ; Returns:
 ; ude:uhl = ude:uhl>>c
 

@@ -1,9 +1,5 @@
-; Performs 48 count set bits
-; 
-; Arguments:
-; ude = Most signficant bytes of arg
-; uhl = Least significant bytes of arg
-; 
+; Performs 48-bit population count
+;
 ; Returns:
 ; a = number of set bits in ude:uhl
 
