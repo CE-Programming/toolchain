@@ -318,6 +318,17 @@ jobs:
         if: always()
         run: cmake -E rm -rf ${{env.SECRETS_PATH}}
 
+      - name: "[Linux] Zip built examples"
+        if: runner.os == 'Linux' && matrix.compressed == 'YES'
+        run: zip -r ${{env.CEDEV}}/built-examples.zip ${{env.CEDEV_EXAMPLES}}
+
+      - name: "[Linux] Upload built examples"
+        if: runner.os == 'Linux' && matrix.compressed == 'YES'
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-examples
+          path: ${{env.CEDEV}}/built-examples.zip
+
   docs:
     runs-on: ubuntu-latest
     steps:
@@ -383,6 +394,11 @@ jobs:
         with:
           name: clibs
           path: ${{github.workspace}}
+      - name: Download Built examples
+        uses: actions/download-artifact@v4
+        with:
+          name: built-examples
+          path: ${{github.workspace}}
 
       - name: Rename Artifacts
         run: |
@@ -390,6 +406,7 @@ jobs:
           mv CEdev-Windows.zip CEdev-Windows-nightly.zip
           mv CEdev-macOS.dmg CEdev-macOS-nightly.dmg
           mv clibs.8xg clibs-nightly.8xg
+          mv built-examples.zip built-examples-nightly.zip
 
       - name: Update nightly release
         uses: pyTooling/Actions/releaser@main
@@ -402,3 +419,4 @@ jobs:
             CEdev-Windows-nightly.zip
             CEdev-macOS-nightly.dmg
             clibs-nightly.8xg
+            built-examples-nightly.zip
