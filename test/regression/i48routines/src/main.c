@@ -245,6 +245,12 @@ void gen_regs_signed_near_zero(regs_t *regs) {
     regs->dehl.s_ext %= 2;
 }
 
+void gen_regs_unsigned_near_zero(regs_t *regs) {
+    gen_regs_signed_near_zero(regs);
+    regs->dehl.z_ext = regs->dehl.full;
+    regs->iybc.z_ext = regs->iybc.full;
+}
+
 void gen_regs_signed_near_int_max(regs_t *regs) {
     gen_regs_signed(regs);
     regs->dehl.s_ext = (int64_t)INT24_MAX + (regs->dehl.s_ext % 2);
@@ -334,6 +340,7 @@ int main(void)
         TEST(unsigned, i48dvrmu, 0)
         TEST(unsigned, i48mulu, 0)
         TEST(unsigned, i48neg, 0)
+        TEST(unsigned_near_zero, i48neg, 0)
         TEST(unsigned, i48not, 0)
         TEST(unsigned, i48or, 0)
         TEST(unsigned, i48popcnt, 0)
