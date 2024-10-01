@@ -8,75 +8,77 @@ assume	adl=1
 	section	.text
 	public	__i48shl
 __i48shl:
-	bit	0, c
-	jr	z, .bit0
+	push bc
+	ld b, a
+
+	ld a, e ; Accumulate E in A to reduce register exchanges and preserve Z
+	srl c
+	jr nc, .bit0
 	; ude:uhl<<1
 	add hl, hl
+	rla
 	ex de, hl
-	adc hl, hl
+	add hl, hl
 	ex de, hl
 .bit0:
-	bit	1, c
-	jr	z, .bit1
+	srl c
+	jr nc, .bit1
 	; ude:uhl<<2
 	add hl, hl
-	ex de, hl
-	adc hl, hl
+	rla
+	add hl, hl
+	rla
 	ex de, hl
 	add hl, hl
-	ex de, hl
-	adc hl, hl
+	add hl, hl
 	ex de, hl
 .bit1:
-	bit	2, c
-	jr	z, .bit2
+	srl c
+	jr nc, .bit2
 	; ude:uhl<<4
 	add hl, hl
-	ex de, hl
-	adc hl, hl
+	rla
+	add hl, hl
+	rla
+	add hl, hl
+	rla
+	add hl, hl
+	rla
 	ex de, hl
 	add hl, hl
-	ex de, hl
-	adc hl, hl
-	ex de, hl
 	add hl, hl
-	ex de, hl
-	adc hl, hl
-	ex de, hl
 	add hl, hl
-	ex de, hl
-	adc hl, hl
+	add hl, hl
 	ex de, hl
 .bit2:
-	; set up stack stuff for later
-	push ix
-	ld ix, 0
+	ld e, a
+
+	jr z, .done ; Early out when no byte shift is needed
+	; Subtract the byte shift amount from 9
+	ld a, 9
+	sub a, c ; Clears carry for valid shift amounts
+
+	; Push the result shifted left by 48 as a 96-bit value on the stack
 	push de
 	push hl
-	push ix
-	push ix
-	add ix, sp
-	
-	bit	3, c
-	jr	z, .bit3
-	; ude:uhl<<8
-	dec ix
-.bit3:
-	bit 4, c
-	jr z, .bit4
-	; ude:uhl<<16
-	lea ix, ix-2
-.bit4:
-	bit 5, c
-	jr z, .finish
-	; ude:uhl<<32
-	lea ix, ix-4
-.finish:
-	ld de, (ix+9)
-	ld hl, (ix+6)
-	pop ix
-	pop ix
-	pop ix
-	pop ix
-	pop ix
+	sbc hl, hl
+	push hl
+	push hl
+
+	; Offset and read the byte-shifted value
+	ld l, a
+	add hl, sp
+	ld de, (hl)
+	dec hl
+	dec hl
+	dec hl
+	ld hl, (hl)
+
+	pop af
+	pop af
+	pop af
+	pop af
+.done:
+	ld a, b
+	pop bc
 	ret
