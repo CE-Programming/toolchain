@@ -245,6 +245,11 @@ void gen_regs_signed_near_zero(regs_t *regs) {
     regs->dehl.s_ext %= 2;
 }
 
+void gen_regs_signed_near_int_max(regs_t *regs) {
+    gen_regs_signed(regs);
+    regs->dehl.s_ext = (int64_t)INT24_MAX + (regs->dehl.s_ext % 2);
+}
+
 void print_regs(regs_t *regs) {
     printf("A=%02X DE=%06X HL=%06X\n"
            "F=%02X IY=%06X BC=%06X\n",
@@ -317,6 +322,7 @@ int main(void)
         TEST(unsigned_near, i48cmpu, 0x41)
         TEST(signed, i48cmpzero, 0xC0)
         TEST(signed_near_zero, i48cmpzero, 0xC0)
+        TEST(signed_near_int_max, i48cmpzero, 0xC0)
         TEST(unsigned, i48ctlz, 0)
         TEST(signed, i48divs, 0)
         TEST(unsigned, i48divu, 0)

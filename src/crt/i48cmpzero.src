@@ -16,8 +16,10 @@ __i48cmpzero:
 	ex de, hl
 	ret nz
 	;check lsb's == 0
-	add hl, bc
-	or a, a
-	sbc hl, bc
+	;in this path, de = 0 and carry is reset
+	sbc hl, de
+	ret p
+	;special case if bit 23 is set
+	inc e ; reset z and s flags
+	dec de
 	ret
-	
