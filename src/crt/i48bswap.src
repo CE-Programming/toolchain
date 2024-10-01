@@ -8,42 +8,29 @@
 	section	.text
 	public	__i48bswap
 __i48bswap:
-	push bc
-
-	ld b, l ; save l for later
-
+	; Line up the reversed data on the stack
 	push hl
-	ld hl, 0
-	add hl, sp
+	ld h, e
+	ld l, d
+	ex (sp), hl
+	ld d, l
+	ld e, h
 	push de
-	dec hl
-	; -1: u[hl]
-	; -2: h
-	; -3: l
-	; -4: u[de]   <--hl
-	; -5: d
-	; -6: e
+	push hl
+	; -1: hlu
+	; -2: e
+	; -3: d
+	; -4: deu
+	; -5: l
+	; -6: h
+	; -7: hlu
+	; -8: h
+	; -9: l
 
-	; reverse de bytes
-	ld c, (hl) ; c = u[de]
-	ld (hl), e ; u[de] on stack = e
-	pop de ; ude = e d e
-	ld e, c ; ude = e d u[de]
-	
-	inc hl
-	inc hl
-	inc hl
-
-	; reverse hl bytes
-	; -1: u[hl]   <--hl
-	; -2: h
-	; -3: l
-	ld c, (hl) ; c = u[hl]
-	ld (hl), b ; u[hl] on stack = l
-	pop hl ; uhl = l h l
-	ld l, c ; uhl = l h u[hl]
-
-	ex de, hl
-
-	pop bc
+	; Misalign the stack and pop into the correct registers
+	inc sp
+	inc sp
+	pop de
+	pop hl
+	inc sp
 	ret
