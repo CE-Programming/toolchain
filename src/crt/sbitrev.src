@@ -4,16 +4,15 @@
 	public	__sbitrev
 __sbitrev:
 	push	af
+	ld	a, l				; a=L
 	push	hl
 	dec	sp
 	pop	hl
-	inc	sp			; uhl=HL?
-	call	__internal_bitrev_byte	; a=H', uhl=L?0
-	ld	l, a			; uhl=L?H'
-	call	__internal_bitrev_byte	; a=L', hl=H'0
-	ld	l, h
-	ld	h, a			; hl=L'H'
+	inc	sp				; uhl=HL?
+	call	__internal_bitrev_two_bytes	; a=H', uhl=L?L'
+	ld	h, l
+	ld	l, a				; hl=L'H'
 	pop	af
 	ret
 
-	extern	__internal_bitrev_byte
+	extern	__internal_bitrev_two_bytes
