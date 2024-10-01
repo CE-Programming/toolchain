@@ -10,16 +10,42 @@
 __i48and:
 	push af
 
-	; Low and high
+	; Deal with Upper Byte
+	push hl
+	push bc
+	push de
+	scf
+	sbc hl, hl
+	add hl, sp ; uhl = &iyu
+	push iy
+
+	ld de, 3
+	ld a, (hl) ; a = iyu
+	add hl, de
+	and a, (hl) ; a &= deu
+	ld (hl), a ; deu = a
+
+	add hl, de
+	ld a, (hl) ; a = bcu
+	add hl, de
+	and a, (hl) ; a &= hlu
+	ld (hl), a ; hlu = a
+
+	; Load values back into registers and process low and high bytes
+	pop bc
+	pop de
 
 	ld a, d
-	and a, iyh
+	and a, b ; = iyh
 	ld d, a
 
 	ld a, e
-	and a, iyl
+	and a, c ; = iyl
 	ld e, a
-    
+
+	pop bc
+	pop hl
+
 	ld a, h
 	and a, b
 	ld h, a
@@ -28,43 +54,5 @@ __i48and:
 	and a, c
 	ld l, a
 
-	; Push 2/3 done values
-	push iy
-	ld iy, 0
-	add iy, sp
-	push de
-	push hl
-	push bc
-
-	; -1 : iyu
-	; -2 : iyh
-	; -3 : iyl = iy
-	; -4 : ude
-	; -5 : d
-	; -6 : e
-	; -7 : uhl
-	; -8 : h
-	; -9 : l
-	;-10 : ubc
-	;-11 : b
-	;-12 : c
-
-	; Deal with Upper Byte
-
-	ld a, (iy-1) ; a = u[de] (modified)
-	and a, (iy+2) ; a &= u[iy]
-	ld (iy-1), a ; u[de] (modified) = a
-
-	ld a, (iy-4) ; a = u[hl] (modified)
-	and a, (iy-7) ; a &= u[bc]
-	ld (iy-4), a ; u[hl] (modified) = a
-
-	; Load values back into registers and clean up stack
-	pop bc
-	pop hl
-	pop de
-	pop iy
-
 	pop af
-
 	ret
