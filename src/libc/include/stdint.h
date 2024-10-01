@@ -89,7 +89,7 @@ typedef  __UINT_LEAST32_TYPE__                uint_least32_t;
 
 #ifdef   __SIZEOF_INT48__
 #define         __INT48_TYPE__              signed __int48
-#define         __INT48_MAX__  ((__UINT48_TYPE__)(__UINT48_MAX__>>1))
+#define         __INT48_MAX__  ((__INT48_TYPE__)(__UINT48_MAX__>>1))
 typedef         __INT48_TYPE__                       int48_t;
 #define           INT48_MIN                      (~__INT48_MAX__)
 #define           INT48_MAX                        __INT48_MAX__

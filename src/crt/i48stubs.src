@@ -83,7 +83,7 @@ __i48cmpu:
 	ret
 
 	section	.text
-	public	__i48cmpu
+	public	__i48cmpzero
 __i48cmpzero:
 	push	bc
 	dec	sp
@@ -248,8 +248,11 @@ __i48dvrmu:
 	pop	af
 	pop	bc
 	pop	bc
+	ex	(sp), hl
 	pop	bc
+	push	de
 	pop	iy
+	pop	de
 	inc	sp
 	inc	sp
 	inc	sp
@@ -258,11 +261,13 @@ __i48dvrmu:
 	section	.text
 	public	__i48ctlz
 __i48ctlz:
+	push	bc
 	xor	a, a
 	ld	b, a
 	ld	c, a
 	call	__llctlz
 	sub	a, 16
+	pop	bc
 	ret
 
 	section	.text
