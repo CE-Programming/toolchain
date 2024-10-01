@@ -8,37 +8,16 @@
 	section	.text
 	public	__i48not
 __i48not:
-	push de
-	ex de, hl
+	add hl, de ; hl = HL + DE
+	ex de, hl ; hl = DE, de = HL + DE
+	or a, a
+	sbc hl, de ; hl = -HL
+	ex de, hl ; hl = HL + DE, de = -HL
+	add hl, de ; hl = DE
+	add hl, de ; hl = DE - HL
+	ex de, hl ; hl = -HL, de = DE - HL
 	scf
-	sbc hl, hl ; hl = -1
-	or a, a ; reset carry flag
-	sbc hl, de ; hl = -1 -value of hl = ~hl
-
-	; -3: e                <-- SP
-	; -2: d
-	; -1: u[de]
-	; -0: everything else
-
-	ex (sp), hl ; hl = original value of de
-
-	; -3: ~l                <-- SP
-	; -2: ~h
-	; -1: ~u[hl]
-	; -0: everything else
-
-	ex de, hl
-	scf
-	sbc hl, hl ; hl = -1
-	or a, a ; reset carry flag
-	sbc hl, de ; hl = -1-value of de
-	ex de, hl	
-
-	; -3: ~l               <-- SP
-	; -2: ~h
-	; -1: ~u[hl]
-	; -0: everything else
-
-	pop hl
-
-    ret
+	sbc hl, de ; hl = -DE - 1
+	ex de, hl ; hl = DE - HL, de = -DE - 1 = ~DE
+	add hl, de ; hl = -HL - 1 = ~HL
+	ret
