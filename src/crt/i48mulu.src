@@ -260,14 +260,13 @@ __i48mulu:
 
 	ld (ix-16), hl
 
-	;clean up stack
+	;clean up stack and restore registers
 	pop hl
 	pop de
-	pop ix
-	pop ix
-	pop ix
-	pop ix
-	pop ix
+	pop bc
+	pop bc
+	pop iy
+	ld sp, ix
 	pop ix
 
 	pop af ; interrupt stuff back, P/V = IEF2

@@ -5,7 +5,7 @@
 ; uiy:ubc = right-hand side
 ;
 ; Returns:
-; flags updated according to comparison
+; Z and C flags updated according to comparison
 
 	assume	adl=1
 
@@ -13,16 +13,13 @@
 	public	__i48cmpu
 __i48cmpu:
 	push hl
-
-	lea hl, iy+0 ;iy
-	sbc hl, de
-	jq nz, .ccfExit
+	or a, a
+	lea hl, iy
+	sbc hl, de ; subtract IY - DE, which is the other way around
+	ccf ; complement carry
 	pop hl
-	push hl
-	sbc hl, bc ; subtracting operands the other way around
-	pop hl
-	ret ; don't compliment carry
-.ccfExit:
-	pop hl
-	ccf
-	ret
+	ret nz
+	or a, a
+	sbc hl, bc ; subtract the low parts the normal way
+	add hl, bc ; causes the same carry, preserves Z
+	ret ; don't complement carry

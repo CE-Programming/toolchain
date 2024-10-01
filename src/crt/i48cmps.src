@@ -5,7 +5,7 @@
 ; uiy:ubc = right-hand side
 ;
 ; Returns:
-; flags updated according to comparison
+; S and V flags updated according to comparison
 
 	assume	adl=1
 
@@ -14,12 +14,12 @@
 __i48cmps:
 	push hl
 	push de
+	or a, a
 	sbc hl, bc ; compare hl to bc
 	ex de, hl ; hl = de
-	lea de, iy+0 ; de = iy
-	sbc hl, de ; compare de to iy 
+	lea de, iy ; de = iy
+	sbc hl, de ; compare de to iy
 	pop de
 	pop hl
-	
 	ret
 
