@@ -9,19 +9,23 @@
 	public	__i48ctlz
 __i48ctlz:
 	push de
-	push hl
+	ex de, hl
 
-	scf
-	sbc a, a
+	; Check if upper half is non-zero
+	add hl, de
+	xor a, a
+	sbc hl, de
+	jr nz, .nonzero
 
+	; Skip to lower half
+	add hl, de
+	sub a, -23 ; Set carry to prevent infinite loop
 .loop:
-	adc hl, hl
-	ex de, hl
-	adc hl, hl
-	ex de, hl
 	inc a
+.nonzero:
+	adc hl, hl
 	jr nc, .loop
-	
-	pop hl
+
+	ex de, hl
 	pop de
 	ret
