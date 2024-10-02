@@ -1,120 +1,89 @@
 ; Performs 48-bit division and modulo
 ;
 ; Arguments:
-; ude:uhl = numerator
-; uiy:ubc = denominator
+; ude:uhl = dividend
+; uiy:ubc = divisor
 ;
 ; Returns (loaded into other registers by i48divu/s and i48remu/s):
 ; ude:uhl quotient, uiy:ubc remainder
 
-    assume adl=1
+	assume adl=1
 
-    section .data
+	section .data
 
-    section .text
-    public __i48dvrmu
+	section .text
+	public __i48dvrmu
 
 __i48dvrmu:
-    ;backup af
-    push af
+	;backup af
+	push af
 
-    push ix
-    ld ix, 0
-    add ix, sp
-    ;backup interrupt
-    ld a, i ; P = IEF2
-    di
-    push af
+	;backup interrupt
+	ld a, i ; P = IEF2
+	di
+	push af
 
-    exx
-    ld hl, 0
-    exx
+	; save dividend to stack
+	push de
+	push hl
 
-    push de
-    push hl
-
-    ;Stack Use:
-    ; ix-1 : 0
-    ; ix-2 : a interrupt stuff
-    ; ix-3 : f interrupt stuff
-    ; ix-4 : deu n[5]
-    ; ix-5 : d   n[4]
-    ; ix-6 : e   n[3]
-    ; ix-7 : hlu n[2]
-    ; ix-8 : h   n[1]
-    ; ix-9 : l   n[0]
-    
-    ; Set up for c quotient, uhl':uhl remainder, and ude':ude denom
-
-    ; ude = low denom
-    ld de, 0
-    ex de, hl
-    add hl, bc
-    ex de, hl
-    
-    exx
-    lea de, iy+0 ; ude' = iy = high denom
-    exx
-
-    ld bc, $000600 ; b = byte counter
-    ld iy, 0
-    ld hl, 0
+	; Set up for ubc' dividend/quotient ptr, uhl':uhl remainder, and ude':ude divisor
+	push bc
+	pop de ; ude = low divisor
+	ld hl, 6
+	ld c, l ; c = byte counter
+	add hl, sp
+	push hl
+	sbc hl, hl  ; uhl = low remainder
+	exx
+	pop bc ; ubc' = dividend/quotient pointer
+	lea de, iy ; ude' = iy = high divisor
+	sbc hl, hl ; uhl' = high remainder
 .byteLoop:
-    exx
-    ld b, 8 ; b' = bit counter
-    ld a, (ix-4); a = relevant numerator byte
+	dec bc
+	ld a, (bc); a = relevant dividend byte
+	exx
+	ld b, 8 ; b = bit counter
 .bitLoop:
-    exx ; loop entered with alt registers as b' is bit counter, exx here to not be in alt
-    sla c ; q<<1
-    ; r<<1 and r[0] = n[b]
-    rla ; c = n[b]
-    adc hl, hl ; low r += low r + n[b]
-    exx
-    adc hl, hl ; high r += high r + c from low r
-    exx
-    ; r - d
-    sbc hl, de ; low r -= low d
-    exx
-    sbc hl, de ; high r -= high d
-    exx
-    jr nc, .greaterEqual
-    ; restore if r<d
-    add hl, de ; restore low
-    exx
-    adc hl, de ; restore high
-    djnz .bitLoop
-    jr .postBit
+	; r<<1 and r[0] = n[b]
+	rla ; c = n[b], ~q[b-1] = c
+	adc hl, hl ; low r += low r + n[b]
+	exx
+	adc hl, hl ; high r += high r + c from low r
+	exx
+	; r - d
+	sbc hl, de ; low r -= low d
+	exx
+	sbc hl, de ; high r -= high d
+	exx
+	jr nc, .greaterEqual
+	; restore if r<d
+	add hl, de ; restore low
+	exx
+	adc hl, de ; restore high
+	exx
 .greaterEqual:
-    ; keep r -= d, and update quotient
-    inc c
-    exx
-    djnz .bitLoop
-.postBit:
-    exx
-    ld (ix-4), c ; now that numerator byte isn't needed, overwrite with quotient
-    dec ix
-    djnz .byteLoop
+	; carry contains inverted quotient bit, which is saved in the next iteration
+	djnz .bitLoop
+	rla ; ~q[b] = c
+	cpl ; uninvert quotient
+	dec c ; decrement byte counter
+	exx
+	ld (bc), a ; now that dividend byte isn't needed, overwrite with quotient
+	jr nz, .byteLoop
 
-    ;finish and clean up
+	;finish and clean up
 
-    ; iy = remainder high
-    ld iy, 0
-    exx
-    ex de, hl
-    add iy, de
-    exx
+	push hl
+	exx
+	pop iy ; iy = remainder high
+	ex (sp), hl ; hl = lower quotient
+	pop bc ; bc = remainder low
+	pop de ; de = upper quotient
 
-    ; bc = remainder low
-    push hl
-    pop bc
-
-    pop hl ; hl = lower quotient
-    pop de ; de = upper quotient
-
-    pop af
-    jp po, .skipEI
-    ei
+	pop af
+	jp po, .skipEI
+	ei
 .skipEI:
-    pop ix
-    pop af
-    ret
+	pop af
+	ret
