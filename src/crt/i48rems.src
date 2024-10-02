@@ -1,52 +1,37 @@
-    assume adl=1
+	assume	adl=1
 
-    section .text
-    public __i48rems
+	section	.text
+	public	__i48rems
 ; Result in ude:uhl
 __i48rems:
-    push iy
-    push bc
-    
-    ; iy sign check
-    push hl
-    lea hl, iy
-    add hl, de
-    or a, a
-    sbc hl, de
-    pop hl
-    call m, __uiyubcNeg
+	push iy
+	push bc
 
-    ; de sign check
-    ex de, hl
-    add hl, de
-    or a, a
-    sbc hl, de
-    ex de, hl
-    push af
-    call m, __i48neg
-    pop af
+	; divisor sign check
+	push hl
+	lea hl, iy
+	add hl, hl
+	call c, __uiyubcNeg
 
-    call __i48dvrmu
-    jq m, .negExit
-    jr .exit
+	; dividend sign check
+	sbc hl, hl
+	adc hl, de
+	pop hl
+	push af
+	call m, __i48neg
+	pop af
 
-; uhl:ude (numerator) negative case
-.negExit:
-    lea de, iy+0
-    ld hl, 0
-    add hl, bc
-    call __i48neg
-    jr .cleanup
-; uhl:ude (numerator) positive case
-.exit:
-    lea de, iy+0
-    ld hl, 0
-    add hl, bc
-.cleanup:
-    pop bc
-    pop iy
-    ret
+	call __i48dvrmu
+	lea de, iy
+	push bc
+	pop hl
+	; negate remainder if dividend was negative
+	call m, __i48neg
 
-    extern	__i48dvrmu
-    extern  __i48neg
-    extern  __uiyubcNeg
+	pop bc
+	pop iy
+	ret
+
+	extern	__i48dvrmu
+	extern	__i48neg
+	extern	__uiyubcNeg
