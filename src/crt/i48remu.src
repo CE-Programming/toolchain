@@ -1,20 +1,21 @@
-    assume adl=1
+	assume	adl=1
 
-    section .text
-    public __i48remu
+	section	.text
+	public	__i48remu
 
 ; Result in ude:uhl
 __i48remu:
-    push iy
-    push bc
-    
-    call __i48dvrmu
-    lea de, iy+0
-    ld hl, 0
-    add hl, bc
+	push iy
+	push bc
 
-    pop bc
-    pop iy
-    ret
+	call __i48dvrmu
+	lea de, iy
+	or a, a
+	sbc hl, hl
+	add hl, bc
 
-    extern	__i48dvrmu
+	pop bc
+	pop iy
+	ret
+
+	extern	__i48dvrmu
