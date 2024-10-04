@@ -1164,7 +1164,7 @@ fat_Create:
 	xor	a,a
 	sbc	hl,hl
 	ld	(yfat.working_cluster),a,hl
-	call	util_alloc_entry
+	call	util_alloc_entry.enter
 	ld	(yfat.working_next_entry),de
 	ld	(yfat.working_block),a,hl
 	call	util_block_to_cluster
@@ -1616,20 +1616,16 @@ util_do_alloc_entry:
 
 ;-------------------------------------------------------------------------------
 ; inputs:
-;   iy : fat struct
+;   iy: fat struct
 ;   iy + working_cluster: first cluster
 ;   iy + working_block: parent entry block
 ;   iy + working_entry: parent entry in block
 ; outputs:
-;   auhl : new entry block
-;   de : offset in entry block
+;   auhl: new entry block
+;   de: offset in entry block
 util_alloc_entry:
 	ld	a,hl,(yfat.working_cluster)
-	call	util_cluster_to_block
-	ld	(.blockhigh),a
-	ld	(.blocklow),hl
 .enter:
-	ld	a,hl,(yfat.working_cluster)
 	call	util_cluster_to_block
 	compare_auhl_zero
 	jq	nz,.validcluster
@@ -1650,7 +1646,7 @@ util_alloc_entry:
 	cp	a,$e5				; deleted entry, let's use it!
 	jr	z,.foundavailentry
 	or	a,a
-	jq	z,.foundendoflist		; end of list, let's allocate here
+	jq	z,.foundavailentry		; end of list, let's allocate here
 	djnz	.findavailentry
 	pop	iy,af,hl
 	call	util_increment_auhl
@@ -1673,26 +1669,6 @@ util_alloc_entry:
 	lea	de,iy				; pointer to new entry
 	pop	iy,af,hl,bc			; auhl = block with entry
 	ret
-.foundendoflist:
-	dec	b
-	jq	z,.movetonextcluster
-	lea	de,iy				; pointer to new entry
-	pop	iy,af,hl,bc
-	push	af,hl,de
-	ld	a,0
-.blockhigh := $-1
-	ld	hl,0
-.blocklow := $-3
-	call	util_write_fat_block
-	pop	de,hl
-	jq	nz,.error
-	pop	af
-	ret
-.error:
-	pop	hl
-	xor	a,a
-	sbc	hl,hl
-	ret
 
 ;-------------------------------------------------------------------------------
 ; inputs:
@@ -1709,7 +1685,7 @@ util_alloc_entry_root:
 	ld	a,hl,(yfat.root_dir_pos)
 	call	util_block_to_cluster
 	ld	(yfat.working_cluster),a,hl
-	jq	util_alloc_entry
+	jq	util_alloc_entry.enter
 
 ;-------------------------------------------------------------------------------
 util_get_file_size:
@@ -1909,14 +1885,11 @@ util_validate_fat_name:
 
 ;-------------------------------------------------------------------------------
 util_toupper:
-	sub	a,'a'
-	cp	a,1+'z'-'a'
-	jr	nc,.nochange
-	add	a,'a'
+	cp	a,'a'
+	ret	c
+	cp	a,'z'+1
+	ret	nc
 	res	5,a
-	ret
-.nochange:
-	add	a,'a'
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2232,11 +2205,12 @@ util_next_cluster:
 	sbc	hl,hl
 	ret
 
+;-------------------------------------------------------------------------------
+util_fat_read_write:
 ; inputs:
 ;   same as fat_ReadFile / fat_WriteFile
 ; outputs:
 ;   same as fat_ReadFile / fat_WriteFile
-util_fat_read_write:
 	ld	iy,0
 	add	iy,sp
 	push	ix
@@ -2503,6 +2477,7 @@ util_ceil_byte_size_to_block_size:
 	inc	hl
 	ret
 
+;-------------------------------------------------------------------------------
 util_ceil_byte_size_to_blocks_per_cluster:
 	compare_auhl_zero
 	ret	z
@@ -2525,10 +2500,4 @@ util_ceil_byte_size_to_blocks_per_cluster:
 	pop	af
 	ret	z
 	inc	hl
-	ret
-
-util_compare_auhl_zero:
-	compare_hl_zero
-	ret	nz
-	or	a,a
 	ret
