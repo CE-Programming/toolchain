@@ -6,6 +6,8 @@
  */
 
 #include <stdio.h>
+#include <stdint.h>
+#include <cdefs.h>
 
 #ifdef __cplusplus
 extern "C" {
