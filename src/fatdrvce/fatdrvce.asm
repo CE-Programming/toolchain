@@ -452,7 +452,7 @@ fat_ReadDir:
 	ld	bc,sizeof fatDirEntry
 	xor	a,a
 	call	ti.MemSet
-	or	a,a
+	xor	a,a
 	sbc	hl,hl				; success, zeroed entry at end
 	pop	ix
 	ret
