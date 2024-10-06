@@ -1,0 +1,52 @@
+	assume	adl=1
+
+	section	.text
+	public	_dbg_Debugger
+_dbg_Debugger:
+	scf
+	sbc	hl,hl
+	ld	(hl),2
+	ret
+
+	section .text
+	public	_dbg_WatchpointSet
+_dbg_WatchpointSet:
+	; currently have to do stupid stuff until CEmu is updated to be less dumb
+	ld	iy,0
+	add	iy,sp
+	scf
+	sbc	hl,hl
+	ld	de,(iy + 3)	; addr
+	ld	bc,(iy + 6)	; size (must be 1 right now)
+	ld	a,(iy + 9)	; mask
+	ld	(hl),8
+	ld	(hl),4
+	or	a,a		; 0 = remove
+	ret	z
+	bit	0,a		; read
+	jr	z,.noread
+	bit	1,a		; write
+	jr	z,.noreadwrite
+ 	ld	(hl),7
+	jr	.checkexecute
+.noreadwrite:
+	ld	(hl),5
+	jr	.checkexecute
+.noread:
+	bit	1,a		; write
+	jr	z,.checkexecute
+	ld	(hl),6
+.checkexecute:
+	bit	2,a		; execute
+	ret	z
+	ld	(hl),3
+	ret
+
+	section .text
+	public	_dbg_WatchpointRemoveAll
+_dbg_WatchpointRemoveAll:
+	scf
+	sbc	hl,hl
+	ld	(hl),9
+	ld	(hl),10
+	ret

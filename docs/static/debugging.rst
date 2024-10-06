@@ -27,3 +27,15 @@ Here are some examples:
 
 To view the output of these functions within `CEmu <https://ce-programming.github.io/CEmu>`_, enable the console using **Docks > Console**.
 
+debug.h
+=======
+
+.. code-block:: c
+
+    #include <debug.h>
+
+API Documentation
+-----------------
+
+.. doxygenfile:: debug.h
+   :project: CE C/C++ Toolchain
