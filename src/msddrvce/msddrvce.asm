@@ -429,12 +429,6 @@ msd_Close:
 	pop	hl
 	ex	(sp),iy
 	push	hl
-	ld	hl,scsi.synchronizecache
-	call	scsi_sync_command
-	jq	z,.done
-	ld	hl,scsi.requestsense
-	call	scsi_sync_command
-.done:
 	push	iy
 	ld	hl,(ymsd.dev)
 	push	hl
@@ -1428,7 +1422,6 @@ scsi.modesense          scsipkt         1,$c0, $1a,$00,$3f,$00,$c0,$00
 scsi.requestsense       scsipkt         1,$12, $03,$00,$00,$00,$12,$00
 scsi.testunitready      scsipkt         0,$00, $00,$00,$00,$00,$00,$00
 scsi.readcapacity       scsipkt         1,$08, $25,$00,$00,$00,$00,$00,$00,$00,$00,$00
-scsi.synchronizecache   scsipkt         0,$00, $35,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
 scsi.read10             scsipktrw       1,$28
 scsi.write10            scsipktrw       0,$2a
