@@ -16,9 +16,9 @@ extern "C" {
 #ifndef NDEBUG
 
 /** Standard debug output */
-#define dbgout ((void*)0xFB0000)
+#define dbgout ((char*)0xFB0000)
 /** Standard error debug output */
-#define dbgerr ((void*)0xFC0000)
+#define dbgerr ((char*)0xFC0000)
 
 /** Break on read. */
 #define DBG_WATCHPOINT_READ (1 << 0) 
