@@ -42,7 +42,14 @@ void boot_GetDate(uint8_t *day, uint8_t *month, uint16_t *year);
 /**
  * Sets the calculator's time
  *
- * Performs checks to ensure time is within range
+ * Performs checks to ensure time is within range.
+ * @warning This function doesn't wait until the previous full RTC load
+ *          operation is completed before attempting to start a new one.
+ *          This may lead to issues, for example if you call boot_SetDate()
+ *          before this function.
+ *          To mitigate this, use boot_SetDate() (which doesn't have this bug),
+ *          after boot_SetTime() or validate rtc_IsBusy() is false before
+ *          calling boot_SetTime().
  * @param[in] seconds Seconds to set
  * @param[in] minutes Minutes to set
  * @param[in] hours Hours to set
