@@ -48,6 +48,13 @@ By default, the toolchain is installed into the home (``~/CEdev``) directory.
 
 This is configurable with :code:`make install PREFIX=[LOCATION]`
 
+As an alternative to using :code:`make`, you can build and install it with Nix:
+
+.. code-block:: bash
+
+   nix build .?submodules=1#cedev-nightly               # Build
+   nix profile install .?submodules=1#cedev-nightly     # Build and install
+
 Windows
 ~~~~~~~
 

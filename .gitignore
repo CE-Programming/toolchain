@@ -61,3 +61,8 @@ src/include/*.alm
 src/include/ez80.inc
 src/include/ti84pceg.inc
 src/include/tiformat.inc
+
+# Nix files
+examples/nix_flake/flake.lock
+*result*
+
