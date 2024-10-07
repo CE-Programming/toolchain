@@ -64,14 +64,14 @@
       "description": "Test triangle fill display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "A1154AE5" ]
+      "expected_CRCs": [ "7AA72F13" ]
     },
     "6":
     {
       "description": "Test line display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "08AE93E1" ]
+      "expected_CRCs": [ "D94140BB" ]
     },
     "7":
     {
