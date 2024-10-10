@@ -29,6 +29,12 @@ extern "C" {
 #define FP_ILOGB0     (~__INT_MAX__)
 #define FP_ILOGBNAN     __INT_MAX__
 
+#define FP_NORMAL    0x1
+#define FP_ZERO      0x2
+#define FP_SUBNORMAL (FP_NORMAL | FP_ZERO)     /* 0x3 */
+#define FP_INFINITE  0x4
+#define FP_NAN       (FP_NORMAL | FP_INFINITE) /* 0x5 */
+
 #define signbit(x)           __builtin_signbit(x)
 #define isgreater(x, y)      __builtin_isgreater(x, y)
 #define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
@@ -41,6 +47,7 @@ int _isinff(float n);
 int _isnanf(float n);
 int _isnormalf(float n);
 int _isfinitef(float n);
+int _fpclassifyf(float n);
 
 #define isinf(x) ( \
 	sizeof((x)) == sizeof(float) ? _isinff((x)) : \
@@ -54,6 +61,9 @@ int _isfinitef(float n);
 #define isfinite(x) ( \
 	sizeof((x)) == sizeof(float) ? _isfinitef((x)) : \
 	1)
+#define fpclassify(x) ( \
+	sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
+	0)
 
 double      acos(double);
 float       acosf(float);
