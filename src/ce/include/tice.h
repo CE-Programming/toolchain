@@ -15,7 +15,6 @@
 #include <sys/rtc.h>
 #include <sys/timers.h>
 #include <sys/util.h>
-#include <ti/debug.h>
 #include <ti/error.h>
 #include <ti/flags.h>
 #include <ti/getcsc.h>

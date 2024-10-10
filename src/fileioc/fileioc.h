@@ -331,7 +331,11 @@ uint16_t ti_GetSize(uint8_t handle);
  *
  * @param[in] handle AppVar/variable handle.
  * @param[in] size New AppVar/variable size.
- * @returns Resized size on success, `0` on failure, or `-1` if the AppVar/variable cannot be opened.
+ * @returns Resized size on success, `0` on failure, or `-1` if the
+ *          AppVar/variable cannot be opened.
+ * @warning This function does not maintain the data already stored in the
+ *          AppVar/variable when shrinking/expanding, and effectively
+ *          corrupts the contents.
  */
 int ti_Resize(size_t size, uint8_t handle);
 

@@ -1,13 +1,14 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v11.3...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v12.0...master)
 
-# [v11.3](https://github.com/CE-Programming/toolchain/releases/tag/v11.3) (2024-7-14)
+# [v12.0](https://github.com/CE-Programming/toolchain/releases/tag/v12.0) (2024-10-6)
 
 * **New features**
+  * Added optimized 48-bit runtime routines by @calc84maniac / @fundudeone
   * Added strftime implementation by @mateoconlechuga
   * Fixed off-by-one localtime day calculation (#469) by @mateoconlechuga
-  * Added features to convimg by @mateoconlechuga
+  * Added flip and rotate options for tilesets to convimg by @mateoconlechuga
   * Added support for different memory allocators by @mateoconlechuga
 
 * **Bugfixes**
@@ -19,7 +20,12 @@
   * Fixed write crash in fileioc (#461) by @mateoconlechuga
   * Fixed floating point multiply bug by @calc84maniac
   * Fixed incorrect sign compare in __lcmpzero by @calc84maniac
-
+  * Fixed bug in fatdrvce that could corrupt the root directory when creating a file by @mateoconlechuga
+  * Fixed ldexpf behaviour for NaN and Inf by @ZERICO2005
+  * Fixed duplicated OS_TOK_STAT_F define by @adriweb
+  * Fixed some repository submodule issues by @myclevorname
+  * Fixed color quantization for unique colors in convimg by @mateoconlechuga
+  
 * **Improvements**:
   * Fixes/improvements for str[n]casecmp by @calc84maniac
   * Fixes/improvements for GetStringInput by @calc84maniac
@@ -28,6 +34,9 @@
   * Optimize 24-bit and 32-bit and/or/xor operations by @calc84maniac
   * Optimize malloc implementation by @calc84maniac
   * CI macos improvements by @adriweb
+  * Greatly optimized the fatdrvce fat_SetFileBlockOffset function by @mateoconlechuga
+  * Enforce fatdrvce to only support uppercase filenames by @mateoconlechuga
+  * Added prefix and suffix options for convimg by @JonasVdS18
 
 # [v11.2](https://github.com/CE-Programming/toolchain/releases/tag/v11.2) (2023-8-24)
 

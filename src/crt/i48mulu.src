@@ -1,0 +1,215 @@
+; Performs 48-bit multiplication
+;
+; Arguments:
+; ude:uhl = multiplicand
+; uiy:ubc = multiplier
+;
+; Returns:
+; ude:uhl = ude:uhl * uiy:ubc
+
+	assume	adl=1
+
+	section	.text
+	public	__i48mulu
+__i48mulu:
+	;backup af
+	push af
+	push ix
+	ld ix, 0
+	add ix, sp
+
+	; On stack to get upper byte when needed
+	push de ; de will also be used to perform the actual multiplication
+	push hl
+	push iy
+	push bc
+
+	; bc = a[0], a[1]
+	ld a, l ; a = b[0]
+	ld iy, (ix-5) ; iy = b[1], b[2]
+
+	or a, a
+	sbc hl, hl
+	push hl ; upper bytes of sum at -15
+	;Stack Use:
+	; ix-1 : deu b[5]
+	; ix-2 : d   b[4]
+	; ix-3 : e   b[3]
+	; ix-4 : hlu b[2]
+	; ix-5 : h   b[1]
+	; ix-6 : l   b[0]
+	; ix-7 : iyu a[5]
+	; ix-8 : iyh a[4]
+	; ix-9 : iyl a[3]
+	; ix-10: bcu a[2]
+	; ix-11: b   a[1]
+	; ix-12: c   a[0]
+	; ix-13:   sum[5]
+	; ix-14:   sum[4]
+	; ix-15:   sum[3]
+	; ix-16:   sum[2]
+	; ix-17:   sum[1]
+	; ix-18:   sum[0]
+
+	; sum[0-1] =============================================================================================================================
+
+	; a[0]*b[0]
+	ld d, c ; d = a[0]
+	ld e, a ; e = b[0]
+	mlt de
+	push de ; lower bytes of sum at -18
+	
+	; sum[1-2] =============================================================================================================================
+	ld l, d ; hl will store current partial sum
+
+	; a[1]*b[0]
+	ld d, b ; d = a[1]
+	ld e, a ; e = b[0]
+	mlt de
+	add hl, de
+
+	; a[0]*b[1]
+	ld d, c ; d = a[0]
+	ld e, iyl ; e = b[1]
+	mlt de
+	add hl, de
+
+	ld (ix-17), hl
+
+	; sum[2-3] =============================================================================================================================
+	ld hl, (ix-16) ; hl will store current partial sum
+
+	; a[0]*b[2]
+	ld d, c ; d = a[0]
+	ld e, iyh ; e = b[2]
+	mlt de
+	add hl, de
+
+	; a[1]*b[1]
+	ld d, b ; d = a[1]
+	ld e, iyl ; e = b[1]
+	mlt de
+	add hl, de
+
+	; a[2]*b[0]
+	ld d, (ix-10) ; d = a[2]
+	ld e, a ; e = b[0]
+	mlt de
+	add hl, de
+
+	ld (ix-16), hl
+
+	; sum[3-4] =============================================================================================================================
+	ld hl, (ix-15) ; hl will store current partial sum
+
+	; a[0]*b[3]
+	ld d, c ; d = a[0]
+	ld e, (ix-3) ; e = b[3]
+	mlt de
+	add hl, de
+
+	; a[1]*b[2]
+	ld d, b ; d = a[1]
+	ld e, iyh ; e = b[2]
+	mlt de
+	add hl, de
+
+	; a[2]*b[1]
+	ld d, (ix-10) ; d = a[2]
+	ld e, iyl ; e = b[1]
+	mlt de
+	add hl, de
+
+	; a[3]*b[0]
+	ld d, (ix-9) ; d = a[3]
+	ld e, a ; e = b[0]
+	mlt de
+	add hl, de
+
+	ld (ix-15), hl
+
+	; sum [4-5] =============================================================================================================================
+	ld hl, (ix-14) ; hl will store current partial sum
+
+	; a[0]*b[4]
+	ld d, c ; d = a[0]
+	ld e, (ix-2) ; e = b[4]
+	mlt de
+	add hl, de
+
+	; a[1]*b[3]
+	ld d, b ; d = a[1]
+	ld e, (ix-3) ; e = b[3]
+	mlt de
+	add hl, de
+
+	; a[2]*b[2]
+	ld d, (ix-10) ; d = a[2]
+	ld e, iyh ; e = b[2]
+	mlt de
+	add hl, de
+
+	; a[3]*b[1]
+	ld d, (ix-9) ; d = a[3]
+	ld e, iyl ; e = b[1]
+	mlt de
+	add hl, de
+
+	; a[4]*b[0]
+	ld d, (ix-8) ; d = a[4]
+	ld e, a ; e = b[0]
+	mlt de
+	add hl, de
+
+	ld (ix-14), l
+
+	; sum [5] (and overflow) ====================================================================================================================
+	ld l, h ; hl will store current partial sum
+
+	; a[0]*b[5]
+	ld d, c ; d = a[0]
+	ld e, (ix-1) ; e = b[5]
+	mlt de
+	add hl, de
+
+	; a[1]*b[4]
+	ld c, (ix-2) ; c = b[4]
+	mlt bc
+	add hl, bc
+
+	; a[2]*b[3]
+	ld bc, (ix-10) ; bc = a[2], a[3]
+	ld d, c ; d = a[2]
+	ld e, (ix-3) ; e = b[3]
+	mlt de
+	add hl, de
+
+	; a[3]*b[2]
+	ld c, iyh ; c = b[2]
+	mlt bc
+	add hl, bc
+
+	; a[4]*b[1]
+	ld bc, (ix-8) ; bc = a[4], a[5]
+	ld d, c ; d = a[4]
+	ld e, iyl ; e = b[1]
+	mlt de
+	add hl, de
+
+	; a[5]*b[0]
+	ld c, a ; c = b[0]
+	mlt bc
+	add hl, bc
+
+	ld (ix-13), l
+
+	;clean up stack and restore registers
+	pop hl
+	pop de
+	pop bc
+	pop iy
+
+	ld sp, ix
+	pop ix
+	pop af
+	ret

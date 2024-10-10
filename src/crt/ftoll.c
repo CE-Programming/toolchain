@@ -12,6 +12,6 @@ long long _ftoll_c(float x)
         const long long result = mantissa >> (bias + FLT_MANT_DIG - 1 - exponent);
         return parts.sign ? -result : result;
     }
-    const long long result = (long long)mantissa << (exponent - bias);
+    const long long result = (long long)mantissa << (exponent - (bias + FLT_MANT_DIG - 1));
     return parts.sign ? -result : result;
 }

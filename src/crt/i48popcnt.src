@@ -1,0 +1,39 @@
+; Performs 48-bit population count
+;
+; Returns:
+; a = number of set bits in ude:uhl
+
+	assume	adl=1
+
+	section	.text
+	public	__i48popcnt
+__i48popcnt:
+	push hl
+	push de
+	; Calculate 8-popcount(L)-popcount(HLU), and set HLU=H
+	call __popcnt_common_init_full
+	; Save the current count in H
+	ld h, a
+	; Prepare to accumulate 8-popcount(D)-popcount(HLU)
+	ld a, d
+	cpl
+	ld l, a
+	; Subtract output carry and an additional H, the adjusted call adds H*2-L
+	sbc a, h
+	call __popcnt_common_iter_adjusted
+	; Subtract value from 25, and accumulate output carry
+	cpl
+	adc a, 26
+	; Set L=9-popcount(UHL)-popcount(D)
+	ld l, a
+	; Calculate 8-popcount(DEU)-popcount(E)
+	ex de, hl
+	call __popcnt_common_init_full
+	; Subtract from saved value in L minus 1 and accumulate output carry
+	cpl
+	adc a, e
+	pop de
+	pop hl
+	ret
+
+	extern	__popcnt_common_init_full, __popcnt_common_iter_adjusted

@@ -13,17 +13,17 @@
     "action|launch",
     "delay|100",
     "hashWait|1",
-    "key|clear",
+    "key|enter",
     "hashWait|2"
   ],
   "hashes":
   {
     "1":
     {
-      "description": "Test sprite moving display",
+      "description": "Test line display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "5080C961" ]
+      "expected_CRCs": [ "69DA2AC4" ]
     },
     "2":
     {

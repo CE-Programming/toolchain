@@ -1,0 +1,37 @@
+	assume	adl=1
+
+	section	.text
+	public	__i48rems
+; Result in ude:uhl
+__i48rems:
+	push iy
+	push bc
+
+	; divisor sign check
+	push hl
+	lea hl, iy
+	add hl, hl
+	call c, __uiyubcNeg
+
+	; dividend sign check
+	sbc hl, hl
+	adc hl, de
+	pop hl
+	push af
+	call m, __i48neg
+	pop af
+
+	call __i48dvrmu
+	lea de, iy
+	push bc
+	pop hl
+	; negate remainder if dividend was negative
+	call m, __i48neg
+
+	pop bc
+	pop iy
+	ret
+
+	extern	__i48dvrmu
+	extern	__i48neg
+	extern	__uiyubcNeg

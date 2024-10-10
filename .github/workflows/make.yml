@@ -193,6 +193,10 @@ jobs:
           name: CEdev-${{runner.os}}
           path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
 
+      - name: Create Libraries Zip
+        if: runner.os == 'Linux'
+        run: cd ${{env.TOOLCHAIN_PATH}} && zip -r9 clibs_separately_in_zip.zip clibs/
+
       - name: Upload Libraries
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
@@ -205,7 +209,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: clibs_separately_in_zip
-          path: ${{github.workspace}}/toolchain/clibs
+          path: ${{github.workspace}}/toolchain/clibs_separately_in_zip.zip
 
   test:
     needs: build
@@ -394,6 +398,11 @@ jobs:
         with:
           name: clibs
           path: ${{github.workspace}}
+      - name: Download Libraries Zip
+        uses: actions/download-artifact@v4
+        with:
+          name: clibs_separately_in_zip
+          path: ${{github.workspace}}
       - name: Download Built examples
         uses: actions/download-artifact@v4
         with:
@@ -405,7 +414,6 @@ jobs:
           mv CEdev-Linux.tar.gz CEdev-Linux-nightly.tar.gz
           mv CEdev-Windows.zip CEdev-Windows-nightly.zip
           mv CEdev-macOS.dmg CEdev-macOS-nightly.dmg
-          mv clibs.8xg clibs-nightly.8xg
           mv built-examples.zip built-examples-nightly.zip
 
       - name: Update nightly release
@@ -418,5 +426,14 @@ jobs:
             CEdev-Linux-nightly.tar.gz
             CEdev-Windows-nightly.zip
             CEdev-macOS-nightly.dmg
-            clibs-nightly.8xg
+            clibs.8xg
+            clibs_separately_in_zip.zip
             built-examples-nightly.zip
+
+      - name: Dispatch libraries repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CI_PAT_CLIBS_NIGHTLTY }}
+          repository: CE-Programming/libraries
+          event-type: ci-clibs-nightly
+

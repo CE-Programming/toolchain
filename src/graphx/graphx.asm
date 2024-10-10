@@ -1981,6 +1981,7 @@ ComputeNewY:
 	ex	de,hl
 	ld	hl,(iy+12)
 	ld	bc,(iy+6)
+	or	a,a
 	sbc	hl,bc			; x1 - x0
 	call	_MultiplyHLDE
 	ex	de,hl			; (x1 - x0)*(xmax_XMin - x0)
@@ -6394,9 +6395,13 @@ _DivideHLBC:
 	ex	de,hl
 	adc	hl,hl
 	ret	c
-	ex	de,hl
-	sbc	hl,hl
-	sbc	hl,de
+	dec	de		; ude=UDE-1
+	add	hl, de		; uhl=UHL+UDE-1
+	add	hl, bc		; uhl=UHL+UDE+UBC-1
+	ex	de, hl		; uhl=UDE-1, ude=UHL+UDE+UBC-1
+	add	hl, bc		; uhl=UDE+UBC-1, carry set if UDE==0
+	ccf			; carry set if UDE!=0
+	sbc	hl, de		; uhl=-UHL-(UDE!=0)
 	ret
 
 ;-------------------------------------------------------------------------------
