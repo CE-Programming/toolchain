@@ -52,7 +52,7 @@ static const char *executable_path(void)
     return path;
 }
 
-static bool is_valid_path(const char *str, size_t max)
+static bool is_valid_make_path(const char *str, size_t max)
 {
     size_t i = 0;
 
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 
             case 'm':
                 cwk_path_get_absolute(cedev, "./meta/makefile.mk", buffer, sizeof buffer);
-                if (is_valid_path(buffer, sizeof buffer))
+                if (!is_valid_make_path(buffer, sizeof buffer))
                 {
                     fprintf(stderr, "The CE C Toolchain is installed in a directory containing\n");
                     fprintf(stderr, "spaces. This does not work properly with the \'make\' command.\n");
