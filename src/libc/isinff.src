@@ -9,8 +9,8 @@ __isinff:
 	jr	nz,.nxt
 	ld	hl,(ix+8)
 	add	hl,hl
-.nxt:
 	inc	h
+.nxt:
 	ld	hl,0
 	jr	nz,.ret
 	inc	hl
