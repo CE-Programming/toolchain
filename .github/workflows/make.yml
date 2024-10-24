@@ -25,11 +25,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-20.04, macos-latest, windows-latest]
+        runs-on: [ubuntu-20.04, macos-13, macos-14, windows-latest]
         include:
           - nul: /dev/null
-          - runs-on: macos-latest
+          - runs-on: macos-13
             fasmg: /source/macos/x64/fasmg
+            arch-suffix: "-intel"
+            ez80-bins-suffix: macOS_intel
+            install-output-ext: "dmg"
+          - runs-on: macos-14
+            fasmg: /source/macos/x64/fasmg
+            arch-suffix: "-arm"
             ez80-bins-suffix: macOS_arm
             install-output-ext: "dmg"
           - runs-on: windows-latest
@@ -163,7 +169,7 @@ jobs:
               --icon-size 64 \
               --icon 'Readme.txt' 125 120 \
               --icon 'CEdev' 125 275 \
-              'CEdev-${{runner.os}}.${{matrix.install-output-ext}}' \
+              'CEdev-${{runner.os}}${{matrix.arch-suffix}}.${{matrix.install-output-ext}}' \
               '${TOOLCHAIN_PATH}/resources/macOS/dmg/contents'"
           eval "create-dmg $createDmgArgs" || eval "create-dmg $createDmgArgs" # We also retry just in case...
 
@@ -175,8 +181,8 @@ jobs:
           APPLE_NOTARIZATION_TEAMID: ${{ secrets.APPLE_NOTARIZATION_TEAMID }}
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "$APPLE_NOTARIZATION_USERNAME" --team-id "$APPLE_NOTARIZATION_TEAMID" --password "$APPLE_NOTARIZATION_PASSWORD"
-          xcrun notarytool submit "CEdev-${{runner.os}}.${{matrix.install-output-ext}}" --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple "CEdev-${{runner.os}}.${{matrix.install-output-ext}}"
+          xcrun notarytool submit "CEdev-${{runner.os}}${{matrix.arch-suffix}}.${{matrix.install-output-ext}}" --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple "CEdev-${{runner.os}}${{matrix.arch-suffix}}.${{matrix.install-output-ext}}"
 
       - name: "[Linux] Tar toolchain"
         if: runner.os == 'Linux'
@@ -190,8 +196,8 @@ jobs:
       - name: Upload CEdev
         uses: actions/upload-artifact@v4
         with:
-          name: CEdev-${{runner.os}}
-          path: CEdev-${{runner.os}}.${{matrix.install-output-ext}}
+          name: CEdev-${{runner.os}}${{matrix.arch-suffix}}
+          path: CEdev-${{runner.os}}${{matrix.arch-suffix}}.${{matrix.install-output-ext}}
 
       - name: Create Libraries Zip
         if: runner.os == 'Linux'
@@ -217,12 +223,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu, macos, windows]
+        runs-on: [ubuntu-latest, macos-13, macos-14, windows-latest]
         compressed: [YES, NO]
         include:
-          - runs-on: windows
+          - runs-on: macos-13
+            arch-suffix: "-intel"
+          - runs-on: macos-14
+            arch-suffix: "-arm"
+          - runs-on: windows-latest
             env: "env:"
-    runs-on: ${{matrix.runs-on}}-latest
+    runs-on: ${{matrix.runs-on}}
     steps:
       - name: Prepare Test Environment
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
@@ -230,7 +240,7 @@ jobs:
       - name: Download CEdev
         uses: actions/download-artifact@v4
         with:
-          name: CEdev-${{runner.os}}
+          name: CEdev-${{runner.os}}${{matrix.arch-suffix}}
           path: ${{github.workspace}}
       - name: Extract Artifact Contents
         if: runner.os == 'Linux'
@@ -238,7 +248,7 @@ jobs:
       - name: Extract Artifact Contents
         if: runner.os == 'macOS'
         run: |
-           hdiutil attach CEdev-${{runner.os}}.dmg
+           hdiutil attach CEdev-${{runner.os}}${{matrix.arch-suffix}}.dmg
            cp -a "/Volumes/CE Programming Toolchain/CEdev" ./
            umount "/Volumes/CE Programming Toolchain"
       - name: Extract Artifact Contents
@@ -388,10 +398,15 @@ jobs:
         with:
           name: CEdev-Windows
           path: ${{github.workspace}}
-      - name: Download CEdev macOS
+      - name: Download CEdev macOS-intel
         uses: actions/download-artifact@v4
         with:
-          name: CEdev-macOS
+          name: CEdev-macOS-intel
+          path: ${{github.workspace}}
+      - name: Download CEdev macOS-arm
+        uses: actions/download-artifact@v4
+        with:
+          name: CEdev-macOS-arm
           path: ${{github.workspace}}
       - name: Download CE Libraries
         uses: actions/download-artifact@v4
@@ -413,7 +428,8 @@ jobs:
         run: |
           mv CEdev-Linux.tar.gz CEdev-Linux-nightly.tar.gz
           mv CEdev-Windows.zip CEdev-Windows-nightly.zip
-          mv CEdev-macOS.dmg CEdev-macOS-nightly.dmg
+          mv CEdev-macOS-intel.dmg CEdev-macOS-intel-nightly.dmg
+          mv CEdev-macOS-arm.dmg CEdev-macOS-arm-nightly.dmg
           mv built-examples.zip built-examples-nightly.zip
 
       - name: Update nightly release
@@ -425,7 +441,8 @@ jobs:
           files: |
             CEdev-Linux-nightly.tar.gz
             CEdev-Windows-nightly.zip
-            CEdev-macOS-nightly.dmg
+            CEdev-macOS-intel-nightly.dmg
+            CEdev-macOS-arm-nightly.dmg
             clibs.8xg
             clibs_separately_in_zip.zip
             built-examples-nightly.zip
