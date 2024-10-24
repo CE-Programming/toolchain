@@ -3,22 +3,15 @@
 	section	.text
 	public	_islower
 _islower:
-	pop	hl
 	pop	de
+	ex	(sp),hl
 	push	de
-	push	hl
+	ld	a,l
 	or	a,a
 	sbc	hl,hl
-	ld	a,e
-	and	a,128
-	ret	nz
-	ex	de,hl
-	ld	de,___maptab
-	add	hl,de
-	ld	a,(hl)
-	and	a,4
-	sbc	hl,hl
-	ld	l,a
+	cp	a,97
+	ret	c
+	cp	a,122+1
+	ret	nc
+	inc	l
 	ret
-
-	extern	___maptab
