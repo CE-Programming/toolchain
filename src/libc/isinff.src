@@ -3,20 +3,16 @@
 	section	.text
 	public	__isinff
 __isinff:
-	call	__frameset0
-	ld	hl,(ix+6)
+	ld	iy,0
+	add	iy,sp
+	ld	hl,(iy+3)
 	adc	hl,hl
-	jr	nz,.nxt
-	ld	hl,(ix+8)
+	jr	nz,.l
+	ld	hl,(iy+5)
 	add	hl,hl
 	inc	h
-.nxt:
+.l:
 	ld	hl,0
-	jr	nz,.ret
+	ret	nz
 	inc	hl
-.ret:
-	ld	sp,ix
-	pop	ix
 	ret
-
-	extern	__frameset0
