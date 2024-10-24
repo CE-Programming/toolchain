@@ -3,21 +3,16 @@
 	section	.text
 	public	_isupper
 _isupper:
-	pop	hl
 	pop	de
+	ex	(sp),hl
 	push	de
-	push	hl
+	ld	a,l
 	or	a,a
 	sbc	hl,hl
-	bit	7,e
-	ret	nz
-	ex	de,hl
-	ld	de,___maptab
-	add	hl,de
-	ld	a,(hl)
-	and	a,8
-	sbc	hl,hl
-	ld	l,a
+	cp	a,65
+	ret	c
+	cp	a,90+1
+	ret	nc
+	inc	l
 	ret
 
-	extern	___maptab
