@@ -7,6 +7,7 @@ _outchar:
 	ex	(sp),hl
 	push	de
 	ld	iy,$d00080	; ti.flags
+	ld	a,l
 	cp	a,10
 	jp	z,$0207F0	; ti.NewLine
 	jp	$207B8	; ti.PutC
