@@ -6,15 +6,9 @@ _isalpha:
 	pop	de
 	ex	(sp),hl
 	push	de
-	ld	e,l
 	ld	a,l
-	sub	a,97
-	add	a,-26
-	sbc	hl,hl
-	inc	hl
-	ret	z
-	ld	a,e
 	sub	a,65
+	res	5,a
 	add	a,-26
 	sbc	hl,hl
 	inc	hl
