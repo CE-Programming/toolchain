@@ -3,21 +3,21 @@
 	section	.text
 	public	_ispunct
 _ispunct:
-	pop	hl
 	pop	de
+	ex	(sp),hl
 	push	de
-	push	hl
-	or	a,a
+	ld	a,l
+	sub	a,33
+	cp	a,48-33
+	ret	c
+	sub	a,58-33
+	cp	a,65-58
+	ret	c
+	sub	a,91-58
+	cp	a,97-91
+	ret	c
+	sub	a,123-91
+	cp	a,127-123
+	ret	c
 	sbc	hl,hl
-	bit	7,e
-	ret	nz
-	ex	de,hl
-	ld	de,___maptab
-	add	hl,de
-	ld	a,(hl)
-	and	a,2
-	sbc	hl,hl
-	ld	l,a
 	ret
-
-	extern	___maptab
