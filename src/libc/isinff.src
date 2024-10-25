@@ -7,12 +7,13 @@ __isinff:
 	add	iy,sp
 	ld	hl,(iy+3)
 	adc	hl,hl
-	jr	nz,.l
-	ld	hl,(iy+5)
-	add	hl,hl
-	inc	h
-.l:
-	ld	hl,0
-	ret	nz
+	jr	nz,.finite
+	ld	a,(iy+6)
+	rla
+	inc	a
 	inc	hl
+	ret	z
+.finite:
+	or	a,a
+	sbc	hl,hl
 	ret
