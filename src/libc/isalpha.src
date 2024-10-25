@@ -3,21 +3,19 @@
 	section	.text
 	public	_isalpha
 _isalpha:
-	pop	hl
 	pop	de
+	ex	(sp),hl
 	push	de
-	push	hl
-	or	a,a
+	ld	e,l
+	ld	a,l
+	sub	a,97
+	add	a,-26
 	sbc	hl,hl
-	bit	7,e
-	ret	nz
-	ex	de,hl
-	ld	de,___maptab
-	add	hl,de
-	ld	a,(hl)
-	and	a,12
+	inc	hl
+	ret	z
+	ld	a,e
+	sub	a,65
+	add	a,-26
 	sbc	hl,hl
-	ld	l,a
+	inc	hl
 	ret
-
-	extern	___maptab
