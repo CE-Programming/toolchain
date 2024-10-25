@@ -9,8 +9,7 @@ _isblank:
 	ld	a,l
 	cp	a,32
 	ret	z
-	cp	a,9
+	xor	a,9
 	ret	z
-	or	a,a
 	sbc	hl,hl
 	ret
