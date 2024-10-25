@@ -10,7 +10,7 @@ _putchar:
 	push	hl
 	call	_outchar
 	pop	hl
-	push	hl
+	pop	hl
 	ret
 
 	extern	_outchar
