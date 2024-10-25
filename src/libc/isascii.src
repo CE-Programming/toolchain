@@ -6,8 +6,7 @@ _isascii:
 	pop	de
 	ex	(sp),hl
 	push	de
-	ld	de,-128
-	add	hl,de
+	sla	l
 	sbc	hl,hl
 	inc	hl
 	ret
