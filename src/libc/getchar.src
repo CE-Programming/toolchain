@@ -2,16 +2,5 @@
 
 	section	.text
 	public	_getchar
-_getchar:
-	call	_inchar
-	ld	l,a
-	rlc	l
-	sbc	hl,hl
-	ld	l,a
-	push	hl
-	call	_outchar
-	pop	hl
-	ret
-
+_getchar := _inchar
 	extern	_inchar
-	extern	_outchar

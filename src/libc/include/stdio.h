@@ -36,7 +36,7 @@ typedef struct
 __BEGIN_DECLS
 
 /* weak user-defined functions */
-char inchar(void);
+int inchar(void);
 
 void outchar(char character);
 

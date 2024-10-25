@@ -4,20 +4,27 @@
 	weak	_inchar
 _inchar:
     	ld	iy,$d00080	; ti.flags
-.getchar:
+.l:
 	call	$2014C		; ti.GetCSC
 	or	a,a
-	jr	z,.getchar
+	jr	z,.l
 	sbc	hl,hl
 	ld	l,a
-	ld	de,.lut_char
+	ld	de,.lut
     	add	hl,de
 	ld	a,(hl)
 	or	a,a
-	jr	z,_inchar
+	jr	z,.l
+	sbc	hl,hl
+	ld	l,a
+	push	hl
+	push	hl
+	call	_outchar
+	pop	hl
+	pop	hl
 	ret
 
-.lut_char:
+.lut:
 	db	0,0,0,0,0,0,0,0,0,10		;
 	db	0,'WRMH',0,0   			; + - × ÷ ^ undef
 	db	0,'Z'+ 1,'VQLG',0,0 		; (-) 3 6 9 ) TAN VARS undef
@@ -25,3 +32,5 @@ _inchar:
 	db	' YTOJEBX',0			; 0 1 4 7 , SIN APPS XT?n undef
 	db	'XSNIDA'			; STO LN LOG x2 x-1 MATH
 	db	0,0,0,0,0,0,0,0,0,0		;
+
+	extern	_outchar
