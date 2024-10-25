@@ -11,8 +11,7 @@ int __attribute__((weak)) fputc(int c, FILE *stream)
     }
     else if (stream == stdout || stream == stderr)
     {
-        putchar(c);
-        ret = c;
+        ret = putchar(c);
     }
     else
     {
