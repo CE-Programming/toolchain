@@ -1,6 +1,24 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v12.0...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v12.1...master)
+
+# [v12.1](https://github.com/CE-Programming/toolchain/releases/tag/v12.1) (2024-10-26)
+
+* **New features**
+  * Added convbin support for bundles by @mateoconlechuga
+  * Added isblank function by @mateoconlechuga
+  * Added _fpclassifyf and _isnormalf by @@ZERICO2005
+
+* **Bugfixes**
+  * Fixed _isinf function by @runer112
+  * Fixed __ftoll ABI and left shift amount by @calc84maniac
+  * Fixed graphx line clipping issue (#353) by @mateoconlechuga
+  * Fixed msd_Close msddrvce freezing issue (#477) by @mateoconlechuga
+  * Fixed multiple issues with inchar/outchar and fget/fput functions by @mateoconlechuga
+
+* **Improvements**:
+  * Optimized all isxxxxx ctype.h functions by @calc84maniac / @mateoconlechuga
+  * The `inchar` function now returns `int` to support EOF by @mateoconlechuga
 
 # [v12.0](https://github.com/CE-Programming/toolchain/releases/tag/v12.0) (2024-10-6)
 
