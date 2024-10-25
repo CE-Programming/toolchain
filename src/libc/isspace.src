@@ -3,21 +3,14 @@
 	section	.text
 	public	_isspace
 _isspace:
-	pop	hl
 	pop	de
+	ex	(sp),hl
 	push	de
-	push	hl
-	or	a,a
+	ld	a,l
+	cp	a,32
+	ret	z
+	sub	a,9
+	add	a,-5
 	sbc	hl,hl
-	bit	7,e
-	ret	nz
-	ex	de,hl
-	ld	de,___maptab
-	add	hl,de
-	ld	a,(hl)
-	and	a,64
-	sbc	hl,hl
-	ld	l,a
+	inc	hl
 	ret
-
-	extern	___maptab
