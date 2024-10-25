@@ -7,12 +7,8 @@ _isupper:
 	ex	(sp),hl
 	push	de
 	ld	a,l
-	or	a,a
+	sub	a,65
+	add	a,-26
 	sbc	hl,hl
-	cp	a,65
-	ret	c
-	cp	a,90+1
-	ret	nc
-	inc	l
+	inc	hl
 	ret
-
