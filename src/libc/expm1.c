@@ -1,6 +1,6 @@
 #include <math.h>
 
-float M_expm1f(const float x)
+float expm1f(const float x)
 {
     #if 1
         /**
