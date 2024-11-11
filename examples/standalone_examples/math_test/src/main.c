@@ -61,21 +61,25 @@ using int48_t = IntN<48, int_fast64_t>;
 static int24_t __builtin_bitreverse24(int24_t x)
 {
     return __builtin_bitreverse32(x) >> 8;
+    // return __builtin_bitreverse16(x >> 8) | __builtin_bitreverse8(x) << 16;
 }
 
 #endif
 
 static int48_t __builtin_bitreverse48(int48_t x)
 {
-    return __builtin_bitreverse64(x) >> 16;
+    // return __builtin_bitreverse64(x) >> 16;
+    return __builtin_bitreverse32(x >> 16) | (int48_t)__builtin_bitreverse16(x) << 32;
 }
 static uint24_t __builtin_bswap24(uint24_t x)
 {
     return __builtin_bswap32(x) >> 8;
+    // return __builtin_bswap16(x >> 8) | (uint8_t)x << 16;
 }
 static uint48_t __builtin_bswap48(uint48_t x)
 {
     return __builtin_bswap64(x) >> 16;
+    // return __builtin_bswap32(x >> 16) | (uint48_t)(uint16_t)x << 32;
 }
 static int __builtin_popcounti48(uint48_t x)
 {
