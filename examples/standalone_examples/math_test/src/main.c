@@ -25,6 +25,9 @@
 #   endif
 
 #else
+
+#   define x_printf printf
+
 #   ifndef __cplusplus
 
 typedef int32_t int24_t;
@@ -84,10 +87,10 @@ static int48_t i48abs(int48_t x)
 }
 
 
-#if INTERACTIVE || !defined(_EZ80)
-#   define x_printf printf
+#if INTERACTIVE && defined(_EZ80)
+#   define x_printffull x_printf
 #else
-#   define x_printf(...) dbg_printf(__VA_ARGS__)
+#   define x_printffull(format, ...) x_printf(format "\n", __VA_ARGS__)
 #endif
 
 static void separateOutput()
@@ -329,24 +332,28 @@ static void testOp(bool isBinOp, const BinOp *op, int64_t x, int64_t y)
     unsigned nameLength = strlen(op->name);
     unsigned prefixLength = lhsLength - nameLength;
 
-    x_printf("%*s=%016llX\n", lhsLength, "x", (long long)x);
+    x_printffull("%*s=%016llX", lhsLength, "x", (long long)x);
     if (!isBinOp)
     {
         x_printf("\n");
     }
     else
     {
-        x_printf("%*s=%016llX\n", lhsLength, "y", (long long)y);
+        x_printffull("%*s=%016llX", lhsLength, "y", (long long)y);
     }
+    x_printf("\n");
 
-#define TEST_OP(prefix, bits)                                                                          \
-    x_printf("\n");                                                                                    \
-    if (op->prefix)                                                                                    \
-    {                                                                                                  \
-        unsigned digits = (bits + 3) / 4;                                                              \
-        unsigned long long result = (op->prefix)(x, y) & ((1ULL << (bits - 1) << 1) - 1);              \
-        x_printf("%*s%s=%*s%0*llX", prefixLength, #prefix, op->name, 16 - digits, "", digits, result); \
-    }
+#define TEST_OP(prefix, bits)                                                                              \
+    if (op->prefix)                                                                                        \
+    {                                                                                                      \
+        unsigned digits = (bits + 3) / 4;                                                                  \
+        unsigned long long result = (op->prefix)(x, y) & ((1ULL << (bits - 1) << 1) - 1);                  \
+        x_printffull("%*s%s=%*s%0*llX", prefixLength, #prefix, op->name, 16 - digits, "", digits, result); \
+    }                                                                                                      \
+    else                                                                                                   \
+    {                                                                                                      \
+        x_printf("\n");                                                                                    \
+    }                                                                                                      \
 
     TEST_OP(b, 8)
     TEST_OP(s, 16)
