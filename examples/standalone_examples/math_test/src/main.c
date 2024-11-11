@@ -13,6 +13,7 @@
 
 
 #ifdef _EZ80
+
 #   include <debug.h>
 #   include <ti/screen.h>
 #   include <ti/getcsc.h>
@@ -25,9 +26,14 @@
 
 #else
 #   ifndef __cplusplus
+
 typedef int32_t int24_t;
 typedef uint32_t uint24_t;
+typedef int64_t int48_t;
+typedef uint64_t uint48_t;
+
 #   else
+
 template <unsigned bits, typename U>
 struct IntN final
 {
@@ -44,13 +50,38 @@ private:
 };
 using uint24_t = IntN<24, uint_fast32_t>;
 using int24_t = IntN<24, int_fast32_t>;
+using uint48_t = IntN<48, uint_fast64_t>;
+using int48_t = IntN<48, int_fast64_t>;
+
 #   endif
 
 static int24_t __builtin_bitreverse24(int24_t x)
 {
     return __builtin_bitreverse32(x) >> 8;
 }
+
 #endif
+
+static int48_t __builtin_bitreverse48(int48_t x)
+{
+    return __builtin_bitreverse64(x) >> 16;
+}
+static uint24_t __builtin_bswap24(uint24_t x)
+{
+    return __builtin_bswap32(x) >> 8;
+}
+static uint48_t __builtin_bswap48(uint48_t x)
+{
+    return __builtin_bswap64(x) >> 16;
+}
+static int __builtin_popcounti48(uint48_t x)
+{
+    return __builtin_popcountll(x & ((1LL << 48) - 1));
+}
+static int48_t i48abs(int48_t x)
+{
+    return x < 0 ? (int48_t)-x : x;
+}
 
 
 #if INTERACTIVE || !defined(_EZ80)
@@ -109,6 +140,8 @@ static void finishOutput()
     DEFINE_UNOP_PREFIX_FUNC(u##int24_t, i##name, op)
 #define DEFINE_UNOP_PREFIX_FUNC_L(u, name, op) \
     DEFINE_UNOP_PREFIX_FUNC(u##int32_t, l##name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_I48(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC(u##int48_t, i48##name, op)
 #define DEFINE_UNOP_PREFIX_FUNC_LL(u, name, op) \
     DEFINE_UNOP_PREFIX_FUNC(u##int64_t, ll##name, op)
 
@@ -120,6 +153,8 @@ static void finishOutput()
     DEFINE_BINOP_FUNC_FUNC(u##int24_t, i##name, func, post)
 #define DEFINE_BINOP_FUNC_FUNC_L(u, name, func, post) \
     DEFINE_BINOP_FUNC_FUNC(u##int32_t, l##name, l##func, post)
+#define DEFINE_BINOP_FUNC_FUNC_I48(u, name, func, post) \
+    DEFINE_BINOP_FUNC_FUNC(u##int48_t, i48##name, i48##func, post)
 #define DEFINE_BINOP_FUNC_FUNC_LL(u, name, func, post) \
     DEFINE_BINOP_FUNC_FUNC(u##int64_t, ll##name, ll##func, post)
 
@@ -131,6 +166,8 @@ static void finishOutput()
     DEFINE_BINOP_INFIX_FUNC(u##int24_t, i##name, op)
 #define DEFINE_BINOP_INFIX_FUNC_L(u, name, op) \
     DEFINE_BINOP_INFIX_FUNC(u##int32_t, l##name, op)
+#define DEFINE_BINOP_INFIX_FUNC_I48(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC(u##int48_t, i48##name, op)
 #define DEFINE_BINOP_INFIX_FUNC_LL(u, name, op) \
     DEFINE_BINOP_INFIX_FUNC(u##int64_t, ll##name, op)
 
@@ -143,8 +180,11 @@ static void finishOutput()
 #define DEFINE_UNOP_PREFIX_FUNC_B_TO_L(u, name, op) \
     DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, name, op)     \
     DEFINE_UNOP_PREFIX_FUNC_L(u, name, op)
+#define DEFINE_UNOP_PREFIX_FUNC_B_TO_I48(u, name, op) \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_L(u, name, op)       \
+    DEFINE_UNOP_PREFIX_FUNC_I48(u, name, op)
 #define DEFINE_UNOP_PREFIX_FUNC_B_TO_LL(u, name, op) \
-    DEFINE_UNOP_PREFIX_FUNC_B_TO_L(u, name, op)      \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_I48(u, name, op)    \
     DEFINE_UNOP_PREFIX_FUNC_LL(u, name, op)
 
 #define DEFINE_BINOP_INFIX_FUNC_B_TO_S(u, name, op) \
@@ -156,38 +196,46 @@ static void finishOutput()
 #define DEFINE_BINOP_INFIX_FUNC_B_TO_L(u, name, op) \
     DEFINE_BINOP_INFIX_FUNC_B_TO_I(u, name, op)     \
     DEFINE_BINOP_INFIX_FUNC_L(u, name, op)
+#define DEFINE_BINOP_INFIX_FUNC_B_TO_I48(u, name, op) \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_L(u, name, op)       \
+    DEFINE_BINOP_INFIX_FUNC_I48(u, name, op)
 #define DEFINE_BINOP_INFIX_FUNC_B_TO_LL(u, name, op) \
-    DEFINE_BINOP_INFIX_FUNC_B_TO_L(u, name, op)      \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_I48(u, name, op)    \
     DEFINE_BINOP_INFIX_FUNC_LL(u, name, op)
 
 #define DEFINE_BINOP_FUNC_FUNC_I_TO_L(u, name, func, post) \
     DEFINE_BINOP_FUNC_FUNC_I(u, name, func, post)          \
     DEFINE_BINOP_FUNC_FUNC_L(u, name, func, post)
+#define DEFINE_BINOP_FUNC_FUNC_I_TO_I48(u, name, func, post) \
+    DEFINE_BINOP_FUNC_FUNC_I_TO_L(u, name, func, post)       \
+    // DEFINE_BINOP_FUNC_FUNC_I48(u, name, func, post)
 #define DEFINE_BINOP_FUNC_FUNC_I_TO_LL(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC_I_TO_L(u, name, func, post)      \
+    DEFINE_BINOP_FUNC_FUNC_I_TO_I48(u, name, func, post)    \
     DEFINE_BINOP_FUNC_FUNC_LL(u, name, func, post)
 
 
-#define DEFINE_UNOP_TYPE(u)           \
-    typedef struct u##UnOp_           \
-    {                                 \
-        const char *name;             \
-        u##int8_t (*b)(u##int8_t);    \
-        u##int16_t (*s)(u##int16_t);  \
-        u##int24_t (*i)(u##int24_t);  \
-        u##int32_t (*l)(u##int32_t);  \
-        u##int64_t (*ll)(u##int64_t); \
+#define DEFINE_UNOP_TYPE(u)            \
+    typedef struct u##UnOp_            \
+    {                                  \
+        const char *name;              \
+        u##int8_t (*b)(u##int8_t);     \
+        u##int16_t (*s)(u##int16_t);   \
+        u##int24_t (*i)(u##int24_t);   \
+        u##int32_t (*l)(u##int32_t);   \
+        u##int48_t (*i48)(u##int48_t); \
+        u##int64_t (*ll)(u##int64_t);  \
     } u##UnOp;
 
-#define DEFINE_BINOP_TYPE(u)                      \
-    typedef struct u##BinOp_                      \
-    {                                             \
-        const char *name;                         \
-        u##int8_t (*b)(u##int8_t, u##int8_t);     \
-        u##int16_t (*s)(u##int16_t, u##int16_t);  \
-        u##int24_t (*i)(u##int24_t, u##int24_t);  \
-        u##int32_t (*l)(u##int32_t, u##int32_t);  \
-        u##int64_t (*ll)(u##int64_t, u##int64_t); \
+#define DEFINE_BINOP_TYPE(u)                       \
+    typedef struct u##BinOp_                       \
+    {                                              \
+        const char *name;                          \
+        u##int8_t (*b)(u##int8_t, u##int8_t);      \
+        u##int16_t (*s)(u##int16_t, u##int16_t);   \
+        u##int24_t (*i)(u##int24_t, u##int24_t);   \
+        u##int32_t (*l)(u##int32_t, u##int32_t);   \
+        u##int48_t (*i48)(u##int48_t, u##int48_t); \
+        u##int64_t (*ll)(u##int64_t, u##int64_t);  \
     } u##BinOp;
 
 DEFINE_UNOP_TYPE()
@@ -204,10 +252,17 @@ DEFINE_BINOP_TYPE(u)
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_L(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_};
+#define DEFINE_UNOP_STRUCT_B_TO_I48(u, name) \
+    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_LL(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, ll##name##_};
-#define DEFINE_UNOP_STRUCT_S_L_LL(u, name) \
-    static const u##UnOp unop_##name = {#name, 0, s##name##_, 0, l##name##_, ll##name##_};
+    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
+#define DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48(u, name) \
+    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
+// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0):
+// - doesn't emit __ibswap
+// - unable to legalize instruction: %5:_(s48) = G_BSWAP %0:_ (in function: i48bswap_)
+#define DEFINE_UNOP_STRUCT_BSWAP(u, name) \
+    static const u##UnOp unop_##name = {#name, NULL, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
 
 #define DEFINE_BINOP_STRUCT_B(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_};
@@ -217,12 +272,16 @@ DEFINE_BINOP_TYPE(u)
     static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_};
 #define DEFINE_BINOP_STRUCT_B_TO_L(u, name) \
     static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_};
+#define DEFINE_BINOP_STRUCT_B_TO_I48(u, name) \
+    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_};
 #define DEFINE_BINOP_STRUCT_B_TO_LL(u, name) \
-    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, ll##name##_};
+    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
 #define DEFINE_BINOP_STRUCT_I_TO_L(u, name) \
     static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_};
+// #define DEFINE_BINOP_STRUCT_I_TO_I48(u, name) \
+//     static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_, i48##name##_};
 #define DEFINE_BINOP_STRUCT_I_TO_LL(u, name) \
-    static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_, ll##name##_};
+    static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_, NULL, ll##name##_};
 
 
 #define DEFINE_UNOP_PREFIX_B(u, name, op)  \
@@ -237,6 +296,9 @@ DEFINE_BINOP_TYPE(u)
 #define DEFINE_UNOP_PREFIX_B_TO_L(u, name, op)  \
     DEFINE_UNOP_PREFIX_FUNC_B_TO_L(u, name, op) \
     DEFINE_UNOP_STRUCT_B_TO_L(u, name)
+#define DEFINE_UNOP_PREFIX_B_TO_I48(u, name, op)  \
+    DEFINE_UNOP_PREFIX_FUNC_B_TO_I48(u, name, op) \
+    DEFINE_UNOP_STRUCT_B_TO_I48(u, name)
 #define DEFINE_UNOP_PREFIX_B_TO_LL(u, name, op)  \
     DEFINE_UNOP_PREFIX_FUNC_B_TO_LL(u, name, op) \
     DEFINE_UNOP_STRUCT_B_TO_LL(u, name)
@@ -253,6 +315,9 @@ DEFINE_BINOP_TYPE(u)
 #define DEFINE_BINOP_INFIX_B_TO_L(u, name, op)  \
     DEFINE_BINOP_INFIX_FUNC_B_TO_L(u, name, op) \
     DEFINE_BINOP_STRUCT_B_TO_L(u, name)
+#define DEFINE_BINOP_INFIX_B_TO_I48(u, name, op)  \
+    DEFINE_BINOP_INFIX_FUNC_B_TO_I48(u, name, op) \
+    DEFINE_BINOP_STRUCT_B_TO_I48(u, name)
 #define DEFINE_BINOP_INFIX_B_TO_LL(u, name, op)  \
     DEFINE_BINOP_INFIX_FUNC_B_TO_LL(u, name, op) \
     DEFINE_BINOP_STRUCT_B_TO_LL(u, name)
@@ -260,7 +325,7 @@ DEFINE_BINOP_TYPE(u)
 
 static void testOp(bool isBinOp, const BinOp *op, int64_t x, int64_t y)
 {
-    unsigned lhsLength = 8;
+    unsigned lhsLength = 9;
     unsigned nameLength = strlen(op->name);
     unsigned prefixLength = lhsLength - nameLength;
 
@@ -287,6 +352,7 @@ static void testOp(bool isBinOp, const BinOp *op, int64_t x, int64_t y)
     TEST_OP(s, 16)
     TEST_OP(i, 24)
     TEST_OP(l, 32)
+    TEST_OP(i48, 48)
     TEST_OP(ll, 64)
 
     finishOutput();
@@ -308,25 +374,34 @@ DEFINE_UNOP_PREFIX_B_TO_LL( , neg, -)
 
 DEFINE_UNOP_PREFIX_FUNC_B_TO_I( , abs, abs)
 DEFINE_UNOP_PREFIX_FUNC_L( , abs, labs)
+DEFINE_UNOP_PREFIX_FUNC_I48( , abs, i48abs)
 DEFINE_UNOP_PREFIX_FUNC_LL( , abs, llabs)
-DEFINE_UNOP_STRUCT_B_TO_LL( , abs)
+// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0)
+// doesn't emit __i48abs
+DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48( , abs)
 
 DEFINE_UNOP_PREFIX_FUNC_B( , bitrev, __builtin_bitreverse8)
 DEFINE_UNOP_PREFIX_FUNC_S( , bitrev, __builtin_bitreverse16)
 DEFINE_UNOP_PREFIX_FUNC_I( , bitrev, __builtin_bitreverse24)
 DEFINE_UNOP_PREFIX_FUNC_L( , bitrev, __builtin_bitreverse32)
+DEFINE_UNOP_PREFIX_FUNC_I48( , bitrev, __builtin_bitreverse48)
 DEFINE_UNOP_PREFIX_FUNC_LL( , bitrev, __builtin_bitreverse64)
-DEFINE_UNOP_STRUCT_B_TO_LL( , bitrev)
+// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0)
+// doesn't emit __i48bitrev
+DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48( , bitrev)
 
 // Needs to be unsigned to avoid extra bits from sign extension
 DEFINE_UNOP_PREFIX_FUNC_S(u, bswap, __builtin_bswap16)
+DEFINE_UNOP_PREFIX_FUNC_I(u, bswap, __builtin_bswap24)
 DEFINE_UNOP_PREFIX_FUNC_L(u, bswap, __builtin_bswap32)
+DEFINE_UNOP_PREFIX_FUNC_I48(u, bswap, __builtin_bswap48)
 DEFINE_UNOP_PREFIX_FUNC_LL(u, bswap, __builtin_bswap64)
-DEFINE_UNOP_STRUCT_S_L_LL(u, bswap)
+DEFINE_UNOP_STRUCT_BSWAP(u, bswap)
 
 // Needs to be unsigned to avoid extra bits from sign extension
 DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, popcnt, __builtin_popcount)
 DEFINE_UNOP_PREFIX_FUNC_L(u, popcnt, __builtin_popcountl)
+DEFINE_UNOP_PREFIX_FUNC_I48(u, popcnt, __builtin_popcounti48)
 DEFINE_UNOP_PREFIX_FUNC_LL(u, popcnt, __builtin_popcountll)
 DEFINE_UNOP_STRUCT_B_TO_LL(u, popcnt)
 
