@@ -54,7 +54,7 @@ jobs:
 
       - name: Download ez80-clang and ez80-link
         id: ez80-bins
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2.0.2
         with:
           file-url: https://github.com/CE-Programming/llvm-project/releases/download/nightly/ez80-clang-link_${{matrix.ez80-bins-suffix}}_nightly.zip
       - name: Extract ez80-clang
@@ -65,7 +65,7 @@ jobs:
 
       - name: Download Fasmg Download Page
         id: fasmg-download
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2.0.2
         with:
           file-url: ${{env.FASMG_DOMAIN}}/download.php
       - name: Parse Fasmg Download Page
@@ -78,7 +78,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
       - name: Download Fasmg
         id: fasmg
-        uses: carlosperate/download-file-action@v1.0.3
+        uses: carlosperate/download-file-action@v2.0.2
         with:
           file-url: ${{env.FASMG_DOMAIN}}/${{env.href}}
       - name: Extract Fasmg
