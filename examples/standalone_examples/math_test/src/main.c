@@ -28,14 +28,21 @@
 
 #   define x_printf printf
 
-#   ifndef __cplusplus
+#   if __STDC_VERSION__ >= 202311L
 
-typedef int32_t int24_t;
-typedef uint32_t uint24_t;
-typedef int64_t int48_t;
-typedef uint64_t uint48_t;
+typedef _BitInt(24) int24_t;
+typedef unsigned _BitInt(24) uint24_t;
+typedef _BitInt(48) int48_t;
+typedef unsigned _BitInt(48) uint48_t;
 
-#   else
+#   elif defined(__clang__)
+
+typedef _ExtInt(24) int24_t;
+typedef unsigned _ExtInt(24) uint24_t;
+typedef _ExtInt(48) int48_t;
+typedef unsigned _ExtInt(48) uint48_t;
+
+#   elif defined(__cplusplus)
 
 template <unsigned bits, typename U>
 struct IntN final
@@ -55,6 +62,10 @@ using uint24_t = IntN<24, uint_fast32_t>;
 using int24_t = IntN<24, int_fast32_t>;
 using uint48_t = IntN<48, uint_fast64_t>;
 using int48_t = IntN<48, int_fast64_t>;
+
+#   else
+
+#error "Use a more modern language standard/compiler"
 
 #   endif
 
@@ -84,6 +95,10 @@ static uint48_t __builtin_bswap48(uint48_t x)
 static int __builtin_popcounti48(uint48_t x)
 {
     return __builtin_popcountll(x & ((1LL << 48) - 1));
+}
+static int24_t iabs(int24_t x)
+{
+    return x < 0 ? (int24_t)-x : x;
 }
 static int48_t i48abs(int48_t x)
 {
@@ -127,16 +142,16 @@ static void finishOutput()
         return (type)(op(x));                   \
     }
 
-#define DEFINE_BINOP_FUNC_FUNC(type, name, func, post) \
-    static type name##_(type x, type y)                \
-    {                                                  \
-        return (type)(func(x, y)post);                 \
-    }
-
 #define DEFINE_BINOP_INFIX_FUNC(type, name, op) \
     static type name##_(type x, type y)         \
     {                                           \
         return (type)(x op y);                  \
+    }
+
+#define DEFINE_BINOP_DIV_LIKE_FUNC(type, name, func, post) \
+    static type name##_(type x, type y)                    \
+    {                                                      \
+        return (type)(func(x + 0, y + 0)post);                     \
     }
 
 #define DEFINE_UNOP_PREFIX_FUNC_B(u, name, op) \
@@ -152,19 +167,6 @@ static void finishOutput()
 #define DEFINE_UNOP_PREFIX_FUNC_LL(u, name, op) \
     DEFINE_UNOP_PREFIX_FUNC(u##int64_t, ll##name, op)
 
-#define DEFINE_BINOP_FUNC_FUNC_B(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int8_t, b##name, b##func, post)
-#define DEFINE_BINOP_FUNC_FUNC_S(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int16_t, s##name, s##func, post)
-#define DEFINE_BINOP_FUNC_FUNC_I(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int24_t, i##name, func, post)
-#define DEFINE_BINOP_FUNC_FUNC_L(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int32_t, l##name, l##func, post)
-#define DEFINE_BINOP_FUNC_FUNC_I48(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int48_t, i48##name, i48##func, post)
-#define DEFINE_BINOP_FUNC_FUNC_LL(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC(u##int64_t, ll##name, ll##func, post)
-
 #define DEFINE_BINOP_INFIX_FUNC_B(u, name, op) \
     DEFINE_BINOP_INFIX_FUNC(u##int8_t, b##name, op)
 #define DEFINE_BINOP_INFIX_FUNC_S(u, name, op) \
@@ -177,6 +179,19 @@ static void finishOutput()
     DEFINE_BINOP_INFIX_FUNC(u##int48_t, i48##name, op)
 #define DEFINE_BINOP_INFIX_FUNC_LL(u, name, op) \
     DEFINE_BINOP_INFIX_FUNC(u##int64_t, ll##name, op)
+
+#define DEFINE_BINOP_DIV_LIKE_FUNC_B(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC(u##int8_t, b##name, b##func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_S(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC(u##int16_t, s##name, s##func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_I(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC(u##int24_t, i##name, func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_L(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC(u##int32_t, l##name, l##func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_I48(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC(u##int48_t, i48##name, i48##func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_LL(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC(u##int64_t, ll##name, ll##func, post)
 
 #define DEFINE_UNOP_PREFIX_FUNC_B_TO_S(u, name, op) \
     DEFINE_UNOP_PREFIX_FUNC_B(u, name, op)          \
@@ -210,15 +225,15 @@ static void finishOutput()
     DEFINE_BINOP_INFIX_FUNC_B_TO_I48(u, name, op)    \
     DEFINE_BINOP_INFIX_FUNC_LL(u, name, op)
 
-#define DEFINE_BINOP_FUNC_FUNC_I_TO_L(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC_I(u, name, func, post)          \
-    DEFINE_BINOP_FUNC_FUNC_L(u, name, func, post)
-#define DEFINE_BINOP_FUNC_FUNC_I_TO_I48(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC_I_TO_L(u, name, func, post)       \
-    // DEFINE_BINOP_FUNC_FUNC_I48(u, name, func, post)
-#define DEFINE_BINOP_FUNC_FUNC_I_TO_LL(u, name, func, post) \
-    DEFINE_BINOP_FUNC_FUNC_I_TO_I48(u, name, func, post)    \
-    DEFINE_BINOP_FUNC_FUNC_LL(u, name, func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_L(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC_I(u, name, func, post)          \
+    DEFINE_BINOP_DIV_LIKE_FUNC_L(u, name, func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_I48(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_L(u, name, func, post)       \
+    // DEFINE_BINOP_DIV_LIKE_FUNC_I48(u, name, func, post)
+#define DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_LL(u, name, func, post) \
+    DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_I48(u, name, func, post)    \
+    DEFINE_BINOP_DIV_LIKE_FUNC_LL(u, name, func, post)
 
 
 #define DEFINE_UNOP_TYPE(u)            \
@@ -383,7 +398,8 @@ static void testBinOp(const BinOp *op, int64_t x, int64_t y)
 DEFINE_UNOP_PREFIX_B_TO_LL( , not, ~)
 DEFINE_UNOP_PREFIX_B_TO_LL( , neg, -)
 
-DEFINE_UNOP_PREFIX_FUNC_B_TO_I( , abs, abs)
+DEFINE_UNOP_PREFIX_FUNC_B_TO_S( , abs, abs)
+DEFINE_UNOP_PREFIX_FUNC_I( , abs, iabs)
 DEFINE_UNOP_PREFIX_FUNC_L( , abs, labs)
 DEFINE_UNOP_PREFIX_FUNC_I48( , abs, i48abs)
 DEFINE_UNOP_PREFIX_FUNC_LL( , abs, llabs)
@@ -426,11 +442,10 @@ DEFINE_BINOP_INFIX_B_TO_LL(u, remu, %)
 DEFINE_BINOP_INFIX_B_TO_LL( , divs, /)
 DEFINE_BINOP_INFIX_B_TO_LL( , rems, %)
 
-
-DEFINE_BINOP_FUNC_FUNC_I_TO_LL( , div_q, div, .quot)
+DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_LL( , div_q, div, .quot)
 DEFINE_BINOP_STRUCT_I_TO_LL( , div_q)
 
-DEFINE_BINOP_FUNC_FUNC_I_TO_LL( , div_r, div, .rem)
+DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_LL( , div_r, div, .rem)
 DEFINE_BINOP_STRUCT_I_TO_LL( , div_r)
 
 
