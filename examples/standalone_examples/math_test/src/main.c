@@ -261,9 +261,9 @@ DEFINE_BINOP_TYPE(u)
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48(u, name) \
     static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
-// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0):
-// - doesn't emit __ibswap
-// - unable to legalize instruction: %5:_(s48) = G_BSWAP %0:_ (in function: i48bswap_)
+// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project
+// 23b78267b5d376b232475d0805a937e54b61e0d0): unable to legalize instruction:
+// %5:_(s48) = G_BSWAP %0:_ (in function: i48bswap_)
 #define DEFINE_UNOP_STRUCT_BSWAP(u, name) \
     static const u##UnOp unop_##name = {#name, NULL, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
 
@@ -383,9 +383,7 @@ DEFINE_UNOP_PREFIX_FUNC_B_TO_I( , abs, abs)
 DEFINE_UNOP_PREFIX_FUNC_L( , abs, labs)
 DEFINE_UNOP_PREFIX_FUNC_I48( , abs, i48abs)
 DEFINE_UNOP_PREFIX_FUNC_LL( , abs, llabs)
-// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0)
-// doesn't emit __i48abs
-DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48( , abs)
+DEFINE_UNOP_STRUCT_B_TO_LL(, abs)
 
 DEFINE_UNOP_PREFIX_FUNC_B( , bitrev, __builtin_bitreverse8)
 DEFINE_UNOP_PREFIX_FUNC_S( , bitrev, __builtin_bitreverse16)
@@ -393,9 +391,7 @@ DEFINE_UNOP_PREFIX_FUNC_I( , bitrev, __builtin_bitreverse24)
 DEFINE_UNOP_PREFIX_FUNC_L( , bitrev, __builtin_bitreverse32)
 DEFINE_UNOP_PREFIX_FUNC_I48( , bitrev, __builtin_bitreverse48)
 DEFINE_UNOP_PREFIX_FUNC_LL( , bitrev, __builtin_bitreverse64)
-// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 23b78267b5d376b232475d0805a937e54b61e0d0)
-// doesn't emit __i48bitrev
-DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48( , bitrev)
+DEFINE_UNOP_STRUCT_B_TO_LL(, bitrev)
 
 // Needs to be unsigned to avoid extra bits from sign extension
 DEFINE_UNOP_PREFIX_FUNC_S(u, bswap, __builtin_bswap16)
