@@ -162,6 +162,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install create-dmg || brew install create-dmg; # we try twice because sometimes it fails...
+          echo killing XProtect...; sudo pkill -9 XProtect >/dev/null || true;
+          echo waiting...; while pgrep XProtect; do sleep 3; done;
           cp -a "${CEDEV}" "${TOOLCHAIN_PATH}/resources/macOS/dmg/contents/";
           # The codesign variable may be empty (for forks) but that's fine, create-dmg only does code-signing if it's not empty.
           createDmgArgs="--codesign '${{ secrets.MACOS_CODESIGN_IDENT }}' \
