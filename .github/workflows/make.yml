@@ -66,6 +66,10 @@ jobs:
           pathSource: ${{steps.ez80-bins.outputs.file-path}}
           pathTarget: ${{env.CEDEV_BIN}}
 
+      - name: Add fasmg website to /etc/hosts since DNS seems to be broken
+        if: runner.os == 'macOS'
+        run: |
+             sudo echo "208.99.203.253 flatassembler.net" | sudo tee -a /etc/hosts
       - name: Download Fasmg Download Page
         id: fasmg-download
         uses: carlosperate/download-file-action@v2.0.2
