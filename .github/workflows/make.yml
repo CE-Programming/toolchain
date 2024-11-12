@@ -136,7 +136,7 @@ jobs:
       - name: Install Toolchain
         env:
           PREFIX: ${{github.workspace}}
-        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install V=1 DESTDIR=${{github.workspace}}/
+        run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install V=1 DESTDIR=${{github.workspace}}
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
