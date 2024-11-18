@@ -239,7 +239,47 @@ macro setSmcBytesFast name*
 	jp	(hl)
 end macro
 
+macro setSmcBytesInline name*
+	local temp, list
+	postpone
+		temp equ each
+		irpv each, name
+			temp equ temp, each
+		end irpv
+		list equ temp
+	end postpone
+
+	match expand, list
+		iterate expand
+			ld	(each),a
+		end iterate
+	end match
+end macro
+
+macro setSmcWordsInline name*
+	local temp, list
+	postpone
+		temp equ each
+		irpv each, name
+			temp equ temp, each
+		end irpv
+		list equ temp
+	end postpone
+
+	match expand, list
+		iterate expand
+			ld	(each),hl
+		end iterate
+	end match
+end macro
+
 macro smcByte name*, addr: $-1
+	local link
+	link := addr
+	name equ link
+end macro
+
+macro smcWord name*, addr: $-3
 	local link
 	link := addr
 	name equ link
@@ -362,17 +402,46 @@ gfx_SetClipRegion:
 ;  arg3 : Ymax
 ; Returns:
 ;  None
-	ld	hl,_ClipRegion_Full	; clip against the actual LCD screen
-	call	.copy
+	; clip against the actual LCD screen
+	xor	a,a
+	sbc	hl,hl
+	ld	(_ClipRegion.XMin),hl
+	inc	h
+	ld	l,ti.lcdWidth-256
+	ld	(_ClipRegion.XMax),hl
+	ld	(_ClipRegion.YMin),a
+	ld	a,ti.lcdHeight
+	ld	(_ClipRegion.YMax),a
 	ld	iy,0
 	add	iy,sp
 	call	_ClipRegion		; iy points to the start of the arguments
-	ret	c
-	lea	hl,iy+3
-.copy:
-	ld	de,_XMin
-	ld	bc,4*3
-	ldir
+	ld	hl,(iy+3)
+	ld	c,(iy+6)
+	ld	de,(iy+9)
+	ld	a,(iy+12)
+	jr	nc,.apply
+	xor	a,a
+	ld	c,a
+	sbc	hl,hl
+	ld	de,ti.lcdWidth
+	ld	a,ti.lcdHeight
+.apply:
+	setSmcWordsInline _XMin
+	ex	de,hl
+	setSmcWordsInline _XMax
+	dec	hl
+	setSmcWordsInline _XMaxMinus1
+	inc	hl
+	sbc	hl,de
+	setSmcWordsInline _XSpan
+	setSmcBytesInline _YMax
+	dec	a
+	setSmcBytesInline _YMaxMinus1
+	inc	a
+	sub	a,c
+	setSmcBytesInline _YSpan
+	ld	a,c
+	setSmcBytesInline _YMin
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -851,34 +920,34 @@ gfx_HorizLine:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	de,(_YMin)
 	ld	hl,(iy+6)
-	mIsHLLessThanDE			; compare y coordinate <-> ymin
-	ret	c
-	ld	hl,(_YMax)
-	dec	hl			; inclusive
-	ld	de,(iy+6)
-	mIsHLLessThanDE			; compare y coordinate <-> ymax
-	ret	c
+	ld	de,ti.lcdHeight
+smcWord _YMax
+	sbc	hl,de			; subtract maximum y
+	ld	de,ti.lcdHeight		; add y bounds span
+smcWord _YSpan
+	add	hl,de
+	ret	nc			; return if not within y bounds
 	ld	hl,(iy+9)
 	ld	de,(iy+3)
 	add	hl,de
-	ld	(iy+9),hl
-	ld	hl,(_XMin)
-	call	_Maximum
-	ld	(iy+3),hl		; save maximum x value
-	ld	hl,(_XMax)
-	ld	de,(iy+9)
-	call	_Minimum
-	ld	(iy+9),hl		; save minimum x value
-	ld	de,(iy+3)
-	mIsHLLessThanDE
-	ret	c
-	ld	hl,(iy+9)
+	push	hl
+	ld	hl,0
+smcWord _XMin
+	call	_Maximum		; get minimum x
+	ex	(sp),hl
+	ld	de,ti.lcdWidth
+smcWord _XMax
+	call	_Minimum		; get maximum x
+	pop	de
+	scf
 	sbc	hl,de
+	ret	c
+	inc	hl
 	push	hl
 	pop	bc			; bc = length
-	jr	_HorizLine_NoClip_StackXY
+	ex	de,hl
+	jr	_HorizLine_NoClip_NotDegen_StackY
 
 ;-------------------------------------------------------------------------------
 gfx_HorizLine_NoClip:
@@ -897,8 +966,9 @@ _HorizLine_NoClip_StackXY:
 	adc	hl,bc
 	ret	z			; abort if length == 0
 _HorizLine_NoClip_NotDegen_StackXY:
-	ld	e,(iy+6)		; e = y
 	ld	hl,(iy+3)		; hl = x
+_HorizLine_NoClip_NotDegen_StackY:
+	ld	e,(iy+6)		; e = y
 _HorizLine_NoClip_NotDegen:
 	wait_quick
 _HorizLine_NoClip_NotDegen_NoWait:
@@ -931,33 +1001,31 @@ gfx_VertLine:
 ;  None
 	ld	iy,0
 	add	iy,sp
-	ld	hl,(_XMax)
-	dec	hl			; inclusive
-	ld	de,(iy+3)
-	mIsHLLessThanDE
-	ret	c			; return if x > xmax
-	ld	hl,(_XMin)
-	ex	de,hl
-	mIsHLLessThanDE
-	ret	c			; return if x < xmin
+	ld	hl,(iy+3)
+	ld	de,ti.lcdWidth
+smcWord _XMax
+	sbc	hl,de			; subtract maximum x
+	ld	de,ti.lcdWidth
+smcWord _XSpan
+	add	hl,de			; add x bounds span
+	ret	nc			; return if not within x bounds
 	ld	hl,(iy+9)
 	ld	de,(iy+6)
 	add	hl,de
-	ld	(iy+9),hl
-	ld	hl,(_YMin)
+	push	hl
+	ld	hl,0
+smcWord _YMin
 	call	_Maximum		; get minimum y
-	ld	(iy+6),hl
-	ld	hl,(_YMax)
-	ld	de,(iy+9)
+	ex	(sp),hl
+	ld	de,ti.lcdHeight
+smcWord _YMax
 	call	_Minimum		; get maximum y
-	ld	(iy+9),hl
-	ld	de,(iy+6)
-	mIsHLLessThanDE
+	pop	de
+	ld	a,l
+	sub	a,e
 	ret	c			; return if not within y bounds
-	ld	hl,(iy+9)
-	sbc	hl,de
-	ld	b,l
-	jr	_VertLine_NoClip_StackX	; jump to unclipped version
+	ld	b,a
+	jr	_VertLine_NoClip_MaybeDegen_StackX	; jump to unclipped version
 
 ;-------------------------------------------------------------------------------
 gfx_VertLine_NoClip:
@@ -975,6 +1043,7 @@ gfx_VertLine_NoClip:
 _VertLine_NoClip_StackX:
 	xor	a,a
 	or	a,b
+_VertLine_NoClip_MaybeDegen_StackX:
 	ret	z			; abort if length == 0
 _VertLine_NoClip_NotDegen_StackX:
 	ld	hl,(iy+3)		; hl = x
@@ -1932,13 +2001,14 @@ GetOutOutcode:				; select correct outcode
 	push	af			; a = outoutcode
 	rra
 	jr	nc,.notop		; if (outcodeOut & TOP)
-	ld	hl,(_YMax)
-	dec	hl			; inclusive
+	ld	hl,ti.lcdHeight-1
+smcWord _YMaxMinus1
 	jr	ComputeNewX
 .notop:
 	rra
 	jr	nc,NotBottom		; if (outcodeOut & BOTTOM)
-	ld	hl,(_YMin)
+	ld	hl,0
+smcWord _YMin
 ComputeNewX:
 	push	hl
 	ld	bc,(iy+6)
@@ -1966,13 +2036,14 @@ ComputeNewX:
 NotBottom:
 	rra
 	jr	nc,NotRight		; if (outcodeOut & RIGHT)
-	ld	hl,(_XMax)
-	dec	hl			; inclusive
+	ld	hl,ti.lcdWidth-1
+smcWord _XMaxMinus1
 	jr	ComputeNewY
 NotRight:
 	rra
 	jr	nc,FinishComputations	; if (outcodeOut & LEFT)
-	ld	hl,(_XMin)
+	ld	hl,0
+smcWord _XMin
 ComputeNewY:
 	push	hl
 	ld	bc,(iy+3)
@@ -2343,24 +2414,20 @@ gfx_ShiftUp:
 	ld	a,$B0
 	call	_ShiftCalculate
 	ld	(ShiftAmountOffset),hl
-	jr	z,.next
-	sbc	hl,hl
-.next:
+	ld	de,ti.lcdWidth
+smcWord _XSpan
+	jr	nz,.next
 	ex	de,hl
-	ld	hl,(_XMax)
-	ld	bc,(_XMin)
-	sbc	hl,bc
 	sbc	hl,de
-	ld	(ShiftCopyAmount),hl
 	ex	de,hl
+.next:
+	push	de	; shift copy amount
 	ld	hl,ti.lcdWidth
 	sbc	hl,de
-	ld	(ShiftLineOff),hl
-	ld	hl,_YMax
-	sub	a,(hl)
-	ld	hl,_YMin
-	ld	e,(hl)
-	add	a,e
+	ld	e,0
+smcByte _YMin
+	ld	bc,0
+smcWord _XMin
 	jr	_Shift
 
 ;-------------------------------------------------------------------------------
@@ -2386,28 +2453,26 @@ gfx_ShiftDown:
 	sbc	hl,hl
 	sbc	hl,de
 	ld	(ShiftAmountOffset),hl
+	ld	hl,ti.lcdWidth
+smcWord _XSpan
 	or	a,a
-	jr	z,.next
-	sbc	hl,hl
-.next:
-	ld	bc,(_XMax)
-	add	hl,bc
-	dec	bc
-	ld	e,a
-	ld	a,(_YMin)
-	add	a,e
-	ld	de,(_XMin)
+	jr	nz,.next
 	sbc	hl,de
-	ld	(ShiftCopyAmount),hl
+.next:
+	push	hl	; shift copy amount
 	ld	de,0 - ti.lcdWidth
 	add	hl,de
-	ld	(ShiftLineOff),hl
-	ld	hl,_YMax
-	ld	e,(hl)
-	sub	a,e
-	dec	e
+	ld	e,ti.lcdHeight-1
+smcByte _YMaxMinus1
+	ld	bc,ti.lcdWidth-1
+smcWord _XMaxMinus1
 
 _Shift:
+	ex	(sp),ix	; shift copy amount
+	push	hl
+	pop	iy	; shift line offset
+	sub	a,ti.lcdHeight
+smcByte _YSpan
 	ld	d,ti.lcdWidth / 2
 	mlt	de
 	ld	hl,(CurrentBuffer)
@@ -2417,18 +2482,18 @@ _Shift:
 	call	gfx_Wait
 ShiftCopyAmount :=$+1
 .loop:
-	ld	bc,0
+	lea	bc,ix	; shift copy amount
 	ex	de,hl
 ShiftAmountOffset :=$+1
 	ld	hl,0
 	add	hl,de
 ShiftCopyDirection :=$+1
 	ldir
-ShiftLineOff :=$+1
-	ld	hl,0
+	lea	hl,iy	; shift line offset
 	add	hl,de
 	inc	a
 	jr	nz,.loop
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2911,24 +2976,27 @@ _ClipCoordinates:
 	ld	hl,(ix+3)		; hl -> sprite data
 	ld	iy,(hl)			; iyl = width, iyh = height
 
-	ld	bc,(_YMin)
+	ld	bc,0
+smcWord _YMin
 	ld	hl,(ix+9)		; hl = y coordinate
 	sbc	hl,bc
 	ex	de,hl			; de = y coordinate relative to min y
-	ld	hl,(_YMax)
-	xor	a,a
-	sbc	hl,bc			; hl = clip_height
+	ld	a,ti.lcdHeight		; a = clip_height
+smcByte _YSpan
 	ld	c,iyh			; bc = height
-	sbc	hl,bc			; get difference between clip_height and height
+	sub	a,c			; get difference between clip_height and height
+	sbc	hl,hl
+	ld	l,a
 	dec	c			; bc = height - 1
 	jr	nc,.nottaller
-	or	a,a
+	xor	a,a
 	sbc	hl,de			; is partially clipped both top and bottom?
 	jr	nc,.yclip
 	sub	a,e			; a = negated relative y
 	add	hl,de			; use clip_height as the draw height, and clip top
 	jr	.cliptop
 .nottaller:
+	xor	a,a
 	sbc	hl,de			; is fully onscreen vertically?
 	jr	nc,.yclipped
 .yclip:
@@ -2946,21 +3014,22 @@ _ClipCoordinates:
 	ld	hl,(ix+3)		; hl -> sprite data
 	add	hl,bc
 	ld	(ix+3),hl		; store new ptr
-	ld	a,(_YMin)
-	ld	(ix+9),a		; save min y coordinate
+	ld	(ix+9),0		; save min y coordinate
+smcByte _YMin
 .clipbottom:
 	inc	e
 	ld	iyh,e			; save new height
 .yclipped:
 
-	ld	bc,(_XMin)
+	ld	bc,0
+smcWord _XMin
 	ld	hl,(ix+6)		; hl = x coordinate
 	or	a,a
 	sbc	hl,bc
 	ex	de,hl			; de = x coordinate relative to min x
-	ld	hl,(_XMax)
+	ld	hl,ti.lcdWidth		; hl = clip_width
+smcWord _XSpan
 	xor	a,a
-	sbc	hl,bc			; hl = clip_width
 	ld	b,a
 	ld	c,iyl			; bc = width
 	sbc	hl,bc			; get difference between clip_width and width
@@ -2988,7 +3057,8 @@ _ClipCoordinates:
 	ld	hl,(ix+3)		; hl -> sprite data
 	add	hl,bc
 	ld	(ix+3),hl
-	ld	hl,(_XMin)
+	ld	hl,0
+smcWord _XMin
 	ld	(ix+6),hl		; save min x coordinate
 .clipright:
 	inc	e
@@ -5353,11 +5423,6 @@ gfx_FloodFill:
 	ld	(.newcolor0),a
 	ld	(.newcolor1),a
 
-	ld	hl,(_XMax)		; smc to gain speedz in inner loops
-	ld	(.xmax),hl
-	ld	hl,(_XMin)
-	ld	(.xmin),hl
-
 	lea	iy,ix
 	ld	bc,-3224
 	add	iy,bc
@@ -5392,83 +5457,75 @@ gfx_FloodFill:
 	ld	(ix-8),bc		; x1 = sp->xl;
 
 	ld	hl,(CurrentBuffer)
-	add	hl,bc
 	ld	e,a
 	ld	d,ti.lcdWidth / 2
 	mlt	de
 	add	hl,de
 	add	hl,de
 	ld	de,0
-.xmin = $-3
+smcWord _XMin
+	ex	de,hl
+	add	hl,de
+	ex	de,hl			; de -> draw location at xmin, y
+	add	hl,bc			; hl -> draw location at x, y
 	ld	a,0
 .oldcolor0 = $-1
 
 	jr	.begin
-.forloop0:				; for (x=x1; !(x & 0x8000) && x>=xmin && p(x, y) == ov; x--) { s(x, y); }
+.forloop0:				; for (x=x1; x>=xmin && p(x, y) == ov; x--) { s(x, y); }
 	ld	(hl),0
 .newcolor0 = $-1
-	dec	hl
 	dec	bc
+	scf
 .begin:
-	bit	7,b
-	jr	nz,.nonnegative
-	or	a,a
 	sbc	hl,de
 	jr	c,.nonnegative
 	add	hl,de
 	cp	a,(hl)
 	jr	z,.forloop0
-
+	or	a,a
 .nonnegative:
 	ld	(ix+6),bc
 	ld	bc,(ix-8)
 	ld	hl,(ix+6)
-	bit	7,h
-	jr	nz,.check
-	or	a,a
+	jr	c,.check
 	sbc	hl,bc
-	jp	nc,.skip		; if (!(x & 0x8000) && (unsigned)x>=x1) goto skip;
+	jp	nc,.skip		; if (x>=xmin && (unsigned)x>=x1) goto skip;
 	add	hl,bc
 .check:
 	inc	hl
 	ld	(ix-11),hl		; l = x+1;
-	or	a,a
+	xor	a,a
 	sbc	hl,bc
+	ld	e,(ix+9)
 	jr	nc,.badpush0		; if (l<x1) { push(y, l, x1-1, -dy); }
+	or	a,e
 	lea	de,ix-24
 	lea	hl,iy
-	or	a,a
 	sbc	hl,de
+	ld	e,a
 	jr	nc,.badpush0		; check stack limit
-	ld	a,(_YMin)
-	ld	e,a
-	ld	a,(ix+9)
 	sub	a,(ix-4)
-	cp	a,e
-	jr	c,.badpush0
-	ld	e,a
-	ld	a,(_YMax)
-	scf
-	sbc	a,e
-	jr	c,.badpush0		; compare y values
-	ld	a,(ix+9)
-	ld	(iy+6),a
-	ld	bc,(ix-11)
-	ld	(iy+0),bc
-	ld	bc,(ix-8)
+	sub	a,0			; check if y coordinate is in bounds
+smcByte _YMin
+	cp	a,ti.lcdHeight
+smcByte _YSpan
+	jr	nc,.badpush0
+	ld	(iy+6),e
+	ld	hl,(ix-11)
+	ld	(iy+0),hl
 	dec	bc
 	ld	(iy+3),bc
-	ld	a,(ix-4)
-	neg
+	inc	bc
+	xor	a,a
+	sub	a,(ix-4)
 	ld	(iy+7),a
 	lea	iy,iy+8
 .badpush0:
-	ld	bc,(ix-8)
 	inc	bc			; x = x1+1;
 
 	ld	hl,(CurrentBuffer)
 	add	hl,bc
-	ld	e,(ix+9)
 	ld	d,ti.lcdWidth / 2
 	mlt	de
 	add	hl,de
@@ -5476,8 +5533,8 @@ gfx_FloodFill:
 	ex	de,hl			; de -> draw location
 					; do {
 .forloop1start:
-	ld	hl,0
-.xmax = $-3
+	ld	hl,ti.lcdWidth-1
+smcWord _XMaxMinus1
 	jr	.atov			; for (; (unsigned)x<=xmax && p(x, y) == ov; x++) { s(x, y); }
 .forloop1:
 	ld	a,0
@@ -5486,7 +5543,6 @@ gfx_FloodFill:
 	inc	de
 	inc	bc
 .atov:
-	or	a,a
 	sbc	hl,bc
 	jr	c,.ovat
 	add	hl,bc
@@ -5502,17 +5558,13 @@ gfx_FloodFill:
 	or	a,a
 	sbc	hl,de
 	jr	nc,.badpush1
-	ld	a,(_YMin)
-	ld	e,a
 	ld	a,(ix-4)
 	add	a,(ix+9)
-	cp	a,e
-	jr	c,.badpush1
-	ld	e,a
-	ld	a,(_YMax)
-	scf
-	sbc	a,e
-	jr	c,.badpush1		; compare y values
+	sub	a,0			; check if y coordinate is in bounds
+smcByte _YMin
+	cp	a,ti.lcdHeight
+smcByte _YSpan
+	jr	nc,.badpush1
 	dec	bc
 	ld	(iy+3),bc
 	ld	a,(ix+9)
@@ -5534,24 +5586,20 @@ gfx_FloodFill:
 	or	a,a
 	sbc	hl,de
 	jr	nc,.badpush2
-	ld	a,(_YMin)
-	ld	e,a
 	ld	a,(ix+9)
 	sub	a,(ix-4)
-	cp	a,e
-	jr	c,.badpush2
-	ld	e,a
-	ld	a,(_YMax)
-	scf
-	sbc	a,e
-	jr	c,.badpush2		; compare y values
+	sub	a,0			; check if y coordinate is in bounds
+smcByte _YMin
+	cp	a,ti.lcdHeight
+smcByte _YSpan
+	jr	nc,.badpush2
 	dec	bc
 	ld	(iy+3),bc
 	ld	bc,(ix-15)
 	inc	bc
 	ld	(iy+0),bc
-	ld	a,(ix-4)
-	neg
+	xor	a,a
+	sub	a,(ix-4)
 	ld	(iy+7),a
 	ld	a,(ix+9)
 	ld	(iy+6),a
@@ -5619,7 +5667,8 @@ gfx_RLETSprite:
 	ld	hl,(iy+3)		; hl = sprite struct
 	inc	hl
 	ld	c,(hl)			; bc = height
-	ld	hl,(_YMax)		; hl = ymax
+	ld	hl,ti.lcdHeight		; hl = ymax
+smcWord _YMax
 	ld	de,(iy+9)		; de = y
 	sbc	hl,de			; hl = ymax-y
 	ret	m			; m ==> ymax < y || y ~ int_min ==> fully off-screen
@@ -5633,7 +5682,8 @@ gfx_RLETSprite:
 _RLETSprite_SkipClipBottom:
 ; ymax-y did not overflow ==> y-ymin will not overflow
 ; Clip top
-	ld	hl,(_YMin)		; hl = ymin
+	ld	hl,0			; hl = ymin
+smcWord _YMin
 	ex	de,hl			; de = ymin
 					; hl = y
 	sbc	hl,de			; hl = y-ymin
@@ -5656,7 +5706,8 @@ _RLETSprite_SkipClipTop:
 	ld	hl,(iy+3)		; hl = sprite struct
 	ld	e,(hl)			; de = width
 	ld	hl,(iy+6)		; hl = x
-	ld	bc,(_XMin)		; bc = xmin
+	ld	bc,0			; bc = xmin
+smcWord _XMin
 	sbc	hl,bc			; hl = x-xmin
 	ret	pe			; v ==> x ~ int_min ==> fully off-screen
 	jp	p,_RLETSprite_SkipClipLeft ; p ==> x >= xmin ==> fully on-screen
@@ -5676,7 +5727,8 @@ _RLETSprite_SkipClipLeft:
 ; Clip right
 	add	hl,bc			; hl = x (clipped)
 	ld	(iy+6),hl		; write back clipped x
-	ld	bc,(_XMax)		; bc = xmax
+	ld	bc,ti.lcdWidth		; bc = xmax
+smcWord _XMax
 	sbc	hl,bc			; hl = x-xmax
 	ret	nc			; nc ==> x >= xmax ==> fully off-screen
 	ld	a,d			; a[0] = clip left?
@@ -6284,22 +6336,30 @@ _ClipRegion:
 ; Outputs:
 ;  Modifies data registers
 ;  Sets C flag if offscreen
-	ld	hl,(_XMin)
+	ld	hl,0
+smcWord _XMin
+.XMin := $-3
 	ld	de,(iy+3)
 	call	_Maximum
 	ld	(iy+3),hl
-	ld	hl,(_XMax)
+	ld	hl,ti.lcdWidth
+smcWord _XMax
+.XMax := $-3
 	ld	de,(iy+9)
 	call	_Minimum
 	ld	(iy+9),hl
 	ld	de,(iy+3)
 	call	.compare
 	ret	c
-	ld	hl,(_YMin)
+	ld	hl,0
+smcWord _YMin
+.YMin := $-3
 	ld	de,(iy+6)
 	call	_Maximum
 	ld	(iy+6),hl
-	ld	hl,(_YMax)
+	ld	hl,ti.lcdHeight
+smcWord _YMax
+.YMax := $-3
 	ld	de,(iy+12)
 	call	_Minimum
 	ld	(iy+12),hl
@@ -6458,7 +6518,8 @@ _ComputeOutcode:
 ;  DE : Y Argument
 ; Outputs:
 ;   A : Bitcode
-	ld	bc,(_XMin)
+	ld	bc,0
+smcWord _XMin
 	push	hl
 	xor	a,a
 	sbc	hl,bc
@@ -6468,15 +6529,16 @@ _ComputeOutcode:
 	ccf
 .skip1:
 	rla
-	ld	hl,(_XMax)
-	dec	hl			; inclusive
+	ld	hl,ti.lcdWidth-1
+smcWord _XMaxMinus1
 	sbc	hl,bc
 	add	hl,hl
 	jp	po,.skip2
 	ccf
 .skip2:
 	rla
-	ld	hl,(_YMin)
+	ld	hl,0
+smcWord _YMin
 	scf
 	sbc	hl,de
 	add	hl,hl
@@ -6484,8 +6546,8 @@ _ComputeOutcode:
 	ccf
 .skip3:
 	rla
-	ld	hl,(_YMax)
-	dec	hl			; inclusive
+	ld	hl,ti.lcdHeight-1
+smcWord _YMaxMinus1
 	sbc	hl,de
 	add	hl,hl
 	rla
@@ -6711,21 +6773,6 @@ _LcdTiming:
 ;  V = (LPP+1)+(VSW+1)+VFP+VBP = 320+1+179+0 = 500
 ; CC = H*V*PCD*2 = 400*500*2*2 = 800000
 ; Hz = 48000000/CC = 60
-
-_XMin:
-	dl	0
-_YMin:
-	dl	0
-_XMax:
-	dl	ti.lcdWidth
-_YMax:
-	dl	ti.lcdHeight
-
-_ClipRegion_Full:
-	dl	0
-	dl	0
-	dl	ti.lcdWidth
-	dl	ti.lcdHeight
 
 _TmpCharSprite:
 	db	8,8
