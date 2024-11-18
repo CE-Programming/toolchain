@@ -438,7 +438,6 @@ DEFINE_UNOP_PREFIX_FUNC_I48( , bitrev, __builtin_bitreverse48)
 DEFINE_UNOP_PREFIX_FUNC_LL( , bitrev, __builtin_bitreverse64)
 DEFINE_UNOP_STRUCT_B_TO_LL(, bitrev)
 
-// Needs to be unsigned to avoid extra bits from sign extension
 DEFINE_UNOP_PREFIX_FUNC_S(u, bswap, __builtin_bswap16)
 DEFINE_UNOP_PREFIX_FUNC_I(u, bswap, __builtin_bswap24)
 DEFINE_UNOP_PREFIX_FUNC_L(u, bswap, __builtin_bswap32)
@@ -446,7 +445,6 @@ DEFINE_UNOP_PREFIX_FUNC_I48(u, bswap, __builtin_bswap48)
 DEFINE_UNOP_PREFIX_FUNC_LL(u, bswap, __builtin_bswap64)
 DEFINE_UNOP_STRUCT_BSWAP(u, bswap)
 
-// Needs to be unsigned to avoid extra bits from sign extension
 DEFINE_UNOP_PREFIX_FUNC_B_TO_I(u, popcnt, __builtin_popcount)
 DEFINE_UNOP_PREFIX_FUNC_L(u, popcnt, __builtin_popcountl)
 DEFINE_UNOP_PREFIX_FUNC_I48(u, popcnt, __builtin_popcounti48)
