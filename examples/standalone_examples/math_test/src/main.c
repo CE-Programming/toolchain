@@ -236,9 +236,24 @@ static void finishOutput()
     DEFINE_BINOP_DIV_LIKE_FUNC_LL(u, name, func, post)
 
 
+typedef struct Op_
+{
+    bool isBinary;
+    bool isUnsigned;
+    const char *name;
+    void (*b)();
+    void (*s)();
+    void (*i)();
+    void (*l)();
+    void (*i48)();
+    void (*ll)();
+} Op;
+
 #define DEFINE_UNOP_TYPE(u)            \
     typedef struct u##UnOp_            \
     {                                  \
+        bool isBinary;                 \
+        bool isUnsigned;               \
         const char *name;              \
         u##int8_t (*b)(u##int8_t);     \
         u##int16_t (*s)(u##int16_t);   \
@@ -251,6 +266,8 @@ static void finishOutput()
 #define DEFINE_BINOP_TYPE(u)                       \
     typedef struct u##BinOp_                       \
     {                                              \
+        bool isBinary;                             \
+        bool isUnsigned;                           \
         const char *name;                          \
         u##int8_t (*b)(u##int8_t, u##int8_t);      \
         u##int16_t (*s)(u##int16_t, u##int16_t);   \
@@ -266,44 +283,47 @@ DEFINE_UNOP_TYPE(u)
 DEFINE_BINOP_TYPE()
 DEFINE_BINOP_TYPE(u)
 
+static const bool _0IsUnsigned = 0;
+static const bool _0IsUnsignedu = 1;
+
 #define DEFINE_UNOP_STRUCT_B(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_S(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_I(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_L(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_I48(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_LL(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48(u, name) \
-    static const u##UnOp unop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
 // clang version 15.0.0 (https://github.com/CE-Programming/llvm-project
 // 23b78267b5d376b232475d0805a937e54b61e0d0): unable to legalize instruction:
 // %5:_(s48) = G_BSWAP %0:_ (in function: i48bswap_)
 #define DEFINE_UNOP_STRUCT_BSWAP(u, name) \
-    static const u##UnOp unop_##name = {#name, NULL, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, NULL, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
 
 #define DEFINE_BINOP_STRUCT_B(u, name) \
-    static const u##BinOp binop_##name = {#name, b##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, b##name##_};
 #define DEFINE_BINOP_STRUCT_B_TO_S(u, name) \
-    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, b##name##_, s##name##_};
 #define DEFINE_BINOP_STRUCT_B_TO_I(u, name) \
-    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_};
 #define DEFINE_BINOP_STRUCT_B_TO_L(u, name) \
-    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_};
 #define DEFINE_BINOP_STRUCT_B_TO_I48(u, name) \
-    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_};
 #define DEFINE_BINOP_STRUCT_B_TO_LL(u, name) \
-    static const u##BinOp binop_##name = {#name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
 #define DEFINE_BINOP_STRUCT_I_TO_L(u, name) \
-    static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, NULL, NULL, i##name##_, l##name##_};
 // #define DEFINE_BINOP_STRUCT_I_TO_I48(u, name) \
-//     static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_, i48##name##_};
+//     static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, NULL, NULL, i##name##_, l##name##_, i48##name##_};
 #define DEFINE_BINOP_STRUCT_I_TO_LL(u, name) \
-    static const u##BinOp binop_##name = {#name, NULL, NULL, i##name##_, l##name##_, NULL, ll##name##_};
+    static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, NULL, NULL, i##name##_, l##name##_, NULL, ll##name##_};
 
 
 #define DEFINE_UNOP_PREFIX_B(u, name, op)  \
@@ -345,14 +365,14 @@ DEFINE_BINOP_TYPE(u)
     DEFINE_BINOP_STRUCT_B_TO_LL(u, name)
 
 
-static void testOp(bool isBinOp, const BinOp *op, int64_t x, int64_t y)
+static void testOp(const Op *op, int64_t x, int64_t y)
 {
     unsigned lhsLength = 9;
     unsigned nameLength = strlen(op->name);
     unsigned prefixLength = lhsLength - nameLength;
 
     x_printffull("%*s=%016llX", lhsLength, "x", (long long)x);
-    if (!isBinOp)
+    if (!op->isBinary)
     {
         x_printf("\n");
     }
@@ -362,17 +382,32 @@ static void testOp(bool isBinOp, const BinOp *op, int64_t x, int64_t y)
     }
     x_printf("\n");
 
-#define TEST_OP(prefix, bits)                                                                              \
-    if (op->prefix)                                                                                        \
-    {                                                                                                      \
-        unsigned digits = (bits + 3) / 4;                                                                  \
-        unsigned long long result = (op->prefix)(x, y) & ((1ULL << (bits - 1) << 1) - 1);                  \
-        x_printffull("%*s%s=%*s%0*llX", prefixLength, #prefix, op->name, 16 - digits, "", digits, result); \
-    }                                                                                                      \
-    else                                                                                                   \
-    {                                                                                                      \
-        x_printf("\n");                                                                                    \
-    }                                                                                                      \
+#define TEST_OP(prefix, bits)                               \
+    if (op->prefix)                                         \
+    {                                                       \
+        unsigned digits = (bits + 3) / 4;                   \
+        unsigned long long result =                         \
+            !op->isBinary                                   \
+                ? !op->isUnsigned                           \
+                    ? ((const   UnOp *)(op))->prefix(x)     \
+                    : ((const  uUnOp *)(op))->prefix(x)     \
+                : !op->isUnsigned                           \
+                    ? ((const  BinOp *)(op))->prefix(x, y)  \
+                    : ((const uBinOp *)(op))->prefix(x, y); \
+        result &= ((1ULL << (bits - 1) << 1) - 1);          \
+        x_printffull("%*s%s=%*s%0*llX",                     \
+                     prefixLength,                          \
+                     #prefix,                               \
+                     op->name,                              \
+                     16 - digits,                           \
+                     "",                                    \
+                     digits,                                \
+                     result);                               \
+    }                                                       \
+    else                                                    \
+    {                                                       \
+        x_printf("\n");                                     \
+    }
 
     TEST_OP(b, 8)
     TEST_OP(s, 16)
@@ -382,16 +417,6 @@ static void testOp(bool isBinOp, const BinOp *op, int64_t x, int64_t y)
     TEST_OP(ll, 64)
 
     finishOutput();
-}
-
-static void testUnOp(const UnOp *op, int64_t x)
-{
-    testOp(false, (const BinOp*)op, x, 0);
-}
-
-static void testBinOp(const BinOp *op, int64_t x, int64_t y)
-{
-    testOp(true, op, x, y);
 }
 
 
@@ -449,31 +474,28 @@ DEFINE_BINOP_DIV_LIKE_FUNC_I_TO_LL( , div_r, div, .rem)
 DEFINE_BINOP_STRUCT_I_TO_LL( , div_r)
 
 
-static const UnOp *unops[] = {
-    &unop_not,
-    &unop_neg,
-    &unop_abs,
-    &unop_bitrev,
-    (const UnOp *)&unop_bswap,
-    (const UnOp *)&unop_popcnt,
-};
-
-static const BinOp *binops[] = {
-    &binop_and,
-    &binop_or,
-    &binop_xor,
-    &binop_add,
-    &binop_sub,
-    &binop_shl,
-    (const BinOp *)&binop_shru,
-    &binop_shrs,
-    (const BinOp *)&binop_mulu,
-    (const BinOp *)&binop_divu,
-    (const BinOp *)&binop_remu,
-    &binop_divs,
-    &binop_rems,
-    &binop_div_q,
-    &binop_div_r,
+static const Op *ops[] = {
+    (const Op *)&unop_not,
+    (const Op *)&unop_neg,
+    (const Op *)&unop_abs,
+    (const Op *)&unop_bitrev,
+    (const Op *)&uunop_bswap,
+    (const Op *)&uunop_popcnt,
+    (const Op *)&binop_and,
+    (const Op *)&binop_or,
+    (const Op *)&binop_xor,
+    (const Op *)&binop_add,
+    (const Op *)&binop_sub,
+    (const Op *)&binop_shl,
+    (const Op *)&ubinop_shru,
+    (const Op *)&binop_shrs,
+    (const Op *)&ubinop_mulu,
+    (const Op *)&ubinop_divu,
+    (const Op *)&ubinop_remu,
+    (const Op *)&binop_divs,
+    (const Op *)&binop_rems,
+    (const Op *)&binop_div_q,
+    (const Op *)&binop_div_r,
 };
 
 
@@ -484,14 +506,9 @@ int main(int argc, char *argv[])
 
     separateOutput();
 
-    for (size_t i = 0; i < sizeof(unops) / sizeof(*unops); i++)
+    for (size_t i = 0; i < sizeof(ops) / sizeof(*ops); i++)
     {
-        testUnOp(unops[i], x);
-    }
-
-    for (size_t i = 0; i < sizeof(binops) / sizeof(*binops); i++)
-    {
-        testBinOp(binops[i], x, y);
+        testOp(ops[i], x, y);
     }
 
     return 0;
