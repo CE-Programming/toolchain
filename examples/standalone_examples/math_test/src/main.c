@@ -82,15 +82,10 @@ static int48_t __builtin_bitreverse48(int48_t x)
     // return __builtin_bitreverse64(x) >> 16;
     return __builtin_bitreverse32(x >> 16) | (int48_t)__builtin_bitreverse16(x) << 32;
 }
-static uint24_t __builtin_bswap24(uint24_t x)
-{
-    return __builtin_bswap32(x) >> 8;
-    // return __builtin_bswap16(x >> 8) | (uint8_t)x << 16;
-}
 static uint48_t __builtin_bswap48(uint48_t x)
 {
     return __builtin_bswap64(x) >> 16;
-    // return __builtin_bswap32(x >> 16) | (uint48_t)(uint16_t)x << 32;
+    // return __builtin_bswap32(x >> 16) | (uint48_t)__builtin_bswap16(x) << 32;
 }
 static int __builtin_popcounti48(uint48_t x)
 {
@@ -300,11 +295,8 @@ static const bool _0IsUnsignedu = 1;
     static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_, i48##name##_, ll##name##_};
 #define DEFINE_UNOP_STRUCT_B_TO_LL_EXCEPT_I48(u, name) \
     static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, b##name##_, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
-// clang version 15.0.0 (https://github.com/CE-Programming/llvm-project
-// 23b78267b5d376b232475d0805a937e54b61e0d0): unable to legalize instruction:
-// %5:_(s48) = G_BSWAP %0:_ (in function: i48bswap_)
 #define DEFINE_UNOP_STRUCT_BSWAP(u, name) \
-    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, NULL, s##name##_, i##name##_, l##name##_, NULL, ll##name##_};
+    static const u##UnOp u##unop_##name = {0, _0IsUnsigned##u, #name, NULL, s##name##_, NULL, l##name##_, i48##name##_, ll##name##_};
 
 #define DEFINE_BINOP_STRUCT_B(u, name) \
     static const u##BinOp u##binop_##name = {1, _0IsUnsigned##u, #name, b##name##_};
@@ -439,7 +431,6 @@ DEFINE_UNOP_PREFIX_FUNC_LL( , bitrev, __builtin_bitreverse64)
 DEFINE_UNOP_STRUCT_B_TO_LL(, bitrev)
 
 DEFINE_UNOP_PREFIX_FUNC_S(u, bswap, __builtin_bswap16)
-DEFINE_UNOP_PREFIX_FUNC_I(u, bswap, __builtin_bswap24)
 DEFINE_UNOP_PREFIX_FUNC_L(u, bswap, __builtin_bswap32)
 DEFINE_UNOP_PREFIX_FUNC_I48(u, bswap, __builtin_bswap48)
 DEFINE_UNOP_PREFIX_FUNC_LL(u, bswap, __builtin_bswap64)

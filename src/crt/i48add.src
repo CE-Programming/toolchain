@@ -1,0 +1,18 @@
+; Performs 48-bit addition
+;
+; Returns:
+; ude:uhl = ude:uhl + uiy:ubc
+
+	assume	adl=1
+
+	section	.text
+	public	__i48add
+__i48add:
+	add hl, bc
+	ex de, hl
+	push bc
+	lea bc, iy
+	adc hl, bc
+	pop bc
+	ex de, hl
+	ret

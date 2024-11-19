@@ -62,7 +62,7 @@
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [
-        "B9510AD8"
+        "D4024EF7"
       ]
     },
     "neg": {
@@ -94,7 +94,7 @@
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [
-        "C9C416BB"
+        "42B53B74"
       ]
     },
     "popcnt": {
