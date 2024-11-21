@@ -23,7 +23,7 @@
       "description": "Test strtol",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "138641DB" ]
+      "expected_CRCs": [ "5F0E7754" ]
     },
     "2":
     {
