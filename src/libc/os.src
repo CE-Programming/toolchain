@@ -24,8 +24,6 @@ _strcmp     := 0000C8h
 _strcpy     := 0000CCh
 	public	_strcspn
 _strcspn    := 0000D0h
-	public	_strlen
-_strlen     := 0000D4h
 	public	_strncat
 _strncat    := 0000D8h
 	public	_strncmp
