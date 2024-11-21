@@ -104,10 +104,10 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
     unsigned STRTOX_TYPE acc;
     unsigned STRTOX_TYPE cutoff;
     const char *s;
+    unsigned char cutlim;
+    unsigned char c;
     bool neg;
     char any;
-    unsigned char cutlim;
-    int c;
 
     if (base < 0 || base > 36)
     {
