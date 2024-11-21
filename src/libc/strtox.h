@@ -103,9 +103,10 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
 {
     unsigned STRTOX_TYPE acc;
     unsigned STRTOX_TYPE cutoff;
-    const char *s;
     unsigned char cutlim;
     unsigned char c;
+    unsigned char b;
+    const char *s;
     bool neg;
     char any;
 
@@ -119,6 +120,7 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
         return 0;
     }
 
+    b = base;
     s = nptr;
     neg = false;
 
@@ -137,31 +139,31 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
         c = *s++;
     }
 
-    if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
+    if ((b == 0 || b == 16) && c == '0' && (*s == 'x' || *s == 'X'))
     {
         c = s[1];
         s += 2;
-        base = 16;
+        b = 16;
     }
-    else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B'))
+    else if ((b == 0 || b == 2) && c == '0' && (*s == 'b' || *s == 'B'))
     {
         c = s[1];
         s += 2;
-        base = 2;
+        b = 2;
     }
 
-    if (base == 0)
+    if (b == 0)
     {
-        base = c == '0' ? 8 : 10;
+        b = c == '0' ? 8 : 10;
     }
 
 #if STRTOX_SIGNED
     cutoff = neg ? -(unsigned STRTOX_TYPE)(STRTOX_MIN) : STRTOX_MAX;
-    cutlim = cutoff % base;
-    cutoff /= base;
+    cutlim = cutoff % b;
+    cutoff /= b;
 #else
-    cutoff = STRTOX_MAX / base;
-    cutlim = STRTOX_MAX % base;
+    cutoff = STRTOX_MAX / b;
+    cutlim = STRTOX_MAX % b;
 #endif
 
     for (acc = 0, any = 0;; c = *s++)
@@ -178,7 +180,7 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
         {
             break;
         }
-        if (c >= base)
+        if (c >= b)
         {
             break;
         }
@@ -190,7 +192,7 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
         else
         {
             any = 1;
-            acc *= base;
+            acc *= b;
             acc += c;
         }
     }
