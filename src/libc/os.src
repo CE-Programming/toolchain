@@ -8,8 +8,6 @@ _longjmp    := 000098h
 _memchr     := 00009Ch
 	public	_memcmp
 _memcmp     := 0000A0h
-	public	_memcpy
-_memcpy     := 0000A4h
 	public	_memmove
 _memmove    := 0000A8h
 	public	_setjmp
