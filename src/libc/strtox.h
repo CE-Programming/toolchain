@@ -113,7 +113,7 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
     {
         if (endptr)
         {
-            *endptr = (char *)(uintptr_t)nptr;
+            *endptr = (char *)nptr;
         }
 
         return 0;
@@ -207,7 +207,7 @@ STRTOX_TYPE STRTOX_NAME(const char *nptr, char **endptr, int base)
 
     if (endptr)
     {
-        *endptr = (char *)(uintptr_t)(any ? s - 1 : nptr);
+        *endptr = (char *)(any ? s - 1 : nptr);
     }
 
     return acc;
