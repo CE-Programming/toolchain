@@ -15,7 +15,6 @@ whoever in the community first discovered something gave it a name following the
     :maxdepth: 1
     :glob:
 
-    debug
     error
     flags
     getcsc
