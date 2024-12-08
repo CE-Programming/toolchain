@@ -12,7 +12,8 @@ Download the latest stable toolchain release below:
 
   * Windows: `CEdev-Windows.zip <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-Windows.zip>`__
   * Linux:  `CEdev-Linux.tar.gz <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-Linux.tar.gz>`__
-  * macOS: `CEdev-macOS.dmg <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-macOS.dmg>`__
+  * macOS *arm*: `CEdev-macOS-arm.dmg <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-macOS-arm.dmg>`__
+  * macOS *intel*: `CEdev-macOS-intel.dmg <https://github.com/CE-Programming/toolchain/releases/latest/download/CEdev-macOS-intel.dmg>`__
 
 ..
 
@@ -32,13 +33,13 @@ If you would rather try the "nightly" build (which includes the latest features 
 
     * Extract the archive to a path **without any spaces**, e.g. :code:`/home/user/CEdev`.
 
-    * Extend the PATH environment variable to point to :code:`CEdev/bin` by modifying *.bashrc*, *.zshrc*, or whatever flavor the OS uses.
-      An example command may be:
+    * Extend the PATH environment variable to point to :code:`CEdev/bin` by modifying either the :code:`~/.zshrc` or :code:`~/.bashrc` in your home directory.
+      An example command that can be added would look similar to the following:
 
         .. indent with spaces
         .. code-block:: bash
 
-            export PATH=/<insert path here>/CEdev/bin:$PATH
+            export PATH=/<insert path to the CEdev folder here>/CEdev/bin:$PATH
 
 .. caution::
 
