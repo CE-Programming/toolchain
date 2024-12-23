@@ -358,7 +358,7 @@ typedef enum usb_transfer_type {
   USB_INTERRUPT_TRANSFER,
 } usb_transfer_type_t;
 
-typedef struct usb_control_setup {
+typedef struct usb_control_setup __attribute__((packed)) {
   uint8_t  bmRequestType;       /**< direction, type, and recipient           */
   uint8_t  bRequest;            /**< usb_request_t                            */
   uint16_t wValue;              /**< request specific                         */
@@ -366,13 +366,13 @@ typedef struct usb_control_setup {
   uint16_t wLength;             /**< transfer length                          */
 } usb_control_setup_t;
 
-typedef struct usb_descriptor {
+typedef struct usb_descriptor __attribute__((packed)) {
   uint8_t  bLength;             /**< The length of this descriptor.           */
   uint8_t  bDescriptorType;     /**< A usb_descriptor_type_t.                 */
   uint8_t  data[];              /**< The rest of the descriptor               */
 } usb_descriptor_t;
 
-typedef struct usb_device_descriptor {
+typedef struct usb_device_descriptor __attribute__((packed)) {
   uint8_t  bLength;             /**< 18                                       */
   uint8_t  bDescriptorType;     /**< USB_DEVICE_DESCRIPTOR                    */
   uint16_t bcdUSB;              /**< usb specification version                */
@@ -389,7 +389,7 @@ typedef struct usb_device_descriptor {
   uint8_t  bNumConfigurations;  /**< how many valid configuration indices     */
 } usb_device_descriptor_t;
 
-typedef struct usb_device_qualifier_descriptor {
+typedef struct usb_device_qualifier_descriptor __attribute__((packed)) {
   uint8_t  bLength;             /**< 10                                       */
   uint8_t  bDescriptorType;     /**< USB_DEVICE_QUALIFIER_DESCRIPTOR          */
   uint16_t bcdUSB;              /**< usb specification version                */
@@ -401,7 +401,7 @@ typedef struct usb_device_qualifier_descriptor {
   uint8_t  bReserved;           /**< must be 0                                */
 } usb_device_qualifier_descriptor_t;
 
-typedef struct usb_configuration_descriptor {
+typedef struct usb_configuration_descriptor __attribute__((packed)) {
   uint8_t  bLength;             /**< 9                                        */
   uint8_t  bDescriptorType;     /**< USB_CONFIGURATION_DESCRIPTOR             */
   uint16_t wTotalLength;        /**< total length of combined descriptors     */
@@ -413,7 +413,7 @@ typedef struct usb_configuration_descriptor {
 } usb_configuration_descriptor_t;
 typedef struct usb_configuration_descriptor usb_other_speed_configuration_t;
 
-typedef struct usb_interface_descriptor {
+typedef struct usb_interface_descriptor __attribute__((packed)) {
   uint8_t  bLength;             /**< 9                                        */
   uint8_t  bDescriptorType;     /**< USB_INTERFACE_DESCRIPTOR                 */
   uint8_t  bInterfaceNumber;    /**< zero-based interface index               */
@@ -425,7 +425,7 @@ typedef struct usb_interface_descriptor {
   uint8_t  iInterface;          /**< index of description string descriptor   */
 } usb_interface_descriptor_t;
 
-typedef struct usb_endpoint_descriptor {
+typedef struct usb_endpoint_descriptor __attribute__((packed)) {
   uint8_t  bLength;             /**< 7                                        */
   uint8_t  bDescriptorType;     /**< USB_ENDPOINT_DESCRIPTOR                  */
   uint8_t  bEndpointAddress;    /**< endpoint direction and number            */
@@ -436,7 +436,7 @@ typedef struct usb_endpoint_descriptor {
   uint8_t  bInterval;           /**  transfer type specific                   */
 } usb_endpoint_descriptor_t;
 
-typedef struct usb_string_descriptor {
+typedef struct usb_string_descriptor __attribute__((packed)) {
   uint8_t  bLength;             /**< byte length, not character length        */
   uint8_t  bDescriptorType;     /**< USB_STRING_DESCRIPTOR                    */
   wchar_t  bString[];           /**< UTF-16 string, no null termination       */
