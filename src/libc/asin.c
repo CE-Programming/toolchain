@@ -5,33 +5,30 @@
  * arctan is called after appropriate range reduction.
  */
 
-#include	<errno.h>
-#include	<math.h>
+#include    <errno.h>
+#include    <math.h>
 
-#define pio2  1.57079632679490
+#define pio2  1.57079632679490f
 
-float _asinf_c(float arg) {
-	float sign, temp;
+float _asinf_c(float arg)
+{
+    float sign, temp;
+    sign = copysignf(1.0f, arg);
+    arg = fabsf(arg);
 
-	sign = 1.;
-	if(arg < 0) {
-		arg = -arg;
-		sign = -1.;
-	}
+    if(arg > 1.0f) {
+        errno = EDOM;
+        return 0.0f;
+    }
 
-	if(arg > 1.) {
-		errno = EDOM;
-		return(0.);
-	}
+    temp = sqrtf(1.0f - arg*arg);
+    if(arg > 0.7f) {
+        temp = pio2 - atanf(temp/arg);
+    } else {
+        temp = atanf(arg/temp);
+    }
 
-	temp = sqrt(1. - arg*arg);
-	if(arg > 0.7) {
-		temp = pio2 - atan(temp/arg);
-	} else {
-		temp = atan(arg/temp);
-	}
-
-	return(sign*temp);
+    return copysignf(temp, sign);
 }
 
 double _asin_c(double) __attribute__((alias("_asinf_c")));
