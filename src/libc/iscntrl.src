@@ -9,7 +9,6 @@ _iscntrl:
 	ld	a,l
 	cp	a,127
 	ret	z
-	add	a,-32
+	sub	a,32
 	sbc	hl,hl
-	inc	hl
 	ret

@@ -12,8 +12,7 @@ __isfinitef:
 	add	hl,hl
 	ld	a,e
 	rla
-	add	a,1
+	sub	a,-1
 	sbc	hl,hl
-	inc	hl
 	ret
 

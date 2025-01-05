@@ -8,7 +8,6 @@ _isupper:
 	push	de
 	ld	a,l
 	sub	a,65
-	add	a,-26
+	sub	a,26
 	sbc	hl,hl
-	inc	hl
 	ret

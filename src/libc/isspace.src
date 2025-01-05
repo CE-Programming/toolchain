@@ -10,7 +10,6 @@ _isspace:
 	cp	a,32
 	ret	z
 	sub	a,9
-	add	a,-5
+	sub	a,5
 	sbc	hl,hl
-	inc	hl
 	ret

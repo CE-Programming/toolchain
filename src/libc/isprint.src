@@ -8,7 +8,6 @@ _isprint:
 	push	de
 	ld	a,l
 	sub	a,32
-	add	a,-95
+	sub	a,95
 	sbc	hl,hl
-	inc	hl
 	ret
