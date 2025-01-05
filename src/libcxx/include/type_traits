@@ -94,6 +94,7 @@ template<>          struct __integral<           char8_t> : true_type  {};
 #endif
 template<>          struct __integral<          char16_t> : true_type  {};
 template<>          struct __integral<          char32_t> : true_type  {};
+template<>          struct __integral<  signed     short> : true_type  {};
 template<>          struct __integral<unsigned     short> : true_type  {};
 template<>          struct __integral<  signed       int> : true_type  {};
 template<>          struct __integral<unsigned       int> : true_type  {};
