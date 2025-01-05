@@ -1,0 +1,19 @@
+; Performs 48-bit subtraction
+;
+; Returns:
+; ude:uhl = ude:uhl - uiy:ubc
+
+	assume	adl=1
+
+	section	.text
+	public	__i48sub
+__i48sub:
+	or a, a
+	sbc hl, bc
+	ex de, hl
+	push bc
+	lea bc, iy
+	sbc hl, bc
+	pop bc
+	ex de, hl
+	ret

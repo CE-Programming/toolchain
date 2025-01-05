@@ -64,7 +64,9 @@ extern "C" {
 #pragma warning(push, 3)
 #endif
 #include <windows.h>
-#include <intrin.h>
+// runer112: I SWEAR TO GOD(S), STOP REINTRODUCING THIS INCLUSION
+// The following may not always be available and doesn't seem to be necessary:
+// #include <intrin.h>
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif

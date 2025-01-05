@@ -26,10 +26,9 @@ If you are interested in contributing your expertise, check out the :ref:`contri
 
     static/getting-started
     static/makefile-options
+    static/debugging
     static/printf
     static/fileio
-    static/ides
-    static/debugging
     static/asm
 
 .. toctree::
@@ -45,6 +44,7 @@ If you are interested in contributing your expertise, check out the :ref:`contri
     :caption: Helpful Resources
     :maxdepth: 1
 
+    static/ides
     static/git
     static/coding-guidelines
     static/contributing

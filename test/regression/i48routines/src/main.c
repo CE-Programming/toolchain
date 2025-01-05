@@ -69,6 +69,7 @@ void test_##ROUTINE(regs_t *regs)               \
     : "cc", "a", "c", "e", "l");                \
 }
 
+TESTFUNC(i48add)
 TESTFUNC(i48and)
 TESTFUNC(i48bitrev)
 TESTFUNC(i48bswap)
@@ -89,7 +90,13 @@ TESTFUNC(i48remu)
 TESTFUNC(i48shl)
 TESTFUNC(i48shrs)
 TESTFUNC(i48shru)
+TESTFUNC(i48sub)
 TESTFUNC(i48xor)
+
+void ref_i48add(regs_t *regs)
+{
+    regs->dehl.z_ext += regs->iybc.z_ext;
+}
 
 void ref_i48and(regs_t *regs)
 {
@@ -193,6 +200,11 @@ void ref_i48shrs(regs_t *regs)
 void ref_i48shru(regs_t *regs)
 {
     regs->dehl.z_ext >>= regs->iybc.low & 0xFF;
+}
+
+void ref_i48sub(regs_t *regs)
+{
+    regs->dehl.z_ext -= regs->iybc.z_ext;
 }
 
 void ref_i48xor(regs_t *regs)
@@ -324,6 +336,7 @@ int main(void)
 
     do
     {
+        TEST(unsigned, i48add, 0)
         TEST(unsigned, i48and, 0)
         TEST(unsigned, i48bitrev, 0)
         TEST(unsigned, i48bswap, 0)
@@ -349,6 +362,7 @@ int main(void)
         TEST(unsigned_shift, i48shl, 0)
         TEST(signed_shift, i48shrs, 0)
         TEST(unsigned_shift, i48shru, 0)
+        TEST(unsigned, i48sub, 0)
         TEST(unsigned, i48xor, 0)
 
         printf("All tests passed");

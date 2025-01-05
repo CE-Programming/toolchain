@@ -1,0 +1,26 @@
+	assume	adl=1
+
+	section	.text
+	public	_strlen
+
+if PREFER_OS_LIBC
+
+_strlen := $0000D4
+
+else
+
+_strlen:
+	pop	bc
+	ex	(sp),hl
+	push	bc
+	xor	a,a
+	ld	bc,0
+	cpir
+	or	a,a
+	sbc	hl,hl
+	scf
+	sbc	hl,bc
+	ret
+
+end if
+
