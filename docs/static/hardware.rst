@@ -119,7 +119,7 @@ Therefore, software has to implement that functionality.
 Like the Z80, the eZ80 also lacks native support for float-point arithmetic, so :code:`float` is slower than :code:`int`.
 Furthermore, in the toolchain, :code:`float` and :code:`double` are actually treated the same (this is allowed by the C standard).
 
-In the toolchain, :code:`float` is the standard IEEE 32-bit float.
+In the toolchain, :code:`float` is the standard IEEE 32-bit float, and :code:`long double` is the standard IEEE 64-bit float.
 However, IEEE floats have limited precision and have unintuitive rouding behavior.
 So when TI designed the TI-81, they wrote their own special floating-point number format, which is much more suitable for precision scientific calculations.
 Unfortunately, it also much slower.
