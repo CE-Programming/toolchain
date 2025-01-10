@@ -1,0 +1,14 @@
+assume	adl=1
+
+section	.text
+
+public	__dneg
+
+__dneg:
+	; f64_ret_f64
+	push	af, iy, bc, de, hl
+	call	__dneg_c
+	pop	af, af, af, iy, af
+	ret
+
+extern	__dneg_c
