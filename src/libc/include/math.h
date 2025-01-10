@@ -47,7 +47,15 @@ int _isinff(float n);
 int _isnanf(float n);
 int _isnormalf(float n);
 int _isfinitef(float n);
+int _iszerof(float n);
 int _fpclassifyf(float n);
+
+// int _isinfl(long double n);
+// int _isnanl(long double n);
+// int _isnormall(long double n);
+// int _isfinitel(long double n);
+int _iszerol(long double n);
+// int _fpclassifyl(long double n);
 
 #define isinf(x) ( \
 	sizeof((x)) == sizeof(float) ? _isinff((x)) : \
@@ -61,6 +69,10 @@ int _fpclassifyf(float n);
 #define isfinite(x) ( \
 	sizeof((x)) == sizeof(float) ? _isfinitef((x)) : \
 	1)
+#define iszero(x) ( \
+	sizeof((x)) == sizeof(float) ? _iszerof((x)) : \
+	sizeof((x)) == sizeof(long double) ? _iszerol(x) : \
+	(x) != 0)
 #define fpclassify(x) ( \
 	sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
 	0)

@@ -1,0 +1,146 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__dadd, __dsub, __dmul, __ddiv, __drem
+	public	__ftod, __ltod, __lltod, __ultod, __ulltod
+	public 	__dtof, __dtol, __dtoll, __dtoul, __dtoull
+
+;-------------------------------------------------------------------------------
+; Arithmetic functions
+;-------------------------------------------------------------------------------
+
+__dadd:
+	; f64_f64*_ret_f64
+	push	af, iy
+	ld	iy, 9
+	add	iy, sp
+	push	iy, bc, de, hl
+	call	__dadd_c
+	pop	af, af, af, af, iy, af
+	ret
+	
+__dsub:
+	; f64_f64*_ret_f64
+	push	af, iy
+	ld	iy, 9
+	add	iy, sp
+	push	iy, bc, de, hl
+	call	__dsub_c
+	pop	af, af, af, af, iy, af
+	ret
+
+__dmul:
+	; f64_f64*_ret_f64
+	push	af, iy
+	ld	iy, 9
+	add	iy, sp
+	push	iy, bc, de, hl
+	call	__dmul_c
+	pop	af, af, af, af, iy, af
+	ret
+
+__ddiv:
+	; f64_f64*_ret_f64
+	push	af, iy
+	ld	iy, 9
+	add	iy, sp
+	push	iy, bc, de, hl
+	call	__ddiv_c
+	pop	af, af, af, af, iy, af
+	ret
+
+__drem:
+	; f64_f64*_ret_f64
+	push	af, iy
+	ld	iy, 9
+	add	iy, sp
+	push	iy, bc, de, hl
+	call	__drem_c
+	pop	af, af, af, af, iy, af
+	ret
+
+;-------------------------------------------------------------------------------
+; Convert to long double
+;-------------------------------------------------------------------------------
+
+__ftod:
+	; f32_ret_f64
+	ld	d, a
+	push	iy, de, hl
+	call	__ftod_c
+	pop	af, af, iy
+	ret
+
+__ltod:
+	; i32_ret_f64
+	ld	d, a
+	push	iy, de, hl
+	call	__ltod_c
+	pop	af, af, iy
+	ret
+
+__lltod:
+	; i64_ret_f64
+	push	af, iy, bc, de, hl
+	call	__lltod_c
+	pop	af, af, af, iy, af
+	ret
+
+__ultod:
+	; u32_ret_f64
+	ld	d, a
+	push	iy, de, hl
+	call	__ultod_c
+	pop	af, af, iy
+	ret
+
+__ulltod:
+	; u64_ret_f64
+	push	af, iy, bc, de, hl
+	call	__ulltod_c
+	pop	af, af, af, iy, af
+	ret
+	
+;-------------------------------------------------------------------------------
+; Convert from long double
+;-------------------------------------------------------------------------------
+
+__dtof:
+	; f64_ret_f32
+	push	af, iy, bc, de, hl
+	call	__dtof_c
+	pop	af, af, af, iy, af
+	ret
+
+__dtol:
+	; f64_ret_i32
+	push	af, iy, bc, de, hl
+	call	__dtol_c
+	pop	af, af, af, iy, af
+	ret
+
+__dtoll:
+	; f64_ret_i64
+	push	af, iy, bc, de, hl
+	call	__dtoll_c
+	pop	af, af, af, iy, af
+	ret
+
+__dtoul:
+	; f64_ret_u32
+	push	af, iy, bc, de, hl
+	call	__dtoul_c
+	pop	af, af, af, iy, af
+	ret
+
+__dtoull:
+	; f64_ret_u64
+	push	af, iy, bc, de, hl
+	call	__dtoull_c
+	pop	af, af, af, iy, af
+	ret
+
+	extern	__dadd_c, __dsub_c, __dmul_c, __ddiv_c, __drem_c
+	extern	__ftod_c, __ltod_c, __lltod_c, __ultod_c, __ulltod_c
+	extern	__dtof_c, __dtol_c, __dtoll_c, __dtoul_c, __dtoull_c
