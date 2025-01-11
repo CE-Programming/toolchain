@@ -1,23 +1,38 @@
 #include <stdint.h>
 #include <math.h>
 
-typedef union Float32_Bitwise {
-    float flt_part;
-    uint32_t u32_part;
-    uint24_t u24_part;
-} Float32_Bitwise;
+typedef union F32_pun {
+    float flt;
+    uint32_t bin;
+} F32_pun;
 
-#define Float32_Exponent_Mask INT32_C(0x7F800000)
+#define Float32_exp_mask INT32_C(0x7F800000)
 
 int _isnormalf(float x)
 {
-    Float32_Bitwise x_bin;
-    x_bin.flt_part = x;
-    
-    const int32_t exp_mask = x_bin.u32_part & Float32_Exponent_Mask;
+    F32_pun val;
+    val.flt = x;
+    val.bin &= Float32_exp_mask;
     
     // Check that the exponent isn't all zeros (subnormal) or all ones (nan/inf)
-    return (exp_mask != 0 && exp_mask != Float32_Exponent_Mask);
+    return (val.bin != 0 && val.bin != Float32_exp_mask);
 }
 
 int _isnormal(double) __attribute__((alias("_isnormalf")));
+
+typedef union F64_pun {
+    long double flt;
+    uint64_t bin;
+} F64_pun;
+
+#define Float64_exp_mask UINT64_C(0x7FF0000000000000)
+
+int _isnormall(long double x)
+{
+    F64_pun val;
+    val.flt = x;
+    val.bin &= Float64_exp_mask;
+    
+    // Check that the exponent isn't all zeros (subnormal) or all ones (nan/inf)
+    return (val.bin != 0 && val.bin != Float64_exp_mask);
+}

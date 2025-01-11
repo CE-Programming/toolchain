@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "../../softfloat/include/softfloat.h"
+#include "../softfloat/include/softfloat.h"
 
 //------------------------------------------------------------------------------
 // unions
@@ -116,23 +116,23 @@ float _dtof_c(long double x) {
 int32_t _dtol_c(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    return f64_to_i32_r_minMag(arg_x.soft, true);
+    return f64_to_i32_r_minMag(arg_x.soft, false);
 }
 
 int64_t _dtoll_c(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    return f64_to_i64_r_minMag(arg_x.soft, true);
+    return f64_to_i64_r_minMag(arg_x.soft, false);
 }
 
 uint32_t _dtoul_c(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    return f64_to_ui32_r_minMag(arg_x.soft, true);
+    return f64_to_ui32_r_minMag(arg_x.soft, false);
 }
 
 uint64_t _dtoull_c(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    return f64_to_ui64_r_minMag(arg_x.soft, true);
+    return f64_to_ui64_r_minMag(arg_x.soft, false);
 }

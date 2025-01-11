@@ -1,8 +1,9 @@
 #include <stdint.h>
+#include <math.h>
 
 typedef union F32_pun {
-    long double flt;
-    uint64_t bin;
+    float flt;
+    uint32_t bin;
 } F32_pun;
 
 int _iszerof(float x) {
