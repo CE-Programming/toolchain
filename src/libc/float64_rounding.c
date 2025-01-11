@@ -2,7 +2,7 @@
 #include <fenv.h>
 #include <errno.h>
 #include <math.h>
-#include "../../softfloat/include/softfloat.h"
+#include "../softfloat/include/softfloat.h"
 
 typedef union F64_pun {
     long double flt;
@@ -13,48 +13,62 @@ typedef union F64_pun {
 long double truncl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
-    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_minMag, true);
+    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_minMag, false);
     return ret.flt;
 }
 
 long double floorl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
-    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_min, true);
+    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_min, false);
     return ret.flt;
 }
 
 long double ceill(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
-    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_max, true);
+    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_max, false);
     return ret.flt;
 }
 
 long double roundevenl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
-    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_near_even, true);
+    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_near_even, false);
     return ret.flt;
 }
 
 long double roundl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
-    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_near_maxMag, true);
+    ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_near_maxMag, false);
     return ret.flt;
 }
 
 long lroundl(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    return f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, true);
+    
+    softfloat_exceptionFlags = 0;
+    int32_t ret = f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, false);
+
+    if (softfloat_exceptionFlags & softfloat_flag_invalid) {
+        feraiseexcept(FE_INVALID);
+    }
+    return ret;
 }
 
 long long llroundl(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    return f64_to_i64(arg_x.soft, softfloat_round_near_maxMag, true);
+    
+    softfloat_exceptionFlags = 0;
+    int64_t ret = f64_to_i64(arg_x.soft, softfloat_round_near_maxMag, false);
+    
+    if (softfloat_exceptionFlags & softfloat_flag_invalid) {
+        feraiseexcept(FE_INVALID);
+    }
+    return ret;
 }
 
 #if ( \
@@ -81,24 +95,49 @@ long long llroundl(long double x) {
 long double nearbyintl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
-    ret.soft = f64_roundToInt(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
+    ret.soft = f64_roundToInt(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), false);
     return ret.flt;
 }
 
 long double rintl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
+    
+    softfloat_exceptionFlags = 0;
     ret.soft = f64_roundToInt(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
-    if (ret.bin != arg_x.bin) {
+    
+    if (softfloat_exceptionFlags & softfloat_flag_inexact) {
         feraiseexcept(FE_INEXACT);
     }
     return ret.flt;
 }
 
 long lrintl(long double x) {
-    return (int32_t)rintl(x);
+    F64_pun arg_x;
+    arg_x.flt = x;
+
+    softfloat_exceptionFlags = 0;
+    int32_t ret = f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, true);
+
+    if (softfloat_exceptionFlags & softfloat_flag_inexact) {
+        feraiseexcept(FE_INEXACT);
+    } else if (softfloat_exceptionFlags & softfloat_flag_invalid) {
+        feraiseexcept(FE_INVALID);
+    }
+    return ret;
 }
 
 long long llrintl(long double x) {
-    return (int64_t)rintl(x);
+    F64_pun arg_x;
+    arg_x.flt = x;
+
+    softfloat_exceptionFlags = 0;
+    int32_t ret = f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, true);
+
+    if (softfloat_exceptionFlags & softfloat_flag_inexact) {
+        feraiseexcept(FE_INEXACT);
+    } else if (softfloat_exceptionFlags & softfloat_flag_invalid) {
+        feraiseexcept(FE_INVALID);
+    }
+    return ret;
 }
