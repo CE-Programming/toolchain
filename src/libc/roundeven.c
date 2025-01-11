@@ -13,6 +13,10 @@ float roundevenf(float x)
 
 double roundeven(double x) __attribute__((alias("roundevenf")));
 
+#if 0
+
+// conflicts with roundevenl in float64_rounding.c
+
 long double roundevenl(long double x)
 {
     long double i, f = modfl(x, &i);
@@ -23,3 +27,5 @@ long double roundevenl(long double x)
     }
     return signbit(i) ? i - 1 : i + 1;
 }
+
+#endif

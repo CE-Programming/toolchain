@@ -1,6 +1,7 @@
+#include <fenv.h>
 #include <math.h>
 #include <stdint.h>
-#include "../../softfloat/include/softfloat.h"
+#include "../softfloat/include/softfloat.h"
 
 typedef union F64_pun {
     long double flt;
@@ -20,7 +21,13 @@ long double fmal(long double x, long double y, long double z) {
 long double sqrtl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
+
+    softfloat_exceptionFlags = 0;
     ret.soft = f64_sqrt(arg_x.soft);
+    if (softfloat_exceptionFlags & softfloat_flag_invalid) {
+        feraiseexcept(FE_INVALID);
+    }
+
     return ret.flt;
 }
 
@@ -29,11 +36,25 @@ long double fmodl(long double x, long double y) {
     F64_pun arg_x, arg_y, ret;
     arg_x.flt = x;
     arg_y.flt = y;
+
+    softfloat_exceptionFlags = 0;
     ret.soft = f64_rem(arg_x.soft, arg_y.soft);
+    if (softfloat_exceptionFlags & softfloat_flag_invalid) {
+        feraiseexcept(FE_INVALID);
+    }
+
     return ret.flt;
 }
 
 long double modfl(long double x, long double *integral_part) {
+    if (iszero(x)) {
+        *integral_part = x;
+        return x;
+    }
+    if (isinf(x)) {
+        *integral_part = x;
+        return copysignl(0.0L, x);
+    }
     F64_pun arg_x, arg_y, ret;
     arg_x.flt = x;
     arg_y.flt = 1.0L;

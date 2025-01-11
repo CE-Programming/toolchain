@@ -48,34 +48,45 @@ int _isnanf(float n);
 int _isnormalf(float n);
 int _isfinitef(float n);
 int _iszerof(float n);
+int _issubnormalf(float n);
 int _fpclassifyf(float n);
 
-// int _isinfl(long double n);
-// int _isnanl(long double n);
-// int _isnormall(long double n);
-// int _isfinitel(long double n);
+int _isinfl(long double n);
+int _isnanl(long double n);
+int _isnormall(long double n);
+int _isfinitel(long double n);
 int _iszerol(long double n);
-// int _fpclassifyl(long double n);
+int _issubnormall(long double n);
+int _fpclassifyl(long double n);
 
 #define isinf(x) ( \
-	sizeof((x)) == sizeof(float) ? _isinff((x)) : \
-	0)
+    sizeof((x)) == sizeof(float) ? _isinff((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isinfl((x)) : \
+    0)
 #define isnan(x) ( \
-	sizeof((x)) == sizeof(float) ? _isnanf((x)) : \
-	0)
+    sizeof((x)) == sizeof(float) ? _isnanf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isnanl((x)) : \
+    0)
 #define isnormal(x) ( \
-	sizeof((x)) == sizeof(float) ? _isnormalf((x)) : \
-	(x) != 0)
+    sizeof((x)) == sizeof(float) ? _isnormalf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isnormall((x)) : \
+    (x) != 0)
 #define isfinite(x) ( \
-	sizeof((x)) == sizeof(float) ? _isfinitef((x)) : \
-	1)
+    sizeof((x)) == sizeof(float) ? _isfinitef((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isfinitel((x)) : \
+    1)
 #define iszero(x) ( \
-	sizeof((x)) == sizeof(float) ? _iszerof((x)) : \
-	sizeof((x)) == sizeof(long double) ? _iszerol(x) : \
-	(x) != 0)
+    sizeof((x)) == sizeof(float) ? _iszerof((x)) : \
+    sizeof((x)) == sizeof(long double) ? _iszerol(x) : \
+    (x) == 0)
+#define issubnormal(x) ( \
+    sizeof((x)) == sizeof(float) ? _issubnormalf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _issubnormall(x) : \
+    (x) == 0)
 #define fpclassify(x) ( \
-	sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
-	0)
+    sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _fpclassifyl((x)) : \
+    0)
 
 double      acos(double);
 float       acosf(float);
