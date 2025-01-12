@@ -77,12 +77,12 @@ int _fpclassifyl(long double n);
     1)
 #define iszero(x) ( \
     sizeof((x)) == sizeof(float) ? _iszerof((x)) : \
-    sizeof((x)) == sizeof(long double) ? _iszerol(x) : \
+    sizeof((x)) == sizeof(long double) ? _iszerol((x)) : \
     (x) == 0)
 #define issubnormal(x) ( \
     sizeof((x)) == sizeof(float) ? _issubnormalf((x)) : \
-    sizeof((x)) == sizeof(long double) ? _issubnormall(x) : \
-    (x) == 0)
+    sizeof((x)) == sizeof(long double) ? _issubnormall((x)) : \
+    0)
 #define fpclassify(x) ( \
     sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
     sizeof((x)) == sizeof(long double) ? _fpclassifyl((x)) : \
@@ -256,9 +256,17 @@ double      nextafter(double, double);
 float       nextafterf(float, float);
 long double nextafterl(long double, long double);
 
+double      nextdown(double);
+float       nextdownf(float);
+long double nextdownl(long double);
+
 double      nexttoward(double, long double);
 float       nexttowardf(float, long double);
 long double nexttowardl(long double, long double);
+
+double      nextup(double);
+float       nextupf(float);
+long double nextupl(long double);
 
 double      pow(double, double);
 float       powf(float, float);

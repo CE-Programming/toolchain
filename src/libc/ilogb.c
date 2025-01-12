@@ -29,3 +29,50 @@ int ilogbf(float x)
 }
 
 int ilogb(double) __attribute__((alias("ilogbf")));
+
+
+
+typedef union F64_pun {
+    long double flt;
+    uint64_t bin;
+} F64_pun;
+
+#define Float64_ilogb_subnorm_max -1023
+#define Float64_exp_bias          1023
+#define Float64_mantissa_bits     52
+#define Float64_inf_lsh_1         UINT64_C(0xFFE0000000000000)
+#define Float64_norm_min_lsh_1    UINT64_C(0x0020000000000000)
+
+#define Float64_exponent_bits  11
+#define Float64_sign_bits      1
+
+int ilogbl(long double x) {
+    F64_pun val;
+    val.flt = x;
+    // clears the signbit
+    val.bin <<= 1;
+    /* iszero(x) */
+    if (val.bin == 0) {
+        errno = EDOM;
+        feraiseexcept(FE_INVALID);
+        return FP_ILOGB0;
+    }
+    /* isinf(x) || isnan(x) */
+    if (val.bin >= Float64_inf_lsh_1) {
+        errno = EDOM;
+        feraiseexcept(FE_INVALID);
+        // Assumes FP_ILOGBNAN == INT_MAX
+        return FP_ILOGBNAN;
+    }
+    /* isnormal(x) */
+    if (val.bin >= Float64_norm_min_lsh_1) {
+        // shift an additional bit to account for the signbit clear shift
+        int x_exp = (int)(val.bin >> (Float64_mantissa_bits + 1));
+        x_exp -= Float64_exp_bias;
+        return x_exp;
+    }
+    /* issubnormal(x) */
+    // val.bin was already shifted by one, so subtract one from the clz_offset
+    const int clz_offset = Float64_exponent_bits + Float64_sign_bits - 1;
+    return (Float64_ilogb_subnorm_max + clz_offset) - __builtin_clzll(val.bin);
+}
