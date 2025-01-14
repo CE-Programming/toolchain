@@ -1,0 +1,30 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CONCEPTS
+#define _EZCXX_CONCEPTS
+
+#include <type_traits>
+
+#pragma clang system_header
+
+namespace std {
+
+template <class _Tp, class _Up>
+concept same_as = is_same<_Tp, _Up>::value && is_same<_Up, _Tp>::value;
+
+// arithmetic:
+
+template <class _Tp>
+concept integral = is_integral_v<_Tp>;
+
+template <class _Tp>
+concept signed_integral = integral<_Tp> && is_signed_v<_Tp>;
+
+template <class _Tp>
+concept unsigned_integral = integral<_Tp> && !signed_integral<_Tp>;
+
+template <class _Tp>
+concept floating_point = is_floating_point_v<_Tp>;
+
+} // namespace std
+
+#endif // _EZCXX_CONCEPTS
