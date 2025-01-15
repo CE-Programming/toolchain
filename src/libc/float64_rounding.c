@@ -132,7 +132,7 @@ long long llrintl(long double x) {
     arg_x.flt = x;
 
     softfloat_exceptionFlags = 0;
-    int32_t ret = f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, true);
+    int64_t ret = f64_to_i64(arg_x.soft, softfloat_round_near_maxMag, true);
 
     if (softfloat_exceptionFlags & softfloat_flag_inexact) {
         feraiseexcept(FE_INEXACT);
