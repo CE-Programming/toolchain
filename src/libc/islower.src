@@ -8,7 +8,6 @@ _islower:
 	push	de
 	ld	a,l
 	sub	a,97
-	add	a,-26
+	sub	a,26
 	sbc	hl,hl
-	inc	hl
 	ret
