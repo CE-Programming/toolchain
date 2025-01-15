@@ -3,21 +3,17 @@
 	section	.text
 	public	_isalnum
 _isalnum:
-	pop	hl
 	pop	de
+	ex	(sp),hl
 	push	de
-	push	hl
-	or	a,a
+	ld	a,l
+	sub	a,48
+	add	a,-10
 	sbc	hl,hl
-	bit	7,e
-	ret	nz
-	ex	de,hl
-	ld	de,___maptab
-	add	hl,de
-	ld	a,(hl)
-	and	a,13
-	sbc	hl,hl
-	ld	l,a
+	inc	hl
+	ret	z
+	sub	a,65-(48+10)
+	res	5,a
+	cp	a,26
+	adc	hl,hl
 	ret
-
-	extern	___maptab

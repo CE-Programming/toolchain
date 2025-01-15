@@ -3,21 +3,11 @@
 	section	.text
 	public	_isgraph
 _isgraph:
-	pop	hl
 	pop	de
+	ex	(sp),hl
 	push	de
-	push	hl
-	or	a,a
+	ld	a,l
+	sub	a,33
+	sub	a,94
 	sbc	hl,hl
-	bit	7,e
-	ret	nz
-	ex	de,hl
-	ld	de,___maptab
-	add	hl,de
-	ld	a,(hl)
-	and	a,15
-	sbc	hl,hl
-	ld	l,a
 	ret
-
-	extern	___maptab

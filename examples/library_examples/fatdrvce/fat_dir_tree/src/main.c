@@ -69,13 +69,21 @@ fat_error_t scan_fat_files(char* path)
     faterr = fat_OpenDir(&fat, path, &dir);
     if (faterr != FAT_SUCCESS)
     {
+        printf("error code %d\n", faterr);
         return faterr;
     }
 
     for (;;)
     {
         faterr = fat_ReadDir(&dir, &entry);
-        if (faterr != FAT_SUCCESS || entry.name[0] == 0)
+        if (faterr != FAT_SUCCESS)
+        {
+            printf("error code %d", faterr);
+            break;
+        }
+
+        /* end of entries */
+        if (entry.name[0] == 0)
         {
             break;
         }

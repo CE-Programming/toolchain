@@ -3,27 +3,21 @@
 	section	.text
 	public	_strnlen
 _strnlen:
-	call	__frameset0
-	ld	de,(ix+6)
-	ld	bc,(ix+9)
-	or	a,a
-	sbc	hl,hl
-	jr	StartFor
-ForLoop:
-	inc	hl
-	inc	de
-StartFor:
-	push	hl
-	or	a,a
-	sbc	hl,bc
 	pop	hl
-	jr	nc,ReachedMax
-	ld	a,(de)
-	or	a,a
-	jr	nz,ForLoop
-ReachedMax:
-	ld	sp,ix
-	pop	ix
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
+	xor	a, a
+	sbc	hl, hl
+	sbc	hl, bc
+	ret	z
+	add	hl, bc
+	sbc	hl, de
+	ex	de, hl
+	cpir
+	add	hl, de
+	ret	z
+	inc	hl
 	ret
-
-	extern	__frameset0

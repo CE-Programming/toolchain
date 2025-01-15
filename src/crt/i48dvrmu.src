@@ -1,0 +1,89 @@
+; Performs 48-bit division and modulo
+;
+; Arguments:
+; ude:uhl = dividend
+; uiy:ubc = divisor
+;
+; Returns (loaded into other registers by i48divu/s and i48remu/s):
+; ude:uhl quotient, uiy:ubc remainder
+
+	assume adl=1
+
+	section .data
+
+	section .text
+	public __i48dvrmu
+
+__i48dvrmu:
+	;backup af
+	push af
+
+	;backup interrupt
+	ld a, i ; P = IEF2
+	di
+	push af
+
+	; save dividend to stack
+	push de
+	push hl
+
+	; Set up for ubc' dividend/quotient ptr, uhl':uhl remainder, and ude':ude divisor
+	push bc
+	pop de ; ude = low divisor
+	ld hl, 6
+	ld c, l ; c = byte counter
+	add hl, sp
+	push hl
+	sbc hl, hl  ; uhl = low remainder
+	exx
+	pop bc ; ubc' = dividend/quotient pointer
+	lea de, iy ; ude' = iy = high divisor
+	sbc hl, hl ; uhl' = high remainder
+.byteLoop:
+	dec bc
+	ld a, (bc); a = relevant dividend byte
+	exx
+	ld b, 8 ; b = bit counter
+.bitLoop:
+	; r<<1 and r[0] = n[b]
+	rla ; c = n[b], ~q[b-1] = c
+	adc hl, hl ; low r += low r + n[b]
+	exx
+	adc hl, hl ; high r += high r + c from low r
+	exx
+	; r - d
+	sbc hl, de ; low r -= low d
+	exx
+	sbc hl, de ; high r -= high d
+	exx
+	jr nc, .greaterEqual
+	; restore if r<d
+	add hl, de ; restore low
+	exx
+	adc hl, de ; restore high
+	exx
+.greaterEqual:
+	; carry contains inverted quotient bit, which is saved in the next iteration
+	djnz .bitLoop
+	rla ; ~q[b] = c
+	cpl ; uninvert quotient
+	dec c ; decrement byte counter
+	exx
+	ld (bc), a ; now that dividend byte isn't needed, overwrite with quotient
+	jr nz, .byteLoop
+
+	;finish and clean up
+
+	push hl
+	exx
+	pop iy ; iy = remainder high
+	ex (sp), hl ; hl = lower quotient
+	pop bc ; bc = remainder low
+	pop de ; de = upper quotient
+
+	pop af
+	jp po, .skipEI
+	ei
+.skipEI:
+	pop af
+	ret

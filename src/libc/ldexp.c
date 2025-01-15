@@ -47,7 +47,7 @@ float _ldexpf_c(float value, int power)
     int     exponent;
 	int powerplusexponent;
 
-	if ( value == 0.0 ) return 0;
+	if ( value == 0.0 || !isfinite(value) ) return value;
 
 	floating.value = value;
     exponent = (floating.bits >> exponent_shift) & exponent_mask;

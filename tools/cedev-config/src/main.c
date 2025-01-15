@@ -18,13 +18,13 @@
 
 static int help(const char *prgm)
 {
-    fprintf(stdout, "usage: %s <OPTION>\n", prgm);
+    fprintf(stdout, "usage: %s <option>\n", prgm);
     fprintf(stdout, "\n");
     fprintf(stdout, "Get various configuration information needed to compile programs\n");
-    fprintf(stdout, "using the CE C Toolchain.\n");
+    fprintf(stdout, "using the CE C/C++ Toolchain.\n");
     fprintf(stdout, "\n");
     fprintf(stdout, "Options:\n");
-    fprintf(stdout, "  --version         Print CE C Toolchain version.\n");
+    fprintf(stdout, "  --version         Print CE C/C++ Toolchain version.\n");
     fprintf(stdout, "  --prefix          Print the installation prefix.\n");
     fprintf(stdout, "  --makefile        Core toolchain makefile path.\n");
     fprintf(stdout, "  --help            Show this page.\n");
@@ -52,21 +52,20 @@ static const char *executable_path(void)
     return path;
 }
 
-static bool str_has_whitespace(const char *str, size_t max)
+static bool is_valid_make_path(const char *str, size_t max)
 {
     size_t i = 0;
 
-    for (i = 0; i < max; ++i)
+    for (; i < max; ++i)
     {
         char c = str[i];
-        switch (c)
+        if (!c)
         {
-            case '\0':
-                return false;
-            case '\t': case '\r': case '\n': case '\v': case '\f': case ' ':
-                return true;
-            default:
-                break;
+            return true;
+        }
+        if (isspace(c))
+        {
+            return false;
         }
     }
 
@@ -120,7 +119,7 @@ int main(int argc, char *argv[])
 
             case 'm':
                 cwk_path_get_absolute(cedev, "./meta/makefile.mk", buffer, sizeof buffer);
-                if (str_has_whitespace(buffer, sizeof buffer))
+                if (!is_valid_make_path(buffer, sizeof buffer))
                 {
                     fprintf(stderr, "The CE C Toolchain is installed in a directory containing\n");
                     fprintf(stderr, "spaces. This does not work properly with the \'make\' command.\n");

@@ -119,12 +119,12 @@ int main(void)
 
     /* Line Drawing */
     gfx_SetColor(227);
-    gfx_Line(-10, -10, 330, 250);
-    gfx_Line(-10, 250, 330, -10);
-    gfx_Line_NoClip(0, 0, 320, 0);
-    gfx_Line_NoClip(0, 0, 0, 240);
-    gfx_Line_NoClip(0, 240, 320, 240);
-    gfx_Line_NoClip(320, 240, 320, 0);
+    gfx_Line(-10, -10, 329, 249);
+    gfx_Line(-10, 249, 329, -10);
+    gfx_Line_NoClip(0, 0, 319, 0);
+    gfx_Line_NoClip(0, 0, 0, 239);
+    gfx_Line_NoClip(0, 239, 319, 239);
+    gfx_Line_NoClip(319, 239, 319, 0);
     gfx_SetColor(18);
     gfx_HorizLine(-10, 10, 340);
     gfx_HorizLine_NoClip(0, 230, 320);

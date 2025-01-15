@@ -15,10 +15,5 @@ int __attribute__((weak)) fputs(const char *__restrict str, FILE *__restrict str
         i++;
     }
 
-    if (fputc('\n', stream) == EOF)
-    {
-        return EOF;
-    }
-
     return 1;
 }

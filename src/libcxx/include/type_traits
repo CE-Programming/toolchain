@@ -94,6 +94,7 @@ template<>          struct __integral<           char8_t> : true_type  {};
 #endif
 template<>          struct __integral<          char16_t> : true_type  {};
 template<>          struct __integral<          char32_t> : true_type  {};
+template<>          struct __integral<  signed     short> : true_type  {};
 template<>          struct __integral<unsigned     short> : true_type  {};
 template<>          struct __integral<  signed       int> : true_type  {};
 template<>          struct __integral<unsigned       int> : true_type  {};
@@ -118,6 +119,16 @@ template<class _Tp> inline constexpr bool is_arithmetic_v = is_arithmetic<_Tp>::
 
 template<class _Tp> using is_fundamental = disjunction<is_void<_Tp>, is_null_pointer<_Tp>, is_arithmetic<_Tp>>;
 template<class _Tp> inline constexpr bool is_fundamental_v = is_fundamental<_Tp>::value;
+
+template<class _Tp, bool = is_arithmetic<_Tp>::value> struct __is_signed : integral_constant<bool, _Tp(-1) < _Tp(0)> {};
+template<class _Tp>                                   struct __is_signed<_Tp, false> : false_type {};
+template<class _Tp> struct is_signed : __is_signed<_Tp>::type {};
+template<class _Tp> constexpr bool is_signed_v = is_signed<_Tp>::value;
+
+template<class _Tp, bool = is_arithmetic<_Tp>::value> struct __is_unsigned : integral_constant<bool, _Tp(0) < _Tp(-1)> {};
+template<class _Tp>                                   struct __is_unsigned<_Tp, false> : false_type {};
+template<class _Tp> struct is_unsigned : __is_unsigned<_Tp>::type {};
+template<class _Tp> constexpr bool is_unsigned_v = is_unsigned<_Tp>::value;
 
 template<class>                 struct is_array           : false_type {};
 template<class _Tp>             struct is_array<_Tp[]>    : true_type  {};

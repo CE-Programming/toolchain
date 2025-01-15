@@ -4,18 +4,14 @@
 	public	__ibitrev
 __ibitrev:
 	push	af
-	ld	a, h			; a=H
+	ld	a, l				; a=L
+	call	__internal_bitrev_two_bytes	; a=HLU', uhl=HLL'
 	ld	h, l
-	ld	l, a			; uhl=[HLU]LH
-	call	__internal_bitrev_byte	; a=HLU', uhl=LH0
-	ld	l, a			; uhl=LH[HLU']
-	call	__internal_bitrev_byte	; a=L', uhl=H[HLU']0
+	ld	l, a				; uhl=HL'[HLU']
+	call	__internal_bitrev_two_bytes	; a=H', uhl=L'[HLU'][HLU]
 	ld	l, h
-	ld	h, a			; uhl=HL'[HLU']
-	call	__internal_bitrev_byte	; a=H', uhl=L'[HLU']0
-	ld	l, h
-	ld	h, a			; uhl=L'H'[HLU']
+	ld	h, a				; uhl=L'H'[HLU']
 	pop	af
 	ret
 
-	extern	__internal_bitrev_byte
+	extern	__internal_bitrev_two_bytes

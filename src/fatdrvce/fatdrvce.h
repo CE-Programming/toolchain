@@ -52,6 +52,7 @@ typedef enum {
     FAT_ERROR_INVALID_MAGIC, /**< Some invalid magic bytes were detected */
     FAT_ERROR_INVALID_SIGNATURE, /**< Some invalid signature was detected */
     FAT_ERROR_NO_MORE_ENTRIES, /**< No more entries in the directory */
+    FAT_ERROR_INVALID_NAME, /**< An invalid filename was provided */
 } fat_error_t;
 
 /**
@@ -139,9 +140,10 @@ fat_error_t fat_Open(fat_t *fat,
 
 /**
  * Closes the FAT filesystem. This is not required to be called, however
- * it will clear the filesystem dirty bit so other OSes don't see the filesystem
- * with potential errors. You cannot use the FAT structure after this call,
- * and should call fat_Open() if you need to modify the filesystem again.
+ * it will clear the filesystem dirty bit so other OSes don't see the
+ * filesystem with potential errors. You cannot use the FAT structure after
+ * this call, and should call fat_Open() if you need to modify the filesystem
+ * again.
  * @param[in] fat Initialized FAT structure type.
  * @return FAT_SUCCESS on success, otherwise error.
  */
@@ -157,11 +159,11 @@ fat_error_t fat_Close(fat_t *fat);
 fat_error_t fat_OpenDir(fat_t *fat, const char *path, fat_dir_t *dir);
 
 /**
- * Gets the next directory entry. If `entry.name[0] = 0`, then there are no more
- * entries to fetch.
+ * Gets the next directory entry. If `entry.name[0]` is `0`, then there
+ * are no more entries to fetch.
  * @param[in] dir Initialized directory handle from fat_OpenDir().
  * @param[out] entry Pointer to store entry information.
- * @return Number of entries found.
+ * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_ReadDir(fat_dir_t *dir, fat_dir_entry_t *entry);
 

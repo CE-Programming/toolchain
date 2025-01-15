@@ -1,22 +1,23 @@
 	assume	adl=1
 
 	section	.text
-	public	__internal_bitrev_byte
-__internal_bitrev_byte:
-	add	hl, hl
+	public	__internal_bitrev_two_bytes
+__internal_bitrev_two_bytes:
 	rra
-	add	hl, hl
+	adc	hl, hl
 	rra
-	add	hl, hl
+	adc	hl, hl
 	rra
-	add	hl, hl
+	adc	hl, hl
 	rra
-	add	hl, hl
+	adc	hl, hl
 	rra
-	add	hl, hl
+	adc	hl, hl
 	rra
-	add	hl, hl
+	adc	hl, hl
 	rra
-	add	hl, hl
+	adc	hl, hl
+	rra
+	adc	hl, hl
 	rra
 	ret

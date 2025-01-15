@@ -7,7 +7,9 @@ _putchar:
 	ex	(sp),hl
 	push	de
 	push	hl
+	push	hl
 	call	_outchar
+	pop	hl
 	pop	hl
 	ret
 

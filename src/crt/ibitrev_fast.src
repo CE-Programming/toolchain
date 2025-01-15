@@ -3,6 +3,26 @@
 	section	.text
 	public	__ibitrev_fast
 __ibitrev_fast:
+	ld	a, l
+	rra
+	adc	hl, hl
+	rra
+	adc	hl, hl
+	rra
+	adc	hl, hl
+	rra
+	adc	hl, hl
+	rra
+	adc	hl, hl
+	rra
+	adc	hl, hl
+	rra
+	adc	hl, hl
+	rra
+	adc	hl, hl
+	rra
+	ld	h, l
+	ld	l, a
 	add	hl, hl
 	rra
 	add	hl, hl
@@ -19,44 +39,6 @@ __ibitrev_fast:
 	rra
 	add	hl, hl
 	rra
-	ld	c, a
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	ld	b, a
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	add	hl, hl
-	rra
-	push	af
-	dec	sp
-	pop	hl
-	inc	sp
-	ld	l, c
-	ld	h, b
+	ld	l, h
+	ld	h, a
 	ret

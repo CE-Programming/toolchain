@@ -29,11 +29,11 @@ int main(void)
 
     /* Set the palette for the sprites */
     gfx_SetPalette(global_palette, sizeof_global_palette, 0);
-    gfx_FillScreen(1);
     gfx_SetTransparentColor(0);
 
     /* Draw to the offscreen buffer */
     gfx_SetDrawBuffer();
+    gfx_FillScreen(1);
 
     /* Draw a bunch of random sprites to demonstrate the partial redraw */
     for (i = 0; i < 6; ++i)

@@ -18,11 +18,11 @@ Overview
 
 The graphx library places the LCD in a "palettized" mode - pixels on the screen are actually indexes into an array of colors rather than the color iself.
 What this means is that graphx is only functionally capable of displaying up to 256 colors on-screen at one time.
-This array of colors is called a "palette", and is accessed using the :code:`gfx_palette` macro variable: e.g. the code :code:`gfx_palette[16]` accesses the 17th color in the palette, and can be directly read or written with an color value.
-Alternatively, the function :code:`gfx_SetPalette` sets multiple color entries at once, which may be useful when configuring a custom color palette.
-Palette colors are stored in 1555 format (aka 565 format), and the macro :code:`gfx_RGBTo1555` can be used to convert a normal 24-bit RGB value into a palette color.
+This array of colors is called a "palette", and is accessed using the :code:`gfx_palette` macro variable: e.g. the code :code:`gfx_palette[16]` accesses the 17th color in the palette, and can be directly read or written with a color value.
+Palette colors are stored in 1555 format (a version of 565 format), and the macro :code:`gfx_RGBTo1555` may be used to convert a normal 24-bit RGB value into a palette color, for example :code:`gfx_palette[0] = gfx_RGBTo1555(10, 21, 32)`.
+The function :code:`gfx_SetPalette` can set multiple color entries at once, which may be useful when configuring an entire custom color palette.
 
-However, a better option when working with graphx palettes is to utilize the `convimg <https://github.com/mateoconlechuga/convimg>`_ tool which is supplied with the toolchain.
+A better option when working with graphx is to utilize the `convimg <https://github.com/mateoconlechuga/convimg>`_ tool which is supplied with the toolchain.
 This tool is able to consume multiple images and sprites and to create a palette that matches as closely as possible with only 256 colors.
 The output of this tool is normal data arrays which are then automatically picked up by the compiler at build time, making the process seamless.
 Additionally, convimg allows sprite and color data to be stored in AppVars to help reduce the size of the program binary. 
