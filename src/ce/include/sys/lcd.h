@@ -30,34 +30,7 @@ extern "C" {
 /** LCD Control register */
 #define lcd_Control              (*(volatile uint24_t*)0xE30018)
 /* @cond */
-/** LCD RGB/BGR and Bits per pixel */
-#define lcd_VideoMode            (*(volatile uint16_t*)0xE30018)
-#define LCD_RGB1bit               (0x821) /**< RGB 1bit indexed color */
-#define LCD_RGB2bit               (0x823) /**< RGB 2bit indexed color */
-#define LCD_RGB4bit               (0x825) /**< RGB 4bit indexed color */
-#define LCD_RGB8bit               (0x827) /**< RGB 8bit indexed color */
-#define LCD_RGB1555               (0x829) /**< RGB 1555 16bit */
-#define LCD_RGB565                (0x82D) /**< RGB 565 16bit */
-#define LCD_RGB444                (0x82F) /**< RGB 444 16bit */
-#define LCD_RGB16bit              (LCD_RGB565) /**< TI-OS Default */
-#define LCD_BGR1bit               (0x921) /**< BGR 1bit indexed color */
-#define LCD_BGR2bit               (0x923) /**< BGR 2bit indexed color */
-#define LCD_BGR4bit               (0x925) /**< BGR 4bit indexed color */
-#define LCD_BGR8bit               (0x927) /**< BGR 8bit indexed color */
-#define LCD_BGR1555               (0x929) /**< BGR 1555 16bit */
-#define LCD_BGR565                (0x92D) /**< BGR 565 16bit */
-#define LCD_BGR444                (0x92F) /**< BGR 444 16bit */
-#define LCD_BGR16bit              (LCD_BGR565) /**< TI-OS Default */
 /** LCD Bits per pixel */
-#define lcd_VideoBPP             (*(volatile uint8_t*)0xE30018)
-#define LCD_INDEXED1              (0x21) /**< 1bit indexed color */
-#define LCD_INDEXED2              (0x23) /**< 2bit indexed color */
-#define LCD_INDEXED4              (0x25) /**< 4bit indexed color */
-#define LCD_INDEXED8              (0x27) /**< 8bit indexed color */
-#define LCD_COLOR1555             (0x29) /**< 1555 16bit */
-#define LCD_COLOR565              (0x2D) /**< 565 16bit */
-#define LCD_COLOR444              (0x2F) /**< 444 16bit */
-#define LCD_COLOR16               (LCD_COLOR565) /**< TI-OS Default */
 #define lcd_EnableInt            (*(volatile uint8_t*)0xE3001C)
 #define lcd_IntStatus            (*(volatile uint8_t*)0xE30020)
 #define lcd_IntStatusMasked      (*(volatile uint8_t*)0xE30024)
@@ -99,6 +72,53 @@ extern "C" {
 #define LCD_HEIGHT              (240)
 /** Total size of VRAM in bytes */
 #define LCD_SIZE                (LCD_WIDTH*LCD_HEIGHT*2)
+
+#define LCD_BGR (0x100)
+#define LCD_RGB (0x000)
+
+#define LCD_INDEXED1              (0x21) /**< 1bit indexed color */
+#define LCD_INDEXED2              (0x23) /**< 2bit indexed color */
+#define LCD_INDEXED4              (0x25) /**< 4bit indexed color */
+#define LCD_INDEXED8              (0x27) /**< 8bit indexed color */
+#define LCD_COLOR1555             (0x29) /**< 1555 16bit */
+#define LCD_COLOR565              (0x2D) /**< 565 16bit */
+#define LCD_COLOR444              (0x2F) /**< 444 16bit */
+#define LCD_COLOR16               (LCD_COLOR565) /**< TI-OS Default */
+
+#define LCD_BGR1bit               (LCD_INDEXED1  | LCD_BGR) /**< BGR 1bit indexed color */
+#define LCD_BGR2bit               (LCD_INDEXED2  | LCD_BGR) /**< BGR 2bit indexed color */
+#define LCD_BGR4bit               (LCD_INDEXED4  | LCD_BGR) /**< BGR 4bit indexed color */
+#define LCD_BGR8bit               (LCD_INDEXED8  | LCD_BGR) /**< BGR 8bit indexed color */
+#define LCD_BGR1555               (LCD_COLOR1555 | LCD_BGR) /**< BGR 1555 16bit */
+#define LCD_BGR565                (LCD_COLOR565  | LCD_BGR) /**< BGR 565 16bit */
+#define LCD_BGR444                (LCD_COLOR444  | LCD_BGR) /**< BGR 444 16bit */
+#define LCD_BGR16bit              (LCD_COLOR16   | LCD_BGR) /**< BGR 565 16bit (TI-OS Default) */
+
+#define LCD_RGB1bit               (LCD_INDEXED1  | LCD_RGB) /**< RGB 1bit indexed color */
+#define LCD_RGB2bit               (LCD_INDEXED2  | LCD_RGB) /**< RGB 2bit indexed color */
+#define LCD_RGB4bit               (LCD_INDEXED4  | LCD_RGB) /**< RGB 4bit indexed color */
+#define LCD_RGB8bit               (LCD_INDEXED8  | LCD_RGB) /**< RGB 8bit indexed color */
+#define LCD_RGB1555               (LCD_COLOR1555 | LCD_RGB) /**< RGB 1555 16bit */
+#define LCD_RGB565                (LCD_COLOR565  | LCD_RGB) /**< RGB 565 16bit */
+#define LCD_RGB444                (LCD_COLOR444  | LCD_RGB) /**< RGB 444 16bit */
+#define LCD_RGB16bit              (LCD_COLOR16   | LCD_RGB) /**< RGB 565 16bit */
+
+/**
+ * Sets the color order (RGB/BGR) and the bits per pixel on the LCD without
+ * modifying other bits.
+ */
+#define lcd_SetVideoMode(VideoMode) \
+do { \
+    lcd_Control = (lcd_Control & ~0x10E) | ((VideoMode) & 0x10E); \
+} while(0)
+
+/**
+ * Resets lcd_Control to TI-OS defaults
+ */
+#define lcd_ResetVideoMode() \
+do { \
+    lcd_Control = LCD_BGR16bit; \
+} while(0)
 
 #ifdef __cplusplus
 }
