@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+
+	public __ftod
+
+__ftod:
+	; f32_ret_f64
+	ld	d, a
+	push	iy, de, hl
+	call	__ftod_c
+	pop	af, af, iy
+	ret
+
+extern __ftod_c
