@@ -8,7 +8,6 @@ _isdigit:
 	push	de
 	ld	a,l
 	sub	a,48
-	add	a,-10
+	sub	a,10
 	sbc	hl,hl
-	inc	hl
 	ret

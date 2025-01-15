@@ -8,7 +8,6 @@ _isgraph:
 	push	de
 	ld	a,l
 	sub	a,33
-	add	a,-94
+	sub	a,94
 	sbc	hl,hl
-	inc	hl
 	ret
