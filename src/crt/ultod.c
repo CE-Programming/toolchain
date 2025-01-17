@@ -1,63 +1,36 @@
-
-/*============================================================================
-
-This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
-Package, Release 3e, by John R. Hauser.
-
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
-California.  All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
-
 #include <stdbool.h>
 #include <stdint.h>
 
-union ui64_f64 { uint64_t ui; long double f; };
+typedef union F64_pun {
+    long double flt;
+    uint64_t bin;
+    struct {
+        uint16_t low16;
+        uint32_t mid32;
+		uint16_t exp16;
+    } split;
+} F64_pun;
 
-#define packToF64UI( sign, exp, sig ) ((uint64_t) (((uint_fast64_t) (sign)<<63) + ((uint_fast64_t) (exp)<<52) + (sig)))
+#define Float64_bias      1023
+#define Float64_mant_bits 52
+#define uint32_max_exp    31
+#define uint48_bits       48
 
-/**
- * @remarks inlined version of `float64_t ui32_to_f64(int32_t)` from
- * `ui32_to_f64.c`
- */
-long double _ultod_c( uint32_t a )
-{
-    uint_fast64_t uiZ;
-    int_fast8_t shiftDist;
-    union ui64_f64 uZ;
+long double _ultod_c(uint32_t x) {
+	if (x == 0) {
+		return 0.0L;
+	}
+	F64_pun ret;
+	uint32_t val = (uint32_t)(x);
+	unsigned clz_result = __builtin_clzl(val);
+	// clears the MSB since the float will be normalized
+	val <<= clz_result + 1;
 
-    if ( ! a ) {
-        uiZ = 0;
-    } else {
-        shiftDist = __builtin_clzl( a ) + 21;
-        uiZ =
-            packToF64UI( 0, 0x432 - shiftDist, (uint_fast64_t) a<<shiftDist );
-    }
-    uZ.ui = uiZ;
-    return uZ.f;
+	ret.split.low16 = 0;
+	ret.split.mid32 = val;
+	ret.split.exp16 = Float64_bias + (uint32_max_exp - clz_result);
+	
+	ret.bin <<= Float64_mant_bits - uint48_bits;
+
+	return ret.flt;
 }

@@ -10,6 +10,7 @@ extern "C" {
 
 #define HUGE_VALF    __builtin_inff()
 #define HUGE_VAL     __builtin_inf()
+#define HUGE_VALL    __builtin_infl()
 
 #define M_E           2.71828182845904523536     /* e              */
 #define M_LOG2E       1.44269504088896340736     /* log2(e)        */
@@ -24,16 +25,16 @@ extern "C" {
 #define M_2_SQRTPI    1.12837916709551257390     /* 2/sqrt(pi)     */
 #define M_SQRT2       1.41421356237309504880     /* sqrt(2)        */
 #define M_SQRT1_2     0.707106781186547524401    /* 1/sqrt(2)      */
-#define M_LOG_2M_PI   1.83787706640934548        /* log2(M_PI)     */
+#define M_LOG_2M_PI   1.83787706640934548        /* log(2*M_PI)    */
 
 #define FP_ILOGB0     (~__INT_MAX__)
 #define FP_ILOGBNAN     __INT_MAX__
 
-#define FP_NORMAL    0x1
-#define FP_ZERO      0x2
-#define FP_SUBNORMAL (FP_NORMAL | FP_ZERO)     /* 0x3 */
-#define FP_INFINITE  0x4
-#define FP_NAN       (FP_NORMAL | FP_INFINITE) /* 0x5 */
+#define FP_ZERO      0x0
+#define FP_INFINITE  0x1
+#define FP_SUBNORMAL 0x2
+#define FP_NAN       0x3
+#define FP_NORMAL    0x4
 
 #define signbit(x)           __builtin_signbit(x)
 #define isgreater(x, y)      __builtin_isgreater(x, y)

@@ -4,30 +4,6 @@
 
 	public	__dcmp
 
-#if 0
-
-; This version of _dcmp does not save/restore the state of BC/DE/HL, the state
-; of these registers may by modified by the C function
-
-; int _dcmp_c(long double x, const long double *y)
-__dcmp:
-	; f64_f64*_ret_i24
-	push	af, iy
-	ld	iy, 9
-	add	iy, sp
-	push	iy, bc, de, hl
-	call	__dcmp_c
-	pop	af, af, af, af, iy, af
-	; Set the comparison flags
-	add	hl, de
-	or	a, a
-	sbc	hl, de
-	ret
-
-#else
-
-; Properly saves/restores the state of BC/DE/HL
-
 ; int _dcmp_c(const long double *x, const long double *y)
 __dcmp:
 	; f64*_f64*_ret_i24
@@ -44,7 +20,5 @@ __dcmp:
 	sbc	hl, de
 	pop	hl, de, bc
 	ret
-
-#end if
 
 	extern	__dcmp_c
