@@ -2,7 +2,7 @@
 
 	section	.text
 	public	__lltof
-__lltod:
+__lltof:
 	push	af, iy, bc, de, hl
 	call	__lltof_c
 	pop	af, af, af, iy, af

@@ -1,6 +1,7 @@
 	assume	adl=1
 
 	section	.text
+	
 	public	_copysign, _copysignf
 _copysign:
 _copysignf:
@@ -19,4 +20,17 @@ _copysignf:
 	rrca
 	ld	l,a
 	ex	de,hl
+	ret
+
+	public	_copysignl
+_copysignl:
+	ld	hl, 19	; upper 8 bits of y
+	add	hl, sp
+	ld	a, (hl)
+	ld	de, -9	; upper 8 bits of x
+	add	hl, de
+	xor	a, (hl)
+	and	a, $80
+	xor	a, (hl)
+	ld	(hl), a
 	ret

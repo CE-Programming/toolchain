@@ -3,7 +3,7 @@
 	section	.text
 
 	public	__dadd, __dsub, __dmul, __ddiv, __drem
-	public 	__dtof, __dtol, __dtoll, __dtoul, __dtoull
+	public	__lltod,__ulltod, __dtof
 
 ;-------------------------------------------------------------------------------
 ; Arithmetic functions
@@ -60,7 +60,7 @@ __drem:
 	ret
 
 ;-------------------------------------------------------------------------------
-; Convert from long double
+; Conversion functions
 ;-------------------------------------------------------------------------------
 
 __dtof:
@@ -70,33 +70,19 @@ __dtof:
 	pop	af, af, af, iy, af
 	ret
 
-__dtol:
-	; f64_ret_i32
+__lltod:
+	; i64_ret_f64
 	push	af, iy, bc, de, hl
-	call	__dtol_c
+	call	__lltod_c
 	pop	af, af, af, iy, af
 	ret
 
-__dtoll:
-	; f64_ret_i64
+__ulltod:
+	; u64_ret_f64
 	push	af, iy, bc, de, hl
-	call	__dtoll_c
-	pop	af, af, af, iy, af
-	ret
-
-__dtoul:
-	; f64_ret_u32
-	push	af, iy, bc, de, hl
-	call	__dtoul_c
-	pop	af, af, af, iy, af
-	ret
-
-__dtoull:
-	; f64_ret_u64
-	push	af, iy, bc, de, hl
-	call	__dtoull_c
+	call	__ulltod_c
 	pop	af, af, af, iy, af
 	ret
 
 	extern	__dadd_c, __dsub_c, __dmul_c, __ddiv_c, __drem_c
-	extern	__dtof_c, __dtol_c, __dtoll_c, __dtoul_c, __dtoull_c
+	extern	__dtof_c, __lltod_c, __ulltod_c

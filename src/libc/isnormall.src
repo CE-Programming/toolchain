@@ -1,0 +1,29 @@
+	assume	adl=1
+
+	section	.text
+	
+	public	__isnormall
+
+; int _isnormall(long double)
+__isnormall:
+	; load upper 24bits
+	ld	hl, 8	
+	add	hl, sp
+	ld	hl, (hl)
+	; clear signbit
+	add	hl, hl
+	; test for inf/NaN
+	ld	de, $2000
+	add	hl, de
+	jr	c, .exp_all_ones
+	; double de
+	ld	d, $40
+	; test for zero/subnormal
+	sbc	hl, de
+	jr	c, .exp_all_zero
+
+.exp_all_ones:
+.exp_all_zero:
+	sbc	hl, hl
+	inc	hl
+	ret
