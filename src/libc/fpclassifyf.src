@@ -1,0 +1,29 @@
+	assume	adl=1
+
+	section	.text
+	
+	public	__fpclassifyf
+
+; FP_ZERO      := 0
+; FP_INFINITE  := 1
+; FP_SUBNORMAL := 2
+; FP_NAN       := 3
+; FP_NORMAL    := 4
+
+; int _fpclassifyf(float)
+__fpclassifyf:
+	pop	bc, hl, de
+	push	de, hl, bc
+	or	a, a
+	adc	hl, hl
+	jr	z, .mant_zero	; normal, zero, or inf
+	ld	hl, 2
+	; normal, subnormal, or NaN
+.mant_zero:
+	rl	e
+	ret	z	; subnormal or zero
+	inc	hl
+	inc	e
+	ret	z	; inf or NaN
+	ld	l, 4
+	ret	; normal

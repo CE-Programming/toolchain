@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	
+	public	__iszerof
+
+; int iszerof(float)
+__iszerof:
+	pop	bc, hl, de
+	push	de, hl, bc
+	add	hl, hl
+	jr	nz, .not_zero_f32
+	rl	e
+	jr	nz, .not_zero_f32
+	inc	hl
+	ret
+.not_zero_f32:
+	or	a, a
+	sbc	hl, hl
+	ret

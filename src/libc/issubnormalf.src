@@ -1,0 +1,19 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__issubnormalf
+
+; int _issubnormalf(float)
+__issubnormalf:
+	pop	bc, hl, de
+	push	de, hl, bc
+	or	a, a
+	adc	hl, hl
+	ret z	; zero mantissa is not subnormal
+	ld	a, e
+	adc	a, a
+	ret z	; zero exponent is subnormal
+	or	a, a
+	sbc	hl, hl
+	ret
