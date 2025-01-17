@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__ltod
+
+__ltod:
+	; i32_ret_f64
+	ld	d, a
+	push	iy, de, hl
+	call	__ltod_c
+	pop	af, af, iy
+	ret
+
+	extern __ltod_c

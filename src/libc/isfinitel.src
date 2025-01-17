@@ -1,0 +1,17 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__isfinitel
+
+; int _isfinitel(long double)
+__isfinitel:
+	ld	hl, 8
+	add	hl, sp
+	ld	hl, (hl)	; load the upper 24bits
+	add	hl, hl	; clears signbit
+	ld	de, $2000	; (1 << (5 + 8))
+	add	hl, de	; attempts to overflow the exponent
+	sbc	hl, hl
+	inc	hl
+	ret

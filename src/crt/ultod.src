@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__ultod
+
+__ultod:
+	; u32_ret_f64
+	ld	d, a
+	push	iy, de, hl
+	call	__ultod_c
+	pop	af, af, iy
+	ret
+
+	extern __ultod_c
