@@ -1,7 +1,7 @@
 	assume	adl=1
 
 	section	.text
-	public	_fabs, _fabsf
+	public	_fabs, _fabsf, _fabsl
 
 if PREFER_OS_LIBC
 
@@ -10,15 +10,21 @@ _fabs := _fabsf
 
 else
 
+; CC: 2 + 8F + 4R + 1W
+; 8 bytes
 _fabs:
 _fabsf:
-	pop	bc
-	pop	hl
-	pop	de
-	push	de
-	push	hl
-	push	bc
-	res	7,e
+	ld	hl, 6
+	add	hl, sp
+	res	7, (hl)
 	ret
 
 end if
+
+; CC: 2 + 8F + 4R + 1W
+; 8 bytes
+_fabsl:
+	ld	hl, 10
+	add	hl, sp
+	res	7, (hl)
+	ret

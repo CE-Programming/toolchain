@@ -45,11 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_BUILTIN_CLZ
 
 INLINE uint_fast8_t softfloat_countLeadingZeros16( uint16_t a )
-    { return a ? __builtin_clz( a ) - 16 : 16; }
+    { return a ? __builtin_clz( a ) - (sizeof(int) * 8 - 16) : 16; }
 #define softfloat_countLeadingZeros16 softfloat_countLeadingZeros16
 
 INLINE uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
-    { return a ? __builtin_clz( a ) : 32; }
+    { return a ? __builtin_clzl( a ) : 32; }
 #define softfloat_countLeadingZeros32 softfloat_countLeadingZeros32
 
 INLINE uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )

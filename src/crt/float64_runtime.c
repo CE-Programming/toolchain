@@ -99,7 +99,7 @@ long double _drem_c(long double x, const long double *y) {
 /* int _dcmp_c(const long double *x, const long double* y) */
 
 //------------------------------------------------------------------------------
-// Convert from long double
+// Conversion functions
 //------------------------------------------------------------------------------
 
 float _dtof_c(long double x) {
@@ -110,26 +110,14 @@ float _dtof_c(long double x) {
     return ret.flt;
 }
 
-int32_t _dtol_c(long double x) {
-    F64_pun arg_x;
-    arg_x.flt = x;
-    return f64_to_i32_r_minMag(arg_x.soft, false);
+long double _lltod_c(int64_t x) {
+    F64_pun ret;
+    ret.soft = i64_to_f64(x);
+    return ret.flt;
 }
 
-int64_t _dtoll_c(long double x) {
-    F64_pun arg_x;
-    arg_x.flt = x;
-    return f64_to_i64_r_minMag(arg_x.soft, false);
-}
-
-uint32_t _dtoul_c(long double x) {
-    F64_pun arg_x;
-    arg_x.flt = x;
-    return f64_to_ui32_r_minMag(arg_x.soft, false);
-}
-
-uint64_t _dtoull_c(long double x) {
-    F64_pun arg_x;
-    arg_x.flt = x;
-    return f64_to_ui64_r_minMag(arg_x.soft, false);
+long double _ulltod_c(uint64_t x) {
+    F64_pun ret;
+    ret.soft = ui64_to_f64(x);
+    return ret.flt;
 }
