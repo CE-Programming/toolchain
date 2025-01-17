@@ -1,0 +1,11 @@
+	assume	adl = 1
+
+	section	.text
+	weak	_feof
+_feof:
+	ld	iy, 0
+	add	iy, sp
+	ld	iy, (iy + 3)
+	sbc	hl, hl
+	ld	l, (iy + 1)
+	ret
