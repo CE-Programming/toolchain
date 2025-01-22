@@ -49,6 +49,9 @@ float strtof(const char *__restrict nptr,
 double strtod(const char *__restrict nptr,
               char **__restrict endptr) __attribute__((nonnull(1)));
 
+long double strtold(const char *__restrict nptr,
+                    char **__restrict endptr) __attribute__((nonnull(1)));
+
 long strtol(const char *__restrict nptr,
             char **__restrict endptr, int base) __attribute__((nonnull(1)));
 

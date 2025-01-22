@@ -10,3 +10,13 @@ float nanf(const char *tag)
 }
 
 double nan(const char *) __attribute__((alias("nanf")));
+
+#define Float64_nan_mask UINT64_C(0x0007FFFFFFFFFFFF)
+#define Float64_pos_nan  UINT64_C(0x7FF8000000000000)
+
+long double nanl(const char *tag)
+{
+    return (union { uint64_t u; long double f; }) {
+        .u = (strtoll(tag, NULL, 0) & Float64_nan_mask) | Float64_pos_nan,
+    }.f;
+}
