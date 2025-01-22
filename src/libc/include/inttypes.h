@@ -165,7 +165,7 @@
 #define SCNxMAX          __UINTMAX_FMTx__
 
 #define SCNdPTR           __INTPTR_FMTd__
-#define SCNiPTR          __ INTPTR_FMTi__
+#define SCNiPTR           __INTPTR_FMTi__
 #define SCNoPTR          __UINTPTR_FMTo__
 #define SCNuPTR          __UINTPTR_FMTu__
 #define SCNxPTR          __UINTPTR_FMTx__

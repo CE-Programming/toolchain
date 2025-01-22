@@ -6,13 +6,13 @@
 
 #define  FLT_RADIX        __FLT_RADIX__
 
-#if __STDC_VERSION__ >= 199901L
+#if (__STDC_VERSION__ >= 199901L) || (defined(__cplusplus) && __cplusplus >= 201103L)
 #define  FLT_EVAL_METHOD  __FLT_EVAL_METHOD__
 
 #define      DECIMAL_DIG      __DECIMAL_DIG__
 #endif
 
-#if __STDC_VERSION__ >= 201112L
+#if (__STDC_VERSION__ >= 201112L) || (defined(__cplusplus) && __cplusplus >= 201703L)
 #define  FLT_DECIMAL_DIG  __FLT_DECIMAL_DIG__
 #define  DBL_DECIMAL_DIG  __DBL_DECIMAL_DIG__
 #define LDBL_DECIMAL_DIG __LDBL_DECIMAL_DIG__
@@ -64,4 +64,4 @@
 
 #define  FLT_ROUNDS      ((__fe_cur_env ^ 1) & 3)
 
-#endif
+#endif /* _FLOAT_H */

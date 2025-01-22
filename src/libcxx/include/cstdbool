@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CSTDBOOL
+#define _EZCXX_CSTDBOOL
+
+#include <stdbool.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_CSTDBOOL

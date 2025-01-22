@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CISO646
+#define _EZCXX_CISO646
+
+#include <iso646.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_CISO646

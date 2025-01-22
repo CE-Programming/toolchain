@@ -1,0 +1,15 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CSETJMP
+#define _EZCXX_CSETJMP
+
+#include <setjmp.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::jmp_buf;
+using ::setjmp;
+using ::longjmp;
+} // namespace std
+
+#endif // _EZCXX_CSETJMP

@@ -9,6 +9,7 @@
 namespace std {
 using ::isalnum;
 using ::isalpha;
+using ::isblank;
 using ::iscntrl;
 using ::isdigit;
 using ::isgraph;

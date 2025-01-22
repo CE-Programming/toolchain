@@ -1,5 +1,9 @@
 // -*- C++ -*-
+#ifndef _EZCXX_CASSERT
+#define _EZCXX_CASSERT
 
 #include <assert.h>
 
 #pragma clang system_header
+
+#endif // _EZCXX_CASSERT
