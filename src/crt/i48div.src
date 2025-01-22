@@ -1,0 +1,8 @@
+	assume	adl=1
+
+	section	.text
+
+;	public	_i48div
+
+; i48div_t i48div(int48_t numer, int48_t denom);
+; _i48div:
