@@ -9,21 +9,17 @@ typedef union F64_pun {
 
 #define Float64_inf_lsh_1 UINT64_C(0xFFE0000000000000)
 
-#define F64_CMP_EQUAL      0
-#define F64_CMP_LESS      -1
-#define F64_CMP_GREATER    1  
-#define F64_CMP_UNORDERED  1
+#define F64_CMP_EQUAL      0 /* sets the Z flag */
+#define F64_CMP_LESS      -1 /* sets the S flag */
+#define F64_CMP_GREATER    1 /* doesn't trigger flags */
+#define F64_CMP_UNORDERED  1 /* doesn't trigger flags */
 
 // assumes no NaN
-int _dcmp_c(const long double* x, const long double *y) {
-    F64_pun arg_x, arg_y;
+int _dcmp_c(const long double * x, const long double * y) {
+	F64_pun arg_x, arg_y;
     arg_x.flt = *x;
     arg_y.flt = *y;
 
-    // if (isunordered(x, y)) {
-    // 	return F64_CMP_UNORDERED;
-    // }
-    
     bool x_sign = signbit(*x);
     bool y_sign = signbit(*y);
     if (x_sign != y_sign) {
@@ -32,7 +28,7 @@ int _dcmp_c(const long double* x, const long double *y) {
         }
         return (x_sign ? F64_CMP_LESS : F64_CMP_GREATER);
     }
-    
+	
     if (arg_x.bin == arg_y.bin) {
         return F64_CMP_EQUAL;
     }
