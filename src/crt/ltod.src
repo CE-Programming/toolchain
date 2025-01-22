@@ -2,14 +2,43 @@
 
 	section	.text
 
-	public	__ltod
+	public	__ultod, __ltod
+;	public	__utod, __itod
+
+; __utod:
+;	; u24_ret_f64
+;	ld	e, 0
+__ultod:
+	; u32_ret_f64
+	ld	d, a
+.ultod_skip:
+	push	iy, de, hl
+	call	__ultod_c
+	pop	af, af, iy
+	ret
+
+; __itod:
+;	; i24_ret_f64
+;	ld	d, a
+;	push	hl
+;	add	hl, hl
+;	sbc	a, a
+;	ld	e, a
+;	pop	hl
+;	jr	.ltod_skip
 
 __ltod:
 	; i32_ret_f64
 	ld	d, a
+	bit	7, e
+.ltod_skip:
+	jr	z, .ultod_skip	; positive argument
+	; return -_ultod_c(labs(x))
+	call	__lneg
 	push	iy, de, hl
-	call	__ltod_c
+	call	__ultod_c
+	set	7, b	; negative result
 	pop	af, af, iy
 	ret
-
-	extern __ltod_c
+	
+	extern __ultod_c, __lneg

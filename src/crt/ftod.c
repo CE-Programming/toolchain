@@ -27,6 +27,8 @@ typedef union F64_pun {
 #define Float64_pos_nan  UINT64_C(0x7FF8000000000000)
 #define Float64_neg_nan  UINT64_C(0xFFF8000000000000)
 
+#define Float32_pos_inf UINT32_C(0x7F800000)
+
 #define Float64_mant_bits  52
 #define Float32_mant_bits  23
 #define Float64_expon_bits 11
@@ -34,8 +36,10 @@ typedef union F64_pun {
 #define Float64_bias       1023
 #define Float32_bias       127
 
+/**
+ * @note x must be positive
+ */
 long double _ftod_c(float x) {
-	bool x_sign = signbit(x);
 	F32_pun val;
 	F64_pun ret;
 	val.flt = x;
@@ -44,8 +48,7 @@ long double _ftod_c(float x) {
 	if (isnormal(val.flt)) {
 		uint24_t mantissa = val.split.mant;
 		uint24_t expon =
-			(val.split.expon + ((Float64_bias - Float32_bias) >> 1)) +
-			(x_sign ? (((1 << Float64_expon_bits) - (1 << Float32_expon_bits)) >> 1) : (0));
+			(val.split.expon + ((Float64_bias - Float32_bias) >> 1));
 		ret.u24.hi = expon;
 		ret.u24.lo = mantissa;
 		// mantissa[0, 22] exponent[23, 33] signbit[34]
@@ -66,10 +69,7 @@ long double _ftod_c(float x) {
 		 */
 		mantissa += (clz_result & 0x1) ? 0x800000 : 0x000000;
 
-		uint24_t expon =
-			(((Float64_bias - Float32_bias) >> 1) -
-			(clz_result >> 1)) +
-			(x_sign ? ((1 << Float64_expon_bits) >> 1) : 0);
+		uint24_t expon = ((Float64_bias - Float32_bias) >> 1) - (clz_result >> 1);
 
 		ret.u24.hi = expon;
 		ret.u24.lo = mantissa;
@@ -77,15 +77,15 @@ long double _ftod_c(float x) {
 		ret.bin <<= Float64_mant_bits - Float32_mant_bits;
 		return ret.flt;
 	}
-	if (iszero(val.flt)) {
-		ret.bin = x_sign ? Float64_neg_zero : Float64_pos_zero;
-		return ret.flt;
+	/* iszero(val.flt) */
+	if (val.bin == 0) {
+		return 0.0L;
 	}
-	if (isinf(val.flt)) {
-		ret.bin = x_sign ? Float64_neg_inf : Float64_pos_inf;
-		return ret.flt;
+	/* isinf(val.flt) */
+	if (val.bin == Float32_pos_inf) {
+		return HUGE_VALL;
 	}
 	/* isnan(val.flt) */
-	ret.bin = x_sign ? Float64_neg_nan : Float64_pos_nan;
+	ret.bin = Float64_pos_nan;
 	return ret.flt;
 }

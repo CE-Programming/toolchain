@@ -1,0 +1,137 @@
+// -*- C++ -*-
+#ifndef _EZCXX_NUMBERS
+#define _EZCXX_NUMBERS
+
+#include <type_traits>
+
+#if __cplusplus >= 201907L
+	#include <concepts>
+#endif
+
+#pragma clang system_header
+
+namespace std {
+
+namespace numbers {
+
+#if __cplusplus >= 201907L
+
+// implemented with C++20 <concepts>
+
+template <class _Tp>
+inline constexpr bool __false = false;
+
+template <class _Tp>
+struct __illformed {
+	static_assert(
+		__false<_Tp>,
+		"A program that instantiates a primary template of a mathematical constant variable template is ill-formed."
+	);
+};
+
+template <class _Tp>
+inline constexpr _Tp e_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp log2e_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp log10e_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp pi_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp inv_pi_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp inv_sqrtpi_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp ln2_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp ln10_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp sqrt2_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp sqrt3_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp inv_sqrt3_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp egamma_v = __illformed<_Tp>{};
+template <class _Tp>
+inline constexpr _Tp phi_v = __illformed<_Tp>{};
+
+template <floating_point _Tp>
+inline constexpr _Tp e_v<_Tp> = 2.718281828459045235360287471352662L;
+template <floating_point _Tp>
+inline constexpr _Tp log2e_v<_Tp> = 1.442695040888963407359924681001892L;
+template <floating_point _Tp>
+inline constexpr _Tp log10e_v<_Tp> = 0.434294481903251827651128918916605L;
+template <floating_point _Tp>
+inline constexpr _Tp pi_v<_Tp> = 3.141592653589793238462643383279502L;
+template <floating_point _Tp>
+inline constexpr _Tp inv_pi_v<_Tp> = 0.318309886183790671537767526745028L;
+template <floating_point _Tp>
+inline constexpr _Tp inv_sqrtpi_v<_Tp> = 0.564189583547756286948079451560772L;
+template <floating_point _Tp>
+inline constexpr _Tp ln2_v<_Tp> = 0.693147180559945309417232121458176L;
+template <floating_point _Tp>
+inline constexpr _Tp ln10_v<_Tp> = 2.302585092994045684017991454684364L;
+template <floating_point _Tp>
+inline constexpr _Tp sqrt2_v<_Tp> = 1.414213562373095048801688724209698L;
+template <floating_point _Tp>
+inline constexpr _Tp sqrt3_v<_Tp> = 1.732050807568877293527446341505872L;
+template <floating_point _Tp>
+inline constexpr _Tp inv_sqrt3_v<_Tp> = 0.577350269189625764509148780501957L;
+template <floating_point _Tp>
+inline constexpr _Tp egamma_v<_Tp> = 0.577215664901532860606512090082402L;
+template <floating_point _Tp>
+inline constexpr _Tp phi_v<_Tp> = 1.618033988749894848204586834365638L;
+
+#else
+
+// backwards compatible with C++14
+
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp e_v = static_cast<_Tp>(2.718281828459045235360287471352662L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp log2e_v = static_cast<_Tp>(1.442695040888963407359924681001892L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp log10e_v = static_cast<_Tp>(0.434294481903251827651128918916605L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp pi_v = static_cast<_Tp>(3.141592653589793238462643383279502L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp inv_pi_v = static_cast<_Tp>(0.318309886183790671537767526745028L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp inv_sqrtpi_v = static_cast<_Tp>(0.564189583547756286948079451560772L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp ln2_v = static_cast<_Tp>(0.693147180559945309417232121458176L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp ln10_v = static_cast<_Tp>(2.302585092994045684017991454684364L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp sqrt2_v = static_cast<_Tp>(1.414213562373095048801688724209698L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp sqrt3_v = static_cast<_Tp>(1.732050807568877293527446341505872L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp inv_sqrt3_v = static_cast<_Tp>(0.577350269189625764509148780501957L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp egamma_v = static_cast<_Tp>(0.577215664901532860606512090082402L);
+template <typename _Tp, std::enable_if_t<std::is_floating_point_v<_Tp>, int> = 0>
+inline constexpr _Tp phi_v = static_cast<_Tp>(1.618033988749894848204586834365638L);
+
+#endif
+
+inline constexpr double e          = e_v<double>;
+inline constexpr double log2e      = log2e_v<double>;
+inline constexpr double log10e     = log10e_v<double>;
+inline constexpr double pi         = pi_v<double>;
+inline constexpr double inv_pi     = inv_pi_v<double>;
+inline constexpr double inv_sqrtpi = inv_sqrtpi_v<double>;
+inline constexpr double ln2        = ln2_v<double>;
+inline constexpr double ln10       = ln10_v<double>;
+inline constexpr double sqrt2      = sqrt2_v<double>;
+inline constexpr double sqrt3      = sqrt3_v<double>;
+inline constexpr double inv_sqrt3  = inv_sqrt3_v<double>;
+inline constexpr double egamma     = egamma_v<double>;
+inline constexpr double phi        = phi_v<double>;
+
+} // namespace numbers
+
+} // namespace std
+
+#endif // _EZCXX_NUMBERS
