@@ -1,0 +1,22 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CINTTYPES
+#define _EZCXX_CINTTYPES
+
+#include <inttypes.h>
+#include <cstdint>
+
+#pragma clang system_header
+
+namespace std {
+
+using ::imaxdiv_t;
+
+using ::imaxabs;
+inline constexpr intmax_t abs(intmax_t __x) { return imaxabs(__x); }
+
+using ::imaxdiv;
+inline constexpr imaxdiv_t div(intmax_t __x, intmax_t __y) { return imaxdiv(__x, __y); }
+
+} // namespace std
+
+#endif // _EZCXX_CINTTYPES

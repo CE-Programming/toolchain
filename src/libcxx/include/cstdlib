@@ -15,10 +15,13 @@ using ::free;
 using ::atof;
 using ::atoi;
 using ::atol;
+using ::atoll;
 using ::strtof;
 using ::strtod;
 using ::strtol;
+using ::strtoll;
 using ::strtoul;
+using ::strtoull;
 
 using ::srand;
 using ::rand;
@@ -36,8 +39,16 @@ using ::_Exit;
 
 using ::abs;
 using ::labs;
+using ::llabs;
+inline constexpr long abs(long __x) { return labs(__x); }
+inline constexpr long long abs(long long __x) { return llabs(__x); }
+
 using ::div;
 using ::ldiv;
+using ::lldiv;
+inline constexpr ldiv_t div(long __x, long __y) { return ldiv(__x, __y); }
+inline constexpr lldiv_t div(long long __x, long long __y) { return lldiv(__x, __y); }
+
 } // namespace std
 
 #endif // _EZCXX_CSTDLIB

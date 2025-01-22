@@ -1,0 +1,25 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CTIME
+#define _EZCXX_CTIME
+
+#include <time.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::clock_t;
+using ::time_t;
+using ::tm;
+
+using ::clock;
+using ::difftime;
+using ::mktime;
+using ::time;
+using ::localtime;
+using ::gmtime;
+using ::asctime;
+using ::ctime;
+using ::strftime;
+} // namespace std
+
+#endif // _EZCXX_CTIME

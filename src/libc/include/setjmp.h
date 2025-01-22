@@ -12,4 +12,4 @@ void longjmp(jmp_buf env, int val) __attribute__((noreturn));
 
 __END_DECLS
 
-#endif
+#endif /* _SETJMP_H */

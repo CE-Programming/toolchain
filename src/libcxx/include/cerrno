@@ -1,0 +1,13 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CERRNO
+#define _EZCXX_CERRNO
+
+#include <errno.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::errno;
+} // namespace std
+
+#endif // _EZCXX_CERRNO

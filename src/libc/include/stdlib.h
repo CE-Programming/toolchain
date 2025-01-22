@@ -4,18 +4,18 @@
 #include <cdefs.h>
 
 typedef struct {
-  int quot;
-  int rem;
+    int quot;
+    int rem;
 } div_t;
 
 typedef struct {
-  long quot;
-  long rem;
+    long quot;
+    long rem;
 } ldiv_t;
 
 typedef struct {
-  long long rem;
-  long long quot;
+    long long rem;
+    long long quot;
 } lldiv_t;
 
 #define EXIT_SUCCESS 0

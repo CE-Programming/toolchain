@@ -83,6 +83,6 @@ int feupdateenv(const fenv_t *);
 }
 #endif
 
-#endif
+#endif /* _FENV_P_ONLY */
 
-#endif
+#endif /* _FENV_P */

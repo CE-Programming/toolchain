@@ -301,4 +301,4 @@ long double truncl(long double);
 }
 #endif
 
-#endif
+#endif /* _MATH_H */
