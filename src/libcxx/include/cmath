@@ -351,9 +351,9 @@ nextafter(_Tp __x, _Up __y) { return nextafter(__x, __y); }
 using ::nextup;
 using ::nextupf;
 using ::nextupl;
-inline constexpr float nextup(float __x) { return nextupf(__x); }
-inline constexpr long double nextup(long double __x) { return nextupl(__x); }
-template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>                                                           
+inline float nextup(float __x) { return nextupf(__x); }
+inline long double nextup(long double __x) { return nextupl(__x); }
+template<typename _Tp> inline enable_if_t<is_integral_v<_Tp>, double>                                                           
 nextup(_Tp __x) { return nextup(__x); }
 
 using ::nexttoward;
@@ -368,9 +368,9 @@ nexttoward(_Tp __x, _Up __y) { return nexttoward(__x, __y); }
 using ::nextdown;
 using ::nextdownf;
 using ::nextdownl;
-inline constexpr float nextdown(float __x) { return nextdownf(__x); }
-inline constexpr long double nextdown(long double __x) { return nextdownl(__x); }
-template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>                                                           
+inline float nextdown(float __x) { return nextdownf(__x); }
+inline long double nextdown(long double __x) { return nextdownl(__x); }
+template<typename _Tp> inline enable_if_t<is_integral_v<_Tp>, double>                                                           
 nextdown(_Tp __x) { return nextdown(__x); }
 
 using ::pow;
@@ -419,9 +419,9 @@ round(_Tp __x) { return round(__x); }
 using ::roundeven;
 using ::roundevenf;
 using ::roundevenl;
-inline constexpr float roundeven(float __x) { return roundevenf(__x); }
-inline constexpr long double roundeven(long double __x) { return roundevenl(__x); }
-template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
+inline float roundeven(float __x) { return roundevenf(__x); }
+inline long double roundeven(long double __x) { return roundevenl(__x); }
+template<typename _Tp> inline enable_if_t<is_integral_v<_Tp>, double>
 roundeven(_Tp __x) { return roundeven(__x); }
 
 using ::scalbln;
