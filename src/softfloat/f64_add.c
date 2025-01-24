@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+#if 0
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "platform.h"
@@ -72,3 +74,4 @@ float64_t f64_add( float64_t a, float64_t b )
 
 }
 
+#endif

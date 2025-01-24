@@ -135,8 +135,13 @@ struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t );
 float64_t softfloat_roundPackToF64( bool, int_fast16_t, uint_fast64_t );
 float64_t softfloat_normRoundPackToF64( bool, int_fast16_t, uint_fast64_t );
 
+#if 0
 float64_t softfloat_addMagsF64( uint_fast64_t, uint_fast64_t, bool );
 float64_t softfloat_subMagsF64( uint_fast64_t, uint_fast64_t, bool );
+#else
+float64_t softfloat_addMagsF64( uint_fast64_t, const uint_fast64_t*, bool );
+float64_t softfloat_subMagsF64( uint_fast64_t, const uint_fast64_t*, bool );
+#endif
 float64_t
  softfloat_mulAddF64(
      uint_fast64_t, uint_fast64_t, uint_fast64_t, uint_fast8_t );

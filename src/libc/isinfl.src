@@ -3,37 +3,28 @@
 	section	.text
 
 	public	__isinfl
-	
+
 ; int _isinfl(long double)
 __isinfl:
-	; load upper 24bits
-	ld	hl, 8	
-	add	hl, sp
-	ld	hl, (hl)
-	; clear signbit
-	add	hl, hl
+	pop	bc, hl, de
 	or	a, a
-	ld	bc, $FFE000
-	sbc	hl, bc
-	jr	z, .mantissa_check
-	; finite and common NaN
-.mant_non_zero:
-	or	a, a
-	sbc	hl, hl
+	adc	hl, de
+	pop	de
+	push	bc, bc, bc, bc
+	jr	nz, .mant_nonzero
+	jr	c, .mant_carry
+	ld	a, e
+	xor	a, $F0
+	ret	nz	; mantissa is non-zero
+	; A is zero here
+	set	7, d
+	inc	d
+	ret	nz
+	inc	hl
 	ret
 	
-.mantissa_check:
-	pop	bc, hl, de
-	push	de, hl, bc
-	; __i40cmpzero
-	add	hl, de
+.mant_nonzero:
+.mant_carry:
 	or	a, a
-	sbc	hl, de
-	jr	nz, .mant_non_zero
-	; hl was zero, so the carry flag cannot have been set
-	ex	de, hl
-	sbc	hl, de
-	jr	nz, .mant_non_zero
-	; both hl and de are zero
-	inc	hl
+	sbc	hl, hl
 	ret
