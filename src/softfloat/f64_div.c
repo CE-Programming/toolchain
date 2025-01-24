@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float64_t f64_div( float64_t a, float64_t b )
+float64_t f64_div( float64_t a, const float64_t *b )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;
@@ -70,7 +70,7 @@ float64_t f64_div( float64_t a, float64_t b )
     signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
-    uB.f = b;
+    uB.f = *b;
     uiB = uB.ui;
     signB = signF64UI( uiB );
     expB  = expF64UI( uiB );

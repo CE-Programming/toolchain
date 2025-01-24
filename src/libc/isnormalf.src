@@ -8,11 +8,11 @@
 __isnormalf:
 	ld	hl, 5
 	add	hl, sp
-	ld	hl, (hl)
+	ld	hl, (hl)	; load the upper 16 bits
 	add	hl, hl	; clears signbit
 	ld	a, h
 	dec	a
-	cp	a, -2	; overflows on zero/denormal/inf/NaN exponents
-	sbc	hl, hl	; hl is -1 or 0
-	inc	hl	; hl is 0 or 1
+	cp	a, $FE	; tests for zero/denormal/inf/NaN exponents
+	sbc	hl, hl	; -1 if normal, 0 otherwise
 	ret
+

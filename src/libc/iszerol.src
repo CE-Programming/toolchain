@@ -6,29 +6,24 @@
 
 ; int iszerol(long double)
 __iszerol:
-	pop	iy, de, hl, bc
-	push	bc, hl, de, iy
-	; normal, inf, and NaN have non-zero exponents
-	ld	a, b
-	add	a, a	; clears the signbit
-	or	a, c
-	jr	z, .exp_zero_f64
-	sbc	hl, hl
-	ret
-.exp_zero_f64:
-	; __i48cmpzero
-	add	hl, de
+	pop	bc, hl, de
 	or	a, a
-	sbc	hl, de
-	jr	nz, .mant_non_zero_f64
-	ex	de, hl
-	; hl was zero, so the carry flag cannot have been set
-	sbc	hl, de
-	jr	nz, .mant_non_zero_f64
+	adc	hl, de
+	pop	de
+	push	bc, bc, bc, bc
+	; return if mantissa is non-zero
+	jr	nz, .mant_nonzero
+	jr	c, .mant_carry
+	ld	a, d
+	rla	; clear the signbit
+	or	a, e
 	inc	hl
-	ret
-	
-.mant_non_zero_f64:
+	ret	z
+	; upper 16 bits non-zero
+;	dec	hl
+;	ret
+.mant_nonzero:
+.mant_carry:
 	or	a, a
 	sbc	hl, hl
 	ret
