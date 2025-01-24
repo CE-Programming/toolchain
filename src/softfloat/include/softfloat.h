@@ -224,12 +224,14 @@ float128_t f64_to_f128( float64_t );
 void f64_to_extF80M( float64_t, extFloat80_t * );
 void f64_to_f128M( float64_t, float128_t * );
 float64_t f64_roundToInt( float64_t, uint_fast8_t, bool );
+#if 0
 float64_t f64_add( float64_t, float64_t );
 float64_t f64_sub( float64_t, float64_t );
-float64_t f64_mul( float64_t, float64_t );
+#endif
+float64_t f64_mul( float64_t, const float64_t* );
 float64_t f64_mulAdd( float64_t, float64_t, float64_t );
-float64_t f64_div( float64_t, float64_t );
-float64_t f64_rem( float64_t, float64_t );
+float64_t f64_div( float64_t, const float64_t* );
+float64_t f64_rem( float64_t, const float64_t* );
 float64_t f64_sqrt( float64_t );
 bool f64_eq( float64_t, float64_t );
 bool f64_le( float64_t, float64_t );

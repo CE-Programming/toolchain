@@ -25,14 +25,14 @@ __ultod:
 ;	sbc	a, a
 ;	ld	e, a
 ;	pop	hl
-;	jr	.ltod_skip
+;	jr	__ltod.ltod_skip
 
 __ltod:
 	; i32_ret_f64
 	ld	d, a
 	bit	7, e
 .ltod_skip:
-	jr	z, .ultod_skip	; positive argument
+	jr	z, __ultod.ultod_skip	; positive argument
 	; return -_ultod_c(labs(x))
 	call	__lneg
 	push	iy, de, hl

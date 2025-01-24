@@ -53,7 +53,7 @@ long double fmodl(long double x, long double y) {
     arg_y.flt = y;
 
     softfloat_exceptionFlags = 0;
-    ret.soft = f64_rem(arg_x.soft, arg_y.soft);
+    ret.soft = f64_rem(arg_x.soft, &arg_y.soft);
     if (softfloat_exceptionFlags & softfloat_flag_invalid) {
         feraiseexcept(FE_INVALID);
     }
@@ -74,6 +74,6 @@ long double modfl(long double x, long double *integral_part) {
     arg_x.flt = x;
     arg_y.flt = 1.0L;
     *integral_part = truncl(x);
-    ret.soft = f64_rem(arg_x.soft, arg_y.soft);
+    ret.soft = f64_rem(arg_x.soft, &arg_y.soft);
     return ret.flt;
 }
