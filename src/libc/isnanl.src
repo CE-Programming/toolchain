@@ -4,9 +4,6 @@
 
 	public	__isnanl
 
-; adapted from fpclassify.src
-
-if 1
 ; int _isnanl(long double)
 __isnanl:
 	pop	bc, hl, de
@@ -17,63 +14,20 @@ __isnanl:
 	ld	a, e
 	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
 	jr	c, .mant_nonzero	; normal, subnormal, or NaN
-	tst	a, $0F
-	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
-	sbc	hl, hl	; normal, or subnormal
+	; common NaN, inf, normal, or subnormal
+	add	a, 15	; overflows 0xF1
+	jr	c, .skip_exp_check
 	ret
 .mant_nonzero:
 	or	a, a
 	sbc	hl, hl
-	rra
-	and	a, $78
-	res	7, d
-	add	a, d
-	ret	z	; subnormal
-	inc	l
-	add	a, -($78 + $7F)
-	ret	z	; NaN
-	dec	l	; normal
+	add	a, 16	; overflows 0xF0
+	ret	nc
+.skip_exp_check:
+	; carry is set here
+	ld	a, d
+	rla	; A should be all ones if D was all ones
+	inc	a
+	ret	nz
+	inc	hl
 	ret
-
-else
-
-; int _isnanl(long double)
-__isnanl:
-    ; load upper 24bits
-    ld    hl, 8    
-    add    hl, sp
-    ld    hl, (hl)
-    ; clear signbit
-    add    hl, hl
-    ; test for inf/NaN
-    ld    de, $2000
-    add    hl, de
-    jr    c, .exp_all_ones
-    sbc    hl, hl
-    ret
-.exp_all_ones:
-    ld a, h
-    and a, $1E    ; most common NaN
-    jr    nz, .upper_mantissa_nan
-    ; infinity or uncommon NaN
-    pop    bc, hl, de
-    push    de, hl, bc
-    ; __i48cmpzero
-    add    hl, de
-    or    a, a
-    sbc    hl, de
-    jr    nz, .lower_mantissa_nan
-    ex    de, hl
-    ; hl was zero, so the carry flag cannot have been set
-    sbc    hl, de
-    jr    nz, .lower_mantissa_nan
-    ret    ; infinity
-
-.lower_mantissa_nan:
-    or    a, a
-.upper_mantissa_nan:
-    sbc    hl, hl
-    inc    hl
-    ret
-
-end if

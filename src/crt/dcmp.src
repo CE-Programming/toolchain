@@ -4,7 +4,7 @@
 
 	public	__dcmp
 
-; int _dcmp_c(const long double *x, const long double *y)
+; int _dcmp_c(const long double *__restrict x, const long double *__restrict y)
 __dcmp:
 	; f64*_f64*_ret_i24
 	push	bc, de, hl, af, iy

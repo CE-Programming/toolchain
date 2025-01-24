@@ -4,76 +4,27 @@
 
 	public	__issubnormall
 
-
-
-if 0
-
-; int _fpclassifyl(long double)
-__fpclassifyl:
+; int _issubnormall(long double)
+__issubnormall:
 	pop	bc, hl, de
 	or	a, a
 	adc	hl, de
 	pop	de
 	push	bc, bc, bc, bc
+	; zero is not subnormal
+	jr	nz, .mant_nonzero
+	jr	c, .mant_carry
 	ld	a, e
-	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
-	jr	c, .mant_nonzero	; normal, subnormal, or NaN
-	tst	a, $0F
-	jr	z, .mant_zero	; normal, zero, or inf
+	and	a, $0F
+	ret	z	; mantissa is zero
 .mant_nonzero:
-	; normal, subnormal, or NaN
-	ld	hl, 2
-.mant_zero:
+.mant_carry:
+	ld	a, e
+	and	a, $F0
+	sbc	hl, hl
 	rra
-	and	a, $78
 	res	7, d
 	add	a, d
-	ret	z	; subnormal or zero
-	inc	l
-	add	a, -($78 + $7F)
-	ret	z	; inf or  NaN
-	ld	l, 4	; normal
-	ret
-
-else
-
-; int _issubnormall(long double)
-__issubnormall:
-	pop	iy, de, hl, bc
-	push	bc, hl, de, iy
-	
-	ld	a, b	; upper 8bits of the exponent
-	add	a, a
-	jr	z, .upper_exp_all_zero
-	; most common path
-	or	a, a
-.exp_non_zero:
-	sbc	hl, hl
-	ret
-
-; normal, zero, or subnormal
-.upper_exp_all_zero:
-	ld	a, c	; lower 8bits of the exponent
-	tst	a, $F0
-	jr	nz, .exp_non_zero
-	and	a, $0F
-	jr	nz, .upper_mant_non_zero
-	
-	; __i48cmpzero
-	add	hl, de
-	or	a, a
-	sbc	hl, de
-	jr	nz, .mant_non_zero
-	ex	de, hl
-	; hl was zero, so the carry flag cannot have been set
-	sbc	hl, de
-	jr	nz, .mant_non_zero
-	ret
-.mant_non_zero:
-	or	a, a
-.upper_mant_non_zero:
-	sbc	hl, hl
+	ret	nz
 	inc	hl
 	ret
-
-end if
