@@ -41,8 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 
 float64_t
- softfloat_addMagsF64( uint_fast64_t uiA, uint_fast64_t uiB, bool signZ )
+ softfloat_addMagsF64( uint_fast64_t uiA, const uint_fast64_t *uiB_ptr, bool signZ )
 {
+    uint_fast64_t uiB;
     int_fast16_t expA;
     uint_fast64_t sigA;
     int_fast16_t expB;
@@ -55,6 +56,7 @@ float64_t
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
+    uiB = *uiB_ptr;
     expA = expF64UI( uiA );
     sigA = fracF64UI( uiA );
     expB = expF64UI( uiB );
