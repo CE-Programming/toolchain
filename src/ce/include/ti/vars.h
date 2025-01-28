@@ -79,8 +79,14 @@ extern "C" {
 #define OS_TYPE_STR          (0x04)
 /** Unprotected program */
 #define OS_TYPE_PRGM         (0x05)
-/** Protected (uneditable) program */
+/** Protected (uneditable) program, generally ASM program */
 #define OS_TYPE_PROT_PRGM    (0x06)
+/** Picture */
+#define OS_TYPE_PIC          (0x07)
+/** Graph DataBase */
+#define OS_TYPE_GDB          (0x08)
+/** Smart Equation */
+#define OS_TYPE_SMARTEQU     (0x0B)
 /** Complex variable */
 #define OS_TYPE_CPLX         (0x0C)
 /** Complex variable list */
@@ -89,6 +95,27 @@ extern "C" {
 #define OS_TYPE_APPVAR       (0x15)
 /** Temporary program, deleted on homescreen */
 #define OS_TYPE_TMP_PRGM     (0x16)
+/** Var group */
+#define OS_TYPE_GROUP        (0x17)
+/** Real Fraction */
+#define OS_TYPE_REALFRAC     (0x18)
+/** Image */
+#define OS_TYPE_IMAGE        (0x1A)
+
+/** (83PCE-only) Exact Complex Fraction */
+#define OS_TYPE_EXACTCPLXFRAC   (0x1B)
+/** (83PCE-only) Exact Real Radical */
+#define OS_TYPE_EXACTREALRAD    (0x1C)
+/** (83PCE-only) Exact Complex Radical */
+#define OS_TYPE_EXACTCPLXRAD    (0x1D)
+/** (83PCE-only) Exact Complex Pi */
+#define OS_TYPE_EXACTCPLXPI     (0x1E)
+/** (83PCE-only) Exact Complex Pi Fraction */
+#define OS_TYPE_EXACTCPLXPIFRAC (0x1F)
+/** (83PCE-only) Exact Real Pi */
+#define OS_TYPE_EXACTREALPI     (0x20)
+/** (83PCE-only) Exact Real Pi Fraction */
+#define OS_TYPE_EXACTREALPIFRAC (0x21)
 
 /** Name of Ans variable */
 #define OS_VAR_ANS      "\x72\0"
@@ -236,6 +263,7 @@ size_t os_MemChk(void **free);
 tiflags void os_ArcChk(void);
 
 /**
+ * Useful for starting the iteration in the first parameter of \c os_NextSymEntry
  * @return A pointer to symtable of the OS
  */
 void *os_GetSymTablePtr(void);
@@ -243,22 +271,22 @@ void *os_GetSymTablePtr(void);
 /**
  * Iterates over the OS symbol table.
  * This table stores the name and pointers to the variables (such as AppVars and programs)
- * on the calculator. This function can be used to find all the variables on the calculator,
- * to search for a specific variable the function os_ChkFindSym should be used instead.
+ * on the calculator. This function can be used to find all the variables (including system ones).
+ * To search for a specific variable, the function \c os_ChkFindSym should be used instead.
  *
  * @param[in] entry Current iterative entry, pass the output of os_GetSymTablePtr to start the search.
- * @param[in] type Type of variable returned.
- * @param[in] nameLength Length of variable name. The name may not be null-terminated.
- * @param[in] name Variable name.
- * @param[in] data Returns a pointer to the variable's data, which may be in either RAM or flash.
- * @return next entry to pass to the \p entry argument on subsequent calls.
+ * @param[out] type Type of variable returned.
+ * @param[out] nameLength Length of variable name. The name may not be null-terminated.
+ * @param[out] name Variable name.
+ * @param[out] data Returns a pointer to the variable's data, which may be in either RAM or flash.
+ * @return next entry (to pass to the \p entry argument on subsequent calls), or \c NULL at the end.
  */
 void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *name, void **data);
 
 /**
  * Delete a var from RAM.
  *
- * @param[in] entry An entry as returned from os_NextSymEntry().
+ * @param[in] entry An entry as used in (or returned from) \c os_NextSymEntry or \c os_ChkFindSym.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_DelSymEntry(void *entry);
@@ -276,9 +304,9 @@ int os_CreateString(const char *name, const string_t *data);
  * Gets a pointer to an TIOS Str's data, which may be in archive.
  *
  * @param[in] name Name of the Str to lookup.
- * @param[in] archived Set to 1 if the Str is archived, otherwise 0, may be NULL if you don't need it.
+ * @param[out] archived Set to 1 if the Str is archived, otherwise 0, may be \c NULL if you don't need it.
  * @returns A pointer to the Str data
- * @note Returns NULL if the Str doesn't exist, otherwise a pointer to the size bytes.
+ * @note Returns \c NULL if the Str doesn't exist, otherwise a pointer to the size bytes.
  */
 string_t *os_GetStringData(const char *name, int *archived);
 
@@ -295,9 +323,9 @@ int os_CreateEquation(const char *name, const equ_t *data);
  * Gets a pointer to an TIOS Equ's data, which may be in archive.
  *
  * @param[in] name Name of the Equ to lookup.
- * @param[in] archived Set to 1 if the Equ is archived, otherwise 0, may be NULL if you don't need it.
+ * @param[out] archived Set to 1 if the Equ is archived, otherwise 0, may be \c NULL if you don't need it.
  * @returns A pointer to the Equ data.
- * @note Returns NULL if the Equ doesn't exist, otherwise a pointer to the size bytes.
+ * @note Returns \c NULL if the Equ doesn't exist, otherwise a pointer to the size bytes.
  */
 equ_t *os_GetEquationData(const char *name, int *archived);
 
@@ -307,7 +335,7 @@ equ_t *os_GetEquationData(const char *name, int *archived);
  * @param[in] name Name of the AppVar to create.
  * @param[in] size Size of AppVar to create.
  * @returns A pointer to the AppVar data.
- * @note Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes.
+ * @note Returns \c NULL if creation failed for some reason, otherwise a pointer to the size bytes.
  * @note If successful, the AppVar contents will be uninitialized, aka filled with random bytes.
  */
 var_t *os_CreateAppVar(const char *name, uint16_t size);
@@ -316,14 +344,16 @@ var_t *os_CreateAppVar(const char *name, uint16_t size);
  * Gets a pointer to a TIOS AppVar's data, which may be in archive.
  *
  * @param[in] name Name of the AppVar to lookup.
- * @param[in] archived Set to 1 if the AppVar is archived, otherwise 0, may be NULL if you don't need it.
+ * @param[out] archived Set to 1 if the AppVar is archived, otherwise 0, may be \c NULL if you don't need it.
  * @returns A pointer to the AppVar data.
- * @note Returns NULL if the AppVar doesn't exist, otherwise a pointer to the size bytes.
+ * @note Returns \c NULL if the AppVar doesn't exist, otherwise a pointer to the size bytes.
  */
 var_t *os_GetAppVarData(const char *name, int *archived);
 
 /**
  * Deletes an AppVar from RAM.
+ * This may trigger an OS Error screen if there was an issue deleting it.
+ * Use \c os_DelSymEntry instead if you want an error code returned.
  *
  * @param[in] name Name of the AppVar to delete.
  */
@@ -334,8 +364,8 @@ void os_DelAppVar(const char *name);
  *
  * @param[in] type Type of symbol to find
  * @param[in] name Pointer to name of symbol to find
- * @param[out] entry Can be NULL if you don't care
- * @param[out] data Can be NULL if you don't care
+ * @param[out] entry Can be \c NULL if you don't care
+ * @param[out] data Can be \c NULL if you don't care
  * @return If file exists, returns 1 and sets entry and data, otherwise returns 0.
  */
 int os_ChkFindSym(uint8_t type, const char *name, void **entry, void **data);
@@ -354,8 +384,8 @@ int os_GetVarSize(const char *name, size_t *size);
  * Gets the dimensions of a matrix.
  *
  * @param[in] name Name of the matrix to lookup.
- * @param[in] rows Pointer to store number of rows.
- * @param[in] cols Pointer to store number of columns.
+ * @param[out] rows Pointer to store number of rows.
+ * @param[out] cols Pointer to store number of columns.
  * @return TIOS System Error Code or 0 on success.
  */
 int os_GetMatrixDims(const char *name, int *rows, int *cols);
@@ -447,9 +477,9 @@ int os_SetRealVar(const char *name, const real_t *value);
 /**
  * Gets the Ans variable
  *
- * @param[in] type This is set to the current variable type in ANS
+ * @param[out] type This is set to the current variable type in ANS
  * @returns Pointer to the data
- * @note Returns NULL if Ans doesn't exist or type is NULL
+ * @note Returns \c NULL if Ans doesn't exist or type is \c NULL
  */
 void *os_GetAnsData(uint8_t *type);
 
@@ -496,6 +526,8 @@ int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t 
 
 /**
  * Evalutes a tokenized expression.
+ * Note that this doesn't allow "side effects" (for instance, you can't \c DelVar),
+ * and is similar to what \c expr( does in TI-Basic.
  *
  * @param[in] data Tokenized expression to evaluate.
  * @param[in] len Length of tokenized data.
@@ -510,6 +542,7 @@ int os_Eval(const void *data, size_t len);
  * @param[in] name Name of variable to evaluate.
  * @returns TIOS System Error Code or 0 on success, with the result stored in
  * the Ans variable.
+ * @see os_Eval
  */
 int os_EvalVar(const char *name);
 
