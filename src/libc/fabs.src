@@ -10,21 +10,17 @@ _fabs := _fabsf
 
 else
 
-; CC: 2 + 8F + 4R + 1W
-; 8 bytes
 _fabs:
 _fabsf:
-	ld	hl, 6
-	add	hl, sp
-	res	7, (hl)
+	pop	bc, hl ,de
+	push	de, hl, bc
+	res	7, e
 	ret
 
 end if
 
-; CC: 2 + 8F + 4R + 1W
-; 8 bytes
 _fabsl:
-	ld	hl, 10
-	add	hl, sp
-	res	7, (hl)
+	pop	iy, hl ,de, bc
+	push	bc, hl, de, iy
+	res	7, b
 	ret
