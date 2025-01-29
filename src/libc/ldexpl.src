@@ -1,0 +1,19 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_ldexpl
+
+; long double ldexpl(long double, int)
+_ldexpl:
+	ld	hl, 10
+	add	hl, sp
+	bit	7, (hl)	; signbit(x)
+	jp	z, __ldexpl_c	; positive input
+	; negative input
+	res	7, (hl)	; x = fabsl(x)
+	call	__ldexpl_c
+	set 7, b	; copysignl(x, -1.0L)
+	ret
+
+	extern	__ldexpl_c
