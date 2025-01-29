@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_ilogbl
+
+; int ilogbl(long double)
+_ilogbl:
+	; x = fabsl(x)
+	ld	hl, 10
+	add	hl, sp
+	res	7, (hl)
+	jp	__ilogbl_c	; this can be jr depending on where __ilogbl_c is placed
+
+	extern	__ilogbl_c
