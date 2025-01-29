@@ -9,7 +9,7 @@ _frexpl:
 	ld	hl, 10
 	add	hl, sp
 	bit	7, (hl)	; signbit(x)
-	jp	z, __frexpl_c	; positive input
+	jq	z, __frexpl_c	; positive input
 	; negative input
 	res	7, (hl)	; x = fabsl(x)
 	call	__frexpl_c

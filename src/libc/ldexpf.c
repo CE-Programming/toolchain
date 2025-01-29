@@ -69,7 +69,3 @@ float _ldexpf_c(float value, int power)
 }
 
 double _ldexp_c(double, int) __attribute__((alias("_ldexpf_c")));
-
-// when FLT_RADIX == 2, scalbn is equivilent to ldexp
-float scalbnf(float, int) __attribute__((alias("_ldexpf_c")));
-double scalbn(double, int) __attribute__((alias("_ldexpf_c")));
