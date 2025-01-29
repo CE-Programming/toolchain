@@ -44,6 +44,9 @@ extern "C" {
 #define islessgreater(x, y)  __builtin_islessgreater(x, y)
 #define isunordered(x, y)    __builtin_isunordered(x, y)
 
+typedef float float_t;
+typedef double double_t;
+
 int _isinff(float n);
 int _isnanf(float n);
 int _isnormalf(float n);

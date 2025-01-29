@@ -26,11 +26,9 @@ _copysignf:
 _copysignl:
 	ld	hl, 19	; upper 8 bits of y
 	add	hl, sp
-	ld	a, (hl)
-	ld	de, -9	; upper 8 bits of x
-	add	hl, de
-	xor	a, (hl)
-	and	a, $80
-	xor	a, (hl)
-	ld	(hl), a
-	ret
+	rl	(hl)	; extract the signbit of y
+	pop	iy, hl, de, bc
+	push	bc, de, hl
+	rl	b	; clear the signbit of x, signbit of y is in the LSB
+	rrc	b	; rotate the LSB into the MSB to copy the signbit of y
+	jp	(iy)

@@ -2,14 +2,16 @@
 
 	section	.text
 
-	public	_ldexpl
+	public	_ldexpl, _scalbnl
 
 ; long double ldexpl(long double, int)
 _ldexpl:
+; when FLT_RADIX == 2, scalbn is equivilent to ldexp
+_scalbnl:
 	ld	hl, 10
 	add	hl, sp
 	bit	7, (hl)	; signbit(x)
-	jp	z, __ldexpl_c	; positive input
+	jq	z, __ldexpl_c	; positive input
 	; negative input
 	res	7, (hl)	; x = fabsl(x)
 	call	__ldexpl_c

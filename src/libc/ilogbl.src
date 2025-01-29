@@ -10,6 +10,6 @@ _ilogbl:
 	ld	hl, 10
 	add	hl, sp
 	res	7, (hl)
-	jp	__ilogbl_c	; this can be jr depending on where __ilogbl_c is placed
+	jq	__ilogbl_c
 
 	extern	__ilogbl_c
