@@ -6,8 +6,6 @@ typedef union F64_pun {
     uint64_t bin;
 } F64_pun;
 
-#define Float64_inf_lsh_1          UINT64_C(0xFFE0000000000000)
-#define Float64_norm_min_lsh_1     UINT64_C(0x0020000000000000)
 #define Float64_frexp_mask         UINT64_C(0x800FFFFFFFFFFFFF)
 #define Float64_pos_one            UINT64_C(0x3FF0000000000000)
 #define Float64_frexp_subnorm_mask Float64_pos_one

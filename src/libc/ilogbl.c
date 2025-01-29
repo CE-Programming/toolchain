@@ -18,8 +18,6 @@ typedef union F64_pun {
 #define Float64_ilogb_subnorm_max -1023
 #define Float64_exp_bias          1023
 #define Float64_mantissa_bits     52
-#define Float64_inf_lsh_1         UINT64_C(0xFFE0000000000000)
-#define Float64_norm_min_lsh_1    UINT64_C(0x0020000000000000)
 
 #define Float64_exponent_bits  11
 #define Float64_sign_bits      1
@@ -32,7 +30,7 @@ typedef union F64_pun {
 int _ilogbl_c(long double x) {
     F64_pun val;
     val.flt = x;
-    uint8_t fp_class = (uint8_t)fpclassify(val.flt);
+    int fp_class = fpclassify(val.flt);
     switch(fp_class) {
         case FP_ZERO: {
             errno = EDOM;

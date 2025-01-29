@@ -7,13 +7,8 @@ typedef union F64_pun {
     uint64_t bin;
 } F64_pun;
 
-#define Float64_pos_inf           UINT64_C(0x7FF0000000000000)
 #define Float64_norm_min_exp_mask UINT64_C(0x0010000000000000)
-#define Float64_inf_lsh_1         UINT64_C(0xFFE0000000000000)
-#define Float64_norm_min_lsh_1    UINT64_C(0x0020000000000000)
 #define Float64_frexp_mask        UINT64_C(0x800FFFFFFFFFFFFF)
-
-#define Float64_huge_val Float64_pos_inf
 
 #define Float64_mantissa_bits  52
 #define Float64_exp_bias       1023
@@ -111,6 +106,3 @@ long double _ldexpl_c(long double x, int expon) {
     val.bin += ((uint64_t)expon) << Float64_mantissa_bits;
     return val.flt;
 }
-
-// when FLT_RADIX == 2, scalbn is equivilent to ldexp
-long double scalbnl(long double, int) __attribute__((alias("ldexpl")));

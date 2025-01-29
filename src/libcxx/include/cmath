@@ -8,6 +8,9 @@
 #pragma clang system_header
 
 namespace std {
+using ::float_t;
+using ::double_t;
+
 using ::acos;
 using ::acosf;
 using ::acosl;
