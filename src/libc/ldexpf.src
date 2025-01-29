@@ -3,16 +3,23 @@
 	section	.text
 	public	_ldexpf
 	public	_ldexp
+	; when FLT_RADIX == 2, scalbn is equivilent to ldexp
+	public	_scalbnf
+	public	_scalbn
 
 if PREFER_OS_LIBC
 
 _ldexpf := 0220DCh
 _ldexp := _ldexpf
+_scalbnf := _ldexpf
+_scalbn := _ldexpf
 
 else
 
 _ldexpf := __ldexpf_c
+_scalbnf := __ldexpf_c
 _ldexp := __ldexp_c
+_scalbn := __ldexp_c
 
 	extern	__ldexpf_c
 	extern	__ldexp_c

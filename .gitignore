@@ -3,6 +3,7 @@
 .idea/
 .vs/
 .vscode/
+*.code-workspace
 
 # generated documentation
 doxygen/
