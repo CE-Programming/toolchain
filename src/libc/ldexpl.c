@@ -5,6 +5,11 @@
 typedef union F64_pun {
     long double flt;
     uint64_t bin;
+    struct {
+        uint24_t HL;
+        uint24_t DE;
+        uint16_t BC;
+    } reg;
 } F64_pun;
 
 #define Float64_norm_min_exp_mask UINT64_C(0x0010000000000000)
@@ -15,8 +20,12 @@ typedef union F64_pun {
 #define Float64_max_exp        1023
 #define Float64_norm_min_exp  -1022
 
+#define Float64_biased_inf_nan_exp 2047
+
 #define Float64_exponent_bits  11
 #define Float64_sign_bits      1
+
+#define uint48_bits 48
 
 /** Generates a normalized constant that is 2^expon */
 static long double generate_ldexpl_mult(int expon) {
@@ -33,14 +42,19 @@ static long double generate_ldexpl_mult(int expon) {
 long double _ldexpl_c(long double x, int expon) {
     F64_pun val;
     val.flt = x;
-    /* expon == 0 || iszero(x) || isinf(x) || isnan(x) */
-    if (expon == 0 || val.bin == 0 || !isfinite(x)) {
+    /* expon == 0 || iszero(x) */
+    if (expon == 0 || val.bin == 0) {
         // return unmodifed
-        return x;
+        return val.flt;
     }
-    /* isnormal(x) */
-    if (isnormal(x)) {
-        int x_exp = (int)(val.bin >> (Float64_mantissa_bits));
+    int x_exp = (int)(val.reg.BC >> (Float64_mantissa_bits - uint48_bits));
+    /* isnormal(x) || isinf(x) || isnan(x) */
+    if (x_exp != 0) {
+        /* isinf(x) || isnan(x) */
+        if (x_exp == Float64_biased_inf_nan_exp) {
+            // return unmodifed
+            return val.flt;
+        }
         x_exp -= Float64_exp_bias;
         x_exp += expon;
         // overflow
@@ -51,9 +65,9 @@ long double _ldexpl_c(long double x, int expon) {
         // normalized
         if (x_exp >= Float64_norm_min_exp) {
             // Clear the exponent bits
-            val.bin &= Float64_frexp_mask;
+            val.reg.BC &= 0x000F;
             x_exp += Float64_exp_bias;
-            val.bin |= ((uint64_t)x_exp) << Float64_mantissa_bits;
+            val.reg.BC |= (x_exp << (Float64_mantissa_bits - uint48_bits));
             return val.flt;
         }
         // make subnormal (with correct rounding)
@@ -83,8 +97,8 @@ long double _ldexpl_c(long double x, int expon) {
      */
     if (expon < Float64_mantissa_bits) {
         // precision may be lost when expon < 0
-        x *= generate_ldexpl_mult(expon);
-        return x;
+        val.flt *= generate_ldexpl_mult(expon);
+        return val.flt;
     }
     const int clz_offset = Float64_exponent_bits + Float64_sign_bits;
     int clz_result = __builtin_clzll(val.bin);
@@ -101,8 +115,8 @@ long double _ldexpl_c(long double x, int expon) {
         return HUGE_VALL;
     }
     // Shift everything such that the MSB of the mantissa is in the LSB of the exponent
-    val.bin <<= clz_result - clz_offset;
+    val.bin <<= clz_result - clz_offset + 1;
     // Add the exponent
-    val.bin += ((uint64_t)expon) << Float64_mantissa_bits;
+    val.reg.BC += expon << (Float64_mantissa_bits - uint48_bits);
     return val.flt;
 }

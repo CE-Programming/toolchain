@@ -21,6 +21,6 @@ end if
 
 _fabsl:
 	pop	iy, hl ,de, bc
-	push	bc, hl, de, iy
+	push	bc, hl, de
 	res	7, b
-	ret
+	jp	(iy)
