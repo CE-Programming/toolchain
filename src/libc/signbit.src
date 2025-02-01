@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__signbitf, __signbitl
+
+; bool _signbitf(float)
+__signbitf:
+	ld	hl, 6
+	add	hl, sp
+	ld	a, (hl)
+	rla
+	sbc	a, a
+	ret
+
+; bool _signbitl(long double)
+__signbitl:
+	ld	hl, 10
+	add	hl, sp
+	ld	a, (hl)
+	rla
+	sbc	a, a
+	ret
