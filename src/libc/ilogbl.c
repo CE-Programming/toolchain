@@ -37,11 +37,14 @@ int _ilogbl_c(long double x) {
             feraiseexcept(FE_INVALID);
             return FP_ILOGB0;
         }
-        case FP_INFINITE:
+        case FP_INFINITE: {
+            errno = EDOM;
+            feraiseexcept(FE_INVALID);
+            return INT_MAX;
+        }
         case FP_NAN: {
             errno = EDOM;
             feraiseexcept(FE_INVALID);
-            // Assumes FP_ILOGBNAN == INT_MAX
             return FP_ILOGBNAN;
         }
         case FP_NORMAL: {
