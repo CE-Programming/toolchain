@@ -1,6 +1,8 @@
 #ifndef _MATH_H
 #define _MATH_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +38,20 @@ extern "C" {
 #define FP_NAN       0x3
 #define FP_NORMAL    0x4
 
+#if 0
+/* disabled until builtin is optimized */
 #define signbit(x)           __builtin_signbit(x)
+
+#else
+bool _signbitf(float x);
+bool _signbitl(long double x);
+#define signbit(x) ( \
+    sizeof((x)) == sizeof(float) ? _signbitf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _signbitl((x)) : \
+    (x) < 0)
+
+#endif
+
 #define isgreater(x, y)      __builtin_isgreater(x, y)
 #define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
 #define isless(x, y)         __builtin_isless(x, y)
