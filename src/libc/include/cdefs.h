@@ -12,13 +12,17 @@
 #ifndef __cplusplus
 # define __BEGIN_DECLS
 # define __END_DECLS
-# define __NOEXCEPT     __attribute__((__nothrow__, __leaf__))
 # define __IGNORE(expr) ((void)(expr))
 #else /* __cplusplus */
 # define __BEGIN_DECLS  extern "C" {
 # define __END_DECLS    }
-# define __NOEXCEPT     noexcept
 # define __IGNORE(expr) (static_cast<void>(expr))
+#endif /* __cplusplus */
+
+#if defined(__cplusplus) && __cplusplus >= 201103L
+# define __NOEXCEPT noexcept
+#else /* __cplusplus */
+# define __NOEXCEPT __attribute__((__nothrow__, __leaf__))
 #endif /* __cplusplus */
 
 #ifndef NULL
