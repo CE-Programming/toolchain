@@ -12,10 +12,12 @@ namespace std {
 using ::imaxdiv_t;
 
 using ::imaxabs;
-inline constexpr intmax_t abs(intmax_t __x) { return imaxabs(__x); }
-
 using ::imaxdiv;
+
+#if __INTMAX_WIDTH__ > __LLONG_WIDTH__
+inline constexpr intmax_t abs(intmax_t __x) { return imaxabs(__x); }
 inline constexpr imaxdiv_t div(intmax_t __x, intmax_t __y) { return imaxdiv(__x, __y); }
+#endif // __INTMAX_WIDTH__ > __LLONG_WIDTH__
 
 } // namespace std
 
