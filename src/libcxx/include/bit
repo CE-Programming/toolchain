@@ -1,0 +1,33 @@
+// -*- C++ -*-
+#ifndef _EZCXX_BIT
+#define _EZCXX_BIT
+
+#include <cstring> // for memcpy
+#include <type_traits>
+
+#pragma clang system_header
+
+namespace std {
+
+enum class endian {
+    little = __ORDER_LITTLE_ENDIAN__,
+    big    = __ORDER_BIG_ENDIAN__,
+    native = __BYTE_ORDER__
+}; // endian
+
+template<class _To, class _From>
+std::enable_if_t<
+    sizeof(_To) == sizeof(_From) &&
+    std::is_trivially_copyable_v<_From> &&
+    std::is_trivially_copyable_v<_To>, _To>
+constexpr bit_cast(const _From& src) noexcept {
+    static_assert(std::is_trivially_constructible_v<_To>,
+        "destination type is required to be trivially constructible");
+    _To dst;
+    std::memcpy(&dst, &src, sizeof(_To));
+    return dst;
+}
+
+} // namespace std
+
+#endif // _EZCXX_BIT

@@ -481,6 +481,32 @@ C((is_nothrow_move_constructible<test_class>::value));
 C((is_nothrow_move_constructible_v<test_union>));
 C((!is_nothrow_move_constructible<int()>::value));
 
+// test is_signed
+C((std::is_signed_v<void> == false));
+C((std::is_signed_v<void*> == false));
+C((std::is_signed_v<int> == true));
+C((std::is_signed_v<int*> == false));
+C((std::is_signed_v<unsigned int> == false));
+C((std::is_signed_v<unsigned int*> == false));
+C((std::is_signed_v<float> == true));
+C((std::is_signed_v<double> == true));
+C((std::is_signed_v<  signed __int48> == true));
+C((std::is_signed_v<unsigned __int48> == false));
+C((std::is_signed_v<bool> == false));
+
+// test is_unsigned
+C((std::is_unsigned_v<void> == false));
+C((std::is_unsigned_v<void*> == false));
+C((std::is_unsigned_v<int> == false));
+C((std::is_unsigned_v<int*> == false));
+C((std::is_unsigned_v<unsigned int> == true));
+C((std::is_unsigned_v<unsigned int*> == false));
+C((std::is_unsigned_v<float> == false));
+C((std::is_unsigned_v<double> == false));
+C((std::is_unsigned_v<  signed __int48> == false));
+C((std::is_unsigned_v<unsigned __int48> == true));
+C((std::is_unsigned_v<bool> == true));
+
 #undef C
 
 } // namespace
