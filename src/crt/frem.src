@@ -13,9 +13,11 @@ __frem:
 	push	de	; x_hi8
 	push	bc	; x_lo24
 	call	_fmodf
-	pop	hl, hl, hl, hl
+	pop	bc, bc, bc, bc
 
-	pop	hl, de
+	ld	a, e
+	ex	(sp), hl
+	pop	bc, de
 	ret
 
 	extern	_fmodf
