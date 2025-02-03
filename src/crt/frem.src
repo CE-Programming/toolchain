@@ -6,7 +6,7 @@
 
 ; wraps _fmodf
 __frem:
-	push	de, hl
+	push	iy, de, hl
 
 	push	de, hl	; y
 	ld	e, a	
@@ -17,7 +17,7 @@ __frem:
 
 	ld	a, e
 	ex	(sp), hl
-	pop	bc, de
+	pop	bc, de, iy
 	ret
 
 	extern	_fmodf
