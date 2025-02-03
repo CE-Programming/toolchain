@@ -1,12 +1,14 @@
 /************************************************************************/
 /*                                                                      */
-/*			Copyright (C) 2000-2008 Zilog, Inc.		*/
+/*                      Copyright (C)1987-2008 by                       */
+/*                              Zilog, Inc.                             */
 /*                                                                      */
 /*                          San Jose, California                        */
 /*                                                                      */
 /************************************************************************/
-
+#include <errno.h>
 #include <math.h>
+#include <stdint.h>
 
 typedef union
 {
@@ -29,36 +31,41 @@ enum
     exponent_min   = 0
 };
 
-// frexp - Standard C library routine
-// frexp returns the exponent and mantissa of its floating point
-// argument.
+// ldexp - Standard C library routine
+// ldexp returns the argument multiplied by an integral (positive or
+// negative) power of two.
 //
 // Arguments:
-//   value     - the floating point argument
-//   pExponent - pointer to the returned exponent
+//   value - the floating point argument
+//   power - the power of two to be used
 //
 // Returns:
-//   - a floating point number between 0.5 and 1.0 (or zero if
-//     the input argument is zero)
+//   - the argument multiplied by an integral power of two
 //
-float _frexpf_c(float value, int *pExponent)
+float _ldexpf_c(float value, int power)
 {
     Ieee754 floating;
-    long    exponentBits = 0;
+    int     exponent;
+    int powerplusexponent;
+
+    if ( value == 0.0 || !isfinite(value) ) return value;
 
     floating.value = value;
-    if ( value != 0.0 )
+    exponent = (floating.bits >> exponent_shift) & exponent_mask;
+    powerplusexponent = power + exponent;
+
+    if ( powerplusexponent > exponent_max )
     {
-        exponentBits   = (floating.bits
-                          & ((unsigned long) exponent_mask << exponent_shift))
-                       - ((exponent_base - 1L) << exponent_shift);
-        floating.bits -= exponentBits;  // adjust exponent
+        errno = ERANGE;
+        return (floating.bits & (1L << sign_shift)) == 0 ? HUGE_VALF : - HUGE_VALF;
     }
-    if ( pExponent != 0 )
+    if ( powerplusexponent <= exponent_min )		// CR 3964
     {
-        *pExponent = exponentBits >> exponent_shift;
+        errno = ERANGE;
+        return 0.0;
     }
+    floating.bits += (long) power << exponent_shift;  // adjust exponent
     return floating.value;
 }
 
-double _frexp_c(double, int *) __attribute__((alias("_frexpf_c")));
+double _ldexp_c(double, int) __attribute__((alias("_ldexpf_c")));

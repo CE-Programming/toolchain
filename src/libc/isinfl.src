@@ -1,0 +1,30 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__isinfl
+
+; int _isinfl(long double)
+__isinfl:
+	pop	bc, hl, de
+	or	a, a
+	adc	hl, de
+	pop	de
+	push	bc, bc, bc, bc
+	jr	nz, .mant_nonzero
+	jr	c, .mant_carry
+	ld	a, e
+	xor	a, $F0
+	ret	nz	; mantissa is non-zero
+	; A is zero here
+	set	7, d
+	inc	d
+	ret	nz
+	inc	hl
+	ret
+	
+.mant_nonzero:
+.mant_carry:
+	or	a, a
+	sbc	hl, hl
+	ret

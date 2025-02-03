@@ -1,11 +1,9 @@
 	assume	adl=1
 
 	section	.text
-	public	__ftoll, __ftoull, __dtoll, __dtoull
+	public	__ftoll, __ftoull
 __ftoll:
 __ftoull:
-__dtoll:
-__dtoull:
 	ld	d, a
 	push	iy, de, hl
 	call	__ftoll_c

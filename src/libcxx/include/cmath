@@ -8,6 +8,9 @@
 #pragma clang system_header
 
 namespace std {
+using ::float_t;
+using ::double_t;
+
 using ::acos;
 using ::acosf;
 using ::acosl;
@@ -348,6 +351,14 @@ template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<
                                                                   is_integral_v<_Up>, double>
 nextafter(_Tp __x, _Up __y) { return nextafter(__x, __y); }
 
+using ::nextup;
+using ::nextupf;
+using ::nextupl;
+inline float nextup(float __x) { return nextupf(__x); }
+inline long double nextup(long double __x) { return nextupl(__x); }
+template<typename _Tp> inline enable_if_t<is_integral_v<_Tp>, double>                                                           
+nextup(_Tp __x) { return nextup(__x); }
+
 using ::nexttoward;
 using ::nexttowardf;
 using ::nexttowardl;
@@ -356,6 +367,14 @@ inline constexpr long double nexttoward(long double __x, long double __y) { retu
 template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<_Tp> &&
                                                                   is_integral_v<_Up>, double>
 nexttoward(_Tp __x, _Up __y) { return nexttoward(__x, __y); }
+
+using ::nextdown;
+using ::nextdownf;
+using ::nextdownl;
+inline float nextdown(float __x) { return nextdownf(__x); }
+inline long double nextdown(long double __x) { return nextdownl(__x); }
+template<typename _Tp> inline enable_if_t<is_integral_v<_Tp>, double>                                                           
+nextdown(_Tp __x) { return nextdown(__x); }
 
 using ::pow;
 using ::powf;
@@ -399,6 +418,14 @@ inline constexpr float round(float __x) { return roundf(__x); }
 inline constexpr long double round(long double __x) { return roundl(__x); }
 template<typename _Tp> inline constexpr enable_if_t<is_integral_v<_Tp>, double>
 round(_Tp __x) { return round(__x); }
+
+using ::roundeven;
+using ::roundevenf;
+using ::roundevenl;
+inline float roundeven(float __x) { return roundevenf(__x); }
+inline long double roundeven(long double __x) { return roundevenl(__x); }
+template<typename _Tp> inline enable_if_t<is_integral_v<_Tp>, double>
+roundeven(_Tp __x) { return roundeven(__x); }
 
 using ::scalbln;
 using ::scalblnf;

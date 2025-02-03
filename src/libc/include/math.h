@@ -1,6 +1,8 @@
 #ifndef _MATH_H
 #define _MATH_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -10,6 +12,7 @@ extern "C" {
 
 #define HUGE_VALF    __builtin_inff()
 #define HUGE_VAL     __builtin_inf()
+#define HUGE_VALL    __builtin_infl()
 
 #define M_E           2.71828182845904523536     /* e              */
 #define M_LOG2E       1.44269504088896340736     /* log2(e)        */
@@ -24,18 +27,31 @@ extern "C" {
 #define M_2_SQRTPI    1.12837916709551257390     /* 2/sqrt(pi)     */
 #define M_SQRT2       1.41421356237309504880     /* sqrt(2)        */
 #define M_SQRT1_2     0.707106781186547524401    /* 1/sqrt(2)      */
-#define M_LOG_2M_PI   1.83787706640934548        /* log2(M_PI)     */
+#define M_LOG_2M_PI   1.83787706640934548        /* log(2*M_PI)    */
 
 #define FP_ILOGB0     (~__INT_MAX__)
 #define FP_ILOGBNAN     __INT_MAX__
 
-#define FP_NORMAL    0x1
-#define FP_ZERO      0x2
-#define FP_SUBNORMAL (FP_NORMAL | FP_ZERO)     /* 0x3 */
-#define FP_INFINITE  0x4
-#define FP_NAN       (FP_NORMAL | FP_INFINITE) /* 0x5 */
+#define FP_ZERO      0x0
+#define FP_INFINITE  0x1
+#define FP_SUBNORMAL 0x2
+#define FP_NAN       0x3
+#define FP_NORMAL    0x4
 
+#if 0
+/* disabled until builtin is optimized */
 #define signbit(x)           __builtin_signbit(x)
+
+#else
+bool _signbitf(float x);
+bool _signbitl(long double x);
+#define signbit(x) ( \
+    sizeof((x)) == sizeof(float) ? _signbitf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _signbitl((x)) : \
+    (x) < 0)
+
+#endif
+
 #define isgreater(x, y)      __builtin_isgreater(x, y)
 #define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
 #define isless(x, y)         __builtin_isless(x, y)
@@ -43,27 +59,53 @@ extern "C" {
 #define islessgreater(x, y)  __builtin_islessgreater(x, y)
 #define isunordered(x, y)    __builtin_isunordered(x, y)
 
+typedef float float_t;
+typedef double double_t;
+
 int _isinff(float n);
 int _isnanf(float n);
 int _isnormalf(float n);
 int _isfinitef(float n);
+int _iszerof(float n);
+int _issubnormalf(float n);
 int _fpclassifyf(float n);
 
+int _isinfl(long double n);
+int _isnanl(long double n);
+int _isnormall(long double n);
+int _isfinitel(long double n);
+int _iszerol(long double n);
+int _issubnormall(long double n);
+int _fpclassifyl(long double n);
+
 #define isinf(x) ( \
-	sizeof((x)) == sizeof(float) ? _isinff((x)) : \
-	0)
+    sizeof((x)) == sizeof(float) ? _isinff((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isinfl((x)) : \
+    0)
 #define isnan(x) ( \
-	sizeof((x)) == sizeof(float) ? _isnanf((x)) : \
-	0)
+    sizeof((x)) == sizeof(float) ? _isnanf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isnanl((x)) : \
+    0)
 #define isnormal(x) ( \
-	sizeof((x)) == sizeof(float) ? _isnormalf((x)) : \
-	(x) != 0)
+    sizeof((x)) == sizeof(float) ? _isnormalf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isnormall((x)) : \
+    (x) != 0)
 #define isfinite(x) ( \
-	sizeof((x)) == sizeof(float) ? _isfinitef((x)) : \
-	1)
+    sizeof((x)) == sizeof(float) ? _isfinitef((x)) : \
+    sizeof((x)) == sizeof(long double) ? _isfinitel((x)) : \
+    1)
+#define iszero(x) ( \
+    sizeof((x)) == sizeof(float) ? _iszerof((x)) : \
+    sizeof((x)) == sizeof(long double) ? _iszerol((x)) : \
+    (x) == 0)
+#define issubnormal(x) ( \
+    sizeof((x)) == sizeof(float) ? _issubnormalf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _issubnormall((x)) : \
+    0)
 #define fpclassify(x) ( \
-	sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
-	0)
+    sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _fpclassifyl((x)) : \
+    0)
 
 double      acos(double);
 float       acosf(float);
@@ -233,9 +275,17 @@ double      nextafter(double, double);
 float       nextafterf(float, float);
 long double nextafterl(long double, long double);
 
+double      nextdown(double);
+float       nextdownf(float);
+long double nextdownl(long double);
+
 double      nexttoward(double, long double);
 float       nexttowardf(float, long double);
 long double nexttowardl(long double, long double);
+
+double      nextup(double);
+float       nextupf(float);
+long double nextupl(long double);
 
 double      pow(double, double);
 float       powf(float, float);

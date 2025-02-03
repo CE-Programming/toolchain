@@ -1,0 +1,38 @@
+	assume	adl=1
+
+	section	.text
+	
+	public	__fpclassifyl
+
+; FP_ZERO      := 0
+; FP_INFINITE  := 1
+; FP_SUBNORMAL := 2
+; FP_NAN       := 3
+; FP_NORMAL    := 4
+
+; int _fpclassifyl(long double)
+__fpclassifyl:
+	pop	bc, hl, de
+	or	a, a
+	adc	hl, de
+	pop	de
+	push	bc, bc, bc, bc
+	ld	a, e
+	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
+	jr	c, .mant_nonzero	; normal, subnormal, or NaN
+	tst	a, $0F
+	jr	z, .mant_zero	; normal, zero, or inf
+.mant_nonzero:
+	; normal, subnormal, or NaN
+	ld	hl, 2
+.mant_zero:
+	rra
+	and	a, $78
+	res	7, d
+	add	a, d
+	ret	z	; subnormal or zero
+	inc	l
+	add	a, -($78 + $7F)
+	ret	z	; inf or  NaN
+	ld	l, 4	; normal
+	ret

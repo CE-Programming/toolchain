@@ -1,0 +1,40 @@
+Berkeley SoftFloat-3e is an IEEE conformant software floating-point library. It is written in C89, and supports 16, 32, 64, 80, and 128bit floating-point formats.
+
+It has been choosen to implement 64bit `long double` on the Ti84CE, using the following functions:
+Arithmetic:
+* f64_add
+* f64_sub
+* f64_mul
+* f64_div
+* f64_rem
+* f64_mulAdd (Fused-multiply add)
+* f64_sqrt
+Conversion:
+* f32_to_f64
+* f64_to_f32
+* f64_to_i32_r_minMag
+* f64_to_i64_r_minMag
+* f64_to_ui32_r_minMag
+* f64_to_ui64_r_minMag
+* f64_to_i32
+* f64_to_i64
+* i32_to_f64
+* i64_to_f64
+* ui32_to_f64
+* ui64_to_f64
+* f64_roundToInt
+
+The SoftFloat library is configured to use the `8086-SSE` rules for NaN propagation, but this can customized, and possibly disabled to reduce binary size. A program using all of the above routines compiled to ~30kb with `-Oz -flto` (~34kb with `fmaf`). SoftFloat also supports an `INLINE_LEVEL` macro, setting it to `0-1` gave a binary size of 34449 bytes, and setting it to `2-5` gave a binary size of 34837 bytes. The size difference in `lto.src` comes from `_f64_add`, `_f64_sub`, `_dadd`, and `_dsub`.
+
+Every unused source file from `SoftFloat-3e/source` has been exlucded to speed up compile times.
+
+The following files are used for implementing `float fmaf(float, float, float)`, but are not needed for `long double`:
+* SoftFloat-3e/source/f32_mulAdd.c
+* SoftFloat-3e/source/s_mulAddF32.c
+* SoftFloat-3e/source/8086-SSE/s_propagateNaNF32UI.c
+
+The following files may or may not be needed at -O0, or when `SOFTFLOAT_BUILTIN_CLZ` is not defined in `platform.h`:
+* SoftFloat-3e/source/s_countLeadingZeros8.c
+* SoftFloat-3e/source/s_countLeadingZeros16.c
+* SoftFloat-3e/source/s_countLeadingZeros32.c
+* SoftFloat-3e/source/s_countLeadingZeros64.c
