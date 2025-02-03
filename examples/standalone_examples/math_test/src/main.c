@@ -95,10 +95,12 @@ static int24_t iabs(int24_t x)
 {
     return x < 0 ? (int24_t)-x : x;
 }
+#ifndef _EZ80
 static int48_t i48abs(int48_t x)
 {
     return x < 0 ? (int48_t)-x : x;
 }
+#endif
 
 
 #if INTERACTIVE && defined(_EZ80)
