@@ -42,12 +42,20 @@ using ::labs;
 using ::llabs;
 inline constexpr long abs(long __x) { return labs(__x); }
 inline constexpr long long abs(long long __x) { return llabs(__x); }
+#ifdef __SIZEOF_INT48__
+using ::i48abs;
+inline signed __int48 abs(signed __int48 __x) { return i48abs(__x); }
+#endif // __SIZEOF_INT48__
 
 using ::div;
 using ::ldiv;
 using ::lldiv;
 inline constexpr ldiv_t div(long __x, long __y) { return ldiv(__x, __y); }
 inline constexpr lldiv_t div(long long __x, long long __y) { return lldiv(__x, __y); }
+#ifdef __SIZEOF_INT48__
+using ::i48div;
+inline i48div_t div(signed __int48 __x, signed __int48 __y) { return i48div(__x, __y); }
+#endif // __SIZEOF_INT48__
 
 } // namespace std
 

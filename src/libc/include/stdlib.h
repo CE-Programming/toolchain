@@ -13,6 +13,13 @@ typedef struct {
     long rem;
 } ldiv_t;
 
+#ifdef __SIZEOF_INT48__
+typedef struct {
+    signed __int48 quot;
+    signed __int48 rem;
+} i48div_t;
+#endif /* __SIZEOF_INT48__ */
+
 typedef struct {
     long long rem;
     long long quot;
@@ -96,11 +103,19 @@ long labs(long n);
 
 long long llabs(long long n);
 
+#ifdef __SIZEOF_INT48__
+signed __int48 i48abs(signed __int48 n);
+#endif /* __SIZEOF_INT48__ */
+
 div_t div(int numer, int denom);
 
 ldiv_t ldiv(long numer, long denom);
 
 lldiv_t lldiv(long long numer, long long denom);
+
+#ifdef __SIZEOF_INT48__
+i48div_t i48div(signed __int48 numer, signed __int48 denom);
+#endif /* __SIZEOF_INT48__ */
 
 __END_DECLS
 
