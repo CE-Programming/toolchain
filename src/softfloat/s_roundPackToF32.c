@@ -75,14 +75,18 @@ float32_t
             sig = softfloat_shiftRightJam32( sig, -exp );
             exp = 0;
             roundBits = sig & 0x7F;
+            #if 0
             if ( isTiny && roundBits ) {
                 softfloat_raiseFlags( softfloat_flag_underflow );
             }
+            #endif
         } else if ( (0xFD < exp) || (0x80000000 <= sig + roundIncrement) ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
+            #if 0
             softfloat_raiseFlags(
                 softfloat_flag_overflow | softfloat_flag_inexact );
+            #endif
             uiZ = packToF32UI( sign, 0xFF, 0 ) - ! roundIncrement;
             goto uiZ;
         }
@@ -90,6 +94,7 @@ float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sig = (sig + roundIncrement)>>7;
+    #if 0
     if ( roundBits ) {
         softfloat_exceptionFlags |= softfloat_flag_inexact;
 #ifdef SOFTFLOAT_ROUND_ODD
@@ -99,6 +104,7 @@ float32_t
         }
 #endif
     }
+    #endif
     sig &= ~(uint_fast32_t) (! (roundBits ^ 0x40) & roundNearEven);
     if ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------

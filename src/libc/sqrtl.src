@@ -1,0 +1,8 @@
+	assume	adl=1
+	section	.text
+
+	public	_sqrtl
+_sqrtl = _f64_sqrt
+	; flags handled by softfloat
+
+	extern	_f64_sqrt
