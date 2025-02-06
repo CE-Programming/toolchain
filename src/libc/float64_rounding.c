@@ -45,30 +45,18 @@ long double roundl(long double x) {
     return ret.flt;
 }
 
+/* flags handled by softfloat */
 long lroundl(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    
-    softfloat_exceptionFlags = 0;
-    int32_t ret = f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, false);
-
-    if (softfloat_exceptionFlags & softfloat_flag_invalid) {
-        feraiseexcept(FE_INVALID);
-    }
-    return ret;
+    return f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, false);
 }
 
+/* flags handled by softfloat */
 long long llroundl(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-    
-    softfloat_exceptionFlags = 0;
-    int64_t ret = f64_to_i64(arg_x.soft, softfloat_round_near_maxMag, false);
-    
-    if (softfloat_exceptionFlags & softfloat_flag_invalid) {
-        feraiseexcept(FE_INVALID);
-    }
-    return ret;
+    return f64_to_i64(arg_x.soft, softfloat_round_near_maxMag, false);
 }
 
 #if ( \
@@ -99,45 +87,24 @@ long double nearbyintl(long double x) {
     return ret.flt;
 }
 
+/* flags handled by softfloat */
 long double rintl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
-    
-    softfloat_exceptionFlags = 0;
     ret.soft = f64_roundToInt(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
-    
-    if (softfloat_exceptionFlags & softfloat_flag_inexact) {
-        feraiseexcept(FE_INEXACT);
-    }
     return ret.flt;
 }
 
+/* flags handled by softfloat */
 long lrintl(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-
-    softfloat_exceptionFlags = 0;
-    int32_t ret = f64_to_i32(arg_x.soft, softfloat_round_near_maxMag, true);
-
-    if (softfloat_exceptionFlags & softfloat_flag_inexact) {
-        feraiseexcept(FE_INEXACT);
-    } else if (softfloat_exceptionFlags & softfloat_flag_invalid) {
-        feraiseexcept(FE_INVALID);
-    }
-    return ret;
+    return f64_to_i32(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
 }
 
+/* flags handled by softfloat */
 long long llrintl(long double x) {
     F64_pun arg_x;
     arg_x.flt = x;
-
-    softfloat_exceptionFlags = 0;
-    int64_t ret = f64_to_i64(arg_x.soft, softfloat_round_near_maxMag, true);
-
-    if (softfloat_exceptionFlags & softfloat_flag_inexact) {
-        feraiseexcept(FE_INEXACT);
-    } else if (softfloat_exceptionFlags & softfloat_flag_invalid) {
-        feraiseexcept(FE_INVALID);
-    }
-    return ret;
+    return f64_to_i64(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
 }

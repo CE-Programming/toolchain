@@ -48,6 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#if 1
+#include <fenv.h>
+#endif
+
 #include "softfloat_types.h"
 
 #ifndef THREAD_LOCAL
@@ -57,7 +62,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*----------------------------------------------------------------------------
 | Software floating-point underflow tininess-detection mode.
 *----------------------------------------------------------------------------*/
+#if 0
 extern THREAD_LOCAL uint_fast8_t softfloat_detectTininess;
+#else
+	#define softfloat_detectTininess softfloat_tininess_afterRounding
+#endif
 enum {
     softfloat_tininess_beforeRounding = 0,
     softfloat_tininess_afterRounding  = 1
@@ -67,7 +76,11 @@ enum {
 | Software floating-point rounding mode.  (Mode "odd" is supported only if
 | SoftFloat is compiled with macro 'SOFTFLOAT_ROUND_ODD' defined.)
 *----------------------------------------------------------------------------*/
+#if 0
 extern THREAD_LOCAL uint_fast8_t softfloat_roundingMode;
+#else
+#define softfloat_roundingMode softfloat_round_near_even
+#endif
 enum {
     softfloat_round_near_even   = 0,
     softfloat_round_minMag      = 1,
@@ -80,6 +93,7 @@ enum {
 /*----------------------------------------------------------------------------
 | Software floating-point exception flags.
 *----------------------------------------------------------------------------*/
+#if 0
 extern THREAD_LOCAL uint_fast8_t softfloat_exceptionFlags;
 enum {
     softfloat_flag_inexact   =  1,
@@ -88,6 +102,16 @@ enum {
     softfloat_flag_infinite  =  8,
     softfloat_flag_invalid   = 16
 };
+#else
+#define softfloat_exceptionFlags __fe_cur_env
+enum {
+    softfloat_flag_inexact   = FE_INEXACT  ,
+    softfloat_flag_underflow = FE_UNDERFLOW,
+    softfloat_flag_overflow  = FE_OVERFLOW ,
+    softfloat_flag_infinite  = FE_DIVBYZERO,
+    softfloat_flag_invalid   = FE_INVALID
+};
+#endif
 
 /*----------------------------------------------------------------------------
 | Routine to raise any or all of the software floating-point exception flags.
@@ -245,7 +269,11 @@ bool f64_isSignalingNaN( float64_t );
 | Rounding precision for 80-bit extended double-precision floating-point.
 | Valid values are 32, 64, and 80.
 *----------------------------------------------------------------------------*/
+#if 0
 extern THREAD_LOCAL uint_fast8_t extF80_roundingPrecision;
+#else
+#define extF80_roundingPrecision 80
+#endif
 
 /*----------------------------------------------------------------------------
 | 80-bit extended double-precision floating-point operations.

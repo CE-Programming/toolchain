@@ -1,7 +1,7 @@
 	assume	adl=1
 
 	section	.text
-	public	_fabs, _fabsf, _fabsl
+	public	_fabsf, _fabs
 
 if PREFER_OS_LIBC
 
@@ -18,9 +18,3 @@ _fabsf:
 	ret
 
 end if
-
-_fabsl:
-	pop	iy, hl ,de, bc
-	push	bc, hl, de
-	res	7, b
-	jp	(iy)

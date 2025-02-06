@@ -1,10 +1,5 @@
 	assume	adl=1
 
-	section	.text
-
-	public	__dadd, __dsub, __dmul, __ddiv, __drem
-	public	__lltod, __ulltod, __dtof
-
 if 1
 
 ; reduces binary size by directly calling SoftFloat functions
@@ -13,12 +8,15 @@ if 1
 ; Addition and Subtraction
 ;-------------------------------------------------------------------------------
 
+	section	.text
+	public	__dadd, __dsub
+
 ; float64_t softfloat_addMagsF64(float64_t x, const float64_t *y, bool sign_x)
 __dadd:
 	push	af
 	ld	a, b
 	jr	__daddsub
-	
+
 ; float64_t softfloat_subMagsF64(float64_t x, const float64_t *y, bool sign_x)
 __dsub:
 	push	af
@@ -30,17 +28,17 @@ __daddsub:
 	push	iy
 	ld	iy, 9
 	add	iy, sp
-	
+
 	rlc	b
 	push	af	; sign_x
 	rrc	b
 
 	push	iy	; address of y
 	push	bc, de, hl	; pass x by value
-	
+
 	xor a, (iy + 7)
 	rla
-	
+
 	jr	nc, .__daddmags	; same signs
 ; .__dsubmags:
 	call	_softfloat_subMagsF64
@@ -52,9 +50,14 @@ __daddsub:
 	pop	iy, af
 	ret
 
+extern	_softfloat_addMagsF64, _softfloat_subMagsF64
+
 ;-------------------------------------------------------------------------------
 ; Other Arithmetic
 ;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__dmul
 
 ; float64_t f64_mul(float64_t, const float64_t*)
 __dmul:
@@ -66,6 +69,13 @@ __dmul:
 	pop	af, af, af, af, iy, af
 	ret
 
+	extern	_f64_mul
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__ddiv
+
 ; float64_t f64_div(float64_t, const float64_t*)
 __ddiv:
 	push	af, iy
@@ -75,6 +85,13 @@ __ddiv:
 	call	_f64_div
 	pop	af, af, af, af, iy, af
 	ret
+
+	extern	_f64_div
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__drem
 
 ; float64_t f64_rem(float64_t, const float64_t*)
 __drem:
@@ -86,9 +103,14 @@ __drem:
 	pop	af, af, af, af, iy, af
 	ret
 
+	extern  _f64_rem
+
 ;-------------------------------------------------------------------------------
 ; Conversion
 ;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__dtof
 
 __dtof:
 	; f64_ret_f32
@@ -97,12 +119,26 @@ __dtof:
 	pop	af, af, af, iy, af
 	ret
 
+	extern	_f64_to_f32
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__lltod
+
 __lltod:
 	; i64_ret_f64
 	push	af, iy, bc, de, hl
 	call	_i64_to_f64
 	pop	af, af, af, iy, af
 	ret
+
+	extern	_i64_to_f64
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__ulltod
 
 __ulltod:
 	; u64_ret_f64
@@ -111,13 +147,16 @@ __ulltod:
 	pop	af, af, af, iy, af
 	ret
 
-	extern	_softfloat_addMagsF64, _softfloat_subMagsF64
-	extern	_f64_mul, _f64_div, _f64_rem
-	extern	_f64_to_f32, _i64_to_f64, _ui64_to_f64
+	extern	_ui64_to_f64
 
 else
 
-; wraps C functions   
+; wraps C functions
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__dadd
 
 __dadd:
 	; f64_f64*_ret_f64
@@ -128,6 +167,13 @@ __dadd:
 	call	__dadd_c
 	pop	af, af, af, af, iy, af
 	ret
+	
+	extern	__dadd_c
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__dsub
 
 __dsub:
 	; f64_f64*_ret_f64
@@ -138,6 +184,13 @@ __dsub:
 	call	__dsub_c
 	pop	af, af, af, af, iy, af
 	ret
+	
+	extern	__dsub_c
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__dmul
 
 __dmul:
 	; f64_f64*_ret_f64
@@ -148,6 +201,13 @@ __dmul:
 	call	__dmul_c
 	pop	af, af, af, af, iy, af
 	ret
+	
+	extern	__dmul_c
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__ddiv
 
 __ddiv:
 	; f64_f64*_ret_f64
@@ -158,6 +218,13 @@ __ddiv:
 	call	__ddiv_c
 	pop	af, af, af, af, iy, af
 	ret
+	
+	extern	__ddiv_c
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__drem
 
 __drem:
 	; f64_f64*_ret_f64
@@ -169,12 +236,26 @@ __drem:
 	pop	af, af, af, af, iy, af
 	ret
 
+	extern	__drem_c
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__dtof
+
 __dtof:
 	; f64_ret_f32
 	push	af, iy, bc, de, hl
 	call	__dtof_c
 	pop	af, af, af, iy, af
 	ret
+	
+	extern	__dtof_c,
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__lltod
 
 __lltod:
 	; i64_ret_f64
@@ -182,6 +263,13 @@ __lltod:
 	call	__lltod_c
 	pop	af, af, af, iy, af
 	ret
+	
+	extern	__lltod_c
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+	public	__ulltod
 
 __ulltod:
 	; u64_ret_f64
@@ -190,7 +278,6 @@ __ulltod:
 	pop	af, af, af, iy, af
 	ret
 
-	extern	__dadd_c, __dsub_c, __dmul_c, __ddiv_c, __drem_c
-	extern	__dtof_c, __lltod_c, __ulltod_c
+	extern	__ulltod_c
 
 end if
