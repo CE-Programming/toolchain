@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+	public	_copysign, _copysignf
+
+_copysign:
+_copysignf:
+	pop	bc
+	pop	de
+	pop	hl
+	ld	a,l
+	inc	sp
+	ex	(sp),hl
+	dec	sp
+	push	hl
+	push	de
+	push	bc
+	add	hl,hl
+	rla
+	rrca
+	ld	l,a
+	ex	de,hl
+	ret

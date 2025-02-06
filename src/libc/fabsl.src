@@ -1,0 +1,10 @@
+	assume	adl=1
+
+	section	.text
+	public	_fabsl
+
+_fabsl:
+	pop	iy, hl ,de, bc
+	push	bc, de, hl
+	res	7, b
+	jp	(iy)
