@@ -76,9 +76,11 @@ float64_t
             sig = softfloat_shiftRightJam64( sig, -exp );
             exp = 0;
             roundBits = sig & 0x3FF;
+            #if 0
             if ( isTiny && roundBits ) {
                 softfloat_raiseFlags( softfloat_flag_underflow );
             }
+            #endif
         } else if (
             (0x7FD < exp)
                 || (UINT64_C( 0x8000000000000000 ) <= sig + roundIncrement)
