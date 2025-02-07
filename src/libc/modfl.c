@@ -16,7 +16,7 @@ long double modfl(long double x, long double *integral_part) {
         case FP_NORMAL:
     }
     long double trunc_x = truncl(x);
-    *integral_part = x;
+    *integral_part = trunc_x;
     // result will be exact, and should not raise exceptions
     return x - trunc_x;
 }
