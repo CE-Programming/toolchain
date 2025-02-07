@@ -1,0 +1,58 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_roundl
+
+if 0
+
+; long double roundl(long double)
+_roundl:
+	; return truncl(x + copysignl(0.5L, x))
+	pop	iy, hl, de, bc
+	push	iy
+	ex	(sp), hl
+	; push the value of copysignl(0.5L, x) onto the stack
+	ld	hl, $7EE0	; 0.5L with upper 8 bits left shifted by one
+	ld	a, b
+	rla		; extract signbit of x
+	rr	h	; copy the carry flag into the signbit (carry not set)
+	push	hl
+	sbc	hl, hl
+	push	hl, hl
+	ex	(sp), hl
+	ld	a, (___fe_cur_env)
+	call	_dadd
+	ld	(___fe_cur_env), a
+	push	bc, de, hl
+	call	_truncl
+	pop	af, af, af
+	ret
+
+else
+
+; long double roundl(long double)
+_roundl:
+	; return truncl(copysignl(0.5L, x) + x)
+	ld	hl, 10
+	add	hl, sp
+	ld	a, (hl)
+	; loads the value of copysignl(0.5L, x) in BC:UDE:UHL
+	ld	bc, $7EE0	; 0.5L with upper 8 bits left shifted by one
+	rla		; extract signbit of x
+	rr	b	; copy the carry flag into the signbit (carry not set)
+	; set HL and DE to zero
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	a, (___fe_cur_env)
+	call	_dadd
+	ld	(___fe_cur_env), a
+	push	bc, de, hl
+	call	_truncl
+	pop	af, af, af
+	ret
+
+end if
+
+extern	___fe_cur_env, __dadd, _truncl
