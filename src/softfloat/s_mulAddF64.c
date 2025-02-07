@@ -245,8 +245,9 @@ float64_t
 
 float64_t
  softfloat_mulAddF64(
-     uint_fast64_t uiA, uint_fast64_t uiB, uint_fast64_t uiC, uint_fast8_t op )
+     uint_fast64_t uiA, uint_fast64_t uiB, uint_fast64_t uiC /*, uint_fast8_t op */)
 {
+	#define op 0
     bool signA;
     int_fast16_t expA;
     uint64_t sigA;

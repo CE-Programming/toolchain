@@ -10,26 +10,35 @@ typedef union F64_pun {
     uint64_t bin;
 } F64_pun;
 
+#if 0
+/* implemented in truncl.src/truncl.c */
 long double truncl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
     ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_minMag, false);
     return ret.flt;
 }
+#endif
 
+#if 0
+/* implemented in floorl.c */
 long double floorl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
     ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_min, false);
     return ret.flt;
 }
+#endif
 
+#if 0
+/* implemented in ceill.c */
 long double ceill(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
     ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_max, false);
     return ret.flt;
 }
+#endif
 
 long double roundevenl(long double x) {
     F64_pun arg_x, ret;
@@ -38,12 +47,15 @@ long double roundevenl(long double x) {
     return ret.flt;
 }
 
+#if 0
+/* implemented in roundl.src */
 long double roundl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
     ret.soft = f64_roundToInt(arg_x.soft, softfloat_round_near_maxMag, false);
     return ret.flt;
 }
+#endif
 
 /* flags handled by softfloat */
 long lroundl(long double x) {
