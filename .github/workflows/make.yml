@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-20.04, macos-13, macos-14, windows-latest]
+        runs-on: [ubuntu-22.04, macos-13, macos-14, windows-latest]
         include:
           - nul: /dev/null
           - runs-on: macos-13
@@ -46,7 +46,7 @@ jobs:
             nul: nul
             ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
             install-output-ext: "zip"
-          - runs-on: ubuntu-20.04
+          - runs-on: ubuntu-22.04
             ez80-bins-suffix: ubuntu
             fasmg: /fasmg.x64
             install-output-ext: "tar.gz"
