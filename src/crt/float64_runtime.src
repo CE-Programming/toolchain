@@ -151,133 +151,133 @@ __ulltod:
 
 else
 
-; wraps C functions
+; ; wraps C functions
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__dadd
+	; section	.text
+	; public	__dadd
 
-__dadd:
-	; f64_f64*_ret_f64
-	push	af, iy
-	ld	iy, 9
-	add	iy, sp
-	push	iy, bc, de, hl
-	call	__dadd_c
-	pop	af, af, af, af, iy, af
-	ret
+; __dadd:
+	; ; f64_f64*_ret_f64
+	; push	af, iy
+	; ld	iy, 9
+	; add	iy, sp
+	; push	iy, bc, de, hl
+	; call	__dadd_c
+	; pop	af, af, af, af, iy, af
+	; ret
 	
-	extern	__dadd_c
+	; extern	__dadd_c
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__dsub
+	; section	.text
+	; public	__dsub
 
-__dsub:
-	; f64_f64*_ret_f64
-	push	af, iy
-	ld	iy, 9
-	add	iy, sp
-	push	iy, bc, de, hl
-	call	__dsub_c
-	pop	af, af, af, af, iy, af
-	ret
+; __dsub:
+	; ; f64_f64*_ret_f64
+	; push	af, iy
+	; ld	iy, 9
+	; add	iy, sp
+	; push	iy, bc, de, hl
+	; call	__dsub_c
+	; pop	af, af, af, af, iy, af
+	; ret
 	
-	extern	__dsub_c
+	; extern	__dsub_c
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__dmul
+	; section	.text
+	; public	__dmul
 
-__dmul:
-	; f64_f64*_ret_f64
-	push	af, iy
-	ld	iy, 9
-	add	iy, sp
-	push	iy, bc, de, hl
-	call	__dmul_c
-	pop	af, af, af, af, iy, af
-	ret
+; __dmul:
+	; ; f64_f64*_ret_f64
+	; push	af, iy
+	; ld	iy, 9
+	; add	iy, sp
+	; push	iy, bc, de, hl
+	; call	__dmul_c
+	; pop	af, af, af, af, iy, af
+	; ret
 	
-	extern	__dmul_c
+	; extern	__dmul_c
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__ddiv
+	; section	.text
+	; public	__ddiv
 
-__ddiv:
-	; f64_f64*_ret_f64
-	push	af, iy
-	ld	iy, 9
-	add	iy, sp
-	push	iy, bc, de, hl
-	call	__ddiv_c
-	pop	af, af, af, af, iy, af
-	ret
+; __ddiv:
+	; ; f64_f64*_ret_f64
+	; push	af, iy
+	; ld	iy, 9
+	; add	iy, sp
+	; push	iy, bc, de, hl
+	; call	__ddiv_c
+	; pop	af, af, af, af, iy, af
+	; ret
 	
-	extern	__ddiv_c
+	; extern	__ddiv_c
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__drem
+	; section	.text
+	; public	__drem
 
-__drem:
-	; f64_f64*_ret_f64
-	push	af, iy
-	ld	iy, 9
-	add	iy, sp
-	push	iy, bc, de, hl
-	call	__drem_c
-	pop	af, af, af, af, iy, af
-	ret
+; __drem:
+	; ; f64_f64*_ret_f64
+	; push	af, iy
+	; ld	iy, 9
+	; add	iy, sp
+	; push	iy, bc, de, hl
+	; call	__drem_c
+	; pop	af, af, af, af, iy, af
+	; ret
 
-	extern	__drem_c
+	; extern	__drem_c
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__dtof
+	; section	.text
+	; public	__dtof
 
-__dtof:
-	; f64_ret_f32
-	push	af, iy, bc, de, hl
-	call	__dtof_c
-	pop	af, af, af, iy, af
-	ret
+; __dtof:
+	; ; f64_ret_f32
+	; push	af, iy, bc, de, hl
+	; call	__dtof_c
+	; pop	af, af, af, iy, af
+	; ret
 	
-	extern	__dtof_c,
+	; extern	__dtof_c,
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__lltod
+	; section	.text
+	; public	__lltod
 
-__lltod:
-	; i64_ret_f64
-	push	af, iy, bc, de, hl
-	call	__lltod_c
-	pop	af, af, af, iy, af
-	ret
+; __lltod:
+	; ; i64_ret_f64
+	; push	af, iy, bc, de, hl
+	; call	__lltod_c
+	; pop	af, af, af, iy, af
+	; ret
 	
-	extern	__lltod_c
+	; extern	__lltod_c
 
-;-------------------------------------------------------------------------------
+; ;-------------------------------------------------------------------------------
 
-	section	.text
-	public	__ulltod
+	; section	.text
+	; public	__ulltod
 
-__ulltod:
-	; u64_ret_f64
-	push	af, iy, bc, de, hl
-	call	__ulltod_c
-	pop	af, af, af, iy, af
-	ret
+; __ulltod:
+	; ; u64_ret_f64
+	; push	af, iy, bc, de, hl
+	; call	__ulltod_c
+	; pop	af, af, af, iy, af
+	; ret
 
-	extern	__ulltod_c
+	; extern	__ulltod_c
 
 end if

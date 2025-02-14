@@ -78,3 +78,7 @@ long double _frexpl_c(long double x, int *expon) {
     #endif
     return val.flt;
 }
+
+long double frexpl(long double x, int *expon) {
+    return copysignl(_frexpl_c(fabsl(x), expon), x);
+}
