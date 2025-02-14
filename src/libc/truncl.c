@@ -17,7 +17,7 @@ typedef union F64_pun {
 #define uint48_bits 48
 
 /** @note x is assumed to be positive */
-long double _truncl_c(long double x) {
+static long double _truncl_c(long double x) {
     F64_pun val;
     val.flt = x;
     unsigned int expon = (unsigned int)(val.reg.BC >> (Float64_mantissa_bits - uint48_bits));
@@ -33,4 +33,8 @@ long double _truncl_c(long double x) {
     uint64_t mask = UINT64_MAX << (Float64_mantissa_bits - expon);
     val.bin &= mask;
     return val.flt;
+}
+
+long double truncl(long double x) {
+    return copysignl(_truncl_c(fabsl(x)), x);
 }
