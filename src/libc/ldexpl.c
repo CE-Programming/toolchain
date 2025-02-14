@@ -120,3 +120,7 @@ long double _ldexpl_c(long double x, int expon) {
     val.reg.BC += expon << (Float64_mantissa_bits - uint48_bits);
     return val.flt;
 }
+
+long double ldexpl(long double x, int expon) {
+    return copysignl(_ldexpl_c(fabsl(x), expon), x);
+}
