@@ -8,12 +8,13 @@ long double modfl(long double x, long double *integral_part) {
             *integral_part = x;
             return x;
         }
-        case FP_INFINITY: {
+        case FP_INFINITE: {
             *integral_part = x;
             return copysignl(0.0L, x);
         }
         case FP_SUBNORMAL:
         case FP_NORMAL:
+            break;
     }
     long double trunc_x = truncl(x);
     *integral_part = trunc_x;
