@@ -1,8 +1,10 @@
 	assume	adl=1
 
 	section	.text
-	public	_fabsl
 
+	public	_fabsl, __debug_fabsl
+
+__debug_fabsl:
 _fabsl:
 	pop	iy, hl ,de, bc
 	push	bc, de, hl
