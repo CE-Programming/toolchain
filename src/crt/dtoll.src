@@ -1,0 +1,14 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__dtoll
+
+__dtoll:
+	; f64_ret_i64
+	push	af, iy, bc, de, hl
+	call	__dtoll_c
+	pop	af, af, af, iy, af
+	ret
+
+	extern	__dtoll_c
