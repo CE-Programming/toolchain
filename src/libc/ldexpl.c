@@ -22,6 +22,8 @@ typedef union F64_pun {
 
 #define Float64_biased_inf_nan_exp 2047
 
+#define Float64_implicit_mantissa_bits 1
+
 #define Float64_exponent_bits  11
 #define Float64_sign_bits      1
 
@@ -39,7 +41,7 @@ static long double generate_ldexpl_mult(int expon) {
  * @remarks Assumes round to nearest ties to even for correct rounding of
  * subnormal values.
  */
-long double _ldexpl_c(long double x, int expon) {
+static long double _ldexpl_c_positive(long double x, int expon) {
     F64_pun val;
     val.flt = x;
     /* expon == 0 || iszero(x) */
@@ -72,7 +74,7 @@ long double _ldexpl_c(long double x, int expon) {
         }
         // make subnormal (with correct rounding)
         int subnorm_exp = x_exp - Float64_norm_min_exp;
-        if (subnorm_exp < -53) {
+        if (subnorm_exp < -(Float64_mantissa_bits + Float64_implicit_mantissa_bits)) {
             // rounds to zero (round to nearest ties to even)
             errno = ERANGE;
             return 0.0L;
@@ -86,41 +88,37 @@ long double _ldexpl_c(long double x, int expon) {
         return val.flt;
     }
     // make normalized (with correct rounding)
-    if (expon < -52) {
+    if (expon < -Float64_mantissa_bits) {
         // rounds to zero (round to nearest ties to even)
         errno = ERANGE;
         return 0.0L;
     }
-    /**
-     * fallsback to multiplication if there is a chance the subnormal value
-     * wont't be normalized
-     */
-    if (expon < Float64_mantissa_bits) {
-        // precision may be lost when expon < 0
+
+    int clz_result = __builtin_clzll(val.bin);
+    int shift_amount = clz_result - (Float64_exponent_bits + Float64_sign_bits) + 1;
+
+    // fallsback to multiplication if the value will stay subnormal
+    if (expon - shift_amount < 0) {
+        // precision may be lost
         val.flt *= generate_ldexpl_mult(expon);
         return val.flt;
     }
-    const int clz_offset = Float64_exponent_bits + Float64_sign_bits;
-    int clz_result = __builtin_clzll(val.bin);
-    expon -= clz_result - clz_offset + 1;
-    /**
-     * 2045 is the largest power of 2 that you can multiply the smallest
-     * normalized number by without overflowing the expoenent field
-     * (creating infinity/NaN). Any lower, and floats will be wrongly rounded
-     * to infinty.
-     */
-    if (expon > 2045) {
+
+    expon -= shift_amount;
+    if (expon >= Float64_biased_inf_nan_exp - 1) {
         // overflow
         errno = ERANGE;
         return HUGE_VALL;
     }
     // Shift everything such that the MSB of the mantissa is in the LSB of the exponent
-    val.bin <<= clz_result - clz_offset + 1;
+    val.bin <<= shift_amount;
     // Add the exponent
     val.reg.BC += expon << (Float64_mantissa_bits - uint48_bits);
     return val.flt;
 }
 
 long double ldexpl(long double x, int expon) {
-    return copysignl(_ldexpl_c(fabsl(x), expon), x);
+    return copysignl(_ldexpl_c_positive(fabsl(x), expon), x);
 }
+
+long double scalbnl(long double, int) __attribute__((alias("ldexpl")));

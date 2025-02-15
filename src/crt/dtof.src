@@ -1,0 +1,14 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__dtof
+
+__dtof:
+	; f64_ret_f32
+	push	af, iy, bc, de, hl
+	call	_f64_to_f32
+	pop	af, af, af, iy, af
+	ret
+
+	extern	_f64_to_f32

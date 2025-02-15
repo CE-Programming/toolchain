@@ -347,6 +347,25 @@ double      trunc(double);
 float       truncf(float);
 long double truncl(long double);
 
+/* aliases */
+
+long double _debug_fabsl(long double x);
+#define fabsl _debug_fabsl
+long double _debug_copysignl(long double x, long double y);
+#define copysignl _debug_copysignl
+long double _debug_truncl(long double x);
+#define truncl _debug_truncl
+long double _debug_floorl(long double x);
+#define floorl _debug_floorl
+long double _debug_ceill(long double x);
+#define ceill _debug_ceill
+long double _debug_roundl(long double x);
+#define roundl _debug_roundl
+long double _debug_nearbyintl(long double x);
+#define nearbyintl _debug_nearbyintl
+long double _debug_rintl(long double x);
+#define rintl _debug_rintl
+
 #ifdef __cplusplus
 }
 #endif

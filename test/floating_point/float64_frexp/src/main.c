@@ -12,9 +12,14 @@
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
+typedef union F64_pun {
+    long double flt;
+    uint64_t bin;
+} F64_pun;
+
 size_t run_test(void) {
     typedef long double input_t;
-    typedef struct { long double frac; int expon; } output_t;
+    typedef struct { F64_pun frac; int expon; } output_t;
 
     const size_t length = ARRAY_LENGTH(f64_frexp_LUT_input);
     const input_t  *input  = (const input_t* )((const void*)f64_frexp_LUT_input );
@@ -22,9 +27,12 @@ size_t run_test(void) {
 
     for (size_t i = 0; i < length; i++) {
         int expon;
-        long double result = frexpl(input[i], &expon);
-        if (result != output[i].frac || expon != output[i].expon) {
-            return i;
+        F64_pun result;
+        result.flt = frexpl(input[i], &expon);
+        if (result.bin != output[i].frac.bin || expon != output[i].expon) {
+            if (!(isnan(result.flt) && isnan(output[i].frac.flt))) {
+                return i;
+            }
         }
     }
 

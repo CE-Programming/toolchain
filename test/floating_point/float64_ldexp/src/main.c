@@ -12,18 +12,26 @@
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
+typedef union F64_pun {
+    long double flt;
+    uint64_t bin;
+} F64_pun;
+
 size_t run_test(void) {
     typedef struct { long double value; int expon; } input_t;
-    typedef long double output_t;
+    typedef F64_pun output_t;
 
     const size_t length = ARRAY_LENGTH(f64_ldexp_LUT_input);
     const input_t  *input  = (const input_t* )((const void*)f64_ldexp_LUT_input );
     const output_t *output = (const output_t*)((const void*)f64_ldexp_LUT_output);
 
     for (size_t i = 0; i < length; i++) {
-        long double result = ldexpl(input[i].value, input[i].expon);
-        if (result != output[i]) {
-            return i;
+        F64_pun result;
+        result.flt = ldexpl(input[i].value, input[i].expon);
+        if (result.bin != output[i].bin) {
+            if (!(isnan(result.flt) && isnan(output[i].flt))) {
+                return i;
+            }
         }
     }
 

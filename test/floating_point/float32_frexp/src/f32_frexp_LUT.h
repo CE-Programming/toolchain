@@ -1039,7 +1039,7 @@ const input_type f32_frexp_LUT_input[1024] = {
 };
 
 const output_type f32_frexp_LUT_output[1024] = {
-/*    0 */ {UINT32_C(0x00000000), FP_ILOGB0},
+/*    0 */ {UINT32_C(0x00000000), 0},
 /*    1 */ {UINT32_C(0x3F000000), -148},
 /*    2 */ {UINT32_C(0x3F000000), -125},
 /*    3 */ {UINT32_C(0x3F000000), 0},
@@ -1059,7 +1059,7 @@ const output_type f32_frexp_LUT_output[1024] = {
 /*   17 */ {UINT32_C(0x3F000001), -125},
 /*   18 */ {UINT32_C(0x3F7FFFFE), -126},
 /*   19 */ {UINT32_C(0x3F7FFFFE), 128},
-/*   20 */ {UINT32_C(0x80000000), FP_ILOGB0},
+/*   20 */ {UINT32_C(0x80000000), 0},
 /*   21 */ {UINT32_C(0xBF000000), -148},
 /*   22 */ {UINT32_C(0xBF000000), -125},
 /*   23 */ {UINT32_C(0xBF000000), 0},

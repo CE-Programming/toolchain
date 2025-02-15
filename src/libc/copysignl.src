@@ -2,8 +2,9 @@
 
 	section	.text
 
-	public	_copysignl
+	public	_copysignl, __debug_copysignl
 
+__debug_copysignl:
 _copysignl:
 	ld	hl, 19	; upper 8 bits of y
 	add	hl, sp
