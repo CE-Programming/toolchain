@@ -1,0 +1,17 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__dmul
+
+; float64_t f64_mul(float64_t, const float64_t*)
+__dmul:
+	push	af, iy
+	ld	iy, 9
+	add	iy, sp
+	push	iy, bc, de, hl
+	call	_f64_mul
+	pop	af, af, af, af, iy, af
+	ret
+
+	extern	_f64_mul

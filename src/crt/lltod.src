@@ -1,0 +1,14 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__lltod
+
+__lltod:
+	; i64_ret_f64
+	push	af, iy, bc, de, hl
+	call	_i64_to_f64
+	pop	af, af, af, iy, af
+	ret
+
+	extern	_i64_to_f64

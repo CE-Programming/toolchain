@@ -27,7 +27,7 @@ typedef union F64_pun {
 /**
  * @note x is assumed to be positive
  */
-long double _frexpl_c(long double x, int *expon) {
+static long double _frexpl_c_positive(long double x, int *expon) {
     F64_pun val;
     val.flt = x;
     int x_exp = (int)(val.reg.BC >> (Float64_mantissa_bits - uint48_bits));
@@ -80,5 +80,5 @@ long double _frexpl_c(long double x, int *expon) {
 }
 
 long double frexpl(long double x, int *expon) {
-    return copysignl(_frexpl_c(fabsl(x), expon), x);
+    return copysignl(_frexpl_c_positive(fabsl(x), expon), x);
 }
