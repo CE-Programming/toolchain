@@ -93,11 +93,12 @@ void quick_exit(int) __NOEXCEPT __attribute__((noreturn));
 
 void _Exit(int) __NOEXCEPT __attribute__((noreturn));
 
+#ifndef _ABS_INT_DEFINED
+#define _ABS_INT_DEFINED
 int abs(int n);
-
 long labs(long n);
-
 long long llabs(long long n);
+#endif /* _ABS_INT_DEFINED */
 
 div_t div(int numer, int denom);
 

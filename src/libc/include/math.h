@@ -175,9 +175,12 @@ double      expm1(double);
 float       expm1f(float);
 long double expm1l(long double);
 
+#ifndef _ABS_FLOAT_DEFINED
+#define _ABS_FLOAT_DEFINED
 double      fabs(double);
 float       fabsf(float);
 long double fabsl(long double);
+#endif /* _ABS_FLOAT_DEFINED */
 
 double      fdim(double, double);
 float       fdimf(float, float);
@@ -353,6 +356,10 @@ long double _debug_fabsl(long double x);
 #define fabsl _debug_fabsl
 long double _debug_copysignl(long double x, long double y);
 #define copysignl _debug_copysignl
+long double _debug_fmaxl(long double x, long double y);
+#define fmaxl _debug_fmaxl
+long double _debug_fminl(long double x, long double y);
+#define fminl _debug_fminl
 long double _debug_truncl(long double x);
 #define truncl _debug_truncl
 long double _debug_floorl(long double x);
