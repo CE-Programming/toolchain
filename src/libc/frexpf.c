@@ -1,4 +1,8 @@
-#if 0
+/**
+ * @remarks Zilog's implementation of ldexpf is probably smaller since it does
+ * not handle subnormals.
+ */
+#if 1
 /************************************************************************/
 /*                                                                      */
 /*			Copyright (C) 2000-2008 Zilog, Inc.		*/

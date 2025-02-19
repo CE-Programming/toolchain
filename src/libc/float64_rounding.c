@@ -11,7 +11,7 @@ typedef union F64_pun {
 } F64_pun;
 
 #if 0
-/* implemented in truncl.src/truncl.c */
+/* implemented in truncl.c */
 long double truncl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
