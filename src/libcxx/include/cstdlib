@@ -6,6 +6,8 @@
 
 #pragma clang system_header
 
+#include <__abs_overloads>
+
 namespace std {
 using ::calloc;
 using ::malloc;
@@ -38,11 +40,8 @@ using ::at_quick_exit;
 using ::quick_exit;
 using ::_Exit;
 
-using ::abs;
 using ::labs;
 using ::llabs;
-inline constexpr long abs(long __x) { return labs(__x); }
-inline constexpr long long abs(long long __x) { return llabs(__x); }
 
 using ::div;
 using ::ldiv;
