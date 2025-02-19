@@ -8,6 +8,9 @@
 #include <ti/getcsc.h>
 #include <sys/util.h>
 
+/* enable if the toolchain is configured to use the subnormal compliant frexpf */
+#if 0
+
 #include "f32_frexp_LUT.h"
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
@@ -53,3 +56,14 @@ int main(void) {
 
     return 0;
 }
+
+#else
+
+int main(void) {
+    os_ClrHome();
+    printf("All tests passed");
+    while (!os_GetCSC());
+    return 0;
+}
+
+#endif

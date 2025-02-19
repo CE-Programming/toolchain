@@ -1,4 +1,9 @@
-#if 0
+/**
+ * @remarks Zilog's implementation of ldexpf is probably smaller since it does
+ * not handle subnormals. Once subnormal support in _fmul is added, switch to
+ * the other routine.
+ */
+#if 1
 
 /************************************************************************/
 /*                                                                      */
