@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <math.h>
 
 typedef union F64_pun {
     long double flt;
@@ -91,6 +92,9 @@ static uint64_t f64_to_unsigned(F64_pun val) {
 }
 
 uint64_t _dtoull_c(long double x) {
+    if (signbit(x)) {
+        return 0;
+    }
     F64_pun val;
     val.flt = x;
     /* overflow || signbit(x) || isinf(x) || isnan(x) */
@@ -102,6 +106,9 @@ uint64_t _dtoull_c(long double x) {
 }
 
 uint32_t _dtoul_c(long double x) {
+    if (signbit(x)) {
+        return 0;
+    }
     F64_pun val;
     val.flt = x;
     /* overflow || signbit(x) || isinf(x) || isnan(x) */
@@ -114,11 +121,9 @@ uint32_t _dtoul_c(long double x) {
 
 int64_t _dtoll_c(long double x) {
     F64_pun val;
-    val.flt = x;
-    // tests for signbit(x)
-    bool x_sign = (val.reg.BC >= 0x8000);
-    // clears the signbit
-    val.reg.BC &= 0x7FFF;
+    bool x_sign = signbit(x);
+    val.flt = fabsl(x);
+    
     /* overflow || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_i64_max_exp) << Float64_exp_BC_shift)) {
         /* undefined return value for inf/NaN values of x */
@@ -131,11 +136,9 @@ int64_t _dtoll_c(long double x) {
 
 int32_t _dtol_c(long double x) {
     F64_pun val;
-    val.flt = x;
-    // tests for signbit(x)
-    bool x_sign = (val.reg.BC >= 0x8000);
-    // clears the signbit
-    val.reg.BC &= 0x7FFF;
+    bool x_sign = signbit(x);
+    val.flt = fabsl(x);
+    
     /* overflow || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_i32_max_exp) << Float64_exp_BC_shift)) {
         /* undefined return value for inf/NaN values of x */
