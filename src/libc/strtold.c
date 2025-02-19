@@ -8,6 +8,8 @@
 /*		        San Jose, California     			*/
 /*									*/
 /************************************************************************/
+
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -35,13 +37,18 @@ typedef union F64_pun {
 *	the value of the number
 *
 *************************************************/
+
+/**
+ * @remarks `*str >= '0' && *str <= '9'` is smaller than calls to `isdigit(*str)`
+ * @todo Add support for INF INFINITY NAN NAN(...)
+ */
 long double strtold(const char *__restrict nptr, char **__restrict endptr)
 {
     F64_pun val;
     int frac = 0;
     int exp = 0;
-    int8_t sign = 1;
-    int8_t exp_sign = 1;
+    bool sign = false;
+    bool exp_sign = false;
     const char *str = (const char*)nptr;
 
     while (isspace(*str)) {
@@ -49,23 +56,22 @@ long double strtold(const char *__restrict nptr, char **__restrict endptr)
     }
 
     if (*str == '-') {
-        sign = -1;
+        sign = true;
         ++str;
-    }
-    else if (*str == '+') {
+    } else if (*str == '+') {
         ++str;
     }
 
     val.flt = 0.0L;
-    while (isdigit(*str)) {
-        val.flt = val.flt * 10.0L + (*str - '0');
+    while (*str >= '0' && *str <= '9') {
+        val.flt = val.flt * 10.0L + (long double)(*str - '0');
         ++str;
     }
 
     if (*str == '.') {
         ++str;
-        while (isdigit(*str)) {
-            val.flt = val.flt * 10.0L + (*str - '0');
+        while (*str >= '0' && *str <= '9') {
+            val.flt = val.flt * 10.0L + (long double)(*str - '0');
             ++frac;
             ++str;
         }
@@ -74,14 +80,13 @@ long double strtold(const char *__restrict nptr, char **__restrict endptr)
     if (*str == 'e' || *str == 'E') {
         ++str;
         if (*str == '-') {
-            exp_sign = -1;
+            exp_sign = true;
+            ++str;
+        } else if (*str == '+') {
+            exp_sign = false;
             ++str;
         }
-        else if (*str == '+') {
-            exp_sign = 1;
-            ++str;
-        }
-        while (isdigit(*str)) {
+        while (*str >= '0' && *str <= '9') {
             exp = exp * 10 + (*str - '0');
             ++str;
         }
@@ -91,7 +96,7 @@ long double strtold(const char *__restrict nptr, char **__restrict endptr)
         *endptr = (char*)str;
     }
 
-    if (exp_sign < 0 ) {
+    if (exp_sign) {
         exp = -exp;
     }
     exp -= frac;
@@ -118,9 +123,9 @@ long double strtold(const char *__restrict nptr, char **__restrict endptr)
             }
             ++exp;
         }
-        if (sign < 0 ) {
-            val.flt = -val.flt;
-        }
+    }
+    if (sign) {
+        val.flt = -val.flt;
     }
     return val.flt;
 }

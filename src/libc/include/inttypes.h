@@ -170,17 +170,30 @@
 #define SCNuPTR          __UINTPTR_FMTu__
 #define SCNxPTR          __UINTPTR_FMTx__
 
+typedef struct {
+    intmax_t rem;
+    intmax_t quot;
+} imaxdiv_t;
+
 __BEGIN_DECLS
 
 extern intmax_t imaxabs(intmax_t __n)
     __NOEXCEPT __attribute__((__const__));
 
-typedef struct {
-    intmax_t rem;
-    intmax_t quot;
-} imaxdiv_t;
 extern imaxdiv_t imaxdiv(intmax_t __numer, intmax_t __denom)
     __NOEXCEPT __attribute__((__const__));
+
+intmax_t strtoimax(
+    const char *__restrict nptr,
+    char **__restrict endptr,
+    int base
+) __attribute__((nonnull(1)));
+
+uintmax_t strtoumax(
+    const char *__restrict nptr,
+    char **__restrict endptr,
+    int base
+) __attribute__((nonnull(1)));
 
 __END_DECLS
 
