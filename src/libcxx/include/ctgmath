@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CTGMATH
+#define _EZCXX_CTGMATH
+
+#include <tgmath.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_CTGMATH
