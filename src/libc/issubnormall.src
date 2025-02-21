@@ -1,0 +1,30 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__issubnormall
+
+; int _issubnormall(long double)
+__issubnormall:
+	pop	bc, hl, de
+	or	a, a
+	adc	hl, de
+	pop	de
+	push	bc, bc, bc, bc
+	; zero is not subnormal
+	jr	nz, .mant_nonzero
+	jr	c, .mant_carry
+	ld	a, e
+	and	a, $0F
+	ret	z	; mantissa is zero
+.mant_nonzero:
+.mant_carry:
+	ld	a, e
+	and	a, $F0
+	sbc	hl, hl
+	rra
+	res	7, d
+	add	a, d
+	ret	nz
+	inc	hl
+	ret

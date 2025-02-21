@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_copysignl, __debug_copysignl
+
+__debug_copysignl:
+_copysignl:
+	ld	hl, 19	; upper 8 bits of y
+	add	hl, sp
+	rl	(hl)	; extract the signbit of y
+	pop	iy, hl, de, bc
+	push	bc, de, hl
+	rl	b	; clear the signbit of x, signbit of y is in the LSB
+	rrc	b	; rotate the LSB into the MSB to copy the signbit of y
+	jp	(iy)

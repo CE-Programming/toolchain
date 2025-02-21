@@ -1,0 +1,14 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__ulltod
+
+__ulltod:
+	; u64_ret_f64
+	push	af, iy, bc, de, hl
+	call	_ui64_to_f64
+	pop	af, af, af, iy, af
+	ret
+
+	extern	_ui64_to_f64

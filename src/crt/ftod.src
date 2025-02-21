@@ -1,0 +1,27 @@
+	assume	adl=1
+
+	section	.text
+
+	public __ftod
+
+__ftod:
+	; f32_ret_f64
+	ld	d, a
+	push	iy
+	bit	7, e
+	jr	nz, .negative_arg
+	; positive
+	push	de, hl
+	call	__ftod_c
+	pop	af, af, iy
+	ret
+.negative_arg:
+	; return -_ftod_c(fabsf(x))
+	res	7, e
+	push	de, hl
+	call	__ftod_c
+	set	7, b
+	pop	af, af, iy
+	ret
+
+extern __ftod_c

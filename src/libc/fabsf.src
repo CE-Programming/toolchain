@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+	public	_fabsf, _fabs
+
+if PREFER_OS_LIBC
+
+_fabsf := 0220F0h
+_fabs := _fabsf
+
+else
+
+_fabs:
+_fabsf:
+	pop	bc, hl ,de
+	push	de, hl, bc
+	res	7, e
+	ret
+
+end if

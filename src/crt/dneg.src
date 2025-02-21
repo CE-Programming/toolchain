@@ -1,0 +1,12 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__dneg
+
+; assumes BC:UDE:UHL
+__dneg:
+	rl	b
+	ccf
+	rr	b
+	ret

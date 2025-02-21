@@ -1,0 +1,24 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__dcmp
+
+; int _dcmp_c(const long double *__restrict x, const long double *__restrict y)
+__dcmp:
+	; f64*_f64*_ret_i24
+	push	bc, de, hl, af, iy
+	ld	iy, 6
+	add	iy, sp
+	pea	iy + 12
+	push	iy
+	call	__dcmp_c
+	pop	af, af, iy, af
+	; Set the comparison flags
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	pop	hl, de, bc
+	ret
+
+	extern	__dcmp_c

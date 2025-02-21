@@ -3,6 +3,7 @@
 .idea/
 .vs/
 .vscode/
+*.code-workspace
 
 # generated documentation
 doxygen/
@@ -17,6 +18,7 @@ doxygen/
 obj/
 release/
 build/
+CEdev/
 cmake-build-debug/
 tools/fasmg/fasmg
 tools/fasmg/fasmg.exe

@@ -1,0 +1,18 @@
+	assume	adl=1
+
+	section	.text
+	
+	public	__isnormalf
+	
+; int _isnormalf(float)
+__isnormalf:
+	ld	hl, 5
+	add	hl, sp
+	ld	hl, (hl)	; load the upper 16 bits
+	add	hl, hl	; clears signbit
+	ld	a, h
+	dec	a
+	cp	a, $FE	; tests for zero/denormal/inf/NaN exponents
+	sbc	hl, hl	; -1 if normal, 0 otherwise
+	ret
+

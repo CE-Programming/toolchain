@@ -49,6 +49,9 @@ float strtof(const char *__restrict nptr,
 double strtod(const char *__restrict nptr,
               char **__restrict endptr) __attribute__((nonnull(1)));
 
+long double strtold(const char *__restrict nptr,
+                    char **__restrict endptr) __attribute__((nonnull(1)));
+
 long strtol(const char *__restrict nptr,
             char **__restrict endptr, int base) __attribute__((nonnull(1)));
 
@@ -90,11 +93,12 @@ void quick_exit(int) __NOEXCEPT __attribute__((noreturn));
 
 void _Exit(int) __NOEXCEPT __attribute__((noreturn));
 
+#ifndef _ABS_INT_DEFINED
+#define _ABS_INT_DEFINED
 int abs(int n);
-
 long labs(long n);
-
 long long llabs(long long n);
+#endif /* _ABS_INT_DEFINED */
 
 div_t div(int numer, int denom);
 

@@ -6,3 +6,8 @@
 #define STRTOX_NAME    strtoull
 
 #include "strtox.h"
+
+/* not sure why __ULLONG_WIDTH__ isn't defined */
+#if __UINTMAX_WIDTH__ == __LLONG_WIDTH__
+__UINTMAX_TYPE__ strtoumax(const char *, char **, int) __attribute__((alias("strtoull")));
+#endif /* __UINTMAX_WIDTH__ == __LLONG_WIDTH__ */
