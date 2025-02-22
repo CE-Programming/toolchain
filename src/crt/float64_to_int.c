@@ -65,6 +65,16 @@ uint64_t _dtoull_c(long double x) {
 #endif
 
 /**
+ * @brief set to 0 or 1
+ * If set to 1, values that truncate to `INT32_MIN`/`INT64_MIN` will be
+ * handled correctly.
+ * If set to 0, it can save a little bit of space by removing a comparison from
+ * `_dtol_c` and `_dtoll_c`. However this will cause values that would truncate
+ * to `INT32_MIN`/`INT64_MIN` to have an undefined result.
+ */
+#define HANDLE_INT_MIN 1
+
+/**
  * @note val must have the signbit cleared
  */
 static uint64_t f64_to_unsigned(F64_pun val) {
@@ -92,29 +102,23 @@ static uint64_t f64_to_unsigned(F64_pun val) {
 }
 
 uint64_t _dtoull_c(long double x) {
-    if (signbit(x)) {
-        return 0;
-    }
     F64_pun val;
     val.flt = x;
     /* overflow || signbit(x) || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_u64_max_exp) << Float64_exp_BC_shift)) {
-        /* undefined return value for negative/inf/NaN values of x */
-        return UINT64_MAX;
+        /* undefined return value for negative/overflow/inf/NaN of x */
+        return 0;
     }
     return f64_to_unsigned(val);
 }
 
 uint32_t _dtoul_c(long double x) {
-    if (signbit(x)) {
-        return 0;
-    }
     F64_pun val;
     val.flt = x;
     /* overflow || signbit(x) || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_u32_max_exp) << Float64_exp_BC_shift)) {
-        /* undefined return value for negative/inf/NaN values of x */
-        return UINT32_MAX;
+        /* undefined return value for negative/overflow/inf/NaN values of x */
+        return 0;
     }
     return (uint32_t)f64_to_unsigned(val);
 }
@@ -126,9 +130,16 @@ int64_t _dtoll_c(long double x) {
     
     /* overflow || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_i64_max_exp) << Float64_exp_BC_shift)) {
-        /* undefined return value for inf/NaN values of x */
-        return x_sign ? INT64_MIN : INT64_MAX;
+        #if HANDLE_INT_MIN != 0
+            /* if the value truncates to INT64_MIN */
+            if (x_sign && val.bin == UINT64_C(0x43E0000000000000)) {
+                return INT64_MIN;
+            }
+        #endif
+        /* undefined return value for underflow/overflow/inf/NaN values of x */
+        return 0;
     }
+
     int64_t ret = (int64_t)f64_to_unsigned(val);
     ret = x_sign ? -ret : ret;
     return ret;
@@ -141,8 +152,14 @@ int32_t _dtol_c(long double x) {
     
     /* overflow || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_i32_max_exp) << Float64_exp_BC_shift)) {
-        /* undefined return value for inf/NaN values of x */
-        return x_sign ? INT32_MIN : INT32_MAX;
+        #if HANDLE_INT_MIN != 0
+            /* if the value truncates to INT32_MIN */
+            if (x_sign && val.bin <= UINT64_C(0x41E00000001FFFFF)) {
+                return INT32_MIN;
+            }
+        #endif
+        /* undefined return value for underflow/overflow/inf/NaN values of x */
+        return 0;
     }
     int32_t ret = (int32_t)f64_to_unsigned(val);
     ret = x_sign ? -ret : ret;

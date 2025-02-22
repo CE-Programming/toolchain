@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <math.h>
 #include <stdint.h>
 
@@ -36,7 +37,7 @@ static long double _frexpl_c_positive(long double x, int *expon) {
         /* isinf(x) || isnan(x) */
         if (x_exp == Float64_biased_inf_nan_exp) {
             // Unspecified exponent value for inf and NaN
-            *expon = FP_ILOGBNAN;
+            *expon = INT_MAX;
             return val.flt;
         }
         /* isnormal(x) */
