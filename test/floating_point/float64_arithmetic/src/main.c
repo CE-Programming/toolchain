@@ -90,8 +90,8 @@ long double sleef_xatan(long double s) {
 
     t = s + s * (t * u);
 
-    if ((q & 1) != 0) t = 1.570796326794896557998982L - t;
-    if ((q & 2) != 0) t = -t;
+    if ((q & 1) != 0) { t = 1.570796326794896557998982L - t; }
+    if ((q & 2) != 0) { t = -t; }
 
     return t;
 }

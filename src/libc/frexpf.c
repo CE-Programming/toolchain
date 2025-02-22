@@ -69,8 +69,9 @@ float _frexpf_c(float value, int *pExponent)
 
 #else
 
-#include <stdint.h>
+#include <limits.h>
 #include <math.h>
+#include <stdint.h>
 
 typedef union F32_pun {
     float flt;
@@ -97,7 +98,7 @@ float _frexpf_c(float x, int *expon) {
         case FP_INFINITE:
         case FP_NAN: {
             // Unspecified exponent value for inf and NaN
-            *expon = FP_ILOGBNAN;
+            *expon = INT_MAX;
             return val.flt;
         }
         case FP_ZERO: {

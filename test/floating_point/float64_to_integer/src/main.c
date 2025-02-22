@@ -75,14 +75,36 @@ size_t run_test(const char** failed_func) {
     return SIZE_MAX;
 }
 
+bool run_edge_cases(void) {
+    volatile long double i32_min_input = -0x1.00000001fffffp+31;
+    volatile int32_t i32_min_result = (int32_t)i32_min_input;
+    if (i32_min_result != INT32_MIN) {
+        printf("%08lX !=\nINT32_MIN (dtol)\n", i32_min_result);
+        return false;
+    }
+
+    volatile long double i64_min_input = -0x1.0p+63;
+    volatile int64_t i64_min_result = (int64_t)i64_min_input;
+    if (i64_min_result != INT64_MIN) {
+        printf("%016llX !=\nINT64_MIN (dtoll)\n", i64_min_result);
+        return false;
+    }
+    return true;
+}
+
 int main(void) {
     os_ClrHome();
-    const char* failed_func;
-    size_t fail_index = run_test(&failed_func);
-    if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
-    } else {
-        printf("Failed test: %zu %s", fail_index, failed_func);
+
+    bool passed_edge_cases = run_edge_cases();
+
+    if (passed_edge_cases) {
+        const char* failed_func;
+        size_t fail_index = run_test(&failed_func);
+        if (fail_index == SIZE_MAX) {
+            printf("All tests passed");
+        } else {
+            printf("Failed test: %zu %s", fail_index, failed_func);
+        }
     }
 
     while (!os_GetCSC());
