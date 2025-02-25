@@ -33,6 +33,7 @@ using ::strcmp;
 using ::strncmp;
 using ::strcasecmp;
 using ::strncasecmp;
+using ::strerror;
 } // namespace std
 
 #endif // _EZCXX_CSTRING

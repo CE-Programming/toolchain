@@ -104,6 +104,8 @@ int sprintf(char *__restrict buffer,
     const char *__restrict format, ...)
     __attribute__ ((format (__printf__, 2, 3)));
 
+void perror(const char* str);
+
 __END_DECLS
 
 #endif /* _STDIO_H */
