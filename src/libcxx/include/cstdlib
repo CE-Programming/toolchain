@@ -3,10 +3,9 @@
 #define _EZCXX_CSTDLIB
 
 #include <stdlib.h>
+#include <__abs_overloads>
 
 #pragma clang system_header
-
-#include <__abs_overloads>
 
 namespace std {
 using ::calloc;
@@ -48,6 +47,10 @@ using ::ldiv;
 using ::lldiv;
 inline constexpr ldiv_t div(long __x, long __y) { return ldiv(__x, __y); }
 inline constexpr lldiv_t div(long long __x, long long __y) { return lldiv(__x, __y); }
+#ifdef __SIZEOF_INT48__
+using ::i48div;
+inline i48div_t div(signed __int48 __x, signed __int48 __y) { return i48div(__x, __y); }
+#endif // __SIZEOF_INT48__
 
 } // namespace std
 
