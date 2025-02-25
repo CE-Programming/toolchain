@@ -1,0 +1,34 @@
+	assume	adl = 1
+
+	section	.text
+	weak	_clearerr
+
+; Bytes: 24
+; Cycles:
+;	argument <= 2:	12F+9R+6W+2	= 98 (in RAM)
+;	argument > 2:	25F+11R+9W+2	= 164 (in RAM
+_clearerr:
+	pop	de
+	ex	(sp), hl
+	push	de
+
+	ld	bc, 3		; stderr+1
+	or	a, a
+	sbc	hl, bc
+	ret	c
+
+	add	hl, bc
+	ld	c, (hl)		; The load isn't done earlier because HL may be less than 3,
+				; meaning a read from Flash, which is expensive
+
+	ld	hl, __file_streams
+	add	hl, bc
+	add	hl, bc
+	add	hl, bc
+
+	ld	c, (hl)
+	ld	(hl), bc
+
+	ret
+
+	extern	__file_streams
