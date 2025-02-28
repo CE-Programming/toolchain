@@ -45,6 +45,9 @@ static_assert(
     "FP_MACROS are wrong"
 );
 
+#define MACRO_TO_STR(x) #x
+#define NUM_TO_STR(x) MACRO_TO_STR(x)
+
 /**
  * Basic Testing: 13 (Covers all exponent values and the MSB of the mantissa)
  * Advanced Testing: 18 (Covers bugs that involve checking if the lower 48 bits are zero)
@@ -125,7 +128,7 @@ static test_result fpclassify_test(void) {
 
 int main(void) {
     os_ClrHome();
-    printf("Testing 2^%d inputs...", test_count);
+    printf("Testing 2^" NUM_TO_STR(test_count) " inputs");
     test_result ret = fpclassify_test();
     os_ClrHome();
     if (ret.passed) {

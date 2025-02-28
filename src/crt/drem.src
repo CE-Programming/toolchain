@@ -10,7 +10,7 @@ __drem:
 	ld	iy, 9
 	add	iy, sp
 	push	iy, bc, de, hl
-	call	_f64_drem
+	call	_f64_rem
 	pop	af, af, af, af, iy, af
 	ret
 
