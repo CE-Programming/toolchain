@@ -1,8 +1,11 @@
 	assume	adl=1
+
 	section	.text
 
-	public	_fmal
+	public	_fmal, __debug_fmal
+
 _fmal := _softfloat_mulAddF64
+__debug_fmal := _softfloat_mulAddF64
 	; flags handled by softfloat
 
 	extern	_softfloat_mulAddF64

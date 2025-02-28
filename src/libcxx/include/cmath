@@ -12,6 +12,15 @@ namespace std {
 using ::float_t;
 using ::double_t;
 
+using ::signbit;
+using ::isinf;
+using ::isnan;
+using ::isnormal;
+using ::isfinite;
+using ::iszero;
+using ::issubnormal;
+using ::fpclassify;
+
 using ::acos;
 using ::acosf;
 using ::acosl;

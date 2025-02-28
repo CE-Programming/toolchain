@@ -38,29 +38,12 @@ extern "C" {
 #define FP_NAN       0x3
 #define FP_NORMAL    0x4
 
-#if 0
-/* disabled until builtin is optimized */
-#define signbit(x)           __builtin_signbit(x)
-
-#else
-bool _signbitf(float x);
-bool _signbitl(long double x);
-#define signbit(x) ( \
-    sizeof((x)) == sizeof(float) ? _signbitf((x)) : \
-    sizeof((x)) == sizeof(long double) ? _signbitl((x)) : \
-    (x) < 0)
-
-#endif
-
 #define isgreater(x, y)      __builtin_isgreater(x, y)
 #define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
 #define isless(x, y)         __builtin_isless(x, y)
 #define islessequal(x, y)    __builtin_islessequal(x, y)
 #define islessgreater(x, y)  __builtin_islessgreater(x, y)
 #define isunordered(x, y)    __builtin_isunordered(x, y)
-
-typedef float float_t;
-typedef double double_t;
 
 int _isinff(float n);
 int _isnanf(float n);
@@ -78,6 +61,21 @@ int _iszerol(long double n);
 int _issubnormall(long double n);
 int _fpclassifyl(long double n);
 
+#if 0
+/* disabled until builtin is optimized */
+#define _signbitf(x) __builtin_signbit(x)
+#define _signbitl(x) __builtin_signbit(x)
+#else
+bool _signbitf(float x);
+bool _signbitl(long double x);
+#endif
+
+#ifndef __cplusplus
+
+#define signbit(x) ( \
+    sizeof((x)) == sizeof(float) ? _signbitf((x)) : \
+    sizeof((x)) == sizeof(long double) ? _signbitl((x)) : \
+    (x) < 0)
 #define isinf(x) ( \
     sizeof((x)) == sizeof(float) ? _isinff((x)) : \
     sizeof((x)) == sizeof(long double) ? _isinfl((x)) : \
@@ -106,6 +104,49 @@ int _fpclassifyl(long double n);
     sizeof((x)) == sizeof(float) ? _fpclassifyf((x)) : \
     sizeof((x)) == sizeof(long double) ? _fpclassifyl((x)) : \
     0)
+
+#else
+
+extern "C++" {
+
+inline bool signbit(float __x) { return _signbitf(__x); }
+inline bool signbit(double __x) { return _signbitf(__x); }
+inline bool signbit(long double __x) { return _signbitl(__x); }
+
+inline bool isinf(float __x) { return _isinff(__x); }
+inline bool isinf(double __x) { return _isinff(__x); }
+inline bool isinf(long double __x) { return _isinfl(__x); }
+
+inline bool isnan(float __x) { return _isnanf(__x); }
+inline bool isnan(double __x) { return _isnanf(__x); }
+inline bool isnan(long double __x) { return _isnanl(__x); }
+
+inline bool isnormal(float __x) { return _isnormalf(__x); }
+inline bool isnormal(double __x) { return _isnormalf(__x); }
+inline bool isnormal(long double __x) { return _isnormall(__x); }
+
+inline bool isfinite(float __x) { return _isfinitef(__x); }
+inline bool isfinite(double __x) { return _isfinitef(__x); }
+inline bool isfinite(long double __x) { return _isfinitel(__x); }
+
+inline bool iszero(float __x) { return _iszerof(__x); }
+inline bool iszero(double __x) { return _iszerof(__x); }
+inline bool iszero(long double __x) { return _iszerol(__x); }
+
+inline bool issubnormal(float __x) { return _issubnormalf(__x); }
+inline bool issubnormal(double __x) { return _issubnormalf(__x); }
+inline bool issubnormal(long double __x) { return _issubnormall(__x); }
+
+inline bool fpclassify(float __x) { return _fpclassifyf(__x); }
+inline bool fpclassify(double __x) { return _fpclassifyf(__x); }
+inline bool fpclassify(long double __x) { return _fpclassifyl(__x); }
+
+} /* extern "C++" */
+
+#endif
+
+typedef float float_t;
+typedef double double_t;
 
 double      acos(double);
 float       acosf(float);
@@ -352,26 +393,28 @@ long double truncl(long double);
 
 /* aliases */
 
-long double _debug_fabsl(long double x);
+long double _debug_fabsl(long double);
 #define fabsl _debug_fabsl
-long double _debug_copysignl(long double x, long double y);
+long double _debug_copysignl(long double, long double);
 #define copysignl _debug_copysignl
-long double _debug_fmaxl(long double x, long double y);
+long double _debug_fmaxl(long double, long double);
 #define fmaxl _debug_fmaxl
-long double _debug_fminl(long double x, long double y);
+long double _debug_fminl(long double, long double);
 #define fminl _debug_fminl
-long double _debug_truncl(long double x);
+long double _debug_truncl(long double);
 #define truncl _debug_truncl
-long double _debug_floorl(long double x);
+long double _debug_floorl(long double);
 #define floorl _debug_floorl
-long double _debug_ceill(long double x);
+long double _debug_ceill(long double);
 #define ceill _debug_ceill
-long double _debug_roundl(long double x);
+long double _debug_roundl(long double);
 #define roundl _debug_roundl
-long double _debug_nearbyintl(long double x);
+long double _debug_nearbyintl(long double);
 #define nearbyintl _debug_nearbyintl
-long double _debug_rintl(long double x);
+long double _debug_rintl(long double);
 #define rintl _debug_rintl
+long double _debug_fmal(long double, long double, long double);
+#define fmal _debug_fmal
 
 #ifdef __cplusplus
 }
