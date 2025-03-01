@@ -56,6 +56,19 @@ static_assert(
 /* fastest type that can handle 2^test_count */
 typedef uint24_t test_count_t;
 
+static const testb test_values[] = {
+    {/* UINT64_C(0x0000000000000000), */ UINT64_C(0x0000000000000000), true , false, false, false, false, true , FP_ZERO     },
+    {/* UINT64_C(0x0000000000000001), */ UINT64_C(0x000FFFFFFFFFFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
+    {/* UINT64_C(0x0010000000000000), */ UINT64_C(0x7FEFFFFFFFFFFFFF), true , false, false, true , false, false, FP_NORMAL   },
+    {/* UINT64_C(0x7FF0000000000000), */ UINT64_C(0x7FF0000000000000), false, true , false, false, false, false, FP_INFINITE },
+    {/* UINT64_C(0x7FF0000000000001), */ UINT64_C(0x7FFFFFFFFFFFFFFF), false, false, true , false, false, false, FP_NAN      },
+    {/* UINT64_C(0x8000000000000000), */ UINT64_C(0x8000000000000000), true , false, false, false, false, true , FP_ZERO     },
+    {/* UINT64_C(0x8000000000000001), */ UINT64_C(0x800FFFFFFFFFFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
+    {/* UINT64_C(0x8010000000000000), */ UINT64_C(0xFFEFFFFFFFFFFFFF), true , false, false, true , false, false, FP_NORMAL   },
+    {/* UINT64_C(0xFFF0000000000000), */ UINT64_C(0xFFF0000000000000), false, true , false, false, false, false, FP_INFINITE },
+    {/* UINT64_C(0xFFF0000000000001), */ UINT64_C(0xFFFFFFFFFFFFFFFF), false, false, true , false, false, false, FP_NAN      },
+};
+
 /**
  * @param test_count Performs 2^test_count tests
  */
@@ -63,18 +76,6 @@ static test_result fpclassify_test(void) {
 
     test_result ret;
     ret.passed = false;
-    testb test_values[] = {
-        {/* UINT64_C(0x0000000000000000), */ UINT64_C(0x0000000000000000), true , false, false, false, false, true , FP_ZERO     },
-        {/* UINT64_C(0x0000000000000001), */ UINT64_C(0x000FFFFFFFFFFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
-        {/* UINT64_C(0x0010000000000000), */ UINT64_C(0x7FEFFFFFFFFFFFFF), true , false, false, true , false, false, FP_NORMAL   },
-        {/* UINT64_C(0x7FF0000000000000), */ UINT64_C(0x7FF0000000000000), false, true , false, false, false, false, FP_INFINITE },
-        {/* UINT64_C(0x7FF0000000000001), */ UINT64_C(0x7FFFFFFFFFFFFFFF), false, false, true , false, false, false, FP_NAN      },
-        {/* UINT64_C(0x8000000000000000), */ UINT64_C(0x8000000000000000), true , false, false, false, false, true , FP_ZERO     },
-        {/* UINT64_C(0x8000000000000001), */ UINT64_C(0x800FFFFFFFFFFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
-        {/* UINT64_C(0x8010000000000000), */ UINT64_C(0xFFEFFFFFFFFFFFFF), true , false, false, true , false, false, FP_NORMAL   },
-        {/* UINT64_C(0xFFF0000000000000), */ UINT64_C(0xFFF0000000000000), false, true , false, false, false, false, FP_INFINITE },
-        {/* UINT64_C(0xFFF0000000000001), */ UINT64_C(0xFFFFFFFFFFFFFFFF), false, false, true , false, false, false, FP_NAN      },
-    };
     
     F64_pun x;
     x.bin = 0;

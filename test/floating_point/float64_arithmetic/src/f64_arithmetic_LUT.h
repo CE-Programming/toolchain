@@ -9,7 +9,7 @@ typedef uint64_t input_type;
 
 typedef uint64_t output_type;
 
-const input_type f64_arithmetic_LUT_input[32] = {
+static const input_type f64_arithmetic_LUT_input[32] = {
 /*    0 */ UINT64_C(0xC005946422F56498),
 /*    1 */ UINT64_C(0xC02119D138A066D8),
 /*    2 */ UINT64_C(0xC0223928AEA8EDEA),
@@ -44,7 +44,7 @@ const input_type f64_arithmetic_LUT_input[32] = {
 /*   31 */ UINT64_C(0x4013CAB3EE93FF84),
 };
 
-const output_type f64_arithmetic_LUT_output[32] = {
+static const output_type f64_arithmetic_LUT_output[32] = {
 /*    0 */ UINT64_C(0xBFE9552C9719A304),
 /*    1 */ UINT64_C(0xC0464E14333CED34),
 /*    2 */ UINT64_C(0xC048B5CBB092B529),

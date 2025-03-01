@@ -11,7 +11,7 @@ typedef uint32_t input_type;
 
 typedef int output_type;
 
-const input_type f32_ilogb_LUT_input[640] = {
+static const input_type f32_ilogb_LUT_input[640] = {
 /*    0 */ UINT32_C(0x00000000),
 /*    1 */ UINT32_C(0x00000001),
 /*    2 */ UINT32_C(0x00800000),
@@ -654,7 +654,7 @@ const input_type f32_ilogb_LUT_input[640] = {
 /*  639 */ UINT32_C(0x6D28B96D),
 };
 
-const output_type f32_ilogb_LUT_output[640] = {
+static const output_type f32_ilogb_LUT_output[640] = {
 /*    0 */ FP_ILOGB0,
 /*    1 */ -149,
 /*    2 */ -126,

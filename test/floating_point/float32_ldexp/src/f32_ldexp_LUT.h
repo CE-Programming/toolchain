@@ -9,7 +9,7 @@ typedef struct { uint32_t value; int expon; } input_type;
 
 typedef uint32_t output_type;
 
-const input_type f32_ldexp_LUT_input[640] = {
+static const input_type f32_ldexp_LUT_input[640] = {
 /*    0 */ {UINT32_C(0x00000000), 0},
 /*    1 */ {UINT32_C(0x00000001), 0},
 /*    2 */ {UINT32_C(0x00800000), 0},
@@ -652,7 +652,7 @@ const input_type f32_ldexp_LUT_input[640] = {
 /*  639 */ {UINT32_C(0x100DEF62), -126},
 };
 
-const output_type f32_ldexp_LUT_output[640] = {
+static const output_type f32_ldexp_LUT_output[640] = {
 /*    0 */ UINT32_C(0x00000000),
 /*    1 */ UINT32_C(0x00000001),
 /*    2 */ UINT32_C(0x00800000),

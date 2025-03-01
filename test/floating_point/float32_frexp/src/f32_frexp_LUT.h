@@ -11,7 +11,7 @@ typedef uint32_t input_type;
 
 typedef struct { uint32_t frac; int expon; } output_type;
 
-const input_type f32_frexp_LUT_input[640] = {
+static const input_type f32_frexp_LUT_input[640] = {
 /*    0 */ UINT32_C(0x00000000),
 /*    1 */ UINT32_C(0x00000001),
 /*    2 */ UINT32_C(0x00800000),
@@ -654,7 +654,7 @@ const input_type f32_frexp_LUT_input[640] = {
 /*  639 */ UINT32_C(0x71A3D246),
 };
 
-const output_type f32_frexp_LUT_output[640] = {
+static const output_type f32_frexp_LUT_output[640] = {
 /*    0 */ {UINT32_C(0x00000000), 0},
 /*    1 */ {UINT32_C(0x3F000000), -148},
 /*    2 */ {UINT32_C(0x3F000000), -125},

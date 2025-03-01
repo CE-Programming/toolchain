@@ -1,13 +1,13 @@
 #include <math.h>
 
-/**
- * @remarks This function has a bug. Because `fabsf(x) + 0.5f` uses
- * round-to-nearest ties-to-even, `roundf(0.4999999702f)` will
- * return 1.0f instead of 0.0f
- */
 float roundf(float x)
 {
-    return copysignf(truncf(fabsf(x) + .5f), x);
+    /**
+     * The below magic number allows the expression `fabsf(x) + 0.5f` to be
+     * calculated as round-to-zero instead of round-to-nearest.
+     * The magic number is nextafterf(0.5f, 0.0f) or 0x3EFFFFFF
+     */
+    return copysignf(truncf(fabsf(x) + 0.4999999701976776f), x);
 }
 
 double round(double) __attribute__((alias("roundf")));

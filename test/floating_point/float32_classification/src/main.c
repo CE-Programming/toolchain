@@ -56,6 +56,19 @@ static_assert(
 /* fastest type that can handle 2^test_count */
 typedef uint24_t test_count_t;
 
+static const testb test_values[] = {
+    {/* UINT32_C(0x00000000), */ UINT32_C(0x00000000), true , false, false, false, false, true , FP_ZERO     },
+    {/* UINT32_C(0x00000001), */ UINT32_C(0x007FFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
+    {/* UINT32_C(0x00800000), */ UINT32_C(0x7F7FFFFF), true , false, false, true , false, false, FP_NORMAL   },
+    {/* UINT32_C(0x7F800000), */ UINT32_C(0x7F800000), false, true , false, false, false, false, FP_INFINITE },
+    {/* UINT32_C(0x7F800001), */ UINT32_C(0x7FFFFFFF), false, false, true , false, false, false, FP_NAN      },
+    {/* UINT32_C(0x80000000), */ UINT32_C(0x80000000), true , false, false, false, false, true , FP_ZERO     },
+    {/* UINT32_C(0x80000001), */ UINT32_C(0x807FFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
+    {/* UINT32_C(0x80800000), */ UINT32_C(0xFF7FFFFF), true , false, false, true , false, false, FP_NORMAL   },
+    {/* UINT32_C(0xFF800000), */ UINT32_C(0xFF800000), false, true , false, false, false, false, FP_INFINITE },
+    {/* UINT32_C(0xFF800001), */ UINT32_C(0xFFFFFFFF), false, false, true , false, false, false, FP_NAN      },
+};
+
 /**
  * @param test_count Performs 2^test_count tests
  */
@@ -63,18 +76,6 @@ static test_result fpclassify_test(void) {
 
     test_result ret;
     ret.passed = false;
-    testb test_values[] = {
-        {/* UINT32_C(0x00000000), */ UINT32_C(0x00000000), true , false, false, false, false, true , FP_ZERO     },
-        {/* UINT32_C(0x00000001), */ UINT32_C(0x007FFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
-        {/* UINT32_C(0x00800000), */ UINT32_C(0x7F7FFFFF), true , false, false, true , false, false, FP_NORMAL   },
-        {/* UINT32_C(0x7F800000), */ UINT32_C(0x7F800000), false, true , false, false, false, false, FP_INFINITE },
-        {/* UINT32_C(0x7F800001), */ UINT32_C(0x7FFFFFFF), false, false, true , false, false, false, FP_NAN      },
-        {/* UINT32_C(0x80000000), */ UINT32_C(0x80000000), true , false, false, false, false, true , FP_ZERO     },
-        {/* UINT32_C(0x80000001), */ UINT32_C(0x807FFFFF), true , false, false, false, true , false, FP_SUBNORMAL},
-        {/* UINT32_C(0x80800000), */ UINT32_C(0xFF7FFFFF), true , false, false, true , false, false, FP_NORMAL   },
-        {/* UINT32_C(0xFF800000), */ UINT32_C(0xFF800000), false, true , false, false, false, false, FP_INFINITE },
-        {/* UINT32_C(0xFF800001), */ UINT32_C(0xFFFFFFFF), false, false, true , false, false, false, FP_NAN      },
-    };
     
     F32_pun x;
     x.bin = 0;
