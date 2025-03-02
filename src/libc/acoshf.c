@@ -6,8 +6,3 @@ float acoshf(float x)
 }
 
 double acosh(double) __attribute__((alias("acoshf")));
-
-long double acoshl(long double x)
-{
-    return logl(x + sqrtl(x * x - 1));
-}
