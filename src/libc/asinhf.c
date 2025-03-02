@@ -6,8 +6,3 @@ float asinhf(float x)
 }
 
 double asinh(double) __attribute__((alias("asinhf")));
-
-long double asinhl(long double x)
-{
-    return logl(x + sqrtl(x * x + 1));
-}
