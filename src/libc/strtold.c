@@ -1,12 +1,12 @@
 #if 1
 
 /************************************************************************/
-/*									*/
-/*			Copyright (C)1987-2008 by				*/
-/*		            Zilog, Inc.           			*/
-/*									*/
-/*		        San Jose, California     			*/
-/*									*/
+/*                                                                      */
+/*                      Copyright (C)1987-2008 by                       */
+/*                             Zilog, Inc.                              */
+/*                                                                      */
+/*                         San Jose, California                         */
+/*                                                                      */
 /************************************************************************/
 
 #include <stdbool.h>
@@ -29,12 +29,12 @@ typedef union F64_pun {
 * strtold - string to long double conversion
 *
 * Inputs:
-*	str - pointer to the character string
-*	endptr - pointer to pointer to char to
-*		 put address of first char past
-*		 the end of the string -- or NULL
+*       str - pointer to the character string
+*       endptr - pointer to pointer to char to
+*                put address of first char past
+*                the end of the string -- or NULL
 * Returns:
-*	the value of the number
+*       the value of the number
 *
 *************************************************/
 

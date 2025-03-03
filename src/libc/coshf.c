@@ -1,23 +1,23 @@
 /************************************************************************/
-/*									*/
-/*			Copyright (C)1987-2008 by				*/
-/*		            Zilog, Inc.           			*/
-/*									*/
-/*		        San Jose, California     			*/
-/*									*/
+/*                                                                      */
+/*                      Copyright (C)1987-2008 by                       */
+/*                             Zilog, Inc.                              */
+/*                                                                      */
+/*                         San Jose, California                         */
+/*                                                                      */
 /************************************************************************/
 /*
-	sinh(arg) returns the hyperbolic sine of its floating-
-	point argument.
+    sinh(arg) returns the hyperbolic sine of its floating-
+    point argument.
 
-	The exponential function is called for arguments
-	greater in magnitude than 0.5.
+    The exponential function is called for arguments
+    greater in magnitude than 0.5.
 
-	A series is used for arguments smaller in magnitude than 0.5.
-	The coefficients are #2029 from Hart & Cheney. (20.36D)
+    A series is used for arguments smaller in magnitude than 0.5.
+    The coefficients are #2029 from Hart & Cheney. (20.36D)
 
-	cosh(arg) is computed from the exponential function for
-	all arguments.
+    cosh(arg) is computed from the exponential function for
+    all arguments.
 */
 
 #include <math.h>
@@ -31,21 +31,21 @@
 #define q2  -0.173678953558234e+3
 
 float _coshf_c(float arg) {
-	float val;
+    float val;
 
-	if(arg < 0) {
-		arg = -arg;
-	}
+    if(arg < 0) {
+        arg = -arg;
+    }
 
-	val = expf(arg);
+    val = expf(arg);
 
-	if(arg > 21.) {
-		return val/2;
-	}
+    if(arg > 21.) {
+        return val/2;
+    }
 
-	val += expf(-arg);
-	val /= 2;
-	return val;
+    val += expf(-arg);
+    val /= 2;
+    return val;
 }
 
 double _cosh_c(double) __attribute__((alias("_coshf_c")));

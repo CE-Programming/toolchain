@@ -37,6 +37,8 @@ float nextupf(float x) {
     return arg_x.flt;
 }
 
+double nextup(double) __attribute__((alias("nextupf")));
+
 float nextdownf(float x) {
     F32_pun arg_x;
     arg_x.flt = x;
@@ -62,5 +64,4 @@ float nextdownf(float x) {
     return arg_x.flt;
 }
 
-double nextup(double) __attribute__((alias("nextupf")));
 double nextdown(double) __attribute__((alias("nextdownf")));

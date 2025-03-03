@@ -1,23 +1,23 @@
 /************************************************************************/
-/*									*/
-/*			Copyright (C)1987-2008 by				*/
-/*		            Zilog, Inc.           			*/
-/*									*/
-/*		        San Jose, California     			*/
-/*									*/
+/*                                                                      */
+/*                      Copyright (C)1987-2008 by                       */
+/*                             Zilog, Inc.                              */
+/*                                                                      */
+/*                         San Jose, California                         */
+/*                                                                      */
 /************************************************************************/
 /*
-	sinh(arg) returns the hyperbolic sine of its floating-
-	point argument.
+    sinh(arg) returns the hyperbolic sine of its floating-
+    point argument.
 
-	The exponential function is called for arguments
-	greater in magnitude than 0.5.
+    The exponential function is called for arguments
+    greater in magnitude than 0.5.
 
-	A series is used for arguments smaller in magnitude than 0.5.
-	The coefficients are #2029 from Hart & Cheney. (20.36D)
+    A series is used for arguments smaller in magnitude than 0.5.
+    The coefficients are #2029 from Hart & Cheney. (20.36D)
 
-	cosh(arg) is computed from the exponential function for
-	all arguments.
+    cosh(arg) is computed from the exponential function for
+    all arguments.
 */
 
 #include <math.h>
@@ -31,31 +31,31 @@
 #define q2  -0.173678953558234e+3
 
 float _sinhf_c(float arg) {
-	float temp, argsq;
-	register int sign;
+    float temp, argsq;
+    register int sign;
 
-	sign = 1;
-	if(arg < 0) {
-		arg = -arg;
-		sign = -1;
-	}
+    sign = 1;
+    if(arg < 0) {
+        arg = -arg;
+        sign = -1;
+    }
 
-	if(arg > 21.) {
-		temp = expf(arg)/2;
-		if (sign>0)
-			return(temp);
-		else
-			return(-temp);
-	}
+    if(arg > 21.) {
+        temp = expf(arg)/2;
+        if (sign>0)
+            return(temp);
+        else
+            return(-temp);
+    }
 
-	if(arg > 0.5) {
-		return(sign*(expf(arg) - expf(-arg))/2);
-	}
+    if(arg > 0.5) {
+        return(sign*(expf(arg) - expf(-arg))/2);
+    }
 
-	argsq = arg*arg;
-	temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0)*arg;
-	temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
-	return(sign*temp);
+    argsq = arg*arg;
+    temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0)*arg;
+    temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
+    return(sign*temp);
 }
 
 double _sinh_c(double, double *) __attribute__((alias("_sinhf_c")));
