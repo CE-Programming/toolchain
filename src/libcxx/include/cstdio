@@ -35,6 +35,7 @@ using ::vsprintf;
 using ::snprintf;
 using ::vsnprintf;
 using ::sprintf;
+using ::perror;
 } // namespace std
 
 #endif // _EZCXX_CSTDINT
