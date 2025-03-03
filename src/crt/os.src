@@ -42,5 +42,3 @@ __sshru_b   := 000254h
 __stoi      := 000260h
 	public	__stoiu
 __stoiu     := 000264h
-	public	__ultof
-__ultof     := 000280h
