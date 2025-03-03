@@ -7,12 +7,12 @@
 #if __cplusplus >= 201402L
 // # define __cpp_lib_chrono_udls                          201304L
 // # define __cpp_lib_complex_udls                         201309L
-// # define __cpp_lib_exchange_function                    201304L
+# define __cpp_lib_exchange_function                    201304L
 // # define __cpp_lib_generic_associative_lookup           201304L
 // # define __cpp_lib_integer_sequence                     201304L
-// # define __cpp_lib_integral_constant_callable           201304L
+# define __cpp_lib_integral_constant_callable           201304L
 // # define __cpp_lib_is_final                             201402L
-// # define __cpp_lib_is_null_pointer                      201309L
+# define __cpp_lib_is_null_pointer                      201309L
 // # define __cpp_lib_make_reverse_iterator                201402L
 // # define __cpp_lib_make_unique                          201304L
 // # define __cpp_lib_null_iterators                       201304L
@@ -33,11 +33,11 @@
 // # define __cpp_lib_any                                  201606L
 // # define __cpp_lib_apply                                201603L
 // # define __cpp_lib_array_constexpr                      201603L
-// # define __cpp_lib_as_const                             201510L
+# define __cpp_lib_as_const                             201510L
 // # define __cpp_lib_atomic_is_always_lock_free           201603L
-// # define __cpp_lib_bool_constant                        201505L
+# define __cpp_lib_bool_constant                        201505L
 // # define __cpp_lib_boyer_moore_searcher                 201603L
-// # define __cpp_lib_byte                                 201603L
+# define __cpp_lib_byte                                 201603L
 // # define __cpp_lib_chrono                               201611L
 // # define __cpp_lib_clamp                                201603L
 // # define __cpp_lib_enable_shared_from_this              201603L
@@ -53,7 +53,7 @@
 // # define __cpp_lib_is_invocable                         201703L
 // # define __cpp_lib_is_swappable                         201603L
 // # define __cpp_lib_launder                              201606L
-// # define __cpp_lib_logical_traits                       201510L
+# define __cpp_lib_logical_traits                       201510L
 // # define __cpp_lib_make_from_tuple                      201606L
 // # define __cpp_lib_map_try_emplace                      201411L
 // # define __cpp_lib_math_special_functions               201603L
@@ -77,7 +77,7 @@
 // # define __cpp_lib_uncaught_exceptions                  201411L
 // # define __cpp_lib_unordered_map_try_emplace            201411L
 // # define __cpp_lib_variant                              202102L
-// # define __cpp_lib_void_t                               201411L
+# define __cpp_lib_void_t                               201411L
 #endif // __cplusplus >= 201703L
 
 #if __cplusplus >= 202002L
@@ -93,7 +93,7 @@
 // # define __cpp_lib_atomic_wait                          201907L
 // # define __cpp_lib_barrier                              201907L
 // # define __cpp_lib_bind_front                           201907L
-// # define __cpp_lib_bit_cast                             201806L
+# define __cpp_lib_bit_cast                             201806L
 // # define __cpp_lib_bitops                               201907L
 // # define __cpp_lib_bounded_array_traits                 201902L
 // # define __cpp_lib_char8_t                              201907L
@@ -114,7 +114,7 @@
 // # if defined(__cpp_impl_destroying_delete) && __cpp_impl_destroying_delete >= 201806L
 // #  define __cpp_lib_destroying_delete                   201806L
 // # endif
-// # define __cpp_lib_endian                               201907L
+# define __cpp_lib_endian                               201907L
 // # define __cpp_lib_erase_if                             202002L
 // # undef  __cpp_lib_execution
 // # define __cpp_lib_execution                            201902L
@@ -131,7 +131,7 @@
 // # define __cpp_lib_jthread                              201911L
 // # define __cpp_lib_latch                                201907L
 // # define __cpp_lib_list_remove_return_type              201806L
-// # define __cpp_lib_math_constants                       201907L
+# define __cpp_lib_math_constants                       201907L
 // # define __cpp_lib_move_iterator_concept                202207L
 // # define __cpp_lib_polymorphic_allocator                201902L
 // # define __cpp_lib_ranges                               202110L
