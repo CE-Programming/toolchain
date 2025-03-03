@@ -1,10 +1,10 @@
 /************************************************************************/
-/*									*/
-/*			Copyright (C)1987-2008 by				*/
-/*		            Zilog, Inc.           			*/
-/*									*/
-/*		        San Jose, California     			*/
-/*									*/
+/*                                                                      */
+/*                      Copyright (C)1987-2008 by                       */
+/*                             Zilog, Inc.                              */
+/*                                                                      */
+/*                         San Jose, California                         */
+/*                                                                      */
 /************************************************************************/
 
 #include <stdbool.h>
@@ -24,18 +24,17 @@ typedef union F32_pun {
 
 /*************************************************
 *
-* strtod - string to double conversion
+* strtof - string to float conversion
 *
 * Inputs:
-*	str - pointer to the character string
-*	endptr - pointer to pointer to char to
-*		 put address of first char past
-*		 the end of the string -- or NULL
+*       str - pointer to the character string
+*       endptr - pointer to pointer to char to
+*                put address of first char past
+*                the end of the string -- or NULL
 * Returns:
-*	the value of the number
+*       the value of the number
 *
 *************************************************/
-
 /**
  * @remarks `*str >= '0' && *str <= '9'` is smaller than calls to `isdigit(*str)`
  * @todo Add support for INF INFINITY NAN NAN(...)

@@ -10,7 +10,7 @@
 
 #define N       8
 
-#define B0  1                 /* Bernoulli numbers */
+#define B0  1.0               /* Bernoulli numbers */
 #define B1  (-1.0 / 2.0)
 #define B2  ( 1.0 / 6.0)
 #define B4  (-1.0 / 30.0)
@@ -23,15 +23,27 @@
 
 float lgammaf(float x) { /* the natural logarithm of the Gamma function. */
     float v, w;
+    v = 1.0;
 
-    v = 1;
-    while (x < N) {  v *= x;  x++;  }
-    w = 1 / (x * x);
-    return ((((((((B16 / (16 * 15))  * w + (B14 / (14 * 13))) * w
-                + (B12 / (12 * 11))) * w + (B10 / (10 *  9))) * w
-                + (B8  / ( 8 *  7))) * w + (B6  / ( 6 *  5))) * w
-                + (B4  / ( 4 *  3))) * w + (B2  / ( 2 *  1))) / x
-                + 0.5 * M_LOG_2M_PI - log(v) - x + (x - 0.5) * log(x);
+    /**
+     * This loop will take forever to terminate if `x < -100.0f`, so we have a
+     * maximum iteration count to ensure that the loop will terminate in a
+     * reasonable amount of time. `v` should overflow when `x < -33.0f`
+     */
+    const int maximum_iter = 36 + N;
+    for (int iter = 0; iter < maximum_iter; iter++) {
+        if (x < (float)N) {
+            break;
+        }
+        v *= x;
+        x++;
+    }
+    w = 1.0 / (x * x);
+    return ((((((((B16 / (16.0 * 15.0))  * w + (B14 / (14.0 * 13.0))) * w
+                + (B12 / (12.0 * 11.0))) * w + (B10 / (10.0 *  9.0))) * w
+                + (B8  / ( 8.0 *  7.0))) * w + (B6  / ( 6.0 *  5.0))) * w
+                + (B4  / ( 4.0 *  3.0))) * w + (B2  / ( 2.0 *  1.0))) / x
+                + 0.5 * (float)M_LOG_2M_PI - logf(v) - x + (x - 0.5) * logf(x);
 }
 
 double lgamma(double) __attribute__((alias("lgammaf")));

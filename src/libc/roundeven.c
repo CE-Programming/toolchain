@@ -5,7 +5,7 @@ float roundevenf(float x)
     float i, f = modff(x, &i);
     if (!isgreaterequal(f, .5f)) return i;
     if (f == .5f) {
-        float half = ldexp(i, -1);
+        float half = ldexpf(i, -1);
         if (truncf(half) == half) return i;
     }
     return signbit(i) ? i - 1 : i + 1;

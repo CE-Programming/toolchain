@@ -11,19 +11,19 @@
 float tgammaf(float x) { /* Gamma function */
     if (x == 0.0) { /* Pole Error */
         errno = ERANGE;
-        return 1/x < 0 ? -HUGE_VAL : HUGE_VAL;
+        return signbit(x) ? -HUGE_VALF : HUGE_VALF;
     }
     if (x < 0) {
         int sign;
-	static float zero = 0.0;
+    static float zero = 0.0;
         float i, f;
         f = modff(-x, &i);
         if (f == 0.0) { /* Domain Error */
             errno = EDOM;
-            return zero/zero;
+            return zero/zero; /* probably better to return NAN here */
         }
         sign = (fmodf(i, 2.0) != 0.0) ? 1 : -1;
-        return sign * M_PI / (sinf(M_PI * f) * expf(lgammaf(1 - x)));
+        return (sign * M_PI) / (sinf(M_PI * f) * expf(lgammaf(1 - x)));
     }
     return expf(lgammaf(x));
 }
