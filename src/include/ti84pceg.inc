@@ -2282,7 +2282,7 @@ namespace ti?
 ?_fcmp                     := 0000274h
 ?_fdiv                     := 0000278h
 ?_ftol                     := 000027Ch
-?_ultof                    := 0000280h
+;?_ultof                    := 0000280h
 ?_ltof                     := 0000284h
 ?_fmul                     := 0000288h
 ?_fneg                     := 000028Ch
