@@ -14,48 +14,43 @@
 
 #include <errno.h>
 #include <math.h>
-#include "__float32_constants.h"
+#include "__float64_constants.h"
+
+#define p0 -0.240139179559211e2L
+#define p1  0.309572928215377e2L
+#define p2 -0.963769093368687e1L
+#define p3  0.421087371217980e0L
+#define q0 -0.120069589779605e2L
+#define q1  0.194809660700890e2L
+#define q2 -0.891110902798312e1L
 
 /**
- * @note These coefficients are for float64
- */
-#define p0 -0.240139179559211e2f
-#define p1  0.309572928215377e2f
-#define p2 -0.963769093368687e1f
-#define p3  0.421087371217980e0f
-#define q0 -0.120069589779605e2f
-#define q1  0.194809660700890e2f
-#define q2 -0.891110902798312e1f
- 
-/**
- * @remarks Minimum ulp:
- * ulp of +4 at +0x1.8ef9aap-1
+ * @remarks Minimum relative precision of:
+ * 2^-46.60 at +1.063981771e+00
  *
  * See the purple line for relative precision (lag warning):
  * https://www.desmos.com/calculator/gae4qofdtc
  */
-float _logf_c(float arg)
+long double logl(long double arg)
 {
-    float x, z, zsq, temp;
+    long double x, z, zsq, temp;
     int expon;
 
-    if (arg <= 0.0f) {
+    if (arg <= 0.0L) {
         errno = EDOM;
-        return -HUGE_VALF;
+        return -HUGE_VALL;
     }
-    x = frexpf(arg, & expon);
-    if ( x < F32_INV_SQRT2 ){
-        x *= 2.0f;
+    x = frexpl(arg, & expon);
+    if ( x < F64_INV_SQRT2 ){
+        x *= 2.0L;
         expon--;
     }
 
-    z = (x-1.0f) / (x+1.0f);
+    z = (x-1.0L) / (x+1.0L);
     zsq = z*z;
 
     temp = ((p3*zsq + p2)*zsq + p1)*zsq + p0;
     temp = temp / (((zsq + q2)*zsq + q1)*zsq + q0);
-    temp = temp * z + expon * F32_LN2;
+    temp = temp * z + expon * F64_LN2;
     return temp;
 }
-
-double _log_c(double) __attribute__((alias("_logf_c")));

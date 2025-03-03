@@ -11,8 +11,19 @@ _sqrt := _sqrtf
 
 else
 
+	public	__f32_fast_div4
+
 _sqrtf := __sqrtf_c
 _sqrt := __sqrt_c
+
+; float _f32_fast_div4(float x);
+; only works for normalized values
+; CC: 9F + 12R + 9W + 1 | 8 bytes
+__f32_fast_div4:
+	pop	bc, hl, de
+	dec	e	; subtracts 2 from the exponent
+	push	de, hl, bc
+	ret
 
 	extern	__sqrtf_c
 	extern	__sqrt_c
