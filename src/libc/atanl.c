@@ -14,40 +14,35 @@
  * coefficients are #5077 from Hart & Cheney. (19.56D)
  */
 #include <math.h>
-#include "__float32_constants.h"
+#include "__float64_constants.h"
 
-/**
- * @note These coefficients are for float64
- */
-#define p4 0.161536412982230e2f
-#define p3 0.268425481955040e3f
-#define p2 0.115302935154049e4f
-#define p1 0.178040631643320e4f
-#define p0 0.896785974036639e3f
-#define q4 0.589569705084446e2f
-#define q3 0.536265374031215e3f
-#define q2 0.166678381488163e4f
-#define q1 0.207933497444541e4f
-#define q0 0.896785974036639e3f
+#define p4 0.161536412982230e2L
+#define p3 0.268425481955040e3L
+#define p2 0.115302935154049e4L
+#define p1 0.178040631643320e4L
+#define p0 0.896785974036639e3L
+#define q4 0.589569705084446e2L
+#define q3 0.536265374031215e3L
+#define q2 0.166678381488163e4L
+#define q1 0.207933497444541e4L
+#define q0 0.896785974036639e3L
 
 /**
  * atan makes its argument positive and
  * calls the inner routine satan.
  *
- * @remarks Minimum ulp:
- * ulp of +4 at +0x1.a85846p-2
+ * @remarks Minimum relative precision of:
+ * 2^-46.95 at +2.438776493e+00
  */
-float _atanf_c(float arg) {
-    float satan(float);
+long double atanl(long double arg) {
+    long double f64_satan(long double);
 
     if (signbit(arg)) {
-        return (-satan(-arg));
+        return (-f64_satan(-arg));
     } else {
-        return (satan(arg));
+        return (f64_satan(arg));
     }
 }
-
-double _atan_c(double) __attribute__((alias("_atanf_c")));
 
 /**
  * atan2 discovers what quadrant the angle
@@ -59,9 +54,9 @@ double _atan_c(double) __attribute__((alias("_atanf_c")));
  * range [-0.414...,+0.414...].
  */
 
-static float xatan(float arg) {
-    float argsq;
-    float value;
+static long double f64_xatan(long double arg) {
+    long double argsq;
+    long double value;
 
     argsq = arg*arg;
     value = ((((p4*argsq + p3)*argsq + p2)*argsq + p1)*argsq + p0);
@@ -74,16 +69,16 @@ static float xatan(float arg) {
  * to the range [0,0.414...] and calls xatan.
  */
 
-float satan(float arg) {
-    if (arg < F32_SQRT2_MINUS_1) {
-        return (xatan(arg));
-    } else if (arg > F32_SQRT2_PLUS_1) {
-        if (arg > 0x1.0p+25f) {
+long double f64_satan(long double arg) {
+    if (arg < F64_SQRT2_MINUS_1) {
+        return f64_xatan(arg);
+    } else if (arg > F64_SQRT2_PLUS_1) {
+        if (arg > 0x1.0p+54L) {
             /* rounds to pi/2 */
-            return F32_PI2;
+            return F64_PI2;
         }
-        return (F32_PI2 - xatan(1.0f/arg));
+        return (F64_PI2 - f64_xatan(1.0L / arg));
     } else {
-        return (F32_PI4 + xatan((arg-1.0f)/(arg+1.0f)));
+        return (F64_PI4 + f64_xatan((arg - 1.0L) / (arg + 1.0L)));
     }
 }
