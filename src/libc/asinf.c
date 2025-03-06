@@ -7,31 +7,33 @@
 
 #include <errno.h>
 #include <math.h>
+#include <stdbool.h>
 
-#define pio2  1.57079632679490
-
+/**
+ * @remarks Minimum ulp:
+ * ulp of +8 at +0x1.ffe956p-1
+ */
 float _asinf_c(float arg) {
-    float sign, temp;
+    bool arg_sign;
+    float temp;
+    arg_sign = signbit(arg);
+    arg = fabsf(arg);
 
-    sign = 1.;
-    if(arg < 0) {
-        arg = -arg;
-        sign = -1.;
-    }
-
-    if(arg > 1.) {
+    if(arg > 1.0f) {
         errno = EDOM;
-        return(0.);
+        return 0.0f;
     }
 
-    temp = sqrtf(1. - arg*arg);
-    if(arg > 0.7) {
-        temp = pio2 - atanf(temp/arg);
+    temp = sqrtf(1.0f - arg*arg);
+    if(arg > 0.7f) {
+        temp = (float)M_PI_2 - atanf(temp/arg);
     } else {
         temp = atanf(arg/temp);
     }
-
-    return(sign*temp);
+    if (arg_sign) {
+        temp = -temp;
+    }
+    return temp;
 }
 
 double _asin_c(double) __attribute__((alias("_asinf_c")));

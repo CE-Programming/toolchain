@@ -22,40 +22,33 @@
 
 #include <math.h>
 
-#define p0  -0.630767364049772e+6
-#define p1  -0.899127202203951e+5
-#define p2  -0.289421135598956e+4
-#define p3  -0.263056321339750e+2
-#define q0  -0.630767364049772e+6
-#define q1  0.152151737879002e+5
-#define q2  -0.173678953558234e+3
+#define p0 -0.630767364049772e+6f
+#define p1 -0.899127202203951e+5f
+#define p2 -0.289421135598956e+4f
+#define p3 -0.263056321339750e+2f
+#define q0 -0.630767364049772e+6f
+#define q1  0.152151737879002e+5f
+#define q2 -0.173678953558234e+3f
 
+/**
+ * @remarks Minimum ulp:
+ * ulp of -3  at +0x1.eec25ap-9 with ideal expf (|x| < 21.0f)
+ * ulp of -18 at +0x1.0a049cp+4 with current expf (|x| < 21.0f)
+ */
 float _sinhf_c(float arg) {
-    float temp, argsq;
-    register int sign;
+    float temp, argsq, x;
+    x = fabsf(arg);
 
-    sign = 1;
-    if(arg < 0) {
-        arg = -arg;
-        sign = -1;
+    if (x > 21.0f) {
+        temp = expf(x) / 2.0f;
+    } else if (x > 0.5f) {
+        temp = (expf(x) - expf(-x)) / 2.0f;
+    } else {
+        argsq = x * x;
+        temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0) * x;
+        temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
     }
-
-    if(arg > 21.) {
-        temp = expf(arg)/2;
-        if (sign>0)
-            return(temp);
-        else
-            return(-temp);
-    }
-
-    if(arg > 0.5) {
-        return(sign*(expf(arg) - expf(-arg))/2);
-    }
-
-    argsq = arg*arg;
-    temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0)*arg;
-    temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
-    return(sign*temp);
+    return copysignf(temp, arg);
 }
 
 double _sinh_c(double, double *) __attribute__((alias("_sinhf_c")));
