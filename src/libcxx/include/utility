@@ -28,8 +28,10 @@ template<class _Tp> _EZCXX_INLINE constexpr conditional_t<!is_nothrow_move_const
                                                           is_copy_constructible_v<_Tp>, _Tp const&, _Tp&&>
 move_if_noexcept(_Tp& __value) noexcept { return move(__value); }
 
+#if __cplusplus > 201103L
 template<class _Tp> _EZCXX_INLINE constexpr std::add_const_t<_Tp>& as_const(_Tp& __value) noexcept { return __value; }
 template<class _Tp> _EZCXX_INLINE constexpr auto as_const(_Tp const&& __value) noexcept = delete;
+#endif // __cplusplus > 201103L
 
 } // namespace std
 

@@ -11,7 +11,7 @@
 // # define __cpp_lib_generic_associative_lookup           201304L
 // # define __cpp_lib_integer_sequence                     201304L
 # define __cpp_lib_integral_constant_callable           201304L
-// # define __cpp_lib_is_final                             201402L
+# define __cpp_lib_is_final                             201402L
 # define __cpp_lib_is_null_pointer                      201309L
 // # define __cpp_lib_make_reverse_iterator                201402L
 // # define __cpp_lib_make_unique                          201304L
@@ -135,7 +135,7 @@
 // # define __cpp_lib_move_iterator_concept                202207L
 // # define __cpp_lib_polymorphic_allocator                201902L
 // # define __cpp_lib_ranges                               202110L
-// # define __cpp_lib_remove_cvref                         201711L
+# define __cpp_lib_remove_cvref                         201711L
 // # define __cpp_lib_semaphore                            201907L
 // # undef  __cpp_lib_shared_ptr_arrays
 // # define __cpp_lib_shared_ptr_arrays                    201707L
@@ -151,7 +151,7 @@
 // # define __cpp_lib_three_way_comparison                 201907L
 // # define __cpp_lib_to_address                           201711L
 // # define __cpp_lib_to_array                             201907L
-// # define __cpp_lib_type_identity                        201806L
+# define __cpp_lib_type_identity                        201806L
 // # define __cpp_lib_unwrap_ref                           201811L
 #endif // __cplusplus >= 202002L
 

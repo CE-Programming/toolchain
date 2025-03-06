@@ -507,6 +507,41 @@ C((std::is_unsigned_v<  signed __int48> == false));
 C((std::is_unsigned_v<unsigned __int48> == true));
 C((std::is_unsigned_v<bool> == true));
 
+// test rank
+C((std::rank<int>{} == 0));
+C((std::rank<int[5]>{} == 1));
+C((std::rank<int[5][5]>{} == 2));
+C((std::rank<int[][5][5]>{} == 3));
+
+// test extent
+C((std::extent_v<int[3]> == 3));
+C((std::extent_v<int[3], 0> == 3));
+C((std::extent_v<int[3][4], 0> == 3));
+C((std::extent_v<int[3][4], 1> == 4));
+C((std::extent_v<int[3][4], 2> == 0));
+C((std::extent_v<int[]> == 0));
+
+// test remove_cvref
+C((std::is_same_v<std::remove_cvref_t<int>, int>));
+C((std::is_same_v<std::remove_cvref_t<int&>, int>));
+C((std::is_same_v<std::remove_cvref_t<int&&>, int>));
+C((std::is_same_v<std::remove_cvref_t<const int&>, int>));
+C((std::is_same_v<std::remove_cvref_t<const int[2]>, int[2]>));
+C((std::is_same_v<std::remove_cvref_t<const int(&)[2]>, int[2]>));
+C((std::is_same_v<std::remove_cvref_t<int(int)>, int(int)>));
+
+// test decay
+C(( std::is_same_v<std::decay_t<int       >, int        >));
+C((!std::is_same_v<std::decay_t<int       >, float      >));
+C(( std::is_same_v<std::decay_t<int&      >, int        >));
+C(( std::is_same_v<std::decay_t<int&&     >, int        >));
+C(( std::is_same_v<std::decay_t<const int&>, int        >));
+C(( std::is_same_v<std::decay_t<int[2]    >, int*       >));
+C((!std::is_same_v<std::decay_t<int[4][2] >, int*       >));
+C((!std::is_same_v<std::decay_t<int[4][2] >, int**      >));
+C(( std::is_same_v<std::decay_t<int[4][2] >, int(*)[2]  >));
+C(( std::is_same_v<std::decay_t<int(int)  >, int(*)(int)>));
+
 #undef C
 
 } // namespace
