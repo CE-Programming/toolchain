@@ -105,14 +105,12 @@ run_basic_prgm:
 run_asm_prgm:
 	inc	hl
 	ld	a,(hl)			; if 0, indicates a C program with retval
+	sbc	hl,hl
 	or	a,a
 	jr	nz,.not_c
-	sbc	hl,hl
 	ld	(stub.basic_c_smc - reloc.offset),hl
 .not_c:
-	push	de
-	pop	hl
-	ld	de,64
+	ld	l,64
 	add	hl,de
 	ld	de,(ti.asm_prgm_size)
 	sbc	hl,de
@@ -131,9 +129,7 @@ run_asm_prgm:
 	jp	launch_asm_prgm
 
 push_user_data:
-	pop	hl
-	ld	(.fakeret),hl
-	ld	iy,0			; exit() doesn't unwind stack so "safe"
+	ld	iy,3			; exit() doesn't unwind stack so "safe"
 	add	iy,sp
 	ld	hl,(iy + 12)		; callback
 	add	hl,de
@@ -150,43 +146,35 @@ push_user_data:
 	ld	(push_stub.data_size - reloc.offset),bc
 	ld	hl,(_exit.sp)
 	or	a,a
-	sbc	hl,bc
-	ld	de,(iy + 6)
-	di				; disable to prevent moving sp
+	sbc	hl,bc			; resets carry
 	push	hl
+	pop	de
 	dec	hl
 	dec	hl
 	dec	hl
 	ld	(_exit.sp),hl
-	pop	hl
-	ld	iy,ti.flags
-	ex	de,hl
-	push	hl
-	or	a,a
 	sbc	hl,hl
-	sbc	hl,bc
-	pop	hl
+	adc	hl,bc			; resets carry
+	ld	hl,(iy + 6)
+	pop	iy
+	di				; disable to prevent modifying moved stack data
 	jr	z,.done_move
-	push	hl
-	or	a,a
 	sbc	hl,de
-	pop	hl
 	jr	c,.lddr
+	add	hl,de
 	ldir
 	jr	.done_move
 .lddr:
-	add	hl,bc
-	dec	hl
 	ex	de,hl
 	add	hl,bc
 	dec	hl
 	ex	de,hl
+	add	hl,de
 	lddr
 .done_move:
 	ld	hl,(_exit.sp)
-	ld	de,0			; fake return
-.fakeret := $-3
-	ld	(hl),de
+	ld	(hl),iy			; fake return
+	ld	iy,ti.flags
 	or	a,a
 	sbc	hl,hl
 	jq	___exithl		; should return to caller
