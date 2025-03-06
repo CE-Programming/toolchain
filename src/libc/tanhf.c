@@ -16,20 +16,22 @@
 
 #include <math.h>
 
-float _tanhf_c(float arg)
-{
-    float sign;
+/**
+ * @remarks Minimum ulp:
+ * ulp of -2 at +0x1.e0000cp-11 with ideal sinhf and coshf
+ * ulp of -5 at +0x1.f921b4p-6  with current sinhf coshf and ideal expf
+ * ulp of -7 at +0x1.0c2064p-1  with current sinhf coshf and expf
+ */
+float _tanhf_c(float arg) {
+    float x = fabsf(arg);
 
-    sign = 1.;
-    if(arg < 0.){
-        arg = -arg;
-        sign = -1.;
+    if(x > 21.0f) {
+        x = 1.0f;
+    } else {
+        x = sinhf(x) / coshf(x);
     }
 
-    if(arg > 21.)
-        return(sign);
-
-    return(sign*sinhf(arg)/coshf(arg));
+    return copysignf(x, arg);
 }
 
 double _tanh_c(double) __attribute__((alias("_tanhf_c")));
