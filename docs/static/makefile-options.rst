@@ -194,6 +194,15 @@ Extra libload (``.lib``) libraries to be added at link time.
 
     EXTRA_LIBLOAD_LIBS = <space separated list of libraries>
 
+.. rubric:: SKIP_LIBRARY_LDFLAGS
+
+Completely omit the :code:`-library` flags passed to fasmg when linking.
+Default: :code:`NO`.
+
+.. code-block:: makefile
+
+    SKIP_LIBRARY_LDFLAGS = YES
+
 Extra command(s) to run when :code:`make clean` is executed.
 
 .. code-block:: makefile

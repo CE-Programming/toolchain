@@ -47,6 +47,7 @@ HAS_LIBCXX ?= YES
 ALLOCATOR ?= STANDARD
 PREFER_OS_CRT ?= NO
 PREFER_OS_LIBC ?= YES
+SKIP_LIBRARY_LDFLAGS ?= NO
 LIBLOAD_OPTIONAL ?=
 COMPRESSED_MODE ?= zx7
 COMMENT ?= $(shell cedev-config --comment)
@@ -169,6 +170,7 @@ LDFILES = $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
 DEPFILES = $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
 endif
 
+ifneq ($(SKIP_LIBRARY_LDFLAGS),YES)
 # find all required/optional libload libraries
 LIBLOAD_LIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib) $(EXTRA_LIBLOAD_LIBS)
 LIBLOAD_LIBS := $(filter-out %libload.lib,$(LIBLOAD_LIBS))
@@ -179,6 +181,8 @@ OPT_LIBLOAD := $(call FASMG_LIB,$(OPT_LIBLOAD))
 OPT_LIBLOAD := $(foreach lib,$(OPT_LIBLOAD),$(lib)$(space)optional)
 LDLIBS := $(subst $(space),$(comma)$(space),$(strip $(REQ_LIBLOAD)$(space)$(OPT_LIBLOAD)))
 LDLIBS := $(subst $(comma)$(space)optional,$(space)optional,$(LDLIBS))
+LDLIBRARYFLAGS := -i $(call QUOTE_ARG,library $(LDLIBS))
+endif
 
 # check if there is an icon present that to convert
 ifneq ($(ICONIMG),)
@@ -269,7 +273,7 @@ FASMGFLAGS = \
 	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
 	$(LDMAPFLAG) \
 	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
-	-i $(call QUOTE_ARG,library $(LDLIBS)) \
+	$(LDLIBRARYFLAGS) \
 	$(EXTRA_LDFLAGS)
 
 .PHONY: all clean version gfx debug
