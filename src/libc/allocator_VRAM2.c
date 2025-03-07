@@ -5,10 +5,11 @@
 #include <sys/lcd.h>
 #include <debug.h>
 
-// This allocator uses the 2nd part of the VRAM as the heap. It gives you 76K of memory,
+// This allocator uses the 2nd part of the VRAM as another area for heap allocations, providing 76KB more memory,
 // but requires you to only use the first part of the VRAM for the LCD configured in 8bpp.
 
-#define MALLOC_MINSIZE 6 // minimal size (avoid blocks that are too small)
+// minimal size (avoid blocks that are too small)
+#define MALLOC_MINSIZE 6
 
 static unsigned int freeslotpos(unsigned int n)
 {
@@ -100,9 +101,6 @@ void* _vram2_malloc(const size_t alloc_size)
 
     if (alloc_size == 0)
         return NULL;
-
-    if (alloc_size == 0xFFFFFF)
-        return (void*)((heap_ptrend - heap_ptr) + (heap2_ptrend - heap2_ptr));
 
     if (alloc_size <= sizeof(char6_t))
     {
@@ -330,8 +328,8 @@ void* _vram2_realloc(void* ptr, const size_t size)
     }
 
     if ((((size_t)ptr >= (size_t)&tab2[0]) && ((size_t)ptr < (size_t)&tab2[ALLOC2])) ||
-        (((size_t)ptr >= (size_t)&tab3[0]) && ((size_t)ptr < (size_t)&tab3[ALLOC2])) ||
-        (((size_t)ptr >= (size_t)&tab6[0]) && ((size_t)ptr < (size_t)&tab6[ALLOC2])))
+        (((size_t)ptr >= (size_t)&tab3[0]) && ((size_t)ptr < (size_t)&tab3[ALLOC3])) ||
+        (((size_t)ptr >= (size_t)&tab6[0]) && ((size_t)ptr < (size_t)&tab6[ALLOC6])))
     {
         // ok
     }
