@@ -33,13 +33,17 @@ _malloc := __simple_malloc
 _free := __simple_free
 _realloc := __simple_realloc
 
-end if
-
-if defined ALLOCATOR_STANDARD
+else if defined ALLOCATOR_STANDARD
 
 _malloc := __standard_malloc
 _free := __standard_free
 _realloc := __standard_realloc
+
+else if defined ALLOCATOR_VRAM2
+
+_malloc := __vram2_malloc
+_free := __vram2_free
+_realloc := __vram2_realloc
 
 end if
 
@@ -49,5 +53,8 @@ end if
 	extern  __standard_malloc
 	extern  __standard_free
 	extern  __standard_realloc
+	extern  __vram2_malloc
+	extern  __vram2_free
+	extern  __vram2_realloc
 	extern	__imulu
 	extern	_memset
