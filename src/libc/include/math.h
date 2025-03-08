@@ -27,7 +27,7 @@ extern "C" {
 #define M_2_SQRTPI    1.12837916709551257390     /* 2/sqrt(pi)     */
 #define M_SQRT2       1.41421356237309504880     /* sqrt(2)        */
 #define M_SQRT1_2     0.707106781186547524401    /* 1/sqrt(2)      */
-#define M_LOG_2M_PI   1.83787706640934548        /* log(2*M_PI)    */
+// /* deprecated */ #define M_LOG_2M_PI   1.83787706640934548        /* log(2*M_PI)    */
 
 #define FP_ILOGB0     (~__INT_MAX__)
 #define FP_ILOGBNAN     __INT_MAX__
