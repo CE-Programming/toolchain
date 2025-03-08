@@ -1,0 +1,61 @@
+#include <__config>
+#include <bit>
+#include <cassert>
+#include <cctype>
+#include <cerrno>
+#include <cfloat>
+#include <cinttypes>
+#include <ciso646>
+#include <climits>
+#include <cmath>
+#if __cplusplus >= 201907L
+#include <concepts>
+#endif // __cplusplus >= 201907L
+#include <csetjmp>
+#include <cstdalign>
+#include <cstdbool>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <ctgmath>
+#include <cxxabi.h>
+#include <exception>
+#include <initializer_list>
+#include <limits>
+#include <new>
+#include <numbers>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+#include <version>
+
+#include <alloca.h>
+#include <assert.h>
+#include <byteswap.h>
+#include <cdefs.h>
+#include <ctype.h>
+#include <errno.h>
+#include <fenv.h>
+#include <float.h>
+#include <inttypes.h>
+#include <iso646.h>
+#include <limits.h>
+#include <math.h>
+#include <setjmp.h>
+#include <stdalign.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdnoreturn.h>
+#include <string.h>
+#include <tgmath.h>
+#include <time.h>
+#include <wchar.h>
+
+// tests for conflicts

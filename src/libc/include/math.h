@@ -255,6 +255,10 @@ double      hypot(double, double);
 float       hypotf(float, float);
 long double hypotl(long double, long double);
 
+double      __hypot3(double, double, double);
+float       __hypot3f(float, float, float);
+long double __hypot3l(long double, long double, long double);
+
 int         ilogb(double);
 int         ilogbf(float);
 int         ilogbl(long double);

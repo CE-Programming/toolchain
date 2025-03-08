@@ -9,6 +9,7 @@
 
 #include <math.h>
 
+
 #define __tgmath_promote(x) _Generic((x), \
     float: ((float)0.f), \
     default: ((double)0.), \
@@ -301,12 +302,6 @@
     float: fmodf \
 )((x), (y))
 
-#define hypot(x, y) _Generic(__tgmath_promote(x) + __tgmath_promote(y), \
-    long double: hypotl, \
-    default: hypot, \
-    float: hypotf \
-)((x), (y))
-
 #define nextafter(x, y) _Generic(__tgmath_promote(x) + __tgmath_promote(y), \
     long double: nextafterl, \
     default: nextafter, \
@@ -368,6 +363,27 @@
     default: scalbn, \
     float: scalbnf \
 )((x), (y))
+
+/* hypot */
+
+#define __tgmath_hypot2(x, y) _Generic(__tgmath_promote(x) + __tgmath_promote(y), \
+    long double: hypotl, \
+    default: hypot, \
+    float: hypotf \
+)((x), (y))
+
+#define __tgmath_hypot3(x, y, z) _Generic(__tgmath_promote(x) + __tgmath_promote(y) + __tgmath_promote(z), \
+    long double: __hypot3l, \
+    default: __hypot3, \
+    float: __hypot3f \
+)((x), (y), (z))
+
+#define __tgmath_hypot2(x,y)2
+#define __tgmath_hypot3(x,y,z)3
+#define __tgmath_hypot_count(_1,_2,_3,count,...)count
+#define __tgmath_JOIN2(X,Y)X##Y
+#define __tgmath_CONCAT(X,Y)__tgmath_JOIN2(X,Y)
+#define hypot(...)__tgmath_CONCAT(__tgmath_hypot,__tgmath_hypot_count(__VA_ARGS__,3,2,))(__VA_ARGS__)
 
 #endif /* __cplusplus */
 
