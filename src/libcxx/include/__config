@@ -5,5 +5,7 @@
 #pragma clang system_header
 
 #define _EZCXX_INLINE [[__gnu__::__visibility__("hidden"), __gnu__::__always_inline__]] inline
+#define _EZCXX_NODISCARD [[nodiscard]]
+#define _EZCXX_NODISCARD_EXT [[nodiscard]]
 
 #endif // _EZCXX_CONFIG

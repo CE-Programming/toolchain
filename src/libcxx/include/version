@@ -1,4 +1,12 @@
 // -*- C++ -*-
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef _EZCXX_VERSION
 #define _EZCXX_VERSION
 
@@ -39,7 +47,7 @@
 // # define __cpp_lib_boyer_moore_searcher                 201603L
 # define __cpp_lib_byte                                 201603L
 // # define __cpp_lib_chrono                               201611L
-// # define __cpp_lib_clamp                                201603L
+# define __cpp_lib_clamp                                201603L
 // # define __cpp_lib_enable_shared_from_this              201603L
 // # define __cpp_lib_execution                            201603L
 // # define __cpp_lib_filesystem                           201703L
