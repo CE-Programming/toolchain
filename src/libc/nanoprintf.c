@@ -48,6 +48,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdlib.h> /* malloc */
 
 // Pick reasonable defaults if nothing's been configured.
 #if !defined(NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS) && \
@@ -640,6 +641,10 @@ static void npf_putc_std(int c, void *ctx) {
   outchar(c);
 }
 
+static void npf_fputc_std(int c, void *ctx) {
+  fputc(c, (FILE*)ctx);
+}
+
 typedef struct npf_cnt_putc_ctx {
   npf_putc pc;
   void *ctx;
@@ -978,10 +983,10 @@ int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
 #undef NPF_WRITEBACK
 
 int _printf_c(char const *format, ...) {
-  va_list val;
-  va_start(val, format);
-  int const rv = vprintf(format, val);
-  va_end(val);
+  va_list va;
+  va_start(va, format);
+  int const rv = vprintf(format, va);
+  va_end(va);
   return rv;
 }
 
@@ -1005,10 +1010,10 @@ int _vsnprintf_c(char *buffer, size_t bufsz, char const *format, va_list vlist) 
 }
 
 int _snprintf_c(char *buffer, size_t bufsz, const char *format, ...) {
-  va_list val;
-  va_start(val, format);
-  int const rv = vsnprintf(buffer, bufsz, format, val);
-  va_end(val);
+  va_list va;
+  va_start(va, format);
+  int const rv = vsnprintf(buffer, bufsz, format, va);
+  va_end(va);
   return rv;
 }
 
@@ -1027,6 +1032,49 @@ int _sprintf_c(char *buffer, const char *format, ...)
   va_list va;
   va_start(va, format);
   const int ret = vsnprintf(buffer, (size_t)INT_MAX, format, va);
+  va_end(va);
+  return ret;
+}
+
+int _vasprintf_c(char **__restrict p_str, const char *__restrict format, va_list vlist) {
+  *p_str = NULL;
+  int str_len = vsnprintf(NULL, 0, format, vlist);
+  if (str_len <= 0) {
+    return str_len;
+  }
+  size_t buf_len = (size_t)str_len + 1;
+  char* buf = (char*)malloc(buf_len);
+  if (buf == NULL) {
+    // malloc failure
+    return -1;
+  }
+  int ret = vsnprintf(buf, buf_len, format, vlist);
+  if (ret <= 0) {
+    free(buf);
+    return ret;
+  }
+  *p_str = buf;
+  return ret;
+}
+
+int _asprintf_c(char **__restrict p_str, const char *__restrict format, ...) {
+  va_list va;
+  va_start(va, format);
+  const int ret = vasprintf(p_str, format, va);
+  va_end(va);
+  return ret;
+}
+
+int _vfprintf_c(FILE* __restrict stream, const char* __restrict format, va_list vlist)
+{
+  return npf_vpprintf(npf_fputc_std, (void*)stream, format, vlist);
+}
+
+int _fprintf_c(FILE* __restrict stream, const char* __restrict format, ...)
+{
+  va_list va;
+  va_start(va, format);
+  const int ret = vfprintf(stream, format, va);
   va_end(va);
   return ret;
 }
