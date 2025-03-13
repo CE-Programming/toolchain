@@ -31,10 +31,14 @@ using ::putchar;
 using ::puts;
 using ::printf;
 using ::vprintf;
+using ::sprintf;
 using ::vsprintf;
 using ::snprintf;
 using ::vsnprintf;
-using ::sprintf;
+using ::fprintf;
+using ::vfprintf;
+using ::asprintf;
+using ::vasprintf;
 using ::perror;
 } // namespace std
 
