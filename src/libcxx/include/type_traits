@@ -79,68 +79,24 @@ template<class _Tp> using remove_volatile_t = typename remove_volatile<_Tp>::typ
 template<class _Tp> using remove_cv = remove_const<remove_volatile_t<_Tp>>;
 template<class _Tp> using remove_cv_t = typename remove_cv<_Tp>::type;
 
-// classification traits:
-template<class>     struct is_const            : false_type {};
-template<class _Tp> struct is_const<_Tp const> : true_type  {};
-template<class _Tp> inline constexpr bool is_const_v = is_const<_Tp>::value;
-
-template<class>     struct is_volatile               : false_type {};
-template<class _Tp> struct is_volatile<_Tp volatile> : true_type  {};
-template<class _Tp> inline constexpr bool is_volatile_v = is_volatile<_Tp>::value;
-
-template<class>     struct is_lvalue_reference       : false_type {};
-template<class _Tp> struct is_lvalue_reference<_Tp&> : true_type  {};
-template<class _Tp> inline constexpr bool is_lvalue_reference_v = is_lvalue_reference<_Tp>::value;
-
-template<class>     struct is_rvalue_reference        : false_type {};
-template<class _Tp> struct is_rvalue_reference<_Tp&&> : true_type  {};
-template<class _Tp> inline constexpr bool is_rvalue_reference_v = is_rvalue_reference<_Tp>::value;
-
-template<class _Tp> using is_reference = disjunction<is_lvalue_reference<_Tp>, is_rvalue_reference<_Tp>>;
-template<class _Tp> inline constexpr bool is_reference_v = is_reference<_Tp>::value;
-
-template<class _Tp>            struct __member_pointer             : false_type {};
-template<class _Tp, class _Cp> struct __member_pointer<_Tp _Cp::*> : true_type  {};
-template<class _Tp> using is_member_pointer = __member_pointer<remove_cv_t<_Tp>>;
-template<class _Tp> inline constexpr bool is_member_pointer_v = is_member_pointer<_Tp>::value;
-
 // primary type categories:
-template<class _Tp> using is_void = is_same<remove_cv_t<_Tp>, void>;
-template<class _Tp> inline constexpr bool is_void_v = is_void<_Tp>::value;
+#if __has_builtin(__is_void)
+template<class _Tp> inline constexpr bool is_void_v = __is_void(_Tp);
+template<class _Tp> using is_void = bool_constant<is_void_v<_Tp>>;
+#endif
 
 template<class _Tp> using is_null_pointer = is_same<remove_cv_t<_Tp>, nullptr_t>;
 template<class _Tp> inline constexpr bool is_null_pointer_v = is_null_pointer<_Tp>::value;
 
-template<class _Tp> struct __integral                     : false_type {};
-template<>          struct __integral<              bool> : true_type  {};
-template<>          struct __integral<              char> : true_type  {};
-template<>          struct __integral<  signed      char> : true_type  {};
-template<>          struct __integral<unsigned      char> : true_type  {};
-template<>          struct __integral<           wchar_t> : true_type  {};
-#if __cplusplus >= 202002L
-template<>          struct __integral<           char8_t> : true_type  {};
+#if __has_builtin(__is_integral)
+template<class _Tp> inline constexpr bool is_integral_v = __is_integral(_Tp);
+template<class _Tp> using is_integral = bool_constant<is_integral_v<_Tp>>;
 #endif
-template<>          struct __integral<          char16_t> : true_type  {};
-template<>          struct __integral<          char32_t> : true_type  {};
-template<>          struct __integral<  signed     short> : true_type  {};
-template<>          struct __integral<unsigned     short> : true_type  {};
-template<>          struct __integral<  signed       int> : true_type  {};
-template<>          struct __integral<unsigned       int> : true_type  {};
-template<>          struct __integral<  signed      long> : true_type  {};
-template<>          struct __integral<unsigned      long> : true_type  {};
-template<>          struct __integral<  signed   __int48> : true_type  {};
-template<>          struct __integral<unsigned   __int48> : true_type  {};
-template<>          struct __integral<  signed long long> : true_type  {};
-template<>          struct __integral<unsigned long long> : true_type  {};
-template<class _Tp> using is_integral = __integral<remove_cv_t<_Tp>>;
-template<class _Tp> inline constexpr bool is_integral_v = is_integral<_Tp>::value;
 
-template<class _Tp> struct __floating_point              : false_type {};
-template<>          struct __floating_point<      float> : true_type  {};
-template<>          struct __floating_point<     double> : true_type  {};
-template<>          struct __floating_point<long double> : true_type  {};
-template<class _Tp> using is_floating_point = __floating_point<remove_cv_t<_Tp>>;
-template<class _Tp> inline constexpr bool is_floating_point_v = is_floating_point<_Tp>::value;
+#if __has_builtin(__is_floating_point)
+template<class _Tp> inline constexpr bool is_floating_point_v = __is_floating_point(_Tp);
+template<class _Tp> using is_floating_point = bool_constant<is_floating_point_v<_Tp>>;
+#endif
 
 #if __has_builtin(__is_array)
 template<class _Tp> inline constexpr bool is_array_v = __is_array(_Tp);
@@ -162,50 +118,82 @@ template<class _Tp> inline constexpr bool is_class_v = __is_class(_Tp);
 template<class _Tp> using is_class = bool_constant<is_class_v<_Tp>>;
 #endif
 
-template<class _Tp> using is_function = negation<disjunction<is_const<_Tp const>, is_reference<_Tp>>>;
-template<class _Tp> inline constexpr bool is_function_v = is_function<_Tp>::value;
+#if __has_builtin(__is_function)
+template<class _Tp> inline constexpr bool is_function_v = __is_function(_Tp);
+template<class _Tp> using is_function = bool_constant<is_function_v<_Tp>>;
+#endif
 
-template<class>     struct is_pointer       : false_type {};
-template<class _Tp> struct is_pointer<_Tp*> : true_type  {};
-template<class _Tp> inline constexpr bool is_pointer_v = is_pointer<_Tp>::value;
+#if __has_builtin(__is_pointer)
+template<class _Tp> inline constexpr bool is_pointer_v = __is_pointer(_Tp);
+template<class _Tp> using is_pointer = bool_constant<is_pointer_v<_Tp>>;
+#endif
 
-template<class _Tp>            struct __member_function_pointer             : false_type       {};
-template<class _Tp, class _Cp> struct __member_function_pointer<_Tp _Cp::*> : is_function<_Tp> {};
-template<class _Tp> using is_member_function_pointer = __member_function_pointer<remove_cv_t<_Tp>>;
-template<class _Tp> inline constexpr bool is_member_function_pointer_v = is_member_function_pointer<_Tp>::value;
+#if __has_builtin(__is_lvalue_reference)
+template<class _Tp> inline constexpr bool is_lvalue_reference_v = __is_lvalue_reference(_Tp);
+template<class _Tp> using is_lvalue_reference = bool_constant<is_lvalue_reference_v<_Tp>>;
+#endif
 
-template<class _Tp>            struct __member_object_pointer             : false_type                 {};
-template<class _Tp, class _Cp> struct __member_object_pointer<_Tp _Cp::*> : negation<is_function<_Tp>> {};
-template<class _Tp> using is_member_object_pointer = __member_object_pointer<remove_cv_t<_Tp>>;
-template<class _Tp> inline constexpr bool is_member_object_pointer_v = is_member_object_pointer<_Tp>::value;
+#if __has_builtin(__is_rvalue_reference)
+template<class _Tp> inline constexpr bool is_rvalue_reference_v = __is_rvalue_reference(_Tp);
+template<class _Tp> using is_rvalue_reference = bool_constant<is_rvalue_reference_v<_Tp>>;
+#endif
+
+#if __has_builtin(__is_member_object_pointer)
+template<class _Tp> inline constexpr bool is_member_object_pointer_v = __is_member_object_pointer(_Tp);
+template<class _Tp> using is_member_object_pointer = bool_constant<is_member_object_pointer_v<_Tp>>;
+#endif
+
+#if __has_builtin(__is_member_function_pointer)
+template<class _Tp> inline constexpr bool is_member_function_pointer_v = __is_member_function_pointer(_Tp);
+template<class _Tp> using is_member_function_pointer = bool_constant<is_member_function_pointer_v<_Tp>>;
+#endif
 
 // composite type categories:
+#if __has_builtin(__is_fundamental)
+template<class _Tp> inline constexpr bool is_fundamental_v = __is_fundamental(_Tp);
+template<class _Tp> using is_fundamental = bool_constant<is_fundamental_v<_Tp>>;
+#endif
 
-template<class _Tp> using is_arithmetic = disjunction<is_integral<_Tp>, is_floating_point<_Tp>>;
-template<class _Tp> inline constexpr bool is_arithmetic_v = is_arithmetic<_Tp>::value;
+#if __has_builtin(__is_arithmetic)
+template<class _Tp> inline constexpr bool is_arithmetic_v = __is_arithmetic(_Tp);
+template<class _Tp> using is_arithmetic = bool_constant<is_arithmetic_v<_Tp>>;
+#endif
 
-template<class _Tp> using is_fundamental = disjunction<is_void<_Tp>, is_null_pointer<_Tp>, is_arithmetic<_Tp>>;
-template<class _Tp> inline constexpr bool is_fundamental_v = is_fundamental<_Tp>::value;
+#if __has_builtin(__is_scalar)
+template<class _Tp> inline constexpr bool is_scalar_v = __is_scalar(_Tp);
+template<class _Tp> using is_scalar = bool_constant<is_scalar_v<_Tp>>;
+#endif
 
-template <class _Tp> struct is_scalar : public integral_constant<bool,
-    is_arithmetic<_Tp>::value ||
-    is_member_pointer<_Tp>::value ||
-    is_pointer<_Tp>::value ||
-    is_null_pointer<_Tp>::value ||
-    is_enum<_Tp>::value
-> {};
-template <class _Tp> inline constexpr bool is_scalar_v = is_scalar<_Tp>::value;
+#if __has_builtin(__is_object)
+template<class _Tp> inline constexpr bool is_object_v = __is_object(_Tp);
+template<class _Tp> using is_object = bool_constant<is_object_v<_Tp>>;
+#endif
 
-template <class _Tp> struct is_object : integral_constant<bool,
-    is_scalar<_Tp>::value ||
-    is_array<_Tp>::value ||
-    is_union<_Tp>::value ||
-    is_class<_Tp>::value
-> {};
-template <class _Tp> inline constexpr bool is_object_v = is_object<_Tp>::value;
+#if __has_builtin(__is_compound)
+template<class _Tp> inline constexpr bool is_compound_v = __is_compound(_Tp);
+template<class _Tp> using is_compound = bool_constant<is_compound_v<_Tp>>;
+#endif
 
-template<class _Tp> struct is_compound : std::integral_constant<bool, !std::is_fundamental<_Tp>::value> {};
-template<class _Tp> inline constexpr bool is_compound_v = is_compound<_Tp>::value;
+#if __has_builtin(__is_reference)
+template<class _Tp> inline constexpr bool is_reference_v = __is_reference(_Tp);
+template<class _Tp> using is_reference = bool_constant<is_reference_v<_Tp>>;
+#endif
+
+#if __has_builtin(__is_member_pointer)
+template<class _Tp> inline constexpr bool is_member_pointer_v = __is_member_pointer(_Tp);
+template<class _Tp> using is_member_pointer = bool_constant<is_member_pointer_v<_Tp>>;
+#endif
+
+// type properties:
+#if __has_builtin(__is_const)
+template<class _Tp> inline constexpr bool is_const_v = __is_const(_Tp);
+template<class _Tp> using is_const = bool_constant<is_const_v<_Tp>>;
+#endif
+
+#if __has_builtin(__is_volatile)
+template<class _Tp> inline constexpr bool is_volatile_v = __is_volatile(_Tp);
+template<class _Tp> using is_volatile = bool_constant<is_volatile_v<_Tp>>;
+#endif
 
 #if __has_builtin(__is_trivial)
 template<class _Tp> inline constexpr bool is_trivial_v = __is_trivial(_Tp);
@@ -297,60 +285,60 @@ template<class _Tp> struct remove_reference<_Tp&>  : type_identity<_Tp> {};
 template<class _Tp> struct remove_reference<_Tp&&> : type_identity<_Tp> {};
 template<class _Tp> using remove_reference_t = typename remove_reference<_Tp>::type;
 
-template <class _Tp> using __remove_cvref_t = typename remove_cv<typename remove_reference<_Tp>::type>::type;
-template <class _Tp> struct remove_cvref { using type = __remove_cvref_t<_Tp>; };
-template <class _Tp> using remove_cvref_t = typename remove_cvref<_Tp>::type;
+template<class _Tp> using __remove_cvref_t = typename remove_cv<typename remove_reference<_Tp>::type>::type;
+template<class _Tp> struct remove_cvref { using type = __remove_cvref_t<_Tp>; };
+template<class _Tp> using remove_cvref_t = typename remove_cvref<_Tp>::type;
 
-template<class _Tp> auto __add_pointer(int) -> type_identity<_Tp*>;
-template<class _Tp> auto __add_pointer(...) -> type_identity<_Tp>;
-template<class _Tp> using add_pointer = decltype(__add_pointer<_Tp>(0));
+template<class _Tp> auto __ezcxx_add_pointer(int) -> type_identity<_Tp*>;
+template<class _Tp> auto __ezcxx_add_pointer(...) -> type_identity<_Tp>;
+template<class _Tp> using add_pointer = decltype(__ezcxx_add_pointer<_Tp>(0));
 template<class _Tp> using add_pointer_t = typename add_pointer<_Tp>::type;
 
-template<class _Tp> auto __add_lvalue_reference(int) -> type_identity<_Tp&>;
-template<class _Tp> auto __add_lvalue_reference(...) -> type_identity<_Tp>;
-template<class _Tp> using add_lvalue_reference = decltype(__add_lvalue_reference<_Tp>(0));
+template<class _Tp> auto __ezcxx_add_lvalue_reference(int) -> type_identity<_Tp&>;
+template<class _Tp> auto __ezcxx_add_lvalue_reference(...) -> type_identity<_Tp>;
+template<class _Tp> using add_lvalue_reference = decltype(__ezcxx_add_lvalue_reference<_Tp>(0));
 template<class _Tp> using add_lvalue_reference_t = typename add_lvalue_reference<_Tp>::type;
 
-template<class _Tp> auto __add_rvalue_reference(int) -> type_identity<_Tp&&>;
-template<class _Tp> auto __add_rvalue_reference(...) -> type_identity<_Tp>;
-template<class _Tp> using add_rvalue_reference = decltype(__add_rvalue_reference<_Tp>(0));
+template<class _Tp> auto __ezcxx_add_rvalue_reference(int) -> type_identity<_Tp&&>;
+template<class _Tp> auto __ezcxx_add_rvalue_reference(...) -> type_identity<_Tp>;
+template<class _Tp> using add_rvalue_reference = decltype(__ezcxx_add_rvalue_reference<_Tp>(0));
 template<class _Tp> using add_rvalue_reference_t = typename add_rvalue_reference<_Tp>::type;
 
 // alignment_of:
-template <class _Tp> struct alignment_of
+template<class _Tp> struct alignment_of
     : public integral_constant<size_t, alignof(_Tp)> {};
-template <class _Tp> inline constexpr size_t alignment_of_v = alignment_of<_Tp>::value;
+template<class _Tp> inline constexpr size_t alignment_of_v = alignment_of<_Tp>::value;
 
 // rank/extent:
-template <class _Tp> struct rank
+template<class _Tp> struct rank
     : public integral_constant<size_t, 0> {};
-template <class _Tp> struct rank<_Tp[]>
+template<class _Tp> struct rank<_Tp[]>
     : public integral_constant<size_t, rank<_Tp>::value + 1> {};
-template <class _Tp, size_t _Np> struct rank<_Tp[_Np]>
+template<class _Tp, size_t _Np> struct rank<_Tp[_Np]>
     : public integral_constant<size_t, rank<_Tp>::value + 1> {};
-template <class _Tp> inline constexpr size_t rank_v = rank<_Tp>::value;
+template<class _Tp> inline constexpr size_t rank_v = rank<_Tp>::value;
 
-template <class _Tp, unsigned _Ip = 0> struct extent
+template<class _Tp, unsigned _Ip = 0> struct extent
     : public integral_constant<size_t, 0> {};
-template <class _Tp> struct extent<_Tp[], 0>
+template<class _Tp> struct extent<_Tp[], 0>
     : public integral_constant<size_t, 0> {};
-template <class _Tp, unsigned _Ip> struct extent<_Tp[], _Ip>
+template<class _Tp, unsigned _Ip> struct extent<_Tp[], _Ip>
     : public integral_constant<size_t, extent<_Tp, _Ip-1>::value> {};
-template <class _Tp, size_t _Np> struct extent<_Tp[_Np], 0>
+template<class _Tp, size_t _Np> struct extent<_Tp[_Np], 0>
     : public integral_constant<size_t, _Np> {};
-template <class _Tp, size_t _Np, unsigned _Ip> struct extent<_Tp[_Np], _Ip>
+template<class _Tp, size_t _Np, unsigned _Ip> struct extent<_Tp[_Np], _Ip>
     : public integral_constant<size_t, extent<_Tp, _Ip-1>::value> {};
-template <class _Tp, unsigned _Ip = 0> inline constexpr size_t extent_v = extent<_Tp, _Ip>::value;
+template<class _Tp, unsigned _Ip = 0> inline constexpr size_t extent_v = extent<_Tp, _Ip>::value;
 
 template<class _Tp> struct remove_extent { typedef _Tp type; };
 template<class _Tp> struct remove_extent<_Tp[]> { typedef _Tp type; };
 template<class _Tp, size_t _Np> struct remove_extent<_Tp[_Np]> { typedef _Tp type; };
-template <class _Tp> using remove_extent_t = typename remove_extent<_Tp>::type;
+template<class _Tp> using remove_extent_t = typename remove_extent<_Tp>::type;
 
-template <class _Tp> struct remove_all_extents { typedef _Tp type; };
-template <class _Tp> struct remove_all_extents<_Tp[]> { typedef typename remove_all_extents<_Tp>::type type; };
-template <class _Tp, size_t _Np> struct remove_all_extents<_Tp[_Np]> { typedef typename remove_all_extents<_Tp>::type type; };
-template <class _Tp> using remove_all_extents_t = typename remove_all_extents<_Tp>::type;
+template<class _Tp> struct remove_all_extents { typedef _Tp type; };
+template<class _Tp> struct remove_all_extents<_Tp[]> { typedef typename remove_all_extents<_Tp>::type type; };
+template<class _Tp, size_t _Np> struct remove_all_extents<_Tp[_Np]> { typedef typename remove_all_extents<_Tp>::type type; };
+template<class _Tp> using remove_all_extents_t = typename remove_all_extents<_Tp>::type;
 
 // decay:
 template<class _Tp>
@@ -368,7 +356,7 @@ public:
         >::type
     >::type type;
 };
-template <class _Tp> using decay_t = typename decay<_Tp>::type;
+template<class _Tp> using decay_t = typename decay<_Tp>::type;
 
 // underlying_type:
 
@@ -467,6 +455,11 @@ template<class _Tp> using is_destructible = bool_constant<is_destructible_v<_Tp>
 #if __has_builtin(__is_trivially_destructible)
 template<class _Tp> inline constexpr bool is_trivially_destructible_v = __is_trivially_destructible(_Tp);
 template<class _Tp> using is_trivially_destructible = bool_constant<is_trivially_destructible_v<_Tp>>;
+#endif
+
+#if __has_builtin(__is_nothrow_destructible)
+template<class _Tp> inline constexpr bool is_nothrow_destructible_v = __is_nothrow_destructible(_Tp);
+template<class _Tp> using is_nothrow_destructible = bool_constant<is_nothrow_destructible_v<_Tp>>;
 #endif
 
 #if __has_builtin(__has_virtual_destructor)
