@@ -33,6 +33,8 @@ template<class _Tp> _EZCXX_INLINE constexpr std::add_const_t<_Tp>& as_const(_Tp&
 template<class _Tp> _EZCXX_INLINE constexpr auto as_const(_Tp const&& __value) noexcept = delete;
 #endif // __cplusplus > 201103L
 
+[[noreturn]] inline void unreachable() { __builtin_unreachable(); }
+
 } // namespace std
 
 #endif // _EZCXX_UTILITY

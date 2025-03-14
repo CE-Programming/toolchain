@@ -1,4 +1,5 @@
 #include <__config>
+#include <algorithm>
 #include <bit>
 #include <cassert>
 #include <cctype>

@@ -8,22 +8,48 @@
 
 namespace std {
 
-template <class _Tp, class _Up>
+template<class _Tp, class _Up>
 concept same_as = is_same<_Tp, _Up>::value && is_same<_Up, _Tp>::value;
 
-// arithmetic:
+template<class _From, class _To>
+concept convertible_to =
+    is_convertible_v<_From, _To> &&
+    requires { static_cast<_To>(std::declval<_From>()); };
 
-template <class _Tp>
+template <class _Dp, class _Bp>
+concept derived_from =
+    is_base_of_v<_Bp, _Dp> &&
+    is_convertible_v<const volatile _Dp*, const volatile _Bp*>;
+
+template<class _Tp>
+concept destructible = is_nothrow_destructible_v<_Tp>;
+
+template<class _Tp, class... _Args>
+concept constructible_from =
+    destructible<_Tp> && is_constructible_v<_Tp, _Args...>;
+
+template<class _Tp>
 concept integral = is_integral_v<_Tp>;
 
-template <class _Tp>
+template<class _Tp>
 concept signed_integral = integral<_Tp> && is_signed_v<_Tp>;
 
-template <class _Tp>
+template<class _Tp>
 concept unsigned_integral = integral<_Tp> && !signed_integral<_Tp>;
 
-template <class _Tp>
+template<class _Tp>
 concept floating_point = is_floating_point_v<_Tp>;
+
+template<class _Tp>
+concept move_constructible =
+    constructible_from<_Tp, _Tp> && std::convertible_to<_Tp, _Tp>;
+
+template<class _Tp>
+concept copy_constructible =
+    move_constructible<_Tp> &&
+    constructible_from<_Tp, _Tp&> && convertible_to<_Tp&, _Tp> &&
+    constructible_from<_Tp, const _Tp&> && convertible_to<const _Tp&, _Tp> &&
+    constructible_from<_Tp, const _Tp> && convertible_to<const _Tp, _Tp>;
 
 } // namespace std
 
