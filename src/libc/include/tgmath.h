@@ -9,7 +9,6 @@
 
 #include <math.h>
 
-
 #define __tgmath_promote(x) _Generic((x), \
     float: ((float)0.f), \
     default: ((double)0.), \
@@ -378,8 +377,6 @@
     float: __hypot3f \
 )((x), (y), (z))
 
-#define __tgmath_hypot2(x,y)2
-#define __tgmath_hypot3(x,y,z)3
 #define __tgmath_hypot_count(_1,_2,_3,count,...)count
 #define __tgmath_JOIN2(X,Y)X##Y
 #define __tgmath_CONCAT(X,Y)__tgmath_JOIN2(X,Y)

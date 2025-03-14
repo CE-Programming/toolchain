@@ -20,7 +20,7 @@ __isnormall:
 	ld	d, $40
 	; test for zero/subnormal
 	sbc	hl, de
-	jr	c, .exp_all_zero
+;	jr	c, .exp_all_zero
 
 .exp_all_ones:
 .exp_all_zero:

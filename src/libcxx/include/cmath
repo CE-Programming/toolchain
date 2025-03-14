@@ -239,7 +239,7 @@ template<typename _Tp, typename _Up> inline constexpr enable_if_t<is_integral_v<
 hypot(_Tp __x, _Up __y) { return hypot(__x, __y); }
 
 inline float hypot(float __x, float __y, float __z) { return __hypot3f(__x, __y, __z); }
-inline long double hypot(long double __x, long double __y, long double __z) { __hypot3l(__x, __y, __z); }
+inline long double hypot(long double __x, long double __y, long double __z) { return __hypot3l(__x, __y, __z); }
 template<typename _Tp, typename _Up, typename _Vp>
 inline enable_if_t<is_integral_v<_Tp> && is_integral_v<_Up> && is_integral_v<_Vp>, double>
 hypot(_Tp __x, _Up __y, _Vp __z) { return __hypot3(__x, __y, __z); }
