@@ -49,7 +49,7 @@ float _expf_c(float arg) {
     if ( arg == 0.0f){
         return 1.0f;
     }
-    if ( arg < -exp_min_arg ){
+    if ( arg < exp_min_arg ){
         return 0.0f;
     }
     if ( arg > exp_max_arg ){

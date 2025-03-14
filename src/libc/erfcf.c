@@ -6,7 +6,7 @@
  *
  * @remarks Minimum ulp:
  * ulp of +16     at +0x1.a13834p-1 with ideal expf (x < 1.0f)
- * ulp of +594482 at +0x1.251634p+3 with ideal expf (x >= 1.0f)
+ * ulp of +594482 at +0x1.251634p+3 with current expf (x >= 1.0f)
  */
 float erfcf(float x)
 {

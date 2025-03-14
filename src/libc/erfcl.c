@@ -7,7 +7,7 @@
  * @remarks Minimum ulp:
  * ulp of -516 at +2.373300261e+01 with ideal expl
  */
-long double _erfcl_c(long double arg) {
+long double erfcl(long double arg) {
     long double x, x_sqr;
     long double t0, t1, t2, t3, t4, t5;
     long double ret;

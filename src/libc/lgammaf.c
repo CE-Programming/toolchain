@@ -42,7 +42,7 @@ float lgammaf(float x) { /* the natural logarithm of the Gamma function. */
      */
     const int maximum_iter = 36 + N;
     for (int iter = 0; iter < maximum_iter; iter++) {
-        if (x < (float)N) {
+        if (!(x < (float)N)) {
             break;
         }
         v *= x;
@@ -53,7 +53,7 @@ float lgammaf(float x) { /* the natural logarithm of the Gamma function. */
                 + (B12 / (12.0f * 11.0f))) * w + (B10 / (10.0f *  9.0f))) * w
                 + (B8  / ( 8.0f *  7.0f))) * w + (B6  / ( 6.0f *  5.0f))) * w
                 + (B4  / ( 4.0f *  3.0f))) * w + (B2  / ( 2.0f *  1.0f))) / x
-                + ln_pi_div_2 - logf(v) - x + (x - 0.5f) * logf(x);
+                + ln_pi_div_2 - logf(fabsf(v)) - x + (x - 0.5f) * logf(fabsf(x));
 }
 
 double lgamma(double) __attribute__((alias("lgammaf")));

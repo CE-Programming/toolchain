@@ -29,7 +29,7 @@ float tgammaf(float x) { /* Gamma function */
             return zero/zero; /* probably better to return NAN here */
         }
         ret = (float)M_PI / (sinf((float)M_PI * f) * expf(lgammaf(1.0f - x)));
-        if (((unsigned int)i & 0x1) == 0) {
+        if (((unsigned char)i & 0x1) == 0) {
             ret = -ret;
         }
         return ret;
