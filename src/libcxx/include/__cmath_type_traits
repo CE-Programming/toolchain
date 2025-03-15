@@ -1,0 +1,35 @@
+// -*- C++ -*-
+#ifndef _EZCXX_MATH_TYPE_TRAITS
+#define _EZCXX_MATH_TYPE_TRAITS
+
+#include <__config>
+
+#pragma clang system_header
+
+template<class _Tp, _Tp __value> struct __cmath_integral_constant {
+    static const _Tp value = __value;
+    using value_type = _Tp;
+    using type = __cmath_integral_constant;
+    _EZCXX_INLINE constexpr operator value_type()   const noexcept { return value; }
+    _EZCXX_INLINE constexpr value_type operator()() const noexcept { return value; }
+};
+
+template<bool __value> using __cmath_bool_constant = __cmath_integral_constant<bool, __value>;
+using __cmath_false_type = __cmath_bool_constant<false>;
+using __cmath_true_type  = __cmath_bool_constant<true>;
+
+template<class _Tp> struct __cmath_type_identity { using type = _Tp; };
+template<class _Tp> using __cmath_type_identity_t = typename __cmath_type_identity<_Tp>::type;
+
+template<bool, class = void> struct __cmath_enable_if {};
+template<class _Tp> struct __cmath_enable_if<true, _Tp> : __cmath_type_identity<_Tp> {};
+template<bool _Ep, class _Tp = void> using __cmath_enable_if_t = typename __cmath_enable_if<_Ep, _Tp>::type;
+
+#if __has_builtin(__is_integral)
+template<class _Tp> inline constexpr bool __cmath_is_integral_v = __is_integral(_Tp);
+template<class _Tp> using __cmath_is_integral = __cmath_bool_constant<__cmath_is_integral_v<_Tp>>;
+#else
+#error "the __is_integral builtin is required"
+#endif
+
+#endif // _EZCXX_MATH_TYPE_TRAITS
