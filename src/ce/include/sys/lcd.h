@@ -75,12 +75,14 @@ extern "C" {
 
 /** Sets up the hardware cursor. */
 #define lcd_CrsrSetup() \
+do { \
   lcd_Timing2 = (uint32_t)(lcd_Timing2 & ~(uint32_t)0x03FF0000) | (uint32_t)(LCD_WIDTH - 1) << 16; \
   lcd_CrsrConfig = 0; \
   lcd_CrsrPalette0 = 0x00000000; \
   lcd_CrsrPalette1 = 0x00FFFFFF; \
   lcd_CrsrXY = 0; \
-  lcd_CrsrClip = 0;
+  lcd_CrsrClip = 0; \
+} while (0)
 
 /**
  * Hardware cursor sizes.
@@ -97,7 +99,9 @@ typedef enum {
  * @see lcd_cursor_size_t
  */
 #define lcd_CrsrSetSize(size) \
-  (lcd_CrsrConfig = ((lcd_CrsrConfig >> 1) << 1) | (size & 1))
+do { \
+  lcd_CrsrConfig = ((lcd_CrsrConfig >> 1) << 1) | (size & 1); \
+} while (0)
 
 /** 
  * Gets cursor size.
@@ -105,8 +109,7 @@ typedef enum {
  * @returns The cursor size.
  * @see lcd_cursor_size_t
  */
-#define lcd_CrsrGetSize() \
-  ((lcd_cursor_size_t)(lcd_CrsrConfig & 1))
+#define lcd_CrsrGetSize() ((lcd_cursor_size_t)(lcd_CrsrConfig & 1))
 
 /** 
  * Sets cursor image.
@@ -120,7 +123,9 @@ typedef enum {
  * to your image(s).
  */
 #define lcd_CrsrSetImage(data) \
-  (memcpy(lcd_CrsrImage, data, lcd_CrsrGetSize() == LCD_CURSOR_SIZE_LARGE ? lcd_CrsrImageLen64 : lcd_CrsrImageLen32))
+do { \
+  memcpy(lcd_CrsrImage, data, lcd_CrsrGetSize() == LCD_CURSOR_SIZE_LARGE ? lcd_CrsrImageLen64 : lcd_CrsrImageLen32); \
+} while (0)
 
 /** 
  * Sets the position of the cursor on screen.
@@ -129,20 +134,28 @@ typedef enum {
  * @param[in] y Y coordinate.
  */
 #define lcd_CrsrSetPosition(x, y) \
+do { \
   lcd_CrsrX = x; \
-  lcd_CrsrY = y;
+  lcd_CrsrY = y; \
+} while (0)
 
 /** Shows the cursor. */
 #define lcd_CrsrShow() \
-  lcd_CrsrCtrl = 1;
+do { \
+  lcd_CrsrCtrl = 1; \
+} while (0)
 
 /** Hides the cursor. */
 #define lcd_CrsrHide() \
-  lcd_CrsrCtrl = 0;
+do { \
+  lcd_CrsrCtrl = 0; \
+} while (0)
 
 #define lcd_CrsrCleanup() \
+do { \
   lcd_CrsrHide(); \
-  lcd_Timing2 = (uint32_t)(lcd_Timing2 & ~(uint32_t)0x03FF0000) | (uint32_t)(LCD_HEIGHT - 1) << 16;
+  lcd_Timing2 = (uint32_t)(lcd_Timing2 & ~(uint32_t)0x03FF0000) | (uint32_t)(LCD_HEIGHT - 1) << 16; \
+} while (0)
 
 #ifdef __cplusplus
 }
