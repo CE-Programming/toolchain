@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_cimagf, _cimag
+
+; float cimagf(float _Complex)
+_cimagf:
+_cimag:
+	ld	iy, 0
+	add	iy, sp
+	ld	sp, iy
+	ld	hl, (iy + 7)
+	ld	e, (iy + 10)
+	ret

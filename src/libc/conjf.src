@@ -1,0 +1,66 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_conjf, _conj
+
+; enable if fpneg is required
+if 1
+
+; float _Complex conjf(float _Complex) /* struct ABI */
+_conjf:
+_conj:
+	pop	iy, de
+	ld	hl, 7
+	add	hl, sp
+
+	; negate the complex part
+	ld	a, (hl)
+	or	a, a
+	jr	nz, .do_fpneg
+	; test if value is +0.0f
+	push	hl
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	bc, (hl)
+	sbc	hl, hl
+	sbc	hl, bc
+	pop	hl
+	jr	z, .skip_fpneg
+.do_fpneg:
+	xor	a, $80
+	ld	(hl), a
+.skip_fpneg:
+
+	ld	bc, 8	; sizeof(float _Complex)
+	sbc	hl, bc
+	inc	hl	; hl = sp + 0
+	push	de	; ZDS II sret
+	ldir
+	ex	de, hl
+	ex	(sp), hl ; ZDS II sret
+	jp	(iy)
+
+else
+
+; float _Complex conjf(float _Complex) /* struct ABI */
+_conjf:
+_conj:
+	pop	iy, de
+	ld	hl, 7
+	add	hl, sp
+	ld	a, (hl)
+	xor	a, $80	; negate imag-part
+	ld	(hl), a
+
+	ld	bc, 8	; sizeof(float _Complex)
+	sbc	hl, bc
+	inc	hl	; hl = sp + 0
+	push	de	; ZDS II sret
+	ldir
+	ex	de, hl
+	ex	(sp), hl ; ZDS II sret
+	jp	(iy)
+
+end if

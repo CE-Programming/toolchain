@@ -1,0 +1,12 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_crealf, _creal
+
+; float crealf(float _Complex)
+_crealf:
+_creal:
+	pop	bc, hl, de
+	push	de, hl, bc
+	ret

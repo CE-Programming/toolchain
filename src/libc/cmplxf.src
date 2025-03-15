@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_CMPLXF, _CMPLX
+
+; float _Complex CMPLXF(float x, float y) /* struct ABI */
+_CMPLXF:
+_CMPLX:
+	pop	iy, de
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	push	de	; ZDS II sret
+	ld	bc, 4	; sizeof(float _Complex)
+	ldir
+	; skip over the padding
+	inc	hl
+	inc	hl
+	ld	c, 4
+	ldir
+	ex	(sp), hl ; ZDS II sret
+	jp	(iy)

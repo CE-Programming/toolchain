@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_cimagl
+
+; long double cimagl(long double _Complex)
+_cimagl:
+	ld	iy, 0
+	add	iy, sp
+	ld	sp, iy
+	ld	hl, (iy + 11)
+	ld	de, (iy + 14)
+	ld	bc, (iy + 17)
+	ret

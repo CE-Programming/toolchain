@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_conjl
+
+; long double _Complex conjl(long double _Complex) /* struct ABI */
+_conjl:
+	pop	iy, de
+	ld	hl, 15
+	add	hl, sp
+	ld	a, (hl)
+	xor	a, $80	; negate imag-part
+	ld	(hl), a
+
+	ld	bc, 16	; sizeof(long double _Complex)
+	sbc	hl, bc
+	inc	hl	; hl = sp + 0
+	push	de	; ZDS II sret
+	ldir
+	ex	de, hl
+	ex	(sp), hl ; ZDS II sret
+	jp	(iy)

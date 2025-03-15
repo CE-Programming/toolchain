@@ -1,0 +1,21 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_CMPLXL
+
+; long double _Complex CMPLXL(long double x, long double y) /* struct ABI */
+_CMPLXL:
+	pop	iy, de
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	push	de	; ZDS II sret
+	ld	bc, 8	; sizeof(long double _Complex)
+	ldir
+	; skip over the padding
+	inc	hl
+	ld	c, 8
+	ldir
+	ex	(sp), hl ; ZDS II sret
+	jp	(iy)

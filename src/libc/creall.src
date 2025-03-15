@@ -1,0 +1,11 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_creall
+
+; long double creall(long double _Complex)
+_creall:
+	pop	iy, hl, de, bc
+	push	bc, de, hl
+	jp	(iy)
