@@ -71,6 +71,12 @@
     float: cosf \
 )(x)
 
+#define cospi(x) _Generic(__tgmath_promote(x), \
+    long double: cospil, \
+    default: cospi, \
+    float: cospif \
+)(x)
+
 #define cosh(x) _Generic(__tgmath_promote(x), \
     long double: coshl, \
     default: cosh, \
@@ -227,6 +233,12 @@
     float: sinf \
 )(x)
 
+#define sinpi(x) _Generic(__tgmath_promote(x), \
+    long double: sinpil, \
+    default: sinpi, \
+    float: sinpif \
+)(x)
+
 #define sinh(x) _Generic(__tgmath_promote(x), \
     long double: sinhl, \
     default: sinh, \
@@ -243,6 +255,12 @@
     long double: tanl, \
     default: tan, \
     float: tanf \
+)(x)
+
+#define tanpi(x) _Generic(__tgmath_promote(x), \
+    long double: tanpil, \
+    default: tanpi, \
+    float: tanpif \
 )(x)
 
 #define tanh(x) _Generic(__tgmath_promote(x), \
