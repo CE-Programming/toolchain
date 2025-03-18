@@ -110,6 +110,10 @@ double      cos(double);
 float       cosf(float);
 long double cosl(long double);
 
+double      cospi(double);
+float       cospif(float);
+long double cospil(long double);
+
 double      cosh(double);
 float       coshf(float);
 long double coshl(long double);
@@ -289,6 +293,10 @@ double      sin(double);
 float       sinf(float);
 long double sinl(long double);
 
+double      sinpi(double);
+float       sinpif(float);
+long double sinpil(long double);
+
 double      sinh(double);
 float       sinhf(float);
 long double sinhl(long double);
@@ -300,6 +308,10 @@ long double sqrtl(long double);
 double      tan(double);
 float       tanf(float);
 long double tanl(long double);
+
+double      tanpi(double);
+float       tanpif(float);
+long double tanpil(long double);
 
 double      tanh(double);
 float       tanhf(float);

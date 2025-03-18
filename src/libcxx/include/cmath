@@ -209,6 +209,15 @@ template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
 cos(_Tp __x) { return cos(__x); }
 
+using ::cospi;
+using ::cospif;
+using ::cospil;
+inline float cospi(float __x) { return cospif(__x); }
+inline long double cospi(long double __x) { return cospil(__x); }
+template<typename _Tp> inline
+__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
+cospi(_Tp __x) { return cospi(__x); }
+
 using ::cosh;
 using ::coshf;
 using ::coshl;
@@ -594,6 +603,15 @@ template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
 sin(_Tp __x) { return sin(__x); }
 
+using ::sinpi;
+using ::sinpif;
+using ::sinpil;
+inline float sinpi(float __x) { return sinpif(__x); }
+inline long double sinpi(long double __x) { return sinpil(__x); }
+template<typename _Tp> inline
+__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
+sinpi(_Tp __x) { return sinpi(__x); }
+
 using ::sinh;
 using ::sinhf;
 using ::sinhl;
@@ -620,6 +638,15 @@ inline constexpr long double tan(long double __x) { return tanl(__x); }
 template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
 tan(_Tp __x) { return tan(__x); }
+
+using ::tanpi;
+using ::tanpif;
+using ::tanpil;
+inline float tanpi(float __x) { return tanpif(__x); }
+inline long double tanpi(long double __x) { return tanpil(__x); }
+template<typename _Tp> inline
+__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
+tanpi(_Tp __x) { return tanpi(__x); }
 
 using ::tanh;
 using ::tanhf;
