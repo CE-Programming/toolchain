@@ -4,7 +4,7 @@
 
 	public	__isfinitel
 
-; int _isfinitel(long double)
+; bool _isfinitel(long double)
 __isfinitel:
 	ld	hl, 8
 	add	hl, sp
@@ -12,6 +12,6 @@ __isfinitel:
 	add	hl, hl	; clears signbit
 	ld	de, $2000	; (1 << (5 + 8))
 	add	hl, de	; attempts to overflow the exponent
-	sbc	hl, hl
-	inc	hl
+	sbc	a, a
+	inc	a
 	ret

@@ -136,7 +136,7 @@ int main(void) {
         printf("All tests passed");
     } else {
         printf(
-            "Failed test:\n0x%08lX\nTruth: %X_%d\nGuess: %X_%d",
+            "Failed test:\n0x%08lX\nTruth: %06X_%d\nGuess: %06X_%d",
             ret.failed_index, ret.guess, ret.guess_fp, ret.truth, ret.truth_fp
         );
     }

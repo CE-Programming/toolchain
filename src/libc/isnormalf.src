@@ -4,7 +4,7 @@
 	
 	public	__isnormalf
 	
-; int _isnormalf(float)
+; bool _isnormalf(float)
 __isnormalf:
 	ld	hl, 5
 	add	hl, sp
@@ -13,6 +13,5 @@ __isnormalf:
 	ld	a, h
 	dec	a
 	cp	a, $FE	; tests for zero/denormal/inf/NaN exponents
-	sbc	hl, hl	; -1 if normal, 0 otherwise
+	sbc	a, a	; -1 if normal, 0 otherwise
 	ret
-
