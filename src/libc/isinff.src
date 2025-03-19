@@ -1,19 +1,20 @@
 	assume	adl=1
 
 	section	.text
+
 	public	__isinff
+
+; bool _isinff(float)
 __isinff:
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy+3)
-	adc	hl,hl
-	jr	nz,.finite
-	ld	a,(iy+6)
+	xor	a, a
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy+3)
+	adc	hl, hl
+	ret	nz	; finite or NaN
+	; HL is zero
+	ld	a, (iy+6)
 	rla
-	inc	a
-	inc	hl
-	ret	z
-.finite:
-	or	a,a
-	sbc	hl,hl
+	add	a, 1	; attempt to overflow the exponent
+	sbc	a, a
 	ret

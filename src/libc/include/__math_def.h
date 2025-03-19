@@ -43,17 +43,17 @@ extern "C" {
 int _fpclassifyf(float n);
 int _fpclassifyl(long double n);
 
-int _isinff(float n);
-int _isnanf(float n);
-int _isnormalf(float n);
-int _isfinitef(float n);
-int _iszerof(float n);
-int _issubnormalf(float n);
+bool _isinff(float n);
+bool _isnanf(float n);
+bool _isnormalf(float n);
+bool _isfinitef(float n);
+bool _iszerof(float n);
+bool _issubnormalf(float n);
 
 int _isinfl(long double n);
 int _isnanl(long double n);
-int _isnormall(long double n);
-int _isfinitel(long double n);
+bool _isnormall(long double n);
+bool _isfinitel(long double n);
 int _iszerol(long double n);
 int _issubnormall(long double n);
 
