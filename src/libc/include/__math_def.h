@@ -1,6 +1,7 @@
 #ifndef _MATH_DEF_H
 #define _MATH_DEF_H
 
+#include <cdefs.h>
 #include <stdbool.h>
 
 #define NAN          __builtin_nanf("")
@@ -40,30 +41,30 @@ typedef double double_t;
 extern "C" {
 #endif
 
-int _fpclassifyf(float n);
-int _fpclassifyl(long double n);
+int _fpclassifyf(float) __NOEXCEPT_CONST;
+int _fpclassifyl(long double) __NOEXCEPT_CONST;
 
-bool _isinff(float n);
-bool _isnanf(float n);
-bool _isnormalf(float n);
-bool _isfinitef(float n);
-bool _iszerof(float n);
-bool _issubnormalf(float n);
+bool _isinff(float) __NOEXCEPT_CONST;
+bool _isnanf(float) __NOEXCEPT_CONST;
+bool _isnormalf(float) __NOEXCEPT_CONST;
+bool _isfinitef(float) __NOEXCEPT_CONST;
+bool _iszerof(float) __NOEXCEPT_CONST;
+bool _issubnormalf(float) __NOEXCEPT_CONST;
 
-int _isinfl(long double n);
-int _isnanl(long double n);
-bool _isnormall(long double n);
-bool _isfinitel(long double n);
-int _iszerol(long double n);
-int _issubnormall(long double n);
+int _isinfl(long double) __NOEXCEPT_CONST;
+int _isnanl(long double) __NOEXCEPT_CONST;
+bool _isnormall(long double) __NOEXCEPT_CONST;
+bool _isfinitel(long double) __NOEXCEPT_CONST;
+int _iszerol(long double) __NOEXCEPT_CONST;
+int _issubnormall(long double) __NOEXCEPT_CONST;
 
 #if 0
 /* disabled until builtin is optimized */
 #define _signbitf(x) __builtin_signbit(x)
 #define _signbitl(x) __builtin_signbit(x)
 #else
-bool _signbitf(float x);
-bool _signbitl(long double x);
+bool _signbitf(float) __NOEXCEPT_CONST;
+bool _signbitl(long double) __NOEXCEPT_CONST;
 #endif
 
 double      acos(double);
@@ -327,9 +328,9 @@ long double truncl(long double);
 
 /* aliases */
 
-long double _debug_fabsl(long double);
+long double _debug_fabsl(long double) __NOEXCEPT_CONST;
 #define fabsl _debug_fabsl
-long double _debug_copysignl(long double, long double);
+long double _debug_copysignl(long double, long double) __NOEXCEPT_CONST;
 #define copysignl _debug_copysignl
 long double _debug_fmaxl(long double, long double);
 #define fmaxl _debug_fmaxl

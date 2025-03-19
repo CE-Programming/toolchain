@@ -18,7 +18,7 @@ long labs(long n);
 long long llabs(long long n);
 
 #ifdef __SIZEOF_INT48__
-signed __int48 i48abs(signed __int48 n);
+signed __int48 i48abs(signed __int48 n) __NOEXCEPT_CONST;
 #endif // __SIZEOF_INT48__
 
 __END_DECLS

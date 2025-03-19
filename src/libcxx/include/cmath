@@ -12,38 +12,113 @@ namespace std {
 using ::float_t;
 using ::double_t;
 
-inline bool signbit(float __x) { return static_cast<bool>(_signbitf(__x)); }
-inline bool signbit(double __x) { return static_cast<bool>(_signbitf(__x)); }
-inline bool signbit(long double __x) { return static_cast<bool>(_signbitl(__x)); }
-template<typename _Tp> inline
+inline constexpr bool signbit(float __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_signbitf(__x);
+	}
+	return static_cast<bool>(_signbitf(__x));
+}
+inline constexpr bool signbit(double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_signbit(__x);
+	}
+	return static_cast<bool>(_signbitf(__x));
+}
+inline constexpr bool signbit(long double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_signbitl(__x);
+	}
+	return static_cast<bool>(_signbitl(__x));
+}
+template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
 signbit(_Tp __x) { return signbit(__x); }
 
-inline bool isinf(float __x) { return static_cast<bool>(_isinff(__x)); }
-inline bool isinf(double __x) { return static_cast<bool>(_isinff(__x)); }
-inline bool isinf(long double __x) { return static_cast<bool>(_isinfl(__x)); }
-template<typename _Tp> inline
+inline constexpr bool isinf(float __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isinf(__x);
+	}
+	return static_cast<bool>(_isinff(__x));
+}
+inline constexpr bool isinf(double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isinf(__x);
+	}
+	return static_cast<bool>(_isinff(__x));
+}
+inline constexpr bool isinf(long double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isinf(__x);
+	}
+	return static_cast<bool>(_isinfl(__x));
+}
+template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
 isinf(_Tp __x) { return isinf(__x); }
 
-inline bool isnan(float __x) { return static_cast<bool>(_isnanf(__x)); }
-inline bool isnan(double __x) { return static_cast<bool>(_isnanf(__x)); }
-inline bool isnan(long double __x) { return static_cast<bool>(_isnanl(__x)); }
-template<typename _Tp> inline
+inline constexpr bool isnan(float __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isnan(__x);
+	}
+	return static_cast<bool>(_isnanf(__x));
+}
+inline constexpr bool isnan(double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isnan(__x);
+	}
+	return static_cast<bool>(_isnanf(__x));
+}
+inline constexpr bool isnan(long double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isnan(__x);
+	}
+	return static_cast<bool>(_isnanl(__x));
+}
+template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
 isnan(_Tp __x) { return isnan(__x); }
 
-inline bool isnormal(float __x) { return static_cast<bool>(_isnormalf(__x)); }
-inline bool isnormal(double __x) { return static_cast<bool>(_isnormalf(__x)); }
-inline bool isnormal(long double __x) { return static_cast<bool>(_isnormall(__x)); }
-template<typename _Tp> inline
+inline constexpr bool isnormal(float __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isnormal(__x);
+	}
+	return static_cast<bool>(_isnormalf(__x));
+}
+inline constexpr bool isnormal(double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isnormal(__x);
+	}
+	return static_cast<bool>(_isnormalf(__x));
+}
+inline constexpr bool isnormal(long double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isnormal(__x);
+	}
+	return static_cast<bool>(_isnormall(__x));
+}
+template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
 isnormal(_Tp __x) { return isnormal(__x); }
 
-inline bool isfinite(float __x) { return static_cast<bool>(_isfinitef(__x)); }
-inline bool isfinite(double __x) { return static_cast<bool>(_isfinitef(__x)); }
-inline bool isfinite(long double __x) { return static_cast<bool>(_isfinitel(__x)); }
-template<typename _Tp> inline
+inline constexpr bool isfinite(float __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isfinite(__x);
+	}
+	return static_cast<bool>(_isfinitef(__x));
+}
+inline constexpr bool isfinite(double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isfinite(__x);
+	}
+	return static_cast<bool>(_isfinitef(__x));
+}
+inline constexpr bool isfinite(long double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_isfinite(__x);
+	}
+	return static_cast<bool>(_isfinitel(__x));
+}
+template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
 isfinite(_Tp __x) { return isfinite(__x); }
 
@@ -61,10 +136,28 @@ template<typename _Tp> inline
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
 issubnormal(_Tp __x) { return issubnormal(__x); }
 
-inline int fpclassify(float __x) { return _fpclassifyf(__x); }
-inline int fpclassify(double __x) { return _fpclassifyf(__x); }
-inline int fpclassify(long double __x) { return _fpclassifyl(__x); }
-template<typename _Tp> inline
+inline constexpr int fpclassify(float __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
+	} else {
+		return _fpclassifyf(__x);
+	}
+}
+inline constexpr int fpclassify(double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
+	} else {
+		return _fpclassifyf(__x);
+	}
+}
+inline constexpr int fpclassify(long double __x) {
+	if (__builtin_constant_p(__x)) {
+		return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
+	} else {
+		return _fpclassifyl(__x);
+	}
+}
+template<typename _Tp> inline constexpr
 __cmath_enable_if_t<__cmath_is_integral_v<_Tp>, int>
 fpclassify(_Tp __x) { return fpclassify(__x); }
 
