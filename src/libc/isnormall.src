@@ -4,7 +4,7 @@
 	
 	public	__isnormall
 
-; int _isnormall(long double)
+; bool _isnormall(long double)
 __isnormall:
 	; load upper 24bits
 	ld	hl, 8	
@@ -24,6 +24,6 @@ __isnormall:
 
 .exp_all_ones:
 .exp_all_zero:
-	sbc	hl, hl
-	inc	hl
+	sbc	a, a
+	inc	a
 	ret

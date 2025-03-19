@@ -4,16 +4,16 @@
 
 	public	__issubnormalf
 
-; int _issubnormalf(float)
+; bool _issubnormalf(float)
 __issubnormalf:
-	pop	bc, hl, de
-	push	de, hl, bc
-	or	a, a
+	xor	a, a
+	pop	bc, hl
 	adc	hl, hl
-	ret z	; zero mantissa is not subnormal
-	ld	a, e
-	adc	a, a
-	ret z	; zero exponent is subnormal
-	or	a, a
-	sbc	hl, hl
+	ex	(sp), hl
+	push	hl, bc
+	ret	z	; zero mantissa is not subnormal
+	adc	hl, hl
+	sub	a, l
+	sbc	a, a
+	inc	a
 	ret
