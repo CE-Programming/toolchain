@@ -108,7 +108,7 @@ long labs(long n);
 long long llabs(long long n);
 
 #ifdef __SIZEOF_INT48__
-signed __int48 i48abs(signed __int48 n);
+signed __int48 i48abs(signed __int48 n) __NOEXCEPT_CONST;
 #endif /* __SIZEOF_INT48__ */
 
 #endif /* _ABS_INT_DEFINED */
@@ -120,7 +120,7 @@ ldiv_t ldiv(long numer, long denom);
 lldiv_t lldiv(long long numer, long long denom);
 
 #ifdef __SIZEOF_INT48__
-i48div_t i48div(signed __int48 numer, signed __int48 denom);
+i48div_t i48div(signed __int48 numer, signed __int48 denom) __NOEXCEPT_CONST;
 #endif /* __SIZEOF_INT48__ */
 
 __END_DECLS

@@ -25,6 +25,9 @@
 # define __NOEXCEPT __attribute__((__nothrow__, __leaf__))
 #endif /* __cplusplus */
 
+#define __NOEXCEPT_CONST __NOEXCEPT __attribute__((__const__))
+#define __NOEXCEPT_PURE __NOEXCEPT __attribute__((__pure__))
+
 #ifndef NULL
 # ifndef __cplusplus
 #  define NULL ((void *)0)
