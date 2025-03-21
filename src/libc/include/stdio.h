@@ -108,10 +108,10 @@ int vfprintf(FILE* __restrict stream, const char* __restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0)));
 
 int asprintf(char **__restrict p_buffer, const char *__restrict format, ...)
-    __attribute__((format (__printf__, 2, 3)));
+    __attribute__((format (__printf__, 2, 3))) __attribute__((nonnull(1)));
 
 int vasprintf(char **__restrict p_buffer, const char *__restrict format, va_list va)
-    __attribute__((format(__printf__, 2, 0)));
+    __attribute__((format(__printf__, 2, 0))) __attribute__((nonnull(1)));
 
 void perror(const char* str);
 
