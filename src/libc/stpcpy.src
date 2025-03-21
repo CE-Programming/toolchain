@@ -1,0 +1,24 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_stpcpy
+
+_stpcpy:
+	pop	bc
+	pop	de
+	ex	(sp), hl
+	push	de
+	push	bc
+	xor	a, a
+	ld	bc, 0
+	push	hl
+	cpir
+	sbc	hl, hl
+	sbc	hl, bc
+	ex	(sp), hl
+	pop	bc
+	ldir
+	ex	de, hl
+	dec	hl
+	ret

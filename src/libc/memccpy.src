@@ -1,0 +1,30 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_memccpy
+
+_memccpy:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, (iy + 12)
+	sbc	hl, hl
+	adc	hl, bc
+	ret	z
+	ld	de, (iy + 6)
+	push	de
+	sbc	hl, hl
+	sbc	hl, de
+	ex	de, hl
+	ld	a, (iy + 9)
+	cpir
+	add	hl, de
+	ex	(sp), hl
+	pop	bc
+	ld	de, (iy + 3)
+	ldir
+	ex	de, hl
+	ret	z
+	or	a, a
+	sbc	hl, hl
+	ret
