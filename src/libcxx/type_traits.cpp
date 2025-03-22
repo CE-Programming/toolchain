@@ -28,10 +28,24 @@ const auto test_lambda = [](){};
 template<class T> void test_type_identity(integral_constant<T, 0>, type_identity_t<T>);
 C((is_void_v<decltype(test_type_identity(bool_constant<false>{}, 0))>));
 
+//------------------------------------------------------------------------------
+// type relationships
+//------------------------------------------------------------------------------
+
 // test is_same
 C((is_same_v<void, void>));
 C((!is_same<void, void const>::value));
 C((!is_same_v<void const, void() const>));
+
+// test is_base_of
+/** @todo */
+
+// test is_convertible
+/** @todo */
+
+//------------------------------------------------------------------------------
+// logical operator traits
+//------------------------------------------------------------------------------
 
 // test conjunction
 C((conjunction_v<>));
@@ -67,6 +81,10 @@ C((disjunction<test_true, false_type, true_type>::test));
 C((disjunction<test_true, true_type, false_type>::test));
 C((disjunction<test_true, true_type, true_type>::test));
 
+//------------------------------------------------------------------------------
+// const/volatile removal traits
+//------------------------------------------------------------------------------
+
 // test negation
 C((negation_v<false_type>));
 C((!negation<true_type>::value));
@@ -88,19 +106,9 @@ C((is_same_v<void, remove_cv_t<void volatile>>));
 C((is_same_v<void, remove_cv<void const volatile>::type>));
 C((is_same_v<void() const volatile, remove_cv_t<void() const volatile>>));
 
-// test is_const
-C((is_const_v<void const>));
-C((is_const<void* const>::value));
-C((!is_const_v<void>));
-C((!is_const<void volatile>::value));
-C((!is_const_v<void() const>));
-
-// test is_volatile
-C((is_volatile_v<void volatile>));
-C((is_volatile<void* volatile>::value));
-C((!is_volatile_v<void>));
-C((!is_volatile<void const>::value));
-C((!is_volatile_v<void() volatile>));
+//------------------------------------------------------------------------------
+// primary type categories
+//------------------------------------------------------------------------------
 
 // test is_void
 C((is_void_v<void>));
@@ -142,26 +150,6 @@ C((!is_floating_point_v<int>));
 C((!is_floating_point<true_type>::value));
 C((!is_floating_point_v<float() const>));
 
-// test is_arithmetic
-C((is_arithmetic_v<bool>));
-C((is_arithmetic<int const>::value));
-C((is_arithmetic_v<float volatile>));
-C((is_arithmetic<double const volatile>::value));
-C((!is_arithmetic_v<void>));
-C((!is_arithmetic<nullptr_t>::value));
-C((!is_arithmetic_v<integral_constant<int, 0>>));
-C((!is_arithmetic<double() const>::value));
-
-// test is_fundamental
-C((is_fundamental_v<void>));
-C((is_fundamental<nullptr_t>::value));
-C((is_fundamental_v<bool>));
-C((is_fundamental<int const>::value));
-C((is_fundamental_v<float volatile>));
-C((is_fundamental<double const volatile>::value));
-C((!is_fundamental_v<integral_constant<int, 0>>));
-C((!is_fundamental<double() const>::value));
-
 // test is_enum
 C((is_enum_v<test_enum>));
 C((!is_enum<test_union>::value));
@@ -188,6 +176,23 @@ C((!is_class<void>::value));
 C((!is_class_v<nullptr_t>));
 C((!is_class<int>::value));
 C((!is_class_v<float>));
+
+// test is_function
+C((is_function_v<int(int)>));
+C((is_function<int(int, const char *, ...) const>::value));
+C((is_function_v<int(int) volatile &>));
+C((is_function<int(int) const volatile && noexcept>::value));
+C((!is_function_v<int>));
+C((!is_function<test_class>::value));
+C((!is_function_v<decltype(test_lambda)>));
+C((!is_function<int(*)(int)>::value));
+C((!is_function_v<int(&)(int) noexcept>));
+C((!is_function<void* test_class::*>::value));
+C((!is_function_v<void* test_class::*&>));
+C((!is_function<void* test_class::*&&>::value));
+C((!is_function_v<void(test_class::*)()>));
+C((!is_function<void(test_class::*&)()>::value));
+C((!is_function_v<void(test_class::*&&)()>));
 
 // test is_pointer
 C((is_pointer_v<void*>));
@@ -251,6 +256,59 @@ C((!is_rvalue_reference_v<void* test_class::*&>));
 C((!is_rvalue_reference<void(test_class::*)()>::value));
 C((!is_rvalue_reference_v<void(test_class::*&)()>));
 
+// test is_member_object_pointer
+C((is_member_object_pointer_v<int test_class::*>));
+C((!is_member_object_pointer<void*>::value));
+C((!is_member_object_pointer_v<nullptr_t>));
+C((!is_member_object_pointer<void(int)>::value));
+C((!is_member_object_pointer_v<void(*)(int)>));
+C((!is_member_object_pointer<int test_class::*()>::value));
+C((!is_member_object_pointer_v<int test_class::*&>));
+C((!is_member_object_pointer<int(test_class::*&)()>::value));
+
+// test is_member_function_pointer
+C((is_member_function_pointer_v<int(test_class::*)()>));
+C((!is_member_function_pointer<void*>::value));
+C((!is_member_function_pointer_v<nullptr_t>));
+C((!is_member_function_pointer<void(int)>::value));
+C((!is_member_function_pointer_v<void(*)(int)>));
+C((!is_member_function_pointer<int test_class::*>::value));
+C((!is_member_function_pointer_v<int test_class::*&>));
+C((!is_member_function_pointer<int(test_class::*&)()>::value));
+
+//------------------------------------------------------------------------------
+// composite type categories
+//------------------------------------------------------------------------------
+
+// test is_fundamental
+C((is_fundamental_v<void>));
+C((is_fundamental<nullptr_t>::value));
+C((is_fundamental_v<bool>));
+C((is_fundamental<int const>::value));
+C((is_fundamental_v<float volatile>));
+C((is_fundamental<double const volatile>::value));
+C((!is_fundamental_v<integral_constant<int, 0>>));
+C((!is_fundamental<double() const>::value));
+
+// test is_arithmetic
+C((is_arithmetic_v<bool>));
+C((is_arithmetic<int const>::value));
+C((is_arithmetic_v<float volatile>));
+C((is_arithmetic<double const volatile>::value));
+C((!is_arithmetic_v<void>));
+C((!is_arithmetic<nullptr_t>::value));
+C((!is_arithmetic_v<integral_constant<int, 0>>));
+C((!is_arithmetic<double() const>::value));
+
+// test is_scalar
+/** @todo */
+
+// test is_object
+/** @todo */
+
+// test is_compound
+/** @todo */
+
 // test is_reference
 C((is_reference_v<void*&>));
 C((is_reference<void*&&>::value));
@@ -275,23 +333,6 @@ C((!is_reference<void()>::value));
 C((!is_reference_v<void* test_class::*>));
 C((!is_reference<void(test_class::*)()>::value));
 
-// test is_function
-C((is_function_v<int(int)>));
-C((is_function<int(int, const char *, ...) const>::value));
-C((is_function_v<int(int) volatile &>));
-C((is_function<int(int) const volatile && noexcept>::value));
-C((!is_function_v<int>));
-C((!is_function<test_class>::value));
-C((!is_function_v<decltype(test_lambda)>));
-C((!is_function<int(*)(int)>::value));
-C((!is_function_v<int(&)(int) noexcept>));
-C((!is_function<void* test_class::*>::value));
-C((!is_function_v<void* test_class::*&>));
-C((!is_function<void* test_class::*&&>::value));
-C((!is_function_v<void(test_class::*)()>));
-C((!is_function<void(test_class::*&)()>::value));
-C((!is_function_v<void(test_class::*&&)()>));
-
 // test is_member_pointer
 C((is_member_pointer_v<int test_class::*>));
 C((is_member_pointer<int(test_class::*)()>::value));
@@ -302,25 +343,86 @@ C((!is_member_pointer<void(*)(int)>::value));
 C((!is_member_pointer_v<int test_class::*&>));
 C((!is_member_pointer<int(test_class::*&)()>::value));
 
-// test is_member_function_pointer
-C((is_member_function_pointer_v<int(test_class::*)()>));
-C((!is_member_function_pointer<void*>::value));
-C((!is_member_function_pointer_v<nullptr_t>));
-C((!is_member_function_pointer<void(int)>::value));
-C((!is_member_function_pointer_v<void(*)(int)>));
-C((!is_member_function_pointer<int test_class::*>::value));
-C((!is_member_function_pointer_v<int test_class::*&>));
-C((!is_member_function_pointer<int(test_class::*&)()>::value));
+//------------------------------------------------------------------------------
+// type properties
+//------------------------------------------------------------------------------
 
-// test is_member_object_pointer
-C((is_member_object_pointer_v<int test_class::*>));
-C((!is_member_object_pointer<void*>::value));
-C((!is_member_object_pointer_v<nullptr_t>));
-C((!is_member_object_pointer<void(int)>::value));
-C((!is_member_object_pointer_v<void(*)(int)>));
-C((!is_member_object_pointer<int test_class::*()>::value));
-C((!is_member_object_pointer_v<int test_class::*&>));
-C((!is_member_object_pointer<int(test_class::*&)()>::value));
+// test is_const
+C((is_const_v<void const>));
+C((is_const<void* const>::value));
+C((!is_const_v<void>));
+C((!is_const<void volatile>::value));
+C((!is_const_v<void() const>));
+
+// test is_volatile
+C((is_volatile_v<void volatile>));
+C((is_volatile<void* volatile>::value));
+C((!is_volatile_v<void>));
+C((!is_volatile<void const>::value));
+C((!is_volatile_v<void() volatile>));
+
+// test is_trivial
+/** @todo */
+
+// test is_trivially_copyable
+/** @todo */
+
+// test is_standard_layout
+/** @todo */
+
+// test is_pod
+/** @todo */
+
+// test is_literal_type
+/** @todo */
+
+// test has_unique_object_representations
+/** @todo */
+
+// test is_empty
+/** @todo */
+
+// test is_polymorphic
+/** @todo */
+
+// test is_abstract
+/** @todo */
+
+// test is_final
+/** @todo */
+
+// test is_aggregate
+/** @todo */
+
+// test is_signed
+C((std::is_signed_v<void> == false));
+C((std::is_signed_v<void*> == false));
+C((std::is_signed_v<int> == true));
+C((std::is_signed_v<int*> == false));
+C((std::is_signed_v<unsigned int> == false));
+C((std::is_signed_v<unsigned int*> == false));
+C((std::is_signed_v<float> == true));
+C((std::is_signed_v<double> == true));
+C((std::is_signed_v<  signed __int48> == true));
+C((std::is_signed_v<unsigned __int48> == false));
+C((std::is_signed_v<bool> == false));
+
+// test is_unsigned
+C((std::is_unsigned_v<void> == false));
+C((std::is_unsigned_v<void*> == false));
+C((std::is_unsigned_v<int> == false));
+C((std::is_unsigned_v<int*> == false));
+C((std::is_unsigned_v<unsigned int> == true));
+C((std::is_unsigned_v<unsigned int*> == false));
+C((std::is_unsigned_v<float> == false));
+C((std::is_unsigned_v<double> == false));
+C((std::is_unsigned_v<  signed __int48> == false));
+C((std::is_unsigned_v<unsigned __int48> == true));
+C((std::is_unsigned_v<bool> == true));
+
+//------------------------------------------------------------------------------
+// const/volatile addition traits
+//------------------------------------------------------------------------------
 
 // test add_const
 C((is_same_v<void const, add_const_t<void>>));
@@ -338,6 +440,10 @@ C((is_same_v<void const volatile, add_cv<void const>::type>));
 C((is_same_v<void const volatile, add_cv_t<void volatile>>));
 C((is_same_v<void const volatile, add_cv<void const volatile>::type>));
 C((is_same_v<void() const volatile, add_cv_t<void() const volatile>>));
+
+//------------------------------------------------------------------------------
+// reference/pointer transformation traits
+//------------------------------------------------------------------------------
 
 // test remove_pointer
 C((is_same_v<int const, remove_pointer_t<int const>>));
@@ -360,6 +466,15 @@ C((is_same_v<void*, remove_reference_t<void*>>));
 C((is_same_v<void**, remove_reference<void**>::type>));
 C((is_same_v<void(*)(), remove_reference_t<void(*)()>>));
 C((is_same_v<void(**)(), remove_reference<void(**)()>::type>));
+
+// test remove_cvref
+C((std::is_same_v<std::remove_cvref_t<int>, int>));
+C((std::is_same_v<std::remove_cvref_t<int&>, int>));
+C((std::is_same_v<std::remove_cvref_t<int&&>, int>));
+C((std::is_same_v<std::remove_cvref_t<const int&>, int>));
+C((std::is_same_v<std::remove_cvref_t<const int[2]>, int[2]>));
+C((std::is_same_v<std::remove_cvref_t<const int(&)[2]>, int[2]>));
+C((std::is_same_v<std::remove_cvref_t<int(int)>, int(int)>));
 
 // test add_pointer
 C((is_same_v<int const*, add_pointer_t<int const>>));
@@ -394,6 +509,64 @@ C((is_same_v<void*&, add_rvalue_reference_t<void*&>>));
 C((is_same_v<void(*&)(), add_rvalue_reference<void(*&)()>::type>));
 C((is_same_v<void*&&, add_rvalue_reference_t<void*&&>>));
 C((is_same_v<void(*&&)(), add_rvalue_reference<void(*&&)()>::type>));
+
+//------------------------------------------------------------------------------
+// alignment_of 
+//------------------------------------------------------------------------------
+
+// test alignment_of
+/** @todo */
+
+//------------------------------------------------------------------------------
+// rank/extent
+//------------------------------------------------------------------------------
+
+// test rank
+C((std::rank<int>{} == 0));
+C((std::rank<int[5]>{} == 1));
+C((std::rank<int[5][5]>{} == 2));
+C((std::rank<int[][5][5]>{} == 3));
+
+// test extent
+C((std::extent_v<int[3]> == 3));
+C((std::extent_v<int[3], 0> == 3));
+C((std::extent_v<int[3][4], 0> == 3));
+C((std::extent_v<int[3][4], 1> == 4));
+C((std::extent_v<int[3][4], 2> == 0));
+C((std::extent_v<int[]> == 0));
+
+// test remove_extent
+/** @todo */
+
+// test remove_all_extents
+/** @todo */
+
+//------------------------------------------------------------------------------
+// decay
+//------------------------------------------------------------------------------
+
+// test decay
+C(( std::is_same_v<std::decay_t<int       >, int        >));
+C((!std::is_same_v<std::decay_t<int       >, float      >));
+C(( std::is_same_v<std::decay_t<int&      >, int        >));
+C(( std::is_same_v<std::decay_t<int&&     >, int        >));
+C(( std::is_same_v<std::decay_t<const int&>, int        >));
+C(( std::is_same_v<std::decay_t<int[2]    >, int*       >));
+C((!std::is_same_v<std::decay_t<int[4][2] >, int*       >));
+C((!std::is_same_v<std::decay_t<int[4][2] >, int**      >));
+C(( std::is_same_v<std::decay_t<int[4][2] >, int(*)[2]  >));
+C(( std::is_same_v<std::decay_t<int(int)  >, int(*)(int)>));
+
+//------------------------------------------------------------------------------
+// underlying_type
+//------------------------------------------------------------------------------
+
+// test underlying_type
+/** @todo */
+
+//------------------------------------------------------------------------------
+// member classification traits
+//------------------------------------------------------------------------------
 
 // test is_constructible
 C((is_constructible_v<int>));
@@ -481,66 +654,60 @@ C((is_nothrow_move_constructible<test_class>::value));
 C((is_nothrow_move_constructible_v<test_union>));
 C((!is_nothrow_move_constructible<int()>::value));
 
-// test is_signed
-C((std::is_signed_v<void> == false));
-C((std::is_signed_v<void*> == false));
-C((std::is_signed_v<int> == true));
-C((std::is_signed_v<int*> == false));
-C((std::is_signed_v<unsigned int> == false));
-C((std::is_signed_v<unsigned int*> == false));
-C((std::is_signed_v<float> == true));
-C((std::is_signed_v<double> == true));
-C((std::is_signed_v<  signed __int48> == true));
-C((std::is_signed_v<unsigned __int48> == false));
-C((std::is_signed_v<bool> == false));
+// test is_assignable
+/** @todo */
 
-// test is_unsigned
-C((std::is_unsigned_v<void> == false));
-C((std::is_unsigned_v<void*> == false));
-C((std::is_unsigned_v<int> == false));
-C((std::is_unsigned_v<int*> == false));
-C((std::is_unsigned_v<unsigned int> == true));
-C((std::is_unsigned_v<unsigned int*> == false));
-C((std::is_unsigned_v<float> == false));
-C((std::is_unsigned_v<double> == false));
-C((std::is_unsigned_v<  signed __int48> == false));
-C((std::is_unsigned_v<unsigned __int48> == true));
-C((std::is_unsigned_v<bool> == true));
+// test is_trivially_assignable
+/** @todo */
 
-// test rank
-C((std::rank<int>{} == 0));
-C((std::rank<int[5]>{} == 1));
-C((std::rank<int[5][5]>{} == 2));
-C((std::rank<int[][5][5]>{} == 3));
+// test is_nothrow_assignable
+/** @todo */
 
-// test extent
-C((std::extent_v<int[3]> == 3));
-C((std::extent_v<int[3], 0> == 3));
-C((std::extent_v<int[3][4], 0> == 3));
-C((std::extent_v<int[3][4], 1> == 4));
-C((std::extent_v<int[3][4], 2> == 0));
-C((std::extent_v<int[]> == 0));
+// test is_copy_assignable
+/** @todo */
 
-// test remove_cvref
-C((std::is_same_v<std::remove_cvref_t<int>, int>));
-C((std::is_same_v<std::remove_cvref_t<int&>, int>));
-C((std::is_same_v<std::remove_cvref_t<int&&>, int>));
-C((std::is_same_v<std::remove_cvref_t<const int&>, int>));
-C((std::is_same_v<std::remove_cvref_t<const int[2]>, int[2]>));
-C((std::is_same_v<std::remove_cvref_t<const int(&)[2]>, int[2]>));
-C((std::is_same_v<std::remove_cvref_t<int(int)>, int(int)>));
+// test is_nothrow_copy_assignable
+/** @todo */
 
-// test decay
-C(( std::is_same_v<std::decay_t<int       >, int        >));
-C((!std::is_same_v<std::decay_t<int       >, float      >));
-C(( std::is_same_v<std::decay_t<int&      >, int        >));
-C(( std::is_same_v<std::decay_t<int&&     >, int        >));
-C(( std::is_same_v<std::decay_t<const int&>, int        >));
-C(( std::is_same_v<std::decay_t<int[2]    >, int*       >));
-C((!std::is_same_v<std::decay_t<int[4][2] >, int*       >));
-C((!std::is_same_v<std::decay_t<int[4][2] >, int**      >));
-C(( std::is_same_v<std::decay_t<int[4][2] >, int(*)[2]  >));
-C(( std::is_same_v<std::decay_t<int(int)  >, int(*)(int)>));
+// test is_move_assignable
+/** @todo */
+
+// test is_nothrow_move_assignable
+/** @todo */
+
+/* Clang 16.0.0 required */
+#if 0
+// test is_destructible
+/** @todo */
+#endif
+
+// test is_trivially_destructible
+/** @todo */
+
+/* Clang 16.0.0 required */
+#if 0
+// test is_nothrow_destructible
+/** @todo */
+#endif
+
+// test has_virtual_destructor
+/** @todo */
+
+//------------------------------------------------------------------------------
+// swappable classification traits
+//------------------------------------------------------------------------------
+
+// test is_swappable_with
+/** @todo */
+
+// test is_swappable
+/** @todo */
+
+// test is_nothrow_swappable_with
+/** @todo */
+
+// test is_nothrow_swappable
+/** @todo */
 
 #undef C
 
