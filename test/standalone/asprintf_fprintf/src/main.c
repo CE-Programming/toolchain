@@ -130,22 +130,28 @@ static char const * const fprintf_test =
 
 static char const * const file_name = "FPRINTST";
 
-static void get_diff_char(const char* buf, const char* test) {
+static void get_diff_char(const char* data, const char* test) {
     size_t char_pos = 0;
     char prev = '\0';
-    while (*buf != '\0' && *test != '\0') {
-        if (*buf != *test) {
-            printf("prev %02X: %02X != %02X at %zu\n", prev, *buf, *test, char_pos);
-            break;
+    while (*data != '\0' && *test != '\0') {
+        if (*data != *test) {
+            printf("prev %02X: %02X != %02X at %zu\n", prev, *data, *test, char_pos);
+            return;
         }
-        prev = *buf;
-        buf++;
+        prev = *data;
+        data++;
         test++;
         char_pos++;
     }
 }
 
 int memccpy_tests(void) {
+    // test zero byte case
+    void* ptr = memccpy((void*)0xC0FFEE, (void*)0x123456, 123, 0);
+    if (ptr != NULL) {
+        printf("%p != NULL\n", ptr);
+        return __LINE__;
+    }
     file = fopen(file_name, "wb");
     
     // Check if the file was opened successfully
@@ -209,8 +215,7 @@ int memccpy_tests(void) {
         return __LINE__;
     }
 
-    int alloc_size = (int)ftell(file);
-    buf = (char*)calloc(alloc_size + 2, sizeof(char));
+    buf = (char*)calloc(file_size + 1, sizeof(char));
     if (buf == NULL) {
         perror("calloc failure");
         return __LINE__;
@@ -235,6 +240,38 @@ int memccpy_tests(void) {
     return 0;
 }
 
+int mempcpy_test(void) {
+    // test zero byte case
+    void* ptr = mempcpy((void*)0xC0FFEE, (void*)0x123456, 0);
+    if (ptr != (void*)0xC0FFEE) {
+        printf("%p != %p\n", ptr, (void*)0xC0FFEE);
+        return __LINE__;
+    }
+    char data[192 + 1];
+    memset(&data[  0], 0x12, 64);
+    memset(&data[ 64], 0x12, 64);
+    memset(&data[128], 0x56, 64);
+    char append[64 + 1];
+    memset(append, 0x34, 64);
+    char* res = mempcpy(&data[64], append, 64);
+    if (res != &data[128]) {
+        printf("%p != %p\n", res, data);
+        return __LINE__;
+    }
+
+    char truth[192 + 1];
+    memset(&truth[  0], 0x12, 64);
+    memset(&truth[ 64], 0x34, 64);
+    memset(&truth[128], 0x56, 64);
+
+    int cmp = memcmp(data, truth, 192);
+    if (cmp != 0) {
+        printf("cmp: %d\n", cmp);
+        return __LINE__;
+    }
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* ti_asprintf */
@@ -247,13 +284,17 @@ int run_tests(void) {
         free(buf); buf = NULL;
         if (ret != 0) { return ret; }
 
-    /* nano_fprintf */
+    /* nano_fprintf memccpy */
         ret = memccpy_tests();
         free(buf); buf = NULL;
         fclose(file);
         if (remove(file_name) != 0) {
             perror("Couldn't delete file");
         }
+        if (ret != 0) { return ret; }
+
+    /* mempcpy */
+        ret = mempcpy_test();
         if (ret != 0) { return ret; }
 
     return 0;

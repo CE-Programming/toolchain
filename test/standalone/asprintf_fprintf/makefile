@@ -8,8 +8,8 @@ DESCRIPTION = "CE C Toolchain Demo"
 COMPRESSED = NO
 ARCHIVED = NO
 
-CFLAGS = -Wall -Wextra -Oz
-CXXFLAGS = -Wall -Wextra -Oz
+CFLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Oz
+CXXFLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Oz
 
 PREFER_OS_LIBC = NO
 

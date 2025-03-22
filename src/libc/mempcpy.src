@@ -1,0 +1,18 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_mempcpy
+
+_mempcpy:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, (iy + 9)	; Load count
+	sbc	hl, hl
+	sbc	hl, bc
+	ld	hl, (iy + 3)	; Load destination
+	ret	z	; zero bytes to copy
+	ld	de, (iy + 6)	; Load source
+	ex	de, hl
+	ldir
+	ret
