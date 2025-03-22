@@ -19,6 +19,46 @@
  * memccpy
  */
 
+// prevents Clang from replacing function calls with builtins
+#if 1
+
+void *T_memcpy(void *__restrict dest, const void *__restrict src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
+void *T_memset(void *s, int c, size_t n)
+    __attribute__((nonnull(1)));
+
+int T_memcmp(const void *s1, const void *s2, size_t n)
+    __attribute__((nonnull(1, 2)));
+
+void *T_memccpy(void *__restrict dest, const void *__restrict src, int c, size_t n)
+    __attribute__((nonnull(1, 2)));
+
+void *T_mempcpy(void *__restrict dest, const void *__restrict src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
+char *T_stpcpy(char *__restrict dest, const char *__restrict src)
+    __attribute__((nonnull(1, 2)));
+
+size_t T_strlen(const char *s)
+    __attribute__((nonnull(1)));
+
+int T_strcmp(const char *s1, const char *s2)
+    __attribute__((nonnull(1, 2)));
+
+#else
+
+#define T_memcpy memcpy
+#define T_memset memset
+#define T_memcmp memcmp
+#define T_memccpy memccpy
+#define T_mempcpy mempcpy
+#define T_stpcpy stpcpy
+#define T_strlen strlen
+#define T_strcmp strcmp
+
+#endif
+
 static char const * const test_1 =
 "+123 asprintf% 076543 0x9abcd  0XFE1 0\n";
 static char const * const test_2 =
@@ -42,9 +82,9 @@ int ti_tests(void) {
     if (buf[len] != '\0') {
         return __LINE__;
     }
-    size_t buf_len = strlen(buf);
-    if (buf_len != strlen(test_1) || buf_len != (size_t)len) {
-        printf("E: %zu != %zu != %d\n", strlen(test_1), buf_len, len);
+    size_t buf_len = T_strlen(buf);
+    if (buf_len != T_strlen(test_1) || buf_len != (size_t)len) {
+        printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
         return __LINE__;
     }
     if (pos != pos_1) {
@@ -63,15 +103,15 @@ int ti_tests(void) {
         return __LINE__;
     }
     int len_2 = ti_snprintf(append, sizeof(append), "%s", test_1);
-    if (len_2 != strlen(test_1)) {
-        printf("E: %d != %zu\n", len_2, strlen(test_1));
+    if (len_2 != (int)T_strlen(test_1)) {
+        printf("E: %d != %zu\n", len_2, T_strlen(test_1));
         return __LINE__;
     }
     char str2[128];
     char* end;
-    end = stpcpy(str2, append);
-    end = stpcpy(end, "");
-    end = stpcpy(end, "foo");
+    end = T_stpcpy(str2, append);
+    end = T_stpcpy(end, "");
+    end = T_stpcpy(end, "foo");
     if (*end != '\0') {
         return __LINE__;
     }
@@ -79,7 +119,7 @@ int ti_tests(void) {
         printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
         return __LINE__;
     }
-    int cmp2 = strcmp(str2, test_2);
+    int cmp2 = T_strcmp(str2, test_2);
     if (cmp2 != 0) {
         printf("cmp: %d\n", cmp2);
         return __LINE__;
@@ -100,16 +140,16 @@ int nano_tests(void) {
     if (buf[len] != '\0') {
         return __LINE__;
     }
-    size_t buf_len = strlen(buf);
-    if (buf_len != strlen(test_1) || buf_len != (size_t)len) {
-        printf("E: %zu != %zu != %d\n", strlen(test_1), buf_len, len);
+    size_t buf_len = T_strlen(buf);
+    if (buf_len != T_strlen(test_1) || buf_len != (size_t)len) {
+        printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
         return __LINE__;
     }
     if (pos != pos_1) {
         printf("E: %d != %d\n", pos, pos_1);
         return __LINE__;
     }
-    int cmp = strcmp(buf, test_1);
+    int cmp = T_strcmp(buf, test_1);
     if (cmp != 0) {
         printf("cmp: %d\n", cmp);
         return __LINE__;
@@ -147,7 +187,7 @@ static void get_diff_char(const char* data, const char* test) {
 
 int memccpy_tests(void) {
     // test zero byte case
-    void* ptr = memccpy((void*)0xC0FFEE, (void*)0x123456, 123, 0);
+    void* ptr = T_memccpy((void*)0xC0FFEE, (void*)0x123456, 123, 0);
     if (ptr != NULL) {
         printf("%p != NULL\n", ptr);
         return __LINE__;
@@ -167,7 +207,7 @@ int memccpy_tests(void) {
  
     for (size_t i = 0; i != sizeof terminal; ++i)
     {
-        void* to = memccpy(dest, src, terminal[i], sizeof dest);
+        void* to = T_memccpy(dest, src, terminal[i], sizeof dest);
  
         fprintf(file,"Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
  
@@ -193,7 +233,7 @@ int memccpy_tests(void) {
     for (size_t t = 0; t != (sizeof star_distance) / (sizeof star_distance[0]); ++t)
     {
         if (first) {
-            first = memccpy(first, star_distance[t], ' ', last - first);
+            first = T_memccpy(first, star_distance[t], ' ', last - first);
         } else {
             break;
         }
@@ -226,8 +266,8 @@ int memccpy_tests(void) {
         perror("Error reading from file");
         return __LINE__;
     }
-    if (strlen(buf) != strlen(fprintf_test)) {
-        printf("E: %zu != %zu\n", strlen(buf), strlen(fprintf_test));
+    if (T_strlen(buf) != T_strlen(fprintf_test)) {
+        printf("E: %zu != %zu\n", T_strlen(buf), T_strlen(fprintf_test));
         get_diff_char(buf, fprintf_test);
         return __LINE__;
     }
@@ -242,29 +282,29 @@ int memccpy_tests(void) {
 
 int mempcpy_test(void) {
     // test zero byte case
-    void* ptr = mempcpy((void*)0xC0FFEE, (void*)0x123456, 0);
+    void* ptr = T_mempcpy((void*)0xC0FFEE, (void*)0x123456, 0);
     if (ptr != (void*)0xC0FFEE) {
         printf("%p != %p\n", ptr, (void*)0xC0FFEE);
         return __LINE__;
     }
     char data[192 + 1];
-    memset(&data[  0], 0x12, 64);
-    memset(&data[ 64], 0x12, 64);
-    memset(&data[128], 0x56, 64);
+    T_memset(&data[  0], 0x12, 64);
+    T_memset(&data[ 64], 0x12, 64);
+    T_memset(&data[128], 0x56, 64);
     char append[64 + 1];
-    memset(append, 0x34, 64);
-    char* res = mempcpy(&data[64], append, 64);
+    T_memset(append, 0x34, 64);
+    char* res = T_mempcpy(&data[64], append, 64);
     if (res != &data[128]) {
-        printf("%p != %p\n", res, data);
+        printf("%p != %p\n", res, &data[128]);
         return __LINE__;
     }
 
     char truth[192 + 1];
-    memset(&truth[  0], 0x12, 64);
-    memset(&truth[ 64], 0x34, 64);
-    memset(&truth[128], 0x56, 64);
+    T_memset(&truth[  0], 0x12, 64);
+    T_memset(&truth[ 64], 0x34, 64);
+    T_memset(&truth[128], 0x56, 64);
 
-    int cmp = memcmp(data, truth, 192);
+    int cmp = T_memcmp(data, truth, 192);
     if (cmp != 0) {
         printf("cmp: %d\n", cmp);
         return __LINE__;
