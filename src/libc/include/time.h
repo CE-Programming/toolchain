@@ -45,7 +45,8 @@ char *asctime(const struct tm *tmp);
 
 char *ctime(const time_t *timer);
 
-size_t strftime(char* ptr, size_t maxsize, const char* format, const struct tm* timeptr);
+size_t strftime(char* ptr, size_t maxsize, const char* format, const struct tm* timeptr)
+    __attribute__((format(__strftime__, 3, 0)));
 
 __END_DECLS
 
