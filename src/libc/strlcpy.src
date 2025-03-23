@@ -1,0 +1,97 @@
+	assume	adl=1
+
+	section	.text
+	public	_strlcpy
+
+; BSD variant of strncpy that ensures the destination is null-terminated.
+; OpenBSD reference: https://github.com/openbsd/src/blob/master/lib/libc/string/strlcpy.c
+; size_t strlcpy(char *dst, const char *src, size_t dsize)
+
+_strlcpy:
+
+	ld iy, 0
+	add iy, sp
+
+	; do min(strlen(src), dsize-1)
+
+	ld bc, (iy + 9) ; bc = dsize
+
+	; check if dsize is zero
+	xor a,a ; clear carry and set a to 0
+	ld hl, 0
+	sbc hl, bc
+	jr z, .strlcpy_done ; do nothing if dsize is zero
+
+	dec bc ; bc = dsize - 1
+
+	push bc ; cpir-based strlen touches bc, so put it on the stack
+
+	; strlen(src)
+	ld hl, (iy + 6) ; hl = pointer to src
+	xor a,a ; clear carry and set a to 0
+	ld bc, 0
+	cpir ; dec bc until byte at (hl) matches a (= NUL)
+	; calculate HL=-BC-1
+	sbc hl,hl
+	scf
+	sbc hl,bc
+	; now hl = strlen(src)
+
+	pop bc ; get bc back from the stack
+
+	; dsize is not zero, compare them
+	; hl = strlen(src)
+	; bc = dsize - 1
+	
+	; https://www.msx.org/forum/development/msx-development/how-compare-16bits-registers-z80
+	or a ; clear carry flag
+	sbc hl, bc
+	add hl, bc
+
+	; if hl >= bc, c = 0; keep bc as is
+	; if strlen(src) >= (dsize - 1), c = 0; keep bc as is
+	jr nc, .ready_for_ldir
+	
+	; hl < bc, so strlen(src) < (dsize - 1); set bc to the value in hl
+	push hl
+	pop bc
+
+.ready_for_ldir:
+	ld de, (iy + 3) ; put dst in de
+	
+	; check if bc is zero
+	xor a,a ; clear carry and set a to 0
+	ld hl, 0
+	sbc hl, bc
+	jr z, .null_terminate ; null terminate if bc is zero
+
+	ld hl, (iy + 6) ; put src in hl
+	; bc is filled already
+
+	; at this point we are set up for an ldir:
+	; hl has the start address
+	; de has the destination address
+	; bc has the length
+
+	ldir
+
+.null_terminate:
+	; dsize is nonzero, null terminate dst
+	xor a,a ; clear carry and set a to 0 (= NUL)
+	ld (de), a ; store null terminator at the address pointed to by de
+
+.strlcpy_done:
+	; return strlen(src)
+
+	; strlen(src)
+	ld hl, (iy + 6) ; hl = pointer to src
+	xor a,a ; clear carry and set a to 0
+	ld bc, 0
+	cpir ; dec bc until byte at (hl) matches a (= NUL)
+	; calculate HL=-BC-1
+	sbc hl,hl
+	scf
+	sbc hl,bc
+	; now hl = strlen(src)
+
+	ret
