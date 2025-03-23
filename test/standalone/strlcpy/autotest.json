@@ -1,0 +1,64 @@
+{
+  "transfer_files": [
+    "bin/STRLCPY.8xp"
+  ],
+  "target": {
+    "name": "STRLCPY",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|1000",
+    "hashWait|1",
+    "key|enter",
+    "delay|1000",
+    "hashWait|2",
+    "key|enter",
+    "delay|1000",
+    "hashWait|3",
+    "key|enter",
+    "delay|1000",
+    "hashWait|4"
+  ],
+  "hashes": {
+    "1": {
+      "description": "First set of tests passed",
+	  "timeout": 5000,
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "0835F244"
+      ]
+    },
+    "2": {
+      "description": "Second set of tests passed",
+	  "timeout": 5000,
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "2CABBF0E"
+      ]
+    },
+    "3": {
+      "description": "Third set of tests passed",
+	  "timeout": 5000,
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "508333F7"
+      ]
+    },
+    "4": {
+      "description": "Exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "FFAF89BA",
+        "101734A5",
+        "9DA19F44",
+        "A32840C8",
+        "349F4775"
+      ]
+    }
+  }
+}
