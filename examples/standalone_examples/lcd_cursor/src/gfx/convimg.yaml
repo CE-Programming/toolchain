@@ -1,0 +1,28 @@
+palettes:
+  - name: hw_cursor_palette
+    max-entries: 4
+    fixed-entries:
+    - color: {index: 0, r: 0, g: 0, b: 0}
+    - color: {index: 1, r: 255, g: 255, b: 255}
+    - color: {index: 2, r: 192, g: 6, b: 192}
+    - color: {index: 3, r: 6, g: 192, b: 192}
+    images: automatic
+
+converts:
+  - name: hw_cursor
+    palette: hw_cursor_palette
+    palette-offset: 0
+    bpp: 2
+    transparent-index: 2
+    width-and-height: false
+    images:
+      - cursor.png
+
+outputs:
+  - type: c
+    include-file: gfx.h
+    palettes:
+    converts:
+      - hw_cursor
+
+
