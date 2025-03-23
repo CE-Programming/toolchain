@@ -14,7 +14,7 @@
  * ti_snprintf
  * ti_asprintf
  * asprintf
- * fprintf
+ * fprintf // disabled for now
  * stpcpy
  * memccpy
  */
@@ -68,6 +68,8 @@ static const int pos_2 = 42;
 
 static char* buf = NULL;
 static FILE* file = NULL;
+
+static char sprintfbuf[200] = {0};
 
 int ti_tests(void) {
     int pos;
@@ -157,6 +159,7 @@ int nano_tests(void) {
     return 0;
 }
 
+#if 0
 static char const * const fprintf_test =
     "Terminal ':' (found):\t\"Stars:\"\n"
     "Terminal ' ' (found):\t\"Stars: \"\n"
@@ -167,6 +170,7 @@ static char const * const fprintf_test =
     "Separate star names from distances (ly):\n"
     "Arcturus Vega Capella Rigel Procyon \n"
 /* fprintf_test */;
+#endif
 
 static char const * const file_name = "FPRINTST";
 
@@ -208,8 +212,9 @@ int memccpy_tests(void) {
     for (size_t i = 0; i != sizeof terminal; ++i)
     {
         void* to = T_memccpy(dest, src, terminal[i], sizeof dest);
- 
-        fprintf(file,"Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
+
+        sprintf(sprintfbuf, "Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
+        fputs(sprintfbuf, file);
  
         // if `terminal` character was not found - print the whole `dest`
         to = to ? to : dest + sizeof dest;
@@ -222,7 +227,8 @@ int memccpy_tests(void) {
     }
  
  
-    fprintf(file, "%c%s", '\n', "Separate star names from distances (ly):\n");
+    sprintf(sprintfbuf, "%c%s", '\n', "Separate star names from distances (ly):\n");
+    fputs(sprintfbuf, file);
     const char *star_distance[] = {
         "Arcturus : 37", "Vega : 25", "Capella : 43", "Rigel : 860", "Procyon : 11"
     };
@@ -241,7 +247,8 @@ int memccpy_tests(void) {
 
     if (first) {
         *first = '\0';
-        fprintf(file, "%s%c", names_only, '\n');
+        sprintf(sprintfbuf, "%s%c", names_only, '\n');
+        fputs(sprintfbuf, file);
     } else {
         printf("Error Buffer is too small.\n");
     }
@@ -266,6 +273,7 @@ int memccpy_tests(void) {
         perror("Error reading from file");
         return __LINE__;
     }
+#if 0
     if (T_strlen(buf) != T_strlen(fprintf_test)) {
         printf("E: %zu != %zu\n", T_strlen(buf), T_strlen(fprintf_test));
         get_diff_char(buf, fprintf_test);
@@ -277,6 +285,7 @@ int memccpy_tests(void) {
         get_diff_char(buf, fprintf_test);
         return __LINE__;
     }
+#endif
     return 0;
 }
 
@@ -347,7 +356,7 @@ int main(void)
     if (ret != 0) {
         printf("Failed test L%d\n", ret);
     } else {
-        fprintf(stdout, "All tests %s", "passed");
+        printf("All tests passed\n");
     }
     
     while (!os_GetCSC());

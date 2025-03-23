@@ -12,8 +12,8 @@ if HAS_PRINTF
 	public	_vsnprintf
 	public	_asprintf
 	public	_vasprintf
-	public	_fprintf
-	public	_vfprintf
+	;public	_fprintf
+	;public	_vfprintf
 
 _printf := __printf_c
 _vprintf := __vprintf_c
@@ -23,8 +23,8 @@ _snprintf := __snprintf_c
 _vsnprintf := __vsnprintf_c
 _asprintf := __asprintf_c
 _vasprintf := __vasprintf_c
-_fprintf := __fprintf_c
-_vfprintf := __vfprintf_c
+;_fprintf := __fprintf_c
+;_vfprintf := __vfprintf_c
 
 	extern	__printf_c
 	extern	__vprintf_c
@@ -34,8 +34,8 @@ _vfprintf := __vfprintf_c
 	extern	__vsnprintf_c
 	extern	__asprintf_c
 	extern	__vasprintf_c
-	extern	__fprintf_c
-	extern	__vfprintf_c
+	;extern	__fprintf_c
+	;extern	__vfprintf_c
 
 else
 

@@ -641,9 +641,11 @@ static void npf_putc_std(int c, void *ctx) {
   outchar(c);
 }
 
+#if 0
 static void npf_fputc_std(int c, void *ctx) {
   fputc(c, (FILE*)ctx);
 }
+#endif
 
 typedef struct npf_cnt_putc_ctx {
   npf_putc pc;
@@ -1065,6 +1067,7 @@ int _asprintf_c(char **__restrict p_str, const char *__restrict format, ...) {
   return ret;
 }
 
+#if 0
 int _vfprintf_c(FILE* __restrict stream, const char* __restrict format, va_list vlist)
 {
   return npf_vpprintf(npf_fputc_std, (void*)stream, format, vlist);
@@ -1078,6 +1081,7 @@ int _fprintf_c(FILE* __restrict stream, const char* __restrict format, ...)
   va_end(va);
   return ret;
 }
+#endif
 
 #if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
   #pragma GCC diagnostic pop
