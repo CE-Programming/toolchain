@@ -14,18 +14,6 @@ _strlcpy:
 
 	; do min(strlen(src), dsize-1)
 
-	ld bc, (iy + 9) ; bc = dsize
-
-	; check if dsize is zero
-	xor a,a ; clear carry and set a to 0
-	ld hl, 0
-	sbc hl, bc
-	jr z, .strlcpy_done ; do nothing if dsize is zero
-
-	dec bc ; bc = dsize - 1
-
-	push bc ; cpir-based strlen touches bc, so put it on the stack
-
 	; strlen(src)
 	ld hl, (iy + 6) ; hl = pointer to src
 	xor a,a ; clear carry and set a to 0
@@ -37,7 +25,21 @@ _strlcpy:
 	sbc hl,bc
 	; now hl = strlen(src)
 
-	pop bc ; get bc back from the stack
+	push hl ; save this for after dsize check
+
+	ld bc, (iy + 9) ; bc = dsize
+
+	; check if dsize is zero
+	xor a,a ; clear carry and set a to 0
+	sbc hl, hl
+	sbc hl, bc
+	jr z, .strlcpy_done ; do nothing if dsize is zero
+
+	dec bc ; bc = dsize - 1
+
+	; restore hl without changing the stack
+	pop hl ; get it back
+	push hl ; save it for the end
 
 	; dsize is not zero, compare them
 	; hl = strlen(src)
@@ -61,7 +63,7 @@ _strlcpy:
 	
 	; check if bc is zero
 	xor a,a ; clear carry and set a to 0
-	ld hl, 0
+	sbc hl, hl
 	sbc hl, bc
 	jr z, .null_terminate ; null terminate if bc is zero
 
@@ -83,15 +85,6 @@ _strlcpy:
 .strlcpy_done:
 	; return strlen(src)
 
-	; strlen(src)
-	ld hl, (iy + 6) ; hl = pointer to src
-	xor a,a ; clear carry and set a to 0
-	ld bc, 0
-	cpir ; dec bc until byte at (hl) matches a (= NUL)
-	; calculate HL=-BC-1
-	sbc hl,hl
-	scf
-	sbc hl,bc
-	; now hl = strlen(src)
+	pop hl ; get the result of strlen(src) from earlier and put into hl
 
 	ret
