@@ -128,6 +128,34 @@ do { \
 } while (0)
 
 /** 
+ * Sets a small cursor image at the specified index.
+ * 
+ * @param[in] data A pointer to 256 bytes of packed 2bpp image data.
+ * @param[in] index The cursor image index to copy the data to (0-3).
+ * 
+ * @see lcd_CrsrSetImageIndex
+ * @see lcd_cursor_size_t
+ * @see lcd_CrsrSetImage
+ */
+#define lcd_CrsrSetImageSmall(data, index) \
+do { \
+  memcpy(lcd_CrsrImage + ((index & 0b11) * 0x100), data, lcd_CrsrImageLen32); \
+} while (0)
+
+/** 
+ * Sets a large cursor image.
+ * 
+ * @param[in] data A pointer to 1024 bytes of packed 2bpp image data.
+ * 
+ * @see lcd_cursor_size_t
+ * @see lcd_CrsrSetImage
+ */
+#define lcd_CrsrSetImageLarge(data) \
+do { \
+  memcpy(lcd_CrsrImage, data, lcd_CrsrImageLen64); \
+} while (0)
+
+/** 
  * Sets the position of the cursor on screen.
  * 
  * @param[in] x X coordinate.
@@ -158,6 +186,23 @@ do { \
 #define lcd_CrsrShow() \
 do { \
   lcd_CrsrCtrl |= 1; \
+} while (0)
+
+/**
+ * Sets the cursor image index (0-3).
+ * The cursor is capable of holding up to four small (32x32) images at once,
+ * each occupying a quarter of the cursor RAM.
+ * This function lets you choose which image you want to display.
+ * 
+ * @param[in] index The index of the cursor image to display (0-3).
+ * 
+ * @note
+ * There is no effect if the cursor size is set to large (64x64),
+ * since the cursor RAM can only hold one 64x64 image.
+ */
+#define lcd_CrsrSetImageIndex(index) \
+do { \
+  lcd_CrsrCtrl = (lcd_CrsrCtrl & ~(0b11 << 4)) | ((index & 0b11) << 4); \
 } while (0)
 
 /** Hides the cursor. */
