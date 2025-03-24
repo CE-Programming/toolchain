@@ -114,13 +114,18 @@ do { \
 /** 
  * Sets cursor image.
  * 
- * @param[in] data A pointer to 256 or 1024 bytes of packed 2bpp image data.
+ * @param[in] data A pointer to 256 or 1024 bytes of packed 2bpp image data,
+ * depending on the value of lcd_CrsrGetSize().
  * @see lcd_cursor_size_t
  * 
  * @note
  * To use convimg to create the required data, add `bpp: 2`
  * to the converts section in convimg.yaml corresponding
  * to your image(s).
+ * 
+ * @note
+ * If the cursor size is set to small (32x32), this will copy the data
+ * to image index 0.
  */
 #define lcd_CrsrSetImage(data) \
 do { \
