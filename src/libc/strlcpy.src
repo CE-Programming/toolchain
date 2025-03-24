@@ -25,29 +25,30 @@ _strlcpy:
 	sbc hl, bc ; always sets carry flag
 	; now hl = strlen(src)
 
-	push hl ; save this for after dsize check
-
 	ld bc, (iy + 9) ; bc = dsize
 	ex de, hl ; de = strlen(src)
 
 	; check if dsize is zero
 	sbc hl, hl ; set hl to -1, carry was already set
 	add hl, bc ; hl = -1 + dsize
-	jr nc, .strlcpy_done ; do nothing if dsize is zero
+        ex de, hl ; hl = strlen(src), de = dsize - 1
+	ret nc ; do nothing and return strlen(src) if dsize is zero
+
+	push hl ; save strlen(src) for after copy
 
 	; dsize is not zero, compare them
-	; hl = dsize - 1
-	; de = strlen(src)
+	; hl = strlen(src)
+	; de = dsize - 1
 
 	; carry flag is set, so calculate hl - (de + 1)
 	sbc hl, de
 
-	; if hl <= de, (dsize - 1) <= strlen(src); keep bc as dsize
-	jr c, .ready_for_ldir
+	; if hl > de, strlen(src) > (dsize - 1); string is truncated, keep bc as dsize
+	jr nc, .ready_for_ldir
 
-	; hl > de, so (dsize - 1) > strlen(src); set bc to strlen(src) + 1
-	push de
+	; hl <= de, so strlen(src) <= (dsize - 1); string is not truncated, set bc to strlen(src) + 1
 	pop bc
+	push bc
 	inc bc
 
 .ready_for_ldir:
@@ -61,14 +62,13 @@ _strlcpy:
 	; bc has the length (including space for null terminator)
 	ldir
 
-	; replace final byte with NUL, in case src null terminator wasn't reached
+	pop hl ; get the result of strlen(src) from earlier and put into hl
+
+	ret c ; return strlen(src) if string was not truncated
+
+	; string was truncated, so replace final byte with NUL
 	dec de
 	; a is already 0
 	ld (de), a ; store null terminator at the address pointed to by de
 
-.strlcpy_done:
-	; return strlen(src)
-
-	pop hl ; get the result of strlen(src) from earlier and put into hl
-
-	ret
+	ret ; return strlen(src)
