@@ -11,8 +11,7 @@ However, they contribute around 8 KiB to the resultant program.
 It is highly recommended to not use `printf` and related functions at all because of this.
 If you insist on using these functions, this page details how to do so in the next section.
 
-Alternatively, a limited `sprintf` implementation is baked into the OS which doesn't add any extra size to the resultant program.
-Only the 'c', 'd', 'u', 'x', and 's' format specifiers will probably work.
+Alternatively, a limited `sprintf` (no `long` or `float` support) implementation is baked into the OS which doesn't add any extra size to the resultant program. See the dedicated page for more information `<boot_sprintf.h> <https://ce-programming.github.io/toolchain/headers/boot_sprintf.html>`_.
 To disable all other printf functions and use this `sprintf` implementation, add the following line to the Makefile:
 
 .. code-block:: makefile
