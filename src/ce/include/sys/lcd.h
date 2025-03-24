@@ -157,13 +157,13 @@ do { \
 /** Shows the cursor. */
 #define lcd_CrsrShow() \
 do { \
-  lcd_CrsrCtrl = 1; \
+  lcd_CrsrCtrl |= 1; \
 } while (0)
 
 /** Hides the cursor. */
 #define lcd_CrsrHide() \
 do { \
-  lcd_CrsrCtrl = 0; \
+  lcd_CrsrCtrl &= ~(1); \
 } while (0)
 
 #define lcd_CrsrCleanup() \
