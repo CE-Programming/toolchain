@@ -2,7 +2,7 @@
 #ifndef _EZCXX_CLIMITS
 #define _EZCXX_CLIMITS
 
-#include <climits>
+#include <limits.h>
 
 #pragma clang system_header
 
