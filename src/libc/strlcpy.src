@@ -10,76 +10,60 @@
 _strlcpy:
 
 	ld iy, 0
+	lea bc, iy ; set bc to 0
 	add iy, sp
 
 	; do min(strlen(src), dsize-1)
 
 	; strlen(src)
 	ld hl, (iy + 6) ; hl = pointer to src
-	xor a,a ; clear carry and set a to 0
-	ld bc, 0
+	xor a, a ; clear carry and set a to 0
 	cpir ; dec bc until byte at (hl) matches a (= NUL)
 	; calculate HL=-BC-1
-	sbc hl,hl
+	sbc hl, hl
 	scf
-	sbc hl,bc
+	sbc hl, bc ; always sets carry flag
 	; now hl = strlen(src)
 
 	push hl ; save this for after dsize check
 
 	ld bc, (iy + 9) ; bc = dsize
+	ex de, hl ; de = strlen(src)
 
 	; check if dsize is zero
-	xor a,a ; clear carry and set a to 0
-	sbc hl, hl
-	sbc hl, bc
-	jr z, .strlcpy_done ; do nothing if dsize is zero
-
-	dec bc ; bc = dsize - 1
-
-	; restore hl without changing the stack
-	pop hl ; get it back
-	push hl ; save it for the end
+	sbc hl, hl ; set hl to -1, carry was already set
+	add hl, bc ; hl = -1 + dsize
+	jr nc, .strlcpy_done ; do nothing if dsize is zero
 
 	; dsize is not zero, compare them
-	; hl = strlen(src)
-	; bc = dsize - 1
-	
-	; https://www.msx.org/forum/development/msx-development/how-compare-16bits-registers-z80
-	or a ; clear carry flag
-	sbc hl, bc
-	add hl, bc
+	; hl = dsize - 1
+	; de = strlen(src)
 
-	; if hl >= bc, c = 0; keep bc as is
-	; if strlen(src) >= (dsize - 1), c = 0; keep bc as is
-	jr nc, .ready_for_ldir
-	
-	; hl < bc, so strlen(src) < (dsize - 1); set bc to the value in hl
-	push hl
+	; carry flag is set, so calculate hl - (de + 1)
+	sbc hl, de
+
+	; if hl <= de, (dsize - 1) <= strlen(src); keep bc as dsize
+	jr c, .ready_for_ldir
+
+	; hl > de, so (dsize - 1) > strlen(src); set bc to strlen(src) + 1
+	push de
 	pop bc
+	inc bc
 
 .ready_for_ldir:
 	ld de, (iy + 3) ; put dst in de
-	
-	; check if bc is zero
-	xor a,a ; clear carry and set a to 0
-	sbc hl, hl
-	sbc hl, bc
-	jr z, .null_terminate ; null terminate if bc is zero
-
 	ld hl, (iy + 6) ; put src in hl
-	; bc is filled already
+	; bc is filled already and greater than 0
 
 	; at this point we are set up for an ldir:
 	; hl has the start address
 	; de has the destination address
-	; bc has the length
-
+	; bc has the length (including space for null terminator)
 	ldir
 
-.null_terminate:
-	; dsize is nonzero, null terminate dst
-	xor a,a ; clear carry and set a to 0 (= NUL)
+	; replace final byte with NUL, in case src null terminator wasn't reached
+	dec de
+	; a is already 0
 	ld (de), a ; store null terminator at the address pointed to by de
 
 .strlcpy_done:
