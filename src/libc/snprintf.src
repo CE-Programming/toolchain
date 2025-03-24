@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+
+if HAS_PRINTF
+
+	public	_snprintf
+	public	_vsnprintf
+
+_snprintf := __snprintf_c
+_vsnprintf := __vsnprintf_c
+
+	extern	__snprintf_c
+	extern	__vsnprintf_c
+
+end if

@@ -4,6 +4,10 @@
 #include <cdefs.h>
 #include <stdarg.h>
 
+#ifndef HAS_PRINTF
+# include <boot_sprintf.h>
+#endif /* HAS_PRINTF */
+
 #ifdef HAS_CUSTOM_FILE
 #include CUSTOM_FILE_FILE
 #else
@@ -95,16 +99,16 @@ int sprintf(char *__restrict buffer, const char *__restrict format, ...)
 int vsprintf(char *__restrict buffer, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0)));
 
-int snprintf(char* buffer, size_t count, const char *__restrict format, ...)
+int snprintf(char *__restrict buffer, size_t count, const char *__restrict format, ...)
     __attribute__((format(__printf__, 3, 4)));
 
-int vsnprintf(char* buffer, size_t count, const char *__restrict format, va_list va)
+int vsnprintf(char *__restrict buffer, size_t count, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 3, 0)));
 
-int fprintf(FILE* __restrict stream, const char* __restrict format, ...)
+int fprintf(FILE *__restrict stream, const char *__restrict format, ...)
     __attribute__((format (__printf__, 2, 3)));
 
-int vfprintf(FILE* __restrict stream, const char* __restrict format, va_list va)
+int vfprintf(FILE *__restrict stream, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0)));
 
 int asprintf(char **__restrict p_buffer, const char *__restrict format, ...)
@@ -113,8 +117,51 @@ int asprintf(char **__restrict p_buffer, const char *__restrict format, ...)
 int vasprintf(char **__restrict p_buffer, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0))) __attribute__((nonnull(1)));
 
-void perror(const char* str);
+void perror(const char *str);
 
 __END_DECLS
+
+#ifdef __cplusplus
+namespace std {
+    using ::size_t;
+    using ::FILE;
+    
+    using ::fopen;
+    using ::fclose;
+    using ::fflush;
+    using ::ferror;
+    using ::feof;
+    using ::clearerr;
+    using ::fputs;
+    using ::fread;
+    using ::fwrite;
+    using ::ftell;
+    using ::fseek;
+    using ::fgetc;
+    using ::fputc;
+    using ::fgets;
+    using ::remove;
+    using ::rewind;
+    using ::getchar;
+    using ::putchar;
+    using ::puts;
+    using ::printf;
+    using ::vprintf;
+    using ::sprintf;
+    using ::vsprintf;
+    using ::snprintf;
+    using ::vsnprintf;
+    using ::fprintf;
+    using ::vfprintf;
+    using ::asprintf;
+    using ::vasprintf;
+    using ::perror;
+} /* namespace std */
+#endif /* __cplusplus */
+
+#ifndef HAS_PRINTF
+# define snprintf boot_snprintf
+# define asprintf boot_asprintf
+#endif /* HAS_PRINTF */
 
 #endif /* _STDIO_H */

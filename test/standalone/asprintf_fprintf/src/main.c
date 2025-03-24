@@ -5,16 +5,16 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
-#include <ti_sprintf.h>
+#include <boot_sprintf.h>
 #include <ctype.h>
 
 /**
  * @brief Tests the following functions/macros:
- * ti_sprintf
- * ti_snprintf
- * ti_asprintf
+ * boot_sprintf
+ * boot_snprintf
+ * boot_asprintf
  * asprintf
- * fprintf // disabled for now
+ * fprintf
  * stpcpy
  * memccpy
  */
@@ -69,11 +69,9 @@ static const int pos_2 = 42;
 static char* buf = NULL;
 static FILE* file = NULL;
 
-static char sprintfbuf[200] = {0};
-
-int ti_tests(void) {
+int boot_sprintf_tests(void) {
     int pos;
-    int len = ti_asprintf(
+    int len = boot_asprintf(
         &buf, "%+d %s%% %#o %#x %n %#X %i\n",
         123, "asprintf", 076543, 0x9abcd, &pos, 0xFE1, 0
     );
@@ -99,12 +97,12 @@ int ti_tests(void) {
         return __LINE__;
     }
     char append[128];
-    int snprintf_test = ti_snprintf(append, 20, "%s", test_1);
+    int snprintf_test = boot_snprintf(append, 20, "%s", test_1);
     if (snprintf_test >= 0) {
         printf("sprintf_test: %d\n", snprintf_test);
         return __LINE__;
     }
-    int len_2 = ti_snprintf(append, sizeof(append), "%s", test_1);
+    int len_2 = boot_snprintf(append, sizeof(append), "%s", test_1);
     if (len_2 != (int)T_strlen(test_1)) {
         printf("E: %d != %zu\n", len_2, T_strlen(test_1));
         return __LINE__;
@@ -159,7 +157,6 @@ int nano_tests(void) {
     return 0;
 }
 
-#if 0
 static char const * const fprintf_test =
     "Terminal ':' (found):\t\"Stars:\"\n"
     "Terminal ' ' (found):\t\"Stars: \"\n"
@@ -170,7 +167,6 @@ static char const * const fprintf_test =
     "Separate star names from distances (ly):\n"
     "Arcturus Vega Capella Rigel Procyon \n"
 /* fprintf_test */;
-#endif
 
 static char const * const file_name = "FPRINTST";
 
@@ -212,9 +208,8 @@ int memccpy_tests(void) {
     for (size_t i = 0; i != sizeof terminal; ++i)
     {
         void* to = T_memccpy(dest, src, terminal[i], sizeof dest);
-
-        sprintf(sprintfbuf, "Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
-        fputs(sprintfbuf, file);
+ 
+        fprintf(file,"Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
  
         // if `terminal` character was not found - print the whole `dest`
         to = to ? to : dest + sizeof dest;
@@ -227,8 +222,7 @@ int memccpy_tests(void) {
     }
  
  
-    sprintf(sprintfbuf, "%c%s", '\n', "Separate star names from distances (ly):\n");
-    fputs(sprintfbuf, file);
+    fprintf(file, "%c%s", '\n', "Separate star names from distances (ly):\n");
     const char *star_distance[] = {
         "Arcturus : 37", "Vega : 25", "Capella : 43", "Rigel : 860", "Procyon : 11"
     };
@@ -247,8 +241,7 @@ int memccpy_tests(void) {
 
     if (first) {
         *first = '\0';
-        sprintf(sprintfbuf, "%s%c", names_only, '\n');
-        fputs(sprintfbuf, file);
+        fprintf(file, "%s%c", names_only, '\n');
     } else {
         printf("Error Buffer is too small.\n");
     }
@@ -273,7 +266,6 @@ int memccpy_tests(void) {
         perror("Error reading from file");
         return __LINE__;
     }
-#if 0
     if (T_strlen(buf) != T_strlen(fprintf_test)) {
         printf("E: %zu != %zu\n", T_strlen(buf), T_strlen(fprintf_test));
         get_diff_char(buf, fprintf_test);
@@ -285,7 +277,6 @@ int memccpy_tests(void) {
         get_diff_char(buf, fprintf_test);
         return __LINE__;
     }
-#endif
     return 0;
 }
 
@@ -323,8 +314,8 @@ int mempcpy_test(void) {
 
 int run_tests(void) {
     int ret = 0;
-    /* ti_asprintf */
-        ret = ti_tests();
+    /* boot_asprintf */
+        ret = boot_sprintf_tests();
         free(buf); buf = NULL;
         if (ret != 0) { return ret; }
 
@@ -356,7 +347,11 @@ int main(void)
     if (ret != 0) {
         printf("Failed test L%d\n", ret);
     } else {
-        printf("All tests passed\n");
+        #if 1
+            fprintf(stdout, "All tests %s", "passed");
+        #else
+            printf("All tests %s", "passed");
+        #endif
     }
     
     while (!os_GetCSC());

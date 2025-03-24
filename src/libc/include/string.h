@@ -44,7 +44,7 @@ char *stpcpy(char *__restrict dest, const char *__restrict src)
 char *stpncpy(char *__restrict dest, const char *__restrict src, size_t n)
     __NOEXCEPT __attribute__((nonnull(1, 2)));
 
-char *strlcpy(char *__restrict dest, const char *__restrict src, size_t n)
+size_t strlcpy(char *__restrict dest, const char *__restrict src, size_t n)
     __NOEXCEPT __attribute__((nonnull(1, 2)));
 
 char *strcat(char *__restrict dest, const char *__restrict src)
@@ -53,7 +53,7 @@ char *strcat(char *__restrict dest, const char *__restrict src)
 char *strncat(char *__restrict dest, const char *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
 
-char *strlcat(char *__restrict dest, const char *__restrict src, size_t n)
+size_t strlcat(char *__restrict dest, const char *__restrict src, size_t n)
     __NOEXCEPT __attribute__((nonnull(1, 2)));
 
 char *strchr(const char *s, int c)

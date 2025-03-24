@@ -17,7 +17,9 @@ typedef __WCHAR_TYPE__ wchar_t;
 #define WCHAR_MAX   __WCHAR_MAX__
 #endif
 
+#ifndef WEOF
 #define WEOF -1
+#endif
 
 __BEGIN_DECLS
 

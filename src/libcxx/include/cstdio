@@ -6,42 +6,4 @@
 
 #pragma clang system_header
 
-namespace std {
-using ::size_t;
-using ::FILE;
-
-using ::fopen;
-using ::fclose;
-using ::fflush;
-using ::ferror;
-using ::feof;
-using ::clearerr;
-using ::fputs;
-using ::fread;
-using ::fwrite;
-using ::ftell;
-using ::fseek;
-using ::fgetc;
-using ::fputc;
-using ::fgets;
-using ::remove;
-using ::rewind;
-using ::getchar;
-using ::putchar;
-using ::puts;
-using ::printf;
-using ::vprintf;
-using ::sprintf;
-using ::vsprintf;
-using ::snprintf;
-using ::vsnprintf;
-#if 0
-using ::fprintf;
-using ::vfprintf;
-#endif
-using ::asprintf;
-using ::vasprintf;
-using ::perror;
-} // namespace std
-
 #endif // _EZCXX_CSTDINT

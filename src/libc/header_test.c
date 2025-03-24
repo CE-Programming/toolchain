@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <byteswap.h>
 #include <cdefs.h>
-#include <complex.h>
+// #include <complex.h> // supress -ffast-math warnings for now
 #include <ctype.h>
 #include <errno.h>
 #include <fenv.h>

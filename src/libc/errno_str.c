@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <ti_sprintf.h>
+#include <boot_sprintf.h>
 
 static char const * const errno_strings[] = {
     "no error",
@@ -29,7 +29,7 @@ static_assert(
 
 char* strerror(int errnum) {
     if ((unsigned int)errnum >= errno_strings_count) {
-        ti_sprintf(&(unknown_errno_string[unknown_errno_number_offset]), "%d", errnum);
+        boot_sprintf(&(unknown_errno_string[unknown_errno_number_offset]), "%d", errnum);
         return (char*)unknown_errno_string;
     }
     return (char*)errno_strings[errnum];

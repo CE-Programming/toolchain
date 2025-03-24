@@ -1,0 +1,16 @@
+	assume	adl=1
+
+	section	.text
+
+if HAS_PRINTF
+
+	public	_asprintf
+	public	_vasprintf
+
+_asprintf := __asprintf_c
+_vasprintf := __vasprintf_c
+
+	extern	__asprintf_c
+	extern	__vasprintf_c
+
+end if
