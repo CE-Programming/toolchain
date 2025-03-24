@@ -139,6 +139,21 @@ do { \
   lcd_CrsrY = y; \
 } while (0)
 
+/** 
+ * Sets the cursor clip position.
+ * 
+ * The cursor clip is the distance from the top-left edge of the cursor image
+ * to the first displayed pixel in the cursor image.
+ * 
+ * @param[in] x X coordinate.
+ * @param[in] y Y coordinate.
+ */
+#define lcd_CrsrSetClipPosition(x, y) \
+do { \
+  lcd_CrsrClipX = x; \
+  lcd_CrsrClipY = y; \
+} while (0)
+
 /** Shows the cursor. */
 #define lcd_CrsrShow() \
 do { \
