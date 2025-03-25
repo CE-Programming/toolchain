@@ -137,7 +137,7 @@ int main(void) {
     } else {
         printf(
             "Failed test:\n0x%08lX\nTruth: %06X_%d\nGuess: %06X_%d",
-            ret.failed_index, ret.guess, ret.guess_fp, ret.truth, ret.truth_fp
+            ret.failed_index, ret.truth, ret.truth_fp, ret.guess, ret.guess_fp
         );
     }
 

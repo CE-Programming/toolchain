@@ -7,24 +7,17 @@
 ; int _isinfl(long double)
 __isinfl:
 	pop	bc, hl, de
-	or	a, a
+	xor	a, a
 	adc	hl, de
 	pop	de
 	push	bc, bc, bc, bc
-	jr	nz, .mant_nonzero
-	jr	c, .mant_carry
+	ret	nz	; mant_nonzero
+	ret	c	; mant_carry
 	ld	a, e
-	xor	a, $F0
-	ret	nz	; mantissa is non-zero
-	; A is zero here
+	xor	a, $F0	; sets A to zero if the bit pattern matches infinity
 	set	7, d
-	inc	d
-	ret	nz
-	inc	hl
-	ret
-	
-.mant_nonzero:
-.mant_carry:
-	or	a, a
-	sbc	hl, hl
+	inc	d	; set d to zero if it matches infinity
+	or	a, d
+	sub	a, 1
+	sbc	a, a
 	ret

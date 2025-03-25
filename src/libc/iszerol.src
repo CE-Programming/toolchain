@@ -7,23 +7,16 @@
 ; int iszerol(long double)
 __iszerol:
 	pop	bc, hl, de
-	or	a, a
+	xor	a, a
 	adc	hl, de
 	pop	de
 	push	bc, bc, bc, bc
 	; return if mantissa is non-zero
-	jr	nz, .mant_nonzero
-	jr	c, .mant_carry
+	ret	nz	; mant_nonzero
+	ret	c	; mant_carry
 	ld	a, d
 	rla	; clear the signbit
 	or	a, e
-	inc	hl
-	ret	z
-	; upper 16 bits non-zero
-;	dec	hl
-;	ret
-.mant_nonzero:
-.mant_carry:
-	or	a, a
-	sbc	hl, hl
+	sub	a, 1
+	sbc	a, a
 	ret
