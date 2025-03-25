@@ -5,7 +5,7 @@
 #include <stdarg.h>
 
 #ifndef HAS_PRINTF
-# include <boot_sprintf.h>
+# include <ti/sprintf.h>
 #endif /* HAS_PRINTF */
 
 #ifdef HAS_CUSTOM_FILE
