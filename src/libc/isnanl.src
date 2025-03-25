@@ -4,7 +4,7 @@
 
 	public	__isnanl
 
-; int _isnanl(long double)
+; bool _isnanl(long double)
 __isnanl:
 	pop	bc, hl, de
 	or	a, a

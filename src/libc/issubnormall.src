@@ -4,7 +4,7 @@
 
 	public	__issubnormall
 
-; int _issubnormall(long double)
+; bool _issubnormall(long double)
 __issubnormall:
 	pop	bc, hl, de
 	or	a, a

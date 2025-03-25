@@ -9,6 +9,5 @@ __signbitl:
 	ld	hl, 10
 	add	hl, sp
 	ld	a, (hl)
-	rla
-	sbc	a, a
+	rlca	; faster than rla \ sbc a, a
 	ret
