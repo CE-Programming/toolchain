@@ -25,7 +25,7 @@ int main(void)
     // Set up the hardware cursor
     lcd_CrsrSetup();
     lcd_CrsrSetSize(LCD_CURSOR_SIZE_LARGE);
-    lcd_CrsrSetImage(cursor_data);
+    lcd_CrsrSetImageLarge(cursor_data);
 
     lcd_CrsrShow();
 

@@ -119,7 +119,6 @@ do { \
  * 
  * @see lcd_CrsrSetImageIndex
  * @see lcd_cursor_size_t
- * @see lcd_CrsrSetImage
  * 
  * @note
  * To use convimg to create the required data, add `bpp: 2`
@@ -137,7 +136,6 @@ do { \
  * @param[in] data A pointer to 1024 bytes of packed 2bpp image data.
  * 
  * @see lcd_cursor_size_t
- * @see lcd_CrsrSetImage
  * 
  * @note
  * To use convimg to create the required data, add `bpp: 2`
