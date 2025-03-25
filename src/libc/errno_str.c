@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <boot_sprintf.h>
+#include <ti/sprintf.h>
 
 static char const * const errno_strings[] = {
     "no error",

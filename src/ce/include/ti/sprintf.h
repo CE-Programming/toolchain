@@ -1,5 +1,5 @@
-#ifndef CE_SPRINTF_H
-#define CE_SPRINTF_H
+#ifndef TI_SPRINTF_H
+#define TI_SPRINTF_H
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -60,4 +60,4 @@ int boot_sprintf(
 }
 #endif
 
-#endif /* CE_SPRINTF_H */
+#endif /* TI_SPRINTF_H */

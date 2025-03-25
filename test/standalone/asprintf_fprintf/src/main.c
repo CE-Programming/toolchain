@@ -5,7 +5,7 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
-#include <boot_sprintf.h>
+#include <ti/sprintf.h>
 #include <ctype.h>
 
 /**

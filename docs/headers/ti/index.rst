@@ -23,6 +23,7 @@ whoever in the community first discovered something gave it a name following the
     info
     python
     real
+    sprintf
     tokens
     ui
     vars
