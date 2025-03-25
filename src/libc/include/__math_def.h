@@ -51,12 +51,12 @@ bool _isfinitef(float) __NOEXCEPT_CONST;
 bool _iszerof(float) __NOEXCEPT_CONST;
 bool _issubnormalf(float) __NOEXCEPT_CONST;
 
-int _isinfl(long double) __NOEXCEPT_CONST;
-int _isnanl(long double) __NOEXCEPT_CONST;
+bool _isinfl(long double) __NOEXCEPT_CONST;
+bool _isnanl(long double) __NOEXCEPT_CONST;
 bool _isnormall(long double) __NOEXCEPT_CONST;
 bool _isfinitel(long double) __NOEXCEPT_CONST;
-int _iszerol(long double) __NOEXCEPT_CONST;
-int _issubnormall(long double) __NOEXCEPT_CONST;
+bool _iszerol(long double) __NOEXCEPT_CONST;
+bool _issubnormall(long double) __NOEXCEPT_CONST;
 
 #if 0
 /* disabled until builtin is optimized */

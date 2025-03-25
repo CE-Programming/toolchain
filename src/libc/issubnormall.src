@@ -21,10 +21,8 @@ __issubnormall:
 .mant_carry:
 	ld	a, e
 	and	a, $F0
-	sbc	hl, hl
-	rra
 	res	7, d
-	add	a, d
-	ret	nz
-	inc	hl
+	or	a, d
+	sub	a, 1
+	sbc	a, a
 	ret

@@ -139,7 +139,7 @@ int main(void) {
         const uint32_t* failed_index_split = (const uint32_t*)((const void*)&(ret.failed_index));
         printf(
             "Failed test:\n0x%08lX%08lX\nTruth: %06X_%d\nGuess: %06X_%d",
-            failed_index_split[1], failed_index_split[0], ret.guess, ret.guess_fp, ret.truth, ret.truth_fp
+            failed_index_split[1], failed_index_split[0], ret.truth, ret.truth_fp, ret.guess, ret.guess_fp
         );
     }
 

@@ -15,19 +15,15 @@ __isnanl:
 	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
 	jr	c, .mant_nonzero	; normal, subnormal, or NaN
 	; common NaN, inf, normal, or subnormal
-	add	a, 15	; overflows 0xF1
-	jr	c, .skip_exp_check
-	ret
-.mant_nonzero:
 	or	a, a
-	sbc	hl, hl
+	ret	z
+	dec	a
+.mant_nonzero:
 	add	a, 16	; overflows 0xF0
-	ret	nc
-.skip_exp_check:
-	; carry is set here
+	sbc	a, a
+	ret	z
 	ld	a, d
-	rla	; A should be all ones if D was all ones
-	inc	a
-	ret	nz
-	inc	hl
+	add	a, a
+	add	a, 2
+	sbc	a, a
 	ret
