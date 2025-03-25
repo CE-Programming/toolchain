@@ -4,7 +4,7 @@
 
 	public	__isinfl
 
-; int _isinfl(long double)
+; bool _isinfl(long double)
 __isinfl:
 	pop	bc, hl, de
 	xor	a, a
