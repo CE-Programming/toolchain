@@ -30,7 +30,6 @@ _ceilf:
 	ld	e,a
 	push	bc
 	pop	hl
-	ld	sp,ix
 	pop	ix
 	ret
 
