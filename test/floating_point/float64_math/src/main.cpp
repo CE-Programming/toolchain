@@ -46,16 +46,24 @@ static size_t run_test(void) {
     if (test_result(std::atanh(  -0.9L), -1.472219489583220230004513715944L)) { return __LINE__; }
     if (test_result(std::atan (  12.0L),  1.487655094906455389320653376989L)) { return __LINE__; }
     if (test_result(std::atan (  -1.1L), -0.832981266674431705417693561837L)) { return __LINE__; }
+
     // if (test_result(std::sinh (   5.0L),  74.20321057778875897700947199607L)) { return __LINE__; }
     // if (test_result(std::sinh (  -9.0L), -4051.541902082789960515223595898L)) { return __LINE__; }
     // if (test_result(std::cosh (   8.0L),  1490.479161252178088627715460421L)) { return __LINE__; }
     // if (test_result(std::cosh (  -2.0L),  3.762195691083631459562213477774L)) { return __LINE__; }
     // if (test_result(std::tanh (   0.8L),  0.664036770267848963684844656400L)) { return __LINE__; }
     // if (test_result(std::tanh (  -3.2L), -0.996682397839651156180968063061L)) { return __LINE__; }
+
     if (test_result(std::exp  (   6.3L),  544.5719101259290330593886677332L)) { return __LINE__; }
     if (test_result(std::exp  (  -4.2L),  0.014995576820477706211984360229L)) { return __LINE__; }
     if (test_result(std::log  (1.0e-6L), -13.81551055796427410410794872811L)) { return __LINE__; }
     if (test_result(std::log  (3.0e+8L),  19.51929303262047516353917687440L)) { return __LINE__; }
+
+    if (test_result(std::expm1 (    0.2L),  0.221402758160169833921071994640L)) { return __LINE__; }
+    if (test_result(std::expm1 (-1.0e-8L), -9.999999950000000166666666250e-9L)) { return __LINE__; }
+    if (test_result(std::log1p (   -0.2L), -0.223143551314209755766295090310L)) { return __LINE__; }
+    if (test_result(std::log1p ( 1.0e-8L),  9.999999950000000333333330833e-9L)) { return __LINE__; }
+
     if (test_result(std::erfc (  -1.3L),  1.934007944940652436603893327504L)) { return __LINE__; }
     if (test_result(std::erfc (   3.1L),  0.000011648657367199596033706164L)) { return __LINE__; }
     if (test_result(std::erf  (  -2.2L), -0.998137153702018108556548243971L)) { return __LINE__; }
