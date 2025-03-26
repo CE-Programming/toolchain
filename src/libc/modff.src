@@ -11,10 +11,91 @@ _modf := _modff
 
 else
 
-_modff := __modff_c
-_modf := __modf_c
+; float modf(float x, float* iptr)
+_modff:
+_modf:
+	call	__frameset0
 
-	extern	__modff_c
-	extern	__modf_c
+	; copy the mantissa into HL and BC
+	sbc	hl, hl
+	ld	bc, (ix + 6) ; mantissa
+	add	hl, bc
+	adc	hl, hl
+	ld	a, (ix + 9) ; exponent
+	ld	e, a
+	rla
+	ld	d, a
+	jr	z, .maybe_inf
+	inc	a
+	ld	a, e
+	jr	z, .ret_nan
+.not_inf:
+	ld	a, d
+	sub	a, 127	; |x| < 1.0f
+	jr	c, .less_than_one
+	; fintie and normal
+	ld	hl, (ix + 6) ; mantissa
+	; E has exponent
+	push	de
+	push	hl
+	call	_truncf
+	pop	af, af
+
+	ld	a, e
+	ex	hl, de
+	ld	hl, (ix + 12)	; float *iptr
+	ld	(hl), de
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl), a
+	ex	hl, de
+	ld	e, a
+	ld	bc, (ix + 6)
+	ld	a, (ix + 9)
+
+	call	__fsub
+	push	bc
+	pop	hl
+	ld	e, a
+	pop	ix
+	ret
+
+.maybe_inf:
+	inc	a
+	jr	nz, .not_inf
+	ld	a, e
+	ld	hl, (ix + 12)	; float *iptr
+	ld	(hl), bc
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl), a	; inf exp
+	xor	a, a
+	ld	e, a
+	sbc	hl, hl
+	pop	ix
+	ret
+
+.less_than_one:
+	ld	bc, 0
+	ld	a, e
+	and	a, $80
+	; A:UBC = copysignf(0.0f, x)
+.ret_nan:
+	ld	hl, (ix + 12)	; float *iptr
+	ld	(hl), bc
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	(hl), a
+	ld	hl, (ix + 6)	; mantissa
+	; E has exponent
+	pop	ix
+	ret
+
+	extern	__frameset0
+	extern	_truncf
+	extern	__fsub
 
 end if
