@@ -240,9 +240,40 @@ typedef struct {
   size_t cur;
 } npf_bufputc_ctx_t;
 
-static int npf_parse_format_spec(char const *format, npf_format_spec_t *out_spec);
+#if 0
+
 static void npf_bufputc(int c, void *ctx);
 static void npf_bufputc_nop(int c, void *ctx);
+
+static void npf_bufputc(int c, void *ctx) {
+  npf_bufputc_ctx_t *bpc = (npf_bufputc_ctx_t *)ctx;
+  if (bpc->cur < bpc->len) { bpc->dst[bpc->cur++] = (char)c; }
+}
+
+static void npf_bufputc_nop(int c, void *ctx) { (void)c; (void)ctx; }
+
+static void npf_putc_std(int c, void *ctx) {
+  (void)ctx;
+  outchar(c);
+}
+
+static void npf_fputc_std(int c, void *ctx) {
+  fputc(c, (FILE*)ctx);
+}
+
+#else
+
+void npf_bufputc(int c, void *ctx);
+
+void npf_bufputc_nop(int c, void *ctx) __attribute__((__const__, __leaf__, __nothrow__));
+
+void npf_putc_std(int c, void *ctx);
+
+void npf_fputc_std(int c, void *ctx);
+
+#endif
+
+static int npf_parse_format_spec(char const *format, npf_format_spec_t *out_spec);
 static int npf_itoa_rev(char *buf, npf_int_t i);
 static int npf_utoa_rev(char *buf, npf_uint_t i, unsigned base, unsigned case_adjust);
 
@@ -628,22 +659,6 @@ static int npf_bin_len(npf_uint_t u) {
 #endif
 }
 #endif
-
-static void npf_bufputc(int c, void *ctx) {
-  npf_bufputc_ctx_t *bpc = (npf_bufputc_ctx_t *)ctx;
-  if (bpc->cur < bpc->len) { bpc->dst[bpc->cur++] = (char)c; }
-}
-
-static void npf_bufputc_nop(int c, void *ctx) { (void)c; (void)ctx; }
-
-static void npf_putc_std(int c, void *ctx) {
-  (void)ctx;
-  outchar(c);
-}
-
-static void npf_fputc_std(int c, void *ctx) {
-  fputc(c, (FILE*)ctx);
-}
 
 typedef struct npf_cnt_putc_ctx {
   npf_putc pc;

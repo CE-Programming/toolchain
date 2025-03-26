@@ -10,7 +10,21 @@ if HAS_PRINTF
 _printf := __printf_c
 _vprintf := __vprintf_c
 
+	public	_npf_putc_std
+
+_npf_putc_std:
+;	call	__frameset0
+;	ld	a, (ix + 6)
+;	ld	(ix + 6), a
+;	pop	ix
+;	jp	_outchar
+	ld	hl, 6
+	add	hl, sp
+	ld	a, (hl)
+	jp	_outchar
+
 	extern	__printf_c
 	extern	__vprintf_c
+	extern	_outchar
 
 end if

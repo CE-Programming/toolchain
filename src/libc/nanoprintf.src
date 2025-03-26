@@ -1,0 +1,45 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_npf_bufputc_nop
+	public	_npf_bufputc
+
+_npf_bufputc:
+;	call	__frameset0
+;	ld	iy, (ix + 9)
+;	ld	de, (iy + 6)
+;	ld	bc, (iy + 3)
+;	push	de
+;	pop	hl
+;	or	a, a
+;	sbc	hl, bc
+;	jr	nc, .finish
+;	ld	a, (ix + 6)
+;	ld	hl, (iy)
+;	push	de
+;	pop	bc
+;	inc	bc
+;	ld	(iy + 6), bc
+;	add	hl, de
+;	ld	(hl), a
+;.finish:
+;	pop	ix
+;	ret
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy + 3)
+	ld	iy, (iy + 6)
+	ld	hl, (iy + 6)
+	ld	bc, (iy + 3)
+	sbc	hl, bc	; carry not set
+	ret	nc
+	add	hl, bc
+	ex	de, hl
+	ld	hl, (iy)
+	add	hl, de
+	inc	de
+	ld	(iy + 6), de
+	ld	(hl), a
+_npf_bufputc_nop:
+	ret

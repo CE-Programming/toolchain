@@ -19,6 +19,10 @@
  * memccpy
  */
 
+#if defined(sprintf) || defined(snprintf) || defined(asprintf)
+# error "sprintf snprintf asprintf macro aliases need to be disabled"
+#endif
+
 // prevents Clang from replacing function calls with builtins
 #if 1
 
@@ -141,8 +145,9 @@ int nano_tests(void) {
         return __LINE__;
     }
     size_t buf_len = T_strlen(buf);
-    if (buf_len != T_strlen(test_1) || buf_len != (size_t)len) {
-        printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
+    const size_t test_1_len = T_strlen(test_1);
+    if (buf_len != test_1_len || buf_len != (size_t)len) {
+        printf("E: %zu != %zu != %d\n", test_1_len, buf_len, len);
         return __LINE__;
     }
     if (pos != pos_1) {
@@ -152,6 +157,34 @@ int nano_tests(void) {
     int cmp = T_strcmp(buf, test_1);
     if (cmp != 0) {
         printf("cmp: %d\n", cmp);
+        return __LINE__;
+    }
+    char append[128];
+    int snprintf_test = snprintf(append, 20, "%s", test_1);
+    if (snprintf_test != (int)test_1_len) {
+        printf("sprintf_test: %d != %zu\n", snprintf_test, test_1_len);
+        return __LINE__;
+    }
+    int len_2 = snprintf(append, sizeof(append), "%s", test_1);
+    if (len_2 != (int)test_1_len) {
+        printf("E: %d != %zu\n", len_2, test_1_len);
+        return __LINE__;
+    }
+    char str2[128];
+    char* end;
+    end = T_stpcpy(str2, append);
+    end = T_stpcpy(end, "");
+    end = T_stpcpy(end, "foo");
+    if (*end != '\0') {
+        return __LINE__;
+    }
+    if (end != &str2[pos_2]) {
+        printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
+        return __LINE__;
+    }
+    int cmp2 = T_strcmp(str2, test_2);
+    if (cmp2 != 0) {
+        printf("cmp: %d\n", cmp2);
         return __LINE__;
     }
     return 0;

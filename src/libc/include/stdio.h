@@ -4,7 +4,7 @@
 #include <cdefs.h>
 #include <stdarg.h>
 
-#ifndef HAS_PRINTF
+#if defined(HAS_PRINTF) && HAS_PRINTF == 0
 # include <ti/sprintf.h>
 #endif /* HAS_PRINTF */
 
@@ -159,7 +159,7 @@ namespace std {
 } /* namespace std */
 #endif /* __cplusplus */
 
-#ifndef HAS_PRINTF
+#if defined(HAS_PRINTF) && HAS_PRINTF == 0
 # define snprintf boot_snprintf
 # define asprintf boot_asprintf
 #endif /* HAS_PRINTF */

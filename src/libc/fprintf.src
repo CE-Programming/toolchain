@@ -10,7 +10,26 @@ if HAS_PRINTF
 _fprintf := __fprintf_c
 _vfprintf := __vfprintf_c
 
+	public	_npf_fputc_std
+_npf_fputc_std:
+;	call	__frameset0
+;	ld	hl, (ix + 6)
+;	ld	de, (ix + 9)
+;	ld	(ix + 6), hl
+;	ld	(ix + 9), de
+;	pop	ix
+;	jp	_fputc
+	ld	hl, 9
+	add	hl, sp
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	jp	_fputc
+
 	extern	__fprintf_c
 	extern	__vfprintf_c
+	extern	_fputc
 
 end if
