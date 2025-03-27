@@ -4,10 +4,6 @@
 #include <cdefs.h>
 #include <stdarg.h>
 
-#ifndef HAS_PRINTF
-# include <ti/sprintf.h>
-#endif /* HAS_PRINTF */
-
 #ifdef HAS_CUSTOM_FILE
 #include CUSTOM_FILE_FILE
 #else
@@ -158,10 +154,5 @@ namespace std {
     using ::perror;
 } /* namespace std */
 #endif /* __cplusplus */
-
-#ifndef HAS_PRINTF
-# define snprintf boot_snprintf
-# define asprintf boot_asprintf
-#endif /* HAS_PRINTF */
 
 #endif /* _STDIO_H */

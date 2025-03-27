@@ -6,13 +6,9 @@
 
 if HAS_PRINTF
 
-	public	_vsprintf
-
 _sprintf := __sprintf_c
-_vsprintf := __vsprintf_c
 
 	extern	__sprintf_c
-	extern	__vsprintf_c
 
 else
 

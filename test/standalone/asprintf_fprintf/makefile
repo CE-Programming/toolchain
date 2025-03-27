@@ -13,6 +13,8 @@ CXXFLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Oz
 
 PREFER_OS_LIBC = NO
 
+HAS_PRINTF = YES
+
 # ----------------------------
 
 include $(shell cedev-config --makefile)

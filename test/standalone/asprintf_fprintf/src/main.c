@@ -8,16 +8,19 @@
 #include <ti/sprintf.h>
 #include <ctype.h>
 
+
 /**
- * @brief Tests the following functions/macros:
- * boot_sprintf
- * boot_snprintf
- * boot_asprintf
- * asprintf
- * fprintf
- * stpcpy
- * memccpy
- */
+* @brief Tests the following functions/macros:
+* boot_sprintf
+* boot_snprintf
+* boot_asprintf
+* asprintf
+* fprintf
+* stpcpy
+* memccpy
+*/
+
+#define SINK (char*)0xE40000
 
 // prevents Clang from replacing function calls with builtins
 #if 1
@@ -66,6 +69,12 @@ static char const * const test_2 =
 static const int pos_1 = 30;
 static const int pos_2 = 42;
 
+static char const * const test_3 =
+"sprintf%%%% %%is unsafe";
+static const int pos_3 = 20;
+
+static const int pos_4 = 209;
+
 static char* buf = NULL;
 static FILE* file = NULL;
 
@@ -98,7 +107,7 @@ int boot_sprintf_tests(void) {
     }
     char append[128];
     int snprintf_test = boot_snprintf(append, 20, "%s", test_1);
-    if (snprintf_test >= 0) {
+    if (snprintf_test != (int)T_strlen(test_1)) {
         printf("sprintf_test: %d\n", snprintf_test);
         return __LINE__;
     }
@@ -124,6 +133,51 @@ int boot_sprintf_tests(void) {
         printf("cmp: %d\n", cmp2);
         return __LINE__;
     }
+    char buf_3[30];
+    int len_3 = boot_snprintf(buf_3, sizeof(buf_3), test_3);
+    if (len_3 != pos_3) {
+        printf("E: %d != %d\n", len_3, pos_3);
+        return __LINE__;
+    }
+    
+    // large string test
+    static char const * const s = "Hello";
+    int len_4 = boot_snprintf(SINK, 300,
+        "Strings:\n"
+        " padding:\n"
+        "*[%10s]\n"
+        "*[%-10s]\n"
+        "*[%*s]\n"
+        " truncating:\n"
+        "%%%.4s\n"
+        "%%%.*s\n"
+        "Characters:\t%c %%\n"
+        "Integers:\n"
+        "%%*Decimal:\t%i %d %.6i %i %.0i %+i %i\n"
+        "*%%Hexadecimal:\t%x %x %X %#x\n"
+        "%%*.*%%Octal:\t%o %#o %#o\n"
+        "Width trick: %*d \n",
+        s,
+        s,
+        10, s,
+        s,
+        3, s,
+        'A',
+        1, 2, 3, 0, 0, 4, -4,
+        5, 10, 10, 6,
+        10, 10, 4,
+        5, 10
+    );
+    if (len_4 != pos_4) {
+        printf("E: %d != %d\n", len_4, pos_4);
+        return __LINE__;
+    }
+    int len_5 = boot_snprintf(SINK, 10, "");
+    if (len_5 != 0) {
+        printf("E: %d != 0\n", len_5);
+        return __LINE__;
+    }
+
     return 0;
 }
 
@@ -149,11 +203,84 @@ int nano_tests(void) {
         printf("E: %d != %d\n", pos, pos_1);
         return __LINE__;
     }
-    int cmp = T_strcmp(buf, test_1);
+    int cmp = strcmp(buf, test_1);
     if (cmp != 0) {
         printf("cmp: %d\n", cmp);
         return __LINE__;
     }
+    char append[128];
+    int snprintf_test = snprintf(append, 20, "%s", test_1);
+    if (snprintf_test != (int)T_strlen(test_1)) {
+        printf("sprintf_test: %d\n", snprintf_test);
+        return __LINE__;
+    }
+    int len_2 = snprintf(append, sizeof(append), "%s", test_1);
+    if (len_2 != (int)T_strlen(test_1)) {
+        printf("E: %d != %zu\n", len_2, T_strlen(test_1));
+        return __LINE__;
+    }
+    char str2[128];
+    char* end;
+    end = T_stpcpy(str2, append);
+    end = T_stpcpy(end, "");
+    end = T_stpcpy(end, "foo");
+    if (*end != '\0') {
+        return __LINE__;
+    }
+    if (end != &str2[pos_2]) {
+        printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
+        return __LINE__;
+    }
+    int cmp2 = T_strcmp(str2, test_2);
+    if (cmp2 != 0) {
+        printf("cmp: %d\n", cmp2);
+        return __LINE__;
+    }
+    char buf_3[30];
+    int len_3 = snprintf(buf_3, sizeof(buf_3), test_3);
+    if (len_3 != pos_3) {
+        printf("E: %d != %d\n", len_3, pos_3);
+        return __LINE__;
+    }
+    
+    // https://en.cppreference.com/w/c/io/fprintf
+    static char const * const s = "Hello";
+    int len_4 = snprintf(SINK, 300,
+        "Strings:\n"
+        " padding:\n"
+        "*[%10s]\n"
+        "*[%-10s]\n"
+        "*[%*s]\n"
+        " truncating:\n"
+        "%%%.4s\n"
+        "%%%.*s\n"
+        "Characters:\t%c %%\n"
+        "Integers:\n"
+        "%%*Decimal:\t%i %d %.6i %i %.0i %+i %i\n"
+        "*%%Hexadecimal:\t%x %x %X %#x\n"
+        "%%*.*%%Octal:\t%o %#o %#o\n"
+        "Width trick: %*d \n",
+        s,
+        s,
+        10, s,
+        s,
+        3, s,
+        'A',
+        1, 2, 3, 0, 0, 4, -4,
+        5, 10, 10, 6,
+        10, 10, 4,
+        5, 10
+    );
+    if (len_4 != pos_4) {
+        printf("E: %d != %d\n", len_4, pos_4);
+        return __LINE__;
+    }
+    int len_5 = snprintf(SINK, 10, "");
+    if (len_5 != 0) {
+        printf("E: %d != 0\n", len_5);
+        return __LINE__;
+    }
+
     return 0;
 }
 
