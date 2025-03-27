@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include <stdarg.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -12,49 +14,40 @@ extern "C" {
  * @brief C89 `sprintf`. `long` arguments and width specifiers are unsupported.
  * @note `%s` will write up to 255 characters.
  */
-int boot_sprintf(
-    char *__restrict buffer, const char *__restrict format, ...
-) __attribute__((format (__printf__, 2, 3)));
+int boot_sprintf(char *__restrict buffer, const char *__restrict format, ...)
+    __attribute__((format (__printf__, 2, 3)));
+
+/**
+ * @note calls va_copy to wrap boot_sprintf
+ */
+int boot_vsprintf(char *__restrict buffer, const char *__restrict format, va_list va)
+    __attribute__((format(__printf__, 2, 0)));
 
 /**
  * @brief Returns an empty string if the output from sprintf does not fit.
- * @warning `__VA_ARGS__` is evaluated twice.
  */
-#define boot_snprintf(buffer, count, ...)\
-({\
-    char * const __buffer = buffer;\
-    const int __count = count;\
-    int __ret = -1;\
-    int __str_len = boot_sprintf((char*)0xE40000, __VA_ARGS__);\
-    if (__buffer == NULL || __count == 0) {\
-        __ret = __str_len;\
-    } else if ((size_t)__str_len > __count) {\
-        *__buffer = '\0'; /* won't fit or invalid formatting */\
-    } else {\
-        __ret = boot_sprintf(__buffer, __VA_ARGS__);\
-    }\
-    __ret;\
-})
+int boot_snprintf(char *__restrict buffer, size_t count, const char *__restrict format, ...)
+    __attribute__((format(__printf__, 3, 4)));
+
+/**
+ * @brief Returns an empty string if the output from sprintf does not fit.
+ */
+int boot_vsnprintf(char *__restrict buffer, size_t count, const char *__restrict format, va_list va)
+    __attribute__((format(__printf__, 3, 0)));
 
 /**
  * @brief Allocates a null terminated string containing the output of sprintf.
  * The returned pointer shall be deallocated with `free`.
- * @warning `__VA_ARGS__` is evaluated twice.
  */
-#define boot_asprintf(p_buffer, ...)\
-({\
-    char** const __p_buffer = p_buffer;\
-    int __ret = -1;\
-    int __str_len = boot_sprintf((char*)0xE40000, __VA_ARGS__);\
-    if (__str_len >= 0) {\
-        size_t __buffer_size = (size_t)__str_len + 1;\
-        *__p_buffer = (char*)malloc(__buffer_size);\
-        if (*__p_buffer != NULL) {\
-            __ret = boot_sprintf(*__p_buffer, __VA_ARGS__);\
-        }\
-    }\
-    __ret;\
-})
+int boot_asprintf(char **__restrict p_buffer, const char *__restrict format, ...)
+    __attribute__((format (__printf__, 2, 3))) __attribute__((nonnull(1)));
+
+/**
+ * @brief Allocates a null terminated string containing the output of sprintf.
+ * The returned pointer shall be deallocated with `free`.
+ */
+int boot_vasprintf(char **__restrict p_buffer, const char *__restrict format, va_list va)
+    __attribute__((format(__printf__, 2, 0))) __attribute__((nonnull(1)));
 
 #ifdef __cplusplus
 }

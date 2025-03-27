@@ -2,15 +2,23 @@
 
 	section	.text
 
-if HAS_PRINTF
-
 	public	_snprintf
 	public	_vsnprintf
+
+if HAS_PRINTF
 
 _snprintf := __snprintf_c
 _vsnprintf := __vsnprintf_c
 
 	extern	__snprintf_c
 	extern	__vsnprintf_c
+
+else
+
+_snprintf := _boot_snprintf
+_vsnprintf := _boot_vsnprintf
+
+	extern	_boot_snprintf
+	extern	_boot_vsnprintf
 
 end if
