@@ -51,9 +51,10 @@ This is configurable with :code:`make install PREFIX=[LOCATION]`
 Windows
 ~~~~~~~
 
-Get `MinGW <https://osdn.net/projects/mingw/>`_.
-The only required pacakges are `mingw32-base` and `mingw32-gcc-g++`.
-Make sure the ``MinGW\bin`` directory is in the system's PATH environment variable.
+Get `MSYS2 <https://www.msys2.org/>`_ and use the `MinGW64` environment.
+
+The only required pacakge is `mingw-w64-x86_64-toolchain <https://packages.msys2.org/groups/mingw-w64-x86_64-toolchain>`_.
+Make sure the ``C:\msys64\mingw64\bin`` directory is in the system's PATH environment variable.
 
 Get the `ez80 LLVM compiler <https://github.com/jacobly0/llvm-project/wiki>`_.
 Make sure that ``ez80-clang.exe`` and ``ez80-link.exe`` are reachable by the system's PATH environment variable.
