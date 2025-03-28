@@ -12,36 +12,40 @@ The OS comes with an implementation of ANSI C89 `sprintf`, which can reduce the 
 boot_sprintf
 ------------
 
-The following type specifiers are supported :code:`%s %c %d %i %u %o %x %X %p %n`, alongside the flags :code:`-+#0*` in addition to the space flag and minimum field width.
+The following type specifiers are supported :code:`%s %c %d %i %u %o %x %X %p %n`. The minimum field width :code:`*`, precision :code:`.*`, alongside :code:`-+#0` and the space flag are also supported.
 
 All length modifiers :code:`hh h l ll j z t L` and floating point specifiers :code:`%f %g %e %a` are **not** supported.
 
 Additionally, each individual argument will write no more than 255 characters each. This means that any strings written with :code:`%s` will be truncated after 255 characters.
 
-:code:`<ti/sprintf.h>` provides `boot_sprintf`, in addition to `boot_snprintf` and `boot_asprintf` as macros.
+:code:`<ti/sprintf.h>` provides `boot_sprintf`, `boot_snprintf`, and `boot_asprintf`, in addition to `boot_vsprintf`, `boot_vsnprintf`, and `boot_vasprintf` which accept a `va_list`.
 
 .. code-block:: c
 
     int boot_sprintf(char *restrict buffer, const char *restrict format, ...)
+    int boot_vsprintf(char *restrict buffer, const char *restrict format, va_list args)
 
     int boot_snprintf(char *restrict buffer, size_t count, const char *restrict format, ...)
+    int boot_vsnprintf(char *restrict buffer, size_t count, const char *restrict format, va_list args)
 
     int boot_asprintf(char **restrict p_buffer, const char *restrict format, ...)
+    int boot_vasprintf(char **restrict p_buffer, const char *restrict format, va_list args)
 
-Because the OS does not provide `vsprintf`, `boot_snprintf` and `boot_asprintf` are implemented as macros. This means that :code:`...` or :code:`__VA_ARGS__` will be evaluated twice when the macro is expanded. `sprintf` is traditionally "unsafe" because a maximum output length cannot be specified, which can cause buffer overflows. By writing to an unmapped memory address :code:`0xE40000`, `boot_sprintf` can safely write up to ~786000 bytes which can then be used to determine the length of the output.
+`sprintf` is traditionally "unsafe" because a maximum output length cannot be specified, which can cause buffer overflows. By writing to an unmapped memory address :code:`0xE40000`, `boot_sprintf` can safely write up to ~786000 bytes which can then be used to determine the length of the output.
 
 Replacing printf functions
 --------------------------
 
-To disable all other printf functions with `boot_sprintf`, `boot_snprintf`, and `boot_asprintf`, add the following line to the Makefile. More information :ref:`here <printf>`.
+To replace all other printf functions with the `boot_sprintf` functions, add the following line to the Makefile. More information :ref:`here <printf>`.
 
 .. code-block:: makefile
 
     HAS_PRINTF = NO
 
-.. warning::
+boot_vsprintf
+-------------
 
-    :code:`std::snprintf` and :code:`std::asprintf` will cause errors if :code:`HAS_PRINTF = NO`
+Because the OS does not provide `vsprintf`, `boot_vsprintf` is implemented by counting the number of arguments in the format string, and then copying the arguments from `va_list` onto the stack so they can be passed into `boot_sprintf`.
 
 boot_asprintf
 -------------
@@ -68,14 +72,11 @@ The truncating behavior of C99 `snprintf` can be replicated with `boot_asprintf`
 
 printf and fprintf
 ------------------
-`printf` and `fprintf` can be replicated by using `boot_asprintf` and `fputs`
+`printf` and `fprintf` can be replicated by using `fputs`
 
 .. code-block:: c
 
-    char *output;
-    boot_asprintf(&output, format, ...);
-    if (output != NULL) {
-        // fprintf(stdout, ...) == printf(...)
-        fputs(stdout, output);
-        free(output);
-    }
+    char output[50];
+    boot_snprintf(output, format, ...);
+    // fprintf(stdout, ...) == printf(...)
+    fputs(stdout, output);
