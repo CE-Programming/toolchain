@@ -4,3 +4,4 @@ src/gfx/*.c
 src/gfx/*.h
 .DS_Store
 convimg.out
+src/gfx/convimg.yaml.lst

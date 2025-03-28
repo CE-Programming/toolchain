@@ -1,0 +1,74 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_boot_vsprintf
+
+; wraps boot_sprintf
+_boot_vsprintf:
+	call	__frameset0
+	; Get length of format string, plus 1
+	ld	hl, (ix + 9)
+	push	hl
+	push	hl
+	call	_strlen
+	pop	bc
+	ex	(sp), hl
+	pop	bc
+	inc	bc
+	; Track pointer to stack allocation
+	lea	de, ix
+.countSpecifiersLoop:
+	ld	a, '%'
+.countSpecifiersInnerLoop:
+	; Find format specifier
+	cpir
+	jr	nz, .countDone
+	; Check for escaped specifier
+	cpi
+	jr	z, .countSpecifiersInnerLoop
+	dec	hl
+	inc	bc
+	ld	a, '*'
+.countSpecifiersIncrement:
+	; Add one parameter
+	dec	de
+	dec	de
+	dec	de
+.countSpecifiersFormat:
+	; Check for end of specifier
+	bit	6, (hl)
+	jr	nz, .countSpecifiersLoop
+	; Check for additional variable-length parameter
+	cpi
+	jr	z, .countSpecifiersIncrement
+	; Check for end of string
+	jp	pe, .countSpecifiersFormat
+.countDone:
+	; Get length of parameters
+	lea	hl, ix
+	or	a, a
+	sbc	hl, de
+	jr	z, .noCopy
+	; Allocate space for parameters
+	ex	de, hl
+	ld	sp, hl
+	ex	de, hl
+	; Copy parameters
+	push	hl
+	pop	bc
+	ld	hl, (ix + 12)
+	ldir
+.noCopy:
+	ld	hl, (ix + 9)
+	push	hl
+	ld	hl, (ix + 6)
+	push	hl
+	call	_boot_sprintf
+	ld	sp, ix
+	pop	ix
+	ret
+
+	extern	_boot_sprintf
+	extern	__frameset0
+	extern	_strlen

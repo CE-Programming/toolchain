@@ -1,0 +1,19 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_vsprintf
+
+if HAS_PRINTF
+
+_vsprintf := __vsprintf_c
+
+	extern	__vsprintf_c
+
+else
+
+_vsprintf := _boot_vsprintf
+
+	extern	_boot_vsprintf
+
+end if
