@@ -1,4 +1,12 @@
 // -*- C++ -*-
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
 #ifndef _EZCXX_TYPE_TRAITS
 #define _EZCXX_TYPE_TRAITS
 
@@ -9,7 +17,10 @@
 
 namespace std {
 
-// helper classes:
+//------------------------------------------------------------------------------
+// helper classes
+//------------------------------------------------------------------------------
+
 template<class _Tp, _Tp __value> struct integral_constant {
     static const _Tp value = __value;
     using value_type = _Tp;
@@ -22,7 +33,10 @@ template<bool __value> using bool_constant = integral_constant<bool, __value>;
 using false_type = bool_constant<false>;
 using true_type  = bool_constant<true>;
 
-// helper traits:
+//------------------------------------------------------------------------------
+// helper traits
+//------------------------------------------------------------------------------
+
 template<class _Tp> struct type_identity { using type = _Tp; };
 template<class _Tp> using type_identity_t = typename type_identity<_Tp>::type;
 
@@ -38,7 +52,10 @@ template<class...> using void_t = void;
 
 template<class...> using __require = true_type;
 
-// type relationships:
+//------------------------------------------------------------------------------
+// type relationships
+//------------------------------------------------------------------------------
+
 template<class, class> struct is_same           : false_type {};
 template<class _Tp>    struct is_same<_Tp, _Tp> : true_type  {};
 template<class _Lp, class _Rp> inline constexpr bool is_same_v = is_same<_Lp, _Rp>::value;
@@ -53,7 +70,10 @@ template<class _Lp, class _Rp> inline constexpr bool is_convertible_v = __is_con
 template<class _Lp, class _Rp> using is_convertible = bool_constant<is_convertible_v<_Lp, _Rp>>;
 #endif
 
-// logical operator traits:
+//------------------------------------------------------------------------------
+// logical operator traits
+//------------------------------------------------------------------------------
+
 template<class...>                struct conjunction              : true_type                                           {};
 template<class _Tp>               struct conjunction<_Tp>         : _Tp                                                 {};
 template<class _Lp, class... _Rs> struct conjunction<_Lp, _Rs...> : conditional_t<_Lp::value, conjunction<_Rs...>, _Lp> {};
@@ -67,7 +87,10 @@ template<class... _Ts> inline constexpr bool disjunction_v = disjunction<_Ts...>
 template<class _Tp> inline constexpr bool negation_v = !bool(_Tp::value);
 template<class _Tp> using negation = bool_constant<negation_v<_Tp>>;
 
-// const/volatile removal traits:
+//------------------------------------------------------------------------------
+// const/volatile removal traits
+//------------------------------------------------------------------------------
+
 template<class _Tp> struct remove_const            : type_identity<_Tp> {};
 template<class _Tp> struct remove_const<_Tp const> : type_identity<_Tp> {};
 template<class _Tp> using remove_const_t = typename remove_const<_Tp>::type;
@@ -79,7 +102,10 @@ template<class _Tp> using remove_volatile_t = typename remove_volatile<_Tp>::typ
 template<class _Tp> using remove_cv = remove_const<remove_volatile_t<_Tp>>;
 template<class _Tp> using remove_cv_t = typename remove_cv<_Tp>::type;
 
-// primary type categories:
+//------------------------------------------------------------------------------
+// primary type categories
+//------------------------------------------------------------------------------
+
 #if __has_builtin(__is_void)
 template<class _Tp> inline constexpr bool is_void_v = __is_void(_Tp);
 template<class _Tp> using is_void = bool_constant<is_void_v<_Tp>>;
@@ -148,7 +174,10 @@ template<class _Tp> inline constexpr bool is_member_function_pointer_v = __is_me
 template<class _Tp> using is_member_function_pointer = bool_constant<is_member_function_pointer_v<_Tp>>;
 #endif
 
-// composite type categories:
+//------------------------------------------------------------------------------
+// composite type categories
+//------------------------------------------------------------------------------
+
 #if __has_builtin(__is_fundamental)
 template<class _Tp> inline constexpr bool is_fundamental_v = __is_fundamental(_Tp);
 template<class _Tp> using is_fundamental = bool_constant<is_fundamental_v<_Tp>>;
@@ -184,7 +213,10 @@ template<class _Tp> inline constexpr bool is_member_pointer_v = __is_member_poin
 template<class _Tp> using is_member_pointer = bool_constant<is_member_pointer_v<_Tp>>;
 #endif
 
-// type properties:
+//------------------------------------------------------------------------------
+// type properties
+//------------------------------------------------------------------------------
+
 #if __has_builtin(__is_const)
 template<class _Tp> inline constexpr bool is_const_v = __is_const(_Tp);
 template<class _Tp> using is_const = bool_constant<is_const_v<_Tp>>;
@@ -260,7 +292,10 @@ template<class _Tp> inline constexpr bool is_unsigned_v = __is_unsigned(_Tp);
 template<class _Tp> using is_unsigned = bool_constant<is_unsigned_v<_Tp>>;
 #endif
 
-// const/volatile addition traits:
+//------------------------------------------------------------------------------
+// const/volatile addition traits
+//------------------------------------------------------------------------------
+
 template<class _Tp> using add_const = conditional<disjunction_v<is_reference<_Tp>, is_function<_Tp>, is_const<_Tp>>,
                                                   _Tp, _Tp const>;
 template<class _Tp> using add_const_t = typename add_const<_Tp>::type;
@@ -272,7 +307,10 @@ template<class _Tp> using add_volatile_t = typename add_volatile<_Tp>::type;
 template<class _Tp> using add_cv = add_const<add_volatile_t<_Tp>>;
 template<class _Tp> using add_cv_t = typename add_cv<_Tp>::type;
 
-// reference/pointer transformation traits:
+//------------------------------------------------------------------------------
+// reference/pointer transformation traits
+//------------------------------------------------------------------------------
+
 template<class _Tp> struct remove_pointer                      : type_identity<_Tp> {};
 template<class _Tp> struct remove_pointer<_Tp*>                : type_identity<_Tp> {};
 template<class _Tp> struct remove_pointer<_Tp* const>          : type_identity<_Tp> {};
@@ -303,6 +341,10 @@ template<class _Tp> auto __ezcxx_add_rvalue_reference(int) -> type_identity<_Tp&
 template<class _Tp> auto __ezcxx_add_rvalue_reference(...) -> type_identity<_Tp>;
 template<class _Tp> using add_rvalue_reference = decltype(__ezcxx_add_rvalue_reference<_Tp>(0));
 template<class _Tp> using add_rvalue_reference_t = typename add_rvalue_reference<_Tp>::type;
+
+//------------------------------------------------------------------------------
+// property queries
+//------------------------------------------------------------------------------
 
 // alignment_of:
 template<class _Tp> struct alignment_of
@@ -372,7 +414,10 @@ template<class _Tp> using underlying_type_t = typename underlying_type<_Tp>::typ
 // <utility> functions:
 template<class _Tp> add_rvalue_reference_t<_Tp> declval() noexcept;
 
-// member classification traits:
+//------------------------------------------------------------------------------
+// member classification traits
+//------------------------------------------------------------------------------
+
 template<class _Tp, class... _As> auto __constructible(int) -> __require<decltype(_Tp(declval<_As>()...))>;
 template<class, class...>         auto __constructible(...) -> false_type;
 template<class _Tp, class... _As> using is_constructible = decltype(__constructible<_Tp, _As...>(0));
@@ -483,33 +528,517 @@ template<class _Tp> inline constexpr bool has_virtual_destructor_v = __has_virtu
 template<class _Tp> using has_virtual_destructor = bool_constant<has_virtual_destructor_v<_Tp>>;
 #endif
 
-// more <utility> functions:
-#if __cplusplus > 201103L
-template<class _Tp> _EZCXX_INLINE constexpr auto move(_Tp&& __value) noexcept {
-    return static_cast<remove_reference_t<_Tp>&&>(__value);
+// member relations:
+
+inline constexpr bool is_constant_evaluated() noexcept {
+    return __builtin_is_constant_evaluated();
 }
-#endif // __cplusplus > 201103L
 
-#if __cplusplus > 201103L
-template<class _Tp> _EZCXX_INLINE constexpr enable_if_t<is_move_constructible_v<_Tp> && is_move_assignable_v<_Tp>>
-swap(_Tp& __lhs, _Tp& __rhs) noexcept(is_nothrow_move_constructible_v<_Tp> && is_nothrow_move_assignable_v<_Tp>) {
-    _Tp __temp(move(__lhs));
-    __lhs = move(__rhs);
-    __rhs = move(__temp);
+//------------------------------------------------------------------------------
+// internal utilities
+//------------------------------------------------------------------------------
+
+// copy_cv
+
+template <class _From>
+struct __copy_cv {
+  template <class _To>
+  using __apply _EZCXX_NODEBUG = _To;
+};
+
+template <class _From>
+struct __copy_cv<const _From> {
+  template <class _To>
+  using __apply _EZCXX_NODEBUG = const _To;
+};
+
+template <class _From>
+struct __copy_cv<volatile _From> {
+  template <class _To>
+  using __apply _EZCXX_NODEBUG = volatile _To;
+};
+
+template <class _From>
+struct __copy_cv<const volatile _From> {
+  template <class _To>
+  using __apply _EZCXX_NODEBUG = const volatile _To;
+};
+
+template <class _From, class _To>
+using __copy_cv_t _EZCXX_NODEBUG = typename __copy_cv<_From>::template __apply<_To>;
+
+// copy_cvref
+
+template <class _From>
+struct __copy_cvref {
+  template <class _To>
+  using __apply _EZCXX_NODEBUG = __copy_cv_t<_From, _To>;
+};
+
+template <class _From>
+struct __copy_cvref<_From&> {
+  template <class _To>
+  using __apply _EZCXX_NODEBUG = add_lvalue_reference_t<__copy_cv_t<_From, _To> >;
+};
+
+template <class _From>
+struct __copy_cvref<_From&&> {
+  template <class _To>
+  using __apply _EZCXX_NODEBUG = add_rvalue_reference_t<__copy_cv_t<_From, _To> >;
+};
+
+template <class _From, class _To>
+using __copy_cvref_t _EZCXX_NODEBUG = typename __copy_cvref<_From>::template __apply<_To>;
+
+// type_list
+
+template <class... _Types>
+struct __type_list {};
+
+template <class>
+struct __type_list_head;
+
+template <class _Head, class... _Tail>
+struct __type_list_head<__type_list<_Head, _Tail...> > {
+  using type _EZCXX_NODEBUG = _Head;
+};
+
+template <class _TypeList, size_t _Size, bool = _Size <= sizeof(typename __type_list_head<_TypeList>::type)>
+struct __find_first;
+
+template <class _Head, class... _Tail, size_t _Size>
+struct __find_first<__type_list<_Head, _Tail...>, _Size, true> {
+  using type _EZCXX_NODEBUG = _Head;
+};
+
+template <class _Head, class... _Tail, size_t _Size>
+struct __find_first<__type_list<_Head, _Tail...>, _Size, false> {
+  using type _EZCXX_NODEBUG = typename __find_first<__type_list<_Tail...>, _Size>::type;
+};
+
+// nat
+
+struct __nat {
+    __nat()                        = delete;
+    __nat(const __nat&)            = delete;
+    __nat& operator=(const __nat&) = delete;
+    ~__nat()                       = delete;
+};
+
+//------------------------------------------------------------------------------
+// make_signed make_unsigned
+//------------------------------------------------------------------------------
+
+using __signed_types =
+__type_list<
+    signed char,
+    signed short,
+    signed int,
+    signed long,
+    signed __int48,
+    signed long long
+>;
+
+using __unsigned_types =
+__type_list<
+    unsigned char,
+    unsigned short,
+    unsigned int,
+    unsigned long,
+    unsigned __int48,
+    unsigned long long
+>;
+
+template <class _Tp, bool = is_integral<_Tp>::value || is_enum<_Tp>::value>
+struct __ezcxx_make_signed{};
+
+template <class _Tp>
+struct __ezcxx_make_signed<_Tp, true> {
+typedef typename __find_first<__signed_types, sizeof(_Tp)>::type type;
+};
+
+template <class _Tp, bool = is_integral<_Tp>::value || is_enum<_Tp>::value>
+struct __ezcxx_make_unsigned{};
+
+template <class _Tp>
+struct __ezcxx_make_unsigned<_Tp, true> {
+  typedef typename __find_first<__unsigned_types, sizeof(_Tp)>::type type;
+};
+
+template <> struct __ezcxx_make_unsigned<bool,               true> {};
+template <> struct __ezcxx_make_unsigned<  signed short,     true> {typedef unsigned short     type;};
+template <> struct __ezcxx_make_unsigned<unsigned short,     true> {typedef unsigned short     type;};
+template <> struct __ezcxx_make_unsigned<  signed int,       true> {typedef unsigned int       type;};
+template <> struct __ezcxx_make_unsigned<unsigned int,       true> {typedef unsigned int       type;};
+template <> struct __ezcxx_make_unsigned<  signed long,      true> {typedef unsigned long      type;};
+template <> struct __ezcxx_make_unsigned<unsigned long,      true> {typedef unsigned long      type;};
+template <> struct __ezcxx_make_unsigned<  signed __int48,   true> {typedef unsigned __int48   type;};
+template <> struct __ezcxx_make_unsigned<unsigned __int48,   true> {typedef unsigned __int48   type;};
+template <> struct __ezcxx_make_unsigned<  signed long long, true> {typedef unsigned long long type;};
+template <> struct __ezcxx_make_unsigned<unsigned long long, true> {typedef unsigned long long type;};
+
+template <> struct __ezcxx_make_signed<bool,               true> {};
+template <> struct __ezcxx_make_signed<  signed short,     true> {typedef short     type;};
+template <> struct __ezcxx_make_signed<unsigned short,     true> {typedef short     type;};
+template <> struct __ezcxx_make_signed<  signed int,       true> {typedef int       type;};
+template <> struct __ezcxx_make_signed<unsigned int,       true> {typedef int       type;};
+template <> struct __ezcxx_make_signed<  signed long,      true> {typedef long      type;};
+template <> struct __ezcxx_make_signed<unsigned long,      true> {typedef long      type;};
+template <> struct __ezcxx_make_signed<  signed __int48,   true> {typedef __int48   type;};
+template <> struct __ezcxx_make_signed<unsigned __int48,   true> {typedef __int48   type;};
+template <> struct __ezcxx_make_signed<  signed long long, true> {typedef long long type;};
+template <> struct __ezcxx_make_signed<unsigned long long, true> {typedef long long type;};
+
+template <class _Tp>
+using __make_signed_t = __copy_cv_t<_Tp, typename __ezcxx_make_signed<remove_cv_t<_Tp> >::type>;
+
+template <class _Tp>
+using __make_unsigned_t = __copy_cv_t<_Tp, typename __ezcxx_make_unsigned<remove_cv_t<_Tp> >::type>;
+
+template <class _Tp>
+struct make_signed {
+using type _EZCXX_NODEBUG = __make_signed_t<_Tp>;
+};
+
+template <class _Tp>
+struct make_unsigned {
+using type _EZCXX_NODEBUG = __make_unsigned_t<_Tp>;
+};
+
+template <class _Tp> using make_signed_t = __make_signed_t<_Tp>;
+
+template <class _Tp> using make_unsigned_t = __make_unsigned_t<_Tp>;
+
+//------------------------------------------------------------------------------
+// common_type
+//------------------------------------------------------------------------------
+
+#if __cplusplus >= 201907L
+// Let COND_RES(X, Y) be:
+template <class _Tp, class _Up>
+using __cond_type _EZCXX_NODEBUG = decltype(false ? std::declval<_Tp>() : std::declval<_Up>());
+
+template <class _Tp, class _Up, class = void>
+struct __common_type3 {};
+
+// sub-bullet 4 - "if COND_RES(CREF(D1), CREF(D2)) denotes a type..."
+template <class _Tp, class _Up>
+struct __common_type3<_Tp, _Up, void_t<__cond_type<const _Tp&, const _Up&>>> {
+  using type _EZCXX_NODEBUG = remove_cvref_t<__cond_type<const _Tp&, const _Up&>>;
+};
+
+template <class _Tp, class _Up, class = void>
+struct __common_type2_imp : __common_type3<_Tp, _Up> {};
+#else // __cplusplus >= 201907L
+template <class _Tp, class _Up, class = void>
+struct __common_type2_imp {};
+#endif // __cplusplus >= 201907L
+
+template <class _Tp, class _Up>
+struct __common_type2_imp<_Tp, _Up, void_t<decltype(true ? std::declval<_Tp>() : std::declval<_Up>())> > {
+  using type _EZCXX_NODEBUG = decay_t<decltype(true ? std::declval<_Tp>() : std::declval<_Up>())>;
+};
+
+template <class, class = void>
+struct __common_type_impl {};
+
+template <class... _Tp>
+struct __common_types;
+template <class... _Tp>
+struct _EZCXX_TEMPLATE_VIS common_type;
+
+template <class _Tp, class _Up>
+struct __common_type_impl< __common_types<_Tp, _Up>, void_t<typename common_type<_Tp, _Up>::type> > {
+  typedef typename common_type<_Tp, _Up>::type type;
+};
+
+template <class _Tp, class _Up, class _Vp, class... _Rest>
+struct __common_type_impl<__common_types<_Tp, _Up, _Vp, _Rest...>, void_t<typename common_type<_Tp, _Up>::type> >
+    : __common_type_impl<__common_types<typename common_type<_Tp, _Up>::type, _Vp, _Rest...> > {};
+
+template <>
+struct _EZCXX_TEMPLATE_VIS common_type<> {};
+
+template <class _Tp>
+struct _EZCXX_TEMPLATE_VIS common_type<_Tp> : public common_type<_Tp, _Tp> {};
+
+template <class _Tp, class _Up>
+struct _EZCXX_TEMPLATE_VIS common_type<_Tp, _Up>
+    : conditional_t<is_same<_Tp, decay_t<_Tp> >::value && is_same<_Up, decay_t<_Up> >::value,
+    __common_type2_imp<_Tp, _Up>, common_type<decay_t<_Tp>, decay_t<_Up> > > {};
+
+template <class _Tp, class _Up, class _Vp, class... _Rest>
+struct _EZCXX_TEMPLATE_VIS common_type<_Tp, _Up, _Vp, _Rest...>
+    : __common_type_impl<__common_types<_Tp, _Up, _Vp, _Rest...> > {};
+
+template <class... _Tp> using common_type_t = typename common_type<_Tp...>::type;
+
+//------------------------------------------------------------------------------
+// common_reference basic_common_reference
+//------------------------------------------------------------------------------
+
+#if __cplusplus >= 201907L
+
+// Let COND_RES(X, Y) be:
+template <class _Xp, class _Yp>
+using __cond_res _EZCXX_NODEBUG = decltype(false ? std::declval<_Xp (&)()>()() : std::declval<_Yp (&)()>()());
+
+// Let `XREF(A)` denote a unary alias template `T` such that `T<U>` denotes the same type as `U`
+// with the addition of `A`'s cv and reference qualifiers, for a non-reference cv-unqualified type
+// `U`.
+// [Note: `XREF(A)` is `__xref<A>::template __apply`]
+template <class _Tp>
+struct __xref {
+  template <class _Up>
+  using __apply _EZCXX_NODEBUG = __copy_cvref_t<_Tp, _Up>;
+};
+
+// Given types A and B, let X be remove_reference_t<A>, let Y be remove_reference_t<B>,
+// and let COMMON-REF(A, B) be:
+template <class _Ap, class _Bp, class _Xp = remove_reference_t<_Ap>, class _Yp = remove_reference_t<_Bp>>
+struct __common_ref;
+
+template <class _Xp, class _Yp>
+using __common_ref_t _EZCXX_NODEBUG = typename __common_ref<_Xp, _Yp>::__type;
+
+template <class _Xp, class _Yp>
+using __cv_cond_res _EZCXX_NODEBUG = __cond_res<__copy_cv_t<_Xp, _Yp>&, __copy_cv_t<_Yp, _Xp>&>;
+
+//    If A and B are both lvalue reference types, COMMON-REF(A, B) is
+//    COND-RES(COPYCV(X, Y)&, COPYCV(Y, X)&) if that type exists and is a reference type.
+// clang-format off
+template <class _Ap, class _Bp, class _Xp, class _Yp>
+  requires
+    requires { typename __cv_cond_res<_Xp, _Yp>; } &&
+    is_reference_v<__cv_cond_res<_Xp, _Yp>>
+struct __common_ref<_Ap&, _Bp&, _Xp, _Yp> {
+  using __type _EZCXX_NODEBUG = __cv_cond_res<_Xp, _Yp>;
+};
+// clang-format on
+
+//    Otherwise, let C be remove_reference_t<COMMON-REF(X&, Y&)>&&. ...
+template <class _Xp, class _Yp>
+using __common_ref_C _EZCXX_NODEBUG = remove_reference_t<__common_ref_t<_Xp&, _Yp&>>&&;
+
+//    .... If A and B are both rvalue reference types, C is well-formed, and
+//    is_convertible_v<A, C> && is_convertible_v<B, C> is true, then COMMON-REF(A, B) is C.
+// clang-format off
+template <class _Ap, class _Bp, class _Xp, class _Yp>
+  requires
+    requires { typename __common_ref_C<_Xp, _Yp>; } &&
+    is_convertible_v<_Ap&&, __common_ref_C<_Xp, _Yp>> &&
+    is_convertible_v<_Bp&&, __common_ref_C<_Xp, _Yp>>
+struct __common_ref<_Ap&&, _Bp&&, _Xp, _Yp> {
+  using __type _EZCXX_NODEBUG = __common_ref_C<_Xp, _Yp>;
+};
+// clang-format on
+
+//    Otherwise, let D be COMMON-REF(const X&, Y&). ...
+template <class _Tp, class _Up>
+using __common_ref_D _EZCXX_NODEBUG = __common_ref_t<const _Tp&, _Up&>;
+
+//    ... If A is an rvalue reference and B is an lvalue reference and D is well-formed and
+//    is_convertible_v<A, D> is true, then COMMON-REF(A, B) is D.
+// clang-format off
+template <class _Ap, class _Bp, class _Xp, class _Yp>
+  requires
+    requires { typename __common_ref_D<_Xp, _Yp>; } &&
+    is_convertible_v<_Ap&&, __common_ref_D<_Xp, _Yp>>
+struct __common_ref<_Ap&&, _Bp&, _Xp, _Yp> {
+  using __type _EZCXX_NODEBUG = __common_ref_D<_Xp, _Yp>;
+};
+// clang-format on
+
+//    Otherwise, if A is an lvalue reference and B is an rvalue reference, then
+//    COMMON-REF(A, B) is COMMON-REF(B, A).
+template <class _Ap, class _Bp, class _Xp, class _Yp>
+struct __common_ref<_Ap&, _Bp&&, _Xp, _Yp> : __common_ref<_Bp&&, _Ap&> {};
+
+//    Otherwise, COMMON-REF(A, B) is ill-formed.
+template <class _Ap, class _Bp, class _Xp, class _Yp>
+struct __common_ref {};
+
+// Note C: For the common_reference trait applied to a parameter pack [...]
+
+template <class...>
+struct common_reference;
+
+template <class... _Types>
+using common_reference_t = typename common_reference<_Types...>::type;
+
+// bullet 1 - sizeof...(T) == 0
+template <>
+struct common_reference<> {};
+
+// bullet 2 - sizeof...(T) == 1
+template <class _Tp>
+struct common_reference<_Tp> {
+  using type _EZCXX_NODEBUG = _Tp;
+};
+
+// bullet 3 - sizeof...(T) == 2
+template <class _Tp, class _Up>
+struct __common_reference_sub_bullet3;
+template <class _Tp, class _Up>
+struct __common_reference_sub_bullet2 : __common_reference_sub_bullet3<_Tp, _Up> {};
+template <class _Tp, class _Up>
+struct __common_reference_sub_bullet1 : __common_reference_sub_bullet2<_Tp, _Up> {};
+
+// sub-bullet 1 - If T1 and T2 are reference types and COMMON-REF(T1, T2) is well-formed, then
+// the member typedef `type` denotes that type.
+template <class _Tp, class _Up>
+struct common_reference<_Tp, _Up> : __common_reference_sub_bullet1<_Tp, _Up> {};
+
+template <class _Tp, class _Up>
+  requires is_reference_v<_Tp> && is_reference_v<_Up> && requires { typename __common_ref_t<_Tp, _Up>; }
+struct __common_reference_sub_bullet1<_Tp, _Up> {
+  using type _EZCXX_NODEBUG = __common_ref_t<_Tp, _Up>;
+};
+
+// sub-bullet 2 - Otherwise, if basic_common_reference<remove_cvref_t<T1>, remove_cvref_t<T2>, XREF(T1), XREF(T2)>::type
+// is well-formed, then the member typedef `type` denotes that type.
+template <class, class, template <class> class, template <class> class>
+struct basic_common_reference {};
+
+template <class _Tp, class _Up>
+using __basic_common_reference_t _EZCXX_NODEBUG =
+    typename basic_common_reference<remove_cvref_t<_Tp>,
+                                    remove_cvref_t<_Up>,
+                                    __xref<_Tp>::template __apply,
+                                    __xref<_Up>::template __apply>::type;
+
+template <class _Tp, class _Up>
+  requires requires { typename __basic_common_reference_t<_Tp, _Up>; }
+struct __common_reference_sub_bullet2<_Tp, _Up> {
+  using type _EZCXX_NODEBUG = __basic_common_reference_t<_Tp, _Up>;
+};
+
+// sub-bullet 3 - Otherwise, if COND-RES(T1, T2) is well-formed,
+// then the member typedef `type` denotes that type.
+template <class _Tp, class _Up>
+  requires requires { typename __cond_res<_Tp, _Up>; }
+struct __common_reference_sub_bullet3<_Tp, _Up> {
+  using type _EZCXX_NODEBUG = __cond_res<_Tp, _Up>;
+};
+
+// sub-bullet 4 & 5 - Otherwise, if common_type_t<T1, T2> is well-formed,
+//                    then the member typedef `type` denotes that type.
+//                  - Otherwise, there shall be no member `type`.
+template <class _Tp, class _Up>
+struct __common_reference_sub_bullet3 : common_type<_Tp, _Up> {};
+
+// bullet 4 - If there is such a type `C`, the member typedef type shall denote the same type, if
+//            any, as `common_reference_t<C, Rest...>`.
+template <class _Tp, class _Up, class _Vp, class... _Rest>
+  requires requires { typename common_reference_t<_Tp, _Up>; }
+struct common_reference<_Tp, _Up, _Vp, _Rest...> : common_reference<common_reference_t<_Tp, _Up>, _Vp, _Rest...> {};
+
+// bullet 5 - Otherwise, there shall be no member `type`.
+template <class...>
+struct common_reference {};
+
+#endif // __cplusplus >= 201907L
+
+//------------------------------------------------------------------------------
+// move swap
+//------------------------------------------------------------------------------
+
+template <class _Tp>
+_EZCXX_NODISCARD _EZCXX_INLINE constexpr remove_reference_t<_Tp>&&
+move(_EZCXX_LIFETIMEBOUND _Tp&& __t) noexcept {
+  using _Up _EZCXX_NODEBUG = remove_reference_t<_Tp>;
+  return static_cast<_Up&&>(__t);
 }
-#endif // __cplusplus > 201103L
 
-// swappable classification traits:
-template<class _Lp, class _Rp> auto __swappable(int) -> __require<decltype(swap(declval<_Lp>(), declval<_Rp>()))>;
-template<class _Lp, class _Rp> auto __swappable(...) -> false_type;
+template <class _Tp>
+_EZCXX_NODISCARD _EZCXX_INLINE constexpr
+conditional_t<!is_nothrow_move_constructible<_Tp>::value && is_copy_constructible<_Tp>::value, const _Tp&, _Tp&&>
+move_if_noexcept(_EZCXX_LIFETIMEBOUND _Tp& __x) noexcept {
+    return std::move(__x);
+}
 
-template<class _Lp, class _Rp> using is_swappable_with = conjunction<decltype(__swappable<_Lp, _Rp>(0)),
-                                                                     decltype(__swappable<_Rp, _Lp>(0))>;
-template<class _Lp, class _Rp> inline constexpr bool is_swappable_with_v = is_swappable_with<_Lp, _Rp>::value;
+template <class _Tp>
+_EZCXX_INLINE
+#if __cplusplus >= 201402L
+constexpr
+#endif
+enable_if_t<is_move_constructible<_Tp>::value && is_move_assignable<_Tp>::value>
+swap(_Tp& __x, _Tp& __y)
+noexcept(is_nothrow_move_constructible<_Tp>::value && is_nothrow_move_assignable<_Tp>::value) {
+    _Tp __t(std::move(__x));
+    __x = std::move(__y);
+    __y = std::move(__t);
+}
 
-template<class _Lp, class _Rp> inline constexpr bool is_nothrow_swappable_with_v =
-    noexcept(swap(declval<_Lp>(), declval<_Rp>())) && noexcept(swap(declval<_Rp>(), declval<_Lp>()));
-template<class _Lp, class _Rp> using is_nothrow_swappable_with = bool_constant<is_nothrow_swappable_with_v<_Lp, _Rp>>;
+//------------------------------------------------------------------------------
+// swappable classification traits
+//------------------------------------------------------------------------------
+
+template <class _Tp, class _Up, class = void>
+inline const bool __is_swappable_with_v = false;
+
+template <class _Tp>
+inline const bool __is_swappable_v = __is_swappable_with_v<_Tp&, _Tp&>;
+
+template <class _Tp, class _Up, bool = __is_swappable_with_v<_Tp, _Up> >
+inline const bool __is_nothrow_swappable_with_v = false;
+
+template <class _Tp>
+inline const bool __is_nothrow_swappable_v = __is_nothrow_swappable_with_v<_Tp&, _Tp&>;
+
+template <class _Tp, size_t _Np, enable_if_t<__is_swappable_v<_Tp>, int> >
+_EZCXX_INLINE
+#if __cplusplus >= 201402L
+constexpr
+#endif
+void swap(_Tp (&__a)[_Np], _Tp (&__b)[_Np])
+noexcept(__is_nothrow_swappable_v<_Tp>) {
+    for (size_t __i = 0; __i != _Np; ++__i) {
+        swap(__a[__i], __b[__i]);
+    }
+}
+
+template <class _Tp, class _Up>
+inline const bool __is_swappable_with_v<
+    _Tp, _Up, void_t<
+        decltype(swap(std::declval<_Tp>(), std::declval<_Up>())),
+        decltype(swap(std::declval<_Up>(), std::declval<_Tp>()))
+    >
+> = true;
+
+template <class _Tp, class _Up>
+inline const bool __is_nothrow_swappable_with_v<_Tp, _Up, true> =
+    noexcept(swap(std::declval<_Tp>(), std::declval<_Up>())) &&
+    noexcept(swap(std::declval<_Up>(), std::declval<_Tp>()));
+
+template <class _Tp, class _Up>
+inline constexpr bool is_swappable_with_v = __is_swappable_with_v<_Tp, _Up>;
+
+template <class _Tp, class _Up>
+struct _EZCXX_TEMPLATE_VIS is_swappable_with
+    : bool_constant<is_swappable_with_v<_Tp, _Up>> {};
+
+template <class _Tp>
+inline constexpr bool is_swappable_v =
+    is_swappable_with_v<add_lvalue_reference_t<_Tp>, add_lvalue_reference_t<_Tp>>;
+
+template <class _Tp>
+struct _EZCXX_TEMPLATE_VIS is_swappable : bool_constant<is_swappable_v<_Tp>> {};
+
+template <class _Tp, class _Up>
+inline constexpr bool is_nothrow_swappable_with_v = __is_nothrow_swappable_with_v<_Tp, _Up>;
+
+template <class _Tp, class _Up>
+struct _EZCXX_TEMPLATE_VIS is_nothrow_swappable_with
+    : bool_constant<is_nothrow_swappable_with_v<_Tp, _Up>> {};
+
+template <class _Tp>
+inline constexpr bool is_nothrow_swappable_v =
+    is_nothrow_swappable_with_v<add_lvalue_reference_t<_Tp>, add_lvalue_reference_t<_Tp>>;
+
+template <class _Tp>
+struct _EZCXX_TEMPLATE_VIS is_nothrow_swappable
+    : bool_constant<is_nothrow_swappable_v<_Tp>> {};
 
 } // namespace std
 

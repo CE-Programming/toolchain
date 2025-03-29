@@ -1,0 +1,19 @@
+// -*- C++ -*-
+#ifndef _EZCXX_MEMORY
+#define _EZCXX_MEMORY
+
+#pragma clang system_header
+
+namespace std {
+
+template <class _Tp>
+inline _Tp* addressof(_Tp& __x) noexcept {
+    return __builtin_addressof(__x);
+}
+
+template <class _Tp>
+_Tp* addressof(const _Tp&&) noexcept = delete;
+
+} // namespace std
+
+#endif // _EZCXX_MEMORY

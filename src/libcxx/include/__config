@@ -7,5 +7,12 @@
 #define _EZCXX_INLINE [[__gnu__::__visibility__("hidden"), __gnu__::__always_inline__]] inline
 #define _EZCXX_NODISCARD [[nodiscard]]
 #define _EZCXX_NODISCARD_EXT [[nodiscard]]
+#define _EZCXX_HIDDEN __attribute__((__visibility__("hidden")))
+#define _EZCXX_INTERNAL_LINKAGE __attribute__((internal_linkage))
+#define _EZCXX_EXCLUDE_FROM_EXPLICIT_INSTANTIATION __attribute__((__exclude_from_explicit_instantiation__))
+#define _EZCXX_HIDE_FROM_ABI _EZCXX_HIDDEN _EZCXX_EXCLUDE_FROM_EXPLICIT_INSTANTIATION
+#define _EZCXX_NODEBUG __attribute__((__nodebug__))
+#define _EZCXX_TEMPLATE_VIS __attribute__ ((__type_visibility__("default")))
+#define _EZCXX_LIFETIMEBOUND [[_Clang::__lifetimebound__]]
 
 #endif // _EZCXX_CONFIG

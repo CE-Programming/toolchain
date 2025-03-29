@@ -36,7 +36,7 @@
 #endif // __cplusplus >= 201402L
 
 #if __cplusplus >= 201703L
-// # define __cpp_lib_addressof_constexpr                  201603L
+# define __cpp_lib_addressof_constexpr                  201603L
 // # define __cpp_lib_allocator_traits_is_always_equal     201411L
 // # define __cpp_lib_any                                  201606L
 // # define __cpp_lib_apply                                201603L
@@ -59,7 +59,7 @@
 // # define __cpp_lib_invoke                               201411L
 # define __cpp_lib_is_aggregate                         201703L
 // # define __cpp_lib_is_invocable                         201703L
-// # define __cpp_lib_is_swappable                         201603L
+# define __cpp_lib_is_swappable                         201603L
 // # define __cpp_lib_launder                              201606L
 # define __cpp_lib_logical_traits                       201510L
 // # define __cpp_lib_make_from_tuple                      201606L
@@ -132,7 +132,7 @@
 // # define __cpp_lib_int_pow2                             202002L
 // # define __cpp_lib_integer_comparison_functions         202002L
 // # define __cpp_lib_interpolate                          201902L
-// # define __cpp_lib_is_constant_evaluated                201811L
+# define __cpp_lib_is_constant_evaluated                201811L
 // # define __cpp_lib_is_layout_compatible                 201907L
 // # define __cpp_lib_is_nothrow_convertible               201806L
 // # define __cpp_lib_is_pointer_interconvertible          201907L
