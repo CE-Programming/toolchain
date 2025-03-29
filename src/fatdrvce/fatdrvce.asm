@@ -2359,11 +2359,19 @@ util_fat_read_write:
 	push	de
 	pop	bc
 	ld	de,(iy + 9)
+	push	bc
 	push	iy
 	ld	iy,(xfatFile.fat)
 	call	util_read_fat_multiple_blocks
 .block_func := $-3
 	pop	iy
+	pop	hl
+	ld	h,l
+	ld	l,0
+	add	hl,hl				; mutiply by 512
+	ld	bc,(iy + 9)
+	add	hl,bc
+	ld	(iy + 9),hl
 	ret
 .getnextcluster:
 	ld	hl,(xfatFile.block_index)
