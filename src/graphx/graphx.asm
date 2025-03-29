@@ -5418,8 +5418,11 @@ gfx_FloodFill:
 	ld	(.oldcolor0),a
 	ld	(.oldcolor1),a
 	ld	(.oldcolor2),a
+	ld	b,(ix+12)
+	cp	a,b			; return if same color
+	jq	z,.return
 
-	ld	a,(ix+12)
+	ld	a,b
 	ld	(.newcolor0),a
 	ld	(.newcolor1),a
 
@@ -5647,6 +5650,7 @@ smcByte _YSpan
 	sbc	hl,de
 	jp	c,.dowhileloop		; } while (sp>stack);
 
+.return:
 	ld	sp,ix
 	pop	ix
 	ret
