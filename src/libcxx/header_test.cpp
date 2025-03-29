@@ -29,6 +29,9 @@
 #include <memory>
 #include <new>
 #include <numbers>
+#if __cplusplus >= 201907L
+#include <source_location>
+#endif // __cplusplus >= 201907L
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
