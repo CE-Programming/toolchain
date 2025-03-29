@@ -1,4 +1,7 @@
 #include <type_traits>
+#if __cplusplus >= 201907L
+#include <concepts>
+#endif
 
 namespace std {
 
@@ -61,7 +64,11 @@ namespace test_is_base_of {
 // test is_convertible
 namespace test_is_convertible {
     class E { public: template<class T> E(T&&) {} };
-    static constexpr void __attribute__((unused)) test(void) {
+    static
+    #if __cplusplus >= 201402L
+    constexpr
+    #endif
+    void __attribute__((unused)) test(void) {
         class A {};
         class B : public A {};
         class Z {};
@@ -920,6 +927,64 @@ namespace test_has_virtual_destructor {
     C((has_virtual_destructor_v<B>));
     C((has_virtual_destructor_v<D>));
 }
+
+//------------------------------------------------------------------------------
+// make_signed make_unsigned
+//------------------------------------------------------------------------------
+
+// test make_signed
+namespace test_make_signed {
+    enum struct E : unsigned short {};
+    using char_type = make_signed_t<unsigned char>;
+    using int_type  = make_signed_t<unsigned int>;
+    using long_type = make_signed_t<volatile unsigned long>;
+    using enum_type = make_signed_t<E>;
+    C((is_same_v<char_type, signed char>));
+    C((is_same_v<int_type, signed int>));
+    C((is_same_v<long_type, volatile signed long>));
+    C((is_same_v<enum_type, signed short>));
+}
+
+// test make_unsigned
+namespace test_make_unsigned {
+    using uchar_type = make_unsigned_t<char>;
+    using uint_type  = make_unsigned_t<int>;
+    using ulong_type = make_unsigned_t<volatile long>;
+    C((is_same_v<uchar_type, unsigned char>));
+    C((is_same_v<uint_type, unsigned int>));
+    C((is_same_v<ulong_type, volatile unsigned long>));
+}
+
+//------------------------------------------------------------------------------
+// common_type
+//------------------------------------------------------------------------------
+
+// test common_type
+/** @todo */
+
+//------------------------------------------------------------------------------
+// common_reference basic_common_reference
+//------------------------------------------------------------------------------
+
+#if __cplusplus >= 201907L
+
+// test common_reference
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-reference-qualifiers"
+/** @todo get more complicated tests */
+C((same_as<int&, common_reference_t<
+    add_lvalue_reference_t<int>,
+    add_lvalue_reference_t<int>&,
+    add_lvalue_reference_t<int>&&,
+    add_lvalue_reference_t<int>const,
+    add_lvalue_reference_t<int>const&
+>>));
+#pragma GCC diagnostic pop
+
+// test basic_common_reference
+/** @todo */
+
+#endif
 
 //------------------------------------------------------------------------------
 // swappable classification traits

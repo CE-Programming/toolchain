@@ -26,6 +26,7 @@
 #include <exception>
 #include <initializer_list>
 #include <limits>
+#include <memory>
 #include <new>
 #include <numbers>
 #include <type_traits>
