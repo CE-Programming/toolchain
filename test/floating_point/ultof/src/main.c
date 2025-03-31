@@ -37,13 +37,23 @@ size_t run_test(void) {
         result.flt = (float)input[i];
         if (result.bin != output[i].bin) {
             // ignore round to maximum magnitude errors from __ltof
-            bool ignore_ltof_failure =
-                (input[i] <= INT32_MAX) &&
-                (result.bin == output[i].bin + 1);
-            if (ignore_ltof_failure == false) {
-                print_failed(input[i], result.bin, output[i].bin);
-                return i;
-            }
+            #if 0
+                bool ignore_ltof_failure =
+                    (input[i] <= INT32_MAX) &&
+                    (result.bin == output[i].bin + 1);
+                if (ignore_ltof_failure == false) {
+                    print_failed(input[i], result.bin, output[i].bin);
+                    return i;
+                }
+            #else
+                // round to nearest ties away from zero to match __ltof behaviour
+                bool ignore_ltof_failure =
+                    (result.bin == output[i].bin + 1);
+                if (ignore_ltof_failure == false) {
+                    print_failed(input[i], result.bin, output[i].bin);
+                    return i;
+                }
+            #endif
         }
     }
 
