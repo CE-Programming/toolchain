@@ -6,8 +6,8 @@ __lmuls_fast:
 __lmulu_fast:
 
 ; Multiplies EUHL by AUBC and returns the 32-bit product euhl.
-;    I: AUBC=multiplier, EUHL=multiplicand, ADL=1
-;    O: a=EUHL*AUBC-L*C>>24, ubc=L*C, deu=0, d=H*C>>8, euhl=EUHL*AUBC
+;	I: AUBC=multiplier, EUHL=multiplicand, ADL=1
+;	O: a=EUHL*AUBC-L*C>>24, ubc=L*C, deu=0, d=H*C>>8, euhl=EUHL*AUBC
 ;   FO: sz(e), vc((EUHL*AUBC-L*C&0xFFFFFFFF)+L*C)
 ;   CC: (86+2*cf)*r(PC)+9*w(SPL)+9*r(SPL)+42
 ;				; a		ubc		ude		uhl		uix		u(sp)

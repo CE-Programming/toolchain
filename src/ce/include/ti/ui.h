@@ -61,25 +61,25 @@ void os_ForceCmdNoChar(void);
  * Colors used by the OS
  */
 typedef enum {
-    OS_COLOR_BLUE = 10,
-    OS_COLOR_RED,
-    OS_COLOR_BLACK,
-    OS_COLOR_MAGENTA,
-    OS_COLOR_GREEN,
-    OS_COLOR_ORANGE,
-    OS_COLOR_BROWN,
-    OS_COLOR_NAVY,
-    OS_COLOR_LTBLUE,
-    OS_COLOR_YELLOW,
-    OS_COLOR_WHITE,
-    OS_COLOR_LTGRAY,
-    OS_COLOR_MEDGRAY,
-    OS_COLOR_GRAY,
-    OS_COLOR_DARKGRAY
+	OS_COLOR_BLUE = 10,
+	OS_COLOR_RED,
+	OS_COLOR_BLACK,
+	OS_COLOR_MAGENTA,
+	OS_COLOR_GREEN,
+	OS_COLOR_ORANGE,
+	OS_COLOR_BROWN,
+	OS_COLOR_NAVY,
+	OS_COLOR_LTBLUE,
+	OS_COLOR_YELLOW,
+	OS_COLOR_WHITE,
+	OS_COLOR_LTGRAY,
+	OS_COLOR_MEDGRAY,
+	OS_COLOR_GRAY,
+	OS_COLOR_DARKGRAY
 } os_colors_t;
 
 /** `uint8_t`: User's configured screen brightness */
-#define os_Brightness        (*(uint8_t*)0xD0058F)
+#define os_Brightness		(*(uint8_t*)0xD0058F)
 /** `uint16_t`: Status bar 565 color */
 #define os_StatusBarBGColor  (*(uint16_t*)0xD02ACC)
 

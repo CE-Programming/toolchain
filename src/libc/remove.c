@@ -3,5 +3,5 @@
 
 int __attribute__((weak)) remove(const char *filename)
 {
-    return !ti_Delete(filename);
+	return !ti_Delete(filename);
 }

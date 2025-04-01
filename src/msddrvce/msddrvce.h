@@ -21,42 +21,42 @@ extern "C" {
 
 /** Mass Storage Driver return codes */
 typedef enum {
-    MSD_SUCCESS = 0, /**< Operation was successful */
-    MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
-    MSD_ERROR_USB_FAILED, /**< An error occurred in usbdrvce */
-    MSD_ERROR_SCSI_FAILED, /**< An error occurred in scsi transfer */
-    MSD_ERROR_SCSI_CHECK_CONDITION, /**< SCSI command failed */
-    MSD_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
-    MSD_ERROR_INVALID_DEVICE, /**< An invalid usb device was specified */
-    MSD_ERROR_TIMEOUT, /**< The transfer timed out */
+	MSD_SUCCESS = 0, /**< Operation was successful */
+	MSD_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
+	MSD_ERROR_USB_FAILED, /**< An error occurred in usbdrvce */
+	MSD_ERROR_SCSI_FAILED, /**< An error occurred in scsi transfer */
+	MSD_ERROR_SCSI_CHECK_CONDITION, /**< SCSI command failed */
+	MSD_ERROR_NOT_SUPPORTED, /**< The operation is not supported */
+	MSD_ERROR_INVALID_DEVICE, /**< An invalid usb device was specified */
+	MSD_ERROR_TIMEOUT, /**< The transfer timed out */
 } msd_error_t;
 
 typedef struct {
 /* @cond */
-    uint8_t priv[1024]; /**< Internal library use */
+	uint8_t priv[1024]; /**< Internal library use */
 /* @endcond */
 } msd_t;
 
 typedef struct {
-    uint32_t bsize; /**< Size of each block in bytes */
-    uint32_t bnum; /**< Number of blocks on MSD */
+	uint32_t bsize; /**< Size of each block in bytes */
+	uint32_t bnum; /**< Number of blocks on MSD */
 } msd_info_t;
 
 typedef struct msd_transfer {
-    msd_t *msd; /**< Initialized MSD device */
-    uint32_t lba; /**< Logical block address */
-    void *buffer; /**< Pointer to data location to read/write */
-    uint24_t count; /**< Number of blocks to transfer */
-    void (*callback)(msd_error_t error, struct msd_transfer *xfer); /**< Called when transfer completes */
-    void *userptr; /**< Custom user data for callback (optional) */
+	msd_t *msd; /**< Initialized MSD device */
+	uint32_t lba; /**< Logical block address */
+	void *buffer; /**< Pointer to data location to read/write */
+	uint24_t count; /**< Number of blocks to transfer */
+	void (*callback)(msd_error_t error, struct msd_transfer *xfer); /**< Called when transfer completes */
+	void *userptr; /**< Custom user data for callback (optional) */
 /* @cond */
-    uint8_t priv[76];
+	uint8_t priv[76];
 /* @endcond */
 } msd_transfer_t;
 
 typedef struct {
-    uint32_t first_lba; /**< First Logical Block Address (LBA) of partition */
-    uint32_t last_lba; /**< Last Logical Block Address (LBA) of partition */
+	uint32_t first_lba; /**< First Logical Block Address (LBA) of partition */
+	uint32_t last_lba; /**< Last Logical Block Address (LBA) of partition */
 } msd_partition_t;
 
 /**
@@ -141,7 +141,7 @@ uint24_t msd_Write(msd_t *msd, uint32_t lba, uint24_t count, const void *buffer)
  * @param partitions Returned array of partitions available.
  * @param max The maximum number of partitions that can be found.
  * @return Number of partitions detected; \p partitions will be filled with
- *         valid partition information up to the number detected.
+ *		 valid partition information up to the number detected.
  * @note Currently MBR (msdos) and GUID (gpt) partition tables are supported.
  */
 uint8_t msd_FindPartitions(msd_t *msd, msd_partition_t *partitions, uint8_t max);

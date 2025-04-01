@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
 INLINE
 uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
-    { return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
+	{ return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
 #else
 uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist );
 #endif
@@ -70,8 +70,8 @@ uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist );
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
 INLINE uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )
 {
-    return
-        (dist < 31) ? a>>dist | ((uint32_t) (a<<(-dist & 31)) != 0) : (a != 0);
+	return
+		(dist < 31) ? a>>dist | ((uint32_t) (a<<(-dist & 31)) != 0) : (a != 0);
 }
 #else
 uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist );
@@ -91,8 +91,8 @@ uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist );
 #if defined INLINE_LEVEL && (3 <= INLINE_LEVEL)
 INLINE uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist )
 {
-    return
-        (dist < 63) ? a>>dist | ((uint64_t) (a<<(-dist & 63)) != 0) : (a != 0);
+	return
+		(dist < 63) ? a>>dist | ((uint64_t) (a<<(-dist & 63)) != 0) : (a != 0);
 }
 #else
 uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist );
@@ -114,13 +114,13 @@ extern const uint_least8_t softfloat_countLeadingZeros8[256];
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
 INLINE uint_fast8_t softfloat_countLeadingZeros16( uint16_t a )
 {
-    uint_fast8_t count = 8;
-    if ( 0x100 <= a ) {
-        count = 0;
-        a >>= 8;
-    }
-    count += softfloat_countLeadingZeros8[a];
-    return count;
+	uint_fast8_t count = 8;
+	if ( 0x100 <= a ) {
+		count = 0;
+		a >>= 8;
+	}
+	count += softfloat_countLeadingZeros8[a];
+	return count;
 }
 #else
 uint_fast8_t softfloat_countLeadingZeros16( uint16_t a );
@@ -135,17 +135,17 @@ uint_fast8_t softfloat_countLeadingZeros16( uint16_t a );
 #if defined INLINE_LEVEL && (3 <= INLINE_LEVEL)
 INLINE uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
 {
-    uint_fast8_t count = 0;
-    if ( a < 0x10000 ) {
-        count = 16;
-        a <<= 16;
-    }
-    if ( a < 0x1000000 ) {
-        count += 8;
-        a <<= 8;
-    }
-    count += softfloat_countLeadingZeros8[a>>24];
-    return count;
+	uint_fast8_t count = 0;
+	if ( a < 0x10000 ) {
+		count = 16;
+		a <<= 16;
+	}
+	if ( a < 0x1000000 ) {
+		count += 8;
+		a <<= 8;
+	}
+	count += softfloat_countLeadingZeros8[a>>24];
+	return count;
 }
 #else
 uint_fast8_t softfloat_countLeadingZeros32( uint32_t a );
@@ -223,7 +223,7 @@ uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a );
 #if defined INLINE_LEVEL && (1 <= INLINE_LEVEL)
 INLINE
 bool softfloat_eq128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
-    { return (a64 == b64) && (a0 == b0); }
+	{ return (a64 == b64) && (a0 == b0); }
 #else
 bool softfloat_eq128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 );
 #endif
@@ -238,7 +238,7 @@ bool softfloat_eq128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 );
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
 INLINE
 bool softfloat_le128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
-    { return (a64 < b64) || ((a64 == b64) && (a0 <= b0)); }
+	{ return (a64 < b64) || ((a64 == b64) && (a0 <= b0)); }
 #else
 bool softfloat_le128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 );
 #endif
@@ -253,7 +253,7 @@ bool softfloat_le128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 );
 #if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
 INLINE
 bool softfloat_lt128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
-    { return (a64 < b64) || ((a64 == b64) && (a0 < b0)); }
+	{ return (a64 < b64) || ((a64 == b64) && (a0 < b0)); }
 #else
 bool softfloat_lt128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 );
 #endif
@@ -269,10 +269,10 @@ INLINE
 struct uint128
  softfloat_shortShiftLeft128( uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
-    struct uint128 z;
-    z.v64 = a64<<dist | a0>>(-dist & 63);
-    z.v0 = a0<<dist;
-    return z;
+	struct uint128 z;
+	z.v64 = a64<<dist | a0>>(-dist & 63);
+	z.v0 = a0<<dist;
+	return z;
 }
 #else
 struct uint128
@@ -290,10 +290,10 @@ INLINE
 struct uint128
  softfloat_shortShiftRight128( uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
-    struct uint128 z;
-    z.v64 = a64>>dist;
-    z.v0 = a64<<(-dist & 63) | a0>>dist;
-    return z;
+	struct uint128 z;
+	z.v64 = a64>>dist;
+	z.v0 = a64<<(-dist & 63) | a0>>dist;
+	return z;
 }
 #else
 struct uint128
@@ -310,17 +310,17 @@ struct uint128
 INLINE
 struct uint64_extra
  softfloat_shortShiftRightJam64Extra(
-     uint64_t a, uint64_t extra, uint_fast8_t dist )
+	 uint64_t a, uint64_t extra, uint_fast8_t dist )
 {
-    struct uint64_extra z;
-    z.v = a>>dist;
-    z.extra = a<<(-dist & 63) | (extra != 0);
-    return z;
+	struct uint64_extra z;
+	z.v = a>>dist;
+	z.extra = a<<(-dist & 63) | (extra != 0);
+	return z;
 }
 #else
 struct uint64_extra
  softfloat_shortShiftRightJam64Extra(
-     uint64_t a, uint64_t extra, uint_fast8_t dist );
+	 uint64_t a, uint64_t extra, uint_fast8_t dist );
 #endif
 #endif
 
@@ -336,20 +336,20 @@ struct uint64_extra
 INLINE
 struct uint128
  softfloat_shortShiftRightJam128(
-     uint64_t a64, uint64_t a0, uint_fast8_t dist )
+	 uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
-    uint_fast8_t negDist = -dist;
-    struct uint128 z;
-    z.v64 = a64>>dist;
-    z.v0 =
-        a64<<(negDist & 63) | a0>>dist
-            | ((uint64_t) (a0<<(negDist & 63)) != 0);
-    return z;
+	uint_fast8_t negDist = -dist;
+	struct uint128 z;
+	z.v64 = a64>>dist;
+	z.v0 =
+		a64<<(negDist & 63) | a0>>dist
+			| ((uint64_t) (a0<<(negDist & 63)) != 0);
+	return z;
 }
 #else
 struct uint128
  softfloat_shortShiftRightJam128(
-     uint64_t a64, uint64_t a0, uint_fast8_t dist );
+	 uint64_t a64, uint64_t a0, uint_fast8_t dist );
 #endif
 #endif
 
@@ -362,19 +362,19 @@ struct uint128
 INLINE
 struct uint128_extra
  softfloat_shortShiftRightJam128Extra(
-     uint64_t a64, uint64_t a0, uint64_t extra, uint_fast8_t dist )
+	 uint64_t a64, uint64_t a0, uint64_t extra, uint_fast8_t dist )
 {
-    uint_fast8_t negDist = -dist;
-    struct uint128_extra z;
-    z.v.v64 = a64>>dist;
-    z.v.v0 = a64<<(negDist & 63) | a0>>dist;
-    z.extra = a0<<(negDist & 63) | (extra != 0);
-    return z;
+	uint_fast8_t negDist = -dist;
+	struct uint128_extra z;
+	z.v.v64 = a64>>dist;
+	z.v.v0 = a64<<(negDist & 63) | a0>>dist;
+	z.extra = a0<<(negDist & 63) | (extra != 0);
+	return z;
 }
 #else
 struct uint128_extra
  softfloat_shortShiftRightJam128Extra(
-     uint64_t a64, uint64_t a0, uint64_t extra, uint_fast8_t dist );
+	 uint64_t a64, uint64_t a0, uint64_t extra, uint_fast8_t dist );
 #endif
 #endif
 
@@ -399,23 +399,23 @@ struct uint128_extra
 INLINE
 struct uint64_extra
  softfloat_shiftRightJam64Extra(
-     uint64_t a, uint64_t extra, uint_fast32_t dist )
+	 uint64_t a, uint64_t extra, uint_fast32_t dist )
 {
-    struct uint64_extra z;
-    if ( dist < 64 ) {
-        z.v = a>>dist;
-        z.extra = a<<(-dist & 63);
-    } else {
-        z.v = 0;
-        z.extra = (dist == 64) ? a : (a != 0);
-    }
-    z.extra |= (extra != 0);
-    return z;
+	struct uint64_extra z;
+	if ( dist < 64 ) {
+		z.v = a>>dist;
+		z.extra = a<<(-dist & 63);
+	} else {
+		z.v = 0;
+		z.extra = (dist == 64) ? a : (a != 0);
+	}
+	z.extra |= (extra != 0);
+	return z;
 }
 #else
 struct uint64_extra
  softfloat_shiftRightJam64Extra(
-     uint64_t a, uint64_t extra, uint_fast32_t dist );
+	 uint64_t a, uint64_t extra, uint_fast32_t dist );
 #endif
 #endif
 
@@ -454,7 +454,7 @@ struct uint128
 *----------------------------------------------------------------------------*/
 struct uint128_extra
  softfloat_shiftRightJam128Extra(
-     uint64_t a64, uint64_t a0, uint64_t extra, uint_fast32_t dist );
+	 uint64_t a64, uint64_t a0, uint64_t extra, uint_fast32_t dist );
 #endif
 
 #ifndef softfloat_shiftRightJam256M
@@ -472,7 +472,7 @@ struct uint128_extra
 *----------------------------------------------------------------------------*/
 void
  softfloat_shiftRightJam256M(
-     const uint64_t *aPtr, uint_fast32_t dist, uint64_t *zPtr );
+	 const uint64_t *aPtr, uint_fast32_t dist, uint64_t *zPtr );
 #endif
 
 #ifndef softfloat_add128
@@ -486,10 +486,10 @@ INLINE
 struct uint128
  softfloat_add128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
-    struct uint128 z;
-    z.v0 = a0 + b0;
-    z.v64 = a64 + b64 + (z.v0 < a0);
-    return z;
+	struct uint128 z;
+	z.v0 = a0 + b0;
+	z.v64 = a64 + b64 + (z.v0 < a0);
+	return z;
 }
 #else
 struct uint128
@@ -507,7 +507,7 @@ struct uint128
 *----------------------------------------------------------------------------*/
 void
  softfloat_add256M(
-     const uint64_t *aPtr, const uint64_t *bPtr, uint64_t *zPtr );
+	 const uint64_t *aPtr, const uint64_t *bPtr, uint64_t *zPtr );
 #endif
 
 #ifndef softfloat_sub128
@@ -521,11 +521,11 @@ INLINE
 struct uint128
  softfloat_sub128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
-    struct uint128 z;
-    z.v0 = a0 - b0;
-    z.v64 = a64 - b64;
-    z.v64 -= (a0 < b0);
-    return z;
+	struct uint128 z;
+	z.v0 = a0 - b0;
+	z.v64 = a64 - b64;
+	z.v64 -= (a0 < b0);
+	return z;
 }
 #else
 struct uint128
@@ -544,7 +544,7 @@ struct uint128
 *----------------------------------------------------------------------------*/
 void
  softfloat_sub256M(
-     const uint64_t *aPtr, const uint64_t *bPtr, uint64_t *zPtr );
+	 const uint64_t *aPtr, const uint64_t *bPtr, uint64_t *zPtr );
 #endif
 
 #ifndef softfloat_mul64ByShifted32To128
@@ -554,12 +554,12 @@ void
 #if defined INLINE_LEVEL && (3 <= INLINE_LEVEL)
 INLINE struct uint128 softfloat_mul64ByShifted32To128( uint64_t a, uint32_t b )
 {
-    uint_fast64_t mid;
-    struct uint128 z;
-    mid = (uint_fast64_t) (uint32_t) a * b;
-    z.v0 = mid<<32;
-    z.v64 = (uint_fast64_t) (uint32_t) (a>>32) * b + (mid>>32);
-    return z;
+	uint_fast64_t mid;
+	struct uint128 z;
+	mid = (uint_fast64_t) (uint32_t) a * b;
+	z.v0 = mid<<32;
+	z.v64 = (uint_fast64_t) (uint32_t) (a>>32) * b + (mid>>32);
+	return z;
 }
 #else
 struct uint128 softfloat_mul64ByShifted32To128( uint64_t a, uint32_t b );
@@ -583,14 +583,14 @@ struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b );
 INLINE
 struct uint128 softfloat_mul128By32( uint64_t a64, uint64_t a0, uint32_t b )
 {
-    struct uint128 z;
-    uint_fast64_t mid;
-    uint_fast32_t carry;
-    z.v0 = a0 * b;
-    mid = (uint_fast64_t) (uint32_t) (a0>>32) * b;
-    carry = (uint32_t) ((uint_fast32_t) (z.v0>>32) - (uint_fast32_t) mid);
-    z.v64 = a64 * b + (uint_fast32_t) ((mid + carry)>>32);
-    return z;
+	struct uint128 z;
+	uint_fast64_t mid;
+	uint_fast32_t carry;
+	z.v0 = a0 * b;
+	mid = (uint_fast64_t) (uint32_t) (a0>>32) * b;
+	carry = (uint32_t) ((uint_fast32_t) (z.v0>>32) - (uint_fast32_t) mid);
+	z.v64 = a64 * b + (uint_fast32_t) ((mid + carry)>>32);
+	return z;
 }
 #else
 struct uint128 softfloat_mul128By32( uint64_t a64, uint64_t a0, uint32_t b );
@@ -607,7 +607,7 @@ struct uint128 softfloat_mul128By32( uint64_t a64, uint64_t a0, uint32_t b );
 *----------------------------------------------------------------------------*/
 void
  softfloat_mul128To256M(
-     uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0, uint64_t *zPtr );
+	 uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0, uint64_t *zPtr );
 #endif
 
 #else
@@ -654,17 +654,17 @@ int_fast8_t
 INLINE
 void
  softfloat_shortShiftLeft64To96M(
-     uint64_t a, uint_fast8_t dist, uint32_t *zPtr )
+	 uint64_t a, uint_fast8_t dist, uint32_t *zPtr )
 {
-    zPtr[indexWord( 3, 0 )] = (uint32_t) a<<dist;
-    a >>= 32 - dist;
-    zPtr[indexWord( 3, 2 )] = a>>32;
-    zPtr[indexWord( 3, 1 )] = a;
+	zPtr[indexWord( 3, 0 )] = (uint32_t) a<<dist;
+	a >>= 32 - dist;
+	zPtr[indexWord( 3, 2 )] = a>>32;
+	zPtr[indexWord( 3, 1 )] = a;
 }
 #else
 void
  softfloat_shortShiftLeft64To96M(
-     uint64_t a, uint_fast8_t dist, uint32_t *zPtr );
+	 uint64_t a, uint_fast8_t dist, uint32_t *zPtr );
 #endif
 #endif
 
@@ -680,10 +680,10 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_shortShiftLeftM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     uint_fast8_t dist,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 uint_fast8_t dist,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -724,10 +724,10 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_shiftLeftM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     uint32_t dist,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 uint32_t dist,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -767,10 +767,10 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_shortShiftRightM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     uint_fast8_t dist,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 uint_fast8_t dist,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -803,7 +803,7 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_shortShiftRightJamM(
-     uint_fast8_t, const uint32_t *, uint_fast8_t, uint32_t * );
+	 uint_fast8_t, const uint32_t *, uint_fast8_t, uint32_t * );
 #endif
 
 #ifndef softfloat_shortShiftRightJam160M
@@ -827,10 +827,10 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_shiftRightM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     uint32_t dist,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 uint32_t dist,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -858,10 +858,10 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_shiftRightJamM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     uint32_t dist,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 uint32_t dist,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -900,10 +900,10 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_addM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     const uint32_t *bPtr,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 const uint32_t *bPtr,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -942,11 +942,11 @@ void
 *----------------------------------------------------------------------------*/
 uint_fast8_t
  softfloat_addCarryM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     const uint32_t *bPtr,
-     uint_fast8_t carry,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 const uint32_t *bPtr,
+	 uint_fast8_t carry,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -958,11 +958,11 @@ uint_fast8_t
 *----------------------------------------------------------------------------*/
 uint_fast8_t
  softfloat_addComplCarryM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     const uint32_t *bPtr,
-     uint_fast8_t carry,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 const uint32_t *bPtr,
+	 uint_fast8_t carry,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -1054,10 +1054,10 @@ void softfloat_sub1XM( uint_fast8_t size_words, uint32_t *zPtr );
 *----------------------------------------------------------------------------*/
 void
  softfloat_subM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     const uint32_t *bPtr,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 const uint32_t *bPtr,
+	 uint32_t *zPtr
  );
 #endif
 
@@ -1106,7 +1106,7 @@ void softfloat_mul64To128M( uint64_t a, uint64_t b, uint32_t *zPtr );
 *----------------------------------------------------------------------------*/
 void
  softfloat_mul128MTo256M(
-     const uint32_t *aPtr, const uint32_t *bPtr, uint32_t *zPtr );
+	 const uint32_t *aPtr, const uint32_t *bPtr, uint32_t *zPtr );
 #endif
 
 #ifndef softfloat_remStepMBy32
@@ -1121,12 +1121,12 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_remStepMBy32(
-     uint_fast8_t size_words,
-     const uint32_t *remPtr,
-     uint_fast8_t dist,
-     const uint32_t *bPtr,
-     uint32_t q,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *remPtr,
+	 uint_fast8_t dist,
+	 const uint32_t *bPtr,
+	 uint32_t q,
+	 uint32_t *zPtr
  );
 #endif
 

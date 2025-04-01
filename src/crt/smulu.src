@@ -15,8 +15,8 @@ __smuls:
 __smulu:
 
 ; Multiplies HL by BC and returns the 16-bit product hl.
-;    I: BC=multiplier, HL=multiplicand
-;    O: hl=HL*BC, hlu=ADL&&(L*C+(H*C+L*B<<8&0xFFFF)>>16)
+;	I: BC=multiplier, HL=multiplicand
+;	O: hl=HL*BC, hlu=ADL&&(L*C+(H*C+L*B<<8&0xFFFF)>>16)
 ;   FO: c=!ADL&&(L*C+(H*C+L*B<<8&0xFFFF)>>16)
 ;   CC: 20*r(PC)+(ADL?6*r(SPL)+3*w(SPL):4*r(SPS)+2*w(SPS))+13
 				; ude		uhl		u(sp)
@@ -38,6 +38,6 @@ Mul_HL_BC_HL:			;--------------+---------------+----------------
 	ret
 
 ; HL*BC&0xFFFF=L*C+(H*C+L*B<<8)+(H*B<<16)&0xFFFF
-;	      =L*C+(H*C+L*B<<8)&0xFFFF
+;		  =L*C+(H*C+L*B<<8)&0xFFFF
 
 end if

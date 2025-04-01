@@ -12,4 +12,4 @@ Download `flat assembler g` available [here](https://flatassembler.net/download.
 
 Then execute:
 
-    fasmg libload.asm libload.8xv
+	fasmg libload.asm libload.8xv

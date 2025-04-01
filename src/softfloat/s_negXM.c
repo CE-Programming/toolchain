@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -42,20 +42,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void softfloat_negXM( uint_fast8_t size_words, uint32_t *zPtr )
 {
-    unsigned int index, lastIndex;
-    uint_fast8_t carry;
-    uint32_t word;
+	unsigned int index, lastIndex;
+	uint_fast8_t carry;
+	uint32_t word;
 
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    carry = 1;
-    for (;;) {
-        word = ~zPtr[index] + carry;
-        zPtr[index] = word;
-        if ( index == lastIndex ) break;
-        index += wordIncr;
-        if ( word ) carry = 0;
-    }
+	index = indexWordLo( size_words );
+	lastIndex = indexWordHi( size_words );
+	carry = 1;
+	for (;;) {
+		word = ~zPtr[index] + carry;
+		zPtr[index] = word;
+		if ( index == lastIndex ) break;
+		index += wordIncr;
+		if ( word ) carry = 0;
+	}
 
 }
 

@@ -1,15 +1,15 @@
 /************************************************************************/
-/*                                                                      */
-/*                Copyright (C) 1999-2008 by Zilog, Inc.                */
-/*                                                                      */
+/*																	  */
+/*				Copyright (C) 1999-2008 by Zilog, Inc.				*/
+/*																	  */
 /************************************************************************/
 /*
-    log returns the natural logarithm of its floating
-    point argument.
+	log returns the natural logarithm of its floating
+	point argument.
 
-    The coefficients are #2705 from Hart & Cheney. (19.38D)
+	The coefficients are #2705 from Hart & Cheney. (19.38D)
 
-    It calls frexp.
+	It calls frexp.
 */
 
 #include <errno.h>
@@ -33,24 +33,24 @@
  */
 long double logl(long double arg)
 {
-    long double x, z, zsq, temp;
-    int expon;
+	long double x, z, zsq, temp;
+	int expon;
 
-    if (arg <= 0.0L) {
-        errno = EDOM;
-        return -HUGE_VALL;
-    }
-    x = frexpl(arg, & expon);
-    if ( x < F64_INV_SQRT2 ){
-        x *= 2.0L;
-        expon--;
-    }
+	if (arg <= 0.0L) {
+		errno = EDOM;
+		return -HUGE_VALL;
+	}
+	x = frexpl(arg, & expon);
+	if ( x < F64_INV_SQRT2 ){
+		x *= 2.0L;
+		expon--;
+	}
 
-    z = (x-1.0L) / (x+1.0L);
-    zsq = z*z;
+	z = (x-1.0L) / (x+1.0L);
+	zsq = z*z;
 
-    temp = ((p3*zsq + p2)*zsq + p1)*zsq + p0;
-    temp = temp / (((zsq + q2)*zsq + q1)*zsq + q0);
-    temp = temp * z + expon * F64_LN2;
-    return temp;
+	temp = ((p3*zsq + p2)*zsq + p1)*zsq + p0;
+	temp = temp / (((zsq + q2)*zsq + q1)*zsq + q0);
+	temp = temp * z + expon * F64_LN2;
+	return temp;
 }

@@ -38,13 +38,13 @@
  * ulp of +4 at +0x1.a85846p-2
  */
 float _atanf_c(float arg) {
-    float satan(float);
+	float satan(float);
 
-    if (signbit(arg)) {
-        return (-satan(-arg));
-    } else {
-        return (satan(arg));
-    }
+	if (signbit(arg)) {
+		return (-satan(-arg));
+	} else {
+		return (satan(arg));
+	}
 }
 
 double _atan_c(double) __attribute__((alias("_atanf_c")));
@@ -60,13 +60,13 @@ double _atan_c(double) __attribute__((alias("_atanf_c")));
  */
 
 static float xatan(float arg) {
-    float argsq;
-    float value;
+	float argsq;
+	float value;
 
-    argsq = arg*arg;
-    value = ((((p4*argsq + p3)*argsq + p2)*argsq + p1)*argsq + p0);
-    value = value/(((((argsq + q4)*argsq + q3)*argsq + q2)*argsq + q1)*argsq + q0);
-    return (value*arg);
+	argsq = arg*arg;
+	value = ((((p4*argsq + p3)*argsq + p2)*argsq + p1)*argsq + p0);
+	value = value/(((((argsq + q4)*argsq + q3)*argsq + q2)*argsq + q1)*argsq + q0);
+	return (value*arg);
 }
 
 /**
@@ -75,15 +75,15 @@ static float xatan(float arg) {
  */
 
 float satan(float arg) {
-    if (arg < F32_SQRT2_MINUS_1) {
-        return (xatan(arg));
-    } else if (arg > F32_SQRT2_PLUS_1) {
-        if (arg > 0x1.0p+25f) {
-            /* rounds to pi/2 */
-            return F32_PI2;
-        }
-        return (F32_PI2 - xatan(1.0f/arg));
-    } else {
-        return (F32_PI4 + xatan((arg-1.0f)/(arg+1.0f)));
-    }
+	if (arg < F32_SQRT2_MINUS_1) {
+		return (xatan(arg));
+	} else if (arg > F32_SQRT2_PLUS_1) {
+		if (arg > 0x1.0p+25f) {
+			/* rounds to pi/2 */
+			return F32_PI2;
+		}
+		return (F32_PI2 - xatan(1.0f/arg));
+	} else {
+		return (F32_PI4 + xatan((arg-1.0f)/(arg+1.0f)));
+	}
 }

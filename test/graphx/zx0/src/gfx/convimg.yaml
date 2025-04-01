@@ -1,22 +1,22 @@
 palettes:
   - name: global_palette
-    max-entries: 48
-    fixed-entries:
-      - color: {index: 0, r: 255, g: 255, b: 255}
-    images: automatic
+	max-entries: 48
+	fixed-entries:
+	  - color: {index: 0, r: 255, g: 255, b: 255}
+	images: automatic
 
 converts:
   - name: apple_image
-    palette: global_palette
-    compress: zx0
-    images:
-      - apple.png
+	palette: global_palette
+	compress: zx0
+	images:
+	  - apple.png
 
 outputs:
   - type: c
-    include-file: gfx.h
-    palettes:
-      - global_palette
-    converts:
-      - apple_image
+	include-file: gfx.h
+	palettes:
+	  - global_palette
+	converts:
+	  - apple_image
 

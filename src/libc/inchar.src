@@ -3,7 +3,7 @@
 	section	.text
 	weak	_inchar
 _inchar:
-    	ld	iy,$d00080	; ti.flags
+		ld	iy,$d00080	; ti.flags
 .l:
 	call	$2014C		; ti.GetCSC
 	or	a,a
@@ -11,7 +11,7 @@ _inchar:
 	sbc	hl,hl
 	ld	l,a
 	ld	de,.lut
-    	add	hl,de
+		add	hl,de
 	ld	a,(hl)
 	or	a,a
 	jr	z,.l

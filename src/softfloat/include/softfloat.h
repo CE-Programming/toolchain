@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -68,8 +68,8 @@ extern THREAD_LOCAL uint_fast8_t softfloat_detectTininess;
 	#define softfloat_detectTininess softfloat_tininess_afterRounding
 #endif
 enum {
-    softfloat_tininess_beforeRounding = 0,
-    softfloat_tininess_afterRounding  = 1
+	softfloat_tininess_beforeRounding = 0,
+	softfloat_tininess_afterRounding  = 1
 };
 
 /*----------------------------------------------------------------------------
@@ -82,12 +82,12 @@ extern THREAD_LOCAL uint_fast8_t softfloat_roundingMode;
 #define softfloat_roundingMode softfloat_round_near_even
 #endif
 enum {
-    softfloat_round_near_even   = 0,
-    softfloat_round_minMag      = 1,
-    softfloat_round_min         = 2,
-    softfloat_round_max         = 3,
-    softfloat_round_near_maxMag = 4,
-    softfloat_round_odd         = 6
+	softfloat_round_near_even   = 0,
+	softfloat_round_minMag	  = 1,
+	softfloat_round_min		 = 2,
+	softfloat_round_max		 = 3,
+	softfloat_round_near_maxMag = 4,
+	softfloat_round_odd		 = 6
 };
 
 /*----------------------------------------------------------------------------
@@ -96,20 +96,20 @@ enum {
 #if 0
 extern THREAD_LOCAL uint_fast8_t softfloat_exceptionFlags;
 enum {
-    softfloat_flag_inexact   =  1,
-    softfloat_flag_underflow =  2,
-    softfloat_flag_overflow  =  4,
-    softfloat_flag_infinite  =  8,
-    softfloat_flag_invalid   = 16
+	softfloat_flag_inexact   =  1,
+	softfloat_flag_underflow =  2,
+	softfloat_flag_overflow  =  4,
+	softfloat_flag_infinite  =  8,
+	softfloat_flag_invalid   = 16
 };
 #else
 #define softfloat_exceptionFlags __fe_cur_env
 enum {
-    softfloat_flag_inexact   = FE_INEXACT  ,
-    softfloat_flag_underflow = FE_UNDERFLOW,
-    softfloat_flag_overflow  = FE_OVERFLOW ,
-    softfloat_flag_infinite  = FE_DIVBYZERO,
-    softfloat_flag_invalid   = FE_INVALID
+	softfloat_flag_inexact   = FE_INEXACT  ,
+	softfloat_flag_underflow = FE_UNDERFLOW,
+	softfloat_flag_overflow  = FE_OVERFLOW ,
+	softfloat_flag_infinite  = FE_DIVBYZERO,
+	softfloat_flag_invalid   = FE_INVALID
 };
 #endif
 
@@ -320,7 +320,7 @@ float64_t extF80M_to_f64( const extFloat80_t * );
 void extF80M_to_f128M( const extFloat80_t *, float128_t * );
 void
  extF80M_roundToInt(
-     const extFloat80_t *, uint_fast8_t, bool, extFloat80_t * );
+	 const extFloat80_t *, uint_fast8_t, bool, extFloat80_t * );
 void extF80M_add( const extFloat80_t *, const extFloat80_t *, extFloat80_t * );
 void extF80M_sub( const extFloat80_t *, const extFloat80_t *, extFloat80_t * );
 void extF80M_mul( const extFloat80_t *, const extFloat80_t *, extFloat80_t * );
@@ -385,7 +385,7 @@ void f128M_sub( const float128_t *, const float128_t *, float128_t * );
 void f128M_mul( const float128_t *, const float128_t *, float128_t * );
 void
  f128M_mulAdd(
-     const float128_t *, const float128_t *, const float128_t *, float128_t *
+	 const float128_t *, const float128_t *, const float128_t *, float128_t *
  );
 void f128M_div( const float128_t *, const float128_t *, float128_t * );
 void f128M_rem( const float128_t *, const float128_t *, float128_t * );

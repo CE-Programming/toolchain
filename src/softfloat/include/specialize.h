@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -53,10 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 #define ui32_fromPosOverflow UINT32_C( 0x0 )
 #define ui32_fromNegOverflow UINT32_C( 0x0 )
-#define ui32_fromNaN         UINT32_C( 0x0 )
+#define ui32_fromNaN		 UINT32_C( 0x0 )
 #define i32_fromPosOverflow  INT32_C( 0x0 )
 #define i32_fromNegOverflow  INT32_C( 0x0 )
-#define i32_fromNaN          INT32_C( 0x0 )
+#define i32_fromNaN		  INT32_C( 0x0 )
 
 /*----------------------------------------------------------------------------
 | The values to return on conversions to 64-bit integer formats that raise an
@@ -64,21 +64,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 #define ui64_fromPosOverflow UINT64_C( 0x0 )
 #define ui64_fromNegOverflow UINT64_C( 0x0 )
-#define ui64_fromNaN         UINT64_C( 0x0 )
+#define ui64_fromNaN		 UINT64_C( 0x0 )
 #define i64_fromPosOverflow  INT64_C( 0x0 )
 #define i64_fromNegOverflow  INT64_C( 0x0 )
-#define i64_fromNaN          INT64_C( 0x0 )
+#define i64_fromNaN		  INT64_C( 0x0 )
 
 /*----------------------------------------------------------------------------
 | "Common NaN" structure, used to transfer NaN representations from one format
 | to another.
 *----------------------------------------------------------------------------*/
 struct commonNaN {
-    bool sign;
+	bool sign;
 #ifdef LITTLEENDIAN
-    uint64_t v0, v64;
+	uint64_t v0, v64;
 #else
-    uint64_t v64, v0;
+	uint64_t v64, v0;
 #endif
 };
 
@@ -217,7 +217,7 @@ uint_fast64_t
 *----------------------------------------------------------------------------*/
 void
  softfloat_extF80UIToCommonNaN(
-     uint_fast16_t uiA64, uint_fast64_t uiA0, struct commonNaN *zPtr );
+	 uint_fast16_t uiA64, uint_fast64_t uiA0, struct commonNaN *zPtr );
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by 'aPtr' into an 80-bit extended
@@ -237,10 +237,10 @@ struct uint128 softfloat_commonNaNToExtF80UI( const struct commonNaN *aPtr );
 *----------------------------------------------------------------------------*/
 struct uint128
  softfloat_propagateNaNExtF80UI(
-     uint_fast16_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast16_t uiB64,
-     uint_fast64_t uiB0
+	 uint_fast16_t uiA64,
+	 uint_fast64_t uiA0,
+	 uint_fast16_t uiB64,
+	 uint_fast64_t uiB0
  );
 
 /*----------------------------------------------------------------------------
@@ -266,7 +266,7 @@ struct uint128
 *----------------------------------------------------------------------------*/
 void
  softfloat_f128UIToCommonNaN(
-     uint_fast64_t uiA64, uint_fast64_t uiA0, struct commonNaN *zPtr );
+	 uint_fast64_t uiA64, uint_fast64_t uiA0, struct commonNaN *zPtr );
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by 'aPtr' into a 128-bit floating-point
@@ -285,10 +285,10 @@ struct uint128 softfloat_commonNaNToF128UI( const struct commonNaN * );
 *----------------------------------------------------------------------------*/
 struct uint128
  softfloat_propagateNaNF128UI(
-     uint_fast64_t uiA64,
-     uint_fast64_t uiA0,
-     uint_fast64_t uiB64,
-     uint_fast64_t uiB0
+	 uint_fast64_t uiA64,
+	 uint_fast64_t uiA0,
+	 uint_fast64_t uiB64,
+	 uint_fast64_t uiB0
  );
 
 #else
@@ -306,7 +306,7 @@ struct uint128
 *----------------------------------------------------------------------------*/
 void
  softfloat_extF80MToCommonNaN(
-     const struct extFloat80M *aSPtr, struct commonNaN *zPtr );
+	 const struct extFloat80M *aSPtr, struct commonNaN *zPtr );
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by 'aPtr' into an 80-bit extended
@@ -315,7 +315,7 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_commonNaNToExtF80M(
-     const struct commonNaN *aPtr, struct extFloat80M *zSPtr );
+	 const struct commonNaN *aPtr, struct extFloat80M *zSPtr );
 
 /*----------------------------------------------------------------------------
 | Assuming at least one of the two 80-bit extended floating-point values
@@ -325,9 +325,9 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_propagateNaNExtF80M(
-     const struct extFloat80M *aSPtr,
-     const struct extFloat80M *bSPtr,
-     struct extFloat80M *zSPtr
+	 const struct extFloat80M *aSPtr,
+	 const struct extFloat80M *bSPtr,
+	 struct extFloat80M *zSPtr
  );
 
 /*----------------------------------------------------------------------------
@@ -368,7 +368,7 @@ void
 *----------------------------------------------------------------------------*/
 void
  softfloat_propagateNaNF128M(
-     const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr );
+	 const uint32_t *aWPtr, const uint32_t *bWPtr, uint32_t *zWPtr );
 
 #endif
 

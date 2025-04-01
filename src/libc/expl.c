@@ -1,13 +1,13 @@
 /************************************************************************/
-/*                                                                      */
-/*                 Copyright (C) 2000-2008 Zilog, Inc.                  */
-/*                                                                      */
+/*																	  */
+/*				 Copyright (C) 2000-2008 Zilog, Inc.				  */
+/*																	  */
 /************************************************************************/
 /*
-    exp returns the exponential function of its
-    floating-point argument.
+	exp returns the exponential function of its
+	floating-point argument.
 
-    The coefficients are #1069 from Hart and Cheney. (22.35D)
+	The coefficients are #1069 from Hart and Cheney. (22.35D)
 */
 
 #include <errno.h>
@@ -39,25 +39,25 @@
  * https://www.desmos.com/calculator/zlrmxatxkf
  */
 long double expl(long double arg) {
-    long double fraction;
-    long double temp1, temp2, xsq;
-    long double ent;
+	long double fraction;
+	long double temp1, temp2, xsq;
+	long double ent;
 
-    if ( arg == 0.0L ){
-        return 1.0L;
-    }
-    if ( arg < exp_min_arg ){
-        return 0.0L;
-    }
-    if ( arg > exp_max_arg ){
-        errno = ERANGE;
-        return HUGE_VALL;
-    }
-    arg *= F64_LOG2E;
-    ent = floorl( arg );
-    fraction = arg - ent - 0.5L;
-    xsq = fraction * fraction;
-    temp1 = ((p2 * xsq + p1) * xsq + p0) * fraction;
-    temp2 = ((xsq + q2) * xsq + q1) * xsq + q0;
-    return ldexpl( F64_SQRT2 * ((temp2+temp1) / (temp2-temp1)), (int)ent );
+	if ( arg == 0.0L ){
+		return 1.0L;
+	}
+	if ( arg < exp_min_arg ){
+		return 0.0L;
+	}
+	if ( arg > exp_max_arg ){
+		errno = ERANGE;
+		return HUGE_VALL;
+	}
+	arg *= F64_LOG2E;
+	ent = floorl( arg );
+	fraction = arg - ent - 0.5L;
+	xsq = fraction * fraction;
+	temp1 = ((p2 * xsq + p1) * xsq + p0) * fraction;
+	temp2 = ((xsq + q2) * xsq + q1) * xsq + q0;
+	return ldexpl( F64_SQRT2 * ((temp2+temp1) / (temp2-temp1)), (int)ent );
 }

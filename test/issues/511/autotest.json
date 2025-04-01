@@ -1,117 +1,117 @@
 {
   "transfer_files":
   [
-    "bin/DEMO.8xp"
+	"bin/DEMO.8xp"
   ],
   "target":
   {
-    "name": "DEMO",
-    "isASM": true
+	"name": "DEMO",
+	"isASM": true
   },
   "sequence":
   [
-    "action|launch",
-    "delay|100",
-    "hashWait|1",
-    "key|enter",
-    "hashWait|2",
-    "key|enter",
-    "hashWait|3",
-    "key|enter",
-    "hashWait|4",
-    "key|enter",
-    "hashWait|5",
-    "key|enter",
-    "hashWait|6",
-    "key|enter",
-    "hashWait|7",
-    "key|enter",
-    "hashWait|8",
-    "key|enter",
-    "hashWait|9",
-    "key|enter",
-    "hashWait|10",
-    "key|enter",
-    "hashWait|11"
+	"action|launch",
+	"delay|100",
+	"hashWait|1",
+	"key|enter",
+	"hashWait|2",
+	"key|enter",
+	"hashWait|3",
+	"key|enter",
+	"hashWait|4",
+	"key|enter",
+	"hashWait|5",
+	"key|enter",
+	"hashWait|6",
+	"key|enter",
+	"hashWait|7",
+	"key|enter",
+	"hashWait|8",
+	"key|enter",
+	"hashWait|9",
+	"key|enter",
+	"hashWait|10",
+	"key|enter",
+	"hashWait|11"
   ],
   "hashes":
   {
-    "1":
-    {
-      "description": "Test 1",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "0C357809" ]
-    },
-    "2":
-    {
-      "description": "Test 2",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "C37E4C46" ]
-    },
-    "3":
-    {
-      "description": "Test 3",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "E680110F" ]
-    },
-    "4":
-    {
-      "description": "Test 4",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "F0FE4DDC" ]
-    },
-    "5":
-    {
-      "description": "Test 5",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "67BB7FC3" ]
-    },
-    "6":
-    {
-      "description": "Test 6",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "0A97FD4D" ]
-    },
-    "7":
-    {
-      "description": "Test 7",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "8BD8CD6E" ]
-    },
-    "8":
-    {
-      "description": "Test 8",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "49563B96" ]
-    },
-    "9":
-    {
-      "description": "Test 9",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "0D88654C" ]
-    },
-    "10":
-    {
-      "description": "Test 10",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "DE8AD0AF" ]
-    },
-    "11":
-    {
-      "description": "Test program exit",
-      "start": "vram_start",
-      "size": "vram_16_size",
-      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
-    }
+	"1":
+	{
+	  "description": "Test 1",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "0C357809" ]
+	},
+	"2":
+	{
+	  "description": "Test 2",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "C37E4C46" ]
+	},
+	"3":
+	{
+	  "description": "Test 3",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "E680110F" ]
+	},
+	"4":
+	{
+	  "description": "Test 4",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "F0FE4DDC" ]
+	},
+	"5":
+	{
+	  "description": "Test 5",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "67BB7FC3" ]
+	},
+	"6":
+	{
+	  "description": "Test 6",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "0A97FD4D" ]
+	},
+	"7":
+	{
+	  "description": "Test 7",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "8BD8CD6E" ]
+	},
+	"8":
+	{
+	  "description": "Test 8",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "49563B96" ]
+	},
+	"9":
+	{
+	  "description": "Test 9",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "0D88654C" ]
+	},
+	"10":
+	{
+	  "description": "Test 10",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "DE8AD0AF" ]
+	},
+	"11":
+	{
+	  "description": "Test program exit",
+	  "start": "vram_start",
+	  "size": "vram_16_size",
+	  "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+	}
   }
 }

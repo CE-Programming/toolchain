@@ -1,29 +1,29 @@
 	assume	adl=1
 
-kUp           := 3
-kLeft         := 2
-kDown         := 4
-kEnter        := 5
-kClear        := 9
-kRight        := 1
-kQuit         := $40
-kIns          := $0B
-curLock       := 4
-flags         := $D00080
-keyExtend     := $D0058E
-curRow        := $D00595		; also includes curCol
-curUnder      := $D00599
-_PutS         := $207C0
-_PutC         := $207B8
-_PutPS        := $207C8
-_GetKey       := $20D8C
-_CursorOn     := $208B0
-_CursorOff    := $208A8
+kUp		   := 3
+kLeft		 := 2
+kDown		 := 4
+kEnter		:= 5
+kClear		:= 9
+kRight		:= 1
+kQuit		 := $40
+kIns		  := $0B
+curLock	   := 4
+flags		 := $D00080
+keyExtend	 := $D0058E
+curRow		:= $D00595		; also includes curCol
+curUnder	  := $D00599
+_PutS		 := $207C0
+_PutC		 := $207B8
+_PutPS		:= $207C8
+_GetKey	   := $20D8C
+_CursorOn	 := $208B0
+_CursorOff	:= $208A8
 _PullDownChk  := $208BC
 _ConvKeyToTok := $20E40
 _GetTokString := $20874
 _PutTokString := $20D74
-_ClrTxtShd    := $20818
+_ClrTxtShd	:= $20818
 
 	section	.text
 	public	_os_GetTokenInput

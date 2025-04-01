@@ -18,46 +18,46 @@ new_handler get_new_handler() noexcept { return __new_handler; }
 
 void __throw_bad_alloc() {
 #if __has_feature(cxx_exceptions)
-    throw bad_alloc();
+	throw bad_alloc();
 #else
-    std::abort();
+	std::abort();
 #endif
 }
 
 } // namespace std
 
 [[gnu::weak]] void* operator new  (std::size_t size) {
-    if (size == 0)
-        size = 1;
-    void* ptr;
-    while ((ptr = std::malloc(size)) == nullptr)
-        if (auto handler = std::get_new_handler())
-            handler();
-        else
+	if (size == 0)
+		size = 1;
+	void* ptr;
+	while ((ptr = std::malloc(size)) == nullptr)
+		if (auto handler = std::get_new_handler())
+			handler();
+		else
 #if __has_feature(cxx_exceptions)
-            throw std::bad_alloc();
+			throw std::bad_alloc();
 #else
-            break;
+			break;
 #endif
-    return ptr;
+	return ptr;
 }
 [[gnu::weak]] void* operator new  (std::size_t size, std::nothrow_t const&) noexcept {
-    void* ptr = nullptr;
+	void* ptr = nullptr;
 #if __has_feature(cxx_exceptions)
-    try {
+	try {
 #endif
-        ptr = ::operator new(size);
+		ptr = ::operator new(size);
 #if __has_feature(cxx_exceptions)
-    } catch(...) {}
+	} catch(...) {}
 #endif
-    return ptr;
+	return ptr;
 }
-[[gnu::weak]] void  operator delete  (void* ptr)                        noexcept { std::free(ptr); }
+[[gnu::weak]] void  operator delete  (void* ptr)						noexcept { std::free(ptr); }
 [[gnu::weak]] void  operator delete  (void* ptr, const std::nothrow_t&) noexcept { ::operator delete  (ptr); }
-[[gnu::weak]] void  operator delete  (void* ptr, std::size_t)           noexcept { ::operator delete  (ptr); }
+[[gnu::weak]] void  operator delete  (void* ptr, std::size_t)		   noexcept { ::operator delete  (ptr); }
 
 [[gnu::weak]] void* operator new[](std::size_t size) { return operator new(size); }
 [[gnu::weak]] void* operator new[](std::size_t size, std::nothrow_t const&) noexcept { return operator new(size, std::nothrow); }
-[[gnu::weak]] void  operator delete[](void* ptr)                        noexcept { ::operator delete  (ptr); }
+[[gnu::weak]] void  operator delete[](void* ptr)						noexcept { ::operator delete  (ptr); }
 [[gnu::weak]] void  operator delete[](void* ptr, const std::nothrow_t&) noexcept { ::operator delete[](ptr); }
-[[gnu::weak]] void  operator delete[](void* ptr, std::size_t)           noexcept { ::operator delete[](ptr); }
+[[gnu::weak]] void  operator delete[](void* ptr, std::size_t)		   noexcept { ::operator delete[](ptr); }

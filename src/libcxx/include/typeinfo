@@ -12,20 +12,20 @@ namespace std {
 
 class type_info {
 public:
-    virtual ~type_info();
+	virtual ~type_info();
 
-    _EZCXX_INLINE bool operator==(const type_info &__rhs) const noexcept { return name() == __rhs.name(); }
-    _EZCXX_INLINE bool operator!=(const type_info &__rhs) const noexcept { return !(*this == __rhs); }
-    _EZCXX_INLINE bool before(const type_info &__rhs) const noexcept { return name() < __rhs.name(); }
+	_EZCXX_INLINE bool operator==(const type_info &__rhs) const noexcept { return name() == __rhs.name(); }
+	_EZCXX_INLINE bool operator!=(const type_info &__rhs) const noexcept { return !(*this == __rhs); }
+	_EZCXX_INLINE bool before(const type_info &__rhs) const noexcept { return name() < __rhs.name(); }
 
-    _EZCXX_INLINE const char *name() const noexcept { return __type_name; }
-    _EZCXX_INLINE size_t hash_code() { return reinterpret_cast<size_t>(name()); }
+	_EZCXX_INLINE const char *name() const noexcept { return __type_name; }
+	_EZCXX_INLINE size_t hash_code() { return reinterpret_cast<size_t>(name()); }
 
 private:
-    type_info(const type_info &) = delete;
-    type_info &operator=(const type_info &) = delete;
+	type_info(const type_info &) = delete;
+	type_info &operator=(const type_info &) = delete;
 
-    const char *__type_name;
+	const char *__type_name;
 };
 
 _EZCXX_DECLARE_EXCEPTION(bad_cast);

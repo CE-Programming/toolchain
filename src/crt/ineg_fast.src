@@ -7,6 +7,6 @@ __ineg_fast:
 	ex	de, hl	; ude=UHL+UDE, uhl=UDE
 	or	a, a
 	sbc	hl, de	; uhl=UDE-(UHL+UDE)
-			;    =UDE-UHL-UDE
-			;    =-UHL
+			;	=UDE-UHL-UDE
+			;	=-UHL
 	ret

@@ -71,11 +71,11 @@ tiflags uint8_t boot_GetBatteryStatus(void);
 uint8_t boot_BatteryCharging(void);
 
 
-#define os_ApdFlags          (*(uint8_t*)0xD00088)
-#define os_ApdSubTimer       (*(uint8_t*)0xD00590)
-#define os_ApdTimer          (*(uint8_t*)0xD00591)
+#define os_ApdFlags		  (*(uint8_t*)0xD00088)
+#define os_ApdSubTimer	   (*(uint8_t*)0xD00590)
+#define os_ApdTimer		  (*(uint8_t*)0xD00591)
 
-#define os_BatteryStatus     (*(uint8_t*)0xD02A86)
+#define os_BatteryStatus	 (*(uint8_t*)0xD02A86)
 
 #undef tiflags
 

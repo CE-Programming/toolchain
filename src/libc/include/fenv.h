@@ -16,27 +16,27 @@ extern "C" {
 #endif
 
 enum {
-    FE_DIVBYZERO  = 1 << 6,
+	FE_DIVBYZERO  = 1 << 6,
 #define FE_DIVBYZERO  FE_DIVBYZERO
-    FE_INEXACT    = 1 << 5,
-#define FE_INEXACT    FE_INEXACT
-    FE_INVALID    = 1 << 4,
-#define FE_INVALID    FE_INVALID
-    FE_OVERFLOW   = 1 << 3,
+	FE_INEXACT	= 1 << 5,
+#define FE_INEXACT	FE_INEXACT
+	FE_INVALID	= 1 << 4,
+#define FE_INVALID	FE_INVALID
+	FE_OVERFLOW   = 1 << 3,
 #define FE_OVERFLOW   FE_OVERFLOW
-    FE_UNDERFLOW  = 1 << 2,
+	FE_UNDERFLOW  = 1 << 2,
 #define FE_UNDERFLOW  FE_UNDERFLOW
-    FE_ALL_EXCEPT = FE_DIVBYZERO | FE_INEXACT | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW,
+	FE_ALL_EXCEPT = FE_DIVBYZERO | FE_INEXACT | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW,
 #define FE_ALL_EXCEPT FE_ALL_EXCEPT
 
-    FE_TONEAREST  = 0,
+	FE_TONEAREST  = 0,
 #define FE_TONEAREST  FE_TONEAREST
-    FE_TOWARDZERO = 1,
+	FE_TOWARDZERO = 1,
 #define FE_TOWARDZERO FE_TOWARDZERO
-    FE_DOWNWARD   = 2,
+	FE_DOWNWARD   = 2,
 #define FE_DOWNWARD   FE_DOWNWARD
-    FE_UPWARD     = 3,
-#define FE_UPWARD     FE_UPWARD
+	FE_UPWARD	 = 3,
+#define FE_UPWARD	 FE_UPWARD
 };
 
 typedef __fenv_t fenv_t;
@@ -56,7 +56,7 @@ int feraiseexcept(int);
 
 int fesetexceptflag(const fexcept_t *, int);
 #define fesetexceptflag(flagp, excepts) (__fe_cur_env = (__fe_cur_env & ~((excepts) & FE_ALL_EXCEPT)) \
-                                         | (*(flagp) & (excepts) & FE_ALL_EXCEPT), 0)
+										 | (*(flagp) & (excepts) & FE_ALL_EXCEPT), 0)
 
 int fetestexcept(int);
 #define fetestexcept(excepts) (__fe_cur_env & (excepts) & FE_ALL_EXCEPT)

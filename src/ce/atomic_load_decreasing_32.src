@@ -15,7 +15,7 @@ _atomic_load_decreasing_32:
 ; Read the value twice.
 ; first value read = cude, second value read = auhl
 					; Time between first and last byte read:
-	ld	de,(iy)			;      2R
+	ld	de,(iy)			;	  2R
 	ld	c,(iy+3)		; + 3F+1R
 	ld	hl,(iy)			; + 3F+3R
 	ld	a,(iy+3)		; + 3F+1R
@@ -34,14 +34,14 @@ no_ei:
 ; first byte of the first 32-bit read and the last byte of the second 32-bit
 ; read:
 ;  * If a change occurs between the two 32-bit reads, then both values read
-;    remain valid.
+;	remain valid.
 ;  * If a change occurs in the middle of one of the 32-bit reads:
-;     * If the bytes already read change but the bytes yet to read do not
-;       change, then the value read is the valid value before the change.
-;     * If the bytes already read do not change but the yet still to read
-;       change, then the value read is the valid value after the change.
-;     * If the bytes already read and the bytes yet to read change, then the
-;       value read is an invalid mix of the values before and after the change.
+;	 * If the bytes already read change but the bytes yet to read do not
+;	   change, then the value read is the valid value before the change.
+;	 * If the bytes already read do not change but the yet still to read
+;	   change, then the value read is the valid value after the change.
+;	 * If the bytes already read and the bytes yet to read change, then the
+;	   value read is an invalid mix of the values before and after the change.
 ;
 ; If the final case did not occur, then both values read are valid.
 ;
@@ -72,7 +72,7 @@ no_ei:
 	or	a,a
 	sbc	hl,de
 	sbc	a,c			; auhl = second value read
-					;         - first value read
+					;		 - first value read
 	jr	c,swap
 ; second value read >= first value read
 ;  ==> second value read is valid

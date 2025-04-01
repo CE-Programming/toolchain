@@ -3,7 +3,7 @@
 	section	.text
 	public	__fpupop2
 __fpupop2:
-	push    bc
+	push	bc
 	ld	bc, 0800000h
 	add	hl, bc
 	jr	nc, ncarry

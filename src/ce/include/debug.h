@@ -57,7 +57,7 @@ sprintf(out, ##__VA_ARGS__)
  */
 #define dbg_ClearConsole() \
 do { \
-    *(volatile unsigned char*)0xFD0000 = 1; \
+	*(volatile unsigned char*)0xFD0000 = 1; \
 } while (0)
 
 /**
@@ -74,7 +74,7 @@ void dbg_Debugger(void);
  * @param[in] address Watchpoint address.
  * @param[in] size Watchpoint size in bytes. Currently must be 1.
  * @param[in] mask Watchpoint mask, use DBG_WATCHPOINT_NONE to remove
- *                 the watchpoint.
+ *				 the watchpoint.
  */
 void dbg_WatchpointSet(void *address, size_t size, uint8_t mask);
 

@@ -34,25 +34,25 @@ extern "C" {
 
 /** FAT Driver return codes */
 typedef enum {
-    FAT_SUCCESS = 0, /**< Operation was successful */
-    FAT_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
-    FAT_ERROR_INVALID_CLUSTER, /**< An invalid FAT cluster was accessed */
-    FAT_ERROR_INVALID_POSITION, /**< An invalid position in the file */
-    FAT_ERROR_NOT_FOUND, /**< The partition, file, or entry does not exist */
-    FAT_ERROR_EXISTS, /**< The file or entry already exists */
-    FAT_ERROR_INVALID_PATH, /**< An invalid path was provided */
-    FAT_ERROR_FAILED_ALLOC, /**< Allocation of a cluster or file failed */
-    FAT_ERROR_CLUSTER_CHAIN, /**< The cluster chain was corrupted */
-    FAT_ERROR_DIRECTORY_NOT_EMPTY, /**< The directory is not empty */
-    FAT_ERROR_NO_VOLUME_LABEL, /**< No volume label found for partition */
-    FAT_ERROR_RDONLY, /**< The file or entry is read-only */
-    FAT_ERROR_RW_FAILED, /**< The read or write callback failed (count != return) */
-    FAT_ERROR_INVALID_FILESYSTEM, /**< A non-FAT filesystem detected */
-    FAT_ERROR_INVALID_SIZE, /**< An invalid size was detected */
-    FAT_ERROR_INVALID_MAGIC, /**< Some invalid magic bytes were detected */
-    FAT_ERROR_INVALID_SIGNATURE, /**< Some invalid signature was detected */
-    FAT_ERROR_NO_MORE_ENTRIES, /**< No more entries in the directory */
-    FAT_ERROR_INVALID_NAME, /**< An invalid filename was provided */
+	FAT_SUCCESS = 0, /**< Operation was successful */
+	FAT_ERROR_INVALID_PARAM, /**< An invalid argument was provided */
+	FAT_ERROR_INVALID_CLUSTER, /**< An invalid FAT cluster was accessed */
+	FAT_ERROR_INVALID_POSITION, /**< An invalid position in the file */
+	FAT_ERROR_NOT_FOUND, /**< The partition, file, or entry does not exist */
+	FAT_ERROR_EXISTS, /**< The file or entry already exists */
+	FAT_ERROR_INVALID_PATH, /**< An invalid path was provided */
+	FAT_ERROR_FAILED_ALLOC, /**< Allocation of a cluster or file failed */
+	FAT_ERROR_CLUSTER_CHAIN, /**< The cluster chain was corrupted */
+	FAT_ERROR_DIRECTORY_NOT_EMPTY, /**< The directory is not empty */
+	FAT_ERROR_NO_VOLUME_LABEL, /**< No volume label found for partition */
+	FAT_ERROR_RDONLY, /**< The file or entry is read-only */
+	FAT_ERROR_RW_FAILED, /**< The read or write callback failed (count != return) */
+	FAT_ERROR_INVALID_FILESYSTEM, /**< A non-FAT filesystem detected */
+	FAT_ERROR_INVALID_SIZE, /**< An invalid size was detected */
+	FAT_ERROR_INVALID_MAGIC, /**< Some invalid magic bytes were detected */
+	FAT_ERROR_INVALID_SIGNATURE, /**< Some invalid signature was detected */
+	FAT_ERROR_NO_MORE_ENTRIES, /**< No more entries in the directory */
+	FAT_ERROR_INVALID_NAME, /**< An invalid filename was provided */
 } fat_error_t;
 
 /**
@@ -64,9 +64,9 @@ typedef enum {
  * @returns Number of logical blocks read.
  */
 typedef uint24_t (*fat_read_callback_t)(fat_callback_usr_t *usr,
-                                        uint32_t lba,
-                                        uint24_t count,
-                                        void *buffer);
+										uint32_t lba,
+										uint24_t count,
+										void *buffer);
 
 /**
  * Callback for writing logical blocks
@@ -77,46 +77,46 @@ typedef uint24_t (*fat_read_callback_t)(fat_callback_usr_t *usr,
  * @returns Number of logical blocks written.
  */
 typedef uint24_t (*fat_write_callback_t)(fat_callback_usr_t *usr,
-                                         uint32_t lba,
-                                         uint24_t count,
-                                         const void *buffer);
+										 uint32_t lba,
+										 uint24_t count,
+										 const void *buffer);
 
 /** FAT structure */
 typedef struct {
 /* @cond */
-    uint8_t priv[768];
+	uint8_t priv[768];
 /* @endcond */
 } fat_t;
 
 /** FAT file structure */
 typedef struct {
 /* @cond */
-    uint8_t priv[64];
+	uint8_t priv[64];
 /* @endcond */
 } fat_file_t;
 
 /** FAT directory structure */
 typedef struct {
 /* @cond */
-    uint8_t priv[32];
+	uint8_t priv[32];
 /* @endcond */
 } fat_dir_t;
 
 /** FAT directory entry structure */
 typedef struct {
-    char name[13]; /**< Name in 8.3 format */
-    uint8_t attrib; /**< File attributes @see fat_file_attrib */
-    uint32_t size; /**< Size of file in bytes */
+	char name[13]; /**< Name in 8.3 format */
+	uint8_t attrib; /**< File attributes @see fat_file_attrib */
+	uint32_t size; /**< Size of file in bytes */
 } fat_dir_entry_t;
 
 enum fat_file_attrib
 {
-    FAT_RDONLY    = (1 << 0),  /**< Entry is read-only */
-    FAT_HIDDEN    = (1 << 1),  /**< Entry is hidden */
-    FAT_SYSTEM    = (1 << 2),  /**< Entry is a system file / directory */
-    FAT_VOLLABEL  = (1 << 3),  /**< Entry is a volume label */
-    FAT_DIR       = (1 << 4),  /**< Entry is a directory (or subdirectory) */
-    FAT_ARCHIVE   = (1 << 5),  /**< Entry is changed (created/modified) */
+	FAT_RDONLY	= (1 << 0),  /**< Entry is read-only */
+	FAT_HIDDEN	= (1 << 1),  /**< Entry is hidden */
+	FAT_SYSTEM	= (1 << 2),  /**< Entry is a system file / directory */
+	FAT_VOLLABEL  = (1 << 3),  /**< Entry is a volume label */
+	FAT_DIR	   = (1 << 4),  /**< Entry is a directory (or subdirectory) */
+	FAT_ARCHIVE   = (1 << 5),  /**< Entry is changed (created/modified) */
 };
 
 /**
@@ -127,16 +127,16 @@ enum fat_file_attrib
  * @param[in] read Callback for reading logical blocks.
  * @param[in] write Callback for writing logical blocks.
  * @param[in] usr Pointer to user-provided data structure that is passed to the
- *                relevant read/write callback functions. This can be used to
- *                store context information with different storage mechanisms.
+ *				relevant read/write callback functions. This can be used to
+ *				store context information with different storage mechanisms.
  * @param[in] base_lba LBA added to every FAT access for ease of use.
  * @return FAT_SUCCESS on success, otherwise error.
  */
 fat_error_t fat_Open(fat_t *fat,
-                     fat_read_callback_t read,
-                     fat_write_callback_t write,
-                     fat_callback_usr_t *usr,
-                     const uint32_t base_lba);
+					 fat_read_callback_t read,
+					 fat_write_callback_t write,
+					 fat_callback_usr_t *usr,
+					 const uint32_t base_lba);
 
 /**
  * Closes the FAT filesystem. This is not required to be called, however
@@ -179,7 +179,7 @@ fat_error_t fat_CloseDir(fat_dir_t *dir);
  * @param[in] fat Initialized FAT structure type.
  * @param[out] label Storage for returning label, must be >= 13 bytes.
  * @returns FAT_SUCCESS on success, FAT_ERROR_NO_VOLUME_LABEL if no label,
- *          otherwise a different error.
+ *		  otherwise a different error.
  */
 fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
 
@@ -200,7 +200,7 @@ fat_error_t fat_Create(fat_t *fat, const char *path, const char *name, uint8_t a
  * @return FAT_SUCCESS on success, otherwise error.
  * @note Directories must be empty in order to be deleted.
  * @warning Do not use this function on open files. The file must be closed
- *          before attempting to delete it.
+ *		  before attempting to delete it.
  */
 fat_error_t fat_Delete(fat_t *fat, const char *filepath);
 

@@ -4,11 +4,11 @@
 	
 	public	__fpclassifyf
 
-; FP_ZERO      := 0
+; FP_ZERO	  := 0
 ; FP_INFINITE  := 1
 ; FP_SUBNORMAL := 2
-; FP_NAN       := 3
-; FP_NORMAL    := 4
+; FP_NAN	   := 3
+; FP_NORMAL	:= 4
 
 ; int _fpclassifyf(float)
 __fpclassifyf:

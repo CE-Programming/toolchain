@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -43,88 +43,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 float64_t
  softfloat_addMagsF64( uint_fast64_t uiA, const uint_fast64_t *uiB_ptr, bool signZ )
 {
-    uint_fast64_t uiB;
-    int_fast16_t expA;
-    uint_fast64_t sigA;
-    int_fast16_t expB;
-    uint_fast64_t sigB;
-    int_fast16_t expDiff;
-    uint_fast64_t uiZ;
-    int_fast16_t expZ;
-    uint_fast64_t sigZ;
-    union ui64_f64 uZ;
+	uint_fast64_t uiB;
+	int_fast16_t expA;
+	uint_fast64_t sigA;
+	int_fast16_t expB;
+	uint_fast64_t sigB;
+	int_fast16_t expDiff;
+	uint_fast64_t uiZ;
+	int_fast16_t expZ;
+	uint_fast64_t sigZ;
+	union ui64_f64 uZ;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    uiB = *uiB_ptr;
-    expA = expF64UI( uiA );
-    sigA = fracF64UI( uiA );
-    expB = expF64UI( uiB );
-    sigB = fracF64UI( uiB );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    expDiff = expA - expB;
-    if ( ! expDiff ) {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
-        if ( ! expA ) {
-            uiZ = uiA + sigB;
-            goto uiZ;
-        }
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
-            uiZ = uiA;
-            goto uiZ;
-        }
-        expZ = expA;
-        sigZ = UINT64_C( 0x0020000000000000 ) + sigA + sigB;
-        sigZ <<= 9;
-    } else {
-        /*--------------------------------------------------------------------
-        *--------------------------------------------------------------------*/
-        sigA <<= 9;
-        sigB <<= 9;
-        if ( expDiff < 0 ) {
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
-                uiZ = packToF64UI( signZ, 0x7FF, 0 );
-                goto uiZ;
-            }
-            expZ = expB;
-            if ( expA ) {
-                sigA += UINT64_C( 0x2000000000000000 );
-            } else {
-                sigA <<= 1;
-            }
-            sigA = softfloat_shiftRightJam64( sigA, -expDiff );
-        } else {
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
-                uiZ = uiA;
-                goto uiZ;
-            }
-            expZ = expA;
-            if ( expB ) {
-                sigB += UINT64_C( 0x2000000000000000 );
-            } else {
-                sigB <<= 1;
-            }
-            sigB = softfloat_shiftRightJam64( sigB, expDiff );
-        }
-        sigZ = UINT64_C( 0x2000000000000000 ) + sigA + sigB;
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
-            --expZ;
-            sigZ <<= 1;
-        }
-    }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+	/*------------------------------------------------------------------------
+	*------------------------------------------------------------------------*/
+	uiB = *uiB_ptr;
+	expA = expF64UI( uiA );
+	sigA = fracF64UI( uiA );
+	expB = expF64UI( uiB );
+	sigB = fracF64UI( uiB );
+	/*------------------------------------------------------------------------
+	*------------------------------------------------------------------------*/
+	expDiff = expA - expB;
+	if ( ! expDiff ) {
+		/*--------------------------------------------------------------------
+		*--------------------------------------------------------------------*/
+		if ( ! expA ) {
+			uiZ = uiA + sigB;
+			goto uiZ;
+		}
+		if ( expA == 0x7FF ) {
+			if ( sigA | sigB ) goto propagateNaN;
+			uiZ = uiA;
+			goto uiZ;
+		}
+		expZ = expA;
+		sigZ = UINT64_C( 0x0020000000000000 ) + sigA + sigB;
+		sigZ <<= 9;
+	} else {
+		/*--------------------------------------------------------------------
+		*--------------------------------------------------------------------*/
+		sigA <<= 9;
+		sigB <<= 9;
+		if ( expDiff < 0 ) {
+			if ( expB == 0x7FF ) {
+				if ( sigB ) goto propagateNaN;
+				uiZ = packToF64UI( signZ, 0x7FF, 0 );
+				goto uiZ;
+			}
+			expZ = expB;
+			if ( expA ) {
+				sigA += UINT64_C( 0x2000000000000000 );
+			} else {
+				sigA <<= 1;
+			}
+			sigA = softfloat_shiftRightJam64( sigA, -expDiff );
+		} else {
+			if ( expA == 0x7FF ) {
+				if ( sigA ) goto propagateNaN;
+				uiZ = uiA;
+				goto uiZ;
+			}
+			expZ = expA;
+			if ( expB ) {
+				sigB += UINT64_C( 0x2000000000000000 );
+			} else {
+				sigB <<= 1;
+			}
+			sigB = softfloat_shiftRightJam64( sigB, expDiff );
+		}
+		sigZ = UINT64_C( 0x2000000000000000 ) + sigA + sigB;
+		if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+			--expZ;
+			sigZ <<= 1;
+		}
+	}
+	return softfloat_roundPackToF64( signZ, expZ, sigZ );
+	/*------------------------------------------------------------------------
+	*------------------------------------------------------------------------*/
  propagateNaN:
-    uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
+	uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:
-    uZ.ui = uiZ;
-    return uZ.f;
+	uZ.ui = uiZ;
+	return uZ.f;
 
 }
 

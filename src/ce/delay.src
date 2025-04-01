@@ -39,23 +39,23 @@ assert .multiplier_fp shr 24 = 0
 	ld	bc, .multiplier_fp	; aubc = ceil(256 * 32768 / 1e3)
 assert ($FFFF * .multiplier_fp) shr 32 = 0
 	call	__lmulu			; euhl = (millis - 1) *
-					;            ceil(256 * 32768 / 1e3)
+					;			ceil(256 * 32768 / 1e3)
 ; https://docs.google.com/spreadsheets/d/1mZwDn6rEw3-uSQPuy48Ez0UWIvnggLiJxWft4u4OtcU/edit?usp=sharing
 .correction_fp := 413
 	ld	bc, .multiplier_fp + .correction_fp
 	add	hl, bc
 	adc	a, e			; auhl = millis *
-					;            ceil(256 * 32768 / 1e3) +
-					;            correction_fp
+					;			ceil(256 * 32768 / 1e3) +
+					;			correction_fp
 	push	af
 	inc	sp
 	push	hl
 	inc	sp
 	pop	hl			; uhl = (millis *
-					;            ceil(256 * 32768 / 1e3) +
-					;            correction_fp) /
-					;           256
-					;     = ticks + correction
+					;			ceil(256 * 32768 / 1e3) +
+					;			correction_fp) /
+					;		   256
+					;	 = ticks + correction
 	inc	sp
 	xor	a, a			; auhl = ticks + correction
 ; Join common code for the rest.

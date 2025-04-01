@@ -918,7 +918,7 @@ float64_t f64_add( float64_t <I>a</I>, float64_t <I>b</I> );
 <PRE>
 void
  f128M_add(
-     const float128_t *<I>aPtr</I>, const float128_t *<I>bPtr</I>, float128_t *<I>destPtr</I> );
+	 const float128_t *<I>aPtr</I>, const float128_t *<I>bPtr</I>, float128_t *<I>destPtr</I> );
 </PRE>
 <PRE>
 float64_t f64_sqrt( float64_t <I>a</I> );
@@ -966,10 +966,10 @@ float64_t f64_mulAdd( float64_t <I>a</I>, float64_t <I>b</I>, float64_t <I>c</I>
 <PRE>
 void
  f128M_mulAdd(
-     const float128_t *<I>aPtr</I>,
-     const float128_t *<I>bPtr</I>,
-     const float128_t *<I>cPtr</I>,
-     float128_t *<I>destPtr</I>
+	 const float128_t *<I>aPtr</I>,
+	 const float128_t *<I>bPtr</I>,
+	 const float128_t *<I>cPtr</I>,
+	 float128_t *<I>destPtr</I>
  );
 </PRE>
 </BLOCKQUOTE>
@@ -1010,7 +1010,7 @@ float64_t f64_rem( float64_t <I>a</I>, float64_t <I>b</I> );
 <PRE>
 void
  f128M_rem(
-     const float128_t *<I>aPtr</I>, const float128_t *<I>bPtr</I>, float128_t *<I>destPtr</I> );
+	 const float128_t *<I>aPtr</I>, const float128_t *<I>bPtr</I>, float128_t *<I>destPtr</I> );
 </PRE>
 </BLOCKQUOTE>
 When floating-point values are passed indirectly through pointers, arguments
@@ -1065,10 +1065,10 @@ float64_t f64_roundToInt( float64_t <I>a</I>, uint_fast8_t <I>roundingMode</I>, 
 <PRE>
 void
  f128M_roundToInt(
-     const float128_t *<I>aPtr</I>,
-     uint_fast8_t <I>roundingMode</I>,
-     bool <I>exact</I>,
-     float128_t *<I>destPtr</I>
+	 const float128_t *<I>aPtr</I>,
+	 uint_fast8_t <I>roundingMode</I>,
+	 bool <I>exact</I>,
+	 float128_t *<I>destPtr</I>
  );
 </PRE>
 </BLOCKQUOTE>
@@ -1299,10 +1299,10 @@ function names:
 <TD>used in names in Release 2:<CODE>&nbsp;&nbsp;&nbsp;&nbsp;</CODE></TD>
 <TD>used in names in Release 3:</TD>
 </TR>
-<TR> <TD><CODE>int32</CODE></TD>    <TD><CODE>i32</CODE></TD>    </TR>
-<TR> <TD><CODE>int64</CODE></TD>    <TD><CODE>i64</CODE></TD>    </TR>
-<TR> <TD><CODE>float32</CODE></TD>  <TD><CODE>f32</CODE></TD>    </TR>
-<TR> <TD><CODE>float64</CODE></TD>  <TD><CODE>f64</CODE></TD>    </TR>
+<TR> <TD><CODE>int32</CODE></TD>	<TD><CODE>i32</CODE></TD>	</TR>
+<TR> <TD><CODE>int64</CODE></TD>	<TD><CODE>i64</CODE></TD>	</TR>
+<TR> <TD><CODE>float32</CODE></TD>  <TD><CODE>f32</CODE></TD>	</TR>
+<TR> <TD><CODE>float64</CODE></TD>  <TD><CODE>f64</CODE></TD>	</TR>
 <TR> <TD><CODE>floatx80</CODE></TD> <TD><CODE>extF80</CODE></TD> </TR>
 <TR> <TD><CODE>float128</CODE></TD> <TD><CODE>f128</CODE></TD>   </TR>
 </TABLE>

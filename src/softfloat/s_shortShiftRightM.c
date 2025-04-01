@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -42,27 +42,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void
  softfloat_shortShiftRightM(
-     uint_fast8_t size_words,
-     const uint32_t *aPtr,
-     uint_fast8_t dist,
-     uint32_t *zPtr
+	 uint_fast8_t size_words,
+	 const uint32_t *aPtr,
+	 uint_fast8_t dist,
+	 uint32_t *zPtr
  )
 {
-    uint_fast8_t uNegDist;
-    unsigned int index, lastIndex;
-    uint32_t partWordZ, wordA;
+	uint_fast8_t uNegDist;
+	unsigned int index, lastIndex;
+	uint32_t partWordZ, wordA;
 
-    uNegDist = -dist;
-    index = indexWordLo( size_words );
-    lastIndex = indexWordHi( size_words );
-    partWordZ = aPtr[index]>>dist;
-    while ( index != lastIndex ) {
-        wordA = aPtr[index + wordIncr];
-        zPtr[index] = wordA<<(uNegDist & 31) | partWordZ;
-        index += wordIncr;
-        partWordZ = wordA>>dist;
-    }
-    zPtr[index] = partWordZ;
+	uNegDist = -dist;
+	index = indexWordLo( size_words );
+	lastIndex = indexWordHi( size_words );
+	partWordZ = aPtr[index]>>dist;
+	while ( index != lastIndex ) {
+		wordA = aPtr[index + wordIncr];
+		zPtr[index] = wordA<<(uNegDist & 31) | partWordZ;
+		index += wordIncr;
+		partWordZ = wordA>>dist;
+	}
+	zPtr[index] = partWordZ;
 
 }
 

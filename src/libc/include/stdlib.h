@@ -4,25 +4,25 @@
 #include <cdefs.h>
 
 typedef struct {
-    int quot;
-    int rem;
+	int quot;
+	int rem;
 } div_t;
 
 typedef struct {
-    long quot;
-    long rem;
+	long quot;
+	long rem;
 } ldiv_t;
 
 #ifdef __SIZEOF_INT48__
 typedef struct {
-    signed __int48 quot;
-    signed __int48 rem;
+	signed __int48 quot;
+	signed __int48 rem;
 } i48div_t;
 #endif /* __SIZEOF_INT48__ */
 
 typedef struct {
-    long long rem;
-    long long quot;
+	long long rem;
+	long long quot;
 } lldiv_t;
 
 #define EXIT_SUCCESS 0
@@ -51,40 +51,40 @@ long atol(const char *nptr) __attribute__((nonnull(1)));
 long long atoll(const char *nptr) __attribute__((nonnull(1)));
 
 float strtof(const char *__restrict nptr,
-             char **__restrict endptr) __attribute__((nonnull(1)));
+			 char **__restrict endptr) __attribute__((nonnull(1)));
 
 double strtod(const char *__restrict nptr,
-              char **__restrict endptr) __attribute__((nonnull(1)));
+			  char **__restrict endptr) __attribute__((nonnull(1)));
 
 long double strtold(const char *__restrict nptr,
-                    char **__restrict endptr) __attribute__((nonnull(1)));
+					char **__restrict endptr) __attribute__((nonnull(1)));
 
 long strtol(const char *__restrict nptr,
-            char **__restrict endptr, int base) __attribute__((nonnull(1)));
+			char **__restrict endptr, int base) __attribute__((nonnull(1)));
 
 long long strtoll(const char *__restrict nptr,
-                  char **__restrict endptr,
-                  int base) __attribute__((nonnull(1)));
+				  char **__restrict endptr,
+				  int base) __attribute__((nonnull(1)));
 
 unsigned long strtoul(const char *__restrict nptr,
-                      char **__restrict endptr, int base)
-                      __attribute__((nonnull(1)));
+					  char **__restrict endptr, int base)
+					  __attribute__((nonnull(1)));
 
 unsigned long long strtoull(const char *__restrict nptr,
-                            char **__restrict endptr, int base)
-                            __attribute__((nonnull(1)));
+							char **__restrict endptr, int base)
+							__attribute__((nonnull(1)));
 
 void srand(unsigned int seed);
 
 int rand(void);
 
 void *bsearch(void *key, void *base, size_t nmemb, size_t size,
-              int (*compar)(const void *, const void *))
-              __attribute__((nonnull(1, 2, 5)));
+			  int (*compar)(const void *, const void *))
+			  __attribute__((nonnull(1, 2, 5)));
 
 void qsort(void *base, size_t nmemb, size_t size,
-           int (*compar)(const void *, const void *))
-           __attribute__((nonnull(1, 4)));
+		   int (*compar)(const void *, const void *))
+		   __attribute__((nonnull(1, 4)));
 
 void abort(void) __NOEXCEPT __attribute__((noreturn));
 

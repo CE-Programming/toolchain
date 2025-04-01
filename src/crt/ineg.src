@@ -17,14 +17,14 @@ end if
 	ex	de, hl	; ude=UHL+UDE, uhl=UDE
 	or	a, a
 	sbc	hl, de	; uhl=UDE-(UHL+UDE)
-			;    =UDE-UHL-UDE
-			;    =-UHL
+			;	=UDE-UHL-UDE
+			;	=-UHL
 if 0
 	pop	de
 else
 	ex	de, hl	; ude=-UHL, uhl=UHL+UDE
 	add	hl, de	; uhl=UHL+UDE+-UHL
-			;    =UDE
+			;	=UDE
 	ex	de, hl	; ude=UDE, uhl=-UHL
 end if
 	ret

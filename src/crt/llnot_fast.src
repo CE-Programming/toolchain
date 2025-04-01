@@ -8,15 +8,15 @@ __llnot_fast:
 	ex	de, hl		; ude=UHL+UDE, uhl=UDE
 	scf
 	sbc	hl, de		; uhl=UDE-(UHL+UDE)-1
-				;    =UDE-UHL-UDE-1
-				;    =-UHL-1
-				;    =~UHL
+				;	=UDE-UHL-UDE-1
+				;	=-UHL-1
+				;	=~UHL
 	ex	(sp), hl	; uhl=UHL, *spl=~UHL
 	scf
 	sbc	hl, de		; uhl=UHL-(UHL+UDE)-1
-				;    =UHL-UHL-UDE-1
-				;    =-UDE-1
-				;    =~UDE
+				;	=UHL-UHL-UDE-1
+				;	=-UDE-1
+				;	=~UDE
 	ex	de, hl		; ude=~UDE, uhl=UHL+UDE
 	pop	hl		; uhl=~UHL
 	ld	a, c		; a=C

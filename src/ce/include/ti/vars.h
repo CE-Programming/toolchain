@@ -25,24 +25,24 @@ extern "C" {
 /* @endcond */
 
 /** Start of RAM. Type: `uint8_t[1024 * 256]`*/
-#define os_RamStart        ((uint8_t*)0xD00000)
+#define os_RamStart		((uint8_t*)0xD00000)
 
 /** @see `<ti/flags.h>` */
-#define os_RclFlags        (*(uint8_t*)0xD0008E)
+#define os_RclFlags		(*(uint8_t*)0xD0008E)
 
 /** Generally unused by the OS. Type: `uint8_t[256]` */
-#define os_AppData         ((uint8_t*)0xD00429)
+#define os_AppData		 ((uint8_t*)0xD00429)
 
 /* @cond */
-#define os_ProgToEdit      ((char*)0xD0065B)
-#define os_NameBuff        ((char*)0xD00663)
+#define os_ProgToEdit	  ((char*)0xD0065B)
+#define os_NameBuff		((char*)0xD00663)
 /* @endcond */
 
 /** Current size of executing program. Type: `uint24_t` */
-#define os_AsmPrgmSize     (*(uint24_t*)0xD0118C)
+#define os_AsmPrgmSize	 (*(uint24_t*)0xD0118C)
 
 /** Set after asm_ArcChk call. Type: `uint24_t` */
-#define os_TempFreeArc     (*(uint24_t*)0xD02655)
+#define os_TempFreeArc	 (*(uint24_t*)0xD02655)
 
 /**
  * When writing to flash, the calculator's hardware cannot read from flash.
@@ -52,7 +52,7 @@ extern "C" {
  * 
  * Type: `uint8_t[1023]`
  */
-#define os_RamCode         ((uint8_t*)0xD18C7C)
+#define os_RamCode		 ((uint8_t*)0xD18C7C)
 
 /**
  * Gets an element from a matrix
@@ -65,128 +65,128 @@ extern "C" {
 #define OS_MATRIX_ELEMENT(matrix, row, col) ((matrix)->items[(col)+(row)*(matrix)->cols])
 
 /** Maximum size of OS variable */
-#define OS_VAR_MAX_SIZE      (65512)
+#define OS_VAR_MAX_SIZE	  (65512)
 
 /** Real variable */
-#define OS_TYPE_REAL         (0x00)
+#define OS_TYPE_REAL		 (0x00)
 /** Real variable list */
-#define OS_TYPE_REAL_LIST    (0x01)
+#define OS_TYPE_REAL_LIST	(0x01)
 /** Matrix variable */
-#define OS_TYPE_MATRIX       (0x02)
+#define OS_TYPE_MATRIX	   (0x02)
 /** Equation */ 
-#define OS_TYPE_EQU          (0x03)
+#define OS_TYPE_EQU		  (0x03)
 /** String */
-#define OS_TYPE_STR          (0x04)
+#define OS_TYPE_STR		  (0x04)
 /** Unprotected program */
-#define OS_TYPE_PRGM         (0x05)
+#define OS_TYPE_PRGM		 (0x05)
 /** Protected (uneditable) program, generally ASM program */
-#define OS_TYPE_PROT_PRGM    (0x06)
+#define OS_TYPE_PROT_PRGM	(0x06)
 /** Picture */
-#define OS_TYPE_PIC          (0x07)
+#define OS_TYPE_PIC		  (0x07)
 /** Graph DataBase */
-#define OS_TYPE_GDB          (0x08)
+#define OS_TYPE_GDB		  (0x08)
 /** Smart Equation */
-#define OS_TYPE_SMARTEQU     (0x0B)
+#define OS_TYPE_SMARTEQU	 (0x0B)
 /** Complex variable */
-#define OS_TYPE_CPLX         (0x0C)
+#define OS_TYPE_CPLX		 (0x0C)
 /** Complex variable list */
-#define OS_TYPE_CPLX_LIST    (0x0D)
+#define OS_TYPE_CPLX_LIST	(0x0D)
 /** AppVar */
-#define OS_TYPE_APPVAR       (0x15)
+#define OS_TYPE_APPVAR	   (0x15)
 /** Temporary program, deleted on homescreen */
-#define OS_TYPE_TMP_PRGM     (0x16)
+#define OS_TYPE_TMP_PRGM	 (0x16)
 /** Var group */
-#define OS_TYPE_GROUP        (0x17)
+#define OS_TYPE_GROUP		(0x17)
 /** Real Fraction */
-#define OS_TYPE_REALFRAC     (0x18)
+#define OS_TYPE_REALFRAC	 (0x18)
 /** Image */
-#define OS_TYPE_IMAGE        (0x1A)
+#define OS_TYPE_IMAGE		(0x1A)
 
 /** (83PCE-only) Exact Complex Fraction */
 #define OS_TYPE_EXACTCPLXFRAC   (0x1B)
 /** (83PCE-only) Exact Real Radical */
-#define OS_TYPE_EXACTREALRAD    (0x1C)
+#define OS_TYPE_EXACTREALRAD	(0x1C)
 /** (83PCE-only) Exact Complex Radical */
-#define OS_TYPE_EXACTCPLXRAD    (0x1D)
+#define OS_TYPE_EXACTCPLXRAD	(0x1D)
 /** (83PCE-only) Exact Complex Pi */
-#define OS_TYPE_EXACTCPLXPI     (0x1E)
+#define OS_TYPE_EXACTCPLXPI	 (0x1E)
 /** (83PCE-only) Exact Complex Pi Fraction */
 #define OS_TYPE_EXACTCPLXPIFRAC (0x1F)
 /** (83PCE-only) Exact Real Pi */
-#define OS_TYPE_EXACTREALPI     (0x20)
+#define OS_TYPE_EXACTREALPI	 (0x20)
 /** (83PCE-only) Exact Real Pi Fraction */
 #define OS_TYPE_EXACTREALPIFRAC (0x21)
 
 /** Name of Ans variable */
-#define OS_VAR_ANS      "\x72\0"
+#define OS_VAR_ANS	  "\x72\0"
 
 /**
  * Name of Str1 string variable.
  * Other Str variables follow the naming format `OS_VAR_STR?` where `?`
  * is the value [0-9].
  */
-#define OS_VAR_STR1     "\xAA\x0\0"
+#define OS_VAR_STR1	 "\xAA\x0\0"
 /* @cond */
-#define OS_VAR_STR2     "\xAA\x1\0"
-#define OS_VAR_STR3     "\xAA\x2\0"
-#define OS_VAR_STR4     "\xAA\x3\0"
-#define OS_VAR_STR5     "\xAA\x4\0"
-#define OS_VAR_STR6     "\xAA\x5\0"
-#define OS_VAR_STR7     "\xAA\x6\0"
-#define OS_VAR_STR8     "\xAA\x7\0"
-#define OS_VAR_STR9     "\xAA\x8\0"
-#define OS_VAR_STR0     "\xAA\x9\0"
+#define OS_VAR_STR2	 "\xAA\x1\0"
+#define OS_VAR_STR3	 "\xAA\x2\0"
+#define OS_VAR_STR4	 "\xAA\x3\0"
+#define OS_VAR_STR5	 "\xAA\x4\0"
+#define OS_VAR_STR6	 "\xAA\x5\0"
+#define OS_VAR_STR7	 "\xAA\x6\0"
+#define OS_VAR_STR8	 "\xAA\x7\0"
+#define OS_VAR_STR9	 "\xAA\x8\0"
+#define OS_VAR_STR0	 "\xAA\x9\0"
 /* @endcond */
 
 /**
  * Name of Y1 equation variable.
  * Other Y variables follow the naming format `OS_VAR_Y?` where `?` is [0-9].
  */
-#define OS_VAR_Y1       "\x5E\x10\0"
+#define OS_VAR_Y1	   "\x5E\x10\0"
 /* @cond */
-#define OS_VAR_Y2       "\x5E\x11\0"
-#define OS_VAR_Y3       "\x5E\x12\0"
-#define OS_VAR_Y4       "\x5E\x13\0"
-#define OS_VAR_Y5       "\x5E\x14\0"
-#define OS_VAR_Y6       "\x5E\x15\0"
-#define OS_VAR_Y7       "\x5E\x16\0"
-#define OS_VAR_Y8       "\x5E\x17\0"
-#define OS_VAR_Y9       "\x5E\x18\0"
-#define OS_VAR_Y0       "\x5E\x19\0"
+#define OS_VAR_Y2	   "\x5E\x11\0"
+#define OS_VAR_Y3	   "\x5E\x12\0"
+#define OS_VAR_Y4	   "\x5E\x13\0"
+#define OS_VAR_Y5	   "\x5E\x14\0"
+#define OS_VAR_Y6	   "\x5E\x15\0"
+#define OS_VAR_Y7	   "\x5E\x16\0"
+#define OS_VAR_Y8	   "\x5E\x17\0"
+#define OS_VAR_Y9	   "\x5E\x18\0"
+#define OS_VAR_Y0	   "\x5E\x19\0"
 /* @endcond */
 
 /**
  * Name of A real variable.
  * Other real variables follow the naming format `OS_VAR_?` where `?` is [A-Z] (and THETA).
  */
-#define OS_VAR_A        "\x41\0\0"
+#define OS_VAR_A		"\x41\0\0"
 /* @cond */
-#define OS_VAR_B        "\x42\0\0"
-#define OS_VAR_C        "\x43\0\0"
-#define OS_VAR_D        "\x44\0\0"
-#define OS_VAR_E        "\x45\0\0"
-#define OS_VAR_F        "\x46\0\0"
-#define OS_VAR_G        "\x47\0\0"
-#define OS_VAR_H        "\x48\0\0"
-#define OS_VAR_I        "\x49\0\0"
-#define OS_VAR_J        "\x4A\0\0"
-#define OS_VAR_K        "\x4B\0\0"
-#define OS_VAR_L        "\x4C\0\0"
-#define OS_VAR_M        "\x4D\0\0"
-#define OS_VAR_N        "\x4E\0\0"
-#define OS_VAR_O        "\x4F\0\0"
-#define OS_VAR_P        "\x50\0\0"
-#define OS_VAR_Q        "\x51\0\0"
-#define OS_VAR_R        "\x52\0\0"
-#define OS_VAR_S        "\x53\0\0"
-#define OS_VAR_T        "\x54\0\0"
-#define OS_VAR_U        "\x55\0\0"
-#define OS_VAR_V        "\x56\0\0"
-#define OS_VAR_W        "\x57\0\0"
-#define OS_VAR_X        "\x58\0\0"
-#define OS_VAR_Y        "\x59\0\0"
-#define OS_VAR_Z        "\x5A\0\0"
-#define OS_VAR_THETA    "\x5B\0\0"
+#define OS_VAR_B		"\x42\0\0"
+#define OS_VAR_C		"\x43\0\0"
+#define OS_VAR_D		"\x44\0\0"
+#define OS_VAR_E		"\x45\0\0"
+#define OS_VAR_F		"\x46\0\0"
+#define OS_VAR_G		"\x47\0\0"
+#define OS_VAR_H		"\x48\0\0"
+#define OS_VAR_I		"\x49\0\0"
+#define OS_VAR_J		"\x4A\0\0"
+#define OS_VAR_K		"\x4B\0\0"
+#define OS_VAR_L		"\x4C\0\0"
+#define OS_VAR_M		"\x4D\0\0"
+#define OS_VAR_N		"\x4E\0\0"
+#define OS_VAR_O		"\x4F\0\0"
+#define OS_VAR_P		"\x50\0\0"
+#define OS_VAR_Q		"\x51\0\0"
+#define OS_VAR_R		"\x52\0\0"
+#define OS_VAR_S		"\x53\0\0"
+#define OS_VAR_T		"\x54\0\0"
+#define OS_VAR_U		"\x55\0\0"
+#define OS_VAR_V		"\x56\0\0"
+#define OS_VAR_W		"\x57\0\0"
+#define OS_VAR_X		"\x58\0\0"
+#define OS_VAR_Y		"\x59\0\0"
+#define OS_VAR_Z		"\x5A\0\0"
+#define OS_VAR_THETA	"\x5B\0\0"
 /* @endcond */
 
 /**
@@ -194,17 +194,17 @@ extern "C" {
  * Other matrix variables follow the naming format `OS_VAR_MAT_?` where `?`
  * is value [A-J].
  */
-#define OS_VAR_MAT_A    "\x5C\x0\0"
+#define OS_VAR_MAT_A	"\x5C\x0\0"
 /* @cond */
-#define OS_VAR_MAT_B    "\x5C\x1\0"
-#define OS_VAR_MAT_C    "\x5C\x2\0"
-#define OS_VAR_MAT_D    "\x5C\x3\0"
-#define OS_VAR_MAT_E    "\x5C\x4\0"
-#define OS_VAR_MAT_F    "\x5C\x5\0"
-#define OS_VAR_MAT_G    "\x5C\x6\0"
-#define OS_VAR_MAT_H    "\x5C\x7\0"
-#define OS_VAR_MAT_I    "\x5C\x8\0"
-#define OS_VAR_MAT_J    "\x5C\x9\0"
+#define OS_VAR_MAT_B	"\x5C\x1\0"
+#define OS_VAR_MAT_C	"\x5C\x2\0"
+#define OS_VAR_MAT_D	"\x5C\x3\0"
+#define OS_VAR_MAT_E	"\x5C\x4\0"
+#define OS_VAR_MAT_F	"\x5C\x5\0"
+#define OS_VAR_MAT_G	"\x5C\x6\0"
+#define OS_VAR_MAT_H	"\x5C\x7\0"
+#define OS_VAR_MAT_I	"\x5C\x8\0"
+#define OS_VAR_MAT_J	"\x5C\x9\0"
 /* @endcond */
 
 /**
@@ -212,13 +212,13 @@ extern "C" {
  * Other list variables follow the naming format `OS_VAR_L?` where `?`
  * is the value [1-6].
  */
-#define OS_VAR_L1       "\x5D\x0\0"
+#define OS_VAR_L1	   "\x5D\x0\0"
 /* @cond */
-#define OS_VAR_L2       "\x5D\x1\0"
-#define OS_VAR_L3       "\x5D\x2\0"
-#define OS_VAR_L4       "\x5D\x3\0"
-#define OS_VAR_L5       "\x5D\x4\0"
-#define OS_VAR_L6       "\x5D\x5\0"
+#define OS_VAR_L2	   "\x5D\x1\0"
+#define OS_VAR_L3	   "\x5D\x2\0"
+#define OS_VAR_L4	   "\x5D\x3\0"
+#define OS_VAR_L5	   "\x5D\x4\0"
+#define OS_VAR_L6	   "\x5D\x5\0"
 /* @endcond */
 
 /**

@@ -8,13 +8,13 @@
 namespace std {
 
 void __terminate_message(const char *message) {
-    dbg_sprintf(dbgerr, "libezc++: %s\n", message);
-    std::terminate();
+	dbg_sprintf(dbgerr, "libezc++: %s\n", message);
+	std::terminate();
 }
 
 void __abort_message(const char *message) {
-    dbg_sprintf(dbgerr, "libezc++: %s\n", message);
-    abort();
+	dbg_sprintf(dbgerr, "libezc++: %s\n", message);
+	abort();
 }
 
 }

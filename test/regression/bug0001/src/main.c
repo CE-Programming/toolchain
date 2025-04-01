@@ -5,20 +5,20 @@
 
 __attribute__((noinline)) uint64_t custom_bswap64(uint64_t x)
 {
-    return __builtin_bswap64(x);
+	return __builtin_bswap64(x);
 }
 
 int main(void)
 {
-    const uint64_t x = 0x0123456789ABCDEFull;
+	const uint64_t x = 0x0123456789ABCDEFull;
 
-    os_ClrHome();
+	os_ClrHome();
 
-    printf("compile time:\n    0x%016" PRIX64 "\nrun time:\n    0x%016" PRIX64 "\n",
-        __builtin_bswap64(x),
-        custom_bswap64(x));
+	printf("compile time:\n	0x%016" PRIX64 "\nrun time:\n	0x%016" PRIX64 "\n",
+		__builtin_bswap64(x),
+		custom_bswap64(x));
 
-    os_GetKey();
+	os_GetKey();
 
-    return 0;
+	return 0;
 }

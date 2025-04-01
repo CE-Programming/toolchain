@@ -411,8 +411,8 @@ fontlib_SetFont:
 ;  arg1: Load flags
 ; Returns:
 ;  bool:
-;     - true if font loaded successfully
-;     - false on failure (invalid font, or you tried to use the version byte)
+;	 - true if font loaded successfully
+;	 - false on failure (invalid font, or you tried to use the version byte)
 	ld	hl,arg0
 	add	hl,sp
 	ld	hl,(hl)
@@ -948,8 +948,8 @@ smcByte _DrawIntMinus
 	inc	c
 	cp	a,8
 	ret	c			; nc ==> a digit has already been
-					;        printed, or must start printing
-					;        to satisfy min num chars
+					;		printed, or must start printing
+					;		to satisfy min num chars
 	xor	a,a
 .printdigit:
 	add	a,'0'
@@ -1271,7 +1271,7 @@ fontlib_GetFirstPrintableCodePoint:
 ;  None
 ; Returns:
 ;  Code point that is currently recognized as being the first printable code
-;    point.
+;	point.
 	ld	a,(_TextFirstPrintableCodePoint)
 	ret
 
@@ -1322,7 +1322,7 @@ fontlib_GetGlyphWidth:
 ;  arg0: Codepoint
 ; Returns:
 ;  Width of glyph
-;    Zero if invalid index
+;	Zero if invalid index
 	ld	hl,arg0
 	add	hl,sp
 	ld	a,(hl)

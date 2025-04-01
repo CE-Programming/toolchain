@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -44,28 +44,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
 {
-    uint_fast8_t count;
-    uint32_t a32;
+	uint_fast8_t count;
+	uint32_t a32;
 
-    count = 0;
-    a32 = a>>32;
-    if ( ! a32 ) {
-        count = 32;
-        a32 = a;
-    }
-    /*------------------------------------------------------------------------
-    | From here, result is current count + count leading zeros of `a32'.
-    *------------------------------------------------------------------------*/
-    if ( a32 < 0x10000 ) {
-        count += 16;
-        a32 <<= 16;
-    }
-    if ( a32 < 0x1000000 ) {
-        count += 8;
-        a32 <<= 8;
-    }
-    count += softfloat_countLeadingZeros8[a32>>24];
-    return count;
+	count = 0;
+	a32 = a>>32;
+	if ( ! a32 ) {
+		count = 32;
+		a32 = a;
+	}
+	/*------------------------------------------------------------------------
+	| From here, result is current count + count leading zeros of `a32'.
+	*------------------------------------------------------------------------*/
+	if ( a32 < 0x10000 ) {
+		count += 16;
+		a32 <<= 16;
+	}
+	if ( a32 < 0x1000000 ) {
+		count += 8;
+		a32 <<= 8;
+	}
+	count += softfloat_countLeadingZeros8[a32>>24];
+	return count;
 
 }
 

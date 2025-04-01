@@ -25,19 +25,19 @@ extern "C" {
 #endif
 
 typedef enum usb_init_flags {
-  USB_USE_C_HEAP        = 1 <<  0, /**< Use part of the default C heap.
-                                        @warning Do not use this unless you
-                                        changed your program's bss/heap to end
-                                        at 0xD10000! */
-  USB_USE_OS_HEAP       = 1 <<  1, /**< Use the application heap area. */
+  USB_USE_C_HEAP		= 1 <<  0, /**< Use part of the default C heap.
+										@warning Do not use this unless you
+										changed your program's bss/heap to end
+										at 0xD10000! */
+  USB_USE_OS_HEAP	   = 1 <<  1, /**< Use the application heap area. */
 #define USB_INIT_FLSZ(x) (((x) & 3) <<  2)
   USB_INIT_FLSZ_1024 = USB_INIT_FLSZ(0), /**< Init Frame List Size to 1024. */
   USB_INIT_FLSZ_512  = USB_INIT_FLSZ(1), /**< Init Frame List Size to  512. */
   USB_INIT_FLSZ_256  = USB_INIT_FLSZ(2), /**< Init Frame List Size to  256. */
-  USB_INIT_FLSZ_0    = USB_INIT_FLSZ(3), /**< Disable Frame List.
-                                              @warning This also disables
-                                              support for periodic transfers
-                                              and hubs! */
+  USB_INIT_FLSZ_0	= USB_INIT_FLSZ(3), /**< Disable Frame List.
+											  @warning This also disables
+											  support for periodic transfers
+											  and hubs! */
 #define USB_INIT_ASST(x) (((x) & 3) <<  8)
   USB_INIT_ASST_0 = USB_INIT_ASST(0), /**< Init Async Sched Sleep Timer to 0. */
   USB_INIT_ASST_1 = USB_INIT_ASST(1), /**< Init Async Sched Sleep Timer to 1. */
@@ -55,7 +55,7 @@ typedef enum usb_init_flags {
   USB_INIT_EOF2_3 = USB_INIT_EOF2(3), /**< Init EOF 2 Timing to 3. */
   USB_INIT_UNKNOWN = 1 << 15,
   USB_DEFAULT_INIT_FLAGS = USB_USE_OS_HEAP | USB_INIT_FLSZ_256 | USB_INIT_ASST_1
-                         | USB_INIT_EOF1_3 | USB_INIT_EOF2_0 | USB_INIT_UNKNOWN,
+						 | USB_INIT_EOF1_3 | USB_INIT_EOF2_0 | USB_INIT_UNKNOWN,
 } usb_init_flags_t;
 
 typedef enum usb_event {
@@ -150,7 +150,7 @@ typedef enum usb_transfer_status {
    * the endpoint's halt condition is automatically cleared and any pending
    * transfers are cancelled.
    */
-  USB_TRANSFER_STALLED    = 1 << 0,
+  USB_TRANSFER_STALLED	= 1 << 0,
   /**
    * Lost the connection with the device.  It was probably unplugged.  This
    * always counts as a cancellation.
@@ -166,7 +166,7 @@ typedef enum usb_transfer_status {
    * in this case to keep retrying the transfer until some timeout condition
    * occurs.
    */
-  USB_TRANSFER_ERROR      = 1 << 3,
+  USB_TRANSFER_ERROR	  = 1 << 3,
   /**
    * More bytes were received than can fit in the transfer buffer and were lost.
    * @note This can be avoided by ensuring that receive buffer lengths are
@@ -183,7 +183,7 @@ typedef enum usb_transfer_status {
   /**
    * The transfer failed for some reason, usually indicated by another bit.
    */
-  USB_TRANSFER_FAILED     = 1 << 6,
+  USB_TRANSFER_FAILED	 = 1 << 6,
   /**
    * The transfer was cancelled.  In that case, any other set bits refer to the
    * transfer that caused the cancellation.  If no other bits are set, then it
@@ -193,59 +193,59 @@ typedef enum usb_transfer_status {
 } usb_transfer_status_t;
 
 typedef enum usb_device_flags {
-  USB_IS_DISABLED = 1 << 0, /**< Device is disabled.                          */
-  USB_IS_ENABLED  = 1 << 1, /**< Device is enabled.                           */
-  USB_IS_DEVICE   = 1 << 2, /**< Device is not a hub.                         */
-  USB_IS_HUB      = 1 << 3, /**< Device is a hub.                             */
+  USB_IS_DISABLED = 1 << 0, /**< Device is disabled.						  */
+  USB_IS_ENABLED  = 1 << 1, /**< Device is enabled.						   */
+  USB_IS_DEVICE   = 1 << 2, /**< Device is not a hub.						 */
+  USB_IS_HUB	  = 1 << 3, /**< Device is a hub.							 */
 } usb_device_flags_t;
 
 typedef enum usb_find_device_flags {
-  USB_SKIP_NONE     = 0,      /**< Return all devices                         */
-  USB_SKIP_DISABLED = 1 << 0, /**< Don't return disabled devices.             */
-  USB_SKIP_ENABLED  = 1 << 1, /**< Don't return enabled devices.              */
-  USB_SKIP_DEVICES  = 1 << 2, /**< Don't return non-hubs.                     */
-  USB_SKIP_HUBS     = 1 << 3, /**< Don't return hubs.                         */
+  USB_SKIP_NONE	 = 0,	  /**< Return all devices						 */
+  USB_SKIP_DISABLED = 1 << 0, /**< Don't return disabled devices.			 */
+  USB_SKIP_ENABLED  = 1 << 1, /**< Don't return enabled devices.			  */
+  USB_SKIP_DEVICES  = 1 << 2, /**< Don't return non-hubs.					 */
+  USB_SKIP_HUBS	 = 1 << 3, /**< Don't return hubs.						 */
   USB_SKIP_ATTACHED = 1 << 4, /**< Only return devices directly attached to   */
-                              /**  any of the hubs through which \c from is   */
-                              /**  connected.  This skips recursing over      */
-                              /**  devices attached to other hubs.            */
+							  /**  any of the hubs through which \c from is   */
+							  /**  connected.  This skips recursing over	  */
+							  /**  devices attached to other hubs.			*/
 } usb_find_device_flags_t;
 
 typedef enum usb_endpoint_flags {
-  USB_MANUAL_TERMINATE = 0 << 0, /**< For transfers that are a multiple of    */
-                                 /**  the endpoint's maximum packet length,   */
-                                 /**  don't automatically terminate outgoing  */
-                                 /**  ones with a zero-length packet and      */
-                                 /**  don't require incoming ones to be       */
-                                 /**  terminated with a zero-length packet.   */
-                                 /**  @note This allows you to send or        */
-                                 /**  receive partial transfers in multiples  */
-                                 /**  of the endpoint's maximum packet        */
-                                 /**  length, but requires that transfers     */
-                                 /**  which are a multiple of the endpoint's  */
-                                 /**  maximum packet length to be manually    */
-                                 /**  terminated with an explicit zero-length */
-                                 /**  transfer.                               */
-  USB_AUTO_TERMINATE   = 1 << 0, /**< For transfers that are a multiple of    */
-                                 /**  the endpoint's maximum packet length,   */
-                                 /**  automatically terminate outgoing ones   */
-                                 /**  with a zero-length packet and require   */
-                                 /**  incoming ones to be terminated with a   */
-                                 /**  zero-length packet or fail with         */
-                                 /**  USB_TRANSFER_OVERFLOW.                  */
+  USB_MANUAL_TERMINATE = 0 << 0, /**< For transfers that are a multiple of	*/
+								 /**  the endpoint's maximum packet length,   */
+								 /**  don't automatically terminate outgoing  */
+								 /**  ones with a zero-length packet and	  */
+								 /**  don't require incoming ones to be	   */
+								 /**  terminated with a zero-length packet.   */
+								 /**  @note This allows you to send or		*/
+								 /**  receive partial transfers in multiples  */
+								 /**  of the endpoint's maximum packet		*/
+								 /**  length, but requires that transfers	 */
+								 /**  which are a multiple of the endpoint's  */
+								 /**  maximum packet length to be manually	*/
+								 /**  terminated with an explicit zero-length */
+								 /**  transfer.							   */
+  USB_AUTO_TERMINATE   = 1 << 0, /**< For transfers that are a multiple of	*/
+								 /**  the endpoint's maximum packet length,   */
+								 /**  automatically terminate outgoing ones   */
+								 /**  with a zero-length packet and require   */
+								 /**  incoming ones to be terminated with a   */
+								 /**  zero-length packet or fail with		 */
+								 /**  USB_TRANSFER_OVERFLOW.				  */
 } usb_endpoint_flags_t;
 
 typedef enum usb_role {
   USB_ROLE_HOST   = 0 << 4, /**< Acting as usb host.   */
   USB_ROLE_DEVICE = 1 << 4, /**< Acting as usb device. */
-  USB_ROLE_A      = 0 << 5, /**< Plug A plugged in.    */
-  USB_ROLE_B      = 1 << 5, /**< Plug B plugged in.    */
+  USB_ROLE_A	  = 0 << 5, /**< Plug A plugged in.	*/
+  USB_ROLE_B	  = 1 << 5, /**< Plug B plugged in.	*/
 } usb_role_t;
 
 typedef enum usb_speed {
   USB_SPEED_UNKNOWN = -1,
-  USB_SPEED_FULL    = 0 << 4, /**<  12 Mb/s */
-  USB_SPEED_LOW     = 1 << 4, /**< 1.5 Mb/s */
+  USB_SPEED_FULL	= 0 << 4, /**<  12 Mb/s */
+  USB_SPEED_LOW	 = 1 << 4, /**< 1.5 Mb/s */
 } usb_speed_t;
 
 typedef enum usb_transfer_direction {
@@ -255,7 +255,7 @@ typedef enum usb_transfer_direction {
 
 typedef enum usb_request_type {
   USB_STANDARD_REQUEST = 0 << 5,
-  USB_CLASS_REQUEST    = 1 << 5,
+  USB_CLASS_REQUEST	= 1 << 5,
   USB_VENDOR_REQUEST   = 2 << 5,
 } usb_request_type_t;
 
@@ -330,24 +330,24 @@ typedef enum usb_class {
 } usb_class_t;
 
 typedef enum usb_configuration_attributes {
-  USB_NO_REMOTE_WAKEUP         = 0 << 5,
-  USB_REMOTE_WAKEUP            = 1 << 5,
-  USB_BUS_POWERED              = 0 << 6,
-  USB_SELF_POWERED             = 1 << 6,
+  USB_NO_REMOTE_WAKEUP		 = 0 << 5,
+  USB_REMOTE_WAKEUP			= 1 << 5,
+  USB_BUS_POWERED			  = 0 << 6,
+  USB_SELF_POWERED			 = 1 << 6,
   USB_CONFIGURATION_ATTRIBUTES = 1 << 7,
 } usb_configuration_attributes_t;
 
 typedef enum usb_usage_type {
-  USB_DATA_ENDPOINT                   = 0 << 4,
-  USB_FEEDBACK_ENDPOINT               = 1 << 4,
+  USB_DATA_ENDPOINT				   = 0 << 4,
+  USB_FEEDBACK_ENDPOINT			   = 1 << 4,
   USB_IMPLICIT_FEEDBACK_DATA_ENDPOINT = 2 << 4,
 } usb_usage_type_t;
 
 typedef enum usb_synchronization_type {
   USB_NO_SYNCHRONIZATION = 0 << 2,
-  USB_ASYNCHRONOUS       = 1 << 2,
-  USB_ADAPTIVE           = 2 << 2,
-  USB_SYNCHRONOUS        = 3 << 2,
+  USB_ASYNCHRONOUS	   = 1 << 2,
+  USB_ADAPTIVE		   = 2 << 2,
+  USB_SYNCHRONOUS		= 3 << 2,
 } usb_synchronization_type_t;
 
 typedef enum usb_transfer_type {
@@ -359,87 +359,87 @@ typedef enum usb_transfer_type {
 } usb_transfer_type_t;
 
 typedef struct usb_control_setup {
-  uint8_t  bmRequestType;       /**< direction, type, and recipient           */
-  uint8_t  bRequest;            /**< usb_request_t                            */
-  uint16_t wValue;              /**< request specific                         */
-  uint16_t wIndex;              /**< request specific                         */
-  uint16_t wLength;             /**< transfer length                          */
+  uint8_t  bmRequestType;	   /**< direction, type, and recipient		   */
+  uint8_t  bRequest;			/**< usb_request_t							*/
+  uint16_t wValue;			  /**< request specific						 */
+  uint16_t wIndex;			  /**< request specific						 */
+  uint16_t wLength;			 /**< transfer length						  */
 } usb_control_setup_t;
 
 typedef struct usb_descriptor {
-  uint8_t  bLength;             /**< The length of this descriptor.           */
-  uint8_t  bDescriptorType;     /**< A usb_descriptor_type_t.                 */
-  uint8_t  data[];              /**< The rest of the descriptor               */
+  uint8_t  bLength;			 /**< The length of this descriptor.		   */
+  uint8_t  bDescriptorType;	 /**< A usb_descriptor_type_t.				 */
+  uint8_t  data[];			  /**< The rest of the descriptor			   */
 } usb_descriptor_t;
 
 typedef struct usb_device_descriptor {
-  uint8_t  bLength;             /**< 18                                       */
-  uint8_t  bDescriptorType;     /**< USB_DEVICE_DESCRIPTOR                    */
-  uint16_t bcdUSB;              /**< usb specification version                */
-  uint8_t  bDeviceClass;        /**< usb_class_t                              */
-  uint8_t  bDeviceSubClass;     /**< usb class specific                       */
-  uint8_t  bDeviceProtocol;     /**< usb class specific                       */
-  uint8_t  bMaxPacketSize0;     /**< 8, 16, 32, or 64                         */
-  uint16_t idVendor;            /**< usb assigned vendor id                   */
-  uint16_t idProduct;           /**< usb assigned product id                  */
-  uint16_t bcdDevice;           /**< device version                           */
-  uint8_t  iManufacturer;       /**< index of manufacturer string descriptor  */
-  uint8_t  iProduct;            /**< index of product string descriptor       */
-  uint8_t  iSerialNumber;       /**< index of serial number string descriptor */
-  uint8_t  bNumConfigurations;  /**< how many valid configuration indices     */
+  uint8_t  bLength;			 /**< 18									   */
+  uint8_t  bDescriptorType;	 /**< USB_DEVICE_DESCRIPTOR					*/
+  uint16_t bcdUSB;			  /**< usb specification version				*/
+  uint8_t  bDeviceClass;		/**< usb_class_t							  */
+  uint8_t  bDeviceSubClass;	 /**< usb class specific					   */
+  uint8_t  bDeviceProtocol;	 /**< usb class specific					   */
+  uint8_t  bMaxPacketSize0;	 /**< 8, 16, 32, or 64						 */
+  uint16_t idVendor;			/**< usb assigned vendor id				   */
+  uint16_t idProduct;		   /**< usb assigned product id				  */
+  uint16_t bcdDevice;		   /**< device version						   */
+  uint8_t  iManufacturer;	   /**< index of manufacturer string descriptor  */
+  uint8_t  iProduct;			/**< index of product string descriptor	   */
+  uint8_t  iSerialNumber;	   /**< index of serial number string descriptor */
+  uint8_t  bNumConfigurations;  /**< how many valid configuration indices	 */
 } usb_device_descriptor_t;
 
 typedef struct usb_device_qualifier_descriptor {
-  uint8_t  bLength;             /**< 10                                       */
-  uint8_t  bDescriptorType;     /**< USB_DEVICE_QUALIFIER_DESCRIPTOR          */
-  uint16_t bcdUSB;              /**< usb specification version                */
-  uint8_t  bDeviceClass;        /**< usb_class_t                              */
-  uint8_t  bDeviceSubClass;     /**< usb class specific                       */
-  uint8_t  bDeviceProtocol;     /**< usb class specific                       */
-  uint8_t  bMaxPacketSize0;     /**< 8, 16, 32, or 64                         */
-  uint8_t  bNumConfigurations;  /**< how many valid configuration indices     */
-  uint8_t  bReserved;           /**< must be 0                                */
+  uint8_t  bLength;			 /**< 10									   */
+  uint8_t  bDescriptorType;	 /**< USB_DEVICE_QUALIFIER_DESCRIPTOR		  */
+  uint16_t bcdUSB;			  /**< usb specification version				*/
+  uint8_t  bDeviceClass;		/**< usb_class_t							  */
+  uint8_t  bDeviceSubClass;	 /**< usb class specific					   */
+  uint8_t  bDeviceProtocol;	 /**< usb class specific					   */
+  uint8_t  bMaxPacketSize0;	 /**< 8, 16, 32, or 64						 */
+  uint8_t  bNumConfigurations;  /**< how many valid configuration indices	 */
+  uint8_t  bReserved;		   /**< must be 0								*/
 } usb_device_qualifier_descriptor_t;
 
 typedef struct usb_configuration_descriptor {
-  uint8_t  bLength;             /**< 9                                        */
-  uint8_t  bDescriptorType;     /**< USB_CONFIGURATION_DESCRIPTOR             */
-  uint16_t wTotalLength;        /**< total length of combined descriptors     */
-  uint8_t  bNumInterfaces;      /**< how many interface descriptors follow    */
+  uint8_t  bLength;			 /**< 9										*/
+  uint8_t  bDescriptorType;	 /**< USB_CONFIGURATION_DESCRIPTOR			 */
+  uint16_t wTotalLength;		/**< total length of combined descriptors	 */
+  uint8_t  bNumInterfaces;	  /**< how many interface descriptors follow	*/
   uint8_t  bConfigurationValue; /**< value used to select this configuration  */
-  uint8_t  iConfiguration;      /**< index of description string descriptor   */
-  uint8_t  bmAttributes;        /**< usb_configuration_attributes_t           */
-  uint8_t  bMaxPower;           /**< units of 2mA                             */
+  uint8_t  iConfiguration;	  /**< index of description string descriptor   */
+  uint8_t  bmAttributes;		/**< usb_configuration_attributes_t		   */
+  uint8_t  bMaxPower;		   /**< units of 2mA							 */
 } usb_configuration_descriptor_t;
 typedef struct usb_configuration_descriptor usb_other_speed_configuration_t;
 
 typedef struct usb_interface_descriptor {
-  uint8_t  bLength;             /**< 9                                        */
-  uint8_t  bDescriptorType;     /**< USB_INTERFACE_DESCRIPTOR                 */
-  uint8_t  bInterfaceNumber;    /**< zero-based interface index               */
-  uint8_t  bAlternateSetting;   /**< value used to select this alt setting    */
-  uint8_t  bNumEndpoints;       /**< how many endpoint descriptors follow     */
-  uint8_t  bInterfaceClass;     /**< usb_class_t                              */
-  uint8_t  bInterfaceSubClass;  /**< usb class specific                       */
-  uint8_t  bInterfaceProtocol;  /**< usb class specific                       */
-  uint8_t  iInterface;          /**< index of description string descriptor   */
+  uint8_t  bLength;			 /**< 9										*/
+  uint8_t  bDescriptorType;	 /**< USB_INTERFACE_DESCRIPTOR				 */
+  uint8_t  bInterfaceNumber;	/**< zero-based interface index			   */
+  uint8_t  bAlternateSetting;   /**< value used to select this alt setting	*/
+  uint8_t  bNumEndpoints;	   /**< how many endpoint descriptors follow	 */
+  uint8_t  bInterfaceClass;	 /**< usb_class_t							  */
+  uint8_t  bInterfaceSubClass;  /**< usb class specific					   */
+  uint8_t  bInterfaceProtocol;  /**< usb class specific					   */
+  uint8_t  iInterface;		  /**< index of description string descriptor   */
 } usb_interface_descriptor_t;
 
 typedef struct usb_endpoint_descriptor {
-  uint8_t  bLength;             /**< 7                                        */
-  uint8_t  bDescriptorType;     /**< USB_ENDPOINT_DESCRIPTOR                  */
-  uint8_t  bEndpointAddress;    /**< endpoint direction and number            */
-  uint8_t  bmAttributes;        /**< usb_usage_type_t |                       */
-                                /**  usb_synchronization_type_t |             */
-                                /**  usb_transfer_type_t                      */
-  uint16_t wMaxPacketSize;      /**  transfer type specific                   */
-  uint8_t  bInterval;           /**  transfer type specific                   */
+  uint8_t  bLength;			 /**< 7										*/
+  uint8_t  bDescriptorType;	 /**< USB_ENDPOINT_DESCRIPTOR				  */
+  uint8_t  bEndpointAddress;	/**< endpoint direction and number			*/
+  uint8_t  bmAttributes;		/**< usb_usage_type_t |					   */
+								/**  usb_synchronization_type_t |			 */
+								/**  usb_transfer_type_t					  */
+  uint16_t wMaxPacketSize;	  /**  transfer type specific				   */
+  uint8_t  bInterval;		   /**  transfer type specific				   */
 } usb_endpoint_descriptor_t;
 
 typedef struct usb_string_descriptor {
-  uint8_t  bLength;             /**< byte length, not character length        */
-  uint8_t  bDescriptorType;     /**< USB_STRING_DESCRIPTOR                    */
-  wchar_t  bString[];           /**< UTF-16 string, no null termination       */
+  uint8_t  bLength;			 /**< byte length, not character length		*/
+  uint8_t  bDescriptorType;	 /**< USB_STRING_DESCRIPTOR					*/
+  wchar_t  bString[];		   /**< UTF-16 string, no null termination	   */
 } usb_string_descriptor_t;
 
 typedef struct usb_standard_descriptors {
@@ -466,7 +466,7 @@ typedef struct usb_endpoint *usb_endpoint_t; /**< opaque endpoint handle */
 enum { USB_RETRY_FOREVER = 0xFFFFFFu };
 
 #define /*usb_device_t */usb_RootHub(/*void*/)/*;*/ \
-    ((usb_device_t)0xD13FE0u) /**< Root hub device */
+	((usb_device_t)0xD13FE0u) /**< Root hub device */
 
 /**
  * A pointer to \c usb_callback_data_t is passed to the \c usb_event_callback_t.
@@ -528,7 +528,7 @@ enum { USB_RETRY_FOREVER = 0xFFFFFFu };
  * usb_ProcessEvents() with that value.
  */
 typedef usb_error_t (*usb_event_callback_t)(usb_event_t event, void *event_data,
-                                            usb_callback_data_t *callback_data);
+											usb_callback_data_t *callback_data);
 
 /**
  * Type of the function to be called when a transfer finishes.
@@ -548,9 +548,9 @@ typedef usb_error_t (*usb_event_callback_t)(usb_event_t event, void *event_data,
  * value.
  */
 typedef usb_error_t (*usb_transfer_callback_t)(usb_endpoint_t endpoint,
-                                               usb_transfer_status_t status,
-                                               size_t transferred,
-                                               usb_transfer_data_t *data);
+											   usb_transfer_status_t status,
+											   size_t transferred,
+											   usb_transfer_data_t *data);
 
 /**
  * This struct represents a timed callback.  It must be allocated by the user.
@@ -570,7 +570,7 @@ typedef struct usb_timer usb_timer_t;
 typedef usb_error_t (*usb_timer_callback_t)(usb_timer_t *timer);
 
 struct usb_timer {
-  uint32_t tick;     /**< private */
+  uint32_t tick;	 /**< private */
   usb_timer_t *next; /**< private */
   usb_timer_callback_t handler;
 };
@@ -587,8 +587,8 @@ struct usb_timer {
  * to cancel all transfers and disable all devices.
  */
 usb_error_t usb_Init(usb_event_callback_t handler, usb_callback_data_t *data,
-                     const usb_standard_descriptors_t *device_descriptors,
-                     usb_init_flags_t flags);
+					 const usb_standard_descriptors_t *device_descriptors,
+					 usb_init_flags_t flags);
 
 /**
  * Uninitializes the usb driver.
@@ -718,9 +718,9 @@ usb_device_flags_t usb_GetDeviceFlags(usb_device_t device);
  * To enumerate all disabled hubs directly attached to a specific hub:
  * \code
  * usb_device_t device = NULL; // must not use hub or else USB_SKIP_ATTACHED
- *                             // will skip all devices attached to hub!
+ *							 // will skip all devices attached to hub!
  * while ((device = usb_FindDevice(hub, device, USB_SKIP_ENABLED |
- *                                 USB_SKIP_DEVICES | USB_SKIP_ATTACHED))) {
+ *								 USB_SKIP_DEVICES | USB_SKIP_ATTACHED))) {
  *   handle(device);
  * }
  * \endcode
@@ -733,7 +733,7 @@ usb_device_flags_t usb_GetDeviceFlags(usb_device_t device);
  * \p flags or \c NULL if none.
  */
 usb_device_t usb_FindDevice(usb_device_t root, usb_device_t from,
-                            usb_find_device_flags_t flags);
+							usb_find_device_flags_t flags);
 
 /**
  * Performs an asynchronous usb reset on a device. This triggers a device
@@ -775,7 +775,7 @@ int8_t usb_GetDeviceSpeed(usb_device_t device);
  * 0 on error.
  */
 size_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
-                                                 uint8_t index);
+												 uint8_t index);
 
 /**
  * Gets the descriptor of a \p device of \p type at \p index.
@@ -790,28 +790,28 @@ size_t usb_GetConfigurationDescriptorTotalLength(usb_device_t device,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetDescriptor(usb_device_t device, usb_descriptor_type_t type,
-                              uint8_t index, void *descriptor, size_t length,
-                              size_t *transferred);
+							  uint8_t index, void *descriptor, size_t length,
+							  size_t *transferred);
 /**
  * Macro of usb_GetDescriptor() using USB_DEVICE_DESCRIPTOR for the type.
  * @see usb_GetDescriptor()
  */
-#define /*usb_error_t */                                                       \
-usb_GetDeviceDescriptor(/*usb_device_t */device,                               \
-                        /*usb_device_descriptor_t **/descriptor,               \
-                        /*size_t */length, /*size_t **/transferred)            \
-    usb_GetDescriptor(device, USB_DEVICE_DESCRIPTOR, 0, descriptor, length,    \
-                      transferred)
+#define /*usb_error_t */													   \
+usb_GetDeviceDescriptor(/*usb_device_t */device,							   \
+						/*usb_device_descriptor_t **/descriptor,			   \
+						/*size_t */length, /*size_t **/transferred)			\
+	usb_GetDescriptor(device, USB_DEVICE_DESCRIPTOR, 0, descriptor, length,	\
+					  transferred)
 /**
  * Macro of usb_GetDescriptor() using USB_CONFIGURATION_DESCRIPTOR for the type.
  * @see usb_GetDescriptor()
  */
-#define /*usb_error_t */                                                       \
-usb_GetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,     \
-                               /*usb_configuration_descriptor_t **/descriptor, \
-                               /*size_t */length, /*size_t **/transferred)     \
-    usb_GetDescriptor(device, USB_CONFIGURATION_DESCRIPTOR, index, descriptor, \
-                      length, transferred)
+#define /*usb_error_t */													   \
+usb_GetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,	 \
+							   /*usb_configuration_descriptor_t **/descriptor, \
+							   /*size_t */length, /*size_t **/transferred)	 \
+	usb_GetDescriptor(device, USB_CONFIGURATION_DESCRIPTOR, index, descriptor, \
+					  length, transferred)
 
 /**
  * Changes the descriptor at \p index.
@@ -826,27 +826,27 @@ usb_GetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,     \
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetDescriptor(usb_device_t device, usb_descriptor_type_t type,
-                              uint8_t index, const void *descriptor,
-                              size_t length);
+							  uint8_t index, const void *descriptor,
+							  size_t length);
 /**
  * Macro of usb_SetDescriptor() using USB_DEVICE_DESCRIPTOR for the type.
  * @see usb_SetDescriptor()
  */
-#define /*usb_error_t */                                                       \
-usb_SetDeviceDescriptor(/*usb_device_t */device,                               \
-                        /*usb_device_descriptor_t **/descriptor,               \
-                        /*size_t */length)                                     \
-    usb_SetDescriptor(device, USB_DEVICE_DESCRIPTOR, 0, descriptor, length)
+#define /*usb_error_t */													   \
+usb_SetDeviceDescriptor(/*usb_device_t */device,							   \
+						/*usb_device_descriptor_t **/descriptor,			   \
+						/*size_t */length)									 \
+	usb_SetDescriptor(device, USB_DEVICE_DESCRIPTOR, 0, descriptor, length)
 /**
  * Macro of usb_SetDescriptor() using USB_CONFIGURATION_DESCRIPTOR for the type.
  * @see usb_SetDescriptor()
  */
-#define /*usb_error_t */                                                       \
-usb_SetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,     \
-                               /*usb_configuration_descriptor_t **/descriptor, \
-                               /*size_t */length)                              \
-    usb_SetDescriptor(device, USB_CONFIGURATION_DESCRIPTOR, index, descriptor, \
-                      length)
+#define /*usb_error_t */													   \
+usb_SetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,	 \
+							   /*usb_configuration_descriptor_t **/descriptor, \
+							   /*size_t */length)							  \
+	usb_SetDescriptor(device, USB_CONFIGURATION_DESCRIPTOR, index, descriptor, \
+					  length)
 
 /**
  * Gets the string descriptor at \p index and \p langid.
@@ -861,9 +861,9 @@ usb_SetConfigurationDescriptor(/*usb_device_t */device, /*uint8_t */index,     \
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t index,
-                                    uint16_t langid,
-                                    usb_string_descriptor_t *descriptor,
-                                    size_t length, size_t *transferred);
+									uint16_t langid,
+									usb_string_descriptor_t *descriptor,
+									size_t length, size_t *transferred);
 
 /**
  * Sets the string descriptor at \p index and \p langid.
@@ -878,9 +878,9 @@ usb_error_t usb_GetStringDescriptor(usb_device_t device, uint8_t index,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetStringDescriptor(usb_device_t device, uint8_t index,
-                                    uint16_t langid,
-                                    const usb_string_descriptor_t *descriptor,
-                                    size_t length);
+									uint16_t langid,
+									const usb_string_descriptor_t *descriptor,
+									size_t length);
 
 /**
  * Gets the currently active configuration of a device.
@@ -904,8 +904,8 @@ usb_error_t usb_GetConfiguration(usb_device_t device, uint8_t *index);
  */
 usb_error_t
 usb_SetConfiguration(usb_device_t device,
-                     const usb_configuration_descriptor_t *descriptor,
-                     size_t length);
+					 const usb_configuration_descriptor_t *descriptor,
+					 size_t length);
 
 /**
  * Gets the current alternate setting in use on the specified interface.
@@ -915,7 +915,7 @@ usb_SetConfiguration(usb_device_t device,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_GetInterface(usb_device_t device, uint8_t interface,
-                             uint8_t *alternate_setting);
+							 uint8_t *alternate_setting);
 
 /**
  * Sets the alternate setting to use for its corresponding interface.  Calling
@@ -929,8 +929,8 @@ usb_error_t usb_GetInterface(usb_device_t device, uint8_t interface,
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_SetInterface(usb_device_t device,
-                             const usb_interface_descriptor_t *descriptor,
-                             size_t length);
+							 const usb_interface_descriptor_t *descriptor,
+							 size_t length);
 
 /**
  * Sets halt condition on \p endpoint.  This is only supported by bulk and
@@ -1066,7 +1066,7 @@ unsigned usb_GetFrameNumber(void);
  */
 usb_error_t
 usb_ControlTransfer(usb_endpoint_t endpoint, const usb_control_setup_t *setup,
-                    void *buffer, unsigned retries, size_t *transferred);
+					void *buffer, unsigned retries, size_t *transferred);
 
 /**
  * Schedules a control transfer to the default control pipe of \p device, in the
@@ -1084,13 +1084,13 @@ usb_ControlTransfer(usb_endpoint_t endpoint, const usb_control_setup_t *setup,
  * @param transferred NULL or returns the number of bytes actually received.
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
-#define /*usb_error_t */                                                 \
-usb_DefaultControlTransfer(/*usb_device_t */device,                      \
-                           /*const usb_control_setup_t **/setup,         \
-                           /*void **/buffer, /*unsigned */retries,       \
-                           /*size_t **/transferred)/*;*/                 \
-    usb_ControlTransfer(usb_GetDeviceEndpoint(device, 0), setup, buffer, \
-                        retries, transferred)
+#define /*usb_error_t */												 \
+usb_DefaultControlTransfer(/*usb_device_t */device,					  \
+						   /*const usb_control_setup_t **/setup,		 \
+						   /*void **/buffer, /*unsigned */retries,	   \
+						   /*size_t **/transferred)/*;*/				 \
+	usb_ControlTransfer(usb_GetDeviceEndpoint(device, 0), setup, buffer, \
+						retries, transferred)
 
 /**
  * Schedules a transfer to the pipe connected to \p endpoint, using \p length as
@@ -1113,7 +1113,7 @@ usb_DefaultControlTransfer(/*usb_device_t */device,                      \
  * @return USB_SUCCESS if the transfer succeeded or an error.
  */
 usb_error_t usb_Transfer(usb_endpoint_t endpoint, void *buffer, size_t length,
-                         unsigned retries, size_t *transferred);
+						 unsigned retries, size_t *transferred);
 /**
  * Macro duplicate of the usb_Transfer() function with the same arguments.
  * @see usb_Transfer()
@@ -1149,9 +1149,9 @@ usb_error_t usb_Transfer(usb_endpoint_t endpoint, void *buffer, size_t length,
  */
 usb_error_t
 usb_ScheduleControlTransfer(usb_endpoint_t endpoint,
-                            const usb_control_setup_t *setup, void *buffer,
-                            usb_transfer_callback_t handler,
-                            usb_transfer_data_t *data);
+							const usb_control_setup_t *setup, void *buffer,
+							usb_transfer_callback_t handler,
+							usb_transfer_data_t *data);
 
 /**
  * Schedules a control transfer to the default control pipe of \p device, in
@@ -1169,14 +1169,14 @@ usb_ScheduleControlTransfer(usb_endpoint_t endpoint,
  * @param data Opaque pointer to be passed to the \p handler.
  * @return USB_SUCCESS if the transfer was scheduled or an error.
  */
-#define /*usb_error_t */                                                       \
-usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
-                                   /*const usb_control_setup_t **/setup,       \
-                                   /*void **/buffer,                           \
-                                   /*usb_transfer_callback_t */handler,        \
-                                   /*usb_transfer_data_t **/data)/*;*/         \
+#define /*usb_error_t */													   \
+usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,					\
+								   /*const usb_control_setup_t **/setup,	   \
+								   /*void **/buffer,						   \
+								   /*usb_transfer_callback_t */handler,		\
+								   /*usb_transfer_data_t **/data)/*;*/		 \
   usb_ScheduleControlTransfer(usb_GetDeviceEndpoint(device, 0), setup, buffer, \
-                              handler, data)
+							  handler, data)
 
 /**
  * If endpoint is not a control endpoint, schedules a transfer of the endpoint's
@@ -1198,8 +1198,8 @@ usb_ScheduleDefaultControlTransfer(/*usb_device_t */device,                    \
  */
 usb_error_t
 usb_ScheduleTransfer(usb_endpoint_t endpoint, void *buffer, size_t length,
-                     usb_transfer_callback_t handler,
-                     usb_transfer_data_t *data);
+					 usb_transfer_callback_t handler,
+					 usb_transfer_data_t *data);
 /**
  * Macro duplicate of the usb_ScheduleTransfer() function with the same arguments.
  * @see usb_ScheduleTransfer()
@@ -1224,8 +1224,8 @@ usb_ScheduleTransfer(usb_endpoint_t endpoint, void *buffer, size_t length,
  */
 uint32_t usb_MsToCycles(uint16_t ms);
 /* @cond */
-#define /*uint32_t */usb_MsToCycles(/*uint16_t */ms)                    \
-    (__builtin_constant_p(ms) ? (ms) * UINT32_C(48000) : usb_MsToCycles(ms))
+#define /*uint32_t */usb_MsToCycles(/*uint16_t */ms)					\
+	(__builtin_constant_p(ms) ? (ms) * UINT32_C(48000) : usb_MsToCycles(ms))
 /* @endcond */
 
 /**
@@ -1240,9 +1240,9 @@ void usb_StopTimer(usb_timer_t *timer);
  * @param timer A user allocated struct with \c timer->handler already initialized.
  * @param timeout_ms Timeout in milliseconds.
  */
-#define /*void */usb_StartTimerMs(/*usb_timer_t **/timer,        \
-                                  /*uint16_t */timeout_ms)/*;*/  \
-    usb_StartTimerCycles(timer, usb_MsToCycles(timeout_ms))
+#define /*void */usb_StartTimerMs(/*usb_timer_t **/timer,		\
+								  /*uint16_t */timeout_ms)/*;*/  \
+	usb_StartTimerCycles(timer, usb_MsToCycles(timeout_ms))
 
 /**
  * Starts a timer that expires \p timeout_ms after it last expired.
@@ -1250,9 +1250,9 @@ void usb_StopTimer(usb_timer_t *timer);
  * @param timer A user allocated struct with \c timer->handler already initialized.
  * @param timeout_ms Repeat interval in milliseconds.
  */
-#define /*void */usb_RepeatTimerMs(/*usb_timer_t **/timer,       \
-                                   /*uint16_t */timeout_ms)/*;*/ \
-    usb_RepeatTimerCycles(timer, usb_MsToCycles(timeout_ms))
+#define /*void */usb_RepeatTimerMs(/*usb_timer_t **/timer,	   \
+								   /*uint16_t */timeout_ms)/*;*/ \
+	usb_RepeatTimerCycles(timer, usb_MsToCycles(timeout_ms))
 
 /**
  * Starts a timer that expires \p timeout_cycles after calling this function.

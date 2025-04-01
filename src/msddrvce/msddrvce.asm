@@ -1414,14 +1414,14 @@ util_check_mbr_magic:
 ; utility data
 ;-------------------------------------------------------------------------------
 
-;setup.msdreset          setuppkt        $21,$ff,0,0,0
-setup.msdmaxlun         setuppkt        $a1,$fe,0,0,1
+;setup.msdreset		  setuppkt		$21,$ff,0,0,0
+setup.msdmaxlun		 setuppkt		$a1,$fe,0,0,1
 
-scsi.inquiry            scsipkt         1,$05, $12,$00,$00,$00,$05,$00
-scsi.modesense          scsipkt         1,$c0, $1a,$00,$3f,$00,$c0,$00
-scsi.requestsense       scsipkt         1,$12, $03,$00,$00,$00,$12,$00
-scsi.testunitready      scsipkt         0,$00, $00,$00,$00,$00,$00,$00
-scsi.readcapacity       scsipkt         1,$08, $25,$00,$00,$00,$00,$00,$00,$00,$00,$00
+scsi.inquiry			scsipkt		 1,$05, $12,$00,$00,$00,$05,$00
+scsi.modesense		  scsipkt		 1,$c0, $1a,$00,$3f,$00,$c0,$00
+scsi.requestsense	   scsipkt		 1,$12, $03,$00,$00,$00,$12,$00
+scsi.testunitready	  scsipkt		 0,$00, $00,$00,$00,$00,$00,$00
+scsi.readcapacity	   scsipkt		 1,$08, $25,$00,$00,$00,$00,$00,$00,$00,$00,$00
 
-scsi.read10             scsipktrw       1,$28
-scsi.write10            scsipktrw       0,$2a
+scsi.read10			 scsipktrw	   1,$28
+scsi.write10			scsipktrw	   0,$2a

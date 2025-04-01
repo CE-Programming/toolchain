@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -43,56 +43,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int_fast32_t
  softfloat_roundToI32(
-     bool sign, uint_fast64_t sig, uint_fast8_t roundingMode, bool exact )
+	 bool sign, uint_fast64_t sig, uint_fast8_t roundingMode, bool exact )
 {
-    uint_fast16_t roundIncrement, roundBits;
-    uint_fast32_t sig32;
-    union { uint32_t ui; int32_t i; } uZ;
-    int_fast32_t z;
+	uint_fast16_t roundIncrement, roundBits;
+	uint_fast32_t sig32;
+	union { uint32_t ui; int32_t i; } uZ;
+	int_fast32_t z;
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    roundIncrement = 0x800;
-    if (
-        (roundingMode != softfloat_round_near_maxMag)
-            && (roundingMode != softfloat_round_near_even)
-    ) {
-        roundIncrement = 0;
-        if ( 
-            sign
-                ? (roundingMode == softfloat_round_min)
+	/*------------------------------------------------------------------------
+	*------------------------------------------------------------------------*/
+	roundIncrement = 0x800;
+	if (
+		(roundingMode != softfloat_round_near_maxMag)
+			&& (roundingMode != softfloat_round_near_even)
+	) {
+		roundIncrement = 0;
+		if ( 
+			sign
+				? (roundingMode == softfloat_round_min)
 #ifdef SOFTFLOAT_ROUND_ODD
-                      || (roundingMode == softfloat_round_odd)
+					  || (roundingMode == softfloat_round_odd)
 #endif
-                : (roundingMode == softfloat_round_max)
-        ) {
-            roundIncrement = 0xFFF;
-        }
-    }
-    roundBits = sig & 0xFFF;
-    sig += roundIncrement;
-    if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
-    sig32 = sig>>12;
-    if (
-        (roundBits == 0x800) && (roundingMode == softfloat_round_near_even)
-    ) {
-        sig32 &= ~(uint_fast32_t) 1;
-    }
-    uZ.ui = sign ? -sig32 : sig32;
-    z = uZ.i;
-    if ( z && ((z < 0) ^ sign) ) goto invalid;
-    if ( roundBits ) {
+				: (roundingMode == softfloat_round_max)
+		) {
+			roundIncrement = 0xFFF;
+		}
+	}
+	roundBits = sig & 0xFFF;
+	sig += roundIncrement;
+	if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
+	sig32 = sig>>12;
+	if (
+		(roundBits == 0x800) && (roundingMode == softfloat_round_near_even)
+	) {
+		sig32 &= ~(uint_fast32_t) 1;
+	}
+	uZ.ui = sign ? -sig32 : sig32;
+	z = uZ.i;
+	if ( z && ((z < 0) ^ sign) ) goto invalid;
+	if ( roundBits ) {
 #ifdef SOFTFLOAT_ROUND_ODD
-        if ( roundingMode == softfloat_round_odd ) z |= 1;
+		if ( roundingMode == softfloat_round_odd ) z |= 1;
 #endif
-        if ( exact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
-    }
-    return z;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
+		if ( exact ) softfloat_exceptionFlags |= softfloat_flag_inexact;
+	}
+	return z;
+	/*------------------------------------------------------------------------
+	*------------------------------------------------------------------------*/
  invalid:
-    softfloat_raiseFlags( softfloat_flag_invalid );
-    return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+	softfloat_raiseFlags( softfloat_flag_invalid );
+	return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
 
 }
 

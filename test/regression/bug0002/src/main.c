@@ -5,15 +5,15 @@
 
 int main(void)
 {
-    volatile uint64_t x = 3750000;
+	volatile uint64_t x = 3750000;
 
-    os_ClrHome();
+	os_ClrHome();
 
-    x *= 2.5;
+	x *= 2.5;
 
-    printf("value: %llu\n", x);
+	printf("value: %llu\n", x);
 
-    os_GetKey();
+	os_GetKey();
 
-    return 0;
+	return 0;
 }

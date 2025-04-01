@@ -29,19 +29,19 @@ typedef struct real_t { int8_t sign, exp; uint8_t mant[7]; } real_t;
 typedef struct cplx_t { real_t real, imag; } cplx_t;
 
 /** OP1 Variable */
-#define os_OP1                  ((uint8_t*)0xD005F8)
+#define os_OP1				  ((uint8_t*)0xD005F8)
 /** OP2 Variable */
-#define os_OP2                  ((uint8_t*)0xD00603)
+#define os_OP2				  ((uint8_t*)0xD00603)
  /** OP3 Variable */
-#define os_OP3                  ((uint8_t*)0xD0060E)
+#define os_OP3				  ((uint8_t*)0xD0060E)
 /** OP4 Variable */
-#define os_OP4                  ((uint8_t*)0xD00619)
+#define os_OP4				  ((uint8_t*)0xD00619)
 /** OP5 Variable */
-#define os_OP5                  ((uint8_t*)0xD00624)
+#define os_OP5				  ((uint8_t*)0xD00624)
 /** OP6 Variable */
-#define os_OP6                  ((uint8_t*)0xD0062F)
+#define os_OP6				  ((uint8_t*)0xD0062F)
 /** OP7 Variable */
-#define os_OP7                  ((uint8_t*)0xD0063A)
+#define os_OP7				  ((uint8_t*)0xD0063A)
 
 /**
  * Contains data used by the statistics package.
@@ -55,7 +55,7 @@ typedef struct cplx_t { real_t real, imag; } cplx_t;
  * 
  * Type: `uint8_t[531]`
  */
-#define os_StatVars          ((uint8_t*)0xD01191)
+#define os_StatVars		  ((uint8_t*)0xD01191)
 
 /** @defgroup finance_reals Finance Reals
  * The following are finance variables that are always allocated.
@@ -64,19 +64,19 @@ typedef struct cplx_t { real_t real, imag; } cplx_t;
 /** \addtogroup finance_reals
  *  @{
  */
-#define os_Fin_N             (*(real_t*)0xD01F38)
-#define os_Fin_I             (*(real_t*)0xD01F41)
-#define os_Fin_PV            (*(real_t*)0xD01F4A)
-#define os_Fin_PMT           (*(real_t*)0xD01F53)
-#define os_Fin_FV            (*(real_t*)0xD01F5C)
-#define os_Fin_PY            (*(real_t*)0xD01F65)
-#define os_Fin_CY            (*(real_t*)0xD01F6E)
-#define os_Cal_N             (*(real_t*)0xD01F77)
-#define os_Cal_I             (*(real_t*)0xD01F80)
-#define os_Cal_PV            (*(real_t*)0xD01F89)
-#define os_Cal_PMT           (*(real_t*)0xD01F92)
-#define os_Cal_FV            (*(real_t*)0xD01F9B)
-#define os_Cal_PY            (*(real_t*)0xD01FA4)
+#define os_Fin_N			 (*(real_t*)0xD01F38)
+#define os_Fin_I			 (*(real_t*)0xD01F41)
+#define os_Fin_PV			(*(real_t*)0xD01F4A)
+#define os_Fin_PMT		   (*(real_t*)0xD01F53)
+#define os_Fin_FV			(*(real_t*)0xD01F5C)
+#define os_Fin_PY			(*(real_t*)0xD01F65)
+#define os_Fin_CY			(*(real_t*)0xD01F6E)
+#define os_Cal_N			 (*(real_t*)0xD01F77)
+#define os_Cal_I			 (*(real_t*)0xD01F80)
+#define os_Cal_PV			(*(real_t*)0xD01F89)
+#define os_Cal_PMT		   (*(real_t*)0xD01F92)
+#define os_Cal_FV			(*(real_t*)0xD01F9B)
+#define os_Cal_PY			(*(real_t*)0xD01FA4)
 /** @}*/
 
 /**
@@ -213,17 +213,17 @@ real_t os_FloatToReal(float arg);
  * @param[in] result Zero terminated string copied to this address
  * @param[in] arg Real to convert
  * @param[in] maxLength
- *  <=0: use default max length (14)                            <br>
+ *  <=0: use default max length (14)							<br>
  *  >0:  max length of result, minimum of 6
  * @param[in] mode:
- *  0: Use current mode for everything (digits ignored)         <br>
- *  1: Normal mode                                              <br>
- *  2: Sci mode                                                 <br>
- *  3: Eng mode                                                 <br>
- *  >4: Use current Normal/Sci/Eng mode (digits still used)     <br>
+ *  0: Use current mode for everything (digits ignored)		 <br>
+ *  1: Normal mode											  <br>
+ *  2: Sci mode												 <br>
+ *  3: Eng mode												 <br>
+ *  >4: Use current Normal/Sci/Eng mode (digits still used)	 <br>
  * @param[in] digits
- *  -1:  Float mode                                             <br>
- *  0-9: Fix # mode                                             <br>
+ *  -1:  Float mode											 <br>
+ *  0-9: Fix # mode											 <br>
  * @returns Length of result
  */
 int os_RealToStr(char *result, const real_t *arg, int8_t maxLength, uint8_t mode, int8_t digits);

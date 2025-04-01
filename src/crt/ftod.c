@@ -33,8 +33,8 @@ typedef union F64_pun {
 #define Float32_mant_bits  23
 #define Float64_expon_bits 11
 #define Float32_expon_bits 8
-#define Float64_bias       1023
-#define Float32_bias       127
+#define Float64_bias	   1023
+#define Float32_bias	   127
 
 /**
  * @note x must be positive

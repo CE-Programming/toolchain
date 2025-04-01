@@ -146,14 +146,14 @@ library GRAPHX, 12
 	export gfx_FillEllipse_NoClip
 
 ;-------------------------------------------------------------------------------
-LcdSize            := ti.lcdWidth*ti.lcdHeight
+LcdSize			:= ti.lcdWidth*ti.lcdHeight
 ; minimum stack size to provide for interrupts if moving the stack
 InterruptStackSize := 4000
-CurrentBuffer      := ti.mpLcdLpbase
+CurrentBuffer	  := ti.mpLcdLpbase
 TRASPARENT_COLOR   := 0
-TEXT_FG_COLOR      := 0
-TEXT_BG_COLOR      := 255
-TEXT_TP_COLOR      := 255
+TEXT_FG_COLOR	  := 0
+TEXT_BG_COLOR	  := 255
+TEXT_TP_COLOR	  := 255
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -565,7 +565,7 @@ gfx_FillScreen:
 ;  None
 
 FillScreen_PushesPerIter := 115		; see fillscreen.xlsx for derivation
-FillScreen_NumIters      := (LcdSize-InterruptStackSize)/(FillScreen_PushesPerIter*3)
+FillScreen_NumIters	  := (LcdSize-InterruptStackSize)/(FillScreen_PushesPerIter*3)
 FillScreen_BytesToPush   := FillScreen_PushesPerIter*3*FillScreen_NumIters
 FillScreen_BytesToLddr   := LcdSize-FillScreen_BytesToPush
 
@@ -681,8 +681,8 @@ _GetPixel:
 	add	hl,bc
 	add	hl,de
 	add	hl,de			; hl = buffer + y * (lcdWidth / 2)*2 + (uint16_t)x
-					;    = buffer + y * lcdWidth + (uint16_t)x
-					;    = &buffer[y][x]
+					;	= buffer + y * lcdWidth + (uint16_t)x
+					;	= &buffer[y][x]
 ; No clipping is necessary, because if the pixel is offscreen, the result is
 ; undefined. All that is necessary is to ensure that there are no side effects
 ; of reading outside of the buffer. In this case, the largest possible offset
@@ -1152,7 +1152,7 @@ gfx_Wait:
 	ld	hl,(ti.mpLcdCurr + 1)	; hl = *mpLcdCurr>>8
 	sub	a,h
 	jr	nz,.ReadLcdCurr		; nz ==> lcdCurr may have updated
-					;        mid-read; retry read
+					;		mid-read; retry read
 	ld	de,(CurrentBuffer + 1)
 	sbc	hl,de
 	ld	de,-LcdSize shr 8
@@ -1204,7 +1204,7 @@ assert .LcdSizeH and ti.lcdIntLNBU
 					;   = (old_draw>>16)^1
 					;   = (old_draw>>16)^(LcdSize>>16)
 					; bc = (old_draw>>8)^(LcdSize>>8)
-					;    = new_draw>>8
+					;	= new_draw>>8
 	ld	(iy-ti.mpLcdRange+CurrentBuffer+1),bc
 	ld	hl,gfx_Wait
 	ld	(hl),$E5		; push hl; enable wait logic
@@ -3112,41 +3112,41 @@ gfx_Tilemap:
 ;  None
 ; C Function:
 ;  void DrawBGTilemap(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
-;      int x_draw, y_draw;
-;      uint8_t x, x_tile, y_tile, y_next;
-;      uint8_t x_res = x_offset/tilemap->tile_width;
-;      uint8_t y = y_offset/tilemap->tile_height;
+;	  int x_draw, y_draw;
+;	  uint8_t x, x_tile, y_tile, y_next;
+;	  uint8_t x_res = x_offset/tilemap->tile_width;
+;	  uint8_t y = y_offset/tilemap->tile_height;
 ;
-;      x_offset = x_offset%tilemap->tile_width;
-;      y_offset = y_offset%tilemap->tile_height;
+;	  x_offset = x_offset%tilemap->tile_width;
+;	  y_offset = y_offset%tilemap->tile_height;
 ;
-;      y_draw = tilemap->y_loc-y_offset;
-;      for(y_tile = 0; y_tile <= tilemap->draw_height; y_tile++) {
-;          x = x_res;
-;          y_next = y*tilemap->width;
-;          x_draw = tilemap->x_loc-x_offset;
-;          for(x_tile = 0; x_tile <= tilemap->draw_width; x_tile++) {
-;              gfx_Sprite(tilemap->tiles[tilemap->map[x+y_next]], x_draw, y_draw, tilemap->tile_width, tilemap->tile_height);
-;              x_draw += tilemap->tile_width;
-;              x++;
-;          }
-;          y_draw += tilemap->tile_height;
-;          y++;
-;      }
+;	  y_draw = tilemap->y_loc-y_offset;
+;	  for(y_tile = 0; y_tile <= tilemap->draw_height; y_tile++) {
+;		  x = x_res;
+;		  y_next = y*tilemap->width;
+;		  x_draw = tilemap->x_loc-x_offset;
+;		  for(x_tile = 0; x_tile <= tilemap->draw_width; x_tile++) {
+;			  gfx_Sprite(tilemap->tiles[tilemap->map[x+y_next]], x_draw, y_draw, tilemap->tile_width, tilemap->tile_height);
+;			  x_draw += tilemap->tile_width;
+;			  x++;
+;		  }
+;		  y_draw += tilemap->tile_height;
+;		  y++;
+;	  }
 ;  }
 ;
-t_data        := 0
+t_data		:= 0
 t_type_width  := 10
 t_type_height := 11
-t_height      := 12
-t_width       := 13
+t_height	  := 12
+t_width	   := 13
 t_tile_height := 6
 t_tile_width  := 7
 t_draw_height := 8
 t_draw_width  := 9
-t_x_loc       := 15
-x_offset      := 9
-y_offset      := 12
+t_x_loc	   := 15
+x_offset	  := 9
+y_offset	  := 12
 
 	ld	hl,gfx_Sprite
 _Tilemap:
@@ -3303,7 +3303,7 @@ gfx_TilePtr:
 ;  A pointer to an indexed tile in the tilemap (so it can be looked at or changed)
 ; C Function:
 ;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
-;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
+;	  return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
 	push	ix
 	ld	ix,0
@@ -3833,8 +3833,8 @@ gfx_PrintUInt:
 	inc	c
 	cp	a,8
 	ret	c			; nc ==> a digit has already been
-					;        printed, or must start printing
-					;        to satisfy min num chars
+					;		printed, or must start printing
+					;		to satisfy min num chars
 	xor	a,a
 .printdigit:
 	add	a,'0'
@@ -5765,7 +5765,7 @@ _RLETSprite_SkipClipRight:
 	ld	bc,0			; b = height off-screen (top), c = height on-screen
 _RLETSprite_Heights_SMC := $-3
 	ld	d,c
-	push	de			;     (sp) = (height on-screen)<<8|(width on-screen)
+	push	de			;	 (sp) = (height on-screen)<<8|(width on-screen)
 	ld	hl,(iy+3)		; hl = sprite struct
 	ld	c,(hl)			; c = width
 	inc	hl
@@ -5791,7 +5791,7 @@ _RLETSprite_ClipTop_RowEnd:
 					; nz => still off-screen
 _RLETSprite_ClipTop_End:		; a = 0, hl = start of (clipped) sprite data
 ; Do stuff
-	pop	iy			;     iyh = height on-screen, iyl = width on-screen
+	pop	iy			;	 iyh = height on-screen, iyl = width on-screen
 	pop	bc			;   bcu = 0, b = x clip bits
 	pop	de			; de = buffer
 	dec	de			; decrement buffer pointer (negate inc)
@@ -6189,7 +6189,7 @@ _ConvertToRLETSprite_TransLoop:
 	inc	bc			; increment trans run length
 ;;;; Continue transparent loop while width remaining != 0.
 	djnz	_ConvertToRLETSprite_TransLoop ; decrement width remaining,
-					       ; nz ==> width remaining != 0
+						   ; nz ==> width remaining != 0
 ;;; }
 ;;; Write the length of the transparent run to the output.
 _ConvertToRLETSprite_TransEnd:
@@ -6199,7 +6199,7 @@ _ConvertToRLETSprite_TransEnd:
 	ex	de,hl			; de = output data, hl = input data
 ;;; Break out of data loop if width remaining == 0.
 	jr	z,_ConvertToRLETSprite_RowEnd ; z ==> last pixel was transparent
-					      ;   ==> width remaining == 0
+						  ;   ==> width remaining == 0
 ;;; Copy an opaque run to the output.
 _ConvertToRLETSprite_Opaque:
 	ld	c,0			; c = 0 = opaque run length
@@ -6221,7 +6221,7 @@ _ConvertToRLETSprite_OpaqueEnd:
 	pop	hl			; hl = input data
 ;;; Continue data loop if width remaining != 0.
 	jr	z,_ConvertToRLETSprite_Trans ; z ==> last pixel was transparent
-					     ;   ==> width remaining != 0
+						 ;   ==> width remaining != 0
 ;;; }
 ;; }
 _ConvertToRLETSprite_RowEnd:

@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -42,17 +42,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 float64_t i64_to_f64( int64_t a )
 {
-    bool sign;
-    union ui64_f64 uZ;
-    uint_fast64_t absA;
+	bool sign;
+	union ui64_f64 uZ;
+	uint_fast64_t absA;
 
-    sign = (a < 0);
-    if ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
-        uZ.ui = sign ? packToF64UI( 1, 0x43E, 0 ) : 0;
-        return uZ.f;
-    }
-    absA = sign ? -(uint_fast64_t) a : (uint_fast64_t) a;
-    return softfloat_normRoundPackToF64( sign, 0x43C, absA );
+	sign = (a < 0);
+	if ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
+		uZ.ui = sign ? packToF64UI( 1, 0x43E, 0 ) : 0;
+		return uZ.f;
+	}
+	absA = sign ? -(uint_fast64_t) a : (uint_fast64_t) a;
+	return softfloat_normRoundPackToF64( sign, 0x43C, absA );
 
 }
 

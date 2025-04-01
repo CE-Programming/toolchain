@@ -3,7 +3,7 @@
 
 int __attribute__((weak)) fflush(FILE *stream)
 {
-    (void)stream;
+	(void)stream;
 
-    return 0;
+	return 0;
 }

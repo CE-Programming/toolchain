@@ -43,16 +43,16 @@ _usleep:
 	ld	bc, .correction_scaled
 	add	hl, bc
 	adc	a, e			; auhl = usec * multiplier +
-					;            correction_scaled
+					;			correction_scaled
 	ld	e, a			; euhl = usec * multiplier +
-					;            correction_scaled
+					;			correction_scaled
 .divisor := 3479
 	ld	bc, .divisor
 	xor	a, a			; aubc = divisor
 	call	__ldivu			; euhl = (usec * multiplier +
-					;             correction_scaled) /
-					;            divisor
-					;      = ticks + correction
+					;			 correction_scaled) /
+					;			divisor
+					;	  = ticks + correction
 ; Join common code for the rest.
 	jp	___sleep_common.2
 

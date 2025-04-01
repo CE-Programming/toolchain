@@ -38,7 +38,7 @@ _sleep:
 	rla
 	djnz	.loop
 	ld	e,a			; euhl = seconds * 32768
-					;      = ticks
+					;	  = ticks
 ; Join common code for the rest.
 	jp	___sleep_common.1
 

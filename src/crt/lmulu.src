@@ -14,8 +14,8 @@ __lmuls:
 __lmulu:
 
 ; Multiplies EUHL by AUBC and returns the 32-bit product euhl.
-;    I: AUBC=multiplier, EUHL=multiplicand, ADL=1
-;    O: euhl=EUHL*AUBC
+;	I: AUBC=multiplier, EUHL=multiplicand, ADL=1
+;	O: euhl=EUHL*AUBC
 ;   FO: --
 ;   CC: 93*r(PC)+15*w(SPL)+15*r(SPL)+41
 ;				; a		ude		uhl		uix		u(sp)

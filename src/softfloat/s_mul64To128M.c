@@ -11,15 +11,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
  1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
+	this list of conditions, and the following disclaimer.
 
  2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+	this list of conditions, and the following disclaimer in the documentation
+	and/or other materials provided with the distribution.
 
  3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
+	be used to endorse or promote products derived from this software without
+	specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -42,25 +42,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void softfloat_mul64To128M( uint64_t a, uint64_t b, uint32_t *zPtr )
 {
-    uint32_t a32, a0, b32, b0;
-    uint64_t z0, mid1, z64, mid;
+	uint32_t a32, a0, b32, b0;
+	uint64_t z0, mid1, z64, mid;
 
-    a32 = a>>32;
-    a0 = a;
-    b32 = b>>32;
-    b0 = b;
-    z0 = (uint64_t) a0 * b0;
-    mid1 = (uint64_t) a32 * b0;
-    mid = mid1 + (uint64_t) a0 * b32;
-    z64 = (uint64_t) a32 * b32;
-    z64 += (uint64_t) (mid < mid1)<<32 | mid>>32;
-    mid <<= 32;
-    z0 += mid;
-    zPtr[indexWord( 4, 1 )] = z0>>32;
-    zPtr[indexWord( 4, 0 )] = z0;
-    z64 += (z0 < mid);
-    zPtr[indexWord( 4, 3 )] = z64>>32;
-    zPtr[indexWord( 4, 2 )] = z64;
+	a32 = a>>32;
+	a0 = a;
+	b32 = b>>32;
+	b0 = b;
+	z0 = (uint64_t) a0 * b0;
+	mid1 = (uint64_t) a32 * b0;
+	mid = mid1 + (uint64_t) a0 * b32;
+	z64 = (uint64_t) a32 * b32;
+	z64 += (uint64_t) (mid < mid1)<<32 | mid>>32;
+	mid <<= 32;
+	z0 += mid;
+	zPtr[indexWord( 4, 1 )] = z0>>32;
+	zPtr[indexWord( 4, 0 )] = z0;
+	z64 += (z0 < mid);
+	zPtr[indexWord( 4, 3 )] = z64>>32;
+	zPtr[indexWord( 4, 2 )] = z64;
 
 }
 

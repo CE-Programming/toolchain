@@ -8,9 +8,9 @@ __lnot_fast:
 	ex	de, hl	; ude=UHL+x, uhl=x
 	scf
 	sbc	hl, de	; uhl=x-(UHL+x)-1
-			;    =x-UHL-x-1
-			;    =-UHL-1
-			;    =~UHL
+			;	=x-UHL-x-1
+			;	=-UHL-1
+			;	=~UHL
 	cpl		; a=~E
 	ld	e, a	; e=~E
 	ret

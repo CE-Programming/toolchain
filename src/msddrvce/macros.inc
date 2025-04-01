@@ -40,23 +40,23 @@ macro ?!
    idx = index
    assertpo2 idx
    match @, value
-    val equ value
+	val equ value
    else
-    val equ
-    rest equ index
-    while 1
-     match car.cdr, rest
-      match any, val
-       val equ any.car
-      else
-       val equ car
-      end match
-      rest equ cdr
-     else
-      val equ (val)
-      break
-     end match
-    end while
+	val equ
+	rest equ index
+	while 1
+	 match car.cdr, rest
+	  match any, val
+	   val equ any.car
+	  else
+	   val equ car
+	  end match
+	  rest equ cdr
+	 else
+	  val equ (val)
+	  break
+	 end match
+	end while
    end match
    match v, val
 	op	bsr idx,v
@@ -66,12 +66,12 @@ macro ?!
 
  macro struct? name*, parameters&
   macro end?.struct?!
-    end namespace
+	end namespace
    end struc
    iterate <base,prefix>, 0,, ix-name,x, iy-name,y
-    virtual at base
+	virtual at base
 	prefix#name	name
-    end virtual
+	end virtual
    end iterate
    purge end?.struct?
   end macro

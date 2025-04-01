@@ -11,11 +11,11 @@
  * ulp of +117 at -0x1.02c81cp-5 with current expf
  */
 float expm1f(float x) {
-    if (fabsf(x) < 0x1.0p-5f) {
-        float x_sqr = x * x;
-        return (x_sqr * x) * F32_1_DIV_6 + 0.5f * (x_sqr) + x;
-    }
-    return expf(x) - 1.0f;
+	if (fabsf(x) < 0x1.0p-5f) {
+		float x_sqr = x * x;
+		return (x_sqr * x) * F32_1_DIV_6 + 0.5f * (x_sqr) + x;
+	}
+	return expf(x) - 1.0f;
 }
 
 #else
@@ -26,11 +26,11 @@ float expm1f(float x) {
  * ulp of -62 at +0x1.adbe02p-5 with current expf (|x| < 64.0f)
  */
 float expm1f(float x) {
-    if (fabsf(x) < 0.04f) {
-        float x_sqr = x * x;
-        return (x_sqr * x) * F32_1_DIV_6 + 0.5f * (x_sqr) + x;
-    }
-    return expf(x) - 1.0f;
+	if (fabsf(x) < 0.04f) {
+		float x_sqr = x * x;
+		return (x_sqr * x) * F32_1_DIV_6 + 0.5f * (x_sqr) + x;
+	}
+	return expf(x) - 1.0f;
 }
 
 #endif

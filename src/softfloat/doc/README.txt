@@ -13,9 +13,9 @@ containing the floating-point subroutines.
 The SoftFloat package is documented in the following files in the "doc"
 subdirectory:
 
-    SoftFloat.html          Documentation for using the SoftFloat functions.
-    SoftFloat-source.html   Documentation for building SoftFloat.
-    SoftFloat-history.html  History of the major changes to SoftFloat.
+	SoftFloat.html		  Documentation for using the SoftFloat functions.
+	SoftFloat-source.html   Documentation for building SoftFloat.
+	SoftFloat-history.html  History of the major changes to SoftFloat.
 
 Other files in the package comprise the source code for SoftFloat.
 

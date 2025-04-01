@@ -1,16 +1,16 @@
 /************************************************************************/
 /*									*/
 /*			Copyright (C)1987-2008 by				*/
-/*		            Zilog, Inc.           			*/
+/*					Zilog, Inc.		   			*/
 /*									*/
-/*		        San Jose, California     			*/
+/*				San Jose, California	 			*/
 /*									*/
 /************************************************************************/
 /*
-    floating point tangent
+	floating point tangent
 
-    A series is used after range reduction.
-    Coefficients are #4285 from Hart & Cheney. (19.74D)
+	A series is used after range reduction.
+	Coefficients are #4285 from Hart & Cheney. (19.74D)
 */
 
 #include <errno.h>
@@ -37,56 +37,56 @@
  */
 long double tanl(long double arg)
 {
-    long double temp, e, x, xsq;
-    bool flag, sign;
-    int i;
+	long double temp, e, x, xsq;
+	bool flag, sign;
+	int i;
 
-    flag = false;
-    sign = signbit(arg);
-    x = fabsl(arg);
+	flag = false;
+	sign = signbit(arg);
+	x = fabsl(arg);
 
 	if (x < 0x1.0p-26L) {
 		return arg;
 	}
 
-    x *= four_mul_invpi; /*overflow?*/
-    x = modfl(x, &e);
-    i = (int)e;
+	x *= four_mul_invpi; /*overflow?*/
+	x = modfl(x, &e);
+	i = (int)e;
 
-    switch(i % 4) {
-        case 1:
-            x = 1.0L - x;
-            flag = true;
-            break;
-            
-        case 2:
-            sign = !sign;
-            flag = true;
-            break;
+	switch(i % 4) {
+		case 1:
+			x = 1.0L - x;
+			flag = true;
+			break;
+			
+		case 2:
+			sign = !sign;
+			flag = true;
+			break;
 
-        case 3:
-            x = 1.0L - x;
-            sign = !sign;
-            break;
+		case 3:
+			x = 1.0L - x;
+			sign = !sign;
+			break;
 
-        case 0:
-            break;
-    }
+		case 0:
+			break;
+	}
 
-    xsq = x*x;
-    temp = ((((p4*xsq+p3)*xsq+p2)*xsq+p1)*xsq+p0)*x;
-    temp = temp/(((xsq+q2)*xsq+q1)*xsq+q0);
+	xsq = x*x;
+	temp = ((((p4*xsq+p3)*xsq+p2)*xsq+p1)*xsq+p0)*x;
+	temp = temp/(((xsq+q2)*xsq+q1)*xsq+q0);
 
-    if (flag) {
-        if (temp == 0.0L) {
-            errno = ERANGE;
-            temp = HUGE_VALL;
-        } else {
-            temp = 1.0L/temp;
-        }
-    }
-    if (sign) {
-        temp = -temp;
-    }
-    return temp;
+	if (flag) {
+		if (temp == 0.0L) {
+			errno = ERANGE;
+			temp = HUGE_VALL;
+		} else {
+			temp = 1.0L/temp;
+		}
+	}
+	if (sign) {
+		temp = -temp;
+	}
+	return temp;
 }

@@ -37,11 +37,11 @@ end macro
 ;-------------------------------------------------------------------------------
 macro struct? name*, parameters&
  macro end?.struct?!
-     iterate base, ., .base
-      if defined base
-       assert base+sizeof base=$
-      end if
-     end iterate
+	 iterate base, ., .base
+	  if defined base
+	   assert base+sizeof base=$
+	  end if
+	 end iterate
    end namespace
   end struc
   iterate <base,prefix>, 0,, ix-name,x, iy-name,y
@@ -207,11 +207,11 @@ virtual at 1
 end virtual
 
 ;srl_error_t srl_Open(srl_device_t *srl,
-;                     usb_device_t dev,
-;                     void *buffer,
-;                     size_t size,
-;                     uint8_t interface,
-;                     uint24_t rate);
+;					 usb_device_t dev,
+;					 void *buffer,
+;					 size_t size,
+;					 uint8_t interface,
+;					 uint24_t rate);
 srl_Open:
 	ld	iy,0
 	add	iy,sp
@@ -454,8 +454,8 @@ srl_Close:
 	jq	usb_UnrefDevice
 
 ;size_t srl_Read(srl_device_t *srl,
-;                void *data,
-;                size_t length);
+;				void *data,
+;				size_t length);
 srl_Read:
 	ld	iy,0
 	add	iy,sp
@@ -480,8 +480,8 @@ srl_Read:
 	ret
 
 ;size_t srl_Write(srl_device_t *srl,
-;                 const void *data,
-;                 size_t length);
+;				 const void *data,
+;				 size_t length);
 srl_Write:
 	ld	iy,0
 	add	iy,sp
@@ -574,18 +574,18 @@ srl_GetCDCStandardDescriptors:
 .stringserialnum dw $0316, '0','0','0','0','0','0','0','0','0','0'
 
 ;usb_error_t srl_UsbEventCallback(usb_event_t event, void *event_data,
-;                                    usb_callback_data_t *callback_data) {
-;    if (event == USB_DEFAULT_SETUP_EVENT) {
-;        static uint8_t line_coding[7];
-;        usb_control_setup_t *setup = (usb_control_setup_t*)event_data;
-;        // Hack because Windows doesn't follow the damn specification
-;        if ((setup->bmRequestType == 0xA1 && setup->bRequest == 0x21) ||
-;            (setup->bmRequestType == 0x21 && setup->bRequest == 0x20)) {
-;                usb_ScheduleDefaultControlTransfer(usb_FindDevice(NULL, NULL, USB_SKIP_HUBS), setup, line_coding, NULL, NULL);
-;            return USB_IGNORE;
-;        }
-;    }
-;    return USB_SUCCESS;
+;									usb_callback_data_t *callback_data) {
+;	if (event == USB_DEFAULT_SETUP_EVENT) {
+;		static uint8_t line_coding[7];
+;		usb_control_setup_t *setup = (usb_control_setup_t*)event_data;
+;		// Hack because Windows doesn't follow the damn specification
+;		if ((setup->bmRequestType == 0xA1 && setup->bRequest == 0x21) ||
+;			(setup->bmRequestType == 0x21 && setup->bRequest == 0x20)) {
+;				usb_ScheduleDefaultControlTransfer(usb_FindDevice(NULL, NULL, USB_SKIP_HUBS), setup, line_coding, NULL, NULL);
+;			return USB_IGNORE;
+;		}
+;	}
+;	return USB_SUCCESS;
 ;}
 srl_UsbEventCallback:
 	call	ti._frameset0

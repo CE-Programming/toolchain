@@ -6,7 +6,7 @@ ___sleep_common:
 	public	___sleep_common.1
 .1:
 	scf				; cf = 1
-					;    = correction
+					;	= correction
 	public	___sleep_common.2
 .2:
 	ld	a, e			; auhl = start or ticks
@@ -16,7 +16,7 @@ ___sleep_common:
 	pop	bc			; eubc = ticks or start
 	adc	hl, bc
 	adc	a, e			; auhl = start + ticks + correction
-					;      = end
+					;	  = end
 ; Prepare.
 	ld	e, a			; euhl = end
 	push	hl

@@ -21,31 +21,31 @@ extern "C" {
  * @see fontlib_SetNewlineOptions
  */
 typedef enum {
-    /**
-     * Enables automatic wrapping at the end of the line.
-     * @note This is per-glyph; word warp is neither implemented nor planned
-     */
-    FONTLIB_ENABLE_AUTO_WRAP = 0x01,
-    /**
-     * Upon any newline, clears the remainder of the line of text.
-     * @note Useful for printing over previously printed text when transparency
-     * is turned off, as this means each pixel in a line of text need only be
-     * visited once.
-     */
-    FONTLIB_AUTO_CLEAR_TO_EOL = 0x02,
-    /**
-     * Clears the NEXT line of text
-     * @note Don't combine this with AUTO_CLEAR because that just wastes CPU
-     * cycles due to erasing/drawing each pixel twice.
-     */
-    FONTLIB_PRECLEAR_NEWLINE = 0x04,
-    /**
-     * Enables automatic scrolling when a newline would push the cursor past the
-     * bottom of the text window.  The cursor is left at the bottom left.
-     * @note If PRECLEAR is not set, then the bottom line of text will not be
-     * erased.
-     */
-    FONTLIB_AUTO_SCROLL = 0x08
+	/**
+	 * Enables automatic wrapping at the end of the line.
+	 * @note This is per-glyph; word warp is neither implemented nor planned
+	 */
+	FONTLIB_ENABLE_AUTO_WRAP = 0x01,
+	/**
+	 * Upon any newline, clears the remainder of the line of text.
+	 * @note Useful for printing over previously printed text when transparency
+	 * is turned off, as this means each pixel in a line of text need only be
+	 * visited once.
+	 */
+	FONTLIB_AUTO_CLEAR_TO_EOL = 0x02,
+	/**
+	 * Clears the NEXT line of text
+	 * @note Don't combine this with AUTO_CLEAR because that just wastes CPU
+	 * cycles due to erasing/drawing each pixel twice.
+	 */
+	FONTLIB_PRECLEAR_NEWLINE = 0x04,
+	/**
+	 * Enables automatic scrolling when a newline would push the cursor past the
+	 * bottom of the text window.  The cursor is left at the bottom left.
+	 * @note If PRECLEAR is not set, then the bottom line of text will not be
+	 * erased.
+	 */
+	FONTLIB_AUTO_SCROLL = 0x08
 } fontlib_newline_options_t;
 
 /**
@@ -53,11 +53,11 @@ typedef enum {
  * @see fontlib_SetFont
  */
 typedef enum {
-    /**
-     * If set, then the space above/below metrics specified in the font will be
-     * ignored and set to zero.  You can still manually set them later.
-     */
-    FONTLIB_IGNORE_LINE_SPACING = 0x01
+	/**
+	 * If set, then the space above/below metrics specified in the font will be
+	 * ignored and set to zero.  You can still manually set them later.
+	 */
+	FONTLIB_IGNORE_LINE_SPACING = 0x01
 } fontlib_load_options_t;
 
 /**
@@ -65,28 +65,28 @@ typedef enum {
  * @see fontlib_GetFontByStyle
  */
 typedef enum {
-    /**
-     * Clear = sans-serif font
-     */
-    FONTLIB_SERIF = 0x01,
-    /**
-     * Oblique is slanted like italic text, but with the cursive-like styling.
-     */
-    FONTLIB_OBLIQUE = 0x02,
-    /**
-     * If both italic and oblique are set, then assume there's no difference
-     * between oblique and italic styles.
-     */
-    FONTLIB_ITALIC = 0x04,
-    /**
-     * Monospaced font
-     * @note Chances are you're not using this library for monospaced fonts.
-     * But if you are, you'll still have to provide a widths table where
-     * every byte is the same.
-     * @note This is not enforced; a variable-width font can claim to be
-     * monospaced!
-     */
-    FONTLIB_MONOSPACED = 0x08
+	/**
+	 * Clear = sans-serif font
+	 */
+	FONTLIB_SERIF = 0x01,
+	/**
+	 * Oblique is slanted like italic text, but with the cursive-like styling.
+	 */
+	FONTLIB_OBLIQUE = 0x02,
+	/**
+	 * If both italic and oblique are set, then assume there's no difference
+	 * between oblique and italic styles.
+	 */
+	FONTLIB_ITALIC = 0x04,
+	/**
+	 * Monospaced font
+	 * @note Chances are you're not using this library for monospaced fonts.
+	 * But if you are, you'll still have to provide a widths table where
+	 * every byte is the same.
+	 * @note This is not enforced; a variable-width font can claim to be
+	 * monospaced!
+	 */
+	FONTLIB_MONOSPACED = 0x08
 } fontlib_styles_t;
 
 /**
@@ -94,16 +94,16 @@ typedef enum {
  * @see fontlib_GetFontByStyle
  */
 typedef enum {
-    FONTLIB_THIN = 0x20,
-    FONTLIB_EXTRA_LIGHT = 0x30,
-    FONTLIB_LIGHT = 0x40,
-    FONTLIB_SEMILIGHT = 0x60,
-    FONTLIB_NORMAL = 0x80,
-    FONTLIB_MEDIUM = 0x90,
-    FONTLIB_SEMIBOLD = 0xA0,
-    FONTLIB_BOLD = 0xC0,
-    FONTLIB_EXTRA_BOLD = 0xE0,
-    FONTLIB_BLACK = 0xF0
+	FONTLIB_THIN = 0x20,
+	FONTLIB_EXTRA_LIGHT = 0x30,
+	FONTLIB_LIGHT = 0x40,
+	FONTLIB_SEMILIGHT = 0x60,
+	FONTLIB_NORMAL = 0x80,
+	FONTLIB_MEDIUM = 0x90,
+	FONTLIB_SEMIBOLD = 0xA0,
+	FONTLIB_BOLD = 0xC0,
+	FONTLIB_EXTRA_BOLD = 0xE0,
+	FONTLIB_BLACK = 0xF0
 } fontlib_weights_t;
 
 /**
@@ -114,41 +114,41 @@ typedef enum {
  * @see fontlib_font_pack_t
  */
 typedef struct fontlib_metadata_t {
-    /**
-     * Size of this struct, basically functions as a version field.
-     * This does NOT include the lengths of the strings!
-     */
-    int24_t length;
-    /**
-     * A short, human-readable typeface name, such as "Times"
-     */
-    int24_t font_family_name;
-    /**
-     * A SHORT string naming the typeface designer.
-     */
-    int24_t font_author;
-    /**
-     * A SHORT copyright claim.
-     * Do not try to include a complete license in here!  Space is limited!
-     * @note Typefaces and bitmapped fonts cannot be copyrighted under US law.
-     * This field is therefore referred to as a pseudocopyright.  HOWEVER,
-     * it IS is applicable in other jusrisdictions, such as Germany. */
-    int24_t font_pseudocopyright;
-    /**
-     * A BRIEF description of the font.
-     */
-    int24_t font_description;
-    /**
-     * @note This is a STRING, so while this should be something like "1.0.0.0"
-     * it could also be something like "1 June 2019" or even "Hahaha versioning
-     * is overrated!"
-     */
-    int24_t font_version;
-    /**
-     * Suggested values: "ASCII" "TIOS" "ISO-8859-1" "Windows 1252"
-     * "Calculator 1252"
-     */
-    int24_t font_code_page;
+	/**
+	 * Size of this struct, basically functions as a version field.
+	 * This does NOT include the lengths of the strings!
+	 */
+	int24_t length;
+	/**
+	 * A short, human-readable typeface name, such as "Times"
+	 */
+	int24_t font_family_name;
+	/**
+	 * A SHORT string naming the typeface designer.
+	 */
+	int24_t font_author;
+	/**
+	 * A SHORT copyright claim.
+	 * Do not try to include a complete license in here!  Space is limited!
+	 * @note Typefaces and bitmapped fonts cannot be copyrighted under US law.
+	 * This field is therefore referred to as a pseudocopyright.  HOWEVER,
+	 * it IS is applicable in other jusrisdictions, such as Germany. */
+	int24_t font_pseudocopyright;
+	/**
+	 * A BRIEF description of the font.
+	 */
+	int24_t font_description;
+	/**
+	 * @note This is a STRING, so while this should be something like "1.0.0.0"
+	 * it could also be something like "1 June 2019" or even "Hahaha versioning
+	 * is overrated!"
+	 */
+	int24_t font_version;
+	/**
+	 * Suggested values: "ASCII" "TIOS" "ISO-8859-1" "Windows 1252"
+	 * "Calculator 1252"
+	 */
+	int24_t font_code_page;
 } fontlib_metadata_t;
 
 /**
@@ -159,9 +159,9 @@ typedef struct fontlib_metadata_t {
  * @code{.cpp}
  *  unsigned char baseline;
  *  fontlib_font_t *my_font = fontlib_GetFontByStyle("FONTPACK", 12, 12,
- *      FONTLIB_NORMAL, FONTLIB_NORMAL, FONTLIB_SERIF, 0);
+ *	  FONTLIB_NORMAL, FONTLIB_NORMAL, FONTLIB_SERIF, 0);
  *  if (!my_font || !fontlib_SetFont(my_font))
- *      return;
+ *	  return;
  *  baseline = my_font->baseline_height;
  * @endcode
  * @note The font's width table and bitmaps table should appear directly after
@@ -170,68 +170,68 @@ typedef struct fontlib_metadata_t {
  * directly.
  */
 typedef struct fontlib_font_t {
-    /**
-     * Version ID
-     * @note This must be zero or the font will be rejected as invalid.
-     */
-    uint8_t fontVersion;
-    /**
-     * Height in pixels not including space above/below
-     */
-    uint8_t height;
-    /**
-     * Total number of glyphs provided.
-     * @note If this is zero, then 256 glyphs are provided, not zero!
-     */
-    uint8_t total_glyphs;
-    /**
-     * Number of first glyph.  If you have no codepoints below 32, for
-     * example, you can omit the first 32 bitmaps.
-     */
-    uint8_t first_glyph;
-    /**
-     * Offset/pointer to glyph widths table.
-     * This is an OFFSET from the fontVersion member
-     * @note It is 24-bits long because it becomes a real pointer upon loading.
-     */
-    int24_t widths_table;
-    /**
-     * Offset to a table of offsets to glyph bitmaps.
-     * @note Parsing the bitmaps yourself is probably not useful.
-     * @note These offsets are only 16-bits each to save some space.
-     */
-    int24_t bitmaps;
-    /**
-     * Specifies how much to move the cursor left after each glyph.
-     * Total movement is width - overhang.
-     * @note Intended for italics.
-     */
-    uint8_t italic_space_adjust;
-    /**
-     * These suggest adding blank space above or below each line of text.
-     * @note This can be overridden
-     * @note This can increase legibility while saving space for always-blank
-     * lines.
-     */
-    uint8_t space_above;
-    uint8_t space_below;
-    /**
-     * Specifies the boldness of the font.
-     * @see fontlib_weights_t
-     */
-    uint8_t weight;
-    /**
-     * Specifies the style of the font.
-     * @see fontlib_styles_t
-     */
-    uint8_t style;
-    /**
-     * For layout, allows aligning text of differing fonts vertically.
-     * These count pixels going down, i.e. 0 means the top of the glyph.
-     */
-    uint8_t cap_height;
-    uint8_t x_height;
-    uint8_t baseline_height;
+	/**
+	 * Version ID
+	 * @note This must be zero or the font will be rejected as invalid.
+	 */
+	uint8_t fontVersion;
+	/**
+	 * Height in pixels not including space above/below
+	 */
+	uint8_t height;
+	/**
+	 * Total number of glyphs provided.
+	 * @note If this is zero, then 256 glyphs are provided, not zero!
+	 */
+	uint8_t total_glyphs;
+	/**
+	 * Number of first glyph.  If you have no codepoints below 32, for
+	 * example, you can omit the first 32 bitmaps.
+	 */
+	uint8_t first_glyph;
+	/**
+	 * Offset/pointer to glyph widths table.
+	 * This is an OFFSET from the fontVersion member
+	 * @note It is 24-bits long because it becomes a real pointer upon loading.
+	 */
+	int24_t widths_table;
+	/**
+	 * Offset to a table of offsets to glyph bitmaps.
+	 * @note Parsing the bitmaps yourself is probably not useful.
+	 * @note These offsets are only 16-bits each to save some space.
+	 */
+	int24_t bitmaps;
+	/**
+	 * Specifies how much to move the cursor left after each glyph.
+	 * Total movement is width - overhang.
+	 * @note Intended for italics.
+	 */
+	uint8_t italic_space_adjust;
+	/**
+	 * These suggest adding blank space above or below each line of text.
+	 * @note This can be overridden
+	 * @note This can increase legibility while saving space for always-blank
+	 * lines.
+	 */
+	uint8_t space_above;
+	uint8_t space_below;
+	/**
+	 * Specifies the boldness of the font.
+	 * @see fontlib_weights_t
+	 */
+	uint8_t weight;
+	/**
+	 * Specifies the style of the font.
+	 * @see fontlib_styles_t
+	 */
+	uint8_t style;
+	/**
+	 * For layout, allows aligning text of differing fonts vertically.
+	 * These count pixels going down, i.e. 0 means the top of the glyph.
+	 */
+	uint8_t cap_height;
+	uint8_t x_height;
+	uint8_t baseline_height;
 } fontlib_font_t;
 
 /**
@@ -247,50 +247,50 @@ typedef struct fontlib_font_t {
  *  uint8_t *search_pos = NULL;
  *  // Just randomly select the first font pack found
  *  if ((var_name = ti_Detect(&search_pos, "FONTPACK")) == NULL)
- *      return;
+ *	  return;
  *  // Get font pack header
  *  font_pack_file = ti_Open(var_name, "r");
  *  font_pack = ti_GetDataPtr(font_pack_file);
  *  // Is metadata present?
  *  if (!font->metadata)
- *      return;
+ *	  return;
  *  if (EOF == ti_Seek(font->metadata, SEEK_SET, font_pack_file))
- *      return;
+ *	  return;
  *  // Is metadata semi-valid?
  *  metadata = ti_GetDataPtr(font_pack_file);
  *  if (metadata->length < sizeof(fontlib_metadata_t))
- *      return;
+ *	  return;
  *  // Get font's author
  *  if (!metadata->font_author)
- *      return;
+ *	  return;
  *  if (EOF == ti_Seek(metadata->font_author, SEEK_SET, font_pack_file))
- *      return;
+ *	  return;
  *  font_author = ti_GetDataPtr(font_pack_file);
  *  ti_Close(font_pack_file);
  * @endcode
  */
 typedef struct fontlib_font_pack_t {
-    /**
-     * Must be "FONTPACK"
-     * @note This is NOT null-terminated!
-     */
-    char header[8]; /* "FONTPACK" */
-    /**
-     * Offset from first byte of header
-     */
-    int24_t metadata;
-    /**
-     * Number of fonts present.  Should be greater than zero. . . .
-     * @note Frankly, if you have more than 127 fonts in a pack, you have a
-     * problem.
-     */
-    uint8_t fontCount;
-    /**
-     * Array of offsets to each individual font.
-     * @note Despite being declared as a single element, this will be fontCount
-     * elements long.
-     */
-    int24_t font_list[1];
+	/**
+	 * Must be "FONTPACK"
+	 * @note This is NOT null-terminated!
+	 */
+	char header[8]; /* "FONTPACK" */
+	/**
+	 * Offset from first byte of header
+	 */
+	int24_t metadata;
+	/**
+	 * Number of fonts present.  Should be greater than zero. . . .
+	 * @note Frankly, if you have more than 127 fonts in a pack, you have a
+	 * problem.
+	 */
+	uint8_t fontCount;
+	/**
+	 * Array of offsets to each individual font.
+	 * @note Despite being declared as a single element, this will be fontCount
+	 * elements long.
+	 */
+	int24_t font_list[1];
 } fontlib_font_pack_t;
 
 

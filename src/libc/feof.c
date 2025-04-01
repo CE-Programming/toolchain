@@ -3,5 +3,5 @@
 
 int __attribute__((weak)) feof(FILE *stream)
 {
-    return stream->eof;
+	return stream->eof;
 }

@@ -139,7 +139,7 @@ extern "C" {
 #define OS_TOK_FNINT 0x24
 /** nDeriv(‎ */
 #define OS_TOK_NDERIV 0x25
-//#define tEvalF              0x26
+//#define tEvalF			  0x26
 /** fMin(‎ */
 #define OS_TOK_FMIN 0x27
 /** fMax(‎ */

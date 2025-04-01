@@ -12,7 +12,7 @@ else
 __lshl:
 ; Suboptimal for large shift amounts
 ; CC: if L!=0: L*(5*r(PC)+1)+9*r(PC)+(ADL?12*r(SPL)+9*w(SPL):8*r(SPS)+6*w(SPS))+1
-;     if L==0: 4*r(PC)+(ADL?3*r(SPL):2*r(SPS))+2
+;	 if L==0: 4*r(PC)+(ADL?3*r(SPL):2*r(SPS))+2
 	inc	l
 	dec	l
 	ret	z

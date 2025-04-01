@@ -31,7 +31,7 @@ _strlcpy:
 	; check if dsize is zero
 	sbc hl, hl ; set hl to -1, carry was already set
 	add hl, bc ; hl = -1 + dsize
-        ex de, hl ; hl = strlen(src), de = dsize - 1
+		ex de, hl ; hl = strlen(src), de = dsize - 1
 	ret nc ; do nothing and return strlen(src) if dsize is zero
 
 	push hl ; save strlen(src) for after copy

@@ -7,8 +7,8 @@
 
 struct tm *localtime(const time_t *timer)
 {
-    time_t timer2 = *timer;
-    timer2 -= LOCALTIME_GMT_OFFSET * SECS_PER_MIN;
+	time_t timer2 = *timer;
+	timer2 -= LOCALTIME_GMT_OFFSET * SECS_PER_MIN;
 
-    return gmtime(&timer2);
+	return gmtime(&timer2);
 }

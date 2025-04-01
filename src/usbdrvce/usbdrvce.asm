@@ -82,23 +82,23 @@ macro ?!
    idx = index
    assertpo2 idx
    match @, value
-    val equ value
+	val equ value
    else
-    val equ
-    rest equ index
-    while 1
-     match car.cdr, rest
-      match any, val
-       val equ any.car
-      else
-       val equ car
-      end match
-      rest equ cdr
-     else
-      val equ (val)
-      break
-     end match
-    end while
+	val equ
+	rest equ index
+	while 1
+	 match car.cdr, rest
+	  match any, val
+	   val equ any.car
+	  else
+	   val equ car
+	  end match
+	  rest equ cdr
+	 else
+	  val equ (val)
+	  break
+	 end match
+	end while
    end match
    match v, val
 	op	bsr idx,v
@@ -108,17 +108,17 @@ macro ?!
 
  macro struct? name*
   macro end?.struct?!
-      iterate base, ., .base
-       if defined base
-        assert base+sizeof base=$
-       end if
-      end iterate
-    end namespace
+	  iterate base, ., .base
+	   if defined base
+		assert base+sizeof base=$
+	   end if
+	  end iterate
+	end namespace
    end struc
    iterate <base,prefix>, 0,, ix?-name,ix?., iy?-name,iy?.
-    virtual at base
+	virtual at base
 	prefix#name	name
-    end virtual
+	end virtual
    end iterate
    purge end?.struct?
   end macro
@@ -854,7 +854,7 @@ usb_HandleEvents:
 ;	ld	c,a			;+(4
 ;.waitForReset.inner:
 ;	dec	c			;  +(4
-;	jq	nz,.waitForReset.inner	;    +13)256-5
+;	jq	nz,.waitForReset.inner	;	+13)256-5
 ;	dec	a			;  +4
 ;	jq	nz,.waitForReset.outer	;  +13)256-5
 ;	djnz	.waitForReset		;+13
@@ -2257,7 +2257,7 @@ element _Error
 namespace _Error
 
  iterate error, SYSTEM, INVALID_PARAM, SCHEDULE_FULL, NO_DEVICE, NO_MEMORY, \
-                NOT_SUPPORTED, TIMEOUT, OVERFLOW, FAILED
+				NOT_SUPPORTED, TIMEOUT, OVERFLOW, FAILED
 
 error:
 	ld	a,USB_ERROR_#error
@@ -2418,7 +2418,7 @@ end namespace
 	ld	d,a			;+(4
 .reset.loop:
 	dec	d			;  +(4
-	jq	nz,.reset.loop		;    +13)256-5
+	jq	nz,.reset.loop		;	+13)256-5
 	dec	a			;  +4
 	jq	nz,.reset		;  +13)256-5
 	djnz	.reset.wait		;+13
@@ -2889,8 +2889,8 @@ assert endpoint.smask+2 = endpoint.hubInfo+0
 assert endpoint.flags+1 = endpoint.interval
 assert endpoint.flags+2 = endpoint.offset
 iterate <field,value>, smask,bc, hubInfo+1,1 shl 6, \
-                       overlay.altNext,1, overlay.status,c, \
-                       flags,bc, device,iy.device
+					   overlay.altNext,1, overlay.status,c, \
+					   flags,bc, device,iy.device
  if .l+1 = endpoint.field
 	inc	l
  else
@@ -2983,8 +2983,8 @@ assert USB_ERROR_INVALID_PARAM
 	ret
 .intr:
 ;  full-speed other: 4*bytes + 54 fs sbp
-;     low-speed  in: 32*bytes + 348 fs sbp
-;     low-speed out: 32*bytes + 350 fs sbp
+;	 low-speed  in: 32*bytes + 348 fs sbp
+;	 low-speed out: 32*bytes + 350 fs sbp
 	inc	(iy.endpoint.smask);00000001b
 	ld	(iy.endpoint.cmask),00011100b
 	bit	bsf iy.endpoint.info.eps,(iy.endpoint.info)

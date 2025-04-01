@@ -26,37 +26,37 @@ namespace std {
 template <class _Tp, class _Compare> _EZCXX_NODISCARD_EXT inline constexpr
 const _Tp& max(const _Tp& __a, const _Tp& __b, _Compare __comp)
 {
-    return __comp(__a, __b) ? __b : __a;
+	return __comp(__a, __b) ? __b : __a;
 }
 
 template <class _Tp> _EZCXX_NODISCARD_EXT inline constexpr
 const _Tp& max(const _Tp& __a, const _Tp& __b)
 {
-    return (__a < __b) ? __b : __a;
+	return (__a < __b) ? __b : __a;
 }
 
 template <class _Tp, class _Compare> _EZCXX_NODISCARD_EXT inline constexpr
 const _Tp& min(const _Tp& __a, const _Tp& __b, _Compare __comp)
 {
-    return __comp(__a, __b) ? __a : __b;
+	return __comp(__a, __b) ? __a : __b;
 }
 
 template <class _Tp> _EZCXX_NODISCARD_EXT inline constexpr
 const _Tp& min(const _Tp& __a, const _Tp& __b)
 {
-    return (__a < __b) ? __a : __b;
+	return (__a < __b) ? __a : __b;
 }
 
 template <class _Tp, class _Compare> _EZCXX_NODISCARD_EXT inline constexpr
 const _Tp& clamp(const _Tp& __v, const _Tp& __lo, const _Tp& __hi, _Compare __comp)
 {
-    return __comp(__v, __lo) ? __lo : __comp(__hi, __v) ? __hi : __v;
+	return __comp(__v, __lo) ? __lo : __comp(__hi, __v) ? __hi : __v;
 }
 
 template <class _Tp> _EZCXX_NODISCARD_EXT inline constexpr
 const _Tp& clamp(const _Tp& __v, const _Tp& __lo, const _Tp& __hi)
 {
-    return (__v < __lo) ? __lo : (__hi < __v) ? __hi : __v;
+	return (__v < __lo) ? __lo : (__hi < __v) ? __hi : __v;
 }
 
 } // namespace std

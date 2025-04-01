@@ -25,7 +25,7 @@ _ticksleep:
 	push	bc
 	sbc	a, a			; a = -(ticks & 0xFFFFFF != 0)
 	or	a, e			; a = -(ticks & 0xFFFFFF != 0) |
-					;         ticks >> 24
+					;		 ticks >> 24
 					; zf = ticks == 0
 	ret	z
 ; ^ 103 cc

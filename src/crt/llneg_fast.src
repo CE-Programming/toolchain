@@ -13,7 +13,7 @@ __llneg_fast:
 	ld	l, a		; l=0
 	mlt	hl		; uhl=0
 	sbc	hl, de		; uhl=-UDE-(UHL!=0)
-				;    =-UDEUHL>>24
+				;	=-UDEUHL>>24
 	ex	de, hl		; ude=-UDEUHL>>24, uhl=UDE
 	sbc	a, c		; a=-C-(UDEUHL!=0)
 				;  =-CUDEUHL>>48

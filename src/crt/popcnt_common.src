@@ -5,8 +5,8 @@
 __popcnt_common_init_full:
 	; Calculates a combined popcount of L and HLU.
 	; Note the carry flag must be combined with A on return.
-	;     I: L,HLU=values to popcount
-	;     O: A-cf=8-popcount(L)-popcount(HLU), HLU=H, L=0
+	;	 I: L,HLU=values to popcount
+	;	 O: A-cf=8-popcount(L)-popcount(HLU), HLU=H, L=0
 	ld	a, l
 
 	public	__popcnt_common_init
@@ -25,8 +25,8 @@ __popcnt_common_init:
 __popcnt_common_iter:
 	; Calculates a popcount accumulation.
 	; Note the carry flag must be combined with A on return.
-	;     I: HLU,L=values to popcount, A=current accumulation
-	;     O: A-cf=A+popcount(L)-popcount(HLU)+H-L, HLU=H, L=0
+	;	 I: HLU,L=values to popcount, A=current accumulation
+	;	 O: A-cf=A+popcount(L)-popcount(HLU)+H-L, HLU=H, L=0
 	sub	a, h
 
 	public	__popcnt_common_iter_adjusted

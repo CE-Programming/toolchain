@@ -19,8 +19,8 @@ __ishru:
 	db	$DA	; push af \ add hl,hl \ sbc a,a -> jp c,*
 __ishrs:
 ; CC: if 0<=C<8:   35*r(PC)+9*r(SPL)+9*w(SPL)+4+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
-;     if 8<=C<16:  34*r(PC)+9*r(SPL)+6*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
-;     if 16<=C<24: 33*r(PC)+6*r(SPL)+3*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
+;	 if 8<=C<16:  34*r(PC)+9*r(SPL)+6*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
+;	 if 16<=C<24: 33*r(PC)+6*r(SPL)+3*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
 	push	af
 	add	hl, hl
 	sbc	a, a

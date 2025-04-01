@@ -88,7 +88,7 @@ __lldvrmu:
 
 	ld	sp, iy
 ; Stack frame:
-; iy      -> interrupts state
+; iy	  -> interrupts state
 ; iy +  3 -> return vector
 ; iy +  6 -> ???
 ; iy +  9 -> ???

@@ -35,13 +35,13 @@
  * 2^-46.95 at +2.438776493e+00
  */
 long double atanl(long double arg) {
-    long double f64_satan(long double);
+	long double f64_satan(long double);
 
-    if (signbit(arg)) {
-        return (-f64_satan(-arg));
-    } else {
-        return (f64_satan(arg));
-    }
+	if (signbit(arg)) {
+		return (-f64_satan(-arg));
+	} else {
+		return (f64_satan(arg));
+	}
 }
 
 /**
@@ -55,13 +55,13 @@ long double atanl(long double arg) {
  */
 
 static long double f64_xatan(long double arg) {
-    long double argsq;
-    long double value;
+	long double argsq;
+	long double value;
 
-    argsq = arg*arg;
-    value = ((((p4*argsq + p3)*argsq + p2)*argsq + p1)*argsq + p0);
-    value = value/(((((argsq + q4)*argsq + q3)*argsq + q2)*argsq + q1)*argsq + q0);
-    return (value*arg);
+	argsq = arg*arg;
+	value = ((((p4*argsq + p3)*argsq + p2)*argsq + p1)*argsq + p0);
+	value = value/(((((argsq + q4)*argsq + q3)*argsq + q2)*argsq + q1)*argsq + q0);
+	return (value*arg);
 }
 
 /**
@@ -70,15 +70,15 @@ static long double f64_xatan(long double arg) {
  */
 
 long double f64_satan(long double arg) {
-    if (arg < F64_SQRT2_MINUS_1) {
-        return f64_xatan(arg);
-    } else if (arg > F64_SQRT2_PLUS_1) {
-        if (arg > 0x1.0p+54L) {
-            /* rounds to pi/2 */
-            return F64_PI2;
-        }
-        return (F64_PI2 - f64_xatan(1.0L / arg));
-    } else {
-        return (F64_PI4 + f64_xatan((arg - 1.0L) / (arg + 1.0L)));
-    }
+	if (arg < F64_SQRT2_MINUS_1) {
+		return f64_xatan(arg);
+	} else if (arg > F64_SQRT2_PLUS_1) {
+		if (arg > 0x1.0p+54L) {
+			/* rounds to pi/2 */
+			return F64_PI2;
+		}
+		return (F64_PI2 - f64_xatan(1.0L / arg));
+	} else {
+		return (F64_PI4 + f64_xatan((arg - 1.0L) / (arg + 1.0L)));
+	}
 }

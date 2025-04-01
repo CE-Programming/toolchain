@@ -3,5 +3,5 @@
 
 int __attribute__((weak)) ferror(FILE *stream)
 {
-    return stream->err;
+	return stream->err;
 }

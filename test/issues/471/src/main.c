@@ -3,17 +3,17 @@
 
 int main(void)
 {
-    gfx_Begin();
+	gfx_Begin();
 
-    gfx_SetColor(7); // green
-    gfx_Line(-100, 20, 30, 40);
+	gfx_SetColor(7); // green
+	gfx_Line(-100, 20, 30, 40);
 
-    gfx_SetColor(224); // red
-    gfx_Line(30, 40, -100, 20); // same numbers as above, just flipped order
+	gfx_SetColor(224); // red
+	gfx_Line(30, 40, -100, 20); // same numbers as above, just flipped order
 
-    while (!os_GetCSC());
+	while (!os_GetCSC());
 
-    gfx_End();
+	gfx_End();
 
-    return 0;
+	return 0;
 }

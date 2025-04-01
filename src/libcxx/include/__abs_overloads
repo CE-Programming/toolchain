@@ -29,9 +29,9 @@ __END_DECLS
 #define _ABS_FLOAT_DEFINED
 
 extern "C" {
-    float fabsf(float);
-    double fabs(double);
-    long double fabsl(long double);
+	float fabsf(float);
+	double fabs(double);
+	long double fabsl(long double);
 } // extern "C"
 
 #endif // _ABS_FLOAT_DEFINED
