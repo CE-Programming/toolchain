@@ -1,6 +1,7 @@
 	assume	adl=1
 
 	section	.text
+
 	public	_sinf
 	public	_sin
 
@@ -11,10 +12,45 @@ _sin := _sinf
 
 else
 
-_sinf := __sinf_c
-_sin := __sin_c
+	public	_sinf.hijack
 
-	extern	__sinf_c
-	extern	__sin_c
+; float _f32_sinus(int quad, float arg)
+_sin:
+_sinf:
+	call	__frameset0
+	ld	e, (ix + 9) ; exponent
+	ld	hl, (ix + 6) ; mantissa
+	ld	a, e
+	add	a, a	; clear signbit
+	sub	a, 117	; |x| < 2^-10 or 0x3affffff
+	jr	c, .small_arg
+	ld	a, e
+	res	7, e	; x = fabsf(x)
+	push	de	; exponent
+	push	hl	; mantissa
+	rlca
+	add	a, a
+	ld	e, a
+	push	de
+.hijack:
+	call	__f32_sinus
+.small_arg:
+	ld	sp, ix
+	pop	ix
+	; you can ret here if clamping is not needed
+	; clamp the result to [-1.0, +1.0]
+	ld	a, e
+	add	a, a
+	sub	a, 126
+	ret	nz	; |y| < 0.5f
+	push	hl
+	add	hl, hl
+	pop	hl
+	ret	nc	; |y| < 1.0f
+	ld	l, h	; zero out the lower 8 bits of the mantissa
+	ret
+
+	extern	__frameset0
+	extern	__f32_sinus
 
 end if

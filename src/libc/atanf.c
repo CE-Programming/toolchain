@@ -38,13 +38,8 @@
  * ulp of +4 at +0x1.a85846p-2
  */
 float _atanf_c(float arg) {
-    float satan(float);
-
-    if (signbit(arg)) {
-        return (-satan(-arg));
-    } else {
-        return (satan(arg));
-    }
+    float _f32_satan(float);
+    return copysignf(_f32_satan(fabsf(arg)), arg);
 }
 
 double _atan_c(double) __attribute__((alias("_atanf_c")));
@@ -58,8 +53,7 @@ double _atan_c(double) __attribute__((alias("_atanf_c")));
  * xatan evaluates a series valid in the
  * range [-0.414...,+0.414...].
  */
-
-static float xatan(float arg) {
+static float _f32_xatan(float arg) {
     float argsq;
     float value;
 
@@ -73,17 +67,16 @@ static float xatan(float arg) {
  * satan reduces its argument (known to be positive)
  * to the range [0,0.414...] and calls xatan.
  */
-
-float satan(float arg) {
+float _f32_satan(float arg) {
     if (arg < F32_SQRT2_MINUS_1) {
-        return (xatan(arg));
+        return (_f32_xatan(arg));
     } else if (arg > F32_SQRT2_PLUS_1) {
         if (arg > 0x1.0p+25f) {
             /* rounds to pi/2 */
             return F32_PI2;
         }
-        return (F32_PI2 - xatan(1.0f/arg));
+        return (F32_PI2 - _f32_xatan(1.0f/arg));
     } else {
-        return (F32_PI4 + xatan((arg-1.0f)/(arg+1.0f)));
+        return (F32_PI4 + _f32_xatan((arg-1.0f)/(arg+1.0f)));
     }
 }
