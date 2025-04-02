@@ -230,9 +230,9 @@ long        lround(double);
 long        lroundf(float);
 long        lroundl(long double);
 
-double      modf(double, double *);
-float       modff(float, float *);
-long double modfl(long double, long double *);
+double      modf(double, double *) __attribute__((nonnull(2)));
+float       modff(float, float *) __attribute__((nonnull(2)));
+long double modfl(long double, long double *) __attribute__((nonnull(2)));
 
 double      nan(const char *);
 float       nanf(const char *);

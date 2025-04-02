@@ -35,13 +35,8 @@
  * 2^-46.95 at +2.438776493e+00
  */
 long double atanl(long double arg) {
-    long double f64_satan(long double);
-
-    if (signbit(arg)) {
-        return (-f64_satan(-arg));
-    } else {
-        return (f64_satan(arg));
-    }
+    long double _f64_satan(long double);
+    return copysignl(_f64_satan(fabsl(arg)), arg);
 }
 
 /**
@@ -54,7 +49,7 @@ long double atanl(long double arg) {
  * range [-0.414...,+0.414...].
  */
 
-static long double f64_xatan(long double arg) {
+static long double _f64_xatan(long double arg) {
     long double argsq;
     long double value;
 
@@ -69,16 +64,16 @@ static long double f64_xatan(long double arg) {
  * to the range [0,0.414...] and calls xatan.
  */
 
-long double f64_satan(long double arg) {
+long double _f64_satan(long double arg) {
     if (arg < F64_SQRT2_MINUS_1) {
-        return f64_xatan(arg);
+        return _f64_xatan(arg);
     } else if (arg > F64_SQRT2_PLUS_1) {
         if (arg > 0x1.0p+54L) {
             /* rounds to pi/2 */
             return F64_PI2;
         }
-        return (F64_PI2 - f64_xatan(1.0L / arg));
+        return (F64_PI2 - _f64_xatan(1.0L / arg));
     } else {
-        return (F64_PI4 + f64_xatan((arg - 1.0L) / (arg + 1.0L)));
+        return (F64_PI4 + _f64_xatan((arg - 1.0L) / (arg + 1.0L)));
     }
 }

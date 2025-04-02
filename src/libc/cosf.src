@@ -10,35 +10,20 @@ _cos := _cosf
 
 else
 
+; float _f32_sinus(int quad, float arg)
 _cos:
 _cosf:
 	call	__frameset0
-	ld	hl,(ix+6)
-	ld	e,(ix+9)
-	ld	bc,0
-	xor	a,a
+	ld	e, (ix + 9) ; exponent
+	ld	hl, (ix + 6) ; mantissa
+	res	7, e	; fabsf(x)
 	push	de
 	push	hl
-	call	__fcmp
-	pop	bc
-	pop	de
-	ld	a,e
-	jp	p,l_1
-	call	__fneg
+	scf	; quad 1, N reset, C set
+	push	af
+	jp	_sinf.hijack
 
-l_1:	ld	hl,1
-	push	hl
-	ld	l,a
-	push	hl
-	push	bc
-	call	_sinus
-	ld	sp,ix
-	pop	ix
-	ret
-
-	extern	_sinus
 	extern	__frameset0
-	extern	__fcmp
-	extern	__fneg
+	extern	_sinf.hijack
 
 end if

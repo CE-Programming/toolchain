@@ -22,53 +22,31 @@
 #define q2           0.946309610153821e4f
 #define q3           0.132653490878614e3f
 
-float sinus(float arg, int quad)
-{
-    float e, f;
-    int k;
+/**
+ * @remarks Minimum ulp:
+ * ulp of -5 at +0x1.fe2dd0p-9 (2^-10 < |x| < pi/2)
+ *
+ * @note positive arguments only
+ * @warning undefined behaviour if |x| > LONG_MAX
+ */
+float _f32_sinus(unsigned char quad, float x) {
+    float x_trunc;
     float ysq;
-    float x,y;
+    float y;
     float temp1, temp2;
 
-    x = arg;
-    if (x<0.0f) {
-        x = -x;
-        quad = quad + 2;
-    }
-    x = x * two_over_pi; /* underflow? */
-    if (x > 32764.0f) {
-        y = modff(x,&e);
-        e = e + quad;
-        modff(0.25f * e,&f);
-        quad = e - 4.0f * f;
-    } else {
-        k = x;
-        y = x - k;
-        quad = (quad + k) & 0x3;
-    }
+    x = x * two_over_pi;
+    y = modff(x, &x_trunc);
+    quad = (quad + (unsigned char)x_trunc) & 0x3;
     if (quad & 0x1) {
         y = 1.0f - y;
     }
-    if (quad > 1) {
+    if (quad & 0x2) {
         y = -y;
     }
 
-    ysq = y*y;
+    ysq = y * y;
     temp1 = ((((p4*ysq+p3)*ysq+p2)*ysq+p1)*ysq+p0)*y;
     temp2 = ((((ysq+q3)*ysq+q2)*ysq+q1)*ysq+q0);
     return(temp1/temp2);
 }
-
-/**
- * @remarks Minimum ulp:
- * ulp of -5 at +0x1.fe2dd0p-9 (|x| < pi/2)
- */
-float _sinf_c(float arg) {
-    if (fabsf(arg) < 0x1.0p-11f) {
-        return arg;
-    }
-    return sinus(arg, 0);
-}
-
-
-double _sin_c(double) __attribute__((alias("_sinf_c")));

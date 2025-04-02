@@ -2,26 +2,18 @@
 #include <math.h>
 #include "__float32_constants.h"
 
-float _atan2f_c(float arg1, float arg2) {
-    float satan(float);
-
-    if ((arg1+arg2)==arg1) {
-        if (arg1 >= 0.0f) {
-            return (F32_PI2);
-        } else {
-            return (-F32_PI2);
-        }
-    } else if (arg2 < 0.0f) {
-        if(arg1 >= 0.0f) {
-            return (F32_PI - satan(-arg1/arg2));
-        } else {
-            return (-F32_PI + satan(arg1/arg2));
-        }
-    } else if (arg1 > 0.0f) {
-        return (satan(arg1/arg2));
-    } else {
-        return (-satan(-arg1/arg2));
+static float _positive_atan2f(float y, float x) {
+    float _f32_satan(float);
+    if ((y+x)==y) {
+        return F32_PI2;
+    } else if (signbit(x)) {
+        return F32_PI - _f32_satan(-y / x);
     }
+    return _f32_satan(y / x);
+}
+
+float _atan2f_c(float y, float x) {
+    return copysignf(_positive_atan2f(fabsf(y), x), y);
 }
 
 double _atan2_c(double, double) __attribute__((alias("_atan2f_c")));
