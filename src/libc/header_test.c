@@ -16,6 +16,7 @@
 #include <stdarg.h>
 #include <stdbit.h>
 #include <stdbool.h>
+#include <stdckdint.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
