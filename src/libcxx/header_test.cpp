@@ -52,6 +52,7 @@
 #include <setjmp.h>
 #include <stdalign.h>
 #include <stdarg.h>
+#include <stdbit.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
