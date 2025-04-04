@@ -1,7 +1,9 @@
 	assume	adl=1
 
 	section	.text
+
 	public	__llshrs
+
 __llshrs:
 ; Suboptimal for large shift amounts
 	push	af
@@ -19,14 +21,20 @@ __llshrs:
 .hijack_llshru:
 	rr	c
 	rr	(iy - 1)
-	rr	(iy - 2)
-	rr	(iy - 3)
+	rr	d
+	rr	e
 	rr	(iy - 4)
-	rr	(iy - 5)
-	rr	(iy - 6)
+	rr	h
+	rr	l
 	dec	a
 	jr	nz, .loop
+
+	ld	(iy - 3), e
+	ld	(iy - 2), d
+	ex	de, hl
 	pop	hl
+	ld	l, e
+	ld	h, d
 	pop	de
 	public	__llshrs.finish
 .finish:
