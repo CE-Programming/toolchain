@@ -168,7 +168,7 @@
 // # define __cpp_lib_allocate_at_least                    202302L
 // # define __cpp_lib_associative_heterogeneous_erasure    202110L
 // # define __cpp_lib_bind_back                            202202L
-// # define __cpp_lib_byteswap                             202110L
+# define __cpp_lib_byteswap                             202110L
 // # define __cpp_lib_constexpr_bitset                     202207L
 // # define __cpp_lib_constexpr_charconv                   202207L
 // # define __cpp_lib_constexpr_cmath                      202202L

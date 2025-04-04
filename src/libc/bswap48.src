@@ -1,0 +1,13 @@
+	assume	adl=1
+
+	section	.text
+
+	public	___ezcxx_bswap48
+
+; allows __i48bswap to be called from C
+___ezcxx_bswap48:
+	pop	bc, hl, de
+	push	de, hl, bc
+	jp	__i48bswap
+
+	extern	__i48bswap
