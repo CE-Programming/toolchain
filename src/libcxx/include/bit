@@ -9,6 +9,11 @@
 
 #pragma clang system_header
 
+extern "C" {
+    unsigned int __ezcxx_bswap24(unsigned int) noexcept __attribute__((__const__));
+    unsigned __int48 __ezcxx_bswap48(unsigned __int48) noexcept __attribute__((__const__));
+}
+
 namespace std {
 
 enum class endian {
@@ -143,6 +148,33 @@ template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int popcount(unsigned long long __t) noexcept {
     return __builtin_popcountll(__t);
 }
+
+//------------------------------------------------------------------------------
+// byteswap
+//------------------------------------------------------------------------------
+
+#if __cplusplus >= 201703L
+
+template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+_Tp byteswap(_Tp __val) noexcept {
+    if constexpr (sizeof(_Tp) == 1) {
+        return __val;
+    } else if constexpr (sizeof(_Tp) == 2) {
+        return __builtin_bswap16(__val);
+    } else if constexpr (sizeof(_Tp) == 3) {
+        return __ezcxx_bswap24(__val);
+    } else if constexpr (sizeof(_Tp) == 4) {
+        return __builtin_bswap32(__val);
+    } else if constexpr (sizeof(_Tp) == 6) {
+        return __ezcxx_bswap48(__val);
+    } else if constexpr (sizeof(_Tp) == 8) {
+        return __builtin_bswap64(__val);
+    } else {
+        static_assert(sizeof(_Tp) == 0, "byteswap is unimplemented for integral types of this size");
+    }
+}
+
+#endif /* __cplusplus >= 201703L */
 
 //------------------------------------------------------------------------------
 // has_single_bit

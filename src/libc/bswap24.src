@@ -1,0 +1,15 @@
+	assume	adl=1
+
+	section	.text
+
+	public	___ezcxx_bswap24
+
+___ezcxx_bswap24:
+	ld	iy, 0
+	add	iy, sp
+	ld	h, (iy + 3)
+	ld	l, (iy + 5)
+	ld	(iy + 3), l
+	ld	(iy + 5), h
+	ld	hl, (iy + 3)
+	ret
