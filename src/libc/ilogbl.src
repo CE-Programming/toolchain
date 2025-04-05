@@ -6,10 +6,65 @@
 
 ; int ilogbl(long double)
 _ilogbl:
-	; x = fabsl(x)
-	ld	hl, 10
-	add	hl, sp
-	res	7, (hl)
-	jq	__ilogbl_c
+	ld	iy, 0
+	lea	de, iy + 0
+	add	iy, sp
+	ld	hl, (iy + 9)
+	add	hl, hl
+	ld	a, h
+	rlca
+	rlca
+	rlca
+	add	hl, hl
+	add	hl, hl
+	add.s	hl, hl	; clears upper bits
+	and	a, $07
+	ld	l, h
+	ld	h, a
+	; HL = exponent
+	adc	hl, de
+	jr	z, .maybe_subnormal
+	inc	hl
+	bit	3, h
+	jr	nz, .inf_nan
+	; Float64_exp_bias + 1
+	ld	de, -1024
+	add	hl, de
+	ret
 
-	extern	__ilogbl_c
+.maybe_subnormal:
+	ld	c, (iy + 9)
+	ld	b, e	; DE is zero
+	ld	de, (iy + 6)
+	ld	hl, (iy + 3)
+	call	__llctlz
+	cp	a, 64
+	sbc	hl, hl
+	jr	z, .ret_zero	; A was 64
+	neg
+	ld	l, a
+	; -1023 + 11 + 1
+	; Float64_ilogb_subnorm_max + Float64_exponent_bits + Float64_sign_bits
+	ld	de, -1011
+	add	hl, de
+	ret
+
+.ret_zero:
+	ex	de, hl
+	inc	de
+.inf_nan:
+ 	ld	hl, $7FFFFF	; FP_ILOGBNAN or INT_MAX
+	add	hl, de	; FP_ILOGB0 when DE is one
+	ex	de, hl
+	;	DE was zero or one, so HL is now zero or one
+	ld	l, 4	; EDOM
+	ld	(_errno), hl
+	ld	hl, ___fe_cur_env
+	set	4, (hl)	; FE_INVALID
+	ex	de, hl
+	ret
+
+	extern	__fpclassifyl
+	extern	_errno
+	extern	___fe_cur_env
+	extern	__llctlz

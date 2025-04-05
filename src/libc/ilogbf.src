@@ -1,0 +1,62 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_ilogbf, _ilogb
+
+; int ilogbf(float)
+_ilogb:
+_ilogbf:
+	ld	hl, 6
+	add	hl, sp
+	ld	a, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	de, (hl)
+	sbc	hl, hl
+	ex	de, hl
+	; DE is zero
+	add	hl, hl
+
+	adc	a, a
+	jr	z, .maybe_subnormal
+	inc	a
+	scf
+	jr	z, .inf_nan
+	rr	e	; E = 128 or float32_bias + 1
+	sbc	hl, hl
+	ld	l, a
+	sbc	hl, de
+	ret
+
+.maybe_subnormal:
+	; DE is zero, Carry unknown
+	add	hl, de
+	sbc	hl, de
+	jr	z, .ret_zero
+	call	__ictlz
+	; Carry flag will be set at the end of __ictlz
+;	scf
+	sbc	hl, hl
+	neg
+	add	a, 129
+	ld	l, a
+	ret
+
+.ret_zero:
+.inf_nan:
+ 	ld	hl, $800000	; FP_ILOGB0
+	sbc	hl, de	; FP_ILOGBNAN or INT_MAX when carry is set
+	ex	de, hl
+	;	DE was zero, so HL is now zero
+	ld	l, 4	; EDOM
+	ld	(_errno), hl
+	ld	hl, ___fe_cur_env
+	set	4, (hl)	; FE_INVALID
+	ex	de, hl
+	ret
+
+	extern	_errno
+	extern	___fe_cur_env
+	extern	__ictlz

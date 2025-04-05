@@ -23,6 +23,8 @@ size_t run_test(void) {
     for (size_t i = 0; i < length; i++) {
         int result = ilogbf(input[i]);
         if (result != output[i]) {
+            // printf("%3zu: %08lX\n\t%d != %d\n", i, input[i], result, output[i]);
+            // while (!os_GetCSC());
             return i;
         }
     }
@@ -32,6 +34,7 @@ size_t run_test(void) {
 }
 
 int main(void) {
+
     os_ClrHome();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {

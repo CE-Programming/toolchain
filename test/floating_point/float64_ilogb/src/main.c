@@ -23,6 +23,7 @@ size_t run_test(void) {
     for (size_t i = 0; i < length; i++) {
         int result = ilogbl(input[i]);
         if (result != output[i]) {
+            // printf("%4zu: %016llX\n %d != %d\n", i, input[i], result, output[i]);
             return i;
         }
     }
