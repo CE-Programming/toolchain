@@ -1,6 +1,7 @@
 	assume	adl=1
 
 	section	.text
+
 	public	_frexpf
 	public	_frexp
 
@@ -11,10 +12,61 @@ _frexp := _frexpf
 
 else
 
-_frexpf := __frexpf_c
-_frexp := __frexp_c
+_frexp:
+_frexpf:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	add	hl, hl
+	ld	b, (iy + 6)
+	ld	a, b
+	adc	a, a
+	jr	z, .maybe_subnormal
+	inc	a
+	jr	z, .inf_nan
+	; normal
+	ld	b, $7E	; $3F << 1
+	rr	b
+	sbc	hl, hl
+	ld	l, a
+	ld	de, -127	; bias
+	add	hl, de
+.ret_subnormal:
+	res	7, (iy + 5)
+.ret_zero:
+.ret_self:
+	ld	de, (iy + 9)	; int *expon
+	ex	de, hl
+	ld	(hl), de
+	ld	hl, (iy + 3)	; mantissa
+	ld	e, b	; exponent
+	ret
 
-	extern	__frexpf_c
-	extern	__frexp_c
+.inf_nan:
+	ld	hl, $7FFFFF ; INT_MAX
+	jr	.ret_self
+
+.maybe_subnormal:
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	z, .ret_zero
+	; input: HL output: A
+	call	__ictlz
+	ld	c, a
+	call	__ishl
+	ld	(iy + 3), hl
+	scf
+	sbc	hl, hl
+	neg
+	add	a, 130	; 127 + 3? idk where this magic number comes from
+	ld	l, a
+	ld	a, b	; exponent
+	xor	a, $3F
+	ld	b, a
+	jr	.ret_subnormal
+
+	extern	__ictlz
+	extern	__ishl
 
 end if

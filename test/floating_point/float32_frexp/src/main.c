@@ -8,9 +8,6 @@
 #include <ti/getcsc.h>
 #include <sys/util.h>
 
-/* enable if the toolchain is configured to use the subnormal compliant frexpf */
-#if 0
-
 #include "f32_frexp_LUT.h"
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
@@ -34,6 +31,8 @@ size_t run_test(void) {
         result.flt = frexpf(input[i], &expon);
         if (result.bin != output[i].frac.bin || expon != output[i].expon) {
             if (!(isnan(result.flt) && isnan(output[i].frac.flt))) {
+                // printf("G: %08lX %d\n", result.bin, expon);
+                // printf("T: %08lX %d\n", output[i].frac.bin, output[i].expon);
                 return i;
             }
         }
@@ -56,14 +55,3 @@ int main(void) {
 
     return 0;
 }
-
-#else
-
-int main(void) {
-    os_ClrHome();
-    printf("All tests passed");
-    while (!os_GetCSC());
-    return 0;
-}
-
-#endif
