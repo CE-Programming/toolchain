@@ -1,0 +1,54 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__ultof
+
+if 0
+
+; round to nearest ties to even
+__ultof:
+	bit	7, a
+	jp	z, __ltof	; common case
+	; A:UBC > INT32_MAX
+	res	7, a	; sets the LSB of the exponent
+	sla	c	; C = Round, NZ = Sticky
+	; A:UBC >>= 8
+	push	af
+	inc	sp
+	push	bc
+	inc	sp
+	pop	bc
+	inc	sp
+	ld	a, $4F	; sets the exponent
+	ret	nc	; round down
+	inc	bc
+	ret	nz	; round up (this will not overflow because bit 23 is 0)
+	; round to even
+	res	0, c
+	ret
+
+else
+
+; round to nearest ties away from zero (to match __ltof behaviour)
+__ultof:
+	bit	7, a
+	jp	z, __ltof	; common case
+	; A:UBC > INT32_MAX
+	res	7, a	; sets the LSB of the exponent
+	; A:UBC >>= 8
+	push	af
+	or	a, c	; M = Round
+	inc	sp
+	push	bc
+	inc	sp
+	pop	bc
+	inc	sp
+	ld	a, $4F	; sets the exponent
+	ret	p	; round down
+	inc	bc
+	ret	; round up (this will not overflow because bit 23 is 0)
+
+end if
+
+	extern	__ltof
