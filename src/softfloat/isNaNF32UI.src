@@ -1,0 +1,8 @@
+	assume	adl = 1
+
+	section	.text
+
+	public	_isNaNF32UI
+_isNaNF32UI := __isnanf
+
+	extern	__isnanf

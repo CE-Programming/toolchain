@@ -127,7 +127,11 @@ uint_fast16_t
 | 32-bit floating-point signaling NaN.
 | Note:  This macro evaluates its argument more than once.
 *----------------------------------------------------------------------------*/
+#if 0
 #define softfloat_isSigNaNF32UI( uiA ) ((((uiA) & 0x7FC00000) == 0x7F800000) && ((uiA) & 0x003FFFFF))
+#else
+bool softfloat_isSigNaNF32UI(uint32_t a) __attribute__((__const__, __nothrow__, __leaf__));
+#endif
 
 /*----------------------------------------------------------------------------
 | Assuming 'uiA' has the bit pattern of a 32-bit floating-point NaN, converts
@@ -162,7 +166,11 @@ uint_fast32_t
 | 64-bit floating-point signaling NaN.
 | Note:  This macro evaluates its argument more than once.
 *----------------------------------------------------------------------------*/
+#if 0
 #define softfloat_isSigNaNF64UI( uiA ) ((((uiA) & UINT64_C( 0x7FF8000000000000 )) == UINT64_C( 0x7FF0000000000000 )) && ((uiA) & UINT64_C( 0x0007FFFFFFFFFFFF )))
+#else
+bool softfloat_isSigNaNF64UI(uint64_t a) __attribute__((__const__, __nothrow__, __leaf__));
+#endif
 
 /*----------------------------------------------------------------------------
 | Assuming 'uiA' has the bit pattern of a 64-bit floating-point NaN, converts
