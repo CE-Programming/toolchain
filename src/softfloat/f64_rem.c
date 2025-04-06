@@ -41,11 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float64_t f64_rem( float64_t a, const float64_t *b )
+float64_t f64_rem( bool signA, float64_t a, float64_t *__restrict b )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;
-    bool signA;
+    // bool signA;
     int_fast16_t expA;
     uint_fast64_t sigA;
     union ui64_f64 uB;
@@ -66,7 +66,7 @@ float64_t f64_rem( float64_t a, const float64_t *b )
     *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    signA = signF64UI( uiA );
+    // signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
     uB.f = *b;

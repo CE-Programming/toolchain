@@ -252,11 +252,17 @@ float64_t f64_roundToInt( float64_t, uint_fast8_t, bool );
 float64_t f64_add( float64_t, float64_t );
 float64_t f64_sub( float64_t, float64_t );
 #endif
+#if 0
 float64_t f64_mul( float64_t, const float64_t* );
-float64_t f64_mulAdd( float64_t, float64_t, float64_t );
 float64_t f64_div( float64_t, const float64_t* );
 float64_t f64_rem( float64_t, const float64_t* );
-float64_t f64_sqrt( float64_t );
+#else
+float64_t f64_mul( bool, float64_t, float64_t *__restrict );
+float64_t f64_div( bool, float64_t, float64_t *__restrict );
+float64_t f64_rem( bool, float64_t, float64_t *__restrict );
+#endif
+float64_t f64_mulAdd( float64_t, float64_t, float64_t );
+// float64_t f64_sqrt( float64_t );
 bool f64_eq( float64_t, float64_t );
 bool f64_le( float64_t, float64_t );
 bool f64_lt( float64_t, float64_t );

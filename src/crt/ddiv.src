@@ -4,14 +4,23 @@
 
 	public	__ddiv
 
-; float64_t f64_div(float64_t, const float64_t*)
+; float64_t f64_div(bool, float64_t, const float64_t*)
 __ddiv:
 	push	af, iy
 	ld	iy, 9
-	add	iy, sp
+	add	iy, sp	
+	
 	push	iy, bc, de, hl
+
+	ld	a, b	; signbit(x)
+	xor	a, (iy + 7)	; signbit(y)
+	rla
+	push	af	; Carry = (signbit(x) != signbit(y))
+	
 	call	_f64_div
-	pop	af, af, af, af, iy, af
+	
+	pop	af, af, af, af, af
+	pop	iy, af	; restore
 	ret
 
 	extern	_f64_div
