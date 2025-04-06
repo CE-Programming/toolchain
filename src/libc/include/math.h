@@ -21,10 +21,10 @@
     float: _signbitf \
 )(x))
 
-#define isinf(x) ((int)_Generic(__math_promote(x), \
-    long double: _isinfl, \
-    default: _isinff, \
-    float: _isinff \
+#define issignaling(x) ((int)_Generic(__math_promote(x), \
+    long double: _issignalingl, \
+    default: _issignalingf, \
+    float: _issignalingf \
 )(x))
 
 #define isnan(x) ((int)_Generic(__math_promote(x), \
@@ -33,10 +33,11 @@
     float: _isnanf \
 )(x))
 
-#define isnormal(x) ((int)_Generic(__math_promote(x), \
-    long double: _isnormall, \
-    default: _isnormalf, \
-    float: _isnormalf \
+
+#define isinf(x) ((int)_Generic(__math_promote(x), \
+    long double: _isinfl, \
+    default: _isinff, \
+    float: _isinff \
 )(x))
 
 #define isfinite(x) ((int)_Generic(__math_promote(x), \
@@ -45,16 +46,22 @@
     float: _isfinitef \
 )(x))
 
-#define iszero(x) ((int)_Generic(__math_promote(x), \
-    long double: _iszerol, \
-    default: _iszerof, \
-    float: _iszerof \
+#define isnormal(x) ((int)_Generic(__math_promote(x), \
+    long double: _isnormall, \
+    default: _isnormalf, \
+    float: _isnormalf \
 )(x))
 
 #define issubnormal(x) ((int)_Generic(__math_promote(x), \
     long double: _issubnormall, \
     default: _issubnormalf, \
     float: _issubnormalf \
+)(x))
+
+#define iszero(x) ((int)_Generic(__math_promote(x), \
+    long double: _iszerol, \
+    default: _iszerof, \
+    float: _iszerof \
 )(x))
 
 #define fpclassify(x) ((int)_Generic(__math_promote(x), \

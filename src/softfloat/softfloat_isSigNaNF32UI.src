@@ -1,0 +1,8 @@
+	assume	adl = 1
+
+	section	.text
+
+	public	_softfloat_isSigNaNF32UI
+_softfloat_isSigNaNF32UI := __issignalingf
+
+	extern	__issignalingf
