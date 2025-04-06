@@ -4,14 +4,20 @@
 
 	public	__drem
 
-; float64_t f64_rem(float64_t, const float64_t*)
+; float64_t f64_rem(bool, float64_t, const float64_t*)
 __drem:
 	push	af, iy
 	ld	iy, 9
 	add	iy, sp
 	push	iy, bc, de, hl
+	
+	rl	b
+	push	af	; Carry = signbit(x)
+
 	call	_f64_rem
-	pop	af, af, af, af, iy, af
+
+	pop	af, af, af, af, af
+	pop	iy, af	; restore
 	ret
 
 	extern	_f64_rem

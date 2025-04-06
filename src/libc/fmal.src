@@ -4,8 +4,18 @@
 
 	public	_fmal, __debug_fmal
 
-_fmal := _softfloat_mulAddF64
-__debug_fmal := _softfloat_mulAddF64
+_fmal:
+__debug_fmal:
 	; flags handled by softfloat
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy + 28)
+	rlca
+	ld	(iy + 11), a	; signC
+	ld	a, (iy + 10)
+	xor	a, (iy + 19)
+	rlca
+	ld	(iy + 20), a	; signZ
+	jq	_softfloat_mulAddF64
 
 	extern	_softfloat_mulAddF64

@@ -3,7 +3,15 @@
 	section	.text
 
 	public	_sqrtl
-_sqrtl := _f64_sqrt
+
+_sqrtl:
 	; flags handled by softfloat
+	ld	hl, 10
+	add	hl, sp
+	ld	a, (hl)
+	rlca
+	inc	hl
+	ld	(hl), a
+	jq	_f64_sqrt
 
 	extern	_f64_sqrt
