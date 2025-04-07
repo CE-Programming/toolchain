@@ -1,0 +1,343 @@
+	assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_clzc
+___ez80_clzc:
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (hl)
+	jp	__bctlz
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_clzi48
+___ez80_clzi48:
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	jp	__i48ctlz
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_ctzc
+___ez80_ctzc:
+	; unoptimized
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (hl)
+	ld	l, a
+	cpl
+	dec	l
+	and	a, l
+	ld	l, a
+	jp	__bpopcnt
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_ctzi48
+___ez80_ctzi48:
+	; unoptimized
+	ld	a, 48
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	de, (iy + 6)
+	call	__i48cmpzero
+	ret	z
+	ld	bc, (iy + 3)
+	ld	iy, (iy + 6)
+	call	__i48sub_1
+	call	__i48xor
+	call	__i48popcnt
+	dec	a
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_ffsc
+___ez80_ffsc:
+	; unoptimized
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (hl)
+	or	a, a
+	ret	z
+	ld	l, a
+	dec	l
+	xor	a, l
+	jp	__bpopcnt
+
+;-------------------------------------------------------------------------------
+	
+	section	.text
+
+	public	___ez80_ffss
+___ez80_ffss:
+	; unoptimized
+	ld	hl, 3
+	add	hl, sp
+	ld	hl, (hl)
+	xor	a, a
+	or	a, h
+	or	a, l
+	ret	z
+	ld	b, h
+	ld	c, l
+	dec	bc
+	;	HL ^ (HL - 1)
+	ld	a, h
+	xor	a, b
+	ld	h, a
+	ld	a, l
+	xor	a, c
+	ld	l, a
+	jp	__spopcnt
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_ffsi48
+___ez80_ffsi48:
+	; unoptimized
+	xor	a, a
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	de, (iy + 6)
+	call	__i48cmpzero
+	ret	z
+	ld	bc, (iy + 3)
+	ld	iy, (iy + 6)
+	call	__i48sub_1
+	call	__i48xor
+	jp	__i48popcnt
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_popcountc
+___ez80_popcountc:
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (hl)
+	jp	__bpopcnt
+
+;-------------------------------------------------------------------------------
+	
+	section	.text
+
+	public	___ez80_popcounts
+___ez80_popcounts:
+	ld	hl, 3
+	add	hl, sp
+	ld	hl, (hl)
+	jp	__spopcnt
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_popcounti48
+___ez80_popcounti48:
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	jp	__i48popcnt
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_bswap24
+___ez80_bswap24:
+	; unoptimized
+	ld	iy, 0
+	add	iy, sp
+	ld	h, (iy + 3)
+	ld	l, (iy + 5)
+	ld	(iy + 3), l
+	ld	(iy + 5), h
+	ld	hl, (iy + 3)
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_bswap48
+___ez80_bswap48:
+	pop	bc, hl, de
+	push	de, hl, bc
+	jp	__i48bswap
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_bitreverse24
+___ez80_bitreverse24:
+	pop	bc
+	ex	(sp), hl
+	push	bc
+	jp	__ibitrev
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_bitreverse48
+___ez80_bitreverse48:
+	pop	bc, hl, de
+	push	de, hl, bc
+	jp	__i48bitrev
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_rotateleft24
+___ez80_rotateleft24:
+	; unoptimized
+	ld	iy, 0
+	lea	de, iy + 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	a, (iy + 6)
+	ld	c, 24
+.mod24:
+	sub	a, c
+	jr	nc, .mod24
+	add	a, c
+	ret	z
+	ld	b, a
+.loop:
+	add	hl, hl
+	adc	hl, de
+	djnz	.loop
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_rotateleft48
+___ez80_rotateleft48:
+	; unoptimized
+	ld	iy, 0
+	lea	bc, iy + 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	de, (iy + 6)
+	ld	a, (iy + 9)
+	ld	c, 48
+.mod48:
+	sub	a, c
+	jr	nc, .mod48
+	add	a, c
+	ret	z
+	ld	c, 0
+.loop:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, bc
+	dec	a
+	jr	nz, .loop
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_rotateright24
+___ez80_rotateright24:
+	; unoptimized
+	ld	iy, 0
+	lea	de, iy + 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	a, (iy + 6)
+	ld	c, 24
+.mod24:
+	sub	a, c
+	jr	nc, .mod24
+	neg
+	cp	a, c
+	ret	z
+	ld	b, a
+.loop:
+	add	hl, hl
+	adc	hl, de
+	djnz	.loop
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_rotateright48
+___ez80_rotateright48:
+	; unoptimized
+	ld	iy, 0
+	lea	bc, iy + 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	de, (iy + 6)
+	ld	a, (iy + 9)
+	ld	c, 48
+.mod48:
+	sub	a, c
+	jr	nc, .mod48
+	neg
+	cp	a, c
+	ret	z
+	ld	c, 0
+.loop:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, bc
+	dec	a
+	jr	nz, .loop
+	ret
+
+;-------------------------------------------------------------------------------
+
+	extern	__i48xor
+	extern	__i48cmpzero
+	extern	__i48sub_1
+
+	extern	__bctlz
+	extern	__i48ctlz
+
+	extern	__bpopcnt
+	extern	__spopcnt
+	extern	__i48popcnt
+
+	extern	__ibitrev
+	extern	__i48bitrev
+
+	extern	__frameset0

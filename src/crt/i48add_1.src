@@ -1,0 +1,19 @@
+; Performs 48-bit addition
+;
+; Returns:
+; ude:uhl = ude:uhl + 1
+
+	assume	adl=1
+
+	section	.text
+
+	public	__i48add_1
+__i48add_1:
+	inc	hl
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	ret	nz
+	; carry
+	inc	de
+	ret

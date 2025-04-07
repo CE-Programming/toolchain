@@ -5,9 +5,7 @@
 #include <stdint.h>
 #include <bit>
 
-#define C(expr) if (!(expr)) { return __LINE__; }
-#define TEST(test) { ret = test; if (ret != 0) { return ret; }}
-
+#include "data.h"
 
 /* prevents clang from constant folding builtins */
 
@@ -76,9 +74,57 @@ int test_byteswap(void) {
     return 0;
 }
 
+int test_cxxbit(void) {
+    C((std::countl_zero(zero_u8 ) == val_8 ));
+    C((std::countl_zero(zero_u16) == val_16));
+    C((std::countl_zero(zero_u24) == val_24));
+    C((std::countl_zero(zero_u32) == val_32));
+    C((std::countl_zero(zero_u48) == val_48));
+    C((std::countl_zero(zero_u64) == val_64));
+    C((std::countl_zero(ones_u8 ) == val_0 ));
+    C((std::countl_zero(ones_u16) == val_0 ));
+    C((std::countl_zero(ones_u24) == val_0 ));
+    C((std::countl_zero(ones_u32) == val_0 ));
+    C((std::countl_zero(ones_u48) == val_0 ));
+    C((std::countl_zero(ones_u64) == val_0 ));
+
+    C((std::countr_zero(zero_u8 ) == val_8 ));
+    C((std::countr_zero(zero_u16) == val_16));
+    C((std::countr_zero(zero_u24) == val_24));
+    C((std::countr_zero(zero_u32) == val_32));
+    C((std::countr_zero(zero_u48) == val_48));
+    C((std::countr_zero(zero_u64) == val_64));
+    C((std::countr_zero(ones_u8 ) == val_0 ));
+    C((std::countr_zero(ones_u16) == val_0 ));
+    C((std::countr_zero(ones_u24) == val_0 ));
+    C((std::countr_zero(ones_u32) == val_0 ));
+    C((std::countr_zero(ones_u48) == val_0 ));
+    C((std::countr_zero(ones_u64) == val_0 ));
+
+    C((std::popcount(zero_u8 ) == val_0 ));
+    C((std::popcount(zero_u16) == val_0 ));
+    C((std::popcount(zero_u24) == val_0 ));
+    C((std::popcount(zero_u32) == val_0 ));
+    C((std::popcount(zero_u48) == val_0 ));
+    C((std::popcount(zero_u64) == val_0 ));
+    C((std::popcount(ones_u8 ) == val_8 ));
+    C((std::popcount(ones_u16) == val_16));
+    C((std::popcount(ones_u24) == val_24));
+    C((std::popcount(ones_u32) == val_32));
+    C((std::popcount(ones_u48) == val_48));
+    C((std::popcount(ones_u64) == val_64));
+    return 0;
+}
+
+extern "C" {
+    int test_stdbit(void);
+}
+
 int run_tests(void) {
     int ret = 0;
     TEST(test_byteswap());
+    TEST(test_stdbit());
+    TEST(test_cxxbit());
     return ret;
 }
 
