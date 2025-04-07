@@ -2,6 +2,77 @@
 
 	section	.data
 
+	public	_zero_u8
+	public	_zero_u16
+	public	_zero_u24
+	public	_zero_u32
+	public	_zero_u48
+	public	_zero_u64
+_zero_u8:
+_zero_u16:
+_zero_u24:
+_zero_u32:
+_zero_u48:
+_zero_u64:
+	db $00, $00, $00, $00, $00, $00, $00, $00
+
+	public	_ones_u8
+	public	_ones_u16
+	public	_ones_u24
+	public	_ones_u32
+	public	_ones_u48
+	public	_ones_u64
+_ones_u8:
+_ones_u16:
+_ones_u24:
+_ones_u32:
+_ones_u48:
+_ones_u64:
+	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+	public	_val_0
+_val_0:
+	db 0
+	public	_val_1
+_val_1:
+	db 1
+	public	_val_7
+_val_7:
+	db 7
+	public	_val_8
+_val_8:
+	db 8
+	public	_val_15
+_val_15:
+	db 15
+	public	_val_16
+_val_16:
+	db 16
+	public	_val_23
+_val_23:
+	db 23
+	public	_val_24
+_val_24:
+	db 24
+	public	_val_31
+_val_31:
+	db 31
+	public	_val_32
+_val_32:
+	db 32
+	public	_val_47
+_val_47:
+	db 47
+	public	_val_48
+_val_48:
+	db 48
+	public	_val_63
+_val_63:
+	db 63
+	public	_val_64
+_val_64:
+	db 64
+
 ; uint8_t byteswap_u8[4] = {
 ;     0x00,
 ;     0xFF,

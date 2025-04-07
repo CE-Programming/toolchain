@@ -6,13 +6,9 @@
 #include <cstring> // for memcpy
 #include <type_traits>
 #include <limits>
+#include <ez80_builtin.h>
 
 #pragma clang system_header
-
-extern "C" {
-    unsigned int __ezcxx_bswap24(unsigned int) noexcept __attribute__((__const__));
-    unsigned __int48 __ezcxx_bswap48(unsigned __int48) noexcept __attribute__((__const__));
-}
 
 namespace std {
 
@@ -42,7 +38,10 @@ constexpr bit_cast(const _From& src) noexcept {
 template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int countl_zero(_Tp x) noexcept;
 
-/* countl_zero uint8_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_zero(unsigned char __t) noexcept {
+    return __ez80_clzc(__t);
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int countl_zero(unsigned short __t) noexcept {
@@ -59,7 +58,10 @@ int countl_zero(unsigned long __t) noexcept {
     return __builtin_clzl(__t);
 }
 
-/* countl_zero uint48_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_zero(unsigned __int48 __t) noexcept {
+    return __ez80_clzi48(__t);
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int countl_zero(unsigned long long __t) noexcept {
@@ -79,7 +81,10 @@ int countl_zero(unsigned long long __t) noexcept {
 template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int countr_zero(_Tp __t) noexcept;
 
-/* countr_zero uint8_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_zero(unsigned char __t) noexcept {
+    return __ez80_ctzc(__t);
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int countr_zero(unsigned short __t) noexcept {
@@ -96,7 +101,10 @@ int countr_zero(unsigned long __t) noexcept {
     return __builtin_ctzl(__t);
 }
 
-/* countr_zero uint48_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_zero(unsigned __int48 __t) noexcept {
+    return __ez80_ctzi48(__t);
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int countr_zero(unsigned long long __t) noexcept {
@@ -118,14 +126,12 @@ int popcount(_Tp __t) noexcept;
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int popcount(unsigned char __t) noexcept {
-    /** @todo fix this inefficiency */
-    return __builtin_popcount(static_cast<unsigned int>(__t));
+    return __ez80_popcountc(__t);
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int popcount(unsigned short __t) noexcept {
-    /** @todo fix this inefficiency */
-    return __builtin_popcount(static_cast<unsigned int>(__t));
+    return __ez80_popcounts(__t);
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
@@ -140,8 +146,7 @@ int popcount(unsigned long __t) noexcept {
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int popcount(unsigned __int48 __t) noexcept {
-    /** @todo fix this inefficiency */
-    return __builtin_popcountll(static_cast<unsigned long long>(__t));
+    return __ez80_popcounti48(__t);
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
@@ -162,11 +167,11 @@ _Tp byteswap(_Tp __val) noexcept {
     } else if constexpr (sizeof(_Tp) == 2) {
         return __builtin_bswap16(__val);
     } else if constexpr (sizeof(_Tp) == 3) {
-        return __ezcxx_bswap24(__val);
+        return __ez80_bswap24(__val);
     } else if constexpr (sizeof(_Tp) == 4) {
         return __builtin_bswap32(__val);
     } else if constexpr (sizeof(_Tp) == 6) {
-        return __ezcxx_bswap48(__val);
+        return __ez80_bswap48(__val);
     } else if constexpr (sizeof(_Tp) == 8) {
         return __builtin_bswap64(__val);
     } else {
@@ -217,14 +222,28 @@ unsigned short rotl(unsigned short __t, int __r) noexcept {
     return __builtin_rotateleft16(__t, static_cast<unsigned int>(__r));
 }
 
-/* rotl uint24_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned int rotl(unsigned int __t, int __r) noexcept {
+    return (__r > 0)
+        ? __ez80_rotateleft24(__t, static_cast<unsigned char>(__r))
+        : (__r < 0)
+        ? __ez80_rotateright24(__t, static_cast<unsigned char>(-__r))
+        : __r;
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned long rotl(unsigned long __t, int __r) noexcept {
     return __builtin_rotateleft32(__t, static_cast<unsigned int>(__r));
 }
 
-/* rotl uint48_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned __int48 rotl(unsigned __int48 __t, int __r) noexcept {
+    return (__r > 0)
+        ? __ez80_rotateleft48(__t, static_cast<unsigned char>(__r))
+        : (__r < 0)
+        ? __ez80_rotateright48(__t, static_cast<unsigned char>(-__r))
+        : __r;
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned long long rotl(unsigned long long __t, int __r) noexcept {
@@ -248,14 +267,28 @@ unsigned short rotr(unsigned short __t, int __r) noexcept {
     return __builtin_rotateright16(__t, static_cast<unsigned int>(__r));
 }
 
-/* rotr uint24_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned int rotr(unsigned int __t, int __r) noexcept {
+    return (__r > 0)
+        ? __ez80_rotateright24(__t, static_cast<unsigned char>(__r))
+        : (__r < 0)
+        ? __ez80_rotateleft24(__t, static_cast<unsigned char>(-__r))
+        : __r;
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned long rotr(unsigned long __t, int __r) noexcept {
     return __builtin_rotateright32(__t, static_cast<unsigned int>(__r));
 }
 
-/* rotr uint48_t */
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned __int48 rotr(unsigned __int48 __t, int __r) noexcept {
+    return (__r > 0)
+        ? __ez80_rotateright48(__t, static_cast<unsigned char>(__r))
+        : (__r < 0)
+        ? __ez80_rotateleft48(__t, static_cast<unsigned char>(-__r))
+        : __r;
+}
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned long long rotr(unsigned long long __t, int __r) noexcept {
