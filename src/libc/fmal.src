@@ -2,10 +2,9 @@
 
 	section	.text
 
-	public	_fmal, __debug_fmal
+	public	_fmal
 
 _fmal:
-__debug_fmal:
 	; flags handled by softfloat
 	ld	iy, 0
 	add	iy, sp

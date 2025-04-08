@@ -47,10 +47,6 @@ long double roundevenl(long double x) {
     return ret.flt;
 }
 
-#ifdef roundl
-#undef roundl
-#endif
-
 long double roundl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
@@ -93,20 +89,12 @@ long long llroundl(long double x) {
     }
 #endif
 
-#ifdef nearbyintl
-#undef nearbyintl
-#endif
-
 long double nearbyintl(long double x) {
     F64_pun arg_x, ret;
     arg_x.flt = x;
     ret.soft = f64_roundToInt(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), false);
     return ret.flt;
 }
-
-#ifdef rintl
-#undef rintl
-#endif
 
 /* flags handled by softfloat */
 long double rintl(long double x) {
@@ -129,8 +117,3 @@ long long llrintl(long double x) {
     arg_x.flt = x;
     return f64_to_i64(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
 }
-
-long double _debug_roundl(long double) __attribute__((alias("roundl")));
-long double _debug_rintl(long double) __attribute__((alias("rintl")));
-long double _debug_nearbyintl(long double) __attribute__((alias("nearbyintl")));
-

@@ -1,9 +1,5 @@
 #include <math.h>
 
-#ifdef floorl
-#undef floorl
-#endif
-
 long double floorl(long double x) {
     if (!signbit(x)) {
         return truncl(x);
@@ -17,5 +13,3 @@ long double floorl(long double x) {
     }
     return x;
 }
-
-long double _debug_floorl(long double) __attribute__((alias("floorl")));
