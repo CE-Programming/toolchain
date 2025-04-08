@@ -6,9 +6,17 @@
 
 __dtol:
 	; f64_ret_i32
-	push	af, iy, bc, de, hl
+	push	af, iy
+	ld	a, b
+	push	bc, de, hl
+	ld	hl, 7
+	add	hl, sp
+	res	7, (hl)	; fabsl(x)
+	inc	hl
+	rlca
+	ld	(hl), a	; store the sign of x in the padding byte
 	call	__dtol_c
-	pop	af, af, af, iy, af
+	pop	af, af, bc, iy, af
 	ret
 
 	extern	__dtol_c

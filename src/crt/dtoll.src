@@ -6,7 +6,14 @@
 
 __dtoll:
 	; f64_ret_i64
-	push	af, iy, bc, de, hl
+	push	af, iy
+	ld	a, b
+	res	7, b	; fabsl(x)
+	push	bc, de, hl
+	ld	hl, 8
+	add	hl, sp
+	rlca
+	ld	(hl), a	; store the sign of x in the padding byte
 	call	__dtoll_c
 	pop	af, af, af, iy, af
 	ret

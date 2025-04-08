@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+#if 0
+
 #include "platform.h"
 #include "softfloat.h"
 #include <fenv.h>
@@ -49,3 +51,4 @@ void softfloat_raiseFlags( uint_fast8_t flags )
     softfloat_exceptionFlags |= flags;
 }
 
+#endif
