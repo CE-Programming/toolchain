@@ -34,12 +34,6 @@ static long double _truncl_c_positive(long double x) {
     return val.flt;
 }
 
-#ifdef truncl
-#undef truncl
-#endif
-
 long double truncl(long double x) {
     return copysignl(_truncl_c_positive(fabsl(x)), x);
 }
-
-long double _debug_truncl(long double) __attribute__((alias("truncl")));

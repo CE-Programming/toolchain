@@ -328,31 +328,6 @@ double      trunc(double);
 float       truncf(float);
 long double truncl(long double);
 
-/* aliases */
-
-long double _debug_fabsl(long double) __NOEXCEPT_CONST;
-#define fabsl _debug_fabsl
-long double _debug_copysignl(long double, long double) __NOEXCEPT_CONST;
-#define copysignl _debug_copysignl
-long double _debug_fmaxl(long double, long double);
-#define fmaxl _debug_fmaxl
-long double _debug_fminl(long double, long double);
-#define fminl _debug_fminl
-long double _debug_truncl(long double);
-#define truncl _debug_truncl
-long double _debug_floorl(long double);
-#define floorl _debug_floorl
-long double _debug_ceill(long double);
-#define ceill _debug_ceill
-long double _debug_roundl(long double);
-#define roundl _debug_roundl
-long double _debug_nearbyintl(long double);
-#define nearbyintl _debug_nearbyintl
-long double _debug_rintl(long double);
-#define rintl _debug_rintl
-long double _debug_fmal(long double, long double, long double);
-#define fmal _debug_fmal
-
 #ifdef __cplusplus
 }
 #endif

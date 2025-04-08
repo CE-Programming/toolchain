@@ -1,9 +1,5 @@
 #include <math.h>
 
-#ifdef ceill
-#undef ceill
-#endif
-
 long double ceill(long double x) {
     if (signbit(x)) {
         return truncl(x);
@@ -17,5 +13,3 @@ long double ceill(long double x) {
     }
     return x;
 }
-
-long double _debug_ceill(long double) __attribute__((alias("ceill")));
