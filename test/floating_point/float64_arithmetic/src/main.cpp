@@ -61,16 +61,54 @@ static size_t run_test(int64_t* fail_ulp) {
     return SIZE_MAX;
 }
 
+#define C(expr) if (!(expr)) { return __LINE__; }
+
+extern volatile long double f64_pos_zero;
+extern volatile long double f64_neg_zero;
+extern volatile long double f64_pos_one;
+extern volatile long double f64_neg_one;
+extern volatile long double f64_pos_pi;
+extern volatile long double f64_neg_pi;
+
+int comparison_test(void) {
+    C(f64_pos_one  == f64_pos_one );
+    C(f64_neg_one  <  f64_pos_one );
+    C(f64_pos_one  >= f64_neg_one );
+    C(f64_pos_one  != f64_neg_one );
+    C(f64_pos_zero <  f64_pos_one );
+    C(f64_neg_zero >  f64_neg_one );
+
+    C(f64_pos_zero == f64_pos_zero);
+    C(f64_neg_zero == f64_neg_zero);
+    C(f64_pos_zero >= f64_neg_zero);
+    C(f64_neg_zero == f64_pos_zero);
+
+    C(f64_pos_pi   == f64_pos_pi  );
+    C(f64_pos_pi   >  f64_pos_one );
+    C(f64_neg_pi   <  f64_neg_one );
+    C(f64_pos_pi   >  f64_pos_zero);
+    C(f64_neg_pi   <= f64_neg_zero);
+    C(f64_neg_pi   != f64_neg_zero);
+    C(f64_pos_pi   != f64_neg_pi  );
+    C(f64_pos_pi   >= f64_neg_pi  );
+    
+    return 0;
+}
+
 int main(void) {
     os_ClrHome();
-    int64_t fail_ulp = 0;
-    size_t fail_index = run_test(&fail_ulp);
-    if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+    int comparison_result = comparison_test();
+    if (comparison_result != 0) {
+        printf("Failed test L%d\n", comparison_result);
     } else {
-        printf("Failed test: %zu\nULP: %lld", fail_index, fail_ulp);
+        int64_t fail_ulp = 0;
+        size_t fail_index = run_test(&fail_ulp);
+        if (fail_index == SIZE_MAX) {
+            printf("All tests passed");
+        } else {
+            printf("Failed test: %zu\nULP: %lld", fail_index, fail_ulp);
+        }
     }
-
     while (!os_GetCSC());
 
     return 0;

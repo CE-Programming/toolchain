@@ -116,7 +116,13 @@ enum {
 /*----------------------------------------------------------------------------
 | Routine to raise any or all of the software floating-point exception flags.
 *----------------------------------------------------------------------------*/
+#if 0
 void softfloat_raiseFlags( uint_fast8_t );
+#else
+inline void softfloat_raiseFlags( uint_fast8_t flags ) {
+    softfloat_exceptionFlags |= flags;
+}
+#endif
 
 /*----------------------------------------------------------------------------
 | Integer-to-floating-point conversion routines.

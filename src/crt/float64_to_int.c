@@ -74,6 +74,11 @@ uint64_t _dtoull_c(long double x) {
  */
 #define HANDLE_INT_MIN 1
 
+typedef struct f64_sign {
+    long double flt;
+    bool sign;
+} f64_sign;
+
 /**
  * @note val must have the signbit cleared
  */
@@ -123,10 +128,10 @@ uint32_t _dtoul_c(long double x) {
     return (uint32_t)f64_to_unsigned(val);
 }
 
-int64_t _dtoll_c(long double x) {
+int64_t _dtoll_c(f64_sign arg) {
     F64_pun val;
-    bool x_sign = signbit(x);
-    val.flt = fabsl(x);
+    bool x_sign = arg.sign;
+    val.flt = arg.flt;
     
     /* overflow || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_i64_max_exp) << Float64_exp_BC_shift)) {
@@ -145,10 +150,10 @@ int64_t _dtoll_c(long double x) {
     return ret;
 }
 
-int32_t _dtol_c(long double x) {
+int32_t _dtol_c(f64_sign arg) {
     F64_pun val;
-    bool x_sign = signbit(x);
-    val.flt = fabsl(x);
+    bool x_sign = arg.sign;
+    val.flt = arg.flt;
     
     /* overflow || isinf(x) || isnan(x) */
     if (val.reg.BC >= ((Float64_bias + Float64_i32_max_exp) << Float64_exp_BC_shift)) {

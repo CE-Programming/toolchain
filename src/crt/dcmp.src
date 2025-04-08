@@ -4,16 +4,18 @@
 
 	public	__dcmp
 
-; int _dcmp_c(const long double *__restrict x, const long double *__restrict y)
+; int _dcmp_c(f64_cmp_arg const *__restrict const arg)
 __dcmp:
-	; f64*_f64*_ret_i24
-	push	bc, de, hl, af, iy
-	ld	iy, 6
-	add	iy, sp
-	pea	iy + 12
-	push	iy
+	; f64_cmp_arg*_ret_i24
+	push	bc, de, hl
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	push	iy, af
+	push	hl	; f64_cmp_arg*
 	call	__dcmp_c
-	pop	af, af, iy, af
+	pop	af
+	pop	af, iy
 	; Set the comparison flags
 	add	hl, de
 	or	a, a
