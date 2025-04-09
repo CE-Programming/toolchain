@@ -2,6 +2,7 @@
 #define _EZ80_BUILTIN_H
 
 #include <cdefs.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,6 +17,14 @@ unsigned char __ez80_ctzi48(unsigned __int48) __NOEXCEPT_CONST;
 unsigned char __ez80_ffsc(unsigned char) __NOEXCEPT_CONST;
 unsigned char __ez80_ffss(unsigned short) __NOEXCEPT_CONST;
 unsigned char __ez80_ffsi48(unsigned __int48) __NOEXCEPT_CONST;
+
+unsigned char __ez80_clrsbc(unsigned char) __NOEXCEPT_CONST;
+unsigned char __ez80_clrsbs(unsigned short) __NOEXCEPT_CONST;
+unsigned char __ez80_clrsbi48(unsigned __int48) __NOEXCEPT_CONST;
+
+bool __ez80_parityc(unsigned char) __NOEXCEPT_CONST;
+bool __ez80_paritys(unsigned short) __NOEXCEPT_CONST;
+bool __ez80_parityi48(unsigned __int48) __NOEXCEPT_CONST;
 
 unsigned char __ez80_popcountc(unsigned char) __NOEXCEPT_CONST;
 unsigned char __ez80_popcounts(unsigned short) __NOEXCEPT_CONST;
