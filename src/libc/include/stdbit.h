@@ -111,14 +111,19 @@ __builtin_ffsll(x)
 
 #define stdc_count_ones_uc(x) \
 __ez80_popcountc(x)
+
 #define stdc_count_ones_us(x) \
 __ez80_popcounts(x)
+
 #define stdc_count_ones_ui(x) \
 __builtin_popcount(x)
+
 #define stdc_count_ones_ul(x) \
 __builtin_popcountl(x)
+
 #define stdc_count_ones_ui48(x) \
 __ez80_popcounti48(x)
+
 #define stdc_count_ones_ull(x) \
 __builtin_popcountll(x)
 
@@ -136,6 +141,13 @@ __builtin_popcountll(x)
 
 //------------------------------------------------------------------------------
 // stdc_bit_width
+//------------------------------------------------------------------------------
+
+
+
+
+//------------------------------------------------------------------------------
+// stdc_bit_ceil
 //------------------------------------------------------------------------------
 
 

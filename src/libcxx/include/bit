@@ -72,7 +72,38 @@ int countl_zero(unsigned long long __t) noexcept {
 // countl_one
 //------------------------------------------------------------------------------
 
+template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_one(_Tp x) noexcept;
 
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_one(unsigned char __t) noexcept {
+    return __ez80_clzc(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_one(unsigned short __t) noexcept {
+    return __builtin_clzs(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_one(unsigned int __t) noexcept {
+    return __builtin_clz(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_one(unsigned long __t) noexcept {
+    return __builtin_clzl(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_one(unsigned __int48 __t) noexcept {
+    return __ez80_clzi48(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countl_one(unsigned long long __t) noexcept {
+    return __builtin_clzll(~__t);
+}
 
 //------------------------------------------------------------------------------
 // countr_zero
@@ -115,7 +146,38 @@ int countr_zero(unsigned long long __t) noexcept {
 // countr_one
 //------------------------------------------------------------------------------
 
+template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_one(_Tp __t) noexcept;
 
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_one(unsigned char __t) noexcept {
+    return __ez80_ctzc(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_one(unsigned short __t) noexcept {
+    return __builtin_ctzs(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_one(unsigned int __t) noexcept {
+    return __builtin_ctz(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_one(unsigned long __t) noexcept {
+    return __builtin_ctzl(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_one(unsigned __int48 __t) noexcept {
+    return __ez80_ctzi48(~__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int countr_one(unsigned long long __t) noexcept {
+    return __builtin_ctzll(~__t);
+}
 
 //------------------------------------------------------------------------------
 // popcount
@@ -161,7 +223,7 @@ int popcount(unsigned long long __t) noexcept {
 #if __cplusplus >= 201703L
 
 template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
-_Tp byteswap(_Tp __val) noexcept {
+std::enable_if_t<std::is_integral_v<_Tp>,_Tp> byteswap(_Tp __val) noexcept {
     if constexpr (sizeof(_Tp) == 1) {
         return __val;
     } else if constexpr (sizeof(_Tp) == 2) {
@@ -185,25 +247,167 @@ _Tp byteswap(_Tp __val) noexcept {
 // has_single_bit
 //------------------------------------------------------------------------------
 
+template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+bool has_single_bit(_Tp __t) noexcept;
 
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+bool has_single_bit(unsigned char __t) noexcept {
+    return (__t != 0 && (__t & (__t - 1)) == 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+bool has_single_bit(unsigned short __t) noexcept {
+    return (__t != 0 && (__t & (__t - 1)) == 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+bool has_single_bit(unsigned int __t) noexcept {
+    return (__t != 0 && (__t & (__t - 1)) == 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+bool has_single_bit(unsigned long __t) noexcept {
+    return (__t != 0 && (__t & (__t - 1)) == 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+bool has_single_bit(unsigned __int48 __t) noexcept {
+    return (__t != 0 && (__t & (__t - 1)) == 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+bool has_single_bit(unsigned long long __t) noexcept {
+    return (__t != 0 && (__t & (__t - 1)) == 0);
+}
 
 //------------------------------------------------------------------------------
 // bit_width
 //------------------------------------------------------------------------------
 
+template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int bit_width(_Tp __t) noexcept;
 
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int bit_width(unsigned char __t) noexcept {
+    return 8 - __ez80_clzc(__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int bit_width(unsigned short __t) noexcept {
+    return 16 - __builtin_clzs(__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int bit_width(unsigned int __t) noexcept {
+    return 24 - __builtin_clz(__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int bit_width(unsigned long __t) noexcept {
+    return 32 - __builtin_clzl(__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int bit_width(unsigned __int48 __t) noexcept {
+    return 48 - __ez80_clzi48(__t);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+int bit_width(unsigned long long __t) noexcept {
+    return 64 - __builtin_clzll(__t);
+}
 
 //------------------------------------------------------------------------------
 // bit_ceil
 //------------------------------------------------------------------------------
 
+template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+_Tp bit_ceil(_Tp __t) noexcept;
 
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned char bit_ceil(unsigned char __t) noexcept {
+    return
+        (static_cast<signed char>(__t) > 0)
+        ? (static_cast<unsigned char>(1) << bit_width<unsigned char>(__t - 1))
+        : ((__t == 0) ? 1 : 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned short bit_ceil(unsigned short __t) noexcept {
+    return
+        (static_cast<signed short>(__t) > 0)
+        ? (static_cast<unsigned short>(1) << bit_width<unsigned short>(__t - 1))
+        : ((__t == 0) ? 1 : 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned int bit_ceil(unsigned int __t) noexcept {
+    return
+        (static_cast<signed int>(__t) > 0)
+        ? (static_cast<unsigned int>(1) << bit_width<unsigned int>(__t - 1))
+        : ((__t == 0) ? 1 : 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned long bit_ceil(unsigned long __t) noexcept {
+    return
+        (static_cast<signed long>(__t) > 0)
+        ? (static_cast<unsigned long>(1) << bit_width<unsigned long>(__t - 1))
+        : ((__t == 0) ? 1 : 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned __int48 bit_ceil(unsigned __int48 __t) noexcept {
+    return
+        (static_cast<signed __int48>(__t) > 0)
+        ? (static_cast<unsigned __int48>(1) << bit_width<unsigned __int48>(__t - 1))
+        : ((__t == 0) ? 1 : 0);
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned long long bit_ceil(unsigned long long __t) noexcept {
+    return
+        (static_cast<signed long long>(__t) > 0)
+        ? (static_cast<unsigned long long>(1) << bit_width<unsigned long long>(__t - 1))
+        : ((__t == 0) ? 1 : 0);
+}
 
 //------------------------------------------------------------------------------
 // bit_floor
 //------------------------------------------------------------------------------
 
+template<class _Tp> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+_Tp bit_floor(_Tp __t) noexcept;
 
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned char bit_floor(unsigned char __t) noexcept {
+    return (__t == 0) ? 0 : (static_cast<unsigned char>(1) << (bit_width(__t) - 1));
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned short bit_floor(unsigned short __t) noexcept {
+    return (__t == 0) ? 0 : (static_cast<unsigned short>(1) << (bit_width(__t) - 1));
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned int bit_floor(unsigned int __t) noexcept {
+    return (__t == 0) ? 0 : (static_cast<unsigned int>(1) << (bit_width(__t) - 1));
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned long bit_floor(unsigned long __t) noexcept {
+    return (__t == 0) ? 0 : (static_cast<unsigned long>(1) << (bit_width(__t) - 1));
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned __int48 bit_floor(unsigned __int48 __t) noexcept {
+    return (__t == 0) ? 0 : (static_cast<unsigned __int48>(1) << (bit_width(__t) - 1));
+}
+
+template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
+unsigned long long bit_floor(unsigned long long __t) noexcept {
+    return (__t == 0) ? 0 : (static_cast<unsigned long long>(1) << (bit_width(__t) - 1));
+}
 
 //------------------------------------------------------------------------------
 // rotl

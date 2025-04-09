@@ -132,6 +132,113 @@ ___ez80_ffsi48:
 
 	section	.text
 
+	public	___ez80_clrsbc
+___ez80_clrsbc:
+	; unoptimized
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (hl)
+	rlca
+	sbc	hl, hl
+	xor	a, l
+	rrca	
+	call	__bctlz
+	dec	a
+	ret
+
+;-------------------------------------------------------------------------------
+	
+	section	.text
+
+	public	___ez80_clrsbs
+___ez80_clrsbs:
+	; unoptimized
+	ld	hl, 3
+	add	hl, sp
+	ld	hl, (hl)
+	ld	a, h
+	rla
+	call	c, __snot
+	call	__sctlz
+	dec	a
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_clrsbi48
+___ez80_clrsbi48:
+	; unoptimized
+	ld	hl, 8
+	add	hl, sp
+	ld	a, (hl)
+	dec	hl
+	dec	hl
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	rla
+	call	c, __i48not
+	call	__i48ctlz
+	dec	a
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_parityc
+___ez80_parityc:
+	xor	a, a
+	ld	hl, 3
+	add	hl, sp
+	or	a, (hl)
+	ld	a, 0
+	ret	pe
+	dec	a
+	ret
+
+;-------------------------------------------------------------------------------
+	
+	section	.text
+
+	public	___ez80_paritys
+___ez80_paritys:
+	; unoptimized
+	ld	hl, 3
+	add	hl, sp
+	ld	hl, (hl)
+	call	__spopcnt
+	rrca
+	sbc	a, a
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	___ez80_parityi48
+___ez80_parityi48:
+	; unoptimized
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	call	__i48popcnt
+	rrca
+	sbc	a, a
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
 	public	___ez80_popcountc
 ___ez80_popcountc:
 	ld	hl, 3
@@ -326,11 +433,14 @@ ___ez80_rotateright48:
 
 ;-------------------------------------------------------------------------------
 
+	extern	__snot
+	extern	__i48not
 	extern	__i48xor
 	extern	__i48cmpzero
 	extern	__i48sub_1
 
 	extern	__bctlz
+	extern	__sctlz
 	extern	__i48ctlz
 
 	extern	__bpopcnt
@@ -340,4 +450,4 @@ ___ez80_rotateright48:
 	extern	__ibitrev
 	extern	__i48bitrev
 
-	extern	__frameset0
+	extern	__i48bswap
