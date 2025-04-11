@@ -166,98 +166,278 @@ int test_byteswap(void) {
     return 0;
 }
 
-int test_cxxbit_edge_cases(void) {
+int test_countl_zero(void) {
     C((std::countl_zero(zero_u8 ) == val_8 ));
     C((std::countl_zero(zero_u16) == val_16));
     C((std::countl_zero(zero_u24) == val_24));
     C((std::countl_zero(zero_u32) == val_32));
     C((std::countl_zero(zero_u48) == val_48));
     C((std::countl_zero(zero_u64) == val_64));
-    C((std::countl_zero(ones_u8 ) == val_0 ));
-    C((std::countl_zero(ones_u16) == val_0 ));
-    C((std::countl_zero(ones_u24) == val_0 ));
-    C((std::countl_zero(ones_u32) == val_0 ));
-    C((std::countl_zero(ones_u48) == val_0 ));
-    C((std::countl_zero(ones_u64) == val_0 ));
+    C((std::countl_zero( one_u8 ) == val_7 ));
+    C((std::countl_zero( one_u16) == val_15));
+    C((std::countl_zero( one_u24) == val_23));
+    C((std::countl_zero( one_u32) == val_31));
+    C((std::countl_zero( one_u48) == val_47));
+    C((std::countl_zero( one_u64) == val_63));
+    C((std::countl_zero(umax_u8 ) == val_0 ));
+    C((std::countl_zero(umax_u16) == val_0 ));
+    C((std::countl_zero(umax_u24) == val_0 ));
+    C((std::countl_zero(umax_u32) == val_0 ));
+    C((std::countl_zero(umax_u48) == val_0 ));
+    C((std::countl_zero(umax_u64) == val_0 ));
+    C((std::countl_zero(smax_u8 ) == val_1 ));
+    C((std::countl_zero(smax_u16) == val_1 ));
+    C((std::countl_zero(smax_u24) == val_1 ));
+    C((std::countl_zero(smax_u32) == val_1 ));
+    C((std::countl_zero(smax_u48) == val_1 ));
+    C((std::countl_zero(smax_u64) == val_1 ));
+    C((std::countl_zero(smin_u8 ) == val_0 ));
+    C((std::countl_zero(smin_u16) == val_0 ));
+    C((std::countl_zero(smin_u24) == val_0 ));
+    C((std::countl_zero(smin_u32) == val_0 ));
+    C((std::countl_zero(smin_u48) == val_0 ));
+    C((std::countl_zero(smin_u64) == val_0 ));
+    return 0;
+}
 
+int test_countl_one(void) {
     C((std::countl_one(zero_u8 ) == val_0 ));
     C((std::countl_one(zero_u16) == val_0 ));
     C((std::countl_one(zero_u24) == val_0 ));
     C((std::countl_one(zero_u32) == val_0 ));
     C((std::countl_one(zero_u48) == val_0 ));
     C((std::countl_one(zero_u64) == val_0 ));
-    C((std::countl_one(ones_u8 ) == val_8 ));
-    C((std::countl_one(ones_u16) == val_16));
-    C((std::countl_one(ones_u24) == val_24));
-    C((std::countl_one(ones_u32) == val_32));
-    C((std::countl_one(ones_u48) == val_48));
-    C((std::countl_one(ones_u64) == val_64));
+    C((std::countl_one( one_u8 ) == val_0 ));
+    C((std::countl_one( one_u16) == val_0 ));
+    C((std::countl_one( one_u24) == val_0 ));
+    C((std::countl_one( one_u32) == val_0 ));
+    C((std::countl_one( one_u48) == val_0 ));
+    C((std::countl_one( one_u64) == val_0 ));
+    C((std::countl_one(umax_u8 ) == val_8 ));
+    C((std::countl_one(umax_u16) == val_16));
+    C((std::countl_one(umax_u24) == val_24));
+    C((std::countl_one(umax_u32) == val_32));
+    C((std::countl_one(umax_u48) == val_48));
+    C((std::countl_one(umax_u64) == val_64));
+    C((std::countl_one(smax_u8 ) == val_0 ));
+    C((std::countl_one(smax_u16) == val_0 ));
+    C((std::countl_one(smax_u24) == val_0 ));
+    C((std::countl_one(smax_u32) == val_0 ));
+    C((std::countl_one(smax_u48) == val_0 ));
+    C((std::countl_one(smax_u64) == val_0 ));
+    C((std::countl_one(smin_u8 ) == val_1 ));
+    C((std::countl_one(smin_u16) == val_1 ));
+    C((std::countl_one(smin_u24) == val_1 ));
+    C((std::countl_one(smin_u32) == val_1 ));
+    C((std::countl_one(smin_u48) == val_1 ));
+    C((std::countl_one(smin_u64) == val_1 ));
+    return 0;
+}
 
+int test_countr_zero(void) {
     C((std::countr_zero(zero_u8 ) == val_8 ));
     C((std::countr_zero(zero_u16) == val_16));
     C((std::countr_zero(zero_u24) == val_24));
     C((std::countr_zero(zero_u32) == val_32));
     C((std::countr_zero(zero_u48) == val_48));
     C((std::countr_zero(zero_u64) == val_64));
-    C((std::countr_zero(ones_u8 ) == val_0 ));
-    C((std::countr_zero(ones_u16) == val_0 ));
-    C((std::countr_zero(ones_u24) == val_0 ));
-    C((std::countr_zero(ones_u32) == val_0 ));
-    C((std::countr_zero(ones_u48) == val_0 ));
-    C((std::countr_zero(ones_u64) == val_0 ));
+    C((std::countr_zero( one_u8 ) == val_0 ));
+    C((std::countr_zero( one_u16) == val_0 ));
+    C((std::countr_zero( one_u24) == val_0 ));
+    C((std::countr_zero( one_u32) == val_0 ));
+    C((std::countr_zero( one_u48) == val_0 ));
+    C((std::countr_zero( one_u64) == val_0 ));
+    C((std::countr_zero(umax_u8 ) == val_0 ));
+    C((std::countr_zero(umax_u16) == val_0 ));
+    C((std::countr_zero(umax_u24) == val_0 ));
+    C((std::countr_zero(umax_u32) == val_0 ));
+    C((std::countr_zero(umax_u48) == val_0 ));
+    C((std::countr_zero(umax_u64) == val_0 ));
+    C((std::countr_zero(smax_u8 ) == val_0 ));
+    C((std::countr_zero(smax_u16) == val_0 ));
+    C((std::countr_zero(smax_u24) == val_0 ));
+    C((std::countr_zero(smax_u32) == val_0 ));
+    C((std::countr_zero(smax_u48) == val_0 ));
+    C((std::countr_zero(smax_u64) == val_0 ));
+    C((std::countr_zero(smin_u8 ) == val_7 ));
+    C((std::countr_zero(smin_u16) == val_15));
+    C((std::countr_zero(smin_u24) == val_23));
+    C((std::countr_zero(smin_u32) == val_31));
+    C((std::countr_zero(smin_u48) == val_47));
+    C((std::countr_zero(smin_u64) == val_63));
+    return 0;
+}
 
+int test_countr_one(void) {
     C((std::countr_one(zero_u8 ) == val_0 ));
     C((std::countr_one(zero_u16) == val_0 ));
     C((std::countr_one(zero_u24) == val_0 ));
     C((std::countr_one(zero_u32) == val_0 ));
     C((std::countr_one(zero_u48) == val_0 ));
     C((std::countr_one(zero_u64) == val_0 ));
-    C((std::countr_one(ones_u8 ) == val_8 ));
-    C((std::countr_one(ones_u16) == val_16));
-    C((std::countr_one(ones_u24) == val_24));
-    C((std::countr_one(ones_u32) == val_32));
-    C((std::countr_one(ones_u48) == val_48));
-    C((std::countr_one(ones_u64) == val_64));
+    C((std::countr_one( one_u8 ) == val_1 ));
+    C((std::countr_one( one_u16) == val_1 ));
+    C((std::countr_one( one_u24) == val_1 ));
+    C((std::countr_one( one_u32) == val_1 ));
+    C((std::countr_one( one_u48) == val_1 ));
+    C((std::countr_one( one_u64) == val_1 ));
+    C((std::countr_one(umax_u8 ) == val_8 ));
+    C((std::countr_one(umax_u16) == val_16));
+    C((std::countr_one(umax_u24) == val_24));
+    C((std::countr_one(umax_u32) == val_32));
+    C((std::countr_one(umax_u48) == val_48));
+    C((std::countr_one(umax_u64) == val_64));
+    C((std::countr_one(smax_u8 ) == val_7 ));
+    C((std::countr_one(smax_u16) == val_15));
+    C((std::countr_one(smax_u24) == val_23));
+    C((std::countr_one(smax_u32) == val_31));
+    C((std::countr_one(smax_u48) == val_47));
+    C((std::countr_one(smax_u64) == val_63));
+    C((std::countr_one(smin_u8 ) == val_0 ));
+    C((std::countr_one(smin_u16) == val_0 ));
+    C((std::countr_one(smin_u24) == val_0 ));
+    C((std::countr_one(smin_u32) == val_0 ));
+    C((std::countr_one(smin_u48) == val_0 ));
+    C((std::countr_one(smin_u64) == val_0 ));
+    return 0;
+}
 
+int test_bit_width(void) {
     C((std::bit_width(zero_u8 ) == val_0 ));
     C((std::bit_width(zero_u16) == val_0 ));
     C((std::bit_width(zero_u24) == val_0 ));
     C((std::bit_width(zero_u32) == val_0 ));
     C((std::bit_width(zero_u48) == val_0 ));
     C((std::bit_width(zero_u64) == val_0 ));
-    C((std::bit_width(ones_u8 ) == val_8 ));
-    C((std::bit_width(ones_u16) == val_16));
-    C((std::bit_width(ones_u24) == val_24));
-    C((std::bit_width(ones_u32) == val_32));
-    C((std::bit_width(ones_u48) == val_48));
-    C((std::bit_width(ones_u64) == val_64));
+    C((std::bit_width( one_u8 ) == val_1 ));
+    C((std::bit_width( one_u16) == val_1 ));
+    C((std::bit_width( one_u24) == val_1 ));
+    C((std::bit_width( one_u32) == val_1 ));
+    C((std::bit_width( one_u48) == val_1 ));
+    C((std::bit_width( one_u64) == val_1 ));
+    C((std::bit_width(umax_u8 ) == val_8 ));
+    C((std::bit_width(umax_u16) == val_16));
+    C((std::bit_width(umax_u24) == val_24));
+    C((std::bit_width(umax_u32) == val_32));
+    C((std::bit_width(umax_u48) == val_48));
+    C((std::bit_width(umax_u64) == val_64));
+    C((std::bit_width(smax_u8 ) == val_7 ));
+    C((std::bit_width(smax_u16) == val_15));
+    C((std::bit_width(smax_u24) == val_23));
+    C((std::bit_width(smax_u32) == val_31));
+    C((std::bit_width(smax_u48) == val_47));
+    C((std::bit_width(smax_u64) == val_63));
+    C((std::bit_width(smin_u8 ) == val_8 ));
+    C((std::bit_width(smin_u16) == val_16));
+    C((std::bit_width(smin_u24) == val_24));
+    C((std::bit_width(smin_u32) == val_32));
+    C((std::bit_width(smin_u48) == val_48));
+    C((std::bit_width(smin_u64) == val_64));
+    return 0;
+}
 
-    C((std::bit_ceil(zero_u8 ) == val_1 ));
-    C((std::bit_ceil(zero_u16) == val_1 ));
-    C((std::bit_ceil(zero_u24) == val_1 ));
-    C((std::bit_ceil(zero_u32) == val_1 ));
-    C((std::bit_ceil(zero_u48) == val_1 ));
-    C((std::bit_ceil(zero_u64) == val_1 ));
+int test_bit_ceil(void) {
+    C((std::bit_ceil(zero_u8 ) ==  one_u8 ));
+    C((std::bit_ceil(zero_u16) ==  one_u16));
+    C((std::bit_ceil(zero_u24) ==  one_u24));
+    C((std::bit_ceil(zero_u32) ==  one_u32));
+    C((std::bit_ceil(zero_u48) ==  one_u48));
+    C((std::bit_ceil(zero_u64) ==  one_u64));
+    C((std::bit_ceil( one_u8 ) ==  one_u8 ));
+    C((std::bit_ceil( one_u16) ==  one_u16));
+    C((std::bit_ceil( one_u24) ==  one_u24));
+    C((std::bit_ceil( one_u32) ==  one_u32));
+    C((std::bit_ceil( one_u48) ==  one_u48));
+    C((std::bit_ceil( one_u64) ==  one_u64));
+    // optional undefined behaviour
+#if 0
+    C((std::bit_ceil(umax_u8 ) == zero_u8 ));
+    C((std::bit_ceil(umax_u16) == zero_u16));
+    C((std::bit_ceil(umax_u24) == zero_u24));
+    C((std::bit_ceil(umax_u32) == zero_u32));
+    C((std::bit_ceil(umax_u48) == zero_u48));
+    C((std::bit_ceil(umax_u64) == zero_u64));
+#endif
+    C((std::bit_ceil(smax_u8 ) == smin_u8 ));
+    C((std::bit_ceil(smax_u16) == smin_u16));
+    C((std::bit_ceil(smax_u24) == smin_u24));
+    C((std::bit_ceil(smax_u32) == smin_u32));
+    C((std::bit_ceil(smax_u48) == smin_u48));
+    C((std::bit_ceil(smax_u64) == smin_u64));
+    C((std::bit_ceil(smin_u8 ) == smin_u8 ));
+    C((std::bit_ceil(smin_u16) == smin_u16));
+    C((std::bit_ceil(smin_u24) == smin_u24));
+    C((std::bit_ceil(smin_u32) == smin_u32));
+    C((std::bit_ceil(smin_u48) == smin_u48));
+    C((std::bit_ceil(smin_u64) == smin_u64));
+    return 0;
+}
 
-    C((std::bit_floor(zero_u8 ) == val_0 ));
-    C((std::bit_floor(zero_u16) == val_0 ));
-    C((std::bit_floor(zero_u24) == val_0 ));
-    C((std::bit_floor(zero_u32) == val_0 ));
-    C((std::bit_floor(zero_u48) == val_0 ));
-    C((std::bit_floor(zero_u64) == val_0 ));
+int test_bit_floor(void) {
+    C((std::bit_floor(zero_u8 ) == zero_u8 ));
+    C((std::bit_floor(zero_u16) == zero_u16));
+    C((std::bit_floor(zero_u24) == zero_u24));
+    C((std::bit_floor(zero_u32) == zero_u32));
+    C((std::bit_floor(zero_u48) == zero_u48));
+    C((std::bit_floor(zero_u64) == zero_u64));
+    C((std::bit_floor( one_u8 ) ==  one_u8 ));
+    C((std::bit_floor( one_u16) ==  one_u16));
+    C((std::bit_floor( one_u24) ==  one_u24));
+    C((std::bit_floor( one_u32) ==  one_u32));
+    C((std::bit_floor( one_u48) ==  one_u48));
+    C((std::bit_floor( one_u64) ==  one_u64));
+    C((std::bit_floor(umax_u8 ) == smin_u8 ));
+    C((std::bit_floor(umax_u16) == smin_u16));
+    C((std::bit_floor(umax_u24) == smin_u24));
+    C((std::bit_floor(umax_u32) == smin_u32));
+    C((std::bit_floor(umax_u48) == smin_u48));
+    C((std::bit_floor(umax_u64) == smin_u64));
+    C((std::bit_floor(smax_u8 ) == smin_u8  >> 1));
+    C((std::bit_floor(smax_u16) == smin_u16 >> 1));
+    C((std::bit_floor(smax_u24) == smin_u24 >> 1));
+    C((std::bit_floor(smax_u32) == smin_u32 >> 1));
+    C((std::bit_floor(smax_u48) == smin_u48 >> 1));
+    C((std::bit_floor(smax_u64) == smin_u64 >> 1));
+    C((std::bit_floor(smin_u8 ) == smin_u8 ));
+    C((std::bit_floor(smin_u16) == smin_u16));
+    C((std::bit_floor(smin_u24) == smin_u24));
+    C((std::bit_floor(smin_u32) == smin_u32));
+    C((std::bit_floor(smin_u48) == smin_u48));
+    C((std::bit_floor(smin_u64) == smin_u64));
+    return 0;
+}
 
+int test_popcount(void) {
     C((std::popcount(zero_u8 ) == val_0 ));
     C((std::popcount(zero_u16) == val_0 ));
     C((std::popcount(zero_u24) == val_0 ));
     C((std::popcount(zero_u32) == val_0 ));
     C((std::popcount(zero_u48) == val_0 ));
     C((std::popcount(zero_u64) == val_0 ));
-    C((std::popcount(ones_u8 ) == val_8 ));
-    C((std::popcount(ones_u16) == val_16));
-    C((std::popcount(ones_u24) == val_24));
-    C((std::popcount(ones_u32) == val_32));
-    C((std::popcount(ones_u48) == val_48));
-    C((std::popcount(ones_u64) == val_64));
+    C((std::popcount( one_u8 ) == val_1 ));
+    C((std::popcount( one_u16) == val_1 ));
+    C((std::popcount( one_u24) == val_1 ));
+    C((std::popcount( one_u32) == val_1 ));
+    C((std::popcount( one_u48) == val_1 ));
+    C((std::popcount( one_u64) == val_1 ));
+    C((std::popcount(umax_u8 ) == val_8 ));
+    C((std::popcount(umax_u16) == val_16));
+    C((std::popcount(umax_u24) == val_24));
+    C((std::popcount(umax_u32) == val_32));
+    C((std::popcount(umax_u48) == val_48));
+    C((std::popcount(umax_u64) == val_64));
+    C((std::popcount(smax_u8 ) == val_7 ));
+    C((std::popcount(smax_u16) == val_15));
+    C((std::popcount(smax_u24) == val_23));
+    C((std::popcount(smax_u32) == val_31));
+    C((std::popcount(smax_u48) == val_47));
+    C((std::popcount(smax_u64) == val_63));
+    C((std::popcount(smin_u8 ) == val_1 ));
+    C((std::popcount(smin_u16) == val_1 ));
+    C((std::popcount(smin_u24) == val_1 ));
+    C((std::popcount(smin_u32) == val_1 ));
+    C((std::popcount(smin_u48) == val_1 ));
+    C((std::popcount(smin_u64) == val_1 ));
     return 0;
 }
 
@@ -281,7 +461,7 @@ static inline bool verify_bit_ceil(void) {
     return true;
 }
 
-int test_bit_ceil(void) {
+int extra_test_bit_ceil(void) {
     C((verify_bit_ceil<uint8_t>()));
     C((verify_bit_ceil<uint16_t>()));
     C((verify_bit_ceil<uint24_t>()));
@@ -311,7 +491,7 @@ static inline bool verify_bit_floor(void) {
     return true;
 }
 
-int test_bit_floor(void) {
+int extra_test_bit_floor(void) {
     C((verify_bit_floor<uint8_t>()));
     C((verify_bit_floor<uint16_t>()));
     C((verify_bit_floor<uint24_t>()));
@@ -362,9 +542,16 @@ int run_tests(void) {
     int ret = 0;
     TEST(test_byteswap());
     TEST(test_stdbit());
-    TEST(test_cxxbit_edge_cases());
+    TEST(test_countl_zero());
+    TEST(test_countl_one());
+    TEST(test_countr_zero());
+    TEST(test_countr_one());
+    TEST(test_bit_width());
     TEST(test_bit_ceil());
     TEST(test_bit_floor());
+    TEST(test_popcount());
+    TEST(extra_test_bit_ceil());
+    TEST(extra_test_bit_floor());
     TEST(test_rotate());
     return ret;
 }

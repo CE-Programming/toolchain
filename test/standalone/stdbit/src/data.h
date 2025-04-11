@@ -17,12 +17,33 @@ extern uint32_t zero_u32;
 extern uint48_t zero_u48;
 extern uint64_t zero_u64;
 
-extern uint8_t  ones_u8;
-extern uint16_t ones_u16;
-extern uint24_t ones_u24;
-extern uint32_t ones_u32;
-extern uint48_t ones_u48;
-extern uint64_t ones_u64;
+extern uint8_t  one_u8;
+extern uint16_t one_u16;
+extern uint24_t one_u24;
+extern uint32_t one_u32;
+extern uint48_t one_u48;
+extern uint64_t one_u64;
+
+extern uint8_t  umax_u8;
+extern uint16_t umax_u16;
+extern uint24_t umax_u24;
+extern uint32_t umax_u32;
+extern uint48_t umax_u48;
+extern uint64_t umax_u64;
+
+extern uint8_t  smin_u8;
+extern uint16_t smin_u16;
+extern uint24_t smin_u24;
+extern uint32_t smin_u32;
+extern uint48_t smin_u48;
+extern uint64_t smin_u64;
+
+extern uint8_t  smax_u8;
+extern uint16_t smax_u16;
+extern uint24_t smax_u24;
+extern uint32_t smax_u32;
+extern uint48_t smax_u48;
+extern uint64_t smax_u64;
 
 extern uint8_t val_0;
 extern uint8_t val_1;
