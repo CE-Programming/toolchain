@@ -621,7 +621,8 @@ void gfx_End(void);
  */
 gfx_sprite_t *gfx_AllocSprite(uint8_t width,
                               uint8_t height,
-                              void *(*malloc_routine)(size_t));
+                              void *(*malloc_routine)(size_t)
+                              ) __attribute__((__nonnull__(3)));
 
 /**
  * Draws a tilemap.
@@ -681,7 +682,8 @@ void gfx_TransparentTilemap_NoClip(const gfx_tilemap_t *tilemap,
  */
 uint8_t *gfx_TilePtr(const gfx_tilemap_t *tilemap,
                      uint24_t x_offset,
-                     uint24_t y_offset);
+                     uint24_t y_offset
+                     ) __attribute__((__pure__));
 
 /**
  * Gets a pointer to a particular sprite tileset index.
@@ -693,7 +695,8 @@ uint8_t *gfx_TilePtr(const gfx_tilemap_t *tilemap,
  */
 uint8_t *gfx_TilePtrMapped(const gfx_tilemap_t *tilemap,
                            uint8_t col,
-                           uint8_t row);
+                           uint8_t row
+                           ) __attribute__((__pure__));
 
 /**
  * Sets the color index that drawing routines will use
@@ -1214,12 +1217,12 @@ void gfx_PrintStringXY(const char *string, int x, int y);
 /**
  * @returns The current text cursor X position.
  */
-int gfx_GetTextX(void);
+int gfx_GetTextX(void) __attribute__((__pure__));
 
 /**
  * @returns The current text cursor Y position.
  */
-int gfx_GetTextY(void);
+int gfx_GetTextY(void) __attribute__((__pure__));
 
 /**
  * Sets the text cursor X and Y positions.
@@ -1401,8 +1404,8 @@ uint8_t gfx_RotatedScaledSprite_NoClip(const gfx_sprite_t *sprite,
  * @returns A pointer to sprite_out.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
-gfx_sprite_t *gfx_FlipSpriteX(const gfx_sprite_t *sprite_in,
-                              gfx_sprite_t *sprite_out);
+gfx_sprite_t *gfx_FlipSpriteX(const gfx_sprite_t *__restrict sprite_in,
+                              gfx_sprite_t *__restrict sprite_out);
 
 /**
  * Flips a sprite along the Y axis.
@@ -1412,8 +1415,8 @@ gfx_sprite_t *gfx_FlipSpriteX(const gfx_sprite_t *sprite_in,
  * @returns A pointer to sprite_out.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
-gfx_sprite_t *gfx_FlipSpriteY(const gfx_sprite_t *sprite_in,
-                              gfx_sprite_t *sprite_out);
+gfx_sprite_t *gfx_FlipSpriteY(const gfx_sprite_t *__restrict sprite_in,
+                              gfx_sprite_t *__restrict sprite_out);
 
 /**
  * Rotates a sprite 90 degrees clockwise.
@@ -1423,8 +1426,8 @@ gfx_sprite_t *gfx_FlipSpriteY(const gfx_sprite_t *sprite_in,
  * @returns A pointer to sprite_out.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
-gfx_sprite_t *gfx_RotateSpriteC(const gfx_sprite_t *sprite_in,
-                                gfx_sprite_t *sprite_out);
+gfx_sprite_t *gfx_RotateSpriteC(const gfx_sprite_t *__restrict sprite_in,
+                                gfx_sprite_t *__restrict sprite_out);
 
 /**
  * Rotates a sprite 90 degrees counter clockwise.
@@ -1434,8 +1437,8 @@ gfx_sprite_t *gfx_RotateSpriteC(const gfx_sprite_t *sprite_in,
  * @returns A pointer to sprite_out.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
-gfx_sprite_t *gfx_RotateSpriteCC(const gfx_sprite_t *sprite_in,
-                                 gfx_sprite_t *sprite_out);
+gfx_sprite_t *gfx_RotateSpriteCC(const gfx_sprite_t *__restrict sprite_in,
+                                 gfx_sprite_t *__restrict sprite_out);
 
 /**
  * Rotates a sprite 180 degrees.
@@ -1445,8 +1448,8 @@ gfx_sprite_t *gfx_RotateSpriteCC(const gfx_sprite_t *sprite_in,
  * @returns A pointer to sprite_out.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
-gfx_sprite_t *gfx_RotateSpriteHalf(const gfx_sprite_t *sprite_in,
-                                   gfx_sprite_t *sprite_out);
+gfx_sprite_t *gfx_RotateSpriteHalf(const gfx_sprite_t *__restrict sprite_in,
+                                   gfx_sprite_t *__restrict sprite_out);
 
 /**
  * Resizes a sprite to new dimensions.
@@ -1458,8 +1461,8 @@ gfx_sprite_t *gfx_RotateSpriteHalf(const gfx_sprite_t *sprite_in,
  * @returns A pointer to \p sprite_out.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
-gfx_sprite_t *gfx_ScaleSprite(const gfx_sprite_t *sprite_in,
-                              gfx_sprite_t *sprite_out);
+gfx_sprite_t *gfx_ScaleSprite(const gfx_sprite_t *__restrict sprite_in,
+                              gfx_sprite_t *__restrict sprite_out);
 
 /**
  * Fixed Rotation with scaling factor for sprites.
@@ -1479,8 +1482,8 @@ gfx_sprite_t *gfx_ScaleSprite(const gfx_sprite_t *sprite_in,
  * @returns A pointer to \p sprite_out.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
-gfx_sprite_t *gfx_RotateScaleSprite(const gfx_sprite_t *sprite_in,
-                                    gfx_sprite_t *sprite_out,
+gfx_sprite_t *gfx_RotateScaleSprite(const gfx_sprite_t *__restrict sprite_in,
+                                    gfx_sprite_t *__restrict sprite_out,
                                     uint8_t angle,
                                     uint8_t scale);
 
@@ -1554,7 +1557,7 @@ void gfx_SetMonospaceFont(uint8_t spacing);
  * @param[in] string Pointer to a string.
  * @note Takes into account monospacing flag.
  */
-unsigned int gfx_GetStringWidth(const char *string);
+unsigned int gfx_GetStringWidth(const char *string) __attribute__((__pure__));
 
 /**
  * Gets the pixel width of the given character.
@@ -1563,7 +1566,7 @@ unsigned int gfx_GetStringWidth(const char *string);
  * @returns Width in pixels of character.
  * @note Takes into account monospacing flag.
  */
-unsigned int gfx_GetCharWidth(const char c);
+unsigned int gfx_GetCharWidth(const char c) __attribute__((__pure__));
 
 /**
  * Sets the dimensions of the drawing window for all clipped routines.
@@ -1623,7 +1626,8 @@ void gfx_ShiftRight(uint24_t pixels);
  * @note 0 returns full white, 255 returns original color.
  */
 uint16_t gfx_Lighten(uint16_t color,
-                     uint8_t amount);
+                     uint8_t amount
+                     ) __attribute__((__const__));
 
 /**
  * Darkens a given 1555 color; useful for palette color conversions.
@@ -1634,7 +1638,8 @@ uint16_t gfx_Lighten(uint16_t color,
  * @note 0 returns full black, 255 returns original color.
  */
 uint16_t gfx_Darken(uint16_t color,
-                    uint8_t amount);
+                    uint8_t amount
+                    ) __attribute__((__const__));
 
 /**
  * Fills an area with a color.
@@ -1744,7 +1749,8 @@ gfx_rletsprite_t *gfx_ConvertToRLETSprite(const gfx_sprite_t *sprite_in,
  * @see gfx_ConvertFromRLETSprite.
  */
 gfx_rletsprite_t *gfx_ConvertToNewRLETSprite(const gfx_sprite_t *sprite_in,
-                                             void *(*malloc_routine)(size_t));
+                                             void *(*malloc_routine)(size_t)
+                                             ) __attribute__((__nonnull__(2)));
 
 /* Compatibility defines (don't use please) */
 /* @cond */
