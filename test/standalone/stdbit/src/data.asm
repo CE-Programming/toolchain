@@ -16,19 +16,76 @@ _zero_u48:
 _zero_u64:
 	db $00, $00, $00, $00, $00, $00, $00, $00
 
-	public	_ones_u8
-	public	_ones_u16
-	public	_ones_u24
-	public	_ones_u32
-	public	_ones_u48
-	public	_ones_u64
-_ones_u8:
-_ones_u16:
-_ones_u24:
-_ones_u32:
-_ones_u48:
-_ones_u64:
+	public	_one_u8
+	public	_one_u16
+	public	_one_u24
+	public	_one_u32
+	public	_one_u48
+	public	_one_u64
+_one_u8:
+_one_u16:
+_one_u24:
+_one_u32:
+_one_u48:
+_one_u64:
+	db $01, $00, $00, $00, $00, $00, $00, $00
+
+	public	_umax_u8
+	public	_umax_u16
+	public	_umax_u24
+	public	_umax_u32
+	public	_umax_u48
+	public	_umax_u64
+_umax_u8:
+_umax_u16:
+_umax_u24:
+_umax_u32:
+_umax_u48:
+_umax_u64:
 	db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+	public	_smin_u8
+	public	_smin_u16
+	public	_smin_u24
+	public	_smin_u32
+	public	_smin_u48
+	public	_smin_u64
+_smin_u64:
+	db $00
+	db $00
+_smin_u48:
+	db $00
+	db $00
+_smin_u32:
+	db $00
+_smin_u24:
+	db $00
+_smin_u16:
+	db $00
+_smin_u8:
+	db $80
+
+	public	_smax_u8
+	public	_smax_u16
+	public	_smax_u24
+	public	_smax_u32
+	public	_smax_u48
+	public	_smax_u64
+_smax_u64:
+	db $FF
+	db $FF
+_smax_u48:
+	db $FF
+	db $FF
+_smax_u32:
+	db $FF
+_smax_u24:
+	db $FF
+_smax_u16:
+	db $FF
+_smax_u8:
+	db $7F
+
 
 	public	_val_0
 _val_0:
