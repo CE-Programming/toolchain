@@ -349,15 +349,12 @@ int test_bit_ceil(void) {
     C((std::bit_ceil( one_u32) ==  one_u32));
     C((std::bit_ceil( one_u48) ==  one_u48));
     C((std::bit_ceil( one_u64) ==  one_u64));
-    // optional undefined behaviour
-#if 0
     C((std::bit_ceil(umax_u8 ) == zero_u8 ));
     C((std::bit_ceil(umax_u16) == zero_u16));
     C((std::bit_ceil(umax_u24) == zero_u24));
     C((std::bit_ceil(umax_u32) == zero_u32));
     C((std::bit_ceil(umax_u48) == zero_u48));
     C((std::bit_ceil(umax_u64) == zero_u64));
-#endif
     C((std::bit_ceil(smax_u8 ) == smin_u8 ));
     C((std::bit_ceil(smax_u16) == smin_u16));
     C((std::bit_ceil(smax_u24) == smin_u24));
