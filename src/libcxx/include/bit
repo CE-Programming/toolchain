@@ -326,44 +326,32 @@ _Tp bit_ceil(_Tp __t) noexcept;
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned char bit_ceil(unsigned char __t) noexcept {
-    return
-        (__t <= static_cast<unsigned char>(std::numeric_limits<signed char>::min()))
-        ? ((__t != 0) ? (static_cast<unsigned char>(1) << bit_width<unsigned char>(__t - 1)) : 1) : 0;
+    return ((__t < 2) ? 1 : (static_cast<unsigned char>(2) << (bit_width<unsigned char>(__t - 1) - 1)));
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned short bit_ceil(unsigned short __t) noexcept {
-    return
-        (__t <= static_cast<unsigned short>(std::numeric_limits<signed short>::min()))
-        ? ((__t != 0) ? (static_cast<unsigned short>(1) << bit_width<unsigned short>(__t - 1)) : 1) : 0;
+    return ((__t < 2) ? 1 : (static_cast<unsigned short>(2) << (bit_width<unsigned short>(__t - 1) - 1)));
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned int bit_ceil(unsigned int __t) noexcept {
-    return
-        (__t <= static_cast<unsigned int>(std::numeric_limits<signed int>::min()))
-        ? ((__t != 0) ? (static_cast<unsigned int>(1) << bit_width<unsigned int>(__t - 1)) : 1) : 0;
+    return ((__t < 2) ? 1 : (static_cast<unsigned int>(2) << (bit_width<unsigned int>(__t - 1) - 1)));
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned long bit_ceil(unsigned long __t) noexcept {
-    return
-        (__t <= static_cast<unsigned long>(std::numeric_limits<signed long>::min()))
-        ? ((__t != 0) ? (static_cast<unsigned long>(1) << bit_width<unsigned long>(__t - 1)) : 1) : 0;
+    return ((__t < 2) ? 1 : (static_cast<unsigned long>(2) << (bit_width<unsigned long>(__t - 1) - 1)));
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned __int48 bit_ceil(unsigned __int48 __t) noexcept {
-    return
-        (__t <= static_cast<unsigned __int48>(std::numeric_limits<signed __int48>::min()))
-        ? ((__t != 0) ? (static_cast<unsigned __int48>(1) << bit_width<unsigned __int48>(__t - 1)) : 1) : 0;
+    return ((__t < 2) ? 1 : (static_cast<unsigned __int48>(2) << (bit_width<unsigned __int48>(__t - 1) - 1)));
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 unsigned long long bit_ceil(unsigned long long __t) noexcept {
-    return
-        (__t <= static_cast<unsigned long long>(std::numeric_limits<signed long long>::min()))
-        ? ((__t != 0) ? (static_cast<unsigned long long>(1) << bit_width<unsigned long long>(__t - 1)) : 1) : 0;
+    return ((__t < 2) ? 1 : (static_cast<unsigned long long>(2) << (bit_width<unsigned long long>(__t - 1) - 1)));
 }
 
 //------------------------------------------------------------------------------
