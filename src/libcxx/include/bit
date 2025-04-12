@@ -289,7 +289,7 @@ int bit_width(_Tp __t) noexcept;
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
 int bit_width(unsigned char __t) noexcept {
-    return std::numeric_limits<unsigned char>::digits- __ez80_clzc(__t);
+    return std::numeric_limits<unsigned char>::digits - __ez80_clzc(__t);
 }
 
 template <> _EZCXX_NODISCARD _EZCXX_INLINE constexpr
