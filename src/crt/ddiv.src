@@ -17,10 +17,10 @@ __ddiv:
 	rla
 	push	af	; Carry = (signbit(x) != signbit(y))
 	
-	call	_f64_div
+	call	___f64_div
 	
 	pop	af, af, af, af, af
 	pop	iy, af	; restore
 	ret
 
-	extern	_f64_div
+	extern	___f64_div

@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "softfloat.h"
 
-float64_t ui64_to_f64( uint64_t a )
+float64_t __ui64_to_f64( uint64_t a )
 {
     union ui64_f64 uZ;
 

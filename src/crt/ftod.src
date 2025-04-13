@@ -24,4 +24,4 @@ __ftod:
 	pop	af, af, iy
 	ret
 
-extern __ftod_c
+	extern __ftod_c

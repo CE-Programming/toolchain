@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "softfloat.h"
 
-float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
+float64_t __f64_mulAdd( float64_t a, float64_t b, float64_t c )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;

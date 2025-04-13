@@ -25,3 +25,25 @@ _f64_pos_pi:
 	public	_f64_neg_pi
 _f64_neg_pi:
 	db $18, $2D, $44, $54, $FB, $21, $09, $C0
+
+	public	_drem_libcall
+_drem_libcall:
+	call	__frameset0
+	; push y onto the stack
+	ld	hl, (ix + 21)
+	push	hl
+	ld	hl, (ix + 18)
+	push	hl
+	ld	hl, (ix + 15)
+	push	hl
+	; load x in registers
+	ld	bc, (ix + 12)
+	ld	de, (ix + 9)
+	ld	hl, (ix + 6)
+	call	__drem
+	ld	sp, ix
+	pop	ix
+	ret
+
+	extern	__drem
+	extern	__frameset0

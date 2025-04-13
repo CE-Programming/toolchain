@@ -7,7 +7,7 @@
 __dtof:
 	; f64_ret_f32
 	push	af, iy, bc, de, hl
-	call	_f64_to_f32
+	call	___f64_to_f32
 	pop	af
 	ld	a, e
 	pop	de
@@ -15,4 +15,4 @@ __dtof:
 	pop	bc, iy, af
 	ret
 
-	extern	_f64_to_f32
+	extern	___f64_to_f32

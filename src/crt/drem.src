@@ -14,10 +14,10 @@ __drem:
 	rl	b
 	push	af	; Carry = signbit(x)
 
-	call	_f64_rem
+	call	___f64_rem
 
 	pop	af, af, af, af, af
 	pop	iy, af	; restore
 	ret
 
-	extern	_f64_rem
+	extern	___f64_rem

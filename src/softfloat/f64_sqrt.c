@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float64_t f64_sqrt( f64_param A )
+float64_t __f64_sqrt( f64_param A )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;
