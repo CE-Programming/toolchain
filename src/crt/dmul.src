@@ -17,10 +17,10 @@ __dmul:
 	rla
 	push	af	; Carry = (signbit(x) != signbit(y))
 	
-	call	_f64_mul
+	call	___f64_mul
 	
 	pop	af, af, af, af, af
 	pop	iy, af	; restore
 	ret
 
-	extern	_f64_mul
+	extern	___f64_mul

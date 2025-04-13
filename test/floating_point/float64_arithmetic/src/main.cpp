@@ -70,28 +70,53 @@ extern volatile long double f64_neg_one;
 extern volatile long double f64_pos_pi;
 extern volatile long double f64_neg_pi;
 
+extern "C" {
+long double drem_libcall(long double x, long double y);
+}
+
 int comparison_test(void) {
-    C(f64_pos_one  == f64_pos_one );
-    C(f64_neg_one  <  f64_pos_one );
-    C(f64_pos_one  >= f64_neg_one );
-    C(f64_pos_one  != f64_neg_one );
-    C(f64_pos_zero <  f64_pos_one );
-    C(f64_neg_zero >  f64_neg_one );
+    C((f64_pos_one  == f64_pos_one ));
+    C((f64_neg_one  <  f64_pos_one ));
+    C((f64_pos_one  >= f64_neg_one ));
+    C((f64_pos_one  != f64_neg_one ));
+    C((f64_pos_zero <  f64_pos_one ));
+    C((f64_neg_zero >  f64_neg_one ));
 
-    C(f64_pos_zero == f64_pos_zero);
-    C(f64_neg_zero == f64_neg_zero);
-    C(f64_pos_zero >= f64_neg_zero);
-    C(f64_neg_zero == f64_pos_zero);
+    C((f64_pos_zero == f64_pos_zero));
+    C((f64_neg_zero == f64_neg_zero));
+    C((f64_pos_zero >= f64_neg_zero));
+    C((f64_neg_zero == f64_pos_zero));
 
-    C(f64_pos_pi   == f64_pos_pi  );
-    C(f64_pos_pi   >  f64_pos_one );
-    C(f64_neg_pi   <  f64_neg_one );
-    C(f64_pos_pi   >  f64_pos_zero);
-    C(f64_neg_pi   <= f64_neg_zero);
-    C(f64_neg_pi   != f64_neg_zero);
-    C(f64_pos_pi   != f64_neg_pi  );
-    C(f64_pos_pi   >= f64_neg_pi  );
+    C((f64_pos_pi   == f64_pos_pi  ));
+    C((f64_pos_pi   >  f64_pos_one ));
+    C((f64_neg_pi   <  f64_neg_one ));
+    C((f64_pos_pi   >  f64_pos_zero));
+    C((f64_neg_pi   <= f64_neg_zero));
+    C((f64_neg_pi   != f64_neg_zero));
+    C((f64_pos_pi   != f64_neg_pi  ));
+    C((f64_pos_pi   >= f64_neg_pi  ));
     
+    /*  fmodl test */
+    long double trunc_part;
+    C((std::fmod(f64_pos_pi, f64_pos_one) == std::modf(f64_pos_pi, &trunc_part)));
+    C((trunc_part == 3.0L));
+    C((std::fmod(f64_neg_pi, f64_pos_one) == std::modf(f64_neg_pi, &trunc_part)));
+    C((trunc_part == -3.0L));
+    C((std::fmod(f64_pos_pi, f64_neg_one) == std::modf(f64_pos_pi, &trunc_part)));
+    C((trunc_part == 3.0L));
+    C((std::fmod(f64_neg_pi, f64_neg_one) == std::modf(f64_neg_pi, &trunc_part)));
+    C((trunc_part == -3.0L));
+
+    /*  drem test */
+    C((drem_libcall(f64_pos_pi, f64_pos_one) == std::modf(f64_pos_pi, &trunc_part)));
+    C((trunc_part == 3.0L));
+    C((drem_libcall(f64_neg_pi, f64_pos_one) == std::modf(f64_neg_pi, &trunc_part)));
+    C((trunc_part == -3.0L));
+    C((drem_libcall(f64_pos_pi, f64_neg_one) == std::modf(f64_pos_pi, &trunc_part)));
+    C((trunc_part == 3.0L));
+    C((drem_libcall(f64_neg_pi, f64_neg_one) == std::modf(f64_neg_pi, &trunc_part)));
+    C((trunc_part == -3.0L));
+
     return 0;
 }
 

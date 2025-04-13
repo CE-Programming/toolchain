@@ -11,6 +11,7 @@ _fmodl:
 	
 	ld	hl, (ix + 12)
 	push	hl	; x[63:48]
+	ld	a, h
 	
 	ld	hl, (ix + 9)
 	push	hl	; x[47:24]
@@ -18,14 +19,13 @@ _fmodl:
 	ld	hl, (ix + 6)
 	push	hl	; x[23:0]
 	
-	ld	a, h
 	rla
 	push	af	; Carry = signbit(x)
 
-	call	_f64_rem
+	call	___f64_rem
 	ld	sp, ix
 	pop	ix
 	ret
 
-	extern	_f64_rem
+	extern	___f64_rem
 	extern	__frameset0

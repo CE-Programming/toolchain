@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "internals.h"
 #include "softfloat.h"
 
-float64_t i32_to_f64( int32_t a )
+float64_t __i32_to_f64( int32_t a )
 {
     uint_fast64_t uiZ;
     bool sign;

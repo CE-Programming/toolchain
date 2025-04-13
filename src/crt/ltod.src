@@ -41,4 +41,4 @@ __ltod:
 	pop	af, af, iy
 	ret
 	
-	extern __ultod_c, __lneg
+	extern	__ultod_c, __lneg
