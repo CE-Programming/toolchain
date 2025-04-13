@@ -302,17 +302,6 @@ ___ez80_bswap48:
 
 	section	.text
 
-	public	___ez80_bitreverse24
-___ez80_bitreverse24:
-	pop	bc
-	ex	(sp), hl
-	push	bc
-	jp	__ibitrev
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
 	public	___ez80_bitreverse48
 ___ez80_bitreverse48:
 	pop	bc, hl, de
@@ -447,7 +436,6 @@ ___ez80_rotateright48:
 	extern	__spopcnt
 	extern	__i48popcnt
 
-	extern	__ibitrev
 	extern	__i48bitrev
 
 	extern	__i48bswap

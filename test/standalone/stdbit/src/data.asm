@@ -93,6 +93,9 @@ _val_0:
 	public	_val_1
 _val_1:
 	db 1
+	public	_val_2
+_val_2:
+	db 2
 	public	_val_7
 _val_7:
 	db 7

@@ -47,6 +47,7 @@ extern uint64_t smax_u64;
 
 extern uint8_t val_0;
 extern uint8_t val_1;
+extern uint8_t val_2;
 extern uint8_t val_7;
 extern uint8_t val_8;
 extern uint8_t val_15;

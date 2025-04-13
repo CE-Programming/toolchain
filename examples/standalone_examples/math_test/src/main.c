@@ -11,12 +11,12 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #ifdef _EZ80
 
 #   include <debug.h>
 #   include <ti/screen.h>
 #   include <ti/getcsc.h>
+#   include <ez80_builtin.h>
 
 #   if INTERACTIVE
 #       define x_printf printf
@@ -77,6 +77,7 @@ static int24_t __builtin_bitreverse24(int24_t x)
 
 #endif
 
+#ifndef _EZ80
 static int48_t __builtin_bitreverse48(int48_t x)
 {
     // return __builtin_bitreverse64(x) >> 16;
@@ -91,6 +92,20 @@ static int __builtin_popcounti48(uint48_t x)
 {
     return __builtin_popcountll(x & ((1LL << 48) - 1));
 }
+#else
+static int48_t __builtin_bitreverse48(int48_t x)
+{
+    return __ez80_bitreverse48(x);
+}
+static uint48_t __builtin_bswap48(uint48_t x)
+{
+    return __ez80_bswap48(x);
+}
+static int __builtin_popcounti48(uint48_t x)
+{
+    return __ez80_popcounti48(x);
+}
+#endif
 static int24_t iabs(int24_t x)
 {
     return x < 0 ? (int24_t)-x : x;
