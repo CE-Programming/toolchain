@@ -1,0 +1,63 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_truncl
+
+_truncl:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 9)
+	ld	a, h
+	add.s	hl, hl
+	ld	de, -1023 shl 5	; 0xFF8020
+	add.s	hl, de
+	jr	nc, .ret_zero
+;	ld	de, -52 shl 5	; 0xFFF980
+	ld	e, d
+	ld	d, $F9
+
+	add	hl, de
+	jr	c, .ret_self
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	a, h
+	neg	; carry will be set as A is not zero
+	ld	b, a
+	; UINT56_MAX
+	sbc	a, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+
+	; __i56shl
+.loop:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rla
+	djnz	.loop
+	dec	b	; b = $FF
+	ld	c, a
+	; values already on the stack
+	jp	__lland
+
+.ret_zero:
+	and	a, $80
+	ld	b, a
+	sbc	hl, hl
+	ld	c, l
+	ex	de, hl
+	sbc	hl, hl
+	ret
+
+.ret_self:
+	; already (large) integer, inf, or NaN
+	ld	bc, (iy + 9)
+	ld	de, (iy + 6)
+	ld	hl, (iy + 3)
+	ret
+
+	extern	__lland

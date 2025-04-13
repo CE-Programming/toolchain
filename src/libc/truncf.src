@@ -6,10 +6,14 @@
 
 _trunc:
 _truncf:
-	ld	iy, 0
-	add	iy, sp
-	ld	e, (iy + 6)
-	ld	bc, (iy + 3)
+	ld	hl, 6
+	add	hl, sp
+	ld	e, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	bc, (hl)
+
 	sbc	hl, hl
 	add	hl, bc	; copy BC to HL
 	add	hl, hl
