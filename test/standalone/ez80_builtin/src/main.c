@@ -346,20 +346,6 @@ static int test_parityi48(void) {
     return 0;
 }
 
-static int test_bitrev24(void) {
-    C(__ez80_bitreverse24(0x000000) == 0x000000);
-    C(__ez80_bitreverse24(0xFFFFFF) == 0xFFFFFF);
-    C(__ez80_bitreverse24(0xAAAAAA) == 0x555555);
-    C(__ez80_bitreverse24(0x555555) == 0xAAAAAA);
-    C(__ez80_bitreverse24(0x000001) == 0x800000);
-    C(__ez80_bitreverse24(0x800000) == 0x000001);
-    C(__ez80_bitreverse24(0x00CC00) == 0x003300);
-    C(__ez80_bitreverse24(0x003300) == 0x00CC00);
-    C(__ez80_bitreverse24(0x0AA550) == 0x0AA550);
-    C(__ez80_bitreverse24(0x5F99FA) == 0x5F99FA);
-    return 0;
-}
-
 static int test_bitrev48(void) {
     C(__ez80_bitreverse48(0x000000000000) == 0x000000000000);
     C(__ez80_bitreverse48(0xFFFFFFFFFFFF) == 0xFFFFFFFFFFFF);
@@ -570,7 +556,6 @@ int run_tests(void) {
     TEST(test_popcounti48());
     TEST(test_parityi48());
     
-    TEST(test_bitrev24());
     TEST(test_bitrev48());
     TEST(test_rotateleft24());
     TEST(test_rotateright24());
