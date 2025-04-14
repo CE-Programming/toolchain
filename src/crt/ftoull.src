@@ -2,12 +2,12 @@
 
 	section	.text
 
-	public	__ftoll
-__ftoll:
+	public	__ftoull
+__ftoull:
 	ld	d, a
 	push	iy, de, hl
-	call	__ftoll_c
+	call	__ftoull_c
 	pop	af, af, iy
 	ret
 
-	extern	__ftoll_c
+	extern	__ftoull_c
