@@ -2,7 +2,7 @@
 
 float remquof(float x, float y, int *quo)
 {
-    const float quotient = nearbyintf(x / y);
+    const float quotient = roundevenf(x / y);
     *quo = quotient;
     return x - quotient * y; // FIXME: accuracy
 }

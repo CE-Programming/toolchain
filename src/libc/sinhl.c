@@ -21,34 +21,32 @@
 */
 
 #include <math.h>
+#include "__float64_constants.h"
 
-#define p0 -0.630767364049772e+6f
-#define p1 -0.899127202203951e+5f
-#define p2 -0.289421135598956e+4f
-#define p3 -0.263056321339750e+2f
-#define q0 -0.630767364049772e+6f
-#define q1  0.152151737879002e+5f
-#define q2 -0.173678953558234e+3f
+#define p0 -0.630767364049772e+6L
+#define p1 -0.899127202203951e+5L
+#define p2 -0.289421135598956e+4L
+#define p3 -0.263056321339750e+2L
+#define q0 -0.630767364049772e+6L
+#define q1  0.152151737879002e+5L
+#define q2 -0.173678953558234e+3L
 
 /**
- * @remarks Minimum ulp:
- * ulp of -3  at +0x1.eec25ap-9 with ideal expf (|x| < 21.0f)
- * ulp of -18 at +0x1.0a049cp+4 with current expf (|x| < 21.0f)
+ * @remarks Approximate minimum ulp:
+ * ulp of -3 at +0x1.d535220f91000p-2 with ideal expl (|x| < 709.0)
+ * ulp of +496 at +0x1.62e428917b3fcp+9 with ideal expl (|x| >= 709.0)
  */
-float _sinhf_c(float arg) {
-    float temp, argsq, x;
-    x = fabsf(arg);
-
-    if (x < 0.5f) {
+long double sinhl(long double arg) {
+    long double temp, argsq, x;
+    x = fabsl(arg);
+	if (x < 0.5L) {
         argsq = x * x;
         temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0) * x;
         temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
-    } else if (x < 88.5f) {
-        temp = (expf(x) - expf(-x)) / 2.0f;
-    } else {
-        temp = expf(x - (float)M_LN2);
-    }
-    return copysignf(temp, arg);
+	} else if (x < 709.0L) {
+		temp = (expl(x) - expl(-x)) / 2.0L;
+	} else {
+		temp = expl(x - F64_LN2);
+	}
+    return copysignl(temp, arg);
 }
-
-double _sinh_c(double, double *) __attribute__((alias("_sinhf_c")));

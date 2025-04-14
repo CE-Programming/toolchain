@@ -172,9 +172,9 @@ double      fmod(double, double);
 float       fmodf(float, float);
 long double fmodl(long double, long double);
 
-double      frexp(double, int *);
-float       frexpf(float, int *);
-long double frexpl(long double, int *);
+double      frexp(double, int *) __attribute__((nonnull(2)));
+float       frexpf(float, int *) __attribute__((nonnull(2)));
+long double frexpl(long double, int *) __attribute__((nonnull(2)));
 
 double      hypot(double, double);
 float       hypotf(float, float);
@@ -268,9 +268,9 @@ double      remainder(double, double);
 float       remainderf(float, float);
 long double remainderl(long double, long double);
 
-double      remquo(double, double, int *);
-float       remquof(float, float, int *);
-long double remquol(long double, long double, int *);
+double      remquo(double, double, int *) __attribute__((nonnull(3)));
+float       remquof(float, float, int *) __attribute__((nonnull(3)));
+long double remquol(long double, long double, int *) __attribute__((nonnull(3)));
 
 double      rint(double);
 float       rintf(float);

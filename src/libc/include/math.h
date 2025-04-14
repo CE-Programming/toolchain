@@ -33,7 +33,6 @@
     float: _isnanf \
 )(x))
 
-
 #define isinf(x) ((int)_Generic(__math_promote(x), \
     long double: _isinfl, \
     default: _isinff, \
