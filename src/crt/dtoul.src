@@ -8,7 +8,11 @@ __dtoul:
 	; f64_ret_u32
 	push	af, iy, bc, de, hl
 	call	__dtoul_c
-	pop	af, af, bc, iy, af
+	pop	af
+	ld	a, e
+	pop	de
+	ld	e, a
+	pop	bc, iy, af
 	ret
 
 	extern	__dtoul_c
