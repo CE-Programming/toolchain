@@ -17,22 +17,19 @@
 #include <math.h>
 
 /**
- * @remarks Minimum ulp:
- * ulp of -2 at +0x1.e0000cp-11 with ideal sinhf and coshf
- * ulp of -5 at +0x1.f921b4p-6  with current sinhf coshf and ideal expf
- * ulp of -7 at +0x1.0c2064p-1  with current sinhf coshf and expf
+ * @remarks Approximate minimum ulp:
+ * ulp of -3 at -0x1.eb3e727326400p+2 assuming ideal sinhl coshl
+ * ulp of -5 at +0x1.02e0b35c71800p-2 assuming current sinhl coshl with ideal expl
  */
-float _tanhf_c(float arg) {
-    float x = fabsf(arg);
+long double tanhl(long double arg) {
+    long double x = fabsl(arg);
 
-    // result rounds to 1.0f
-    if(x > 10.0f) {
-        x = 1.0f;
+    // I think this rounds to 1.0 for float64 around 19.1
+    if (x > 21.0L) {
+        x = 1.0L;
     } else {
-        x = sinhf(x) / coshf(x);
+        x = sinhl(x) / coshl(x);
     }
 
-    return copysignf(x, arg);
+    return copysignl(x, arg);
 }
-
-double _tanh_c(double) __attribute__((alias("_tanhf_c")));
