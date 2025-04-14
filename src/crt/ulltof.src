@@ -5,7 +5,11 @@
 __ulltof:
 	push	af, iy, bc, de, hl
 	call	__ulltof_c
-	pop	af, af, af, iy, af
+	pop	af
+	ld	a, e
+	pop	de
+	ld	e, a
+	pop	bc, iy, af
 	ret
 
 	extern	__ulltof_c
