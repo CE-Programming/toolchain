@@ -16,7 +16,14 @@
 
 include $(CURDIR)/../common.mk
 
-WILDCARD_SRC = $(wildcard *.src)
+BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
+
+EZCFLAGS := -S -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
+EZCFLAGS += -D_EZ80 -isystem ../libc/include -mllvm -profile-guided-section-prefix=false
+EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
+EZCXXFLAGS += -isystem ../libc/include/c++
+
+WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
 WILDCARD_H = $(wildcard include/*.h)
 WILDCARD_HW_H = $(wildcard include/sys/*.h)
 WILDCARD_TI_H = $(wildcard include/ti/*.h)
@@ -24,7 +31,15 @@ WILDCARD_TI_H = $(wildcard include/ti/*.h)
 WILDCARD_CXX_H = $(wildcard include/c++/*)
 WILDCARD_CXX_TI_H = $(wildcard include/ti/c++/*)
 
-all:
+all: $(BUILD_SRC)
+
+build/%.c.src: %.c
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCFLAGS) $< -o $@
+
+build/%.cpp.src: %.cpp
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCXXFLAGS) $< -o $@
 
 install: $(addprefix install-,$(TARGETS))
 	$(Q)$(call MKDIR,$(INSTALL_H))
