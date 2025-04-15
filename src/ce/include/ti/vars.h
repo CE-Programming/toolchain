@@ -12,6 +12,7 @@
 #ifndef TI_VARS_H
 #define TI_VARS_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <ti/real.h>
@@ -290,6 +291,23 @@ void *os_NextSymEntry(void *entry, uint24_t *type, uint24_t *nameLength, char *n
  * @return TIOS System Error Code or 0 on success.
  */
 int os_DelSymEntry(void *entry);
+
+/**
+ * Delete a var from RAM or archive (Flash).
+ *
+ * @param[in] entry An entry as used in (or returned from) \c os_NextSymEntry or \c os_ChkFindSym.
+ */
+void os_DelVar(void *entry);
+
+/**
+ * Archive (if in RAM) or Unarchive (if in Flash) a variable.
+ *
+ * @param[in] varType The variable type ID (like \c OS_TYPE_PROT_PRGM etc.)
+ * @param[in] nameLen Length of the variable name
+ * @param[in] name Variable name
+ * @return true on success, false on failure.
+ */
+bool arcUnarcVariable(uint8_t varType, uint8_t nameLen, const char *name);
 
 /**
  * Creates an TIOS Str.

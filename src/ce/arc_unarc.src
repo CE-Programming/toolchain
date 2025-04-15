@@ -1,0 +1,75 @@
+	section	.text,"ax",@progbits
+	assume	adl = 1
+
+; bool arcUnarcVariable(uint8_t varType, uint8_t nameLen, const char *name)
+; {
+;     const int err = os_PushErrorHandler();
+;     if (err) {
+;         return false;
+;     }
+;     *(os_OP1) = varType;
+;     __builtin_memcpy((char*)(os_OP1+1), name, nameLen);
+;     *(os_OP1+1+nameLen) = '\0';
+;     asm volatile (
+;         "call 021448h"    // Arc_Unarc
+;         :
+;         : [flags] "iyl" (os_Flags)
+;         : "cc", "a", "bc", "de", "hl", "ix", "iy"
+;     );
+;     os_PopErrorHandler();
+;     return true;
+; }
+	public	_arcUnarcVariable
+_arcUnarcVariable:
+	push	ix
+	ld	hl, -6
+	call	__frameset
+	call	_os_PushErrorHandler
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, BB1_2
+	ld	(ix - 3), hl
+	ld	e, (ix + 12)
+	ld	iy, (ix + 15)
+	ld	bc, -3144199
+	ld	a, (ix + 9)
+	ld	(-3144200), a
+	or	a, a
+	sbc	hl, hl
+	ld	l, e
+	ld	(ix - 6), hl
+	push	hl
+	push	iy
+	push	bc
+	call	_memcpy
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl, -3144199
+	ld	de, (ix - 6)
+	add	hl, de
+	ld	(hl), 0
+	ld	iy, $D00080	; flags
+	call 021448h ; Arc_Unarc
+	call	_os_PopErrorHandler
+	ld	hl, (ix - 3)
+BB1_2:
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	z, BB1_4
+	ld	a, 0
+	jr	BB1_5
+BB1_4:
+	ld	a, -1
+BB1_5:
+	ld	sp, ix
+	pop	ix
+	pop	ix
+	ret
+
+	extern	_os_PushErrorHandler
+	extern	_os_PopErrorHandler
+	extern	__frameset
+	extern	_memcpy

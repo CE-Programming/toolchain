@@ -1,0 +1,59 @@
+	assume	adl = 1
+	section	.text
+
+;  void os_DelVar(void *entry)
+;  {
+;      int clobber_hl, clobber_de;
+;      unsigned int *tmp = (unsigned int *)(entry - 5);
+;      void *data = (void*)((*tmp & 0xFF) << 16 | (*tmp & 0xFF00) | (*tmp & 0xFF0000) >> 16);
+;      asm volatile (
+;          "call 021434h"    // DelVarArc
+;          : "=l" (clobber_hl),
+;            "=e" (clobber_de)
+;          : [hl] "l" (entry),
+;            [de] "e" (data),
+;            [flags] "iyl" (os_Flags)
+;          : "cc", "a", "bc", "ix", "iy"
+;      );
+;  }
+	public	_os_DelVar
+_os_DelVar:
+	push	ix
+	call	__frameset0
+	ld	iy, (ix + 9)
+	ld	de, (iy - 5)
+	ld	a, 16
+	push	de
+	pop	hl
+	ld	c, a
+	call	__ishl
+	push	hl
+	pop	iy
+	push	de
+	pop	hl
+	ld	bc, 65280
+	call	__iand
+	push	hl
+	pop	bc
+	add	iy, bc
+	ex	de, hl
+	ld	c, a
+	call	__ishru
+	push	hl
+	pop	de
+	add	iy, de
+	ld	hl, (ix + 9)
+	lea	de, iy
+	ld	iy, $D00080	; flags
+	call 021434h ; DelVarArc
+	pop	ix
+	pop	ix
+	ret
+
+	extern	__frameset
+	extern	__iand
+	extern	__frameset0
+	extern	_memcpy
+	extern	__ishl
+	extern	__ishru
+
