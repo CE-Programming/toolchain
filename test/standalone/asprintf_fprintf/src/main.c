@@ -73,7 +73,7 @@ static char const * const test_3 =
 "sprintf%%%% %%is unsafe";
 static const int pos_3 = 20;
 
-static const int pos_4 = 209;
+static const int pos_4 = 212;
 
 static char* buf = NULL;
 static FILE* file = NULL;
@@ -153,7 +153,7 @@ int boot_sprintf_tests(void) {
         "%%%.*s\n"
         "Characters:\t%c %%\n"
         "Integers:\n"
-        "%%*Decimal:\t%i %d %.6i %i %.0i %+i %i\n"
+        "%%*Decimal:\t%i %d %.6i %i %3u %+i %i\n"
         "*%%Hexadecimal:\t%x %x %X %#x\n"
         "%%*.*%%Octal:\t%o %#o %#o\n"
         "Width trick: %*d \n",
@@ -256,7 +256,7 @@ int nano_tests(void) {
         "%%%.*s\n"
         "Characters:\t%c %%\n"
         "Integers:\n"
-        "%%*Decimal:\t%i %d %.6i %i %.0i %+i %i\n"
+        "%%*Decimal:\t%i %d %.6i %i %3u %+i %i\n"
         "*%%Hexadecimal:\t%x %x %X %#x\n"
         "%%*.*%%Octal:\t%o %#o %#o\n"
         "Width trick: %*d \n",
@@ -466,6 +466,27 @@ int run_tests(void) {
 
     return 0;
 }
+
+#if 0
+static void write_letter(char c) {
+    if (isgraph(c)) {
+        fputc(c, stdout);
+        return;
+    }
+    fputc('\\', stdout);
+    switch (c) {
+        case '\0': fputc('0', stdout); return;
+        case ' ': fputc('s', stdout); return;
+        case '\n': fputc('n', stdout); return;
+        case '\t': fputc('t', stdout); return;
+        case '\v': fputc('v', stdout); return;
+        case '\r': fputc('r', stdout); return;
+        case '\f': fputc('f', stdout); return;
+        case '\b': fputc('b', stdout); return;
+        default: printf("x%02X", (unsigned int)c); return;
+    }
+}
+#endif
 
 int main(void)
 {

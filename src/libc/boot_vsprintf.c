@@ -24,7 +24,7 @@ int boot_vsnprintf(char *__restrict buffer, size_t count, const char *__restrict
 int boot_snprintf(char *__restrict buffer, size_t count, const char *__restrict format, ...) {
     va_list args;
     va_start(args, format);
-    const int ret = vsnprintf(buffer, count, format, args);
+    const int ret = boot_vsnprintf(buffer, count, format, args);
     va_end(args);
     return ret;
 }

@@ -982,15 +982,7 @@ int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
 #undef NPF_EXTRACT
 #undef NPF_WRITEBACK
 
-int _printf_c(char const *format, ...) {
-  va_list va;
-  va_start(va, format);
-  int const rv = vprintf(format, va);
-  va_end(va);
-  return rv;
-}
-
-int _vsnprintf_c(char *buffer, size_t bufsz, char const *format, va_list vlist) {
+int _vsnprintf_c(char *__restrict buffer, size_t bufsz, char const *__restrict format, va_list vlist) {
   npf_bufputc_ctx_t bufputc_ctx;
   bufputc_ctx.dst = buffer;
   bufputc_ctx.len = bufsz;
@@ -1009,36 +1001,31 @@ int _vsnprintf_c(char *buffer, size_t bufsz, char const *format, va_list vlist) 
   return n;
 }
 
-int _snprintf_c(char *buffer, size_t bufsz, const char *format, ...) {
+int _snprintf_c(char *__restrict buffer, size_t bufsz, const char *__restrict format, ...) {
   va_list va;
   va_start(va, format);
-  int const rv = vsnprintf(buffer, bufsz, format, va);
+  int const rv = _vsnprintf_c(buffer, bufsz, format, va);
   va_end(va);
   return rv;
 }
 
-int _vsprintf_c(char *buffer, const char *format, va_list vlist)
+int _vsprintf_c(char *__restrict buffer, const char *__restrict format, va_list vlist)
 {
-  return vsnprintf(buffer, (size_t)INT_MAX, format, vlist);
+  return _vsnprintf_c(buffer, (size_t)INT_MAX, format, vlist);
 }
 
-int _vprintf_c(const char *format, va_list vlist)
-{
-  return npf_vpprintf(npf_putc_std, NULL, format, vlist);
-}
-
-int _sprintf_c(char *buffer, const char *format, ...)
+int _sprintf_c(char *__restrict buffer, const char *__restrict format, ...)
 {
   va_list va;
   va_start(va, format);
-  const int ret = vsnprintf(buffer, (size_t)INT_MAX, format, va);
+  const int ret = _vsnprintf_c(buffer, (size_t)INT_MAX, format, va);
   va_end(va);
   return ret;
 }
 
 int _vasprintf_c(char **__restrict p_str, const char *__restrict format, va_list vlist) {
   *p_str = NULL;
-  int str_len = vsnprintf(NULL, 0, format, vlist);
+  int str_len = _vsnprintf_c(NULL, 0, format, vlist);
   if (str_len <= 0) {
     return str_len;
   }
@@ -1048,7 +1035,7 @@ int _vasprintf_c(char **__restrict p_str, const char *__restrict format, va_list
     // malloc failure
     return -1;
   }
-  int ret = vsnprintf(buf, buf_len, format, vlist);
+  int ret = _vsnprintf_c(buf, buf_len, format, vlist);
   if (ret <= 0) {
     free(buf);
     return ret;
@@ -1060,11 +1047,12 @@ int _vasprintf_c(char **__restrict p_str, const char *__restrict format, va_list
 int _asprintf_c(char **__restrict p_str, const char *__restrict format, ...) {
   va_list va;
   va_start(va, format);
-  const int ret = vasprintf(p_str, format, va);
+  const int ret = _vasprintf_c(p_str, format, va);
   va_end(va);
   return ret;
 }
 
+__attribute__((__always_inline__))
 int _vfprintf_c(FILE* __restrict stream, const char* __restrict format, va_list vlist)
 {
   return npf_vpprintf(npf_fputc_std, (void*)stream, format, vlist);
@@ -1074,9 +1062,23 @@ int _fprintf_c(FILE* __restrict stream, const char* __restrict format, ...)
 {
   va_list va;
   va_start(va, format);
-  const int ret = vfprintf(stream, format, va);
+  const int ret = _vfprintf_c(stream, format, va);
   va_end(va);
   return ret;
+}
+
+__attribute__((__always_inline__))
+int _vprintf_c(const char *__restrict format, va_list vlist)
+{
+  return npf_vpprintf(npf_putc_std, NULL, format, vlist);
+}
+
+int _printf_c(char const *__restrict format, ...) {
+  va_list va;
+  va_start(va, format);
+  int const rv = _vprintf_c(format, va);
+  va_end(va);
+  return rv;
 }
 
 #if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS

@@ -12,7 +12,7 @@ The OS comes with an implementation of ANSI C89 `sprintf`, which can reduce the 
 boot_sprintf
 ------------
 
-The following type specifiers are supported :code:`%s %c %d %i %u %o %x %X %p %n`. The minimum field width :code:`*`, precision :code:`.*`, alongside :code:`-+#0` and the space flag are also supported.
+The following type specifiers are supported :code:`%s %c %d %i %u %o %x %X %p %n`. The minimum field width :code:`*`, precision :code:`.*`, alongside :code:`-+#0` and the space flag are also supported. However, the precision :code:`.*` field is ignored for integers.
 
 All length modifiers :code:`hh h l ll j z t L` and floating point specifiers :code:`%f %g %e %a` are **not** supported.
 
