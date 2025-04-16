@@ -485,11 +485,16 @@ static int npf_fsplit_abs(float f, uint64_t *out_int_part, uint64_t *out_frac_pa
      grisu2 (https://bit.ly/2JgMggX) and ryu (https://bit.ly/2RLXSg0)
      are fast + precise + round, but require large lookup tables. */
 
+#if 0
   uint32_t f_bits; { // union-cast is UB, let compiler optimize byte-copy loop.
     char const *src = (char const *)&f;
     char *dst = (char *)&f_bits;
     for (unsigned i = 0; i < sizeof(f_bits); ++i) { dst[i] = src[i]; }
   }
+#else
+  uint32_t f_bits;
+  __builtin_memcpy(&f_bits, &f, sizeof(uint32_t));
+#endif
 
   int const exponent =
     ((int)((f_bits >> NPF_MANTISSA_BITS) & ((1u << NPF_EXPONENT_BITS) - 1u)) -
@@ -549,12 +554,17 @@ static int npf_fsplit_abs(float f, uint64_t *out_int_part, uint64_t *out_frac_pa
 }
 
 static int npf_ftoa_rev(char *buf, float f, char case_adj, int *out_frac_chars) {
-  uint32_t f_bits; { // union-cast is UB, let compiler optimize byte-copy loop.
-    char const *src = (char const *)&f;
-    char *dst = (char *)&f_bits;
-    for (unsigned i = 0; i < sizeof(f_bits); ++i) { dst[i] = src[i]; }
-  }
-
+  #if 0
+    uint32_t f_bits; { // union-cast is UB, let compiler optimize byte-copy loop.
+      char const *src = (char const *)&f;
+      char *dst = (char *)&f_bits;
+      for (unsigned i = 0; i < sizeof(f_bits); ++i) { dst[i] = src[i]; }
+    }
+  #else
+    uint32_t f_bits;
+    __builtin_memcpy(&f_bits, &f, sizeof(uint32_t));
+  #endif
+  
   if ((uint8_t)(f_bits >> 23) == 0xFF) {
     if (f_bits & 0x7fffff) {
       for (int i = 0; i < 3; ++i) { *buf++ = (char)("NAN"[i] + case_adj); }
