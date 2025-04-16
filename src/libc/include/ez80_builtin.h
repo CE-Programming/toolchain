@@ -11,13 +11,19 @@ extern "C" {
 #if __has_builtin(__builtin_clzc)
 #define __ez80_clzc __builtin_clzc
 #else
-unsigned char __ez80_clzc(unsigned char) __NOEXCEPT_CONST;
+static inline __attribute__((__always_inline__))
+int __ez80_clzc(unsigned char __x) __NOEXCEPT_CONST {
+    return (unsigned char)(__builtin_clzs(__x) - 8);
+}
 #endif
 
 #if __has_builtin(__builtin_clzi48)
 #define __ez80_clzi48 __builtin_clzi48
 #else
-unsigned char __ez80_clzi48(unsigned __int48) __NOEXCEPT_CONST;
+static inline __attribute__((__always_inline__))
+int __ez80_clzi48(unsigned __int48 __x) __NOEXCEPT_CONST {
+    return (unsigned char)(__builtin_clzll(__x) - 16);
+}
 #endif
 
 #if __has_builtin(__builtin_ctzc)
