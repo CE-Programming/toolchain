@@ -19,7 +19,7 @@ PREFIX = CEdev
 
 include $(CURDIR)/src/common.mk
 
-LIBS := libload graphx fontlibc keypadc fileioc usbdrvce srldrvce msddrvce fatdrvce lcddrvce
+LIBS := libload graphx fontlibc keypadc fileioc usbdrvce srldrvce msddrvce fatdrvce lcddrvce graphy
 SRCS := ce crt libc libcxx softfloat
 TOOLS := fasmg convbin convimg convfont cedev-config cedev-obj
 
