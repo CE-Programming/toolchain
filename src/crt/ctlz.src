@@ -1,0 +1,101 @@
+	assume	adl=1
+
+	section	.text
+	public	__bctlz
+__bctlz:
+	cp	a, 010h
+	jr	c, .low4
+	cp	a, 040h
+	jr	c, .low6
+	add	a, a
+	sbc	a, a
+	inc	a
+	ret
+.low6:
+	add	a, -020h
+	sbc	a, a
+	add	a, 3
+	ret
+.low4:
+	cp	a, 4
+	jr	c, .low2
+	add	a, -8
+	sbc	a, a
+	add	a, 5
+	ret
+.low2:
+	add	a, -3
+	cpl
+	adc	a, 6
+	ret
+
+	section	.text
+	public	__sctlz
+__sctlz:
+	ld	a, h
+	or	a, a
+	jr	nz, __bctlz
+	ld	a, l
+	require	__sctlz.hijack
+
+	section	.text
+	private	__sctlz.hijack
+__sctlz.hijack:
+	call	__bctlz
+	add	a, 8
+	ret
+
+	section	.text
+	public	__ictlz
+__ictlz:
+	dec	sp
+	push	hl
+	inc	sp
+	pop	af
+	or	a, a
+	jr	nz, __bctlz
+	or	a, h
+	jr	nz, __sctlz.hijack
+	ld	a, l
+	call	__bctlz
+	add	a, 16
+	ret
+
+	section	.text
+	public	__lctlz
+__lctlz:
+	ld	a, e
+	or	a, a
+	jr	nz, __bctlz
+	call	__ictlz
+	add	a, 8
+	ret
+
+	section	.text
+	public	__llctlz
+__llctlz:
+	ld	a, b
+	or	a, a
+	jr	nz, __bctlz
+	or	a, c
+	jr	nz, __sctlz.hijack
+	call	__i48ctlz
+	add	a, 16
+	ret
+
+	section	.text
+	public	__i48ctlz
+__i48ctlz:
+	ex	de, hl
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	z, .low
+	call	__ictlz
+	ex	de, hl
+	ret
+.low:
+	ex	de, hl
+	call	__ictlz
+	add	a, 24
+	ret
