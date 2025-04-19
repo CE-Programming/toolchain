@@ -105,11 +105,11 @@ __attribute__((__unused__)) static uint64_t rand64(void) {
 }
 
 static int test_clzc(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned char input;
     for (int i = 0; i < 256; i ++)  {
         input = (unsigned char)i;
-        truth = (input == 0) ? 8 : (unsigned char)(__builtin_clz((unsigned int)input) - 16);
+        truth = (input == 0) ? 8 : __builtin_clz((unsigned int)input) - 16;
         guess = __ez80_clzc(input);
         CMP("%d", input, truth, guess);
     }
@@ -117,11 +117,11 @@ static int test_clzc(void) {
 }
 
 static int test_ctzc(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned char input;
     for (int i = 0; i < 256; i++) {
         input = (unsigned char)i;
-        truth = (input == 0) ? 8 : (unsigned char)__builtin_ctz((unsigned int)input);
+        truth = (input == 0) ? 8 : __builtin_ctz((unsigned int)input);
         guess = __ez80_ctzc(input);
         CMP("%d", input, truth, guess);
     }
@@ -129,11 +129,11 @@ static int test_ctzc(void) {
 }
 
 static int test_ffsc(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned char input;
     for (int i = 0; i < 256; i++) {
         input = (unsigned char)i;
-        truth = (unsigned char)__builtin_ffs(input);
+        truth = __builtin_ffs(input);
         guess = __ez80_ffsc(input);
         CMP("%d", input, truth, guess);
     }
@@ -141,11 +141,11 @@ static int test_ffsc(void) {
 }
 
 static int test_clrsbc(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned char input;
     for (int i = 0; i < 256; i++) {
         input = (unsigned char)i;
-        truth = (unsigned char)__builtin_clrsb((signed int)((signed char)input)) - 16;
+        truth = __builtin_clrsb((signed int)((signed char)input)) - 16;
         guess = __ez80_clrsbc(input);
         CMP("%d", input, truth, guess);
     }
@@ -153,11 +153,11 @@ static int test_clrsbc(void) {
 }
 
 static int test_parityc(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned char input;
     for (int i = 0; i < 256; i++) {
         input = (unsigned char)i;
-        truth = (unsigned char)__builtin_parity((unsigned int)input);
+        truth = __builtin_parity((unsigned int)input);
         guess = __ez80_parityc(input);
         CMP("%d", input, truth, guess);
     }
@@ -165,11 +165,11 @@ static int test_parityc(void) {
 }
 
 static int test_popcountc(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned char input;
     for (int i = 0; i < 256; i++) {
         input = (unsigned char)i;
-        truth = (unsigned char)__builtin_popcount((unsigned int)input);
+        truth = __builtin_popcount((unsigned int)input);
         guess = __ez80_popcountc(input);
         CMP("%d", input, truth, guess);
     }
@@ -177,7 +177,7 @@ static int test_popcountc(void) {
 }
 
 static int test_ffss(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned short input;
     CMP("%d", 0, 0, __ez80_ffss(0));
     CMP("%d", 1, 1, __ez80_ffss(1));
@@ -186,7 +186,7 @@ static int test_ffss(void) {
     CMP("%d", USHRT_MAX, 1, __ez80_ffss(USHRT_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand16();
-        truth = (unsigned char)__builtin_ffs((int)input);
+        truth = __builtin_ffs((int)input);
         guess = __ez80_ffss(input);
         CMP("%d", input, truth, guess);
     }
@@ -194,7 +194,7 @@ static int test_ffss(void) {
 }
 
 static int test_clrsbs(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned short input;
     CMP("%d", 0, 15, __ez80_clrsbs(0));
     CMP("%d", 1, 14, __ez80_clrsbs(1));
@@ -203,7 +203,7 @@ static int test_clrsbs(void) {
     CMP("%d", USHRT_MAX, 15, __ez80_clrsbs(USHRT_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand16();
-        truth = (unsigned char)__builtin_clrsb((signed int)((signed short)input)) - 8;
+        truth = __builtin_clrsb((signed int)((signed short)input)) - 8;
         guess = __ez80_clrsbs(input);
         CMP("%d", input, truth, guess);
     }
@@ -211,7 +211,7 @@ static int test_clrsbs(void) {
 }
 
 static int test_popcounts(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned short input;
     CMP("%d", 0, 0, __ez80_popcounts(0));
     CMP("%d", 1, 1, __ez80_popcounts(1));
@@ -220,7 +220,7 @@ static int test_popcounts(void) {
     CMP("%d", USHRT_MAX, 16, __ez80_popcounts(USHRT_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand16();
-        truth = (unsigned char)__builtin_popcount((unsigned int)input);
+        truth = __builtin_popcount((unsigned int)input);
         guess = __ez80_popcounts(input);
         CMP("%d", input, truth, guess);
     }
@@ -228,7 +228,7 @@ static int test_popcounts(void) {
 }
 
 static int test_paritys(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     unsigned short input;
     CMP("%d", 0, false, __ez80_paritys(0));
     CMP("%d", 1, true, __ez80_paritys(1));
@@ -237,7 +237,7 @@ static int test_paritys(void) {
     CMP("%d", USHRT_MAX, false, __ez80_paritys(USHRT_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand16();
-        truth = __ez80_paritys(input) % 2;
+        truth = __ez80_popcounts(input) % 2;
         guess = __ez80_paritys(input);
         CMP("%d", input, (int)truth, (int)guess);
     }
@@ -245,7 +245,7 @@ static int test_paritys(void) {
 }
 
 static int test_clzi48(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     uint48_t input;
     CMP("%012llX", (uint64_t)0, 48, __ez80_clzi48((uint48_t)0));
     CMP("%012llX", (uint64_t)1, 47, __ez80_clzi48((uint48_t)1));
@@ -254,7 +254,7 @@ static int test_clzi48(void) {
     CMP("%012llX", (uint64_t)UINT48_MAX, 0, __ez80_clzi48(UINT48_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand48();
-        truth = (input == 0) ? 48 : (unsigned char)(__builtin_clzll((unsigned long long)input) - 16);
+        truth = (input == 0) ? 48 : __builtin_clzll((unsigned long long)input) - 16;
         guess = __ez80_clzi48(input);
         CMP("%012llX", (uint64_t)input, truth, guess);
     }
@@ -262,7 +262,7 @@ static int test_clzi48(void) {
 }
 
 static int test_ctzi48(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     uint48_t input;
     CMP("%012llX", (uint64_t)0, 48, __ez80_ctzi48((uint48_t)0));
     CMP("%012llX", (uint64_t)1, 0, __ez80_ctzi48((uint48_t)1));
@@ -271,7 +271,7 @@ static int test_ctzi48(void) {
     CMP("%012llX", (uint64_t)UINT48_MAX, 0, __ez80_ctzi48(UINT48_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand48();
-        truth = (input == 0) ? 48 : (unsigned char)(__builtin_ctzll((unsigned long long)input));
+        truth = (input == 0) ? 48 : __builtin_ctzll((unsigned long long)input);
         guess = __ez80_ctzi48(input);
         CMP("%012llX", (uint64_t)input, truth, guess);
     }
@@ -279,7 +279,7 @@ static int test_ctzi48(void) {
 }
 
 static int test_ffsi48(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     uint48_t input;
     CMP("%012llX", (uint64_t)0, 0, __ez80_ffsi48((uint48_t)0));
     CMP("%012llX", (uint64_t)1, 1, __ez80_ffsi48((uint48_t)1));
@@ -288,7 +288,7 @@ static int test_ffsi48(void) {
     CMP("%012llX", (uint64_t)UINT48_MAX, 1, __ez80_ffsi48(UINT48_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand48();
-        truth = (unsigned char)__builtin_ffsll((unsigned long long)input);
+        truth = __builtin_ffsll((unsigned long long)input);
         guess = __ez80_ffsi48(input);
         CMP("%012llX", (uint64_t)input, truth, guess);
     }
@@ -296,7 +296,7 @@ static int test_ffsi48(void) {
 }
 
 static int test_clrsbi48(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     uint48_t input;
     CMP("%012llX", (uint64_t)0, 47, __ez80_clrsbi48((uint48_t)0));
     CMP("%012llX", (uint64_t)1, 46, __ez80_clrsbi48((uint48_t)1));
@@ -305,7 +305,7 @@ static int test_clrsbi48(void) {
     CMP("%012llX", (uint64_t)UINT48_MAX, 47, __ez80_clrsbi48(UINT48_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand48();
-        truth = (unsigned char)__builtin_clrsbll((signed long long)((signed __int48)input)) - 16;
+        truth = __builtin_clrsbll((signed long long)((signed __int48)input)) - 16;
         guess = __ez80_clrsbi48(input);
         CMP("%012llX", (uint64_t)input, truth, guess);
     }
@@ -313,7 +313,7 @@ static int test_clrsbi48(void) {
 }
 
 static int test_popcounti48(void) {
-    unsigned char truth, guess;
+    int truth, guess;
     uint48_t input;
     CMP("%012llX", (uint64_t)0, 0, __ez80_popcounti48((uint48_t)0));
     CMP("%012llX", (uint64_t)1, 1, __ez80_popcounti48((uint48_t)1));
@@ -322,7 +322,7 @@ static int test_popcounti48(void) {
     CMP("%012llX", (uint64_t)UINT48_MAX, 48, __ez80_popcounti48(UINT48_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand48();
-        truth = (unsigned char)__builtin_popcountll((unsigned long long)input);
+        truth = __builtin_popcountll((unsigned long long)input);
         guess = __ez80_popcounti48(input);
         CMP("%012llX", (uint64_t)input, truth, guess);
     }
@@ -330,7 +330,7 @@ static int test_popcounti48(void) {
 }
 
 static int test_parityi48(void) {
-    bool truth, guess;
+    int truth, guess;
     uint48_t input;
     CMP("%012llX", (uint64_t)0, false, __ez80_parityi48((uint48_t)0));
     CMP("%012llX", (uint64_t)1, true, __ez80_parityi48((uint48_t)1));

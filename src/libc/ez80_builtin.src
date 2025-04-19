@@ -4,44 +4,20 @@
 
 	section	.text
 
-	public	___ez80_clzc
-___ez80_clzc:
-	ld	hl, 3
-	add	hl, sp
-	ld	a, (hl)
-	jp	__bctlz
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
-	public	___ez80_clzi48
-___ez80_clzi48:
-	ld	hl, 6
-	add	hl, sp
-	ld	de, (hl)
-	dec	hl
-	dec	hl
-	dec	hl
-	ld	hl, (hl)
-	jp	__i48ctlz
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
 	public	___ez80_ctzc
 ___ez80_ctzc:
 	; unoptimized
 	ld	hl, 3
 	add	hl, sp
-	ld	a, (hl)
-	ld	l, a
-	cpl
-	dec	l
+	ld	l, (hl)
+	xor	a, a
+	sub	a, l
 	and	a, l
-	ld	l, a
-	jp	__bpopcnt
+	call	__bctlz
+	bit	3, a
+	ret	nz
+	xor	a, 7
+	ret
 
 ;-------------------------------------------------------------------------------
 
@@ -50,19 +26,23 @@ ___ez80_ctzc:
 	public	___ez80_ctzi48
 ___ez80_ctzi48:
 	; unoptimized
+	ld	hl, 3
+	add	hl, sp
+	ld	bc, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	iy, (hl)
+	sbc	hl, hl
+	add	hl, bc
+	lea	de, iy
+	call	__i48neg
+	call	__i48and
+	call	__i48ctlz
+	cpl
+	add	a, 48
+	ret	p
 	ld	a, 48
-	ld	iy, 0
-	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	de, (iy + 6)
-	call	__i48cmpzero
-	ret	z
-	ld	bc, (iy + 3)
-	ld	iy, (iy + 6)
-	call	__i48sub_1
-	call	__i48xor
-	call	__i48popcnt
-	dec	a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -74,13 +54,14 @@ ___ez80_ffsc:
 	; unoptimized
 	ld	hl, 3
 	add	hl, sp
-	ld	a, (hl)
-	or	a, a
-	ret	z
-	ld	l, a
-	dec	l
-	xor	a, l
-	jp	__bpopcnt
+	ld	l, (hl)
+	xor	a, a
+	sub	a, l
+	and	a, l
+	call	__bctlz
+	cpl
+	add	a, 9
+	ret
 
 ;-------------------------------------------------------------------------------
 	
@@ -92,21 +73,21 @@ ___ez80_ffss:
 	ld	hl, 3
 	add	hl, sp
 	ld	hl, (hl)
-	xor	a, a
-	or	a, h
-	or	a, l
-	ret	z
+	; HL & -HL
 	ld	b, h
 	ld	c, l
-	dec	bc
-	;	HL ^ (HL - 1)
+	sbc	hl, hl
+	sbc	hl, bc
 	ld	a, h
-	xor	a, b
+	and	a, b
 	ld	h, a
 	ld	a, l
-	xor	a, c
+	and	a, c
 	ld	l, a
-	jp	__spopcnt
+	call	__sctlz
+	cpl
+	add	a, 17
+	ret
 
 ;-------------------------------------------------------------------------------
 
@@ -115,18 +96,22 @@ ___ez80_ffss:
 	public	___ez80_ffsi48
 ___ez80_ffsi48:
 	; unoptimized
-	xor	a, a
-	ld	iy, 0
-	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	de, (iy + 6)
-	call	__i48cmpzero
-	ret	z
-	ld	bc, (iy + 3)
-	ld	iy, (iy + 6)
-	call	__i48sub_1
-	call	__i48xor
-	jp	__i48popcnt
+	ld	hl, 3
+	add	hl, sp
+	ld	bc, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	iy, (hl)
+	sbc	hl, hl
+	add	hl, bc
+	lea	de, iy
+	call	__i48neg
+	call	__i48and
+	call	__i48ctlz
+	cpl
+	add	a, 49
+	ret
 
 ;-------------------------------------------------------------------------------
 
@@ -134,17 +119,15 @@ ___ez80_ffsi48:
 
 	public	___ez80_clrsbc
 ___ez80_clrsbc:
-	; unoptimized
 	ld	hl, 3
 	add	hl, sp
 	ld	a, (hl)
-	rlca
-	sbc	hl, hl
+	add	a, a
+	ld	l, a
+	sbc	a, a
 	xor	a, l
-	rrca	
-	call	__bctlz
-	dec	a
-	ret
+	set	0, a
+	jp	__bctlz
 
 ;-------------------------------------------------------------------------------
 	
@@ -156,12 +139,10 @@ ___ez80_clrsbs:
 	ld	hl, 3
 	add	hl, sp
 	ld	hl, (hl)
-	ld	a, h
-	rla
+	add.s	hl, hl
 	call	c, __snot
-	call	__sctlz
-	dec	a
-	ret
+	set	0, l
+	jp	__sctlz
 
 ;-------------------------------------------------------------------------------
 
@@ -169,22 +150,20 @@ ___ez80_clrsbs:
 
 	public	___ez80_clrsbi48
 ___ez80_clrsbi48:
-	; unoptimized
-	ld	hl, 8
+	ld	hl, 6
 	add	hl, sp
-	ld	a, (hl)
-	dec	hl
-	dec	hl
 	ld	de, (hl)
 	dec	hl
 	dec	hl
 	dec	hl
 	ld	hl, (hl)
-	rla
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
 	call	c, __i48not
-	call	__i48ctlz
-	dec	a
-	ret
+	set	0, l
+	jp	__i48ctlz
 
 ;-------------------------------------------------------------------------------
 
@@ -207,13 +186,14 @@ ___ez80_parityc:
 
 	public	___ez80_paritys
 ___ez80_paritys:
-	; unoptimized
 	ld	hl, 3
 	add	hl, sp
-	ld	hl, (hl)
-	call	__spopcnt
-	rrca
-	sbc	a, a
+	ld	a, (hl)
+	inc	hl
+	xor	a, (hl)
+	ld	a, 0
+	ret	pe
+	dec	a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -222,17 +202,17 @@ ___ez80_paritys:
 
 	public	___ez80_parityi48
 ___ez80_parityi48:
-	; unoptimized
-	ld	hl, 6
+	ld	hl, 3
 	add	hl, sp
-	ld	de, (hl)
-	dec	hl
-	dec	hl
-	dec	hl
-	ld	hl, (hl)
-	call	__i48popcnt
-	rrca
-	sbc	a, a
+	ld	a, (hl)
+	ld	b, 5
+.loop:
+	inc	hl
+	xor	a, (hl)
+	djnz	.loop
+	ld	a, b
+	ret	pe
+	dec	a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -278,14 +258,16 @@ ___ez80_popcounti48:
 
 	public	___ez80_bswap24
 ___ez80_bswap24:
-	; unoptimized
-	ld	iy, 0
-	add	iy, sp
-	ld	h, (iy + 3)
-	ld	l, (iy + 5)
-	ld	(iy + 3), l
-	ld	(iy + 5), h
-	ld	hl, (iy + 3)
+	ld	hl, 1
+	add	hl, sp
+	ld	de, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	d, (hl)
+	inc	hl
+	ld	e, (hl)
+	ex	de, hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -424,9 +406,8 @@ ___ez80_rotateright48:
 
 	extern	__snot
 	extern	__i48not
-	extern	__i48xor
-	extern	__i48cmpzero
-	extern	__i48sub_1
+	extern	__i48and
+	extern	__i48neg
 
 	extern	__bctlz
 	extern	__sctlz
