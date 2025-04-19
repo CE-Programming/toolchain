@@ -36,11 +36,11 @@ _ilogbf:
 	sbc	hl, de
 	jr	z, .ret_zero
 	call	__ictlz
-	; Carry flag will be set at the end of __ictlz
-;	scf
-	sbc	hl, hl
-	neg
-	add	a, 129
+	ex	de, hl
+	;	DE was zero, so HL is now zero
+	dec	hl
+	cpl
+	add	a, 130
 	ld	l, a
 	ret
 
