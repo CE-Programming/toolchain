@@ -58,8 +58,8 @@ _frexpf:
 	ld	(iy + 3), hl
 	scf
 	sbc	hl, hl
-	neg
-	add	a, 130	; 127 + 3? idk where this magic number comes from
+	cpl
+	add	a, 131	; 127 + 3 + 1? idk where this magic number comes from
 	ld	l, a
 	ld	a, b	; exponent
 	xor	a, $3F
