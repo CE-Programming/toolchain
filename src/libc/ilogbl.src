@@ -41,11 +41,11 @@ _ilogbl:
 	cp	a, 64
 	sbc	hl, hl
 	jr	z, .ret_zero	; A was 64
-	neg
+	cpl
 	ld	l, a
-	; -1023 + 11 + 1
+	; -1023 + 11 + 1 + 1
 	; Float64_ilogb_subnorm_max + Float64_exponent_bits + Float64_sign_bits
-	ld	de, -1011
+	ld	de, -1010
 	add	hl, de
 	ret
 
