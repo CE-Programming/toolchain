@@ -13,7 +13,7 @@
  * commands, which may or may not work on all Ti84CE models.
  */
 
-// #define GRAPHY_LCDDRVCE
+#define GRAPHY_LCDDRVCE
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -386,39 +386,6 @@ static const int8_t gfy_SineTable[65] = {
 #endif
 
 //------------------------------------------------------------------------------
-// column major routines
-//------------------------------------------------------------------------------
-
-#ifdef GRAPHY_LCDDRVCE
-
-static void gfy_InitColumnMajor(void) {
-    lcd_Init();
-    lcd_SendCommand1(LCD_CMD_MADCTL, 0b00001000);
-    lcd_SendSizedCommandWords(CASET, 2, 0, 239);
-    lcd_SendSizedCommandWords(RASET, 2, 0, 319);
-}
-
-static void gfy_RestoreRowMajor(void) {
-    lcd_SendCommand1(LCD_CMD_MADCTL, 0b00101000);
-    lcd_SendSizedCommandWords(CASET, 2, 0, 319);
-    lcd_SendSizedCommandWords(RASET, 2, 0, 239);
-    lcd_Cleanup();
-}
-
-#else 
-
-static void gfy_InitColumnMajor(void) {
-    boot_InitializeHardware();
-    SPI_COLUMN_MAJOR();
-}
-
-static void gfy_RestoreRowMajor(void) {
-    SPI_ROW_MAJOR();
-}
-
-#endif
-
-//------------------------------------------------------------------------------
 // internal routines
 //------------------------------------------------------------------------------
 
@@ -460,13 +427,12 @@ __attribute__((unused)) static uint8_t gfy_Cos(uint8_t theta) {
 void gfy_internal_Begin(void);
 
 void gfy_Begin(void) {
+    lcd_Init();
     gfy_internal_Begin();
-    
-    lcd_VideoMode = lcd_BGR8bit;
-    
-    gfy_InitColumnMajor();
-
-    lcd_VideoMode = lcd_BGR8bit;
+    lcd_SetRamAccessOrder(LCD_MADCTL_DEFAULT ^ LCD_MV);
+    lcd_SetColumnAddress(0, 239);
+    lcd_SetRowAddress(0, 319);
+    lcd_Cleanup();
 }
 
 /* gfy_End */
@@ -474,13 +440,12 @@ void gfy_Begin(void) {
 void gfy_internal_End(void);
 
 void gfy_End(void) {
-    gfy_RestoreRowMajor();
-
-    lcd_VideoMode = lcd_BGR16bit;
-
+    lcd_Init();
+    lcd_SetRamAccessOrder(LCD_MADCTL_DEFAULT);
+    lcd_SetColumnAddress(0, 319);
+    lcd_SetRowAddress(0, 239);
+    lcd_Cleanup();
     gfy_internal_End();
-
-    lcd_VideoMode = lcd_BGR16bit;
 }
 
 /* gfy_SetColor (graphy.asm) */
@@ -548,6 +513,7 @@ void gfy_BlitLines(gfy_location_t src, uint8_t y_loc, uint8_t num_lines) {
 /* gfy_BlitLines */
 
 void gfy_BlitColumns(gfy_location_t src, uint24_t x_loc, uint24_t num_columns) {
+    gfy_Wait();
     const uint8_t *src_buf = gfy_vram;
     uint8_t *dst_buf = gfy_vram + (GFY_LCD_HEIGHT * GFY_LCD_WIDTH);
     if (src) {
@@ -568,6 +534,7 @@ void gfy_BlitRectangle(
     uint24_t width,
     uint24_t height
 ) {
+    gfy_Wait();
     const uint8_t *src_buf = gfy_vram;
     uint8_t *dst_buf = gfy_vram + (GFY_LCD_HEIGHT * GFY_LCD_WIDTH);
     if (src) {
@@ -616,6 +583,7 @@ static void gfy_internal_PrintChar_NoClip(const char c, const uint8_t charWidth)
 /* gfy_PrintChar */
 
 void gfy_PrintChar(const char c) {
+    gfy_Wait();
     const uint8_t charWidth = gfy_GetCharWidth(c);
     const uint8_t textSizeX = charWidth * gfy_TextWidthScale;
     const uint8_t textSizeY = GFY_MAXIMUM_FONT_HEIGHT * gfy_TextHeightScale;
@@ -1201,6 +1169,7 @@ bool gfy_GetClipRegion(gfy_region_t *region) {
 
 void gfy_ShiftDown(uint8_t pixels) {
     if (pixels == 0) { return; }
+    gfy_Wait();
     const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (gfy_ClipYMin + (int24_t)pixels) + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     const int24_t copySize = gfy_ClipYMax - gfy_ClipYMin - (int24_t)pixels;
@@ -1218,6 +1187,7 @@ void gfy_ShiftDown(uint8_t pixels) {
 
 void gfy_ShiftUp(uint8_t pixels) {
     if (pixels == 0) { return; }
+    gfy_Wait();
     const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (gfy_ClipYMin - (int24_t)pixels) + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     const int24_t copySize = gfy_ClipYMax - gfy_ClipYMin - (int24_t)pixels;
@@ -1235,6 +1205,7 @@ void gfy_ShiftUp(uint8_t pixels) {
 
 void gfy_ShiftLeft(uint24_t pixels) {
     if (pixels == 0) { return; }
+    gfy_Wait();
     const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + ((gfy_ClipXMin - (int24_t)pixels) * GFY_LCD_HEIGHT);
     const size_t copySize = gfy_ClipYMax - gfy_ClipYMin;
@@ -1253,6 +1224,7 @@ void gfy_ShiftLeft(uint24_t pixels) {
 
 void gfy_ShiftRight(uint24_t pixels) {
     if (pixels == 0) { return; }
+    gfy_Wait();
     const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + ((gfy_ClipXMin - (int24_t)pixels) * GFY_LCD_HEIGHT);
     const size_t copySize = gfy_ClipYMax - gfy_ClipYMin;
@@ -1380,6 +1352,8 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
     if (draw_sizeX == 0 || draw_sizeY == 0) {
         return;
     }
+
+    gfy_Wait();
     
     /* Debugging */ const uint24_t map_size = tilemap->width * tilemap->height;
 
@@ -1448,6 +1422,7 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
 /* gfy_Tilemap_NoClip */
 
 void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_t y_offset) {
+    gfy_Wait();
     uint24_t map_row = x_offset / tilemap->tile_width;
     uint24_t map_col = y_offset / tilemap->tile_height;
     
@@ -1657,6 +1632,7 @@ void gfy_Sprite(const gfy_sprite_t *restrict sprite, int24_t x, int24_t y) {
         gfy_Sprite_NoClip(sprite, (uint24_t)x, (uint8_t)y);
         return;
     }
+    gfy_Wait();
     const uint8_t min_clipX = (x < gfy_ClipXMin) ? (gfy_ClipXMin - x) : 0;
     const uint8_t min_clipY = (y < gfy_ClipYMin) ? (gfy_ClipYMin - y) : 0;
     const uint8_t max_clipX = ((x + sprite->width) > gfy_ClipXMax) ? ((x + sprite->width) - gfy_ClipXMax) : 0;
@@ -1696,6 +1672,7 @@ void gfy_TransparentSprite(const gfy_sprite_t *restrict sprite, int24_t x, int24
         gfy_TransparentSprite_NoClip(sprite, (uint24_t)x, (uint8_t)y);
         return;
     }
+    gfy_Wait();
     const uint8_t min_clipX = (x < gfy_ClipXMin) ? (gfy_ClipXMin - x) : 0;
     const uint8_t min_clipY = (y < gfy_ClipYMin) ? (gfy_ClipYMin - y) : 0;
     const uint8_t max_clipX = ((x + sprite->width) > gfy_ClipXMax) ? ((x + sprite->width) - gfy_ClipXMax) : 0;
@@ -1723,6 +1700,7 @@ void gfy_TransparentSprite(const gfy_sprite_t *restrict sprite, int24_t x, int24
 /* gfy_Sprite_NoClip */
 
 void gfy_Sprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t y) {
+    gfy_Wait();
     const uint8_t* src_buf = sprite->data;
     uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + y + (x * GFY_LCD_HEIGHT);
     
@@ -1736,6 +1714,7 @@ void gfy_Sprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t 
 /* gfy_TransparentSprite_NoClip */
 
 void gfy_TransparentSprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t y) {
+    gfy_Wait();
     const uint8_t* src_buf = sprite->data;
     uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + y + (x * GFY_LCD_HEIGHT);
     const uint24_t dst_jump = GFY_LCD_HEIGHT - sprite->height;
@@ -1776,6 +1755,7 @@ void gfy_ScaledSprite_NoClip(
     if (width_scale == 0 || height_scale == 0) {
         return;
     }
+    gfy_Wait();
     const uint8_t* src_buf = sprite->data;
     uint8_t* buf_start = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + y + (x * GFY_LCD_HEIGHT);
     uint8_t* dst_buf = buf_start;
@@ -1822,6 +1802,7 @@ void gfy_ScaledTransparentSprite_NoClip(
     if (width_scale == 0 || height_scale == 0) {
         return;
     }
+    gfy_Wait();
     const uint8_t* src_buf = sprite->data;
     uint8_t* buf_start = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + y + (x * GFY_LCD_HEIGHT);
     uint8_t* dst_buf = buf_start;
@@ -2388,6 +2369,7 @@ void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24
         gfy_RLETSprite_NoClip(sprite, (uint24_t)x, (uint8_t)y);
         return;
     }
+    gfy_Wait();
 
     // Naive clipping method
     const uint8_t* src_buf = sprite->data;
@@ -2447,6 +2429,7 @@ void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24
 /* gfy_RLETSprite_NoClip */
 
 void gfy_RLETSprite_NoClip(const gfy_rletsprite_t *sprite, const uint24_t x, const uint8_t y) {
+    gfy_Wait();
     const uint8_t* src_buf = sprite->data;
     uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (y + (GFY_LCD_HEIGHT * x));
     const uint24_t dst_jump = GFY_LCD_HEIGHT - sprite->height;
@@ -2520,6 +2503,7 @@ void gfy_CopyRectangle(
     uint24_t dst_x, uint8_t dst_y,
     uint24_t width, uint8_t height
 ) {
+    gfy_Wait();
     const uint8_t* src_buf = (src == gfy_screen) ?
         (uint8_t*)RAM_ADDRESS(lcd_UpBase) : (uint8_t*)RAM_ADDRESS(lcd_LpBase);
     uint8_t* dst_buf = (dst == gfy_screen) ?

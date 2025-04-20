@@ -37,6 +37,7 @@ file_data = file_data.replace(b"\tsection", b";\tsection")
 
 file_data = file_data.replace(b"_gfy_", b"gfy_")
 file_data = file_data.replace(b"_GFY_", b"GFY_")
+file_data = file_data.replace(b"_lcd_", b"lcd_")
 
 if (len(file_data) < 10):
     print("Error: Output is empty")
