@@ -3814,65 +3814,6 @@ _ConvertToRLETSprite_RowEnd:
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
-_LZ_ReadVarSize: ; COPIED_FROM_GRAPHX
-; LZ Decompression Subroutine (DEPRECATED)
-	push	ix
-	ld	ix,0
-	lea	de,ix
-	add	ix,sp
-	lea	hl,ix-12
-	ld	sp,hl
-	ld	(ix-3),de
-	ld	(ix-6),de
-.loop:
-	or	a,a
-	sbc	hl,hl
-	ex	de,hl
-	ld	hl,(ix+9)
-	ld	a,(hl)
-	or	a,a
-	sbc	hl,hl
-	ld	l,a
-	ld	(ix-9),hl
-	ld	bc,(ix+9)
-	inc	bc
-	ld	(ix+9),bc
-	ld	a,(ix-9)
-	and	a,127
-	sbc	hl,hl
-	ld	l,a
-	ld	(ix-12),hl
-	ld	hl,(ix-3)
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	push	hl
-	pop	bc
-	ld	hl,(ix-12)
-	call	ti._ior
-	ld	(ix-3),hl
-	ld	bc,(ix-6)
-	inc	bc
-	ld	(ix-6),bc
-	ld	a,(ix-9)
-	and	a,128
-	sbc	hl,hl
-	ld	l,a
-	sbc	hl,de
-	jr	nz,.loop
-	ld	hl,(ix+6)
-	ld	bc,(ix-3)
-	ld	(hl),bc
-	ld	hl,(ix-6)
-	ld	sp,ix
-	pop	ix
-	ret
-
-;-------------------------------------------------------------------------------
 _Maximum: ; COPIED_FROM_GRAPHX
 ; Calculate the resut of a signed comparison
 ; Inputs:
