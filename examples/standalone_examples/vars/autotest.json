@@ -1,0 +1,76 @@
+{
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|1000",
+    "hashWait|1",
+    "delay|100",
+    "key|enter",
+    "delay|250",
+    "hashWait|2",
+    "delay|100",
+    "key|enter",
+    "delay|250",
+    "hashWait|3",
+    "delay|100",
+    "key|enter",
+    "delay|250",
+    "hashWait|4",
+    "delay|100",
+    "key|enter",
+    "delay|250",
+    "hashWait|5"
+  ],
+  "hashes": {
+    "1": {
+      "description": "Before creating list",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "8118A4A8"
+      ]
+    },
+    "2": {
+      "description": "After creating list",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "D74C55F7"
+      ]
+    },
+    "3": {
+      "description": "After archiving list",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "D4DD64A8"
+      ]
+    },
+    "4": {
+      "description": "After deleting list",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "472EC618"
+      ]
+    },
+    "5": {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "FFAF89BA",
+        "101734A5",
+        "9DA19F44",
+        "A32840C8",
+        "349F4775"
+      ]
+    }
+  }
+}
