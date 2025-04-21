@@ -20,6 +20,8 @@ This library exposes interfaces to send any supported command to the LCD (this e
 Communication with the LCD controller is done over an SPI connection; however, the SPI hardware is also used to communicate with the ARM coprocessor on Python models.
 As such, the SPI hardware is not always set up properly to communicate with the LCD controller, and this library exists to provide a reliable and performant interface to the LCD across calculator models.
 
+For additional information about the LCD controller and its commands, check out the documentation on `WikiTI <https://wikiti.brandonw.net/index.php?title=84PCE:LCD_Controller>`__.
+
 Library Initialization
 ----------------------
 
