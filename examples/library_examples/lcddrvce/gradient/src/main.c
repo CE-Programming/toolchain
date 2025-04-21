@@ -17,10 +17,10 @@ int main(void)
     /* Switch RAM access to SPI and display mode to MCU */
     lcd_SetRamInterface(LCD_RAM_SPI | LCD_DM_MCU);
     /* Set 18bpp pixel format */
-    lcd_SetPixelFormat(LCD_RGB_18BPP | LCD_MCU_18BPP);
+    lcd_SetPixelFormat(LCD_SPI_18BPP | LCD_RGB_DEFAULT);
 
     /* Start RAM write command */
-    lcd_SendCommand(LCD_CMD_RAMWR);
+    lcd_StartPixelWrite();
 
     /* Generate and display gradient patterns */
     DrawGradient(0x040404);
