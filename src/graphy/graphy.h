@@ -586,6 +586,23 @@ gfy_ConvertToNewRLETSprite(sprite_in, malloc)
         2 + gfy_GetZX7SpriteWidth(_Sprite) * gfy_GetZX7SpriteHeight(_Sprite); \
     })
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
+# define GRAPHY_NOEXCEPT noexcept
+#else /* __cplusplus */
+# define GRAPHY_NOEXCEPT __attribute__((__nothrow__, __leaf__))
+#endif /* __cplusplus */
+#define GRAPHY_PURE GRAPHY_NOEXCEPT __attribute__((__pure__))
+#define GRAPHY_CONST GRAPHY_NOEXCEPT __attribute__((__const__))
+#define GRAPHY_NONNULL(...) __attribute__((__nonnull__(__VA_ARGS__)))
+#define GRAPHY_NONNULL_IF_NONZERO(...) __attribute__((__nonnull_if_nonzero__(__VA_ARGS__)))
+#define GRAPHY_RETURNS_NONNULL __attribute__((__returns_nonnull__))
+#define GRAPHY_STRING_ARG(...) __attribute__((__null_terminated_string_arg__(__VA_ARGS__), __nonnull__(__VA_ARGS__)))
+#if 0
+# define GRAPHY_ALLOCATOR __attribute__((__malloc__))
+#else
+# define GRAPHY_ALLOCATOR
+#endif
+
 /**
  * Initializes the `graphy` library context.
  *
@@ -622,10 +639,11 @@ void gfy_End(void);
  * @param[in] malloc_routine Malloc implementation to use.
  * @return A pointer to the allocated sprite.
  */
-gfy_sprite_t *gfy_AllocSprite(uint8_t width,
-                              uint8_t height,
-                              void *(*malloc_routine)(size_t)
-                              ) __attribute__((__nonnull__(3)));
+gfy_sprite_t *gfy_AllocSprite(
+    uint8_t width,
+    uint8_t height,
+    void *(*malloc_routine)(size_t)
+) GRAPHY_ALLOCATOR GRAPHY_NONNULL(3);
 
 /**
  * Draws a tilemap.
@@ -635,9 +653,11 @@ gfy_sprite_t *gfy_AllocSprite(uint8_t width,
  * @param[in] y_offset Offset in pixels from the top of the tilemap.
  * @see gfy_tilemap_t.
  */
-void gfy_Tilemap(const gfy_tilemap_t *tilemap,
-                 uint24_t x_offset,
-                 uint24_t y_offset);
+void gfy_Tilemap(
+    const gfy_tilemap_t *tilemap,
+    uint24_t x_offset,
+    uint24_t y_offset
+) GRAPHY_NONNULL(1);
 
 /**
  * Draws an unclipped tilemap.
@@ -647,9 +667,11 @@ void gfy_Tilemap(const gfy_tilemap_t *tilemap,
  * @param[in] y_offset Offset in pixels from the top of the tilemap.
  * @see gfy_tilemap_t.
  */
-void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap,
-                            uint24_t x_offset,
-                            uint24_t y_offset);
+void gfy_Tilemap_NoClip(
+    const gfy_tilemap_t *tilemap,
+    uint24_t x_offset,
+    uint24_t y_offset
+) GRAPHY_NONNULL(1);
 
 /**
  * Draws a transparent tilemap.
@@ -659,9 +681,11 @@ void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap,
  * @param[in] y_offset Offset in pixels from the top of the tilemap.
  * @see gfy_tilemap_t.
  */
-void gfy_TransparentTilemap(const gfy_tilemap_t *tilemap,
-                            uint24_t x_offset,
-                            uint24_t y_offset);
+void gfy_TransparentTilemap(
+    const gfy_tilemap_t *tilemap,
+    uint24_t x_offset,
+    uint24_t y_offset
+) GRAPHY_NONNULL(1);
 
 /**
  * Draws an unclipped transparent tilemap.
@@ -671,9 +695,11 @@ void gfy_TransparentTilemap(const gfy_tilemap_t *tilemap,
  * @param[in] y_offset Offset in pixels from the top of the tilemap.
  * @see gfy_tilemap_t.
  */
-void gfy_TransparentTilemap_NoClip(const gfy_tilemap_t *tilemap,
-                                   uint24_t x_offset,
-                                   uint24_t y_offset);
+void gfy_TransparentTilemap_NoClip(
+    const gfy_tilemap_t *tilemap,
+    uint24_t x_offset,
+    uint24_t y_offset
+) GRAPHY_NONNULL(1);
 
 /**
  * Gets a pointer to a particular sprite tileset index.
@@ -683,10 +709,24 @@ void gfy_TransparentTilemap_NoClip(const gfy_tilemap_t *tilemap,
  * @param[in] x_offset Offset in pixels from the left of the tilemap.
  * @param[in] y_offset Offset in pixels from the top of the tilemap.
  */
-uint8_t *gfy_TilePtr(const gfy_tilemap_t *tilemap,
-                     uint24_t x_offset,
-                     uint24_t y_offset
-                     ) __attribute__((__pure__));
+uint8_t *gfy_TilePtr(
+    const gfy_tilemap_t *tilemap,
+    uint24_t x_offset,
+    uint24_t y_offset
+) GRAPHY_PURE GRAPHY_NONNULL(1) GRAPHY_RETURNS_NONNULL;
+
+static inline __attribute__((__always_inline__))
+uint8_t *inline_gfy_TilePtr(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_t y_offset) {
+    if (__builtin_constant_p(tilemap) && __builtin_constant_p(x_offset) && __builtin_constant_p(y_offset)) {
+        uint24_t map_row = x_offset / tilemap->tile_width;
+        uint24_t map_col = y_offset / tilemap->tile_height;
+        uint24_t map_index = map_row + (map_col * tilemap->width);
+        return &(tilemap->map[map_index]);
+    }
+    return gfy_TilePtr(tilemap, x_offset, y_offset);
+}
+
+#define gfy_TilePtr(tilemap, x_offset, y_offset) inline_gfy_TilePtr(tilemap, x_offset, y_offset)
 
 /**
  * Gets a pointer to a particular sprite tileset index.
@@ -696,10 +736,10 @@ uint8_t *gfy_TilePtr(const gfy_tilemap_t *tilemap,
  * @param[in] col Column of tile in tilemap.
  * @param[in] row Row of tile in tilemap.
  */
-uint8_t *gfy_TilePtrMapped(const gfy_tilemap_t *tilemap,
-                           uint8_t col,
-                           uint8_t row
-                           ) __attribute__((__pure__));
+static inline __attribute__((__always_inline__))
+uint8_t *gfy_TilePtrMapped(const gfy_tilemap_t *tilemap, uint8_t col, uint8_t row) {
+    return &(tilemap->map[row + (col * tilemap->width)]);
+}
 
 /**
  * Sets the color index that drawing routines will use
@@ -733,9 +773,11 @@ void gfy_SetDefaultPalette(gfy_mode_t mode);
  * @param[in] size Size of palette in bytes.
  * @param[in] offset Palette index to insert at.
  */
-void gfy_SetPalette(const void *palette,
-                    uint24_t size,
-                    uint8_t offset);
+void gfy_SetPalette(
+    const void *palette,
+    uint24_t size,
+    uint8_t offset
+) GRAPHY_NONNULL(1);
 
 /**
  * Fills the screen with a given palette index.
@@ -778,10 +820,13 @@ uint8_t gfy_GetPixel(uint24_t x, uint8_t y);
  * @param[in] x1 Second X coordinate.
  * @param[in] y1 Second Y coordinate.
  */
-void gfy_Line(int x0,
-              int y0,
-              int x1,
-              int y1);
+void gfy_Line(
+    int24_t x0,
+    int24_t y0,
+    int24_t x1,
+    int24_t y1
+);
+
 
 /**
  * Draws an unclipped line.
@@ -791,10 +836,12 @@ void gfy_Line(int x0,
  * @param[in] x1 Second X coordinate.
  * @param[in] y1 Second Y coordinate.
  */
-void gfy_Line_NoClip(uint24_t x0,
-                     uint8_t y0,
-                     uint24_t x1,
-                     uint8_t y1);
+void gfy_Line_NoClip(
+    uint24_t x0,
+    uint8_t y0,
+    uint24_t x1,
+    uint8_t y1
+);
 
 /**
  * Draws a horizontal line.
@@ -804,9 +851,11 @@ void gfy_Line_NoClip(uint24_t x0,
  * @param[in] y Y coordinate.
  * @param[in] length Length of line.
  */
-void gfy_HorizLine(int x,
-                   int y,
-                   int length);
+void gfy_HorizLine(
+    int24_t x,
+    int24_t y,
+    int24_t length
+);
 
 /**
  * Draws an unclipped horizontal line.
@@ -816,9 +865,11 @@ void gfy_HorizLine(int x,
  * @param[in] y Y coordinate.
  * @param[in] length Length of line.
  */
-void gfy_HorizLine_NoClip(uint24_t x,
-                          uint8_t y,
-                          uint24_t length);
+void gfy_HorizLine_NoClip(
+    uint24_t x,
+    uint8_t y,
+    uint24_t length
+);
 
 /**
  * Draws a vertical line
@@ -828,9 +879,11 @@ void gfy_HorizLine_NoClip(uint24_t x,
  * @param[in] y Y coordinate
  * @param[in] length Length of line
  */
-void gfy_VertLine(int x,
-                  int y,
-                  int length);
+void gfy_VertLine(
+    int24_t x,
+    int24_t y,
+    int24_t length
+);
 
 /**
  * Draws an unclipped vertical line.
@@ -840,9 +893,11 @@ void gfy_VertLine(int x,
  * @param[in] y Y coordinate.
  * @param[in] length Length of line.
  */
-void gfy_VertLine_NoClip(uint24_t x,
-                         uint8_t y,
-                         uint24_t length);
+void gfy_VertLine_NoClip(
+    uint24_t x,
+    uint8_t y,
+    uint24_t length
+);
 
 /**
  * Draws a rectangle outline.
@@ -852,10 +907,12 @@ void gfy_VertLine_NoClip(uint24_t x,
  * @param[in] width Width of rectangle.
  * @param[in] height Height of rectangle.
  */
-void gfy_Rectangle(int x,
-                   int y,
-                   int width,
-                   int height);
+ void gfy_Rectangle(
+    int24_t x,
+    int24_t y,
+    int24_t width,
+    int24_t height
+);
 
 /**
  * Draws an unclipped rectangle outline.
@@ -865,10 +922,12 @@ void gfy_Rectangle(int x,
  * @param[in] width Width of rectangle.
  * @param[in] height Height of rectangle.
  */
-void gfy_Rectangle_NoClip(uint24_t x,
-                          uint8_t y,
-                          uint24_t width,
-                          uint8_t height);
+void gfy_Rectangle_NoClip(
+    uint24_t x,
+    uint8_t y,
+    uint24_t width,
+    uint8_t height
+);
 
 /**
  * Draws a filled rectangle.
@@ -878,10 +937,12 @@ void gfy_Rectangle_NoClip(uint24_t x,
  * @param[in] width Width of rectangle.
  * @param[in] height Height of rectangle.
  */
-void gfy_FillRectangle(int x,
-                       int y,
-                       int width,
-                       int height);
+void gfy_FillRectangle(
+    int24_t x,
+    int24_t y,
+    int24_t width,
+    int24_t height
+);
 
 /**
  * Draws an unclipped filled rectangle
@@ -891,10 +952,12 @@ void gfy_FillRectangle(int x,
  * @param[in] width Width of rectangle
  * @param[in] height Height of rectangle
  */
-void gfy_FillRectangle_NoClip(uint24_t x,
-                              uint8_t y,
-                              uint24_t width,
-                              uint8_t height);
+void gfy_FillRectangle_NoClip(
+    uint24_t x,
+    uint8_t y,
+    uint24_t width,
+    uint8_t height
+);
 
 /**
  * Draws a circle outline.
@@ -903,9 +966,11 @@ void gfy_FillRectangle_NoClip(uint24_t x,
  * @param[in] y Y coordinate.
  * @param[in] radius The radius of the circle.
  */
-void gfy_Circle(int x,
-                int y,
-                uint24_t radius);
+void gfy_Circle(
+    int24_t x,
+    int24_t y,
+    uint24_t radius
+);
 
 /**
  * Draws a filled circle.
@@ -914,9 +979,11 @@ void gfy_Circle(int x,
  * @param[in] y Y coordinate.
  * @param[in] radius The radius of the circle.
  */
-void gfy_FillCircle(int x,
-                    int y,
-                    uint24_t radius);
+void gfy_FillCircle(
+    int24_t x,
+    int24_t y,
+    uint24_t radius
+);
 
 /**
  * Draws an unclipped filled circle.
@@ -925,9 +992,11 @@ void gfy_FillCircle(int x,
  * @param[in] y Y coordinate.
  * @param[in] radius The radius of the circle.
  */
-void gfy_FillCircle_NoClip(uint24_t x,
-                           uint8_t y,
-                           uint24_t radius);
+void gfy_FillCircle_NoClip(
+    uint24_t x,
+    uint8_t y,
+    uint24_t radius
+);
 
 /**
  * Draws an unclipped filled ellipse.
@@ -973,7 +1042,7 @@ void gfy_Ellipse(int24_t x, int24_t y, uint24_t a, uint24_t b);
  * Draws a clipped polygon outline.
  *
  * @code{.cpp}
- * int points[6] = {
+ * int24_t points[6] = {
  *                    160,  1,  // (x0, y0)
  *                    1,  238,  // (x1, y1)
  *                    318,238,  // (x2, y2)
@@ -984,13 +1053,13 @@ void gfy_Ellipse(int24_t x, int24_t y, uint24_t a, uint24_t b);
  * @param[in] points Pointer to x and y pairs.
  * @param[in] num_points Number of x and y pairs.
  */
-void gfy_Polygon(const int *points, unsigned num_points);
+void gfy_Polygon(const int24_t *points, size_t num_points) GRAPHY_NONNULL(1);
 
 /**
  * Draws an unclipped polygon outline
  *
  * @code{.cpp}
- * int points[6] = {
+ * int24_t points[6] = {
  *                    160,  1,  // (x0, y0)
  *                    1,  238,  // (x1, y1)
  *                    318,238,  // (x2, y2)
@@ -1002,7 +1071,7 @@ void gfy_Polygon(const int *points, unsigned num_points);
  * @param[in] points Pointer to x and y pairs
  * @param[in] num_points Number of x and y pairs
  */
-void gfy_Polygon_NoClip(const int *points, unsigned num_points);
+void gfy_Polygon_NoClip(const int24_t *points, size_t num_points) GRAPHY_NONNULL(1);
 
 /**
  * Draws a clipped filled triangle.
@@ -1014,12 +1083,14 @@ void gfy_Polygon_NoClip(const int *points, unsigned num_points);
  * @param[in] x2 Third X coordinate.
  * @param[in] y2 Third Y coordinate.
  */
-void gfy_FillTriangle(int x0,
-                      int y0,
-                      int x1,
-                      int y1,
-                      int x2,
-                      int y2);
+void gfy_FillTriangle(
+    int24_t x0,
+    int24_t y0,
+    int24_t x1,
+    int24_t y1,
+    int24_t x2,
+    int24_t y2
+);
 
 /**
  * Draws a unclipped filled triangle.
@@ -1031,12 +1102,14 @@ void gfy_FillTriangle(int x0,
  * @param[in] x2 Third X coordinate.
  * @param[in] y2 Third Y coordinate.
  */
-void gfy_FillTriangle_NoClip(int x0,
-                             int y0,
-                             int x1,
-                             int y1,
-                             int x2,
-                             int y2);
+void gfy_FillTriangle_NoClip(
+    int24_t x0,
+    int24_t y0,
+    int24_t x1,
+    int24_t y1,
+    int24_t x2,
+    int24_t y2
+);
 
 /**
  * Forces all graphics routines draw location.
@@ -1052,7 +1125,7 @@ void gfy_SetDraw(uint8_t location);
  * @returns Location type enumeration.
  * @see gfy_location_t.
  */
-uint8_t gfy_GetDraw(void);
+uint8_t gfy_GetDraw(void) GRAPHY_PURE;
 
 /**
  * Swaps the roles of the screen and drawing buffers.
@@ -1104,11 +1177,13 @@ void gfy_Blit(gfy_location_t src);
  * @param[in] height Height of rectangle.
  * @see gfy_location_t.
  */
-void gfy_BlitRectangle(gfy_location_t src,
-                       uint24_t x,
-                       uint8_t y,
-                       uint24_t width,
-                       uint24_t height);
+void gfy_BlitRectangle(
+    gfy_location_t src,
+    uint24_t x,
+    uint8_t y,
+    uint24_t width,
+    uint24_t height
+);
 
 /**
  * Copies lines from the input buffer to the opposite buffer.
