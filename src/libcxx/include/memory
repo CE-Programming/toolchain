@@ -7,7 +7,7 @@
 namespace std {
 
 template <class _Tp>
-inline _Tp* addressof(_Tp& __x) noexcept {
+constexpr inline _Tp* addressof(_Tp& __x) noexcept {
     return __builtin_addressof(__x);
 }
 

@@ -75,23 +75,23 @@ C((!iszero     (std::numeric_limits<long double>::denorm_min())));
 
 /* MIN */
 
-C((!signbit    (std::numeric_limits<long double>::min())));
-C((!issignaling(std::numeric_limits<long double>::min())));
-C((!isnan      (std::numeric_limits<long double>::min())));
-C((!isinf      (std::numeric_limits<long double>::min())));
-C(( isfinite   (std::numeric_limits<long double>::min())));
-C(( isnormal   (std::numeric_limits<long double>::min())));
-C((!issubnormal(std::numeric_limits<long double>::min())));
-C((!iszero     (std::numeric_limits<long double>::min())));
+C((!signbit    (std::numeric_limits<float>::min())));
+C((!issignaling(std::numeric_limits<float>::min())));
+C((!isnan      (std::numeric_limits<float>::min())));
+C((!isinf      (std::numeric_limits<float>::min())));
+C(( isfinite   (std::numeric_limits<float>::min())));
+C(( isnormal   (std::numeric_limits<float>::min())));
+C((!issubnormal(std::numeric_limits<float>::min())));
+C((!iszero     (std::numeric_limits<float>::min())));
 
-C((!signbit    (std::numeric_limits<long double>::min())));
-C((!issignaling(std::numeric_limits<long double>::min())));
-C((!isnan      (std::numeric_limits<long double>::min())));
-C((!isinf      (std::numeric_limits<long double>::min())));
-C(( isfinite   (std::numeric_limits<long double>::min())));
-C(( isnormal   (std::numeric_limits<long double>::min())));
-C((!issubnormal(std::numeric_limits<long double>::min())));
-C((!iszero     (std::numeric_limits<long double>::min())));
+C((!signbit    (std::numeric_limits<double>::min())));
+C((!issignaling(std::numeric_limits<double>::min())));
+C((!isnan      (std::numeric_limits<double>::min())));
+C((!isinf      (std::numeric_limits<double>::min())));
+C(( isfinite   (std::numeric_limits<double>::min())));
+C(( isnormal   (std::numeric_limits<double>::min())));
+C((!issubnormal(std::numeric_limits<double>::min())));
+C((!iszero     (std::numeric_limits<double>::min())));
 
 C((!signbit    (std::numeric_limits<long double>::min())));
 C((!issignaling(std::numeric_limits<long double>::min())));
@@ -191,23 +191,23 @@ C((!iszero     (3.1415926535897932384626433832795L)));
 
 /* MAX */
 
-C((!signbit    (std::numeric_limits<long double>::max())));
-C((!issignaling(std::numeric_limits<long double>::max())));
-C((!isnan      (std::numeric_limits<long double>::max())));
-C((!isinf      (std::numeric_limits<long double>::max())));
-C(( isfinite   (std::numeric_limits<long double>::max())));
-C(( isnormal   (std::numeric_limits<long double>::max())));
-C((!issubnormal(std::numeric_limits<long double>::max())));
-C((!iszero     (std::numeric_limits<long double>::max())));
+C((!signbit    (std::numeric_limits<float>::max())));
+C((!issignaling(std::numeric_limits<float>::max())));
+C((!isnan      (std::numeric_limits<float>::max())));
+C((!isinf      (std::numeric_limits<float>::max())));
+C(( isfinite   (std::numeric_limits<float>::max())));
+C(( isnormal   (std::numeric_limits<float>::max())));
+C((!issubnormal(std::numeric_limits<float>::max())));
+C((!iszero     (std::numeric_limits<float>::max())));
 
-C((!signbit    (std::numeric_limits<long double>::max())));
-C((!issignaling(std::numeric_limits<long double>::max())));
-C((!isnan      (std::numeric_limits<long double>::max())));
-C((!isinf      (std::numeric_limits<long double>::max())));
-C(( isfinite   (std::numeric_limits<long double>::max())));
-C(( isnormal   (std::numeric_limits<long double>::max())));
-C((!issubnormal(std::numeric_limits<long double>::max())));
-C((!iszero     (std::numeric_limits<long double>::max())));
+C((!signbit    (std::numeric_limits<double>::max())));
+C((!issignaling(std::numeric_limits<double>::max())));
+C((!isnan      (std::numeric_limits<double>::max())));
+C((!isinf      (std::numeric_limits<double>::max())));
+C(( isfinite   (std::numeric_limits<double>::max())));
+C(( isnormal   (std::numeric_limits<double>::max())));
+C((!issubnormal(std::numeric_limits<double>::max())));
+C((!iszero     (std::numeric_limits<double>::max())));
 
 C((!signbit    (std::numeric_limits<long double>::max())));
 C((!issignaling(std::numeric_limits<long double>::max())));
@@ -369,23 +369,23 @@ C((!iszero     (-std::numeric_limits<long double>::denorm_min())));
 
 /* MIN */
 
-C(( signbit    (-std::numeric_limits<long double>::min())));
-C((!issignaling(-std::numeric_limits<long double>::min())));
-C((!isnan      (-std::numeric_limits<long double>::min())));
-C((!isinf      (-std::numeric_limits<long double>::min())));
-C(( isfinite   (-std::numeric_limits<long double>::min())));
-C(( isnormal   (-std::numeric_limits<long double>::min())));
-C((!issubnormal(-std::numeric_limits<long double>::min())));
-C((!iszero     (-std::numeric_limits<long double>::min())));
+C(( signbit    (-std::numeric_limits<float>::min())));
+C((!issignaling(-std::numeric_limits<float>::min())));
+C((!isnan      (-std::numeric_limits<float>::min())));
+C((!isinf      (-std::numeric_limits<float>::min())));
+C(( isfinite   (-std::numeric_limits<float>::min())));
+C(( isnormal   (-std::numeric_limits<float>::min())));
+C((!issubnormal(-std::numeric_limits<float>::min())));
+C((!iszero     (-std::numeric_limits<float>::min())));
 
-C(( signbit    (-std::numeric_limits<long double>::min())));
-C((!issignaling(-std::numeric_limits<long double>::min())));
-C((!isnan      (-std::numeric_limits<long double>::min())));
-C((!isinf      (-std::numeric_limits<long double>::min())));
-C(( isfinite   (-std::numeric_limits<long double>::min())));
-C(( isnormal   (-std::numeric_limits<long double>::min())));
-C((!issubnormal(-std::numeric_limits<long double>::min())));
-C((!iszero     (-std::numeric_limits<long double>::min())));
+C(( signbit    (-std::numeric_limits<double>::min())));
+C((!issignaling(-std::numeric_limits<double>::min())));
+C((!isnan      (-std::numeric_limits<double>::min())));
+C((!isinf      (-std::numeric_limits<double>::min())));
+C(( isfinite   (-std::numeric_limits<double>::min())));
+C(( isnormal   (-std::numeric_limits<double>::min())));
+C((!issubnormal(-std::numeric_limits<double>::min())));
+C((!iszero     (-std::numeric_limits<double>::min())));
 
 C(( signbit    (-std::numeric_limits<long double>::min())));
 C((!issignaling(-std::numeric_limits<long double>::min())));
@@ -485,23 +485,23 @@ C((!iszero     (-3.1415926535897932384626433832795L)));
 
 /* MAX */
 
-C(( signbit    (-std::numeric_limits<long double>::max())));
-C((!issignaling(-std::numeric_limits<long double>::max())));
-C((!isnan      (-std::numeric_limits<long double>::max())));
-C((!isinf      (-std::numeric_limits<long double>::max())));
-C(( isfinite   (-std::numeric_limits<long double>::max())));
-C(( isnormal   (-std::numeric_limits<long double>::max())));
-C((!issubnormal(-std::numeric_limits<long double>::max())));
-C((!iszero     (-std::numeric_limits<long double>::max())));
+C(( signbit    (-std::numeric_limits<float>::max())));
+C((!issignaling(-std::numeric_limits<float>::max())));
+C((!isnan      (-std::numeric_limits<float>::max())));
+C((!isinf      (-std::numeric_limits<float>::max())));
+C(( isfinite   (-std::numeric_limits<float>::max())));
+C(( isnormal   (-std::numeric_limits<float>::max())));
+C((!issubnormal(-std::numeric_limits<float>::max())));
+C((!iszero     (-std::numeric_limits<float>::max())));
 
-C(( signbit    (-std::numeric_limits<long double>::max())));
-C((!issignaling(-std::numeric_limits<long double>::max())));
-C((!isnan      (-std::numeric_limits<long double>::max())));
-C((!isinf      (-std::numeric_limits<long double>::max())));
-C(( isfinite   (-std::numeric_limits<long double>::max())));
-C(( isnormal   (-std::numeric_limits<long double>::max())));
-C((!issubnormal(-std::numeric_limits<long double>::max())));
-C((!iszero     (-std::numeric_limits<long double>::max())));
+C(( signbit    (-std::numeric_limits<double>::max())));
+C((!issignaling(-std::numeric_limits<double>::max())));
+C((!isnan      (-std::numeric_limits<double>::max())));
+C((!isinf      (-std::numeric_limits<double>::max())));
+C(( isfinite   (-std::numeric_limits<double>::max())));
+C(( isnormal   (-std::numeric_limits<double>::max())));
+C((!issubnormal(-std::numeric_limits<double>::max())));
+C((!iszero     (-std::numeric_limits<double>::max())));
 
 C(( signbit    (-std::numeric_limits<long double>::max())));
 C((!issignaling(-std::numeric_limits<long double>::max())));
