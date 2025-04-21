@@ -14,13 +14,13 @@ library LCDDRVCE, 0
 	export lcd_Init
 	export lcd_Cleanup
 	export lcd_Wait
-	export lcd_SendCommandRaw
+	export lcd_SendSizedCommandRaw
 	export lcd_SendParamsRaw
 	export lcd_SendCommand
 	export lcd_SendCommand1
 	export lcd_SendCommand2
-	export lcd_SendCommandBytes
-	export lcd_SendCommandWords
+	export lcd_SendSizedCommandBytes
+	export lcd_SendSizedCommandWords
 	export lcd_SetUniformGamma
 	export lcd_SetDefaultGamma
 
@@ -134,14 +134,14 @@ _Gamma:
 	; Set positive gamma
 	ld bc, (14 shl 8) or $E0
 	push bc
-	call lcd_SendCommandRaw.entry
+	call lcd_SendSizedCommandRaw.entry
 	; Set negative gamma
 	ex de, hl
 	pop bc
 	inc c
-	jr lcd_SendCommandRaw.entry
+	jr lcd_SendSizedCommandRaw.entry
 
-lcd_SendCommandRaw:
+lcd_SendSizedCommandRaw:
 	pop hl
 	pop bc
 	pop de
@@ -222,17 +222,17 @@ _sendSingleByte:
 
 lcd_SendCommand:
 	ld b, 0+1
-	jr lcd_SendCommandBytes.entry
+	jr lcd_SendSizedCommandBytes.entry
 
 lcd_SendCommand1:
 	ld b, 1+1
-	jr lcd_SendCommandBytes.entry
+	jr lcd_SendSizedCommandBytes.entry
 
 lcd_SendCommand2:
 	ld b, 2+1
-	jr lcd_SendCommandBytes.entry
+	jr lcd_SendSizedCommandBytes.entry
 
-lcd_SendCommandBytes:
+lcd_SendSizedCommandBytes:
 	pop hl
 	pop bc
 	push bc
@@ -252,7 +252,7 @@ lcd_SendCommandBytes:
 	djnz .loop
 	ret
 
-lcd_SendCommandWords:
+lcd_SendSizedCommandWords:
 	ld hl, 4
 	add hl, sp
 	ld b, (hl)

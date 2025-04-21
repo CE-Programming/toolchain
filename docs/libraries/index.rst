@@ -19,6 +19,7 @@ Common libraries:
     fontlibc
     fileioc
     keypadc
+    lcddrvce
     libload
 
 USB Libraries:

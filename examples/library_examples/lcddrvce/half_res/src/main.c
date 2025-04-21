@@ -122,8 +122,8 @@ void SetHalfResMode(bool enable)
 
     typedef struct res_settings
     {
-        uint8_t frctrl2;
-        uint8_t bpa;
+        uint8_t frctrl;
+        uint8_t bp;
         uint16_t xe;
         uint8_t tfa;
         uint8_t ramctrl1;
@@ -134,8 +134,8 @@ void SetHalfResMode(bool enable)
     {
         {
             /* Default ST7789 settings */
-            .frctrl2 = LCD_FRCTRL2_DEFAULT,
-            .bpa = LCD_BPA_DEFAULT,
+            .frctrl = LCD_FRCTRL_DEFAULT,
+            .bp = LCD_BP_DEFAULT,
             .xe = LCD_WIDTH - 1,
             .tfa = 0,
             .ramctrl1 = LCD_RAMCTRL1_DEFAULT
@@ -145,11 +145,11 @@ void SetHalfResMode(bool enable)
              * Refreshes LCD in at most 16.51 ms after VSYNC, assuming worst case 9.5 MHz clock
              * Waits at least 3.42 ms after VSYNC to read LCD memory, assuming worst case 10.5 MHz clock
              */
-            .frctrl2 = 8, /* 378 clocks per line */
-            .bpa = 95,    /* 95 lines of back porch */
+            .frctrl = LCD_RTN_378 | LCD_NL_DEFAULT, /* 378 clocks per line */
+            .bp = 95, /* 95 lines of back porch */
             .xe = HALF_LCD_WIDTH - 1,
             .tfa = HALF_LCD_WIDTH,
-            .ramctrl1 = LCD_RAM_RGB | LCD_DM_VSYNC,
+            .ramctrl1 = LCD_DM_VSYNC | LCD_RAM_DEFAULT,
             /* With the following PL111 timing:
              * Refreshes LCD at 60 Hz = 24 MHz / (800*250*2), a VSYNC period of 16.67 ms
              * Outputs 38400 pixels to LCD memory within the first 3.40 ms after VSYNC
@@ -184,9 +184,9 @@ void SetHalfResMode(bool enable)
     lcd_Init();
 
     /* Set clocks per line */
-    lcd_SetNormalFrameRateControl(p->frctrl2);
+    lcd_SetNormalFrameRateControl(p->frctrl);
     /* Set back porch */
-    lcd_SendCommand1(LCD_CMD_PORCTRL, p->bpa);
+    lcd_SetNormalBackPorchControl(p->bp);
     /* Set horizontal output window */
     lcd_SetColumnAddress(0, p->xe);
     /* Set fixed left scroll area */
