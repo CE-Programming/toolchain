@@ -8,14 +8,14 @@ if 0
 
 ; faster when count is zero
 _mempcpy:
-	ld	iy, 0
+	ld	iy, -1
 	add	iy, sp
-	ld	bc, (iy + 9)	; Load count
+	ld	bc, (iy + 10)	; Load count
 	sbc	hl, hl
-	sbc	hl, bc
-	ld	hl, (iy + 3)	; Load destination
-	ret	z	; zero bytes to copy
-	ld	de, (iy + 6)	; Load source
+	add	hl, bc
+	ld	hl, (iy + 4)	; Load destination
+	ret	nc	; zero bytes to copy
+	ld	de, (iy + 7)	; Load source
 	ex	de, hl
 	ldir
 	ex	de, hl
@@ -25,14 +25,14 @@ else
 
 ; faster in full execution case by 0F + 1 clock cycles
 _mempcpy:
-	ld	iy, 0
+	ld	iy, -1
 	add	iy, sp
-	ld	bc, (iy + 9)	; Load count
+	ld	bc, (iy + 10)	; Load count
 	sbc	hl, hl
-	sbc	hl, bc
-	ld	de, (iy + 3)	; Load destination
-	jr	z, .zero_byte_copy	; zero bytes to copy
-	ld	hl, (iy + 6)	; Load source
+	add	hl, bc
+	ld	de, (iy + 4)	; Load destination
+	jr	nc, .zero_byte_copy	; zero bytes to copy
+	ld	hl, (iy + 7)	; Load source
 	ldir
 .zero_byte_copy:
 	ex	de, hl

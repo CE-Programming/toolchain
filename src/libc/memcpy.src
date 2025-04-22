@@ -1,6 +1,7 @@
 	assume	adl=1
 
 	section	.text
+
 	public	_memcpy
 
 if PREFER_OS_LIBC
@@ -10,19 +11,17 @@ _memcpy := $0000A4
 else
 
 _memcpy:
-	ld	iy,0
-	add	iy,sp
-	ld	bc,(iy + 9)  ; Load count
-	sbc	hl,hl
-	sbc	hl,bc
-	jr	z,.zero
-	ld	de,(iy + 3)  ; Load destination
-	ld	hl,(iy + 6)  ; Load source
+	ld	iy, -1
+	add	iy, sp
+	ld	bc, (iy + 10)  ; Load count
+	sbc	hl, hl
+	add	hl, bc
+	jr	nc, .zero
+	ld	de, (iy + 4)  ; Load destination
+	ld	hl, (iy + 7)  ; Load source
 	ldir
 .zero:
-	ld	hl,(iy + 3)  ; Return the destination pointer
+	ld	hl, (iy + 4)  ; Return the destination pointer
 	ret
 
 end if
-
-
