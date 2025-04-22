@@ -28,35 +28,6 @@
 #define test_printf(...)
 #endif
 
-/**
- * @brief (Out of date) examples/library_examples/graphx status
- * 
- * background           > 
- * hello_world          > 
- * sprites              > Passed - Casts to (gfy_sprite_t*)
- * sprites_rotate_flip  > Passed - Casts to (gfy_sprite_t*)
- * text_flipped         > 
- * background_appvar    > 
- * lighten_darken       > 
- * sprites_appvar       > 
- * sprites_rotate_scale > 
- * tilemap              > Okay - Runs slow - Casts to (gfy_sprite_t*)
- * blitting             > Passed
- * scaled_text          > Okay - Text transparency unimplemented
- * sprites_compress     > 
- * sprites_scaled       > Passed - Took ~4 frames in CEmu - Casts to (gfy_sprite_t*)
- * tilemap_appvar       > 
- * buffered_cube        > Passed - Line algorithm is slow
- * screen_shift         > Passed
- * sprites_moving       > Passed - Sprite clipping is too extreme - Casts to (gfy_sprite_t*)
- * text_clipped         > Okay - Text clipping is too extreme - Text transparency unimplemented
- * tilemap_compressed   > 
- * floodfill            > 
- * shapes               > Bad - Incorrect Clipping - Missing Shapes
- * sprites_rlet         > Passed - Could be faster
- * text_custom          > 
- */
-
 //------------------------------------------------------------------------------
 // global variables
 //------------------------------------------------------------------------------
@@ -168,38 +139,38 @@
 
 #if 1
 
-extern const uint8_t gfy_DefaultCharSpacing[160];
-extern const uint8_t gfy_DefaultTextData[1024];
-extern const uint8_t* gfy_CharSpacing;
-extern const uint8_t* gfy_TextData;
+extern uint8_t const gfy_DefaultCharSpacing[160];
+extern uint8_t const gfy_DefaultTextData[1024];
+extern uint8_t const *__restrict const gfy_CharSpacing;
+extern uint8_t const *__restrict const gfy_TextData;
 
 extern int24_t gfy_TextXPos;
 extern int24_t gfy_TextYPos;
 extern uint8_t gfy_TextWidthScale;
 extern uint8_t gfy_TextHeightScale;
 extern uint8_t gfy_PrintChar_Clip;
-extern const volatile uint8_t gfy_FontHeight;
+extern uint8_t gfy_FontHeight;
 extern uint8_t gfy_MonospaceFont;
 
-extern gfy_sprite_t *gfy_TmpCharSprite;
+extern gfy_sprite_t *__restrict const gfy_TmpCharSprite;
 
-extern const volatile uint8_t gfy_Color;
-extern const volatile uint8_t gfy_Transparent_Color;
-extern const volatile uint8_t gfy_Text_FG_Color;
-extern const volatile uint8_t gfy_Text_BG_Color;
-extern const volatile uint8_t gfy_Text_TP_Color;
+extern uint8_t gfy_Color;
+extern uint8_t gfy_Transparent_Color;
+extern uint8_t gfy_Text_FG_Color;
+extern uint8_t gfy_Text_BG_Color;
+extern uint8_t gfy_Text_TP_Color;
 
-extern const volatile int24_t gfy_ClipXMin;
-extern const volatile uint8_t gfy_ClipYMin;
+extern int24_t gfy_ClipXMin;
+extern uint8_t gfy_ClipYMin;
 #define gfy_ClipYMin ((int24_t)gfy_ClipYMin)
-// extern const volatile int24_t gfy_ClipYMin;
+// extern int24_t const gfy_ClipYMin;
 
-extern const volatile int24_t gfy_ClipXMax;
-extern const volatile uint8_t gfy_ClipYMax;
+extern int24_t gfy_ClipXMax;
+extern uint8_t gfy_ClipYMax;
 #define gfy_ClipYMax ((int24_t)gfy_ClipYMax)
-// extern const volatile int24_t gfy_ClipYMax;
+// extern int24_t const gfy_ClipYMax;
 
-extern const int8_t gfy_SineTable[65];
+extern int8_t const gfy_SineTable[65];
 
 #else
 
