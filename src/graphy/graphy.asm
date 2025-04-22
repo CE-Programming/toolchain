@@ -4417,7 +4417,7 @@ gfy_SineTable := _SineTable
 ;-------------------------------------------------------------------------------
 
 ; __bremu     := 
-_memcpy     := $0000A4
+; _memcpy     := $0000A4
 __idivs     := $00013C
 __idivu     := $000140
 __ixor      := $000198
@@ -4468,8 +4468,53 @@ __bdvrmu:
 	djnz	.loop
 	ret
 
+
 __indcallhl:
 	jp	(hl)
+
+;-------------------------------------------------------------------------------
+; inlined routines
+;-------------------------------------------------------------------------------
+
+_memcpy:
+	ld	iy, -1
+	add	iy, sp
+	ld	bc, (iy + 10)  ; Load count
+	sbc	hl, hl
+	add	hl, bc
+	jr	nc, .zero
+	ld	de, (iy + 4)  ; Load destination
+	ld	hl, (iy + 7)  ; Load source
+	ldir
+.zero:
+	ld	hl, (iy + 4)  ; Return the destination pointer
+	ret
+
+__set_bc_and_mul_hl_by_240:
+	push	hl
+	pop	bc
+	add	hl, hl	; 2
+	add	hl, bc	; 3
+	add	hl, hl	; 6
+	add	hl, bc	; 7
+	add	hl, hl	; 14
+	add	hl, bc	; 15
+	add	hl, hl	; 30
+	add	hl, hl	; 60
+	add	hl, hl	; 120
+	add	hl, hl	; 240
+	ld	bc, 240
+	ret
+
+__set_bc_and_mul_hl_by_minus2:
+	add	hl, hl
+	push	hl
+	pop	bc
+	or	a, a
+	sbc	hl, hl
+	sbc	hl, bc
+	ld	bc, -2
+	ret
 
 ;-------------------------------------------------------------------------------
 ; graphy.c.src
