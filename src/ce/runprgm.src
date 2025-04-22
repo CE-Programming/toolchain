@@ -80,11 +80,13 @@ _os_RunPrgm:
 	call	ti.Mov9b
 	ld	hl,___prgm_to_run - reloc.offset
 	call	find_prgm - reloc.offset
-	ld	(___prgm_to_run_size - reloc.offset),de
 	jr	nc,.found
 	sbc	hl,hl
 	ret
 .found:
+	ld	a,(ti.OP1)
+	ld	(___prgm_to_run - reloc.offset),a
+	ld	(___prgm_to_run_size - reloc.offset),de
 	ld	a,(hl)
 	cp	a,ti.tExtTok
 	jr	nz,run_basic_prgm
@@ -208,6 +210,7 @@ launch_asm_prgm:
 
 launch_basic_prgm:
 	call	delete_running_prgm
+	call	setup_temp_parser_hook
 	call	setup_prgm_state
 	call	push_stub
 	ld	hl,___prgm_to_run
@@ -216,26 +219,20 @@ launch_basic_prgm:
 	call	ti.Mov9ToOP1
 	jp	ti.ParseInp
 
+setup_save_parser_hook:
+	or	a,a
+	sbc	hl,hl
+	bit	ti.parserHookActive,(iy + ti.hookflags4)
+	jr	z,.not_set
+	ld	hl,(ti.parserHookPtr)
+.not_set:
+	ld	(stub.prev_hook),hl
+	ret
+
 setup_prgm_state:
+	call	setup_save_parser_hook
 	xor	a,a
 	ld	(ti.kbdGetKy),a
-	bit	ti.parserHookActive,(iy + ti.hookflags4)
-	jr	nz,.chain_hook
-.no_chain:
-	ld	hl,stub.chain
-	ld	(hl),$af		; xor a,a
-	inc	hl
-	ld	(hl),$c9		; ret
-	jr	.check_flags
-.chain_hook:
-	ld	hl,(ti.parserHookPtr)
-	ld	a,(hl)
-	cp	a,$83
-	jr	nz,.no_chain		; ensure the hook is valid
-	ld	(stub.chain + 1),hl
-	ld	(stub.prev_hook),hl
-	;jr	.check_flags
-.check_flags:
 	ld	a,$ce			; set
 	bit	ti.allowProgTokens,(iy + ti.newDispF)
 	jr	nz,.setAllowProgTokens
@@ -250,6 +247,25 @@ setup_prgm_state:
 .setCmdExec:
 	ld	(stub.flags.cmdFlags),a
 	jp	ti.DisableAPD
+
+setup_temp_parser_hook:
+	bit	ti.parserHookActive,(iy + ti.hookflags4)
+	jr	nz,.chain_hook
+.no_chain:
+	ld	hl,stub.chain
+	ld	(hl),$af		; xor a,a
+	inc	hl
+	ld	(hl),$c9		; ret
+	ret
+.chain_hook:
+	ld	hl,(ti.parserHookPtr)
+	ld	a,(hl)
+	cp	a,$83
+	jr	nz,.no_chain		; ensure the hook is valid
+	ld	(stub.chain + 1),hl
+	xor	a,a
+	ld	(push_stub.skip_parser_hook_jr),a
+	ret
 
 delete_running_prgm:
 	ld	iy,ti.flags
@@ -285,11 +301,14 @@ push_stub:
 	add	hl,bc
 	ld	(.stub_error_handler),hl
 	pop	hl
+	jr	.skip_parser_hook
+.skip_parser_hook_jr := $-1
 	push	hl
 	ld	bc,stub.hook_parser - stub.normal
 	add	hl,bc
 	call	ti.SetParserHook
 	pop	hl
+.skip_parser_hook:
 	ex	de,hl
 	ld	hl,stub
 	ld	bc,stub.len
