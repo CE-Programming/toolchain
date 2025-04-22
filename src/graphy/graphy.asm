@@ -1842,13 +1842,166 @@ util.blit:
 	jp	(iy)
 
 ;-------------------------------------------------------------------------------
-; gfy_BlitLines:
+gfy_BlitColumns:
+; Copies the buffer image to the screen and vice versa column wise
+; Arguments:
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
+;  arg1 : X coordinate
+;  arg2 : Number of columns to copy
+; Returns:
+;  None
+if 0
+
+	pop	iy	; return address
+	pop	bc
+	ld	a, c	; A = buffer to blit from
+	pop	de	; DE = num_columns
+	ex	(sp), hl	; HL = x_loc
+	push	de
+	push	bc
+
+	ld	bc, ti.lcdHeight * 256
+
+	dec	d
+	ld	d, b	; ti.lcdHeight
+	mlt	de
+	jr	nz, .DE_lt_256
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+.DE_lt_256:
+	push	de	; bytes to copy
+
+	dec	h
+	ld	h, b	; ti.lcdHeight
+	mlt	hl
+	jr	nz, .HL_lt_256
+	add	hl, bc
+.HL_lt_256:
+	push	hl	; offset
+
+	call	util.getbuffer		; determine blit buffers
+
+	pop	bc	; offset
+	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	pop	bc	; bytes to copy
+	jr	util.blit
+
+else
+; This version saves 2F and 2 bytes
+
+	pop	iy	; return address
+	pop	bc
+	ld	a, c	; A = buffer to blit from
+	pop	hl	; HL = num_columns
+
+	ld	bc, ti.lcdHeight * 256
+
+	dec	h
+	ld	h, b	; ti.lcdHeight
+	mlt	hl
+	jr	nz, .Columns_lt_256
+	add	hl, bc
+.Columns_lt_256:
+	ex	(sp), hl	; HL = x_loc, (SP) = bytes to copy
+
+	dec	h
+	ld	h, b	; ti.lcdHeight
+	mlt	hl
+	jr	nz, .X_lt_256
+	add	hl, bc
+.X_lt_256:
+	push	hl	; offset
+
+	call	util.getbuffer		; determine blit buffers
+
+	pop	bc	; offset
+	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	pop	bc	; bytes to copy
+	push	af, af, af	; restore SP :(
+	jr	util.blit
+
+end if
 
 ;-------------------------------------------------------------------------------
-; gfy_BlitColumns:
+gfy_BlitRectangle:
+; Copies the buffer image to the screen and vice versa rectangularly
+; Arguments:
+;  arg0 : Buffer to copy from (screen = 0, buffer = 1)
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
+;  arg3 : Width
+;  arg4 : Height
+; Returns:
+;  None
 
-;-------------------------------------------------------------------------------
-; gfy_BlitRectangle:
+	ld	iy, 0
+	add	iy, sp
+
+	ld	bc, ti.lcdHeight * 256
+
+	ld	hl, (iy + 6) ; x coordinate
+	dec	h
+	ld	h, b	; ti.lcdHeight
+	mlt	hl
+	jr	nz, .x_lt_256
+	add	hl, bc
+.x_lt_256:
+	push	hl	; offset
+
+	ld	a, (iy + 3)	; a = buffer to blit from
+	call	util.getbuffer	; determine blit buffers
+	
+	; buffers will be 0xD40000 or 0xD52C00
+	ld	a, (iy + 9) ; y coordinate
+	; adds A to HL and DE
+	ld	l, a
+	ld	e, a
+
+	pop	bc
+	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+
+	ld	bc, (iy + 12)	; width
+	ld	a, (iy + 15)	; height
+	ld	iyl, a
+	; A = 240 - A
+	sub	a, ti.lcdHeight
+	neg
+	ld	iyh, a	; jump
+
+	ld	a, c	; width % 256
+	push	bc
+	ld	bc, 0
+
+	; IYL = height
+	; IYH = jump
+	; A = width % 256
+
+	call	gfy_Wait
+.loop:
+	ld	c, iyl
+	ldir
+	ld	c, iyh
+	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	dec	a
+	jr	nz, .loop
+	pop	af
+	dec	a	; A = width % 256
+	ret	nz
+	push	af
+	jr	.loop
 
 ;-------------------------------------------------------------------------------
 ; gfy_CopyRectangle:
@@ -1905,7 +2058,56 @@ smcByte _TransparentColor
 ; gfy_Sprite:
 
 ;-------------------------------------------------------------------------------
-; gfy_Sprite_NoClip:
+gfy_Sprite_NoClip:
+; Places an sprite on the screen as fast as possible
+; Arguments:
+;  arg0 : Pointer to sprite
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
+; Returns:
+;  None
+	ld	iy, 0
+	lea	bc, iy + 0
+	add	iy, sp
+	ld	hl, (iy + 6)	; hl = x
+	ld	e, (iy + 9)	; e = y
+	ld	d, h		; maybe ld d, 0
+	dec	h		; tests if x >= 256
+	ld	h, ti.lcdHeight
+	jr	nz, .x_lt_256
+	ld	d, h		; ld d, ti.lcdHeight * 256
+.x_lt_256:
+	mlt	hl
+	ex.s	de, hl		; clear upper byte of DE
+	add	hl, de		; add y cord
+	ld	de, (CurrentBuffer)
+	add	hl, de		; add buffer offset
+	ex	de, hl		; de = start draw location
+
+	ld	hl, (iy + 3)	; hl = sprite structure
+	ld	c, (hl)		; sprite width
+	inc	hl
+	ld	a, (hl)		; sprite height
+	ld	iyh, a
+	inc	hl
+	; calculate jump
+	ld	a, ti.lcdHeight
+	sub	a, iyh
+	ld	iyl, c
+	wait_quick
+	; A = jump
+	; IYH = height
+	; IYL = width
+.loop:
+	ldir
+	ld	c, a	; jump
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	ld	c, iyh	; height
+	dec	iyl
+	jr	nz, .loop
+	ret
 
 ;-------------------------------------------------------------------------------
 ; gfy_GetSprite:
@@ -2255,7 +2457,7 @@ gfy_PrintInt: ; COPIED FROM GRAPHX
 	push	hl
 	push	de
 	add	hl,hl
-	db	$3E			; xor a,a -> ld a,*
+	db	$3E			; xor a,a -> ld a, $AF
 
 ;-------------------------------------------------------------------------------
 gfy_PrintUInt: ; COPIED FROM GRAPHX
