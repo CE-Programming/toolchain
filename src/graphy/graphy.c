@@ -432,22 +432,22 @@ void gfy_End(void) {
 /* gfy_SetPixel (graphy.asm) */
 
 // Macro to write a pixel without clipping
-#define gfy_SetPixel_NoClip(x, y, color) \
-    ((uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer))[(y) + ((x) * GFY_LCD_HEIGHT)] = (color)
+#define gfy_SetPixel_NoClip(buffer, x, y, color) \
+    buffer[(y) + ((x) * GFY_LCD_HEIGHT)] = (color)
 
 // Macro to write a pixel inside the screen bounds
-#define gfy_SetPixel_ScreenClip(x, y, color); \
+#define gfy_SetPixel_ScreenClip(buffer, x, y, color); \
     if ((x) < GFY_LCD_WIDTH && (y) < GFY_LCD_HEIGHT) { \
-        ((uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer))[(y) + ((x) * GFY_LCD_HEIGHT)] = (color); \
+        buffer[(y) + ((x) * GFY_LCD_HEIGHT)] = (color); \
     }
 
 // Macro to write a pixel inside the clipping region
-#define gfy_SetPixel_RegionClip(x, y, color) \
+#define gfy_SetPixel_RegionClip(buffer, x, y, color) \
     if ( \
         (int24_t)(x) >= gfy_ClipXMin && (int24_t)(x) < gfy_ClipXMax && \
         (int24_t)(y) >= gfy_ClipYMin && (int24_t)(y) < gfy_ClipYMax \
     ) { \
-        ((uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer))[(y) + ((x) * GFY_LCD_HEIGHT)] = (color); \
+        buffer[(y) + ((x) * GFY_LCD_HEIGHT)] = (color); \
     }
 
 /* gfy_GetPixel (graphy.asm) */
@@ -481,7 +481,9 @@ void gfy_BlitLines(gfy_location_t src, uint8_t y_loc, uint8_t num_lines) {
 }
 #endif
 
-/* gfy_BlitLines */
+/* gfy_BlitColumns (graphy.asm) */
+
+#if 0
 
 void gfy_BlitColumns(gfy_location_t src, uint24_t x_loc, uint24_t num_columns) {
     gfy_Wait();
@@ -496,7 +498,11 @@ void gfy_BlitColumns(gfy_location_t src, uint24_t x_loc, uint24_t num_columns) {
     memcpy(dst_buf, src_buf, num_columns * GFY_LCD_HEIGHT);
 }
 
-/* gfy_BlitRectangle */
+#endif
+
+/* gfy_BlitRectangle (graphy.asm) */
+
+#if 0
 
 void gfy_BlitRectangle(
     gfy_location_t src,
@@ -520,6 +526,8 @@ void gfy_BlitRectangle(
         dst_buf += GFY_LCD_HEIGHT;
     }
 }
+
+#endif
 
 /* gfy_internal_PrintCharXY_NoClip */
 
@@ -568,12 +576,13 @@ void gfy_PrintChar(const char c) {
         gfy_internal_PrintChar_NoClip(c, charWidth);
         return;
     }
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     const uint8_t *bitImage = gfy_TextData + GFY_MAXIMUM_FONT_HEIGHT * (uint24_t)((unsigned char)c);
-    uint8_t *fillLinePtr = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (gfy_TextYPos + (gfy_TextXPos * GFY_LCD_HEIGHT));
+    uint8_t *fillLinePtr = buffer + (gfy_TextYPos + (gfy_TextXPos * GFY_LCD_HEIGHT));
     uint8_t b = (1 << 7);
     gfy_TextXPos += charWidth * gfy_TextWidthScale;
-    uint8_t const * const lo_addr = (uint8_t * const)RAM_ADDRESS(gfy_CurrentBuffer);
-    uint8_t const * const hi_addr = (uint8_t * const)RAM_ADDRESS(gfy_CurrentBuffer) + GFY_LCD_WIDTH * GFY_LCD_HEIGHT;
+    uint8_t const * const lo_addr = buffer;
+    uint8_t const * const hi_addr = buffer + GFY_LCD_WIDTH * GFY_LCD_HEIGHT;
     for (uint8_t x = 0; x < charWidth; x++) {
         for (uint8_t u = 0; u < gfy_TextWidthScale; u++) {
             uint8_t *fillPtr = fillLinePtr;
@@ -717,6 +726,7 @@ uint24_t gfy_GetStringWidth(const char *string) {
 
 // Unoptimized routine
 static void gfy_internal_Line0(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     int24_t dX = x1 - x0;
     int24_t dY = y1 - y0;
     int24_t yI = 1;
@@ -729,7 +739,7 @@ static void gfy_internal_Line0(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
     dY *= 2;
     int24_t y = y0;
     for (int24_t x = x0; x < x1; x++) {
-        gfy_SetPixel_RegionClip(x, y, gfy_Color);
+        gfy_SetPixel_RegionClip(buffer, x, y, gfy_Color);
         if (dD > 0) {
             y += yI;
             dD += dD_jump;
@@ -741,6 +751,7 @@ static void gfy_internal_Line0(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
 
 // Unoptimized routine
 static void gfy_internal_Line1(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     int24_t dX = x1 - x0;
     int24_t dY = y1 - y0;
     int24_t xI = 1;
@@ -754,7 +765,7 @@ static void gfy_internal_Line1(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
     int24_t x = x0;
 
     for (int24_t y = y0; y < y1; y++) {
-        gfy_SetPixel_RegionClip(x, y, gfy_Color);
+        gfy_SetPixel_RegionClip(buffer, x, y, gfy_Color);
         if (dD > 0) {
             x += xI;
             dD += dD_jump;
@@ -837,16 +848,17 @@ void gfy_VertLine(int24_t x, int24_t y, int24_t length) {
 void gfy_Circle(
     const int24_t x, const int24_t y, const uint24_t radius
 ) {
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     int24_t r = radius;
 
     int24_t x_pos = -r;
     int24_t y_pos = 0;
     int24_t err = 2 - 2 * r;
     do {
-        gfy_SetPixel_RegionClip(x - x_pos, y + y_pos, gfy_Color);
-        gfy_SetPixel_RegionClip(x - y_pos, y - x_pos, gfy_Color);
-        gfy_SetPixel_RegionClip(x + x_pos, y - y_pos, gfy_Color);
-        gfy_SetPixel_RegionClip(x + y_pos, y + x_pos, gfy_Color);
+        gfy_SetPixel_RegionClip(buffer, x - x_pos, y + y_pos, gfy_Color);
+        gfy_SetPixel_RegionClip(buffer, x - y_pos, y - x_pos, gfy_Color);
+        gfy_SetPixel_RegionClip(buffer, x + x_pos, y - y_pos, gfy_Color);
+        gfy_SetPixel_RegionClip(buffer, x + y_pos, y + x_pos, gfy_Color);
         r = err;
         if (r <= y_pos) {
             err += ++y_pos * 2 + 1;
@@ -941,6 +953,7 @@ void gfy_FillRectangle(int24_t x, int24_t y, int24_t width, int24_t height) {
 
 // Unoptimized routine
 static void gfy_internal_Line0_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     int24_t dX = x1 - x0;
     int24_t dY = y1 - y0;
     int24_t yI = 1;
@@ -953,7 +966,7 @@ static void gfy_internal_Line0_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_
     dY *= 2;
     int24_t y = y0;
     for (int24_t x = x0; x < x1; x++) {
-        gfy_SetPixel_NoClip(x, y, gfy_Color);
+        gfy_SetPixel_NoClip(buffer, x, y, gfy_Color);
         if (dD > 0) {
             y += yI;
             dD += dD_jump;
@@ -965,6 +978,7 @@ static void gfy_internal_Line0_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_
 
 // Unoptimized routine
 static void gfy_internal_Line1_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     int24_t dX = x1 - x0;
     int24_t dY = y1 - y0;
     int24_t xI = 1;
@@ -978,7 +992,7 @@ static void gfy_internal_Line1_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_
     int24_t x = x0;
 
     for (int24_t y = y0; y < y1; y++) {
-        gfy_SetPixel_NoClip(x, y, gfy_Color);
+        gfy_SetPixel_NoClip(buffer, x, y, gfy_Color);
         if (dD > 0) {
             x += xI;
             dD += dD_jump;
@@ -1141,8 +1155,9 @@ bool gfy_GetClipRegion(gfy_region_t *region) {
 void gfy_ShiftDown(uint8_t pixels) {
     if (pixels == 0) { return; }
     gfy_Wait();
-    const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
-    uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (gfy_ClipYMin + (int24_t)pixels) + (gfy_ClipXMin * GFY_LCD_HEIGHT);
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    const uint8_t* src_buf = buffer + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
+    uint8_t* dst_buf = buffer + (gfy_ClipYMin + (int24_t)pixels) + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     const int24_t copySize = gfy_ClipYMax - gfy_ClipYMin - (int24_t)pixels;
     if (copySize <= 0) { return; }
     int24_t x0 = gfy_ClipXMin;
@@ -1159,8 +1174,9 @@ void gfy_ShiftDown(uint8_t pixels) {
 void gfy_ShiftUp(uint8_t pixels) {
     if (pixels == 0) { return; }
     gfy_Wait();
-    const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
-    uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (gfy_ClipYMin - (int24_t)pixels) + (gfy_ClipXMin * GFY_LCD_HEIGHT);
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    const uint8_t* src_buf = buffer + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
+    uint8_t* dst_buf = buffer + (gfy_ClipYMin - (int24_t)pixels) + (gfy_ClipXMin * GFY_LCD_HEIGHT);
     const int24_t copySize = gfy_ClipYMax - gfy_ClipYMin - (int24_t)pixels;
     if (copySize <= 0) { return; }
     int24_t x0 = gfy_ClipXMin;
@@ -1177,8 +1193,9 @@ void gfy_ShiftUp(uint8_t pixels) {
 void gfy_ShiftLeft(uint24_t pixels) {
     if (pixels == 0) { return; }
     gfy_Wait();
-    const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
-    uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + ((gfy_ClipXMin - (int24_t)pixels) * GFY_LCD_HEIGHT);
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    const uint8_t* src_buf = buffer + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
+    uint8_t* dst_buf = buffer + gfy_ClipYMin + ((gfy_ClipXMin - (int24_t)pixels) * GFY_LCD_HEIGHT);
     const size_t copySize = gfy_ClipYMax - gfy_ClipYMin;
     int24_t x0 = gfy_ClipXMin + pixels;
     int24_t x1 = gfy_ClipXMax;
@@ -1196,8 +1213,9 @@ void gfy_ShiftLeft(uint24_t pixels) {
 void gfy_ShiftRight(uint24_t pixels) {
     if (pixels == 0) { return; }
     gfy_Wait();
-    const uint8_t* src_buf = (const uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
-    uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + gfy_ClipYMin + ((gfy_ClipXMin - (int24_t)pixels) * GFY_LCD_HEIGHT);
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    const uint8_t* src_buf = buffer + gfy_ClipYMin + (gfy_ClipXMin * GFY_LCD_HEIGHT);
+    uint8_t* dst_buf = buffer + gfy_ClipYMin + ((gfy_ClipXMin - (int24_t)pixels) * GFY_LCD_HEIGHT);
     const size_t copySize = gfy_ClipYMax - gfy_ClipYMin;
     int24_t x0 = gfy_ClipXMin + pixels;
     int24_t x1 = gfy_ClipXMax;
@@ -1211,6 +1229,8 @@ void gfy_ShiftRight(uint24_t pixels) {
 }
 
 /* internal tilemap functions */
+
+#if 0
 
 static void gfy_Sprite_NoClip_Size2(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t y) {
     const uint8_t* src_buf = sprite->data;
@@ -1283,6 +1303,8 @@ static void gfy_Sprite_NoClip_Size128(const gfy_sprite_t *restrict sprite, uint2
     }
 }
 
+#endif
+
 /* gfy_Tilemap */
 
 void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_offset) {
@@ -1333,6 +1355,7 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
 
     void (*plot_function)(const gfy_sprite_t*, uint24_t, uint8_t) = gfy_Sprite_NoClip;
 
+#if 0
     switch (tilemap->type_height) {
         case gfy_tile_2_pixel:
             plot_function = gfy_Sprite_NoClip_Size2;
@@ -1356,6 +1379,7 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
             plot_function = gfy_Sprite_NoClip_Size128;
             break;
     }
+#endif
 
     const uint24_t limitX = gfy_ClipXMax - tilemap->tile_width;
     const uint24_t limitY = gfy_ClipYMax - tilemap->tile_height;
@@ -1407,6 +1431,7 @@ void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_
 
     void (*plot_function)(const gfy_sprite_t*, uint24_t, uint8_t) = gfy_Sprite_NoClip;
 
+#if 0
     switch (tilemap->type_height) {
         case gfy_tile_2_pixel:
             plot_function = gfy_Sprite_NoClip_Size2;
@@ -1430,6 +1455,7 @@ void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_
             plot_function = gfy_Sprite_NoClip_Size128;
             break;
     }
+#endif
 
     for (uint8_t draw_y = 0; draw_y < tilemap->draw_height; draw_y++) {
         uint24_t posX = posX0;
@@ -1668,8 +1694,9 @@ void gfy_TransparentSprite(const gfy_sprite_t *restrict sprite, int24_t x, int24
     }
 }
 
-/* gfy_Sprite_NoClip */
+/* gfy_Sprite_NoClip (graphy.asm) */
 
+#if 0
 void gfy_Sprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t y) {
     gfy_Wait();
     const uint8_t* src_buf = sprite->data;
@@ -1681,6 +1708,7 @@ void gfy_Sprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t 
         dst_buf += GFY_LCD_HEIGHT;
     }
 }
+#endif
 
 /* gfy_TransparentSprite_NoClip */
 
@@ -1734,11 +1762,9 @@ void gfy_ScaledSprite_NoClip(
     
     for (uint8_t x_cord = 0; x_cord < sprite->width; x_cord++) {
         for (uint8_t y_cord = 0; y_cord < sprite->height; y_cord++) {
-            const uint8_t color = *src_buf;
-            src_buf++;
+            const uint8_t color = *src_buf++;
             for (uint8_t v = 0; v < height_scale; v++) {
-                *dst_buf = color;
-                dst_buf++;
+                *dst_buf++ = color;
             }
         }
         dst_buf += dst_jump;
@@ -1782,15 +1808,13 @@ void gfy_ScaledTransparentSprite_NoClip(
     for (uint8_t x_cord = 0; x_cord < sprite->width; x_cord++) {
         for (uint8_t u = 0; u < width_scale; u++) {
             for (uint8_t y_cord = 0; y_cord < sprite->height; y_cord++) {
-                const uint8_t color = *src_buf;
-                src_buf++;
+                const uint8_t color = *src_buf++;
                 if (color == gfy_Transparent_Color) {
                     dst_buf += height_scale;
                     continue;
                 }
                 for (uint8_t v = 0; v < height_scale; v++) {
-                    *dst_buf = color;
-                    dst_buf++;
+                    *dst_buf++ = color;
                 }
             }
             dst_buf += dst_jump;
@@ -2505,23 +2529,24 @@ void gfy_CopyRectangle(
 #if 0
 
 /* gfy_internal_Ellipse */
-
 static void gfy_internal_Ellipse_dual_point(
     int24_t x, int24_t y, int24_t xc, int24_t yc
 ) {
-    gfy_SetPixel_RegionClip(x - xc, y - yc, gfy_Color);
-    gfy_SetPixel_RegionClip(x + xc, y - yc, gfy_Color);
-    gfy_SetPixel_RegionClip(x - xc, y + yc, gfy_Color);
-    gfy_SetPixel_RegionClip(x + xc, y + yc, gfy_Color);
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    gfy_SetPixel_RegionClip(buffer, x - xc, y - yc, gfy_Color);
+    gfy_SetPixel_RegionClip(buffer, x + xc, y - yc, gfy_Color);
+    gfy_SetPixel_RegionClip(buffer, x - xc, y + yc, gfy_Color);
+    gfy_SetPixel_RegionClip(buffer, x + xc, y + yc, gfy_Color);
 }
 
 static void gfy_internal_Ellipse_dual_point_NoClip(
     int24_t x, int24_t y, int24_t xc, int24_t yc
 ) {
-    gfy_SetPixel_NoClip(x - xc, y - yc, gfy_Color);
-    gfy_SetPixel_NoClip(x + xc, y - yc, gfy_Color);
-    gfy_SetPixel_NoClip(x - xc, y + yc, gfy_Color);
-    gfy_SetPixel_NoClip(x + xc, y + yc, gfy_Color);
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    gfy_SetPixel_NoClip(buffer, x - xc, y - yc, gfy_Color);
+    gfy_SetPixel_NoClip(buffer, x + xc, y - yc, gfy_Color);
+    gfy_SetPixel_NoClip(buffer, x - xc, y + yc, gfy_Color);
+    gfy_SetPixel_NoClip(buffer, x + xc, y + yc, gfy_Color);
 }
 
 static void gfy_internal_Ellipse_dual_line(
