@@ -21,6 +21,8 @@
 
 #include "graphy.h"
 
+#include <math.h>
+
 #if 0
 #include <ti/sprintf.h>
 #define test_printf(...) boot_sprintf((char*)0xFB0000, __VA_ARGS__)
@@ -2464,11 +2466,184 @@ void gfy_RLETSprite_NoClip(const gfy_rletsprite_t *sprite, const uint24_t x, con
 
 /* gfy_RotatedScaledTransparentSprite_NoClip */
 
+uint8_t gfy_RotatedScaledTransparentSprite_NoClip(
+    const gfy_sprite_t *sprite,
+    uint24_t x0,
+    uint8_t y0,
+    uint8_t angle,
+    uint8_t scale
+) {
+    gfy_Wait();
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    const uint8_t in_size = sprite->width;
+    uint24_t temp_size = sprite->width * scale / 64;
+    const uint8_t out_size = (temp_size >= 256) ? 255 : temp_size;
 
+    const float angle_f = (float)angle * 0.0245436926f;
+
+    const float cos_f = (float)cosf(angle_f);
+    const float sin_f = (float)sinf(angle_f);
+
+    const float in_size_f = (float)in_size;
+    const float out_size_f = (float)out_size;
+    
+    const float size_ratio = in_size_f / out_size_f;
+
+    const float cos_jump = cos_f * size_ratio;
+    const float sin_jump = sin_f * size_ratio;
+
+    const float in_size_mult = -0.5f * in_size_f;
+    float yc_cos = in_size_mult * (cos_f + sin_f - 1.0f);
+    float yc_sin = in_size_mult * (cos_f - sin_f - 1.0f);
+
+    uint8_t *__restrict plot = buffer + x0 * GFY_LCD_HEIGHT + y0;
+    for (uint8_t x = 0; x < out_size; x++) {
+        float xc_cos = yc_sin;
+        float xc_sin = yc_cos;
+        for (uint8_t y = 0; y < out_size; y++) {
+            uint8_t y_pos = (uint8_t)(int)xc_cos;
+            uint8_t x_pos = (uint8_t)(int)xc_sin;
+            if (
+                x_pos < in_size && y_pos < in_size &&
+                x_pos >= 0 && y_pos >= 0
+            ) {
+                uint8_t color = sprite->data[y_pos + x_pos * in_size];
+                if (color != gfy_Transparent_Color) {
+                    *plot = color;
+                }
+            }
+            plot++;
+            xc_cos += cos_jump;
+            xc_sin += sin_jump;
+        }
+        plot += GFY_LCD_HEIGHT - out_size;
+        yc_cos += cos_jump;
+        yc_sin -= sin_jump;
+    }
+    return out_size;
+}
 
 /* gfy_RotatedScaledSprite_NoClip */
 
+#if 0
+uint8_t gfy_RotatedScaledSprite_NoClip(
+    const gfy_sprite_t *sprite,
+    uint24_t x0,
+    uint8_t y0,
+    uint8_t angle,
+    uint8_t scale
+) {
+    gfy_Wait();
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    const uint8_t in_size = sprite->width;
+    uint24_t temp_size = sprite->width * scale / 64;
+    const uint8_t out_size = (temp_size >= 256) ? 255 : temp_size;
 
+    angle *= -1;
+
+    const float sin_f = (float)sinf((float)angle * 0.0245436926f);
+    const float cos_f = (float)cosf((float)angle * 0.0245436926f);
+
+    const float in_size_f = in_size;
+    const float out_size_f = out_size;
+    
+    const float scaled_half = 0.5f * in_size_f;
+    const float scaled_sin_f = sin_f * in_size_f;
+    const float scaled_cos_f = cos_f * in_size_f;
+
+    const float xc_cos_jump = scaled_cos_f / out_size_f;
+    const float xc_sin_jump = scaled_sin_f / out_size_f;
+
+    const float yc_cos_jump = scaled_cos_f / out_size_f;
+    const float yc_sin_jump = -scaled_sin_f / out_size_f;
+
+    const float xc0_cos = -0.5f * scaled_cos_f;
+    const float xc0_sin = -0.5f * scaled_sin_f;
+
+    const float yc0_cos = -0.5f * scaled_cos_f;
+    const float yc0_sin = -0.5f * -scaled_sin_f;
+
+    float yc_sin = xc0_cos + yc0_sin + scaled_half;
+    float yc_cos = xc0_sin + yc0_cos + scaled_half;
+    for (uint8_t y = 0; y < out_size; y++) {
+        float xc_cos = yc_sin;
+        float xc_sin = yc_cos;
+        for (uint8_t x = 0; x < out_size; x++) {
+            float x_pos = (xc_cos);
+            float y_pos = (xc_sin);
+            int24_t x_write = (int24_t)x_pos;
+            int24_t y_write = (int24_t)y_pos;
+            if (
+                x_write < in_size && y_write < in_size &&
+                x_write >= 0 && y_write >= 0
+            ) {
+                uint8_t color = sprite->data[y_write + x_write * in_size];
+                gfy_SetPixel_NoClip(buffer, x0 + x, y0 + y, color);
+            }
+            xc_cos += xc_cos_jump;
+            xc_sin += xc_sin_jump;
+        }
+        yc_cos += yc_cos_jump;
+        yc_sin += yc_sin_jump;
+    }
+    return out_size;
+}
+#else
+uint8_t gfy_RotatedScaledSprite_NoClip(
+    const gfy_sprite_t *sprite,
+    uint24_t x0,
+    uint8_t y0,
+    uint8_t angle,
+    uint8_t scale
+) {
+    gfy_Wait();
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    const uint8_t in_size = sprite->width;
+    uint24_t temp_size = sprite->width * scale / 64;
+    const uint8_t out_size = (temp_size >= 256) ? 255 : temp_size;
+
+    const float angle_f = (float)angle * 0.0245436926f;
+
+    const float cos_f = (float)cosf(angle_f);
+    const float sin_f = (float)sinf(angle_f);
+
+    const float in_size_f = (float)in_size;
+    const float out_size_f = (float)out_size;
+    
+    const float size_ratio = in_size_f / out_size_f;
+
+    const float cos_jump = cos_f * size_ratio;
+    const float sin_jump = sin_f * size_ratio;
+
+    const float in_size_mult = -0.5f * in_size_f;
+    float yc_cos = in_size_mult * (cos_f + sin_f - 1.0f);
+    float yc_sin = in_size_mult * (cos_f - sin_f - 1.0f);
+
+    uint8_t *__restrict plot = buffer + x0 * GFY_LCD_HEIGHT + y0;
+    for (uint8_t x = 0; x < out_size; x++) {
+        float xc_cos = yc_sin;
+        float xc_sin = yc_cos;
+        for (uint8_t y = 0; y < out_size; y++) {
+            uint8_t y_pos = (uint8_t)(int)xc_cos;
+            uint8_t x_pos = (uint8_t)(int)xc_sin;
+            if (
+                x_pos < in_size && y_pos < in_size &&
+                x_pos >= 0 && y_pos >= 0
+            ) {
+                uint8_t color = sprite->data[y_pos + x_pos * in_size];
+                *plot = color;
+            }
+            plot++;
+            xc_cos += cos_jump;
+            xc_sin += sin_jump;
+        }
+        plot += GFY_LCD_HEIGHT - out_size;
+        yc_cos += cos_jump;
+        yc_sin -= sin_jump;
+    }
+    return out_size;
+}
+#endif
 
 //------------------------------------------------------------------------------
 // v8 functions

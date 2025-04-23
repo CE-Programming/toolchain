@@ -3487,17 +3487,10 @@ dv_shr_8_times_Height_plus_Height := $-3
 end if
 
 ;-------------------------------------------------------------------------------
-gfy_RotatedScaledSprite_NoClip: ; UNIMPLEMENTED
-	ret
+; gfy_RotatedScaledSprite_NoClip:
 
 ;-------------------------------------------------------------------------------
-gfy_RotatedScaledTransparentSprite_NoClip: ; UNIMPLEMENTED
-	ret
-
-; ...
-
-	cp	a,TRASPARENT_COLOR
-smcByte _TransparentColor
+; gfy_RotatedScaledTransparentSprite_NoClip:
 
 ;-------------------------------------------------------------------------------
 gfy_RotateScaleSprite: ; COPIED_FROM_GRAPHX
@@ -4636,6 +4629,22 @@ __frameset  := $00012C
 __frameset0 := $000130
 __iremu     := $000170
 __bshl      := $000100
+__land      := $0001A4
+__ior       := $000168
+__ishru     := $000184
+
+__fcmp      := $000274
+__fneg      := $00028C
+__fadd      := $000270
+__fsub      := $000290
+__fmul      := $000288
+__fdiv      := $000278
+__ftol      := $00027C
+__ftoul     := __ftol
+__ltof      := $000284
+__ultof     := $000280
+_sinf       := $022118
+_cosf       := $02211C
 
 ; for debugging
 _boot_sprintf := $0000BC
