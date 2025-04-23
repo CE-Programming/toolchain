@@ -2080,7 +2080,7 @@ void gfy_FillTriangle_NoClip(
 /* gfy_FloodFill */
 
 // It is probably better (and safer) to reimplement this routine
-#if 1
+#if 0
 
     // Debug printf statements
     // #define FLOODFILL_DEBUG
@@ -2343,6 +2343,176 @@ void gfy_FillTriangle_NoClip(
             /* insert cleanup code here */
         #endif
     }
+#else
+
+// #define FLOODFILL_STACK_SIZE (3224)
+// going slightly lower to prevent stack overflows (not by much though)
+#define FLOODFILL_STACK_SIZE (3072)
+
+typedef struct FloodFillCord {
+    uint16_t x;
+    uint8_t y;
+} FloodFillCord;
+
+#define Maximum_FloodFill_Stack_Depth (FLOODFILL_STACK_SIZE / sizeof(FloodFillCord))
+
+#define FloodFill_Safety_Margin (3)
+
+void gfy_FloodFill(uint24_t x, uint8_t y, const uint8_t color) {
+    if (
+        (int24_t)x < gfy_ClipXMin || (int24_t)x >= gfy_ClipXMax ||
+        (int24_t)y < gfy_ClipYMin || (int24_t)y >= gfy_ClipYMax
+    ) {
+        return;
+    }
+    const uint8_t ff_ClipYMin = (uint8_t)gfy_ClipYMin;
+    const uint8_t ff_ClipYMax = (uint8_t)gfy_ClipYMax;
+    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
+    uint8_t* pixel = buffer + ((x * GFY_LCD_HEIGHT) + y);
+    const uint8_t replace = *pixel;
+    if (replace == color) {
+        return; // Same color
+    }
+
+    FloodFillCord* const ff_stack = (FloodFillCord*)alloca(FLOODFILL_STACK_SIZE);
+    size_t stack_size = 1;
+    ff_stack[0] = (FloodFillCord){(int24_t)x, y};
+#if 0
+    int x1;
+    bool spanAbove, spanBelow;
+    do {
+        stack_size--;
+        const FloodFillCord ff_cord = ff_stack[stack_size];
+
+        x1 = ff_cord.x;
+        while(x1 >= gfy_ClipXMin && buffer[ff_cord.y + x1 * GFY_LCD_HEIGHT] == replace) {
+            x1--;
+        }
+        x1++;
+        spanAbove = false;
+        spanBelow = false;
+        while(
+            x1 < gfy_ClipXMax &&
+            buffer[ff_cord.y + x1 * GFY_LCD_HEIGHT] == replace &&
+            stack_size <= Maximum_FloodFill_Stack_Depth - FloodFill_Safety_Margin
+        ) {
+            buffer[ff_cord.y + x1 * GFY_LCD_HEIGHT] = color;
+            if (!spanAbove && ff_cord.y > gfy_ClipYMin && buffer[(ff_cord.y - 1) + x1 * GFY_LCD_HEIGHT] == replace) {
+                ff_stack[stack_size] = (FloodFillCord){
+                    x1, ff_cord.y - 1
+                };
+                stack_size++;
+                spanAbove = true;
+            } else if (spanAbove && ff_cord.y > gfy_ClipYMin && buffer[(ff_cord.y - 1) + x1 * GFY_LCD_HEIGHT] != replace) {
+                spanAbove = false;
+            }
+            if (!spanBelow && ff_cord.y < gfy_ClipYMax - 1 && buffer[(ff_cord.y + 1) + x1 * GFY_LCD_HEIGHT] == replace) {
+                ff_stack[stack_size] = (FloodFillCord){
+                    x1, ff_cord.y + 1
+                };
+                stack_size++;
+                spanBelow = true;
+            } else if (spanBelow && ff_cord.y < gfy_ClipYMax - 1 && buffer[(ff_cord.y + 1) + x1 * GFY_LCD_HEIGHT] != replace) {
+                spanBelow = false;
+            }
+            x1++;
+        }
+    } while (stack_size > 0);
+#elif 1
+    int x1;
+    bool spanAbove, spanBelow;
+    const uint8_t ff_ClipYMaxMinus1 = (uint8_t)(ff_ClipYMax - 1);
+    do {
+        stack_size--;
+        const FloodFillCord ff_cord = ff_stack[stack_size];
+
+        x1 = ff_cord.x;
+        uint8_t* src = &buffer[ff_cord.y + x1 * GFY_LCD_HEIGHT];
+        while(x1 >= gfy_ClipXMin && *src == replace) {
+            x1--;
+            src -= GFY_LCD_HEIGHT;
+        }
+        x1++;
+        src += GFY_LCD_HEIGHT;
+        spanAbove = false;
+        spanBelow = false;
+        while(
+            x1 < gfy_ClipXMax &&
+            *src == replace &&
+            stack_size <= Maximum_FloodFill_Stack_Depth - FloodFill_Safety_Margin
+        ) {
+            *src = color;
+            if (ff_cord.y > ff_ClipYMin) {
+                const uint8_t src_pixel = *(src - 1);
+                if (!spanAbove && src_pixel == replace) {
+                    ff_stack[stack_size] = (FloodFillCord){
+                        x1, ff_cord.y - 1
+                    };
+                    stack_size++;
+                    spanAbove = true;
+                } else if (spanAbove && src_pixel != replace) {
+                    spanAbove = false;
+                }
+            }
+            if (ff_cord.y < ff_ClipYMaxMinus1) {
+                const uint8_t src_pixel = *(src + 1);
+                if (!spanBelow && src_pixel == replace) {
+                    ff_stack[stack_size] = (FloodFillCord){
+                        x1, ff_cord.y + 1
+                    };
+                    stack_size++;
+                    spanBelow = true;
+                } else if (spanBelow && src_pixel != replace) {
+                    spanBelow = false;
+                }
+            }
+            x1++;
+            src += GFY_LCD_HEIGHT;
+        }
+    } while (stack_size > 0);
+#elif 1
+    int y1;
+    bool spanAbove, spanBelow;
+    do {
+        stack_size--;
+        const FloodFillCord ff_cord = ff_stack[stack_size];
+
+        y1 = ff_cord.y;
+        while(y1 >= gfy_ClipYMin && buffer[ff_cord.x * GFY_LCD_HEIGHT + y1] == replace) {
+            y1--;
+        }
+        y1++;
+        spanAbove = false;
+        spanBelow = false;
+        while(
+            y1 < gfy_ClipYMax &&
+            buffer[ff_cord.x * GFY_LCD_HEIGHT + y1] == replace &&
+            stack_size <= Maximum_FloodFill_Stack_Depth - FloodFill_Safety_Margin
+        ) {
+            buffer[ff_cord.x * GFY_LCD_HEIGHT + y1] = color;
+            if (!spanAbove && ff_cord.x > gfy_ClipXMin && buffer[(ff_cord.x - 1) * GFY_LCD_HEIGHT + y1] == replace) {
+                ff_stack[stack_size] = (FloodFillCord){
+                    ff_cord.x - 1, y1
+                };
+                stack_size++;
+                spanAbove = true;
+            } else if (spanAbove && ff_cord.x > gfy_ClipXMin && buffer[(ff_cord.x - 1) * GFY_LCD_HEIGHT + y1] != replace) {
+                spanAbove = false;
+            }
+            if (!spanBelow && ff_cord.x < gfy_ClipXMax - 1 && buffer[(ff_cord.x + 1) * GFY_LCD_HEIGHT + y1] == replace) {
+                ff_stack[stack_size] = (FloodFillCord){
+                    ff_cord.x + 1, y1
+                };
+                stack_size++;
+                spanBelow = true;
+            } else if (spanBelow && ff_cord.x < gfy_ClipXMax - 1 && buffer[(ff_cord.x + 1) * GFY_LCD_HEIGHT + y1] != replace) {
+                spanBelow = false;
+            }
+            y1++;
+        }
+    } while (stack_size > 0);
+#endif
+}
 #endif
 
 //------------------------------------------------------------------------------
