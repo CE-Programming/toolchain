@@ -2354,6 +2354,7 @@ gfy_SetTextScale: ; COPIED_FROM_GRAPHX
 .bothone:
 ;	ld	(hl),a			; store a 0, which means no (literal) jump
 	inc	a
+	ld	(_TextHeightScale),a
 	ld	(de),a
 	ret
 
@@ -3493,6 +3494,7 @@ end if
 ; gfy_RotatedScaledTransparentSprite_NoClip:
 
 ;-------------------------------------------------------------------------------
+if 0
 gfy_RotateScaleSprite: ; COPIED_FROM_GRAPHX
 ; Rotate and scale an image using an output buffer
 ; Arguments:
@@ -3693,6 +3695,8 @@ _smc_dsrs_sinf_1:			; smc = sinf
 	pop	de
 	pop	ix
 	ret
+
+end if
 
 getSinCos:
 	; returns a = sin/cos(a) * 128
