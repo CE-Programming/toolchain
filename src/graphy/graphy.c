@@ -23,6 +23,8 @@
 
 #include <math.h>
 
+#include <alloca.h>
+
 #if 0
 #include <ti/sprintf.h>
 #define test_printf(...) boot_sprintf((char*)0xFB0000, __VA_ARGS__)
@@ -2075,7 +2077,7 @@ void gfy_FillTriangle_NoClip(
 /* gfy_FloodFill */
 
 // It is probably better (and safer) to reimplement this routine
-#if 0
+#if 1
 
     // Debug printf statements
     // #define FLOODFILL_DEBUG
@@ -2087,24 +2089,34 @@ void gfy_FillTriangle_NoClip(
         #endif
     #endif
 
-    // compress_stack() will run a little bit faster, this can also alter how many pixels are written before a soft stack-overflow
-    #define FLOODFILL_FAST_COMPRESS
+    /**
+     * @brief compress_stack() will run a little bit faster, this can also
+     * alter how many pixels are written before a soft stack-overflow.
+     * @remarks while it might be faster, it performs searches out of order
+     * and runs out of memory much sooner.
+     */
+    // #define FLOODFILL_FAST_COMPRESS
 
     // malloc and free ff_stack each time
-    #define FLOODFILL_MALLOC_STACK
+    #define FLOODFILL_ALLOCA_STACK
 
-    #define FLOODFILL_STACK_SIZE (3224)
+    // #define FLOODFILL_STACK_SIZE (3224)
+    // going slightly lower to prevent stack overflows (not by much though)
+    #define FLOODFILL_STACK_SIZE (3072)
 
     typedef struct FloodFillCord {
-        int24_t x;
+        uint16_t x;
         uint8_t y;
     } FloodFillCord;
 
-    #ifndef FLOODFILL_MALLOC_STACK
+    #ifndef FLOODFILL_ALLOCA_STACK
         #define Maximum_FloodFill_Stack_Depth (FLOODFILL_STACK_SIZE / sizeof(FloodFillCord))
-
         static FloodFillCord ff_stack[Maximum_FloodFill_Stack_Depth];
+    #else
+        #define Maximum_FloodFill_Stack_Depth (FLOODFILL_STACK_SIZE / sizeof(FloodFillCord))
     #endif
+
+    #define FloodFill_Safety_Margin (4)
 
     // static int16_t ff_ClipXMin = 0;
     // static int16_t ff_ClipXMax = GFY_LCD_WIDTH;
@@ -2112,7 +2124,7 @@ void gfy_FillTriangle_NoClip(
     // static uint8_t ff_ClipYMax = GFY_LCD_HEIGHT;
 
     static bool ffcord_redundant(
-        #ifdef FLOODFILL_MALLOC_STACK
+        #ifdef FLOODFILL_ALLOCA_STACK
             FloodFillCord* const ff_stack,
         #endif
         const uint24_t index, const uint8_t replace,
@@ -2158,7 +2170,7 @@ void gfy_FillTriangle_NoClip(
 
     // Returns new stack size
     static uint24_t compress_stack(
-        #ifdef FLOODFILL_MALLOC_STACK
+        #ifdef FLOODFILL_ALLOCA_STACK
             FloodFillCord* const ff_stack,
         #endif
         const uint24_t stack_size, const uint8_t replace,
@@ -2169,7 +2181,7 @@ void gfy_FillTriangle_NoClip(
             for (uint24_t i = 0; i < compressed_size; i++) {
                 while (
                     ffcord_redundant(
-                        #ifdef FLOODFILL_MALLOC_STACK
+                        #ifdef FLOODFILL_ALLOCA_STACK
                             ff_stack,
                         #endif
                         i, replace, ff_ClipYMax, ff_ClipYMin
@@ -2187,7 +2199,7 @@ void gfy_FillTriangle_NoClip(
             uint24_t dst_index = 0;
             for (uint24_t src_index = 0; src_index < stack_size; src_index++) {
                 if (ffcord_redundant(
-                    #ifdef FLOODFILL_MALLOC_STACK
+                    #ifdef FLOODFILL_ALLOCA_STACK
                         ff_stack,
                     #endif
                     src_index, replace, ff_ClipYMax, ff_ClipYMin
@@ -2205,7 +2217,7 @@ void gfy_FillTriangle_NoClip(
     }
 
     void gfy_FloodFill(uint24_t x, uint8_t y, const uint8_t color) {
-            if (
+        if (
             (int24_t)x < gfy_ClipXMin || (int24_t)x >= gfy_ClipXMax ||
             (int24_t)y < gfy_ClipYMin || (int24_t)y >= gfy_ClipYMax
         ) {
@@ -2220,17 +2232,8 @@ void gfy_FillTriangle_NoClip(
             return; // Same color
         }
 
-        #ifdef FLOODFILL_MALLOC_STACK
-            uint24_t Maximum_FloodFill_Stack_Depth = FLOODFILL_STACK_SIZE;
-            FloodFillCord* ff_stack = malloc(Maximum_FloodFill_Stack_Depth * sizeof(FloodFillCord));
-            if (ff_stack == NULL) {
-                // Tries to malloc half as much instead
-                Maximum_FloodFill_Stack_Depth = FLOODFILL_STACK_SIZE / 2;
-                ff_stack = malloc(Maximum_FloodFill_Stack_Depth * sizeof(FloodFillCord));
-                if (ff_stack == NULL) {
-                    return;
-                }
-            }
+        #ifdef FLOODFILL_ALLOCA_STACK
+            FloodFillCord* const ff_stack = (FloodFillCord*)alloca(FLOODFILL_STACK_SIZE);
         #endif
 
         *pixel = color;
@@ -2250,7 +2253,6 @@ void gfy_FillTriangle_NoClip(
 
             stack_size--;
             const FloodFillCord ff_cord = ff_stack[stack_size];
-
 
             uint8_t* test = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (ff_cord.x * GFY_LCD_HEIGHT + ff_cord.y);
             test++; // Down 1
@@ -2313,12 +2315,12 @@ void gfy_FillTriangle_NoClip(
                     pixels_written++;
                 #endif
             }
-            if (stack_size > Maximum_FloodFill_Stack_Depth - 4) {
+            if (stack_size > Maximum_FloodFill_Stack_Depth - FloodFill_Safety_Margin) {
                 #ifdef FLOODFILL_DEBUG
                     printf("pixels_written: %5zu ", pixels_written);
                 #endif
                 stack_size = compress_stack(
-                    #ifdef FLOODFILL_MALLOC_STACK
+                    #ifdef FLOODFILL_ALLOCA_STACK
                         ff_stack,
                     #endif
                     stack_size, replace, ff_ClipYMax, ff_ClipYMin
@@ -2326,17 +2328,16 @@ void gfy_FillTriangle_NoClip(
             }
         } while (
             stack_size > 0 &&
-            stack_size <= Maximum_FloodFill_Stack_Depth - 4
+            stack_size <= Maximum_FloodFill_Stack_Depth - FloodFill_Safety_Margin
         );
         #ifdef FLOODFILL_DEBUG
             printf("Maximum stack_size: %u pixels_written: %zu\n", (uint32_t)max_s, pixels_written);
-            if (stack_size > Maximum_FloodFill_Stack_Depth - 4) {
+            if (stack_size > Maximum_FloodFill_Stack_Depth - FloodFill_Safety_Margin) {
                 printf("Error: stack_size: %u\n", (uint32_t)stack_size);
             }
         #endif
-        #ifdef FLOODFILL_MALLOC_STACK
-            free(ff_stack);
-            ff_stack = NULL;
+        #ifdef FLOODFILL_ALLOCA_STACK
+            /* insert cleanup code here */
         #endif
     }
 #endif

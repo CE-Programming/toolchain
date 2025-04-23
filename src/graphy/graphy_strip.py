@@ -101,12 +101,18 @@ file_data = file_data.replace(
     b"\tld\tbc, 255\n\tinc.s\thl\n\tdec\thl\n\tld\th, b\n"
 )
 
-
 # __land
 
 file_data = file_data.replace(
     b"\tld\tbc, 255\n\txor\ta, a\n\tcall\t__land\n",
     b"\tld\tbc, 255\n\t\n\txor\ta, a\n\tinc.s\thl\n\tdec\thl\n\tld\th, b\n\tld\te, b\n"
+)
+
+# __lshru
+
+file_data = file_data.replace(
+    b"\tld\tl, 24\n\tcall\t__lshru\n",
+    b"\tld\tl, 24\n\tld\tbc, 0\n\tld\tc, a\n\txor\ta, a\n"
 )
 
 # __imulu
