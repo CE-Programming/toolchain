@@ -1979,6 +1979,10 @@ gfy_BlitRectangle:
 	ld	iyh, a	; jump
 
 	ld	a, c	; width % 256
+	or	a, a	; does with = 256?
+	jr	nz, .not_256
+	ld	b, a	; ld b, 0
+.not_256:
 	push	bc
 	ld	bc, 0
 
@@ -2099,12 +2103,12 @@ gfy_Sprite_NoClip:
 	; IYH = height
 	; IYL = width
 .loop:
+	ld	c, iyh	; height
 	ldir
 	ld	c, a	; jump
 	ex	de, hl
 	add	hl, bc
 	ex	de, hl
-	ld	c, iyh	; height
 	dec	iyl
 	jr	nz, .loop
 	ret
@@ -3395,7 +3399,7 @@ gfy_RotateSpriteHalf: ; MODIFIED_FROM_GRAPHX
 	ret
 
 ;-------------------------------------------------------------------------------
-if 1
+if 0
 gfy_ScaleSprite: ; UNIMPLEMENTED
 	ret
 else
@@ -3474,10 +3478,10 @@ du := $-1
 dv_shl_16 := $-1
 	add	iy,bc
 	ld	bc,0			; dv>>8*src_height
-dv_shr_8_times_Height := $-3
+dv_shr_8_times_height := $-3
 	jr	nc,.skip
 	ld	bc,0			; dv>>8*src_height+src_height
-dv_shr_8_times_Height_plus_Height := $-3
+dv_shr_8_times_height_plus_height := $-3
 .skip:
 	add	hl,bc
 	inc	ixl
