@@ -101,6 +101,14 @@ file_data = file_data.replace(
     b"\tld\tbc, 255\n\tinc.s\thl\n\tdec\thl\n\tld\th, b\n"
 )
 
+
+# __land
+
+file_data = file_data.replace(
+    b"\tld\tbc, 255\n\txor\ta, a\n\tcall\t__land\n",
+    b"\tld\tbc, 255\n\t\n\txor\ta, a\n\tinc.s\thl\n\tdec\thl\n\tld\th, b\n\tld\te, b\n"
+)
+
 # __imulu
 
 file_data = file_data.replace(
