@@ -566,8 +566,11 @@ static void gfy_internal_PrintChar_NoClip(const char c, const uint8_t charWidth)
 /* gfy_PrintChar */
 
 void gfy_PrintChar(const char c) {
+    if (gfy_TextWidthScale == 0 || gfy_TextHeightScale == 0) {
+        return;
+    }
     gfy_Wait();
-    const uint8_t charWidth = gfy_GetCharWidth(c);
+    const uint8_t charWidth = gfy_GetCharWidth(c) / gfy_TextWidthScale;
     const uint8_t textSizeX = charWidth * gfy_TextWidthScale;
     const uint8_t textSizeY = GFY_MAXIMUM_FONT_HEIGHT * gfy_TextHeightScale;
     if (
@@ -2464,6 +2467,63 @@ void gfy_RLETSprite_NoClip(const gfy_rletsprite_t *sprite, const uint24_t x, con
 //------------------------------------------------------------------------------
 
 /* gfy_RotateScaleSprite (graphy.asm) */
+
+#if 1
+
+gfy_sprite_t *gfy_RotateScaleSprite(
+    const gfy_sprite_t *__restrict sprite_in,
+    gfy_sprite_t *__restrict sprite_out,
+    uint8_t angle,
+    uint8_t scale
+) {
+    const uint8_t in_size = sprite_in->width;
+    uint24_t temp_size = sprite_in->width * scale / 64;
+    const uint8_t out_size = (temp_size >= 256) ? 255 : temp_size;
+    sprite_out->width = out_size;
+    sprite_out->height = out_size;
+    memset(sprite_out->data, gfy_Transparent_Color, out_size * out_size);
+
+    const float angle_f = (float)angle * 0.0245436926f;
+
+    const float cos_f = (float)cosf(angle_f);
+    const float sin_f = (float)sinf(angle_f);
+
+    const float in_size_f = (float)in_size;
+    const float out_size_f = (float)out_size;
+    
+    const float size_ratio = in_size_f / out_size_f;
+
+    const float cos_jump = cos_f * size_ratio;
+    const float sin_jump = sin_f * size_ratio;
+
+    const float in_size_mult = -0.5f * in_size_f;
+    float yc_cos = in_size_mult * (cos_f + sin_f - 1.0f);
+    float yc_sin = in_size_mult * (cos_f - sin_f - 1.0f);
+
+    uint8_t* dst_ptr = sprite_out->data;
+    for (uint8_t x = 0; x < out_size; x++) {
+        float xc_cos = yc_sin;
+        float xc_sin = yc_cos;
+        for (uint8_t y = 0; y < out_size; y++) {
+            uint8_t x_pos = (uint8_t)(int)xc_cos;
+            uint8_t y_pos = (uint8_t)(int)xc_sin;
+            if (
+                x_pos < in_size && y_pos < in_size &&
+                x_pos >= 0 && y_pos >= 0
+            ) {
+                *dst_ptr = sprite_in->data[y_pos + x_pos * in_size];
+            }
+            dst_ptr++;
+            xc_cos += cos_jump;
+            xc_sin += sin_jump;
+        }
+        yc_cos += cos_jump;
+        yc_sin -= sin_jump;
+    }
+    return sprite_out;
+}
+
+#endif
 
 /* gfy_RotatedScaledTransparentSprite_NoClip */
 
