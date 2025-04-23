@@ -3778,8 +3778,7 @@ _16Mul16SignedNeg:
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_FloodFill: ; UNIMPLEMENTED
-	ret
+; gfy_FloodFill:
 
 ;-------------------------------------------------------------------------------
 ; gfy_RLETSprite:
@@ -3788,7 +3787,7 @@ gfy_FloodFill: ; UNIMPLEMENTED
 ; gfy_RLETSprite_NoClip:
 
 ;-------------------------------------------------------------------------------
-gfy_ConvertFromRLETSprite: ; COPIED_FROM_GRAPHX
+gfy_ConvertFromRLETSprite: ; MODIFIED_FROM_GRAPHX
 ; Converts a sprite with RLE transpareny to a sprite with normal transparency.
 ; Arguments:
 ;  arg0 : pointer to gfy_rletsprite_t input
@@ -3811,7 +3810,7 @@ gfy_ConvertFromRLETSprite: ; COPIED_FROM_GRAPHX
 	inc.s	bc			; bcu = 0
 ; Row loop {
 _ConvertFromRLETSprite_Row:
-	ld	a,iyl			; a = width
+	ld	a,iyh			; a = height
 ;; Data loop {
 _ConvertFromRLETSprite_Trans:
 ;;; Read the length of a transparent run.
@@ -3822,7 +3821,7 @@ _ConvertFromRLETSprite_Trans:
 ;;; Skip the transparent run if the length is zero.
 	jr	z,_ConvertFromRLETSprite_Opaque ; z ==> trans run length == 0
 ;;; Write <transparent run length> zeros to the output.
-	sub	a,b			; a = width remaining after trans run
+	sub	a,b			; a = height remaining after trans run
 	ld	c,0			; c = trans color
 smcByte _TransparentColor
 	ex	de,hl			; de = input data, hl = output data
@@ -3832,28 +3831,28 @@ _ConvertFromRLETSprite_TransLoop:
 	djnz	_ConvertFromRLETSprite_TransLoop ; decrement trans run length remaining,
 						 ; nz ==> trans run length remaining != 0
 	ex	de,hl			; de = output data, hl = input data
-;;; Break out of data loop if width remaining == 0.
-	jr	z,_ConvertFromRLETSprite_RowEnd ; z ==> width remaining == 0
+;;; Break out of data loop if height remaining == 0.
+	jr	z,_ConvertFromRLETSprite_RowEnd ; z ==> height remaining == 0
 _ConvertFromRLETSprite_Opaque:
 ;;; Read the length of an opaque run and copy it to the output.
 	ld	c,(hl)			; bc = opaque run length
 	inc	hl
-	sub	a,c			; a = width remaining after opqaue run
+	sub	a,c			; a = height remaining after opqaue run
 	ldir				; copy opaque run
-;;; Continue data loop while width remaining != 0.
-	jr	nz,_ConvertFromRLETSprite_Trans ; nz ==> width remaining != 0
+;;; Continue data loop while height remaining != 0.
+	jr	nz,_ConvertFromRLETSprite_Trans ; nz ==> height remaining != 0
 ;; }
 _ConvertFromRLETSprite_RowEnd:
-;; Decrement height remaining. Continue row loop while not zero.
-	dec	iyh			; decrement height remaining
-	jr	nz,_ConvertFromRLETSprite_Row ; nz ==> height remaining != 0
+;; Decrement width remaining. Continue row loop while not zero.
+	dec	iyl			; decrement width remaining
+	jr	nz,_ConvertFromRLETSprite_Row ; nz ==> width remaining != 0
 ; }
 ; Return output.
 	pop	hl			; hl = output
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_ConvertToNewRLETSprite: ; COPIED_FROM_GRAPHX
+gfy_ConvertToNewRLETSprite: ; MODIFIED_FROM_GRAPHX
 ; Converts a sprite with normal transpareny to a sprite with RLE transparency,
 ; allocating the exact amount of necessary space for the converted sprite.
 ; Arguments:
@@ -3879,7 +3878,7 @@ gfy_ConvertToNewRLETSprite: ; COPIED_FROM_GRAPHX
 smcByte _TransparentColor
 ; Row loop {
 _ConvertToNewRLETSprite_Row:
-	ld	b,iyl			; b = width
+	ld	b,iyh			; b = height
 	inc	de			; increment output size for first trans run
 ;; Transparent loop {
 _ConvertToNewRLETSprite_TransLoop:
@@ -3889,9 +3888,9 @@ _ConvertToNewRLETSprite_TransLoop:
 	jr	nz,_ConvertToNewRLETSprite_OpaquePixel ; nz ==> not transparent
 	dec	de			; revert output size, not opaque run
 _ConvertToNewRLETSprite_TransPixel:
-;;; Continue while width remaining != 0.
-	djnz	_ConvertToNewRLETSprite_TransLoop ; decrement width remaining,
-						  ; nz ==> width remaining != 0
+;;; Continue while height remaining != 0.
+	djnz	_ConvertToNewRLETSprite_TransLoop ; decrement height remaining,
+						  ; nz ==> height remaining != 0
 ;; }
 ;; Finish row.
 	jr	_ConvertToNewRLETSprite_RowEnd
@@ -3902,14 +3901,14 @@ _ConvertToNewRLETSprite_OpaqueLoop:
 _ConvertToNewRLETSprite_OpaquePixel:
 	inc	de			; increment output length
 	jr	z,_ConvertToNewRLETSprite_TransPixel ; z ==> transparent
-;;; Continue while width remaining != 0.
-	djnz	_ConvertToNewRLETSprite_OpaqueLoop ; decrement width remaining,
-						   ; nz ==> width remaining != 0
+;;; Continue while height remaining != 0.
+	djnz	_ConvertToNewRLETSprite_OpaqueLoop ; decrement height remaining,
+						   ; nz ==> height remaining != 0
 ;; }
 _ConvertToNewRLETSprite_RowEnd:
-;; Decrement height remaining. Continue row loop while not zero.
-	dec	iyh			; decrement height remaining
-	jr	nz,_ConvertToNewRLETSprite_Row ; nz ==> height remaining != 0
+;; Decrement width remaining. Continue row loop while not zero.
+	dec	iyl			; decrement width remaining
+	jr	nz,_ConvertToNewRLETSprite_Row ; nz ==> width remaining != 0
 ; }
 ; Allocate output.
 	push	de
@@ -3921,7 +3920,7 @@ _ConvertToNewRLETSprite_Malloc_SMC := $-3
 	jr	_ConvertToRLETSprite_ASM
 
 ;-------------------------------------------------------------------------------
-gfy_ConvertToRLETSprite: ; COPIED_FROM_GRAPHX
+gfy_ConvertToRLETSprite: ; MODIFIED_FROM_GRAPHX
 ; Converts a sprite with normal transpareny to a sprite with RLE transparency.
 ; Arguments:
 ;  arg0 : pointer to gfy_sprite_t input
@@ -3947,7 +3946,7 @@ _ConvertToRLETSprite_ASM:
 smcByte _TransparentColor
 ; Row loop {
 _ConvertToRLETSprite_Row:
-	ld	b,iyl			; b = width
+	ld	b,iyh			; b = height
 ;; Data loop {
 _ConvertToRLETSprite_Trans:
 ;;; Calculate the length of a transparent run.
@@ -3958,9 +3957,9 @@ _ConvertToRLETSprite_TransLoop:
 	jr	nz,_ConvertToRLETSprite_TransEnd ; nz ==> not transparent
 	inc	hl
 	inc	bc			; increment trans run length
-;;;; Continue transparent loop while width remaining != 0.
-	djnz	_ConvertToRLETSprite_TransLoop ; decrement width remaining,
-					       ; nz ==> width remaining != 0
+;;;; Continue transparent loop while height remaining != 0.
+	djnz	_ConvertToRLETSprite_TransLoop ; decrement height remaining,
+					       ; nz ==> height remaining != 0
 ;;; }
 ;;; Write the length of the transparent run to the output.
 _ConvertToRLETSprite_TransEnd:
@@ -3968,9 +3967,9 @@ _ConvertToRLETSprite_TransEnd:
 	ld	(hl),c			; write trans run length
 	inc	hl
 	ex	de,hl			; de = output data, hl = input data
-;;; Break out of data loop if width remaining == 0.
+;;; Break out of data loop if height remaining == 0.
 	jr	z,_ConvertToRLETSprite_RowEnd ; z ==> last pixel was transparent
-					      ;   ==> width remaining == 0
+					      ;   ==> height remaining == 0
 ;;; Copy an opaque run to the output.
 _ConvertToRLETSprite_Opaque:
 	ld	c,0			; c = 0 = opaque run length
@@ -3983,22 +3982,22 @@ _ConvertToRLETSprite_OpaqueLoop:
 	inc	bc			; cancel dec bc from upcoming ldi
 	ldi				; copy opaque pixel
 	inc	bc			; increment opaque run length
-;;;; Continue opaque/data loop while width remaining != 0.
-	djnz	_ConvertToRLETSprite_OpaqueLoop ; decrement width remaining,
-						; nz ==> width remaining != 0
+;;;; Continue opaque/data loop while height remaining != 0.
+	djnz	_ConvertToRLETSprite_OpaqueLoop ; decrement height remaining,
+						; nz ==> height remaining != 0
 _ConvertToRLETSprite_OpaqueEnd:
 	ex	(sp),hl			; (sp) = input data, hl = location to write opaque run length
 	ld	(hl),c			; write opaque run length
 	pop	hl			; hl = input data
-;;; Continue data loop if width remaining != 0.
+;;; Continue data loop if height remaining != 0.
 	jr	z,_ConvertToRLETSprite_Trans ; z ==> last pixel was transparent
-					     ;   ==> width remaining != 0
+					     ;   ==> height remaining != 0
 ;;; }
 ;; }
 _ConvertToRLETSprite_RowEnd:
-;; Decrement height remaining. Continue row loop while not zero.
-	dec	iyh			; decrement height remaining
-	jr	nz,_ConvertToRLETSprite_Row ; nz ==> height remaining != 0
+;; Decrement width remaining. Continue row loop while not zero.
+	dec	iyl			; decrement width remaining
+	jr	nz,_ConvertToRLETSprite_Row ; nz ==> width remaining != 0
 ; }
 ; Return output.
 	pop	hl			; hl = output
@@ -4632,6 +4631,7 @@ __bshl      := $000100
 __land      := $0001A4
 __ior       := $000168
 __ishru     := $000184
+__lshru     := $0001EC
 
 __fcmp      := $000274
 __fneg      := $00028C

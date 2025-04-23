@@ -4751,6 +4751,453 @@ BB22_13:
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
+;	public	gfy_FloodFill
+gfy_FloodFill:
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 32
+	ld	sp, hl
+	ld	hl, (ix + 6)
+	ld	iy, (gfy_ClipXMin)
+	ld	bc, -8388608
+	add	iy, bc
+	add	hl, bc
+	push	hl
+	pop	de
+	lea	bc, iy
+	or	a, a
+	sbc	hl, bc
+	jp	c, BB23_38
+	ld	iy, (gfy_ClipXMax)
+	ld	bc, -8388608
+	add	iy, bc
+	ex	de, hl
+	lea	bc, iy
+	or	a, a
+	sbc	hl, bc
+	jp	nc, BB23_38
+	ld	c, (ix + 9)
+	ld	a, (gfy_ClipYMin)
+	ld	l, a
+	ld	a, c
+	ld	(ix - 4), l
+	cp	a, l
+	jp	c, BB23_38
+	ld	a, (gfy_ClipYMax)
+	ld	iyl, a
+	ld	a, c
+	cp	a, iyl
+	jp	nc, BB23_38
+	ld	bc, 240
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	ld	e, (ix + 9)
+	ld	a, iyl
+	ld	iy, (-1900524)
+	ld	hl, (ix + 6)
+	call	__imulu
+	add	hl, de
+	push	hl
+	pop	bc
+	ld	(ix - 3), iy
+	lea	hl, iy
+	ld	iyl, a
+	add	hl, bc
+	ld	a, (hl)
+	ld	(ix - 8), a
+	ld	l, (ix + 12)
+	cp	a, l
+	jp	z, BB23_38
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	ld	e, iyl
+	ex	de, hl
+	ld	(ix - 20), hl
+	ld	de, 3072
+	ld	hl, 0
+	add	hl, sp
+	sbc	hl, de
+	push	hl
+	pop	iy
+	ld	sp, iy
+	ld	hl, (ix - 3)
+	add	hl, bc
+	ld	a, (ix + 12)
+	ld	(hl), a
+	ld	hl, (ix + 6)
+	ld	(iy), l
+	ld	(iy + 1), h
+	ld	(ix - 14), iy
+	ld	a, (ix + 9)
+	ld	(iy + 2), a
+	ld	bc, 1
+BB23_6:
+	ld	(ix - 7), bc
+	push	bc
+	pop	hl
+	dec	hl
+	ld	(ix - 3), hl
+	push	hl
+	pop	bc
+	add	hl, bc
+	add	hl, bc
+	ld	bc, 3
+	push	hl
+	pop	de
+	ld	iy, (ix - 14)
+	add	iy, de
+	ld	bc, (iy)
+	ld	(ix - 26), iy
+	ld	a, (iy + 2)
+	ld	iy, (-1900524)
+	ld	de, 0
+	push	de
+	pop	hl
+	ld	(ix - 29), bc
+	ld	l, c
+	ld	h, b
+	ld	(ix - 17), hl
+	call	__set_bc_and_mul_hl_by_240
+	ld	(ix - 23), a
+	ld	e, a
+	add	hl, de
+	push	hl
+	pop	bc
+	add	iy, bc
+	inc	de
+	push	de
+	pop	hl
+	ld	bc, (ix - 20)
+	or	a, a
+	sbc	hl, bc
+	lea	hl, iy
+	ld	(ix - 11), hl
+	jr	nc, BB23_9
+	ld	bc, (ix - 26)
+	ld	iy, (ix - 11)
+	ld	a, (iy + 1)
+	ld	l, (ix - 8)
+	cp	a, l
+	jr	nz, BB23_9
+	push	bc
+	pop	iy
+	ld	(iy + 2), e
+	ld	a, (ix + 12)
+	ld	iy, (ix - 11)
+	ld	(iy + 1), a
+	ld	hl, (ix - 7)
+	ld	(ix - 3), hl
+BB23_9:
+	ld	de, (ix - 17)
+	inc	de
+	ld	iy, (gfy_ClipXMax)
+	ld	hl, -8388608
+	push	hl
+	pop	bc
+	add	iy, bc
+	push	de
+	pop	hl
+	add	hl, bc
+	lea	bc, iy
+	or	a, a
+	sbc	hl, bc
+	jr	nc, BB23_12
+	ld	iy, (ix - 11)
+	ld	bc, 240
+	add	iy, bc
+	ld	a, (iy)
+	ld	l, (ix - 8)
+	cp	a, l
+	jr	nz, BB23_12
+	ld	hl, (ix - 3)
+	push	hl
+	pop	bc
+	add	hl, bc
+	add	hl, bc
+	ld	bc, 3
+	push	hl
+	pop	bc
+	ld	iy, (ix - 14)
+	add	iy, bc
+	ld	bc, 240
+	ld	(iy), e
+	ld	(iy + 1), d
+	ld	a, (ix - 23)
+	ld	(iy + 2), a
+	ld	hl, (ix - 3)
+	inc	hl
+	ld	(ix - 3), hl
+	ld	iy, (ix - 11)
+	add	iy, bc
+	ld	a, (ix + 12)
+	ld	(iy), a
+BB23_12:
+	ld	hl, (gfy_ClipXMin)
+	ld	de, -8388608
+	ld	iy, (ix - 17)
+	add	iy, de
+	add	hl, de
+	lea	de, iy
+	or	a, a
+	sbc	hl, de
+	jp	nc, BB23_15
+	ld	bc, (ix - 11)
+	push	bc
+	pop	iy
+	ld	de, -240
+	add	iy, de
+	ld	a, (iy)
+	ld	l, (ix - 8)
+	cp	a, l
+	jp	nz, BB23_15
+	ld	hl, (ix - 29)
+	dec.sis	hl
+	ld	(ix - 7), hl
+	ld	de, (ix - 3)
+	push	de
+	pop	hl
+	push	hl
+	pop	bc
+	add	hl, bc
+	add	hl, bc
+	ld	bc, 3
+	push	hl
+	pop	bc
+	ld	iy, (ix - 14)
+	add	iy, bc
+	ld	hl, (ix - 7)
+	ld	(iy), l
+	ld	(iy + 1), h
+	ld	l, (ix - 23)
+	ld	(iy + 2), l
+	inc	de
+	ld	(ix - 3), de
+	ld	iy, (ix - 11)
+	ld	de, -240
+	add	iy, de
+	ld	a, (ix + 12)
+	ld	(iy), a
+	jr	BB23_16
+BB23_15:
+	ld	l, (ix - 23)
+BB23_16:
+	ld	a, l
+	or	a, a
+	jr	z, BB23_20
+	ld	e, l
+	dec	e
+	ld	a, (ix - 4)
+	cp	a, l
+	jr	nc, BB23_20
+	ld	iy, (ix - 11)
+	ld	a, (iy - 1)
+	ld	l, (ix - 8)
+	cp	a, l
+	jr	nz, BB23_20
+	ld	hl, (ix - 3)
+	push	hl
+	pop	bc
+	add	hl, bc
+	add	hl, bc
+	ld	bc, 3
+	push	hl
+	pop	bc
+	ld	iy, (ix - 14)
+	add	iy, bc
+	ld	hl, (ix - 29)
+	ld	(iy), l
+	ld	(iy + 1), h
+	ld	(iy + 2), e
+	ld	bc, (ix - 3)
+	inc	bc
+	ld	a, (ix + 12)
+	ld	iy, (ix - 11)
+	ld	(iy - 1), a
+	jr	BB23_21
+BB23_20:
+	ld	bc, (ix - 3)
+BB23_21:
+	push	bc
+	pop	hl
+	ld	de, 1021
+	or	a, a
+	sbc	hl, de
+	jp	c, BB23_36
+	ld	hl, (gfy_ClipXMax)
+	ld	(ix - 29), hl
+	ld	hl, (gfy_ClipXMin)
+	ld	(ix - 32), hl
+	ld	iy, (ix - 14)
+	or	a, a
+	sbc	hl, hl
+	ld	(ix - 7), hl
+BB23_23:
+	ld	(ix - 3), bc
+	ld	bc, (iy)
+	ld	(ix - 17), iy
+	ld	a, (iy + 2)
+	ld	iy, (-1900524)
+	ld	de, 0
+	push	de
+	pop	hl
+	ld	l, c
+	ld	h, b
+	ld	(ix - 23), hl
+	call	__set_bc_and_mul_hl_by_240
+	ld	(ix - 26), a
+	ld	e, a
+	add	hl, de
+	push	hl
+	pop	bc
+	add	iy, bc
+	ld	(ix - 11), iy
+	inc	de
+	ex	de, hl
+	ld	de, (ix - 20)
+	or	a, a
+	sbc	hl, de
+	ld	iy, (ix - 7)
+	jr	nc, BB23_25
+	lea	hl, iy
+	ld	iy, (ix - 11)
+	ld	a, (iy + 1)
+	push	hl
+	pop	iy
+	ld	l, (ix - 8)
+	cp	a, l
+	jr	z, BB23_31
+BB23_25:
+	ld	a, (ix - 4)
+	ld	l, (ix - 26)
+	cp	a, l
+	jr	nc, BB23_27
+	lea	hl, iy
+	ld	iy, (ix - 11)
+	ld	a, (iy - 1)
+	push	hl
+	pop	iy
+	ld	l, (ix - 8)
+	cp	a, l
+	jr	z, BB23_31
+BB23_27:
+	ld	hl, (ix - 23)
+	inc	hl
+	lea	bc, iy
+	ld	iy, (ix - 29)
+	ld	de, -8388608
+	add	iy, de
+	add	hl, de
+	lea	de, iy
+	push	bc
+	pop	iy
+	or	a, a
+	sbc	hl, de
+	jr	nc, BB23_29
+	ld	iy, (ix - 11)
+	ld	de, 240
+	add	iy, de
+	ld	a, (iy)
+	push	bc
+	pop	iy
+	ld	l, (ix - 8)
+	cp	a, l
+	jr	z, BB23_31
+BB23_29:
+	lea	bc, iy
+	ld	hl, -8388608
+	ex	de, hl
+	ld	iy, (ix - 23)
+	add	iy, de
+	ld	hl, (ix - 32)
+	add	hl, de
+	lea	de, iy
+	or	a, a
+	sbc	hl, de
+	jr	nc, BB23_32
+	ld	de, -240
+	ld	hl, (ix - 11)
+	add	hl, de
+	ld	a, (hl)
+	ld	l, (ix - 8)
+	cp	a, l
+	push	bc
+	pop	iy
+	jr	nz, BB23_33
+BB23_31:
+	lea	hl, iy
+	push	hl
+	pop	bc
+	add	hl, bc
+	add	hl, bc
+	ld	bc, 3
+	push	hl
+	pop	de
+	lea	bc, iy
+	ld	hl, (ix - 14)
+	add	hl, de
+	push	hl
+	pop	de
+	ld	iy, (ix - 17)
+	ld	a, (iy)
+	ld	(hl), a
+	ld	a, (iy + 1)
+	lea	hl, iy
+	push	de
+	pop	iy
+	ld	(iy + 1), a
+	push	hl
+	pop	iy
+	ld	a, (iy + 2)
+	push	de
+	pop	iy
+	ld	(iy + 2), a
+	push	hl
+	pop	iy
+	push	bc
+	pop	hl
+	inc	hl
+	ld	(ix - 7), hl
+	ld	bc, (ix - 3)
+	jr	BB23_35
+BB23_32:
+	ld	(ix - 7), bc
+	jr	BB23_34
+BB23_33:
+	ld	(ix - 7), iy
+BB23_34:
+	ld	bc, (ix - 3)
+	ld	iy, (ix - 17)
+BB23_35:
+	dec	bc
+	lea	iy, iy + 3
+	push	bc
+	pop	hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jp	nz, BB23_23
+	jr	BB23_37
+BB23_36:
+	ld	(ix - 7), bc
+BB23_37:
+	ld	bc, (ix - 7)
+	push	bc
+	pop	hl
+	dec	hl
+	ld	de, 1020
+	or	a, a
+	sbc	hl, de
+	jp	c, BB23_6
+BB23_38:
+	ld	sp, ix
+	pop	ix
+	ret
+;	section	.text,"ax",@progbits
+
+;	section	.text,"ax",@progbits
 ;	public	gfy_RLETSprite
 gfy_RLETSprite:
 	push	ix
@@ -4766,7 +5213,7 @@ gfy_RLETSprite:
 	lea	de, iy
 	or	a, a
 	sbc	hl, de
-	jp	nc, BB23_40
+	jp	nc, BB24_40
 	ld	a, (gfy_ClipYMax)
 	or	a, a
 	sbc	hl, hl
@@ -4783,17 +5230,17 @@ gfy_RLETSprite:
 	lea	de, iy
 	or	a, a
 	sbc	hl, de
-	jp	nc, BB23_40
+	jp	nc, BB24_40
 	ld	hl, (ix + 6)
 	ld	l, (hl)
 	ld	a, l
 	or	a, a
-	jp	z, BB23_40
+	jp	z, BB24_40
 	ld	iy, (ix + 6)
 	ld	e, (iy + 1)
 	ld	a, e
 	or	a, a
-	jp	z, BB23_40
+	jp	z, BB24_40
 	ld	(ix - 9), e
 	ld	a, l
 	ld	(ix - 12), bc
@@ -4808,7 +5255,7 @@ gfy_RLETSprite:
 	lea	bc, iy
 	or	a, a
 	sbc	hl, bc
-	jr	c, BB23_8
+	jr	c, BB24_8
 	or	a, a
 	sbc	hl, hl
 	push	hl
@@ -4838,7 +5285,7 @@ gfy_RLETSprite:
 	ld	hl, (ix - 3)
 	or	a, a
 	sbc	hl, de
-	jr	c, BB23_8
+	jr	c, BB24_8
 	ld	de, -8388608
 	push	bc
 	pop	iy
@@ -4847,7 +5294,7 @@ gfy_RLETSprite:
 	lea	de, iy
 	or	a, a
 	sbc	hl, de
-	jr	c, BB23_8
+	jr	c, BB24_8
 	ld	de, -8388608
 	ld	iy, (ix - 9)
 	add	iy, de
@@ -4855,8 +5302,8 @@ gfy_RLETSprite:
 	lea	de, iy
 	or	a, a
 	sbc	hl, de
-	jp	nc, BB23_41
-BB23_8:
+	jp	nc, BB24_41
+BB24_8:
 	call	gfy_Wait
 	ld	hl, (-1900524)
 	ld	(ix - 3), hl
@@ -4873,7 +5320,7 @@ BB23_8:
 	ld	(ix - 12), a
 	or	a, a
 	ld	hl, (ix + 9)
-	jp	z, BB23_40
+	jp	z, BB24_40
 	call	__set_bc_and_mul_hl_by_240
 	ld	bc, (ix + 9)
 	ld	de, (ix + 12)
@@ -4886,7 +5333,7 @@ BB23_8:
 	ld	(ix - 21), hl
 	ld	a, (ix - 6)
 	ld	iy, 0
-BB23_10:
+BB24_10:
 	ld	(ix - 15), iy
 	add	iy, bc
 	ld	bc, (gfy_ClipXMin)
@@ -4902,7 +5349,7 @@ BB23_10:
 	lea	hl, iy
 	or	a, a
 	sbc	hl, bc
-	jr	c, BB23_14
+	jr	c, BB24_14
 	ld	hl, (ix - 9)
 	add	hl, de
 	push	hl
@@ -4910,15 +5357,15 @@ BB23_10:
 	lea	hl, iy
 	or	a, a
 	sbc	hl, bc
-	jr	nc, BB23_14
+	jr	nc, BB24_14
 	ld	e, a
 	or	a, a
-	jr	nz, BB23_20
+	jr	nz, BB24_20
 	xor	a, a
 	sbc	hl, hl
 	ld	iy, (ix - 3)
-	jp	BB23_38
-BB23_14:
+	jp	BB24_38
+BB24_14:
 	ld	hl, (ix - 9)
 	add	hl, de
 	push	hl
@@ -4926,22 +5373,22 @@ BB23_14:
 	lea	hl, iy
 	or	a, a
 	sbc	hl, bc
-	jp	nc, BB23_40
+	jp	nc, BB24_40
 	ld	e, a
 	or	a, a
 	sbc	hl, hl
 	or	a, a
-	jr	nz, BB23_17
+	jr	nz, BB24_17
 	ld	a, e
-	jp	BB23_34
-BB23_17:
+	jp	BB24_34
+BB24_17:
 	push	hl
 	pop	bc
 	ld	c, e
 	ld	(ix - 9), bc
 	ld	iy, 0
 	ld	a, e
-BB23_18:
+BB24_18:
 	push	hl
 	pop	bc
 	ld	hl, (ix - 21)
@@ -4953,7 +5400,7 @@ BB23_18:
 	ld	bc, (ix - 9)
 	or	a, a
 	sbc	hl, bc
-	jp	nc, BB23_33
+	jp	nc, BB24_33
 	or	a, a
 	sbc	hl, hl
 	push	hl
@@ -4978,9 +5425,9 @@ BB23_18:
 	sbc	hl, de
 	push	bc
 	pop	hl
-	jr	c, BB23_18
-	jp	BB23_34
-BB23_20:
+	jr	c, BB24_18
+	jp	BB24_34
+BB24_20:
 	ld	hl, (ix - 21)
 	ld	a, (hl)
 	or	a, a
@@ -4991,12 +5438,12 @@ BB23_20:
 	ld	iy, (ix - 3)
 	add	iy, bc
 	cp	a, e
-	jp	nc, BB23_35
+	jp	nc, BB24_35
 	ld	(ix - 12), bc
 	ld	hl, (ix - 21)
 	ld	(ix - 9), hl
 	ld	e, (ix - 6)
-BB23_22:
+BB24_22:
 	ld	(ix - 3), iy
 	ld	bc, (ix - 9)
 	push	bc
@@ -5005,21 +5452,21 @@ BB23_22:
 	ld	c, (iy + 1)
 	ld	a, c
 	or	a, a
-	jr	nz, BB23_24
+	jr	nz, BB24_24
 	ld	(ix - 9), hl
 	or	a, a
 	sbc	hl, hl
 	ld	a, e
 	ld	iy, (ix - 3)
-	jr	BB23_31
-BB23_24:
+	jr	BB24_31
+BB24_24:
 	ld	a, (gfy_ClipYMin)
 	ld	(ix - 21), a
 	ld	(ix - 9), hl
 	ld	hl, (ix - 12)
 	ld	(ix - 6), hl
 	ld	iy, (ix - 3)
-BB23_25:
+BB24_25:
 	ld	(ix - 12), c
 	ld	hl, (ix + 12)
 	ld	de, (ix - 6)
@@ -5030,10 +5477,10 @@ BB23_25:
 	ld	hl, (ix - 3)
 	or	a, a
 	sbc	hl, bc
-	jr	nc, BB23_27
+	jr	nc, BB24_27
 	ld	c, (ix - 12)
-	jr	BB23_29
-BB23_27:
+	jr	BB24_29
+BB24_27:
 	ld	a, (gfy_ClipYMax)
 	ld	bc, 0
 	ld	c, a
@@ -5041,13 +5488,13 @@ BB23_27:
 	or	a, a
 	sbc	hl, bc
 	ld	c, (ix - 12)
-	jr	nc, BB23_29
+	jr	nc, BB24_29
 	ld	hl, (ix - 9)
 	ld	a, (hl)
 	ld	(iy), a
 	ld	a, (gfy_ClipYMin)
 	ld	(ix - 21), a
-BB23_29:
+BB24_29:
 	ld	hl, (ix - 9)
 	inc	hl
 	ld	(ix - 9), hl
@@ -5058,7 +5505,7 @@ BB23_29:
 	ld	a, c
 	or	a, a
 	ld	hl, 0
-	jr	nz, BB23_25
+	jr	nz, BB24_25
 	lea	de, iy
 	ld	iy, (ix + 6)
 	ld	a, (iy + 1)
@@ -5066,7 +5513,7 @@ BB23_29:
 	pop	iy
 	ld	de, (ix - 6)
 	ld	(ix - 12), de
-BB23_31:
+BB24_31:
 	push	hl
 	pop	bc
 	ld	c, a
@@ -5074,7 +5521,7 @@ BB23_31:
 	ld	hl, (ix - 12)
 	or	a, a
 	sbc	hl, bc
-	jr	nc, BB23_36
+	jr	nc, BB24_36
 	ld	hl, (ix - 9)
 	inc	hl
 	ld	(ix - 21), hl
@@ -5094,35 +5541,35 @@ BB23_31:
 	ld	c, a
 	ld	hl, 0
 	ld	e, a
-	jr	nc, BB23_37
-	jp	BB23_22
-BB23_33:
+	jr	nc, BB24_37
+	jp	BB24_22
+BB24_33:
 	inc	de
 	ld	(ix - 21), de
 	or	a, a
 	sbc	hl, hl
-BB23_34:
+BB24_34:
 	ld	bc, 240
 	ex	de, hl
 	ld	hl, (ix - 3)
 	add	hl, bc
 	ld	(ix - 3), hl
 	ex	de, hl
-	jr	BB23_39
-BB23_35:
+	jr	BB24_39
+BB24_35:
 	ld	c, e
 	ld	de, (ix - 21)
 	inc	de
 	ld	(ix - 21), de
 	ld	e, (ix - 6)
-	jr	BB23_37
-BB23_36:
+	jr	BB24_37
+BB24_36:
 	ld	c, a
 	ld	hl, (ix - 9)
 	ld	(ix - 21), hl
 	ex	de, hl
 	ld	e, a
-BB23_37:
+BB24_37:
 	ld	(ix - 6), e
 	ex	de, hl
 	ld	hl, (ix + 6)
@@ -5130,11 +5577,11 @@ BB23_37:
 	ex	de, hl
 	ld	(ix - 12), a
 	ld	a, c
-BB23_38:
+BB24_38:
 	ld	bc, (ix - 18)
 	add	iy, bc
 	ld	(ix - 3), iy
-BB23_39:
+BB24_39:
 	ld	iy, (ix - 15)
 	inc	iy
 	push	hl
@@ -5144,12 +5591,12 @@ BB23_39:
 	or	a, a
 	sbc	hl, bc
 	ld	bc, (ix + 9)
-	jp	c, BB23_10
-BB23_40:
+	jp	c, BB24_10
+BB24_40:
 	ld	sp, ix
 	pop	ix
 	ret
-BB23_41:
+BB24_41:
 	call	gfy_Wait
 	ld	hl, (-1900524)
 	ld	(ix - 3), hl
@@ -5166,7 +5613,7 @@ BB23_41:
 	ld	(ix - 9), a
 	or	a, a
 	ld	hl, (ix + 9)
-	jr	z, BB23_40
+	jr	z, BB24_40
 	call	__set_bc_and_mul_hl_by_240
 	push	hl
 	pop	de
@@ -5189,13 +5636,13 @@ BB23_41:
 	ld	(ix - 6), bc
 	ld	d, (ix - 12)
 	ld	e, iyl
-BB23_43:
+BB24_43:
 	ld	a, d
 	or	a, a
-	jr	nz, BB23_45
+	jr	nz, BB24_45
 	ld	d, iyl
-	jp	BB23_58
-BB23_45:
+	jp	BB24_58
+BB24_45:
 	ld	iy, (ix - 6)
 	ld	a, (iy)
 	ld	bc, 0
@@ -5204,11 +5651,11 @@ BB23_45:
 	add	hl, bc
 	ld	(ix - 3), hl
 	cp	a, d
-	jp	nc, BB23_56
+	jp	nc, BB24_56
 	ld	(ix - 21), e
 	ld	(ix - 9), bc
 	ld	(ix - 6), iy
-BB23_47:
+BB24_47:
 	ld	iy, (ix - 6)
 	lea	hl, iy + 2
 	ld	(ix - 18), hl
@@ -5220,16 +5667,16 @@ BB23_47:
 	ld	(ix - 9), hl
 	ld	a, d
 	or	a, a
-	jr	nz, BB23_49
+	jr	nz, BB24_49
 	ld	hl, (ix - 18)
 	ld	(ix - 6), hl
 	ld	d, (ix - 12)
 	ld	e, (ix - 21)
-	jr	BB23_52
-BB23_49:
+	jr	BB24_52
+BB24_49:
 	ld	e, (ix - 21)
 	ld	hl, (ix - 18)
-BB23_50:
+BB24_50:
 	ld	a, (hl)
 	inc	hl
 	ld	iy, (ix - 3)
@@ -5239,11 +5686,11 @@ BB23_50:
 	dec	d
 	ld	a, d
 	or	a, a
-	jr	nz, BB23_50
+	jr	nz, BB24_50
 	ld	(ix - 6), hl
 	ld	iy, (ix + 6)
 	ld	d, (iy + 1)
-BB23_52:
+BB24_52:
 	or	a, a
 	sbc	hl, hl
 	push	hl
@@ -5253,7 +5700,7 @@ BB23_52:
 	lea	hl, iy
 	sbc	hl, bc
 	ld	(ix - 12), d
-	jr	nc, BB23_55
+	jr	nc, BB24_55
 	or	a, a
 	sbc	hl, hl
 	ld	(ix - 18), hl
@@ -5274,24 +5721,24 @@ BB23_52:
 	ld	(ix - 9), hl
 	or	a, a
 	sbc	hl, bc
-	jp	c, BB23_47
+	jp	c, BB24_47
 	ld	hl, (ix - 6)
 	inc	hl
 	ld	(ix - 6), hl
 	ld	d, (ix - 12)
 	ld	e, (ix - 21)
-BB23_55:
+BB24_55:
 	ld	hl, (ix + 6)
 	ld	l, (hl)
 	ld	(ix - 9), l
-	jr	BB23_57
-BB23_56:
+	jr	BB24_57
+BB24_56:
 	inc	iy
 	ld	(ix - 6), iy
-BB23_57:
+BB24_57:
 	ld	c, 0
 	ld	iyl, c
-BB23_58:
+BB24_58:
 	ld	bc, (ix - 15)
 	ld	hl, (ix - 3)
 	add	hl, bc
@@ -5300,8 +5747,8 @@ BB23_58:
 	ld	a, e
 	ld	l, (ix - 9)
 	cp	a, l
-	jp	c, BB23_43
-	jp	BB23_40
+	jp	c, BB24_43
+	jp	BB24_40
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
@@ -5327,7 +5774,7 @@ gfy_RLETSprite_NoClip:
 	ld	d, (hl)
 	ld	a, d
 	or	a, a
-	jp	z, BB24_17
+	jp	z, BB25_17
 	push	bc
 	pop	iy
 	ld	hl, (ix + 9)
@@ -5348,13 +5795,13 @@ gfy_RLETSprite_NoClip:
 	ld	iyl, a
 	pop	af
 	ld	e, 0
-BB24_2:
+BB25_2:
 	ld	a, iyl
 	or	a, a
-	jr	nz, BB24_4
+	jr	nz, BB25_4
 	ld	iyl, 0
-	jp	BB24_16
-BB24_4:
+	jp	BB25_16
+BB25_4:
 	ld	d, iyl
 	ld	iy, (ix - 13)
 	ld	a, (iy)
@@ -5364,9 +5811,9 @@ BB24_4:
 	ld	(ix - 3), hl
 	ld	(ix - 16), d
 	cp	a, d
-	jp	nc, BB24_13
+	jp	nc, BB25_13
 	ld	(ix - 10), bc
-BB24_6:
+BB25_6:
 	lea	hl, iy + 2
 	ld	(ix - 13), hl
 	ld	d, (iy + 1)
@@ -5377,14 +5824,14 @@ BB24_6:
 	ld	(ix - 10), iy
 	ld	a, d
 	or	a, a
-	jr	nz, BB24_8
+	jr	nz, BB25_8
 	ld	hl, (ix - 13)
 	ld	(ix - 19), hl
 	ld	a, (ix - 7)
-	jr	BB24_11
-BB24_8:
+	jr	BB25_11
+BB25_8:
 	ld	hl, (ix - 13)
-BB24_9:
+BB25_9:
 	ld	a, (hl)
 	inc	hl
 	ld	bc, (ix - 3)
@@ -5396,11 +5843,11 @@ BB24_9:
 	dec	d
 	ld	a, d
 	or	a, a
-	jr	nz, BB24_9
+	jr	nz, BB25_9
 	ld	(ix - 19), hl
 	ld	iy, (ix + 6)
 	ld	a, (iy + 1)
-BB24_11:
+BB25_11:
 	ld	iy, 0
 	lea	bc, iy
 	ld	c, a
@@ -5408,7 +5855,7 @@ BB24_11:
 	or	a, a
 	sbc	hl, bc
 	ld	(ix - 7), a
-	jr	nc, BB24_14
+	jr	nc, BB25_14
 	ld	hl, (ix - 19)
 	inc	hl
 	ld	(ix - 13), hl
@@ -5431,17 +5878,17 @@ BB24_11:
 	or	a, a
 	sbc	hl, bc
 	ld	(ix - 16), a
-	jr	nc, BB24_15
-	jp	BB24_6
-BB24_13:
+	jr	nc, BB25_15
+	jp	BB25_6
+BB25_13:
 	inc	iy
 	ld	(ix - 13), iy
-	jr	BB24_15
-BB24_14:
+	jr	BB25_15
+BB25_14:
 	ld	(ix - 16), a
 	ld	hl, (ix - 19)
 	ld	(ix - 13), hl
-BB24_15:
+BB25_15:
 	ld	hl, (ix + 6)
 	ld	d, (hl)
 	ld	hl, (ix - 3)
@@ -5449,14 +5896,14 @@ BB24_15:
 	ld	a, (ix - 16)
 	ld	iyl, a
 	pop	af
-BB24_16:
+BB25_16:
 	ld	bc, (ix - 6)
 	add	hl, bc
 	inc	e
 	ld	a, e
 	cp	a, d
-	jp	c, BB24_2
-BB24_17:
+	jp	c, BB25_2
+BB25_17:
 	ld	sp, ix
 	pop	ix
 	ret
@@ -5492,9 +5939,9 @@ gfy_RotatedScaledTransparentSprite_NoClip:
 	ld	de, 255
 	or	a, a
 	sbc	hl, de
-	jr	c, BB25_2
+	jr	c, BB26_2
 	ld	bc, 255
-BB25_2:
+BB26_2:
 	ld	(ix - 6), bc
 	lea	bc, iy
 	ld	c, (ix + 15)
@@ -5566,7 +6013,7 @@ BB25_2:
 	ld	(ix - 24), a
 	ld	a, c
 	or	a, a
-	jp	z, BB25_11
+	jp	z, BB26_11
 	ld	hl, (ix + 9)
 	ld	de, 0
 	ld	e, (ix + 12)
@@ -5636,7 +6083,7 @@ BB25_2:
 	ld	de, (ix - 30)
 	ld	(ix - 44), hl
 	ld	(ix - 36), bc
-BB25_4:
+BB26_4:
 	ld	bc, 0
 	push	bc
 	pop	hl
@@ -5651,7 +6098,7 @@ BB25_4:
 	ld	e, a
 	ld	a, iyl
 	ld	iy, 255
-BB25_5:
+BB26_5:
 	ld	(ix - 12), hl
 	ld	(ix - 3), bc
 	ld	d, a
@@ -5665,7 +6112,7 @@ BB25_5:
 	ld	a, c
 	ld	l, (ix - 16)
 	cp	a, l
-	jr	nc, BB25_9
+	jr	nc, BB26_9
 	ld	(ix - 41), bc
 	ld	bc, (ix - 9)
 	ld	a, e
@@ -5680,7 +6127,7 @@ BB25_5:
 	ld	a, l
 	ld	l, (ix - 16)
 	cp	a, l
-	jr	nc, BB25_9
+	jr	nc, BB26_9
 	push	bc
 	pop	hl
 	ld	bc, (ix - 33)
@@ -5698,7 +6145,7 @@ BB25_5:
 	ld	a, c
 	cp	a, e
 	ld	e, b
-	jr	z, BB25_9
+	jr	z, BB26_9
 	ld	hl, (ix - 15)
 	ld	a, d
 	ld	de, (ix - 12)
@@ -5706,7 +6153,7 @@ BB25_5:
 	ld	e, b
 	ld	d, a
 	ld	(hl), c
-BB25_9:
+BB26_9:
 	ld	bc, (ix - 19)
 	ld	a, (ix - 20)
 	ld	hl, (ix - 9)
@@ -5734,7 +6181,7 @@ BB25_9:
 	push	bc
 	pop	hl
 	ld	bc, (ix - 3)
-	jp	nz, BB25_5
+	jp	nz, BB26_5
 	ld	hl, (ix - 15)
 	ld	de, (ix - 44)
 	add	hl, de
@@ -5763,8 +6210,8 @@ BB25_9:
 	ld	bc, (ix - 6)
 	or	a, a
 	sbc	hl, bc
-	jp	nz, BB25_4
-BB25_11:
+	jp	nz, BB26_4
+BB26_11:
 	ld	a, c
 	ld	sp, ix
 	pop	ix
@@ -5801,9 +6248,9 @@ gfy_RotatedScaledSprite_NoClip:
 	ld	de, 255
 	or	a, a
 	sbc	hl, de
-	jr	c, BB26_2
+	jr	c, BB27_2
 	ld	bc, 255
-BB26_2:
+BB27_2:
 	ld	(ix - 3), bc
 	lea	bc, iy
 	ld	c, (ix + 15)
@@ -5875,7 +6322,7 @@ BB26_2:
 	ld	(ix - 24), a
 	ld	a, c
 	or	a, a
-	jp	z, BB26_10
+	jp	z, BB27_10
 	ld	hl, (ix + 9)
 	ld	de, 0
 	ld	e, (ix + 12)
@@ -5945,7 +6392,7 @@ BB26_2:
 	ld	de, (ix - 36)
 	ld	(ix - 47), hl
 	ld	(ix - 42), bc
-BB26_4:
+BB27_4:
 	ld	bc, 0
 	push	bc
 	pop	hl
@@ -5959,7 +6406,7 @@ BB26_4:
 	ld	(ix - 43), a
 	ld	(ix - 9), a
 	ld	a, iyl
-BB26_5:
+BB27_5:
 	ld	(ix - 12), hl
 	ld	(ix - 27), bc
 	ld	(ix - 30), a
@@ -5975,7 +6422,7 @@ BB26_5:
 	ld	a, iyl
 	ld	l, (ix - 16)
 	cp	a, l
-	jr	nc, BB26_8
+	jr	nc, BB27_8
 	ld	bc, (ix - 6)
 	ld	a, (ix - 9)
 	call	__ftol
@@ -5989,7 +6436,7 @@ BB26_5:
 	ld	a, e
 	ld	l, (ix - 16)
 	cp	a, l
-	jr	nc, BB26_8
+	jr	nc, BB27_8
 	lea	hl, iy
 	ld	bc, (ix - 39)
 	call	__imulu
@@ -6003,7 +6450,7 @@ BB26_5:
 	ld	de, (ix - 12)
 	add	hl, de
 	ld	(hl), a
-BB26_8:
+BB27_8:
 	ld	bc, (ix - 19)
 	ld	a, (ix - 20)
 	ld	hl, (ix - 6)
@@ -6026,7 +6473,7 @@ BB26_8:
 	or	a, a
 	sbc	hl, bc
 	lea	hl, iy
-	jp	nz, BB26_5
+	jp	nz, BB27_5
 	ld	hl, (ix - 15)
 	ld	de, (ix - 47)
 	add	hl, de
@@ -6055,8 +6502,8 @@ BB26_8:
 	ld	bc, (ix - 3)
 	or	a, a
 	sbc	hl, bc
-	jp	nz, BB26_4
-BB26_10:
+	jp	nz, BB27_4
+BB27_10:
 	ld	a, c
 	ld	sp, ix
 	pop	ix
@@ -6081,9 +6528,9 @@ gfy_CopyRectangle:
 	ld	hl, -1900528
 	push	hl
 	pop	de
-	jr	z, BB27_2
+	jr	z, BB28_2
 	ld	hl, -1900524
-BB27_2:
+BB28_2:
 	ld	a, (ix + 21)
 	ld	bc, 240
 	ld	iy, (hl)
@@ -6092,9 +6539,9 @@ BB27_2:
 	or	a, a
 	sbc	hl, bc
 	ex	de, hl
-	jr	z, BB27_4
+	jr	z, BB28_4
 	ld	hl, -1900524
-BB27_4:
+BB28_4:
 	ld	hl, (hl)
 	ld	(ix - 6), hl
 	ld	de, 0
@@ -6129,14 +6576,14 @@ BB27_4:
 	lea	bc, iy
 	or	a, a
 	sbc	hl, bc
-	jr	nz, BB27_8
+	jr	nz, BB28_8
 	ld	hl, (ix + 24)
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jp	z, BB27_11
+	jp	z, BB28_11
 	ld	(ix - 21), de
-BB27_7:
+BB28_7:
 	ld	(ix - 6), hl
 	ld	de, (ix - 3)
 	ld	iy, (ix - 15)
@@ -6160,16 +6607,16 @@ BB27_7:
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jr	nz, BB27_7
-	jr	BB27_11
-BB27_8:
+	jr	nz, BB28_7
+	jr	BB28_11
+BB28_8:
 	ld	hl, (ix + 24)
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jr	z, BB27_11
+	jr	z, BB28_11
 	ld	(ix - 21), de
-BB27_10:
+BB28_10:
 	ld	(ix - 6), hl
 	ld	de, (ix - 3)
 	ld	iy, (ix - 15)
@@ -6193,8 +6640,8 @@ BB27_10:
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jr	nz, BB27_10
-BB27_11:
+	jr	nz, BB28_10
+BB28_11:
 	ld	sp, ix
 	pop	ix
 	ret
