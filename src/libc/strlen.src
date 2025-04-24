@@ -10,17 +10,14 @@ _strlen := $0000D4
 else
 
 _strlen:
-	pop	bc
-	ex	(sp),hl
-	push	bc
-	xor	a,a
-	ld	bc,0
+	pop	iy
+	ex	(sp), hl
+	xor	a, a
+	ld	bc, 0
 	cpir
-	or	a,a
-	sbc	hl,hl
+	sbc	hl, hl
 	scf
-	sbc	hl,bc
-	ret
+	sbc	hl, bc
+	jp	(iy)
 
 end if
-

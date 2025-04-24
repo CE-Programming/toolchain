@@ -49,6 +49,8 @@ size_t T_strlen(const char *s)
 int T_strcmp(const char *s1, const char *s2)
     __attribute__((nonnull(1, 2)));
 
+void T_bzero(void* s, size_t n);
+
 #else
 
 #define T_memcpy memcpy
@@ -59,6 +61,7 @@ int T_strcmp(const char *s1, const char *s2)
 #define T_stpcpy stpcpy
 #define T_strlen strlen
 #define T_strcmp strcmp
+#define T_bzero bzero
 
 #endif
 
@@ -439,6 +442,35 @@ int mempcpy_test(void) {
     return 0;
 }
 
+int bzero_test(void) {
+    char truth[32];
+    char data[32];
+    T_memset(data, 0x8F, sizeof(data));
+    T_memset(&truth[ 0], 0x8F,  8);
+    T_memset(&truth[ 2], 0x00,  1);
+    T_memset(&truth[ 8], 0x00, 17);
+    T_memset(&truth[25], 0x8F,  7);
+    T_bzero(&data[2], 0);
+    T_bzero(&data[2], 1);
+    if (T_strlen(&data[0]) != 2) {
+        return __LINE__;
+    }
+    if (T_strlen(&data[1]) != 1) {
+        return __LINE__;
+    }
+    if (T_strlen(&data[2]) != 0) {
+        return __LINE__;
+    }
+    T_bzero(NULL, 0);
+    T_bzero(&data[8], 17);
+    int cmp = T_memcmp(data, truth, 32);
+    if (cmp != 0) {
+        printf("cmp: %d\n", cmp);
+        return __LINE__;
+    }
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* boot_asprintf */
@@ -462,6 +494,10 @@ int run_tests(void) {
 
     /* mempcpy */
         ret = mempcpy_test();
+        if (ret != 0) { return ret; }
+
+    /* bzero */
+        ret = bzero_test();
         if (ret != 0) { return ret; }
 
     return 0;

@@ -12,6 +12,7 @@ using ::size_t;
 using ::memcpy;
 using ::memmove;
 using ::memset;
+using ::bzero;
 using ::memcmp;
 using ::memchr;
 using ::memrchr;
