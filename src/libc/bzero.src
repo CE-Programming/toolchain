@@ -1,0 +1,20 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_bzero
+
+; void bzero(void* buf, size_t n)
+_bzero:
+	ld	hl, 6
+	add	hl, sp
+	ld	bc, (hl)	; size
+	inc	bc
+	cpd	; dec hl
+	ret	po	; zero size
+	dec	hl
+	dec	hl
+	ld	de, (hl)	; buf
+	ld	hl, $E40000	; large region of all zeros on the Ti84CE
+	ldir
+	ret
