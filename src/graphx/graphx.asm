@@ -1344,8 +1344,8 @@ _Ellipse:
 	ld	(ix - el_comp_a),hl
 	inc	hl
 	sbc	hl,bc
-	ld	bc,(ix - el_a2)
-	call	_MultiplyHLBC
+	ld	de,(ix - el_a2)
+	call	_MultiplyHLDE
 	ld	bc,(ix - el_b2)
 	add	hl,bc
 	add	hl,bc
@@ -1358,13 +1358,13 @@ _Ellipse:
 	sbc	hl,hl
 	inc	hl
 	sbc	hl,de
-	ld	bc,(ix - el_fb2)
-	call	_MultiplyHLBC
+	ld	de,(ix - el_fb2)
+	call	_MultiplyHLDE
 	ld	(ix - el_sigma_2),hl	; int sigma_add_2 = fb2 * (1 - a);
 
 	ld	hl,(ix - el_a2)
-	ld	bc,(ix - el_y)
-	call	_MultiplyHLBC
+	ld	de,(ix - el_y)
+	call	_MultiplyHLDE
 	ld	(ix - el_comp_b),hl
 	
 	wait_quick
@@ -1437,16 +1437,16 @@ _ellipse_loop_draw_2 := $-3
 	mlt	de
 	inc	hl
 	sbc	hl,de
-	ld	bc,(ix - el_b2)
-	call	_MultiplyHLBC
+	ld	de,(ix - el_b2)
+	call	_MultiplyHLDE
 	ld	de,(ix - el_a2)
 	add	hl,de
 	add	hl,de
 	ld	(ix - el_sigma), hl
 
 	ld	hl,(ix - el_b2)
-	ld	bc,(ix - el_temp1)
-	call	_MultiplyHLBC
+	ld	de,(ix - el_temp1)
+	call	_MultiplyHLDE
 	ld	(ix - el_comp_b),hl
 
 .main_loop2:
@@ -4324,15 +4324,15 @@ _FillTriangle:
 	ld	hl,(ix-12)
 	or	a,a
 	sbc	hl,bc
-	ld	bc,(ix-30)
-	call	_MultiplyHLBC		; sa = dx12 * (y - y1);
+	ld	de,(ix-30)
+	call	_MultiplyHLDE		; sa = dx12 * (y - y1);
 	ld	(ix-15),hl
 	ld	bc,(ix+9)
 	ld	hl,(ix-12)
 	or	a,a
 	sbc	hl,bc
-	ld	bc,(ix-21)
-	call	_MultiplyHLBC		; sb = dx02 * (y - y0);
+	ld	de,(ix-21)
+	call	_MultiplyHLDE		; sb = dx02 * (y - y0);
 	ld	(ix-18),hl
 	jp	.secondloopstart	; for(; y <= y2; y++)
 .secondloop:
@@ -6448,17 +6448,7 @@ _DivideHLBC:
 	ret
 
 ;-------------------------------------------------------------------------------
-_MultiplyHLDE:
-; Performs (un)signed integer multiplication
-; Inputs:
-;  HL : Operand 1
-;  DE : Operand 2
-; Outputs:
-;  HL = HL*DE
-	push	de
-	pop	bc
-
-;-------------------------------------------------------------------------------
+if 0
 _MultiplyHLBC:
 ; Performs (un)signed integer multiplication
 ; Inputs:
@@ -6466,48 +6456,54 @@ _MultiplyHLBC:
 ;  BC : Operand 2
 ; Outputs:
 ;  HL = HL*BC
-	push	iy
-	push	hl
 	push	bc
-	push	hl
-	ld	iy,0
-	ld	d,l
-	ld	e,b
-	mlt	de
-	add	iy,de
-	ld	d,c
-	ld	e,h
-	mlt	de
-	add	iy,de
-	ld	d,c
-	ld	e,l
-	mlt	de
-	ld	c,h
+	pop	de
+end if
+
+;-------------------------------------------------------------------------------
+; identical to __imulu_fast, but BC and DE are swapped
+_MultiplyHLDE:
+; Performs (un)signed integer multiplication
+; Inputs:
+;  HL : Operand 1
+;  DE : Operand 2
+; Outputs:
+;  HL = HL*DE
+	ld	b, d
+	ld	c, h
 	mlt	bc
-	ld	a,c
+	ld	a, c
+	dec	sp
+	push	hl
+	push	de
 	inc	sp
-	inc	sp
-	pop	hl
+	pop	bc
+	ld	c, l
+	mlt	bc
+	add	a, c
+	pop	bc
+	ld	c, e
+	mlt	bc
+	add	a, c
+	ld	b, e
+	ld	c, l
+	ld	l, b
+	ld	e, c
+	mlt	de
+	mlt	bc
 	mlt	hl
-	add	a,l
-	pop	hl
-	inc	sp
-	mlt	hl
-	add	a,l
-	ld	b,a
-	ld	c,0
-	lea	hl,iy+0
-	add	hl,bc
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,de
-	pop	iy
+	add	hl, de
+	add	a, h
+	ld	h, a
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, bc
 	ret
 
 ;-------------------------------------------------------------------------------
