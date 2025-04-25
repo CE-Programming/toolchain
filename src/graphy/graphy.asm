@@ -3399,11 +3399,7 @@ gfy_RotateSpriteHalf: ; MODIFIED_FROM_GRAPHX
 	ret
 
 ;-------------------------------------------------------------------------------
-if 0
-gfy_ScaleSprite: ; UNIMPLEMENTED
-	ret
-else
-gfy_ScaleSprite: ; COPIED_FROM_GRAPHX
+gfy_ScaleSprite: ; MODIFIED_FROM_GRAPHX
 ; Scale an image using an output buffer
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
@@ -3415,20 +3411,25 @@ gfy_ScaleSprite: ; COPIED_FROM_GRAPHX
 	add	iy,sp
 	push	ix
 	ld	hl,(iy+6)
-	push	hl
 
-	; -target_width
+	; DEBUG swap target width/height
+	push	bc
+	ld	b, (hl)
+	inc	hl
+	ld	c, (hl)
+	ld	(hl), b
+	dec	hl
+	ld	(hl), c
+	pop	bc
+
+	push	hl
+	ld	a,(hl)
+	ld	ixh,a			; target_width
+	ld	(ScaleWidth),a
+	inc	hl
 	xor	a,a
 	sub	a,(hl)
-	ld	ixh,a
-
-	inc	hl
-
-	; target_height
-	ld	a,(hl)
-	ld	ixl,a			
-	ld	(ScaleHeight),a
-		
+	ld	ixl,a			; -target_height
 	inc	hl
 	push	hl			; hl->tgt_data
 	ld	hl,(iy+3)
@@ -3437,31 +3438,31 @@ gfy_ScaleSprite: ; COPIED_FROM_GRAPHX
 	ld	e,(hl)			; src_width
 	inc	hl
 	push	hl			; hl->src_data
-	push	de			; e = src_height
-	call	_UCDivA			; ca = dv = (source_width*256)/target_width
-	pop	hl			; l = src_height
+	push	de			; e = src_width
+	call	_UCDivA			; ca = dv = (source_height*256)/target_height
+	pop	hl			; l = src_width
 	ld	(dv_shl_16),a
 	ld	h,c
 	ld	c,l
 	mlt	hl
-	ld	(dv_shr_8_times_height),hl
+	ld	(dv_shr_8_times_width),hl
 	add	hl,bc
-	ld	(dv_shr_8_times_height_plus_height),hl
+	ld	(dv_shr_8_times_width_plus_width),hl
 	xor	a,a
-	sub	a,ixl			; -target_height
-	call	_UCDivA			; ca = du = (source_height*256)/target_height
+	sub	a,ixh			; -target_width
+	call	_UCDivA			; ca = du = (source_width*256)/target_width
 	pop	hl			; hl->src_data
 	pop	de			; de->tgt_data
 	ld	iy,0
 	ld	iyl,a
 	ld	a,c			; du = bc:iyl
-	ld	(du),a			; ixh = target_width
+	ld	(du),a			; ixl = target_height
 
 ; b = out_loop_times
 ; de = target buffer adress
 .outer:
 	push	hl
-ScaleHeight := $+2
+ScaleWidth := $+2
 	ld	iyh, 0
 	xor	a,a
 	ld	b,a
@@ -3477,19 +3478,29 @@ du := $-1
 	ld	bc,0			; dv<<16
 dv_shl_16 := $-1
 	add	iy,bc
-	ld	bc,0			; dv>>8*src_height
-dv_shr_8_times_height := $-3
+	ld	bc,0			; dv>>8*src_width
+dv_shr_8_times_width := $-3
 	jr	nc,.skip
-	ld	bc,0			; dv>>8*src_height+src_height
-dv_shr_8_times_height_plus_height := $-3
+	ld	bc,0			; dv>>8*src_width+src_width
+dv_shr_8_times_width_plus_width := $-3
 .skip:
 	add	hl,bc
 	inc	ixl
 	jr	nz,.outer
 	pop	hl
 	pop	ix
+
+	; DEBUG swap target width/height
+	push	bc
+	ld	b, (hl)
+	inc	hl
+	ld	c, (hl)
+	ld	(hl), b
+	dec	hl
+	ld	(hl), c
+	pop	bc
+
 	ret
-end if
 
 ;-------------------------------------------------------------------------------
 ; gfy_RotatedScaledSprite_NoClip:
@@ -4166,7 +4177,64 @@ _DivideHLBC: ; COPIED_FROM_GRAPHX
 	ret
 
 ;-------------------------------------------------------------------------------
-_MultiplyHLDE: ; COPIED_FROM_GRAPHX
+if 0
+_MultiplyHLBC:
+; Performs (un)signed integer multiplication
+; Inputs:
+;  HL : Operand 1
+;  BC : Operand 2
+; Outputs:
+;  HL = HL*BC
+	push	bc
+	pop	de
+
+;-------------------------------------------------------------------------------
+; identical to __imulu_fast, but BC and DE are swapped
+_MultiplyHLDE:
+; Performs (un)signed integer multiplication
+; Inputs:
+;  HL : Operand 1
+;  DE : Operand 2
+; Outputs:
+;  HL = HL*DE
+	ld	b, d
+	ld	c, h
+	mlt	bc
+	ld	a, c
+	dec	sp
+	push	hl
+	push	de
+	inc	sp
+	pop	bc
+	ld	c, l
+	mlt	bc
+	add	a, c
+	pop	bc
+	ld	c, e
+	mlt	bc
+	add	a, c
+	ld	b, e
+	ld	c, l
+	ld	l, b
+	ld	e, c
+	mlt	de
+	mlt	bc
+	mlt	hl
+	add	hl, de
+	add	a, h
+	ld	h, a
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, bc
+	ret
+else
+_MultiplyHLDE:
 ; Performs (un)signed integer multiplication
 ; Inputs:
 ;  HL : Operand 1
@@ -4177,56 +4245,59 @@ _MultiplyHLDE: ; COPIED_FROM_GRAPHX
 	pop	bc
 
 ;-------------------------------------------------------------------------------
-_MultiplyHLBC: ; COPIED_FROM_GRAPHX
+; identical to __imulu
+_MultiplyHLBC:
 ; Performs (un)signed integer multiplication
 ; Inputs:
 ;  HL : Operand 1
 ;  BC : Operand 2
 ; Outputs:
 ;  HL = HL*BC
-	push	iy
+__imulu:
+	push	af
+	push	de
+	ld	d, b
+	ld	e, h
+	mlt	de
+	ld	a, e
+	dec	sp
 	push	hl
 	push	bc
-	push	hl
-	ld	iy,0
-	ld	d,l
-	ld	e,b
-	mlt	de
-	add	iy,de
-	ld	d,c
-	ld	e,h
-	mlt	de
-	add	iy,de
-	ld	d,c
-	ld	e,l
-	mlt	de
-	ld	c,h
-	mlt	bc
-	ld	a,c
 	inc	sp
-	inc	sp
-	pop	hl
+	pop	de
+	ld	e, l
+	mlt	de
+	add	a, e
+	pop	de
+	ld	e, c
+	mlt	de
+	add	a, e
+	ld	e, l
+	ld	l, c
 	mlt	hl
-	add	a,l
-	pop	hl
-	inc	sp
-	mlt	hl
-	add	a,l
-	ld	b,a
-	ld	c,0
-	lea	hl,iy+0
-	add	hl,bc
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,de
-	pop	iy
+	add	a, h
+	ld	h, a
+	ld	a, e
+	ld	d, b
+	mlt	de
+	add	hl, de
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	d, a
+	ld	e, c
+	mlt	de
+	add	hl, de
+	pop	de
+	pop	af
 	ret
+
+end if
 
 ;-------------------------------------------------------------------------------
 _ComputeOutcode:
@@ -4627,11 +4698,11 @@ __sremu     := $00023C
 __ineg      := $000160
 ; __indcallhl := 
 _memmove    := $0000A8
-__imulu     := $000154
+; __imulu     := $000154
 __ishl      := $000174
 __setflag   := $000218
 __iand      := $000134
-_memset     := $0000AC
+; _memset     := $0000AC
 __frameset  := $00012C
 __frameset0 := $000130
 __iremu     := $000170
@@ -4733,6 +4804,24 @@ __set_bc_and_mul_hl_by_minus2:
 	sbc	hl, hl
 	sbc	hl, bc
 	ld	bc, -2
+	ret
+
+_memset:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	bc, (iy + 9)
+	cpi
+	add	hl, bc
+	ret	c
+	dec	hl
+	ld	e, (iy + 6)
+	ld	(hl), e
+	ret	po
+	push	hl
+	pop	de
+	dec	de
+	lddr
 	ret
 
 ;-------------------------------------------------------------------------------
