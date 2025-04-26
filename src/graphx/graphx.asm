@@ -6401,33 +6401,39 @@ _UCDivA:
 
 ;-------------------------------------------------------------------------------
 _DivideHLBC:
-; Performs signed integer division
+; Performs signed integer division, rounding towards negative
 ; Inputs:
 ;  HL : Operand 1
 ;  BC : Operand 2
 ; Outputs:
-;  HL = HL/BC
+;  HL = floor(HL/BC)
+	ld	a,23
 	ex	de,hl
-	xor	a,a
 	sbc	hl,hl
+	ccf
 	sbc	hl,bc
-	jp	p,.next0
+	jp	m,.positive
+	add	hl,bc
+	inc	hl
+	sbc	hl,de
+	jp	po,.signcheck
+	inc	a
+	jr	.overflowed
+.positive:
+	inc	hl
 	push	hl
 	pop	bc
-	inc	a
-.next0:
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,de
-	jp	m,.next1
 	ex	de,hl
-	inc	a
-.next1:
-	add	hl,de
-	rra
-	ld	a,24
+.signcheck:
+	add	hl,hl
+	ex	de,hl
+	sbc	hl,hl
+	jr	nc,.loop
+	inc	hl
+	sbc	hl,bc
 .loop:
 	ex	de,hl
+.overflowed:
 	adc	hl,hl
 	ex	de,hl
 	adc	hl,hl
@@ -6437,17 +6443,8 @@ _DivideHLBC:
 .spill:
 	dec	a
 	jr	nz,.loop
-
 	ex	de,hl
 	adc	hl,hl
-	ret	c
-	dec	de		; ude=UDE-1
-	add	hl, de		; uhl=UHL+UDE-1
-	add	hl, bc		; uhl=UHL+UDE+UBC-1
-	ex	de, hl		; uhl=UDE-1, ude=UHL+UDE+UBC-1
-	add	hl, bc		; uhl=UDE+UBC-1, carry set if UDE==0
-	ccf			; carry set if UDE!=0
-	sbc	hl, de		; uhl=-UHL-(UDE!=0)
 	ret
 
 ;-------------------------------------------------------------------------------
