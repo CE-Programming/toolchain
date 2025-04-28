@@ -121,7 +121,7 @@ static int test_ctzc(void) {
     unsigned char input;
     for (int i = 0; i < 256; i++) {
         input = (unsigned char)i;
-        truth = (input == 0) ? 8 : __builtin_ctz((unsigned int)input);
+        truth = (input == 0) ? 8 : __builtin_ctz((unsigned int)input | INT_MIN);
         guess = __ez80_ctzc(input);
         CMP("%d", input, truth, guess);
     }
@@ -271,7 +271,7 @@ static int test_ctzi48(void) {
     CMP("%012llX", (uint64_t)UINT48_MAX, 0, __ez80_ctzi48(UINT48_MAX));
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         input = rand48();
-        truth = (input == 0) ? 48 : __builtin_ctzll((unsigned long long)input);
+        truth = (input == 0) ? 48 : __builtin_ctzll((unsigned long long)input | INT64_MIN);
         guess = __ez80_ctzi48(input);
         CMP("%012llX", (uint64_t)input, truth, guess);
     }

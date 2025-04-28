@@ -6,18 +6,10 @@
 
 	public	___ez80_ctzc
 ___ez80_ctzc:
-	; unoptimized
 	ld	hl, 3
 	add	hl, sp
-	ld	l, (hl)
-	xor	a, a
-	sub	a, l
-	and	a, l
-	call	__bctlz
-	bit	3, a
-	ret	nz
-	xor	a, 7
-	ret
+	ld	a, (hl)
+	jp	__bcttz
 
 ;-------------------------------------------------------------------------------
 
@@ -25,25 +17,14 @@ ___ez80_ctzc:
 
 	public	___ez80_ctzi48
 ___ez80_ctzi48:
-	; unoptimized
-	ld	hl, 3
+	ld	hl, 6
 	add	hl, sp
-	ld	bc, (hl)
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	iy, (hl)
-	sbc	hl, hl
-	add	hl, bc
-	lea	de, iy
-	call	__i48neg
-	call	__i48and
-	call	__i48ctlz
-	cpl
-	add	a, 48
-	ret	p
-	ld	a, 48
-	ret
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	jp	__i48cttz
 
 ;-------------------------------------------------------------------------------
 
@@ -51,16 +32,12 @@ ___ez80_ctzi48:
 
 	public	___ez80_ffsc
 ___ez80_ffsc:
-	; unoptimized
 	ld	hl, 3
 	add	hl, sp
-	ld	l, (hl)
-	xor	a, a
-	sub	a, l
-	and	a, l
-	call	__bctlz
-	cpl
-	add	a, 9
+	ld	a, (hl)
+	or	a, a
+	rla
+	jp	nz, __bcttz
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -69,24 +46,13 @@ ___ez80_ffsc:
 
 	public	___ez80_ffss
 ___ez80_ffss:
-	; unoptimized
 	ld	hl, 3
 	add	hl, sp
 	ld	hl, (hl)
-	; HL & -HL
-	ld	b, h
-	ld	c, l
-	sbc	hl, hl
-	sbc	hl, bc
 	ld	a, h
-	and	a, b
-	ld	h, a
-	ld	a, l
-	and	a, c
-	ld	l, a
-	call	__sctlz
-	cpl
-	add	a, 17
+	or	a, l
+	add	hl, hl
+	jp	nz, __scttz
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -95,22 +61,18 @@ ___ez80_ffss:
 
 	public	___ez80_ffsi48
 ___ez80_ffsi48:
-	; unoptimized
-	ld	hl, 3
+	ld	hl, 6
 	add	hl, sp
-	ld	bc, (hl)
-	inc	hl
-	inc	hl
-	inc	hl
-	ld	iy, (hl)
-	sbc	hl, hl
-	add	hl, bc
-	lea	de, iy
-	call	__i48neg
-	call	__i48and
-	call	__i48ctlz
-	cpl
-	add	a, 49
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	call	__i48cttz
+	inc	a
+	cp	a, 49
+	ret	nz
+	xor	a, a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -406,12 +368,14 @@ ___ez80_rotateright48:
 
 	extern	__snot
 	extern	__i48not
-	extern	__i48and
-	extern	__i48neg
 
 	extern	__bctlz
 	extern	__sctlz
 	extern	__i48ctlz
+
+	extern	__bcttz
+	extern	__scttz
+	extern	__i48cttz
 
 	extern	__bpopcnt
 	extern	__spopcnt
