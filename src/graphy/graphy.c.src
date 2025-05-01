@@ -3669,92 +3669,92 @@ BB16_45:
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_TransparentSprite_NoClip
-gfy_TransparentSprite_NoClip:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	lea	hl, ix - 9
-	ld	sp, hl
-	call	gfy_Wait
-	ld	hl, (-1900524)
-	ld	(ix - 6), hl
-	ld	iy, (ix + 6)
-	ld	e, (iy + 1)
-	ld	bc, 0
-	ld	c, e
-	ld	hl, 240
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 9), hl
-	ld	hl, (ix + 6)
-	ld	l, (hl)
-	ld	a, l
-	or	a, a
-	jr	z, BB17_8
-	ld	a, l
-	ld	hl, (ix + 9)
-	ld	bc, 0
-	ld	c, (ix + 12)
-	ld	iy, (ix - 6)
-	add	iy, bc
-	call	__set_bc_and_mul_hl_by_240
-	push	hl
-	pop	bc
-	ld	h, a
-	ld	l, 0
-	add	iy, bc
-	ld	(ix - 6), iy
-	ld	iy, (ix + 6)
-	lea	bc, iy + 2
-	ld	(ix - 3), bc
-	ld	iy, (ix - 6)
-	ld	b, l
-BB17_2:
-	ld	a, e
-	or	a, a
-	ld	e, l
-	ld	c, l
-	jr	z, BB17_7
-BB17_3:
-	ld	hl, (ix - 3)
-	ld	e, (hl)
-	ld	a, (gfy_Transparent_Color)
-	ld	h, a
-	ld	a, e
-	cp	a, h
-	jr	nz, BB17_5
-	ld	e, (iy)
-BB17_5:
-	ld	(iy), e
-	ld	hl, (ix - 3)
-	inc	hl
-	ld	(ix - 3), hl
-	inc	iy
-	inc	c
-	lea	hl, iy
-	ld	iy, (ix + 6)
-	ld	e, (iy + 1)
-	push	hl
-	pop	iy
-	ld	a, c
-	cp	a, e
-	jr	c, BB17_3
-	ld	hl, (ix + 6)
-	ld	h, (hl)
-	ld	l, 0
-BB17_7:
-	ld	a, e
-	ld	de, (ix - 9)
-	add	iy, de
-	ld	e, a
-	inc	b
-	ld	a, b
-	cp	a, h
-	jr	c, BB17_2
-BB17_8:
-	ld	sp, ix
-	pop	ix
-	ret
+;gfy_TransparentSprite_NoClip:
+;	push	ix
+;	ld	ix, 0
+;	add	ix, sp
+;	lea	hl, ix - 9
+;	ld	sp, hl
+;	call	gfy_Wait
+;	ld	hl, (-1900524)
+;	ld	(ix - 6), hl
+;	ld	iy, (ix + 6)
+;	ld	e, (iy + 1)
+;	ld	bc, 0
+;	ld	c, e
+;	ld	hl, 240
+;	or	a, a
+;	sbc	hl, bc
+;	ld	(ix - 9), hl
+;	ld	hl, (ix + 6)
+;	ld	l, (hl)
+;	ld	a, l
+;	or	a, a
+;	jr	z, BB17_8
+;	ld	a, l
+;	ld	hl, (ix + 9)
+;	ld	bc, 0
+;	ld	c, (ix + 12)
+;	ld	iy, (ix - 6)
+;	add	iy, bc
+;	call	__set_bc_and_mul_hl_by_240
+;	push	hl
+;	pop	bc
+;	ld	h, a
+;	ld	l, 0
+;	add	iy, bc
+;	ld	(ix - 6), iy
+;	ld	iy, (ix + 6)
+;	lea	bc, iy + 2
+;	ld	(ix - 3), bc
+;	ld	iy, (ix - 6)
+;	ld	b, l
+;BB17_2:
+;	ld	a, e
+;	or	a, a
+;	ld	e, l
+;	ld	c, l
+;	jr	z, BB17_7
+;BB17_3:
+;	ld	hl, (ix - 3)
+;	ld	e, (hl)
+;	ld	a, (gfy_Transparent_Color)
+;	ld	h, a
+;	ld	a, e
+;	cp	a, h
+;	jr	nz, BB17_5
+;	ld	e, (iy)
+;BB17_5:
+;	ld	(iy), e
+;	ld	hl, (ix - 3)
+;	inc	hl
+;	ld	(ix - 3), hl
+;	inc	iy
+;	inc	c
+;	lea	hl, iy
+;	ld	iy, (ix + 6)
+;	ld	e, (iy + 1)
+;	push	hl
+;	pop	iy
+;	ld	a, c
+;	cp	a, e
+;	jr	c, BB17_3
+;	ld	hl, (ix + 6)
+;	ld	h, (hl)
+;	ld	l, 0
+;BB17_7:
+;	ld	a, e
+;	ld	de, (ix - 9)
+;	add	iy, de
+;	ld	e, a
+;	inc	b
+;	ld	a, b
+;	cp	a, h
+;	jr	c, BB17_2
+;BB17_8:
+;	ld	sp, ix
+;	pop	ix
+;	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
