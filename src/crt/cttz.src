@@ -3,47 +3,53 @@
 	section	.text
 	public	__bcttz
 __bcttz:
-	tst	a, 0Fh
+	cp	a, 1
+	require	__cttz_common
+
+	section	.text
+	private	__cttz_common
+	; Input: A=byte, CF=(A==0)
+	; Output: A=cttz(A)
+__cttz_common:
+	adc	a, a
+	add	a, a
+	jr	z, .high2
+	add	a, a
+	add	a, a
 	jr	z, .high4
-	tst	a, 3
+	add	a, a
+	add	a, a
 	jr	z, .high6
-	cpl
-	and	a, 1
+	add	a, a
+	add	a, a
+	sbc	a, -1
+	ret	p
+	ld	a, 8
 	ret
 .high6:
-	dec	a
-	and	a, 6
-	ret	po
-	rrca
+	sbc	a, -3
 	ret
 .high4:
-	tst	a, 030h
-	jr	z, .high2
-	dec	a
-	and	a, 014h
-	ret	po
-	ld	a, 5
+	sbc	a, -5
 	ret
 .high2:
-	add	a, a
-	sbc	a, -8
-	ret	p
-	ld	a, 6
+	sbc	a, -7
 	ret
 
 	section	.text
 	public	__scttz
 __scttz:
-	ld	a, l
-	or	a, a
-	jr	nz, __bcttz
-	ld	a, h
+	xor	a, a
+	or	a, l
+	jr	nz, __cttz_common
+	sub	a, h
+	ccf
 	require	__scttz.hijack
 
 	section	.text
 	private	__scttz.hijack
 __scttz.hijack:
-	call	__bcttz
+	call	__cttz_common
 	add	a, 8
 	ret
 
@@ -57,7 +63,7 @@ __icttz:
 	private	__icttz.hijack
 __icttz.hijack:
 	or	a, l
-	jr	nz, __bcttz
+	jr	nz, __cttz_common
 	or	a, h
 	jr	nz, __scttz.hijack
 	dec	sp
@@ -75,8 +81,9 @@ __lcttz:
 	xor	a, a
 	sbc	hl, de
 	jr	nz, __icttz.hijack
-	ld	a, e
-	call	__bcttz
+	sub	a, e
+	ccf
+	call	__cttz_common
 	add	a, 24
 	ret
 
@@ -91,14 +98,15 @@ __llcttz:
 	sbc	hl, de
 	jr	nz, __i48cttz.hijack
 	or	a, c
-	jr	z, .high
-	call	__bcttz
-	add	a, 48
-	ret
-.high:
-	ld	a, b
-	call	__bcttz
+	jr	nz, .low
+	sub	a, b
+	ccf
+	call	__cttz_common
 	add	a, 56
+	ret
+.low:
+	call	__cttz_common
+	add	a, 48
 	ret
 
 	section	.text
