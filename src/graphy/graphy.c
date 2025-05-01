@@ -2913,17 +2913,28 @@ void gfy_CopyRectangle(
         (uint8_t*)RAM_ADDRESS(lcd_UpBase) : (uint8_t*)RAM_ADDRESS(lcd_LpBase);
     uint8_t* dst_buf = (dst == gfy_screen) ?
         (uint8_t*)RAM_ADDRESS(lcd_UpBase) : (uint8_t*)RAM_ADDRESS(lcd_LpBase);
-    const bool buf_overlap = (src_buf == dst_buf) ? true : false;
     src_buf += src_y + (src_x * GFY_LCD_HEIGHT);
     dst_buf += dst_y + (dst_x * GFY_LCD_HEIGHT);
     const uint24_t jump = GFY_LCD_HEIGHT - height;
-    if (buf_overlap == true) {
-        for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
-            memmove(dst_buf, src_buf, height);
-            src_buf += jump;
-            dst_buf += jump;
+    if (src_buf == dst_buf) {
+        // copy forwards
+        if (src_buf > dst_buf)
+            for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
+                memmove(dst_buf, src_buf, height);
+                src_buf += jump;
+                dst_buf += jump;
+            }
+            return;
         }
-        return;
+        // copy backwards
+        const uint24_t jump_to_end = jump * width;
+        src_buf += jump_to_end;
+        dst_buf += jump_to_end;
+        for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
+            src_buf -= jump;
+            dst_buf -= jump;
+            memmove(dst_buf, src_buf, height);
+        }
     }
     for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
         memcpy(dst_buf, src_buf, height);
