@@ -2638,7 +2638,7 @@ void gfy_RLETSprite_NoClip(const gfy_rletsprite_t *sprite, const uint24_t x, con
 
 /* gfy_RotateScaleSprite (graphy.asm) */
 
-#if 1
+#if 0
 
 gfy_sprite_t *gfy_RotateScaleSprite(
     const gfy_sprite_t *__restrict sprite_in,
@@ -2695,7 +2695,9 @@ gfy_sprite_t *gfy_RotateScaleSprite(
 
 #endif
 
-/* gfy_RotatedScaledTransparentSprite_NoClip */
+/* gfy_RotatedScaledTransparentSprite_NoClip (graphy.asm) */
+
+#if 0
 
 uint8_t gfy_RotatedScaledTransparentSprite_NoClip(
     const gfy_sprite_t *sprite,
@@ -2754,7 +2756,9 @@ uint8_t gfy_RotatedScaledTransparentSprite_NoClip(
     return out_size;
 }
 
-/* gfy_RotatedScaledSprite_NoClip */
+#endif
+
+/* gfy_RotatedScaledSprite_NoClip (graphy.asm) */
 
 #if 0
 uint8_t gfy_RotatedScaledSprite_NoClip(
@@ -2819,7 +2823,7 @@ uint8_t gfy_RotatedScaledSprite_NoClip(
     }
     return out_size;
 }
-#else
+#elif 0
 uint8_t gfy_RotatedScaledSprite_NoClip(
     const gfy_sprite_t *sprite,
     uint24_t x0,
