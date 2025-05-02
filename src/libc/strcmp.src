@@ -1,0 +1,34 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_strcmp
+
+if PREFER_OS_LIBC
+
+_strcmp := $0000C8
+
+else
+
+_strcmp:
+	ld	hl, 3
+	add	hl, sp
+	ld	de, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	hl, (hl)
+.loop:
+	ld	a, (de)
+	cp	a, (hl)
+	jr	nz, .finish
+	inc	hl
+	inc	de
+	or	a, a
+	jr	nz, .loop
+.finish:
+	sbc	hl, hl
+	ld	l, a
+	ret
+
+end if

@@ -2,7 +2,7 @@
 # Makefile Options
 # ----------------------------
 
-NAME = STRLCPY
+NAME = DEMO
 ICON = icon.png
 DESCRIPTION = "strlcpy test"
 COMPRESSED = NO
