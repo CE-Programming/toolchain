@@ -1,0 +1,42 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_strncmp
+
+if PREFER_OS_LIBC
+
+_strncmp := $0000DC
+
+else
+
+_strncmp:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, (iy + 9)
+	sbc	hl, hl
+	adc	hl, bc
+	ld	hl, (iy + 6)
+	ld	de, (iy + 3)
+	call	nz, .start	; z means BC was zero
+.ret_zero:
+	sbc	hl, hl
+	ret
+.loop:
+	ret	po	; ret_zero
+	or	a, a
+	ret	z	; ret_zero
+	inc	de
+.start:
+	ld	a, (de)
+	cpi
+	jr	z, .loop
+.finish:
+	ld	sp, iy	; ret
+	dec	hl
+	sub	a, (hl)
+	sbc	hl, hl
+	ld	l, a
+	ret
+
+end if

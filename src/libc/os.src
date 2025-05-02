@@ -16,16 +16,12 @@ _setjmp     := 0000B8h
 _strcat     := 0000C0h
 	public	_strchr
 _strchr     := 0000C4h
-	public	_strcmp
-_strcmp     := 0000C8h
 	public	_strcpy
 _strcpy     := 0000CCh
 	public	_strcspn
 _strcspn    := 0000D0h
 	public	_strncat
 _strncat    := 0000D8h
-	public	_strncmp
-_strncmp    := 0000DCh
 	public	_strncpy
 _strncpy    := 0000E0h
 	public	_strpbrk

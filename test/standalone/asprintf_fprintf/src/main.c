@@ -20,6 +20,8 @@
 * memccpy
 */
 
+#define C(expr) if (!(expr)) { return __LINE__; }
+
 #define SINK (char*)0xE40000
 
 // prevents Clang from replacing function calls with builtins
@@ -40,6 +42,9 @@ void *T_memccpy(void *__restrict dest, const void *__restrict src, int c, size_t
 void *T_mempcpy(void *__restrict dest, const void *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
 
+void *T_memrchr(const void *s, int c, size_t n)
+    __attribute__((nonnull(1)));
+
 char *T_stpcpy(char *__restrict dest, const char *__restrict src)
     __attribute__((nonnull(1, 2)));
 
@@ -47,6 +52,9 @@ size_t T_strlen(const char *s)
     __attribute__((nonnull(1)));
 
 int T_strcmp(const char *s1, const char *s2)
+    __attribute__((nonnull(1, 2)));
+
+int T_strncmp(const char *s1, const char *s2, size_t n)
     __attribute__((nonnull(1, 2)));
 
 void T_bzero(void* s, size_t n);
@@ -58,9 +66,11 @@ void T_bzero(void* s, size_t n);
 #define T_memcmp memcmp
 #define T_memccpy memccpy
 #define T_mempcpy mempcpy
+#define T_memrchr memrchr
 #define T_stpcpy stpcpy
 #define T_strlen strlen
 #define T_strcmp strcmp
+#define T_strncmp strncmp
 #define T_bzero bzero
 
 #endif
@@ -471,6 +481,73 @@ int bzero_test(void) {
     return 0;
 }
 
+int strncmp_test(void) {
+    const char* str0 = "Hello World!";
+    const char* str1 = "Hello!";
+    const char* str2 = "Hello";
+    const char* str3 = "Hello there";
+    const char* str4 = "Hello, everybody!";
+    const char* str5 = "Hello, somebody!";
+
+    C(T_strcmp(SINK, SINK) == 0);
+    C(T_strcmp("C", "C") == 0);
+    C(T_strcmp("A", "C") < 0);
+    C(T_strcmp("C", "A") > 0);
+    C(T_strcmp("CD", "CD") == 0);
+    C(T_strcmp("AB", "CD") < 0);
+    C(T_strcmp("CD", "AB") > 0);
+    C(T_strcmp("FE", "FG") < 0);
+    C(T_strcmp("FG", "FE") > 0);
+    C(T_strcmp(str0, str1) < 0);
+    C(T_strcmp(str0, str2) > 0);
+    C(T_strcmp(str0, str3) < 0);
+    C(T_strcmp(str4 + 12, str5 + 11) == 0);
+
+    C(T_strncmp(SINK, SINK, 0) == 0);
+    C(T_strncmp(SINK, SINK, 1) == 0);
+    C(T_strncmp(SINK, SINK, 2) == 0);
+    C(T_strncmp("C", "C", 1) == 0);
+    C(T_strncmp("A", "C", 1) < 0);
+    C(T_strncmp("C", "A", 1) > 0);
+    C(T_strncmp("CD", "CD", 2) == 0);
+    C(T_strncmp("AB", "CD", 2) < 0);
+    C(T_strncmp("CD", "AB", 2) > 0);
+    C(T_strncmp("FE", "FG", 2) < 0);
+    C(T_strncmp("FG", "FE", 2) > 0);
+    C(T_strncmp(str0, str1, 5) == 0);
+    C(T_strncmp(str0, str2, 10) > 0);
+    C(T_strncmp(str0, str3, 10) < 0);
+    C(T_strncmp(str4 + 12, str5 + 11, 5) == 0);
+
+    return 0;
+}
+
+int memrchr_test(void) {
+    C(T_memrchr(SINK, 0x00, 0) == NULL);
+    C(T_memrchr(SINK, 0x00, 1) == SINK);
+    C(T_memrchr(SINK, 0xFF, 1) == NULL);
+    C(T_memrchr(SINK, 0x00, 2) == SINK + 2 - 1);
+    C(T_memrchr(SINK, 0x00, 500) == SINK + 500 - 1);
+    const char test0[] = "GABCDEFABCDEF";
+    char const * const test = &test0[1];
+
+    const size_t test_size = sizeof(test0) - 1;
+    const size_t test_strlen = sizeof(test0) - 2;
+
+    C(T_memrchr(test, '\0', test_size) == &test[12]);
+    C(T_memrchr(test, 'A', test_strlen) == &test[6]);
+    C(T_memrchr(&test[7], 'A', 5) == NULL);
+    C(T_memrchr(&test[6], 'A', 6) == &test[6]);
+    C(T_memrchr(&test[5], 'A', 7) == &test[6]);
+    C(T_memrchr(&test[7], 'B', 5) == &test[7]);
+    C(T_memrchr(&test[8], 'C', 1) == &test[8]);
+    C(T_memrchr(&test[8], 'C', 8) == &test[8]);
+    C(T_memrchr(test, 'G', test_strlen) == NULL);
+    C(T_memrchr(test, 'G', test_size) == NULL);
+    C(T_memrchr(test0, 'G', sizeof(test0)) == test0);
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* boot_asprintf */
@@ -498,6 +575,14 @@ int run_tests(void) {
 
     /* bzero */
         ret = bzero_test();
+        if (ret != 0) { return ret; }
+
+    /* strncmp */
+        ret = strncmp_test();
+        if (ret != 0) { return ret; }
+
+    /* strncmp */
+        ret = memrchr_test();
         if (ret != 0) { return ret; }
 
     return 0;

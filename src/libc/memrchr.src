@@ -1,0 +1,24 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_memrchr
+
+_memrchr:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 3)
+	ld	bc, (iy + 9)
+	dec	bc
+	add	hl, bc
+	jr	c, .ret_zero
+	inc	bc
+	ld	a, (iy + 6)
+	cpdr
+	inc	hl
+	ret	z	; found match
+.ret_zero:
+	; return NULL
+	or	a, a
+	sbc	hl, hl
+	ret
