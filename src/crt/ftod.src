@@ -4,24 +4,89 @@
 
 	public __ftod
 
+; input E:UHL (float)
+; ouput BC:UDE:UHL (long double)
+; NaN payloads are bitshifted
 __ftod:
-	; f32_ret_f64
-	ld	d, a
-	push	iy
 	bit	7, e
-	jr	nz, .negative_arg
-	; positive
-	push	de, hl
-	call	__ftod_c
-	pop	af, af, iy
-	ret
-.negative_arg:
-	; return -_ftod_c(fabsf(x))
+	push	af
 	res	7, e
-	push	de, hl
-	call	__ftod_c
-	set	7, b
-	pop	af, af, iy
-	ret
 
-	extern __ftod_c
+	xor	a, a
+	ld	a, e
+
+	adc	hl, hl
+	ld	b, $03	; ld bc, $380 - 1
+	jr	z, .mant_zero	; zero inf or normal
+	adc	a, a
+	jr	z, .subnormal
+	inc	a
+	jr	z, .nan
+.normal:
+	; (Float64_bias - Float32_bias) - 1 (undoing inc a)
+	ld	c, $80 - 1	; ld bc, $380 - 1
+	ld	d, 0
+	ld	e, a
+	; DE = expon
+	ex	de, hl
+	add	hl, bc
+	ld	a, h
+	ld	c, l
+	ex	de, hl
+; HL = mant
+; C = lo expon
+; A = hi expon
+.shift_28: ; Float64_mant_bits - Float32_mant_bits
+	ld	b, 4
+.loop:
+	add	hl, hl
+	rl	c
+	rla
+	djnz	.loop
+	ld	b, a
+
+	; zero low bits
+.infinite:
+	or	a, a
+.zero:
+	ex	de, hl
+	sbc	hl, hl
+.finish:
+	pop	af
+	ret	z	; positive
+	set	7, b
+	ret	; negative
+
+.mant_zero:
+	adc	a, a
+	ld	b, e	; maybe load all ones or all zeros including signbit
+	ld	c, l	; HL is zero here
+	jr	z, .zero
+	inc	a
+	jr	nz, .normal
+	; infinite
+	ld	c, $F0
+	jr	.infinite
+
+.subnormal:
+	; since this is subnormal, the LSB of the exponent is already zero
+	call	__ictlz
+	ld	c, a
+	; shift until the MSB of the mantissa is the LSB of the exponent
+	call	__ishl
+	; (Float64_bias - Float32_bias) = $0380
+	; expon = (Float64_bias - Float32_bias) - clz_result
+	add	hl, hl
+	cpl
+	adc	a, $80
+	ld	c, a
+	ld	a, b	; ld a, $03
+	jr	.shift_28
+
+.nan:
+	ld	a, $07
+	ld	c, $FF
+	jr	.shift_28
+
+	extern	__ictlz
+	extern	__ishl

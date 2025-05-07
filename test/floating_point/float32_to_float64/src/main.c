@@ -30,6 +30,10 @@ size_t run_test(void) {
         result.flt = (long double)input[i];
         if (result.bin != output[i].bin) {
             if (!(isnan(result.flt) && isnan(output[i].flt))) {
+                printf(
+                    "I: %08lX\nG: %016llX\nT: %016llX\n",
+                    *((const uint32_t*)input + i), result.bin, output[i].bin
+                );
                 return i;
             }
         }
