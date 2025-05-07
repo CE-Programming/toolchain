@@ -24,31 +24,27 @@ __ftod:
 	jr	z, .nan
 .normal:
 	; (Float64_bias - Float32_bias) - 1 (undoing inc a)
-	ld	c, $80 - 1	; ld bc, $380 - 1
-	ld	d, 0
-	ld	e, a
-	; DE = expon
-	ex	de, hl
-	add	hl, bc
-	ld	a, h
-	ld	c, l
-	ex	de, hl
+	; (Float64_bias - Float32_bias) = $0380
+	add	a, $80 - 1
+	ld	c, a
+	adc	a, b
+	sub	a, c
 ; HL = mant
 ; C = lo expon
 ; A = hi expon
 .shift_28: ; Float64_mant_bits - Float32_mant_bits
-	ld	b, 4
+	inc	b	; ld b, 4
 .loop:
 	add	hl, hl
 	rl	c
 	rla
 	djnz	.loop
+.zero:	; <-- A is zero on this path
 	ld	b, a
 
 	; zero low bits
 .infinite:
 	or	a, a
-.zero:
 	ex	de, hl
 	sbc	hl, hl
 .finish:
@@ -59,13 +55,13 @@ __ftod:
 
 .mant_zero:
 	adc	a, a
-	ld	b, e	; maybe load all ones or all zeros including signbit
 	ld	c, l	; HL is zero here
 	jr	z, .zero
 	inc	a
 	jr	nz, .normal
 	; infinite
 	ld	c, $F0
+	ld	b, e	; load all ones with the signbit
 	jr	.infinite
 
 .subnormal:
