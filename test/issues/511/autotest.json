@@ -41,14 +41,14 @@
       "description": "Test 1",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "0C357809" ]
+      "expected_CRCs": [ "0C357809", "96B924C4" ]
     },
     "2":
     {
       "description": "Test 2",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "C37E4C46" ]
+      "expected_CRCs": [ "C37E4C46", "49D4B4DC" ]
     },
     "3":
     {
@@ -97,14 +97,14 @@
       "description": "Test 9",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "0D88654C" ]
+      "expected_CRCs": [ "0D88654C", "871F430C" ]
     },
     "10":
     {
       "description": "Test 10",
       "start": "vram_start",
       "size": "vram_16_size",
-      "expected_CRCs": [ "DE8AD0AF" ]
+      "expected_CRCs": [ "DE8AD0AF", "D47EBD22" ]
     },
     "11":
     {
