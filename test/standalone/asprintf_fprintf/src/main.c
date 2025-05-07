@@ -194,6 +194,9 @@ int boot_sprintf_tests(void) {
     return 0;
 }
 
+static char const float_str[] = "+2.7182817459106445312500";
+static char const long_double_str[] = "2.7182818284590450907956";
+
 int nano_tests(void) {
     int pos;
     int len = asprintf(
@@ -249,10 +252,16 @@ int nano_tests(void) {
         printf("cmp: %d\n", cmp2);
         return __LINE__;
     }
-    char buf_3[30];
-    int len_3 = snprintf(buf_3, sizeof(buf_3), test_3);
-    if (len_3 != pos_3) {
-        printf("E: %d != %d\n", len_3, pos_3);
+    char buf_30[30];
+    int len_3sn = snprintf(buf_30, sizeof(buf_30), test_3);
+    if (len_3sn != pos_3) {
+        printf("E: %d != %d\n", len_3sn, pos_3);
+        return __LINE__;
+    }
+
+    int len_3s = sprintf(buf_30, test_3);
+    if (len_3s != pos_3) {
+        printf("E: %d != %d\n", len_3s, pos_3);
         return __LINE__;
     }
     
@@ -293,6 +302,17 @@ int nano_tests(void) {
         printf("E: %d != 0\n", len_5);
         return __LINE__;
     }
+
+    memset(buf_30, 'T', sizeof(buf_30) - 1);
+    buf_30[sizeof(buf_30) - 1] = '\0';
+
+    // I have memorized e to 70 digits
+    sprintf(buf_30, "%.22f", 2.71828182845904523536028747135f);
+    C(T_strcmp(buf_30, &float_str[1]) == 0);
+    snprintf(buf_30, sizeof(buf_30), "%+.22lf", 2.71828182845904523536028747135);
+    C(T_strcmp(buf_30, &float_str[0]) == 0);
+    snprintf(buf_30, sizeof(long_double_str), "%.22Lf", 2.71828182845904523536028747135L);
+    C(T_strcmp(buf_30, long_double_str) == 0);
 
     return 0;
 }
