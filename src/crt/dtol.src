@@ -3,8 +3,12 @@
 	section	.text
 
 	public	__dtol
+	public	__dtoul
 
+; __dtol_c correctly handles all non-UB cases for both
+; (long)long double and (unsigned long)long double
 __dtol:
+__dtoul:
 	; f64_ret_i32
 	push	af, iy
 	ld	a, b

@@ -2,6 +2,11 @@
 #include <math.h>
 #include <stdint.h>
 
+/**
+ * @brief the exact same routine is used for (long long)float and
+ * (unsigned long long)float. If the input float is out of range,
+ * then the conversion is UB anyways.
+ */
 long long _ftoll_c(float x)
 {
     const union { float f; uint32_t u; struct { uint32_t mantissa: FLT_MANT_DIG - 1, exponent: 8, sign: 1; }; } parts = { .f = x };
