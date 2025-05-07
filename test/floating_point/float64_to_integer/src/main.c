@@ -37,7 +37,7 @@ size_t run_test(const char** failed_func) {
 
     for (size_t i = 0; i < length; i++) {
 
-        if (input[i] >= 0.0L) {
+        if (input[i] > -1.0L) {
             uint32_t ru32 = (uint32_t)input[i];
             if (ru32 != output[i].u32) {
                 print_failed(input[i], (uint64_t)ru32, (uint64_t)output[i].u32);
@@ -60,8 +60,6 @@ size_t run_test(const char** failed_func) {
             return i;
         }
 
-        
-
         int64_t ri64 = (int64_t)input[i];
         if (ri64 != output[i].i64) {
             print_failed(input[i], (uint64_t)ri64, (uint64_t)output[i].i64);
@@ -76,19 +74,34 @@ size_t run_test(const char** failed_func) {
 }
 
 bool run_edge_cases(void) {
-    volatile long double i32_min_input = -0x1.00000001fffffp+31;
+    volatile long double i32_min_input = -0x1.00000001fffffp+31L;
     volatile int32_t i32_min_result = (int32_t)i32_min_input;
     if (i32_min_result != INT32_MIN) {
         printf("%08lX !=\nINT32_MIN (dtol)\n", i32_min_result);
         return false;
     }
 
-    volatile long double i64_min_input = -0x1.0p+63;
+    volatile long double i64_min_input = -0x1.0p+63L;
     volatile int64_t i64_min_result = (int64_t)i64_min_input;
     if (i64_min_result != INT64_MIN) {
         printf("%016llX !=\nINT64_MIN (dtoll)\n", i64_min_result);
         return false;
     }
+
+    volatile long double u32_max_input = +0x1.fffffffffffffp+31L;
+    volatile uint32_t u32_max_result = (uint32_t)u32_max_input;
+    if (u32_max_result != UINT32_MAX) {
+        printf("%08lX !=\nUINT32_MAX (dtoul)\n", u32_max_result);
+        return false;
+    }
+
+    volatile long double u64_max_input = +0x1.fffffffffffffp+63L;
+    volatile uint64_t u64_max_result = (uint64_t)u64_max_input;
+    if (u64_max_result != UINT64_C(0xFFFFFFFFFFFFF800)) {
+        printf("%016llX !=\nFFFFFFFFFFFFF800 (dtoull)\n", u64_max_result);
+        return false;
+    }
+
     return true;
 }
 
