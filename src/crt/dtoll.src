@@ -5,21 +5,77 @@
 	public	__dtoll
 	public	__dtoull
 
-; __dtoll_c correctly handles all non-UB cases for both
+; correctly handles all non-UB cases for both
 ; (long long)long double and (unsigned long long)long double
 __dtoll:
 __dtoull:
-	; f64_ret_i64
-	push	af, iy
-	ld	a, b
-	res	7, b	; fabsl(x)
-	push	bc, de, hl
-	ld	hl, 8
-	add	hl, sp
-	rlca
-	ld	(hl), a	; store the sign of x in the padding byte
-	call	__dtoll_c
-	pop	af, af, af, iy, af
+	bit	6, b	; set if |x| >= 2.0L
+	jr	z, .zero_or_one
+	bit	7, b
+	push	af
+	res	7, b
+	push	hl
+	; -((Float64_mant_bits + Float64_bias) << 4)
+	ld	hl, $FFC010 ; -16368 ; -$3FF0
+
+	; clears the exponent field without touching the mantissa
+	; sets the LSB of the exponent since x is normalized
+	ld	a, c
+	or	a, l	; or a, $10
+	and	a, $1F
+
+	add	hl, bc
+	; HL <<= 4
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+
+	ld	c, a
+	ld	b, 0
+	ld	a, h
+	sub	a, 52 + 1	; float64 mantissa bits
+	jr	c, .shift_right
+	; shift_left
+	; expon >= 52 or [52, 63]
+	; A is one less than it should be here to allow for the CPL trick in shift_right
+	; A is [-1, 10]
+	cp	a, 11	; only call __llshl if the shift amount is [0, 63]
+	inc	a	; positioning inc a after cp a allows __llshl to be skipped when the shift amount is zero
+	ld	l, a
+	ex	(sp), hl
+	call	c, __llshl
+	jr	.finish
+.shift_right:
+	; expon is [0, 51]
+	cpl
+	ld	l, a
+	ex	(sp), hl
+	call	__llshru
+.finish:
+	pop	af	; reset SP
+	pop	af
+.finish_zero_or_one:
+	jp	nz, __llneg
 	ret
 
-	extern	__dtoll_c
+.zero_or_one:
+	ld	hl, 16
+	ld	d, h
+	ld	e, h
+	add	hl, bc	; adds one to the exponent
+	bit	6, h	; if |x| was [1, 2)
+	jr	z, .zero
+	inc	de
+	bit	7, b	; sets NZ if the result should be -1
+.zero:
+	ld	c, d
+	ld	b, d
+	ld	h, d
+	ld	l, d
+	ex.s	de, hl
+	jr	.finish_zero_or_one
+
+	extern	__llneg
+	extern	__llshl
+	extern	__llshru

@@ -5,26 +5,17 @@
 	public	__dtol
 	public	__dtoul
 
-; __dtol_c correctly handles all non-UB cases for both
+; correctly handles all non-UB cases for both
 ; (long)long double and (unsigned long)long double
 __dtol:
 __dtoul:
-	; f64_ret_i32
-	push	af, iy
-	ld	a, b
-	push	bc, de, hl
-	ld	hl, 7
-	add	hl, sp
-	res	7, (hl)	; fabsl(x)
-	inc	hl
-	rlca
-	ld	(hl), a	; store the sign of x in the padding byte
-	call	__dtol_c
-	pop	af
-	ld	a, e
+	push	bc
+	push	de
+	call	__dtoll	; same as __dtoull
+	ld	c, e
 	pop	de
-	ld	e, a
-	pop	bc, iy, af
+	ld	e, c
+	pop	bc
 	ret
 
-	extern	__dtol_c
+	extern	__dtoll

@@ -96,6 +96,8 @@ static uint64_t f64_to_unsigned(F64_pun val) {
     return val.bin;
 }
 
+
+
 /**
  * @brief the exact same routine is used for (long long)long double and
  * (unsigned long long)long double. If the input long double is out of range,

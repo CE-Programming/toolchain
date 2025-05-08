@@ -36,35 +36,43 @@ size_t run_test(const char** failed_func) {
     const output_t *output = (const output_t*)((const void*)f64_to_integer_LUT_output);
 
     for (size_t i = 0; i < length; i++) {
-
-        if (input[i] > -1.0L) {
-            uint32_t ru32 = (uint32_t)input[i];
+        volatile uint32_t ru32 = (uint32_t)input[i];
+        if (input[i] > -1.0L && input[i] < (long double)UINT32_MAX) {
             if (ru32 != output[i].u32) {
                 print_failed(input[i], (uint64_t)ru32, (uint64_t)output[i].u32);
                 *failed_func = "dtoul";
                 return i; 
             }
-
-            uint64_t ru64 = (uint64_t)input[i];
+        }
+    }
+    for (size_t i = 0; i < length; i++) {
+        volatile uint64_t ru64 = (uint64_t)input[i];
+        if (input[i] > -1.0L && input[i] < (long double)UINT64_MAX) {
             if (ru64 != output[i].u64) {
                 print_failed(input[i], (uint64_t)ru64, (uint64_t)output[i].u64);
                 *failed_func = "dtoull";
                 return i;
             }
         }
-
-        int32_t ri32 = (int32_t)input[i];
-        if (ri32 != output[i].i32) {
-            print_failed(input[i], (uint64_t)ri32, (uint64_t)output[i].i32);
-            *failed_func = "dtol";
-            return i;
+    }
+    for (size_t i = 0; i < length; i++) {
+        volatile int32_t ri32 = (int32_t)input[i];
+        if (input[i] > (long double)INT32_MIN && input[i] < (long double)INT32_MAX) {
+            if (ri32 != output[i].i32) {
+                print_failed(input[i], (uint64_t)ri32, (uint64_t)output[i].i32);
+                *failed_func = "dtol";
+                return i;
+            }
         }
-
-        int64_t ri64 = (int64_t)input[i];
-        if (ri64 != output[i].i64) {
-            print_failed(input[i], (uint64_t)ri64, (uint64_t)output[i].i64);
-            *failed_func = "dtoll";
-            return i;
+    }
+    for (size_t i = 0; i < length; i++) {
+        volatile int64_t ri64 = (int64_t)input[i];
+        if (input[i] > (long double)INT64_MIN && input[i] < (long double)INT64_MAX) {
+            if (ri64 != output[i].i64) {
+                print_failed(input[i], (uint64_t)ri64, (uint64_t)output[i].i64);
+                *failed_func = "dtoll";
+                return i;
+            }
         }
     }
 
