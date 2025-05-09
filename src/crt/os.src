@@ -30,8 +30,6 @@ __ishru_b   := 000188h
 __itol      := 000194h
 	public	__ltof
 __ltof      := 000284h
-	public	__setflag
-__setflag   := 000218h
 	public	__sshl_b
 __sshl_b    := 000244h
 	public	__sshrs_b
