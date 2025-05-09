@@ -364,6 +364,8 @@ static const int8_t gfy_SineTable[65] = {
 // internal routines
 //------------------------------------------------------------------------------
 
+#if 0
+
 /**
  * @brief Calculates sin(x) from a lookup table.
  * 
@@ -392,6 +394,8 @@ __attribute__((unused)) static uint8_t gfy_Sin(uint8_t theta) {
 __attribute__((unused)) static uint8_t gfy_Cos(uint8_t theta) {
     return gfy_Sin(theta + 64);
 }
+
+#endif
 
 //------------------------------------------------------------------------------
 // v1 functions
@@ -424,8 +428,6 @@ void gfy_End(void) {
 }
 
 /* gfy_SetColor (graphy.asm) */
-
-
 
 /* gfy_SetDefaultPalette (graphy.asm) */
 
@@ -729,7 +731,9 @@ uint24_t gfy_GetStringWidth(const char *string) {
 
 /* gfy_GetTextY (graphy.asm) */
 
-/* gfy_Line */
+/* gfy_Line (graphy.asm) */
+
+#if 0
 
 // Unoptimized routine
 static void gfy_internal_Line0(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
@@ -784,6 +788,7 @@ static void gfy_internal_Line1(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
 
 void gfy_Line(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
     // Unoptimized routine
+    gfy_Wait();
     if (abs(y1 - y0) < abs(x1 - x0)) {
         if (x0 > x1) {
             gfy_internal_Line0(x1, y1, x0, y0);
@@ -798,6 +803,8 @@ void gfy_Line(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
         }
     }
 }
+
+#endif
 
 /* gfy_HorizLine (graphy.asm) */
 
@@ -960,22 +967,27 @@ void gfy_FillRectangle(int24_t x, int24_t y, int24_t width, int24_t height) {
 
 // Unoptimized routine
 static void gfy_internal_Line0_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
-    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     int24_t dX = x1 - x0;
     int24_t dY = y1 - y0;
-    int24_t yI = 1;
+    int24_t y_incr = 1;
     if (dY < 0) {
-        yI = -1;
+        y_incr = -1;
         dY = -dY;
     }
     int24_t dD = 2 * dY - dX;
     const int24_t dD_jump = 2 * (dY - dX);
     dY *= 2;
-    int24_t y = y0;
-    for (int24_t x = x0; x < x1; x++) {
-        gfy_SetPixel_NoClip(buffer, x, y, gfy_Color);
+
+    uint8_t* buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + x0 * GFY_LCD_HEIGHT + y0;
+    const uint8_t color = gfy_Color;
+
+    uint24_t x = (uint24_t)(x1 - x0);
+
+    for (; x --> 0;) {
+        *buffer = color;
+        buffer += GFY_LCD_HEIGHT;
         if (dD > 0) {
-            y += yI;
+            buffer += y_incr;
             dD += dD_jump;
         } else {
             dD += dY;
@@ -985,23 +997,26 @@ static void gfy_internal_Line0_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_
 
 // Unoptimized routine
 static void gfy_internal_Line1_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_t y1) {
-    uint8_t * const buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer);
     int24_t dX = x1 - x0;
     int24_t dY = y1 - y0;
-    int24_t xI = 1;
+    int24_t x_incr = GFY_LCD_HEIGHT;
     if (dX < 0) {
-        xI = -1;
+        x_incr = -GFY_LCD_HEIGHT;
         dX = -dX;
     }
     int24_t dD = (2 * dX) - dY;
     const int24_t dD_jump = 2 * (dX - dY);
     dX *= 2;
-    int24_t x = x0;
 
-    for (int24_t y = y0; y < y1; y++) {
-        gfy_SetPixel_NoClip(buffer, x, y, gfy_Color);
+    uint8_t* buffer = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + x0 * GFY_LCD_HEIGHT + y0;
+    const uint8_t color = gfy_Color;
+
+    uint8_t y = (uint8_t)(y1 - y0);
+    for (; y --> 0;) {
+        *buffer = color;
+        ++buffer;
         if (dD > 0) {
-            x += xI;
+            buffer += x_incr;
             dD += dD_jump;
         } else {
             dD += dX;
@@ -1011,6 +1026,7 @@ static void gfy_internal_Line1_NoClip(int24_t x0, int24_t y0, int24_t x1, int24_
 
 void gfy_Line_NoClip(uint24_t x0, uint8_t y0, uint24_t x1, uint8_t y1) {
     // Unoptimized routine
+	gfy_Wait();
     if (abs((int24_t)y1 - (int24_t)y0) < abs((int24_t)x1 - (int24_t)x0)) {
         if (x0 > x1) {
             gfy_internal_Line0_NoClip(x1, y1, x0, y0);
@@ -1717,8 +1733,9 @@ void gfy_Sprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t 
 }
 #endif
 
-/* gfy_TransparentSprite_NoClip */
+/* gfy_TransparentSprite_NoClip (graphy.asm) */
 
+#if 0
 void gfy_TransparentSprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t x, uint8_t y) {
     gfy_Wait();
     const uint8_t* src_buf = sprite->data;
@@ -1734,6 +1751,7 @@ void gfy_TransparentSprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t 
         dst_buf += dst_jump;
     }
 }
+#endif
 
 /* gfy_GetSprite */
 
@@ -2918,7 +2936,7 @@ void gfy_CopyRectangle(
     const uint24_t jump = GFY_LCD_HEIGHT - height;
     if (src_buf == dst_buf) {
         // copy forwards
-        if (src_buf > dst_buf)
+        if (src_buf > dst_buf) {
             for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
                 memmove(dst_buf, src_buf, height);
                 src_buf += jump;
