@@ -153,14 +153,14 @@ typedef enum {
  * @see gfy_tilemap_t.
  */
 typedef enum {
-    gfy_tile_no_pow2 = 0,
-    gfy_tile_2_pixel = 128,
-    gfy_tile_4_pixel = 64,
-    gfy_tile_8_pixel = 32,
-    gfy_tile_16_pixel = 16,
-    gfy_tile_32_pixel = 8,
-    gfy_tile_64_pixel = 4,
-    gfy_tile_128_pixel = 2,
+    gfy_tile_no_pow2 = 0,     /**< Use when the tile width/height is not a power of 2. */
+    gfy_tile_2_pixel,         /**< Use when the tile width/height is 2 pixels. */
+    gfy_tile_4_pixel,         /**< Use when the tile width/height is 4 pixels. */
+    gfy_tile_8_pixel,         /**< Use when the tile width/height is 8 pixels. */
+    gfy_tile_16_pixel,        /**< Use when the tile width/height is 16 pixels. */
+    gfy_tile_32_pixel,        /**< Use when the tile width/height is 32 pixels. */
+    gfy_tile_64_pixel,        /**< Use when the tile width/height is 64 pixels. */
+    gfy_tile_128_pixel        /**< Use when the tile width/height is 128 pixels. */
 } gfy_tilemap_type_t;
 
 /**
@@ -1125,7 +1125,7 @@ void gfy_SetDraw(uint8_t location);
  * @returns Location type enumeration.
  * @see gfy_location_t.
  */
-uint8_t gfy_GetDraw(void) GRAPHY_PURE;
+uint8_t gfy_GetDraw(void);
 
 /**
  * Swaps the roles of the screen and drawing buffers.
