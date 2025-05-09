@@ -5,7 +5,8 @@ include '../include/include_library.inc'
 
 ;-------------------------------------------------------------------------------
 
-library GRAPHY, 13
+; version number
+library GRAPHY, 0
 
 include_library '../lcddrvce/lcddrvce.asm'
 
@@ -176,7 +177,7 @@ macro mIsHLLessThanBC?
 end macro
 macro s8 op, imm
 	local i
- 	i = imm
+	i = imm
 	assert i >= -128 & i < 128
 	op, i
 end macro
@@ -896,79 +897,79 @@ gfy_FillRectangle_NoClip:
 ;  arg3 : Height
 ; Returns:
 ;  None
-    ld  iy, 0
-    add iy, sp
-    ld  a, (iy+12)      ; a = height
-    or  a, a
-    ret z           ; make sure height is not 0
-    ld  bc, (iy+9)      ; bc = width
-    sbc hl, hl
-    adc hl, bc
-    ret z           ; make sure width is not 0
-    ld  hl, (iy+3)      ; hl = x coordinate
-    ld  e, (iy+6)       ; e = y coordinate
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy+12)		; a = height
+	or	a, a
+	ret	z			; make sure height is not 0
+	ld	bc, (iy+9)		; bc = width
+	sbc	hl, hl
+	adc	hl, bc
+	ret	z			; make sure width is not 0
+	ld	hl, (iy+3)		; hl = x coordinate
+	ld	e, (iy+6)		; e = y coordinate
 _FillRectangle_NoClip:
-    ld  d, h        ; maybe ld d, 0
-    dec h       ; tests if x >= 256
-    ld  h, ti.lcdHeight
-    jr  nz, .x_lt_256
-    ld  d, h        ; ld d, ti.lcdHeight * 256
+	ld	d, h		; maybe ld d, 0
+	dec	h		; tests if x >= 256
+	ld	h, ti.lcdHeight
+	jr	nz, .x_lt_256
+	ld	d, h		; ld d, ti.lcdHeight * 256
 .x_lt_256:
-    mlt hl
-    ex.s    de, hl      ; clear upper byte of DE
-    add hl, de      ; add y cord
-    ld  de, (CurrentBuffer)
-    add hl, de      ; add buffer offset
-    ex  de, hl          ; de -> place to begin drawing
-    push    de
- 
-    ld  hl, _Color
-    ; divide (width-1) by 2, and set Z flag
-    dec bc
-    srl b
-    rr  c
-    ld  iyl, c
-    ld  c, a
-    ld  b, 0
-    ; iyl = (width-1)/2
-    ; carry = (width-1)%2
-    ; zero = iyl==0
-    ; a = bc = height
-    wait_quick
-    ldi             ; check if we only need to draw 1 pixel
-    pop hl
-    jp  po, .skip
-    ldir
+	mlt	hl
+	ex.s	de, hl		; clear upper byte of DE
+	add	hl, de		; add y cord
+	ld	de, (CurrentBuffer)
+	add	hl, de		; add buffer offset
+	ex	de, hl			; de -> place to begin drawing
+	push	de
+
+	ld	hl, _Color
+	; divide (width-1) by 2, and set Z flag
+	dec	bc
+	srl	b
+	rr	c
+	ld	iyl, c
+	ld	c, a
+	ld	b, 0
+	; iyl = (width-1)/2
+	; carry = (width-1)%2
+	; zero = iyl==0
+	; a = bc = height
+	wait_quick
+	ldi				; check if we only need to draw 1 pixel
+	pop	hl
+	jp	po, .skip
+	ldir
 .skip:
-    jr  z, .final
-    push    af  ; save carry
+	jr	z, .final
+	push	af	; save carry
 .loop:
-    ld  c, ti.lcdHeight - 1
-    ex  de, hl
-    add hl, bc
-    ex  de, hl
-    ld  c, a
-    lddr
-    inc hl
-    ld  c, ti.lcdHeight + 1
-    ex  de, hl
-    add hl, bc
-    ex  de, hl
-    ld  c, a
-    ldir
-    dec hl
-    dec iyl
-    jr  nz, .loop
-    pop af  ; restore carry
+	ld	c, ti.lcdHeight - 1
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	ld	c, a
+	lddr
+	inc	hl
+	ld	c, ti.lcdHeight + 1
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	ld	c, a
+	ldir
+	dec	hl
+	dec	iyl
+	jr	nz, .loop
+	pop	af	; restore carry
 .final:
-    ret nc
-    ld  c, ti.lcdHeight - 1
-    ex  de, hl
-    add hl, bc
-    ex  de, hl
-    ld  c, a
-    lddr
-    ret
+	ret	nc
+	ld	c, ti.lcdHeight - 1
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	ld	c, a
+	lddr
+	ret
 
 ;-------------------------------------------------------------------------------
 gfy_HorizLine:
@@ -1813,13 +1814,138 @@ gfy_Circle: ; COPIED_FROM_GRAPHX
 
 ; ...
 
-_ResetStack:
-	ld	sp,ix
-	pop	ix
-	ret
+;_ResetStack:
+;	ld	sp,ix
+;	pop	ix
+;	ret
 
 ;-------------------------------------------------------------------------------
-; gfy_Line:
+gfy_Line: ; COPIED_FROM_GRAPHX
+; Draws an arbitrarily clipped line
+; Arguments:
+;  arg0: x0
+;  arg0: y0
+;  arg0: x1
+;  arg0: y1
+; Returns:
+;  true if drawn, false if offscreen
+	ld	iy,0
+	add	iy,sp
+	push	hl			; temp storage
+	ld	hl,(iy+3)		; x0
+	ld	de,(iy+6)		; y0
+	call	_ComputeOutcode
+	ld	(iy-1),a
+	ld	hl,(iy+9)		; x1
+	ld	de,(iy+12)		; y1
+	call	_ComputeOutcode
+	ld	(iy-2),a
+CohenSutherlandLoop:
+	ld	b,(iy-1)		; b = outcode0
+	ld	a,(iy-2)		; a = outcode1
+	tst	a,b
+	jp	nz,TrivialReject	; if(outcode0|outcode1)
+	or	a,a
+	jr	nz,GetOutOutcode
+	or	a,b
+	jp	z,TrivialAccept
+GetOutOutcode:				; select correct outcode
+	push	af			; a = outoutcode
+	rra
+	jr	nc,.notop		; if (outcodeOut & TOP)
+	ld	hl,ti.lcdHeight-1
+smcWord _YMaxMinus1
+	jr	ComputeNewX
+.notop:
+	rra
+	jr	nc,NotBottom		; if (outcodeOut & BOTTOM)
+	ld	hl,0
+smcWord _YMin
+ComputeNewX:
+	push	hl
+	ld	bc,(iy+6)
+	or	a,a
+	sbc	hl,bc			; ymax_YMin - y0
+	ex	de,hl
+	ld	hl,(iy+9)
+	ld	bc,(iy+3)
+	or	a,a
+	sbc	hl,bc			; x0 - x1
+	call	_MultiplyHLDE
+	ex	de,hl			; (x0 - x1)*(ymax_YMin - y0)
+	ld	hl,(iy+12)
+	ld	bc,(iy+6)
+	or	a,a
+	sbc	hl,bc			; y1 - y0
+	push	hl
+	pop	bc
+	ex	de,hl
+	call	_DivideHLBC		; ((x0 - x1)*(ymax_YMin - y0))/(y1 - y0)
+	ld	bc,(iy+3)
+	add	hl,bc			; (x) hl = x0 + ((x0 - x1)*(ymax_YMin - y0))/(y1 - y0)
+	pop	de			; (y) de = ymax_YMin
+	jr	FinishComputations
+NotBottom:
+	rra
+	jr	nc,NotRight		; if (outcodeOut & RIGHT)
+	ld	hl,ti.lcdWidth-1
+smcWord _XMaxMinus1
+	jr	ComputeNewY
+NotRight:
+	rra
+	jr	nc,FinishComputations	; if (outcodeOut & LEFT)
+	ld	hl,0
+smcWord _XMin
+ComputeNewY:
+	push	hl
+	ld	bc,(iy+3)
+	or	a,a
+	sbc	hl,bc			; xmax_XMin - x0
+	ex	de,hl
+	ld	hl,(iy+12)
+	ld	bc,(iy+6)
+	or	a,a
+	sbc	hl,bc			; x1 - x0
+	call	_MultiplyHLDE
+	ex	de,hl			; (x1 - x0)*(xmax_XMin - x0)
+	ld	hl,(iy+9)
+	ld	bc,(iy+3)
+	or	a,a
+	sbc	hl,bc			; y1 - y0
+	push	hl
+	pop	bc
+	ex	de,hl
+	call	_DivideHLBC		; ((x1 - x0)*(xmax_XMin - x0))/(y1 - y0)
+	ld	bc,(iy+6)
+	add	hl,bc
+	ex	de,hl			; (y) de = y0 + ((x1 - x0)*(xmax_XMin - x0))/(y1 - y0)
+	pop	hl			; (x) hl = ymax_YMin
+FinishComputations:
+	pop	af
+	cp	a,(iy-1)
+	jr	nz,OutcodeOutOutcode1
+	ld	(iy+3),hl
+	ld	(iy+6),de
+	call	_ComputeOutcode
+	ld	(iy-1),a		; b = outcode0
+	jp	CohenSutherlandLoop
+OutcodeOutOutcode1:
+	ld	(iy+9),hl
+	ld	(iy+12),de
+	call	_ComputeOutcode
+	ld	(iy-2),a		; c = outcode1
+	jp	CohenSutherlandLoop
+TrivialReject:
+	inc	sp
+	inc	sp
+	inc	sp
+	ret
+TrivialAccept:
+	inc	sp
+	inc	sp
+	inc	sp
+;	jr	_Line_NoClip		; line routine handler
+	jp	gfy_Line_NoClip
 
 ;-------------------------------------------------------------------------------
 ; gfy_Line_NoClip:
