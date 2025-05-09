@@ -1,0 +1,24 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__setflag
+
+if PREFER_OS_CRT
+
+__setflag := 000218h
+
+else
+
+__setflag:
+	ret	po
+	push	af
+	ex	(sp), hl
+	ld	a, l
+	xor	a, $80	; invert S flag
+	ld	l, a
+	ex	(sp), hl
+	pop	af
+	ret
+
+end if
