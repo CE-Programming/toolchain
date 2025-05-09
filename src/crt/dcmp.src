@@ -4,23 +4,71 @@
 
 	public	__dcmp
 
-; int _dcmp_c(f64_cmp_arg const *__restrict const arg)
 __dcmp:
-	; f64_cmp_arg*_ret_i24
-	push	bc, de, hl
-	or	a, a
-	sbc	hl, hl
-	add	hl, sp
-	push	iy, af
-	push	hl	; f64_cmp_arg*
-	call	__dcmp_c
-	pop	af
-	pop	af, iy
-	; Set the comparison flags
-	add	hl, de
-	or	a, a
-	sbc	hl, de
-	pop	hl, de, bc
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	push	hl
+	ld	hl, (iy + 12)	; y.hi
+	rlc	b
+	sla	h	; Carry = signbit y
+	bit	0, b	; signbit x
+	jr	z, .positve_x
+	ccf
+.positve_x:
+	res	0, b
+	; H and B now have their signbits cleared
+	jr	c, .different_sign
+	; same_sign
+	sbc.s	hl, bc	; y.hi - x.hi
+	jr	nz, .not_equal
+	ld	hl, (iy + 9)	; y.md
+	sbc	hl, de	; y.md - x.md
+	jr	nz, .not_equal
+	ld	bc, (iy - 6)	; x.lo
+	ld	hl, (iy + 6)	; y.lo
+	sbc	hl, bc	; y.lo - x.lo
+	jr	z, .equal
+.not_equal:
+	ld	l, a	; preserve A
+	rra	; bit 7 of A = Carry
+	cpl
+.ret_flags:
+	xor	a, (iy - 2)	; bit 7 of B = sign of x
+	rla
+	sbc	a, a	; A is 0 or -1
+	ccf	; carry is set when A is 0, so A will be 1 or -1 in the end
+	adc	a, e
+	sub	a, e
+	ld	a, l	; restore A
+.equal:
+.finish_zero:
+	pop	hl
+	pop	bc
+	pop	iy
 	ret
 
-	extern	__dcmp_c
+.different_sign:
+; test for zero
+	; x[hi-md-lo]
+	; y[hi-md-lo]
+	add.s	hl, bc
+	adc	hl, de
+	jr	nz, .non_zero	; path taken by normal, inf, and NaN
+	jr	c, .non_zero
+	; both x and y are subnormal or zero
+	; x[00-00-lo]
+	; y[00-md-lo]
+	; HL is zero, Carry is reset
+	ld	hl, (iy + 6)	; y.lo
+	ld	bc, (iy + 9)	; y.md
+	add	hl, bc
+	ld	bc, (iy - 6)	; x.lo
+	adc	hl, bc
+	jr	nz, .non_zero
+	jr	nc, .finish_zero	; Z, NC, and P
+.non_zero:
+	ld	l, a	; preserve A
+	xor	a, a
+	jr	.ret_flags
