@@ -2,7 +2,7 @@
 
 	section	.text
 
-	public	__ultod, __ltod
+if 0
 ;	public	__utod, __itod
 
 ; __utod:
@@ -41,4 +41,125 @@ __ltod:
 	pop	af, af, iy
 	ret
 	
-	extern	__ultod_c, __lneg
+	extern	__ultod_c
+
+end if
+
+	public	__itod
+__itod:
+	push	hl
+	add	hl, hl
+	pop	hl
+	push	af
+	ld	e, 0
+	call	c, __ineg
+	jr	__ltod.hijack
+
+	section	.text
+
+	public	__utod
+__utod:
+	ld	e, 0
+
+	require	__ultod
+
+	section	.text
+
+	public	__ultod
+__ultod:
+	or	a, a
+	push	af
+	jr	__ltod.hijack
+
+	section	.text
+
+	public	__ltod
+__ltod:
+	rlc	e
+	push	af
+	rrc	e
+	call	c, __lneg
+
+	require	__ltod.hijack
+
+	section	.text
+
+	private	__ltod.hijack
+__ltod.hijack:
+	call	__lctlz
+	cp	a, 32
+	jr	z, .zero
+	; clears the MSB since the float will be normalized
+	; x <<= clz_result + 1; /* shift by 32 is UB */
+if 0
+	; calculate the exponent
+	push	hl
+	; 1023 + 31 = 1054 = 0x41E
+	inc.s	bc
+	or	a, a
+	ld	b, a	; <<= 8
+	ld	hl, $041E00
+	ld	c, l	; ld c, 0
+	sbc	hl, bc
+	ld	l, e	; (expon16 << (16 + 24)) | (mant48)
+	ex	de, hl
+	pop	hl
+
+	ld	b, a
+	inc	b
+	ld	a, e
+.loop32:	; shift by 32 is not UB here!
+	add	hl, hl
+	rla
+	djnz	.loop32
+	ld	e, a
+else
+	; calculate the exponent
+	push	hl
+	; 1023 + 31 = 1054 = 0x41E
+	inc.s	bc
+	or	a, a
+	ld	b, a	; <<= 8
+	ld	hl, $041E00
+	ld	c, l	; ld c, 0
+	sbc	hl, bc
+	ld	l, e	; (expon16 << (16 + 24)) | (mant48)
+	ex	de, hl
+
+	pop	bc
+	ld	l, a
+	ld	a, e
+	call	__lshl
+	push	bc
+	pop	hl
+	; shift by 32 is UB
+	add	hl, hl
+	rla
+	ld	e, a
+end if
+
+	; UDE:D has expon, E:UHL has mant
+	; Float64_mant_bits - uint48_bits = 4
+	ld	c, 16 + 4
+	push	bc
+	call	__llshl
+	pop	af	; reset SP
+.finish:
+	pop	af
+	ret	nc	; positive
+	set	7, b
+	ret	; negative
+
+.zero:
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	b, e
+	ld	c, e
+	pop	af
+	ret
+
+	extern	__lneg
+	extern	__lctlz
+	extern	__lshl
+	extern	__llshl
