@@ -63,15 +63,13 @@ static const testb test_values[] = {
     {/* UINT64_C(0x0010000000000000), */ UINT64_C(0x7FEFFFFFFFFFFFFF), false, false, false, true , true , false, false, FP_NORMAL   },
     {/* UINT64_C(0x7FF0000000000000), */ UINT64_C(0x7FF0000000000000), false, false, true , false, false, false, false, FP_INFINITE },
     {/* UINT64_C(0x7FF0000000000001), */ UINT64_C(0x7FF7FFFFFFFFFFFF), true , true , false, false, false, false, false, FP_NAN      },
-    {/* UINT64_C(0x7FF8000000000000), */ UINT64_C(0x7FF8000000000000), false, true , false, false, false, false, false, FP_NAN      },
-    {/* UINT64_C(0x7FF8000000000001), */ UINT64_C(0x7FFFFFFFFFFFFFFF), true , true , false, false, false, false, false, FP_NAN      },
+    {/* UINT64_C(0x7FF8000000000000), */ UINT64_C(0x7FFFFFFFFFFFFFFF), false, true , false, false, false, false, false, FP_NAN      },
     {/* UINT64_C(0x8000000000000000), */ UINT64_C(0x8000000000000000), false, false, false, true , false, false, true , FP_ZERO     },
     {/* UINT64_C(0x8000000000000001), */ UINT64_C(0x800FFFFFFFFFFFFF), false, false, false, true , false, true , false, FP_SUBNORMAL},
     {/* UINT64_C(0x8010000000000000), */ UINT64_C(0xFFEFFFFFFFFFFFFF), false, false, false, true , true , false, false, FP_NORMAL   },
     {/* UINT64_C(0xFFF0000000000000), */ UINT64_C(0xFFF0000000000000), false, false, true , false, false, false, false, FP_INFINITE },
     {/* UINT64_C(0xFFF0000000000001), */ UINT64_C(0xFFF7FFFFFFFFFFFF), true , true , false, false, false, false, false, FP_NAN      },
-    {/* UINT64_C(0xFFF8000000000000), */ UINT64_C(0xFFF8000000000000), false, true , false, false, false, false, false, FP_NAN      },
-    {/* UINT64_C(0xFFF8000000000001), */ UINT64_C(0xFFFFFFFFFFFFFFFF), true , true , false, false, false, false, false, FP_NAN      },
+    {/* UINT64_C(0xFFF8000000000000), */ UINT64_C(0xFFFFFFFFFFFFFFFF), false, true , false, false, false, false, false, FP_NAN      },
 };
 
 /**

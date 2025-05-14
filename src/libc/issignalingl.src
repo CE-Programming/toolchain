@@ -4,31 +4,14 @@
 
 	public	__issignalingl
 
-; assumes quiet NaN is 0x7FF8000000000000 or 0xFFF8000000000000
+; assumes quiet NaN is NaN with bit 51 set
 ; bool _issignalingl(long double)
 __issignalingl:
-	; based off __isnanl, unoptimized
-	pop	bc, hl, de
-	xor	a, a
-	adc	hl, de
-	pop	de
-	push	bc, bc, bc, bc
-	ld	a, e
-	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
-	jr	c, .mant_nonzero	; normal, subnormal, or NaN
-	; common NaN, inf, normal, or subnormal
-	; quiet NaN will be along this path
-	xor	a, $F8
-	ret	z	; quiet NaN
-	xor	a, $F8
-	ret	z
-	dec	a
-.mant_nonzero:
-	add	a, 16	; overflows 0xF0
-	sbc	a, a
-	ret	z
-	ld	a, d
-	add	a, a
-	add	a, 2
-	sbc	a, a
+	ld	hl, 9
+	add	hl, sp
+	bit	3, (hl) ; 51 % 8 == 3
+	jp	z, __isnanl
+	xor	a, a	; quiet bit set, return false
 	ret
+
+	extern	__isnanl
