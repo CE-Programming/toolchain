@@ -2,62 +2,21 @@
 
 	section	.text
 
-if 0
-;	public	__utod, __itod
-
-; __utod:
-;	; u24_ret_f64
-;	ld	e, 0
-__ultod:
-	; u32_ret_f64
-	ld	d, a
-.ultod_skip:
-	push	iy, de, hl
-	call	__ultod_c
-	pop	af, af, iy
-	ret
-
-; __itod:
-;	; i24_ret_f64
-;	ld	d, a
-;	push	hl
-;	add	hl, hl
-;	sbc	a, a
-;	ld	e, a
-;	pop	hl
-;	jr	__ltod.ltod_skip
-
-__ltod:
-	; i32_ret_f64
-	ld	d, a
-	bit	7, e
-.ltod_skip:
-	jr	z, __ultod.ultod_skip	; positive argument
-	; return -_ultod_c(labs(x))
-	call	__lneg
-	push	iy, de, hl
-	call	__ultod_c
-	set	7, b	; negative result
-	pop	af, af, iy
-	ret
-	
-	extern	__ultod_c
-
-end if
-
 	public	__itod
+; (long double)int
 __itod:
 	push	hl
-	add	hl, hl
+	add	hl, hl	; extract signbit
 	pop	hl
 	push	af
 	ld	e, 0
-	call	c, __ineg
+	call	c, __ineg	; abs(UHL)
 	jr	__ltod.hijack
 
 	section	.text
 
 	public	__utod
+; (long double)unsigned int
 __utod:
 	ld	e, 0
 
@@ -66,19 +25,21 @@ __utod:
 	section	.text
 
 	public	__ultod
+; (long double)unsigned long
 __ultod:
 	or	a, a
-	push	af
+	push	af	
 	jr	__ltod.hijack
 
 	section	.text
 
 	public	__ltod
+; (long double)long
 __ltod:
 	rlc	e
 	push	af
 	rrc	e
-	call	c, __lneg
+	call	c, __lneg	; abs(E:UHL)
 
 	require	__ltod.hijack
 
@@ -159,6 +120,7 @@ end if
 	pop	af
 	ret
 
+	extern	__ineg
 	extern	__lneg
 	extern	__lctlz
 	extern	__lshl

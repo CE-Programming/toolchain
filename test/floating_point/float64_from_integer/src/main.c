@@ -25,6 +25,10 @@ void print_failed(uint64_t input, uint64_t guess, uint64_t truth) {
     );
 }
 
+
+long double CRT_utod(unsigned int);
+long double CRT_itod(signed int);
+
 size_t run_test(const char** failed_func) {
     typedef struct { uint32_t u32; uint64_t u64; } input_t;
     typedef struct { F64_pun fu32; F64_pun fi32; F64_pun fu64; F64_pun fi64; } output_t;
@@ -48,6 +52,24 @@ size_t run_test(const char** failed_func) {
             print_failed((uint64_t)input[i].u32, result.bin, output[i].fi32.bin);
             *failed_func = "ltod";
             return i;
+        }
+
+        if ((uint32_t)input[i].u32 <= UINT24_MAX) {
+            result.flt = CRT_utod((uint24_t)input[i].u32);
+            if (result.bin != output[i].fu32.bin) {
+                print_failed((uint64_t)input[i].u32, result.bin, output[i].fu32.bin);
+                *failed_func = "utod";
+                return i;
+            }
+        }
+ 
+        if ((int32_t)input[i].u32 >= INT24_MIN && (int32_t)input[i].u32 <= INT24_MAX) {
+            result.flt = CRT_itod((int24_t)input[i].u32);
+            if (result.bin != output[i].fi32.bin) {
+                print_failed((uint64_t)input[i].u32, result.bin, output[i].fi32.bin);
+                *failed_func = "itod";
+                return i;
+            }
         }
 
         result.flt = (long double)((uint64_t)input[i].u64);
