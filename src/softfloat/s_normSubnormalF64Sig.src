@@ -1,0 +1,42 @@
+	assume	adl = 1
+
+	section	.text
+
+	public	_softfloat_normSubnormalF64Sig
+
+; saves 78 bytes
+; this function is called in the float64_ldexp tests
+_softfloat_normSubnormalF64Sig:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 6)
+	ld	de, (iy + 9)
+	ld	bc, (iy + 12)
+	ld	iy, (iy + 3)	; struct
+	call	__llctlz
+
+	push	hl
+	; shiftDist = softfloat_countLeadingZeros64( sig ) - 11;
+	sub	a, 11
+	or	a, a
+	sbc	hl, hl
+	ld	l, a
+	; z.exp = 1 - shiftDist;
+	call	__ineg
+	inc	hl
+	ld	(iy + 0), hl
+	; z.sig = sig<<shiftDist;
+	ld	l, a
+	ex	(sp), hl
+	call	__llshl
+	pop	af	; reset SP
+	ld	(iy + 2), hl
+	ld	(iy + 5), de
+	ld	(iy + 8), bc
+
+	lea	hl, iy	; ABI struct ptr
+	ret
+
+	extern	__llshl
+	extern	__llctlz
+	extern	__ineg

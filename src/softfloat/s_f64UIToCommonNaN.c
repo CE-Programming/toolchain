@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+#if 0
+
 #include <stdint.h>
 #include "platform.h"
 #include "specialize.h"
@@ -57,3 +59,4 @@ void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr )
 
 }
 
+#endif
