@@ -63,15 +63,13 @@ static const testb test_values[] = {
     {/* UINT32_C(0x00800000), */ UINT32_C(0x7F7FFFFF), false, false, false, true , true , false, false, FP_NORMAL   },
     {/* UINT32_C(0x7F800000), */ UINT32_C(0x7F800000), false, false, true , false, false, false, false, FP_INFINITE },
     {/* UINT32_C(0x7F800001), */ UINT32_C(0x7FBFFFFF), true , true , false, false, false, false, false, FP_NAN      },
-    {/* UINT32_C(0x7FC00000), */ UINT32_C(0x7FC00000), false, true , false, false, false, false, false, FP_NAN      },
-    {/* UINT32_C(0x7FC00001), */ UINT32_C(0x7FFFFFFF), true , true , false, false, false, false, false, FP_NAN      },
+    {/* UINT32_C(0x7FC00000), */ UINT32_C(0x7FFFFFFF), false, true , false, false, false, false, false, FP_NAN      },
     {/* UINT32_C(0x80000000), */ UINT32_C(0x80000000), false, false, false, true , false, false, true , FP_ZERO     },
     {/* UINT32_C(0x80000001), */ UINT32_C(0x807FFFFF), false, false, false, true , false, true , false, FP_SUBNORMAL},
     {/* UINT32_C(0x80800000), */ UINT32_C(0xFF7FFFFF), false, false, false, true , true , false, false, FP_NORMAL   },
     {/* UINT32_C(0xFF800000), */ UINT32_C(0xFF800000), false, false, true , false, false, false, false, FP_INFINITE },
     {/* UINT32_C(0xFF800001), */ UINT32_C(0xFFBFFFFF), true , true , false, false, false, false, false, FP_NAN      },
-    {/* UINT32_C(0xFFC00000), */ UINT32_C(0xFFC00000), false, true , false, false, false, false, false, FP_NAN      },
-    {/* UINT32_C(0xFFC00001), */ UINT32_C(0xFFFFFFFF), true , true , false, false, false, false, false, FP_NAN      },
+    {/* UINT32_C(0xFFC00000), */ UINT32_C(0xFFFFFFFF), false, true , false, false, false, false, false, FP_NAN      },
 };
 
 /**
