@@ -15,6 +15,7 @@ else
 _frexp:
 _frexpf:
 	ld	iy, 0
+	lea	de, iy - 127	; bias	; $FFFF81
 	add	iy, sp
 	ld	hl, (iy + 3)
 	add	hl, hl
@@ -29,40 +30,39 @@ _frexpf:
 	rr	b
 	sbc	hl, hl
 	ld	l, a
-	ld	de, -127	; bias
+;	ld	de, -127	; bias
 	add	hl, de
+.ret_zero:
+	ex	de, hl
 .ret_subnormal:
 	res	7, (iy + 5)
-.ret_zero:
 .ret_self:
-	ld	de, (iy + 9)	; int *expon
-	ex	de, hl
+	ld	hl, (iy + 9)	; int *expon
 	ld	(hl), de
 	ld	hl, (iy + 3)	; mantissa
 	ld	e, b	; exponent
 	ret
 
 .inf_nan:
-	ld	hl, $7FFFFF ; INT_MAX
+	ld	de, $7FFFFF ; INT_MAX
 	jr	.ret_self
 
 .maybe_subnormal:
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
-	jr	z, .ret_zero
+	ld	e, d	; ld de, -1
+	add	hl, de
+	inc	hl	; restore HL
+	jr	nc, .ret_zero
 	; input: HL output: A
 	call	__ictlz
 	ld	c, a
 	call	__ishl
 	ld	(iy + 3), hl
-	scf
-	sbc	hl, hl
+	sub	a, 131	; (127 + 3) + 1? idk where this magic number comes from
 	cpl
-	add	a, 131	; 127 + 3 + 1? idk where this magic number comes from
-	ld	l, a
-	ld	a, b	; exponent
-	xor	a, $3F
+	ld	e, a	; DE was -1 from before
+	; copy exponent of 0.5f
+	ld	a, b
+	xor	a, $3F	
 	ld	b, a
 	jr	.ret_subnormal
 
