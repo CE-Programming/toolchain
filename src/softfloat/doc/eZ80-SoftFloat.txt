@@ -10,23 +10,16 @@ Arithmetic:
 * f64_mulAdd (Fused-multiply add)
 * f64_sqrt
 Conversion:
-* f32_to_f64
 * f64_to_f32
-* f64_to_i32_r_minMag
-* f64_to_i64_r_minMag
-* f64_to_ui32_r_minMag
-* f64_to_ui64_r_minMag
 * f64_to_i32
 * f64_to_i64
-* i32_to_f64
 * i64_to_f64
-* ui32_to_f64
 * ui64_to_f64
 * f64_roundToInt
 
-The SoftFloat library is configured to use the `8086-SSE` rules for NaN propagation, but this can customized, and possibly disabled to reduce binary size. A program using all of the above routines compiled to ~30kb with `-Oz -flto` (~34kb with `fmaf`). SoftFloat also supports an `INLINE_LEVEL` macro, setting it to `0-1` gave a binary size of 34449 bytes, and setting it to `2-5` gave a binary size of 34837 bytes. The size difference in `lto.src` comes from `_f64_add`, `_f64_sub`, `_dadd`, and `_dsub`.
+The SoftFloat library is configured to use the `8086-SSE` rules for NaN propagation, but this can customized, and possibly disabled to reduce binary size.
 
-Every unused source file from `SoftFloat-3e/source` has been exlucded to speed up compile times.
+Every unused source file from `SoftFloat-3e/source` has been excluded to speed up compile times.
 
 The following files are used for implementing `float fmaf(float, float, float)`, but are not needed for `long double`:
 * SoftFloat-3e/source/f32_mulAdd.c
