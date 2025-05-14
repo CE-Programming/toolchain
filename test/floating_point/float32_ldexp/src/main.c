@@ -8,9 +8,6 @@
 #include <ti/getcsc.h>
 #include <sys/util.h>
 
-/* enable if the toolchain is configured to use the subnormal compliant ldexpf */
-#if 0
-
 #include "f32_ldexp_LUT.h"
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
@@ -30,10 +27,26 @@ size_t run_test(void) {
     for (size_t i = 0; i < length; i++) {
         F32_pun result;
         result.flt = ldexpf(input[i].value, input[i].expon);
+        // ignoring subnormal inputs for now
+        if (issubnormal(input[i].value) || issubnormal(output[i].flt)) {
+            continue;
+        }
         if (result.bin != output[i].bin) {
-            if (!(isnan(result.flt) && isnan(output[i].flt))) {
+            // ignore NaN's with differing payloads
+            // treat signed zeros as equal for now
+            if (
+                (!(isnan(result.flt) && isnan(output[i].flt))) &&
+                (!(iszero(result.flt) && iszero(output[i].flt)))
+            ) {
                 /* Float multiplication does not handle subnormals yet */
                 if (!(iszero(result.flt) && issubnormal(output[i].flt))) {
+                    #if 0
+                        printf(
+                            "%zu:\nI: %08lX %+d\nG: %08lX\nT: %08lX\n",
+                            i, *(uint32_t*)(void*)&(input[i].value), input[i].expon,
+                            result.bin, output[i].bin
+                        );
+                    #endif
                     return i;
                 }
             }
@@ -57,14 +70,3 @@ int main(void) {
 
     return 0;
 }
-
-#else
-
-int main(void) {
-    os_ClrHome();
-    printf("All tests passed");
-    while (!os_GetCSC());
-    return 0;
-}
-
-#endif
