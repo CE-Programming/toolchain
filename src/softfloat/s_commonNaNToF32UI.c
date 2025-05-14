@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+#if 0
+
 #include <stdint.h>
 #include "platform.h"
 #include "specialize.h"
@@ -49,3 +51,4 @@ uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr )
 
 }
 
+#endif
