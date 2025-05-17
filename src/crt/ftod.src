@@ -8,24 +8,26 @@
 ; ouput BC:UDE:UHL (long double)
 ; NaN payloads are bitshifted
 __ftod:
-	bit	7, e
+	sla	e	; extract signbit
 	push	af
-	res	7, e
+	srl	e
+	; signbit and carry are cleared
 
-	xor	a, a
 	ld	a, e
-
-	adc	hl, hl
 	ld	b, $03	; ld bc, $380 - 1
+	
+	adc	hl, hl
 	jr	z, .mant_zero	; zero inf or normal
 	adc	a, a
 	jr	z, .subnormal
 	inc	a
-	jr	z, .nan
+	jr	z, .nan	
 .normal:
 	; (Float64_bias - Float32_bias) - 1 (undoing inc a)
 	; (Float64_bias - Float32_bias) = $0380
-	add	a, $80 - 1
+	add	a, $80 - 1	; this can be changed to adc if needed
+.subnorm_shift:
+	; Same as ld c, a \ ld a, 0 \ adc a, b
 	ld	c, a
 	adc	a, b
 	sub	a, c
@@ -44,12 +46,13 @@ __ftod:
 
 	; zero low bits
 .infinite:
-	or	a, a
+;	or	a, a	; not needed
+	; f64_mant_bits - f32_mant_bits = lowest 29 bits will be zero
 	ex	de, hl
 	sbc	hl, hl
 .finish:
 	pop	af
-	ret	z	; positive
+	ret	nc	; positive
 	set	7, b
 	ret	; negative
 
@@ -61,7 +64,7 @@ __ftod:
 	jr	nz, .normal
 	; infinite
 	ld	c, $F0
-	ld	b, e	; load all ones with the signbit
+	ld	b, e	; ld b, $7F since infinity is all ones
 	jr	.infinite
 
 .subnormal:
@@ -73,11 +76,21 @@ __ftod:
 	; (Float64_bias - Float32_bias) = $0380
 	; expon = (Float64_bias - Float32_bias) - clz_result
 	add	hl, hl
+	; the following three methods are equivilient
+if 1
+	; ($FF - a) - $7F
 	cpl
-	adc	a, $80
-	ld	c, a
-	ld	a, b	; ld a, $03
-	jr	.shift_28
+	sub	a, $80 - 1
+else if 0
+	; $FF - (a + $7F)
+	add	a, $80 - 1
+	cpl
+else
+	; $80 - c (c is equal to a)
+	ld	a, $80
+	sub	a, c
+end if
+	jr	.subnorm_shift
 
 .nan:
 	ld	a, $07
