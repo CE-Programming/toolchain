@@ -17,7 +17,8 @@ _i48abs:
 
 	push	bc
 	ex	de, hl
-	ret nc	; positive
-	jp	__i48neg
+	jp	c, __i48neg	; negative
+	; positive
+	ret
 
 	extern	__i48neg
