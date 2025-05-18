@@ -1,0 +1,38 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_softfloat_propagateNaNF64UI
+
+; at least one of the arguments is NaN
+; returns x if it is NaN, otherwise returns y
+_softfloat_propagateNaNF64UI:
+	call	__frameset0
+	ld	hl, (ix + 12)	; BC
+	push	hl
+	ld	hl, (ix + 9)	; UDE
+	push	hl
+	ld	hl, (ix + 6)	; UHL
+	push	hl
+	call	__isnanl
+	ld	sp, ix
+	rrca
+	jr	c, .x_is_NaN
+	lea	ix, ix + 9	; y is NaN
+.x_is_NaN:
+	ld	bc, (ix + 12)	; (ix + 21)
+	bit	3, c	; test quiet bit
+	jr	nz, .quiet
+	; raise signal
+	set	3, c	; set quiet bit
+	ld	hl, ___fe_cur_env
+	set	4, (hl)	; FE_INVALID
+.quiet:
+	ld	de, (ix + 9)	; (ix + 18)
+	ld	hl, (ix + 6)	; (ix + 15)
+	pop	ix
+	ret
+
+	extern	__isnanl
+	extern	__frameset0
+	extern	___fe_cur_env
