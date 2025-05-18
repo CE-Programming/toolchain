@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+#if 0
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "platform.h"
@@ -61,3 +63,4 @@ uint_fast64_t
 
 }
 
+#endif
