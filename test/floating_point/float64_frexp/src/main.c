@@ -7,6 +7,7 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
+#include <ti/sprintf.h>
 
 #include "f64_frexp_LUT.h"
 
@@ -44,9 +45,11 @@ int main(void) {
     os_ClrHome();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
-        printf("Failed test: %zu", fail_index);
+        char buf[sizeof("Failed test: 16777215\n")];
+        boot_sprintf(buf, "Failed test: %u\n", fail_index);
+        fputs(buf, stdout);
     }
 
     while (!os_GetCSC());

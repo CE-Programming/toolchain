@@ -8,6 +8,7 @@
 #include <ti/getcsc.h>
 #include <sys/util.h>
 #include <stdlib.h>
+#include <ti/sprintf.h>
 
 #include "f64_from_integer_LUT.h"
 
@@ -18,13 +19,22 @@ typedef union F64_pun {
     uint64_t bin;
 } F64_pun;
 
+#define AUTOTEST_DEBUG 0
+
+#ifndef AUTOTEST_DEBUG
+#define AUTOTEST_DEBUG 0
+#endif
+
+#if AUTOTEST_DEBUG
 void print_failed(uint64_t input, uint64_t guess, uint64_t truth) {
     printf(
         "I: %016llX -->\nG: %016llX !=\nT: %016llX\n",
         input, guess, truth
     );
 }
-
+#else
+#define print_failed(...)
+#endif
 
 long double CRT_utod(unsigned int);
 long double CRT_itod(signed int);
@@ -97,9 +107,12 @@ int main(void) {
     const char* failed_func;
     size_t fail_index = run_test(&failed_func);
     if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
-        printf("Failed test: %zu %s", fail_index, failed_func);
+        char buf[sizeof("Failed test: 16777215\n")];
+        boot_sprintf(buf, "Failed test: %u\n", fail_index);
+        fputs(buf, stdout);
+        fputs(failed_func, stdout);
     }
 
     while (!os_GetCSC());

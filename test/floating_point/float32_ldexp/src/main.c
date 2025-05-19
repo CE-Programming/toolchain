@@ -61,7 +61,7 @@ int main(void) {
     if (fail_index == SIZE_MAX) {
         fputs("All tests passed", stdout);
     } else {
-        char buf[sizeof("Failed test: -8388608\n")];
+        char buf[sizeof("Failed test: 16777215\n")];
         boot_sprintf(buf, "Failed test: %u\n", fail_index);
         fputs(buf, stdout);
     }

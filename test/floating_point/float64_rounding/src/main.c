@@ -8,6 +8,7 @@
 #include <ti/getcsc.h>
 #include <sys/util.h>
 #include <stdlib.h>
+#include <ti/sprintf.h>
 
 #include "f64_rounding_LUT.h"
 
@@ -17,6 +18,12 @@ typedef union F64_pun {
     long double flt;
     uint64_t bin;
 } F64_pun;
+
+#define AUTOTEST_DEBUG 0
+
+#ifndef AUTOTEST_DEBUG
+#define AUTOTEST_DEBUG 0
+#endif
 
 size_t run_test(const char** failed_func) {
     typedef long double input_t;
@@ -65,9 +72,12 @@ int main(void) {
     const char* failed_func;
     size_t fail_index = run_test(&failed_func);
     if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
-        printf("Failed test: %zu %s", fail_index, failed_func);
+        char buf[sizeof("Failed test: 16777215\n")];
+        boot_sprintf(buf, "Failed test: %u\n", fail_index);
+        fputs(buf, stdout);
+        fputs(failed_func, stdout);
     }
 
     while (!os_GetCSC());

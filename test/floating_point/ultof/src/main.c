@@ -6,22 +6,33 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
+#include <ti/sprintf.h>
 
 #include "ultof_lut.h"
+
+#define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
 typedef union F32_pun {
     float flt;
     uint32_t bin;
 } F32_pun;
 
-#define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
+#define AUTOTEST_DEBUG 0
 
+#ifndef AUTOTEST_DEBUG
+#define AUTOTEST_DEBUG 0
+#endif
+
+#if AUTOTEST_DEBUG
 void print_failed(uint32_t input, uint32_t guess, uint32_t truth) {
     printf(
         "I: %lu\nU: %08lX -->\nG: %08lX !=\nT: %08lX\n",
         input, input, guess, truth
     );
 }
+#else
+#define print_failed(...)
+#endif
 
 size_t run_test(void) {
     typedef uint32_t input_t;
@@ -65,9 +76,11 @@ int main(void) {
     os_ClrHome();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
-        printf("Failed test: %zu", fail_index);
+        char buf[sizeof("Failed test: 16777215\n")];
+        boot_sprintf(buf, "Failed test: %u\n", fail_index);
+        fputs(buf, stdout);
     }
 
     while (!os_GetCSC());
