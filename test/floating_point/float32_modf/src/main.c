@@ -7,6 +7,7 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
+#include <ti/sprintf.h>
 
 #include "f32_modf_LUT.h"
 
@@ -36,12 +37,14 @@ size_t run_test(void) {
                 isnan(frac_part.flt) && isnan(output[i].frac_part.flt) &&
                 isnan(trunc_part.flt) && isnan(output[i].trunc_part.flt)
             )) {
-                printf(
-                    "I: %08lX T: %zu\nG: %08lX %08lX\nT: %08lX %08lX\n",
-                    input[i].bin, i,
-                    frac_part.bin, trunc_part.bin,
-                    output[i].frac_part.bin, output[i].trunc_part.bin
-                );
+                #if 0
+                    printf(
+                        "I: %08lX T: %zu\nG: %08lX %08lX\nT: %08lX %08lX\n",
+                        input[i].bin, i,
+                        frac_part.bin, trunc_part.bin,
+                        output[i].frac_part.bin, output[i].trunc_part.bin
+                    );
+                #endif
                 return i;
             }
         }
@@ -55,9 +58,11 @@ int main(void) {
     os_ClrHome();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
-        printf("Failed test: %zu", fail_index);
+        char buf[sizeof("Failed test: 16777215\n")];
+        boot_sprintf(buf, "Failed test: %u\n", fail_index);
+        fputs(buf, stdout);
     }
 
     while (!os_GetCSC());

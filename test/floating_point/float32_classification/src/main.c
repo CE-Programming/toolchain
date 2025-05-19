@@ -136,11 +136,11 @@ static test_result fpclassify_test(void) {
 
 int main(void) {
     os_ClrHome();
-    printf("Testing 2^" NUM_TO_STR(test_count) " inputs");
+    fputs("Testing 2^" NUM_TO_STR(test_count) " inputs", stdout);
     test_result ret = fpclassify_test();
     os_ClrHome();
     if (ret.passed) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
         printf(
             "Failed test:\n0x%08lX\nTruth: %06o_%d\nGuess: %06o_%d",

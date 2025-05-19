@@ -136,17 +136,15 @@ static test_result fpclassify_test(void) {
 
 int main(void) {
     os_ClrHome();
-    printf("Testing 2^" NUM_TO_STR(test_count) " inputs");
+    fputs("Testing 2^" NUM_TO_STR(test_count) " inputs", stdout);
     test_result ret = fpclassify_test();
     os_ClrHome();
     if (ret.passed) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
-        // just in-case printf does not support long long or uint64_t
-        const uint32_t* failed_index_split = (const uint32_t*)((const void*)&(ret.failed_index));
         printf(
-            "Failed test:\n0x%08lX%08lX\nTruth: %06o_%d\nGuess: %06o_%d",
-            failed_index_split[1], failed_index_split[0], ret.truth, ret.truth_fp, ret.guess, ret.guess_fp
+            "Failed test:\n0x%016llX\nTruth: %06o_%d\nGuess: %06o_%d",
+            ret.failed_index, ret.truth, ret.truth_fp, ret.guess, ret.guess_fp
         );
     }
 

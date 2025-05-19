@@ -7,6 +7,7 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
+#include <ti/sprintf.h>
 
 #include "f32_ilogb_LUT.h"
 
@@ -23,8 +24,9 @@ size_t run_test(void) {
     for (size_t i = 0; i < length; i++) {
         int result = ilogbf(input[i]);
         if (result != output[i]) {
-            // printf("%3zu: %08lX\n\t%d != %d\n", i, input[i], result, output[i]);
-            // while (!os_GetCSC());
+            #if 0
+                printf("%3zu: %08lX\n\t%d != %d\n", i, input[i], result, output[i]);
+            #endif
             return i;
         }
     }
@@ -34,13 +36,14 @@ size_t run_test(void) {
 }
 
 int main(void) {
-
     os_ClrHome();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+        fputs("All tests passed", stdout);
     } else {
-        printf("Failed test: %zu", fail_index);
+        char buf[sizeof("Failed test: 16777215\n")];
+        boot_sprintf(buf, "Failed test: %u\n", fail_index);
+        fputs(buf, stdout);
     }
 
     while (!os_GetCSC());

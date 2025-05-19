@@ -6,6 +6,7 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
+#include <ti/sprintf.h>
 
 #include <bit>
 #include <cmath>
@@ -38,7 +39,7 @@ static bool test_result(long double guess, long double truth) {
 
 #define TEST(guess, truth) if (test_result(guess, truth)) { return __LINE__; }
 
-static size_t run_test(void) {
+static int run_test(void) {
     
     TEST(std::exp   (    6.3L),  544.5719101259290330593886677332L);
     TEST(std::exp   (   -4.2L),  0.014995576820477706211984360229L);
@@ -91,16 +92,22 @@ static size_t run_test(void) {
     TEST(std::hypot(1.23L, 4.56L, 7.89L), 9.195575022803087326242198470012610630662L);
 
     /* passed all */
-    return SIZE_MAX;
+    return 0;
 }
 
 int main(void) {
     os_ClrHome();
-    size_t fail_index = run_test();
-    if (fail_index == SIZE_MAX) {
-        printf("All tests passed");
+    int failed_test = run_test();
+    if (failed_test != 0) {
+        char buf[sizeof("Failed test L-8388608\n")];
+        boot_sprintf(buf, "Failed test L%d\n", failed_test);
+        fputs(buf, stdout);
+        #if 0
+            /* debugging */
+            printf("ULP: %lld\n", fail_ulp);
+        #endif
     } else {
-        printf("Failed test: L%zu\nULP: %lld", fail_index, fail_ulp);
+        fputs("All tests passed", stdout);
     }
 
     while (!os_GetCSC());

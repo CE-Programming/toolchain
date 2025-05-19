@@ -7,6 +7,7 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
 #include <sys/util.h>
+#include <ti/sprintf.h>
 
 #include <bit>
 #include <cmath>
@@ -124,14 +125,22 @@ int main(void) {
     os_ClrHome();
     int comparison_result = comparison_test();
     if (comparison_result != 0) {
-        printf("Failed test L%d\n", comparison_result);
+        char buf[sizeof("Failed test L-8388608\n")];
+        boot_sprintf(buf, "Failed test L%d\n", comparison_result);
+        fputs(buf, stdout);
     } else {
         int64_t fail_ulp = 0;
         size_t fail_index = run_test(&fail_ulp);
         if (fail_index == SIZE_MAX) {
-            printf("All tests passed");
+            fputs("All tests passed", stdout);
         } else {
-            printf("Failed test: %zu\nULP: %lld", fail_index, fail_ulp);
+            char buf[sizeof("Failed test: 16777215\n")];
+            boot_sprintf(buf, "Failed test: %u\n", fail_index);
+            fputs(buf, stdout);
+            #if 0
+                /* debugging */
+                printf("ULP: %lld\n", fail_ulp);
+            #endif
         }
     }
     while (!os_GetCSC());

@@ -18,6 +18,13 @@ typedef union F64_pun {
     uint64_t bin;
 } F64_pun;
 
+#define AUTOTEST_DEBUG 0
+
+#ifndef AUTOTEST_DEBUG
+#define AUTOTEST_DEBUG 0
+#endif
+
+#if AUTOTEST_DEBUG
 void print_failed(long double input, uint64_t guess, uint64_t truth) {
     F64_pun value;
     value.flt = input;
@@ -26,6 +33,9 @@ void print_failed(long double input, uint64_t guess, uint64_t truth) {
         value.bin, guess, truth
     );
 }
+#else
+#define print_failed(...)
+#endif
 
 size_t run_test(const char** failed_func) {
     typedef long double input_t;
