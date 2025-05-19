@@ -29,20 +29,16 @@ size_t run_test(void) {
     for (size_t i = 0; i < length; i++) {
         F32_pun result;
         result.flt = ldexpf(input[i].value, input[i].expon);
-        // ignoring subnormal inputs for now
-        if (issubnormal(input[i].value) || issubnormal(output[i].flt)) {
-            continue;
-        }
         if (result.bin != output[i].bin) {
             // ignore NaN's with differing payloads
             // treat signed zeros as equal for now
             if (
                 (!(isnan(result.flt) && isnan(output[i].flt))) &&
-                (!(iszero(result.flt) && iszero(output[i].flt)))
+                (!(result.bin == 0 && iszero(output[i].flt)))
             ) {
                 /* Float multiplication does not handle subnormals yet */
-                if (!(iszero(result.flt) && issubnormal(output[i].flt))) {
-                    #if 0
+                if (!(iszero(result.flt) && (issubnormal(output[i].flt) || issubnormal(input[i].value)))) {
+                    #if 1
                         printf(
                             "%zu:\nI: %08lX %+d\nG: %08lX\nT: %08lX\n",
                             i, *(uint32_t*)(void*)&(input[i].value), input[i].expon,

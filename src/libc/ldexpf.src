@@ -47,9 +47,11 @@ _scalbn:
 	bit	7, (iy + 11)	; scale sign
 	jr	z, .scale_up
 .scale_down:
-	; test signbit
+	; HL is not INT_MIN here
+	dec	hl
 	add	hl, hl
-	jr	nc, .finish
+	jr	nc, .finish	; expon > 0
+	; expon <= 0 or subnormal
 .underflow_to_zero:
 	ld	hl, ___fe_cur_env
 	set	5, (hl)	; FE_INEXACT
@@ -99,7 +101,6 @@ end if
 	ld	e, (iy + 6)
 	ret
 
-
 else
 
 ; normal inputs are handled correctly, unless the output is subnormal
@@ -132,9 +133,12 @@ _scalbn:
 .scale_down:
 	; test signbit
 	push	hl
+	; HL is not INT_MIN here
+	dec	hl
 	add	hl, hl
 	pop	hl
-	jr	nc, .finish
+	jr	nc, .finish	; expon > 0
+	; expon <= 0 or subnormal
 ;	jr	.underflow_to_zero
 .underflow_to_zero:
 	ld	hl, ___fe_cur_env
