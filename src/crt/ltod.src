@@ -48,7 +48,9 @@ __ltod:
 	private	__ltod.hijack
 __ltod.hijack:
 	call	__lctlz
-	cp	a, 32
+	inc.s	bc	; clear UBC
+	ld	b, a	; <<= 8
+	xor	a, $20	; turns 32 into zero and clears carry flag
 	jr	z, .zero
 	; clears the MSB since the float will be normalized
 	; x <<= clz_result + 1; /* shift by 32 is UB */
@@ -56,9 +58,6 @@ if 0
 	; calculate the exponent
 	push	hl
 	; 1023 + 31 = 1054 = 0x41E
-	inc.s	bc
-	or	a, a
-	ld	b, a	; <<= 8
 	ld	hl, $041E00
 	ld	c, l	; ld c, 0
 	sbc	hl, bc
@@ -66,7 +65,7 @@ if 0
 	ex	de, hl
 	pop	hl
 
-	ld	b, a
+;	ld	b, a
 	inc	b
 	ld	a, e
 .loop32:	; shift by 32 is not UB here!
@@ -78,17 +77,14 @@ else
 	; calculate the exponent
 	push	hl
 	; 1023 + 31 = 1054 = 0x41E
-	inc.s	bc
-	or	a, a
-	ld	b, a	; <<= 8
 	ld	hl, $041E00
 	ld	c, l	; ld c, 0
 	sbc	hl, bc
 	ld	l, e	; (expon16 << (16 + 24)) | (mant48)
 	ex	de, hl
 
+	ld	l, b
 	pop	bc
-	ld	l, a
 	ld	a, e
 	call	__lshl
 	push	bc
@@ -112,7 +108,7 @@ end if
 	ret	; negative
 
 .zero:
-	sbc	hl, hl
+	; E:UHL and A are zero
 	ex	de, hl
 	sbc	hl, hl
 	ld	b, e
