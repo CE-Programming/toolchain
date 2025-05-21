@@ -13,28 +13,31 @@ __dtoull:
 	jr	z, .zero_or_one
 	bit	7, b
 	push	af
-	res	7, b
+;	res	7, b	; not needed since this bit is shifted out later on
 	push	hl
 	; -((Float64_mant_bits + Float64_bias) << 4)
-	ld	hl, $FFC010 ; -16368 ; -$3FF0
+;	ld	hl, $FFC010 ; -16368 ; -$3FF0
 
-	; clears the exponent field without touching the mantissa
-	; sets the LSB of the exponent since x is normalized
-	ld	a, c
-	or	a, l	; or a, $10
-	and	a, $1F
-
-	add	hl, bc
+	; extract the exponent
+	ld	h, b
+	ld	l, c
 	; HL <<= 4
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
+;	inc	hl
 
+	; clears the exponent field without touching the mantissa
+	; sets the LSB of the exponent since x is normalized
+	ld	a, c
+	or	a, $10
+	and	a, $1F
 	ld	c, a
 	ld	b, 0
-	ld	a, h
-	sub	a, 52 + 1	; float64 mantissa bits
+
+	ld	a, h	; expon
+	sub	a, 52 + 1 - 1	; float64 mantissa bits + CPL trick - inc HL
 	jr	c, .shift_right
 	; shift_left
 	; expon >= 52 or [52, 63]
