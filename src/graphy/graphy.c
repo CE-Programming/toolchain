@@ -535,7 +535,9 @@ void gfy_BlitRectangle(
 
 #endif
 
-/* gfy_internal_PrintCharXY_NoClip */
+/* gfy_PrintChar (graphy.asm) */
+
+#if 0
 
 static void gfy_internal_PrintChar_NoClip(const char c, const uint8_t charWidth) {
     const uint8_t *bitImage = gfy_TextData + GFY_MAXIMUM_FONT_HEIGHT * (uint24_t)((unsigned char)c);
@@ -564,8 +566,6 @@ static void gfy_internal_PrintChar_NoClip(const char c, const uint8_t charWidth)
         b >>= 1;
     }
 }
-
-/* gfy_PrintChar */
 
 void gfy_PrintChar(const char c) {
     if (gfy_TextWidthScale == 0 || gfy_TextHeightScale == 0) {
@@ -603,7 +603,7 @@ void gfy_PrintChar(const char c) {
                     continue;
                 }
                 for (uint8_t v = 0; v < gfy_TextHeightScale; v++) {
-                    if (fillPtr >= lo_addr &&fillPtr < hi_addr) {
+                    if (fillPtr >= lo_addr && fillPtr < hi_addr) {
                         *fillPtr = fillColor;   
                     }
                     fillPtr++;
@@ -615,6 +615,8 @@ void gfy_PrintChar(const char c) {
         b >>= 1;
     }
 }
+
+#endif
 
 /* gfy_PrintInt (graphy.asm) */
 
@@ -679,7 +681,9 @@ void gfy_PrintUInt(uint24_t n, uint8_t length) {
 }
 #endif
 
-/* gfy_PrintString */
+/* gfy_PrintString (graphy.asm) */
+
+#if 0
 
 void gfy_PrintString(const char *string) {
     while (*string != '\0') {
@@ -688,8 +692,11 @@ void gfy_PrintString(const char *string) {
     }
 }
 
-/* gfy_PrintStringXY */
+#endif
 
+/* gfy_PrintStringXY (graphy.asm) */
+
+#if 0
 void gfy_PrintStringXY(const char *string, int24_t x, int24_t y) {
     gfy_SetTextXY(x,y);
     while (*string != '\0') {
@@ -697,6 +704,7 @@ void gfy_PrintStringXY(const char *string, int24_t x, int24_t y) {
         string++;
     }
 }
+#endif
 
 /* gfy_SetTextXY (graphy.asm) */
 
@@ -1708,7 +1716,9 @@ void gfy_TransparentSprite(const gfy_sprite_t *restrict sprite, int24_t x, int24
 
     for (uint8_t x_cord = 0; x_cord < sizeX; x_cord++) {
         for (uint8_t y_cord = 0; y_cord < sizeY; y_cord++) {
-            *dst_buf = (*src_buf != gfy_Transparent_Color) ? *src_buf : *dst_buf;
+            if (*src_buf != gfy_Transparent_Color) {
+                *dst_buf = *src_buf;
+            }
             src_buf++;
             dst_buf++;
         }
@@ -1744,7 +1754,9 @@ void gfy_TransparentSprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t 
     
     for (uint8_t x_cord = 0; x_cord < sprite->width; x_cord++) {
         for (uint8_t y_cord = 0; y_cord < sprite->height; y_cord++) {
-            *dst_buf = (*src_buf != gfy_Transparent_Color) ? *src_buf : *dst_buf;
+            if (*src_buf != gfy_Transparent_Color) {
+                *dst_buf = *src_buf;
+            }
             src_buf++;
             dst_buf++;
         }
@@ -3209,7 +3221,9 @@ void gfy_Transpose_TransparentSprite(const gfx_sprite_t *restrict sprite, int24_
 
     for (uint8_t y_cord = 0; y_cord < sizeY; y_cord++) {
         for (uint8_t x_cord = 0; x_cord < sizeX; x_cord++) {
-            *dst_buf = (*src_buf != gfy_Transparent_Color) ? *src_buf : *dst_buf;
+            if (*src_buf != gfy_Transparent_Color) {
+                *dst_buf = *src_buf;
+            };
             src_buf++;
             dst_buf += GFY_LCD_HEIGHT;
         }
@@ -3244,7 +3258,9 @@ void gfy_Transpose_TransparentSprite_NoClip(const gfx_sprite_t *restrict sprite,
     
     for (uint8_t y_cord = 0; y_cord < sprite->height; y_cord++) {
         for (uint8_t x_cord = 0; x_cord < sprite->width; x_cord++) {
-            *dst_buf = (*src_buf != gfy_Transparent_Color) ? *src_buf : *dst_buf;
+            if (*src_buf != gfy_Transparent_Color) {
+                *dst_buf = *src_buf;
+            }
             src_buf++;
             dst_buf += GFY_LCD_HEIGHT;
         }
