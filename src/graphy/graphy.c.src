@@ -20,7 +20,7 @@ gfy_Begin:
 	push	hl
 	ld	hl, 554
 	push	hl
-	call	lcd_SendCommandWords
+	call	lcd_SendSizedCommandWords
 	ld	hl, 9
 	add	hl, sp
 	ld	sp, hl
@@ -31,7 +31,7 @@ gfy_Begin:
 	push	hl
 	ld	hl, 555
 	push	hl
-	call	lcd_SendCommandWords
+	call	lcd_SendSizedCommandWords
 	ld	hl, 9
 	add	hl, sp
 	ld	sp, hl
@@ -57,7 +57,7 @@ gfy_End:
 	push	hl
 	ld	hl, 554
 	push	hl
-	call	lcd_SendCommandWords
+	call	lcd_SendSizedCommandWords
 	ld	hl, 9
 	add	hl, sp
 	ld	sp, hl
@@ -68,7 +68,7 @@ gfy_End:
 	push	hl
 	ld	hl, 555
 	push	hl
-	call	lcd_SendCommandWords
+	call	lcd_SendSizedCommandWords
 	ld	hl, 9
 	add	hl, sp
 	ld	sp, hl
@@ -78,498 +78,498 @@ gfy_End:
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_PrintChar
-gfy_PrintChar:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	lea	hl, ix - 26
-	ld	sp, hl
-	ld	a, (gfy_TextWidthScale)
-	ld	e, a
-	ld	a, (gfy_TextHeightScale)
-	ld	l, a
-	ld	a, e
-	or	a, a
-	jp	z, BB2_43
-	ld	a, l
-	or	a, a
-	jp	z, BB2_43
-	ld	a, -128
-	ld	(ix - 4), a
-	call	gfy_Wait
-	ld	l, (ix + 6)
-	push	hl
-	call	gfy_GetCharWidth
-	pop	de
-	ld	a, (gfy_TextWidthScale)
-	ld	d, a
-	ld	bc, 0
-	ld	c, d
-	ld	(ix - 17), bc
-	call	__idivu
-	ld	e, l
-	ld	(ix - 7), de
-	ld	bc, 255
-	inc.s	hl
-	dec	hl
-	ld	h, b
-	ld	(ix - 14), hl
-	ld	a, (gfy_TextHeightScale)
-	ld	(ix - 11), a
-	ld	b, 3
-	add	a, a
-	add	a, a
-	add	a, a
-	ld	(ix - 3), a
-	ld	a, (gfy_PrintChar_Clip)
-	ld	hl, (gfy_TextXPos)
-	ld	(ix - 10), hl
-	cp	a, 2
-	jp	z, BB2_26
-	ld	hl, (ix - 10)
-	ld	iy, (gfy_ClipXMin)
-	ld	bc, -8388608
-	add	iy, bc
-	add	hl, bc
-	lea	bc, iy
-	or	a, a
-	sbc	hl, bc
-	jp	nc, BB2_26
-	ld	hl, (gfy_TextYPos)
-	ld	a, (gfy_ClipYMin)
-	ld	iy, 0
-	ld	iyl, a
-	ld	bc, -8388608
-	add	iy, bc
-	ld	(ix - 20), hl
-	add	hl, bc
-	lea	bc, iy
-	or	a, a
-	sbc	hl, bc
-	jp	nc, BB2_26
-	ld	hl, (ix - 7)
-	mlt	hl
-	ld	bc, 0
-	ld	c, l
-	ld	iy, (ix - 10)
-	add	iy, bc
-	ld	hl, (gfy_ClipXMax)
-	ld	de, -8388608
-	add	iy, de
-	add	hl, de
-	lea	bc, iy
-	or	a, a
-	sbc	hl, bc
-	jp	nc, BB2_26
-	or	a, a
-	sbc	hl, hl
-	push	hl
-	pop	bc
-	ld	c, (ix - 3)
-	ld	iy, (ix - 20)
-	add	iy, bc
-	ld	a, (gfy_ClipYMax)
-	ld	l, a
-	ld	de, -8388608
-	add	iy, de
-	add	hl, de
-	lea	bc, iy
-	or	a, a
-	sbc	hl, bc
-	jp	nc, BB2_26
-	ld	hl, (-1900524)
-	ld	(ix - 25), hl
-	ld	de, (ix - 14)
-	push	de
-	pop	hl
-	ld	bc, (ix - 17)
-	call	__imulu
-	push	de
-	pop	bc
-	push	hl
-	pop	de
-	ld	hl, (ix - 10)
-	add	hl, de
-	ld	(gfy_TextXPos), hl
-	ld	a, c
-	or	a, a
-	jp	z, BB2_43
-	ld	iy, (gfy_TextData)
-	ld	hl, (ix - 10)
-	call	__set_bc_and_mul_hl_by_240
-	push	hl
-	pop	de
-	ld	hl, (ix - 20)
-	add	hl, de
-	ld	(ix - 20), hl
-	or	a, a
-	sbc	hl, hl
-	ld	l, (ix + 6)
-	ld	c, 3
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	push	hl
-	pop	de
-	add	iy, de
-	ld	de, (ix - 7)
-	ld	a, (ix - 11)
-	ld	(ix - 22), a
-	ld	a, d
-	or	a, a
-	sbc	hl, hl
-	ld	(ix - 10), hl
-BB2_9:
-	or	a, a
-	jr	nz, BB2_11
-	xor	a, a
-	jp	BB2_25
-BB2_11:
-	ld	a, (gfy_FontHeight)
-	ld	c, a
-	ld	(ix - 17), c
-	ld	l, 0
-BB2_12:
-	ld	(ix - 21), l
-	ld	(ix - 7), de
-	ld	a, c
-	or	a, a
-	ld	e, 0
-	ld	c, e
-	ld	hl, (ix - 20)
-	ld	(ix - 3), hl
-	jp	z, BB2_24
-BB2_13:
-	ld	a, (iy)
-	and	a, (ix - 4)
-	ld	c, a
-	ld	a, (gfy_Text_BG_Color)
-	ld	h, a
-	ld	a, (gfy_Text_FG_Color)
-	ld	l, a
-	ld	a, c
-	or	a, a
-	jr	z, BB2_15
-	ld	h, l
-BB2_15:
-	ld	a, (gfy_Text_TP_Color)
-	ld	l, a
-	ld	a, h
-	cp	a, l
-	jr	nz, BB2_17
-	ld	bc, 0
-	ld	a, (ix - 11)
-	ld	c, a
-	ld	hl, (ix - 3)
-	add	hl, bc
-	ld	(ix - 3), hl
-	ld	l, a
-	jr	BB2_22
-BB2_17:
-	ld	(ix - 26), h
-	ld	a, (ix - 22)
-	or	a, a
-	ld	a, 0
-	ld	l, a
-	ld	bc, (ix - 3)
-	jr	z, BB2_22
-BB2_18:
-	ld	(ix - 3), a
-	ld	(ix - 7), e
-	push	bc
-	pop	hl
-	ld	de, 76800
-	or	a, a
-	sbc	hl, de
-	jr	nc, BB2_20
-	ld	hl, (ix - 25)
-	add	hl, bc
-	ld	a, (ix - 26)
-	ld	(hl), a
-	ld	a, (gfy_TextHeightScale)
-	ld	(ix - 11), a
-BB2_20:
-	inc	bc
-	ld	a, (ix - 3)
-	inc	a
-	ld	l, (ix - 11)
-	cp	a, l
-	ld	e, (ix - 7)
-	jr	c, BB2_18
-	ld	a, (gfy_FontHeight)
-	ld	(ix - 17), a
-	ld	l, (ix - 11)
-	ld	(ix - 3), bc
-BB2_22:
-	ld	(ix - 22), l
-	inc	iy
-	inc	e
-	ld	a, e
-	ld	l, (ix - 17)
-	cp	a, l
-	jp	c, BB2_13
-	ld	a, (gfy_TextWidthScale)
-	ld	h, a
-	ld	(ix - 7), hl
-	ld	c, (ix - 17)
-BB2_24:
-	ld	de, 0
-	ld	e, c
-	ld	a, c
-	ld	bc, 240
-	ld	hl, (ix - 20)
-	add	hl, bc
-	ld	c, a
-	ld	(ix - 20), hl
-	or	a, a
-	sbc	hl, hl
-	sbc	hl, de
-	push	hl
-	pop	de
-	add	iy, de
-	ld	l, (ix - 21)
-	inc	l
-	ld	a, l
-	ld	de, (ix - 7)
-	cp	a, d
-	ld	a, d
-	jp	c, BB2_12
-BB2_25:
-	ld	l, (ix - 4)
-	srl	l
-	ld	(ix - 4), l
-	ld	hl, (ix - 10)
-	inc	hl
-	ld	(ix - 10), hl
-	ld	bc, (ix - 14)
-	or	a, a
-	sbc	hl, bc
-	jp	z, BB2_43
-	jp	BB2_9
-BB2_26:
-	ld	hl, (-1900524)
-	ld	(ix - 3), hl
-	ld	hl, (gfy_TextYPos)
-	ld	(ix - 20), hl
-	ld	hl, (ix - 14)
-	ld	bc, (ix - 17)
-	call	__imulu
-	push	hl
-	pop	de
-	ld	hl, (ix - 10)
-	add	hl, de
-	ld	(gfy_TextXPos), hl
-	ld	hl, (ix - 7)
-	ld	a, l
-	or	a, a
-	jp	z, BB2_43
-	ld	iy, (gfy_TextData)
-	ld	hl, (ix - 10)
-	call	__set_bc_and_mul_hl_by_240
-	ld	de, (ix - 20)
-	add	hl, de
-	ex	de, hl
-	ld	hl, (ix - 3)
-	add	hl, de
-	ld	(ix - 3), hl
-	or	a, a
-	sbc	hl, hl
-	ld	l, (ix + 6)
-	ld	c, 3
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	push	hl
-	pop	de
-	add	iy, de
-	ld	de, (ix - 7)
-	ld	(ix - 20), d
-	ld	l, d
-	ld	c, b
-BB2_28:
-	ld	a, l
-	or	a, a
-	jr	nz, BB2_30
-	ld	l, b
-	jp	BB2_42
-BB2_30:
-	ld	a, (gfy_FontHeight)
-	ld	h, a
-	ld	(ix - 14), h
-	ld	a, b
-	ld	(ix - 21), c
-BB2_31:
-	ld	(ix - 17), a
-	ld	a, h
-	or	a, a
-	ld	a, b
-	ld	l, b
-	ld	de, (ix - 3)
-	ld	(ix - 10), de
-	jr	z, BB2_41
-BB2_32:
-	ld	a, (iy)
-	and	a, (ix - 4)
-	ld	b, a
-	ld	a, (gfy_Text_BG_Color)
-	ld	h, a
-	ld	a, (gfy_Text_FG_Color)
-	ld	d, a
-	ld	a, b
-	or	a, a
-	jr	z, BB2_34
-	ld	h, d
-BB2_34:
-	ld	a, (gfy_Text_TP_Color)
-	ld	d, a
-	ld	a, h
-	cp	a, d
-	jr	nz, BB2_36
-	ld	bc, 0
-	ld	c, (ix - 11)
-	lea	de, iy
-	ld	iy, (ix - 10)
-	add	iy, bc
-	ld	(ix - 10), iy
-	push	de
-	pop	iy
-	jr	BB2_39
-BB2_36:
-	ld	a, (ix - 11)
-	or	a, a
-	ld	a, 0
-	ld	d, a
-	ld	(ix - 11), a
-	jr	z, BB2_39
-BB2_37:
-	lea	bc, iy
-	ld	iy, (ix - 10)
-	ld	(iy), h
-	inc	iy
-	ld	(ix - 10), iy
-	push	bc
-	pop	iy
-	inc	d
-	ld	a, (gfy_TextHeightScale)
-	ld	e, a
-	ld	a, d
-	ld	(ix - 11), e
-	cp	a, e
-	jr	c, BB2_37
-	ld	a, (gfy_FontHeight)
-	ld	(ix - 14), a
-BB2_39:
-	inc	iy
-	inc	l
-	ld	a, l
-	ld	e, (ix - 14)
-	cp	a, e
-	jr	c, BB2_32
-	ld	a, (gfy_TextWidthScale)
-	ld	(ix - 20), a
-	ld	a, (ix - 14)
-BB2_41:
-	ld	bc, 0
-	ld	c, a
-	ld	de, 240
-	ld	hl, (ix - 3)
-	add	hl, de
-	ld	(ix - 3), hl
-	or	a, a
-	sbc	hl, hl
-	sbc	hl, bc
-	push	hl
-	pop	bc
-	ld	h, a
-	add	iy, bc
-	ld	a, (ix - 17)
-	inc	a
-	ld	l, (ix - 20)
-	cp	a, l
-	ld	b, d
-	ld	de, (ix - 7)
-	ld	c, (ix - 21)
-	jp	c, BB2_31
-BB2_42:
-	ld	a, (ix - 4)
-	srl	a
-	ld	(ix - 4), a
-	inc	c
-	ld	a, c
-	cp	a, e
-	jp	nz, BB2_28
-BB2_43:
-	ld	sp, ix
-	pop	ix
-	ret
+; gfy_PrintChar:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	lea	hl, ix - 26
+; 	ld	sp, hl
+; 	ld	a, (gfy_TextWidthScale)
+; 	ld	e, a
+; 	ld	a, (gfy_TextHeightScale)
+; 	ld	l, a
+; 	ld	a, e
+; 	or	a, a
+; 	jp	z, BB2_43
+; 	ld	a, l
+; 	or	a, a
+; 	jp	z, BB2_43
+; 	ld	a, -128
+; 	ld	(ix - 4), a
+; 	call	gfy_Wait
+; 	ld	l, (ix + 6)
+; 	push	hl
+; 	call	gfy_GetCharWidth
+; 	pop	de
+; 	ld	a, (gfy_TextWidthScale)
+; 	ld	d, a
+; 	ld	bc, 0
+; 	ld	c, d
+; 	ld	(ix - 17), bc
+; 	call	__idivu
+; 	ld	e, l
+; 	ld	(ix - 7), de
+; 	ld	bc, 255
+; 	inc.s	hl
+; 	dec	hl
+; 	ld	h, b
+; 	ld	(ix - 14), hl
+; 	ld	a, (gfy_TextHeightScale)
+; 	ld	(ix - 11), a
+; 	ld	b, 3
+; 	add	a, a
+; 	add	a, a
+; 	add	a, a
+; 	ld	(ix - 3), a
+; 	ld	a, (gfy_PrintChar_Clip)
+; 	ld	hl, (gfy_TextXPos)
+; 	ld	(ix - 10), hl
+; 	cp	a, 2
+; 	jp	z, BB2_26
+; 	ld	hl, (ix - 10)
+; 	ld	iy, (gfy_ClipXMin)
+; 	ld	bc, -8388608
+; 	add	iy, bc
+; 	add	hl, bc
+; 	lea	bc, iy
+; 	or	a, a
+; 	sbc	hl, bc
+; 	jp	nc, BB2_26
+; 	ld	hl, (gfy_TextYPos)
+; 	ld	a, (gfy_ClipYMin)
+; 	ld	iy, 0
+; 	ld	iyl, a
+; 	ld	bc, -8388608
+; 	add	iy, bc
+; 	ld	(ix - 20), hl
+; 	add	hl, bc
+; 	lea	bc, iy
+; 	or	a, a
+; 	sbc	hl, bc
+; 	jp	nc, BB2_26
+; 	ld	hl, (ix - 7)
+; 	mlt	hl
+; 	ld	bc, 0
+; 	ld	c, l
+; 	ld	iy, (ix - 10)
+; 	add	iy, bc
+; 	ld	hl, (gfy_ClipXMax)
+; 	ld	de, -8388608
+; 	add	iy, de
+; 	add	hl, de
+; 	lea	bc, iy
+; 	or	a, a
+; 	sbc	hl, bc
+; 	jp	nc, BB2_26
+; 	or	a, a
+; 	sbc	hl, hl
+; 	push	hl
+; 	pop	bc
+; 	ld	c, (ix - 3)
+; 	ld	iy, (ix - 20)
+; 	add	iy, bc
+; 	ld	a, (gfy_ClipYMax)
+; 	ld	l, a
+; 	ld	de, -8388608
+; 	add	iy, de
+; 	add	hl, de
+; 	lea	bc, iy
+; 	or	a, a
+; 	sbc	hl, bc
+; 	jp	nc, BB2_26
+; 	ld	hl, (-1900524)
+; 	ld	(ix - 25), hl
+; 	ld	de, (ix - 14)
+; 	push	de
+; 	pop	hl
+; 	ld	bc, (ix - 17)
+; 	call	__imulu
+; 	push	de
+; 	pop	bc
+; 	push	hl
+; 	pop	de
+; 	ld	hl, (ix - 10)
+; 	add	hl, de
+; 	ld	(gfy_TextXPos), hl
+; 	ld	a, c
+; 	or	a, a
+; 	jp	z, BB2_43
+; 	ld	iy, (gfy_TextData)
+; 	ld	hl, (ix - 10)
+; 	call	__set_bc_and_mul_hl_by_240
+; 	push	hl
+; 	pop	de
+; 	ld	hl, (ix - 20)
+; 	add	hl, de
+; 	ld	(ix - 20), hl
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ld	l, (ix + 6)
+; 	ld	c, 3
+; 	add	hl, hl
+; 	add	hl, hl
+; 	add	hl, hl
+; 	push	hl
+; 	pop	de
+; 	add	iy, de
+; 	ld	de, (ix - 7)
+; 	ld	a, (ix - 11)
+; 	ld	(ix - 22), a
+; 	ld	a, d
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ld	(ix - 10), hl
+; BB2_9:
+; 	or	a, a
+; 	jr	nz, BB2_11
+; 	xor	a, a
+; 	jp	BB2_25
+; BB2_11:
+; 	ld	a, (gfy_FontHeight)
+; 	ld	c, a
+; 	ld	(ix - 17), c
+; 	ld	l, 0
+; BB2_12:
+; 	ld	(ix - 21), l
+; 	ld	(ix - 7), de
+; 	ld	a, c
+; 	or	a, a
+; 	ld	e, 0
+; 	ld	c, e
+; 	ld	hl, (ix - 20)
+; 	ld	(ix - 3), hl
+; 	jp	z, BB2_24
+; BB2_13:
+; 	ld	a, (iy)
+; 	and	a, (ix - 4)
+; 	ld	c, a
+; 	ld	a, (gfy_Text_BG_Color)
+; 	ld	h, a
+; 	ld	a, (gfy_Text_FG_Color)
+; 	ld	l, a
+; 	ld	a, c
+; 	or	a, a
+; 	jr	z, BB2_15
+; 	ld	h, l
+; BB2_15:
+; 	ld	a, (gfy_Text_TP_Color)
+; 	ld	l, a
+; 	ld	a, h
+; 	cp	a, l
+; 	jr	nz, BB2_17
+; 	ld	bc, 0
+; 	ld	a, (ix - 11)
+; 	ld	c, a
+; 	ld	hl, (ix - 3)
+; 	add	hl, bc
+; 	ld	(ix - 3), hl
+; 	ld	l, a
+; 	jr	BB2_22
+; BB2_17:
+; 	ld	(ix - 26), h
+; 	ld	a, (ix - 22)
+; 	or	a, a
+; 	ld	a, 0
+; 	ld	l, a
+; 	ld	bc, (ix - 3)
+; 	jr	z, BB2_22
+; BB2_18:
+; 	ld	(ix - 3), a
+; 	ld	(ix - 7), e
+; 	push	bc
+; 	pop	hl
+; 	ld	de, 76800
+; 	or	a, a
+; 	sbc	hl, de
+; 	jr	nc, BB2_20
+; 	ld	hl, (ix - 25)
+; 	add	hl, bc
+; 	ld	a, (ix - 26)
+; 	ld	(hl), a
+; 	ld	a, (gfy_TextHeightScale)
+; 	ld	(ix - 11), a
+; BB2_20:
+; 	inc	bc
+; 	ld	a, (ix - 3)
+; 	inc	a
+; 	ld	l, (ix - 11)
+; 	cp	a, l
+; 	ld	e, (ix - 7)
+; 	jr	c, BB2_18
+; 	ld	a, (gfy_FontHeight)
+; 	ld	(ix - 17), a
+; 	ld	l, (ix - 11)
+; 	ld	(ix - 3), bc
+; BB2_22:
+; 	ld	(ix - 22), l
+; 	inc	iy
+; 	inc	e
+; 	ld	a, e
+; 	ld	l, (ix - 17)
+; 	cp	a, l
+; 	jp	c, BB2_13
+; 	ld	a, (gfy_TextWidthScale)
+; 	ld	h, a
+; 	ld	(ix - 7), hl
+; 	ld	c, (ix - 17)
+; BB2_24:
+; 	ld	de, 0
+; 	ld	e, c
+; 	ld	a, c
+; 	ld	bc, 240
+; 	ld	hl, (ix - 20)
+; 	add	hl, bc
+; 	ld	c, a
+; 	ld	(ix - 20), hl
+; 	or	a, a
+; 	sbc	hl, hl
+; 	sbc	hl, de
+; 	push	hl
+; 	pop	de
+; 	add	iy, de
+; 	ld	l, (ix - 21)
+; 	inc	l
+; 	ld	a, l
+; 	ld	de, (ix - 7)
+; 	cp	a, d
+; 	ld	a, d
+; 	jp	c, BB2_12
+; BB2_25:
+; 	ld	l, (ix - 4)
+; 	srl	l
+; 	ld	(ix - 4), l
+; 	ld	hl, (ix - 10)
+; 	inc	hl
+; 	ld	(ix - 10), hl
+; 	ld	bc, (ix - 14)
+; 	or	a, a
+; 	sbc	hl, bc
+; 	jp	z, BB2_43
+; 	jp	BB2_9
+; BB2_26:
+; 	ld	hl, (-1900524)
+; 	ld	(ix - 3), hl
+; 	ld	hl, (gfy_TextYPos)
+; 	ld	(ix - 20), hl
+; 	ld	hl, (ix - 14)
+; 	ld	bc, (ix - 17)
+; 	call	__imulu
+; 	push	hl
+; 	pop	de
+; 	ld	hl, (ix - 10)
+; 	add	hl, de
+; 	ld	(gfy_TextXPos), hl
+; 	ld	hl, (ix - 7)
+; 	ld	a, l
+; 	or	a, a
+; 	jp	z, BB2_43
+; 	ld	iy, (gfy_TextData)
+; 	ld	hl, (ix - 10)
+; 	call	__set_bc_and_mul_hl_by_240
+; 	ld	de, (ix - 20)
+; 	add	hl, de
+; 	ex	de, hl
+; 	ld	hl, (ix - 3)
+; 	add	hl, de
+; 	ld	(ix - 3), hl
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ld	l, (ix + 6)
+; 	ld	c, 3
+; 	add	hl, hl
+; 	add	hl, hl
+; 	add	hl, hl
+; 	push	hl
+; 	pop	de
+; 	add	iy, de
+; 	ld	de, (ix - 7)
+; 	ld	(ix - 20), d
+; 	ld	l, d
+; 	ld	c, b
+; BB2_28:
+; 	ld	a, l
+; 	or	a, a
+; 	jr	nz, BB2_30
+; 	ld	l, b
+; 	jp	BB2_42
+; BB2_30:
+; 	ld	a, (gfy_FontHeight)
+; 	ld	h, a
+; 	ld	(ix - 14), h
+; 	ld	a, b
+; 	ld	(ix - 21), c
+; BB2_31:
+; 	ld	(ix - 17), a
+; 	ld	a, h
+; 	or	a, a
+; 	ld	a, b
+; 	ld	l, b
+; 	ld	de, (ix - 3)
+; 	ld	(ix - 10), de
+; 	jr	z, BB2_41
+; BB2_32:
+; 	ld	a, (iy)
+; 	and	a, (ix - 4)
+; 	ld	b, a
+; 	ld	a, (gfy_Text_BG_Color)
+; 	ld	h, a
+; 	ld	a, (gfy_Text_FG_Color)
+; 	ld	d, a
+; 	ld	a, b
+; 	or	a, a
+; 	jr	z, BB2_34
+; 	ld	h, d
+; BB2_34:
+; 	ld	a, (gfy_Text_TP_Color)
+; 	ld	d, a
+; 	ld	a, h
+; 	cp	a, d
+; 	jr	nz, BB2_36
+; 	ld	bc, 0
+; 	ld	c, (ix - 11)
+; 	lea	de, iy
+; 	ld	iy, (ix - 10)
+; 	add	iy, bc
+; 	ld	(ix - 10), iy
+; 	push	de
+; 	pop	iy
+; 	jr	BB2_39
+; BB2_36:
+; 	ld	a, (ix - 11)
+; 	or	a, a
+; 	ld	a, 0
+; 	ld	d, a
+; 	ld	(ix - 11), a
+; 	jr	z, BB2_39
+; BB2_37:
+; 	lea	bc, iy
+; 	ld	iy, (ix - 10)
+; 	ld	(iy), h
+; 	inc	iy
+; 	ld	(ix - 10), iy
+; 	push	bc
+; 	pop	iy
+; 	inc	d
+; 	ld	a, (gfy_TextHeightScale)
+; 	ld	e, a
+; 	ld	a, d
+; 	ld	(ix - 11), e
+; 	cp	a, e
+; 	jr	c, BB2_37
+; 	ld	a, (gfy_FontHeight)
+; 	ld	(ix - 14), a
+; BB2_39:
+; 	inc	iy
+; 	inc	l
+; 	ld	a, l
+; 	ld	e, (ix - 14)
+; 	cp	a, e
+; 	jr	c, BB2_32
+; 	ld	a, (gfy_TextWidthScale)
+; 	ld	(ix - 20), a
+; 	ld	a, (ix - 14)
+; BB2_41:
+; 	ld	bc, 0
+; 	ld	c, a
+; 	ld	de, 240
+; 	ld	hl, (ix - 3)
+; 	add	hl, de
+; 	ld	(ix - 3), hl
+; 	or	a, a
+; 	sbc	hl, hl
+; 	sbc	hl, bc
+; 	push	hl
+; 	pop	bc
+; 	ld	h, a
+; 	add	iy, bc
+; 	ld	a, (ix - 17)
+; 	inc	a
+; 	ld	l, (ix - 20)
+; 	cp	a, l
+; 	ld	b, d
+; 	ld	de, (ix - 7)
+; 	ld	c, (ix - 21)
+; 	jp	c, BB2_31
+; BB2_42:
+; 	ld	a, (ix - 4)
+; 	srl	a
+; 	ld	(ix - 4), a
+; 	inc	c
+; 	ld	a, c
+; 	cp	a, e
+; 	jp	nz, BB2_28
+; BB2_43:
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_PrintString
-gfy_PrintString:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	push	hl
-	ld	iy, (ix + 6)
-	ld	l, (iy)
-	ld	a, l
-	or	a, a
-	jp	z, BB3_3
-	inc	iy
-BB3_2:
-	ld	(ix - 3), iy
-	push	hl
-	call	gfy_PrintChar
-	ld	iy, (ix - 3)
-	pop	hl
-	ld	a, (iy)
-	ld	l, a
-	inc	iy
-	or	a, a
-	jr	nz, BB3_2
-BB3_3:
-	ld	sp, ix
-	pop	ix
-	ret
+; gfy_PrintString:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	push	hl
+; 	ld	iy, (ix + 6)
+; 	ld	l, (iy)
+; 	ld	a, l
+; 	or	a, a
+; 	jp	z, BB3_3
+; 	inc	iy
+; BB3_2:
+; 	ld	(ix - 3), iy
+; 	push	hl
+; 	call	gfy_PrintChar
+; 	ld	iy, (ix - 3)
+; 	pop	hl
+; 	ld	a, (iy)
+; 	ld	l, a
+; 	inc	iy
+; 	or	a, a
+; 	jr	nz, BB3_2
+; BB3_3:
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_PrintStringXY
-gfy_PrintStringXY:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	push	hl
-	ld	hl, (ix + 9)
-	ld	de, (ix + 12)
-	push	de
-	push	hl
-	call	gfy_SetTextXY
-	ld	iy, (ix + 6)
-	ld	hl, 6
-	add	hl, sp
-	ld	sp, hl
-	ld	l, (iy)
-	ld	a, l
-	or	a, a
-	jp	z, BB4_3
-	inc	iy
-BB4_2:
-	ld	(ix - 3), iy
-	push	hl
-	call	gfy_PrintChar
-	ld	iy, (ix - 3)
-	pop	hl
-	ld	a, (iy)
-	ld	l, a
-	inc	iy
-	or	a, a
-	jr	nz, BB4_2
-BB4_3:
-	ld	sp, ix
-	pop	ix
-	ret
+; gfy_PrintStringXY:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	push	hl
+; 	ld	hl, (ix + 9)
+; 	ld	de, (ix + 12)
+; 	push	de
+; 	push	hl
+; 	call	gfy_SetTextXY
+; 	ld	iy, (ix + 6)
+; 	ld	hl, 6
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	l, (iy)
+; 	ld	a, l
+; 	or	a, a
+; 	jp	z, BB4_3
+; 	inc	iy
+; BB4_2:
+; 	ld	(ix - 3), iy
+; 	push	hl
+; 	call	gfy_PrintChar
+; 	ld	iy, (ix - 3)
+; 	pop	hl
+; 	ld	a, (iy)
+; 	ld	l, a
+; 	inc	iy
+; 	or	a, a
+; 	jr	nz, BB4_2
+; BB4_3:
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
@@ -5045,6 +5045,7 @@ BB24_12:
 ;	extern	_memcpy
 ;	extern	gfy_internal_End
 ;	extern	__idivu
+;	extern	lcd_SendSizedCommandWords
 ;	extern	__iand
 ;	extern	__ixor
 ;	extern	gfy_Sprite_NoClip
@@ -5055,7 +5056,6 @@ BB24_12:
 ;	extern	_memset
 ;	extern	gfy_TextXPos
 ;	extern	gfy_SetTextXY
-;	extern	lcd_SendCommandWords
 ;	extern	_memmove
 ;	extern	gfy_Color
 ;	extern	lcd_Init
