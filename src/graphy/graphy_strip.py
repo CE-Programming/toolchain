@@ -41,6 +41,13 @@ file_data = file_data.replace(b"_lcd_", b"lcd_")
 
 # This is the fun optimization section
 
+# common patterns
+
+file_data = file_data.replace(
+    b"\tsbc\ta, a\n\tbit\t0, a\n",
+    b"\tsbc\ta, a\n",
+)
+
 # __ishl
 
 file_data = file_data.replace(
@@ -72,6 +79,13 @@ file_data = file_data.replace(
     b"\tld\tc, 1\n\tpush\tbc\n\tpop\thl\n\tadd\thl, hl\n",
 )
 
+# other __ishl
+
+file_data = file_data.replace(
+    b"\tld\tc, 1\n\tlea\thl, iy\n\tcall\t__ishl\n",
+    b"\tld\tc, 1\n\tlea\thl, iy\n\tadd\thl, hl\n",
+)
+
 # __bshl
 
 file_data = file_data.replace(
@@ -98,14 +112,14 @@ file_data = file_data.replace(
 
 file_data = file_data.replace(
     b"\tld\tbc, 255\n\tcall\t__iand\n",
-    b"\tld\tbc, 255\n\tinc.s\thl\n\tdec\thl\n\tld\th, b\n"
+    b"\tld\tbc, 255\n\tinc\thl\n\tdec.s\thl\n\tld\th, b\n"
 )
 
 # __land
 
 file_data = file_data.replace(
     b"\tld\tbc, 255\n\txor\ta, a\n\tcall\t__land\n",
-    b"\tld\tbc, 255\n\t\n\txor\ta, a\n\tinc.s\thl\n\tdec\thl\n\tld\th, b\n\tld\te, b\n"
+    b"\tld\tbc, 255\n\t\n\txor\ta, a\n\tinc\thl\n\tdec.s\thl\n\tld\th, b\n\tld\te, b\n"
 )
 
 # __lshru
