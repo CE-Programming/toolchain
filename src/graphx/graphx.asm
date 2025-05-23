@@ -1584,32 +1584,9 @@ _ellipse_line_routine_2 := $-3
 	pop	hl
 	pop	hl
 	ret
-	
 
 ;-------------------------------------------------------------------------------
-gfx_Circle:
-; Draws a clipped circle outline
-; Arguments:
-;  arg0 : X coordinate
-;  arg1 : Y coordinate
-;  arg2 : Radius
-; Returns:
-;  None
-	ld	iy,0
-	add	iy,sp
-	lea	hl,iy-9
-	ld	sp,hl
-	ld	bc,(iy+9)
-	ld	(iy-6),bc
-	sbc	hl,hl
-	ld	(iy-3),hl
-	adc	hl,bc
-	jp	z,.exit
-	ld	hl,1
-	or	a,a
-	sbc	hl,bc
-	call	gfx_Wait
-	jp	.next
+_Circle:
 .sectors:
 	ld	bc,(iy+3)
 	ld	hl,(iy-6)
@@ -1718,31 +1695,32 @@ gfx_Circle:
 .exit:
 	ld	sp,iy
 	ret
-
-;-------------------------------------------------------------------------------
-gfx_FillCircle:
-; Draws an clipped circle
+gfx_Circle:
+; Draws a clipped circle outline
 ; Arguments:
 ;  arg0 : X coordinate
 ;  arg1 : Y coordinate
 ;  arg2 : Radius
 ; Returns:
 ;  None
-	push	ix
-	ld	ix,0
-	add	ix,sp
-	lea	hl,ix-9
-	ld	sp,hl
-	ld	bc,(ix+12)
-	ld	(ix-6),bc
-	sbc	hl,hl
-	ld	(ix-3),hl
-	adc	hl,bc
-	jp	z,_ResetStack
-	ld	hl,1
-	or	a,a
-	sbc	hl,bc
-	jp	.cmp3
+	ld	iy, 0
+	add	iy, sp
+	lea	hl, iy - 9
+	ld	sp, hl
+	ld	bc, (iy + 9)
+	sbc	hl, hl
+	adc	hl, bc	; carry won't be set since HL is zero here
+	jr	z, _Circle.exit
+	ld	(iy - 6), bc
+	sbc	hl, hl
+	ld	(iy - 3), hl
+	inc	hl
+	sbc	hl, bc	; HL = 1 - BC
+	call	gfx_Wait
+	jr	_Circle.next
+
+;-------------------------------------------------------------------------------
+_FillCircle:
 .fillsectors:
 	ld	hl,(ix-3)
 	add	hl,hl
@@ -1844,13 +1822,12 @@ gfx_FillCircle:
 	ret
 .check:
 	jp	po,.fillsectors
+.ResetStack:
 	ld	sp,ix
 	pop	ix
 	ret
-
-;-------------------------------------------------------------------------------
-gfx_FillCircle_NoClip:
-; Draws an unclipped circle
+gfx_FillCircle:
+; Draws an clipped circle
 ; Arguments:
 ;  arg0 : X coordinate
 ;  arg1 : Y coordinate
@@ -1858,21 +1835,23 @@ gfx_FillCircle_NoClip:
 ; Returns:
 ;  None
 	push	ix
-	ld	ix,0
-	add	ix,sp
-	lea	hl,ix-9
-	ld	sp,hl
-	ld	bc,(ix+12)
-	ld	(ix-6),bc
-	sbc	hl,hl
-	ld	(ix-3),hl
-	adc	hl,bc
-	jp	z,_ResetStack
-	ld	hl,1
-	or	a,a
-	sbc	hl,bc
-	call	gfx_Wait
-	jp	.loop
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 9
+	ld	sp, hl
+	ld	bc, (ix + 12)
+	sbc	hl, hl
+	adc	hl, bc	; carry won't be set since HL is zero here
+	jr	z, _FillCircle.ResetStack
+	ld	(ix - 6), bc
+	sbc	hl, hl
+	ld	(ix - 3), hl
+	inc	hl
+	sbc	hl, bc	; HL = 1 - BC
+	jr	_FillCircle.cmp3
+
+;-------------------------------------------------------------------------------
+_FillCircle_NoClip:
 .fillsectors:
 	ld	hl,(ix-3)
 	add	hl,hl
@@ -1962,10 +1941,34 @@ gfx_FillCircle_NoClip:
 	or	a,a
 	sbc	hl,bc
 	jp	nc,.fillsectors
-_ResetStack:
+.ResetStack:
 	ld	sp,ix
 	pop	ix
 	ret
+gfx_FillCircle_NoClip:
+; Draws an unclipped circle
+; Arguments:
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
+;  arg2 : Radius
+; Returns:
+;  None
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 9
+	ld	sp, hl
+	ld	bc, (ix + 12)
+	sbc	hl, hl
+	adc	hl, bc	; carry won't be set since HL is zero here
+	jr	z, _FillCircle_NoClip.ResetStack
+	ld	(ix - 6), bc
+	sbc	hl, hl
+	ld	(ix - 3), hl
+	inc	hl
+	sbc	hl, bc	; HL = 1 - BC
+	call	gfx_Wait
+	jr	_FillCircle_NoClip.loop
 
 ;-------------------------------------------------------------------------------
 gfx_Line:
