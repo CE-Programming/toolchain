@@ -892,8 +892,9 @@ void gfy_Circle(
 }
 #endif
 
-/* gfy_FillCircle */
+/* gfy_FillCircle (graphy.asm) */
 
+#if 0
 // https://zingl.github.io/bresenham.html
 /** @todo make function pixel perfect */
 void gfy_FillCircle(
@@ -918,6 +919,7 @@ void gfy_FillCircle(
         }
     } while (x_pos < 0);
 }
+#endif
 
 /* gfy_Rectangle (graphy.asm) */
 
@@ -1075,7 +1077,9 @@ void gfy_VertLine_NoClip(uint24_t x, uint8_t y, uint24_t length) { //x postion, 
 }
 #endif
 
-/* gfy_FillCircle_NoClip */
+/* gfy_FillCircle_NoClip (graphy.asm) */
+
+#if 0
 
 // https://zingl.github.io/bresenham.html
 /** @todo make function pixel perfect */
@@ -1101,6 +1105,8 @@ void gfy_FillCircle_NoClip(
         }
     } while (x_pos < 0);
 }
+
+#endif
 
 /* gfy_Rectangle_NoClip (graphy.asm) */
 
