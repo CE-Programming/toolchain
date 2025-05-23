@@ -574,150 +574,150 @@ gfy_End:
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_FillCircle
-gfy_FillCircle:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	lea	hl, ix - 15
-	ld	sp, hl
-	ld	bc, (ix + 12)
-	ld	de, 0
-	push	de
-	pop	hl
-	or	a, a
-	sbc	hl, bc
-	push	hl
-	pop	iy
-	push	bc
-	pop	hl
-	call	__set_bc_and_mul_hl_by_minus2
-	ld	bc, 2
-	add	hl, bc
-	ld	(ix - 6), hl
-	ld	(ix - 3), de
-BB5_1:
-	ld	hl, (ix + 6)
-	ld	de, (ix - 3)
-	or	a, a
-	sbc	hl, de
-	push	hl
-	pop	de
-	lea	hl, iy
-	ld	bc, (ix + 9)
-	add	hl, bc
-	ld	(ix - 12), hl
-	ld	(ix - 9), iy
-	lea	hl, iy
-	call	__set_bc_and_mul_hl_by_minus2
-	inc	hl
-	ld	(ix - 15), hl
-	push	hl
-	ld	hl, (ix - 12)
-	push	hl
-	push	de
-	call	gfy_VertLine
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	hl, (ix - 3)
-	ld	de, (ix + 6)
-	add	hl, de
-	ld	de, (ix - 15)
-	push	de
-	ld	de, (ix - 12)
-	push	de
-	push	hl
-	call	gfy_VertLine
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	iy, (ix - 6)
-	ld	de, -8388608
-	add	iy, de
-	ld	bc, (ix - 3)
-	push	bc
-	pop	hl
-	add	hl, de
-	ld	(ix - 12), iy
-	lea	de, iy
-	or	a, a
-	sbc	hl, de
-	sbc	a, a
-	push	bc
-	pop	iy
-	inc	iy
-	lea	hl, iy
-	ld	c, 1
-	add	hl, hl
-	bit	0, a
-	jr	nz, BB5_3
-	ld	(ix - 3), iy
-BB5_3:
-	bit	0, a
-	ld	iy, 0
-	jr	nz, BB5_5
-	inc	hl
-	push	hl
-	pop	iy
-BB5_5:
-	ld	de, (ix - 6)
-	add	iy, de
-	ld	(ix - 6), iy
-	ld	hl, (ix - 9)
-	ld	bc, -8388608
-	add	hl, bc
-	ld	de, (ix - 12)
-	or	a, a
-	sbc	hl, de
-	sbc	a, a
-	ld	e, a
-	add	iy, bc
-	ld	hl, (ix - 3)
-	add	hl, bc
-	lea	bc, iy
-	ld	iy, (ix - 9)
-	or	a, a
-	sbc	hl, bc
-	sbc	a, a
-	ld	l, a
-	ld	a, e
-	or	a, l
-	lea	de, iy
-	inc	de
-	push	de
-	pop	hl
-	ld	c, 1
-	add	hl, hl
-	bit	0, a
-	jr	nz, BB5_7
-	lea	de, iy
-BB5_7:
-	bit	0, a
-	jr	nz, BB5_9
-	or	a, a
-	sbc	hl, hl
-	jr	BB5_10
-BB5_9:
-	inc	hl
-BB5_10:
-	ld	bc, -8388608
-	push	bc
-	pop	iy
-	ld	bc, (ix - 6)
-	add	hl, bc
-	ld	(ix - 6), hl
-	push	de
-	pop	hl
-	lea	bc, iy
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
-	push	de
-	pop	iy
-	jp	c, BB5_1
-	ld	sp, ix
-	pop	ix
-	ret
+; gfy_FillCircle:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	lea	hl, ix - 15
+; 	ld	sp, hl
+; 	ld	bc, (ix + 12)
+; 	ld	de, 0
+; 	push	de
+; 	pop	hl
+; 	or	a, a
+; 	sbc	hl, bc
+; 	push	hl
+; 	pop	iy
+; 	push	bc
+; 	pop	hl
+; 	call	__set_bc_and_mul_hl_by_minus2
+; 	ld	bc, 2
+; 	add	hl, bc
+; 	ld	(ix - 6), hl
+; 	ld	(ix - 3), de
+; BB5_1:
+; 	ld	hl, (ix + 6)
+; 	ld	de, (ix - 3)
+; 	or	a, a
+; 	sbc	hl, de
+; 	push	hl
+; 	pop	de
+; 	lea	hl, iy
+; 	ld	bc, (ix + 9)
+; 	add	hl, bc
+; 	ld	(ix - 12), hl
+; 	ld	(ix - 9), iy
+; 	lea	hl, iy
+; 	call	__set_bc_and_mul_hl_by_minus2
+; 	inc	hl
+; 	ld	(ix - 15), hl
+; 	push	hl
+; 	ld	hl, (ix - 12)
+; 	push	hl
+; 	push	de
+; 	call	gfy_VertLine
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	hl, (ix - 3)
+; 	ld	de, (ix + 6)
+; 	add	hl, de
+; 	ld	de, (ix - 15)
+; 	push	de
+; 	ld	de, (ix - 12)
+; 	push	de
+; 	push	hl
+; 	call	gfy_VertLine
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	iy, (ix - 6)
+; 	ld	de, -8388608
+; 	add	iy, de
+; 	ld	bc, (ix - 3)
+; 	push	bc
+; 	pop	hl
+; 	add	hl, de
+; 	ld	(ix - 12), iy
+; 	lea	de, iy
+; 	or	a, a
+; 	sbc	hl, de
+; 	sbc	a, a
+; 	push	bc
+; 	pop	iy
+; 	inc	iy
+; 	lea	hl, iy
+; 	ld	c, 1
+; 	add	hl, hl
+; 	bit	0, a
+; 	jr	nz, BB5_3
+; 	ld	(ix - 3), iy
+; BB5_3:
+; 	bit	0, a
+; 	ld	iy, 0
+; 	jr	nz, BB5_5
+; 	inc	hl
+; 	push	hl
+; 	pop	iy
+; BB5_5:
+; 	ld	de, (ix - 6)
+; 	add	iy, de
+; 	ld	(ix - 6), iy
+; 	ld	hl, (ix - 9)
+; 	ld	bc, -8388608
+; 	add	hl, bc
+; 	ld	de, (ix - 12)
+; 	or	a, a
+; 	sbc	hl, de
+; 	sbc	a, a
+; 	ld	e, a
+; 	add	iy, bc
+; 	ld	hl, (ix - 3)
+; 	add	hl, bc
+; 	lea	bc, iy
+; 	ld	iy, (ix - 9)
+; 	or	a, a
+; 	sbc	hl, bc
+; 	sbc	a, a
+; 	ld	l, a
+; 	ld	a, e
+; 	or	a, l
+; 	lea	de, iy
+; 	inc	de
+; 	push	de
+; 	pop	hl
+; 	ld	c, 1
+; 	add	hl, hl
+; 	bit	0, a
+; 	jr	nz, BB5_7
+; 	lea	de, iy
+; BB5_7:
+; 	bit	0, a
+; 	jr	nz, BB5_9
+; 	or	a, a
+; 	sbc	hl, hl
+; 	jr	BB5_10
+; BB5_9:
+; 	inc	hl
+; BB5_10:
+; 	ld	bc, -8388608
+; 	push	bc
+; 	pop	iy
+; 	ld	bc, (ix - 6)
+; 	add	hl, bc
+; 	ld	(ix - 6), hl
+; 	push	de
+; 	pop	hl
+; 	lea	bc, iy
+; 	add	hl, bc
+; 	or	a, a
+; 	sbc	hl, bc
+; 	push	de
+; 	pop	iy
+; 	jp	c, BB5_1
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
@@ -1199,152 +1199,152 @@ BB6_38:
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_FillCircle_NoClip
-gfy_FillCircle_NoClip:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	lea	hl, ix - 15
-	ld	sp, hl
-	ld	de, (ix + 12)
-	ld	iy, 0
-	ld	bc, -2
-	lea	hl, iy
-	or	a, a
-	sbc	hl, de
-	push	hl
-	pop	de
-	ld	hl, (ix + 12)
-	call	__imulu
-	ld	bc, 2
-	add	hl, bc
-	ld	(ix - 6), hl
-	ld	(ix - 3), iy
-	push	de
-	pop	bc
-BB7_1:
-	ld	hl, (ix + 6)
-	ld	de, (ix - 3)
-	or	a, a
-	sbc	hl, de
-	push	hl
-	pop	de
-	ld	a, c
-	add	a, (ix + 9)
-	ld	l, a
-	ld	(ix - 12), hl
-	ld	(ix - 9), bc
-	push	bc
-	pop	hl
-	call	__set_bc_and_mul_hl_by_minus2
-	inc	hl
-	ld	(ix - 15), hl
-	push	hl
-	ld	hl, (ix - 12)
-	push	hl
-	push	de
-	call	gfy_VertLine_NoClip
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	hl, (ix - 3)
-	ld	de, (ix + 6)
-	add	hl, de
-	ld	de, (ix - 15)
-	push	de
-	ld	de, (ix - 12)
-	push	de
-	push	hl
-	call	gfy_VertLine_NoClip
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	iy, (ix - 6)
-	ld	de, -8388608
-	add	iy, de
-	ld	bc, (ix - 3)
-	push	bc
-	pop	hl
-	add	hl, de
-	ld	(ix - 12), iy
-	lea	de, iy
-	or	a, a
-	sbc	hl, de
-	sbc	a, a
-	push	bc
-	pop	iy
-	inc	iy
-	lea	hl, iy
-	ld	c, 1
-	add	hl, hl
-	bit	0, a
-	jr	nz, BB7_3
-	ld	(ix - 3), iy
-BB7_3:
-	bit	0, a
-	ld	iy, 0
-	jr	nz, BB7_5
-	inc	hl
-	push	hl
-	pop	iy
-BB7_5:
-	ld	de, (ix - 6)
-	add	iy, de
-	ld	(ix - 6), iy
-	ld	hl, (ix - 9)
-	ld	bc, -8388608
-	add	hl, bc
-	ld	de, (ix - 12)
-	or	a, a
-	sbc	hl, de
-	sbc	a, a
-	ld	e, a
-	add	iy, bc
-	ld	hl, (ix - 3)
-	add	hl, bc
-	lea	bc, iy
-	ld	iy, (ix - 9)
-	or	a, a
-	sbc	hl, bc
-	sbc	a, a
-	ld	l, a
-	ld	a, e
-	or	a, l
-	lea	de, iy
-	inc	de
-	push	de
-	pop	hl
-	ld	c, 1
-	add	hl, hl
-	bit	0, a
-	jr	nz, BB7_7
-	lea	de, iy
-BB7_7:
-	bit	0, a
-	jr	nz, BB7_9
-	or	a, a
-	sbc	hl, hl
-	jr	BB7_10
-BB7_9:
-	inc	hl
-BB7_10:
-	ld	bc, -8388608
-	push	bc
-	pop	iy
-	ld	bc, (ix - 6)
-	add	hl, bc
-	ld	(ix - 6), hl
-	push	de
-	pop	hl
-	lea	bc, iy
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
-	push	de
-	pop	bc
-	jp	c, BB7_1
-	ld	sp, ix
-	pop	ix
-	ret
+; gfy_FillCircle_NoClip:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	lea	hl, ix - 15
+; 	ld	sp, hl
+; 	ld	de, (ix + 12)
+; 	ld	iy, 0
+; 	ld	bc, -2
+; 	lea	hl, iy
+; 	or	a, a
+; 	sbc	hl, de
+; 	push	hl
+; 	pop	de
+; 	ld	hl, (ix + 12)
+; 	call	__imulu
+; 	ld	bc, 2
+; 	add	hl, bc
+; 	ld	(ix - 6), hl
+; 	ld	(ix - 3), iy
+; 	push	de
+; 	pop	bc
+; BB7_1:
+; 	ld	hl, (ix + 6)
+; 	ld	de, (ix - 3)
+; 	or	a, a
+; 	sbc	hl, de
+; 	push	hl
+; 	pop	de
+; 	ld	a, c
+; 	add	a, (ix + 9)
+; 	ld	l, a
+; 	ld	(ix - 12), hl
+; 	ld	(ix - 9), bc
+; 	push	bc
+; 	pop	hl
+; 	call	__set_bc_and_mul_hl_by_minus2
+; 	inc	hl
+; 	ld	(ix - 15), hl
+; 	push	hl
+; 	ld	hl, (ix - 12)
+; 	push	hl
+; 	push	de
+; 	call	gfy_VertLine_NoClip
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	hl, (ix - 3)
+; 	ld	de, (ix + 6)
+; 	add	hl, de
+; 	ld	de, (ix - 15)
+; 	push	de
+; 	ld	de, (ix - 12)
+; 	push	de
+; 	push	hl
+; 	call	gfy_VertLine_NoClip
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	iy, (ix - 6)
+; 	ld	de, -8388608
+; 	add	iy, de
+; 	ld	bc, (ix - 3)
+; 	push	bc
+; 	pop	hl
+; 	add	hl, de
+; 	ld	(ix - 12), iy
+; 	lea	de, iy
+; 	or	a, a
+; 	sbc	hl, de
+; 	sbc	a, a
+; 	push	bc
+; 	pop	iy
+; 	inc	iy
+; 	lea	hl, iy
+; 	ld	c, 1
+; 	add	hl, hl
+; 	bit	0, a
+; 	jr	nz, BB7_3
+; 	ld	(ix - 3), iy
+; BB7_3:
+; 	bit	0, a
+; 	ld	iy, 0
+; 	jr	nz, BB7_5
+; 	inc	hl
+; 	push	hl
+; 	pop	iy
+; BB7_5:
+; 	ld	de, (ix - 6)
+; 	add	iy, de
+; 	ld	(ix - 6), iy
+; 	ld	hl, (ix - 9)
+; 	ld	bc, -8388608
+; 	add	hl, bc
+; 	ld	de, (ix - 12)
+; 	or	a, a
+; 	sbc	hl, de
+; 	sbc	a, a
+; 	ld	e, a
+; 	add	iy, bc
+; 	ld	hl, (ix - 3)
+; 	add	hl, bc
+; 	lea	bc, iy
+; 	ld	iy, (ix - 9)
+; 	or	a, a
+; 	sbc	hl, bc
+; 	sbc	a, a
+; 	ld	l, a
+; 	ld	a, e
+; 	or	a, l
+; 	lea	de, iy
+; 	inc	de
+; 	push	de
+; 	pop	hl
+; 	ld	c, 1
+; 	add	hl, hl
+; 	bit	0, a
+; 	jr	nz, BB7_7
+; 	lea	de, iy
+; BB7_7:
+; 	bit	0, a
+; 	jr	nz, BB7_9
+; 	or	a, a
+; 	sbc	hl, hl
+; 	jr	BB7_10
+; BB7_9:
+; 	inc	hl
+; BB7_10:
+; 	ld	bc, -8388608
+; 	push	bc
+; 	pop	iy
+; 	ld	bc, (ix - 6)
+; 	add	hl, bc
+; 	ld	(ix - 6), hl
+; 	push	de
+; 	pop	hl
+; 	lea	bc, iy
+; 	add	hl, bc
+; 	or	a, a
+; 	sbc	hl, bc
+; 	push	de
+; 	pop	bc
+; 	jp	c, BB7_1
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits

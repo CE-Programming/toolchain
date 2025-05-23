@@ -1033,6 +1033,8 @@ _HorizLine_NoClip_NotDegen_StackXY:
 _HorizLine_NoClip_NotDegen_StackY:
 	ld	e, (iy+6)		; e = y
 _HorizLine_NoClip_NotDegen:
+	wait_quick
+_HorizLine_NoClip_NotDegen_NoWait:
 	ld	d, h		; maybe ld d, 0
 	dec	h		; tests if x >= 256
 	ld	h, ti.lcdHeight
@@ -1045,7 +1047,7 @@ _HorizLine_NoClip_NotDegen:
 	ld	de, (CurrentBuffer)
 	add	hl, de		; add buffer offset
 	
-_HorizLine_NoClip_Draw:
+_HorizLine_NoClip_Draw_NoWait:
 	ld	de, ti.lcdHeight
 	; swap b and c
 	ld	a, b
@@ -1054,7 +1056,6 @@ _HorizLine_NoClip_Draw:
 
 	ld	a, 0
 smcByte _Color
-	wait_quick
 .loop:
 	ld	(hl), a		; loop for width
 	add	hl, de
@@ -1674,29 +1675,7 @@ _ellipse_line_routine_2 := $-3
 	
 
 ;-------------------------------------------------------------------------------
-gfy_Circle: ; COPIED_FROM_GRAPHX
-; Draws a clipped circle outline
-; Arguments:
-;  arg0 : X coordinate
-;  arg1 : Y coordinate
-;  arg2 : Radius
-; Returns:
-;  None
-	ld	iy,0
-	add	iy,sp
-	lea	hl,iy-9
-	ld	sp,hl
-	ld	bc,(iy+9)
-	ld	(iy-6),bc
-	sbc	hl,hl
-	ld	(iy-3),hl
-	adc	hl,bc
-	jp	z,.exit
-	ld	hl,1
-	or	a,a
-	sbc	hl,bc
-	call	gfy_Wait
-	jp	.next
+_Circle:
 .sectors:
 	ld	bc,(iy+3)
 	ld	hl,(iy-6)
@@ -1805,19 +1784,431 @@ gfy_Circle: ; COPIED_FROM_GRAPHX
 .exit:
 	ld	sp,iy
 	ret
+gfy_Circle: ; COPIED_FROM_GRAPHX
+; Draws a clipped circle outline
+; Arguments:
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
+;  arg2 : Radius
+; Returns:
+;  None
+	ld	iy, 0
+	add	iy, sp
+	lea	hl, iy - 9
+	ld	sp, hl
+	ld	bc, (iy + 9)
+	sbc	hl, hl
+	adc	hl, bc	; carry won't be set since HL is zero here
+	jr	z, _Circle.exit
+	ld	(iy - 6), bc
+	sbc	hl, hl
+	ld	(iy - 3), hl
+	inc	hl
+	sbc	hl, bc	; HL = 1 - BC
+	call	gfy_Wait
+	jr	_Circle.next
 
 ;-------------------------------------------------------------------------------
-; gfy_FillCircle:
+fc_x := 9
+fc_y := 6
+_FillCircle:
+.fillsectors:
+	ld	hl,(ix-3)
+	add	hl,hl
+	inc	hl
+	ld	(.circle0),hl
+	push	hl	; len
+	ld	bc,(ix-3)
+	ld	hl, (ix + fc_x)
+	or	a,a
+	sbc	hl,bc
+	ld	(.circle1),hl
+	push	hl	; x
+	ld	bc,(ix-6)
+	ld	hl, (ix + fc_y)
+	add	hl,bc
+	push	hl	; y
+	call	gfy_VertLine
+	ld	hl,0
+.circle0 := $-3
+	push	hl	; len
+	ld	hl,0
+.circle1 := $-3
+	push	hl	; x
+	ld	bc,(ix-6)
+	ld	hl, (ix + fc_y)
+	or	a,a
+	sbc	hl,bc
+	push	hl	; y
+	call	gfy_VertLine
+	ld	hl,(ix-6)
+	add	hl,hl
+	inc	hl
+	ld	(.circle2),hl
+	push	hl	; len
+	ld	bc,(ix-6)
+	ld	hl, (ix + fc_x)
+	or	a,a
+	sbc	hl,bc
+	ld	(.circle3),hl
+	push	hl	; x
+	ld	bc,(ix-3)
+	ld	hl, (ix + fc_y)
+	add	hl,bc
+	push	hl	; y
+	call	gfy_VertLine
+	ld	hl,0
+.circle2 := $-3
+	push	hl	; len
+	ld	hl,0
+.circle3 := $-3
+	push	hl	; x
+	ld	bc,(ix-3)
+	ld	hl, (ix + fc_y)
+	or	a,a
+	sbc	hl,bc
+	push	hl	; y
+	call	gfy_VertLine
+	lea	hl,ix-9
+	ld	sp,hl
+	ld	bc,(ix-3)
+	inc	bc
+	ld	(ix-3),bc
+	ld	bc,(ix-9)
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,bc
+	jp	m,.cmp0
+	jp	pe,.cmp2
+	jr	.cmp1
+.cmp0:
+	jp	po,.cmp2
+.cmp1:
+	ld	hl,(ix-3)
+	add	hl,hl
+	inc	hl
+	add	hl,bc
+	jr	.cmp3
+.cmp2:
+	ld	bc,(ix-6)
+	dec	bc
+	ld	(ix-6),bc
+	ld	hl,(ix-3)
+	ld	de,(ix-9)
+	or	a,a
+	sbc	hl,bc
+	add	hl,hl
+	inc	hl
+	add	hl,de
+.cmp3:
+	ld	(ix-9),hl
+	ld	bc,(ix-3)
+	ld	hl,(ix-6)
+	or	a,a
+	sbc	hl,bc
+	jp	p,.check
+	jp	pe,.fillsectors
+	ld	sp,ix
+	pop	ix
+	ret
+.check:
+	jp	po,.fillsectors
+.ResetStack:
+	ld	sp,ix
+	pop	ix
+	ret
+gfy_FillCircle: ; MODIFIED_FROM_GRAPHX
+; Draws an clipped circle
+; Arguments:
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
+;  arg2 : Radius
+; Returns:
+;  None
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 9
+	ld	sp, hl
+	ld	bc, (ix + 12)
+	sbc	hl, hl
+	adc	hl, bc	; carry won't be set since HL is zero here
+	jr	z, _FillCircle.ResetStack
+	ld	(ix - 6), bc
+	sbc	hl, hl
+	ld	(ix - 3), hl
+	inc	hl
+	sbc	hl, bc	; HL = 1 - BC
+	jr	_FillCircle.cmp3
 
 ;-------------------------------------------------------------------------------
-; gfy_FillCircle_NoClip:
+; not working at the moment
+if 0
+fcnc_x := 6
+fcnc_y := 9
+_FillCircle_NoClip:
+.fillsectors:
+	ld	hl,(ix-3)
+	add	hl,hl
+	inc	hl
+	ld	(.circle0),hl
+	push	hl
+	ld	bc,(ix-6)
+	ld	hl,(ix+fcnc_y)
+	add	hl,bc
+	ld	e,l
+	ld	bc,(ix-3)
+	ld	hl,(ix+fcnc_x)
+	or	a,a
+	sbc	hl,bc
+	ld	(.circle1),hl
+	pop	bc
+	ex	de, hl
+	call	_VertLine_NoClip_NotDegen_NoWait
+	ex	de, hl
+	ld	bc,0
+.circle0 := $-3
+	ld	de,(ix-6)
+	ld	hl,(ix+fcnc_y)
+	or	a,a
+	sbc	hl,de
+	ld	e,l
+	ld	hl,0
+.circle1 := $-3
+	ex	de, hl
+	call	_VertLine_NoClip_NotDegen_NoWait
+	ex	de, hl
+	ld	hl,(ix-6)
+	add	hl,hl
+	inc	hl
+	ld	(.circle2),hl
+	push	hl
+	ld	bc,(ix-3)
+	ld	hl,(ix+fcnc_y)
+	add	hl,bc
+	ld	e,l
+	ld	bc,(ix-6)
+	ld	hl,(ix+fcnc_x)
+	or	a,a
+	sbc	hl,bc
+	ld	(.circle3),hl
+	pop	bc
+	call	_VertLine_NoClip_NotDegen_NoWait
+	ld	bc,0
+.circle2 := $-3
+	ld	de,(ix-3)
+	ld	hl,(ix+fcnc_y)
+	or	a,a
+	sbc	hl,de
+	ld	e,l
+	ld	hl,0
+.circle3 := $-3
+	call	_VertLine_NoClip_NotDegen_NoWait
+	ld	bc,(ix-3)
+	inc	bc
+	ld	(ix-3),bc
+	ld	bc,(ix-9)
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,bc
+	jp	m,.cmp0
+	jp	pe,.cmp2
+	jr	.cmp1
+.cmp0:
+	jp	po,.cmp2
+.cmp1:
+	ld	hl,(ix-3)
+	add	hl,hl
+	inc	hl
+	add	hl,bc
+	jr	.loop
+.cmp2:
+	ld	bc,(ix-6)
+	dec	bc
+	ld	(ix-6),bc
+	ld	hl,(ix-3)
+	or	a,a
+	sbc	hl,bc
+	add	hl,hl
+	inc	hl
+	ld	de,(ix-9)
+	add	hl,de
+.loop:
+	ld	(ix-9),hl
+	ld	bc,(ix-3)
+	ld	hl,(ix-6)
+	or	a,a
+	sbc	hl,bc
+	jp	nc,.fillsectors
+.ResetStack:
+	ld	sp,ix
+	pop	ix
+	ret
+gfy_FillCircle_NoClip: ; MODIFIED_FROM_GRAPHX
+; Draws an unclipped circle
+; Arguments:
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
+;  arg2 : Radius
+; Returns:
+;  None
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 9
+	ld	sp, hl
 
-; ...
+	; ensure that Y is zeroed out
+	xor	a, a
+	ld	(ix + 10), a
+	ld	(ix + 11), a
 
-;_ResetStack:
-;	ld	sp,ix
-;	pop	ix
-;	ret
+	ld	bc, (ix + 12)
+	sbc	hl, hl
+	adc	hl, bc	; carry won't be set since HL is zero here
+	jr	z, _FillCircle_NoClip.ResetStack
+	ld	(ix - 6), bc
+	sbc	hl, hl
+	ld	(ix - 3), hl
+	inc	hl
+	sbc	hl, bc	; HL = 1 - BC
+	call	gfy_Wait
+	jr	_FillCircle_NoClip.loop
+
+else
+
+_FillCircle_NoClip:
+.fillsectors:
+	ld	hl,(ix-3)
+	add	hl,hl
+	inc	hl
+	ld	(.circle0),hl
+	push	hl	; len
+	ld	bc,(ix-3)
+	ld	hl, (ix + fc_x)
+	or	a,a
+	sbc	hl,bc
+	ld	(.circle1),hl
+	push	hl	; x
+	ld	bc,(ix-6)
+	ld	hl, (ix + fc_y)
+	add	hl,bc
+	push	hl	; y
+	call	gfy_VertLine_NoClip
+	ld	hl,0
+.circle0 := $-3
+	push	hl	; len
+	ld	hl,0
+.circle1 := $-3
+	push	hl	; x
+	ld	bc,(ix-6)
+	ld	hl, (ix + fc_y)
+	or	a,a
+	sbc	hl,bc
+	push	hl	; y
+	call	gfy_VertLine_NoClip
+	ld	hl,(ix-6)
+	add	hl,hl
+	inc	hl
+	ld	(.circle2),hl
+	push	hl	; len
+	ld	bc,(ix-6)
+	ld	hl, (ix + fc_x)
+	or	a,a
+	sbc	hl,bc
+	ld	(.circle3),hl
+	push	hl	; x
+	ld	bc,(ix-3)
+	ld	hl, (ix + fc_y)
+	add	hl,bc
+	push	hl	; y
+	call	gfy_VertLine_NoClip
+	ld	hl,0
+.circle2 := $-3
+	push	hl	; len
+	ld	hl,0
+.circle3 := $-3
+	push	hl	; x
+	ld	bc,(ix-3)
+	ld	hl, (ix + fc_y)
+	or	a,a
+	sbc	hl,bc
+	push	hl	; y
+	call	gfy_VertLine_NoClip
+	lea	hl,ix-9
+	ld	sp,hl
+	ld	bc,(ix-3)
+	inc	bc
+	ld	(ix-3),bc
+	ld	bc,(ix-9)
+	or	a,a
+	sbc	hl,hl
+	sbc	hl,bc
+	jp	m,.cmp0
+	jp	pe,.cmp2
+	jr	.cmp1
+.cmp0:
+	jp	po,.cmp2
+.cmp1:
+	ld	hl,(ix-3)
+	add	hl,hl
+	inc	hl
+	add	hl,bc
+	jr	.cmp3
+.cmp2:
+	ld	bc,(ix-6)
+	dec	bc
+	ld	(ix-6),bc
+	ld	hl,(ix-3)
+	ld	de,(ix-9)
+	or	a,a
+	sbc	hl,bc
+	add	hl,hl
+	inc	hl
+	add	hl,de
+.cmp3:
+	ld	(ix-9),hl
+	ld	bc,(ix-3)
+	ld	hl,(ix-6)
+	or	a,a
+	sbc	hl,bc
+	jp	p,.check
+	jp	pe,.fillsectors
+	ld	sp,ix
+	pop	ix
+	ret
+.check:
+	jp	po,.fillsectors
+.ResetStack:
+	ld	sp,ix
+	pop	ix
+	ret
+; reuse the implementation from gfy_FillCircle for now
+gfy_FillCircle_NoClip: ; MODIFIED_FROM_GRAPHX
+; Draws an clipped circle
+; Arguments:
+;  arg0 : X coordinate
+;  arg1 : Y coordinate
+;  arg2 : Radius
+; Returns:
+;  None
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 9
+	ld	sp, hl
+	ld	bc, (ix + 12)
+	sbc	hl, hl
+	adc	hl, bc	; carry won't be set since HL is zero here
+	jr	z, _FillCircle_NoClip.ResetStack
+	ld	(ix - 6), bc
+	sbc	hl, hl
+	ld	(ix - 3), hl
+	inc	hl
+	sbc	hl, bc	; HL = 1 - BC
+	jr	_FillCircle_NoClip.cmp3
+
+end if
 
 ;-------------------------------------------------------------------------------
 gfy_Line: ; COPIED_FROM_GRAPHX
@@ -3340,325 +3731,364 @@ gfy_FillTriangle_NoClip: ; COPIED_FROM_GRAPHX
 ;  arg0-5 : x0,y0,x1,y1,x2,y2
 ; Returns:
 ;  None
-	ld	hl,gfy_HorizLine_NoClip
+	ld	hl,gfy_VertLine_NoClip
 ;	jr	_FillTriangle		; emulated by dummifying next instruction:
 	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-gfy_FillTriangle: ; COPIED_FROM_GRAPHX
+gfy_FillTriangle: ; MODIFIED_FROM_GRAPHX
 ; Draws a filled triangle with clipping
 ; Arguments:
-;  arg0-5 : x0,y0,x1,y1,x2,y2
+;  arg0-5 : x0, y0, x1, y1, x2, y2
 ; Returns:
 ;  None
-	ld	hl,gfy_HorizLine
+
+if 0
+ft_x0 := 6
+ft_y0 := 9
+ft_x1 := 12
+ft_y1 := 15
+ft_x2 := 18
+ft_y2 := 21
+else
+; swap x and y
+ft_y0 := 6
+ft_x0 := 9
+ft_y1 := 12
+ft_x1 := 15
+ft_y2 := 18
+ft_x2 := 21
+end if
+
+	ld	hl, gfy_VertLine
 _FillTriangle:
-	ld	(.line0),hl
-	ld	(.line1),hl
-	ld	(.line2),hl
+	ld	(.line0), hl
+	ld	(.line1), hl
+	ld	(.line2), hl
 	push	ix
-	ld	ix,0
-	add	ix,sp
-	lea	hl,ix-39
-	ld	sp,hl
-	sbc	hl,hl
-	ld	(ix-15),hl
-	ld	(ix-18),hl		; int sa = 0, sb = 0;
-	ld	hl,(ix+9)		; sort coordinates by y order (y2 >= y1 >= y0)
-	ld	de,(ix+15)		; if (y0 > y1)
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 39
+	ld	sp, hl
+	sbc	hl, hl
+	ld	(ix - 15), hl
+	ld	(ix - 18), hl		; int sa = 0, sb = 0;
+	ld	hl, (ix + ft_y0)		; sort coordinates by y order (y2 >= y1 >= y0)
+	ld	de, (ix + ft_y1)		; if (y0 > y1)
 	call	_SignedCompare
-	jr	c,.cmp0
-	ld	hl,(ix+9)
-	ld	(ix+9),de
-	ld	(ix+15),hl
-	ld	hl,(ix+6)
-	ld	de,(ix+12)
-	ld	(ix+6),de
-	ld	(ix+12),hl
+	jr	c, .cmp0
+	ld	hl, (ix + ft_y0)
+	ld	(ix + ft_y0), de
+	ld	(ix + ft_y1), hl
+	ld	hl, (ix + ft_x0)
+	ld	de, (ix + ft_x1)
+	ld	(ix + ft_x0), de
+	ld	(ix + ft_x1), hl
 .cmp0:
-	ld	hl,(ix+15)
-	ld	de,(ix+21)
+	ld	hl, (ix + ft_y1)
+	ld	de, (ix + ft_y2)
 	call	_SignedCompare
-	jr	c,.cmp1
-	ld	hl,(ix+15)
-	ld	(ix+15),de
-	ld	(ix+21),hl
-	ld	hl,(ix+12)
-	ld	de,(ix+18)
-	ld	(ix+12),de
-	ld	(ix+18),hl
+	jr	c, .cmp1
+	ld	hl, (ix + ft_y1)
+	ld	(ix + ft_y1), de
+	ld	(ix + ft_y2), hl
+	ld	hl, (ix + ft_x1)
+	ld	de, (ix + ft_x2)
+	ld	(ix + ft_x1), de
+	ld	(ix + ft_x2), hl
 .cmp1:
-	ld	hl,(ix+9)
-	ld	de,(ix+15)
+	ld	hl, (ix + ft_y0)
+	ld	de, (ix + ft_y1)
 	call	_SignedCompare
-	jr	c,.cmp2
-	ld	hl,(ix+9)
-	ld	(ix+9),de
-	ld	(ix+15),hl
-	ld	hl,(ix+6)
-	ld	de,(ix+12)
-	ld	(ix+6),de
-	ld	(ix+12),hl
+	jr	c, .cmp2
+	ld	hl, (ix + ft_y0)
+	ld	(ix + ft_y0), de
+	ld	(ix + ft_y1), hl
+	ld	hl, (ix + ft_x0)
+	ld	de, (ix + ft_x1)
+	ld	(ix + ft_x0), de
+	ld	(ix + ft_x1), hl
 .cmp2:
-	ld	de,(ix+21)		; if(y0 == y2) - handle awkward all-on-same-line case as its own thing
-	ld	hl,(ix+9)
-	or	a,a
-	sbc	hl,de
-	jp	nz,.notflat
-	ld	bc,(ix+6)		; x0
-	ld	(ix-6),bc		; a = x0
-	ld	(ix-3),bc		; b = x0;
-	ld	hl,(ix+12)		; if (x1 < a) { a = x1; }
-	or	a,a
-	sbc	hl,bc
-	jp	p,.cmp00
-	jp	pe,.cmp01
+	ld	de, (ix + ft_y2)		; if(y0 == y2) - handle awkward all-on-same-line case as its own thing
+	ld	hl, (ix + ft_y0)
+	or	a, a
+	sbc	hl, de
+	jp	nz, .notflat
+	ld	bc, (ix + ft_x0)		; x0
+	ld	(ix - 6), bc		; a = x0
+	ld	(ix - 3), bc		; b = x0;
+	ld	hl, (ix + ft_x1)		; if (x1 < a) { a = x1; }
+	or	a, a
+	sbc	hl, bc
+	jp	p, .cmp00
+	jp	pe, .cmp01
 	jr	.cmp02
 .cmp00:
-	jp	po,.cmp01
+	jp	po, .cmp01
 .cmp02:
-	ld	bc,(ix+12)
-	ld	(ix-3),bc
+	ld	bc, (ix + ft_x1)
+	ld	(ix-3), bc
 	jr	.cmp11
 .cmp01:
-	ld	bc,(ix+12)
-	ld	hl,(ix-6)
-	or	a,a
-	sbc	hl,bc			; else if (x1 > b) { b = x1; }
-	jp	p,.cmp10
-	jp	pe,.cmp11
+	ld	bc, (ix + ft_x1)
+	ld	hl, (ix - 6)
+	or	a, a
+	sbc	hl, bc			; else if (x1 > b) { b = x1; }
+	jp	p, .cmp10
+	jp	pe, .cmp11
 	jr	.cmp12
 .cmp10:
-	jp	po,.cmp11
+	jp	po, .cmp11
 .cmp12:
-	ld	bc,(ix+12)
-	ld	(ix-6),bc
+	ld	bc, (ix + ft_x1)
+	ld	(ix - 6), bc
 .cmp11:
-	ld	bc,(ix-3)
-	ld	hl,(ix+18)
-	or	a,a
-	sbc	hl,bc			; if (x2 < a) { a = x2; }
-	jp	p,.cmp20
-	jp	pe,.cmp21
+	ld	bc, (ix - 3)
+	ld	hl, (ix + ft_x2)
+	or	a, a
+	sbc	hl, bc			; if (x2 < a) { a = x2; }
+	jp	p, .cmp20
+	jp	pe, .cmp21
 	jr	.cmp22
 .cmp20:
-	jp	po,.cmp21
+	jp	po, .cmp21
 .cmp22:
-	ld	bc,(ix+18)
-	ld	(ix-3),bc
+	ld	bc, (ix + ft_x2)
+	ld	(ix-3), bc
 	jr	.cmp31
 .cmp21:
-	ld	bc,(ix+18)
-	ld	hl,(ix-6)
-	or	a,a
-	sbc	hl,bc			; else if (x2 > b) { b = x2; }
-	jp	p,.cmp30
-	jp	pe,.cmp31
+	ld	bc, (ix + ft_x2)
+	ld	hl, (ix - 6)
+	or	a, a
+	sbc	hl, bc			; else if (x2 > b) { b = x2; }
+	jp	p, .cmp30
+	jp	pe, .cmp31
 	jr	.cmp32
 .cmp30:
-	jp	po,.cmp31
+	jp	po, .cmp31
 .cmp32:
-	ld	bc,(ix+18)
-	ld	(ix-6),bc
+	ld	bc, (ix + ft_x2)
+	ld	(ix - 6), bc
 .cmp31:
-	ld	de,(ix-3)
-	ld	hl,(ix-6)
-	or	a,a
-	sbc	hl,de
+	ld	de, (ix - 3)
+	ld	hl, (ix - 6)
+	or	a, a
+	sbc	hl, de
 	inc	hl
+if 0
 	push	hl
-	ld	bc,(ix+9)
+	ld	bc, (ix + ft_y0)
 	push	bc
 	push	de
+else
+	push	hl	; len
+	ld	bc, (ix + ft_y0)
+	push	de	; x
+	push	bc	; y
+end if
 	call	0			; horizline(a, y0, b-a+1);
 .line0 := $-3
 	pop	bc
 	pop	bc
 	pop	bc
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 	ret				; return;
 .notflat:
-	ld	bc,(ix+6)		; x0
-	ld	hl,(ix+12)
-	or	a,a
-	sbc	hl,bc
-	ld	(ix-36),hl		; dx01 = x1 - x0;
-	ld	hl,(ix+18)
-	or	a,a
-	sbc	hl,bc
-	ld	(ix-21),hl		; dx02 = x2 - x0;
-	ld	bc,(ix+9)		; y0
-	ld	hl,(ix+15)
-	or	a,a
-	sbc	hl,bc
-	ld	(ix-33),hl		; dy01 = y1 - y0;
-	ld	hl,(ix+21)
-	or	a,a
-	sbc	hl,bc
-	ld	(ix-27),hl		; dy02 = y2 - y0;
-	ld	bc,(ix+12)
-	ld	hl,(ix+18)
-	or	a,a
-	sbc	hl,bc
-	ld	(ix-30),hl		; dx12 = x2 - x1;
-	ld	bc,(ix+15)
-	ld	hl,(ix+21)
-	or	a,a
-	sbc	hl,bc
-	ld	(ix-39),hl		; dy12 = y2 - y1;
-	jr	nz,.elselast		; if (y1 == y2) { last = y1; }
-	ld	(ix-24),bc
+	ld	bc, (ix + ft_x0)		; x0
+	ld	hl, (ix + ft_x1)
+	or	a, a
+	sbc	hl, bc
+	ld	(ix - 36), hl		; dx01 = x1 - x0;
+	ld	hl, (ix + ft_x2)
+	or	a, a
+	sbc	hl, bc
+	ld	(ix - 21), hl		; dx02 = x2 - x0;
+	ld	bc, (ix + ft_y0)		; y0
+	ld	hl, (ix + ft_y1)
+	or	a, a
+	sbc	hl, bc
+	ld	(ix - 33), hl		; dy01 = y1 - y0;
+	ld	hl, (ix + ft_y2)
+	or	a, a
+	sbc	hl, bc
+	ld	(ix - 27), hl		; dy02 = y2 - y0;
+	ld	bc, (ix + ft_x1)
+	ld	hl, (ix + ft_x2)
+	or	a, a
+	sbc	hl, bc
+	ld	(ix - 30), hl		; dx12 = x2 - x1;
+	ld	bc, (ix + ft_y1)
+	ld	hl, (ix + ft_y2)
+	or	a, a
+	sbc	hl, bc
+	ld	(ix - 39), hl		; dy12 = y2 - y1;
+	jr	nz, .elselast		; if (y1 == y2) { last = y1; }
+	ld	(ix - 24), bc
 	jr	.sublast
 .elselast:
-	ld	bc,(ix+15)		; else { last = y1-1; }
+	ld	bc, (ix + ft_y1)		; else { last = y1-1; }
 	dec	bc
-	ld	(ix-24),bc
+	ld	(ix - 24), bc
 .sublast:
-	ld	bc,(ix+9)
-	ld	(ix-12),bc		; for (y = y0; y <= last; y++)
+	ld	bc, (ix + ft_y0)
+	ld	(ix - 12), bc		; for (y = y0; y <= last; y++)
 	jp	.firstloopstart
 .firstloop:
-	ld	hl,(ix-15)
-	ld	bc,(ix-33)
+	ld	hl, (ix - 15)
+	ld	bc, (ix - 33)
 	call	_DivideHLBC
-	ld	bc,(ix+6)
-	add	hl,bc
-	ld	(ix-3),hl		; a = x0 + sa / dy01;
-	ld	hl,(ix-18)
-	ld	bc,(ix-27)
+	ld	bc, (ix + ft_x0)
+	add	hl, bc
+	ld	(ix - 3), hl		; a = x0 + sa / dy01;
+	ld	hl, (ix - 18)
+	ld	bc, (ix - 27)
 	call	_DivideHLBC
-	ld	bc,(ix+6)
-	add	hl,bc
-	ld	(ix-6),hl		; b = x0 + sb / dy02;
-	ld	bc,(ix-36)
-	ld	hl,(ix-15)
-	add	hl,bc
-	ld	(ix-15),hl		; sa += dx01;
-	ld	bc,(ix-21)
-	ld	hl,(ix-18)
-	add	hl,bc
-	ld	(ix-18),hl		; sb += dx02;
-	ld	de,(ix-3)
-	ld	hl,(ix-6)
-	or	a,a
-	sbc	hl,de			; if (b < a) { swap(a,b); }
-	jp	p,.cmp40
-	jp	pe,.cmp41
+	ld	bc, (ix + ft_x0)
+	add	hl, bc
+	ld	(ix - 6), hl		; b = x0 + sb / dy02;
+	ld	bc, (ix - 36)
+	ld	hl, (ix - 15)
+	add	hl, bc
+	ld	(ix - 15), hl		; sa += dx01;
+	ld	bc, (ix - 21)
+	ld	hl, (ix - 18)
+	add	hl, bc
+	ld	(ix - 18), hl		; sb += dx02;
+	ld	de, (ix - 3)
+	ld	hl, (ix - 6)
+	or	a, a
+	sbc	hl, de			; if (b < a) { swap(a, b); }
+	jp	p, .cmp40
+	jp	pe, .cmp41
 	jr	.cmp42
 .cmp40:
-	jp	po,.cmp41
+	jp	po, .cmp41
 .cmp42:
-	ld	hl,(ix-3)
-	ld	de,(ix-6)
-	ld	(ix-3),de
-	ld	(ix-6),hl
+	ld	hl, (ix - 3)
+	ld	de, (ix - 6)
+	ld	(ix - 3), de
+	ld	(ix - 6), hl
 .cmp41:
-	ld	hl,(ix-6)
-	or	a,a
-	sbc	hl,de
+	ld	hl, (ix - 6)
+	or	a, a
+	sbc	hl, de
 	inc	hl
+if 0
 	push	hl
-	ld	bc,(ix-12)
+	ld	bc, (ix - 12)
 	push	bc
 	push	de
+else
+	push	hl	; len
+	ld	bc, (ix - 12)
+	push	de	; x
+	push	bc	; y
+end if
 	call	0			; horizline(a, y, b-a+1);
 .line1 := $-3
 	pop	bc
 	pop	bc
 	pop	bc
-	ld	bc,(ix-12)
+	ld	bc, (ix - 12)
 	inc	bc
-	ld	(ix-12),bc
+	ld	(ix - 12), bc
 .firstloopstart:
-	ld	hl,(ix-24)
-	or	a,a
-	sbc	hl,bc
-	jp	p,.cmp50
-	jp	pe,.firstloop
+	ld	hl, (ix - 24)
+	or	a, a
+	sbc	hl, bc
+	jp	p, .cmp50
+	jp	pe, .firstloop
 	jr	.cmp52
 .cmp50:
-	jp	po,.firstloop
+	jp	po, .firstloop
 .cmp52:
-	ld	bc,(ix+15)
-	ld	hl,(ix-12)
-	or	a,a
-	sbc	hl,bc
-	ld	bc,(ix-30)
+	ld	bc, (ix + ft_y1)
+	ld	hl, (ix - 12)
+	or	a, a
+	sbc	hl, bc
+	ld	bc, (ix - 30)
 	call	_MultiplyHLBC		; sa = dx12 * (y - y1);
-	ld	(ix-15),hl
-	ld	bc,(ix+9)
-	ld	hl,(ix-12)
-	or	a,a
-	sbc	hl,bc
-	ld	bc,(ix-21)
+	ld	(ix - 15), hl
+	ld	bc, (ix + ft_y0)
+	ld	hl, (ix - 12)
+	or	a, a
+	sbc	hl, bc
+	ld	bc, (ix - 21)
 	call	_MultiplyHLBC		; sb = dx02 * (y - y0);
-	ld	(ix-18),hl
+	ld	(ix - 18), hl
 	jp	.secondloopstart	; for(; y <= y2; y++)
 .secondloop:
-	ld	hl,(ix-15)
-	ld	bc,(ix-39)
+	ld	hl, (ix - 15)
+	ld	bc, (ix - 39)
 	call	_DivideHLBC
-	ld	bc,(ix+12)
-	add	hl,bc
-	ld	(ix-3),hl		; a = x1 + sa / dy12;
-	ld	hl,(ix-18)
-	ld	bc,(ix-27)
+	ld	bc, (ix + ft_x1)
+	add	hl, bc
+	ld	(ix - 3), hl		; a = x1 + sa / dy12;
+	ld	hl, (ix - 18)
+	ld	bc, (ix - 27)
 	call	_DivideHLBC
-	ld	bc,(ix+6)
-	add	hl,bc
-	ld	(ix-6),hl		; b = x0 + sb / dy02;
-	ld	bc,(ix-30)
-	ld	hl,(ix-15)
-	add	hl,bc
-	ld	(ix-15),hl		; sa += dx12;
-	ld	bc,(ix-21)
-	ld	hl,(ix-18)
-	add	hl,bc
-	ld	(ix-18),hl		; sb += dx02;
-	ld	de,(ix-3)
-	ld	hl,(ix-6)
-	or	a,a
-	sbc	hl,de			; if (b < a) { swap(a,b); }
-	jp	p,.cmp60
-	jp	pe,.cmp61
+	ld	bc, (ix + ft_x0)
+	add	hl, bc
+	ld	(ix - 6), hl		; b = x0 + sb / dy02;
+	ld	bc, (ix - 30)
+	ld	hl, (ix - 15)
+	add	hl, bc
+	ld	(ix - 15), hl		; sa += dx12;
+	ld	bc, (ix - 21)
+	ld	hl, (ix - 18)
+	add	hl, bc
+	ld	(ix - 18), hl		; sb += dx02;
+	ld	de, (ix - 3)
+	ld	hl, (ix - 6)
+	or	a, a
+	sbc	hl, de			; if (b < a) { swap(a, b); }
+	jp	p, .cmp60
+	jp	pe, .cmp61
 	jr	.cmp62
 .cmp60:
-	jp	po,.cmp61
+	jp	po, .cmp61
 .cmp62:
-	ld	hl,(ix-3)
-	ld	de,(ix-6)
-	ld	(ix-3),de
-	ld	(ix-6),hl
+	ld	hl, (ix - 3)
+	ld	de, (ix - 6)
+	ld	(ix-3), de
+	ld	(ix-6), hl
 .cmp61:
-	ld	hl,(ix-6)
-	or	a,a
-	sbc	hl,de
+	ld	hl, (ix - 6)
+	or	a, a
+	sbc	hl, de
 	inc	hl
+if 0
 	push	hl
-	ld	bc,(ix-12)
+	ld	bc, (ix - 12)
 	push	bc
 	push	de
+else
+	push	hl	; len
+	ld	bc, (ix - 12)
+	push	de	; x
+	push	bc	; y
+end if
 	call	0			; horizline(a, y, b-a+1);
 .line2 := $-3
 	pop	bc
 	pop	bc
 	pop	bc
-	ld	bc,(ix-12)
+	ld	bc, (ix - 12)
 	inc	bc
-	ld	(ix-12),bc
+	ld	(ix - 12), bc
 .secondloopstart:
-	ld	bc,(ix-12)
-	ld	hl,(ix+21)
-	or	a,a
-	sbc	hl,bc
-	jp	p,.cmp70
-	jp	pe,.secondloop
-	ld	sp,ix
+	ld	bc, (ix - 12)
+	ld	hl, (ix + ft_y2)
+	or	a, a
+	sbc	hl, bc
+	jp	p, .cmp70
+	jp	pe, .secondloop
+	ld	sp, ix
 	pop	ix
 	ret
 .cmp70:
-	jp	po,.secondloop
-	ld	sp,ix
+	jp	po, .secondloop
+	ld	sp, ix
 	pop	ix
 	ret
 
