@@ -1641,8 +1641,9 @@ gfy_sprite_t *gfy_AllocSprite(
 }
 #endif
 
-/* gfy_Sprite */
+/* gfy_Sprite (graphy.asm) */
 
+#if 0
 void gfy_Sprite(const gfy_sprite_t *restrict sprite, int24_t x, int24_t y) {
     // test_printf(
     //     "%s: %02X (%d, %d) %dx%d [%d,%d:%d,%d]\n",
@@ -1685,9 +1686,11 @@ void gfy_Sprite(const gfy_sprite_t *restrict sprite, int24_t x, int24_t y) {
         dst_buf += GFY_LCD_HEIGHT;
     }
 }
+#endif
 
-/* gfy_TransparentSprite */
+/* gfy_TransparentSprite (graphy.asm) */
 
+#if 0
 void gfy_TransparentSprite(const gfy_sprite_t *restrict sprite, int24_t x, int24_t y) {
     if (
         x >= gfy_ClipXMax || y >= gfy_ClipYMax ||
@@ -1732,6 +1735,7 @@ void gfy_TransparentSprite(const gfy_sprite_t *restrict sprite, int24_t x, int24
         dst_buf += dst_jump;
     }
 }
+#endif
 
 /* gfy_Sprite_NoClip (graphy.asm) */
 
