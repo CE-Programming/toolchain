@@ -2569,16 +2569,119 @@ gfy_GetClipRegion: ; COPIED_FROM_GRAPHX
 smcByte _TransparentColor
 
 ;-------------------------------------------------------------------------------
-; gfy_TransparentSprite:
-
-; ...
-
-gfy_TransparentSprite.transparent_color := $+1
+gfy_TransparentSprite:
+; Draws a transparent sprite with clipping
+; Arguments:
+;  arg0 : Pointer to sprite
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
+; Returns:
+;  None
+	push	ix			; save ix sp
+	call	_ClipCoordinates
+	jr	nc,.culled
+	ld	(.amount),a
+	ld	a,b			; new width
+	ld	(.next),a
+	ld	ixh,c			; new height
+	ld	b,0
+.transparent_color := $+1
 	ld	a,TRASPARENT_COLOR
 smcByte _TransparentColor
+	wait_quick
+.loop:
+	ld	c,0
+.next := $-1
+	lea	de,iy
+	call	_TransparentPlot	; call the transparent routine
+	ld	c,0
+.amount := $-1
+	add	hl,bc
+	ld	de,ti.lcdHeight		; move to next row
+	add	iy,de
+	dec	ixh
+	jr	nz,.loop
+.culled:
+	pop	ix
+	ret
+
+_TransparentPlot_Opaque:		; routine to handle transparent plotting
+	ldi
+	ret	po
+	cp	a,(hl)
+	jr	z,_TransparentPlot_Transparent
+	ldi
+	ret	po
+	cp	a,(hl)
+	jr	z,_TransparentPlot_Transparent
+	ldi
+	ret	po
+	cp	a,(hl)
+	jr	z,_TransparentPlot_Transparent
+	ldi
+	ret	po
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_Opaque
+_TransparentPlot_Transparent:
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+_TransparentPlot:
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_Opaque
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_Opaque
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+	cp	a,(hl)
+	jr	nz,_TransparentPlot_Opaque
+	inc	de
+	inc	hl
+	dec	c
+	ret	z
+	cp	a,(hl)
+	jr	z,_TransparentPlot_Transparent
+	jr	_TransparentPlot_Opaque
 
 ;-------------------------------------------------------------------------------
-; gfy_Sprite:
+gfy_Sprite:
+; Places an sprite on the screen as fast as possible with clipping
+; Arguments:
+;  arg0 : Pointer to sprite
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
+; Returns:
+;  None
+	push	ix			; save ix sp
+	call	_ClipCoordinates
+	pop	ix			; restore ix sp
+	ret	nc
+	ld	(.amount),a
+	ld	a,b			; new width
+	ld	(.next),a
+	ld	a,c			; new height
+	ld	b,0
+	wait_quick
+.loop:
+	ld	c,0
+.next := $-1
+	lea	de,iy
+	ldir
+	ld	de,ti.lcdHeight
+	add	iy,de
+	ld	c,0
+.amount := $-1
+	add	hl,bc			; move to next line
+	dec	a
+	jr	nz,.loop
+	ret
 
 ;-------------------------------------------------------------------------------
 gfy_Sprite_NoClip:
@@ -2690,51 +2793,6 @@ smcByte _TransparentColor
 	jr	nz,.loop
 	ret
 
-_TransparentPlot_Opaque:		; routine to handle transparent plotting
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	nz,_TransparentPlot_Opaque
-_TransparentPlot_Transparent:
-	inc	de
-	inc	hl
-	dec	c
-	ret	z
-_TransparentPlot:
-	cp	a,(hl)
-	jr	nz,_TransparentPlot_Opaque
-	inc	de
-	inc	hl
-	dec	c
-	ret	z
-	cp	a,(hl)
-	jr	nz,_TransparentPlot_Opaque
-	inc	de
-	inc	hl
-	dec	c
-	ret	z
-	cp	a,(hl)
-	jr	nz,_TransparentPlot_Opaque
-	inc	de
-	inc	hl
-	dec	c
-	ret	z
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
-	jr	_TransparentPlot_Opaque
-
 ;-------------------------------------------------------------------------------
 _ClipCoordinates:
 ; Clipping stuff
@@ -2755,6 +2813,66 @@ _ClipCoordinates:
 	ld	hl,(ix+3)		; hl -> sprite data
 	ld	iy,(hl)			; iyl = width, iyh = height
 
+;-------------------------------------------------------------------------------
+	ld	bc,0
+smcWord _XMin
+	ld	hl,(ix+6)		; hl = x coordinate
+	or	a,a
+	sbc	hl,bc
+	ex	de,hl			; de = x coordinate relative to min x
+	ld	hl,ti.lcdWidth		; hl = clip_width
+smcWord _XSpan
+	xor	a,a
+	ld	b,a
+	ld	c,iyl			; bc = width
+	sbc	hl,bc			; get difference between clip_width and width
+	dec	c			; bc = width - 1
+	jr	nc,.notwider
+	or	a,a
+	sbc	hl,de			; is partially clipped both left and right?
+	jr	nc,.xclip
+	sub	a,e			; a = negated relative x
+	add	hl,de			; use clip_width as the draw width, and clip left
+	jr	.clipleft
+.notwider:
+	sbc	hl,de			; is fully onscreen horizontally?	
+	jr	nc,.xclipped		; a = 0 for bytes to add per iteration
+.xclip:
+	add	hl,bc			; is partially clipped right?
+	ex	de,hl			; e = new width - 1, hl = relative x
+	jr	c,.clipright
+	sub	a,l			; a = negated relative x
+.clipleft:
+	add	hl,bc			; is partially clipped left?
+	ret	nc			; return if offscreen
+	ex	de,hl			; e = new width - 1
+
+if 0
+	ld	c,a			; bc = negated relative x
+else
+	ld	c,a			; bc = negated relative x
+	ld	b,iyh			; b = height
+	mlt	bc			; bc = amount of bytes clipped off
+end if
+	ld	hl,(ix+3)		; hl -> sprite data
+	add	hl,bc
+	ld	(ix+3),hl
+
+	ld	hl,0
+smcWord _XMin
+	ld	(ix+6),hl		; save min x coordinate
+.clipright:
+if 0
+	inc	e
+	ld	a,iyl			; get old width
+	ld	iyl,e			; save new width
+	sub	a,e			; calculate bytes to add per iteration
+else
+	inc	e
+	ld	iyl,e			; save new width
+end if
+.xclipped:
+;-------------------------------------------------------------------------------
 	ld	bc,0
 smcWord _YMin
 	ld	hl,(ix+9)		; hl = y coordinate
@@ -2787,73 +2905,46 @@ smcByte _YSpan
 	add	hl,bc			; is partially clipped top?
 	ret	nc
 	ex	de,hl			; e = new height - 1
+
+if 0
 	ld	c,a			; c = negated relative y
 	ld	b,iyl			; b = width
 	mlt	bc			; bc = amount of bytes clipped off
+else
+	ld	c,a			; c = negated relative y
+end if
 	ld	hl,(ix+3)		; hl -> sprite data
 	add	hl,bc
 	ld	(ix+3),hl		; store new ptr
+
 	ld	(ix+9),0		; save min y coordinate
 smcByte _YMin
+
 .clipbottom:
+if 0
 	inc	e
 	ld	iyh,e			; save new height
-.yclipped:
-
-	ld	bc,0
-smcWord _XMin
-	ld	hl,(ix+6)		; hl = x coordinate
-	or	a,a
-	sbc	hl,bc
-	ex	de,hl			; de = x coordinate relative to min x
-	ld	hl,ti.lcdWidth		; hl = clip_width
-smcWord _XSpan
-	xor	a,a
-	ld	b,a
-	ld	c,iyl			; bc = width
-	sbc	hl,bc			; get difference between clip_width and width
-	dec	c			; bc = width - 1
-	jr	nc,.notwider
-	or	a,a
-	sbc	hl,de			; is partially clipped both left and right?
-	jr	nc,.xclip
-	sub	a,e			; a = negated relative x
-	add	hl,de			; use clip_width as the draw width, and clip left
-	jr	.clipleft
-.notwider:
-	sbc	hl,de			; is fully onscreen horizontally?
-	jr	nc,.xclipped		; a = 0 for bytes to add per iteration
-.xclip:
-	add	hl,bc			; is partially clipped right?
-	ex	de,hl			; e = new width - 1, hl = relative x
-	jr	c,.clipright
-	sub	a,l			; a = negated relative x
-.clipleft:
-	add	hl,bc			; is partially clipped left?
-	ret	nc			; return if offscreen
-	ex	de,hl			; e = new width - 1
-	ld	c,a			; bc = negated relative x
-	ld	hl,(ix+3)		; hl -> sprite data
-	add	hl,bc
-	ld	(ix+3),hl
-	ld	hl,0
-smcWord _XMin
-	ld	(ix+6),hl		; save min x coordinate
-.clipright:
+else
 	inc	e
-	ld	a,iyl			; get old width
-	ld	iyl,e			; save new width
+	ld	a,iyh			; get old height
+	ld	iyh,e			; save new height
 	sub	a,e			; calculate bytes to add per iteration
-.xclipped:
-
+end if
+.yclipped:
+;-------------------------------------------------------------------------------
 	lea.s	bc,iy
-	ld	l,(ix+9)		; l = y coordinate
-	ld	h,ti.lcdWidth / 2
+	ld	hl,(ix+6)		; x
+	ld	e,(ix+9)		; y
+	ld	d, h		; maybe ld d, 0
+	dec	h		; tests if x >= 256
+	ld	h, ti.lcdHeight
+	jr	nz, .x_lt_256
+	ld	d, h		; ld d, ti.lcdHeight * 256
+.x_lt_256:
 	mlt	hl
-	add	hl,hl
-	ld	de,(ix+6)		; de = x coordinate
-	add	hl,de
-	ex	de,hl
+	ex.s	de, hl		; clear upper byte of DE
+	add	hl, de		; add y cord
+	ex	de, hl
 	ld	iy,(CurrentBuffer)
 	add	iy,de
 	ld	hl,(ix+3)		; hl -> sprite data
