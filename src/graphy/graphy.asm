@@ -2580,10 +2580,14 @@ gfy_TransparentSprite:
 	push	ix			; save ix sp
 	call	_ClipCoordinates
 	jr	nc,.culled
+	lea	de,iy
 	ld	(.amount),a
 	ld	a,b			; new width
 	ld	(.next),a
-	ld	ixh,c			; new height
+	cpl
+	add	a, ti.lcdHeight + 1
+	ld	ixl, a
+	ld	ixh, c			; new height
 	ld	b,0
 .transparent_color := $+1
 	ld	a,TRASPARENT_COLOR
@@ -2592,13 +2596,16 @@ smcByte _TransparentColor
 .loop:
 	ld	c,0
 .next := $-1
-	lea	de,iy
+
 	call	_TransparentPlot	; call the transparent routine
 	ld	c,0
 .amount := $-1
 	add	hl,bc
-	ld	de,ti.lcdHeight		; move to next row
-	add	iy,de
+	
+	ld	c,ixl		; move to next row
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
 	dec	ixh
 	jr	nz,.loop
 .culled:
@@ -2663,19 +2670,28 @@ gfy_Sprite:
 	call	_ClipCoordinates
 	pop	ix			; restore ix sp
 	ret	nc
+	lea	de,iy
 	ld	(.amount),a
 	ld	a,b			; new width
 	ld	(.next),a
+	cpl
+	add	a, ti.lcdHeight + 1
+	ld	(.jump), a
 	ld	a,c			; new height
 	ld	b,0
 	wait_quick
+
 .loop:
 	ld	c,0
 .next := $-1
-	lea	de,iy
 	ldir
-	ld	de,ti.lcdHeight
-	add	iy,de
+
+	ld	c, ti.lcdHeight
+.jump := $-1
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+
 	ld	c,0
 .amount := $-1
 	add	hl,bc			; move to next line
@@ -2729,7 +2745,7 @@ gfy_Sprite_NoClip:
 	ldir
 	ld	c, a	; jump
 	ex	de, hl
-	add	hl, bc
+	add	hl, bc	; next column
 	ex	de, hl
 	dec	iyl
 	jr	nz, .loop
@@ -2787,7 +2803,7 @@ smcByte _TransparentColor
 	call	_TransparentPlot	; call the plotter
 	ld	c, iyl
 	ex	de, hl
-	add	hl, bc
+	add	hl, bc			; next column
 	ex	de, hl
 	dec	iyh			; loop for width
 	jr	nz,.loop
@@ -2813,7 +2829,7 @@ _ClipCoordinates:
 	ld	hl,(ix+3)		; hl -> sprite data
 	ld	iy,(hl)			; iyl = width, iyh = height
 
-;-------------------------------------------------------------------------------
+; CLIP X COORDINATE
 	ld	bc,0
 smcWord _XMin
 	ld	hl,(ix+6)		; hl = x coordinate
@@ -2847,13 +2863,9 @@ smcWord _XSpan
 	ret	nc			; return if offscreen
 	ex	de,hl			; e = new width - 1
 
-if 0
-	ld	c,a			; bc = negated relative x
-else
 	ld	c,a			; bc = negated relative x
 	ld	b,iyh			; b = height
 	mlt	bc			; bc = amount of bytes clipped off
-end if
 	ld	hl,(ix+3)		; hl -> sprite data
 	add	hl,bc
 	ld	(ix+3),hl
@@ -2862,17 +2874,11 @@ end if
 smcWord _XMin
 	ld	(ix+6),hl		; save min x coordinate
 .clipright:
-if 0
-	inc	e
-	ld	a,iyl			; get old width
-	ld	iyl,e			; save new width
-	sub	a,e			; calculate bytes to add per iteration
-else
 	inc	e
 	ld	iyl,e			; save new width
-end if
 .xclipped:
-;-------------------------------------------------------------------------------
+; CLIP Y COORDINATE
+	or	a, a	; debug clear carry
 	ld	bc,0
 smcWord _YMin
 	ld	hl,(ix+9)		; hl = y coordinate
@@ -2906,13 +2912,7 @@ smcByte _YSpan
 	ret	nc
 	ex	de,hl			; e = new height - 1
 
-if 0
 	ld	c,a			; c = negated relative y
-	ld	b,iyl			; b = width
-	mlt	bc			; bc = amount of bytes clipped off
-else
-	ld	c,a			; c = negated relative y
-end if
 	ld	hl,(ix+3)		; hl -> sprite data
 	add	hl,bc
 	ld	(ix+3),hl		; store new ptr
@@ -2921,17 +2921,12 @@ end if
 smcByte _YMin
 
 .clipbottom:
-if 0
-	inc	e
-	ld	iyh,e			; save new height
-else
 	inc	e
 	ld	a,iyh			; get old height
 	ld	iyh,e			; save new height
 	sub	a,e			; calculate bytes to add per iteration
-end if
 .yclipped:
-;-------------------------------------------------------------------------------
+; CALCULATE OFFSETS
 	lea.s	bc,iy
 	ld	hl,(ix+6)		; x
 	ld	e,(ix+9)		; y
@@ -2943,7 +2938,7 @@ end if
 .x_lt_256:
 	mlt	hl
 	ex.s	de, hl		; clear upper byte of DE
-	add	hl, de		; add y cord
+	add	hl, de		; add y cord (result is 17 bits)
 	ex	de, hl
 	ld	iy,(CurrentBuffer)
 	add	iy,de
