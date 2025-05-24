@@ -3088,7 +3088,7 @@ PrintChar_2 = $-3
 	jr	_DrawCharacters
 
 ;-------------------------------------------------------------------------------
-gfy_SetTextScale: ; COPIED_FROM_GRAPHX
+gfy_SetTextScale: ; MODIFIED_FROM_GRAPHX
 ; Changes the amount of text scaling (note that height and width are independent)
 ; Arguments:
 ;  arg0 : Width scale (1 is default)
@@ -3181,7 +3181,7 @@ _TextXPos := $-3
 	push	bc	; preserve the old _TextXPos
 	sbc	hl,hl
 	ld	l,a
-	ld	ixh,a			; ixh = char width
+	ld	ixl,a			; ixh = char width
 	ld	a,(_TextWidthScale)
 	ld	h,a
 	mlt	hl
@@ -3204,10 +3204,7 @@ _TextYPos := $-3
 	add	hl, de		; add y cord
 	ld	de, (CurrentBuffer)
 	add	hl, de		; add buffer offset	
-	; IY = draw location		
-	push	hl
-	pop	iy
-
+	ex	de,hl		; DE = draw location
 
 	ld	a, c			; C = character
 	or	a, a
@@ -3219,77 +3216,66 @@ _TextYPos := $-3
 	ld	bc, (_TextData)		; get text data array
 	add	hl, bc
 
-	ld	de,ti.lcdHeight
-
-	ld	ixl,8
+	ld	iy,0
+	ld	ixh,8
 smcByte _TextHeight
 	wait_quick
 	jr	_PrintLargeFont		; SMC the jump
 _TextScaleJump := $ - 1
-	; (SP) = char data pointer 
-	; IY = draw row
-	; HL = draw location
-	; DE = $0000F0 ti.lcdHeight
-	; IXL = char height
-	; B = char width counter
-	; C = char data
-	; IXH = char width
 _PrintNormalFont:
 .loop:
-	ld	c, (hl)
-	push	hl
-	lea	hl, iy	; load row
-	ld	b, ixh
+	ld	c,(hl)			; c = 8 pixels
+	add	iy,de			; get draw location
+	lea	de,iy
+	ld	b,ixh
 .nextpixel:
-	ld	a, TEXT_BG_COLOR
+	ld	a,TEXT_BG_COLOR
 smcByte _TextBGColor
 	rlc	c
-	jr	nc, .bgcolor
-	ld	a, TEXT_FG_COLOR
+	jr	nc,.bgcolor
+	ld	a,TEXT_FG_COLOR
 smcByte _TextFGColor
 .bgcolor:
-	cp	a, TEXT_TP_COLOR		; check if transparent
+	cp	a,TEXT_TP_COLOR		; check if transparent
 gfy_PrintChar.transparent_color := $-1
 smcByte _TextTPColor
-	jr	z, .transparent
-	ld	(hl), a
+	jr	z,.transparent
+	ld	(de),a
 .transparent:
-	add	hl, de	; move to next pixel		
+	inc	de			; move to next pixel
 	djnz	.nextpixel
-	inc	iy	; next column
-	pop	hl
-	inc	hl	; next pixel
+	ld	de,ti.lcdHeight
+	inc	hl
 	dec	ixl
-	jr	nz, .loop
+	jr	nz,.loop
 	pop	hl			; restore hl and stack pointer
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 _PrintLargeFont:
-	ld	a, ixh
-	ld	(_LargeFontHeight), a
 ; Prints in scaled font for prosperity
 ; This is so that way unscaled font can still be reasonably fast
 ; Returns:
 ;  None
-	ld	de,ti.lcdHeight
 .loop:
-	ld	b,1
-_TextHeightScale := $-1
-	ld	c, (hl)
+;	ld	c,(hl)			; c = 8 pixels
+	ld	a,(hl)
+	ld	(_DebugLargeFontPixel), a
 	push	hl
-.hscale:
-	push	bc		
-	lea	hl,iy	; get draw location
-	ld	b, 8
-_LargeFontHeight := $-1
-
+	ld	h,1
+_TextWidthScale := $-1
+.wscale:
+	ld	c,0
+_DebugLargeFontPixel := $-1
+	add	iy,de			; get draw location
+	lea	de,iy
+	ld	b,ixh
 .inner:
 	ld	a,TEXT_BG_COLOR
 smcByte _TextBGColor
-	ld	ixh,1
-_TextWidthScale := $-1
+	ld	l,1
+_TextHeightScale := $-1
 	rlc	c
 	jr	nc,.bgcolor
 	ld	a,TEXT_FG_COLOR
@@ -3299,32 +3285,30 @@ smcByte _TextFGColor
 smcByte _TextTPColor
 	jr	z,.fgcolor
 
-.wscale0:
-	ld	(hl), a
-	add	hl, de
-	dec	ixh
-	jr	nz,.wscale0
+.hscale0:
+	ld	(de),a
+	inc	de
+	dec	l
+	jr	nz,.hscale0
 	djnz	.inner
 	jr	.done
 
 .fgcolor:
-.wscale1:
-	add	hl, de
-	dec	ixh
-	jr	nz,.wscale1		; move to next pixel
+.hscale1:
+	inc	de
+	dec	l
+	jr	nz,.hscale1		; move to next pixel
 	djnz	.inner
-
 .done:
-	inc	iy	; next column
-	pop	bc
-	djnz	.hscale
+	ld	de,ti.lcdHeight
+
+	dec	h
+	jr	nz, .wscale
 
 	pop	hl
-	inc	hl	; next pixel
-
+	inc	hl
 	dec	ixl
 	jr	nz,.loop
-
 	pop	hl			; restore hl and stack pointer
 	pop	ix
 	ret
@@ -3358,10 +3342,12 @@ _PrintChar_Clip:
 	ld	bc,(_TextData)		; get text data array
 	add	hl,bc			; de = draw location
 	ld	de,_TmpCharData		; store pixel data into temporary sprite
-	ld	iyl,8
+	ld	iyl,a			; ixh = char width
+	ld	(_TmpCharSprite),a
+	ld	a,8
 smcByte _TextHeight
-	ld	iyh,a			; ixh = char width
-	ld	(_TmpCharSprite),a	; store width of character we are drawing
+	ld	iyh,a
+	ld	(_TmpCharSprite + 1),a	; store width of character we are drawing
 	call	_GetChar		; store the character data
 
 	ld	hl, gfy_TransparentSprite.transparent_color
@@ -3376,7 +3362,10 @@ smcByte _TextHeight
 	push	bc
 	or	a,a
 	sbc	hl,hl
-	ld	a,iyh
+
+	; ld	a,iyl	; iyl was decremented to zero
+	ld	a, (_TmpCharSprite)
+
 	ld	l,a
 	add	hl,bc
 	ld	(_TextXPos),hl		; move the text x posisition by the character width
@@ -3562,12 +3551,16 @@ gfy_GetSpriteChar: ; COPIED_FROM_GRAPHX
 	ld	de,_TmpCharSprite
 	ex	de,hl
 	push	hl			; save pointer to sprite
+	inc	hl
+	ld	(hl),a			; store width of character we are drawing
+	dec	hl
+	ld	iyl,a			; ixh = char width
 	ld	a,8
 smcByte _TextHeight
-	ld	iyh,a			; ixh = char width
-	ld	(hl),a			; store width of character we are drawing
+	ld	(hl),a
 	inc	hl
-	ld	iyl,a			; height of char
+	ld	iyh,a			; height of char
+
 	inc	hl
 	ex	de,hl
 	call	_GetChar		; read the character into the array
@@ -3575,7 +3568,7 @@ smcByte _TextHeight
 	ret
 
 ;-------------------------------------------------------------------------------
-_GetChar:
+_GetChar: ; MODIFIED_FROM_GRAPHX
 ; Places a character data into a nice buffer
 ; Inputs:
 ;  HL : Points to character pixmap
@@ -3583,58 +3576,36 @@ _GetChar:
 ; Outputs:
 ;  Stored pixmap image
 ;  Uses IY
-
-	push	de
-	ex	(sp), ix
-;	ld	de, 8
-	db	$11
-	db	$08
-smcByte _TextHeight
-	db	$00
-	db	$00
-
 .loop:
-	ld	c, (hl)			; c = 8 pixels (or width based)
-	push	hl
-	lea	hl, ix
-	inc	ix	; next column
-	ld	b, iyh
+	ld	c,(hl)			; c = 8 pixels (or width based)
+	ld	b,iyh
 .nextpixel:
-	ld	a, TEXT_BG_COLOR
+	ld	a,TEXT_BG_COLOR
 smcByte _TextBGColor
 	rlc	c
-	jr	nc, .bgcolor
-	ld	a, TEXT_FG_COLOR
+	jr	nc,.bgcolor
+	ld	a,TEXT_FG_COLOR
 smcByte _TextFGColor
 .bgcolor:
-	cp	a, TEXT_TP_COLOR	; check if transparent
+	cp	a,TEXT_TP_COLOR		; check if transparent
 smcByte _TextTPColor
-	jr	z, .transparent
-	ld	(hl), a
-	add	hl, de	; move to next pixel
+	jr	z,.transparent
+	ld	(de),a
+	inc	de
 	djnz	.nextpixel
-
-	pop	hl
-	inc	hl	; next pixel
+	inc	hl
 	dec	iyl
 	jr	nz,.loop
-
-	pop	ix
 	ret
-
 .transparent:
-	ld	a, 0
+	ld	a,0
 smcByte _TextTPColor
-	ld	(hl), a
-	add	hl, de	; move to next pixel
+	ld	(de),a
+	inc	de			; move to next pixel
 	djnz	.nextpixel
-
-	pop	hl
-	inc	hl	; next pixel
+	inc	hl
 	dec	iyl
 	jr	nz,.loop		; okay we stored the character sprite now draw it
-	
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -5615,7 +5586,8 @@ _DefaultCharSpacing: ; COPIED_FROM_GRAPHX
 	db	8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
 	db	8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
 
-_DefaultTextData: ; COPIED_FROM_GRAPHX
+if 0
+_DefaultTextData: ; row-major
 	db	$00,$00,$00,$00,$00,$00,$00,$00 ;  
 	db	$7E,$81,$A5,$81,$BD,$BD,$81,$7E ; ☺
 	db	$7E,$FF,$DB,$FF,$C3,$C3,$FF,$7E ; ☻
@@ -5744,6 +5716,137 @@ _DefaultTextData: ; COPIED_FROM_GRAPHX
 	db	$E0,$30,$30,$1C,$30,$30,$E0,$00 ; }
 	db	$76,$DC,$00,$00,$00,$00,$00,$00 ; ~
 	db	$00,$10,$38,$6C,$C6,$C6,$FE,$00 ; Δ
+else
+_DefaultTextData: ; column-major
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ;  
+	db	$7E,$81,$AD,$8D,$8D,$AD,$81,$7E ; ☺
+	db	$7E,$FF,$D3,$F3,$F3,$D3,$FF,$7E ; ☻
+	db	$70,$F8,$FC,$7E,$FC,$F8,$70,$00 ; ♥
+	db	$10,$38,$7C,$FE,$7C,$38,$10,$00 ; ♦
+	db	$18,$59,$F9,$FF,$F9,$59,$18,$00 ; ♣
+	db	$08,$1D,$3D,$7F,$7F,$3D,$1D,$08 ; ♠
+	db	$00,$00,$18,$3C,$3C,$18,$00,$00 ; •
+	db	$FF,$FF,$E7,$C3,$C3,$E7,$FF,$FF ; ◘
+	db	$00,$3C,$66,$42,$42,$66,$3C,$00 ; ○
+	db	$FF,$C3,$99,$BD,$BD,$99,$C3,$FF ; ◙
+	db	$0E,$1F,$11,$11,$BF,$FE,$E0,$F0 ; ♂
+	db	$00,$72,$FA,$8F,$8F,$FA,$72,$00 ; ♀
+	db	$03,$07,$FF,$FE,$A0,$A0,$E0,$E0 ; ♪
+	db	$03,$FF,$FE,$A0,$A0,$A6,$FE,$FC ; ♫
+	db	$99,$5A,$3C,$E7,$E7,$3C,$5A,$99 ; *
+	db	$FE,$7C,$7C,$38,$38,$10,$10,$00 ; ►
+	db	$10,$10,$38,$38,$7C,$7C,$FE,$00 ; ◄
+	db	$00,$24,$66,$FF,$FF,$66,$24,$00 ; ↕
+	db	$00,$FA,$FA,$00,$00,$FA,$FA,$00 ; ‼
+	db	$60,$F0,$90,$FE,$FE,$80,$FE,$FE ; ¶
+	db	$01,$79,$FD,$A5,$A5,$BF,$9E,$80 ; §
+	db	$00,$0E,$0E,$0E,$0E,$0E,$0E,$00 ; ▬
+	db	$01,$29,$6D,$FF,$FF,$6D,$29,$01 ; ↨
+	db	$00,$20,$60,$FE,$FE,$60,$20,$00 ; ↑
+	db	$00,$08,$0C,$FE,$FE,$0C,$08,$00 ; ↓
+	db	$10,$10,$10,$54,$7C,$38,$10,$00 ; →
+	db	$10,$38,$7C,$54,$10,$10,$10,$00 ; ←
+	db	$3C,$3C,$04,$04,$04,$04,$04,$00 ; └
+	db	$10,$38,$7C,$10,$10,$7C,$38,$10 ; ↔
+	db	$0C,$1C,$3C,$7C,$7C,$3C,$1C,$0C ; ▲
+	db	$60,$70,$78,$7C,$7C,$78,$70,$60 ; ▼
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ;
+	db	$FA,$FA,$00,$00,$00,$00,$00,$00 ; !
+	db	$E0,$E0,$00,$E0,$E0,$00,$00,$00 ; "
+	db	$28,$FE,$FE,$28,$FE,$FE,$28,$00 ; #
+	db	$24,$74,$54,$D6,$D6,$5C,$48,$00 ; $
+	db	$62,$66,$0C,$18,$30,$66,$46,$00 ; %
+	db	$0C,$5E,$F2,$BA,$EC,$5E,$12,$00 ; &
+	db	$00,$20,$E0,$C0,$00,$00,$00,$00 ; '
+	db	$38,$7C,$C6,$82,$00,$00,$00,$00 ; (
+	db	$82,$C6,$7C,$38,$00,$00,$00,$00 ; )
+	db	$10,$54,$7C,$38,$38,$7C,$54,$10 ; *
+	db	$18,$18,$7E,$7E,$18,$18,$00,$00 ; +
+	db	$01,$07,$06,$00,$00,$00,$00,$00 ; ,
+	db	$10,$10,$10,$10,$10,$10,$00,$00 ; -
+	db	$06,$06,$00,$00,$00,$00,$00,$00 ; .
+	db	$06,$0C,$18,$30,$60,$C0,$80,$00 ; /
+	db	$7C,$FE,$9A,$B2,$E2,$FE,$7C,$00 ; 0
+	db	$02,$42,$FE,$FE,$02,$02,$00,$00 ; 1
+	db	$4E,$DE,$92,$92,$92,$F2,$62,$00 ; 2
+	db	$82,$82,$92,$92,$92,$FE,$6C,$00 ; 3
+	db	$78,$78,$08,$08,$FE,$FE,$08,$00 ; 4
+	db	$E4,$E6,$A2,$A2,$A2,$BE,$9C,$00 ; 5
+	db	$7C,$FE,$92,$92,$92,$9E,$0C,$00 ; 6
+	db	$80,$80,$86,$8E,$98,$F0,$E0,$00 ; 7
+	db	$6C,$FE,$92,$92,$92,$FE,$6C,$00 ; 8
+	db	$60,$F2,$92,$92,$92,$FE,$7C,$00 ; 9
+	db	$66,$66,$00,$00,$00,$00,$00,$00 ; :
+	db	$01,$67,$66,$00,$00,$00,$00,$00 ; ;
+	db	$10,$38,$6C,$C6,$82,$00,$00,$00 ; <
+	db	$28,$28,$28,$28,$28,$28,$00,$00 ; =
+	db	$82,$C6,$6C,$38,$10,$00,$00,$00 ; >
+	db	$40,$C0,$9A,$BA,$E0,$40,$00,$00 ; ?
+	db	$7C,$FE,$82,$BA,$BA,$FA,$7A,$00 ; @
+	db	$3E,$7E,$C8,$88,$C8,$7E,$3E,$00 ; A
+	db	$FE,$FE,$92,$92,$92,$FE,$6C,$00 ; B
+	db	$7C,$FE,$82,$82,$82,$C6,$44,$00 ; C
+	db	$FE,$FE,$82,$82,$C6,$7C,$38,$00 ; D
+	db	$FE,$FE,$92,$92,$92,$82,$82,$00 ; E
+	db	$FE,$FE,$90,$90,$90,$80,$80,$00 ; F
+	db	$7C,$FE,$82,$82,$8A,$CE,$4C,$00 ; G
+	db	$FE,$FE,$10,$10,$10,$FE,$FE,$00 ; H
+	db	$00,$82,$82,$FE,$FE,$82,$82,$00 ; I
+	db	$04,$06,$02,$02,$02,$FE,$FC,$00 ; J
+	db	$FE,$FE,$10,$38,$6C,$C6,$82,$00 ; K
+	db	$FE,$FE,$02,$02,$02,$02,$02,$00 ; L
+	db	$FE,$FE,$70,$38,$70,$FE,$FE,$00 ; M
+	db	$FE,$FE,$60,$30,$18,$FE,$FE,$00 ; N
+	db	$7C,$FE,$82,$82,$82,$FE,$7C,$00 ; O
+	db	$FE,$FE,$90,$90,$90,$F0,$60,$00 ; P
+	db	$7C,$FE,$82,$8E,$86,$FF,$7D,$00 ; Q
+	db	$FE,$FE,$90,$98,$9C,$F6,$62,$00 ; R
+	db	$64,$F6,$92,$92,$92,$DE,$4C,$00 ; S
+	db	$80,$80,$80,$FE,$FE,$80,$80,$80 ; T
+	db	$FE,$FE,$02,$02,$02,$FE,$FE,$00 ; U
+	db	$F8,$FC,$06,$06,$06,$FC,$F8,$00 ; V
+	db	$FC,$FE,$06,$0C,$06,$FE,$FC,$00 ; W
+	db	$C6,$EE,$38,$10,$38,$EE,$C6,$00 ; X
+	db	$E2,$F2,$16,$1C,$18,$F0,$E0,$00 ; Y
+	db	$82,$86,$8E,$9A,$B2,$E2,$C2,$00 ; Z
+	db	$FE,$FE,$82,$82,$00,$00,$00,$00 ; [
+	db	$80,$C0,$60,$30,$18,$0C,$06,$00 ; \
+	db	$82,$82,$FE,$FE,$00,$00,$00,$00 ; ]
+	db	$10,$30,$60,$C0,$60,$30,$10,$00 ; ^
+	db	$01,$01,$01,$01,$01,$01,$01,$01 ; _
+	db	$C0,$E0,$20,$00,$00,$00,$00,$00 ; `
+	db	$04,$2E,$2A,$2A,$2A,$3E,$1E,$00 ; a
+	db	$FE,$FE,$12,$12,$12,$1E,$0C,$00 ; b
+	db	$1C,$3E,$22,$22,$22,$36,$14,$00 ; c
+	db	$0C,$1E,$12,$12,$12,$FE,$FE,$00 ; d
+	db	$1C,$3E,$2A,$2A,$2A,$3A,$18,$00 ; e
+	db	$00,$12,$7E,$FE,$92,$C0,$40,$00 ; f
+	db	$19,$3D,$25,$25,$25,$3F,$3E,$00 ; g
+	db	$FE,$FE,$20,$20,$20,$3E,$1E,$00 ; h
+	db	$22,$BE,$BE,$02,$00,$00,$00,$00 ; i
+	db	$02,$03,$01,$01,$01,$BF,$BE,$00 ; j
+	db	$FE,$FE,$08,$18,$3C,$26,$02,$00 ; k
+	db	$82,$FE,$FE,$02,$00,$00,$00,$00 ; l
+	db	$3E,$3E,$18,$1E,$38,$3E,$1E,$00 ; m
+	db	$3E,$3E,$20,$20,$20,$3E,$1E,$00 ; n
+	db	$1C,$3E,$22,$22,$22,$3E,$1C,$00 ; o
+	db	$3F,$3F,$24,$24,$24,$3C,$18,$00 ; p
+	db	$18,$3C,$24,$24,$24,$3F,$3F,$00 ; q
+	db	$3E,$3E,$20,$20,$20,$30,$10,$00 ; r
+	db	$12,$3A,$2A,$2A,$2A,$2E,$24,$00 ; s
+	db	$20,$20,$FC,$FE,$22,$22,$00,$00 ; t
+	db	$3C,$3E,$02,$02,$02,$3E,$3E,$00 ; u
+	db	$38,$3C,$06,$06,$06,$3C,$38,$00 ; v
+	db	$3C,$3E,$06,$0C,$06,$3E,$3C,$00 ; w
+	db	$22,$36,$1C,$08,$1C,$36,$22,$00 ; x
+	db	$39,$3D,$05,$05,$05,$3F,$3E,$00 ; y
+	db	$22,$26,$2E,$2A,$3A,$32,$22,$00 ; z
+	db	$10,$10,$7C,$EE,$82,$82,$00,$00 ; {
+	db	$EE,$EE,$00,$00,$00,$00,$00,$00 ; |
+	db	$82,$82,$EE,$7C,$10,$10,$00,$00 ; }
+	db	$40,$C0,$80,$C0,$40,$C0,$80,$00 ; ~
+	db	$0E,$1E,$32,$62,$32,$1E,$0E,$00 ; Δ
+end if
 
 _LcdTiming:
 ;	db	14 shl 2		; PPL shl 2
