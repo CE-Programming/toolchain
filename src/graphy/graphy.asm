@@ -2579,35 +2579,33 @@ gfy_TransparentSprite:
 ;  None
 	push	ix			; save ix sp
 	call	_ClipCoordinates
-	jr	nc,.culled
-	lea	de,iy
-	ld	(.amount),a
-	ld	a,b			; new width
-	ld	(.next),a
+	jr	nc, .culled
+	ld	iyh, a	; (.amount)
+	ld	a, b			; new width
+	ld	iyl, a	; (.next)
 	cpl
 	add	a, ti.lcdHeight + 1
-	ld	ixl, a
+	ld	ixl, a	; (.jump)
 	ld	ixh, c			; new height
-	ld	b,0
+	ld	b, 0
 .transparent_color := $+1
-	ld	a,TRASPARENT_COLOR
+	ld	a, TRASPARENT_COLOR
 smcByte _TransparentColor
 	wait_quick
 .loop:
-	ld	c,0
-.next := $-1
+	ld	c, iyl	; (.next)
 
 	call	_TransparentPlot	; call the transparent routine
-	ld	c,0
-.amount := $-1
-	add	hl,bc
+	ld	c, iyh	; (.amount)
+	add	hl, bc	; move to next line
 	
-	ld	c,ixl		; move to next row
+	ld	c, ixl	; (.jump)
 	ex	de, hl
-	add	hl, bc
+	add	hl, bc	; move to next column
 	ex	de, hl
+
 	dec	ixh
-	jr	nz,.loop
+	jr	nz, .loop
 .culled:
 	pop	ix
 	ret
@@ -2668,35 +2666,33 @@ gfy_Sprite:
 ;  None
 	push	ix			; save ix sp
 	call	_ClipCoordinates
-	pop	ix			; restore ix sp
-	ret	nc
-	lea	de,iy
-	ld	(.amount),a
-	ld	a,b			; new width
-	ld	(.next),a
+	jr	nc, .culled
+	ld	iyh, a	; (.amount)
+	ld	a, b			; new width
+	ld	iyl, a	; (.next)
 	cpl
 	add	a, ti.lcdHeight + 1
-	ld	(.jump), a
-	ld	a,c			; new height
-	ld	b,0
+	ld	ixl, a	; (.jump)
+	ld	a, c			; new height
+	ld	b, 0
 	wait_quick
 
 .loop:
-	ld	c,0
-.next := $-1
+	ld	c, iyl	; (.next)
 	ldir
 
-	ld	c, ti.lcdHeight
-.jump := $-1
+	ld	c, iyh	; (.amount)
+	add	hl, bc	; move to next line
+
+	ld	c, ixl	; (.jump)
 	ex	de, hl
-	add	hl, bc
+	add	hl, bc	; move to next column
 	ex	de, hl
 
-	ld	c,0
-.amount := $-1
-	add	hl,bc			; move to next line
 	dec	a
-	jr	nz,.loop
+	jr	nz, .loop
+.culled:
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2822,18 +2818,18 @@ _ClipCoordinates:
 ;  B  : New sprite height
 ;  C  : New sprite width
 ;  HL : Sprite pixel pointer
-;  IY : Buffer pixel pointer
+;  DE : Buffer pixel pointer
 ;  NC : If offscreen
-	ld	ix,6			; get pointer to arguments
-	add	ix,sp
-	ld	hl,(ix+3)		; hl -> sprite data
-	ld	iy,(hl)			; iyl = width, iyh = height
+	ld	ix, 6			; get pointer to arguments
+	add	ix, sp
+	ld	hl, (ix + 3)		; hl -> sprite data
+	ld	iy, (hl)		; iyl = width, iyh = height
 
 ; CLIP X COORDINATE
 	ld	bc,0
 smcWord _XMin
 	ld	hl,(ix+6)		; hl = x coordinate
-	or	a,a
+;	or	a,a
 	sbc	hl,bc
 	ex	de,hl			; de = x coordinate relative to min x
 	ld	hl,ti.lcdWidth		; hl = clip_width
@@ -2877,11 +2873,12 @@ smcWord _XMin
 	inc	e
 	ld	iyl,e			; save new width
 .xclipped:
+
 ; CLIP Y COORDINATE
-	or	a, a	; debug clear carry
 	ld	bc,0
 smcWord _YMin
 	ld	hl,(ix+9)		; hl = y coordinate
+	or	a,a
 	sbc	hl,bc
 	ex	de,hl			; de = y coordinate relative to min y
 	ld	a,ti.lcdHeight		; a = clip_height
@@ -2927,9 +2924,9 @@ smcByte _YMin
 	sub	a,e			; calculate bytes to add per iteration
 .yclipped:
 ; CALCULATE OFFSETS
-	lea.s	bc,iy
-	ld	hl,(ix+6)		; x
-	ld	e,(ix+9)		; y
+	lea.s	bc, iy
+	ld	hl, (ix+6)		; x
+	ld	e, (ix+9)		; y
 	ld	d, h		; maybe ld d, 0
 	dec	h		; tests if x >= 256
 	ld	h, ti.lcdHeight
@@ -2939,9 +2936,11 @@ smcByte _YMin
 	mlt	hl
 	ex.s	de, hl		; clear upper byte of DE
 	add	hl, de		; add y cord (result is 17 bits)
-	ex	de, hl
-	ld	iy,(CurrentBuffer)
-	add	iy,de
+
+	ld	de, (CurrentBuffer)
+	add	hl, de
+	ex	de, hl			; de -> buffer pointer 
+
 	ld	hl,(ix+3)		; hl -> sprite data
 	inc	hl
 	inc	hl
