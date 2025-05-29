@@ -2948,19 +2948,60 @@ smcByte _YMin
 	ret
 
 ;-------------------------------------------------------------------------------
-; gfy_TransparentTilemap_NoClip:
-
+gfy_TransparentTilemap_NoClip: ; COPIED_FROM_GRAPHX
+; Tilemapping subsection
+	ld	hl,gfy_TransparentSprite_NoClip
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-; gfy_Tilemap_NoClip:
-
+gfy_Tilemap_NoClip: ; COPIED_FROM_GRAPHX
+; Tilemapping subsection
+	ld	hl,gfy_Sprite_NoClip
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+if 0
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-; gfy_TransparentTilemap:
-
+gfy_TransparentTilemap: ; COPIED_FROM_GRAPHX
+; Tilemapping subsection
+	ld	hl,gfy_TransparentSprite
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-; gfy_Tilemap:
-
-; ...
-
+gfy_Tilemap: ; COPIED_FROM_GRAPHX
+	ld	hl,gfy_Sprite
+end if
+; Draws a tilemap given a tile map structure and some offsets
+; Arguments:
+;  arg0 : Tilemap Struct
+;  arg1 : X Pixel Offset (Unsigned)
+;  arg2 : Y Pixel Offset (Unsigned)
+; Returns:
+;  None
+; C Function:
+;  void DrawBGTilemap(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
+;      int x_draw, y_draw;
+;      uint8_t x, x_tile, y_tile, y_next;
+;      uint8_t x_res = x_offset/tilemap->tile_width;
+;      uint8_t y = y_offset/tilemap->tile_height;
+;
+;      x_offset = x_offset%tilemap->tile_width;
+;      y_offset = y_offset%tilemap->tile_height;
+;
+;      y_draw = tilemap->y_loc-y_offset;
+;      for(y_tile = 0; y_tile <= tilemap->draw_height; y_tile++) {
+;          x = x_res;
+;          y_next = y*tilemap->width;
+;          x_draw = tilemap->x_loc-x_offset;
+;          for(x_tile = 0; x_tile <= tilemap->draw_width; x_tile++) {
+;              gfx_Sprite(tilemap->tiles[tilemap->map[x+y_next]], x_draw, y_draw, tilemap->tile_width, tilemap->tile_height);
+;              x_draw += tilemap->tile_width;
+;              x++;
+;          }
+;          y_draw += tilemap->tile_height;
+;          y++;
+;      }
+;  }
+;
 t_data        := 0
 t_type_width  := 10
 t_type_height := 11
@@ -2973,6 +3014,149 @@ t_draw_width  := 9
 t_x_loc       := 15
 x_offset      := 9
 y_offset      := 12
+
+_Tilemap:
+	ld	(.tilemethod),hl
+	push	ix
+	ld	ix,0
+	lea	bc,ix
+	add	ix,sp
+	lea	hl,ix-12
+	ld	sp,hl
+	ld	iy,(ix+6)		; iy -> tilemap structure
+
+	ld	hl,(ix+y_offset)
+	ld	c,(iy+t_tile_height)
+	ld	a,(iy+t_type_height)
+	or	a,a
+	jr	nz,.heightpow2
+	call	ti._idvrmu
+	ex	de,hl
+	push	de
+	pop	bc
+	jr	.heightnotpow2
+.heightpow2:				; compute as power of 2 height using shifts
+	ld	b,a
+	dec	c
+	ld	a,l
+	and	a,c
+	ld	c,a
+.div0:
+	srl	h
+	rr	l
+	djnz	.div0
+.heightnotpow2:
+	ld	(ix-4),l		; y = y_offset / tilemap->tile_height
+	ld	(ix+y_offset),bc	; y_offset = y_offset % tilemap->tile_height;
+
+	ld	c,(iy+t_tile_width)
+	ld	hl,(ix+x_offset)	; x offset
+	ld	a,(iy+t_type_width)
+	or	a,a
+	jr	nz,.widthpow2
+	call	ti._idvrmu
+	ex	de,hl
+	push	de
+	pop	bc
+	jr	.widthnotpow2
+.widthpow2:
+	ld	b,a
+	dec	c
+	ld	a,l
+	and	a,c
+	ld	c,a
+.div1:
+	srl	h
+	rr	l
+	djnz	.div1
+.widthnotpow2:
+	ld	a,l
+	ld	(.xres),a
+	ld	hl,(iy+t_x_loc)
+	or	a,a
+	sbc	hl,bc
+	ld	(.xoffset),hl		; tilemap->x_loc - x_offset;
+
+	or	a,a
+	sbc	hl,hl
+	ld	l,(iy+14)
+	ld	bc,(ix+y_offset)
+	ld	(ix-3),h
+	sbc	hl,bc
+	ld	(ix-12),hl
+	jp	.yloop
+
+.xres := $+3
+.loop:
+	ld	(ix-1),0
+	ld	hl,0
+.xoffset := $-3
+	ld	(ix-7),hl
+	ld	l,(iy+t_width)
+	ld	h,(ix-4)
+	mlt	hl
+	ld	(.ynext),hl
+	xor	a,a
+	jr	.xloop
+
+.xloopinner:
+	or	a,a
+	sbc	hl,hl
+	ld	l,(ix-1)
+	ld	bc,(iy+t_data)		; iy -> tilemap data
+	add	hl,bc
+	ld	bc,0
+.ynext := $-3
+	add	hl,bc
+	ld	a,(hl)
+	ld	l,a
+	inc	a
+	jr	z,.blanktile
+	ld	h,3
+	mlt	hl
+	ld	de,(iy+3)
+	add	hl,de
+	ld	bc,(ix-12)
+	push	bc
+	ld	bc,(ix-7)
+	push	bc
+	ld	bc,(hl)
+	push	bc
+	call	0			; call sprite drawing routine
+.tilemethod := $-3
+	lea	hl,ix-12
+	ld	sp,hl
+.blanktile:
+	or	a,a
+	sbc	hl,hl
+	ld	iy,(ix+6)
+	ld	l,(iy+7)
+	ld	bc,(ix-7)
+	add	hl,bc
+	ld	(ix-7),hl
+	inc	(ix-1)
+	ld	a,(ix-2)
+	inc	a
+
+.xloop:
+	ld	(ix-2),a
+	cp	a,(iy+t_draw_width)
+	jr	nz,.xloopinner
+	ld	h,0
+	ld	l,(iy+6)
+	ld	bc,(ix-12)
+	add	hl,bc
+	ld	(ix-12),hl
+	inc	(ix-4)
+	inc	(ix-3)
+
+.yloop:
+	ld	a,(iy+t_draw_height)
+	cp	a,(ix-3)
+	jp	nz,.loop
+	ld	sp,ix
+	pop	ix
+	ret
 
 ;-------------------------------------------------------------------------------
 gfy_TilePtr: ; COPIED_FROM_GRAPHX
@@ -5066,7 +5250,76 @@ _16Mul16SignedNeg:
 ; gfy_RLETSprite:
 
 ;-------------------------------------------------------------------------------
-; gfy_RLETSprite_NoClip:
+gfy_RLETSprite_NoClip: ; MODIFIED_FROM_GRAPHX
+	ld	iy, 0
+	lea	bc, iy + 0
+	add	iy, sp
+	ld	e, (iy + 9)
+	ld	hl, (iy + 6)
+	ld	d, h		; maybe ld d, 0
+	dec	h		; tests if x >= 256
+	ld	h, ti.lcdHeight
+	ld	a, h	; ld a, ti.lcdHeight
+	jr	nz, .x_lt_256
+	ld	d, h		; ld d, ti.lcdHeight * 256
+.x_lt_256:
+	mlt	hl
+	ex.s	de, hl		; clear upper byte of DE
+	add	hl, de		; add y cord
+	ld	de, (CurrentBuffer)
+	add	hl, de		; add buffer offset
+	ex	de, hl		; de = top-left corner of sprite in buffer
+
+; Read the sprite width and height.
+	ld	hl,(iy+3)		; hl = sprite struct
+	ld	iy,(hl)			; iyh = height, iyl = width
+	inc	hl
+	;	ld	a, ti.lcdHeight
+	sub	a, (hl)
+	inc	hl			; hl = sprite data
+; Initialize values for looping.
+_RLETSprite_NoClip_Begin:
+; Generate the code to advance the buffer pointer to the start of the next row.
+	ld	(_RLETSprite_NoClip_ColumnDelta_SMC), a
+	wait_quick
+; Column loop
+_RLETSprite_NoClip_Column:
+	ld	a,iyh			; a = height
+;; Data loop {
+_RLETSprite_NoClip_Trans:
+;;; Read the length of a transparent run and skip that many bytes in the buffer.
+	ld	c,(hl)			; bc = trans run length
+	inc	hl
+	sub	a,c			; a = height remaining after trans run
+	ex	de,hl			; de = sprite, hl = buffer
+_RLETSprite_NoClip_TransSkip:
+	add	hl,bc			; skip trans run
+;;; Break out of data loop if height remaining == 0.
+	jr	z,_RLETSprite_NoClip_ColumnEnd ; z ==> height remaining == 0
+	ex	de,hl			; de = buffer, hl = sprite
+_RLETSprite_NoClip_Opaque:
+;;; Read the length of an opaque run and copy it to the buffer.
+	ld	c,(hl)			; bc = opaque run length
+	inc	hl
+	sub	a,c			; a = height remaining after opqaue run
+_RLETSprite_NoClip_OpaqueCopy:
+	ldir				; copy opaque run
+;;; Continue data loop while height remaining != 0.
+	jr	nz,_RLETSprite_NoClip_Trans ; nz ==> height remaining != 0
+	ex	de,hl			; de = sprite, hl = buffer
+;; }
+_RLETSprite_NoClip_ColumnEnd:
+;; Advance buffer pointer to the next column
+	ld	c,0			; c = (lcdHeight-height)
+_RLETSprite_NoClip_ColumnDelta_SMC := $-1
+	add	hl,bc			; advance buffer to next column
+	ex	de,hl			; de = buffer, hl = sprite
+;; Decrement width remaining. Continue column loop while not zero.
+	dec	iyl			; decrement width remaining
+	jr	nz,_RLETSprite_NoClip_Column ; nz ==> width remaining != 0
+; }
+; Done.
+	ret
 
 ;-------------------------------------------------------------------------------
 gfy_ConvertFromRLETSprite: ; MODIFIED_FROM_GRAPHX
