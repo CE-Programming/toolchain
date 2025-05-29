@@ -1382,41 +1382,11 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
     if (draw_sizeX == 0 || draw_sizeY == 0) {
         return;
     }
-
-    gfy_Wait();
     
     /* Debugging */ const uint24_t map_size = tilemap->width * tilemap->height;
 
     uint24_t map_index = map_row + (map_col * tilemap->width);
     const uint24_t map_jump = (tilemap->width - draw_sizeX);
-
-    void (*plot_function)(const gfy_sprite_t*, uint24_t, uint8_t) = gfy_Sprite_NoClip;
-
-#if 0
-    switch (tilemap->type_height) {
-        case gfy_tile_2_pixel:
-            plot_function = gfy_Sprite_NoClip_Size2;
-            break;
-        case gfy_tile_4_pixel:
-            plot_function = gfy_Sprite_NoClip_Size4;
-            break;
-        case gfy_tile_8_pixel:
-            plot_function = gfy_Sprite_NoClip_Size8;
-            break;
-        case gfy_tile_16_pixel:
-            plot_function = gfy_Sprite_NoClip_Size16;
-            break;
-        case gfy_tile_32_pixel:
-            plot_function = gfy_Sprite_NoClip_Size32;
-            break;
-        case gfy_tile_64_pixel:
-            plot_function = gfy_Sprite_NoClip_Size64;
-            break;
-        case gfy_tile_128_pixel:
-            plot_function = gfy_Sprite_NoClip_Size128;
-            break;
-    }
-#endif
 
     const uint24_t limitX = gfy_ClipXMax - tilemap->tile_width;
     const uint24_t limitY = gfy_ClipYMax - tilemap->tile_height;
@@ -1428,7 +1398,7 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
                     return; // Optimize this out
                 }
                 if (posX < limitX) {
-                    (*plot_function)(tilemap->tiles[tilemap->map[map_index]], posX, posY);
+                    gfy_Sprite_NoClip(tilemap->tiles[tilemap->map[map_index]], posX, posY);
                 } else {
                     gfy_Sprite(tilemap->tiles[tilemap->map[map_index]], posX, posY);
                 }
@@ -1450,8 +1420,9 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
     }
 }
 
+/* gfy_Tilemap_NoClip (graphy.asm) */
 
-/* gfy_Tilemap_NoClip */
+#if 0
 
 void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_t y_offset) {
     gfy_Wait();
@@ -1506,6 +1477,8 @@ void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_
     }
 }
 
+#endif
+
 /* gfy_TransparentTilemap */
 
 void gfy_TransparentTilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_offset) {
@@ -1541,6 +1514,10 @@ void gfy_TransparentTilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uin
         } else if (posY_offset != 0) {
             posY += tilemap->tile_height;
         }
+    }
+
+    if (draw_sizeX == 0 || draw_sizeY == 0) {
+        return;
     }
 
     /* Debugging */ const uint24_t map_size = tilemap->width * tilemap->height;
@@ -1580,7 +1557,9 @@ void gfy_TransparentTilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uin
     }
 }
 
-/* gfy_TransparentTilemap_NoClip */
+/* gfy_TransparentTilemap_NoClip (graphy.asm) */
+
+#if 0
 
 void gfy_TransparentTilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_t y_offset) {
     uint24_t map_row = x_offset / tilemap->tile_width;
@@ -1603,6 +1582,8 @@ void gfy_TransparentTilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offs
         posY += tilemap->tile_height;
     }
 }
+
+#endif
 
 /* gfy_TilePtr (graphy.asm) */
 
@@ -2637,7 +2618,9 @@ void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24
     }
 }
 
-/* gfy_RLETSprite_NoClip */
+/* gfy_RLETSprite_NoClip (graphy.asm) */
+
+#if 0
 
 void gfy_RLETSprite_NoClip(const gfy_rletsprite_t *sprite, const uint24_t x, const uint8_t y) {
     gfy_Wait();
@@ -2665,6 +2648,8 @@ void gfy_RLETSprite_NoClip(const gfy_rletsprite_t *sprite, const uint24_t x, con
         dst_buf += dst_jump;
     }
 }
+
+#endif
 
 /* gfy_ConvertFromRLETSprite (graphy.asm) */
 
@@ -2961,8 +2946,8 @@ void gfy_CopyRectangle(
         if (src_buf > dst_buf) {
             for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
                 memmove(dst_buf, src_buf, height);
-                src_buf += jump;
-                dst_buf += jump;
+                src_buf += GFY_LCD_HEIGHT;
+                dst_buf += GFY_LCD_HEIGHT;
             }
             return;
         }
@@ -2971,15 +2956,15 @@ void gfy_CopyRectangle(
         src_buf += jump_to_end;
         dst_buf += jump_to_end;
         for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
-            src_buf -= jump;
-            dst_buf -= jump;
+            src_buf -= GFY_LCD_HEIGHT;
+            dst_buf -= GFY_LCD_HEIGHT;
             memmove(dst_buf, src_buf, height);
         }
     }
     for (uint24_t x_cord = 0; x_cord < width; x_cord++) {
         memcpy(dst_buf, src_buf, height);
-        src_buf += jump;
-        dst_buf += jump;
+        src_buf += GFY_LCD_HEIGHT;
+        dst_buf += GFY_LCD_HEIGHT;
     }
 }
 
