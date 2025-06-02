@@ -1992,14 +1992,15 @@ gfx_Line:
 	call	_ComputeOutcode
 	ld	(iy-2),a
 CohenSutherlandLoop:
-	ld	b,(iy-1)		; b = outcode0
 	ld	a,(iy-2)		; a = outcode1
+.skip_ld_A:
+	ld	b,(iy-1)		; b = outcode0
 	tst	a,b
-	jp	nz,TrivialReject	; if(outcode0|outcode1)
+	jr	nz,TrivialReject	; if(outcode0|outcode1)
 	or	a,a
 	jr	nz,GetOutOutcode
 	or	a,b
-	jp	z,TrivialAccept
+	jr	z,TrivialAccept
 GetOutOutcode:				; select correct outcode
 	push	af			; a = outoutcode
 	rra
@@ -2042,6 +2043,14 @@ NotBottom:
 	ld	hl,ti.lcdWidth-1
 smcWord _XMaxMinus1
 	jr	ComputeNewY
+
+TrivialReject:
+	ld	sp, iy
+	ret
+TrivialAccept:
+	ld	sp, iy
+	jr	_Line_NoClip		; line routine handler
+
 NotRight:
 	rra
 	jr	nc,FinishComputations	; if (outcodeOut & LEFT)
@@ -2085,17 +2094,7 @@ OutcodeOutOutcode1:
 	ld	(iy+12),de
 	call	_ComputeOutcode
 	ld	(iy-2),a		; c = outcode1
-	jp	CohenSutherlandLoop
-TrivialReject:
-	inc	sp
-	inc	sp
-	inc	sp
-	ret
-TrivialAccept:
-	inc	sp
-	inc	sp
-	inc	sp
-;	jr	_Line_NoClip		; line routine handler
+	jp	CohenSutherlandLoop.skip_ld_A
 
 ;-------------------------------------------------------------------------------
 gfx_Line_NoClip:
@@ -2109,19 +2108,21 @@ gfx_Line_NoClip:
 ;  None
 	ld	iy,0
 	add	iy,sp
+_Line_NoClip:
 	ld	hl,(iy+3)
 	ld	de,(iy+9)
 	ld	b,(iy+6)
 	ld	c,(iy+12)		; line from hl,b to de,c
-	or	a,a
+;	or	a,a
 	sbc	hl,de
 	add	hl,de
-	jr	c,+_			; draw left to right
+	jr	c,_draw_left_to_right	; draw left to right
 	ex	de,hl
 	ld	a,b
 	ld	b,c
 	ld	c,a
-_:	push	bc
+_draw_left_to_right:
+	push	bc
 	pop	iy
 	push	hl
 	ld	hl,(CurrentBuffer)
@@ -2146,17 +2147,18 @@ _:	push	bc
 	sbc	hl,hl
 	ld	l,a			; y0
 	sbc	hl,de
-	jr	nc,$+9
+	jr	nc,.positive_dy
 	ex	de,hl
+	or	a, a
 	sbc	hl,hl
-	ccf
-	sbc	hl,de
-	inc	hl			; abs(dy)
+	sbc	hl,de			; abs(dy)			
+.positive_dy:
 	ld	a,iyl
 	sub	a,iyh
 	ld	iy,-320
-	jr	c,$+7
+	jr	c,.use_negative_IY
 	ld	iy,320
+.use_negative_IY:
 	or	a,a
 	sbc	hl,bc
 	add	hl,bc			; hl = dy
@@ -2165,15 +2167,15 @@ dl_horizontal:
 	ld	a,l
 	or	a,h
 	ld	a,$38
-	jr	nz,$+4
+	jr	nz,.dl_nz
 	xor	a,$20
+.dl_nz:
 	ld	(_smc_dl_jr_0 + 0),a ; write smc
 	ld	(_smc_dl_width_1 + 1),iy ; write smc
 	ex	de,hl
+;	or	a,a	; or a,h clears carry
 	sbc	hl,hl
-	ccf
 	sbc	hl,de
-	inc	hl
 	ex	de,hl			; de = -dy
 	pop	hl			; restore buffer
 	ld	(_smc_dl_dx_1 + 1),bc ; write smc
@@ -3998,8 +4000,7 @@ gfx_SetFontData:
 ; Returns:
 ;  Pointer to previous font data
 	pop	de
-	pop	hl
-	push	hl			; hl -> custom font data
+	ex	(sp), hl		; hl -> custom font data
 	push	de
 	add	hl,de
 	or	a,a
@@ -4050,8 +4051,7 @@ gfx_SetFontSpacing:
 ; Returns:
 ;  None
 	pop	de
-	pop	hl
-	push	hl			; hl -> custom font width
+	ex	(sp), hl		; hl -> custom font width
 	push	de
 	add	hl,de
 	or	a,a
@@ -4069,11 +4069,10 @@ gfx_SetMonospaceFont:
 ;  arg0 : Monospace spacing amount
 ; Returns:
 ;  None
-	pop	hl
 	pop	de
+	ex	(sp), hl
 	push	de
-	push	hl
-	ld	a,e			; a = width
+	ld	a,l			; a = width
 	ld	(_TextFixedWidth),a	; store the value of the monospace width
 	ret
 
@@ -4215,9 +4214,6 @@ _FillTriangle:
 	push	de
 	call	0			; horizline(a, y0, b-a+1);
 .line0 := $-3
-	pop	bc
-	pop	bc
-	pop	bc
 	ld	sp,ix
 	pop	ix
 	ret				; return;
@@ -5320,21 +5316,23 @@ _smc_dsrs_sinf_1:			; smc = sinf
 
 getSinCos:
 	; returns a = sin/cos(a) * 128
-	ld	c,a
-	bit	7,a
-	jr	z,$+4
-	sub	a,128
-	bit	6,a
-	jr	z,$+6
-	ld	e,a
-	ld	a,128
-	sub	a,e
-	ld	de,0
-	ld	e,a
-	ld	hl,_SineTable
-	add	hl,de
-	ld	a,(hl)
-	bit	7,c
+	ld	de, $80
+	ld	c, a
+	bit	7, a
+	jr	z, .bit7
+	sub	a, e	; sub a, 128
+.bit7:
+	bit	6, a
+	jr	z, .bit6
+	;	A = 128 - A
+	neg
+	add	a, e	; add a, 128
+.bit6:
+	ld	e, a
+	ld	hl, _SineTable
+	add	hl, de
+	ld	a, (hl)
+	bit	7, c
 	ret	z
 	neg
 	ret
