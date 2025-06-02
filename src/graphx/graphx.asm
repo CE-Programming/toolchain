@@ -4398,6 +4398,262 @@ _FillTriangle:
 	ret
 .cmp70:
 	jp	po,.secondloop
+_Return:
+	ld	sp,ix
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+gfx_FloodFill:
+; Implements a flood fill so no one hopefully crashes the stack
+; Maximum stack depth is 3224 bytes
+; Arguments:
+;  arg0 : X Coordinate
+;  arg1 : Y Coordinate
+;  arg2 : New Color Index
+; Returns:
+;  None
+	ld	hl,-3224
+	call	ti._frameset
+
+	ld	e,(ix+9)
+	ld	bc,(ix+6)
+	call	_GetPixel		; ov = p(x, y);
+
+	ld	(.oldcolor0),a
+	ld	(.oldcolor1),a
+	ld	(.oldcolor2),a
+	ld	b,(ix+12)
+	cp	a,b			; return if same color
+	jr	z,_Return
+
+	ld	a,b
+	ld	(.newcolor0),a
+	ld	(.newcolor1),a
+
+	lea	iy,ix
+	ld	bc,-3224
+	add	iy,bc
+	ld	(.stack),iy
+
+	ld	a,(ix+9)
+	ld	hl,(ix+6)
+	ld	(iy+0),hl		; sp->xl = x;
+	ld	(iy+3),hl		; sp->xr = x;
+	ld	(iy+6),a		; sp->y  = y;
+	ld	(iy+7),1		; sp->dy = 1;
+	lea	iy,iy+8			; sp++;
+
+	inc	a
+	ld	(iy+6),a		; sp->y  = y+1;
+	ld	(iy+0),hl		; sp->xl = x;
+	ld	(iy+3),hl		; sp->xr = x;
+	ld	(iy+7),255		; sp->dy = -1;
+	lea	iy,iy+8			; sp++;
+
+	call	gfx_Wait
+
+.dowhileloop:				; do {
+	lea	iy,iy-8			; sp--;
+	ld	a,(iy+7)
+	ld	(ix-4),a		; dy = sp->dy;
+	add	a,(iy+6)		; y  = sp->y+dy;
+	ld	(ix+9),a
+	ld	bc,(iy+3)
+	ld	(ix-15),bc		; x2 = sp->xr;
+	ld	bc,(iy+0)
+	ld	(ix-8),bc		; x1 = sp->xl;
+
+	ld	hl,(CurrentBuffer)
+	ld	e,a
+	ld	d,ti.lcdWidth / 2
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ld	de,0
+smcWord _XMin
+	ex	de,hl
+	add	hl,de
+	ex	de,hl			; de -> draw location at xmin, y
+	add	hl,bc			; hl -> draw location at x, y
+	ld	a,0
+.oldcolor0 = $-1
+
+	jr	.begin
+.forloop0:				; for (x=x1; x>=xmin && p(x, y) == ov; x--) { s(x, y); }
+	ld	(hl),0
+.newcolor0 = $-1
+	dec	bc
+	scf
+.begin:
+	sbc	hl,de
+	jr	c,.nonnegative
+	add	hl,de
+	cp	a,(hl)
+	jr	z,.forloop0
+	or	a,a
+.nonnegative:
+	ld	(ix+6),bc
+	ld	bc,(ix-8)
+	ld	hl,(ix+6)
+	jr	c,.check
+	sbc	hl,bc
+	jp	nc,.skip		; if (x>=xmin && (unsigned)x>=x1) goto skip;
+	add	hl,bc
+.check:
+	inc	hl
+	ld	(ix-11),hl		; l = x+1;
+	xor	a,a
+	sbc	hl,bc
+	ld	e,(ix+9)
+	jr	nc,.badpush0		; if (l<x1) { push(y, l, x1-1, -dy); }
+	or	a,e
+	lea	de,ix-24
+	lea	hl,iy
+	sbc	hl,de
+	ld	e,a
+	jr	nc,.badpush0		; check stack limit
+	sub	a,(ix-4)
+	sub	a,0			; check if y coordinate is in bounds
+smcByte _YMin
+	cp	a,ti.lcdHeight
+smcByte _YSpan
+	jr	nc,.badpush0
+	ld	(iy+6),e
+	ld	hl,(ix-11)
+	ld	(iy+0),hl
+	dec	bc
+	ld	(iy+3),bc
+	inc	bc
+	xor	a,a
+	sub	a,(ix-4)
+	ld	(iy+7),a
+	lea	iy,iy+8
+.badpush0:
+	inc	bc			; x = x1+1;
+
+	ld	hl,(CurrentBuffer)
+	add	hl,bc
+	ld	d,ti.lcdWidth / 2
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ex	de,hl			; de -> draw location
+					; do {
+.forloop1start:
+	ld	hl,ti.lcdWidth-1
+smcWord _XMaxMinus1
+	jr	.atov			; for (; (unsigned)x<=xmax && p(x, y) == ov; x++) { s(x, y); }
+.forloop1:
+	ld	a,0
+.newcolor1 = $-1
+	ld	(de),a
+	inc	de
+	inc	bc
+.atov:
+	sbc	hl,bc
+	jr	c,.ovat
+	add	hl,bc
+	ld	a,(de)
+	cp	a,0
+.oldcolor1 = $-1
+	jr	z,.forloop1
+
+.ovat:
+	ld	(ix+6),bc
+	lea	de,ix-24		; push(y, l, x-1, dy);
+	lea	hl,iy
+	or	a,a
+	sbc	hl,de
+	jr	nc,.badpush1
+	ld	a,(ix-4)
+	add	a,(ix+9)
+	sub	a,0			; check if y coordinate is in bounds
+smcByte _YMin
+	cp	a,ti.lcdHeight
+smcByte _YSpan
+	jr	nc,.badpush1
+	dec	bc
+	ld	(iy+3),bc
+	ld	a,(ix+9)
+	ld	(iy+6),a
+	ld	bc,(ix-11)
+	ld	(iy+0),bc
+	ld	a,(ix-4)
+	ld	(iy+7),a
+	lea	iy,iy+8
+.badpush1:
+	ld	hl,(ix-15)		; if (x>x2+1) { push(y, x2+1, x-1, -dy); }
+	ld	bc,(ix+6)
+	inc	hl
+	or	a,a
+	sbc	hl,bc
+	jr	nc,.skip
+	lea	de,ix-24
+	lea	hl,iy
+	or	a,a
+	sbc	hl,de
+	jr	nc,.badpush2
+	ld	a,(ix+9)
+	sub	a,(ix-4)
+	sub	a,0			; check if y coordinate is in bounds
+smcByte _YMin
+	cp	a,ti.lcdHeight
+smcByte _YSpan
+	jr	nc,.badpush2
+	dec	bc
+	ld	(iy+3),bc
+	ld	bc,(ix-15)
+	inc	bc
+	ld	(iy+0),bc
+	xor	a,a
+	sub	a,(ix-4)
+	ld	(iy+7),a
+	ld	a,(ix+9)
+	ld	(iy+6),a
+	lea	iy,iy+8
+.skip:
+.badpush2:				; skip: for (x++; (unsigned)x<=x2 && p(x, y) != ov; x++);
+	ld	bc,(ix+6)
+	inc	bc
+
+	ld	hl,(CurrentBuffer)
+	add	hl,bc
+	ld	e,(ix+9)
+	ld	d,ti.lcdWidth / 2
+	mlt	de
+	add	hl,de
+	add	hl,de
+	ex	de,hl			; de -> draw location
+	ld	hl,(ix-15)
+
+	jr	.whileloop
+.forloop2:
+	inc	bc
+	inc	de
+.whileloop:
+	or	a,a
+	sbc	hl,bc
+	add	hl,bc
+	jr	c,.done
+	ld	a,(de)
+	cp	a,0
+.oldcolor2 = $-1
+	jr	nz,.forloop2
+
+.done:
+	ld	(ix+6),bc
+	ld	(ix-11),bc		; l = x;
+	or	a,a
+	sbc	hl,bc
+	jp	nc,.forloop1start	; } while ((unsigned)x<=x2);
+
+	ld	hl,0
+.stack = $-3
+	lea	de,iy
+	or	a,a
+	sbc	hl,de
+	jp	c,.dowhileloop		; } while (sp>stack);
 	ld	sp,ix
 	pop	ix
 	ret
@@ -5397,263 +5653,6 @@ _16Mul16SignedNeg:
 	sbc	hl,hl
 	ld	l,e
 	ld	h,d
-	ret
-
-;-------------------------------------------------------------------------------
-gfx_FloodFill:
-; Implements a flood fill so no one hopefully crashes the stack
-; Maximum stack depth is 3224 bytes
-; Arguments:
-;  arg0 : X Coordinate
-;  arg1 : Y Coordinate
-;  arg2 : New Color Index
-; Returns:
-;  None
-	ld	hl,-3224
-	call	ti._frameset
-
-	ld	e,(ix+9)
-	ld	bc,(ix+6)
-	call	_GetPixel		; ov = p(x, y);
-
-	ld	(.oldcolor0),a
-	ld	(.oldcolor1),a
-	ld	(.oldcolor2),a
-	ld	b,(ix+12)
-	cp	a,b			; return if same color
-	jq	z,.return
-
-	ld	a,b
-	ld	(.newcolor0),a
-	ld	(.newcolor1),a
-
-	lea	iy,ix
-	ld	bc,-3224
-	add	iy,bc
-	ld	(.stack),iy
-
-	ld	a,(ix+9)
-	ld	hl,(ix+6)
-	ld	(iy+0),hl		; sp->xl = x;
-	ld	(iy+3),hl		; sp->xr = x;
-	ld	(iy+6),a		; sp->y  = y;
-	ld	(iy+7),1		; sp->dy = 1;
-	lea	iy,iy+8			; sp++;
-
-	inc	a
-	ld	(iy+6),a		; sp->y  = y+1;
-	ld	(iy+0),hl		; sp->xl = x;
-	ld	(iy+3),hl		; sp->xr = x;
-	ld	(iy+7),255		; sp->dy = -1;
-	lea	iy,iy+8			; sp++;
-
-	call	gfx_Wait
-
-.dowhileloop:				; do {
-	lea	iy,iy-8			; sp--;
-	ld	a,(iy+7)
-	ld	(ix-4),a		; dy = sp->dy;
-	add	a,(iy+6)		; y  = sp->y+dy;
-	ld	(ix+9),a
-	ld	bc,(iy+3)
-	ld	(ix-15),bc		; x2 = sp->xr;
-	ld	bc,(iy+0)
-	ld	(ix-8),bc		; x1 = sp->xl;
-
-	ld	hl,(CurrentBuffer)
-	ld	e,a
-	ld	d,ti.lcdWidth / 2
-	mlt	de
-	add	hl,de
-	add	hl,de
-	ld	de,0
-smcWord _XMin
-	ex	de,hl
-	add	hl,de
-	ex	de,hl			; de -> draw location at xmin, y
-	add	hl,bc			; hl -> draw location at x, y
-	ld	a,0
-.oldcolor0 = $-1
-
-	jr	.begin
-.forloop0:				; for (x=x1; x>=xmin && p(x, y) == ov; x--) { s(x, y); }
-	ld	(hl),0
-.newcolor0 = $-1
-	dec	bc
-	scf
-.begin:
-	sbc	hl,de
-	jr	c,.nonnegative
-	add	hl,de
-	cp	a,(hl)
-	jr	z,.forloop0
-	or	a,a
-.nonnegative:
-	ld	(ix+6),bc
-	ld	bc,(ix-8)
-	ld	hl,(ix+6)
-	jr	c,.check
-	sbc	hl,bc
-	jp	nc,.skip		; if (x>=xmin && (unsigned)x>=x1) goto skip;
-	add	hl,bc
-.check:
-	inc	hl
-	ld	(ix-11),hl		; l = x+1;
-	xor	a,a
-	sbc	hl,bc
-	ld	e,(ix+9)
-	jr	nc,.badpush0		; if (l<x1) { push(y, l, x1-1, -dy); }
-	or	a,e
-	lea	de,ix-24
-	lea	hl,iy
-	sbc	hl,de
-	ld	e,a
-	jr	nc,.badpush0		; check stack limit
-	sub	a,(ix-4)
-	sub	a,0			; check if y coordinate is in bounds
-smcByte _YMin
-	cp	a,ti.lcdHeight
-smcByte _YSpan
-	jr	nc,.badpush0
-	ld	(iy+6),e
-	ld	hl,(ix-11)
-	ld	(iy+0),hl
-	dec	bc
-	ld	(iy+3),bc
-	inc	bc
-	xor	a,a
-	sub	a,(ix-4)
-	ld	(iy+7),a
-	lea	iy,iy+8
-.badpush0:
-	inc	bc			; x = x1+1;
-
-	ld	hl,(CurrentBuffer)
-	add	hl,bc
-	ld	d,ti.lcdWidth / 2
-	mlt	de
-	add	hl,de
-	add	hl,de
-	ex	de,hl			; de -> draw location
-					; do {
-.forloop1start:
-	ld	hl,ti.lcdWidth-1
-smcWord _XMaxMinus1
-	jr	.atov			; for (; (unsigned)x<=xmax && p(x, y) == ov; x++) { s(x, y); }
-.forloop1:
-	ld	a,0
-.newcolor1 = $-1
-	ld	(de),a
-	inc	de
-	inc	bc
-.atov:
-	sbc	hl,bc
-	jr	c,.ovat
-	add	hl,bc
-	ld	a,(de)
-	cp	a,0
-.oldcolor1 = $-1
-	jr	z,.forloop1
-
-.ovat:
-	ld	(ix+6),bc
-	lea	de,ix-24		; push(y, l, x-1, dy);
-	lea	hl,iy
-	or	a,a
-	sbc	hl,de
-	jr	nc,.badpush1
-	ld	a,(ix-4)
-	add	a,(ix+9)
-	sub	a,0			; check if y coordinate is in bounds
-smcByte _YMin
-	cp	a,ti.lcdHeight
-smcByte _YSpan
-	jr	nc,.badpush1
-	dec	bc
-	ld	(iy+3),bc
-	ld	a,(ix+9)
-	ld	(iy+6),a
-	ld	bc,(ix-11)
-	ld	(iy+0),bc
-	ld	a,(ix-4)
-	ld	(iy+7),a
-	lea	iy,iy+8
-.badpush1:
-	ld	hl,(ix-15)		; if (x>x2+1) { push(y, x2+1, x-1, -dy); }
-	ld	bc,(ix+6)
-	inc	hl
-	or	a,a
-	sbc	hl,bc
-	jr	nc,.skip
-	lea	de,ix-24
-	lea	hl,iy
-	or	a,a
-	sbc	hl,de
-	jr	nc,.badpush2
-	ld	a,(ix+9)
-	sub	a,(ix-4)
-	sub	a,0			; check if y coordinate is in bounds
-smcByte _YMin
-	cp	a,ti.lcdHeight
-smcByte _YSpan
-	jr	nc,.badpush2
-	dec	bc
-	ld	(iy+3),bc
-	ld	bc,(ix-15)
-	inc	bc
-	ld	(iy+0),bc
-	xor	a,a
-	sub	a,(ix-4)
-	ld	(iy+7),a
-	ld	a,(ix+9)
-	ld	(iy+6),a
-	lea	iy,iy+8
-.skip:
-.badpush2:				; skip: for (x++; (unsigned)x<=x2 && p(x, y) != ov; x++);
-	ld	bc,(ix+6)
-	inc	bc
-
-	ld	hl,(CurrentBuffer)
-	add	hl,bc
-	ld	e,(ix+9)
-	ld	d,ti.lcdWidth / 2
-	mlt	de
-	add	hl,de
-	add	hl,de
-	ex	de,hl			; de -> draw location
-	ld	hl,(ix-15)
-
-	jr	.whileloop
-.forloop2:
-	inc	bc
-	inc	de
-.whileloop:
-	or	a,a
-	sbc	hl,bc
-	add	hl,bc
-	jr	c,.done
-	ld	a,(de)
-	cp	a,0
-.oldcolor2 = $-1
-	jr	nz,.forloop2
-
-.done:
-	ld	(ix+6),bc
-	ld	(ix-11),bc		; l = x;
-	or	a,a
-	sbc	hl,bc
-	jp	nc,.forloop1start	; } while ((unsigned)x<=x2);
-
-	ld	hl,0
-.stack = $-3
-	lea	de,iy
-	or	a,a
-	sbc	hl,de
-	jp	c,.dowhileloop		; } while (sp>stack);
-
-.return:
-	ld	sp,ix
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
