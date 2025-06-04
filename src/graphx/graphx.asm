@@ -4430,13 +4430,12 @@ _Polygon:
 	ld	(.line0),hl
 	ld	(.line1),hl
 	push	ix
-	ld	ix,0
+	ld	ix,-3
 	add	ix,sp
-	ld	sp,hl
-	ld	iy,(ix+6)
+	ld	iy,(ix+9)
 	jr	.startloop
 .loop:
-	push	iy
+	pea	iy + 6
 	ld	bc,(iy+9)
 	push	bc
 	ld	bc,(iy+6)
@@ -4447,16 +4446,12 @@ _Polygon:
 	push	bc
 	call	0
 .line0 := $-3
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	bc
-	pop	iy
-	lea	iy,iy+6
+	ld	sp, ix
+	pop	iy	; iy += 6
 .startloop:
-	ld	hl,(ix+9)
+	ld	hl,(ix+12)
 	dec	hl
-	ld	(ix+9),hl
+	ld	(ix+12),hl
 	add	hl,bc
 	or	a,a
 	sbc	hl,bc
@@ -4465,14 +4460,15 @@ _Polygon:
 	push	bc
 	ld	bc,(iy+0)
 	push	bc
-	ld	iy,(ix+6)
+	ld	iy,(ix+9)
 	ld	bc,(iy+3)
 	push	bc
 	ld	bc,(iy+0)
 	push	bc
 	call	0
 .line1 := $-3
-	ld	sp,ix
+	lea	hl, ix + 3
+	ld	sp, hl
 	pop	ix
 	ret
 
