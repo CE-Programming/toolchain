@@ -2709,31 +2709,30 @@ gfx_TransparentSprite:
 	push	ix			; save ix sp
 	call	_ClipCoordinates
 	jr	nc,.culled
+	;	iyl = new width (next)
+	;	iyh = new height
 	ld	(.amount),a
-	ld	a,c			; new width
-	ld	(.next),a
-	ld	ixh,b			; new height
-	ld	b,0
 .transparent_color := $+1
 	ld	a,TRASPARENT_COLOR
 smcByte _TransparentColor
 	wait_quick
 .loop:
-	ld	c,0
-.next := $-1
-	lea	de,iy
+	ld	c,iyl	; next
+	lea	de,ix
 	call	_TransparentPlot	; call the transparent routine
 	ld	c,0
 .amount := $-1
 	add	hl,bc
 	ld	de,ti.lcdWidth		; move to next row
-	add	iy,de
-	dec	ixh
+	add	ix,de
+	dec	iyh
 	jr	nz,.loop
 .culled:
 	pop	ix
 	ret
 
+; Opaque unrolled 4 times
+; Transparent unrolled 4 times
 _TransparentPlot_Opaque:		; routine to handle transparent plotting
 	ldi
 	ret	po
@@ -2790,26 +2789,22 @@ gfx_Sprite:
 ;  None
 	push	ix			; save ix sp
 	call	_ClipCoordinates
-	pop	ix			; restore ix sp
-	ret	nc
-	ld	(.amount),a
-	ld	a,c			; new width
-	ld	(.next),a
-	ld	a,b			; new height
-	ld	b,0
+	jr	nc,.culled
+	;	iyl = new width (next)
+	;	iyh = new height
 	wait_quick
 .loop:
-	ld	c,0
-.next := $-1
-	lea	de,iy
+	ld	c,iyl	; next
+	lea	de,ix
 	ldir
 	ld	de,ti.lcdWidth
-	add	iy,de
-	ld	c,0
-.amount := $-1
+	add	ix,de
+	ld	c,a	; amount
 	add	hl,bc			; move to next line
-	dec	a
+	dec	iyh
 	jr	nz,.loop
+.culled:
+	pop	ix			; restore ix sp
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2928,7 +2923,6 @@ gfx_TransparentSprite_NoClip:
 	add	iy,sp
 	ld	hl,(iy+6)		; hl = x coordinate
 	ld	c,(iy+9)		; c = y coordinate
-	ld	iy,(iy+3)		; iy -> sprite struct
 	ld	de,(CurrentBuffer)
 	add	hl,de
 	ld	b,ti.lcdWidth / 2
@@ -2936,25 +2930,25 @@ gfx_TransparentSprite_NoClip:
 	add	hl,bc
 	add	hl,bc			; hl -> place to draw
 	push	hl
-	ld	a,(iy+0)
-	ld	(.next),a
-	ld	a,(iy+1)
-	lea	hl,iy+2
-	pop	iy
-	push	ix
-	ld	ixh,a			; ixh = height of sprite
+	ld	hl,(iy+3)		; hl -> sprite struct
+	ld	a,(hl)
+	inc	hl
+	ld	iyl,a			; (.next)
+	ld	a,(hl)
+	inc	hl
+	ex	(sp), ix		; preserve ix and load it with (sp)
+	ld	iyh,a			; ixh = height of sprite
 	ld	b,0			; zero mid byte
 	ld	a,TRASPARENT_COLOR
 smcByte _TransparentColor
 	wait_quick
 .loop:
-	ld	c,0
-.next := $-1
-	lea	de,iy
+	ld	c,iyl			; (.next)
+	lea	de,ix
 	call	_TransparentPlot	; call the plotter
 	ld	de,ti.lcdWidth
-	add	iy,de
-	dec	ixh			; loop for height
+	add	ix,de
+	dec	iyh			; loop for height
 	jr	nz,.loop
 	pop	ix			; restore stack pointer
 	ret
@@ -2969,10 +2963,11 @@ _ClipCoordinates:
 ; Returns:
 ;  A  : How much to add to the sprite per iteration
 ;  BCU: 0
-;  B  : New sprite height
-;  C  : New sprite width
+;  B  : 0
+;  IYH: New sprite height
+;  IYL: New sprite width
 ;  HL : Sprite pixel pointer
-;  IY : Buffer pixel pointer
+;  IX : Buffer pixel pointer
 ;  NC : If offscreen
 	ld	ix,6			; get pointer to arguments
 	add	ix,sp
@@ -3022,18 +3017,18 @@ smcByte _YMin
 .clipbottom:
 	inc	e
 	ld	iyh,e			; save new height
-.yclipped:
+	or	a,a
+.yclipped:	; <-- carry already cleared on this path
 
 	ld	bc,0
 smcWord _XMin
 	ld	hl,(ix+6)		; hl = x coordinate
-	or	a,a
 	sbc	hl,bc
 	ex	de,hl			; de = x coordinate relative to min x
 	ld	hl,ti.lcdWidth		; hl = clip_width
 smcWord _XSpan
 	xor	a,a
-	ld	b,a
+	ld	b,a			; UBC and B are zero from this point onwards
 	ld	c,iyl			; bc = width
 	sbc	hl,bc			; get difference between clip_width and width
 	dec	c			; bc = width - 1
@@ -3070,7 +3065,6 @@ smcWord _XMin
 	sub	a,e			; calculate bytes to add per iteration
 .xclipped:
 
-	lea.s	bc,iy
 	ld	l,(ix+9)		; l = y coordinate
 	ld	h,ti.lcdWidth / 2
 	mlt	hl
@@ -3078,11 +3072,11 @@ smcWord _XMin
 	ld	de,(ix+6)		; de = x coordinate
 	add	hl,de
 	ex	de,hl
-	ld	iy,(CurrentBuffer)
-	add	iy,de
 	ld	hl,(ix+3)		; hl -> sprite data
 	inc	hl
 	inc	hl
+	ld	ix,(CurrentBuffer)
+	add	ix,de
 	scf				; set carry for success
 	ret
 
