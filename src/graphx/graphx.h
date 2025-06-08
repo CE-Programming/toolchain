@@ -1362,6 +1362,8 @@ void gfx_ScaledTransparentSprite_NoClip(const gfx_sprite_t *sprite,
  *
  * @note A scale factor of 64 represents 100% scaling.
  * @warning This routine only accepts square input sprites.
+ * @note Sprites larger than 210x210 may have rendering artifacts.
+ * @warning The output size cannot be greater than 255x255.
  * @param[in] sprite Input sprite to rotate/scale.
  * @param[in] x X coordinate position.
  * @param[in] y Y coordinate position.
@@ -1381,6 +1383,8 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(const gfx_sprite_t *sprite,
  *
  * @note A scale factor of 64 represents 100% scaling.
  * @warning This routine only accepts square input sprites.
+ * @note Sprites larger than 210x210 may have rendering artifacts.
+ * @warning The output size cannot be greater than 255x255.
  * @param[in] sprite Input sprite to rotate/scale.
  * @param[in] x X coordinate position.
  * @param[in] y Y coordinate position.
@@ -1480,6 +1484,8 @@ gfx_sprite_t *gfx_ScaleSprite(const gfx_sprite_t *__restrict sprite_in,
  * @param[in] angle 256 position angular integer.
  * @param[in] scale Scaling factor; range is about 1% to 400% scale.
  * @returns A pointer to \p sprite_out.
+ * @note Rendering artifacts may occur if the output is larger than 210x210.
+ * @warning The output size cannot be greater than 255x255.
  * @note sprite_in and sprite_out cannot be the same. Ensure sprite_out is allocated.
  */
 gfx_sprite_t *gfx_RotateScaleSprite(const gfx_sprite_t *__restrict sprite_in,
