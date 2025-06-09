@@ -11,6 +11,7 @@
   },
   "sequence":
   [
+    "delay|200",
     "action|launch",
     "delay|200",
     "hashWait|1",
