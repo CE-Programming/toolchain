@@ -4584,7 +4584,7 @@ d_18:	ld	bc,(ix-17)
 
 ;-------------------------------------------------------------------------------
 gfx_FlipSpriteY:
-; Flips an array horizontally about the center vertical axis
+; Flips a sprite horizontally about the center vertical axis
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
@@ -4592,90 +4592,90 @@ gfx_FlipSpriteY:
 ;  arg1 : Pointer to sprite struct output
 	ld	iy,0
 	add	iy,sp
-	push	ix
-	ld	ix,(iy+3)
-	ld	a,(ix+0)		; a = width of sprite
+	ld	de,(iy+3)
+	ld	a,(de)		; a = width of sprite
+	inc.s	bc		; clear UBC
+
 	sbc	hl,hl
 	ld	l,a
 	ld	c,a
-	push	hl
-	ld	(.width),a
-	add	hl,hl
-	ld	(.delta),hl		; width*2
-	ld	a,(ix+1)		; a = height of sprite
-	pop	hl
-	lea	de,ix+2
+
+	inc	de
+	ld	a,(de)		; a = height of sprite
+
+	inc	de
 	add	hl,de
-	ld	ix,(iy+6)
-	ld	(ix+1),a		; store height to width
-	ld	(ix+0),c		; store width to height
-	lea	de,ix+2			; de -> sprite data
-	ex	(sp),ix			; restore stack frame
+	ld	de,(iy+6)	; de -> sprite data
+	push	de
+	inc	de
+	ld	(de),a		; store height
+	ld	iyh, a
+;	inc	de		; use the inc de inside the loop instead
 .loop:
-	ld	b,0
-.width := $-1
-	ld	c,a
+	ld	b,c	; width
 .pixelloop:
 	dec	hl
+	inc	de
 	ld	a,(hl)
 	ld	(de),a			; store the new pixel data
-	inc	de
 	djnz	.pixelloop
-	ld	a,c
-	ld	bc,0
-.delta := $-3
+	; hl += delta * 2
 	add	hl,bc
-	dec	a
+	add	hl,bc
+	dec	iyh
 	jr	nz,.loop
 	pop	hl
+	ld	(hl),c		; store width (the loop preserves c)
 	ret
 
 ;-------------------------------------------------------------------------------
 gfx_FlipSpriteX:
-; Flip a sprite vertically about the center horizontal axis
+; Flips a sprite vertically about the center horizontal axis
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	ld	iy,0
-	add	iy,sp
-	push	ix
-	ld	ix,(iy+3)
-	xor	a,a
-	sub	a,(ix+0)
-	ld	(.delta),a
-	neg
-	ld	(.width),a
-	ld	l,(ix+1)
-	ld	c,l
-	dec	l
-	ld	h,a
-	mlt	hl
-	lea	de,ix+2
-	add	hl,de
-	ld	ix,(iy+6)
-	ld	(ix+0),a
-	ld	(ix+1),c
-	lea	de,ix+2
-	push	ix
+	ld	iy, 6
+	lea	hl, iy
+	ld	c, l	; prevent underflow from ldi
+	add	hl, sp
+	ld	de, (hl)
+	push	de	; return value
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+
+	xor	a, a
+	ld	b, (hl)
+	sub	a, b
+	ld	(.delta), a
+	ld	iyl, b	; (.width)
+	ldi		; copy width
+
+	ld	a, (hl)
+	ld	c, a
+	ldi		; copy height (and decrement C)
+
+	mlt	bc
+	add	hl, bc
 .loop:
-	ld	bc,0
-.width := $-3
+	lea	bc, iy	; (.width)
 	ldir
-	ld	bc,-1
-.delta := $-3
-	add	hl,bc
-	add	hl,bc
+	dec	bc	; ld bc, -1
+	ld	c, -1
+.delta := $-1
+	add	hl, bc
+	add	hl, bc
 	dec	a
-	jr	nz,.loop
+	jr	nz, .loop
 	pop	hl
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 gfx_RotateSpriteC:
-; Rotates an array 90 degress clockwise
+; Rotates a sprite 90 degress clockwise
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
@@ -4756,29 +4756,33 @@ gfx_RotateSpriteCC:
 
 ;-------------------------------------------------------------------------------
 gfx_RotateSpriteHalf:
-; Rotates an array 180 degrees
+; Rotates a sprite 180 degrees
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy+3)
-	ld	c,(hl)			; c = width
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)	; output sprite
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)	; input sprite
+	ld	c, (hl)		; c = width
 	inc	hl
-	ld	b,(hl)			; b = height
-	ld	iy,(iy+6)
-	ld	(iy+0),bc
+	ld	b, (hl)		; b = height
+	ex	de, hl
+	ld	(hl), bc
+	ex	de, hl
 	mlt	bc
-	add	hl,bc
-	lea	de,iy
+	add	hl, bc
 	push	de
 .loop:
 	inc	de
 	inc	de
 	ldd
-	jp	pe,.loop
+	jp	pe, .loop
 	pop	hl
 	ret
 
