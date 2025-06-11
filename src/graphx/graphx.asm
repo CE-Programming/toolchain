@@ -4895,8 +4895,8 @@ gfx_RotatedScaledSprite_NoClip:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	ld	a, -1 + _RotatedScaledSprite_NoClip.inner_opaque - _RotatedScaledSprite_NoClip.dsrs_jump_1
-	; jr .inner_opaque_hijack \ inc l
-	ld	bc, ($2C0018) or (((-1 + _RotatedScaledSprite_NoClip.inner_opaque_hijack - _RotatedScaledSprite_NoClip.dsrs_jump_2) and $FF) shl 8)
+	; push hl \ ld l, a \ inc l
+	ld	bc, $2C6FE5
 	jr	_RotatedScaledSprite_NoClip
 ;-------------------------------------------------------------------------------
 gfx_RotatedScaledTransparentSprite_NoClip:
@@ -4909,8 +4909,8 @@ gfx_RotatedScaledTransparentSprite_NoClip:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	ld	a, -1 + _RotatedScaledSprite_NoClip.inner_transparent - _RotatedScaledSprite_NoClip.dsrs_jump_1
-	; push hl \ ld l, a \ inc l
-	ld	bc, $2C6FE5
+	; jr .inner_transparent_hijack \ inc l
+	ld	bc, ($2C0018) or (((-1 + _RotatedScaledSprite_NoClip.inner_transparent_hijack - _RotatedScaledSprite_NoClip.dsrs_jump_2) and $FF) shl 8)
 _RotatedScaledSprite_NoClip:
 	ld	iy, .dsrs_base_address
 	ld	(iy + (_RotatedScaledSprite_NoClip.dsrs_jump_1 - .dsrs_base_address)), a
@@ -5059,73 +5059,16 @@ _RotatedScaledSprite_NoClip:
 
 ;-------------------------------------------------------------------------------
 
-.inner_opaque:
-	cp	a, h
-	jr	c, .skip_pixel
-	ld	c, ixh
-	cp	a, c
-	jr	c, .skip_pixel
-.inner_opaque_hijack:
-	; get pixel and draw to buffer
-	push	hl			; xs
-	ld	l, a
-	inc	l
-	mlt	hl
-	ld	b, 0
-	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
-	add	hl, bc			; y * size + x
-
-	ld	bc, 0
-.dsrs_sprptr_0B := $-3
-	add	hl, bc
-	ldi
-	pop	hl
-
-	ld	bc, 0			; smc = -sinf
-.dsrs_sinf_0B := $-3
-	add	hl, bc			; ys += -sinf
-
-	ld	bc, 0			; smc = cosf
-.dsrs_cosf_0B := $-3
-	add	ix, bc			; xs += cosf
-
-	dec	iyl
-	jr	nz, .inner_opaque	; x loop
-
-	dec	iyh	
-	jr	z, .finish		; y loop
-.outer:
-	; restore and increment dxc
-	ld	bc, 0			; smc = cosf
-.dsrs_cosf_1_plus_offset_hl := $-3
-.dsrs_base_address := .dsrs_cosf_1_plus_offset_hl
-	add	hl, bc			; dxc += cosf
-
-	; restore and increment dxs
-	ld	bc, 0			; smc = sinf
-.dsrs_sinf_1_plus_offset_ix := $-3
-	add	ix, bc			; dxs += sinf + offset
-
-	ld	bc, 0
-.line_add := $-3
-	; y++
-	ex	de, hl
-	add	hl, bc
-	ex	de, hl
-.begin_loop:
-.dsrs_size_1 := $+2			; smc = size * scale / 64
-	ld	iyl, 0
 .inner_transparent:
 	cp	a, h
 	jr	c, .skip_pixel
 	ld	c, ixh
 	cp	a, c
 	jr	c, .skip_pixel
+.inner_transparent_hijack:
 	; get pixel and draw to buffer
-	; smc to jr inner_opaque_hijack \ inc l
 	push	hl			; xs
 	ld	l, a
-.dsrs_jump_2 := $-1
 	inc	l
 	mlt	hl
 	ld	b, 0
@@ -5157,6 +5100,63 @@ smcByte _TransparentColor
 	dec	iyl
 	jr	nz, .inner_transparent		; x loop
 .dsrs_jump_1 := $-1
+
+	dec	iyh	
+	jr	z, .finish		; y loop
+.outer:
+	; restore and increment dxc
+	ld	bc, 0			; smc = cosf
+.dsrs_cosf_1_plus_offset_hl := $-3
+.dsrs_base_address := .dsrs_cosf_1_plus_offset_hl
+	add	hl, bc			; dxc += cosf
+
+	; restore and increment dxs
+	ld	bc, 0			; smc = sinf
+.dsrs_sinf_1_plus_offset_ix := $-3
+	add	ix, bc			; dxs += sinf + offset
+
+	ld	bc, 0
+.line_add := $-3
+	; y++
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+.begin_loop:
+.dsrs_size_1 := $+2			; smc = size * scale / 64
+	ld	iyl, 0
+.inner_opaque:
+	cp	a, h
+	jr	c, .skip_pixel
+	ld	c, ixh
+	cp	a, c
+	jr	c, .skip_pixel
+	; get pixel and draw to buffer
+	; SMC: push hl \ ld l, a --> jr inner_transparent_hijack
+	push	hl			; xs
+	ld	l, a
+.dsrs_jump_2 := $-1
+	inc	l
+	mlt	hl
+	ld	b, 0
+	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
+	add	hl, bc			; y * size + x
+
+	ld	bc, 0
+.dsrs_sprptr_0B := $-3
+	add	hl, bc
+	ldi
+	pop	hl
+
+	ld	bc, 0			; smc = -sinf
+.dsrs_sinf_0B := $-3
+	add	hl, bc			; ys += -sinf
+
+	ld	bc, 0			; smc = cosf
+.dsrs_cosf_0B := $-3
+	add	ix, bc			; xs += cosf
+
+	dec	iyl
+	jr	nz, .inner_opaque	; x loop
 
 	dec	iyh
 	jr	nz, .outer		; y loop
