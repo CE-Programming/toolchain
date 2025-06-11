@@ -4894,7 +4894,10 @@ gfx_RotatedScaledSprite_NoClip:
 ;  arg3 : Scale factor (64 = 100%)
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	xor	a, a
+	; ld	hl, $120000	; nop \ nop \ ld (de), a
+	ld	de, $E1A0ED	; ldi \ pop hl
+	ld	a, $18		; jr $+5 (lo)
+	ld	b, $05		; jr $+5 (hi)
 	jr	_RotatedScaledSprite_NoClip
 ;-------------------------------------------------------------------------------
 gfx_RotatedScaledTransparentSprite_NoClip:
@@ -4906,10 +4909,16 @@ gfx_RotatedScaledTransparentSprite_NoClip:
 ;  arg3 : Scale factor (64 = 100%)
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	ld	a, 1
+	; ld	hl, $1201s28	; jr z, $+1 \ ld (de), a
+	ld	de, $FE7E47	; ld b, a \ ld a, (hl) \ cp a, n (lo)
+	ld	a, TRASPARENT_COLOR	; cp a, n (hi)
+smcByte _TransparentColor
+	ld	b, $28	; jr z, $+1 (lo)
 _RotatedScaledSprite_NoClip:
 	ld	iy, .dsrs_base_address
-	ld	(iy + (.rotatescale - .dsrs_base_address)), a
+	ld	(iy + (.dsrs_routine - .dsrs_base_address)), de
+	ld	(iy + (.dsrs_transparent - .dsrs_base_address)), a
+	ld	(iy + (.dsrs_jump - .dsrs_base_address)), b
 	push	ix
 	; aligning ix with gfx_RotateScaleSprite allows for code sharing
 	ld	ix, 3
@@ -5070,14 +5079,18 @@ _RotatedScaledSprite_NoClip:
 	ld	bc, 0
 .dsrs_sprptr_0 := $-3
 	add	hl, bc
-	
-	ld	b, a	; preserve A
-	ld	a, (hl)
-	cp	a, TRASPARENT_COLOR
-smcByte _TransparentColor
-	jr	z, $+1
-.rotatescale := $-1
-	ld	(de), a			; write pixel
+
+	; SMC           ; Transparent    ; Non-Transparent
+	db	$47	; ld b, a        ; ldi (lo)
+	db	$7E	; ld a, (hl)     ; ldi (hi)
+	db	$FE	; cp a, n (lo)   ; pop hl
+.dsrs_routine := $-3
+	db	$00	; cp a, n (hi)   ; jr $+5 (lo)
+.dsrs_transparent := $-1
+	db	$28	; jr z, $+1 (lo) ; jr $+5 (hi)
+.dsrs_jump := $-1
+	db	$01	; jr z, $+1 (hi)
+	ld	(de), a
 	ld	a, b	; restore A
 
 	pop	hl			; ys
