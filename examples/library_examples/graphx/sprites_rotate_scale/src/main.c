@@ -19,11 +19,13 @@ int main(void)
     gfx_SetDrawBuffer();
 
     /* Rotate the sprite until a key is pressed */
+	uint8_t s = 4;
     do
     {
-
+		gfx_SetTextXY(270, 10);
+		gfx_PrintUInt(s, 1);
         /* Draw a rotated transparent scaled spite */
-        gfx_RotatedScaledTransparentSprite_NoClip(star, 120, 80, 256 - x, 128);
+        gfx_RotatedScaledSprite_NoClip(star, 2, 2, x, s);
 
         /* Show the buffered screen */
         gfx_BlitBuffer();
@@ -33,7 +35,10 @@ int main(void)
 
         /* Change the rotation amount */
         x++;
-
+		s++;
+		if (s < 4) {
+			s = 4;
+		}
     } while (!os_GetCSC());
 
     /* End graphics drawing */

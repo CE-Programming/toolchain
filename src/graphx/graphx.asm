@@ -4950,9 +4950,6 @@ _RotatedScaledSprite_NoClip:
 
 	ld	bc, (ix + 15)	; B = size, C = scale
 	ld	a, b
-	dec	a
-	ld	(iy + (.dsrs_ssize - .dsrs_base_address)), a	; write smc
-	inc	a
 	mlt	bc			; size * scale
 	srl	a			; size / 2
 	or	a, a
@@ -5031,6 +5028,10 @@ _RotatedScaledSprite_NoClip:
 	add	hl, de			; offset buffer
 	ex	de, hl			; de = buffer pointer
 
+	; note that A is preserved throughout the loop
+	ld	a, (ix + 16)	; scale
+	dec	a		; scale - 1 for comparison flags to work correctly
+
 	pop	hl			; smc = dxc start
 	ld	ixh, c
 	ex	(sp), ix		; smc = dxs start	
@@ -5039,6 +5040,7 @@ _RotatedScaledSprite_NoClip:
 
 	ld	bc, 0	; xs = (dxs + dyc) + (size * 128)
 .dsrs_size128_0_plus_dyc_0 := $-3
+.dsrs_base_address := .dsrs_size128_0_plus_dyc_0
 	add	ix, bc	; de = (dxs + dyc) + (size * 128)
 
 	ld	bc, 0	; ys = (dxc - dys) + (size * 128)
@@ -5051,17 +5053,15 @@ _RotatedScaledSprite_NoClip:
 .dsrs_size_1 := $+2			; smc = size * scale / 64
 	ld	iyl, 0
 .inner:
-	ld	a, 0
-.dsrs_ssize := $-1
 	cp	a, h
-	jr	c, .skip
+	jr	c, .skip_pixel
 	ld	c, ixh
 	cp	a, c
-	jr	c, .skip
+	jr	c, .skip_pixel
 	; get pixel and draw to buffer
 	push	hl			; xs
-	inc	a
 	ld	l, a
+	inc	l
 	mlt	hl
 	ld	b, 0
 	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
@@ -5070,14 +5070,18 @@ _RotatedScaledSprite_NoClip:
 	ld	bc, 0
 .dsrs_sprptr_0 := $-3
 	add	hl, bc
+	
+	ld	b, a	; preserve A
 	ld	a, (hl)
 	cp	a, TRASPARENT_COLOR
 smcByte _TransparentColor
 	jr	z, $+1
 .rotatescale := $-1
 	ld	(de), a			; write pixel
+	ld	a, b	; restore A
+
 	pop	hl			; ys
-.skip:
+.skip_pixel:
 	inc	de			; x++s
 
 	ld	bc, 0			; smc = -sinf
@@ -5094,7 +5098,6 @@ smcByte _TransparentColor
 	; restore and increment dxc
 	ld	bc, 0			; smc = cosf
 .dsrs_cosf_1_plus_offset_hl := $-3
-.dsrs_base_address := .dsrs_cosf_1_plus_offset_hl
 	add	hl, bc			; dxc += cosf
 
 	; restore and increment dxs
@@ -5165,9 +5168,6 @@ gfx_RotateScaleSprite:
 
 	ld	bc, (ix + 15)	; B = size, C = scale
 	ld	a, b
-	dec	a
-	ld	(iy + (_smc_dsrs_ssize - _smc_dsrs_base_address)), a ; write smc
-	inc	a
 	mlt	bc			; size * scale
 	srl	a			; size / 2
 	or	a, a
@@ -5227,6 +5227,10 @@ gfx_RotateScaleSprite:
 	sbc	hl, de
 	ld	(iy + (_smc_dsrs_cosf_1_plus_offset_hl - _smc_dsrs_base_address)), hl
 
+	; note that A is preserved throughout the loop
+	ld	a, (ix + 16)	; scale
+	dec	a		; scale - 1 for comparison flags to work correctly
+
 	ld	iy, (ix + 9)		; sprite storing to
 	ld	b, c
 	ld	(iy + 0), bc
@@ -5241,6 +5245,7 @@ gfx_RotateScaleSprite:
 
 	ld	bc, $000000	; xs = (dxs + dyc) + (size * 128)
 _smc_dsrs_size128_0_plus_dyc_0 := $-3
+_smc_dsrs_base_address := _smc_dsrs_size128_0_plus_dyc_0
 	add	ix, bc		; de = (dxs + dyc) + (size * 128)
 
 	ld	bc, $000000	; ys = (dxc - dys) + (size * 128)
@@ -5249,12 +5254,11 @@ _smc_dsrs_size128_1_minus_dys_0 := $-3
 
 	jr	drawSpriteRotateScale_Begin
 _yloop:
- 	ld	bc, 0			; smc = cosf
+ 	ld	bc, $000000		; smc = cosf
 _smc_dsrs_cosf_1_plus_offset_hl := $-3
-_smc_dsrs_base_address := _smc_dsrs_cosf_1_plus_offset_hl
 	add	hl, bc			; dxc += cosf
 
-	ld	bc, 0			; smc = sinf
+	ld	bc, $000000		; smc = sinf
 _smc_dsrs_sinf_1_plus_offset_ix := $-3
 	add	ix, bc			; dxs += sinf
 
@@ -5262,9 +5266,6 @@ drawSpriteRotateScale_Begin:
 _smc_dsrs_size_1 := $+2			; smc = size * scale / 64
 	ld	iyl, $00
 _xloop:
-
-	ld	a, 0
-_smc_dsrs_ssize := $-1
 	cp	a, h
 	jr	c, drawSpriteRotateScale_SkipPixel
 	ld	c, ixh
@@ -5272,8 +5273,8 @@ _smc_dsrs_ssize := $-1
 	jr	c, drawSpriteRotateScale_SkipPixel
 	; get pixel and draw to buffer
 	push	hl			; xs
-	inc	a
 	ld	l, a
+	inc	l
 	mlt	hl
 	ld	b, 0
 	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
@@ -5288,16 +5289,16 @@ _smc_dsrs_sprptr_0 := $-3
 	ldi
 
 	pop	hl			; ys
-	ld	bc, 0			; smc = -sinf
+	ld	bc, $000000		; smc = -sinf
 _smc_dsrs_sinf_0A := $-3
 	add	hl, bc			; ys += -sinf
 
-	ld	bc, 0			; smc = cosf
+	ld	bc, $000000		; smc = cosf
 _smc_dsrs_cosf_0A := $-3
 	add	ix, bc			; xs += cosf
 
 	dec	iyl
-	jr	nz, _xloop		; x loop
+	jr	nz, _xloop	; x loop
 
 	dec	iyh
 	jr	nz, _yloop		; y loop
@@ -5306,10 +5307,12 @@ _smc_dsrs_cosf_0A := $-3
 	ret
 
 drawSpriteRotateScale_SkipPixel:
+	ld	b, a	; preserve A
 	ld	a,TRASPARENT_COLOR
 smcByte _TransparentColor
 	ld	(de), a			; write pixel
 	inc	de			; x++s
+	ld	a, b	; restore A
 
 	ld	bc, 0			; smc = -sinf
 _smc_dsrs_sinf_0B := $-3
