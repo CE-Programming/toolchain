@@ -2733,25 +2733,9 @@ smcByte _TransparentColor
 	pop	ix
 	ret
 
-; Opaque unrolled 8 times
+; Opaque unrolled 4 times
 ; Transparent unrolled 4 times
 _TransparentPlot_Opaque:		; routine to handle transparent plotting
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
-	ldi
-	ret	po
-	cp	a,(hl)
-	jr	z,_TransparentPlot_Transparent
 	ldi
 	ret	po
 	cp	a,(hl)
