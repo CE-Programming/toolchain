@@ -4894,10 +4894,9 @@ gfx_RotatedScaledSprite_NoClip:
 ;  arg3 : Scale factor (64 = 100%)
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	; ld	hl, $120000	; nop \ nop \ ld (de), a
-	ld	de, $E1A0ED	; ldi \ pop hl
-	ld	a, $18		; jr $+5 (lo)
-	ld	b, $05		; jr $+5 (hi)
+	ld	a, -1 + _RotatedScaledSprite_NoClip.inner_opaque - _RotatedScaledSprite_NoClip.dsrs_jump_1
+	; jr .inner_opaque_hijack \ inc l
+	ld	bc, ($2C0018) or (((-1 + _RotatedScaledSprite_NoClip.inner_opaque_hijack - _RotatedScaledSprite_NoClip.dsrs_jump_2) and $FF) shl 8)
 	jr	_RotatedScaledSprite_NoClip
 ;-------------------------------------------------------------------------------
 gfx_RotatedScaledTransparentSprite_NoClip:
@@ -4909,16 +4908,13 @@ gfx_RotatedScaledTransparentSprite_NoClip:
 ;  arg3 : Scale factor (64 = 100%)
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	; ld	hl, $1201s28	; jr z, $+1 \ ld (de), a
-	ld	de, $FE7E47	; ld b, a \ ld a, (hl) \ cp a, n (lo)
-	ld	a, TRASPARENT_COLOR	; cp a, n (hi)
-smcByte _TransparentColor
-	ld	b, $28	; jr z, $+1 (lo)
+	ld	a, -1 + _RotatedScaledSprite_NoClip.inner_transparent - _RotatedScaledSprite_NoClip.dsrs_jump_1
+	; push hl \ ld l, a \ inc l
+	ld	bc, $2C6FE5
 _RotatedScaledSprite_NoClip:
 	ld	iy, .dsrs_base_address
-	ld	(iy + (.dsrs_routine - .dsrs_base_address)), de
-	ld	(iy + (.dsrs_transparent - .dsrs_base_address)), a
-	ld	(iy + (.dsrs_jump - .dsrs_base_address)), b
+	ld	(iy + (_RotatedScaledSprite_NoClip.dsrs_jump_1 - .dsrs_base_address)), a
+	ld	(iy + (_RotatedScaledSprite_NoClip.dsrs_jump_2 - .dsrs_base_address - 1)), bc
 	push	ix
 	; aligning ix with gfx_RotateScaleSprite allows for code sharing
 	ld	ix, 3
@@ -4929,7 +4925,8 @@ _RotatedScaledSprite_NoClip:
 	inc	hl
 	inc	hl
 
-	ld	(iy + (.dsrs_sprptr_0 - .dsrs_base_address)), hl	; write smc
+	ld	(iy + (.dsrs_sprptr_0A - .dsrs_base_address)), hl	; write smc
+	ld	(iy + (.dsrs_sprptr_0B - .dsrs_base_address)), hl	; write smc
 
 	; sinf = _SineTable[angle] * 128 / scale;
 	ld	a, (ix + 12)		; angle
@@ -4941,7 +4938,8 @@ _RotatedScaledSprite_NoClip:
 	sbc	hl, hl
 	ccf
 	sbc	hl, de
-	ld	(iy + (.dsrs_sinf_0 - .dsrs_base_address)), hl	; write smc
+	ld	(iy + (.dsrs_sinf_0A - .dsrs_base_address)), hl	; write smc
+	ld	(iy + (.dsrs_sinf_0B - .dsrs_base_address)), hl	; write smc
 
 	; dxs = sinf * -(size * scale / 128);
 	call	_CalcDXS	; uses (iy + 0)
@@ -4949,7 +4947,8 @@ _RotatedScaledSprite_NoClip:
 
 	; cosf = _SineTable[angle + 64] * 128 / scale
 	call	calcSinCosSMC_loadCosine
-	ld	(iy + (.dsrs_cosf_0 - .dsrs_base_address)), hl	; write smc
+	ld	(iy + (.dsrs_cosf_0A - .dsrs_base_address)), hl	; write smc
+	ld	(iy + (.dsrs_cosf_0B - .dsrs_base_address)), hl	; write smc
 	; ld	(.dsrs_cosf_1), hl	; write smc
 
 	; dxc = cosf * -(size * scale / 128);
@@ -4996,7 +4995,7 @@ _RotatedScaledSprite_NoClip:
 	ld	c, a
 
 	; calculate y-loop offset for IX
-	ld	hl, (iy + (.dsrs_cosf_0 - .dsrs_base_address))
+	ld	hl, (iy + (.dsrs_cosf_0A - .dsrs_base_address))
 	; DE = HL * C
 	ld	e, l
 	ld	d, c
@@ -5008,11 +5007,11 @@ _RotatedScaledSprite_NoClip:
 	ld	d, a
 	ld	hl, (iy + (.dsrs_sinf_1_plus_offset_ix - .dsrs_base_address))
 	or	a, a
-	sbc.s	hl, de	; make sure UHL is zero
+	sbc	hl, de
 	ld	(iy + (.dsrs_sinf_1_plus_offset_ix - .dsrs_base_address)), hl
 
 	; calculate y-loop offset for HL
-	ld	hl, (iy + (.dsrs_sinf_0 - .dsrs_base_address))
+	ld	hl, (iy + (.dsrs_sinf_0A - .dsrs_base_address))
 	; DE = HL * C
 	ld	e, l
 	ld	d, c
@@ -5022,7 +5021,7 @@ _RotatedScaledSprite_NoClip:
 	ld	a, d
 	add	a, l
 	ld	d, a
-	ld	hl, (iy + (.dsrs_cosf_0 - .dsrs_base_address))
+	ld	hl, (iy + (.dsrs_cosf_0A - .dsrs_base_address))
 	or	a, a
 	sbc	hl, de
 	ld	(iy + (.dsrs_cosf_1_plus_offset_hl - .dsrs_base_address)), hl
@@ -5042,14 +5041,13 @@ _RotatedScaledSprite_NoClip:
 	dec	a		; scale - 1 for comparison flags to work correctly
 
 	pop	hl			; smc = dxc start
-	ld	ixh, c
+	ld	ixh, c			; store return value
 	ex	(sp), ix		; smc = dxs start	
 
 	ld	iyh, c			; size * scale / 64
 
 	ld	bc, 0	; xs = (dxs + dyc) + (size * 128)
 .dsrs_size128_0_plus_dyc_0 := $-3
-.dsrs_base_address := .dsrs_size128_0_plus_dyc_0
 	add	ix, bc	; de = (dxs + dyc) + (size * 128)
 
 	ld	bc, 0	; ys = (dxc - dys) + (size * 128)
@@ -5057,16 +5055,17 @@ _RotatedScaledSprite_NoClip:
 	add	hl, bc	; hl = (dxc - dys) + (size * 128)
 
 	call	gfx_Wait
+	jr	.begin_loop
 
-.outer:
-.dsrs_size_1 := $+2			; smc = size * scale / 64
-	ld	iyl, 0
-.inner:
+;-------------------------------------------------------------------------------
+
+.inner_opaque:
 	cp	a, h
 	jr	c, .skip_pixel
 	ld	c, ixh
 	cp	a, c
 	jr	c, .skip_pixel
+.inner_opaque_hijack:
 	; get pixel and draw to buffer
 	push	hl			; xs
 	ld	l, a
@@ -5077,40 +5076,29 @@ _RotatedScaledSprite_NoClip:
 	add	hl, bc			; y * size + x
 
 	ld	bc, 0
-.dsrs_sprptr_0 := $-3
+.dsrs_sprptr_0B := $-3
 	add	hl, bc
-
-	; SMC           ; Transparent    ; Non-Transparent
-	db	$47	; ld b, a        ; ldi (lo)
-	db	$7E	; ld a, (hl)     ; ldi (hi)
-	db	$FE	; cp a, n (lo)   ; pop hl
-.dsrs_routine := $-3
-	db	$00	; cp a, n (hi)   ; jr $+5 (lo)
-.dsrs_transparent := $-1
-	db	$28	; jr z, $+1 (lo) ; jr $+5 (hi)
-.dsrs_jump := $-1
-	db	$01	; jr z, $+1 (hi)
-	ld	(de), a
-	ld	a, b	; restore A
-
-	pop	hl			; ys
-.skip_pixel:
-	inc	de			; x++s
+	ldi
+	pop	hl
 
 	ld	bc, 0			; smc = -sinf
-.dsrs_sinf_0 := $-3
+.dsrs_sinf_0B := $-3
 	add	hl, bc			; ys += -sinf
 
 	ld	bc, 0			; smc = cosf
-.dsrs_cosf_0 := $-3
+.dsrs_cosf_0B := $-3
 	add	ix, bc			; xs += cosf
 
 	dec	iyl
-	jr	nz, .inner		; x loop
+	jr	nz, .inner_opaque	; x loop
 
+	dec	iyh	
+	jr	z, .finish		; y loop
+.outer:
 	; restore and increment dxc
 	ld	bc, 0			; smc = cosf
 .dsrs_cosf_1_plus_offset_hl := $-3
+.dsrs_base_address := .dsrs_cosf_1_plus_offset_hl
 	add	hl, bc			; dxc += cosf
 
 	; restore and increment dxs
@@ -5124,8 +5112,55 @@ _RotatedScaledSprite_NoClip:
 	ex	de, hl
 	add	hl, bc
 	ex	de, hl
+.begin_loop:
+.dsrs_size_1 := $+2			; smc = size * scale / 64
+	ld	iyl, 0
+.inner_transparent:
+	cp	a, h
+	jr	c, .skip_pixel
+	ld	c, ixh
+	cp	a, c
+	jr	c, .skip_pixel
+	; get pixel and draw to buffer
+	; smc to jr inner_opaque_hijack \ inc l
+	push	hl			; xs
+	ld	l, a
+.dsrs_jump_2 := $-1
+	inc	l
+	mlt	hl
+	ld	b, 0
+	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
+	add	hl, bc			; y * size + x
+
+	ld	bc, 0
+.dsrs_sprptr_0A := $-3
+	add	hl, bc
+	ld	b, a	; preserve A
+	ld	a, (hl)
+	cp	a, TRASPARENT_COLOR
+smcByte _TransparentColor
+	jr	z, .transparent_pixel
+	ld	(de), a
+.transparent_pixel:
+	ld	a, b	; restore A
+	pop	hl			; ys
+.skip_pixel:
+	inc	de			; x++s
+	ld	bc, 0			; smc = -sinf
+.dsrs_sinf_0A := $-3
+	add	hl, bc			; ys += -sinf
+
+	ld	bc, 0			; smc = cosf
+.dsrs_cosf_0A := $-3
+	add	ix, bc			; xs += cosf
+
+	dec	iyl
+	jr	nz, .inner_transparent		; x loop
+.dsrs_jump_1 := $-1
+
 	dec	iyh
 	jr	nz, .outer		; y loop
+.finish:
 	pop	af			; sprite out size
 	pop	ix
 	ret
@@ -5266,6 +5301,7 @@ _smc_dsrs_size128_1_minus_dys_0 := $-3
 	add	hl, bc		; hl = (dxc - dys) + (size * 128)
 
 	jr	drawSpriteRotateScale_Begin
+;-------------------------------------------------------------------------------
 _yloop:
  	ld	bc, $000000		; smc = cosf
 _smc_dsrs_cosf_1_plus_offset_hl := $-3
@@ -5343,6 +5379,8 @@ _smc_dsrs_cosf_0B := $-3
 	pop	hl			; sprite out ptr
 	pop	ix
 	ret
+
+;-------------------------------------------------------------------------------
 
 calcSinCosSMC_loadCosine:
 	ld	a, 64
