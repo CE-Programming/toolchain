@@ -5177,7 +5177,7 @@ gfx_RotateScaleSprite:
 	; sinf = _SineTable[angle] * 128 / scale;
 	ld	a, (ix + 12)		; angle
 	call	calcSinCosSMC
-	push	hl		; ld (ix - 3), _smc_dsrs_sinf_1_plus_offset_ix
+	push	hl	; ld (ix - 3), _smc_dsrs_sinf_1_plus_offset_ix
 	; ld	(_smc_dsrs_sinf_1_plus_offset_ix),hl ; write smc
 
 	; The previous code does ~HL instead of -HL. Unsure if intentional.
@@ -5216,12 +5216,12 @@ gfx_RotateScaleSprite:
 
 	; carry is cleared here
 	ld	de, (ix - 6)	; dsrs_dys_0
-	sbc.s	hl, de		; make sure UHL is zero
-	ld	(iy + (_smc_dsrs_size128_1_minus_dys_0 - _smc_dsrs_base_address)), hl	; write smc
+	sbc	hl, de
+	push	hl	; ld (ix - 12), _smc_dsrs_size128_1_minus_dys_0
 	add	hl, de		; restore HL
 	ld	de, (ix - 9)	; dsrs_dyc_0
 	add	hl, de
-	ld	(iy + (_smc_dsrs_size128_0_plus_dyc_0 - _smc_dsrs_base_address)), hl	; write smc
+	push	hl	; ld (ix - 15), _smc_dsrs_size128_0_plus_dyc_0
 	; carry might be set, but that shouldn't matter for rl c
 
 	ld	a, b
@@ -5246,7 +5246,7 @@ gfx_RotateScaleSprite:
 	ld	a, d
 	add	a, l
 	ld	d, a
-	ld	hl, (ix - 3)
+	ld	hl, (ix - 3)	; _smc_dsrs_sinf_1_plus_offset_ix
 	or	a, a
 	sbc.s	hl, de	; make sure UHL is zero
 	ld	(iy + (_smc_dsrs_sinf_1_plus_offset_ix - _smc_dsrs_base_address)), hl
@@ -5274,29 +5274,34 @@ gfx_RotateScaleSprite:
 	ld	iy, (ix + 9)		; sprite storing to
 	ld	b, c
 	ld	(iy + 0), bc
-	lea	de, iy + 2
 
+	; by popping these off the stack in a werid way, we can reduce SMC useage
+
+	pop	ix	; _smc_dsrs_size128_0_plus_dyc_0
+	pop	de	; _smc_dsrs_size128_1_minus_dys_0
 	pop	hl			; smc = dxc start
-	pop	ix			; smc = dxs start
+
+	; ys = (dxc - dys) + (size * 128)
+	add	hl, de	; HL = (dxc - dys) + (size * 128)
+
+	pop	de			; smc = dxs start
+
+	; xs = (dxs + dyc) + (size * 128)
+	add	ix, de	; IX = (dxs + dyc) + (size * 128)
+
+	lea	de, iy + 2
 
 	ex	(sp), iy		; pop reg24 \ push iy
 
 	ld	iyh, c			; size * scale / 64
 
-	ld	bc, $000000	; xs = (dxs + dyc) + (size * 128)
-_smc_dsrs_size128_0_plus_dyc_0 := $-3
-_smc_dsrs_base_address := _smc_dsrs_size128_0_plus_dyc_0
-	add	ix, bc		; de = (dxs + dyc) + (size * 128)
-
-	ld	bc, $000000	; ys = (dxc - dys) + (size * 128)
-_smc_dsrs_size128_1_minus_dys_0 := $-3
-	add	hl, bc		; hl = (dxc - dys) + (size * 128)
-
+	; UBC was set to zero from mlt bc awhile back
 	jr	drawSpriteRotateScale_Begin
 ;-------------------------------------------------------------------------------
 _yloop:
 	ld	bc, $000000		; smc = cosf
 _smc_dsrs_cosf_1_plus_offset_hl := $-3
+_smc_dsrs_base_address := _smc_dsrs_cosf_1_plus_offset_hl
 	add	hl, bc			; dxc += cosf
 
 	ld	bc, $000000		; smc = sinf
