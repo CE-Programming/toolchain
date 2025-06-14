@@ -4934,13 +4934,27 @@ _RSS_NC:
 	ld	(iy + (.dsrs_jump_2 - .dsrs_base_address - 1)), bc
 	ld	(iy + (.dsrs_clip_call - .dsrs_base_address)), h
 	push	ix
-	; aligning ix with gfx_RotateScaleSprite allows for code sharing
-	ld	ix, 3
-	lea	bc, ix - 3	; ld bc, 0
+	ld	ix, 0
+	lea	bc, ix + 0	; ld bc, 0
 	add	ix, sp
-	ld	hl, (ix + 3)		; sprite pointer
+	; iy +  0 : -(size * scale / 128)
+	; ix -  9 : size128_1_minus_dys_0
+	; ix -  6 : dyc_0
+	; ix -  3 : dys_0
+	; ix -  0 : IX
+	; ix +  3 : return address
+	; ix +  6 : sprite pointer
+	; ix +  9 : x position
+	; ix + 12 : y position
+	; ix + 15 : angle
+	; ix + 16 : width that was clipped
+	; ix + 17 : height that was clipped
+	; ix + 18 : scale
+	; ix + 19 : sprite size
+
+	ld	hl, (ix + 6)		; sprite pointer
 	ld	b, (hl)
-	ld	(ix + 16), b		; store sprite size
+	ld	(ix + 19), b		; store sprite size
 	inc	hl
 	inc	hl
 
@@ -4952,7 +4966,7 @@ _RSS_NC:
 	ld	(iy + (.dsrs_sprptr_0B - .dsrs_base_address)), hl	; write smc
 
 	; sinf = _SineTable[angle] * 128 / scale;
-	ld	a, (ix + 12)		; angle
+	ld	a, (ix + 15)		; angle
 	call	calcSinCosSMC
 	ld	(iy + (.dsrs_sinf_1_plus_offset_ix - .dsrs_base_address)), hl	; write smc
 
@@ -4966,20 +4980,21 @@ _RSS_NC:
 
 	; dxs = sinf * -(size * scale / 128);
 	call	_CalcDXS	; uses (iy + 0)
-	push	hl	; ld (ix - 6), dsrs_dys_0
+	push	hl	; ld (ix - 3), dsrs_dys_0
 
 	; cosf = _SineTable[angle + 64] * 128 / scale
 	call	calcSinCosSMC_loadCosine
+	; dxc = cosf * -(size * scale / 128);
+	ld	bc, (iy + 0)		; -(size * scale / 128)
+
 	ld	(iy + (.dsrs_cosf_0A - .dsrs_base_address)), hl	; write smc
 	ld	(iy + (.dsrs_cosf_0B - .dsrs_base_address)), hl	; write smc
 	; ld	(.dsrs_cosf_1), hl	; write smc
 
-	; dxc = cosf * -(size * scale / 128);
-	ld	bc,(iy + 0)		; -(size * scale / 128)
 	call	_16Mul16SignedNeg	; cosf * -(size * scale / 128)
-	push	hl	; ld (ix - 9), dsrs_dyc_0
+	push	hl	; ld (ix - 6), dsrs_dyc_0
 
-	ld	bc, (ix + 15)	; B = size, C = scale
+	ld	bc, (ix + 18)	; B = size, C = scale
 	or	a, a
 	sbc	hl, hl
 	ld	h, b
@@ -4991,13 +5006,16 @@ _RSS_NC:
 	or	a, a	; truncate
 
 	; carry is cleared here
-	ld	de, (ix - 6)	; dsrs_dys_0
-	sbc.s	hl, de		; make sure UHL is zero
-	ld	(iy + (.dsrs_size128_1_minus_dys_0 - .dsrs_base_address)), hl	; write smc
+	ld	de, (ix - 3)	; dsrs_dys_0
+	sbc	hl, de
+	; ld	(iy + (.dsrs_size128_1_minus_dys_0 - .dsrs_base_address)), hl	; write smc
+	push	hl	; ld (ix - 9), dsrs_size128_1_minus_dys_0
 	add	hl, de		; restore HL
-	ld	de, (ix - 9)	; dsrs_dyc_0
-	add	hl, de
-	ld	(iy + (.dsrs_size128_0_plus_dyc_0 - .dsrs_base_address)), hl	; write smc
+	ld	de, (ix - 6)	; dsrs_dyc_0
+	add.s	hl, de		; make sure UHL is zero
+	; ld	(iy + (.dsrs_size128_0_plus_dyc_0 - .dsrs_base_address)), hl	; write smc
+	push	hl	; ld (ix - 12), dsrs_size128_0_plus_dyc_0
+
 	; carry might be set, but that shouldn't matter for rl c
 
 	ld	a, b
@@ -5008,6 +5026,8 @@ _RSS_NC:
 	jr	nz, .hax
 	inc	a			; hax for scale = 1?
 .hax:
+	; store the return value before it gets modified
+	ld	(iy + (.dsrs_ret_size - .dsrs_base_address)), a
 	ld	b, a	; render height
 	ld	c, a	; render width
 
@@ -5043,34 +5063,34 @@ _RSS_NC:
 	sbc	hl, de
 	ld	(iy + (.dsrs_cosf_1_plus_offset_hl - .dsrs_base_address)), hl
 
-	ld	l, (ix + 9)		; y
+	ld	l, (ix + 12)		; y
 	ld	h, 160
 	mlt	hl
 	add	hl, hl
-	ld	de, (ix + 6)		; x
+	ld	de, (ix + 9)		; x
 	add	hl, de
 	ld	de, (CurrentBuffer)
 	add	hl, de			; offset buffer
 	ex	de, hl			; de = buffer pointer
 
 	; note that A is preserved throughout the loop
-	ld	a, (ix + 16)	; scale
+	ld	a, (ix + 19)	; scale
 	dec	a		; scale - 1 for comparison flags to work correctly
 
-	pop	hl			; smc = dxc start
-	ld	ixh, c			; store return value
-	ex	(sp), ix		; smc = dxs start
+	; by popping these off the stack in a werid way, we can reduce SMC useage
 
 	ld	iyh, b			; size * scale / 64
 
-	ld	bc, 0	; xs = (dxs + dyc) + (size * 128)
-.dsrs_size128_0_plus_dyc_0 := $-3
-	add	ix, bc	; de = (dxs + dyc) + (size * 128)
+	pop	ix			; dsrs_size128_0_plus_dyc_0
+	pop	hl			; dsrs_size128_1_minus_dys_0
 
-	ld	bc, 0	; ys = (dxc - dys) + (size * 128)
-.dsrs_size128_1_minus_dys_0 := $-3
-.dsrs_base_address := .dsrs_size128_1_minus_dys_0
-	add	hl, bc	; hl = (dxc - dys) + (size * 128)
+	pop	bc			; smc = dxc start
+	; ys = (dxc - dys) + (size * 128)
+	add	hl, bc	; HL = (dxc - dys) + (size * 128)
+
+	pop	bc			; smc = dxs start
+	; xs = (dxs + dyc) + (size * 128)
+	add	ix, bc	; IX = (dxs + dyc) + (size * 128)
 
 	call	gfx_Wait
 	jr	.begin_loop
@@ -5105,6 +5125,7 @@ _RSS_NC:
 
 	ld	bc, 0			; smc = cosf
 .dsrs_cosf_0B := $-3
+.dsrs_base_address := $-3
 	add	ix, bc			; xs += cosf
 
 	dec	iyl
@@ -5178,7 +5199,8 @@ smcByte _TransparentColor
 	dec	iyh
 	jr	nz, .outer		; y loop
 .finish:
-	pop	af			; sprite out size
+	ld	a, 0	; return value should be [1, 255]
+.dsrs_ret_size := $-1
 	pop	ix
 	ret
 
@@ -5186,8 +5208,7 @@ smcByte _TransparentColor
 _rss_not_culled:
 	; offscreen
 	ld	a, iyl	; sprite out size (iyl/width should remain untouched)
-	lea	hl, ix - 3
-	ld	sp, hl
+	ld	sp, ix
 	pop	ix
 	ret
 _RotatedScaled_ClipAdjust:
@@ -5196,8 +5217,8 @@ _RotatedScaled_ClipAdjust:
 	ld	iyh, b	; height
 	ld	iyl, c	; width
 	xor	a, a
-	ld	(ix + 13), a	; width that was clipped
-	ld	(ix + 14), a	; height that was clipped
+	ld	(ix + 16), a	; width that was clipped
+	ld	(ix + 17), a	; height that was clipped
 ; Clipping stuff
 ; Arguments:
 ;  arg0 : Pointer to sprite structure
@@ -5209,7 +5230,7 @@ _RotatedScaled_ClipAdjust:
 ;  NC : If offscreen
 	ld	bc,0
 smcWord _YMin
-	ld	hl,(ix + 9)		; hl = y coordinate
+	ld	hl,(ix + 12)		; hl = y coordinate
 	sbc	hl,bc
 	ex	de,hl			; de = y coordinate relative to min y
 	ld	a,ti.lcdHeight		; a = clip_height
@@ -5239,8 +5260,8 @@ smcByte _YSpan
 	add	hl,bc			; is partially clipped top?
 	jr	nc, _rss_not_culled
 	ex	de,hl			; e = new height - 1
-	ld	(ix + 14), a		; store height that was clipped
-	ld	(ix + 9),0		; save min y coordinate
+	ld	(ix + 17), a		; store height that was clipped
+	ld	(ix + 12),0		; save min y coordinate
 smcByte _YMin
 .clipbottom:
 	inc	e
@@ -5277,11 +5298,11 @@ smcWord _XSpan
 .clipleft:
 	add	hl,bc			; is partially clipped left?
 	jr	nc, _rss_not_culled	; return if offscreen
-	ld	(ix + 13), a		; store width that was clipped
+	ld	(ix + 16), a		; store width that was clipped
 	ex	de,hl			; e = new width - 1
 	ld	hl,0
 smcWord _XMin
-	ld	(ix + 6),hl		; save min x coordinate
+	ld	(ix + 9),hl		; save min x coordinate
 .clipright:
 	inc	e
 	ld	iyl,e			; save new width
@@ -5289,13 +5310,14 @@ smcWord _XMin
 	; width and height are on the stack
 	ex	(sp), iy
 
-	ld	bc, (ix + 13)
+	ld	bc, (ix + 16)
 
 	; Starting IX offset X
 	ld	hl, (iy + (_RSS_NC.dsrs_cosf_0A - _RSS_NC.dsrs_base_address))
 	; DE = HL * C(width)
 	call	_set_DE_to_HL_mul_C
-	ld	hl, (iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address))
+	; ld	hl, (iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address))
+	ld	hl, (ix - 12)	; dsrs_size128_0_plus_dyc_0
 	add	hl, de
 	push	hl
 
@@ -5303,7 +5325,8 @@ smcWord _XMin
 	ld	hl, (iy + (_RSS_NC.dsrs_sinf_0A - _RSS_NC.dsrs_base_address))
 	; DE = HL * C(width)
 	call	_set_DE_to_HL_mul_C
-	ld	hl, (iy + (_RSS_NC.dsrs_size128_1_minus_dys_0 - _RSS_NC.dsrs_base_address))
+	; ld	hl, (iy + (_RSS_NC.dsrs_size128_1_minus_dys_0 - _RSS_NC.dsrs_base_address))
+	ld	hl, (ix - 9)	; dsrs_size128_1_minus_dys_0
 	add	hl, de
 	push	hl
 
@@ -5314,16 +5337,18 @@ smcWord _XMin
 	; DE = HL * B(height)
 	call	_set_DE_to_HL_mul_C
 	pop	hl
-	add.s	hl, de	; make sure UHL is zero
-	ld	(iy + (_RSS_NC.dsrs_size128_1_minus_dys_0 - _RSS_NC.dsrs_base_address)), hl
+	add	hl, de
+	; ld	(iy + (_RSS_NC.dsrs_size128_1_minus_dys_0 - _RSS_NC.dsrs_base_address)), hl
+	ld	(ix - 9), hl	; dsrs_size128_1_minus_dys_0
 
 	; Starting IX offset Y
 	ld	hl, (iy + (_RSS_NC.dsrs_sinf_1_plus_offset_ix - _RSS_NC.dsrs_base_address))
 	; DE = HL * B(height)
 	call	_set_DE_to_HL_mul_C
 	pop	hl
-	add	hl, de
-	ld	(iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address)), hl
+	add.s	hl, de	; make sure UHL is zero
+	; ld	(iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address)), hl
+	ld	(ix - 12), hl	; dsrs_size128_0_plus_dyc_0
 
 	pop	bc	; B = height, C = width
 	ret
@@ -5350,26 +5375,41 @@ gfx_RotateScaleSprite:
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
 	push	ix
-	ld	ix, 0
-	lea	bc, ix + 0	; ld bc, 0
+	; aligning ix with gfx_RotatedScaledSprite allows for code sharing
+	ld	ix, -3
+	lea	bc, ix + 3	; ld bc, 0
 	add	ix, sp
+	; iy +  0 : -(size * scale / 128)
+	; ix - 12 : size128_0_plus_dyc_0
+	; ix -  9 : size128_1_minus_dys_0
+	; ix -  6 : dyc_0
+	; ix -  3 : dys_0
+	; ix -  0 : _smc_dsrs_sinf_1_plus_offset_ixX
+	; ix +  3 : IX
+	; ix +  6 : return address
+	; ix +  9 : input sprite pointer
+	; ix + 12 : output sprite pointer
+	; ix + 15 : angle
+	; ix + 18 : scale
+	; ix + 19 : sprite size
+
 	ld	iy, _smc_dsrs_base_address
-	ld	hl, (ix + 6)		; sprite pointer
+	ld	hl, (ix + 9)		; sprite pointer
 	ld	b, (hl)
-	ld	(ix + 16), b		; store sprite size
+	ld	(ix + 19), b		; store sprite size
 	inc	hl
 	inc	hl
 
-	; or	a, a	; carry already cleared
+	or	a, a
 	dec	b
 	sbc	hl, bc	; offset the sprite pointer by (size - 1) * 256
 
 	ld	(iy + (_smc_dsrs_sprptr_0 - _smc_dsrs_base_address)), hl ; write smc
 
 	; sinf = _SineTable[angle] * 128 / scale;
-	ld	a, (ix + 12)		; angle
+	ld	a, (ix + 15)		; angle
 	call	calcSinCosSMC
-	push	hl	; ld (ix - 3), _smc_dsrs_sinf_1_plus_offset_ix
+	push	hl	; ld (ix - 0), _smc_dsrs_sinf_1_plus_offset_ix
 	; ld	(_smc_dsrs_sinf_1_plus_offset_ix),hl ; write smc
 
 	; The previous code does ~HL instead of -HL. Unsure if intentional.
@@ -5382,20 +5422,21 @@ gfx_RotateScaleSprite:
 
 	; dxs = sinf * -(size * scale / 128);
 	call	_CalcDXS	; uses (iy + 0)
-	push	hl		; ld (ix - 6), _smc_dsrs_dys_0
+	push	hl		; ld (ix - 3), _smc_dsrs_dys_0
 
 	; cosf = _SineTable[angle + 64] * 128 / scale
 	call	calcSinCosSMC_loadCosine
+	ld	bc, (iy + 0)		; -(size * scale / 128)
+
 	ld	(iy + (_smc_dsrs_cosf_0A - _smc_dsrs_base_address)), hl ; write smc
 	ld	(iy + (_smc_dsrs_cosf_0B - _smc_dsrs_base_address)), hl ; write smc
 	; ld	(_smc_dsrs_cosf_1_plus_offset_hl),hl ; write smc
 
 	; dxc = cosf * -(size * scale / 128);
-	ld	bc, (iy + 0)		; -(size * scale / 128)
 	call	_16Mul16SignedNeg	; cosf * -(size * scale / 128)
-	push	hl	; ld (ix - 9), _smc_dsrs_dyc_0
+	push	hl	; ld (ix - 6), _smc_dsrs_dyc_0
 
-	ld	bc, (ix + 15)	; B = size, C = scale
+	ld	bc, (ix + 18)	; B = size, C = scale
 	or	a, a
 	sbc	hl, hl
 	ld	h, b
@@ -5407,13 +5448,13 @@ gfx_RotateScaleSprite:
 	or	a, a	; truncate
 
 	; carry is cleared here
-	ld	de, (ix - 6)	; dsrs_dys_0
+	ld	de, (ix - 3)	; dsrs_dys_0
 	sbc	hl, de
-	push	hl	; ld (ix - 12), _smc_dsrs_size128_1_minus_dys_0
+	push	hl	; ld (ix - 9), _smc_dsrs_size128_1_minus_dys_0
 	add	hl, de		; restore HL
-	ld	de, (ix - 9)	; dsrs_dyc_0
+	ld	de, (ix - 6)	; dsrs_dyc_0
 	add	hl, de
-	push	hl	; ld (ix - 15), _smc_dsrs_size128_0_plus_dyc_0
+	push	hl	; ld (ix - 12), _smc_dsrs_size128_0_plus_dyc_0
 	; carry might be set, but that shouldn't matter for rl c
 
 	ld	a, b
@@ -5431,7 +5472,7 @@ gfx_RotateScaleSprite:
 	ld	hl, (iy + (_smc_dsrs_cosf_0A - _smc_dsrs_base_address))
 	; DE = HL * C
 	call	_set_DE_to_HL_mul_C
-	ld	hl, (ix - 3)	; _smc_dsrs_sinf_1_plus_offset_ix
+	ld	hl, (ix - 0)	; _smc_dsrs_sinf_1_plus_offset_ix
 	or	a, a
 	sbc.s	hl, de	; make sure UHL is zero
 	ld	(iy + (_smc_dsrs_sinf_1_plus_offset_ix - _smc_dsrs_base_address)), hl
@@ -5446,24 +5487,23 @@ gfx_RotateScaleSprite:
 	ld	(iy + (_smc_dsrs_cosf_1_plus_offset_hl - _smc_dsrs_base_address)), hl
 
 	; note that A is preserved throughout the loop
-	ld	a, (ix + 16)	; scale
+	ld	a, (ix + 19)	; scale
 	dec	a		; scale - 1 for comparison flags to work correctly
 
-	ld	iy, (ix + 9)		; sprite storing to
+	ld	iy, (ix + 12)		; sprite storing to
 	ld	b, c
 	ld	(iy + 0), bc
 
 	; by popping these off the stack in a werid way, we can reduce SMC useage
 
 	pop	ix	; _smc_dsrs_size128_0_plus_dyc_0
-	pop	de	; _smc_dsrs_size128_1_minus_dys_0
-	pop	hl			; smc = dxc start
+	pop	hl	; _smc_dsrs_size128_1_minus_dys_0
 
+	pop	de			; smc = dxc start
 	; ys = (dxc - dys) + (size * 128)
 	add	hl, de	; HL = (dxc - dys) + (size * 128)
 
 	pop	de			; smc = dxs start
-
 	; xs = (dxs + dyc) + (size * 128)
 	add	ix, de	; IX = (dxs + dyc) + (size * 128)
 
@@ -5560,9 +5600,9 @@ _smc_dsrs_cosf_0B := $-3
 
 calcSinCosSMC_loadCosine:
 	ld	a, 64
-	add	a, (ix + 12)
+	add	a, (ix + 15)
 calcSinCosSMC:
-	ld	e, (ix + 15)
+	ld	e, (ix + 18)
 ; inputs:
 ; A = angle
 ; E = scale
@@ -5634,7 +5674,7 @@ _SineTable:
 
 _CalcDXS:
 	ex	de, hl
-	ld	bc, (ix + 15)
+	ld	bc, (ix + 18)
 	; inputs:
 	; DE = sinf
 	; B = size
