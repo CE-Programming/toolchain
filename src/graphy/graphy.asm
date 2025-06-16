@@ -4400,98 +4400,101 @@ _Polygon:
 
 ;-------------------------------------------------------------------------------
 gfy_FlipSpriteX: ; MODIFIED_FROM_GRAPHX gfx_FlipSpriteY
-; Flips an array horizontally about the center vertical axis
+; Flips a sprite vertically about the center horizontal axis
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
+	inc.s	bc		; clear UBC
 	ld	iy,0
 	add	iy,sp
-	push	ix
-	ld	ix,(iy+3)
-	ld	a,(ix+1)		; a = width of sprite
+	ld	de,(iy+3)
+	ld	a,(de)		; a = width of sprite
+	ld	b, a
+	inc	de
+	ld	a,(de)		; a = height of sprite
+
 	sbc	hl,hl
 	ld	l,a
 	ld	c,a
-	push	hl
-	ld	(.width),a
-	add	hl,hl
-	ld	(.delta),hl		; width*2
-	ld	a,(ix+0)		; a = height of sprite
-	pop	hl
-	lea	de,ix+2
+
+	inc	de
+	
 	add	hl,de
-	ld	ix,(iy+6)
-	ld	(ix+0),a		; store height to width
-	ld	(ix+1),c		; store width to height
-	lea	de,ix+2			; de -> sprite data
-	ex	(sp),ix			; restore stack frame
+	ld	de,(iy+6)	; de -> sprite data
+	push	de
+	ex	de, hl
+	ld	(hl),b		; store width
+	ex	de, hl
+	inc	de
+	ld	(de),a		; store height
+	ld	iyh, b
+;	inc	de		; use the inc de inside the loop instead
 .loop:
-	ld	b,0
-.width := $-1
-	ld	c,a
+	ld	b,c	; height
 .pixelloop:
 	dec	hl
+	inc	de
 	ld	a,(hl)
 	ld	(de),a			; store the new pixel data
-	inc	de
 	djnz	.pixelloop
-	ld	a,c
-	ld	bc,0
-.delta := $-3
+	; hl += delta * 2
 	add	hl,bc
-	dec	a
+	add	hl,bc
+	dec	iyh
 	jr	nz,.loop
 	pop	hl
 	ret
 
 ;-------------------------------------------------------------------------------
 gfy_FlipSpriteY: ; MODIFIED_FROM_GRAPHX gfx_FlipSpriteX
-; Flip a sprite vertically about the center horizontal axis
+; Flips a sprite horizontally about the center vertical axis
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	ld	iy,0
-	add	iy,sp
-	push	ix
-	ld	ix,(iy+3)
-	xor	a,a
-	sub	a,(ix+1)
-	ld	(.delta),a
-	neg
-	ld	(.width),a
-	ld	l,(ix+0)
-	ld	c,l
-	dec	l
-	ld	h,a
-	mlt	hl
-	lea	de,ix+2
-	add	hl,de
-	ld	ix,(iy+6)
-	ld	(ix+1),a
-	ld	(ix+0),c
-	lea	de,ix+2
-	push	ix
+	ld	iy, 6
+	lea	hl, iy
+	add	hl, sp
+	ld	de, (hl)
+	push	de	; return value
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+
+	ld	a, (hl)
+	ldi		; copy width
+	ld	c, a
+
+	xor	a, a
+	ld	b, (hl)
+	sub	a, b
+	ld	(.delta), a
+	ld	iyl, b	; (.height) 
+	ld	a, c
+	ldi		; copy height (and decrement C)
+
+	mlt	bc
+	add	hl, bc
 .loop:
-	ld	bc,0
-.width := $-3
+	lea	bc, iy	; (.height)
 	ldir
-	ld	bc,-1
-.delta := $-3
-	add	hl,bc
-	add	hl,bc
+	dec	bc	; ld bc, -1
+	ld	c, -1
+.delta := $-1
+	add	hl, bc
+	add	hl, bc
 	dec	a
-	jr	nz,.loop
+	jr	nz, .loop
 	pop	hl
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
 gfy_RotateSpriteCC: ; MODIFIED_FROM_GRAPHX gfy_RotateSpriteC
-; Rotates an array 90 degress clockwise
+; Rotates a sprite 90 degrees counter clockwise
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
@@ -4502,12 +4505,11 @@ gfy_RotateSpriteCC: ; MODIFIED_FROM_GRAPHX gfy_RotateSpriteC
 	push	ix
 	ld	hl,(iy+6)
 	ld	iy,(iy+3)
-	ld	ix,(iy+0)		; ixl = height  ,  ixh = width
-	ld	a, ixl
+	ld	ix,(iy+0)		; ixl = width  ,  ixh = height
 	lea	bc,ix
-	ld	(hl),c
-	inc	hl
 	ld	(hl),b
+	inc	hl
+	ld	(hl),c
 	mlt	bc
 	add	hl,bc
 	ex	de,hl
@@ -4533,7 +4535,7 @@ gfy_RotateSpriteCC: ; MODIFIED_FROM_GRAPHX gfy_RotateSpriteC
 
 ;-------------------------------------------------------------------------------
 gfy_RotateSpriteC: ; MODIFIED_FROM_GRAPHX gfy_RotateSpriteCC
-; Rotates a sprite 90 degrees counter clockwise
+; Rotates a sprite 90 degress clockwise
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
@@ -4546,14 +4548,14 @@ gfy_RotateSpriteC: ; MODIFIED_FROM_GRAPHX gfy_RotateSpriteCC
 	ld	hl,(iy+6)
 	push	hl
 	ld	iy,(iy+3)
-	ld	ix,(iy+0)		; ixl = height  ,  ixh = width
+	ld	ix,(iy+0)		; ixl = width  ,  ixh = height
 	lea	de,ix
-	ld	(hl),e
-	inc	hl
 	ld	(hl),d
 	inc	hl
-	dec	e
-	ld	c,e
+	ld	(hl),e
+	inc	hl
+	dec	d
+	ld	c,d
 	ex	de,hl
 .outer:
 	lea	hl,iy+2
@@ -4572,30 +4574,34 @@ gfy_RotateSpriteC: ; MODIFIED_FROM_GRAPHX gfy_RotateSpriteCC
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_RotateSpriteHalf: ; MODIFIED_FROM_GRAPHX
-; Rotates an array 180 degrees
+gfy_RotateSpriteHalf: ; COPIED_FROM_GRAPHX
+; Rotates a sprite 180 degrees
 ; Arguments:
 ;  arg0 : Pointer to sprite struct input
 ;  arg1 : Pointer to sprite struct output
 ; Returns:
 ;  arg1 : Pointer to sprite struct output
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy+3)
-	ld	b,(hl)			; c = height
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)	; output sprite
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)	; input sprite
+	ld	c, (hl)		; c = width
 	inc	hl
-	ld	c,(hl)			; b = width
-	ld	iy,(iy+6)
-	ld	(iy+0),bc
+	ld	b, (hl)		; b = height
+	ex	de, hl
+	ld	(hl), bc
+	ex	de, hl
 	mlt	bc
-	add	hl,bc
-	lea	de,iy
+	add	hl, bc
 	push	de
 .loop:
 	inc	de
 	inc	de
 	ldd
-	jp	pe,.loop
+	jp	pe, .loop
 	pop	hl
 	ret
 
