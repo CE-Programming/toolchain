@@ -476,16 +476,42 @@ gfy_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle, 64)
 
 /**
  * Helper macro to only perform rotation using
+ * gfy_RotatedScaledTransparentSprite.
+ *
+ * @param[in] sprite Input sprite to rotate/scale.
+ * @param[in] x X coordinate position.
+ * @param[in] y Y coordinate position.
+ * @param[in] angle 256 position angular integer.
+ * @see gfy_RotatedScaledTransparentSprite.
+ */
+ #define gfy_RotatedTransparentSprite(sprite, x, y, angle) \
+gfy_RotatedScaledTransparentSprite(sprite, x, y, angle, 64) 
+
+/**
+ * Helper macro to only perform rotation using
  * gfy_RotatedScaledSprite_NoClip.
  *
  * @param[in] sprite Input sprite to rotate/scale.
  * @param[in] x X coordinate position.
  * @param[in] y Y coordinate position.
  * @param[in] angle 256 position angular integer.
- * @see gfy_RotatedScaledTransparentSprite_NoClip.
+ * @see gfy_RotatedScaledSprite_NoClip.
  */
 #define gfy_RotatedSprite_NoClip(sprite, x, y, angle) \
 gfy_RotatedScaledSprite_NoClip(sprite, x, y, angle, 64)
+
+/**
+ * Helper macro to only perform rotation using
+ * gfy_RotatedScaledSprite.
+ *
+ * @param[in] sprite Input sprite to rotate/scale.
+ * @param[in] x X coordinate position.
+ * @param[in] y Y coordinate position.
+ * @param[in] angle 256 position angular integer.
+ * @see gfy_RotatedScaledSprite.
+ */
+#define gfy_RotatedSprite(sprite, x, y, angle) \
+gfy_RotatedScaledSprite(sprite, x, y, angle, 64)
 
 /**
  * Helper macro to only perform rotation using gfy_RotateScaleSprite.
@@ -1458,10 +1484,12 @@ void gfy_ScaledTransparentSprite_NoClip(const gfy_sprite_t *sprite,
                                         uint8_t height_scale);
 
 /**
- * Fixed Rotation with scaling factor for sprites.
+ * Fixed Rotation with scaling factor for an unclipped sprite.
  *
  * @note A scale factor of 64 represents 100% scaling.
  * @warning This routine only accepts square input sprites.
+ * @note Sprites larger than 210x210 may have rendering artifacts.
+ * @warning The output size cannot be greater than 255x255.
  * @param[in] sprite Input sprite to rotate/scale.
  * @param[in] x X coordinate position.
  * @param[in] y Y coordinate position.
@@ -1477,10 +1505,12 @@ uint8_t gfy_RotatedScaledTransparentSprite_NoClip(const gfy_sprite_t *sprite,
                                                   uint8_t scale);
 
 /**
- * Fixed Rotation with scaling fator for sprites without transparency.
+ * Fixed Rotation with scaling fator for an unclipped sprite without transparency.
  *
  * @note A scale factor of 64 represents 100% scaling.
  * @warning This routine only accepts square input sprites.
+ * @note Sprites larger than 210x210 may have rendering artifacts.
+ * @warning The output size cannot be greater than 255x255.
  * @param[in] sprite Input sprite to rotate/scale.
  * @param[in] x X coordinate position.
  * @param[in] y Y coordinate position.
@@ -1495,6 +1525,49 @@ uint8_t gfy_RotatedScaledSprite_NoClip(const gfy_sprite_t *sprite,
                                        uint8_t y,
                                        uint8_t angle,
                                        uint8_t scale);
+
+/**
+ * Fixed Rotation with scaling factor for sprites.
+ *
+ * @note A scale factor of 64 represents 100% scaling.
+ * @warning This routine only accepts square input sprites.
+ * @note Sprites larger than 210x210 may have rendering artifacts.
+ * @warning The output size cannot be greater than 255x255.
+ * @param[in] sprite Input sprite to rotate/scale.
+ * @param[in] x X coordinate position.
+ * @param[in] y Y coordinate position.
+ * @param[in] angle 256 position angular integer.
+ * @param[in] scale Scaling factor; range is about 1% to 400% scale.
+ * @returns The unclipped size of the sprite after scaling.
+ *          This can be used for centering purposes.
+ */
+uint8_t gfy_RotatedScaledTransparentSprite(const gfy_sprite_t *sprite,
+                                           int x,
+                                           int y,
+                                           uint8_t angle,
+                                           uint8_t scale);
+
+/**
+ * Fixed Rotation with scaling fator for sprites without transparency.
+ *
+ * @note A scale factor of 64 represents 100% scaling.
+ * @warning This routine only accepts square input sprites.
+ * @note Sprites larger than 210x210 may have rendering artifacts.
+ * @warning The output size cannot be greater than 255x255.
+ * @param[in] sprite Input sprite to rotate/scale.
+ * @param[in] x X coordinate position.
+ * @param[in] y Y coordinate position.
+ * @param[in] angle 256 position angular integer.
+ * @param[in] scale Scaling factor; range is about 1% to 400% scale.
+ *        64 represents 100% scaling.
+ * @returns The unclipped size of the sprite after scaling.
+ *          This can be used for centering purposes.
+ */
+uint8_t gfy_RotatedScaledSprite(const gfy_sprite_t *sprite,
+                                int x,
+                                int y,
+                                uint8_t angle,
+                                uint8_t scale);
 
 /**
  * Flips a sprite along the X axis.
