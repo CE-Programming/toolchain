@@ -4614,23 +4614,21 @@ gfy_ScaleSprite: ; MODIFIED_FROM_GRAPHX
 	push	ix
 	ld	hl,(iy+6)
 
-	; DEBUG swap target width/height
-	ld	d, (hl)
-	inc	hl
-	ld	e, (hl)
-	ld	(hl), d
-	dec	hl
-	ld	(hl), e
-
 	push	hl
+
+	inc	hl
 	ld	a,(hl)
+	dec	hl
 	ld	ixh,a			; target_width
 	ld	(ScaleWidth),a
-	inc	hl
+	
 	xor	a,a
 	sub	a,(hl)
 	ld	ixl,a			; -target_height
+
 	inc	hl
+	inc	hl
+
 	push	hl			; hl->tgt_data
 	ld	hl,(iy+3)
 	ld	c,(hl)			; src_height
@@ -4688,15 +4686,6 @@ dv_shr_8_times_width_plus_width := $-3
 	jr	nz,.outer
 	pop	hl
 	pop	ix
-
-	; DEBUG swap target width/height
-	ld	d, (hl)
-	inc	hl
-	ld	e, (hl)
-	ld	(hl), d
-	dec	hl
-	ld	(hl), e
-
 	ret
 
 ;-------------------------------------------------------------------------------
