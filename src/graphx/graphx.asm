@@ -4904,12 +4904,17 @@ _RotatedScaledSprite_NoClip:
 	push	ix
 	; aligning ix with gfx_RotateScaleSprite allows for code sharing
 	ld	ix, 3
+	lea	bc, ix - 3	; ld bc, 0
 	add	ix, sp
 	ld	hl, (ix + 3)		; sprite pointer
-	ld	a, (hl)
-	ld	(ix + 16), a		; store sprite size
+	ld	b, (hl)
+	ld	(ix + 16), b		; store sprite size
 	inc	hl
 	inc	hl
+
+	; or	a, a	; carry already cleared
+	dec	b
+	sbc	hl, bc	; offset the sprite pointer by (size - 1) * 256
 
 	ld	(iy + (.dsrs_sprptr_0A - .dsrs_base_address)), hl	; write smc
 	ld	(iy + (.dsrs_sprptr_0B - .dsrs_base_address)), hl	; write smc
@@ -5060,7 +5065,7 @@ _RotatedScaledSprite_NoClip:
 	ld	l, a
 	inc	l
 	mlt	hl
-	ld	b, 0
+	ld	b, a	; A is a known constant that we can compensate for
 	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
 	add	hl, bc			; y * size + x
 
@@ -5117,7 +5122,7 @@ _RotatedScaledSprite_NoClip:
 .dsrs_jump_2 := $-1
 	inc	l
 	mlt	hl
-	ld	b, 0
+	ld	b, a	; A is a known constant that we can compensate for
 	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
 	add	hl, bc			; y * size + x
 
@@ -5166,14 +5171,21 @@ gfx_RotateScaleSprite:
 ;  arg1 : Pointer to sprite struct output
 	push	ix
 	ld	ix, 0
+	lea	bc, ix + 0	; ld bc, 0
 	add	ix, sp
 	ld	iy, _smc_dsrs_base_address
 	ld	hl, (ix + 6)		; sprite pointer
-	ld	a, (hl)
-	ld	(ix + 16), a		; store sprite size
+	ld	b, (hl)
+	ld	(ix + 16), b		; store sprite size
 	inc	hl
 	inc	hl
+
+	; or	a, a	; carry already cleared
+	dec	b
+	sbc	hl, bc	; offset the sprite pointer by (size - 1) * 256
+
 	ld	(iy + (_smc_dsrs_sprptr_0 - _smc_dsrs_base_address)), hl ; write smc
+
 	; sinf = _SineTable[angle] * 128 / scale;
 	ld	a, (ix + 12)		; angle
 	call	calcSinCosSMC
@@ -5297,6 +5309,7 @@ gfx_RotateScaleSprite:
 
 	; UBC was set to zero from mlt bc awhile back
 	jr	drawSpriteRotateScale_Begin
+
 ;-------------------------------------------------------------------------------
 _yloop:
 	ld	bc, $000000		; smc = cosf
@@ -5322,7 +5335,7 @@ _xloop:
 	ld	l, a
 	inc	l
 	mlt	hl
-	ld	b, 0
+	ld	b, a	; A is a known constant that we can compensate for
 	; result is at most 255 * 255 + 255 or 65279. Make sure UBC is zero
 	add	hl, bc			; y * size + x
 
