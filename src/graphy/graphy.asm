@@ -2582,36 +2582,30 @@ gfy_TransparentSprite:
 	push	ix			; save ix sp
 	call	_ClipCoordinates
 	jr	nc, .culled
-	ld	iyh, a	; (.amount)
-	ld	a, b			; new width
-	ld	iyl, a	; (.next)
-	cpl
-	add	a, ti.lcdHeight + 1
-	ld	ixl, a	; (.jump)
-	ld	ixh, c			; new height
-	ld	b, 0
 .transparent_color := $+1
 	ld	a, TRASPARENT_COLOR
 smcByte _TransparentColor
 	wait_quick
 .loop:
-	ld	c, iyl	; (.next)
+	ld	c, iyh	; (.next)
 
 	call	_TransparentPlot	; call the transparent routine
-	ld	c, iyh	; (.amount)
+	ld	c, ixl	; (.amount)
 	add	hl, bc	; move to next line
 	
-	ld	c, ixl	; (.jump)
+	ld	c, ixh	; (.jump)
 	ex	de, hl
 	add	hl, bc	; move to next column
 	ex	de, hl
 
-	dec	ixh
+	dec	iyl
 	jr	nz, .loop
 .culled:
 	pop	ix
 	ret
 
+; Opaque unrolled 4 times
+; Transparent unrolled 4 times
 _TransparentPlot_Opaque:		; routine to handle transparent plotting
 	ldi
 	ret	po
@@ -2669,24 +2663,16 @@ gfy_Sprite:
 	push	ix			; save ix sp
 	call	_ClipCoordinates
 	jr	nc, .culled
-	ld	iyh, a	; (.amount)
-	ld	a, b			; new width
-	ld	iyl, a	; (.next)
-	cpl
-	add	a, ti.lcdHeight + 1
-	ld	ixl, a	; (.jump)
-	ld	a, c			; new height
-	ld	b, 0
+	ld	a, iyl	; new width
 	wait_quick
-
 .loop:
-	ld	c, iyl	; (.next)
+	ld	c, iyh	; (.next)
 	ldir
 
-	ld	c, iyh	; (.amount)
+	ld	c, ixl	; (.amount)
 	add	hl, bc	; move to next line
 
-	ld	c, ixl	; (.jump)
+	ld	c, ixh	; (.jump)
 	ex	de, hl
 	add	hl, bc	; move to next column
 	ex	de, hl
@@ -2777,20 +2763,20 @@ gfy_TransparentSprite_NoClip:
 	add	hl, de		; add y cord
 	ld	de, (CurrentBuffer)
 	add	hl, de		; add buffer offset
-	ex	de, hl	; de -> place to draw
+	ex	de, hl		; de -> place to draw
 	ld	hl,(iy+3)
 
 	ld	a,(hl)
-	ld	iyh, a			; iyh = width of sprite
+	ld	iyh, a		; iyh = width of sprite
 	inc	hl
 
 	ld	a,(hl)
 	ld	(.next),a
 	cpl
 	add	a, ti.lcdHeight + 1
-	ld	iyl, a	; jump
+	ld	iyl, a		; jump
 
-	inc	hl	; hl -> sprite_data
+	inc	hl		; hl -> sprite_data
 
 	ld	a,TRASPARENT_COLOR
 smcByte _TransparentColor
@@ -2815,13 +2801,15 @@ _ClipCoordinates:
 ;  arg1 : X coordinate
 ;  arg2 : Y coordinate
 ; Returns:
-;  A  : How much to add to the sprite per iteration
-;  BCU: 0
-;  B  : New sprite height
-;  C  : New sprite width
-;  HL : Sprite pixel pointer
-;  DE : Buffer pixel pointer
-;  NC : If offscreen
+;  IXL : How much to add to the sprite per iteration
+;  IXH : Column increment
+;  IYL : New sprite width
+;  IYH : New sprite height
+;  BCU : 0
+;  B   : 0
+;  HL  : Sprite pixel pointer
+;  DE  : Buffer pixel pointer
+;  NC  : If offscreen
 	ld	ix, 6			; get pointer to arguments
 	add	ix, sp
 	ld	hl, (ix + 3)		; hl -> sprite data
@@ -2926,7 +2914,6 @@ smcByte _YMin
 	sub	a,e			; calculate bytes to add per iteration
 .yclipped:
 ; CALCULATE OFFSETS
-	lea.s	bc, iy
 	ld	hl, (ix+6)		; x
 	ld	e, (ix+9)		; y
 	ld	d, h		; maybe ld d, 0
@@ -2946,6 +2933,14 @@ smcByte _YMin
 	ld	hl,(ix+3)		; hl -> sprite data
 	inc	hl
 	inc	hl
+
+	; UBC is cleared here
+	ld	ixl, a			; (.amount)
+	ld	a, iyh			; new height (.next)
+	cpl
+	add	a, ti.lcdHeight + 1
+	ld	b, 0
+	ld	ixh, a			; (.jump)
 	scf				; set carry for success
 	ret
 
