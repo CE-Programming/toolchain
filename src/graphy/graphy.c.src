@@ -1599,66 +1599,66 @@ BB8_36:
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_GetSprite
-gfy_GetSprite:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	lea	hl, ix - 7
-	ld	sp, hl
-	ld	hl, (ix + 6)
-	xor	a, a
-	ld	(ix - 4), a
-	ld	bc, (-1900524)
-	ld	a, (hl)
-	or	a, a
-	jr	z, BB9_3
-	ld	hl, (ix + 12)
+; gfy_GetSprite:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	lea	hl, ix - 7
+; 	ld	sp, hl
+; 	ld	hl, (ix + 6)
+; 	xor	a, a
+; 	ld	(ix - 4), a
+; 	ld	bc, (-1900524)
+; 	ld	a, (hl)
+; 	or	a, a
+; 	jr	z, BB9_3
+; 	ld	hl, (ix + 12)
 	
-	push	bc
-	pop	iy
-	push	hl
-	pop	bc
-	add	iy, bc
-	ld	hl, (ix + 9)
-	call	__set_bc_and_mul_hl_by_240
-	push	hl
-	pop	de
-	add	iy, de
-	ld	(ix - 3), iy
-	ld	iy, (ix + 6)
-	lea	hl, iy + 2
-	ld	de, 0
-	ld	e, (iy + 1)
-BB9_2:
-	push	de
-	ld	de, (ix - 3)
-	push	de
-	ld	(ix - 7), hl
-	push	hl
-	call	_memcpy
-	ld	iy, (ix + 6)
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	de, 240
-	ld	hl, (ix - 3)
-	add	hl, de
-	ld	(ix - 3), hl
-	ld	de, 0
-	ld	e, (iy + 1)
-	ld	hl, (ix - 7)
-	add	hl, de
-	ld	a, (ix - 4)
-	inc	a
-	ld	c, (iy)
-	ld	(ix - 4), a
-	cp	a, c
-	jr	c, BB9_2
-BB9_3:
-	ld	hl, (ix + 6)
-	ld	sp, ix
-	pop	ix
-	ret
+; 	push	bc
+; 	pop	iy
+; 	push	hl
+; 	pop	bc
+; 	add	iy, bc
+; 	ld	hl, (ix + 9)
+; 	call	__set_bc_and_mul_hl_by_240
+; 	push	hl
+; 	pop	de
+; 	add	iy, de
+; 	ld	(ix - 3), iy
+; 	ld	iy, (ix + 6)
+; 	lea	hl, iy + 2
+; 	ld	de, 0
+; 	ld	e, (iy + 1)
+; BB9_2:
+; 	push	de
+; 	ld	de, (ix - 3)
+; 	push	de
+; 	ld	(ix - 7), hl
+; 	push	hl
+; 	call	_memcpy
+; 	ld	iy, (ix + 6)
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	de, 240
+; 	ld	hl, (ix - 3)
+; 	add	hl, de
+; 	ld	(ix - 3), hl
+; 	ld	de, 0
+; 	ld	e, (iy + 1)
+; 	ld	hl, (ix - 7)
+; 	add	hl, de
+; 	ld	a, (ix - 4)
+; 	inc	a
+; 	ld	c, (iy)
+; 	ld	(ix - 4), a
+; 	cp	a, c
+; 	jr	c, BB9_2
+; BB9_3:
+; 	ld	hl, (ix + 6)
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
