@@ -2737,6 +2737,70 @@ gfy_Sprite_NoClip:
 
 ;-------------------------------------------------------------------------------
 ; gfy_GetSprite:
+; ; Grabs the data from the current draw buffer and stores it in another buffer
+; ; Arguments:
+; ;  arg0 : Pointer to storage buffer
+; ;  arg1 : X coordinate
+; ;  arg2 : Y coordinate
+; ; Returns:
+; ;  Pointer to resultant sprite
+; 	ld	iy, 0
+; 	lea	bc, iy + 0
+; 	add	iy, sp
+
+; 	bit	1, (iy + 7)
+; 	jr	z,.next_x
+; 	ld	hl, (iy + 6)
+; 	ld	de, (-ti.lcdHeight)*512
+; 	add	hl, de
+; 	ld	(iy + 6), hl
+; .next_x:
+
+; 	ld	hl, (iy + 6)	; hl = x
+; 	ld	e, (iy + 9)	; e = y
+; 	ld	d, h		; maybe ld d, 0
+; 	dec	h		; tests if x >= 256
+; 	ld	h, ti.lcdHeight
+; 	jr	nz, .x_lt_256
+; 	ld	d, h		; ld d, ti.lcdHeight * 256
+; .x_lt_256:
+; 	mlt	hl
+; 	ex.s	de, hl		; clear upper byte of DE
+; 	add	hl, de		; add y cord
+; 	ld	de, (CurrentBuffer)
+; 	add	hl, de		; add buffer offset
+
+; 	bit	0, (iy + 10)
+; 	jr	z,.next_y
+; 	ld	de,-256
+; 	add	hl,de			; fix if negative
+; .next_y:
+
+; 	ld	de,(iy+3)
+; 	push	de
+; 	inc	de
+; 	ld	a,(de)
+; 	ld	(.amount),a		; amount to copy per line
+; 	ld	c,a
+; 	ld	a,ti.lcdHeight
+; 	sub	a,c
+; 	ld	c,a
+; 	ld	(.offset),bc	; the amount to add to get to the next line
+; 	dec	de
+; 	ld	a,(de)
+; 	inc	de
+; 	inc	de
+; .loop:
+; 	ld	bc,0
+; .amount := $-3
+; 	ldir				; copy the data into the struct data
+; 	ld	bc,0
+; .offset := $-3
+; 	add	hl,bc
+; 	dec	a
+; 	jr	nz,.loop
+; 	pop	hl
+; 	ret
 
 ;-------------------------------------------------------------------------------
 gfy_TransparentSprite_NoClip:
