@@ -2802,6 +2802,88 @@ gfy_Sprite_NoClip:
 ; 	pop	hl
 ; 	ret
 
+if 0
+gfy_GetSprite:
+	ld	iy, 0
+	add	iy, sp
+	push	ix
+	ld	de, ti.lcdHeight
+	ld	hl, (iy + 6)	; x
+	; don't want to deal with sign extension problems so I will just use
+	; the 24bit multiply routine for now.
+	call	_MultiplyHLDE
+	ld	de, (iy + 9)	; y
+	add	hl, de
+	ld	de, (CurrentBuffer)
+	add	hl, de
+	push	hl
+	ld	iy, (iy + 3)	; sprite pointer
+	ld	hl, ti.lcdHeight
+	ld	bc, 0
+	ld	a, (iy + 0)
+	ld	c, (iy + 1)
+	or	a, a
+	sbc	hl, bc
+	push	hl
+	pop	ix
+	lea	de, iy + 2
+	pop	hl
+	push	iy		; return value
+	ld	iy, 0
+	ld	iyl, c
+.loop:
+	lea	bc, iy
+	ldir
+	lea	bc, ix
+	add	hl, bc
+	dec	a
+	jr	nz, .loop
+	pop	hl
+	pop	ix
+	ret
+else
+gfy_GetSprite:
+	ld	iy, 0
+	add	iy, sp
+	ld	de, ti.lcdHeight
+	ld	hl, (iy + 6)	; x
+	; don't want to deal with sign extension problems so I will just use
+	; the 24bit multiply routine for now.
+	call	_MultiplyHLDE
+	ld	de, (iy + 9)	; y
+	add	hl, de
+	ld	de, (CurrentBuffer)
+	add	hl, de
+	push	hl		; (iy - 3), dst
+	ex	de, hl
+	ld	hl, (iy + 3)	; sprite pointer
+	ld	a, ti.lcdHeight
+	ld	b, (hl)
+	inc	hl
+	ld	c, (hl)
+	inc	hl
+	sub	a, c
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, a
+	ld	a, b
+	ex	(sp), hl	; (iy - 3), jump | dst , (iy - 3)
+	ex	(sp), ix	; (iy - 3), ix   | jump, (iy - 3)
+	push	iy		; (iy - 6), return value
+	ld	iy, 0
+	ld	iyl, c
+.loop:
+	lea	bc, iy
+	ldir
+	lea	bc, ix
+	add	hl, bc
+	dec	a
+	jr	nz, .loop
+	pop	hl	; return value, (iy - 6)
+	pop	ix	; ix, (iy - 3)
+	ret
+end if
+
 ;-------------------------------------------------------------------------------
 gfy_TransparentSprite_NoClip:
 ; Draws a transparent sprite to the current buffer
