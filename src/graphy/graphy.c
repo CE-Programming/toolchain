@@ -1342,7 +1342,9 @@ static void gfy_Sprite_NoClip_Size128(const gfy_sprite_t *restrict sprite, uint2
 
 #endif
 
-/* gfy_Tilemap */
+/* gfy_Tilemap (graphy.asm) */
+
+#if 0
 
 void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_offset) {
     // Unoptimized and overclips a bit
@@ -1420,6 +1422,8 @@ void gfy_Tilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_off
     }
 }
 
+#endif
+
 /* gfy_Tilemap_NoClip (graphy.asm) */
 
 #if 0
@@ -1479,7 +1483,9 @@ void gfy_Tilemap_NoClip(const gfy_tilemap_t *tilemap, uint24_t x_offset, uint24_
 
 #endif
 
-/* gfy_TransparentTilemap */
+/* gfy_TransparentTilemap (graphy.asm) */
+
+#if 0
 
 void gfy_TransparentTilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uint24_t y_offset) {
     // Unoptimized and overclips a bit
@@ -1556,6 +1562,8 @@ void gfy_TransparentTilemap(const gfy_tilemap_t* tilemap, uint24_t x_offset, uin
         posY += tilemap->tile_height;
     }
 }
+
+#endif
 
 /* gfy_TransparentTilemap_NoClip (graphy.asm) */
 
