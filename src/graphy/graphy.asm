@@ -2971,7 +2971,7 @@ smcWord _XMin
 	ld	hl,ti.lcdWidth		; hl = clip_width
 smcWord _XSpan
 	xor	a,a
-	ld	b,a			; UBC and B are zero here
+	ld	b,a			; UBC and B are zero from this point onwards
 	ld	c,iyl			; bc = width
 	sbc	hl,bc			; get difference between clip_width and width
 	dec	c			; bc = width - 1
@@ -2993,20 +2993,22 @@ smcWord _XSpan
 .clipleft:
 	add	hl,bc			; is partially clipped left?
 	ret	nc			; return if offscreen
-	ex	de,hl			; e = new width - 1
 
-	ld	c,a			; bc = negated relative x
-	ld	b,iyh			; b = height
-	mlt	bc			; bc = amount of bytes clipped off
+	; If we are careful, we can avoid setting B to non-zero
+	ld	e, a			; e = negated relative x
+	ld	a, l			; a = new width - 1
+
+	ld	d,iyh			; d = height
+	mlt	de			; de = amount of bytes clipped off
 	ld	hl,(ix+3)		; hl -> sprite data
-	add	hl,bc
+	add	hl,de
 	ld	(ix+3),hl
-
-	ld	b, 0			; Set B to zero again
-
 	ld	hl,0
 smcWord _XMin
 	ld	(ix+6),hl		; save min x coordinate
+
+	ld	e, a			; e = new width - 1
+
 .clipright:
 	inc	e
 	ld	iyl,e			; save new width
