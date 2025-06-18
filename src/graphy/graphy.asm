@@ -2971,7 +2971,7 @@ smcWord _XMin
 	ld	hl,ti.lcdWidth		; hl = clip_width
 smcWord _XSpan
 	xor	a,a
-	ld	b,a
+	ld	b,a			; UBC and B are zero here
 	ld	c,iyl			; bc = width
 	sbc	hl,bc			; get difference between clip_width and width
 	dec	c			; bc = width - 1
@@ -3002,19 +3002,21 @@ smcWord _XSpan
 	add	hl,bc
 	ld	(ix+3),hl
 
+	ld	b, 0			; Set B to zero again
+
 	ld	hl,0
 smcWord _XMin
 	ld	(ix+6),hl		; save min x coordinate
 .clipright:
 	inc	e
 	ld	iyl,e			; save new width
-.xclipped:
+	or	a,a
+.xclipped:	; <-- carry already cleared on this path
 
 ; CLIP Y COORDINATE
-	ld	bc,0
-smcWord _YMin
+	ld	c,0
+smcByte _YMin
 	ld	hl,(ix+9)		; hl = y coordinate
-	or	a,a
 	sbc	hl,bc
 	ex	de,hl			; de = y coordinate relative to min y
 	ld	a,ti.lcdHeight		; a = clip_height
@@ -3032,6 +3034,9 @@ smcByte _YSpan
 	add	hl,de			; use clip_height as the draw height, and clip top
 	jr	.cliptop
 .nottaller:
+	; HL = y_span - height && HL >= 0 
+	; DE = y_pos - y_min
+	; if HL - DE has no carry, then we can skip clearing UDE since it is already zero
 	xor	a,a
 	sbc	hl,de			; is fully onscreen vertically?
 	jr	nc,.yclipped
@@ -3054,38 +3059,35 @@ smcByte _YSpan
 smcByte _YMin
 
 .clipbottom:
-	inc	e
+	inc.s	de			; inc e and it clears UDE
 	ld	a,iyh			; get old height
 	ld	iyh,e			; save new height
 	sub	a,e			; calculate bytes to add per iteration
-.yclipped:
+.yclipped:	; <-- UDE is zero on this path
 ; CALCULATE OFFSETS
-	ld	hl, (ix+6)		; x
-	ld	e, (ix+9)		; y
-	ld	d, h		; maybe ld d, 0
+	ld	hl, (ix + 6)	; x
+	ld	e, (ix + 9)	; y
+	ld	d, b		; ld d, 0
 	dec	h		; tests if x >= 256
 	ld	h, ti.lcdHeight
 	jr	nz, .x_lt_256
 	ld	d, h		; ld d, ti.lcdHeight * 256
 .x_lt_256:
 	mlt	hl
-	ex.s	de, hl		; clear upper byte of DE
 	add	hl, de		; add y cord (result is 17 bits)
 
 	ld	de, (CurrentBuffer)
 	add	hl, de
 	ex	de, hl			; de -> buffer pointer 
 
-	ld	hl,(ix+3)		; hl -> sprite data
+	ld	hl, (ix + 3)		; hl -> sprite data
 	inc	hl
 	inc	hl
 
-	; UBC is cleared here
 	ld	ixl, a			; (.amount)
 	ld	a, iyh			; new height (.next)
 	cpl
 	add	a, ti.lcdHeight + 1
-	ld	b, 0
 	ld	ixh, a			; (.jump)
 	scf				; set carry for success
 	ret
