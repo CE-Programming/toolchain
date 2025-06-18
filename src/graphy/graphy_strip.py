@@ -48,6 +48,11 @@ file_data = file_data.replace(
     b"\tsbc\ta, a\n",
 )
 
+file_data = file_data.replace(
+    b"\tpush\thl\n\tpop\tde\n\tld\thl,",
+    b"\tex\tde, hl\n\thl,",
+)
+
 # __ishl
 
 file_data = file_data.replace(

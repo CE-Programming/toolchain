@@ -2936,28 +2936,26 @@ smcByte _TransparentColor
 	ret
 
 ;-------------------------------------------------------------------------------
+gfy_Tilemap_NoClip: ; COPIED_FROM_GRAPHX
+; Tilemapping subsection
+	ld	hl,gfy_Sprite_NoClip
+;	jr	_Tilemap		; emulated by dummifying next instruction:
+	db	$FD			; ld hl,* -> ld iy,*
+;-------------------------------------------------------------------------------
 gfy_TransparentTilemap_NoClip: ; COPIED_FROM_GRAPHX
 ; Tilemapping subsection
 	ld	hl,gfy_TransparentSprite_NoClip
 ;	jr	_Tilemap		; emulated by dummifying next instruction:
 	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-gfy_Tilemap_NoClip: ; COPIED_FROM_GRAPHX
+gfy_Tilemap: ; COPIED_FROM_GRAPHX
 ; Tilemapping subsection
-	ld	hl,gfy_Sprite_NoClip
+	ld	hl,gfy_Sprite
 ;	jr	_Tilemap		; emulated by dummifying next instruction:
-if 0
 	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfy_TransparentTilemap: ; COPIED_FROM_GRAPHX
-; Tilemapping subsection
 	ld	hl,gfy_TransparentSprite
-;	jr	_Tilemap		; emulated by dummifying next instruction:
-	db	$FD			; ld hl,* -> ld iy,*
-;-------------------------------------------------------------------------------
-gfy_Tilemap: ; COPIED_FROM_GRAPHX
-	ld	hl,gfy_Sprite
-end if
 ; Draws a tilemap given a tile map structure and some offsets
 ; Arguments:
 ;  arg0 : Tilemap Struct
