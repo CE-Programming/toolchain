@@ -5209,7 +5209,7 @@ smcWord _XMin
 	ld	hl,ti.lcdWidth		; hl = clip_width
 smcWord _XSpan
 	xor	a,a
-	ld	b,a
+	ld	b,a			; UBC and B are zero from this point onwards
 	ld	c,iyl			; bc = width
 	sbc	hl,bc			; get difference between clip_width and width
 	dec	c			; bc = width - 1
@@ -5239,13 +5239,13 @@ smcWord _XMin
 .clipright:
 	inc	e
 	ld	iyl,e			; save new width
+	or	a,a
 .xclipped:
 
 ; CLIP Y COORDINATE
-	ld	bc,0
-smcWord _YMin
+	ld	c,0
+smcByte _YMin
 	ld	hl, (ix + 12)		; hl = y coordinate
-	or	a,a
 	sbc	hl,bc
 	ex	de,hl			; de = y coordinate relative to min y
 	ld	a,ti.lcdHeight		; a = clip_height
