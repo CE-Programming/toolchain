@@ -2682,14 +2682,18 @@ void gfy_RLETSprite(const gfy_rletsprite_t *__restrict sprite, const int24_t x, 
         }
     }
 
+    const uint8_t sprite_height = sprite->height;
+    const uint8_t maxY = gfy_ClipYMax;
+    const uint8_t minY = gfy_ClipYMin;
+
     for (uint8_t posX = 0; posX < sizeX; posX++) {
         uint24_t posY = 0;
-        while (posY < sprite->height) {
+        while (posY < sprite_height) {
             const uint8_t jump_TP = *src_buf++;
             posY += jump_TP;
             dst_buf += jump_TP;
 
-            if (posY >= sprite->height) {
+            if (posY >= sprite_height) {
                 break;
             }
 
@@ -2697,8 +2701,8 @@ void gfy_RLETSprite(const gfy_rletsprite_t *__restrict sprite, const int24_t x, 
 
             for(uint8_t r = 0; r < len; r++) {
                 if (
-                    y + posY >= (uint24_t)gfy_ClipYMin &&
-                    y + posY < (uint24_t)gfy_ClipYMax
+                    y + posY >= minY &&
+                    y + posY < maxY
                 ) {
                     *dst_buf = *src_buf;
                 }

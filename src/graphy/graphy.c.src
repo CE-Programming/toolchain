@@ -1628,7 +1628,7 @@ gfy_RLETSprite:
 	push	ix
 	ld	ix, 0
 	add	ix, sp
-	lea	hl, ix - 32
+	lea	hl, ix - 39
 	ld	sp, hl
 	ld	hl, (ix + 9)
 	ld	iy, (gfy_ClipXMax)
@@ -1694,7 +1694,7 @@ gfy_RLETSprite:
 	ld	(ix - 9), bc
 	push	bc
 	pop	hl
-	ld	(ix - 22), a
+	ld	(ix - 24), a
 	ld	de, (ix + 12)
 	add	hl, de
 	push	hl
@@ -1707,7 +1707,7 @@ gfy_RLETSprite:
 	push	bc
 	pop	hl
 	add	hl, de
-	ld	(ix - 25), hl
+	ld	(ix - 27), hl
 	lea	bc, iy
 	lea	de, iy
 	or	a, a
@@ -1731,7 +1731,7 @@ gfy_RLETSprite:
 	sbc	hl, de
 	jr	c, BB10_10
 	ld	hl, (ix - 6)
-	ld	de, (ix - 25)
+	ld	de, (ix - 27)
 	or	a, a
 	sbc	hl, de
 	jq	nc, BB10_37
@@ -1788,10 +1788,10 @@ BB10_14:
 	ld	a, l
 	add	a, e
 	ld	l, a
-	ld	a, (ix - 22)
+	ld	a, (ix - 24)
 	ld	(ix - 21), l
 	sub	a, l
-	ld	(ix - 15), a
+	ld	(ix - 12), a
 	lea	hl, iy + 2
 	ld	(ix - 3), hl
 	ld	iy, (-1900524)
@@ -1810,14 +1810,14 @@ BB10_14:
 	ld	bc, (ix - 9)
 	or	a, a
 	sbc	hl, bc
-	ld	(ix - 18), hl
-	ld	(ix - 12), de
+	ld	(ix - 15), hl
+	ld	(ix - 18), de
 	ld	a, e
 	or	a, a
 	jr	z, BB10_21
 	ld	bc, 0
 BB10_16:
-	ld	(ix - 25), bc
+	ld	(ix - 27), bc
 	ld	iy, 0
 BB10_17:
 	ld	de, 0
@@ -1832,7 +1832,7 @@ BB10_17:
 	sbc	hl, de
 	jr	nc, BB10_19
 	ld	de, 0
-	ld	(ix - 28), iy
+	ld	(ix - 30), iy
 	push	bc
 	pop	iy
 	ld	e, (iy + 1)
@@ -1843,7 +1843,7 @@ BB10_17:
 	pop	iy
 	lea	iy, iy + 2
 	ld	(ix - 3), iy
-	ld	iy, (ix - 28)
+	ld	iy, (ix - 30)
 	add	iy, de
 	lea	hl, iy
 	ld	de, (ix - 9)
@@ -1855,30 +1855,43 @@ BB10_19:
 	inc	bc
 	ld	(ix - 3), bc
 BB10_20:
-	ld	bc, (ix - 25)
+	ld	bc, (ix - 27)
 	inc	bc
 	push	bc
 	pop	hl
-	ld	de, (ix - 12)
+	ld	de, (ix - 18)
 	or	a, a
 	sbc	hl, de
 	jr	nz, BB10_16
 BB10_21:
-	ld	a, (ix - 22)
+	ld	a, (gfy_ClipYMax)
+	ld	iyl, a
+	ld	a, (gfy_ClipYMin)
+	ld	c, a
+	ld	a, (ix - 24)
 	ld	l, (ix - 21)
 	cp	a, l
 	ld	b, 0
 	ld	a, b
 	jq	z, BB10_36
-BB10_22:
+	ld	de, 0
+	push	de
+	pop	hl
+	ex	de, hl
+	ld	e, iyl
+	ex	de, hl
+	ld	(ix - 39), hl
+	ld	e, c
+	ld	(ix - 27), de
+BB10_23:
+	ld	(ix - 18), a
 	ld	iy, 0
 	lea	bc, iy
-	ld	(ix - 12), a
-BB10_23:
+BB10_24:
 	lea	de, iy
 	ld	hl, (ix - 3)
 	ld	e, (hl)
-	ld	(ix - 25), bc
+	ld	(ix - 24), bc
 	push	bc
 	pop	iy
 	add	iy, de
@@ -1892,78 +1905,66 @@ BB10_23:
 	sbc	hl, bc
 	jq	nc, BB10_34
 	ld	iy, (ix - 3)
-	ld	l, (iy + 1)
-	ld	a, l
+	ld	c, (iy + 1)
+	ld	a, c
 	or	a, a
-	jr	nz, BB10_26
+	jr	nz, BB10_27
 	lea	iy, iy + 2
 	ld	(ix - 3), iy
 	ld	bc, (ix - 21)
 	ld	iy, 0
 	jq	BB10_33
-BB10_26:
-	ld	(ix - 22), l
-	ld	a, (gfy_ClipYMin)
-	ld	(ix - 29), a
+BB10_27:
 	ld	hl, (ix + 12)
-	ld	bc, (ix - 25)
+	ld	a, c
+	ld	bc, (ix - 24)
 	add	hl, bc
+	ld	c, a
 	add	hl, de
-	ld	(ix - 32), hl
+	ld	(ix - 33), hl
 	ld	de, 2
 	ld	iy, 0
-BB10_27:
+BB10_28:
 	ld	hl, (ix - 6)
 	add	hl, de
-	ld	(ix - 28), hl
-	ld	hl, (ix - 32)
-	ld	(ix - 25), de
+	ld	(ix - 30), hl
+	ld	hl, (ix - 33)
+	ld	(ix - 24), de
 	add	hl, de
 	ld	de, -2
 	add	hl, de
-	lea	de, iy
-	ld	e, (ix - 29)
-	push	hl
-	pop	bc
+	ld	(ix - 36), hl
+	ld	de, (ix - 27)
 	or	a, a
 	sbc	hl, de
-	jr	nc, BB10_29
-	ld	bc, (ix - 25)
-	jr	BB10_31
-BB10_29:
-	ld	a, (gfy_ClipYMax)
-	lea	de, iy
-	ld	e, a
-	push	bc
-	pop	hl
+	jr	c, BB10_31
+	ld	hl, (ix - 36)
+	ld	de, (ix - 39)
 	or	a, a
 	sbc	hl, de
-	ld	bc, (ix - 25)
 	jr	nc, BB10_31
 	ld	iy, (ix - 3)
-	add	iy, bc
+	ld	de, (ix - 24)
+	add	iy, de
 	ld	a, (iy)
 	ld	hl, 0
-	ld	iy, (ix - 28)
+	ld	iy, (ix - 30)
 	ld	(iy - 2), a
 	push	hl
 	pop	iy
-	ld	a, (gfy_ClipYMin)
-	ld	(ix - 29), a
 BB10_31:
-	ld	a, (ix - 22)
-	dec	a
-	push	bc
-	pop	de
+	dec	c
+	ld	de, (ix - 24)
 	inc	de
-	ld	(ix - 22), a
+	ld	a, c
 	or	a, a
-	jr	nz, BB10_27
+	jr	nz, BB10_28
 	ld	hl, (ix - 3)
+	ld	bc, (ix - 24)
 	add	hl, bc
 	inc	hl
 	ld	(ix - 3), hl
-	ld	bc, (ix - 28)
+	ld	bc, (ix - 30)
 	dec	bc
 	ld	hl, (ix - 21)
 	add	hl, de
@@ -1973,28 +1974,27 @@ BB10_31:
 	push	hl
 	pop	bc
 BB10_33:
-	ld	a, (ix - 12)
 	push	bc
 	pop	hl
 	ld	de, (ix - 9)
 	or	a, a
 	sbc	hl, de
 	jr	nc, BB10_35
-	jq	BB10_23
+	jq	BB10_24
 BB10_34:
 	ld	hl, (ix - 3)
 	inc	hl
 	ld	(ix - 3), hl
-	ld	a, (ix - 12)
 BB10_35:
 	ld	hl, (ix - 6)
-	ld	de, (ix - 18)
+	ld	de, (ix - 15)
 	add	hl, de
 	ld	(ix - 6), hl
+	ld	a, (ix - 18)
 	inc	a
-	ld	l, (ix - 15)
+	ld	l, (ix - 12)
 	cp	a, l
-	jq	nz, BB10_22
+	jq	nz, BB10_23
 BB10_36:
 	ld	sp, ix
 	pop	ix
