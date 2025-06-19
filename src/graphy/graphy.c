@@ -1764,7 +1764,9 @@ void gfy_TransparentSprite_NoClip(const gfy_sprite_t *restrict sprite, uint24_t 
 }
 #endif
 
-/* gfy_GetSprite */
+/* gfy_GetSprite (graphy.asm) */
+
+#if 0
 
 gfy_sprite_t *gfy_GetSprite(gfy_sprite_t *sprite_buffer, int24_t x, int24_t y) {
     uint8_t* dst_buf = sprite_buffer->data;
@@ -1777,6 +1779,8 @@ gfy_sprite_t *gfy_GetSprite(gfy_sprite_t *sprite_buffer, int24_t x, int24_t y) {
     }
     return sprite_buffer;
 }
+
+#endif
 
 /* gfy_ScaledSprite_NoClip */
 
@@ -2550,6 +2554,8 @@ void gfy_FloodFill(uint24_t x, uint8_t y, const uint8_t color) {
 
 /* gfy_RLETSprite */
 
+#if 0
+
 void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24_t y) {
     if (
         /* Out of Bounds */
@@ -2625,6 +2631,87 @@ void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24
         }
     }
 }
+
+#else
+
+void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24_t y) {
+    if (
+        x >= gfy_ClipXMax || y >= gfy_ClipYMax ||
+        sprite->width == 0 || sprite->height == 0 ||
+        x + sprite->width < gfy_ClipXMin ||
+        y + sprite->height < gfy_ClipYMin
+    ) {
+        return;
+    }
+    if (
+        x >= gfy_ClipXMin &&
+        y >= gfy_ClipYMin &&
+        x + sprite->width <= gfy_ClipXMax &&
+        y + sprite->height <= gfy_ClipYMax
+    ) {
+        // If fully inside the clipping region
+        gfy_RLETSprite_NoClip(sprite, (uint24_t)x, (uint8_t)y);
+        return;
+    }
+    gfy_Wait();
+
+    // X axis (Columns) are properly clipped. The Y axis (Rows) uses naive clipping
+
+    const uint8_t min_clipX = (x < gfy_ClipXMin) ? (gfy_ClipXMin - x) : 0;
+    const uint8_t max_clipX = ((x + sprite->width) > gfy_ClipXMax) ? ((x + sprite->width) - gfy_ClipXMax) : 0;
+
+    const uint8_t sizeX = sprite->width - (min_clipX + max_clipX);
+
+    const uint8_t* src_buf = sprite->data;
+    uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (y + (GFY_LCD_HEIGHT * (x + min_clipX)));
+    const uint24_t dst_jump = GFY_LCD_HEIGHT - sprite->height;
+
+    // Fast forward through the decompression if needed
+    for (uint8_t posX = 0; posX < min_clipX; posX++) {
+        uint24_t posY = 0;
+        while (posY < sprite->height) {
+            posY += *src_buf++;
+
+            if (posY >= sprite->height) {
+                break;
+            }
+
+            const uint8_t len = *src_buf++;
+            src_buf += len;
+            posY += len;
+        }
+    }
+
+    for (uint8_t posX = 0; posX < sizeX; posX++) {
+        uint24_t posY = 0;
+        while (posY < sprite->height) {
+            const uint8_t jump_TP = *src_buf++;
+            posY += jump_TP;
+            dst_buf += jump_TP;
+
+            if (posY >= sprite->height) {
+                break;
+            }
+
+            const uint8_t len = *src_buf++;
+
+            for(uint8_t r = 0; r < len; r++) {
+                if (
+                    y + posY >= (uint24_t)gfy_ClipYMin &&
+                    y + posY < (uint24_t)gfy_ClipYMax
+                ) {
+                    *dst_buf = *src_buf;
+                }
+                src_buf++;
+                posY++;
+                dst_buf++;
+            }
+        }
+        dst_buf += dst_jump;
+    }
+}
+
+#endif
 
 /* gfy_RLETSprite_NoClip (graphy.asm) */
 
