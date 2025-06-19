@@ -2634,7 +2634,7 @@ void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24
 
 #else
 
-void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24_t y) {
+void gfy_RLETSprite(const gfy_rletsprite_t *__restrict sprite, const int24_t x, const int24_t y) {
     if (
         x >= gfy_ClipXMax || y >= gfy_ClipYMax ||
         sprite->width == 0 || sprite->height == 0 ||
@@ -2662,8 +2662,8 @@ void gfy_RLETSprite(const gfy_rletsprite_t *sprite, const int24_t x, const int24
 
     const uint8_t sizeX = sprite->width - (min_clipX + max_clipX);
 
-    const uint8_t* src_buf = sprite->data;
-    uint8_t* dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (y + (GFY_LCD_HEIGHT * (x + min_clipX)));
+    const uint8_t *__restrict src_buf = sprite->data;
+    uint8_t *__restrict dst_buf = (uint8_t*)RAM_ADDRESS(gfy_CurrentBuffer) + (y + (GFY_LCD_HEIGHT * (x + min_clipX)));
     const uint24_t dst_jump = GFY_LCD_HEIGHT - sprite->height;
 
     // Fast forward through the decompression if needed
