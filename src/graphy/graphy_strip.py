@@ -41,6 +41,35 @@ file_data = file_data.replace(b"_lcd_", b"lcd_")
 
 # This is the fun optimization section
 
+# the dangerous one
+
+file_data = file_data.replace(
+    b"\n\tjp\t",
+    b"\n\tjq\t",
+)
+
+# remove p m po pe
+
+file_data = file_data.replace(
+    b"\n\tjq\tp,",
+    b"\n\tjp\tp,",
+)
+
+file_data = file_data.replace(
+    b"\n\tjq\tm,",
+    b"\n\tjp\tm,",
+)
+
+file_data = file_data.replace(
+    b"\n\tjq\tpo,",
+    b"\n\tjp\tpo,",
+)
+
+file_data = file_data.replace(
+    b"\n\tjq\tpe,",
+    b"\n\tjp\tpe,",
+)
+
 # common patterns
 
 file_data = file_data.replace(
@@ -48,9 +77,23 @@ file_data = file_data.replace(
     b"\tsbc\ta, a\n",
 )
 
+# duplicate value register loads
+
+file_data = file_data.replace(
+    b"\tld\tbc, 0\n\tld\tiy, 0\n",
+    b"\tld\tiy, 0\n\tlea\tbc, iy\n",
+)
+
+# destructive register loads
+
 file_data = file_data.replace(
     b"\tpush\thl\n\tpop\tde\n\tld\thl,",
-    b"\tex\tde, hl\n\thl,",
+    b"\tex\tde, hl\n\tld\thl,",
+)
+
+file_data = file_data.replace(
+    b"\tld\tiy, 0\n\tlea\thl, iy\n\tld\tiy,",
+    b"\tld\thl, 0\n\tld\tiy,",
 )
 
 # __ishl
@@ -113,6 +156,16 @@ file_data = file_data.replace(
     b"\tld\tb, 4\n\tadd\ta, a\n\tadd\ta, a\n\tadd\ta, a\n\tadd\ta, a\n"
 )
 
+file_data = file_data.replace(
+    b"\tld\tb, 6\n\tcall\t__bshl\n",
+    b"\tld\tb, 6\n\trrca\n\trrca\n\tand\ta, 192\n"
+)
+
+file_data = file_data.replace(
+    b"\tld\tb, 7\n\tcall\t__bshl\n",
+    b"\tld\tb, 7\n\trrca\n\tand\ta, 128\n"
+)
+
 # __iand
 
 file_data = file_data.replace(
@@ -131,7 +184,7 @@ file_data = file_data.replace(
 
 file_data = file_data.replace(
     b"\tld\tl, 24\n\tcall\t__lshru\n",
-    b"\tld\tl, 24\n\tld\tbc, 0\n\tld\tc, a\n\txor\ta, a\n"
+    b"\tld\tbc, 24\n\tld\tl, c\n\tld\tc, a\n\txor\ta, a\n"
 )
 
 # __imulu
@@ -140,6 +193,8 @@ file_data = file_data.replace(
     b"\tld\tbc, 3\n\tcall\t__imulu\n",
     b"\tpush\thl\n\tpop\tbc\n\tadd\thl, bc\n\tadd\thl, bc\n\tld\tbc, 3\n"
 )
+
+# targetted __imulu
 
 file_data = file_data.replace(
     b"\tld\tbc, 240\n\tcall\t__imulu\n",
