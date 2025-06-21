@@ -937,7 +937,8 @@ INPUT                  = ../src/graphx/graphx.h \
                          ../src/usbdrvce/usbdrvce.h \
                          ../src/srldrvce/srldrvce.h \
                          ../src/fatdrvce/fatdrvce.h \
-                         ../src/msddrvce/msddrvce.h
+                         ../src/msddrvce/msddrvce.h \
+                         ../src/lcddrvce/lcddrvce.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
