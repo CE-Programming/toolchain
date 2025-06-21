@@ -284,7 +284,9 @@ all: $(BINDIR)/$(TARGET8XP)
 # this rule is trigged to build debug everything
 debug: DEBUGMODE = DEBUG
 debug: LDDEBUG = 1
-debug: CCDEBUG = -gdwarf-5 -g3
+# Due to an issue with ez80-clang 15.0.7, this is disabled for now. Previously: -gdwarf-5 -g3
+# Then again, no tool using the produced .dbg files currently exists (CEmu's source-level-debugging was never finished)
+debug: CCDEBUG = -g0
 debug: $(BINDIR)/$(TARGET8XP)
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
