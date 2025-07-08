@@ -1,5 +1,123 @@
 	assume	adl=1
 
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	__ulltod
+; (long double)unsigned long long
+__ulltod:
+	cp	a, a	; set Z flag
+	push	af
+	jq	__lltod_common
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	__lltod
+; (long double)long long
+__lltod:
+	bit	7, b
+	push	af
+	call	nz, __llneg	; abs(BC:UDE:UHL)
+
+	require	__lltod_common
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	private	__lltod_common
+__lltod_common:
+	call	__llctlz
+	sub	a, 63	; normalize clz_result
+	; filter out exponent of $000 (zero) and $3FF (one)
+	jr	nc, __int_to_f64_zero_or_one
+	; A is [-63, -1]
+	add	a, 52
+	; A is [-11, 51]
+	jr	c, __int_to_f64_shl
+; __int_to_f64_shr:
+	; exponent = (1023 or $3FF or f64_bias) + base2_logarithm
+	; Minimum exponent: $434 (2^53)
+	; Maximum exponent: $43E (2^63)
+	; It is assumed that A is [-11, -1] here, or [-63, -53] before adding 52
+	cpl
+	inc	a
+	; A is [1, 11]
+	push	hl
+	push	bc
+	ld	b, a
+	ld	c, 1
+.shift_loop:
+	jr	nc, .no_carry
+	inc	c
+.no_carry:
+	srl	h
+	rr	l
+	djnz	.shift_loop
+	; test round bit
+	jr	nc, .no_round
+	; test sticky bits
+	dec	c
+	jr	nz, .round_up
+	; test guard bit
+	bit	0, l
+	jr	nc, .no_round
+.round_up:
+	inc	b	; round up after shifting
+.no_round:
+	ld	h, b
+	pop	bc
+
+	ld	l, a
+	ex	(sp), hl	; (SP) = shift
+	call	__llshru
+	ex	(sp), hl	; (SP) = shifted HL, H = rounding, L = shift
+	add	a, 51
+
+	dec	h
+	push	af
+	; exponent = ($400 + (base2_logarithm - 1)) << 4
+	; BC = $4EEM
+	ld	l, a
+	ld	h, $04
+	; clear the implicit mantissa bit
+	res	4, c	; 52 % 8 == 4
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	a, l
+	or	a, c
+	ld	c, a
+	ld	b, h
+	pop	af
+	pop	hl	; restore shifted HL
+	call	z, __lladd_1	; round up to even
+	jr	__int_to_f64_shl.finish
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	private	__int_to_f64_zero_or_one
+__int_to_f64_zero_or_one:
+	; carry is cleared here
+	; UHL is either one or zero
+	ld	b, h
+	ld	c, h
+	jr	nz, .ret_zero
+	ld	bc, $3FF0
+	dec	hl	; ld hl, 0
+.ret_zero:
+	ex	de, hl
+	sbc	hl, hl
+	jr	__int_to_f64_shl.finish
+
+;-------------------------------------------------------------------------------
+
 	section	.text
 
 	public	__itod
@@ -7,11 +125,12 @@
 __itod:
 	push	hl
 	add	hl, hl	; extract signbit
+	sbc	hl, hl	; set Z flag
+	ld	e, l	; sign extend UHL to E:UHL
 	pop	hl
-	push	af
-	ld	e, 0
-	call	c, __ineg	; abs(UHL)
-	jr	__ltod.hijack
+	jq	__ltod
+
+;-------------------------------------------------------------------------------
 
 	section	.text
 
@@ -22,102 +141,104 @@ __utod:
 
 	require	__ultod
 
+;-------------------------------------------------------------------------------
+
 	section	.text
 
 	public	__ultod
 ; (long double)unsigned long
 __ultod:
-	or	a, a
-	push	af	
-	jr	__ltod.hijack
+	cp	a, a	; set Z flag
+	push	af
+	jq	__ltod_common
+
+;-------------------------------------------------------------------------------
 
 	section	.text
 
 	public	__ltod
 ; (long double)long
 __ltod:
-	rlc	e
-	push	af
-	rrc	e
-	call	c, __lneg	; abs(E:UHL)
+	bit	7, e
 
-	require	__ltod.hijack
+	require	__ltod.hijack_itod
+
+;-------------------------------------------------------------------------------
 
 	section	.text
 
-	private	__ltod.hijack
-__ltod.hijack:
+	private	__ltod.hijack_itod
+__ltod.hijack_itod:
+
+	push	af
+	call	nz, __lneg	; abs(E:UHL)
+
+	require	__ltod_common
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	private	__ltod_common
+__ltod_common:
 	call	__lctlz
-	inc.s	bc	; clear UBC
-	ld	b, a	; <<= 8
-	xor	a, $20	; turns 32 into zero and clears carry flag
-	jr	z, .zero
-	; clears the MSB since the float will be normalized
-	; x <<= clz_result + 1; /* shift by 32 is UB */
-if 0
-	; calculate the exponent
+	sub	a, 31	; normalize clz_result
+
+	; filter out exponent of $000 (zero) and $3FF (one)
+	jr	nc, __int_to_f64_zero_or_one
+	; A is [-31, -1]
+	add	a, 52
+	; A is [21, 51]
+
+	require	__int_to_f64_shl
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	private	__int_to_f64_shl
+__int_to_f64_shl:
+	; exponent = (1023 or $3FF or f64_bias) + base2_logarithm
+	; Minimum exponent: $400 (2^1)
+	; Maximum exponent: $434 (2^52)
+	; It is assumed that A is [0, 51] here, or [-52, -1] before adding 52
 	push	hl
-	; 1023 + 31 = 1054 = 0x41E
-	ld	hl, $041E00
-	ld	c, l	; ld c, 0
-	sbc	hl, bc
-	ld	l, e	; (expon16 << (16 + 24)) | (mant48)
-	ex	de, hl
-	pop	hl
-
-;	ld	b, a
-	inc	b
-	ld	a, e
-.loop32:	; shift by 32 is not UB here!
-	add	hl, hl
-	rla
-	djnz	.loop32
-	ld	e, a
-else
-	; calculate the exponent
-	push	hl
-	; 1023 + 31 = 1054 = 0x41E
-	ld	hl, $041E00
-	ld	c, l	; ld c, 0
-	sbc	hl, bc
-	ld	l, e	; (expon16 << (16 + 24)) | (mant48)
-	ex	de, hl
-
-	ld	l, b
-	pop	bc
-	ld	a, e
-	call	__lshl
-	push	bc
-	pop	hl
-	; shift by 32 is UB
-	add	hl, hl
-	rla
-	ld	e, a
-end if
-
-	; UDE:D has expon, E:UHL has mant
-	; Float64_mant_bits - uint48_bits = 4
-	ld	c, 16 + 4
-	push	bc
+	ld	l, a
+	ex	(sp), hl	; (SP) = shift
 	call	__llshl
-	pop	af	; reset SP
+	ex	(sp), hl	; (SP) = shifted HL, L = shift
+
+	ld	a, 51
+	sub	a, l
+
+	; exponent = ($400 + (base2_logarithm - 1)) << 4
+	; BC = $4EEM
+	ld	l, a
+	ld	h, $04
+	; clear the implicit mantissa bit
+	res	4, c	; 52 % 8 == 4
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	a, l
+	or	a, c
+	ld	c, a
+	ld	b, h
+	pop	hl	; restore shifted HL
 .finish:
 	pop	af
-	ret	nc	; positive
+	ret	z
 	set	7, b
-	ret	; negative
-
-.zero:
-	; E:UHL and A are zero
-	ex	de, hl
-	sbc	hl, hl
-	ld	b, e
-	ld	c, e
-	pop	af
 	ret
+
+;-------------------------------------------------------------------------------
 
 	extern	__ineg
 	extern	__lneg
 	extern	__lctlz
-	extern	__lshl
+	extern	__llctlz
 	extern	__llshl
+	extern	__llshru
+	extern	__llneg
+	extern	__lladd_1
