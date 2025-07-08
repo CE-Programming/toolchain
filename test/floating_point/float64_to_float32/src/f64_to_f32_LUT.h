@@ -9,7 +9,7 @@ typedef uint64_t input_type;
 
 typedef uint32_t output_type;
 
-static const input_type f64_to_f32_LUT_input[256] = {
+static const input_type f64_to_f32_LUT_input[260] = {
 /*    0 */ UINT64_C(0x0000000000000000),
 /*    1 */ UINT64_C(0x0000000000000001),
 /*    2 */ UINT64_C(0x0010000000000000),
@@ -266,9 +266,14 @@ static const input_type f64_to_f32_LUT_input[256] = {
 /*  253 */ UINT64_C(0xD22D38D57ABF3991),
 /*  254 */ UINT64_C(0xA86498F2933913FB),
 /*  255 */ UINT64_C(0x4841C1F00831E908),
+/* bonus edge cases */
+/*  256 */ UINT64_C(0x369F82B925D1BFBA),
+/*  257 */ UINT64_C(0xB76634D97D4F585C),
+/*  258 */ UINT64_C(0x36DD000000000000),
+/*  259 */ UINT64_C(0xB80E0000A0000000),
 };
 
-const output_type f64_to_f32_LUT_output[256] = {
+const output_type f64_to_f32_LUT_output[260] = {
 /*    0 */ UINT32_C(0x00000000),
 /*    1 */ UINT32_C(0x00000000),
 /*    2 */ UINT32_C(0x00000000),
@@ -525,6 +530,11 @@ const output_type f64_to_f32_LUT_output[256] = {
 /*  253 */ UINT32_C(0xFF800000),
 /*  254 */ UINT32_C(0x80000000),
 /*  255 */ UINT32_C(0x7F800000),
+/* bonus edge cases */
+/*  256 */ UINT32_C(0x00000001),
+/*  257 */ UINT32_C(0x80001635),
+/*  258 */ UINT32_C(0x0000000E),
+/*  259 */ UINT32_C(0x80780002),
 };
 
 #endif /* F64_TO_F32_LUT_H */
