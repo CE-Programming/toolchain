@@ -3,5 +3,6 @@ bin/
 src/gfx/*.c
 src/gfx/*.h
 src/gfx/*.8xv
+src/tilemap/*.c
 .DS_Store
 convimg.yaml.lst
