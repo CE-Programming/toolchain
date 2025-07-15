@@ -427,13 +427,13 @@ gfy_SetClipRegion: ; COPIED_FROM_GRAPHX
 	ld	(_ClipRegion.YMin),a
 	ld	a,ti.lcdHeight
 	ld	(_ClipRegion.YMax),a
-	ld	iy,0
+	ld	iy,3
 	add	iy,sp
 	call	_ClipRegion		; iy points to the start of the arguments
-	ld	hl,(iy+3)
-	ld	c,(iy+6)
-	ld	de,(iy+9)
-	ld	a,(iy+12)
+	ld	hl,(iy+0)
+	ld	c,(iy+3)
+	ld	de,(iy+6)
+	ld	a,(iy+9)
 	jr	nc,.apply
 	xor	a,a
 	ld	c,a
@@ -868,28 +868,27 @@ gfy_FillRectangle: ; COPIED_FROM_GRAPHX
 ;  arg3 : Height
 ; Returns:
 ;  None
-	ld	iy,0
+	ld	iy,3
 	add	iy,sp
-	ld	hl,(iy+9)		; hl = width
-	ld	de,(iy+3)		; de = x coordinate
+	ld	hl,(iy+6)		; hl = width
+	ld	de,(iy+0)		; de = x coordinate
+	add	hl,de
+	ld	(iy+6),hl
+	ld	hl,(iy+9)		; hl = height
+	ld	de,(iy+3)		; de = y coordinate
 	add	hl,de
 	ld	(iy+9),hl
-	ld	hl,(iy+12)		; hl = height
-	ld	de,(iy+6)		; de = y coordinate
-	add	hl,de
-	ld	(iy+12),hl
 	call	_ClipRegion
 	ret	c			; return if offscreen or degenerate
-	ld	de,(iy+3)
-	ld	hl,(iy+9)
+	ld	de,(iy+0)
+	ld	hl,(iy+6)
 	sbc	hl,de
 	push	hl
-	ld	de,(iy+6)
-	ld	hl,(iy+12)
-	sbc	hl,de
+	ld	de,(iy+3)
+	ld	a,(iy+9)
+	sbc	a, e			; a = new height
 	pop	bc			; bc = new width
-	ld	a,l			; a = new height
-	ld	hl,(iy+3)		; hl = new x, de = new y
+	; ld	hl,(iy+0)		; hl = new x, de = new y
 	jr	_FillRectangle_NoClip
 
 ;-------------------------------------------------------------------------------
@@ -902,18 +901,19 @@ gfy_FillRectangle_NoClip:
 ;  arg3 : Height
 ; Returns:
 ;  None
-	ld	iy, 0
+	ld	iy, 3
 	add	iy, sp
-	ld	a, (iy+12)		; a = height
+	ld	bc, (iy+6)		; bc = width
+	ld	a, c
+	or	a, b
+	; dont care what UBC is
+	ret	z			; make sure width is not 0
+	ld	a, (iy+9)		; a = height
 	or	a, a
 	ret	z			; make sure height is not 0
-	ld	bc, (iy+9)		; bc = width
-	sbc	hl, hl
-	adc	hl, bc
-	ret	z			; make sure width is not 0
-	ld	hl, (iy+3)		; hl = x coordinate
-	ld	e, (iy+6)		; e = y coordinate
+	ld	e, (iy+3)		; e = y coordinate
 _FillRectangle_NoClip:
+	ld	hl, (iy+0)		; hl = x coordinate
 	ld	d, h		; maybe ld d, 0
 	dec	h		; tests if x >= 256
 	ld	h, ti.lcdHeight
@@ -1318,15 +1318,15 @@ gfy_FillEllipse_NoClip: ; COPIED_FROM_GRAPHX
 ;-------------------------------------------------------------------------------
 gfy_FillEllipse: ; COPIED_FROM_GRAPHX
 	ld	hl,gfy_HorizLine
-	ld	(_ellipse_line_routine_1),hl
-	ld	(_ellipse_line_routine_2),hl
-	ld	hl,_ellipse_draw_line
-	ld	(_ellipse_loop_draw_2),hl
-	ld	(_ellipse_loop_draw_3),hl
-	ld	hl,_ellipse_ret
+	ld	iy, _ellipse_smc_base
+	ld	(iy + (_ellipse_line_routine_1 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_line_routine_2 - _ellipse_smc_base)), hl
+	lea	hl, iy + (_ellipse_ret - _ellipse_smc_base)
 	ld	(_ellipse_loop_draw_1),hl
+	lea	hl, iy + (_ellipse_draw_line - _ellipse_smc_base)
+	ld	(_ellipse_loop_draw_2),hl
 	jr	_Ellipse
-	
+
 ;-------------------------------------------------------------------------------
 gfy_Ellipse_NoClip: ; COPIED_FROM_GRAPHX
 	ld	hl,_SetPixel_NoClip_NoWait
@@ -1335,15 +1335,15 @@ gfy_Ellipse_NoClip: ; COPIED_FROM_GRAPHX
 ;-------------------------------------------------------------------------------
 gfy_Ellipse: ; COPIED_FROM_GRAPHX
 	ld	hl,_SetPixel_NoWait
-	ld	(_ellipse_pixel_routine_1),hl
-	ld	(_ellipse_pixel_routine_2),hl
-	ld	(_ellipse_pixel_routine_3),hl
-	ld	(_ellipse_pixel_routine_4),hl
-	ld	hl,_ellipse_draw_pixels
-	ld	(_ellipse_loop_draw_1),hl
-	ld	(_ellipse_loop_draw_3),hl
-	ld	hl,_ellipse_ret
+	ld	iy, _ellipse_smc_base
+	ld	(iy + (_ellipse_pixel_routine_1 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_pixel_routine_2 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_pixel_routine_3 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_pixel_routine_4 - _ellipse_smc_base)), hl
+	lea	hl, iy + (_ellipse_ret - _ellipse_smc_base)
 	ld	(_ellipse_loop_draw_2),hl
+	lea	hl, iy + (_ellipse_draw_pixels - _ellipse_smc_base)
+	ld	(_ellipse_loop_draw_1),hl
 
 el_x		:= 3		; Current X coordinate of the ellipse
 el_y		:= 6		; Current Y coordinate of the ellipse
@@ -1361,6 +1361,7 @@ el_sigma_diff1	:= 39		; Offset to be added to sigma in loop 1
 el_sigma_diff2	:= 42		; Offset to be added to sigma in loop 2
 
 _Ellipse:
+	ld	(iy + (_ellipse_loop_draw_3 - _ellipse_smc_base)), hl
 ; Draws an ellipse, either filled or not, either clipped or not
 ; Arguments:
 ;  arg0 : X coordinate (ix+6)
@@ -1385,25 +1386,28 @@ _Ellipse:
 	ret
 .valid_x_radius:
 	ld	l,a
-	ld	h,a
+	ld	a,(ix + 15)
+	or	a,a
+	jr	z,.return		; Make sure Y radius is not 0
+	ld	h,l
 	mlt	hl
 	ld	(ix - el_a2),hl		; int a2 = a * a;
 	add	hl,hl
 	ld	(ix - el_sigma_diff2),hl; Save a2 * 2 for later
 	add	hl,hl
 	ld	(ix - el_fa2),hl	; int fa2 = 4 * a2;
-	ld	a,(ix + 15)
-	or	a,a
-	jr	z,.return		; Make sure Y radius is not 0
-	ld	e,a
-	ld	d,1
-	mlt	de
-	ld	(ix - el_y),de		; int y = b;
-	ld	hl,(ix - el_a2)
-	ld	d,l
-	ld	l,e
-	mlt	de
+
+	; carry won't be set
+	sbc	hl, hl
+	ld	l, a
+	ld	(ix - el_y),hl		; int y = b;
+	ld	de, (ix - el_a2)
+
+	; DE *= L
+	ld	h,e
+	ld	e,l
 	mlt	hl
+	mlt	de
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -1416,6 +1420,7 @@ _Ellipse:
 	add	hl,hl
 	add	hl,hl
 	ex	de,hl
+
 	ld	hl,(ix - el_fa2)
 	or	a,a
 	sbc	hl,de
@@ -1443,12 +1448,12 @@ _Ellipse:
 	add	hl,bc
 	add	hl,bc
 	ld	(ix - el_sigma),hl	; int sigma = 2 * b2 + a2 * (1 - 2 * b);
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
 	ld	e,(ix + 12)
-	ld	d,1
-	mlt	de
 	ld	(ix - el_temp1),de	; Save int a for later
-	or	a,a
-	sbc	hl,hl
 	inc	hl
 	sbc	hl,de
 	ld	de,(ix - el_fb2)
@@ -1595,6 +1600,7 @@ _ellipse_loop_draw_3 := $-3
 	ld	sp,ix
 	pop	ix
 _ellipse_ret:
+_ellipse_smc_base := $
 	ret
 
 _ellipse_draw_pixels:
@@ -2553,7 +2559,7 @@ gfy_GetClipRegion: ; COPIED_FROM_GRAPHX
 	ld	hl,3
 	add	hl,sp
 	ld	iy,(hl)
-	lea	iy, iy - 3
+	; lea	iy, iy - 3	; _ClipRegion accounts for the offset
 	call	_ClipRegion		; get the clipping region
 	sbc	a,a			; return false if offscreen (0)
 	inc	a
@@ -6016,7 +6022,7 @@ _Minimum: ; COPIED_FROM_GRAPHX
 
 ;-------------------------------------------------------------------------------
 _ClipRegion: ; COPIED_FROM_GRAPHX
-; Calculates the new coordinates given the clip  and inputs
+; Calculates the new coordinates given the clip and inputs
 ; Inputs:
 ;  None
 ; Outputs:
@@ -6025,31 +6031,31 @@ _ClipRegion: ; COPIED_FROM_GRAPHX
 	ld	hl,0
 smcWord _XMin
 .XMin := $-3
-	ld	de,(iy+3)
+	ld	de,(iy+0)
 	call	_Maximum
-	ld	(iy+3),hl
+	ld	(iy+0),hl
 	ld	hl,ti.lcdWidth
 smcWord _XMax
 .XMax := $-3
-	ld	de,(iy+9)
+	ld	de,(iy+6)
 	call	_Minimum
-	ld	(iy+9),hl
-	ld	de,(iy+3)
+	ld	(iy+6),hl
+	ld	de,(iy+0)
 	call	.compare
 	ret	c
 	ld	hl,0
 smcWord _YMin
 .YMin := $-3
-	ld	de,(iy+6)
+	ld	de,(iy+3)
 	call	_Maximum.no_carry
-	ld	(iy+6),hl
+	ld	(iy+3),hl
 	ld	hl,ti.lcdHeight
 smcWord _YMax
 .YMax := $-3
-	ld	de,(iy+12)
+	ld	de,(iy+9)
 	call	_Minimum
-	ld	(iy+12),hl
-	ld	de,(iy+6)
+	ld	(iy+9),hl
+	ld	de,(iy+3)
 .compare:
 	dec	hl
 _SignedCompare:
