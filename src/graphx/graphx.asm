@@ -1219,38 +1219,36 @@ assert .LcdSizeH and ti.lcdIntLNBU
 
 ;-------------------------------------------------------------------------------
 gfx_FillEllipse_NoClip:
-	ld	hl,gfx_HorizLine_NoClip
+	ld	hl, gfx_HorizLine_NoClip
 	db	$FD			; ld hl,* -> ld iy,*
 
 ;-------------------------------------------------------------------------------
 gfx_FillEllipse:
-	ld	hl,gfx_HorizLine
-	ld	(_ellipse_line_routine_1),hl
-	ld	(_ellipse_line_routine_2),hl
-	ld	hl,_ellipse_draw_line
-	ld	(_ellipse_loop_draw_2),hl
-	ld	(_ellipse_loop_draw_3),hl
-	ld	hl,_ellipse_ret
-	ld	(_ellipse_loop_draw_1),hl
+	ld	hl, gfx_HorizLine
+	ld	iy, _ellipse_smc_base
+	ld	(iy + (_ellipse_line_routine_1 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_line_routine_2 - _ellipse_smc_base)), hl
+	lea	hl, iy + (_ellipse_ret - _ellipse_smc_base)
+	lea	de, iy + (_ellipse_draw_line - _ellipse_smc_base)
+	ld	(iy + (_ellipse_loop_draw_3 - _ellipse_smc_base)), de
 	jr	_Ellipse
 
 ;-------------------------------------------------------------------------------
 gfx_Ellipse_NoClip:
-	ld	hl,_SetPixel_NoClip_NoWait
+	ld	hl, _SetPixel_NoClip_NoWait
 	db	$FD		; ld hl,* -> ld iy,*
 
 ;-------------------------------------------------------------------------------
 gfx_Ellipse:
-	ld	hl,_SetPixel_NoWait
-	ld	(_ellipse_pixel_routine_1),hl
-	ld	(_ellipse_pixel_routine_2),hl
-	ld	(_ellipse_pixel_routine_3),hl
-	ld	(_ellipse_pixel_routine_4),hl
-	ld	hl,_ellipse_draw_pixels
-	ld	(_ellipse_loop_draw_1),hl
-	ld	(_ellipse_loop_draw_3),hl
-	ld	hl,_ellipse_ret
-	ld	(_ellipse_loop_draw_2),hl
+	ld	hl, _SetPixel_NoWait
+	ld	iy, _ellipse_smc_base
+	ld	(iy + (_ellipse_pixel_routine_1 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_pixel_routine_2 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_pixel_routine_3 - _ellipse_smc_base)), hl
+	ld	(iy + (_ellipse_pixel_routine_4 - _ellipse_smc_base)), hl
+	lea	de, iy + (_ellipse_ret - _ellipse_smc_base)
+	lea	hl, iy + (_ellipse_draw_pixels - _ellipse_smc_base)
+	ld	(iy + (_ellipse_loop_draw_3 - _ellipse_smc_base)), hl
 
 el_x		:= 3		; Current X coordinate of the ellipse
 el_y		:= 6		; Current Y coordinate of the ellipse
@@ -1268,6 +1266,9 @@ el_sigma_diff1	:= 39		; Offset to be added to sigma in loop 1
 el_sigma_diff2	:= 42		; Offset to be added to sigma in loop 2
 
 _Ellipse:
+	lea	iy, iy - 128
+	ld	(iy + (_ellipse_loop_draw_1 - _ellipse_smc_base_m128)), hl
+	ld	(iy + (_ellipse_loop_draw_2 - _ellipse_smc_base_m128)), de
 ; Draws an ellipse, either filled or not, either clipped or not
 ; Arguments:
 ;  arg0 : X coordinate (ix+6)
@@ -1502,6 +1503,8 @@ _ellipse_loop_draw_3 := $-3
 	ld	sp,ix
 	pop	ix
 _ellipse_ret:
+_ellipse_smc_base := $
+_ellipse_smc_base_m128 := _ellipse_smc_base - 128
 	ret
 
 _ellipse_draw_pixels:
