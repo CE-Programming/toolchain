@@ -4018,25 +4018,24 @@ gfx_SetCharData:
 ;  arg0 : Pointer to character data; if null returns current data
 ; Returns:
 ;  Pointer to character data if null, otherwise pointer to next character
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy+6)		; de -> custom character data
-	add	hl,de
-	or	a,a
-	sbc	hl,de			; sets z flag if null
+	ld	iy, 0
+	add	iy, sp
+	sbc	hl, hl		; ld hl, 0
+	ld	de, (iy + 6)	; de -> custom_character_data
+	sbc	hl, de		; sets z flag if NULL
+	add	hl, de
+	ld	l, (iy + 3)	; hl = index
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	bc, (_TextData)
+	add	hl, bc
+	; returns _TextData + (index * 8) if custom_character_data is NULL
 	ret	z
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	ld	l,(iy+3)		; hl = index
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	ld	bc,(_TextData)
-	add	hl,bc
-	ex	de,hl
-	ld	bc,8
+	ld	bc, 8
+	ex	de, hl
 	ldir
+	; returns custom_character_data + 8
 	ret
 
 ;-------------------------------------------------------------------------------

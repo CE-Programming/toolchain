@@ -9,8 +9,6 @@ static unsigned char font8x8_spacing[128];
 
 int main(void)
 {
-    int i;
-
     /* Initialize graphics drawing */
     gfx_Begin();
 
@@ -24,14 +22,29 @@ int main(void)
     /* Waits for a key */
     while (!os_GetCSC());
 
+    PrintCentered("Before: ***");
+
+    /* Waits for a key */
+    while (!os_GetCSC());
+
+    /* Get a pointer to the character data for '*' by passing in NULL */
+    unsigned char *char_ptr = gfx_SetCharData('*', NULL);
+
+    /* Invert the pixels of '*' */
+    for (int i = 0; i < 8; i++) {
+        char_ptr[i] = ~char_ptr[i];
+    }
+
+    PrintCentered("After:  ***");
+
+    /* Waits for a key */
+    while (!os_GetCSC());
+
     /* Change the font by shifting each character up 1 */
-    for (i = 127; i > 0; --i)
+    for (int i = 127; i > 0; --i)
     {
         gfx_SetCharData(i, &font8x8[(i - 1) * 8]);
     }
-
-    /* Clear old string */
-    gfx_FillScreen(255);
 
     /* Print with the changed font */
     PrintCentered("Uijt!tusjoh!xbt!ijeefo\"");
@@ -48,9 +61,12 @@ int main(void)
 /* Prints a screen centered string */
 void PrintCentered(const char *str)
 {
-    gfx_PrintStringXY(str,
-                      (GFX_LCD_WIDTH - gfx_GetStringWidth(str)) / 2,
-                      (GFX_LCD_HEIGHT - 8) / 2);
+    /* Clear old string */
+    gfx_FillScreen(255);
+
+    int x_center = (GFX_LCD_WIDTH - gfx_GetStringWidth(str)) / 2;
+    int y_center = (GFX_LCD_HEIGHT - 8) / 2;
+    gfx_PrintStringXY(str, x_center, y_center);
 }
 
 static unsigned char font8x8_spacing[128] =
@@ -181,7 +197,7 @@ static unsigned char font8x8[128 * 8] =
 	0x00, 0x00, 0x00, 0x7e, 0x46, 0x62, 0x62, 0x7e,	// Char 111 (o)
 	0x00, 0x00, 0x00, 0x7e, 0x46, 0x42, 0x7e, 0x60,	// Char 112 (p)
 	0x60, 0x00, 0x00, 0x7e, 0x46, 0x42, 0x7e, 0x02,	// Char 113 (q)
-	0x02, 0x00, 0x00, 0x7e, 0x46, 0x60, 0x60, 0x60,	// Char 114 (r)
+	0x00, 0x00, 0x00, 0x7e, 0x46, 0x60, 0x60, 0x60,	// Char 114 (r)
 	0x00, 0x00, 0x00, 0x7c, 0x40, 0x7c, 0x04, 0x7c,	// Char 115 (s)
 	0x00, 0x10, 0x10, 0x3c, 0x10, 0x10, 0x18, 0x1c,	// Char 116 (t)
 	0x00, 0x00, 0x00, 0x46, 0x46, 0x62, 0x62, 0x7e,	// Char 117 (u)
