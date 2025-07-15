@@ -5166,7 +5166,8 @@ smcByte _TransparentColor
 	dec	iyh
 	jr	nz, .outer		; y loop
 .finish:
-	pop	af			; sprite out size
+	ld	a, 0	; return value should be [1, 255]
+.dsrs_ret_size := $-1
 	pop	ix
 	ret
 
