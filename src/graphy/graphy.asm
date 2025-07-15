@@ -5289,7 +5289,8 @@ smcByte _YMin
 	ld	hl, (iy + (_RSS_NC.dsrs_cosf_0A - _RSS_NC.dsrs_base_address))
 	; DE = HL * B(height)
 	call	_set_DE_to_HL_mul_B
-	ld	hl, (iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address))
+	; ld	hl, (iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address))
+	ld	hl, (ix - 12)	; dsrs_size128_0_plus_dyc_0
 	add	hl, de
 	push	hl
 
@@ -5319,7 +5320,8 @@ smcByte _YMin
 	call	_set_DE_to_HL_mul_B
 	pop	hl
 	add.s	hl, de	; make sure UHL is zero
-	ld	(iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address)), hl
+	; ld	(iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address)), hl
+	ld	(ix - 12), hl	; dsrs_size128_0_plus_dyc_0
 
 	pop	bc	; B = height, C = width
 	ret
