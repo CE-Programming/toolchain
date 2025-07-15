@@ -4921,8 +4921,7 @@ _RSS_NC:
 	inc	hl
 
 	; or	a, a	; carry already cleared
-	dec	b
-	sbc	hl, bc	; offset the sprite pointer by (size - 1) * 256
+	sbc	hl, bc	; offset the sprite pointer by (size * 256)
 
 	ld	(iy + (.dsrs_sprptr_0A - .dsrs_base_address)), hl	; write smc
 	ld	(iy + (.dsrs_sprptr_0B - .dsrs_base_address)), hl	; write smc
@@ -4975,7 +4974,8 @@ _RSS_NC:
 	add	hl, de		; restore HL
 	ld	de, (ix - 6)	; dsrs_dyc_0
 	add.s	hl, de		; make sure UHL is zero
-	ld	(iy + (.dsrs_size128_0_plus_dyc_0 - .dsrs_base_address)), hl	; write smc
+	; ld	(iy + (.dsrs_size128_0_plus_dyc_0 - .dsrs_base_address)), hl	; write smc
+	push	hl	; ld (ix - 12), dsrs_size128_0_plus_dyc_0
 
 	; carry might be set, but that shouldn't matter for rl c
 
@@ -4987,6 +4987,8 @@ _RSS_NC:
 	jr	nz, .hax
 	inc	a			; hax for scale = 1?
 .hax:
+	; store the return value before it gets modified
+	ld	(iy + (.dsrs_ret_size - .dsrs_base_address)), a
 	ld	b, a	; render height
 	ld	c, a	; render width
 
@@ -5044,18 +5046,17 @@ _RSS_NC:
 
 	; by popping these off the stack in a werid way, we can reduce SMC useage
 
-	pop	hl			; dsrs_size128_1_minus_dys_0
-	ld	ixh, b
-	ld	iyh, c			; size * scale / 64
-	pop	bc			; smc = dxc start
-	ex	(sp), ix		; smc = dxs start	
+	ld	iyh, b			; size * scale / 64
 
+	pop	ix			; dsrs_size128_0_plus_dyc_0
+	pop	hl			; dsrs_size128_1_minus_dys_0
+
+	pop	bc			; smc = dxc start
 	; ys = (dxc - dys) + (size * 128)
 	add	hl, bc	; HL = (dxc - dys) + (size * 128)
-	
-	ld	bc, 0	; xs = (dxs + dyc) + (size * 128)
-.dsrs_size128_0_plus_dyc_0 := $-3
-.dsrs_base_address := .dsrs_size128_0_plus_dyc_0
+
+	pop	bc			; smc = dxs start
+	; xs = (dxs + dyc) + (size * 128)
 	add	ix, bc	; IX = (dxs + dyc) + (size * 128)
 
 	call	gfy_Wait
@@ -5071,7 +5072,7 @@ _RSS_NC:
 	jr	c, .skip_pixel
 .inner_opaque_hijack:
 	; get pixel and draw to buffer
-	push	hl			; xs
+	push	hl			; preserve ys
 	ld	l, a
 	inc	l
 	mlt	hl
@@ -5083,7 +5084,7 @@ _RSS_NC:
 .dsrs_sprptr_0B := $-3
 	add	hl, bc
 	ldi
-	pop	hl
+	pop	hl			; restore ys
 
 	ld	bc, 0			; smc = -sinf
 .dsrs_sinf_0B := $-3
@@ -5091,6 +5092,7 @@ _RSS_NC:
 
 	ld	bc, 0			; smc = cosf
 .dsrs_cosf_0B := $-3
+.dsrs_base_address := $-3
 	add	ix, bc			; xs += cosf
 
 	dec	iyl
@@ -5126,7 +5128,7 @@ _RSS_NC:
 	jr	c, .skip_pixel
 	; get pixel and draw to buffer
 	; SMC: push hl \ ld l, a --> jr inner_opaque_hijack
-	push	hl			; xs
+	push	hl			; preserve ys
 	ld	l, a
 .dsrs_jump_2 := $-1
 	inc	l
@@ -5146,7 +5148,7 @@ smcByte _TransparentColor
 	ld	(de), a
 .transparent_pixel:
 	ld	a, b	; restore A
-	pop	hl			; ys
+	pop	hl			; restore ys
 .skip_pixel:
 	inc	de			; x++s
 	ld	bc, 0			; smc = -sinf
@@ -5234,7 +5236,7 @@ smcWord _XMin
 	inc	e
 	ld	iyl,e			; save new width
 	or	a,a
-.xclipped:
+.xclipped:	; <-- carry already cleared on this path
 
 ; CLIP Y COORDINATE
 	ld	c,0
@@ -5372,8 +5374,7 @@ gfy_RotateScaleSprite: ; MODIFIED_FROM_GRAPHX
 	inc	hl
 
 	or	a, a
-	dec	b
-	sbc	hl, bc	; offset the sprite pointer by (size - 1) * 256
+	sbc	hl, bc	; offset the sprite pointer by (size * 256)
 
 	ld	(iy + (_smc_dsrs_sprptr_0 - _smc_dsrs_base_address)), hl ; write smc
 
@@ -5468,14 +5469,13 @@ gfy_RotateScaleSprite: ; MODIFIED_FROM_GRAPHX
 	; by popping these off the stack in a werid way, we can reduce SMC useage
 
 	pop	ix	; _smc_dsrs_size128_0_plus_dyc_0
-	pop	de	; _smc_dsrs_size128_1_minus_dys_0
-	pop	hl			; smc = dxc start
+	pop	hl	; _smc_dsrs_size128_1_minus_dys_0
 
+	pop	de			; smc = dxc start
 	; ys = (dxc - dys) + (size * 128)
 	add	hl, de	; HL = (dxc - dys) + (size * 128)
 
 	pop	de			; smc = dxs start
-
 	; xs = (dxs + dyc) + (size * 128)
 	add	ix, de	; IX = (dxs + dyc) + (size * 128)
 
@@ -5509,7 +5509,7 @@ _xloop:
 	cp	a, c
 	jr	c, drawSpriteRotateScale_SkipPixel
 	; get pixel and draw to buffer
-	push	hl			; xs
+	push	hl			; preserve ys
 	ld	l, a
 	inc	l
 	mlt	hl
@@ -5525,7 +5525,7 @@ _smc_dsrs_sprptr_0 := $-3
 	; inc	de			; x++s
 	ldi
 
-	pop	hl			; ys
+	pop	hl			; restore ys
 	ld	bc, $000000		; smc = -sinf
 _smc_dsrs_sinf_0A := $-3
 	add	hl, bc			; ys += -sinf
@@ -5544,12 +5544,11 @@ _smc_dsrs_cosf_0A := $-3
 	ret
 
 drawSpriteRotateScale_SkipPixel:
-	ld	b, a	; preserve A
-	ld	a,TRASPARENT_COLOR
+	ex	de, hl
+	ld	(hl), TRASPARENT_COLOR	; write pixel
 smcByte _TransparentColor
-	ld	(de), a			; write pixel
+	ex	de, hl
 	inc	de			; x++s
-	ld	a, b	; restore A
 
 	ld	bc, 0			; smc = -sinf
 _smc_dsrs_sinf_0B := $-3
@@ -5574,36 +5573,32 @@ calcSinCosSMC_loadCosine:
 	ld	a, 64
 	add	a, (ix + 15)
 calcSinCosSMC:
-	ld	e, (ix + 18)
 ; inputs:
 ; A = angle
-; E = scale
 ; outputs:
 ; HL = 16bit quotient
 ; UHL = 0
 	; getSinCos:
 	; returns a = sin/cos(a) * 128
-	ld	bc, $80
+	ld	bc, $107F	; b = 16, c = $7F
 	ld	d, a
-	bit	7, a
-	jr	z, .bit7
-	sub	a, c	; sub a, 128
-.bit7:
 	bit	6, a
 	jr	z, .bit6
-	;	A = 128 - A
-	neg
-	add	a, c	; add a, 128
+	cpl
+	inc	a
 .bit6:
+	and	a, c	; and a, $7F
+	; A is [0, 64]
 	ld	c, a
-	ld	hl, _SineTable
+	ld	hl, _SineTable - $1000	; since BC is offset by $1000
 	add	hl, bc
 	ld	h, (hl)
-	ld	l, b	; ld l, 0
-	; hl = _SineTable[angle + 64] * 128
+	xor	a, a
+	ld	l, a	; ld l, 0
+	; hl = _SineTable[angle] * 128
 	; H is [0, 127]
 	; HL <<= 7
-	add.s	hl, hl
+	add.s	hl, hl	; also clears UHL
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
@@ -5612,10 +5607,10 @@ calcSinCosSMC:
 	add	hl, hl
 
 	; _16Div8Signed:
-	; hl = _SineTable[angle + 64] * 128 / scale (cos)
-	ld	b, 16
-	xor	a, a
-.div:
+	; hl = _SineTable[angle] * 128 / scale (sin)
+	ld	e, (ix + 18)	; scale
+	; 16 iterations
+.div_loop:
 	add	hl, hl
 	rla
 	jr	c, .overflow	; this path is only used when E >= 128
@@ -5625,7 +5620,7 @@ calcSinCosSMC:
 	sub	a, e
 	inc	l
 .check:
-	djnz	.div
+	djnz	.div_loop
 	bit	7, d
 	; UHL is zero here
 	ret	z
