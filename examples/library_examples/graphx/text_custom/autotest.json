@@ -16,7 +16,11 @@
     "key|enter",
     "hashWait|2",
     "key|enter",
-    "hashWait|3"
+    "hashWait|3",
+    "key|enter",
+    "hashWait|4",
+    "key|enter",
+    "hashWait|5"
   ],
   "hashes":
   {
@@ -25,16 +29,30 @@
       "description": "Test custom font display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "F717BF65" ]
+      "expected_CRCs": [ "711E0ED5" ]
     },
     "2":
+    {
+      "description": "Before: ***",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "1BD16129" ]
+    },
+    "3":
+    {
+      "description": "After:  ***",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "B090D407" ]
+    },
+    "4":
     {
       "description": "Test hidden font display",
       "start": "vram_start",
       "size": "vram_8_size",
-      "expected_CRCs": [ "EDA09A59" ]
+      "expected_CRCs": [ "0170C971" ]
     },
-    "3":
+    "5":
     {
       "description": "Test program exit",
       "start": "vram_start",
