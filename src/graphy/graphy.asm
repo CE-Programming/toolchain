@@ -1322,9 +1322,8 @@ gfy_FillEllipse: ; COPIED_FROM_GRAPHX
 	ld	(iy + (_ellipse_line_routine_1 - _ellipse_smc_base)), hl
 	ld	(iy + (_ellipse_line_routine_2 - _ellipse_smc_base)), hl
 	lea	hl, iy + (_ellipse_ret - _ellipse_smc_base)
-	ld	(_ellipse_loop_draw_1),hl
-	lea	hl, iy + (_ellipse_draw_line - _ellipse_smc_base)
-	ld	(_ellipse_loop_draw_2),hl
+	lea	de, iy + (_ellipse_draw_line - _ellipse_smc_base)
+	ld	(iy + (_ellipse_loop_draw_3 - _ellipse_smc_base)), de
 	jr	_Ellipse
 
 ;-------------------------------------------------------------------------------
@@ -1340,10 +1339,9 @@ gfy_Ellipse: ; COPIED_FROM_GRAPHX
 	ld	(iy + (_ellipse_pixel_routine_2 - _ellipse_smc_base)), hl
 	ld	(iy + (_ellipse_pixel_routine_3 - _ellipse_smc_base)), hl
 	ld	(iy + (_ellipse_pixel_routine_4 - _ellipse_smc_base)), hl
-	lea	hl, iy + (_ellipse_ret - _ellipse_smc_base)
-	ld	(_ellipse_loop_draw_2),hl
+	lea	de, iy + (_ellipse_ret - _ellipse_smc_base)
 	lea	hl, iy + (_ellipse_draw_pixels - _ellipse_smc_base)
-	ld	(_ellipse_loop_draw_1),hl
+	ld	(iy + (_ellipse_loop_draw_3 - _ellipse_smc_base)), hl
 
 el_x		:= 3		; Current X coordinate of the ellipse
 el_y		:= 6		; Current Y coordinate of the ellipse
@@ -1361,7 +1359,8 @@ el_sigma_diff1	:= 39		; Offset to be added to sigma in loop 1
 el_sigma_diff2	:= 42		; Offset to be added to sigma in loop 2
 
 _Ellipse:
-	ld	(iy + (_ellipse_loop_draw_3 - _ellipse_smc_base)), hl
+	ld	(_ellipse_loop_draw_1),hl
+	ld	(_ellipse_loop_draw_2),de
 ; Draws an ellipse, either filled or not, either clipped or not
 ; Arguments:
 ;  arg0 : X coordinate (ix+6)
@@ -1375,7 +1374,7 @@ _Ellipse:
 	add	ix,sp
 	lea	hl,ix - 42
 	ld	sp,hl
-	
+
 ; First, setup all the variables
 	ld	a,(ix + 12)
 	or	a,a
@@ -1386,28 +1385,25 @@ _Ellipse:
 	ret
 .valid_x_radius:
 	ld	l,a
-	ld	a,(ix + 15)
-	or	a,a
-	jr	z,.return		; Make sure Y radius is not 0
-	ld	h,l
+	ld	h,a
 	mlt	hl
 	ld	(ix - el_a2),hl		; int a2 = a * a;
 	add	hl,hl
 	ld	(ix - el_sigma_diff2),hl; Save a2 * 2 for later
 	add	hl,hl
 	ld	(ix - el_fa2),hl	; int fa2 = 4 * a2;
-
-	; carry won't be set
-	sbc	hl, hl
-	ld	l, a
-	ld	(ix - el_y),hl		; int y = b;
-	ld	de, (ix - el_a2)
-
-	; DE *= L
-	ld	h,e
-	ld	e,l
-	mlt	hl
+	ld	a,(ix + 15)
+	or	a,a
+	jr	z,.return		; Make sure Y radius is not 0
+	ld	e,a
+	ld	d,1
 	mlt	de
+	ld	(ix - el_y),de		; int y = b;
+	ld	hl,(ix - el_a2)
+	ld	d,l
+	ld	l,e
+	mlt	de
+	mlt	hl
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -1420,7 +1416,6 @@ _Ellipse:
 	add	hl,hl
 	add	hl,hl
 	ex	de,hl
-
 	ld	hl,(ix - el_fa2)
 	or	a,a
 	sbc	hl,de
@@ -1448,12 +1443,12 @@ _Ellipse:
 	add	hl,bc
 	add	hl,bc
 	ld	(ix - el_sigma),hl	; int sigma = 2 * b2 + a2 * (1 - 2 * b);
-	or	a, a
-	sbc	hl, hl
-	ex	de, hl
-	sbc	hl, hl
 	ld	e,(ix + 12)
+	ld	d,1
+	mlt	de
 	ld	(ix - el_temp1),de	; Save int a for later
+	or	a,a
+	sbc	hl,hl
 	inc	hl
 	sbc	hl,de
 	ld	de,(ix - el_fb2)
@@ -1464,7 +1459,7 @@ _Ellipse:
 	ld	de,(ix - el_y)
 	call	_MultiplyHLDE
 	ld	(ix - el_comp_b),hl
-	
+
 	wait_quick
 
 .main_loop1:
@@ -1683,7 +1678,6 @@ _ellipse_line_routine_2 := $-3
 	pop	hl
 	pop	hl
 	ret
-	
 
 ;-------------------------------------------------------------------------------
 _Circle:
