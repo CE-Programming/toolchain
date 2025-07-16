@@ -1,0 +1,66 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__imul_b
+	public	__imulu_b
+
+if PREFER_OS_CRT
+
+__imul_b := 000150h
+__imulu_b := __imul_b
+
+else
+
+__imul_b:
+__imulu_b:
+
+; Multiplies UHL by A (unsigned) and returns the 24-bit product uhl.
+;    I: A=multiplier, UHL=multiplicand, ADL=1
+;    O: uhl=UHL*A
+;   CC: 32*r(PC)+12*r(SPL)+9*w(SPL)+13
+;   CC: 31 bytes | 32F + 12R + 9W + 13
+Mul_UHL_A_UHL:
+	push	de
+	push	af	; preserve A
+
+	dec	sp
+	push	hl
+	inc	sp
+	; (SP + 3) = preserved E
+	; (SP + 2) = ?   --> UDE
+	; (SP + 1) = UHL --> D
+	; (SP + 0) = H   --> E
+	; (SP - 1) = L
+	pop	de	; D = UHL, E = H
+
+	ld	e, a
+	mlt	de	; DE = UHL * A
+
+	ld	d, l
+
+	ld	l, a
+	mlt	hl	; HL = H * A
+
+	ld	a, h
+	add	a, e
+	ld	h, a
+
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+
+	pop	af	; restore A
+	ld	e, a
+	mlt	de	; DE = L * A
+	add	hl, de
+
+	pop	de
+	ret
+
+end if

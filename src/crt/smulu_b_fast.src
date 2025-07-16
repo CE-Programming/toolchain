@@ -1,0 +1,26 @@
+
+
+	assume	adl=1
+
+	section	.text
+
+	public	__smulu_b_fast
+
+__smulu_b_fast:
+
+; Multiplies HL by A (unsigned) and returns the 16-bit product hl.
+;    I: A=multiplier, HL=multiplicand, ADL=1
+;    O: hl=HL*A
+;   CC: 12*r(PC)+3*r(SPL)+9
+;   CC: 11 bytes | 12F + 3R + 9
+Mul_HL_A_HL_Fast:
+; destroys DE and A. You can swap DE with BC to destroy BC instead
+	ld	e, a
+	ld	d, h
+	ld	h, e
+	mlt	de	; DE = H * A
+	mlt	hl	; HL = A * L
+	ld	a, e
+	add	a, h
+	ld	h, a
+	ret
