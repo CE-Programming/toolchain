@@ -16,8 +16,6 @@ __fsub      := 000290h
 __ftol      := 00027Ch
 	public	__ftoul
 __ftoul     := __ftol
-	public	__imul_b
-__imul_b    := 000150h
 	public	__indcall
 __indcall   := 00015Ch
 	public	__ishl_b

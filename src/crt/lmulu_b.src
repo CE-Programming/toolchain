@@ -1,0 +1,61 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__lmulu_b
+
+__lmulu_b:
+
+; Multiplies EUHL by A and returns the 32-bit product euhl.
+;    I: A=multiplier, EUHL=multiplicand, ADL=1
+;    O: euhl=EUHL*A
+;   CC: 43*r(PC)+12*r(SPL)+9*w(SPL)+13
+;   CC: 42 bytes | 43F + 12R + 9W + 13
+Mul_EUHL_A_EUHL:
+	push	bc
+	push	de
+
+	dec	sp
+	push	hl
+	inc	sp
+	pop	bc	; B = UHL, C = H
+
+	ld	c, a
+	mlt	bc	; BC = A * U
+
+	ld	d, a	; preserve A
+	push	de	; A * E
+	ld	d, l
+	ld	e, a
+
+	ld	l, a
+	mlt	hl	; HL = A * H
+
+	ld	a, h
+	add	a, c
+	ld	h, a	; A = H
+	adc	a, b	; A = H + AU.hi + carry
+	sub	a, h	; A = AU.hi + carry
+
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	
+	mlt	de	; DE = A * L
+	add	hl, de	; UHL = AH.hi + AU.lo, AH.lo + AL.hi, AL.lo
+
+	pop	de
+	ld	b, d	; retrieve A
+	mlt	de	; DE = A * E
+	adc	a, e	; AU.hi + AE.lo + Carry
+	pop	de
+	ld	e, a
+	ld	a, b	; restore A
+
+	pop	bc
+	ret

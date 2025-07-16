@@ -1,0 +1,25 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__smulu_b
+
+__smulu_b:
+
+; Multiplies HL by A (unsigned) and returns the 16-bit product hl.
+;    I: A=multiplier, HL=multiplicand, ADL=1
+;    O: hl=HL*A
+;   CC: 15*r(PC)+6*r(SPL)+3*w(SPL)+9
+;   CC: 14 bytes | 15F + 6R + 3W + 9
+Mul_HL_A_HL:
+	push	de
+	ld	e, a
+	ld	d, h
+	ld	h, e
+	mlt	de	; DE = H * A
+	mlt	hl	; HL = A * L
+	ld	d, e
+	ld	e, 0
+	add	hl, de
+	pop	de
+	ret
