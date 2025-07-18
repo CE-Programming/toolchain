@@ -65,11 +65,18 @@ size_t run_test(void) {
             F32_pun mant_0, mant_1;
             mant_0.flt = frexpf(fabsf(input[i].value.flt), &temp);
             mant_1.flt = frexpf(fabsf(output[i].flt     ), &temp);
-            bool inexact_raised = fetestexcept(FE_INEXACT);
+            unsigned char fe_val = __fe_cur_env;
+            bool inexact_raised = (fe_val & FE_INEXACT);
+            bool underflow_raised = (fe_val & FE_UNDERFLOW);
+            bool overflow_raised = (fe_val & FE_OVERFLOW);
             bool mant_equal = (mant_0.bin == mant_1.bin);
             bool became_zero = (mant_0.bin != 0 && mant_1.bin == 0);
             bool became_infinite = (mant_0.bin != UINT32_C(0x7F800000) && mant_1.bin == UINT32_C(0x7F800000));
-            if (!((mant_equal != inexact_raised) && ((became_zero || became_infinite) == (errno == ERANGE)))) {
+            if (!(
+                (mant_equal != inexact_raised) &&
+                ((became_zero || became_infinite) == (errno == ERANGE)) &&
+                (became_zero == underflow_raised) && (became_infinite == overflow_raised)
+            )) {
                 test_printf(
                     "%zu: FE: %02X errno: %d\nI: %08lX %+d\nO: %08lX\n",
                     i, (unsigned int)__fe_cur_env, errno,

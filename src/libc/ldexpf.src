@@ -129,11 +129,13 @@ _ldexpf:
 	jr	nc, _ldexpf.shru_common
 ; .underflow:
 	inc	b	; ld b, 0 ; sets Z
-.underflow_to_zero:	; <-- Z is set when underflowing to zero
 .overflow_to_inf:	; <-- NZ is set when infinite
-.raise_erange_avoid_negative_zero:
+	ld	a, $28	; FE_OVERFLOW | FE_INEXACT
+.underflow_to_zero:	; <-- Z is set when underflowing to zero
+.raise_erange:
 	ld	hl, $800000
 	jr	nz, .overflow
+	ld	a, $24	; FE_UNDERFLOW | FE_INEXACT
 	add	hl, hl	; ld hl, 0
 if __ldexpf_avoid_negative_zero
 	; prevents negative zero from being emitted on underflow
@@ -141,12 +143,12 @@ if __ldexpf_avoid_negative_zero
 end if
 .overflow:
 	ex	de, hl
-.raise_erange:
 	ld	hl, 5	; ERANGE
 	ld	(_errno), hl
 .raise_inexact:
 	ld	hl, ___fe_cur_env
-	set	5, (hl)	; FE_INEXACT
+	or	a, (hl)
+	ld	(hl), a
 .result_is_exact:
 	ld	a, (iy + 6)	; expon
 	rla	; extract signbit
@@ -214,13 +216,10 @@ end if
 	ld	a, c	; UDE
 	or	a, d
 	or	a, e
+	ld	a, $20	; FE_INEXACT
 	jr	nz, .raise_inexact
 	; NZ needs to be set here
-if __ldexpf_avoid_negative_zero
-	jr	.raise_erange_avoid_negative_zero
-else
 	jr	.raise_erange
-end if
 
 	extern	_errno
 	extern	___fe_cur_env
