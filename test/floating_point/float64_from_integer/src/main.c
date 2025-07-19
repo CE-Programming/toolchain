@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
+#include <fenv.h>
 #include <assert.h>
 #include <ti/screen.h>
 #include <ti/getcsc.h>
@@ -32,12 +33,17 @@ void print_failed(uint64_t input, uint64_t guess, uint64_t truth) {
         input, guess, truth
     );
 }
+#define test_printf printf
 #else
 #define print_failed(...)
+#define test_printf(...)
 #endif
 
 long double CRT_utod(unsigned int);
 long double CRT_itod(signed int);
+
+void clear_fe_cur_env(void);
+unsigned char get_fe_cur_env(void);
 
 size_t run_test(const char** failed_func) {
     typedef struct { uint32_t u32; uint64_t u64; } input_t;
@@ -82,19 +88,51 @@ size_t run_test(const char** failed_func) {
             }
         }
 
-        result.flt = (long double)((uint64_t)input[i].u64);
-        if (result.bin != output[i].fu64.bin) {
-            print_failed((uint64_t)input[i].u64, result.bin, output[i].fu64.bin);
-            *failed_func = "ulltod";
-            return i;
+        {
+            clear_fe_cur_env();
+            result.flt = (long double)((uint64_t)input[i].u64);
+            if (result.bin != output[i].fu64.bin) {
+                print_failed((uint64_t)input[i].u64, result.bin, output[i].fu64.bin);
+                *failed_func = "ulltod";
+                return i;
+            }
+            unsigned char fe_env = get_fe_cur_env();
+            bool rounding_occured = ((uint64_t)output[i].fu64.flt != (uint64_t)input[i].u64);
+            bool inexact_raised = (fe_env & FE_INEXACT);
+            if (rounding_occured != inexact_raised) {
+                test_printf(
+                    "%zu: FE: %02X\nI: %016llX\nO: %016llX\n",
+                    i, fe_env,
+                    input[i].u64, output[i].fu64.bin
+                );
+                *failed_func = "ulltod";
+                fputs("fenv\n", stdout);
+                return i;
+            }
         }
 
-        result.flt = (long double)((int64_t)input[i].u64);
-        if (result.bin != output[i].fi64.bin) {
-            print_failed((uint64_t)input[i].u64, result.bin, output[i].fi64.bin);
-            *failed_func = "lltod";
-            return i;
-        }
+        {
+            clear_fe_cur_env();
+            result.flt = (long double)((int64_t)input[i].u64);
+            if (result.bin != output[i].fi64.bin) {
+                print_failed((uint64_t)input[i].u64, result.bin, output[i].fi64.bin);
+                *failed_func = "lltod";
+                return i;
+            }
+            unsigned char fe_env = get_fe_cur_env();
+            bool rounding_occured = ((int64_t)output[i].fi64.flt != (int64_t)input[i].u64);
+            bool inexact_raised = (fe_env & FE_INEXACT);
+            if (rounding_occured != inexact_raised) {
+                test_printf(
+                    "%zu: FE: %02X\nI: %016llX\nO: %016llX\n",
+                    i, fe_env,
+                    input[i].u64, output[i].fu64.bin
+                );
+                *failed_func = "lltod";
+                fputs("fenv\n", stdout);
+                return i;
+            }
+        } 
     }
 
     /* passed all */

@@ -49,54 +49,71 @@ __lltod_common:
 	push	hl
 	push	bc
 	ld	b, a
-	ld	c, 1
+	ld	c, a
+	xor	a, a
 .shift_loop:
-	jr	nc, .no_carry
-	inc	c
-.no_carry:
+	adc	a, 0
 	srl	h
 	rr	l
 	djnz	.shift_loop
-	; test round bit
+	; round upwards to even if (round && (guard || sticky))
 	jr	nc, .no_round
-	; test sticky bits
-	dec	c
+	; we must ensure that FE_INEXACT is raised since rounding has occured
+	or	a, a	; test sticky bits
 	jr	nz, .round_up
-	; test guard bit
-	bit	0, l
-	jr	nc, .no_round
+	inc	a	; ld a, 1
+	and	a, l	; test guard bit
+	jr	nc, .no_round_inexact
 .round_up:
 	inc	b	; round up after shifting
 .no_round:
+	adc	a, a	; test sticky and round bits
+	jr	z, .result_is_exact
+.no_round_inexact:
+	ld	hl, ___fe_cur_env
+	set	5, (hl)	; FE_INEXACT
+.result_is_exact:
+
 	ld	h, b
+	ld	a, c
+	ld	l, c
 	pop	bc
 
-	ld	l, a
 	ex	(sp), hl	; (SP) = shift
 	call	__llshru
 	ex	(sp), hl	; (SP) = shifted HL, H = rounding, L = shift
 	add	a, 51
 
 	dec	h
-	push	af
-	; exponent = ($400 + (base2_logarithm - 1)) << 4
-	; BC = $4EEM
-	ld	l, a
-	ld	h, $04
-	; clear the implicit mantissa bit
-	res	4, c	; 52 % 8 == 4
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	a, l
-	or	a, c
+	jr	nz, __int_to_f64_shl.no_rounding
+
+	dec	a	; compensate for the implicit mantissa bit
+	; BC/exponent = [$434*, $43E*]
+	add	a, a
+	add	a, a
+	add	a, a
+	add	a, a
+	add	a, c
 	ld	c, a
-	ld	b, h
-	pop	af
 	pop	hl	; restore shifted HL
-	call	z, __lladd_1	; round up to even
+	ld	b, $43
+if 0
+	; inlined __lladd_1
+	inc	hl
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	nz, __int_to_f64_shl.finish
+	inc	de
+	sbc	hl, de
+	add	hl, de
+	jr	nz, __int_to_f64_shl.finish
+	inc	bc
 	jr	__int_to_f64_shl.finish
+else
+	call	__lladd_1	; round up to even
+	jr	__int_to_f64_shl.finish
+end if
 
 ;-------------------------------------------------------------------------------
 
@@ -120,31 +137,6 @@ __int_to_f64_zero_or_one:
 
 	section	.text
 
-	public	__itod
-; (long double)int
-__itod:
-	push	hl
-	add	hl, hl	; extract signbit
-	sbc	hl, hl	; set Z flag
-	ld	e, l	; sign extend UHL to E:UHL
-	pop	hl
-	jq	__ltod
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
-	public	__utod
-; (long double)unsigned int
-__utod:
-	ld	e, 0
-
-	require	__ultod
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
 	public	__ultod
 ; (long double)unsigned long
 __ultod:
@@ -160,16 +152,6 @@ __ultod:
 ; (long double)long
 __ltod:
 	bit	7, e
-
-	require	__ltod.hijack_itod
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
-	private	__ltod.hijack_itod
-__ltod.hijack_itod:
-
 	push	af
 	call	nz, __lneg	; abs(E:UHL)
 
@@ -211,17 +193,18 @@ __int_to_f64_shl:
 	ld	a, 51
 	sub	a, l
 
+.no_rounding:
 	; exponent = ($400 + (base2_logarithm - 1)) << 4
 	; BC = $4EEM
 	ld	l, a
 	ld	h, $04
 	; clear the implicit mantissa bit
-	res	4, c	; 52 % 8 == 4
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	ld	a, l
+	res	4, c	; 52 % 8 == 4
 	or	a, c
 	ld	c, a
 	ld	b, h
@@ -234,7 +217,6 @@ __int_to_f64_shl:
 
 ;-------------------------------------------------------------------------------
 
-	extern	__ineg
 	extern	__lneg
 	extern	__lctlz
 	extern	__llctlz
@@ -242,3 +224,4 @@ __int_to_f64_shl:
 	extern	__llshru
 	extern	__llneg
 	extern	__lladd_1
+	extern	___fe_cur_env
