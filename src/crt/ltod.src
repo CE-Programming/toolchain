@@ -1,5 +1,7 @@
 	assume	adl=1
 
+	__lltod_signal_FE_INEXACT := 0
+
 ;-------------------------------------------------------------------------------
 
 	section	.text
@@ -7,7 +9,7 @@
 	public	__ulltod
 ; (long double)unsigned long long
 __ulltod:
-	cp	a, a	; set Z flag
+	cp	a, a		; set Z flag
 	push	af
 	jq	__lltod_common
 
@@ -31,7 +33,7 @@ __lltod:
 	private	__lltod_common
 __lltod_common:
 	call	__llctlz
-	sub	a, 63	; normalize clz_result
+	sub	a, 63		; normalize clz_result
 	; filter out exponent of $000 (zero) and $3FF (one)
 	jr	nc, __int_to_f64_zero_or_one
 	; A is [-63, -1]
@@ -49,54 +51,71 @@ __lltod_common:
 	push	hl
 	push	bc
 	ld	b, a
-	ld	c, 1
+	ld	c, a
+	xor	a, a
 .shift_loop:
-	jr	nc, .no_carry
-	inc	c
-.no_carry:
+	adc	a, 0
 	srl	h
 	rr	l
 	djnz	.shift_loop
-	; test round bit
+	; round upwards to even if (round && (guard || sticky))
 	jr	nc, .no_round
-	; test sticky bits
-	dec	c
+	; we must ensure that FE_INEXACT is raised since rounding has occured
+	or	a, a		; test sticky bits
 	jr	nz, .round_up
-	; test guard bit
-	bit	0, l
-	jr	nc, .no_round
+	inc	a		; ld a, 1
+	and	a, l		; test guard bit
+	jr	z, .no_round_inexact
 .round_up:
-	inc	b	; round up after shifting
+	inc	b		; round up after shifting
 .no_round:
+if __lltod_signal_FE_INEXACT
+	adc	a, a		; test sticky and round bits
+	jr	z, .result_is_exact
+.no_round_inexact:
+	ld	hl, ___fe_cur_env
+	set	5, (hl)		; FE_INEXACT
+.result_is_exact:
+else
+.no_round_inexact:
+end if
 	ld	h, b
+	ld	a, c
+	ld	l, c
 	pop	bc
 
-	ld	l, a
 	ex	(sp), hl	; (SP) = shift
 	call	__llshru
-	ex	(sp), hl	; (SP) = shifted HL, H = rounding, L = shift
-	add	a, 51
+	add	a, 51 - 1	; compensate for the implicit mantissa bit
 
-	dec	h
-	push	af
-	; exponent = ($400 + (base2_logarithm - 1)) << 4
-	; BC = $4EEM
-	ld	l, a
-	ld	h, $04
-	; clear the implicit mantissa bit
-	res	4, c	; 52 % 8 == 4
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	add	hl, hl
-	ld	a, l
-	or	a, c
+	; BC/exponent = [$434*, $43E*]
+	add	a, a
+	add	a, a
+	add	a, a
+	add	a, a
+	add	a, c
 	ld	c, a
-	ld	b, h
-	pop	af
-	pop	hl	; restore shifted HL
-	call	z, __lladd_1	; round up to even
+	pop	af		; A = rounding
+	or	a, a		; NZ = round-up, Z = no-round
+	ld	b, $43
+if 0
+	jr	z, __int_to_f64_shl.no_round
+	; inlined __lladd_1
+	inc	hl
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	nz, __int_to_f64_shl.finish
+	inc	de
+	sbc	hl, de
+	add	hl, de
+	jr	nz, __int_to_f64_shl.finish
+	inc	bc
 	jr	__int_to_f64_shl.finish
+else
+	call	nz, __lladd_1	; round up to even
+	jr	__int_to_f64_shl.finish
+end if
 
 ;-------------------------------------------------------------------------------
 
@@ -110,7 +129,7 @@ __int_to_f64_zero_or_one:
 	ld	c, h
 	jr	nz, .ret_zero
 	ld	bc, $3FF0
-	dec	hl	; ld hl, 0
+	dec	hl		; ld hl, 0
 .ret_zero:
 	ex	de, hl
 	sbc	hl, hl
@@ -120,35 +139,10 @@ __int_to_f64_zero_or_one:
 
 	section	.text
 
-	public	__itod
-; (long double)int
-__itod:
-	push	hl
-	add	hl, hl	; extract signbit
-	sbc	hl, hl	; set Z flag
-	ld	e, l	; sign extend UHL to E:UHL
-	pop	hl
-	jq	__ltod
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
-	public	__utod
-; (long double)unsigned int
-__utod:
-	ld	e, 0
-
-	require	__ultod
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
 	public	__ultod
 ; (long double)unsigned long
 __ultod:
-	cp	a, a	; set Z flag
+	cp	a, a		; set Z flag
 	push	af
 	jq	__ltod_common
 
@@ -160,16 +154,6 @@ __ultod:
 ; (long double)long
 __ltod:
 	bit	7, e
-
-	require	__ltod.hijack_itod
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
-	private	__ltod.hijack_itod
-__ltod.hijack_itod:
-
 	push	af
 	call	nz, __lneg	; abs(E:UHL)
 
@@ -182,7 +166,7 @@ __ltod.hijack_itod:
 	private	__ltod_common
 __ltod_common:
 	call	__lctlz
-	sub	a, 31	; normalize clz_result
+	sub	a, 31		; normalize clz_result
 
 	; filter out exponent of $000 (zero) and $3FF (one)
 	jr	nc, __int_to_f64_zero_or_one
@@ -212,20 +196,21 @@ __int_to_f64_shl:
 	sub	a, l
 
 	; exponent = ($400 + (base2_logarithm - 1)) << 4
-	; BC = $4EEM
+	; BC = $4PPM
 	ld	l, a
 	ld	h, $04
 	; clear the implicit mantissa bit
-	res	4, c	; 52 % 8 == 4
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
 	ld	a, l
+	res	4, c		; 52 % 8 == 4
 	or	a, c
 	ld	c, a
 	ld	b, h
-	pop	hl	; restore shifted HL
+	pop	hl		; restore shifted HL
+.no_round:
 .finish:
 	pop	af
 	ret	z
@@ -234,7 +219,6 @@ __int_to_f64_shl:
 
 ;-------------------------------------------------------------------------------
 
-	extern	__ineg
 	extern	__lneg
 	extern	__lctlz
 	extern	__llctlz
@@ -242,3 +226,4 @@ __int_to_f64_shl:
 	extern	__llshru
 	extern	__llneg
 	extern	__lladd_1
+	extern	___fe_cur_env
