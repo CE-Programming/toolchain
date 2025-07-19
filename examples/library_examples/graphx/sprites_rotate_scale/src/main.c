@@ -40,8 +40,8 @@ int main(void)
         /* Complete one rotation every 5 seconds */
         uint8_t rotation = fmodf(time_elasped * 256.0f / 5.0f, 256.0f);
 
-        /* Interpolates between 75% and 250% scale (64 = 100% scale) */
-        uint8_t scale = (uint8_t)cosine_interpolate(time_elasped, 48, 160);
+        /* Interpolates between 75% and 225% scale (64 = 100% scale) */
+        uint8_t scale = (uint8_t)cosine_interpolate(time_elasped, 48, 144);
 
         /* The output size of the sprite can be calculated with this formula */
         uint8_t output_size = (scale * star_width) / 64;
