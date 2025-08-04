@@ -74,7 +74,18 @@ lcd_Init:
 	ld hl, .fullinit
 	srl (hl)
 	jr nc, .fastinit
-	; Magic initialization sequence to work on Python models
+	; Check certificate for Python model
+	ld de, $0330
+	call ti.FindFirstCertField
+	jr nz, .magicinit
+	call ti.GetFieldSizeFromType
+	ld de, $0430
+	call ti.FindField
+	; Reinitializes Python hardware, probably (routine available on rev M+ boot code)
+	; Without this, LCD SPI transfers start failing a short time after init
+	call z, $000654
+.magicinit:
+	; Magic SPI initialization sequence to work on Python models
 	ld de, ti.spiSpiFrFmt or ti.bmSpiFlash or ti.bmSpiFsPolarity or ti.bmSpiMasterMono
 .loop:
 	ld (ti.mpSpiCtrl0), de
