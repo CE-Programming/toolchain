@@ -68,23 +68,26 @@ lcd_Init:
 	ld (.refcount), hl
 	ret c
 	; Initialize if the old refcount was 0
-	ld hl, ((9-1) shl 16) or (2-1)
-	ld (ti.mpSpiCtrl1), hl
-	; Only fully initialize once per program invocation
+	; Always fully initialize on the first call per program invocation
 	ld hl, .fullinit
 	srl (hl)
-	jr nc, .fastinit
+	jr c, .checkPython
+	; Additionally, fully initialize if an APD reset the SPI state to something other than LCD
+	ld a, (ti.mpSpiCtrl0)
+	cp a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
+	jr z, .fastinit
+.checkPython:
 	; Check certificate for Python model
 	ld de, $0330
 	call ti.FindFirstCertField
-	jr nz, .magicinit
+	jr nz, .notPython
 	call ti.GetFieldSizeFromType
 	ld de, $0430
 	call ti.FindField
+	jr nz, .notPython
 	; Reinitializes Python hardware, probably (routine available on rev M+ boot code)
 	; Without this, LCD SPI transfers start failing a short time after init
-	call z, $000654
-.magicinit:
+	call $000654
 	; Magic SPI initialization sequence to work on Python models
 	ld de, ti.spiSpiFrFmt or ti.bmSpiFlash or ti.bmSpiFsPolarity or ti.bmSpiMasterMono
 .loop:
@@ -100,12 +103,15 @@ lcd_Init:
 	bit ti.bSpiClkPolarity, e
 	ld e, ti.bmSpiFsPolarity or ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
 	jr z, .loop
-.fastinit:
 	ld hl, $21
 	ld (ti.mpSpiIntCtrl), hl
-	ld l, ti.bmSpiChipEn
-	assert ti.bmSpiTxEn = (ti.bmSpiChipEn shl 8)
-	ld h, l
+.notPython:
+	ld a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
+	ld (ti.mpSpiCtrl0), a
+.fastinit:
+	ld hl, ((9-1) shl 16) or (2-1)
+	ld (ti.mpSpiCtrl1), hl
+	ld hl, ti.bmSpiTxEn or ti.bmSpiTxClr or ti.bmSpiRxClr or ti.bmSpiChipEn
 	ld (ti.mpSpiCtrl2), hl
 	ret
 
