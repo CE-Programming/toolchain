@@ -1,0 +1,17 @@
+# ----------------------------
+# Makefile Options
+# ----------------------------
+
+NAME = DEMO
+ICON = icon.png
+DESCRIPTION = "CE C Toolchain Demo"
+COMPRESSED = NO
+
+CFLAGS = -Wall -Wextra -Wshadow -Oz
+CXXFLAGS = -Wall -Wextra -Wshadow -Oz
+
+PREFER_OS_LIBC = NO
+
+# ----------------------------
+
+include $(shell cedev-config --makefile)
