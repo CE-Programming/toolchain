@@ -337,12 +337,11 @@ gfx_SetDefaultPalette:
 	ld	a,b
 	rrca
 	xor	a,b
-	and	a,224
+	and	a,$E0
 	xor	a,b
 	ld	(de),a
+	ld	a,e	; E = B * 2, so we can remove one rla
 	inc	de
-	ld	a,b
-	rla
 	rla
 	rla
 	ld	a,b
