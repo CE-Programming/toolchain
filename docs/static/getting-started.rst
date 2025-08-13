@@ -52,8 +52,8 @@ If you would rather try the "nightly" build (which includes the latest features 
 Example Programs
 ----------------
 
-The toolchain includes multiple example projects inside the :code:`examples` folder.
-Use these examples to learn how to write C/C++ code for the calculator.
+The toolchain includes multiple example projects inside the :code:`examples` folder of your toolchain install (you can also take a look at them `online <https://github.com/CE-Programming/toolchain/tree/master/examples>`_ on the git repo). Use these examples to learn how to write C/C++ code for the calculator.
+
 The examples are broken out into:
 
 standalone_examples
