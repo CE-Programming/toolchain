@@ -4,27 +4,35 @@
 	public	_malloc, _free, _realloc
 
 	public	_calloc
+; void *calloc(size_t nmemb, size_t size)
 _calloc:
 	pop	de
 	pop	bc
-	ex	(sp),hl
+	ex	(sp), hl
 	push	bc
 	push	de
 	call	__imulu
 	push	hl
 	push	hl
 	call	_malloc
-	pop	de
-	add	hl,de
-	xor	a,a
-	sbc	hl,de
-	ld	e,a
-	push	de
+	pop	bc	; reset SP
+	; test for NULL
+	add	hl, bc
+	xor	a, a
+	sbc	hl, bc
+	pop	bc	; BC = size
+	ret	z	; return NULL
+	; inlined bzero/memset
+	cpi
+	add	hl, bc
+	ret	c	; size is zero
+	dec	hl
+	ld	(hl), a
+	ret	po	; size is one
 	push	hl
-	call	nz,_memset
 	pop	de
-	pop	de
-	pop	de
+	dec	de
+	lddr
 	ret
 
 if defined ALLOCATOR_SIMPLE
