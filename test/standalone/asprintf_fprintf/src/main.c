@@ -422,6 +422,12 @@ int memccpy_tests(void) {
         return __LINE__;
     }
 
+    /* check that no crashes occur with small calloc sizes */
+    buf = (char*)calloc(1, sizeof(char));
+    free(buf);
+    buf = (char*)calloc(0, sizeof(char));
+    free(buf);
+
     buf = (char*)calloc(file_size + 1, sizeof(char));
     if (buf == NULL) {
         perror("calloc failure");
