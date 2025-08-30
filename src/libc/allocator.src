@@ -4,6 +4,49 @@
 	public	_malloc, _free, _realloc
 
 	public	_calloc
+
+if defined __TICE__
+
+; uses the hardware specific $E40000 memory location
+
+; void *calloc(size_t nmemb, size_t size)
+_calloc:
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	push	bc
+	push	de
+	call	__imulu
+	push	hl
+	push	hl
+	call	_malloc
+	pop	bc		; reset SP
+	pop	bc		; BC = size
+	; test for NULL
+	add	hl, bc
+	; or	a, a		; assumes that ptr + size does not overflow
+	sbc	hl, bc
+	ret	z		; return NULL
+	; inlined bzero
+	push	hl
+	ex	de, hl		; DE = dest
+	; test if the size is zero
+	scf
+	sbc	hl, hl
+	add	hl, bc
+	jr	nc, .finish
+	; large region of all zeros on the Ti84CE
+	ld	hl, $E40000	; HL = src
+	ldir
+.finish:
+	pop	hl		; return value
+	ret
+
+else
+
+; makes no hardware assumptions
+
+; void *calloc(size_t nmemb, size_t size)
 _calloc:
 	pop	de
 	pop	bc
@@ -26,6 +69,8 @@ _calloc:
 	pop	de
 	pop	de
 	ret
+
+end if
 
 if defined ALLOCATOR_SIMPLE
 
