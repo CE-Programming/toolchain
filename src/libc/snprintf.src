@@ -15,10 +15,14 @@ _vsnprintf := __vsnprintf_c
 
 else
 
+if 0
+
 _snprintf := _boot_snprintf
 _vsnprintf := _boot_vsnprintf
 
 	extern	_boot_snprintf
 	extern	_boot_vsnprintf
+
+end if
 
 end if
