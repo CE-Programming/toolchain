@@ -276,7 +276,7 @@ void os_SetDrawBGColor(uint24_t color);
 /**
  * Gets the background color used to draw text
  *
- * @returns 565 BGR color of text nackground
+ * @returns 565 BGR color of text background
  * @warning Only useable in OS 5.2 and above; use at your own risk
  */
 uint24_t os_GetDrawBGColor(void);
