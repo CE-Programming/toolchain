@@ -15,10 +15,14 @@ _vasprintf := __vasprintf_c
 
 else
 
+if 0
+
 _asprintf := _boot_asprintf
 _vasprintf := _boot_vasprintf
 
 	extern	_boot_asprintf
 	extern	_boot_vasprintf
+
+end if
 
 end if
