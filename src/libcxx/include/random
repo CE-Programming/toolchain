@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_RANDOM
+#define _EZCXX_RANDOM
+
+#include <__eastl_config>
+#include <initializer_list>
+#include <EASTL/random.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_RANDOM

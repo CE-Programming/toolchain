@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_DEQUE
+#define _EZCXX_DEQUE
+
+#include <__eastl_config>
+#include <initializer_list>
+#include <EASTL/deque.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_DEQUE

@@ -1,0 +1,12 @@
+// -*- C++ -*-
+#ifndef _EZCXX_QUEUE
+#define _EZCXX_QUEUE
+
+#include <__eastl_config>
+#include <initializer_list>
+#include <EASTL/queue.h>
+#include <EASTL/priority_queue.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_QUEUE

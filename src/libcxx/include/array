@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_ARRAY
+#define _EZCXX_ARRAY
+
+#include <__eastl_config>
+#include <initializer_list>
+#include <EASTL/array.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_ARRAY

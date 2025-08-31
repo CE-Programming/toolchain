@@ -28,7 +28,7 @@ namespace test_derived_from {
     class A {};
     class B : public A {};
     class C : private A {};
-    
+
     static_assert(std::derived_from<B, B> == true);
     static_assert(std::derived_from<int, int> == false);
     static_assert(std::derived_from<B, A> == true);
@@ -59,7 +59,7 @@ namespace test_floating_point {
     constexpr auto d = x2(1.1);
     constexpr auto f = x2(2.2f);
     constexpr auto i = x2(444);
-    
+
     static_assert(std::is_same_v<double const, decltype(d)>);
     static_assert(std::is_same_v<float const, decltype(f)>);
     static_assert(std::is_same_v<int const, decltype(i)>);
@@ -77,11 +77,11 @@ namespace test_swap {
     namespace Ns {
         class A {
             int id {};
-     
+
             friend void swap(A& lhs, A& rhs) {
                 std::swap(lhs.id, rhs.id);
             }
-     
+
         public:
             A(int i) : id {i} {}
             A(A const&) = delete;
@@ -89,7 +89,7 @@ namespace test_swap {
             int get_val(void) { return id; }
         };
     }
-     
+
     void swap_test(int *arr) {
         int a = 5, b = 3;
         *arr++ = a;
@@ -97,7 +97,7 @@ namespace test_swap {
         std::swap(a, b);
         *arr++ = a;
         *arr++ = b;
-     
+
         Ns::A p {6}, q {9};
         *arr++ = p.get_val();
         *arr++ = q.get_val();

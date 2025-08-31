@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_RATIO
+#define _EZCXX_RATIO
+
+#include <__eastl_config>
+#include <EASTL/ratio.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_RATIO

@@ -1,64 +1,13 @@
 // -*- C++ -*-
-//===----------------------------------------------------------------------===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-
 #ifndef _EZCXX_ALGORITHM
 #define _EZCXX_ALGORITHM
 
-#include <__config>
-
-// currently unused, but included in the standard
+#include <__eastl_config>
 #include <initializer_list>
+#include <EASTL/algorithm.h>
+#include <EASTL/heap.h>
+#include <EASTL/sort.h>
 
 #pragma clang system_header
-
-// very limited implementation of <algorithm>
-// only supports std:max, std::min, and std::clamp
-// these functions can be replaced when <algorithm> is properly implemented
-
-namespace std {
-
-template <class _Tp, class _Compare> _EZCXX_NODISCARD_EXT inline constexpr
-const _Tp& max(const _Tp& __a, const _Tp& __b, _Compare __comp)
-{
-    return __comp(__a, __b) ? __b : __a;
-}
-
-template <class _Tp> _EZCXX_NODISCARD_EXT inline constexpr
-const _Tp& max(const _Tp& __a, const _Tp& __b)
-{
-    return (__a < __b) ? __b : __a;
-}
-
-template <class _Tp, class _Compare> _EZCXX_NODISCARD_EXT inline constexpr
-const _Tp& min(const _Tp& __a, const _Tp& __b, _Compare __comp)
-{
-    return __comp(__a, __b) ? __a : __b;
-}
-
-template <class _Tp> _EZCXX_NODISCARD_EXT inline constexpr
-const _Tp& min(const _Tp& __a, const _Tp& __b)
-{
-    return (__a < __b) ? __a : __b;
-}
-
-template <class _Tp, class _Compare> _EZCXX_NODISCARD_EXT inline constexpr
-const _Tp& clamp(const _Tp& __v, const _Tp& __lo, const _Tp& __hi, _Compare __comp)
-{
-    return __comp(__v, __lo) ? __lo : __comp(__hi, __v) ? __hi : __v;
-}
-
-template <class _Tp> _EZCXX_NODISCARD_EXT inline constexpr
-const _Tp& clamp(const _Tp& __v, const _Tp& __lo, const _Tp& __hi)
-{
-    return (__v < __lo) ? __lo : (__hi < __v) ? __hi : __v;
-}
-
-} // namespace std
 
 #endif // _EZCXX_ALGORITHM

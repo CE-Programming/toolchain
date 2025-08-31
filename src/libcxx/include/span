@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_SPAN
+#define _EZCXX_SPAN
+
+#include <__eastl_config>
+#include <EASTL/span.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_SPAN
