@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_TUPLE
+#define _EZCXX_TUPLE
+
+#include <__eastl_config>
+#include <EASTL/tuple.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_TUPLE

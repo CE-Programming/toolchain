@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_ITERATOR
+#define _EZCXX_ITERATOR
+
+#include <__eastl_config>
+#include <algorithm>
+#include <EASTL/iterator.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_ITERATOR

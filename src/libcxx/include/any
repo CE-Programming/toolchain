@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_ANY
+#define _EZCXX_ANY
+
+#include <__eastl_config>
+#include <algorithm>
+#include <EASTL/any.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_ANY

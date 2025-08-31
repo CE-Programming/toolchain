@@ -2,32 +2,13 @@
 #ifndef _EZCXX_UTILITY
 #define _EZCXX_UTILITY
 
-#pragma clang system_header
-
-#include <__config>
+#include <__eastl_config>
 #include <initializer_list>
 #include <type_traits>
 
+#pragma clang system_header
+
 namespace std {
-
-template<class _Tp> _EZCXX_INLINE constexpr _Tp&& forward(remove_reference_t<_Tp>&  __value) noexcept {
-    return static_cast<_Tp&&>(__value);
-}
-template<class _Tp> _EZCXX_INLINE constexpr _Tp&& forward(remove_reference_t<_Tp>&& __value) noexcept {
-    static_assert(!is_lvalue_reference_v<_Tp>, "can not forward an rvalue as an lvalue");
-    return static_cast<_Tp&&>(__value);
-}
-
-template<class _Lp, class _Rp> _Lp exchange(_Lp& __lhs, _Rp&& __rhs) {
-    _Lp __temp(move(__lhs));
-    __lhs = forward<_Rp>(__rhs);
-    return __temp;
-}
-
-#if __cplusplus > 201103L
-template<class _Tp> _EZCXX_INLINE constexpr std::add_const_t<_Tp>& as_const(_Tp& __value) noexcept { return __value; }
-template<class _Tp> _EZCXX_INLINE constexpr auto as_const(_Tp const&& __value) noexcept = delete;
-#endif // __cplusplus > 201103L
 
 [[noreturn]] inline void unreachable() { __builtin_unreachable(); }
 

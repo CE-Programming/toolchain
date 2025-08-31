@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_EXPECTED
+#define _EZCXX_EXPECTED
+
+#include <__eastl_config>
+#include <EASTL/expected.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_EXPECTED

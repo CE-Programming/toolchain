@@ -20,7 +20,9 @@
 	url = https://github.com/CE-Programming/graphx-template
 [submodule "src/EASTL"]
 	path = src/ea/EASTL
-	url = https://github.com/electronicarts/EASTL.git
+	url = https://github.com/CE-Programming/EASTL.git
+	branch = eastl-tice
 [submodule "src/EABase"]
 	path = src/ea/EABase
-	url = https://github.com/electronicarts/EABase.git
+	url = https://github.com/CE-Programming/EABase.git
+	branch = eastl-tice

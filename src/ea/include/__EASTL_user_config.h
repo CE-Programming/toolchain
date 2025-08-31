@@ -3,6 +3,7 @@
 
 
 #define EASTL_THREAD_SUPPORT_AVAILABLE 0
+#define EASTL_EASTDC_VSNPRINTF 0
 
 
 #if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED) && !defined(SSIZE_T_DEFINED)

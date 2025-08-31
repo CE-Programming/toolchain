@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_VECTOR
+#define _EZCXX_VECTOR
+
+#include <__eastl_config>
+#include <initializer_list>
+#include <EASTL/vector.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_VECTOR

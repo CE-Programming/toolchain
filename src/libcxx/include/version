@@ -15,7 +15,7 @@
 #if __cplusplus >= 201402L
 // # define __cpp_lib_chrono_udls                          201304L
 // # define __cpp_lib_complex_udls                         201309L
-# define __cpp_lib_exchange_function                    201304L
+// # define __cpp_lib_exchange_function                    201304L
 // # define __cpp_lib_generic_associative_lookup           201304L
 // # define __cpp_lib_integer_sequence                     201304L
 # define __cpp_lib_integral_constant_callable           201304L
@@ -36,18 +36,18 @@
 #endif // __cplusplus >= 201402L
 
 #if __cplusplus >= 201703L
-# define __cpp_lib_addressof_constexpr                  201603L
+// # define __cpp_lib_addressof_constexpr                  201603L
 // # define __cpp_lib_allocator_traits_is_always_equal     201411L
 // # define __cpp_lib_any                                  201606L
 // # define __cpp_lib_apply                                201603L
 // # define __cpp_lib_array_constexpr                      201603L
-# define __cpp_lib_as_const                             201510L
+// # define __cpp_lib_as_const                             201510L
 // # define __cpp_lib_atomic_is_always_lock_free           201603L
 # define __cpp_lib_bool_constant                        201505L
 // # define __cpp_lib_boyer_moore_searcher                 201603L
 # define __cpp_lib_byte                                 201603L
 // # define __cpp_lib_chrono                               201611L
-# define __cpp_lib_clamp                                201603L
+// # define __cpp_lib_clamp                                201603L
 // # define __cpp_lib_enable_shared_from_this              201603L
 // # define __cpp_lib_execution                            201603L
 // # define __cpp_lib_filesystem                           201703L

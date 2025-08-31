@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_UNORDERED_SET
+#define _EZCXX_UNORDERED_SET
+
+#include <__eastl_config>
+#include <initializer_list>
+#include <EASTL/unordered_set.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_UNORDERED_SET

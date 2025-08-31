@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CHRONO
+#define _EZCXX_CHRONO
+
+#include <__eastl_config>
+#include <EASTL/chrono.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_CHRONO

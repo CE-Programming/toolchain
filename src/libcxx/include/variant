@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_VARIANT
+#define _EZCXX_VARIANT
+
+#include <__eastl_config>
+#include <EASTL/variant.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_VARIANT

@@ -1,0 +1,68 @@
+// -*- C++ -*-
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+#ifndef _EZCXX_FUNCTIONAL
+#define _EZCXX_FUNCTIONAL
+
+#include <__eastl_config>
+#include <EASTL/functional.h>
+
+#pragma clang system_header
+
+namespace std {
+
+/* unary function */
+
+template <class _Arg, class _Result>
+struct unary_function {
+    typedef _Arg argument_type;
+    typedef _Result result_type;
+};
+
+template <class _Arg, class _Result>
+class pointer_to_unary_function : public unary_function<_Arg, _Result> {
+    _Result (*__f_)(_Arg);
+
+public:
+    _EZCXX_HIDE_FROM_ABI explicit pointer_to_unary_function(_Result (*__f)(_Arg)) : __f_(__f) {}
+    _EZCXX_HIDE_FROM_ABI _Result operator()(_Arg __x) const { return __f_(__x); }
+};
+
+template <class _Arg, class _Result>
+inline _EZCXX_HIDE_FROM_ABI pointer_to_unary_function<_Arg, _Result>
+ptr_fun(_Result (*__f)(_Arg)) {
+    return pointer_to_unary_function<_Arg, _Result>(__f);
+}
+
+/* binary function */
+
+template <class _Arg1, class _Arg2, class _Result>
+struct binary_function {
+    typedef _Arg1 first_argument_type;
+    typedef _Arg2 second_argument_type;
+    typedef _Result result_type;
+};
+
+template <class _Arg1, class _Arg2, class _Result>
+class pointer_to_binary_function : public binary_function<_Arg1, _Arg2, _Result> {
+    _Result (*__f_)(_Arg1, _Arg2);
+
+public:
+    _EZCXX_HIDE_FROM_ABI explicit pointer_to_binary_function(_Result (*__f)(_Arg1, _Arg2)) : __f_(__f) {}
+    _EZCXX_HIDE_FROM_ABI _Result operator()(_Arg1 __x, _Arg2 __y) const { return __f_(__x, __y); }
+};
+
+template <class _Arg1, class _Arg2, class _Result>
+inline _EZCXX_HIDE_FROM_ABI pointer_to_binary_function<_Arg1, _Arg2, _Result>
+ptr_fun(_Result (*__f)(_Arg1, _Arg2)) {
+    return pointer_to_binary_function<_Arg1, _Arg2, _Result>(__f);
+}
+
+} // namespace std
+
+#endif // _EZCXX_FUNCTIONAL

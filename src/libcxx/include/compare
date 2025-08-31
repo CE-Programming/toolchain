@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_COMPARE
+#define _EZCXX_COMPARE
+
+#include <__config>
+#include <EASTL/compare.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_COMPARE

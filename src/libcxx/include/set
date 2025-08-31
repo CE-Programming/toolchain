@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_SET
+#define _EZCXX_SET
+
+#include <__eastl_config>
+#include <EASTL/set.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_SET
