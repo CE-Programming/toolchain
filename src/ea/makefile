@@ -26,6 +26,9 @@ EZCFLAGS += -DEASTL_USER_CONFIG_HEADER="<__EASTL_user_config.h>"
 EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti -fno-use-cxa-atexit
 EZCXXFLAGS +=  -isystem ../libcxx/include -isystem EABase/include/Common -isystem EASTL/include -isystem include
 
+EZCFLAGS += -std=c17
+EZCXXFLAGS += -std=c++20
+
 CONFIG_H = include/__EASTL_user_config.h
 
 WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)

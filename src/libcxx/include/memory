@@ -2,6 +2,10 @@
 #ifndef _EZCXX_MEMORY
 #define _EZCXX_MEMORY
 
+#include <__eastl_config>
+#include <EASTL/memory.h>
+#include <EASTL/unique_ptr.h>
+
 #pragma clang system_header
 
 namespace std {

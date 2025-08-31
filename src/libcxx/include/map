@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_MAP
+#define _EZCXX_MAP
+
+#include <__eastl_config>
+#include <initializer_list>
+#include <EASTL/map.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_MAP

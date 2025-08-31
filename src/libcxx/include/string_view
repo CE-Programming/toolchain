@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef _EZCXX_STRING_VIEW
+#define _EZCXX_STRING_VIEW
+
+#include <__eastl_config>
+#include <EASTL/string_view.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_STRING_VIEW

@@ -19,9 +19,12 @@ include $(CURDIR)/../common.mk
 BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
 
 EZCFLAGS := -S -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
-EZCFLAGS += -D_EZ80 -isystem ../libc/include -isystem ../ce/include -isystem ../fileioc -mllvm -profile-guided-section-prefix=false
+EZCFLAGS += -D_EZ80 -isystem ../libc/include -isystem ../ce/include -isystem ../fileioc -isystem ../ea/EABase/include/Common -isystem ../ea/EASTL/include -mllvm -profile-guided-section-prefix=false
 EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti -fno-use-cxa-atexit
 EZCXXFLAGS += -isystem ../libcxx/include
+
+EZCFLAGS += -std=c17
+EZCXXFLAGS += -std=c++20
 
 WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
 WILDCARD_H := $(wildcard include/*)

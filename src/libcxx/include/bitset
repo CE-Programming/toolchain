@@ -1,0 +1,11 @@
+// -*- C++ -*-
+#ifndef _EZCXX_BITSET
+#define _EZCXX_BITSET
+
+#include <__eastl_config>
+#include <string>
+#include <EASTL/bitset.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_BITSET

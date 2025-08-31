@@ -873,6 +873,10 @@ C((is_nothrow_assignable_v<int&, double>));
 C((is_copy_assignable_v<test_struct>));
 C((!is_copy_assignable_v<int[2]>));
 
+// test is_trivially_copy_assignable_v
+/** @todo get more complicated tests */
+C((is_trivially_copy_assignable_v<test_struct>));
+
 // test is_nothrow_copy_assignable
 /** @todo get more complicated tests */
 C((is_nothrow_copy_assignable_v<int>));
@@ -887,6 +891,10 @@ namespace test_is_move_assignable {
     C((!is_move_assignable_v<int[2]>));
     C((is_move_assignable_v<NoMove>));
 }
+
+// test is_trivially_move_assignable
+/** @todo get more complicated tests */
+C((is_trivially_move_assignable_v<test_struct>));
 
 // test is_nothrow_move_assignable
 /** @todo get more complicated tests */
