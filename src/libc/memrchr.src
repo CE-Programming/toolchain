@@ -5,20 +5,20 @@
 	public	_memrchr
 
 _memrchr:
-	ld	iy, 0
+	ld	iy, -1
 	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	bc, (iy + 9)
-	dec	bc
+	ld	bc, (iy + 10)
+	sbc	hl, hl
 	add	hl, bc
-	jr	c, .ret_zero
-	inc	bc
-	ld	a, (iy + 6)
+	jr	nc, .ret_zero
+	ld	de, (iy + 4)
+	add	hl, de
+	ld	a, (iy + 7)
 	cpdr
 	inc	hl
 	ret	z	; found match
+	; or	a, a	; carry won't be set unless (ptr + size) wraps-around (which is UB)
 .ret_zero:
 	; return NULL
-	or	a, a
 	sbc	hl, hl
 	ret

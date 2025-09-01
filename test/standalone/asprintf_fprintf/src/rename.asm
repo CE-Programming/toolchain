@@ -20,6 +20,12 @@ _T_stpcpy := _stpcpy
 
 _T_bzero := _bzero
 
+	section	.rodata
+
+	public	_NULL_ptr
+_NULL_ptr:
+	db	$00, $00, $00
+
 	extern	_memset, _memcpy, _memcmp, _memccpy, _mempcpy, _memrchr
 	extern	_strlen, _strcmp, _strncmp, _stpcpy
 	extern	_bzero

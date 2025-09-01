@@ -24,6 +24,9 @@
 
 #define SINK (char*)0xE40000
 
+/* pass NULL into functions without triggering -Wnonnull */
+extern void* NULL_ptr;
+
 // prevents Clang from replacing function calls with builtins
 #if 1
 
@@ -543,6 +546,9 @@ int strncmp_test(void) {
 }
 
 int memrchr_test(void) {
+    C(T_memrchr(NULL_ptr, 0x00, 0) == NULL_ptr);
+    C(T_memrchr(NULL_ptr, 0xFF, 0) == NULL_ptr);
+
     C(T_memrchr(SINK, 0x00, 0) == NULL);
     C(T_memrchr(SINK, 0x00, 1) == SINK);
     C(T_memrchr(SINK, 0xFF, 1) == NULL);
@@ -565,6 +571,7 @@ int memrchr_test(void) {
     C(T_memrchr(test, 'G', test_strlen) == NULL);
     C(T_memrchr(test, 'G', test_size) == NULL);
     C(T_memrchr(test0, 'G', sizeof(test0)) == test0);
+
     return 0;
 }
 
