@@ -99,7 +99,7 @@ jobs:
       - name: Checkout CEmu
         uses: actions/checkout@v4
         with:
-          repository: ${{github.repository_owner}}/CEmu
+          repository: CE-Programming/CEmu
           ref: latest-stable
           path: ${{env.CEMU_PATH}}
           persist-credentials: false

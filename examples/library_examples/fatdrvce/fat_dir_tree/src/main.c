@@ -241,22 +241,6 @@ int main(void)
 
     printf("file count: %u\n", file_count);
     printf("dir count: %u\n", dir_count);
-
-/**
- * Gets the next directory entry.
- * @param dir[in] Initialized directory handle from fat_OpenDir().
- * @param entry[out] Pointer to store entry information.
- * @return Number of entries found.
- */
-fat_error_t fat_ReadDir(fat_dir_t *dir, fat_dir_entry_t *entry);
-
-/**
- * Closes an open directory handle.
- * @param dir[in] Directory handle.
- * @return Number of entries found.
- */
-fat_error_t fat_CloseDir(fat_dir_t *dir);
-
     
 fat_error:
     // close the filesystem
