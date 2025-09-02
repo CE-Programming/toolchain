@@ -220,7 +220,7 @@ int main(void)
         p++;
         if (p >= num_partitions)
         {
-            putstr("no suitable patitions");
+            putstr("no suitable partitions");
             goto msd_error;
         }
     }
