@@ -4,7 +4,7 @@
 
 	public	_bzero
 
-if 0
+if defined __TICE__
 
 ; uses the hardware specific $E40000 memory location
 

@@ -267,6 +267,7 @@ FASMGFLAGS = \
 	-i $(call QUOTE_ARG,PREFER_OS_CRT := $(LDPREFER_OS_CRT)) \
 	-i $(call QUOTE_ARG,PREFER_OS_LIBC := $(LDPREFER_OS_LIBC)) \
 	-i $(call QUOTE_ARG,ALLOCATOR_$(ALLOCATOR) := 1) \
+	-i $(call QUOTE_ARG,__TICE__ := 1) \
 	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
 	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
 	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
