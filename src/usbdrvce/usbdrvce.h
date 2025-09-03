@@ -205,34 +205,34 @@ typedef enum usb_find_device_flags {
   USB_SKIP_ENABLED  = 1 << 1, /**< Don't return enabled devices.              */
   USB_SKIP_DEVICES  = 1 << 2, /**< Don't return non-hubs.                     */
   USB_SKIP_HUBS     = 1 << 3, /**< Don't return hubs.                         */
-  USB_SKIP_ATTACHED = 1 << 4, /**< Only return devices directly attached to   */
-                              /**  any of the hubs through which \c from is   */
-                              /**  connected.  This skips recursing over      */
-                              /**  devices attached to other hubs.            */
+  USB_SKIP_ATTACHED = 1 << 4, /**< Only return devices directly attached to
+                                   any of the hubs through which \c from is
+                                   connected.  This skips recursing over
+                                   devices attached to other hubs.            */
 } usb_find_device_flags_t;
 
 typedef enum usb_endpoint_flags {
-  USB_MANUAL_TERMINATE = 0 << 0, /**< For transfers that are a multiple of    */
-                                 /**  the endpoint's maximum packet length,   */
-                                 /**  don't automatically terminate outgoing  */
-                                 /**  ones with a zero-length packet and      */
-                                 /**  don't require incoming ones to be       */
-                                 /**  terminated with a zero-length packet.   */
-                                 /**  @note This allows you to send or        */
-                                 /**  receive partial transfers in multiples  */
-                                 /**  of the endpoint's maximum packet        */
-                                 /**  length, but requires that transfers     */
-                                 /**  which are a multiple of the endpoint's  */
-                                 /**  maximum packet length to be manually    */
-                                 /**  terminated with an explicit zero-length */
-                                 /**  transfer.                               */
-  USB_AUTO_TERMINATE   = 1 << 0, /**< For transfers that are a multiple of    */
-                                 /**  the endpoint's maximum packet length,   */
-                                 /**  automatically terminate outgoing ones   */
-                                 /**  with a zero-length packet and require   */
-                                 /**  incoming ones to be terminated with a   */
-                                 /**  zero-length packet or fail with         */
-                                 /**  USB_TRANSFER_OVERFLOW.                  */
+  USB_MANUAL_TERMINATE = 0 << 0, /**< For transfers that are a multiple of
+                                      the endpoint's maximum packet length,
+                                      don't automatically terminate outgoing
+                                      ones with a zero-length packet and
+                                      don't require incoming ones to be
+                                      terminated with a zero-length packet.
+                                      @note This allows you to send or
+                                      receive partial transfers in multiples
+                                      of the endpoint's maximum packet
+                                      length, but requires that transfers
+                                      which are a multiple of the endpoint's
+                                      maximum packet length to be manually
+                                      terminated with an explicit zero-length
+                                      transfer.                               */
+  USB_AUTO_TERMINATE   = 1 << 0, /**< For transfers that are a multiple of
+                                      the endpoint's maximum packet length,
+                                      automatically terminate outgoing ones
+                                      with a zero-length packet and require
+                                      incoming ones to be terminated with a
+                                      zero-length packet or fail with
+                                      USB_TRANSFER_OVERFLOW.                  */
 } usb_endpoint_flags_t;
 
 typedef enum usb_role {
@@ -429,9 +429,9 @@ typedef struct usb_endpoint_descriptor {
   uint8_t  bLength;             /**< 7                                        */
   uint8_t  bDescriptorType;     /**< USB_ENDPOINT_DESCRIPTOR                  */
   uint8_t  bEndpointAddress;    /**< endpoint direction and number            */
-  uint8_t  bmAttributes;        /**< usb_usage_type_t |                       */
-                                /**  usb_synchronization_type_t |             */
-                                /**  usb_transfer_type_t                      */
+  uint8_t  bmAttributes;        /**< usb_usage_type_t |
+                                     usb_synchronization_type_t |
+                                     usb_transfer_type_t                      */
   uint16_t wMaxPacketSize;      /**  transfer type specific                   */
   uint8_t  bInterval;           /**  transfer type specific                   */
 } usb_endpoint_descriptor_t;
