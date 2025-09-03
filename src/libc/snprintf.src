@@ -15,7 +15,7 @@ _vsnprintf := __vsnprintf_c
 
 else
 
-if 0
+if defined __TICE__
 
 _snprintf := _boot_snprintf
 _vsnprintf := _boot_vsnprintf

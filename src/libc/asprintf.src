@@ -15,7 +15,7 @@ _vasprintf := __vasprintf_c
 
 else
 
-if 0
+if defined __TICE__
 
 _asprintf := _boot_asprintf
 _vasprintf := _boot_vasprintf
