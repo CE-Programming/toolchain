@@ -1,0 +1,100 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_memmove
+
+if PREFER_OS_LIBC
+
+_memmove := 0000A8h
+
+else
+
+if 1
+
+; Optimized for when src != dst
+_memmove:
+	; src > dst | LDIR | 32F + 15R + 1
+	; src < dst | LDDR | 35F + 12R + 2
+	; src = dst | LDDR | 35F + 12R + 2
+	; zero size |      | 24F + 12R + 2
+
+	ld	iy, -1
+	add	iy, sp
+	ld	bc, (iy + 10)
+	sbc	hl, hl
+	add	hl, bc
+	jr	nc, .zero
+	ld	hl, (iy + 7)
+	ld	de, (iy + 4)
+	sbc	hl, de
+	; src <= dst
+	jr	c, .copy_backwards
+	; src > dst
+; .copy_forwards:
+	add	hl, de
+	inc	hl
+	ldir
+.zero:
+	ld	hl, (iy + 4)
+	ret
+
+.copy_backwards:
+	; move HL and DE to the end
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl	; HL = src - dst - 1, DE = dst + size
+	add	hl, de	; HL = src + size - 1
+	dec	de	; DE = dst + size - 1
+	lddr
+	ex	de, hl
+	inc	hl
+	ret
+
+else
+
+; Optimized for when src == dst
+_memmove:
+	; src > dst | LDIR | 33F + 15R + 2
+	; src < dst | LDDR | 36F + 12R + 2
+	; src = dst |      | 29F + 12R + 2
+	; zero size |      | 24F + 12R + 2
+
+	ld	iy, -1
+	add	iy, sp
+	ld	bc, (iy + 10)
+	sbc	hl, hl
+	add	hl, bc
+	jr	nc, .zero
+	ld	de, (iy + 4)
+	ld	hl, (iy + 7)
+	or	a, a
+	sbc	hl, de
+	; src < dst
+	jr	c, .copy_backwards
+	; src >= dst
+; .copy_forwards:
+	add	hl, de
+	; src == dst
+	ret	z	; skips LDIR when src == dst
+	; src > dst
+	ldir
+.zero:
+	ld	hl, (iy + 4)
+	ret
+
+.copy_backwards:
+	; move HL and DE to the end
+	dec	de	; DE = dst - 1
+	ex	de, hl
+	add	hl, bc	; HL = dst + size - 1, DE = src - dst
+	ex	de, hl
+	add	hl, de	; HL = src + size - 1, DE = dst + size - 1
+	lddr
+	ex	de, hl
+	inc	hl
+	ret
+
+end if
+
+end if
