@@ -75,7 +75,7 @@ size_t wcslen(const wchar_t *s)
     __attribute__((nonnull(1)));
 
 size_t wcsnlen(const wchar_t *s, size_t maxlen)
-    __attribute__((nonnull(1)));
+    __NOEXCEPT __attribute__((nonnull(1))) __attribute__((__pure__));
 
 int wcscmp(const wchar_t *s1, const wchar_t *s2)
     __attribute__((nonnull(1, 2)));
