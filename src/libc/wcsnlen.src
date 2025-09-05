@@ -1,0 +1,44 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_wcsnlen
+
+; size_t wcsnlen(const wchar_t *str, size_t maxlen)
+_wcsnlen:
+	ld	hl, 6
+	add	hl, sp
+	ld	bc, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	de, (hl)
+	xor	a, a
+	sbc	hl, hl
+	adc	hl, bc
+	ret	z
+	ex	de, hl
+	call	.loop_start
+	ex	de, hl
+	; return maxlen unless str[maxlen - 1] == L'\0'
+	ret	nz		; low byte was non-zero
+	ld	a, (de)
+	cp	a, c		; cp a, 0
+	ret	nz		; high byte was non-zero
+	dec	hl
+	; ret	; We can use the RET PO below since overflow won't be set
+.loop_lo:
+	ret	po
+.loop_hi:
+	inc	hl
+.loop_start:
+	cpi
+	jr	nz, .loop_lo
+	ret	po
+	cp	a, (hl)
+	jr	nz, .loop_hi
+	ex	de, hl
+	pop	de		; reset SP
+	scf
+	sbc	hl, bc
+	ret
