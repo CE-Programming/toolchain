@@ -42,6 +42,14 @@ static long double generate_ldexpl_mult(int expon) {
  * subnormal values.
  */
 static long double _ldexpl_c_positive(long double x, int expon) {
+    /* clamps the exponent to avoid signed overflow bugs */
+    /* hopefully these can also remove call pe, __setflag from the assembly output */
+    if (expon > 4095) {
+        expon = 4095;
+    }
+    if (expon < -4096) {
+        expon = -4096;
+    }
     F64_pun val;
     val.flt = x;
     /* expon == 0 || iszero(x) */
