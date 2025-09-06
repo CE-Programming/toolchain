@@ -16,183 +16,31 @@ _scalbn := _ldexpf
 
 else
 
-if 1
+; (set to 0 or 1) avoid returning negative zero on underflow with Ti's floats
+__ldexpf_avoid_negative_zero := 1
 
-; NOTE: since Ti floats are used, negative zero will not be returned unless the
-; input was negative zero.
-;
-; normal inputs are handled correctly, unless the output is subnormal
-; subnormal inputs/outputs return zero and set ERANGE and FE_INEXACT
-; zero/infinite/NaN inputs are handled correctly
-_ldexpf:
-_ldexp:
-_scalbnf:
-_scalbn:
-	ld	iy, 0
-	lea	bc, iy + 0
-	add	iy, sp
-	ld	hl, (iy + 3)	; mant
-	add	hl, hl
-	ld	a, (iy + 6)	; expon
-	adc	a, a
-	jr	z, .maybe_subnormal
-	inc	a
-	jr	z, .ret_self	; inf NaN
-	dec	a
-	ex	de, hl
-	ld	hl, (iy + 9)	; scale
-	ld	c, a
-	add	hl, bc	; add expon
-	ld	a, l
-	bit	7, (iy + 11)	; scale sign
-	jr	z, .scale_up
-.scale_down:
-	; HL is not INT_MIN here
-	dec	hl
-	add	hl, hl
-	jr	nc, .finish	; expon > 0
-	; expon <= 0 or subnormal
-.underflow_to_zero:
-	ld	hl, ___fe_cur_env
-	set	5, (hl)	; FE_INEXACT
-if 0
-	ld	a, (iy + 6)
-	and	a, $80	; copysign
-else
-	xor	a, a	; avoid returning negative zero with Ti's floats
-end if
-	sbc	hl, hl
-.common_erange:
-	ld	bc, 5	; ERANGE
-	ld	(_errno), bc
-	ld	e, a
-	ret
-.overflow_to_inf:
-	ld	hl, $800000
-	ld	a, (iy + 6)
-	or	a, $7F	; copysign
-	jr	.common_erange
+; ldexpf behaviour:
+; - signed zero, infinity, and NaN inputs are returned unmodified
+; - ERRNO and FE_INEXACT are set if a finite value becomes zero or infinite
+; - FE_INEXACT is set if rounding occured
+;-------------------------------------------------------------------------------
 
-.scale_up:
-	ld	bc, -255
-	add	hl, bc
-	jr	c, .overflow_to_inf
-.finish:
-	ld	l, a
-	ex	de, hl
-	; signbit(A) E:UHL >>= 1
-	ld	a, (iy + 6)	; expon
-	push	hl
-	rla
-	rr	e
-	rr	(iy - 1)
-	pop	hl
-	rr	h
-	rr	l
-	ret
-
+	private	__ldexpf_helper
+__ldexpf_helper:
 .maybe_subnormal:
-	dec	bc	; BC is now -1
-	add	hl, bc
-	jr	c, .underflow_to_zero
-	; return zero
+	; A = zero, carry = signbit
+	rra	; restore signbit and clear carry
+	adc	hl, bc	; BC is zero
 .ret_self:
-	ld	hl, (iy + 3)
-	ld	e, (iy + 6)
-	ret
-
-else
-
-; normal inputs are handled correctly, unless the output is subnormal
-; subnormal inputs are handled correctly for positive scaling values
-; subnormal outputs return zero and set ERANGE and FE_INEXACT for negative scaling values
-; zero/infinite/NaN inputs are handled correctly
-_ldexpf:
-_ldexp:
-_scalbnf:
-_scalbn:
-	ld	iy, 0
-	lea	bc, iy + 0
-	add	iy, sp
 	ld	hl, (iy + 3)	; mant
-	add	hl, hl
-	ld	e, (iy + 6)	; expon
-	ld	a, e
-	rl	e
-	jr	z, .maybe_subnormal
-	inc	e
-	jr	z, .ret_self	; inf NaN
-	dec	e
-	ld	c, e
-	ex	de, hl
-	ld	hl, (iy + 9)	; scale
-	add	hl, bc	; add expon
-	ld	a, l
-	bit	7, (iy + 11)	; scale sign
-	jr	z, .scale_up
-.scale_down:
-	; test signbit
-	push	hl
-	; HL is not INT_MIN here
-	dec	hl
-	add	hl, hl
-	pop	hl
-	jr	nc, .finish	; expon > 0
-	; expon <= 0 or subnormal
-;	jr	.underflow_to_zero
-.underflow_to_zero:
-	ld	hl, ___fe_cur_env
-	set	5, (hl)	; FE_INEXACT
-	ld	a, (iy + 6)
-	and	a, $80	; copysign
-	sbc	hl, hl
-.common_erange:
-	ld	bc, 5	; ERANGE
-	ld	(_errno), bc
-	ld	e, a
-	ret
-.overflow_to_inf:
-	ld	hl, $800000
-	ld	a, (iy + 6)
-	or	a, $7F	; copysign
-	jr	.common_erange
-
-.scale_up:
-	ld	bc, -255
-	add	hl, bc
-	jr	c, .overflow_to_inf
-.finish:
-	ld	l, a
-	ex	de, hl
-.finish_subnormal:
-	; signbit(A) E:UHL >>= 1
-	ld	a, (iy + 6)	; expon
-	push	hl
-	rla
-	rr	e
-	rr	(iy - 1)
-	pop	hl
-	rr	h
-	rr	l
-	ret
-
-.maybe_subnormal:
+	ret	z	; return zero/inf/NaN
 	dec	bc	; BC is now -1
-	add	hl, bc
-;	jr	c, .underflow_to_zero
-	jr	c, .subnormal
-	; return zero
-.ret_self:
-	ld	hl, (iy + 3)
-	ld	e, (iy + 6)
-	ret
-
-.subnormal:
+; .subnormal_input:
 	; BC is -1 here
 	bit	7, (iy + 11)	; scale sign
-	jr	nz, .underflow_to_zero
 	ld	de, (iy + 9)	; scale
-	ld	hl, (iy + 3)	; mant
+	jr	nz, _ldexpf.move_subnormal_down
+; .move_subnormal_up:
 .norm_loop:
 	add	hl, hl
 	jr	c, .normalized
@@ -201,17 +49,180 @@ _scalbn:
 	ex	de, hl
 	jr	c, .norm_loop
 ; .still_subnormal:
-	ld	e, 0
-	jr	.finish_subnormal
-.normalized:
-	inc	de
-	ex	de, hl
-	ld	a, l
-	jr	.scale_up
-
+	; DE is -1 here
+	; saves 8F for this path at a cost of 3 bytes:
+if 0
+	inc	de	; ld e, 0
+	jr	_ldexpf.finish_subnormal
 end if
+.normalized:
+	inc	de	; don't touch the Z flag
+	ex	de, hl
+	; Z is set here
+	jr	_ldexpf.scale_up_subnormal
 
-	extern	___fe_cur_env
+;-------------------------------------------------------------------------------
+; When the input and output are normal:
+; scaling up  : 60F + 12R + 4W + 2
+; scaling down: 60F + 12R + 4W + 4
+_scalbn:
+_scalbnf:
+_ldexp:
+_ldexpf:
+	ld	iy, 0
+	lea	bc, iy + 0
+	add	iy, sp
+	ld	hl, (iy + 3)	; mant
+	add	hl, hl
+	ld	a, (iy + 6)	; expon
+	ld	e, a		; signbit
+	adc	a, a
+	jr	z, __ldexpf_helper.maybe_subnormal
+	ld	c, a
+	inc	a
+	jr	z, __ldexpf_helper.ret_self	; inf NaN
+	ld	a, e		; signbit
+	ld	de, (iy + 9)	; scale
+	ex	de, hl
+	add	hl, bc	; add expon
+	bit	7, (iy + 11)	; scale sign
+	jr	nz, .scale_down
+.scale_up:
+	; HL is [1, $8000FD]
+	ld	c, b	; ld bc, 0
+	dec	bc	; ld bc, -1
+.scale_up_subnormal:	; <-- HL is [0, $7FFFFE]
+	inc	c	; ld bc, $FFFF00
+	inc	c	; ld bc, $FFFF01 ; BC is -255 ; sets NZ
+	; ld	bc, -255
+	add	hl, bc
+	jr	c, .overflow_to_inf
+	; sbc	hl, bc	; restore hl
+	dec	l	; we only care about the low 8 bits
+	ex	de, hl
+.finish_subnormal:
+	push	hl
+.finish:
+	rla	; extract signbit
+	rr	e
+	rr	(iy - 1)
+	pop	hl
+	rr	h
+	rr	l
+	ret
+
+;-------------------------------------------------------------------------------
+
+.move_subnormal_down:
+	; DE = scale
+	; BC is -1 here
+	; first we need to test that the result won't be zero
+	call	__ictlz
+	ex	de, hl	; HL = scale
+	; A is [1, 23]
+	; return zero if (scale < clz_result - 24) or (clz_result - 25 >= scale)
+	add	a, -24	; A is [-23, -1] and carry is cleared
+	ld	c, a	; sign extend A
+	ld	a, l
+	sbc	hl, bc
+	cpl
+	jr	nc, _ldexpf.shru_common
+; .underflow:
+	inc	b	; ld b, 0 ; sets Z
+.overflow_to_inf:	; <-- NZ is set when infinite
+	ld	a, $28	; FE_OVERFLOW | FE_INEXACT
+.underflow_to_zero:	; <-- Z is set when underflowing to zero
+.raise_erange:
+	ld	hl, $800000
+	jr	nz, .overflow
+	ld	a, $24	; FE_UNDERFLOW | FE_INEXACT
+	add	hl, hl	; ld hl, 0
+if __ldexpf_avoid_negative_zero
+	; prevents negative zero from being emitted on underflow
+	res	7, (iy + 6)
+end if
+.overflow:
+	ex	de, hl
+	ld	hl, 5	; ERANGE
+	ld	(_errno), hl
+.raise_inexact:
+	ld	hl, ___fe_cur_env
+	or	a, (hl)
+	ld	(hl), a
+.result_is_exact:
+	ld	a, (iy + 6)	; expon
+	rla	; extract signbit
+	ex	de, hl
+	; B is $FF if infinite and $00 otherwise
+	rr	b
+	ld	e, b
+	ret
+
+;-------------------------------------------------------------------------------
+.scale_down:
+	push	de	; mant <<= 1
+	ld	e, l	; shift amount
+	; HL is not INT_MIN here
+	dec	hl
+	add	hl, hl
+	jr	nc, .finish	; expon > 0
+;-------------------------------------------------------------------------------
+.shru_to_subnormal:
+	; Z is set here
+	xor	a, a
+	ld	c, 48	; ld bc, 24 << 1
+	add	hl, bc
+	pop	hl	; reset SP
+	jr	nc, .underflow_to_zero
+	sub	a, e
+	set	7, (iy + 5)	; set implicit mantissa bit
+.shru_common:
+	; A should be [0, 23]
+	ld	b, a
+	ld	hl, (iy + 3)	; mantissa
+	push	hl	; ld (iy - 3), hl
+	xor	a, a
+	inc	b
+	; shift amount will be [1, 24]
+	ld	d, a	; ld d, 0
+	ld	c, (iy - 1)
+.shru_loop:
+	adc	a, d	; collect sticky bits
+	srl	c
+	rr	h
+	rr	l
+	djnz	.shru_loop
+	ld	(iy - 1), c
+	pop	de
+	ld	d, h
+	ld	e, l
+
+	; round upwards to even if (round && (guard || sticky))
+	jr	nc, .no_round
+	; we must ensure that FE_INEXACT is raised since rounding has occured
+	or	a, a
+	jr	nz, .round_up
+	inc	a	; ld a, 1
+	and	a, e	; test guard bit
+	jr	z, .no_round_inexact
+.round_up:
+	inc	de	; round upwards to even (wont overflow)
+.no_round:
+	adc	a, a	; test the sticky and round bits
+	jr	z, .result_is_exact
+	; carry wont be set
+.no_round_inexact:
+	; we need to raise ERANGE if the mantissa was rounded down to zero
+	ld	a, c	; UDE
+	or	a, d
+	or	a, e
+	ld	a, $20	; FE_INEXACT
+	jr	nz, .raise_inexact
+	; NZ needs to be set here
+	jr	.raise_erange
+
 	extern	_errno
+	extern	___fe_cur_env
+	extern	__ictlz
 
 end if

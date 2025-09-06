@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
+#include <fenv.h>
+#include <errno.h>
 #include <assert.h>
 #include <ti/screen.h>
 #include <ti/getcsc.h>
@@ -11,42 +13,77 @@
 
 #include "f32_ldexp_LUT.h"
 
-
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
 typedef union F32_pun {
     float flt;
     uint32_t bin;
+    struct {
+        uint24_t mant;
+        uint8_t expon;
+    };
 } F32_pun;
 
+#if 0
+#define test_printf printf
+#else
+#define test_printf(...)
+#endif
+
 size_t run_test(void) {
-    typedef struct { float value; int expon; } input_t;
+    typedef struct { F32_pun value; int expon; } input_t;
     typedef F32_pun output_t;
 
     const size_t length = ARRAY_LENGTH(f32_ldexp_LUT_input);
     const input_t  *input  = (const input_t* )((const void*)f32_ldexp_LUT_input );
     const output_t *output = (const output_t*)((const void*)f32_ldexp_LUT_output);
     for (size_t i = 0; i < length; i++) {
+        feclearexcept(FE_ALL_EXCEPT);
+        errno = 0;
         F32_pun result;
-        result.flt = ldexpf(input[i].value, input[i].expon);
+        result.flt = ldexpf(input[i].value.flt, input[i].expon);
         if (result.bin != output[i].bin) {
-            // ignore NaN's with differing payloads
-            // treat signed zeros as equal for now
             if (
-                (!(isnan(result.flt) && isnan(output[i].flt))) &&
-                (!(result.bin == 0 && iszero(output[i].flt)))
+                /* ignore NaN's with differing payloads */
+                (!(isnan(result.flt) && isnan(output[i].flt)))
+                #if 1
+                    /* treat signed zeros as equal for now */
+                    && (!((result.bin == 0) && (output[i].bin == UINT32_C(0x80000000))))
+                #endif
             ) {
-                /* Float multiplication does not handle subnormals yet */
-                if (!(iszero(result.flt) && (issubnormal(output[i].flt) || issubnormal(input[i].value)))) {
-                    #if 1
-                        printf(
-                            "%zu:\nI: %08lX %+d\nG: %08lX\nT: %08lX\n",
-                            i, *(uint32_t*)(void*)&(input[i].value), input[i].expon,
-                            result.bin, output[i].bin
-                        );
-                    #endif
-                    return i;
-                }
+                test_printf(
+                    "%zu:\nI: %08lX %+d\nG: %08lX\nT: %08lX\n",
+                    i, input[i].value.bin, input[i].expon,
+                    result.bin, output[i].bin
+                );
+                return i;
+            }
+        }
+        /* test exceptions */
+        if (!(isnan(input[i].value.flt) || isnan(output[i].flt))) {
+            int temp;
+            F32_pun mant_0, mant_1;
+            mant_0.flt = frexpf(fabsf(input[i].value.flt), &temp);
+            mant_1.flt = frexpf(fabsf(output[i].flt     ), &temp);
+            unsigned char fe_val = __fe_cur_env;
+            bool inexact_raised = (fe_val & FE_INEXACT);
+            bool underflow_raised = (fe_val & FE_UNDERFLOW);
+            bool overflow_raised = (fe_val & FE_OVERFLOW);
+            bool mant_equal = (mant_0.bin == mant_1.bin);
+            bool became_zero = (mant_0.bin != 0 && mant_1.bin == 0);
+            bool became_infinite = (mant_0.bin != UINT32_C(0x7F800000) && mant_1.bin == UINT32_C(0x7F800000));
+            if (!(
+                (mant_equal != inexact_raised) &&
+                ((became_zero || became_infinite) == (errno == ERANGE)) &&
+                (became_zero == underflow_raised) && (became_infinite == overflow_raised)
+            )) {
+                test_printf(
+                    "%zu: FE: %02X errno: %d\nI: %08lX %+d\nO: %08lX\n",
+                    i, (unsigned int)__fe_cur_env, errno,
+                    input[i].value.bin, input[i].expon, output[i].bin
+                );
+                fputs("fenv/errno\n", stdout);
+                return i;
             }
         }
     }

@@ -9,7 +9,7 @@ typedef struct { uint32_t value; int expon; } input_type;
 
 typedef uint32_t output_type;
 
-static const input_type f32_ldexp_LUT_input[1080] = {
+static const input_type f32_ldexp_LUT_input[1100] = {
 /*    0 */ {UINT32_C(0x00000000), 0},
 /*    1 */ {UINT32_C(0x00000001), 0},
 /*    2 */ {UINT32_C(0x00800000), 0},
@@ -1090,9 +1090,31 @@ static const input_type f32_ldexp_LUT_input[1080] = {
 /* 1077 */ {UINT32_C(0x7A9CE72A), 125},
 /* 1078 */ {UINT32_C(0x3479E345), 129},
 /* 1079 */ {UINT32_C(0xF96A3263), 19},
+/* 1080 */ {UINT32_C(0x1E8739EC), 109},
+/* extra tests */
+/* 1081 */ {UINT32_C(0x0001D191), -17},
+/* 1082 */ {UINT32_C(0x0003EF18), -18},
+/* 1083 */ {UINT32_C(0x000426F3), -19},
+/* 1084 */ {UINT32_C(0x000C70E3), -20},
+/* 1085 */ {UINT32_C(0x800FA056), -20},
+/* 1086 */ {UINT32_C(0x001BB2FA), -21},
+/* 1087 */ {UINT32_C(0x8016A81D), -21},
+/* 1088 */ {UINT32_C(0x002ECA33), -22},
+/* 1089 */ {UINT32_C(0x803655E0), -22},
+/* 1090 */ {UINT32_C(0x004A3993), -23},
+/* 1091 */ {UINT32_C(0x804024DC), -23},
+/* other tests */
+/* 1092 */ {UINT32_C(0x367B228A), -131},
+/* 1093 */ {UINT32_C(0xE1AFE9E3), -218},
+/* 1094 */ {UINT32_C(0x2B683524), -108},
+/* 1095 */ {UINT32_C(0xBF55E15C), -148},
+/* 1096 */ {UINT32_C(0x728C6D7F), -252},
+/* 1097 */ {UINT32_C(0xD9E79CEB), -202},
+/* 1098 */ {UINT32_C(0x19F6F465), -74},
+/* 1099 */ {UINT32_C(0xD014C299), -183},
 };
 
-static const output_type f32_ldexp_LUT_output[1080] = {
+static const output_type f32_ldexp_LUT_output[1100] = {
 /*    0 */ UINT32_C(0x00000000),
 /*    1 */ UINT32_C(0x00000001),
 /*    2 */ UINT32_C(0x00800000),
@@ -2173,6 +2195,28 @@ static const output_type f32_ldexp_LUT_output[1080] = {
 /* 1077 */ UINT32_C(0x7F800000),
 /* 1078 */ UINT32_C(0x74F9E345),
 /* 1079 */ UINT32_C(0xFF800000),
+/* 1080 */ UINT32_C(0x550739EC),
+/* extra tests */
+/* 1081 */ UINT32_C(0x00000001),
+/* 1082 */ UINT32_C(0x00000001),
+/* 1083 */ UINT32_C(0x00000001),
+/* 1084 */ UINT32_C(0x00000001),
+/* 1085 */ UINT32_C(0x80000001),
+/* 1086 */ UINT32_C(0x00000001),
+/* 1087 */ UINT32_C(0x80000001),
+/* 1088 */ UINT32_C(0x00000001),
+/* 1089 */ UINT32_C(0x80000001),
+/* 1090 */ UINT32_C(0x00000001),
+/* 1091 */ UINT32_C(0x80000001),
+/* other tests */
+/* 1092 */ UINT32_C(0x00000001),
+/* 1093 */ UINT32_C(0x80000001),
+/* 1094 */ UINT32_C(0x00000002),
+/* 1095 */ UINT32_C(0x80000002),
+/* 1096 */ UINT32_C(0x00000001),
+/* 1097 */ UINT32_C(0x80000001),
+/* 1098 */ UINT32_C(0x00000001),
+/* 1099 */ UINT32_C(0x80000001),
 };
 
 #endif /* F32_LDEXP_LUT_H */
