@@ -4,13 +4,15 @@
 
 	public	__simple_malloc
 __simple_malloc:
+	; returns NULL when size is zero
 	pop	bc
 	ex	(sp),hl
 	push	bc
 	ld	de,(_heap_ptr)
+	dec	hl
 	add	hl,de
 	jr	c,.null
-	ld	bc,___heaptop
+	ld	bc,___heaptop-1
 	sbc	hl,bc
 	jr	nc,.null
 	add	hl,bc
@@ -18,18 +20,12 @@ __simple_malloc:
 	ex	de,hl
 	ret
 .null:
-	or	a,a
-	sbc	hl,hl
-	ret
-
-	public	__simple_free
-__simple_free:
-	ret
-
 	public	__simple_realloc
 __simple_realloc:
 	or	a,a
 	sbc	hl,hl
+	public	__simple_free
+__simple_free:
 	ret
 
 	section .data
