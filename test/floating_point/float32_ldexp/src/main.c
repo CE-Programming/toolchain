@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <limits.h>
+#include <string.h>
 #include <math.h>
 #include <fenv.h>
 #include <errno.h>
@@ -92,8 +94,58 @@ size_t run_test(void) {
     return SIZE_MAX;
 }
 
+static int32_t rand_i32_expon() {
+    union {
+        struct {
+            uint16_t part[2];
+        };
+        int32_t full;
+    } ret;
+    ret.part[0] = rand() & 0x03FF;
+    ret.part[1] = rand() & 0xC0C0;
+    return ret.full;
+}
+
+static float rand_f32() {
+    union {
+        struct {
+            uint16_t part[2];
+        };
+        float full;
+    } ret;
+    ret.part[0] = rand();
+    ret.part[1] = rand();
+    return ret.full;
+}
+
+static int clamp_exponent(long expon) {
+    if (expon > INT_MAX) {
+        return INT_MAX;
+    }
+    if (expon < INT_MIN) {
+        return INT_MIN;
+    }
+    return (int)expon;
+}
+
+void run_edge_case(void) {
+    srand(0x7184CE);
+    float input, output_i24, output_i32;
+    for (size_t i = 0; i < 512; i++) {
+        input = rand_f32();
+        int32_t expon = rand_i32_expon();
+        output_i24 = scalbnf(input, clamp_exponent(expon));
+        output_i32 = scalblnf(input, expon);
+        if (memcmp(&output_i24, &output_i32, sizeof(float)) != 0) {
+            fputs("Failed edge case\n", stdout);
+            return;
+        }
+    }
+}
+
 int main(void) {
     os_ClrHome();
+    run_edge_case();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
         fputs("All tests passed", stdout);
