@@ -33,6 +33,9 @@ extern void* NULL_ptr;
 void *T_memcpy(void *__restrict dest, const void *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
 
+void *T_memmove(void *dest, const void *src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
 void *T_memset(void *s, int c, size_t n)
     __attribute__((nonnull(1)));
 
@@ -65,6 +68,7 @@ void T_bzero(void* s, size_t n);
 #else
 
 #define T_memcpy memcpy
+#define T_memmove memmove
 #define T_memset memset
 #define T_memcmp memcmp
 #define T_memccpy memccpy
@@ -575,6 +579,24 @@ int memrchr_test(void) {
     return 0;
 }
 
+int memmove_test(void) {
+    char move_str[]        = "0123456789";
+    const char truth_str[] = "9344545689";
+    C(move_str + 5 == (char*)T_memmove(move_str + 5, move_str + 4, 3));
+    C(move_str + 3 == (char*)T_memmove(move_str + 3, move_str + 3, 0));
+    C(move_str + 1 == (char*)T_memmove(move_str + 1, move_str + 3, 4));
+    C(move_str + 2 == (char*)T_memmove(move_str + 2, move_str + 2, 6));
+    C(move_str + 9 == (char*)T_memmove(move_str + 9, move_str + 0, 0));
+    C(move_str + 0 == (char*)T_memmove(move_str + 0, move_str + 9, 1));
+    C(strcmp(move_str, truth_str) == 0);
+
+    C(NULL_ptr - 0 == (char*)T_memmove(NULL_ptr - 0, NULL_ptr - 0, 0));
+    C(NULL_ptr - 0 == (char*)T_memmove(NULL_ptr - 0, NULL_ptr - 1, 0));
+    C(NULL_ptr - 1 == (char*)T_memmove(NULL_ptr - 1, NULL_ptr - 0, 0));
+
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* boot_asprintf */
@@ -608,8 +630,12 @@ int run_tests(void) {
         ret = strncmp_test();
         if (ret != 0) { return ret; }
 
-    /* strncmp */
+    /* memrchr */
         ret = memrchr_test();
+        if (ret != 0) { return ret; }
+
+    /* memrchr */
+        ret = memmove_test();
         if (ret != 0) { return ret; }
 
     return 0;
