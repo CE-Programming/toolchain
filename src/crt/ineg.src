@@ -10,23 +10,19 @@ __ineg := 000160h
 else
 
 __ineg:
-if 0
-	push	de
-end if
+; UHL = -UHL
+;   CC: 10*r(PC)+3*r(SPL)+1
+;   CC: 9 bytes | 10F + 3R + 1
 	add	hl, de	; uhl=UHL+UDE
 	ex	de, hl	; ude=UHL+UDE, uhl=UDE
 	or	a, a
 	sbc	hl, de	; uhl=UDE-(UHL+UDE)
 			;    =UDE-UHL-UDE
 			;    =-UHL
-if 0
-	pop	de
-else
 	ex	de, hl	; ude=-UHL, uhl=UHL+UDE
 	add	hl, de	; uhl=UHL+UDE+-UHL
 			;    =UDE
 	ex	de, hl	; ude=UDE, uhl=-UHL
-end if
 	ret
 
 end if
