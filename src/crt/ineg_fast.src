@@ -3,6 +3,9 @@
 	section	.text
 	public	__ineg_fast
 __ineg_fast:
+; UHL = -UHL
+;   CC: 7*r(PC)+3*r(SPL)+1
+;   CC: 6 bytes | 7F + 3R + 1
 	add	hl, de	; uhl=UHL+UDE
 	ex	de, hl	; ude=UHL+UDE, uhl=UDE
 	or	a, a
