@@ -4104,134 +4104,96 @@ _FillTriangle:
 	ld	(ix + 6), de
 	ld	(ix + 12), hl
 .cmp2:
-	ld	de, (ix + 21)		; if (y0 == y2) - handle awkward all-on-same-line case as its own thing
-	ld	hl, (ix + 9)
+	ld	hl, (ix + 21)		; if (y0 == y2) - handle awkward all-on-same-line case as its own thing
+	ld	bc, (ix + 9)
+	or	a, a
+	sbc	hl, bc
+	ld	de, (ix + 6)		; x0
+	ld	hl, (ix + 12)		; x1
+	jr	nz, .notflat
+;-------------------------------------------------------------------------------
+	; draw a flat horizontal triangle
+	; x_min = min(x0, x1, x2)
+	; x_max = max(x0, x1, x2)
+	; horizline(x_min, y0, x_max - x_min + 1)
+	; DE = x0, HL = x1, BC = y0
+	call	_Minimum.no_carry
+	ld	de, (ix + 18)	; x2
+	call	_Minimum
+	push	hl		; x_min
+	ld	hl, (ix + 6)	; x0
+	ld	de, (ix + 12)	; x1
+	call	_Maximum
+	ld	de, (ix + 18)	; x2
+	call	_Maximum
+	pop	de		; x_min
 	or	a, a
 	sbc	hl, de
-	jr	nz, .notflat
-	ld	bc, (ix + 6)		; x0
-	ld	(ix - 6), bc		; a = x0
-	ld	(ix - 3), bc		; b = x0;
-	ld	hl, (ix + 12)		; if (x1 < a) { a = x1; }
-	or	a, a
-	sbc	hl, bc
-	jp	p, .cmp00
-	jp	pe, .cmp01
-	jr	.cmp02
-.cmp00:
-	jp	po, .cmp01
-.cmp02:
-	ld	bc, (ix + 12)
-	ld	(ix - 3), bc
-	jr	.cmp11
-.cmp01:
-	ld	bc, (ix + 12)
-	ld	hl, (ix - 6)
-	or	a, a
-	sbc	hl, bc			; else if (x1 > b) { b = x1; }
-	jp	p, .cmp10
-	jp	pe, .cmp11
-	jr	.cmp12
-.cmp10:
-	jp	po, .cmp11
-.cmp12:
-	ld	bc, (ix + 12)
-	ld	(ix - 6), bc
-.cmp11:
-	ld	bc, (ix - 3)
-	ld	hl, (ix + 18)
-	or	a, a
-	sbc	hl, bc			; if (x2 < a) { a = x2; }
-	jp	p, .cmp20
-	jp	pe, .cmp21
-	jr	.cmp22
-.cmp20:
-	jp	po, .cmp21
-.cmp22:
-	ld	bc, (ix + 18)
-	ld	(ix - 3), bc
-	jr	.cmp31
-.cmp21:
-	ld	bc, (ix + 18)
-	ld	hl, (ix - 6)
-	or	a, a
-	sbc	hl, bc			; else if (x2 > b) { b = x2; }
-	jp	p, .cmp30
-	jp	pe, .cmp31
-	jr	.cmp32
+	inc	hl
+	push	hl		; x_max - x_min + 1
+	push	bc		; y0
+	push	de		; x_min
+	call	0		; horizline(x_min, y0, x_max - x_min + 1)
+.line0 := $-3
+	ld	sp, ix
+	pop	ix
+	ret
+;-------------------------------------------------------------------------------
 .notflat:
-	ld	bc, (ix + 6)		; x0
-	ld	hl, (ix + 12)
 	or	a, a
-	sbc	hl, bc
+	sbc	hl, de
 	ld	(ix - 36), hl		; dx01 = x1 - x0;
 	ld	hl, (ix + 18)
 	or	a, a
-	sbc	hl, bc
+	sbc	hl, de
 	ld	(ix - 21), hl		; dx02 = x2 - x0;
-	ld	bc, (ix + 9)		; y0
+
+	ld	de, (ix + 9)		; y0
 	ld	hl, (ix + 15)
 	or	a, a
-	sbc	hl, bc
+	sbc	hl, de
 	ld	(ix - 33), hl		; dy01 = y1 - y0;
 	ld	hl, (ix + 21)
 	or	a, a
-	sbc	hl, bc
+	sbc	hl, de
 	ld	(ix - 27), hl		; dy02 = y2 - y0;
-	ld	bc, (ix + 12)
+
+	ld	de, (ix + 12)
 	ld	hl, (ix + 18)
 	or	a, a
-	sbc	hl, bc
+	sbc	hl, de
 	ld	(ix - 30), hl		; dx12 = x2 - x1;
+
 	ld	bc, (ix + 15)
 	ld	hl, (ix + 21)
 	or	a, a
 	sbc	hl, bc
 	ld	(ix - 39), hl		; dy12 = y2 - y1;
-	jr	nz, .elselast		; if (y1 == y2) { last = y1; }
-	ld	(ix - 24), bc
-	jr	.sublast
-.cmp30:
-	jp	po, .cmp31
-.cmp32:
-	ld	bc, (ix + 18)
-	ld	(ix - 6), bc
-.cmp31:
-	ld	de, (ix - 3)
-	ld	hl, (ix - 6)
-	or	a, a
-	sbc	hl, de
-	inc	hl
-	push	hl
-	ld	bc, (ix + 9)
-	push	bc
-	push	de
-	call	0			; horizline(a, y0, b-a+1);
-.line0 := $-3
-	ld	sp, ix
-	pop	ix
-	ret				; return;
-.elselast:
-	ld	bc, (ix + 15)		; else { last = y1-1; }
+	; if (y1 == y2) { last = y1; }
+	jr	z, .sublast
+	; else { last = y1-1; }
 	dec	bc
-	ld	(ix - 24), bc
 .sublast:
+	ld	(ix - 24), bc
 	ld	bc, (ix + 9)
 	ld	(ix - 12), bc		; for (y = y0; y <= last; y++)
 	jr	.firstloopstart
+;-------------------------------------------------------------------------------
 .firstloop:
 	ld	hl, (ix - 15)
 	ld	bc, (ix - 33)
 	call	_DivideHLBC
 	ld	bc, (ix + 6)
 	add	hl, bc
-	ld	(ix - 3), hl		; a = x0 + sa / dy01;
+	; a = x0 + sa / dy01;
+	push	hl	; ld (ix - 3), hl
 	ld	hl, (ix - 18)
 	ld	bc, (ix - 27)
 	call	_DivideHLBC
 	ld	bc, (ix + 6)
 	add	hl, bc
-	ld	(ix - 6), hl		; b = x0 + sb / dy02;
+	; b = x0 + sb / dy02;
+	push	hl	; ld (ix - 6), hl
 	ld	bc, (ix - 36)
 	ld	hl, (ix - 15)
 	add	hl, bc
@@ -4240,22 +4202,17 @@ _FillTriangle:
 	ld	hl, (ix - 18)
 	add	hl, bc
 	ld	(ix - 18), hl		; sb += dx02;
-	ld	de, (ix - 3)
-	ld	hl, (ix - 6)
+	pop	hl	; ld hl, (ix - 6)
+	pop	de	; ld de, (ix - 3)
 	or	a, a
 	sbc	hl, de			; if (b < a) { swap(a, b); }
-	jp	p, .cmp40
-	jp	pe, .cmp41
-	jr	.cmp42
-.cmp40:
-	jp	po, .cmp41
-.cmp42:
-	ld	hl, (ix - 3)
-	ld	de, (ix - 6)
-	ld	(ix - 3), de
-	ld	(ix - 6), hl
-.cmp41:
-	ld	hl, (ix - 6)
+	add	hl, de
+	jp	p, .cmp43
+	ex	de, hl
+.cmp43:
+	jp	po, .cmp44
+	ex	de, hl
+.cmp44:
 	or	a, a
 	sbc	hl, de
 	inc	hl
@@ -4295,20 +4252,24 @@ _FillTriangle:
 	ld	de, (ix - 21)
 	call	_MultiplyHLDE		; sb = dx02 * (y - y0);
 	ld	(ix - 18), hl
+	ld	bc, (ix - 12)
 	jr	.secondloopstart	; for (; y <= y2; y++)
+;-------------------------------------------------------------------------------
 .secondloop:
 	ld	hl, (ix - 15)
 	ld	bc, (ix - 39)
 	call	_DivideHLBC
 	ld	bc, (ix + 12)
 	add	hl, bc
-	ld	(ix - 3), hl		; a = x1 + sa / dy12;
+	; a = x1 + sa / dy12;
+	push	hl	; ld (ix - 3), hl
 	ld	hl, (ix - 18)
 	ld	bc, (ix - 27)
 	call	_DivideHLBC
 	ld	bc, (ix + 6)
 	add	hl, bc
-	ld	(ix - 6), hl		; b = x0 + sb / dy02;
+	; b = x0 + sb / dy02;
+	push	hl	; ld (ix - 6), hl
 	ld	bc, (ix - 30)
 	ld	hl, (ix - 15)
 	add	hl, bc
@@ -4317,22 +4278,17 @@ _FillTriangle:
 	ld	hl, (ix - 18)
 	add	hl, bc
 	ld	(ix - 18), hl		; sb += dx02;
-	ld	de, (ix - 3)
-	ld	hl, (ix - 6)
+	pop	hl	; ld hl, (ix - 6)
+	pop	de	; ld de, (ix - 3)
 	or	a, a
 	sbc	hl, de			; if (b < a) { swap(a, b); }
-	jp	p, .cmp60
-	jp	pe, .cmp61
-	jr	.cmp62
-.cmp60:
-	jp	po, .cmp61
-.cmp62:
-	ld	hl, (ix - 3)
-	ld	de, (ix - 6)
-	ld	(ix - 3), de
-	ld	(ix - 6), hl
-.cmp61:
-	ld	hl, (ix - 6)
+	add	hl, de
+	jp	p, .cmp63
+	ex	de, hl
+.cmp63:
+	jp	po, .cmp64
+	ex	de, hl
+.cmp64:
 	or	a, a
 	sbc	hl, de
 	inc	hl
@@ -4349,7 +4305,6 @@ _FillTriangle:
 	inc	bc
 	ld	(ix - 12), bc
 .secondloopstart:
-	ld	bc, (ix - 12)
 	ld	hl, (ix + 21)
 	or	a, a
 	sbc	hl, bc
