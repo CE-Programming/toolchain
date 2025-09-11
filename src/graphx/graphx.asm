@@ -5708,16 +5708,17 @@ gfx_FloodFill:
 	ld	bc, (ix + 6)
 	call	_GetPixel		; ov = p(x, y);
 
-	ld	(.oldcolor0), a
-	ld	(.oldcolor1), a
-	ld	(.oldcolor2), a
 	ld	b, (ix + 12)
 	cp	a, b			; return if same color
 	jq	z, .return
 
-	ld	a, b
-	ld	(.newcolor0), a
-	ld	(.newcolor1), a
+	ld	iy, _FloodFill_smc_base
+	ld	(iy + (.oldcolor0 - _FloodFill_smc_base)), a
+	ld	(iy + (.oldcolor1 - _FloodFill_smc_base)), a
+	ld	(.oldcolor2), a
+
+	ld	(iy + (.newcolor0 - _FloodFill_smc_base)), b
+	ld	(iy + (.newcolor1 - _FloodFill_smc_base)), b
 
 	lea	iy, ix
 	ld	bc, -3224
@@ -5846,6 +5847,8 @@ smcWord _XMaxMinus1
 	cp	a, 0
 .oldcolor1 = $-1
 	jr	z, .forloop1
+
+_FloodFill_smc_base := $
 
 .ovat:
 	ld	(ix + 6), bc
