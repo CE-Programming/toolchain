@@ -4076,60 +4076,77 @@ gfx_FillTriangle:
 ; Returns:
 ;  None
 	ld	hl, gfx_HorizLine
+tri_frame_offset := 30
+tri_x0        := tri_frame_offset + 6
+tri_y0        := tri_frame_offset + 9
+tri_x1        := tri_frame_offset + 12
+tri_y1        := tri_frame_offset + 15
+tri_x2        := tri_frame_offset + 18
+tri_y2        := tri_frame_offset + 21
+tri_y_counter := tri_frame_offset - 3
+tri_sa        := tri_frame_offset - 6
+tri_sb        := tri_frame_offset - 9
+tri_dx02      := tri_frame_offset - 12
+tri_last      := tri_frame_offset - 15
+tri_dy02      := tri_frame_offset - 18
+tri_dx12      := tri_frame_offset - 21
+tri_dy01      := tri_frame_offset - 24
+tri_dx01      := tri_frame_offset - 27
+tri_dy12      := tri_frame_offset - 30
 _FillTriangle:
 	ld	(.line0), hl
 	ld	(.line1), hl
 	ld	(.line2), hl
 	push	ix
-	ld	ix, 0
+	ld	ix, -tri_frame_offset
 	add	ix, sp
-	lea	hl, ix - 39
-	ld	sp, hl
+	ld	sp, ix
+	or	a, a
 	sbc	hl, hl
-	ld	(ix - 15), hl
-	ld	(ix - 18), hl		; int sa = 0, sb = 0;
-	ld	hl, (ix + 9)		; sort coordinates by y order (y2 >= y1 >= y0)
-	ld	de, (ix + 15)		; if (y0 > y1)
+	ld	(ix + tri_sa), hl
+	ld	(ix + tri_sb), hl		; int sa = 0, sb = 0;
+	ld	hl, (ix + tri_y0)		; sort coordinates by y order (y2 >= y1 >= y0)
+	ld	de, (ix + tri_y1)		; if (y0 > y1)
 	call	_SignedCompare
 	jr	c, .cmp0
-	ld	hl, (ix + 9)
-	ld	(ix + 9), de
-	ld	(ix + 15), hl
-	ld	hl, (ix + 6)
-	ld	de, (ix + 12)
-	ld	(ix + 6), de
-	ld	(ix + 12), hl
+	ld	hl, (ix + tri_y0)
+	ld	(ix + tri_y0), de
+	ld	(ix + tri_y1), hl
+	ld	hl, (ix + tri_x0)
+	ld	de, (ix + tri_x1)
+	ld	(ix + tri_x0), de
+	ld	(ix + tri_x1), hl
 .cmp0:
-	ld	hl, (ix + 15)
-	ld	de, (ix + 21)
+	ld	hl, (ix + tri_y1)
+	ld	de, (ix + tri_y2)
 	call	_SignedCompare
 	jr	c, .cmp1
-	ld	hl, (ix + 15)
-	ld	(ix + 15), de
-	ld	(ix + 21), hl
-	ld	hl, (ix + 12)
-	ld	de, (ix + 18)
-	ld	(ix + 12), de
-	ld	(ix + 18), hl
+	ld	hl, (ix + tri_y1)
+	ld	(ix + tri_y1), de
+	ld	(ix + tri_y2), hl
+	ld	hl, (ix + tri_x1)
+	ld	de, (ix + tri_x2)
+	ld	(ix + tri_x1), de
+	ld	(ix + tri_x2), hl
 .cmp1:
-	ld	hl, (ix + 9)
-	ld	de, (ix + 15)
+	ld	hl, (ix + tri_y0)
+	ld	de, (ix + tri_y1)
 	call	_SignedCompare
 	jr	c, .cmp2
-	ld	hl, (ix + 9)
-	ld	(ix + 9), de
-	ld	(ix + 15), hl
-	ld	hl, (ix + 6)
-	ld	de, (ix + 12)
-	ld	(ix + 6), de
-	ld	(ix + 12), hl
+	ld	hl, (ix + tri_y0)
+	ld	(ix + tri_y0), de
+	ld	(ix + tri_y1), hl
+	ld	hl, (ix + tri_x0)
+	ld	de, (ix + tri_x1)
+	ld	(ix + tri_x0), de
+	ld	(ix + tri_x1), hl
 .cmp2:
-	ld	hl, (ix + 21)		; if (y0 == y2) - handle awkward all-on-same-line case as its own thing
-	ld	bc, (ix + 9)
+	ld	hl, (ix + tri_y2)		; if (y0 == y2) - handle awkward all-on-same-line case as its own thing
+	ld	bc, (ix + tri_y0)
 	or	a, a
 	sbc	hl, bc
-	ld	de, (ix + 6)		; x0
-	ld	hl, (ix + 12)		; x1
+	ld	de, (ix + tri_x0)		; x0
+	ld	hl, (ix + tri_x1)		; x1
 	jr	nz, .notflat
 ;-------------------------------------------------------------------------------
 	; draw a flat horizontal triangle
@@ -4138,13 +4155,13 @@ _FillTriangle:
 	; horizline(x_min, y0, x_max - x_min + 1)
 	; DE = x0, HL = x1, BC = y0
 	call	_Minimum.no_carry
-	ld	de, (ix + 18)	; x2
+	ld	de, (ix + tri_x2)	; x2
 	call	_Minimum
 	push	hl		; x_min
-	ld	hl, (ix + 6)	; x0
-	ld	de, (ix + 12)	; x1
+	ld	hl, (ix + tri_x0)	; x0
+	ld	de, (ix + tri_x1)	; x1
 	call	_Maximum
-	ld	de, (ix + 18)	; x2
+	ld	de, (ix + tri_x2)	; x2
 	call	_Maximum
 	pop	de		; x_min
 	or	a, a
@@ -4155,75 +4172,76 @@ _FillTriangle:
 	push	de		; x_min
 	call	0		; horizline(x_min, y0, x_max - x_min + 1)
 .line0 := $-3
-	ld	sp, ix
+	lea	hl, ix + tri_frame_offset
+	ld	sp, hl
 	pop	ix
 	ret
 ;-------------------------------------------------------------------------------
 .notflat:
 	or	a, a
 	sbc	hl, de
-	ld	(ix - 36), hl		; dx01 = x1 - x0;
-	ld	hl, (ix + 18)
+	ld	(ix + tri_dx01), hl		; dx01 = x1 - x0;
+	ld	hl, (ix + tri_x2)
 	or	a, a
 	sbc	hl, de
-	ld	(ix - 21), hl		; dx02 = x2 - x0;
+	ld	(ix + tri_dx02), hl		; dx02 = x2 - x0;
 
-	ld	de, (ix + 9)		; y0
-	ld	hl, (ix + 15)
+	ld	de, (ix + tri_y0)		; y0
+	ld	hl, (ix + tri_y1)
 	or	a, a
 	sbc	hl, de
-	ld	(ix - 33), hl		; dy01 = y1 - y0;
-	ld	hl, (ix + 21)
+	ld	(ix + tri_dy01), hl		; dy01 = y1 - y0;
+	ld	hl, (ix + tri_y2)
 	or	a, a
 	sbc	hl, de
-	ld	(ix - 27), hl		; dy02 = y2 - y0;
+	ld	(ix + tri_dy02), hl		; dy02 = y2 - y0;
 
-	ld	de, (ix + 12)
-	ld	hl, (ix + 18)
+	ld	de, (ix + tri_x1)
+	ld	hl, (ix + tri_x2)
 	or	a, a
 	sbc	hl, de
-	ld	(ix - 30), hl		; dx12 = x2 - x1;
+	ld	(ix + tri_dx12), hl		; dx12 = x2 - x1;
 
-	ld	bc, (ix + 15)
-	ld	hl, (ix + 21)
+	ld	bc, (ix + tri_y1)
+	ld	hl, (ix + tri_y2)
 	or	a, a
 	sbc	hl, bc
-	ld	(ix - 39), hl		; dy12 = y2 - y1;
+	ld	(ix + tri_dy12), hl		; dy12 = y2 - y1;
 	; if (y1 == y2) { last = y1; }
 	jr	z, .sublast
 	; else { last = y1-1; }
 	dec	bc
 .sublast:
-	ld	(ix - 24), bc
-	ld	bc, (ix + 9)
-	ld	(ix - 12), bc		; for (y = y0; y <= last; y++)
+	ld	(ix + tri_last), bc
+	ld	bc, (ix + tri_y0)
+	ld	(ix + tri_y_counter), bc		; for (y = y0; y <= last; y++)
 	jr	.firstloopstart
 ;-------------------------------------------------------------------------------
+.cmp50:
+	jp	pe, .firstloopfinish
 .firstloop:
-	ld	hl, (ix - 15)
-	ld	bc, (ix - 33)
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dy01)
 	call	_DivideHLBC
-	ld	bc, (ix + 6)
+	ld	bc, (ix + tri_x0)
 	add	hl, bc
-	; a = x0 + sa / dy01;
-	push	hl	; ld (ix - 3), hl
-	ld	hl, (ix - 18)
-	ld	bc, (ix - 27)
+	push	hl	; a = x0 + sa / dy01;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dy02)
 	call	_DivideHLBC
-	ld	bc, (ix + 6)
+	ld	bc, (ix + tri_x0)
 	add	hl, bc
-	; b = x0 + sb / dy02;
-	push	hl	; ld (ix - 6), hl
-	ld	bc, (ix - 36)
-	ld	hl, (ix - 15)
+	push	hl	; b = x0 + sb / dy02;
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dx01)
 	add	hl, bc
-	ld	(ix - 15), hl		; sa += dx01;
-	ld	bc, (ix - 21)
-	ld	hl, (ix - 18)
+	ld	(ix + tri_sa), hl		; sa += dx01;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dx02)
 	add	hl, bc
-	ld	(ix - 18), hl		; sb += dx02;
-	pop	hl	; ld hl, (ix - 6)
-	pop	de	; ld de, (ix - 3)
+	ld	(ix + tri_sb), hl		; sb += dx02;
+	pop	hl	; HL = b
+	pop	de	; DE = a
 	or	a, a
 	sbc	hl, de			; if (b < a) { swap(a, b); }
 	add	hl, de
@@ -4237,69 +4255,64 @@ _FillTriangle:
 	sbc	hl, de
 	inc	hl
 	push	hl
-	ld	bc, (ix - 12)
+	ld	bc, (ix + tri_y_counter)
 	push	bc
 	push	de
 	call	0			; horizline(a, y, b-a+1);
 .line1 := $-3
-	pop	bc
-	pop	bc
-	pop	bc
-	ld	bc, (ix - 12)
+	ld	sp, ix
+	ld	bc, (ix + tri_y_counter)
 	inc	bc
-	ld	(ix - 12), bc
+	ld	(ix + tri_y_counter), bc
 .firstloopstart:
-	ld	hl, (ix - 24)
+	ld	hl, (ix + tri_last)
 	or	a, a
 	sbc	hl, bc
 	jp	p, .cmp50
 	jp	pe, .firstloop
-	jr	.cmp52
-.cmp50:
-	jp	po, .firstloop
-.cmp52:
-	ld	bc, (ix + 15)
-	ld	hl, (ix - 12)
+.firstloopfinish:
+	ld	bc, (ix + tri_y1)
+	ld	hl, (ix + tri_y_counter)
 	or	a, a
 	sbc	hl, bc
-	ld	de, (ix - 30)
+	ld	de, (ix + tri_dx12)
 	call	_MultiplyHLDE		; sa = dx12 * (y - y1);
-	ld	(ix - 15), hl
-	ld	bc, (ix + 9)
-	ld	hl, (ix - 12)
+	ld	(ix + tri_sa), hl
+	ld	bc, (ix + tri_y0)
+	ld	hl, (ix + tri_y_counter)
 	or	a, a
 	sbc	hl, bc
-	ld	de, (ix - 21)
+	ld	de, (ix + tri_dx02)
 	call	_MultiplyHLDE		; sb = dx02 * (y - y0);
-	ld	(ix - 18), hl
-	ld	bc, (ix - 12)
+	ld	(ix + tri_sb), hl
+	ld	bc, (ix + tri_y_counter)
 	jr	.secondloopstart	; for (; y <= y2; y++)
 ;-------------------------------------------------------------------------------
+.cmp70:
+	jp	pe, .secondloopfinish
 .secondloop:
-	ld	hl, (ix - 15)
-	ld	bc, (ix - 39)
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dy12)
 	call	_DivideHLBC
-	ld	bc, (ix + 12)
+	ld	bc, (ix + tri_x1)
 	add	hl, bc
-	; a = x1 + sa / dy12;
-	push	hl	; ld (ix - 3), hl
-	ld	hl, (ix - 18)
-	ld	bc, (ix - 27)
+	push	hl	; a = x1 + sa / dy12;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dy02)
 	call	_DivideHLBC
-	ld	bc, (ix + 6)
+	ld	bc, (ix + tri_x0)
 	add	hl, bc
-	; b = x0 + sb / dy02;
-	push	hl	; ld (ix - 6), hl
-	ld	bc, (ix - 30)
-	ld	hl, (ix - 15)
+	push	hl	; b = x0 + sb / dy02;
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dx12)
 	add	hl, bc
-	ld	(ix - 15), hl		; sa += dx12;
-	ld	bc, (ix - 21)
-	ld	hl, (ix - 18)
+	ld	(ix + tri_sa), hl		; sa += dx12;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dx02)
 	add	hl, bc
-	ld	(ix - 18), hl		; sb += dx02;
-	pop	hl	; ld hl, (ix - 6)
-	pop	de	; ld de, (ix - 3)
+	ld	(ix + tri_sb), hl		; sb += dx02;
+	pop	hl	; HL = b
+	pop	de	; DE = a
 	or	a, a
 	sbc	hl, de			; if (b < a) { swap(a, b); }
 	add	hl, de
@@ -4313,29 +4326,24 @@ _FillTriangle:
 	sbc	hl, de
 	inc	hl
 	push	hl
-	ld	bc, (ix - 12)
+	ld	bc, (ix + tri_y_counter)
 	push	bc
 	push	de
 	call	0			; horizline(a, y, b-a+1);
 .line2 := $-3
-	pop	bc
-	pop	bc
-	pop	bc
-	ld	bc, (ix - 12)
+	ld	sp, ix
+	ld	bc, (ix + tri_y_counter)
 	inc	bc
-	ld	(ix - 12), bc
+	ld	(ix + tri_y_counter), bc
 .secondloopstart:
-	ld	hl, (ix + 21)
+	ld	hl, (ix + tri_y2)
 	or	a, a
 	sbc	hl, bc
 	jp	p, .cmp70
 	jp	pe, .secondloop
-	ld	sp, ix
-	pop	ix
-	ret
-.cmp70:
-	jp	po, .secondloop
-	ld	sp, ix
+.secondloopfinish:
+	lea	hl, ix + tri_frame_offset
+	ld	sp, hl
 	pop	ix
 	ret
 
