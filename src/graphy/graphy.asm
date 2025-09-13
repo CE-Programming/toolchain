@@ -344,12 +344,11 @@ gfy_SetDefaultPalette: ; COPIED_FROM_GRAPHX
 	ld	a,b
 	rrca
 	xor	a,b
-	and	a,224
+	and	a,$E0
 	xor	a,b
 	ld	(de),a
+	ld	a,e	; E = B * 2, so we can remove one rla
 	inc	de
-	ld	a,b
-	rla
 	rla
 	rla
 	ld	a,b
@@ -1359,8 +1358,9 @@ el_sigma_diff1	:= 39		; Offset to be added to sigma in loop 1
 el_sigma_diff2	:= 42		; Offset to be added to sigma in loop 2
 
 _Ellipse:
-	ld	(_ellipse_loop_draw_1),hl
-	ld	(_ellipse_loop_draw_2),de
+	lea	iy, iy - 128
+	ld	(iy + (_ellipse_loop_draw_1 - _ellipse_smc_base_m128)), hl
+	ld	(iy + (_ellipse_loop_draw_2 - _ellipse_smc_base_m128)), de
 ; Draws an ellipse, either filled or not, either clipped or not
 ; Arguments:
 ;  arg0 : X coordinate (ix+6)
@@ -1596,6 +1596,7 @@ _ellipse_loop_draw_3 := $-3
 	pop	ix
 _ellipse_ret:
 _ellipse_smc_base := $
+_ellipse_smc_base_m128 := _ellipse_smc_base - 128
 	ret
 
 _ellipse_draw_pixels:
@@ -1750,14 +1751,10 @@ _Circle:
 	inc	bc
 	ld	(iy-3),bc
 	ld	bc,(iy-9)
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,bc
-	jp	m,.cmp0
-	jp	pe,.cmp1
-	jr	.cmp2
-.cmp0:
-	jp	po,.cmp1
+	ld	hl, $800000
+	or	a, a
+	sbc	hl, bc
+	jp	pe, .cmp1	; BC <= 0
 .cmp2:
 	ld	hl,(iy-3)
 	add	hl,hl
@@ -1879,21 +1876,17 @@ _FillCircle:
 	ld	bc,(ix-3)
 	inc	bc
 	ld	(ix-3),bc
-	ld	bc,(ix-9)
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,bc
-	jp	m,.cmp0
-	jp	pe,.cmp2
-	jr	.cmp1
-.cmp0:
-	jp	po,.cmp2
+	ld	bc, (hl)	; ld bc, (ix - 9)
+	ld	hl, $800000
+	or	a, a
+	sbc	hl, bc
+	jp	pe, .cmp2	; BC <= 0
 .cmp1:
 	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
 	add	hl,bc
-	jr	.cmp3
+	jr	.loop
 .cmp2:
 	ld	bc,(ix-6)
 	dec	bc
@@ -1905,7 +1898,7 @@ _FillCircle:
 	add	hl,hl
 	inc	hl
 	add	hl,de
-.cmp3:
+.loop:
 	ld	(ix-9),hl
 	ld	bc,(ix-3)
 	ld	hl,(ix-6)
@@ -1944,7 +1937,7 @@ gfy_FillCircle: ; MODIFIED_FROM_GRAPHX
 	ld	(ix - 3), hl
 	inc	hl
 	sbc	hl, bc	; HL = 1 - BC
-	jr	_FillCircle.cmp3
+	jr	_FillCircle.loop
 
 ;-------------------------------------------------------------------------------
 ; not working at the moment
@@ -2014,14 +2007,10 @@ _FillCircle_NoClip:
 	inc	bc
 	ld	(ix-3),bc
 	ld	bc,(ix-9)
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,bc
-	jp	m,.cmp0
-	jp	pe,.cmp2
-	jr	.cmp1
-.cmp0:
-	jp	po,.cmp2
+	ld	hl, $800000
+	or	a, a
+	sbc	hl, bc
+	jp	pe, .cmp2	; BC <= 0
 .cmp1:
 	ld	hl,(ix-3)
 	add	hl,hl
@@ -2146,21 +2135,17 @@ _FillCircle_NoClip:
 	ld	bc,(ix-3)
 	inc	bc
 	ld	(ix-3),bc
-	ld	bc,(ix-9)
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,bc
-	jp	m,.cmp0
-	jp	pe,.cmp2
-	jr	.cmp1
-.cmp0:
-	jp	po,.cmp2
+	ld	bc, (hl)	; ld bc, (ix - 9)
+	ld	hl, $800000
+	or	a, a
+	sbc	hl, bc
+	jp	pe, .cmp2	; BC <= 0
 .cmp1:
 	ld	hl,(ix-3)
 	add	hl,hl
 	inc	hl
 	add	hl,bc
-	jr	.cmp3
+	jr	.loop
 .cmp2:
 	ld	bc,(ix-6)
 	dec	bc
@@ -2172,7 +2157,7 @@ _FillCircle_NoClip:
 	add	hl,hl
 	inc	hl
 	add	hl,de
-.cmp3:
+.loop:
 	ld	(ix-9),hl
 	ld	bc,(ix-3)
 	ld	hl,(ix-6)
@@ -2212,7 +2197,7 @@ gfy_FillCircle_NoClip: ; MODIFIED_FROM_GRAPHX
 	ld	(ix - 3), hl
 	inc	hl
 	sbc	hl, bc	; HL = 1 - BC
-	jr	_FillCircle_NoClip.cmp3
+	jr	_FillCircle_NoClip.loop
 
 end if
 
@@ -2989,158 +2974,174 @@ gfy_TransparentTilemap: ; COPIED_FROM_GRAPHX
 ;  }
 ;
 t_data        := 0
-t_type_width  := 10
-t_type_height := 11
-t_height      := 12
-t_width       := 13
+t_tiles       := 3
 t_tile_height := 6
 t_tile_width  := 7
 t_draw_height := 8
 t_draw_width  := 9
+t_type_width  := 10
+t_type_height := 11
+t_height      := 12
+t_width       := 13
+t_y_loc       := 14
 t_x_loc       := 15
-x_offset      := 9
-y_offset      := 12
+
+tm_frame_offset := 14
+tm_tilemap_data := tm_frame_offset + 6
+tm_x_offset     := tm_frame_offset + 9
+tm_y_offset     := tm_frame_offset + 12
+tm_x_res        := tm_frame_offset - 3
+tm_x_pos        := tm_frame_offset - 4
+tm_y_pos        := tm_frame_offset - 5
+tm_y_index      := tm_frame_offset - 6
+tm_x_coord      := tm_frame_offset - 9
+tm_y_coord      := tm_frame_offset - 14
 
 _Tilemap:
-	ld	(.tilemethod),hl
+	ld	(.tilemethod), hl
 	push	ix
-	ld	ix,0
-	lea	bc,ix
-	add	ix,sp
-	lea	hl,ix-12
-	ld	sp,hl
-	ld	iy,(ix+6)		; iy -> tilemap structure
+	ld	ix, -tm_frame_offset
+	lea	bc, ix + tm_frame_offset	; ld bc, 0
+	add	ix, sp
+	ld	sp, ix
+	ld	iy, (ix + tm_tilemap_data)	; iy -> tilemap structure
 
-	ld	hl,(ix+y_offset)
-	ld	c,(iy+t_tile_height)
-	ld	a,(iy+t_type_height)
-	or	a,a
-	jr	nz,.heightpow2
+	xor	a, a
+	sbc	hl, hl
+	ld	(ix + tm_x_res), hl
+
+	ld	hl, (ix + tm_y_offset)
+	ld	c, (iy + t_tile_height)
+	or	a, (iy + t_type_height)
+	jr	nz, .heightpow2
 	call	ti._idvrmu
-	ex	de,hl
+	ex	de, hl
 	push	de
 	pop	bc
 	jr	.heightnotpow2
 .heightpow2:				; compute as power of 2 height using shifts
-	ld	b,a
+	ld	b, a
 	dec	c
-	ld	a,l
-	and	a,c
-	ld	c,a
+	ld	a, l
+	and	a, c
+	ld	c, a
 .div0:
 	srl	h
 	rr	l
 	djnz	.div0
 .heightnotpow2:
-	ld	(ix-4),l		; y = y_offset / tilemap->tile_height
-	ld	(ix+y_offset),bc	; y_offset = y_offset % tilemap->tile_height;
+	ld	(ix + tm_y_index), l		; y = y_offset / tilemap->tile_height
+	ld	(ix + tm_y_offset), bc	; y_offset = y_offset % tilemap->tile_height;
 
-	ld	c,(iy+t_tile_width)
-	ld	hl,(ix+x_offset)	; x offset
-	ld	a,(iy+t_type_width)
-	or	a,a
-	jr	nz,.widthpow2
+	ld	c, (iy + t_tile_width)
+	ld	hl, (ix + tm_x_offset)	; x offset
+	ld	a, (iy + t_type_width)
+	or	a, a
+	jr	nz, .widthpow2
 	call	ti._idvrmu
-	ex	de,hl
+	ex	de, hl
 	push	de
 	pop	bc
 	jr	.widthnotpow2
 .widthpow2:
-	ld	b,a
+	ld	b, a
 	dec	c
-	ld	a,l
-	and	a,c
-	ld	c,a
+	ld	a, l
+	and	a, c
+	ld	c, a
 .div1:
 	srl	h
 	rr	l
 	djnz	.div1
 .widthnotpow2:
-	ld	a,l
-	ld	(.xres),a
-	ld	hl,(iy+t_x_loc)
-	or	a,a
-	sbc	hl,bc
-	ld	(.xoffset),hl		; tilemap->x_loc - x_offset;
+	ld	a, l
+	ld	(.xres), a
+	ld	hl, (iy + t_x_loc)
+	or	a, a
+	sbc	hl, bc
+	ld	(.xoffset), hl		; tilemap->x_loc - x_offset;
 
-	or	a,a
-	sbc	hl,hl
-	ld	l,(iy+14)
-	ld	bc,(ix+y_offset)
-	ld	(ix-3),h
-	sbc	hl,bc
-	ld	(ix-12),hl
-	jr	.yloop
+	ld	hl, (iy + t_tiles)
+	ld	(.smc_t_tiles), hl
 
-.xloopinner:
-	or	a,a
-	sbc	hl,hl
-	ld	l,(ix-1)
-	ld	bc,(iy+t_data)		; iy -> tilemap data
-	add	hl,bc
-	ld	bc,0
-.ynext := $-3
-	add	hl,bc
-	ld	a,(hl)
-	ld	l,a
+	ld	a, (iy + t_tile_width)
+	ld	(.smc_t_tile_width), a
+
+	ld	a, (iy + t_draw_height)
 	inc	a
-	jr	z,.blanktile
-	ld	h,3
+	ld	(ix + tm_y_pos), a
+
+	xor	a, a
+	sbc	hl, hl
+	ld	l, (iy + t_y_loc)
+	ld	bc, (ix + tm_y_offset)
+	sbc	hl, bc
+	ld	(ix + tm_y_coord), hl
+	jr	.yloop
+;-------------------------------------------------------------------------------
+
+.xloop:
+	ld	hl, (ix + tm_x_res)	; UHL and H are zero
+	ld	bc, 0
+.ynext_plus_tilemap_data := $-3
+	add	hl, bc
+	ld	a, (hl)
+	ld	l, a
+	inc	a
+	jr	z, .blanktile
+	ld	h, 3
 	mlt	hl
-	ld	de,(iy+3)
-	add	hl,de
-	ld	bc,(ix-12)
+	ld	de, 0	; (iy + t_tiles)
+.smc_t_tiles := $-3
+	add	hl, de
+	ld	bc, (ix + tm_y_coord)
 	push	bc
-	ld	bc,(ix-7)
+	ld	bc, (ix + tm_x_coord)
 	push	bc
-	ld	bc,(hl)
+	ld	bc, (hl)
 	push	bc
 	call	0			; call sprite drawing routine
 .tilemethod := $-3
-	lea	hl,ix-12
-	ld	sp,hl
+	ld	sp, ix
 .blanktile:
-	or	a,a
-	sbc	hl,hl
-	ld	iy,(ix+6)
-	ld	l,(iy+7)
-	ld	bc,(ix-7)
-	add	hl,bc
-	ld	(ix-7),hl
-	inc	(ix-1)
-	ld	a,(ix-2)
-	inc	a
-
-.xloop:
-	ld	(ix-2),a
-	cp	a,(iy+t_draw_width)
-	jr	nz,.xloopinner
-	ld	h,0
-	ld	l,(iy+6)
-	ld	bc,(ix-12)
-	add	hl,bc
-	ld	(ix-12),hl
-	inc	(ix-4)
-	inc	(ix-3)
-
+	ld	hl, 0	; (iy + t_tile_width)
+.smc_t_tile_width := $-3
+	ld	bc, (ix + tm_x_coord)
+	add	hl, bc
+	ld	(ix + tm_x_coord), hl
+	inc	(ix + tm_x_res)
+	dec	(ix + tm_x_pos)
+	jr	nz, .xloop
+	ld	iy, (ix + tm_tilemap_data)
+	xor	a, a
+	sbc	hl, hl
+	ld	l, (iy + t_tile_height)
+	ld	bc, (ix + tm_y_coord)
+	add	hl, bc
+	ld	(ix + tm_y_coord), hl
+	inc	(ix + tm_y_index)
 .yloop:
-	ld	a,(iy+t_draw_height)
-	cp	a,(ix-3)
-	jr	z,.finish_loop
-.xres := $+3
+	; A is zero here
+	dec	(ix + tm_y_pos)
+	jr	z, .finish_loop
 ; .loop:
-	ld	(ix-1),0
-	ld	hl,0
+	ld	(ix + tm_x_res), 0
+.xres := $-1
+	ld	hl, 0
 .xoffset := $-3
-	ld	(ix-7),hl
-	ld	l,(iy+t_width)
-	ld	h,(ix-4)
+	ld	(ix + tm_x_coord), hl
+	ld	l, (iy + t_width)
+	ld	h, (ix + tm_y_index)
 	mlt	hl
-	ld	(.ynext),hl
-	xor	a,a
-	jr	.xloop
+	ld	bc, (iy + t_data)	; iy -> tilemap data
+	add	hl, bc
+	ld	(.ynext_plus_tilemap_data), hl
+	or	a, (iy + t_draw_width)
+	ld	(ix + tm_x_pos), a
+	jr	nz, .xloop
 .finish_loop:
-	ld	sp,ix
+	lea	hl, ix + tm_frame_offset
+	ld	sp, hl
 	pop	ix
 	ret
 
@@ -3893,25 +3894,24 @@ gfy_SetCharData: ; COPIED_FROM_GRAPHX
 ;  arg0 : Pointer to character data; if null returns current data
 ; Returns:
 ;  Pointer to character data if null, otherwise pointer to next character
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy+6)		; de -> custom character data
-	add	hl,de
-	or	a,a
-	sbc	hl,de			; sets z flag if null
+	ld	iy, 0
+	add	iy, sp
+	sbc	hl, hl		; ld hl, 0
+	ld	de, (iy + 6)	; de -> custom_character_data
+	sbc	hl, de		; sets z flag if NULL
+	add	hl, de
+	ld	l, (iy + 3)	; hl = index
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	ld	bc, (_TextData)
+	add	hl, bc
+	; returns _TextData + (index * 8) if custom_character_data is NULL
 	ret	z
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	ld	l,(iy+3)		; hl = index
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	ld	bc,(_TextData)
-	add	hl,bc
-	ex	de,hl
-	ld	bc,8
+	ld	bc, 8
+	ex	de, hl
 	ldir
+	; returns custom_character_data + 8
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3949,370 +3949,308 @@ gfy_SetMonospaceFont: ; COPIED_FROM_GRAPHX
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
-gfy_FillTriangle_NoClip: ; COPIED_FROM_GRAPHX
+gfy_FillTriangle_NoClip: ; MODIFIED_FROM_GRAPHX
 ; Draws a filled triangle without clipping
 ; Arguments:
 ;  arg0-5 : x0,y0,x1,y1,x2,y2
 ; Returns:
 ;  None
-	ld	hl,gfy_VertLine_NoClip
+	ld	hl, gfy_VertLine_NoClip
 ;	jr	_FillTriangle		; emulated by dummifying next instruction:
 	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
 gfy_FillTriangle: ; MODIFIED_FROM_GRAPHX
 ; Draws a filled triangle with clipping
 ; Arguments:
-;  arg0-5 : x0, y0, x1, y1, x2, y2
+;  arg0-5 : x0,y0,x1,y1,x2,y2
 ; Returns:
 ;  None
+	ld	hl, gfy_VertLine
+
+_FillTriangle:
+
+tri_frame_offset := 30
 
 if 0
-ft_x0 := 6
-ft_y0 := 9
-ft_x1 := 12
-ft_y1 := 15
-ft_x2 := 18
-ft_y2 := 21
+; original x and y
+tri_x0 := tri_frame_offset + 6
+tri_y0 := tri_frame_offset + 9
+tri_x1 := tri_frame_offset + 12
+tri_y1 := tri_frame_offset + 15
+tri_x2 := tri_frame_offset + 18
+tri_y2 := tri_frame_offset + 21
 else
 ; swap x and y
-ft_y0 := 6
-ft_x0 := 9
-ft_y1 := 12
-ft_x1 := 15
-ft_y2 := 18
-ft_x2 := 21
+tri_y0 := tri_frame_offset + 6
+tri_x0 := tri_frame_offset + 9
+tri_y1 := tri_frame_offset + 12
+tri_x1 := tri_frame_offset + 15
+tri_y2 := tri_frame_offset + 18
+tri_x2 := tri_frame_offset + 21
 end if
 
-	ld	hl, gfy_VertLine
-_FillTriangle:
+tri_y_counter := tri_frame_offset - 3
+tri_sa        := tri_frame_offset - 6
+tri_sb        := tri_frame_offset - 9
+tri_dx02      := tri_frame_offset - 12
+tri_last      := tri_frame_offset - 15
+tri_dy02      := tri_frame_offset - 18
+tri_dx12      := tri_frame_offset - 21
+tri_dy01      := tri_frame_offset - 24
+tri_dx01      := tri_frame_offset - 27
+tri_dy12      := tri_frame_offset - 30
+
+; _FillTriangle_Start:
 	ld	(.line0), hl
 	ld	(.line1), hl
 	ld	(.line2), hl
 	push	ix
-	ld	ix, 0
+	ld	ix, -tri_frame_offset
 	add	ix, sp
-	lea	hl, ix - 39
-	ld	sp, hl
+	ld	sp, ix
+	or	a, a
 	sbc	hl, hl
-	ld	(ix - 15), hl
-	ld	(ix - 18), hl		; int sa = 0, sb = 0;
-	ld	hl, (ix + ft_y0)		; sort coordinates by y order (y2 >= y1 >= y0)
-	ld	de, (ix + ft_y1)		; if (y0 > y1)
+	ld	(ix + tri_sa), hl
+	ld	(ix + tri_sb), hl		; int sa = 0, sb = 0;
+	ld	hl, (ix + tri_y0)		; sort coordinates by y order (y2 >= y1 >= y0)
+	ld	de, (ix + tri_y1)		; if (y0 > y1)
 	call	_SignedCompare
 	jr	c, .cmp0
-	ld	hl, (ix + ft_y0)
-	ld	(ix + ft_y0), de
-	ld	(ix + ft_y1), hl
-	ld	hl, (ix + ft_x0)
-	ld	de, (ix + ft_x1)
-	ld	(ix + ft_x0), de
-	ld	(ix + ft_x1), hl
+	ld	hl, (ix + tri_y0)
+	ld	(ix + tri_y0), de
+	ld	(ix + tri_y1), hl
+	ld	hl, (ix + tri_x0)
+	ld	de, (ix + tri_x1)
+	ld	(ix + tri_x0), de
+	ld	(ix + tri_x1), hl
 .cmp0:
-	ld	hl, (ix + ft_y1)
-	ld	de, (ix + ft_y2)
+	ld	hl, (ix + tri_y1)
+	ld	de, (ix + tri_y2)
 	call	_SignedCompare
 	jr	c, .cmp1
-	ld	hl, (ix + ft_y1)
-	ld	(ix + ft_y1), de
-	ld	(ix + ft_y2), hl
-	ld	hl, (ix + ft_x1)
-	ld	de, (ix + ft_x2)
-	ld	(ix + ft_x1), de
-	ld	(ix + ft_x2), hl
+	ld	hl, (ix + tri_y1)
+	ld	(ix + tri_y1), de
+	ld	(ix + tri_y2), hl
+	ld	hl, (ix + tri_x1)
+	ld	de, (ix + tri_x2)
+	ld	(ix + tri_x1), de
+	ld	(ix + tri_x2), hl
 .cmp1:
-	ld	hl, (ix + ft_y0)
-	ld	de, (ix + ft_y1)
+	ld	hl, (ix + tri_y0)
+	ld	de, (ix + tri_y1)
 	call	_SignedCompare
 	jr	c, .cmp2
-	ld	hl, (ix + ft_y0)
-	ld	(ix + ft_y0), de
-	ld	(ix + ft_y1), hl
-	ld	hl, (ix + ft_x0)
-	ld	de, (ix + ft_x1)
-	ld	(ix + ft_x0), de
-	ld	(ix + ft_x1), hl
+	ld	hl, (ix + tri_y0)
+	ld	(ix + tri_y0), de
+	ld	(ix + tri_y1), hl
+	ld	hl, (ix + tri_x0)
+	ld	de, (ix + tri_x1)
+	ld	(ix + tri_x0), de
+	ld	(ix + tri_x1), hl
 .cmp2:
-	ld	de, (ix + ft_y2)		; if(y0 == y2) - handle awkward all-on-same-line case as its own thing
-	ld	hl, (ix + ft_y0)
+	ld	hl, (ix + tri_y2)		; if (y0 == y2) - handle awkward all-on-same-line case as its own thing
+	ld	bc, (ix + tri_y0)
 	or	a, a
-	sbc	hl, de
+	sbc	hl, bc
+	ld	de, (ix + tri_x0)		; x0
+	ld	hl, (ix + tri_x1)		; x1
 	jr	nz, .notflat
-	ld	bc, (ix + ft_x0)		; x0
-	ld	(ix - 6), bc		; a = x0
-	ld	(ix - 3), bc		; b = x0;
-	ld	hl, (ix + ft_x1)		; if (x1 < a) { a = x1; }
-	or	a, a
-	sbc	hl, bc
-	jp	p, .cmp00
-	jp	pe, .cmp01
-	jr	.cmp02
-.cmp00:
-	jp	po, .cmp01
-.cmp02:
-	ld	bc, (ix + ft_x1)
-	ld	(ix-3), bc
-	jr	.cmp11
-.cmp01:
-	ld	bc, (ix + ft_x1)
-	ld	hl, (ix - 6)
-	or	a, a
-	sbc	hl, bc			; else if (x1 > b) { b = x1; }
-	jp	p, .cmp10
-	jp	pe, .cmp11
-	jr	.cmp12
-.cmp10:
-	jp	po, .cmp11
-.cmp12:
-	ld	bc, (ix + ft_x1)
-	ld	(ix - 6), bc
-.cmp11:
-	ld	bc, (ix - 3)
-	ld	hl, (ix + ft_x2)
-	or	a, a
-	sbc	hl, bc			; if (x2 < a) { a = x2; }
-	jp	p, .cmp20
-	jp	pe, .cmp21
-	jr	.cmp22
-.cmp20:
-	jp	po, .cmp21
-.cmp22:
-	ld	bc, (ix + ft_x2)
-	ld	(ix-3), bc
-	jr	.cmp31
-.cmp21:
-	ld	bc, (ix + ft_x2)
-	ld	hl, (ix - 6)
-	or	a, a
-	sbc	hl, bc			; else if (x2 > b) { b = x2; }
-	jp	p, .cmp30
-	jp	pe, .cmp31
-	jr	.cmp32
-.notflat:
-	ld	bc, (ix + ft_x0)		; x0
-	ld	hl, (ix + ft_x1)
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 36), hl		; dx01 = x1 - x0;
-	ld	hl, (ix + ft_x2)
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 21), hl		; dx02 = x2 - x0;
-	ld	bc, (ix + ft_y0)		; y0
-	ld	hl, (ix + ft_y1)
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 33), hl		; dy01 = y1 - y0;
-	ld	hl, (ix + ft_y2)
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 27), hl		; dy02 = y2 - y0;
-	ld	bc, (ix + ft_x1)
-	ld	hl, (ix + ft_x2)
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 30), hl		; dx12 = x2 - x1;
-	ld	bc, (ix + ft_y1)
-	ld	hl, (ix + ft_y2)
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 39), hl		; dy12 = y2 - y1;
-	jr	nz, .elselast		; if (y1 == y2) { last = y1; }
-	ld	(ix - 24), bc
-	jr	.sublast
-.cmp30:
-	jp	po, .cmp31
-.cmp32:
-	ld	bc, (ix + ft_x2)
-	ld	(ix - 6), bc
-.cmp31:
-	ld	de, (ix - 3)
-	ld	hl, (ix - 6)
+;-------------------------------------------------------------------------------
+	; draw a flat horizontal triangle
+	; x_min = min(x0, x1, x2)
+	; x_max = max(x0, x1, x2)
+	; horizline(x_min, y0, x_max - x_min + 1)
+	; DE = x0, HL = x1, BC = y0
+	call	_Minimum.no_carry
+	ld	de, (ix + tri_x2)	; x2
+	call	_Minimum
+	push	hl		; x_min
+	ld	hl, (ix + tri_x0)	; x0
+	ld	de, (ix + tri_x1)	; x1
+	call	_Maximum
+	ld	de, (ix + tri_x2)	; x2
+	call	_Maximum
+	pop	de		; x_min
 	or	a, a
 	sbc	hl, de
 	inc	hl
-if 0
-	push	hl
-	ld	bc, (ix + ft_y0)
-	push	bc
-	push	de
-else
-	push	hl	; len
-	ld	bc, (ix + ft_y0)
-	push	de	; x
-	push	bc	; y
-end if
-	call	0			; horizline(a, y0, b-a+1);
+	push	hl		; x_max - x_min + 1
+	push	de		; x_min
+	push	bc		; y0
+	call	0		; horizline(x_min, y0, x_max - x_min + 1)
 .line0 := $-3
-	pop	bc
-	pop	bc
-	pop	bc
-	ld	sp, ix
+	lea	hl, ix + tri_frame_offset
+	ld	sp, hl
 	pop	ix
-	ret				; return;
-.elselast:
-	ld	bc, (ix + ft_y1)		; else { last = y1-1; }
+	ret
+;-------------------------------------------------------------------------------
+.notflat:
+	or	a, a
+	sbc	hl, de
+	ld	(ix + tri_dx01), hl		; dx01 = x1 - x0;
+	ld	hl, (ix + tri_x2)
+	or	a, a
+	sbc	hl, de
+	ld	(ix + tri_dx02), hl		; dx02 = x2 - x0;
+
+	ld	de, (ix + tri_y0)		; y0
+	ld	hl, (ix + tri_y1)
+	or	a, a
+	sbc	hl, de
+	ld	(ix + tri_dy01), hl		; dy01 = y1 - y0;
+	ld	hl, (ix + tri_y2)
+	or	a, a
+	sbc	hl, de
+	ld	(ix + tri_dy02), hl		; dy02 = y2 - y0;
+
+	ld	de, (ix + tri_x1)
+	ld	hl, (ix + tri_x2)
+	or	a, a
+	sbc	hl, de
+	ld	(ix + tri_dx12), hl		; dx12 = x2 - x1;
+
+	ld	bc, (ix + tri_y1)
+	ld	hl, (ix + tri_y2)
+	or	a, a
+	sbc	hl, bc
+	ld	(ix + tri_dy12), hl		; dy12 = y2 - y1;
+	; if (y1 == y2) { last = y1; }
+	jr	z, .sublast
+	; else { last = y1-1; }
 	dec	bc
-	ld	(ix - 24), bc
 .sublast:
-	ld	bc, (ix + ft_y0)
-	ld	(ix - 12), bc		; for (y = y0; y <= last; y++)
+	ld	(ix + tri_last), bc
+	ld	bc, (ix + tri_y0)
+	ld	(ix + tri_y_counter), bc		; for (y = y0; y <= last; y++)
 	jr	.firstloopstart
+;-------------------------------------------------------------------------------
+.cmp50:
+	jp	pe, .firstloopfinish
 .firstloop:
-	ld	hl, (ix - 15)
-	ld	bc, (ix - 33)
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dy01)
 	call	_DivideHLBC
-	ld	bc, (ix + ft_x0)
+	ld	bc, (ix + tri_x0)
 	add	hl, bc
-	ld	(ix - 3), hl		; a = x0 + sa / dy01;
-	ld	hl, (ix - 18)
-	ld	bc, (ix - 27)
+	push	hl	; a = x0 + sa / dy01;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dy02)
 	call	_DivideHLBC
-	ld	bc, (ix + ft_x0)
+	ld	bc, (ix + tri_x0)
 	add	hl, bc
-	ld	(ix - 6), hl		; b = x0 + sb / dy02;
-	ld	bc, (ix - 36)
-	ld	hl, (ix - 15)
+	push	hl	; b = x0 + sb / dy02;
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dx01)
 	add	hl, bc
-	ld	(ix - 15), hl		; sa += dx01;
-	ld	bc, (ix - 21)
-	ld	hl, (ix - 18)
+	ld	(ix + tri_sa), hl	; sa += dx01;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dx02)
 	add	hl, bc
-	ld	(ix - 18), hl		; sb += dx02;
-	ld	de, (ix - 3)
-	ld	hl, (ix - 6)
+	ld	(ix + tri_sb), hl	; sb += dx02;
+	pop	hl	; HL = b
+	pop	de	; DE = a
 	or	a, a
 	sbc	hl, de			; if (b < a) { swap(a, b); }
-	jp	p, .cmp40
-	jp	pe, .cmp41
-	jr	.cmp42
-.cmp40:
-	jp	po, .cmp41
-.cmp42:
-	ld	hl, (ix - 3)
-	ld	de, (ix - 6)
-	ld	(ix - 3), de
-	ld	(ix - 6), hl
-.cmp41:
-	ld	hl, (ix - 6)
+	add	hl, de
+	jp	p, .cmp43
+	ex	de, hl
+.cmp43:
+	jp	po, .cmp44
+	ex	de, hl
+.cmp44:
 	or	a, a
 	sbc	hl, de
 	inc	hl
-if 0
-	push	hl
-	ld	bc, (ix - 12)
-	push	bc
-	push	de
-else
 	push	hl	; len
-	ld	bc, (ix - 12)
 	push	de	; x
+	ld	bc, (ix + tri_y_counter)
 	push	bc	; y
-end if
 	call	0			; horizline(a, y, b-a+1);
 .line1 := $-3
-	pop	bc
-	pop	bc
-	pop	bc
-	ld	bc, (ix - 12)
+	ld	sp, ix
+	ld	bc, (ix + tri_y_counter)
 	inc	bc
-	ld	(ix - 12), bc
+	ld	(ix + tri_y_counter), bc
 .firstloopstart:
-	ld	hl, (ix - 24)
+	ld	hl, (ix + tri_last)
 	or	a, a
 	sbc	hl, bc
 	jp	p, .cmp50
 	jp	pe, .firstloop
-	jr	.cmp52
-.cmp50:
-	jp	po, .firstloop
-.cmp52:
-	ld	bc, (ix + ft_y1)
-	ld	hl, (ix - 12)
+.firstloopfinish:
+	ld	bc, (ix + tri_y1)
+	ld	hl, (ix + tri_y_counter)
 	or	a, a
 	sbc	hl, bc
-	ld	de, (ix - 30)
+	ld	de, (ix + tri_dx12)
 	call	_MultiplyHLDE		; sa = dx12 * (y - y1);
-	ld	(ix - 15), hl
-	ld	bc, (ix + ft_y0)
-	ld	hl, (ix - 12)
+	ld	(ix + tri_sa), hl
+	ld	bc, (ix + tri_y0)
+	ld	hl, (ix + tri_y_counter)
 	or	a, a
 	sbc	hl, bc
-	ld	de, (ix - 21)
+	ld	de, (ix + tri_dx02)
 	call	_MultiplyHLDE		; sb = dx02 * (y - y0);
-	ld	(ix - 18), hl
+	ld	(ix + tri_sb), hl
+	ld	bc, (ix + tri_y_counter)
 	jr	.secondloopstart	; for(; y <= y2; y++)
+;-------------------------------------------------------------------------------
+.cmp70:
+	jp	pe, .secondloopfinish
 .secondloop:
-	ld	hl, (ix - 15)
-	ld	bc, (ix - 39)
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dy12)
 	call	_DivideHLBC
-	ld	bc, (ix + ft_x1)
+	ld	bc, (ix + tri_x1)
 	add	hl, bc
-	ld	(ix - 3), hl		; a = x1 + sa / dy12;
-	ld	hl, (ix - 18)
-	ld	bc, (ix - 27)
+	push	hl	; a = x1 + sa / dy12;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dy02)
 	call	_DivideHLBC
-	ld	bc, (ix + ft_x0)
+	ld	bc, (ix + tri_x0)
 	add	hl, bc
-	ld	(ix - 6), hl		; b = x0 + sb / dy02;
-	ld	bc, (ix - 30)
-	ld	hl, (ix - 15)
+	push	hl	; b = x0 + sb / dy02;
+	ld	hl, (ix + tri_sa)
+	ld	bc, (ix + tri_dx12)
 	add	hl, bc
-	ld	(ix - 15), hl		; sa += dx12;
-	ld	bc, (ix - 21)
-	ld	hl, (ix - 18)
+	ld	(ix + tri_sa), hl	; sa += dx12;
+	ld	hl, (ix + tri_sb)
+	ld	bc, (ix + tri_dx02)
 	add	hl, bc
-	ld	(ix - 18), hl		; sb += dx02;
-	ld	de, (ix - 3)
-	ld	hl, (ix - 6)
+	ld	(ix + tri_sb), hl	; sb += dx02;
+	pop	hl	; HL = b
+	pop	de	; DE = a
 	or	a, a
 	sbc	hl, de			; if (b < a) { swap(a, b); }
-	jp	p, .cmp60
-	jp	pe, .cmp61
-	jr	.cmp62
-.cmp60:
-	jp	po, .cmp61
-.cmp62:
-	ld	hl, (ix - 3)
-	ld	de, (ix - 6)
-	ld	(ix-3), de
-	ld	(ix-6), hl
-.cmp61:
-	ld	hl, (ix - 6)
+	add	hl, de
+	jp	p, .cmp63
+	ex	de, hl
+.cmp63:
+	jp	po, .cmp64
+	ex	de, hl
+.cmp64:
 	or	a, a
 	sbc	hl, de
 	inc	hl
-if 0
-	push	hl
-	ld	bc, (ix - 12)
-	push	bc
-	push	de
-else
 	push	hl	; len
-	ld	bc, (ix - 12)
 	push	de	; x
+	ld	bc, (ix + tri_y_counter)
 	push	bc	; y
-end if
 	call	0			; horizline(a, y, b-a+1);
 .line2 := $-3
-	pop	bc
-	pop	bc
-	pop	bc
-	ld	bc, (ix - 12)
+	ld	sp, ix
+	ld	bc, (ix + tri_y_counter)
 	inc	bc
-	ld	(ix - 12), bc
+	ld	(ix + tri_y_counter), bc
 .secondloopstart:
-	ld	bc, (ix - 12)
-	ld	hl, (ix + ft_y2)
+	ld	hl, (ix + tri_y2)
 	or	a, a
 	sbc	hl, bc
 	jp	p, .cmp70
 	jp	pe, .secondloop
-	ld	sp, ix
-	pop	ix
-	ret
-.cmp70:
-	jp	po, .secondloop
-	ld	sp, ix
+.secondloopfinish:
+	lea	hl, ix + tri_frame_offset
+	ld	sp, hl
 	pop	ix
 	ret
 
@@ -4872,7 +4810,7 @@ gfy_RotatedScaledTransparentSprite_NoClip: ; MODIFIED_FROM_GRAPHX
 ;  arg4 : Scale factor (64 = 100%)
 ; Returns:
 ;  The size of the sprite after scaling
-	ld	h, $21	; ld hl, *
+	ld	h, $11	; ld de, *
 	db	$FD	; ld h, * --> ld iyh, *
 ;-------------------------------------------------------------------------------
 gfy_RotatedScaledTransparentSprite: ; MODIFIED_FROM_GRAPHX
@@ -4992,9 +4930,10 @@ _RSS_NC:
 	ld	b, a	; render height
 	ld	c, a	; render width
 
-	; changes from call * to ld hl, *
+	; changes from call * to ld de, *
 	.dsrs_clip_call := $+0
 	call	_RotatedScaled_ClipAdjust
+	; UHL is zero
 
 	ld	(iy + (.dsrs_size_1 - .dsrs_base_address)), b	; write smc
 
@@ -5012,7 +4951,7 @@ _RSS_NC:
 	call	_set_DE_to_HL_mul_B
 	ld	hl, (iy + (.dsrs_sinf_1_plus_offset_ix - .dsrs_base_address))
 	or	a, a
-	sbc.s	hl, de	; make sure UHL is zero
+	sbc	hl, de
 	ld	(iy + (.dsrs_sinf_1_plus_offset_ix - .dsrs_base_address)), hl
 
 	; calculate y-loop offset for HL
@@ -5174,10 +5113,9 @@ smcByte _TransparentColor
 ;-------------------------------------------------------------------------------
 _rss_not_culled:
 	; offscreen
-	ld	a, iyh	; sprite out size (iyh/height should remain untouched)
 	ld	sp, ix
-	pop	ix
-	ret
+	jr	_RSS_NC.finish
+
 _RotatedScaled_ClipAdjust:
 ; modified version of _ClipCoordinates
 	push	iy
@@ -5319,7 +5257,7 @@ smcByte _YMin
 	; DE = HL * C(width)
 	call	_set_DE_to_HL_mul_B
 	pop	hl
-	add.s	hl, de	; make sure UHL is zero
+	add.s	hl, de	; make sure UHL is zero when returning from this function
 	; ld	(iy + (_RSS_NC.dsrs_size128_0_plus_dyc_0 - _RSS_NC.dsrs_base_address)), hl
 	ld	(ix - 12), hl	; dsrs_size128_0_plus_dyc_0
 
@@ -5416,7 +5354,7 @@ gfy_RotateScaleSprite: ; MODIFIED_FROM_GRAPHX
 	sbc	hl, hl
 	ld	h, b
 	; BC = size * scale
-	mlt	bc
+	mlt	bc	; UBC cleared
 	; HL = size / 2
 	srl	h
 	; rr	l
@@ -5492,6 +5430,27 @@ gfy_RotateScaleSprite: ; MODIFIED_FROM_GRAPHX
 	jr	drawSpriteRotateScale_Begin
 
 ;-------------------------------------------------------------------------------
+
+drawSpriteRotateScale_SkipPixel:
+	ex	de, hl
+	ld	(hl), TRASPARENT_COLOR	; write pixel
+smcByte _TransparentColor
+	ex	de, hl
+	inc	de			; x++s
+
+	ld	bc, 0			; smc = -sinf
+_smc_dsrs_sinf_0B := $-3
+	add	hl, bc			; ys += -sinf
+
+	ld	bc, 0			; smc = cosf
+_smc_dsrs_cosf_0B := $-3
+	add	ix, bc			; xs += cosf
+
+	dec	iyl
+	jr	nz, _xloop		; x loop
+	; We are here because the right edge of the sprite was transparent.
+	dec	iyh
+	jr	z, drawSpriteRotateScale_Finish		; y loop
 _yloop:
  	ld	bc, $000000		; smc = cosf
 _smc_dsrs_cosf_1_plus_offset_hl := $-3
@@ -5542,30 +5501,7 @@ _smc_dsrs_cosf_0A := $-3
 
 	dec	iyh
 	jr	nz, _yloop		; y loop
-	pop	hl			; sprite out ptr
-	pop	ix
-	ret
-
-drawSpriteRotateScale_SkipPixel:
-	ex	de, hl
-	ld	(hl), TRASPARENT_COLOR	; write pixel
-smcByte _TransparentColor
-	ex	de, hl
-	inc	de			; x++s
-
-	ld	bc, 0			; smc = -sinf
-_smc_dsrs_sinf_0B := $-3
-	add	hl, bc			; ys += -sinf
-
-	ld	bc, 0			; smc = cosf
-_smc_dsrs_cosf_0B := $-3
-	add	ix, bc			; xs += cosf
-
-	dec	iyl
-	jr	nz, _xloop		; x loop
-	; We are here because the right edge of the sprite was transparent.
-	dec	iyh
-	jr	nz, _yloop		; y loop
+drawSpriteRotateScale_Finish:
 	pop	hl			; sprite out ptr
 	pop	ix
 	ret
