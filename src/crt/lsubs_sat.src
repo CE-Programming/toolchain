@@ -1,0 +1,27 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__lsubs_sat
+	.type	__lsubs_sat, @function
+
+__lsubs_sat:
+	; signed saturated subtraction
+	; E:UHL = E:UHL - A:UBC
+	push	bc
+	or	a, a
+	sbc	hl, bc
+	ld	c, a
+	ld	a, e
+	sbc	a, c
+	ld	e, a
+	ld	a, c
+	pop	bc
+	ret	po
+	ld	hl, $000000
+	ld	e, $80
+	ret	p		; negative underflow
+	; positive overflow
+	dec	hl
+	dec	e
+	ret

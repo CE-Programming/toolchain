@@ -1,0 +1,24 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__lsubu_sat
+	.type	__lsubu_sat, @function
+
+__lsubu_sat:
+	; unsigned saturated subtraction
+	; E:UHL = E:UHL - A:UBC
+	push	bc
+	or	a, a
+	sbc	hl, bc
+	ld	c, a
+	ld	a, e
+	sbc	a, c
+	ld	e, a
+	ld	a, c
+	pop	bc
+	ret	nc
+	or	a, a
+	sbc	hl, hl
+	ld	e, l
+	ret

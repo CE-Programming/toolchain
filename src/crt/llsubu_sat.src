@@ -1,0 +1,35 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__llsubu_sat
+	.type	__llsubu_sat, @function
+
+__llsubu_sat:
+	; unsigned saturated subtraction
+	; BC:UDE:UHL = BC:UDE:UHL - (SP)
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	ld	bc, (iy + 6)
+	sbc	hl, bc
+	ex	de, hl
+	ld	bc, (iy + 9)
+	sbc	hl, bc
+	ex	de, hl
+	ex	(sp), hl
+	ld	bc, (iy + 12)
+	sbc.s	hl, bc
+	ld	c, l
+	ld	b, h
+	pop	hl
+	pop	iy
+	ret	nc
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	b, l
+	ld	c, l
+	ret

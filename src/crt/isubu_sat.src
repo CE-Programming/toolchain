@@ -1,0 +1,16 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__isubu_sat
+	.type	__isubu_sat, @function
+
+__isubu_sat:
+	; unsigned saturated subtraction
+	; UHL = UHL - UBC
+	or	a, a
+	sbc	hl, bc
+	ret	nc
+	or	a, a
+	sbc	hl, hl
+	ret

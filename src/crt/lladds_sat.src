@@ -1,0 +1,39 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__lladds_sat
+	.type	__lladds_sat, @function
+
+__lladds_sat:
+	; signed saturated addition
+	; BC:UDE:UHL = BC:UDE:UHL + (SP)
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	ld	bc, (iy + 6)
+	add	hl, bc
+	ex	de, hl
+	ld	bc, (iy + 9)
+	adc	hl, bc
+	ex	de, hl
+	ex	(sp), hl
+	ld	bc, (iy + 12)
+	adc.s	hl, bc
+	ld	c, l
+	ld	b, h
+	pop	hl
+	pop	iy
+	ret	po
+	ld	hl, $FFFFFF
+	push	hl
+	pop	de
+	ld	c, l
+	ld	b, $7F
+	ret	m		; positive overflow
+	; negative underflow
+	inc	hl
+	inc	de
+	inc	bc
+	ret
