@@ -827,8 +827,8 @@ ti_Rewind:
 	or	a, a
 	sbc	hl, hl
 	ret
-	scf
 .ret_neg_one:
+	scf
 	sbc	hl, hl
 	ret
 
@@ -850,6 +850,7 @@ ti_Tell:
 	pop	hl
 	ret
 .ret_neg_one:
+	scf
 	sbc	hl, hl
 	ret
 
@@ -871,6 +872,7 @@ ti_GetSize:
 	pop	hl
 	ret
 .ret_neg_one:
+	scf
 	sbc	hl, hl
 	ret
 
