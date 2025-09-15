@@ -1,0 +1,132 @@
+	assume	adl=1
+
+; fminf and fmaxf treat signed zeros as -0.0f < +0.0f.
+;
+; The same result will be returned no matter the order of the arguments unless
+; both arguments are NaN.
+;
+; If both values are NaN, a NaN value will be returned. However, it is
+; unspecified whether the first, second, or a different NaN is returned.
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	_fminf
+	public	_fmin
+
+_fmin:
+_fminf:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, $010000
+	ld	de, (iy + 4)	; upper 24 bits of X
+	ld	hl, (iy + 10)	; upper 24 bits of Y
+	xor	a, a
+	add	hl, hl	; Y
+	adc	a, b
+	ex	de, hl
+	add	hl, hl	; X
+	sbc	a, b
+	; (X+, Y+): A =  0 NC  Z ; compare
+	; (X-, Y-): A =  0 NC  Z ; invert compare
+	; (X-, Y+): A = -1  C NZ ; X < Y
+	; (X+, Y-): A = +1 NC NZ ; X > Y
+	jr	nz, .different_sign
+; .same_sign:
+	sbc	hl, de		; X - Y
+	add	hl, de
+	jr	nz, .x_and_y_diff
+	ld	a, (iy + 3)
+	cp	a, (iy + 9)
+.x_and_y_diff:
+	sbc	a, a
+	xor	a, (iy + 6)	; invert the comparison
+	add	a, a
+.different_sign:
+	jr	c, _fminmaxf_common.no_swap
+; .swap:
+	ex	de, hl
+	add	hl, bc		; overflows for NaN and Inf
+	jr	c, _fminmaxf_common.y_maybe_NaN
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	private	_fminmaxf_common.no_swap
+	private	_fminmaxf_common.y_maybe_NaN
+
+_fminmaxf_common:
+.return_y:
+	ld	hl, (iy + 9)
+	ld	e, (iy + 12)
+	ret
+
+.y_maybe_NaN:
+	ld	a, l
+	or	a, h
+	or	a, (iy + 9)
+	jr	z, .return_y	; infinity
+	; jr	.return_x
+
+.no_swap:
+	add	hl, bc		; overflows for NaN and Inf
+	jr	c, .x_maybe_NaN
+.return_x:
+	ld	hl, (iy + 3)
+	ld	e, (iy + 6)
+	ret
+
+.x_maybe_NaN:
+	ld	a, l
+	or	a, h
+	or	a, (iy + 3)
+	jr	z, .return_x	; infinity
+	jr	.return_y
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	_fmaxf
+	public	_fmax
+
+_fmax:
+_fmaxf:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, $010000
+	ld	de, (iy + 4)	; upper 24 bits of X
+	ld	hl, (iy + 10)	; upper 24 bits of Y
+	xor	a, a
+	add	hl, hl	; Y
+	adc	a, b
+	ex	de, hl
+	add	hl, hl	; X
+	sbc	a, b
+	; (X+, Y+): A =  0 NC  Z ; compare
+	; (X-, Y-): A =  0 NC  Z ; invert compare
+	; (X-, Y+): A = -1  C NZ ; X < Y
+	; (X+, Y-): A = +1 NC NZ ; X > Y
+	jr	nz, .different_sign
+; .same_sign:
+	sbc	hl, de		; X - Y
+	add	hl, de
+	jr	nz, .x_and_y_diff
+	ld	a, (iy + 3)
+	cp	a, (iy + 9)
+.x_and_y_diff:
+	sbc	a, a
+	xor	a, (iy + 6)	; invert the comparison
+	add	a, a
+.different_sign:
+	jr	nc, _fminmaxf_common.no_swap
+; .swap:
+	ex	de, hl
+	add	hl, bc		; overflows for NaN and Inf
+	jr	c, _fminmaxf_common.y_maybe_NaN
+.return_y:
+	ld	hl, (iy + 9)
+	ld	e, (iy + 12)
+	ret
