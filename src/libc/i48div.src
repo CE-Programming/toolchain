@@ -2,7 +2,31 @@
 
 	section	.text
 
-;	public	_i48div
+	public	_i48div
 
 ; i48div_t i48div(int48_t numer, int48_t denom);
-; _i48div:
+_i48div:
+	; TODO: __i48dvrmu is called twice here
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	ld	hl, (ix + 9)
+	ld	de, (ix + 12)
+	ld	bc, (ix + 15)
+	ld	iy, (ix + 18)
+	ld	ix, (ix + 6)
+	push	hl
+	push	de
+	call	__i48divs
+	ld	(ix + 0), hl
+	ld	(ix + 3), de
+	pop	de
+	pop	hl
+	call	__i48rems
+	ld	(ix + 6), hl
+	ld	(ix + 9), de
+	pop	ix
+	ret
+
+	extern	__i48divs
+	extern	__i48rems
