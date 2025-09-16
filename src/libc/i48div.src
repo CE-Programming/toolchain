@@ -6,27 +6,37 @@
 
 ; i48div_t i48div(int48_t numer, int48_t denom);
 _i48div:
-	; TODO: __i48dvrmu is called twice here
 	push	ix
 	ld	ix, 0
 	add	ix, sp
+	ld	c, (ix + 14)
+	ld	b, (ix + 20)
+	ld	a, c
+	xor	a, b
+	ld	a, c
+	push	af
+	rla
 	ld	hl, (ix + 9)
 	ld	de, (ix + 12)
+	call	c, __i48neg
+	ld	a, b
+	rla
 	ld	bc, (ix + 15)
 	ld	iy, (ix + 18)
+	call	c, __uiyubcNeg
+	call	__i48dvrmu
 	ld	ix, (ix + 6)
-	push	hl
-	push	de
-	call	__i48divs
+	pop	af
+	call	m, __i48neg
 	ld	(ix + 0), hl
 	ld	(ix + 3), de
-	pop	de
-	pop	hl
-	call	__i48rems
-	ld	(ix + 6), hl
-	ld	(ix + 9), de
+	rla
+	call	c, __uiyubcNeg
+	ld	(ix + 6), bc
+	ld	(ix + 9), iy
 	pop	ix
 	ret
 
-	extern	__i48divs
-	extern	__i48rems
+	extern	__i48dvrmu
+	extern	__i48neg
+	extern	__uiyubcNeg
