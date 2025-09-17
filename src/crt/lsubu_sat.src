@@ -8,17 +8,11 @@
 __lsubu_sat:
 	; unsigned saturated subtraction
 	; E:UHL = E:UHL - A:UBC
-	push	bc
-	or	a, a
-	sbc	hl, bc
-	ld	c, a
-	ld	a, e
-	sbc	a, c
-	ld	e, a
-	ld	a, c
-	pop	bc
+	call	__lsubu_overflow
 	ret	nc
 	or	a, a
 	sbc	hl, hl
 	ld	e, l
 	ret
+
+	.extern	__lsubu_overflow

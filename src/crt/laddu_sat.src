@@ -8,14 +8,10 @@
 __laddu_sat:
 	; unsigned saturated addition
 	; E:UHL = E:UHL + A:UBC
-	push	bc
-	add	hl, bc
-	ld	c, a
-	adc	a, e
-	ld	e, a
-	ld	a, c
-	pop	bc
+	call	__laddu_overflow
 	ret	nc
 	sbc	hl, hl
 	ld	e, l
 	ret
+
+	.extern	__laddu_overflow

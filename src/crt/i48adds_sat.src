@@ -8,18 +8,15 @@
 __i48adds_sat:
 	; signed saturated addition
 	; UDE:UHL = UDE:UHL + UIY:UBC
-	add	hl, bc
-	ex	de, hl
-	push	bc
-	lea	bc, iy + 0
-	adc	hl, bc
-	pop	bc
-	ex	de, hl
+	call	__i48adds_overflow
 	ret	po
-	ld	hl, $FFFFFF
-	ld	de, $7FFFFF
-	ret	m		; positive overflow
-	; negative underflow
-	inc	hl
-	inc	de
+	ex	de, hl
+	add	hl, hl
+	sbc	hl, hl
+	ld	de, $800000
+	ret	nc		; negative underflow
+	; positive overflow
+	dec	de
 	ret
+
+	.extern	__i48adds_overflow

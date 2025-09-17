@@ -6,9 +6,24 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__i48add
 	.type	__i48add, @function
 
+	.global	__i48addu_overflow
+	.type	__i48addu_overflow, @function
+
+	.global	__i48subs_overflow
+	.type	__i48subs_overflow, @function
+
+__i48addu_overflow:
+	; returned flags:
+	; NC : no unsigned overflow
+	; C  : unsigned overflow occured
+__i48adds_overflow:
+	; returned flags:
+	; PO : no signed overflow
+	; PE : signed overflow occured
 __i48add:
 ; CC: 11 bytes | 12F + 6R + 3W + 1
 	add	hl, bc

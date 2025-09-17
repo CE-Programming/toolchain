@@ -8,32 +8,17 @@
 __llsubs_sat:
 	; signed saturated subtraction
 	; BC:UDE:UHL = BC:UDE:UHL - (SP)
-	push	iy
-	ld	iy, 0
-	add	iy, sp
-	push	bc
-	ld	bc, (iy + 6)
-	sbc	hl, bc
-	ex	de, hl
-	ld	bc, (iy + 9)
-	sbc	hl, bc
-	ex	de, hl
-	ex	(sp), hl
-	ld	bc, (iy + 12)
-	sbc.s	hl, bc
-	ld	c, l
-	ld	b, h
-	pop	hl
-	pop	iy
+	call	__llsubs_overflow
 	ret	po
-	ld	hl, $000000
-	push	hl
-	pop	de
+	sla	b
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
 	ld	c, l
 	ld	b, $80
-	ret	m		; negative underflow
+	ret	nc		; negative underflow
 	; positive overflow
-	dec	hl
-	dec	de
-	dec	bc
+	dec	b
 	ret
+
+	.extern	__llsubs_overflow

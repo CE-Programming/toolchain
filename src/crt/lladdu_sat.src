@@ -8,24 +8,7 @@
 __lladdu_sat:
 	; unsigned saturated addition
 	; BC:UDE:UHL = BC:UDE:UHL + (SP)
-	push	iy
-	ld	iy, 0
-	add	iy, sp
-	push	bc
-	ld	bc, (iy + 6)
-	add	hl, bc
-	ex	de, hl
-	ld	bc, (iy + 9)
-	adc	hl, bc
-	ex	de, hl
-	pop	bc
-	jr	nc, .nc48
-	inc	bc
-.nc48:
-	ld	iy, (iy + 12)
-	add.s	iy, bc
-	lea	bc, iy + 0
-	pop	iy
+	call	__lladdu_overflow
 	ret	nc
 	sbc	hl, hl
 	ex	de, hl
@@ -33,3 +16,5 @@ __lladdu_sat:
 	ld	b, l
 	ld	c, l
 	ret
+
+	.extern	__lladdu_overflow

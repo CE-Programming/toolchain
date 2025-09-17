@@ -8,32 +8,17 @@
 __lladds_sat:
 	; signed saturated addition
 	; BC:UDE:UHL = BC:UDE:UHL + (SP)
-	push	iy
-	ld	iy, 0
-	add	iy, sp
-	push	bc
-	ld	bc, (iy + 6)
-	add	hl, bc
-	ex	de, hl
-	ld	bc, (iy + 9)
-	adc	hl, bc
-	ex	de, hl
-	ex	(sp), hl
-	ld	bc, (iy + 12)
-	adc.s	hl, bc
-	ld	c, l
-	ld	b, h
-	pop	hl
-	pop	iy
+	call	__lladds_overflow
 	ret	po
-	ld	hl, $FFFFFF
-	push	hl
-	pop	de
+	sla	b
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
 	ld	c, l
-	ld	b, $7F
-	ret	m		; positive overflow
-	; negative underflow
-	inc	hl
-	inc	de
-	inc	bc
+	ld	b, $80
+	ret	nc		; negative underflow
+	; positive overflow
+	dec	b
 	ret
+
+	.extern	__lladds_overflow

@@ -8,18 +8,14 @@
 __ladds_sat:
 	; signed saturated addition
 	; E:UHL = E:UHL + A:UBC
-	push	bc
-	add	hl, bc
-	ld	c, a
-	adc	a, e
-	ld	e, a
-	ld	a, c
-	pop	bc
+	call	__ladds_overflow
 	ret	po
-	ld	e, $7F
-	ld	hl, $FFFFFF
-	ret	m		; positive overflow
-	; negative underflow
-	inc	hl
-	inc	e
+	sla	e
+	sbc	hl, hl
+	ld	e, $80
+	ret	nc		; negative underflow
+	; positive overflow
+	dec	e
 	ret
+
+	.extern	__ladds_overflow
