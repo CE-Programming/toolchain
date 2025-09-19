@@ -426,7 +426,7 @@ ti_SetArchiveStatus:
 ;  sp + 3 : boolean value
 ;  sp + 6 : slot index
 ; return:
-;  n/a
+;  hl = 0 if failure
 	pop	hl
 	pop	de
 	pop	bc
@@ -540,6 +540,11 @@ ti_Write:
 	ret
 
 util_get_data_offset:
+; output:
+;  HL = data_ptr + offset + 2
+;  BC = offset
+; destroyed:
+;  A
 	call	util_get_data_ptr
 	ld	hl, (hl)
 	push	hl
@@ -882,7 +887,7 @@ ti_Close:
 ; args:
 ;  sp + 3 : slot index
 ; return:
-;  n/a
+;  hl = 0 if failure
 	pop	de
 	pop	bc
 	push	bc
@@ -1059,7 +1064,9 @@ ti_Detect:
 ti_GetTokenString:
 ; return pointer to next token string
 ; args:
-;  sp + 3 : slot index
+;  sp + 3 : pointer to token string
+;  sp + 6 : pointer token length
+;  sp + 9 : pointer to string length
 ; return:
 ;  hl -> os string to display
 	ld	iy, 0
@@ -1369,8 +1376,9 @@ ti_StoVar:
 ti_RclVar:
 ; gets a pointer to a variable data structure
 ; args:
-;  sp + 3 : pointer to variable name string
-;  sp + 6 : pointer to data structure pointer
+;  sp + 3 : variable type
+;  sp + 6 : pointer to variable name string
+;  sp + 9 : pointer to data structure pointer
 ; return:
 ;  a = type of variable
 	ld	iy, 0
@@ -1624,6 +1632,10 @@ util_is_slot_open:
 	ret
 
 util_get_vat_ptr:
+; output:
+;  HL = vat_ptr
+; destroyed:
+;  A
 	ld	a, (curr_slot)
 	ld	hl, vat_ptr0 		; vat_ptr0 = $d0244e
 	dec	a
@@ -1640,7 +1652,12 @@ util_get_vat_ptr:
 	ret	z
 	ld	l, $84			; vat_ptr4 = $d02584
 	ret
+
 util_get_data_ptr:
+; output:
+;  HL = data_ptr
+; destroyed:
+;  A
 	ld	a, (curr_slot)
 	ld	hl, data_ptr0		; data_ptr0 = $d0067e
 	dec	a
@@ -1656,7 +1673,10 @@ util_get_data_ptr:
 	ret	z
 	ld	l, $f9			; data_ptr4 = $d01ff9
 	ret
+
 util_get_offset_ptr:
+; output:
+;  HL = offset_ptr
 	push	bc
 	ld	hl, (curr_slot)
 	ld	h, 3
@@ -1665,7 +1685,14 @@ util_get_offset_ptr:
 	add	hl, bc
 	pop	bc
 	ret
+
 util_get_slot_size:
+; output:
+;  HL = data_ptr + 1
+;  BC = slot_size
+;  UBC = 0
+; destroyed:
+;  A
 	call	util_get_data_ptr
 	ld	hl, (hl)
 	ld	bc, 0
@@ -1673,11 +1700,20 @@ util_get_slot_size:
 	inc	hl
 	ld	b, (hl)
 	ret
+
 util_get_offset:
+; output:
+;  HL = offset_ptr
+;  BC = offset
 	call	util_get_offset_ptr
 	ld	bc, (hl)
 	ret
+
 util_set_offset:
+; input:
+;  BC = offset
+; output:
+;  HL = offset_ptr
 	call	util_get_offset_ptr
 	ld	(hl), bc
 	ret
