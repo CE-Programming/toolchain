@@ -365,7 +365,30 @@ int ti_IsArchived(uint8_t handle);
  * @warning Archiving a variable can cause a garbage collection cycle.
  * You should use ti_SetGCBehavior to catch this event.
  */
-int ti_SetArchiveStatus(bool archive, uint8_t handle);
+int ti_SetArchiveStatus(uint8_t archive, uint8_t handle);
+
+/**
+ * Moves an AppVar/variable between archive or RAM storage.
+ * \rst
+ *   +-------------+-----------------------------------------+
+ *   | **archive** | **Description**                         |
+ *   +-------------+-----------------------------------------+
+ *   | true        | Store AppVar/variable in archive.       |
+ *   +-------------+-----------------------------------------+
+ *   | false       | Store AppVar/variable in RAM.           |
+ *   +-------------+-----------------------------------------+
+ * \endrst
+ * @param[in] archive Documented in the above table.
+ * @param[in] handle AppVar/variable handle.
+ * @returns `0` on failure.
+ *
+ * @warning Archiving a variable can cause a garbage collection cycle.
+ * You should use ti_SetGCBehavior to catch this event.
+ *
+ * @note This macro wraps ti_SetArchiveStatus, and ensures that `archive` is
+ * passed into ti_SetArchiveStatus correctly.
+ */
+#define ti_SetArchiveStatus(archive, handle) ti_SetArchiveStatus((bool)(archive), (handle))
 
 /**
  * Deletes an AppVar.
