@@ -101,17 +101,8 @@ ti_AllocEqu:
 	ld	iy, 0
 	add	iy, sp
 	ld	hl, (iy + 3)
-	ld	iy, (iy + 6)
 	push	hl
-	inc	hl
-	inc	hl
-	call	ti._indcall
-	pop	de
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	dec	hl
-	ret
+	jr	util_alloc_string_equ
 
 ;-------------------------------------------------------------------------------
 ti_AllocCplxList:
@@ -124,7 +115,6 @@ ti_AllocCplxList:
 	ld	iy, 0
 	add	iy, sp
 	ld	hl, (iy + 3)
-	ld	iy, (iy + 6)
 	push	hl
 	add	hl, hl
 	jr	util_alloc_var
@@ -140,7 +130,6 @@ ti_AllocList:
 	ld	iy, 0
 	add	iy, sp
 	ld	hl, (iy + 3)
-	ld	iy, (iy + 6)
 	push	hl
 	jr	util_alloc_var
 
@@ -153,15 +142,16 @@ ti_AllocMatrix:
 ;  sp + 9 : pointer to alloc routine
 ; return:
 ;  hl -> allocated space
-	ld	iy, 0
+	ld	iy, 3
 	add	iy, sp
-	ld	h, (iy + 3)
-	ld	l, (iy + 6)
-	ld	iy, (iy + 9)
+	ld	h, (iy + 0)
+	ld	l, (iy + 3)
 	push	hl
 	mlt	hl
 util_alloc_var:
 	call	ti.HLTimes9
+util_alloc_string_equ:
+	ld	iy, (iy + 6)
 	inc	hl
 	inc	hl
 	push	hl
