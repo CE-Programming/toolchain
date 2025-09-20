@@ -87,11 +87,11 @@ extern "C" {
 #define ti_MallocEqu(len) ti_AllocEqu((len), malloc)
 
 /* @cond */
-string_t *ti_AllocString(unsigned len, void *(*malloc_routine)(size_t));
-list_t *ti_AllocList(unsigned dim, void *(*malloc_routine)(size_t));
-matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void *(*malloc_routine)(size_t));
-cplx_list_t *ti_AllocCplxList(unsigned dim, void *(*malloc_routine)(size_t));
-equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t));
+string_t *ti_AllocString(unsigned len, void *(*malloc_routine)(size_t)) __attribute__((__nonnull__(2)));
+list_t *ti_AllocList(unsigned dim, void *(*malloc_routine)(size_t)) __attribute__((__nonnull__(2)));
+matrix_t *ti_AllocMatrix(uint8_t rows, uint8_t cols, void *(*malloc_routine)(size_t)) __attribute__((__nonnull__(3)));
+cplx_list_t *ti_AllocCplxList(unsigned dim, void *(*malloc_routine)(size_t)) __attribute__((__nonnull__(2)));
+equ_t *ti_AllocEqu(unsigned len, void *(*malloc_routine)(size_t)) __attribute__((__nonnull__(2)));
 /* @endcond */
 
 /**
