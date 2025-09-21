@@ -144,9 +144,7 @@ end macro
 relocate helpers, buf + 900
 call_relative:
 	pop	ix
-	lea	ix, ix + 3
-	push	ix
-	lea	ix, ix - 3
+	pea	ix + 3
 	push	de
 	ld	de, (ix)
 	add	ix, de
@@ -160,14 +158,14 @@ jump_relative:
 	pop	de
 	jp	(ix)
 ld_relative:
-	pop	ix
-	ld	de, (ix)
-	push	ix
-	add	ix, de
-	lea	hl, ix
-	pop	ix
-	lea	ix, ix + 3
-	jp	(ix)
+	pop	hl
+	ld	de, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	push	hl
+	add	hl, de			; add hl, relative - 3
+	ret
 end relocate
 
 macro rcall? name
@@ -182,7 +180,7 @@ end macro
 
 macro rload? name
 	call	ld_relative
-	dl	name - $
+	dl	name - $ - 3
 end macro
 
 start:
