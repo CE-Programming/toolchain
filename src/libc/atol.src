@@ -1,21 +1,77 @@
 	assume	adl=1
 
 	section	.text
-	public	_atoi, _atol
-_atoi:
-_atol:
-	pop	bc
-	ex	(sp),hl
-	push	bc
-	ld	bc,10
-	push	bc
-	ld	c,b
-	push	bc
-	push	hl
-	call	_strtol
-	pop	af
-	pop	af
-	pop	af
-	ret
 
-	extern	_strtol
+	public	_atol
+
+_atol:
+	pop	de
+	ex	(sp), hl
+	push	de
+	; inlined isspace
+.whitespace_loop:
+	ld	a, (hl)
+	inc	hl
+	cp	a, 32
+	jr	z, .whitespace_loop
+	sub	a, 9
+	add	a, -5
+	jr	nc, .whitespace_loop
+
+	; A = (HL - 1) - 9 + -5
+	; A = (HL - 1) - 14
+	xor	a, '-' - 14
+	push	af
+	jr	z, .minus_sign
+	xor	a, ('+' - 14) xor ('-' - 14)
+	jr	z, .plus_sign
+	dec	hl
+.plus_sign:
+.minus_sign:
+	; carry is cleared
+	push	hl
+	pop	iy
+	sbc	hl, hl
+	ld	e, l
+	; IY = start of the digits
+	; E:UHL = 0
+	jr	.start
+.loop:
+	; 32F + 4R + 3W + 1 per digit
+	ld	d, a
+	ld	a, e
+	push	hl
+	pop	bc
+	; *= 2
+	add	hl, hl
+	rla
+	; *= 4
+	add	hl, hl
+	rla
+	; *= 5
+	add	hl, bc
+	adc	a, e
+	; *= 10
+	add	hl, hl
+	rla
+	; += digit
+	ld	bc, 0
+	ld	c, d
+	add	hl, bc
+	adc	a, b
+	ld	e, a
+	; next digit
+	inc	iy
+.start:
+	ld	a, (iy)
+	sub	a, 48
+	cp	a, 10
+	jr	c, .loop
+.finish:
+	pop	af
+	; carry is cleared
+	ret	nz	; A != '-' positive
+	; A == '-' negative
+	jp	__lneg
+
+	extern	__lneg

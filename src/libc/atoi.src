@@ -2,13 +2,12 @@
 
 	section	.text
 
-	public	_atoll
+	public	_atoi
 
-_atoll:
-	push	ix
-	ld	ix, -3
-	add	ix, sp
-	ld	hl, (ix + 9)
+_atoi:
+	pop	de
+	ex	(sp), hl
+	push	de
 	; inlined isspace
 .whitespace_loop:
 	ld	a, (hl)
@@ -30,44 +29,33 @@ _atoll:
 .plus_sign:
 .minus_sign:
 	; carry is cleared
-	push	hl
-	pop	iy
-	sbc	hl, hl
 	ex	de, hl
 	sbc	hl, hl
-	ld	b, l
-	ld	c, l
-	push	hl
-	push	hl
-	push	hl
-	; IY = start of the digits
-	; BC:UDE:UHL = 0
-	; (ix - 9) = [0, 10]
+	; DE = start of the digits
+	; HL = 0
 	jr	.start
 .loop:
-	; loop  : 27F + 1R + 8W + 1
-	; lladd : ?
-	; llmulu: ?
-	; total : a lot per digit
-	ld	(ix - 9), 10
-	call	__llmulu	; BC:UDE:UHL *= 10
-	ld	(ix - 9), a
-	call	__lladd
-	inc	iy		; next digit
+	; 21F + 4R + 3W + 1 per digit
+	push	hl
+	pop	bc
+	add	hl, hl		; *= 2
+	add	hl, hl		; *= 4
+	add	hl, bc		; *= 5
+	add	hl, hl		; *= 10
+	ld	bc, 0
+	ld	c, a
+	add	hl, bc
+	inc	de		; next digit
 .start:
-	ld	a, (iy)
+	ld	a, (de)
 	sub	a, 48
 	cp	a, 10
 	jr	c, .loop
 .finish:
-	ld	sp, ix
 	pop	af
 	; carry is cleared
-	pop	ix
 	ret	nz	; A != '-' positive
 	; A == '-' negative
-	jp	__llneg
+	jp	__ineg
 
-	extern	__llneg
-	extern	__lladd
-	extern	__llmulu
+	extern	__ineg
