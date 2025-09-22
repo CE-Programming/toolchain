@@ -155,12 +155,13 @@ call_relative:
 	jp	(ix)
 end if
 jump_relative:
-	pop	ix
+	ex	(sp), hl
 	push	de
-	ld	de, (ix)
-	add	ix, de
+	ld	de, (hl)
+	add	hl, de
 	pop	de
-	jp	(ix)
+	ex	(sp), hl
+	ret
 ld_relative:
 	pop	hl
 	ld	de, 0
