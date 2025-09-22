@@ -94,15 +94,15 @@ disable_relocations
 	ld	(flag_save), a
 	ld	(ix_save), ix		; save IX since older ICE programs don't
 
-	ld	de, show_msgs		; disable or enable error printing
-	ld	a, 1
-	ld	(de), a
 	ld	hl, $AA55AA
 	xor	a, a
 	sbc	hl, bc
-	jr	nz, .show_msgs
-	ld	(de), a
-.show_msgs:
+	jr	z, .no_show_msgs
+; .show_msgs:
+	inc	a
+.no_show_msgs:
+	ld	hl, show_msgs		; disable or enable error printing
+	ld	(hl), a
 
 	pop	hl
 	ld	de,helpers.source
@@ -573,7 +573,7 @@ throw_error:				; draw the error message onscreen
 	ld	a, (show_msgs)
 	or	a, a
 	jr	z, .return
- .show_msgs:
+.show_msgs:
 	ld	a, ti.lcdBpp16
 	ld	(ti.mpLcdCtrl), a
 	push	hl
