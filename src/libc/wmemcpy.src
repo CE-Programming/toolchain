@@ -1,0 +1,32 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_wmemcpy
+
+; CC: !count ? 19*r(PC) + 9*r(SPL) + 3*w(SPL) + 1
+;            : 25*r(PC) + 18*r(SPL) + 12*w(SPL) + count*(r(src) + w(dest) + 1)
+; C:	wchar_t *wmemcpy(wchar_t *dest, const wchar_t *src, size_t count) {
+_wmemcpy:
+; C:	size_t count2 = count * sizeof(wchar_t);
+	ld	hl, 9
+	add	hl, sp
+	ld	hl, (hl)		; hl = count
+	adc	hl, hl			; hl = count * 2
+					;    = count2
+; C:	if (count2) {
+	pop	iy			; iy = ret
+	jr	z, .zero
+; C:	__ldir(src, dest, count2);
+	pop	de			; de = dest
+	ex	(sp), hl		; hl = src
+	pop	bc			; bc = count2
+	push	bc
+	push	de
+	ldir
+; C:	}
+.zero:
+; C:	return dest;
+	ex	(sp), hl
+	jp	(iy)
+; C:	}
