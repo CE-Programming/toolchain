@@ -4,6 +4,10 @@
 
 	public	_bzero
 
+if defined __TICE__
+
+; uses the hardware specific $E40000 memory location
+
 ; void bzero(void* buf, size_t n)
 _bzero:
 	ld	hl, 6
@@ -18,3 +22,30 @@ _bzero:
 	ld	hl, $E40000	; large region of all zeros on the Ti84CE
 	ldir
 	ret
+
+else
+
+; makes no hardware assumptions
+
+; void bzero(void* buf, size_t n)
+_bzero:
+	ld	hl, 6
+	add	hl, sp
+	ld	bc, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	cpi
+	add	hl, bc
+	ret	c
+	dec	hl
+	ld	(hl), 0
+	ret	po
+	push	hl
+	pop	de
+	dec	de
+	lddr
+	ret
+
+end if

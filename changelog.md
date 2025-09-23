@@ -1,6 +1,46 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v12.1...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v13.0...master)
+
+# [v13.0](https://github.com/CE-Programming/toolchain/releases/tag/v13.0) (2025-09-04)
+
+* **New features**
+  * Added new LCDDRVCE library (to interact with the ST7789 LCD controller) by @calc84maniac
+  * Added `long double`/`float64` support and routines by @ZERICO2005
+  * Added CRT routines for 32/24/16bit * 8bit unsigned multiplication by @ZERICO2005
+  * Added clipped gfx_RotatedScaled(Transparent)Sprite by @ZERICO2005
+  * Added missing `<c*>` C++ headers @ZERICO2005
+  * Implemented some C++ headers: `<algorithm>`, `<concepts>`, `<memory>`, `<numbers>` `<source_location>`, `<version>` by @ZERICO2005
+  * Implemented some C headers: `<complex.h>`,`<stdckdint.h>`, `<tgmath.h>` by @ZERICO2005
+  * Added `fprintf` and `asprintf` @ZERICO2005
+  * Added `boot_sprintf`, `boot_vsprintf` et al by @calc84maniac, @ZERICO2005
+  * Implemented `strlcpy` by @nitinseshadri
+  * Implemented `memccpy` by @calc84maniac
+  * Implemented `stpcpy`, `mempcpy`, and `memrchr` by @ZERICO2005
+  * Implemented bit operations under `<ez80_builtin.h>`, `<bit>`, and `<stdbit.h>` by  @calc84maniac, @ZERICO2005
+
+* **Fixes**
+  * Fixed cursor image bugs and improved LCD cursor behavior by @nitinseshadri
+  * Fixed missing `__frem` CRT routine by @calc84maniac
+  * Fixed C++ `abs` overloads by @ZERICO2005
+  * Fixed conformance/behaviour of `<math.h>` and `<cmath>` headers by @ZERICO2005
+  * Fixed floating-point bugs in math routines by @ZERICO2005
+
+* **Improvements**
+  * Updated (rebased) clang compiler from 15.0.0 to 15.0.7 (producing overall better code) by @adriweb
+  * Various compiler optimizations and misc. improvements by @calc84maniac
+  * Updated convimg submodule (adds multithreading support for increased speed) by @mateoconlechuga
+  * Expanded C++ `<type_traits>` by @ZERICO2005
+  * Implemented compile time evaluation of floating-point classification routines by @ZERICO2005
+  * Updated `nanoprintf` version (with long double support) by @ZERICO2005
+  * Optimized `strcmp`, `strncmp`, `strlcpy`, `strlen`, `memcpy`, and `memset` by @ZERICO2005, @calc84maniac
+  * Optimized `frexpf`, `ilogbf`, `ldexpf`, `modff`, `truncf`, and others by @ZERICO2005, @calc84maniac
+  * Improved precision and accuracy of `log1pf` @parisseb
+  * Optimized `sinf`/`cosf`, and ensured that the result will be [-1,+1] by @ZERICO2005
+  * Improved precision and accuracy of  `erf`, `atan2`, `acosh`, and others by @ZERICO2005
+  * Optimized GraphX clipping and added SMC for parameters by @calc84maniac
+  * Optimized various GraphX routines by @ZERICO2005
+  * Added `__TICE__` define by @ZERICO2005
 
 # [v12.1](https://github.com/CE-Programming/toolchain/releases/tag/v12.1) (2024-10-26)
 

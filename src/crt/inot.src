@@ -10,9 +10,9 @@ __inot := 000164h
 else
 
 __inot:
-if 0
-	push	de
-end if
+; UHL = ~UHL
+;   CC: 11*r(PC)+3*r(SPL)+1
+;   CC: 10 bytes | 11F + 3R + 1
 	add	hl, de	; uhl=UHL+UDE
 	ex	de, hl	; ude=UHL+UDE, uhl=UDE
 	scf
@@ -20,9 +20,6 @@ end if
 			;    =UDE-UHL-UDE-1
 			;    =-UHL-1
 			;    =~UHL
-if 0
-	pop	de
-else
 	ex	de, hl	; ude=~UHL, uhl=UHL+UDE
 	add	hl, de	; uhl=UHL+UDE+~UHL
 			;    =UHL+UDE+(-UHL-1)
@@ -30,7 +27,6 @@ else
 			;    =UDE-1
 	inc	hl	; uhl=UDE
 	ex	de, hl	; ude=UDE, uhl=~UHL
-end if
 	ret
 
 end if
