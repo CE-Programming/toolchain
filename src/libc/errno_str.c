@@ -6,11 +6,85 @@
 
 static char const * const errno_strings[] = {
     "no error",
-    "permission error",
-    "invalid argument",
-    "io error",
-    "math domain error",
-    "math range error",
+    "EPERM",
+    "EINVAL",
+    "EIO",
+    "EDOM",
+    "ERANGE",
+    "EILSEQ",
+    /* C++ errno */
+    "E2BIG",
+    "EACCES",
+    "EADDRINUSE",
+    "EADDRNOTAVAIL",
+    "EAFNOSUPPORT",
+    "EAGAIN",
+    "EALREADY",
+    "EBADF",
+    "EBADMSG",
+    "EBUSY",
+    "ECANCELED",
+    "ECHILD",
+    "ECONNABORTED",
+    "ECONNREFUSED",
+    "ECONNRESET",
+    "EDEADLK",
+    "EDESTADDRREQ",
+    "EEXIST",
+    "EFAULT",
+    "EFBIG",
+    "EHOSTUNREACH",
+    "EIDRM",
+    "EINPROGRESS",
+    "EINTR",
+    "EISCONN",
+    "EISDIR",
+    "ELOOP",
+    "EMFILE",
+    "EMLINK",
+    "EMSGSIZE",
+    "ENAMETOOLONG",
+    "ENETDOWN",
+    "ENETRESET",
+    "ENETUNREACH",
+    "ENFILE",
+    "ENOBUFS",
+    "ENODATA",
+    "ENODEV",
+    "ENOENT",
+    "ENOEXEC",
+    "ENOLCK",
+    "ENOLINK",
+    "ENOMEM",
+    "ENOMSG",
+    "ENOPROTOOPT",
+    "ENOSPC",
+    "ENOSR",
+    "ENOSTR",
+    "ENOSYS",
+    "ENOTCONN",
+    "ENOTDIR",
+    "ENOTEMPTY",
+    "ENOTRECOVERABLE",
+    "ENOTSOCK",
+    "ENOTSUP",
+    "ENOTTY",
+    "ENXIO",
+    "EOPNOTSUPP",
+    "EOVERFLOW",
+    "EOWNERDEAD",
+    "EPIPE",
+    "EPROTO",
+    "EPROTONOSUPPORT",
+    "EPROTOTYPE",
+    "EROFS",
+    "ESPIPE",
+    "ESRCH",
+    "ETIME",
+    "ETIMEDOUT",
+    "ETXTBSY",
+    "EWOULDBLOCK",
+    "EXDEV",
 };
 
 static char * const unknown_errno_string = "unknown error -8388608";
@@ -34,13 +108,6 @@ char* strerror(int errnum) {
     }
     return (char*)errno_strings[errnum];
 }
-
-#if 0
-/** disabled until the prototypes for this function are defined */
-size_t strerrorlen_s(errno_t errnum) {
-    return strlen(strerror(errnum));
-}
-#endif
 
 void perror(const char *str) {
     if (str != NULL && *str != '\0') {

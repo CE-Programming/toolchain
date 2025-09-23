@@ -6,31 +6,31 @@
 #define EIO         3   /* io error */
 #define EDOM        4   /* math domain error */
 #define ERANGE      5   /* math range error */
+#define EILSEQ      6   /* Illegal byte sequence (C95) */
 
-// Not used, but defined for compatibility
-#define E2BIG           6 /* Argument list too long */
-#define EACCES          7 /* Permission denied */
-#define EADDRINUSE      8 /* Address in use */
-#define EADDRNOTAVAIL   9 /* Address not available */
-#define EAFNOSUPPORT    10 /* Address family not supported */
-#define EAGAIN          11 /* Resource unavailable, try again */
-#define EALREADY        12 /* Connection already in progress */
-#define EBADF           13 /* Bad file descriptor */
-#define EBADMSG         14 /* Bad message */
-#define EBUSY           15 /* Device or resource busy */
-#define ECANCELED       16 /* Operation canceled */
-#define ECHILD          17 /* No child processes */
-#define ECONNABORTED    18 /* Connection aborted */
-#define ECONNREFUSED    19 /* Connection refused */
-#define ECONNRESET      20 /* Connection reset */
-#define EDEADLK         21 /* Resource deadlock avoided */
-#define EDESTADDRREQ    22 /* Destination address required */
-#define EEXIST          23 /* File exists */
-#define EFAULT          24 /* Bad address */
-#define EFBIG           25 /* File too large */
-#define EHOSTUNREACH    26 /* Host is unreachable */
-#define EIDRM           27 /* Identifier removed */
-#define EILSEQ          28 /* Illegal byte sequence */
+/* C++ errno */
+#define E2BIG            7 /* Argument list too long */
+#define EACCES           8 /* Permission denied */
+#define EADDRINUSE       9 /* Address in use */
+#define EADDRNOTAVAIL   10 /* Address not available */
+#define EAFNOSUPPORT    11 /* Address family not supported */
+#define EAGAIN          12 /* Resource unavailable, try again */
+#define EALREADY        13 /* Connection already in progress */
+#define EBADF           14 /* Bad file descriptor */
+#define EBADMSG         15 /* Bad message */
+#define EBUSY           16 /* Device or resource busy */
+#define ECANCELED       17 /* Operation canceled */
+#define ECHILD          18 /* No child processes */
+#define ECONNABORTED    19 /* Connection aborted */
+#define ECONNREFUSED    20 /* Connection refused */
+#define ECONNRESET      21 /* Connection reset */
+#define EDEADLK         22 /* Resource deadlock avoided */
+#define EDESTADDRREQ    23 /* Destination address required */
+#define EEXIST          24 /* File exists */
+#define EFAULT          25 /* Bad address */
+#define EFBIG           26 /* File too large */
+#define EHOSTUNREACH    27 /* Host is unreachable */
+#define EIDRM           28 /* Identifier removed */
 #define EINPROGRESS     29 /* Operation in progress */
 #define EINTR           30 /* Interrupted function */
 #define EISCONN         31 /* Socket is connected */
