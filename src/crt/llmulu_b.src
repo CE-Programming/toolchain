@@ -1,68 +1,75 @@
 	assume	adl=1
 
 	section	.text
+
 	public	__llmulu_b
+
 __llmulu_b:
-	push	af
+; Multiplies BC:UDE:UHL by (SP) and returns the 64-bit unsigned product bc:ude:uhl.
+;    I: (SP) = 8-bit multiplier, BC:UDE:UHL = multiplicand, ADL=1
+;    O: bc:ude:uhl = BC:UDE:UHL * (SP)
+;   CC: 101*r(PC)+21*r(SPL)+18*w(SPL)+33
+;   CC: 100 bytes | 101F + 21R + 18W + 33
 	push	iy
 	ld	iy, 0
 	add	iy, sp
 	push	de
 	push	hl
-	ld	a, (iy + 9)
-	ld	h, a
+	push	bc
+	ld	b, (iy + 6)
+	ld	c, 0
+	ld	h, b
 	mlt	hl
 	ld	(iy - 6), l
-	ld	d, a
+	ld	d, b
 	ld	e, (iy - 5)
 	mlt	de
 	ld	l, h
-	ld	h, 0
+	ld	h, c
 	add	hl, de
 	ld	(iy - 5), l
-	ld	d, a
+	ld	d, b
 	ld	e, (iy - 4)
 	mlt	de
 	ld	l, h
-	ld	h, 0
+	ld	h, c
 	add	hl, de
 	ld	(iy - 4), l
-	ld	d, a
+	ld	d, b
 	ld	e, (iy - 3)
 	mlt	de
 	ld	l, h
-	ld	h, 0
+	ld	h, c
 	add	hl, de
 	ld	(iy - 3), l
-	ld	d, a
+	ld	d, b
 	ld	e, (iy - 2)
 	mlt	de
 	ld	l, h
-	ld	h, 0
+	ld	h, c
 	add	hl, de
 	ld	(iy - 2), l
-	ld	d, a
+	ld	d, b
 	ld	e, (iy - 1)
 	mlt	de
 	ld	l, h
-	ld	h, 0
+	ld	h, c
 	add	hl, de
 	ld	(iy - 1), l
-	ld	d, a
-	ld	e, c
-	mlt	de
+
+	pop	de
 	ld	l, h
-	ld	h, 0
-	add	hl, de
-	ld	c, l
-	ld	d, a
-	ld	e, b
+	ld	c, d
+	ld	d, b
+	mlt	bc
+	ld	h, c
 	mlt	de
-	ld	a, h
-	add	a, e
-	ld	b, a
+
+	add	hl, de
+	ld	b, h
+	ld	c, l
+
 	pop	hl
 	pop	de
 	pop	iy
-	pop	af
 	ret
