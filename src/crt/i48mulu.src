@@ -12,6 +12,8 @@
 	section	.text
 	public	__i48mulu
 __i48mulu:
+; CC: 202*r(PC)+51*r(SPL)+35*w(SPL)+85
+; CC: 201 bytes | 202F + 51R + 35W + 85
 	; backup af
 	push	af
 	push	ix

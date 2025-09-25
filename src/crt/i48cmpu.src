@@ -12,6 +12,9 @@
 	section	.text
 	public	__i48cmpu
 __i48cmpu:
+; CC: 15 bytes
+; Minimum: 11F + 6R + 3W + 2
+; Maximum: 16F + 6R + 3W + 2
 	push	hl
 	or	a, a
 	lea	hl, iy

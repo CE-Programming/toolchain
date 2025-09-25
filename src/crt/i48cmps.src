@@ -12,6 +12,7 @@
 	section	.text
 	public	__i48cmps
 __i48cmps:
+; CC: 14 bytes | 15F + 9R + 6W + 1
 	push	hl
 	push	de
 	or	a, a

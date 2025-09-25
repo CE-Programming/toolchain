@@ -9,6 +9,9 @@
 
 	public	__i48sub_1
 __i48sub_1:
+; CC: 8 bytes
+; HL != 0: 7F + 3R + 2
+; HL == 0: 9F + 3R + 2
 	add	hl, de
 	or	a, a
 	sbc	hl, de

@@ -8,6 +8,7 @@
 	section	.text
 	public	__i48xor
 __i48xor:
+; CC: 41 bytes | 42F + 22R + 17W + 1
 	push	af
 
 	; Deal with Upper Byte

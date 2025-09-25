@@ -8,6 +8,9 @@
 	section	.text
 	public	__i48neg
 __i48neg:
+; CC: 17 bytes
+; HL != 0: 18F + 3R + 2
+; HL == 0: 16F + 3R + 2
 	or	a, a
 	sbc	hl, de		; hl = HL - DE
 	ex	de, hl		; hl = DE, de = HL - DE
@@ -27,6 +30,7 @@ __i48neg:
 ; Used by i48divs and i48rems, uiy:ubc = -uiy:ubc
 	public	__uiyubcNeg
 __uiyubcNeg:
+; CC: 18 bytes | 19F + 12R + 9W + 1
 	push	hl
 	or	a, a
 	sbc	hl, hl
