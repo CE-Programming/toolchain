@@ -1,4 +1,4 @@
-; Performs 48-bit addition
+; Performs 48-bit increment
 ;
 ; Returns:
 ; ude:uhl = ude:uhl + 1

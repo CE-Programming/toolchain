@@ -9,14 +9,14 @@
 	public	__i48bswap
 __i48bswap:
 	; Line up the reversed data on the stack
-	push hl
-	ld h, e
-	ld l, d
-	ex (sp), hl
-	ld d, l
-	ld e, h
-	push de
-	push hl
+	push	hl
+	ld	h, e
+	ld	l, d
+	ex	(sp), hl
+	ld	d, l
+	ld	e, h
+	push	de
+	push	hl
 	; -1: hlu
 	; -2: e
 	; -3: d
@@ -28,9 +28,9 @@ __i48bswap:
 	; -9: l
 
 	; Misalign the stack and pop into the correct registers
-	inc sp
-	inc sp
-	pop de
-	pop hl
-	inc sp
+	inc	sp
+	inc	sp
+	pop	de
+	pop	hl
+	inc	sp
 	ret
