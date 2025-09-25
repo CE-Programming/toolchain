@@ -8,6 +8,9 @@
 	section	.text
 	public	__i48cmpzero
 __i48cmpzero:
+; CC: 13 bytes
+; Minimum:  8F + 3R + 2
+; Maximum: 14F + 3R + 3
 	; check msb's == 0
 	ex	de, hl
 	add	hl, de

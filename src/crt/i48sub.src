@@ -8,6 +8,7 @@
 	section	.text
 	public	__i48sub
 __i48sub:
+; CC: 13 bytes | 14F + 6R + 3W + 1
 	or	a, a
 	sbc	hl, bc
 	ex	de, hl

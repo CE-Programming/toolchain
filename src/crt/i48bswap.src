@@ -8,6 +8,7 @@
 	section	.text
 	public	__i48bswap
 __i48bswap:
+; CC: 14 bytes | 15F + 12R + 12W + 1
 	; Line up the reversed data on the stack
 	push	hl
 	ld	h, e

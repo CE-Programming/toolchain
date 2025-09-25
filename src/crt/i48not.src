@@ -8,6 +8,7 @@
 	section	.text
 	public	__i48not
 __i48not:
+; CC: 15 bytes | 16F + 3R + 1
 	add	hl, de		; hl = HL + DE
 	ex	de, hl		; hl = DE, de = HL + DE
 	or	a, a
