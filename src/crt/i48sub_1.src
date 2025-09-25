@@ -1,4 +1,4 @@
-; Performs 48-bit subtraction
+; Performs 48-bit decrement
 ;
 ; Returns:
 ; ude:uhl = ude:uhl - 1

@@ -1,21 +1,24 @@
+; Performs 48-bit unsigned remainder
+;
+; Returns:
+; ude:uhl = ude:uhl % uiy:ubc
+
 	assume	adl=1
 
 	section	.text
 	public	__i48remu
-
-; Result in ude:uhl
 __i48remu:
-	push iy
-	push bc
+	push	iy
+	push	bc
 
-	call __i48dvrmu
-	lea de, iy
-	or a, a
-	sbc hl, hl
-	add hl, bc
+	call	__i48dvrmu
+	lea	de, iy
+	or	a, a
+	sbc	hl, hl
+	add	hl, bc
 
-	pop bc
-	pop iy
+	pop	bc
+	pop	iy
 	ret
 
 	extern	__i48dvrmu

@@ -8,11 +8,11 @@
 	section	.text
 	public	__i48add
 __i48add:
-	add hl, bc
-	ex de, hl
-	push bc
-	lea bc, iy
-	adc hl, bc
-	pop bc
-	ex de, hl
+	add	hl, bc
+	ex	de, hl
+	push	bc
+	lea	bc, iy
+	adc	hl, bc
+	pop	bc
+	ex	de, hl
 	ret
