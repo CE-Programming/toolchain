@@ -65,11 +65,10 @@ __lldivs:
 	bit	7, (iy + 23)
 .div_quotient_skip:
 
-	call	nz, __llneg
-
 	pop	iy
 
-	ret
+	ret	z
+	jp	__llneg
 
 	extern	__lldvrmu.hijack
 	extern	__llneg
