@@ -4,15 +4,216 @@
 
 	public	__dtof
 
-__dtof:
-	; f64_ret_f32
-	push	af, iy, bc, de, hl
-	call	___f64_to_f32
-	pop	af
+	private	__dtof_helper
+__dtof_helper:
+	; Moving this block of code to be behind __dtof ensures that
+	; __dtof.ret_copysign can always be reached by jr in all paths.
+.overflow:
+	; carry is set here
+	pop	hl
+	; A = $10
+	add	a, c	; attempts to overflow the low 4 bits of the exponent
+	rl	b	; (0x7F << 1) | 1 if the input is inf/NaN
+	inc	b	; B will only be zero if the input was inf/NaN
+	jr	nz, .not_inf_nan
+
+	; carry is cleared
+	adc	hl, hl
+	jr	nz, .has_payload
 	ld	a, e
+	rla
+	and	a, $3F
+	jr	z, .no_payload
+.has_payload:
+	set	5, e	; ensure that NaN stays NaN
+.no_payload:
+	ld	a, c
+	push	de
+	pop	bc
+	ld	l, 5
+	call	__lshru
+	push	bc
+	pop	hl
+.finish_inf_nan:
+	ld	a, $7F
+	jr	__dtof.ret_copysign
+.not_inf_nan:
+	; return infinity
+	ld	hl, $800000
+	jr	.finish_inf_nan
+
+; Convert BC:UDE:UHL F64 to E:UHL F32
+; Rounding: round to nearest with ties to even
+; Behaviour:
+;  Underflow: Returns signed zero. No signals raised.
+;  Subnormal: No signals raised.
+;  Rounded to Infinity: No signals raised.
+;  Overflow: Returns signed infinity. No signals raised.
+;  Signaling NaN: Quiet bit preserved. No signals raised.
+;  Quiet NaN: Quiet bit preserved. No signals raised.
+;  NaN Payloads: Copies the most significant payload bits. The LSB of mantissa is set if payload bits were discarded/truncated out.
+__dtof:
+	bit	7, b
+	push	af	; preserve A and signbit
+	push	bc
+	push	de
+	push	hl
+	res	7, b
+	ld	hl, -$3810
+	add.s	hl, bc
+	jr	nc, .maybe_subnormal
+	ld	hl, -$47F0	; $FFB810
+	ld	a, l		; ld a, $10
+	add.s	hl, bc
+	jr	c, __dtof_helper.overflow
+	; result is normal or rounds to infinity
+	; calculate new exponent
+	; we only need the low 8 bits of the exponent
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	; offset = -$380 - -$47F = $FF = -1 ; therefore decrement
+	; H = exponent + 1
+	ld	l, 29		; f64_mant_bits - f32_mant_bits = 52 - 23 = 29
+	ex	(sp), hl	; (SP) = exponent/shift, HL = lo24
+
+	; clear exponent
+	dec	a	; ld	a, $0F
+	and	a, c
+	ld	c, a
+	xor	a, a
+	ld	b, a
+	; test round bit
+	bit	4, e
+	jr	z, .round_down
+	; test guard bit
+	ld	a, e
+	and	a, $20
+	jr	nz, .round_up
+	; test sticky bits
+	inc	a	; make A non-zero
+	adc	hl, hl
+	jr	nz, .round_up
+	ld	a, e
+	rla
+	and	a, $1F
+.round_up:
+.round_down:
+	call	__llshru
+	; B, C, and UDE are zero here
+	or	a, a
+	jr	z, .no_round
+	inc	hl	; does not overflow
+.no_round:
+	pop	af	; a = exponent + 1, flags = 29 = ---5H3V-C
+	sbc	a, b	; decrement exponent and clear carry
+	rra
+	jr	nc, .even_exponent
+	ld	bc, $800000
+	add	hl, bc	; the result might be rounded to infinity here
+	adc	a, c	; adc a, 0 ; wont overflow
+.even_exponent:
+.subnormal_no_round:
+.ret_copysign:
 	pop	de
 	ld	e, a
-	pop	bc, iy, af
+	pop	bc
+	pop	af
+	ret	z
+	set	7, e
 	ret
 
-	extern	___f64_to_f32
+.ret_zero:
+	; carry is cleared
+	pop	hl
+	xor	a, a
+	sbc	hl, hl
+	jr	.ret_copysign
+
+.maybe_subnormal:
+	ld	hl, -$3690
+	add.s	hl, bc
+	jr	nc, .ret_zero
+	; calculate shift
+	; A = (uint8_t)((BC - $3690) >> 4)
+	; A = (uint8_t)((HL << 4) >> 8)
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	; Shift = -A + 4 + 24
+	ld	a, 4 + 24
+	sub	a, h
+	; maximum shift = 24 + 4 + 25 = 24 + 29 = 53
+	; minimum shift = 24 + 4 + 1 = 24 + 5 = 29
+	ld	b, a
+	ld	e, a	; store shift amount
+	xor	a, a
+	; calculate sticky bits
+	sbc	hl, hl
+	inc	hl	; ld hl, 1
+.shift_loop:
+	add	hl, hl
+	adc	a, a
+	djnz	.shift_loop
+	; carry won't be set
+	; set C:UDE to A:UHL
+	; shift by an additional 24 bits
+	dec	hl
+	jr	z, .the_set_bit_is_in_hl
+	dec	a
+.the_set_bit_is_in_hl:
+	ld	c, a
+	ld	a, e	; restore shift amount
+	ex	de, hl
+	scf
+	sbc	hl, hl
+	; BC:UDE:UHL = 1 << shift
+	; (SP) = X
+	call	__lland
+	call	__llcmpzero
+	pop	hl
+	; DE and BC are swapped here
+	pop	bc
+	pop	de
+	push	de
+	push	bc
+
+	; clear exponent and include the implicit mantissa bit
+	ld	d, 0
+	jr	z, .no_sticky_bits
+	inc	d
+.no_sticky_bits:
+
+	ld	l, a	; L = shift
+	ld	a, e
+	and	a, $0F
+	or	a, $10
+
+	call	__lshru
+	xor	a, a	; subnormal exponent
+	; HL = BC >> 1
+	scf
+	sbc	hl, hl	; ld hl, -1
+	add	hl, sp
+	push	bc
+	srl	(hl)
+	pop	hl
+	rr	h
+	rr	l	; round bit shifted out
+
+	jr	nc, .subnormal_no_round
+	dec	d
+	jr	z, .subnormal_round_up
+	bit	0, l
+	jr	z, .subnormal_no_round
+.subnormal_round_up:
+	inc	hl	; wont overflow, but may become FLT_MIN
+; .subnormal_no_round:
+	jr	.ret_copysign
+
+	extern	__lland
+	extern	__llcmpzero
+	extern	__llshru
+	extern	__lshru

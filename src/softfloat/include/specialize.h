@@ -145,15 +145,7 @@ void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPtr );
 | Converts the common NaN pointed to by 'aPtr' into a 32-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-#if 0
 uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr );
-#else
-/** only used by f64_to_f32 currently */
-static inline uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr )
-{
-    return (uint_fast32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
-}
-#endif
 
 /*----------------------------------------------------------------------------
 | Interpreting 'uiA' and 'uiB' as the bit patterns of two 32-bit floating-
@@ -186,20 +178,7 @@ bool softfloat_isSigNaNF64UI(uint64_t a) __attribute__((__const__, __nothrow__, 
 | location pointed to by 'zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-#if 0
 void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr );
-#else
-/** only used by f64_to_f32 currently */
-static inline void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr )
-{
-    if ( softfloat_isSigNaNF64UI( uiA ) ) {
-        softfloat_raiseFlags( softfloat_flag_invalid );
-    }
-    zPtr->sign = uiA>>63;
-    zPtr->v64  = uiA<<12;
-    zPtr->v0   = 0;
-}
-#endif
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by 'aPtr' into a 64-bit floating-point

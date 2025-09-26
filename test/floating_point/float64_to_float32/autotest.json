@@ -16,12 +16,12 @@
 	],
 	"hashes": {
 	  "1": {
-		"description": "All tests passed or GDB1 error",
+		"description": "Passed both test types or GDB1 error",
 		"timeout": 5000,
 		"start": "vram_start",
 		"size": "vram_16_size",
 		"expected_CRCs": [
-		  "38E2AD5A",
+		  "C2EF60CF",
 		  "2C812DC2"
 		]
 	  },
