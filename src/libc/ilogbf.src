@@ -13,48 +13,40 @@ _ilogbf:
 	dec	hl
 	dec	hl
 	dec	hl
-	ld	de, (hl)
-	sbc	hl, hl
-	ex	de, hl
-	; DE is zero
+	ld	hl, (hl)
 	add	hl, hl
-
 	adc	a, a
 	jr	z, .maybe_subnormal
 	inc	a
-	scf
 	jr	z, .inf_nan
-	rr	e	; E = 128 or float32_bias + 1
+	sub	a, 128	; float32_bias + 1
 	sbc	hl, hl
 	ld	l, a
-	sbc	hl, de
 	ret
 
 .maybe_subnormal:
-	; DE is zero, Carry unknown
 	add	hl, de
+	or	a, a
 	sbc	hl, de
 	jr	z, .ret_zero
 	call	__ictlz
-	ex	de, hl
-	;	DE was zero, so HL is now zero
-	dec	hl
 	cpl
 	add	a, 130
+	sbc	hl, hl
 	ld	l, a
 	ret
 
-.ret_zero:
 .inf_nan:
- 	ld	hl, $800000	; FP_ILOGB0
-	sbc	hl, de	; FP_ILOGBNAN or INT_MAX when carry is set
-	ex	de, hl
-	;	DE was zero, so HL is now zero
-	ld	l, 4	; EDOM
+	scf
+.ret_zero:
+	ld	hl, 4	; EDOM
 	ld	(_errno), hl
 	ld	hl, ___fe_cur_env
 	set	4, (hl)	; FE_INVALID
-	ex	de, hl
+	ld	hl, $800000	; FP_ILOGB0
+	ret	nc
+	; FP_ILOGBNAN or INT_MAX when carry is set
+	dec	hl
 	ret
 
 	extern	_errno

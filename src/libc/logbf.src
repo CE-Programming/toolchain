@@ -1,0 +1,68 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_logbf, _logb
+
+; float logbf(float)
+_logb:
+_logbf:
+	ld	hl, 6
+	ld	bc, -3
+	add	hl, sp
+	ld	a, (hl)
+	add	hl, bc
+	ld	c, b	; ld bc, -1
+	ld	hl, (hl)
+	add	hl, hl
+	adc	a, a
+	jr	z, .maybe_subnormal
+	inc	a
+	jr	z, .inf_nan
+	sub	a, 128	; float32_bias + 1
+	jr	c, .negative_exponent
+	inc	bc	; ld bc, 0
+.negative_exponent:
+.int_to_float:
+	; exponent is [-149, 127]
+	ld	c, a
+	ld	a, b	; sign extend
+	call	__ltof
+	push	bc
+	pop	hl
+	ld	e, a
+	ret
+
+.inf_nan:
+	; return fabsf(x)
+	pop	bc
+	ex	(sp), hl
+	push	bc
+	ld	e, $7F
+	ret
+
+.ret_zero:
+	; HL is zero here
+	ld	l, 4	; EDOM
+	ld	(_errno), hl
+	; FE_DIVBYZERO
+	ld	hl, ___fe_cur_env
+	set	6, (hl)
+	; -HUGE_VALF
+	ld	hl, $800000
+	ld	e, b	; ld e, $FF
+	ret
+
+.maybe_subnormal:
+	add	hl, bc
+	inc	hl	; restore HL
+	jr	nc, .ret_zero
+	call	__ictlz
+	cpl
+	add	a, 130
+	jr	.int_to_float
+
+	extern	__ltof
+	extern	__ictlz
+	extern	___fe_cur_env
+	extern	_errno

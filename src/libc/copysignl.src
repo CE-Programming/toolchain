@@ -6,7 +6,8 @@
 _copysignl:
 	ld	hl, 19	; upper 8 bits of y
 	add	hl, sp
-	rl	(hl)	; extract the signbit of y
+	ld	a, (hl)	; extract the signbit of y
+	rlca
 	pop	iy, hl, de, bc
 	push	bc, de, hl
 	rl	b	; clear the signbit of x, signbit of y is in the LSB
