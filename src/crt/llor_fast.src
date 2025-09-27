@@ -3,7 +3,7 @@
 	section	.text
 	public	__llor_fast
 __llor_fast:
-; CC: 56*r(PC)+19*r(SPL)+8*w(SPL)+1
+; CC: 55*r(PC)+19*r(SPL)+8*w(SPL)+1
 	ld	iy, 0
 	add	iy, sp
 	push	hl
@@ -31,9 +31,10 @@ __llor_fast:
 	or	a, (hl)
 	ld	e, a
 	dec	hl
-	ld	a, (iy - 1)
+	ld	a, (hl)
+	lea	hl, iy - 1
 	or	a, (hl)
-	ld	(iy - 1), a
+	ld	(hl), a
 	pop	hl
 	ld	a, h
 	or	a, (iy + 4)

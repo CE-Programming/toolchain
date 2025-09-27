@@ -3,7 +3,7 @@
 	section	.text
 	public	__llor
 __llor:
-; CC: 62*r(PC)+25*r(SPL)+14*w(SPL)+1
+; CC: 61*r(PC)+25*r(SPL)+14*w(SPL)+1
 	push	af
 	push	iy
 	ld	iy, 0
@@ -33,9 +33,10 @@ __llor:
 	or	a, (hl)
 	ld	e, a
 	dec	hl
-	ld	a, (iy - 1)
+	ld	a, (hl)
+	lea	hl, iy - 1
 	or	a, (hl)
-	ld	(iy - 1), a
+	ld	(hl), a
 	pop	hl
 	ld	a, h
 	or	a, (iy + 10)
