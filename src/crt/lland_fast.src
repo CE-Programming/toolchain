@@ -3,7 +3,7 @@
 	section	.text
 	public	__lland_fast
 __lland_fast:
-; CC: 56*r(PC)+19*r(SPL)+8*w(SPL)+1
+; CC: 55*r(PC)+19*r(SPL)+8*w(SPL)+1
 	ld	iy, 0
 	add	iy, sp
 	push	hl
@@ -31,9 +31,10 @@ __lland_fast:
 	and	a, (hl)
 	ld	e, a
 	dec	hl
-	ld	a, (iy - 1)
+	ld	a, (hl)
+	lea	hl, iy - 1
 	and	a, (hl)
-	ld	(iy - 1), a
+	ld	(hl), a
 	pop	hl
 	ld	a, h
 	and	a, (iy + 4)
