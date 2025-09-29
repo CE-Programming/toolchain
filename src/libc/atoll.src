@@ -1,73 +1,20 @@
 	assume	adl=1
 
 	section	.text
-
 	public	_atoll
-
 _atoll:
-	push	ix
-	ld	ix, -3
-	add	ix, sp
-	ld	hl, (ix + 9)
-	; inlined isspace
-.whitespace_loop:
-	ld	a, (hl)
-	inc	hl
-	cp	a, 32
-	jr	z, .whitespace_loop
-	sub	a, 9
-	add	a, -5
-	jr	nc, .whitespace_loop
-
-	; A = (HL - 1) - 9 + -5
-	; A = (HL - 1) - 14
-	xor	a, '-' - 14
-	push	af
-	jr	z, .minus_sign
-	xor	a, ('+' - 14) xor ('-' - 14)
-	jr	z, .plus_sign
-	dec	hl
-.plus_sign:
-.minus_sign:
-	; carry is cleared
+	pop	bc
+	ex	(sp),hl
+	push	bc
+	ld	bc,10
+	push	bc
+	ld	c,b
+	push	bc
 	push	hl
-	pop	iy
-	sbc	hl, hl
-	ex	de, hl
-	sbc	hl, hl
-	ld	b, l
-	ld	c, l
-	push	hl
-	push	hl
-	push	hl
-	; IY = start of the digits
-	; BC:UDE:UHL = 0
-	; (ix - 9) = [0, 10]
-	jr	.start
-.loop:
-	; loop  : 27F + 1R + 8W + 1
-	; lladd : ?
-	; llmulu: ?
-	; total : a lot per digit
-	ld	(ix - 9), 10
-	call	__llmulu	; BC:UDE:UHL *= 10
-	ld	(ix - 9), a
-	call	__lladd
-	inc	iy		; next digit
-.start:
-	ld	a, (iy)
-	sub	a, 48
-	cp	a, 10
-	jr	c, .loop
-.finish:
-	ld	sp, ix
+	call	_strtoll
 	pop	af
-	; carry is cleared
-	pop	ix
-	ret	nz	; A != '-' positive
-	; A == '-' negative
-	jp	__llneg
+	pop	af
+	pop	af
+	ret
 
-	extern	__llneg
-	extern	__lladd
-	extern	__llmulu
+	extern	_strtoll
