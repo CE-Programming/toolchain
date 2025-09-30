@@ -1,0 +1,28 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CWCTYPE
+#define _EZCXX_CWCTYPE
+
+#include <wctype.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::wint_t;
+
+using ::iswalnum;
+using ::iswalpha;
+using ::iswblank;
+using ::iswcntrl;
+using ::iswdigit;
+using ::iswgraph;
+using ::iswlower;
+using ::iswprint;
+using ::iswpunct;
+using ::iswspace;
+using ::iswupper;
+using ::iswxdigit;
+using ::towlower;
+using ::towupper;
+} // namespace std
+
+#endif // _EZCXX_CWCTYPE
