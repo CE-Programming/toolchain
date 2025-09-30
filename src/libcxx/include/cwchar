@@ -1,0 +1,34 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CWCHAR
+#define _EZCXX_CWCHAR
+
+#include <wchar.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::wint_t;
+
+using ::wmemcpy;
+using ::wmemmove;
+using ::wmemset;
+using ::wmemcmp;
+using ::wmemchr;
+using ::wcscpy;
+using ::wcsncpy;
+using ::wcscat;
+using ::wcsncat;
+using ::wcschr;
+using ::wcsrchr;
+using ::wcspbrk;
+using ::wcsstr;
+using ::wcstok;
+using ::wcscspn;
+using ::wcsspn;
+using ::wcslen;
+using ::wcsnlen;
+using ::wcscmp;
+using ::wcsncmp;
+} // namespace std
+
+#endif // _EZCXX_CWCHAR
