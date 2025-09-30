@@ -11,10 +11,6 @@ extern __fenv_t __fe_cur_env;
 #ifndef _FENV_H
 #define _FENV_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 enum {
     FE_DIVBYZERO  = 1 << 6,
 #define FE_DIVBYZERO  FE_DIVBYZERO
@@ -45,39 +41,53 @@ typedef unsigned char fexcept_t;
 extern const fenv_t __fe_dfl_env;
 #define FE_DFL_ENV (&__fe_dfl_env)
 
-int feclearexcept(int);
-#define feclearexcept(excepts) (__fe_cur_env &= ~((excepts) & FE_ALL_EXCEPT), 0)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-int fegetexceptflag(fexcept_t *, int);
-#define fegetexceptflag(flagp, excepts) (*(flagp) = __fe_cur_env & (excepts) & FE_ALL_EXCEPT, 0)
+inline int feclearexcept(int __excepts) {
+    return (__fe_cur_env &= ~((__excepts) & FE_ALL_EXCEPT), 0);
+}
 
-int feraiseexcept(int);
-#define feraiseexcept(excepts) (__fe_cur_env |= (excepts) & FE_ALL_EXCEPT, 0)
+inline int fegetexceptflag(fexcept_t *__flagp, int __excepts) {
+    return (*(__flagp) = __fe_cur_env & (__excepts) & FE_ALL_EXCEPT, 0);
+}
 
-int fesetexceptflag(const fexcept_t *, int);
-#define fesetexceptflag(flagp, excepts) (__fe_cur_env = (__fe_cur_env & ~((excepts) & FE_ALL_EXCEPT)) \
-                                         | (*(flagp) & (excepts) & FE_ALL_EXCEPT), 0)
+inline int feraiseexcept(int __excepts) {
+    return (__fe_cur_env |= (__excepts) & FE_ALL_EXCEPT, 0);
+}
 
-int fetestexcept(int);
-#define fetestexcept(excepts) (__fe_cur_env & (excepts) & FE_ALL_EXCEPT)
+inline int fesetexceptflag(const fexcept_t *__flagp, int __excepts) {
+    return (__fe_cur_env = (__fe_cur_env & ~((__excepts) & FE_ALL_EXCEPT)) | (*(__flagp) & (__excepts) & FE_ALL_EXCEPT), 0);
+}
 
-int fegetround(void);
-#define fegetround() (__fe_cur_env & 3)
+inline int fetestexcept(int __excepts) {
+    return (__fe_cur_env & (__excepts) & FE_ALL_EXCEPT);
+}
 
-int fesetround(int);
-#define fesetround(rounding_mode) (__fe_cur_env = (__fe_cur_env & ~3) | ((rounding_mode) & 3), 0)
+inline int fegetround(void) {
+    return (__fe_cur_env & 3);
+}
 
-int fegetenv(fenv_t *);
-#define fegetenv(envp) (*(envp) = __fe_cur_env, 0)
+inline int fesetround(int __rounding_mode) {
+    return (__fe_cur_env = (__fe_cur_env & ~3) | ((__rounding_mode) & 3), 0);
+}
 
-int feholdexcept(fenv_t *);
-#define feholdexcept(envp) (*(envp) = __fe_cur_env, __fe_cur_env &= ~FE_ALL_EXCEPT, 0)
+inline int fegetenv(fenv_t *__envp) {
+    return (*(__envp) = __fe_cur_env, 0);
+}
 
-int fesetenv(const fenv_t *);
-#define fesetenv(envp) (__fe_cur_env = *(envp), 0)
+inline int feholdexcept(fenv_t *__envp) {
+    return (*(__envp) = __fe_cur_env, __fe_cur_env &= ~FE_ALL_EXCEPT, 0);
+}
 
-int feupdateenv(const fenv_t *);
-#define feupdateenv(envp) (__fe_cur_env = (__fe_cur_env & FE_ALL_EXCEPT) | *(envp), 0)
+inline int fesetenv(const fenv_t *__envp) {
+    return (__fe_cur_env = *(__envp), 0);
+}
+
+inline int feupdateenv(const fenv_t *__envp) {
+    return (__fe_cur_env = (__fe_cur_env & FE_ALL_EXCEPT) | *(__envp), 0);
+}
 
 #ifdef __cplusplus
 }

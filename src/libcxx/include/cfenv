@@ -1,0 +1,26 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CFENV
+#define _EZCXX_CFENV
+
+#include <fenv.h>
+
+#pragma clang system_header
+
+namespace std {
+using ::fenv_t;
+using ::fexcept_t;
+
+using ::feclearexcept;
+using ::fegetexceptflag;
+using ::feraiseexcept;
+using ::fesetexceptflag;
+using ::fetestexcept;
+using ::fegetround;
+using ::fesetround;
+using ::fegetenv;
+using ::feholdexcept;
+using ::fesetenv;
+using ::feupdateenv;
+} // namespace std
+
+#endif // _EZCXX_CFENV

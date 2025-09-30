@@ -3,19 +3,24 @@
 const fenv_t __fe_dfl_env = FE_TONEAREST;
 fenv_t __fe_cur_env = __fe_dfl_env;
 
-#define _
-#define DEF(name, params, args) int name _ params { return name args; }
+extern inline int feclearexcept(int __excepts);
 
-DEF(feclearexcept, (int excepts), (excepts))
-DEF(fegetexceptflag, (fexcept_t *flagp, int excepts), (flagp, excepts))
-DEF(feraiseexcept, (int excepts), (excepts))
-DEF(fesetexceptflag, (const fexcept_t *flagp, int excepts), (flagp, excepts))
-DEF(fetestexcept, (int excepts), (excepts))
+extern inline int fegetexceptflag(fexcept_t *__flagp, int __excepts);
 
-DEF(fegetround, (void), ())
-DEF(fesetround, (int rounding_mode), (rounding_mode))
+extern inline int feraiseexcept(int __excepts);
 
-DEF(fegetenv, (fenv_t *envp), (envp))
-DEF(feholdexcept, (fenv_t *envp), (envp))
-DEF(fesetenv, (const fenv_t *envp), (envp))
-DEF(feupdateenv, (const fenv_t *envp), (envp))
+extern inline int fesetexceptflag(const fexcept_t *__flagp, int __excepts);
+
+extern inline int fetestexcept(int __excepts);
+
+extern inline int fegetround(void);
+
+extern inline int fesetround(int __rounding_mode);
+
+extern inline int fegetenv(fenv_t *__envp);
+
+extern inline int feholdexcept(fenv_t *__envp);
+
+extern inline int fesetenv(const fenv_t *__envp);
+
+extern inline int feupdateenv(const fenv_t *__envp);
