@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cctype>
 #include <cerrno>
+#include <cfenv>
 #include <cfloat>
 #include <cinttypes>
 #include <ciso646>
