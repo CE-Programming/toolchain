@@ -13,7 +13,7 @@
 #include <type_traits>
 
 #if __cplusplus >= 201907L
-	#include <concepts>
+    #include <concepts>
 #endif
 
 #pragma clang system_header
@@ -31,10 +31,10 @@ inline constexpr bool __false = false;
 
 template <class _Tp>
 struct __illformed {
-	static_assert(
-		__false<_Tp>,
-		"A program that instantiates a primary template of a mathematical constant variable template is ill-formed."
-	);
+    static_assert(
+        __false<_Tp>,
+        "A program that instantiates a primary template of a mathematical constant variable template is ill-formed."
+    );
 };
 
 template <class _Tp>

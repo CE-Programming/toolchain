@@ -33,7 +33,7 @@ class source_location {
     // type unless the builtin returned that, anyhow, and the invalid cast is
     // unavoidable.
     using __bsl_ty _EZCXX_NODEBUG = decltype(__builtin_source_location());
-  
+
 public:
     // The defaulted __ptr argument is necessary so that the builtin is evaluated
     // in the context of the caller. An explicit value should never be provided.
@@ -43,7 +43,7 @@ public:
         return __sl;
     }
     _EZCXX_HIDE_FROM_ABI constexpr source_location() noexcept = default;
-  
+
     _EZCXX_HIDE_FROM_ABI constexpr uint_least32_t line() const noexcept {
         return __ptr_ != nullptr ? __ptr_->_M_line : 0;
     }

@@ -702,7 +702,7 @@ C((is_same_v<void*&&, add_rvalue_reference_t<void*&&>>));
 C((is_same_v<void(*&&)(), add_rvalue_reference<void(*&&)()>::type>));
 
 //------------------------------------------------------------------------------
-// alignment_of 
+// alignment_of
 //------------------------------------------------------------------------------
 
 // test alignment_of
@@ -731,6 +731,30 @@ C((extent_v<int[]> == 0));
 
 // test remove_all_extents
 /** @todo */
+
+// test is_bounded_array
+namespace test_is_bounded_array {
+    class A {};
+    C((!is_bounded_array_v<A>));
+    C((!is_bounded_array_v<A[]>));
+    C(( is_bounded_array_v<A[3]>));
+    C((!is_bounded_array_v<float>));
+    C((!is_bounded_array_v<int>));
+    C((!is_bounded_array_v<int[]>));
+    C(( is_bounded_array_v<int[3]>));
+}
+
+// test is_unbounded_array
+namespace test_is_unbounded_array {
+    class A {};
+    C((!is_unbounded_array_v<A>));
+    C(( is_unbounded_array_v<A[]>));
+    C((!is_unbounded_array_v<A[3]>));
+    C((!is_unbounded_array_v<float>));
+    C((!is_unbounded_array_v<int>));
+    C(( is_unbounded_array_v<int[]>));
+    C((!is_unbounded_array_v<int[3]>));
+}
 
 //------------------------------------------------------------------------------
 // decay
@@ -873,6 +897,10 @@ C((is_nothrow_assignable_v<int&, double>));
 C((is_copy_assignable_v<test_struct>));
 C((!is_copy_assignable_v<int[2]>));
 
+// test is_trivially_copy_assignable_v
+/** @todo get more complicated tests */
+C((is_trivially_copy_assignable_v<test_struct>));
+
 // test is_nothrow_copy_assignable
 /** @todo get more complicated tests */
 C((is_nothrow_copy_assignable_v<int>));
@@ -887,6 +915,10 @@ namespace test_is_move_assignable {
     C((!is_move_assignable_v<int[2]>));
     C((is_move_assignable_v<NoMove>));
 }
+
+// test is_trivially_move_assignable
+/** @todo get more complicated tests */
+C((is_trivially_move_assignable_v<test_struct>));
 
 // test is_nothrow_move_assignable
 /** @todo get more complicated tests */

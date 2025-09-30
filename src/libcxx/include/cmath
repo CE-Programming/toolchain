@@ -637,7 +637,7 @@ using ::nextupl;
 inline float nextup(float __x) { return nextupf(__x); }
 inline long double nextup(long double __x) { return nextupl(__x); }
 template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>                                                           
+__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
 nextup(_Tp __x) { return nextup(__x); }
 
 using ::nexttoward;
@@ -655,7 +655,7 @@ using ::nextdownl;
 inline float nextdown(float __x) { return nextdownf(__x); }
 inline long double nextdown(long double __x) { return nextdownl(__x); }
 template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>                                                           
+__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
 nextdown(_Tp __x) { return nextdown(__x); }
 
 using ::pow;

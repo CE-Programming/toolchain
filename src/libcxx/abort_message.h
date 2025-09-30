@@ -20,6 +20,7 @@ __BEGIN_DECLS
 void __abort_message(const char *) __attribute__((noreturn));
 
 __END_DECLS
-__END_DECLS
+
+} // namespace std
 
 #endif // _EZCXX_ABORT_MESSAGE_H

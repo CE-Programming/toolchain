@@ -47,4 +47,3 @@ install: all
 	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_CXX_H))
 
 .PHONY: all clean
-
