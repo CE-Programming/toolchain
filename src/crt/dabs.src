@@ -1,0 +1,10 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__dabs
+
+; assumes BC:UDE:UHL
+__dabs:
+	res	7, b
+	ret
