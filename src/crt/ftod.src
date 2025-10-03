@@ -15,13 +15,13 @@ __ftod:
 
 	ld	a, e
 	ld	b, $03	; ld bc, $380 - 1
-	
+
 	adc	hl, hl
 	jr	z, .mant_zero	; zero inf or normal
 	adc	a, a
 	jr	z, .subnormal
 	inc	a
-	jr	z, .nan	
+	jr	z, .nan
 .normal:
 	; (Float64_bias - Float32_bias) - 1 (undoing inc a)
 	; (Float64_bias - Float32_bias) = $0380

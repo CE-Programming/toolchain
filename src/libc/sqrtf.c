@@ -11,7 +11,7 @@ __f32_fast_div4:
 	push	de, hl, bc
 	ret
 */
-float _f32_fast_div4(float x);
+float _f32_fast_div4(float x) __attribute__((__const__, __leaf__, __nothrow__));
 
 /**
  * @remarks Minimum ulp of -1
