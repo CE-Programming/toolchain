@@ -1,0 +1,185 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__fpcbrt
+
+; IEEE single precision cube root
+; aubc = cbrt(aubc)
+__fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cbrt(bitcast(float, pair8_24_t, { in.BC, in.A }))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	push	de, bc
+	ex	(sp), hl
+	ld	e, a
+	call	__fppop1
+	inc	e
+	jq	z, .nonfinite
+	dec	e
+	ld	d, 0ABh	; multiplicative inverse of 3 modulo 256
+	ld	b, d
+	mlt	de
+	ld	c, a
+	ld	a, i
+	push	af, hl
+	ex	(sp), ix
+	or	a, a
+	sbc	hl, hl
+	ld	a, e
+	ld	d, 10	; maximum normalization iterations to determine a zero
+.modulo.loop:
+	; x <<= 1
+	add	ix, ix
+	adc	hl, hl
+	sub	a, b
+	jq	c, .modulo.loop
+	jq	nz, .normalized
+	dec	d
+	jq	z, .return
+	cp	a, l
+	inc	a
+	jq	nc, .modulo.loop
+.normalized:
+	add	a, d
+	ld	b, a
+	push	bc
+	xor	a, a
+	ld	d, a
+	ld	e, a
+	push	de
+	ex	(sp), iy
+	; Optimized first iteration, we know UHL >= 1
+	; r += 1
+	inc	de
+	; x -= r << 24
+	dec	hl
+	di
+	exx
+	ld	c, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	b, 24
+	; x in AUHL[UHL']UIX, r in CUDE[UDE'], q in UIY
+.root.loop:
+	exx
+	lea	bc, iy
+	jq	c, .root.zerobit
+	ex	af, af'
+	; q += 1
+	inc	iy
+	; r += q * 4 - 1
+	ex	de, hl
+	xor	a, a
+	add	hl, bc
+	rla
+	inc	bc
+	repeat	3
+	add	hl, bc
+	adc	a, 0
+	end repeat
+	; r <<= 2
+	add	hl, hl
+	rla
+	; r += q
+	add	hl, bc
+	adc	a, 0
+	jq	.root.nextbit
+.root.zerobit:
+	; x += r << 24
+	add	hl, de
+	exx
+	adc	hl, de
+	adc	a, c
+	exx
+	ex	af, af'
+	; r -= q + 1
+	ex	de, hl
+	scf
+	sbc	hl, bc
+	sbc	a, a
+	; r <<= 1
+	add	hl, hl
+	rla
+	; r -= q
+	or	a, a
+	sbc	hl, bc
+	sbc	a, 0
+.root.nextbit:
+	; r <<= 1
+	add	hl, hl
+	rla
+	ex	de, hl
+	exx
+	push	hl
+	; Sign extend carry byte to 32 bits
+	sbc	hl, hl
+	ld	l, a
+	sbc	a, a
+	; Left shift high 32 bits of r by 2
+	ex	de, hl
+	repeat	2
+	add	hl, hl
+	rl	c
+	end repeat
+	; Add carry byte to shifted high bits
+	add	hl, de
+	ex	de, hl
+	adc	a, c
+	ld	c, a
+	pop	hl
+	exx
+	; x <<= 3
+	xor	a, a
+	repeat	3
+	add	ix, ix
+	adc	hl, hl
+	rla
+	end repeat
+	exx
+	ex	af, af'
+	repeat	3
+	add	hl, hl
+	rla
+	end repeat
+	ex	af, af'
+	or	a, l
+	ld	l, a
+	ex	af, af'
+	exx
+	; q <<= 1
+	add	iy, iy	; clears carry
+	; r += 1
+	inc	de	; sets bit 0 so never overflows
+	; x -= r << 24
+	sbc	hl, de
+	exx
+	sbc	hl, de
+	sbc	a, c
+	djnz	.root.loop
+	; Apply rounding (never round-to-even because a root with the lowest mantissa bit set must be irrational)
+	; q += !carry
+	exx
+	sbc	hl, hl
+	inc	hl
+	add	hl, bc
+	pop	iy, bc
+	; Get final exponent after rounding
+	ld	a, b
+	adc	a, 07Fh - (07Fh / 3) - 10
+	; Set low exponent bit
+	srl	b
+	jq	nc, .return
+	ld	de, 0800000h
+	add	hl, de
+.return:
+	sla	c
+	rra
+	pop	ix, bc
+	bit	2, c
+.nonfinite:
+	ex	(sp), hl
+	pop	bc, de
+	ret	z
+	ei
+	ret
+
+	extern	__fppop1
