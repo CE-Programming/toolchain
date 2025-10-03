@@ -15,11 +15,11 @@ _zx0_Decompress:
 ; -----------------------------------------------------------------------------
 
 dzx0_turbo:
-	ld	bc, -1		; preserve default offset 1
-	ld	(dzx0t_last_offset+1), bc
-	inc	bc
-	ld	a, $80
-	jr	dzx0t_literals
+	ld	iy, -1		; preserve default offset 1
+	lea	bc, iy + 2	; ld bc, 1
+	scf
+	jr	dzx0t_start
+
 dzx0t_new_offset:
 	dec	bc
 	dec	bc		; prepare negative offset
@@ -37,14 +37,15 @@ dzx0t_new_offset_skip:
 	inc	hl
 	rr	b		; last offset bit becomes first length bit
 	rr	c
-	ld	(dzx0t_last_offset+1), bc ; preserve new offset
+	push	bc
+	pop	iy		; preserve new offset
 	ld	bc, 1		; obtain length
 	call	nc, dzx0t_elias
 	inc	bc
 dzx0t_copy:
 	push	hl		; preserve source
-dzx0t_last_offset:
-	ld	hl, 0		; restore offset
+; dzx0t_last_offset:
+	lea	hl, iy		; restore offset
 	add	hl, de		; calculate destination - offset
 	ldir			; copy from offset
 	pop	hl		; restore source
@@ -54,6 +55,7 @@ dzx0t_literals:
 	inc	c		; obtain length
 	add	a, a
 	jr	nz, dzx0t_literals_skip
+dzx0t_start:
 	ld	a, (hl)		; load another group of 8 bits
 	inc	hl
 	rla
@@ -71,6 +73,7 @@ dzx0t_literals_skip:
 dzx0t_last_offset_skip:
 	call	nc, dzx0t_elias
 	jr	dzx0t_copy
+
 dzx0t_elias:
 	add	a, a		; interlaced Elias gamma coding
 	rl	c
