@@ -4,6 +4,59 @@
 
 	public	__fpmul
 
+; ensures that all labels can be reached with jr
+__fpmul_helper:
+.nonfinite:
+	sbc	hl, bc
+	jq	z, .return.2
+	add	hl, bc
+	pop	bc
+	jq	.return.1
+
+.nonfinite.1:
+	inc	d
+	jq	z, .nonfinite
+	ex	de, hl
+	pop	hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ex	de, hl
+	jq	nz, .return.1
+	ld	h, a
+.return.1:
+	pop	af
+	ex	(sp), hl
+	pop	bc
+	jq	.return
+
+.nonfinite.2:
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jq	z, .return.nan
+.return.2:
+	pop	bc, af, bc
+	push	bc
+.return.pop:
+	pop	hl
+.return:
+	pop	de
+	or	a, 07Fh
+	ret
+
+.return.nan:
+	pop	bc
+	set	7, b
+	pop	af
+	jq	.return.pop
+
+__fpmul_helper.underflow:
+	pop	af, af, hl, de
+	and	a, 080h
+	ld	bc, 0
+	ret
+
 ; IEEE single precision multiplication
 ; aubc = aubc * euhl
 __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(float, pair8_24_t, { in.BC, in.A }) * bitcast(float, pair8_24_t, { in.HL, in.E })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
@@ -18,11 +71,11 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	e, a
 	call	__fppop2
 	inc	e
-	jq	z, .nonfinite.1
+	jr	z, __fpmul_helper.nonfinite.1
 	inc	d
-	jq	z, .nonfinite.2
+	jr	z, __fpmul_helper.nonfinite.2
 	ld	a, d
-	ld	d, b; 0
+	ld	d, b		; ld d, 0
 	rlc	e
 	ccf
 	rr	e
@@ -38,7 +91,7 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	jq	z, .subnormal
 	jq	c, .continue
 	cp	a, -23
-	jq	c, .underflow
+	jr	c, __fpmul_helper.underflow
 .subnormal:
 	dec	a
 	ld	d, a
@@ -75,26 +128,28 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	bc, (ix + 12)
 	mlt	bc
 	add	hl, bc
+
 	ld	(ix + 2), hl
-	ld	hl, (ix + 3)
-	inc	hl
-	dec.s	hl
-	ld	c, (ix + 11)
-	ld	b, (ix + 15)
-	mlt	bc
+	ld	b, (ix + 4)
+	ld	c, h
+	ld	l, (ix + 11)
+	ld	h, (ix + 15)
+	mlt	hl		; clears UHL
 	add	hl, bc
+
 	ld	c, (ix + 12)
 	ld	b, (ix + 14)
 	mlt	bc
 	add	hl, bc
+
 	ld	(ix + 3), hl
-	ld	hl, (ix + 4)
-	inc	hl
-	dec.s	hl
-	ld	c, (ix + 12)
-	ld	b, (ix + 15)
-	mlt	bc
+	ld	b, (ix + 5)
+	ld	c, h
+	ld	l, (ix + 12)
+	ld	h, (ix + 15)
+	mlt	hl		; clears UHL
 	add	hl, bc
+
 	cp	a, d
 	jq	nz, .normalized
 	ld	bc, (ix + 2)
@@ -127,52 +182,6 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ex	(sp), hl
 	pop	bc, de
 	ret
-.underflow:
-	pop	af, af, hl, de
-	and	a, 080h
-	ld	bc, 0
-	ret
-.nonfinite:
-	sbc	hl, bc
-	jq	z, .return.2
-	add	hl, bc
-	pop	bc
-	jq	.return.1
-.nonfinite.1:
-	inc	d
-	jq	z, .nonfinite
-	ex	de, hl
-	pop	hl
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
-	ex	de, hl
-	jq	nz, .return.1
-	ld	h, a
-.return.1:
-	pop	af
-	ex	(sp), hl
-	pop	bc
-	jq	.return
-.nonfinite.2:
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
-	jq	z, .return.nan
-.return.2:
-	pop	bc, af, bc
-	push	bc
-.return.pop:
-	pop	hl
-.return:
-	pop	de
-	or	a, 07Fh
-	ret
-.return.nan:
-	pop	bc
-	set	7, b
-	pop	af
-	jq	.return.pop
 
 	extern	__fppop1
 	extern	__fppop2
