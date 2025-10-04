@@ -1,0 +1,38 @@
+	assume	adl=1
+
+	section	.text
+	public	_strspn
+_strspn:
+	xor	a, a
+	sbc	hl, hl
+	add	hl, sp
+	ld	bc, 3
+	add	hl, bc
+	ld	de, (hl)	; DE = str
+	add	hl, bc		; Always resets carry
+	ld	iy, (hl)	; IY = accept
+
+	; Calculate strlen(accept)
+	ld	c, a
+	lea	hl, iy
+	cpir
+	sbc	hl, hl
+	scf
+	sbc	hl, bc		; Always sets carry
+	ret	z		; Return 0 if accept is empty
+
+	push	hl
+	ex	(sp), ix	; IX = strlen(accept)
+	push	de
+.loop:
+	ld	a, (de)		; A = *str++
+	inc	de
+	lea	hl, iy		; HL = accept
+	lea	bc, ix		; BC = strlen(accept)
+	cpir			; Find A in accept
+	jr	z, .loop	; Loop if match
+	ex	de, hl		; Calculate number of matching characters
+	pop	de
+	sbc	hl, de		; Input carry is set
+	pop	ix
+	ret

@@ -1,0 +1,50 @@
+	assume	adl=1
+
+	section	.text
+	public	_strcspn
+_strcspn:
+	call	__strcspn_strpbrk_common
+	sbc	hl, de		; Calculate number of mismatching characters
+	ret
+
+	section	.text
+	public	_strpbrk
+_strpbrk:
+	call	__strcspn_strpbrk_common
+	ret	nz		; Return pointer if not end of string
+	sbc	hl, hl		; Return NULL
+	ret
+
+	section	.text
+	private	__strcspn_strpbrk_common
+__strcspn_strpbrk_common:
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)	; DE = str
+	ld	bc, 3
+	add	hl, bc		; Always resets carry
+	ld	hl, (hl)	; HL = reject
+
+	; Calculate strlen(reject)
+	push	hl
+	xor	a, a
+	ld	c, a
+	cpir
+	sbc	hl, hl
+	sbc	hl, bc
+	ex	(sp), hl
+	pop	iy		; IY = strlen(reject) + 1
+	dec	hl		; HL = reject - 1
+	push	de
+.loop:
+	ld	a, (de)		; A = *str++
+	inc	de
+	lea	bc, iy		; BC = strlen(reject) + 1
+	add	hl, bc		; HL = reject + strlen(reject)
+	cpdr			; Find A in reject, including null terminator
+	jr	nz, .loop	; Loop if no match
+	ex	de, hl
+	dec	hl		; HL = pointer to matching character
+	pop	de		; DE = str
+	or	a, a		; Check if A is null terminator and reset carry
+	ret
