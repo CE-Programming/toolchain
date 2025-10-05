@@ -5,39 +5,45 @@
 	public	_strlcat
 
 _strlcat:
-	push	ix
-	ld	ix, 0
-	lea	bc, ix
-	add	ix, sp
-	ld	hl, (ix + 9)	; src
+	ld	iy, 0
+	lea	bc, iy
+	add	iy, sp
+	ld	hl, (iy + 6)	; src
 	xor	a, a
 	cpir
 	sbc	hl, hl
-	scf
+	dec	hl
 	sbc	hl, bc
-	push	hl		; src_len
+	; carry is clear
+	ex	de, hl
 
-	ld	de, (ix + 12)	; max_size
+	; inlined strnlen
+	ld	bc, (iy + 9)	; max_size
 	sbc	hl, hl
-	adc	hl, de
+	sbc	hl, bc
 	; Allows dst to be NULL when max_size is zero
-	jr	z, .zero_size
-
-	push	de
-	ld	hl, (ix + 6)	; dst
-	push	hl
-	call	_strnlen
-	pop	af
-	pop	af
+	jr	z, .zero_size	; return src_len
+	add	hl, bc
+	push	de		; src_len
+	ld	de, (iy + 3)	; dst
+	sbc	hl, de
+	ex	de, hl
+	cpir
+	add	hl, de
+	jr	z, .finish_strnlen
+	inc	hl
+.finish_strnlen:
 
 	ex	de, hl
-	ld	hl, (ix + 12)	; max_size
+	ld	hl, (iy + 9)	; max_size
 	; (copy_size + 1) = max_size - dst_len
 	xor	a, a
 	sbc	hl, de
+	jr	z, .no_room
+
 	pop	bc		; src_len
 	push	bc
-	jr	z, .no_room
+
 	; (copy_size + 1) - src_len - 1
 	scf
 	sbc	hl, bc
@@ -50,22 +56,21 @@ _strlcat:
 	xor	a, a
 	adc	hl, bc
 	jr	z, .zero_copy_size
-	push	de		; dst_len
 	push	hl
 	pop	bc
-	ld	hl, (ix + 6)	; dst
+
+	push	de		; dst_len
+	ld	hl, (iy + 3)	; dst
 	add	hl, de		; dst + dst_len
 	ex	de, hl
-	ld	hl, (ix + 9)	; src
+	ld	hl, (iy + 6)	; src
 	ldir
 	ld	(de), a		; null terminate
 	pop	de		; dst_len
 .zero_copy_size:
 .no_room:
-.zero_size:
 	pop	hl		; src_len
+.zero_size:
+	; return src_len + dst_len
 	add	hl, de
-	pop	ix
 	ret
-
-	extern	_strnlen
