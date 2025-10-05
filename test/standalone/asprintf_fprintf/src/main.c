@@ -22,6 +22,8 @@
 
 #define C(expr) if (!(expr)) { return __LINE__; }
 
+#define TEST(test) { ret = test; if (ret != 0) { return ret; }}
+
 #define SINK (char*)0xE40000
 
 /* pass NULL into functions without triggering -Wnonnull */
@@ -54,6 +56,9 @@ void *T_memrchr(const void *s, int c, size_t n)
 char *T_stpcpy(char *__restrict dest, const char *__restrict src)
     __attribute__((nonnull(1, 2)));
 
+size_t T_strlcat(void *__restrict dest, const void *__restrict src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
 size_t T_strlen(const char *s)
     __attribute__((nonnull(1)));
 
@@ -75,6 +80,7 @@ void T_bzero(void* s, size_t n);
 #define T_mempcpy mempcpy
 #define T_memrchr memrchr
 #define T_stpcpy stpcpy
+#define T_strlcat strlcat
 #define T_strlen strlen
 #define T_strcmp strcmp
 #define T_strncmp strncmp
@@ -159,7 +165,7 @@ int boot_sprintf_tests(void) {
         printf("E: %d != %d\n", len_3, pos_3);
         return __LINE__;
     }
-    
+
     // large string test
     static char const * const s = "Hello";
     int len_4 = boot_snprintf(SINK, 300,
@@ -271,7 +277,7 @@ int nano_tests(void) {
         printf("E: %d != %d\n", len_3s, pos_3);
         return __LINE__;
     }
-    
+
     // https://en.cppreference.com/w/c/io/fprintf
     static char const * const s = "Hello";
     int len_4 = snprintf(SINK, 300,
@@ -360,7 +366,7 @@ int memccpy_tests(void) {
         return __LINE__;
     }
     file = fopen(file_name, "wb");
-    
+
     // Check if the file was opened successfully
     if (file == NULL) {
         perror("Error opening file");
@@ -371,24 +377,24 @@ int memccpy_tests(void) {
     const char terminal[] = {':', ' ', ',', '.', '!'};
     char dest[sizeof src];
     const char alt = '@';
- 
+
     for (size_t i = 0; i != sizeof terminal; ++i)
     {
         void* to = T_memccpy(dest, src, terminal[i], sizeof dest);
- 
+
         fprintf(file,"Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
- 
+
         // if `terminal` character was not found - print the whole `dest`
         to = to ? to : dest + sizeof dest;
- 
+
         for (char* from = dest; from != to; ++from) {
             fputc(isprint(*from) ? *from : alt, file);
         }
-        
+
         fputs("\"\n", file);
     }
- 
- 
+
+
     fprintf(file, "%c%s", '\n', "Separate star names from distances (ly):\n");
     const char *star_distance[] = {
         "Arcturus : 37", "Vega : 25", "Capella : 43", "Rigel : 860", "Procyon : 11"
@@ -396,7 +402,7 @@ int memccpy_tests(void) {
     char names_only[64];
     char *first = names_only;
     char *last = names_only + sizeof names_only;
- 
+
     for (size_t t = 0; t != (sizeof star_distance) / (sizeof star_distance[0]); ++t)
     {
         if (first) {
@@ -597,6 +603,56 @@ int memmove_test(void) {
     return 0;
 }
 
+static bool strcmp_exact(const char* x, const char* y) {
+    if (strlen(x) != strlen(y)) {
+        return false;
+    }
+    if (strcmp(x, y) != 0) {
+        return false;
+    }
+    return true;
+}
+
+int strlcat_test(void) {
+    const char* src1 = "Foo";
+    const char* src2 = "Bar";
+    char dst[10];
+
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 0) == 3); C(strcmp_exact(dst, "Foo"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 1) == 4); C(strcmp_exact(dst, "Foo"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 2) == 5); C(strcmp_exact(dst, "Foo"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 3) == 6); C(strcmp_exact(dst, "Foo"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 4) == 6); C(strcmp_exact(dst, "Foo"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 5) == 6); C(strcmp_exact(dst, "FooB"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 6) == 6); C(strcmp_exact(dst, "FooBa"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 7) == 6); C(strcmp_exact(dst, "FooBar"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 8) == 6); C(strcmp_exact(dst, "FooBar"));
+    strcpy(dst, src1); C(T_strlcat(dst , src2, 9) == 6); C(strcmp_exact(dst, "FooBar"));
+
+    strcpy(dst, src1); C(T_strlcat(dst , SINK, 0) == 0); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strlcat(dst , SINK, 1) == 1); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strlcat(dst , SINK, 2) == 2); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strlcat(dst , SINK, 3) == 3); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strlcat(dst , SINK, 4) == 3); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strlcat(dst , SINK, 5) == 3); C(strcmp_exact(dst, src1));
+
+    C(T_strlcat(NULL_ptr, SINK, 0) == 0);
+    C(T_strlcat(NULL_ptr, src1, 0) == 3);
+
+    dst[0] = '\0'; C(T_strlcat(dst, SINK, 0) == 0); C(dst[0] == '\0');
+    dst[0] = '\0'; C(T_strlcat(dst, SINK, 1) == 0); C(dst[0] == '\0');
+    dst[0] = '\0'; C(T_strlcat(dst, SINK, 2) == 0); C(dst[0] == '\0');
+
+    dst[0] = '\0'; C(T_strlcat(dst, src1, 0) == 3); C(strcmp_exact(dst, ""));
+    dst[0] = '\0'; C(T_strlcat(dst, src1, 1) == 3); C(strcmp_exact(dst, ""));
+    dst[0] = '\0'; C(T_strlcat(dst, src1, 2) == 3); C(strcmp_exact(dst, "F"));
+    dst[0] = '\0'; C(T_strlcat(dst, src1, 3) == 3); C(strcmp_exact(dst, "Fo"));
+    dst[0] = '\0'; C(T_strlcat(dst, src1, 4) == 3); C(strcmp_exact(dst, "Foo"));
+    dst[0] = '\0'; C(T_strlcat(dst, src1, 5) == 3); C(strcmp_exact(dst, "Foo"));
+
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* boot_asprintf */
@@ -618,25 +674,12 @@ int run_tests(void) {
         }
         if (ret != 0) { return ret; }
 
-    /* mempcpy */
-        ret = mempcpy_test();
-        if (ret != 0) { return ret; }
-
-    /* bzero */
-        ret = bzero_test();
-        if (ret != 0) { return ret; }
-
-    /* strncmp */
-        ret = strncmp_test();
-        if (ret != 0) { return ret; }
-
-    /* memrchr */
-        ret = memrchr_test();
-        if (ret != 0) { return ret; }
-
-    /* memrchr */
-        ret = memmove_test();
-        if (ret != 0) { return ret; }
+    TEST(mempcpy_test());
+    TEST(bzero_test());
+    TEST(strncmp_test());
+    TEST(memrchr_test());
+    TEST(memmove_test());
+    TEST(strlcat_test());
 
     return 0;
 }
@@ -675,7 +718,7 @@ int main(void)
             printf("All tests %s", "passed");
         #endif
     }
-    
+
     while (!os_GetCSC());
 
     return 0;

@@ -1,0 +1,71 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_strlcat
+
+_strlcat:
+	push	ix
+	ld	ix, 0
+	lea	bc, ix
+	add	ix, sp
+	ld	hl, (ix + 9)	; src
+	xor	a, a
+	cpir
+	sbc	hl, hl
+	scf
+	sbc	hl, bc
+	push	hl		; src_len
+
+	ld	de, (ix + 12)	; max_size
+	sbc	hl, hl
+	adc	hl, de
+	; Allows dst to be NULL when max_size is zero
+	jr	z, .zero_size
+
+	push	de
+	ld	hl, (ix + 6)	; dst
+	push	hl
+	call	_strnlen
+	pop	af
+	pop	af
+
+	ex	de, hl
+	ld	hl, (ix + 12)	; max_size
+	; (copy_size + 1) = max_size - dst_len
+	xor	a, a
+	sbc	hl, de
+	pop	bc		; src_len
+	push	bc
+	jr	z, .no_room
+	; (copy_size + 1) - src_len - 1
+	scf
+	sbc	hl, bc
+
+	jr	c, .copy_size_lt_src_len
+	; (copy_size + 1 - 1) >= src_len
+	; copy_size >= src_len
+	sbc	hl, hl
+.copy_size_lt_src_len:
+	xor	a, a
+	adc	hl, bc
+	jr	z, .zero_copy_size
+	push	de		; dst_len
+	push	hl
+	pop	bc
+	ld	hl, (ix + 6)	; dst
+	add	hl, de		; dst + dst_len
+	ex	de, hl
+	ld	hl, (ix + 9)	; src
+	ldir
+	ld	(de), a		; null terminate
+	pop	de		; dst_len
+.zero_copy_size:
+.no_room:
+.zero_size:
+	pop	hl		; src_len
+	add	hl, de
+	pop	ix
+	ret
+
+	extern	_strnlen
