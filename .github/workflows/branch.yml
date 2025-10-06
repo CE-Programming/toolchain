@@ -25,11 +25,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-22.04, macos-13, macos-14, windows-latest]
+        runs-on: [ubuntu-22.04, macos-15-intel, macos-14, windows-latest]
         compressed: [YES, NO]
         include:
           - nul: /dev/null
-          - runs-on: macos-13
+          - runs-on: macos-15-intel
             fasmg: /source/macos/x64/fasmg
             arch-suffix: "-intel"
             ez80-bins-suffix: macOS_intel
