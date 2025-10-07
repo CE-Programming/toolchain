@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 
 #define C(expr) if (!(expr)) { return __LINE__; }
+#define B(expr) if (!(expr)) { return false; }
 
 #define TEST(test) { ret = test; if (ret != 0) { return ret; }}
 
@@ -184,6 +185,11 @@ int stackoverflow_test(void) {
     return 0;
 }
 
+/**
+ * @brief tests if strto(f/d/ld) sets endptr correctly
+ */
+bool strtod_test(void);
+
 int other_test(void) {
     const char* text = "abc]]]def]ghi^^]]^^^jklm^^";
     char buf_1[10] = {'\0'};
@@ -216,6 +222,7 @@ int other_test(void) {
 int run_tests(void) {
     int ret = 0;
 
+    C(strtod_test());
     TEST(basic_test());
     TEST(stdc_test());
     TEST(stackoverflow_test());

@@ -24,6 +24,8 @@ typedef union F64_pun {
     uint64_t bin;
 } F64_pun;
 
+#define c_isdigit(c) ((c) >= '0' && (c) <= '9')
+
 /*************************************************
 *
 * strtold - string to long double conversion
@@ -42,14 +44,14 @@ typedef union F64_pun {
  * @remarks `*str >= '0' && *str <= '9'` is smaller than calls to `isdigit(*str)`
  * @todo Add support for INF INFINITY NAN NAN(...)
  */
-long double strtold(const char *__restrict nptr, char **__restrict endptr)
+long double strtold(char const * const __restrict nptr, char **__restrict endptr)
 {
     F64_pun val;
     int frac = 0;
     int exp = 0;
     bool sign = false;
     bool exp_sign = false;
-    const char *str = (const char*)nptr;
+    char const *__restrict str = nptr;
 
     while (isspace(*str)) {
         ++str;
@@ -62,38 +64,48 @@ long double strtold(const char *__restrict nptr, char **__restrict endptr)
         ++str;
     }
 
+    bool has_digits = false;
+
     val.flt = 0.0L;
-    while (*str >= '0' && *str <= '9') {
+    while (c_isdigit(*str)) {
+        has_digits = true;
         val.flt = val.flt * 10.0L + (long double)(*str - '0');
         ++str;
     }
 
     if (*str == '.') {
         ++str;
-        while (*str >= '0' && *str <= '9') {
+        while (c_isdigit(*str)) {
+            has_digits = true;
             val.flt = val.flt * 10.0L + (long double)(*str - '0');
             ++frac;
             ++str;
         }
     }
 
+    if (!has_digits) {
+        str = nptr;
+        goto finish;
+    }
+
     if (*str == 'e' || *str == 'E') {
+        char const * const end_of_digits = str;
         ++str;
         if (*str == '-') {
             exp_sign = true;
             ++str;
         } else if (*str == '+') {
-            exp_sign = false;
             ++str;
         }
-        while (*str >= '0' && *str <= '9') {
+        if (!c_isdigit(*str)) {
+            str = end_of_digits;
+            val.flt = 0.0L;
+            goto finish;
+        }
+        while (c_isdigit(*str)) {
             exp = exp * 10 + (*str - '0');
             ++str;
         }
-    }
-
-    if (endptr) {
-        *endptr = (char*)str;
     }
 
     if (exp_sign) {
@@ -118,8 +130,8 @@ long double strtold(const char *__restrict nptr, char **__restrict endptr)
             val.flt /= 10.0L;
             if (val.bin == 0)
             {
-                 errno = ERANGE;
-                 break;
+                errno = ERANGE;
+                break;
             }
             ++exp;
         }
@@ -127,6 +139,12 @@ long double strtold(const char *__restrict nptr, char **__restrict endptr)
     if (sign) {
         val.flt = -val.flt;
     }
+
+finish:
+    if (endptr) {
+        *endptr = (char*)str;
+    }
+
     return val.flt;
 }
 

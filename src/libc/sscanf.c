@@ -8,82 +8,138 @@
 #include <inttypes.h>
 #include <ctype.h>
 
-#define NO_FLOAT    0
-#define USE_STRTOD  1
-#define USE_STRTOF  2
-#define USE_STRTOLD 3
+#define NS_DISABLE_FLOAT 1
+#define NS_USE_STRTOD    2
+#define NS_USE_STRTOF    3
+#define NS_USE_STRTOLD   4
 
 /*============================================================================*/
 /* Config                                                                     */
 /*============================================================================*/
 
 /**
- * define to 0 or 1. Enables support for `[` set matching (such as "%3[^]^123abc]").
+ * define to `restrict`, `__restrict`, `__restrict__`, or leave blank.
  */
-#define ENABLE_SET_MATCHING 1
+ #define NS_restrict __restrict
+
+/**
+ * define to 0 or 1 (default = 1)
+ * Enables support for `[` set matching (such as "%3[^]^123abc]").
+ */
+ #define NS_ENABLE_SET_MATCHING 1
+
+/**
+ * define to 0 or 1 (default = 0)
+ * Adds support for C23 `%b` format specifiers.
+ */
+ #define NS_ENABLE_BINARY_CONVERSION_FORMAT 1
 
 /**
  * Maximum characters (including null terminator) to scan for set matching.
  * Also determines the highest maximum field width that can be processed.
- * Recommended values:
+ * Recommended values (default = 128):
  * - 128 or 256 if you are not targetting embedded platforms.
  * otherwise, for embedded targets:
  * - 16 allows for digits and a few other symbols to be matched.
  * - 72 allows for lowercase, uppercase, digits, and a few other symbols to be matched.
  */
-#define SCAN_LIMIT 40
+#define NS_SCAN_LIMIT 40
 
 /**
  * Select the float conversion routine used:
- * NO_FLOAT    : disables float conversion formats.
- * USE_STRTOD  : `strtod`  (default)
- * USE_STRTOF  : `strtof`  (speed)
- * USE_STRTOLD : `strtold` (precision)
+ * NS_DISABLE_FLOAT: disables float conversion formats.
+ * NS_USE_STRTOD   : `strtod`  (default)
+ * NS_USE_STRTOF   : `strtof`  (speed)
+ * NS_USE_STRTOLD  : `strtold` (precision)
  */
-#define STRING_TO_FLOAT USE_STRTOD
+#define NS_STRING_TO_FLOAT NS_USE_STRTOD
 
 /**
- * define to 0 or 1. Adds support for C23 `%b` format specifiers.
+ * define to 0 or 1 (default = 1).
+ * Enables/disables the `%L` conversion format and etc.
  */
-#define ENABLE_BINARY_CONVERSION_FORMAT 1
+#define NS_ENABLE_LONG_DOUBLE 1
 
 /**
- * define to `restrict`, `__restrict`, `__restrict__`, or leave blank.
+ * define to 0 or 1 (default = 1).
+ * You can disbale this if strto(f/d/ld) doesn't support hexadecimal floats.
  */
-#define NANO_SCANF_restrict __restrict
+#define NS_ENABLE_HEXADECIMAL_FLOAT 0
+
+/**
+ * define to 0 or 1 (default = 0).
+ * Inlines isdigit
+ */
+#define NS_INLINE_ISDIGIT 1
+
+/**
+ * define to 0 or 1 (default = 0).
+ * Inlines isspace
+ */
+ #define NS_INLINE_ISSPACE 0
 
 /*============================================================================*/
 /* Validate macros                                                            */
 /*============================================================================*/
 
+#ifndef NS_restrict
+# error "NS_restrict needs to be defined"
+#endif
+
 /* minimum size to read "-32768" */
-#if SCAN_LIMIT < 7
-# error "SCAN_LIMIT is too small"
+#if NS_SCAN_LIMIT < 7
+# error "NS_SCAN_LIMIT is too small"
 #endif
 
-#ifndef STRING_TO_FLOAT
-# error "STRING_TO_FLOAT must be defined to a value"
+#ifndef NS_ENABLE_SET_MATCHING
+# error "NS_ENABLE_SET_MATCHING must be defined to 0 or 1"
 #endif
 
-#if STRING_TO_FLOAT == USE_STRTOD
-# define STRING_TO_FLOAT_TYPE double
-# define STRING_TO_FLOAT_FUNC strtod
-#elif STRING_TO_FLOAT == USE_STRTOF
-# define STRING_TO_FLOAT_TYPE float
-# define STRING_TO_FLOAT_FUNC strtof
-#elif STRING_TO_FLOAT == USE_STRTOLD
-# define STRING_TO_FLOAT_TYPE long double
-# define STRING_TO_FLOAT_FUNC strtold
-#elif STRING_TO_FLOAT != NO_FLOAT
-# error "invalid STRING_TO_FLOAT value"
+#ifndef NS_ENABLE_BINARY_CONVERSION_FORMAT
+# error "NS_ENABLE_BINARY_CONVERSION_FORMAT must be defined to 0 or 1"
 #endif
 
-#ifndef ENABLE_SET_MATCHING
-# error "ENABLE_SET_MATCHING must be defined to 0 or 1"
+#ifndef NS_STRING_TO_FLOAT
+# error "NS_STRING_TO_FLOAT must be defined to a value"
 #endif
 
-#ifndef ENABLE_BINARY_CONVERSION_FORMAT
-# error "ENABLE_BINARY_CONVERSION_FORMAT must be defined to 0 or 1"
+#ifndef NS_INLINE_ISDIGIT
+# error "NS_INLINE_ISDIGIT must be defined to a value"
+#endif
+
+#ifndef NS_INLINE_ISSPACE
+# error "NS_INLINE_ISSPACE must be defined to a value"
+#endif
+
+#ifdef NS_ENABLE_FLOAT
+# error "NS_ENABLE_FLOAT should not be defined here"
+#endif
+
+#if NS_STRING_TO_FLOAT == NS_USE_STRTOD
+# define NS_STRING_TO_FLOAT_TYPE double
+# define NS_STRING_TO_FLOAT_FUNC strtod
+# define NS_ENABLE_FLOAT 1
+#elif NS_STRING_TO_FLOAT == NS_USE_STRTOF
+# define NS_STRING_TO_FLOAT_TYPE float
+# define NS_STRING_TO_FLOAT_FUNC strtof
+# define NS_ENABLE_FLOAT 1
+#elif NS_STRING_TO_FLOAT == NS_USE_STRTOLD
+# define NS_STRING_TO_FLOAT_TYPE long double
+# define NS_STRING_TO_FLOAT_FUNC strtold
+# define NS_ENABLE_FLOAT 1
+#elif NS_STRING_TO_FLOAT == NS_DISABLE_FLOAT
+# define NS_ENABLE_FLOAT 0
+#else
+# error "invalid NS_STRING_TO_FLOAT value"
+#endif
+
+#if NS_ENABLE_FLOAT
+# ifndef NS_ENABLE_LONG_DOUBLE
+#  error "NS_ENABLE_LONG_DOUBLE must be defined to 0 or 1"
+# endif
+# ifndef NS_ENABLE_HEXADECIMAL_FLOAT
+#  error "NS_ENABLE_HEXADECIMAL_FLOAT must be defined to 0 or 1"
+# endif
 #endif
 
 #if UINTMAX_MAX < ULLONG_MAX
@@ -101,70 +157,88 @@
     } \
 } while (0)
 
-#define CONSUME_WHITESPACE() while (isspace(*buf)) { buf++; }
+#if NS_INLINE_ISDIGIT
+static bool ns_isdigit(unsigned char ch) {
+    return (ch >= '0' && ch <= '9');
+}
+#else /* NS_INLINE_ISDIGIT */
+#define ns_isdigit(ch) isdigit(ch)
+#endif /* NS_INLINE_ISDIGIT */
+
+#if NS_INLINE_ISSPACE
+static bool ns_isspace(unsigned char ch) {
+    return (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\v' || ch == '\f' || ch == '\r');
+}
+#else /* NS_INLINE_ISSPACE */
+#define ns_isspace(ch) isspace(ch)
+#endif /* NS_INLINE_ISSPACE */
+
+#define CONSUME_WHITESPACE() while (ns_isspace(*buf)) { buf++; }
 
 #define RETURN_IF_NULL(ptr) if ((ptr) == NULL) { return assignment_count; }
 
+#if !NS_ENABLE_FLOAT
+# undef NS_ENABLE_LONG_DOUBLE
+# define NS_ENABLE_LONG_DOUBLE 0
+#endif /* NS_ENABLE_FLOAT */
+
 static intmax_t limit_strtoimax(
-    char const * NANO_SCANF_restrict str,
-    char * * NANO_SCANF_restrict endptr,
+    char const * NS_restrict str,
+    char const * * NS_restrict endptr,
     int base,
     size_t max_len,
-    char * NANO_SCANF_restrict scan_buf
+    char * NS_restrict scan_buf
 ) {
     if (max_len == 0) {
         return strtoimax(str, (char**)endptr, base);
     }
-    size_t copy_size = ((max_len + 1) > SCAN_LIMIT) ? SCAN_LIMIT : (max_len + 1);
-    strncpy(scan_buf, str, copy_size);
-    /* null terminate */
-    scan_buf[copy_size - 1] = '\0';
-    char* scan_endptr;
-    intmax_t value = strtoimax(scan_buf, &scan_endptr, base);
-    *endptr = (char*)(str + (scan_endptr - scan_buf));
+    size_t copy_size = (max_len > (NS_SCAN_LIMIT - 1)) ? (NS_SCAN_LIMIT - 1) : max_len;
+    scan_buf[0] = '\0';
+    strncat(scan_buf, str, copy_size);
+    char const * scan_endptr;
+    intmax_t value = strtoimax(scan_buf, (char**)&scan_endptr, base);
+    *endptr = str + (scan_endptr - scan_buf);
     return value;
 }
 
 static uintmax_t limit_strtoumax(
-    char const * NANO_SCANF_restrict str,
-    char * * NANO_SCANF_restrict endptr,
+    char const * NS_restrict str,
+    char const * * NS_restrict endptr,
     int base,
     size_t max_len,
-    char * NANO_SCANF_restrict scan_buf
+    char * NS_restrict scan_buf
 ) {
     if (max_len == 0) {
         return strtoumax(str, (char**)endptr, base);
     }
-    size_t copy_size = ((max_len + 1) > SCAN_LIMIT) ? SCAN_LIMIT : (max_len + 1);
-    strncpy(scan_buf, str, copy_size);
-    /* null terminate */
-    scan_buf[copy_size - 1] = '\0';
-    char* scan_endptr;
-    uintmax_t value = strtoumax(scan_buf, &scan_endptr, base);
-    *endptr = (char*)(str + (scan_endptr - scan_buf));
+    size_t copy_size = (max_len > (NS_SCAN_LIMIT - 1)) ? (NS_SCAN_LIMIT - 1) : max_len;
+    scan_buf[0] = '\0';
+    strncat(scan_buf, str, copy_size);
+    char const * scan_endptr;
+    uintmax_t value = strtoumax(scan_buf, (char**)&scan_endptr, base);
+    *endptr = str + (scan_endptr - scan_buf);
     return value;
 }
 
-#if STRING_TO_FLOAT
-static STRING_TO_FLOAT_TYPE limit_strtofloat(
-    char const * NANO_SCANF_restrict str,
-    char * * NANO_SCANF_restrict endptr,
+#if NS_ENABLE_FLOAT
+static NS_STRING_TO_FLOAT_TYPE limit_strtofloat(
+    char const * NS_restrict str,
+    char const * * NS_restrict endptr,
     size_t max_len,
-    char * NANO_SCANF_restrict scan_buf
+    char * NS_restrict scan_buf
 ) {
     if (max_len == 0) {
-        return STRING_TO_FLOAT_FUNC(str, (char**)endptr);
+        return NS_STRING_TO_FLOAT_FUNC(str, (char**)endptr);
     }
-    size_t copy_size = ((max_len + 1) > SCAN_LIMIT) ? SCAN_LIMIT : (max_len + 1);
-    strncpy(scan_buf, str, copy_size);
-    /* null terminate */
-    scan_buf[copy_size - 1] = '\0';
-    char* scan_endptr;
-    STRING_TO_FLOAT_TYPE value = STRING_TO_FLOAT_FUNC(scan_buf, &scan_endptr);
-    *endptr = (char*)(str + (scan_endptr - scan_buf));
+    size_t copy_size = (max_len > (NS_SCAN_LIMIT - 1)) ? (NS_SCAN_LIMIT - 1) : max_len;
+    scan_buf[0] = '\0';
+    strncat(scan_buf, str, copy_size);
+    char const * scan_endptr;
+    NS_STRING_TO_FLOAT_TYPE value = NS_STRING_TO_FLOAT_FUNC(scan_buf, (char**)&scan_endptr);
+    *endptr = str + (scan_endptr - scan_buf);
     return value;
 }
-#endif /* STRING_TO_FLOAT */
+#endif /* NS_ENABLE_FLOAT */
 
 /**
  * @author zerico2005 (Originally based off of https://github.com/tusharjois/bscanf)
@@ -176,21 +250,26 @@ static STRING_TO_FLOAT_TYPE limit_strtofloat(
  * @note ranges such as "%5[0-9]" or "%5[^a-z]" are not supported
  * @note Assumes little endian
  * @note `wchar_t` is not supported
+ * @warning invalid floating point strings are not handled correctly.
+ * Under the C standard, "100e" should fail to match to "%f" (since the
+ * exponent field may not be empty), and no value should be assigned. However,
+ * nano_scanf incorrectly matches "100e" to "%f", assigning a value of 100
+ * instead of exiting.
  */
 int vsscanf(
-    char const * const NANO_SCANF_restrict Buffer,
-    char const * const NANO_SCANF_restrict Format,
+    char const * const NS_restrict Buffer,
+    char const * const NS_restrict Format,
     va_list args
 ) {
-    char scan_buf[SCAN_LIMIT];
+    char scan_buf[NS_SCAN_LIMIT];
     int assignment_count = 0;
-    char const * NANO_SCANF_restrict buf = Buffer;
-    char const * NANO_SCANF_restrict fmt = Format;
+    char const * NS_restrict buf = Buffer;
+    char const * NS_restrict fmt = Format;
     if (buf == NULL || fmt == NULL) {
         return EOF;
     }
     while (*fmt != '\0') {
-        if (isspace(*fmt)) {
+        if (ns_isspace(*fmt)) {
             CONSUME_WHITESPACE();
             fmt++;
             continue;
@@ -208,9 +287,9 @@ int vsscanf(
         fmt++;
         bool is_suppressed = false;
         bool is_double_or_wide_char = false;
-    #if STRING_TO_FLOAT
+    #if NS_ENABLE_FLOAT
         bool is_long_double = false;
-    #endif /* STRING_TO_FLOAT */
+    #endif /* NS_ENABLE_FLOAT */
         size_t max_width = 0;
         size_t ptr_size = sizeof(int);
         if (*fmt == '*') {
@@ -218,15 +297,15 @@ int vsscanf(
             fmt++;
         }
         /* test for digits */
-        if (isdigit(*fmt)) {
-            char *endptr;
+        if (ns_isdigit(*fmt)) {
+            char const * endptr;
             /**
              * @remarks Either strtoumax or strtoul can be used here.
              * strtoul might be faster, however it also means that we link
              * another routine increasing size. So strtoumax is used instead so
              * use can reduce the amount of routines we need to link to.
              */
-            max_width = (size_t)strtoumax(fmt, &endptr, 10);
+            max_width = (size_t)strtoumax(fmt, (char**)&endptr, 10);
             if (fmt == endptr || max_width == 0) {
                 /* failed */
                 return assignment_count;
@@ -264,14 +343,14 @@ int vsscanf(
                 ptr_size = sizeof(ptrdiff_t);
                 fmt++;
             } break;
-        #if STRING_TO_FLOAT
+        #if NS_ENABLE_LONG_DOUBLE
             case 'L':
             {
                 is_long_double = true;
                 ptr_size = 0;
                 fmt++;
             } break;
-        #endif /* STRING_TO_FLOAT */
+        #endif /* NS_ENABLE_LONG_DOUBLE */
             case 'j':
             {
                 ptr_size = sizeof(intmax_t);
@@ -304,7 +383,7 @@ int vsscanf(
                     return assignment_count;
                 }
                 TEST_LENGTH_MODIFIER();
-                void* ptr = va_arg(args, void*);
+                void * ptr = va_arg(args, void*);
                 RETURN_IF_NULL(ptr);
                 unsigned long long diff = buf - Buffer;
                 memcpy(ptr, &diff, ptr_size);
@@ -324,19 +403,19 @@ int vsscanf(
                     /* unimplemented */
                     return assignment_count;
                 }
-                char const * NANO_SCANF_restrict const begin = buf;
+                char const * NS_restrict const begin = buf;
                 for (; max_width --> 0;) {
                     if (*buf == '\0') {
                         break;
                     }
-                    if (string_format && isspace(*buf)) {
+                    if (string_format && ns_isspace(*buf)) {
                         break;
                     }
                     buf++;
                 }
                 size_t copy_size = buf - begin;
                 if (!is_suppressed) {
-                    char* ptr = va_arg(args, char*);
+                    char * ptr = va_arg(args, char*);
                     RETURN_IF_NULL(ptr);
                     memcpy(ptr, begin, copy_size);
                     if (string_format) {
@@ -348,7 +427,7 @@ int vsscanf(
                 fmt++;
                 continue;
             } break;
-        #if ENABLE_SET_MATCHING
+        #if NS_ENABLE_SET_MATCHING
             case '[':
             /* match range */ {
                 fmt++;
@@ -370,7 +449,7 @@ int vsscanf(
                     starts_with_bracket = true;
                     fmt++;
                 }
-                char const * NANO_SCANF_restrict last_bracket = strchr(fmt, ']');
+                char const * NS_restrict last_bracket = strchr(fmt, ']');
                 if (last_bracket == NULL) {
                     /* "%[^]" is still considered to be an empty sequence */
                     return assignment_count;
@@ -380,7 +459,7 @@ int vsscanf(
                 }
                 size_t scan_length = (last_bracket - fmt);
 
-                if (scan_length >= SCAN_LIMIT) {
+                if (scan_length >= NS_SCAN_LIMIT) {
                     /* too many characters */
                     return assignment_count;
                 }
@@ -401,7 +480,7 @@ int vsscanf(
                 }
 
                 if (!is_suppressed) {
-                    char* ptr = va_arg(args, char*);
+                    char * ptr = va_arg(args, char*);
                     RETURN_IF_NULL(ptr);
                     memcpy(ptr, buf, match_length);
                     /* null terminate */
@@ -412,12 +491,12 @@ int vsscanf(
                 buf += match_length;
                 continue;
             } break;
-        #endif /* ENABLE_SET_MATCHING */
+        #endif /* NS_ENABLE_SET_MATCHING */
             case 'i':
             case 'd':
             /* signed integer */ {
                 TEST_LENGTH_MODIFIER();
-                char *endptr;
+                char const * endptr;
                 int base = ((*fmt == 'd') ? 10 : 0);
                 intmax_t value = limit_strtoimax(buf, &endptr, base, max_width, scan_buf);
                 if (buf == endptr) {
@@ -425,7 +504,7 @@ int vsscanf(
                     return assignment_count;
                 }
                 if (!is_suppressed) {
-                    void* ptr = va_arg(args, void*);
+                    void * ptr = va_arg(args, void*);
                     RETURN_IF_NULL(ptr);
                     memcpy(ptr, &value, ptr_size);
                     assignment_count++;
@@ -433,9 +512,9 @@ int vsscanf(
                 buf = endptr;
                 fmt++;
             } break;
-        #if ENABLE_BINARY_CONVERSION_FORMAT
+        #if NS_ENABLE_BINARY_CONVERSION_FORMAT
             case 'b':
-        #endif /* ENABLE_BINARY_CONVERSION_FORMAT */
+        #endif /* NS_ENABLE_BINARY_CONVERSION_FORMAT */
             case 'u':
             case 'o':
             case 'x':
@@ -443,17 +522,17 @@ int vsscanf(
             case 'p':
             /* unsigned integer or pointer */ {
                 TEST_LENGTH_MODIFIER();
-                char *endptr;
+                char const * endptr;
                 int base = 10;
                 if (*fmt == 'X' || *fmt == 'x' || *fmt == 'p') {
                     base = 16;
                     if (*fmt == 'p') {
                         ptr_size = sizeof(void*);
                     }
-            #if ENABLE_BINARY_CONVERSION_FORMAT
+            #if NS_ENABLE_BINARY_CONVERSION_FORMAT
                 } else if (*fmt == 'b') {
                     base = 2;
-            #endif /* ENABLE_BINARY_CONVERSION_FORMAT*/
+            #endif /* NS_ENABLE_BINARY_CONVERSION_FORMAT*/
                 } else if (*fmt == 'o') {
                     base = 8;
                 }
@@ -463,7 +542,7 @@ int vsscanf(
                     return assignment_count;
                 }
                 if (!is_suppressed) {
-                    void* ptr = va_arg(args, void*);
+                    void * ptr = va_arg(args, void*);
                     RETURN_IF_NULL(ptr);
                     memcpy(ptr, &value, ptr_size);
                     assignment_count++;
@@ -471,9 +550,11 @@ int vsscanf(
                 buf = endptr;
                 fmt++;
             } break;
-        #if STRING_TO_FLOAT
+        #if NS_ENABLE_FLOAT
+            #if NS_ENABLE_HEXADECIMAL_FLOAT
             case 'a':
             case 'A':
+            #endif /* NS_ENABLE_HEXADECIMAL_FLOAT */
             case 'e':
             case 'E':
             case 'f':
@@ -481,14 +562,14 @@ int vsscanf(
             case 'g':
             case 'G':
             /* float */ {
-                char *endptr;
-                STRING_TO_FLOAT_TYPE value = limit_strtofloat(buf, &endptr, max_width, scan_buf);
+                char const * endptr;
+                NS_STRING_TO_FLOAT_TYPE value = limit_strtofloat(buf, &endptr, max_width, scan_buf);
                 if (buf == endptr) {
                     /* failed */
                     return assignment_count;
                 }
                 if (!is_suppressed) {
-                    void* ptr = va_arg(args, void*);
+                    void * ptr = va_arg(args, void*);
                     RETURN_IF_NULL(ptr);
                     if (is_long_double) {
                         *(long double*)ptr = (long double)value;
@@ -502,7 +583,7 @@ int vsscanf(
                 buf = endptr;
                 fmt++;
             } break;
-        #endif /* STRING_TO_FLOAT */
+        #endif /* NS_ENABLE_FLOAT */
             default:
             /* unknown format */ {
                 return assignment_count;
@@ -512,7 +593,7 @@ int vsscanf(
     return assignment_count;
 }
 
-int sscanf(const char * NANO_SCANF_restrict buffer, const char * NANO_SCANF_restrict format, ...)
+int sscanf(char const * NS_restrict buffer, char const * NS_restrict format, ...)
 {
     va_list vlist;
     va_start(vlist, format);
