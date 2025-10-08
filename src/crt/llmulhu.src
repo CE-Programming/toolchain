@@ -19,6 +19,7 @@ __llmulhu:
 	ld	(ix - 9), hl
 
 	ld	bc, 0
+	ld	(ix - 10), b
 	ld	(ix - 13), bc
 	ld	(ix - 30), bc
 	ld	c, (ix + 12)
@@ -32,10 +33,12 @@ __llmulhu:
 	inc	de
 	dec.s	de
 	call	__llmulu
+	inc	bc
+	dec.s	bc
 	ld	(ix - 16), bc
 	ld	(ix - 19), de
-	ld	bc, 0
-	ld	(ix - 14), b
+	ld	b, 0
+	ld	c, b
 
 	; x_hi * y_lo
 	inc.s	de
@@ -43,6 +46,8 @@ __llmulhu:
 	ld	e, (ix - 2)
 	ld	hl, (ix - 5)
 	call	__llmulu
+	inc	bc
+	dec.s	bc
 	ld	(ix - 21), bc
 	ld	(ix - 24), de
 	ld	(ix - 27), hl
@@ -53,20 +58,22 @@ __llmulhu:
 	ld	(ix - 36), iy
 
 	; x_lo * y_hi
-	ld	bc, 0
+	ld	b, 0
+	ld	c, b
 	inc.s	de
 	ld	d, b
 	ld	e, (ix - 6)
 	ld	hl, (ix - 9)
 	call	__llmulu
+	inc	bc
+	dec.s	bc
 	lea	iy, ix - 27
-	call	.L.__llmulhu_add
+	call	.L.__llmulhu_i72add
 	lea	iy, ix - 18
-	call	.L.__llmulhu_add
+	call	.L.__llmulhu_i72add
 	ld	(ix - 16), bc
 	ld	(ix - 19), de
 	ld	bc, 0
-	ld	(ix - 14), b
 
 	; x_hi * y_hi
 	inc.s	de
@@ -74,14 +81,16 @@ __llmulhu:
 	ld	e, (ix - 2)
 	ld	hl, (ix - 5)
 	call	__llmulu
+	inc	bc
+	dec.s	bc
 	lea	iy, ix - 18
-	call	.L.__llmulhu_add
+	call	.L.__llmulhu_i72add
 	ld	sp, ix
 	pop	iy
 	pop	ix
 	ret
 
-.L.__llmulhu_add:
+.L.__llmulhu_i72add:
 	; similar to __lladd, except iy points to the stack and is destroyed
 	push	bc
 	ld	bc, (iy + 0)

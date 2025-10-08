@@ -8,7 +8,7 @@
   },
   "sequence": [
     "action|launch",
-    "delay|1000",
+    "delay|2000",
     "hashWait|1",
     "key|enter",
     "delay|300",
