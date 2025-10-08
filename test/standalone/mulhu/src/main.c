@@ -24,7 +24,7 @@
 #define AUTOTEST_SEED 0x7184CE
 
 //------------------------------------------------------------------------------
-// Tests
+// Utility
 //------------------------------------------------------------------------------
 
 #define C(expr) if (!(expr)) { return __LINE__; }
@@ -60,7 +60,8 @@
 
 #define rand32() ((uint32_t)random())
 
-__attribute__((__unused__)) static uint48_t rand48(void) {
+static __attribute__((__always_inline__, __unused__))
+uint48_t rand48(void) {
     union {
         uint48_t u48;
         struct {
@@ -73,7 +74,8 @@ __attribute__((__unused__)) static uint48_t rand48(void) {
     return split.u48;
 }
 
-__attribute__((__unused__)) static uint64_t rand64(void) {
+static __attribute__((__always_inline__, __unused__))
+uint64_t rand64(void) {
     union {
         uint64_t u64;
         struct {
@@ -86,54 +88,111 @@ __attribute__((__unused__)) static uint64_t rand64(void) {
     return split.u64;
 }
 
+//------------------------------------------------------------------------------
+// Functions
+//------------------------------------------------------------------------------
+
 uint16_t CRT_smulhu(uint16_t, uint16_t);
 uint24_t CRT_imulhu(uint24_t, uint24_t);
 uint32_t CRT_lmulhu(uint32_t, uint32_t);
 uint48_t CRT_i48mulhu(uint48_t, uint48_t);
 uint64_t CRT_llmulhu(uint64_t, uint64_t);
 
-static __attribute__((__unused__))
+int16_t CRT_smulhs(int16_t, int16_t);
+int24_t CRT_imulhs(int24_t, int24_t);
+int32_t CRT_lmulhs(int32_t, int32_t);
+int48_t CRT_i48mulhs(int48_t, int48_t);
+int64_t CRT_llmulhs(int64_t, int64_t);
+
+//------------------------------------------------------------------------------
+// Truth
+//------------------------------------------------------------------------------
+
+static __attribute__((__always_inline__, __unused__))
 uint16_t truth_smulhu(uint16_t x, uint16_t y) {
     return (uint16_t)(((uint32_t)x * (uint32_t)y) >> 16);
 }
 
-static __attribute__((__unused__))
+static __attribute__((__always_inline__, __unused__))
 uint24_t truth_imulhu(uint24_t x, uint24_t y) {
     return (uint24_t)(((uint48_t)x * (uint48_t)y) >> 24);
 }
 
-static __attribute__((__unused__))
+static __attribute__((__always_inline__, __unused__))
 uint32_t truth_lmulhu(uint32_t x, uint32_t y) {
     return (uint32_t)(((uint64_t)x * (uint64_t)y) >> 32);
 }
 
-static __attribute__((__unused__))
+static __attribute__((__always_inline__, __unused__))
 uint48_t truth_i48mulhu(uint48_t x, uint48_t y) {
-    const uint48_t x_hi = (x >> 24);
-    const uint48_t y_hi = (y >> 24);
-    const uint48_t x_lo = (x & UINT24_MAX);
-    const uint48_t y_lo = (y & UINT24_MAX);
-    uint48_t result = x_lo * y_lo;
-    result >>= 24;
-    result += x_hi * y_lo + x_lo * y_hi;
-    result >>= 24;
-    result += x_hi * y_hi;
+    const uint48_t x0 = (uint24_t)x;
+    const uint48_t x1 = x >> 24;
+    const uint48_t y0 = (uint24_t)y;
+    const uint48_t y1 = y >> 24;
+    const uint48_t p11 = x1 * y1;
+    const uint48_t p01 = x0 * y1;
+    const uint48_t p10 = x1 * y0;
+    const uint48_t p00 = x0 * y0;
+    const uint48_t middle = p10 + (p00 >> 24) + (uint24_t)p01;
+    return p11 + (middle >> 24) + (p01 >> 24);
+}
+
+static __attribute__((__always_inline__, __unused__))
+uint64_t truth_llmulhu(uint64_t x, uint64_t y) {
+    const uint64_t x0 = (uint32_t)x;
+    const uint64_t x1 = x >> 32;
+    const uint64_t y0 = (uint32_t)y;
+    const uint64_t y1 = y >> 32;
+    const uint64_t p11 = x1 * y1;
+    const uint64_t p01 = x0 * y1;
+    const uint64_t p10 = x1 * y0;
+    const uint64_t p00 = x0 * y0;
+    const uint64_t middle = p10 + (p00 >> 32) + (uint32_t)p01;
+    return p11 + (middle >> 32) + (p01 >> 32);
+}
+
+static __attribute__((__always_inline__, __unused__))
+int16_t truth_smulhs(int16_t x, int16_t y) {
+    return (int16_t)(((int32_t)x * (int32_t)y) >> 16);
+}
+
+static __attribute__((__always_inline__, __unused__))
+int24_t truth_imulhs(int24_t x, int24_t y) {
+    return (int24_t)(((int48_t)x * (int48_t)y) >> 24);
+}
+
+static __attribute__((__always_inline__, __unused__))
+int32_t truth_lmulhs(int32_t x, int32_t y) {
+    return (int32_t)(((int64_t)x * (int64_t)y) >> 32);
+}
+
+static __attribute__((__always_inline__, __unused__))
+int48_t truth_i48mulhs(int48_t x, int48_t y) {
+    int48_t result = truth_i48mulhu(x, y);
+    if (x < 0) {
+        result -= y;
+    }
+    if (y < 0) {
+        result -= x;
+    }
     return result;
 }
 
-static __attribute__((__unused__))
-uint64_t truth_llmulhu(uint64_t x, uint64_t y) {
-    const uint64_t x_hi = (x >> 32);
-    const uint64_t y_hi = (y >> 32);
-    const uint64_t x_lo = (x & UINT32_MAX);
-    const uint64_t y_lo = (y & UINT32_MAX);
-    uint64_t result = x_lo * y_lo;
-    result >>= 32;
-    result += x_hi * y_lo + x_lo * y_hi;
-    result >>= 32;
-    result += x_hi * y_hi;
+static __attribute__((__always_inline__, __unused__))
+int64_t truth_llmulhs(int64_t x, int64_t y) {
+    int64_t result = truth_llmulhu(x, y);
+    if (x < 0) {
+        result -= y;
+    }
+    if (y < 0) {
+        result -= x;
+    }
     return result;
 }
+
+//------------------------------------------------------------------------------
+// Registers
+//------------------------------------------------------------------------------
 
 typedef struct reg_group {
     union {
@@ -178,8 +237,8 @@ void print_reg(void) {
     );
 }
 
-__attribute__((__unused__))
-static bool test_A_UBC_UDE_UIY_UIX(void) {
+static __attribute__((__unused__))
+bool test_A_UBC_UDE_UIY_UIX(void) {
     if (
         (prev_reg.A   == next_reg.A  ) &&
         (prev_reg.BC  == next_reg.BC ) &&
@@ -193,8 +252,8 @@ static bool test_A_UBC_UDE_UIY_UIX(void) {
     return false;
 }
 
-__attribute__((__unused__))
-static bool test_A_UBC_UD_UIY_UIX(void) {
+static __attribute__((__unused__))
+bool test_A_UBC_UD_UIY_UIX(void) {
     if (
         (prev_reg.A   == next_reg.A  ) &&
         (prev_reg.BC  == next_reg.BC ) &&
@@ -209,8 +268,8 @@ static bool test_A_UBC_UD_UIY_UIX(void) {
     return false;
 }
 
-__attribute__((__unused__))
-static bool test_A_UBC_UIY_UIX(void) {
+static __attribute__((__unused__))
+bool test_A_UBC_UIY_UIX(void) {
     if (
         (prev_reg.A   == next_reg.A  ) &&
         (prev_reg.BC  == next_reg.BC ) &&
@@ -223,8 +282,8 @@ static bool test_A_UBC_UIY_UIX(void) {
     return false;
 }
 
-__attribute__((__unused__))
-static bool test_A_UIY_UIX(void) {
+static __attribute__((__unused__))
+bool test_A_UIY_UIX(void) {
     if (
         (prev_reg.A   == next_reg.A  ) &&
         (prev_reg.IY  == next_reg.IY ) &&
@@ -236,14 +295,18 @@ static bool test_A_UIY_UIX(void) {
     return false;
 }
 
+//------------------------------------------------------------------------------
+// Unsigned
+//------------------------------------------------------------------------------
+
 int test_smulhu(void) {
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         uint16_t truth, guess, x, y;
-        x = rand16();
-        y = rand16();
+        x = (uint16_t)rand16();
+        y = (uint16_t)rand16();
         truth = truth_smulhu(x, y);
         guess = CRT_smulhu(x, y);
-        CMP("%04X", x, y, truth, guess);
+        CMP("%04hX", x, y, truth, guess);
         C((test_A_UBC_UDE_UIY_UIX()));
     }
     return 0;
@@ -252,8 +315,8 @@ int test_smulhu(void) {
 int test_imulhu(void) {
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         uint24_t truth, guess, x, y;
-        x = rand24();
-        y = rand24();
+        x = (uint24_t)rand24();
+        y = (uint24_t)rand24();
         truth = truth_imulhu(x, y);
         guess = CRT_imulhu(x, y);
         CMP("%06X", x, y, truth, guess);
@@ -265,8 +328,8 @@ int test_imulhu(void) {
 int test_lmulhu(void) {
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         uint32_t truth, guess, x, y;
-        x = rand32();
-        y = rand32();
+        x = (uint32_t)rand32();
+        y = (uint32_t)rand32();
         truth = truth_lmulhu(x, y);
         guess = CRT_lmulhu(x, y);
         CMP("%08lX", x, y, truth, guess);
@@ -278,8 +341,8 @@ int test_lmulhu(void) {
 int test_i48mulhu(void) {
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         uint48_t truth, guess, x, y;
-        x = rand48();
-        y = rand48();
+        x = (uint48_t)rand48();
+        y = (uint48_t)rand48();
         truth = truth_i48mulhu(x, y);
         guess = CRT_i48mulhu(x, y);
         CMP("%012llX", (uint64_t)x, (uint64_t)y, (uint64_t)truth, (uint64_t)guess);
@@ -291,8 +354,8 @@ int test_i48mulhu(void) {
 int test_llmulhu(void) {
     for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
         uint64_t truth, guess, x, y;
-        x = rand64();
-        y = rand64();
+        x = (uint64_t)rand64();
+        y = (uint64_t)rand64();
         truth = truth_llmulhu(x, y);
         guess = CRT_llmulhu(x, y);
         CMP("%016llX", x, y, truth, guess);
@@ -301,14 +364,94 @@ int test_llmulhu(void) {
     return 0;
 }
 
+//------------------------------------------------------------------------------
+// Signed
+//------------------------------------------------------------------------------
+
+int test_smulhs(void) {
+    for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
+        int16_t truth, guess, x, y;
+        x = (int16_t)rand16();
+        y = (int16_t)rand16();
+        truth = truth_smulhs(x, y);
+        guess = CRT_smulhs(x, y);
+        CMP("%04hX", x, y, truth, guess);
+        C((test_A_UBC_UDE_UIY_UIX()));
+    }
+    return 0;
+}
+
+int test_imulhs(void) {
+    for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
+        int24_t truth, guess, x, y;
+        x = (int24_t)rand24();
+        y = (int24_t)rand24();
+        truth = truth_imulhs(x, y);
+        guess = CRT_imulhs(x, y);
+        CMP("%06X", x, y, truth, guess);
+        C((test_A_UBC_UDE_UIY_UIX()));
+    }
+    return 0;
+}
+
+int test_lmulhs(void) {
+    for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
+        int32_t truth, guess, x, y;
+        x = (int32_t)rand32();
+        y = (int32_t)rand32();
+        truth = truth_lmulhs(x, y);
+        guess = CRT_lmulhs(x, y);
+        CMP("%08lX", x, y, truth, guess);
+        C((test_A_UBC_UD_UIY_UIX()));
+    }
+    return 0;
+}
+
+int test_i48mulhs(void) {
+    for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
+        int48_t truth, guess, x, y;
+        x = (int48_t)rand48();
+        y = (int48_t)rand48();
+        truth = truth_i48mulhs(x, y);
+        guess = CRT_i48mulhs(x, y);
+        CMP("%012llX", (int64_t)x, (int64_t)y, (int64_t)truth, (int64_t)guess);
+        C((test_A_UBC_UIY_UIX()));
+    }
+    return 0;
+}
+
+int test_llmulhs(void) {
+    for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
+        int64_t truth, guess, x, y;
+        x = (int64_t)rand64();
+        y = (int64_t)rand64();
+        truth = truth_llmulhs(x, y);
+        guess = CRT_llmulhs(x, y);
+        CMP("%016llX", x, y, truth, guess);
+        C((test_A_UIY_UIX()));
+    }
+    return 0;
+}
+
+//------------------------------------------------------------------------------
+// Code
+//------------------------------------------------------------------------------
+
 int run_tests(void) {
     srandom(AUTOTEST_SEED);
     int ret = 0;
+
     TEST(test_smulhu());
     TEST(test_imulhu());
     TEST(test_lmulhu());
     TEST(test_i48mulhu());
     TEST(test_llmulhu());
+
+    TEST(test_smulhs());
+    TEST(test_imulhs());
+    TEST(test_lmulhs());
+    TEST(test_i48mulhs());
+    TEST(test_llmulhs());
 
     return ret;
 }
