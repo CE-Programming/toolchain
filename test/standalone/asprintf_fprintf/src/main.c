@@ -56,6 +56,9 @@ void *T_memrchr(const void *s, int c, size_t n)
 char *T_stpcpy(char *__restrict dest, const char *__restrict src)
     __attribute__((nonnull(1, 2)));
 
+char *T_stpncpy(char *__restrict dest, const char *__restrict src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
 size_t T_strlcat(void *__restrict dest, const void *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
 
@@ -80,6 +83,7 @@ void T_bzero(void* s, size_t n);
 #define T_mempcpy mempcpy
 #define T_memrchr memrchr
 #define T_stpcpy stpcpy
+#define T_stpncpy stpncpy
 #define T_strlcat strlcat
 #define T_strlen strlen
 #define T_strcmp strcmp
@@ -653,6 +657,49 @@ int strlcat_test(void) {
     return 0;
 }
 
+int stpncpy_test(void) {
+    char text[6];
+
+    C(T_stpncpy(NULL_ptr, "", 0) == NULL_ptr + 0);
+    C(T_stpncpy(NULL_ptr, "foobar", 0) == NULL_ptr + 0);
+
+    memset(text, '\xee', 6);
+
+    C(T_stpncpy(text, "1", 5) == text + 1);
+    C(memcmp(text, "1\0\0\0\0\xee", 6) == 0);
+
+    C(T_stpncpy(text, "1234", 5) == text + 4);
+    C(memcmp(text, "1234\0\xee", 6) == 0);
+
+    C(T_stpncpy(text, "12345", 5) == text + 5);
+    C(memcmp(text, "12345\xee", 6) == 0);
+
+    C(T_stpncpy(text, "123456", 5) == text + 5);
+    C(memcmp(text, "12345\xee", 6) == 0);
+
+    memset(text, '\xff', 6);
+
+    C(T_stpncpy(text, "", 0) == text + 0);
+    C(memcmp(text, "\xff\xff\xff\xff\xff\xff", 6) == 0);
+
+    C(T_stpncpy(text, "123456", 1) == text + 1);
+    C(memcmp(text, "1\xff\xff\xff\xff\xff", 1) == 0);
+
+    C(T_stpncpy(text, "6", 1) == text + 1);
+    C(memcmp(text, "6\xff\xff\xff\xff\xff", 1) == 0);
+
+    C(T_stpncpy(text, "", 1) == text + 0);
+    C(memcmp(text, "\0\xff\xff\xff\xff\xff", 1) == 0);
+
+    C(T_stpncpy(text, "a", 2) == text + 1);
+    C(memcmp(text, "a\0\xff\xff\xff\xff", 1) == 0);
+
+    C(T_stpncpy(text, "", 5) == text + 0);
+    C(memcmp(text, "\0\0\0\0\0\xff", 1) == 0);
+
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* boot_asprintf */
@@ -680,6 +727,7 @@ int run_tests(void) {
     TEST(memrchr_test());
     TEST(memmove_test());
     TEST(strlcat_test());
+    TEST(stpncpy_test());
 
     return 0;
 }
