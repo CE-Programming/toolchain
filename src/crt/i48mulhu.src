@@ -7,12 +7,12 @@
 
 ; UDE:UHL = ((uint96_t)UDE:UHL * (uint96_t)UIY:UBC) >> 48
 __i48mulhu:
-; CC: 88 bytes
-;  minimum:  87F +  39R +  39W + 2
-;  maximum:  89F +  39R +  39W + 3
+; CC: 93 bytes
+;  minimum:  92F +  42R +  42W + 2
+;  maximum:  94F +  42R +  42W + 4
 ; including __i48mulu:
-;  minimum: 895F + 243R + 179W + 342
-;  maximum: 897F + 243R + 179W + 343
+;  minimum: 900F + 246R + 182W + 342
+;  maximum: 902F + 246R + 182W + 344
 	push	ix
 	push	iy
 	push	bc
@@ -46,6 +46,7 @@ __i48mulhu:
 	adc	hl, bc
 
 	pop	bc		; UHL * UBC (low carry)
+	push	af		; upper carry
 	ex	de, hl
 	add	hl, bc
 	jr	nc, .L.no_low_carry
@@ -59,6 +60,10 @@ __i48mulhu:
 	ld	hl, (ix - 3)
 	call	__i48mulu
 	pop	bc		; high carry
+	pop	af		; upper carry
+	jr	nc, .L.no_upper_carry
+	inc	de
+.L.no_upper_carry:
 	add	hl, bc
 	ld	sp, ix
 	pop	bc
