@@ -1,0 +1,57 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_stpncpy
+
+_stpncpy:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, (iy + 9)	; max_len
+
+	; inlined strnlen
+	xor	a, a
+	sbc	hl, hl
+	sbc	hl, bc
+	jr	z, .zero_size
+	add	hl, bc
+	ld	de, (iy + 6)	; src
+	sbc	hl, de
+	ex	de, hl
+	cpir
+	jr	z, .finish_strnlen
+	inc	hl
+.finish_strnlen:
+	xor	a, a
+	adc	hl, de
+.zero_size:
+
+	; copy strnlen bytes from src
+	push	hl
+	ld	de, (iy + 3)	; dst
+	jr	z, .zero_byte_copy
+	ld	hl, (iy + 6)	; src
+	pop	bc
+	push	bc
+	ldir
+.zero_byte_copy:
+	pop	bc
+
+	; zero pad the remainder
+	ld	hl, (iy + 9)	; max_len
+	scf
+	sbc	hl, bc		; clear_size - 1 = max_len - src_len - 1
+	ex	de, hl
+	ret	c		; clear_size <= 0 (or max_len <= src_len)
+	; HL = dst + src_len
+	; DE = clear_size - 1
+	add	hl, de
+	ld	(hl), a
+	ret	z		; clear_size == 1
+	push	de
+	pop	bc
+	push	hl
+	pop	de
+	dec	de
+	lddr
+	ret
