@@ -26,11 +26,11 @@
 *
 *************************************************/
 void *bsearch(
-    void *keyp, void *ptr, size_t num, size_t width,
+    const void *keyp, const void *ptr, size_t num, size_t width,
     int (*comp)(const void *, const void *)
 ) {
-    char *key = keyp;
-    char *base = ptr;
+    const char *key = keyp;
+    const char *base = ptr;
     unsigned int mid;
     unsigned int low;
     unsigned int high;
@@ -66,7 +66,7 @@ void *bsearch(
             continue;           /* than the key.            */
         }
 
-        d = (*comp)(key,addr = base + mid * width);
+        d = (*comp)(key,addr = (char*)(base + mid * width));
         if (d == 0)             /* we found it              */
             return(addr);
         if (d < 0)              /* key is less than mid,    */
