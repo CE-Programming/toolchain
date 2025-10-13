@@ -7,105 +7,118 @@
 
 ; BC:UDE:UHL = ((uint128_t)BC:UDE:UHL * (uint128_t)(SP64)) >> 64
 __llmulhu:
+; modified version of __llmulu that uses exx to obtain the upper 64 bits of the result.
+; __llmulhu runs slightly faster than two calls to __llmulu, and is much faster
+; than the naive implementation of __llmulhu that calls __llmulu four times.
+	push	af
+	ld	a, i
+	di
+	push	af
+
 	push	ix
 	push	iy
-	ld	ix, -36
-	add	ix, sp
-	ld	sp, ix
-	lea	ix, ix + 36
 
-	ld	(ix - 3), bc
-	ld	(ix - 6), de
-	ld	(ix - 9), hl
+	ld	ix, 0
+	lea	iy, ix - 6
+	add	iy, sp		; cf=1
 
-	ld	bc, 0
-	ld	(ix - 10), b
-	ld	(ix - 13), bc
-	ld	(ix - 30), bc
-	ld	c, (ix + 12)
-	ld	(ix - 33), bc
-	ld	iy, (ix + 9)
-	ld	(ix - 36), iy
+	push	de
+	push	hl
+	ld	l, c
+	ld	h, b
+	ld.s	sp, hl
 
-	; x_lo * y_lo
-	ld	c, b
-	ld	d, b
-	inc	de
-	dec.s	de
-	call	__llmulu
-	inc	bc
-	dec.s	bc
-	ld	(ix - 16), bc
-	ld	(ix - 19), de
-	ld	b, 0
-	ld	c, b
+	lea	hl, iy + 21
+	ld	b, 8
+.L.push_loop:
+	push	af
+	ld	a, (hl)
+	inc	hl
+	or	a, a		; cf=0
+	djnz	.L.push_loop
 
-	; x_hi * y_lo
-	inc.s	de
-	ld	d, b
-	ld	e, (ix - 2)
-	ld	hl, (ix - 5)
-	call	__llmulu
-	inc	bc
-	dec.s	bc
-	ld	(ix - 21), bc
-	ld	(ix - 24), de
-	ld	(ix - 27), hl
+	sbc	hl, hl
+	ld	e, l
+	ld	d, h
 
-	ld	c, (ix + 16)
-	ld	(ix - 33), c
-	ld	iy, (ix + 13)
-	ld	(ix - 36), iy
-
-	; x_lo * y_hi
-	ld	b, 0
-	ld	c, b
-	inc.s	de
-	ld	d, b
-	ld	e, (ix - 6)
-	ld	hl, (ix - 9)
-	call	__llmulu
-	inc	bc
-	dec.s	bc
-	lea	iy, ix - 27
-	call	.L.__llmulhu_i72add
-	lea	iy, ix - 18
-	call	.L.__llmulhu_i72add
-	ld	(ix - 16), bc
-	ld	(ix - 19), de
-	ld	bc, 0
-
-	; x_hi * y_hi
-	inc.s	de
-	ld	d, b
-	ld	e, (ix - 2)
-	ld	hl, (ix - 5)
-	call	__llmulu
-	inc	bc
-	dec.s	bc
-	lea	iy, ix - 18
-	call	.L.__llmulhu_i72add
-	ld	sp, ix
-	pop	iy
-	pop	ix
-	ret
-
-.L.__llmulhu_i72add:
-	; similar to __lladd, except iy points to the stack and is destroyed
-	push	bc
-	ld	bc, (iy + 0)
-	add	hl, bc
+	exx
+	sbc	hl, hl
 	ex	de, hl
+	sbc	hl, hl
+	ld	c, l
+	ld	b, l
+	exx
+
+.L.byte_loop:
+	scf
+	adc	a, a
+
+.L.bit_loop:
+	ex	af, af'
+
+	add	ix, ix
+	adc	hl, hl
+	ex	de, hl
+	adc.s	hl, hl
+	ex	de, hl
+
+	exx
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rl	b
+	exx
+
+	ex	af, af'
+
+	jr	nc, .L.add_end
+	ld	bc, (iy)
+	add	ix, bc
 	ld	bc, (iy + 3)
 	adc	hl, bc
 	ex	de, hl
-	pop	bc
-	jr	nc, .L.no_carry48
+	adc.s	hl, sp
+	ex	de, hl
+	jr	nc, .L.add_end
+	exx
+	inc	hl
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	nz, .L.add_end_exx
+	inc	de
+	sbc	hl, de
+	add	hl, de
+	jr	nz, .L.add_end_exx
 	inc	bc
-.L.no_carry48:
-	ld	iy, (iy + 6)
-	add	iy, bc
-	lea	bc, iy + 0
-	ret
+.L.add_end_exx:
+	exx
+.L.add_end:
 
-	.extern	__llmulu
+	add	a, a
+	jr	nz, .L.bit_loop
+
+	pop	af
+	jr 	nc, .L.byte_loop
+
+	; ld	b, d
+	; ld	c, e
+	; ex	de, hl
+	; lea	hl, ix + 0
+	; BC:UDE:UHL = lower 64 bits
+	; shadow BC:UDE:UHL = upper 64 bits
+	exx
+
+	pop	af		; reset SP
+	pop	af		; reset SP
+	pop	iy
+	pop	ix
+
+	pop	af
+	jp	po, .L.skipEI
+	ei
+.L.skipEI:
+	pop	af
+	ret
