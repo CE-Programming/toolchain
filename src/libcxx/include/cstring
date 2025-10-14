@@ -29,6 +29,7 @@ using ::strncat;
 using ::strlcat;
 using ::strchr;
 using ::strrchr;
+using ::strchrnul;
 using ::strpbrk;
 using ::strstr;
 using ::strcasestr;

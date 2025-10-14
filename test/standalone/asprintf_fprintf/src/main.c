@@ -74,6 +74,9 @@ int T_strcmp(const char *s1, const char *s2)
 int T_strncmp(const char *s1, const char *s2, size_t n)
     __attribute__((nonnull(1, 2)));
 
+char *T_strchrnul(const char *s, int c)
+    __attribute__((nonnull(1)));
+
 void T_bzero(void* s, size_t n);
 
 #else
@@ -92,6 +95,7 @@ void T_bzero(void* s, size_t n);
 #define T_strlen strlen
 #define T_strcmp strcmp
 #define T_strncmp strncmp
+#define T_strchrnul strchrnul
 #define T_bzero bzero
 
 #endif
@@ -796,6 +800,17 @@ int memmem_test(void) {
     return 0;
 }
 
+int strchrnul_test(void) {
+    C(T_strchrnul(SINK, '\0') == SINK);
+    C(T_strchrnul(SINK, '\xff') == SINK);
+    const size_t test_3_len = strlen(test_3);
+    C(T_strchrnul(test_3, '\0') == test_3 + test_3_len);
+    for (size_t i = 0; i < test_3_len; i++) {
+        C(T_strchrnul(test_3, test_3[i]) == strchr(test_3, test_3[i]));
+    }
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* boot_asprintf */
@@ -825,6 +840,7 @@ int run_tests(void) {
     TEST(strlcat_test());
     TEST(stpncpy_test());
     TEST(memmem_test());
+    TEST(strchrnul_test());
 
     return 0;
 }
