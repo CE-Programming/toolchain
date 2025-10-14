@@ -65,6 +65,9 @@ char *strchr(const char *s, int c)
 char *strrchr(const char *s, int c)
     __attribute__((nonnull(1)));
 
+char *strchrnul(const char *s, int c)
+    __NOEXCEPT __attribute__((nonnull(1))) __attribute__((__pure__));
+
 char *strpbrk(const char *s, const char *accept)
     __attribute__((nonnull(1, 2)));
 
