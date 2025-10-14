@@ -53,6 +53,9 @@ void *T_mempcpy(void *__restrict dest, const void *__restrict src, size_t n)
 void *T_memrchr(const void *s, int c, size_t n)
     __attribute__((nonnull(1)));
 
+void *T_memmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
+    __attribute__((nonnull(1, 3)));
+
 char *T_stpcpy(char *__restrict dest, const char *__restrict src)
     __attribute__((nonnull(1, 2)));
 
@@ -82,6 +85,7 @@ void T_bzero(void* s, size_t n);
 #define T_memccpy memccpy
 #define T_mempcpy mempcpy
 #define T_memrchr memrchr
+#define T_memmem memmem
 #define T_stpcpy stpcpy
 #define T_stpncpy stpncpy
 #define T_strlcat strlcat
@@ -700,6 +704,98 @@ int stpncpy_test(void) {
     return 0;
 }
 
+int memmem_test(void) {
+    const char str1[] = "abcdef123\0aababc123";
+    const char str2[] = "wxyz";
+
+    /* Test NULL */
+
+    C(T_memmem(NULL_ptr, 0, NULL_ptr, 0) == NULL_ptr);
+    C(T_memmem(NULL_ptr, 0, SINK, 0) == NULL_ptr);
+    C(T_memmem(NULL_ptr, 0, SINK, 1) == NULL_ptr);
+    C(T_memmem(NULL_ptr, 0, SINK, 2) == NULL_ptr);
+    C(T_memmem(SINK, 0, NULL_ptr, 0) == SINK);
+    C(T_memmem(SINK, 1, NULL_ptr, 0) == SINK);
+    C(T_memmem(SINK, 2, NULL_ptr, 0) == SINK);
+
+    /* Test same */
+
+    C(T_memmem(SINK, 0, SINK, 0) == SINK);
+    C(T_memmem(SINK, 1, SINK, 0) == SINK);
+    C(T_memmem(SINK, 2, SINK, 0) == SINK);
+    C(T_memmem(SINK, 0, SINK, 1) == NULL);
+    C(T_memmem(SINK, 1, SINK, 1) == SINK);
+    C(T_memmem(SINK, 2, SINK, 1) == SINK);
+    C(T_memmem(SINK, 0, SINK, 2) == NULL);
+    C(T_memmem(SINK, 1, SINK, 2) == NULL);
+    C(T_memmem(SINK, 2, SINK, 2) == SINK);
+
+    C(T_memmem(SINK, 300, SINK, 300) == SINK);
+    C(T_memmem(SINK, 300, SINK, 301) == NULL);
+    C(T_memmem(SINK, 300, SINK, 299) == SINK);
+    C(T_memmem(SINK, 300, SINK, 30 ) == SINK);
+    C(T_memmem(SINK,  30, SINK, 300) == NULL);
+
+    C(T_memmem(SINK + 30, 60, SINK +  0, 60) == SINK + 30);
+    C(T_memmem(SINK +  0, 60, SINK + 30, 60) == SINK +  0);
+    C(T_memmem(SINK + 30, 60, SINK +  0, 59) == SINK + 30);
+    C(T_memmem(SINK +  0, 60, SINK + 30, 59) == SINK +  0);
+
+    C(T_memmem(str1, 20, str1,  0) == str1);
+    C(T_memmem(str1, 20, str1,  1) == str1);
+    C(T_memmem(str1, 20, str1,  2) == str1);
+    C(T_memmem(str1, 20, str1,  3) == str1);
+    C(T_memmem(str1, 20, str1,  9) == str1);
+    C(T_memmem(str1, 20, str1, 10) == str1);
+    C(T_memmem(str1, 20, str1, 20) == str1);
+
+    /* Test different */
+
+    C(T_memmem(str1, 0, SINK, 0) == str1);
+    C(T_memmem(str1, 1, SINK, 0) == str1);
+    C(T_memmem(str1, 2, SINK, 0) == str1);
+    C(T_memmem(str1, 0, SINK, 1) == NULL);
+    C(T_memmem(str1, 1, SINK, 1) == NULL);
+    C(T_memmem(str1, 2, SINK, 1) == NULL);
+    C(T_memmem(str1, 0, SINK, 2) == NULL);
+    C(T_memmem(str1, 1, SINK, 2) == NULL);
+    C(T_memmem(str1, 2, SINK, 2) == NULL);
+
+    /* Other tests */
+
+    C(T_memmem(str1 +  1, 19, "abc", 3) == str1 + 13);
+    C(T_memmem(str1 +  0, 20, "123", 4) == str1 +  6);
+    C(T_memmem(str1 +  7, 13, "123", 4) == str1 + 16);
+
+    C(T_memmem(str1 +  0, 20, "aabaab", 6) == NULL);
+    C(T_memmem(str1 +  0, 20, "\xff\x00\xff", 4) == NULL);
+    C(T_memmem(str1 +  0, 20, "\xff", 1) == NULL);
+
+    C(T_memmem(SINK, 300, "\xff", 1) == NULL);
+    C(T_memmem(SINK, 300, "\xff\xff", 2) == NULL);
+    C(T_memmem(SINK, 300, "\xff\0", 2) == NULL);
+    C(T_memmem(SINK, 300, "\0\xff", 2) == NULL);
+
+    C(T_memmem(str2 + 0, 5, "", 1) == str2 + 4);
+    C(T_memmem(str2 + 4, 1, "", 1) == str2 + 4);
+    C(T_memmem(str2 + 0, 5, "z", 1) == str2 + 3);
+    C(T_memmem(str2 + 0, 5, "z", 2) == str2 + 3);
+    C(T_memmem(str2 + 2, 5, "z", 1) == str2 + 3);
+    C(T_memmem(str2 + 2, 5, "z", 2) == str2 + 3);
+    C(T_memmem(str2 + 0, 3, "z", 1) == NULL);
+    C(T_memmem(str2 + 0, 4, "z", 2) == NULL);
+    C(T_memmem(str2 + 0, 5, "w", 1) == str2 + 0);
+    C(T_memmem(str2 + 0, 5, "x", 1) == str2 + 1);
+    C(T_memmem(str2 + 0, 5, "wx", 2) == str2 + 0);
+    C(T_memmem(str2 + 0, 5, "xy", 2) == str2 + 1);
+    C(T_memmem(str2 + 0, 5, "w", 2) == NULL);
+    C(T_memmem(str2 + 0, 5, "x", 2) == NULL);
+    C(T_memmem(str2 + 0, 5, "wx", 3) == NULL);
+    C(T_memmem(str2 + 0, 5, "xy", 3) == NULL);
+
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
     /* boot_asprintf */
@@ -728,6 +824,7 @@ int run_tests(void) {
     TEST(memmove_test());
     TEST(strlcat_test());
     TEST(stpncpy_test());
+    TEST(memmem_test());
 
     return 0;
 }
