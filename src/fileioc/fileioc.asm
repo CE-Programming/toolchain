@@ -281,9 +281,9 @@ ti_OpenVar:
 ;  sp + 9 : variable Type
 ; return:
 ;  slot index if no error
-	ld	iy, 0
-	add	iy, sp
-	ld	a, (iy + 9)
+	ld	hl, 9
+	add	hl, sp
+	ld	a, (hl)			; (sp + 9)
 ;	jr	ti_Open.start		; emulated by dummifying next instruction
 	db	$fe			; ld a,ti.AppVarObj -> cp a,$3e \ dec d
 assert ti.AppVarObj = $15
@@ -343,7 +343,7 @@ ti_Open:
 	cp	a,'a'
 	jr	z,.mode
 	cp	a,'w'
-	jp	nz,util_ret_null_pop_ix
+	jr	nz, .ret_null_pop_ix
 .mode:
 	inc	hl
 	ld	a,(hl)
@@ -354,17 +354,23 @@ ti_Open:
 	jr	c, .not_found
 	call	ti.ChkInRam
 	jr	z, .save_ptrs
-	or	a, a
-	sbc	hl, hl
 	ex	de, hl
+	inc.s	de			; clear UDE
 	ld	e, (hl)
 	inc	hl
 	ld	d, (hl)
 	ex	de, hl
 	call	ti.EnoughMem
-	jp	c, util_ret_null_pop_ix
+	jr	c, .ret_null_pop_ix
 	call	util_unarchive
 	jr	.unarchive_var
+
+.ret_null_pop_ix:
+	pop	ix
+	xor	a, a
+	sbc	hl, hl
+	ret
+
 .no_append:
 	call	ti.ChkFindSym
 	jr	c, .not_found
@@ -375,14 +381,14 @@ ti_Open:
 	ld	a, (hl)
 	cp	a, 'r'
 	pop	hl
-	jp	nz, util_ret_null_pop_ix
+	jr	nz, .ret_null_pop_ix
 	call	util_skip_archive_header
 	jr	.save_ptrs
 .not_found:
 	ld	hl, (ix + 9)
 	ld	a, (hl)
 	cp	a, 'r'
-	jp	z, util_ret_null_pop_ix
+	jr	z, .ret_null_pop_ix
 	or	a, a
 	sbc	hl, hl
 	ld	a, 0
@@ -525,6 +531,7 @@ ti_Write:
 	ld	hl, (iy + 9)
 	ret
 .ret0:
+util_ret_null:
 	xor	a, a
 	sbc	hl, hl
 	ret
@@ -564,9 +571,9 @@ ti_Read:
 	push	bc
 	call	util_get_offset
 	pop	hl
-	or	a, a
+	xor	a, a
 	sbc	hl, bc			; size - offset = bytes left to read
-	jr	z, .ret0
+	ret	z			; jr z, .ret0
 	jr	c, .ret0
 	ld	bc, (iy + 6)
 	call	ti._sdivu			; (size - offset) / chunk_size
@@ -574,10 +581,9 @@ ti_Read:
 	or	a, a
 	sbc	hl, de
 	add	hl, de			; check if left <= read
-	jr	nc, .copy
+	jr	c, .no_copy
 	ex	de, hl
-.copy:
-	ex	de, hl
+.no_copy:
 	ld	bc, (iy + 6)
 	push	hl
 	call	ti._smulu
@@ -748,7 +754,16 @@ ti_Seek:
 	push	de
 	pop	bc
 	jr	c, .ret_neg_one
-	jp	util_set_offset
+	; jp	util_set_offset
+.util_set_offset:
+; input:
+;  BC = offset
+; output:
+;  HL = offset_ptr
+	call	util_get_offset_ptr
+	ld	(hl), bc
+	ret
+
 .seek_curr:
 	push	de
 	call	util_get_offset
@@ -757,6 +772,8 @@ ti_Seek:
 	scf
 	sbc	hl, hl
 	ret
+
+util_set_offset := ti_Seek.util_set_offset
 
 ;-------------------------------------------------------------------------------
 ti_DeleteVar:
@@ -799,6 +816,7 @@ ti_Delete:
 	jp	c, util_ret_null
 	ld	iy, ti.flags
 	call	ti.DelVarArc
+util_ret_neg_one:
 	scf
 	sbc	hl, hl
 	ret
@@ -908,9 +926,9 @@ ti_DetectVar:
 ;  sp + 9 : type of variable to search for
 ; return:
 ;  hl -> name of variable
-	ld	hl,9
-	add	hl,sp
-	ld	a,(hl)
+	ld	hl, 9
+	add	hl, sp
+	ld	a, (hl)			; (sp + 9)
 ;	jr	ti_Detect.start		; emulated by dummifying next instruction:
 	db	$fe			; ld a,ti.AppVarObj -> cp a,$3E \ dec d
 assert ti.AppVarObj = $15
@@ -958,14 +976,6 @@ ti_Detect:
 	jr	c, .finish
 	jr	z, .finish
 	add	hl, de
-	jr	.fcontinue
-
-.finish:
-	xor	a, a
-	sbc	hl, hl
-	pop	ix
-	ret
-
 .fcontinue:
 	push	hl
 	ld	a, 0
@@ -976,6 +986,13 @@ ti_Detect:
 	ld	de, (ix + 12)
 	ld	(de), a
 	jr	.fgoodtype
+
+.finish:
+	xor	a, a
+	sbc	hl, hl
+	pop	ix
+	ret
+
 .fdetectnormal:
 	cp	a, ti.AppVarObj
 .smc_type := $-1
@@ -1190,9 +1207,9 @@ ti_RenameVar:
 ;  a = 1 if new file already exists
 ;  a = 2 if old file does not exist
 ;  a = 3 if other error
-	ld	iy, 0
-	add	iy, sp
-	ld	a, (iy + 9)
+	ld	hl, 9
+	add	hl, sp
+	ld	a, (hl)			; (sp + 9)
 	ld	iy, ti.flags		; probably not needed
 ;	jr	ti_Rename.start		; emulated by dummifying next instruction
 	db	$fe			; ld a,appVarObj -> cp a,$3E \ dec d
@@ -1345,7 +1362,7 @@ ti_StoVar:
 	jr	nz, .notcr
 .iscr:
 	call	ti.FindSym
-	jp	c, .notcr		; fill it with zeros
+	jr	c, .notcr		; fill it with zeros
 	and	a, $3f
 	ex	de, hl
 	call	ti.Mov9OP1OP2
@@ -1371,10 +1388,13 @@ ti_RclVar:
 ;  sp + 9 : pointer to data structure pointer
 ; return:
 ;  a = type of variable
-	ld	iy, 0
-	add	iy, sp
-	ld	hl, (iy + 6)		; pointer to data
-	ld	a, (iy + 3)		; var type
+	ld	hl, 3
+	add	hl, sp
+	ld	a, (hl)			; (sp + 3) var type
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	hl, (hl)		; (sp + 6) pointer to data
 	ld	iy,ti.flags
 	call	util_set_var_str
 	call	ti.FindSym
@@ -1544,7 +1564,7 @@ util_insert_mem:
 	pop	hl
 	ld	hl, (hl)
 	push	hl
-	ld	de, 0
+	inc.s	de			; clear UDE
 	ld	e, (hl)
 	inc	hl
 	ld	d, (hl)
@@ -1567,7 +1587,7 @@ util_delete_mem:
 	pop	hl
 	ld	hl, (hl)
 	push	hl
-	ld	de, 0
+	inc.s	de			; clear UDE
 	ld	e, (hl)
 	inc	hl
 	ld	d, (hl)
@@ -1583,17 +1603,6 @@ util_save_size:
 	ld	(hl), d			; write new size
 util_ret_neg_one_byte:
 	ld	a, 255
-	ret
-
-util_ret_null_pop_ix:
-	pop	ix
-util_ret_null:
-	xor	a, a
-	sbc	hl, hl
-	ret
-util_ret_neg_one:
-	scf
-	sbc	hl, hl
 	ret
 
 util_is_slot_open:
@@ -1685,7 +1694,7 @@ util_get_slot_size:
 ;  A
 	call	util_get_data_ptr
 	ld	hl, (hl)
-	ld	bc, 0
+	inc.s	bc			; clear UBC
 	ld	c, (hl)
 	inc	hl
 	ld	b, (hl)
@@ -1697,15 +1706,6 @@ util_get_offset:
 ;  BC = offset
 	call	util_get_offset_ptr
 	ld	bc, (hl)
-	ret
-
-util_set_offset:
-; input:
-;  BC = offset
-; output:
-;  HL = offset_ptr
-	call	util_get_offset_ptr
-	ld	(hl), bc
 	ret
 
 util_archive:				; properly handle garbage collects
