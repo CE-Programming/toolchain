@@ -29,6 +29,9 @@ void *memrchr(const void *s, int c, size_t n)
 void *memmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
     __NOEXCEPT __attribute__((nonnull(1, 3))) __attribute((__pure__));
 
+void *memrmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
+    __NOEXCEPT __attribute__((nonnull(1, 3))) __attribute((__pure__));
+
 void *memccpy(void *__restrict dest, const void *__restrict src, int c, size_t n)
     __NOEXCEPT __attribute__((nonnull(1, 2)));
 
@@ -65,11 +68,17 @@ char *strchr(const char *s, int c)
 char *strrchr(const char *s, int c)
     __attribute__((nonnull(1)));
 
+char *strchrnul(const char *s, int c)
+    __NOEXCEPT __attribute__((nonnull(1))) __attribute__((__pure__));
+
 char *strpbrk(const char *s, const char *accept)
     __attribute__((nonnull(1, 2)));
 
 char *strstr(const char *haystack, const char *needle)
     __attribute__((nonnull(1, 2)));
+
+char *strrstr(const char *haystack, const char *needle)
+    __NOEXCEPT __attribute__((nonnull(1, 2))) __attribute__((__pure__));
 
 char *strcasestr(const char *haystack, const char *needle)
     __NOEXCEPT __attribute__((nonnull(1, 2))) __attribute__((__pure__));

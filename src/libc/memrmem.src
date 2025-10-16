@@ -1,0 +1,96 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_memrmem
+
+; void *memrmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
+haystack     := iy + 3
+haystack_len := iy + 6
+needle       := iy + 9
+needle_len   := iy + 12
+_memrmem:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (haystack_len)
+	ld	bc, (needle_len)
+	sbc	hl, bc
+	jr	c, .ret_null	; (haystack_len < needle_len)
+	; (haystack_len >= needle_len)
+
+	push	hl
+	adc	hl, bc
+	ex	de, hl
+	; DE = needle_len
+
+	; move to the end of the needle
+	ld	hl, (needle)
+	; return haystack when haystack_len is zero (implies that needle_len is also zero)
+	jr	z, .zero_haystack_len
+	add	hl, bc
+	dec	hl
+	ld	(needle), hl
+
+	sbc	hl, hl
+	adc	hl, bc
+	pop	bc
+	ld	hl, (haystack)
+
+	; move to the end of the haystack
+	add	hl, de
+	dec	hl
+
+	ret	z		; return (haystack + haystack_len - 1) if needle_len is zero
+
+	inc	bc
+	; BC = (haystack_len - needle_len + 1) = search_len
+	; haystack_len >= needle_len && needle_len != 0, therefore haystack_len >= 1
+	call	.begin_loop
+	jr	nz, .ret_null
+	; test for a match at the last possible position
+	call	_memrcmp_fast
+	inc	hl
+	ret	z
+.ret_null:
+	or	a, a
+	sbc	hl, hl
+	ret
+
+.loop:
+	pop	hl
+	pop	bc
+.begin_loop:
+	ld	de, (needle)
+	ld	a, (de)
+	cpdr			; search for the start of the string
+	ret	po		; end of search_len
+	push	bc
+	push	hl
+	call	_memrcmp_fast
+	jr	nz, .loop
+	inc	hl
+	ld	sp, iy
+	ret
+
+.zero_haystack_len:
+	pop	hl
+	ld	hl, (haystack)
+	ret
+
+_memrcmp_fast:
+	; Input:
+	; HL = haystack + needle_len - 1
+	; DE = needle + needle_len - 1
+	; A = (DE)
+	; Output:
+	; Z = match
+	; NZ = no match
+	inc	hl
+	ld	bc, (needle_len)
+.loop:
+	cpd
+	ret	po
+	dec	de
+	ld	a, (de)
+	jr	z, .loop
+	ret

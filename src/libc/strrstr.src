@@ -1,0 +1,38 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_strrstr
+
+_strrstr:
+	pop	bc
+	pop	de
+	ex	(sp), hl
+	push	de
+	push	bc
+
+	push	hl
+	xor	a, a
+	ld	bc, 0
+	cpir
+	sbc	hl, hl
+	dec	hl
+	sbc	hl, bc		; carry will be cleared
+	ex	(sp), hl	; strlen(needle)
+	push	hl		; needle
+
+	ex	de, hl
+	push	hl
+	ld	bc, 0
+	cpir
+	sbc	hl, hl
+	dec	hl
+	sbc	hl, bc
+	ex	(sp), hl	; strlen(haystack)
+	push	hl		; haystack
+
+	call	_memrmem
+	pop	bc, bc, bc, bc
+	ret
+
+	extern	_memrmem
