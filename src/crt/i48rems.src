@@ -29,12 +29,13 @@ __i48rems:
 	lea	de, iy
 	push	bc
 	pop	hl
-	; negate remainder if dividend was negative
-	call	m, __i48neg
 
 	pop	bc
 	pop	iy
-	ret
+
+	ret	p
+	; negate remainder if dividend was negative
+	jp	__i48neg
 
 	extern	__i48dvrmu
 	extern	__i48neg
