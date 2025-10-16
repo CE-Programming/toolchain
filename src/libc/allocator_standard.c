@@ -21,7 +21,8 @@ void *_standard_malloc(size_t alloc_size)
 
     /* add size of block header to real size */
     const size_t size = alloc_size + sizeof(block_t);
-    if (size < alloc_size)
+    /* abort if alloc_size is 0 or size overflowed */
+    if (size <= alloc_size)
     {
         return NULL;
     }
