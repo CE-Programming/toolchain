@@ -42,6 +42,15 @@
 #define PRIxLEAST16 __UINT_LEAST16_FMTx__
 #define PRIXLEAST16 __UINT_LEAST16_FMTX__
 
+#ifdef                     __INT24_TYPE__
+#define PRId24             __INT24_FMTd__
+#define PRIi24             __INT24_FMTi__
+#define PRIo24            __UINT24_FMTo__
+#define PRIu24            __UINT24_FMTu__
+#define PRIx24            __UINT24_FMTx__
+#define PRIX24            __UINT24_FMTX__
+#endif                   /*__INT24_TYPE_*/
+
 #define PRId32             __INT32_FMTd__
 #define PRIi32             __INT32_FMTi__
 #define PRIo32            __UINT32_FMTo__
@@ -125,6 +134,14 @@
 #define SCNoLEAST16 __UINT_LEAST16_FMTo__
 #define SCNuLEAST16 __UINT_LEAST16_FMTu__
 #define SCNxLEAST16 __UINT_LEAST16_FMTx__
+
+#ifdef                     __INT24_TYPE__
+#define SCNd24             __INT24_FMTd__
+#define SCNi24             __INT24_FMTi__
+#define SCNo24            __UINT24_FMTo__
+#define SCNu24            __UINT24_FMTu__
+#define SCNx24            __UINT24_FMTx__
+#endif                   /*__INT24_TYPE_*/
 
 #define SCNd32             __INT32_FMTd__
 #define SCNi32             __INT32_FMTi__
