@@ -1,0 +1,381 @@
+	assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	_strtoll
+	public	_strtoimax
+
+_strtoimax:
+_strtoll:
+	call	__strtoll_common
+	; overflow if Carry is set
+	jr	c, .out_of_range
+	ld	a, b
+	rla
+	jr	c, .maybe_out_of_range
+	ret	nz
+	jp	__llneg
+
+.maybe_out_of_range:
+	; greater than INT_MAX
+	jr	nz, .overflow
+	; negative
+	; check that the result is not an exact INT_MIN
+	ld	b, a		; B = (B << 1)
+	call	__llcmpzero
+	set	7, b
+	ret	z		; exact INT_MIN
+.underflow:
+	xor	a, a		; set Z
+.out_of_range:
+.overflow:
+	ld	b, $80
+	ld	de, 0
+	ld	c, e
+	ld	hl, 5		; ERANGE
+	ld	(_errno), hl
+	ld	l, h		; ld hl, 0
+	ret	z		; underflow
+	; overflow
+	dec	bc
+	dec	hl
+	dec	de
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	public	_strtoull
+	public	_strtoumax
+
+_strtoumax:
+_strtoull:
+	call	__strtoll_common
+	; overflow if Carry is set
+	jr	c, .out_of_range
+	ret	nz
+	jp	__llneg
+
+.out_of_range:
+	sbc	hl, hl
+	ex	de, hl
+	ld	hl, 5		; ERANGE
+	ld	(_errno), hl
+	ld	l, h
+	dec	hl
+	ld	b, e
+	ld	c, e
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	private	__strtoll_common
+
+__strtoll_common:
+	; output: BC:UDE:UHL
+	; NC = no overflow for strtoull
+	; C = overflow, raise ERANGE
+	; Z means that A is zero = negate return value
+	; NZ means that A is non-zero = positive return value
+	push	ix
+	ld	ix, 0
+	lea	hl, ix - 37	; ld hl, -37
+	add	ix, sp
+
+	ld	bc, (ix + 15)	; base
+	add	hl, bc
+	jr	c, .invalid_base
+	; UBC is zero here
+	ld	b, c		; store the base in B to allow for djnz hax
+	ld	hl, (ix + 9)	; nptr
+;-------------------------------------------------------------------------------
+; consume whitespace (inlinsed isspace)
+.whitespace_loop:
+	ld	a, (hl)
+	inc	hl
+	cp	a, 32
+	jr	z, .whitespace_loop
+	sub	a, 9
+	add	a, -5
+	jr	nc, .whitespace_loop
+; test for plus/minus signs
+	; A = (HL - 1) - 9 + -5
+	; A = (HL - 1) - 14
+	xor	a, '-' - 14
+	push	af
+	jr	z, .minus_sign
+	xor	a, ('+' - 14) xor ('-' - 14)
+	jr	z, .plus_sign
+	dec	hl
+	xor	a, a
+.plus_sign:
+.minus_sign:
+	; A = 0, (HL) = start of number
+;-------------------------------------------------------------------------------
+; update the base if needed
+	or	a, b		; base
+	jr	z, .auto_base
+	xor	a, 16
+	jr	z, .hex_base
+	xor	a, 2 xor 16
+	jr	nz, .other_base
+.auto_base:	; test for 0* 0x* 0X* 0b* 0B*
+.bin_base:	; test for 0x* 0X*
+.hex_base:	; test for 0b* 0B*
+	inc	b		; djnz hax
+	ld	a, (hl)
+	xor	a, '0'
+	jr	nz, .maybe_decimal
+	inc	hl
+	ld	a, (hl)
+	res	5, a		; upper case
+	xor	a, 'X'
+	jr	z, .maybe_hex
+	xor	a, 'B' xor 'X'
+	jr	z, .maybe_bin
+	dec	hl
+	djnz	.other_base
+	ld	b, 8		; octal
+	jr	.save_new_base
+
+.maybe_bin:
+	bit	4, b
+	jr	nz, .undo_inc	; hexadecimal
+	; base is 0 or 2
+	inc	hl
+	ld	b, 2
+	jr	.save_new_base
+
+.maybe_hex:
+	bit	1, b
+	jr	nz, .undo_inc	; binary
+	; base is 0 or 16
+	inc	hl
+	ld	b, 16
+	jr	.save_new_base
+
+.undo_inc:
+	dec	hl
+	; dec	b
+	; jr	.other_base
+.maybe_decimal:
+	; set to decimal if base is not zero
+	djnz	.other_base
+	ld	b, 10		; decimal
+.save_new_base:
+;-------------------------------------------------------------------------------
+.other_base:
+	ld	a, (hl)		; first digit of the number
+	push	hl
+	pop	iy
+.invalid_base_hijack:
+	; or	a, a		; carry is cleared here
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	c, l
+	; A = first digit of the number
+	; BC:UDE:UHL = 0
+	; (ix - 1) = base
+	; (ix - 2) = (first-non-whitespace) XOR '-'
+	; 6, (ix - 3) = Z if result should be negative, NZ for positive
+	; 0, (ix - 3) = overflow bit
+
+	; The strto* functions return nptr (not nptr + whitespace) if there are
+	; no digits in the string. Having a digit check here allows us to
+	; directly handle the case where the string has no digits.
+
+	sub	a, 48
+	cp	a, 10
+	jr	c, .check_digit
+	; Convert an alphabetic digit, case-insensitive
+	sub	a, 65 - 48
+	res	5, a
+	add	a, 10
+.check_digit:
+	; End the loop when the digit is out of range for the base
+	cp	a, b
+	ld	(ix - 1), b	; store base
+	ld	b, l		; now BC:UDE:UHL is zero
+	jr	c, .loop
+;-------------------------------------------------------------------------------
+; no digit found or invalid base
+	; set *endptr to nptr and return 0
+	ld	iy, (ix + 9)	; nptr
+	jr	.write_endptr
+.invalid_base:
+	xor	a, a
+	ld	b, a
+	; Setting B (base) to zero ensures that cp a, b will never set carry.
+	; forcing the function to return.
+	push	af
+	; sets E:UHL to zero
+	jr	.invalid_base_hijack
+;-------------------------------------------------------------------------------
+; CC per non-decimal digit:
+; minimum      : 100F + 20R + 18W + 35
+; low average  : 102F + 20R + 18W + 36
+; high average : 112F + 20R + 18W + 37	; an over-estimate of the average CC
+; maximum      : 127F + 20R + 18W + 40
+; overflow max : 131F + 21R + 19W + 42
+.check_decimal:
+	cp	a, (ix - 1)
+	jr	nc, .end_loop
+.loop:
+	call	__llmul_add_b_overflow
+.next_digit:
+	; IY = str, BC:UDE:UHL = accumulator, 0, (ix - 3) = overflow bit
+	inc	iy
+	; Convert a numerical digit
+	ld	a, (iy)
+	sub	a, 48
+	cp	a, 10
+	jr	c, .check_decimal
+	; Convert an alphabetic digit, case-insensitive
+	sub	a, 65 - 48
+	res	5, a
+	add	a, 10
+	; End the loop when the digit is out of range for the base
+	cp	a, (ix - 1)
+	jr	c, .loop
+.end_loop:
+;-------------------------------------------------------------------------------
+.write_endptr:
+	push	hl
+	ld	hl, (ix + 12)	; endptr
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	z, .endptr_null
+	ld	(hl), iy
+.endptr_null:
+	pop	hl
+	pop	af		; overflow and sign flags
+	pop	ix
+	ret
+
+;-------------------------------------------------------------------------------
+
+	private	__llmul_add_b_overflow
+__llmul_add_b_overflow:
+; BC:UDE:UHL = (BC:UDE:UHL * (ix - 1)) + A
+; bit 0, (ix - 3) is set if overflow has occured
+.__llmulu_b_overflow:
+; inlined/modified __llmulu_b
+; CC if no overflow: 70F + 15R + 15W + 32
+	push	de		; (ix - 9)
+	push	hl		; (ix - 12)
+	push	bc		; (ix - 15)
+	ld	b, (ix - 1)
+	ld	c, 0
+	ld	h, b
+	mlt	hl
+	ld	(ix - 12), l
+	ld	d, b
+	ld	e, (ix - 11)
+	mlt	de
+	ld	l, h
+	ld	h, c
+	add	hl, de
+	ld	(ix - 11), l
+	ld	d, b
+	ld	e, (ix - 10)
+	mlt	de
+	ld	l, h
+	ld	h, c
+	add	hl, de
+	ld	(ix - 10), l
+	ld	d, b
+	ld	e, (ix - 9)
+	mlt	de
+	ld	l, h
+	ld	h, c
+	add	hl, de
+	ld	(ix - 9), l
+	ld	d, b
+	ld	e, (ix - 8)
+	mlt	de
+	ld	l, h
+	ld	h, c
+	add	hl, de
+	ld	(ix - 8), l
+	ld	d, b
+	ld	e, (ix - 7)
+	mlt	de
+	ld	l, h
+	ld	h, c
+	add	hl, de
+	ld	(ix - 7), l
+
+	pop	de
+	ld	l, h
+	ld	c, d
+	ld	d, b
+	mlt	bc
+	ld	h, c
+	mlt	de
+
+	add.s	hl, de
+	jr	c, .set_overflow_bit
+	inc	b
+	djnz	.set_overflow_bit
+	ld	b, h
+	ld	c, l
+	pop	hl
+	pop	de
+.__lladd_b_overflow:
+; inlined/modified __lladd_b_fast
+;   NC   L:  3F + 3R + 2 (49.8046875%)
+;   NC   H:  5F + 3R + 3 (49.9992370605%)
+; All other cases:       (0.196075439453%)
+;   NC UHL: 15F + 3R + 0W + 4
+;   NC   E: 17F + 3R + 0W + 5
+;   NC   D: 19F + 3R + 0W + 6
+;   NC UDE: 26F + 3R + 0W + 7
+;   NC  BC: 30F + 3R + 0W + 7
+; Overflow: 34F + 4R + 1W + 9
+; Average :  5F + 3R + 0W + 3 (Rounded up and assuming no overflow)
+	add	a, l		; a=L+A
+	ld	l, a		; l=L+A
+	ret	nc		; cf=1
+	inc	h		; h=H+1
+	ret	nz		; h=0
+	dec	h
+	ld	l, h		; uhl=(HLU<<16)+0xFFFF
+	inc	hl		; uhl=HLU+1<<16
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ld	l, a		; uhl=(HLU+1<<16)+(L+A&0xFF)
+	ret	nz		; uhl=L+A&0xFF, cf=0
+	inc	e		; e=E+1
+	ret	nz		; e=0
+	inc	d		; d=D+1
+	ret	nz		; d=0
+	dec	d
+	ld	e, d		; ude=(DEU<<16)+0xFFFF
+	inc	de		; ude=DEU+1<<16
+	sbc	hl, de
+	add	hl, de
+	ret	c		; ude=0
+	inc	bc		; ubc=UBC+1
+	; test for overflow
+	ld	a, b
+	or	a, c
+	ret	nz
+.finish_overflow:
+	set	0, (ix - 3)	; set carry
+	ret
+.set_overflow_bit:
+	pop	hl
+	pop	de
+	jr	.finish_overflow
+
+	extern	_errno
+	extern	__llneg
+	extern	__llcmpzero
