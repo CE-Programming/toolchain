@@ -1,0 +1,39 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_wmemchr
+
+; wchar_t *wmemchr(const wchar_t *ptr, int ch, size_t count)
+_wmemchr:
+	ld	iy, 0
+	add	iy, sp
+	ld	hl, (iy + 9)
+	adc	hl, hl		; count *= 2
+	ret	z		; return NULL
+	push	hl
+	pop	bc		; BC = count * 2
+	ld	hl, (iy + 3)
+	ld	de, (iy + 6)	; E = lower byte, D = upper byte
+	call	.loop_start
+.ret_null:
+	or	a, a
+	sbc	hl, hl
+	ret
+
+.loop_start:
+.no_match:
+	ld	a, e
+.loop:
+	cpir
+	ret	po		; return NULL
+	; repeat until BC is odd
+	bit	0, c
+	jr	z, .loop
+	; lower byte matches, now check the upper byte
+	ld	a, d
+	xor	a, (hl)
+	jr	nz, .no_match
+	pop	bc		; reset SP
+	dec	hl
+	ret

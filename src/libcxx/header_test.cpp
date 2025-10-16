@@ -23,6 +23,8 @@
 #include <cstring>
 #include <ctime>
 #include <ctgmath>
+#include <cwchar>
+#include <cwctype>
 #include <cxxabi.h>
 #include <exception>
 #include <initializer_list>
@@ -65,5 +67,6 @@
 #include <tgmath.h>
 #include <time.h>
 #include <wchar.h>
+#include <wctype.h>
 
 // tests for conflicts

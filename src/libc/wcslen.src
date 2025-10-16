@@ -1,0 +1,23 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_wcslen
+
+; size_t wcslen(const wchar_t *str)
+_wcslen:
+	pop	bc
+	ex	(sp), hl
+	push	bc
+	ld	bc, 1
+	xor	a, a
+	dec	hl
+.loop:
+	inc	hl
+	cpi
+	jr	nz, .loop
+	cp	a, (hl)
+	jr	nz, .loop
+	sbc	hl, hl
+	sbc	hl, bc
+	ret
