@@ -1,25 +1,7 @@
 #ifndef _WCHAR_H
 #define _WCHAR_H
 
-#include <cdefs.h>
-
-#ifndef _WCHAR_T_DEFINED
-#define _WCHAR_T_DEFINED
-#ifndef __cplusplus
-typedef __WCHAR_TYPE__ wchar_t;
-#endif /* __cplusplus */
-#endif /* _WCHAR_T_DEFINED */
-
-#ifndef _WCHAR_LIMITS_DEFINED
-#define _WCHAR_LIMITS_DEFINED
-#define WCHAR_WIDTH __WCHAR_WIDTH__
-#define WCHAR_MIN (~__WCHAR_MAX__)
-#define WCHAR_MAX   __WCHAR_MAX__
-#endif
-
-#ifndef WEOF
-#define WEOF -1
-#endif
+#include <__wchar_def.h>
 
 __BEGIN_DECLS
 
@@ -75,7 +57,7 @@ size_t wcslen(const wchar_t *s)
     __attribute__((nonnull(1)));
 
 size_t wcsnlen(const wchar_t *s, size_t maxlen)
-    __attribute__((nonnull(1)));
+    __NOEXCEPT __attribute__((nonnull(1))) __attribute__((__pure__));
 
 int wcscmp(const wchar_t *s1, const wchar_t *s2)
     __attribute__((nonnull(1, 2)));

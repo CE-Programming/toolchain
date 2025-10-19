@@ -1,0 +1,40 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_wmemset
+
+; wchar_t *wmemset(wchar_t *dst, wchar_t ch, size_t count)
+_wmemset:
+	pop	iy, hl, de, bc
+	push	bc, de, hl, iy
+	; BC = count
+	; DE = ch
+	; HL = dst
+
+	; count *= sizeof(wchar_t)
+	cpi			; hl++ bc--
+	add	hl, bc		; HL = (dst + 1) + (count - 1) = dst + count
+	ret	c		; bc is zero
+	add	hl, bc		; HL = dst + count + (count - 1) = dst + 2 * count - 1
+
+	; hl += (count - 1) * 2 + 1
+	; count -= 2
+	ld	(hl), d		; upper 8 bits
+	dec	hl
+	ld	(hl), e		; lower 8 bits
+	ret	po		; only one element needs to be written
+
+	; write multiple elements
+	push	hl
+	pop	de
+	inc	hl
+	dec	de
+
+	push	bc
+	; use lddr twice
+	lddr
+	pop	bc
+	lddr
+	dec	hl
+	ret
