@@ -94,15 +94,15 @@ disable_relocations
 	ld	(flag_save), a
 	ld	(ix_save), ix		; save IX since older ICE programs don't
 
-	ld	de, show_msgs		; disable or enable error printing
-	ld	a, 1
-	ld	(de), a
 	ld	hl, $AA55AA
 	xor	a, a
 	sbc	hl, bc
-	jr	nz, .show_msgs
-	ld	(de), a
-.show_msgs:
+	jr	z, .no_show_msgs
+; .show_msgs:
+	inc	a
+.no_show_msgs:
+	ld	hl, show_msgs		; disable or enable error printing
+	ld	(hl), a
 
 	pop	hl
 	ld	de,helpers.source
@@ -143,16 +143,16 @@ macro relocate? name, address*
 end macro
 
 relocate helpers, buf + 900
+if 0
 call_relative:
 	pop	ix
-	lea	ix, ix + 3
-	push	ix
-	lea	ix, ix - 3
+	pea	ix + 3
 	push	de
 	ld	de, (ix)
 	add	ix, de
 	pop	de
 	jp	(ix)
+end if
 jump_relative:
 	pop	ix
 	push	de
@@ -161,14 +161,14 @@ jump_relative:
 	pop	de
 	jp	(ix)
 ld_relative:
-	pop	ix
-	ld	de, (ix)
-	push	ix
-	add	ix, de
-	lea	hl, ix
-	pop	ix
-	lea	ix, ix + 3
-	jp	(ix)
+	pop	hl
+	ld	de, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	push	hl
+	add	hl, de			; add hl, relative - 3
+	ret
 end relocate
 
 macro rcall? name
@@ -183,7 +183,7 @@ end macro
 
 macro rload? name
 	call	ld_relative
-	dl	name - $
+	dl	name - $ - 3
 end macro
 
 start:
@@ -216,10 +216,11 @@ check_already_loaded:
 .no_match:
 	pop	de
 	ld	hl, (end_arc_lib_locs)
-	call	ti.CpHLDE		; have we reached the end of the table?
+	or	a, a
+	sbc	hl, de			; have we reached the end of the table?
+
 	push	af
-	ex	de, hl
-	ld	de, 15			; size of search entry (9=name, 3=ram ptr, 3=arc vec ptr)
+	ld	hl, 15			; size of search entry (9=name, 3=ram ptr, 3=arc vec ptr)
 	add	hl, de
 	ex	de, hl			; end of the extraction table?
 	pop	af
@@ -301,9 +302,9 @@ optional_lib_clear:
 	ld	(hl), e			; mark optional library as not found
 	pop	hl
 	inc	hl			; skip version byte
+	ld	a, JP_OPCODE
 .loop:
-	ld	a, (hl)
-	cp	a, JP_OPCODE		; jp byte ($C3)
+	cp	a, (hl)			; jp byte ($C3)
 	jr	nz, .done
 	inc	hl
 	ld	(hl), de		; make the vector zero
@@ -377,7 +378,8 @@ good_version:
 	add	hl, de			; hl->start of library relocation table
 	ld	(reloc_tbl_ptr), hl	; store this
 	ld	de, (end_reloc_tbl)
-	call	ti.CpHLDE		; check and see if they match -- if so, this library is going to remain in the archive
+	or	a, a
+	sbc	hl, de			; check and see if they match -- if so, this library is going to remain in the archive
 	jr	nz, need_to_load_lib
 	ld	hl, (arclocation)
 	ld	(ramlocation), hl	; okay, not a ram location, but it's use is still the same
@@ -423,17 +425,52 @@ need_to_load_lib:
 
 resolve_entry_points:
 	ld	hl, (ramlocation)
-	rcall	enqueue_all_deps	; get all the dependency pointers that reside in the ram lib
-	ld	hl, (jump_tbl_ptr)	; hl->start of function jump table
+
+	; get all the dependency pointers that reside in the ram lib
+enqueue_all_deps:			; we don't need to store anything if we are here
+	bit	keep_in_arc, (iy + LIB_FLAGS)
+	jr	nz, .finish		; really,  this is just a precautionary check -- should work fine without
 .loop:
+	res	optional, (iy + LIB_FLAGS)
 	ld	a, (hl)
-	cp	a, JP_OPCODE		; jp byte ($C3)
+	cp	a, REQ_LIB_MARKER	; is there a dependency?
+	jr	nz, .check
+	ex	de, hl
+	ld	hl, (end_dep_queue)
+	ld	(hl), de		; save pointer to start of this dependency -- one at a time
+	inc	hl
+	inc	hl
+	inc	hl			; move to next pointer
+	ld	(end_dep_queue), hl	; save next pointer
+	ex	de, hl
+.skip:
+	move_string_to_end
+	inc	hl			; move to start of dependency jump table
+	ld	a, JP_OPCODE
+.next:
+	cp	a, (hl)			; jp byte ($C3)
+	jr	nz, .loop
+	inc	hl
+	inc	hl
+	inc	hl
+	inc	hl			; jp address
+	jr	.next
+.check:
+	cp	a, ti.AppVarObj
+	jr	z, .skip		; keep going
+.finish:
+
+resolve_entry_points_enqueued:
+	ld	hl, (jump_tbl_ptr)	; hl->start of function jump table
+	ld	bc, 3
+	ld	a, JP_OPCODE
+.loop:
+	cp	a, (hl)			; jp byte ($C3)
 	jr	nz, .done
 	inc	hl			; bypass jp byte ($C3)
 	push	hl
 	ld	hl, (hl)		; offset in vector table (0, 3, 6, etc.)
-	ld	bc, 3
-	call	ti._idivs		; originally the offset was just added because vectors were stored in three bytes,  now it is just 2 to save space
+	call	ti._idivu		; originally the offset was just added because vectors were stored in three bytes,  now it is just 2 to save space
 	add	hl, hl			; (offset/3) * 2
 	ld	de, (vector_tbl_ptr)	; hl->start of vector table
 	add	hl, de			; hl->correct vector entry
@@ -443,9 +480,7 @@ resolve_entry_points:
 	ex	de, hl			; de->function in ram
 	pop	hl			; restore jump offset
 	ld	(hl), de		; de=resolved address
-	inc	hl
-	inc	hl
-	inc	hl			; move to next jump
+	add	hl, bc			; move to next jump
 	jr	.loop
 .done:					; finished resolving entry points
 					; now relocate absolutes in library
@@ -458,25 +493,27 @@ relocate_absolutes:
 	ld	hl, (reloc_tbl_ptr)	; restore this
 .loop:
 	ld	de, (end_reloc_tbl)
-	call	ti.CpHLDE		; have we reached the end of the relocation table
+	or	a, a
+	sbc	hl, de			; have we reached the end of the relocation table
 	jr	z, .done
-	push	hl			; save pointer to relocation table current
-	ld	a, (hl)
+	add	hl, de			; restore hl
+	ld	e, (hl)
 	inc	hl
-	ld	h, (hl)
-	ld	l, a			; hl->offset in ram library to relocate
-	call	ti.SetHLUTo0
+	push	hl			; save pointer to relocation table current
+	ld	d, (hl)
+	ex.s	de, hl			; hl->offset in ram library to relocate
+	; UHL = 0
+
 	ld	de, (ramlocation)
 	add	hl, de			; hl->location in library to relocate
 	push	hl
 	ld	hl, (hl)		; hl=offset we are relocating
-	ld	de, (ramlocation)
+	; ld	de, (ramlocation)
 	add	hl, de			; hl=new address
 	ex	de, hl			; de=new address
 	pop	hl
 	ld	(hl), de		; resolved absolute address
 	pop	hl
-	inc	hl
 	inc	hl			; move to next relocation vector
 	jr	.loop
 .done:					; have we found the start of the program?
@@ -502,7 +539,9 @@ check_has_deps:				; the first time we hit this,  we have all the dependencies p
 load_next_dep:
 	ld	hl, (end_dep_queue)
 	ld	de, dep_queue_ptr
-	call	ti.CpHLDE		; make sure we are done parsing the dependency queue
+	or	a, a
+	sbc	hl, de			; make sure we are done parsing the dependency queue
+	add	hl, de
 					; now we need to parse the libraries like they are programs. this will be fun.
 	jr	z, .exit
 	dec	hl
@@ -521,39 +560,6 @@ load_next_dep:
 	ld	a, 1
 	jp	(hl)			; passed all the checks; let's start execution! :)
 
-enqueue_all_deps:			; we don't need to store anything if we are here
-	bit	keep_in_arc, (iy + LIB_FLAGS)
-	ret	nz			; really,  this is just a precautionary check -- should work fine without
-.loop:
-	res	optional, (iy + LIB_FLAGS)
-	ld	a, (hl)
-	cp	a, REQ_LIB_MARKER	; is there a dependency?
-	jr	nz, .check
-	ex	de, hl
-	ld	hl, (end_dep_queue)
-	ld	(hl), de		; save pointer to start of this dependency -- one at a time
-	inc	hl
-	inc	hl
-	inc	hl			; move to next pointer
-	ld	(end_dep_queue), hl	; save next pointer
-	ex	de, hl
-.skip:
-	move_string_to_end
-	inc	hl			; move to start of dependency jump table
-.next:
-	ld	a, (hl)
-	cp	a, JP_OPCODE
-	jr	nz, .loop
-	inc	hl
-	inc	hl
-	inc	hl
-	inc	hl			; jp address
-	jr	.next
-.check:
-	cp	a, ti.AppVarObj
-	jr	z, .skip		; keep going
-	ret
-
 error_invalid:
 	rload	str_error_invalid
 	jr	throw_error
@@ -567,7 +573,7 @@ throw_error:				; draw the error message onscreen
 	ld	a, (show_msgs)
 	or	a, a
 	jr	z, .return
- .show_msgs:
+.show_msgs:
 	ld	a, ti.lcdBpp16
 	ld	(ti.mpLcdCtrl), a
 	push	hl
