@@ -1,0 +1,29 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__smulhs
+
+; HL = ((int32_t)HL * (int32_t)BC) >> 16
+__smulhs:
+	push	bc
+	push	hl
+	call	__smulhu
+
+	; if (BC < 0) { result -= HL; }
+	bit	7, b
+	pop	bc
+	jr	z, .positive_hl
+	or	a, a
+	sbc	hl, bc
+.positive_hl:
+
+	; if (HL < 0) { result -= BC; }
+	bit	7, b
+	pop	bc
+	ret	z
+	or	a, a
+	sbc	hl, bc
+	ret
+
+	extern	__smulhu
