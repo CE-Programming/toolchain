@@ -2,9 +2,9 @@
 
 	section	.text
 
-	public	_atol
+	public	_atoi
 
-_atol:
+_atoi:
 	pop	de
 	ex	(sp), hl
 	push	de
@@ -29,41 +29,25 @@ _atol:
 .plus_sign:
 .minus_sign:
 	; carry is cleared
-	push	hl
-	pop	iy
+	ex	de, hl
 	sbc	hl, hl
-	ld	e, l
-	; IY = start of the digits
-	; E:UHL = 0
+	; DE = start of the digits
+	; HL = 0
 	jr	.start
 .loop:
-	; 32F + 4R + 3W + 1 per digit
-	ld	d, a
-	ld	a, e
+	; 21F + 4R + 3W + 1 per digit
 	push	hl
 	pop	bc
-	; *= 2
-	add	hl, hl
-	rla
-	; *= 4
-	add	hl, hl
-	rla
-	; *= 5
-	add	hl, bc
-	adc	a, e
-	; *= 10
-	add	hl, hl
-	rla
-	; += digit
+	add	hl, hl		; *= 2
+	add	hl, hl		; *= 4
+	add	hl, bc		; *= 5
+	add	hl, hl		; *= 10
 	ld	bc, 0
-	ld	c, d
+	ld	c, a
 	add	hl, bc
-	adc	a, b
-	ld	e, a
-	; next digit
-	inc	iy
+	inc	de		; next digit
 .start:
-	ld	a, (iy)
+	ld	a, (de)
 	sub	a, 48
 	cp	a, 10
 	jr	c, .loop
@@ -72,6 +56,6 @@ _atol:
 	; carry is cleared
 	ret	nz	; A != '-' positive
 	; A == '-' negative
-	jp	__lneg
+	jp	__ineg
 
-	extern	__lneg
+	extern	__ineg
