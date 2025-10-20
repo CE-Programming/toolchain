@@ -6541,18 +6541,21 @@ _LZ_ReadVarSize:
 _Maximum:
 ; Calculate the resut of a signed comparison
 ; Inputs:
-;  DE, HL=numbers
+;  HL, DE
 ; Oututs:
-;  HL=max number
+;  HL = signed_maximum(HL, DE)
+;  DE = destroyed
 	or	a, a
 .no_carry:
 	sbc	hl, de
-	add	hl, de
-	jp	p, .skip
+	jr	c, .skip
+	ex	de,hl
+	ret	m
 	ret	pe
-	ex	de, hl
 .skip:
-	ret	po
+	add	hl, de
+	ret	p
+	ret	pe
 	ex	de, hl
 	ret
 
@@ -6560,19 +6563,22 @@ _Maximum:
 _Minimum:
 ; Calculate the resut of a signed comparison
 ; Inputs:
-;  DE, HL=numbers
+;  HL, DE
 ; Oututs:
-;  HL=min number
+;  HL = signed_minimum(HL, DE)
+;  DE = destroyed
 	or	a, a
 .no_carry:
 	sbc	hl, de
+	jr	nc, .skip
 	ex	de, hl
-	jp	p, .skip
+	ret	p
 	ret	pe
-	add	hl, de
 .skip:
-	ret	po
 	add	hl, de
+	ret	m
+	ret	pe
+	ex	de, hl
 	ret
 
 ;-------------------------------------------------------------------------------
