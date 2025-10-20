@@ -388,10 +388,12 @@ gfx_AllocSprite:
 	inc	de			; de = width * height + 2
 	push	de
 	call	_indcallHL		; hl = malloc(width * height + 2)
-	pop	de			; de = width * height + 2
-	add	hl, de			; this should never carry
-	sbc	hl, de			; check if malloc failed (hl == 0)
-	pop	de			; e = width, d = height
+	pop	de
+	pop	de			; e = width, d = height, ude = unknown
+	; check if malloc failed (hl == 0)
+	add	hl, de
+	or	a, a
+	sbc	hl, de
 	ret	z			; abort if malloc failed
 	ld	(hl), de		; store width and height
 	ret
