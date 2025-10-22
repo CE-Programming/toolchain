@@ -17,7 +17,7 @@ include_library '../lcddrvce/lcddrvce.asm'
 ;-------------------------------------------------------------------------------
 ; v1 functions
 ;-------------------------------------------------------------------------------
-	export gfy_Begin		
+	export gfy_Begin
 	export gfy_End
 	export gfy_SetColor
 	export gfy_SetDefaultPalette
@@ -730,7 +730,7 @@ _HLZero_gfy_SetPixel:
 	add	hl, sp
 	ld	bc, (hl)	; bc = x coordinate
 	add	hl, de		; move to next argument
-	ld	e, (hl)		; e = y coordinate		
+	ld	e, (hl)		; e = y coordinate
 _SetPixel:
 	wait_quick
 _SetPixel_NoWait:
@@ -742,7 +742,7 @@ _SetPixel_NoWait:
 	ret	c			; return if out of bounds
 _SetPixel_NoClip_NoWait:
 	ld	hl, (CurrentBuffer)
-	
+
 	dec	b		; tests if x >= 256
 	jr	nz, .x_lt_256
 	ld	d, $F0		; ti.lcdHeight * 256
@@ -1050,7 +1050,7 @@ _HorizLine_NoClip_NotDegen_NoWait:
 	add	hl, de		; add y cord
 	ld	de, (CurrentBuffer)
 	add	hl, de		; add buffer offset
-	
+
 _HorizLine_NoClip_Draw_NoWait:
 	ld	de, ti.lcdHeight
 	; swap b and c
@@ -2464,7 +2464,7 @@ gfy_BlitRectangle:
 
 	ld	a, (iy + 3)	; a = buffer to blit from
 	call	util.getbuffer	; determine blit buffers
-	
+
 	; buffers will be 0xD40000 or 0xD52C00
 	ld	a, (iy + 9) ; y coordinate
 	; adds A to HL and DE
@@ -2576,7 +2576,7 @@ smcByte _TransparentColor
 	call	_TransparentPlot	; call the transparent routine
 	ld	c, ixl	; (.amount)
 	add	hl, bc	; move to next line
-	
+
 	ld	c, ixh	; (.jump)
 	ex	de, hl
 	add	hl, bc	; move to next column
@@ -3459,7 +3459,7 @@ _TextYPos := $-3
 	ex.s	de, hl		; clear upper byte of DE
 	add	hl, de		; add y cord
 	ld	de, (CurrentBuffer)
-	add	hl, de		; add buffer offset	
+	add	hl, de		; add buffer offset
 	ex	de,hl		; DE = draw location
 
 	ld	a, c			; C = character
@@ -3728,7 +3728,7 @@ gfy_GetStringWidth: ; COPIED_FROM_GRAPHX
 ; Returns:
 ;  Width of string in pixels
 	pop	de
-	ex	(sp), hl		; hl -> string		
+	ex	(sp), hl		; hl -> string
 	push	de
 	ld	de,0
 .loop:
@@ -4342,7 +4342,7 @@ gfy_FlipSpriteX: ; MODIFIED_FROM_GRAPHX gfx_FlipSpriteY
 	ld	c,a
 
 	inc	de
-	
+
 	add	hl,de
 	ld	de,(iy+6)	; de -> sprite data
 	push	de
@@ -4395,7 +4395,7 @@ gfy_FlipSpriteY: ; MODIFIED_FROM_GRAPHX gfx_FlipSpriteX
 	ld	b, (hl)
 	sub	a, b
 	ld	(.delta), a
-	ld	iyl, b	; (.height) 
+	ld	iyl, b	; (.height)
 	ld	a, c
 	ldi		; copy height (and decrement C)
 
@@ -4548,7 +4548,7 @@ gfy_ScaleSprite: ; MODIFIED_FROM_GRAPHX
 	dec	hl
 	ld	ixh,a			; target_width
 	ld	(ScaleWidth),a
-	
+
 	xor	a,a
 	sub	a,(hl)
 	ld	ixl,a			; -target_height
@@ -5037,7 +5037,7 @@ _RSS_NC:
 	dec	iyl
 	jr	nz, .inner_opaque	; x loop
 
-	dec	iyh	
+	dec	iyh
 	jr	z, .finish		; y loop
 .outer:
 	; restore and increment dxc
@@ -5156,7 +5156,7 @@ smcWord _XSpan
 	add	hl,de			; use clip_width as the draw width, and clip left
 	jr	.clipleft
 .notwider:
-	sbc	hl,de			; is fully onscreen horizontally?	
+	sbc	hl,de			; is fully onscreen horizontally?
 	jr	nc,.xclipped		; a = 0 for bytes to add per iteration
 .xclip:
 	add	hl,bc			; is partially clipped right?
@@ -5248,7 +5248,7 @@ smcByte _YMin
 	; DE = HL * C(width)
 	call	_set_DE_to_HL_mul_B
 	pop	hl
-	add	hl, de	
+	add	hl, de
 	; ld	(iy + (_RSS_NC.dsrs_size128_1_minus_dys_0 - _RSS_NC.dsrs_base_address)), hl
 	ld	(ix - 9), hl	; dsrs_size128_1_minus_dys_0
 
@@ -6298,7 +6298,7 @@ _DefaultCharSpacing: ; COPIED_FROM_GRAPHX
 
 if 0
 _DefaultTextData: ; row-major
-	db	$00,$00,$00,$00,$00,$00,$00,$00 ;  
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ;
 	db	$7E,$81,$A5,$81,$BD,$BD,$81,$7E ; ☺
 	db	$7E,$FF,$DB,$FF,$C3,$C3,$FF,$7E ; ☻
 	db	$6C,$FE,$FE,$FE,$7C,$38,$10,$00 ; ♥
@@ -6428,7 +6428,7 @@ _DefaultTextData: ; row-major
 	db	$00,$10,$38,$6C,$C6,$C6,$FE,$00 ; Δ
 else
 _DefaultTextData: ; column-major
-	db	$00,$00,$00,$00,$00,$00,$00,$00 ;  
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ;
 	db	$7E,$81,$AD,$8D,$8D,$AD,$81,$7E ; ☺
 	db	$7E,$FF,$D3,$F3,$F3,$D3,$FF,$7E ; ☻
 	db	$70,$F8,$FC,$7E,$FC,$F8,$70,$00 ; ♥
@@ -6708,14 +6708,14 @@ gfy_SineTable := _SineTable
 ; libc
 ;-------------------------------------------------------------------------------
 
-; __bremu     := 
+; __bremu     :=
 ; _memcpy     := $0000A4
 __idivs     := $00013C
 __idivu     := $000140
 __ixor      := $000198
 __sremu     := $00023C
 __ineg      := $000160
-; __indcallhl := 
+; __indcallhl :=
 _memmove    := $0000A8
 ; __imulu     := $000154
 __ishl      := $000174
