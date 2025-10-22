@@ -167,17 +167,17 @@ TEXT_TP_COLOR      := 255
 
 ;-------------------------------------------------------------------------------
 macro mIsHLLessThanDE?
-	or	a,a
-	sbc	hl,de
-	add	hl,hl
-	jp	po,$+5
+	or	a, a
+	sbc	hl, de
+	add	hl, hl
+	jp	po, $+5
 	ccf
 end macro
 macro mIsHLLessThanBC?
-	or	a,a
-	sbc	hl,bc
-	add	hl,hl
-	jp	po,$+5
+	or	a, a
+	sbc	hl, bc
+	add	hl, hl
+	jp	po, $+5
 	ccf
 end macro
 macro s8 op, imm
@@ -230,21 +230,21 @@ macro setSmcBytesFast name*
 	end postpone
 
 	pop	de			; de = return vetor
-	ex	(sp),hl			; l = byte
-	ld	a,l			; a = byte
+	ex	(sp), hl		; l = byte
+	ld	a, l			; a = byte
 	match expand, list
 		iterate expand
 			if % = 1
-				ld	hl,each
-				ld	c,(hl)
-				ld	(hl),a
+				ld	hl, each
+				ld	c, (hl)
+				ld	(hl), a
 			else
-				ld	(each),a
+				ld	(each), a
 			end if
 		end iterate
 	end match
-	ld	a,c			; a = old byte
-	ex	de,hl			; hl = return vector
+	ld	a, c			; a = old byte
+	ex	de, hl			; hl = return vector
 	jp	(hl)
 end macro
 
@@ -260,7 +260,7 @@ macro setSmcBytesInline name*
 
 	match expand, list
 		iterate expand
-			ld	(each),a
+			ld	(each), a
 		end iterate
 	end match
 end macro
@@ -277,7 +277,7 @@ macro setSmcWordsInline name*
 
 	match expand, list
 		iterate expand
-			ld	(each),hl
+			ld	(each), hl
 		end iterate
 	end match
 end macro
@@ -308,24 +308,24 @@ gfy_internal_Begin:
 ;  None
 	call	ti.boot.ClearVRAM	; clear the screen
 lcdGraphxMode := ti.lcdWatermark+ti.lcdIntFront+ti.lcdPwr+ti.lcdBgr+ti.lcdBpp8
-	ld	de,lcdGraphxMode
-	ld	hl,CurrentBuffer
+	ld	de, lcdGraphxMode
+	ld	hl, CurrentBuffer
 SetGfy:
-	ld	bc,ti.vRam
-	ld	(hl),bc			; set the current draw to the screen
+	ld	bc, ti.vRam
+	ld	(hl), bc		; set the current draw to the screen
 assert CurrentBuffer and -$100 = ti.mpLcdRange
-	ld	l,ti.lcdCtrl
-	ld	(hl),de			; set lots of control parameters
-	ld	l,ti.lcdTiming0+1
-	ld	de,_LcdTiming
+	ld	l, ti.lcdCtrl
+	ld	(hl), de		; set lots of control parameters
+	ld	l, ti.lcdTiming0+1
+	ld	de, _LcdTiming
 assert ti.vRam and $FF = 0
-	ld	b,8+1			; +1 because c = 0, so first ldi will
+	ld	b, 8+1			; +1 because c = 0, so first ldi will
 					; decrement b
 .ExchangeTimingLoop:			; exchange stored and active timing
-	ld	a,(de)
+	ld	a, (de)
 	ldi
 	dec	hl
-	ld	(hl),a
+	ld	(hl), a
 	inc	hl
 	djnz	.ExchangeTimingLoop
 ;	jp	gfy_SetDefaultPalette	; setup the default palette
@@ -338,25 +338,25 @@ gfy_SetDefaultPalette: ; COPIED_FROM_GRAPHX
 ;  None
 ; Returns:
 ;  None
-	ld	de,ti.mpLcdPalette	; address of mmio palette
-	ld	b,e			; b = 0
+	ld	de, ti.mpLcdPalette	; address of mmio palette
+	ld	b, e			; b = 0
 .loop:
-	ld	a,b
+	ld	a, b
 	rrca
-	xor	a,b
-	and	a,$E0
-	xor	a,b
-	ld	(de),a
-	ld	a,e	; E = B * 2, so we can remove one rla
+	xor	a, b
+	and	a, $E0
+	xor	a, b
+	ld	(de), a
+	ld	a, e			; E = B * 2, so we can remove one rla
 	inc	de
 	rla
 	rla
-	ld	a,b
+	ld	a, b
 	rra
-	ld	(de),a
+	ld	(de), a
 	inc	de
 	inc	b
-	jr	nz,.loop		; loop for 256 times to fill palette
+	jr	nz, .loop		; loop for 256 times to fill palette
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -370,8 +370,8 @@ gfy_internal_End:
 ; Returns:
 ;  None
 	call	ti.boot.ClearVRAM	; clear the screen
-	ld	de,ti.lcdNormalMode
-	ld	hl,ti.mpLcdBase
+	ld	de, ti.lcdNormalMode
+	ld	hl, ti.mpLcdBase
 	jr	SetGfy			; restore the screen mode
 
 ;-------------------------------------------------------------------------------
@@ -383,31 +383,33 @@ gfy_AllocSprite: ; COPIED_FROM_GRAPHX
 ;  arg2 : pointer to malloc routine
 ; Returns:
 ;  Pointer to allocated sprite, first byte width, second height
-	ld	bc,3
+	ld	bc, 3
 	push	bc
 	pop	hl
-	add	hl,sp
-	ld	e,(hl)			; e = width
-	add	hl,bc
-	ld	d,(hl)			; d = height
-	add	hl,bc
-	ld	hl,(hl)			; hl = malloc
+	add	hl, sp
+	ld	e, (hl)			; e = width
+	add	hl, bc
+	ld	d, (hl)			; d = height
+	add	hl, bc
+	ld	hl, (hl)		; hl = malloc
 	push	de
 	mlt	de			; de = width * height
 	inc	de			; +2 to store width and height
 	inc	de			; de = width * height + 2
 	push	de
 	call	_indcallHL		; hl = malloc(width * height + 2)
-	pop	de			; de = width * height + 2
-	add	hl,de			; this should never carry
-	sbc	hl,de			; check if malloc failed (hl == 0)
-	pop	de			; e = width, d = height
+	pop	de
+	pop	de			; e = width, d = height, ude = unknown
+	; check if malloc failed (hl == 0)
+	add	hl, de
+	or	a, a
+	sbc	hl, de
 	ret	z			; abort if malloc failed
-	ld	(hl),de			; store width and height
+	ld	(hl), de		; store width and height
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_SetClipRegion: ; COPIED_FROM_GRAPHX
+gfy_SetClipRegion: ; COPIED_FROM_NIGHTLY_GRAPHX
 ; Sets the clipping region for clipped routines
 ; Arguments:
 ;  arg0 : Xmin
@@ -441,20 +443,20 @@ gfy_SetClipRegion: ; COPIED_FROM_GRAPHX
 	ld	a,ti.lcdHeight
 .apply:
 	setSmcWordsInline _XMin
-	ex	de,hl
+	ex	de, hl
 	setSmcWordsInline _XMax
 	dec	hl
 	setSmcWordsInline _XMaxMinus1
 	inc	hl
-	sbc	hl,de
+	sbc	hl, de
 	setSmcWordsInline _XSpan
 	setSmcBytesInline _YMax
 	dec	a
 	setSmcBytesInline _YMaxMinus1
 	inc	a
-	sub	a,c
+	sub	a, c
 	setSmcBytesInline _YSpan
-	ld	a,c
+	ld	a, c
 	setSmcBytesInline _YMin
 	ret
 
@@ -468,24 +470,24 @@ gfy_Lighten: ; COPIED_FROM_GRAPHX
 ;  16 bit color value
 	pop	de			; de = return vector
 	pop	bc			; bc = color
-	ex	(sp),hl			; l = amt
+	ex	(sp), hl		; l = amt
 	push	bc
 	push	de
 					; Strategy: lighten(color, amt) = ~darken(~color, amt)
 					; Darken the inverted color
-	ld	a,c
+	ld	a, c
 	cpl
-	ld	c,a
-	ld	a,b
+	ld	c, a
+	ld	a, b
 	cpl
-	ld	b,a			; bc = ~color
+	ld	b, a			; bc = ~color
 	call	_Darken			; hl = darken(~color, amt)
-	ld	a,l			; Invert the darken result for the lighten result
+	ld	a, l			; Invert the darken result for the lighten result
 	cpl
-	ld	l,a
-	ld	a,h
+	ld	l, a
+	ld	a, h
 	cpl
-	ld	h,a			; hl = ~darken(~color, amt) = lighten(color, amt)
+	ld	h, a			; hl = ~darken(~color, amt) = lighten(color, amt)
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -498,58 +500,58 @@ gfy_Darken: ; COPIED_FROM_GRAPHX
 ;  16 bit color value
 	pop	de			; de = return vector
 	pop	bc			; bc = color
-	ex	(sp),hl			; l = amt
+	ex	(sp), hl		; l = amt
 	push	bc
 	push	de			; Comments assume 1555 RGB color
 _Darken:
 	push	bc			; Calculate the output blue value
-	ld	a,c			; a = color & $FF
-	ld	c,l			; c = amt
-	and	a,31
-	ld	h,a			; h = blue
+	ld	a, c			; a = color & $FF
+	ld	c, l			; c = amt
+	and	a, 31
+	ld	h, a			; h = blue
 	mlt	hl			; hl = blue * amt
-	ld	de,128			; de = 128
-	add	hl,de			; hl = blue * amt + 128
-	ld	l,h
-	ld	h,d			; hl = (blue * amt + 128) / 256 = blue_out
-	ex	(sp),hl			; hl = color, tmp1 = blue_out
+	ld	de, 128			; de = 128
+	add	hl, de			; hl = blue * amt + 128
+	ld	l, h
+	ld	h, d			; hl = (blue * amt + 128) / 256 = blue_out
+	ex	(sp), hl		; hl = color, tmp1 = blue_out
 					; Isolate the input red value
-	ld	a,h			; a = color >> 8
+	ld	a, h			; a = color >> 8
 	rra				; a = color >> 9
-	and	a,62
-	ld	b,a			; b = red << 1
+	and	a, 62
+	ld	b, a			; b = red << 1
 					; Calculate the output green value
-	add.s	hl,hl
+	add.s	hl, hl
 	rla				; a & 1 = green & 1
-	add	hl,hl
-	add	hl,hl			; hl = color << 3
+	add	hl, hl
+	add	hl, hl			; hl = color << 3
 	rra
-	ld	a,h
+	ld	a, h
 	rla
-	and	a,63
-	ld	h,a			; h = green
-	ld	l,c			; l = amt
+	and	a, 63
+	ld	h, a			; h = green
+	ld	l, c			; l = amt
 	mlt	hl			; hl = green * amt
-	add	hl,de			; hl = green * amt + 128
-	ld	l,h			; l = (green * amt + 128) / 256 = green_out
+	add	hl, de			; hl = green * amt + 128
+	ld	l, h			; l = (green * amt + 128) / 256 = green_out
 					; Calculate the output red value
 	mlt	bc			; bc = red * amt << 1
 	inc	b			; b = (red * amt + 128 << 1) / 256
 	srl	b			; b = (red * amt + 128) / 256 = red_out
 					; Position the output red and green bits
-	add	hl,hl
-	add	hl,hl			; l = green_out << 2
-	ld	h,b			; h = red_out
-	add	hl,hl
-	add	hl,hl			; hl = (red_out << 10) | (green_out << 4)
-	bit	4,l
-	jr	z,.out
-	set	7,h
-	res	4,l			; hl = (green_out & 1 << 15) | (red_out << 10) | (green_out >> 1 << 5)
+	add	hl, hl
+	add	hl, hl			; l = green_out << 2
+	ld	h, b			; h = red_out
+	add	hl, hl
+	add	hl, hl			; hl = (red_out << 10) | (green_out << 4)
+	bit	4, l
+	jr	z, .out
+	set	7, h
+	res	4, l			; hl = (green_out & 1 << 15) | (red_out << 10) | (green_out >> 1 << 5)
 .out:
 					; Add the output blue value (no positioning necessary) for the final output color
 	pop	bc			; bc = blue_out
-	add	hl,bc			; hl = color_out
+	add	hl, bc			; hl = color_out
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -568,7 +570,6 @@ gfy_SetTransparentColor: ; COPIED_FROM_GRAPHX
 ;  arg0 : Transparent color index
 ; Returns:
 ;  Previous transparent color index
-
 	setSmcBytes _TransparentColor
 
 ;-------------------------------------------------------------------------------
@@ -584,38 +585,38 @@ FillScreen_NumIters      := (LcdSize-InterruptStackSize)/(FillScreen_PushesPerIt
 FillScreen_BytesToPush   := FillScreen_PushesPerIter*3*FillScreen_NumIters
 FillScreen_BytesToLddr   := LcdSize-FillScreen_BytesToPush
 
-	ld	iy,0
-	add	iy,sp			; iy = original sp
-	ld	hl,FillScreen_FastCode_SrcEnd-1
-	ld	de,FillScreen_FastCode_DestEnd-1
-	ld	bc,FillScreen_FastCode_SrcSize
+	ld	iy, 0
+	add	iy, sp			; iy = original sp
+	ld	hl, FillScreen_FastCode_SrcEnd-1
+	ld	de, FillScreen_FastCode_DestEnd-1
+	ld	bc, FillScreen_FastCode_SrcSize
 	lddr				; copy fast code after push run
 					; de = pointer second to last push
 					; bc = 0
 	push	de
 	pop	hl
 	inc	hl			; hl  = pointer to last push (already copied)
-	ld	c,FillScreen_PushesPerIter-1
+	ld	c, FillScreen_PushesPerIter-1
 	lddr				; fill push run
-	ld	a,$E1
-	ld	(de),a			; write initial pop hl
-	ld	hl,(CurrentBuffer)
-	ld	de,LcdSize
-	add	hl,de			; hl = end (exclusive) of buffer
-	ld	de,(iy+1)		; deu = color
-	ld	d,(iy+3)		; d = color
-	ld	e,d			; e = color
-	ld	b,FillScreen_NumIters	; b = number of fast code iterations
+	ld	a, $E1
+	ld	(de), a			; write initial pop hl
+	ld	hl, (CurrentBuffer)
+	ld	de, LcdSize
+	add	hl, de			; hl = end (exclusive) of buffer
+	ld	de, (iy + 1)		; deu = color
+	ld	d, (iy + 3)		; d = color
+	ld	e, d			; e = color
+	ld	b, FillScreen_NumIters	; b = number of fast code iterations
 	call	gfy_Wait
-	ld	sp,hl			; sp = end (exclusive) of buffer
+	ld	sp, hl			; sp = end (exclusive) of buffer
 	call	_FillScreen_FastCode_Dest ; do fast fill
-	sbc	hl,hl
-	add	hl,sp			; hl = pointer to last byte fast-filled
-	ld	sp,iy			; sp = original sp
+	sbc	hl, hl
+	add	hl, sp			; hl = pointer to last byte fast-filled
+	ld	sp, iy			; sp = original sp
 	push	hl
 	pop	de
 	dec	de			; de = pointer to first byte to slow-fill
-	ld	bc,FillScreen_BytesToLddr
+	ld	bc, FillScreen_BytesToLddr
 	lddr				; finish with slow fill
 	ret
 
@@ -660,15 +661,15 @@ gfy_SetPalette: ; COPIED_FROM_GRAPHX
 	pop	iy			; iy = return vector
 	pop	de			; de = src
 	pop	bc			; bc = size
-	ex	(sp),hl			; l = offset
+	ex	(sp), hl		; l = offset
 	push	bc
 	push	de
-	ld	a,l
+	ld	a, l
 assert ti.mpLcdPalette and 1 = 0
-	ld	hl,ti.mpLcdPalette shr 1
-	ld	l,a			; hl = (palette >> 1) + offset
-	add	hl,hl			; hl = &palette[offset] = dest
-	ex	de,hl			; de = dest, hl = src
+	ld	hl, ti.mpLcdPalette shr 1
+	ld	l, a			; hl = (palette >> 1) + offset
+	add	hl, hl			; hl = &palette[offset] = dest
+	ex	de, hl			; de = dest, hl = src
 	ldir
 	jp	(iy)
 
@@ -709,7 +710,7 @@ _GetPixel:
 ; that the current buffer is the second half of VRAM, the largest that this
 ; pointer can be is $D52C00 + 122895 = $D70C0F. This goes beyond the end of
 ; mapped RAM, but only into unmapped memory with no read side effects.
-	ld	a,(hl)	; a = buffer[y][x]
+	ld	a, (hl)		; a = buffer[y][x]
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -767,45 +768,46 @@ gfy_Rectangle_NoClip: ; optimize this
 ; Returns:
 ;  None
 	push	ix			; need to use ix because lines use iy
-	ld	ix,0
-	add	ix,sp
-	ld	hl,(ix+6)
-	ld	de,(ix+9)
-	ld	bc,(ix+12)
+	ld	ix, 0
+	add	ix, sp
+	ld	hl, (ix + 6)
+	ld	de, (ix + 9)
+	ld	bc, (ix + 12)
 	push	bc
 	push	de
 	push	hl
 	call	gfy_HorizLine_NoClip	; top horizontal line
-	ld	hl,(ix+6)
-	ld	de,(ix+9)
-	ld	bc,(ix+15)
+	ld	hl, (ix + 6)
+	ld	de, (ix + 9)
+	ld	bc, (ix + 15)
 	push	bc
 	push	de
 	push	hl
 	call	gfy_VertLine_NoClip	; left vertical line
-	ld	hl,(ix+6)
-	ld	de,(ix+9)
-	ld	bc,(ix+12)
-	add	hl,bc			; add x and width
+	ld	hl, (ix + 6)
+	ld	de, (ix + 9)
+	ld	bc, (ix + 12)
+	add	hl, bc			; add x and width
 	dec	hl
-	ld	bc,(ix+15)
+	ld	bc, (ix + 15)
 	push	bc
 	push	de
 	push	hl
 	call	gfy_VertLine_NoClip	; right vertical line
-	ld	de,(ix+6)
-	ld	hl,(ix+9)
-	ld	bc,(ix+15)
-	add	hl,bc
+	ld	de, (ix + 6)
+	ld	hl, (ix + 9)
+	ld	bc, (ix + 15)
+	add	hl, bc
 	dec	hl			; add y and height
-	ld	bc,(ix+12)
+	ld	bc, (ix + 12)
 	push	bc
 	push	hl
 	push	de
 	call	gfy_HorizLine_NoClip	; bottom horizontal line
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 	ret
+
 ;-------------------------------------------------------------------------------
 gfy_Rectangle: ; COPIED_FROM_GRAPHX
 ; Draws an clipped rectangle outline with the global color index
@@ -817,48 +819,48 @@ gfy_Rectangle: ; COPIED_FROM_GRAPHX
 ; Returns:
 ;  None
 	push	ix			; need to use ix because lines use iy
-	ld	ix,0
-	add	ix,sp
-	ld	hl,(ix+6)
-	ld	de,(ix+9)
-	ld	bc,(ix+12)
+	ld	ix, 0
+	add	ix, sp
+	ld	hl, (ix + 6)
+	ld	de, (ix + 9)
+	ld	bc, (ix + 12)
 	push	bc
 	push	de
 	push	hl
 	call	gfy_HorizLine		; top horizontal line
-	ld	hl,(ix+6)
-	ld	de,(ix+9)
-	ld	bc,(ix+15)
+	ld	hl, (ix + 6)
+	ld	de, (ix + 9)
+	ld	bc, (ix + 15)
 	push	bc
 	push	de
 	push	hl
 	call	gfy_VertLine		; left vertical line
-	ld	hl,(ix+6)
-	ld	de,(ix+9)
-	ld	bc,(ix+12)
-	add	hl,bc			; add x and width
+	ld	hl, (ix + 6)
+	ld	de, (ix + 9)
+	ld	bc, (ix + 12)
+	add	hl, bc			; add x and width
 	dec	hl
-	ld	bc,(ix+15)
+	ld	bc, (ix + 15)
 	push	bc
 	push	de
 	push	hl
 	call	gfy_VertLine		; right vertical line
-	ld	de,(ix+6)
-	ld	hl,(ix+9)
-	ld	bc,(ix+15)
-	add	hl,bc
+	ld	de, (ix + 6)
+	ld	hl, (ix + 9)
+	ld	bc, (ix + 15)
+	add	hl, bc
 	dec	hl			; add y and height
-	ld	bc,(ix+12)
+	ld	bc, (ix + 12)
 	push	bc
 	push	hl
 	push	de
 	call	gfy_HorizLine		; bottom horizontal line
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_FillRectangle: ; COPIED_FROM_GRAPHX
+gfy_FillRectangle: ; COPIED_FROM_NIGHTLY_GRAPHX
 ; Draws a clipped rectangle with the global color index
 ; Arguments:
 ;  arg0 : X coordinate
@@ -1165,23 +1167,23 @@ gfy_SetDraw: ; COPIED_FROM_GRAPHX
 ; Returns:
 ;  None
 	pop	de
-	ex	(sp),hl
-	ld	a,l
-	or	a,a
-	ld	hl,(ti.mpLcdBase)	; get current base
-	ld	bc,ti.vRam
-	jr	z,.match
-	sbc	hl,bc
-	jr	nz,.swap		; if not the same, swap
+	ex	(sp), hl
+	ld	a, l
+	or	a, a
+	ld	hl, (ti.mpLcdBase)	; get current base
+	ld	bc, ti.vRam
+	jr	z, .match
+	sbc	hl, bc
+	jr	nz, .swap		; if not the same, swap
 .set:
-	ld	bc,ti.vRam + LcdSize
+	ld	bc, ti.vRam + LcdSize
 .swap:
-	ld	(CurrentBuffer),bc
-	ex	de,hl
+	ld	(CurrentBuffer), bc
+	ex	de, hl
 	jp	(hl)
 .match:
-	sbc	hl,bc
-	jr	z,.swap			; if the same, swap
+	sbc	hl, bc
+	jr	z, .swap		; if the same, swap
 	jr	.set
 
 ;-------------------------------------------------------------------------------
@@ -1191,9 +1193,9 @@ gfy_GetDraw: ; COPIED_FROM_GRAPHX
 ;  None
 ; Returns:
 ;  Returns true if drawing on the buffer
-	ld	a,(ti.mpLcdBase+2)	; comparing upper byte only is sufficient
-	ld	hl,CurrentBuffer+2
-	xor	a,(hl)			; always 0 or 1
+	ld	a, (ti.mpLcdBase+2)	; comparing upper byte only is sufficient
+	ld	hl, CurrentBuffer+2
+	xor	a, (hl)			; always 0 or 1
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1234,32 +1236,32 @@ gfy_Wait: ; COPIED_FROM_GRAPHX
 ;  None
 	ret				; will be SMC'd into push hl
 	push	af
-	ld	a,(ti.mpLcdRis)
-	bit	ti.bLcdIntVcomp,a
-	jr	nz,.WaitDone
+	ld	a, (ti.mpLcdRis)
+	bit	ti.bLcdIntVcomp, a
+	jr	nz, .WaitDone
 	push	de
 .WaitLoop:
 .ReadLcdCurr:
-	ld	a,(ti.mpLcdCurr + 2)	; a = *mpLcdCurr>>16
-	ld	hl,(ti.mpLcdCurr + 1)	; hl = *mpLcdCurr>>8
-	sub	a,h
-	jr	nz,.ReadLcdCurr		; nz ==> lcdCurr may have updated
+	ld	a, (ti.mpLcdCurr + 2)	; a = *mpLcdCurr>>16
+	ld	hl, (ti.mpLcdCurr + 1)	; hl = *mpLcdCurr>>8
+	sub	a, h
+	jr	nz, .ReadLcdCurr	; nz ==> lcdCurr may have updated
 					;        mid-read; retry read
-	ld	de,(CurrentBuffer + 1)
-	sbc	hl,de
-	ld	de,-LcdSize shr 8
-	add	hl,de
-	jr	nc,.WaitLoop
+	ld	de, (CurrentBuffer + 1)
+	sbc	hl, de
+	ld	de, -LcdSize shr 8
+	add	hl, de
+	jr	nc, .WaitLoop
 	pop	de
 .WaitDone:
-	ld	a,$C9			; ret
-	ld	(gfy_Wait),a		; disable wait logic
+	ld	a, $C9			; ret
+	ld	(gfy_Wait), a		; disable wait logic
 	pop	af
-	ld	hl,$0218		; jr $+4
+	ld	hl, $0218		; jr $+4
 _WriteWaitQuickSMC:
 repeat wait_quick.usages
 ; Each call _WaitQuick will replace the next unmodified 4-byte entry with
-; ld (_WaitQuick_callee_x),hl.
+; ld (_WaitQuick_callee_x), hl.
 	pop	hl
 	ret
 	nop
@@ -1275,35 +1277,35 @@ gfy_SwapDraw: ; COPIED_FROM_GRAPHX
 ;  None
 ; Returns:
 ;  None
-	ld	iy,ti.mpLcdRange
+	ld	iy, ti.mpLcdRange
 .WaitLoop:
-	bit	ti.bLcdIntLNBU,(iy + ti.lcdRis)
-	jr	z,.WaitLoop
+	bit	ti.bLcdIntLNBU, (iy + ti.lcdRis)
+	jr	z, .WaitLoop
 assert ti.vRam and $FF = 0
 assert LcdSize and $FF = 0
-	ld	bc,(iy-ti.mpLcdRange+CurrentBuffer+1) ; bc = old_draw>>8
+	ld	bc, (iy - ti.mpLcdRange+CurrentBuffer+1) ; bc = old_draw>>8
 .LcdSizeH := (LcdSize shr 8) and $FF
 assert .LcdSizeH and ti.lcdIntVcomp
 assert .LcdSizeH and ti.lcdIntLNBU
-	ld	a,.LcdSizeH		; a = LcdSize>>8
-	ld	(iy+ti.lcdBase+1),bc	; screen = old_draw
-	ld	(iy+ti.lcdIcr),a	; clear interrupt statuses to wait for
-	xor	a,c			; a = (old_draw>>8)^(LcdSize>>8)
-	ld	c,a			; c = (old_draw>>8)^(LcdSize>>8)
+	ld	a, .LcdSizeH		; a = LcdSize>>8
+	ld	(iy + ti.lcdBase+1), bc	; screen = old_draw
+	ld	(iy + ti.lcdIcr), a	; clear interrupt statuses to wait for
+	xor	a, c			; a = (old_draw>>8)^(LcdSize>>8)
+	ld	c, a			; c = (old_draw>>8)^(LcdSize>>8)
 	inc	b
-	res	1,b			; b = (old_draw>>16)+1&-2
+	res	1, b			; b = (old_draw>>16)+1&-2
 					; assuming !((old_draw>>16)&2):
 					;   = (old_draw>>16)^1
 					;   = (old_draw>>16)^(LcdSize>>16)
 					; bc = (old_draw>>8)^(LcdSize>>8)
 					;    = new_draw>>8
-	ld	(iy-ti.mpLcdRange+CurrentBuffer+1),bc
-	ld	hl,gfy_Wait
-	ld	(hl),$E5		; push hl; enable wait logic
+	ld	(iy - ti.mpLcdRange+CurrentBuffer+1), bc
+	ld	hl, gfy_Wait
+	ld	(hl), $E5		; push hl; enable wait logic
 	push	hl
 	dec	sp
 	pop	hl
-	ld	l,$CD			; call *
+	ld	l, $CD			; call *
 					; hl = first 3 bytes of call _Wait
 	dec	sp
 	dec	sp			; sp -= 3 to match pop hl later
@@ -1311,12 +1313,12 @@ assert .LcdSizeH and ti.lcdIntLNBU
 
 ;-------------------------------------------------------------------------------
 gfy_FillEllipse_NoClip: ; COPIED_FROM_GRAPHX
-	ld	hl,gfy_HorizLine_NoClip
-	db	$FD			; ld hl,* -> ld iy,*
+	ld	hl, gfy_HorizLine_NoClip
+	db	$FD			; ld hl, * -> ld iy, *
 
 ;-------------------------------------------------------------------------------
 gfy_FillEllipse: ; COPIED_FROM_GRAPHX
-	ld	hl,gfy_HorizLine
+	ld	hl, gfy_HorizLine
 	ld	iy, _ellipse_smc_base
 	ld	(iy + (_ellipse_line_routine_1 - _ellipse_smc_base)), hl
 	ld	(iy + (_ellipse_line_routine_2 - _ellipse_smc_base)), hl
@@ -1327,12 +1329,12 @@ gfy_FillEllipse: ; COPIED_FROM_GRAPHX
 
 ;-------------------------------------------------------------------------------
 gfy_Ellipse_NoClip: ; COPIED_FROM_GRAPHX
-	ld	hl,_SetPixel_NoClip_NoWait
-	db	$FD		; ld hl,* -> ld iy,*
+	ld	hl, _SetPixel_NoClip_NoWait
+	db	$FD		; ld hl, * -> ld iy, *
 
 ;-------------------------------------------------------------------------------
 gfy_Ellipse: ; COPIED_FROM_GRAPHX
-	ld	hl,_SetPixel_NoWait
+	ld	hl, _SetPixel_NoWait
 	ld	iy, _ellipse_smc_base
 	ld	(iy + (_ellipse_pixel_routine_1 - _ellipse_smc_base)), hl
 	ld	(iy + (_ellipse_pixel_routine_2 - _ellipse_smc_base)), hl
@@ -1363,102 +1365,102 @@ _Ellipse:
 	ld	(iy + (_ellipse_loop_draw_2 - _ellipse_smc_base_m128)), de
 ; Draws an ellipse, either filled or not, either clipped or not
 ; Arguments:
-;  arg0 : X coordinate (ix+6)
-;  arg1 : Y coordinate (ix+9)
-;  arg2 : X radius (ix+12)
-;  arg3 : Y radius (ix+15)
+;  arg0 : X coordinate (ix + 6)
+;  arg1 : Y coordinate (ix + 9)
+;  arg2 : X radius (ix + 12)
+;  arg3 : Y radius (ix + 15)
 ; Returns:
 ;  None
 	push	ix
-	ld	ix,0
-	add	ix,sp
-	lea	hl,ix - 42
-	ld	sp,hl
+	ld	ix, 0
+	add	ix, sp
+	lea	hl, ix - 42
+	ld	sp, hl
 
 ; First, setup all the variables
-	ld	a,(ix + 12)
-	or	a,a
-	jr	nz,.valid_x_radius
+	ld	a, (ix + 12)
+	or	a, a
+	jr	nz, .valid_x_radius
 .return:
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 	ret
 .valid_x_radius:
-	ld	l,a
-	ld	h,a
+	ld	l, a
+	ld	h, a
 	mlt	hl
-	ld	(ix - el_a2),hl		; int a2 = a * a;
-	add	hl,hl
-	ld	(ix - el_sigma_diff2),hl; Save a2 * 2 for later
-	add	hl,hl
-	ld	(ix - el_fa2),hl	; int fa2 = 4 * a2;
-	ld	a,(ix + 15)
-	or	a,a
-	jr	z,.return		; Make sure Y radius is not 0
-	ld	e,a
-	ld	d,1
+	ld	(ix - el_a2), hl	; int a2 = a * a;
+	add	hl, hl
+	ld	(ix - el_sigma_diff2), hl; Save a2 * 2 for later
+	add	hl, hl
+	ld	(ix - el_fa2), hl	; int fa2 = 4 * a2;
+	ld	a, (ix + 15)
+	or	a, a
+	jr	z, .return		; Make sure Y radius is not 0
+	ld	e, a
+	ld	d, 1
 	mlt	de
-	ld	(ix - el_y),de		; int y = b;
-	ld	hl,(ix - el_a2)
-	ld	d,l
-	ld	l,e
+	ld	(ix - el_y), de		; int y = b;
+	ld	hl, (ix - el_a2)
+	ld	d, l
+	ld	l, e
 	mlt	de
 	mlt	hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,hl
-	add	hl,de
-	add	hl,hl
-	add	hl,hl
-	ex	de,hl
-	ld	hl,(ix - el_fa2)
-	or	a,a
-	sbc	hl,de
-	ld	(ix - el_sigma_1),hl	; int sigma_add_1 = fa2 * (1 - b);
-	ld	l,a
-	ld	h,a
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, hl
+	add	hl, de
+	add	hl, hl
+	add	hl, hl
+	ex	de, hl
+	ld	hl, (ix - el_fa2)
+	or	a, a
+	sbc	hl, de
+	ld	(ix - el_sigma_1), hl	; int sigma_add_1 = fa2 * (1 - b);
+	ld	l, a
+	ld	h, a
 	mlt	hl
-	ld	(ix - el_b2),hl		; int b2 = b * b;
-	add	hl,hl
-	ld	(ix - el_sigma_diff1),hl	; Save b2 * 2 for later
-	add	hl,hl
-	ld	(ix - el_fb2),hl	; int fb2 = 4 * b2;
-	ld	c,a
-	ld	b,2
+	ld	(ix - el_b2), hl	; int b2 = b * b;
+	add	hl, hl
+	ld	(ix - el_sigma_diff1), hl	; Save b2 * 2 for later
+	add	hl, hl
+	ld	(ix - el_fb2), hl	; int fb2 = 4 * b2;
+	ld	c, a
+	ld	b, 2
 	mlt	bc
-	or	a,a
-	sbc	hl,hl
-	ld	(ix - el_x),hl		; int x = 0;
-	ld	(ix - el_comp_a),hl
+	or	a, a
+	sbc	hl, hl
+	ld	(ix - el_x), hl		; int x = 0;
+	ld	(ix - el_comp_a), hl
 	inc	hl
-	sbc	hl,bc
-	ld	de,(ix - el_a2)
+	sbc	hl, bc
+	ld	de, (ix - el_a2)
 	call	_MultiplyHLDE
-	ld	bc,(ix - el_b2)
-	add	hl,bc
-	add	hl,bc
-	ld	(ix - el_sigma),hl	; int sigma = 2 * b2 + a2 * (1 - 2 * b);
-	ld	e,(ix + 12)
-	ld	d,1
+	ld	bc, (ix - el_b2)
+	add	hl, bc
+	add	hl, bc
+	ld	(ix - el_sigma), hl	; int sigma = 2 * b2 + a2 * (1 - 2 * b);
+	ld	e, (ix + 12)
+	ld	d, 1
 	mlt	de
-	ld	(ix - el_temp1),de	; Save int a for later
-	or	a,a
-	sbc	hl,hl
+	ld	(ix - el_temp1), de	; Save int a for later
+	or	a, a
+	sbc	hl, hl
 	inc	hl
-	sbc	hl,de
-	ld	de,(ix - el_fb2)
+	sbc	hl, de
+	ld	de, (ix - el_fb2)
 	call	_MultiplyHLDE
-	ld	(ix - el_sigma_2),hl	; int sigma_add_2 = fb2 * (1 - a);
+	ld	(ix - el_sigma_2), hl	; int sigma_add_2 = fb2 * (1 - a);
 
-	ld	hl,(ix - el_a2)
-	ld	de,(ix - el_y)
+	ld	hl, (ix - el_a2)
+	ld	de, (ix - el_y)
 	call	_MultiplyHLDE
-	ld	(ix - el_comp_b),hl
+	ld	(ix - el_comp_b), hl
 
 	wait_quick
 
@@ -1467,132 +1469,132 @@ _Ellipse:
 _ellipse_loop_draw_1 := $-3
 
 ; Eventually change sigma and y
-	ld	hl,(ix - el_sigma)
-	add	hl,hl
-	jr	c,.loop1_jump		; if (sigma >= 0) {
+	ld	hl, (ix - el_sigma)
+	add	hl, hl
+	jr	c, .loop1_jump		; if (sigma >= 0) {
 
 	call	0
 _ellipse_loop_draw_2 := $-3
 
-	ld	hl,(ix - el_sigma)	; sigma += sigma_add_1;
-	ld	de,(ix - el_sigma_1)
-	add	hl,de
-	ld	(ix - el_sigma),hl
-	ld	hl,(ix - el_fa2)
-	add	hl,de
-	ld	(ix - el_sigma_1),hl	; sigma_add_1 += fa2;
+	ld	hl, (ix - el_sigma)	; sigma += sigma_add_1;
+	ld	de, (ix - el_sigma_1)
+	add	hl, de
+	ld	(ix - el_sigma), hl
+	ld	hl, (ix - el_fa2)
+	add	hl, de
+	ld	(ix - el_sigma_1), hl	; sigma_add_1 += fa2;
 	ld	hl, (ix - el_y)
 	dec	hl
-	ld	(ix - el_y),hl		; y--;
-	ld	hl,(ix - el_comp_b)
-	ld	de,(ix - el_a2)
-	or	a,a
-	sbc	hl,de
-	ld	(ix - el_comp_b),hl
+	ld	(ix - el_y), hl		; y--;
+	ld	hl, (ix - el_comp_b)
+	ld	de, (ix - el_a2)
+	or	a, a
+	sbc	hl, de
+	ld	(ix - el_comp_b), hl
 .loop1_jump:				; }
 ; Change sigma and increment x
-	ld	hl,(ix - el_sigma_diff1)
-	ld	de,(ix - el_fb2)
-	add	hl,de
-	ld	(ix - el_sigma_diff1),hl
-	ld	de,(ix - el_sigma)
-	add	hl,de
-	ld	(ix - el_sigma),hl	; sigma += b2 * (4 * x + 6);
-	ld	hl,(ix - el_x)
+	ld	hl, (ix - el_sigma_diff1)
+	ld	de, (ix - el_fb2)
+	add	hl, de
+	ld	(ix - el_sigma_diff1), hl
+	ld	de, (ix - el_sigma)
+	add	hl, de
+	ld	(ix - el_sigma), hl	; sigma += b2 * (4 * x + 6);
+	ld	hl, (ix - el_x)
 	inc	hl
-	ld	(ix - el_x),hl		; x++;
+	ld	(ix - el_x), hl		; x++;
 
 ; Update the comparison operands
-	ld	hl,(ix - el_comp_a)
-	ld	de,(ix - el_b2)
-	add	hl,de
-	ld	(ix - el_comp_a),hl
-	ld	de,(ix - el_comp_b)
+	ld	hl, (ix - el_comp_a)
+	ld	de, (ix - el_b2)
+	add	hl, de
+	ld	(ix - el_comp_a), hl
+	ld	de, (ix - el_comp_b)
 
 ; And compare
-	ld	bc,0x800000		; b2 * x <= a2 * y so hl <= de
-	add	hl,bc
-	ex	de,hl			; de <= hl
-	add	hl,bc
-	or	a,a
-	sbc	hl,de
-	jq	nc,.main_loop1
+	ld	bc, 0x800000		; b2 * x <= a2 * y so hl <= de
+	add	hl, bc
+	ex	de, hl			; de <= hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, de
+	jq	nc, .main_loop1
 
 ; Update few variables for the next loop
 	ld	hl, (ix - el_temp1)
-	ld	(ix - el_x),hl		; x = a
-	ld	e,l
-	or	a,a
-	sbc	hl,hl
-	ld	(ix - el_y),hl		; y = 0
-	ld	(ix - el_comp_a),hl
-	ld	d,2
+	ld	(ix - el_x), hl		; x = a
+	ld	e, l
+	or	a, a
+	sbc	hl, hl
+	ld	(ix - el_y), hl		; y = 0
+	ld	(ix - el_comp_a), hl
+	ld	d, 2
 	mlt	de
 	inc	hl
-	sbc	hl,de
-	ld	de,(ix - el_b2)
+	sbc	hl, de
+	ld	de, (ix - el_b2)
 	call	_MultiplyHLDE
-	ld	de,(ix - el_a2)
-	add	hl,de
-	add	hl,de
+	ld	de, (ix - el_a2)
+	add	hl, de
+	add	hl, de
 	ld	(ix - el_sigma), hl
 
-	ld	hl,(ix - el_b2)
-	ld	de,(ix - el_temp1)
+	ld	hl, (ix - el_b2)
+	ld	de, (ix - el_temp1)
 	call	_MultiplyHLDE
-	ld	(ix - el_comp_b),hl
+	ld	(ix - el_comp_b), hl
 
 .main_loop2:
 	call	0
 _ellipse_loop_draw_3 := $-3
 
 ; Eventually update sigma and x
-	ld	hl,(ix - el_sigma)
-	add	hl,hl
-	jr	c,.loop2_jump		; if (sigma >= 0) {
-	ld	hl,(ix - el_sigma)
-	ld	de,(ix - el_sigma_2)
-	add	hl,de
-	ld	(ix - el_sigma),hl	; sigma += sigma_add_2;
-	ld	hl,(ix - el_fb2)
-	add	hl,de
-	ld	(ix - el_sigma_2),hl	; sigma_add_2 += fb2;
+	ld	hl, (ix - el_sigma)
+	add	hl, hl
+	jr	c, .loop2_jump		; if (sigma >= 0) {
+	ld	hl, (ix - el_sigma)
+	ld	de, (ix - el_sigma_2)
+	add	hl, de
+	ld	(ix - el_sigma), hl	; sigma += sigma_add_2;
+	ld	hl, (ix - el_fb2)
+	add	hl, de
+	ld	(ix - el_sigma_2), hl	; sigma_add_2 += fb2;
 	ld	hl, (ix - el_x)
 	dec	hl
-	ld	(ix - el_x),hl		; x--;
-	ld	hl,(ix - el_comp_b)
-	ld	de,(ix - el_b2)
-	or	a,a
-	sbc	hl,de
-	ld	(ix - el_comp_b),hl
+	ld	(ix - el_x), hl		; x--;
+	ld	hl, (ix - el_comp_b)
+	ld	de, (ix - el_b2)
+	or	a, a
+	sbc	hl, de
+	ld	(ix - el_comp_b), hl
 .loop2_jump:
 ; Change sigma and increment y
-	ld	hl,(ix - el_sigma_diff2)
-	ld	de,(ix - el_fa2)
-	add	hl,de
-	ld	(ix - el_sigma_diff2),hl
-	ld	de,(ix - el_sigma)
-	add	hl,de
-	ld	(ix - el_sigma),hl	; sigma += a2 * (4 * y + 6);
-	ld	hl,(ix - el_y)
+	ld	hl, (ix - el_sigma_diff2)
+	ld	de, (ix - el_fa2)
+	add	hl, de
+	ld	(ix - el_sigma_diff2), hl
+	ld	de, (ix - el_sigma)
+	add	hl, de
+	ld	(ix - el_sigma), hl	; sigma += a2 * (4 * y + 6);
+	ld	hl, (ix - el_y)
 	inc	hl
-	ld	(ix - el_y),hl		; y++;
-	ld	hl,(ix - el_comp_a)
-	ld	de,(ix - el_a2)
-	add	hl,de
-	ld	(ix - el_comp_a),hl
+	ld	(ix - el_y), hl		; y++;
+	ld	hl, (ix - el_comp_a)
+	ld	de, (ix - el_a2)
+	add	hl, de
+	ld	(ix - el_comp_a), hl
 
 ; Compare the boolean operators
-	ld	de,(ix - el_comp_b)
-	ld	bc,0x800000
-	add	hl,bc
-	ex	de,hl
-	add	hl,bc
-	or	a,a
-	sbc	hl,de
-	jq	nc,.main_loop2
+	ld	de, (ix - el_comp_b)
+	ld	bc, 0x800000
+	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, de
+	jq	nc, .main_loop2
 
-	ld	sp,ix
+	ld	sp, ix
 	pop	ix
 _ellipse_ret:
 _ellipse_smc_base := $
@@ -1602,76 +1604,76 @@ _ellipse_smc_base_m128 := _ellipse_smc_base - 128
 _ellipse_draw_pixels:
 ; bc = x coordinate
 ; e = y coordinate
-	ld	hl,(ix + 9)
-	ld	de,(ix - el_y)
-	add	hl,de
-	ex	de,hl
+	ld	hl, (ix + 9)
+	ld	de, (ix - el_y)
+	add	hl, de
+	ex	de, hl
 	push	de
-	ld	hl,(ix + 6)
-	ld	bc,(ix - el_x)
-	add	hl,bc
+	ld	hl, (ix + 6)
+	ld	bc, (ix - el_x)
+	add	hl, bc
 	push	hl
 	pop	bc
 	call	_SetPixel_NoWait	; xc + x, yc + y
 _ellipse_pixel_routine_1 := $-3
 	pop	de
-	ld	hl,(ix + 6)
-	ld	bc,(ix - el_x)
-	or	a,a
-	sbc	hl,bc
+	ld	hl, (ix + 6)
+	ld	bc, (ix - el_x)
+	or	a, a
+	sbc	hl, bc
 	push	hl
 	pop	bc
 	push	bc
 	call	_SetPixel_NoWait	; xc - x, yc + y
 _ellipse_pixel_routine_2 := $-3
 	pop	bc
-	ld	hl,(ix + 9)
-	ld	de,(ix - el_y)
-	or	a,a
-	sbc	hl,de
-	ex	de,hl
+	ld	hl, (ix + 9)
+	ld	de, (ix - el_y)
+	or	a, a
+	sbc	hl, de
+	ex	de, hl
 	push	de
 	call	_SetPixel_NoWait	; xc - x, yc - y
 _ellipse_pixel_routine_3 := $-3
 	pop	de
-	ld	hl,(ix + 6)
-	ld	bc,(ix - el_x)
-	add	hl,bc
+	ld	hl, (ix + 6)
+	ld	bc, (ix - el_x)
+	add	hl, bc
 	push	hl
 	pop	bc
 	jp	_SetPixel_NoWait	; xc + x, yc - y
 _ellipse_pixel_routine_4 := $-3
 
 _ellipse_draw_line:
-	ld	hl,(ix - el_x)
-	add	hl,hl
+	ld	hl, (ix - el_x)
+	add	hl, hl
 	push	hl
-	ld	hl,(ix + 9)
-	ld	de,(ix - el_y)
-	or	a,a
-	sbc	hl,de
+	ld	hl, (ix + 9)
+	ld	de, (ix - el_y)
+	or	a, a
+	sbc	hl, de
 	push	hl
-	ld	hl,(ix + 6)
-	ld	de,(ix - el_x)
-	or	a,a
-	sbc	hl,de
+	ld	hl, (ix + 6)
+	ld	de, (ix - el_x)
+	or	a, a
+	sbc	hl, de
 	push	hl
 	call	0
 _ellipse_line_routine_1 := $-3
 	pop	hl
 	pop	hl
 	pop	hl
-	ld	hl,(ix - el_x)
-	add	hl,hl
+	ld	hl, (ix - el_x)
+	add	hl, hl
 	push	hl
-	ld	hl,(ix + 9)
-	ld	de,(ix - el_y)
-	add	hl,de
+	ld	hl, (ix + 9)
+	ld	de, (ix - el_y)
+	add	hl, de
 	push	hl
-	ld	hl,(ix + 6)
-	ld	de,(ix - el_x)
-	or	a,a
-	sbc	hl,de
+	ld	hl, (ix + 6)
+	ld	de, (ix - el_x)
+	or	a, a
+	sbc	hl, de
 	push	hl
 	call	0
 _ellipse_line_routine_2 := $-3
@@ -1786,7 +1788,7 @@ _Circle:
 .exit:
 	ld	sp,iy
 	ret
-gfy_Circle: ; COPIED_FROM_GRAPHX
+gfy_Circle: ; COPIED_FROM_NIGHTLY_GRAPHX
 ; Draws a clipped circle outline
 ; Arguments:
 ;  arg0 : X coordinate
@@ -2211,67 +2213,67 @@ gfy_Line: ; COPIED_FROM_GRAPHX
 ;  arg0: y1
 ; Returns:
 ;  true if drawn, false if offscreen
-	ld	iy,0
-	add	iy,sp
+	ld	iy, 0
+	add	iy, sp
 	push	hl			; temp storage
-	ld	hl,(iy+3)		; x0
-	ld	de,(iy+6)		; y0
+	ld	hl, (iy + 3)		; x0
+	ld	de, (iy + 6)		; y0
 	call	_ComputeOutcode
-	ld	(iy-1),a
-	ld	hl,(iy+9)		; x1
-	ld	de,(iy+12)		; y1
+	ld	(iy - 1), a
+	ld	hl, (iy + 9)		; x1
+	ld	de, (iy + 12)		; y1
 	call	_ComputeOutcode
-	ld	(iy-2),a
+	ld	(iy - 2), a
 CohenSutherlandLoop:
-	ld	a,(iy-2)		; a = outcode1
+	ld	a, (iy - 2)		; a = outcode1
 .skip_ld_A:
-	ld	b,(iy-1)		; b = outcode0
-	tst	a,b
-	jr	nz,TrivialReject	; if(outcode0|outcode1)
-	or	a,a
-	jr	nz,GetOutOutcode
-	or	a,b
-	jr	z,TrivialAccept
+	ld	b, (iy - 1)		; b = outcode0
+	tst	a, b
+	jr	nz, TrivialReject	; if (outcode0|outcode1)
+	or	a, a
+	jr	nz, GetOutOutcode
+	or	a, b
+	jr	z, TrivialAccept
 GetOutOutcode:				; select correct outcode
 	push	af			; a = outoutcode
 	rra
-	jr	nc,.notop		; if (outcodeOut & TOP)
-	ld	hl,ti.lcdHeight-1
+	jr	nc, .notop		; if (outcodeOut & TOP)
+	ld	hl, ti.lcdHeight-1
 smcWord _YMaxMinus1
 	jr	ComputeNewX
 .notop:
 	rra
-	jr	nc,NotBottom		; if (outcodeOut & BOTTOM)
-	ld	hl,0
+	jr	nc, NotBottom		; if (outcodeOut & BOTTOM)
+	ld	hl, 0
 smcWord _YMin
 ComputeNewX:
 	push	hl
-	ld	bc,(iy+6)
-	or	a,a
-	sbc	hl,bc			; ymax_YMin - y0
-	ex	de,hl
-	ld	hl,(iy+9)
-	ld	bc,(iy+3)
-	or	a,a
-	sbc	hl,bc			; x0 - x1
+	ld	bc, (iy + 6)
+	or	a, a
+	sbc	hl, bc			; ymax_YMin - y0
+	ex	de, hl
+	ld	hl, (iy + 9)
+	ld	bc, (iy + 3)
+	or	a, a
+	sbc	hl, bc			; x0 - x1
 	call	_MultiplyHLDE
-	ex	de,hl			; (x0 - x1)*(ymax_YMin - y0)
-	ld	hl,(iy+12)
-	ld	bc,(iy+6)
-	or	a,a
-	sbc	hl,bc			; y1 - y0
+	ex	de, hl			; (x0 - x1)*(ymax_YMin - y0)
+	ld	hl, (iy + 12)
+	ld	bc, (iy + 6)
+	or	a, a
+	sbc	hl, bc			; y1 - y0
 	push	hl
 	pop	bc
-	ex	de,hl
+	ex	de, hl
 	call	_DivideHLBC		; ((x0 - x1)*(ymax_YMin - y0))/(y1 - y0)
-	ld	bc,(iy+3)
-	add	hl,bc			; (x) hl = x0 + ((x0 - x1)*(ymax_YMin - y0))/(y1 - y0)
+	ld	bc, (iy + 3)
+	add	hl, bc			; (x) hl = x0 + ((x0 - x1)*(ymax_YMin - y0))/(y1 - y0)
 	pop	de			; (y) de = ymax_YMin
 	jr	FinishComputations
 NotBottom:
 	rra
-	jr	nc,NotRight		; if (outcodeOut & RIGHT)
-	ld	hl,ti.lcdWidth-1
+	jr	nc, NotRight		; if (outcodeOut & RIGHT)
+	ld	hl, ti.lcdWidth-1
 smcWord _XMaxMinus1
 	jr	ComputeNewY
 
@@ -2285,47 +2287,47 @@ TrivialAccept:
 
 NotRight:
 	rra
-	jr	nc,FinishComputations	; if (outcodeOut & LEFT)
-	ld	hl,0
+	jr	nc, FinishComputations	; if (outcodeOut & LEFT)
+	ld	hl, 0
 smcWord _XMin
 ComputeNewY:
 	push	hl
-	ld	bc,(iy+3)
-	or	a,a
-	sbc	hl,bc			; xmax_XMin - x0
-	ex	de,hl
-	ld	hl,(iy+12)
-	ld	bc,(iy+6)
-	or	a,a
-	sbc	hl,bc			; x1 - x0
+	ld	bc, (iy + 3)
+	or	a, a
+	sbc	hl, bc			; xmax_XMin - x0
+	ex	de, hl
+	ld	hl, (iy + 12)
+	ld	bc, (iy + 6)
+	or	a, a
+	sbc	hl, bc			; x1 - x0
 	call	_MultiplyHLDE
-	ex	de,hl			; (x1 - x0)*(xmax_XMin - x0)
-	ld	hl,(iy+9)
-	ld	bc,(iy+3)
-	or	a,a
-	sbc	hl,bc			; y1 - y0
+	ex	de, hl			; (x1 - x0)*(xmax_XMin - x0)
+	ld	hl, (iy + 9)
+	ld	bc, (iy + 3)
+	or	a, a
+	sbc	hl, bc			; y1 - y0
 	push	hl
 	pop	bc
-	ex	de,hl
+	ex	de, hl
 	call	_DivideHLBC		; ((x1 - x0)*(xmax_XMin - x0))/(y1 - y0)
-	ld	bc,(iy+6)
-	add	hl,bc
-	ex	de,hl			; (y) de = y0 + ((x1 - x0)*(xmax_XMin - x0))/(y1 - y0)
+	ld	bc, (iy + 6)
+	add	hl, bc
+	ex	de, hl			; (y) de = y0 + ((x1 - x0)*(xmax_XMin - x0))/(y1 - y0)
 	pop	hl			; (x) hl = ymax_YMin
 FinishComputations:
 	pop	af
-	cp	a,(iy-1)
-	jr	nz,OutcodeOutOutcode1
-	ld	(iy+3),hl
-	ld	(iy+6),de
+	cp	a, (iy - 1)
+	jr	nz, OutcodeOutOutcode1
+	ld	(iy + 3), hl
+	ld	(iy + 6), de
 	call	_ComputeOutcode
-	ld	(iy-1),a		; b = outcode0
+	ld	(iy - 1), a		; b = outcode0
 	jp	CohenSutherlandLoop
 OutcodeOutOutcode1:
-	ld	(iy+9),hl
-	ld	(iy+12),de
+	ld	(iy + 9), hl
+	ld	(iy + 12), de
 	call	_ComputeOutcode
-	ld	(iy-2),a		; c = outcode1
+	ld	(iy - 2), a		; c = outcode1
 	jp	CohenSutherlandLoop.skip_ld_A
 
 ;-------------------------------------------------------------------------------
@@ -2339,10 +2341,10 @@ gfy_Blit: ; COPIED_FROM_GRAPHX
 ; Returns:
 ;  None
 	pop	iy			; iy = return vector
-	ex	(sp),hl
-	ld	a,l			; a = buffer to blit from
+	ex	(sp), hl
+	ld	a, l			; a = buffer to blit from
 	call	util.getbuffer		; determine blit buffers
-	ld	bc,LcdSize
+	ld	bc, LcdSize
 util.blit:
 	call	gfy_Wait
 	ldir				; just do it
@@ -2530,7 +2532,7 @@ gfy_BlitRectangle:
 ; gfy_ShiftDown:
 
 ;-------------------------------------------------------------------------------
-gfy_GetClipRegion: ; COPIED_FROM_GRAPHX
+gfy_GetClipRegion: ; COPIED_FROM_NIGHTLY_GRAPHX
 ; Arguments:
 ;  Pointer to struct
 ; Returns:
@@ -2921,25 +2923,25 @@ smcByte _TransparentColor
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_Tilemap_NoClip: ; COPIED_FROM_GRAPHX
+gfy_Tilemap_NoClip: ; COPIED_FROM_NIGHTLY_GRAPHX
 ; Tilemapping subsection
 	ld	hl,gfy_Sprite_NoClip
 ;	jr	_Tilemap		; emulated by dummifying next instruction:
 	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-gfy_TransparentTilemap_NoClip: ; COPIED_FROM_GRAPHX
+gfy_TransparentTilemap_NoClip: ; COPIED_FROM_NIGHTLY_GRAPHX
 ; Tilemapping subsection
 	ld	hl,gfy_TransparentSprite_NoClip
 ;	jr	_Tilemap		; emulated by dummifying next instruction:
 	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-gfy_Tilemap: ; COPIED_FROM_GRAPHX
+gfy_Tilemap: ; COPIED_FROM_NIGHTLY_GRAPHX
 ; Tilemapping subsection
 	ld	hl,gfy_Sprite
 ;	jr	_Tilemap		; emulated by dummifying next instruction:
 	db	$FD			; ld hl,* -> ld iy,*
 ;-------------------------------------------------------------------------------
-gfy_TransparentTilemap: ; COPIED_FROM_GRAPHX
+gfy_TransparentTilemap: ; COPIED_FROM_NIGHTLY_GRAPHX
 	ld	hl,gfy_TransparentSprite
 ; Draws a tilemap given a tile map structure and some offsets
 ; Arguments:
@@ -3159,48 +3161,48 @@ gfy_TilePtr: ; COPIED_FROM_GRAPHX
 ;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
 	push	ix
-	ld	ix,0
-	add	ix,sp
-	ld	iy,(ix+6)
-	ld	hl,(ix+9)
-	ld	a,(iy+t_type_width)
-	or	a,a
-	jr	nz,.fastdiv0
-	ld	bc,0
-	ld	c,(iy+t_tile_width)
+	ld	ix, 0
+	add	ix, sp
+	ld	iy, (ix + 6)
+	ld	hl, (ix + 9)
+	ld	a, (iy + t_type_width)
+	or	a, a
+	jr	nz, .fastdiv0
+	ld	bc, 0
+	ld	c, (iy + t_tile_width)
 	call	ti._idvrmu
-	ex	de,hl
+	ex	de, hl
 	jr	.widthnotpow2
 .fastdiv0:
-	ld	b,a
+	ld	b, a
 .div0:
 	srl	h
 	rr	l
 	djnz	.div0
 .widthnotpow2:
-	ex	de,hl
-	ld	hl,(ix+12)
-	ld	a,(iy+t_type_height)
-	or	a,a
-	jr	nz,.fastdiv1
-	ld	bc,0
-	ld	c,(iy+t_tile_height)
+	ex	de, hl
+	ld	hl, (ix + 12)
+	ld	a, (iy + t_type_height)
+	or	a, a
+	jr	nz, .fastdiv1
+	ld	bc, 0
+	ld	c, (iy + t_tile_height)
 	push	de
 	call	ti._idvrmu
-	ex	de,hl
+	ex	de, hl
 	pop	de
 	jr	.heightnotpow2
 .fastdiv1:
-	ld	b,a
+	ld	b, a
 .div1:	srl	h
 	rr	l
 	djnz	.div1
 .heightnotpow2:
-	ld	h,(iy+t_width)
+	ld	h, (iy + t_width)
 	mlt	hl
-	add	hl,de
-	ld	de,(iy+t_data)
-	add	hl,de
+	add	hl, de
+	ld	de, (iy + t_data)
+	add	hl, de
 	pop	ix
 	ret
 
@@ -3216,16 +3218,16 @@ gfy_TilePtrMapped: ; COPIED_FROM_GRAPHX
 	pop	de			; return vector
 	pop	iy			; tilemap struct
 	pop	bc			; x offset
-	ex	(sp),hl			; y offset
+	ex	(sp), hl		; y offset
 	push	de
 	push	de
 	push	de
-	ld	h,(iy+13)		; tilemap width
+	ld	h, (iy + 13)		; tilemap width
 	mlt	hl
-	ld	b,0
-	add.s	hl,bc
-	ld	bc,(iy+0)		; tilemap data
-	add	hl,bc
+	ld	b, 0
+	add.s	hl, bc
+	ld	bc, (iy + 0)		; tilemap data
+	add	hl, bc
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3235,7 +3237,7 @@ gfy_GetTextX: ; COPIED_FROM_GRAPHX
 ;  None
 ; Returns:
 ;  X Text cursor posistion
-	ld	hl,(_TextXPos)		; return x pos
+	ld	hl, (_TextXPos)		; return x pos
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3245,7 +3247,7 @@ gfy_GetTextY: ; COPIED_FROM_GRAPHX
 ;  None
 ; Returns:
 ;  Y Text cursor posistion
-	ld	hl,(_TextYPos)		; return y pos
+	ld	hl, (_TextYPos)		; return y pos
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3258,11 +3260,11 @@ gfy_SetTextXY: ; COPIED_FROM_GRAPHX
 ;  None
 	pop	de			; de=return address, sp=&xpos
 	pop	hl			; hl=xpos, sp=&ypos
-	ld	(_TextXPos),hl
-	ex	(sp),hl			; hl=ypos, ypos=don't care
-	ld	(_TextYPos),hl
+	ld	(_TextXPos), hl
+	ex	(sp), hl		; hl=ypos, ypos=don't care
+	ld	(_TextYPos), hl
 	push	hl			; xpos=don't care, sp=&xpos
-	ex	de,hl			; hl=return address
+	ex	de, hl			; hl=return address
 ;-------------------------------------------------------------------------------
 _indcallHL: ; COPIED_FROM_GRAPHX
 ; Calls HL
@@ -3319,10 +3321,10 @@ gfy_PrintStringXY: ; COPIED_FROM_GRAPHX
 	pop	bc			; bc = str
 	call	gfy_SetTextXY
 	push	bc
-	ex	(sp),hl			; hl = str
+	ex	(sp), hl		; hl = str
 	push	iy
 ;	jr	_DrawCharacters		; emulated by dummifying next instructions:
-	db	$01			; pop de \ ex (sp),hl \ push de -> ld bc,*
+	db	$01			; pop de \ ex (sp), hl \ push de -> ld bc, *
 
 ;-------------------------------------------------------------------------------
 gfy_PrintString: ; COPIED_FROM_GRAPHX
@@ -3332,11 +3334,11 @@ gfy_PrintString: ; COPIED_FROM_GRAPHX
 ; Returns:
 ;  None
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
 _DrawCharacters:
-	ld	a,(hl)			; get the current character
-	or	a,a
+	ld	a, (hl)			; get the current character
+	or	a, a
 	ret	z
 	call	_PrintChar
 PrintChar_2 = $-3
@@ -3391,17 +3393,17 @@ gfy_SetTextConfig: ; COPIED_FROM_GRAPHX
 ; Returns:
 ;  None
 	pop	de
-	ex	(sp),hl			; hl = config
+	ex	(sp), hl		; hl = config
 	push	de
 	dec	l			; l = config - 1
-	ld	hl,_PrintChar_Clip
-	jr	z,.writesmc		; z ==> config == gfy_text_clip
+	ld	hl, _PrintChar_Clip
+	jr	z, .writesmc		; z ==> config == gfy_text_clip
 ; config == gfy_text_noclip
-	ld	hl,_PrintChar
+	ld	hl, _PrintChar
 .writesmc:				; hl = PrintChar routine
-	ld	(PrintChar_0),hl
-	ld	(PrintChar_1),hl
-	ld	(PrintChar_2),hl
+	ld	(PrintChar_0), hl
+	ld	(PrintChar_1), hl
+	ld	(PrintChar_2), hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3639,7 +3641,7 @@ smcByte _TextHeight
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_PrintInt: ; COPIED FROM GRAPHX
+gfy_PrintInt: ; COPIED_FROM_GRAPHX
 ; Places an int at the current cursor position
 ; Arguments:
 ;  arg0 : Number to print
@@ -3650,69 +3652,69 @@ gfy_PrintInt: ; COPIED FROM GRAPHX
 	pop	hl
 	push	hl
 	push	de
-	add	hl,hl
-	db	$3E			; xor a,a -> ld a, $AF
+	add	hl, hl
+	db	$3E			; xor a, a -> ld a, $AF
 
 ;-------------------------------------------------------------------------------
-gfy_PrintUInt: ; COPIED FROM GRAPHX
+gfy_PrintUInt: ; COPIED_FROM_GRAPHX
 ; Places an unsigned int at the current cursor position
 ; Arguments:
 ;  arg0 : Number to print
 ;  arg1 : Minimum number of characters to print
 ; Returns:
 ;  None
-	xor	a,a
+	xor	a, a
 	pop	de
 	pop	hl			; hl = uint
 	pop	bc			; c = min num chars
 	push	bc
 	push	hl
 	push	de
-	jr	nc,.begin		; c ==> actually a negative int
-	ex	de,hl
-	or	a,a
-	sbc	hl,hl
-	sbc	hl,de			; hl = -int
-	ld	a,'-'
+	jr	nc, .begin		; c ==> actually a negative int
+	ex	de, hl
+	or	a, a
+	sbc	hl, hl
+	sbc	hl, de			; hl = -int
+	ld	a, '-'
 	call	.printchar
 	dec	c
-	jr	nz,.begin
+	jr	nz, .begin
 	inc	c
 .begin:
-	ld	de,-10000000
+	ld	de, -10000000
 	call	.num1
-	ld	de,-1000000
+	ld	de, -1000000
 	call	.num1
-	ld	de,-100000
+	ld	de, -100000
 	call	.num1
-	ld	de,-10000
+	ld	de, -10000
 	call	.num1
-	ld	de,-1000
+	ld	de, -1000
 	call	.num1
-	ld	de,-100
+	ld	de, -100
 	call	.num1
-	ld	de,-10
+	ld	de, -10
 	call	.num1
-	ld	de,-1
+	ld	de, -1
 .num1:
-	xor	a,a
+	xor	a, a
 .num2:
 	inc	a
-	add	hl,de
-	jr	c,.num2
-	sbc	hl,de
+	add	hl, de
+	jr	c, .num2
+	sbc	hl, de
 	dec	a			; a = next digit
-	jr	nz,.printdigit		; z ==> digit is zero, maybe don't print
-	ld	a,c
+	jr	nz, .printdigit		; z ==> digit is zero, maybe don't print
+	ld	a, c
 	inc	c
-	cp	a,8
+	cp	a, 8
 	ret	c			; nc ==> a digit has already been
 					;        printed, or must start printing
 					;        to satisfy min num chars
-	xor	a,a
+	xor	a, a
 .printdigit:
-	add	a,'0'
-	ld	c,a			; mark that a digit has been printed
+	add	a, '0'
+	ld	c, a			; mark that a digit has been printed
 .printchar:
 	push	bc
 	call	_PrintChar
@@ -3730,19 +3732,19 @@ gfy_GetStringWidth: ; COPIED_FROM_GRAPHX
 	pop	de
 	ex	(sp), hl		; hl -> string
 	push	de
-	ld	de,0
+	ld	de, 0
 .loop:
-	ld	a,(hl)
-	or	a,a
-	jr	z,.done			; loop until null byte
+	ld	a, (hl)
+	or	a, a
+	jr	z, .done		; loop until null byte
 	push	hl
 	call	_GetCharWidth
-	ex	de,hl
+	ex	de, hl
 	pop	hl
 	inc	hl
 	jr	.loop
 .done:
-	ex	de,hl			; return width of string
+	ex	de, hl			; return width of string
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3758,24 +3760,24 @@ gfy_GetCharWidth: ; COPIED_FROM_GRAPHX
 	sbc	hl, hl
 	ex	de, hl
 _GetCharWidth:
-	sbc	hl,hl
-	ld	l,a
-	ld	a,(_TextFixedWidth)	; is fixed width
-	or	a,a
-	jr	nz,.fixed
-	ld	bc,(_CharSpacing)	; lookup spacing
-	add	hl,bc
-	ld	a,(hl)
+	sbc	hl, hl
+	ld	l, a
+	ld	a, (_TextFixedWidth)	; is fixed width
+	or	a, a
+	jr	nz, .fixed
+	ld	bc, (_CharSpacing)	; lookup spacing
+	add	hl, bc
+	ld	a, (hl)
 .fixed:
-	ld	l,a
-	ld	a,(_TextWidthScale)	; add scaling factor
-	ld	h,a
+	ld	l, a
+	ld	a, (_TextWidthScale)	; add scaling factor
+	ld	h, a
 	mlt	hl
-	add	hl,de
+	add	hl, de
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_GetSpriteChar: ; COPIED_FROM_GRAPHX
+gfy_GetSpriteChar: ; MODIFIED_FROM_GRAPHX
 ; Sets the data in char_sprite (must have previously allocated an 8x8 width sprite)
 ; the pixel map of the character c
 ; Arguments:
@@ -3875,15 +3877,15 @@ gfy_SetFontData: ; COPIED_FROM_GRAPHX
 	pop	de
 	ex	(sp), hl		; hl -> custom font data
 	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	ld	de,(_TextData)
-	jr	nz,.nonnull		; if null make default font
-	ld	hl,_DefaultTextData
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	ld	de, (_TextData)
+	jr	nz, .nonnull		; if null make default font
+	ld	hl, _DefaultTextData
 .nonnull:
-	ld	(_TextData),hl		; save pointer to custom font
-	ex	de,hl
+	ld	(_TextData), hl		; save pointer to custom font
+	ex	de, hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3925,13 +3927,13 @@ gfy_SetFontSpacing: ; COPIED_FROM_GRAPHX
 	pop	de
 	ex	(sp), hl		; hl -> custom font width
 	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	jr	nz,.notnull		; if null make default font width
-	ld	hl,_DefaultCharSpacing
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	nz, .notnull		; if null make default font width
+	ld	hl, _DefaultCharSpacing
 .notnull:
-	ld	(_CharSpacing),hl	; save pointer to custom widths
+	ld	(_CharSpacing), hl	; save pointer to custom widths
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3944,8 +3946,8 @@ gfy_SetMonospaceFont: ; COPIED_FROM_GRAPHX
 	pop	hl
 	pop	de
 	push	de
-	ld	a,e			; a = width
-	ld	(_TextFixedWidth),a	; store the value of the monospace width
+	ld	a, e			; a = width
+	ld	(_TextFixedWidth), a	; store the value of the monospace width
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -4255,63 +4257,63 @@ tri_dy12      := tri_frame_offset - 30
 	ret
 
 ;-------------------------------------------------------------------------------
-gfy_Polygon_NoClip: ; COPIED FROM GRAPHX
+gfy_Polygon_NoClip: ; COPIED_FROM_GRAPHX
 ; Draws a clipped polygon outline
 ; Arguments:
 ;  arg0 : Pointer to polygon points
 ;  arg1 : length of polygon point array
 ; Returns:
 ;  None
-	ld	hl,gfy_Line_NoClip
+	ld	hl, gfy_Line_NoClip
 ;	jr	_Polygon		; emulated by dummifying next instruction:
-	db	$FD			; ld hl,* -> ld iy,*
+	db	$FD			; ld hl, * -> ld iy, *
 ;-------------------------------------------------------------------------------
-gfy_Polygon: ; COPIED FROM GRAPHX
+gfy_Polygon: ; COPIED_FROM_GRAPHX
 ; Draws a clipped polygon outline
 ; Arguments:
 ;  arg0 : Pointer to polygon points
 ;  arg1 : length of polygon point array
 ; Returns:
 ;  None
-	ld	hl,gfy_Line
+	ld	hl, gfy_Line
 _Polygon:
-	ld	(.line0),hl
-	ld	(.line1),hl
+	ld	(.line0), hl
+	ld	(.line1), hl
 	push	ix
-	ld	ix,-3
-	add	ix,sp
-	ld	iy,(ix+9)
+	ld	ix, -3
+	add	ix, sp
+	ld	iy, (ix + 9)
 	jr	.startloop
 .loop:
 	pea	iy + 6
-	ld	bc,(iy+9)
+	ld	bc, (iy + 9)
 	push	bc
-	ld	bc,(iy+6)
+	ld	bc, (iy + 6)
 	push	bc
-	ld	bc,(iy+3)
+	ld	bc, (iy + 3)
 	push	bc
-	ld	bc,(iy+0)
+	ld	bc, (iy + 0)
 	push	bc
 	call	0
 .line0 := $-3
 	ld	sp, ix
 	pop	iy	; iy += 6
 .startloop:
-	ld	hl,(ix+12)
+	ld	hl, (ix + 12)
 	dec	hl
-	ld	(ix+12),hl
-	add	hl,bc
-	or	a,a
-	sbc	hl,bc
-	jr	nz,.loop
-	ld	bc,(iy+3)
+	ld	(ix + 12), hl
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, .loop
+	ld	bc, (iy + 3)
 	push	bc
-	ld	bc,(iy+0)
+	ld	bc, (iy + 0)
 	push	bc
-	ld	iy,(ix+9)
-	ld	bc,(iy+3)
+	ld	iy, (ix + 9)
+	ld	bc, (iy + 3)
 	push	bc
-	ld	bc,(iy+0)
+	ld	bc, (iy + 0)
 	push	bc
 	call	0
 .line1 := $-3
@@ -5916,43 +5918,43 @@ _ConvertToRLETSprite_RowEnd:
 _Maximum: ; COPIED_FROM_GRAPHX
 ; Calculate the resut of a signed comparison
 ; Inputs:
-;  DE,HL=numbers
+;  DE, HL=numbers
 ; Oututs:
 ;  HL=max number
-	or	a,a
+	or	a, a
 .no_carry:
-	sbc	hl,de
-	add	hl,de
-	jp	p,.skip
+	sbc	hl, de
+	add	hl, de
+	jp	p, .skip
 	ret	pe
-	ex	de,hl
+	ex	de, hl
 .skip:
 	ret	po
-	ex	de,hl
+	ex	de, hl
 	ret
 
 ;-------------------------------------------------------------------------------
 _Minimum: ; COPIED_FROM_GRAPHX
 ; Calculate the resut of a signed comparison
 ; Inputs:
-;  DE,HL=numbers
+;  DE, HL=numbers
 ; Oututs:
 ;  HL=min number
-	or	a,a
+	or	a, a
 .no_carry:
-	sbc	hl,de
-	ex	de,hl
-	jp	p,.skip
+	sbc	hl, de
+	ex	de, hl
+	jp	p, .skip
 	ret	pe
-	add	hl,de
+	add	hl, de
 .skip:
 	ret	po
-	add	hl,de
+	add	hl, de
 	ret
 
 ;-------------------------------------------------------------------------------
-_ClipRegion: ; COPIED_FROM_GRAPHX
-; Calculates the new coordinates given the clip and inputs
+_ClipRegion: ; COPIED_FROM_NIGHTLY_GRAPHX
+; Calculates the new coordinates given the clip  and inputs
 ; Inputs:
 ;  None
 ; Outputs:
@@ -5998,21 +6000,21 @@ _SignedCompare:
 
 ;-------------------------------------------------------------------------------
 _UCDivA: ; COPIED_FROM_GRAPHX
-	sbc	hl,hl
-	ld	h,a
-	xor	a,a
-	ld	l,a
-	ex	de,hl
-	sbc	hl,hl
-	ld	l,c
+	sbc	hl, hl
+	ld	h, a
+	xor	a, a
+	ld	l, a
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, c
 	call	.load
-	ld	c,a
+	ld	c, a
 .load:
-	ld	b,8
-.loop:	add	hl,hl
-	add	hl,de
-	jr	c,.skip
-	sbc	hl,de
+	ld	b, 8
+.loop:	add	hl, hl
+	add	hl, de
+	jr	c, .skip
+	sbc	hl, de
 .skip:	rla
 	djnz	.loop
 	ret				; ca = c*256/a, h = c*256%a
@@ -6025,44 +6027,44 @@ _DivideHLBC: ; COPIED_FROM_GRAPHX
 ;  BC : Operand 2
 ; Outputs:
 ;  HL = floor(HL/BC)
-	ld	a,23
-	ex	de,hl
-	sbc	hl,hl
+	ld	a, 23
+	ex	de, hl
+	sbc	hl, hl
 	ccf
-	sbc	hl,bc
-	jp	m,.positive
-	add	hl,bc
+	sbc	hl, bc
+	jp	m, .positive
+	add	hl, bc
 	inc	hl
-	sbc	hl,de
-	jp	po,.signcheck
+	sbc	hl, de
+	jp	po, .signcheck
 	inc	a
 	jr	.overflowed
 .positive:
 	inc	hl
 	push	hl
 	pop	bc
-	ex	de,hl
+	ex	de, hl
 .signcheck:
-	add	hl,hl
-	ex	de,hl
-	sbc	hl,hl
-	jr	nc,.loop
+	add	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	jr	nc, .loop
 	inc	hl
-	sbc	hl,bc
+	sbc	hl, bc
 .loop:
-	ex	de,hl
+	ex	de, hl
 .overflowed:
-	adc	hl,hl
-	ex	de,hl
-	adc	hl,hl
-	add	hl,bc
-	jr	c,.spill
-	sbc	hl,bc
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	add	hl, bc
+	jr	c, .spill
+	sbc	hl, bc
 .spill:
 	dec	a
-	jr	nz,.loop
-	ex	de,hl
-	adc	hl,hl
+	jr	nz, .loop
+	ex	de, hl
+	adc	hl, hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -6197,56 +6199,56 @@ _ComputeOutcode:
 ;  DE : Y Argument
 ; Outputs:
 ;   A : Bitcode
-	ld	bc,0
+	ld	bc, 0
 smcWord _XMin
 	push	hl
-	xor	a,a
-	sbc	hl,bc
+	xor	a, a
+	sbc	hl, bc
 	pop	bc
-	add	hl,hl
-	jp	po,.skip1
+	add	hl, hl
+	jp	po, .skip1
 	ccf
 .skip1:
 	rla
-	ld	hl,ti.lcdWidth-1
+	ld	hl, ti.lcdWidth-1
 smcWord _XMaxMinus1
-	sbc	hl,bc
-	add	hl,hl
-	jp	po,.skip2
+	sbc	hl, bc
+	add	hl, hl
+	jp	po, .skip2
 	ccf
 .skip2:
 	rla
-	ld	hl,0
+	ld	hl, 0
 smcWord _YMin
 	scf
-	sbc	hl,de
-	add	hl,hl
-	jp	pe,.skip3
+	sbc	hl, de
+	add	hl, hl
+	jp	pe, .skip3
 	ccf
 .skip3:
 	rla
-	ld	hl,ti.lcdHeight-1
+	ld	hl, ti.lcdHeight-1
 smcWord _YMaxMinus1
-	sbc	hl,de
-	add	hl,hl
+	sbc	hl, de
+	add	hl, hl
 	rla
 	ret	po
-	xor	a,1
+	xor	a, 1
 	ret
 
 ;-------------------------------------------------------------------------------
 util.getbuffer: ; COPIED_FROM_GRAPHX
-	ld	hl,ti.vRam + LcdSize
-	ld	de,(ti.mpLcdBase)
-	or	a,a
-	sbc	hl,de
-	add	hl,de
-	jr	nz,.check
-	ld	hl,ti.vRam
+	ld	hl, ti.vRam + LcdSize
+	ld	de, (ti.mpLcdBase)
+	or	a, a
+	sbc	hl, de
+	add	hl, de
+	jr	nz, .check
+	ld	hl, ti.vRam
 .check:
-	or	a,a			; if 0, copy buffer to screen
+	or	a, a			; if 0, copy buffer to screen
 	ret	nz
-	ex	de,hl
+	ex	de, hl
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -6259,18 +6261,18 @@ _SetSmcBytes: ; COPIED_FROM_GRAPHX
 	pop	bc
 	push	bc
 	push	de
-	ld	b,(hl)
+	ld	b, (hl)
 .loop:
 	inc	hl
-	ld	e,(hl)
+	ld	e, (hl)
 	inc	hl
-	ld	d,(hl)
-	ex	de,hl
+	ld	d, (hl)
+	ex	de, hl
 	inc.s	hl
-	add	hl,de
-	ld	a,(hl)
-	ld	(hl),c
-	ex	de,hl
+	add	hl, de
+	ld	a, (hl)
+	ld	(hl), c
+	ex	de, hl
 	djnz	.loop
 	ret
 
@@ -6298,7 +6300,7 @@ _DefaultCharSpacing: ; COPIED_FROM_GRAPHX
 
 if 0
 _DefaultTextData: ; row-major
-	db	$00,$00,$00,$00,$00,$00,$00,$00 ;
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ; 0
 	db	$7E,$81,$A5,$81,$BD,$BD,$81,$7E ; ☺
 	db	$7E,$FF,$DB,$FF,$C3,$C3,$FF,$7E ; ☻
 	db	$6C,$FE,$FE,$FE,$7C,$38,$10,$00 ; ♥
@@ -6330,7 +6332,7 @@ _DefaultTextData: ; row-major
 	db	$00,$24,$66,$FF,$66,$24,$00,$00 ; ↔
 	db	$00,$18,$3C,$7E,$FF,$FF,$00,$00 ; ▲
 	db	$00,$FF,$FF,$7E,$3C,$18,$00,$00 ; ▼
-	db	$00,$00,$00,$00,$00,$00,$00,$00 ;
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ; _
 	db	$C0,$C0,$C0,$C0,$C0,$00,$C0,$00 ; !
 	db	$D8,$D8,$D8,$00,$00,$00,$00,$00 ; "
 	db	$6C,$6C,$FE,$6C,$FE,$6C,$6C,$00 ; #
@@ -6428,7 +6430,7 @@ _DefaultTextData: ; row-major
 	db	$00,$10,$38,$6C,$C6,$C6,$FE,$00 ; Δ
 else
 _DefaultTextData: ; column-major
-	db	$00,$00,$00,$00,$00,$00,$00,$00 ;
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ; 0
 	db	$7E,$81,$AD,$8D,$8D,$AD,$81,$7E ; ☺
 	db	$7E,$FF,$D3,$F3,$F3,$D3,$FF,$7E ; ☻
 	db	$70,$F8,$FC,$7E,$FC,$F8,$70,$00 ; ♥
@@ -6460,7 +6462,7 @@ _DefaultTextData: ; column-major
 	db	$10,$38,$7C,$10,$10,$7C,$38,$10 ; ↔
 	db	$0C,$1C,$3C,$7C,$7C,$3C,$1C,$0C ; ▲
 	db	$60,$70,$78,$7C,$7C,$78,$70,$60 ; ▼
-	db	$00,$00,$00,$00,$00,$00,$00,$00 ;
+	db	$00,$00,$00,$00,$00,$00,$00,$00 ; _
 	db	$FA,$FA,$00,$00,$00,$00,$00,$00 ; !
 	db	$E0,$E0,$00,$E0,$E0,$00,$00,$00 ; "
 	db	$28,$FE,$FE,$28,$FE,$FE,$28,$00 ; #
@@ -6573,16 +6575,16 @@ _LcdTiming:
 ; Hz = 48000000/CC = 60
 
 _TmpCharSprite:
-	db	8,8
+	db	8, 8
 _TmpCharData:
-	db	0,0,0,0,0,0,0,0
-	db	0,0,0,0,0,0,0,0
-	db	0,0,0,0,0,0,0,0
-	db	0,0,0,0,0,0,0,0
-	db	0,0,0,0,0,0,0,0
-	db	0,0,0,0,0,0,0,0
-	db	0,0,0,0,0,0,0,0
-	db	0,0,0,0,0,0,0,0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
+	db	0, 0, 0, 0, 0, 0, 0, 0
 
 ;-------------------------------------------------------------------------------
 
