@@ -92,6 +92,11 @@ file_data = file_data.replace(
 )
 
 file_data = file_data.replace(
+    b"\tpush\thl\n\tpop\tde\n\tlea\thl,",
+    b"\tex\tde, hl\n\tlea\thl,",
+)
+
+file_data = file_data.replace(
     b"\tld\tiy, 0\n\tlea\thl, iy\n\tld\tiy,",
     b"\tld\thl, 0\n\tld\tiy,",
 )
@@ -173,20 +178,6 @@ file_data = file_data.replace(
     b"\tld\tbc, 255\n\tinc\thl\n\tdec.s\thl\n\tld\th, b\n"
 )
 
-# __land
-
-file_data = file_data.replace(
-    b"\tld\tbc, 255\n\txor\ta, a\n\tcall\t__land\n",
-    b"\tld\tbc, 255\n\t\n\txor\ta, a\n\tinc\thl\n\tdec.s\thl\n\tld\th, b\n\tld\te, b\n"
-)
-
-# __lshru
-
-file_data = file_data.replace(
-    b"\tld\tl, 24\n\tcall\t__lshru\n",
-    b"\tld\tbc, 24\n\tld\tl, c\n\tld\tc, a\n\txor\ta, a\n"
-)
-
 # __imulu
 
 file_data = file_data.replace(
@@ -201,48 +192,16 @@ file_data = file_data.replace(
     b"\tcall\t__set_bc_and_mul_hl_by_240\n"
 )
 
-file_data = file_data.replace(
-    b"\tld\tbc, -2\n\tcall\t__imulu\n",
-    b"\tcall\t__set_bc_and_mul_hl_by_minus2\n"
-)
-
-# targetted
+# __imulu cleanup
 
 file_data = file_data.replace(
-    b"\tld\tbc, 240\n\tld\tde, 0\n\tld\te, (ix + 12)\n\tadd\tiy, de\n\tcall\t__imulu\n",
-    b"\tld\tde, 0\n\tld\te, (ix + 12)\n\tadd\tiy, de\n\tcall\t__set_bc_and_mul_hl_by_240\n"
+    b"\tld\tbc, 3\n\tpush\thl\n\tpop\tbc\n",
+    b"\tpush\thl\n\tpop\tbc\n",
 )
 
 file_data = file_data.replace(
-    b"\tld\tbc, 240\n\tadd\tiy, de\n\tld\thl, (ix - 9)\n\tcall\t__imulu\n",
-    b"\tadd\tiy, de\n\tld\thl, (ix - 9)\n\tcall\t__set_bc_and_mul_hl_by_240\n"
-)
-
-file_data = file_data.replace(
-    b"\tld\tbc, 240\n\tadd\tiy, de\n\tld\thl, (ix - 12)\n\tcall\t__imulu\n",
-    b"\tadd\tiy, de\n\tld\thl, (ix - 12)\n\tcall\t__set_bc_and_mul_hl_by_240\n"
-)
-
-file_data = file_data.replace(
-    b"\tld\tbc, 240\n\tld\ta, e\n\tld\tde, 0\n\tld\te, (ix + 12)\n\tadd\tiy, de\n\tcall\t__imulu\n",
-    b"\tld\ta, e\n\tld\tde, 0\n\tld\te, (ix + 12)\n\tadd\tiy, de\n\tcall\t__set_bc_and_mul_hl_by_240\n"
-)
-
-file_data = file_data.replace(
-    b"\tld\tde, 240\n\tpush\tbc\n\tpop\tiy\n\tpush\thl\n\tpop\tbc\n\tadd\tiy, bc\n\tld\thl, (ix + 9)\n\tpush\tde\n\tpop\tbc\n\tcall\t__imulu\n",
-    b"\t\n\tpush\tbc\n\tpop\tiy\n\tpush\thl\n\tpop\tbc\n\tadd\tiy, bc\n\tld\thl, (ix + 9)\n\tcall\t__set_bc_and_mul_hl_by_240\n"
-)
-
-# targetted second pass
-
-file_data = file_data.replace(
-    b"\tcall\t__set_bc_and_mul_hl_by_240\n\tpush\thl\n\tpop\tde\n\tadd\tiy, de\n\tlea\thl, iy\n",
-    b"\tcall\t__set_bc_and_mul_hl_by_240\n\tex\tde, hl\n\tadd\tiy, de\n\tlea\thl, iy\n"
-)
-
-file_data = file_data.replace(
-    b"\tcall\t__set_bc_and_mul_hl_by_240\n\tpush\thl\n\tpop\tde\n\tlea\thl, iy\n\tadd\thl, de\n",
-    b"\tcall\t__set_bc_and_mul_hl_by_240\n\tex\tde, hl\n\tlea\thl, iy\n\tadd\thl, de\n"
+    b"\tpush\tbc\n\tpop\thl\n\tpush\thl\n\tpop\tbc\n",
+    b"\tpush\tbc\n\tpop\thl\n",
 )
 
 if (len(file_data) < 10):
