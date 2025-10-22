@@ -1358,11 +1358,8 @@ BB9_6:
 	ld	(ix - 24), bc
 	push	bc
 	pop	hl
-	push	hl
-	pop	bc
 	add	hl, bc
 	add	hl, bc
-	ld	bc, 3
 	push	hl
 	pop	bc
 	ld	iy, (ix - 28)
@@ -1494,7 +1491,6 @@ BB9_14:
 	pop	bc
 	add	hl, bc
 	add	hl, bc
-	ld	bc, 3
 	push	hl
 	pop	bc
 	ld	iy, (ix - 28)
@@ -1558,7 +1554,6 @@ BB9_27:
 	pop	bc
 	add	hl, bc
 	add	hl, bc
-	ld	bc, 3
 	push	hl
 	pop	bc
 	ld	iy, (ix - 28)
@@ -2154,7 +2149,7 @@ BB11_11:
 	jr	BB11_11
 ;	section	.text,"ax",@progbits
 
-;	ident	"clang version 15.0.0 (https://github.com/CE-Programming/llvm-project 51b05c1c99dbd61fce7daf56414f212f15b2171a)"
+;	ident	"clang version 15.0.7 (https://github.com/CE-Programming/llvm-project db91fd729cd188daf925aaf5043a6ca0d3660655)"
 ;	extern	gfy_internal_Begin
 ;	extern	_memset
 ;	extern	gfy_Transparent_Color
