@@ -1127,21 +1127,6 @@ fontlib_GetItalicSpacingAdjustment:
 
 
 ;-------------------------------------------------------------------------------
-fontlib_GetCurrentFontHeight:
-; Returns the height of the current font
-; Arguments:
-;  None
-; Returns:
-;  Height
-	ld	a,(_CurrentFontProperties.height)
-	ld	hl,_CurrentFontProperties.spaceAbove
-	add	a,(hl)
-	inc	hl
-	add	a,(hl)
-	ret
-
-
-;-------------------------------------------------------------------------------
 fontlib_ValidateCodePoint:
 ; Returns true if the given code point is present in the current font.
 ; Arguments:
@@ -1666,6 +1651,28 @@ util.ClearRect:
 
 
 ;-------------------------------------------------------------------------------
+fontlib_ScrollWindowUp:
+; Scrolls the contents of the text window up one line, i.e. everything in the
+; window is copied DOWN one line, thus yielding the effect of scrolling up.
+; The current text cursor is ignored.  The top line is not erased; you must
+; erase or overwrite it yourself.
+; Arguments:
+;  None
+; Returns:
+;  Nothing
+	ld	de,-ti.lcdWidth
+	call	fontlib_ScrollWindowDown.part1
+; Compute write pointer
+	ld	hl,(_TextYMax)
+	dec	l
+	call	fontlib_ScrollWindowDown.part2
+; Compute read pointer as HL -= ti.lcdWidth * CurrentFontHeight
+	sbc	hl,bc
+	sbc	hl,bc
+	jr	fontlib_ScrollWindowDown.part3
+
+
+;-------------------------------------------------------------------------------
 fontlib_ScrollWindowDown:
 ; Scrolls the contents of the text window down one line, i.e. everything in the
 ; window is copied UP one line, thus yielding the effect of scrolling down.
@@ -1677,6 +1684,7 @@ fontlib_ScrollWindowDown:
 ;  A = 0
 	ld	de,ti.lcdWidth
 	call	.part1
+	; A has height
 ; Compute write pointer
 	ld	hl,(_TextYMin)
 	call	.part2
@@ -1711,21 +1719,6 @@ fontlib_ScrollWindowDown:
 	jr	nz,.copy
 	ret
 
-.part1:
-; Get width loop control first
-	call	fontlib_GetWindowWidth
-	pop	bc
-	ret	c
-	ret	z
-	push	bc
-	push	hl
-	pop	iy			; Stash it in IY for quick access
-	ex	de,hl
-	sbc	hl,de			; carry reset from above
-	ld	(.delta),hl
-; Now is a good time to call this internal routine
-	jp	fontlib_GetCurrentFontHeight	; A has height
-
 .part2:
 	ld	h,ti.lcdWidth / 2
 	mlt	hl
@@ -1744,27 +1737,36 @@ fontlib_ScrollWindowDown:
 	mlt	bc
 	ret
 
+.part1:
+; Get width loop control first
+	call	fontlib_GetWindowWidth
+	pop	bc
+	ret	c
+	ret	z
+	push	bc
+	push	hl
+	pop	iy			; Stash it in IY for quick access
+	ex	de,hl
+	sbc	hl,de			; carry reset from above
+	ld	(.delta),hl
+; Now is a good time to call this internal routine
+	; jp	fontlib_GetCurrentFontHeight
+
+assert $ = fontlib_GetCurrentFontHeight
 
 ;-------------------------------------------------------------------------------
-fontlib_ScrollWindowUp:
-; Scrolls the contents of the text window up one line, i.e. everything in the
-; window is copied DOWN one line, thus yielding the effect of scrolling up.
-; The current text cursor is ignored.  The top line is not erased; you must
-; erase or overwrite it yourself.
+fontlib_GetCurrentFontHeight:
+; Returns the height of the current font
 ; Arguments:
 ;  None
 ; Returns:
-;  Nothing
-	ld	de,-ti.lcdWidth
-	call	fontlib_ScrollWindowDown.part1
-; Compute write pointer
-	ld	hl,(_TextYMax)
-	dec	l
-	call	fontlib_ScrollWindowDown.part2
-; Compute read pointer as HL -= ti.lcdWidth * CurrentFontHeight
-	sbc	hl,bc
-	sbc	hl,bc
-	jr	fontlib_ScrollWindowDown.part3
+;  Height
+	ld	a,(_CurrentFontProperties.height)
+	ld	hl,_CurrentFontProperties.spaceAbove
+	add	a,(hl)
+	inc	hl
+	add	a,(hl)
+	ret
 
 
 ;-------------------------------------------------------------------------------
