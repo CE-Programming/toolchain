@@ -735,16 +735,10 @@ fontlib_DrawString:
 ; Returns:
 ;  New X cursor value
 	pop	bc
-	ld	(.retter + 1),bc
-	pop	de
-	scf
-	sbc	hl,hl
-	push	hl
-	push	de
-	call	fontlib_DrawStringL
-	pop	de
-.retter:
-	jp	0
+	ex	(sp), hl
+	push	bc
+	ld	bc, -1
+	jr	_DrawStringL
 
 
 ;-------------------------------------------------------------------------------
@@ -758,19 +752,23 @@ fontlib_DrawStringL:
 ;  arg1: Maximum number of characters have been printed
 ; Returns:
 ;  New X cursor value
-	push	ix
+	ld	hl, arg1
+	add	hl, sp
+	ld	bc, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+_DrawStringL:
 ; Since reentrancy isn't likely to be needed. . . .
 ; Instead of using stack locals, just access all our local and global
 ; variables via the (IX + offset) addressing mode.
+	push	ix
 	ld	ix,DataBaseAddr
 	res	bWasNewline,(ix + newlineControl)
-	ld	iy,0
-	add	iy,sp
-	ld	hl,(iy + arg1)
+	ld	(ix + charactersLeft), bc
 	dec	hl			; We're reading the string with pre-increment,
 	ld	(ix + strReadPtr),hl	; so we need an initial pre-decrement
-	ld	hl,(iy + arg2)
-	ld	(ix + charactersLeft),hl
 .restartX:
 ; Compute target drawing address
 	ld	hl,(_TextY)
@@ -1348,7 +1346,7 @@ fontlib_GetGlyphWidth:
 	xor	a, a
 	ret
 
-;;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 fontlib_GetStringWidth:
 ; Returns the width of a string.
 ; Stops when it encounters any control code or a codepoint not in the current
@@ -1357,17 +1355,13 @@ fontlib_GetStringWidth:
 ;  arg0: Pointer to string
 ; Returns:
 ;  Width of string
+	pop	hl
 	pop	bc
-	ld	(.retter + 1),bc
-	pop	de
+	push	bc
+	push	hl
 	scf
 	sbc	hl,hl
-	push	hl
-	push	de
-	call	fontlib_GetStringWidthL
-	pop	de
-.retter:
-	jp	0
+	jr	_GetStringWidthL
 
 
 ;-------------------------------------------------------------------------------
@@ -1382,15 +1376,16 @@ fontlib_GetStringWidthL:
 ;  Width of string
 	ld	hl,arg0
 	add	hl,sp
-	push	ix
-	ld	ix,DataBaseAddr
 	ld	bc,(hl)
 	inc	hl
 	inc	hl
 	inc	hl
 	ld	hl,(hl)
-	ld	(ix + charactersLeft),hl
+_GetStringWidthL:
+	push	ix
+	ld	ix, DataBaseAddr
 	ld	iy,0
+	ld	(ix + charactersLeft), hl
 	ld	de,(ix + strucFont.widthsTablePtr)
 	ld	a,(bc)
 	or	a,a
