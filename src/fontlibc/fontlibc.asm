@@ -2100,4 +2100,3 @@ currentFontRoot := _CurrentFontRoot - DataBaseAddr
 DataBaseAddr:
 ; Embed the current font's properties as library variables
 _CurrentFontProperties strucFont
-
