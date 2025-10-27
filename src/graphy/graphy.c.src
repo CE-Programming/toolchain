@@ -884,375 +884,375 @@ BB6_4:
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_ScaledSprite_NoClip
-gfy_ScaledSprite_NoClip:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	lea	hl, ix - 25
-	ld	sp, hl
-	ld	l, (ix + 15)
-	ld	iy, 0
-	ld	a, l
-	or	a, a
-	jq	z, BB7_17
-	ld	c, (ix + 18)
-	ld	a, c
-	or	a, a
-	jq	z, BB7_17
-	lea	de, iy
-	ld	e, l
-	ld	(ix - 6), de
-	lea	hl, iy
-	ld	l, c
-	ld	(ix - 9), hl
-	call	gfy_Wait
-	ld	hl, (-1900524)
-	ld	(ix - 3), hl
-	ld	hl, (ix + 9)
-	call	__set_bc_and_mul_hl_by_240
-	ld	(ix - 19), hl
-	ld	hl, (ix - 6)
-	call	__imulu
-	ld	(ix - 6), hl
-	ld	iy, (ix + 6)
-	ld	a, (iy + 1)
-	or	a, a
-	sbc	hl, hl
-	ld	(ix - 15), a
-	ld	l, a
-	ld	bc, (ix - 9)
-	call	__imulu
-	push	hl
-	pop	bc
-	ld	hl, (ix - 6)
-	ld	iy, (ix + 6)
-	or	a, a
-	sbc	hl, bc
-	ld	(ix - 12), hl
-	ld	l, (iy)
-	ld	a, l
-	or	a, a
-	jr	nz, BB7_5
-	ld	a, (ix + 15)
-	cp	a, 1
-	jq	z, BB7_17
-	ld	hl, (-1900524)
-	jq	BB7_17
-BB7_5:
-	ld	de, 0
-	ld	e, (ix + 12)
-	ld	(ix - 25), de
-	ld	iy, (ix - 3)
-	add	iy, de
-	ld	de, (ix - 19)
-	add	iy, de
-	lea	bc, iy
-	ld	iy, (ix + 6)
-	lea	de, iy + 2
-	ld	(ix - 6), de
-	ld	a, (ix + 18)
-	dec	a
-	ld	iy, 0
-	ld	iyl, a
-	ld	(ix - 22), iy
-	push	af
-	ld	a, (ix - 15)
-	ld	iyl, a
-	pop	af
-	ld	iyh, iyl
-	ld	d, 0
-	ld	a, d
-BB7_6:
-	ld	(ix - 15), a
-	ld	a, iyl
-	or	a, a
-	ld	iyl, d
-	ld	a, d
-	jr	z, BB7_9
-BB7_7:
-	ld	(ix - 16), a
-	ld	hl, (ix - 6)
-	ld	a, (hl)
-	ld	hl, (ix - 9)
-	push	hl
-	ld	l, a
-	push	hl
-	ld	(ix - 3), bc
-	push	bc
-	call	_memset
-	ld	a, (ix - 16)
-	ld	iy, (ix + 6)
-	ld	d, 0
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	hl, (ix - 6)
-	inc	hl
-	ld	(ix - 6), hl
-	ld	bc, (ix - 22)
-	ld	hl, (ix - 3)
-	add	hl, bc
-	inc	hl
-	push	hl
-	pop	bc
-	inc	a
-	ld	l, (iy + 1)
-	ex	de, hl
-	ld	iyh, e
-	ex	de, hl
-	cp	a, l
-	jr	c, BB7_7
-	ld	hl, (ix + 6)
-	ld	l, (hl)
-	ld	iyl, iyh
-BB7_9:
-	ld	e, l
-	push	bc
-	pop	hl
-	ld	bc, (ix - 12)
-	add	hl, bc
-	push	hl
-	pop	bc
-	ld	l, e
-	ld	a, (ix - 15)
-	inc	a
-	cp	a, l
-	jr	c, BB7_6
-	ld	a, (ix + 15)
-	cp	a, 1
-	jq	z, BB7_17
-	ld	hl, (-1900524)
-	ld	(ix - 3), hl
-	or	a, a
-	sbc	hl, hl
-	ex	de, hl
-	ld	e, iyh
-	ex	de, hl
-	ld	bc, (ix - 9)
-	call	__imulu
-	ld	bc, (ix - 25)
-	ld	(ix - 9), hl
-	ld	a, e
-	ld	e, (ix + 15)
-	ld	iyl, a
-	or	a, a
-	jr	z, BB7_17
-	ld	hl, (ix - 3)
-	add	hl, bc
-	ld	bc, (ix - 19)
-	add	hl, bc
-	ld	a, e
-	dec	a
-	ld	(ix - 16), a
-	push	hl
-	pop	bc
-BB7_13:
-	ld	(ix - 3), bc
-	ld	bc, 240
-	add	hl, bc
-	ld	a, e
-	cp	a, 2
-	ld	a, (ix - 16)
-	ld	(ix - 6), a
-	push	hl
-	pop	bc
-	jr	c, BB7_16
-BB7_14:
-	ld	(ix - 12), d
-	ld	hl, (ix - 9)
-	push	hl
-	ld	hl, (ix - 3)
-	push	hl
-	ld	(ix - 15), bc
-	push	bc
-	call	_memcpy
-	ld	iy, (ix + 6)
-	ld	d, (ix - 12)
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	e, (ix + 15)
-	ld	bc, 240
-	ld	hl, (ix - 15)
-	add	hl, bc
-	push	hl
-	pop	bc
-	ld	a, (ix - 6)
-	dec	a
-	ld	(ix - 6), a
-	or	a, a
-	jr	nz, BB7_14
-	ld	a, (iy)
-	ld	iyl, a
-BB7_16:
-	inc	d
-	ld	a, d
-	ex	de, hl
-	ld	e, iyl
-	ex	de, hl
-	cp	a, l
-	push	bc
-	pop	hl
-	jr	c, BB7_13
-BB7_17:
-	ld	sp, ix
-	pop	ix
-	ret
+; gfy_ScaledSprite_NoClip:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	lea	hl, ix - 25
+; 	ld	sp, hl
+; 	ld	l, (ix + 15)
+; 	ld	iy, 0
+; 	ld	a, l
+; 	or	a, a
+; 	jq	z, BB7_17
+; 	ld	c, (ix + 18)
+; 	ld	a, c
+; 	or	a, a
+; 	jq	z, BB7_17
+; 	lea	de, iy
+; 	ld	e, l
+; 	ld	(ix - 6), de
+; 	lea	hl, iy
+; 	ld	l, c
+; 	ld	(ix - 9), hl
+; 	call	gfy_Wait
+; 	ld	hl, (-1900524)
+; 	ld	(ix - 3), hl
+; 	ld	hl, (ix + 9)
+; 	call	__set_bc_and_mul_hl_by_240
+; 	ld	(ix - 19), hl
+; 	ld	hl, (ix - 6)
+; 	call	__imulu
+; 	ld	(ix - 6), hl
+; 	ld	iy, (ix + 6)
+; 	ld	a, (iy + 1)
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ld	(ix - 15), a
+; 	ld	l, a
+; 	ld	bc, (ix - 9)
+; 	call	__imulu
+; 	push	hl
+; 	pop	bc
+; 	ld	hl, (ix - 6)
+; 	ld	iy, (ix + 6)
+; 	or	a, a
+; 	sbc	hl, bc
+; 	ld	(ix - 12), hl
+; 	ld	l, (iy)
+; 	ld	a, l
+; 	or	a, a
+; 	jr	nz, BB7_5
+; 	ld	a, (ix + 15)
+; 	cp	a, 1
+; 	jq	z, BB7_17
+; 	ld	hl, (-1900524)
+; 	jq	BB7_17
+; BB7_5:
+; 	ld	de, 0
+; 	ld	e, (ix + 12)
+; 	ld	(ix - 25), de
+; 	ld	iy, (ix - 3)
+; 	add	iy, de
+; 	ld	de, (ix - 19)
+; 	add	iy, de
+; 	lea	bc, iy
+; 	ld	iy, (ix + 6)
+; 	lea	de, iy + 2
+; 	ld	(ix - 6), de
+; 	ld	a, (ix + 18)
+; 	dec	a
+; 	ld	iy, 0
+; 	ld	iyl, a
+; 	ld	(ix - 22), iy
+; 	push	af
+; 	ld	a, (ix - 15)
+; 	ld	iyl, a
+; 	pop	af
+; 	ld	iyh, iyl
+; 	ld	d, 0
+; 	ld	a, d
+; BB7_6:
+; 	ld	(ix - 15), a
+; 	ld	a, iyl
+; 	or	a, a
+; 	ld	iyl, d
+; 	ld	a, d
+; 	jr	z, BB7_9
+; BB7_7:
+; 	ld	(ix - 16), a
+; 	ld	hl, (ix - 6)
+; 	ld	a, (hl)
+; 	ld	hl, (ix - 9)
+; 	push	hl
+; 	ld	l, a
+; 	push	hl
+; 	ld	(ix - 3), bc
+; 	push	bc
+; 	call	_memset
+; 	ld	a, (ix - 16)
+; 	ld	iy, (ix + 6)
+; 	ld	d, 0
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	hl, (ix - 6)
+; 	inc	hl
+; 	ld	(ix - 6), hl
+; 	ld	bc, (ix - 22)
+; 	ld	hl, (ix - 3)
+; 	add	hl, bc
+; 	inc	hl
+; 	push	hl
+; 	pop	bc
+; 	inc	a
+; 	ld	l, (iy + 1)
+; 	ex	de, hl
+; 	ld	iyh, e
+; 	ex	de, hl
+; 	cp	a, l
+; 	jr	c, BB7_7
+; 	ld	hl, (ix + 6)
+; 	ld	l, (hl)
+; 	ld	iyl, iyh
+; BB7_9:
+; 	ld	e, l
+; 	push	bc
+; 	pop	hl
+; 	ld	bc, (ix - 12)
+; 	add	hl, bc
+; 	push	hl
+; 	pop	bc
+; 	ld	l, e
+; 	ld	a, (ix - 15)
+; 	inc	a
+; 	cp	a, l
+; 	jr	c, BB7_6
+; 	ld	a, (ix + 15)
+; 	cp	a, 1
+; 	jq	z, BB7_17
+; 	ld	hl, (-1900524)
+; 	ld	(ix - 3), hl
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ex	de, hl
+; 	ld	e, iyh
+; 	ex	de, hl
+; 	ld	bc, (ix - 9)
+; 	call	__imulu
+; 	ld	bc, (ix - 25)
+; 	ld	(ix - 9), hl
+; 	ld	a, e
+; 	ld	e, (ix + 15)
+; 	ld	iyl, a
+; 	or	a, a
+; 	jr	z, BB7_17
+; 	ld	hl, (ix - 3)
+; 	add	hl, bc
+; 	ld	bc, (ix - 19)
+; 	add	hl, bc
+; 	ld	a, e
+; 	dec	a
+; 	ld	(ix - 16), a
+; 	push	hl
+; 	pop	bc
+; BB7_13:
+; 	ld	(ix - 3), bc
+; 	ld	bc, 240
+; 	add	hl, bc
+; 	ld	a, e
+; 	cp	a, 2
+; 	ld	a, (ix - 16)
+; 	ld	(ix - 6), a
+; 	push	hl
+; 	pop	bc
+; 	jr	c, BB7_16
+; BB7_14:
+; 	ld	(ix - 12), d
+; 	ld	hl, (ix - 9)
+; 	push	hl
+; 	ld	hl, (ix - 3)
+; 	push	hl
+; 	ld	(ix - 15), bc
+; 	push	bc
+; 	call	_memcpy
+; 	ld	iy, (ix + 6)
+; 	ld	d, (ix - 12)
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	e, (ix + 15)
+; 	ld	bc, 240
+; 	ld	hl, (ix - 15)
+; 	add	hl, bc
+; 	push	hl
+; 	pop	bc
+; 	ld	a, (ix - 6)
+; 	dec	a
+; 	ld	(ix - 6), a
+; 	or	a, a
+; 	jr	nz, BB7_14
+; 	ld	a, (iy)
+; 	ld	iyl, a
+; BB7_16:
+; 	inc	d
+; 	ld	a, d
+; 	ex	de, hl
+; 	ld	e, iyl
+; 	ex	de, hl
+; 	cp	a, l
+; 	push	bc
+; 	pop	hl
+; 	jr	c, BB7_13
+; BB7_17:
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
 ;	public	gfy_ScaledTransparentSprite_NoClip
-gfy_ScaledTransparentSprite_NoClip:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	lea	hl, ix - 19
-	ld	sp, hl
-	ld	a, (ix + 15)
-	or	a, a
-	jq	z, BB8_13
-	ld	e, (ix + 18)
-	ld	a, e
-	or	a, a
-	jq	z, BB8_13
-	or	a, a
-	sbc	hl, hl
-	ld	l, e
-	ld	(ix - 7), hl
-	call	gfy_Wait
-	ld	hl, (-1900524)
-	ld	(ix - 3), hl
-	ld	iy, (ix + 6)
-	ld	a, (iy + 1)
-	or	a, a
-	sbc	hl, hl
-	ld	(ix - 4), a
-	ld	l, a
-	ld	bc, (ix - 7)
-	call	__imulu
-	push	hl
-	pop	bc
-	ld	hl, 240
-	push	hl
-	pop	de
-	or	a, a
-	sbc	hl, bc
-	ld	c, (ix + 18)
-	ld	(ix - 14), hl
-	ld	hl, (ix + 6)
-	ld	a, (hl)
-	or	a, a
-	jq	z, BB8_13
-	ld	hl, (ix + 9)
-	ld	a, c
-	ld	bc, 0
-	ld	c, (ix + 12)
-	ld	iy, (ix - 3)
-	add	iy, bc
-	push	de
-	pop	bc
-	call	__imulu
-	push	hl
-	pop	bc
-	add	iy, bc
-	ld	(ix - 3), iy
-	ld	iy, (ix + 6)
-	lea	iy, iy + 2
-	dec	a
-	or	a, a
-	sbc	hl, hl
-	ld	l, a
-	inc	hl
-	ld	(ix - 19), hl
-	xor	a, a
-BB8_4:
-	ld	(ix - 15), a
-	ld	l, (ix - 4)
-	ld	c, 0
-BB8_5:
-	ld	a, l
-	or	a, a
-	ld	(ix - 8), c
-	jr	nz, BB8_7
-	xor	a, a
-	ld	l, a
-	jr	BB8_11
-BB8_7:
-	ld	a, (gfy_Transparent_Color)
-	ld	d, a
-	ld	e, 0
-BB8_8:
-	ld	a, (iy)
-	cp	a, d
-	ld	bc, (ix - 7)
-	lea	hl, iy
-	jr	z, BB8_10
-	ld	(ix - 11), hl
-	ld	hl, (ix - 7)
-	push	hl
-	ld	l, a
-	push	hl
-	ld	hl, (ix - 3)
-	push	hl
-	ld	(ix - 16), e
-	call	_memset
-	ld	e, (ix - 16)
-	ld	hl, 9
-	add	hl, sp
-	ld	sp, hl
-	ld	hl, (ix - 11)
-	ld	a, (gfy_Transparent_Color)
-	ld	d, a
-	ld	iy, (ix + 6)
-	ld	a, (iy + 1)
-	ld	(ix - 4), a
-	ld	bc, (ix - 19)
-BB8_10:
-	inc	hl
-	push	hl
-	pop	iy
-	ld	hl, (ix - 3)
-	add	hl, bc
-	ld	(ix - 3), hl
-	inc	e
-	ld	a, e
-	ld	l, (ix - 4)
-	cp	a, l
-	jr	c, BB8_8
-BB8_11:
-	ld	(ix - 11), l
-	ld	bc, 0
-	ld	c, l
-	ld	hl, (ix - 3)
-	ld	de, (ix - 14)
-	add	hl, de
-	ld	(ix - 3), hl
-	or	a, a
-	sbc	hl, hl
-	sbc	hl, bc
-	push	hl
-	pop	bc
-	add	iy, bc
-	ld	c, (ix - 8)
-	inc	c
-	ld	a, c
-	ld	l, (ix + 15)
-	cp	a, l
-	ld	l, (ix - 11)
-	jq	nz, BB8_5
-	ld	bc, 0
-	ld	c, (ix - 4)
-	add	iy, bc
-	ld	a, (ix - 15)
-	inc	a
-	ld	hl, (ix + 6)
-	ld	l, (hl)
-	cp	a, l
-	jq	c, BB8_4
-BB8_13:
-	ld	sp, ix
-	pop	ix
-	ret
+; gfy_ScaledTransparentSprite_NoClip:
+; 	push	ix
+; 	ld	ix, 0
+; 	add	ix, sp
+; 	lea	hl, ix - 19
+; 	ld	sp, hl
+; 	ld	a, (ix + 15)
+; 	or	a, a
+; 	jq	z, BB8_13
+; 	ld	e, (ix + 18)
+; 	ld	a, e
+; 	or	a, a
+; 	jq	z, BB8_13
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ld	l, e
+; 	ld	(ix - 7), hl
+; 	call	gfy_Wait
+; 	ld	hl, (-1900524)
+; 	ld	(ix - 3), hl
+; 	ld	iy, (ix + 6)
+; 	ld	a, (iy + 1)
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ld	(ix - 4), a
+; 	ld	l, a
+; 	ld	bc, (ix - 7)
+; 	call	__imulu
+; 	push	hl
+; 	pop	bc
+; 	ld	hl, 240
+; 	push	hl
+; 	pop	de
+; 	or	a, a
+; 	sbc	hl, bc
+; 	ld	c, (ix + 18)
+; 	ld	(ix - 14), hl
+; 	ld	hl, (ix + 6)
+; 	ld	a, (hl)
+; 	or	a, a
+; 	jq	z, BB8_13
+; 	ld	hl, (ix + 9)
+; 	ld	a, c
+; 	ld	bc, 0
+; 	ld	c, (ix + 12)
+; 	ld	iy, (ix - 3)
+; 	add	iy, bc
+; 	push	de
+; 	pop	bc
+; 	call	__imulu
+; 	push	hl
+; 	pop	bc
+; 	add	iy, bc
+; 	ld	(ix - 3), iy
+; 	ld	iy, (ix + 6)
+; 	lea	iy, iy + 2
+; 	dec	a
+; 	or	a, a
+; 	sbc	hl, hl
+; 	ld	l, a
+; 	inc	hl
+; 	ld	(ix - 19), hl
+; 	xor	a, a
+; BB8_4:
+; 	ld	(ix - 15), a
+; 	ld	l, (ix - 4)
+; 	ld	c, 0
+; BB8_5:
+; 	ld	a, l
+; 	or	a, a
+; 	ld	(ix - 8), c
+; 	jr	nz, BB8_7
+; 	xor	a, a
+; 	ld	l, a
+; 	jr	BB8_11
+; BB8_7:
+; 	ld	a, (gfy_Transparent_Color)
+; 	ld	d, a
+; 	ld	e, 0
+; BB8_8:
+; 	ld	a, (iy)
+; 	cp	a, d
+; 	ld	bc, (ix - 7)
+; 	lea	hl, iy
+; 	jr	z, BB8_10
+; 	ld	(ix - 11), hl
+; 	ld	hl, (ix - 7)
+; 	push	hl
+; 	ld	l, a
+; 	push	hl
+; 	ld	hl, (ix - 3)
+; 	push	hl
+; 	ld	(ix - 16), e
+; 	call	_memset
+; 	ld	e, (ix - 16)
+; 	ld	hl, 9
+; 	add	hl, sp
+; 	ld	sp, hl
+; 	ld	hl, (ix - 11)
+; 	ld	a, (gfy_Transparent_Color)
+; 	ld	d, a
+; 	ld	iy, (ix + 6)
+; 	ld	a, (iy + 1)
+; 	ld	(ix - 4), a
+; 	ld	bc, (ix - 19)
+; BB8_10:
+; 	inc	hl
+; 	push	hl
+; 	pop	iy
+; 	ld	hl, (ix - 3)
+; 	add	hl, bc
+; 	ld	(ix - 3), hl
+; 	inc	e
+; 	ld	a, e
+; 	ld	l, (ix - 4)
+; 	cp	a, l
+; 	jr	c, BB8_8
+; BB8_11:
+; 	ld	(ix - 11), l
+; 	ld	bc, 0
+; 	ld	c, l
+; 	ld	hl, (ix - 3)
+; 	ld	de, (ix - 14)
+; 	add	hl, de
+; 	ld	(ix - 3), hl
+; 	or	a, a
+; 	sbc	hl, hl
+; 	sbc	hl, bc
+; 	push	hl
+; 	pop	bc
+; 	add	iy, bc
+; 	ld	c, (ix - 8)
+; 	inc	c
+; 	ld	a, c
+; 	ld	l, (ix + 15)
+; 	cp	a, l
+; 	ld	l, (ix - 11)
+; 	jq	nz, BB8_5
+; 	ld	bc, 0
+; 	ld	c, (ix - 4)
+; 	add	iy, bc
+; 	ld	a, (ix - 15)
+; 	inc	a
+; 	ld	hl, (ix + 6)
+; 	ld	l, (hl)
+; 	cp	a, l
+; 	jq	c, BB8_4
+; BB8_13:
+; 	ld	sp, ix
+; 	pop	ix
+; 	ret
 ;	section	.text,"ax",@progbits
 
 ;	section	.text,"ax",@progbits
