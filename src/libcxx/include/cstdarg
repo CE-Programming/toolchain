@@ -1,0 +1,15 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CSTDARG
+#define _EZCXX_CSTDARG
+
+#include <stdarg.h>
+
+#pragma clang system_header
+
+namespace std {
+
+using ::va_list;
+
+} // namespace std
+
+#endif // _EZCXX_CSTDARG

@@ -10,9 +10,13 @@ namespace std {
 
 using ::ptrdiff_t;
 using ::size_t;
+
+#if __cplusplus >= 201103L
 using ::max_align_t;
 using nullptr_t = decltype(nullptr);
+#endif /* __cplusplus >= 201103L */
 
+#if __cplusplus >= 201703L
 enum class byte : unsigned char {};
 
 constexpr byte  operator| (byte __lhs, byte __rhs) noexcept { return byte(char(__lhs) | char(__rhs)); }
@@ -22,6 +26,7 @@ constexpr byte& operator&=(byte& __lhs, byte __rhs) noexcept { return __lhs = __
 constexpr byte  operator^ (byte __lhs, byte __rhs) noexcept { return byte(char(__lhs) ^ char(__rhs)); }
 constexpr byte& operator^=(byte& __lhs, byte __rhs) noexcept { return __lhs = __lhs ^ __rhs; }
 constexpr byte  operator~ (byte __rhs) noexcept { return byte(~char(__rhs)); }
+#endif /* __cplusplus >= 201703L */
 
 } // namespace std
 
