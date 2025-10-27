@@ -2547,15 +2547,201 @@ gfy_GetClipRegion: ; COPIED_FROM_NIGHTLY_GRAPHX
 	ret
 
 ;-------------------------------------------------------------------------------
-; gfy_ScaledSprite_NoClip:
+gfy_ScaledSprite_NoClip: ; MODIFIED_FROM_GRAPHX
+; Draws a scaled sprite to the screen
+; Arguments:
+;  arg0 : Pointer to sprite
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
+;  arg5 : Width Scale (integer)
+;  arg6 : Height Scale (integer)
+; Returns:
+;  None
+	ld	iy, 0
+	add	iy, sp
+	push	ix
+	ld	h, ti.lcdHeight
+	ld	l, (iy + 12)		; width of scale
+	ld	a, l
+	ld	(NcSprWscl+1), a
+	mlt	hl
+	ld	(NcSprWscl240+1), hl
+	ld	a, (iy + 15)		; height of scale
+	ld	h, a
+	ld	ixl, a
+	ld	de, (iy + 3)		; start of sprite structure
+	ld	a, (de)
+	ld	ixh, a			; width of sprite
+	inc	de
+	ld	a, (de)
+	ld	l, a			; height of sprite
+	ld	(NcSprHeight+1), a
+	mlt	hl
+	ld	(SprHxSclH1+1), hl
+	ld	(SprHxSclH2+1), hl
+
+	ld	hl, (iy + 6)	; x coordinate
+	ld	c, (iy + 9)	; y coordinate
+	ld	b, h		; maybe ld b, 0
+	dec	h		; tests if x >= 256
+	ld	h, ti.lcdHeight
+	jr	nz, .x_lt_256
+	ld	b, h		; ld b, ti.lcdHeight * 256
+.x_lt_256:
+	mlt	hl
+	inc.s	bc		; offset by +1 and clear upper byte of BC
+	add	hl, bc		; add y cord
+	ld	de, (CurrentBuffer)
+	add	hl, de		; add buffer offset
+	; HL = (CurrentBuffer) + (x * ti.lcdHeight) + y + 1
+
+	ld	iy, (iy + 3)
+
+	call	gfy_Wait
+NcSprBigLoop:
+	ex	de, hl
+	sbc	hl, hl
+	ld	b, l
+	add	hl, de
+	dec	hl
+	push	de
+NcSprHeight:
+	ld	a, 0			; height of sprite
+	jr	NcSprLpEntry
+NcSprHlp:
+	ldir
+NcSprLpEntry:
+	ld	c, (iy + 2)
+	inc	iy
+	ld	(hl), c
+	ld	c, ixl			; height of scale
+	dec	a
+	jr	nz, NcSprHlp
+	dec	c
+	jr	z, NcSprWscl
+	ldir
+NcSprWscl:
+	ld	a, 0			; width of scale
+	dec	a
+	jr	z, NcSprH_end
+	ld	c, ti.lcdHeight		; bc = ti.lcdWidth
+NcSprLineCopy:
+	add	hl, bc
+	dec	de
+	ex	de, hl
+SprHxSclH1:
+	ld	bc, 0			; heightSprite x heightScale
+	lddr
+	dec	a
+	jr	z, NcSprH_end
+	ld	bc, ti.lcdHeight * 2 + 1
+	add	hl, bc
+	inc	de
+	ex	de, hl
+SprHxSclH2:
+	ld	bc, 0			; heightSprite x heightScale
+	ldir
+	ld	bc, ti.lcdHeight * 2 - 1
+	dec	a
+	jr	nz, NcSprLineCopy
+NcSprH_end:
+	pop	hl
+NcSprWscl240:
+	ld	bc, 0			; ti.lcdHeight x widthScale
+	add	hl, bc
+	dec	ixh
+	jr	nz, NcSprBigLoop
+	pop	ix			; restore ix sp
+	ret
 
 ;-------------------------------------------------------------------------------
-; gfy_ScaledTransparentSprite_NoClip:
+gfy_ScaledTransparentSprite_NoClip: ; MODIFIED_FROM_GRAPHX
+; Draws a scaled sprite to the screen with transparency
+; Arguments:
+;  arg0 : Pointer to sprite structure
+;  arg1 : X coordinate
+;  arg2 : Y coordinate
+;  arg5 : Width Scale (integer)
+;  arg6 : Height Scale (integer)
+; Returns:
+;  None
+	ld	iy, 0
+	add	iy, sp
 
-; ...
+	ld	hl, (iy + 6)	; hl = x
+	ld	e, (iy + 9)	; e = y
+	ld	d, h		; maybe ld d, 0
+	dec	h		; tests if x >= 256
+	ld	h, ti.lcdHeight
+	jr	nz, .x_lt_256
+	ld	d, h		; ld d, ti.lcdHeight * 256
+.x_lt_256:
+	mlt	hl
+	ex.s	de, hl		; clear upper byte of DE
+	add	hl, de		; add y cord
+	ld	de, (CurrentBuffer)
+	add	hl, de		; add buffer offset
+	ex	de, hl		; de = start draw location
 
+	ld	hl, ti.lcdHeight
+	ld	a, (iy + 12)
+	ld	(.widthscale), a
+	ld	a, (iy + 15)
+	ld	(.heightscale), a	; smc faster inner loop
+	ld	iy, (iy + 3)		; iy -> start of sprite struct
+	ld	c, (iy + 1)		; c = height
+	ld	b, a
+	ld	a, c
+	mlt	bc
+	sbc	hl, bc			; find y offset next
+	ld	(.amount), hl
+	ld	(.height), a
+	ld	a, (iy + 0)
+	lea	hl, iy + 2		; hl -> sprite data
+	push	ix			; save ix sp
+	ld	ixh, a			; ixh = width
+	call	gfy_Wait
+.loop:
+	ld	ixl, 0			; ixl = width scale
+.widthscale := $-1
+.loopwidth:
+	push	hl
+	ld	c, 0
+.height := $-1
+.loopheight:
+	ld	b, 0
+.heightscale := $-1
+	ld	a, (hl)			; get sprite pixel
 	cp	a, TRASPARENT_COLOR
 smcByte _TransparentColor
+	jr	nz, .next		; is transparent?
+.skip:
+	inc	de
+	djnz	.skip
+	jr	.locate			; loop for next pixel
+.next:
+	ld	(de), a
+	inc	de
+	djnz	.next			; set and loop for next pixel
+.locate:
+	inc	hl
+	dec	c
+	jr	nz, .loopheight		; loop for height
+	ex	de, hl
+	ld	iy, 0
+	add	iy, de			; save hl
+	ld	bc, 0
+.amount := $-3
+	add	hl, bc			; get next draw location
+	ex	de, hl
+	pop	hl
+	dec	ixl			; loop width scale
+	jr	nz, .loopwidth
+	lea	hl, iy			; restore hl
+	dec	ixh			; loop width
+	jr	nz, .loop
+	pop	ix			; restore ix sp
+	ret
 
 ;-------------------------------------------------------------------------------
 gfy_TransparentSprite:
@@ -6785,6 +6971,7 @@ __set_bc_and_mul_hl_by_240:
 	ld	bc, 240
 	ret
 
+if 0
 _memset:
 	ld	iy, 0
 	add	iy, sp
@@ -6802,6 +6989,7 @@ _memset:
 	dec	de
 	lddr
 	ret
+end if
 
 ;-------------------------------------------------------------------------------
 ; graphy.c.src
