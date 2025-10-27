@@ -1782,7 +1782,10 @@ gfy_sprite_t *gfy_GetSprite(gfy_sprite_t *sprite_buffer, int24_t x, int24_t y) {
 
 #endif
 
-/* gfy_ScaledSprite_NoClip */
+
+/* gfy_ScaledSprite_NoClip (graphy.asm) */
+
+#if 0
 
 void gfy_ScaledSprite_NoClip(
     const gfy_sprite_t *sprite,
@@ -1827,7 +1830,11 @@ void gfy_ScaledSprite_NoClip(
     }
 }
 
-/* gfy_ScaledTransparentSprite_NoClip */
+#endif
+
+/* gfy_ScaledTransparentSprite_NoClip (graphy.asm) */
+
+#if 0
 
 void gfy_ScaledTransparentSprite_NoClip(
     const gfy_sprite_t *sprite,
@@ -1863,6 +1870,8 @@ void gfy_ScaledTransparentSprite_NoClip(
         src_buf += sprite->height;
     }
 }
+
+#endif
 
 /* gfy_FlipSpriteY (graphy.asm) */
 
