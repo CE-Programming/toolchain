@@ -4,7 +4,18 @@
 
 #include <__eastl_config>
 #include <EASTL/string_view.h>
+#include <__char_traits>
 
 #pragma clang system_header
+
+namespace std {
+
+template<
+    typename CharT,
+    typename Traits = std::char_traits<CharT>
+>
+using basic_string_view = eastl::basic_string_view<CharT>;
+
+} // namespace std
 
 #endif // _EZCXX_STRING_VIEW
