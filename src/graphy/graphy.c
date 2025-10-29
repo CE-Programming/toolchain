@@ -2708,7 +2708,16 @@ void gfy_RLETSprite(const gfy_rletsprite_t *__restrict sprite, const int24_t x, 
 
             const uint8_t len = *src_buf++;
 
-            for(uint8_t r = 0; r < len; r++) {
+            // we can use a fast memcpy if no clipping is needed
+            if (y + posY >= minY && y + posY + len <= maxY) {
+                memcpy(dst_buf, src_buf, len);
+                dst_buf += len;
+                src_buf += len;
+                posY += len;
+                continue;
+            }
+
+            for (uint8_t r = 0; r < len; r++) {
                 if (
                     y + posY >= minY &&
                     y + posY < maxY
@@ -2749,7 +2758,7 @@ void gfy_RLETSprite_NoClip(const gfy_rletsprite_t *sprite, const uint24_t x, con
 
             const uint8_t len = *src_buf++;
             posY += len;
-            for(uint8_t r = 0; r < len; r++) {
+            for (uint8_t r = 0; r < len; r++) {
                 *dst_buf++ = *src_buf++;
             }
         }
