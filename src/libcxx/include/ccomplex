@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CCOMPLEX
+#define _EZCXX_CCOMPLEX
+
+#include <complex>
+
+#pragma clang system_header
+
+#endif // _EZCXX_CCOMPLEX

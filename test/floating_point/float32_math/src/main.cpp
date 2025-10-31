@@ -11,6 +11,7 @@
 #include <bit>
 #include <cmath>
 #include <numbers>
+#include <complex>
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
@@ -40,7 +41,7 @@ static bool test_result(float guess, float truth) {
 #define TEST(guess, truth) if (test_result(guess, truth)) { return __LINE__; }
 
 static int run_test(void) {
-    
+
     TEST(std::exp   (    6.3f),  544.5719101259290330593886677332f);
     TEST(std::exp   (   -4.2f),  0.014995576820477706211984360229f);
     TEST(std::log   ( 1.0e-6f), -13.81551055796427410410794872811f);
@@ -90,6 +91,14 @@ static int run_test(void) {
     TEST(std::tgamma(   -2.3f), -1.447107394255917263858607780549f);
 
     TEST(std::hypot(1.23f, 4.56f, 7.89f), 9.195575022803087326242198470012610630662f);
+
+    using namespace std::complex_literals;
+    std::complex<double> z1 = 1.0 + 2i;
+    std::complex<double> z2 = 3.0 - 4.0i;
+    std::complex<double> z3 = std::conj(z1 * z2);
+    if (!(std::real(z3) == 11.0 && std::imag(z3) == -2.0)) {
+        return __LINE__;
+    }
 
     /* passed all */
     return 0;
