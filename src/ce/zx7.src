@@ -22,52 +22,87 @@ dzx7t_copy_byte_loop:
 	ldi					; copy literal byte
 dzx7t_main_loop:
 	add	a, a				; check next bit
-	call	z, dzx7t_load_bits		; no more bits left?
+	jr	nz, dzx7t_copy_byte_has_bits
+	; dzx7t_load_bits
+	ld	a, (hl)
+	inc	hl
+	rla
+dzx7t_copy_byte_has_bits:
 	jr	nc, dzx7t_copy_byte_loop	; next bit indicates either literal or sequence
 
 	; determine number of bits used for length (Elias gamma coding)
 
 	push	de
-	ld	de, 0
+	ld	de, $FF00
 	ld	bc, 1
 dzx7t_len_size_loop:
-	inc	d
 	add	a, a				; check next bit
-	call	z, dzx7t_load_bits		; no more bits left?
+	jr	nz, dzx7t_len_size_has_bits
+	; dzx7t_load_bits
+	ld	a, (hl)
+	inc	hl
+	rla
+dzx7t_len_size_has_bits:
+	inc	d
 	jr	nc, dzx7t_len_size_loop
-	jr	dzx7t_len_value_start
+	jr	z, dzx7t_len_value_start
 
 	; determine length
 
 dzx7t_len_value_loop:
 	add	a, a				; check next bit
-	call	z, dzx7t_load_bits		; no more bits left?
+	jr	nz, dzx7t_len_value_has_bits
+	; dzx7t_load_bits
+	ld	a, (hl)
+	inc	hl
+	rla
+dzx7t_len_value_has_bits:
 	rl	c
 	rl	b
 	jr	c, dzx7t_exit			; check end marker
-dzx7t_len_value_start:
 	dec	d
 	jr	nz, dzx7t_len_value_loop
+	scf
+dzx7t_len_value_start:
 	inc	bc				; adjust length
 
 	; determine offset
 
 	ld	e, (hl)				; load offset flag (1 bit) + offset value (7 bits)
 	inc	hl
-	sla	e
-	inc	e
+	rl	e				; sll e since carry is set
 	jr	nc, dzx7t_offset_end		; if offset flag is set, load 4 extra bits
 	add	a, a				; check next bit
-	call	z, dzx7t_load_bits		; no more bits left?
+	jr	nz, dzx7t_has_bits_1
+	; dzx7t_load_bits
+	ld	a, (hl)
+	inc	hl
+	rla
+dzx7t_has_bits_1:
 	rl	d				; insert first bit into D
 	add	a, a				; check next bit
-	call	z, dzx7t_load_bits		; no more bits left?
+	jr	nz, dzx7t_has_bits_2
+	; dzx7t_load_bits
+	ld	a, (hl)
+	inc	hl
+	rla
+dzx7t_has_bits_2:
 	rl	d				; insert second bit into D
 	add	a, a				; check next bit
-	call	z, dzx7t_load_bits		; no more bits left?
+	jr	nz, dzx7t_has_bits_3
+	; dzx7t_load_bits
+	ld	a, (hl)
+	inc	hl
+	rla
+dzx7t_has_bits_3:
 	rl	d				; insert third bit into D
 	add	a, a				; check next bit
-	call	z, dzx7t_load_bits		; no more bits left?
+	jr	nz, dzx7t_has_bits_4
+	; dzx7t_load_bits
+	ld	a, (hl)
+	inc	hl
+	rla
+dzx7t_has_bits_4:
 	ccf
 	jr	c, dzx7t_offset_end
 	inc	d				; equivalent to adding 128 to DE
@@ -85,8 +120,8 @@ dzx7t_exit:
 	pop	hl				; restore source address (compressed data)
 	jr	nc, dzx7t_main_loop
 
-dzx7t_load_bits:
-	ld	a, (hl)				; load another group of 8 bits
-	inc	hl
-	rla
+; dzx7t_load_bits:
+; 	ld	a, (hl)				; load another group of 8 bits
+; 	inc	hl
+; 	rla
 	ret
