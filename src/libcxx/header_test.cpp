@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <bit>
 #include <cassert>
+#include <ccomplex>
 #include <cctype>
 #include <cerrno>
 #include <cfenv>
@@ -10,6 +11,7 @@
 #include <ciso646>
 #include <climits>
 #include <cmath>
+#include <complex>
 #if __cplusplus >= 201907L
 #include <concepts>
 #endif // __cplusplus >= 201907L
@@ -45,6 +47,7 @@
 #include <assert.h>
 #include <byteswap.h>
 #include <cdefs.h>
+#include <complex.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fenv.h>

@@ -11,6 +11,7 @@
 #include <bit>
 #include <cmath>
 #include <numbers>
+#include <complex>
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
@@ -40,17 +41,17 @@ static bool test_result(long double guess, long double truth) {
 #define TEST(guess, truth) if (test_result(guess, truth)) { return __LINE__; }
 
 static int run_test(void) {
-    
+
     TEST(std::exp   (    6.3L),  544.5719101259290330593886677332L);
     TEST(std::exp   (   -4.2L),  0.014995576820477706211984360229L);
     TEST(std::log   ( 1.0e-6L), -13.81551055796427410410794872811L);
     TEST(std::log   ( 3.0e+8L),  19.51929303262047516353917687440L);
- 
+
     TEST(std::expm1 (    0.2L),  0.221402758160169833921071994640L);
     TEST(std::expm1 (-1.0e-8L), -9.999999950000000166666666250e-9L);
     TEST(std::log1p (   -0.2L), -0.223143551314209755766295090310L);
     TEST(std::log1p ( 1.0e-8L),  9.999999950000000333333330833e-9L);
-   
+
     TEST(std::sin   (    1.0L),  0.841470984807896506652502321630L);
     TEST(std::sin   (   -0.6L), -0.564642473395035357200945445659L);
     TEST(std::cos   (    1.5L),  0.070737201667702910088189851434L);
@@ -90,6 +91,14 @@ static int run_test(void) {
     TEST(std::tgamma(   -2.3L), -1.447107394255917263858607780549L);
 
     TEST(std::hypot(1.23L, 4.56L, 7.89L), 9.195575022803087326242198470012610630662L);
+
+    using namespace std::complex_literals;
+    std::complex<long double> z1 = 1.0L + 2il;
+    std::complex<long double> z2 = 3.0L - 4.0il;
+    std::complex<long double> z3 = std::conj(z1 * z2);
+    if (!(std::real(z3) == 11.0L && std::imag(z3) == -2.0L)) {
+        return __LINE__;
+    }
 
     /* passed all */
     return 0;

@@ -14,5 +14,6 @@
 #define _EZCXX_NODEBUG __attribute__((__nodebug__))
 #define _EZCXX_TEMPLATE_VIS __attribute__ ((__type_visibility__("default")))
 #define _EZCXX_LIFETIMEBOUND [[_Clang::__lifetimebound__]]
+#define _EZCXX_INLINE_VISIBILITY _EZCXX_HIDE_FROM_ABI
 
 #endif // _EZCXX_CONFIG

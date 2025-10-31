@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 
 #include <cmath>
+#include <complex>
 
 #else /* __cplusplus */
 

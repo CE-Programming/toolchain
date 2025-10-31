@@ -1,13 +1,17 @@
 #ifndef _COMPLEX_H
 #define _COMPLEX_H
 
+#ifdef __cplusplus
+
+#include <complex>
+
+#else /* __cplusplus */
+
 #ifndef __FAST_MATH__
 #warning "-ffast-math is required for complex multiplication and division to work properly at this time"
 #endif
 
-#ifndef __cplusplus
 #define complex _Complex
-#endif
 
 #ifdef _Imaginary
 #define imaginary _Imaginary
@@ -120,5 +124,7 @@ long double _Complex cacoshl(long double _Complex);
 double _Complex catanh(double _Complex);
 float _Complex catanhf(float _Complex);
 long double _Complex catanhl(long double _Complex);
+
+#endif /* __cplusplus */
 
 #endif /* _COMPLEX_H */
