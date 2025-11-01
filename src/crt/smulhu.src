@@ -1,0 +1,36 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__smulhu
+
+; HL = ((uint32_t)HL * (uint32_t)BC) >> 16
+__smulhu:
+; CC: 32 bytes
+; ADL = 1: 33F + 12R + 9W + 17
+; ADL = 0: 33F +  8R + 6W + 17
+	push	af
+	push	de
+	push	bc
+	ld	d, l
+	ld	e, c
+	mlt	de	; L * C
+	ld	a, d
+	ld	d, l
+	ld	e, b
+	mlt	de	; L * B
+	ld	l, b
+	ld	b, h
+	mlt	bc	; H * C
+	mlt	hl	; H * B
+	add	a, c
+	ld	c, b
+	ld	b, 0
+	adc	hl, bc
+	add	a, e
+	ld	c, d
+	adc	hl, bc	; result is [0, $FFFE]
+	pop	bc
+	pop	de
+	pop	af
+	ret

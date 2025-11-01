@@ -1,0 +1,41 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__imulhs
+
+; UHL = ((int48_t)UHL * (int48_t)UBC) >> 24
+__imulhs:
+	push	af
+	push	bc
+	push	hl
+
+	push	hl
+	add	hl, hl
+	rla
+	ld	hl, $800000
+	add	hl, bc
+	rla
+	pop	hl
+
+	call	__imulhu
+
+	; if (UBC < 0) { result -= UHL; }
+	pop	bc
+	cpl
+	rra
+	jr	c, .positive_bc
+	sbc	hl, bc
+.positive_bc:
+
+	; if (UHL < 0) { result -= UBC; }
+	pop	bc
+	rra
+	jr	c, .positive_hl
+	sbc	hl, bc
+.positive_hl:
+
+	pop	af
+	ret
+
+	extern	__imulhu

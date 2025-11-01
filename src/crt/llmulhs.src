@@ -1,0 +1,36 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__llmulhs
+
+; BC:UDE:UHL = ((int128_t)BC:UDE:UHL * (int128_t)(SP64)) >> 64
+__llmulhs:
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+
+	push	bc, de, hl
+
+	ld	hl, (iy + 6)
+	ld	de, (iy + 9)
+	ld	bc, (iy + 12)
+
+	; argument order can be swapped since multiplication is commutative
+	call	__llmulhu
+
+	; if ((SP64) < 0) { result -= BC:UDE:UHL; }
+	bit	7, (iy + 13)
+	call	nz, __llsub
+
+	; if (BC:UDE:UHL < 0) { result -= (SP64); }
+	bit	7, (iy - 2)
+
+	ld	sp, iy
+
+	pop	iy
+	ret	z
+	jp	__llsub
+
+	extern	__llmulhu
+	extern	__llsub
