@@ -90,11 +90,26 @@ _CRT_lmulu_b_fast:
 	ld	a, (iy + 9)
 	jp	__lmulu_b_fast
 
+	public	_CRT_llmulu_b
+_CRT_llmulu_b:
+	ld	iy, 0
+	add	iy, sp
+	ld	l, (iy + 12)
+	push	hl
+	ld	hl, (iy + 3)
+	ld	de, (iy + 6)
+	ld	bc, (iy + 9)
+	call	__llmulu_b
+	ld	sp, iy
+	ret
+
 	extern	__smulu_b
 	extern	__smulu_b_fast
-	
+
 	extern	__imulu_b
 	extern	__imulu_b_fast
 
 	extern	__lmulu_b
 	extern	__lmulu_b_fast
+
+	extern	__llmulu_b
