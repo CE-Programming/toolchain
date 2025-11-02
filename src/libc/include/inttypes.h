@@ -177,21 +177,21 @@ typedef struct {
 
 __BEGIN_DECLS
 
-extern intmax_t imaxabs(intmax_t __n) __NOEXCEPT_CONST;
+intmax_t imaxabs(intmax_t __n) __NOEXCEPT_CONST;
 
-extern imaxdiv_t imaxdiv(intmax_t __numer, intmax_t __denom) __NOEXCEPT_CONST;
+imaxdiv_t imaxdiv(intmax_t __numer, intmax_t __denom) __NOEXCEPT_CONST;
 
-intmax_t strtoimax(
-    const char *__restrict nptr,
-    char **__restrict endptr,
-    int base
-) __attribute__((nonnull(1)));
+intmax_t strtoimax(const char *__restrict nptr, char **__restrict endptr, int base)
+    __attribute__((nonnull(1)));
 
-uintmax_t strtoumax(
-    const char *__restrict nptr,
-    char **__restrict endptr,
-    int base
-) __attribute__((nonnull(1)));
+uintmax_t strtoumax(const char *__restrict nptr, char **__restrict endptr, int base)
+    __attribute__((nonnull(1)));
+
+intmax_t wcstoimax(const wchar_t *__restrict nptr, wchar_t **__restrict endptr, int base)
+    __attribute__((nonnull(1)));
+
+uintmax_t wcstoumax(const wchar_t *__restrict nptr, wchar_t **__restrict endptr, int base)
+    __attribute__((nonnull(1)));
 
 __END_DECLS
 
