@@ -45,6 +45,14 @@
 #define NO_ERR 0
 
 //------------------------------------------------------------------------------
+// Internal functions
+//------------------------------------------------------------------------------
+
+int __strtoi(const char *__restrict nptr, char **__restrict endptr, int base) __attribute__((nonnull(1)));
+
+unsigned int __strtoui(const char *__restrict nptr, char **__restrict endptr, int base) __attribute__((nonnull(1)));
+
+//------------------------------------------------------------------------------
 // Char to digit
 //------------------------------------------------------------------------------
 
@@ -97,6 +105,14 @@ long long atoint_atol(const char* nptr) {
 
 long long atoint_atoll(const char* nptr) {
     return (long long)atoll(nptr);
+}
+
+long long atoint_strtoi(const char* nptr) {
+    return (long long)__strtoi(nptr, NULL, 10);
+}
+
+long long atoint_strtoui(const char* nptr) {
+    return (long long)((int)__strtoui(nptr, NULL, 10));
 }
 
 long long atoint_strtol(const char* nptr) {
@@ -159,6 +175,14 @@ int atoint_test(atoint_func const func) {
 //------------------------------------------------------------------------------
 
 typedef long long (*strtoint_func)(const char* nptr, char** endptr, int base);
+
+long long strtoint_strtoi(const char* nptr, char** endptr, int base) {
+    return (long long)__strtoi(nptr, endptr, base);
+}
+
+long long strtoint_strtoui(const char* nptr, char** endptr, int base) {
+    return (long long)((int)__strtoui(nptr, endptr, base));
+}
 
 long long strtoint_strtol(const char* nptr, char** endptr, int base) {
     return (long long)strtol(nptr, endptr, base);
@@ -315,6 +339,68 @@ int test_atoll(void) {
     return 0;
 }
 
+int test_strtoi(void) {
+    strtoint_func func = strtoint_strtoi;
+
+    C(strtoint_verify( INT_MIN, "-8388608", 8, func, 10, NO_ERR));
+    C(strtoint_verify( INT_MAX, "8388608" , 7, func, 10, ERANGE));
+    C(strtoint_verify( INT_MAX, "8388607" , 7, func, 10, NO_ERR));
+    C(strtoint_verify( INT_MAX, "+8388607", 8, func, 10, NO_ERR));
+    C(strtoint_verify(-INT_MAX, "-8388607", 8, func, 10, NO_ERR));
+
+    C(strtoint_verify( INT_MIN, "-16777216", 9, func, 10, ERANGE));
+    C(strtoint_verify( INT_MAX, "16777216" , 8, func, 10, ERANGE));
+    C(strtoint_verify( INT_MAX, "16777215" , 8, func, 10, ERANGE));
+    C(strtoint_verify( INT_MAX, "+16777215", 9, func, 10, ERANGE));
+    C(strtoint_verify( INT_MIN, "-16777215", 9, func, 10, ERANGE));
+
+    C(strtoint_verify( INT_MIN, "-100000000000000000000000", 25, func, 2, NO_ERR));
+    C(strtoint_verify( INT_MAX, " 100000000000000000000000", 25, func, 2, ERANGE));
+    C(strtoint_verify( INT_MAX, "0b11111111111111111111111", 25, func, 0, NO_ERR));
+    C(strtoint_verify(-INT_MAX, " -11111111111111111111111", 25, func, 2, NO_ERR));
+
+    C(strtoint_verify( INT_MIN, "-1000000000000000000000000", 26, func, 2, ERANGE));
+    C(strtoint_verify( INT_MAX, " 1000000000000000000000000", 26, func, 2, ERANGE));
+    C(strtoint_verify( INT_MAX, "0b111111111111111111111111", 26, func, 0, ERANGE));
+    C(strtoint_verify( INT_MIN, " -111111111111111111111111", 26, func, 2, ERANGE));
+
+    C(strtoint_verify( INT_MIN, "-1qaz2WSX3edc4RFV5tgb", 21, func, 36, ERANGE));
+    C(strtoint_verify( INT_MAX, "+1qaz2WSX3edc4RFV5tgb", 21, func, 36, ERANGE));
+
+    return 0;
+}
+
+int test_strtoui(void) {
+    strtoint_func func = strtoint_strtoui;
+
+    C(strtoint_verify( INT_MIN, "-8388608", 8, func, 10, NO_ERR));
+    C(strtoint_verify( INT_MIN, "8388608" , 7, func, 10, NO_ERR));
+    C(strtoint_verify( INT_MAX, "8388607" , 7, func, 10, NO_ERR));
+    C(strtoint_verify( INT_MAX, "+8388607", 8, func, 10, NO_ERR));
+    C(strtoint_verify(-INT_MAX, "-8388607", 8, func, 10, NO_ERR));
+
+    C(strtoint_verify(       -1, "-16777216", 9, func, 10, ERANGE));
+    C(strtoint_verify(       -1, "16777216" , 8, func, 10, ERANGE));
+    C(strtoint_verify(       -1, "16777215" , 8, func, 10, NO_ERR));
+    C(strtoint_verify(       -1, "+16777215", 9, func, 10, NO_ERR));
+    C(strtoint_verify(        1, "-16777215", 9, func, 10, NO_ERR));
+
+    C(strtoint_verify( INT_MIN, "-100000000000000000000000", 25, func, 2, NO_ERR));
+    C(strtoint_verify( INT_MIN, " 100000000000000000000000", 25, func, 2, NO_ERR));
+    C(strtoint_verify( INT_MAX, "0b11111111111111111111111", 25, func, 0, NO_ERR));
+    C(strtoint_verify(-INT_MAX, " -11111111111111111111111", 25, func, 2, NO_ERR));
+
+    C(strtoint_verify(       -1, "-1000000000000000000000000", 26, func, 2, ERANGE));
+    C(strtoint_verify(       -1, " 1000000000000000000000000", 26, func, 2, ERANGE));
+    C(strtoint_verify(       -1, "0b111111111111111111111111", 26, func, 0, NO_ERR));
+    C(strtoint_verify(        1, " -111111111111111111111111", 26, func, 2, NO_ERR));
+
+    C(strtoint_verify(       -1, "-1qaz2WSX3edc4RFV5tgb", 21, func, 36, ERANGE));
+    C(strtoint_verify(       -1, "+1qaz2WSX3edc4RFV5tgb", 21, func, 36, ERANGE));
+
+    return 0;
+}
+
 int test_strtol(void) {
     strtoint_func func = strtoint_strtol;
 
@@ -450,12 +536,16 @@ int run_tests(void) {
     TEST_NAME(atoint_test(atoint_atoi    ), "atoi"    );
     TEST_NAME(atoint_test(atoint_atol    ), "atol"    );
     TEST_NAME(atoint_test(atoint_atoll   ), "atoll"   );
+    TEST_NAME(atoint_test(atoint_strtoi  ), "strtoi"  );
+    TEST_NAME(atoint_test(atoint_strtoui ), "strtoui" );
     TEST_NAME(atoint_test(atoint_strtol  ), "strtol"  );
     TEST_NAME(atoint_test(atoint_strtoul ), "strtoul" );
     TEST_NAME(atoint_test(atoint_strtoll ), "strtoll" );
     TEST_NAME(atoint_test(atoint_strtoull), "strtoull");
 
     /* basic tests of strto* routines */
+    TEST_NAME(strtoint_test(strtoint_strtol  ), "strtoi"  );
+    TEST_NAME(strtoint_test(strtoint_strtoul ), "strtoui" );
     TEST_NAME(strtoint_test(strtoint_strtol  ), "strtol"  );
     TEST_NAME(strtoint_test(strtoint_strtoul ), "strtoul" );
     TEST_NAME(strtoint_test(strtoint_strtoll ), "strtoll" );
@@ -466,6 +556,8 @@ int run_tests(void) {
     TEST(test_atol());
     TEST(test_atoll());
     TEST(test_strtol());
+    TEST(test_strtoi());
+    TEST(test_strtoui());
     TEST(test_strtoul());
     TEST(test_strtoll());
     TEST(test_strtoull());

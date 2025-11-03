@@ -4,6 +4,41 @@
 
 	section	.text
 
+	public	___strtoi
+
+___strtoi:
+	; Similar to strtol, except that it will raise ERANGE and return INT_MIN/INT_MAX when out of range
+	call	__strtol_common
+	; overflow occured if B is non-zero
+	djnz	.out_of_range
+	inc	e
+	dec	e
+	jr	nz, .out_of_range
+	ld	b, a
+	inc	b
+	ex	de, hl
+	sbc	hl, hl
+	djnz	.positive
+	sbc	hl, de
+	ret	m		; INT_MIN <= x < 0
+	; no underflow if x is zero
+	jr	nz, .out_of_range
+.positive:
+	adc	hl, de
+	ret	p		; 0 <= x <= INT_MAX
+.out_of_range:
+	or	a, a		; test sign (Z = negative)
+	ld	hl, 5		; ERANGE
+	ld	(_errno), hl
+	ld	hl, $7FFFFF	; overflow
+	ret	nz
+	inc	hl		; underflow
+	ret
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
 	public	_strtol
 
 _strtol:
@@ -45,22 +80,43 @@ _strtol:
 
 	section	.text
 
-	public	_strtoul
+	public	___strtoui
 
-_strtoul:
+___strtoui:
+	; Similar to strtoul, except that it will raise ERANGE and return UINT_MAX when out of range
 	call	__strtol_common
 	; overflow occured if B is non-zero
-	djnz	.out_of_range
-	ret	nz
-	jp	__lneg
+	djnz	_strtoul.out_of_range
+	call	z, __ineg
+	inc	e
+	dec	e
+	ret	z
 
-.out_of_range:
+	require	_strtoul.out_of_range
+
+;-------------------------------------------------------------------------------
+
+	section	.text
+
+	private	_strtoul.out_of_range
+_strtoul.out_of_range:
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
 	dec	hl
 	ld	e, l
 	ret
+
+	section	.text
+
+	public	_strtoul
+
+_strtoul:
+	call	__strtol_common
+	; overflow occured if B is non-zero
+	djnz	_strtoul.out_of_range
+	ret	nz
+	jp	__lneg
 
 ;-------------------------------------------------------------------------------
 
@@ -274,5 +330,6 @@ __strtol_common:
 	ret
 
 	extern	_errno
+	extern	__ineg
 	extern	__lneg
 	extern	__lmulu_b
