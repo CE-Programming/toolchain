@@ -80,6 +80,15 @@ _strtoull:
 
 	private	__strtoll_common
 
+__strtoll_common.invalid_base:
+	xor	a, a
+	ld	c, a
+	; Setting C (base) to zero ensures that cp a, c will never set carry.
+	; forcing the function to return.
+	push	af
+	; sets BC:UDE:UHL to zero
+	jr	__strtoll_common.invalid_base_hijack
+
 __strtoll_common:
 	; output: BC:UDE:UHL
 	; NC = no overflow for strtoull
@@ -93,9 +102,8 @@ __strtoll_common:
 
 	ld	bc, (ix + 15)	; base
 	add	hl, bc
-	jr	c, .invalid_base
+	jr	c, __strtoll_common.invalid_base
 	; UBC is zero here
-	ld	b, c		; store the base in B to allow for djnz hax
 	ld	hl, (ix + 9)	; nptr
 ;-------------------------------------------------------------------------------
 ; consume whitespace (inlinsed isspace)
@@ -122,7 +130,7 @@ __strtoll_common:
 	; A = 0, (HL) = start of number
 ;-------------------------------------------------------------------------------
 ; update the base if needed
-	or	a, b		; base
+	or	a, c		; base
 	jr	z, .auto_base
 	xor	a, 16
 	jr	z, .hex_base
@@ -131,7 +139,7 @@ __strtoll_common:
 .auto_base:	; test for 0* 0x* 0X* 0b* 0B*
 .bin_base:	; test for 0x* 0X*
 .hex_base:	; test for 0b* 0B*
-	inc	b		; djnz hax
+	inc	c
 	ld	a, (hl)
 	xor	a, '0'
 	jr	nz, .maybe_decimal
@@ -143,34 +151,36 @@ __strtoll_common:
 	xor	a, 'B' xor 'X'
 	jr	z, .maybe_bin
 	dec	hl
-	djnz	.other_base
-	ld	b, 8		; octal
+	dec	c
+	jr	nz, .other_base
+	ld	c, 8		; octal
 	jr	.save_new_base
 
 .maybe_bin:
-	bit	4, b
+	bit	4, c
 	jr	nz, .undo_inc	; hexadecimal
 	; base is 0 or 2
 	inc	hl
-	ld	b, 2
+	ld	c, 2
 	jr	.save_new_base
 
 .maybe_hex:
-	bit	1, b
+	bit	1, c
 	jr	nz, .undo_inc	; binary
 	; base is 0 or 16
 	inc	hl
-	ld	b, 16
+	ld	c, 16
 	jr	.save_new_base
 
 .undo_inc:
 	dec	hl
-	; dec	b
+	; dec	c
 	; jr	.other_base
 .maybe_decimal:
 	; set to decimal if base is not zero
-	djnz	.other_base
-	ld	b, 10		; decimal
+	dec	c
+	jr	nz, .other_base
+	ld	c, 10		; decimal
 .save_new_base:
 ;-------------------------------------------------------------------------------
 .other_base:
@@ -180,12 +190,10 @@ __strtoll_common:
 .invalid_base_hijack:
 	; or	a, a		; carry is cleared here
 	sbc	hl, hl
-	ex	de, hl
-	sbc	hl, hl
-	ld	c, l
 	; A = first digit of the number
-	; BC:UDE:UHL = 0
-	; (ix - 1) = base
+	; HL = 0
+	; B = 0
+	; C = base
 	; (ix - 2) = (first-non-whitespace) XOR '-'
 	; 6, (ix - 3) = Z if result should be negative, NZ for positive
 	; 0, (ix - 3) = overflow bit
@@ -203,37 +211,95 @@ __strtoll_common:
 	add	a, 10
 .check_digit:
 	; End the loop when the digit is out of range for the base
-	cp	a, b
-	ld	(ix - 1), b	; store base
-	ld	b, l		; now BC:UDE:UHL is zero
+	cp	a, c
+	push	hl	; (ix - 6) = $000000
+	push	hl	; (ix - 9) = $000000
 	jr	c, .loop
 ;-------------------------------------------------------------------------------
 ; no digit found or invalid base
 	; set *endptr to nptr and return 0
 	ld	iy, (ix + 9)	; nptr
 	jr	.write_endptr
-.invalid_base:
-	xor	a, a
-	ld	b, a
-	; Setting B (base) to zero ensures that cp a, b will never set carry.
-	; forcing the function to return.
-	push	af
-	; sets BC:UDE:UHL to zero
-	jr	.invalid_base_hijack
+
 ;-------------------------------------------------------------------------------
 ; CC per non-decimal digit:
-; minimum      : 100F + 20R + 18W + 35
-; low average  : 102F + 20R + 18W + 36
-; high average : 112F + 20R + 18W + 37	; an over-estimate of the average CC
-; maximum      : 127F + 20R + 18W + 40
-; overflow max : 133F + 24R + 22W + 42
+; no overflow : 109F + 10R +  9W + 33
+; overflow    : 117F + 11R + 10W + 35
 .check_decimal:
-	cp	a, (ix - 1)
+	cp	a, c
 	jr	nc, .end_loop
 .loop:
-	call	__llmul_add_b_overflow
+.__llmul_add_b_overflow:
+; value = (value * C) + A
+; bit 0, (ix - 3) is set if overflow has occured
+	; (ix - 6) --> HL
+	; (ix - 9) --> DE
+	; HL --> BC
+	push	hl		; (ix - 12)
+	ld	h, c
+	ld	l, (ix - 6)	; L
+	mlt	hl
+
+	; (255 * 255) + 255 < 65535 so no 16bit carry can occur
+	add	a, l
+	ld	(ix - 6), a	; L
+	ld	d, c
+	ld	e, (ix - 5)	; H
+	mlt	de
+	ld	l, h
+	ld	h, b		; B is guaranteed to be zero if overflow has not occured
+	adc	hl, de		; handles carry from adding A
+	xor	a, a
+
+	ld	(ix - 5), l	; H
+	ld	d, c
+	ld	e, (ix - 4)	; UHL
+	mlt	de
+	ld	l, h
+	ld	h, a
+	add	hl, de
+	ld	(ix - 4), l	; UHL
+	ld	d, c
+	ld	e, (ix - 9)	 ; E
+	mlt	de
+	ld	l, h
+	ld	h, a
+	add	hl, de
+	ld	(ix - 9), l	; E
+	ld	d, c
+	ld	e, (ix - 8)	; D
+	mlt	de
+	ld	l, h
+	ld	h, a
+	add	hl, de
+	ld	(ix - 8), l	; D
+	ld	d, c
+	ld	e, (ix - 7)	; UDE
+	mlt	de
+	ld	l, h
+	ld	h, a
+	add	hl, de
+	ld	(ix - 7), l	; UDE
+
+	pop	de
+	ld	l, h
+	ld	b, d
+	ld	d, c		; D = base
+	mlt	bc
+	ld	h, c
+	ld	c, d		; C = base
+	mlt	de
+
+	add.s	hl, de
+	sbc	a, b		; set carry if B is non-zero or if there was carry previously
+	jr	c, .set_overflow_bit
 .next_digit:
-	; IY = str, BC:UDE:UHL = accumulator, 0, (ix - 3) = overflow bit
+	; (ix - 6) --> HL
+	; (ix - 9) --> DE
+	; HL --> BC
+	; C = base
+	; IY = str
+	; 0, (ix - 3) = overflow bit
 	inc	iy
 	; Convert a numerical digit
 	ld	a, (iy)
@@ -245,12 +311,13 @@ __strtoll_common:
 	res	5, a
 	add	a, 10
 	; End the loop when the digit is out of range for the base
-	cp	a, (ix - 1)
+	cp	a, c
 	jr	c, .loop
 .end_loop:
 ;-------------------------------------------------------------------------------
 .write_endptr:
-	push	hl
+	ld	c, l
+	ld	b, h
 	ld	hl, (ix + 12)	; endptr
 	add	hl, de
 	or	a, a
@@ -258,90 +325,18 @@ __strtoll_common:
 	jr	z, .endptr_null
 	ld	(hl), iy
 .endptr_null:
+	pop	de
 	pop	hl
 	pop	af		; overflow and sign flags
 	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
-
-	private	__llmul_add_b_overflow
-__llmul_add_b_overflow:
-; BC:UDE:UHL = (BC:UDE:UHL * (ix - 1)) + A
-; bit 0, (ix - 3) is set if overflow has occured
-.__llmulu_b_overflow:
-; inlined/modified __llmulu_b
-; CC no overflow  : 69F + 16R + 15W + 33
-; CC overflow max : 73F + 17R + 16W + 34
-	push	hl		; (ix - 9)
-	push	de		; (ix - 12)
-	push	bc		; (ix - 15)
-	ld	b, (ix - 1)
-	ld	c, e		; ld c, (ix - 12)
-	ld	e, h		; ld e, (ix - 8)
-	ld	h, b
-	mlt	hl
-
-	; (255 * 255) + 255 < 65535 so no 16bit carry can occur
-	add	a, l
-	ld	(ix - 9), a	; L
-	ld	d, b
-	; ld	e, (ix - 8)	; H
-	mlt	de
-	ld	l, h
-	ld	h, 0
-	adc	hl, de		; handles carry from adding A
-	xor	a, a
-
-	ld	(ix - 8), l	; H
-	ld	d, b
-	ld	e, (ix - 7)	; UHL
-	mlt	de
-	ld	l, h
-	ld	h, a
-	add	hl, de
-	ld	(ix - 7), l	; UHL
-	ld	d, b
-	ld	e, c		; ld e, (ix - 12) ; E
-	mlt	de
-	ld	l, h
-	ld	h, a
-	add	hl, de
-	ld	(ix - 12), l	; E
-	ld	d, b
-	ld	e, (ix - 11)	; D
-	mlt	de
-	ld	l, h
-	ld	h, a
-	add	hl, de
-	ld	(ix - 11), l	; D
-	ld	d, b
-	ld	e, (ix - 10)	; UDE
-	mlt	de
-	ld	l, h
-	ld	h, a
-	add	hl, de
-	ld	(ix - 10), l	; UDE
-
-	pop	de
-	ld	l, h
-	ld	c, d
-	ld	d, b
-	mlt	bc
-	ld	h, c
-	mlt	de
-
-	add.s	hl, de
-	pop	de
-	jr	c, .set_overflow_bit
-	sub	a, b		; set carry if B is non-zero
-	ld	b, h
-	ld	c, l
 .set_overflow_bit:
-	pop	hl
-	ret	nc
 	set	0, (ix - 3)	; set carry
-	ret
+	jr	.next_digit
+
+;-------------------------------------------------------------------------------
 
 	extern	_errno
 	extern	__llneg
