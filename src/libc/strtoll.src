@@ -32,16 +32,19 @@ _strtoll:
 .out_of_range:
 .overflow:
 	ld	b, $80
-	ld	de, 0
-	ld	c, e
 	ld	hl, 5		; ERANGE
+	ld	c, h
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
+	push	hl
+	pop	de
+	; BC:UDE:UHL = LLONG_MIN
 	ret	z		; underflow
 	; overflow
-	dec	bc
 	dec	hl
 	dec	de
+	dec	bc
+	; BC:UDE:UHL = LLONG_MAX
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -60,14 +63,15 @@ _strtoull:
 	jp	__llneg
 
 .out_of_range:
-	sbc	hl, hl
-	ex	de, hl
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
-	ld	l, h
+	ld	l, h		; ld hl, 0
 	dec	hl
-	ld	b, e
-	ld	c, e
+	push	hl
+	pop	de
+	ld	b, l
+	ld	c, l
+	; BC:UDE:UHL = ULLONG_MAX
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -214,7 +218,7 @@ __strtoll_common:
 	; Setting B (base) to zero ensures that cp a, b will never set carry.
 	; forcing the function to return.
 	push	af
-	; sets E:UHL to zero
+	; sets BC:UDE:UHL to zero
 	jr	.invalid_base_hijack
 ;-------------------------------------------------------------------------------
 ; CC per non-decimal digit:
@@ -222,7 +226,7 @@ __strtoll_common:
 ; low average  : 102F + 20R + 18W + 36
 ; high average : 112F + 20R + 18W + 37	; an over-estimate of the average CC
 ; maximum      : 127F + 20R + 18W + 40
-; overflow max : 131F + 21R + 19W + 42
+; overflow max : 133F + 24R + 22W + 42
 .check_decimal:
 	cp	a, (ix - 1)
 	jr	nc, .end_loop
@@ -267,50 +271,57 @@ __llmul_add_b_overflow:
 ; bit 0, (ix - 3) is set if overflow has occured
 .__llmulu_b_overflow:
 ; inlined/modified __llmulu_b
-; CC if no overflow: 70F + 15R + 15W + 32
-	push	de		; (ix - 9)
-	push	hl		; (ix - 12)
+; CC no overflow  : 69F + 16R + 15W + 33
+; CC overflow max : 73F + 17R + 16W + 34
+	push	hl		; (ix - 9)
+	push	de		; (ix - 12)
 	push	bc		; (ix - 15)
 	ld	b, (ix - 1)
-	ld	c, 0
+	ld	c, e		; ld c, (ix - 12)
+	ld	e, h		; ld e, (ix - 8)
 	ld	h, b
 	mlt	hl
-	ld	(ix - 12), l
+
+	; (255 * 255) + 255 < 65535 so no 16bit carry can occur
+	add	a, l
+	ld	(ix - 9), a	; L
 	ld	d, b
-	ld	e, (ix - 11)
+	; ld	e, (ix - 8)	; H
 	mlt	de
 	ld	l, h
-	ld	h, c
-	add	hl, de
-	ld	(ix - 11), l
+	ld	h, 0
+	adc	hl, de		; handles carry from adding A
+	xor	a, a
+
+	ld	(ix - 8), l	; H
 	ld	d, b
-	ld	e, (ix - 10)
+	ld	e, (ix - 7)	; UHL
 	mlt	de
 	ld	l, h
-	ld	h, c
+	ld	h, a
 	add	hl, de
-	ld	(ix - 10), l
+	ld	(ix - 7), l	; UHL
 	ld	d, b
-	ld	e, (ix - 9)
+	ld	e, c		; ld e, (ix - 12) ; E
 	mlt	de
 	ld	l, h
-	ld	h, c
+	ld	h, a
 	add	hl, de
-	ld	(ix - 9), l
+	ld	(ix - 12), l	; E
 	ld	d, b
-	ld	e, (ix - 8)
+	ld	e, (ix - 11)	; D
 	mlt	de
 	ld	l, h
-	ld	h, c
+	ld	h, a
 	add	hl, de
-	ld	(ix - 8), l
+	ld	(ix - 11), l	; D
 	ld	d, b
-	ld	e, (ix - 7)
+	ld	e, (ix - 10)	; UDE
 	mlt	de
 	ld	l, h
-	ld	h, c
+	ld	h, a
 	add	hl, de
-	ld	(ix - 7), l
+	ld	(ix - 10), l	; UDE
 
 	pop	de
 	ld	l, h
@@ -321,60 +332,16 @@ __llmul_add_b_overflow:
 	mlt	de
 
 	add.s	hl, de
+	pop	de
 	jr	c, .set_overflow_bit
-	inc	b
-	djnz	.set_overflow_bit
+	sub	a, b		; set carry if B is non-zero
 	ld	b, h
 	ld	c, l
-	pop	hl
-	pop	de
-.__lladd_b_overflow:
-; inlined/modified __lladd_b_fast
-;   NC   L:  3F + 3R + 2 (49.8046875%)
-;   NC   H:  5F + 3R + 3 (49.9992370605%)
-; All other cases:       (0.196075439453%)
-;   NC UHL: 15F + 3R + 0W + 4
-;   NC   E: 17F + 3R + 0W + 5
-;   NC   D: 19F + 3R + 0W + 6
-;   NC UDE: 26F + 3R + 0W + 7
-;   NC  BC: 30F + 3R + 0W + 7
-; Overflow: 34F + 4R + 1W + 9
-; Average :  5F + 3R + 0W + 3 (Rounded up and assuming no overflow)
-	add	a, l		; a=L+A
-	ld	l, a		; l=L+A
-	ret	nc		; cf=1
-	inc	h		; h=H+1
-	ret	nz		; h=0
-	dec	h
-	ld	l, h		; uhl=(HLU<<16)+0xFFFF
-	inc	hl		; uhl=HLU+1<<16
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
-	ld	l, a		; uhl=(HLU+1<<16)+(L+A&0xFF)
-	ret	nz		; uhl=L+A&0xFF, cf=0
-	inc	e		; e=E+1
-	ret	nz		; e=0
-	inc	d		; d=D+1
-	ret	nz		; d=0
-	dec	d
-	ld	e, d		; ude=(DEU<<16)+0xFFFF
-	inc	de		; ude=DEU+1<<16
-	sbc	hl, de
-	add	hl, de
-	ret	c		; ude=0
-	inc	bc		; ubc=UBC+1
-	; test for overflow
-	ld	a, b
-	or	a, c
-	ret	nz
-.finish_overflow:
-	set	0, (ix - 3)	; set carry
-	ret
 .set_overflow_bit:
 	pop	hl
-	pop	de
-	jr	.finish_overflow
+	ret	nc
+	set	0, (ix - 3)	; set carry
+	ret
 
 	extern	_errno
 	extern	__llneg
