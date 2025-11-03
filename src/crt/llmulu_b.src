@@ -8,8 +8,8 @@ __llmulu_b:
 ; Multiplies BC:UDE:UHL by (SP) and returns the 64-bit unsigned product bc:ude:uhl.
 ;    I: (SP) = 8-bit multiplier, BC:UDE:UHL = multiplicand, ADL=1
 ;    O: bc:ude:uhl = BC:UDE:UHL * (SP)
-;   CC: 101*r(PC)+21*r(SPL)+18*w(SPL)+33
-;   CC: 100 bytes | 101F + 21R + 18W + 33
+;   CC: 99*r(PC)+20*r(SPL)+18*w(SPL)+33
+;   CC: 98 bytes | 99F + 20R + 18W + 33
 	push	iy
 	ld	iy, 0
 	add	iy, sp
@@ -18,11 +18,11 @@ __llmulu_b:
 	push	bc
 	ld	b, (iy + 6)
 	ld	c, 0
+	ld	e, h		; ld e, (iy - 5)
 	ld	h, b
 	mlt	hl
 	ld	(iy - 6), l
 	ld	d, b
-	ld	e, (iy - 5)
 	mlt	de
 	ld	l, h
 	ld	h, c
