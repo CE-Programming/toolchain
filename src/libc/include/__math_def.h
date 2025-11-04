@@ -3,6 +3,11 @@
 
 #include <cdefs.h>
 #include <stdbool.h>
+#include <__math_abs.h>
+
+#ifdef __cplusplus
+#include <__cxx_abs.h>
+#endif /* __cplusplus */
 
 #define NAN          __builtin_nanf("")
 #define INFINITY     __builtin_inff()
@@ -37,9 +42,7 @@
 typedef float float_t;
 typedef double double_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 int _fpclassifyf(float) __NOEXCEPT_CONST;
 int _fpclassifyl(long double) __NOEXCEPT_CONST;
@@ -140,13 +143,6 @@ long double exp2l(long double);
 double      expm1(double);
 float       expm1f(float);
 long double expm1l(long double);
-
-#ifndef _ABS_FLOAT_DEFINED
-#define _ABS_FLOAT_DEFINED
-double      fabs(double);
-float       fabsf(float);
-long double fabsl(long double);
-#endif /* _ABS_FLOAT_DEFINED */
 
 double      fdim(double, double);
 float       fdimf(float, float);
@@ -328,8 +324,6 @@ double      trunc(double);
 float       truncf(float);
 long double truncl(long double);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif /* _MATH_DEF_H */

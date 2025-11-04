@@ -3,7 +3,6 @@
 #define _EZCXX_CSTDLIB
 
 #include <stdlib.h>
-#include <__abs_overloads>
 
 #pragma clang system_header
 
@@ -41,6 +40,9 @@ using ::_Exit;
 
 using ::labs;
 using ::llabs;
+#ifdef __SIZEOF_INT48__
+using ::i48abs;
+#endif // __SIZEOF_INT48__
 
 using ::div;
 using ::ldiv;
