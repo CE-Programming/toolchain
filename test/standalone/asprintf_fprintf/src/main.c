@@ -521,6 +521,15 @@ int mempcpy_test(void) {
 int bzero_test(void) {
     char truth[32];
     char data[32];
+
+    // test zero size cases
+    C(T_memset(NULL_ptr, 0xCE, 0) == NULL_ptr);
+    C(T_memset((void*)0xFFFFFF, 0xCE, 0) == (void*)0xFFFFFF);
+    C(T_memset((void*)0x000001, 0xCE, 0) == (void*)0x000001);
+    T_bzero(NULL_ptr, 0);
+    T_bzero((void*)0xFFFFFF, 0);
+    T_bzero((void*)0x000001, 0);
+
     T_memset(data, 0x8F, sizeof(data));
     T_memset(&truth[ 0], 0x8F,  8);
     T_memset(&truth[ 2], 0x00,  1);

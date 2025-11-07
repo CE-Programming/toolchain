@@ -24,7 +24,7 @@
 extern wchar_t * const PTR_000000;
 extern wchar_t * const PTR_FFFFFF;
 
-#if 0
+#if 1
 
 int       T_wmemcmp(const wchar_t *s1, const wchar_t *s2, size_t n) __NOEXCEPT __attribute__((__pure__));
 wchar_t * T_wmemchr(const wchar_t *ptr, int ch, size_t count) __NOEXCEPT __attribute__((__pure__));
@@ -182,6 +182,10 @@ int test_wmemset(void) {
         test_printf("%p != %p\n", ptr, (void*)0xC0FFEE);
         return __LINE__;
     }
+    C(wmemset(PTR_000000, 0x71CE, 0) == PTR_000000);
+    C(wmemset(PTR_FFFFFF, 0x71CE, 0) == PTR_FFFFFF);
+    C(wmemset((void*)0x000001, 0x71CE, 0) == (void*)0x000001);
+
     wchar_t data[192 + 1];
     memset(data, 0xBC, sizeof(data));
     wmemset(wmemset(&data[  0], 0x0012, 64) + 64, 0x0012, 64);
@@ -194,7 +198,7 @@ int test_wmemset(void) {
         test_printf("%p != %p\n", res, &data[64]);
         return __LINE__;
     }
-    
+
     wchar_t truth[192 + 1];
     memset(truth, 0xDE, sizeof(truth));
     C(&truth[  0] == wmemset(&truth[  0], 0x0012, 64));
@@ -230,7 +234,7 @@ int test_wmemset(void) {
 int test_wmemmove(void) {
     wchar_t move_str[] =
     {0x000F, 0x111F, 0x222F, 0x333F, 0x444F, 0x555F, 0x666F, 0x777F, 0x888F, 0x999F};
-    const wchar_t truth_str[] = 
+    const wchar_t truth_str[] =
     {0x999F, 0x333F, 0x444F, 0x444F, 0x555F, 0x444F, 0x555F, 0x666F, 0x888F, 0x999F};
     C(move_str + 5 == wmemmove(move_str + 5, move_str + 4, 3));
     C(move_str + 3 == wmemmove(move_str + 3, move_str + 3, 0));
