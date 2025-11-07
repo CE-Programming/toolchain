@@ -5,19 +5,20 @@
 	public	_memset
 
 _memset:
-	ld	iy, 0
+	ld	iy, -1
 	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	bc, (iy + 9)
-	cpi
-	add	hl, bc
-	ret	c
-	dec	hl
-	ld	e, (iy + 6)
-	ld	(hl), e
-	ret	po
-	push	hl
-	pop	de
-	dec	de
+	ld	bc, (iy + 10)	; BC = size
+	sbc	hl, hl		; always resets overflow
+	add	hl, bc		; HL = size - 1
+	ld	de, (iy + 4)	; DE = dst
+	jr	nc, .zero_size
+	ld	a, (iy + 7)
+	add	hl, de		; HL = dst + size - 1
+	ld	(hl), a
+	cpd			; HL = dst + size - 2, BC = size - 1
+.zero_size:
+	ex	de, hl		; DE = dst + size - 2, HL = dst
+	ret	po		; return if size == 1
+	add	hl, bc		; HL = dst + size - 1
 	lddr
 	ret

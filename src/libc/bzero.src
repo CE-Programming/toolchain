@@ -14,8 +14,8 @@ _bzero:
 	add	hl, sp
 	ld	bc, (hl)	; size
 	inc	bc
-	cpd	; dec hl
-	ret	po	; zero size
+	cpd			; dec hl
+	ret	po		; zero size
 	dec	hl
 	dec	hl
 	ld	de, (hl)	; buf
@@ -31,20 +31,21 @@ else
 _bzero:
 	ld	hl, 6
 	add	hl, sp
-	ld	bc, (hl)
+	ld	bc, (hl)	; BC = size
 	dec	hl
 	dec	hl
 	dec	hl
-	ld	hl, (hl)
-	cpi
-	add	hl, bc
-	ret	c
-	dec	hl
+	ld	de, (hl)	; DE = dst
+	scf
+	sbc	hl, hl
+	add	hl, bc		; HL = size - 1
+	ret	nc		; size == 0
+	add	hl, de		; HL = dst + size - 1
 	ld	(hl), 0
-	ret	po
-	push	hl
-	pop	de
-	dec	de
+	cpd			; HL = dst + size - 2, BC = size - 1
+	ex	de, hl		; DE = dst + size - 2, HL = dst
+	ret	po		; return if size == 1
+	add	hl, bc		; HL = dst + size - 1
 	lddr
 	ret
 
