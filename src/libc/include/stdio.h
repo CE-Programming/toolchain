@@ -6,7 +6,7 @@
 
 #ifdef HAS_CUSTOM_FILE
 #include CUSTOM_FILE_FILE
-#else
+#else /* HAS_CUSTOM_FILE*/
 typedef struct
 {
     unsigned char slot;
@@ -17,7 +17,7 @@ typedef struct
 #define stdin      ((FILE*)1)
 #define stdout     ((FILE*)2)
 #define stderr     ((FILE*)2)
-#endif
+#endif /* HAS_CUSTOM_FILE */
 
 #ifndef EOF
 #define EOF (-1)
@@ -36,12 +36,14 @@ typedef struct
 __BEGIN_DECLS
 
 /* weak user-defined functions */
+
 int inchar(void);
 
 void outchar(char character);
 
-FILE *fopen(const char *__restrict filename,
-    const char *__restrict mode);
+FILE *fopen(const char *__restrict filename, const char *__restrict mode);
+
+FILE *freopen(const char *__restrict filename, const char *__restrict mode, FILE *__restrict stream);
 
 int fclose(FILE *stream);
 
@@ -53,35 +55,41 @@ int feof(FILE *stream);
 
 void clearerr(FILE *stream);
 
-int fputs(const char *__restrict str, FILE *__restrict stream);
+size_t fread(void *__restrict ptr, size_t size, size_t count, FILE *__restrict stream);
 
-size_t fread(void *ptr, size_t size, size_t count, FILE *__restrict stream);
-
-size_t fwrite(const void *__restrict ptr, size_t size, size_t count,
-    FILE *__restrict stream);
+size_t fwrite(const void *__restrict ptr, size_t size, size_t count, FILE *__restrict stream);
 
 long int ftell(FILE *stream) __attribute__((__warn_unused_result__));
 
 int fseek(FILE *stream, long int offset, int origin);
 
-int fgetc(FILE *stream);
-#define getc(...) fgetc(__VA_ARGS__)
+void rewind(FILE *stream);
 
-int fputc(int c, FILE *stream);
-#define putc(...) fputc(__VA_ARGS__)
+int fgetc(FILE *stream);
 
 char *fgets(char *__restrict str, int num, FILE *__restrict stream);
 
+int ungetc(int ch, FILE *stream);
+
+int fputc(int c, FILE *stream);
+
+int fputs(const char *__restrict str, FILE *__restrict stream);
+
 int remove(const char *filename);
 
-void rewind(FILE *stream);
+int rename(const char *old_filename, const char *new_filename);
 
 /* standard impls */
+
 int getchar(void);
 
 int putchar(int character);
 
 int puts(const char *str);
+
+int getc(FILE *stream);
+
+int putc(int c, FILE *stream);
 
 int printf(const char *__restrict format, ...)
     __attribute__((format(__printf__, 1, 2)));
@@ -90,7 +98,7 @@ int vprintf(const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 1, 0)));
 
 int sprintf(char *__restrict buffer, const char *__restrict format, ...)
-    __attribute__((format (__printf__, 2, 3)));
+    __attribute__((format(__printf__, 2, 3)));
 
 int vsprintf(char *__restrict buffer, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0)));
@@ -108,7 +116,7 @@ int vfprintf(FILE *__restrict stream, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0)));
 
 int asprintf(char **__restrict p_buffer, const char *__restrict format, ...)
-    __attribute__((format (__printf__, 2, 3))) __attribute__((nonnull(1)));
+    __attribute__((format(__printf__, 2, 3))) __attribute__((nonnull(1)));
 
 int vasprintf(char **__restrict p_buffer, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0))) __attribute__((nonnull(1)));
@@ -119,39 +127,44 @@ __END_DECLS
 
 #ifdef __cplusplus
 namespace std {
-    using ::size_t;
-    using ::FILE;
-    
-    using ::fopen;
-    using ::fclose;
-    using ::fflush;
-    using ::ferror;
-    using ::feof;
-    using ::clearerr;
-    using ::fputs;
-    using ::fread;
-    using ::fwrite;
-    using ::ftell;
-    using ::fseek;
-    using ::fgetc;
-    using ::fputc;
-    using ::fgets;
-    using ::remove;
-    using ::rewind;
-    using ::getchar;
-    using ::putchar;
-    using ::puts;
-    using ::printf;
-    using ::vprintf;
-    using ::sprintf;
-    using ::vsprintf;
-    using ::snprintf;
-    using ::vsnprintf;
-    using ::fprintf;
-    using ::vfprintf;
-    using ::asprintf;
-    using ::vasprintf;
-    using ::perror;
+using ::size_t;
+using ::FILE;
+
+using ::fopen;
+using ::freopen;
+using ::fclose;
+using ::fflush;
+using ::ferror;
+using ::feof;
+using ::clearerr;
+using ::fread;
+using ::fwrite;
+using ::ftell;
+using ::fseek;
+using ::rewind;
+using ::fgetc;
+using ::fgets;
+using ::ungetc;
+using ::fputc;
+using ::fputs;
+using ::remove;
+using ::rename;
+using ::getchar;
+using ::putchar;
+using ::puts;
+using ::getc;
+using ::putc;
+using ::printf;
+using ::vprintf;
+using ::sprintf;
+using ::vsprintf;
+using ::snprintf;
+using ::vsnprintf;
+using ::fprintf;
+using ::vfprintf;
+using ::asprintf;
+using ::vasprintf;
+using ::perror;
 } /* namespace std */
 #endif /* __cplusplus */
 
