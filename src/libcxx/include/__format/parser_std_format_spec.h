@@ -321,12 +321,14 @@ struct __parsed_specifications {
 
 // Validate the struct is small and cheap to copy since the struct is passed by
 // value in formatting functions.
+#ifndef _EZ80
 static_assert(sizeof(__parsed_specifications<char>) == 16);
 static_assert(is_trivially_copyable_v<__parsed_specifications<char>>);
 #  ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 static_assert(sizeof(__parsed_specifications<wchar_t>) == 16);
 static_assert(is_trivially_copyable_v<__parsed_specifications<wchar_t>>);
 #  endif
+#endif // _EZ80
 
 /// The parser for the std-format-spec.
 ///

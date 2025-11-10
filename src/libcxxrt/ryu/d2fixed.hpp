@@ -44,12 +44,25 @@
 #include <charconv>
 #include <cstring>
 
+#ifndef _EZ80
+
 #include "include/ryu/common.h"
 #include "include/ryu/d2fixed.h"
 #include "include/ryu/d2fixed_full_table.h"
 #include "include/ryu/d2s.h"
 #include "include/ryu/d2s_intrinsics.h"
 #include "include/ryu/digit_table.h"
+
+#else // _EZ80
+
+#include "ryu/common.h"
+#include "ryu/d2fixed.h"
+#include "ryu/d2fixed_full_table.h"
+#include "ryu/d2s.h"
+#include "ryu/d2s_intrinsics.h"
+#include "ryu/digit_table.h"
+
+#endif // _EZ80
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
@@ -231,7 +244,7 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
   return (__log10Pow2(16 * static_cast<int32_t>(__idx)) + 1 + 16 + 8) / 9;
 }
 
-[[nodiscard]] to_chars_result __d2fixed_buffered_n(char* _First, char* const _Last, const double __d,
+[[nodiscard]] to_chars_result __d2fixed_buffered_n(char* _First, char* const _Last, const long double __d,
   const uint32_t __precision) {
   char* const _Original_first = _First;
 
@@ -421,7 +434,7 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
   return { _First, errc{} };
 }
 
-[[nodiscard]] to_chars_result __d2exp_buffered_n(char* _First, char* const _Last, const double __d,
+[[nodiscard]] to_chars_result __d2exp_buffered_n(char* _First, char* const _Last, const long double __d,
   uint32_t __precision) {
   char* const _Original_first = _First;
 

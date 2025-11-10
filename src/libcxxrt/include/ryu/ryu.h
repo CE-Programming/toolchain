@@ -52,9 +52,16 @@
 #include <cstring>
 #include <type_traits>
 
+#ifndef _EZ80
 #include "include/ryu/f2s.h"
 #include "include/ryu/d2s.h"
 #include "include/ryu/d2fixed.h"
+#else // _EZ80
+#include <climits>
+#include "ryu/f2s.h"
+#include "ryu/d2s.h"
+#include "ryu/d2fixed.h"
+#endif // _EZ80
 
 #if defined(_MSC_VER)
 #include <intrin.h> // for _umul128(), __shiftright128(), _BitScanForward{,64}
@@ -106,7 +113,7 @@ template <class _Floating>
 
     if (_Precision < 0) {
         _Precision = 6;
-    } else if (_Precision < 1'000'000'000) { // Match ' to fix compilation with GCC in C++11 mode
+    } else if (_Precision < (INT_MAX / 2)) { // Match ' to fix compilation with GCC in C++11 mode
         // _Precision is ok.
     } else {
         // Avoid integer overflow.
@@ -127,7 +134,7 @@ template <class _Floating>
 
     if (_Precision < 0) {
         _Precision = 6;
-    } else if (_Precision < 1'000'000'000) { // Match ' to fix compilation with GCC in C++11 mode
+    } else if (_Precision < (INT_MAX / 2)) { // Match ' to fix compilation with GCC in C++11 mode
         // _Precision is ok.
     } else {
         // Avoid integer overflow.

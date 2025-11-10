@@ -251,9 +251,9 @@ endif
 
 # define the c/c++ flags used by clang
 EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false
-EZCOMMONFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__ -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
-EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+EZCOMMONFLAGS = -nostdinc -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__ -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
+EZCFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) $(CFLAGS)
+EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include/c++) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 
 # these are the fasmg linker flags

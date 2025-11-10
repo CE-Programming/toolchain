@@ -43,12 +43,25 @@
 #include <__config>
 #include <charconv>
 
+#ifndef _EZ80
+
 #include "include/ryu/common.h"
 #include "include/ryu/d2fixed.h"
 #include "include/ryu/d2s_intrinsics.h"
 #include "include/ryu/digit_table.h"
 #include "include/ryu/f2s.h"
 #include "include/ryu/ryu.h"
+
+#else // _EZ80
+
+#include "ryu/common.h"
+#include "ryu/d2fixed.h"
+#include "ryu/d2s_intrinsics.h"
+#include "ryu/digit_table.h"
+#include "ryu/f2s.h"
+#include "ryu/ryu.h"
+
+#endif // _EZ80
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 

@@ -148,6 +148,15 @@ const unsigned indices[] =
 
 template <size_t _Sz = sizeof(size_t)>
 inline _LIBCPP_INLINE_VISIBILITY
+typename enable_if<_Sz == 3, void>::type
+__check_for_overflow(size_t N)
+{
+    if (N > 0xFFFFFD)
+        __throw_overflow_error("__next_prime overflow");
+}
+
+template <size_t _Sz = sizeof(size_t)>
+inline _LIBCPP_INLINE_VISIBILITY
 typename enable_if<_Sz == 4, void>::type
 __check_for_overflow(size_t N)
 {

@@ -96,9 +96,9 @@ _LIBCPP_BEGIN_NAMESPACE_STD
   return __bits;
 }
 
-[[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline uint64_t __double_to_bits(const double __d) {
+[[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline uint64_t __double_to_bits(const long double __d) {
   uint64_t __bits = 0;
-  std::memcpy(&__bits, &__d, sizeof(double));
+  std::memcpy(&__bits, &__d, sizeof(long double));
   return __bits;
 }
 

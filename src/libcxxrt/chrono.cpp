@@ -125,6 +125,15 @@ static system_clock::time_point __libcpp_system_clock_now() {
   return system_clock::time_point(seconds(tp.tv_sec) + microseconds(tp.tv_nsec / 1000));
 }
 
+#elif defined(_EZ80)
+
+static system_clock::time_point __libcpp_system_clock_now() {
+  uint64_t t = clock();
+  uint64_t sec = t / CLOCKS_PER_SEC;
+  uint64_t frac = t % CLOCKS_PER_SEC;
+  return system_clock::time_point(seconds(sec) + microseconds((uint64_t)(((float)frac / (float)CLOCKS_PER_SEC) * 1000000.0f)));
+}
+
 #else
 
 static system_clock::time_point __libcpp_system_clock_now() {
