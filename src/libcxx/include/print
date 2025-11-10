@@ -202,6 +202,8 @@ _LIBCPP_HIDE_FROM_ABI inline bool __is_terminal(FILE* __stream) {
   return std::__is_windows_terminal(__stream);
 #  elif __has_include(<unistd.h>)
   return isatty(fileno(__stream));
+#  elif defined(_EZ80)
+  return false;
 #  else
 #    error "Provide a way to determine whether a FILE* is a terminal"
 #  endif

@@ -3,18 +3,30 @@
 
 #include <debug.h>
 #include <cstdlib>
+#include <cstdio>
 #include <exception>
+#include <ti/sprintf.h>
+#include <__config>
 
-namespace std {
+_LIBCPP_BEGIN_NAMESPACE_STD
 
 void __terminate_message(const char *message) {
-    dbg_sprintf(dbgerr, "libezc++: %s\n", message);
+    boot_sprintf(dbgerr, "libezc++: %s\n", message);
     std::terminate();
 }
 
 void __abort_message(const char *message) {
-    dbg_sprintf(dbgerr, "libezc++: %s\n", message);
+    boot_sprintf(dbgerr, "libezc++: %s\n", message);
     abort();
 }
 
+void __libcpp_verbose_abort(char const* format, ...) {
+    va_list list;
+    va_start(list, format);
+    std::vsprintf(dbgerr, format, list);
+    va_end(list);
+
+    abort();
 }
+
+_LIBCPP_END_NAMESPACE_STD

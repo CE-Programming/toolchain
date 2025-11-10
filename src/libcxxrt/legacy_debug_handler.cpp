@@ -11,6 +11,10 @@
 #include <cstdlib>
 #include <string>
 
+#ifdef _EZ80
+#include "../libcxx/abort_message.h"
+#endif // _EZ80
+
 // This file defines the legacy default debug handler and related mechanisms
 // to set it. This is for backwards ABI compatibility with code that has been
 // using this debug handler previously.
@@ -36,8 +40,12 @@ std::string __libcpp_debug_info::what() const {
 }
 
 _LIBCPP_NORETURN _LIBCPP_EXPORTED_FROM_ABI void __libcpp_abort_debug_function(__libcpp_debug_info const& info) {
+#ifndef _EZ80
   std::fprintf(stderr, "%s\n", info.what().c_str());
   std::abort();
+#else // _EZ80
+  __abort_message(info.what().c_str());
+#endif // _EZ80
 }
 
 typedef void (*__libcpp_debug_function_type)(__libcpp_debug_info const&);

@@ -43,6 +43,8 @@
 #include <__config>
 #include <charconv>
 
+#ifndef _EZ80
+
 #include "include/ryu/common.h"
 #include "include/ryu/d2fixed.h"
 #include "include/ryu/d2s.h"
@@ -50,6 +52,18 @@
 #include "include/ryu/d2s_intrinsics.h"
 #include "include/ryu/digit_table.h"
 #include "include/ryu/ryu.h"
+
+#else // _EZ80
+
+#include "ryu/common.h"
+#include "ryu/d2fixed.h"
+#include "ryu/d2s.h"
+#include "ryu/d2s_full_table.h"
+#include "ryu/d2s_intrinsics.h"
+#include "ryu/digit_table.h"
+#include "ryu/ryu.h"
+
+#endif // _EZ80
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
@@ -353,7 +367,7 @@ struct __floating_decimal_64 {
 }
 
 [[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline to_chars_result __to_chars(char* const _First, char* const _Last, const __floating_decimal_64 __v,
-  chars_format _Fmt, const double __f) {
+  chars_format _Fmt, const long double __f) {
   // Step 5: Print the decimal representation.
   uint64_t _Output = __v.__mantissa;
   int32_t _Ryu_exponent = __v.__exponent;
@@ -700,7 +714,7 @@ struct __floating_decimal_64 {
   return true;
 }
 
-[[nodiscard]] to_chars_result __d2s_buffered_n(char* const _First, char* const _Last, const double __f,
+[[nodiscard]] to_chars_result __d2s_buffered_n(char* const _First, char* const _Last, const long double __f,
   const chars_format _Fmt) {
 
   // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.

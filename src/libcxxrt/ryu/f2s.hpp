@@ -43,12 +43,25 @@
 #include <__config>
 #include <charconv>
 
+#ifndef _EZ80
+
 #include "include/ryu/common.h"
 #include "include/ryu/d2fixed.h"
 #include "include/ryu/d2s_intrinsics.h"
 #include "include/ryu/digit_table.h"
 #include "include/ryu/f2s.h"
 #include "include/ryu/ryu.h"
+
+#else // _EZ80
+
+#include "ryu/common.h"
+#include "ryu/d2fixed.h"
+#include "ryu/d2s_intrinsics.h"
+#include "ryu/digit_table.h"
+#include "ryu/f2s.h"
+#include "ryu/ryu.h"
+
+#endif // _EZ80
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
@@ -108,7 +121,7 @@ inline constexpr uint64_t __FLOAT_POW5_SPLIT[47] = {
   _LIBCPP_ASSERT_UNCATEGORIZED(__value != 0, "");
   _LIBCPP_ASSERT_UNCATEGORIZED(__p < 32, "");
   // __builtin_ctz doesn't appear to be faster here.
-  return (__value & ((1u << __p) - 1)) == 0;
+  return (__value & ((1ul << __p) - 1)) == 0;
 }
 
 [[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline uint32_t __mulShift(const uint32_t __m, const uint64_t __factor, const int32_t __shift) {
@@ -162,7 +175,7 @@ struct __floating_decimal_32 {
     __m2 = __ieeeMantissa;
   } else {
     __e2 = static_cast<int32_t>(__ieeeExponent) - __FLOAT_BIAS - __FLOAT_MANTISSA_BITS - 2;
-    __m2 = (1u << __FLOAT_MANTISSA_BITS) | __ieeeMantissa;
+    __m2 = (1ul << __FLOAT_MANTISSA_BITS) | __ieeeMantissa;
   }
   const bool __even = (__m2 & 1) == 0;
   const bool __acceptBounds = __even;
@@ -540,7 +553,7 @@ struct __floating_decimal_32 {
       }
 
       if (!_Can_use_ryu) {
-        const uint32_t _Mantissa2 = __ieeeMantissa | (1u << __FLOAT_MANTISSA_BITS); // restore implicit bit
+        const uint32_t _Mantissa2 = __ieeeMantissa | (1ul << __FLOAT_MANTISSA_BITS); // restore implicit bit
         const int32_t _Exponent2 = static_cast<int32_t>(__ieeeExponent)
           - __FLOAT_BIAS - __FLOAT_MANTISSA_BITS; // bias and normalization
 
@@ -689,13 +702,13 @@ struct __floating_decimal_32 {
   }
 
   // Decode __bits into mantissa and exponent.
-  const uint32_t __ieeeMantissa = __bits & ((1u << __FLOAT_MANTISSA_BITS) - 1);
+  const uint32_t __ieeeMantissa = __bits & ((1ul << __FLOAT_MANTISSA_BITS) - 1);
   const uint32_t __ieeeExponent = __bits >> __FLOAT_MANTISSA_BITS;
 
   // When _Fmt == chars_format::fixed and the floating-point number is a large integer,
   // it's faster to skip Ryu and immediately print the integer exactly.
   if (_Fmt == chars_format::fixed) {
-    const uint32_t _Mantissa2 = __ieeeMantissa | (1u << __FLOAT_MANTISSA_BITS); // restore implicit bit
+    const uint32_t _Mantissa2 = __ieeeMantissa | (1ul << __FLOAT_MANTISSA_BITS); // restore implicit bit
     const int32_t _Exponent2 = static_cast<int32_t>(__ieeeExponent)
       - __FLOAT_BIAS - __FLOAT_MANTISSA_BITS; // bias and normalization
 

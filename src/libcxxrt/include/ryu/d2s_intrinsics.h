@@ -45,7 +45,11 @@
 #include <__assert>
 #include <__config>
 
+#ifndef _EZ80
 #include "include/ryu/ryu.h"
+#else // _EZ80
+#include "ryu/ryu.h"
+#endif // _EZ80
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 

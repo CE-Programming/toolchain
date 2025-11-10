@@ -41,4 +41,11 @@
 typedef __SIZE_TYPE__ size_t;
 #endif /* SIZE_T_DEFINED */
 
+#ifndef _WCHAR_T_DEFINED
+#define _WCHAR_T_DEFINED
+#ifndef __cplusplus
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* __cplusplus */
+#endif /* _WCHAR_T_DEFINED */
+
 #endif /* _CDEFS_H */
