@@ -1,46 +1,118 @@
 // -*- C++ -*-
-#ifndef _EZCXX_INITIALIZER_LIST
-#define _EZCXX_INITIALIZER_LIST
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
 
-#pragma clang system_header
+#ifndef _LIBCPP_INITIALIZER_LIST
+#define _LIBCPP_INITIALIZER_LIST
 
+/*
+    initializer_list synopsis
+
+namespace std
+{
+
+template<class E>
+class initializer_list
+{
+public:
+    typedef E        value_type;
+    typedef const E& reference;
+    typedef const E& const_reference;
+    typedef size_t   size_type;
+
+    typedef const E* iterator;
+    typedef const E* const_iterator;
+
+    initializer_list() noexcept; // constexpr in C++14
+
+    size_t   size()  const noexcept; // constexpr in C++14
+    const E* begin() const noexcept; // constexpr in C++14
+    const E* end()   const noexcept; // constexpr in C++14
+};
+
+template<class E> const E* begin(initializer_list<E> il) noexcept; // constexpr in C++14
+template<class E> const E* end(initializer_list<E> il) noexcept; // constexpr in C++14
+
+}  // std
+
+*/
+
+#include <__assert> // all public C++ headers provide the assertion handler
 #include <__config>
 #include <cstddef>
 
-namespace std {
+#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+#  pragma GCC system_header
+#endif
+
+namespace std  // purposefully not versioned
+{
+
+#ifndef _LIBCPP_CXX03_LANG
 
 template<class _Ep>
-class initializer_list {
+class _LIBCPP_TEMPLATE_VIS initializer_list
+{
+    const _Ep* __begin_;
+    size_t    __size_;
+
+    _LIBCPP_INLINE_VISIBILITY
+    _LIBCPP_CONSTEXPR_SINCE_CXX14
+    initializer_list(const _Ep* __b, size_t __s) _NOEXCEPT
+        : __begin_(__b),
+          __size_(__s)
+        {}
 public:
-    using value_type = _Ep;
-    using reference = _Ep&;
-    using const_reference = _Ep const&;
-    using size_type = size_t;
-    using iterator = const _Ep*;
-    using const_iterator = const _Ep*;
+    typedef _Ep        value_type;
+    typedef const _Ep& reference;
+    typedef const _Ep& const_reference;
+    typedef size_t    size_type;
 
-private:
-    iterator __begin;
-    size_type __size;
+    typedef const _Ep* iterator;
+    typedef const _Ep* const_iterator;
 
-    _EZCXX_INLINE constexpr initializer_list(const_iterator __begin, size_type __size) noexcept : __begin(__begin), __size(__size) {}
+    _LIBCPP_INLINE_VISIBILITY
+    _LIBCPP_CONSTEXPR_SINCE_CXX14
+    initializer_list() _NOEXCEPT : __begin_(nullptr), __size_(0) {}
 
-public:
-    _EZCXX_INLINE constexpr initializer_list() noexcept : initializer_list(nullptr, 0) {}
+    _LIBCPP_INLINE_VISIBILITY
+    _LIBCPP_CONSTEXPR_SINCE_CXX14
+    size_t    size()  const _NOEXCEPT {return __size_;}
 
-    _EZCXX_INLINE constexpr size_type size() const noexcept { return __size; }
+    _LIBCPP_INLINE_VISIBILITY
+    _LIBCPP_CONSTEXPR_SINCE_CXX14
+    const _Ep* begin() const _NOEXCEPT {return __begin_;}
 
-    _EZCXX_INLINE constexpr const_iterator begin() const noexcept { return __begin; }
-
-    _EZCXX_INLINE constexpr const_iterator end() const noexcept { return __begin + __size; }
+    _LIBCPP_INLINE_VISIBILITY
+    _LIBCPP_CONSTEXPR_SINCE_CXX14
+    const _Ep* end()   const _NOEXCEPT {return __begin_ + __size_;}
 };
 
 template<class _Ep>
-_EZCXX_INLINE constexpr const _Ep* begin(initializer_list<_Ep> __il) noexcept { return __il.begin(); }
+inline _LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR_SINCE_CXX14
+const _Ep*
+begin(initializer_list<_Ep> __il) _NOEXCEPT
+{
+    return __il.begin();
+}
 
 template<class _Ep>
-_EZCXX_INLINE constexpr const _Ep* end(initializer_list<_Ep> __il) noexcept { return __il.end(); }
+inline _LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR_SINCE_CXX14
+const _Ep*
+end(initializer_list<_Ep> __il) _NOEXCEPT
+{
+    return __il.end();
+}
+
+#endif // !defined(_LIBCPP_CXX03_LANG)
 
 } // namespace std
 
-#endif // _EZCXX_INITIALIZER_LIST
+#endif // _LIBCPP_INITIALIZER_LIST

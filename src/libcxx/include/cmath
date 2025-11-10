@@ -1,833 +1,837 @@
 // -*- C++ -*-
-#ifndef _EZCXX_CMATH
-#define _EZCXX_CMATH
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
 
-#include <__math_def.h>
-#include <__cmath_type_traits>
-#include <__abs_overloads>
+#ifndef _LIBCPP_CMATH
+#define _LIBCPP_CMATH
 
-#pragma clang system_header
+/*
+    cmath synopsis
 
-namespace std {
-using ::float_t;
-using ::double_t;
+Macros:
 
-inline constexpr bool signbit(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return (__builtin_copysign(1.0f, __x) < 0.0f);
-    }
-    return _signbitf(__x);
-}
-inline constexpr bool signbit(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return (__builtin_copysign(1.0, __x)  < 0.0);
-    }
-    return _signbitf(__x);
-}
-inline constexpr bool signbit(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return (__builtin_copysign(1.0L, __x) < 0.0L);
-    }
-    return _signbitl(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-signbit(_Tp __x) { return (__x < 0); }
+    HUGE_VAL
+    HUGE_VALF               // C99
+    HUGE_VALL               // C99
+    INFINITY                // C99
+    NAN                     // C99
+    FP_INFINITE             // C99
+    FP_NAN                  // C99
+    FP_NORMAL               // C99
+    FP_SUBNORMAL            // C99
+    FP_ZERO                 // C99
+    FP_FAST_FMA             // C99
+    FP_FAST_FMAF            // C99
+    FP_FAST_FMAL            // C99
+    FP_ILOGB0               // C99
+    FP_ILOGBNAN             // C99
+    MATH_ERRNO              // C99
+    MATH_ERREXCEPT          // C99
+    math_errhandling        // C99
 
-inline constexpr bool issignaling(float __x) {
-    return _issignalingf(__x);
-}
-inline constexpr bool issignaling(double __x) {
-    return _issignalingf(__x);
-}
-inline constexpr bool issignaling(long double __x) {
-    return _issignalingl(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-issignaling(_Tp __x) { return false; }
+namespace std
+{
 
-inline constexpr bool isnan(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isnan(__x);
-    }
-    return _isnanf(__x);
-}
-inline constexpr bool isnan(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isnan(__x);
-    }
-    return _isnanf(__x);
-}
-inline constexpr bool isnan(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isnan(__x);
-    }
-    return _isnanl(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-isnan(_Tp __x) { return false; }
+Types:
 
-inline constexpr bool isinf(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isinf(__x);
-    }
-    return _isinff(__x);
-}
-inline constexpr bool isinf(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isinf(__x);
-    }
-    return _isinff(__x);
-}
-inline constexpr bool isinf(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isinf(__x);
-    }
-    return _isinfl(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-isinf(_Tp __x) { return false; }
+    float_t                 // C99
+    double_t                // C99
 
-inline constexpr bool isfinite(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isfinite(__x);
-    }
-    return _isfinitef(__x);
-}
-inline constexpr bool isfinite(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isfinite(__x);
-    }
-    return _isfinitef(__x);
-}
-inline constexpr bool isfinite(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isfinite(__x);
-    }
-    return _isfinitel(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-isfinite(_Tp __x) { return true; }
+// C90
 
-inline constexpr bool isnormal(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isnormal(__x);
-    }
-    return _isnormalf(__x);
-}
-inline constexpr bool isnormal(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isnormal(__x);
-    }
-    return _isnormalf(__x);
-}
-inline constexpr bool isnormal(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_isnormal(__x);
-    }
-    return _isnormall(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-isnormal(_Tp __x) { return (__x != 0); }
+floating_point abs(floating_point x);
 
-inline constexpr bool issubnormal(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return (FP_SUBNORMAL == __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x));
-    }
-    return _issubnormalf(__x);
-}
-inline constexpr bool issubnormal(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return (FP_SUBNORMAL == __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x));
-    }
-    return _issubnormalf(__x);
-}
-inline constexpr bool issubnormal(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return (FP_SUBNORMAL == __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x));
-    }
-    return _issubnormall(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-issubnormal(_Tp __x) { return false; }
+floating_point acos (arithmetic x);
+float          acosf(float x);
+long double    acosl(long double x);
 
-inline constexpr bool iszero(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return (__x == 0.0f);
-    }
-    return _iszerof(__x);
-}
-inline constexpr bool iszero(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return (__x == 0.0);
-    }
-    return _iszerof(__x);
-}
-inline constexpr bool iszero(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return (__x == 0.0L);
-    }
-    return _iszerol(__x);
-}
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, bool>
-iszero(_Tp __x) { return (__x == 0); }
+floating_point asin (arithmetic x);
+float          asinf(float x);
+long double    asinl(long double x);
 
-inline constexpr int fpclassify(float __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
+floating_point atan (arithmetic x);
+float          atanf(float x);
+long double    atanl(long double x);
+
+floating_point atan2 (arithmetic y, arithmetic x);
+float          atan2f(float y, float x);
+long double    atan2l(long double y, long double x);
+
+floating_point ceil (arithmetic x);
+float          ceilf(float x);
+long double    ceill(long double x);
+
+floating_point cos (arithmetic x);
+float          cosf(float x);
+long double    cosl(long double x);
+
+floating_point cosh (arithmetic x);
+float          coshf(float x);
+long double    coshl(long double x);
+
+floating_point exp (arithmetic x);
+float          expf(float x);
+long double    expl(long double x);
+
+floating_point fabs (arithmetic x);
+float          fabsf(float x);
+long double    fabsl(long double x);
+
+floating_point floor (arithmetic x);
+float          floorf(float x);
+long double    floorl(long double x);
+
+floating_point fmod (arithmetic x, arithmetic y);
+float          fmodf(float x, float y);
+long double    fmodl(long double x, long double y);
+
+floating_point frexp (arithmetic value, int* exp);
+float          frexpf(float value, int* exp);
+long double    frexpl(long double value, int* exp);
+
+floating_point ldexp (arithmetic value, int exp);
+float          ldexpf(float value, int exp);
+long double    ldexpl(long double value, int exp);
+
+floating_point log (arithmetic x);
+float          logf(float x);
+long double    logl(long double x);
+
+floating_point log10 (arithmetic x);
+float          log10f(float x);
+long double    log10l(long double x);
+
+floating_point modf (floating_point value, floating_point* iptr);
+float          modff(float value, float* iptr);
+long double    modfl(long double value, long double* iptr);
+
+floating_point pow (arithmetic x, arithmetic y);
+float          powf(float x, float y);
+long double    powl(long double x, long double y);
+
+floating_point sin (arithmetic x);
+float          sinf(float x);
+long double    sinl(long double x);
+
+floating_point sinh (arithmetic x);
+float          sinhf(float x);
+long double    sinhl(long double x);
+
+floating_point sqrt (arithmetic x);
+float          sqrtf(float x);
+long double    sqrtl(long double x);
+
+floating_point tan (arithmetic x);
+float          tanf(float x);
+long double    tanl(long double x);
+
+floating_point tanh (arithmetic x);
+float          tanhf(float x);
+long double    tanhl(long double x);
+
+//  C99
+
+bool signbit(arithmetic x);
+
+int fpclassify(arithmetic x);
+
+bool isfinite(arithmetic x);
+bool isinf(arithmetic x);
+bool isnan(arithmetic x);
+bool isnormal(arithmetic x);
+
+bool isgreater(arithmetic x, arithmetic y);
+bool isgreaterequal(arithmetic x, arithmetic y);
+bool isless(arithmetic x, arithmetic y);
+bool islessequal(arithmetic x, arithmetic y);
+bool islessgreater(arithmetic x, arithmetic y);
+bool isunordered(arithmetic x, arithmetic y);
+
+floating_point acosh (arithmetic x);
+float          acoshf(float x);
+long double    acoshl(long double x);
+
+floating_point asinh (arithmetic x);
+float          asinhf(float x);
+long double    asinhl(long double x);
+
+floating_point atanh (arithmetic x);
+float          atanhf(float x);
+long double    atanhl(long double x);
+
+floating_point cbrt (arithmetic x);
+float          cbrtf(float x);
+long double    cbrtl(long double x);
+
+floating_point copysign (arithmetic x, arithmetic y);
+float          copysignf(float x, float y);
+long double    copysignl(long double x, long double y);
+
+floating_point erf (arithmetic x);
+float          erff(float x);
+long double    erfl(long double x);
+
+floating_point erfc (arithmetic x);
+float          erfcf(float x);
+long double    erfcl(long double x);
+
+floating_point exp2 (arithmetic x);
+float          exp2f(float x);
+long double    exp2l(long double x);
+
+floating_point expm1 (arithmetic x);
+float          expm1f(float x);
+long double    expm1l(long double x);
+
+floating_point fdim (arithmetic x, arithmetic y);
+float          fdimf(float x, float y);
+long double    fdiml(long double x, long double y);
+
+floating_point fma (arithmetic x, arithmetic y, arithmetic z);
+float          fmaf(float x, float y, float z);
+long double    fmal(long double x, long double y, long double z);
+
+floating_point fmax (arithmetic x, arithmetic y);
+float          fmaxf(float x, float y);
+long double    fmaxl(long double x, long double y);
+
+floating_point fmin (arithmetic x, arithmetic y);
+float          fminf(float x, float y);
+long double    fminl(long double x, long double y);
+
+floating_point hypot (arithmetic x, arithmetic y);
+float          hypotf(float x, float y);
+long double    hypotl(long double x, long double y);
+
+double       hypot(double x, double y, double z);                // C++17
+float        hypot(float x, float y, float z);                   // C++17
+long double  hypot(long double x, long double y, long double z); // C++17
+
+int ilogb (arithmetic x);
+int ilogbf(float x);
+int ilogbl(long double x);
+
+floating_point lgamma (arithmetic x);
+float          lgammaf(float x);
+long double    lgammal(long double x);
+
+long long llrint (arithmetic x);
+long long llrintf(float x);
+long long llrintl(long double x);
+
+long long llround (arithmetic x);
+long long llroundf(float x);
+long long llroundl(long double x);
+
+floating_point log1p (arithmetic x);
+float          log1pf(float x);
+long double    log1pl(long double x);
+
+floating_point log2 (arithmetic x);
+float          log2f(float x);
+long double    log2l(long double x);
+
+floating_point logb (arithmetic x);
+float          logbf(float x);
+long double    logbl(long double x);
+
+long lrint (arithmetic x);
+long lrintf(float x);
+long lrintl(long double x);
+
+long lround (arithmetic x);
+long lroundf(float x);
+long lroundl(long double x);
+
+double      nan (const char* str);
+float       nanf(const char* str);
+long double nanl(const char* str);
+
+floating_point nearbyint (arithmetic x);
+float          nearbyintf(float x);
+long double    nearbyintl(long double x);
+
+floating_point nextafter (arithmetic x, arithmetic y);
+float          nextafterf(float x, float y);
+long double    nextafterl(long double x, long double y);
+
+floating_point nexttoward (arithmetic x, long double y);
+float          nexttowardf(float x, long double y);
+long double    nexttowardl(long double x, long double y);
+
+floating_point remainder (arithmetic x, arithmetic y);
+float          remainderf(float x, float y);
+long double    remainderl(long double x, long double y);
+
+floating_point remquo (arithmetic x, arithmetic y, int* pquo);
+float          remquof(float x, float y, int* pquo);
+long double    remquol(long double x, long double y, int* pquo);
+
+floating_point rint (arithmetic x);
+float          rintf(float x);
+long double    rintl(long double x);
+
+floating_point round (arithmetic x);
+float          roundf(float x);
+long double    roundl(long double x);
+
+floating_point scalbln (arithmetic x, long ex);
+float          scalblnf(float x, long ex);
+long double    scalblnl(long double x, long ex);
+
+floating_point scalbn (arithmetic x, int ex);
+float          scalbnf(float x, int ex);
+long double    scalbnl(long double x, int ex);
+
+floating_point tgamma (arithmetic x);
+float          tgammaf(float x);
+long double    tgammal(long double x);
+
+floating_point trunc (arithmetic x);
+float          truncf(float x);
+long double    truncl(long double x);
+
+constexpr float       lerp(float a, float b, float t) noexcept;                   // C++20
+constexpr double      lerp(double a, double b, double t) noexcept;                // C++20
+constexpr long double lerp(long double a, long double b, long double t) noexcept; // C++20
+
+}  // std
+
+*/
+
+#include <__assert> // all public C++ headers provide the assertion handler
+#include <__config>
+#include <__type_traits/enable_if.h>
+#include <__type_traits/is_arithmetic.h>
+#include <__type_traits/is_constant_evaluated.h>
+#include <__type_traits/is_floating_point.h>
+#include <__type_traits/is_same.h>
+#include <__type_traits/promote.h>
+#include <__type_traits/remove_cv.h>
+#include <version>
+
+#include <math.h>
+
+#ifndef _LIBCPP_MATH_H
+#   error <cmath> tried including <math.h> but didn't find libc++'s <math.h> header. \
+          This usually means that your header search paths are not configured properly. \
+          The header search paths should contain the C++ Standard Library headers before \
+          any C Standard Library, and you are probably using compiler flags that make that \
+          not be the case.
+#endif
+
+#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+#  pragma GCC system_header
+#endif
+
+_LIBCPP_PUSH_MACROS
+#include <__undef_macros>
+
+_LIBCPP_BEGIN_NAMESPACE_STD
+
+using ::signbit _LIBCPP_USING_IF_EXISTS;
+using ::fpclassify _LIBCPP_USING_IF_EXISTS;
+using ::isfinite _LIBCPP_USING_IF_EXISTS;
+using ::isinf _LIBCPP_USING_IF_EXISTS;
+using ::isnan _LIBCPP_USING_IF_EXISTS;
+using ::isnormal _LIBCPP_USING_IF_EXISTS;
+using ::isgreater _LIBCPP_USING_IF_EXISTS;
+using ::isgreaterequal _LIBCPP_USING_IF_EXISTS;
+using ::isless _LIBCPP_USING_IF_EXISTS;
+using ::islessequal _LIBCPP_USING_IF_EXISTS;
+using ::islessgreater _LIBCPP_USING_IF_EXISTS;
+using ::isunordered _LIBCPP_USING_IF_EXISTS;
+using ::isunordered _LIBCPP_USING_IF_EXISTS;
+
+using ::float_t _LIBCPP_USING_IF_EXISTS;
+using ::double_t _LIBCPP_USING_IF_EXISTS;
+
+using ::abs _LIBCPP_USING_IF_EXISTS;
+
+using ::acos _LIBCPP_USING_IF_EXISTS;
+using ::acosf _LIBCPP_USING_IF_EXISTS;
+using ::asin _LIBCPP_USING_IF_EXISTS;
+using ::asinf _LIBCPP_USING_IF_EXISTS;
+using ::atan _LIBCPP_USING_IF_EXISTS;
+using ::atanf _LIBCPP_USING_IF_EXISTS;
+using ::atan2 _LIBCPP_USING_IF_EXISTS;
+using ::atan2f _LIBCPP_USING_IF_EXISTS;
+using ::ceil _LIBCPP_USING_IF_EXISTS;
+using ::ceilf _LIBCPP_USING_IF_EXISTS;
+using ::cos _LIBCPP_USING_IF_EXISTS;
+using ::cosf _LIBCPP_USING_IF_EXISTS;
+using ::cosh _LIBCPP_USING_IF_EXISTS;
+using ::coshf _LIBCPP_USING_IF_EXISTS;
+
+using ::exp _LIBCPP_USING_IF_EXISTS;
+using ::expf _LIBCPP_USING_IF_EXISTS;
+
+using ::fabs _LIBCPP_USING_IF_EXISTS;
+using ::fabsf _LIBCPP_USING_IF_EXISTS;
+using ::floor _LIBCPP_USING_IF_EXISTS;
+using ::floorf _LIBCPP_USING_IF_EXISTS;
+
+using ::fmod _LIBCPP_USING_IF_EXISTS;
+using ::fmodf _LIBCPP_USING_IF_EXISTS;
+
+using ::frexp _LIBCPP_USING_IF_EXISTS;
+using ::frexpf _LIBCPP_USING_IF_EXISTS;
+using ::ldexp _LIBCPP_USING_IF_EXISTS;
+using ::ldexpf _LIBCPP_USING_IF_EXISTS;
+
+using ::log _LIBCPP_USING_IF_EXISTS;
+using ::logf _LIBCPP_USING_IF_EXISTS;
+
+using ::log10 _LIBCPP_USING_IF_EXISTS;
+using ::log10f _LIBCPP_USING_IF_EXISTS;
+using ::modf _LIBCPP_USING_IF_EXISTS;
+using ::modff _LIBCPP_USING_IF_EXISTS;
+
+using ::pow _LIBCPP_USING_IF_EXISTS;
+using ::powf _LIBCPP_USING_IF_EXISTS;
+
+using ::sin _LIBCPP_USING_IF_EXISTS;
+using ::sinf _LIBCPP_USING_IF_EXISTS;
+using ::sinh _LIBCPP_USING_IF_EXISTS;
+using ::sinhf _LIBCPP_USING_IF_EXISTS;
+
+using ::sqrt _LIBCPP_USING_IF_EXISTS;
+using ::sqrtf _LIBCPP_USING_IF_EXISTS;
+using ::tan _LIBCPP_USING_IF_EXISTS;
+using ::tanf _LIBCPP_USING_IF_EXISTS;
+
+using ::tanh _LIBCPP_USING_IF_EXISTS;
+using ::tanhf _LIBCPP_USING_IF_EXISTS;
+
+using ::acosh _LIBCPP_USING_IF_EXISTS;
+using ::acoshf _LIBCPP_USING_IF_EXISTS;
+using ::asinh _LIBCPP_USING_IF_EXISTS;
+using ::asinhf _LIBCPP_USING_IF_EXISTS;
+using ::atanh _LIBCPP_USING_IF_EXISTS;
+using ::atanhf _LIBCPP_USING_IF_EXISTS;
+using ::cbrt _LIBCPP_USING_IF_EXISTS;
+using ::cbrtf _LIBCPP_USING_IF_EXISTS;
+
+using ::copysign _LIBCPP_USING_IF_EXISTS;
+using ::copysignf _LIBCPP_USING_IF_EXISTS;
+
+using ::erf _LIBCPP_USING_IF_EXISTS;
+using ::erff _LIBCPP_USING_IF_EXISTS;
+using ::erfc _LIBCPP_USING_IF_EXISTS;
+using ::erfcf _LIBCPP_USING_IF_EXISTS;
+using ::exp2 _LIBCPP_USING_IF_EXISTS;
+using ::exp2f _LIBCPP_USING_IF_EXISTS;
+using ::expm1 _LIBCPP_USING_IF_EXISTS;
+using ::expm1f _LIBCPP_USING_IF_EXISTS;
+using ::fdim _LIBCPP_USING_IF_EXISTS;
+using ::fdimf _LIBCPP_USING_IF_EXISTS;
+using ::fmaf _LIBCPP_USING_IF_EXISTS;
+using ::fma _LIBCPP_USING_IF_EXISTS;
+using ::fmax _LIBCPP_USING_IF_EXISTS;
+using ::fmaxf _LIBCPP_USING_IF_EXISTS;
+using ::fmin _LIBCPP_USING_IF_EXISTS;
+using ::fminf _LIBCPP_USING_IF_EXISTS;
+using ::hypot _LIBCPP_USING_IF_EXISTS;
+using ::hypotf _LIBCPP_USING_IF_EXISTS;
+using ::ilogb _LIBCPP_USING_IF_EXISTS;
+using ::ilogbf _LIBCPP_USING_IF_EXISTS;
+using ::lgamma _LIBCPP_USING_IF_EXISTS;
+using ::lgammaf _LIBCPP_USING_IF_EXISTS;
+using ::llrint _LIBCPP_USING_IF_EXISTS;
+using ::llrintf _LIBCPP_USING_IF_EXISTS;
+using ::llround _LIBCPP_USING_IF_EXISTS;
+using ::llroundf _LIBCPP_USING_IF_EXISTS;
+using ::log1p _LIBCPP_USING_IF_EXISTS;
+using ::log1pf _LIBCPP_USING_IF_EXISTS;
+using ::log2 _LIBCPP_USING_IF_EXISTS;
+using ::log2f _LIBCPP_USING_IF_EXISTS;
+using ::logb _LIBCPP_USING_IF_EXISTS;
+using ::logbf _LIBCPP_USING_IF_EXISTS;
+using ::lrint _LIBCPP_USING_IF_EXISTS;
+using ::lrintf _LIBCPP_USING_IF_EXISTS;
+using ::lround _LIBCPP_USING_IF_EXISTS;
+using ::lroundf _LIBCPP_USING_IF_EXISTS;
+
+using ::nan _LIBCPP_USING_IF_EXISTS;
+using ::nanf _LIBCPP_USING_IF_EXISTS;
+
+using ::nearbyint _LIBCPP_USING_IF_EXISTS;
+using ::nearbyintf _LIBCPP_USING_IF_EXISTS;
+using ::nextafter _LIBCPP_USING_IF_EXISTS;
+using ::nextafterf _LIBCPP_USING_IF_EXISTS;
+using ::nexttoward _LIBCPP_USING_IF_EXISTS;
+using ::nexttowardf _LIBCPP_USING_IF_EXISTS;
+using ::remainder _LIBCPP_USING_IF_EXISTS;
+using ::remainderf _LIBCPP_USING_IF_EXISTS;
+using ::remquo _LIBCPP_USING_IF_EXISTS;
+using ::remquof _LIBCPP_USING_IF_EXISTS;
+using ::rint _LIBCPP_USING_IF_EXISTS;
+using ::rintf _LIBCPP_USING_IF_EXISTS;
+using ::round _LIBCPP_USING_IF_EXISTS;
+using ::roundf _LIBCPP_USING_IF_EXISTS;
+using ::scalbln _LIBCPP_USING_IF_EXISTS;
+using ::scalblnf _LIBCPP_USING_IF_EXISTS;
+using ::scalbn _LIBCPP_USING_IF_EXISTS;
+using ::scalbnf _LIBCPP_USING_IF_EXISTS;
+using ::tgamma _LIBCPP_USING_IF_EXISTS;
+using ::tgammaf _LIBCPP_USING_IF_EXISTS;
+using ::trunc _LIBCPP_USING_IF_EXISTS;
+using ::truncf _LIBCPP_USING_IF_EXISTS;
+
+using ::acosl _LIBCPP_USING_IF_EXISTS;
+using ::asinl _LIBCPP_USING_IF_EXISTS;
+using ::atanl _LIBCPP_USING_IF_EXISTS;
+using ::atan2l _LIBCPP_USING_IF_EXISTS;
+using ::ceill _LIBCPP_USING_IF_EXISTS;
+using ::cosl _LIBCPP_USING_IF_EXISTS;
+using ::coshl _LIBCPP_USING_IF_EXISTS;
+using ::expl _LIBCPP_USING_IF_EXISTS;
+using ::fabsl _LIBCPP_USING_IF_EXISTS;
+using ::floorl _LIBCPP_USING_IF_EXISTS;
+using ::fmodl _LIBCPP_USING_IF_EXISTS;
+using ::frexpl _LIBCPP_USING_IF_EXISTS;
+using ::ldexpl _LIBCPP_USING_IF_EXISTS;
+using ::logl _LIBCPP_USING_IF_EXISTS;
+using ::log10l _LIBCPP_USING_IF_EXISTS;
+using ::modfl _LIBCPP_USING_IF_EXISTS;
+using ::powl _LIBCPP_USING_IF_EXISTS;
+using ::sinl _LIBCPP_USING_IF_EXISTS;
+using ::sinhl _LIBCPP_USING_IF_EXISTS;
+using ::sqrtl _LIBCPP_USING_IF_EXISTS;
+using ::tanl _LIBCPP_USING_IF_EXISTS;
+
+using ::tanhl _LIBCPP_USING_IF_EXISTS;
+using ::acoshl _LIBCPP_USING_IF_EXISTS;
+using ::asinhl _LIBCPP_USING_IF_EXISTS;
+using ::atanhl _LIBCPP_USING_IF_EXISTS;
+using ::cbrtl _LIBCPP_USING_IF_EXISTS;
+
+using ::copysignl _LIBCPP_USING_IF_EXISTS;
+
+using ::erfl _LIBCPP_USING_IF_EXISTS;
+using ::erfcl _LIBCPP_USING_IF_EXISTS;
+using ::exp2l _LIBCPP_USING_IF_EXISTS;
+using ::expm1l _LIBCPP_USING_IF_EXISTS;
+using ::fdiml _LIBCPP_USING_IF_EXISTS;
+using ::fmal _LIBCPP_USING_IF_EXISTS;
+using ::fmaxl _LIBCPP_USING_IF_EXISTS;
+using ::fminl _LIBCPP_USING_IF_EXISTS;
+using ::hypotl _LIBCPP_USING_IF_EXISTS;
+using ::ilogbl _LIBCPP_USING_IF_EXISTS;
+using ::lgammal _LIBCPP_USING_IF_EXISTS;
+using ::llrintl _LIBCPP_USING_IF_EXISTS;
+using ::llroundl _LIBCPP_USING_IF_EXISTS;
+using ::log1pl _LIBCPP_USING_IF_EXISTS;
+using ::log2l _LIBCPP_USING_IF_EXISTS;
+using ::logbl _LIBCPP_USING_IF_EXISTS;
+using ::lrintl _LIBCPP_USING_IF_EXISTS;
+using ::lroundl _LIBCPP_USING_IF_EXISTS;
+using ::nanl _LIBCPP_USING_IF_EXISTS;
+using ::nearbyintl _LIBCPP_USING_IF_EXISTS;
+using ::nextafterl _LIBCPP_USING_IF_EXISTS;
+using ::nexttowardl _LIBCPP_USING_IF_EXISTS;
+using ::remainderl _LIBCPP_USING_IF_EXISTS;
+using ::remquol _LIBCPP_USING_IF_EXISTS;
+using ::rintl _LIBCPP_USING_IF_EXISTS;
+using ::roundl _LIBCPP_USING_IF_EXISTS;
+using ::scalblnl _LIBCPP_USING_IF_EXISTS;
+using ::scalbnl _LIBCPP_USING_IF_EXISTS;
+using ::tgammal _LIBCPP_USING_IF_EXISTS;
+using ::truncl _LIBCPP_USING_IF_EXISTS;
+
+#if _LIBCPP_STD_VER >= 17
+inline _LIBCPP_INLINE_VISIBILITY float       hypot(       float __x,       float __y,       float __z ) { return sqrt(__x*__x + __y*__y + __z*__z); }
+inline _LIBCPP_INLINE_VISIBILITY double      hypot(      double __x,      double __y,      double __z ) { return sqrt(__x*__x + __y*__y + __z*__z); }
+inline _LIBCPP_INLINE_VISIBILITY long double hypot( long double __x, long double __y, long double __z ) { return sqrt(__x*__x + __y*__y + __z*__z); }
+
+template <class _A1, class _A2, class _A3>
+inline _LIBCPP_INLINE_VISIBILITY
+typename enable_if_t
+<
+    is_arithmetic<_A1>::value &&
+    is_arithmetic<_A2>::value &&
+    is_arithmetic<_A3>::value,
+    __promote<_A1, _A2, _A3>
+>::type
+hypot(_A1 __lcpp_x, _A2 __lcpp_y, _A3 __lcpp_z) _NOEXCEPT
+{
+    typedef typename __promote<_A1, _A2, _A3>::type __result_type;
+    static_assert((!(is_same<_A1, __result_type>::value &&
+                     is_same<_A2, __result_type>::value &&
+                     is_same<_A3, __result_type>::value)), "");
+    return std::hypot((__result_type)__lcpp_x, (__result_type)__lcpp_y, (__result_type)__lcpp_z);
+}
+#endif
+
+template <class _A1>
+_LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR typename enable_if<is_floating_point<_A1>::value, bool>::type
+__constexpr_isnan(_A1 __lcpp_x) _NOEXCEPT
+{
+#if __has_builtin(__builtin_isnan)
+    return __builtin_isnan(__lcpp_x);
+#else
+    return isnan(__lcpp_x);
+#endif
+}
+
+template <class _A1>
+_LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR typename enable_if<!is_floating_point<_A1>::value, bool>::type
+__constexpr_isnan(_A1 __lcpp_x) _NOEXCEPT
+{
+    return std::isnan(__lcpp_x);
+}
+
+template <class _A1>
+_LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR typename enable_if<is_floating_point<_A1>::value, bool>::type
+__constexpr_isinf(_A1 __lcpp_x) _NOEXCEPT
+{
+#if __has_builtin(__builtin_isinf)
+    return __builtin_isinf(__lcpp_x);
+#else
+    return isinf(__lcpp_x);
+#endif
+}
+
+template <class _A1>
+_LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR typename enable_if<!is_floating_point<_A1>::value, bool>::type
+__constexpr_isinf(_A1 __lcpp_x) _NOEXCEPT
+{
+    return std::isinf(__lcpp_x);
+}
+
+template <class _A1>
+_LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR typename enable_if<is_floating_point<_A1>::value, bool>::type
+__constexpr_isfinite(_A1 __lcpp_x) _NOEXCEPT
+{
+#if __has_builtin(__builtin_isfinite)
+    return __builtin_isfinite(__lcpp_x);
+#else
+    return isfinite(__lcpp_x);
+#endif
+}
+
+template <class _A1>
+_LIBCPP_INLINE_VISIBILITY
+_LIBCPP_CONSTEXPR typename enable_if<!is_floating_point<_A1>::value, bool>::type
+__constexpr_isfinite(_A1 __lcpp_x) _NOEXCEPT
+{
+    return __builtin_isfinite(__lcpp_x);
+}
+
+_LIBCPP_CONSTEXPR inline _LIBCPP_HIDE_FROM_ABI float __constexpr_copysign(float __x, float __y) _NOEXCEPT {
+    return __builtin_copysignf(__x, __y);
+}
+
+_LIBCPP_CONSTEXPR inline _LIBCPP_HIDE_FROM_ABI double __constexpr_copysign(double __x, double __y) _NOEXCEPT {
+    return __builtin_copysign(__x, __y);
+}
+
+_LIBCPP_CONSTEXPR inline _LIBCPP_HIDE_FROM_ABI long double
+__constexpr_copysign(long double __x, long double __y) _NOEXCEPT {
+    return __builtin_copysignl(__x, __y);
+}
+
+template <class _A1, class _A2>
+_LIBCPP_CONSTEXPR inline _LIBCPP_HIDE_FROM_ABI
+    typename std::__enable_if_t<std::is_arithmetic<_A1>::value && std::is_arithmetic<_A2>::value,
+                                std::__promote<_A1, _A2> >::type
+    __constexpr_copysign(_A1 __x, _A2 __y) _NOEXCEPT {
+    typedef typename std::__promote<_A1, _A2>::type __result_type;
+    static_assert((!(std::_IsSame<_A1, __result_type>::value && std::_IsSame<_A2, __result_type>::value)), "");
+    return __builtin_copysign((__result_type)__x, (__result_type)__y);
+}
+
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR float __constexpr_fabs(float __x) _NOEXCEPT {
+    return __builtin_fabsf(__x);
+}
+
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR double __constexpr_fabs(double __x) _NOEXCEPT {
+    return __builtin_fabs(__x);
+}
+
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR long double __constexpr_fabs(long double __x) _NOEXCEPT {
+    return __builtin_fabsl(__x);
+}
+
+template <class _Tp, __enable_if_t<is_integral<_Tp>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR double __constexpr_fabs(_Tp __x) _NOEXCEPT {
+    return __builtin_fabs(static_cast<double>(__x));
+}
+
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 float __constexpr_fmax(float __x, float __y) _NOEXCEPT {
+#if !__has_constexpr_builtin(__builtin_fmaxf)
+  if (__libcpp_is_constant_evaluated()) {
+    if (std::__constexpr_isnan(__x))
+      return __y;
+    if (std::__constexpr_isnan(__y))
+      return __x;
+    return __x < __y ? __y : __x;
+  }
+#endif
+  return __builtin_fmaxf(__x, __y);
+}
+
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 double __constexpr_fmax(double __x, double __y) _NOEXCEPT {
+#if !__has_constexpr_builtin(__builtin_fmax)
+  if (__libcpp_is_constant_evaluated()) {
+    if (std::__constexpr_isnan(__x))
+      return __y;
+    if (std::__constexpr_isnan(__y))
+      return __x;
+    return __x < __y ? __y : __x;
+  }
+#endif
+  return __builtin_fmax(__x, __y);
+}
+
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 long double
+__constexpr_fmax(long double __x, long double __y) _NOEXCEPT {
+#if !__has_constexpr_builtin(__builtin_fmaxl)
+  if (__libcpp_is_constant_evaluated()) {
+    if (std::__constexpr_isnan(__x))
+      return __y;
+    if (std::__constexpr_isnan(__y))
+      return __x;
+    return __x < __y ? __y : __x;
+  }
+#endif
+  return __builtin_fmaxl(__x, __y);
+}
+
+template <class _Tp, class _Up, __enable_if_t<is_arithmetic<_Tp>::value && is_arithmetic<_Up>::value, int> = 0>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 typename __promote<_Tp, _Up>::type
+__constexpr_fmax(_Tp __x, _Up __y) _NOEXCEPT {
+  using __result_type = typename __promote<_Tp, _Up>::type;
+  return std::__constexpr_fmax(static_cast<__result_type>(__x), static_cast<__result_type>(__y));
+}
+
+template <class _Tp>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX14 _Tp __constexpr_logb(_Tp __x) {
+#if !__has_constexpr_builtin(__builtin_logb)
+  if (__libcpp_is_constant_evaluated()) {
+    if (__x == _Tp(0)) {
+      // raise FE_DIVBYZERO
+      return -numeric_limits<_Tp>::infinity();
+    }
+
+    if (std::__constexpr_isinf(__x))
+      return numeric_limits<_Tp>::infinity();
+
+    if (std::__constexpr_isnan(__x))
+      return numeric_limits<_Tp>::quiet_NaN();
+
+    __x = std::__constexpr_fabs(__x);
+    unsigned long long __exp = 0;
+    while (__x >= numeric_limits<_Tp>::radix) {
+      __x /= numeric_limits<_Tp>::radix;
+      __exp += 1;
+    }
+    return _Tp(__exp);
+  }
+#endif // !__has_constexpr_builtin(__builtin_logb)
+  return __builtin_logb(__x);
+}
+
+template <class _Tp>
+_LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 _Tp __constexpr_scalbn(_Tp __x, int __exp) {
+#if !__has_constexpr_builtin(__builtin_scalbln)
+  if (__libcpp_is_constant_evaluated()) {
+    if (__x == _Tp(0))
+      return __x;
+
+    if (std::__constexpr_isinf(__x))
+      return __x;
+
+    if (__exp == _Tp(0))
+      return __x;
+
+    if (std::__constexpr_isnan(__x))
+      return numeric_limits<_Tp>::quiet_NaN();
+
+    _Tp __mult(1);
+    if (__exp > 0) {
+      __mult = numeric_limits<_Tp>::radix;
+      --__exp;
     } else {
-        return _fpclassifyf(__x);
+      ++__exp;
+      __exp = -__exp;
+      __mult /= numeric_limits<_Tp>::radix;
     }
-}
-inline constexpr int fpclassify(double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
-    } else {
-        return _fpclassifyf(__x);
+
+    while (__exp > 0) {
+      if (!(__exp & 1)) {
+        __mult *= __mult;
+        __exp >>= 1;
+      } else {
+        __x *= __mult;
+        --__exp;
+      }
     }
+    return __x;
+  }
+#endif // !__has_constexpr_builtin(__builtin_scalbln)
+  return __builtin_scalbn(__x, __exp);
 }
-inline constexpr int fpclassify(long double __x) {
-    if (__builtin_constant_p(__x)) {
-        return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
-    } else {
-        return _fpclassifyl(__x);
-    }
+
+#if _LIBCPP_STD_VER >= 20
+template <typename _Fp>
+_LIBCPP_HIDE_FROM_ABI constexpr
+_Fp __lerp(_Fp __a, _Fp __b, _Fp __t) noexcept {
+    if ((__a <= 0 && __b >= 0) || (__a >= 0 && __b <= 0))
+        return __t * __b + (1 - __t) * __a;
+
+    if (__t == 1) return __b;
+    const _Fp __x = __a + __t * (__b - __a);
+    if ((__t > 1) == (__b > __a))
+        return __b < __x ? __x : __b;
+    else
+        return __x < __b ? __x : __b;
 }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, int>
-fpclassify(_Tp __x) { return (__x != 0) ? FP_NORMAL : FP_ZERO; }
 
-inline constexpr bool isgreater(float __x, float __y) { return __builtin_isgreater(__x, __y); }
-inline constexpr bool isgreater(double __x, double __y) { return __builtin_isgreater(__x, __y); }
-inline constexpr bool isgreater(long double __x, long double __y) { return __builtin_isgreater(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, bool>
-isgreater(_Tp __x, _Up __y) { return __builtin_isgreater(__x, __y); }
-
-inline constexpr bool isgreaterequal(float __x, float __y) { return __builtin_isgreaterequal(__x, __y); }
-inline constexpr bool isgreaterequal(double __x, double __y) { return __builtin_isgreaterequal(__x, __y); }
-inline constexpr bool isgreaterequal(long double __x, long double __y) { return __builtin_isgreaterequal(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, bool>
-isgreaterequal(_Tp __x, _Up __y) { return __builtin_isgreaterequal(__x, __y); }
-
-inline constexpr bool isless(float __x, float __y) { return __builtin_isless(__x, __y); }
-inline constexpr bool isless(double __x, double __y) { return __builtin_isless(__x, __y); }
-inline constexpr bool isless(long double __x, long double __y) { return __builtin_isless(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, bool>
-isless(_Tp __x, _Up __y) { return __builtin_isless(__x, __y); }
-
-inline constexpr bool islessequal(float __x, float __y) { return __builtin_islessequal(__x, __y); }
-inline constexpr bool islessequal(double __x, double __y) { return __builtin_islessequal(__x, __y); }
-inline constexpr bool islessequal(long double __x, long double __y) { return __builtin_islessequal(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, bool>
-islessequal(_Tp __x, _Up __y) { return __builtin_islessequal(__x, __y); }
-
-inline constexpr bool islessgreater(float __x, float __y) { return __builtin_islessgreater(__x, __y); }
-inline constexpr bool islessgreater(double __x, double __y) { return __builtin_islessgreater(__x, __y); }
-inline constexpr bool islessgreater(long double __x, long double __y) { return __builtin_islessgreater(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, bool>
-islessgreater(_Tp __x, _Up __y) { return __builtin_islessgreater(__x, __y); }
-
-inline constexpr bool isunordered(float __x, float __y) { return __builtin_isunordered(__x, __y); }
-inline constexpr bool isunordered(double __x, double __y) { return __builtin_isunordered(__x, __y); }
-inline constexpr bool isunordered(long double __x, long double __y) { return __builtin_isunordered(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, bool>
-isunordered(_Tp __x, _Up __y) { return __builtin_isunordered(__x, __y); }
-
-using ::acos;
-using ::acosf;
-using ::acosl;
-inline constexpr float acos(float __x) { return acosf(__x); }
-inline constexpr long double acos(long double __x) { return acosl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-acos(_Tp __x) { return acos(__x); }
-
-using ::acos;
-using ::acoshf;
-using ::acoshl;
-inline constexpr float acosh(float __x) { return acoshf(__x); }
-inline constexpr long double acosh(long double __x) { return acoshl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-acosh(_Tp __x) { return acosh(__x); }
-
-using ::asin;
-using ::asinf;
-using ::asinl;
-inline constexpr float asin(float __x) { return asinf(__x); }
-inline constexpr long double asin(long double __x) { return asinl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-asin(_Tp __x) { return asin(__x); }
-
-using ::asinh;
-using ::asinhf;
-using ::asinhl;
-inline constexpr float asinh(float __x) { return asinhf(__x); }
-inline constexpr long double asinh(long double __x) { return asinhl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-asinh(_Tp __x) { return asinh(__x); }
-
-using ::atan;
-using ::atanf;
-using ::atanl;
-inline constexpr float atan(float __x) { return atanf(__x); }
-inline constexpr long double atan(long double __x) { return atanl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-atan(_Tp __x) { return atan(__x); }
-
-using ::atan2;
-using ::atan2f;
-using ::atan2l;
-inline constexpr float atan2(float __x, float __y) { return atan2f(__x, __y); }
-inline constexpr long double atan2(long double __x, long double __y) { return atan2l(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-atan2(_Tp __x, _Up __y) { return atan2(__x, __y); }
-
-using ::atanh;
-using ::atanhf;
-using ::atanhl;
-inline constexpr float atanh(float __x) { return atanhf(__x); }
-inline constexpr long double atanh(long double __x) { return atanhl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-atanh(_Tp __x) { return atanh(__x); }
-
-using ::cbrt;
-using ::cbrtf;
-using ::cbrtl;
-inline constexpr float cbrt(float __x) { return cbrtf(__x); }
-inline constexpr long double cbrt(long double __x) { return cbrtl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-cbrt(_Tp __x) { return cbrt(__x); }
-
-using ::ceil;
-using ::ceilf;
-using ::ceill;
-inline constexpr float ceil(float __x) { return ceilf(__x); }
-inline constexpr long double ceil(long double __x) { return ceill(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-ceil(_Tp __x) { return ceil(__x); }
-
-using ::copysign;
-using ::copysignf;
-using ::copysignl;
-inline constexpr float copysign(float __x, float __y) { return copysignf(__x, __y); }
-inline constexpr long double copysign(long double __x, long double __y) { return copysignl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-copysign(_Tp __x, _Up __y) { return copysign(__x, __y); }
-
-using ::cos;
-using ::cosf;
-using ::cosl;
-inline constexpr float cos(float __x) { return cosf(__x); }
-inline constexpr long double cos(long double __x) { return cosl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-cos(_Tp __x) { return cos(__x); }
-
-using ::cospi;
-using ::cospif;
-using ::cospil;
-inline float cospi(float __x) { return cospif(__x); }
-inline long double cospi(long double __x) { return cospil(__x); }
-template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-cospi(_Tp __x) { return cospi(__x); }
-
-using ::cosh;
-using ::coshf;
-using ::coshl;
-inline constexpr float cosh(float __x) { return coshf(__x); }
-inline constexpr long double cosh(long double __x) { return coshl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-cosh(_Tp __x) { return cosh(__x); }
-
-using ::erf;
-using ::erff;
-using ::erfl;
-inline constexpr float erf(float __x) { return erff(__x); }
-inline constexpr long double erf(long double __x) { return erfl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-erf(_Tp __x) { return erf(__x); }
-
-using ::erfc;
-using ::erfcf;
-using ::erfcl;
-inline constexpr float erfc(float __x) { return erfcf(__x); }
-inline constexpr long double erfc(long double __x) { return erfcl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-erfc(_Tp __x) { return erfc(__x); }
-
-using ::exp;
-using ::expf;
-using ::expl;
-inline constexpr float exp(float __x) { return expf(__x); }
-inline constexpr long double exp(long double __x) { return expl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-exp(_Tp __x) { return exp(__x); }
-
-using ::exp2;
-using ::exp2f;
-using ::exp2l;
-inline constexpr float exp2(float __x) { return exp2f(__x); }
-inline constexpr long double exp2(long double __x) { return exp2l(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-exp2(_Tp __x) { return exp2(__x); }
-
-using ::expm1;
-using ::expm1f;
-using ::expm1l;
-inline constexpr float expm1(float __x) { return expm1f(__x); }
-inline constexpr long double expm1(long double __x) { return expm1l(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-expm1(_Tp __x) { return expm1(__x); }
-
-using ::fabs;
-using ::fabsf;
-using ::fabsl;
-inline constexpr float fabs(float __x) { return fabsf(__x); }
-inline constexpr long double fabs(long double __x) { return fabsl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-fabs(_Tp __x) { return fabs(__x); }
-
-using ::fdim;
-using ::fdimf;
-using ::fdiml;
-inline constexpr float fdim(float __x, float __y) { return fdimf(__x, __y); }
-inline constexpr long double fdim(long double __x, long double __y) { return fdiml(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-fdim(_Tp __x, _Up __y) { return fdim(__x, __y); }
-
-using ::floor;
-using ::floorf;
-using ::floorl;
-inline constexpr float floor(float __x) { return floorf(__x); }
-inline constexpr long double floor(long double __x) { return floorl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-floor(_Tp __x) { return floor(__x); }
-
-using ::fma;
-using ::fmaf;
-using ::fmal;
-inline constexpr float fma(float __x, float __y, float __z) { return fmaf(__x, __y, __z); }
-inline constexpr long double fma(long double __x, long double __y, long double __z) { return fmal(__x, __y, __z); }
-template<typename _Tp, typename _Up, typename _Vp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up> && __cmath_is_integral_v<_Vp>, double>
-fma(_Tp __x, _Up __y, _Vp __z) { return fma(__x, __y, __z); }
-
-using ::fmax;
-using ::fmaxf;
-using ::fmaxl;
-inline constexpr float fmax(float __x, float __y) { return fmaxf(__x, __y); }
-inline constexpr long double fmax(long double __x, long double __y) { return fmaxl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-fmax(_Tp __x, _Up __y) { return fmax(__x, __y); }
-
-using ::fmin;
-using ::fminf;
-using ::fminl;
-inline constexpr float fmin(float __x, float __y) { return fminf(__x, __y); }
-inline constexpr long double fmin(long double __x, long double __y) { return fminl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-fmin(_Tp __x, _Up __y) { return fmin(__x, __y); }
-
-using ::fmod;
-using ::fmodf;
-using ::fmodl;
-inline constexpr float fmod(float __x, float __y) { return fmodf(__x, __y); }
-inline constexpr long double fmod(long double __x, long double __y) { return fmodl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-fmod(_Tp __x, _Up __y) { return fmod(__x, __y); }
-
-using ::frexp;
-using ::frexpf;
-using ::frexpl;
-inline constexpr float frexp(float __x, int *__y) { return frexpf(__x, __y); }
-inline constexpr long double frexp(long double __x, int *__y) { return frexpl(__x, __y); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-frexp(_Tp __x, int *__y) { return frexp(__x, __y); }
-
-using ::hypot;
-using ::hypotf;
-using ::hypotl;
-inline constexpr float hypot(float __x, float __y) { return hypotf(__x, __y); }
-inline constexpr long double hypot(long double __x, long double __y) { return hypotl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-hypot(_Tp __x, _Up __y) { return hypot(__x, __y); }
-
-inline float hypot(float __x, float __y, float __z) { return __hypot3f(__x, __y, __z); }
-inline long double hypot(long double __x, long double __y, long double __z) { return __hypot3l(__x, __y, __z); }
-template<typename _Tp, typename _Up, typename _Vp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up> && __cmath_is_integral_v<_Vp>, double>
-hypot(_Tp __x, _Up __y, _Vp __z) { return __hypot3(__x, __y, __z); }
-
-using ::ilogb;
-using ::ilogbf;
-using ::ilogbl;
-inline constexpr int ilogb(float __x) { return ilogbf(__x); }
-inline constexpr int ilogb(long double __x) { return ilogbl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, int>
-ilogb(_Tp __x) { return ilogb(__x); }
-
-using ::ldexp;
-using ::ldexpf;
-using ::ldexpl;
-inline constexpr float ldexp(float __x, int __y) { return ldexpf(__x, __y); }
-inline constexpr long double ldexp(long double __x, int __y) { return ldexpl(__x, __y); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-ldexp(_Tp __x, int __y) { return ldexp(__x, __y); }
-
-using ::lgamma;
-using ::lgammaf;
-using ::lgammal;
-inline constexpr float lgamma(float __x) { return lgammaf(__x); }
-inline constexpr long double lgamma(long double __x) { return lgammal(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-lgamma(_Tp __x) { return lgamma(__x); }
-
-using ::llrint;
-using ::llrintf;
-using ::llrintl;
-inline constexpr long long llrint(float __x) { return llrintf(__x); }
-inline constexpr long long llrint(long double __x) { return llrintl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, long long>
-llrint(_Tp __x) { return llrint(__x); }
-
-using ::llround;
-using ::llroundf;
-using ::llroundl;
-inline constexpr long long llround(float __x) { return llroundf(__x); }
-inline constexpr long long llround(long double __x) { return llroundl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, long long>
-llround(_Tp __x) { return llround(__x); }
-
-using ::log;
-using ::logf;
-using ::logl;
-inline constexpr float log(float __x) { return logf(__x); }
-inline constexpr long double log(long double __x) { return logl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-log(_Tp __x) { return log(__x); }
-
-using ::log10;
-using ::log10f;
-using ::log10l;
-inline constexpr float log10(float __x) { return log10f(__x); }
-inline constexpr long double log10(long double __x) { return log10l(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-log10(_Tp __x) { return log10(__x); }
-
-using ::log1p;
-using ::log1pf;
-using ::log1pl;
-inline constexpr float log1p(float __x) { return log1pf(__x); }
-inline constexpr long double log1p(long double __x) { return log1pl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-log1p(_Tp __x) { return log1p(__x); }
-
-using ::log2;
-using ::log2f;
-using ::log2l;
-inline constexpr float log2(float __x) { return log2f(__x); }
-inline constexpr long double log2(long double __x) { return log2l(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-log2(_Tp __x) { return log2(__x); }
-
-using ::logb;
-using ::logbf;
-using ::logbl;
-inline constexpr float logb(float __x) { return logbf(__x); }
-inline constexpr long double logb(long double __x) { return logbl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-logb(_Tp __x) { return logb(__x); }
-
-using ::lrint;
-using ::lrintf;
-using ::lrintl;
-inline constexpr long lrint(float __x) { return lrintf(__x); }
-inline constexpr long lrint(long double __x) { return lrintl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, long>
-lrint(_Tp __x) { return lrint(__x); }
-
-using ::lround;
-using ::lroundf;
-using ::lroundl;
-inline constexpr long lround(float __x) { return lroundf(__x); }
-inline constexpr long lround(long double __x) { return lroundl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, long>
-lround(_Tp __x) { return lround(__x); }
-
-using ::modf;
-using ::modff;
-using ::modfl;
-inline constexpr float modf(float __x, float *__y) { return modff(__x, __y); }
-inline constexpr long double modf(long double __x, long double *__y) { return modfl(__x, __y); }
-
-using ::nanf;
-using ::nan;
-using ::nanl;
-
-using ::nearbyint;
-using ::nearbyintf;
-using ::nearbyintl;
-inline constexpr float nearbyint(float __x) { return nearbyintf(__x); }
-inline constexpr long double nearbyint(long double __x) { return nearbyintl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-nearbyint(_Tp __x) { return nearbyint(__x); }
-
-using ::nextafter;
-using ::nextafterf;
-using ::nextafterl;
-inline constexpr float nextafter(float __x, float __y) { return nextafterf(__x, __y); }
-inline constexpr long double nextafter(long double __x, long double __y) { return nextafterl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-nextafter(_Tp __x, _Up __y) { return nextafter(__x, __y); }
-
-using ::nextup;
-using ::nextupf;
-using ::nextupl;
-inline float nextup(float __x) { return nextupf(__x); }
-inline long double nextup(long double __x) { return nextupl(__x); }
-template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-nextup(_Tp __x) { return nextup(__x); }
-
-using ::nexttoward;
-using ::nexttowardf;
-using ::nexttowardl;
-inline constexpr float nexttoward(float __x, float __y) { return nexttowardf(__x, __y); }
-inline constexpr long double nexttoward(long double __x, long double __y) { return nexttowardl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-nexttoward(_Tp __x, _Up __y) { return nexttoward(__x, __y); }
-
-using ::nextdown;
-using ::nextdownf;
-using ::nextdownl;
-inline float nextdown(float __x) { return nextdownf(__x); }
-inline long double nextdown(long double __x) { return nextdownl(__x); }
-template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-nextdown(_Tp __x) { return nextdown(__x); }
-
-using ::pow;
-using ::powf;
-using ::powl;
-inline constexpr float pow(float __x, float __y) { return powf(__x, __y); }
-inline constexpr long double pow(long double __x, long double __y) { return powl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-pow(_Tp __x, _Up __y) { return pow(__x, __y); }
-
-using ::remainder;
-using ::remainderf;
-using ::remainderl;
-inline constexpr float remainder(float __x, float __y) { return remainderf(__x, __y); }
-inline constexpr long double remainder(long double __x, long double __y) { return remainderl(__x, __y); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-remainder(_Tp __x, _Up __y) { return remainder(__x, __y); }
-
-using ::remquo;
-using ::remquof;
-using ::remquol;
-inline constexpr float remquo(float __x, float __y, int *__z) { return remquof(__x, __y, __z); }
-inline constexpr long double remquo(long double __x, long double __y, int *__z) { return remquol(__x, __y, __z); }
-template<typename _Tp, typename _Up> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp> && __cmath_is_integral_v<_Up>, double>
-remquo(_Tp __x, _Up __y, int *__z) { return remquo(__x, __y, __z); }
-
-using ::rint;
-using ::rintf;
-using ::rintl;
-inline constexpr float rint(float __x) { return rintf(__x); }
-inline constexpr long double rint(long double __x) { return rintl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-rint(_Tp __x) { return rint(__x); }
-
-using ::round;
-using ::roundf;
-using ::roundl;
-inline constexpr float round(float __x) { return roundf(__x); }
-inline constexpr long double round(long double __x) { return roundl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-round(_Tp __x) { return round(__x); }
-
-using ::roundeven;
-using ::roundevenf;
-using ::roundevenl;
-inline float roundeven(float __x) { return roundevenf(__x); }
-inline long double roundeven(long double __x) { return roundevenl(__x); }
-template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-roundeven(_Tp __x) { return roundeven(__x); }
-
-using ::scalbln;
-using ::scalblnf;
-using ::scalblnl;
-inline constexpr float scalbln(float __x, long __y) { return scalblnf(__x, __y); }
-inline constexpr long double scalbln(long double __x, long __y) { return scalblnl(__x, __y); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-scalbln(_Tp __x, long __y) { return scalbln(__x, __y); }
-
-using ::scalbn;
-using ::scalbnf;
-using ::scalbnl;
-inline constexpr float scalbn(float __x, int __y) { return scalbnf(__x, __y); }
-inline constexpr long double scalbn(long double __x, int __y) { return scalbnl(__x, __y); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-scalbn(_Tp __x, int __y) { return scalbn(__x, __y); }
-
-using ::sin;
-using ::sinf;
-using ::sinl;
-inline constexpr float sin(float __x) { return sinf(__x); }
-inline constexpr long double sin(long double __x) { return sinl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-sin(_Tp __x) { return sin(__x); }
-
-using ::sinpi;
-using ::sinpif;
-using ::sinpil;
-inline float sinpi(float __x) { return sinpif(__x); }
-inline long double sinpi(long double __x) { return sinpil(__x); }
-template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-sinpi(_Tp __x) { return sinpi(__x); }
-
-using ::sinh;
-using ::sinhf;
-using ::sinhl;
-inline constexpr float sinh(float __x) { return sinhf(__x); }
-inline constexpr long double sinh(long double __x) { return sinhl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-sinh(_Tp __x) { return sinh(__x); }
-
-using ::sqrt;
-using ::sqrtf;
-using ::sqrtl;
-inline constexpr float sqrt(float __x) { return sqrtf(__x); }
-inline constexpr long double sqrt(long double __x) { return sqrtl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-sqrt(_Tp __x) { return sqrt(__x); }
-
-using ::tan;
-using ::tanf;
-using ::tanl;
-inline constexpr float tan(float __x) { return tanf(__x); }
-inline constexpr long double tan(long double __x) { return tanl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-tan(_Tp __x) { return tan(__x); }
-
-using ::tanpi;
-using ::tanpif;
-using ::tanpil;
-inline float tanpi(float __x) { return tanpif(__x); }
-inline long double tanpi(long double __x) { return tanpil(__x); }
-template<typename _Tp> inline
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-tanpi(_Tp __x) { return tanpi(__x); }
-
-using ::tanh;
-using ::tanhf;
-using ::tanhl;
-inline constexpr float tanh(float __x) { return tanhf(__x); }
-inline constexpr long double tanh(long double __x) { return tanhl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-tanh(_Tp __x) { return tanh(__x); }
-
-using ::tgamma;
-using ::tgammaf;
-using ::tgammal;
-inline constexpr float tgamma(float __x) { return tgammaf(__x); }
-inline constexpr long double tgamma(long double __x) { return tgammal(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-tgamma(_Tp __x) { return tgamma(__x); }
-
-using ::trunc;
-using ::truncf;
-using ::truncl;
-inline constexpr float trunc(float __x) { return truncf(__x); }
-inline constexpr long double trunc(long double __x) { return truncl(__x); }
-template<typename _Tp> inline constexpr
-__cmath_enable_if_t<__cmath_is_integral_v<_Tp>, double>
-trunc(_Tp __x) { return trunc(__x); }
-
-} // namespace std
-
-using std::signbit;
-using std::issignaling;
-using std::isnan;
-using std::isinf;
-using std::isfinite;
-using std::isnormal;
-using std::issubnormal;
-using std::iszero;
-using std::fpclassify;
-
-using std::isgreater;
-using std::isgreaterequal;
-using std::isless;
-using std::islessequal;
-using std::islessgreater;
-using std::isunordered;
-
-#endif // _EZCXX_CMATH
+_LIBCPP_HIDE_FROM_ABI constexpr float
+lerp(float __a, float __b, float __t)                   _NOEXCEPT { return __lerp(__a, __b, __t); }
+
+_LIBCPP_HIDE_FROM_ABI constexpr double
+lerp(double __a, double __b, double __t)                _NOEXCEPT { return __lerp(__a, __b, __t); }
+
+_LIBCPP_HIDE_FROM_ABI constexpr long double
+lerp(long double __a, long double __b, long double __t) _NOEXCEPT { return __lerp(__a, __b, __t); }
+
+template <class _A1, class _A2, class _A3>
+inline _LIBCPP_HIDE_FROM_ABI
+constexpr typename enable_if_t
+<
+    is_arithmetic<_A1>::value &&
+    is_arithmetic<_A2>::value &&
+    is_arithmetic<_A3>::value,
+    __promote<_A1, _A2, _A3>
+>::type
+lerp(_A1 __a, _A2 __b, _A3 __t) noexcept
+{
+    typedef typename __promote<_A1, _A2, _A3>::type __result_type;
+    static_assert(!(_IsSame<_A1, __result_type>::value &&
+                    _IsSame<_A2, __result_type>::value &&
+                    _IsSame<_A3, __result_type>::value));
+    return std::__lerp((__result_type)__a, (__result_type)__b, (__result_type)__t);
+}
+#endif // _LIBCPP_STD_VER >= 20
+
+_LIBCPP_END_NAMESPACE_STD
+
+_LIBCPP_POP_MACROS
+
+#if !defined(_LIBCPP_REMOVE_TRANSITIVE_INCLUDES) && _LIBCPP_STD_VER <= 20
+#  include <type_traits>
+#endif
+
+#endif // _LIBCPP_CMATH
