@@ -100,6 +100,9 @@ char *T_strchrnul(const char *s, int c)
 char *T_strrstr(const char *haystack, const char *needle)
     __attribute__((nonnull(1, 2)));
 
+char *T_strsep(char **__restrict s, const char *__restrict delim)
+    __attribute__((nonnull(1, 2)));
+
 void T_bzero(void* s, size_t n);
 
 #else
@@ -121,6 +124,7 @@ void T_bzero(void* s, size_t n);
 #define T_strncmp strncmp
 #define T_strchrnul strchrnul
 #define T_strrstr strrstr
+#define T_strsep strsep
 #define T_bzero bzero
 
 #endif
@@ -1017,6 +1021,75 @@ int strchrnul_test(void) {
     return 0;
 }
 
+static char *truth_strsep(char **__restrict stringp, const char *__restrict delim) {
+    char * const begin_str = *stringp;
+    if (begin_str == NULL) {
+        return NULL;
+    }
+    size_t length = strcspn(begin_str, delim);
+    char * end_str = begin_str + length;
+    if (*end_str != '\0') {
+        *end_str++ = '\0';
+        *stringp = end_str;
+    } else {
+        *stringp = NULL;
+    }
+    return begin_str;
+}
+
+static int strsep_loop_test(char * str_1, char * str_2) {
+    for (;;) {
+        char *__restrict prev_1 = T_strsep(&str_1, ", .");
+        char *__restrict prev_2 = truth_strsep(&str_2, ", .");
+        if (str_1 == NULL || str_2 == NULL) {
+            break;
+        }
+        ptrdiff_t diff_1 = (str_1 - prev_1);
+        ptrdiff_t diff_2 = (str_2 - prev_2);
+        if (diff_1 != diff_2) {
+            test_printf("%td != %td\n%p %p\n1: %.20s\n2: %.20s\n", diff_1, diff_2, prev_1, prev_2, str_1, str_2);
+            return __LINE__;
+        }
+        C(diff_1 == diff_2);
+    }
+    C(str_1 == NULL && str_2 == NULL);
+    return 0;
+}
+
+int strsep_test(char** dup_1, char** dup_2) {
+    {
+        char *ptr = NULL_ptr;
+        C(T_strsep(&ptr, SINK) == NULL);
+        C(T_strsep(&ptr, NULL_ptr) == NULL);
+        C(T_strsep((char**)SINK, SINK) == NULL);
+        C(T_strsep((char**)SINK, NULL_ptr) == NULL);
+    }
+    const size_t len = strlen(gnu_copypasta);
+    const size_t size = len + 1;
+    *dup_1 = strdup(gnu_copypasta);
+    *dup_2 = strndup(gnu_copypasta, len);
+    C(*dup_1 != NULL && *dup_2 != NULL);
+    C(strcmp(*dup_1, *dup_2) == 0);
+    {
+        char *ptr, *prev;
+        ptr = *dup_2;
+        prev = T_strsep(&ptr, "");
+        C(ptr == NULL);
+        C(prev == *dup_2);
+        ptr = *dup_2;
+        prev = T_strsep(&ptr, "zZ");
+        C(ptr == NULL);
+        C(prev == *dup_2);
+        C(memcmp(*dup_1, *dup_2, size) == 0);
+    }
+    {
+        int ret;
+        TEST(strsep_loop_test(*dup_1, *dup_2));
+        C(memcmp(*dup_1, *dup_2, size) == 0);
+    }
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
 
@@ -1050,6 +1123,17 @@ int run_tests(void) {
     TEST(memrmem_test());
     TEST(strrstr_test());
     TEST(strchrnul_test());
+
+    /* strsep */ {
+        char *dup_1 = SINK, *dup_2 = SINK;
+        ret = strsep_test(&dup_1, &dup_2);
+        if (dup_1 == NULL || dup_2 == NULL) {
+            perror("str(n)dup returned NULL");
+        }
+        free(dup_1); dup_1 = NULL;
+        free(dup_2); dup_2 = NULL;
+        if (ret != 0) { return ret; }
+    }
 
     return 0;
 }

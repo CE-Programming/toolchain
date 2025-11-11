@@ -3,7 +3,7 @@
 	section	.text
 
 	public	_T_memset, _T_memcpy, _T_memmove, _T_memcmp, _T_memccpy, _T_mempcpy, _T_memrchr, _T_memmem, _T_memrmem
-	public	_T_strlen, _T_strcmp, _T_strncmp, _T_stpcpy, _T_stpncpy, _T_strlcat, _T_strchrnul, _T_strrstr
+	public	_T_strlen, _T_strcmp, _T_strncmp, _T_stpcpy, _T_stpncpy, _T_strlcat, _T_strchrnul, _T_strrstr, _T_strsep
 	public	_T_bzero
 
 _T_memset := _memset
@@ -24,6 +24,7 @@ _T_stpncpy := _stpncpy
 _T_strlcat := _strlcat
 _T_strchrnul := _strchrnul
 _T_strrstr := _strrstr
+_T_strsep := _strsep
 
 _T_bzero := _bzero
 
@@ -35,5 +36,5 @@ _ZERO_size:
 	db	$00, $00, $00
 
 	extern	_memset, _memcpy, _memmove, _memcmp, _memccpy, _mempcpy, _memrchr, _memmem, _memrmem
-	extern	_strlen, _strcmp, _strncmp, _stpcpy, _stpncpy, _strlcat, _strchrnul, _strrstr
+	extern	_strlen, _strcmp, _strncmp, _stpcpy, _stpncpy, _strlcat, _strchrnul, _strrstr, _strsep
 	extern	_bzero
