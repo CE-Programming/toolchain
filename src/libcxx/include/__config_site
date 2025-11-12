@@ -13,8 +13,8 @@
 #error "_EZ80 should be defined here"
 #endif /* _EZ80 */
 
-#define _LIBCPP_ABI_VERSION 1
-#define _LIBCPP_ABI_NAMESPACE __1
+#define _LIBCPP_ABI_VERSION 2
+#define _LIBCPP_ABI_NAMESPACE __2
 // #define _LIBCPP_ABI_FORCE_ITANIUM
 // #define _LIBCPP_ABI_FORCE_MICROSOFT
 #define _LIBCPP_HAS_NO_THREADS

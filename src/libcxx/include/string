@@ -1002,6 +1002,9 @@ public:
     __init(__n, __c);
   }
 
+#ifdef _EZ80
+  _LIBCPP_HIDE_FROM_ABI
+#endif // _EZ80
   _LIBCPP_CONSTEXPR_SINCE_CXX20
   basic_string(const basic_string& __str, size_type __pos, size_type __n, const _Allocator& __a = _Allocator())
       : __r_(__default_init_tag(), __a) {
@@ -1091,7 +1094,12 @@ public:
   }
 #endif // _LIBCPP_CXX03_LANG
 
-  inline _LIBCPP_CONSTEXPR_SINCE_CXX20 ~basic_string() {
+#ifndef _EZ80
+  inline
+#else // _EZ80
+  _LIBCPP_HIDE_FROM_ABI
+#endif // _EZ80
+  _LIBCPP_CONSTEXPR_SINCE_CXX20 ~basic_string() {
     if (__is_long())
       __alloc_traits::deallocate(__alloc(), __get_long_pointer(), __get_long_cap());
   }
