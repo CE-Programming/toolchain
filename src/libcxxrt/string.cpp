@@ -14,6 +14,11 @@
 #include <stdexcept>
 #include <string>
 
+#ifdef _EZ80
+#include <ti/sprintf.h>
+extern "C" int __strtoi(const char *__restrict nptr, char **__restrict endptr, int base) __attribute__((nonnull(1)));
+#endif // _EZ80
+
 #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 #  include <cwchar>
 #endif
@@ -60,10 +65,12 @@ template string operator+<char, char_traits<char>, allocator<char>>(char const*,
 namespace
 {
 
+__attribute__((__unused__))
 inline void throw_from_string_out_of_range(const string& func) {
     std::__throw_out_of_range((func + ": out of range").c_str());
 }
 
+__attribute__((__unused__))
 inline void throw_from_string_invalid_arg(const string& func) {
     std::__throw_invalid_argument((func + ": no conversion").c_str());
 }
@@ -91,6 +98,7 @@ template<typename V, typename S>
 inline V as_integer(const string& func, const S& s, size_t* idx, int base);
 
 // string
+#ifndef _EZ80
 template<>
 inline int as_integer(const string& func, const string& s, size_t* idx, int base) {
     // Use long as no Standard string to integer exists.
@@ -119,6 +127,7 @@ template<>
 inline unsigned long long as_integer(const string& func, const string& s, size_t* idx, int base) {
     return as_integer_helper<unsigned long long>(func, s, idx, base, strtoull);
 }
+#endif // _EZ80
 
 #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 // wstring
@@ -177,6 +186,7 @@ inline V as_float_helper(const string& func, const S& str, size_t* idx, F f) {
 template<typename V, typename S>
 inline V as_float(const string& func, const S& s, size_t* idx = nullptr);
 
+#ifndef _EZ80
 template<>
 inline float as_float(const string& func, const string& s, size_t* idx) {
     return as_float_helper<float>(func, s, idx, strtof);
@@ -191,6 +201,7 @@ template<>
 inline long double as_float(const string& func, const string& s, size_t* idx) {
     return as_float_helper<long double>(func, s, idx, strtold);
 }
+#endif // _EZ80
 
 #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 template<>
@@ -210,6 +221,8 @@ inline long double as_float(const string& func, const wstring& s, size_t* idx) {
 #endif // _LIBCPP_HAS_NO_WIDE_CHARACTERS
 
 }  // unnamed namespace
+
+#ifndef _EZ80
 
 int stoi(const string& str, size_t* idx, int base) {
     return as_integer<int>("stoi", str, idx, base);
@@ -242,6 +255,82 @@ double stod(const string& str, size_t* idx) {
 long double stold(const string& str, size_t* idx) {
     return as_float<long double>("stold", str, idx);
 }
+
+#else // _EZ80
+
+int stoi(const string& str, size_t *pos, int base) {
+    char *end_ptr;
+    int result = static_cast<int>(__strtoi(str.c_str(), &end_ptr, base));
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+long stol(const string& str, size_t *pos, int base) {
+    char *end_ptr;
+    long result = std::strtol(str.c_str(), &end_ptr, base);
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+long long stoll(const string& str, size_t *pos, int base) {
+    char *end_ptr;
+    long long result = std::strtoll(str.c_str(), &end_ptr, base);
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+unsigned long stoul(const string& str, size_t *pos, int base) {
+    char *end_ptr;
+    unsigned long result = std::strtoul(str.c_str(), &end_ptr, base);
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+unsigned long long stoull(const string& str, size_t *pos, int base) {
+    char *end_ptr;
+    unsigned long long result = std::strtoull(str.c_str(), &end_ptr, base);
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+float stof(const string& str, size_t *pos) {
+    char *end_ptr;
+    float result = std::strtof(str.c_str(), &end_ptr);
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+double stod(const string& str, size_t *pos) {
+    char *end_ptr;
+    double result = std::strtod(str.c_str(), &end_ptr);
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+long double stold(const string& str, size_t *pos) {
+    char *end_ptr;
+    long double result = std::strtold(str.c_str(), &end_ptr);
+    if (pos != nullptr) {
+        *pos = static_cast<size_t>(end_ptr - str.c_str());
+    }
+    return result;
+}
+
+#endif // _EZ80
 
 #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 int stoi(const wstring& str, size_t* idx, int base) {
@@ -352,12 +441,66 @@ S i_to_string(V v) {
 
 }  // unnamed namespace
 
+#ifndef _EZ80
+
 string  to_string (int val)                { return i_to_string< string>(val); }
 string  to_string (long val)               { return i_to_string< string>(val); }
 string  to_string (long long val)          { return i_to_string< string>(val); }
 string  to_string (unsigned val)           { return i_to_string< string>(val); }
 string  to_string (unsigned long val)      { return i_to_string< string>(val); }
 string  to_string (unsigned long long val) { return i_to_string< string>(val); }
+
+#else // _EZ80
+
+string to_string(int value) {
+    char buf[sizeof("-8388608")];
+    boot_sprintf(buf, "%d", value);
+    return string(buf);
+}
+
+string to_string(unsigned int value) {
+    char buf[sizeof("16777215")];
+    boot_sprintf(buf, "%u", value);
+    return string(buf);
+}
+
+string to_string(long value) {
+    char buf[sizeof("-2147483648")];
+    std::sprintf(buf, "%ld", value);
+    return string(buf);
+}
+
+string to_string(unsigned long value) {
+    char buf[sizeof("4294967295")];
+    std::sprintf(buf, "%lu", value);
+    return string(buf);
+}
+
+string to_string(signed __int48 value) {
+    char buf[sizeof("-140737488355328")];
+    std::sprintf(buf, "%lld", static_cast<long long>(value));
+    return string(buf);
+}
+
+string to_string(unsigned __int48 value) {
+    char buf[sizeof("281474976710655")];
+    std::sprintf(buf, "%llu", static_cast<unsigned long long>(value));
+    return string(buf);
+}
+
+string to_string(long long value) {
+    char buf[sizeof("-9223372036854775808")];
+    std::sprintf(buf, "%lld", value);
+    return string(buf);
+}
+
+string to_string(unsigned long long value) {
+    char buf[sizeof("18446744073709551615")];
+    std::sprintf(buf, "%llu", value);
+    return string(buf);
+}
+
+#endif // _EZ80
 
 #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 wstring to_wstring(int val)                { return i_to_string<wstring>(val); }
@@ -368,9 +511,33 @@ wstring to_wstring(unsigned long val)      { return i_to_string<wstring>(val); }
 wstring to_wstring(unsigned long long val) { return i_to_string<wstring>(val); }
 #endif
 
+#ifndef _EZ80
+
 string  to_string (float val)       { return as_string(snprintf,       initial_string< string>()(),   "%f", val); }
 string  to_string (double val)      { return as_string(snprintf,       initial_string< string>()(),   "%f", val); }
 string  to_string (long double val) { return as_string(snprintf,       initial_string< string>()(),  "%Lf", val); }
+
+#else // _EZ80
+
+string to_string(float value) {
+    char buf[64];
+    std::snprintf(buf, sizeof(buf), "%f", value);
+    return string(buf);
+}
+
+string to_string(double value) {
+    char buf[64];
+    std::snprintf(buf, sizeof(buf), "%f", value);
+    return string(buf);
+}
+
+string to_string(long double value) {
+    char buf[64];
+    std::snprintf(buf, sizeof(buf), "%Lf", value);
+    return string(buf);
+}
+
+#endif // _EZ80
 
 #ifndef _LIBCPP_HAS_NO_WIDE_CHARACTERS
 wstring to_wstring(float val)       { return as_string(get_swprintf(), initial_string<wstring>()(),  L"%f", val); }
