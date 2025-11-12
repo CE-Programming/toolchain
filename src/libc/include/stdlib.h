@@ -118,6 +118,20 @@ lldiv_t lldiv(long long numer, long long denom);
 i48div_t i48div(signed __int48 numer, signed __int48 denom) __NOEXCEPT_CONST;
 #endif /* __SIZEOF_INT48__ */
 
+int mblen(const char* s, size_t n);
+
+int mbtowc(wchar_t* pwc, const char* s, size_t n);
+
+int wctomb(char* s, wchar_t wchar);
+
+size_t mbstowcs(wchar_t* pwcs, const char* s, size_t n);
+
+size_t wcstombs(char* s, const wchar_t* pwcs, size_t n);
+
+int __mb_cur_max(void);
+
+#define MB_CUR_MAX __mb_cur_max()
+
 __END_DECLS
 
 #endif /* _STDLIB_H */
