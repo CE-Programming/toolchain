@@ -23,6 +23,9 @@ template <class _Tp> struct __libcpp_is_signed_integer                   : publi
 template <>          struct __libcpp_is_signed_integer<signed char>      : public true_type {};
 template <>          struct __libcpp_is_signed_integer<signed short>     : public true_type {};
 template <>          struct __libcpp_is_signed_integer<signed int>       : public true_type {};
+#ifdef _EZ80
+template <>          struct __libcpp_is_signed_integer<signed __int48>   : public true_type {};
+#endif // _EZ80
 template <>          struct __libcpp_is_signed_integer<signed long>      : public true_type {};
 template <>          struct __libcpp_is_signed_integer<signed long long> : public true_type {};
 #ifndef _LIBCPP_HAS_NO_INT128

@@ -4279,6 +4279,10 @@ _LIBCPP_EXPORTED_FROM_ABI string to_string(int __val);
 _LIBCPP_EXPORTED_FROM_ABI string to_string(unsigned __val);
 _LIBCPP_EXPORTED_FROM_ABI string to_string(long __val);
 _LIBCPP_EXPORTED_FROM_ABI string to_string(unsigned long __val);
+#ifdef _EZ80
+_LIBCPP_EXPORTED_FROM_ABI string to_string(signed __int48 __val);
+_LIBCPP_EXPORTED_FROM_ABI string to_string(unsigned __int48 __val);
+#endif // _EZ80
 _LIBCPP_EXPORTED_FROM_ABI string to_string(long long __val);
 _LIBCPP_EXPORTED_FROM_ABI string to_string(unsigned long long __val);
 _LIBCPP_EXPORTED_FROM_ABI string to_string(float __val);
@@ -4300,6 +4304,10 @@ _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(int __val);
 _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(unsigned __val);
 _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(long __val);
 _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(unsigned long __val);
+#ifdef _EZ80
+_LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(signed __int48 __val);
+_LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(unsigned __int48 __val);
+#endif // _EZ80
 _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(long long __val);
 _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(unsigned long long __val);
 _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(float __val);
