@@ -14,11 +14,41 @@
 #include <__config>
 #include <cstdint>
 
+#ifdef _EZ80
+#include <__type_traits/enable_if.h>
+#include <__type_traits/is_integral.h>
+#include <ez80_builtin.h>
+#endif // _EZ80
+
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
 #endif
 
 _LIBCPP_BEGIN_NAMESPACE_STD
+
+#if defined(_EZ80) && _LIBCPP_STD_VER >= 20
+
+template <integral _Tp>
+_LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr _Tp byteswap(_Tp __val) noexcept {
+
+  if constexpr (sizeof(_Tp) == 1) {
+    return __val;
+  } else if constexpr (sizeof(_Tp) == 2) {
+    return __builtin_bswap16(__val);
+  } else if constexpr (sizeof(_Tp) == 3) {
+      return __ez80_bswap24(__val);
+  } else if constexpr (sizeof(_Tp) == 4) {
+    return __builtin_bswap32(__val);
+  } else if constexpr (sizeof(_Tp) == 6) {
+      return __ez80_bswap48(__val);
+  } else if constexpr (sizeof(_Tp) == 8) {
+    return __builtin_bswap64(__val);
+  } else {
+    static_assert(sizeof(_Tp) == 0, "byteswap is unimplemented for integral types of this size");
+  }
+}
+
+#else // _EZ80
 
 #if _LIBCPP_STD_VER >= 23
 
@@ -48,6 +78,8 @@ _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr _Tp byteswap(_Tp __val) no
 }
 
 #endif // _LIBCPP_STD_VER >= 23
+
+#endif // _EZ80
 
 _LIBCPP_END_NAMESPACE_STD
 

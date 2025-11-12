@@ -34,11 +34,17 @@ typedef __type_list<signed char,
         __type_list<signed short,
         __type_list<signed int,
         __type_list<signed long,
+#  ifdef _EZ80
+        __type_list<signed __int48,
+#  endif // _EZ80
         __type_list<signed long long,
 #  ifndef _LIBCPP_HAS_NO_INT128
         __type_list<__int128_t,
 #  endif
         __nat
+#  ifdef _EZ80
+        >
+#  endif // _EZ80
 #  ifndef _LIBCPP_HAS_NO_INT128
         >
 #  endif
@@ -61,6 +67,10 @@ template <> struct __make_signed<  signed int,       true> {typedef int       ty
 template <> struct __make_signed<unsigned int,       true> {typedef int       type;};
 template <> struct __make_signed<  signed long,      true> {typedef long      type;};
 template <> struct __make_signed<unsigned long,      true> {typedef long      type;};
+#ifdef _EZ80
+template <> struct __make_signed<  signed __int48,   true> {typedef signed __int48   type;};
+template <> struct __make_signed<unsigned __int48,   true> {typedef signed __int48   type;};
+#endif // _EZ80
 template <> struct __make_signed<  signed long long, true> {typedef long long type;};
 template <> struct __make_signed<unsigned long long, true> {typedef long long type;};
 #  ifndef _LIBCPP_HAS_NO_INT128

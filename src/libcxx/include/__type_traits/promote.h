@@ -29,6 +29,10 @@ struct __numeric_type {
   static double __test(unsigned);
   static double __test(long);
   static double __test(unsigned long);
+#ifdef _EZ80
+  static double __test(signed __int48);
+  static double __test(unsigned __int48);
+#endif // _EZ80
   static double __test(long long);
   static double __test(unsigned long long);
 #ifndef _LIBCPP_HAS_NO_INT128

@@ -65,12 +65,10 @@ template string operator+<char, char_traits<char>, allocator<char>>(char const*,
 namespace
 {
 
-__attribute__((__unused__))
 inline void throw_from_string_out_of_range(const string& func) {
     std::__throw_out_of_range((func + ": out of range").c_str());
 }
 
-__attribute__((__unused__))
 inline void throw_from_string_invalid_arg(const string& func) {
     std::__throw_invalid_argument((func + ": no conversion").c_str());
 }

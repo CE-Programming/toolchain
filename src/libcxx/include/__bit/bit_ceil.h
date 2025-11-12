@@ -14,6 +14,9 @@
 #include <__concepts/arithmetic.h>
 #include <__config>
 #include <limits>
+#ifdef _EZ80
+#include <__bit/bit_width.h>
+#endif // _EZ80
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
@@ -22,6 +25,8 @@
 _LIBCPP_BEGIN_NAMESPACE_STD
 
 #if _LIBCPP_STD_VER >= 20
+
+#ifndef _EZ80
 
 template <__libcpp_unsigned_integer _Tp>
 _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr _Tp bit_ceil(_Tp __t) noexcept {
@@ -38,6 +43,43 @@ _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr _Tp bit_ceil(_Tp __t) noex
     return (_Tp)(__ret_val >> __extra);
   }
 }
+
+#else // _EZ80
+
+template<class _Tp> _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr
+_Tp bit_ceil(_Tp __t) noexcept;
+
+template <> _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr
+unsigned char bit_ceil(unsigned char __t) noexcept {
+    return ((__t < 2) ? 1 : (static_cast<unsigned char>(2) << (bit_width<unsigned char>(__t - 1) - 1)));
+}
+
+template <> _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr
+unsigned short bit_ceil(unsigned short __t) noexcept {
+    return ((__t < 2) ? 1 : (static_cast<unsigned short>(2) << (bit_width<unsigned short>(__t - 1) - 1)));
+}
+
+template <> _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr
+unsigned int bit_ceil(unsigned int __t) noexcept {
+    return ((__t < 2) ? 1 : (static_cast<unsigned int>(2) << (bit_width<unsigned int>(__t - 1) - 1)));
+}
+
+template <> _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr
+unsigned long bit_ceil(unsigned long __t) noexcept {
+    return ((__t < 2) ? 1 : (static_cast<unsigned long>(2) << (bit_width<unsigned long>(__t - 1) - 1)));
+}
+
+template <> _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr
+unsigned __int48 bit_ceil(unsigned __int48 __t) noexcept {
+    return ((__t < 2) ? 1 : (static_cast<unsigned __int48>(2) << (bit_width<unsigned __int48>(__t - 1) - 1)));
+}
+
+template <> _LIBCPP_NODISCARD_EXT _LIBCPP_HIDE_FROM_ABI constexpr
+unsigned long long bit_ceil(unsigned long long __t) noexcept {
+    return ((__t < 2) ? 1 : (static_cast<unsigned long long>(2) << (bit_width<unsigned long long>(__t - 1) - 1)));
+}
+
+#endif // _EZ80
 
 #endif // _LIBCPP_STD_VER >= 20
 

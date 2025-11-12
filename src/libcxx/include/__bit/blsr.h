@@ -25,6 +25,12 @@ inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR unsigned long __libcpp_blsr(u
   return __x ^ (__x & -__x);
 }
 
+#ifdef _EZ80
+inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR unsigned __int48 __libcpp_blsr(unsigned __int48 __x) _NOEXCEPT {
+  return __x ^ (__x & -__x);
+}
+#endif // _EZ80
+
 inline _LIBCPP_INLINE_VISIBILITY _LIBCPP_CONSTEXPR unsigned long long __libcpp_blsr(unsigned long long __x) _NOEXCEPT {
   return __x ^ (__x & -__x);
 }
