@@ -8,28 +8,46 @@
 #include <ti/sprintf.h>
 #include <ctype.h>
 
-/**
-* @brief Tests the following functions/macros:
-* boot_sprintf
-* boot_snprintf
-* boot_asprintf
-* asprintf
-* fprintf
-* stpcpy
-* memccpy
-*/
+//------------------------------------------------------------------------------
+// Config
+//------------------------------------------------------------------------------
+
+// define to 0 or 1
+#define DEBUG_DIAGNOSTICS 0
+
+// define to 0 or 1 (prevents Clang from replacing functions with builtins)
+#define RENAME_FUNCTIONS 1
+
+//------------------------------------------------------------------------------
+// Utilities
+//------------------------------------------------------------------------------
 
 #define C(expr) if (!(expr)) { return __LINE__; }
 
-#define TEST(test) { ret = test; if (ret != 0) { return ret; }}
+#define TEST(test) { ret = test; if (ret != 0) { return ret; } }
 
 #define SINK (char*)0xE40000
 
+#ifndef DEBUG_DIAGNOSTICS
+#error "DEBUG_DIAGNOSTICS needs to be defined to 0 or 1"
+#endif
+
+#if DEBUG_DIAGNOSTICS
+#define test_printf printf
+#else
+#define test_printf(...)
+#endif
+
 /* pass NULL into functions without triggering -Wnonnull */
-extern void* NULL_ptr;
+extern void * NULL_ptr;
+extern size_t ZERO_size;
+
+//------------------------------------------------------------------------------
+// Functions
+//------------------------------------------------------------------------------
 
 // prevents Clang from replacing function calls with builtins
-#if 1
+#if RENAME_FUNCTIONS
 
 void *T_memcpy(void *__restrict dest, const void *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
@@ -107,6 +125,10 @@ void T_bzero(void* s, size_t n);
 
 #endif
 
+//------------------------------------------------------------------------------
+// Globals
+//------------------------------------------------------------------------------
+
 const char gnu_copypasta[] =
     "I would just like to interject for a moment. What you're referring to "\
     "as Linux, is in fact, GNU/Linux, or as I\'ve recently taken to calling "\
@@ -131,6 +153,10 @@ static const int pos_4 = 212;
 static char* buf = NULL;
 static FILE* file = NULL;
 
+//------------------------------------------------------------------------------
+// Tests
+//------------------------------------------------------------------------------
+
 int boot_sprintf_tests(void) {
     int pos;
     int len = boot_asprintf(
@@ -138,7 +164,7 @@ int boot_sprintf_tests(void) {
         123, "asprintf", 076543, 0x9abcd, &pos, 0xFE1, 0
     );
     if (buf == NULL || len <= 0) {
-        printf("buf %p len %d\n", buf, len);
+        test_printf("buf %p len %d\n", buf, len);
         return __LINE__;
     }
     if (buf[len] != '\0') {
@@ -146,27 +172,27 @@ int boot_sprintf_tests(void) {
     }
     size_t buf_len = T_strlen(buf);
     if (buf_len != T_strlen(test_1) || buf_len != (size_t)len) {
-        printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
+        test_printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
         return __LINE__;
     }
     if (pos != pos_1) {
-        printf("E: %d != %d\n", pos, pos_1);
+        test_printf("E: %d != %d\n", pos, pos_1);
         return __LINE__;
     }
     int cmp = strcmp(buf, test_1);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     char append[128];
     int snprintf_test = boot_snprintf(append, 20, "%s", test_1);
     if (snprintf_test != (int)T_strlen(test_1)) {
-        printf("sprintf_test: %d\n", snprintf_test);
+        test_printf("sprintf_test: %d\n", snprintf_test);
         return __LINE__;
     }
     int len_2 = boot_snprintf(append, sizeof(append), "%s", test_1);
     if (len_2 != (int)T_strlen(test_1)) {
-        printf("E: %d != %zu\n", len_2, T_strlen(test_1));
+        test_printf("E: %d != %zu\n", len_2, T_strlen(test_1));
         return __LINE__;
     }
     char str2[128];
@@ -178,18 +204,18 @@ int boot_sprintf_tests(void) {
         return __LINE__;
     }
     if (end != &str2[pos_2]) {
-        printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
+        test_printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
         return __LINE__;
     }
     int cmp2 = T_strcmp(str2, test_2);
     if (cmp2 != 0) {
-        printf("cmp: %d\n", cmp2);
+        test_printf("cmp: %d\n", cmp2);
         return __LINE__;
     }
     char buf_3[30];
     int len_3 = boot_snprintf(buf_3, sizeof(buf_3), test_3);
     if (len_3 != pos_3) {
-        printf("E: %d != %d\n", len_3, pos_3);
+        test_printf("E: %d != %d\n", len_3, pos_3);
         return __LINE__;
     }
 
@@ -222,12 +248,12 @@ int boot_sprintf_tests(void) {
         5, 10
     );
     if (len_4 != pos_4) {
-        printf("E: %d != %d\n", len_4, pos_4);
+        test_printf("E: %d != %d\n", len_4, pos_4);
         return __LINE__;
     }
     int len_5 = boot_snprintf(SINK, 10, "");
     if (len_5 != 0) {
-        printf("E: %d != 0\n", len_5);
+        test_printf("E: %d != 0\n", len_5);
         return __LINE__;
     }
 
@@ -244,7 +270,7 @@ int nano_tests(void) {
         123, "asprintf", 076543, 0x9abcd, &pos, 0xFE1, 0
     );
     if (buf == NULL || len <= 0) {
-        printf("buf %p len %d\n", buf, len);
+        test_printf("buf %p len %d\n", buf, len);
         return __LINE__;
     }
     if (buf[len] != '\0') {
@@ -252,27 +278,27 @@ int nano_tests(void) {
     }
     size_t buf_len = T_strlen(buf);
     if (buf_len != T_strlen(test_1) || buf_len != (size_t)len) {
-        printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
+        test_printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
         return __LINE__;
     }
     if (pos != pos_1) {
-        printf("E: %d != %d\n", pos, pos_1);
+        test_printf("E: %d != %d\n", pos, pos_1);
         return __LINE__;
     }
     int cmp = strcmp(buf, test_1);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     char append[128];
     int snprintf_test = snprintf(append, 20, "%s", test_1);
     if (snprintf_test != (int)T_strlen(test_1)) {
-        printf("sprintf_test: %d\n", snprintf_test);
+        test_printf("sprintf_test: %d\n", snprintf_test);
         return __LINE__;
     }
     int len_2 = snprintf(append, sizeof(append), "%s", test_1);
     if (len_2 != (int)T_strlen(test_1)) {
-        printf("E: %d != %zu\n", len_2, T_strlen(test_1));
+        test_printf("E: %d != %zu\n", len_2, T_strlen(test_1));
         return __LINE__;
     }
     char str2[128];
@@ -284,24 +310,24 @@ int nano_tests(void) {
         return __LINE__;
     }
     if (end != &str2[pos_2]) {
-        printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
+        test_printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
         return __LINE__;
     }
     int cmp2 = T_strcmp(str2, test_2);
     if (cmp2 != 0) {
-        printf("cmp: %d\n", cmp2);
+        test_printf("cmp: %d\n", cmp2);
         return __LINE__;
     }
     char buf_30[30];
     int len_3sn = snprintf(buf_30, sizeof(buf_30), test_3);
     if (len_3sn != pos_3) {
-        printf("E: %d != %d\n", len_3sn, pos_3);
+        test_printf("E: %d != %d\n", len_3sn, pos_3);
         return __LINE__;
     }
 
     int len_3s = sprintf(buf_30, test_3);
     if (len_3s != pos_3) {
-        printf("E: %d != %d\n", len_3s, pos_3);
+        test_printf("E: %d != %d\n", len_3s, pos_3);
         return __LINE__;
     }
 
@@ -334,12 +360,12 @@ int nano_tests(void) {
         5, 10
     );
     if (len_4 != pos_4) {
-        printf("E: %d != %d\n", len_4, pos_4);
+        test_printf("E: %d != %d\n", len_4, pos_4);
         return __LINE__;
     }
     int len_5 = snprintf(SINK, 10, "");
     if (len_5 != 0) {
-        printf("E: %d != 0\n", len_5);
+        test_printf("E: %d != 0\n", len_5);
         return __LINE__;
     }
 
@@ -389,7 +415,7 @@ int memccpy_tests(void) {
     // test zero byte case
     void* ptr = T_memccpy((void*)0xC0FFEE, (void*)0x123456, 123, 0);
     if (ptr != NULL) {
-        printf("%p != NULL\n", ptr);
+        test_printf("%p != NULL\n", ptr);
         return __LINE__;
     }
     file = fopen(file_name, "wb");
@@ -405,11 +431,10 @@ int memccpy_tests(void) {
     char dest[sizeof src];
     const char alt = '@';
 
-    for (size_t i = 0; i != sizeof terminal; ++i)
-    {
+    for (size_t i = 0; i != sizeof terminal; ++i) {
         void* to = T_memccpy(dest, src, terminal[i], sizeof dest);
 
-        fprintf(file,"Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
+        fprintf(file, "Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
 
         // if `terminal` character was not found - print the whole `dest`
         to = to ? to : dest + sizeof dest;
@@ -421,7 +446,6 @@ int memccpy_tests(void) {
         fputs("\"\n", file);
     }
 
-
     fprintf(file, "%c%s", '\n', "Separate star names from distances (ly):\n");
     const char *star_distance[] = {
         "Arcturus : 37", "Vega : 25", "Capella : 43", "Rigel : 860", "Procyon : 11"
@@ -430,8 +454,7 @@ int memccpy_tests(void) {
     char *first = names_only;
     char *last = names_only + sizeof names_only;
 
-    for (size_t t = 0; t != (sizeof star_distance) / (sizeof star_distance[0]); ++t)
-    {
+    for (size_t t = 0; t != (sizeof star_distance) / (sizeof star_distance[0]); ++t) {
         if (first) {
             first = T_memccpy(first, star_distance[t], ' ', last - first);
         } else {
@@ -490,7 +513,7 @@ int mempcpy_test(void) {
     // test zero byte case
     void* ptr = T_mempcpy((void*)0xC0FFEE, (void*)0x123456, 0);
     if (ptr != (void*)0xC0FFEE) {
-        printf("%p != %p\n", ptr, (void*)0xC0FFEE);
+        test_printf("%p != %p\n", ptr, (void*)0xC0FFEE);
         return __LINE__;
     }
     char data[192 + 1];
@@ -501,7 +524,7 @@ int mempcpy_test(void) {
     T_memset(append, 0x34, 64);
     char* res = T_mempcpy(&data[64], append, 64);
     if (res != &data[128]) {
-        printf("%p != %p\n", res, &data[128]);
+        test_printf("%p != %p\n", res, &data[128]);
         return __LINE__;
     }
 
@@ -512,7 +535,7 @@ int mempcpy_test(void) {
 
     int cmp = T_memcmp(data, truth, 192);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     return 0;
@@ -535,7 +558,7 @@ int bzero_test(void) {
     T_memset(&truth[ 2], 0x00,  1);
     T_memset(&truth[ 8], 0x00, 17);
     T_memset(&truth[25], 0x8F,  7);
-    T_bzero(&data[2], 0);
+    T_bzero(&data[2], ZERO_size);
     T_bzero(&data[2], 1);
     if (T_strlen(&data[0]) != 2) {
         return __LINE__;
@@ -546,11 +569,11 @@ int bzero_test(void) {
     if (T_strlen(&data[2]) != 0) {
         return __LINE__;
     }
-    T_bzero(NULL, 0);
+    T_bzero(NULL_ptr, ZERO_size);
     T_bzero(&data[8], 17);
     int cmp = T_memcmp(data, truth, 32);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     return 0;
@@ -996,6 +1019,7 @@ int strchrnul_test(void) {
 
 int run_tests(void) {
     int ret = 0;
+
     /* boot_asprintf */
         ret = boot_sprintf_tests();
         free(buf); buf = NULL;

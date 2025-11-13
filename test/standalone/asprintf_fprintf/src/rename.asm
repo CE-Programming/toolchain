@@ -29,8 +29,9 @@ _T_bzero := _bzero
 
 	section	.rodata
 
-	public	_NULL_ptr
+	public	_NULL_ptr, _ZERO_size
 _NULL_ptr:
+_ZERO_size:
 	db	$00, $00, $00
 
 	extern	_memset, _memcpy, _memmove, _memcmp, _memccpy, _mempcpy, _memrchr, _memmem, _memrmem
