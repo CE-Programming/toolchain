@@ -61,9 +61,11 @@ size_t run_test(void) {
     return SIZE_MAX;
 }
 
+#ifdef __cplusplus
 extern "C" {
     int main(void);
 }
+#endif /* __cplusplus */
 
 int main(void) {
     os_ClrHome();
