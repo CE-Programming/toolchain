@@ -20,7 +20,7 @@
 #  define NOMINMAX
 #  include <io.h>
 #  include <windows.h>
-#elif __has_include(<unistd.h>)
+#elif !defined(_EZ80) && __has_include(<unistd.h>)
 #  include <unistd.h>
 #endif
 
@@ -56,7 +56,7 @@ __write_to_windows_console([[maybe_unused]] FILE* __stream, [[maybe_unused]] wst
 }
 #  endif // _LIBCPP_HAS_NO_WIDE_CHARACTERS
 
-#elif __has_include(<unistd.h>) // !_LIBCPP_WIN32API
+#elif !defined(_EZ80) && __has_include(<unistd.h>) // !_LIBCPP_WIN32API
 
 _LIBCPP_EXPORTED_FROM_ABI bool __is_posix_terminal(FILE* __stream) { return isatty(fileno(__stream)); }
 #endif
