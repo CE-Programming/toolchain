@@ -23,11 +23,11 @@
 #include "include/apple_availability.h"
 #include <time.h> // clock_gettime and CLOCK_{MONOTONIC,REALTIME,MONOTONIC_RAW}
 
-#if __has_include(<unistd.h>)
+#if !defined(_EZ80) && __has_include(<unistd.h>)
 #  include <unistd.h> // _POSIX_TIMERS
 #endif
 
-#if __has_include(<sys/time.h>)
+#if !defined(_EZ80) && __has_include(<sys/time.h>)
 #  include <sys/time.h> // for gettimeofday and timeval
 #endif
 
@@ -50,7 +50,7 @@
 #  include <zircon/syscalls.h>
 #endif
 
-#if __has_include(<mach/mach_time.h>)
+#if !defined(_EZ80) && __has_include(<mach/mach_time.h>)
 #  include <mach/mach_time.h>
 #endif
 

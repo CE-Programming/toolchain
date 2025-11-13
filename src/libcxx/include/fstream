@@ -234,7 +234,7 @@ public:
 #  if _LIBCPP_STD_VER >= 26
 #    if defined(_LIBCPP_WIN32API)
   using native_handle_type = void*; // HANDLE
-#    elif __has_include(<unistd.h>)
+#    elif !defined(_EZ80) && __has_include(<unistd.h>)
   using native_handle_type = int; // POSIX file descriptor
 #    else
 #      error "Provide a native file handle!"
@@ -271,7 +271,7 @@ public:
     _LIBCPP_ASSERT_UNCATEGORIZED(this->is_open(), "File must be opened");
 #    if defined(_LIBCPP_WIN32API)
     return std::__filebuf_windows_native_handle(__file_);
-#    elif __has_include(<unistd.h>)
+#    elif !defined(_EZ80) && __has_include(<unistd.h>)
     return fileno(__file_);
 #    else
 #      error "Provide a way to determine the file native handle!"
