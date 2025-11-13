@@ -12,6 +12,7 @@
 #include <limits.h>
 #include <math.h>
 #include <setjmp.h>
+#include <signal.h>
 #include <stdalign.h>
 #include <stdarg.h>
 #include <stdbit.h>
