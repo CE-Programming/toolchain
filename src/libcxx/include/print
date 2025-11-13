@@ -49,7 +49,7 @@ namespace std {
 #include <string_view>
 #include <version>
 
-#if __has_include(<unistd.h>)
+#if !defined(_EZ80) && __has_include(<unistd.h>)
 #  include <unistd.h>
 #endif
 
@@ -200,7 +200,7 @@ inline constexpr bool __use_unicode = true;
 _LIBCPP_HIDE_FROM_ABI inline bool __is_terminal(FILE* __stream) {
 #  ifdef _WIN32
   return std::__is_windows_terminal(__stream);
-#  elif __has_include(<unistd.h>)
+#  elif !defined(_EZ80) && __has_include(<unistd.h>)
   return isatty(fileno(__stream));
 #  elif defined(_EZ80)
   return false;
