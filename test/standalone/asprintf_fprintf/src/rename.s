@@ -38,6 +38,7 @@ _NULL_ptr:
 	.global	_T_strnlen
 	.global	_T_strrchr
 	.global	_T_strrstr
+	.global	_T_strsep
 	.global	_T_strstr
 	.global	_T_strtok
 	.global	_T_strtok_r
@@ -128,6 +129,9 @@ _T_strrchr:
 _T_strrstr:
 	jp	_strrstr
 
+_T_strsep:
+	jp	_strsep
+
 _T_strstr:
 	jp	_strstr
 
@@ -168,5 +172,6 @@ _T_strtok_r:
 	.extern	_strrchr
 	.extern	_strrstr
 	.extern	_strstr
+	.extern	_strsep
 	.extern	_strtok
 	.extern	_strtok_r

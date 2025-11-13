@@ -43,7 +43,7 @@
 #endif
 
 /* pass NULL into functions without triggering -Wnonnull */
-extern void* NULL_ptr;
+extern void * NULL_ptr;
 
 //------------------------------------------------------------------------------
 // Debug routines
@@ -177,6 +177,9 @@ char *T_strrchr(const char *s, int c)
 char *T_strrstr(const char *haystack, const char *needle)
     __attribute__((nonnull(1, 2)));
 
+char *T_strsep(char **__restrict s, const char *__restrict delim)
+    __attribute__((nonnull(1, 2)));
+
 char *T_strstr(const char *haystack, const char *needle)
     __attribute__((nonnull(1, 2)));
 
@@ -217,6 +220,7 @@ char *T_strtok_r(char *__restrict s, const char *__restrict delim, char **__rest
 #define T_strnlen strnlen
 #define T_strrchr strrchr
 #define T_strrstr strrstr
+#define T_strsep strsep
 #define T_strstr strstr
 #define T_strtok strtok
 #define T_strtok_r strtok_r
@@ -529,11 +533,10 @@ int memccpy_tests(void) {
     char dest[sizeof src];
     const char alt = '@';
 
-    for (size_t i = 0; i != sizeof terminal; ++i)
-    {
+    for (size_t i = 0; i != sizeof terminal; ++i) {
         void* to = T_memccpy(dest, src, terminal[i], sizeof dest);
 
-        fprintf(file,"Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
+        fprintf(file, "Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
 
         // if `terminal` character was not found - print the whole `dest`
         to = to ? to : dest + sizeof dest;
@@ -545,7 +548,6 @@ int memccpy_tests(void) {
         fputs("\"\n", file);
     }
 
-
     fprintf(file, "%c%s", '\n', "Separate star names from distances (ly):\n");
     const char *star_distance[] = {
         "Arcturus : 37", "Vega : 25", "Capella : 43", "Rigel : 860", "Procyon : 11"
@@ -554,8 +556,7 @@ int memccpy_tests(void) {
     char *first = names_only;
     char *last = names_only + sizeof names_only;
 
-    for (size_t t = 0; t != (sizeof star_distance) / (sizeof star_distance[0]); ++t)
-    {
+    for (size_t t = 0; t != (sizeof star_distance) / (sizeof star_distance[0]); ++t) {
         if (first) {
             first = T_memccpy(first, star_distance[t], ' ', last - first);
         } else {
@@ -1474,6 +1475,106 @@ int strtok_test(void) {
     return 0;
 }
 
+static char *truth_strsep(char **__restrict stringp, const char *__restrict delim) {
+    char * const begin_str = *stringp;
+    if (begin_str == NULL) {
+        return NULL;
+    }
+    size_t length = strcspn(begin_str, delim);
+    char * end_str = begin_str + length;
+    if (*end_str != '\0') {
+        *end_str++ = '\0';
+        *stringp = end_str;
+    } else {
+        *stringp = NULL;
+    }
+    return begin_str;
+}
+
+static int strsep_loop_test(char * str_1, char * str_2) {
+    for (;;) {
+        char *__restrict prev_1 = T_strsep(&str_1, ", .");
+        char *__restrict prev_2 = truth_strsep(&str_2, ", .");
+        if (str_1 == NULL || str_2 == NULL) {
+            break;
+        }
+        ptrdiff_t diff_1 = (str_1 - prev_1);
+        ptrdiff_t diff_2 = (str_2 - prev_2);
+        if (diff_1 != diff_2) {
+            test_printf("%td != %td\n%p %p\n1: %.20s\n2: %.20s\n", diff_1, diff_2, prev_1, prev_2, str_1, str_2);
+            return __LINE__;
+        }
+        C(diff_1 == diff_2);
+    }
+    C(str_1 == NULL && str_2 == NULL);
+    return 0;
+}
+
+int strsep_test(char** dup_1, char** dup_2) {
+    {
+        char *ptr = NULL_ptr;
+        C(T_strsep(&ptr, SINK) == NULL);
+        C(T_strsep(&ptr, NULL_ptr) == NULL);
+        C(T_strsep((char**)SINK, SINK) == NULL);
+        C(T_strsep((char**)SINK, NULL_ptr) == NULL);
+    }
+    {
+        // example taken straight from the man page
+        char * argv[] = {
+            NULL,
+            "a/bbb///cc;xxx:yyy:",
+            ":;",
+            "/"
+        };
+        char *token, *subtoken;
+
+        token = T_strsep((char**)&argv[1], argv[2]); C(strcmp_exact(token, "a/bbb///cc"));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, "a"));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, "bbb"));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, ""));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, ""));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, "cc"));
+        subtoken = T_strsep(&token, argv[3]); C(subtoken == NULL);
+
+        token = T_strsep((char**)&argv[1], argv[2]); C(strcmp_exact(token, "xxx"));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, "xxx"));
+        subtoken = T_strsep(&token, argv[3]); C(subtoken == NULL);
+
+        token = T_strsep((char**)&argv[1], argv[2]); C(strcmp_exact(token, "yyy"));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, "yyy"));
+        subtoken = T_strsep(&token, argv[3]); C(subtoken == NULL);
+
+        token = T_strsep((char**)&argv[1], argv[2]); C(strcmp_exact(token, ""));
+        subtoken = T_strsep(&token, argv[3]); C(strcmp_exact(subtoken, ""));
+        subtoken = T_strsep(&token, argv[3]); C(subtoken == NULL);
+    }
+
+    const size_t len = strlen(gnu_copypasta);
+    const size_t size = len + 1;
+    *dup_1 = strdup(gnu_copypasta);
+    *dup_2 = strndup(gnu_copypasta, len);
+    C(*dup_1 != NULL && *dup_2 != NULL);
+    C(strcmp(*dup_1, *dup_2) == 0);
+    {
+        char *ptr, *prev;
+        ptr = *dup_2;
+        prev = T_strsep(&ptr, "");
+        C(ptr == NULL);
+        C(prev == *dup_2);
+        ptr = *dup_2;
+        prev = T_strsep(&ptr, "zZ");
+        C(ptr == NULL);
+        C(prev == *dup_2);
+        C(memcmp(*dup_1, *dup_2, size) == 0);
+    }
+    {
+        int ret;
+        TEST(strsep_loop_test(*dup_1, *dup_2));
+        C(memcmp(*dup_1, *dup_2, size) == 0);
+    }
+    return 0;
+}
+
 int mem65536_test(void) {
     void fill_mem32(void *dst, size_t bytes, uint32_t pattern);
 
@@ -1591,6 +1692,17 @@ int run_tests(void) {
             perror("Couldn't delete file");
         }
         if (ret != 0) { return ret; }
+
+    /* strsep */ {
+        char *dup_1 = SINK, *dup_2 = SINK;
+        ret = strsep_test(&dup_1, &dup_2);
+        if (dup_1 == NULL || dup_2 == NULL) {
+            perror("str(n)dup returned NULL");
+        }
+        free(dup_1); dup_1 = NULL;
+        free(dup_2); dup_2 = NULL;
+        if (ret != 0) { return ret; }
+    }
 
     TEST(mempcpy_test());
     TEST(bzero_test());
