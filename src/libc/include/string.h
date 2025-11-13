@@ -89,6 +89,9 @@ char *strtok(char *__restrict s, const char *__restrict delim)
 char *strtok_r(char *__restrict s, const char *__restrict delim, char **__restrict save_ptr)
     __attribute__((nonnull(2, 3)));
 
+char *strsep(char **__restrict s, const char *__restrict delim)
+    __NOEXCEPT __attribute__((nonnull(1, 2)));
+
 char *strdup(const char *s)
     __attribute__((__malloc__)) __attribute__((nonnull(1)));
 
