@@ -27,7 +27,7 @@ EZCXXFLAGS += -fno-exceptions -fno-rtti -std=c++20 -D_LIBCPP_BUILDING_LIBRARY -D
 EZCXXFLAGS += -fno-use-cxa-atexit
 
 WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
-LIBCXX_H := include/
+LIBCXX_H := include/.
 
 ALGORITHM_H := include/__algorithm
 ALGORITHM_PSTL_H := include/__algorithm/pstl_backends
