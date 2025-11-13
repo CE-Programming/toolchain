@@ -53,6 +53,7 @@ FUNCTIONAL_H := include/__functional
 FWD_H := include/__fwd
 IOS_H := include/__ios
 ITERATOR_H := include/__iterator
+LOCALE_DIR_H := include/__locale_dir
 LOCALE_BASE_API_H := include/__locale_dir/locale_base_api
 MATH_H := include/__math
 MDSPAN_H := include/__mdspan
@@ -66,6 +67,7 @@ RANDOM_H := include/__random
 RANGES_H := include/__ranges
 STOP_TOKEN_H := include/__stop_token
 STRING_H := include/__string
+SUPPORT_DIR_H := include/__support
 SUPPORT_XLOCALE_H := include/__support/xlocale
 SYSTEM_ERROR_H := include/__system_error
 THREAD_H := include/__thread
@@ -89,10 +91,12 @@ clean:
 	$(Q)$(call RMDIR,build)
 
 install: all
-	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
 	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call MKDIR,$(INSTALL_CXX_H))
+	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
 	$(Q)$(call MKDIR,$(INSTALL_ALGORITHM))
+	$(Q)$(call MKDIR,$(INSTALL_ALGORITHM_PSTL))
+	$(Q)$(call MKDIR,$(INSTALL_ALGORITHM_PSTL_CPU))
 	$(Q)$(call MKDIR,$(INSTALL_ATOMIC))
 	$(Q)$(call MKDIR,$(INSTALL_BIT))
 	$(Q)$(call MKDIR,$(INSTALL_CHARCONV))
@@ -163,6 +167,7 @@ install: all
 	$(Q)$(call COPY,$(call NATIVEPATH,$(FWD_H)),$(INSTALL_FWD))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(IOS_H)),$(INSTALL_IOS))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(ITERATOR_H)),$(INSTALL_ITERATOR))
+	$(Q)$(call COPY,$(call NATIVEPATH,$(LOCALE_DIR_H)),$(INSTALL_LOCALE_DIR))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(LOCALE_BASE_API_H)),$(INSTALL_LOCALE_BASE_API))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(MATH_H)),$(INSTALL_MATH))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(MDSPAN_H)),$(INSTALL_MDSPAN))
@@ -176,6 +181,7 @@ install: all
 	$(Q)$(call COPY,$(call NATIVEPATH,$(RANGES_H)),$(INSTALL_RANGES))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(STOP_TOKEN_H)),$(INSTALL_STOP_TOKEN))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(STRING_H)),$(INSTALL_STRING))
+	$(Q)$(call COPY,$(call NATIVEPATH,$(SUPPORT_DIR_H)),$(INSTALL_SUPPORT_DIR))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(SUPPORT_XLOCALE_H)),$(INSTALL_SUPPORT_XLOCALE))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(SYSTEM_ERROR_H)),$(INSTALL_SYSTEM_ERROR))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(THREAD_H)),$(INSTALL_THREAD))
