@@ -113,6 +113,8 @@ uint24_t CRT_imulu_b_fast(uint24_t, uint8_t);
 uint32_t CRT_lmulu_b(uint32_t, uint8_t);
 uint32_t CRT_lmulu_b_fast(uint32_t, uint8_t);
 
+uint64_t CRT_llmulu_b(uint64_t, uint8_t);
+
 typedef struct reg_group {
     union {
         struct {
@@ -171,6 +173,14 @@ static bool test_A_UBC_UD(void) {
         (prev_reg.UDE == next_reg.UDE) &&
         (prev_reg.D   == next_reg.D  )
     ) {
+        return true;
+    }
+    print_reg();
+    return false;
+}
+
+static bool test_A(void) {
+    if (prev_reg.A == next_reg.A) {
         return true;
     }
     print_reg();
@@ -258,6 +268,20 @@ int test_lmulu_b_fast(void) {
     return 0;
 }
 
+int test_llmulu_b(void) {
+    for (int i = 0; i < RANDOM_TEST_COUNT; i++) {
+        uint64_t truth, guess, x;
+        uint8_t y;
+        x = rand64();
+        y = rand8();
+        truth = x * (uint64_t)y;
+        guess = CRT_llmulu_b(x, y);
+        CMP("%016llX", x, y, truth, guess);
+        C((test_A()));
+    }
+    return 0;
+}
+
 int run_tests(void) {
     srand(AUTOTEST_SEED);
     int ret = 0;
@@ -267,6 +291,7 @@ int run_tests(void) {
     TEST(test_imulu_b_fast());
     TEST(test_lmulu_b());
     TEST(test_lmulu_b_fast());
+    TEST(test_llmulu_b());
 
     return ret;
 }
