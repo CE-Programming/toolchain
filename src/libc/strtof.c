@@ -22,6 +22,8 @@ typedef union F32_pun {
     uint32_t bin;
 } F32_pun;
 
+#define c_isdigit(c) ((c) >= '0' && (c) <= '9')
+
 /*************************************************
 *
 * strtof - string to float conversion
@@ -39,14 +41,14 @@ typedef union F32_pun {
  * @remarks `*str >= '0' && *str <= '9'` is smaller than calls to `isdigit(*str)`
  * @todo Add support for INF INFINITY NAN NAN(...)
  */
-float _strtof_c(const char *__restrict nptr, char **__restrict endptr)
+float _strtof_c(char const * const __restrict nptr, char **__restrict endptr)
 {
     F32_pun val;
     int frac = 0;
     int exp = 0;
     bool sign = false;
     bool exp_sign = false;
-    char *str = (char*)nptr;
+    char const *__restrict str = nptr;
 
     while (isspace(*str)) {
         ++str;
@@ -59,39 +61,48 @@ float _strtof_c(const char *__restrict nptr, char **__restrict endptr)
         ++str;
     }
 
-    val.flt = 0.0f;
+    bool has_digits = false;
 
-    while (*str >= '0' && *str <= '9') {
+    val.flt = 0.0f;
+    while (c_isdigit(*str)) {
+        has_digits = true;
         val.flt = val.flt * 10.0f + (float)(*str - '0');
         ++str;
     }
 
     if (*str == '.') {
         ++str;
-        while (*str >= '0' && *str <= '9') {
+        while (c_isdigit(*str)) {
+            has_digits = true;
             val.flt = val.flt * 10.0f + (float)(*str - '0');
             ++frac;
             ++str;
         }
     }
 
+    if (!has_digits) {
+        str = nptr;
+        goto finish;
+    }
+
     if (*str == 'e' || *str == 'E') {
+        char const * const end_of_digits = str;
         ++str;
         if (*str == '-') {
             exp_sign = true;
             ++str;
         } else if (*str == '+') {
-            exp_sign = false;
             ++str;
         }
-        while (*str >= '0' && *str <= '9') {
+        if (!c_isdigit(*str)) {
+            str = end_of_digits;
+            val.flt = 0.0f;
+            goto finish;
+        }
+        while (c_isdigit(*str)) {
             exp = exp * 10 + (*str - '0');
             ++str;
         }
-    }
-
-    if (endptr) {
-        *endptr = (char*)str;
     }
 
     if (exp_sign) {
@@ -125,6 +136,12 @@ float _strtof_c(const char *__restrict nptr, char **__restrict endptr)
     if (sign) {
         val.flt = -val.flt;
     }
+
+finish:
+    if (endptr) {
+        *endptr = (char*)str;
+    }
+
     return val.flt;
 }
 

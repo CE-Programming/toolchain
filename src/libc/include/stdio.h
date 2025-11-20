@@ -121,6 +121,12 @@ int asprintf(char **__restrict p_buffer, const char *__restrict format, ...)
 int vasprintf(char **__restrict p_buffer, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0))) __attribute__((nonnull(1)));
 
+int sscanf(const char *__restrict buffer, const char *__restrict format, ...)
+    __attribute__((format(__scanf__, 2, 3)));
+
+int vsscanf(const char *__restrict buffer, const char *__restrict format, va_list va)
+    __attribute__((format(__scanf__, 2, 0)));
+
 void perror(const char *str);
 
 __END_DECLS
@@ -164,6 +170,8 @@ using ::fprintf;
 using ::vfprintf;
 using ::asprintf;
 using ::vasprintf;
+using ::sscanf;
+using ::vsscanf;
 using ::perror;
 } /* namespace std */
 #endif /* __cplusplus */
