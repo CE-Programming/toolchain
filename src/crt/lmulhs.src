@@ -1,0 +1,32 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__lmulhs
+
+; E:UHL = ((int64_t)E:UHL * (int64_t)A:UBC) >> 32
+__lmulhs:
+	push	bc
+	push	af
+	push	hl
+	push	de
+
+	call	__lmulhu
+
+	; if (A:UBC < 0) { result -= E:UHL; }
+	rlca
+	pop	bc
+	ld	a, c	; ld a, E
+	pop	bc
+	call	c, __lsub
+
+	; if (E:UHL < 0) { result -= A:UBC; }
+	rlca
+	pop	bc
+	ld	a, b	; ld a, A
+	pop	bc
+	ret	nc
+	jp	__lsub
+
+	extern	__lmulhu
+	extern	__lsub

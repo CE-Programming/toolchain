@@ -1,0 +1,44 @@
+	assume	adl=1
+
+	section	.text
+
+	public	__i48mulhs
+
+; UDE:UHL = ((int96_t)UDE:UHL * (int96_t)UIY:UBC) >> 48
+__i48mulhs:
+	push	af
+	push	iy
+	push	bc
+	push	de
+	push	hl
+
+	push	hl
+	lea	hl, iy
+	add	hl, hl
+	sbc	a, a
+
+	ld	hl, $800000
+	add	hl, de
+	pop	hl
+	rla
+
+	call	__i48mulhu
+
+	; if (UDE:UHL < 0) { result -= UIY:UBC; }
+	rrca
+	call	c, __i48sub
+
+	pop	bc
+	pop	iy
+
+	; if (UIY:UBC < 0) { result -= UDE:UHL; }
+	rrca
+	call	c, __i48sub
+
+	pop	bc
+	pop	iy
+	pop	af
+	ret
+
+	extern	__i48mulhu
+	extern	__i48sub
