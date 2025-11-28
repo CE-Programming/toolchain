@@ -1,0 +1,46 @@
+	assume	adl=1
+
+	section	.text
+
+	public	_strsep
+
+; char *strsep(char **__restrict stringp, const char *__restrict delim)
+_strsep:
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
+	push	hl		; stringp
+	ld	hl, (hl)
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	z, .ret_null
+	push	de		; delim
+	push	hl		; *stringp
+	call	_strcspn
+	pop	de
+	pop	de
+	pop	iy		; stringp
+	ld	de, (iy)
+	add	hl, de		; *stringp + length
+	xor	a, a
+	cp	a, (hl)		; test for the nul terminator
+	jr	nz, .not_last_token
+	sbc	hl, hl		; last token
+	jr	.finish
+.not_last_token:
+	ld	(hl), a		; nul terminate
+	inc	hl		; next token
+.finish:
+	ld	(iy), hl	; store the next token
+	ex	de, hl
+	; return *stringp
+	ret
+.ret_null:
+	pop	de
+	ret
+
+	extern	_strcspn
