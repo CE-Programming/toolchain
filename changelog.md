@@ -2,6 +2,50 @@
 
 ## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v13.0...master)
 
+# [v14.0](https://github.com/CE-Programming/toolchain/releases/tag/v14.0) (2025-mm-dd)
+
+* **New features**
+* String/number conversion:
+  * Assembly implementations: `strtol/strtoul`, `strtoll/strtoull`, `atoi/atol/atoll`.
+  * New helpers: `__strtoi`, `__strtoui`.
+* String utilities:
+  * `strlcat`, `stpncpy`, `memmem`, `memrmem`, `strrstr`, `strspn`, `strcspn`, `strpbrk`, `strchrnul`.
+* Wide-character and locale:
+  * `wint_t`, `<wctype.h>`, `<cwchar>`, `<cwctype>`, C95 `wmem*` functions, `wcslen`/`wcsnlen`.
+* C/C++ headers and types:
+  * `<cfenv>`; `PRI24` and `SCN24` in `<inttypes.h>`.
+  * `<cstdarg>` added; fixes for `(c)stddef` under C89/C++98.
+  * Expanded `<type_traits>`.
+  * C++ `<complex>` added.
+* Math/FP:
+  * Assembly `dtof`, `(u)lltod`, `logbf`; optimized `ilogbf`, `copysignl`.
+  * Implemented `scalbln(f/l)`.
+  * `fminf`/`fmaxf` in assembly.
+* Testing/tooling/infra:
+  * lots of tests for the above!
+  * `git-blame-ignore-revs` added.
+  * updated some CI things
+
+* **Fixes**
+- `fclose` correctness; `stdio.h` cleanup and `rename` alias.
+- `gfx_AllocSprite` return value bug.
+- `ti_Alloc(String/Equ)` now handles `NULL` from allocator; `nonnull` attributes added.
+- `ti_SetArchiveStatus` prototype/declaration corrected.
+- `errno`/`perror` strings updated; additional `errno` defines for compatibility (#640).
+- Replaced broken OS `strspn/strcspn/strpbrk` with in-house implementations (Fixes #646).
+- `sscanf`/`vsscanf` added; float handling and `endptr` for `strto(f/d/ld)` fixed.
+- `<fenv.h>` function-macros fixed; introduced `<cfenv>`.
+- Misc. docs fixes
+
+* **Improvements**
+- Multiplication helpers: inlined/optimized `__llmul_b`, `__llmul_add_b_overflow`; `llmulu_b` improvements and cycle count fixes.
+- `memmove` optimized; zero-filling in `calloc` faster under `__TICE__`.
+- File I/O: `fileioc` optimized.
+- i48/i64 routines: implemented `i48div`, optimized `i48div` and i64 bitwise ops; added cycle counts and formatting for i48 CRT routines.
+- ZX0 decompressor optimized using eZ80 instructions.
+- Misc. size opts
+
+
 # [v13.0](https://github.com/CE-Programming/toolchain/releases/tag/v13.0) (2025-09-04)
 
 * **New features**
