@@ -4496,7 +4496,8 @@ gfx_Deprecated:
 	or	a, a
 	sbc	hl, hl
 	ld	(ix - 6), hl
-d_17:	ld	bc, (ix - 3)
+d_17:
+	ld	bc, (ix - 3)
 	ld	hl, (ix + 6)
 	add	hl, bc
 	inc	bc
@@ -4504,7 +4505,7 @@ d_17:	ld	bc, (ix - 3)
 	ld	a, (hl)
 	ld	(ix - 7), a
 	cp	a, (ix - 8)
-	jp	nz, d_16
+	jr	nz, d_16
 	ld	bc, (ix - 3)
 	ld	hl, (ix + 6)
 	add	hl, bc
@@ -4523,7 +4524,27 @@ d_17:	ld	bc, (ix - 3)
 	inc	bc
 	ld	(ix - 3), bc
 	jr	d_18
-d_13:	ld	bc, (ix - 14)
+
+d_16:
+	ld	bc, (ix - 6)
+	ld	hl, (ix + 9)
+	add	hl, bc
+	inc	bc
+	ld	(ix - 6), bc
+	ld	a, (ix - 7)
+	ld	(hl), a
+d_18:
+	ld	bc, (ix - 17)
+	ld	hl, (ix - 3)
+	or	a, a
+	sbc	hl, bc
+	jr	c, d_17
+	ld	sp, ix
+	pop	ix
+	ret
+
+d_13:
+	ld	bc, (ix - 14)
 	push	bc
 	pea	ix - 20
 	call	_LZ_ReadVarSize
@@ -4546,7 +4567,9 @@ d_13:	ld	bc, (ix - 14)
 	sbc	hl, hl
 	ld	(ix - 11), hl
 	jr	d_11
-d_9:	ld	bc, (ix - 23)
+
+d_9:
+	ld	bc, (ix - 23)
 	ld	hl, (ix - 6)
 	or	a, a
 	sbc	hl, bc
@@ -4564,27 +4587,13 @@ d_9:	ld	bc, (ix - 23)
 	ld	bc, (ix - 11)
 	inc	bc
 	ld	(ix - 11), bc
-d_11:	ld	bc, (ix - 20)
+d_11:
+	ld	bc, (ix - 20)
 	ld	hl, (ix - 11)
 	or	a, a
 	sbc	hl, bc
 	jr	c, d_9
 	jr	d_18
-d_16:	ld	bc, (ix - 6)
-	ld	hl, (ix + 9)
-	add	hl, bc
-	inc	bc
-	ld	(ix - 6), bc
-	ld	a, (ix - 7)
-	ld	(hl), a
-d_18:	ld	bc, (ix - 17)
-	ld	hl, (ix - 3)
-	or	a, a
-	sbc	hl, bc
-	jp	c, d_17
-	ld	sp, ix
-	pop	ix
-	ret
 
 ;-------------------------------------------------------------------------------
 gfx_FlipSpriteY:
