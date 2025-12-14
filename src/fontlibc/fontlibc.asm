@@ -1326,43 +1326,27 @@ fontlib_GetGlyphWidth:
 	ld	hl,arg0
 	add	hl,sp
 	ld	a,(hl)
-;	jp	util.GetGlyphWidth
-assert $ = util.GetGlyphWidth
-
-
-;-------------------------------------------------------------------------------
-util.GetGlyphWidth:
-; Internal-use version
-; Input:
-;  A: Codepoint
-; Output:
-;  A: Width
-;  C if invalid codepoint,NC if valid
-; Destroys:
-;  DE
-;  HL
-; Subtract out firstGlyph
 	ld	hl,_CurrentFontProperties.firstGlyph
 	sub	a,(hl)
-; Validate that the glyph index is actually valid
-	jr	nc,.checkMaxIndex
-.invalidIndex:
-	xor	a,a
-	scf
-	ret
-.checkMaxIndex:
-	ld	hl,_CurrentFontProperties.totalGlyphs
-	cp	a,(hl)
 	jr	c,.invalidIndex
-; Look up width
-	or	a,a
+	; Code >= firstGlyph
 	sbc	hl,hl
 	ld	l,a
+	ld	a, (_CurrentFontProperties.totalGlyphs)
+	; (0 - 1) becomes 255, handling the special case of 256 totalGlyphs
+	dec	a
+	cp	a, l
+	jr	c, .invalidIndex
+	; totalGlyphs - 1 >= Code
+	; totalGlyphs > Code
 	ld	de,(_CurrentFontProperties.widthsTablePtr)
 	add	hl,de
 	ld	a,(hl)
 	ret
 
+.invalidIndex:
+	xor	a, a
+	ret
 
 ;;-------------------------------------------------------------------------------
 fontlib_GetStringWidth:
@@ -2100,4 +2084,3 @@ currentFontRoot := _CurrentFontRoot - DataBaseAddr
 DataBaseAddr:
 ; Embed the current font's properties as library variables
 _CurrentFontProperties strucFont
-
