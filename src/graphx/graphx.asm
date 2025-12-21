@@ -779,13 +779,13 @@ gfx_FillRectangle_NoClip:
 ;  None
 	ld	iy, 0
 	add	iy, sp
+	ld	bc, (iy + 9)		; bc = width
+	ld	a, b
+	or	a, c
+	ret	z			; make sure width is not 0
 	ld	a, (iy + 12)		; a = height
 	or	a, a
 	ret	z			; make sure height is not 0
-	ld	bc, (iy + 9)		; bc = width
-	sbc	hl, hl
-	adc	hl, bc
-	ret	z			; make sure width is not 0
 	ld	hl, (iy + 3)		; hl = x coordinate
 	ld	e, (iy + 6)		; e = y coordinate
 _FillRectangle_NoClip:
@@ -894,13 +894,13 @@ gfx_Rectangle_NoClip:
 ;  None
 	ld	iy, 0
 	add	iy, sp
+	ld	bc, (iy + 9)		; bc = width
+	ld	a, b
+	or	a, c
+	ret	z			; abort if width == 0
 	ld	a, (iy + 12)		; a = height
 	or	a, a
 	ret	z			; abort if height == 0
-	ld	bc, (iy + 9)		; bc = width
-	sbc	hl, hl
-	adc	hl, bc
-	ret	z			; abort if width == 0
 	push	bc
 	call	_HorizLine_NoClip_NotDegen_StackXY ; draw top horizontal line
 						   ; hl = &buf[y][x+width-1]
@@ -930,30 +930,22 @@ gfx_HorizLine:
 	ld	de, ti.lcdHeight
 smcWord _YMax
 	sbc	hl, de			; subtract maximum y
-	ld	de, ti.lcdHeight	; add y bounds span
+	ld	de, ti.lcdHeight
 smcWord _YSpan
-	add	hl, de
+	add	hl, de			; add y bounds span
 	ret	nc			; return if not within y bounds
-	ld	hl, (iy + 9)
 	ld	de, (iy + 3)
-	add	hl, de
-	push	hl
 	ld	hl, 0
 smcWord _XMin
-	call	_Maximum		; get minimum x
-	ex	(sp), hl
-	ld	de, ti.lcdWidth
-smcWord _XMax
-	call	_Minimum		; get maximum x
-	pop	de
-	scf
-	sbc	hl, de
-	ret	c
-	inc	hl
-	push	hl
-	pop	bc			; bc = length
+	ld	bc, ti.lcdWidth
+smcWord _XSpan
+	call	_ClipInterval
 	ex	de, hl
-	jr	_HorizLine_NoClip_NotDegen_StackY
+	; Check for empty interval
+	ld	a, b
+	or	a, c
+	jr	nz, _HorizLine_NoClip_NotDegen_StackY
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_HorizLine_NoClip:
@@ -968,8 +960,8 @@ gfx_HorizLine_NoClip:
 	add	iy, sp
 	ld	bc, (iy + 9)		; bc = length
 _HorizLine_NoClip_StackXY:
-	sbc	hl, hl
-	adc	hl, bc
+	ld	a, b
+	or	a, c
 	ret	z			; abort if length == 0
 _HorizLine_NoClip_NotDegen_StackXY:
 	ld	hl, (iy + 3)		; hl = x
@@ -1015,23 +1007,14 @@ smcWord _XMax
 smcWord _XSpan
 	add	hl, de			; add x bounds span
 	ret	nc			; return if not within x bounds
-	ld	hl, (iy + 9)
 	ld	de, (iy + 6)
-	add	hl, de
-	push	hl
 	ld	hl, 0
 smcWord _YMin
-	call	_Maximum		; get minimum y
-	ex	(sp), hl
-	ld	de, ti.lcdHeight
-smcWord _YMax
-	call	_Minimum		; get maximum y
-	pop	de
-	ld	a, l
-	sub	a, e
-	ret	c			; return if not within y bounds
-	ld	b, a
-	jr	_VertLine_NoClip_MaybeDegen_StackX	; jump to unclipped version
+	ld	bc, ti.lcdHeight
+smcWord _YSpan
+	call	_ClipInterval
+	ld	b, c
+	jr	_VertLine_NoClip_StackX	; jump to unclipped version
 
 ;-------------------------------------------------------------------------------
 gfx_VertLine_NoClip:
@@ -1968,8 +1951,8 @@ gfx_FillCircle_NoClip:
 	lea	hl, ix - 9
 	ld	sp, hl
 	ld	bc, (ix + 12)
-	sbc	hl, hl
-	adc	hl, bc	; carry won't be set since HL is zero here
+	ld	a, c
+	or	a, a
 	jr	z, _FillCircle_NoClip.ResetStack
 	ld	(ix - 6), bc
 	sbc	hl, hl
@@ -6646,6 +6629,65 @@ _Minimum:
 	ret	po
 	add	hl, de
 	ret
+
+;-------------------------------------------------------------------------------
+_ClipInterval:
+; Clips an interval represented as start, length
+; Inputs:
+;  HL : Start of the clip region
+;  DE : Start of the interval to clip
+;  BC : Length of the clip region
+;  (IY+9) : Length of the interval to clip
+;  Carry flag is set
+; Outputs:
+;  DE : Start of the clipped interval
+;  BC : Size of the clipped interval (less than or equal to input BC)
+;  Returns to the caller's caller if the interval is culled,
+;  but may return an empty interval in edge cases
+	; Reject negative-length intervals
+	bit	7, (iy + 11)
+	jr	nz, .cull
+	; Check if the interval starts in the clip region [start, end),
+	; and calculate the length until the end of the clip region
+	; Carry flag is set
+	sbc	hl, de
+	add	hl, bc
+	inc	hl
+	jr	nc, .clip_start
+	ld	bc, (iy + 9)
+.clip_end:
+	; DE : clipped interval start
+	; BC : unclipped interval length
+	; HL : length until the end of the clip region
+	; Return the minimum of the two lengths in BC
+	or	a, a
+	sbc	hl, bc
+	ret	nc
+	add	hl, bc
+	push	hl
+	pop	bc
+	ret
+
+.clip_start:
+	; Restore the original coordinates and swap them
+	; Carry flag is clear
+	sbc	hl, bc
+	add	hl, de
+	ex	de, hl
+	; Check if the clip region starts inside the interval (start, end],
+	; and calculate the length until the end of the interval
+	or	a, a
+	sbc	hl, de
+	push	bc
+	ld	bc, (iy + 9)
+	add	hl, bc
+	pop	bc
+	jr	c, .clip_end
+.cull:
+	; Return to the caller's caller
+	pop	bc
+	ret
+
 
 ;-------------------------------------------------------------------------------
 _ClipRegion:
