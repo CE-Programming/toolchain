@@ -8,6 +8,9 @@
 
 namespace std {
 using ::wint_t;
+using ::mbstate_t;
+using ::size_t;
+using ::tm;
 
 using ::wmemcpy;
 using ::wmemmove;
@@ -29,6 +32,47 @@ using ::wcslen;
 using ::wcsnlen;
 using ::wcscmp;
 using ::wcsncmp;
+
+using ::wprintf;
+using ::vwprintf;
+using ::swprintf;
+using ::vswprintf;
+using ::fwprintf;
+using ::vfwprintf;
+using ::wscanf;
+using ::vwscanf;
+using ::swscanf;
+using ::vswscanf;
+using ::fwscanf;
+using ::vfwscanf;
+using ::fgetwc;
+using ::fgetws;
+using ::fputwc;
+using ::fputws;
+using ::fwide;
+using ::getwc;
+using ::getwchar;
+using ::putwc;
+using ::putwchar;
+using ::ungetwc;
+using ::wcstof;
+using ::wcstod;
+using ::wcstold;
+using ::wcstol;
+using ::wcstoll;
+using ::wcstoul;
+using ::wcstoull;
+using ::wcsftime;
+using ::wcscoll;
+using ::wcsxfrm;
+using ::btowc;
+using ::wctob;
+using ::mbsinit;
+using ::mbrlen;
+using ::mbrtowc;
+using ::wcrtomb;
+using ::mbsrtowcs;
+using ::wcsrtombs;
 } // namespace std
 
 #endif // _EZCXX_CWCHAR
