@@ -28,6 +28,8 @@
 
 * **Fixes**
 - `fclose` correctness; `stdio.h` cleanup and `rename` alias.
+- Fix and optimize clipping behavior for `gfx_HorizLine` and `gfx_VertLine` (Fixes #673).
+- Fixed `fontlib_GetGlyphWidth`.
 - `gfx_AllocSprite` return value bug.
 - `ti_Alloc(String/Equ)` now handles `NULL` from allocator; `nonnull` attributes added.
 - `ti_SetArchiveStatus` prototype/declaration corrected.
@@ -35,6 +37,7 @@
 - Replaced broken OS `strspn/strcspn/strpbrk` with in-house implementations (Fixes #646).
 - `sscanf`/`vsscanf` added; float handling and `endptr` for `strto(f/d/ld)` fixed.
 - `<fenv.h>` function-macros fixed; introduced `<cfenv>`.
+- convimg: fix transparent-index and palette-offset.
 - Misc. docs fixes
 
 * **Improvements**
