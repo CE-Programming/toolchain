@@ -439,10 +439,11 @@ jobs:
           mv built-examples.zip built-examples-nightly.zip
 
       - name: Update nightly release
-        uses: pyTooling/Actions/releaser@v6.7.0
+        if: ${{ github.ref == 'refs/heads/master' && github.event_name != 'pull_request' }}
+        uses: softprops/action-gh-release@5122b4edc95f85501a71628a57dc180a03ec7588 # latest as of 2025-12-22
         with:
-          tag: nightly
-          rm: true
+          tag_name: nightly
+          prerelease: true
           token: ${{secrets.GITHUB_TOKEN}}
           files: |
             CEdev-Linux-nightly.tar.gz
