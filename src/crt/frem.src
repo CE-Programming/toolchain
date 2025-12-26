@@ -1,23 +1,32 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__frem
+	.global	__frem
+	.type	__frem, @function
 
 ; wraps _fmodf
 __frem:
-	push	iy, de, hl
+	push iy
+	push de
+	push hl
 
-	push	de, hl	; y
+	push de
+	push hl	; y
 	ld	e, a	
 	push	de	; x_hi8
 	push	bc	; x_lo24
 	call	_fmodf
-	pop	bc, bc, bc, bc
+	pop bc
+	pop bc
+	pop bc
+	pop bc
 
 	ld	a, e
 	ex	(sp), hl
-	pop	bc, de, iy
+	pop bc
+	pop de
+	pop iy
 	ret
 
-	extern	_fmodf
+	.extern	_fmodf

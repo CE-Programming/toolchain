@@ -1,3 +1,17 @@
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _powf\n"
+    "\t.type _powf, @function\n"
+    "\t.equ _powf, 0x0220F8\n"
+    "\t.global _pow\n"
+    "\t.type _pow, @function\n"
+    "\t.equ _pow, _powf\n"
+);
+
+#else
+
 /************************************************************************/
 /*                                                                      */
 /*                      Copyright (C)1987-2008 by                       */
@@ -10,7 +24,7 @@
 #include <errno.h>
 #include <math.h>
 
-float _powf_c(float arg1, float arg2) {
+float powf(float arg1, float arg2) {
     float result;
     long temp;
 
@@ -31,4 +45,6 @@ float _powf_c(float arg1, float arg2) {
     return 0.0;
 }
 
-double _pow_c(double, double) __attribute__((alias("_powf_c")));
+double pow(double, double) __attribute__((alias("powf")));
+
+#endif

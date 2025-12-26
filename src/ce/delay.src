@@ -1,15 +1,17 @@
 ; void delay(uint16_t millis);
 
-	assume	adl=1
+	.assume	adl=1
 
-if 0
+.if 0
 ; Minimal caller code (for timing calculation).
 	call	_delay
 ; ^ 22 cc
-end if
+.endif
 
-	section	.text
-	public	_delay
+	.section	.text._delay
+	.global	_delay
+	.type	_delay, @function
+
 _delay:
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
 
@@ -34,15 +36,15 @@ _delay:
 	dec.s	hl
 	xor	a, a			; a = 0
 	ld	e, a			; euhl = millis - 1
-.multiplier_fp := (256 * 32768 + 1000 - 1) / 1000
-assert .multiplier_fp shr 24 = 0
-	ld	bc, .multiplier_fp	; aubc = ceil(256 * 32768 / 1e3)
-assert ($FFFF * .multiplier_fp) shr 32 = 0
+	.equ	.L.multiplier_fp, (256 * 32768 + 1000 - 1) / 1000
+;assert .multiplier_fp shr 24 = 0
+	ld	bc, .L.multiplier_fp	; aubc = ceil(256 * 32768 / 1e3)
+;assert ($FFFF * .multiplier_fp) shr 32 = 0
 	call	__lmulu			; euhl = (millis - 1) *
 					;            ceil(256 * 32768 / 1e3)
 ; https://docs.google.com/spreadsheets/d/1mZwDn6rEw3-uSQPuy48Ez0UWIvnggLiJxWft4u4OtcU/edit?usp=sharing
-.correction_fp := 413
-	ld	bc, .multiplier_fp + .correction_fp
+	.equ	.L.correction_fp, 413
+	ld	bc, .L.multiplier_fp + .L.correction_fp
 	add	hl, bc
 	adc	a, e			; auhl = millis *
 					;            ceil(256 * 32768 / 1e3) +
@@ -61,10 +63,10 @@ assert ($FFFF * .multiplier_fp) shr 32 = 0
 ; Join common code for the rest.
 	jp	___sleep_common.3
 
+	.global	_msleep
+	.type	_msleep, @function
 
-	public	_msleep
-_msleep := _delay
-
+	.set	_msleep, _delay
 
 	extern	___sleep_common.3
 	extern	__lmulu

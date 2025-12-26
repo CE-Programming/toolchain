@@ -558,11 +558,11 @@ int main(void) {
 
     int failed_test = run_tests();
     if (failed_test != 0) {
-        char buf[sizeof("Failed test L-8388608\n")];
-        boot_sprintf(buf, "Failed test L%d\n", failed_test);
-        fputs(buf, stdout);
+        char buf[sizeof("Failed test L-8388608")];
+        boot_sprintf(buf, "Failed test L%d", failed_test);
+        puts(buf);
     } else {
-        fputs("All tests passed", stdout);
+        puts("All tests passed");
     }
 
     while (!os_GetCSC());

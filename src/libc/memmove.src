@@ -1,16 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_memmove
+	.global	_memmove
+	.type	_memmove, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_memmove := 0000A8h
+	.set	_memmove, 0x0000A8
 
-else
+.else
 
-if 1
+.if 1
 
 ; Optimized for when src != dst
 _memmove:
@@ -24,22 +25,22 @@ _memmove:
 	ld	bc, (iy + 10)
 	sbc	hl, hl
 	add	hl, bc
-	jr	nc, .zero
+	jr	nc, .L.zero
 	ld	hl, (iy + 7)
 	ld	de, (iy + 4)
 	sbc	hl, de
 	; src <= dst
-	jr	c, .copy_backwards
+	jr	c, .L.copy_backwards
 	; src > dst
 ; .copy_forwards:
 	add	hl, de
 	inc	hl
 	ldir
-.zero:
+.L.zero:
 	ld	hl, (iy + 4)
 	ret
 
-.copy_backwards:
+.L.copy_backwards:
 	; move HL and DE to the end
 	ex	de, hl
 	add	hl, bc
@@ -51,7 +52,7 @@ _memmove:
 	inc	hl
 	ret
 
-else
+.else
 
 ; Optimized for when src == dst
 _memmove:
@@ -65,7 +66,7 @@ _memmove:
 	ld	bc, (iy + 10)
 	sbc	hl, hl
 	add	hl, bc
-	jr	nc, .zero
+	jr	nc, .L.zero
 	ld	de, (iy + 4)
 	ld	hl, (iy + 7)
 	or	a, a
@@ -73,17 +74,17 @@ _memmove:
 	; src < dst
 	jr	c, .copy_backwards
 	; src >= dst
-; .copy_forwards:
+; .L.copy_forwards:
 	add	hl, de
 	; src == dst
 	ret	z	; skips LDIR when src == dst
 	; src > dst
 	ldir
-.zero:
+.L.zero:
 	ld	hl, (iy + 4)
 	ret
 
-.copy_backwards:
+.L.copy_backwards:
 	; move HL and DE to the end
 	dec	de	; DE = dst - 1
 	ex	de, hl
@@ -95,6 +96,6 @@ _memmove:
 	inc	hl
 	ret
 
-end if
+.endif
 
-end if
+.endif

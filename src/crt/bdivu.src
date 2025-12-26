@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bdivu
+	.section	.text
+	.global	__bdivu
+	.type	__bdivu, @function
+
 __bdivu:
 ; I: B=dividend, C=divisor
 ; O: a=B/C
@@ -17,4 +19,4 @@ __bdivu:
 	ret
 
 
-	extern	__bdvrmu
+	.extern	__bdvrmu

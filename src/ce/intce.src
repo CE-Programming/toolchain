@@ -1,147 +1,158 @@
-	assume	adl=1
+	.assume	adl=1
 
-mpIntStatus := $F00000
-mpIntMask := $F00004
-mpIntAck := $F00008
-mpIntLachEnable := $F0000C
-mpIntXor := $F00010
-mpIntStatusMasked := $F00014
+	.set	ti.mpIntStatus, $F00000
+	.set	ti.mpIntMask, $F00004
+	.set	ti.mpIntAck, $F00008
+	.set	ti.mpIntLachEnable, $F0000C
+	.set	ti.mpIntXor, $F00010
+	.set	ti.mpIntStatusMasked, $F00014
 
-intOnKey := 1
-intTimer1 := 2
-intTimer2 := 4
-intTimer3 := 8
-intOsTimer := $10
-intKbd := $400
-intLcd := $800
-intRtc := $1000
+	.set	ti.intOnKey, 1
+	.set	ti.intTimer1, 2
+	.set	ti.intTimer2, 4
+	.set	ti.intTimer3, 8
+	.set	ti.intOsTimer, $10
+	.set	ti.intKbd, $400
+	.set	ti.intLcd, $800
+	.set	ti.intRtc, $1000
 
 ;-------------------------------------------------------------------------------
-	section	.text
-	public	_int_Initialize
+	.section	.text._int_Initialize
+	.global	_int_Initialize
+	.type	_int_Initialize, @function
+
 _int_Initialize:
 	di
-	ld	de,_lconf
-	ld	hl,mpIntMask
-	ld	bc,16
+	ld	de, _int_lconf
+	ld	hl, ti.mpIntMask
+	ld	bc, 16
 	ldir
-	ld	hl,_cconf
-	ld	de,mpIntMask
-	ld	bc,16
+	ld	hl, _int_cconf
+	ld	de, ti.mpIntMask
+	ld	bc, 16
 	ldir
-	ld	hl,$D18879
-	ld	de,$C90611
-	ld	(hl),de
+	ld	hl, $D18879
+	ld	de, $C90611
+	ld	(hl), de
 	dec	hl
-	ld	(hl),$ED
+	ld	(hl), $ED
 	push	hl
 	inc	d
 	call	$D18878
-	ld	hl,$E10010 or ((_int_Handler shr 8) and $00FF00)
-	ld	de,$C3 or ((_int_Handler shl 8) and $FFFF00)
-	ld	(hl),h
+	; todo: figure out how to do this properly
+	;ld	hl,$E10010 | ((_int_Handler >> 8) & $00FF00)
+	;ld	de,$C3 | ((_int_Handler << 8) & $FFFF00)
+	ld	(hl), h
 	inc	hl
-	ld	(hl),de
-	ld	hl,$E30800
-	ld	bc,$401
-	ld	a,$E1
+	ld	(hl), de
+	ld	hl, $E30800
+	ld	bc, $401
+	ld	a, $E1
 	call	$0210E0		; _Memset
-	ld	hl,$E308
-	ld	i,hl
+	ld	hl, $E308
+	ld	i, hl
 	im	2
-	ld	d,3
+	ld	d, 3
 	ret
 
 ;-------------------------------------------------------------------------------
-	section	.text
-	public	_int_Handler
+	.section	.text._int_Handler
+	.global	_int_Handler
+	.type	_int_Handler, @function
+
 _int_Handler:
-	ex	af,af'
+	ex	af, af'
 	exx
-	ld	hl,(mpIntStatusMasked)
-	add	hl,hl
+	ld	hl, (ti.mpIntStatusMasked)
+	add	hl, hl
 	inc	hl
-	add	hl,hl
-	xor	a,a
-isr_loop:
+	add	hl, hl
+	xor	a, a
+.L.isr_loop:
 	inc	a
-	add	hl,hl
-	jr	nc,isr_loop
-identified:
+	add	hl, hl
+	jr	nc, .L.isr_loop
+.L.identified:
 	dec	a
-	add	a,a
-	add	a,a
-	ld	(isr_dispatch_smc + 1),a
+	add	a, a
+	add	a, a
+	ld	(.L.isr_dispatch_smc + 1), a
 	exx
 	ex	af, af'
-isr_dispatch_smc:
-	jr	$+2
-iv_list:
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-	jp	unhandledInt
-unhandledInt:
+.L.isr_dispatch_smc:
+	jr	$ + 2
+_int_Handler.iv_list:
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+	jp	.L.unhandled_int
+.L.unhandled_int:
 	ei
 	ret
 
 ;-------------------------------------------------------------------------------
-	section	.text
-	public	_int_SetVector
+	.section	.text._int_SetVector
+	.global	_int_SetVector
+	.type	_int_SetVector, @function
+
 _int_SetVector:
-	ld	iy,0
-	add	iy,sp
-	ld	a,21
-	ld	l,(iy + 3)
-	sub	a,l
-	ld	l,a
-	ld	h,4
+	ld	iy, 0
+	add	iy, sp
+	ld	a, 21
+	ld	l, (iy + 3)
+	sub	a, l
+	ld	l, a
+	ld	h, 4
 	mlt	hl
-	ld	de,iv_list + 1
-	add	hl,de
-	ld	de,(iy + 6)
-	ld	(hl),de
+	ld	de, _int_Handler.iv_list + 1
+	add	hl, de
+	ld	de, (iy + 6)
+	ld	(hl), de
 	ret
 
 ;-------------------------------------------------------------------------------
-	section	.text
-	public	_int_Reset
+	.section	.text._int_Reset
+	.global	_int_Reset
+	.type	_int_Reset, @function
+
 _int_Reset:
 	di
-	ld	hl,_lconf
-	ld	de,mpIntMask
-	ld	bc,16
+	ld	hl, _int_lconf
+	ld	de, ti.mpIntMask
+	ld	bc, 16
 	ldir
 	im	1
 	ret
 
-	section	.bss
-	private	_lconf
-_lconf:
-	rb	16
+;-------------------------------------------------------------------------------
+	.section	.bss._int_lconf
+	.local	_int_lconf
+_int_lconf:
+	.ds	16
 
-	section	.data
-	private	_cconf
-_cconf:
-	db	$00,$00,$00,$00	; mask
-	db	$ff,$ff,$ff,$ff	; ack
-	db	$00,$00,$00,$00	; latch
-	db	$00,$00,$00,$00	; invert
+;-------------------------------------------------------------------------------
+	.section	.data._int_cconf
+	.local	_int_cconf
+_int_cconf:
+	.db	$00,$00,$00,$00	; mask
+	.db	$ff,$ff,$ff,$ff	; ack
+	.db	$00,$00,$00,$00	; latch
+	.db	$00,$00,$00,$00	; invert

@@ -1,6 +1,8 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__indcallhl
+	.section	.text
+	.global	__indcallhl
+	.type	__indcallhl, @function
+
 __indcallhl:
 	jp	(hl)

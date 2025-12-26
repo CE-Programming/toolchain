@@ -1,11 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llneg
+	.section	.text
+	.global	__llneg
+	.type	__llneg, @function
+	.global	__llneg.hijack_nc
+	.type	__llneg.hijack_nc, @function
+
 __llneg:
 	or	a, a
-	public	__llneg.hijack_nc
-.hijack_nc:
+__llneg.hijack_nc:
 	ex	de, hl		; ude=UHL, uhl=UDE
 	push	hl		; *spl=UDE
 	sbc	hl, hl		; uhl=0

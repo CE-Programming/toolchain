@@ -1,8 +1,9 @@
-	assume	adl = 1
+	.assume	adl = 1
 
-	section	.text
+	.section	.text
 
-	public	_fmodl
+	.global	_fmodl
+	.type	_fmodl, @function
 
 _fmodl:
 	call	__frameset0
@@ -27,5 +28,5 @@ _fmodl:
 	pop	ix
 	ret
 
-	extern	___f64_rem
-	extern	__frameset0
+	.extern	___f64_rem
+	.extern	__frameset0

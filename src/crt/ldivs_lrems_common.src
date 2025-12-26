@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ldivs_lrems_common
+	.section	.text
+	.global	__ldivs_lrems_common
+	.type	__ldivs_lrems_common, @function
+
 __ldivs_lrems_common:
 ; I: ZF=EUHL>=0
 ; O: aubc=abs(AUBC), euhl=abs(EUHL)
@@ -21,4 +23,4 @@ __ldivs_lrems_common:
 
 	ret
 
-	extern	__lneg
+	.extern	__lneg

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__frimuls
+	.section	.text
+	.global	__frimuls
+	.type	__frimuls, @function
+
 __frimuls:
 	push	af
 	push	de
@@ -65,4 +67,4 @@ _L2:
 	pop	af
 	ret
 
-	extern	__frimulu
+	.extern	__frimulu

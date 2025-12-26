@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__ultof
+	.global	__ultof
+	.type	__ultof, @function
 
-if 0
+.if 0
 
 ; round to nearest ties to even
 __ultof:
@@ -28,7 +29,7 @@ __ultof:
 	res	0, c
 	ret
 
-else
+.else
 
 ; round to nearest ties away from zero (to match __ltof behaviour)
 __ultof:
@@ -49,6 +50,6 @@ __ultof:
 	inc	bc
 	ret	; round up (this will not overflow because bit 23 is 0)
 
-end if
+.endif
 
-	extern	__ltof
+	.extern	__ltof

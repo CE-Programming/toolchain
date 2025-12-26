@@ -1,3 +1,17 @@
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _atanf\n"
+    "\t.type _atanf, @function\n"
+    "\t.equ _atanf, 0x022108\n"
+    "\t.global _atan\n"
+    "\t.type _atan, @function\n"
+    "\t.equ _atan, _atanf\n"
+);
+
+#else
+
 /* Copyright (c) 2000-2008 Zilog, Inc. */
 
 /**
@@ -37,12 +51,10 @@
  * @remarks Minimum ulp:
  * ulp of +4 at +0x1.a85846p-2
  */
-float _atanf_c(float arg) {
+float atanf(float arg) {
     float _f32_satan(float);
     return copysignf(_f32_satan(fabsf(arg)), arg);
 }
-
-double _atan_c(double) __attribute__((alias("_atanf_c")));
 
 /**
  * atan2 discovers what quadrant the angle
@@ -80,3 +92,7 @@ float _f32_satan(float arg) {
         return (F32_PI4 + _f32_xatan((arg-1.0f)/(arg+1.0f)));
     }
 }
+
+double atan(double) __attribute__((alias("atanf")));
+
+#endif

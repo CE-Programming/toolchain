@@ -1,43 +1,28 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lxor
+	.section	.text
+	.global	__lxor
+	.type	__lxor, @function
+	.global	__ixor
+	.type	__ixor, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__lxor := 0001FCh
+	.set	__lxor, 0x0001FC
+	.set	__ixor, 0x000198
 
-else
+.else
 
 __lxor:
 ; CC: 28*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
 	xor	a, e
 	ld	e, a
-;	jr	__ixor.hijack_lxor
-	virtual
-		ld	a, 0
-		load .ld_a: byte from $$
-	end virtual
-	db	.ld_a	; push af -> ld a,*
-	require	__ixor
-
-end if
-
-	section	.text
-	public	__ixor
-
-if PREFER_OS_CRT
-
-__ixor := 000198h
-
-else
-
+	jr	.L.hijack_lxor
 __ixor:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
-	private	__ixor.hijack_lxor
-.hijack_lxor:
+.L.hijack_lxor:
 	push	hl
 	scf
 	sbc	hl, hl
@@ -60,4 +45,4 @@ __ixor:
 	pop	af
 	ret
 
-end if
+.endif

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lldivu
+	.section	.text
+	.global	__lldivu
+	.type	__lldivu, @function
+
 __lldivu:
 
 	push	iy
@@ -18,4 +20,4 @@ __lldivu:
 
 	ret
 
-	extern	__lldvrmu
+	.extern	__lldvrmu

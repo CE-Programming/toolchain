@@ -3,10 +3,12 @@
 ; Returns:
 ; ude:uhl = ude:uhl / uiy:ubc
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48divs
+	.section	.text
+	.global	__i48divs
+	.type	__i48divs, @function
+
 __i48divs:
 	push	af
 	push	iy
@@ -14,7 +16,7 @@ __i48divs:
 
 	; divisor sign check
 	push	hl
-	lea	hl, iy
+	lea	hl, iy + 0
 	add	hl, hl
 	sbc	a, a
 	call	c, __uiyubcNeg
@@ -38,6 +40,6 @@ __i48divs:
 	pop	af
 	ret
 
-	extern	__i48dvrmu
-	extern	__i48neg
-	extern	__uiyubcNeg
+	.extern	__i48dvrmu
+	.extern	__i48neg
+	.extern	__uiyubcNeg

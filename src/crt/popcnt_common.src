@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__popcnt_common_init_full
+	.section	.text
+	.global	__popcnt_common_init_full
+	.type	__popcnt_common_init_full, @function
+
 __popcnt_common_init_full:
 	; Calculates a combined popcount of L and HLU.
 	; Note the carry flag must be combined with A on return.
@@ -9,7 +11,9 @@ __popcnt_common_init_full:
 	;     O: A-cf=8-popcount(L)-popcount(HLU), HLU=H, L=0
 	ld	a, l
 
-	public	__popcnt_common_init
+	.global	__popcnt_common_init
+	.type	__popcnt_common_init, @function
+
 __popcnt_common_init:
 	; Same as above, but input is in A and HLU.
 
@@ -21,7 +25,9 @@ __popcnt_common_init:
 	; since the code below is subtracting it by a factor of 0xFF.
 	sub	a, h
 
-	public	__popcnt_common_iter
+	.global	__popcnt_common_iter
+	.type	__popcnt_common_iter, @function
+
 __popcnt_common_iter:
 	; Calculates a popcount accumulation.
 	; Note the carry flag must be combined with A on return.
@@ -29,7 +35,9 @@ __popcnt_common_iter:
 	;     O: A-cf=A+popcount(L)-popcount(HLU)+H-L, HLU=H, L=0
 	sub	a, h
 
-	public	__popcnt_common_iter_adjusted
+	.global	__popcnt_common_iter_adjusted
+	.type	__popcnt_common_iter_adjusted, @function
+
 __popcnt_common_iter_adjusted:
 	; Same as above, but an additional H is accumulated into A.
 	; This is the same popcount technique as described in __bpopcnt,

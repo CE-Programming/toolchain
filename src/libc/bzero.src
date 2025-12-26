@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_bzero
+	.global	_bzero
+	.type	_bzero, @function
 
-if defined __TICE__
+.ifdef PREFER_CE_CRT
 
 ; uses the hardware specific $E40000 memory location
 
@@ -23,7 +24,7 @@ _bzero:
 	ldir
 	ret
 
-else
+.else
 
 ; makes no hardware assumptions
 
@@ -49,4 +50,4 @@ _bzero:
 	lddr
 	ret
 
-end if
+.endif

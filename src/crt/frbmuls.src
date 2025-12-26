@@ -14,10 +14,12 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__frbmuls
+	.section	.text
+	.global	__frbmuls
+	.type	__frbmuls, @function
+
 __frbmuls:
 	push	hl
 	;;
@@ -51,4 +53,3 @@ _L1:
 _L2:
 	pop	af
 	ret
-

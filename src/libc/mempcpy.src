@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_mempcpy
+	.global	_mempcpy
+	.type	_mempcpy, @function
 
-if 0
+.if 0
 
 ; faster when count is zero
 _mempcpy:
@@ -21,7 +22,7 @@ _mempcpy:
 	ex	de, hl
 	ret
 
-else
+.else
 
 ; faster in full execution case by 0F + 1 clock cycles
 _mempcpy:
@@ -31,11 +32,11 @@ _mempcpy:
 	sbc	hl, hl
 	add	hl, bc
 	ld	de, (iy + 4)	; Load destination
-	jr	nc, .zero_byte_copy	; zero bytes to copy
+	jr	nc, .L.zero_byte_copy	; zero bytes to copy
 	ld	hl, (iy + 7)	; Load source
 	ldir
-.zero_byte_copy:
+.L.zero_byte_copy:
 	ex	de, hl
 	ret
 
-end if
+.endif

@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__isfinitel
+	.global	__isfinitel
+	.type	__isfinitel, @function
 
 ; bool _isfinitel(long double)
 __isfinitel:

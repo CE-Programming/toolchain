@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__sremu
+	.section	.text
+	.global	__sremu
+	.type	__sremu, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__sremu := 00023Ch
+	.set	__sremu, 0x00023C
 
-else
+.else
 
 __sremu:
 ; I: HL=dividend, BC=divisor
@@ -20,6 +21,6 @@ __sremu:
 	pop	de
 	ret
 
-	extern	__sdvrmu
+	.extern	__sdvrmu
 
-end if
+.endif

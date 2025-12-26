@@ -1,22 +1,24 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__fpupop2
+	.section	.text
+	.global	__fpupop2
+	.type	__fpupop2, @function
+
 __fpupop2:
 	push    bc
 	ld	bc, 0800000h
 	add	hl, bc
-	jr	nc, ncarry
+	jr	nc, .ncarry
 	add	hl, bc
 	scf
-ncarry:
+.ncarry:
 	ld	d, c
 	pop	bc
 	rl	e
-	jr	nz, nzero
+	jr	nz, .nzero
 	or	a, a
 	sbc	hl, hl
-nzero:
+.nzero:
 	rl	d
 	inc	e
 	dec	e

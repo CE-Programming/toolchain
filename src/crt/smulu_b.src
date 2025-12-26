@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__smulu_b
+	.global	__smulu_b
+	.type	__smulu_b, @function
 
 __smulu_b:
 
@@ -11,7 +12,7 @@ __smulu_b:
 ;    O: hl=HL*A
 ;   CC: 15*r(PC)+6*r(SPL)+3*w(SPL)+9
 ;   CC: 14 bytes | 15F + 6R + 3W + 9
-Mul_HL_A_HL:
+.L.Mul_HL_A_HL:
 	push	de
 	ld	e, a
 	ld	d, h

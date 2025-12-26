@@ -16,17 +16,25 @@
 
 include $(CURDIR)/../common.mk
 
-BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
+OBJECTS =
+OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
+OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
+OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
 
-EZCFLAGS := -S -fno-addrsig -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
-EZCFLAGS += -D_EZ80 -isystem ../libc/include -isystem ../ce/include -isystem ../fileioc -mllvm -profile-guided-section-prefix=false
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
-EZCXXFLAGS += -isystem ../libcxx/include
+OBJECTS_CE =
+OBJECTS_CE += $(patsubst %.c,build/%.c.ce.o,$(wildcard *.c))
+OBJECTS_CE += $(patsubst %.cpp,build/%.cpp.ce.o,$(wildcard *.cpp))
+OBJECTS_CE += $(patsubst %.src,build/%.ce.o,$(wildcard *.src))
 
-WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
-WILDCARD_H := $(wildcard include/*.h)
+.SECONDARY:
 
-all: $(BUILD_SRC)
+all: build/libc.a build/libc_ce.a
+	$(MAKE) -C allocator
+	$(MAKE) -C printf
+
+build/libc.a: $(OBJECTS)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
 
 build/%.c.src: %.c
 	$(Q)$(call MKDIR,build)
@@ -36,14 +44,54 @@ build/%.cpp.src: %.cpp
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZCC) $(EZCXXFLAGS) $< -o $@
 
+build/%.c.o: build/%.c.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.cpp.o: build/%.cpp.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.o: %.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+# -----
+
+build/libc_ce.a: $(OBJECTS_CE)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
+
+build/%.c.ce.src: %.c
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCFLAGS) -DPREFER_CE_LIBC=1 $< -o $@
+
+build/%.cpp.ce.src: %.cpp
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCXXFLAGS) -DPREFER_CE_LIBC=1 $< -o $@
+
+build/%.c.ce.o: build/%.c.ce.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_LIBC=1 $< -o $@
+
+build/%.cpp.ce.o: build/%.cpp.ce.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_LIBC=1 $< -o $@
+
+build/%.ce.o: %.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_LIBC=1 $< -o $@
+
 clean:
 	$(Q)$(call RMDIR,build)
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIBC))
-	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_LIBC))
-	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/libc.a),$(INSTALL_LIBC))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/libc_ce.a),$(INSTALL_LIBC))
+	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(wildcard include/*.h)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
+	$(MAKE) -C allocator install
+	$(MAKE) -C printf install
 
-.PHONY: all clean
-
+.PHONY: all clean install

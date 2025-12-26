@@ -1,14 +1,15 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_strncmp
+	.global	_strncmp
+	.type	_strncmp, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_strncmp := $0000DC
+	.set	_strncmp, 0x0000DC
 
-else
+.else
 
 _strncmp:
 	ld	iy, 0
@@ -18,20 +19,20 @@ _strncmp:
 	adc	hl, bc
 	ld	hl, (iy + 6)
 	ld	de, (iy + 3)
-	call	nz, .start	; z means BC was zero
-.ret_zero:
+	call	nz, .L.start	; z means BC was zero
+.L.ret_zero:
 	sbc	hl, hl
 	ret
-.loop:
+.L.loop:
 	ret	po	; ret_zero
 	or	a, a
 	ret	z	; ret_zero
 	inc	de
-.start:
+.L.start:
 	ld	a, (de)
 	cpi
-	jr	z, .loop
-.finish:
+	jr	z, .L.loop
+.L.finish:
 	ld	sp, iy	; ret
 	dec	hl
 	sub	a, (hl)
@@ -39,4 +40,4 @@ _strncmp:
 	ld	l, a
 	ret
 
-end if
+.endif

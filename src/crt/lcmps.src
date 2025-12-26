@@ -1,26 +1,27 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lcmps
+	.section	.text
+	.global	__lcmps
+	.type	__lcmps, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__lcmps := 0001A8h
+	.set	__lcmps, 0x0001A8
 
-else
+.else
 
 __lcmps:
 	push	de
 	ld	d, a
 	ld	a, e
 	sub	a, d
-	jr	nz, .finish
+	jr	nz, .L.finish
 	sbc	hl, bc
 	add	hl, bc
 	sbc	a, a
-.finish:
+.L.finish:
 	ld	a, d
 	pop	de
 	ret
 
-end if
+.endif

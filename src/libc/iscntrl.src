@@ -1,15 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_iscntrl
+	.section	.text
+	.global	_iscntrl
+	.type	_iscntrl, @function
+
 _iscntrl:
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
-	ld	a,l
-	cp	a,127
+	ld	a, l
+	cp	a, 127
 	ret	z
-	add	a,-32
-	sbc	hl,hl
+	add	a, -32
+	sbc	hl, hl
 	inc	hl
 	ret

@@ -1,24 +1,30 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__issubnormall
+	.global	__issubnormall
+	.type	__issubnormall, @function
 
 ; bool _issubnormall(long double)
 __issubnormall:
-	pop	bc, hl, de
+	pop	bc
+	pop	hl
+	pop	de
 	or	a, a
 	adc	hl, de
 	pop	de
-	push	bc, bc, bc, bc
+	push	bc
+	push	bc
+	push	bc
+	push	bc
 	; zero is not subnormal
-	jr	nz, .mant_nonzero
-	jr	c, .mant_carry
+	jr	nz, .L.mant_nonzero
+	jr	c, .L.mant_carry
 	ld	a, e
 	and	a, $0F
 	ret	z	; mantissa is zero
-.mant_nonzero:
-.mant_carry:
+.L.mant_nonzero:
+.L.mant_carry:
 	ld	a, e
 	and	a, $F0
 	res	7, d

@@ -1,8 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__llshru
+	.global	__llshru
+	.type	__llshru, @function
+	.global	__llshrs
+	.type	__llshrs, @function
 
 __llshru:
 ; Suboptimal for large shift amounts
@@ -12,15 +15,11 @@ __llshru:
 	add	iy, sp
 	ld	a, (iy + 9)
 	or	a, a
-	jr	z, __llshr_common.finish
+	jr	z, .L.finish
 	push	de
 	push	hl
 	srl	b
-	jr	__llshr_common.hijack_llshru
-
-	section	.text
-
-	public	__llshrs
+	jr	.L.hijack_llshru
 
 __llshrs:
 ; Suboptimal for large shift amounts
@@ -30,18 +29,15 @@ __llshrs:
 	add	iy, sp
 	ld	a, (iy + 9)
 	or	a, a
-	jr	z, __llshr_common.finish
+	jr	z, .L.finish
 	push	de
 	push	hl
 
-	section	.text
-
-	private	__llshr_common
+	.local	__llshr_common
 __llshr_common:
-.loop:
+.L.loop:
 	sra	b
-	private	__llshr_common.hijack_llshru
-.hijack_llshru:
+.L.hijack_llshru:
 	rr	c
 	rr	(iy - 1)
 	rr	d
@@ -50,7 +46,7 @@ __llshr_common:
 	rr	h
 	rr	l
 	dec	a
-	jr	nz, .loop
+	jr	nz, .L.loop
 
 	ld	(iy - 3), e
 	ld	(iy - 2), d
@@ -59,8 +55,8 @@ __llshr_common:
 	ld	l, e
 	ld	h, d
 	pop	de
-	private	__llshr_common.finish
-.finish:
+	.local	.L.finish
+.L.finish:
 	pop	iy
 	pop	af
 	ret

@@ -1,16 +1,21 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__ddiv
+	.global	__ddiv
+	.type	__ddiv, @function
 
 ; float64_t f64_div(bool, float64_t, const float64_t*)
 __ddiv:
-	push	af, iy
+	push	af
+	push	iy
 	ld	iy, 9
 	add	iy, sp	
 	
-	push	iy, bc, de, hl
+	push	iy
+	push	bc
+	push	de
+	push	hl
 
 	ld	a, b	; signbit(x)
 	xor	a, (iy + 7)	; signbit(y)
@@ -19,8 +24,13 @@ __ddiv:
 	
 	call	___f64_div
 	
-	pop	af, af, af, af, af
-	pop	iy, af	; restore
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	iy
+	pop	af	; restore
 	ret
 
-	extern	___f64_div
+	.extern	___f64_div

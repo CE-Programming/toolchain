@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_ilogbl
+	.global	_ilogbl
+	.type	_ilogbl, @function
 
 ; int ilogbl(long double)
 _ilogbl:
@@ -23,16 +24,16 @@ _ilogbl:
 	ld	h, a
 	; HL = exponent
 	adc	hl, de
-	jr	z, .maybe_subnormal
+	jr	z, .L.maybe_subnormal
 	inc	hl
 	bit	3, h
-	jr	nz, .inf_nan
+	jr	nz, .L.inf_nan
 	; Float64_exp_bias + 1
 	ld	de, -1024
 	add	hl, de
 	ret
 
-.maybe_subnormal:
+.L.maybe_subnormal:
 	ld	c, (iy + 9)
 	ld	b, e	; DE is zero
 	ld	de, (iy + 6)
@@ -40,7 +41,7 @@ _ilogbl:
 	call	__llctlz
 	cp	a, 64
 	sbc	hl, hl
-	jr	z, .ret_zero	; A was 64
+	jr	z, .L.ret_zero	; A was 64
 	cpl
 	ld	l, a
 	; -1023 + 11 + 1 + 1
@@ -49,10 +50,10 @@ _ilogbl:
 	add	hl, de
 	ret
 
-.ret_zero:
+.L.ret_zero:
 	ex	de, hl
 	inc	de
-.inf_nan:
+.L.inf_nan:
  	ld	hl, $7FFFFF	; FP_ILOGBNAN or INT_MAX
 	add	hl, de	; FP_ILOGB0 when DE is one
 	ex	de, hl
@@ -64,7 +65,7 @@ _ilogbl:
 	ex	de, hl
 	ret
 
-	extern	__fpclassifyl
-	extern	_errno
-	extern	___fe_cur_env
-	extern	__llctlz
+	.extern	__fpclassifyl
+	.extern	_errno
+	.extern	___fe_cur_env
+	.extern	__llctlz

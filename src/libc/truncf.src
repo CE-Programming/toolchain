@@ -1,8 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_truncf, _trunc
+	.global	_truncf
+	.type	_truncf, @function
+	.global	_trunc
+	.type	_trunc, @function
 
 _trunc:
 _truncf:
@@ -21,9 +24,9 @@ _truncf:
 	rla
 
 	sub	a, 127	; exponent bias
-	jr	c, .ret_zero
+	jr	c, .L.ret_zero
 	sub	a, 23	; bits in the mantissa
-	jr	nc, .ret_self
+	jr	nc, .L.ret_self
 	sbc	hl, hl	; HL = 0xFFFFFF
 	neg
 	ld	d, c	; store C
@@ -32,13 +35,13 @@ _truncf:
 	ld	c, d	; restore C
 	jp	__iand
 
-.ret_self:
+.L.ret_self:
 	; already (large) integer, inf, or NaN
 	sbc	hl, hl
 	add	hl, bc
 	ret
 
-.ret_zero:
+.L.ret_zero:
 	; return signed zero
 	ld	a, e
 	and	a, $80
@@ -46,5 +49,5 @@ _truncf:
 	sbc	hl, hl
 	ret
 
-	extern	__ishl
-	extern	__iand
+	.extern	__ishl
+	.extern	__iand

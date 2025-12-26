@@ -1,15 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_modff
-	public	_modf
+	.section	.text
+	.global	_modff
+	.type	_modff, @function
+	.global	_modf
+	.type	_modf, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_modff := 0220ECh
-_modf := _modff
+	.set	_modff, 0x0220EC
+	.set	_modf, _modff
 
-else
+.else
 
 ; float modf(float x, float* iptr)
 _modff:
@@ -25,31 +27,32 @@ _modf:
 	ld	e, a
 	rla
 	ld	d, a
-	jr	z, .maybe_inf
+	jr	z, .L.maybe_inf
 	inc	a
 	ld	a, e
-	jr	z, .ret_nan
-.not_inf:
+	jr	z, .L.ret_nan
+.L.not_inf:
 	ld	a, d
 	sub	a, 127	; |x| < 1.0f
-	jr	c, .less_than_one
+	jr	c, .L.less_than_one
 	; fintie and normal
 	ld	hl, (ix + 6) ; mantissa
 	; E has exponent
 	push	de
 	push	hl
 	call	_truncf
-	pop	af, af
+	pop	af
+	pop	af
 
 	ld	a, e
-	ex	hl, de
+	ex	de, hl
 	ld	hl, (ix + 12)	; float *iptr
 	ld	(hl), de
 	inc	hl
 	inc	hl
 	inc	hl
 	ld	(hl), a
-	ex	hl, de
+	ex	de, hl
 	ld	e, a
 	ld	bc, (ix + 6)
 	ld	a, (ix + 9)
@@ -61,9 +64,9 @@ _modf:
 	pop	ix
 	ret
 
-.maybe_inf:
+.L.maybe_inf:
 	inc	a
-	jr	nz, .not_inf
+	jr	nz, .L.not_inf
 	ld	a, e
 	ld	hl, (ix + 12)	; float *iptr
 	ld	(hl), bc
@@ -77,12 +80,12 @@ _modf:
 	pop	ix
 	ret
 
-.less_than_one:
+.L.less_than_one:
 	ld	bc, 0
 	ld	a, e
 	and	a, $80
 	; A:UBC = copysignf(0.0f, x)
-.ret_nan:
+.L.ret_nan:
 	ld	hl, (ix + 12)	; float *iptr
 	ld	(hl), bc
 	inc	hl
@@ -94,8 +97,8 @@ _modf:
 	pop	ix
 	ret
 
-	extern	__frameset0
-	extern	_truncf
-	extern	__fsub
+	.extern	__frameset0
+	.extern	_truncf
+	.extern	__fsub
 
-end if
+.endif

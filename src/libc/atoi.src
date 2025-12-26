@@ -1,40 +1,41 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_atoi
+	.global	_atoi
+	.type	_atoi, @function
 
 _atoi:
 	pop	de
 	ex	(sp), hl
 	push	de
 	; inlined isspace
-.whitespace_loop:
+.L.whitespace_loop:
 	ld	a, (hl)
 	inc	hl
 	cp	a, 32
-	jr	z, .whitespace_loop
+	jr	z, .L.whitespace_loop
 	sub	a, 9
 	add	a, -5
-	jr	nc, .whitespace_loop
+	jr	nc, .L.whitespace_loop
 
 	; A = (HL - 1) - 9 + -5
 	; A = (HL - 1) - 14
 	xor	a, '-' - 14
 	push	af
-	jr	z, .minus_sign
-	xor	a, ('+' - 14) xor ('-' - 14)
-	jr	z, .plus_sign
+	jr	z, .L.minus_sign
+	xor	a, ('+' - 14) ^ ('-' - 14)
+	jr	z, .L.plus_sign
 	dec	hl
-.plus_sign:
-.minus_sign:
+.L.plus_sign:
+.L.minus_sign:
 	; carry is cleared
 	ex	de, hl
 	sbc	hl, hl
 	; DE = start of the digits
 	; HL = 0
-	jr	.start
-.loop:
+	jr	.L.start
+.L.loop:
 	; 21F + 4R + 3W + 1 per digit
 	push	hl
 	pop	bc
@@ -46,16 +47,16 @@ _atoi:
 	ld	c, a
 	add	hl, bc
 	inc	de		; next digit
-.start:
+.L.start:
 	ld	a, (de)
 	sub	a, 48
 	cp	a, 10
-	jr	c, .loop
-.finish:
+	jr	c, .L.loop
+.L.finish:
 	pop	af
 	; carry is cleared
 	ret	nz	; A != '-' positive
 	; A == '-' negative
 	jp	__ineg
 
-	extern	__ineg
+	.extern	__ineg

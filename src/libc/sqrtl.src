@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_sqrtl
+	.global	_sqrtl
+	.type	_sqrtl, @function
 
 _sqrtl:
 	; flags handled by softfloat
@@ -12,6 +13,6 @@ _sqrtl:
 	rlca
 	inc	hl
 	ld	(hl), a
-	jq	___f64_sqrt
+	jp	___f64_sqrt
 
-	extern	___f64_sqrt
+	.extern	___f64_sqrt

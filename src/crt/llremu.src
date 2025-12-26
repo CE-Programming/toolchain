@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llremu
+	.section	.text
+	.global	__llremu
+	.type	__llremu, @function
+
 __llremu:
 
 	push	iy
@@ -14,4 +16,4 @@ __llremu:
 
 	ret
 
-	extern	__lldvrmu
+	.extern	__lldvrmu

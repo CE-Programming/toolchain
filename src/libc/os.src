@@ -1,26 +1,36 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-
-	public	_longjmp
-_longjmp    := 000098h
-	public	_memchr
-_memchr     := 00009Ch
-	public	_memcmp
-_memcmp     := 0000A0h
-	public	_setjmp
-_setjmp     := 0000B8h
-	public	_strcat
-_strcat     := 0000C0h
-	public	_strchr
-_strchr     := 0000C4h
-	public	_strcpy
-_strcpy     := 0000CCh
-	public	_strncat
-_strncat    := 0000D8h
-	public	_strncpy
-_strncpy    := 0000E0h
-	public	_strstr
-_strstr     := 0000F0h
-	public	_strtok
-_strtok     := 0000F4h
+	.section	.text
+	.global	_longjmp
+	.type	_longjmp, @function
+	.set	_longjmp, 0x000098
+	.global	_memchr
+	.type	_memchr, @function
+	.set	_memchr, 0x00009C
+	.global	_memcmp
+	.type	_memcmp, @function
+	.set	_memcmp, 0x0000A0
+	.global	_setjmp
+	.type	_setjmp, @function
+	.set	_setjmp, 0x0000B8
+	.global	_strcat
+	.type	_strcat, @function
+	.set	_strcat, 0x0000C0
+	.global	_strchr
+	.type	_strchr, @function
+	.set	_strchr, 0x0000C4
+	.global	_strcpy
+	.type	_strcpy, @function
+	.set	_strcpy, 0x0000CC
+	.global	_strncat
+	.type	_strncat, @function
+	.set	_strncat, 0x0000D8
+	.global	_strncpy
+	.type	_strncpy, @function
+	.set	_strncpy, 0x0000E0
+	.global	_strstr
+	.type	_strstr, @function
+	.set	_strstr, 0x0000F0
+	.global	_strtok
+	.type	_strtok, @function
+	.set	_strtok, 0x0000F4

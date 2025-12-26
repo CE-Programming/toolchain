@@ -27,3 +27,5 @@ int __attribute__((weak)) fgetc(FILE *stream)
 
     return c;
 }
+
+int getc(FILE *stream) __attribute__((weak, alias("fgetc")));

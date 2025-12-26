@@ -1,7 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_imaxabs, _llabs
+	.section	.text
+	.global	_imaxabs
+	.type	_imaxabs, @function
+	.global	_llabs
+	.type	_llabs, @function
+
 _imaxabs:
 _llabs:
 	pop	iy
@@ -17,4 +21,4 @@ _llabs:
 	jp	(iy)
 
 
-	extern	__llneg.hijack_nc
+	.extern	__llneg.hijack_nc

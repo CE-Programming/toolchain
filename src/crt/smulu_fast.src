@@ -1,7 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__smuls_fast, __smulu_fast
+	.section	.text
+	.global	__smuls_fast
+	.type	__smuls_fast, @function
+	.global	__smulu_fast
+	.type	__smulu_fast, @function
+
 __smuls_fast:
 __smulu_fast:
 
@@ -11,7 +15,7 @@ __smulu_fast:
 ;   FO: sz(h), p/v=?, c=?
 ;   CC: 16*r(PC)+(ADL?3*r(SPL):2*r(SPS))+13
 				; a		ubc		ude		uhl
-Mul_HL_BC_HL_Fast:		;--------------+---------------+---------------+----------------
+.L.Mul_HL_BC_HL_Fast:		;--------------+---------------+---------------+----------------
 	ld	d, b
 	ld	e, l		; 				 de=BL
 	ld	b, h		;		 bc=HC

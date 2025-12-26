@@ -72,7 +72,8 @@ The truncating behavior of C99 `snprintf` can be replicated with `boot_asprintf`
 
 printf and fprintf
 ------------------
-`printf` and `fprintf` can be replicated by using `fputs`
+
+`printf` and `fprintf` can be replicated by using `fputs`.
 
 .. code-block:: c
 

@@ -14,6 +14,8 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+
 GIT_SHA = $(shell git describe --abbrev=8 --dirty --always --tags)
 
 CEDEV_VERSION := $(GIT_SHA)
@@ -42,6 +44,8 @@ WINDOWS := 1
 SHELL := cmd.exe
 FASMG ?= fasmg.exe
 EZCC ?= ez80-clang.exe
+EZAS ?= z80-none-elf-as.exe
+EZAR ?= z80-none-elf-ar.exe
 NULL ?= nul
 NATIVEPATH ?= $(subst /,\,$1)
 NATIVEEXE ?= $(NATIVEPATH).exe
@@ -56,6 +60,8 @@ RELEASE_NAME = windows
 else
 FASMG ?= fasmg
 EZCC ?= ez80-clang
+EZAS ?= z80-none-elf-as
+EZAR ?= z80-none-elf-ar
 NULL ?= /dev/null
 NATIVEPATH ?= $(subst \,/,$1)
 NATIVEEXE ?= $(NATIVEPATH)
@@ -75,21 +81,31 @@ RELEASE_NAME = linux
 endif
 endif
 
+QUOTE_NATIVE = $(call QUOTE_ARG,$(call NATIVEPATH,$1))
+
+EZCFLAGS := -S -fno-autolink -fno-addrsig -fno-math-errno -ffunction-sections -fdata-sections -ffreestanding
+EZCFLAGS += -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
+EZCFLAGS += -D_EZ80 -isystem $(call NATIVEPATH,$(ROOT_DIR)libc/include) -I$(call NATIVEPATH,$(ROOT_DIR)ce/include) -I$(call NATIVEPATH,$(ROOT_DIR)fileioc)
+EZCFLAGS += -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style
+EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
+EZCXXFLAGS += -isystem $(call NATIVEPATH,$(ROOT_DIR)libcxx/include)
+EZASFLAGS := -march=ez80+full
+
 INSTALL_DIR := $(patsubst %/,%,$(subst \,/,$(DESTDIR)))/$(PREFIX)
-INSTALL_PATH := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)))
-INSTALL_EXAMPLES := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/examples))
-INSTALL_LIB := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libload))
-INSTALL_CRT := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/crt))
-INSTALL_LIBC := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libc))
-INSTALL_LIBCXX := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/libcxx))
-INSTALL_SOFTFLOAT := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/softfloat))
-INSTALL_CE := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/lib/ce))
-INSTALL_BIN := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/bin))
-INSTALL_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include))
-INSTALL_TI_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include/ti))
-INSTALL_HW_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include/sys))
-INSTALL_CXX_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include/c++))
-INSTALL_CXX_TI_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include/c++/ti))
-INSTALL_CXX_HW_H := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/include/c++/sys))
-INSTALL_META := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)/meta))
-INSTALL_DIR := $(call QUOTE_ARG,$(call NATIVEPATH,$(INSTALL_DIR)))
+INSTALL_PATH := $(call QUOTE_NATIVE,$(INSTALL_DIR))
+INSTALL_EXAMPLES := $(call QUOTE_NATIVE,$(INSTALL_DIR)/examples)
+INSTALL_LIB := $(call QUOTE_NATIVE,$(INSTALL_DIR)/lib/libload)
+INSTALL_CRT := $(call QUOTE_NATIVE,$(INSTALL_DIR)/lib/crt)
+INSTALL_LIBC := $(call QUOTE_NATIVE,$(INSTALL_DIR)/lib/libc)
+INSTALL_LIBCXX := $(call QUOTE_NATIVE,$(INSTALL_DIR)/lib/libcxx)
+INSTALL_SOFTFLOAT := $(call QUOTE_NATIVE,$(INSTALL_DIR)/lib/softfloat)
+INSTALL_CE := $(call QUOTE_NATIVE,$(INSTALL_DIR)/lib/ce)
+INSTALL_BIN := $(call QUOTE_NATIVE,$(INSTALL_DIR)/bin)
+INSTALL_H := $(call QUOTE_NATIVE,$(INSTALL_DIR)/include)
+INSTALL_TI_H := $(call QUOTE_NATIVE,$(INSTALL_DIR)/include/ti)
+INSTALL_HW_H := $(call QUOTE_NATIVE,$(INSTALL_DIR)/include/sys)
+INSTALL_CXX_H := $(call QUOTE_NATIVE,$(INSTALL_DIR)/include/c++)
+INSTALL_CXX_TI_H := $(call QUOTE_NATIVE,$(INSTALL_DIR)/include/c++/ti)
+INSTALL_CXX_HW_H := $(call QUOTE_NATIVE,$(INSTALL_DIR)/include/c++/sys)
+INSTALL_META := $(call QUOTE_NATIVE,$(INSTALL_DIR)/meta)
+INSTALL_DIR := $(call QUOTE_NATIVE,$(INSTALL_DIR))

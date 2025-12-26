@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_srand
+	.section	.text
+	.global	_srand
+	.type	_srand, @function
+
 _srand:
 	pop	bc
 	ex	(sp),hl
@@ -9,4 +11,4 @@ _srand:
 	xor	a,a
 	jp	__setstate
 
-	extern	__setstate
+	.extern	__setstate

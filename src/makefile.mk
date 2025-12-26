@@ -22,10 +22,10 @@ ICON ?=
 DESCRIPTION ?=
 COMPRESSED ?= NO
 ARCHIVED ?= YES
-BSSHEAP_LOW ?= D052C6
-BSSHEAP_HIGH ?= D13FD8
-STACK_HIGH ?= D1A87E
-INIT_LOC ?= D1A87F
+BSSHEAP_LOW ?= 0xD052C6
+BSSHEAP_HIGH ?= 0xD13FD8
+STACK_HIGH ?= 0xD1A87E
+LOAD_ADDR ?= 0xD1A87F
 OUTPUT_MAP ?= YES
 CFLAGS ?= -Wall -Wextra -Oz
 CXXFLAGS ?= -Wall -Wextra -Oz
@@ -37,6 +37,7 @@ BINDIR ?= bin
 GFXDIR ?= src/gfx
 CPP_EXTENSION ?= cpp
 C_EXTENSION ?= c
+ASM_EXTENSION ?= S
 CUSTOM_FILE_FILE ?= stdio_file.h
 DEPS ?=
 HAS_UPPERCASE_NAME ?= YES
@@ -45,8 +46,8 @@ HAS_CUSTOM_FILE ?= NO
 HAS_LIBC ?= YES
 HAS_LIBCXX ?= YES
 ALLOCATOR ?= STANDARD
-PREFER_OS_CRT ?= NO
-PREFER_OS_LIBC ?= YES
+PREFER_CE_CRT ?= NO
+PREFER_CE_LIBC ?= YES
 SKIP_LIBRARY_LDFLAGS ?= NO
 LIBLOAD_OPTIONAL ?=
 COMPRESSED_MODE ?= zx7
@@ -64,62 +65,74 @@ empty :=
 space := $(empty) $(empty)
 comma := ,
 
-# configure defaults
-DEBUGMODE := NDEBUG
-CCDEBUG := -g0
-LDDEBUG := 0
-LDPREFER_OS_CRT := 0
-LDPREFER_OS_LIBC := 0
-LDHAS_PRINTF := 0
-LDHAS_LIBC := 0
-LDHAS_LIBCXX := 0
-
 # verbosity
 V ?= 0
 ifeq ($(V),0)
 Q = @
-FASMG_V := -n
 else
 Q =
-FASMG_V := -v$(V)
 endif
 
+# location of binaries
 BIN ?= $(CEDEV_TOOLCHAIN)/bin
-# get the os specific items
+BINUTILS_BIN ?= $(CEDEV_TOOLCHAIN)/binutils/bin
+
+# get the os specific operations
 ifeq ($(OS),Windows_NT)
 SHELL = cmd.exe
 NATIVEPATH = $(subst /,\,$1)
-FASMG = $(call NATIVEPATH,$(BIN)/fasmg.exe)
-CONVBIN = $(call NATIVEPATH,$(BIN)/convbin.exe)
-CONVIMG = $(call NATIVEPATH,$(BIN)/convimg.exe)
-CEMUTEST = $(call NATIVEPATH,$(BIN)/cemu-autotester.exe)
-CC = $(call NATIVEPATH,$(BIN)/ez80-clang.exe)
-LINK = $(call NATIVEPATH,$(BIN)/ez80-link.exe)
+EXE_SUFFIX = .exe
 RM = ( del /q /f $1 2>nul || call )
 RMDIR = ( rmdir /s /q $1 2>nul || call )
 NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG = "$(subst ",',$1)"#'
 else
 NATIVEPATH = $(subst \,/,$1)
-FASMG = $(call NATIVEPATH,$(BIN)/fasmg)
-CONVBIN = $(call NATIVEPATH,$(BIN)/convbin)
-CONVIMG = $(call NATIVEPATH,$(BIN)/convimg)
-CEMUTEST = $(call NATIVEPATH,$(BIN)/cemu-autotester)
-CC = $(call NATIVEPATH,$(BIN)/ez80-clang)
-LINK = $(call NATIVEPATH,$(BIN)/ez80-link)
+EXE_SUFFIX =
 RM = rm -f $1
 RMDIR = rm -rf $1
 NATIVEMKDR = mkdir -p $1
 QUOTE_ARG = '$(subst ','\'',$1)'#'
 endif
 
-MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
+# toolchain binaries
+CONVBIN = $(call NATIVEPATH,$(BIN)/convbin$(EXE_SUFFIX))
+CONVIMG = $(call NATIVEPATH,$(BIN)/convimg$(EXE_SUFFIX))
+CEMUTEST = $(call NATIVEPATH,$(BIN)/cemu-autotester$(EXE_SUFFIX))
+CC = $(call NATIVEPATH,$(BIN)/ez80-clang$(EXE_SUFFIX))
+LINK = $(call NATIVEPATH,$(BIN)/ez80-link$(EXE_SUFFIX))
+AS = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-as$(EXE_SUFFIX))
+LD = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-ld$(EXE_SUFFIX))
+OBJCOPY = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-objcopy$(EXE_SUFFIX))
+STRIP = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-strip$(EXE_SUFFIX))
+CEDEV_OBJ = $(call NATIVEPATH,$(BIN)/cedev-obj$(EXE_SUFFIX))
+
+# filepath operations
+QUOTE_NATIVE = $(call QUOTE_ARG,$(call NATIVEPATH,$1))
+MKDIR = $(call NATIVEMKDR,$(call QUOTE_NATIVE,$1))
 UPDIR_ADD = $(subst ../,_../,$(subst \,/,$1))
 UPDIR_RM = $(subst _../,../,$(subst \,/,$1))
 
-FASMG_LIB = $(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1))))
-FASMG_FILES = $(subst $(space),$(comma) ,$(patsubst %,"%",$(subst ",\",$(subst \,\\,$(call NATIVEPATH,$1)))))#"
-LINKER_SCRIPT ?= $(CEDEV_TOOLCHAIN)/meta/linker_script
+# configure debug defaults
+CC_DEBUG = -DNDEBUG=1
+LD_DEBUG = --defsym NDEBUG=1
+
+# linker script
+LINKER_SCRIPT ?= $(CEDEV_TOOLCHAIN)/meta/linker_script.ld
+
+# allocator (malloc/realloc/free)
+ifeq ($(ALLOCATOR),STANDARD)
+LIB_ALLOCATOR = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_standard.a)
+endif
+ifeq ($(ALLOCATOR),SIMPLE)
+LIB_ALLOCATOR = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_simple.a)
+endif
+
+# ensure always a hexadecimal value
+BSSHEAP_LOW := 0x$(patsubst 0x%,%,$(BSSHEAP_LOW))
+BSSHEAP_HIGH := 0x$(patsubst 0x%,%,$(BSSHEAP_HIGH))
+STACK_HIGH := 0x$(patsubst 0x%,%,$(STACK_HIGH))
+LOAD_ADDR := 0x$(patsubst 0x%,%,$(LOAD_ADDR))
 
 # ensure native paths
 SRCDIR := $(call NATIVEPATH,$(SRCDIR))
@@ -129,14 +142,19 @@ GFXDIR := $(call NATIVEPATH,$(GFXDIR))
 
 # generate default names
 TARGETBIN ?= $(NAME).bin
+TARGETOBJ ?= $(NAME).obj
+TARGETTMP ?= $(NAME).o
 TARGETMAP ?= $(NAME).map
 TARGET8XP ?= $(NAME).8xp
-ICONIMG := $(wildcard $(call NATIVEPATH,$(ICON)))
+ICON_IMG := $(wildcard $(call NATIVEPATH,$(ICON)))
 
 # startup routines
-LDCRT0 = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/crt0.src)
-LDBCLTO = $(OBJDIR)/lto.bc
-LDLTO = $(OBJDIR)/lto.src
+CRT0_SRC = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/crt0.S)
+CRT0_TMP = $(OBJDIR)/crt0.s
+CRT0_OBJ = $(OBJDIR)/crt0.o
+LTO_BC = $(OBJDIR)/lto.bc
+LTO_SRC = $(OBJDIR)/lto.s
+LTO_OBJ = $(OBJDIR)/lto.o
 
 # source: http://blog.jgc.org/2011/07/gnu-make-recursive-wildcard-function.html
 rwildcard = $(strip $(foreach d,$(wildcard $1/*),$(call rwildcard,$d,$2) $(filter $(subst %%,%,%$(subst *,%,$2)),$d)))
@@ -150,54 +168,50 @@ EXTRA_ASM_SOURCES += $(EXTRA_ASMSOURCES)
 # find source files
 CSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.$(C_EXTENSION)) $(EXTRA_C_SOURCES))
 CPPSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.$(CPP_EXTENSION)) $(EXTRA_CXX_SOURCES))
-ASMSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.asm) $(EXTRA_ASM_SOURCES))
+ASMSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.s) $(EXTRA_ASM_SOURCES))
+PREASMSOURCES = $(sort $(call rwildcard,$(SRCDIR),*.S) $(EXTRA_PREASM_SOURCES))
 
+# link time optimization
 ifneq ($(filter debug,$(MAKECMDGOALS)),)
 LTO := NO
 endif
 ifeq ($(LTO),YES)
 LINK_CSOURCES = $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).bc))
 LINK_CPPSOURCES = $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).bc))
-LINK_ASMSOURCES = $(ASMSOURCES)
-LTOFILES = $(LINK_CSOURCES) $(LINK_CPPSOURCES)
-LDFILES = $(LDCRT0) $(LDLTO) $(LINK_ASMSOURCES)
+LINK_ASMSOURCES = $(call UPDIR_ADD,$(ASMSOURCES:%.s=$(OBJDIR)/%.s.o))
+LINK_PREASMSOURCES = $(call UPDIR_ADD,$(PREASMSOURCES:%.S=$(OBJDIR)/%.S.o))
+LTO_FILES = $(LINK_CSOURCES) $(LINK_CPPSOURCES)
+OBJECTS = $(LTO_OBJ) $(LINK_ASMSOURCES) $(LINK_PREASMSOURCES)
 DEPFILES = $(wildcard $(LINK_CSOURCES:%.bc=%.d) $(LINK_CPPSOURCES:%.bc=%.d))
 else
-LINK_CSOURCES = $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).src))
-LINK_CPPSOURCES = $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).src))
-LINK_ASMSOURCES = $(ASMSOURCES)
-LDFILES = $(LDCRT0) $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES)
-DEPFILES = $(wildcard $(LINK_CSOURCES:%.src=%.d) $(LINK_CPPSOURCES:%.src=%.d))
+LINK_CSOURCES = $(call UPDIR_ADD,$(CSOURCES:%.$(C_EXTENSION)=$(OBJDIR)/%.$(C_EXTENSION).o))
+LINK_CPPSOURCES = $(call UPDIR_ADD,$(CPPSOURCES:%.$(CPP_EXTENSION)=$(OBJDIR)/%.$(CPP_EXTENSION).o))
+LINK_ASMSOURCES = $(call UPDIR_ADD,$(ASMSOURCES:%.s=$(OBJDIR)/%.s.o))
+LINK_PREASMSOURCES = $(call UPDIR_ADD,$(PREASMSOURCES:%.S=$(OBJDIR)/%.S.o))
+OBJECTS = $(LINK_CSOURCES) $(LINK_CPPSOURCES) $(LINK_ASMSOURCES) $(LINK_PREASMSOURCES)
+DEPFILES = $(wildcard $(LINK_CSOURCES:%.o=%.d) $(LINK_CPPSOURCES:%.o=%.d))
 endif
 
 ifneq ($(SKIP_LIBRARY_LDFLAGS),YES)
 # find all required/optional libload libraries
 LIBLOAD_LIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib) $(EXTRA_LIBLOAD_LIBS)
 LIBLOAD_LIBS := $(filter-out %libload.lib,$(LIBLOAD_LIBS))
-REQ_LIBLOAD := $(filter-out $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
-OPT_LIBLOAD := $(filter $(addprefix %,$(addsuffix .lib,$(LIBLOAD_OPTIONAL))),$(LIBLOAD_LIBS))
-REQ_LIBLOAD := $(call FASMG_LIB,$(REQ_LIBLOAD))
-OPT_LIBLOAD := $(call FASMG_LIB,$(OPT_LIBLOAD))
-OPT_LIBLOAD := $(foreach lib,$(OPT_LIBLOAD),$(lib)$(space)optional)
-LDLIBS := $(subst $(space),$(comma)$(space),$(strip $(REQ_LIBLOAD)$(space)$(OPT_LIBLOAD)))
-LDLIBS := $(subst $(comma)$(space)optional,$(space)optional,$(LDLIBS))
-LDLIBRARYFLAGS := -i $(call QUOTE_ARG,library $(LDLIBS))
 endif
 
 # check if there is an icon present that to convert
-ifneq ($(ICONIMG),)
-ICONSRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.src)
+ifneq ($(ICON_IMG),)
+ICON_SRC = $(call NATIVEPATH,$(OBJDIR)/icon.s)
 ifneq ($(DESCRIPTION),)
-ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
+ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_NATIVE,$(ICON_IMG)) --icon-output $(call QUOTE_NATIVE,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
 else
-ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICONIMG)) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm
+ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_NATIVE,$(ICON_IMG)) --icon-output $(call QUOTE_NATIVE,$(ICON_SRC)) --icon-format gas
 endif
-LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
+ICON_OBJ = $(call NATIVEPATH,$(OBJDIR)/icon.obj)
 else
 ifneq ($(DESCRIPTION),)
-ICONSRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.src)
-ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICONSRC)) --icon-format asm --icon-description $(DESCRIPTION)
-LDICON ?= $(call FASMG_FILES,$(ICONSRC))$(comma)$(space)
+ICON_SRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.s)
+ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_NATIVE,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
+ICON_OBJ = $(call NATIVEPATH,$(OBJDIR)/icon.obj)
 endif
 endif
 
@@ -226,56 +240,73 @@ CONVBINFLAGS += -n $(NAME)
 
 # output debug map file
 ifeq ($(OUTPUT_MAP),YES)
-LDMAPFLAG := -i map
+LD_MAP = -Map=$(BINDIR)/$(TARGETMAP)
+else
+LD_MAP =
 endif
 ifeq ($(HAS_CUSTOM_FILE),YES)
 DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
 endif
 
-# convert to linker crt/libc define
+# old style selection
 ifeq ($(PREFER_OS_CRT),YES)
-LDPREFER_OS_CRT := 1
+$(info [warn] PREFER_OS_CRT is deprecated, use PREFER_CE_CRT instead)
+PREFER_CE_CRT = $(PREFER_OS_CRT)
 endif
-ifeq ($(PREFER_OS_LIBC),YES)
-LDPREFER_OS_LIBC := 1
+ifeq ($(PREFER_OS_LIBC),NO)
+$(info [warn] PREFER_OS_LIBC is deprecated, use PREFER_CE_LIBC instead)
+PREFER_CE_LIBC = $(PREFER_OS_LIBC)
 endif
+
+# choose crt
+ifeq ($(PREFER_CE_CRT),YES)
+LIB_CRT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt_ce.a)
+else
+LIB_CRT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt.a)
+endif
+
+# choose libc
 ifeq ($(HAS_LIBC),YES)
-LDHAS_LIBC := 1
+ifeq ($(PREFER_CE_LIBC),YES)
+LIB_C = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc_ce.a)
+else
+LIB_C = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc.a)
 endif
+else
+LIB_C =
+endif
+
+# choose libcxx
 ifeq ($(HAS_LIBCXX),YES)
-LDHAS_LIBCXX := 1
+LIB_CXX = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libcxx/libcxx.a)
+else
+LIB_CXX =
 endif
+
+# add other libs
+LIB_CE = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/ce/libce.a)
+LIB_SOFTFLOAT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/softfloat/libsoftfloat.a)
+
+# include printf
 ifeq ($(HAS_PRINTF),YES)
-LDHAS_PRINTF := 1
+LIB_PRINTF = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf.a)
+else
+LIB_PRINTF =
+endif
+
+# enable/disable errno checks
+ifeq ($(HAS_MATH_ERRNO),YES)
+MATH_ERRNO =
+else
+MATH_ERRNO = -fno-math-errno
 endif
 
 # define the c/c++ flags used by clang
-EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -fno-addrsig
-EZCOMMONFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__ -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
+EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style -ffunction-sections -fdata-sections -fno-addrsig -fno-autolink -fno-threadsafe-statics $(MATH_ERRNO)
+EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_NATIVE,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_DEBUG) $(DEFCUSTOMFILE)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_NATIVE,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
-
-# these are the fasmg linker flags
-FASMGFLAGS = \
-	$(FASMG_V) \
-	$(call QUOTE_ARG,$(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/meta/ld.alm)) \
-	-i $(call QUOTE_ARG,DEBUG := $(LDDEBUG)) \
-	-i $(call QUOTE_ARG,HAS_PRINTF := $(LDHAS_PRINTF)) \
-	-i $(call QUOTE_ARG,HAS_LIBC := $(LDHAS_LIBC)) \
-	-i $(call QUOTE_ARG,HAS_LIBCXX := $(LDHAS_LIBCXX)) \
-	-i $(call QUOTE_ARG,PREFER_OS_CRT := $(LDPREFER_OS_CRT)) \
-	-i $(call QUOTE_ARG,PREFER_OS_LIBC := $(LDPREFER_OS_LIBC)) \
-	-i $(call QUOTE_ARG,ALLOCATOR_$(ALLOCATOR) := 1) \
-	-i $(call QUOTE_ARG,__TICE__ := 1) \
-	-i $(call QUOTE_ARG,include $(call FASMG_FILES,$(LINKER_SCRIPT))) \
-	-i $(call QUOTE_ARG,range .bss $$$(BSSHEAP_LOW) : $$$(BSSHEAP_HIGH)) \
-	-i $(call QUOTE_ARG,provide __stack = $$$(STACK_HIGH)) \
-	-i $(call QUOTE_ARG,locate .header at $$$(INIT_LOC)) \
-	$(LDMAPFLAG) \
-	-i $(call QUOTE_ARG,source $(LDICON)$(call FASMG_FILES,$(LDFILES))) \
-	$(LDLIBRARYFLAGS) \
-	$(EXTRA_LDFLAGS)
 
 .PHONY: all clean version gfx debug
 
@@ -283,27 +314,54 @@ FASMGFLAGS = \
 all: $(BINDIR)/$(TARGET8XP)
 
 # this rule is trigged to build debug everything
-debug: DEBUGMODE = DEBUG
-debug: LDDEBUG = 1
-# Due to an issue with ez80-clang 15.0.7, this is disabled for now. Previously: -gdwarf-5 -g3
-# Then again, no tool using the produced .dbg files currently exists (CEmu's source-level-debugging was never finished)
-debug: CCDEBUG = -g0
+debug: CC_DEBUG = -DDEBUG=1
+debug: LD_DEBUG = --defsym DEBUG=1
 debug: $(BINDIR)/$(TARGET8XP)
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(CONVBIN) $(CONVBINFLAGS) -i $(call QUOTE_ARG,$(call NATIVEPATH,$<)) -o $(call QUOTE_ARG,$(call NATIVEPATH,$@))
+	$(Q)$(CONVBIN) $(CONVBINFLAGS) -i $(call QUOTE_NATIVE,$<) -o $(call QUOTE_NATIVE,$@)
 
-$(BINDIR)/$(TARGETBIN): $(LDFILES) $(ICONSRC) $(MAKEFILE_LIST) $(DEPS)
+$(BINDIR)/$(TARGETBIN): $(BINDIR)/$(TARGETOBJ)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [objcopy] $(call NATIVEPATH,$@)
+	$(Q)$(OBJCOPY) -O binary $(call QUOTE_ARG,$<) $(call QUOTE_ARG,$@)
+
+$(BINDIR)/$(TARGETOBJ): $(CRT0_OBJ) $(OBJDIR)/$(TARGETTMP) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [linking] $(call NATIVEPATH,$@)
-	$(Q)$(FASMG) $(FASMGFLAGS) $(call NATIVEPATH,$@)
+	$(Q)$(LD) \
+		-static \
+		--entry=__start \
+		--no-warn-rwx-segments \
+		--gc-sections \
+		--omagic \
+		--defsym=LOAD_ADDR=$(LOAD_ADDR) \
+		--defsym=BSSHEAP_LOW=$(BSSHEAP_LOW) \
+		--defsym=BSSHEAP_HIGH=$(BSSHEAP_HIGH) \
+		--defsym=STACK_HIGH=$(STACK_HIGH) \
+		--defsym __TICE__=1 \
+		-T$(LINKER_SCRIPT) \
+		$(LD_MAP) \
+		$(EXTRA_LDFLAGS) \
+		$(OBJDIR)/$(TARGETTMP) \
+		$(CRT0_OBJ) \
+		$(LIB_ALLOCATOR) \
+		--start-group \
+		$(LIB_SOFTFLOAT) \
+		$(LIB_CRT) \
+		--end-group \
+		$(LIB_C) \
+		$(LIB_CXX) \
+		$(LIB_CE) \
+		-o $(call QUOTE_ARG,$@)
 
-ifneq ($(ICONSRC),)
-$(ICONSRC): $(ICONIMG) $(MAKEFILE_LIST) $(DEPS)
+ifneq ($(ICON_SRC),)
+$(ICON_OBJ): $(ICON_IMG) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [convimg] $(or $(ICONIMG),description)
+	$(Q)echo [convimg] $(or $(ICON_IMG),description)
 	$(Q)$(ICON_CONV)
+	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(ICON_SRC)) -o $(call QUOTE_ARG,$@)
 endif
 
 clean:
@@ -315,41 +373,105 @@ gfx:
 	$(Q)$(MAKE_GFX)
 
 test:
-	$(Q)$(CEMUTEST) $(call NATIVEPATH,$(CURDIR)/autotest.json)
+	$(Q)$(CEMUTEST) $(call QUOTE_NATIVE,$(CURDIR)/autotest.json)
 
 version:
 	$(Q)echo CE C/C++ Toolchain $(shell cedev-config --version)
 
 .SECONDEXPANSION:
+.SECONDARY:
 
 # no lto
-$(OBJDIR)/%.$(C_EXTENSION).src: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(EXTRA_HEADERS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/%.$(C_EXTENSION).s: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(EXTRA_HEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)echo [cc] $<
 	$(Q)$(CC) -S -MD $(EZCFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
-$(OBJDIR)/%.$(CPP_EXTENSION).src: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_HEADERS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/%.$(CPP_EXTENSION).s: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_HEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)echo [cc] $<
 	$(Q)$(CC) -S -MD $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
+$(OBJDIR)/%.$(C_EXTENSION).o: $(OBJDIR)/%.$(C_EXTENSION).s
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.$(CPP_EXTENSION).o: $(OBJDIR)/%.$(CPP_EXTENSION).s
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.s.o: $$(call UPDIR_RM,$$*).s 
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [as] $<
+	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.s: $$(call UPDIR_RM,$$*).S
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)echo [as] $<
+	$(Q)$(CC) -MD $(EZCFLAGS) -E $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(OBJDIR)/%.S.o: $(OBJDIR)/%.s
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
 # lto
-$(LDLTO): $(LDBCLTO)
+$(LTO_OBJ): $(LTO_SRC)
+	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+
+$(LTO_SRC): $(LTO_BC)
 	$(Q)$(CC) -S $(EZLTOFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
-$(LDBCLTO): $(LTOFILES)
-	$(Q)echo [lto opt] $(call NATIVEPATH,$@)
+$(LTO_BC): $(LTO_FILES)
+	$(Q)echo [lto] $(call NATIVEPATH,$@)
 	$(Q)$(LINK) $(foreach d,$^,$(call QUOTE_ARG,$(addprefix $(CURDIR)/,$d))) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(OBJDIR)/%.$(C_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(EXTRA_HEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)echo [cc] $<
 	$(Q)$(CC) -MD -c -emit-llvm $(EZCFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 $(OBJDIR)/%.$(CPP_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_HEADERS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [compiling] $(call NATIVEPATH,$<)
+	$(Q)echo [cc] $<
 	$(Q)$(CC) -MD -c -emit-llvm $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+
+# crt
+$(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(LIB_CE) $(LIB_SOFTFLOAT) $(LIB_CRT) $(LIB_C) $(ICON_OBJ) $(EXTRA_LIBS) $(MAKEFILE_LIST) $(DEPS)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)$(LD) \
+		-i \
+		-static \
+		--entry=__start \
+		--build-id=none \
+		--gc-sections \
+		--omagic \
+		--defsym __TICE__=1 \
+		$(LD_DEBUG) \
+		$(EXTRA_PRE_LDFLAGS) \
+		$(OBJECTS) \
+		$(ICON_OBJ) \
+		$(LIB_ALLOCATOR) \
+		$(LIB_PRINTF) \
+		$(LIB_CXX) \
+		$(LIB_CE) \
+		$(LIB_CRT) \
+		$(LIB_C) \
+		$(LIB_SOFTFLOAT) \
+		$(EXTRA_LIBS) \
+		-o $(call QUOTE_ARG,$@)
+	$(Q)$(STRIP) --strip-unneeded $(call QUOTE_ARG,$@)
+
+$(OBJDIR)/crt.h: $(OBJDIR)/$(TARGETTMP)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)$(CEDEV_OBJ) --elf $(call QUOTE_ARG,$<) --output $(call QUOTE_ARG,$@) --libs $(LIBLOAD_LIBS) --optional-libs $(LIBLOAD_OPTIONAL)
+
+$(CRT0_OBJ): $(CRT0_TMP)
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)$(AS) -I$(OBJDIR) -march=ez80+full $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+
+$(CRT0_TMP): $(CRT0_SRC) $(OBJDIR)/crt.h
+	$(Q)$(call MKDIR,$(@D))
+	$(Q)$(CC) -I$(OBJDIR) -E -P $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 ifeq ($(filter clean gfx test version,$(MAKECMDGOALS)),)
 -include $(DEPFILES)

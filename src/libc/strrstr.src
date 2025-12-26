@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_strrstr
+	.global	_strrstr
+	.type	_strrstr, @function
 
 _strrstr:
 	pop	bc
@@ -32,7 +33,10 @@ _strrstr:
 	push	hl		; haystack
 
 	call	_memrmem
-	pop	bc, bc, bc, bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	ret
 
-	extern	_memrmem
+	.extern	_memrmem

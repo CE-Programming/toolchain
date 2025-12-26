@@ -1,23 +1,25 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_ispunct
+	.section	.text
+	.global	_ispunct
+	.type	_ispunct, @function
+
 _ispunct:
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
-	ld	a,l
-	sub	a,33
-	cp	a,48-33
+	ld	a, l
+	sub	a, 33
+	cp	a, 48 - 33
 	ret	c
-	sub	a,58-33
-	cp	a,65-58
+	sub	a, 58 - 33
+	cp	a, 65 - 58
 	ret	c
-	sub	a,91-58
-	cp	a,97-91
+	sub	a, 91 - 58
+	cp	a, 97 - 91
 	ret	c
-	sub	a,123-91
-	cp	a,127-123
+	sub	a, 123 - 91
+	cp	a, 127 - 123
 	ret	c
-	sbc	hl,hl
+	sbc	hl, hl
 	ret

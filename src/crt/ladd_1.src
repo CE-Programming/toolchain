@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ladd_1
+	.section	.text
+	.global	__ladd_1
+	.type	__ladd_1, @function
+
 __ladd_1:
 	inc	hl
 	add	hl, bc

@@ -1,15 +1,23 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ulltof
+	.section	.text
+	.global	__ulltof
+	.type	__ulltof, @function
+
 __ulltof:
-	push	af, iy, bc, de, hl
+	push af
+	push iy
+	push bc
+	push de
+	push hl
 	call	__ulltof_c
 	pop	af
 	ld	a, e
 	pop	de
 	ld	e, a
-	pop	bc, iy, af
+	pop bc
+	pop iy
+	pop af
 	ret
 
-	extern	__ulltof_c
+	.extern	__ulltof_c

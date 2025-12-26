@@ -1,7 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__inot_fast
+	.section	.text
+	.global	__inot_fast
+	.type	__inot_fast, @function
+	.global	__snot_fast
+	.type	__snot_fast, @function
+
 __inot_fast:
 ; UHL = ~UHL
 ;   CC: 7*r(PC)+3*r(SPL)+1
@@ -14,3 +18,5 @@ __inot_fast:
 			;    =-UHL-1
 			;    =~UHL
 	ret
+
+	.set	__snot_fast, __inot_fast

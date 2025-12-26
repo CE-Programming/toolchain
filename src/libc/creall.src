@@ -1,11 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_creall
+	.global	_creall
+	.type	_creall, @function
 
 ; long double creall(long double _Complex)
 _creall:
-	pop	iy, hl, de, bc
-	push	bc, de, hl
+	pop	iy
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
 	jp	(iy)

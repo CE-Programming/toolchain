@@ -1,22 +1,24 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	weak	_inchar
+	.section	.text
+	.weak	_inchar
+	.type	_inchar, @function
+
 _inchar:
-    	ld	iy,$d00080	; ti.flags
-.l:
+	ld	iy,$d00080	; ti.flags
+.L.loop:
 	call	$2014C		; ti.GetCSC
-	or	a,a
-	jr	z,.l
-	sbc	hl,hl
-	ld	l,a
-	ld	de,.lut
-    	add	hl,de
-	ld	a,(hl)
-	or	a,a
-	jr	z,.l
-	sbc	hl,hl
-	ld	l,a
+	or	a, a
+	jr	z, .L.loop
+	sbc	hl, hl
+	ld	l, a
+	ld	de, .L.lut
+	add	hl, de
+	ld	a, (hl)
+	or	a, a
+	jr	z, .L.loop
+	sbc	hl, hl
+	ld	l, a
 	push	hl
 	push	hl
 	call	_outchar
@@ -24,7 +26,7 @@ _inchar:
 	pop	hl
 	ret
 
-.lut:
+.L.lut:
 	db	0,0,0,0,0,0,0,0,0,10		;
 	db	0,'WRMH',0,0   			; + - × ÷ ^ undef
 	db	0,'Z'+ 1,'VQLG',0,0 		; (-) 3 6 9 ) TAN VARS undef
@@ -33,4 +35,8 @@ _inchar:
 	db	'XSNIDA'			; STO LN LOG x2 x-1 MATH
 	db	0,0,0,0,0,0,0,0,0,0		;
 
-	extern	_outchar
+	.global	_getchar
+	.type	_getchar, @function
+	.equ	_getchar, _inchar
+
+	.extern	_outchar

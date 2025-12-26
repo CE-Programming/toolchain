@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_wmemcpy
+	.global	_wmemcpy
+	.type	_wmemcpy, @function
 
 ; CC: !count ? 19*r(PC) + 9*r(SPL) + 3*w(SPL) + 1
 ;            : 25*r(PC) + 18*r(SPL) + 12*w(SPL) + count*(r(src) + w(dest) + 1)
@@ -16,7 +17,7 @@ _wmemcpy:
 					;    = count2
 ; C:	if (count2) {
 	pop	iy			; iy = ret
-	jr	z, .zero
+	jr	z, .L.zero
 ; C:	__ldir(src, dest, count2);
 	pop	de			; de = dest
 	ex	(sp), hl		; hl = src
@@ -25,7 +26,7 @@ _wmemcpy:
 	push	de
 	ldir
 ; C:	}
-.zero:
+.L.zero:
 ; C:	return dest;
 	ex	(sp), hl
 	jp	(iy)

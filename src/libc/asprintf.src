@@ -1,28 +1,19 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_asprintf
-	public	_vasprintf
+	.global	_asprintf
+	.global	_vasprintf
 
-if HAS_PRINTF
+	.type	_asprintf, @function
+	.type	_vasprintf, @function
 
-_asprintf := __asprintf_c
-_vasprintf := __vasprintf_c
+.ifdef PREFER_CE_CRT
 
-	extern	__asprintf_c
-	extern	__vasprintf_c
+	.set	_asprintf, _boot_asprintf
+	.set	_vasprintf, _boot_vasprintf
 
-else
+	.extern	_boot_asprintf
+	.extern	_boot_vasprintf
 
-if defined __TICE__
-
-_asprintf := _boot_asprintf
-_vasprintf := _boot_vasprintf
-
-	extern	_boot_asprintf
-	extern	_boot_vasprintf
-
-end if
-
-end if
+.endif

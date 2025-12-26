@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_cimagl
+	.global	_cimagl
+	.type	_cimagl, @function
 
 ; long double cimagl(long double _Complex)
 _cimagl:

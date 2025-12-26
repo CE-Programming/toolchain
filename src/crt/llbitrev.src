@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llbitrev
+	.section	.text
+	.global	__llbitrev
+	.type	__llbitrev, @function
+
 __llbitrev:
 	push	af
 	ld	a, d				; a=D
@@ -23,4 +25,4 @@ __llbitrev:
 	pop	af
 	ret
 
-	extern	__internal_bitrev_two_bytes
+	.extern	__internal_bitrev_two_bytes

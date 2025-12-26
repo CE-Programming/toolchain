@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_i48div
+	.global	_i48div
+	.type	_i48div, @function
 
 ; i48div_t i48div(int48_t numer, int48_t denom);
 _i48div:
@@ -37,6 +38,6 @@ _i48div:
 	pop	ix
 	ret
 
-	extern	__i48dvrmu
-	extern	__i48neg
-	extern	__uiyubcNeg
+	.extern	__i48dvrmu
+	.extern	__i48neg
+	.extern	__uiyubcNeg

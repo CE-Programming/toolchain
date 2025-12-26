@@ -3,17 +3,19 @@
 ; Returns:
 ; ude:uhl = ude:uhl % uiy:ubc
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48rems
+	.section	.text
+	.global	__i48rems
+	.type	__i48rems, @function
+
 __i48rems:
 	push	iy
 	push	bc
 
 	; divisor sign check
 	push	hl
-	lea	hl, iy
+	lea	hl, iy + 0
 	add	hl, hl
 	call	c, __uiyubcNeg
 
@@ -26,7 +28,7 @@ __i48rems:
 	pop	af
 
 	call	__i48dvrmu
-	lea	de, iy
+	lea	de, iy + 0
 	push	bc
 	pop	hl
 
@@ -37,6 +39,6 @@ __i48rems:
 	; negate remainder if dividend was negative
 	jp	__i48neg
 
-	extern	__i48dvrmu
-	extern	__i48neg
-	extern	__uiyubcNeg
+	.extern	__i48dvrmu
+	.extern	__i48neg
+	.extern	__uiyubcNeg

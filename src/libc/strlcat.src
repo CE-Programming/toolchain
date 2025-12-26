@@ -1,12 +1,12 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_strlcat
+	.global	_strlcat
 
 _strlcat:
 	ld	iy, 0
-	lea	bc, iy
+	lea	bc, iy + 0
 	add	iy, sp
 	ld	hl, (iy + 6)	; src
 	xor	a, a
@@ -22,7 +22,7 @@ _strlcat:
 	sbc	hl, hl
 	sbc	hl, bc
 	; Allows dst to be NULL when max_size is zero
-	jr	z, .zero_size	; return src_len
+	jr	z, _strlcat.zero_size	; return src_len
 	add	hl, bc
 	push	de		; src_len
 	ld	de, (iy + 3)	; dst
@@ -30,16 +30,16 @@ _strlcat:
 	ex	de, hl
 	cpir
 	add	hl, de
-	jr	z, .finish_strnlen
+	jr	z, _strlcat.finish_strnlen
 	inc	hl
-.finish_strnlen:
+_strlcat.finish_strnlen:
 
 	ex	de, hl
 	ld	hl, (iy + 9)	; max_size
 	; (copy_size + 1) = max_size - dst_len
 	xor	a, a
 	sbc	hl, de
-	jr	z, .no_room
+	jr	z, _strlcat.no_room
 
 	pop	bc		; src_len
 	push	bc
@@ -48,14 +48,14 @@ _strlcat:
 	scf
 	sbc	hl, bc
 
-	jr	c, .copy_size_lt_src_len
+	jr	c, _strlcat.copy_size_lt_src_len
 	; (copy_size + 1 - 1) >= src_len
 	; copy_size >= src_len
 	sbc	hl, hl
-.copy_size_lt_src_len:
+_strlcat.copy_size_lt_src_len:
 	xor	a, a
 	adc	hl, bc
-	jr	z, .zero_copy_size
+	jr	z, _strlcat.zero_copy_size
 	push	hl
 	pop	bc
 
@@ -67,10 +67,10 @@ _strlcat:
 	ldir
 	ld	(de), a		; null terminate
 	pop	de		; dst_len
-.zero_copy_size:
-.no_room:
+_strlcat.zero_copy_size:
+_strlcat.no_room:
 	pop	hl		; src_len
-.zero_size:
+_strlcat.zero_size:
 	; return src_len + dst_len
 	add	hl, de
 	ret

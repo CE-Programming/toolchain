@@ -1,3 +1,17 @@
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _tanhf\n"
+    "\t.type _tanhf, @function\n"
+    "\t.equ _tanhf, 0x022138\n"
+    "\t.global _tanh\n"
+    "\t.type _tanh, @function\n"
+    "\t.equ _tanh, _tanhf\n"
+);
+
+#else
+
 /************************************************************************/
 /*                                                                      */
 /*                      Copyright (C)1987-2008 by                       */
@@ -22,7 +36,7 @@
  * ulp of -5 at +0x1.f921b4p-6  with current sinhf coshf and ideal expf
  * ulp of -7 at +0x1.0c2064p-1  with current sinhf coshf and expf
  */
-float _tanhf_c(float arg) {
+float tanhf(float arg) {
     float x = fabsf(arg);
 
     // result rounds to 1.0f
@@ -35,4 +49,6 @@ float _tanhf_c(float arg) {
     return copysignf(x, arg);
 }
 
-double _tanh_c(double) __attribute__((alias("_tanhf_c")));
+double tanh(double) __attribute__((alias("tanhf")));
+
+#endif

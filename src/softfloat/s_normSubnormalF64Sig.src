@@ -1,8 +1,8 @@
-	assume	adl = 1
+	.assume	adl = 1
 
-	section	.text
+	.section	.text
 
-	public	_softfloat_normSubnormalF64Sig
+	.global	_softfloat_normSubnormalF64Sig
 
 ; saves 78 bytes
 ; this function is called in the float64_ldexp tests
@@ -34,9 +34,9 @@ _softfloat_normSubnormalF64Sig:
 	ld	(iy + 5), de
 	ld	(iy + 8), bc
 
-	lea	hl, iy	; ABI struct ptr
+	lea	hl, iy + 0	; ABI struct ptr
 	ret
 
-	extern	__llshl
-	extern	__llctlz
-	extern	__ineg
+	.extern	__llshl
+	.extern	__llctlz
+	.extern	__ineg

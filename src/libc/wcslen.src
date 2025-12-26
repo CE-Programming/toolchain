@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_wcslen
+	.global	_wcslen
+	.type	_wcslen, @function
 
 ; size_t wcslen(const wchar_t *str)
 _wcslen:
@@ -12,12 +13,12 @@ _wcslen:
 	ld	bc, 1
 	xor	a, a
 	dec	hl
-.loop:
+.L.loop:
 	inc	hl
 	cpi
-	jr	nz, .loop
+	jr	nz, .L.loop
 	cp	a, (hl)
-	jr	nz, .loop
+	jr	nz, .L.loop
 	sbc	hl, hl
 	sbc	hl, bc
 	ret

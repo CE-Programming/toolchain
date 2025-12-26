@@ -1,20 +1,20 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llrems
+	.section	.text
+	.global	__llrems
+	.type	__llrems, @function
+	.global	__lldivs
+	.type	__lldivs, @function
+
 __llrems:
 
 	scf
-virtual
-	jr	nc, $ + 2
-	load .jr_nc: 1 from $$
-end virtual
-	db	.jr_nc
+	jr	.L.hijack
 
-	public	__lldivs
 __lldivs:
 
 	or	a, a
+.L.hijack:
 
 	push	iy
 	push	af
@@ -29,7 +29,7 @@ __lldivs:
 
 	xor	a, b
 	rla
-	jr	nc, .neg_divisor_skip
+	jr	nc, .L.neg_divisor_skip
 
 	push	bc
 	push	hl
@@ -39,16 +39,16 @@ __lldivs:
 	ld	c, a
 	ld	b, 8
 
-.neg_divisor_loop:
+.L.neg_divisor_loop:
 	ld	a, c
 	sbc	a, (hl)
 	ld	(hl), a
 	inc	hl
-	djnz	.neg_divisor_loop
+	djnz	.L.neg_divisor_loop
 
 	pop	hl
 	pop	bc
-.neg_divisor_skip:
+.L.neg_divisor_skip:
 
 	bit	7, b
 	call	nz, __llneg
@@ -58,17 +58,17 @@ __lldivs:
 
 	pop	af
 	bit	7, (iy + 8)
-	jr	c, .div_quotient_skip
+	jr	c, .L.div_quotient_skip
 	ld	hl, (iy + 15)
 	ld	de, (iy + 18)
 	ld	bc, (iy + 21)
 	bit	7, (iy + 23)
-.div_quotient_skip:
+.L.div_quotient_skip:
 
 	pop	iy
 
 	ret	z
 	jp	__llneg
 
-	extern	__lldvrmu.hijack
-	extern	__llneg
+	.extern	__lldvrmu.hijack
+	.extern	__llneg

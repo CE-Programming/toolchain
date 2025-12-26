@@ -1,4 +1,4 @@
-	assume	adl=1
+	.assume	adl=1
 
 ; fminf and fmaxf treat signed zeros as -0.0f < +0.0f.
 ;
@@ -10,13 +10,19 @@
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	_fminf
-	public	_fmin
+	.global	_fminf
+	.type	_fminf, @function
+	.global	_fmin
+	.type	_fmin, @function
+	.global	_fmaxf
+	.type	_fmaxf, @function
+	.global	_fmax
+	.type	_fmax, @function
 
-_fmin:
 _fminf:
+_fmin:
 	ld	iy, 0
 	add	iy, sp
 	ld	bc, $010000
@@ -32,68 +38,68 @@ _fminf:
 	; (X-, Y-): A =  0 NC  Z ; invert compare
 	; (X-, Y+): A = -1  C NZ ; X < Y
 	; (X+, Y-): A = +1 NC NZ ; X > Y
-	jr	nz, .different_sign
-; .same_sign:
+	jr	nz, .L_fmin.different_sign
+; .L_fmin.same_sign:
 	sbc	hl, de		; X - Y
 	add	hl, de
-	jr	nz, .x_and_y_diff
+	jr	nz, .L_fmin.x_and_y_diff
 	ld	a, (iy + 3)
 	cp	a, (iy + 9)
-.x_and_y_diff:
+.L_fmin.x_and_y_diff:
 	sbc	a, a
 	xor	a, (iy + 6)	; invert the comparison
 	add	a, a
-.different_sign:
+.L_fmin.different_sign:
 	jr	c, _fminmaxf_common.no_swap
-; .swap:
+; .L_fmin.swap:
 	ex	de, hl
 	add	hl, bc		; overflows for NaN and Inf
 	jr	c, _fminmaxf_common.y_maybe_NaN
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	private	_fminmaxf_common.no_swap
-	private	_fminmaxf_common.y_maybe_NaN
+	.local	_fminmaxf_common.no_swap
+	.local	_fminmaxf_common.y_maybe_NaN
 
 _fminmaxf_common:
-.return_y:
+_fminmaxf_common.return_y:
 	ld	hl, (iy + 9)
 	ld	e, (iy + 12)
 	ret
 
-.y_maybe_NaN:
+_fminmaxf_common.y_maybe_NaN:
 	ld	a, l
 	or	a, h
 	or	a, (iy + 9)
-	jr	z, .return_y	; infinity
+	jr	z, _fminmaxf_common.return_y	; infinity
 	; jr	.return_x
 
-.no_swap:
+_fminmaxf_common.no_swap:
 	add	hl, bc		; overflows for NaN and Inf
-	jr	c, .x_maybe_NaN
-.return_x:
+	jr	c, _fminmaxf_common.x_maybe_NaN
+_fminmaxf_common.return_x:
 	ld	hl, (iy + 3)
 	ld	e, (iy + 6)
 	ret
 
-.x_maybe_NaN:
+_fminmaxf_common.x_maybe_NaN:
 	ld	a, l
 	or	a, h
 	or	a, (iy + 3)
-	jr	z, .return_x	; infinity
-	jr	.return_y
+	jr	z, _fminmaxf_common.return_x	; infinity
+	jr	_fminmaxf_common.return_y
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	_fmaxf
-	public	_fmax
+	.global	_fmaxf
+	.global	_fmax
 
-_fmax:
 _fmaxf:
+_fmax:
 	ld	iy, 0
 	add	iy, sp
 	ld	bc, $010000
@@ -109,24 +115,24 @@ _fmaxf:
 	; (X-, Y-): A =  0 NC  Z ; invert compare
 	; (X-, Y+): A = -1  C NZ ; X < Y
 	; (X+, Y-): A = +1 NC NZ ; X > Y
-	jr	nz, .different_sign
-; .same_sign:
+	jr	nz, .L_fmax.different_sign
+; .L_fmax.same_sign:
 	sbc	hl, de		; X - Y
 	add	hl, de
-	jr	nz, .x_and_y_diff
+	jr	nz, .L_fmax.x_and_y_diff
 	ld	a, (iy + 3)
 	cp	a, (iy + 9)
-.x_and_y_diff:
+.L_fmax.x_and_y_diff:
 	sbc	a, a
 	xor	a, (iy + 6)	; invert the comparison
 	add	a, a
-.different_sign:
+.L_fmax.different_sign:
 	jr	nc, _fminmaxf_common.no_swap
-; .swap:
+; .L_fmax.swap:
 	ex	de, hl
 	add	hl, bc		; overflows for NaN and Inf
 	jr	c, _fminmaxf_common.y_maybe_NaN
-.return_y:
+.L_fmax.return_y:
 	ld	hl, (iy + 9)
 	ld	e, (iy + 12)
 	ret

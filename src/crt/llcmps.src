@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llcmps
+	.section	.text
+	.global	__llcmps
+	.type	__llcmps, @function
+
 __llcmps:
 	push	iy
 	ld	iy, 0
@@ -13,21 +15,21 @@ __llcmps:
 	ld	bc, (iy + 12)
 	sbc.s	hl, bc
 	pop	hl
-	jr	nz, .finish
+	jr	nz, .L.finish
 	ld	bc, (iy + 9)
 	ex	de, hl
 	sbc	hl, bc
 	add	hl, bc
 	ex	de, hl
-	jr	nz, .finish_unsigned
+	jr	nz, .L.finish_unsigned
 	ld	bc, (iy + 6)
 	sbc	hl, bc
 	add	hl, bc
-.finish_unsigned:
+.L.finish_unsigned:
 	ld	b, a
 	sbc	a, a
 	ld	a, b
-.finish:
+.L.finish:
 	pop	bc
 	pop	iy
 	ret

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llpopcnt
+	.section	.text
+	.global	__llpopcnt
+	.type	__llpopcnt, @function
+
 __llpopcnt:
 	call	__lpopcnt
 	push	de
@@ -16,4 +18,4 @@ __llpopcnt:
 	pop	de
 	ret
 
-	extern	__lpopcnt
+	.extern	__lpopcnt

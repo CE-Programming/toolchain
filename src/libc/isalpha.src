@@ -1,15 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_isalpha
+	.section	.text
+	.global	_isalpha
+	.type	_isalpha, @function
+
 _isalpha:
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
-	ld	a,l
-	sub	a,65
-	res	5,a
-	add	a,-26
-	sbc	hl,hl
+	ld	a, l
+	sub	a, 65
+	res	5, a
+	add	a, -26
+	sbc	hl, hl
 	inc	hl
 	ret

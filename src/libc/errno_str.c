@@ -101,19 +101,28 @@ static_assert(
 
 #define errno_strings_count (sizeof(errno_strings) / sizeof(errno_strings[0]))
 
-char* strerror(int errnum) {
-    if ((unsigned int)errnum >= errno_strings_count) {
+char *strerror(int errnum)
+{
+    if ((unsigned int)errnum >= errno_strings_count)
+    {
         boot_sprintf(&(unknown_errno_string[unknown_errno_number_offset]), "%d", errnum);
         return (char*)unknown_errno_string;
     }
+
     return (char*)errno_strings[errnum];
 }
 
 void perror(const char *str) {
+    /* Normally this would print to stderr, but since they are handled the same and pulling */
+    /* in fputs would create a dependency on fileioc, just use puts rather than fputs here */
+
     if (str != NULL && *str != '\0') {
-        fputs(str, stderr);
-        fputs(": ", stderr);
+        while (*str)
+        {
+            putchar(*str++);
+        }
+        putchar(':');
+        putchar(' ');
     }
-    fputs(strerror(errno), stderr);
-    fputc('\n', stderr);
+    puts(strerror(errno));
 }

@@ -1,14 +1,17 @@
-	assume	adl=1
+    .assume adl=1
 
-	section	.text
-	public	_acos, _acosf
+    .section .text
+    .global _acos
+	.type	_acos, @function
+	.global	_acosf
+	.type	_acosf, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_acosf := 022100h
-_acos := _acosf
+    .set _acosf, 0x022100
+    .set _acos, _acosf
 
-else
+.else
 
 _acos:
 _acosf:
@@ -26,19 +29,21 @@ _acosf:
 	call	__fcmp
 	pop	bc
 	pop	hl
-	jp	m,l_1
+	jp	m, .L1
 	ld	e,a
 	ld	a,191
 	call	__fcmp
-	jp	p,l_2
+	jp	p, .L2
 
-l_1:	ld	hl,4
+.L1:
+	ld	hl,4
 	ld	(_errno),hl
 	ld	l,h
 	ld	e,h
 	ret
 
-l_2:	push	de
+.L2:
+	push	de
 	push	hl
 	call	_asin
 	pop	bc
@@ -51,10 +56,10 @@ l_2:	push	de
 	ld	e,a
 	ret
 
-	extern	__frameset0
-	extern	__fcmp
-	extern	__fsub
-	extern	_asin
-	extern	_errno
+	.extern	__frameset0
+	.extern	__fcmp
+	.extern	__fsub
+	.extern	_asin
+	.extern	_errno
 
-end if
+.endif
