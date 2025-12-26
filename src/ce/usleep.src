@@ -1,16 +1,18 @@
 ; typedef unsigned int useconds_t;
 ; int usleep(useconds_t usec);
 
-	assume	adl=1
+	.assume	adl=1
 
-if 0
+.if 0
 ; Minimal caller code (for timing calculation).
 	call	_usleep
 ; ^ 22 cc
-end if
+.endif
 
-	section	.text
-	public	_usleep
+	.section	.text
+	.global	_usleep
+	.type	_usleep, @function
+
 _usleep:
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
 
@@ -36,18 +38,18 @@ _usleep:
 ; https://docs.google.com/spreadsheets/d/1mZwDn6rEw3-uSQPuy48Ez0UWIvnggLiJxWft4u4OtcU/edit?usp=sharing
 	xor	a, a			; a = 0
 	ld	e, a			; euhl = usec
-.multiplier := 114
-	ld	bc, .multiplier		; aubc = multiplier
+	.equ	.L.multiplier, 114
+	ld	bc, .L.multiplier		; aubc = multiplier
 	call	__lmulu			; euhl = usec * multiplier
-.correction_scaled := 5796
-	ld	bc, .correction_scaled
+	.equ	.L.correction_scaled, 5796
+	ld	bc, .L.correction_scaled
 	add	hl, bc
 	adc	a, e			; auhl = usec * multiplier +
 					;            correction_scaled
 	ld	e, a			; euhl = usec * multiplier +
 					;            correction_scaled
-.divisor := 3479
-	ld	bc, .divisor
+	.equ	.L.divisor, 3479
+	ld	bc, .L.divisor
 	xor	a, a			; aubc = divisor
 	call	__ldivu			; euhl = (usec * multiplier +
 					;             correction_scaled) /
@@ -57,7 +59,7 @@ _usleep:
 	jp	___sleep_common.2
 
 
-	extern	___sleep_common.2
-	extern	__ldivu
-	extern	__lmulu
-	extern	_clock
+	.extern	___sleep_common.2
+	.extern	__ldivu
+	.extern	__lmulu
+	.extern	_clock

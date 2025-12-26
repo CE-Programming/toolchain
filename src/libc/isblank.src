@@ -1,15 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_isblank
+	.section	.text
+	.global	_isblank
+	.type	_isblank, @function
+
 _isblank:
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
-	ld	a,l
-	cp	a,32
+	ld	a, l
+	cp	a, 32
 	ret	z
-	xor	a,9
+	xor	a, 9
 	ret	z
-	sbc	hl,hl
+	sbc	hl, hl
 	ret

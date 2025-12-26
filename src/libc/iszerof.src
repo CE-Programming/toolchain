@@ -1,16 +1,19 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__iszerof
+	.global	__iszerof
+	.type	__iszerof, @function
 
 ; bool _iszerof(float)
 __iszerof:
 	xor	a, a
-	pop	bc, hl
+	pop	bc
+	pop	hl
 	adc	hl, hl
 	ex	(sp), hl
-	push	hl, bc
+	push	hl
+	push	bc
 	ret	nz	; non-zero mantissa
 	ld	a, l
 	adc	a, a

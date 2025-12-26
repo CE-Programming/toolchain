@@ -1,15 +1,17 @@
 ; unsigned int sleep(unsigned int seconds);
 
-	assume	adl=1
+	.assume	adl=1
 
-if 0
+.if 0
 ; Minimal caller code (for timing calculation).
 	call	_sleep
 ; ^ 22 cc
-end if
+.endif
 
-	section	.text
-	public	_sleep
+	.section	.text
+	.global	_sleep
+	.type	_sleep, @function
+
 _sleep:
 ; Even though the input is 24-bit, let's just pretend that it's 16-bit.
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
@@ -32,12 +34,12 @@ _sleep:
 	ex	(sp), hl		; hl = seconds
 	push	de
 ; Convert from seconds to clock ticks.
-	ld	b,15
+	ld	b, 15
 .loop:
-	add	hl,hl
+	add	hl, hl
 	rla
 	djnz	.loop
-	ld	e,a			; euhl = seconds * 32768
+	ld	e, a			; euhl = seconds * 32768
 					;      = ticks
 ; Join common code for the rest.
 	jp	___sleep_common.1

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lneg_fast
+	.section	.text
+	.global	__lneg_fast
+	.type	__lneg_fast, @function
+
 __lneg_fast:
 	ld	c, e	; c=E
 	ex	de, hl	; ude=UHL, l=E

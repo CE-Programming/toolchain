@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__dcmp
+	.global	__dcmp
+	.type	__dcmp, @function
 
 __dcmp:
 	push	iy

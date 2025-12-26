@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_isspace
+	.section	.text
+	.global	_isspace
+	.type	_isspace, @function
+
 _isspace:
 	pop	de
 	ex	(sp),hl

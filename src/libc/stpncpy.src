@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_stpncpy
+	.global	_stpncpy
+	.type	_stpncpy, @function
 
 _stpncpy:
 	ld	iy, 0
@@ -13,28 +14,28 @@ _stpncpy:
 	xor	a, a
 	sbc	hl, hl
 	sbc	hl, bc
-	jr	z, .zero_size
+	jr	z, .L.zero_size
 	add	hl, bc
 	ld	de, (iy + 6)	; src
 	sbc	hl, de
 	ex	de, hl
 	cpir
-	jr	z, .finish_strnlen
+	jr	z, .L.finish_strnlen
 	inc	hl
-.finish_strnlen:
+.L.finish_strnlen:
 	xor	a, a
 	adc	hl, de
-.zero_size:
+.L.zero_size:
 
 	; copy strnlen bytes from src
 	push	hl
 	ld	de, (iy + 3)	; dst
-	jr	z, .zero_byte_copy
+	jr	z, .L.zero_byte_copy
 	ld	hl, (iy + 6)	; src
 	pop	bc
 	push	bc
 	ldir
-.zero_byte_copy:
+.L.zero_byte_copy:
 	pop	bc
 
 	; zero pad the remainder

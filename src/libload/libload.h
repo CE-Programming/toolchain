@@ -13,10 +13,9 @@
  * @returns \c false if the library is not loaded.
  * @note See the Makefile option `LIBLOAD_OPTIONAL` for more information.
  */
-#define libload_IsLibLoaded(name) __extension__({         \
-        extern const unsigned char libload_Library_##name \
-            __asm__("lib."#name);                         \
-        libload_Library_##name;                           \
+#define libload_IsLibLoaded(name) __extension__({                \
+        extern const unsigned char _libload_library_##name;     \
+        _libload_library_##name;                                \
     })
 
 #endif

@@ -1,12 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_strchrnul
+	.global	_strchrnul
+	.type	_strchrnul, @function
 
 _strchrnul:
-	pop	bc, hl, de
-	push	de, hl, bc
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
 	xor	a, a
 	ld	bc, 0
 	push	hl

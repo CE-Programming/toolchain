@@ -1,21 +1,22 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_memrmem
+	.global	_memrmem
+	.type	_memrmem, @function
 
 ; void *memrmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
-haystack     := iy + 3
-haystack_len := iy + 6
-needle       := iy + 9
-needle_len   := iy + 12
+	.equ	haystack, 3
+	.equ	haystack_len, 6
+	.equ	needle, 9
+	.equ	needle_len, 12
 _memrmem:
 	ld	iy, 0
 	add	iy, sp
-	ld	hl, (haystack_len)
-	ld	bc, (needle_len)
+	ld	hl, (iy + haystack_len)
+	ld	bc, (iy + needle_len)
 	sbc	hl, bc
-	jr	c, .ret_null	; (haystack_len < needle_len)
+	jr	c, .L.ret_null	; (haystack_len < needle_len)
 	; (haystack_len >= needle_len)
 
 	push	hl
@@ -24,17 +25,17 @@ _memrmem:
 	; DE = needle_len
 
 	; move to the end of the needle
-	ld	hl, (needle)
+	ld	hl, (iy + needle)
 	; return haystack when haystack_len is zero (implies that needle_len is also zero)
-	jr	z, .zero_haystack_len
+	jr	z, .L.zero_haystack_len
 	add	hl, bc
 	dec	hl
-	ld	(needle), hl
+	ld	(iy + needle), hl
 
 	sbc	hl, hl
 	adc	hl, bc
 	pop	bc
-	ld	hl, (haystack)
+	ld	hl, (iy + haystack)
 
 	; move to the end of the haystack
 	add	hl, de
@@ -45,36 +46,36 @@ _memrmem:
 	inc	bc
 	; BC = (haystack_len - needle_len + 1) = search_len
 	; haystack_len >= needle_len && needle_len != 0, therefore haystack_len >= 1
-	call	.begin_loop
-	jr	nz, .ret_null
+	call	.L.begin_loop
+	jr	nz, .L.ret_null
 	; test for a match at the last possible position
 	call	_memrcmp_fast
 	inc	hl
 	ret	z
-.ret_null:
+.L.ret_null:
 	or	a, a
 	sbc	hl, hl
 	ret
 
-.loop:
+.L.loop:
 	pop	hl
 	pop	bc
-.begin_loop:
-	ld	de, (needle)
+.L.begin_loop:
+	ld	de, (iy + needle)
 	ld	a, (de)
 	cpdr			; search for the start of the string
 	ret	po		; end of search_len
 	push	bc
 	push	hl
 	call	_memrcmp_fast
-	jr	nz, .loop
+	jr	nz, .L.loop
 	inc	hl
 	ld	sp, iy
 	ret
 
-.zero_haystack_len:
+.L.zero_haystack_len:
 	pop	hl
-	ld	hl, (haystack)
+	ld	hl, (iy + haystack)
 	ret
 
 _memrcmp_fast:
@@ -86,11 +87,11 @@ _memrcmp_fast:
 	; Z = match
 	; NZ = no match
 	inc	hl
-	ld	bc, (needle_len)
-.loop:
+	ld	bc, (iy + needle_len)
+.L_memrcmp_fast.loop:
 	cpd
 	ret	po
 	dec	de
 	ld	a, (de)
-	jr	z, .loop
+	jr	z, .L_memrcmp_fast.loop
 	ret

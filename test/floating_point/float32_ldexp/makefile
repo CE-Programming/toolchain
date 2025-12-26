@@ -13,7 +13,8 @@ OPT_FLAGS = -Oz
 CFLAGS = $(WARN_FLAGS) $(OPT_FLAGS) -std=c11
 CXXFLAGS = $(WARN_FLAGS) $(OPT_FLAGS) -std=c++11
 
-PREFER_OS_LIBC = NO
+HAS_MATH_ERRNO = YES
+PREFER_CE_LIBC = NO
 
 # ----------------------------
 

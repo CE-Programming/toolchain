@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llcmpu_fast
+	.section	.text
+	.global	__llcmpu_fast
+	.type	__llcmpu_fast, @function
+
 __llcmpu_fast:
 	ld	iy, 0
 	add	iy, sp

@@ -1,14 +1,16 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_atoll
+	.section	.text
+	.global	_atoll
+	.type	_atoll, @function
+
 _atoll:
 	pop	bc
-	ex	(sp),hl
+	ex	(sp), hl
 	push	bc
-	ld	bc,10
+	ld	bc, 10
 	push	bc
-	ld	c,b
+	ld	c, b
 	push	bc
 	push	hl
 	call	_strtoll
@@ -17,4 +19,4 @@ _atoll:
 	pop	af
 	ret
 
-	extern	_strtoll
+	.extern	_strtoll

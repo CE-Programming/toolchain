@@ -11,7 +11,8 @@ ARCHIVED = NO
 CFLAGS = -Wall -Wextra -Oz
 CXXFLAGS = -Wall -Wextra -Oz
 
-PREFER_OS_LIBC = NO
+HAS_MATH_ERRNO = YES
+PREFER_CE_LIBC = NO
 
 # ----------------------------
 

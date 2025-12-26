@@ -1,40 +1,58 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fadd
-__fadd      := 000270h
-	public	__fcmp
-__fcmp      := 000274h
-	public	__fdiv
-__fdiv      := 000278h
-	public	__fmul
-__fmul      := 000288h
-	public	__fsub
-__fsub      := 000290h
-	public	__ftol
-__ftol      := 00027Ch
-	public	__ftoul
-__ftoul     := __ftol
-	public	__indcall
-__indcall   := 00015Ch
-	public	__ishl_b
-__ishl_b    := 000178h
-	public	__ishrs_b
-__ishrs_b   := 000180h
-	public	__ishru_b
-__ishru_b   := 000188h
-	public	__itol
-__itol      := 000194h
-	public	__ltof
-__ltof      := 000284h
-	public	__sshl_b
-__sshl_b    := 000244h
-	public	__sshrs_b
-__sshrs_b   := 00024Ch
-	public	__sshru_b
-__sshru_b   := 000254h
-	public	__stoi
-__stoi      := 000260h
-	public	__stoiu
-__stoiu     := 000264h
+	.global	__fadd
+	.type	__fadd, @function
+	.set	__fadd, 0x000270
+	.global	__fcmp
+	.type	__fcmp, @function
+	.set	__fcmp, 0x000274
+	.global	__fdiv
+	.type	__fdiv, @function
+	.set	__fdiv, 0x000278
+	.global	__fmul
+	.type	__fmul, @function
+	.set	__fmul, 0x000288
+	.global	__fsub
+	.type	__fsub, @function
+	.set	__fsub, 0x000290
+	.global	__ftol
+	.type	__ftol, @function
+	.set	__ftol, 0x00027C
+	.global	__ftoul
+	.type	__ftoul, @function
+	.set	__ftoul, __ftol
+	.global	__indcall
+	.type	__indcall, @function
+	.set	__indcall, 0x00015C
+	.global	__ishl_b
+	.type	__ishl_b, @function
+	.set	__ishl_b, 0x000178
+	.global	__ishrs_b
+	.type	__ishrs_b, @function
+	.set	__ishrs_b, 0x000180
+	.global	__ishru_b
+	.type	__ishru_b, @function
+	.set	__ishru_b, 0x000188
+	.global	__itol
+	.type	__itol, @function
+	.set	__itol, 0x000194
+	.global	__ltof
+	.type	__ltof, @function
+	.set	__ltof, 0x000284
+	.global	__sshl_b
+	.type	__sshl_b, @function
+	.set	__sshl_b, 0x000244
+	.global	__sshrs_b
+	.type	__sshrs_b, @function
+	.set	__sshrs_b, 0x00024C
+	.global	__sshru_b
+	.type	__sshru_b, @function
+	.set	__sshru_b, 0x000254
+	.global	__stoi
+	.type	__stoi, @function
+	.set	__stoi, 0x000260
+	.global	__stoiu
+	.type	__stoiu, @function
+	.set	__stoiu, 0x000264

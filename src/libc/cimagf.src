@@ -1,8 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_cimagf, _cimag
+	.global	_cimagf
+	.global	_cimag
+	.type	_cimagf, @function
+	.type	_cimag, @function
 
 ; float cimagf(float _Complex)
 _cimagf:

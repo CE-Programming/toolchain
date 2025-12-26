@@ -13,7 +13,8 @@ Including the output of the :code:`make V=1` command outputs more verbose inform
 What versions of C/C++ are supported?
 -------------------------------------
 
-The CE Toolchain uses LLVM/Clang v15.0.7 - the status of each language feature support can be found at the respective links: `C <https://clang.llvm.org/c_status.html>`_, `C++ <https://clang.llvm.org/cxx_status.html>`_
+The CE Toolchain uses LLVM/Clang v17.
+The status of each language feature support can be found at the respective links: `C <https://clang.llvm.org/c_status.html>`_, `C++ <https://clang.llvm.org/cxx_status.html>`_
 
 What is the C/C++ Runtime Memory Layout?
 ----------------------------------------
@@ -29,37 +30,14 @@ The following graphic breaks down the address space.
 .. image:: images/mem_layout.png
    :align: center
 
-How can I use fasmg on a non-x86 processor?
--------------------------------------------
-
-`Fasmg <https://flatassembler.net/docs.php?article=fasmg>`_ is a macro assembler used for assembling and linking project source files.
-The project is written in x86 assembly, which means it cannot be run directly on non-x86 processors (such as ARM).
-To mitigate this, the `QEMU <https://www.qemu.org>`_ project can be used to emulate the x86 processor in user-mode so that it can be
-used directly. If you use a Debian-based system such as Ubuntu or Linux Mint, you can install QEMU using the following command:
-
-.. code-block:: bash
-
-    sudo apt install qemu-user
-
-Next, open the file :code:`CEdev/meta/makefile.mk` in the toolchain install directory and locate the following line:
-
-.. code-block:: makefile
-
-    FASMG = $(call NATIVEPATH,$(BIN)/fasmg)
-
-Add the text "qemu-x86_64" directly after the equal sign, shown below.
-Now, fasmg will execute in user mode under QEMU, allowing it to successfully complete the assembly and linking steps.
-
-.. code-block:: makefile
-
-    FASMG = qemu-x86_64 $(call NATIVEPATH,$(BIN)/fasmg)
-
 My code used to compile?!
 -------------------------
-
-But now the linker says :code:`Error: variable term used where not expected`.
-    You probably have assembly code that was not placed in a linker section, see :ref:`Assembly Constants <asm>`.
 
 But now I get a bunch of warnings and errors.
     The LLVM compiler being used is able to catch many more coding issues than the previous ZDS compiler.
     These are real issues that should be resolved.
+
+But now my assembly files don't compile.
+    The CE Toolchain switched to using the GNU Assembler (GAS) in version 15.0.0.
+    This means that assembly files will need to be ported from the fasmg syntax to the GAS syntax.
+    More information can be found in the :ref:`Assembly Files <asm>` page.

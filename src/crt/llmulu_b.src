@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__llmulu_b
+	.global	__llmulu_b
+	.type	__llmulu_b, @function
 
 __llmulu_b:
 ; Multiplies BC:UDE:UHL by (SP) and returns the 64-bit unsigned product bc:ude:uhl.

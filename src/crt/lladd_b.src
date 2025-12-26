@@ -1,19 +1,21 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lladd_b
+	.section	.text
+	.global	__lladd_b
+	.type	__lladd_b, @function
+
 __lladd_b:
 	push	bc
 	inc.s	bc
 	ld	c, a
 	ld	b, 0
 	add	hl, bc
-	jr	nc, .finish
+	jr	nc, .L.finish
 	ld	c, 1
 	ex	de, hl
 	add	hl, bc
 	ex	de, hl
-.finish:
+.L.finish:
 	pop	bc
 	ret	nc
 	inc	bc

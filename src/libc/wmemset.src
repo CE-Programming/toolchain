@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_wmemset
+	.global	_wmemset
+	.type	_wmemset, @function
 
 ; wchar_t *wmemset(wchar_t *dst, wchar_t ch, size_t count)
 _wmemset:

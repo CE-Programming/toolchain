@@ -1,15 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lor_fast
+	.section	.text
+	.global	__lor_fast
+	.type	__lor_fast, @function
+	.global	__ior_fast
+	.type	__ior_fast, @function
+	.global	__sor_fast
+	.type	__sor_fast, @function
+
 __lor_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	or	a, e
 	ld	e, a
-	require	__ior_fast
-
-	section	.text
-	public	__ior_fast
 __ior_fast:
 ; CC: 22*r(PC)+8*r(SPL)+7*w(SPL)+1
 	push	hl
@@ -25,10 +27,6 @@ __ior_fast:
 	or	a, (hl)
 	ld	(hl), a
 	pop	hl
-	require	__sor_fast
-
-	section	.text
-	public	__sor_fast
 __sor_fast:
 ; CC: 8*r(PC)+3*r(SPL)+1
 	ld	a, h

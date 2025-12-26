@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__iremu
+	.section	.text
+	.global	__iremu
+	.type	__iremu, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__iremu := 000170h
+	.set	__iremu, 0x000170
 
-else
+.else
 
 __iremu:
 ; I: UHL=dividend, UBC=divisor
@@ -20,6 +21,6 @@ __iremu:
 	pop	de
 	ret
 
-	extern	__idvrmu
+	.extern	__idvrmu
 
-end if
+.endif

@@ -1,12 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_conjl
+	.global	_conjl
+	.type	_conjl, @function
 
 ; long double _Complex conjl(long double _Complex) /* struct ABI */
 _conjl:
-	pop	iy, de
+	pop	iy
+	pop	de
 	ld	hl, 15
 	add	hl, sp
 	ld	a, (hl)

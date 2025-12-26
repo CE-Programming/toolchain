@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bcttz
+	.section	.text.__bcttz
+	.global	__bcttz
+	.type	__bcttz, @function
+
 __bcttz:
 	cp	a, 1
-	require	__cttz_common
 
-	section	.text
-	private	__cttz_common
+	.section	.text.__cttz_common
+	.local	__cttz_common
 	; Input: A=byte, CF=(A==0)
 	; Output: A=cttz(A)
 __cttz_common:
@@ -36,31 +37,27 @@ __cttz_common:
 	sbc	a, -7
 	ret
 
-	section	.text
-	public	__scttz
+	.section	.text.__scttz
+	.global	__scttz
+	.type	__scttz, @function
 __scttz:
 	xor	a, a
 	or	a, l
 	jr	nz, __cttz_common
 	sub	a, h
 	ccf
-	require	__scttz.hijack
-
-	section	.text
-	private	__scttz.hijack
+	.local	__scttz.hijack
 __scttz.hijack:
 	call	__cttz_common
 	add	a, 8
 	ret
 
-	section	.text
-	public	__icttz
+	.section	.text.__icttz
+	.global	__icttz
+	.type	__icttz, @function
 __icttz:
 	xor	a, a
-	require	__icttz.hijack
-
-	section	.text
-	private	__icttz.hijack
+	.local	__icttz.hijack
 __icttz.hijack:
 	or	a, l
 	jr	nz, __cttz_common
@@ -74,8 +71,9 @@ __icttz.hijack:
 	add	a, 16
 	ret
 
-	section	.text
-	public	__lcttz
+	.section	.text.__lcttz
+	.global	__lcttz
+	.type	__lcttz, @function
 __lcttz:
 	add	hl, de
 	xor	a, a
@@ -87,8 +85,9 @@ __lcttz:
 	add	a, 24
 	ret
 
-	section	.text
-	public	__llcttz
+	.section	.text.__llcttz
+	.global	__llcttz
+	.type	__llcttz, @function
 __llcttz:
 	add	hl, de
 	xor	a, a
@@ -109,18 +108,16 @@ __llcttz:
 	add	a, 48
 	ret
 
-	section	.text
-	public	__i48cttz
+	.section	.text.__i48cttz
+	.global	__i48cttz
+	.type	__i48cttz, @function
 __i48cttz:
 	add	hl, de
 	xor	a, a
 	sbc	hl, de
 	jr	nz, __icttz.hijack
 	ex	de, hl
-	require	__i48cttz.hijack
-
-	section	.text
-	private	__i48cttz.hijack
+	.local	__i48cttz.hijack
 __i48cttz.hijack:
 	call	__icttz.hijack
 	ex	de, hl

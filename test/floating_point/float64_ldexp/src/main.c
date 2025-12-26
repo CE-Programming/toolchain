@@ -87,7 +87,7 @@ void run_edge_case(void) {
         output_i24 = scalbnl(input, clamp_exponent(expon));
         output_i32 = scalblnl(input, expon);
         if (memcmp(&output_i24, &output_i32, sizeof(long double)) != 0) {
-            fputs("Failed edge case\n", stdout);
+            puts("Failed edge case");
             return;
         }
     }
@@ -98,11 +98,11 @@ int main(void) {
     run_edge_case();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
-        fputs("All tests passed", stdout);
+        puts("All tests passed");
     } else {
-        char buf[sizeof("Failed test: 16777215\n")];
-        boot_sprintf(buf, "Failed test: %u\n", fail_index);
-        fputs(buf, stdout);
+        char buf[sizeof("Failed test: 16777215")];
+        boot_sprintf(buf, "Failed test: %u", fail_index);
+        puts(buf);
     }
 
     while (!os_GetCSC());

@@ -1,13 +1,15 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_rand
+	.section	.text
+	.global	_rand
+	.type	_rand, @function
+
 _rand:
 	call	_random
-	ld	de,8388608
-	sbc	hl,de
+	ld	de, 8388608
+	sbc	hl, de
 	ret	p
-	add	hl,de
+	add	hl, de
 	ret
 
-	extern	_random
+	.extern	_random

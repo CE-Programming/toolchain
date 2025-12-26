@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_labs
+	.section	.text
+	.global	_labs
+	.type	_labs, @function
+
 _labs:
 	pop	bc
 	pop	hl
@@ -13,4 +15,4 @@ _labs:
 	ret	z
 	jp	__lneg
 
-	extern	__lneg
+	.extern	__lneg

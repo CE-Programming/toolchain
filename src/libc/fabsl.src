@@ -1,11 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_fabsl
+	.global	_fabsl
+	.type	_fabsl, @function
 
 _fabsl:
-	pop	iy, hl ,de, bc
-	push	bc, de, hl
+	pop	iy
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
 	res	7, b
 	jp	(iy)

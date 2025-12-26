@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__issignalingl
+	.global	__issignalingl
+	.type	__issignalingl, @function
 
-; assumes quiet NaN is NaN with bit 51 set
+; .assumes quiet NaN is NaN with bit 51 set
 ; bool _issignalingl(long double)
 __issignalingl:
 	ld	hl, 9
@@ -14,4 +15,4 @@ __issignalingl:
 	xor	a, a	; quiet bit set, return false
 	ret
 
-	extern	__isnanl
+	.extern	__isnanl

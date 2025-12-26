@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llshl_1_fast
+	.section	.text
+	.global	__llshl_1_fast
+	.type	__llshl_1_fast, @function
+
 __llshl_1_fast:
 	add	hl, hl
 	ex	de, hl

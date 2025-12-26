@@ -1,7 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llmuls, __llmulu
+	.section	.text
+	.global	__llmuls
+	.type	__llmuls, @function
+	.global	__llmulu
+	.type	__llmulu, @function
+
 __llmuls:
 __llmulu:
 ; Really slow
@@ -22,22 +26,22 @@ __llmulu:
 
 	lea	hl, iy + 18
 	ld	b, 8
-.push_loop:
+.L.push_loop:
 	push	af
 	ld	a, (hl)
 	inc	hl
 	or	a, a		; cf=0
-	djnz	.push_loop
+	djnz	.L.push_loop
 
 	sbc	hl, hl
 	ld	e, l
 	ld	d, h
 
-.byte_loop:
+.L.byte_loop:
 	scf
 	adc	a, a
 
-.bit_loop:
+.L.bit_loop:
 	push	af
 	add	ix, ix
 	adc	hl, hl
@@ -46,7 +50,7 @@ __llmulu:
 	ex	de, hl
 	pop	af
 
-	jr	nc, .add_end
+	jr	nc, .L.add_end
 	ld	bc, (iy)
 	add	ix, bc
 	ld	bc, (iy + 3)
@@ -54,18 +58,18 @@ __llmulu:
 	ex	de, hl
 	adc.s	hl, sp
 	ex	de, hl
-.add_end:
+.L.add_end:
 
 	add	a, a
-	jr	nz, .bit_loop
+	jr	nz, .L.bit_loop
 
 	pop	af
-	jr 	nc, .byte_loop
+	jr 	nc, .L.byte_loop
 
 	ld	b, d
 	ld	c, e
 	ex	de, hl
-	lea	hl, ix
+	lea	hl, ix + 0
 
 	pop	af
 	pop	af

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lsub_fast
+	.section	.text
+	.global	__lsub_fast
+	.type	__lsub_fast, @function
+
 __lsub_fast:
 	or	a, a
 	sbc	hl, bc

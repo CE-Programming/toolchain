@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__lmulu_b
+	.global	__lmulu_b
+	.type	__lmulu_b, @function
 
 __lmulu_b:
 
@@ -11,7 +12,7 @@ __lmulu_b:
 ;    O: euhl=EUHL*A
 ;   CC: 43*r(PC)+12*r(SPL)+9*w(SPL)+17
 ;   CC: 42 bytes | 43F + 12R + 9W + 17
-Mul_EUHL_A_EUHL:
+.L.Mul_EUHL_A_EUHL:
 	push	bc
 	push	de
 

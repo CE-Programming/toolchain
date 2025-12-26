@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_wmemmove
+	.global	_wmemmove
+	.type	_wmemmove, @function
 
 ; wchar_t *wmemmove(wchar_t *dest, const wchar_t *src, size_t count)
 _wmemmove:
@@ -13,4 +14,4 @@ _wmemmove:
 	ld	(hl), iy
 	jp	_memmove
 
-	extern	_memmove
+	.extern	_memmove

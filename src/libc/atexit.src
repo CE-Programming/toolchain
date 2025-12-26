@@ -1,0 +1,42 @@
+
+    .assume adl=1
+
+	.section	.text
+	.global	_atexit
+	.type	_atexit, @function
+	.global	_on_exit
+	.type	_on_exit, @function
+_atexit:
+_on_exit:
+	ld	hl, 3*3
+	push	hl
+	call	_malloc
+	pop	bc
+	ex	de, hl
+	scf
+	sbc	hl, hl
+	add	hl, de
+	ret	nc
+	ld	hl, (__atexit_functions)
+	ex	de, hl
+	ld	(__atexit_functions), hl
+	ld	(hl), de
+	pop	de
+.rept 2
+	inc	hl
+	inc	hl
+	inc	hl
+	pop	bc
+	ld	(hl), bc
+.endr
+	push	bc
+	push	bc
+	ex	de, hl
+	jp	(hl)
+
+	.section	.bss
+	.global	__atexit_functions
+__atexit_functions:
+	.ds 3
+
+    .extern _malloc

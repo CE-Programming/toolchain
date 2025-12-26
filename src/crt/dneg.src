@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__dneg
+	.global	__dneg
+	.type	__dneg, @function
 
-; assumes BC:UDE:UHL
+; .assumes BC:UDE:UHL
 __dneg:
 	rl	b
 	ccf

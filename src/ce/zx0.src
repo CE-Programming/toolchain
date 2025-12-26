@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_zx0_Decompress
+	.section	.text
+	.global	_zx0_Decompress
+	.type	_zx0_Decompress, @function
+
 _zx0_Decompress:
 	pop	bc
 	pop	de
@@ -45,7 +47,7 @@ dzx0t_new_offset_skip:
 dzx0t_copy:
 	push	hl		; preserve source
 ; dzx0t_last_offset:
-	lea	hl, iy		; restore offset
+	lea	hl, iy + 0		; restore offset
 	add	hl, de		; calculate destination - offset
 	ldir			; copy from offset
 	pop	hl		; restore source

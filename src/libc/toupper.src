@@ -1,18 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_toupper
+	.section	.text
+	.global	_toupper
+	.type	_toupper, @function
+	.global	_toupper_internal
+	.type	_toupper_internal, @function
 
 _toupper:
 	pop	de
 	ex	(sp), hl
 	push	de
-	require	_toupper.internal
-
-	section	.text
-	public	_toupper.internal
 	; ASM interface: input/output char in L, destroys AF
-.internal:
+_toupper_internal:
 	ld	a, l
 	sub	a, 'a'
 	cp	a, 1+'z'-'a'

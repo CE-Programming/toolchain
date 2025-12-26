@@ -7,17 +7,19 @@
 ; Returns:
 ; Z and C flags updated according to comparison
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48cmpu
+	.section	.text
+	.global	__i48cmpu
+	.type	__i48cmpu, @function
+
 __i48cmpu:
 ; CC: 15 bytes
 ; Minimum: 11F + 6R + 3W + 2
 ; Maximum: 16F + 6R + 3W + 2
 	push	hl
 	or	a, a
-	lea	hl, iy
+	lea	hl, iy + 0
 	sbc	hl, de	; subtract IY - DE, which is the other way around
 	ccf		; complement carry
 	pop	hl

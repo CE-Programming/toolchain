@@ -110,13 +110,13 @@ int main(void) {
     if (failed_test != 0) {
         char buf[sizeof("Failed test L-8388608\n")];
         boot_sprintf(buf, "Failed test L%d\n", failed_test);
-        fputs(buf, stdout);
+        puts(buf);
         #if 0
             /* debugging */
             printf("ULP: %ld\n", fail_ulp);
         #endif
     } else {
-        fputs("All tests passed", stdout);
+        puts("All tests passed");
     }
 
     while (!os_GetCSC());

@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_wmemchr
+	.global	_wmemchr
+	.type	_wmemchr, @function
 
 ; wchar_t *wmemchr(const wchar_t *ptr, int ch, size_t count)
 _wmemchr:
@@ -15,25 +16,25 @@ _wmemchr:
 	pop	bc		; BC = count * 2
 	ld	hl, (iy + 3)
 	ld	de, (iy + 6)	; E = lower byte, D = upper byte
-	call	.loop_start
-.ret_null:
+	call	.L.loop_start
+.L.ret_null:
 	or	a, a
 	sbc	hl, hl
 	ret
 
-.loop_start:
-.no_match:
+.L.loop_start:
+.L.no_match:
 	ld	a, e
-.loop:
+.L.loop:
 	cpir
 	ret	po		; return NULL
 	; repeat until BC is odd
 	bit	0, c
-	jr	z, .loop
+	jr	z, .L.loop
 	; lower byte matches, now check the upper byte
 	ld	a, d
 	xor	a, (hl)
-	jr	nz, .no_match
+	jr	nz, .L.no_match
 	pop	bc		; reset SP
 	dec	hl
 	ret

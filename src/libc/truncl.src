@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_truncl
+	.global	_truncl
+	.type	_truncl, @function
 
 _truncl:
 	ld	iy, 0
@@ -10,15 +11,15 @@ _truncl:
 	ld	hl, (iy + 9)
 	ld	a, h
 	add.s	hl, hl
-	ld	de, -1023 shl 5	; 0xFF8020
+	ld	de, 0xFF8020	; -1023 shl 5
 	add.s	hl, de
-	jr	nc, .ret_zero
-;	ld	de, -52 shl 5	; 0xFFF980
+	jr	nc, .L.ret_zero
+;	ld	de,	0xFFF980	; -52 shl 5
 	ld	e, d
 	ld	d, $F9
 
 	add	hl, de
-	jr	c, .ret_self
+	jr	c, .L.ret_self
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
@@ -32,19 +33,19 @@ _truncl:
 	sbc	hl, hl
 
 	; __i56shl
-.loop:
+.L.loop:
 	add	hl, hl
 	ex	de, hl
 	adc	hl, hl
 	ex	de, hl
 	rla
-	djnz	.loop
+	djnz	.L.loop
 	dec	b	; b = $FF
 	ld	c, a
 	; values already on the stack
 	jp	__lland
 
-.ret_zero:
+.L.ret_zero:
 	and	a, $80
 	ld	b, a
 	sbc	hl, hl
@@ -53,11 +54,11 @@ _truncl:
 	sbc	hl, hl
 	ret
 
-.ret_self:
+.L.ret_self:
 	; already (large) integer, inf, or NaN
 	ld	bc, (iy + 9)
 	ld	de, (iy + 6)
 	ld	hl, (iy + 3)
 	ret
 
-	extern	__lland
+	.extern	__lland

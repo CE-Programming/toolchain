@@ -1,7 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_imaxdiv, _lldiv
+	.section	.text
+	.global	_imaxdiv
+	.type	_imaxdiv, @function
+	.global	_lldiv
+	.type	_lldiv, @function
+
 _imaxdiv:
 _lldiv:
 
@@ -42,5 +46,5 @@ _lldiv:
 	jp	(hl)
 
 
-	extern	__llneg
-	extern	__llrems
+	.extern	__llneg
+	.extern	__llrems

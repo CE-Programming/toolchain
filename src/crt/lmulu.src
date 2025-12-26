@@ -1,14 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lmuls, __lmulu
+	.section	.text
+	.global	__lmuls
+	.type	__lmuls, @function
+	.global	__lmulu
+	.type	__lmulu, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__lmuls := 0001C8h
-__lmulu := 0001CCh
+	.set	__lmuls, 0x0001C8
+	.set	__lmulu, 0x0001CC
 
-else
+.else
 
 __lmuls:
 __lmulu:
@@ -19,7 +22,7 @@ __lmulu:
 ;   FO: --
 ;   CC: 93*r(PC)+15*w(SPL)+15*r(SPL)+41
 ;				; a		ude		uhl		uix		u(sp)
-Mul_EUHL_AUBC_EUHL:		;--------------+---------------+---------------+---------------+----------------------------------------
+.L.Mul_EUHL_AUBC_EUHL:		;--------------+---------------+---------------+---------------+----------------------------------------
 	push	af		;								u(sp)=AF
 	push	de		;									u(sp)=UDE
 	push	ix		;										u(sp)=UIX
@@ -93,4 +96,4 @@ Mul_EUHL_AUBC_EUHL:		;--------------+---------------+---------------+-----------
 ; (EUHL*AUBC)&0xFFFFFFFF=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)+(E*C+HLU*B+H*BCU+L*A<<24)+(E*B+HLU*BCU+H*A<<32)+(E*BCU+HLU*A<<40)+(E*A<<48)&0xFFFFFFFF
 ;			=L*C+(H*C+L*B<<8)+(HLU*C+H*B+L*BCU<<16)+(E*C+HLU*B+H*BCU+L*A<<24)&0xFFFFFFFF
 
-end if
+.endif

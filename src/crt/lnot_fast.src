@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lnot_fast
+	.section	.text
+	.global	__lnot_fast
+	.type	__lnot_fast, @function
+
 __lnot_fast:
 	ld	a, e	; a=E
 	add	hl, de	; uhl=UHL+x

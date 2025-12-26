@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_scalblnl
+	.global	_scalblnl
+	.type	_scalblnl, @function
 
 ; long double _scalblnl(long double, long)
 _scalblnl:
@@ -16,7 +17,7 @@ _scalblnl:
 	; It implies that the scale is either already [-65536, +65535] and can
 	; be safely truncated, or that the original and truncated scale values
 	; are both larger than +-65535 and have the same sign.
-.overflow:
+.L.overflow:
 	cp	a, (hl)
 	jp	z, _scalbnl
 	; We need modify the scale value to ensure that overflow/underflow still occurs.
@@ -26,6 +27,6 @@ _scalblnl:
 	; bit 23 = bit 31, bit 16 is cleared, and bit 17 is set
 	ld	(hl), a	; store the new scale
 	; cp a, a
-	jr	.overflow
+	jr	.L.overflow
 
-	extern	_scalbnl
+	.extern	_scalbnl

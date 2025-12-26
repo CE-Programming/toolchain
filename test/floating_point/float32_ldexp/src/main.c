@@ -84,7 +84,7 @@ size_t run_test(void) {
                     i, (unsigned int)__fe_cur_env, errno,
                     input[i].value.bin, input[i].expon, output[i].bin
                 );
-                fputs("fenv/errno\n", stdout);
+                puts("fenv/errno");
                 return i;
             }
         }
@@ -137,7 +137,7 @@ void run_edge_case(void) {
         output_i24 = scalbnf(input, clamp_exponent(expon));
         output_i32 = scalblnf(input, expon);
         if (memcmp(&output_i24, &output_i32, sizeof(float)) != 0) {
-            fputs("Failed edge case\n", stdout);
+            puts("Failed edge case");
             return;
         }
     }
@@ -148,11 +148,11 @@ int main(void) {
     run_edge_case();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
-        fputs("All tests passed", stdout);
+        puts("All tests passed");
     } else {
         char buf[sizeof("Failed test: 16777215\n")];
-        boot_sprintf(buf, "Failed test: %u\n", fail_index);
-        fputs(buf, stdout);
+        boot_sprintf(buf, "Failed test: %u", fail_index);
+        puts(buf);
     }
 
     while (!os_GetCSC());

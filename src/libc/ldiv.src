@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_ldiv
+	.section	.text
+	.global	_ldiv
+	.type	_ldiv, @function
+
 _ldiv:
 
 	pop	hl
@@ -45,12 +47,12 @@ _ldiv:
 	push	de
 	push	de
 	bit	2, c
-	jr	z, .ei_skip
+	jr	z, .L.ei_skip
 	ei
-.ei_skip:
+.L.ei_skip:
 	jp	(hl)
 
 
-	extern	__ldivs_lrems_common
-	extern	__ldvrmu
-	extern	__lneg
+	.extern	__ldivs_lrems_common
+	.extern	__ldvrmu
+	.extern	__lneg

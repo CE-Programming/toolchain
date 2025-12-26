@@ -1,14 +1,18 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lldvrmu
+	.section	.text
+	.global	__lldvrmu
+	.type	__lldvrmu, @function
+	.global	__lldvrmu.hijack
+	.type	__lldvrmu.hijack, @function
+
 __lldvrmu:
 ; Atrociously slow.
 
 	ld	iy, 5
 	add	iy, sp
-	public	__lldvrmu.hijack
-.hijack:
+
+__lldvrmu.hijack:
 
 	ld	a, i
 	di
@@ -43,13 +47,13 @@ __lldvrmu:
 
 	ld	c, 8
 
-.byte_loop:
+.L.byte_loop:
 	dec	iy
 	ld	a, (iy - 9)
 
 	ld	b, 8
 
-.bit_loop:
+.L.bit_loop:
 	adc	a, a
 	exx
 	adc	hl, hl
@@ -67,7 +71,7 @@ __lldvrmu:
 	exx
 	sbc	hl, de
 
-	jr	nc, .add_back_skip
+	jr	nc, .L.add_back_skip
 	exx
 	add	hl, sp
 	ex	de, hl
@@ -75,16 +79,16 @@ __lldvrmu:
 	ex	de, hl
 	exx
 	adc	hl, de
-.add_back_skip:
+.L.add_back_skip:
 
-	djnz	.bit_loop
+	djnz	.L.bit_loop
 
 	adc	a, a
 	cpl
 	ld	(iy + 15), a
 
 	dec	c
-	jr	nz, .byte_loop
+	jr	nz, .L.byte_loop
 
 	ld	sp, iy
 ; Stack frame:

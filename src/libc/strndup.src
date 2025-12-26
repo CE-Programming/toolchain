@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_strndup
+	.section	.text
+	.global	_strndup
+	.type	_strndup, @function
+
 _strndup:
 	pop	bc
 	pop	de
@@ -44,5 +46,5 @@ _strndup:
 	pop	hl
 	ret
 
-	extern	_strnlen
-	extern	_malloc
+	.extern	_strnlen
+	.extern	_malloc

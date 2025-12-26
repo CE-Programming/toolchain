@@ -1,147 +1,149 @@
-	assume	adl=1
+	.assume	adl=1
 
-kUp           := 3
-kLeft         := 2
-kDown         := 4
-kEnter        := 5
-kClear        := 9
-kRight        := 1
-kQuit         := $40
-kIns          := $0B
-curLock       := 4
-flags         := $D00080
-keyExtend     := $D0058E
-curRow        := $D00595		; also includes curCol
-curUnder      := $D00599
-_PutS         := $207C0
-_PutC         := $207B8
-_PutPS        := $207C8
-_GetKey       := $20D8C
-_CursorOn     := $208B0
-_CursorOff    := $208A8
-_PullDownChk  := $208BC
-_ConvKeyToTok := $20E40
-_GetTokString := $20874
-_PutTokString := $20D74
-_ClrTxtShd    := $20818
+	.set	ti.kUp, 3
+	.set	ti.kLeft, 2
+	.set	ti.kDown, 4
+	.set	ti.kEnter, 5
+	.set	ti.kClear, 9
+	.set	ti.kRight, 1
+	.set	ti.kQuit, 0x40
+	.set	ti.kIns, 0x0B
+	.set	ti.curLock, 4
+	.set	ti.flags, 0xD00080
+	.set	ti.keyExtend, 0xD0058E
+	.set	ti.curRow, 0xD00595
+	.set	ti.curUnder, 0xD00599
+	.set	ti.PutS, 0x207C0
+	.set	ti.PutC, 0x207B8
+	.set	ti.PutPS, 0x207C8
+	.set	ti.GetKey, 0x20D8C
+	.set	ti.CursorOn, 0x208B0
+	.set	ti.CursorOff, 0x208A8
+	.set	ti.PullDownChk, 0x208BC
+	.set	ti.ConvKeyToTok, 0x20E40
+	.set	ti.GetTokString, 0x20874
+	.set	ti.PutTokString, 0x20D74
+	.set	ti.ClrTxtShd, 0x20818
 
-	section	.text
-	public	_os_GetStringInput
+	.section	.text
+	.global	_os_GetStringInput
+	.type	_os_GetStringInput, @function
+
 _os_GetStringInput:
 	call	__frameset0
-	ld	iy,flags
-	ld	l,(iy + $0d)
-	ld	h,(iy + $4c)
+	ld	iy, ti.flags
+	ld	l, (iy + 0x0D)
+	ld	h, (iy + 0x4C)
 	push	hl			; save text flags
-	set	1,(iy + $0d)		; use text buffer
-	res	5,(iy + $4c)		; use text buffer
-	call	_ClrTxtShd
-	ld	hl,(ix+6)		; hl -> input string prompt
-	add	hl,de
-	xor	a,a
-	sbc	hl,de
-	call	nz,_PutS
-	ld	hl,(curRow)
-.start:
+	set	1, (iy + 0x0D)		; use text buffer
+	res	5, (iy + 0x4C)		; use text buffer
+	call	ti.ClrTxtShd
+	ld	hl, (ix + 6)		; hl -> input string prompt
+	add	hl, de
+	xor	a, a
+	sbc	hl, de
+	call	nz, ti.PutS
+	ld	hl, (ti.curRow)
+.L.start:
 	push	hl			; save initial row/column
-	ld	hl,(ix+12)		; buffer size
-	add	hl,de
-	xor	a,a
-	sbc	hl,de
+	ld	hl, (ix + 12)		; buffer size
+	add	hl, de
+	xor	a, a
+	sbc	hl, de
 	push	ix
 	push	hl			; save remaining size
-	jr	z,.empty
-	ld	de,(ix+9)
-.loop_save:
+	jr	z, .L.empty
+	ld	de, (ix+9)
+.L.loop_save:
 	push	de			; save buf pointer
-.loop:
-	call	_CursorOn
-.getkey:
-	call	_GetKey
-	call	_CursorOff
-	call	_PullDownChk
+.L.loop:
+	call	ti.CursorOn
+.L.getkey:
+	call	ti.GetKey
+	call	ti.CursorOff
+	call	ti.PullDownChk
 	push	af
-	call	_CursorOn
+	call	ti.CursorOn
 	pop	af
-	jr	c,.getkey
-	cp	a,kQuit
-	jr	z,.done
+	jr	c, .L.getkey
+	cp	a, ti.kQuit
+	jr	z, .L.done
 	dec	a			; kRight=1
-	cp	a,kEnter-kRight		; kEnter=kDown+1
-	jr	c,.loop
-	jr	z,.done
+	cp	a, ti.kEnter - ti.kRight		; kEnter=kDown+1
+	jr	c, .L.loop
+	jr	z, .L.done
 	inc	a
-	cp	a,kIns
-	jr	z,.loop
-	cp	a,kClear
-	jr	z,.clear
-	cp	a,$F3			; for lists? idk something is wrong with _PullDownChk
-	jr	c,.conv_key
-	cp	a,$FB+1
-	jr	nc,.conv_key
-	sub	a,$7C
-	ld	(keyExtend),a
-	ld	a,$FE
-.conv_key:
-	call	_ConvKeyToTok
-	call	_GetTokString
+	cp	a, ti.kIns
+	jr	z, .L.loop
+	cp	a, ti.kClear
+	jr	z, .L.clear
+	cp	a, 0xF3			; for lists? idk something is wrong with _PullDownChk
+	jr	c, .L.conv_key
+	cp	a, 0xFB+1
+	jr	nc, .L.conv_key
+	sub	a, 0x7C
+	ld	(ti.keyExtend), a
+	ld	a, 0xFE
+.L.conv_key:
+	call	ti.ConvKeyToTok
+	call	ti.GetTokString
 	pop	de			; restore buf pointer
-	ld	b,(hl)			; token string length
-.draw_string:
-	ex	(sp),hl			; remaining size
-	add	hl,de
+	ld	b, (hl)			; token string length
+.L.draw_string:
+	ex	(sp), hl			; remaining size
+	add	hl, de
 	scf
-	sbc	hl,de			; decrement and check if done
-	ex	(sp),hl
-	jr	z,.full
+	sbc	hl, de			; decrement and check if done
+	ex	(sp), hl
+	jr	z, .L.full
 	inc	hl
-	ld	a,(hl)
-	ld	(de),a
+	ld	a, (hl)
+	ld	(de), a
 	inc	de
-	call	_PutC
-	djnz	.draw_string
-	jr	.loop_save
+	call	ti.PutC
+	djnz	.L.draw_string
+	jr	.L.loop_save
 
-.done:
+.L.done:
 	pop	hl			; restore buf pointer
-	ld	(hl),0
-.empty:
+	ld	(hl), 0
+.L.empty:
 	pop	hl			; remaining size
 	pop	hl			; saved IX
 	pop	hl			; initial row/column
-	call	_ClrTxtShd
-	call	_CursorOff
+	call	ti.ClrTxtShd
+	call	ti.CursorOff
 	pop	hl			; restore text flags
-	ld	(iy + $0d),l
-	ld	(iy + $4c),h
+	ld	(iy + 0x0D), l
+	ld	(iy + 0x4C), h
 	pop	ix
 	ret
 
-.full:
+.L.full:
 	push	de			; save buf pointer
-.full_loop:
-	call	_GetKey
-	cp	a,kEnter
-	jr	z,.done
-	cp	a,kClear
-	jr	nz,.full_loop
-.clear:
+.L.full_loop:
+	call	ti.GetKey
+	cp	a, ti.kEnter
+	jr	z, .L.done
+	cp	a, ti.kClear
+	jr	nz, .L.full_loop
+.L.clear:
 	pop	hl			; restore buf pointer
 	inc	hl
 	pop	de			; remaining size
 	pop	ix
 	pop	de			; initial row/column
-	ld	(curRow),de
-.clear_loop:
-	ld	a,' '
-	call	_PutC
-	ld	bc,(ix+9)
+	ld	(ti.curRow), de
+.L.clear_loop:
+	ld	a, ' '
+	call	ti.PutC
+	ld	bc, (ix + 9)
 	scf
-	sbc	hl,bc			; decrement and compare to buf start
-	add	hl,bc
-	jr	nz,.clear_loop
+	sbc	hl, bc			; decrement and compare to buf start
+	add	hl, bc
+	jr	nz, .L.clear_loop
 	ex	de,hl
-	ld	(curRow),hl
-	jp	.start
+	ld	(ti.curRow), hl
+	jp	.L.start
 
 	extern	__frameset0

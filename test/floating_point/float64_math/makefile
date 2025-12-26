@@ -10,7 +10,8 @@ COMPRESSED = NO
 CFLAGS = -Wall -Wextra -Wshadow -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
 CXXFLAGS = -Wall -Wextra -Wshadow -Wimplicit-float-conversion -Wimplicit-int-float-conversion -std=c++20 -Oz
 
-PREFER_OS_LIBC = NO
+HAS_MATH_ERRNO = YES
+PREFER_CE_LIBC = NO
 
 # ----------------------------
 

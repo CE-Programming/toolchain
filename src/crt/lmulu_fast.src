@@ -1,7 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lmuls_fast, __lmulu_fast
+	.section	.text
+	.global	__lmuls_fast
+	.type	__lmuls_fast, @function
+	.global	__lmulu_fast
+	.type	__lmulu_fast, @function
+
 __lmuls_fast:
 __lmulu_fast:
 
@@ -11,7 +15,7 @@ __lmulu_fast:
 ;   FO: sz(e), vc((EUHL*AUBC-L*C&0xFFFFFFFF)+L*C)
 ;   CC: (86+2*cf)*r(PC)+9*w(SPL)+9*r(SPL)+42
 ;				; a		ubc		ude		uhl		uix		u(sp)
-Mul_EUHL_AUBC_EUHL_Fast:	;--------------+---------------+---------------+---------------+---------------+------------------------
+.L.Mul_EUHL_AUBC_EUHL_Fast:	;--------------+---------------+---------------+---------------+---------------+------------------------
 	push	ix		;										u(sp)=UIX
 	ld	d, c		;				 de=CE
 	mlt	de		;				ude=E*C

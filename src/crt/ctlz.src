@@ -1,52 +1,55 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bctlz
+	.section	.text.__bctlz
+	.global	__bctlz
+	.type	__bctlz, @function
+
 __bctlz:
 	cp	a, 010h
-	jr	c, .low4
+	jr	c, .L.low4
 	cp	a, 040h
-	jr	c, .low6
+	jr	c, .L.low6
 	add	a, a
 	sbc	a, a
 	inc	a
 	ret
-.low6:
+.L.low6:
 	add	a, -020h
 	sbc	a, a
 	add	a, 3
 	ret
-.low4:
+.L.low4:
 	cp	a, 4
-	jr	c, .low2
+	jr	c, .L.low2
 	add	a, -8
 	sbc	a, a
 	add	a, 5
 	ret
-.low2:
+.L.low2:
 	add	a, -3
 	cpl
 	adc	a, 6
 	ret
 
-	section	.text
-	public	__sctlz
+	.section	.text.__sctlz
+	.global	__sctlz
+	.type	__sctlz, @function
+
 __sctlz:
 	ld	a, h
 	or	a, a
 	jr	nz, __bctlz
 	ld	a, l
-	require	__sctlz.hijack
-
-	section	.text
-	private	__sctlz.hijack
+	.local	__sctlz.hijack
 __sctlz.hijack:
 	call	__bctlz
 	add	a, 8
 	ret
 
-	section	.text
-	public	__ictlz
+	.section	.text.__ictlz
+	.global	__ictlz
+	.type	__ictlz, @function
+
 __ictlz:
 	dec	sp
 	push	hl
@@ -61,8 +64,10 @@ __ictlz:
 	add	a, 16
 	ret
 
-	section	.text
-	public	__lctlz
+	.section	.text.__lctlz
+	.global	__lctlz
+	.type	__lctlz, @function
+
 __lctlz:
 	ld	a, e
 	or	a, a
@@ -71,8 +76,10 @@ __lctlz:
 	add	a, 8
 	ret
 
-	section	.text
-	public	__llctlz
+	.section	.text.__llctlz
+	.global	__llctlz
+	.type	__llctlz, @function
+
 __llctlz:
 	ld	a, b
 	or	a, a
@@ -83,18 +90,20 @@ __llctlz:
 	add	a, 16
 	ret
 
-	section	.text
-	public	__i48ctlz
+	.section	.text.__i48ctlz
+	.global	__i48ctlz
+	.type	__i48ctlz, @function
+
 __i48ctlz:
 	ex	de, hl
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	z, .low
+	jr	z, .L.low
 	call	__ictlz
 	ex	de, hl
 	ret
-.low:
+.L.low:
 	ex	de, hl
 	call	__ictlz
 	add	a, 24

@@ -3,10 +3,14 @@
 ; Returns:
 ; ude:uhl = -ude:uhl
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48neg
+	.section	.text
+	.global	__i48neg
+	.type	__i48neg, @function
+	.global	__uiyubcNeg
+	.type	__uiyubcNeg, @function
+
 __i48neg:
 ; CC: 17 bytes
 ; HL != 0: 18F + 3R + 2
@@ -28,7 +32,6 @@ __i48neg:
 	ret
 
 ; Used by i48divs and i48rems, uiy:ubc = -uiy:ubc
-	public	__uiyubcNeg
 __uiyubcNeg:
 ; CC: 18 bytes | 19F + 12R + 9W + 1
 	push	hl
@@ -37,7 +40,7 @@ __uiyubcNeg:
 	sbc	hl, bc		; hl = 0 - BC = -BC
 	push	hl
 	add	hl, bc		; hl = 0, causes the same carry
-	lea	bc, iy
+	lea	bc, iy + 0
 	sbc	hl, bc		; hl = 0 - IY - c
 	pop	bc		; bc = -BC
 	ex	(sp), hl	; hl = HL

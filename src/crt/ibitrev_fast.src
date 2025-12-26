@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ibitrev_fast
+	.section	.text
+	.global	__ibitrev_fast
+	.type	__ibitrev_fast, @function
+
 __ibitrev_fast:
 	ld	a, l
 	rra

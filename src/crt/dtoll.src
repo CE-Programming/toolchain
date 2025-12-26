@@ -1,9 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__dtoll
-	public	__dtoull
+	.global	__dtoll
+	.type	__dtoll, @function
+	.global	__dtoull
+	.type	__dtoull, @function
 
 ; correctly handles all non-UB cases for both
 ; (long long)long double and (unsigned long long)long double
@@ -79,6 +81,6 @@ __dtoull:
 	ex.s	de, hl
 	jr	.finish_zero_or_one
 
-	extern	__llneg
-	extern	__llshl
-	extern	__llshru
+	.extern	__llneg
+	.extern	__llshl
+	.extern	__llshru

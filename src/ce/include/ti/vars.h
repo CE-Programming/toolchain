@@ -221,6 +221,9 @@ extern "C" {
 #define OS_VAR_L6       "\x5D\x5\0"
 /* @endcond */
 
+#define OS_RUN_PRGM_NOT_FOUND  -1
+#define OS_RUN_PRGM_ERR_MEMORY -2
+
 /**
  * @brief Structure of list variable type
  */
@@ -514,9 +517,9 @@ typedef int (*os_runprgm_callback_t)(void *data, int retval);
  * argument may be left \c NULL if execution should not return to the calling
  * program.
  *
- * @return This function should not return, but if it does, -1 indicates the
- * program could not be found, -2 if not enough memory, and < 0 if some other
- * error occurred.
+ * @return This function should not return, but if it does, a value < 0 is
+ * returned. \c OS_RUN_PRGM_NOT_FOUND (-1) indicates the program could not be
+ * found, and \c OS_RUN_PRGM_ERR_MEM (-2) if not enough memory.
  *
  * @note The integer return of the callback acts the same as the integer return
  * of the \p main function, and is returned to the parent caller (either the OS

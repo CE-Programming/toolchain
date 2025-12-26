@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bremu
+	.section	.text
+	.global	__bremu
+	.type	__bremu, @function
+
 __bremu:
 ; I: A=dividend, C=divisor
 ; O: a=A%C
@@ -18,4 +20,4 @@ __bremu:
 	ret
 
 
-	extern	__bdvrmu
+	.extern	__bdvrmu

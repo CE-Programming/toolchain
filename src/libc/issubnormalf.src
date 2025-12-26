@@ -1,16 +1,19 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__issubnormalf
+	.global	__issubnormalf
+	.type	__issubnormalf, @function
 
 ; bool _issubnormalf(float)
 __issubnormalf:
 	xor	a, a
-	pop	bc, hl
+	pop	bc
+	pop	hl
 	adc	hl, hl
 	ex	(sp), hl
-	push	hl, bc
+	push	hl
+	push	bc
 	ret	z	; zero mantissa is not subnormal
 	adc	hl, hl
 	sub	a, l

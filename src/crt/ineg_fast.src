@@ -1,7 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ineg_fast
+	.section	.text
+	.global	__ineg_fast
+	.type	__ineg_fast, @function
+	.global	__sneg_fast
+	.type	__sneg_fast, @function
+
 __ineg_fast:
 ; UHL = -UHL
 ;   CC: 7*r(PC)+3*r(SPL)+1
@@ -13,3 +17,5 @@ __ineg_fast:
 			;    =UDE-UHL-UDE
 			;    =-UHL
 	ret
+
+	.set	__sneg_fast, __ineg_fast

@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_wmemcmp
+	.global	_wmemcmp
+	.type	_wmemcmp, @function
 
 ; int wmemcmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 _wmemcmp:
@@ -14,32 +15,32 @@ _wmemcmp:
 	ret	z		; return 0
 	ld	de, (iy + 3)
 	ld	hl, (iy + 6)
-.loop:
+.L.loop:
 	ld	a, (de)
 	xor	a, (hl)
 	inc	hl
 	inc	de
 	ld	a, (de)
-	jr	nz, .low_diff
+	jr	nz, .L.low_diff
 	cpi
-	jr	nz, .high_diff
+	jr	nz, .L.high_diff
 	inc	de
-	jp	pe, .loop
+	jp	pe, .L.loop
 	sbc	hl, hl
 	ret
 
-.high_diff:
+.L.high_diff:
 	dec	hl
-.low_diff:
+.L.low_diff:
 	; compare high bytes
 	sub	a, (hl)		; s1 - s2
-	jr	nz, .skip_low_check
+	jr	nz, .L.skip_low_check
 	; compare low bytes
 	dec	de
 	ld	a, (de)
 	dec	hl
 	sub	a, (hl)		; s1 - s2
-.skip_low_check:
+.L.skip_low_check:
 	sbc	hl, hl
 	; A is non-zero here
 	ld	l, a

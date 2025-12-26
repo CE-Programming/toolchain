@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bmulu
+	.section	.text
+	.global	__bmulu
+	.type	__bmulu, @function
+
 __bmulu:
 	push	bc
 	mlt	bc

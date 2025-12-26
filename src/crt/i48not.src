@@ -3,10 +3,12 @@
 ; Returns:
 ; ude:uhl = ~ude:uhl
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48not
+	.section	.text
+	.global	__i48not
+	.type	__i48not, @function
+
 __i48not:
 ; CC: 15 bytes | 16F + 3R + 1
 	add	hl, de		; hl = HL + DE

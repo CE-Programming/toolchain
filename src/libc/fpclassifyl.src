@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 	
-	public	__fpclassifyl
+	.global	__fpclassifyl
+	.type	__fpclassifyl, @function
 
 ; FP_ZERO      := 0
 ; FP_INFINITE  := 1
@@ -12,20 +13,25 @@
 
 ; int _fpclassifyl(long double)
 __fpclassifyl:
-	pop	bc, hl, de
+	pop	bc
+	pop	hl
+	pop	de
 	or	a, a
 	adc	hl, de
 	pop	de
-	push	bc, bc, bc, bc
+	push	bc
+	push	bc
+	push	bc
+	push	bc
 	ld	a, e
-	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
-	jr	c, .mant_nonzero	; normal, subnormal, or NaN
+	jr	nz, .L.mant_nonzero	; normal, subnormal, or NaN
+	jr	c, .L.mant_nonzero	; normal, subnormal, or NaN
 	tst	a, $0F
-	jr	z, .mant_zero	; normal, zero, or inf
-.mant_nonzero:
+	jr	z, .L.mant_zero	; normal, zero, or inf
+.L.mant_nonzero:
 	; normal, subnormal, or NaN
 	ld	hl, 2
-.mant_zero:
+.L.mant_zero:
 	rra
 	and	a, $78
 	res	7, d
