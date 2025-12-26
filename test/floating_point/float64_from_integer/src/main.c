@@ -131,7 +131,7 @@ size_t run_test(const char** failed_func) {
                         input[i].u64, output[i].fu64.bin
                     );
                     *failed_func = "ulltod";
-                    fputs("fenv\n", stdout);
+                    puts("fenv");
                     return i;
                 }
             #endif /* TEST_FENV */
@@ -156,7 +156,7 @@ size_t run_test(const char** failed_func) {
                         input[i].u64, output[i].fu64.bin
                     );
                     *failed_func = "lltod";
-                    fputs("fenv\n", stdout);
+                    puts("fenv");
                     return i;
                 }
             #endif /* TEST_FENV */
@@ -173,12 +173,12 @@ int main(void) {
     const char* failed_func;
     size_t fail_index = run_test(&failed_func);
     if (fail_index == SIZE_MAX) {
-        fputs("All tests passed", stdout);
+        puts("All tests passed");
     } else {
         char buf[sizeof("Failed test: 16777215\n")];
-        boot_sprintf(buf, "Failed test: %u\n", fail_index);
-        fputs(buf, stdout);
-        fputs(failed_func, stdout);
+        boot_sprintf(buf, "Failed test: %u", fail_index);
+        puts(buf);
+        puts(failed_func);
     }
 
     while (!os_GetCSC());

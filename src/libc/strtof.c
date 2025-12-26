@@ -1,11 +1,16 @@
-/************************************************************************/
-/*                                                                      */
-/*                      Copyright (C)1987-2008 by                       */
-/*                             Zilog, Inc.                              */
-/*                                                                      */
-/*                         San Jose, California                         */
-/*                                                                      */
-/************************************************************************/
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _strtof\n"
+    "\t.type _strtof, @function\n"
+    "\t.equ _strtof, 0x0220E0\n"
+    "\t.global _strtod\n"
+    "\t.type _strtod, @function\n"
+    "\t.equ _strtod, _strtof\n"
+);
+
+#else
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -41,7 +46,7 @@ typedef union F32_pun {
  * @remarks `*str >= '0' && *str <= '9'` is smaller than calls to `isdigit(*str)`
  * @todo Add support for INF INFINITY NAN NAN(...)
  */
-float _strtof_c(char const * const __restrict nptr, char **__restrict endptr)
+float strtof(char const * const __restrict nptr, char **__restrict endptr)
 {
     F32_pun val;
     int frac = 0;
@@ -145,4 +150,6 @@ finish:
     return val.flt;
 }
 
-double _strtod_c(const char *, char **) __attribute__((alias("_strtof_c")));
+double strtod(const char *, char **) __attribute__((alias("strtof")));
+
+#endif

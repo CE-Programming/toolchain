@@ -72,12 +72,12 @@ int main(void) {
     const char* failed_func;
     size_t fail_index = run_test(&failed_func);
     if (fail_index == SIZE_MAX) {
-        fputs("All tests passed", stdout);
+        puts("All tests passed");
     } else {
-        char buf[sizeof("Failed test: 16777215\n")];
-        boot_sprintf(buf, "Failed test: %u\n", fail_index);
-        fputs(buf, stdout);
-        fputs(failed_func, stdout);
+        char buf[sizeof("Failed test: 16777215")];
+        boot_sprintf(buf, "Failed test: %u", fail_index);
+        puts(buf);
+        puts(failed_func);
     }
 
     while (!os_GetCSC());

@@ -1,8 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__dadd, __dsub
+	.global	__dadd
+	.type	__dadd, @function
+	.global	__dsub
+	.type	__dsub, @function
 
 ; float64_t softfloat_addMagsF64(float64_t x, const float64_t *y, bool sign_x)
 __dadd:
@@ -27,20 +30,27 @@ __daddsub:
 	rrc	b
 
 	push	iy	; address of y
-	push	bc, de, hl	; pass x by value
+	push	bc
+	push	de
+	push	hl	; pass x by value
 
 	xor a, (iy + 7)
 	rla
 
-	jr	nc, .__daddmags	; same signs
-; .__dsubmags:
+	jr	nc, .L.__daddmags	; same signs
+; .L.__dsubmags:
 	call	_softfloat_subMagsF64
-	jr	.__daddsub_ret
-.__daddmags:
+	jr	.L.__daddsub_ret
+.L.__daddmags:
 	call	_softfloat_addMagsF64
-.__daddsub_ret:
-	pop	af, af, af, af, af
-	pop	iy, af
+.L.__daddsub_ret:
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	iy
+	pop	af
 	ret
 
-	extern	_softfloat_addMagsF64, _softfloat_subMagsF64
+	.extern	_softfloat_addMagsF64, _softfloat_subMagsF64

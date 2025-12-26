@@ -14,10 +14,12 @@
 ; Registers Used:
 ;	none
 ;-------------------------------------------------------------------------
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__frsmulu
+	.section	.text
+	.global	__frsmulu
+	.type	__frsmulu, @function
+
 __frsmulu:
 	push	af
 	push	de

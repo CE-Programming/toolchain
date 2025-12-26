@@ -1,13 +1,13 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_strlen
+	.section	.text
+	.global	_strlen
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_strlen := $0000D4
+	.set	_strlen, 0x0000D4
 
-else
+.else
 
 _strlen:
 	pop	iy
@@ -20,4 +20,4 @@ _strlen:
 	sbc	hl, bc
 	jp	(iy)
 
-end if
+.endif

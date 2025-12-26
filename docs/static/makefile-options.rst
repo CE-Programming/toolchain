@@ -109,31 +109,41 @@ Default: :code:`YES`.
 
 .. rubric:: EXTRA_LDFLAGS
 
-These flags are passed directly to the fasmg linker.
+These flags are passed directly to the GNU linker (ld).
 
 .. code-block:: makefile
 
     EXTRA_LDFLAGS =
 
-.. rubric:: PREFER_OS_CRT
+.. rubric:: PREFER_CE_CRT
 
-Prefer the builtin OS CRT (Compiler-Run-Time) functions if they exist.
+Prefer the calculator's builtin CRT (Compiler-Run-Time) functions if they exist.
 This can help to decrease the output size in some circumstances, as a select number of CRT functions will execute from flash.
 Default: :code:`NO`.
 
 .. code-block:: makefile
 
+    HAS_MATH_ERRNO = NO
+
+.. rubric:: HAS_MATH_ERRNO
+
+By default, the compiler flag :code:`-fno-math-errno` is added to improve performance.
+However, this may lead to discrepencies on the value of :code:`errno` when running math operations in some cases.
+To avoid this, set this option to :code:`YES`.
+
+.. code-block:: makefile
+
     PREFER_OS_CRT = NO
 
-.. rubric:: PREFER_OS_LIBC
+.. rubric:: PREFER_CE_LIBC
 
-Prefer the builtin OS LIBC functions if they exist.
+Prefer the calculator's builtin LIBC functions if they exist.
 This can help to decrease the output size in some circumstances, as a select number of LIBC functions will execute from flash.
 Default: :code:`YES`.
 
 .. code-block:: makefile
 
-    PREFER_OS_LIBC = YES
+    PREFER_CE_LIBC = YES
 
 .. rubric:: LIBLOAD_OPTIONAL
 
@@ -194,15 +204,6 @@ Extra libload (``.lib``) libraries to be added at link time.
 
     EXTRA_LIBLOAD_LIBS = <space separated list of libraries>
 
-.. rubric:: SKIP_LIBRARY_LDFLAGS
-
-Completely omit the :code:`-library` flags passed to fasmg when linking.
-Default: :code:`NO`.
-
-.. code-block:: makefile
-
-    SKIP_LIBRARY_LDFLAGS = YES
-
 Extra command(s) to run when :code:`make clean` is executed.
 
 .. code-block:: makefile
@@ -233,4 +234,3 @@ Define rules for the files after including the main CEdev makefile.
     $(BINDIR)/levelpack.bin:
     	$(call MKDIR,$(@D))
     	echo "levelpack" > $(BINDIR)/levelpack.bin
-

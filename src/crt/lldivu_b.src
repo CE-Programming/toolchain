@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lldivu_b
+	.section	.text
+	.global	__lldivu_b
+	.type	__lldivu_b, @function
+
 __lldivu_b:
 ; Very slow
 	push	af
@@ -11,7 +13,7 @@ __lldivu_b:
 	ld	iy, (iy + 9)
 	xor	a, a
 	ld	iyh, 64
-.loop:
+.L.loop:
 	add	hl, hl
 	ex	de, hl
 	adc	hl, hl
@@ -19,15 +21,15 @@ __lldivu_b:
 	rl	c
 	rl	b
 	rla
-	jr	c, .1
+	jr	c, .L.1
 	cp	a, iyl
-	jr	c, .0
-.1:
+	jr	c, .L.0
+.L.1:
 	sub	a, iyl
 	inc	l
-.0:
+.L.0:
 	dec	iyh
-	jr	nz, .loop
+	jr	nz, .L.loop
 	pop	iy
 	pop	af
 	ret

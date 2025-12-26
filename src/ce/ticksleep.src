@@ -1,15 +1,17 @@
 ; void ticksleep(unsigned long ticks);
 
-	assume	adl=1
+	.assume	adl=1
 
-if 0
+.if 0
 ; Minimal caller code (for timing calculation).
 	call	_ticksleep
 ; ^ 22 cc
-end if
+.endif
 
-	section	.text
-	public	_ticksleep
+	.section	.text
+	.global	_ticksleep
+	.type	_ticksleep, @function
+
 _ticksleep:
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
 

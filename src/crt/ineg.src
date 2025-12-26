@@ -1,13 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ineg
+	.section	.text
+	.global	__ineg
+	.type	__ineg, @function
+	.global	__sneg
+	.type	__sneg, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__ineg := 000160h
+	.set	__ineg, 0x000160
+	.set	__sneg, 0x00022C
 
-else
+.else
 
 __ineg:
 ; UHL = -UHL
@@ -25,4 +29,6 @@ __ineg:
 	ex	de, hl	; ude=UDE, uhl=-UHL
 	ret
 
-end if
+	.set	__sneg, __ineg
+
+.endif

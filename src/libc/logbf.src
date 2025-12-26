@@ -1,8 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_logbf, _logb
+	.global	_logbf
+	.type	_logbf, @function
+	.global	_logb
+	.type	_logb, @function
 
 ; float logbf(float)
 _logb:
@@ -16,14 +19,14 @@ _logbf:
 	ld	hl, (hl)
 	add	hl, hl
 	adc	a, a
-	jr	z, .maybe_subnormal
+	jr	z, .L.maybe_subnormal
 	inc	a
-	jr	z, .inf_nan
+	jr	z, .L.inf_nan
 	sub	a, 128	; float32_bias + 1
-	jr	c, .negative_exponent
+	jr	c, .L.negative_exponent
 	inc	bc	; ld bc, 0
-.negative_exponent:
-.int_to_float:
+.L.negative_exponent:
+.L.int_to_float:
 	; exponent is [-149, 127]
 	ld	c, a
 	ld	a, b	; sign extend
@@ -33,7 +36,7 @@ _logbf:
 	ld	e, a
 	ret
 
-.inf_nan:
+.L.inf_nan:
 	; return fabsf(x)
 	pop	bc
 	ex	(sp), hl
@@ -41,7 +44,7 @@ _logbf:
 	ld	e, $7F
 	ret
 
-.ret_zero:
+.L.ret_zero:
 	; HL is zero here
 	ld	l, 4	; EDOM
 	ld	(_errno), hl
@@ -53,14 +56,14 @@ _logbf:
 	ld	e, b	; ld e, $FF
 	ret
 
-.maybe_subnormal:
+.L.maybe_subnormal:
 	add	hl, bc
 	inc	hl	; restore HL
-	jr	nc, .ret_zero
+	jr	nc, .L.ret_zero
 	call	__ictlz
 	cpl
 	add	a, 130
-	jr	.int_to_float
+	jr	.L.int_to_float
 
 	extern	__ltof
 	extern	__ictlz

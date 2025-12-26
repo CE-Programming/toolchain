@@ -1,3 +1,17 @@
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _tanf\n"
+    "\t.type _tanf, @function\n"
+    "\t.equ _tanf, 0x022120\n"
+    "\t.global _tan\n"
+    "\t.type _tan, @function\n"
+    "\t.equ _tan, _tanf\n"
+);
+
+#else
+
 /************************************************************************/
 /*                                                                      */
 /*                      Copyright (C)1987-2008 by                       */
@@ -39,7 +53,7 @@
  * See the purple line for relative precision (lag warning):
  * https://www.desmos.com/calculator/c0zs4b8sqk
  */
-float _tanf_c(float arg)
+float tanf(float arg)
 {
     float temp, e, x, xsq;
     bool flag, sign;
@@ -95,4 +109,6 @@ float _tanf_c(float arg)
     return temp;
 }
 
-double _tan_c(double) __attribute__((alias("_tanf_c")));
+double tan(double) __attribute__((alias("tanf")));
+
+#endif

@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 	
-	public	__isnormall
+	.global	__isnormall
+	.type	__isnormall, @function
 
 ; bool _isnormall(long double)
 __isnormall:
@@ -15,15 +16,15 @@ __isnormall:
 	; test for inf/NaN
 	ld	de, $2000
 	add	hl, de
-	jr	c, .exp_all_ones
+	jr	c, .L.exp_all_ones
 	; double de
 	ld	d, $40
 	; test for zero/subnormal
 	sbc	hl, de
-;	jr	c, .exp_all_zero
+;	jr	c, .L.exp_all_zero
 
-.exp_all_ones:
-.exp_all_zero:
+.L.exp_all_ones:
+.L.exp_all_zero:
 	sbc	a, a
 	inc	a
 	ret

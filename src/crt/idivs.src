@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__idivs
+	.section	.text
+	.global	__idivs
+	.type	__idivs, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__idivs := 00013Ch
+	.set	__idivs, 0x00013C
 
-else
+.else
 
 __idivs:
 ; I: UHL=dividend, UBC=divisor
@@ -21,6 +22,6 @@ __idivs:
 	ret
 
 
-	extern	__idvrms
+	.extern	__idvrms
 
-end if
+.endif

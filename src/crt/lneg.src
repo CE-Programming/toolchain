@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lneg
+	.section	.text
+	.global	__lneg
+	.type	__lneg, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__lneg := 0001D0h
+	.set	__lneg, 0x0001D0
 
-else
+.else
 
 __lneg:
 	push	af
@@ -22,4 +23,4 @@ __lneg:
 	pop	af
 	ret
 
-end if
+.endif

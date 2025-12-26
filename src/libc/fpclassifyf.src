@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 	
-	public	__fpclassifyf
+	.global	__fpclassifyf
+	.type	__fpclassifyf, @function
 
 ; FP_ZERO      := 0
 ; FP_INFINITE  := 1
@@ -12,14 +13,18 @@
 
 ; int _fpclassifyf(float)
 __fpclassifyf:
-	pop	bc, hl, de
-	push	de, hl, bc
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
 	or	a, a
 	adc	hl, hl
-	jr	z, .mant_zero	; normal, zero, or inf
+	jr	z, .L.mant_zero	; normal, zero, or inf
 	ld	hl, 2
 	; normal, subnormal, or NaN
-.mant_zero:
+.L.mant_zero:
 	rl	e
 	ret	z	; subnormal or zero
 	inc	hl

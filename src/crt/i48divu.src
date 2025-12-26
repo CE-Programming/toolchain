@@ -3,10 +3,12 @@
 ; Returns:
 ; ude:uhl = ude:uhl / uiy:ubc
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48divu
+	.section	.text
+	.global	__i48divu
+	.type	__i48divu, @function
+
 __i48divu:
 	push	iy
 	push	bc
@@ -17,4 +19,4 @@ __i48divu:
 	pop	iy
 	ret
 
-	extern	__i48dvrmu
+	.extern	__i48dvrmu

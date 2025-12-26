@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llsub_1
+	.section	.text
+	.global	__llsub_1
+	.type	__llsub_1, @function
+
 __llsub_1:
 	add	hl, de
 	or	a, a

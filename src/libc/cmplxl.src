@@ -1,12 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_CMPLXL
+	.global	_CMPLXL
+	.type	_CMPLXL, @function
 
 ; long double _Complex CMPLXL(long double x, long double y) /* struct ABI */
 _CMPLXL:
-	pop	iy, de
+	pop	iy
+	pop	de
 	or	a, a
 	sbc	hl, hl
 	add	hl, sp

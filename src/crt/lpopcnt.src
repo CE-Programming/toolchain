@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lpopcnt
+	.section	.text
+	.global	__lpopcnt
+	.type	__lpopcnt, @function
+
 __lpopcnt:
 	push	hl
 	; Calculate 8-popcount(L)-popcount(HLU), and set HLU=H
@@ -21,4 +23,4 @@ __lpopcnt:
 	pop	hl
 	ret
 
-	extern	__popcnt_common_init_full, __popcnt_common_iter_adjusted
+	.extern	__popcnt_common_init_full, __popcnt_common_iter_adjusted

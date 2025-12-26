@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__sshrs
+	.section	.text
+	.global	__sshrs
+	.type	__sshrs, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__sshrs := 000248h
+	.set	__sshrs, 0x000248
 
-else
+.else
 
 __sshrs:
 ; Suboptimal for large shift amounts
@@ -18,11 +19,11 @@ __sshrs:
 	ret	z
 	push	bc
 	ld	b, c
-.loop:
+.L.loop:
 	sra	h
 	rr	l
-	djnz	.loop
+	djnz	.L.loop
 	pop	bc
 	ret
 
-end if
+.endif

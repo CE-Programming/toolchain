@@ -16,16 +16,24 @@
 
 include $(CURDIR)/../common.mk
 
-BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
+OBJECTS =
+OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
+OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
+OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
 
-EZCFLAGS := -S -fno-addrsig -Wall -Wextra -Wshadow -Oz
-EZCFLAGS += -D_EZ80 -isystem ../libc/include -I ./include
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
+EZCFLAGS += -Iinclude
 
-WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
 WILDCARD_H := $(wildcard include/*.h)
 
-all: $(BUILD_SRC)
+LIB_SOFTFLOAT := build/libsoftfloat.a
+
+.SECONDARY:
+
+all: $(LIB_SOFTFLOAT)
+
+$(LIB_SOFTFLOAT): $(OBJECTS)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
 
 build/%.c.src: %.c
 	$(Q)$(call MKDIR,build)
@@ -35,18 +43,23 @@ build/%.cpp.src: %.cpp
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZCC) $(EZCXXFLAGS) $< -o $@
 
+build/%.c.o: build/%.c.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.cpp.o: build/%.cpp.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.o: %.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
 clean:
 	$(Q)$(call RMDIR,build)
 
-#	install: all
-#		$(Q)$(call MKDIR,$(INSTALL_H))
-#		$(Q)$(call MKDIR,$(INSTALL_SOFTFLOAT))
-#		$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_SOFTFLOAT))
-#		$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
-	
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_SOFTFLOAT))
-	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_SOFTFLOAT))
+	$(Q)$(call COPY,$(call NATIVEPATH,$(LIB_SOFTFLOAT)),$(INSTALL_SOFTFLOAT))
 
-.PHONY: all clean
-
+.PHONY: all clean install

@@ -3,20 +3,20 @@
 ; Returns:
 ; ude:uhl = ude:uhl>>c
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48shrs
+	.section	.text
+	.global	__i48shrs
+	.type	__i48shrs, @function
+	.global	__i48shru
+	.type	__i48shru, @function
+
 __i48shrs:
 	inc	c
 	dec	c
 	ret	z
 	cp	a, a	; Set Z flag
 	db	$C2	; inc c \ dec c \ ret z -> jp nz, *
-	require	__i48shru
-
-	section	.text
-	public	__i48shru
 __i48shru:
 	inc	c
 	dec	c

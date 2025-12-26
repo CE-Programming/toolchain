@@ -1,3 +1,17 @@
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _sqrtf\n"
+    "\t.type _sqrtf, @function\n"
+    "\t.equ _sqrtf, 0x000298\n"
+    "\t.global _sqrt\n"
+    "\t.type _sqrt, @function\n"
+    "\t.equ _sqrt, _sqrtf\n"
+);
+
+#else
+
 #include <errno.h>
 #include <math.h>
 #include <stdint.h>
@@ -16,7 +30,7 @@ float _f32_fast_div4(float x);
 /**
  * @remarks Minimum ulp of -1
  */
-float _sqrtf_c(float x)
+float sqrtf(float x)
 {
     float f, y;
     int n;
@@ -46,4 +60,6 @@ float _sqrtf_c(float x)
     return ldexpf(y, n/2);
 }
 
-double _sqrt_c(double) __attribute__((alias("_sqrtf_c")));
+double sqrt(double) __attribute__((alias("sqrtf")));
+
+#endif

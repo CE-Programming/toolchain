@@ -3,10 +3,12 @@
 ; Returns:
 ; ude:uhl = ude:uhl & uiy:ubc
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48and
+	.section	.text
+	.global	__i48and
+	.type	__i48and, @function
+
 __i48and:
 ; CC: 41 bytes | 42F + 22R + 17W + 1
 	push	af

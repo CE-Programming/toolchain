@@ -7,10 +7,12 @@
 ; Returns:
 ; S and V flags updated according to comparison
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48cmps
+	.section	.text
+	.global	__i48cmps
+	.type	__i48cmps, @function
+
 __i48cmps:
 ; CC: 14 bytes | 15F + 9R + 6W + 1
 	push	hl
@@ -18,7 +20,7 @@ __i48cmps:
 	or	a, a
 	sbc	hl, bc	; compare hl to bc
 	ex	de, hl	; hl = de
-	lea	de, iy	; de = iy
+	lea	de, iy + 0	; de = iy
 	sbc	hl, de	; compare de to iy
 	pop	de
 	pop	hl

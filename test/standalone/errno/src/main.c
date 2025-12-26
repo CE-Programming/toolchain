@@ -120,11 +120,11 @@ int main(void)
         const char * str = strerror(i);
         errno = (int)i;
         if (strlen(truth[i]) != strlen(str) || strcmp(truth[i], str) != 0) {
-            fputs("strerror failed\n", stdout);
+            puts("strerror failed");
             break;
         }
     }
-    fputs("finished\n", stdout);
+    puts("finished");
 
     while (!os_GetCSC());
 

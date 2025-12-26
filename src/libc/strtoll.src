@@ -1,36 +1,38 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	_strtoll
-	public	_strtoimax
+	.global	_strtoll
+	.type	_strtoll, @function
+	.global	_strtoimax
+	.type	_strtoimax, @function
 
 _strtoimax:
 _strtoll:
 	call	__strtoll_common
 	; overflow if Carry is set
-	jr	c, .out_of_range
+	jr	c, _strtoll.out_of_range
 	ld	a, b
 	rla
-	jr	c, .maybe_out_of_range
+	jr	c, _strtoll.maybe_out_of_range
 	ret	nz
 	jp	__llneg
 
-.maybe_out_of_range:
+_strtoll.maybe_out_of_range:
 	; greater than INT_MAX
-	jr	nz, .overflow
+	jr	nz, _strtoll.overflow
 	; negative
 	; check that the result is not an exact INT_MIN
 	ld	b, a		; B = (B << 1)
 	call	__llcmpzero
 	set	7, b
 	ret	z		; exact INT_MIN
-.underflow:
+_strtoll.underflow:
 	xor	a, a		; set Z
-.out_of_range:
-.overflow:
+_strtoll.out_of_range:
+_strtoll.overflow:
 	ld	b, $80
 	ld	hl, 5		; ERANGE
 	ld	c, h
@@ -49,20 +51,22 @@ _strtoll:
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	_strtoull
-	public	_strtoumax
+	.global	_strtoull
+	.type	_strtoull, @function
+	.global	_strtoumax
+	.type	_strtoumax, @function
 
 _strtoumax:
 _strtoull:
 	call	__strtoll_common
 	; overflow if Carry is set
-	jr	c, .out_of_range
+	jr	c, _strtoull.out_of_range
 	ret	nz
 	jp	__llneg
 
-.out_of_range:
+_strtoull.out_of_range:
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
@@ -76,9 +80,9 @@ _strtoull:
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	private	__strtoll_common
+	.local	__strtoll_common
 
 __strtoll_common.invalid_base:
 	xor	a, a
@@ -107,87 +111,87 @@ __strtoll_common:
 	ld	hl, (ix + 9)	; nptr
 ;-------------------------------------------------------------------------------
 ; consume whitespace (inlinsed isspace)
-.whitespace_loop:
+__strtoll_common.whitespace_loop:
 	ld	a, (hl)
 	inc	hl
 	cp	a, 32
-	jr	z, .whitespace_loop
+	jr	z, __strtoll_common.whitespace_loop
 	sub	a, 9
 	add	a, -5
-	jr	nc, .whitespace_loop
+	jr	nc, __strtoll_common.whitespace_loop
 ; test for plus/minus signs
 	; A = (HL - 1) - 9 + -5
 	; A = (HL - 1) - 14
 	xor	a, '-' - 14
 	push	af
-	jr	z, .minus_sign
-	xor	a, ('+' - 14) xor ('-' - 14)
-	jr	z, .plus_sign
+	jr	z, __strtoll_common.minus_sign
+	xor	a, ('+' - 14) ^ ('-' - 14)
+	jr	z, __strtoll_common.plus_sign
 	dec	hl
 	xor	a, a
-.plus_sign:
-.minus_sign:
+__strtoll_common.plus_sign:
+__strtoll_common.minus_sign:
 	; A = 0, (HL) = start of number
 ;-------------------------------------------------------------------------------
 ; update the base if needed
 	or	a, c		; base
-	jr	z, .auto_base
+	jr	z, __strtoll_common.auto_base
 	xor	a, 16
-	jr	z, .hex_base
-	xor	a, 2 xor 16
-	jr	nz, .other_base
-.auto_base:	; test for 0* 0x* 0X* 0b* 0B*
-.bin_base:	; test for 0x* 0X*
-.hex_base:	; test for 0b* 0B*
+	jr	z, __strtoll_common.hex_base
+	xor	a, 2 ^ 16
+	jr	nz, __strtoll_common.other_base
+__strtoll_common.auto_base:	; test for 0* 0x* 0X* 0b* 0B*
+__strtoll_common.bin_base:	; test for 0x* 0X*
+__strtoll_common.hex_base:	; test for 0b* 0B*
 	inc	c
 	ld	a, (hl)
 	xor	a, '0'
-	jr	nz, .maybe_decimal
+	jr	nz, __strtoll_common.maybe_decimal
 	inc	hl
 	ld	a, (hl)
 	res	5, a		; upper case
 	xor	a, 'X'
-	jr	z, .maybe_hex
-	xor	a, 'B' xor 'X'
-	jr	z, .maybe_bin
+	jr	z, __strtoll_common.maybe_hex
+	xor	a, 'B' ^ 'X'
+	jr	z, __strtoll_common.maybe_bin
 	dec	hl
 	dec	c
-	jr	nz, .other_base
+	jr	nz, __strtoll_common.other_base
 	ld	c, 8		; octal
-	jr	.save_new_base
+	jr	__strtoll_common.save_new_base
 
-.maybe_bin:
+__strtoll_common.maybe_bin:
 	bit	4, c
-	jr	nz, .undo_inc	; hexadecimal
+	jr	nz, __strtoll_common.undo_inc	; hexadecimal
 	; base is 0 or 2
 	inc	hl
 	ld	c, 2
-	jr	.save_new_base
+	jr	__strtoll_common.save_new_base
 
-.maybe_hex:
+__strtoll_common.maybe_hex:
 	bit	1, c
-	jr	nz, .undo_inc	; binary
+	jr	nz, __strtoll_common.undo_inc	; binary
 	; base is 0 or 16
 	inc	hl
 	ld	c, 16
-	jr	.save_new_base
+	jr	__strtoll_common.save_new_base
 
-.undo_inc:
+__strtoll_common.undo_inc:
 	dec	hl
 	; dec	c
-	; jr	.other_base
-.maybe_decimal:
+	; jr	__strtoll_common.other_base
+__strtoll_common.maybe_decimal:
 	; set to decimal if base is not zero
 	dec	c
-	jr	nz, .other_base
+	jr	nz, __strtoll_common.other_base
 	ld	c, 10		; decimal
-.save_new_base:
+__strtoll_common.save_new_base:
 ;-------------------------------------------------------------------------------
-.other_base:
+__strtoll_common.other_base:
 	ld	a, (hl)		; first digit of the number
 	push	hl
 	pop	iy
-.invalid_base_hijack:
+__strtoll_common.invalid_base_hijack:
 	; or	a, a		; carry is cleared here
 	sbc	hl, hl
 	; A = first digit of the number
@@ -204,32 +208,32 @@ __strtoll_common:
 
 	sub	a, 48
 	cp	a, 10
-	jr	c, .check_digit
+	jr	c, __strtoll_common.check_digit
 	; Convert an alphabetic digit, case-insensitive
 	sub	a, 65 - 48
 	res	5, a
 	add	a, 10
-.check_digit:
+__strtoll_common.check_digit:
 	; End the loop when the digit is out of range for the base
 	cp	a, c
 	push	hl	; (ix - 6) = $000000
 	push	hl	; (ix - 9) = $000000
-	jr	c, .loop
+	jr	c, __strtoll_common.loop
 ;-------------------------------------------------------------------------------
 ; no digit found or invalid base
 	; set *endptr to nptr and return 0
 	ld	iy, (ix + 9)	; nptr
-	jr	.write_endptr
+	jr	__strtoll_common.write_endptr
 
 ;-------------------------------------------------------------------------------
 ; CC per non-decimal digit:
 ; no overflow : 109F + 10R +  9W + 33
 ; overflow    : 117F + 11R + 10W + 35
-.check_decimal:
+__strtoll_common.check_decimal:
 	cp	a, c
-	jr	nc, .end_loop
-.loop:
-.__llmul_add_b_overflow:
+	jr	nc, __strtoll_common.end_loop
+__strtoll_common.loop:
+__strtoll_common.__llmul_add_b_overflow:
 ; value = (value * C) + A
 ; bit 0, (ix - 3) is set if overflow has occured
 	; (ix - 6) --> HL
@@ -292,8 +296,8 @@ __strtoll_common:
 
 	add.s	hl, de
 	sbc	a, b		; set carry if B is non-zero or if there was carry previously
-	jr	c, .set_overflow_bit
-.next_digit:
+	jr	c, __strtoll_common.set_overflow_bit
+__strtoll_common.next_digit:
 	; (ix - 6) --> HL
 	; (ix - 9) --> DE
 	; HL --> BC
@@ -305,26 +309,26 @@ __strtoll_common:
 	ld	a, (iy)
 	sub	a, 48
 	cp	a, 10
-	jr	c, .check_decimal
+	jr	c, __strtoll_common.check_decimal
 	; Convert an alphabetic digit, case-insensitive
 	sub	a, 65 - 48
 	res	5, a
 	add	a, 10
 	; End the loop when the digit is out of range for the base
 	cp	a, c
-	jr	c, .loop
-.end_loop:
+	jr	c, __strtoll_common.loop
+__strtoll_common.end_loop:
 ;-------------------------------------------------------------------------------
-.write_endptr:
+__strtoll_common.write_endptr:
 	ld	c, l
 	ld	b, h
 	ld	hl, (ix + 12)	; endptr
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	z, .endptr_null
+	jr	z, __strtoll_common.endptr_null
 	ld	(hl), iy
-.endptr_null:
+__strtoll_common.endptr_null:
 	pop	de
 	pop	hl
 	pop	af		; overflow and sign flags
@@ -332,12 +336,12 @@ __strtoll_common:
 	ret
 
 ;-------------------------------------------------------------------------------
-.set_overflow_bit:
+__strtoll_common.set_overflow_bit:
 	set	0, (ix - 3)	; set carry
-	jr	.next_digit
+	jr	__strtoll_common.next_digit
 
 ;-------------------------------------------------------------------------------
 
-	extern	_errno
-	extern	__llneg
-	extern	__llcmpzero
+	.extern	_errno
+	.extern	__llneg
+	.extern	__llcmpzero

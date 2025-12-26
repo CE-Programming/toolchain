@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llcmpu
+	.section	.text
+	.global	__llcmpu
+	.type	__llcmpu, @function
+
 __llcmpu:
 	push	iy
 	ld	iy, 0
@@ -9,10 +11,10 @@ __llcmpu:
 	push	hl
 	ld	hl, (iy + 12)
 	sbc.s	hl, bc
-	jr	nz, .ne
+	jr	nz, .L.ne
 	ld	hl, (iy + 9)
 	sbc	hl, de
-	jr	nz, .ne
+	jr	nz, .L.ne
 	pop	hl
 	push	bc
 	ld	bc, (iy + 6)
@@ -22,7 +24,7 @@ __llcmpu:
 	pop	iy
 	ret
 
-.ne:
+.L.ne:
 	ccf
 	pop	hl
 	pop	iy

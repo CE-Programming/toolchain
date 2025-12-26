@@ -1,8 +1,8 @@
-	assume	adl = 1
+	.assume	adl = 1
 
-	section	.text
+	.section	.text
 
-	public	_softfloat_shortShiftRightJam64
+	.global	_softfloat_shortShiftRightJam64
 
 	; shift amount is [1, 63]
 _softfloat_shortShiftRightJam64:
@@ -11,11 +11,11 @@ _softfloat_shortShiftRightJam64:
 	add	iy, sp
 	ld	l, (iy + 13)	; shift amount
 ;	scf	; disables jr nc, .overflow_shift
-	jr	_softfloat_shiftRightJam64.hijack
+	jr	.L.hijack
 
-	section	.text
+	.section	.text
 
-	public	_softfloat_shiftRightJam64
+	.global	_softfloat_shiftRightJam64
 
 	; shift amount is non-zero
 _softfloat_shiftRightJam64:
@@ -24,16 +24,15 @@ _softfloat_shiftRightJam64:
 	add	iy, sp
 	ld	a, (iy + 16)	; shift amount hi8
 	or	a, a
-	jr	nz, .overflow
+	jr	nz, .L.overflow
 	ld	hl, (iy + 13)	; shift amount lo24
 	sbc	hl, bc
 	add	hl, bc
-.overflow:
-	private	_softfloat_shiftRightJam64.hijack
-.hijack:
+.L.overflow:
+.L.hijack:
 	ld	de, (iy + 7)
 	ld	bc, (iy + 10)
-	jr	nc, .overflow_shift
+	jr	nc, .L.overflow_shift
 	push	hl	; >> shift
 	sub	a, l	; A = 0 - L
 	and	a, $3F
@@ -43,9 +42,9 @@ _softfloat_shiftRightJam64:
 	call	__llshl
 	xor	a, a
 	call	__llcmpzero
-	jr	z, .no_round
+	jr	z, .L.no_round
 	inc	a	; ld a, 1
-.no_round:
+.L.no_round:
 	pop	hl	; SP -= 3
 	ld	hl, (iy + 4)
 	ld	de, (iy + 7)
@@ -56,7 +55,7 @@ _softfloat_shiftRightJam64:
 	pop	af	; reset SP
 	ret
 
-.overflow_shift:
+.L.overflow_shift:
 	; A is zero here
 	ld	hl, (iy + 4)
 	call	__llcmpzero
@@ -70,6 +69,6 @@ _softfloat_shiftRightJam64:
 	inc	hl
 	ret
 
-	extern	__llcmpzero
-	extern	__llshl
-	extern	__llshru
+	.extern	__llcmpzero
+	.extern	__llshl
+	.extern	__llshru

@@ -1,18 +1,20 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_sinf
-	public	_sin
+	.global	_sinf
+	.type	_sinf, @function
+	.global	_sin
+	.type	_sin, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_sinf := 022118h
-_sin := _sinf
+	.set	_sinf, 0x022118
+	.set	_sin, _sinf
 
-else
+.else
 
-	public	_sinf.hijack
+	.global	_sinf.hijack
 
 ; float _f32_sinus(int quad, float arg)
 _sin:
@@ -23,7 +25,7 @@ _sinf:
 	ld	a, e
 	add	a, a	; clear signbit
 	sub	a, 117	; |x| < 2^-10 or 0x3affffff
-	jr	c, .small_arg
+	jr	c, _sinf.small_arg
 	ld	a, e
 	res	7, e	; x = fabsf(x)
 	push	de	; exponent
@@ -32,9 +34,9 @@ _sinf:
 	add	a, a
 	ld	e, a
 	push	de
-.hijack:
+_sinf.hijack:
 	call	__f32_sinus
-.small_arg:
+_sinf.small_arg:
 	ld	sp, ix
 	pop	ix
 	; you can ret here if clamping is not needed
@@ -50,7 +52,7 @@ _sinf:
 	ld	l, h	; zero out the lower 8 bits of the mantissa
 	ret
 
-	extern	__frameset0
-	extern	__f32_sinus
+	.extern	__frameset0
+	.extern	__f32_sinus
 
-end if
+.endif

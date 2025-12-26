@@ -1,22 +1,22 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_strcspn
+	.section	.text
+	.global	_strcspn
 _strcspn:
 	call	__strcspn_strpbrk_common
 	sbc	hl, de		; Calculate number of mismatching characters
 	ret
 
-	section	.text
-	public	_strpbrk
+	.section	.text
+	.global	_strpbrk
 _strpbrk:
 	call	__strcspn_strpbrk_common
 	ret	nz		; Return pointer if not end of string
 	sbc	hl, hl		; Return NULL
 	ret
 
-	section	.text
-	private	__strcspn_strpbrk_common
+	.section	.text
+	.local	__strcspn_strpbrk_common
 __strcspn_strpbrk_common:
 	ld	hl, 6
 	add	hl, sp
@@ -36,13 +36,13 @@ __strcspn_strpbrk_common:
 	pop	iy		; IY = strlen(reject) + 1
 	dec	hl		; HL = reject - 1
 	push	de
-.loop:
+__strcspn_strpbrk_common.loop:
 	ld	a, (de)		; A = *str++
 	inc	de
-	lea	bc, iy		; BC = strlen(reject) + 1
+	lea	bc, iy + 0	; BC = strlen(reject) + 1
 	add	hl, bc		; HL = reject + strlen(reject)
 	cpdr			; Find A in reject, including null terminator
-	jr	nz, .loop	; Loop if no match
+	jr	nz, __strcspn_strpbrk_common.loop	; Loop if no match
 	ex	de, hl
 	dec	hl		; HL = pointer to matching character
 	pop	de		; DE = str

@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__sand
+	.section	.text
+	.global	__sand
+	.type	__sand, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__sand := 000200h
+	.set	__sand, 0x000200
 
-else
+.else
 
 __sand:
 	push	af
@@ -20,4 +21,4 @@ __sand:
 	pop	af
 	ret
 
-end if
+.endif

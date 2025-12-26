@@ -1,16 +1,16 @@
-/************************************************************************/
-/*                                                                      */
-/*                Copyright (C) 1999-2008 by Zilog, Inc.                */
-/*                                                                      */
-/************************************************************************/
-/*
-    log returns the natural logarithm of its floating
-    point argument.
+#if PREFER_CE_LIBC
 
-    The coefficients are #2705 from Hart & Cheney. (19.38D)
+asm
+(
+    "\t.global _logf\n"
+    "\t.type _logf, @function\n"
+    "\t.equ _logf, 0x0220E4\n"
+    "\t.global _log\n"
+    "\t.type _log, @function\n"
+    "\t.equ _log, _logf\n"
+);
 
-    It calls frexp.
-*/
+#else
 
 #include <errno.h>
 #include <math.h>
@@ -26,7 +26,7 @@
 #define q0 -0.120069589779605e2f
 #define q1  0.194809660700890e2f
 #define q2 -0.891110902798312e1f
- 
+
 /**
  * @remarks Minimum ulp:
  * ulp of +4 at +0x1.8ef9aap-1
@@ -34,7 +34,7 @@
  * See the purple line for relative precision (lag warning):
  * https://www.desmos.com/calculator/gae4qofdtc
  */
-float _logf_c(float arg)
+float logf(float arg)
 {
     float x, z, zsq, temp;
     int expon;
@@ -58,4 +58,6 @@ float _logf_c(float arg)
     return temp;
 }
 
-double _log_c(double) __attribute__((alias("_logf_c")));
+double log(double) __attribute__((alias("logf")));
+
+#endif

@@ -30,3 +30,5 @@ int __attribute__((weak)) fputc(int c, FILE *stream)
 
     return ret;
 }
+
+int putc(int c, FILE *stream) __attribute__((weak, alias("fputc")));

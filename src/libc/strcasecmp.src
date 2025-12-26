@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_strcasecmp
+	.section	.text
+	.global	_strcasecmp
+	.type	_strcasecmp, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_strcasecmp := 021E3Ch
+	.set	_strcasecmp, 0x021E3C
 
-else
+.else
 
 _strcasecmp:
 	pop	iy
@@ -16,44 +17,29 @@ _strcasecmp:
 	push	de
 	ld	b, 1+'z'-'a'
 	ld	c, 'a'-'A'
-	jr	.loop_entry
-.loop:
+	jr	.L.cmp_loop_entry
+.L.cmp_loop:
 	cp	a, (hl)
-	jr	z, .done
-.loop_nonnull:
+	jr	z, .L.done
+.L.loop_nonnull:
 	inc	hl
 	inc	de
-.loop_entry:
+.L.cmp_loop_entry:
 	ld	a, (de)
 	xor	a, (hl)
-	jr	z, .loop
+	jr	z, .L.cmp_loop
 	cp	a, c
-	jr	nz, .mismatch
+	jr	nz, .L.mismatch
 	or	a, (hl)
 	sub	a, 'a'
 	cp	a, b
-	jr	c, .loop_nonnull
+	jr	c, .L.loop_nonnull
 
-end if
+.endif
 
-	section	.text
-	private	_strcasecmp.mismatch
-	private	_strcasecmp.done
-_strcasecmp.mismatch:
-	ld	l, (hl)
-	call	_tolower.internal
-	ex	de, hl
-	ld	l, (hl)
-	call	_tolower.internal
-	ld	a, l
-	sub	a, e
-_strcasecmp.done:
-	sbc	hl, hl
-	ld	l, a
-	jp	(iy)
+	.global	_strncasecmp
+	.type	_strncasecmp, @function
 
-	section	.text
-	public	_strncasecmp
 _strncasecmp:
 	pop	iy
 	pop	de
@@ -68,28 +54,41 @@ _strncasecmp:
 	add	hl, bc
 	ex	(sp), hl
 
-	call	c, .loop_entry
-	jr	c, _strcasecmp.mismatch
+	call	c, .L.loop_entry
+	jr	c, .L.mismatch
 	sbc	hl, hl
 	jp	(iy)
 
-.checkcase:
+.L.checkcase:
 	or	a, (hl)
 	sub	a, 'a'
 	add	a, -(1+'z'-'a')
 	ret	c
-.loop:
+.L.loop:
 	cpi
 	ret	po
 	ret	z
 	inc	de
-.loop_entry:
+.L.loop_entry:
 	ld	a, (de)
 	xor	a, (hl)
-	jr	z, .loop
+	jr	z, .L.loop
 	cp	a, 'a'-'A'
-	jr	z, .checkcase
+	jr	z, .L.checkcase
 	scf
 	ret
 
-	extern	_tolower.internal
+.L.mismatch:
+	ld	l, (hl)
+	call	_tolower.internal
+	ex	de, hl
+	ld	l, (hl)
+	call	_tolower.internal
+	ld	a, l
+	sub	a, e
+.L.done:
+	sbc	hl, hl
+	ld	l, a
+	jp	(iy)
+
+	.extern	_tolower.internal

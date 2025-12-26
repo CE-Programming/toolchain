@@ -1,10 +1,12 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_putchar
+	.section	.text
+	.global	_putchar
+	.type	_putchar, @function
+
 _putchar:
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
 	push	hl
 	push	hl
@@ -13,4 +15,4 @@ _putchar:
 	pop	hl
 	ret
 
-	extern	_outchar
+	.extern	_outchar

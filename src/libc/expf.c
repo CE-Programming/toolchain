@@ -1,3 +1,17 @@
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _expf\n"
+    "\t.type _expf, @function\n"
+    "\t.equ _expf, 0x022124\n"
+    "\t.global _exp\n"
+    "\t.type _exp, @function\n"
+    "\t.equ _exp, _expf\n"
+);
+
+#else
+
 /************************************************************************/
 /*                                                                      */
 /*                 Copyright (C) 2000-2008 Zilog, Inc.                  */
@@ -41,7 +55,7 @@
  * See the purple line for relative precision (lag warning):
  * https://www.desmos.com/calculator/zlrmxatxkf
  */
-float _expf_c(float arg) {
+float expf(float arg) {
     float fraction;
     float temp1, temp2, xsq;
     float ent;
@@ -65,4 +79,6 @@ float _expf_c(float arg) {
     return ldexpf( F32_SQRT2 * (temp2+temp1) / (temp2-temp1), (int)ent );
 }
 
-double _exp_c(double) __attribute__((alias("_expf_c")));
+double exp(double) __attribute__((alias("expf")));
+
+#endif

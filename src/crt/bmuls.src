@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bmuls
+	.section	.text
+	.global	__bmuls
+	.type	__bmuls, @function
+
 __bmuls:
 	push	bc
 	ld	c,a

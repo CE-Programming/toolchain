@@ -1,13 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ishl
+	.section	.text
+	.global	__ishl
+	.type	__ishl, @function
+	.global	__sshl
+	.type	__sshl, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__ishl := 000174h
+	.set	__ishl, 0x000174
+	.set	__sshl, 0x000240
 
-else
+.else
 
 __ishl:
 ; CC: if 0<=C<8:   23*r(PC)+3*r(SPL)+4+(C&1==0)+(C&2!=0)*(1*r(PC)-1)+(C&4!=0)*(3*r(PC)-1)
@@ -47,4 +51,6 @@ __ishl_8:
 	add	hl, hl
 	ret
 
-end if
+	.set	__sshl, __ishl
+
+.endif

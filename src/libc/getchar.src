@@ -1,6 +1,0 @@
-	assume	adl=1
-
-	section	.text
-	public	_getchar
-_getchar := _inchar
-	extern	_inchar

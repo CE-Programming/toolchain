@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bshl
+	.section	.text
+	.global	__bshl
+	.type	__bshl, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__bshl := 000100h
+	.set	__bshl, 0x000100
 
-else
+.else
 
 __bshl:
 ; CC: if B!=0: B*(4*r(PC)+1)+6*r(PC)+(ADL?6*r(SPL)+3*w(SPL):4*r(SPS)+2*w(SPS))+1
@@ -16,10 +17,10 @@ __bshl:
 	dec	b
 	ret	z
 	push	bc
-.loop:
+.L.loop:
 	add	a, a
-	djnz	.loop
+	djnz	.L.loop
 	pop	bc
 	ret
 
-end if
+.endif

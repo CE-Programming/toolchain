@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__idivu
+	.section	.text
+	.global	__idivu
+	.type	__idivu, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__idivu := 000140h
+	.set	__idivu, 0x000140
 
-else
+.else
 
 __idivu:
 ; I: UHL=dividend, UBC=divisor
@@ -22,6 +23,6 @@ __idivu:
 	ret
 
 
-	extern	__idvrmu
+	.extern	__idvrmu
 
-end if
+.endif

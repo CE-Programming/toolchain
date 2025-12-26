@@ -70,7 +70,7 @@ int main(void) {
 
     os_ClrHome();
 
-    fputs(result, stdout);
+    puts(result);
 
     while (!os_GetCSC());
 

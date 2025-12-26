@@ -1,8 +1,0 @@
-	assume	adl = 1
-
-	section	.text
-
-	public	_isNaNF64UI
-_isNaNF64UI := __isnanl
-
-	extern	__isnanl

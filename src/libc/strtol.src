@@ -1,32 +1,33 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text.___strtoi
 
-	public	___strtoi
+	.global	___strtoi
+	.type	___strtoi, @function
 
 ___strtoi:
 	; Similar to strtol, except that it will raise ERANGE and return INT_MIN/INT_MAX when out of range
-	call	__strtol_common
+	call	.L__strtol_common
 	; overflow occured if B is non-zero
-	djnz	.out_of_range
+	djnz	.L.out_of_range
 	inc	e
 	dec	e
-	jr	nz, .out_of_range
+	jr	nz, .L.out_of_range
 	ld	b, a
 	inc	b
 	ex	de, hl
 	sbc	hl, hl
-	djnz	.positive
+	djnz	.L.positive
 	sbc	hl, de
 	ret	m		; INT_MIN <= x < 0
 	; no underflow if x is zero
-	jr	nz, .out_of_range
-.positive:
+	jr	nz, .L.out_of_range
+.L.positive:
 	adc	hl, de
 	ret	p		; 0 <= x <= INT_MAX
-.out_of_range:
+.L.out_of_range:
 	or	a, a		; test sign (Z = negative)
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
@@ -37,35 +38,36 @@ ___strtoi:
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text._strtol
 
-	public	_strtol
+	.global	_strtol
+	.type	_strtol, @function
 
 _strtol:
-	call	__strtol_common
+	call	.L__strtol_common
 	; overflow occured if B is non-zero
-	djnz	.out_of_range
+	djnz	.L_strtol.out_of_range
 	ld	a, e
 	rla
-	jr	c, .maybe_out_of_range
+	jr	c, .L_strtol.maybe_out_of_range
 	ret	nz
 	jp	__lneg
 
-.maybe_out_of_range:
+.L_strtol.maybe_out_of_range:
 	; greater than INT_MAX
-	jr	nz, .overflow
+	jr	nz, .L_strtol.overflow
 	; negative
 	; check that the result is not an exact INT_MIN
 	or	a, a
 	adc	hl, hl
-	jr	nz, .underflow
+	jr	nz, .L_strtol.underflow
 	ld	a, e
 	adc	a, a
 	ret	z		; exact INT_MIN
-.underflow:
+.L_strtol.underflow:
 	xor	a, a		; set Z
-.out_of_range:
-.overflow:
+.L_strtol.out_of_range:
+.L_strtol.overflow:
 	ld	e, $80
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
@@ -78,28 +80,21 @@ _strtol:
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text.___strtoui
 
-	public	___strtoui
+	.global	___strtoui
+	.type	___strtoui, @function
 
 ___strtoui:
 	; Similar to strtoul, except that it will raise ERANGE and return UINT_MAX when out of range
-	call	__strtol_common
+	call	.L__strtol_common
 	; overflow occured if B is non-zero
-	djnz	_strtoul.out_of_range
+	djnz	.L_strtoui.out_of_range
 	call	z, __ineg
 	inc	e
 	dec	e
 	ret	z
-
-	require	_strtoul.out_of_range
-
-;-------------------------------------------------------------------------------
-
-	section	.text
-
-	private	_strtoul.out_of_range
-_strtoul.out_of_range:
+.L_strtoui.out_of_range:
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
@@ -107,24 +102,23 @@ _strtoul.out_of_range:
 	ld	e, l
 	ret
 
-	section	.text
+	.section	.text._strtoul
 
-	public	_strtoul
-
+	.global	_strtoul
 _strtoul:
-	call	__strtol_common
+	call	.L__strtol_common
 	; overflow occured if B is non-zero
-	djnz	_strtoul.out_of_range
+	djnz	.L_strtoui.out_of_range
 	ret	nz
 	jp	__lneg
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text.__strtol_common
 
-	private	__strtol_common
+	.local	.L__strtol_common
 
-__strtol_common:
+.L__strtol_common:
 	; output: E:UHL
 	; B = 1 if no overflow
 	; Z means that A is zero = negate return value
@@ -136,92 +130,92 @@ __strtol_common:
 
 	ld	bc, (ix + 15)	; base
 	add	hl, bc
-	jr	c, .invalid_base
+	jr	c, .L.invalid_base
 	; UBC is zero here
 	ld	b, c		; store the base in B to allow for djnz hax
 	ld	hl, (ix + 9)	; nptr
 ;-------------------------------------------------------------------------------
 ; consume whitespace (inlinsed isspace)
-.whitespace_loop:
+.L.whitespace_loop:
 	ld	a, (hl)
 	inc	hl
 	cp	a, 32
-	jr	z, .whitespace_loop
+	jr	z, .L.whitespace_loop
 	sub	a, 9
 	add	a, -5
-	jr	nc, .whitespace_loop
+	jr	nc, .L.whitespace_loop
 ; test for plus/minus signs
 	; A = (HL - 1) - 9 + -5
 	; A = (HL - 1) - 14
 	xor	a, '-' - 14
 	push	af
-	jr	z, .minus_sign
-	xor	a, ('+' - 14) xor ('-' - 14)
-	jr	z, .plus_sign
+	jr	z, .L.minus_sign
+	xor	a, ('+' - 14) ^ ('-' - 14)
+	jr	z, .L.plus_sign
 	dec	hl
 	xor	a, a
-.plus_sign:
-.minus_sign:
+.L.plus_sign:
+.L.minus_sign:
 	; A = 0, (HL) = start of number
 ;-------------------------------------------------------------------------------
 ; update the base if needed
 	or	a, b		; base
-	jr	z, .auto_base
+	jr	z, .L.auto_base
 	xor	a, 16
-	jr	z, .hex_base
-	xor	a, 2 xor 16
-	jr	nz, .other_base
-.auto_base:	; test for 0* 0x* 0X* 0b* 0B*
-.bin_base:	; test for 0x* 0X*
-.hex_base:	; test for 0b* 0B*
+	jr	z, .L.hex_base
+	xor	a, 2 ^ 16
+	jr	nz, .L.other_base
+.L.auto_base:	; test for 0* 0x* 0X* 0b* 0B*
+.L.bin_base:	; test for 0x* 0X*
+.L.hex_base:	; test for 0b* 0B*
 	inc	b		; djnz hax
 	ld	a, (hl)
 	xor	a, '0'
-	jr	nz, .maybe_decimal
+	jr	nz, .L.maybe_decimal
 	inc	hl
 	ld	a, (hl)
 	res	5, a		; upper case
 	xor	a, 'X'
-	jr	z, .maybe_hex
-	xor	a, 'B' xor 'X'
-	jr	z, .maybe_bin
+	jr	z, .L.maybe_hex
+	xor	a, 'B' ^ 'X'
+	jr	z, .L.maybe_bin
 	dec	hl
-	djnz	.other_base
+	djnz	.L.other_base
 	ld	b, 8		; octal
-	jr	.save_new_base
+	jr	.L.save_new_base
 
-.maybe_bin:
+.L.maybe_bin:
 	bit	4, b
-	jr	nz, .undo_inc	; hexadecimal
+	jr	nz, .L.undo_inc	; hexadecimal
 	; base is 0 or 2
 	inc	hl
 	ld	b, 2
-	jr	.save_new_base
+	jr	.L.save_new_base
 
-.maybe_hex:
+.L.maybe_hex:
 	bit	1, b
-	jr	nz, .undo_inc	; binary
+	jr	nz, .L.undo_inc	; binary
 	; base is 0 or 16
 	inc	hl
 	ld	b, 16
-	jr	.save_new_base
+	jr	.L.save_new_base
 
-.undo_inc:
+.L.undo_inc:
 	dec	hl
 	; dec	b
-	; jr	.other_base
-.maybe_decimal:
+	; jr	.L.other_base
+.L.maybe_decimal:
 	; set to decimal if base is not zero
-	djnz	.other_base
+	djnz	.L.other_base
 	ld	b, 10		; decimal
-.save_new_base:
+.L.save_new_base:
 ;-------------------------------------------------------------------------------
-.other_base:
+.L.other_base:
 	ld	a, (hl)		; first digit of the number
 	push	hl
 	pop	iy
 	ld	d, b
-.invalid_base_hijack:
+.L.invalid_base_hijack:
 	; or	a, a		; carry is cleared here
 	sbc	hl, hl
 	ld	e, l
@@ -238,28 +232,28 @@ __strtol_common:
 
 	sub	a, 48
 	cp	a, 10
-	jr	c, .check_digit
+	jr	c, .L.check_digit
 	; Convert an alphabetic digit, case-insensitive
 	sub	a, 65 - 48
 	res	5, a
 	add	a, 10
-.check_digit:
+.L.check_digit:
 	; End the loop when the digit is out of range for the base
 	cp	a, d
-	jr	c, .loop
+	jr	c, .L.loop
 ;-------------------------------------------------------------------------------
 ; no digit found or invalid base
 	; set *endptr to nptr and return 0
 	ld	iy, (ix + 9)	; nptr
-	jr	.write_endptr
-.invalid_base:
+	jr	.L.write_endptr
+.L.invalid_base:
 	xor	a, a
 	ld	d, a
 	; Setting D (base) to zero ensures that cp a, d will never set carry.
 	; forcing the function to return.
 	push	af
 	; sets E:UHL to zero
-	jr	.invalid_base_hijack
+	jr	.L.invalid_base_hijack
 ;-------------------------------------------------------------------------------
 	; common path   : 30F +  1R +  3W +  5 + __lmulu_b
 	; decimal path  :  6F +  0R +  0W +  1
@@ -272,10 +266,10 @@ __strtol_common:
 	; Total CC per digit:
 	; decimal digit : 79F + 13R + 12W + 21
 	; other digit   : 85F + 13R + 12W + 21
-.check_decimal:
+.L.check_decimal:
 	cp	a, d
-	jr	nc, .end_loop
-.loop:
+	jr	nc, .L.end_loop
+.L.loop:
 	ld	c, a		; UBC = digit if no carry, don't care otherwise
 	ld	a, d		; A = base
 	ld	d, e		; D = upper accumulator byte
@@ -298,38 +292,38 @@ __strtol_common:
 	ld	b, a
 	ld	d, c		; D = base
 	; IY = str, D = base, E:UHL = accumulator, BCU = 0, B = 0 if no carry
-.next_digit:
+.L.next_digit:
 	inc	iy
 	; Convert a numerical digit
 	ld	a, (iy)
 	sub	a, 48
 	cp	a, 10
-	jr	c, .check_decimal
+	jr	c, .L.check_decimal
 	; Convert an alphabetic digit, case-insensitive
 	sub	a, 65 - 48
 	res	5, a
 	add	a, 10
 	; End the loop when the digit is out of range for the base
 	cp	a, d
-	jr	c, .loop
-.end_loop:
+	jr	c, .L.loop
+.L.end_loop:
 ;-------------------------------------------------------------------------------
-.write_endptr:
+.L.write_endptr:
 	push	hl
 	ld	hl, (ix + 12)	; endptr
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	z, .endptr_null
+	jr	z, .L.endptr_null
 	ld	(hl), iy
-.endptr_null:
+.L.endptr_null:
 	pop	hl
 	inc	b		; djnz hax
 	pop	af
 	pop	ix
 	ret
 
-	extern	_errno
-	extern	__ineg
-	extern	__lneg
-	extern	__lmulu_b
+	.extern	_errno
+	.extern	__ineg
+	.extern	__lneg
+	.extern	__lmulu_b

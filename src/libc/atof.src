@@ -1,14 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_atof, _atoff
+	.section	.text
+	.global	_atof
+	.global	_atoff
+	.type	_atof, @function
+	.type	_atoff, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_atoff := 022110h
-_atof := _atoff
+	.set	_atoff, 0x022110
+	.set	_atof, _atoff
 
-else
+.else
 
 _atof:
 _atoff:
@@ -25,7 +28,7 @@ _atoff:
 	pop	hl
 	ret
 
-	extern	__frameset0
-	extern	_strtod
+	.extern	__frameset0
+	.extern	_strtod
 
-end if
+.endif

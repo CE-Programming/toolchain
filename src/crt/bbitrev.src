@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bbitrev
+	.section	.text
+	.global	__bbitrev
+	.type	__bbitrev, @function
+
 __bbitrev:
 	push	bc
 	ld	b,a 		; b=ABCDEFGH
@@ -21,4 +23,3 @@ __bbitrev:
 	rrca 			; a=HGFEDCBA
 	pop	bc
 	ret
-

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__spopcnt_fast
+	.section	.text
+	.global	__spopcnt_fast
+	.type	__spopcnt_fast, @function
+
 __spopcnt_fast:
 	; Inlined implementation of __spopcnt
 	; Destroys: HL

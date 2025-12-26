@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_div
+	.section	.text
+	.global	_div
+	.type	_div, @function
+
 _div:
 	pop	de
 	pop	iy
@@ -18,4 +20,4 @@ _div:
 
 	ret
 
-	extern	__idvrms
+	.extern	__idvrms

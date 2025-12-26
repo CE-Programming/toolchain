@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_memccpy
+	.global	_memccpy
+	.type	_memccpy, @function
 
 _memccpy:
 	ld	iy, 0

@@ -1,15 +1,22 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_copysignl
+	.global	_copysignl
+	.type	_copysignl, @function
+
 _copysignl:
 	ld	hl, 19	; upper 8 bits of y
 	add	hl, sp
 	ld	a, (hl)	; extract the signbit of y
 	rlca
-	pop	iy, hl, de, bc
-	push	bc, de, hl
+	pop	iy
+	pop	hl
+	pop	de
+	pop	bc
+	push	bc
+	push	de
+	push	hl
 	rl	b	; clear the signbit of x, signbit of y is in the LSB
 	rrc	b	; rotate the LSB into the MSB to copy the signbit of y
 	jp	(iy)

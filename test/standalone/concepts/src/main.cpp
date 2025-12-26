@@ -117,7 +117,7 @@ int run_tests(void) {
                 "ret: %d != %d\nstrcmp(buf, text) == %d\n",
                 ret, text_len, cmp
             );
-            std::fputs(buf, stdout);
+            std::puts(buf);
             return __LINE__;
         }
     }

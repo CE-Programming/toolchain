@@ -1,9 +1,0 @@
-	assume	adl=1
-
-	section	.text
-
-	public	_getc
-
-_getc := _fgetc
-
-	extern	_fgetc

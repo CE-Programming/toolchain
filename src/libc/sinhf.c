@@ -1,24 +1,16 @@
-/************************************************************************/
-/*                                                                      */
-/*                      Copyright (C)1987-2008 by                       */
-/*                             Zilog, Inc.                              */
-/*                                                                      */
-/*                         San Jose, California                         */
-/*                                                                      */
-/************************************************************************/
-/*
-    sinh(arg) returns the hyperbolic sine of its floating-
-    point argument.
+#if PREFER_CE_LIBC
 
-    The exponential function is called for arguments
-    greater in magnitude than 0.5.
+asm
+(
+    "\t.global _sinhf\n"
+    "\t.type _sinhf, @function\n"
+    "\t.equ _sinhf, 0x022130\n"
+    "\t.global _sinh\n"
+    "\t.type _sinh, @function\n"
+    "\t.equ _sinh, _sinhf\n"
+);
 
-    A series is used for arguments smaller in magnitude than 0.5.
-    The coefficients are #2029 from Hart & Cheney. (20.36D)
-
-    cosh(arg) is computed from the exponential function for
-    all arguments.
-*/
+#else
 
 #include <math.h>
 
@@ -35,7 +27,7 @@
  * ulp of -3  at +0x1.eec25ap-9 with ideal expf (|x| < 21.0f)
  * ulp of -18 at +0x1.0a049cp+4 with current expf (|x| < 21.0f)
  */
-float _sinhf_c(float arg) {
+float sinhf(float arg) {
     float temp, argsq, x;
     x = fabsf(arg);
 
@@ -51,4 +43,6 @@ float _sinhf_c(float arg) {
     return copysignf(temp, arg);
 }
 
-double _sinh_c(double, double *) __attribute__((alias("_sinhf_c")));
+double sinh(double) __attribute__((alias("sinhf")));
+
+#endif

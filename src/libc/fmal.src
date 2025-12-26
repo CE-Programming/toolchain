@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_fmal
+	.global	_fmal
+	.type	_fmal, @function
 
 _fmal:
 	; flags handled by softfloat
@@ -15,6 +16,6 @@ _fmal:
 	xor	a, (iy + 19)
 	rlca
 	ld	(iy + 20), a	; signZ
-	jq	_softfloat_mulAddF64
+	jp	_softfloat_mulAddF64
 
-	extern	_softfloat_mulAddF64
+	.extern	_softfloat_mulAddF64

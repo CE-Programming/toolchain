@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llnot_fast
+	.section	.text
+	.global	__llnot_fast
+	.type	__llnot_fast, @function
+
 __llnot_fast:
 	push	hl		; *spl=UHL
 	add	hl, de		; uhl=UHL+UDE

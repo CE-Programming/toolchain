@@ -185,7 +185,7 @@ void brute_force_test(void) {
             }
         }
     }
-    fputs("Passed random tests", stdout);
+    puts("Passed random tests");
 }
 
 size_t run_test(void) {
@@ -215,11 +215,11 @@ int main(void) {
     os_ClrHome();
     size_t fail_index = run_test();
     if (fail_index == SIZE_MAX) {
-        fputs("Passed edge cases\n", stdout);
+        puts("Passed edge cases");
     } else {
-        char buf[sizeof("Failed test: 16777215\n")];
-        boot_sprintf(buf, "Failed test: %u\n", fail_index);
-        fputs(buf, stdout);
+        char buf[sizeof("Failed test: 16777215")];
+        boot_sprintf(buf, "Failed test: %u", fail_index);
+        puts(buf);
     }
     brute_force_test();
 

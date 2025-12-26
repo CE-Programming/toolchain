@@ -1,14 +1,15 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_memcpy
+	.global	_memcpy
+	.type	_memcpy, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_memcpy := $0000A4
+	.set	_memcpy, 0x0000A4
 
-else
+.else
 
 _memcpy:
 	ld	iy, -1
@@ -16,12 +17,12 @@ _memcpy:
 	ld	bc, (iy + 10)  ; Load count
 	sbc	hl, hl
 	add	hl, bc
-	jr	nc, .zero
+	jr	nc, .L.zero
 	ld	de, (iy + 4)  ; Load destination
 	ld	hl, (iy + 7)  ; Load source
 	ldir
-.zero:
+.L.zero:
 	ld	hl, (iy + 4)  ; Return the destination pointer
 	ret
 
-end if
+.endif

@@ -1,13 +1,15 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_isdigit
+	.section	.text
+	.global	_isdigit
+	.type	_isdigit, @function
+
 _isdigit:
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
-	ld	a,l
-	sub	a,48
-	sub	a,10
-	sbc	hl,hl
+	ld	a, l
+	sub	a, 48
+	sub	a, 10
+	sbc	hl, hl
 	ret

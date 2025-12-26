@@ -1,8 +1,10 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ishru_1_fast
-__ishru_1_fast:
+	.section	.text
+	.global	__ishrs_1_fast
+	.type	__ishrs_1_fast, @function
+
+__ishrs_1_fast:
 	push	hl
 	ld	hl, 2
 	add	hl, sp

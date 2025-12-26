@@ -1,18 +1,19 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 ;;; struct u32div_t {
 ;;;     uint32_t rem;
 ;;;     uint32_t quot;
 ;;; };
 ;;; u32div_t _ldvrmu(uint32_t dividend, uint32_t divisor) {
-	public	__ldvrmu
+	.global	__ldvrmu
+	.type	__ldvrmu, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__ldvrmu := 0001BCh
+	.set	__ldvrmu, 0x0001BC
 
-else
+.else
 
 __ldvrmu:
 if 1
@@ -46,7 +47,7 @@ if 1
 	ld	b, 32			; b : i
 
 ;;;     do {
-.loop:
+.L.c.loop:
 
 ;;;         bool dividendBit = result.quot >> 31;
 ;;;         result.quot <<= 1;
@@ -63,23 +64,23 @@ if 1
 	sbc	a, e
 
 ;;;         if (!quotBit) {
-	jr	nc, .restore_skip
+	jr	nc, .L.c.restore_skip
 ;;;             result.rem += divisor;
 	add	hl, bc
 	adc	a, e
 ;;;         }
-.restore_skip:
+.L.c.restore_skip:
 
 ;;;         if (quotBit) {
 	exx
-	jr	c, .1_skip
+	jr	c, .L.c.skip
 ;;;             result.quot++;
 	inc	l
 ;;;         }
-.1_skip:
+.L.c.skip:
 
 ;;;     } while (--i != 0);
-	djnz	.loop
+	djnz	.L.c.loop
 
 ;;;     return result;
 	pop	bc
@@ -87,7 +88,7 @@ if 1
 	ret
 ;;; }
 
-else
+.else
 ; I: EUHL=dividend, AUBC=divisor
 ; O: auhl=EUHL%AUBC, euix=EUHL/AUBC, iyh=A, iyl=0
 
@@ -101,7 +102,7 @@ else
 
 	ld	iyl, 32
 
-.loop:
+.L.loop:
 	add	ix, ix
 	rl	e
 	adc	hl, hl
@@ -111,17 +112,17 @@ else
 	sbc	a, iyh
 	inc	ixl
 
-	jr	nc, .restore_skip
+	jr	nc, .L.restore_skip
 	add	hl, bc
 	adc	a, iyh
 	dec	ixl
-.restore_skip:
+.L.restore_skip:
 
 	dec	iyl
-	jr	nz, .loop
+	jr	nz, .L.loop
 
 	ret
 
-end if
+.endif
 
-end if
+.endif

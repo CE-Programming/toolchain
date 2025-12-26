@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lshru
+	.section	.text
+	.global	__lshru
+	.type	__lshru, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__lshru := 0001ECh
+	.set	__lshru, 0x0001EC
 
-else
+.else
 
 __lshru:
 ; Suboptimal for large shift amounts
@@ -22,10 +23,10 @@ __lshru:
 	or	a, a
 	sbc	hl, hl
 	add	hl, sp
-.loop:
+.L.loop:
 	srl	a
 	jp	__lshrs.hijack_lshru
 
-	extern	__lshrs.hijack_lshru
+	.extern	__lshrs.hijack_lshru
 
-end if
+.endif

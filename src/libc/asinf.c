@@ -1,3 +1,17 @@
+#if PREFER_CE_LIBC
+
+asm
+(
+    "\t.global _asinf\n"
+    "\t.type _asinf, @function\n"
+    "\t.equ _asinf, 0x022104\n"
+    "\t.global _asin\n"
+    "\t.type _asin, @function\n"
+    "\t.equ _asin, _asinf\n"
+);
+
+#else
+
 /* Copyright (c) 2000-2008 Zilog, Inc. */
 
 /**
@@ -13,7 +27,7 @@
  * @remarks Minimum ulp:
  * ulp of +8 at +0x1.ffe956p-1
  */
-float _asinf_c(float arg) {
+float asinf(float arg) {
     bool arg_sign;
     float temp;
     arg_sign = signbit(arg);
@@ -36,4 +50,6 @@ float _asinf_c(float arg) {
     return temp;
 }
 
-double _asin_c(double) __attribute__((alias("_asinf_c")));
+double asin(double) __attribute__((alias("asinf")));
+
+#endif

@@ -1,21 +1,23 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llcmpzero
+	.section	.text
+	.global	__llcmpzero
+	.type	__llcmpzero, @function
+
 __llcmpzero:
 	inc	b
 	dec	b
 	ret	nz
 	inc.s	bc
 	dec	c
-	jr	nz, .p_nz
+	jr	nz, .L.p_nz
 	or	a, a
 	sbc	hl, bc
-	jr	nz, .p_nz
+	jr	nz, .L.p_nz
 	sbc	hl, de
 	ret	z
 	add	hl, de
-.p_nz:
+.L.p_nz:
 	inc	b
 	ld	b, 0
 	ret

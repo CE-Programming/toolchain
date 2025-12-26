@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llshl
+	.section	.text
+	.global	__llshl
+	.type	__llshl, @function
+
 __llshl:
 ; Suboptimal for large shift amounts
 	push	af
@@ -14,17 +16,17 @@ __llshl:
 	pop	hl
 
 	inc	b
-	jr	.begin
+	jr	.L.begin
 
-.loop:
+.L.loop:
 	add	hl, hl
 	ex	de, hl
 	adc	hl, hl
 	ex	de, hl
 	rl	c
 	rla
-.begin:
-	djnz	.loop
+.L.begin:
+	djnz	.L.loop
 
 	ld	b, a
 	pop	af

@@ -1,13 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__ladd
+	.section	.text
+	.global	__ladd
+	.type	__ladd, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__ladd := 00019Ch
+	.set	__ladd, 0x00019C
 
-else
+.else
 
 __ladd:
 	push	af
@@ -17,4 +18,4 @@ __ladd:
 	pop	af
 	ret
 
-end if
+.endif

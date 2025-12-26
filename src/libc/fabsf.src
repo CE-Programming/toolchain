@@ -1,20 +1,27 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_fabsf, _fabs
+	.section	.text
+	.global	_fabsf
+	.type	_fabsf, @function
+	.global	_fabs
+	.type	_fabs, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_fabsf := 0220F0h
-_fabs := _fabsf
+	.set	_fabsf, 0x0220F0
+	.set	_fabs, _fabsf
 
-else
+.else
 
 _fabs:
 _fabsf:
-	pop	bc, hl ,de
-	push	de, hl, bc
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
 	res	7, e
 	ret
 
-end if
+.endif

@@ -1,14 +1,15 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_strcmp
+	.global	_strcmp
+	.type	_strcmp, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_strcmp := $0000C8
+	.set	_strcmp, 0x0000C8
 
-else
+.else
 
 _strcmp:
 	ld	hl, 3
@@ -18,17 +19,17 @@ _strcmp:
 	inc	hl
 	inc	hl
 	ld	hl, (hl)
-.loop:
+_strcmp.loop:
 	ld	a, (de)
 	cp	a, (hl)
-	jr	nz, .finish
+	jr	nz, _strcmp.finish
 	inc	hl
 	inc	de
 	or	a, a
-	jr	nz, .loop
-.finish:
+	jr	nz, _strcmp.loop
+_strcmp.finish:
 	sbc	hl, hl
 	ld	l, a
 	ret
 
-end if
+.endif

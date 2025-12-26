@@ -1,20 +1,22 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_powf
-	public	_pow
+	.section	.text
+	.global	_powf
+	.type	_powf, @function
+	.global	_pow
+	.type	_pow, @function
 
-if PREFER_OS_LIBC
+.ifdef PREFER_CE_LIBC
 
-_powf := 0220F8h
-_pow := _powf
+	.set	_powf, 0x0220F8
+	.set	_pow, _powf
 
-else
+.else
 
-_powf := __powf_c
-_pow := __pow_c
+	.set	_powf, __powf_c
+	.set	_pow, __pow_c
 
-	extern	__powf_c
-	extern	__pow_c
+	.extern	__powf_c
+	.extern	__pow_c
 
-end if
+.endif

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llshru_1_fast
+	.section	.text
+	.global	__llshru_1_fast
+	.type	__llshru_1_fast, @function
+
 __llshru_1_fast:
 	push	hl
 	push	de

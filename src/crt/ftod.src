@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public __ftod
+	.global __ftod
+	.type	__ftod, @function
 
 ; input E:UHL (float)
 ; ouput BC:UDE:UHL (long double)
@@ -17,16 +18,16 @@ __ftod:
 	ld	b, $03	; ld bc, $380 - 1
 	
 	adc	hl, hl
-	jr	z, .mant_zero	; zero inf or normal
+	jr	z, .L.mant_zero	; zero inf or normal
 	adc	a, a
-	jr	z, .subnormal
+	jr	z, .L.subnormal
 	inc	a
-	jr	z, .nan	
-.normal:
+	jr	z, .L.nan	
+.L.normal:
 	; (Float64_bias - Float32_bias) - 1 (undoing inc a)
 	; (Float64_bias - Float32_bias) = $0380
 	add	a, $80 - 1	; this can be changed to adc if needed
-.subnorm_shift:
+.L.subnorm_shift:
 	; Same as ld c, a \ ld a, 0 \ adc a, b
 	ld	c, a
 	adc	a, b
@@ -34,40 +35,40 @@ __ftod:
 ; HL = mant
 ; C = lo expon
 ; A = hi expon
-.shift_28: ; Float64_mant_bits - Float32_mant_bits
+.L.shift_28: ; Float64_mant_bits - Float32_mant_bits
 	inc	b	; ld b, 4
-.loop:
+.L.loop:
 	add	hl, hl
 	rl	c
 	rla
-	djnz	.loop
-.zero:	; <-- A is zero on this path
+	djnz	.L.loop
+.L.zero:	; <-- A is zero on this path
 	ld	b, a
 
 	; zero low bits
-.infinite:
+.L.infinite:
 ;	or	a, a	; not needed
 	; f64_mant_bits - f32_mant_bits = lowest 29 bits will be zero
 	ex	de, hl
 	sbc	hl, hl
-.finish:
+.L.finish:
 	pop	af
 	ret	nc	; positive
 	set	7, b
 	ret	; negative
 
-.mant_zero:
+.L.mant_zero:
 	adc	a, a
 	ld	c, l	; HL is zero here
-	jr	z, .zero
+	jr	z, .L.zero
 	inc	a
-	jr	nz, .normal
+	jr	nz, .L.normal
 	; infinite
 	ld	c, $F0
 	ld	b, e	; ld b, $7F since infinity is all ones
-	jr	.infinite
+	jr	.L.infinite
 
-.subnormal:
+.L.subnormal:
 	; since this is subnormal, the LSB of the exponent is already zero
 	call	__ictlz
 	ld	c, a
@@ -77,25 +78,27 @@ __ftod:
 	; expon = (Float64_bias - Float32_bias) - clz_result
 	add	hl, hl
 	; the following three methods are equivilient
-if 1
+.if 1
 	; ($FF - a) - $7F
 	cpl
 	sub	a, $80 - 1
-else if 0
+.else
+.if 0
 	; $FF - (a + $7F)
 	add	a, $80 - 1
 	cpl
-else
+.else
 	; $80 - c (c is equal to a)
 	ld	a, $80
 	sub	a, c
-end if
-	jr	.subnorm_shift
+.endif
+.endif
+	jr	.L.subnorm_shift
 
-.nan:
+.L.nan:
 	ld	a, $07
 	ld	c, $FF
-	jr	.shift_28
+	jr	.L.shift_28
 
-	extern	__ictlz
-	extern	__ishl
+	.extern	__ictlz
+	.extern	__ishl

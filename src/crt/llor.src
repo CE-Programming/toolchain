@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llor
+	.section	.text
+	.global	__llor
+	.type	__llor, @function
+
 __llor:
 ; CC: 61*r(PC)+25*r(SPL)+14*w(SPL)+1
 	push	af
