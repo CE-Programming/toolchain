@@ -71,7 +71,7 @@ void _standard_free(void *ptr)
 
         for (p = &_alloc_base; p->ptr && p->ptr < q; p = p->ptr);
 
-        if ((uint8_t*)p->ptr == ((uint8_t*)q) + q->size)
+        if (p->ptr && (uint8_t*)p->ptr == ((uint8_t*)q) + q->size)
         {
             q->size += p->ptr->size;
             q->ptr = p->ptr->ptr;
@@ -81,7 +81,7 @@ void _standard_free(void *ptr)
             q->ptr = p->ptr;
         }
 
-        if (((uint8_t*)p) + p->size == (uint8_t*)q)
+        if (p->size && ((uint8_t*)p) + p->size == (uint8_t*)q)
         {
             p->size += q->size;
             p->ptr = q->ptr;
@@ -103,18 +103,22 @@ void *_standard_realloc(void *ptr, size_t size)
         return malloc(size);
     }
 
-    h = (block_t*)((uint8_t*)ptr - sizeof(block_t));
+    h = (block_t*)ptr - 1;
 
-    if (h->size >= (size + sizeof(block_t)))
+    if (h->size >= size + sizeof(block_t))
     {
         return ptr;
     }
 
-    if ((p = malloc(size)))
+    p = malloc(size);
+    if (p == NULL)
     {
-        memcpy(p, ptr, size);
-        free(ptr);
+        return NULL;
     }
+
+    memcpy(p, ptr, h->size - sizeof(block_t));
+    free(ptr);
 
     return p;
 }
+
