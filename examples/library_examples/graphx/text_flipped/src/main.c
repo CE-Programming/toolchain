@@ -35,15 +35,16 @@ int main(void)
 void PrintCenteredFlippedText(char *str)
 {
     int x, y;
-    char *string = str + strlen(str) - 1;
+    char *string = str + strlen(str);
     gfx_TempSprite(ch, 8, 8);
 
     x = (GFX_LCD_WIDTH - gfx_GetStringWidth(str)) / 2;
     y = (GFX_LCD_HEIGHT - FONT_HEIGHT) / 2;
 
-    while (*string)
+    while (string != str)
     {
-        gfx_Sprite(gfx_RotateSpriteHalf(gfx_GetSpriteChar(*string), ch), x, y);
-        x += gfx_GetCharWidth(*string--);
+        char c = *--string;
+        gfx_Sprite(gfx_RotateSpriteHalf(gfx_GetSpriteChar(c), ch), x, y);
+        x += gfx_GetCharWidth(c);
     }
 }
