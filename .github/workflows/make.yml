@@ -1,6 +1,7 @@
 name: Win/Mac/Linux
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - v* # push events versioned tags
