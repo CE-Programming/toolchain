@@ -18,7 +18,7 @@ include $(CURDIR)/../common.mk
 
 BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
 
-EZCFLAGS := -S -Wall -Wextra -Wshadow -Oz
+EZCFLAGS := -S -fno-addrsig -Wall -Wextra -Wshadow -Oz
 EZCFLAGS += -D_EZ80 -isystem ../libc/include -I ./include
 EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
 
