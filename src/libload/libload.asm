@@ -142,6 +142,7 @@ macro relocate? name, address*
 end macro
 
 relocate helpers, buf + 900
+if 0
 call_relative:
 	pop	ix
 	pea	ix + 3
@@ -150,6 +151,7 @@ call_relative:
 	add	ix, de
 	pop	de
 	jp	(ix)
+end if
 jump_relative:
 	pop	ix
 	push	de
@@ -420,7 +422,42 @@ need_to_load_lib:
 
 resolve_entry_points:
 	ld	hl, (ramlocation)
-	rcall	enqueue_all_deps	; get all the dependency pointers that reside in the ram lib
+	; get all the dependency pointers that reside in the ram lib
+enqueue_all_deps:			; we don't need to store anything if we are here
+	bit	keep_in_arc, (iy + LIB_FLAGS)
+	jr	nz, .finish		; really, this is just a precautionary check -- should work fine without
+.loop:
+	res	optional, (iy + LIB_FLAGS)
+	ld	a, (hl)
+	cp	a, REQ_LIB_MARKER	; is there a dependency?
+	jr	nz, .check
+	ex	de, hl
+	ld	hl, (end_dep_queue)
+	ld	(hl), de		; save pointer to start of this dependency -- one at a time
+	inc	hl
+	inc	hl
+	inc	hl			; move to next pointer
+	ld	(end_dep_queue), hl	; save next pointer
+	ex	de, hl
+.skip:
+	move_string_to_end
+	inc	hl			; move to start of dependency jump table
+.next:
+	ld	a, (hl)
+	cp	a, JP_OPCODE
+	jr	nz, .loop
+	inc	hl
+	inc	hl
+	inc	hl
+	inc	hl			; jp address
+	jr	.next
+.check:
+	cp	a, ti.AppVarObj
+	jr	z, .skip		; keep going
+.finish:
+
+resolve_entry_points_enqueued:
+
 	ld	hl, (jump_tbl_ptr)	; hl->start of function jump table
 .loop:
 	ld	a, (hl)
@@ -517,39 +554,6 @@ load_next_dep:
 	ld	(iy + LIB_FLAGS), a	; restore flag bits
 	ld	a, 1
 	jp	(hl)			; passed all the checks; let's start execution! :)
-
-enqueue_all_deps:			; we don't need to store anything if we are here
-	bit	keep_in_arc, (iy + LIB_FLAGS)
-	ret	nz			; really,  this is just a precautionary check -- should work fine without
-.loop:
-	res	optional, (iy + LIB_FLAGS)
-	ld	a, (hl)
-	cp	a, REQ_LIB_MARKER	; is there a dependency?
-	jr	nz, .check
-	ex	de, hl
-	ld	hl, (end_dep_queue)
-	ld	(hl), de		; save pointer to start of this dependency -- one at a time
-	inc	hl
-	inc	hl
-	inc	hl			; move to next pointer
-	ld	(end_dep_queue), hl	; save next pointer
-	ex	de, hl
-.skip:
-	move_string_to_end
-	inc	hl			; move to start of dependency jump table
-.next:
-	ld	a, (hl)
-	cp	a, JP_OPCODE
-	jr	nz, .loop
-	inc	hl
-	inc	hl
-	inc	hl
-	inc	hl			; jp address
-	jr	.next
-.check:
-	cp	a, ti.AppVarObj
-	jr	z, .skip		; keep going
-	ret
 
 error_invalid:
 	rload	str_error_invalid
