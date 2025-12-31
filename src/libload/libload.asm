@@ -210,21 +210,8 @@ check_already_loaded:
 	inc	hl
 	inc	de
 	or	a, a			; means we've reached the end of the string
-	jr	z, .match
-	jr	.seach_tbl
-.no_match:
-	pop	de
-	ld	hl, (end_arc_lib_locs)
-	call	ti.CpHLDE		; have we reached the end of the table?
-	push	af
-	ex	de, hl
-	ld	de, 15			; size of search entry (9=name, 3=ram ptr, 3=arc vec ptr)
-	add	hl, de
-	ex	de, hl			; end of the extraction table?
-	pop	af
-	pop	hl
-	jr	z, .not_loaded
-	jr	.loop
+	jr	nz, .seach_tbl
+
 .match:					; mark as previously loaded (don't resolve absolutes again)
 	set	loaded, (iy + LIB_FLAGS)
 	pop	hl
@@ -244,6 +231,20 @@ check_already_loaded:
 	inc	hl			; bypass version byte
 	ld	(jump_tbl_ptr), hl
 	rjump	resolve_entry_points	; need to resolve the entry points & enqueue dependencies
+
+.no_match:
+	pop	de
+	ld	hl, (end_arc_lib_locs)
+	call	ti.CpHLDE		; have we reached the end of the table?
+	push	af
+	ex	de, hl
+	ld	de, 15			; size of search entry (9=name, 3=ram ptr, 3=arc vec ptr)
+	add	hl, de
+	ex	de, hl			; end of the extraction table?
+	pop	af
+	pop	hl
+	jr	nz, .loop
+
 .not_loaded:
 	ld	hl, (lib_name_ptr)
 	move_string_to_end
@@ -251,12 +252,12 @@ check_already_loaded:
 findlib:
 	call	ti.ChkFindSym
 	jr	nc, .foundlib		; throw an error if the library doesn't exist
-	bit	optional,(iy + LIB_FLAGS)
-	jr	z, .missing		; if optional, zeroize marker and move on
-	pop	hl			; get version byte pointer
-	jr	optional_lib_clear
+	bit	optional, (iy + LIB_FLAGS)
+	; if optional, zeroize marker and move on
+	jr	nz, optional_lib_clear_pop_hl
 .missing:
 	rjump	error_missing		; jump to the lib missing handler
+
 .foundlib:
 	call	ti.ChkInRam
 	jr	nz, .archived		; if the library is found in ram, archive the library and search again
@@ -264,6 +265,7 @@ findlib:
 	call	ti.Arc_Unarc
 	call	ti.PopOP1
 	jr	findlib
+
 .archived:
 	ex	de, hl
 	ld	de, 9
@@ -291,6 +293,7 @@ assert LIB_MAGIC_1 = LIB_MAGIC_1_ALT+1
 	jr	z, lib_exists
 	bit	optional,(iy + LIB_FLAGS)
 	jr	z, invalid_error
+optional_lib_clear_pop_hl:
 	pop	hl			; get version byte pointer
 optional_lib_clear:
 	push	hl
@@ -310,10 +313,13 @@ optional_lib_clear:
 	inc	hl
 	inc	hl			; move to next jump
 	jr	.loop
+
 .done:
 	rjump	check_for_lib_marker
+
 invalid_error:
 	rjump	error_invalid		; throw an error if the library doesn't match the magic numbers
+
 lib_exists:
 	inc	hl			; hl->version byte in library
 	push	hl			; save location of version byte
@@ -335,11 +341,11 @@ lib_exists:
 	pop	hl			; hl->version of library in the program
 	cp	a, (hl)			; check if library version in program is greater than library version on-calc
 	jr	nc, good_version
-	bit	optional,(iy + LIB_FLAGS)
-	jr	z, .version_error
-	jr	optional_lib_clear
+	bit	optional, (iy + LIB_FLAGS)
+	jr	nz, optional_lib_clear
 .version_error:
 	rjump	error_version		; c flag set if on-calc lib version is less than the one used in the program
+
 good_version:
 	push	hl
 	push	de
@@ -392,8 +398,7 @@ need_to_load_lib:
 	ld	(end_arc_lib_locs), hl
 
 	bit	keep_in_arc, (iy + LIB_FLAGS)
-	jr	z, .not_in_arc
-	jr	resolve_entry_points
+	jr	nz, resolve_entry_points
 .not_in_arc:
 	ld	hl, (loaded_size)
 	push	hl
@@ -451,6 +456,7 @@ enqueue_all_deps:			; we don't need to store anything if we are here
 	inc	hl
 	inc	hl			; jp address
 	jr	.next
+
 .check:
 	cp	a, ti.AppVarObj
 	jr	z, .skip		; keep going
@@ -481,6 +487,7 @@ resolve_entry_points_enqueued:
 	inc	hl
 	inc	hl			; move to next jump
 	jr	.loop
+
 .done:					; finished resolving entry points
 					; now relocate absolutes in library
 relocate_absolutes:
@@ -513,6 +520,7 @@ relocate_absolutes:
 	inc	hl
 	inc	hl			; move to next relocation vector
 	jr	.loop
+
 .done:					; have we found the start of the program?
 	bit	is_dep, (iy + LIB_FLAGS)
 	jr	nz, load_next_dep	; if loading dependencies, don't check markers
@@ -527,6 +535,7 @@ check_for_lib_marker:
 	jr	nz, check_has_deps
 goto_load_lib:
 	rjump	load_lib		; load the next library
+
 check_has_deps:				; the first time we hit this,  we have all the dependencies placed onto the queue that the libraries use.
 	res	optional, (iy + LIB_FLAGS)
 	bit	is_dep, (iy + LIB_FLAGS)
@@ -558,9 +567,11 @@ load_next_dep:
 error_invalid:
 	rload	str_error_invalid
 	jr	throw_error
+
 error_version:
 	rload	str_error_version
 	jr	throw_error
+
 error_missing:
 	rload	str_error_missing
 throw_error:				; draw the error message onscreen
@@ -599,11 +610,10 @@ throw_error:				; draw the error message onscreen
 	call	ti.PutS
 .wait_key:
 	call	ti.GetCSC
-	cp	a,ti.skEnter
-	jr	z,.exit
-	cp	a,ti.skClear
-	jr	z,.exit
-	jr	.wait_key
+	cp	a, ti.skEnter
+	jr	z, .exit
+	cp	a, ti.skClear
+	jr	nz, .wait_key
 .exit:
 	call	ti.ClrScrn
 	call	ti.HomeUp
