@@ -759,12 +759,11 @@ gfx_FillRectangle:
 	ld	hl, (iy + 9)
 	sbc	hl, de
 	push	hl
-	ld	de, (iy + 6)
-	ld	hl, (iy + 12)
-	sbc	hl, de
+	ex	de, hl			; hl = new x
+	ld	e, (iy + 6)		; e = new y
+	ld	a, (iy + 12)
+	sub	a, e			; a = new height
 	pop	bc			; bc = new width
-	ld	a, l			; a = new height
-	ld	hl, (iy + 3)		; hl = new x, de = new y
 	jr	_FillRectangle_NoClip
 
 ;-------------------------------------------------------------------------------
@@ -782,6 +781,7 @@ gfx_FillRectangle_NoClip:
 	ld	bc, (iy + 9)		; bc = width
 	ld	a, b
 	or	a, c
+	; We don't need to check UBC since width >= 65536 would be undefined behavior
 	ret	z			; make sure width is not 0
 	ld	a, (iy + 12)		; a = height
 	or	a, a
@@ -796,9 +796,9 @@ _FillRectangle_NoClip:
 	ld	de, (CurrentBuffer)
 	add	hl, de
 	ex	de, hl			; de -> place to begin drawing
+	push	bc
+	pop	iy
 	push	de
-	ld	(.width1), bc
-	ld	(.width2), bc
 	ld	hl, _Color
 	wait_quick
 	ldi				; check if we only need to draw 1 pixel
@@ -814,8 +814,7 @@ _FillRectangle_NoClip:
 	add	hl, bc
 	dec	de
 	ex	de, hl
-.width1 = $ + 1
-	ld	bc, 0
+	lea	bc, iy
 	lddr
 	dec	a
 	ret	z
@@ -823,8 +822,7 @@ _FillRectangle_NoClip:
 	add	hl, bc
 	inc	de
 	ex	de, hl
-.width2 = $ + 1
-	ld	bc, 0
+	lea	bc, iy
 	ldir
 	ld	bc, (2 * ti.lcdWidth) - 1
 	dec	a
@@ -959,9 +957,9 @@ gfx_HorizLine_NoClip:
 	ld	iy, 0
 	add	iy, sp
 	ld	bc, (iy + 9)		; bc = length
-_HorizLine_NoClip_StackXY:
 	ld	a, b
 	or	a, c
+	; We don't need to check UBC since length >= 65536 would be undefined behavior
 	ret	z			; abort if length == 0
 _HorizLine_NoClip_NotDegen_StackXY:
 	ld	hl, (iy + 3)		; hl = x
@@ -1032,7 +1030,6 @@ gfx_VertLine_NoClip:
 _VertLine_NoClip_StackX:
 	xor	a, a
 	or	a, b
-_VertLine_NoClip_MaybeDegen_StackX:
 	ret	z			; abort if length == 0
 _VertLine_NoClip_NotDegen_StackX:
 	ld	hl, (iy + 3)		; hl = x
