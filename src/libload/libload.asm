@@ -301,14 +301,14 @@ optional_lib_clear:
 	ld	de, 0
 	ld	(hl), e			; mark optional library as not found
 	pop	hl
-	inc	hl			; skip version byte
+	ld	a, JP_OPCODE
+	; inc	hl			; skip version byte
 .loop:
-	ld	a, (hl)
-	cp	a, JP_OPCODE		; jp byte ($C3)
+	inc	hl
+	cp	a, (hl)			; jp byte ($C3)
 	jr	nz, .done
 	inc	hl
 	ld	(hl), de		; make the vector zero
-	inc	hl
 	inc	hl
 	inc	hl			; move to next jump
 	jr	.loop
@@ -445,12 +445,12 @@ enqueue_all_deps:			; we don't need to store anything if we are here
 	ex	de, hl
 .skip:
 	move_string_to_end
-	inc	hl			; move to start of dependency jump table
+	ld	a, JP_OPCODE
+	; inc	hl			; move to start of dependency jump table
 .next:
-	ld	a, (hl)
-	cp	a, JP_OPCODE
-	jr	nz, .loop
 	inc	hl
+	cp	a, (hl)			; jp byte ($C3)
+	jr	nz, .loop
 	inc	hl
 	inc	hl
 	inc	hl			; jp address
@@ -464,15 +464,15 @@ enqueue_all_deps:			; we don't need to store anything if we are here
 resolve_entry_points_enqueued:
 
 	ld	hl, (jump_tbl_ptr)	; hl->start of function jump table
+	ld	bc, 3
+	ld	a, JP_OPCODE
 .loop:
-	ld	a, (hl)
-	cp	a, JP_OPCODE		; jp byte ($C3)
+	cp	a, (hl)			; jp byte ($C3)
 	jr	nz, .done
 	inc	hl			; bypass jp byte ($C3)
 	push	hl
 	ld	hl, (hl)		; offset in vector table (0, 3, 6, etc.)
-	ld	bc, 3
-	call	ti._idivs		; originally the offset was just added because vectors were stored in three bytes,  now it is just 2 to save space
+	call	ti._idivu		; originally the offset was just added because vectors were stored in three bytes,  now it is just 2 to save space
 	add	hl, hl			; (offset/3) * 2
 	ld	de, (vector_tbl_ptr)	; hl->start of vector table
 	add	hl, de			; hl->correct vector entry
@@ -482,9 +482,7 @@ resolve_entry_points_enqueued:
 	ex	de, hl			; de->function in ram
 	pop	hl			; restore jump offset
 	ld	(hl), de		; de=resolved address
-	inc	hl
-	inc	hl
-	inc	hl			; move to next jump
+	add	hl, bc			; move to next jump
 	jr	.loop
 
 .done:					; finished resolving entry points
