@@ -24,7 +24,9 @@ enum {
     SRL_TYPE_HOST,    /**< Calc is acting as a device */
     SRL_TYPE_CDC,     /**< CDC device */
     SRL_TYPE_FTDI,    /**< FTDI device */
-    SRL_TYPE_PL2303   /**< PL2303 device */
+    SRL_TYPE_PL2303,  /**< PL2303 device */
+    SRL_TYPE_CH34X,   /**< CH34X device */
+    SRL_TYPE_CP210X   /**< CP210X device */
 };
 
 typedef uint8_t srl_device_type_t;
@@ -32,19 +34,50 @@ typedef uint8_t srl_device_type_t;
 enum {
     SRL_SUBTYPE_FTDI_UNKNOWN = 0,
     SRL_SUBTYPE_SIO,
-    SRL_SUBTYPE_FT8U232AM,
-    SRL_SUBTYPE_FT232BM,
+    SRL_SUBTYPE_FT232A,
+    SRL_SUBTYPE_FT232B,
     SRL_SUBTYPE_FT2232C,
-    SRL_SUBTYPE_FT232RL,
-    SRL_SUBTYPE_FTX,
+    SRL_SUBTYPE_FT232R,
+    SRL_SUBTYPE_FT232H,
     SRL_SUBTYPE_FT2232H,
     SRL_SUBTYPE_FT4232H,
-    SRL_SUBTYPE_FT232H,
+    SRL_SUBTYPE_FT4232HA,
+    SRL_SUBTYPE_FT232HP,
+    SRL_SUBTYPE_FT233HP,
+    SRL_SUBTYPE_FT2232HP,
+    SRL_SUBTYPE_FT2233HP,
+    SRL_SUBTYPE_FT4232HP,
+    SRL_SUBTYPE_FT4233HP,
+    SRL_SUBTYPE_FTX
 };
 
 enum {
     SRL_SUBTYPE_PL2303_01 = 0,
-    SRL_SUBTYPE_PL2303_HX,
+    SRL_SUBTYPE_PL2303_HX
+};
+
+enum {
+    SRL_SUBTYPE_CH340 = 0,
+    SRL_SUBTYPE_CH341
+};
+
+enum {
+    SRL_SUBTYPE_CP2101 = 0,
+    SRL_SUBTYPE_CP2102,
+    SRL_SUBTYPE_CP2103
+};
+
+enum {
+    BAUD_TYPE_UNKNOWN = 0,
+    BAUD_TYPE_HOST,
+    BAUD_TYPE_CDC,
+    BAUD_TYPE_FTDI_SIO,
+    BAUD_TYPE_FTDI_AM,
+    BAUD_TYPE_FTDI_BM,
+    BAUD_TYPE_FTDI_H,
+    BAUD_TYPE_PL2303,
+    BAUD_TYPE_CH34X,
+    BAUD_TYPE_CP210X
 };
 
 typedef uint8_t srl_device_subtype_t;
@@ -77,10 +110,14 @@ typedef struct {
     uint8_t tx_addr;
     srl_device_type_t type;
     srl_device_subtype_t subtype;
+    uint16_t idvendor;
+    uint16_t idproduct;
+    uint16_t bcddevice;
+    uint8_t baudtype;
     ring_buf_ctrl_t rx_buf;
     ring_buf_ctrl_t tx_buf;
     srl_error_t err;
-    uint8_t reserved[16];
+    uint8_t reserved[23];
 } srl_device_t;
 
 #define SRL_INTERFACE_ANY 0xFF
