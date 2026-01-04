@@ -187,7 +187,7 @@ jobs:
           security unlock-keychain -p $MACOS_KEYCHAIN_PWD build.keychain
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_KEYCHAIN_PWD build.keychain
-          /usr/bin/codesign --deep --force --verify --verbose --sign "$MACOS_CODESIGN_IDENT" --timestamp --options runtime $CEDEV_BIN/*
+          find "${CEDEV}" -type f -perm +111 -print0 | xargs -0 -I {} /usr/bin/codesign --deep --force --verify --verbose --sign "$MACOS_CODESIGN_IDENT" --timestamp --options runtime {}
 
       - name: "[macOS] Create the DMG"
         if: runner.os == 'macOS'
