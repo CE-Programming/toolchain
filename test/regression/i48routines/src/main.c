@@ -43,7 +43,8 @@ typedef void (*test_func_t)(regs_t *);
 void test_##ROUTINE(regs_t *regs)               \
 {                                               \
     asm volatile("ld\thl,(iy + %[af])\n\t"      \
-                 "push\tiy, hl\n\t"             \
+                 "push\tiy\n\t"                 \
+                 "push\thl\n\t"                 \
                  "pop\taf\n\t"                  \
                  "ld\thl, (iy + %[hl])\n\t"     \
                  "ld\tde, (iy + %[de])\n\t"     \
@@ -56,7 +57,8 @@ void test_##ROUTINE(regs_t *regs)               \
                  "ld\t(iy + %[de]), de\n\t"     \
                  "ld\t(iy + %[bc]), bc\n\t"     \
                  "push\taf\n\t"                 \
-                 "pop\thl, de\n\t"              \
+                 "pop\thl\n\t"                  \
+                 "pop\tde\n\t"                  \
                  "ld\t(iy + %[af]), hl\n\t"     \
                  "ld\t(iy + %[iy]), de\n\t"     \
     :                                           \

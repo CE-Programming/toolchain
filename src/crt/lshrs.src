@@ -1,13 +1,16 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lshrs
+	.section	.text
+	.global	__lshrs
+	.type	__lshrs, @function
+	.global	__lshrs.hijack_lshru
+	.type	__lshrs.hijack_lshru, @function
 
-if PREFER_OS_CRT
+.ifdef PREFER_CE_CRT
 
-__lshrs := 0001E8h
+	.set	__lshrs, 0x0001E8
 
-else
+.else
 
 __lshrs:
 ; Suboptimal for large shift amounts
@@ -22,10 +25,9 @@ __lshrs:
 	or	a, a
 	sbc	hl, hl
 	add	hl, sp
-.loop:
+.L.loop:
 	sra	a
-	public	__lshrs.hijack_lshru
-.hijack_lshru:
+__lshrs.hijack_lshru:
 	inc	hl
 	inc	hl
 	rr	(hl)
@@ -33,9 +35,9 @@ __lshrs:
 	rr	(hl)
 	dec	hl
 	rr	(hl)
-	djnz	.loop
+	djnz	.L.loop
 	pop	bc
 	pop	hl
 	ret
 
-end if
+.endif

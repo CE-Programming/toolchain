@@ -1,18 +1,24 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__ftoll
-	public	__ftoull
+	.global	__ftoll
+	.type	__ftoll, @function
+	.global	__ftoull
+	.type	__ftoull, @function
 
 ; __ftoll_c correctly handles all non-UB cases for both
 ; (long long)float and (unsigned long long)float
 __ftoll:
 __ftoull:
 	ld	d, a
-	push	iy, de, hl
+	push iy
+push de
+push hl
 	call	__ftoll_c
-	pop	af, af, iy
+	pop af
+pop af
+pop iy
 	ret
 
-	extern	__ftoll_c
+	.extern	__ftoll_c

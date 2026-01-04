@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llneg_fast
+	.section	.text
+	.global	__llneg_fast
+	.type	__llneg_fast, @function
+
 __llneg_fast:
 	push	de		; *spl=UDE
 	ex	de, hl		; ude=UHL, uhl=UDE

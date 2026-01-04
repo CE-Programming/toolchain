@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__signbitl
+	.global	__signbitl
+	.type	__signbitl, @function
 
 ; bool _signbitl(long double)
 __signbitl:

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llpopcnt_fast
+	.section	.text
+	.global	__llpopcnt_fast
+	.type	__llpopcnt_fast, @function
+
 __llpopcnt_fast:
 	; Destroys: HL, DE
 	call	__lpopcnt_fast
@@ -13,4 +15,4 @@ __llpopcnt_fast:
 	add	a, d
 	ret
 
-	extern	__lpopcnt_fast
+	.extern	__lpopcnt_fast

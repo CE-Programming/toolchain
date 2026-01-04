@@ -11,7 +11,8 @@ ARCHIVED = NO
 CFLAGS = -Wall -Wextra -Wconversion -Wformat=2 -std=c17 -Oz
 CXXFLAGS = -Wall -Wextra -Wconversion -Wformat=2 -std=c++20 -Oz
 
-PREFER_OS_LIBC = NO
+HAS_MATH_ERRNO = YES
+PREFER_CE_LIBC = NO
 
 # ----------------------------
 

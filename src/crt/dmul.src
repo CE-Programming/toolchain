@@ -1,16 +1,21 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__dmul
+	.global	__dmul
+	.type	__dmul, @function
 
 ; float64_t f64_mul(bool, float64_t, const float64_t*)
 __dmul:
-	push	af, iy
+	push	af
+	push	iy
 	ld	iy, 9
 	add	iy, sp	
 	
-	push	iy, bc, de, hl
+	push	iy
+	push	bc
+	push	de
+	push	hl
 	
 	ld	a, b	; signbit(x)
 	xor	a, (iy + 7)	; signbit(y)
@@ -19,8 +24,13 @@ __dmul:
 	
 	call	___f64_mul
 	
-	pop	af, af, af, af, af
-	pop	iy, af	; restore
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	iy
+	pop	af	; restore
 	ret
 
-	extern	___f64_mul
+	.extern	___f64_mul

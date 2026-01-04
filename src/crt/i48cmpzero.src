@@ -3,10 +3,12 @@
 ; Returns:
 ; z status flag set if ude:uhl == 0, s status flag set if ude:uhl is negative
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48cmpzero
+	.section	.text
+	.global	__i48cmpzero
+	.type	__i48cmpzero, @function
+
 __i48cmpzero:
 ; CC: 13 bytes
 ; Minimum:  8F + 3R + 2

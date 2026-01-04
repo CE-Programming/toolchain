@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_strnlen
+	.section	.text
+	.global	_strnlen
+	.type	_strnlen, @function
+
 _strnlen:
 	pop	hl
 	pop	de

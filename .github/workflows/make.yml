@@ -13,6 +13,7 @@ env:
   AUTOTESTER_ROM: ${{github.workspace}}/secrets/83pce_515_530.rom
   CEDEV: ${{github.workspace}}/CEdev
   CEDEV_BIN: ${{github.workspace}}/CEdev/bin
+  CEDEV_BINUTILS_BIN: ${{github.workspace}}/CEdev/binutils/bin
   CEDEV_EXAMPLES: ${{github.workspace}}/CEdev/examples
   CEDEV_TEST: ${{github.workspace}}/toolchain/test
   CEMU_PATH: ${{github.workspace}}/CEmu
@@ -32,40 +33,64 @@ jobs:
           - runs-on: macos-15-intel
             fasmg: /source/macos/x64/fasmg
             arch-suffix: "-intel"
-            ez80-bins-suffix: macOS_intel
+            llvm-project: ez80-clang-link_macOS_intel_nightly.zip
+            binutils-gdb: binutils_macos_intel_nightly.tar.gz
             install-output-ext: "dmg"
           - runs-on: macos-14
             fasmg: /source/macos/x64/fasmg
             arch-suffix: "-arm"
-            ez80-bins-suffix: macOS_arm
+            llvm-project: ez80-clang-link_macOS_arm_nightly.zip
+            binutils-gdb: binutils_macos_arm_nightly.tar.gz
             install-output-ext: "dmg"
           - runs-on: windows-latest
             fasmg: /fasmg.exe
-            ez80-bins-suffix: windows
+            llvm-project: ez80-clang-link_windows_nightly.zip
+            binutils-gdb: binutils_windows_nightly.zip
             env: "env:"
             exe: .exe
             nul: nul
             ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
             install-output-ext: "zip"
           - runs-on: ubuntu-22.04
-            ez80-bins-suffix: ubuntu
+            llvm-project: ez80-clang-link_ubuntu_nightly.zip
+            binutils-gdb: binutils_ubuntu_nightly.tar.gz
             fasmg: /fasmg.x64
             install-output-ext: "tar.gz"
+
     runs-on: ${{matrix.runs-on}}
     steps:
       - name: Prepare Build Environment
-        run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
+        run: |
+          cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
+          cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BINUTILS_BIN}}
+          cmake -E make_directory "${{env.CEDEV}}"
+          cmake -E make_directory "${{env.CEDEV_BIN}}"
 
       - name: Download ez80-clang and ez80-link
         id: ez80-bins
         uses: carlosperate/download-file-action@v2.0.2
         with:
-          file-url: https://github.com/CE-Programming/llvm-project/releases/download/nightly/ez80-clang-link_${{matrix.ez80-bins-suffix}}_nightly.zip
-      - name: Extract ez80-clang
-        uses: DuckSoft/extract-7z-action@v1.0
+          file-url: https://github.com/CE-Programming/llvm-project/releases/download/nightly/${{matrix.llvm-project}}
+      - name: Extract ez80-clang (Unix)
+        if: runner.os != 'Windows'
+        run: unzip -q "${{steps.ez80-bins.outputs.file-path}}" -d "${{env.CEDEV_BIN}}"
+      - name: Extract ez80-clang (Windows)
+        if: runner.os == 'Windows'
+        run: Expand-Archive -Path "${{steps.ez80-bins.outputs.file-path}}" -DestinationPath "${{env.CEDEV_BIN}}"
+        shell: pwsh
+
+      - name: Download binutils
+        id: binutils
+        uses: carlosperate/download-file-action@v2.0.2
         with:
-          pathSource: ${{steps.ez80-bins.outputs.file-path}}
-          pathTarget: ${{env.CEDEV_BIN}}
+          file-url: https://github.com/CE-Programming/binutils-gdb/releases/download/nightly/${{matrix.binutils-gdb}}
+      - name: Extract binutils (Unix)
+        if: runner.os != 'Windows'
+        run: tar -xzf "${{steps.binutils.outputs.file-path}}" -C "${{env.CEDEV}}"
+      - name: Extract binutils (Windows)
+        if: runner.os == 'Windows'
+        run: Expand-Archive -Path "${{steps.binutils.outputs.file-path}}" -DestinationPath "${{env.CEDEV}}"
+        shell: pwsh
 
       - name: Add fasmg website to /etc/hosts since DNS seems to be broken
         if: runner.os == 'macOS'
@@ -139,9 +164,14 @@ jobs:
           PREFIX: ${{github.workspace}}
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install V=1 DESTDIR=${{github.workspace}}
 
+      - name: Remove Fasmg
+        run: cmake -E rm -f ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
+
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
-        run: chmod +x ${{env.CEDEV_BIN}}/*
+        run: |
+          chmod +x ${{env.CEDEV_BIN}}/*
+          chmod +x ${{env.CEDEV_BINUTILS_BIN}}/*
 
       - name: "[macOS] CodeSign Toolchain binaries"
         if: runner.os == 'macOS' && github.repository == 'CE-Programming/toolchain' # don't run on forks, since they don't have secrets
@@ -461,4 +491,3 @@ jobs:
           token: ${{ secrets.CI_PAT_CLIBS_NIGHTLTY }}
           repository: CE-Programming/libraries
           event-type: ci-clibs-nightly
-

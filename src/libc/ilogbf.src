@@ -1,12 +1,15 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_ilogbf, _ilogb
+	.global	_ilogbf
+	.type	_ilogbf, @function
+	.global	_ilogb
+	.type	_ilogb, @function
 
 ; int ilogbf(float)
-_ilogb:
 _ilogbf:
+_ilogb:
 	ld	hl, 6
 	add	hl, sp
 	ld	a, (hl)
@@ -16,19 +19,19 @@ _ilogbf:
 	ld	hl, (hl)
 	add	hl, hl
 	adc	a, a
-	jr	z, .maybe_subnormal
+	jr	z, .L.maybe_subnormal
 	inc	a
-	jr	z, .inf_nan
+	jr	z, .L.inf_nan
 	sub	a, 128	; float32_bias + 1
 	sbc	hl, hl
 	ld	l, a
 	ret
 
-.maybe_subnormal:
+.L.maybe_subnormal:
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	z, .ret_zero
+	jr	z, .L.ret_zero
 	call	__ictlz
 	cpl
 	add	a, 130
@@ -36,9 +39,9 @@ _ilogbf:
 	ld	l, a
 	ret
 
-.inf_nan:
+.L.inf_nan:
 	scf
-.ret_zero:
+.L.ret_zero:
 	ld	hl, 4	; EDOM
 	ld	(_errno), hl
 	ld	hl, ___fe_cur_env
@@ -49,6 +52,6 @@ _ilogbf:
 	dec	hl
 	ret
 
-	extern	_errno
-	extern	___fe_cur_env
-	extern	__ictlz
+	.extern	_errno
+	.extern	___fe_cur_env
+	.extern	__ictlz

@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bpopcnt
+	.section	.text
+	.global	__bpopcnt
+	.type	__bpopcnt, @function
+
 __bpopcnt:
 	push	hl
 	ld	l, a

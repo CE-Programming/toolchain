@@ -1,32 +1,33 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__dtof
+	.global	__dtof
+	.type	__dtof, @function
 
-	private	__dtof_helper
+	.local	__dtof_helper
 __dtof_helper:
 	; Moving this block of code to be behind __dtof ensures that
-	; __dtof.ret_copysign can always be reached by jr in all paths.
-.overflow:
+	; .L.ret_copysign can always be reached by jr in all paths.
+.L.overflow:
 	; carry is set here
 	pop	hl
 	; A = $10
 	add	a, c	; attempts to overflow the low 4 bits of the exponent
 	rl	b	; (0x7F << 1) | 1 if the input is inf/NaN
 	inc	b	; B will only be zero if the input was inf/NaN
-	jr	nz, .not_inf_nan
+	jr	nz, .L.not_inf_nan
 
 	; carry is cleared
 	adc	hl, hl
-	jr	nz, .has_payload
+	jr	nz, .L.has_payload
 	ld	a, e
 	rla
 	and	a, $3F
-	jr	z, .no_payload
-.has_payload:
+	jr	z, .L.no_payload
+.L.has_payload:
 	set	5, e	; ensure that NaN stays NaN
-.no_payload:
+.L.no_payload:
 	ld	a, c
 	push	de
 	pop	bc
@@ -34,13 +35,13 @@ __dtof_helper:
 	call	__lshru
 	push	bc
 	pop	hl
-.finish_inf_nan:
+.L.finish_inf_nan:
 	ld	a, $7F
-	jr	__dtof.ret_copysign
-.not_inf_nan:
+	jr	.L.ret_copysign
+.L.not_inf_nan:
 	; return infinity
 	ld	hl, $800000
-	jr	.finish_inf_nan
+	jr	.L.finish_inf_nan
 
 ; Convert BC:UDE:UHL F64 to E:UHL F32
 ; Rounding: round to nearest with ties to even
@@ -61,11 +62,11 @@ __dtof:
 	res	7, b
 	ld	hl, -$3810
 	add.s	hl, bc
-	jr	nc, .maybe_subnormal
+	jr	nc, .L.maybe_subnormal
 	ld	hl, -$47F0	; $FFB810
 	ld	a, l		; ld a, $10
 	add.s	hl, bc
-	jr	c, __dtof_helper.overflow
+	jr	c, .L.overflow
 	; result is normal or rounds to infinity
 	; calculate new exponent
 	; we only need the low 8 bits of the exponent
@@ -86,36 +87,36 @@ __dtof:
 	ld	b, a
 	; test round bit
 	bit	4, e
-	jr	z, .round_down
+	jr	z, .L.round_down
 	; test guard bit
 	ld	a, e
 	and	a, $20
-	jr	nz, .round_up
+	jr	nz, .L.round_up
 	; test sticky bits
 	inc	a	; make A non-zero
 	adc	hl, hl
-	jr	nz, .round_up
+	jr	nz, .L.round_up
 	ld	a, e
 	rla
 	and	a, $1F
-.round_up:
-.round_down:
+.L.round_up:
+.L.round_down:
 	call	__llshru
 	; B, C, and UDE are zero here
 	or	a, a
-	jr	z, .no_round
+	jr	z, .L.no_round
 	inc	hl	; does not overflow
-.no_round:
+.L.no_round:
 	pop	af	; a = exponent + 1, flags = 29 = ---5H3V-C
 	sbc	a, b	; decrement exponent and clear carry
 	rra
-	jr	nc, .even_exponent
+	jr	nc, .L.even_exponent
 	ld	bc, $800000
 	add	hl, bc	; the result might be rounded to infinity here
 	adc	a, c	; adc a, 0 ; wont overflow
-.even_exponent:
-.subnormal_no_round:
-.ret_copysign:
+.L.even_exponent:
+.L.subnormal_no_round:
+.L.ret_copysign:
 	pop	de
 	ld	e, a
 	pop	bc
@@ -124,17 +125,17 @@ __dtof:
 	set	7, e
 	ret
 
-.ret_zero:
+.L.ret_zero:
 	; carry is cleared
 	pop	hl
 	xor	a, a
 	sbc	hl, hl
-	jr	.ret_copysign
+	jr	.L.ret_copysign
 
-.maybe_subnormal:
+.L.maybe_subnormal:
 	ld	hl, -$3690
 	add.s	hl, bc
-	jr	nc, .ret_zero
+	jr	nc, .L.ret_zero
 	; calculate shift
 	; A = (uint8_t)((BC - $3690) >> 4)
 	; A = (uint8_t)((HL << 4) >> 8)
@@ -153,17 +154,17 @@ __dtof:
 	; calculate sticky bits
 	sbc	hl, hl
 	inc	hl	; ld hl, 1
-.shift_loop:
+.L.shift_loop:
 	add	hl, hl
 	adc	a, a
-	djnz	.shift_loop
+	djnz	.L.shift_loop
 	; carry won't be set
 	; set C:UDE to A:UHL
 	; shift by an additional 24 bits
 	dec	hl
-	jr	z, .the_set_bit_is_in_hl
+	jr	z, .L.the_set_bit_is_in_hl
 	dec	a
-.the_set_bit_is_in_hl:
+.L.the_set_bit_is_in_hl:
 	ld	c, a
 	ld	a, e	; restore shift amount
 	ex	de, hl
@@ -182,9 +183,9 @@ __dtof:
 
 	; clear exponent and include the implicit mantissa bit
 	ld	d, 0
-	jr	z, .no_sticky_bits
+	jr	z, .L.no_sticky_bits
 	inc	d
-.no_sticky_bits:
+.L.no_sticky_bits:
 
 	ld	l, a	; L = shift
 	ld	a, e
@@ -203,17 +204,17 @@ __dtof:
 	rr	h
 	rr	l	; round bit shifted out
 
-	jr	nc, .subnormal_no_round
+	jr	nc, .L.subnormal_no_round
 	dec	d
-	jr	z, .subnormal_round_up
+	jr	z, .L.subnormal_round_up
 	bit	0, l
-	jr	z, .subnormal_no_round
-.subnormal_round_up:
+	jr	z, .L.subnormal_no_round
+.L.subnormal_round_up:
 	inc	hl	; wont overflow, but may become FLT_MIN
-; .subnormal_no_round:
-	jr	.ret_copysign
+; .L.subnormal_no_round:
+	jr	.L.ret_copysign
 
-	extern	__lland
-	extern	__llcmpzero
-	extern	__llshru
-	extern	__lshru
+	.extern	__lland
+	.extern	__llcmpzero
+	.extern	__llshru
+	.extern	__lshru

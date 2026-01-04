@@ -1,10 +1,16 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_strrchr
+	.section	.text
+	.global	_strrchr
+	.type	_strrchr, @function
+
 _strrchr:
-	pop	bc,hl,de
-	push	de,hl,bc
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
 	xor	a,a
 	ld	bc,0
 	cpir

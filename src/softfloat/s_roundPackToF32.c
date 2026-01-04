@@ -46,7 +46,9 @@ float32_t
     uint_fast8_t roundingMode;
     bool roundNearEven;
     uint_fast8_t roundIncrement, roundBits;
+    #if 0
     bool isTiny;
+    #endif
     uint_fast32_t uiZ;
     union ui32_f32 uZ;
 
@@ -69,9 +71,11 @@ float32_t
         if ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
+            #if 0
             isTiny =
                 (softfloat_detectTininess == softfloat_tininess_beforeRounding)
                     || (exp < -1) || (sig + roundIncrement < 0x80000000);
+            #endif
             sig = softfloat_shiftRightJam32( sig, -exp );
             exp = 0;
             roundBits = sig & 0x7F;
@@ -109,11 +113,12 @@ float32_t
     if ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
+ #if 0
  packReturn:
+ #endif
     uiZ = packToF32UI( sign, exp, sig );
  uiZ:
     uZ.ui = uiZ;
     return uZ.f;
 
 }
-

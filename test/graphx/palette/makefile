@@ -10,7 +10,8 @@ COMPRESSED = NO
 CFLAGS = -Wall -Wextra -Wshadow -Oz
 CXXFLAGS = -Wall -Wextra -Wshadow -Oz
 
-PREFER_OS_LIBC = NO
+HAS_MATH_ERRNO = YES
+PREFER_CE_LIBC = NO
 
 # ----------------------------
 

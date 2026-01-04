@@ -93,7 +93,6 @@ Use the `CEmu <https://ce-programming.github.io/CEmu>`_ emulator to run the buil
 .. tip::
 
     Antivirus software (e.g. Windows Defender) may flag binaries in the :code:`CEdev/bin` directory as false positives, and either quarantine/remove the files or prevent them from running.
-    This may result in build errors such as being unable find/execute `fasmg`.
     Please whitelist or disable scanning in :code:`CEdev/bin` to prevent these false positives from occurring.
 
 Project Structure

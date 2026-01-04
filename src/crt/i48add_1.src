@@ -3,11 +3,12 @@
 ; Returns:
 ; ude:uhl = ude:uhl + 1
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
+	.global	__i48add_1
+	.type	__i48add_1, @function
 
-	public	__i48add_1
 __i48add_1:
 ; CC: 8 bytes
 ; HL != -1: 7F + 3R + 2

@@ -7,10 +7,11 @@
 ; Returns (loaded into other registers by i48divu/s and i48remu/s):
 ; ude:uhl quotient, uiy:ubc remainder
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48dvrmu
+	.section	.text
+	.global	__i48dvrmu
+	.type	__i48dvrmu, @function
 
 __i48dvrmu:
 	; backup af
@@ -35,7 +36,7 @@ __i48dvrmu:
 	sbc	hl, hl		; uhl = low remainder
 	exx
 	pop	bc		; ubc' = dividend/quotient pointer
-	lea	de, iy		; ude' = iy = high divisor
+	lea	de, iy + 0		; ude' = iy = high divisor
 	sbc	hl, hl		; uhl' = high remainder
 .byteLoop:
 	dec	bc

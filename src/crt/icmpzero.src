@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__icmpzero
+	.section	.text
+	.global	__icmpzero
+	.type	__icmpzero, @function
+
 __icmpzero:
 	add	hl, de
 	or	a, a

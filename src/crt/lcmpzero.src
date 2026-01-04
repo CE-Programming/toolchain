@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lcmpzero
+	.section	.text
+	.global	__lcmpzero
+	.type	__lcmpzero, @function
+
 __lcmpzero:
 	inc	e
 	dec	e

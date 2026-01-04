@@ -7,10 +7,12 @@
 ; Returns:
 ; ude:uhl = ude:uhl * uiy:ubc
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48mulu
+	.section	.text
+	.global	__i48mulu
+	.type	__i48mulu, @function
+
 __i48mulu:
 ; CC: 202*r(PC)+51*r(SPL)+35*w(SPL)+85
 ; CC: 201 bytes | 202F + 51R + 35W + 85

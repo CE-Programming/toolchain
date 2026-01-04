@@ -1,31 +1,34 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__bdvrms_abs
+	.section	.text
+	.global	__bdvrms_abs
+	.type	__bdvrms_abs, @function
+
 __bdvrms_abs:
 ; I: C=divisor, L=dividend
 ; O: a=?, h=abs(L)%abs(C), l=abs(L)/abs(C)
 
 	ld	a, l
-	public	__bdvrms_abs.hijack_a_l_dividend
-.hijack_a_l_dividend:
+	.global	__bdvrms_abs.hijack_a_l_dividend
+	.type	__bdvrms_abs.hijack_a_l_dividend, @function
+__bdvrms_abs.hijack_a_l_dividend:
 	rla
-	jr	nc, .neg_dividend_skip
+	jr	nc, .L.neg_dividend_skip
 	xor	a, a
 	sub	a, l
 	ld	l, a
-.neg_dividend_skip:
+.L.neg_dividend_skip:
 
 	push	bc
 
 	ld	a, c
 	rla
-	jr	nc, .neg_divisor_skip
+	jr	nc, .L.neg_divisor_skip
 	xor	a, a
 	sub	a, c
 	ld	c, a
-	jr	nc, .neg_dividend_skip
-.neg_divisor_skip:
+	jr	nc, .L.neg_dividend_skip
+.L.neg_divisor_skip:
 
 	call	__bdvrmu.hijack_l_dividend
 
@@ -33,4 +36,4 @@ __bdvrms_abs:
 	ret
 
 
-	extern	__bdvrmu.hijack_l_dividend
+	.extern	__bdvrmu.hijack_l_dividend

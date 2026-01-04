@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lcmps_fast
+	.section	.text
+	.global	__lcmps_fast
+	.type	__lcmps_fast, @function
+
 __lcmps_fast:
 	ld	d, a
 	ld	a, e

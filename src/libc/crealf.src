@@ -1,12 +1,19 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_crealf, _creal
+	.global	_crealf
+	.type	_crealf, @function
+	.global	_creal
+	.type	_creal, @function
 
 ; float crealf(float _Complex)
 _crealf:
 _creal:
-	pop	bc, hl, de
-	push	de, hl, bc
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
 	ret

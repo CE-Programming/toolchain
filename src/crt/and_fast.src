@@ -1,15 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__land_fast
+	.section	.text
+	.global	__land_fast
+	.global	__iand_fast
+	.global	__sand_fast
+
 __land_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	and	a, e
 	ld	e, a
-	require	__iand_fast
-
-	section	.text
-	public	__iand_fast
 __iand_fast:
 ; CC: 22*r(PC)+8*r(SPL)+7*w(SPL)+1
 	push	hl
@@ -25,10 +24,6 @@ __iand_fast:
 	and	a, (hl)
 	ld	(hl), a
 	pop	hl
-	require	__sand_fast
-
-	section	.text
-	public	__sand_fast
 __sand_fast:
 ; CC: 8*r(PC)+3*r(SPL)+1
 	ld	a, h

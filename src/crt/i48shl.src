@@ -3,10 +3,12 @@
 ; Returns:
 ; ude:uhl = ude:uhl<<c
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48shl
+	.section	.text
+	.global	__i48shl
+	.type	__i48shl, @function
+
 __i48shl:
 	push	bc
 	ld	b, a

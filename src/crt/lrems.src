@@ -1,15 +1,16 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lrems
+	.section	.text
+	.global	__lrems
+	.type	__lrems, @function
 
-;if PREFER_OS_CRT
+;.ifdef PREFER_CE_CRT
 ;
 ; Bug: Does not ensure `nc` before `sbc hl, hl` to negate divisor.
 ;
-; __lrems := 0001DCh
+; .set	__lrems, 0x0001DC
 ;
-;else
+;.else
 
 __lrems:
 ; I: EUHL=dividend, AUBC=divisor
@@ -28,8 +29,8 @@ __lrems:
 	ret	z
 	jp	__lneg
 
-	extern	__ldivs_lrems_common
-	extern	__lneg
-	extern	__lremu
+	.extern	__ldivs_lrems_common
+	.extern	__lneg
+	.extern	__lremu
 
-;end if
+;.endif

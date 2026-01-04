@@ -16,17 +16,22 @@
 
 include $(CURDIR)/../common.mk
 
-BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
+OBJECTS =
+OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
+OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
+OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
 
-EZCFLAGS := -S -fno-addrsig -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
-EZCFLAGS += -D_EZ80 -isystem ../libc/include -isystem ../ce/include -isystem ../fileioc -mllvm -profile-guided-section-prefix=false
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
-EZCXXFLAGS += -isystem ../libcxx/include
-
-WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
 WILDCARD_H := $(wildcard include/*)
 
-all: $(BUILD_SRC)
+CXX_LIB := build/libcxx.a
+
+.SECONDARY:
+
+all: $(CXX_LIB)
+
+$(CXX_LIB): $(OBJECTS)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
 
 build/%.c.src: %.c
 	$(Q)$(call MKDIR,build)
@@ -36,6 +41,18 @@ build/%.cpp.src: %.cpp
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZCC) $(EZCXXFLAGS) $< -o $@
 
+build/%.c.o: build/%.c.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.cpp.o: build/%.cpp.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.o: %.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
 clean:
 	$(Q)$(call RMDIR,build)
 
@@ -43,7 +60,7 @@ install: all
 	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call MKDIR,$(INSTALL_CXX_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
-	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_LIBCXX))
+	$(Q)$(call COPY,$(call NATIVEPATH,$(CXX_LIB)),$(INSTALL_LIBCXX))
 	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_CXX_H))
 
-.PHONY: all clean
+.PHONY: all clean install

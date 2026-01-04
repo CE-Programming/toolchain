@@ -1,10 +1,12 @@
 ; ---
 ; enables / disables homescreen text buffering which can destroy bss / heap
 ; ---
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_os_DisableHomeTextBuffer
+	.section	.text._os_DisableHomeTextBuffer
+	.global	_os_DisableHomeTextBuffer
+	.type	_os_DisableHomeTextBuffer, @function
+
 _os_DisableHomeTextBuffer:
 	ld	iy,$d00080
 	res	1,(iy + $0d)	; no text buffer
@@ -12,12 +14,13 @@ _os_DisableHomeTextBuffer:
 	set	5,(iy + $4c)	; only display
 	ret
 
-	section	.text
-	public	_os_EnableHomeTextBuffer
+	.section	.text._os_EnableHomeTextBuffer
+	.global	_os_EnableHomeTextBuffer
+	.type	_os_EnableHomeTextBuffer, @function
+
 _os_EnableHomeTextBuffer:
 	ld	iy,$d00080
 	set	1,(iy + $0d)	; use text buffer
 	res	3,(iy + $4a)	; use first shadow buffer
 	res	5,(iy + $4c)	; use shadow buffer
 	ret
-

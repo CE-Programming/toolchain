@@ -1,0 +1,19 @@
+	.assume	adl=1
+
+	.section	.text.__f32_fast_div4
+
+	.global	__f32_fast_div4
+	.type	__f32_fast_div4, @function
+
+; float _f32_fast_div4(float x);
+; only works for normalized values
+; CC: 9F + 12R + 9W + 1 | 8 bytes
+__f32_fast_div4:
+	pop	bc
+	pop	hl
+	pop	de
+	dec	e	; subtracts 2 from the exponent
+	push	de
+	push	hl
+	push	bc
+	ret

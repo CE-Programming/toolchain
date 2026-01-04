@@ -375,18 +375,18 @@ int main(void) {
     os_ClrHome();
     int comparison_result = basic_test();
     if (comparison_result != 0) {
-        char buf[sizeof("Failed test L-8388608\n")];
-        boot_sprintf(buf, "Failed test L%d\n", comparison_result);
-        fputs(buf, stdout);
+        char buf[sizeof("Failed test L-8388608")];
+        boot_sprintf(buf, "Failed test L%d", comparison_result);
+        puts(buf);
     } else {
         int64_t fail_ulp = 0;
         size_t fail_index = run_test(&fail_ulp);
         if (fail_index == SIZE_MAX) {
-            fputs("All tests passed", stdout);
+            puts("All tests passed");
         } else {
-            char buf[sizeof("Failed test: 16777215\n")];
-            boot_sprintf(buf, "Failed test: %u\n", fail_index);
-            fputs(buf, stdout);
+            char buf[sizeof("Failed test: 16777215")];
+            boot_sprintf(buf, "Failed test: %u", fail_index);
+            puts(buf);
             #if 0
                 /* debugging */
                 printf("ULP: %lld\n", fail_ulp);

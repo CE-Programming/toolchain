@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lladd_b_fast
+	.section	.text
+	.global	__lladd_b_fast
+	.type	__lladd_b_fast, @function
+
 __lladd_b_fast:
 	add	a, l		; a=L+A
 	ld	l, a		; l=L+A

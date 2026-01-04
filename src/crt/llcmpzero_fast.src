@@ -1,18 +1,20 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__llcmpzero_fast
+	.section	.text
+	.global	__llcmpzero_fast
+	.type	__llcmpzero_fast, @function
+
 __llcmpzero_fast:
 	xor	a, a
 	add	a, b
 	ret	nz
 	cp	a, c
-	jr	nz, .p_nz
+	jr	nz, .L.p_nz
 	mlt	bc
 	adc	hl, bc
-	jr	nz, .p_nz
+	jr	nz, .L.p_nz
 	adc	hl, de
 	ret	z
-.p_nz:
+.L.p_nz:
 	inc	a
 	ret

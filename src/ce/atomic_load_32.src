@@ -1,30 +1,32 @@
 ; ---
 ; uint32_t atomic_load_32(volatile uint32_t *p)
 ; ---
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_atomic_load_32
+	.section	.text
+	.global	_atomic_load_32
+	.type	_atomic_load_32, @function
+
 _atomic_load_32:
 	pop	hl
-	ex	(sp),iy
+	ex	(sp), iy
 	push	hl
-	ld	c,0
-retry:
+	ld	c, 0
+.L.retry:
 ; Wait for a different (increasing) amount of time before each retry to prevent
 ; getting caught in an endless loop of the value changing between reads with a
 ; fixed period equal to the amount of time it takes for each retry
 	inc	c
 	ld	b,c
-wait:
-	djnz	wait
+.L.wait:
+	djnz	.L.wait
 ; Read the value twice.
-	lea	hl,iy+3
+	lea	hl, iy+3
 					; Time between first and last byte read:
-	ld	de,(iy)			;      2R
-	ld	a,(hl)			; + 1F+1R
-	cp	a,(hl)			; + 1F+1R
-	ld	hl,(iy)			; + 3F+3R
+	ld	de, (iy)			;      2R
+	ld	a, (hl)			; + 1F+1R
+	cp	a, (hl)			; + 1F+1R
+	ld	hl, (iy)			; + 3F+3R
 					; = 5F+7R
 					; = 48cc (assuming F = R = 3)
 					; = 1us (assuming 48MHz clock speed)
@@ -52,10 +54,10 @@ wait:
 ;
 ; (Furthermore, if a change occurs in the middle of both 32-bit reads and the
 ; bytes already read change in both, then both values read become invalid.)
-	jr	nz,retry
-	sbc	hl,de
-	jr	nz,retry
+	jr	nz, .L.retry
+	sbc	hl, de
+	jr	nz, .L.retry
 ; Values don't differ, good to go.
-	add	hl,de
-	ld	e,a			; euhl = value read
+	add	hl, de
+	ld	e, a			; euhl = value read
 	ret

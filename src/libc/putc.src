@@ -1,9 +1,0 @@
-	assume	adl=1
-
-	section	.text
-
-	public	_putc
-
-_putc := _fputc
-
-	extern	_fputc

@@ -1,9 +1,10 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 	
-	public	__isnormalf
-	
+	.global	__isnormalf
+	.type	__isnormalf, @function
+
 ; bool _isnormalf(float)
 __isnormalf:
 	ld	hl, 5

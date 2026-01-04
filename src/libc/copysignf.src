@@ -1,7 +1,10 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_copysign, _copysignf
+	.section	.text
+	.global	_copysign
+	.type	_copysign, @function
+	.global	_copysignf
+	.type	_copysignf, @function
 
 _copysign:
 _copysignf:

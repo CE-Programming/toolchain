@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_zx7_Decompress
+	.section	.text
+	.global	_zx7_Decompress
+	.type	_zx7_Decompress, @function
+
 _zx7_Decompress:
 	pop	bc
 	pop	de

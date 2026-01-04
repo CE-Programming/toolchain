@@ -1,210 +1,206 @@
-	assume	adl=1
+	.assume	adl=1
 
-define ti? ti
-namespace ti?
-?Mov9b                     := 00202FCh
-?Mov8b                     := 0020304h
-?Mov9ToOP1                 := 0020320h
-?MovFROP1                  := 002032Ch
-?MemChk                    := 00204FCh
-?ChkFindSym                := 002050Ch
-?InsertMem                 := 0020514h
-?EnoughMem                 := 002051Ch
-?DelMem                    := 0020590h
-?PopRealO1                 := 00205DCh
-?ErrNotEnoughMem           := 002072Ch
-?ErrMemory                 := 0020768h
-?JError                    := 0020790h
-?PushErrorHandler          := 0020798h
-?PopErrorHandler           := 002079Ch
-?ParseInp                  := 0020F00h
-?GetParse                  := 0020F0Ch
-?SaveParse                 := 0020F10h
-?DisableAPD                := 0021134h
-?SetParserHook             := 002149Ch
-?ClrParserHook             := 00214A0h
-?DeleteTempPrograms        := 00214C0h
-?ForceFullScreen           := 0021528h
-?LoadDEInd_s               := 0021D9Ch
-?ChkInRam                  := 0021F98h
-?flags                     := 0D00080h
-?tempSP                    := 0D0053Fh
-?kbdGetKy                  := 0D0058Dh
-?OP1                       := 0D005F8h
-?errNo                     := 0D008DFh
-?appErr2                   := 0D025B6h
-?parserHookPtr             := 0D025F9h
-?pixelShadow               := 0D031F6h
-?asm_prgm_size             := 0D0118Ch
-?userMem                   := 0D1A881h
-?cursorImage               := 0E30800h
-?tExtTok                   := 0EFh
-?ProgObj                   := 005h
-?tAsm84CeCmp               := 07Bh
-?tAsm84CePrgm              := 07Ah
+	.set	ti.Mov9b                    , 0x0202FC
+	.set	ti.Mov8b                    , 0x020304
+	.set	ti.Mov9ToOP1                , 0x020320
+	.set	ti.MovFROP1                 , 0x02032C
+	.set	ti.MemChk                   , 0x0204FC
+	.set	ti.ChkFindSym               , 0x02050C
+	.set	ti.InsertMem                , 0x020514
+	.set	ti.EnoughMem                , 0x02051C
+	.set	ti.DelMem                   , 0x020590
+	.set	ti.PopRealO1                , 0x0205DC
+	.set	ti.ErrNotEnoughMem          , 0x02072C
+	.set	ti.ErrMemory                , 0x020768
+	.set	ti.JError                   , 0x020790
+	.set	ti.PushErrorHandler         , 0x020798
+	.set	ti.PopErrorHandler          , 0x02079C
+	.set	ti.ParseInp                 , 0x020F00
+	.set	ti.GetParse                 , 0x020F0C
+	.set	ti.SaveParse                , 0x020F10
+	.set	ti.DisableAPD               , 0x021134
+	.set	ti.SetParserHook            , 0x02149C
+	.set	ti.ClrParserHook            , 0x0214A0
+	.set	ti.DeleteTempPrograms       , 0x0214C0
+	.set	ti.ForceFullScreen          , 0x021528
+	.set	ti.LoadDEInd_s              , 0x021D9C
+	.set	ti.ChkInRam                 , 0x021F98
+	.set	ti.flags                    , 0xD00080
+	.set	ti.tempSP                   , 0xD0053F
+	.set	ti.kbdGetKy                 , 0xD0058D
+	.set	ti.OP1                      , 0xD005F8
+	.set	ti.errNo                    , 0xD008DF
+	.set	ti.appErr2                  , 0xD025B6
+	.set	ti.parserHookPtr            , 0xD025F9
+	.set	ti.pixelShadow              , 0xD031F6
+	.set	ti.asm_prgm_size            , 0xD0118C
+	.set	ti.userMem                  , 0xD1A881
+	.set	ti.cursorImage              , 0xE30800
+	.set	ti.tExtTok                  , 0xEF
+	.set	ti.ProgObj                  , 0x05
+	.set	ti.tAsm84CeCmp              , 0x7B
+	.set	ti.tAsm84CePrgm             , 0x7A
+	.set	ti.hookflags4               , 0x36
+	.set	ti.parserHookActive         , 0x1
+	.set	ti.ParsFlag2                , 0x7
+	.set	ti.numOP1                   , 0x0
+	.set	ti.newDispF                 , 0x8
+	.set	ti.allowProgTokens          , 0x1
+	.set	ti.progExecuting            , 0x1
+	.set	ti.cmdFlags                 , 0xC
+	.set	ti.cmdExec                  , 0x6
+	.set	ti.onFlags                  , 0x9
+	.set	ti.onInterrupt              , 0x4
+	.set	ti.textFlags                , 0x5
+	.set	ti.textEraseBelow           , 0x1
+	.set	ti.textScrolled             , 0x2
+	.set	ti.textInverse              , 0x3
 
-?hookflags4                := 36h
-?parserHookActive          := 1
+	.section	.text._os_RunPrgm
+	.global	_os_RunPrgm
+	.type	_os_RunPrgm, @function
 
-?ParsFlag2                 := 7h
-?numOP1                    := 0
-?newDispF                  := 08h
-?allowProgTokens           := 1
-?progExecuting             := 1
-?cmdFlags                  := 0Ch
-?cmdExec                   := 6
-?onFlags                   := 09h
-?onInterrupt               := 4
-?textFlags                 := 05h
-?textEraseBelow            := 1
-?textScrolled              := 2
-?textInverse               := 3
-end namespace
-
-	section	.text
-	public	_os_RunPrgm
 _os_RunPrgm:
-	require	___prgm_run_check
-	ld	iy,ti.flags
+	ld	hl, ___runprgm_reloc_start
+	ld	de, ti.cursorImage
+	ld	bc, ___runprgm_reloc_len
+	ldir
+	ld	iy, ti.flags
 	pop	de
 	pop	hl
 	push	hl
 	push	de
-	ld	a,ti.ProgObj
-	ld	de,___prgm_to_run - reloc.offset
-	ld	(de),a
+	ld	a, ti.ProgObj
+	ld	de, ___prgm_to_run
+	ld	(de), a
 	inc	de
 	call	ti.Mov8b
-	ld	hl,___prgm_caller
-	ld	de,stub.prgm - reloc.offset
+	ld	hl, ___prgm_caller
+	ld	de, stub.prgm
 	call	ti.Mov9b
-	ld	hl,___prgm_to_run - reloc.offset
-	call	find_prgm - reloc.offset
-	jr	nc,.found
-	sbc	hl,hl
+	ld	hl, ___prgm_to_run
+	call	find_prgm
+	jr	nc, .L.found_prgm
+	sbc	hl, hl
 	ret
-.found:
-	ld	a,(ti.OP1)
-	ld	(___prgm_to_run - reloc.offset),a
-	ld	(___prgm_to_run_size - reloc.offset),de
-	ld	a,(hl)
-	cp	a,ti.tExtTok
-	jr	nz,run_basic_prgm
+.L.found_prgm:
+	ld	a, (ti.OP1)
+	ld	(___prgm_to_run), a
+	ld	(___prgm_to_run_size), de
+	ld	a, (hl)
+	cp	a, ti.tExtTok
+	jr	nz, .L.run_basic_prgm
 	inc	hl
-	ld	a,(hl)
-	cp	a,ti.tAsm84CeCmp
-	jr	z,run_asm_prgm
-	;jr	run_basic_prgm
+	ld	a, (hl)
+	cp	a, ti.tAsm84CeCmp
+	jr	z, .L.run_asm_prgm
+	;jr	.L.run_basic_prgm
 
-run_basic_prgm:
-	call	push_user_data
-	ld	hl,reloc.data
-	ld	de,ti.cursorImage
-	ld	bc,reloc.data.len
-	ldir
+.L.run_basic_prgm:
+	call	.L.push_user_data
 	jp	launch_basic_prgm
 
-run_asm_prgm:
+.L.run_asm_prgm:
 	inc	hl
-	ld	a,(hl)			; if 0, indicates a C program with retval
-	sbc	hl,hl
-	or	a,a
-	jr	nz,.not_c
-	ld	(stub.basic_c_smc - reloc.offset),hl
-.not_c:
-	ld	l,64
-	add	hl,de
-	ld	de,(ti.asm_prgm_size)
-	sbc	hl,de
-	jr	c,.enough_mem
+	ld	a, (hl)			; if 0, indicates a C program with retval
+	sbc	hl, hl
+	or	a, a
+	jr	nz, .L.not_c
+	ld	(stub.basic_c_smc), hl
+.L.not_c:
+	ld	l, 64
+	add	hl, de
+	ld	de, (ti.asm_prgm_size)
+	sbc	hl, de
+	jr	c, .L.enough_mem
 	call	ti.EnoughMem
-	jr	nc,.enough_mem
-	sbc	hl,hl
+	jr	nc, .L.enough_mem
+	sbc	hl, hl
 	dec	hl
 	ret
-.enough_mem:
-	call	push_user_data
-	ld	hl,reloc.data
-	ld	de,ti.cursorImage
-	ld	bc,reloc.data.len
-	ldir
+.L.enough_mem:
+	call	.L.push_user_data
 	jp	launch_asm_prgm
 
-push_user_data:
-	ld	iy,3			; exit() doesn't unwind stack so "safe"
-	add	iy,sp
-	ld	hl,(iy + 12)		; callback
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	ld	de,stub.callback - reloc.offset
-	jr	nz,.has_callback
+.L.push_user_data:
+	ld	iy, 3			; exit() doesn't unwind stack so "safe"
+	add	iy, sp
+	ld	hl, (iy + 12)		; callback
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	ld	de, stub.callback
+	jr	nz, .L.has_callback
 	dec	de
-	ld	hl,((-(stub.callback - stub.error + 1)) shl 8) or $18	; jr stub.error
-.has_callback:
-	ex	de,hl
-	ld	(hl),de
-	ld	bc,(iy + 9)
-	ld	(push_stub.data_size - reloc.offset),bc
-	ld	hl,(_exit.sp)
-	or	a,a
-	sbc	hl,bc			; resets carry
+	ld	hl, ((-(stub.callback - stub.error + 1)) << 8) | $18	; jr stub.error
+.L.has_callback:
+	ex	de, hl
+	ld	(hl), de
+	ld	bc, (iy + 9)
+	ld	(push_stub.data_size), bc
+	ld	hl, (_exit.sp)
+	or	a, a
+	sbc	hl, bc			; resets carry
 	push	hl
 	pop	de
 	dec	hl
 	dec	hl
 	dec	hl
-	ld	(_exit.sp),hl
-	sbc	hl,hl
-	adc	hl,bc			; resets carry
-	ld	hl,(iy + 6)
+	ld	(_exit.sp), hl
+	sbc	hl, hl
+	adc	hl, bc			; resets carry
+	ld	hl, (iy + 6)
 	pop	iy
 	di				; disable to prevent modifying moved stack data
-	jr	z,.done_move
-	sbc	hl,de
-	jr	c,.lddr
-	add	hl,de
+	jr	z, .L.done_move
+	sbc	hl, de
+	jr	c, .L.lddr
+	add	hl, de
 	ldir
-	jr	.done_move
-.lddr:
-	ex	de,hl
-	add	hl,bc
+	jr	.L.done_move
+.L.lddr:
+	ex	de, hl
+	add	hl, bc
 	dec	hl
-	ex	de,hl
-	add	hl,de
+	ex	de, hl
+	add	hl, de
 	lddr
-.done_move:
-	ld	hl,(_exit.sp)
-	ld	(hl),iy			; fake return
-	ld	iy,ti.flags
-	or	a,a
-	sbc	hl,hl
-	jq	___exithl		; should return to caller
+.L.done_move:
+	ld	hl, (_exit.sp)
+	ld	(hl), iy		; fake return
+	ld	iy, ti.flags
+	or	a, a
+	sbc	hl, hl
+	jp	___exithl		; should return to caller
 
-virtual at ti.cursorImage
+; ---------------------------------------------------------------
+; relocated functions
+; ---------------------------------------------------------------
+
+	.section .runprgm.reloc, "awx", @progbits
 launch_asm_prgm:
 	call	delete_running_prgm
 	call	setup_prgm_state
 	call	push_stub
-	ld	de,(___prgm_to_run_size)
-	ld	hl,ti.userMem
-	ex	hl,de
+	ld	de, (___prgm_to_run_size)
+	ld	hl, ti.userMem
+	ex	de, hl
 	call	ti.InsertMem
-	ld	hl,___prgm_to_run
+	ld	hl, ___prgm_to_run
 	call	find_prgm
-	jr	c,.fatal
+	jr	c, .L.fatal
 	inc	hl
 	inc	hl
-	ld	de,ti.userMem
-	ld	bc,(___prgm_to_run_size)
-	ld	(ti.asm_prgm_size),bc
+	ld	de, ti.userMem
+	ld	bc, (___prgm_to_run_size)
+	ld	(ti.asm_prgm_size), bc
 	ldir
-	ld	hl,___prgm_to_run
+	ld	hl, ___prgm_to_run
 	call	ti.Mov9ToOP1
 	jp	ti.userMem
-.fatal:
-	ld	de,(___prgm_to_run_size)
-	ld	hl,ti.userMem
+.L.fatal:
+	ld	de, (___prgm_to_run_size)
+	ld	hl, ti.userMem
 	call	ti.DelMem
 	jp	ti.ErrMemory
 
@@ -213,270 +209,256 @@ launch_basic_prgm:
 	call	setup_temp_parser_hook
 	call	setup_prgm_state
 	call	push_stub
-	ld	hl,___prgm_to_run
-	set	ti.allowProgTokens,(iy + ti.newDispF)
-	set	ti.cmdExec,(iy + ti.cmdFlags)
+	ld	hl, ___prgm_to_run
+	set	ti.allowProgTokens, (iy + ti.newDispF)
+	set	ti.cmdExec, (iy + ti.cmdFlags)
 	call	ti.Mov9ToOP1
 	jp	ti.ParseInp
 
 setup_save_parser_hook:
-	or	a,a
-	sbc	hl,hl
-	bit	ti.parserHookActive,(iy + ti.hookflags4)
-	jr	z,.not_set
-	ld	hl,(ti.parserHookPtr)
-.not_set:
-	ld	(stub.prev_hook),hl
+	or	a, a
+	sbc	hl, hl
+	bit	ti.parserHookActive, (iy + ti.hookflags4)
+	jr	z, .L.not_set
+	ld	hl, (ti.parserHookPtr)
+.L.not_set:
+	ld	(stub.prev_hook), hl
 	ret
 
 setup_prgm_state:
 	call	setup_save_parser_hook
-	xor	a,a
-	ld	(ti.kbdGetKy),a
-	ld	a,$ce			; set
-	bit	ti.allowProgTokens,(iy + ti.newDispF)
-	jr	nz,.setAllowProgTokens
-	res	ti.numOP1,(iy + ti.ParsFlag2)
-	ld	a,$8e			; res
-.setAllowProgTokens:
-	ld	(stub.flags.newDispF),a
-	ld	a,$f6			; set
-	bit	ti.cmdExec,(iy + ti.cmdFlags)
-	jr	nz,.setCmdExec
-	ld	a,$b6			; res
-.setCmdExec:
-	ld	(stub.flags.cmdFlags),a
+	xor	a, a
+	ld	(ti.kbdGetKy), a
+	ld	a, 0xCE			; set
+	bit	ti.allowProgTokens, (iy + ti.newDispF)
+	jr	nz, .L.setAllowProgTokens
+	res	ti.numOP1, (iy + ti.ParsFlag2)
+	ld	a, 0x8E			; res
+.L.setAllowProgTokens:
+	ld	(stub.flags.newDispF), a
+	ld	a, 0xF6			; set
+	bit	ti.cmdExec, (iy + ti.cmdFlags)
+	jr	nz, .L.setCmdExec
+	ld	a, 0xB6			; res
+.L.setCmdExec:
+	ld	(stub.flags.cmdFlags), a
 	jp	ti.DisableAPD
 
 setup_temp_parser_hook:
-	bit	ti.parserHookActive,(iy + ti.hookflags4)
-	jr	nz,.chain_hook
-.no_chain:
-	ld	hl,stub.chain
-	ld	(hl),$af		; xor a,a
+	bit	ti.parserHookActive, (iy + ti.hookflags4)
+	jr	nz, .L.chain_hook
+.L.no_chain:
+	ld	hl, stub.chain
+	ld	(hl), 0xAF		; xor a,a
 	inc	hl
-	ld	(hl),$c9		; ret
+	ld	(hl), 0xC9		; ret
 	ret
-.chain_hook:
-	ld	hl,(ti.parserHookPtr)
-	ld	a,(hl)
-	cp	a,$83
-	jr	nz,.no_chain		; ensure the hook is valid
-	ld	(stub.chain + 1),hl
-	xor	a,a
-	ld	(push_stub.skip_parser_hook_jr),a
+.L.chain_hook:
+	ld	hl, (ti.parserHookPtr)
+	ld	a, (hl)
+	cp	a, 0x83
+	jr	nz, .L.no_chain		; ensure the hook is valid
+	ld	(stub.chain + 1), hl
+	xor	a, a
+	ld	(push_stub.skip_parser_hook_jr), a
 	ret
 
 delete_running_prgm:
-	ld	iy,ti.flags
-	ld	hl,ti.userMem
-	ld	de,(ti.asm_prgm_size)
+	ld	iy, ti.flags
+	ld	hl, ti.userMem
+	ld	de, (ti.asm_prgm_size)
 	call	ti.DelMem
-	or	a,a
-	sbc	hl,hl
-	ld	(ti.asm_prgm_size),hl
+	or	a, a
+	sbc	hl, hl
+	ld	(ti.asm_prgm_size), hl
 	ret
 
 push_stub:
 	pop	hl
-	ld	(.ret),hl
-	ld	hl,stub.prgm
+	ld	(push_stub.ret), hl
+	ld	hl, stub.prgm
 	call	find_prgm
-	ld	(.stub_prgm_size),de
-	ld	(.prev_sp),sp
-	ld	hl,-9
-	add	hl,sp
-	ld	sp,hl
-	ld	(.stub_prgm),hl
-	ex	de,hl
-	ld	hl,stub.prgm
-	ld	bc,9
+	ld	(push_stub.stub_prgm_size), de
+	ld	(push_stub.prev_sp), sp
+	ld	hl, -9
+	add	hl, sp
+	ld	sp, hl
+	ld	(push_stub.stub_prgm), hl
+	ex	de, hl
+	ld	hl, stub.prgm
+	ld	bc, 9
 	ldir
-	ld	hl,-(stub.len - 9)
-	add	hl,sp
-	ld	sp,hl
-	ld	(.stub_normal),hl
+	ld	hl, -(stub.len - 9)
+	add	hl, sp
+	ld	sp, hl
+	ld	(push_stub.stub_normal), hl
 	push	hl
-	ld	bc,stub.error_handler - stub.normal
-	add	hl,bc
-	ld	(.stub_error_handler),hl
+	ld	bc, stub.error_handler - stub.normal
+	add	hl, bc
+	ld	(push_stub.stub_error_handler), hl
 	pop	hl
-	jr	.skip_parser_hook
-.skip_parser_hook_jr := $-1
+	jr	.L.skip_parser_hook
+.equ	push_stub.skip_parser_hook_jr, $-1
 	push	hl
-	ld	bc,stub.hook_parser - stub.normal
-	add	hl,bc
+	ld	bc, stub.hook_parser - stub.normal
+	add	hl, bc
 	call	ti.SetParserHook
 	pop	hl
-.skip_parser_hook:
-	ex	de,hl
-	ld	hl,stub
-	ld	bc,stub.len
+.L.skip_parser_hook:
+	ex	de, hl
+	ld	hl, stub
+	ld	bc, stub.len
 	ldir
-	ld	hl,0
-.prev_sp := $-3
+	ld	hl, 0
+.equ	push_stub.prev_sp, $-3
 	push	hl
 	ld	hl,0
-.data_size := $-3
+.equ	push_stub.data_size, $-3
 	push	hl
-	ld	hl,0
-.stub_prgm := $-3
+	ld	hl, 0
+.equ	push_stub.stub_prgm, $-3
 	push	hl
-	ld	hl,0
-.stub_prgm_size := $-3
+	ld	hl, 0
+.equ	push_stub.stub_prgm_size, $-3
 	push	hl
 	call	ti.SaveParse
-	ld	hl,0
-.stub_error_handler := $-3
+	ld	hl, 0
+.equ	push_stub.stub_error_handler, $-3
 	call	ti.PushErrorHandler
-	ld	hl,0
-.stub_normal := $-3
+	ld	hl, 0
+.equ	push_stub.stub_normal, $-3
 	push	hl
 	jp	0
-.ret := $-3
+.equ	push_stub.ret, $-3
 
 find_prgm:
 	call	ti.Mov9ToOP1
 	call	ti.ChkFindSym
 	ret	c
 	call	ti.ChkInRam
-	ex	de,hl
-	jr	z,.in_ram
-	ld	de,9
-	add	hl,de
-	ld	e,(hl)
-	add	hl,de
+	ex	de, hl
+	jr	z, .L.prgm_in_ram
+	ld	de, 9
+	add	hl, de
+	ld	e, (hl)
+	add	hl, de
 	inc	hl
-.in_ram:
+.L.prgm_in_ram:
 	call	ti.LoadDEInd_s
-	or	a,a
+	or	a, a
 	ret
 
 stub:
-.normal:
-	xor	a,a
-	sbc	hl,hl
-.basic_c_smc := $-3
-	ld	(ti.cursorImage),hl
-	ld	iy,ti.flags
+stub.normal:
+	xor	a, a
+	sbc	hl, hl
+.equ	stub.basic_c_smc, $-3
+	ld	(ti.cursorImage), hl
+	ld	iy, ti.flags
 	call	ti.PopErrorHandler
-	jr	.no_error
-.error_handler:
-	or	a,a
-	sbc	hl,hl
-	ld	l,a
-	ld	(ti.cursorImage),hl
-.no_error:
-	ld	iy,ti.flags
-	set	ti.allowProgTokens,(iy + ti.newDispF)
-.flags.newDispF := $-1
-	set	ti.cmdExec,(iy + ti.cmdFlags)
-.flags.cmdFlags := $-1
-	res	ti.textInverse,(iy + ti.textFlags)
-	res	ti.onInterrupt,(iy + ti.onFlags)
-	res	ti.numOP1,(iy + ti.ParsFlag2)
+	jr	.L.no_error
+stub.error_handler:
+	or	a, a
+	sbc	hl, hl
+	ld	l, a
+	ld	(ti.cursorImage), hl
+.L.no_error:
+	ld	iy, ti.flags
+	set	ti.allowProgTokens, (iy + ti.newDispF)
+.equ	stub.flags.newDispF, $-1
+	set	ti.cmdExec, (iy + ti.cmdFlags)
+.equ	stub.flags.cmdFlags, $-1
+	res	ti.textInverse, (iy + ti.textFlags)
+	res	ti.onInterrupt, (iy + ti.onFlags)
+	res	ti.numOP1, (iy + ti.ParsFlag2)
 	call	ti.ClrParserHook
-	ld	hl,0
-.prev_hook := $-3
-	ld	a,(hl)
-	cp	a,$83
-	call	z,ti.SetParserHook
-	ld	hl,(ti.asm_prgm_size)
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	ex	de,hl
-	ld	hl,ti.userMem
-	call	nz,ti.DelMem
+	ld	hl, 0
+.equ	stub.prev_hook, $-3
+	ld	a, (hl)
+	cp	a, $83
+	call	z, ti.SetParserHook
+	ld	hl, (ti.asm_prgm_size)
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	ex	de, hl
+	ld	hl, ti.userMem
+	call	nz, ti.DelMem
 	call	ti.PopRealO1
 	call	ti.GetParse
-	pop	de		; size of return program -- shouldn't change?
+	pop	de			; size of return program -- shouldn't change?
 	push	de
 	call	ti.ErrNotEnoughMem
 	pop	hl
-	ld	(ti.asm_prgm_size),hl
-	ld	de,ti.userMem
+	ld	(ti.asm_prgm_size), hl
+	ld	de, ti.userMem
 	call	ti.InsertMem
-	pop	hl		; stub program to return
+	pop	hl			; stub program to return
 	call	ti.Mov9ToOP1
 	call	ti.ChkFindSym
-	jr	nc,.found
-.error:
+	jr	nc, .L.found
+stub.error:
 	pop	bc
 	pop	hl
-	add	hl,bc
-	ld	sp,hl		; os should delete created program
+	add	hl, bc
+	ld	sp, hl			; os should delete created program
 	ret
-.hook_parser:
-	db	$83		; hook signifier
-	cp	a,2
-	jr	nz,.chain
-	ld	a,$d9 - $ce	; check if stop token
-	sub	a,b
-	jp	z,ti.JError
-	ld	a,2
-.chain:
-	jp	0		; xor a,a \ ret if not chaining
-.found:
+stub.hook_parser:
+	db	0x83			; hook signifier
+	cp	a, 2
+	jr	nz, stub.chain
+	ld	a, 0xD9 - 0xCE		; check if stop token
+	sub	a, b
+	jp	z, ti.JError
+	ld	a, 2
+stub.chain:
+	jp	0			; xor a,a \ ret if not chaining
+.L.found:
 	call	ti.ChkInRam
-	ex	de,hl
-	jr	z,.in_ram
-	ld	de,9
-	add	hl,de
-	ld	e,(hl)
-	add	hl,de
+	ex	de, hl
+	jr	z, .L.in_ram
+	ld	de, 9
+	add	hl, de
+	ld	e, (hl)
+	add	hl, de
 	inc	hl
-.in_ram:
-	inc	hl
-	inc	hl
+.L.in_ram:
 	inc	hl
 	inc	hl
-	ld	bc,(ti.asm_prgm_size)
-	ld	de,ti.userMem
+	inc	hl
+	inc	hl
+	ld	bc, (ti.asm_prgm_size)
+	ld	de, ti.userMem
 	ldir
 	ld	de,0
-.callback := $-3
+.equ	stub.callback, $-3
 	pop	bc			; data size
 	pop	hl			; data
 	di
-	ld	sp,hl
+	ld	sp, hl
 	push	bc
 	push	de			; push callback address
 	scf
-	ld	hl,(ti.cursorImage)
+	ld	hl, (ti.cursorImage)
 	push	hl			; push retval
-	sbc	hl,hl
+	sbc	hl, hl
 	push	hl			; return of -1 should never occur
 	jp	ti.userMem
-	rb	3			; padding bytes for sp change
-.prgm:
-	rb	9
-.len := $-stub
+	.zero	3			; padding bytes for sp change
+stub.prgm:
+	.zero	9
+.equ	stub.len, $-stub
 
 ___prgm_to_run:
-	rb	9
+	.zero	9
 ___prgm_to_run_size:
-	dl	0
+	.d24	0
 
-	private	reloc_rodata
-load reloc_rodata: $-$$ from $$
-end virtual
-
-	section	.data
-	private	reloc.data
-	private	reloc.data.len
-reloc.data:
-	db	reloc_rodata
-.len := $-.
-reloc.base := ti.cursorImage
-reloc.offset := reloc.base - reloc.data
-
-	section	.data
-	public	___prgm_caller
+	section	.data.___prgm_caller
+	.global	___prgm_caller
 ___prgm_caller:
-	rb	9
+	.zero	9
 
-	extern	___exithl
-	extern	_exit.sp
-	extern	_exit.offset
-	extern	___prgm_run_check
+	.extern	___exithl
+	.extern	_exit.sp
+	.extern	_exit.offset

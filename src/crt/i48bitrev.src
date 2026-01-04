@@ -3,10 +3,12 @@
 ; Returns:
 ; ude:uhl = ude:uhl bits reversed
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48bitrev
+	.section	.text
+	.global	__i48bitrev
+	.type	__i48bitrev, @function
+
 __i48bitrev:
 	push	af
 	ld	a, l				; a=L
@@ -27,4 +29,4 @@ __i48bitrev:
 	pop	af
 	ret
 
-	extern	__internal_bitrev_two_bytes
+	.extern	__internal_bitrev_two_bytes

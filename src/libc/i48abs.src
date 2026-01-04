@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_i48abs
+	.global	_i48abs
+	.type	_i48abs, @function
 
 ; int48_t i48abs(int48_t)
 _i48abs:
@@ -21,4 +22,4 @@ _i48abs:
 	; positive
 	ret
 
-	extern	__i48neg
+	.extern	__i48neg

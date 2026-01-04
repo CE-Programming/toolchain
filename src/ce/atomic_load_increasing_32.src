@@ -1,42 +1,44 @@
 ; ---
 ; uint32_t atomic_load_increasing_32(volatile uint32_t *p)
 ; ---
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_atomic_load_increasing_32
+	.section	.text
+	.global	_atomic_load_increasing_32
+	.type	_atomic_load_increasing_32, @function
+
 _atomic_load_increasing_32:
 ; CC: 202 + 9 * read_1_invalid + 3 * ie
 ; Timing assumes fetching from RAM (4cc) and reading from non-RAM (3cc).
 
 ; Read the argument.
 	pop	hl
-	ex	(sp),iy			; iy = p
+	ex	(sp), iy			; iy = p
 	push	hl
 ; ^ 48 cc
 ; Temporarily disable interrupts.
-	ld	a,i
+	ld	a, i
 	di
 ; ^ 12 cc
 ; Read from the pointer twice: first into cude, second into auhl.
 					; Time between first and last byte read:
-	ld	de,(iy)			;         2R
+	ld	de, (iy)			;         2R
 ; ^ 21 cc
 ; 48 + 12 + 21 - 6 = 75 cc until first value captured if valid
-	ld	c,(iy+3)		;  + 3F + 1R
-	ld	hl,(iy)			;  + 3F + 3R
+	ld	c, (iy+3)		;  + 3F + 1R
+	ld	hl, (iy)			;  + 3F + 3R
 ; ^ 36 cc
 ; 48 + 12 + 21 + 36 - 5 = 112 cc until second value captured if valid
-	ld	a,(iy+3)		;  + 3F + 1R
+	ld	a, (iy+3)		;  + 3F + 1R
 					; == 9F + 7R
 					; == 57 cc
 					;  + 9 * 19 cc = 171 cc (worst-case DMA)
 					; = 228 cc
 ; ^ 15 cc
 ; Re-enable interrupts if they were previously enabled.
-	jp	po,no_ei
+	jp	po, .L.no_ei
 	ei
-no_ei:
+.L.no_ei:
 ; ^ 17 + 3 * ie cc
 ; Compare and return the lesser of the two values read.
 ;
@@ -81,24 +83,24 @@ no_ei:
 ;
 ; Combining all of these cases and assumptions, the lesser of the two values
 ; read will always be valid.
-	or	a,a
-	sbc	hl,de
-	sbc	a,c			; auhl = second value read
+	or	a, a
+	sbc	hl, de
+	sbc	a, c			; auhl = second value read
 					;         - first value read
 ; ^ 16 cc
-	jr	c,no_swap
+	jr	c, .L.no_swap
 ; second value read >= first value read
 ;  ==> first value read is valid
-	ex	de,hl
-	ld	e,c			; euhl = first value read
+	ex	de, hl
+	ld	e, c			; euhl = first value read
 	ret
 ; ^ 37 cc
 
-no_swap:
+.L.no_swap:
 ; second value read < first value read
 ;  ==> second value read is valid
-	add	hl,de
-	adc	a,c
-	ld	e,a			; euhl = second value read
+	add	hl, de
+	adc	a, c
+	ld	e, a			; euhl = second value read
 	ret
 ; ^ 46 cc (including conditional jr into)

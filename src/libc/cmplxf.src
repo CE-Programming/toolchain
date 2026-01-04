@@ -1,13 +1,17 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_CMPLXF, _CMPLX
+	.global	_CMPLXF
+	.type	_CMPLXF, @function
+	.global	_CMPLX
+	.type	_CMPLX, @function
 
 ; float _Complex CMPLXF(float x, float y) /* struct ABI */
 _CMPLXF:
 _CMPLX:
-	pop	iy, de
+	pop	iy
+	pop	de
 	or	a, a
 	sbc	hl, hl
 	add	hl, sp

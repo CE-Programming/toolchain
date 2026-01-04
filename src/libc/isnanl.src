@@ -1,24 +1,30 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__isnanl
+	.global	__isnanl
+	.type	__isnanl, @function
 
 ; bool _isnanl(long double)
 __isnanl:
-	pop	bc, hl, de
+	pop	bc
+	pop	hl
+	pop	de
 	or	a, a
 	adc	hl, de
 	pop	de
-	push	bc, bc, bc, bc
+	push	bc
+	push	bc
+	push	bc
+	push	bc
 	ld	a, e
-	jr	nz, .mant_nonzero	; normal, subnormal, or NaN
-	jr	c, .mant_nonzero	; normal, subnormal, or NaN
+	jr	nz, .L.mant_nonzero	; normal, subnormal, or NaN
+	jr	c, .L.mant_nonzero	; normal, subnormal, or NaN
 	; common NaN, inf, normal, or subnormal
 	or	a, a
 	ret	z
 	dec	a
-.mant_nonzero:
+.L.mant_nonzero:
 	add	a, 16	; overflows 0xF0
 	sbc	a, a
 	ret	z

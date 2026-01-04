@@ -16,16 +16,23 @@
 
 include $(CURDIR)/../common.mk
 
-BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
+OBJECTS =
+OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
+OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
+OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
 
-EZCFLAGS := -S -fno-addrsig -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
-EZCFLAGS += -D_EZ80 -isystem ../libc/include -mllvm -profile-guided-section-prefix=false
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
-EZCXXFLAGS += -isystem ../libc/include/c++
+OBJECTS_CE =
+OBJECTS_CE += $(patsubst %.c,build/%.c.ce.o,$(wildcard *.c))
+OBJECTS_CE += $(patsubst %.cpp,build/%.cpp.ce.o,$(wildcard *.cpp))
+OBJECTS_CE += $(patsubst %.src,build/%.ce.o,$(wildcard *.src))
 
-WILDCARD_SRC = $(wildcard *.src) $(BUILD_SRC)
+.SECONDARY:
 
-all: $(BUILD_SRC)
+all: build/libcrt.a build/libcrt_ce.a
+
+build/libcrt.a: $(OBJECTS)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
 
 build/%.c.src: %.c
 	$(Q)$(call MKDIR,build)
@@ -35,11 +42,51 @@ build/%.cpp.src: %.cpp
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZCC) $(EZCXXFLAGS) $< -o $@
 
+build/%.c.o: build/%.c.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.cpp.o: build/%.cpp.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+build/%.o: %.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) $< -o $@
+
+# -----
+
+build/libcrt_ce.a: $(OBJECTS_CE)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
+
+build/%.c.ce.src: %.c
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCFLAGS) $< -o $@
+
+build/%.cpp.ce.src: %.cpp
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZCC) $(EZCXXFLAGS) $< -o $@
+
+build/%.c.ce.o: build/%.c.ce.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_CRT=1 $< -o $@
+
+build/%.cpp.ce.o: build/%.cpp.ce.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_CRT=1 $< -o $@
+
+build/%.ce.o: %.src
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_CRT=1 $< -o $@
+
 clean:
 	$(Q)$(call RMDIR,build)
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_CRT))
-	$(Q)$(call COPY,$(call NATIVEPATH,$(WILDCARD_SRC)),$(INSTALL_CRT))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/libcrt.a),$(INSTALL_CRT))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/libcrt_ce.a),$(INSTALL_CRT))
+	$(Q)$(call COPY,$(call NATIVEPATH,crt0.S),$(INSTALL_CRT))
 
-.PHONY: all clean
+.PHONY: all clean install

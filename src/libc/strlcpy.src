@@ -1,7 +1,7 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_strlcpy
+	.section	.text
+	.global	_strlcpy
 
 ; BSD variant of strncpy that ensures the destination is null-terminated.
 ; OpenBSD reference: https://github.com/openbsd/src/blob/master/lib/libc/string/strlcpy.c
@@ -10,7 +10,7 @@
 _strlcpy:
 
 	ld iy, 0
-	lea bc, iy ; set bc to 0
+	lea bc, iy + 0 ; set bc to 0
 	add iy, sp
 
 	; do min(strlen(src), dsize-1)
@@ -44,14 +44,14 @@ _strlcpy:
 	sbc hl, de
 
 	; if hl > de, strlen(src) > (dsize - 1); string is truncated, keep bc as dsize
-	jr nc, .ready_for_ldir
+	jr nc, _strlcpy.ready_for_ldir
 
 	; hl <= de, so strlen(src) <= (dsize - 1); string is not truncated, set bc to strlen(src) + 1
 	pop bc
 	push bc
 	inc bc
 
-.ready_for_ldir:
+_strlcpy.ready_for_ldir:
 	ld de, (iy + 3) ; put dst in de
 	ld hl, (iy + 6) ; put src in hl
 	; bc is filled already and greater than 0

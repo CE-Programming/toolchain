@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__brems
+	.section	.text
+	.global	__brems
+	.type	__brems, @function
+
 __brems:
 ; I: A=dividend, C=divisor
 ; O: a=A%C
@@ -22,4 +24,4 @@ __brems:
 	ret
 
 
-	extern	__bdvrms_abs.hijack_a_l_dividend
+	.extern	__bdvrms_abs.hijack_a_l_dividend

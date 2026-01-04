@@ -40,7 +40,7 @@
 
 #define TEST(test) { ret = test; if (ret != 0) { return ret; }}
 
-#define TEST_NAME(test, name) { ret = test; if (ret != 0) { fputs(name "\n", stdout); return ret; }}
+#define TEST_NAME(test, name) { ret = test; if (ret != 0) { puts(name); return ret; }}
 
 #define NO_ERR 0
 
@@ -572,11 +572,11 @@ int main(void) {
     os_ClrHome();
     int failed_test = run_tests();
     if (failed_test != 0) {
-        char buf[sizeof("Failed test L-8388608\n")];
-        boot_sprintf(buf, "Failed test L%d\n", failed_test);
-        fputs(buf, stdout);
+        char buf[sizeof("Failed test L-8388608")];
+        boot_sprintf(buf, "Failed test L%d", failed_test);
+        puts(buf);
     } else {
-        fputs("All tests passed", stdout);
+        puts("All tests passed");
     }
 
     while (!os_GetCSC());

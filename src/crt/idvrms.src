@@ -1,7 +1,8 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__idvrms
+	.section	.text
+	.global	__idvrms
+	.type	__idvrms, @function
 
 __idvrms:
 ; I: UHL=dividend, UBC=divisor
@@ -16,20 +17,20 @@ __idvrms:
 	ccf
 	sbc	hl, bc
 	inc	hl
-	jp	m, .neg_divisor_skip
+	jp	m, .L.neg_divisor_skip
 	cpl
 	push	hl
 	pop	bc
-.neg_divisor_skip:
+.L.neg_divisor_skip:
 
 	sbc	hl, hl
 	ccf
 	sbc	hl, de
 	inc	hl
-	jp	p, .pos_dividend_skip
+	jp	p, .L.pos_dividend_skip
 	cpl
 	ex	de, hl
-.pos_dividend_skip:
+.L.pos_dividend_skip:
 
 	call	__idvrmu
 
@@ -43,5 +44,5 @@ __idvrms:
 	ret	nz
 	jp	__ineg
 
-	extern	__idvrmu
-	extern	__ineg
+	.extern	__idvrmu
+	.extern	__ineg

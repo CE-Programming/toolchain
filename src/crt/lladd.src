@@ -1,7 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__lladd
+	.section	.text
+	.global	__lladd
+	.type	__lladd, @function
+
 __lladd:
 	push	iy
 	ld	iy, 0
@@ -14,11 +16,11 @@ __lladd:
 	adc	hl, bc
 	ex	de, hl
 	pop	bc
-	jr	nc, .nc48
+	jr	nc, .L.nc48
 	inc	bc
-.nc48:
+.L.nc48:
 	ld	iy, (iy + 12)
 	add	iy, bc
-	lea	bc, iy
+	lea	bc, iy + 0
 	pop	iy
 	ret

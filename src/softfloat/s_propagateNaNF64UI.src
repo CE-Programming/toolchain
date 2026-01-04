@@ -1,8 +1,8 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	_softfloat_propagateNaNF64UI
+	.global	_softfloat_propagateNaNF64UI
 
 ; at least one of the arguments is NaN
 ; returns x if it is NaN, otherwise returns y
@@ -33,6 +33,6 @@ _softfloat_propagateNaNF64UI:
 	pop	ix
 	ret
 
-	extern	__isnanl
-	extern	__frameset0
-	extern	___fe_cur_env
+	.extern	__isnanl
+	.extern	__frameset0
+	.extern	___fe_cur_env

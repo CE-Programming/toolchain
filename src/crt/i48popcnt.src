@@ -3,10 +3,12 @@
 ; Returns:
 ; a = number of set bits in ude:uhl
 
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	__i48popcnt
+	.section	.text
+	.global	__i48popcnt
+	.type	__i48popcnt, @function
+
 __i48popcnt:
 	push	hl
 	push	de
@@ -36,4 +38,4 @@ __i48popcnt:
 	pop	hl
 	ret
 
-	extern	__popcnt_common_init_full, __popcnt_common_iter_adjusted
+	.extern	__popcnt_common_init_full, __popcnt_common_iter_adjusted

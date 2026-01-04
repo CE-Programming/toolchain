@@ -21,7 +21,8 @@ include $(CURDIR)/src/common.mk
 
 LIBS := libload graphx fontlibc keypadc fileioc usbdrvce srldrvce msddrvce fatdrvce lcddrvce
 SRCS := ce crt libc libcxx softfloat
-TOOLS := fasmg convbin convimg convfont cedev-config
+TOOLS := fasmg convbin convimg convfont cedev-config cedev-obj
+
 
 ifeq ($(OS),Windows_NT)
 WINDOWS_COPY := $(call COPY,resources\windows\make.exe,$(INSTALL_BIN)) && $(call COPY,resources\windows\cedev.bat,$(INSTALL_DIR))
@@ -44,7 +45,6 @@ $(LIBS): fasmg
 	$(Q)$(MAKE) -C $(call SRCDIR,$@)
 
 install: all $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
-	$(Q)$(MAKE) -f linker.mk -C src -B
 	$(Q)$(call MKDIR,$(INSTALL_DIR))
 	$(Q)$(call MKDIR,$(INSTALL_BIN))
 	$(Q)$(call MKDIR,$(INSTALL_H))
@@ -55,14 +55,12 @@ install: all $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
 	$(Q)$(call MKDIR,$(INSTALL_EXAMPLES))
 	$(Q)$(call COPYDIR,$(call NATIVEPATH,examples/*),$(INSTALL_EXAMPLES))
 	$(Q)$(call COPY,$(call NATIVEPATH,src/makefile.mk),$(INSTALL_META))
-	$(Q)$(call COPY,$(call NATIVEPATH,src/linker_script),$(INSTALL_META))
-	$(Q)$(call COPY,$(call NATIVEPATH,tools/fasmg/fasmg-ez80/commands.alm),$(INSTALL_META))
-	$(Q)$(call COPY,$(call NATIVEPATH,tools/fasmg/fasmg-ez80/ez80.alm),$(INSTALL_META))
-	$(Q)$(call COPY,$(call NATIVEPATH,tools/fasmg/fasmg-ez80/ld.alm),$(INSTALL_META))
+	$(Q)$(call COPY,$(call NATIVEPATH,src/linker_script.ld),$(INSTALL_META))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convfont/convfont),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convimg/bin/convimg),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/convbin/bin/convbin),$(INSTALL_BIN))
 	$(Q)$(call COPY,$(call NATIVEEXE,tools/cedev-config/bin/cedev-config),$(INSTALL_BIN))
+	$(Q)$(call COPY,$(call NATIVEEXE,tools/cedev-obj/bin/cedev-obj),$(INSTALL_BIN))
 	$(Q)$(WINDOWS_COPY)
 
 $(addprefix install-,$(SRCS)): $(TOOLS)
@@ -73,14 +71,13 @@ $(addprefix install-,$(LIBS)): $(TOOLS)
 
 libs: $(LIBS) $(TOOLS)
 	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract \
-		$(foreach library,$(LIBS),$(addprefix --input ,$(call SRCDIR,$(library))/$(library).8xv)) --output $(call NATIVEPATH,clibs.8xg)
+		$(foreach library,$(LIBS),$(addprefix --input ,$(call SRCDIR,$(library))/$(library).8xv)) --output clibs.8xg
 
 libs-zip:
 	$(Q)$(call MKDIR,clibs)
 	$(Q)$(foreach library,$(LIBS),$(call COPY,$(call NATIVEPATH,$(call SRCDIR,$(library))/$(library).8xv),clibs) &&) $(call NATIVEEXE,7z) a clibs_separately_in_zip.zip clibs
 
 clean: $(addprefix clean-,$(TOOLS)) $(addprefix clean-,$(SRCS)) $(addprefix clean-,$(LIBS))
-	$(Q)$(call REMOVE,src/linker_script)
 	$(Q)$(call REMOVE,clibs.8xg)
 	$(Q)$(call RMDIR,docs/build)
 	$(Q)$(call RMDIR,docs/doxygen)

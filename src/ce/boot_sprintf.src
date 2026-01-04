@@ -1,9 +1,0 @@
-	assume	adl=1
-
-	section	.text
-
-; to reduce binary size (or performance in the case of sprintf), ti's routines
-; can be linked instead of the toolchain's routines
-
-	public	_boot_sprintf
-_boot_sprintf := 0000BCh

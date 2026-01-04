@@ -1,12 +1,14 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
-	public	_isascii
+	.section	.text
+	.global	_isascii
+	.type	_isascii, @function
+
 _isascii:
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
 	sla	l
-	sbc	hl,hl
+	sbc	hl, hl
 	inc	hl
 	ret

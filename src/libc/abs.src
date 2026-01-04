@@ -1,7 +1,8 @@
-	assume	adl=1
+	.assume	ADL=1
 
-	section	.text
-	public	_abs
+	.section	.text
+	.global	_abs
+	.type	_abs,@function
 _abs:
 	pop	hl
 	pop	de
