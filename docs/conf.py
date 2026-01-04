@@ -1,7 +1,7 @@
 import subprocess, os
 
 project = 'CE C/C++ Toolchain'
-copyright = '2015-2024 CE Programming'
+copyright = '2015-2026 CE Programming'
 author = 'CE Programming'
 
 current_version = os.environ['current_version']
