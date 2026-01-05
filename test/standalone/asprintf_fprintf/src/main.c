@@ -114,6 +114,9 @@ void *T_memmove(void *dest, const void *src, size_t n)
 void *T_mempcpy(void *__restrict dest, const void *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
 
+void *T_memchr(const void *s, int c, size_t n)
+    __attribute__((nonnull(1)));
+
 void *T_memrchr(const void *s, int c, size_t n)
     __attribute__((nonnull(1)));
 
@@ -187,6 +190,7 @@ char *T_strtok_r(char *__restrict s, const char *__restrict delim, char **__rest
 #define T_memmem memmem
 #define T_memmove memmove
 #define T_mempcpy mempcpy
+#define T_memchr memchr
 #define T_memrchr memrchr
 #define T_memrmem memrmem
 #define T_memset memset
@@ -1465,6 +1469,53 @@ int strtok_test(void) {
 
         C(T_memcmp(str, truth_str, sizeof(truth_str)) == 0);
     }
+    return 0;
+}
+
+int mem65536_test(void) {
+    void fill_mem32(void *dst, size_t bytes, uint32_t pattern);
+
+    uint8_t * const dst = (uint8_t*)0xD40000;
+    const size_t screen_size = 320 * 240 * 2;
+    memset(dst, 0, screen_size);
+    const size_t B16 = 65536;
+    const size_t B17 = 131072;
+
+    /* test return values */
+
+    C(T_memcpy(SINK, SINK, B16) == SINK);
+    C(T_memcpy(SINK, SINK, B17) == SINK);
+
+    C(T_memmove(SINK, SINK, B16) == SINK);
+    C(T_memmove(SINK, SINK, B17) == SINK);
+
+    C(T_memmove(SINK + 16, SINK, B16) == SINK + 16);
+    C(T_memmove(SINK + 16, SINK, B17) == SINK + 16);
+
+    C(T_memmove(SINK, SINK + 16, B16) == SINK);
+    C(T_memmove(SINK, SINK + 16, B17) == SINK);
+
+    /* test memcpy and memmove when size is a non-zero multiple of 65536 */
+
+    fill_mem32(dst + screen_size - B16, B16, 0x78563412);
+    C(T_memcpy(dst + 32, dst + screen_size - B16, B16) == dst + 32);
+    C(T_memchr(dst, 0x00, 32) == dst);
+    C(T_memchr(dst, 0x12, 32) == NULL_ptr);
+    C(T_memchr(dst, 0x12, 33) == dst + 32);
+    C(T_memrchr(dst, 0x78, 32 + B16 + 32) == dst + 32 + B16 - 1);
+    const uint32_t pattern_1 = 0xA3A0A1A0;
+    const uint32_t pattern_2 = 0xFECDAB89;
+    fill_mem32(dst, 32, pattern_1);
+    fill_mem32(dst + 24576, B16, pattern_2);
+
+    C(T_memmove(dst + 61, dst, B16) == dst + 61);
+    C(T_memmem(dst, B17, &pattern_1, sizeof(pattern_1)) == dst);
+    C(T_memrmem(dst, B17, &pattern_1, sizeof(pattern_1)) == dst + 61 - 4 + 32);
+    C(T_memmove(dst + 24578, dst, B16) == dst + 24578);
+    C(T_memmem(dst, B16, &pattern_1, sizeof(pattern_1)) ==  dst + 0);
+    C(T_memrmem(dst, B16, &pattern_1, sizeof(pattern_1)) == dst + 24578 + 61 + 32 - 4);
+    C(T_memmem(dst, B16, &pattern_2, sizeof(pattern_2)) ==  dst + 24576 + 24578 + 61);
+    C(T_memrmem(dst, B16, &pattern_2, sizeof(pattern_2)) == dst + B16 - 4u - (((24578u - 24576u) - 61u) % 4u));
 
     return 0;
 }
@@ -1508,6 +1559,9 @@ int run_tests(void) {
     TEST(strrstr_test());
     TEST(strchrnul_test());
     TEST(strtok_test());
+
+    TEST(mem65536_test());
+    os_ClrHome();
 
     return 0;
 }
