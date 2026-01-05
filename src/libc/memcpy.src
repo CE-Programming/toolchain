@@ -12,17 +12,30 @@
 .else
 
 _memcpy:
-	ld	iy, -1
+	; size >  0     : 25F + 15R + 1 + LDIR
+	; size >= 65536 : 32F + 16R + 3 + LDIR
+	; size == 0     : 26F + 13R + 2
+	; size >= 65536    +  7F +  1R + 2 (only when the low 16 bits are zero)
+
+	ld	iy, 0
 	add	iy, sp
-	ld	bc, (iy + 10)  ; Load count
-	sbc	hl, hl
-	add	hl, bc
-	jr	nc, .L.zero
-	ld	de, (iy + 4)  ; Load destination
-	ld	hl, (iy + 7)  ; Load source
+	ld	bc, (iy + 9)	; Load count
+	ld	a, c
+	or	a, b
+	ld	de, (iy + 3)	; Load destination
+	jr	z, .L.maybe_zero
+.L.not_zero:
+	ld	hl, (iy + 6)	; Load source
 	ldir
-.L.zero:
-	ld	hl, (iy + 4)  ; Return the destination pointer
+	ld	hl, (iy + 3)	; Return the destination pointer
+	ret
+
+.L.maybe_zero:
+	; low 16 bits are zero
+	or	a, (iy + 11)	; test upper 8 bits
+	jr	nz, .L.not_zero	; size >= 65536
+	; size == 0
+	ex	de, hl
 	ret
 
 .endif
