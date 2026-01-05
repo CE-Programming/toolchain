@@ -15,85 +15,101 @@
 
 ; Optimized for when src != dst
 _memmove:
-	; src > dst | LDIR | 32F + 15R + 1
-	; src < dst | LDDR | 35F + 12R + 2
-	; src = dst | LDDR | 35F + 12R + 2
-	; zero size |      | 24F + 12R + 2
+	; src > dst | LDIR | 31F + 15R + 2
+	; src < dst | LDDR | 33F + 12R + 1
+	; src = dst | LDIR | 31F + 15R + 2
+	; zero size |      | 26F + 10R + 2
+	; size >= 65536    +  7F +  1R + 2 (only when the low 16 bits are zero)
 
-	ld	iy, -1
+	ld	iy, 0
 	add	iy, sp
-	ld	bc, (iy + 10)
-	sbc	hl, hl
-	add	hl, bc
-	jr	nc, .L.zero
-	ld	hl, (iy + 7)
-	ld	de, (iy + 4)
+	ld	bc, (iy + 9)
+	ld	a, c
+	or	a, b
+	ld	de, (iy + 3)
+	jr	z, .L.maybe_zero
+.L.not_zero:
+	ld	hl, (iy + 6)
 	sbc	hl, de
-	; src <= dst
-	jr	c, .L.copy_backwards
-	; src > dst
-; .copy_forwards:
-	add	hl, de
-	inc	hl
-	ldir
-.L.zero:
-	ld	hl, (iy + 4)
-	ret
-
-.L.copy_backwards:
+	; src >= dst
+	jr	nc, .L.copy_forwards
+	; src < dst
+; .L.copy_backwards:
 	; move HL and DE to the end
+	dec	de		; DE = dst - 1
 	ex	de, hl
-	add	hl, bc
-	ex	de, hl	; HL = src - dst - 1, DE = dst + size
-	add	hl, de	; HL = src + size - 1
-	dec	de	; DE = dst + size - 1
+	add	hl, bc		; HL = dst + size - 1, DE = src - dst
+	ex	de, hl
+	add	hl, de		; HL = src + size - 1, DE = dst + size - 1
 	lddr
 	ex	de, hl
 	inc	hl
+	ret
+
+.L.copy_forwards:
+	add	hl, de
+	ldir
+	ld	hl, (iy + 3)
+	ret
+
+.L.maybe_zero:
+	; low 16 bits are zero
+	or	a, (iy + 11)	; test upper 8 bits
+	jr	nz, .L.not_zero	; size >= 65536
+	; size == 0
+	ex	de, hl
 	ret
 
 .else
 
 ; Optimized for when src == dst
 _memmove:
-	; src > dst | LDIR | 33F + 15R + 2
-	; src < dst | LDDR | 36F + 12R + 2
-	; src = dst |      | 29F + 12R + 2
-	; zero size |      | 24F + 12R + 2
+	; src > dst | LDIR | 31F + 15R + 2
+	; src < dst | LDDR | 34F + 12R + 2
+	; src = dst |      | 27F + 12R + 2
+	; zero size |      | 26F + 10R + 2
+	; size >= 65536    +  7F +  1R + 2 (only when the low 16 bits are zero)
 
-	ld	iy, -1
+	ld	iy, 0
 	add	iy, sp
-	ld	bc, (iy + 10)
-	sbc	hl, hl
-	add	hl, bc
-	jr	nc, .L.zero
-	ld	de, (iy + 4)
-	ld	hl, (iy + 7)
-	or	a, a
+	ld	bc, (iy + 9)
+	ld	a, c
+	or	a, b
+	ld	de, (iy + 3)
+	jr	z, .L.maybe_zero
+.L.not_zero:
+	ld	hl, (iy + 6)
 	sbc	hl, de
 	; src < dst
-	jr	c, .copy_backwards
+	jr	c, .L.copy_backwards
 	; src >= dst
 ; .L.copy_forwards:
 	add	hl, de
 	; src == dst
-	ret	z	; skips LDIR when src == dst
+	ret	z		; skips LDIR when src == dst
 	; src > dst
 	ldir
-.L.zero:
-	ld	hl, (iy + 4)
+	ld	hl, (iy + 3)
 	ret
 
 .L.copy_backwards:
 	; move HL and DE to the end
-	dec	de	; DE = dst - 1
+	dec	de		; DE = dst - 1
 	ex	de, hl
-	add	hl, bc	; HL = dst + size - 1, DE = src - dst
+	add	hl, bc		; HL = dst + size - 1, DE = src - dst
 	ex	de, hl
-	add	hl, de	; HL = src + size - 1, DE = dst + size - 1
+	add	hl, de		; HL = src + size - 1, DE = dst + size - 1
 	lddr
 	ex	de, hl
 	inc	hl
+	ret
+
+.L.maybe_zero:
+	; low 16 bits are zero
+	or	a, (iy + 11)	; test upper 8 bits
+	jr	nz, .L.not_zero	; size >= 65536
+	; size == 0
+	ex	de, hl
 	ret
 
 .endif
