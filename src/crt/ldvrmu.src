@@ -9,7 +9,7 @@
 	.global	__ldvrmu
 	.type	__ldvrmu, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__ldvrmu, 0x0001BC
 

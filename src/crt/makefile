@@ -28,7 +28,7 @@ OBJECTS_CE += $(patsubst %.src,build/%.ce.o,$(wildcard *.src))
 
 .SECONDARY:
 
-all: build/libcrt.a build/libcrt_ce.a
+all: build/libcrt.a build/libcrt_os.a
 
 build/libcrt.a: $(OBJECTS)
 	$(Q)$(call MKDIR,build)
@@ -56,7 +56,7 @@ build/%.o: %.src
 
 # -----
 
-build/libcrt_ce.a: $(OBJECTS_CE)
+build/libcrt_os.a: $(OBJECTS_CE)
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZAR) rcs $@ $^
 
@@ -70,15 +70,15 @@ build/%.cpp.ce.src: %.cpp
 
 build/%.c.ce.o: build/%.c.ce.src
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_CRT=1 $< -o $@
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_OS_CRT=1 $< -o $@
 
 build/%.cpp.ce.o: build/%.cpp.ce.src
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_CRT=1 $< -o $@
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_OS_CRT=1 $< -o $@
 
 build/%.ce.o: %.src
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_CRT=1 $< -o $@
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_OS_CRT=1 $< -o $@
 
 clean:
 	$(Q)$(call RMDIR,build)
@@ -86,7 +86,7 @@ clean:
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_CRT))
 	$(Q)$(call COPY,$(call NATIVEPATH,build/libcrt.a),$(INSTALL_CRT))
-	$(Q)$(call COPY,$(call NATIVEPATH,build/libcrt_ce.a),$(INSTALL_CRT))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/libcrt_os.a),$(INSTALL_CRT))
 	$(Q)$(call COPY,$(call NATIVEPATH,crt0.S),$(INSTALL_CRT))
 
 .PHONY: all clean install

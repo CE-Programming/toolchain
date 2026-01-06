@@ -11,7 +11,7 @@
 	.global	_scalbn
 	.type	_scalbn, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_ldexpf, 0x0220DC
 	.set	_ldexp, _ldexpf

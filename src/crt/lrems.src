@@ -4,7 +4,7 @@
 	.global	__lrems
 	.type	__lrems, @function
 
-;.ifdef PREFER_CE_CRT
+;.ifdef PREFER_OS_CRT
 ;
 ; Bug: Does not ensure `nc` before `sbc hl, hl` to negate divisor.
 ;

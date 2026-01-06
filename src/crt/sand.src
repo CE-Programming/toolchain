@@ -4,7 +4,7 @@
 	.global	__sand
 	.type	__sand, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__sand, 0x000200
 

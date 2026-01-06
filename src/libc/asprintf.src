@@ -8,7 +8,7 @@
 	.type	_asprintf, @function
 	.type	_vasprintf, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	_asprintf, _boot_asprintf
 	.set	_vasprintf, _boot_vasprintf

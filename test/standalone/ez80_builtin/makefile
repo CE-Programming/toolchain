@@ -12,8 +12,8 @@ CFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wformat=2 -Wno-sign-conversion -Oz
 CXXFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wformat=2 -Wno-sign-conversion -Oz
 
 HAS_MATH_ERRNO = YES
-PREFER_CE_LIBC = NO
-PREFER_CE_CRT = NO
+PREFER_OS_LIBC = NO
+PREFER_OS_CRT = NO
 
 # ----------------------------
 

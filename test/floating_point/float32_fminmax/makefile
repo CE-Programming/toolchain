@@ -14,7 +14,7 @@ CFLAGS = ${COMMON_FLAGS} -std=c17
 CXXFLAGS = ${COMMON_FLAGS} -std=c++20
 
 HAS_MATH_ERRNO = YES
-PREFER_CE_LIBC = NO
+PREFER_OS_LIBC = NO
 
 # ----------------------------
 

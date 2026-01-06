@@ -5,7 +5,7 @@
 	.global	_memmove
 	.type	_memmove, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_memmove, 0x0000A8
 

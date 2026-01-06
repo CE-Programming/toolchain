@@ -4,7 +4,7 @@
 	.global	__bshru
 	.type	__bshru, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__bshru, 0x000104
 

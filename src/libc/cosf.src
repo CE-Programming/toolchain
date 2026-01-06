@@ -6,7 +6,7 @@
 	.global	_cosf
 	.type	_cosf, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_cosf, 0x02211C
 	.set	_cos, _cosf

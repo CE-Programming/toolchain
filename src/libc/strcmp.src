@@ -5,7 +5,7 @@
 	.global	_strcmp
 	.type	_strcmp, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_strcmp, 0x0000C8
 

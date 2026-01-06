@@ -6,7 +6,7 @@
 	.global	__sshl
 	.type	__sshl, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__ishl, 0x000174
 	.set	__sshl, 0x000240

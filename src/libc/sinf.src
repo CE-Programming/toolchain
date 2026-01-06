@@ -7,7 +7,7 @@
 	.global	_sin
 	.type	_sin, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_sinf, 0x022118
 	.set	_sin, _sinf

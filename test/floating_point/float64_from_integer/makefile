@@ -11,7 +11,7 @@ CFLAGS = -Wall -Wextra -Wshadow -Wfloat-conversion -Wimplicit-float-conversion -
 CXXFLAGS = -Wall -Wextra -Wshadow -Wfloat-conversion -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz -std=c++11
 
 HAS_MATH_ERRNO = YES
-PREFER_CE_LIBC = NO
+PREFER_OS_LIBC = NO
 
 # ----------------------------
 

@@ -5,7 +5,7 @@
 	.section	.text
 	.global	__iand
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__land, 0x0001A4
 	.set	__iand, 000134h

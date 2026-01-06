@@ -7,7 +7,7 @@
 	.global	_frexp
 	.type	_frexp, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_frexpf, 0x0220D8
 	.set	_frexp, _frexpf

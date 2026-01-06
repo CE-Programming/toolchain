@@ -4,7 +4,7 @@
 	.global	__lsub
 	.type	__lsub, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__lsub, 0x0001F8
 

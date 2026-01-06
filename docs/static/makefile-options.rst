@@ -115,7 +115,7 @@ These flags are passed directly to the GNU linker (ld).
 
     EXTRA_LDFLAGS =
 
-.. rubric:: PREFER_CE_CRT
+.. rubric:: PREFER_OS_CRT
 
 Prefer the calculator's builtin CRT (Compiler-Run-Time) functions if they exist.
 This can help to decrease the output size in some circumstances, as a select number of CRT functions will execute from flash.
@@ -135,7 +135,7 @@ To avoid this, set this option to :code:`YES`.
 
     PREFER_OS_CRT = NO
 
-.. rubric:: PREFER_CE_LIBC
+.. rubric:: PREFER_OS_LIBC
 
 Prefer the calculator's builtin LIBC functions if they exist.
 This can help to decrease the output size in some circumstances, as a select number of LIBC functions will execute from flash.
@@ -143,7 +143,7 @@ Default: :code:`YES`.
 
 .. code-block:: makefile
 
-    PREFER_CE_LIBC = YES
+    PREFER_OS_LIBC = YES
 
 .. rubric:: LIBLOAD_OPTIONAL
 

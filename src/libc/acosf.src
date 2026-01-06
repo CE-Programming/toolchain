@@ -6,7 +6,7 @@
 	.global	_acosf
 	.type	_acosf, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
     .set _acosf, 0x022100
     .set _acos, _acosf

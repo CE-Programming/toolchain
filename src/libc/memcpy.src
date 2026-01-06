@@ -5,7 +5,7 @@
 	.global	_memcpy
 	.type	_memcpy, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_memcpy, 0x0000A4
 

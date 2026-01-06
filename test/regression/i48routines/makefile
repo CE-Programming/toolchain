@@ -12,7 +12,7 @@ CFLAGS = -Wall -Wextra -Oz
 CXXFLAGS = -Wall -Wextra -Oz
 
 HAS_MATH_ERRNO = YES
-PREFER_CE_LIBC = NO
+PREFER_OS_LIBC = NO
 
 # ----------------------------
 

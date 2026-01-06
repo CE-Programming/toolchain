@@ -1,4 +1,4 @@
-#if PREFER_CE_LIBC
+#if PREFER_OS_LIBC
 
 asm
 (

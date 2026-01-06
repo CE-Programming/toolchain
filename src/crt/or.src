@@ -6,7 +6,7 @@
 	.global	__ior
 	.type	__ior, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__lor, 0x0001D8
 	.set	__ior, 0x000168

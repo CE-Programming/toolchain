@@ -6,7 +6,7 @@
 	.global	__lshrs.hijack_lshru
 	.type	__lshrs.hijack_lshru, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__lshrs, 0x0001E8
 

@@ -6,7 +6,7 @@
 	.global	_fabs
 	.type	_fabs, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_fabsf, 0x0220F0
 	.set	_fabs, _fabsf

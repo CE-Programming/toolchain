@@ -46,8 +46,8 @@ HAS_CUSTOM_FILE ?= NO
 HAS_LIBC ?= YES
 HAS_LIBCXX ?= YES
 ALLOCATOR ?= STANDARD
-PREFER_CE_CRT ?= NO
-PREFER_CE_LIBC ?= YES
+PREFER_OS_CRT ?= NO
+PREFER_OS_LIBC ?= YES
 SKIP_LIBRARY_LDFLAGS ?= NO
 LIBLOAD_OPTIONAL ?=
 COMPRESSED_MODE ?= zx7
@@ -248,27 +248,17 @@ ifeq ($(HAS_CUSTOM_FILE),YES)
 DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
 endif
 
-# old style selection
-ifeq ($(PREFER_OS_CRT),YES)
-$(info [warn] PREFER_OS_CRT is deprecated, use PREFER_CE_CRT instead)
-PREFER_CE_CRT = $(PREFER_OS_CRT)
-endif
-ifeq ($(PREFER_OS_LIBC),NO)
-$(info [warn] PREFER_OS_LIBC is deprecated, use PREFER_CE_LIBC instead)
-PREFER_CE_LIBC = $(PREFER_OS_LIBC)
-endif
-
 # choose crt
-ifeq ($(PREFER_CE_CRT),YES)
-LIB_CRT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt_ce.a)
+ifeq ($(PREFER_OS_CRT),YES)
+LIB_CRT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt_os.a)
 else
 LIB_CRT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt.a)
 endif
 
 # choose libc
 ifeq ($(HAS_LIBC),YES)
-ifeq ($(PREFER_CE_LIBC),YES)
-LIB_C = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc_ce.a)
+ifeq ($(PREFER_OS_LIBC),YES)
+LIB_C = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc_os.a)
 else
 LIB_C = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc.a)
 endif

@@ -4,7 +4,7 @@
 	.global	__lcmps
 	.type	__lcmps, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__lcmps, 0x0001A8
 

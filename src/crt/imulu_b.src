@@ -7,7 +7,7 @@
 	.global	__imulu_b
 	.type	__imulu_b, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__imul_b, 0x000150
 	.set	__imulu_b, __imul_b

@@ -6,7 +6,7 @@
 	.type	_atof, @function
 	.type	_atoff, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_atoff, 0x022110
 	.set	_atof, _atoff

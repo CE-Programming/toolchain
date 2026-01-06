@@ -6,7 +6,7 @@
 	.global	__smulu
 	.type	__smulu, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__smuls, 0x000224
 	.set	__smulu, 0x000228

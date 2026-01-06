@@ -6,7 +6,7 @@
 	.type	_ceil, @function
 	.type	_ceilf, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_ceilf, 0x022114
 	.set	_ceil, _ceilf

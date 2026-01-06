@@ -12,7 +12,7 @@ CFLAGS = -Wall -Wextra -Wconversion -Wformat=2 -std=c17 -Oz
 CXXFLAGS = -Wall -Wextra -Wconversion -Wformat=2 -std=c++20 -Oz
 
 HAS_MATH_ERRNO = YES
-PREFER_CE_LIBC = NO
+PREFER_OS_LIBC = NO
 
 # ----------------------------
 

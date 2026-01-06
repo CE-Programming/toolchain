@@ -4,7 +4,7 @@
 	.global	__sxor
 	.type	__sxor, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__sxor, 0x000268
 

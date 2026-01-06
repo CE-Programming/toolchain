@@ -4,7 +4,7 @@
 	.global	__srems
 	.type	__srems, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__srems, 0x000238
 

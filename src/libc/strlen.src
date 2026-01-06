@@ -3,7 +3,7 @@
 	.section	.text
 	.global	_strlen
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_strlen, 0x0000D4
 

@@ -4,7 +4,7 @@
 	.global	__irems
 	.type	__irems, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__irems, 0x00016C
 

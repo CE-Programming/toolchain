@@ -4,7 +4,7 @@
 	.global	__sshru
 	.type	__sshru, @function
 
-.ifdef PREFER_CE_CRT
+.ifdef PREFER_OS_CRT
 
 	.set	__sshru, 0x000250
 

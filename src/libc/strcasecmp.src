@@ -4,7 +4,7 @@
 	.global	_strcasecmp
 	.type	_strcasecmp, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_strcasecmp, 0x021E3C
 

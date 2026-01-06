@@ -28,7 +28,7 @@ OBJECTS_CE += $(patsubst %.src,build/%.ce.o,$(wildcard *.src))
 
 .SECONDARY:
 
-all: build/libc.a build/libc_ce.a
+all: build/libc.a build/libc_os.a
 	$(MAKE) -C allocator
 	$(MAKE) -C printf
 
@@ -58,29 +58,29 @@ build/%.o: %.src
 
 # -----
 
-build/libc_ce.a: $(OBJECTS_CE)
+build/libc_os.a: $(OBJECTS_CE)
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZAR) rcs $@ $^
 
 build/%.c.ce.src: %.c
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZCC) $(EZCFLAGS) -DPREFER_CE_LIBC=1 $< -o $@
+	$(Q)$(EZCC) $(EZCFLAGS) -DPREFER_OS_LIBC=1 $< -o $@
 
 build/%.cpp.ce.src: %.cpp
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZCC) $(EZCXXFLAGS) -DPREFER_CE_LIBC=1 $< -o $@
+	$(Q)$(EZCC) $(EZCXXFLAGS) -DPREFER_OS_LIBC=1 $< -o $@
 
 build/%.c.ce.o: build/%.c.ce.src
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_LIBC=1 $< -o $@
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_OS_LIBC=1 $< -o $@
 
 build/%.cpp.ce.o: build/%.cpp.ce.src
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_LIBC=1 $< -o $@
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_OS_LIBC=1 $< -o $@
 
 build/%.ce.o: %.src
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_CE_LIBC=1 $< -o $@
+	$(Q)$(EZAS) $(EZASFLAGS) --defsym PREFER_OS_LIBC=1 $< -o $@
 
 clean:
 	$(Q)$(call RMDIR,build)
@@ -89,7 +89,7 @@ install: all
 	$(Q)$(call MKDIR,$(INSTALL_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIBC))
 	$(Q)$(call COPY,$(call NATIVEPATH,build/libc.a),$(INSTALL_LIBC))
-	$(Q)$(call COPY,$(call NATIVEPATH,build/libc_ce.a),$(INSTALL_LIBC))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/libc_os.a),$(INSTALL_LIBC))
 	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(wildcard include/*.h)),$(call QUOTE_ARG,$(file))),$(INSTALL_H))
 	$(MAKE) -C allocator install
 	$(MAKE) -C printf install
