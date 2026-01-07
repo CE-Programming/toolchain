@@ -4,9 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - v* # push events versioned tags
-    branches:
-      - master
+      - v14.1
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
@@ -60,7 +58,7 @@ jobs:
         id: ez80-bins
         uses: carlosperate/download-file-action@v2.0.2
         with:
-          file-url: https://github.com/CE-Programming/llvm-project/releases/download/nightly/ez80-clang-link_${{matrix.ez80-bins-suffix}}_nightly.zip
+          file-url: https://github.com/CE-Programming/llvm-project/releases/download/v15/ez80-clang-link_${{matrix.ez80-bins-suffix}}_v15.zip
       - name: Extract ez80-clang
         uses: DuckSoft/extract-7z-action@v1.0
         with:
