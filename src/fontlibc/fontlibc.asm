@@ -458,8 +458,8 @@ fontlib_SetFont:
 	add	hl,de
 	add	hl,bc
 	ld	(iy + strucFont.bitmapsTablePtr),hl
-; Check for the ignore ling spacing flag
-	ld	hl,arg0
+; Check for the ignore line spacing flag
+	ld	hl,arg1
 	add	hl,sp
 	ld	a,(hl)
 	or	a,a
