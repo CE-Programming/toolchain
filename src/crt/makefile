@@ -18,7 +18,7 @@ include $(CURDIR)/../common.mk
 
 BUILD_SRC := $(patsubst %,build/%.src,$(wildcard *.c *.cpp))
 
-EZCFLAGS := -S -fno-addrsig -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
+EZCFLAGS := -S -ffreestanding -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
 EZCFLAGS += -D_EZ80 -isystem ../libc/include -mllvm -profile-guided-section-prefix=false
 EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
 EZCXXFLAGS += -isystem ../libc/include/c++

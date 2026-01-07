@@ -250,7 +250,7 @@ LDHAS_PRINTF := 1
 endif
 
 # define the c/c++ flags used by clang
-EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -fno-addrsig
+EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false
 EZCOMMONFLAGS = -nostdinc -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -fno-threadsafe-statics -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__ -D$(DEBUGMODE) $(DEFCUSTOMFILE) $(CCDEBUG)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
 EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
