@@ -1,6 +1,28 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v14.0...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v14.2...master)
+
+# [v14.2](https://github.com/CE-Programming/toolchain/releases/tag/v14.2) (2026-01-13)
+
+Minor bugfix release, and the last toolchain version to be using the compiler based on:
+- clang v15 (next will have v17)
+- fasmg (next will have standard binutils-based tooling)
+
+Changes:
+- [convimg] fix appvar output
+
+# [v14.1](https://github.com/CE-Programming/toolchain/releases/tag/v14.1) (2026-01-07)
+
+Minor release, and the last toolchain version to be using the compiler based on:
+- clang v15 (next will have v17)
+- fasmg (next will have standard binutils-based tooling)
+
+Changes:
+- [libc] fix some issues with asctime
+- [libc] fix some issues with standard allocator
+- [tests] fix text_flipped example
+- Optimizations to GraphX's gfx_FillRect
+- Optimizations to libload
 
 # [v14.0](https://github.com/CE-Programming/toolchain/releases/tag/v14.0) (2025-12-22)
 
