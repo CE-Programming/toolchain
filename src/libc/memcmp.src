@@ -1,0 +1,42 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_memcmp
+	.type	_memcmp, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_memcmp, 0x0000A0
+
+.else
+
+_memcmp:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, (iy + 9)
+	sbc	hl, hl
+	adc	hl, bc
+	ld	hl, (iy + 6)
+	ld	de, (iy + 3)
+	call	nz, .L.start	; z means BC was zero
+.L.ret_zero:
+	sbc	hl, hl
+	ret
+
+.L.loop:
+	ret	po
+	inc	de
+.L.start:
+	ld	a, (de)
+	cpi
+	jr	z, .L.loop
+.L.finish:
+	ld	sp, iy		; ret
+	dec	hl
+	sub	a, (hl)
+	sbc	hl, hl
+	ld	l, a
+	ret
+
+.endif

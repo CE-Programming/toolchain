@@ -1,0 +1,51 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_strncat
+	.type	_strncat, @function
+
+.ifdef PREFER_OS_LIBC
+
+	.set	_strncat, 0x0000D8
+
+.else
+
+_strncat:
+	ld	iy, 0
+	lea	bc, iy + 0
+	add	iy, sp
+	xor	a, a
+	ld	hl, (iy + 3)	; dst
+	cpir
+	dec	hl
+	push	hl		; dst + strlen(dst)
+
+	; inlined strnlen
+	ld	bc, (iy + 9)	; max_size
+	sbc	hl, hl
+	sbc	hl, bc
+	jr	z, .L.zero_size
+	add	hl, bc
+	ld	de, (iy + 6)	; src
+	sbc	hl, de
+	ex	de, hl
+	cpir
+	jr	z, .L.finish_strnlen
+	inc	hl
+.L.finish_strnlen:
+	xor	a, a
+	adc	hl, de
+.L.zero_size:
+	pop	de		; dst + strlen(dst)
+	jr	z, .L.no_room
+	push	hl
+	pop	bc
+	ld	hl, (iy + 6)	; src
+	ldir
+	ld	(de), a		; nul terminate
+.L.no_room:
+	ld	hl, (iy + 3)
+	ret
+
+.endif

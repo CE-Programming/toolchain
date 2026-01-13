@@ -1,0 +1,103 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	_strtok
+	.type	_strtok, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_strtok, 0x0000F4
+
+.else
+
+	.equ	strtokPtr, $D000FF
+
+; strtok_r(char *__restrict str, const char *__restrict delim)
+_strtok:
+	pop	bc
+	pop	de
+	ex	(sp), hl
+	push	de
+	push	bc
+
+	ld	bc, strtokPtr
+	push	bc	; save_ptr
+	push	hl	; delim
+	push	de	; str
+	call	_strtok_r
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+.endif
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	_strtok_r
+	.type	_strtok_r, @function
+
+; strtok_r(char *__restrict str, const char *__restrict delim, char **__restrict save_ptr)
+_strtok_r:
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	ld	hl, (ix + 6)	; str
+	add	hl, de
+	xor	a, a
+	sbc	hl, de
+	jr	nz, .L.str_non_null
+	; use save_ptr
+	ld	hl, (ix + 12)	; save_ptr
+	ld	hl, (hl)
+	ld	(ix + 6), hl
+.L.str_non_null:
+	cp	a, (hl)
+	jr	z, .L.end_of_str
+	ld	de, (ix + 9)	; delim
+	push	de
+	push	hl
+	call	_strspn
+	ld	de, (ix + 6)	; str
+	add	hl, de
+	xor	a, a
+	cp	a, (hl)
+	jr	z, .L.end_of_strspn
+
+	push	hl		; ld (ix - 9), hl
+
+	ld	de, (ix + 9)	; delim
+	push	de
+	push	hl
+	call	_strcspn
+
+	ld	de, (ix - 9)
+
+	add	hl, de
+	xor	a, a
+	cp	a, (hl)
+	jr	z, .L.finish
+	; nul terminate
+	ld	(hl), a
+	inc	hl
+.L.finish:
+	ld	iy, (ix + 12)
+	ld	(iy), hl
+	ex	de, hl
+	ld	sp, ix
+	pop	ix
+	ret
+
+.L.end_of_str:
+.L.end_of_strspn:
+	; return NULL
+	ld	de, 0
+	jr	.L.finish
+
+	.extern	_strspn
+	.extern	_strcspn

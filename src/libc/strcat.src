@@ -1,0 +1,46 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_strcat
+	.type	_strcat, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_strcat, 0x0000C0
+
+.else
+
+_strcat:
+	pop	iy
+	pop	de
+	ex	(sp), hl	; src
+	push	de		; dst
+
+	; move to the end of src
+	xor	a, a
+	ld	bc, 0
+	push	hl		; src
+	cpir
+	sbc	hl, hl
+	sbc	hl, bc		; carry is set
+	ex	(sp), hl
+	ex	de, hl
+	; move to the end of dst
+
+	; not needed unless the strlen(dst) + strlen(src) > 16777215 bytes,
+	; which would imply that the resulting string would not fit into memory
+	; ld bc, 0
+	cpir
+	dec	hl
+
+	pop	bc
+	ex	de, hl
+	; DE = dst + strlen(dst)
+	; HL = src
+	; BC = strlen(src) + 1
+	ldir
+	ex	(sp), hl	; return value
+	jp	(iy)
+
+.endif

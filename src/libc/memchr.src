@@ -1,0 +1,32 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_memchr
+	.type	_memchr, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_memchr, 0x00009C
+
+.else
+
+_memchr:
+	ld	iy, -1
+	add	iy, sp
+	ld	bc, (iy + 10)
+	sbc	hl, hl
+	add	hl, bc
+	jr	nc, .L.ret_zero
+	ld	hl, (iy + 4)
+	ld	a, (iy + 7)
+	cpir
+	dec	hl
+	ret	z	; found match
+	or	a, a
+.L.ret_zero:
+	; return NULL
+	sbc	hl, hl
+	ret
+
+.endif

@@ -1,0 +1,42 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_strchr
+	.type	_strchr, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_strchr, 0x0000C4
+
+.else
+
+_strchr:
+	pop	bc
+	pop	hl
+	pop	de
+	push	de
+	push	hl
+	push	bc
+	xor	a, a
+	ld	bc, 0
+	cpir
+	ld	a, e
+	ex	de, hl
+	; calculate strlen(str) + 1
+	sbc	hl, hl
+	sbc	hl, bc
+	ex	de, hl
+	; rewind HL to the beginning of str
+	add	hl, bc
+	push	de
+	pop	bc
+	cpir
+	dec	hl
+	ret	z	; found match
+	; return NULL
+	or	a, a
+	sbc	hl, hl
+	ret
+
+.endif

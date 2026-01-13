@@ -36,6 +36,7 @@ using ::strstr;
 using ::strrstr;
 using ::strcasestr;
 using ::strtok;
+using ::strtok_r;
 using ::strdup;
 using ::strndup;
 using ::strcspn;
