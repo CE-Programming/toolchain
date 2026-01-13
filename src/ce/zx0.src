@@ -34,13 +34,12 @@ dzx0t_new_offset_skip:
 	call	nc, dzx0t_elias	; obtain offset MSB
 	inc	c
 	ret	z		; check end marker
-	ld	b, c
-	ld	c, (hl)		; obtain offset LSB
+	ld	b, (hl)		; obtain offset LSB
 	inc	hl
-	rr	b		; last offset bit becomes first length bit
-	rr	c
-	push	bc
-	pop	iy		; preserve new offset
+	rr	c		; last offset bit becomes first length bit
+	rr	b
+	ld	iyl, b		; preserve new offset
+	ld	iyh, c
 	ld	bc, 1		; obtain length
 	call	nc, dzx0t_elias
 	inc	bc
