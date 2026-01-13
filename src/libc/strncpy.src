@@ -1,0 +1,69 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_strncpy
+	.type	_strncpy, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_strncpy, 0x0000E0
+
+.else
+
+; currently this just copies the stpncpy implementation, and could probably be optimized further
+_strncpy:
+	ld	iy, 0
+	add	iy, sp
+	ld	bc, (iy + 9)	; max_len
+
+	; inlined strnlen
+	xor	a, a
+	sbc	hl, hl
+	sbc	hl, bc
+	jr	z, .L.zero_size
+	add	hl, bc
+	ld	de, (iy + 6)	; src
+	sbc	hl, de
+	ex	de, hl
+	cpir
+	jr	z, .L.finish_strnlen
+	inc	hl
+.L.finish_strnlen:
+	xor	a, a
+	adc	hl, de
+.L.zero_size:
+
+	; copy strnlen bytes from src
+	push	hl
+	ld	de, (iy + 3)	; dst
+	jr	z, .L.zero_byte_copy
+	ld	hl, (iy + 6)	; src
+	pop	bc
+	push	bc
+	ldir
+.L.zero_byte_copy:
+	pop	bc
+
+	; zero pad the remainder
+	ld	hl, (iy + 9)	; max_len
+	scf
+	sbc	hl, bc		; clear_size - 1 = max_len - src_len - 1
+	ex	de, hl
+	jr	c, .L.finish	; clear_size <= 0 (or max_len <= src_len)
+	; HL = dst + src_len
+	; DE = clear_size - 1
+	add	hl, de
+	ld	(hl), a
+	jr	z, .L.finish	; clear_size == 1
+	push	de
+	pop	bc
+	push	hl
+	pop	de
+	dec	de
+	lddr
+.L.finish:
+	ld	hl, (iy + 3)
+	ret
+
+.endif

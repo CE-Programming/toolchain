@@ -86,6 +86,9 @@ char *strcasestr(const char *haystack, const char *needle)
 char *strtok(char *__restrict s, const char *__restrict delim)
     __attribute__((nonnull(2)));
 
+char *strtok_r(char *__restrict s, const char *__restrict delim, char **__restrict save_ptr)
+    __attribute__((nonnull(2, 3)));
+
 char *strdup(const char *s)
     __attribute__((__malloc__)) __attribute__((nonnull(1)));
 

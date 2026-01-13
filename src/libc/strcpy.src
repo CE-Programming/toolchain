@@ -1,0 +1,37 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_strcpy
+	.type	_strcpy, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_strcpy, 0x0000CC
+
+.else
+
+_strcpy:
+	pop	iy
+	pop	de
+	ex	(sp), hl	; src
+	push	de		; dst
+
+	xor	a, a
+	ld	bc, 0
+	; move to the end of src
+	push	hl
+	cpir
+	sbc	hl, hl
+	sbc	hl, bc
+	ex	(sp), hl
+	pop	bc
+
+	; DE = dst
+	; HL = src
+	; BC = strlen(src) + 1
+	ldir
+	ex	(sp), hl	; return dst
+	jp	(iy)
+
+.endif

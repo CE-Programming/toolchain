@@ -1,0 +1,51 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_strstr
+	.type	_strstr, @function
+
+.ifdef PREFER_CE_LIBC
+
+	.set	_strstr, 0x0000F0
+
+.else
+
+; strstr can probably be optimized further beyond just wrapping memmem
+_strstr:
+	pop	bc
+	pop	de
+	ex	(sp), hl
+	push	de
+	push	bc
+
+	push	hl
+	xor	a, a
+	ld	bc, 0
+	cpir
+	sbc	hl, hl
+	dec	hl
+	sbc	hl, bc		; carry will be cleared
+	ex	(sp), hl	; strlen(needle)
+	push	hl		; needle
+
+	ex	de, hl
+	push	hl
+	ld	bc, 0
+	cpir
+	sbc	hl, hl
+	dec	hl
+	sbc	hl, bc
+	ex	(sp), hl	; strlen(haystack)
+	push	hl		; haystack
+
+	call	_memmem
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+	.extern	_memmem
+
+.endif
