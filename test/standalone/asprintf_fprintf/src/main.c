@@ -8,42 +8,107 @@
 #include <ti/sprintf.h>
 #include <ctype.h>
 
-/**
-* @brief Tests the following functions/macros:
-* boot_sprintf
-* boot_snprintf
-* boot_asprintf
-* asprintf
-* fprintf
-* stpcpy
-* memccpy
-*/
+//------------------------------------------------------------------------------
+// Config
+//------------------------------------------------------------------------------
+
+// define to 0 or 1
+#define DEBUG_DIAGNOSTICS 0
+
+// define to 0 or 1 (prevents Clang from replacing functions with builtins)
+#define RENAME_FUNCTIONS 1
+
+//------------------------------------------------------------------------------
+// Utilities
+//------------------------------------------------------------------------------
 
 #define C(expr) if (!(expr)) { return __LINE__; }
 
-#define TEST(test) { ret = test; if (ret != 0) { return ret; }}
+#define TEST(test) { ret = test; if (ret != 0) { return ret; } }
 
 #define SINK (char*)0xE40000
+
+#ifndef DEBUG_DIAGNOSTICS
+#error "DEBUG_DIAGNOSTICS needs to be defined to 0 or 1"
+#endif
+
+#ifndef RENAME_FUNCTIONS
+#error "RENAME_FUNCTIONS needs to be defined to 0 or 1"
+#endif
+
+#if DEBUG_DIAGNOSTICS
+#define test_printf printf
+#else
+#define test_printf(...)
+#endif
 
 /* pass NULL into functions without triggering -Wnonnull */
 extern void* NULL_ptr;
 
+//------------------------------------------------------------------------------
+// Debug routines
+//------------------------------------------------------------------------------
+
+__attribute__((__unused__)) static void write_letter(char ch) {
+    if (isgraph(ch)) {
+        fputc(ch, stdout);
+        return;
+    }
+    fputc('\\', stdout);
+    switch (ch) {
+        case '\0': fputc('0', stdout); return;
+        case ' ' : fputc('s', stdout); return;
+        case '\n': fputc('n', stdout); return;
+        case '\t': fputc('t', stdout); return;
+        case '\v': fputc('v', stdout); return;
+        case '\r': fputc('r', stdout); return;
+        case '\f': fputc('f', stdout); return;
+        case '\b': fputc('b', stdout); return;
+        default: {
+            char buf[sizeof("xFF")];
+            boot_sprintf(buf, "x%02X", (unsigned int)ch);
+            fputs(buf, stdout);
+            return;
+        }
+    }
+}
+
+__attribute__((__unused__)) static void print_mem_string(const char *str, size_t length) {
+    for (size_t i = 0; i < length; i++) {
+        write_letter(*str++);
+    }
+    fputc('\n', stdout);
+}
+
+__attribute__((__unused__)) static void print_string(const char* str) {
+    print_mem_string(str, strlen(str));
+}
+
+//------------------------------------------------------------------------------
+// Functions
+//------------------------------------------------------------------------------
+
 // prevents Clang from replacing function calls with builtins
-#if 1
+#if RENAME_FUNCTIONS
 
-void *T_memcpy(void *__restrict dest, const void *__restrict src, size_t n)
+void T_bzero(void* s, size_t n);
+
+void *T_memccpy(void *__restrict dest, const void *__restrict src, int c, size_t n)
     __attribute__((nonnull(1, 2)));
 
-void *T_memmove(void *dest, const void *src, size_t n)
-    __attribute__((nonnull(1, 2)));
-
-void *T_memset(void *s, int c, size_t n)
+void *T_memchr(const void *s, int c, size_t n)
     __attribute__((nonnull(1)));
 
 int T_memcmp(const void *s1, const void *s2, size_t n)
     __attribute__((nonnull(1, 2)));
 
-void *T_memccpy(void *__restrict dest, const void *__restrict src, int c, size_t n)
+void *T_memcpy(void *__restrict dest, const void *__restrict src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
+void *T_memmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
+    __attribute__((nonnull(1, 3)));
+
+void *T_memmove(void *dest, const void *src, size_t n)
     __attribute__((nonnull(1, 2)));
 
 void *T_mempcpy(void *__restrict dest, const void *__restrict src, size_t n)
@@ -52,16 +117,31 @@ void *T_mempcpy(void *__restrict dest, const void *__restrict src, size_t n)
 void *T_memrchr(const void *s, int c, size_t n)
     __attribute__((nonnull(1)));
 
-void *T_memmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
-    __attribute__((nonnull(1, 3)));
-
 void *T_memrmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
     __attribute__((nonnull(1, 3)));
+
+void *T_memset(void *s, int c, size_t n)
+    __attribute__((nonnull(1)));
 
 char *T_stpcpy(char *__restrict dest, const char *__restrict src)
     __attribute__((nonnull(1, 2)));
 
 char *T_stpncpy(char *__restrict dest, const char *__restrict src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
+char *T_strcat(char *__restrict dest, const char *__restrict src)
+    __attribute__((nonnull(1, 2)));
+
+char *T_strchr(const char *s, int c)
+    __attribute__((nonnull(1)));
+
+char *T_strchrnul(const char *s, int c)
+    __attribute__((nonnull(1)));
+
+int T_strcmp(const char *s1, const char *s2)
+    __attribute__((nonnull(1, 2)));
+
+char *T_strcpy(char *__restrict dest, const char *__restrict src)
     __attribute__((nonnull(1, 2)));
 
 size_t T_strlcat(void *__restrict dest, const void *__restrict src, size_t n)
@@ -70,42 +150,70 @@ size_t T_strlcat(void *__restrict dest, const void *__restrict src, size_t n)
 size_t T_strlen(const char *s)
     __attribute__((nonnull(1)));
 
-int T_strcmp(const char *s1, const char *s2)
+char *T_strncat(char *__restrict dest, const char *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
 
 int T_strncmp(const char *s1, const char *s2, size_t n)
     __attribute__((nonnull(1, 2)));
 
-char *T_strchrnul(const char *s, int c)
+char *T_strncpy(char *__restrict dest, const char *__restrict src, size_t n)
+    __attribute__((nonnull(1, 2)));
+
+size_t T_strnlen(const char *s, size_t maxlen)
+    __attribute__((nonnull(1)));
+
+char *T_strrchr(const char *s, int c)
     __attribute__((nonnull(1)));
 
 char *T_strrstr(const char *haystack, const char *needle)
     __attribute__((nonnull(1, 2)));
 
-void T_bzero(void* s, size_t n);
+char *T_strstr(const char *haystack, const char *needle)
+    __attribute__((nonnull(1, 2)));
+
+char *T_strtok(char *__restrict s, const char *__restrict delim)
+    __attribute__((nonnull(2)));
+
+char *T_strtok_r(char *__restrict s, const char *__restrict delim, char **__restrict save_ptr)
+    __attribute__((nonnull(2, 3)));
 
 #else
 
-#define T_memcpy memcpy
-#define T_memmove memmove
-#define T_memset memset
-#define T_memcmp memcmp
+#define T_bzero bzero
 #define T_memccpy memccpy
+#define T_memchr memchr
+#define T_memcmp memcmp
+#define T_memcpy memcpy
+#define T_memmem memmem
+#define T_memmove memmove
 #define T_mempcpy mempcpy
 #define T_memrchr memrchr
-#define T_memmem memmem
 #define T_memrmem memrmem
+#define T_memset memset
 #define T_stpcpy stpcpy
 #define T_stpncpy stpncpy
+#define T_strcat strcat
+#define T_strchr strchr
+#define T_strchrnul strchrnul
+#define T_strcmp strcmp
+#define T_strcpy strcpy
 #define T_strlcat strlcat
 #define T_strlen strlen
-#define T_strcmp strcmp
+#define T_strncat strncat
 #define T_strncmp strncmp
-#define T_strchrnul strchrnul
+#define T_strncpy strncpy
+#define T_strnlen strnlen
+#define T_strrchr strrchr
 #define T_strrstr strrstr
-#define T_bzero bzero
+#define T_strstr strstr
+#define T_strtok strtok
+#define T_strtok_r strtok_r
 
 #endif
+
+//------------------------------------------------------------------------------
+// Globals
+//------------------------------------------------------------------------------
 
 const char gnu_copypasta[] =
     "I would just like to interject for a moment. What you're referring to "\
@@ -131,6 +239,10 @@ static const int pos_4 = 212;
 static char* buf = NULL;
 static FILE* file = NULL;
 
+//------------------------------------------------------------------------------
+// Tests
+//------------------------------------------------------------------------------
+
 int boot_sprintf_tests(void) {
     int pos;
     int len = boot_asprintf(
@@ -138,7 +250,7 @@ int boot_sprintf_tests(void) {
         123, "asprintf", 076543, 0x9abcd, &pos, 0xFE1, 0
     );
     if (buf == NULL || len <= 0) {
-        printf("buf %p len %d\n", buf, len);
+        test_printf("buf %p len %d\n", buf, len);
         return __LINE__;
     }
     if (buf[len] != '\0') {
@@ -146,27 +258,27 @@ int boot_sprintf_tests(void) {
     }
     size_t buf_len = T_strlen(buf);
     if (buf_len != T_strlen(test_1) || buf_len != (size_t)len) {
-        printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
+        test_printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
         return __LINE__;
     }
     if (pos != pos_1) {
-        printf("E: %d != %d\n", pos, pos_1);
+        test_printf("E: %d != %d\n", pos, pos_1);
         return __LINE__;
     }
     int cmp = strcmp(buf, test_1);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     char append[128];
     int snprintf_test = boot_snprintf(append, 20, "%s", test_1);
     if (snprintf_test != (int)T_strlen(test_1)) {
-        printf("sprintf_test: %d\n", snprintf_test);
+        test_printf("sprintf_test: %d\n", snprintf_test);
         return __LINE__;
     }
     int len_2 = boot_snprintf(append, sizeof(append), "%s", test_1);
     if (len_2 != (int)T_strlen(test_1)) {
-        printf("E: %d != %zu\n", len_2, T_strlen(test_1));
+        test_printf("E: %d != %zu\n", len_2, T_strlen(test_1));
         return __LINE__;
     }
     char str2[128];
@@ -178,18 +290,18 @@ int boot_sprintf_tests(void) {
         return __LINE__;
     }
     if (end != &str2[pos_2]) {
-        printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
+        test_printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
         return __LINE__;
     }
     int cmp2 = T_strcmp(str2, test_2);
     if (cmp2 != 0) {
-        printf("cmp: %d\n", cmp2);
+        test_printf("cmp: %d\n", cmp2);
         return __LINE__;
     }
     char buf_3[30];
     int len_3 = boot_snprintf(buf_3, sizeof(buf_3), test_3);
     if (len_3 != pos_3) {
-        printf("E: %d != %d\n", len_3, pos_3);
+        test_printf("E: %d != %d\n", len_3, pos_3);
         return __LINE__;
     }
 
@@ -222,12 +334,12 @@ int boot_sprintf_tests(void) {
         5, 10
     );
     if (len_4 != pos_4) {
-        printf("E: %d != %d\n", len_4, pos_4);
+        test_printf("E: %d != %d\n", len_4, pos_4);
         return __LINE__;
     }
     int len_5 = boot_snprintf(SINK, 10, "");
     if (len_5 != 0) {
-        printf("E: %d != 0\n", len_5);
+        test_printf("E: %d != 0\n", len_5);
         return __LINE__;
     }
 
@@ -244,7 +356,7 @@ int nano_tests(void) {
         123, "asprintf", 076543, 0x9abcd, &pos, 0xFE1, 0
     );
     if (buf == NULL || len <= 0) {
-        printf("buf %p len %d\n", buf, len);
+        test_printf("buf %p len %d\n", buf, len);
         return __LINE__;
     }
     if (buf[len] != '\0') {
@@ -252,27 +364,27 @@ int nano_tests(void) {
     }
     size_t buf_len = T_strlen(buf);
     if (buf_len != T_strlen(test_1) || buf_len != (size_t)len) {
-        printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
+        test_printf("E: %zu != %zu != %d\n", T_strlen(test_1), buf_len, len);
         return __LINE__;
     }
     if (pos != pos_1) {
-        printf("E: %d != %d\n", pos, pos_1);
+        test_printf("E: %d != %d\n", pos, pos_1);
         return __LINE__;
     }
     int cmp = strcmp(buf, test_1);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     char append[128];
     int snprintf_test = snprintf(append, 20, "%s", test_1);
     if (snprintf_test != (int)T_strlen(test_1)) {
-        printf("sprintf_test: %d\n", snprintf_test);
+        test_printf("sprintf_test: %d\n", snprintf_test);
         return __LINE__;
     }
     int len_2 = snprintf(append, sizeof(append), "%s", test_1);
     if (len_2 != (int)T_strlen(test_1)) {
-        printf("E: %d != %zu\n", len_2, T_strlen(test_1));
+        test_printf("E: %d != %zu\n", len_2, T_strlen(test_1));
         return __LINE__;
     }
     char str2[128];
@@ -284,24 +396,24 @@ int nano_tests(void) {
         return __LINE__;
     }
     if (end != &str2[pos_2]) {
-        printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
+        test_printf("diff %p - %p = %td\n", end, str2, (ptrdiff_t)(end - str2));
         return __LINE__;
     }
     int cmp2 = T_strcmp(str2, test_2);
     if (cmp2 != 0) {
-        printf("cmp: %d\n", cmp2);
+        test_printf("cmp: %d\n", cmp2);
         return __LINE__;
     }
     char buf_30[30];
     int len_3sn = snprintf(buf_30, sizeof(buf_30), test_3);
     if (len_3sn != pos_3) {
-        printf("E: %d != %d\n", len_3sn, pos_3);
+        test_printf("E: %d != %d\n", len_3sn, pos_3);
         return __LINE__;
     }
 
     int len_3s = sprintf(buf_30, test_3);
     if (len_3s != pos_3) {
-        printf("E: %d != %d\n", len_3s, pos_3);
+        test_printf("E: %d != %d\n", len_3s, pos_3);
         return __LINE__;
     }
 
@@ -334,12 +446,12 @@ int nano_tests(void) {
         5, 10
     );
     if (len_4 != pos_4) {
-        printf("E: %d != %d\n", len_4, pos_4);
+        test_printf("E: %d != %d\n", len_4, pos_4);
         return __LINE__;
     }
     int len_5 = snprintf(SINK, 10, "");
     if (len_5 != 0) {
-        printf("E: %d != 0\n", len_5);
+        test_printf("E: %d != 0\n", len_5);
         return __LINE__;
     }
 
@@ -389,7 +501,7 @@ int memccpy_tests(void) {
     // test zero byte case
     void* ptr = T_memccpy((void*)0xC0FFEE, (void*)0x123456, 123, 0);
     if (ptr != NULL) {
-        printf("%p != NULL\n", ptr);
+        test_printf("%p != NULL\n", ptr);
         return __LINE__;
     }
     file = fopen(file_name, "wb");
@@ -490,7 +602,7 @@ int mempcpy_test(void) {
     // test zero byte case
     void* ptr = T_mempcpy((void*)0xC0FFEE, (void*)0x123456, 0);
     if (ptr != (void*)0xC0FFEE) {
-        printf("%p != %p\n", ptr, (void*)0xC0FFEE);
+        test_printf("%p != %p\n", ptr, (void*)0xC0FFEE);
         return __LINE__;
     }
     char data[192 + 1];
@@ -501,7 +613,7 @@ int mempcpy_test(void) {
     T_memset(append, 0x34, 64);
     char* res = T_mempcpy(&data[64], append, 64);
     if (res != &data[128]) {
-        printf("%p != %p\n", res, &data[128]);
+        test_printf("%p != %p\n", res, &data[128]);
         return __LINE__;
     }
 
@@ -512,7 +624,7 @@ int mempcpy_test(void) {
 
     int cmp = T_memcmp(data, truth, 192);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     return 0;
@@ -550,7 +662,7 @@ int bzero_test(void) {
     T_bzero(&data[8], 17);
     int cmp = T_memcmp(data, truth, 32);
     if (cmp != 0) {
-        printf("cmp: %d\n", cmp);
+        test_printf("cmp: %d\n", cmp);
         return __LINE__;
     }
     return 0;
@@ -593,6 +705,52 @@ int strncmp_test(void) {
     C(T_strncmp(str0, str2, 10) > 0);
     C(T_strncmp(str0, str3, 10) < 0);
     C(T_strncmp(str4 + 12, str5 + 11, 5) == 0);
+
+    C(T_memcmp(SINK, SINK, 0) == 0);
+    C(T_memcmp(SINK, SINK, 1) == 0);
+    C(T_memcmp(SINK, SINK, 2) == 0);
+    C(T_memcmp("C", "C", 1) == 0);
+    C(T_memcmp("A", "C", 1) < 0);
+    C(T_memcmp("C", "A", 1) > 0);
+    C(T_memcmp("CD", "CD", 2) == 0);
+    C(T_memcmp("AB", "CD", 2) < 0);
+    C(T_memcmp("CD", "AB", 2) > 0);
+    C(T_memcmp("FE", "FG", 2) < 0);
+    C(T_memcmp("FG", "FE", 2) > 0);
+    C(T_memcmp(str0, str1, 5) == 0);
+    C(T_memcmp(str0, str2, 10) > 0);
+    C(T_memcmp(str0, str3, 10) < 0);
+    C(T_memcmp(str4 + 12, str5 + 11, 5) == 0);
+
+    return 0;
+}
+
+int memchr_test(void) {
+    C(T_memchr(NULL_ptr, 0x00, 0) == NULL_ptr);
+    C(T_memchr(NULL_ptr, 0xFF, 0) == NULL_ptr);
+
+    C(T_memchr(SINK, 0x00, 0) == NULL);
+    C(T_memchr(SINK, 0x00, 1) == SINK);
+    C(T_memchr(SINK, 0xFF, 1) == NULL);
+    C(T_memchr(SINK, 0x00, 2) == SINK);
+    C(T_memchr(SINK, 0x00, 500) == SINK);
+    const char test0[] = "ABCDEFABCDEF\0G";
+    char const * const test = &test0[0];
+
+    const size_t test_size = sizeof(test0) - 2;
+    const size_t test_strlen = sizeof(test0) - 3;
+
+    C(T_memchr(test, '\0', sizeof(test0)) == &test[12]);
+    C(T_memchr(test, 'A', test_strlen) == &test[0]);
+    C(T_memchr(&test[7], 'A', 5) == NULL);
+    C(T_memchr(&test[6], 'A', 6) == &test[6]);
+    C(T_memchr(&test[5], 'A', 7) == &test[6]);
+    C(T_memchr(&test[7], 'B', 5) == &test[7]);
+    C(T_memchr(&test[8], 'C', 1) == &test[8]);
+    C(T_memchr(&test[8], 'C', 8) == &test[8]);
+    C(T_memchr(test, 'G', test_strlen) == NULL);
+    C(T_memchr(test, 'G', test_size) == NULL);
+    C(T_memchr(test0, 'G', sizeof(test0)) == &test[test_size]);
 
     return 0;
 }
@@ -695,6 +853,116 @@ int strlcat_test(void) {
     return 0;
 }
 
+int strcpy_test(void) {
+    char dst[10];
+    dst[0] = '\0';
+    C(T_strcpy(SINK, dst) == SINK);
+    C(T_strcpy(dst, SINK) == dst);
+
+    dst[0] = '\xff';
+    C(T_strcpy(dst, "") == dst); C(strcmp_exact(dst, ""));
+    C(T_strcpy(dst, "a") == dst); C(strcmp_exact(dst, "a"));
+    C(T_strcpy(dst, "bc") == dst); C(strcmp_exact(dst, "bc"));
+    C(T_strcpy(dst, "def") == dst); C(strcmp_exact(dst, "def"));
+    C(T_strcpy(dst, "123456789") == dst); C(strcmp_exact(dst, "123456789"));
+
+    return 0;
+}
+
+int strcat_test(void) {
+    char dst[10];
+    memset(dst, '\0', sizeof(dst));
+    C(T_strcat(SINK, dst) == SINK);
+    C(T_strcat(dst, SINK) == dst);
+
+    dst[0] = '\0';
+    C(T_strcat(dst, "" ) == dst); C(strcmp_exact(dst, ""));
+    C(T_strcat(dst, "a") == dst); C(strcmp_exact(dst, "a"));
+    C(T_strcat(dst, "b") == dst); C(strcmp_exact(dst, "ab"));
+    C(T_strcat(dst, "" ) == dst); C(strcmp_exact(dst, "ab"));
+    dst[0] = '\0';
+    C(T_strcat(dst, "Foo") == dst); C(strcmp_exact(dst, "Foo"));
+    C(T_strcat(dst, "Bar") == dst); C(strcmp_exact(dst, "FooBar"));
+
+    return 0;
+}
+
+int strncat_test(void) {
+    const char* src1 = "Foo";
+    const char* src2 = "Bar";
+    char dst[10];
+
+    strcpy(dst, src1); C(T_strncat(dst , src2, 0) == dst); C(strcmp_exact(dst, "Foo"));
+    strcpy(dst, src1); C(T_strncat(dst , src2, 1) == dst); C(strcmp_exact(dst, "FooB"));
+    strcpy(dst, src1); C(T_strncat(dst , src2, 2) == dst); C(strcmp_exact(dst, "FooBa"));
+    strcpy(dst, src1); C(T_strncat(dst , src2, 3) == dst); C(strcmp_exact(dst, "FooBar"));
+    strcpy(dst, src1); C(T_strncat(dst , src2, 4) == dst); C(strcmp_exact(dst, "FooBar"));
+    strcpy(dst, src1); C(T_strncat(dst , src2, 5) == dst); C(strcmp_exact(dst, "FooBar"));
+
+    strcpy(dst, src1); C(T_strncat(dst , SINK, 0) == dst); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strncat(dst , SINK, 1) == dst); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strncat(dst , SINK, 2) == dst); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strncat(dst , SINK, 3) == dst); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strncat(dst , SINK, 4) == dst); C(strcmp_exact(dst, src1));
+    strcpy(dst, src1); C(T_strncat(dst , SINK, 5) == dst); C(strcmp_exact(dst, src1));
+
+    dst[0] = '\0'; C(T_strncat(dst, SINK, 0) == dst); C(dst[0] == '\0');
+    dst[0] = '\0'; C(T_strncat(dst, SINK, 1) == dst); C(dst[0] == '\0');
+    dst[0] = '\0'; C(T_strncat(dst, SINK, 2) == dst); C(dst[0] == '\0');
+
+    dst[0] = '\0'; C(T_strncat(dst, src1, 0) == dst); C(strcmp_exact(dst, ""));
+    dst[0] = '\0'; C(T_strncat(dst, src1, 1) == dst); C(strcmp_exact(dst, "F"));
+    dst[0] = '\0'; C(T_strncat(dst, src1, 2) == dst); C(strcmp_exact(dst, "Fo"));
+    dst[0] = '\0'; C(T_strncat(dst, src1, 3) == dst); C(strcmp_exact(dst, "Foo"));
+    dst[0] = '\0'; C(T_strncat(dst, src1, 4) == dst); C(strcmp_exact(dst, "Foo"));
+    dst[0] = '\0'; C(T_strncat(dst, src1, 5) == dst); C(strcmp_exact(dst, "Foo"));
+
+    return 0;
+}
+
+int strncpy_test(void) {
+    char text[6];
+
+    C(T_strncpy(NULL_ptr, "", 0) == NULL_ptr + 0);
+    C(T_strncpy(NULL_ptr, "foobar", 0) == NULL_ptr + 0);
+
+    memset(text, '\xee', 6);
+
+    C(T_strncpy(text, "1", 5) == text);
+    C(memcmp(text, "1\0\0\0\0\xee", 6) == 0);
+
+    C(T_strncpy(text, "1234", 5) == text);
+    C(memcmp(text, "1234\0\xee", 6) == 0);
+
+    C(T_strncpy(text, "12345", 5) == text);
+    C(memcmp(text, "12345\xee", 6) == 0);
+
+    C(T_strncpy(text, "123456", 5) == text);
+    C(memcmp(text, "12345\xee", 6) == 0);
+
+    memset(text, '\xff', 6);
+
+    C(T_strncpy(text, "", 0) == text);
+    C(memcmp(text, "\xff\xff\xff\xff\xff\xff", 6) == 0);
+
+    C(T_strncpy(text, "123456", 1) == text);
+    C(memcmp(text, "1\xff\xff\xff\xff\xff", 6) == 0);
+
+    C(T_strncpy(text, "6", 1) == text);
+    C(memcmp(text, "6\xff\xff\xff\xff\xff", 6) == 0);
+
+    C(T_strncpy(text, "", 1) == text);
+    C(memcmp(text, "\0\xff\xff\xff\xff\xff", 6) == 0);
+
+    C(T_strncpy(text, "a", 2) == text);
+    C(memcmp(text, "a\0\xff\xff\xff\xff", 6) == 0);
+
+    C(T_strncpy(text, "", 5) == text);
+    C(memcmp(text, "\0\0\0\0\0\xff", 6) == 0);
+
+    return 0;
+}
+
 int stpncpy_test(void) {
     char text[6];
 
@@ -721,19 +989,19 @@ int stpncpy_test(void) {
     C(memcmp(text, "\xff\xff\xff\xff\xff\xff", 6) == 0);
 
     C(T_stpncpy(text, "123456", 1) == text + 1);
-    C(memcmp(text, "1\xff\xff\xff\xff\xff", 1) == 0);
+    C(memcmp(text, "1\xff\xff\xff\xff\xff", 6) == 0);
 
     C(T_stpncpy(text, "6", 1) == text + 1);
-    C(memcmp(text, "6\xff\xff\xff\xff\xff", 1) == 0);
+    C(memcmp(text, "6\xff\xff\xff\xff\xff", 6) == 0);
 
     C(T_stpncpy(text, "", 1) == text + 0);
-    C(memcmp(text, "\0\xff\xff\xff\xff\xff", 1) == 0);
+    C(memcmp(text, "\0\xff\xff\xff\xff\xff", 6) == 0);
 
     C(T_stpncpy(text, "a", 2) == text + 1);
-    C(memcmp(text, "a\0\xff\xff\xff\xff", 1) == 0);
+    C(memcmp(text, "a\0\xff\xff\xff\xff", 6) == 0);
 
     C(T_stpncpy(text, "", 5) == text + 0);
-    C(memcmp(text, "\0\0\0\0\0\xff", 1) == 0);
+    C(memcmp(text, "\0\0\0\0\0\xff", 6) == 0);
 
     return 0;
 }
@@ -952,6 +1220,38 @@ int memrmem_test(void) {
     return 0;
 }
 
+int strstr_test(void) {
+    const char str1[] = "abcdef123\0aababc123";
+
+    C(T_strstr(SINK, SINK) == SINK);
+    C(T_strstr(SINK, str1) == NULL);
+    C(T_strstr(str1, SINK) == str1);
+    C(T_strstr(str1, str1) == str1);
+
+    C(T_strstr(str1 +  0, str1 + 6) == str1 +  6);
+    C(T_strstr(str1 +  9, str1 + 9) == str1 +  9);
+    C(T_strstr(str1 + 10, "ab") == str1 + 11);
+    C(T_strstr(str1 + 10, "aa") == str1 + 10);
+    C(T_strstr(str1 + 10, "b" ) == str1 + 12);
+    C(T_strstr(str1 + 10, "ba") == str1 + 12);
+    C(T_strstr(str1 + 10, "aac") == NULL);
+
+    C(T_strstr(gnu_copypasta, ""          ) == gnu_copypasta +   0);
+    C(T_strstr(gnu_copypasta, "a"         ) == gnu_copypasta +  35);
+    C(T_strstr(gnu_copypasta, "by"        ) == gnu_copypasta + 286);
+    C(T_strstr(gnu_copypasta, "GNU"       ) == gnu_copypasta +  92);
+    C(T_strstr(gnu_copypasta, "full"      ) == gnu_copypasta + 245);
+    C(T_strstr(gnu_copypasta, "linux"     ) == NULL);
+    C(T_strstr(gnu_copypasta, "Linux"     ) == gnu_copypasta +  73);
+    C(T_strstr(gnu_copypasta, "I would"   ) == gnu_copypasta +   0);
+    C(T_strstr(gnu_copypasta, "POSIX"     ) == gnu_copypasta + 386);
+    C(T_strstr(gnu_copypasta, "POsIX"     ) == NULL);
+    C(T_strstr(gnu_copypasta, "system"    ) == gnu_copypasta + 186);
+    C(T_strstr(gnu_copypasta, " component") == gnu_copypasta + 229);
+
+    return 0;
+}
+
 int strrstr_test(void) {
     const char str1[] = "abcdef123\0aababc123";
 
@@ -968,6 +1268,7 @@ int strrstr_test(void) {
     C(T_strrstr(str1 + 10, "ba") == str1 + 12);
     C(T_strrstr(str1 + 10, "aac") == NULL);
 
+    C(T_strrstr(gnu_copypasta, ""          ) == gnu_copypasta +  390);
     C(T_strrstr(gnu_copypasta, "a"         ) == gnu_copypasta +  372);
     C(T_strrstr(gnu_copypasta, "by"        ) == gnu_copypasta +  383);
     C(T_strrstr(gnu_copypasta, "GNU"       ) == gnu_copypasta +  293);
@@ -984,13 +1285,187 @@ int strrstr_test(void) {
 }
 
 int strchrnul_test(void) {
+    const char one_char[] = "S";
+
+    C(T_strchr(SINK, '\0') == SINK);
+    C(T_strchr(SINK, '\xff') == NULL);
+    C(T_strchr(one_char, 'S') == one_char);
+    C(T_strchr(one_char, 's') == NULL);
+    C(T_strchr(one_char, '\0') == one_char + 1);
+
+    C(T_strrchr(SINK, '\0') == SINK);
+    C(T_strrchr(SINK, '\xff') == NULL);
+    C(T_strrchr(one_char, 'S') == one_char);
+    C(T_strrchr(one_char, 's') == NULL);
+    C(T_strrchr(one_char, '\0') == one_char + 1);
+
     C(T_strchrnul(SINK, '\0') == SINK);
     C(T_strchrnul(SINK, '\xff') == SINK);
+    C(T_strchrnul(one_char, 'S') == one_char);
+    C(T_strchrnul(one_char, 's') == one_char + 1);
+    C(T_strchrnul(one_char, '\0') == one_char + 1);
+
+    C(T_strchr(gnu_copypasta, '\0') == gnu_copypasta + 391);
+    C(T_strchr(gnu_copypasta, 'a') == gnu_copypasta + 35);
+    C(T_strchr(gnu_copypasta, 'A') == NULL);
+    C(T_strrchr(gnu_copypasta, '\0') == gnu_copypasta + 391);
+    C(T_strrchr(gnu_copypasta, 'a') == gnu_copypasta + 372);
+    C(T_strrchr(gnu_copypasta, 'A') == NULL);
+
     const size_t test_3_len = strlen(test_3);
     C(T_strchrnul(test_3, '\0') == test_3 + test_3_len);
     for (size_t i = 0; i < test_3_len; i++) {
         C(T_strchrnul(test_3, test_3[i]) == strchr(test_3, test_3[i]));
     }
+    return 0;
+}
+
+int strtok_test(void) {
+    const char input_empty[] = "\x00\xff";
+    const char truth_empty[] = "\x00\xff";
+    const char input_text[] = "?a???b,,,#c";
+    const char truth_text[] = "?a\0??b\0,,#c";
+    const char input_str[] = "A bird came... down the walk";
+    const char truth_str[] = "A\0bird\0came\0.. down\0the\0walk";
+    const char delim[] = " .,";
+    char empty[sizeof(input_empty)];
+    char text[sizeof(input_text)];
+    char str[sizeof(input_str)];
+
+    /* strtok */ {
+        char *token;
+        memcpy(empty, input_empty, sizeof(input_empty));
+        strcpy(text, input_text);
+        strcpy(str, input_str);
+
+        token = T_strtok(empty, "");
+        C(token == NULL);
+
+        token = T_strtok(NULL, "");
+        C(token == NULL);
+
+        C(T_memcmp(empty, truth_empty, sizeof(truth_empty)) == 0);
+
+        // token points to the token "a"
+        token = T_strtok(text, "?");
+        C(token == text + 1);
+        C(strcmp_exact(token, "a"));
+
+        // token points to the token "??b"
+        token = T_strtok(NULL, ",");
+        C(token == text + 3);
+        C(strcmp_exact(token, "??b"));
+
+        // token points to the token "c"
+        token = T_strtok(NULL, "#,");
+        C(token == text + 10);
+        C(strcmp_exact(token, "c"));
+
+        // token is a null pointer
+        token = T_strtok(NULL, "?");
+        C(token == NULL);
+
+        C(T_memcmp(text, truth_text, sizeof(truth_text)) == 0);
+
+        strcpy(str, input_str);
+
+        token = strtok(str , delim);
+        C(token == str + 0);
+
+        token = strtok(NULL, delim);
+        C(token == str + 2);
+
+        token = strtok(NULL, delim);
+        C(token == str + 7);
+
+        token = strtok(NULL, delim);
+        C(token == str + 15);
+
+        token = strtok(NULL, delim);
+        C(token == str + 20);
+
+        token = strtok(NULL, delim);
+        C(token == str + 24);
+
+        token = strtok(NULL, delim);
+        C(token == NULL);
+
+        C(T_memcmp(str, truth_str, sizeof(truth_str)) == 0);
+    }
+
+    /* strtok_r */ {
+        char *save_ptr;
+        char *token;
+        memcpy(empty, input_empty, sizeof(input_empty));
+        strcpy(text, input_text);
+        strcpy(str, input_str);
+
+        token = T_strtok_r(empty, "", &save_ptr);
+        C(token == NULL);
+        C(save_ptr == empty);
+
+        token = T_strtok_r(NULL, "", &save_ptr);
+        C(token == NULL);
+        C(save_ptr == empty);
+
+        C(T_memcmp(empty, truth_empty, sizeof(truth_empty)) == 0);
+
+        // token points to the token "a"
+        token = T_strtok_r(text, "?", &save_ptr);
+        C(token == text + 1);
+        C(strcmp_exact(token, "a"));
+        C(save_ptr == text + 3);
+
+        // token points to the token "??b"
+        token = T_strtok_r(NULL, ",", &save_ptr);
+        C(token == text + 3);
+        C(strcmp_exact(token, "??b"));
+        C(save_ptr == text + 7);
+
+        // token points to the token "c"
+        token = T_strtok_r(NULL, "#,", &save_ptr);
+        C(token == text + 10);
+        C(strcmp_exact(token, "c"));
+        C(save_ptr == text + 11);
+
+        // token is a null pointer
+        token = T_strtok_r(NULL, "?", &save_ptr);
+        C(token == NULL);
+        C(save_ptr == text + 11);
+
+        C(T_memcmp(text, truth_text, sizeof(truth_text)) == 0);
+
+        token = T_strtok_r(str , delim, &save_ptr);
+        C(token == str + 0);
+        C(save_ptr == str + 2);
+
+        token = T_strtok_r(NULL, delim, &save_ptr);
+        C(token == str + 2);
+        C(save_ptr == str + 7);
+
+        token = T_strtok_r(NULL, delim, &save_ptr);
+        C(token == str + 7);
+        C(save_ptr == str + 12);
+
+        token = T_strtok_r(NULL, delim, &save_ptr);
+        C(token == str + 15);
+        C(save_ptr == str + 20);
+
+        token = T_strtok_r(NULL, delim, &save_ptr);
+        C(token == str + 20);
+        C(save_ptr == str + 24);
+
+        token = T_strtok_r(NULL, delim, &save_ptr);
+        C(token == str + 24);
+        C(save_ptr == str + 28);
+
+        token = T_strtok_r(NULL, delim, &save_ptr);
+        C(token == NULL);
+        C(save_ptr == str + 28);
+
+        C(T_memcmp(str, truth_str, sizeof(truth_str)) == 0);
+    }
+
     return 0;
 }
 
@@ -1018,38 +1493,24 @@ int run_tests(void) {
     TEST(mempcpy_test());
     TEST(bzero_test());
     TEST(strncmp_test());
+    TEST(memchr_test());
     TEST(memrchr_test());
     TEST(memmove_test());
+    TEST(strcpy_test());
+    TEST(strcat_test());
+    TEST(strncat_test());
     TEST(strlcat_test());
+    TEST(strncpy_test());
     TEST(stpncpy_test());
     TEST(memmem_test());
     TEST(memrmem_test());
+    TEST(strstr_test());
     TEST(strrstr_test());
     TEST(strchrnul_test());
+    TEST(strtok_test());
 
     return 0;
 }
-
-#if 0
-static void write_letter(char c) {
-    if (isgraph(c)) {
-        fputc(c, stdout);
-        return;
-    }
-    fputc('\\', stdout);
-    switch (c) {
-        case '\0': fputc('0', stdout); return;
-        case ' ': fputc('s', stdout); return;
-        case '\n': fputc('n', stdout); return;
-        case '\t': fputc('t', stdout); return;
-        case '\v': fputc('v', stdout); return;
-        case '\r': fputc('r', stdout); return;
-        case '\f': fputc('f', stdout); return;
-        case '\b': fputc('b', stdout); return;
-        default: printf("x%02X", (unsigned int)c); return;
-    }
-}
-#endif
 
 int main(void)
 {
