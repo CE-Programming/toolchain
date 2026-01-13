@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - v14.2
+      - v14.*
 
 env:
   AUTOTESTER_LIBS_GROUP: ${{github.workspace}}/toolchain/clibs.8xg
