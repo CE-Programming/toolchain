@@ -5,26 +5,6 @@
 	.global	_mempcpy
 	.type	_mempcpy, @function
 
-.if 0
-
-; faster when count is zero
-_mempcpy:
-	ld	iy, -1
-	add	iy, sp
-	ld	bc, (iy + 10)	; Load count
-	sbc	hl, hl
-	add	hl, bc
-	ld	hl, (iy + 4)	; Load destination
-	ret	nc	; zero bytes to copy
-	ld	de, (iy + 7)	; Load source
-	ex	de, hl
-	ldir
-	ex	de, hl
-	ret
-
-.else
-
-; faster in full execution case by 0F + 1 clock cycles
 _mempcpy:
 	ld	iy, -1
 	add	iy, sp
@@ -38,5 +18,3 @@ _mempcpy:
 .L.zero_byte_copy:
 	ex	de, hl
 	ret
-
-.endif
