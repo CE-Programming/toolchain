@@ -110,6 +110,7 @@ CEDEV_OBJ = $(call NATIVEPATH,$(BIN)/cedev-obj$(EXE_SUFFIX))
 
 # filepath operations
 MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
+FORWARD_PATH = $(subst \,/,$1)
 UPDIR_ADD = $(subst ../,_../,$(subst \,/,$1))
 UPDIR_RM = $(subst _../,../,$(subst \,/,$1))
 
@@ -118,14 +119,14 @@ CC_DEBUG = -DNDEBUG=1
 LD_DEBUG = --defsym NDEBUG=1
 
 # linker script
-LINKER_SCRIPT ?= $(CEDEV_TOOLCHAIN)/meta/linker_script.ld
+LINKER_SCRIPT ?= $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script.ld)
 
 # allocator (malloc/realloc/free)
 ifeq ($(ALLOCATOR),STANDARD)
-LIB_ALLOCATOR = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_standard.a)
+LIB_ALLOCATOR = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_standard.a)
 endif
 ifeq ($(ALLOCATOR),SIMPLE)
-LIB_ALLOCATOR = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_simple.a)
+LIB_ALLOCATOR = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_simple.a)
 endif
 
 # ensure always a hexadecimal value
@@ -135,10 +136,10 @@ STACK_HIGH := 0x$(patsubst 0x%,%,$(STACK_HIGH))
 LOAD_ADDR := 0x$(patsubst 0x%,%,$(LOAD_ADDR))
 
 # ensure native paths
-SRCDIR := $(call NATIVEPATH,$(SRCDIR))
-OBJDIR := $(call NATIVEPATH,$(OBJDIR))
-BINDIR := $(call NATIVEPATH,$(BINDIR))
-GFXDIR := $(call NATIVEPATH,$(GFXDIR))
+SRCDIR := $(call FORWARD_PATH,$(SRCDIR))
+OBJDIR := $(call FORWARD_PATH,$(OBJDIR))
+BINDIR := $(call FORWARD_PATH,$(BINDIR))
+GFXDIR := $(call FORWARD_PATH,$(GFXDIR))
 
 # generate default names
 TARGETBIN ?= $(NAME).bin
@@ -146,10 +147,10 @@ TARGETOBJ ?= $(NAME).obj
 TARGETTMP ?= $(NAME).o
 TARGETMAP ?= $(NAME).map
 TARGET8XP ?= $(NAME).8xp
-ICON_IMG := $(wildcard $(call NATIVEPATH,$(ICON)))
+ICON_IMG := $(call FORWARD_PATH,$(wildcard $(call NATIVEPATH,$(ICON))))
 
 # startup routines
-CRT0_SRC = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/crt0.S)
+CRT0_SRC = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/crt/crt0.S)
 CRT0_TMP = $(OBJDIR)/crt0.s
 CRT0_OBJ = $(OBJDIR)/crt0.o
 LTO_BC = $(OBJDIR)/lto.bc
@@ -195,23 +196,23 @@ endif
 ifneq ($(SKIP_LIBRARY_LDFLAGS),YES)
 # find all required/optional libload libraries
 LIBLOAD_LIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib) $(EXTRA_LIBLOAD_LIBS)
-LIBLOAD_LIBS := $(filter-out %libload.lib,$(LIBLOAD_LIBS))
+LIBLOAD_LIBS := $(foreach l,$(filter-out %libload.lib,$(LIBLOAD_LIBS)),$(call QUOTE_ARG,$(call FORWARD_PATH,$l)))
 endif
 
 # check if there is an icon present that to convert
 ifneq ($(ICON_IMG),)
-ICON_SRC = $(call NATIVEPATH,$(OBJDIR)/icon.s)
+ICON_SRC = $(OBJDIR)/icon.s
 ifneq ($(DESCRIPTION),)
 ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICON_IMG)) --icon-output $(call QUOTE_ARG,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
 else
 ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICON_IMG)) --icon-output $(call QUOTE_ARG,$(ICON_SRC)) --icon-format gas
 endif
-ICON_OBJ = $(call NATIVEPATH,$(OBJDIR)/icon.obj)
+ICON_OBJ = $(OBJDIR)/icon.obj
 else
 ifneq ($(DESCRIPTION),)
-ICON_SRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.s)
+ICON_SRC ?= $(OBJDIR)/icon.s
 ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
-ICON_OBJ = $(call NATIVEPATH,$(OBJDIR)/icon.obj)
+ICON_OBJ = $(OBJDIR)/icon.obj
 endif
 endif
 
@@ -245,22 +246,22 @@ else
 LD_MAP =
 endif
 ifeq ($(HAS_CUSTOM_FILE),YES)
-DEFCUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
+CC_CUSTOMFILE := -DHAS_CUSTOM_FILE=1 -DCUSTOM_FILE_FILE=\"$(CUSTOM_FILE_FILE)\"
 endif
 
 # choose crt
 ifeq ($(PREFER_OS_CRT),YES)
-LIB_CRT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt_os.a)
+LIB_CRT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt_os.a)
 else
-LIB_CRT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt.a)
+LIB_CRT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/crt/libcrt.a)
 endif
 
 # choose libc
 ifeq ($(HAS_LIBC),YES)
 ifeq ($(PREFER_OS_LIBC),YES)
-LIB_C = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc_os.a)
+LIB_C = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc_os.a)
 else
-LIB_C = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc.a)
+LIB_C = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libc.a)
 endif
 else
 LIB_C =
@@ -268,18 +269,18 @@ endif
 
 # choose libcxx
 ifeq ($(HAS_LIBCXX),YES)
-LIB_CXX = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libcxx/libcxx.a)
+LIB_CXX = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libcxx/libcxx.a)
 else
 LIB_CXX =
 endif
 
 # add other libs
-LIB_CE = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/ce/libce.a)
-LIB_SOFTFLOAT = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/softfloat/libsoftfloat.a)
+LIB_CE = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/ce/libce.a)
+LIB_SOFTFLOAT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/softfloat/libsoftfloat.a)
 
 # include printf
 ifeq ($(HAS_PRINTF),YES)
-LIB_PRINTF = $(call NATIVEPATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf.a)
+LIB_PRINTF = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf.a)
 else
 LIB_PRINTF =
 endif
@@ -293,9 +294,9 @@ endif
 
 # define the compiler/assembler flags
 EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style -ffunction-sections -fdata-sections -fno-addrsig -fno-autolink -fno-threadsafe-statics $(MATH_ERRNO)
-EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_ARG,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_DEBUG) $(DEFCUSTOMFILE)
+EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include)) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_DEBUG) $(CC_CUSTOMFILE)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include/c++)) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 EZASFLAGS = -march=ez80+full $(ASFLAGS)
 
@@ -364,7 +365,7 @@ gfx:
 	$(Q)$(MAKE_GFX)
 
 test:
-	$(Q)$(CEMUTEST) $(call QUOTE_ARG,$(CURDIR)/autotest.json)
+	$(Q)$(CEMUTEST) $(call QUOTE_ARG,$(call FORWARD_PATH,$(CURDIR)/autotest.json))
 
 version:
 	$(Q)echo CE C/C++ Toolchain $(shell cedev-config --version)
