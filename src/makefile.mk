@@ -29,6 +29,7 @@ LOAD_ADDR ?= 0xD1A87F
 OUTPUT_MAP ?= YES
 CFLAGS ?= -Wall -Wextra -Oz
 CXXFLAGS ?= -Wall -Wextra -Oz
+ASFLAGS ?=
 LTOFLAGS ?= $(CFLAGS)
 LTO ?= YES
 SRCDIR ?= src
@@ -108,8 +109,7 @@ STRIP = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-strip$(EXE_SUFFIX))
 CEDEV_OBJ = $(call NATIVEPATH,$(BIN)/cedev-obj$(EXE_SUFFIX))
 
 # filepath operations
-QUOTE_NATIVE = $(call QUOTE_ARG,$(call NATIVEPATH,$1))
-MKDIR = $(call NATIVEMKDR,$(call QUOTE_NATIVE,$1))
+MKDIR = $(call NATIVEMKDR,$(call QUOTE_ARG,$(call NATIVEPATH,$1)))
 UPDIR_ADD = $(subst ../,_../,$(subst \,/,$1))
 UPDIR_RM = $(subst _../,../,$(subst \,/,$1))
 
@@ -202,15 +202,15 @@ endif
 ifneq ($(ICON_IMG),)
 ICON_SRC = $(call NATIVEPATH,$(OBJDIR)/icon.s)
 ifneq ($(DESCRIPTION),)
-ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_NATIVE,$(ICON_IMG)) --icon-output $(call QUOTE_NATIVE,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
+ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICON_IMG)) --icon-output $(call QUOTE_ARG,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
 else
-ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_NATIVE,$(ICON_IMG)) --icon-output $(call QUOTE_NATIVE,$(ICON_SRC)) --icon-format gas
+ICON_CONV ?= $(CONVIMG) --icon $(call QUOTE_ARG,$(ICON_IMG)) --icon-output $(call QUOTE_ARG,$(ICON_SRC)) --icon-format gas
 endif
 ICON_OBJ = $(call NATIVEPATH,$(OBJDIR)/icon.obj)
 else
 ifneq ($(DESCRIPTION),)
 ICON_SRC ?= $(call NATIVEPATH,$(OBJDIR)/icon.s)
-ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_NATIVE,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
+ICON_CONV ?= $(CONVIMG) --icon-output $(call QUOTE_ARG,$(ICON_SRC)) --icon-format gas --icon-description $(DESCRIPTION)
 ICON_OBJ = $(call NATIVEPATH,$(OBJDIR)/icon.obj)
 endif
 endif
@@ -291,12 +291,13 @@ else
 MATH_ERRNO = -fno-math-errno
 endif
 
-# define the c/c++ flags used by clang
+# define the compiler/assembler flags
 EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style -ffunction-sections -fdata-sections -fno-addrsig -fno-autolink -fno-threadsafe-statics $(MATH_ERRNO)
-EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_NATIVE,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_DEBUG) $(DEFCUSTOMFILE)
+EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_ARG,$(CEDEV_TOOLCHAIN)/include) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_DEBUG) $(DEFCUSTOMFILE)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_NATIVE,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(CEDEV_TOOLCHAIN)/include/c++) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
+EZASFLAGS = -march=ez80+full $(ASFLAGS)
 
 .PHONY: all clean version gfx debug
 
@@ -310,16 +311,16 @@ debug: $(BINDIR)/$(TARGET8XP)
 
 $(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(CONVBIN) $(CONVBINFLAGS) -i $(call QUOTE_NATIVE,$<) -o $(call QUOTE_NATIVE,$@)
+	$(Q)$(CONVBIN) $(CONVBINFLAGS) -i $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 $(BINDIR)/$(TARGETBIN): $(BINDIR)/$(TARGETOBJ)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [objcopy] $(call NATIVEPATH,$@)
+	$(Q)echo [objcopy] $@
 	$(Q)$(OBJCOPY) -O binary $(call QUOTE_ARG,$<) $(call QUOTE_ARG,$@)
 
 $(BINDIR)/$(TARGETOBJ): $(CRT0_OBJ) $(OBJDIR)/$(TARGETTMP) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [linking] $(call NATIVEPATH,$@)
+	$(Q)echo [linking] $@
 	$(Q)$(LD) \
 		-static \
 		--entry=__start \
@@ -363,7 +364,7 @@ gfx:
 	$(Q)$(MAKE_GFX)
 
 test:
-	$(Q)$(CEMUTEST) $(call QUOTE_NATIVE,$(CURDIR)/autotest.json)
+	$(Q)$(CEMUTEST) $(call QUOTE_ARG,$(CURDIR)/autotest.json)
 
 version:
 	$(Q)echo CE C/C++ Toolchain $(shell cedev-config --version)
@@ -384,16 +385,16 @@ $(OBJDIR)/%.$(CPP_EXTENSION).s: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_H
 
 $(OBJDIR)/%.$(C_EXTENSION).o: $(OBJDIR)/%.$(C_EXTENSION).s
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(AS) $(EZASFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(OBJDIR)/%.$(CPP_EXTENSION).o: $(OBJDIR)/%.$(CPP_EXTENSION).s
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(AS) $(EZASFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(OBJDIR)/%.s.o: $$(call UPDIR_RM,$$*).s 
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [as] $<
-	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(AS) $(EZASFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(OBJDIR)/%.s: $$(call UPDIR_RM,$$*).S
 	$(Q)$(call MKDIR,$(@D))
@@ -402,17 +403,17 @@ $(OBJDIR)/%.s: $$(call UPDIR_RM,$$*).S
 
 $(OBJDIR)/%.S.o: $(OBJDIR)/%.s
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(AS) $(EZASFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 # lto
 $(LTO_OBJ): $(LTO_SRC)
-	$(Q)$(AS) -march=ez80+full $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
+	$(Q)$(AS) $(EZASFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(LTO_SRC): $(LTO_BC)
 	$(Q)$(CC) -S $(EZLTOFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(LTO_BC): $(LTO_FILES)
-	$(Q)echo [lto] $(call NATIVEPATH,$@)
+	$(Q)echo [lto] $@
 	$(Q)$(LINK) $(foreach d,$^,$(call QUOTE_ARG,$(addprefix $(CURDIR)/,$d))) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
 $(OBJDIR)/%.$(C_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(C_EXTENSION) $(EXTRA_HEADERS) $(MAKEFILE_LIST) $(DEPS)

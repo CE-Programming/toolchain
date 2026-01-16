@@ -89,13 +89,21 @@ Compiler Configuration
 
 .. rubric:: CFLAGS / CXXFLAGS
 
-These flags are passed to the compiler.
+These flags are additionally passed to the compiler.
 :code:`CFLAGS` is used for C source files, :code:`CXXFLAGS` is used for C++ source files.
 
 .. code-block:: makefile
 
     CFLAGS = -Wall -Wextra -Oz
     CXXFLAGS = -Wall -Wextra -Oz
+
+.. rubric:: ASFLAGS
+
+These flags are additionally passed to the assembler:
+
+.. code-block:: makefile
+
+    ASFLAGS =
 
 .. rubric:: LTO
 
