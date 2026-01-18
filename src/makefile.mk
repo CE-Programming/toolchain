@@ -22,6 +22,7 @@ ICON ?=
 DESCRIPTION ?=
 COMPRESSED ?= NO
 ARCHIVED ?= YES
+APPLICATION ?= NO
 BSSHEAP_LOW ?= 0xD052C6
 BSSHEAP_HIGH ?= 0xD13FD8
 STACK_HIGH ?= 0xD1A87E
@@ -142,11 +143,10 @@ BINDIR := $(call FORWARD_PATH,$(BINDIR))
 GFXDIR := $(call FORWARD_PATH,$(GFXDIR))
 
 # generate default names
-TARGETBIN ?= $(NAME).bin
 TARGETOBJ ?= $(NAME).obj
 TARGETTMP ?= $(NAME).o
 TARGETMAP ?= $(NAME).map
-TARGET8XP ?= $(NAME).8xp
+TARGET ?= $(NAME).8xp
 ICON_IMG := $(call FORWARD_PATH,$(wildcard $(call NATIVEPATH,$(ICON))))
 
 # startup routines
@@ -222,6 +222,13 @@ MAKE_GFX ?= cd $(GFXDIR) && $(CONVIMG)
 endif
 
 # determine output target flags
+ifeq ($(APPLICATION),YES)
+LD_EMIT_RELOCS = --emit-relocs
+LOAD_ADDR = 0x000000
+CONVBINFLAGS += -k 8ek
+TARGET ?= $(NAME).8ek
+else
+LD_EMIT_RELOCS =
 ifeq ($(ARCHIVED),YES)
 CONVBINFLAGS += -r
 endif
@@ -231,6 +238,9 @@ CONVBINFLAGS += -k 8xp-compressed
 else
 CONVBINFLAGS += -k 8xp
 endif
+endif
+
+# common output targer flags
 ifeq ($(HAS_UPPERCASE_NAME),YES)
 CONVBINFLAGS += -u
 endif
@@ -303,21 +313,16 @@ EZASFLAGS = -march=ez80+full $(ASFLAGS)
 .PHONY: all clean version gfx debug
 
 # this rule is trigged to build everything
-all: $(BINDIR)/$(TARGET8XP)
+all: $(BINDIR)/$(TARGET)
 
 # this rule is trigged to build debug everything
 debug: CC_DEBUG = -DDEBUG=1
 debug: LD_DEBUG = --defsym DEBUG=1
-debug: $(BINDIR)/$(TARGET8XP)
+debug: $(BINDIR)/$(TARGET)
 
-$(BINDIR)/$(TARGET8XP): $(BINDIR)/$(TARGETBIN) $(MAKEFILE_LIST) $(DEPS)
+$(BINDIR)/$(TARGET): $(BINDIR)/$(TARGETOBJ) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(CONVBIN) $(CONVBINFLAGS) -i $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
-
-$(BINDIR)/$(TARGETBIN): $(BINDIR)/$(TARGETOBJ)
-	$(Q)$(call MKDIR,$(@D))
-	$(Q)echo [objcopy] $@
-	$(Q)$(OBJCOPY) -O binary $(call QUOTE_ARG,$<) $(call QUOTE_ARG,$@)
+	$(Q)$(CONVBIN) $(CONVBINFLAGS) -j elf -i $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 $(BINDIR)/$(TARGETOBJ): $(CRT0_OBJ) $(OBJDIR)/$(TARGETTMP) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
@@ -335,6 +340,7 @@ $(BINDIR)/$(TARGETOBJ): $(CRT0_OBJ) $(OBJDIR)/$(TARGETTMP) $(MAKEFILE_LIST) $(DE
 		--defsym __TICE__=1 \
 		-T$(LINKER_SCRIPT) \
 		$(LD_MAP) \
+		$(LD_EMIT_RELOCS) \
 		$(EXTRA_LDFLAGS) \
 		$(OBJDIR)/$(TARGETTMP) \
 		$(CRT0_OBJ) \
