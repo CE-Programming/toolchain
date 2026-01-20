@@ -5,11 +5,8 @@
 	.global	_memmove
 	.type	_memmove, @function
 
-.ifdef PREFER_OS_LIBC
-
-	.set	_memmove, 0x0000A8
-
-.else
+	; Note: TiOS memmove works fine, but our implementation is faster
+	; .set	_memmove, 0x0000A8
 
 .if 1
 
@@ -111,7 +108,5 @@ _memmove:
 	; size == 0
 	ex	de, hl
 	ret
-
-.endif
 
 .endif
