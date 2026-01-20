@@ -226,7 +226,9 @@ ifeq ($(APPLICATION),YES)
 LD_EMIT_RELOCS = --emit-relocs
 LOAD_ADDR = 0x000000
 CONVBINFLAGS += -k 8ek
-TARGET ?= $(NAME).8ek
+TARGET = $(NAME).8ek
+CRT0_APPLICATION = -DHAS_APPLICATION=1
+LINKER_SCRIPT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script_app.ld)
 else
 LD_EMIT_RELOCS =
 ifeq ($(ARCHIVED),YES)
@@ -469,7 +471,7 @@ $(CRT0_OBJ): $(CRT0_TMP)
 
 $(CRT0_TMP): $(CRT0_SRC) $(OBJDIR)/crt.h
 	$(Q)$(call MKDIR,$(@D))
-	$(Q)$(CC) -I$(OBJDIR) -E -P $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
+	$(Q)$(CC) -I$(OBJDIR) $(CRT0_APPLICATION) -E -P $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 ifeq ($(filter clean gfx test version,$(MAKECMDGOALS)),)
 -include $(DEPFILES)
