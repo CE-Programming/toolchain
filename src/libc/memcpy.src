@@ -5,17 +5,13 @@
 	.global	_memcpy
 	.type	_memcpy, @function
 
-.ifdef PREFER_OS_LIBC
-
-	.set	_memcpy, 0x0000A4
-
-.else
+	; Note: TiOS memcpy works fine, but our implementation is faster
+	; .set	_memcpy, 0x0000A4
 
 _memcpy:
 	; size >  0     : 25F + 15R + 1 + LDIR
-	; size >= 65536 : 32F + 16R + 3 + LDIR
+	; size >= 65536 : 32F + 16R + 3 + LDIR (only when the low 16 bits are zero)
 	; size == 0     : 26F + 13R + 2
-	; size >= 65536    +  7F +  1R + 2 (only when the low 16 bits are zero)
 
 	ld	iy, 0
 	add	iy, sp
@@ -37,5 +33,3 @@ _memcpy:
 	; size == 0
 	ex	de, hl
 	ret
-
-.endif
