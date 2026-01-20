@@ -1,0 +1,12 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	__frameset0_fast
+	.type	__frameset0_fast, @function
+
+__frameset0_fast:
+	pop	hl
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	jp	(hl)

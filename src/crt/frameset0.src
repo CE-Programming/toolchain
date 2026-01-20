@@ -5,8 +5,9 @@
 	.type	__frameset0, @function
 
 __frameset0:
-	pop	hl
-	push	ix
-	ld	ix,0
-	add	ix,sp
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	ex	(sp), hl
+	ex	(sp), ix
 	jp	(hl)
