@@ -48,6 +48,9 @@ using ::strncmp;
 using ::strcasecmp;
 using ::strncasecmp;
 using ::strerror;
+
+using ::strcoll;
+using ::strxfrm;
 } // namespace std
 
 #endif // _EZCXX_CSTRING
