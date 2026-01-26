@@ -23,6 +23,7 @@ DESCRIPTION ?=
 COMPRESSED ?= NO
 ARCHIVED ?= YES
 APPLICATION ?= NO
+APPLICATION_DESCRIPTION ?=
 BSSHEAP_LOW ?= 0xD052C6
 BSSHEAP_HIGH ?= 0xD13FD8
 STACK_HIGH ?= 0xD1A87E
@@ -225,10 +226,13 @@ endif
 ifeq ($(APPLICATION),YES)
 LD_EMIT_RELOCS = --emit-relocs
 LOAD_ADDR = 0x000000
-CONVBINFLAGS += -k 8ek
 TARGET = $(NAME).8ek
 CRT0_APPLICATION = -DHAS_APPLICATION=1
 LINKER_SCRIPT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script_app.ld)
+CONVBINFLAGS += -k 8ek
+ifneq ($(APPLICATION_DESCRIPTION),)
+CONVBINFLAGS += -d $(APPLICATION_DESCRIPTION)
+endif
 else
 LD_EMIT_RELOCS =
 ifeq ($(ARCHIVED),YES)
@@ -295,6 +299,7 @@ ifeq ($(HAS_PRINTF),YES)
 LIB_PRINTF = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf.a)
 else
 LIB_PRINTF =
+SPRINTF_SYMBOL = --defsym _sprintf=0x0000BC
 endif
 
 # enable/disable errno checks
@@ -446,6 +451,7 @@ $(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(L
 		--gc-sections \
 		--omagic \
 		--defsym __TICE__=1 \
+		$(SPRINTF_SYMBOL) \
 		$(LD_DEBUG) \
 		$(EXTRA_PRE_LDFLAGS) \
 		$(OBJECTS) \
