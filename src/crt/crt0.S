@@ -38,11 +38,13 @@
 	.equ	ti.MovFrOP1, 0x02032C
 	.equ	ti.ClrLCDFull, 0x020808
 
-#if !HAS_APPLICATION
 	.section	.header,"ax",@progbits
 
 	.local	__header
 __header:
+#if HAS_APPLICATION
+	.db	0x00					; 0x00 is signifier for C applications (also force includes icon/description)
+#else
 	.db	0xEF, 0x7B, 0x00		; 0x00 is signifier for C programs
 #endif
 
@@ -62,14 +64,21 @@ __header:
 	.equ	ti.MemClear, 0x0210DC
 	.equ	ti.ClrTxtShd, 0x020818
 
+	.global	__start
+__start:
 	ld	iy, ti.flags
 	ld	sp, (ti.onSP)			; reset stacks
 	call	ti.ResetStacks
+	ld	bc, ___data_len
+	or	a, a
+    sbc hl, hl
+    adc hl, bc
+	jr	z, .L.skip_data_copy
 	ld	hl, ___data_lma
 	ld	de, ___data_vma
-	ld	bc, ___data_len
-	ldir					; there is always .data, no need for zero check
-	call	__start
+	ldir
+.L.skip_data_copy:
+	call	___app_start
 	ld	de, (ti.asm_prgm_size)
 	ld	hl, ti.userMem
 	call	ti.DelMem
@@ -86,11 +95,13 @@ __header:
 	ldir
 	ld	a, ti.kClear
 	jp	ti.JForceCmd
-#endif
-
+	.local	___app_start
+___app_start:
+#else
 	.global	__start
 __start:
 	ld	iy, ti.flags
+#endif
 
 #if HAS_RUN_PRGM
 	ld	de, ___prgm_caller
@@ -158,6 +169,26 @@ ___libload_libs:
 	call	ti.RunIndicOff			; assumes iy = flags
 	call	ti.usb_DisableTimer
 	di
+
+.L.bss_zeroize:
+	ld	hl, ___bss_len
+	ld	bc, 0
+	xor	a, a
+	sbc	hl, bc
+	jr	z, .L.bss_done
+	ld	de, ___bss_low
+	push	de
+	ld	(de), a
+	dec	hl
+	sbc	hl, bc
+	pop	hl
+	jr	z, .L.bss_done
+	ld	bc, ___bss_len
+	dec	bc
+	inc	de
+	ldir
+.L.bss_done:
+
 	res	1, (iy + 0x0D)			; no text buffer
 	res	3, (iy + 0x4A)			; use first shadow buffer
 	set	5, (iy + 0x4C)			; only display
@@ -249,25 +280,6 @@ ___libload_libs:
 	push	bc
 	call	ti.PopRealO1
 #endif
-
-.L.bss_zeroize:
-	ld	hl, ___bss_len
-	ld	bc, 0
-	xor	a, a
-	sbc	hl, bc
-	jr	z, .L.bss_done
-	ld	de, ___bss_low
-	push	de
-	ld	(de), a
-	dec	hl
-	sbc	hl, bc
-	pop	hl
-	jr	z, .L.bss_done
-	ld	bc, ___bss_len
-	dec	bc
-	inc	de
-	ldir
-.L.bss_done:
 
 #if HAS_CLOCK
 	ld	hl, ti.mpTmrCtrl + 1

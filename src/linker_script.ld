@@ -13,10 +13,12 @@ SECTIONS
         KEEP (*(.header))
         KEEP (*(.header.icon))
     } >prgm
+
     .init :
     {
         *(.init)
     } >prgm
+
     .text :
     {
         *(.text.unlikely .text.*_unlikely .text.unlikely.*)
@@ -27,6 +29,7 @@ SECTIONS
         *(.text .stub .text.* .gnu.linkonce.t.*)
         *(.gnu.warning)
     } >prgm
+
     .rodata :
     {
         *(.rodata .rodata.* .gnu.linkonce.r.*)

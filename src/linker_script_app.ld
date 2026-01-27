@@ -4,6 +4,11 @@ MEMORY
     bss  : ORIGIN = BSSHEAP_LOW, LENGTH = BSSHEAP_HIGH - BSSHEAP_LOW
 }
 
+PHDRS
+{
+    prgm PT_LOAD;
+}
+
 SECTIONS
 {
     . = LOAD_ADDR;
@@ -11,13 +16,14 @@ SECTIONS
     .header :
     {
         KEEP (*(.header))
+        PROVIDE_HIDDEN (___icon_optional = .);
         KEEP (*(.header.icon))
-    } >prgm
+    } >prgm :prgm
     
     .init :
     {
         *(.init)
-    } >prgm
+    } >prgm :prgm
     
     .text :
     {
@@ -28,12 +34,12 @@ SECTIONS
         *(SORT(.text.sorted.*))
         *(.text .stub .text.* .gnu.linkonce.t.*)
         *(.gnu.warning)
-    } >prgm
+    } >prgm :prgm
     
     .rodata :
     {
         *(.rodata .rodata.* .gnu.linkonce.r.*)
-    } >prgm
+    } >prgm :prgm
 
     .init_array :
     {
@@ -42,7 +48,7 @@ SECTIONS
         KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*)))
         KEEP (*(.init_array))
         PROVIDE_HIDDEN (__init_array_end = .);
-    } >prgm
+    } >prgm :prgm
     
     .fini_array :
     {
@@ -50,7 +56,7 @@ SECTIONS
         KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*)))
         KEEP (*(.fini_array))
         PROVIDE_HIDDEN (__fini_array_end = .);
-    } >prgm
+    } >prgm :prgm
 
     .data :
     {
@@ -59,7 +65,7 @@ SECTIONS
         SORT(CONSTRUCTORS)
         *(.data1)
         ___data_vma_end = .;
-    } >bss AT>prgm
+    } >bss AT>prgm :prgm
     ___data_lma = LOADADDR(.data);
     ___data_len = ___data_vma_end - ___data_vma;
 
@@ -70,7 +76,7 @@ SECTIONS
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
         ___bss_high = .;
-    } >bss
+    } >bss :NONE
     ___bss_len = ___bss_high - ___bss_low;
 
     ASSERT(. <= BSSHEAP_HIGH, "Error: BSS exceed BSSHEAP_HIGH limit")
