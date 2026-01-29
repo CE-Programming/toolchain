@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/screen.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/info.h" href="info.html" />
+    <link rel="prev" title="ti/getkey.h" href="getkey.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v12.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html#debug-h">debug.h</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="debug.html">ti/debug.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/screen.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/screen.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-screen-h">
+<span id="screen-h"></span><h1>ti/screen.h<a class="headerlink" href="#ti-screen-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/screen.h&gt;</span>
+</pre></div>
+</div>
+<p>Programs that don’t need fancy graphics can use TI’s screen routines instead of <code class="code docutils literal notranslate"><span class="pre">&lt;graphx.h&gt;</span></code>.</p>
+<p>If you want to print text to the homescreen and have it support automatic scrolling,
+then cursor locations are based on a character grid.
+Most of the text routines work this way.
+In particular, <code class="code docutils literal notranslate"><span class="pre">os_GetStringInput</span></code> and <code class="code docutils literal notranslate"><span class="pre">os_PutStr*</span></code> work this way.</p>
+<p>However, you can also draw text to arbitrary pixel locations using either the large or small font.
+Those routines have <code class="code docutils literal notranslate"><span class="pre">Font</span></code> in their name and also let you use color.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI CE OS screen functions. If you want to print to the screen without using GraphX, this is the file. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_ClrHome">
+<span class="target" id="screen_8h_1af31f77eb16adfccf31a00072554c48c5"></span><span class="sig-name descname"><span class="n"><span class="pre">os_ClrHome</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.os_ClrHome" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Resets the OS homescreen; accounts for split screen. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_ClrHomeFull">
+<span class="target" id="screen_8h_1a085b3ccef49b2e3eb7c7e6d6c24507f5"></span><span class="sig-name descname"><span class="n"><span class="pre">os_ClrHomeFull</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.os_ClrHomeFull" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Resets the OS homescreen fully; ignores split screen mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_SmallFont">
+<span class="target" id="screen_8h_1affcbdd2a87eba7c1dc19d60ec1e34315"></span><span class="sig-name descname"><span class="n"><span class="pre">os_SmallFont</span></span></span><a class="headerlink" href="#c.os_SmallFont" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TIOS small font. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#screen_8h_1a6cf85044a75dc8122639287851b9c84a"><span class="std std-ref">os_FontSelect</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_LargeFont">
+<span class="target" id="screen_8h_1a9db5af494b520cf19f331cfea623e541"></span><span class="sig-name descname"><span class="n"><span class="pre">os_LargeFont</span></span></span><a class="headerlink" href="#c.os_LargeFont" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TIOS large font. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#screen_8h_1a6cf85044a75dc8122639287851b9c84a"><span class="std std-ref">os_FontSelect</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_CurRow">
+<span class="target" id="screen_8h_1a06111799ed77d4edcdc825316ebd0819"></span><span class="sig-name descname"><span class="n"><span class="pre">os_CurRow</span></span></span><a class="headerlink" href="#c.os_CurRow" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>: Font row position </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_CurCol">
+<span class="target" id="screen_8h_1a9e2d4be533542853e7381d452e49ff0f"></span><span class="sig-name descname"><span class="n"><span class="pre">os_CurCol</span></span></span><a class="headerlink" href="#c.os_CurCol" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>: Font column position </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_TextFGColor">
+<span class="target" id="screen_8h_1ade8ecfcdfb21d1c3a13010b737295cc1"></span><span class="sig-name descname"><span class="n"><span class="pre">os_TextFGColor</span></span></span><a class="headerlink" href="#c.os_TextFGColor" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code>: Large font foreground 565 BGR color </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_TextBGColor">
+<span class="target" id="screen_8h_1a081b0915952db3b86ca581bd4b9c08af"></span><span class="sig-name descname"><span class="n"><span class="pre">os_TextBGColor</span></span></span><a class="headerlink" href="#c.os_TextBGColor" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code>: Large font background 565 BGR color </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_PenCol">
+<span class="target" id="screen_8h_1ad1718876e77b610a987e8a837b49adce"></span><span class="sig-name descname"><span class="n"><span class="pre">os_PenCol</span></span></span><a class="headerlink" href="#c.os_PenCol" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint24_t</span></code>: Small font column position </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_PenRow">
+<span class="target" id="screen_8h_1a445f4ccb9c0c495f034011c473633ba0"></span><span class="sig-name descname"><span class="n"><span class="pre">os_PenRow</span></span></span><a class="headerlink" href="#c.os_PenRow" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>: Small font row position </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_DrawBGColor">
+<span class="target" id="screen_8h_1a856436e92f2839b5629178a9e104a592"></span><span class="sig-name descname"><span class="n"><span class="pre">os_DrawBGColor</span></span></span><a class="headerlink" href="#c.os_DrawBGColor" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code>: Small font background 565 BGR color </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_DrawFGColor">
+<span class="target" id="screen_8h_1aa9031a6bc83c9ca1a7ae5b663a5b5b18"></span><span class="sig-name descname"><span class="n"><span class="pre">os_DrawFGColor</span></span></span><a class="headerlink" href="#c.os_DrawFGColor" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code>: Small font foreground 565 BGR color </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_DrawColorCode">
+<span class="target" id="screen_8h_1a68815d95fed927e156380ec9619d6430"></span><span class="sig-name descname"><span class="n"><span class="pre">os_DrawColorCode</span></span></span><a class="headerlink" href="#c.os_DrawColorCode" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>: Small OS font color code </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_GraphBGColor">
+<span class="target" id="screen_8h_1a2b6a3ab8cbb7eb858c9adf95679ed07b"></span><span class="sig-name descname"><span class="n"><span class="pre">os_GraphBGColor</span></span></span><a class="headerlink" href="#c.os_GraphBGColor" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code>: Graph background 565 BGR color </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_FillRectColor">
+<span class="target" id="screen_8h_1aac583d6131605fa7d493f1ff4f370956"></span><span class="sig-name descname"><span class="n"><span class="pre">os_FillRectColor</span></span></span><a class="headerlink" href="#c.os_FillRectColor" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code>: OS Rect draw 565 BGR color </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv46font_t">
+<span id="_CPPv36font_t"></span><span id="_CPPv26font_t"></span><span id="font_t"></span><span class="target" id="screen_8h_1a4869d6f320684d34e65d214f59af7a8c"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv44font" title="font"><span class="n"><span class="pre">font</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_t</span></span></span><a class="headerlink" href="#_CPPv46font_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Structure of font description. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#screen_8h_1a6cf85044a75dc8122639287851b9c84a"><span class="std std-ref">os_FontSelect</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412boot_NewLinev">
+<span id="_CPPv312boot_NewLinev"></span><span id="_CPPv212boot_NewLinev"></span><span id="boot_NewLine__void"></span><span class="target" id="screen_8h_1aaaffb7da274570bc1e4c852c62765770"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_NewLine</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412boot_NewLinev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Inserts a new line at the current cursor posistion on the homescreen Does not scroll. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_NewLinev">
+<span id="_CPPv310os_NewLinev"></span><span id="_CPPv210os_NewLinev"></span><span id="os_NewLine__void"></span><span class="target" id="screen_8h_1a42b2cb04bc3d20d2a259cc956cb64d2b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_NewLine</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_NewLinev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Inserts a new line at the current cursor posistion on the homescreen. </p>
+<p>Does scroll. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_DisableCursorv">
+<span id="_CPPv316os_DisableCursorv"></span><span id="_CPPv216os_DisableCursorv"></span><span id="os_DisableCursor__void"></span><span class="target" id="screen_8h_1afe1b552868eb4844aace0efc6dbee0c4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_DisableCursor</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_DisableCursorv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Disables the OS cursor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_EnableCursorv">
+<span id="_CPPv315os_EnableCursorv"></span><span id="_CPPv215os_EnableCursorv"></span><span id="os_EnableCursor__void"></span><span class="target" id="screen_8h_1aeaea1d3a3cfe9d2405cdad509a6ee591"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_EnableCursor</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_EnableCursorv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enables the OS cursor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_SetCursorPos7uint8_t7uint8_t">
+<span id="_CPPv315os_SetCursorPos7uint8_t7uint8_t"></span><span id="_CPPv215os_SetCursorPos7uint8_t7uint8_t"></span><span id="os_SetCursorPos__uint8_t.uint8_t"></span><span class="target" id="screen_8h_1a0fcf624fd8a7b43375fd0aa925b02872"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetCursorPos</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">curRow</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">curCol</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_SetCursorPos7uint8_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set the cursor posistion used on the homescreen. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curRow</strong> – <strong>[in]</strong> The row aligned offset </p></li>
+<li><p><strong>curCol</strong> – <strong>[in]</strong> The column aligned offset </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_GetCursorPosPjPj">
+<span id="_CPPv315os_GetCursorPosPjPj"></span><span id="_CPPv215os_GetCursorPosPjPj"></span><span id="os_GetCursorPos__unsigned-iP.unsigned-iP"></span><span class="target" id="screen_8h_1a92cfe934f3c43d8235d678d97a9080b8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetCursorPos</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">curRow</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">curCol</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_GetCursorPosPjPj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the cursor posistion used on the homescreen. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curRow</strong> – <strong>[in]</strong> Pointer to store the row aligned offset </p></li>
+<li><p><strong>curCol</strong> – <strong>[in]</strong> Pointer to store the column aligned offset </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_PutStrFullPKc">
+<span id="_CPPv313os_PutStrFullPKc"></span><span id="_CPPv213os_PutStrFullPKc"></span><span id="os_PutStrFull__cCP"></span><span class="target" id="screen_8h_1a5316ce240dc00c400d1f30af6579d666"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_PutStrFull</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">string</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_PutStrFullPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Puts some text at the current homescreen cursor location. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> – <strong>[in]</strong> Text to put on homescreen </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1 if string fits on screen, 0 otherwise </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_PutStrLinePKc">
+<span id="_CPPv313os_PutStrLinePKc"></span><span id="_CPPv213os_PutStrLinePKc"></span><span id="os_PutStrLine__cCP"></span><span class="target" id="screen_8h_1a37908b624f2bd7c37f46e8b0533394b8"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_PutStrLine</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">string</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_PutStrLinePKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Puts some text at the current homescreen cursor location. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> – <strong>[in]</strong> Text to put on homescreen </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1 if string fits on line, 0 otherwise </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49os_MoveUpv">
+<span id="_CPPv39os_MoveUpv"></span><span id="_CPPv29os_MoveUpv"></span><span id="os_MoveUp__void"></span><span class="target" id="screen_8h_1a4a12456b167131d01b74c9de5d5b247f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_MoveUp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49os_MoveUpv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to scroll homescreen up. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411os_MoveDownv">
+<span id="_CPPv311os_MoveDownv"></span><span id="_CPPv211os_MoveDownv"></span><span id="os_MoveDown__void"></span><span class="target" id="screen_8h_1aef8e320a7d77919b30c1bf66ed6d6d28"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_MoveDown</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411os_MoveDownv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to scroll homescreen down. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49os_HomeUpv">
+<span id="_CPPv39os_HomeUpv"></span><span id="_CPPv29os_HomeUpv"></span><span id="os_HomeUp__void"></span><span class="target" id="screen_8h_1a67a6dc4177ffd0cce49aca1e9f5ebfbf"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_HomeUp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49os_HomeUpv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to move row and column posistion to (0,0) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_ClrLCDFullv">
+<span id="_CPPv313os_ClrLCDFullv"></span><span id="_CPPv213os_ClrLCDFullv"></span><span id="os_ClrLCDFull__void"></span><span class="target" id="screen_8h_1a850b2591b12ad04af210596bfe249369"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ClrLCDFull</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_ClrLCDFullv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to clear the homescreen lcd. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49os_ClrLCDv">
+<span id="_CPPv39os_ClrLCDv"></span><span id="_CPPv29os_ClrLCDv"></span><span id="os_ClrLCD__void"></span><span class="target" id="screen_8h_1a76b55fb8cf571b9a91eadb7057e7d57e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ClrLCD</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49os_ClrLCDv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to clear the homescreen lcd. </p>
+<p>Accounts for split screen </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412os_ClrTxtShdv">
+<span id="_CPPv312os_ClrTxtShdv"></span><span id="_CPPv212os_ClrTxtShdv"></span><span id="os_ClrTxtShd__void"></span><span class="target" id="screen_8h_1a73bff95023931d07ca78c7115d864e86"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ClrTxtShd</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412os_ClrTxtShdv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Invalidate and clear text shadow area. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424os_DisableHomeTextBufferv">
+<span id="_CPPv324os_DisableHomeTextBufferv"></span><span id="_CPPv224os_DisableHomeTextBufferv"></span><span id="os_DisableHomeTextBuffer__void"></span><span class="target" id="screen_8h_1a530453db72aabb7bda179e244bfec63c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_DisableHomeTextBuffer</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424os_DisableHomeTextBufferv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Disable text buffering on the homescreen. </p>
+<p>C programs use this area by default for the BSS / Heap. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423os_EnableHomeTextBufferv">
+<span id="_CPPv323os_EnableHomeTextBufferv"></span><span id="_CPPv223os_EnableHomeTextBufferv"></span><span id="os_EnableHomeTextBuffer__void"></span><span class="target" id="screen_8h_1ad2beeceae6d37a699fdec285b94afb41"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_EnableHomeTextBuffer</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423os_EnableHomeTextBufferv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enables text buffering on the homescreen. </p>
+<p>C programs use this area by default for the BSS / Heap. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_GetStringInputPKcPc6size_t">
+<span id="_CPPv317os_GetStringInputPKcPc6size_t"></span><span id="_CPPv217os_GetStringInputPKcPc6size_t"></span><span id="os_GetStringInput__cCP.cP.s"></span><span class="target" id="screen_8h_1a8d62ad964f6316c333c898782bbd4ad8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetStringInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prompt</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buf</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bufsize</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_GetStringInputPKcPc6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get string input using the TIOS homescreen. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt</strong> – <strong>[in]</strong> Input prompt string to be displayed to the user. </p></li>
+<li><p><strong>buf</strong> – <strong>[in]</strong> Storage location to store input string. The string will always be null terminated. </p></li>
+<li><p><strong>bufsize</strong> – <strong>[in]</strong> Available storage size for input string. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_GetTokenInputPKcPv6size_t">
+<span id="_CPPv316os_GetTokenInputPKcPv6size_t"></span><span id="_CPPv216os_GetTokenInputPKcPv6size_t"></span><span id="os_GetTokenInput__cCP.voidP.s"></span><span class="target" id="screen_8h_1adecd87898b6870515091fc49fb1cd6ac"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetTokenInput</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prompt</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buf</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">bufsize</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_GetTokenInputPKcPv6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get tokenized input using the TIOS homescreen. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prompt</strong> – <strong>[in]</strong> Input prompt string to be displayed to the user. </p></li>
+<li><p><strong>buf</strong> – <strong>[in]</strong> Storage location to store input string. </p></li>
+<li><p><strong>bufsize</strong> – <strong>[in]</strong> Available storage size for buffer.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Length of tokenized input. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_FontSelectP6font_t">
+<span id="_CPPv313os_FontSelectP6font_t"></span><span id="_CPPv213os_FontSelectP6font_t"></span><span id="os_FontSelect__font_tP"></span><span class="target" id="screen_8h_1a6cf85044a75dc8122639287851b9c84a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_FontSelect</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv46font_t" title="font_t"><span class="n"><span class="pre">font_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">font</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_FontSelectP6font_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Selects the (monospace) font to use when drawing text. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>font</strong> – <strong>[in]</strong> <p>font id/pointer to use os_SmallFont</p>
+<p>os_LargeFont</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412os_FontGetIDv">
+<span id="_CPPv312os_FontGetIDv"></span><span id="_CPPv212os_FontGetIDv"></span><span id="os_FontGetID__void"></span><span class="target" id="screen_8h_1a958a654bcebabb87513097459f839c3b"></span><a class="reference internal" href="#_CPPv46font_t" title="font_t"><span class="n"><span class="pre">font_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_FontGetID</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412os_FontGetIDv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the font to use when drawing text. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>0: small font</p>
+<p>1: large monospace font</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_FontGetWidthPKc">
+<span id="_CPPv315os_FontGetWidthPKc"></span><span id="_CPPv215os_FontGetWidthPKc"></span><span id="os_FontGetWidth__cCP"></span><span class="target" id="screen_8h_1ad6b8e1cdc5f402887b62c72d9f9fc0a2"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_FontGetWidth</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">string</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_FontGetWidthPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> – <strong>[in]</strong> String to get pixel width of </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The width of a string in the variable-width format </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_FontGetHeightv">
+<span id="_CPPv316os_FontGetHeightv"></span><span id="_CPPv216os_FontGetHeightv"></span><span id="os_FontGetHeight__void"></span><span class="target" id="screen_8h_1a3773dcdcedd131b11d48dda78c73e347"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_FontGetHeight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_FontGetHeightv" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The height of the font characters </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_FontDrawTextPKc8uint16_t7uint8_t">
+<span id="_CPPv315os_FontDrawTextPKc8uint16_t7uint8_t"></span><span id="_CPPv215os_FontDrawTextPKc8uint16_t7uint8_t"></span><span id="os_FontDrawText__cCP.uint16_t.uint8_t"></span><span class="target" id="screen_8h_1a002b1a506b96eefa7e6193d9ec19205d"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_FontDrawText</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">string</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_FontDrawTextPKc8uint16_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draws text using the small font to the screen. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – <strong>[in]</strong> String to draw </p></li>
+<li><p><strong>col</strong> – <strong>[in]</strong> Column to start drawing at </p></li>
+<li><p><strong>row</strong> – <strong>[in]</strong> Row to start drawing at </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The end column </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420os_FontDrawTransTextPKc8uint16_t7uint8_t">
+<span id="_CPPv320os_FontDrawTransTextPKc8uint16_t7uint8_t"></span><span id="_CPPv220os_FontDrawTransTextPKc8uint16_t7uint8_t"></span><span id="os_FontDrawTransText__cCP.uint16_t.uint8_t"></span><span class="target" id="screen_8h_1aa2ac7abeec2959dc64b763ceb1ca5cc0"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_FontDrawTransText</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">string</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420os_FontDrawTransTextPKc8uint16_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draws transparent text using the small font to the screen. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – <strong>[in]</strong> String to draw </p></li>
+<li><p><strong>col</strong> – <strong>[in]</strong> Column to start drawing at </p></li>
+<li><p><strong>row</strong> – <strong>[in]</strong> Row to start drawing at </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The end column </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_SetDrawFGColor8uint24_t">
+<span id="_CPPv317os_SetDrawFGColor8uint24_t"></span><span id="_CPPv217os_SetDrawFGColor8uint24_t"></span><span id="os_SetDrawFGColor__uint24_t"></span><span class="target" id="screen_8h_1abe70f3b6bc7dc87a24bea99839ab7968"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetDrawFGColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_SetDrawFGColor8uint24_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the foreground color used to draw text. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>color</strong> – <strong>[in]</strong> 565 BGR color to set text foreground to </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_GetDrawFGColorv">
+<span id="_CPPv317os_GetDrawFGColorv"></span><span id="_CPPv217os_GetDrawFGColorv"></span><span id="os_GetDrawFGColor__void"></span><span class="target" id="screen_8h_1a04f297c914cee4f29f90a981c395b84f"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetDrawFGColor</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_GetDrawFGColorv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the foreground color used to draw text. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>565 BGR color of text foreground </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_SetDrawBGColor8uint24_t">
+<span id="_CPPv317os_SetDrawBGColor8uint24_t"></span><span id="_CPPv217os_SetDrawBGColor8uint24_t"></span><span id="os_SetDrawBGColor__uint24_t"></span><span class="target" id="screen_8h_1aa282c55ac71cb8a9f04eb16d39e4f8d3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetDrawBGColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_SetDrawBGColor8uint24_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the background color used to draw text. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>color</strong> – <strong>[in]</strong> 565 BGR color to set text background to </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_GetDrawBGColorv">
+<span id="_CPPv317os_GetDrawBGColorv"></span><span id="_CPPv217os_GetDrawBGColorv"></span><span id="os_GetDrawBGColor__void"></span><span class="target" id="screen_8h_1a7a67f4155bda58ca6716c8e4782eeae3"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetDrawBGColor</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_GetDrawBGColorv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the background color used to draw text. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only useable in OS 5.2 and above; use at your own risk </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>565 BGR color of text nackground </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv44font">
+<span id="_CPPv34font"></span><span id="_CPPv24font"></span><span id="font"></span><span class="target" id="structfont"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font</span></span></span><a class="headerlink" href="#_CPPv44font" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;screen.h&gt;</em></div>
+<p>Structure of font description. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#screen_8h_1a6cf85044a75dc8122639287851b9c84a"><span class="std std-ref">os_FontSelect</span></a> </p>
+</div>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4font4fontE">
+<span id="_CPPv3N4font4fontE"></span><span id="_CPPv2N4font4fontE"></span><span id="font::font__fontP"></span><span class="target" id="structfont_1a95a78c12c72b622843562aa835bc4e09"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N4font4fontE" title="font::font"><span class="n"><span class="pre">font</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">font</span></span></span><a class="headerlink" href="#_CPPv4N4font4fontE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Points to this font itself, yuck! </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4font8drawCharE">
+<span id="_CPPv3N4font8drawCharE"></span><span id="_CPPv2N4font8drawCharE"></span><span class="target" id="structfont_1a506945419fe06f4366890185bbd53ae6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">drawChar</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N4font8drawCharE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draws a character using this font. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param c</dt>
+<dd class="field-odd"><p>The character </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4font8getWidthE">
+<span id="_CPPv3N4font8getWidthE"></span><span id="_CPPv2N4font8getWidthE"></span><span class="target" id="structfont_1a2651305e65079c267ed892d83d2bd3b0"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getWidth</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N4font8getWidthE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the width of a character in this font. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param c</dt>
+<dd class="field-odd"><p>The character </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4font9getHeightE">
+<span id="_CPPv3N4font9getHeightE"></span><span id="_CPPv2N4font9getHeightE"></span><span class="target" id="structfont_1a85a4e4a8ae365f0471c79b184e47acbf"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">getHeight</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N4font9getHeightE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the height of this font. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getkey.html" class="btn btn-neutral float-left" title="ti/getkey.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="info.html" class="btn btn-neutral float-right" title="ti/info.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v12.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

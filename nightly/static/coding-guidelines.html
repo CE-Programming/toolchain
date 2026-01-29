@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>General Coding Guidelines &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing to the CE Toolchain" href="contributing.html" />
+    <link rel="prev" title="Using Git For Revision Control" href="git.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                nightly
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asm.html">Assembly Files</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General Coding Guidelines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#style-consistency">Style Consistency</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#use-descriptive-naming">Use Descriptive Naming</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#write-comments-intelligently">Write comments intelligently</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#avoid-commenting-unused-code">Avoid Commenting Unused Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#include-file-recommendations">Include File Recommendations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#proper-prototyping">Proper Prototyping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-not-to-put-in-header-files">What not to put in header files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#avoid-global-variables">Avoid Global Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#proper-scoping">Proper Scoping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-the-static-keyword">Using the static keyword</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-structures">Using structures</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#avoid-dynamic-allocation">Avoid Dynamic Allocation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ways-to-avoid-dynamic-allocation">Ways to avoid dynamic allocation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#general-guidelines">General Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#limit-magic-numbers">Limit Magic Numbers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-const-as-much-as-possible">Use const as much as possible</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#avoid-explicit-casting">Avoid explicit casting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-static-analysis-tools">Use Static Analysis Tools</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>General Coding Guidelines</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="general-coding-guidelines">
+<span id="coding-guidelines"></span><h1>General Coding Guidelines<a class="headerlink" href="#general-coding-guidelines" title="Permalink to this headline"></a></h1>
+<p>If you are new to the C/C++ language and are looking for some pointers to improve your coding style, this page is for you!
+These suggestions should help you avoid common pitfalls, and make your code easier to manage.</p>
+<img alt="../_images/code-review.jpg" class="align-center" src="../_images/code-review.jpg" />
+<div class="section" id="style-consistency">
+<h2>Style Consistency<a class="headerlink" href="#style-consistency" title="Permalink to this headline"></a></h2>
+<p>This is a big one.
+When programming, it is important to choose a coding style that you prefer and <strong>stick with it</strong>.
+For instance, if you prefer using 4 spaces to indent your code, use that everywhere – don’t mix tabs and spaces!
+If your variables are <code class="code docutils literal notranslate"><span class="pre">snake_case</span></code> or <code class="code docutils literal notranslate"><span class="pre">camelCase</span></code> – use the same format everywhere.
+This goes for function naming too.</p>
+<p>Some additional style guidelines:</p>
+<ul class="simple">
+<li><p>Try to keep lines 80 characters or less. This will promote less indentation and better coding design, as well as avoid insanely long variable names. If you have more than 3 levels of indentation, it’s probably time to rethink your code.</p></li>
+<li><p>Use consistent bracing formats; if your braces all start on a new line, don’t mix them. It is especially helpful to always use braces even on single-line conditional statements as it will avoid spurious bugs from popping up.</p></li>
+<li><p>Try to keep functions at 100 lines or less. Any more and the function should be broken out, as this will increase readability and make it easier for you 6 months later to understand what you wrote.</p></li>
+<li><p>It doesn’t really matter <em>what</em> your style is as long as it is consistent! People will be more inclined to help and contribute to your code if you keep it neat.</p></li>
+<li><p>This also applies when you are the one contributing to another project: use <em>their</em> codestyle, not yours, even if you don’t like it.</p></li>
+</ul>
+<div class="section" id="use-descriptive-naming">
+<h3>Use Descriptive Naming<a class="headerlink" href="#use-descriptive-naming" title="Permalink to this headline"></a></h3>
+<p>This may seem like a relatively minor one, but it’s still important: try to give functions and variables useful and unique names.
+For example, <code class="code docutils literal notranslate"><span class="pre">int</span> <span class="pre">player_x</span></code> is more descriptive than <code class="code docutils literal notranslate"><span class="pre">int</span> <span class="pre">x</span></code>, and <code class="code docutils literal notranslate"><span class="pre">void</span> <span class="pre">handle_user_input(void)</span></code> is more meaningful than <code class="code docutils literal notranslate"><span class="pre">void</span> <span class="pre">do_things(void)</span></code>.
+The name should tell you why it exists, what it does, and how it is used.
+If a name requires a comment, then the name is useless.</p>
+<p>Some helpful tips:</p>
+<ul class="simple">
+<li><p>Use pronounceable names.</p></li>
+<li><p>Beware of using names which vary in small ways. (e.g. “player_x” and “player_xx”).</p></li>
+<li><p>Use intention-revealing names.</p></li>
+<li><p>Don’t be afraid of using names that are a bit longer than what you may be used to. Probably not 50 chars long, sure, but you get the point.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="write-comments-intelligently">
+<h2>Write comments intelligently<a class="headerlink" href="#write-comments-intelligently" title="Permalink to this headline"></a></h2>
+<p>In a perfect world, code should have a minimal number of comments in it because it should all be self-explanatory.
+Especially if there’s a document along side that explains architecture choices, workflows etc.</p>
+<p>Comments aren’t code; they are for a human to convey what is going on and why in a particular portion of code, to another human.
+They should ideally be kept fairly short and to the point (“K.I.S.S” = Keep It Short and Simple”).
+Don’t write comments just because you’ve been told to at some point: the other human in question can read just fine and doesn’t want to waste time reading that “return val;” indeed “returns the value”.</p>
+<p>It is much easier to read code without having to also read comments that don’t convey any helpful information. Instead, provide useful information when needed, in particular when someone may be tempted to change some code that probably shouldn’t be without a lot of thought first, or where some algorithm is complex to understand for someone new on the project and only reading the code to understand what is happening would take too long pointlessly (reverse-engineering source code can annoyingly take a lot of time).</p>
+<p>As such, and especially for complex code, focus rather on explaining <strong>why</strong> something is written that way, and even <strong>why not</strong> written in another way (i.e. some edge case may not work with an alternative algorithm, some use case may have inferior performance, etc.). Time will be saved that way for future refactors, whether it’s done by you, or even more so by someone else that may now know the context of the code as much as you.</p>
+<p>And remember this: having too many comments leads to issues where <strong>a)</strong> the comments don’t match the code, <strong>b)</strong> they are either superfluous or useless, <strong>c)</strong> they are flat out incorrect or outdated, or <strong>d)</strong> they add noise to the code itself and make it more difficult to read.</p>
+<p>These are examples of bad comments that add no value: remember, good self-explanatory naming and simple code provide better information than comments do.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// locates the first occurrence of the character in the string</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">findFirstChar</span><span class="p">(</span><span class="n">string_t</span><span class="o">*</span><span class="w"> </span><span class="n">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="p">}</span>
+
+<span class="c1">// check if the string is empty</span>
+<span class="kt">bool</span><span class="w"> </span><span class="nf">isStringEmpty</span><span class="p">(</span><span class="n">string_t</span><span class="o">*</span><span class="w"> </span><span class="n">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">str</span><span class="o">-&gt;</span><span class="n">len</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>More food for thought about this topic: <a class="reference external" href="https://blog.codinghorror.com/coding-without-comments/">https://blog.codinghorror.com/coding-without-comments/</a></p>
+<div class="section" id="avoid-commenting-unused-code">
+<h3>Avoid Commenting Unused Code<a class="headerlink" href="#avoid-commenting-unused-code" title="Permalink to this headline"></a></h3>
+<p>A lot of people when they program will change a few lines, or try many different iterations of code in an attempt to get something working.
+The code that doesn’t make it is usually commented out like below:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span>
+<span class="c1">// y = 10 + y ^ 6;</span>
+<span class="c1">// y = 10;</span>
+<span class="c1">// y = x + 76;</span>
+</pre></div>
+</div>
+<p>This hinders readability and makes the whole codebase reek.
+Unused code should be purged from the source file; and revision control (e.g. git) should be used to keep track of these modifications instead.
+If you really need sections of code that can be enabled/disabled, then consider using a define that is passed via the compiler to toggle the option.
+Or in a pinch, use <code class="code docutils literal notranslate"><span class="pre">#if</span> <span class="pre">0</span> <span class="pre">\</span> <span class="pre">code</span> <span class="pre">\</span> <span class="pre">#endif</span></code>.</p>
+</div>
+</div>
+<div class="section" id="include-file-recommendations">
+<h2>Include File Recommendations<a class="headerlink" href="#include-file-recommendations" title="Permalink to this headline"></a></h2>
+<p>Include files can be one of the most hated aspects of C – so it is important to use them correctly to prevent losing your mind.
+When working with multiple files, there is the concept of a “source” file and a “header” file.
+The source file includes all the code/variables that the program needs to work.
+The header file exposes an interface that allows other source files to use functions and/or variables defined in the corresponding source file.
+The below example shows the proper and recommended implementation of the source and header files.</p>
+<p><strong>source.c</strong>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;source.h&quot;</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">my_internal_source_function</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// do some stuff in here</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">my_external_source_function</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">my_internal_source_function</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// do some other stuff in here</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>source.h</strong>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef SOURCE_H</span>
+<span class="cp">#define SOURCE_H</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;some_other_header.h&quot;</span>
+
+<span class="cp">#ifdef __cplusplus</span>
+<span class="k">extern</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="cp">#endif</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">my_external_source_function</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+
+<span class="cp">#ifdef __cplusplus</span>
+<span class="p">}</span>
+<span class="cp">#endif</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>Here are the important takeaways from the above example:</p>
+<ul class="simple">
+<li><p>The first line in the source file should be the corresponding header file for the source interface. Other headers can then be included after; with system/toolchain headers last. This ensures that the header includes all the things necessary to compile it.</p></li>
+<li><p>The source file uses the <strong>static</strong> keyword in front of a function to indicate that it can only be used in the <em>source.c</em> file. This prevents other source files from attempting to use it. It is a good idea to get into the habit of labeling functions in this way if they are not used anywhere except for the file they are in.</p></li>
+<li><p>The header includes so-called “header guards” (the <code class="code docutils literal notranslate"><span class="pre">#ifdef</span> <span class="pre">SOURCE_H</span></code> / <code class="code docutils literal notranslate"><span class="pre">#define</span> <span class="pre">SOURCE_H</span></code> lines), which are used to prevent the header from being included multiple times in the same source file.</p></li>
+<li><p>The <code class="code docutils literal notranslate"><span class="pre">#ifdef</span> <span class="pre">__cplusplus</span></code> lines are used to prevent a C++ compiler from mangling the names of the header functions. It is a good idea to add this, even if you are working on a C-only project as it will save you any headache if a C++ compiler tries to compile the header.</p></li>
+<li><p>The external source function is represented as a “prototype” inside the header. This prototype tells the rest of the source files the arguments and return of the function, but does not define the implementation. It is the responsibility of the linker to take all the compiled source files and find the corresponding functions.</p></li>
+<li><p>There should be one header file for one source file which defines the external functions/variables in the source file. Having “global” header files (i.e. a header file that includes a bunch of other headers and functions) is prone to many issues during linking, affects code modularity, and maintenance, as well as adding to compile time. Putting all possible headers in one application header is as wrong as wrong can be.</p></li>
+</ul>
+<div class="section" id="proper-prototyping">
+<h3>Proper Prototyping<a class="headerlink" href="#proper-prototyping" title="Permalink to this headline"></a></h3>
+<p>In C, if a function takes no arguments it should be represented as <code class="code docutils literal notranslate"><span class="pre">foo(void);</span></code> in the prototype, not <code class="code docutils literal notranslate"><span class="pre">foo();</span></code>.
+Contrary to what it might seem, <code class="code docutils literal notranslate"><span class="pre">foo();</span></code> indicates that the function can take <em>any number</em> of arguments.</p>
+<p>In C++, you should use <code class="code docutils literal notranslate"><span class="pre">foo();</span></code> without the <cite>void</cite> argument.
+In C23, <code class="code docutils literal notranslate"><span class="pre">foo();</span></code> is now identical to <code class="code docutils literal notranslate"><span class="pre">foo(void);</span></code> (it is still recommended to use <code class="code docutils literal notranslate"><span class="pre">foo(void);</span></code> for portability).</p>
+</div>
+<div class="section" id="what-not-to-put-in-header-files">
+<h3>What not to put in header files<a class="headerlink" href="#what-not-to-put-in-header-files" title="Permalink to this headline"></a></h3>
+<p>Here are the following things that should not be put in header files in C:</p>
+<ul class="simple">
+<li><p>Function implementations. Only function prototypes should be put in header files.</p></li>
+<li><p>Variable declarations. If you need to have a “global variable” (you likely don’t), then the global variable should be declared in a <em>source</em> file and then included in the header using the <em>extern</em> keyword (e.g. <code class="code docutils literal notranslate"><span class="pre">extern</span> <span class="pre">global_variable[100];</span></code>).</p></li>
+</ul>
+<p>The reason you shouldn’t do the above is that the <code class="code docutils literal notranslate"><span class="pre">#include</span></code> preprocessor command literally performs a copy/paste of one file into another.
+If a header is used in two different source files, then the function or variable will be duplicated <em>twice</em> (include guards cannot prevent this, they only prevent inclusion in a single source file!).
+Even worse is making the function/variable “static” in the header, which makes each file has its own implementation – it will still compile, but it most certainly is not what you intended!
+If you ever see code or variables that are defined in a header, run far away… or try to fix it.</p>
+</div>
+</div>
+<div class="section" id="avoid-global-variables">
+<h2>Avoid Global Variables<a class="headerlink" href="#avoid-global-variables" title="Permalink to this headline"></a></h2>
+<p>Global variables are <strong>bad</strong>.
+These are variables which are defined outside of a function.</p>
+<p>Here’s why you shouldn’t use them:</p>
+<ul class="simple">
+<li><p>Global variables can be modified by any section of code, making it difficult to remember every possible use.</p></li>
+<li><p>A global variable can have no access control. It can not be limited to some parts of the program.</p></li>
+<li><p>Using global variables causes namespace pollution. This may lead to unnecessarily reassigning a global value.</p></li>
+</ul>
+<p>So, most of the time, and unless you have a really good excuse, don’t use global variables.
+There are better alternatives to using global variables, described below:</p>
+<div class="section" id="proper-scoping">
+<h3>Proper Scoping<a class="headerlink" href="#proper-scoping" title="Permalink to this headline"></a></h3>
+<p>“Scope” is an important part of C programming.
+Every opening brace <code class="code docutils literal notranslate"><span class="pre">{</span></code> is the start of a new scope, and every ending brace <code class="code docutils literal notranslate"><span class="pre">}</span></code> the end of the previous scope.
+Global variables, which are not inside any braces, are declared in what’s known as the global or file scope.
+Variables declared in one scope can only be accessed from the same scope, or from scopes inside of it.
+You want to make sure that you declare variables are in the narrowest scope possible.</p>
+<p>Properly scoping your code instead of using globals for everything makes it easier to think about. For example, the following code uses a global variable <code class="code docutils literal notranslate"><span class="pre">my_var</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">my_func</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">my_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">do_some_thing</span><span class="p">();</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">my_var</span><span class="p">);</span>
+<span class="w">    </span><span class="n">do_some_other_thing</span><span class="p">();</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">my_var</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What values of <code class="code docutils literal notranslate"><span class="pre">my_var</span></code> get printed? It might still be 0, or it could be 1, or 42, or -1, or the address of a string containing a proof of the Riemann hypothesis (though the latter is exceedingly unlikely). It’s impossible to tell without looking at the definitions for <code class="code docutils literal notranslate"><span class="pre">do_some_thing</span></code> and <code class="code docutils literal notranslate"><span class="pre">do_some_other_thing</span></code>. If each of these functions called several other functions, you might have to dig through dozens of functions to say for certain that <code class="code docutils literal notranslate"><span class="pre">my_var</span></code> is not modified. Compare this to the same code written using more proper scoping:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">my_func</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">int24_t</span><span class="w"> </span><span class="n">my_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">do_some_thing</span><span class="p">();</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">my_var</span><span class="p">);</span>
+<span class="w">    </span><span class="n">do_some_other_thing</span><span class="p">(</span><span class="n">my_var</span><span class="p">);</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%u</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">my_var</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this code, it’s clear that the function will print 0 both times, as <code class="code docutils literal notranslate"><span class="pre">my_var</span></code> is not in scope for <code class="code docutils literal notranslate"><span class="pre">do_some_thing</span></code>, and is only passed by value to <code class="code docutils literal notranslate"><span class="pre">do_some_other_thing</span></code>. It’s also clear that <code class="code docutils literal notranslate"><span class="pre">do_some_other_thing</span></code> uses the value of <code class="code docutils literal notranslate"><span class="pre">my_var</span></code>.</p>
+<p>Sure, in real code, functions and variables will have more descriptive names that tell you what they do. But properly scoping your code allows you to only have to think about your program in small chunks, rather than having to think about every other function in the entire codebase that might be able to modify a variable.</p>
+<p>There are other benefits to proper scoping as well. It helps reduce namespace pollution, and the compiler will be able to provide better optimizations, too.</p>
+</div>
+<div class="section" id="using-the-static-keyword">
+<span id="id1"></span><h3>Using the static keyword<a class="headerlink" href="#using-the-static-keyword" title="Permalink to this headline"></a></h3>
+<p>The static keyword is helpful when trying to avoid dynamic allocation and avoiding global variables.
+The below example shows an array that is globally allocated by <code class="code docutils literal notranslate"><span class="pre">malloc</span></code>, which is not recommended.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">big_text_array</span><span class="p">;</span>
+
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="nf">alloc_array</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">big_text_array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">malloc</span><span class="p">(</span><span class="mi">16000</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">big_text_array</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Alternatively, the <code class="code docutils literal notranslate"><span class="pre">static</span></code> keyword can be used to allocate the buffer.
+The <code class="code docutils literal notranslate"><span class="pre">static</span></code> keyword changes the storage space for the variable, and allows it to persist as if it were a global variable.
+The variable maintains the contents it previously held when the function was last called.
+Rather than using dynamic allocation to create the array, static allocation can be used instead as shown below:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="nf">return_array</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">big_text_array</span><span class="p">[</span><span class="mi">16000</span><span class="p">];</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">big_text_array</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-structures">
+<h3>Using structures<a class="headerlink" href="#using-structures" title="Permalink to this headline"></a></h3>
+<p>Structures are a helpful way to encapsulate particular objects used in a program.
+For example, you might have different objects for a player, enemies, and props when creating a game.
+A structure allows you to put all the relevant information into a single object that can then be passed around to different functions.</p>
+<p>For example, the following code snippet creates a player structure:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">player</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">set_player_position</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">player</span><span class="w"> </span><span class="o">*</span><span class="n">player</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">player</span><span class="o">-&gt;</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+<span class="w">    </span><span class="n">player</span><span class="o">-&gt;</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is recommended to avoid “typedef” on structures.
+This is because it is hiding the underlying type, and makes it harder on readability.</p>
+</div>
+</div>
+<div class="section" id="avoid-dynamic-allocation">
+<h2>Avoid Dynamic Allocation<a class="headerlink" href="#avoid-dynamic-allocation" title="Permalink to this headline"></a></h2>
+<p>Dynamic allocation (e.g. <em>malloc</em>, <em>calloc</em>, <em>realloc</em>) should be avoided as much as possible.
+This is because it is an expensive operation and uses a few kilobytes of space for the function itself.</p>
+<p>On the CE, the heap (the region of memory that the above functions allocate from) is stored <a class="reference external" href="https://ce-programming.github.io/toolchain/static/faq.html#what-is-the-c-c-runtime-memory-layout">in the same region</a> of memory that uninitialized data is stored in (referred to as the “bss” section).
+This means that any uninitialized variables not on the stack will automatically use the same region of memory.
+Since this region is a fixed known size (which is not that large, up to ≈60KB total), there is next to zero usefulness in using malloc to perform memory allocation.</p>
+<p>Dynamic allocation can also lead to fragmentation of the heap when running, making programs be extremely unstable and prone to leaks and crashes.
+You also aren’t guaranteed that you will get a valid memory pointer – and thus have no way to recover other than to quit your program!</p>
+<p>In conclusion, avoid dynamic allocation unless you really know what you’re doing. Check the paragraph below for alternatives.</p>
+<div class="section" id="ways-to-avoid-dynamic-allocation">
+<h3>Ways to avoid dynamic allocation<a class="headerlink" href="#ways-to-avoid-dynamic-allocation" title="Permalink to this headline"></a></h3>
+<p>The following tips can help avoid dynamic allocation.</p>
+<ul class="simple">
+<li><p>Statically allocate variables with the <code class="code docutils literal notranslate"><span class="pre">static</span></code> keyword. See <a class="reference internal" href="#using-the-static-keyword"><span class="std std-ref">here</span></a> for more info.</p></li>
+<li><p>Try stack-based allocation using the <code class="code docutils literal notranslate"><span class="pre">alloca</span></code> function (but watch out, the stack is only about 4KB large).</p></li>
+<li><p>Consider why you are allocating memory at runtime in the first place.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="general-guidelines">
+<h2>General Guidelines<a class="headerlink" href="#general-guidelines" title="Permalink to this headline"></a></h2>
+<div class="section" id="limit-magic-numbers">
+<h3>Limit Magic Numbers<a class="headerlink" href="#limit-magic-numbers" title="Permalink to this headline"></a></h3>
+<p>Magic numbers are special numbers that one might put in code when it is 2AM and it’s the 50th time you’ve recompiled just to get a pixel positioned perfectly.
+For example, <code class="code docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">29</span> <span class="pre">+</span> <span class="pre">52</span> <span class="pre">-</span> <span class="pre">3</span></code> contains so-called “magic numbers” – numbers that aren’t tied to a variable or have any real context for why they contain the value they do.
+When updating code 6 months down the road, you won’t have any clue what these numbers meant.
+A better solution is to use a macro such as <code class="code docutils literal notranslate"><span class="pre">#define</span> <span class="pre">X_OFFSET</span> <span class="pre">(29</span> <span class="pre">+</span> <span class="pre">52</span> <span class="pre">-</span> <span class="pre">3)</span></code> where the intent of the numbers is less obscured.</p>
+</div>
+<div class="section" id="use-const-as-much-as-possible">
+<h3>Use const as much as possible<a class="headerlink" href="#use-const-as-much-as-possible" title="Permalink to this headline"></a></h3>
+<p>When a variable will not actually change over time, mark it as <code class="code docutils literal notranslate"><span class="pre">const</span></code>!
+This helps with performance (the compiler will produce better code), conveys the intent more clearly, and leads to fewer bugs.</p>
+<p>More information: <a class="reference external" href="https://www.cppstories.com/2016/12/please-declare-your-variables-as-const/">https://www.cppstories.com/2016/12/please-declare-your-variables-as-const/</a></p>
+</div>
+<div class="section" id="avoid-explicit-casting">
+<h3>Avoid explicit casting<a class="headerlink" href="#avoid-explicit-casting" title="Permalink to this headline"></a></h3>
+<p>A cast is nothing more than a lie to the compiler, claiming you know better than the compiler what is happening.
+Casting can do nefarious things, such as masking away a <code class="code docutils literal notranslate"><span class="pre">const</span></code>, strip an object of its type, and makes the code harder to understand.
+If you must use explicit casting, ensure that it is needed and you aren’t trying to hack something in.</p>
+<p>More information: <a class="reference external" href="https://gustedt.wordpress.com/2014/04/02/dont-use-casts-i/">https://gustedt.wordpress.com/2014/04/02/dont-use-casts-i/</a></p>
+</div>
+<div class="section" id="use-static-analysis-tools">
+<h3>Use Static Analysis Tools<a class="headerlink" href="#use-static-analysis-tools" title="Permalink to this headline"></a></h3>
+<p>Static Analysis examines the code without executing the program in order to find common programming issues and flaw/bugs that may not be intended.
+It is a great way to improve the reliability and ensure that you are following the best programming practices.
+There are many static analysis tools available, some better than others.
+Some common ones include:</p>
+<ul class="simple">
+<li><p>Cppcheck</p></li>
+<li><p>Clang Static Analyzer (scan-build)</p></li>
+<li><p>Coverity</p></li>
+</ul>
+<p>Cppcheck is the easiest one to use with the CE C toolchain, but it is also fairly limited.
+Your IDE may also have a static analyzer built-in.
+Make sure to enable warning flags on the compiler, too (<code class="code docutils literal notranslate"><span class="pre">-Wall</span> <span class="pre">-Wextra</span></code>)</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="git.html" class="btn btn-neutral float-left" title="Using Git For Revision Control" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing to the CE Toolchain" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      nightly
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+             </strong> 
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Makefile Options &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing to the CE Toolchain" href="contributing.html" />
+    <link rel="prev" title="Debugging" href="debugging.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v9.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Information</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">CE Toolchain Specific Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Makefile Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#name">NAME</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#icon">ICON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#description">DESCRIPTION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compressed">COMPRESSED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#archived">ARCHIVED</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deps">DEPS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cflags-cxxflags">CFLAGS / CXXFLAGS</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Makefile Options</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="makefile-options">
+<span id="id1"></span><h1>Makefile Options<a class="headerlink" href="#makefile-options" title="Permalink to this headline"></a></h1>
+<p>The project’s makefile controls different features and settings for the output program.
+Additional rules can be added to build different components as well.</p>
+<p>To edit these options, open the <code class="code docutils literal notranslate"><span class="pre">makefile</span></code> file inside the project’s folder.</p>
+<div class="section" id="name">
+<h2>NAME<a class="headerlink" href="#name" title="Permalink to this headline"></a></h2>
+<p>This is the name of the program variable that will be stored on the calculator.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>PRGM
+</pre></div>
+</div>
+</div>
+<div class="section" id="icon">
+<h2>ICON<a class="headerlink" href="#icon" title="Permalink to this headline"></a></h2>
+<p>Icons make a more polished program that can be displayed in shells such as <a class="reference external" href="https://github.com/mateoconlechuga/cesium/releases/latest">Cesium</a>.</p>
+<p>Place a 16x16 image in the same directory as the makefile with the name of whatever <cite>ICON</cite> is defined as, e.g. <cite>icon.png</cite>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">ICON</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>icon.png
+</pre></div>
+</div>
+</div>
+<div class="section" id="description">
+<h2>DESCRIPTION<a class="headerlink" href="#description" title="Permalink to this headline"></a></h2>
+<p>Change <cite>DESCRIPTION</cite> to the program’s description. It is recommended to keep this under 25 characters.</p>
+<p>The description will be displayed in shells such as <a class="reference external" href="https://github.com/mateoconlechuga/cesium/releases/latest">Cesium</a>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">DESCRIPTION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My awesome program&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="compressed">
+<h2>COMPRESSED<a class="headerlink" href="#compressed" title="Permalink to this headline"></a></h2>
+<p>Programs can tend to be quite large from a variety of factors such as sprites, bloated code, or other issues.
+The toolchain offers the ability to compress programs into a self-extracting executable.
+This does not change the execution size, but rather the executable’s storage size.</p>
+<p>To enable this feature, open the project’s makefile and edit the line:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">COMPRESSED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+</div>
+<div class="section" id="archived">
+<h2>ARCHIVED<a class="headerlink" href="#archived" title="Permalink to this headline"></a></h2>
+<p>Programs can be built to be stored in the archive rather than RAM.
+To enable this feature, open the project’s makefile and change the line:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">ARCHIVED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+</div>
+<div class="section" id="deps">
+<h2>DEPS<a class="headerlink" href="#deps" title="Permalink to this headline"></a></h2>
+<p>Add any files that you want to be built by the toolchain to this variable.
+Define rules for the files after including the main CEdev makefile.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">DEPS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">$(</span>BINDIR<span class="k">)</span>/levelpack.bin
+
+<span class="cp">include $(shell cedev-config --makefile)</span>
+
+<span class="nf">$(BINDIR)/levelpack.bin</span><span class="o">:</span>
+<span class="w">    </span><span class="k">$(</span>call<span class="w"> </span>MKDIR,<span class="k">$(</span>@D<span class="k">))</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;levelpack&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="k">$(</span>BINDIR<span class="k">)</span>/levelpack.bin
+</pre></div>
+</div>
+</div>
+<div class="section" id="cflags-cxxflags">
+<h2>CFLAGS / CXXFLAGS<a class="headerlink" href="#cflags-cxxflags" title="Permalink to this headline"></a></h2>
+<p>These flags are passed to the clang compiler.
+<em>CFLAGS</em> is used for C source files – <em>CXXFLAGS</em> is used for CPP source files.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">CFLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-Oz
+<span class="nv">CXXFLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-Oz
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="debugging.html" class="btn btn-neutral float-left" title="Debugging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing to the CE Toolchain" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v9.2
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+             </strong> 
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

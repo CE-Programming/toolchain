@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sys/timers.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="sys/util.h" href="util.html" />
+    <link rel="prev" title="sys/rtc.h" href="rtc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v11.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE Hardware Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicusb.html">sys/basicusb.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lcd.html">sys/lcd.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="power.html">sys/power.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rtc.html">sys/rtc.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">sys/timers.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">sys/util.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE Hardware Headers</a> &raquo;</li>
+      <li>sys/timers.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="sys-timers-h">
+<span id="timers-h"></span><h1>sys/timers.h<a class="headerlink" href="#sys-timers-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/timers.h&gt;</span>
+</pre></div>
+</div>
+<p>This header includes defines for the CE’s 3 hardware timers.
+It is discouraged from directly modifying the timers themseleves, and instead use the standard C <cite>clock()</cite> fuction.
+These functions provide direct maniplution of the hardware timers.
+Keep in mind that using them may cause the <cite>clock()</cite> and related functions to not work correctly.
+This header also includes functions such as <cite>sleep()</cite> and <cite>delay()</cite> which are based around <cite>clock()</cite>’s functionality and are always safe to use.</p>
+<p>There are two possible timing (“clock”) sources: a 32768 Hz crystal with similar accuracy to the clock found in any smartphone or wristwatch, and the CPU’s main 48 MHz clock with likely much inferior accuracy.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>CE hardware timers define file. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv410useconds_t">
+<span id="_CPPv310useconds_t"></span><span id="_CPPv210useconds_t"></span><span id="useconds_t"></span><span class="target" id="timers_8h_1a4e3322434ea918ae562e0ea5237ab191"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">useconds_t</span></span></span><a class="headerlink" href="#_CPPv410useconds_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An unsigned integer type capable of holding integers in the range [0,1000000]. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1ac0383719bafa9b5b2aa25fabc586bd1f"><span class="std std-ref">usleep</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv45delay8uint16_t">
+<span id="_CPPv35delay8uint16_t"></span><span id="_CPPv25delay8uint16_t"></span><span id="delay__uint16_t"></span><span class="target" id="timers_8h_1acfd12579679c85d5f1c716509b2587f6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">delay</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">msec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv45delay8uint16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Suspends execution of the calling thread for (at least) <code class="docutils literal notranslate"><span class="pre">msec</span></code> milliseconds. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1a69c97039c9ec10a30e5edbdf365e3bbd"><span class="std std-ref">sleep</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1ac0383719bafa9b5b2aa25fabc586bd1f"><span class="std std-ref">usleep</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msec</strong> – <strong>[in]</strong> number of milliseconds </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv46msleep8uint16_t">
+<span id="_CPPv36msleep8uint16_t"></span><span id="_CPPv26msleep8uint16_t"></span><span id="msleep__uint16_t"></span><span class="target" id="timers_8h_1a883d291cfa3fa060430e9da88e3f610e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msleep</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">msec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46msleep8uint16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Suspends execution of the calling thread for (at least) <code class="docutils literal notranslate"><span class="pre">msec</span></code> milliseconds. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1a69c97039c9ec10a30e5edbdf365e3bbd"><span class="std std-ref">sleep</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1ac0383719bafa9b5b2aa25fabc586bd1f"><span class="std std-ref">usleep</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msec</strong> – <strong>[in]</strong> number of milliseconds </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv45sleepj">
+<span id="_CPPv35sleepj"></span><span id="_CPPv25sleepj"></span><span id="sleep__unsigned-i"></span><span class="target" id="timers_8h_1a69c97039c9ec10a30e5edbdf365e3bbd"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sleep</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">seconds</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv45sleepj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sleeps until the number of real-time seconds specified in <code class="docutils literal notranslate"><span class="pre">seconds</span></code> have elapsed or until a signal arrives which is not ignored. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1acfd12579679c85d5f1c716509b2587f6"><span class="std std-ref">delay</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1ac0383719bafa9b5b2aa25fabc586bd1f"><span class="std std-ref">usleep</span></a> </p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, signals do not exist, so this will never be interrupted.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seconds</strong> – <strong>[in]</strong> number of seconds </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>zero if the requested time has elapsed, or the number of seconds left to sleep, if the call was interrupted by a signal handler </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ticksleepm">
+<span id="_CPPv39ticksleepm"></span><span id="_CPPv29ticksleepm"></span><span id="ticksleep__unsigned-l"></span><span class="target" id="timers_8h_1a98eb33ff885799cbd6fc7849c4e33968"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ticksleep</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">long</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ticks</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ticksleepm" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Suspends execution of the calling thread for (at least) <code class="docutils literal notranslate"><span class="pre">ticks</span></code> clock ticks. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>CLOCKS_PER_SEC </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1acfd12579679c85d5f1c716509b2587f6"><span class="std std-ref">delay</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1ac0383719bafa9b5b2aa25fabc586bd1f"><span class="std std-ref">usleep</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ticks</strong> – <strong>[in]</strong> number of clock ticks </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv46usleep10useconds_t">
+<span id="_CPPv36usleep10useconds_t"></span><span id="_CPPv26usleep10useconds_t"></span><span id="usleep__useconds_t"></span><span class="target" id="timers_8h_1ac0383719bafa9b5b2aa25fabc586bd1f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">usleep</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410useconds_t" title="useconds_t"><span class="n"><span class="pre">useconds_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">usec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46usleep10useconds_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Suspends execution of the calling thread for (at least) <code class="docutils literal notranslate"><span class="pre">usec</span></code> microseconds. </p>
+<p>The sleep may be lengthened slightly by any system activity or by the time spent processing the call or by the granularity of system timers.</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1acfd12579679c85d5f1c716509b2587f6"><span class="std std-ref">delay</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1a69c97039c9ec10a30e5edbdf365e3bbd"><span class="std std-ref">sleep</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#timers_8h_1a4e3322434ea918ae562e0ea5237ab191"><span class="std std-ref">useconds_t</span></a> </p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, no errors are possible.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>usec</strong> – <strong>[in]</strong> number of microseconds </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 on success, or -1 on error, with <code class="docutils literal notranslate"><span class="pre">errno</span></code> set to indicate the error </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414boot_WaitShortv">
+<span id="_CPPv314boot_WaitShortv"></span><span id="_CPPv214boot_WaitShortv"></span><span id="boot_WaitShort__void"></span><span class="target" id="timers_8h_1a4751701988751e498490608739b3def1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_WaitShort</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414boot_WaitShortv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Waits for ~10 ms. </p>
+<p>In most cases it is better to use the <a class="reference internal" href="#timers_8h_1acfd12579679c85d5f1c716509b2587f6"><span class="std std-ref">delay()</span></a> function. </p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rtc.html" class="btn btn-neutral float-left" title="sys/rtc.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="util.html" class="btn btn-neutral float-right" title="sys/util.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v11.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

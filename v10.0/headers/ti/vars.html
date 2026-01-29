@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/vars.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Miscellaneous Headers" href="../index.html" />
+    <link rel="prev" title="ti/ui.h" href="ui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v10.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="debug.html">ti/debug.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/vars.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/vars.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-vars-h">
+<span id="vars"></span><h1>ti/vars.h<a class="headerlink" href="#ti-vars-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/vars.h&gt;</span>
+</pre></div>
+</div>
+<p>The TI-84 Plus CE’s early-90s roots result in it managing files and data quite differently than how modern computers do.
+Some data in the OS, such as stat vars, are permanently allocated a fixed location in RAM;
+other data, such as user programs and strings, are not assigned a fixed location.
+The operating system’s equivalent to a “file” is called a variable, and they come in many types.
+The locations of dynamic variables are tracked in a structure called the VAT (Variable Allocation Table).</p>
+<p>The VAT has the novel property that it is stored completely reversed and must be parsed backwards.
+This means that no C structs are available to represent VAT entires, because C can’t (easily) deal with backwards structs.
+As a further complication, archived variables store a copy of their VAT entry in the archive, and <em>that</em> copy is <em>not</em> reversed.</p>
+<p>Every variable type deals with its size differently.
+The size is not stored in the VAT entry, but is instead stored with the variable’s data.
+But <code class="code docutils literal notranslate"><span class="pre">real_t</span></code> has no explicit size; the OS infers the size.
+Meanwhile, lists store the number of elements and matrices store the number of rows and columns, so you have to compute the size.
+(Don’t forget that lists–but not matrices–can be either real or complex.)
+Most other types use a simple size word.
+The <code class="code docutils literal notranslate"><span class="pre">fileioc</span></code> library masks all of this wackyness for you, but the OS also includes many helpful C functions.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI CE OS user variables and memory. </p>
+<p>
+This declares routines for low-level access to user variables (appvars, programs, Str0-9, matrix, &amp;c.), as well as other user-memory management routines (not the heap!), stat vars, and the RunPrgm interface. <dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.matrix_element">
+<span class="target" id="vars_8h_1a5d9e4f37175df52ece5e95789224e1f0"></span><span class="sig-name descname"><span class="n"><span class="pre">matrix_element</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">matrix</span></span>, <span class="n"><span class="pre">row</span></span>, <span class="n"><span class="pre">col</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.matrix_element" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets an element from a matrix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> – Structure of matrix </p></li>
+<li><p><strong>row</strong> – Row in matrix </p></li>
+<li><p><strong>col</strong> – Column in matrix </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="real.html#structreal__t"><span class="std std-ref">real_t</span></a> containing element data </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_RamStart">
+<span class="target" id="vars_8h_1a11eb28d9b6aef805d7a54a1495a86626"></span><span class="sig-name descname"><span class="n"><span class="pre">os_RamStart</span></span></span><a class="headerlink" href="#c.os_RamStart" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Start of RAM. </p>
+<p>Type: <code class="docutils literal notranslate"><span class="pre">uint8_t[1024</span> <span class="pre">*</span> <span class="pre">256]</span></code> </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_RclFlags">
+<span class="target" id="vars_8h_1a1540bda5d37b36d1d99d47fc4f626a36"></span><span class="sig-name descname"><span class="n"><span class="pre">os_RclFlags</span></span></span><a class="headerlink" href="#c.os_RclFlags" title="Permalink to this definition"></a><br /></dt>
+<dd><p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;</span><span class="pre">ti/flags.h</span><span class="pre">&gt;</span></code> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_AppData">
+<span class="target" id="vars_8h_1aa7424c3c49daa1b81a6518088398c71b"></span><span class="sig-name descname"><span class="n"><span class="pre">os_AppData</span></span></span><a class="headerlink" href="#c.os_AppData" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Generally unused by the OS. </p>
+<p>Type: <code class="docutils literal notranslate"><span class="pre">uint8_t[256]</span></code> </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_ProgToEdit">
+<span class="target" id="vars_8h_1abf6415fbfa68d05087d8a4e6c0c3973a"></span><span class="sig-name descname"><span class="n"><span class="pre">os_ProgToEdit</span></span></span><a class="headerlink" href="#c.os_ProgToEdit" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_NameBuff">
+<span class="target" id="vars_8h_1a0d5ab9fa6ac2516878a0b4b772bb2d62"></span><span class="sig-name descname"><span class="n"><span class="pre">os_NameBuff</span></span></span><a class="headerlink" href="#c.os_NameBuff" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_AsmPrgmSize">
+<span class="target" id="vars_8h_1a7be625b0f50db0d58fd6e552adb491ca"></span><span class="sig-name descname"><span class="n"><span class="pre">os_AsmPrgmSize</span></span></span><a class="headerlink" href="#c.os_AsmPrgmSize" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Current size of executing program. </p>
+<p>Type: <code class="docutils literal notranslate"><span class="pre">uint16_t</span></code> </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_TempFreeArc">
+<span class="target" id="vars_8h_1ad93b56112739741b0b6c5588459317ee"></span><span class="sig-name descname"><span class="n"><span class="pre">os_TempFreeArc</span></span></span><a class="headerlink" href="#c.os_TempFreeArc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set after asm_ArcChk call. </p>
+<p>Type: <code class="docutils literal notranslate"><span class="pre">uint24_t</span></code> </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_RamCode">
+<span class="target" id="vars_8h_1a1516736dd9f41abfe95ea6fe5c93bf98"></span><span class="sig-name descname"><span class="n"><span class="pre">os_RamCode</span></span></span><a class="headerlink" href="#c.os_RamCode" title="Permalink to this definition"></a><br /></dt>
+<dd><p>When writing to flash, the calculator’s hardware cannot read from flash. </p>
+<p>So the flash writing code has to be copied to RAM first. It is copied here. You can use this as long as you don’t attempt any flash writes.</p>
+<p>Type: <code class="docutils literal notranslate"><span class="pre">uint8_t[1023]</span></code> </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv421os_runprgm_callback_t">
+<span id="_CPPv321os_runprgm_callback_t"></span><span id="_CPPv221os_runprgm_callback_t"></span><span id="os_runprgm_callback_t"></span><span class="target" id="vars_8h_1a576ba09761060bdad1037e7d071122fe"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_runprgm_callback_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n"><span class="pre">retval</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv421os_runprgm_callback_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Callback function pointer type for os_RunPrgm. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>os_RunPrgm </p>
+</div>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49os_MemChkPPv">
+<span id="_CPPv39os_MemChkPPv"></span><span id="_CPPv29os_MemChkPPv"></span><span id="os_MemChk__voidPP"></span><span class="target" id="vars_8h_1ac8a018c90c6e1d6a922afe8f7b2a3c9b"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_MemChk</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">free</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49os_MemChkPPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the size in bytes of free RAM that the user isn’t using. </p>
+<p>A pointer is also returned to the start of this region; you can use it for your own purposes but do not exceed the size returned. This function is useful if you are running out of space in the bss or heap and need a little extra memory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>free</strong> – <strong>[out]</strong> Set to start of free available RAM </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Size of available RAM </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49os_ArcChkv">
+<span id="_CPPv39os_ArcChkv"></span><span id="_CPPv29os_ArcChkv"></span><span id="os_ArcChk__void"></span><span class="target" id="vars_8h_1a0ac2d0c349446077665fc1aba42a6697"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ArcChk</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49os_ArcChkv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine checks the amount of free archive. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_GetSymTablePtrv">
+<span id="_CPPv317os_GetSymTablePtrv"></span><span id="_CPPv217os_GetSymTablePtrv"></span><span id="os_GetSymTablePtr__void"></span><span class="target" id="vars_8h_1aefd7bc0b0312cc0a29144ecf6d582ee1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_GetSymTablePtr</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_GetSymTablePtrv" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A pointer to symtable of the OS </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_NextSymEntryPvP8uint24_tP8uint24_tPcPPv">
+<span id="_CPPv315os_NextSymEntryPvP8uint24_tP8uint24_tPcPPv"></span><span id="_CPPv215os_NextSymEntryPvP8uint24_tP8uint24_tPcPPv"></span><span id="os_NextSymEntry__voidP.uint24_tP.uint24_tP.cP.voidPP"></span><span class="target" id="vars_8h_1ac3f9e69eb3a363add1627306da51d6eb"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_NextSymEntry</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">entry</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">type</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">nameLength</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_NextSymEntryPvP8uint24_tP8uint24_tPcPPv" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>next entry or NULL if no more entries, pass os_GetSymTablePtr() as first entry </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_DelSymEntryPv">
+<span id="_CPPv314os_DelSymEntryPv"></span><span id="_CPPv214os_DelSymEntryPv"></span><span id="os_DelSymEntry__voidP"></span><span class="target" id="vars_8h_1a2349c485689ae1ff8dba93b5ccb4e4fe"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_DelSymEntry</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">entry</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_DelSymEntryPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Delete a var from RAM. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>entry</strong> – <strong>[in]</strong> An entry as returned from os_NextSymEntry(). </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_CreateStringPKcPK8string_t">
+<span id="_CPPv315os_CreateStringPKcPK8string_t"></span><span id="_CPPv215os_CreateStringPKcPK8string_t"></span><span id="os_CreateString__cCP.string_tCP"></span><span class="target" id="vars_8h_1a4fa7f4de49a50d8ccdaed37e38e68985"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_CreateString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48string_t" title="string_t"><span class="n"><span class="pre">string_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_CreateStringPKcPK8string_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Creates an TIOS Str. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the Str to create. </p></li>
+<li><p><strong>data</strong> – <strong>[in]</strong> Initial contents of the created Str. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A TIOS error code, or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_GetStringDataPKcPi">
+<span id="_CPPv316os_GetStringDataPKcPi"></span><span id="_CPPv216os_GetStringDataPKcPi"></span><span id="os_GetStringData__cCP.iP"></span><span class="target" id="vars_8h_1a858d7cd24327b9d9a6ad206ad6c6a2d1"></span><a class="reference internal" href="#_CPPv48string_t" title="string_t"><span class="n"><span class="pre">string_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_GetStringData</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">archived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_GetStringDataPKcPi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to an TIOS Str’s data, which may be in archive. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Returns NULL if the Str doesn’t exist, otherwise a pointer to the size bytes. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the Str to lookup. </p></li>
+<li><p><strong>archived</strong> – <strong>[in]</strong> Set to 1 if the Str is archived, otherwise 0, may be NULL if you don’t need it. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A pointer to the Str data </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_CreateEquationPKcPK5equ_t">
+<span id="_CPPv317os_CreateEquationPKcPK5equ_t"></span><span id="_CPPv217os_CreateEquationPKcPK5equ_t"></span><span id="os_CreateEquation__cCP.equ_tCP"></span><span class="target" id="vars_8h_1a8be1023b809c928c0313bf91cf8a4f7d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_CreateEquation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv45equ_t" title="equ_t"><span class="n"><span class="pre">equ_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_CreateEquationPKcPK5equ_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Creates a TIOS Equ. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the Equ to create. </p></li>
+<li><p><strong>data</strong> – <strong>[in]</strong> Initial contents of the created Equ. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A TIOS error code, or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418os_GetEquationDataPKcPi">
+<span id="_CPPv318os_GetEquationDataPKcPi"></span><span id="_CPPv218os_GetEquationDataPKcPi"></span><span id="os_GetEquationData__cCP.iP"></span><span class="target" id="vars_8h_1a9e2000a3bc1ceb5ec40d499b08159d5b"></span><a class="reference internal" href="#_CPPv45equ_t" title="equ_t"><span class="n"><span class="pre">equ_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_GetEquationData</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">archived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418os_GetEquationDataPKcPi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to an TIOS Equ’s data, which may be in archive. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Returns NULL if the Equ doesn’t exist, otherwise a pointer to the size bytes. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the Equ to lookup. </p></li>
+<li><p><strong>archived</strong> – <strong>[in]</strong> Set to 1 if the Equ is archived, otherwise 0, may be NULL if you don’t need it. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A pointer to the Equ data. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_CreateAppVarPKc8uint16_t">
+<span id="_CPPv315os_CreateAppVarPKc8uint16_t"></span><span id="_CPPv215os_CreateAppVarPKc8uint16_t"></span><span id="os_CreateAppVar__cCP.uint16_t"></span><span class="target" id="vars_8h_1a5c6e30c341108c0c330e587399247cf1"></span><a class="reference internal" href="#_CPPv45var_t" title="var_t"><span class="n"><span class="pre">var_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_CreateAppVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_CreateAppVarPKc8uint16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Creates a TIOS AppVar. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Returns NULL if creation failed for some reason, otherwise a pointer to the size bytes. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If successful, the AppVar contents will be uninitialized, aka filled with random bytes. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the AppVar to create. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Size of AppVar to create. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A pointer to the AppVar data. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_GetAppVarDataPKcPi">
+<span id="_CPPv316os_GetAppVarDataPKcPi"></span><span id="_CPPv216os_GetAppVarDataPKcPi"></span><span id="os_GetAppVarData__cCP.iP"></span><span class="target" id="vars_8h_1a0cff8d1e81c731c579f7c8116cb5fbeb"></span><a class="reference internal" href="#_CPPv45var_t" title="var_t"><span class="n"><span class="pre">var_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_GetAppVarData</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">archived</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_GetAppVarDataPKcPi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to a TIOS AppVar’s data, which may be in archive. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Returns NULL if the AppVar doesn’t exist, otherwise a pointer to the size bytes. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the AppVar to lookup. </p></li>
+<li><p><strong>archived</strong> – <strong>[in]</strong> Set to 1 if the AppVar is archived, otherwise 0, may be NULL if you don’t need it. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A pointer to the AppVar data. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412os_DelAppVarPKc">
+<span id="_CPPv312os_DelAppVarPKc"></span><span id="_CPPv212os_DelAppVarPKc"></span><span id="os_DelAppVar__cCP"></span><span class="target" id="vars_8h_1afc6c8e88138816d153c48d170ff2f027"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_DelAppVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412os_DelAppVarPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deletes an AppVar from RAM. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> Name of the AppVar to delete. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_ChkFindSym7uint8_tPKcPPvPPv">
+<span id="_CPPv313os_ChkFindSym7uint8_tPKcPPvPPv"></span><span id="_CPPv213os_ChkFindSym7uint8_tPKcPPvPPv"></span><span id="os_ChkFindSym__uint8_t.cCP.voidPP.voidPP"></span><span class="target" id="vars_8h_1a03c7b7fd5d27d43d38717c3a0a9db1f0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ChkFindSym</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">entry</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_ChkFindSym7uint8_tPKcPPvPPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Locates a symbol in the symtable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> – <strong>[in]</strong> Type of symbol to find </p></li>
+<li><p><strong>name</strong> – <strong>[in]</strong> Pointer to name of symbol to find </p></li>
+<li><p><strong>entry</strong> – <strong>[out]</strong> Can be NULL if you don’t care </p></li>
+<li><p><strong>data</strong> – <strong>[out]</strong> Can be NULL if you don’t care </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If file exists, returns 1 and sets entry and data, otherwise returns 0. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_GetVarSizePKcP6size_t">
+<span id="_CPPv313os_GetVarSizePKcP6size_t"></span><span id="_CPPv213os_GetVarSizePKcP6size_t"></span><span id="os_GetVarSize__cCP.sP"></span><span class="target" id="vars_8h_1a34d09157e27f7dbad5267fa34a231017"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetVarSize</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_GetVarSizePKcP6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the size of sized vars such as equations, string, programs, appvars, or the dimension of a list. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the var to lookup. </p></li>
+<li><p><strong>size</strong> – <strong>[out]</strong> Pointer to store size of variable. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_GetMatrixDimsPKcPiPi">
+<span id="_CPPv316os_GetMatrixDimsPKcPiPi"></span><span id="_CPPv216os_GetMatrixDimsPKcPiPi"></span><span id="os_GetMatrixDims__cCP.iP.iP"></span><span class="target" id="vars_8h_1afd19d240bb5ec417bd93c2989d3df77a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetMatrixDims</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">rows</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cols</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_GetMatrixDimsPKcPiPi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the dimensions of a matrix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the matrix to lookup. </p></li>
+<li><p><strong>rows</strong> – <strong>[in]</strong> Pointer to store number of rows. </p></li>
+<li><p><strong>cols</strong> – <strong>[in]</strong> Pointer to store number of columns. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421os_GetRealListElementPKciP6real_t">
+<span id="_CPPv321os_GetRealListElementPKciP6real_t"></span><span id="_CPPv221os_GetRealListElementPKciP6real_t"></span><span id="os_GetRealListElement__cCP.i.real_tP"></span><span class="target" id="vars_8h_1a3d4c4814a5325b3f3dd5ffb44a2d272c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetRealListElement</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421os_GetRealListElementPKciP6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a real value from a real list or a complex list where the selected element has no imaginary component. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the list. </p></li>
+<li><p><strong>index</strong> – <strong>[in]</strong> Element index (1-based). </p></li>
+<li><p><strong>value</strong> – <strong>[out]</strong> Set to the value of the selected element. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419os_GetMatrixElementPKciiP6real_t">
+<span id="_CPPv319os_GetMatrixElementPKciiP6real_t"></span><span id="_CPPv219os_GetMatrixElementPKciiP6real_t"></span><span id="os_GetMatrixElement__cCP.i.i.real_tP"></span><span class="target" id="vars_8h_1a851c08e538b9ba7c6bb07660271d05e6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetMatrixElement</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419os_GetMatrixElementPKciiP6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a real value from a matrix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the matrix. </p></li>
+<li><p><strong>row</strong> – <strong>[in]</strong> Element row (1-based). </p></li>
+<li><p><strong>col</strong> – <strong>[in]</strong> Element col (1-based). </p></li>
+<li><p><strong>value</strong> – <strong>[out]</strong> Set to the value of the selected element. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_GetRealVarPKcP6real_t">
+<span id="_CPPv313os_GetRealVarPKcP6real_t"></span><span id="_CPPv213os_GetRealVarPKcP6real_t"></span><span id="os_GetRealVar__cCP.real_tP"></span><span class="target" id="vars_8h_1a459ee6f7031fdecd984ea5003e770724"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetRealVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_GetRealVarPKcP6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the real value of a real variable or a complex variable with no imaginary component. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of TIOS variable. </p></li>
+<li><p><strong>value</strong> – <strong>[out]</strong> Set to the value of the variable. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_SetListDimPKci">
+<span id="_CPPv313os_SetListDimPKci"></span><span id="_CPPv213os_SetListDimPKci"></span><span id="os_SetListDim__cCP.i"></span><span class="target" id="vars_8h_1ad3dce8652a5d17b8a1da6d989f6a0543"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetListDim</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dim</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_SetListDimPKci" title="Permalink to this definition"></a><br /></dt>
+<dd><p>If list <code class="docutils literal notranslate"><span class="pre">name</span></code> doesn’t exist, create it with <code class="docutils literal notranslate"><span class="pre">dim</span></code> elements, otherwise resize the list, with new elements being set to 0. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the list to resize. </p></li>
+<li><p><strong>dim</strong> – <strong>[in]</strong> New list dimension. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_SetMatrixDimsPKcii">
+<span id="_CPPv316os_SetMatrixDimsPKcii"></span><span id="_CPPv216os_SetMatrixDimsPKcii"></span><span id="os_SetMatrixDims__cCP.i.i"></span><span class="target" id="vars_8h_1a9a7a5fd90a78e4f12cb8d11a33d28790"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetMatrixDims</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rows</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cols</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_SetMatrixDimsPKcii" title="Permalink to this definition"></a><br /></dt>
+<dd><p>If matrix <code class="docutils literal notranslate"><span class="pre">name</span></code> doesn’t exist, create it with dimensions <code class="docutils literal notranslate"><span class="pre">rows</span></code> and <code class="docutils literal notranslate"><span class="pre">cols</span></code>, otherwise resize the matrix, with new elements being set to 0. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the matrix to resize. </p></li>
+<li><p><strong>rows</strong> – <strong>[in]</strong> New row dimension. </p></li>
+<li><p><strong>cols</strong> – <strong>[in]</strong> New col dimension. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421os_SetRealListElementPKciPK6real_t">
+<span id="_CPPv321os_SetRealListElementPKciPK6real_t"></span><span id="_CPPv221os_SetRealListElementPKciPK6real_t"></span><span id="os_SetRealListElement__cCP.i.real_tCP"></span><span class="target" id="vars_8h_1aad69f93573bdcd79d60b626dcc094596"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetRealListElement</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421os_SetRealListElementPKciPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets a list element to a real value. </p>
+<p>If the list doesn’t exist, then index must be 1 and it creates a 1 element list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the list. </p></li>
+<li><p><strong>index</strong> – <strong>[in]</strong> Element index (1-based). </p></li>
+<li><p><strong>value</strong> – <strong>[in]</strong> The value to set to the selected element. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419os_SetMatrixElementPKciiPK6real_t">
+<span id="_CPPv319os_SetMatrixElementPKciiPK6real_t"></span><span id="_CPPv219os_SetMatrixElementPKciiPK6real_t"></span><span id="os_SetMatrixElement__cCP.i.i.real_tCP"></span><span class="target" id="vars_8h_1a0ff9bdfa9fbf2912607ae9c041259215"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetMatrixElement</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">col</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419os_SetMatrixElementPKciiPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets a matrix element to a real value. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of the matrix. </p></li>
+<li><p><strong>row</strong> – <strong>[in]</strong> Element row (1-based). </p></li>
+<li><p><strong>col</strong> – <strong>[in]</strong> Element col (1-based). </p></li>
+<li><p><strong>value</strong> – <strong>[in]</strong> The value to set to the selected element. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_SetRealVarPKcPK6real_t">
+<span id="_CPPv313os_SetRealVarPKcPK6real_t"></span><span id="_CPPv213os_SetRealVarPKcPK6real_t"></span><span id="os_SetRealVar__cCP.real_tCP"></span><span class="target" id="vars_8h_1abf0d56cc9ac0755e77d96a0d9b7e0f60"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetRealVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_SetRealVarPKcPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets a variable to a real value, creating it if it doesn’t exist. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of variable to lookup. </p></li>
+<li><p><strong>value</strong> – <strong>[in]</strong> The value to set the variable to. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TIOS System Error Code or 0 on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_GetAnsDataP7uint8_t">
+<span id="_CPPv313os_GetAnsDataP7uint8_t"></span><span id="_CPPv213os_GetAnsDataP7uint8_t"></span><span id="os_GetAnsData__uint8_tP"></span><span class="target" id="vars_8h_1a1cce97b7fa95fa8017425d70ca6713ad"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_GetAnsData</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_GetAnsDataP7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the Ans variable. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Returns NULL if Ans doesn’t exist or type is NULL </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>type</strong> – <strong>[in]</strong> This is set to the current variable type in ANS </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to the data </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49os_DelResv">
+<span id="_CPPv39os_DelResv"></span><span id="_CPPv29os_DelResv"></span><span id="os_DelRes__void"></span><span class="target" id="vars_8h_1abe2be5a73be715caf3058a7066c2198a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_DelRes</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49os_DelResv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Invalidate and clear stat variables. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RunPrgmPKcPv6size_t21os_runprgm_callback_t">
+<span id="_CPPv310os_RunPrgmPKcPv6size_t21os_runprgm_callback_t"></span><span id="_CPPv210os_RunPrgmPKcPv6size_t21os_runprgm_callback_t"></span><span id="os_RunPrgm__cCP.voidP.s.os_runprgm_callback_t"></span><span class="target" id="vars_8h_1a0a6fece31fca63a81c4ece229e50f671"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RunPrgm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">prgm</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <a class="reference internal" href="#_CPPv421os_runprgm_callback_t" title="os_runprgm_callback_t"><span class="n"><span class="pre">os_runprgm_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">callback</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RunPrgmPKcPv6size_t21os_runprgm_callback_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Runs a program that exists on the calculator. </p>
+<p>Note that this will destroy the currently running program, requiring you to save any data as needed. This program has an optional callback that will be executed when the called program finishes, which can be used to rebuild the program state. Additionally, program context information can be safely stored by using the extra user data arguments, which will then be delivered to the callback.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The callback return code is passed to the launcher of the original program that called this function. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prgm</strong> – <strong>[in]</strong> Name of program to execute. </p></li>
+<li><p><strong>data</strong> – <strong>[in]</strong> User data that will be available in the callback function. May be <code class="docutils literal notranslate"><span class="pre">NULL</span></code>. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Size of user data (keep this small, it is stored on the stack!) </p></li>
+<li><p><strong>callback</strong> – <strong>[in]</strong> Callback function to run when program finishes executing. The argument <code class="docutils literal notranslate"><span class="pre">data</span></code> will contain the provided <code class="docutils literal notranslate"><span class="pre">data</span></code> contents, and <code class="docutils literal notranslate"><span class="pre">retval</span></code> will contain the error code if a TI-BASIC program, or the exit code if a C program. Other types of programs may have an undefined <code class="docutils literal notranslate"><span class="pre">retval</span></code>. This argument may be left <code class="docutils literal notranslate"><span class="pre">NULL</span></code> if execution should not return to the calling program.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>This function should not return, but if it does, -1 indicates the program could not be found, -2 if not enough memory, and &lt; 0 if some other error occurred.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv46list_t">
+<span id="_CPPv36list_t"></span><span id="_CPPv26list_t"></span><span id="list_t"></span><span class="target" id="structlist__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">list_t</span></span></span><a class="headerlink" href="#_CPPv46list_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;vars.h&gt;</em></div>
+<p>Structure of list variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6list_t3dimE">
+<span id="_CPPv3N6list_t3dimE"></span><span id="_CPPv2N6list_t3dimE"></span><span id="list_t::dim__uint16_t"></span><span class="target" id="structlist__t_1a45cca0d6cc11a2bf0b2b5927fbbbcd5f"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dim</span></span></span><a class="headerlink" href="#_CPPv4N6list_t3dimE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6list_t5itemsE">
+<span id="_CPPv3N6list_t5itemsE"></span><span id="_CPPv2N6list_t5itemsE"></span><span id="list_t::items__real_tA"></span><span class="target" id="structlist__t_1a6e65dcf5748ad3f1704f7238e1eb7ec7"></span><a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">items</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N6list_t5itemsE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411cplx_list_t">
+<span id="_CPPv311cplx_list_t"></span><span id="_CPPv211cplx_list_t"></span><span id="cplx_list_t"></span><span class="target" id="structcplx__list__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cplx_list_t</span></span></span><a class="headerlink" href="#_CPPv411cplx_list_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;vars.h&gt;</em></div>
+<p>Structure of complex list variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11cplx_list_t3dimE">
+<span id="_CPPv3N11cplx_list_t3dimE"></span><span id="_CPPv2N11cplx_list_t3dimE"></span><span id="cplx_list_t::dim__uint16_t"></span><span class="target" id="structcplx__list__t_1a595196f7091ddb781f816a283d0bdb62"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dim</span></span></span><a class="headerlink" href="#_CPPv4N11cplx_list_t3dimE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11cplx_list_t5itemsE">
+<span id="_CPPv3N11cplx_list_t5itemsE"></span><span id="_CPPv2N11cplx_list_t5itemsE"></span><span id="cplx_list_t::items__cplx_tA"></span><span class="target" id="structcplx__list__t_1ad3e496d9bfb9a9a5c375d3ab865c22a3"></span><a class="reference internal" href="real.html#_CPPv46cplx_t" title="cplx_t"><span class="n"><span class="pre">cplx_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">items</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N11cplx_list_t5itemsE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv48matrix_t">
+<span id="_CPPv38matrix_t"></span><span id="_CPPv28matrix_t"></span><span id="matrix_t"></span><span class="target" id="structmatrix__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">matrix_t</span></span></span><a class="headerlink" href="#_CPPv48matrix_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;vars.h&gt;</em></div>
+<p>Structure of matrix variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8matrix_t4colsE">
+<span id="_CPPv3N8matrix_t4colsE"></span><span id="_CPPv2N8matrix_t4colsE"></span><span id="matrix_t::cols__uint8_t"></span><span class="target" id="structmatrix__t_1a15a64c8a6709df06e3f9413149a08c8d"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cols</span></span></span><a class="headerlink" href="#_CPPv4N8matrix_t4colsE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8matrix_t4rowsE">
+<span id="_CPPv3N8matrix_t4rowsE"></span><span id="_CPPv2N8matrix_t4rowsE"></span><span id="matrix_t::rows__uint8_t"></span><span class="target" id="structmatrix__t_1ab5191311233e58196be2d3d38885db19"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rows</span></span></span><a class="headerlink" href="#_CPPv4N8matrix_t4rowsE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8matrix_t5itemsE">
+<span id="_CPPv3N8matrix_t5itemsE"></span><span id="_CPPv2N8matrix_t5itemsE"></span><span id="matrix_t::items__real_tA"></span><span class="target" id="structmatrix__t_1adbfa5269ced2458134dbfe5f0c9d237c"></span><a class="reference internal" href="real.html#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">items</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N8matrix_t5itemsE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv48string_t">
+<span id="_CPPv38string_t"></span><span id="_CPPv28string_t"></span><span id="string_t"></span><span class="target" id="structstring__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">string_t</span></span></span><a class="headerlink" href="#_CPPv48string_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;vars.h&gt;</em></div>
+<p>Structure of string variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8string_t3lenE">
+<span id="_CPPv3N8string_t3lenE"></span><span id="_CPPv2N8string_t3lenE"></span><span id="string_t::len__uint16_t"></span><span class="target" id="structstring__t_1a760bf0c52f67849c4f1964ce82dba7fe"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">len</span></span></span><a class="headerlink" href="#_CPPv4N8string_t3lenE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N8string_t4dataE">
+<span id="_CPPv3N8string_t4dataE"></span><span id="_CPPv2N8string_t4dataE"></span><span id="string_t::data__cA"></span><span class="target" id="structstring__t_1a77a073ad97b7ecd3b52721775af56fe0"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N8string_t4dataE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv45equ_t">
+<span id="_CPPv35equ_t"></span><span id="_CPPv25equ_t"></span><span id="equ_t"></span><span class="target" id="structequ__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">equ_t</span></span></span><a class="headerlink" href="#_CPPv45equ_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;vars.h&gt;</em></div>
+<p>Structure of equation variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5equ_t3lenE">
+<span id="_CPPv3N5equ_t3lenE"></span><span id="_CPPv2N5equ_t3lenE"></span><span id="equ_t::len__uint16_t"></span><span class="target" id="structequ__t_1aacceec42b713444c76a48e1764c00129"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">len</span></span></span><a class="headerlink" href="#_CPPv4N5equ_t3lenE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5equ_t4dataE">
+<span id="_CPPv3N5equ_t4dataE"></span><span id="_CPPv2N5equ_t4dataE"></span><span id="equ_t::data__cA"></span><span class="target" id="structequ__t_1ae47b1618eb9f986c08102c7fcc777726"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N5equ_t4dataE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv45var_t">
+<span id="_CPPv35var_t"></span><span id="_CPPv25var_t"></span><span id="var_t"></span><span class="target" id="structvar__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">var_t</span></span></span><a class="headerlink" href="#_CPPv45var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;vars.h&gt;</em></div>
+<p>Structure of miscellaneous variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5var_t4sizeE">
+<span id="_CPPv3N5var_t4sizeE"></span><span id="_CPPv2N5var_t4sizeE"></span><span id="var_t::size__uint16_t"></span><span class="target" id="structvar__t_1a8758ba629a2f7da0a3034268807a6b50"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><a class="headerlink" href="#_CPPv4N5var_t4sizeE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5var_t4dataE">
+<span id="_CPPv3N5var_t4dataE"></span><span id="_CPPv2N5var_t4dataE"></span><span id="var_t::data__uint8_tA"></span><span class="target" id="structvar__t_1a2b8eec58c45afb2550ad6ce21fc79910"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N5var_t4dataE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ui.html" class="btn btn-neutral float-left" title="ti/ui.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-right" title="Miscellaneous Headers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v10.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
