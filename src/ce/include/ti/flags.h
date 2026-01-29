@@ -43,14 +43,14 @@ int os_TestFlagBits(uint16_t offset_pattern);
 /**
  * Set OS flag bits
  *
- * @param offset_pattern High 8 is unsigned offset, low 8 is bits to test
+ * @param offset_pattern High 8 is signed offset, low 8 is bits to test
  */
 void os_SetFlagBits(int16_t offset_pattern);
 
 /**
  * Clear OS flag bits
  *
- * @param offset_pattern High 8 is unsigned offset, low 8 is bits to test
+ * @param offset_pattern High 8 is signed offset, low 8 is bits to test
  */
 void os_ResetFlagBits(int16_t offset_pattern);
 
