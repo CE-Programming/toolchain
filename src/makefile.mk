@@ -317,15 +317,20 @@ EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CE
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 EZASFLAGS = -march=ez80+full $(ASFLAGS)
 
-.PHONY: all clean version gfx debug
+BUILD = target
+
+.PHONY: target clean version gfx debug
+
+# override default build target here
+build: $(BUILD)
 
 # this rule is trigged to build everything
-all: $(BINDIR)/$(TARGET)
+target: $(BINDIR)/$(TARGET)
 
 # this rule is trigged to build debug everything
 debug: CC_DEBUG = -DDEBUG=1
 debug: LD_DEBUG = --defsym DEBUG=1
-debug: $(BINDIR)/$(TARGET)
+debug: $(BUILD)
 
 $(BINDIR)/$(TARGET): $(BINDIR)/$(TARGETOBJ) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))

@@ -4,11 +4,6 @@ MEMORY
     bss  : ORIGIN = BSSHEAP_LOW, LENGTH = BSSHEAP_HIGH - BSSHEAP_LOW
 }
 
-PHDRS
-{
-    prgm PT_LOAD;
-}
-
 SECTIONS
 {
     . = LOAD_ADDR;
@@ -18,12 +13,12 @@ SECTIONS
         KEEP (*(.header))
         PROVIDE_HIDDEN (___icon_optional = .);
         KEEP (*(.header.icon))
-    } >prgm :prgm
+    } >prgm
     
     .init :
     {
         *(.init)
-    } >prgm :prgm
+    } >prgm
     
     .text :
     {
@@ -34,12 +29,12 @@ SECTIONS
         *(SORT(.text.sorted.*))
         *(.text .stub .text.* .gnu.linkonce.t.*)
         *(.gnu.warning)
-    } >prgm :prgm
+    } >prgm
     
     .rodata :
     {
         *(.rodata .rodata.* .gnu.linkonce.r.*)
-    } >prgm :prgm
+    } >prgm
 
     .init_array :
     {
@@ -48,7 +43,7 @@ SECTIONS
         KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*)))
         KEEP (*(.init_array))
         PROVIDE_HIDDEN (__init_array_end = .);
-    } >prgm :prgm
+    } >prgm
     
     .fini_array :
     {
@@ -56,17 +51,17 @@ SECTIONS
         KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*)))
         KEEP (*(.fini_array))
         PROVIDE_HIDDEN (__fini_array_end = .);
-    } >prgm :prgm
+    } >prgm
 
     .data :
     {
         ___data_vma = .;
+        ___data_lma = . + (LOADADDR(.data) - ADDR(.data));
         *(.data .data.* .gnu.linkonce.d.*)
         SORT(CONSTRUCTORS)
         *(.data1)
         ___data_vma_end = .;
-    } >bss AT>prgm :prgm
-    ___data_lma = LOADADDR(.data);
+    } >bss AT>prgm
     ___data_len = ___data_vma_end - ___data_vma;
 
     .bss (NOLOAD) :
