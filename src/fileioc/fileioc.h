@@ -249,7 +249,7 @@ char *ti_DetectAny(void **vat_ptr, const char *detect_string, uint8_t *var_type)
  * @param[in] size Size (in bytes) of a single \p data element.
  * @param[in] count Number of \p data elements to write.
  * @param[in] handle AppVar/variable handle.
- * @returns Number of data elements read; equals count on success.
+ * @returns Number of data elements written; equals count on success.
  */
 size_t ti_Write(const void *data, size_t size, size_t count, uint8_t handle);
 
@@ -260,7 +260,7 @@ size_t ti_Write(const void *data, size_t size, size_t count, uint8_t handle);
  * @param[in] size Size (in bytes) of a single \p data element.
  * @param[in] count Number of \p data elements to read.
  * @param[in] handle AppVar/variable handle.
- * @returns Number of data elements written; equals count on success.
+ * @returns Number of data elements read; equals count on success.
  */
 size_t ti_Read(void *data, size_t size, size_t count, uint8_t handle);
 
