@@ -89,6 +89,7 @@ RM = ( del /q /f $1 2>nul || call )
 RMDIR = ( rmdir /s /q $1 2>nul || call )
 NATIVEMKDR = ( mkdir $1 2>nul || call )
 QUOTE_ARG = "$(subst ",',$1)"#'
+NOOP = rem
 else
 NATIVEPATH = $(subst \,/,$1)
 EXE_SUFFIX =
@@ -96,6 +97,7 @@ RM = rm -f $1
 RMDIR = rm -rf $1
 NATIVEMKDR = mkdir -p $1
 QUOTE_ARG = '$(subst ','\'',$1)'#'
+NOOP = :
 endif
 
 # toolchain binaries
@@ -108,6 +110,8 @@ AS = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-as$(EXE_SUFFIX))
 LD = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-ld$(EXE_SUFFIX))
 OBJCOPY = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-objcopy$(EXE_SUFFIX))
 STRIP = $(call NATIVEPATH,$(BINUTILS_BIN)/z80-none-elf-strip$(EXE_SUFFIX))
+STRIP_FLAGS = --strip-unneeded
+STRIP_CMD = $(STRIP) $(STRIP_FLAGS)
 CEDEV_OBJ = $(call NATIVEPATH,$(BIN)/cedev-obj$(EXE_SUFFIX))
 
 # filepath operations
@@ -328,7 +332,8 @@ build: $(BUILD)
 target: $(BINDIR)/$(TARGET)
 
 # this rule is trigged to build debug everything
-debug: CC_DEBUG = -DDEBUG=1
+debug: CC_DEBUG = -DDEBUG=1 -Og -gdwarf-5 -g3
+debug: STRIP_CMD = $(NOOP)
 debug: LD_DEBUG = --defsym DEBUG=1
 debug: $(BUILD)
 
@@ -470,7 +475,7 @@ $(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(L
 		$(LIB_SOFTFLOAT) \
 		$(EXTRA_LIBS) \
 		-o $(call QUOTE_ARG,$@)
-	$(Q)$(STRIP) --strip-unneeded $(call QUOTE_ARG,$@)
+	$(Q)$(STRIP_CMD) $(call QUOTE_ARG,$@)
 
 $(OBJDIR)/crt.h: $(OBJDIR)/$(TARGETTMP)
 	$(Q)$(call MKDIR,$(@D))
