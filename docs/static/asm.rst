@@ -36,7 +36,7 @@ Because of this, the correct time to switch sections is usually every time you s
 To define a symbol in a block that can be referenced from other blocks, you should do :code:`.local _symbol` or :code:`.global _symbol` right before its definition.
 If it is local then it is only able to be referenced from the same file and no :ref:`.extern <asm-extern>` should be used.
 If it is global then it can be referenced within the same file without :ref:`.extern <asm-extern>` just like local symbols, but global symbols can also be referenced from other files and even C/C++!
-The gllobal assembly symbol named :code:`_symbol` is accessible in C by the global name :code:`symbol` (note the leading underscore), assuming it is properly declared, with your asm symbol acting as the definition.
+The global assembly symbol named :code:`_symbol` in assembly is accessible in C using the name :code:`symbol`, without the leading underscore.
 
 .. _asm-extern:
 
