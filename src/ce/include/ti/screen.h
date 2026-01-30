@@ -28,7 +28,7 @@ extern "C" {
  */
 
 /**
- * Inserts a new line at the current cursor posistion on the homescreen
+ * Inserts a new line at the current cursor position on the homescreen
  * Does not scroll.
  */
 void boot_NewLine(void);
@@ -58,7 +58,7 @@ do { \
 } while (0)
 
 /**
- * Inserts a new line at the current cursor posistion on the homescreen.
+ * Inserts a new line at the current cursor position on the homescreen.
  * Does scroll.
  */
 tiflags void os_NewLine(void);
@@ -74,7 +74,7 @@ void os_DisableCursor(void);
 void os_EnableCursor(void);
 
 /**
- * Set the cursor posistion used on the homescreen
+ * Set the cursor position used on the homescreen
  *
  * @param[in] curRow The row aligned offset
  * @param[in] curCol The column aligned offset
@@ -82,7 +82,7 @@ void os_EnableCursor(void);
 void os_SetCursorPos(uint8_t curRow, uint8_t curCol);
 
 /**
- * Gets the cursor posistion used on the homescreen
+ * Gets the cursor position used on the homescreen
  *
  * @param[in] curRow Pointer to store the row aligned offset
  * @param[in] curCol Pointer to store the column aligned offset
@@ -116,17 +116,17 @@ tiflags void os_MoveUp(void);
 tiflags void os_MoveDown(void);
 
 /**
- * Routine to move row and column posistion to (0,0)
+ * Routine to move row and column position to (0,0)
  */
 tiflags void os_HomeUp(void);
 
 /**
- * Routine to clear the homescreen lcd
+ * Routine to clear the homescreen LCD
  */
 tiflags void os_ClrLCDFull(void);
 
 /**
- * Routine to clear the homescreen lcd.
+ * Routine to clear the homescreen LCD.
  * Accounts for split screen
  */
 tiflags void os_ClrLCD(void);
@@ -153,7 +153,7 @@ void os_EnableHomeTextBuffer(void);
  *
  * @param[in] prompt Input prompt string to be displayed to the user.
  * @param[in] buf Storage location to store input string.
- *            The string will always be null terminated.
+ *            The string will always be null-terminated.
  * @param[in] bufsize Available storage size for input string.
  */
 void os_GetStringInput(const char *prompt, char *buf, size_t bufsize);

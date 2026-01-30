@@ -1,7 +1,7 @@
 /**
  * @file
  *
- * The below example template shows the best graphx buffer usage pattern:
+ * The example template below shows the best graphx buffer usage pattern:
  * @code{.cpp}
  * // Standard #includes omitted
  *
@@ -119,7 +119,7 @@ typedef struct gfx_region_t {
 } gfx_region_t;
 
 /**
- * Defines tilemap structure
+ * Defines a tilemap structure.
  *
  * @see gfx_Tilemap
  */
@@ -163,7 +163,7 @@ typedef enum {
 } gfx_tilemap_type_t;
 
 /**
- * Different locations routines can be drawn to
+ * Different locations that routines can draw to.
  */
 typedef enum {
     gfx_screen = 0, /**< Visible Screen. */
@@ -175,7 +175,7 @@ typedef enum {
  */
 typedef enum {
     gfx_text_clip = 1, /**< Text routines will clip against the defined clip window. */
-    gfx_text_noclip    /**< Default, text routines do not clip (much faster). */
+    gfx_text_noclip    /**< Default: text routines do not clip (much faster). */
 } gfx_text_options_t;
 
 /**
@@ -340,7 +340,7 @@ gfx_sprite_t *name = (gfx_sprite_t *)name##_data
  *
  * @param[in] data_size (Maximum) sprite data size.
  * @param[in] malloc_routine Malloc implementation to use.
- * @return A pointer to the allocated sprite, or NULL if the allocation failed..
+ * @return A pointer to the allocated sprite, or NULL if the allocation failed.
  */
 #define gfx_AllocRLETSprite(data_size, malloc_routine) \
 ((gfx_rletsprite_t *)(malloc_routine)(data_size))
@@ -412,7 +412,7 @@ gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 
 /**
  * Sets a particular tile's sprite tileset index.
- * This function uses the corrdinates from the tilemap array.
+ * This function uses the coordinates from the tilemap array.
  *
  * @param[in] tilemap Pointer to initialized tilemap structure.
  * @param[in] col Column of tile in tilemap.
@@ -424,7 +424,7 @@ gfx_rletsprite_t *name = (gfx_rletsprite_t *)name##_data
 
 /**
  * Gets a particular tile's sprite tileset index.
- * This function uses the corrdinates from the tilemap array.
+ * This function uses the coordinates from the tilemap array.
  *
  * @param[in] tilemap Pointer to an initialized tilemap structure.
  * @param[in] col Column of tile in tilemap.
@@ -713,7 +713,7 @@ uint8_t *gfx_TilePtr(const gfx_tilemap_t *tilemap,
 
 /**
  * Gets a pointer to a particular sprite tileset index.
- * This function uses the corrdinates from the tilemap array.
+ * This function uses the coordinates from the tilemap array.
  *
  * @param[in] tilemap Pointer to an initialized tilemap structure.
  * @param[in] col Column of tile in tilemap.
@@ -1405,7 +1405,7 @@ uint8_t gfx_RotatedScaledTransparentSprite_NoClip(const gfx_sprite_t *sprite,
                                                   uint8_t scale);
 
 /**
- * Fixed Rotation with scaling fator for an unclipped sprite without transparency.
+ * Fixed Rotation with scaling factor for an unclipped sprite without transparency.
  *
  * @note A scale factor of 64 represents 100% scaling.
  * @warning This routine only accepts square input sprites.
@@ -1448,7 +1448,7 @@ uint8_t gfx_RotatedScaledTransparentSprite(const gfx_sprite_t *sprite,
                                            uint8_t scale);
 
 /**
- * Fixed Rotation with scaling fator for sprites without transparency.
+ * Fixed Rotation with scaling factor for sprites without transparency.
  *
  * @note A scale factor of 64 represents 100% scaling.
  * @warning This routine only accepts square input sprites.
@@ -1503,7 +1503,7 @@ gfx_sprite_t *gfx_RotateSpriteC(const gfx_sprite_t *__restrict sprite_in,
                                 gfx_sprite_t *__restrict sprite_out);
 
 /**
- * Rotates a sprite 90 degrees counter clockwise.
+ * Rotates a sprite 90 degrees counterclockwise.
  *
  * @param[in] sprite_in Input sprite to rotate.
  * @param[out] sprite_out Pointer to where rotated sprite will be stored.
@@ -1565,7 +1565,7 @@ gfx_sprite_t *gfx_RotateScaleSprite(const gfx_sprite_t *__restrict sprite_in,
 /**
  * Creates a temporary character sprite.
  *
- * This may be useful for performing rotations and other.
+ * This may be useful for performing rotations and other operations.
  * operations on characters. The sprite returned is always 8x8 pixels.
  * @param[in] c Character to generate.
  * @returns A sprite of the character data.
@@ -1575,7 +1575,7 @@ gfx_sprite_t *gfx_GetSpriteChar(char c);
 /**
  * Sets the font's character data.
  *
- * Fonts can be created manually or and exported to a C-style format
+ * Fonts can be created manually or exported to a C-style format
  * using 8x8 Pixel ROM Font Editor:
  * (https://www.min.at/prinz/o/software/pixelfont/#download)
  *
@@ -1590,7 +1590,7 @@ uint8_t *gfx_SetFontData(const uint8_t *data);
  *
  * @param[in] index Character index to modify.
  *              (if using default font, values range from 0-127,
- *               custom font can have indexes 0-255).
+ *               custom font can have indices 0-255).
  * @param[in] data Pointer to formatted 8x8 pixel font.
  * @returns Pointer to current character data if \p data is NULL,
  *          otherwise a pointer to next character data.

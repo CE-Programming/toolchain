@@ -4,7 +4,7 @@
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young\n
  * prime17569
- * @brief CE PL111 LCD controller define file
+ * @brief CE PL111 LCD controller definition file
  */
 
 #ifndef SYS_LCD_H

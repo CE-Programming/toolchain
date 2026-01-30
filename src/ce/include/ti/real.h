@@ -32,7 +32,7 @@ typedef struct cplx_t { real_t real, imag; } cplx_t;
 #define os_OP1                  ((uint8_t*)0xD005F8)
 /** OP2 Variable */
 #define os_OP2                  ((uint8_t*)0xD00603)
- /** OP3 Variable */
+/** OP3 Variable */
 #define os_OP3                  ((uint8_t*)0xD0060E)
 /** OP4 Variable */
 #define os_OP4                  ((uint8_t*)0xD00619)
@@ -94,13 +94,13 @@ real_t os_RealAcosRad(const real_t *arg);
 /** Takes the arcsine of a real_t, giving the answer in radians
  *  @note Ensure -1 <= *arg <= 1, or program will crash. */
 real_t os_RealAsinRad(const real_t *arg);
-/** Takes the arctangent of a real_t, giving the answers in radians */
+/** Takes the arctangent of a real_t, giving the answer in radians */
 real_t os_RealAtanRad(const real_t *arg);
 /** Takes the cosine of a real_t given in radians */
 real_t os_RealCosRad(const real_t *arg);
 /** Converts a real_t from radians to degrees */
 real_t os_RealRadToDeg(const real_t *arg);
-/** Evaluates the exponential function (e^x, where e=2.717..) of a real_t */
+/** Evaluates the exponential function (e^x, where e=2.717...) of a real_t */
 real_t os_RealExp(const real_t *arg);
 /** Takes the floor of a real_t */
 real_t os_RealFloor(const real_t *arg);

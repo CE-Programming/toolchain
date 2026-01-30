@@ -17,13 +17,13 @@ extern "C" {
 
 /**
  * Perform an MSD GetMaxLUN request, either through the USB port or with an ARM coprocessor.
- * @param[in,out] value On input the wValue to use in the request (should be zero for usb?), on output the max logical unit number.
+ * @param[in,out] value On input, the wValue to use in the request (should be zero for USB); on output, the max logical unit number.
  */
 void os_MSDGetMaxLUN(uint8_t *value);
 
 /**
  * Perform an MSD mass storage reset request, either through the USB port or with an ARM coprocessor.
- * @param[in] value Affects the wValue of the request, 1 for 0x55AA, 2 for 0xAA55, otherwise 0x0000 (for usb).
+ * @param[in] value Affects the wValue of the request, 1 for 0x55AA, 2 for 0xAA55, otherwise 0x0000 (for USB).
  */
 void os_MSDReset(uint8_t value);
 

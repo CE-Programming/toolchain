@@ -528,7 +528,7 @@ typedef int (*os_runprgm_callback_t)(void *data, int retval);
 int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t callback);
 
 /**
- * Evalutes a tokenized expression.
+ * Evaluates a tokenized expression.
  * Note that this doesn't allow "side effects" (for instance, you can't \c DelVar),
  * and is similar to what \c expr( does in TI-Basic.
  *
@@ -540,7 +540,7 @@ int os_RunPrgm(const char *prgm, void *data, size_t size, os_runprgm_callback_t 
 int os_Eval(const void *data, size_t len);
 
 /**
- * Evalutes a tokenized equation or string variable.
+ * Evaluates a tokenized equation or string variable.
  *
  * @param[in] name Name of variable to evaluate.
  * @returns TIOS System Error Code or 0 on success, with the result stored in

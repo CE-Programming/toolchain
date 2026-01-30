@@ -4,7 +4,7 @@
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young\n
  * Zachary "Runer112" Wassall
- * @brief CE hardware timers define file
+ * @brief CE hardware timers definition file
  */
 
 #ifndef SYS_TIMERS_H

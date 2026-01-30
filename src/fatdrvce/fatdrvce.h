@@ -57,7 +57,7 @@ typedef enum {
 
 /**
  * Callback for reading logical blocks
- * @param[in] usr User defined data pointer.
+ * @param[in] usr User-defined data pointer.
  * @param[in] lba Local block address (LBA) to read.
  * @param[in] count Number of logical blocks to read.
  * @param[in] buffer Buffer to store read data into.
@@ -70,7 +70,7 @@ typedef uint24_t (*fat_read_callback_t)(fat_callback_usr_t *usr,
 
 /**
  * Callback for writing logical blocks
- * @param[in] usr User defined data pointer.
+ * @param[in] usr User-defined data pointer.
  * @param[in] lba Local block address (LBA) to write.
  * @param[in] count Number of logical blocks to write.
  * @param[in] buffer Buffer to fetch write data from.
@@ -139,7 +139,7 @@ fat_error_t fat_Open(fat_t *fat,
                      const uint32_t base_lba);
 
 /**
- * Closes the FAT filesystem. This is not required to be called, however
+ * Closes the FAT filesystem. This is not required to be called; however,
  * it will clear the filesystem dirty bit so other OSes don't see the
  * filesystem with potential errors. You cannot use the FAT structure after
  * this call, and should call fat_Open() if you need to modify the filesystem
@@ -194,7 +194,7 @@ fat_error_t fat_GetVolumeLabel(fat_t *fat, char *label);
 fat_error_t fat_Create(fat_t *fat, const char *path, const char *name, uint8_t attrib);
 
 /**
- * Deletes a file or directory and deallocates the spaced used by it on disk.
+ * Deletes a file or directory and deallocates the space used by it on disk.
  * @param[in] fat Initialized FAT structure.
  * @param[in] filepath Absolute path to file or directory to delete.
  * @return FAT_SUCCESS on success, otherwise error.
@@ -205,7 +205,7 @@ fat_error_t fat_Create(fat_t *fat, const char *path, const char *name, uint8_t a
 fat_error_t fat_Delete(fat_t *fat, const char *filepath);
 
 /**
- * Sets the attributes (read only, hidden, etc) of the file.
+ * Sets the attributes (read-only, hidden, etc.) of the file.
  * @param[in] fat Initialized FAT structure.
  * @param[in] filepath Absolute file path.
  * @param[in] attrib FAT attributes to set file to (#fat_file_attrib mask).
@@ -214,7 +214,7 @@ fat_error_t fat_Delete(fat_t *fat, const char *filepath);
 fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
 
 /**
- * Gets the attributes (read only, hidden, etc) of the file.
+ * Gets the attributes (read-only, hidden, etc.) of the file.
  * @param[in] fat Initialized FAT structure.
  * @param[in] filepath Absolute file path.
  * @return File attributes, or 255 if an error.
@@ -222,10 +222,10 @@ fat_error_t fat_SetAttrib(fat_t *fat, const char *filepath, uint8_t attrib);
 uint8_t fat_GetAttrib(fat_t *fat, const char *filepath);
 
 /**
- * Opens a file for either reading or writing, or both.
+ * Opens a file for reading, writing, or both.
  * @param[in] fat Initialized FAT structure.
  * @param[in] filepath Absolute file path.
- * @param[in] flags File open flags (currently no flags available, set to 0)
+ * @param[in] flags File open flags (currently no flags available; set to 0).
  * @param[out] file Uninitialized structure to store working file information.
  * @return FAT_SUCCESS on success, otherwise error.
  */
@@ -233,8 +233,8 @@ fat_error_t fat_OpenFile(fat_t *fat, const char *filepath, uint8_t flags, fat_fi
 
 /**
  * Sets the size of the file, allocating or deallocating space as needed.
- * This function should be called before attempting to read/write in a file that
- * does not have a large enough current file size, (i.e. a newly created file).
+ * This function should be called before attempting to read or write a file that
+ * does not have a large enough current file size (i.e. a newly created file).
  * This function may take a long time to run as it will allocate/deallocate the
  * clusters required for storing to the file.
  * @param[in] file FAT file structure.
@@ -277,7 +277,7 @@ uint24_t fat_ReadFile(fat_file_t *file, uint24_t count, void *buffer);
 
 /**
  * Write to a file. Advances file block offset position. Does not extend file
- * size if at last block in file, fat_SetFileSize() must be used instead.
+ * size if at the last block in the file; fat_SetFileSize() must be used instead.
  * @param[in] file File handle returned from fat_OpenFile().
  * @param[in] count Number of blocks to write to file.
  * @param[in] buffer Data to write to FAT file.

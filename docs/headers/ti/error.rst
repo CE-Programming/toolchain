@@ -10,13 +10,13 @@ ti/error.h
 Exceptions in languages like Python provide a structured way of handling rare error conditions.
 TI calls their implementation of this idea error handlers.
 
-When the OS encounters an unsusal condition such as divide-by-zero or out-of-memory, it looks for an active error handler.
-If no active error handlers exist, the OS will display the :code:`ERR:` screen.
+When the OS encounters an unusual condition such as division by zero or out-of-memory, it looks for an active error handler.
+If no active error handler exists, the OS will display the :code:`ERR:` screen.
 If an active error handler does exist, it gets control instead of showing the :code:`ERR:` screen.
 
 Unlike exception handlers, TI's error handlers do not differentiate between error codes; the same error handler is called for all errors.
 However, error handlers do support nesting.
-If an handler decides that it can't handle an error, it can rethrow it.
+If a handler decides that it can't handle an error, it can rethrow it.
 
 .. warning::
 

@@ -25,7 +25,7 @@ What is GitHub not?
 ^^^^^^^^^^^^^^^^^^^
 
 Git - You can use Git without GitHub, and you should probably familiarize yourself with Git before using GitHub.
-Nor is GitHub a file hosting service - Most of the benefits of GitHub over another site (say, Mediafire, or Google Drive) come from Git.
+Nor is GitHub a file hosting service - most of the benefits of GitHub over another site (say, Mediafire or Google Drive) come from Git.
 If your GitHub repositories are not proper Git repositories, you might as well be using another service!
 
 Downloading Git
@@ -54,7 +54,7 @@ You can also make a copy of a repository that is already on GitHub using :code:`
 This command downloads the repository and its associated files into a new folder.
 For example, :code:`git clone https://github.com/commandblockguy/dino-run-ce.git` would create the folder dino-run-ce, and download the source for Dino Run CE into it.
 You can then :code:`cd dino-run-ce`, and run :code:`make` without any further setup.
-This is what makes Git significantly more convenient than a zip with the source.
+This is what makes Git significantly more convenient than a ZIP with the source.
 
 The .gitignore file
 ^^^^^^^^^^^^^^^^^^^
@@ -84,7 +84,7 @@ Making commits
 
 Now that we are ignoring the right files, how do we add the ones we actually care about to the repository?
 Before making a commit, you have to add the files that you want to include in the commit.
-To get a list of the files that you can add, run :code:`git status` -- The files that you have already added are in green, and the files that have changed but that will not be included in the next commit are in red.
+To get a list of the files that you can add, run :code:`git status` -- the files that you have already added are in green, and the files that have changed but that will not be included in the next commit are in red.
 To add the files to the next commit, run :code:`git add (file1) (file2) (file3) (etc)`.
 Once you are done adding files, you can create the commit by running :code:`git commit -m "Some message for the commit"`.
 

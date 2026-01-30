@@ -28,14 +28,14 @@ extern "C" {
 /**
  * Checks if the [on] key was pressed
  *
- * @returns True is returned if [on] key was pressed
+ * @returns True if the [on] key was pressed
  */
 bool boot_CheckOnPressed(void);
 
 /**
- * Performs an OS call to get the keypad scan code. This function does NOT block, use os_GetKey() if you need blocking.
+ * Performs an OS call to get the keypad scan code. This function does not block; use os_GetKey() if you need blocking.
  *
- * This function does NOT account for 2nd/alpha modifiers. Use os_getKey() if you need to account for those
+ * This function does not account for 2nd/alpha modifiers. Use os_GetKey() if you need to account for those
  *
  * You can also use this function to get input from the user as a string like this:
  * @code{.cpp}
@@ -76,13 +76,13 @@ uint8_t os_GetCSC(void);
 /** TI-84 Plus CE name */
 #define sk_Yequ             0x35
 #define sk_Mode             0x37
- /** TI-84 Plus CE name */
+/** TI-84 Plus CE name */
 #define sk_Del              0x38
 #define sk_Store            0x2A
 #define sk_Ln               0x2B
 #define sk_Log              0x2C
 #define sk_Square           0x2D
- /** TI-84 Plus CE [x^-1]; on the TI-83 Premium CE, this is [<>] */
+/** TI-84 Plus CE [x^-1]; on the TI-83 Premium CE, this is [<>] */
 #define sk_Recip            0x2E
 #define sk_Math             0x2F
 #define sk_0                0x21
@@ -108,10 +108,10 @@ uint8_t os_GetCSC(void);
 #define sk_Cos              0x1E
 #define sk_Prgm             0x1F
 #define sk_Stat             0x20
- /** Unary negation, not subtraction */
+/** Unary negation, not subtraction */
 #define sk_Chs              0x11
 #define sk_RParen           0x15
-/** TI-84 Plus CE; on; the TI-83 Premium CE, this is the fraction template */
+/** TI-84 Plus CE; on the TI-83 Premium CE, this is the fraction template */
 #define sk_Tan              0x16
 #define sk_Vars             0x17
 /** [^] */

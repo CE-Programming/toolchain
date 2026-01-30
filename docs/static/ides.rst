@@ -3,8 +3,8 @@
 Using the Toolchain in an IDE
 =============================
 
-The CE Toolchain can be used in a variety of Integrated Development Enviornments (IDEs).
-The below are currently supported - Raise an issue or pull request on `GitHub <https://github.com/CE-Programming/toolchain>`_ if you would like to see a different one, or if an IDE update changes the current flow.
+The CE Toolchain can be used in a variety of Integrated Development Environments (IDEs).
+The following are currently supported. Raise an issue or pull request on `GitHub <https://github.com/CE-Programming/toolchain>`_ if you would like to see a different one, or if an IDE update changes the current flow.
 
 .. dropdown:: CLion
 
@@ -35,8 +35,8 @@ The below are currently supported - Raise an issue or pull request on `GitHub <h
 
     On Windows, set the "Build Tool" to :code:`CEdev/bin/make.exe` and both C compilers to :code:`CEdev/bin/ez80-clang.exe`
 
-    On MacOS/Linux, set both C compilers to :code:`CEdev/bin/ez80-clang`.
-    MacOS/Linux come with their own system :code:`make` executable, and the default system one can be used.
+    On macOS/Linux, set both C compilers to :code:`CEdev/bin/ez80-clang`.
+    macOS/Linux come with their own system :code:`make` executable, and the default system one can be used.
 
     .. image:: images/ides_clion_4.png
        :align: center
@@ -59,14 +59,14 @@ The below are currently supported - Raise an issue or pull request on `GitHub <h
 
     Before this step, make sure you added your CEdev :code:`bin` folder to your system's PATH environment variable, otherwise :code:`make` won't be able to find the compiler.
 
-    At the top right, 5 Run Configurations are auto-generated.
+    At the top right, five Run Configurations are auto-generated.
 
     * Select "all" for the standard build.
 
     * Select "debug" for a debug build for use with the `CEmu debugging toolchain <https://ce-programming.github.io/toolchain/static/debugging.html>`_.
 
     * Only use the Build (the hammer icon) button with these.
-      The Run icon tries to run the generated executables, which fails since .8xp files can't be run natively on PC.
+      The Run icon tries to run the generated executables, which fails since .8xp files can't be run natively on a PC.
 
 .. dropdown:: Visual Studio Code
 

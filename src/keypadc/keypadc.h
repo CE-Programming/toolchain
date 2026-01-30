@@ -71,7 +71,7 @@ typedef enum {
 #define kb_EnableInt \
 (*(uint8_t*)0xF5000C)          /**< Enabled keypad interrupt signals. */
 #define kb_IntAcknowledge \
-(*(volatile uint8_t*)0xF50008) /**< Acknowledege keypad interrupt signals. */
+(*(volatile uint8_t*)0xF50008) /**< Acknowledge keypad interrupt signals. */
 #define kb_IntStatus \
 (*(volatile uint8_t*)0xF50008) /**< Status of keypad interrupt signals. */
 #define kb_Config \
@@ -164,7 +164,7 @@ typedef enum {
 (*(volatile uint8_t*)0xF00020 & 1)
 
 /**
- * Causes kb_On to latch when the ON is key pressed: once the ON key is pressed, kb_On will remain true until
+ * Causes kb_On to latch when the ON key is pressed: once the ON key is pressed, kb_On will remain true until
  * reset with kb_ClearOnLatch(). This may be useful if you want to check the ON key occasionally, for example
  * as a break signal.
  * @warning This defaults to whatever the last program set this to, so be sure to set it explicitly.
@@ -184,7 +184,7 @@ typedef enum {
 /**
  * When ON key latching has been enabled with kb_EnableOnLatch(), this will reset kb_On back to false
  * (assuming the user is no longer pressing ON).
- * @note This may persist between program runs, so be to sure to disable as needed.
+ * @note This may persist between program runs, so be sure to disable as needed.
  * @see kb_EnableOnLatch
  */
 #define kb_ClearOnLatch() \
@@ -280,7 +280,7 @@ typedef enum {
 #define kb_Power    (1<<5)
 #define kb_Clear    (1<<6)
 
-/* Keyboard group 5 - 83 Premium CE key names */
+/* Keyboard group 6 - 83 Premium CE key names */
 #define kb_Annul    kb_Clear
 
 

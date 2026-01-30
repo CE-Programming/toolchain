@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-/** @defgroup one_byte_tokens One Bye Tokens
+/** @defgroup one_byte_tokens One Byte Tokens
  *  One-byte tokens are one byte tokens.
  */
 
@@ -50,14 +50,14 @@ extern "C" {
  */
 
 /** @defgroup graph_tokens Graph Tokens
- *  Graph two-byte tokens prefixed by `OS_TOK_GRAPH`.
+ *  Graph tokens are two-byte tokens prefixed by `OS_TOK_GRAPH`.
  */
 
-/** @defgroup two_byte_tokens General Two Byte Tokens
+/** @defgroup two_byte_tokens General Two-Byte Tokens
  *  General two-byte tokens starting with byte `OS_TOK_2BYTE`.
  */
 
-/** @defgroup ext_two_byte_tokens Extended Two Byte Tokens
+/** @defgroup ext_two_byte_tokens Extended Two-Byte Tokens
  *  Extended two-byte tokens starting with byte `OS_TOK_2BYTE_EXT`.
  */
 

@@ -9,13 +9,13 @@ usbdrvce.h
 
 The :code:`usbdrvce` library is used for interacting with the USB peripheral in either host or device mode.
 
-Currently this library is a work-in-progress, so some functionality may not behave as expected.
+Currently this library is a work in progress, so some functionality may not behave as expected.
 In particular, the following items are known to not work:
 
 - All timer-related functions
 - Isochronous transfers
 
-Because of these limitations, future library versions may create backwards-incompatible changes - however the likelihood of this is rather low as long as you use the library in a reasonable manner.
+Because of these limitations, future library versions may create backward-incompatible changes - however, the likelihood of this is rather low as long as you use the library in a reasonable manner.
 
 .. tip::
 

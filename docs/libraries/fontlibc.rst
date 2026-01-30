@@ -10,7 +10,7 @@ fontlibc.h
 The :code:`fontlibc` library provides routines for displaying custom fonts and glyphs,
 and can be used to extend the limited font capabilities of :ref:`graphx <graphx_h>`.
 
-The :code:`fontlibc` library was designed under a "mechanism not policy" sort of philosophy.
+The :code:`fontlibc` library was designed under a "mechanism, not policy" philosophy.
 Rather than attempting to provide as many fancy features as a programmer could want,
 fontlibc tries to provide fast, basic routines that can be used to build the additional functionality you want.
 For example, word-wrap is not directly provided, but can be implemented using :code:`fontlib_SetAlternateStopCode` and :code:`fontlib_GetStringWidth`.
@@ -32,9 +32,9 @@ GUI Editor Software
 `Fony <http://hukka.ncn.fi/?fony>`_ is probably the most-used FNT editor available.
 It can open both .FNT and .FON files.
 
-`mkwinfont <https://github.com/juanitogan/mkwinfont>`_ provides some Python code for converting a text-based format to and .FON files;
-it should be trivial for someone with basic Python skills to change to code to skip the .FON packaging stage and directly produce a .FNT resource file.
-Useful if for some reason you think graphics are best done without the aid of any kind of graphics editor.
+`mkwinfont <https://github.com/juanitogan/mkwinfont>`_ provides some Python code for converting a text-based format into .FON files;
+it should be trivial for someone with basic Python skills to change the code to skip the .FON packaging stage and directly produce a .FNT resource file.
+Useful if, for some reason, you think graphics are best done without the aid of any kind of graphics editor.
 
 `VSoft's FontEdit <http://www.vsoft.nl/software/utils/win/fontedit/>`_ is mostly just the original FontEdit included
 with the Windows SDK for Windows 3.x, but compiled for 32-bit Windows.
@@ -100,7 +100,7 @@ Making the image is simple: anything that isn't a space is a set pixel.
 
     : Note that comments are not accepted inside bitmaps; they would just be treated as bitmap data.
 
-For more details, consult the :code:`convfont` readme.
+For more details, consult the :code:`convfont` README.
 
 Using Fonts in Your Project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,10 +108,10 @@ Using Fonts in Your Project
 Once your .FNT file has been created,
 use the convfont utility included with the SDK to convert the .FNT resource file into a format usable in your project.
 
-There are two main ways of including a font in your project:
+There are two main ways to include a font in your project:
 
  - directly in your program binary; or,
- - in separate font pack appvar.
+ - in a separate font pack appvar.
 
 Embedding a Font Directly in Your Program
 .........................................

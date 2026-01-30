@@ -21,7 +21,7 @@ extern "C" {
 #define dbgerr ((char*)0xFC0000)
 
 /** Break on read. */
-#define DBG_WATCHPOINT_READ (1 << 0) 
+#define DBG_WATCHPOINT_READ (1 << 0)
 /** Break on write. */
 #define DBG_WATCHPOINT_WRITE (1 << 1)
 /** Break on execute. */
@@ -35,7 +35,7 @@ extern "C" {
  * Used to print to the emulator console.
  *
  * See the syntax for 'printf' for format specifiers.
- * @param[in] ... Uses printf-formated specifier string.
+ * @param[in] ... Uses printf-formatted specifier string.
  * @note Does not support floats unless `HAS_PRINTF = YES`.
  */
 #define dbg_printf(...) \
@@ -46,14 +46,14 @@ sprintf(dbgout, ##__VA_ARGS__)
  *
  * See the syntax for 'printf' for format specifiers.
  * @param[in] out Use \p dbgout for normal output and \p dbgerr for errors.
- * @param[in] ... Uses printf-formated specifier string.
+ * @param[in] ... Uses printf-formatted specifier string.
  * @note Does not support floats unless `HAS_PRINTF = YES`.
  */
 #define dbg_sprintf(out, ...) \
 sprintf(out, ##__VA_ARGS__)
 
 /**
- * Clears the emulation console.
+ * Clears the emulator console.
  */
 #define dbg_ClearConsole() \
 do { \
@@ -61,7 +61,7 @@ do { \
 } while (0)
 
 /**
- * Opens the emulator's debugger immediately
+ * Opens the emulator's debugger immediately.
  */
 void dbg_Debugger(void);
 

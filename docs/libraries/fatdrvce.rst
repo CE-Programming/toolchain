@@ -7,7 +7,7 @@ fatdrvce.h
 
     #include <fatdrvce.h>
 
-The **fatdrvce** library implements routines for working with a FAT32 based filesystem.
+The **fatdrvce** library implements routines for working with a FAT32-based filesystem.
 The read and write functions are implemented as user-provided callbacks, allowing for any underlying storage to be used.
 
 .. contents:: :local:
@@ -19,7 +19,7 @@ Physical Drive Usage
 This library can be integrated with **msddrvce** in order to access physical devices such as a flash drive.
 
 For best performance, the "cluster allocation size" should be set to the maximum allowed.
-On Linux this can be accomplished with the following command:
+On Linux, this can be accomplished with the following command:
 
 .. code-block:: bash
 
@@ -28,7 +28,7 @@ On Linux this can be accomplished with the following command:
 Known Limitations
 -----------------
 
-- The filesystem must use 512 byte logical blocks.
+- The filesystem must use 512-byte logical blocks.
 - The filesystem must be formatted as FAT32 (no support for FAT12, FAT16, or exFAT)
 - Long name support is not currently implemented.
 

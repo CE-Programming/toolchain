@@ -7,11 +7,11 @@ tice.h
 
     #include <tice.h>
 
-This header provides backwards compatibility for code written before the header files were split up.
+This header provides backward compatibility for code written before the header files were split up.
 
 .. important::
 
-    This header is provided for backwards compatibility only.
+    This header is provided for backward compatibility only.
     For new projects, it is recommended that the required header be used directly.
 
 Included Header Files

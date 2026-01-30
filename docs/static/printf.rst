@@ -7,18 +7,18 @@ What's the deal with printf?
 ----------------------------
 
 The `printf` and related functions (`sprintf`, `vsprintf`, etc.) are based on a relatively `small implementation <https://github.com/charlesnicholson/nanoprintf>`_.
-However, they contribute around 8 KiB to the resultant program.
-It is highly recommended to not use `printf` and related functions at all because of this.
+However, they contribute around 8 KiB to the resulting program.
+It is highly recommended not to use `printf` and related functions at all because of this.
 If you insist on using these functions, this page details how to do so in the next section.
 
-Alternatively, a limited `sprintf` (no `long` or `float` support) implementation is baked into the OS which doesn't add any extra size to the resultant program. See the dedicated page for more information :ref:`ti/sprintf.h <sprintf_h>`.
+Alternatively, a limited `sprintf` (no `long` or `float` support) implementation is baked into the OS, which doesn't add any extra size to the resulting program. See the dedicated page for more information: :ref:`ti/sprintf.h <sprintf_h>`.
 To disable all other printf functions and use this `sprintf` implementation, add the following line to the Makefile:
 
 .. code-block:: makefile
 
     HAS_PRINTF = NO
 
-If you just need to convert a float to a string, which the OS sprintf does not support, you can utilize the following `float2str` function instead.
+If you just need to convert a float to a string, which the OS sprintf does not support, you can use the following `float2str` function instead.
 
 .. code-block:: c
 
@@ -37,14 +37,14 @@ Using the printf functions
 All the `printf` and related functions are defined in the standard `stdio.h` header, and can be used just as they would in any normal C program.
 
 The output of character text is done via the `outchar` function, which is a special toolchain function that by default prints to the OS homescreen.
-It's prototype looks like this:
+Its prototype looks like this:
 
 .. code-block:: c
 
     void outchar(char character);
 
 Reimplement this function in your program in any source file to change how characters are printed.
-For example, a horrid implementation of this function might look like the one below, which just prints to the OS homescreen.
+For example, a crude implementation of this function might look like the one below, which just prints to the OS home screen.
 
 .. code-block:: c
 

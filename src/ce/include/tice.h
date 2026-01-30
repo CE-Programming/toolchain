@@ -3,7 +3,7 @@
  * @authors
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
- * @brief Core CE define file
+ * @brief Core CE definition file
  */
 
 #ifndef TICE_H

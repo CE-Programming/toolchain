@@ -7,7 +7,7 @@ sys/rtc.h
 
     #include <sys/rtc.h>
 
-This header includes defines for the Real-Time Clock (RTC) used in the CE.
+This header includes definitions for the Real-Time Clock (RTC) used in the CE.
 The toolchain allows both direct access to the hardware registers, and using TI's helper routines.
 
 .. contents:: :local:

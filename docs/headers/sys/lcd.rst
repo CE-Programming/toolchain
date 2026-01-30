@@ -7,7 +7,7 @@ sys/lcd.h
 
     #include <sys/lcd.h>
 
-This header includes defines for the PL111 LCD controller used in the CE.
+This header includes definitions for the PL111 LCD controller used in the CE.
 
 .. contents:: :local:
    :depth: 3

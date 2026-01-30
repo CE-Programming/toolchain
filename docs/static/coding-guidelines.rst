@@ -4,7 +4,7 @@ General Coding Guidelines
 =========================
 
 If you are new to the C/C++ language and are looking for some pointers to improve your coding style, this page is for you!
-These suggestions should help you avoid common pitfalls, and make your code easier to manage.
+These suggestions should help you avoid common pitfalls and make your code easier to manage.
 
 .. image:: images/code-review.jpg
    :align: center
@@ -16,15 +16,15 @@ This is a big one.
 When programming, it is important to choose a coding style that you prefer and **stick with it**.
 For instance, if you prefer using 4 spaces to indent your code, use that everywhere -- don't mix tabs and spaces!
 If your variables are :code:`snake_case` or :code:`camelCase` -- use the same format everywhere.
-This goes for function naming too.
+This goes for function names, too.
 
 Some additional style guidelines:
 
-- Try to keep lines 80 characters or less. This will promote less indentation and better coding design, as well as avoid insanely long variable names. If you have more than 3 levels of indentation, it's probably time to rethink your code.
+- Try to keep lines 80 characters or fewer. This will promote less indentation and better coding design, as well as avoid very long variable names. If you have more than three levels of indentation, it's probably time to rethink your code.
 - Use consistent bracing formats; if your braces all start on a new line, don't mix them. It is especially helpful to always use braces even on single-line conditional statements as it will avoid spurious bugs from popping up.
 - Try to keep functions at 100 lines or less. Any more and the function should be broken out, as this will increase readability and make it easier for you 6 months later to understand what you wrote.
 - It doesn't really matter *what* your style is as long as it is consistent! People will be more inclined to help and contribute to your code if you keep it neat.
-- This also applies when you are the one contributing to another project: use *their* codestyle, not yours, even if you don't like it.
+- This also applies when you are the one contributing to another project: use *their* code style, not yours, even if you don't like it.
 
 Use Descriptive Naming
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -45,17 +45,17 @@ Write comments intelligently
 ----------------------------
 
 In a perfect world, code should have a minimal number of comments in it because it should all be self-explanatory.
-Especially if there's a document along side that explains architecture choices, workflows etc.
+Especially if there's a document alongside that explains architecture choices, workflows, etc.
 
-Comments aren't code; they are for a human to convey what is going on and why in a particular portion of code, to another human.
+Comments aren't code; they are for a human to convey what is going on and why in a portion of code to another human.
 They should ideally be kept fairly short and to the point ("K.I.S.S" = Keep It Short and Simple").
 Don't write comments just because you've been told to at some point: the other human in question can read just fine and doesn't want to waste time reading that "return val;" indeed "returns the value".
 
-It is much easier to read code without having to also read comments that don't convey any helpful information. Instead, provide useful information when needed, in particular when someone may be tempted to change some code that probably shouldn't be without a lot of thought first, or where some algorithm is complex to understand for someone new on the project and only reading the code to understand what is happening would take too long pointlessly (reverse-engineering source code can annoyingly take a lot of time).
+It is much easier to read code without having to also read comments that don't convey any helpful information. Instead, provide useful information when needed, in particular when someone may be tempted to change some code that probably shouldn't be without a lot of thought first, or where some algorithm is complex to understand for someone new on the project and only reading the code to understand what is happening would take too long unnecessarily (reverse-engineering source code can annoyingly take a lot of time).
 
-As such, and especially for complex code, focus rather on explaining **why** something is written that way, and even **why not** written in another way (i.e. some edge case may not work with an alternative algorithm, some use case may have inferior performance, etc.). Time will be saved that way for future refactors, whether it's done by you, or even more so by someone else that may now know the context of the code as much as you.
+As such, and especially for complex code, focus rather on explaining **why** something is written that way, and even **why not** written in another way (i.e. some edge case may not work with an alternative algorithm, some use case may have inferior performance, etc.). Time will be saved that way for future refactors, whether it's done by you, or even more so by someone else that may not know the context of the code as much as you.
 
-And remember this: having too many comments leads to issues where **a)** the comments don't match the code, **b)** they are either superfluous or useless, **c)** they are flat out incorrect or outdated, or **d)** they add noise to the code itself and make it more difficult to read.
+And remember this: having too many comments leads to issues where **a)** the comments don't match the code, **b)** they are either superfluous or useless, **c)** they are flat-out incorrect or outdated, or **d)** they add noise to the code itself and make it more difficult to read.
 
 These are examples of bad comments that add no value: remember, good self-explanatory naming and simple code provide better information than comments do.
 
@@ -98,7 +98,7 @@ Include files can be one of the most hated aspects of C -- so it is important to
 When working with multiple files, there is the concept of a "source" file and a "header" file.
 The source file includes all the code/variables that the program needs to work.
 The header file exposes an interface that allows other source files to use functions and/or variables defined in the corresponding source file.
-The below example shows the proper and recommended implementation of the source and header files.
+The example below shows the proper and recommended implementation of the source and header files.
 
 **source.c**:
 
@@ -143,10 +143,10 @@ Here are the important takeaways from the above example:
 
 - The first line in the source file should be the corresponding header file for the source interface. Other headers can then be included after; with system/toolchain headers last. This ensures that the header includes all the things necessary to compile it.
 - The source file uses the **static** keyword in front of a function to indicate that it can only be used in the *source.c* file. This prevents other source files from attempting to use it. It is a good idea to get into the habit of labeling functions in this way if they are not used anywhere except for the file they are in.
-- The header includes so-called "header guards" (the :code:`#ifdef SOURCE_H` / :code:`#define SOURCE_H` lines), which are used to prevent the header from being included multiple times in the same source file.
+- The header includes so-called "header guards" (the :code:`#ifndef SOURCE_H` / :code:`#define SOURCE_H` lines), which are used to prevent the header from being included multiple times in the same source file.
 - The :code:`#ifdef __cplusplus` lines are used to prevent a C++ compiler from mangling the names of the header functions. It is a good idea to add this, even if you are working on a C-only project as it will save you any headache if a C++ compiler tries to compile the header.
 - The external source function is represented as a "prototype" inside the header. This prototype tells the rest of the source files the arguments and return of the function, but does not define the implementation. It is the responsibility of the linker to take all the compiled source files and find the corresponding functions.
-- There should be one header file for one source file which defines the external functions/variables in the source file. Having "global" header files (i.e. a header file that includes a bunch of other headers and functions) is prone to many issues during linking, affects code modularity, and maintenance, as well as adding to compile time. Putting all possible headers in one application header is as wrong as wrong can be.
+- There should be one header file for one source file that defines the external functions/variables in the source file. Having "global" header files (i.e. a header file that includes a bunch of other headers and functions) is prone to many issues during linking, affects code modularity and maintenance, as well as adding to compile time. Putting all possible headers in one application header is as wrong as wrong can be.
 
 Proper Prototyping
 ^^^^^^^^^^^^^^^^^^
@@ -167,7 +167,7 @@ Here are the following things that should not be put in header files in C:
 
 The reason you shouldn't do the above is that the :code:`#include` preprocessor command literally performs a copy/paste of one file into another.
 If a header is used in two different source files, then the function or variable will be duplicated *twice* (include guards cannot prevent this, they only prevent inclusion in a single source file!).
-Even worse is making the function/variable "static" in the header, which makes each file has its own implementation -- it will still compile, but it most certainly is not what you intended!
+Even worse is making the function/variable "static" in the header, which makes each file have its own implementation -- it will still compile, but it most certainly is not what you intended.
 If you ever see code or variables that are defined in a header, run far away... or try to fix it.
 
 Avoid Global Variables
@@ -179,7 +179,7 @@ These are variables which are defined outside of a function.
 Here's why you shouldn't use them:
 
 - Global variables can be modified by any section of code, making it difficult to remember every possible use.
-- A global variable can have no access control. It can not be limited to some parts of the program.
+- A global variable can have no access control. It cannot be limited to some parts of the program.
 - Using global variables causes namespace pollution. This may lead to unnecessarily reassigning a global value.
 
 So, most of the time, and unless you have a really good excuse, don't use global variables.
@@ -192,7 +192,7 @@ Proper Scoping
 Every opening brace :code:`{` is the start of a new scope, and every ending brace :code:`}` the end of the previous scope.
 Global variables, which are not inside any braces, are declared in what's known as the global or file scope.
 Variables declared in one scope can only be accessed from the same scope, or from scopes inside of it.
-You want to make sure that you declare variables are in the narrowest scope possible.
+You want to make sure that you declare variables in the narrowest scope possible.
 
 Properly scoping your code instead of using globals for everything makes it easier to think about. For example, the following code uses a global variable :code:`my_var`:
 

@@ -7,7 +7,7 @@ graphx.h
 
     #include <graphx.h>
 
-The :code:`graphx` library implements efficient graphics routines from everything to drawing sprites, shapes, and tilemaps.
+The :code:`graphx` library implements efficient graphics routines for everything from drawing sprites to shapes and tilemaps.
 This allows a programmer to easily add quality graphics to their program without needing to worry about the low-level implementation details.
 
 .. contents:: :local:
@@ -16,7 +16,7 @@ This allows a programmer to easily add quality graphics to their program without
 Overview
 --------
 
-The graphx library places the LCD in a "palettized" mode - pixels on the screen are actually indexes into an array of colors rather than the color iself.
+The graphx library places the LCD in a "palettized" mode - pixels on the screen are actually indices into an array of colors rather than the color itself.
 What this means is that graphx is only functionally capable of displaying up to 256 colors on-screen at one time.
 This array of colors is called a "palette", and is accessed using the :code:`gfx_palette` macro variable: e.g. the code :code:`gfx_palette[16]` accesses the 17th color in the palette, and can be directly read or written with a color value.
 Palette colors are stored in 1555 format (a version of 565 format), and the macro :code:`gfx_RGBTo1555` may be used to convert a normal 24-bit RGB value into a palette color, for example :code:`gfx_palette[0] = gfx_RGBTo1555(10, 21, 32)`.
@@ -30,7 +30,7 @@ Additionally, convimg allows sprite and color data to be stored in AppVars to he
 Default Palette
 ^^^^^^^^^^^^^^^
 
-This is the default palette used by graphx, commonally known as the ``xlibc`` palette for historical reasons.
+This is the default palette used by graphx, commonly known as the ``xlibc`` palette for historical reasons.
 This palette can be modified at any time with different colors, using either :code:`gfx_palette` or the output of the convimg tool.
 
 .. image:: images/graphx_palette.png
@@ -41,8 +41,8 @@ Coordinate System
 
 The graphx library coordinate system consists of the horizontal (``x``) and vertical (``y``) components of the screen.
 Pixel coordinates are generally expressed as an ``x`` and ``y`` pair, such as (``x``, ``y``).
-The graphx library uses the top left of the screen as pixel coordinate (0, 0), while the bottom right of the screen is pixel coordinate (319, 239).
-The defines :code:`GFX_LCD_WIDTH` and :code:`GFX_LCD_HEIGHT` can be used to get the LCD screen width and height respectively.
+The graphx library uses the top-left of the screen as pixel coordinates (0, 0), while the bottom-right of the screen is pixel coordinates (319, 239).
+The definitions :code:`GFX_LCD_WIDTH` and :code:`GFX_LCD_HEIGHT` can be used to get the LCD screen width and height, respectively.
 
 Clipped vs. Unclipped
 ^^^^^^^^^^^^^^^^^^^^^
@@ -53,10 +53,10 @@ Clipping is the process of checking if parts (or all) of an object to be drawn a
 This checking process takes time.
 If you can be sure that an object to be drawn is fully within the bounds of the screen, the clipping process can be safely skipped by using the **_NoClip** variant of the routine.
 
-**Do not use the _NoClip variant of a routine if you can not be sure that the object to be drawn is fully within the bounds of the screen. Doing so may result in corrupted graphics or memory.
-This is because the screen itself is represented as a region of memory. If you draw outside the bounds of that region, you risk overwriting other, possibly important data. This can cause corruption, and can cause crashes.**
+**Do not use the _NoClip variant of a routine if you cannot be sure that the object to be drawn is fully within the bounds of the screen. Doing so may result in corrupted graphics or memory.
+This is because the screen itself is represented as a region of memory. If you draw outside the bounds of that region, you risk overwriting other, possibly important data. This can cause corruption and crashes.**
 
-General Usage 
+General Usage
 ^^^^^^^^^^^^^
 
 To begin using the graphx library functions, the :code:`gfx_Begin` function must first be called.
@@ -79,7 +79,7 @@ For example, in a simple Pong game, if a white ball is drawn on a black backgrou
 Sample Implementation
 ^^^^^^^^^^^^^^^^^^^^^
 
-A brief summation of the partial redraw using graphx is:
+A brief summary of partial redraw using graphx is:
 
 * Allocate space for a temporary sprite.
 * When the background is drawn, a small copy of it is saved to the temporary sprite.
@@ -87,7 +87,7 @@ A brief summation of the partial redraw using graphx is:
 * Upon movement, the sprite is erased using the temporary sprite and the coordinates are updated.
 * The section of background with the updated coordinates is stored to the temporary sprite and the process repeated.
 
-This is implemented using somewhat pseudo code:
+This is implemented using pseudocode:
 
 .. code-block:: c
 
@@ -119,10 +119,10 @@ This is implemented using somewhat pseudo code:
 Buffering Graphics
 ------------------
 
-Buffering is a fancy method in order to prevent graphics from being displayed as they are being drawn.
+Buffering is a method used to prevent graphics from being displayed as they are being drawn.
 It is used primarily to eliminate visible draws which can make an application look amateurish, sluggish, or appear to flicker.
 
-When graphics routines are buffered, they draw offscreen (non-visible) portion of memory, so the user doesn't see the partial drawing.
+When graphics routines are buffered, they draw to an off-screen (non-visible) portion of memory, so the user doesn't see the partial drawing.
 This is accomplished in one line with the following routine, usually placed directly after calling `gfx_Begin()`:
 
 .. code-block:: c
@@ -150,18 +150,18 @@ Method 2 (Buffer Swapping)
 
 Buffer swapping swaps the visible screen with an offscreen buffer, leaving the contents on both.
 Whatever is currently on the screen will become the graphics buffer, and whatever is in the graphics buffer will be displayed on the screen.
-The code to swap the visible screen with non-visibile buffer is:
+The code to swap the visible screen with an off-screen buffer is:
 
 .. code-block:: c
 
     gfx_SwapDraw();
 
-What actually happens is shown below, 'graphics' is simply where the graphics routines will draw to.
+What actually happens is shown below; 'graphics' is simply where the graphics routines will draw to.
 
 .. image:: images/graphx_buffer.png
    :align: center
 
-This method is really useful when you are redrawing all of the graphics each frame, and requires more work to handle if you only wish to do a partial redraw.
+This method is useful when you redraw all of the graphics each frame, but it requires more work to handle if you only want a partial redraw.
 
 Pros and Cons
 ^^^^^^^^^^^^^
@@ -185,11 +185,11 @@ We are going to begin by taking a look at an example program to familiarize ours
 
 Open the `graphx/sprites` example, and navigate to the `src/gfx` folder.
 
-The image :code:`oiram.png` is the sprite that wants to be converted, and :code:`convimg.yaml` is used to configure how the image should be converted.
+The image :code:`oiram.png` is the sprite that needs to be converted, and :code:`convimg.yaml` is used to configure how the image should be converted.
 
-Open :code:`convimg.yaml` in a text editor, which contains the below lines.
-Run the command :code:`convimg --help`. This outputs the readme for convimg, and what each of the various commands do.
-You can also find the readme online, available `here <https://github.com/mateoconlechuga/convimg/blob/master/README.md>`_.
+Open :code:`convimg.yaml` in a text editor, which contains the lines below.
+Run the command :code:`convimg --help`. This outputs the README for convimg and what each of the various commands do.
+You can also find the README online, available `here <https://github.com/mateoconlechuga/convimg/blob/master/README.md>`_.
 
 .. code-block:: yaml
 

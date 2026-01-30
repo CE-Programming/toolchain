@@ -18,12 +18,12 @@ Known Limitations
 -----------------
 
 - The maximum drive size is 2TiB.
-- Only drives utilizing 512 byte logical blocks are supported.
+- Only drives using 512-byte logical blocks are supported.
 
 Supported Devices
 -----------------
 
-The following table lists drives have been verified to work when used with a standard OTG adapter connector.
+The following table lists drives that have been verified to work when used with a standard OTG adapter connector.
 Other devices may also work but may not have been tested.
 The **msd_bandwidth** program found in the msddrvce examples directory can be used to determine if the device is suitable, and additionally tests the bandwidth for reading/writing blocks on the device.
 It is recommended to use SanDisk or Kingston drives for best results.

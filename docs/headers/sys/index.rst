@@ -3,7 +3,7 @@
 CE Hardware Headers
 ===================
 
-These headers are specific to the calculator's hardware, and contain various defines and prototypes.
+These headers are specific to the calculator's hardware and contain various definitions and prototypes.
 
 .. toctree::
     :maxdepth: 1
@@ -16,4 +16,4 @@ These headers are specific to the calculator's hardware, and contain various def
     timers
     util
 
-Click any of the above links to navigate to the header's documentation.
+Click any of the above links to navigate to the headers' documentation.

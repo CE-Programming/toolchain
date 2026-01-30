@@ -6,13 +6,13 @@ Assembly Files
 Assembly files can be linked into a C/C++ program by putting them into the same **src** directory that your C/C++ sources are in.
 Use a **.S** extension if you want the compiler's preprocessor to run on the file first, or use a **.s** extension if the assembly file does not need to be preprocessed.
 
-The use of inline assembly is supported, but highly discouraged as future changes to the compiler may render the inline assembly incompatible, and it reduces the readablity of the code.
+The use of inline assembly is supported, but highly discouraged as future changes to the compiler may render the inline assembly incompatible, and it reduces the readability of the code.
 
 Assembler
 ---------
 
 The CE Toolchain uses the GNU Assembler (GAS) to assemble source files.
-Historically the fasmg assembler was used, but is no longer supported to allow for better cross-platform support and linking performance.
+Historically the fasmg assembler was used, but it is no longer supported to allow for better cross-platform support and linking performance.
 
 Documentation for the GNU Assembler: https://www.sourceware.org/binutils/docs/as/index.html
 
@@ -34,8 +34,8 @@ The CE Toolchain uses :code:`.section .text` for code, :code:`.section .data` fo
 Every time you start a new section (such as :code:`.section .text.function`), the linker has an opportunity to delete a block of dead code/data.
 Because of this, the correct time to switch sections is usually every time you start a new function or variable.
 To define a symbol in a block that can be referenced from other blocks, you should do :code:`.local _symbol` or :code:`.global _symbol` right before its definition.
-If it is local then it is only able to be referenced from the same file and no :ref:`.extern <asm-extern>` should be used.
-If it is global then it can be referenced within the same file without :ref:`.extern <asm-extern>` just like local symbols, but global symbols can also be referenced from other files and even C/C++!
+If it is local, then it can only be referenced from the same file and no :ref:`.extern <asm-extern>` should be used.
+If it is global, then it can be referenced within the same file without :ref:`.extern <asm-extern>` just like local symbols, but global symbols can also be referenced from other files and even C/C++.
 The global assembly symbol named :code:`_symbol` in assembly is accessible in C using the name :code:`symbol`, without the leading underscore.
 
 .. _asm-extern:
@@ -43,14 +43,14 @@ The global assembly symbol named :code:`_symbol` in assembly is accessible in C 
 Extern
 ^^^^^^
 
-At the end of the file is a good place to list every external symbol that you might depend on like :code:`.extern _symbol`.
+The end of the file is a good place to list every external symbol that you might depend on, like :code:`.extern _symbol`.
 This includes both global symbols defined in another assembly file and global symbols from C, prefixed with an underscore.
 Block ordering can only be relied on within a single file, and only for blocks belonging to the same section.
 
 Linking ASM routines to C/C++
 -----------------------------
 
-If an assembly function needs to be called from C, a separate header file should define a extern C global prototype.
+If an assembly function needs to be called from C, a separate header file should define an extern C global prototype.
 In C this looks like a normal function or global declaration, and in C++ it's the same thing but in an :code:`extern "C" {}` block.
 
 Below is an example C prototype followed by the assembly implementation:
@@ -110,7 +110,7 @@ Arguments are pushed from last to first corresponding to the C prototype.
 In eZ80, 3 bytes are always pushed to the stack regardless of the actual size.
 However, the assembly function must be careful to only use the valid bytes that are pushed.
 For example, if a *short* type is used, the upper byte of the value pushed on the stack will contain arbitrary data.
-This table lists the locations relative to *sp* from within the called funciton.
+This table lists the locations relative to *sp* from within the called function.
 Note that :code:`sp + [0,2]` contains the return address.
 
 Assembly routines must preserve the :code:`IX` and :code:`SP` registers.

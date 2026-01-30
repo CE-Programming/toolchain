@@ -3,7 +3,7 @@
  * @authors
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
- * @brief Miscellaneous CE define file
+ * @brief Miscellaneous CE definition file
  */
 
 #ifndef SYS_UTIL_H

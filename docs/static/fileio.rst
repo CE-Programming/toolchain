@@ -18,19 +18,19 @@ For :code:`stdin`, :code:`stdout`, and :code:`stderr` file streams, the default 
 Using Custom File I/O
 ---------------------
 
-If you do not wish to have the file I/O functions backed by the :ref:`fileioc library <fileioc_h>`, you can instead redefine the functions that you need in any source file.
+If you do not wish to have the file I/O functions backed by the :ref:`fileioc library <fileioc_h>`, you can instead redefine the functions you need in any source file.
 The new functions will override the default implementation.
 
-Additionally, the makefile needs to be updated accordingly.
-Add the below lines to the makefile to enable the custom file operations:
+Additionally, the Makefile needs to be updated accordingly.
+Add the following lines to the Makefile to enable the custom file operations:
 
 .. code-block:: makefile
 
     HAS_CUSTOM_FILE := YES
     CUSTOM_FILE_FILE := stdio_file.h
 
-The option **CUSTOM_FILE_FILE** should be set to the name of the file which redefines the :code:`FILE` structure used by the standard file I/O functions.
-Additionally, it should redefine :code:`stdin`, :code:`stdout`, and :code:`stderr`, however if your program doesn't require these this isn't necessary.
+The option **CUSTOM_FILE_FILE** should be set to the name of the file that redefines the :code:`FILE` structure used by the standard file I/O functions.
+Additionally, it should redefine :code:`stdin`, :code:`stdout`, and :code:`stderr`; however, if your program doesn't require these, this isn't necessary.
 
 An example *stdio_file.h* might look like this:
 

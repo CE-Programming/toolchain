@@ -7,7 +7,7 @@ sys/util.h
 
     #include <sys/util.h>
 
-This header includes defines for miscellaneous CE-specific things.
+This header includes definitions for miscellaneous CE-specific things.
 
 .. contents:: :local:
    :depth: 3

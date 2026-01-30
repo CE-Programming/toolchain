@@ -3,7 +3,7 @@
 Miscellaneous Headers
 =====================
 
-These headers contain various defines and prototypes, as well as any backwards compatibility definitions.
+These headers contain various definitions and prototypes, as well as backward compatibility definitions.
 
 .. toctree::
     :maxdepth: 1
@@ -13,4 +13,4 @@ These headers contain various defines and prototypes, as well as any backwards c
     intce
     tice
 
-Click any of the above links to navigate to the header's documentation.
+Click any of the above links to navigate to the headers' documentation.

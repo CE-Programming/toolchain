@@ -3,7 +3,7 @@
  * @authors
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
- * @brief CE Real-Time Clock define file
+ * @brief CE Real-Time Clock definition file
  */
 
 #ifndef SYS_RTC_H
@@ -23,7 +23,7 @@ extern "C" {
 /**
  * Sets the calculator's date
  *
- * Performs checks to ensure date is within range
+ * Performs checks to ensure the date is within range.
  * @param[in] day Day to set
  * @param[in] month Month to set
  * @param[in] year Year to set
@@ -59,8 +59,8 @@ void boot_SetTime(uint8_t seconds, uint8_t minutes, uint8_t hours);
 /**
  * Gets the calculator's time
  *
- * @note You can read \c rtc_Seconds, \c rtc_Minutes , and \c rtc_Hours directly, but you should double check
- * that \c rtc_Seconds didn't change while reading \c rtc_Minutes and \c rtc_Hours .
+ * @note You can read \c rtc_Seconds, \c rtc_Minutes, and \c rtc_Hours directly, but you should double-check
+ * that \c rtc_Seconds didn't change while reading \c rtc_Minutes and \c rtc_Hours.
  *
  * @param[out] seconds Pointer to variable to store seconds
  * @param[out] minutes Pointer to variable to store minutes
@@ -112,7 +112,7 @@ bool boot_IsAfterNoon(void);
 /* @endcond */
 
 /**
- * Enables the Real-Time-Clock (RTC).
+ * Enables the Real-Time Clock (RTC).
  *
  * @param int Interrupt mask to enable specific RTC interrupts.
  */

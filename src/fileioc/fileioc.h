@@ -27,7 +27,7 @@ extern "C" {
 /**
  * Allocate a \p real_t variable on the C heap using malloc().
  * Does not modify OS storage. The allocated variable should be
- * free'd with the free() function when you are done using it.
+ * freed with the free() function when you are done using it.
  * @returns Pointer to \p real_t allocated variable.
  */
 #define ti_MallocReal() ((real_t*)malloc(sizeof(real_t)))
@@ -35,7 +35,7 @@ extern "C" {
 /**
  * Allocate a \p cplx_t variable on the C heap using malloc().
  * Does not modify OS storage. The allocated variable should be
- * free'd with the free() function when you are done using it.
+ * freed with the free() function when you are done using it.
  * @returns Pointer to \p cplx_t allocated variable.
  */
 #define ti_MallocCplx() ((cplx_t*)malloc(sizeof(cplx_t)))
@@ -43,7 +43,7 @@ extern "C" {
 /**
  * Allocate a \p string_t variable on the C heap using malloc().
  * Does not modify OS storage. The allocated variable should be
- * free'd with the free() function when you are done using it.
+ * freed with the free() function when you are done using it.
  * @param[in] len Length of string to allocate in tokens/characters.
  * @returns Pointer to \p string_t allocated variable.
  */
@@ -52,7 +52,7 @@ extern "C" {
 /**
  * Allocate a \p list_t variable on the C heap using malloc().
  * Does not modify OS storage. The allocated variable should be
- * free'd with the free() function when you are done using it.
+ * freed with the free() function when you are done using it.
  * @param[in] dim Dimension of list.
  * @returns Pointer to \p list_t allocated variable.
  */
@@ -61,7 +61,7 @@ extern "C" {
 /**
  * Allocate a \p matrix_t variable on the C heap using malloc().
  * Does not modify OS storage. The allocated variable should be
- * free'd with the free() function when you are done using it.
+ * freed with the free() function when you are done using it.
  * @param[in] rows Number of rows in matrix.
  * @param[in] cols Number of columns in matrix.
  * @returns Pointer to \p matrix_t allocated variable.
@@ -71,16 +71,16 @@ extern "C" {
 /**
  * Allocate a \p cplx_list_t variable on the C heap using malloc().
  * Does not modify OS storage. The allocated variable should be
- * free'd with the free() function when you are done using it.
+ * freed with the free() function when you are done using it.
  * @param[in] dim Dimension of list.
- * @returns Pointer to \p cplx_list_t  allocated variable.
+ * @returns Pointer to \p cplx_list_t allocated variable.
  */
 #define ti_MallocCplxList(dim) ti_AllocCplxList((dim), malloc)
 
 /**
  * Allocate a \p equ_t variable on the C heap using malloc().
  * Does not modify OS storage. The allocated variable should be
- * free'd with the free() function when you are done using it.
+ * freed with the free() function when you are done using it.
  * @param[in] len Length of equation to allocate in tokens/characters.
  * @returns Pointer to \p equ_t allocated variable.
  */
@@ -249,7 +249,7 @@ char *ti_DetectAny(void **vat_ptr, const char *detect_string, uint8_t *var_type)
  * @param[in] size Size (in bytes) of a single \p data element.
  * @param[in] count Number of \p data elements to write.
  * @param[in] handle AppVar/variable handle.
- * @returns Number of data elements written; equals count on success.
+ * @returns Number of data elements read; equals count on success.
  */
 size_t ti_Write(const void *data, size_t size, size_t count, uint8_t handle);
 
@@ -294,7 +294,7 @@ int ti_GetC(uint8_t handle);
  *   | SEEK_END     | Seek from end of AppVar/variable.                     |
  *   +--------------+-------------------------------------------------------+
  * \endrst
- * @param[in] offset Number of bytes to offest from (can be negative).
+ * @param[in] offset Number of bytes to offset from (can be negative).
  * @param[in] origin Documented in the above table.
  * @param[in] handle AppVar/variable handle.
  * @returns `EOF` on failure.
@@ -471,7 +471,7 @@ void *ti_GetVATPtr(uint8_t handle);
 /**
  * Gets the AppVar/variable name of an already opened handle.
  *
- * @param[in] name Buffer to store name, must be at least 10 bytes in sizew.
+ * @param[in] name Buffer to store name, must be at least 10 bytes in size.
  * @param[in] handle AppVar/variable handle.
  */
 void ti_GetName(char *name, uint8_t handle);
@@ -524,7 +524,7 @@ uint8_t ti_SetVar(uint8_t type, const char *name, const void *data);
 uint8_t ti_StoVar(uint8_t type_to, const char *to, uint8_t type_from, const char *from);
 
 /**
- * Recalls a OS variable.
+ * Recalls an OS variable.
  *
  * @param[in] type Variable type.
  * @param[in] name Variable name.
@@ -555,8 +555,8 @@ bool ti_ArchiveHasRoomVar(uint8_t handle);
  * Set routines to run before and after a garbage collect would be triggered.
  * A garbage collect is used to free up space in archive memory by reorganizing
  * archive variable storage and removing variables marked for deletion. The OS
- * is required to request the user if they want to perform the operation,
- * and this request may be triggered any time a variable is moved to archive
+ * is required to ask the user whether they want to perform the operation,
+ * and this request may be triggered at any time a variable is moved to archive
  * memory. This function is used to set up callbacks that are triggered when
  * this event occurs.
  *
@@ -565,7 +565,7 @@ bool ti_ArchiveHasRoomVar(uint8_t handle);
  * to restore the OS to its default state in the routine run before garbage
  * collection.
  *
- * In the after garbage collection rotuine, the LCD state can be restored (using
+ * In the after garbage collection routine, the LCD state can be restored (using
  * `gfx_Begin` or similar as appropriate), as well as potentially reloading
  * cached variable pointers created with ti_GetDataPtr.
  * 

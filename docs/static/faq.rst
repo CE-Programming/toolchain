@@ -3,18 +3,18 @@
 Frequently Asked Questions
 ==========================
 
-I Found A Bug, Help!?
+I Found a Bug, Help?
 ---------------------
 
 Please create an `issue report here <https://github.com/CE-Programming/toolchain/issues>`_ with details on what caused the crash.
-Uploading a zip of your code and/or a minimal reproducible example is very appreciated (and is usually required).
-Including the output of the :code:`make V=1` command outputs more verbose information that helps diagnose the issue.
+Uploading a ZIP of your code and/or a minimal reproducible example is very appreciated (and is usually required).
+Including the output of the :code:`make V=1` command provides more verbose information that helps diagnose the issue.
 
 What versions of C/C++ are supported?
 -------------------------------------
 
 The CE Toolchain uses LLVM/Clang v17.
-The status of each language feature support can be found at the respective links: `C <https://clang.llvm.org/c_status.html>`_, `C++ <https://clang.llvm.org/cxx_status.html>`_
+The status of each language feature support can be found at the respective links: `C <https://clang.llvm.org/c_status.html>`_, `C++ <https://clang.llvm.org/cxx_status.html>`_.
 
 What is the C/C++ Runtime Memory Layout?
 ----------------------------------------

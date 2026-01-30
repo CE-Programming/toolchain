@@ -7,7 +7,7 @@ intce.h
 
     #include <intce.h>
 
-This header includes defines and prototypes for working with user interrupts.
+This header includes definitions and prototypes for working with user interrupts.
 
 .. warning::
 

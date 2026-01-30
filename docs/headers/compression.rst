@@ -7,7 +7,7 @@ compression.h
 
     #include <compression.h>
 
-This header includes protoypes for various (de)compression routines.
+This header includes prototypes for various (de)compression routines.
 
 .. contents:: :local:
    :depth: 3

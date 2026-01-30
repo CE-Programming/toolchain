@@ -5,7 +5,7 @@ Debugging Features
 
 The toolchain offers the ability to debug your programs using the `CEmu emulator <https://ce-programming.github.io/CEmu>`_.
 
-Add :code:`#include <debug.h>` to a source file, and use :code:`make debug` instead of :code:`make` to build a debug program.
+Add :code:`#include <debug.h>` to a source file, and use :code:`make debug` instead of :code:`make` to build a debug build.
 You may need to run :code:`make clean` beforehand in order to ensure all source files are rebuilt.
 
 Emulator Console

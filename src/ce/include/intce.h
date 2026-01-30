@@ -1,12 +1,12 @@
 /**
  * @file
- * @brief Interrupt configuring and setting.
+ * @brief Interrupt configuration and setup.
  * @author Matt "MateoConLechuga" Waltz
  * @author Jacob "jacobly" Young
  *
  * This file provides routines for setting custom interrupt vectors
  * for your program. Note that TI broke interrupt support in hardware
- * revisions >= I, and they will not work. Use at your own risk.
+ * revisions >= I; they will not work. Use at your own risk.
  */
 
 #ifndef _INTCE_H
@@ -25,7 +25,7 @@ extern "C" {
 asm("ei")
 
 /**
- * @brief Diasble global interrupts
+ * @brief Disable global interrupts
  */
 #define int_Disable() \
 asm("di")
@@ -60,14 +60,14 @@ asm("halt")
 #define int_MaskedStatus    (*(volatile uint24_t*)0x0F00014) /**< Masked state of interrupt signals */
 #define int_EnableConfig    (*(volatile uint24_t*)0x0F00004) /**< Enabled interrupt signals         */
 #define int_LatchConfig     (*(volatile uint24_t*)0x0F0000C) /**< Latchable interrupt signals       */
-#define int_InvertConfig    (*(volatile uint24_t*)0x0F00010) /**< Invertable interrupt signals      */
+#define int_InvertConfig    (*(volatile uint24_t*)0x0F00010) /**< Invertible interrupt signals      */
 #define int_Acknowledge     (*(volatile uint24_t*)0x0F00008) /**< Acknowledge interrupt signals     */
 
 #ifdef FORCE_INTERRUPTS
 #warning TI broke interrupt support on CE models with hardware revision >= I. Use at your own risk.
 
 /**
- * Initizalize to use custom interrupts.
+ * Initialize to use custom interrupts.
  *
  * @note Saves status of current interrupt state.
  * @warning TI broke interrupt support on CE models with hardware revision >= I.
@@ -75,7 +75,7 @@ asm("halt")
 void int_Initialize(void);
 
 /**
- * Resets interrupts back to the OS expected values.
+ * Resets interrupts back to the OS-expected values.
  *
  * @warning Must have called int_Initialize before using.
  * @warning TI broke interrupt support on CE models with hardware revision >= I.

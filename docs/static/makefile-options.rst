@@ -6,7 +6,7 @@
 Makefile Options
 ================
 
-The project's makefile controls different features and settings for the output program.
+The project's Makefile controls different features and settings for the output program.
 Additional rules can be added to build different components as well.
 
 To edit these options, open the :code:`makefile` file inside the project's folder in a text editor.
@@ -77,7 +77,7 @@ To enable this feature, open the project's makefile and change the line:
 .. rubric:: OUTPUT_MAP
 
 Outputs a <name>.map file into the :code:`bin` directory that includes section, variable, and function addressing/size information of the compiled program.
-To speed up linking this step can be disabled.
+To speed up linking, this step can be disabled.
 Default: :code:`YES`.
 
 .. code-block:: makefile
@@ -125,27 +125,27 @@ These flags are passed directly to the GNU linker (ld).
 
 .. rubric:: PREFER_OS_CRT
 
-Prefer the calculator's builtin CRT (Compiler-Run-Time) functions if they exist.
+Prefer the calculator's built-in CRT (Compiler-Run-Time) functions if they exist.
 This can help to decrease the output size in some circumstances, as a select number of CRT functions will execute from flash.
 Default: :code:`NO`.
 
 .. code-block:: makefile
 
-    HAS_MATH_ERRNO = NO
+    PREFER_OS_CRT = NO
 
 .. rubric:: HAS_MATH_ERRNO
 
 By default, the compiler flag :code:`-fno-math-errno` is added to improve performance.
-However, this may lead to discrepencies on the value of :code:`errno` when running math operations in some cases.
+However, this may lead to discrepancies on the value of :code:`errno` when running math operations in some cases.
 To avoid this, set this option to :code:`YES`.
 
 .. code-block:: makefile
 
-    PREFER_OS_CRT = NO
+    HAS_MATH_ERRNO = NO
 
 .. rubric:: PREFER_OS_LIBC
 
-Prefer the calculator's builtin LIBC functions if they exist.
+Prefer the calculator's built-in LIBC functions if they exist.
 This can help to decrease the output size in some circumstances, as a select number of LIBC functions will execute from flash.
 Default: :code:`YES`.
 
@@ -155,8 +155,8 @@ Default: :code:`YES`.
 
 .. rubric:: LIBLOAD_OPTIONAL
 
-Space separated list of ``libload`` libraries to mark as optional in the program.
-If an optional library is not present on the device, the program will still execute and not be blocked from running by ``libload``, however calls to the library's functions will crash the program.
+Space-separated list of ``libload`` libraries to mark as optional in the program.
+If an optional library is not present on the device, the program will still execute and not be blocked from running by ``libload``; however, calls to the library's functions will crash the program.
 
 * If this option is left blank, libraries supplied to the function :code:`libload_IsLibLoaded` will be automatically marked as optional.
 * Libraries specified by this option are forced to be optional, regardless of :code:`libload_IsLibLoaded` usage.
@@ -198,7 +198,7 @@ Extra assembly source files to be compiled in that are not located in the source
 
 .. rubric:: EXTRA_HEADERS
 
-Extra header files to be used in that are not located in the source directory.
+Extra header files to be used that are not located in the source directory.
 
 .. code-block:: makefile
 

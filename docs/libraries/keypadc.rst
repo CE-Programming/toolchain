@@ -10,6 +10,14 @@ keypadc.h
 The :code:`keypadc` library is used for quickly polling the status of the keys in the keypad.
 It supports multi-key presses, and can be used for extremely responsive input compared to OS routines such as :code:`os_GetCSC()`.
 
+The keypad hardware works by continously "scanning" the key matrix and updating the memory-mapped registers.
+It is recommended to put the keypad in continous scanning mode at the start of your program using the below code.
+This avoids the need to call the :code:`kb_Scan` function, as the hardware will update the data registers in the background.
+
+.. code-block:: c
+
+    kb_SetMode(MODE_3_CONTINUOUS);
+
 .. contents:: :local:
    :depth: 3
 
@@ -17,7 +25,7 @@ Key Detection
 -------------
 
 Handling key detection properly is a major requirement for a lot of programs.
-Detecting a hold can be rather straightforward, but things like a press, release, can sometimes be rather confusing at first.
+Detecting a hold can be straightforward, but things like a press and release can sometimes be confusing at first.
 
 Detecting a Single Press
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -38,7 +46,7 @@ The following code sets up a simple rising edge detector to catch this.
 Detecting a Single Release
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When a key is released we only want to trigger on that event.
+When a key is released, we only want to trigger on that event.
 The following code sets up a simple falling edge detector to catch this.
 
 .. code-block:: c

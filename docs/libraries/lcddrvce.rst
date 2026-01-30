@@ -28,9 +28,9 @@ Library Initialization
 The :code:`lcd_Init` and :code:`lcd_Cleanup` functions provide reference-counted initialization and cleanup of the SPI configuration.
 That means multiple calls to :code:`lcd_Init()` are allowed, and the SPI hardware is restored to its original settings only after the same number of calls to :code:`lcd_Cleanup()`.
 Since the configuration is set differently than the OS's default settings for performance reasons, it's not allowed to power off the calculator without cleaning up the library first.
-This means if calling certain functions like :code:`os_GetKey` which can auto-power-down the calculator, either the LCD library should be cleaned up or auto-power-down should be disabled with :code:`os_DisableAPD()`.
+This means that if you call certain functions like :code:`os_GetKey`, which can auto-power-down the calculator, either the LCD library should be cleaned up or auto-power-down should be disabled with :code:`os_DisableAPD()`.
 When using this library as part of another library's implementation and performance is not critical, it's safest to call both :code:`lcd_Init()` and :code:`lcd_Cleanup()` each time commands need to be sent.
-That way, users of the library will be able to cleanup the SPI configuration whenever they need to.
+That way, users of the library will be able to clean up the SPI configuration whenever they need to.
 
 API Documentation
 -----------------
