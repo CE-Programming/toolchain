@@ -14,8 +14,6 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-
 GIT_SHA = $(shell git describe --abbrev=8 --dirty --always --tags)
 
 CEDEV_VERSION := $(GIT_SHA)
@@ -82,6 +80,7 @@ endif
 endif
 
 QUOTE_NATIVE = $(call QUOTE_ARG,$(call NATIVEPATH,$1))
+ROOT_DIR := $(dir $(realpath $(call NATIVEPATH,$(lastword $(MAKEFILE_LIST)))))
 
 EZCFLAGS := -S -fno-autolink -fno-addrsig -fno-math-errno -ffunction-sections -fdata-sections -ffreestanding
 EZCFLAGS += -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
