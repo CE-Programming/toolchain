@@ -369,12 +369,11 @@ good_version:
 	inc	hl
 	ld	(end_arc_lib_locs), hl
 
-	ld	hl, ti.userMem		; this is where programs are loaded to
-	ld	de, (ti.asm_prgm_size)
+	ld	de, ti.userMem		; this is where programs are loaded to
+	ld	hl, (ti.asm_prgm_size)
 	add	hl, de			; hl->end of program+libaries
-	ex	de, hl			; de->location to load to
 
-	ld	(ramlocation), de	; save this pointer
+	ld	(ramlocation), hl	; save this pointer
 
 	res	keep_in_arc, (iy + LIB_FLAGS)
 	ld	hl, (arclocation)	; hl->start of library code in archive
@@ -389,7 +388,7 @@ good_version:
 	set	keep_in_arc, (iy + LIB_FLAGS)
 
 need_to_load_lib:
-	ld	de, (ramlocation)
+	ld	de, (ramlocation)	; de->location to load to
 	ld	hl, (end_arc_lib_locs)
 	ld	(hl), de
 	inc	hl
@@ -415,14 +414,14 @@ need_to_load_lib:
 .enough_mem:
 	call	ti.InsertMem		; insert memory for the relocated library (de)
 
-	ld	hl, (loaded_size)	; loaded size = dependency jumps + library code
-	ld	de, (ti.asm_prgm_size)
-	add	hl, de
+	ld	bc, (loaded_size)	; loaded size = dependency jumps + library code
+	ld	hl, (ti.asm_prgm_size)
+	add	hl, bc
 	ld	(ti.asm_prgm_size), hl	; store new size of program+libraries
 
 	ld	hl, (arclocation)	; hl->start of library code
 	ld	de, (ramlocation)	; de->insertion place
-	ld	bc, (loaded_size)	; bc=loaded library size
+	; bc = loaded library size
 	ldir				; copy in the library to ram
 
 resolve_entry_points:
