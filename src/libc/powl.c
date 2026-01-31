@@ -18,8 +18,8 @@ long double powl(long double x, long double y) {
         return expl( y * logl( x ) );
     }
     if ( x < 0.0L ){
-        temp = y;
-        if ( temp == y ){
+        temp = (long)y;
+        if ( (long double)temp == y ){
             result = expl( y * logl( -x ) );
             return temp & 1 ? -result : result;
         }
