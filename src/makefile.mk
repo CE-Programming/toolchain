@@ -315,9 +315,9 @@ endif
 
 # define the compiler/assembler flags
 EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style -ffunction-sections -fdata-sections -fno-addrsig -fno-autolink -fno-threadsafe-statics $(MATH_ERRNO)
-EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include)) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_DEBUG) $(CC_CUSTOMFILE)
-EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include/c++)) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS)
+EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include)) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_CUSTOMFILE)
+EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS) $(CC_DEBUG)
+EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include/c++)) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS) $(CC_DEBUG)
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 EZASFLAGS = -march=ez80+full $(ASFLAGS)
 
@@ -332,7 +332,7 @@ build: $(BUILD)
 target: $(BINDIR)/$(TARGET)
 
 # this rule is trigged to build debug everything
-debug: CC_DEBUG = -DDEBUG=1 -Og -gdwarf-5 -g3
+debug: CC_DEBUG = -DDEBUG=1 -O0 -gdwarf-5 -g3
 debug: STRIP_CMD = $(NOOP)
 debug: LD_DEBUG = --defsym DEBUG=1
 debug: $(BUILD)
