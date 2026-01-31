@@ -65,17 +65,12 @@ lz4_decompress_block_internal:
 	ret
 
 .L.copy_backref_long:
-	; Read the last length byte
-	dec	hl
-	ld	a, (hl)
-	inc	hl
 	; Save the input pointer and restore the backref pointer
 	ex	(sp), hl
 	; Copy the amount prior to the last length byte, minus 1
 	ldir
 	; Copy the amount of the last length byte, plus 1
 	ld	c, a
-	inc	bc
 .L.copy_backref:
 	; Copy the backref data
 	ldir
@@ -132,16 +127,18 @@ lz4_decompress_block_internal:
 	ld	c, a
 	ld	b, 0
 	; Check for extended length
-	add	a, -($0F + 4)
-	jr	nc, .L.copy_backref
+	cp	a, $0F + 4
+	jr	nz, .L.copy_backref
 	; Save the backref pointer and restore the input pointer
 	ex	(sp), hl
-.L.backref_loop_outer:
-	; Carry is always set here, set A = 255
-	sbc	a, a
 .L.backref_loop:
-	; Check for a length byte of 255, and decrement the length by 1
-	cpi
+	; Read the next length byte
+	ld	a, (hl)
+	inc	hl
+	; Decrement the length by 1
+	dec	bc
+	; Increment the length byte, and check if it was 255
+	inc	a
 	jr	nz, .L.copy_backref_long
 	; Increment the length by 256
 	inc	b
@@ -156,7 +153,7 @@ lz4_decompress_block_internal:
 	inc	bc
 	; Restore C
 	ld	c, a
-	jr	.L.backref_loop_outer
+	jr	.L.backref_loop
 
 .L.literal_long:
 	; Save the backref field
@@ -164,12 +161,14 @@ lz4_decompress_block_internal:
 	; Start with literal length of 15
 	ld	b, 0
 	dec	bc
-.L.literal_loop_outer:
-	; Carry is always set here, set A = 255
-	sbc	a, a
 .L.literal_loop:
-	; Check for a length byte of 255, and decrement the length by 1
-	cpi
+	; Read the next length byte
+	ld	a, (hl)
+	inc	hl
+	; Decrement the length by 1
+	dec	bc
+	; Increment the length byte, and check if it was 255
+	inc	a
 	jr	nz, .L.copy_literal_long
 	; Increment the length by 256
 	inc	b
@@ -184,18 +183,13 @@ lz4_decompress_block_internal:
 	inc	bc
 	; Restore C
 	ld	c, a
-	jr	.L.literal_loop_outer
+	jr	.L.literal_loop
 
 .L.copy_literal_long:
-	; Read the last length byte
-	dec	hl
-	ld	a, (hl)
-	inc	hl
 	; Copy the amount prior to the last length byte, minus 1
 	ldir
 	; Copy the amount of the last length byte, plus 1
 	ld	c, a
-	inc	bc
 	; Restore the backref field
 	pop	af
 	; Affect the zero flag based on the backref field and clear carry
