@@ -1,0 +1,203 @@
+	.assume	adl=1
+
+	.section	.text._lz4_Decompress_Block
+	.global	_lz4_Decompress_Block
+	.type	_lz4_Decompress_Block, @function
+
+	; size_t lz4_Decompress_Block(void *dst, const void *block, size_t block_size);
+_lz4_Decompress_Block:
+	ld	iy, 0
+	add	iy, sp
+	; DE = dst
+	ld	de, (iy + 3)
+	; BC = block_size
+	ld	bc, (iy + 9)
+	; IY = block
+	ld	iy, (iy + 6)
+	; Save dst
+	push	de
+	call	lz4_decompress_block_internal
+	; Calculate decompressed size based on final dst
+	ex	de, hl
+	pop	de
+	or	a, a
+	sbc	hl, de
+	ret
+
+	.section	.text._lz4_Decompress
+	.global	_lz4_Decompress
+	.type	_lz4_Decompress, @function
+
+	; void lz4_Decompress(void *dst, const void *src);
+_lz4_Decompress:
+	ld	hl, 3
+	add	hl, sp
+	; DE = dst
+	ld	de, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	; IY = src
+	ld	iy, (hl)
+	; BC = size
+	ld	bc, (iy)
+	; Skip size header
+	lea	iy, iy + 3
+	; Fallthrough
+
+	.local	lz4_decompress_block_internal
+	.type	lz4_decompress_block_internal, @function
+
+	; Input: IY = compressed block, DE = decompression buffer, BC = size of block
+	; Output: IY = after compressed block, DE = after decompressed data
+	; Destroys: AF, BC, HL
+lz4_decompress_block_internal:
+	; HL = compressed block
+	lea	hl, iy + 0
+	; Set IY to after compressed block
+	add	iy, bc
+	inc.s	bc	; BCU = 0
+	; Read the first token
+	ld	a, (hl)
+	; Check for the special case of zero-length output
+	or	a, a
+	jr	nz, .L.start
+	ret
+
+.L.copy_backref_long:
+	; Read the last length byte
+	dec	hl
+	ld	a, (hl)
+	inc	hl
+	; Save the input pointer and restore the backref pointer
+	ex	(sp), hl
+	; Copy the amount prior to the last length byte, minus 1
+	ldir
+	; Copy the amount of the last length byte, plus 1
+	ld	c, a
+	inc	bc
+.L.copy_backref:
+	; Copy the backref data
+	ldir
+	; Restore the input pointer
+	pop	hl
+	; Read the next token
+	ld	a, (hl)
+.L.start:
+	inc	hl
+	; Check if the literal field is zero
+	; If so, this cannot be the end of block, go directly to backref handling
+	ld	c, $10
+	cp	a, c
+	jr	c, .L.backref
+	; Save the token in B
+	ld	b, a
+	; Check for extended literal
+	add	a, c
+	jr	c, .L.literal_long
+	; Multiply the token by 16, placing the literal field in B
+	mlt	bc
+	; Set BC to the literal length, which is known to be non-zero
+	ld	c, b
+	ld	b, 0
+	; Mask the backref field, affecting the zero flag, and clear carry
+	and	a, $0F
+.L.copy_literal:
+	; Copy the literals
+	ldir
+	; Zero flag is currently set according to the backref field
+	; If the backref field is non-zero, this cannot be end of block 
+	jr	nz, .L.backref
+	; Check for end of block (carry is currently clear)
+	lea	bc, iy + 0
+	sbc	hl, bc
+	ret	nc
+	add	hl, bc
+	inc.s	bc	; BCU = 0
+.L.backref:
+	; Read backref offset into BC
+	ld	c, (hl)
+	inc	hl
+	ld	b, (hl)
+	inc	hl
+	; Save the input pointer
+	push	hl
+	; Add 4 to backref length field, and clear carry
+	add	a, 4
+	; Calculate HL = DE - BC
+	sbc	hl, hl
+	add	hl, de
+	sbc	hl, bc
+	; Set BC to backref length
+	ld	c, a
+	ld	b, 0
+	; Check for extended length
+	add	a, -($0F + 4)
+	jr	nc, .L.copy_backref
+	; Save the backref pointer and restore the input pointer
+	ex	(sp), hl
+.L.backref_loop_outer:
+	; Carry is always set here, set A = 255
+	sbc	a, a
+.L.backref_loop:
+	; Check for a length byte of 255, and decrement the length by 1
+	cpi
+	jr	nz, .L.copy_backref_long
+	; Increment the length by 256
+	inc	b
+	; Loop if B did not carry to 0
+	jr	nz, .L.backref_loop
+	; Save C
+	ld	a, c
+	; Set B = C = 255
+	dec	b
+	ld	c, b
+	; Increment BCU and set B = C = 0
+	inc	bc
+	; Restore C
+	ld	c, a
+	jr	.L.backref_loop_outer
+
+.L.literal_long:
+	; Save the backref field
+	push	af
+	; Start with literal length of 15
+	ld	b, 0
+	dec	bc
+.L.literal_loop_outer:
+	; Carry is always set here, set A = 255
+	sbc	a, a
+.L.literal_loop:
+	; Check for a length byte of 255, and decrement the length by 1
+	cpi
+	jr	nz, .L.copy_literal_long
+	; Increment the length by 256
+	inc	b
+	; Loop if B did not carry to 0
+	jr	nz, .L.literal_loop
+	; Save C
+	ld	a, c
+	; Set B = C = 255
+	dec	b
+	ld	c, b
+	; Increment BCU and set B = C = 0
+	inc	bc
+	; Restore C
+	ld	c, a
+	jr	.L.literal_loop_outer
+
+.L.copy_literal_long:
+	; Read the last length byte
+	dec	hl
+	ld	a, (hl)
+	inc	hl
+	; Copy the amount prior to the last length byte, minus 1
+	ldir
+	; Copy the amount of the last length byte, plus 1
+	ld	c, a
+	inc	bc
+	; Restore the backref field
+	pop	af
+	; Affect the zero flag based on the backref field and clear carry
+	or	a, a
+	jr	.L.copy_literal
