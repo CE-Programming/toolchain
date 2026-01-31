@@ -538,10 +538,7 @@ check_for_lib_marker:
 	jr	z, goto_load_lib
 	set	optional, (iy + LIB_FLAGS)
 	cp	a, OPT_LIB_MARKER
-	jr	nz, check_has_deps
-goto_load_lib:
-	rjump	load_lib		; load the next library
-
+	jr	z, goto_load_lib	; load the next library
 check_has_deps:				; the first time we hit this,  we have all the dependencies placed onto the queue that the libraries use.
 	res	optional, (iy + LIB_FLAGS)
 	bit	is_dep, (iy + LIB_FLAGS)
@@ -555,15 +552,16 @@ load_next_dep:
 	sbc	hl, de			; make sure we are done parsing the dependency queue
 	add	hl, de
 					; now we need to parse the libraries like they are programs. this will be fun.
-	jr	z, .exit
+	jr	z, start_execution
 	dec	hl
 	dec	hl
 	dec	hl			; hl->dependency ($C0, "LIBNAME", 0, VERSION, JUMP_TABLE)
 	ld	(end_dep_queue), hl
 	ld	hl, (hl)		; valid pointer to $C0 (REQ_LIB_MARKER)
+goto_load_lib:
 	rjump	load_lib		; load current dependency if needed,  or resolve entry points
 
-.exit:
+start_execution:
 	call	ti.PopOP1		; restore program name
 	ld	hl, (prgm_start)
 	ld	ix, (ix_save)		; restore IX register
