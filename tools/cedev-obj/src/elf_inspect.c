@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
 /* ELF format definitions (from ELF specification) */
 #define EI_NIDENT 16
@@ -78,6 +79,7 @@ struct elf_file
 {
     FILE *fp;
     char error[256];
+    size_t file_size;
     
     /* ELF header */
     struct elf32_ehdr ehdr;
@@ -101,6 +103,33 @@ static void set_error(struct elf_file *elf, const char *msg)
     snprintf(elf->error, sizeof(elf->error), "%s", msg);
 }
 
+static bool set_file_size(struct elf_file *elf)
+{
+    struct stat st;
+    if (fstat(fileno(elf->fp), &st) != 0)
+    {
+        set_error(elf, "Failed to stat ELF file");
+        return false;
+    }
+    if (st.st_size < 0)
+    {
+        set_error(elf, "Invalid ELF file size");
+        return false;
+    }
+    elf->file_size = (size_t)st.st_size;
+    return true;
+}
+
+static bool check_range(struct elf_file *elf, size_t offset, size_t size)
+{
+    if (offset > elf->file_size || size > elf->file_size - offset)
+    {
+        set_error(elf, "ELF file truncated or corrupt");
+        return false;
+    }
+    return true;
+}
+
 static bool read_at(FILE *fp, void *buf, size_t size, long offset)
 {
     if (fseek(fp, offset, SEEK_SET) != 0)
@@ -113,6 +142,12 @@ static bool read_at(FILE *fp, void *buf, size_t size, long offset)
 
 static bool parse_elf_header(struct elf_file *elf)
 {
+    if (elf->file_size < sizeof(elf->ehdr))
+    {
+        set_error(elf, "ELF file too small");
+        return false;
+    }
+
     if (!read_at(elf->fp, &elf->ehdr, sizeof(elf->ehdr), 0))
     {
         set_error(elf, "Failed to read ELF header");
@@ -132,13 +167,35 @@ static bool parse_elf_header(struct elf_file *elf)
         set_error(elf, "Only 32-bit ELF supported");
         return false;
     }
+
+    if (elf->ehdr.e_shentsize != sizeof(struct elf32_shdr))
+    {
+        set_error(elf, "Unexpected section header size");
+        return false;
+    }
+
+    if (elf->ehdr.e_shnum == 0)
+    {
+        set_error(elf, "No section headers present");
+        return false;
+    }
     
     return true;
 }
 
 static bool load_section_headers(struct elf_file *elf)
 {
+    if (elf->ehdr.e_shnum > SIZE_MAX / elf->ehdr.e_shentsize)
+    {
+        set_error(elf, "Section header table size overflow");
+        return false;
+    }
+
     size_t shdr_table_size = elf->ehdr.e_shnum * elf->ehdr.e_shentsize;
+    if (!check_range(elf, elf->ehdr.e_shoff, shdr_table_size))
+    {
+        return false;
+    }
     
     elf->section_headers = malloc(shdr_table_size);
     if (!elf->section_headers)
@@ -165,6 +222,15 @@ static bool load_string_table(struct elf_file *elf, uint32_t shdr_idx, char **st
     }
     
     struct elf32_shdr *shdr = &elf->section_headers[shdr_idx];
+    if (shdr->sh_type != SHT_STRTAB)
+    {
+        set_error(elf, "Expected string table section");
+        return false;
+    }
+    if (!check_range(elf, shdr->sh_offset, shdr->sh_size))
+    {
+        return false;
+    }
     
     *strtab = malloc(shdr->sh_size);
     if (!*strtab)
@@ -202,6 +268,23 @@ static bool load_symbol_table(struct elf_file *elf)
     if (!symtab_shdr)
     {
         set_error(elf, "No symbol table found");
+        return false;
+    }
+
+    if (symtab_shdr->sh_entsize != sizeof(struct elf32_sym))
+    {
+        set_error(elf, "Unexpected symbol entry size");
+        return false;
+    }
+
+    if (symtab_shdr->sh_size % sizeof(struct elf32_sym) != 0)
+    {
+        set_error(elf, "Invalid symbol table size");
+        return false;
+    }
+
+    if (!check_range(elf, symtab_shdr->sh_offset, symtab_shdr->sh_size))
+    {
         return false;
     }
     
@@ -242,6 +325,12 @@ struct elf_file *elf_open(const char *filename)
     {
         set_error(elf, "Failed to open file");
         free(elf);
+        return NULL;
+    }
+
+    if (!set_file_size(elf))
+    {
+        elf_close(elf);
         return NULL;
     }
     
