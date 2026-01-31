@@ -32,8 +32,8 @@ float powf(float arg1, float arg2) {
         return expf( arg2 * logf( arg1 ) );
     }
     if ( arg1 < 0.0 ){
-        temp = arg2;
-        if ( temp == arg2 ){
+        temp = (long)arg2;
+        if ( (float)temp == arg2 ){
             result = expf( arg2 * logf( -arg1 ) );
             return temp & 1 ? -result : result;
         }
