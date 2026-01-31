@@ -28,6 +28,25 @@ void zx7_Decompress(void *dst, const void *src);
 */
 void zx0_Decompress(void *dst, const void *src);
 
+/**
+ * Decompress a length-prefixed block of LZ4 encoded data.
+ *
+ * @param[in] dst Uncompressed data destination.
+ * @param[in] src Compressed data source.
+*/
+void lz4_Decompress(void *dst, const void *src);
+
+/**
+ * Decompress a raw block of LZ4 encoded data.
+ *
+ * @param[in] dst Uncompressed data destination.
+ * @param[in] src Compressed data source start.
+ * @param[in] size Compressed data source size.
+ *
+ * @returns The uncompressed data size.
+*/
+size_t lz4_Decompress_Block(void *dst, const void *src, size_t size);
+
 #ifdef __cplusplus
 }
 #endif
