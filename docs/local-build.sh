@@ -13,4 +13,3 @@ export versions="$default_version nightly"
 export current_version=$default_version
 
 sphinx-build -b html . build/html
-
