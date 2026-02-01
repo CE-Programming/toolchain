@@ -235,13 +235,12 @@ check_already_loaded:
 .no_match:
 	pop	de
 	ld	hl, (end_arc_lib_locs)
-	call	ti.CpHLDE		; have we reached the end of the table?
-	push	af
-	ex	de, hl
-	ld	de, 15			; size of search entry (9=name, 3=ram ptr, 3=arc vec ptr)
+	or	a, a
+	sbc	hl, de			; have we reached the end of the table?
+
+	ld	hl, 15			; size of search entry (9=name, 3=ram ptr, 3=arc vec ptr)
 	add	hl, de
 	ex	de, hl			; end of the extraction table?
-	pop	af
 	pop	hl
 	jr	nz, .loop
 
@@ -381,7 +380,8 @@ good_version:
 	add	hl, de			; hl->start of library relocation table
 	ld	(reloc_tbl_ptr), hl	; store this
 	ld	de, (end_reloc_tbl)
-	call	ti.CpHLDE		; check and see if they match -- if so, this library is going to remain in the archive
+	or	a, a
+	sbc	hl, de			; check and see if they match -- if so, this library is going to remain in the archive
 	jr	nz, need_to_load_lib
 	ld	hl, (arclocation)
 	ld	(ramlocation), hl	; okay, not a ram location, but it's use is still the same
@@ -498,25 +498,26 @@ relocate_absolutes:
 	ld	hl, (reloc_tbl_ptr)	; restore this
 .loop:
 	ld	de, (end_reloc_tbl)
-	call	ti.CpHLDE		; have we reached the end of the relocation table
+	or	a, a
+	sbc	hl, de			; have we reached the end of the relocation table
 	jr	z, .done
-	push	hl			; save pointer to relocation table current
-	ld	a, (hl)
+	add	hl, de			; restore hl
+	ld	e, (hl)
 	inc	hl
-	ld	h, (hl)
-	ld	l, a			; hl->offset in ram library to relocate
-	call	ti.SetHLUTo0
+	push	hl			; save pointer to relocation table current
+	ld	d, (hl)
+	ex.s	de, hl			; hl->offset in ram library to relocate
+	; UHL = 0
+
 	ld	de, (ramlocation)
 	add	hl, de			; hl->location in library to relocate
 	push	hl
 	ld	hl, (hl)		; hl=offset we are relocating
-	ld	de, (ramlocation)
 	add	hl, de			; hl=new address
 	ex	de, hl			; de=new address
 	pop	hl
 	ld	(hl), de		; resolved absolute address
 	pop	hl
-	inc	hl
 	inc	hl			; move to next relocation vector
 	jr	.loop
 
@@ -544,7 +545,9 @@ check_has_deps:				; the first time we hit this,  we have all the dependencies p
 load_next_dep:
 	ld	hl, (end_dep_queue)
 	ld	de, dep_queue_ptr
-	call	ti.CpHLDE		; make sure we are done parsing the dependency queue
+	or	a, a
+	sbc	hl, de			; make sure we are done parsing the dependency queue
+	add	hl, de
 					; now we need to parse the libraries like they are programs. this will be fun.
 	jr	z, .exit
 	dec	hl
