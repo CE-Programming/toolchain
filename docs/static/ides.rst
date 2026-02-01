@@ -42,6 +42,17 @@ The following are currently supported. Raise an issue or pull request on `GitHub
        :align: center
 
 
+    On macOS/Linux, you might want to set the PATH to include the CEdev :code:`bin` folder. Do this by clicking on "Add environment" next to your toolchain's name and setting it to something like :code:`/home/youruser/.cedev.env`.
+    Proceed by making the :code:`/home/youruser/.cedev.env` file with the following content:
+
+    .. code-block:: bash
+
+        PATH=/home/youruser/.cedev/bin:$PATH
+
+    .. image:: images/ides_clion_7.png
+       :align: center
+
+
     CLion will likely warn that "Test CMake run finished with errors".
     This is safe to ignore.
 
