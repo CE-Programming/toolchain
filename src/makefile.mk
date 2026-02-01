@@ -248,12 +248,12 @@ CONVBINFLAGS += -k 8xp-compressed
 else
 CONVBINFLAGS += -k 8xp
 endif
-endif
-
-# common output targer flags
 ifeq ($(HAS_UPPERCASE_NAME),YES)
 CONVBINFLAGS += -u
 endif
+endif
+
+# common output target flags
 ifneq ($(COMMENT),)
 CONVBINFLAGS += -b $(call QUOTE_ARG,$(COMMENT))
 endif
