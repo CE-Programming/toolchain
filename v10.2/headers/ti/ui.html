@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/ui.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/vars.h" href="vars.html" />
+    <link rel="prev" title="ti/tokens.h" href="tokens.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v10.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="debug.html">ti/debug.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/ui.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/ui.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-ui-h">
+<span id="ui-h"></span><h1>ti/ui.h<a class="headerlink" href="#ti-ui-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/ui.h&gt;</span>
+</pre></div>
+</div>
+<p>TI’s apps and the OS itself follow a common user interface design convention.
+While most user programs try hard to escape those conventions, these routines can help you adhere to them if you wish.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI CE OS standard TI user interface stuff. Has run indicator, status bar, TI colors, and user-specified brightness. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_Brightness">
+<span class="target" id="ui_8h_1a1a59c781c55c0214b6eb7b011af29c26"></span><span class="sig-name descname"><span class="n"><span class="pre">os_Brightness</span></span></span><a class="headerlink" href="#c.os_Brightness" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>: User’s configured screen brightness </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_StatusBarBGColor">
+<span class="target" id="ui_8h_1afb42845f8baf2a75e2f8aeda252fd4e9"></span><span class="sig-name descname"><span class="n"><span class="pre">os_StatusBarBGColor</span></span></span><a class="headerlink" href="#c.os_StatusBarBGColor" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint16_t</span></code>: Status bar 565 color </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv411os_colors_t">
+<span id="_CPPv311os_colors_t"></span><span id="_CPPv211os_colors_t"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7be"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_colors_t</span></span></span><a class="headerlink" href="#_CPPv411os_colors_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Colors used by the OS. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t13OS_COLOR_BLUEE">
+<span id="_CPPv3N11os_colors_t13OS_COLOR_BLUEE"></span><span id="_CPPv2N11os_colors_t13OS_COLOR_BLUEE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea320262ff6f6263c5f30186f68d9cf0c4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_BLUE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><a class="headerlink" href="#_CPPv4N11os_colors_t13OS_COLOR_BLUEE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t12OS_COLOR_REDE">
+<span id="_CPPv3N11os_colors_t12OS_COLOR_REDE"></span><span id="_CPPv2N11os_colors_t12OS_COLOR_REDE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea30dfc9956212842519675dbd5420a8a8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_RED</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t12OS_COLOR_REDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t14OS_COLOR_BLACKE">
+<span id="_CPPv3N11os_colors_t14OS_COLOR_BLACKE"></span><span id="_CPPv2N11os_colors_t14OS_COLOR_BLACKE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea19e03ff7b12cc8d2c2a57102e17177e2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_BLACK</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t14OS_COLOR_BLACKE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t16OS_COLOR_MAGENTAE">
+<span id="_CPPv3N11os_colors_t16OS_COLOR_MAGENTAE"></span><span id="_CPPv2N11os_colors_t16OS_COLOR_MAGENTAE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7beac054d9ba0aed7a9efd766f57689a4771"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_MAGENTA</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t16OS_COLOR_MAGENTAE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t14OS_COLOR_GREENE">
+<span id="_CPPv3N11os_colors_t14OS_COLOR_GREENE"></span><span id="_CPPv2N11os_colors_t14OS_COLOR_GREENE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7beaaff9bf342f29d02c06b205fd2d48fe90"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_GREEN</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t14OS_COLOR_GREENE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t15OS_COLOR_ORANGEE">
+<span id="_CPPv3N11os_colors_t15OS_COLOR_ORANGEE"></span><span id="_CPPv2N11os_colors_t15OS_COLOR_ORANGEE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7beafed5901871c83edee7347f2b66cab965"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_ORANGE</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t15OS_COLOR_ORANGEE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t14OS_COLOR_BROWNE">
+<span id="_CPPv3N11os_colors_t14OS_COLOR_BROWNE"></span><span id="_CPPv2N11os_colors_t14OS_COLOR_BROWNE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea98b72fc62a1d0c0d64bee95cf949b3e9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_BROWN</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t14OS_COLOR_BROWNE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t13OS_COLOR_NAVYE">
+<span id="_CPPv3N11os_colors_t13OS_COLOR_NAVYE"></span><span id="_CPPv2N11os_colors_t13OS_COLOR_NAVYE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea2870e1d2eddca02aff3e1836238e07cc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_NAVY</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t13OS_COLOR_NAVYE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t15OS_COLOR_LTBLUEE">
+<span id="_CPPv3N11os_colors_t15OS_COLOR_LTBLUEE"></span><span id="_CPPv2N11os_colors_t15OS_COLOR_LTBLUEE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea20da12dee9e85c80dc58a4d0bcb3f324"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_LTBLUE</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t15OS_COLOR_LTBLUEE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t15OS_COLOR_YELLOWE">
+<span id="_CPPv3N11os_colors_t15OS_COLOR_YELLOWE"></span><span id="_CPPv2N11os_colors_t15OS_COLOR_YELLOWE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bead7c7c9249d881d82525a642941fe85b6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_YELLOW</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t15OS_COLOR_YELLOWE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t14OS_COLOR_WHITEE">
+<span id="_CPPv3N11os_colors_t14OS_COLOR_WHITEE"></span><span id="_CPPv2N11os_colors_t14OS_COLOR_WHITEE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea869bf2bc1df8e7f036b76da8977d4f8e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_WHITE</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t14OS_COLOR_WHITEE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t15OS_COLOR_LTGRAYE">
+<span id="_CPPv3N11os_colors_t15OS_COLOR_LTGRAYE"></span><span id="_CPPv2N11os_colors_t15OS_COLOR_LTGRAYE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea9172c98213f432fd74506c76059701aa"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_LTGRAY</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t15OS_COLOR_LTGRAYE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t16OS_COLOR_MEDGRAYE">
+<span id="_CPPv3N11os_colors_t16OS_COLOR_MEDGRAYE"></span><span id="_CPPv2N11os_colors_t16OS_COLOR_MEDGRAYE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea60ebd2ab5d3c42cd128b438a2bf9d9f4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_MEDGRAY</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t16OS_COLOR_MEDGRAYE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t13OS_COLOR_GRAYE">
+<span id="_CPPv3N11os_colors_t13OS_COLOR_GRAYE"></span><span id="_CPPv2N11os_colors_t13OS_COLOR_GRAYE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea11a3d39e5da87a8573a69fe803a22d21"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_GRAY</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t13OS_COLOR_GRAYE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11os_colors_t17OS_COLOR_DARKGRAYE">
+<span id="_CPPv3N11os_colors_t17OS_COLOR_DARKGRAYE"></span><span id="_CPPv2N11os_colors_t17OS_COLOR_DARKGRAYE"></span><span class="target" id="ui_8h_1a33b96d8def662e168dd4a51d8233b7bea1e32fc4ae9714ba5205494ce88561d05"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OS_COLOR_DARKGRAY</span></span></span><a class="headerlink" href="#_CPPv4N11os_colors_t17OS_COLOR_DARKGRAYE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414boot_ClearVRAMv">
+<span id="_CPPv314boot_ClearVRAMv"></span><span id="_CPPv214boot_ClearVRAMv"></span><span id="boot_ClearVRAM__void"></span><span class="target" id="ui_8h_1a677f306acf49dacc9901bc5f848bc344"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_ClearVRAM</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414boot_ClearVRAMv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Turns all of VRAM into 0xFF (white) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_RunIndicOnv">
+<span id="_CPPv313os_RunIndicOnv"></span><span id="_CPPv213os_RunIndicOnv"></span><span id="os_RunIndicOn__void"></span><span class="target" id="ui_8h_1a6a70310fb85609de996ec93422cd96b7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RunIndicOn</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_RunIndicOnv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to turn on the Run Indicator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RunIndicOffv">
+<span id="_CPPv314os_RunIndicOffv"></span><span id="_CPPv214os_RunIndicOffv"></span><span id="os_RunIndicOff__void"></span><span class="target" id="ui_8h_1adc00870524aba07fd3bd5765ea5bda65"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RunIndicOff</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RunIndicOffv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to turn off the Run Indicator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_DrawStatusBarv">
+<span id="_CPPv316os_DrawStatusBarv"></span><span id="_CPPv216os_DrawStatusBarv"></span><span id="os_DrawStatusBar__void"></span><span class="target" id="ui_8h_1ac04861f74a043a85f576afc18a3b0cea"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_DrawStatusBar</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_DrawStatusBarv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Routine to redraw the status bar. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417os_ForceCmdNoCharv">
+<span id="_CPPv317os_ForceCmdNoCharv"></span><span id="_CPPv217os_ForceCmdNoCharv"></span><span id="os_ForceCmdNoChar__void"></span><span class="target" id="ui_8h_1a190aee5cf27dcd5f6e889ea738e0890b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ForceCmdNoChar</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417os_ForceCmdNoCharv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Executes the assembly routine _ForceCmdNoChar. </p>
+<p>Probably not a good idea to use in a program. </p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tokens.html" class="btn btn-neutral float-left" title="ti/tokens.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vars.html" class="btn btn-neutral float-right" title="ti/vars.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v10.2
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+             </strong> 
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

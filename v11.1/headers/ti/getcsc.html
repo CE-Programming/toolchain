@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/getcsc.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/getkey.h" href="getkey.html" />
+    <link rel="prev" title="ti/flags.h" href="flags.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v11.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="debug.html">ti/debug.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/getcsc.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ti-83-premium-ce">TI-83 Premium CE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/getcsc.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-getcsc-h">
+<span id="getcsc-h"></span><h1>ti/getcsc.h<a class="headerlink" href="#ti-getcsc-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/getcsc.h&gt;</span>
+</pre></div>
+</div>
+<p>Naturally, TI’s operating system also has its own keyboard driver. This header is used to get the CSCs (current scan codes) from the keyboard driver.
+You can easily use this header instead of the <code class="code docutils literal notranslate"><span class="pre">keypadc</span></code> library, and is particularly suited to non-game programs.</p>
+<p>The OS’s interrupt handler handles the keyboard driver and caches a scancode when it detects a key press.
+You can use this scancode directly without any translation of 2nd and alpha through the <code class="code docutils literal notranslate"><span class="pre">os_GetCSC</span></code> function.</p>
+<div class="section" id="ti-83-premium-ce">
+<h2>TI-83 Premium CE<a class="headerlink" href="#ti-83-premium-ce" title="Permalink to this headline"></a></h2>
+<p>Some keys on the TI-83 Premium CE are labeled differently, and some have completely different functions.
+For convenience, there are additional equates for the TI-83 Premium CE names.
+In the table below, the five keys with different functions are <strong>emphasized.</strong></p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 23%" />
+<col style="width: 28%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>TI-84 Plus CE</p></th>
+<th class="head"><p>Equate</p></th>
+<th class="head"><p>TI-83 Premium CE</p></th>
+<th class="head"><p>Equate</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Y=</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Yequ</span></code></p></td>
+<td><p>f(x)</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Fx</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Window</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Window</span></code></p></td>
+<td><p>Fenetre</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Fenetre</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Del</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Del</span></code></p></td>
+<td><p>Suppr</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Suppr</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Apps</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Apps</span></code></p></td>
+<td><p><strong>Matrice</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Matrice</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Clear</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Clear</span></code></p></td>
+<td><p>Annul</p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Annul</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>x^-1</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Recip</span></code></p></td>
+<td><p><strong>&lt;&gt;</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_TglExact</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Sin</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Sin</span></code></p></td>
+<td><p><strong>Trig</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Trig</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Cos</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Cos</span></code></p></td>
+<td><p><strong>Resol</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Resol</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Tan</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Tan</span></code></p></td>
+<td><p><strong>Fraction template</strong></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">sk_Frac</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI’s keyboard interface defines. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_KbdScanCode">
+<span class="target" id="getcsc_8h_1a1961f212f475638d54f1d00fb5af2e81"></span><span class="sig-name descname"><span class="n"><span class="pre">os_KbdScanCode</span></span></span><a class="headerlink" href="#c.os_KbdScanCode" title="Permalink to this definition"></a><br /></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">uint8_t</span></code>: Cached GetCSC code. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Down">
+<span class="target" id="getcsc_8h_1a2c75438769dbf61e21838a32152bcdba"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Down</span></span></span><a class="headerlink" href="#c.sk_Down" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Left">
+<span class="target" id="getcsc_8h_1a70256156a12cba1feb0582e2a9b0234b"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Left</span></span></span><a class="headerlink" href="#c.sk_Left" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Right">
+<span class="target" id="getcsc_8h_1ae8540720c62051ac14cb13ede7e20b29"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Right</span></span></span><a class="headerlink" href="#c.sk_Right" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Up">
+<span class="target" id="getcsc_8h_1a5c8b1f6b47f80a13fd4373be0f0b9c36"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Up</span></span></span><a class="headerlink" href="#c.sk_Up" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Enter">
+<span class="target" id="getcsc_8h_1ace6566c9ac75a18166175cebf5267897"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Enter</span></span></span><a class="headerlink" href="#c.sk_Enter" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_2nd">
+<span class="target" id="getcsc_8h_1a03be428817e801a785a5960c1d754741"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_2nd</span></span></span><a class="headerlink" href="#c.sk_2nd" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Clear">
+<span class="target" id="getcsc_8h_1a1d137f77f2768db0f34644f5a5acd698"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Clear</span></span></span><a class="headerlink" href="#c.sk_Clear" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE name. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Alpha">
+<span class="target" id="getcsc_8h_1ab56ea207538bcd6b67761e5fc9a29c00"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Alpha</span></span></span><a class="headerlink" href="#c.sk_Alpha" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Add">
+<span class="target" id="getcsc_8h_1a9e3b2df68b182f6fe1f4cfb105f687c9"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Add</span></span></span><a class="headerlink" href="#c.sk_Add" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Sub">
+<span class="target" id="getcsc_8h_1aebb5a02262297fb47abc83ec1f5c55d8"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Sub</span></span></span><a class="headerlink" href="#c.sk_Sub" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Subtract, not negate. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Mul">
+<span class="target" id="getcsc_8h_1a09fa720e805f6cd714bece232377c418"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Mul</span></span></span><a class="headerlink" href="#c.sk_Mul" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Div">
+<span class="target" id="getcsc_8h_1a095a90343f08ab1af18de71e6c7d2d05"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Div</span></span></span><a class="headerlink" href="#c.sk_Div" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Graph">
+<span class="target" id="getcsc_8h_1a868b114e0f26a14633feefc5d0228298"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Graph</span></span></span><a class="headerlink" href="#c.sk_Graph" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Trace">
+<span class="target" id="getcsc_8h_1a90649dc5cb1b16e4aeef167d0d130efc"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Trace</span></span></span><a class="headerlink" href="#c.sk_Trace" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Zoom">
+<span class="target" id="getcsc_8h_1a382149fe8aeda22e1b5e8f05f07fd975"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Zoom</span></span></span><a class="headerlink" href="#c.sk_Zoom" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Window">
+<span class="target" id="getcsc_8h_1a099750a478469ecc75f6917b33b12150"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Window</span></span></span><a class="headerlink" href="#c.sk_Window" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE name. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Yequ">
+<span class="target" id="getcsc_8h_1a5ad877c1baae4751bf9d2e565e267e4a"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Yequ</span></span></span><a class="headerlink" href="#c.sk_Yequ" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE name. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Mode">
+<span class="target" id="getcsc_8h_1a3c1f1073047de5e6b48ea83cefa45dea"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Mode</span></span></span><a class="headerlink" href="#c.sk_Mode" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Del">
+<span class="target" id="getcsc_8h_1a5429ee44b03b1c07d1f5637c48f3fb2b"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Del</span></span></span><a class="headerlink" href="#c.sk_Del" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE name. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Store">
+<span class="target" id="getcsc_8h_1af4ff882b3486ee11b2522c6e07e156de"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Store</span></span></span><a class="headerlink" href="#c.sk_Store" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Ln">
+<span class="target" id="getcsc_8h_1a77ea4ada3b5c6e91f2ac498d4fb1ec6a"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Ln</span></span></span><a class="headerlink" href="#c.sk_Ln" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Log">
+<span class="target" id="getcsc_8h_1aea3ea4568ce981243316cebfe040ac00"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Log</span></span></span><a class="headerlink" href="#c.sk_Log" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Square">
+<span class="target" id="getcsc_8h_1a3658dc4415951f4545565f22779405dc"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Square</span></span></span><a class="headerlink" href="#c.sk_Square" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Recip">
+<span class="target" id="getcsc_8h_1af018fa70ccce4cb50014fe47dd89bd41"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Recip</span></span></span><a class="headerlink" href="#c.sk_Recip" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE [x^-1]; on the TI-83 Premium CE, this is [&lt;&gt;]. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Math">
+<span class="target" id="getcsc_8h_1aee9256171dc84217f73abd33a4bb15ad"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Math</span></span></span><a class="headerlink" href="#c.sk_Math" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_0">
+<span class="target" id="getcsc_8h_1a107424754c6ced8fde7f43525877d2c6"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_0</span></span></span><a class="headerlink" href="#c.sk_0" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_1">
+<span class="target" id="getcsc_8h_1a99884613a7d8a319f5e5e02b4da251a0"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_1</span></span></span><a class="headerlink" href="#c.sk_1" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_4">
+<span class="target" id="getcsc_8h_1a6962b7824f23188f0bc30a9a5bb818ed"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_4</span></span></span><a class="headerlink" href="#c.sk_4" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_7">
+<span class="target" id="getcsc_8h_1aae8ce2f90b05b744da1eb4d757448536"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_7</span></span></span><a class="headerlink" href="#c.sk_7" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_2">
+<span class="target" id="getcsc_8h_1abeb7bb1fb04c5a21a3c0cc71324ba3fe"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_2</span></span></span><a class="headerlink" href="#c.sk_2" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_5">
+<span class="target" id="getcsc_8h_1a4d37996377d968f9ae54cb2e5294611f"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_5</span></span></span><a class="headerlink" href="#c.sk_5" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_8">
+<span class="target" id="getcsc_8h_1ade510981c2c9883b0b756cc7e9851292"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_8</span></span></span><a class="headerlink" href="#c.sk_8" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_3">
+<span class="target" id="getcsc_8h_1adccc883367005168abd764c8b5b9b1b0"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_3</span></span></span><a class="headerlink" href="#c.sk_3" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_6">
+<span class="target" id="getcsc_8h_1a421ef6c9153d1faad778b92c1e2e2283"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_6</span></span></span><a class="headerlink" href="#c.sk_6" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_9">
+<span class="target" id="getcsc_8h_1a9b25413200fa8f9a81fc687e0d47d98f"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_9</span></span></span><a class="headerlink" href="#c.sk_9" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Comma">
+<span class="target" id="getcsc_8h_1ab2c43aab4e49b9a9783f6528d8ca953f"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Comma</span></span></span><a class="headerlink" href="#c.sk_Comma" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Sin">
+<span class="target" id="getcsc_8h_1ae9348115c3bd00b5ca67bb295e76d926"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Sin</span></span></span><a class="headerlink" href="#c.sk_Sin" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE; on the TI-83 Premium CE, this is [TRIG] </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Apps">
+<span class="target" id="getcsc_8h_1aea7afc8a6d48b1394e9614d7cb9a2e2f"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Apps</span></span></span><a class="headerlink" href="#c.sk_Apps" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE; on the TI-83 Premium CE, this is [MATRICE]. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_GraphVar">
+<span class="target" id="getcsc_8h_1ad1eecddc3d60d3ae585027758351870c"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_GraphVar</span></span></span><a class="headerlink" href="#c.sk_GraphVar" title="Permalink to this definition"></a><br /></dt>
+<dd><p>X, T, theta, n. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_DecPnt">
+<span class="target" id="getcsc_8h_1ae63a99354da0ba2741eeb7d796c14fa7"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_DecPnt</span></span></span><a class="headerlink" href="#c.sk_DecPnt" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_LParen">
+<span class="target" id="getcsc_8h_1a9e00aceb8802fa4118ec5080c57ba091"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_LParen</span></span></span><a class="headerlink" href="#c.sk_LParen" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Cos">
+<span class="target" id="getcsc_8h_1a57ab6f59e0256e9d737f222020725b15"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Cos</span></span></span><a class="headerlink" href="#c.sk_Cos" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE; on the TI-83 Premium CE, this is [RESOL]. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Prgm">
+<span class="target" id="getcsc_8h_1acd7621446beeb40e12a27522af536748"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Prgm</span></span></span><a class="headerlink" href="#c.sk_Prgm" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Stat">
+<span class="target" id="getcsc_8h_1a55afacf6f1ad6eabe8d863c6f7e5083e"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Stat</span></span></span><a class="headerlink" href="#c.sk_Stat" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Chs">
+<span class="target" id="getcsc_8h_1a8eb47085b9c2f7c169ed8f8f351bfe95"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Chs</span></span></span><a class="headerlink" href="#c.sk_Chs" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Unary negation, not subtraction. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_RParen">
+<span class="target" id="getcsc_8h_1a0a4c7cf8b1f242ceacf30bbebf1f0c8a"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_RParen</span></span></span><a class="headerlink" href="#c.sk_RParen" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Tan">
+<span class="target" id="getcsc_8h_1a6b6ec3e95a2bfb38bed674ffede71585"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Tan</span></span></span><a class="headerlink" href="#c.sk_Tan" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-84 Plus CE; on; the TI-83 Premium CE, this is the fraction template. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Vars">
+<span class="target" id="getcsc_8h_1a76b95ab31869fd9b146070265f32f17d"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Vars</span></span></span><a class="headerlink" href="#c.sk_Vars" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Power">
+<span class="target" id="getcsc_8h_1aa3b0f41471839a72fb4670eb927b6c14"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Power</span></span></span><a class="headerlink" href="#c.sk_Power" title="Permalink to this definition"></a><br /></dt>
+<dd><p>[^] </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Fenetre">
+<span class="target" id="getcsc_8h_1a827ee1eb03ea101bd4c393c3253e0a64"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Fenetre</span></span></span><a class="headerlink" href="#c.sk_Fenetre" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE name. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Fx">
+<span class="target" id="getcsc_8h_1a98dd2e5797db12707815f773eb9441eb"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Fx</span></span></span><a class="headerlink" href="#c.sk_Fx" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE name. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Suppr">
+<span class="target" id="getcsc_8h_1a676248c78d8a7bb0d93be621a257e2d3"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Suppr</span></span></span><a class="headerlink" href="#c.sk_Suppr" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE name. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_TglExact">
+<span class="target" id="getcsc_8h_1aa2e76da22efd657afc59715cf781662b"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_TglExact</span></span></span><a class="headerlink" href="#c.sk_TglExact" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE [&lt;&gt;]; it’s [x^-1] on the TI-84 Plus CE. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Trig">
+<span class="target" id="getcsc_8h_1a7f6584bfdcf051f7bffc280e083fcff1"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Trig</span></span></span><a class="headerlink" href="#c.sk_Trig" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE; on the TI-84 Plus CE, this is [SIN]. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Matrice">
+<span class="target" id="getcsc_8h_1a219d4000113ff2572c487c9ec38288b5"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Matrice</span></span></span><a class="headerlink" href="#c.sk_Matrice" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE; on the TI-84 Plus CE, this is [APPS]. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Resol">
+<span class="target" id="getcsc_8h_1a40604a4ac5baf1c60a4e71e6becda570"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Resol</span></span></span><a class="headerlink" href="#c.sk_Resol" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE; on the TI-84 Plus CE, this is [COS]. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Frac">
+<span class="target" id="getcsc_8h_1aa77e5e94a48a139d402d2dbc08d53e45"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Frac</span></span></span><a class="headerlink" href="#c.sk_Frac" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE; on the TI-84 Plus CE, this is [TAN]. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.sk_Annul">
+<span class="target" id="getcsc_8h_1ac18ba1f114f2f11ca2711cc46b0751f3"></span><span class="sig-name descname"><span class="n"><span class="pre">sk_Annul</span></span></span><a class="headerlink" href="#c.sk_Annul" title="Permalink to this definition"></a><br /></dt>
+<dd><p>TI-83 Premium CE name. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419boot_CheckOnPressedv">
+<span id="_CPPv319boot_CheckOnPressedv"></span><span id="_CPPv219boot_CheckOnPressedv"></span><span id="boot_CheckOnPressed__void"></span><span class="target" id="getcsc_8h_1ab2e816a24c2b94e7b10ec6ed83c1bf68"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_CheckOnPressed</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419boot_CheckOnPressedv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if the [on] key was pressed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True is returned if [on] key was pressed </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49os_GetCSCv">
+<span id="_CPPv39os_GetCSCv"></span><span id="_CPPv29os_GetCSCv"></span><span id="os_GetCSC__void"></span><span class="target" id="getcsc_8h_1abe440243235535e1d921d6b26b4ecdc3"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetCSC</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49os_GetCSCv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Performs an OS call to get the keypad scan code. </p>
+<p>This function does NOT block, use <a class="reference internal" href="getkey.html#getkey_8h_1a2fe1d4602b3181350157d3c5cec287a7"><span class="std std-ref">os_GetKey()</span></a> if you need blocking.</p>
+<p>This function does NOT account for 2nd/alpha modifiers. Use os_getKey() if you need to account for those</p>
+<p>You can also use this function to get input from the user as a string like this: <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">chars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\0\0\0\0\0\0\0\0\0\0\&quot;</span><span class="s">WRMH</span><span class="se">\0\0</span><span class="s">?[VQLG</span><span class="se">\0\0</span><span class="s">:ZUPKFC</span><span class="se">\0</span><span class="s"> YTOJEB</span><span class="se">\0\0</span><span class="s">XSNIDA</span><span class="se">\0\0\0\0\0\0\0\0</span><span class="s">&quot;</span><span class="p">;</span>
+<span class="kt">uint8_t</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+
+<span class="k">while</span><span class="p">((</span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">os_GetCSC</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">sk_Enter</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">chars</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">[</span><span class="n">i</span><span class="o">++</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chars</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+ Feel free to modify the string to suit your needs. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Keypad scan code or 0 if no key is pressed </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="flags.html" class="btn btn-neutral float-left" title="ti/flags.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="getkey.html" class="btn btn-neutral float-right" title="ti/getkey.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v11.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

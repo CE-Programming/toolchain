@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using Git For Revision Control &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="General Coding Guidelines" href="coding-guidelines.html" />
+    <link rel="prev" title="Frequently Asked Questions" href="faq.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v9.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Information</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using Git For Revision Control</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-git">What is Git?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-git-not">What is Git not?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-github">What is GitHub?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-github-not">What is GitHub not?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#downloading-git">Downloading Git</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-does-git-work">How does Git work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-git-and-github">Using Git and GitHub</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#creating-a-repository">Creating a Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-gitignore-file">The .gitignore file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#making-commits">Making commits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-repository-to-github">Adding a repository to GitHub</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-releases-to-github">Adding releases to GitHub</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">CE Toolchain Specific Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Using Git For Revision Control</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="using-git-for-revision-control">
+<span id="git"></span><h1>Using Git For Revision Control<a class="headerlink" href="#using-git-for-revision-control" title="Permalink to this headline"></a></h1>
+<div class="section" id="what-is-git">
+<h2>What is Git?<a class="headerlink" href="#what-is-git" title="Permalink to this headline"></a></h2>
+<p>Git is a revision control system.
+It was designed to be used to keep track of the history of a code project and allow multiple people to work simultaneously on the same project.</p>
+<div class="section" id="what-is-git-not">
+<h3>What is Git not?<a class="headerlink" href="#what-is-git-not" title="Permalink to this headline"></a></h3>
+<p>A file hosting tool.
+Git can only properly track text-based files – you should not include binaries (8XPs, EXEs, ZIPs, etc.) or the output of a compiler.
+It’s fine to track images and other manually-generated non-text files, but Git doesn’t track their history in the same way.</p>
+</div>
+</div>
+<div class="section" id="what-is-github">
+<h2>What is GitHub?<a class="headerlink" href="#what-is-github" title="Permalink to this headline"></a></h2>
+<p>GitHub is an online service that hosts Git repositories so that multiple people can easily access them.</p>
+<div class="section" id="what-is-github-not">
+<h3>What is GitHub not?<a class="headerlink" href="#what-is-github-not" title="Permalink to this headline"></a></h3>
+<p>Git - You can use Git without GitHub, and you should probably familiarize yourself with Git before using GitHub.
+Nor is GitHub a file hosting service - Most of the benefits of GitHub over another site (say, Mediafire, or Google Drive) come from Git.
+If your GitHub repositories are not proper Git repositories, you might as well be using another service!</p>
+</div>
+</div>
+<div class="section" id="downloading-git">
+<h2>Downloading Git<a class="headerlink" href="#downloading-git" title="Permalink to this headline"></a></h2>
+<p>You can download Git <a class="reference external" href="https://git-scm.com/downloads">here</a>.</p>
+</div>
+<div class="section" id="how-does-git-work">
+<h2>How does Git work?<a class="headerlink" href="#how-does-git-work" title="Permalink to this headline"></a></h2>
+<p>Git keeps track of changes to files using <em>commits</em>.
+Each commit contains information about what files were changed since the last commit, who made the changes, when the changes were made, and a message to help you remember what changed with that commit.
+You can easily restore a previous commit, or just see what the code looked like at that point.
+All projects that use Git contain data called a <em>repository</em>, which is stored in a hidden metadata folder named <em>.git</em>.
+To use any Git commands, you must first create a repository.</p>
+</div>
+<div class="section" id="using-git-and-github">
+<h2>Using Git and GitHub<a class="headerlink" href="#using-git-and-github" title="Permalink to this headline"></a></h2>
+<div class="section" id="creating-a-repository">
+<h3>Creating a Repository<a class="headerlink" href="#creating-a-repository" title="Permalink to this headline"></a></h3>
+<p>For CE toolchain projects, navigate to your project’s directory (the directory you run <em>make</em> from), and execute <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">init</span></code>.</p>
+<p>You can also make a copy of a repository that is already on GitHub using <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">(URL)</span></code>.
+This command downloads the repository and its associated files into a new folder.
+For example, <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/commandblockguy/dino-run-ce.git</span></code> would create the folder dino-run-ce, and download the source for Dino Run CE into it.
+You can then <code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">dino-run-ce</span></code>, and run <code class="code docutils literal notranslate"><span class="pre">make</span></code> without any further setup.
+This is what makes Git significantly more convenient than a zip with the source.</p>
+</div>
+<div class="section" id="the-gitignore-file">
+<h3>The .gitignore file<a class="headerlink" href="#the-gitignore-file" title="Permalink to this headline"></a></h3>
+<p>You generally want Git to ignore automatically generated/binary files (8XPs, EXEs, the output of convimg, etc.).
+You don’t have to store these files as you can regenerate them from the source, and the files are likely to change with every commit.
+This makes the repository much larger and commits harder to read, and requires you to manually add them to each commit.
+Luckily, Git includes an easy way to do this – .gitignore files.
+To use them, just create a file called <em>.gitignore</em> and add a list of files/folders you want to ignore.
+I recommend the following .gitignore file, as it should match all non-source files:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bin/
+obj/
+src/gfx/*.c
+src/gfx/*.h
+</pre></div>
+</div>
+</div></blockquote>
+<p>Now, from Git’s perspective, these files basically no longer exist - you won’t be asked to add them to commits and it will keep your repository clean.</p>
+</div>
+<div class="section" id="making-commits">
+<h3>Making commits<a class="headerlink" href="#making-commits" title="Permalink to this headline"></a></h3>
+<p>Now that we are ignoring the right files, how do we add the ones we actually care about to the repository?
+Before making a commit, you have to add the files that you want to include in the commit.
+To get a list of the files that you can add, run <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span></code> – The files that you have already added are in green, and the files that have changed but that will not be included in the next commit are in red.
+To add the files to the next commit, run <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span> <span class="pre">(file1)</span> <span class="pre">(file2)</span> <span class="pre">(file3)</span> <span class="pre">(etc)</span></code>.
+Once you are done adding files, you can create the commit by running <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">&quot;Some</span> <span class="pre">message</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">commit&quot;</span></code>.</p>
+</div>
+<div class="section" id="adding-a-repository-to-github">
+<h3>Adding a repository to GitHub<a class="headerlink" href="#adding-a-repository-to-github" title="Permalink to this headline"></a></h3>
+<p>Right now, the repository exists on your local computer and can be used with all Git commands, but it is not backed up to GitHub so that others can access it.
+To do that, you must first <a class="reference external" href="https://github.com/new">create a new repository on GitHub</a>.
+Leave the “Initialize this repository with a README” box unchecked.
+This will make a blank repository on GitHub that we can write our local changes to.
+Next, we add the GitHub repository as a “remote” that we can save our local changes to.
+To do this, run <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">remote</span> <span class="pre">add</span> <span class="pre">origin</span> <span class="pre">https://github.com/&lt;user&gt;/&lt;repo&gt;.git</span></code>, substituting with your user and repository names.
+The final step is to synchronize the changes in your local repository with the remote GitHub repository by “pushing”.
+This is done via the command <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">master</span></code>.
+The remote repository will only be updated with your code and commits when you push.</p>
+<p>Before pushing, it is good practice to run <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">pull</span> <span class="pre">--rebase</span> <span class="pre">origin</span> <span class="pre">master</span></code> to prevent conflicts.
+You do not have to push after every commit - Git is running on your computer, and you can still use all of its features without pushing your code to GitHub.
+You only need to push when you want to share the code on your computer with others.</p>
+<p>Avoid using the GitHub web interface as much as possible.
+Although it may initially seem more convenient, it makes it much easier to accidentally use Git in a way that it wasn’t intended for.
+This only applies to your actual code - the web interface is the only way to create a repository, view the issues, create a wiki, and add releases.
+Any action besides these should be done in the Git command line.
+If you are unsure how to do something, feel free to ask in our IRC channel!</p>
+</div>
+<div class="section" id="adding-releases-to-github">
+<h3>Adding releases to GitHub<a class="headerlink" href="#adding-releases-to-github" title="Permalink to this headline"></a></h3>
+<p>Since it’s poor practice to include binaries in a Git repository, GitHub has another way of hosting them - the Releases tab.
+To access the Releases tab, open your repository on the GitHub website and click on the Releases button above the file list.
+From there, you create a release by clicking “Draft a new release”.
+Give it a tag like “v1.0” and a name and a description.
+Then, you can add 8XPs or a ZIP file to the file upload area by clicking and dragging or by clicking the upload area and selecting a file.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="faq.html" class="btn btn-neutral float-left" title="Frequently Asked Questions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="coding-guidelines.html" class="btn btn-neutral float-right" title="General Coding Guidelines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v9.2
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+             </strong> 
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
