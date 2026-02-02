@@ -22,7 +22,7 @@ static void draw_spinner(void)
     /* Convert the character into a null-terminated string. */
     char str[2] = { character, '\0' };
 
-    /* Draw the string to the screen. */    
+    /* Draw the string to the screen. */
     os_SetCursorPos(0, 0);
     os_PutStrFull(str);
 

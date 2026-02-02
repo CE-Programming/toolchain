@@ -76,7 +76,7 @@ float tanf(float arg)
             x = 1.0f - x;
             flag = true;
             break;
-            
+
         case 2:
             sign = !sign;
             flag = true;

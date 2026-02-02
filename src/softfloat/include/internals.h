@@ -135,7 +135,7 @@ float32_t
 #define softfloat_isSigNaNF64UI( uiA )
 ((((uiA) & UINT64_C( 0x7FF8000000000000 )) == UINT64_C( 0x7FF0000000000000 )) && ((uiA) & UINT64_C( 0x0007FFFFFFFFFFFF )))
  (((~(a) & UINT64_C( 0x7FF0000000000000 )) == 0) && ((a) & UINT64_C( 0x000FFFFFFFFFFFFF )))
-#define isNaNF64UI( a ) 
+#define isNaNF64UI( a )
 #else
 bool isNaNF64UI(uint64_t a) __attribute__((__const__, __nothrow__, __leaf__));
 #endif

@@ -53,7 +53,7 @@ float nextdownf(float x) {
         ret.bin = Float32_neg_subnorm_min;
         return ret.flt;
     }
-    
+
     if (signbit(x)) {
         // Towards negative infinity
         arg_x.bin++;

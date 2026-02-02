@@ -37,7 +37,7 @@ int main(void)
 
     test_strlcpy_impl(19);
     test_strlcpy_impl(10);
-    
+
     while (!os_GetCSC()) {};
 
     test_strlcpy_impl(1);

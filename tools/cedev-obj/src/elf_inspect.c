@@ -80,19 +80,19 @@ struct elf_file
     FILE *fp;
     char error[256];
     size_t file_size;
-    
+
     /* ELF header */
     struct elf32_ehdr ehdr;
-    
+
     /* Section headers */
     struct elf32_shdr *section_headers;
-    
+
     /* String tables */
     char *shstrtab;
     size_t shstrtab_size;
     char *strtab;
     size_t strtab_size;
-    
+
     /* Symbol table */
     struct elf32_sym *symtab;
     size_t symtab_count;
@@ -136,7 +136,7 @@ static bool read_at(FILE *fp, void *buf, size_t size, long offset)
     {
         return false;
     }
-    
+
     return fread(buf, 1, size, fp) == size;
 }
 
@@ -153,14 +153,14 @@ static bool parse_elf_header(struct elf_file *elf)
         set_error(elf, "Failed to read ELF header");
         return false;
     }
-    
+
     /* Check ELF magic number */
     if (memcmp(elf->ehdr.e_ident, "\177ELF", 4) != 0)
     {
         set_error(elf, "Not an ELF file");
         return false;
     }
-    
+
     /* Check for 32-bit */
     if (elf->ehdr.e_ident[EI_CLASS] != ELFCLASS32)
     {
@@ -179,7 +179,7 @@ static bool parse_elf_header(struct elf_file *elf)
         set_error(elf, "No section headers present");
         return false;
     }
-    
+
     return true;
 }
 
@@ -196,20 +196,20 @@ static bool load_section_headers(struct elf_file *elf)
     {
         return false;
     }
-    
+
     elf->section_headers = malloc(shdr_table_size);
     if (!elf->section_headers)
     {
         set_error(elf, "Failed to allocate section headers");
         return false;
     }
-    
+
     if (!read_at(elf->fp, elf->section_headers, shdr_table_size, elf->ehdr.e_shoff))
     {
         set_error(elf, "Failed to read section headers");
         return false;
     }
-    
+
     return true;
 }
 
@@ -220,7 +220,7 @@ static bool load_string_table(struct elf_file *elf, uint32_t shdr_idx, char **st
         set_error(elf, "Invalid section index");
         return false;
     }
-    
+
     struct elf32_shdr *shdr = &elf->section_headers[shdr_idx];
     if (shdr->sh_type != SHT_STRTAB)
     {
@@ -231,14 +231,14 @@ static bool load_string_table(struct elf_file *elf, uint32_t shdr_idx, char **st
     {
         return false;
     }
-    
+
     *strtab = malloc(shdr->sh_size);
     if (!*strtab)
     {
         set_error(elf, "Failed to allocate string table");
         return false;
     }
-    
+
     if (!read_at(elf->fp, *strtab, shdr->sh_size, shdr->sh_offset))
     {
         set_error(elf, "Failed to read string table");
@@ -246,7 +246,7 @@ static bool load_string_table(struct elf_file *elf, uint32_t shdr_idx, char **st
         *strtab = NULL;
         return false;
     }
-    
+
     *size = shdr->sh_size;
     return true;
 }
@@ -255,7 +255,7 @@ static bool load_symbol_table(struct elf_file *elf)
 {
     /* Find .symtab section */
     struct elf32_shdr *symtab_shdr = NULL;
-    
+
     for (uint16_t i = 0; i < elf->ehdr.e_shnum; i++)
     {
         if (elf->section_headers[i].sh_type == SHT_SYMTAB)
@@ -264,7 +264,7 @@ static bool load_symbol_table(struct elf_file *elf)
             break;
         }
     }
-    
+
     if (!symtab_shdr)
     {
         set_error(elf, "No symbol table found");
@@ -287,7 +287,7 @@ static bool load_symbol_table(struct elf_file *elf)
     {
         return false;
     }
-    
+
     /* Load symbol table */
     elf->symtab_count = symtab_shdr->sh_size / sizeof(struct elf32_sym);
     elf->symtab = malloc(symtab_shdr->sh_size);
@@ -296,19 +296,19 @@ static bool load_symbol_table(struct elf_file *elf)
         set_error(elf, "Failed to allocate symbol table");
         return false;
     }
-    
+
     if (!read_at(elf->fp, elf->symtab, symtab_shdr->sh_size, symtab_shdr->sh_offset))
     {
         set_error(elf, "Failed to read symbol table");
         return false;
     }
-    
+
     /* Load associated string table */
     if (!load_string_table(elf, symtab_shdr->sh_link, &elf->strtab, &elf->strtab_size))
     {
         return false;
     }
-    
+
     return true;
 }
 
@@ -319,7 +319,7 @@ struct elf_file *elf_open(const char *filename)
     {
         return NULL;
     }
-    
+
     elf->fp = fopen(filename, "rb");
     if (!elf->fp)
     {
@@ -333,32 +333,32 @@ struct elf_file *elf_open(const char *filename)
         elf_close(elf);
         return NULL;
     }
-    
+
     if (!parse_elf_header(elf))
     {
         elf_close(elf);
         return NULL;
     }
-    
+
     if (!load_section_headers(elf))
     {
         elf_close(elf);
         return NULL;
     }
-    
+
     /* Load section header string table */
     if (!load_string_table(elf, elf->ehdr.e_shstrndx, &elf->shstrtab, &elf->shstrtab_size))
     {
         elf_close(elf);
         return NULL;
     }
-    
+
     if (!load_symbol_table(elf))
     {
         elf_close(elf);
         return NULL;
     }
-    
+
     return elf;
 }
 
@@ -368,32 +368,32 @@ void elf_close(struct elf_file *elf)
     {
         return;
     }
-    
+
     if (elf->fp)
     {
         fclose(elf->fp);
     }
-    
+
     if (elf->section_headers)
     {
         free(elf->section_headers);
     }
-    
+
     if (elf->shstrtab)
     {
         free(elf->shstrtab);
     }
-    
+
     if (elf->strtab)
     {
         free(elf->strtab);
     }
-    
+
     if (elf->symtab)
     {
         free(elf->symtab);
     }
-    
+
     free(elf);
 }
 
@@ -425,7 +425,7 @@ bool elf_has_defined_symbol(struct elf_file *elf, const char *symbol_name)
     {
         return false;
     }
-    
+
     for (size_t i = 0; i < elf->symtab_count; i++)
     {
         if (elf->symtab[i].st_name < elf->strtab_size)
@@ -437,7 +437,7 @@ bool elf_has_defined_symbol(struct elf_file *elf, const char *symbol_name)
             }
         }
     }
-    
+
     return false;
 }
 
@@ -447,7 +447,7 @@ bool elf_has_section(struct elf_file *elf, const char *section_name)
     {
         return false;
     }
-    
+
     for (uint16_t i = 0; i < elf->ehdr.e_shnum; i++)
     {
         if (elf->section_headers[i].sh_name < elf->shstrtab_size)
@@ -460,7 +460,7 @@ bool elf_has_section(struct elf_file *elf, const char *section_name)
             }
         }
     }
-    
+
     return false;
 }
 

@@ -38,7 +38,7 @@ void os_ThrowError(uint8_t error) __attribute__((noreturn));
  *     os_PopErrorHandler();
  * }
  * @endcode
- * 
+ *
  * @warning This does not respect C++ destructors!  So don't use anything that requires a non-trivial destructor.
  *
  * @see os_PopErrorHandler

@@ -14,12 +14,12 @@ SECTIONS
         PROVIDE_HIDDEN (___icon_optional = .);
         KEEP (*(.header.icon))
     } >prgm
-    
+
     .init :
     {
         *(.init)
     } >prgm
-    
+
     .text :
     {
         *(.text.unlikely .text.*_unlikely .text.unlikely.*)
@@ -30,7 +30,7 @@ SECTIONS
         *(.text .stub .text.* .gnu.linkonce.t.*)
         *(.gnu.warning)
     } >prgm
-    
+
     .rodata :
     {
         *(.rodata .rodata.* .gnu.linkonce.r.*)
@@ -44,7 +44,7 @@ SECTIONS
         KEEP (*(.init_array))
         PROVIDE_HIDDEN (__init_array_end = .);
     } >prgm
-    
+
     .fini_array :
     {
         PROVIDE_HIDDEN (__fini_array_start = .);
@@ -119,10 +119,10 @@ SECTIONS
     .eh_frame 0 : { KEEP(*(.eh_frame)) }
     .eh_frame_hdr 0 : { KEEP(*(.eh_frame_hdr)) }
 
-    /DISCARD/ : 
-    { 
+    /DISCARD/ :
+    {
         *(.runprgm.reloc)
-        *(.comment) 
-        *(.note*) 
+        *(.comment)
+        *(.note*)
     }
 }

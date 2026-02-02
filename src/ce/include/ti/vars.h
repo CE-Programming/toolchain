@@ -4,7 +4,7 @@
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
  * @brief TI CE OS user variables and memory
- * 
+ *
  * This declares routines for low-level access to user variables (AppVars, programs, Str0-9, matrix, &c.),
  * as well as other user-memory management routines (not the heap!), stat vars, and the RunPrgm interface.
  */
@@ -49,7 +49,7 @@ extern "C" {
  * So the flash writing code has to be copied to RAM first.
  * It is copied here.
  * You can use this as long as you don't attempt any flash writes.
- * 
+ *
  * Type: `uint8_t[1023]`
  */
 #define os_RamCode         ((uint8_t*)0xD18C7C)
@@ -73,7 +73,7 @@ extern "C" {
 #define OS_TYPE_REAL_LIST    (0x01)
 /** Matrix variable */
 #define OS_TYPE_MATRIX       (0x02)
-/** Equation */ 
+/** Equation */
 #define OS_TYPE_EQU          (0x03)
 /** String */
 #define OS_TYPE_STR          (0x04)

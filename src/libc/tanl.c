@@ -58,7 +58,7 @@ long double tanl(long double arg)
             x = 1.0L - x;
             flag = true;
             break;
-            
+
         case 2:
             sign = !sign;
             flag = true;

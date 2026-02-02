@@ -415,7 +415,7 @@ $(OBJDIR)/%.$(CPP_EXTENSION).o: $(OBJDIR)/%.$(CPP_EXTENSION).s
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(AS) $(EZASFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))
 
-$(OBJDIR)/%.s.o: $$(call UPDIR_RM,$$*).s 
+$(OBJDIR)/%.s.o: $$(call UPDIR_RM,$$*).s
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)echo [as] $<
 	$(Q)$(AS) $(EZASFLAGS) $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$<)) -o $(call QUOTE_ARG,$(addprefix $(CURDIR)/,$@))

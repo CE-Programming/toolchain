@@ -70,7 +70,7 @@ void dbg_Debugger(void);
  * is read, written, or executed. Use the masks DBG_WATCHPOINT_READ,
  * DBG_WATCHPOINT_WRITE, and DBG_WATCHPOINT_EXECUTE respectively to
  * configure the watchpoint.
- * 
+ *
  * @param[in] address Watchpoint address.
  * @param[in] size Watchpoint size in bytes. Currently must be 1.
  * @param[in] mask Watchpoint mask, use DBG_WATCHPOINT_NONE to remove

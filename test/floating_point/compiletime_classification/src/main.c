@@ -696,7 +696,7 @@ int run_test(void) {
 
 int main(void) {
     os_ClrHome();
-    
+
     int failed_test = run_test();
     if (failed_test != 0) {
         char buf[sizeof("Failed test L-8388608")];

@@ -126,10 +126,10 @@ SECTIONS
     .eh_frame 0 : { KEEP(*(.eh_frame)) }
     .eh_frame_hdr 0 : { KEEP(*(.eh_frame_hdr)) }
 
-    /DISCARD/ : 
-    { 
-        *(.comment) 
-        *(.note*) 
+    /DISCARD/ :
+    {
+        *(.comment)
+        *(.note*)
     }
 }
 

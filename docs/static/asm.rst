@@ -76,11 +76,11 @@ Below is an example C prototype followed by the assembly implementation:
     	pop	de
     	push	de	; de = arg
     	push	hl
-    
+
     	push	de
     	call	_external_func
     	pop	de
-    
+
     	ret
 
     	.extern	_external_func
@@ -94,7 +94,7 @@ Below is an example C prototype followed by the assembly implementation:
         printf("external_func called with %d\n", arg);
         return 4321;
     }
-    
+
     void test(void)
     {
         int arg = 1234;

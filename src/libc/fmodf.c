@@ -9,7 +9,7 @@ asm
     "\t.type _fmod, @function\n"
     "\t.equ _fmod, _fmodf\n"
 );
- 
+
 #else
 
 #include <math.h>

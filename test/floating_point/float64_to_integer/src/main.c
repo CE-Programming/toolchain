@@ -51,7 +51,7 @@ size_t run_test(const char** failed_func) {
             if (ru32 != output[i].u32) {
                 print_failed(input[i], (uint64_t)ru32, (uint64_t)output[i].u32);
                 *failed_func = "dtoul";
-                return i; 
+                return i;
             }
         }
     }

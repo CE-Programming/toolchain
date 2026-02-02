@@ -44,7 +44,7 @@ size_t run_test(void) {
 
     for (size_t i = 0; i < length; i++) {
         F32_pun result;
-        
+
         result.flt = (float)input[i];
         if (result.bin != output[i].bin) {
             // ignore round to maximum magnitude errors from __ltof

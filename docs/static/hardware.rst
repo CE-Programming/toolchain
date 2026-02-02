@@ -154,7 +154,7 @@ The toolchain exposes these special addresses as variables you can read and writ
 .. code-block:: c
 
     #include <sys/lcd.h> // Gets access to the LCD's special memory addresses
-    
+
     // Later in your program
     // Show the current backlight level by reading it directly from hardware:
     printf("Current backlight level: 0x%2X\n", lcd_BacklightLevel);
@@ -239,9 +239,9 @@ The calculator has a USB port which uses a Faraday FOTG210.
 A hardware driver is implemented in the  :ref:`usbdrvce <usbdrvce_h>` library; available toolchain libraries are listed below.
 
 =============================  ====================================
-Library                        Use Case            
+Library                        Use Case
 =============================  ====================================
-:ref:`usbdrvce <usbdrvce_h>`   USB data/control transfers 
+:ref:`usbdrvce <usbdrvce_h>`   USB data/control transfers
 :ref:`msddrvce <msddrvce_h>`   Mass Storage Device access (drives)
 :ref:`fatdrvce <fatdrvce_h>`   FAT32 filesystem support
 :ref:`srldrvce <srldrvce_h>`   Serial device/host driver

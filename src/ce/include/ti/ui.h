@@ -52,7 +52,7 @@ tiflags void os_DrawStatusBar(void);
 
 /**
  * Executes the assembly routine _ForceCmdNoChar
- * 
+ *
  * Probably not a good idea to use in a program.
  */
 void os_ForceCmdNoChar(void);

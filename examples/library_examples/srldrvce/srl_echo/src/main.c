@@ -89,7 +89,7 @@ int main(void) {
 
     do {
         kb_Scan();
-        
+
         usb_HandleEvents();
 
         if(has_srl_device) {

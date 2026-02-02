@@ -139,7 +139,7 @@ void lcd_SetDefaultGamma(void);
 
 /**
  * Sends a command, given a pointer to its raw parameters.
- * 
+ *
  * @see lcd_SendSizedCommandRaw
  *
  * @param[in] cmd Command name without `LCD_CMD_` prefix
@@ -151,7 +151,7 @@ void lcd_SetDefaultGamma(void);
 
 /**
  * Sends a command with an arbitrary number of byte parameters.
- * 
+ *
  * @see lcd_SendSizedCommandBytes
  *
  * @param[in] cmd Command name without `LCD_CMD_` prefix

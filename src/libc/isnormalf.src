@@ -1,7 +1,7 @@
 	.assume	adl=1
 
 	.section	.text
-	
+
 	.global	__isnormalf
 	.type	__isnormalf, @function
 

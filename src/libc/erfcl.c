@@ -11,7 +11,7 @@ long double erfcl(long double arg) {
     long double x, x_sqr;
     long double t0, t1, t2, t3, t4, t5;
     long double ret;
-    
+
     x = fabsl(arg);
     x_sqr = x * x;
     t0 = 0.56418958354775629L / (x + 2.06955023132914151L);

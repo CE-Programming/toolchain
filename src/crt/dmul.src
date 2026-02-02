@@ -10,20 +10,20 @@ __dmul:
 	push	af
 	push	iy
 	ld	iy, 9
-	add	iy, sp	
-	
+	add	iy, sp
+
 	push	iy
 	push	bc
 	push	de
 	push	hl
-	
+
 	ld	a, b	; signbit(x)
 	xor	a, (iy + 7)	; signbit(y)
 	rla
 	push	af	; Carry = (signbit(x) != signbit(y))
-	
+
 	call	___f64_mul
-	
+
 	pop	af
 	pop	af
 	pop	af

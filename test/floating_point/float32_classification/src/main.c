@@ -79,7 +79,7 @@ static test_result fpclassify_test(void) {
 
     test_result ret;
     ret.passed = false;
-    
+
     F32_pun x;
     x.bin = 0;
     const testb* ground_truth = &test_values[0];
@@ -117,7 +117,7 @@ static test_result fpclassify_test(void) {
                 | (is_inf << (2 * 3)) | (is_finite << (3 * 3))
                 | (is_normal << (4 * 3)) | (is_subnormal << (5 * 3))
                 | (is_zero << (6 * 3));
-                
+
             ret.guess_fp = fp_class;
             return ret;
         }

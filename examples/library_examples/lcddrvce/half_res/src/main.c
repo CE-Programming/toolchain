@@ -18,7 +18,7 @@ int main(void)
 {
     /* Initialize GraphX first, because it sets LCD timing */
     gfx_Begin();
-    
+
     /* Set half-resolution mode */
     SetHalfResMode(true);
 
@@ -34,7 +34,7 @@ int main(void)
     {
         /* Clear the screen, gfx_FillScreen covers too much area so use this instead */
         QuarterResFillScreen(255);
-        
+
         /* Print the message on the screen */
         PrintCentered("Hello, World!", border);
 
@@ -192,7 +192,7 @@ void SetHalfResMode(bool enable)
     /* Set fixed left scroll area */
     lcd_SetScrollArea(p->tfa, LCD_WIDTH - p->tfa, 0);
     /* Set starting vertical scroll address to 0 */
-    lcd_SetScrollAddress(0);    
+    lcd_SetScrollAddress(0);
     /* Set display mode */
     lcd_SetRamInterface(p->ramctrl1);
     /* Set interlace mode */

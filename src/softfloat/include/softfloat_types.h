@@ -52,9 +52,9 @@ typedef struct { uint16_t v; } float16_t;
 typedef struct { uint32_t v; } float32_t;
 typedef struct { uint64_t v; } float64_t;
 #else
-typedef uint16_t float16_t; 
-typedef uint32_t float32_t; 
-typedef uint64_t float64_t; 
+typedef uint16_t float16_t;
+typedef uint32_t float32_t;
+typedef uint64_t float64_t;
 #endif
 typedef struct { uint64_t v[2]; } float128_t;
 

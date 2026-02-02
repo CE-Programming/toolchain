@@ -25,7 +25,7 @@ The function :code:`gfx_SetPalette` can set multiple color entries at once, whic
 A better option when working with graphx is to utilize the `convimg <https://github.com/mateoconlechuga/convimg>`_ tool which is supplied with the toolchain.
 This tool is able to consume multiple images and sprites and to create a palette that matches as closely as possible with only 256 colors.
 The output of this tool is normal data arrays which are then automatically picked up by the compiler at build time, making the process seamless.
-Additionally, convimg allows sprite and color data to be stored in AppVars to help reduce the size of the program binary. 
+Additionally, convimg allows sprite and color data to be stored in AppVars to help reduce the size of the program binary.
 
 Default Palette
 ^^^^^^^^^^^^^^^

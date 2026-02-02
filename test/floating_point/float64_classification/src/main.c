@@ -79,7 +79,7 @@ static test_result fpclassify_test(void) {
 
     test_result ret;
     ret.passed = false;
-    
+
     F64_pun x;
     x.bin = 0;
     const testb* ground_truth = &test_values[0];

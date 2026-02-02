@@ -152,7 +152,7 @@ Changes:
   * Fixed duplicated OS_TOK_STAT_F define by @adriweb
   * Fixed some repository submodule issues by @myclevorname
   * Fixed color quantization for unique colors in convimg by @mateoconlechuga
-  
+
 * **Improvements**:
   * Fixes/improvements for str[n]casecmp by @calc84maniac
   * Fixes/improvements for GetStringInput by @calc84maniac
