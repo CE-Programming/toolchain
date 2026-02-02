@@ -95,20 +95,17 @@ lz4_decompress_block_internal:
 	; Set BC to the literal length, which is known to be non-zero
 	ld	c, b
 	ld	b, 0
-	; Mask the backref field, affecting the zero flag, and clear carry
-	and	a, $0F
-.L.copy_literal:
 	; Copy the literals
 	ldir
-	; Zero flag is currently set according to the backref field
-	; If the backref field is non-zero, this cannot be end of block 
+	; Mask the backref field
+	and	a, $0F
+	; If the backref field is non-zero, this cannot be end of block
 	jr	nz, .L.backref
-	; Check for end of block (carry is currently clear)
-	lea	bc, iy + 0
-	sbc	hl, bc
-	ret	nc
-	add	hl, bc
-	inc.s	bc	; BCU = 0
+	; Check for end of block quickly
+	ld	a, l
+	sub	a, iyl
+	jr	z, .L.maybe_end_of_block
+	xor	a, a
 .L.backref:
 	; Read backref offset into BC
 	ld	c, (hl)
@@ -157,7 +154,7 @@ lz4_decompress_block_internal:
 	jr	.L.backref_loop
 
 .L.literal_long:
-	; Save the backref field
+	; Save the backref field and zero flag
 	push	af
 	; Start with literal length of 15
 	ld	b, 0
@@ -193,8 +190,18 @@ lz4_decompress_block_internal:
 	ldir
 	; Copy the amount of the last length byte, plus 1
 	ld	c, a
-	; Restore the backref field
+	ldir
+	; Restore the backref field and zero flag
 	pop	af
-	; Affect the zero flag based on the backref field and clear carry
+	; If the backref field is non-zero, this cannot be end of block
+	jr	nz, .L.backref
+	; Clear carry
 	or	a, a
-	jr	.L.copy_literal
+.L.maybe_end_of_block:
+	; Full check for end of block (carry is clear and A = 0)
+	lea	bc, iy + 0
+	sbc	hl, bc
+	add	hl, bc
+	inc.s	bc	; BCU = 0
+	jr	nz, .L.backref
+	ret
