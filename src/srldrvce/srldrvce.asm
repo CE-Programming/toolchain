@@ -36,6 +36,14 @@ end macro
 ; memory structures
 ;-------------------------------------------------------------------------------
 macro struct? name*, parameters&
+ local anon
+ anon = 0
+ macro name args&
+  anon = anon + 1
+  repeat 1, @anon: anon
+   .@anon name args
+  end repeat
+ end macro
  macro end?.struct?!
      iterate base, ., .base
       if defined base
@@ -46,7 +54,7 @@ macro struct? name*, parameters&
   end struc
   iterate <base,prefix>, 0,, ix-name,x, iy-name,y
    virtual at base
-	prefix#name	name
+	?prefix#name	name
    end virtual
   end iterate
   purge end?.struct?
@@ -75,6 +83,10 @@ struct srl_device
 	tx_addr				rb 1
 	type				rb 1
 	subtype				rb 1
+	idvendor			rw 1
+	idproduct			rw 1
+	bcddevice			rw 1
+	baudtype			rb 1
 	rx_buf				ring_buf_ctrl
 	tx_buf				ring_buf_ctrl
 	error				rl 1
@@ -87,19 +99,38 @@ virtual at 0
 	SRL_TYPE_CDC			rb 1	; CDC device
 	SRL_TYPE_FTDI			rb 1	; FTDI device
 	SRL_TYPE_PL2303			rb 1	; PL2303 device
+	SRL_TYPE_CH34X			rb 1	; CH34X device
+	SRL_TYPE_CP210X			rb 1	; CP210X device
 end virtual
 
 virtual at 0
 	SRL_SUBTYPE_FTDI_UNKNOWN	rb 1
+;	SRL_SUBTYPE_SIO			rb 1
+;	SRL_SUBTYPE_FT8U232AM		rb 1
+;	SRL_SUBTYPE_FT232BM		rb 1
+;	SRL_SUBTYPE_FT2232C		rb 1
+;	SRL_SUBTYPE_FT232RL		rb 1
+;	SRL_SUBTYPE_FTX			rb 1
+;	SRL_SUBTYPE_FT2232H		rb 1
+;	SRL_SUBTYPE_FT4232H		rb 1
+;	SRL_SUBTYPE_FT232H		rb 1
+	
 	SRL_SUBTYPE_SIO			rb 1
-	SRL_SUBTYPE_FT8U232AM		rb 1
-	SRL_SUBTYPE_FT232BM		rb 1
+	SRL_SUBTYPE_FT232A		rb 1
+	SRL_SUBTYPE_FT232B		rb 1
 	SRL_SUBTYPE_FT2232C		rb 1
-	SRL_SUBTYPE_FT232RL		rb 1
-	SRL_SUBTYPE_FTX			rb 1
+	SRL_SUBTYPE_FT232R		rb 1				; FT232RL tested
+	SRL_SUBTYPE_FT232H		rb 1
 	SRL_SUBTYPE_FT2232H		rb 1
 	SRL_SUBTYPE_FT4232H		rb 1
-	SRL_SUBTYPE_FT232H		rb 1
+	SRL_SUBTYPE_FT4232HA		rb 1
+	SRL_SUBTYPE_FT232HP		rb 1
+	SRL_SUBTYPE_FT233HP		rb 1
+	SRL_SUBTYPE_FT2232HP		rb 1
+	SRL_SUBTYPE_FT2233HP		rb 1
+	SRL_SUBTYPE_FT4232HP		rb 1
+	SRL_SUBTYPE_FT4233HP		rb 1
+	SRL_SUBTYPE_FTX			rb 1
 end virtual
 
 virtual at 0
@@ -107,7 +138,31 @@ virtual at 0
 	SRL_SUBTYPE_PL2303_HX		rb 1
 end virtual
 
-SRL_INTERFACE_ANY	:= $FF
+virtual at 0
+	SRL_SUBTYPE_CH340		rb 1				; CH340 tested
+	SRL_SUBTYPE_CH341		rb 1
+end virtual
+
+virtual at 0
+	SRL_SUBTYPE_CP2101		rb 1
+	SRL_SUBTYPE_CP2102		rb 1				; CP2102 tested
+	SRL_SUBTYPE_CP2103		rb 1
+end virtual
+
+virtual at 0
+	BAUD_TYPE_UNKNOWN		rb 1
+	BAUD_TYPE_HOST			rb 1
+	BAUD_TYPE_CDC			rb 1
+	BAUD_TYPE_FTDI_SIO		rb 1
+	BAUD_TYPE_FTDI_AM		rb 1
+	BAUD_TYPE_FTDI_BM		rb 1
+	BAUD_TYPE_FTDI_H		rb 1
+	BAUD_TYPE_PL2303		rb 1
+	BAUD_TYPE_CH34X			rb 1
+	BAUD_TYPE_CP210X		rb 1
+end virtual
+
+SRL_INTERFACE_ANY		:= $FF
 
 SRL_SUCCESS			:= 0
 SRL_ERROR_INVALID_PARAM		:= -1
@@ -129,13 +184,33 @@ SRL_ERROR_DEVICE_DISCONNECTED	:= -7
 ?USB_TRANSFER_FAILED		:= 1 shl 6
 ?USB_TRANSFER_CANCELLED		:= 1 shl 7
 
-struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?
-	label .: 8
+; vendor device matching equates
+mtEquals		:= $20						; jr nz - for equal to (test succeeds on opposite of flag)
+mtGreaterThanOrEqualTo	:= $38						; jr c - for greater than (or equal to) (adjust your table value by 1 to achieve 'greater than' behaviour)
+mtLessThan		:= $30						; jr nc - for less than
+
+struct setuppkt, requestType: ?, request: ?, value: ?, index: ?, length: ?, data: 0
+	label .: 11
 	bmRequestType		db requestType
 	bRequest		db request
 	wValue			dw value
 	wIndex			dw index
 	wLength			dw length
+	ldata			dl data
+end struct
+
+struct baud, deviceType: ?, value: ?, index: ?
+	label .: 5
+	bdeviceSubType		db deviceType
+	wValue			dw value
+	wIndex			dw index
+end struct
+
+struct devchk, param: ?, matchtype: ?, value: ?
+	label .: 4
+	bParameter		db param
+	bMatchType		db matchtype
+	wValue			dw value
 end struct
 
 struct descriptor
@@ -145,7 +220,7 @@ struct descriptor
 end struct
 struct deviceDescriptor
 	label .: 18
-	descriptor		descriptor
+	?descriptor		descriptor
 	bcdUSB			rw 1
 	bDeviceClass		rb 1
 	bDeviceSubClass		rb 1
@@ -161,7 +236,7 @@ struct deviceDescriptor
 end struct
 struct configurationDescriptor
 	label .: 9
-	descriptor		descriptor
+	?descriptor		descriptor
 	wTotalLength		rw 1
 	bNumInterfaces		rb 1
 	bConfigurationValue	rb 1
@@ -171,7 +246,7 @@ struct configurationDescriptor
 end struct
 struct interfaceDescriptor
 	label .: 9
-	descriptor		descriptor
+	?descriptor		descriptor
 	bInterfaceNumber	rb 1
 	bAlternateSetting	rb 1
 	bNumEndpoints		rb 1
@@ -182,7 +257,7 @@ struct interfaceDescriptor
 end struct
 struct endpointDescriptor
 	label .: 7
-	descriptor		descriptor
+	?descriptor		descriptor
 	bEndpointAddress	rb 1
 	bmAttributes		rb 1
 	wMaxPacketSize		rw 1
@@ -190,12 +265,12 @@ struct endpointDescriptor
 end struct
 
 ; enum usb_find_flag
-?IS_NONE		:= 0
-?IS_DISABLED		:= 1 shl 0
-?IS_ENABLED		:= 1 shl 1
-?IS_DEVICE		:= 1 shl 2
-?IS_HUB			:= 1 shl 3
-?IS_ATTACHED		:= 1 shl 4
+?IS_NONE			:= 0
+?IS_DISABLED			:= 1 shl 0
+?IS_ENABLED			:= 1 shl 1
+?IS_DEVICE			:= 1 shl 2
+?IS_HUB				:= 1 shl 3
+?IS_ATTACHED			:= 1 shl 4
 
 ; enum usb_descriptor_type
 virtual at 1
@@ -205,6 +280,8 @@ virtual at 1
 	?INTERFACE_DESCRIPTOR			rb 1
 	?ENDPOINT_DESCRIPTOR			rb 1
 end virtual
+
+null				:= 0
 
 ;srl_error_t srl_Open(srl_device_t *srl,
 ;                     usb_device_t dev,
@@ -412,6 +489,7 @@ srl_Open:
 	call	get_device_type
 	pop	iy
 	ld	a,(xsrl_device.type)			; check if type is unknown
+	
 	cp	a,SRL_TYPE_UNKNOWN
 	ld	a,SRL_ERROR_INVALID_DEVICE
 	jq	z,.exit
@@ -647,7 +725,6 @@ srl_UsbEventCallback:
 .line_coding:
 	rb	7
 
-
 ; Gets the device type and subtype based on the descriptors
 ; Inputs:
 ;  ix: Serial device struct
@@ -663,8 +740,16 @@ get_device_type:
 
 ; todo: vendor-specific devices
 
-; check for CDC ACM device
 	ld	hl,(xsrl_device.rx_buf.buf_start)
+	push	hl
+	ld	de,deviceDescriptor.idVendor
+	add	hl,de
+	lea	de,xsrl_device.idvendor
+	ld	bc,6
+	ldir								; set idVendor, idProduct & bcdDevice (expand if device matching requires it)
+	pop	hl
+	
+; check for CDC ACM device
 	call	next_descriptor
 	inc	hl
 	inc	hl
@@ -694,7 +779,27 @@ get_device_type:
 	ld	bc,0
 	ld	a,(yinterfaceDescriptor.bInterfaceClass)
 	cp	a,$a	; CDC data class
+	jq	z,.cdc_int_found
+	cp	$FF	; Vendor specific
 	jq	nz,.find_int_loop
+
+	call	check_vendor_specific_device
+	jq	c,.find_int_loop
+	
+	ld	a,(bc)							; set type, subtype and baudtype from table
+	ld	(xsrl_device.type),a
+	inc	bc
+	ld	a,(bc)
+	ld	(xsrl_device.subtype),a
+	inc	bc
+	ld	a,(bc)
+	ld	(xsrl_device.baudtype),a
+	ld	bc,0
+	jr	.find_ep_loop
+
+.cdc_int_found:
+	ld	a,SRL_TYPE_CDC
+	ld	(xsrl_device.type),a
 
 .find_ep_loop:
 	push	bc
@@ -717,8 +822,6 @@ get_device_type:
 	
 	ld	(xsrl_device.tx_addr),b
 	ld	(xsrl_device.rx_addr),c
-	ld	a,SRL_TYPE_CDC
-	ld	(xsrl_device.type),a
 	ret
 .not_int:
 	cp	a,ENDPOINT_DESCRIPTOR
@@ -743,6 +846,72 @@ get_device_type:
 	ld	(xsrl_device.subtype),a
 	ld	(xsrl_device.rx_addr),a
 	ld	(xsrl_device.tx_addr),a
+	ret
+
+; Checks for compatible Vendor Specific device
+; Inputs:
+;  ix: Serial device struct
+; Outputs:
+;  bc = address for device type, subtype & baudtype
+;  carry = error or SUCCESS
+; Destroys: af
+check_vendor_specific_device:
+	push	hl,de
+	ld	hl,vendor_device_match_table
+	ld	b,(hl)							; total devices to check
+	inc	hl
+.loop1:
+	push	hl,bc
+	ld	hl,(hl)							; get current device
+	ld	b,(hl)							; number of conditional check to perform
+	inc	hl
+.loop2:
+	push	hl,bc
+	ld	de,0							; deal with upper byte :S
+	ld	a,(hl)							; device parameter to match
+	ld	(.srl_device_param),a
+	lea	bc,xsrl_device
+.srl_device_param = $-1
+	ld	a,(bc)
+	ld	e,a
+	inc	bc
+	ld	a,(bc)
+	ld	d,a							; de = get parameter to check	
+	inc	hl
+	ld	a,(hl)
+	ld	(.match_type),a						; match mode (self-modify comparison)
+	inc	hl
+	ld	bc,0							; deal with upper byte :S
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	push	bc
+	pop	hl							; hl = value to check against
+	ex	de,hl
+	or	a
+	sbc	hl,de							; hl = srl_device, de = current table value
+.match_type = $+0
+	jr	nz,.match_not_found
+.match_found:
+	pop	bc,hl
+	ld	de,1+1+2						; size of each match entry
+	add	hl,de
+	djnz	.loop2
+.vendor_specific_device_found:
+	push	hl
+	pop	bc							; return pointer
+	pop	hl,hl,de,hl
+	or	a							; nc = SUCCESS
+	ret
+.match_not_found:
+	pop	bc,hl,bc,hl
+	inc	hl
+	inc	hl
+	inc	hl							; next device in table
+	djnz	.loop1
+.no_vendor_specific_device_found:
+	pop	de,hl
+	scf								; c = error
 	ret
 
 ; Skips to the next descriptor
@@ -780,7 +949,6 @@ next_interface_descriptor:
 	scf
 	ret
 
-
 ; Initializes a serial device whose type has been determined
 ; Inputs:
 ;  ix: Serial device struct
@@ -799,16 +967,20 @@ init_device:
 ;  hl: Error or SRL_SUCCESS
 set_rate:
 	ld	a,(xsrl_device.type)
-	or	a,a
+	cp	SRL_TYPE_UNKNOWN			; UNKNOWN
 	jq	z,.invalid_device
-	dec	a					; type == HOST
+	cp	SRL_TYPE_HOST				; type == HOST
 	jq	z,.success
-	dec	a					; type == CDC
+	cp	SRL_TYPE_CDC				; type == CDC
 	jq	z,set_rate_cdc
-	dec	a					; type == FTDI
+	cp	SRL_TYPE_FTDI				; type == FTDI
 	jq	z,set_rate_ftdi
-	dec	a					; type == PL2303
+	cp	SRL_TYPE_PL2303				; type == PL2303
 	jq	z,set_rate_cdc
+	cp	SRL_TYPE_CH34X				; type == ch340x
+	jq	z,set_rate_ch34x
+	cp	SRL_TYPE_CP210X				; type == cp210x
+	jq	z,set_rate_cp210x
 .invalid_device:
 	ld	hl,SRL_ERROR_INVALID_DEVICE
 	ret
@@ -825,35 +997,8 @@ set_rate:
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate_cdc:
-	ld	(.linecoding),hl
-	ld	bc,0
-	push	bc	; transferred
-	ld	bc,50
-	push	bc	; num retries
-	ld	bc,.linecoding
-	push	bc	; data
-	ld	bc,.setup
-	push	bc	; setup
-
-	ld	bc,0
-	push	bc	; ep addr
-	ld	bc,(xsrl_device.dev)
-	push	bc	; device
-	call	usb_GetDeviceEndpoint
-	pop	bc,bc
-
-	push	hl	; endpoint
-	call	usb_ControlTransfer
-	pop	bc,bc,bc,bc,bc
-	ld	a,l
-	or	a,a
-	ret	z
-	ld	l,SRL_ERROR_USB_FAILED
-	ret
-.setup	setuppkt	$21,$20,$0000,$0000,$0007
-.linecoding:
-	db	$80,$25,0,0,0,0,8
-
+	ld	(default_cdc_setup.linecoding),hl			; set baud rate
+	jq	set_rate_ct						; set
 
 ; Sets the baud rate of a FTDI device
 ; Inputs:
@@ -862,8 +1007,24 @@ set_rate_cdc:
 ;  c: Interface number
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
-set_rate_ftdi:
-	ret
+set_rate_ftdi:								; mine is FT232RL, use some kind of gettype to determine correct table
+	ld	a,(xsrl_device.baudtype)
+	call	get_baud_settings_from_table
+	or	a
+	jq	nz,set_rate_ct.error
+	ld	a,(hl)
+	ld	(ft232rl_setup.baudDivisor + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(ft232rl_setup.baudDivisor + 1),a			; divisor & 0xFFFF
+	inc	hl
+	ld	a,(hl)
+	ld	(ft232rl_setup.baudDivisor + 2),a
+	inc	hl
+	ld	a,(hl)
+	ld	(ft232rl_setup.baudDivisor + 3),a			; divisor >> 16
+	ld	hl,ft232rl_setup
+	jq	set_rate_ct
 
 ; Sets the baud rate of a PL2303 device
 ; Inputs:
@@ -873,6 +1034,140 @@ set_rate_ftdi:
 ; Returns:
 ;  hl: Error or SRL_SUCCESS
 set_rate_pl2303:
+	ret
+
+; Sets the baud rate of a CH34X device
+; Inputs:
+;  ix: Serial device struct
+;  hl: Baud rate
+; Returns:
+;  l: Error or SRL_SUCCESS
+set_rate_ch34x:
+	ld	a,(xsrl_device.baudtype)
+	call	get_baud_settings_from_table
+	or	a
+	jq	nz,set_rate_ct.error
+	ld	a,(hl)
+	ld	(ch34x_setup.baudFactor + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(ch34x_setup.baudFactor + 1),a				; baud factor
+	inc	hl
+	ld	a,(hl)
+	ld	(ch34x_setup.baudfOffset + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(ch34x_setup.baudfOffset + 1),a				; baud offset
+	ld	hl,ch34x_setup
+	jq	set_rate_ct	
+
+; Sets the baud rate of a CP210X device
+; Inputs:
+;  ix: Serial device struct
+;  hl: Baud rate
+; Returns:
+;  l: Error or SRL_SUCCESS
+set_rate_cp210x:
+	ld	a,(xsrl_device.baudtype)
+	call	get_baud_settings_from_table
+	or	a
+	jq	nz,set_rate_ct.error
+	ld	a,(hl)
+	ld	(cp210x_setup.baudRate + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(cp210x_setup.baudRate + 1),a				; baud rate (0x384000 / baudrate)
+	ld	hl,cp210x_setup
+	jq	set_rate_ct
+
+; Sets the baud rate of a compatible USB device
+; Inputs:
+;  ix: Serial device struct
+;  hl: Pointer to setup data
+; Returns:
+;  hl: Error or SRL_SUCCESS
+set_rate_ct:
+	ld	b,(hl)							; total number of packets
+	inc	hl
+.loop:
+	push	bc,hl
+	ld	bc,0
+	push	bc							; transferred
+	ld	bc,50
+	push	bc							; num retries
+	ex	de,hl
+	ld	bc,sizeof setuppkt - 3
+	add	hl,bc
+	ld	bc,(hl)
+	push	bc							; data
+	push	de							; setup
+	ld	bc,0
+	push	bc							; ep addr
+	ld	bc,(xsrl_device.dev)
+	push	bc							; device
+	call	usb_GetDeviceEndpoint
+	pop	bc,bc
+	push	hl							; endpoint
+	call	usb_ControlTransfer
+	pop	bc,bc,bc,bc,bc,de,bc
+	ld	a,l							; returned error code
+	or	a,a
+	jq	nz,.error						; something went wrong
+	ld	hl,sizeof setuppkt
+	add	hl,de							; next setup packet
+	djnz	.loop
+	ld	l,SRL_SUCCESS
+	ret
+.error:
+	ld	hl,SRL_ERROR_USB_FAILED
+	ret
+
+; Gets baud settings for device based on baud type and baud rate
+; Inputs:
+;  a: device baud type
+;  hl: baud rate
+; Returns:
+;  hl: pointer to baud table entry
+;  a: Error or SRL_SUCCESS
+get_baud_settings_from_table:
+	push	af							; save subtype
+	ld	a,(baud_rate_table)
+	ld	de,baud_rate_table + 1
+	ex	de,hl
+.findLoop:
+	ld	bc,(hl)
+	ex	de,hl
+	or	a
+	sbc	hl,bc
+	add	hl,bc
+	ex	de,hl
+	jr	z,get_baud_settings_table_data
+	ld	bc,6
+	add	hl,bc
+	dec	a
+	jr	nz,.findLoop
+.error:
+	pop	af
+	ld	a,SRL_ERROR_USB_FAILED					; baud rate not found
+	ret
+get_baud_settings_table_data:
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	hl,(hl)
+	ld	b,(hl)
+	inc	hl
+	ld	de,sizeof baud
+	pop	af							; restore subtype
+.findLoop:
+	cp	(hl)
+	jr	z,.get_baud_rate
+	add	hl,de
+	djnz	.findLoop
+	jr	get_baud_settings_from_table.error			; device subtype not found
+.get_baud_rate:
+	inc	hl
+	xor	a
 	ret
 
 ; Checks how many contiguous bytes are available in a ring buffer
@@ -1245,3 +1540,220 @@ start_write:
 	xor	a,a
 	ld	(xsrl_device.tx_buf.dma_active),a
 	ret
+
+;========================================================================
+; Data tables
+;========================================================================
+; Vendor match table
+; Each table consists of a set of paramters to check to confirm a device
+vendor_device_match_table:
+	db	19							; total number of devices in table (8-bits for now)
+	dl	.device_id_ftdi_sio
+	dl	.device_id_ftdi_ft232a
+	dl	.device_id_ftdi_ft232b
+	dl	.device_id_ftdi_ft2232c
+	dl	.device_id_ftdi_ft232r
+	dl	.device_id_ftdi_ft2232h
+	dl	.device_id_ftdi_ft4232h
+	dl	.device_id_ftdi_ft232h
+	dl	.device_id_ftdi_ftx
+	dl	.device_id_ftdi_ft2233hp
+	dl	.device_id_ftdi_ft4233hp
+	dl	.device_id_ftdi_ft2232hp
+	dl	.device_id_ftdi_ft4232hp
+	dl	.device_id_ftdi_ft233hp
+	dl	.device_id_ftdi_ft232hp
+	dl	.device_id_ftdi_ft4232ha
+	dl	.device_id_ch340
+	dl	.device_id_ch341
+	dl	.device_id_cp2102
+
+.device_id_ftdi_sio:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtLessThan, $0200			; < $0200 = SIO
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_SIO, BAUD_TYPE_FTDI_SIO
+.device_id_ftdi_ft232a:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $0200			; $0200 = FT232A
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT232A, BAUD_TYPE_FTDI_AM
+.device_id_ftdi_ft232b:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $0400			; $0400 = FT232B
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT232B, BAUD_TYPE_FTDI_BM
+.device_id_ftdi_ft2232c:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $0500			; $0500 = FT2232C
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT2232C, BAUD_TYPE_FTDI_BM
+.device_id_ftdi_ft232r:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $0600			; $0600 = FT232R
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT232R, BAUD_TYPE_FTDI_BM
+.device_id_ftdi_ft2232h:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $0700			; $0700 = FT2232H
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT2232H, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft4232h:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $0800			; $0800 = FT4232H
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT4232H, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft232h:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $0900			; $0900 = FT232H
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT232H, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ftx:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $1000			; $1000 = FTX
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FTX, BAUD_TYPE_FTDI_BM
+.device_id_ftdi_ft2233hp:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $2800			; $2800 = FT2233HP
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT2233HP, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft4233hp:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $2900			; $2900 = FT4233HP
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT4233HP, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft2232hp:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $3000			; $3000 = FT2232HP
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT2232HP, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft4232hp:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $3100			; $3100 = FT4232HP
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT4232HP, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft233hp:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $3200			; $3200 = FT233HP
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT233HP, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft232hp:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $3300			; $3300 = FT232HP
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT232HP, BAUD_TYPE_FTDI_H
+.device_id_ftdi_ft4232ha:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $0403			; idVendor = FTDI
+	devchk	srl_device.bcddevice, mtEquals, $3600			; $3600 = FT4232HA
+	db	SRL_TYPE_FTDI, SRL_SUBTYPE_FT4232HA, BAUD_TYPE_FTDI_H
+
+.device_id_ch340:
+	db	2							; number of conditional checks to perform
+	devchk	srl_device.idvendor, mtEquals, $1A86			; paramter to check, match mode (equal, greater than, less than), value to check against
+	devchk	srl_device.idproduct, mtEquals, $7523
+	db	SRL_TYPE_CH34X, SRL_SUBTYPE_CH340, BAUD_TYPE_CH34X	; device data if matched: type, sub type and baud type
+.device_id_ch341:
+	db	2							; number of conditional checks to perform
+	devchk	srl_device.idvendor, mtEquals, $1A86			; paramter to check, match mode (equal, greater than, less than), value to check against
+	devchk	srl_device.idproduct, mtEquals, $5523
+	db	SRL_TYPE_CH34X, SRL_SUBTYPE_CH341, BAUD_TYPE_CH34X	; device data if matched: type, sub type and baud type
+.device_id_cp2102:
+	db	2
+	devchk	srl_device.idvendor, mtEquals, $10C4
+	devchk	srl_device.idproduct, mtEquals, $EA60
+	db	SRL_TYPE_CP210X, SRL_SUBTYPE_CP2102, BAUD_TYPE_CP210X
+
+;========================================================================
+; Device specific init & baud rate usb control data
+;
+; Default CDC baud settings
+default_cdc_setup:
+	db	1							; number of packets to transfer
+	setuppkt $21,$20,$0000,$0000,$0007,.linecoding			; set baud rate
+.linecoding = $ + 0
+	db	$80,$25,0,0,0,0,8
+
+; CH34X baud settings
+ch34x_setup:
+	db	6							; number of packets to transfer
+;	setuppkt $C0,$5F,$0000,$0000,$0002,.buf				; get vendor version
+ 	setuppkt $40,$A1,$0000,$0000,$0000,null				; serial init
+.baudFactor = $ + 4
+	setuppkt $40,$9A,$1312,$B282,$0000,null				; baud factor	
+.baudfOffset = $ + 4
+	setuppkt $40,$9A,$0F2C,$0008,$0000,null				; baud offset
+;	setuppkt $C0,$95,$2518,$0000,$0000,.buf
+	setuppkt $40,$9A,$2518,$00C3,$0000,null				; parity
+	setuppkt $40,$9A,$2727,$0000,$0000,null				; control lines
+	setuppkt $40,$A4,$009F,$0000,$0000,null				; modem call
+;.buf:	dw 0
+
+; FT232RL baud settings
+ft232rl_setup:
+	db	1
+.baudDivisor = $ + 2
+	setuppkt $40,$03,$4138,$0000,$0000,null				; 9600 for FT232RL (divisor, divisor >> 16)
+
+; CP201X baud settings
+cp210x_setup:
+	db	4
+	setuppkt $40,$00,$0001,$0000,$0000,null				; CP210X_IFC_ENABLE
+	setuppkt $40,$07,$0303,$0000,$0000,null				; CP210X_SET_MHS (RTS/DTR)
+.baudRate = $ + 2
+	setuppkt $40,$01,$0180,$0000,$0000,null				; 9600 for CP2102 (0x384000 / baudrate)
+	setuppkt $40,$03,$0800,$0000,$0000,null				; CP210X_SET_LINE_CTL ((dataBits << 8) | parity | stopBits)
+
+;========================================================================
+; Baud rate data look-up tables
+;
+; Baud rate table
+; Default baud rates: 9600, 19200, 38400, 57600, 115200			; expand to include more baud rates
+baud_rate_table:
+	db	5							; number of entries in table
+	dl	9600,	.baud_rate_table_9600
+	dl	19200,	.baud_rate_table_19200
+	dl	38400,	.baud_rate_table_38400
+	dl	57600,	.baud_rate_table_57600
+	dl	115200,	.baud_rate_table_115200
+.baud_rate_table_9600:
+	db	6							; number of entries in table
+	baud	BAUD_TYPE_FTDI_SIO,	$0005,$0000
+	baud	BAUD_TYPE_FTDI_AM,	$4138,$0000
+	baud	BAUD_TYPE_FTDI_BM,	$4138,$0000
+	baud	BAUD_TYPE_FTDI_H,	$04E2,$0002
+	baud	BAUD_TYPE_CH34X,	$B282,$0008
+	baud	BAUD_TYPE_CP210X,	$0180,$0000
+.baud_rate_table_19200:
+	db	6
+	baud	BAUD_TYPE_FTDI_SIO,	$0006,$0000
+	baud	BAUD_TYPE_FTDI_AM,	$809C,$0000
+	baud	BAUD_TYPE_FTDI_BM,	$809C,$0000
+	baud	BAUD_TYPE_FTDI_H,	$0271,$0002
+	baud	BAUD_TYPE_CH34X,	$D982,$0007
+	baud	BAUD_TYPE_CP210X,	$00C0,$0000
+.baud_rate_table_38400:
+	db	6
+	baud	BAUD_TYPE_FTDI_SIO,	$0007,$0000
+	baud	BAUD_TYPE_FTDI_AM,	$C04E,$0000
+	baud	BAUD_TYPE_FTDI_BM,	$C04E,$0000
+	baud	BAUD_TYPE_FTDI_H,	$4138,$0000
+	baud	BAUD_TYPE_CH34X,	$6483,$0000
+	baud	BAUD_TYPE_CP210X,	$0060,$0000
+.baud_rate_table_57600:
+	db	6
+	baud	BAUD_TYPE_FTDI_SIO,	$0008,$0000
+	baud	BAUD_TYPE_FTDI_AM,	$0034,$0000
+	baud	BAUD_TYPE_FTDI_BM,	$0034,$0000
+	baud	BAUD_TYPE_FTDI_H,	$80D0,$0000
+	baud	BAUD_TYPE_CH34X,	$9883,$0000
+	baud	BAUD_TYPE_CP210X,	$0040,$0000
+.baud_rate_table_115200:
+	db	6
+	baud	BAUD_TYPE_FTDI_SIO,	$0009,$0000
+	baud	BAUD_TYPE_FTDI_AM,	$001A,$0000
+	baud	BAUD_TYPE_FTDI_BM,	$001A,$0000
+	baud	BAUD_TYPE_FTDI_H,	$C068,$0000
+	baud	BAUD_TYPE_CH34X,	$CC83,$0000
+	baud	BAUD_TYPE_CP210X,	$0020,$0000
