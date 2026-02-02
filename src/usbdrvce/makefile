@@ -36,4 +36,3 @@ install: all
 	$(Q)$(call COPY,$(LIB_H),$(INSTALL_H))
 
 .PHONY: all clean install
-

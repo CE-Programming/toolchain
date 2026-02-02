@@ -60,4 +60,3 @@ uint_fast32_t
     return (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
 
 }
-

@@ -117,4 +117,3 @@ float64_t __f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool exact )
     return uZ.f;
 
 }
-

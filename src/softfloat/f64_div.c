@@ -169,4 +169,3 @@ float64_t __f64_div( bool signZ, float64_t a, float64_t *__restrict b )
     return uZ.f;
 
 }
-

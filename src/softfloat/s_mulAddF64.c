@@ -513,4 +513,3 @@ f64_param A, f64_param B, uint_fast64_t uiC /*, uint_fast8_t op */
 }
 
 #endif
-

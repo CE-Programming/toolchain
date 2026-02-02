@@ -65,4 +65,3 @@ void softfloat_mul64To128M( uint64_t a, uint64_t b, uint32_t *zPtr )
 }
 
 #endif
-

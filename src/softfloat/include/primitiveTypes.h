@@ -82,4 +82,3 @@ struct uint128_extra { struct uint128 v; uint64_t extra; };
 #endif
 
 #endif
-

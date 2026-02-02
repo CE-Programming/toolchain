@@ -18,4 +18,3 @@ subdirectory:
     SoftFloat-history.html  History of the major changes to SoftFloat.
 
 Other files in the package comprise the source code for SoftFloat.
-
