@@ -20,7 +20,6 @@ _lz4_Decompress_Block:
 	; Calculate decompressed size based on final dst
 	ex	de, hl
 	pop	de
-	or	a, a
 	sbc	hl, de
 	ret
 
@@ -49,7 +48,7 @@ _lz4_Decompress:
 	.type	lz4_decompress_block_internal, @function
 
 	; Input: IY = compressed block, DE = decompression buffer, BC = size of block
-	; Output: IY = after compressed block, DE = after decompressed data
+	; Output: IY = after compressed block, DE = after decompressed data, carry flag clear
 	; Destroys: AF, BC, HL
 lz4_decompress_block_internal:
 	; HL = compressed block
