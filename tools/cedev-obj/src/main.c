@@ -47,7 +47,7 @@ static bool is_optional_lib(const char *lib_name, char **argv, int start, int en
 {
     if (start == -1 || end == -1)
         return false;
-    
+
     for (int i = start; i < end; i++)
     {
         if (strcmp(lib_name, argv[i]) == 0)

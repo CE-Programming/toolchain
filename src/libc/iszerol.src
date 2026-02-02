@@ -1,7 +1,7 @@
 	.assume	adl=1
 
 	.section	.text
-	
+
 	.global	__iszerol
 	.type	__iszerol, @function
 

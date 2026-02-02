@@ -9,7 +9,7 @@ asm
     "\t.type _log10, @function\n"
     "\t.equ _log10, _log10f\n"
 );
- 
+
 #else
 
 #include <math.h>

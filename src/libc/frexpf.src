@@ -64,7 +64,7 @@ _frexp:
 	ld	e, a	; DE was -1 from before
 	; copy exponent of 0.5f
 	ld	a, b
-	xor	a, $3F	
+	xor	a, $3F
 	ld	b, a
 	jr	.L.ret_subnormal
 

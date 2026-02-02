@@ -160,7 +160,7 @@ int main(void)
             usberr = usb_WaitForInterrupt();
         }
     } while (usberr == USB_RETRY_INIT);
-   
+
     if (usberr != USB_SUCCESS)
     {
         putstr("usb enable error.");
@@ -241,7 +241,7 @@ int main(void)
 
     printf("file count: %u\n", file_count);
     printf("dir count: %u\n", dir_count);
-    
+
 fat_error:
     // close the filesystem
     fat_Close(&fat);

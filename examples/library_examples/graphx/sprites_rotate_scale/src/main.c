@@ -45,7 +45,7 @@ int main(void)
 
         /* The output size of the sprite can be calculated with this formula */
         uint8_t output_size = (scale * star_width) / 64;
-        
+
         /* Calculate the x and y position to center the sprite */
         int x_pos = x_center - output_size / 2;
         int y_pos = y_center - output_size / 2;

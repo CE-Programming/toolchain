@@ -58,7 +58,7 @@ int_fast32_t
             && (roundingMode != softfloat_round_near_even)
     ) {
         roundIncrement = 0;
-        if ( 
+        if (
             sign
                 ? (roundingMode == softfloat_round_min)
 #ifdef SOFTFLOAT_ROUND_ODD

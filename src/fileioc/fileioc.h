@@ -568,7 +568,7 @@ bool ti_ArchiveHasRoomVar(uint8_t handle);
  * In the after garbage collection routine, the LCD state can be restored (using
  * `gfx_Begin` or similar as appropriate), as well as potentially reloading
  * cached variable pointers created with ti_GetDataPtr.
- * 
+ *
  * @param[in] before Routine to run before a garbage collect. NULL sets it to do nothing.
  * @param[in] after Routine to run following a garbage collect. NULL sets it to do nothing.
  * */

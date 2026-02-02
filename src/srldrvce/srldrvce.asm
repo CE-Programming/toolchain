@@ -316,7 +316,7 @@ srl_Open:
 
 	push	iy
 	ld	bc,.current_config			; get current config
-	push	bc	
+	push	bc
 	ld	bc,(xsrl_device.dev)
 	push	bc
 	call	usb_GetConfiguration
@@ -433,7 +433,7 @@ srl_Open:
 	push	iy,hl
 	call	usb_RefDevice
 	pop	hl,iy
-	
+
 	lea	ix,xsrl_device.rx_buf
 	call	start_read
 
@@ -714,7 +714,7 @@ get_device_type:
 	ld	a,c
 	or	a,a
 	jq	z,.process_int
-	
+
 	ld	(xsrl_device.tx_addr),b
 	ld	(xsrl_device.rx_addr),c
 	ld	a,SRL_TYPE_CDC

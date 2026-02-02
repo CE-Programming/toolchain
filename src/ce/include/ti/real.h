@@ -46,13 +46,13 @@ typedef struct cplx_t { real_t real, imag; } cplx_t;
 /**
  * Contains data used by the statistics package.
  * If you use this area, mark it invalid:
- * 
+ *
  * @code{.cpp}
  * #include <ti/vars.h>
  * // . . .
  * os_DelRes();
  * @endcode
- * 
+ *
  * Type: `uint8_t[531]`
  */
 #define os_StatVars          ((uint8_t*)0xD01191)

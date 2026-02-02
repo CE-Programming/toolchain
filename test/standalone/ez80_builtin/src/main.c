@@ -548,14 +548,14 @@ int run_tests(void) {
     TEST(test_clrsbs());
     TEST(test_popcounts());
     TEST(test_paritys());
-    
+
     TEST(test_clzi48());
     TEST(test_ctzi48());
     TEST(test_ffsi48());
     TEST(test_clrsbi48());
     TEST(test_popcounti48());
     TEST(test_parityi48());
-    
+
     TEST(test_bitrev48());
     TEST(test_rotateleft24());
     TEST(test_rotateright24());
@@ -563,7 +563,7 @@ int run_tests(void) {
     TEST(test_rotateleft48());
     TEST(test_rotateright48());
     TEST(test_rotate48());
-    
+
     return ret;
 }
 

@@ -51,7 +51,7 @@ long double nextdownl(long double x) {
         ret.bin = Float64_neg_subnorm_min;
         return ret.flt;
     }
-    
+
     if (signbit(x)) {
         // Towards negative infinity
         arg_x.bin++;

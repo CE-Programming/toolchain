@@ -1,7 +1,7 @@
 	.assume	adl=1
 
 	.section	.text
-	
+
 	.global	__fpclassifyl
 	.type	__fpclassifyl, @function
 

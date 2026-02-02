@@ -29,7 +29,7 @@ float nexttowardf(float x, long double y) {
         ret.bin = Float32_pos_nan;
         return ret.flt;
     }
-    
+
     F64_pun x_f64, y_f64;
     x_f64.flt = (long double)x;
     y_f64.flt = y;

@@ -1,14 +1,14 @@
 	.assume	adl=1
 
 	.section	.text
-	
+
 	.global	__isnormall
 	.type	__isnormall, @function
 
 ; bool _isnormall(long double)
 __isnormall:
 	; load upper 24bits
-	ld	hl, 8	
+	ld	hl, 8
 	add	hl, sp
 	ld	hl, (hl)
 	; clear signbit

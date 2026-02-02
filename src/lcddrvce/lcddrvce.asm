@@ -170,7 +170,7 @@ lcd_SendSizedCommandRaw:
 	ld hl, ti.mpSpiStatus + 1
 	ld a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
 .waitNotFull:
-	cp a, (hl) 
+	cp a, (hl)
 	jr c, .waitNotFull
 	ld l, ti.spiData + 1
 	ld (hl), h
@@ -228,7 +228,7 @@ _sendSingleByte:
 	ld l, ti.spiStatus + 1
 	ld a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
 .waitNotFull:
-	cp a, (hl) 
+	cp a, (hl)
 	jr c, .waitNotFull
 	ld l, ti.spiData
 	ld a, (de)

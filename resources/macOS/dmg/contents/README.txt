@@ -11,7 +11,7 @@ Source code:
 https://github.com/CE-Programming/toolchain/
 
 
-Documentation etc.: 
+Documentation etc.:
 -------------------
 http://ce-programming.github.io/toolchain/
 

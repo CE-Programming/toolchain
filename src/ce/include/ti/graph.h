@@ -4,7 +4,7 @@
  * Matt "MateoConLechuga" Waltz\n
  * Jacob "jacobly" Young
  * @brief TI graph screen stuff.
- * 
+ *
  * Note that the heap uses graph screen memory, so you can't use the graph screen unless you reconfigure the heap.
  */
 
@@ -20,7 +20,7 @@ extern "C" {
 
 /**
  * The following are variables that are always allocated.
- * 
+ *
  * Most of these are found under the [VARS] menu.
  * They are all `real_t`.
  */
@@ -79,7 +79,7 @@ extern "C" {
 
 /**
  * The following control the settings of the various graph equations.
- * 
+ *
  * Type: `uint8_t`
  */
 #define os_Y1LineType        (*(uint8_t*)0xD024BF)

@@ -9,17 +9,17 @@ _fmodl:
 	call	__frameset0
 
 	pea	ix + 15	; &y
-	
+
 	ld	hl, (ix + 12)
 	push	hl	; x[63:48]
 	ld	a, h
-	
+
 	ld	hl, (ix + 9)
 	push	hl	; x[47:24]
 
 	ld	hl, (ix + 6)
 	push	hl	; x[23:0]
-	
+
 	rla
 	push	af	; Carry = signbit(x)
 

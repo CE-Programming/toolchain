@@ -224,7 +224,7 @@ Sure, in real code, functions and variables will have more descriptive names tha
 
 There are other benefits to proper scoping as well. It helps reduce namespace pollution, and the compiler will be able to provide better optimizations, too.
 
-.. _using_the_static_keyword:  
+.. _using_the_static_keyword:
 
 Using the static keyword
 ^^^^^^^^^^^^^^^^^^^^^^^^

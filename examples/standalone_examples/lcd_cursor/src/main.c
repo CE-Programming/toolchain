@@ -19,7 +19,7 @@ int main(void)
     // Some demo text
     for (uint8_t i = 0; i < 5; i++) {
         printf("Cursor demo: arrow keys\n");
-        printf(" move cursor, clear quits\n");    
+        printf(" move cursor, clear quits\n");
     }
 
     // Set up the hardware cursor

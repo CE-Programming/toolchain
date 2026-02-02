@@ -101,7 +101,7 @@ int main(void)
             usberr = usb_WaitForInterrupt();
         }
     } while (usberr == USB_RETRY_INIT);
-   
+
     if (usberr != USB_SUCCESS)
     {
         putstr("usb enable error.");

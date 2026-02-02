@@ -270,7 +270,7 @@ int dcmp(long double arg_x, long double arg_y) {
         }
         return (x_sign ? F64_CMP_LESS : F64_CMP_GREATER);
     }
-    
+
     if (x.bin == y.bin) {
         return F64_CMP_EQUAL;
     }
@@ -346,7 +346,7 @@ int basic_test(void) {
             return ret;
         }
     }
-    
+
     /*  fmodl test */
     long double trunc_part;
     C((std::fmod(f64_pos_pi, f64_pos_one) == std::modf(f64_pos_pi, &trunc_part)));

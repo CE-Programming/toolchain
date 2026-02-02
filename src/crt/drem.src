@@ -15,7 +15,7 @@ push iy
 	push bc
 	push de
 	push hl
-	
+
 	rl	b
 	push	af	; Carry = signbit(x)
 

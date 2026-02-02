@@ -36,7 +36,7 @@ size_t run_test(const char** failed_func) {
     for (size_t i = 0; i < length; i++) {
         F64_pun result;
         input_t value = input[i];
-        
+
         result.flt = floorl(value);
         if (result.bin != output[i].r_floor.bin) {
             if (!(isnan(result.flt) && isnan(output[i].r_floor.flt))) {

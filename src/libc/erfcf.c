@@ -24,6 +24,6 @@ float erfcf(float x)
     }
     return ret;
 }
- 
+
 
 double erfc(double) __attribute__((alias("erfcf")));
