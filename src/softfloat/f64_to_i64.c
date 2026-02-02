@@ -100,4 +100,3 @@ int_fast64_t __f64_to_i64( float64_t a, uint_fast8_t roundingMode, bool exact )
             : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 
 }
-

@@ -51,4 +51,3 @@ API Documentation
 
 .. doxygengroup:: ext_two_byte_tokens
    :project: CE C/C++ Toolchain
-

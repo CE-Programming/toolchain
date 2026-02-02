@@ -18,4 +18,3 @@ time_t mktime(struct tm *tp)
         (tp->tm_year - 70) * 31536000 + ((tp->tm_year - 69) / 4) * SECS_PER_DAY -
         ((tp->tm_year - 1) / 100) * SECS_PER_DAY + ((tp->tm_year + 299) / 400) * SECS_PER_DAY;
 }
-

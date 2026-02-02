@@ -79,4 +79,3 @@ int_fast32_t __f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exact )
     return softfloat_roundToI32( sign, sig, roundingMode, exact );
 
 }
-

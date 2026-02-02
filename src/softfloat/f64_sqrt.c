@@ -131,4 +131,3 @@ float64_t __f64_sqrt( f64_param A )
     return uZ.f;
 
 }
-

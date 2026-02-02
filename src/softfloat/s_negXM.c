@@ -60,4 +60,3 @@ void softfloat_negXM( uint_fast8_t size_words, uint32_t *zPtr )
 }
 
 #endif
-

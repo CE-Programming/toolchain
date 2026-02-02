@@ -61,4 +61,3 @@ uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
 }
 
 #endif
-

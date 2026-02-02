@@ -411,4 +411,3 @@ bool __f128M_lt_quiet( const float128_t *, const float128_t * );
 bool __f128M_isSignalingNaN( const float128_t * );
 
 #endif
-

@@ -186,4 +186,3 @@ float64_t __f64_rem( bool signA, float64_t a, float64_t *__restrict b )
     return uZ.f;
 
 }
-

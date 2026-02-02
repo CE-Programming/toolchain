@@ -72,4 +72,3 @@ do
 	# checking out the next branch.
 	wait
 done
-

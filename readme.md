@@ -18,4 +18,3 @@ In that case, post your questions [here](https://github.com/CE-Programming/toolc
 ## Building/Contributing
 
 Documentation for contributing/building the toolchain can be found [here](https://ce-programming.github.io/toolchain/static/contributing.html).
-

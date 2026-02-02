@@ -99,4 +99,3 @@ int_fast64_t
     return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 
 }
-
