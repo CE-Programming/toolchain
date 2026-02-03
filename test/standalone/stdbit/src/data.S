@@ -14,7 +14,7 @@ _zero_u24:
 _zero_u32:
 _zero_u48:
 _zero_u64:
-	.db $00, $00, $00, $00, $00, $00, $00, $00
+	.db	$00, $00, $00, $00, $00, $00, $00, $00
 
 	.global	_one_u8
 	.global	_one_u16
@@ -28,7 +28,7 @@ _one_u24:
 _one_u32:
 _one_u48:
 _one_u64:
-	.db $01, $00, $00, $00, $00, $00, $00, $00
+	.db	$01, $00, $00, $00, $00, $00, $00, $00
 
 	.global	_umax_u8
 	.global	_umax_u16
@@ -42,7 +42,7 @@ _umax_u24:
 _umax_u32:
 _umax_u48:
 _umax_u64:
-	.db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+	.db	$FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
 
 	.global	_smin_u8
 	.global	_smin_u16
@@ -51,19 +51,19 @@ _umax_u64:
 	.global	_smin_u48
 	.global	_smin_u64
 _smin_u64:
-	.db $00
-	.db $00
+	.db	$00
+	.db	$00
 _smin_u48:
-	.db $00
-	.db $00
+	.db	$00
+	.db	$00
 _smin_u32:
-	.db $00
+	.db	$00
 _smin_u24:
-	.db $00
+	.db	$00
 _smin_u16:
-	.db $00
+	.db	$00
 _smin_u8:
-	.db $80
+	.db	$80
 
 	.global	_smax_u8
 	.global	_smax_u16
@@ -72,66 +72,66 @@ _smin_u8:
 	.global	_smax_u48
 	.global	_smax_u64
 _smax_u64:
-	.db $FF
-	.db $FF
+	.db	$FF
+	.db	$FF
 _smax_u48:
-	.db $FF
-	.db $FF
+	.db	$FF
+	.db	$FF
 _smax_u32:
-	.db $FF
+	.db	$FF
 _smax_u24:
-	.db $FF
+	.db	$FF
 _smax_u16:
-	.db $FF
+	.db	$FF
 _smax_u8:
-	.db $7F
+	.db	$7F
 
 
 	.global	_val_0
 _val_0:
-	.db 0
+	.db	0
 	.global	_val_1
 _val_1:
-	.db 1
+	.db	1
 	.global	_val_2
 _val_2:
-	.db 2
+	.db	2
 	.global	_val_7
 _val_7:
-	.db 7
+	.db	7
 	.global	_val_8
 _val_8:
-	.db 8
+	.db	8
 	.global	_val_15
 _val_15:
-	.db 15
+	.db	15
 	.global	_val_16
 _val_16:
-	.db 16
+	.db	16
 	.global	_val_23
 _val_23:
-	.db 23
+	.db	23
 	.global	_val_24
 _val_24:
-	.db 24
+	.db	24
 	.global	_val_31
 _val_31:
-	.db 31
+	.db	31
 	.global	_val_32
 _val_32:
-	.db 32
+	.db	32
 	.global	_val_47
 _val_47:
-	.db 47
+	.db	47
 	.global	_val_48
 _val_48:
-	.db 48
+	.db	48
 	.global	_val_63
 _val_63:
-	.db 63
+	.db	63
 	.global	_val_64
 _val_64:
-	.db 64
+	.db	64
 
 ; uint8_t byteswap_u8[4] = {
 ;     0x00,

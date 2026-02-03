@@ -17,6 +17,6 @@ __iszerof:
 	ret	nz	; non-zero mantissa
 	ld	a, l
 	adc	a, a
-	sub a, 1
+	sub	a, 1
 	sbc	a, a
 	ret

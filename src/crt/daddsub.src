@@ -34,7 +34,7 @@ __daddsub:
 	push	de
 	push	hl	; pass x by value
 
-	xor a, (iy + 7)
+	xor	a, (iy + 7)
 	rla
 
 	jr	nc, .L.__daddmags	; same signs

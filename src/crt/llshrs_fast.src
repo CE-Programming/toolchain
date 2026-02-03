@@ -61,7 +61,7 @@ __llshrs_fast.hijack_llshru:
 	and	a, 00111000b
 	ld	(byteshift_smc)
 	xor	a, a
-	sub 	a, c
+	sub	a, c
 	jr	$+1
 	.equ	byteshift_smc, $-1
 .L.shr1_8:

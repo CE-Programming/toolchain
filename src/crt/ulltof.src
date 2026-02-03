@@ -5,19 +5,19 @@
 	.type	__ulltof, @function
 
 __ulltof:
-	push af
-	push iy
-	push bc
-	push de
-	push hl
+	push	af
+	push	iy
+	push	bc
+	push	de
+	push	hl
 	call	__ulltof_c
 	pop	af
 	ld	a, e
 	pop	de
 	ld	e, a
-	pop bc
-	pop iy
-	pop af
+	pop	bc
+	pop	iy
+	pop	af
 	ret
 
 	.extern	__ulltof_c

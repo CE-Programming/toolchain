@@ -136,4 +136,4 @@ __setstate:
 	.section	.data
 	.local	__state
 __state:
-	.d32 0d0e0f10h,090a0b0ch,05060708h,01020304h
+	.d32	0d0e0f10h,090a0b0ch,05060708h,01020304h

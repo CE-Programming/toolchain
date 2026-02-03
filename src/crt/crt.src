@@ -2,17 +2,17 @@
 
 	.section	.init.weak_crt,"ax",@progbits
 
-    ; hacks to get the icon and description to be included,
-    ; since the real crt overrides the weak
+	; hacks to get the icon and description to be included,
+	; since the real crt overrides the weak
 
-    .weak   __start
+	.weak	__start
 __start:
-    ld  hl, ___description
-    ld  hl, ___icon
-    ld  hl, _main
-    ld  hl, ___main_argc_argv
+	ld	hl, ___description
+	ld	hl, ___icon
+	ld	hl, _main
+	ld	hl, ___main_argc_argv
 
-    .extern ___main_argc_argv
-    .extern _main
-    .extern ___icon
-    .extern ___description
+	.extern	___main_argc_argv
+	.extern	_main
+	.extern	___icon
+	.extern	___description

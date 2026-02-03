@@ -177,7 +177,7 @@ _os_RunPrgm:
 ; relocated functions
 ; ---------------------------------------------------------------
 
-	.section .runprgm.reloc, "awx", @progbits
+	.section	.runprgm.reloc, "awx", @progbits
 launch_asm_prgm:
 	call	delete_running_prgm
 	call	setup_prgm_state
@@ -249,7 +249,7 @@ setup_temp_parser_hook:
 	jr	nz, .L.chain_hook
 .L.no_chain:
 	ld	hl, stub.chain
-	ld	(hl), 0xAF		; xor a,a
+	ld	(hl), 0xAF		; xor a, a
 	inc	hl
 	ld	(hl), 0xC9		; ret
 	ret
@@ -312,7 +312,7 @@ push_stub:
 	ld	hl, 0
 .equ	push_stub.prev_sp, $-3
 	push	hl
-	ld	hl,0
+	ld	hl, 0
 .equ	push_stub.data_size, $-3
 	push	hl
 	ld	hl, 0
@@ -412,7 +412,7 @@ stub.hook_parser:
 	jp	z, ti.JError
 	ld	a, 2
 stub.chain:
-	jp	0			; xor a,a \ ret if not chaining
+	jp	0			; xor a, a \ ret if not chaining
 .L.found:
 	call	ti.ChkInRam
 	ex	de, hl
@@ -430,7 +430,7 @@ stub.chain:
 	ld	bc, (ti.asm_prgm_size)
 	ld	de, ti.userMem
 	ldir
-	ld	de,0
+	ld	de, 0
 .equ	stub.callback, $-3
 	pop	bc			; data size
 	pop	hl			; data

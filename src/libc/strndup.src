@@ -7,7 +7,7 @@
 _strndup:
 	pop	bc
 	pop	de
-	ex	(sp),hl
+	ex	(sp), hl
 	push	de
 	push	bc
 

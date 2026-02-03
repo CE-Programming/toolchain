@@ -1,5 +1,5 @@
 
-    .assume adl=1
+	.assume	adl=1
 
 	.section	.text
 	.global	_atexit
@@ -37,6 +37,6 @@ _on_exit:
 	.section	.bss
 	.global	__atexit_functions
 __atexit_functions:
-	.ds 3
+	.ds	3
 
-    .extern _malloc
+	.extern	_malloc

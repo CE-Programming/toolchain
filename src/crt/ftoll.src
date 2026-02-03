@@ -12,13 +12,13 @@
 __ftoll:
 __ftoull:
 	ld	d, a
-	push iy
-push de
-push hl
+	push	iy
+	push	de
+	push	hl
 	call	__ftoll_c
-	pop af
-pop af
-pop iy
+	pop	af
+	pop	af
+	pop	iy
 	ret
 
 	.extern	__ftoll_c

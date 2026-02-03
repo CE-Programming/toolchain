@@ -71,8 +71,8 @@ __start:
 	call	ti.ResetStacks
 	ld	bc, ___data_len
 	or	a, a
-    sbc hl, hl
-    adc hl, bc
+	sbc	hl, hl
+	adc	hl, bc
 	jr	z, .L.skip_data_copy
 	ld	hl, ___data_lma
 	ld	de, ___data_vma
@@ -82,9 +82,9 @@ __start:
 	ld	de, (ti.asm_prgm_size)
 	ld	hl, ti.userMem
 	call	ti.DelMem
-	or	a,a
-	sbc	hl,hl
-	ld	(ti.asm_prgm_size),hl
+	or	a, a
+	sbc	hl, hl
+	ld	(ti.asm_prgm_size), hl
 	ld	hl, ti.pixelShadow
 	ld	bc, 8400 * 3
 	call	ti.MemClear
@@ -155,7 +155,7 @@ __start:
 	call	ti.HomeUp
 	ld	hl, __missingappvar
 	call	ti.PutS
-	call 	ti.NewLine
+	call	ti.NewLine
 	ld	hl, __webaddress
 	call	ti.PutS
 	jp	ti.GetKey
@@ -212,7 +212,7 @@ ___libload_libs_ret:
 	ld	hl, ti.OP1 + 1
 	call	ti.Mov8b
 	ld	a, d				; Lspace
-	ld	(de),a
+	ld	(de), a
 	inc	de
 	push	de
 	call	ti.AnsName
@@ -305,7 +305,7 @@ ___libload_libs_ret:
 	jr	.L.init_array_start
 .L.init_array_loop:
 	push	hl
-	ld      hl, (hl)
+	ld	hl, (hl)
 	call	__indcallhl
 	pop	hl
 	inc	hl
@@ -370,7 +370,7 @@ _exit:
 	dec	hl
 	dec	hl
 	push	hl
-	ld      hl, (hl)
+	ld	hl, (hl)
 	call	__indcallhl
 	pop	hl
 .L.fini_array_start:

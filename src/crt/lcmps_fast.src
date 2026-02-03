@@ -7,7 +7,7 @@
 __lcmps_fast:
 	ld	d, a
 	ld	a, e
-	sub 	a, d
+	sub	a, d
 	ret	nz
 	sbc	hl, bc
 	sbc	a, a

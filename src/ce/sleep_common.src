@@ -1,4 +1,4 @@
-	.assume adl=1
+	.assume	adl=1
 	.section	.text
 	.global	___sleep_common
 	.type	___sleep_common, @function
@@ -40,7 +40,7 @@ ___sleep_common.3:
 	ld	a, e			; auhl = now
 	pop	de
 	pop	bc			; dubc = end
-; 	or	a, a
+;	or	a, a
 	sbc	hl, bc
 	sbc	a, e			; auhl = now - end
 ; ^ 48 cc

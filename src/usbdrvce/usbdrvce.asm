@@ -5213,13 +5213,13 @@ usb_RepeatTimerCycles:
 
 ;-------------------------------------------------------------------------------
 _DefaultControlEndpointDescriptor:
-	db 7, ENDPOINT_DESCRIPTOR, 0, 0
-	dw 8
-	db 0
+	db	7, ENDPOINT_DESCRIPTOR, 0, 0
+	dw	8
+	db	0
 _DefaultStandardDescriptors:
-	dl .device, .configurations, .langids
-	db 2
-	dl .strings
+	dl	.device, .configurations, .langids
+	db	2
+	dl	.strings
 .device emit $12: $1201000200000040510408E0200201020003 bswap $12
 .configurations dl .configuration1, .configuration2, .configuration3
 .configuration1 emit $23: $0902230001010080FA0904000002FF0100000705810240000007050202400000030903 bswap $23

@@ -7,26 +7,26 @@
 
 ; wraps _fmodf
 __frem:
-	push iy
-	push de
-	push hl
+	push	iy
+	push	de
+	push	hl
 
-	push de
-	push hl	; y
+	push	de
+	push	hl	; y
 	ld	e, a
 	push	de	; x_hi8
 	push	bc	; x_lo24
 	call	_fmodf
-	pop bc
-	pop bc
-	pop bc
-	pop bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 
 	ld	a, e
 	ex	(sp), hl
-	pop bc
-	pop de
-	pop iy
+	pop	bc
+	pop	de
+	pop	iy
 	ret
 
 	.extern	_fmodf

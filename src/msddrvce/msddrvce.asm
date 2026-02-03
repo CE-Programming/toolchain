@@ -1123,7 +1123,7 @@ scsi_async_data:
 	compare_hl_zero
 	ld	iy,(iy + 12)		; xfer struct
 	jq	nz,scsi_async_issue_callback_fail
-	bit 	7,(ymsdXfer.cbw + packetCBW.dir)
+	bit	7,(ymsdXfer.cbw + packetCBW.dir)
 	push	iy
 	ld	iy,(ymsdXfer.msd)	; get msd struct
 	ld	a,(ymsd.bulkin)

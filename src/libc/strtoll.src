@@ -264,7 +264,7 @@ __strtoll_common.__llmul_add_b_overflow:
 	add	hl, de
 	ld	(ix - 4), l	; UHL
 	ld	d, c
-	ld	e, (ix - 9)	 ; E
+	ld	e, (ix - 9)	; E
 	mlt	de
 	ld	l, h
 	ld	h, a

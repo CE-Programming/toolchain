@@ -5,7 +5,7 @@
 	.type	__fpupop2, @function
 
 __fpupop2:
-	push    bc
+	push	bc
 	ld	bc, 0800000h
 	add	hl, bc
 	jr	nc, .ncarry
