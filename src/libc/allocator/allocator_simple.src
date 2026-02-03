@@ -34,8 +34,8 @@ _realloc:
 _free:
 	ret
 
-	.section .data._heap_ptr
-	.local _heap_ptr
+	.section	.data._heap_ptr
+	.local	_heap_ptr
 _heap_ptr:
 	.d24	___heap_low
 

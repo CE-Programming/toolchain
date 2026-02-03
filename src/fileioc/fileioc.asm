@@ -206,20 +206,20 @@ ti_Resize:
 	pop	hl
 	jp	c, util_ret_null
 	ld	de, TI_MAX_SIZE
-	or	a,a
-	sbc	hl,de
-	add	hl,de
+	or	a, a
+	sbc	hl, de
+	add	hl, de
 	push	af
 	push	hl
 	call	ti_Rewind.rewind	; rewind file offset
 	pop	hl
 	pop	af
-	jp	nc,util_ret_null	; return if too big
+	jp	nc, util_ret_null	; return if too big
 	push	hl
 	call	util_get_slot_size
 	pop	hl
-	or	a,a
-	sbc	hl,bc
+	or	a, a
+	sbc	hl, bc
 	ld	(resize_amount), hl
 	jr	z, .no_resize
 	jr	c, .decrease
@@ -285,7 +285,7 @@ ti_OpenVar:
 	add	hl, sp
 	ld	a, (hl)			; (sp + 9)
 ;	jr	ti_Open.start		; emulated by dummifying next instruction
-	db	$fe			; ld a,ti.AppVarObj -> cp a,$3e \ dec d
+	db	$fe			; ld a, ti.AppVarObj -> cp a, $3e \ dec d
 assert ti.AppVarObj = $15
 
 ;-------------------------------------------------------------------------------
@@ -336,19 +336,19 @@ ti_Open:
 	call	nc, ti.DelVarArc
 	call	ti.PopOP1
 .no_overwite:
-	ld	hl,(ix + 9)
-	ld	a,(hl)
-	cp	a,'r'
-	jr	z,.mode
-	cp	a,'a'
-	jr	z,.mode
-	cp	a,'w'
+	ld	hl, (ix + 9)
+	ld	a, (hl)
+	cp	a, 'r'
+	jr	z, .mode
+	cp	a, 'a'
+	jr	z, .mode
+	cp	a, 'w'
 	jr	nz, .ret_null_pop_ix
 .mode:
 	inc	hl
-	ld	a,(hl)
-	cp	a,'+'
-	jr	nz,.no_append
+	ld	a, (hl)
+	cp	a, '+'
+	jr	nz, .no_append
 .unarchive_var:
 	call	ti.ChkFindSym
 	jr	c, .not_found
@@ -485,7 +485,7 @@ ti_Write:
 ;  hl = number of chunks written if success
 	ld	iy, 0
 	add	iy, sp
-	ld	c,(iy + 12)
+	ld	c, (iy + 12)
 	call	util_is_slot_open
 	jr	nz, .ret0
 	call	util_is_in_ram
@@ -524,8 +524,8 @@ ti_Write:
 	ldir
 	call	util_get_offset
 	pop	hl
-	add	hl,bc
-	ex	de,hl
+	add	hl, bc
+	ex	de, hl
 	call	util_get_offset_ptr
 	ld	(hl), de
 	ld	hl, (iy + 9)
@@ -791,7 +791,7 @@ ti_DeleteVar:
 	push	hl
 	ld	a, c
 ;	jr	ti_Delete.start		; emulated by dummifying next instruction:
-	db	$fe			; ld a,ti.AppVarObj -> cp a,$3E \ dec d
+	db	$fe			; ld a, ti.AppVarObj -> cp a, $3E \ dec d
 assert ti.AppVarObj = $15
 
 ;-------------------------------------------------------------------------------
@@ -801,7 +801,7 @@ ti_Delete:
 ;  sp + 3 : pointer to appvar name
 ; return:
 ;  hl = 0 if failure
-	ld	a,ti.AppVarObj
+	ld	a, ti.AppVarObj
 .start:
 	pop	de
 	pop	hl
@@ -914,7 +914,7 @@ ti_DetectAny:
 ;  sp + 9 : pointer storage of type of variable found
 ; return:
 ;  hl -> name of variable
-	ld	a,$ff
+	ld	a, $ff
 	jr	ti_Detect.start_flag
 
 ;-------------------------------------------------------------------------------
@@ -930,7 +930,7 @@ ti_DetectVar:
 	add	hl, sp
 	ld	a, (hl)			; (sp + 9)
 ;	jr	ti_Detect.start		; emulated by dummifying next instruction:
-	db	$fe			; ld a,ti.AppVarObj -> cp a,$3E \ dec d
+	db	$fe			; ld a, ti.AppVarObj -> cp a, $3E \ dec d
 assert ti.AppVarObj = $15
 
 ;-------------------------------------------------------------------------------
@@ -940,10 +940,10 @@ ti_Detect:
 ;  sp + 6 : pointer to null terminated string of data to search for
 ; return:
 ;  hl -> name of variable
-	ld	a,ti.AppVarObj
+	ld	a, ti.AppVarObj
 .start:
 	ld	(.smc_type), a
-	xor	a,a
+	xor	a, a
 .start_flag:
 	ld	(.smc_flag), a
 	push	ix
@@ -1007,7 +1007,7 @@ ti_Detect:
 	dec	hl
 	ld	a, (hl)
 	call	ti.SetDEUToA
-	ex	de,hl
+	ex	de, hl
 	cp	a, $d0
 	jr	nc, .finram
 	ld	de, 9
@@ -1109,7 +1109,7 @@ ti_GetTokenString:
 	ld	hl, (iy + 6)
 	add	hl, bc
 	or	a, a
-	sbc	hl ,bc
+	sbc	hl, bc
 	jr	z, .skipstore
 	ld	(hl), 1
 .smc_length := $-1
@@ -1212,7 +1212,7 @@ ti_RenameVar:
 	ld	a, (hl)			; (sp + 9)
 	ld	iy, ti.flags		; probably not needed
 ;	jr	ti_Rename.start		; emulated by dummifying next instruction
-	db	$fe			; ld a,appVarObj -> cp a,$3E \ dec d
+	db	$fe			; ld a, appVarObj -> cp a, $3E \ dec d
 
 ;-------------------------------------------------------------------------------
 ti_Rename:
@@ -1225,7 +1225,7 @@ ti_Rename:
 ;  a = 1 if new file already exists
 ;  a = 2 if old file does not exist
 ;  a = 3 if other error
-	ld	a,ti.AppVarObj		; file type
+	ld	a, ti.AppVarObj		; file type
 .start:
 	pop	bc
 	pop	hl
@@ -1395,7 +1395,7 @@ ti_RclVar:
 	inc	hl
 	inc	hl
 	ld	hl, (hl)		; (sp + 6) pointer to data
-	ld	iy,ti.flags
+	ld	iy, ti.flags
 	call	util_set_var_str
 	call	ti.FindSym
 	jr	c, .ret_neg_one
@@ -1413,7 +1413,7 @@ ti_RclVar:
 	ld	(hl), de
 	ret
 .ret_neg_one:
-	ld	a,-1
+	ld	a, -1
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1448,30 +1448,30 @@ ti_ArchiveHasRoomVar:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jr	nz,.fail
+	jr	nz, .fail
 	call	util_get_vat_ptr
-	ld	hl,(hl)
-	ld	bc,-6
-	add	hl,bc
-	ld	c,(hl)			; get var name length
+	ld	hl, (hl)
+	ld	bc, -6
+	add	hl, bc
+	ld	c, (hl)			; get var name length
 	call	util_get_data_ptr
-	ld	de,(hl)
+	ld	de, (hl)
 .entry_sym:
-	ld	a,c
-	ex	de,hl
-	ld	hl,(hl)
-	ld	bc,12
-	add	a,c
-	ld	c,a
-	add.s	hl,bc
-	jr	c,.fail
-	ld	c,l
-	ld	b,h
+	ld	a, c
+	ex	de, hl
+	ld	hl, (hl)
+	ld	bc, 12
+	add	a, c
+	ld	c, a
+	add.s	hl, bc
+	jr	c, .fail
+	ld	c, l
+	ld	b, h
 	call	ti.FindFreeArcSpot
-	ld	a,1
+	ld	a, 1
 	ret	nz
 .fail:
-	xor	a,a
+	xor	a, a
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -1484,22 +1484,22 @@ ti_SetGCBehavior:
 ;   None
 	pop	de
 	pop	bc
-	ex	(sp),hl
+	ex	(sp), hl
 	push	bc
 	push	de
-	add	hl,de
-	or	a,a
-	sbc	hl,de
-	jr	nz,.notdefault1
-	ld	hl,util_post_gc_default_handler
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	nz, .notdefault1
+	ld	hl, util_post_gc_default_handler
 .notdefault1:
-	ld	(util_post_gc_handler),hl
-	sbc	hl,hl
-	adc	hl,bc
-	jr	nz,.notdefault2
-	ld	hl,util_pre_gc_default_handler
+	ld	(util_post_gc_handler), hl
+	sbc	hl, hl
+	adc	hl, bc
+	jr	nz, .notdefault2
+	ld	hl, util_pre_gc_default_handler
 .notdefault2:
-	ld	(util_pre_gc_handler),hl
+	ld	(util_pre_gc_handler), hl
 	ret
 util_post_gc_default_handler := util_no_op
 util_pre_gc_default_handler := util_no_op
@@ -1636,7 +1636,7 @@ util_get_vat_ptr:
 ; destroyed:
 ;  A
 	ld	a, (curr_slot)
-	ld	hl, vat_ptr0 		; vat_ptr0 = $d0244e
+	ld	hl, vat_ptr0		; vat_ptr0 = $d0244e
 	dec	a
 	ret	z
 	inc	h
@@ -1715,7 +1715,7 @@ util_archive:				; properly handle garbage collects
 	ret	nz
 	call	ti.PushOP1
 	call	ti_ArchiveHasRoomVar.entry_sym
-	jr	z,.handle_gc
+	jr	z, .handle_gc
 	call	ti.Arc_Unarc
 	jp	ti.PopOP1
 .handle_gc:
@@ -1735,7 +1735,7 @@ util_unarchive:
 	call	ti.PushOP1
 	call	ti.ChkFindSym
 	call	ti.ChkInRam
-	call	nz,ti.Arc_Unarc
+	call	nz, ti.Arc_Unarc
 	jp	ti.PopOP1
 
 ;-------------------------------------------------------------------------------

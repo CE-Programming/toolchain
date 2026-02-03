@@ -2,7 +2,7 @@
 
 	.section	.text
 
-	.global __ftod
+	.global	__ftod
 	.type	__ftod, @function
 
 ; input E:UHL (float)

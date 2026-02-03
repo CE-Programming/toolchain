@@ -28,9 +28,9 @@ _inchar:
 
 .L.lut:
 	db	0,0,0,0,0,0,0,0,0,10		;
-	db	0,'WRMH',0,0   			; + - × ÷ ^ undef
-	db	0,'Z'+ 1,'VQLG',0,0 		; (-) 3 6 9 ) TAN VARS undef
-	db	0,'ZUPKFC',0   			; . 2 5 8 ( COS PRGM STAT
+	db	0,'WRMH',0,0			; + - × ÷ ^ undef
+	db	0,'Z'+ 1,'VQLG',0,0		; (-) 3 6 9 ) TAN VARS undef
+	db	0,'ZUPKFC',0			; . 2 5 8 ( COS PRGM STAT
 	db	' YTOJEBX',0			; 0 1 4 7 , SIN APPS XT?n undef
 	db	'XSNIDA'			; STO LN LOG x2 x-1 MATH
 	db	0,0,0,0,0,0,0,0,0,0		;

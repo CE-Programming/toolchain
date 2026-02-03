@@ -17,7 +17,7 @@ _atomic_load_32:
 ; getting caught in an endless loop of the value changing between reads with a
 ; fixed period equal to the amount of time it takes for each retry
 	inc	c
-	ld	b,c
+	ld	b, c
 .L.wait:
 	djnz	.L.wait
 ; Read the value twice.

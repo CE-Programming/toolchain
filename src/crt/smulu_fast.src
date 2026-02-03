@@ -17,10 +17,10 @@ __smulu_fast:
 				; a		ubc		ude		uhl
 .L.Mul_HL_BC_HL_Fast:		;--------------+---------------+---------------+----------------
 	ld	d, b
-	ld	e, l		; 				 de=BL
+	ld	e, l		;				 de=BL
 	ld	b, h		;		 bc=HC
-	ld	h, c		;					 	hl=CL
-	mlt	bc		; 		ubc=H*C
+	ld	h, c		;						hl=CL
+	mlt	bc		;		ubc=H*C
 	mlt	de		;				ude=L*B
 	mlt	hl		;						uhl=L*C
 	ld	a, h		; a=L*C>>8

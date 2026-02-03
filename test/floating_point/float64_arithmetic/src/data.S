@@ -4,27 +4,27 @@
 
 	.global	_f64_pos_zero
 _f64_pos_zero:
-	db $00, $00, $00, $00, $00, $00, $00, $00
+	db	$00, $00, $00, $00, $00, $00, $00, $00
 
 	.global	_f64_neg_zero
 _f64_neg_zero:
-	db $00, $00, $00, $00, $00, $00, $00, $80
+	db	$00, $00, $00, $00, $00, $00, $00, $80
 
 	.global	_f64_pos_one
 _f64_pos_one:
-	db $00, $00, $00, $00, $00, $00, $F0, $3F
+	db	$00, $00, $00, $00, $00, $00, $F0, $3F
 
 	.global	_f64_neg_one
 _f64_neg_one:
-	db $00, $00, $00, $00, $00, $00, $F0, $BF
+	db	$00, $00, $00, $00, $00, $00, $F0, $BF
 
 	.global	_f64_pos_pi
 _f64_pos_pi:
-	db $18, $2D, $44, $54, $FB, $21, $09, $40
+	db	$18, $2D, $44, $54, $FB, $21, $09, $40
 
 	.global	_f64_neg_pi
 _f64_neg_pi:
-	db $18, $2D, $44, $54, $FB, $21, $09, $C0
+	db	$18, $2D, $44, $54, $FB, $21, $09, $C0
 
 	.global	_drem_libcall
 _drem_libcall:

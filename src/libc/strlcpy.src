@@ -9,51 +9,51 @@
 
 _strlcpy:
 
-	ld iy, 0
-	lea bc, iy + 0 ; set bc to 0
-	add iy, sp
+	ld	iy, 0
+	lea	bc, iy + 0		; set bc to 0
+	add	iy, sp
 
 	; do min(strlen(src), dsize-1)
 
 	; strlen(src)
-	ld hl, (iy + 6) ; hl = pointer to src
-	xor a, a ; clear carry and set a to 0
-	cpir ; dec bc until byte at (hl) matches a (= NUL)
+	ld	hl, (iy + 6)	; hl = pointer to src
+	xor	a, a		; clear carry and set a to 0
+	cpir			; dec bc until byte at (hl) matches a (= NUL)
 	; calculate HL=-BC-1
-	sbc hl, hl
+	sbc	hl, hl
 	scf
-	sbc hl, bc ; always sets carry flag
+	sbc	hl, bc		; always sets carry flag
 	; now hl = strlen(src)
 
-	ld bc, (iy + 9) ; bc = dsize
-	ex de, hl ; de = strlen(src)
+	ld	bc, (iy + 9)	; bc = dsize
+	ex	de, hl		; de = strlen(src)
 
 	; check if dsize is zero
-	sbc hl, hl ; set hl to -1, carry was already set
-	add hl, bc ; hl = -1 + dsize
-        ex de, hl ; hl = strlen(src), de = dsize - 1
-	ret nc ; do nothing and return strlen(src) if dsize is zero
+	sbc	hl, hl		; set hl to -1, carry was already set
+	add	hl, bc		; hl = -1 + dsize
+	ex	de, hl		; hl = strlen(src), de = dsize - 1
+	ret	nc		; do nothing and return strlen(src) if dsize is zero
 
-	push hl ; save strlen(src) for after copy
+	push	hl		; save strlen(src) for after copy
 
 	; dsize is not zero, compare them
 	; hl = strlen(src)
 	; de = dsize - 1
 
 	; carry flag is set, so calculate hl - (de + 1)
-	sbc hl, de
+	sbc	hl, de
 
 	; if hl > de, strlen(src) > (dsize - 1); string is truncated, keep bc as dsize
-	jr nc, _strlcpy.ready_for_ldir
+	jr	nc, _strlcpy.ready_for_ldir
 
 	; hl <= de, so strlen(src) <= (dsize - 1); string is not truncated, set bc to strlen(src) + 1
-	pop bc
-	push bc
-	inc bc
+	pop	bc
+	push	bc
+	inc	bc
 
 _strlcpy.ready_for_ldir:
-	ld de, (iy + 3) ; put dst in de
-	ld hl, (iy + 6) ; put src in hl
+	ld	de, (iy + 3)	; put dst in de
+	ld	hl, (iy + 6)	; put src in hl
 	; bc is filled already and greater than 0
 
 	; at this point we are set up for an ldir:
@@ -62,13 +62,13 @@ _strlcpy.ready_for_ldir:
 	; bc has the length (including space for null terminator)
 	ldir
 
-	pop hl ; get the result of strlen(src) from earlier and put into hl
+	pop	hl		; get the result of strlen(src) from earlier and put into hl
 
-	ret c ; return strlen(src) if string was not truncated
+	ret	c		; return strlen(src) if string was not truncated
 
 	; string was truncated, so replace final byte with NUL
-	dec de
+	dec	de
 	; a is already 0
-	ld (de), a ; store null terminator at the address pointed to by de
+	ld	(de), a		; store null terminator at the address pointed to by de
 
-	ret ; return strlen(src)
+	ret			; return strlen(src)

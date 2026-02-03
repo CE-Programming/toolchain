@@ -30,7 +30,7 @@ __lmulu:
 	mlt	de		;		ude=E*C
 	ld	d, a		;		 d =A
 	ld	a, e		; a=E*C
-	ld	e, l		; 		 de=AL
+	ld	e, l		;		 de=AL
 	ld	ixl, e		;						 ixl=L
 	mlt	de		;		ude=L*A
 	add	a, e		; a=E*C+L*A

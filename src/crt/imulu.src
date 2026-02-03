@@ -48,7 +48,7 @@ Mul_UHL_UBC_UHL:		;--------------+---------------+---------------+--------------
 	add	a, h		; a=(H*C>>8)+HLU*C+H*B+L*BCU
 	ld	h, a		;				uhl=H*C+(HLU*C+H*B+L*BCU<<8)&0xFFFF
 	ld	a, e		; a=L
-	ld	d, b		; 		 de=BL
+	ld	d, b		;		 de=BL
 	mlt	de		;		ude=L*B
 	add	hl, de		;				uhl=L*B+(H*C+(HLU*C+H*B+L*BCU<<8)&0xFFFF)
 	add	hl, hl

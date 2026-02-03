@@ -71,6 +71,6 @@ _calloc:
 
 .endif
 
-	.extern _malloc
+	.extern	_malloc
 	.extern	__imulu
 	.extern	_memset

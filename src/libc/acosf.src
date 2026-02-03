@@ -1,15 +1,15 @@
-    .assume adl=1
+	.assume	adl=1
 
-    .section .text
-    .global _acos
+	.section	.text
+	.global	_acos
 	.type	_acos, @function
 	.global	_acosf
 	.type	_acosf, @function
 
 .ifdef PREFER_OS_LIBC
 
-    .set _acosf, 0x022100
-    .set _acos, _acosf
+	.set	_acosf, 0x022100
+	.set	_acos, _acosf
 
 .else
 

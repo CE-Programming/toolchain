@@ -558,9 +558,9 @@ srl_GetCDCStandardDescriptors:
 	ret
 
 .descriptors:
-	dl .device, .configurations, .langids
-	db 3
-	dl .strings
+	dl	.device, .configurations, .langids
+	db	3
+	dl	.strings
 .device emit $12: $1201000202000040C016E105200201020001 bswap $12
 .configurations dl .configuration1
 .configuration1 emit $3e: $09023e00020100c0320904000001020200000524000110042402000524060001070582030800ff09040100020a0200000705040240000107058302400001 bswap $3e

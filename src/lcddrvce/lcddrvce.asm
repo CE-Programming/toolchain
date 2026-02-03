@@ -61,233 +61,233 @@ end macro
 lcd_Init:
 	; Increase the refcount
 	scf
-	sbc hl,hl
-	ld de, 0
+	sbc	hl, hl
+	ld	de, 0
 .refcount := $-3
-	add hl, de
-	ld (.refcount), hl
-	ret c
+	add	hl, de
+	ld	(.refcount), hl
+	ret	c
 	; Initialize if the old refcount was 0
 	; Always fully initialize on the first call per program invocation
-	ld hl, .fullinit
-	srl (hl)
-	jr c, .checkPython
+	ld	hl, .fullinit
+	srl	(hl)
+	jr	c, .checkPython
 	; Additionally, fully initialize if an APD reset the SPI state to something other than LCD
-	ld a, (ti.mpSpiCtrl0)
-	cp a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
-	jr z, .fastinit
+	ld	a, (ti.mpSpiCtrl0)
+	cp	a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
+	jr	z, .fastinit
 .checkPython:
 	; Check certificate for Python model
-	ld de, $0330
-	call ti.FindFirstCertField
-	jr nz, .notPython
-	call ti.GetFieldSizeFromType
-	ld de, $0430
-	call ti.FindField
-	jr nz, .notPython
+	ld	de, $0330
+	call	ti.FindFirstCertField
+	jr	nz, .notPython
+	call	ti.GetFieldSizeFromType
+	ld	de, $0430
+	call	ti.FindField
+	jr	nz, .notPython
 	; Reinitializes Python hardware, probably (routine available on rev M+ boot code)
 	; Without this, LCD SPI transfers start failing a short time after init
-	call $000654
+	call	$000654
 	; Magic SPI initialization sequence to work on Python models
-	ld de, ti.spiSpiFrFmt or ti.bmSpiFlash or ti.bmSpiFsPolarity or ti.bmSpiMasterMono
+	ld	de, ti.spiSpiFrFmt or ti.bmSpiFlash or ti.bmSpiFsPolarity or ti.bmSpiMasterMono
 .loop:
-	ld (ti.mpSpiCtrl0), de
-	ld hl, ti.bmSpiTxClr or ti.bmSpiRxClr
-	ld (ti.mpSpiCtrl2), hl
+	ld	(ti.mpSpiCtrl0), de
+	ld	hl, ti.bmSpiTxClr or ti.bmSpiRxClr
+	ld	(ti.mpSpiCtrl2), hl
 .fullinit:
 	; Becomes a nop after being shifted
-	db 1
-	ld hl, ti.bmSpiChipReset
-	ld (ti.mpSpiCtrl2), hl
-	call ti.Delay10ms
-	bit ti.bSpiClkPolarity, e
-	ld e, ti.bmSpiFsPolarity or ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
-	jr z, .loop
-	ld hl, $21
-	ld (ti.mpSpiIntCtrl), hl
+	db	1
+	ld	hl, ti.bmSpiChipReset
+	ld	(ti.mpSpiCtrl2), hl
+	call	ti.Delay10ms
+	bit	ti.bSpiClkPolarity, e
+	ld	e, ti.bmSpiFsPolarity or ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
+	jr	z, .loop
+	ld	hl, $21
+	ld	(ti.mpSpiIntCtrl), hl
 .notPython:
-	ld a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
-	ld (ti.mpSpiCtrl0), a
+	ld	a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
+	ld	(ti.mpSpiCtrl0), a
 .fastinit:
-	ld hl, ((9-1) shl 16) or (2-1)
-	ld (ti.mpSpiCtrl1), hl
-	ld hl, ti.bmSpiTxEn or ti.bmSpiTxClr or ti.bmSpiRxClr or ti.bmSpiChipEn
-	ld (ti.mpSpiCtrl2), hl
+	ld	hl, ((9-1) shl 16) or (2-1)
+	ld	(ti.mpSpiCtrl1), hl
+	ld	hl, ti.bmSpiTxEn or ti.bmSpiTxClr or ti.bmSpiRxClr or ti.bmSpiChipEn
+	ld	(ti.mpSpiCtrl2), hl
 	ret
 
 lcd_Cleanup:
 	; Decrease the refcount
-	ld hl, (lcd_Init.refcount)
-	ld de, 1
-	add hl, de
-	ld (lcd_Init.refcount), hl
-	ret nc
+	ld	hl, (lcd_Init.refcount)
+	ld	de, 1
+	add	hl, de
+	ld	(lcd_Init.refcount), hl
+	ret	nc
 	; Deinitialize if the new refcount is 0
-	call lcd_Wait
-	ld hl, ((3-1) shl 16) or (12-1)
-	ld (ti.mpSpiCtrl1), hl
-	ld hl, ti.bmSpiTxEn or ti.bmSpiTxClr or ti.bmSpiRxClr
-	ld (ti.mpSpiCtrl2), hl
+	call	lcd_Wait
+	ld	hl, ((3-1) shl 16) or (12-1)
+	ld	(ti.mpSpiCtrl1), hl
+	ld	hl, ti.bmSpiTxEn or ti.bmSpiTxClr or ti.bmSpiRxClr
+	ld	(ti.mpSpiCtrl2), hl
 	ret
 
 lcd_Wait:
-	ld hl, ti.mpSpiStatus + 1
-	ld a, (1 shl (ti.bSpiTxFifoBytes - 8)) - 1
+	ld	hl, ti.mpSpiStatus + 1
+	ld	a, (1 shl (ti.bSpiTxFifoBytes - 8)) - 1
 .waitEmpty:
-	cp a, (hl)
-	jr c, .waitEmpty
-	dec hl
+	cp	a, (hl)
+	jr	c, .waitEmpty
+	dec	hl
 .waitBusy:
-	bit ti.bSpiChipBusy, (hl)
-	jr nz, .waitBusy
+	bit	ti.bSpiChipBusy, (hl)
+	jr	nz, .waitBusy
 	ret
 
 lcd_SetUniformGamma:
-	ld de, uniformGammaParams
-	jr _Gamma
+	ld	de, uniformGammaParams
+	jr	_Gamma
 lcd_SetDefaultGamma:
-	ld de, defaultGammaParams
+	ld	de, defaultGammaParams
 _Gamma:
 	; Set positive gamma
-	ld bc, (14 shl 8) or $E0
-	push bc
-	call lcd_SendSizedCommandRaw.entry
+	ld	bc, (14 shl 8) or $E0
+	push	bc
+	call	lcd_SendSizedCommandRaw.entry
 	; Set negative gamma
-	ex de, hl
-	pop bc
-	inc c
-	jr lcd_SendSizedCommandRaw.entry
+	ex	de, hl
+	pop	bc
+	inc	c
+	jr	lcd_SendSizedCommandRaw.entry
 
 lcd_SendSizedCommandRaw:
-	pop hl
-	pop bc
-	pop de
-	push de
-	push bc
-	push hl
+	pop	hl
+	pop	bc
+	pop	de
+	push	de
+	push	bc
+	push	hl
 
 .entry:
-	ld hl, ti.mpSpiStatus + 1
-	ld a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
+	ld	hl, ti.mpSpiStatus + 1
+	ld	a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
 .waitNotFull:
-	cp a, (hl)
-	jr c, .waitNotFull
-	ld l, ti.spiData + 1
-	ld (hl), h
-	dec hl
-	ld (hl), c
-	ld c, 1
-	mlt bc
-	ex de, hl
-	xor a, a
-	sub a, c
-	jr nz, lcd_SendParamsRaw.entry
+	cp	a, (hl)
+	jr	c, .waitNotFull
+	ld	l, ti.spiData + 1
+	ld	(hl), h
+	dec	hl
+	ld	(hl), c
+	ld	c, 1
+	mlt	bc
+	ex	de, hl
+	xor	a, a
+	sub	a, c
+	jr	nz, lcd_SendParamsRaw.entry
 	ret
 
 lcd_SendParamsRaw:
-	pop hl
-	pop bc
-	pop de
-	push de
-	push bc
-	push hl
+	pop	hl
+	pop	bc
+	pop	de
+	push	de
+	push	bc
+	push	hl
 	scf
-	sbc hl, hl
-	add hl, bc
-	ex de, hl
-	ret nc
+	sbc	hl, hl
+	add	hl, bc
+	ex	de, hl
+	ret	nc
 
-	ld de, ti.mpSpiRange
-	xor a, a
-	sub a, c
+	ld	de, ti.mpSpiRange
+	xor	a, a
+	sub	a, c
 .entry:
-	and a, 7
-	add a, a
-	add a, a
-	ld (.sendParamsOffsetSMC), a
+	and	a, 7
+	add	a, a
+	add	a, a
+	ld	(.sendParamsOffsetSMC), a
 .sendParamsLoop:
-	ld e, ti.spiStatus + 1
+	ld	e, ti.spiStatus + 1
 	scf
 .waitForEight:
-	ld a, (de)
+	ld	a, (de)
 	rla
-	jr c, .waitForEight
-	ld e, ti.spiData + 1
-	jr nz, $
+	jr	c, .waitForEight
+	ld	e, ti.spiData + 1
+	jr	nz, $
 .sendParamsOffsetSMC = $-1
 	repeat 8
-	ld (de), a
-	dec de
+	ld	(de), a
+	dec	de
 	ldi
 	end repeat
-	ret po
-	cp a, a
-	jr .sendParamsLoop
+	ret	po
+	cp	a, a
+	jr	.sendParamsLoop
 
 _sendSingleByte:
-	ld l, ti.spiStatus + 1
-	ld a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
+	ld	l, ti.spiStatus + 1
+	ld	a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
 .waitNotFull:
-	cp a, (hl)
-	jr c, .waitNotFull
-	ld l, ti.spiData
-	ld a, (de)
-	ld (hl), a
-	inc hl
-	ld (hl), l
+	cp	a, (hl)
+	jr	c, .waitNotFull
+	ld	l, ti.spiData
+	ld	a, (de)
+	ld	(hl), a
+	inc	hl
+	ld	(hl), l
 	ret
 
 lcd_SendCommand:
-	ld b, 0+1
-	jr lcd_SendSizedCommandBytes.entry
+	ld	b, 0+1
+	jr	lcd_SendSizedCommandBytes.entry
 
 lcd_SendCommand1:
-	ld b, 1+1
-	jr lcd_SendSizedCommandBytes.entry
+	ld	b, 1+1
+	jr	lcd_SendSizedCommandBytes.entry
 
 lcd_SendCommand2:
-	ld b, 2+1
-	jr lcd_SendSizedCommandBytes.entry
+	ld	b, 2+1
+	jr	lcd_SendSizedCommandBytes.entry
 
 lcd_SendSizedCommandBytes:
-	pop hl
-	pop bc
-	push bc
-	push hl
-	inc b
+	pop	hl
+	pop	bc
+	push	bc
+	push	hl
+	inc	b
 .entry:
-	ld hl, 3
-	add hl, sp
-	ex de, hl
-	ld hl, ti.mpSpiData + 1
-	ld (hl), h
+	ld	hl, 3
+	add	hl, sp
+	ex	de, hl
+	ld	hl, ti.mpSpiData + 1
+	ld	(hl), h
 .loop:
-	call _sendSingleByte
-	inc de
-	inc de
-	inc de
-	djnz .loop
+	call	_sendSingleByte
+	inc	de
+	inc	de
+	inc	de
+	djnz	.loop
 	ret
 
 lcd_SendSizedCommandWords:
-	ld hl, 4
-	add hl, sp
-	ld b, (hl)
-	inc b
-	ex de, hl
-	ld hl, ti.mpSpiData + 1
-	ld (hl), h
+	ld	hl, 4
+	add	hl, sp
+	ld	b, (hl)
+	inc	b
+	ex	de, hl
+	ld	hl, ti.mpSpiData + 1
+	ld	(hl), h
 .loop:
-	dec de
-	call _sendSingleByte
-	dec b
-	ret z
-	inc de
-	inc de
-	inc de
-	inc de
-	call _sendSingleByte
-	jr .loop
+	dec	de
+	call	_sendSingleByte
+	dec	b
+	ret	z
+	inc	de
+	inc	de
+	inc	de
+	inc	de
+	call	_sendSingleByte
+	jr	.loop
 
 defaultGammaParams:
 	; Positive gamma

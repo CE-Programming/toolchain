@@ -142,7 +142,7 @@ _os_GetStringInput:
 	sbc	hl, bc			; decrement and compare to buf start
 	add	hl, bc
 	jr	nz, .L.clear_loop
-	ex	de,hl
+	ex	de, hl
 	ld	(ti.curRow), hl
 	jp	.L.start
 

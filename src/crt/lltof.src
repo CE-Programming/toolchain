@@ -5,19 +5,19 @@
 	.type	__lltof, @function
 
 __lltof:
-	push af
-	push iy
-	push bc
-	push de
-	push hl
+	push	af
+	push	iy
+	push	bc
+	push	de
+	push	hl
 	call	__lltof_c
 	pop	af
 	ld	a, e
 	pop	de
 	ld	e, a
-	pop bc
-	pop iy
-	pop af
+	pop	bc
+	pop	iy
+	pop	af
 	ret
 
 	.extern	__lltof_c

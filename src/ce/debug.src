@@ -6,11 +6,11 @@
 
 _dbg_Debugger:
 	scf
-	sbc	hl,hl
-	ld	(hl),2
+	sbc	hl, hl
+	ld	(hl), 2
 	ret
 
-	.section .text._dbg_WatchpointSet
+	.section	.text._dbg_WatchpointSet
 	.global	_dbg_WatchpointSet
 	.type	_dbg_WatchpointSet, @function
 
@@ -46,7 +46,7 @@ _dbg_WatchpointSet:
 	ld	(hl), 3
 	ret
 
-	.section .text._dbg_WatchpointRemoveAll
+	.section	.text._dbg_WatchpointRemoveAll
 	.global	_dbg_WatchpointRemoveAll
 	.type	_dbg_WatchpointRemoveAll, @function
 

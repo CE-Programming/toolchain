@@ -104,10 +104,10 @@ disable_relocations
 	ld	(show_msgs), a		; disable or enable error printing
 
 	pop	hl
-	ld	de,helpers.source
-	add	hl,de
-	ld	de,helpers.destination
-	ld	bc,helpers.length
+	ld	de, helpers.source
+	add	hl, de
+	ld	de, helpers.destination
+	ld	bc, helpers.length
 	ldir
 	ld	hl, arc_lib_locs
 	ld	(end_arc_lib_locs), hl
@@ -291,7 +291,7 @@ assert LIB_MAGIC_1 = LIB_MAGIC_1_ALT+1
 	cp	a, LIB_MAGIC_2_ALT
 .magic_error:
 	jr	z, lib_exists
-	bit	optional,(iy + LIB_FLAGS)
+	bit	optional, (iy + LIB_FLAGS)
 	jr	z, invalid_error
 optional_lib_clear_pop_hl:
 	pop	hl			; get version byte pointer
@@ -407,7 +407,7 @@ need_to_load_lib:
 	pop	bc
 	pop	de
 	pop	hl
-	jr	nc,.enough_mem
+	jr	nc, .enough_mem
 	call	ti.PopOP1		; pop program name
 	jp	ti.ErrMemory		; throw a memory error -- need more ram!
 

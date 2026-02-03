@@ -35,15 +35,15 @@ _L1:
 	ex	de,hl
 	call	__frimulu
 	push	hl
-	ex de,hl
+	ex	de,hl
 	ld	hl,2
 	add	hl,sp
-	rr (hl)
+	rr	(hl)
 	rr	d
 	rr	e
-	pop hl
-	ld h,d
-	ld l,e
+	pop	hl
+	ld	h,d
+	ld	l,e
 	;;
 	;; Check signs
 	;;

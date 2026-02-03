@@ -8,10 +8,10 @@
 	.type	_memcmp_fast, @function
 
 ; void *memmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
-	.equ haystack, 3
-	.equ haystack_len, 6
-	.equ needle, 9
-	.equ needle_len, 12
+	.equ	haystack, 3
+	.equ	haystack_len, 6
+	.equ	needle, 9
+	.equ	needle_len, 12
 _memmem:
 	ld	iy, 0
 	add	iy, sp

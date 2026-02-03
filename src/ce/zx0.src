@@ -104,7 +104,7 @@ dzx0t_elias_loop:
 	add	a, a
 	jr	nc, dzx0t_elias_loop
 	ret	nz
-	ld	a, (hl)		 ; load another group of 8 bits
+	ld	a, (hl)		; load another group of 8 bits
 	inc	hl
 	rla
 	jr	nc, dzx0t_elias_loop

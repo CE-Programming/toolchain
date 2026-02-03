@@ -67,7 +67,7 @@ _os_Eval:
 	call	$20F30		; stoans
 	call	$2079C		; pop error handler
 	xor	a, a
- .L_os_Eval.error:
+.L_os_Eval.error:
 	pop	de
 	push	af
 	call	$20E80		; fixtempcnt
