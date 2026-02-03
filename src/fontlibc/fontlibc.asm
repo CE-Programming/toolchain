@@ -158,7 +158,7 @@ macro mIsHLLessThanBC?
 end macro
 macro s8 op,imm
 	local i
- 	i = imm
+	i = imm
 	assert i >= -128 & i < 128
 	op,i
 end macro
