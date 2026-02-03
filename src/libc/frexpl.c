@@ -41,7 +41,7 @@ static long double _frexpl_c_positive(long double x, int *expon) {
             return val.flt;
         }
         /* isnormal(x) */
-		x_exp -= Float64_exp_bias;
+        x_exp -= Float64_exp_bias;
         // frexp is ilogb(x) + 1
         x_exp++;
         *expon = x_exp;
@@ -51,8 +51,8 @@ static long double _frexpl_c_positive(long double x, int *expon) {
         val.reg.BC |= 0x3FE0;
         return val.flt;
     }
-	/* iszero(x) */
-	if (val.bin == 0) {
+    /* iszero(x) */
+    if (val.bin == 0) {
         // return unmodified
         *expon = 0;
         return val.flt;

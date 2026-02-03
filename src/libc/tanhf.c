@@ -40,7 +40,7 @@ float tanhf(float arg) {
     float x = fabsf(arg);
 
     // result rounds to 1.0f
-    if(x > 10.0f) {
+    if (x > 10.0f) {
         x = 1.0f;
     } else {
         x = sinhf(x) / coshf(x);

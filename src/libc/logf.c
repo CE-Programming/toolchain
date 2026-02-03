@@ -44,7 +44,7 @@ float logf(float arg)
         return -HUGE_VALF;
     }
     x = frexpf(arg, & expon);
-    if ( x < F32_INV_SQRT2 ){
+    if ( x < F32_INV_SQRT2 ) {
         x *= 2.0f;
         expon--;
     }

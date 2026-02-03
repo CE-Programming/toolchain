@@ -242,7 +242,7 @@ bool os_TestFlagBitsFast(uint16_t offset_pattern);
 #define OS_FLAGS_ASM1                      0x21 /**< GROUP: Intentionally unused by TI, available for programs! */
 #define OS_FLAGS_ASM2                      0x22 /**< GROUP: Intentionally unused by TI, available for programs! */
 #define OS_FLAGS_ARCHIVE                   0x24 /**< GROUP: Archive stuff */
-#define OS_FLAGS_ARCHIVE_CHECKBATTERY	    0 /**< 1 = check battery levels in Arc_Unarc first and throw error if low */
+#define OS_FLAGS_ARCHIVE_CHECKBATTERY      0 /**< 1 = check battery levels in Arc_Unarc first and throw error if low */
 #define OS_FLAGS_GETSEND                   0x24 /**< FLAGS */
 #define OS_FLAGS_GETSEND_COMFAILED         1 /**< 1 = Get/Send Communication Failed */
 #define OS_FLAGS_SELFTEST                  0x24 /**< GROUP: Self-test screen */

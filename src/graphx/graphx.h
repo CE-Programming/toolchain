@@ -481,7 +481,7 @@ gfx_RotatedScaledTransparentSprite_NoClip(sprite, x, y, angle, 64)
  * @param[in] angle 256 position angular integer.
  * @see gfx_RotatedScaledTransparentSprite.
  */
- #define gfx_RotatedTransparentSprite(sprite, x, y, angle) \
+#define gfx_RotatedTransparentSprite(sprite, x, y, angle) \
 gfx_RotatedScaledTransparentSprite(sprite, x, y, angle, 64)
 
 /**

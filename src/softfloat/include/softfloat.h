@@ -65,7 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if 0
 extern THREAD_LOCAL uint_fast8_t softfloat_detectTininess;
 #else
-	#define softfloat_detectTininess softfloat_tininess_afterRounding
+    #define softfloat_detectTininess softfloat_tininess_afterRounding
 #endif
 enum {
     softfloat_tininess_beforeRounding = 0,

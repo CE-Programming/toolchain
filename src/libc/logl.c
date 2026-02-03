@@ -41,7 +41,7 @@ long double logl(long double arg)
         return -HUGE_VALL;
     }
     x = frexpl(arg, & expon);
-    if ( x < F64_INV_SQRT2 ){
+    if ( x < F64_INV_SQRT2 ) {
         x *= 2.0L;
         expon--;
     }

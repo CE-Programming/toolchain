@@ -630,7 +630,7 @@ void ti_SetGCBehavior(void (*before)(void), void (*after)(void));
 #define ti_K        _Pragma("GCC warning \"'ti_K' is deprecated, use 'OS_VAR_K' instead\"") OS_VAR_K
 #define ti_L        _Pragma("GCC warning \"'ti_L' is deprecated, use 'OS_VAR_L' instead\"") OS_VAR_L
 #define ti_M        _Pragma("GCC warning \"'ti_M' is deprecated, use 'OS_VAR_M' instead\"") OS_VAR_M
-#define ti_N	    _Pragma("GCC warning \"'ti_N' is deprecated, use 'OS_VAR_N' instead\"") OS_VAR_N
+#define ti_N        _Pragma("GCC warning \"'ti_N' is deprecated, use 'OS_VAR_N' instead\"") OS_VAR_N
 #define ti_O        _Pragma("GCC warning \"'ti_O' is deprecated, use 'OS_VAR_O' instead\"") OS_VAR_O
 #define ti_P        _Pragma("GCC warning \"'ti_P' is deprecated, use 'OS_VAR_P' instead\"") OS_VAR_P
 #define ti_Q        _Pragma("GCC warning \"'ti_Q' is deprecated, use 'OS_VAR_Q' instead\"") OS_VAR_Q

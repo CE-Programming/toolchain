@@ -30,7 +30,7 @@ uint8_t popcount64(uint64_t b)
 uint64_t ors(const struct s *s)
 {
     return (s->b0 | s->b1 | s->b2 | s->b3 | s->b4 | s->b5) |
-	   (s->w0 | s->w1 | s->w2 | s->w3 | s->w4 | s->w5);
+        (s->w0 | s->w1 | s->w2 | s->w3 | s->w4 | s->w5);
 }
 
 int main(void)
@@ -48,14 +48,14 @@ int main(void)
     os_ClrHome();
 
     printf("m: %llx\nf: %llx\n",
-	__builtin_bswap64(((s.b0 | s.b1 | s.b2 | s.b3 | s.b4 | s.b5) |
-                           (s.w0 | s.w1 | s.w2 | s.w3 | s.w4 | s.w5))),
-	__builtin_bswap64(ors(&s)));
+        __builtin_bswap64(((s.b0 | s.b1 | s.b2 | s.b3 | s.b4 | s.b5) |
+        (s.w0 | s.w1 | s.w2 | s.w3 | s.w4 | s.w5))),
+        __builtin_bswap64(ors(&s)));
 
     printf("m: %u\nf: %u\n",
-	popcount64(__builtin_bswap64(((s.b0 | s.b1 | s.b2 | s.b3 | s.b4 | s.b5) |
-                           (s.w0 | s.w1 | s.w2 | s.w3 | s.w4 | s.w5)))),
-	popcount64(__builtin_bswap64(ors(&s))));
+        popcount64(__builtin_bswap64(((s.b0 | s.b1 | s.b2 | s.b3 | s.b4 | s.b5) |
+        (s.w0 | s.w1 | s.w2 | s.w3 | s.w4 | s.w5)))),
+        popcount64(__builtin_bswap64(ors(&s))));
 
     os_GetKey();
 

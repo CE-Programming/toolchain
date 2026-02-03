@@ -20,13 +20,13 @@ long double asinl(long double arg) {
     arg_sign = signbit(arg);
     arg = fabsl(arg);
 
-    if(arg > 1.0L) {
+    if (arg > 1.0L) {
         errno = EDOM;
         return 0.0L;
     }
 
     temp = sqrtl(1.0L - arg * arg);
-    if(arg > 0.7L) {
+    if (arg > 0.7L) {
         temp = F64_PI2 - atanl(temp / arg);
     } else {
         temp = atanl(arg / temp);

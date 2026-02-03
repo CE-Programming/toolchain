@@ -20,19 +20,19 @@
 /**
  * define to `restrict`, `__restrict`, `__restrict__`, or leave blank.
  */
- #define NS_restrict __restrict
+#define NS_restrict __restrict
 
 /**
  * define to 0 or 1 (default = 1)
  * Enables support for `[` set matching (such as "%3[^]^123abc]").
  */
- #define NS_ENABLE_SET_MATCHING 1
+#define NS_ENABLE_SET_MATCHING 1
 
 /**
  * define to 0 or 1 (default = 0)
  * Adds support for C23 `%b` format specifiers.
  */
- #define NS_ENABLE_BINARY_CONVERSION_FORMAT 1
+#define NS_ENABLE_BINARY_CONVERSION_FORMAT 1
 
 /**
  * Maximum characters (including null terminator) to scan for set matching.
@@ -76,7 +76,7 @@
  * define to 0 or 1 (default = 0).
  * Inlines isspace
  */
- #define NS_INLINE_ISSPACE 0
+#define NS_INLINE_ISSPACE 0
 
 /*============================================================================*/
 /* Validate macros                                                            */

@@ -304,7 +304,7 @@ uint24_t os_GetDrawBGColor(void);
 #define os_PenCol            (*(uint24_t*)0xD008D2)
 /** `uint8_t`: Small font row position */
 #define os_PenRow            (*(uint8_t*)0xD008D5)
- /** `uint16_t`: Small font background 565 BGR color */
+/** `uint16_t`: Small font background 565 BGR color */
 #define os_DrawBGColor       (*(uint16_t*)0xD026AA)
 /** `uint16_t`: Small font foreground 565 BGR color */
 #define os_DrawFGColor       (*(uint16_t*)0xD026AC)

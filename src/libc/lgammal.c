@@ -33,7 +33,7 @@ long double lgammal(long double x) { /* the natural logarithm of the Gamma funct
     long double v, w;
     v = 1.0L;
 
-	// this will overflow when x < 173.0L
+    // this will overflow when x < 173.0L
     const int maximum_iter = 173 + N;
     for (int iter = 0; iter < maximum_iter; iter++) {
         if (!(x < (long double)N)) {

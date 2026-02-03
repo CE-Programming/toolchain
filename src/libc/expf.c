@@ -60,13 +60,13 @@ float expf(float arg) {
     float temp1, temp2, xsq;
     float ent;
 
-    if ( arg == 0.0f){
+    if ( arg == 0.0f) {
         return 1.0f;
     }
-    if ( arg < exp_min_arg ){
+    if ( arg < exp_min_arg ) {
         return 0.0f;
     }
-    if ( arg > exp_max_arg ){
+    if ( arg > exp_max_arg ) {
         errno = ERANGE;
         return HUGE_VALF;
     }

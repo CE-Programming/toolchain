@@ -33,13 +33,13 @@ float asinf(float arg) {
     arg_sign = signbit(arg);
     arg = fabsf(arg);
 
-    if(arg > 1.0f) {
+    if (arg > 1.0f) {
         errno = EDOM;
         return 0.0f;
     }
 
     temp = sqrtf(1.0f - arg*arg);
-    if(arg > 0.7f) {
+    if (arg > 0.7f) {
         temp = (float)M_PI_2 - atanf(temp/arg);
     } else {
         temp = atanf(arg/temp);

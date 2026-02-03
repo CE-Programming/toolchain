@@ -25,15 +25,15 @@
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(x[0]))
 
 static long double arithmetic_test(long double arg) {
-	long double x = arg;
-	x += std::numbers::pi_v<long double>;
-	x *= std::numbers::e_v<long double>;
-	long double y = ++x;
-	x = std::fma(x, std::numbers::egamma_v<long double>, y);
-	y /= std::numbers::ln2_v<long double> - x;
-	y = std::copysign(y, x--);
-	x -= std::fabs(x) + y;
-	return x;
+    long double x = arg;
+    x += std::numbers::pi_v<long double>;
+    x *= std::numbers::e_v<long double>;
+    long double y = ++x;
+    x = std::fma(x, std::numbers::egamma_v<long double>, y);
+    y /= std::numbers::ln2_v<long double> - x;
+    y = std::copysign(y, x--);
+    x -= std::fabs(x) + y;
+    return x;
 }
 
 static int64_t calc_ULP(long double guess, long double truth) {
