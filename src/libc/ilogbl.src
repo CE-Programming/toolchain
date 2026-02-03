@@ -54,7 +54,7 @@ _ilogbl:
 	ex	de, hl
 	inc	de
 .L.inf_nan:
- 	ld	hl, $7FFFFF	; FP_ILOGBNAN or INT_MAX
+	ld	hl, $7FFFFF	; FP_ILOGBNAN or INT_MAX
 	add	hl, de	; FP_ILOGB0 when DE is one
 	ex	de, hl
 	;	DE was zero or one, so HL is now zero or one

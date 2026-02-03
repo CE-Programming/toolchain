@@ -95,8 +95,8 @@ end struct
 struct fat
 	local size
 	label .: size
-    	read rl 1
-    	write rl 1
+	read rl 1
+	write rl 1
 	user rl 1
 	base_lba rd 1
 	blocks_per_cluster rb 1

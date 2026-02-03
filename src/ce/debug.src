@@ -31,7 +31,7 @@ _dbg_WatchpointSet:
 	jr	z, .L.noread
 	bit	1, a		; write
 	jr	z, .L.noreadwrite
- 	ld	(hl), 7
+	ld	(hl), 7
 	jr	.L.checkexecute
 .L.noreadwrite:
 	ld	(hl), 5

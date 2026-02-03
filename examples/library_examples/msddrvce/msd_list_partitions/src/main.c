@@ -124,10 +124,10 @@ int main(void)
 
     for (uint8_t i = 0; i < num_partitions; ++i)
     {
-    	uint32_t first_lba = partitions[i].first_lba;
-    	uint32_t last_lba = partitions[i].last_lba;
+        uint32_t first_lba = partitions[i].first_lba;
+        uint32_t last_lba = partitions[i].last_lba;
 
-	printf("%lu - %lu\n", first_lba, last_lba);
+        printf("%lu - %lu\n", first_lba, last_lba);
     }
 
     // close the msd device
