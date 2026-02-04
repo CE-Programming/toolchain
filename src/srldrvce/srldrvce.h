@@ -8,8 +8,8 @@
  * a computer with minimal setup required on the other end.
  */
 
-#ifndef H_SRLDRVCE
-#define H_SRLDRVCE
+#ifndef SRLDRVCE_H
+#define SRLDRVCE_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -161,4 +161,4 @@ usb_error_t srl_UsbEventCallback(usb_event_t event, void *event_data,
 }
 #endif
 
-#endif
+#endif /* SRLDRVCE_H */

@@ -14,8 +14,8 @@
  * measure, many routines will return \c USB_ERROR_SYSTEM if this happens.
  */
 
-#ifndef H_USBDRVCE
-#define H_USBDRVCE
+#ifndef USBDRVCE_H
+#define USBDRVCE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -1289,4 +1289,4 @@ uint24_t usb_GetCounter(void);
 }
 #endif
 
-#endif
+#endif /* USBDRVCE_H */
