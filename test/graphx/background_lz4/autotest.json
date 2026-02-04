@@ -14,7 +14,9 @@
     "delay|500",
     "hashWait|1",
     "key|enter",
-    "hashWait|2"
+    "hashWait|2",
+    "key|enter",
+    "hashWait|3"
   ],
   "hashes":
   {
@@ -26,6 +28,13 @@
       "expected_CRCs": [ "69A1B0DB" ]
     },
     "2":
+    {
+      "description": "Test fullscreen image display",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "69A1B0DB" ]
+    },
+    "3":
     {
       "description": "Test program exit",
       "start": "vram_start",
