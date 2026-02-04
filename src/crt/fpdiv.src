@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpdiv
+	.global	__fpdiv
+	.type	__fpdiv, @function
 
 ; IEEE single precision division
 ; aubc = aubc / euhl
@@ -160,5 +161,5 @@ __fpdiv: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	pop	bc, de
 	ret
 
-	extern	__fppop1
-	extern	__fppop2
+	.extern	__fppop1
+	.extern	__fppop2
