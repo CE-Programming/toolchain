@@ -13,7 +13,7 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	set	7, a	; aubc = -abs(AUBC)
 	set	7, e	; euhl = -abs(EUHL)
 	call	__fpcmpo	; abs(AUBC) <=> abs(EUHL)
-	jq	m, .notge	; !(abs(AUBC) >= abs(EUHL))
+	jp	m, .notge	; !(abs(AUBC) >= abs(EUHL))
 	push	hl
 	push	bc
 	call	__fppop1
