@@ -36,7 +36,7 @@ __fptoll: ; PREREQ: bitcast(float, pair8_24_t, { in.HL, in.E })-INT64_MIN > -1.0
 .finish:
 	pop	af
 	ret	p
-	jq	__llneg
+	jp	__llneg
 
 .return.zero:
 	sbc	hl, hl

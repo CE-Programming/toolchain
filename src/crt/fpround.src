@@ -29,7 +29,7 @@ __fpround: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), roundf(b
 	sbc	hl, de
 	ex	(sp), hl
 	ex	de, hl
-	jq	pe, .overflow
+	jp	pe, .overflow
 	jq	c, .no_overflow
 	inc	a
 ;	jq	.overflow
