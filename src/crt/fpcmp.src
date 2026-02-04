@@ -39,7 +39,7 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	; Check if first operand could hold NaN, and if so, the second cannot on this code path
 	inc	e
 	jq	z, .checkFirstNan
-	jq	pe, .checkFirstNan
+	jp	pe, .checkFirstNan
 	dec	e
 .secondLargerAbs:
 	cp	a, 07Fh	; C = S = !sign(aubc), Z = 0
