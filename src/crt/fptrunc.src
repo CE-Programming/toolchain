@@ -54,7 +54,7 @@ __fpfloor.roundup:
 .return.one:
 	ld	bc, 0800000h
 	ld	a, h
-	or	a, 07Fh shr 1
+	or	a, 07Fh >> 1
 	pop	hl
 	ret
 

@@ -8,7 +8,8 @@
 ; IEEE single precision division
 ; aubc = aubc / euhl
 __fpdiv: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(float, pair8_24_t, { in.BC, in.A }) / bitcast(float, pair8_24_t, { in.HL, in.E })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
-	push	de, hl
+	push	de
+	push	hl
 	xor	a, e
 	push	af
 	xor	a, e
@@ -70,7 +71,7 @@ __fpdiv: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	dec	bc
 	ld	a, c
 	inc	b
-	ld	bc, 0800000h or (23 shl 8)
+	ld	bc, 0800000h | (23 << 8)
 	jq	z, .divide.entry.normal
 	adc	a, b
 	ld	b, a
@@ -92,7 +93,9 @@ __fpdiv: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 .return.overflow:
 	ld	c, b
 .return.nonfinite:
-	pop	af, hl, de
+	pop	af
+	pop	hl
+	pop	de
 	or	a, 07Fh
 	ret
 
@@ -143,7 +146,7 @@ __fpdiv: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 .round:
 	ccf
 .subsubnormal:
-	lea	de, iy
+	lea	de, iy + 0
 	pop	iy
 	sbc	hl, hl
 	inc	hl
@@ -158,7 +161,8 @@ __fpdiv: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	sla	d
 	rra
 	ex	(sp), hl
-	pop	bc, de
+	pop	bc
+	pop	de
 	ret
 
 	.extern	__fppop1

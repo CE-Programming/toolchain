@@ -11,7 +11,8 @@
 ; aubc = long(aubc)
 __fptoul: ; PREREQ: bitcast(float, pair8_24_t, { in.BC, in.A }) > -1.0f && bitcast(float, pair8_24_t, { in.BC, in.A }) < (UINT32_MAX/2+1)*2.0f CHECK: bitcast(uint32_t, pair8_24_t, { out.BC, out.A }) == (uint32_t)bitcast(float, pair8_24_t, { in.BC, in.A }) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 __fptol: ; PREREQ: bitcast(float, pair8_24_t, { in.BC, in.A })-INT32_MIN > -1.0f && bitcast(float, pair8_24_t, { in.BC, in.A }) < (INT32_MAX/2+1)*2.0f CHECK: bitcast(int32_t, pair8_24_t, { out.BC, out.A }) == (int32_t)bitcast(float, pair8_24_t, { in.BC, in.A }) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
-	push	de, bc
+	push	de
+	push	bc
 	ex	(sp), hl
 	ld	d, a
 	ld	e, a
@@ -42,7 +43,8 @@ __fptol: ; PREREQ: bitcast(float, pair8_24_t, { in.BC, in.A })-INT32_MIN > -1.0f
 	ld	a, e
 .return:
 	ex	(sp), hl
-	pop	bc, de
+	pop	bc
+	pop	de
 	ret
 
 .return.zero:
