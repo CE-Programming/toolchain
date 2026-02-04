@@ -14,7 +14,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	ld	e, a
 	call	__fppop1
 	inc	e
-	jr	z, .nonfinite
+	jp	z, .nonfinite
 	dec	e
 	ld	d, 0ABh	; multiplicative inverse of 3 modulo 256
 	ld	b, d
@@ -36,7 +36,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	jr	c, .modulo.loop
 	jr	nz, .normalized
 	dec	d
-	jr	z, .return
+	jp	z, .return
 	cp	a, l
 	inc	a
 	jr	nc, .modulo.loop
