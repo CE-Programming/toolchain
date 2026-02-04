@@ -37,11 +37,7 @@ __fpmax: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }),
 	jq	nc, .nocarry
 	ret	po
 ;	jq	.return
-	virtual
-		jr	nc, $
-		load .jr_nc : byte from $$
-	end virtual
-	db	.jr_nc
+	db	$30	; jr nc, *
 .nocarry:
 	ret	pe
 .return:

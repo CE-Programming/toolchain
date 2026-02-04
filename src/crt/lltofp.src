@@ -48,11 +48,7 @@ __ulltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)b
 	ld	l, a
 	ld	b, 07Fh + 63
 ;	jq	.pack
-	virtual
-		jp	c, $
-		load .jp_c : byte from $$
-	end virtual
-	db	.jp_c
+	db	$DA	; jp c, *
 .lower:
 	ld	c, a
 	ld	b, 07Fh + 47
