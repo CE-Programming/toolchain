@@ -8,7 +8,8 @@
 ; IEEE single precision cube root
 ; aubc = cbrt(aubc)
 __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cbrt(bitcast(float, pair8_24_t, { in.BC, in.A }))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
-	push	de, bc
+	push	de
+	push	bc
 	ex	(sp), hl
 	ld	e, a
 	call	__fppop1
@@ -20,7 +21,8 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	mlt	de
 	ld	c, a
 	ld	a, i
-	push	af, hl
+	push	af
+	push	hl
 	ex	(sp), ix
 	or	a, a
 	sbc	hl, hl
@@ -62,7 +64,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	; x in AUHL[UHL']UIX, r in CUDE[UDE'], q in UIY
 .root.loop:
 	exx
-	lea	bc, iy
+	lea	bc, iy + 0
 	jq	c, .root.zerobit
 	ex	af, af'
 	; q += 1
@@ -162,7 +164,8 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	sbc	hl, hl
 	inc	hl
 	add	hl, bc
-	pop	iy, bc
+	pop	iy
+	pop	bc
 	; Get final exponent after rounding
 	ld	a, b
 	adc	a, 07Fh - (07Fh / 3) - 10
@@ -174,11 +177,13 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 .return:
 	sla	c
 	rra
-	pop	ix, bc
+	pop	ix
+	pop	bc
 	bit	2, c
 .nonfinite:
 	ex	(sp), hl
-	pop	bc, de
+	pop	bc
+	pop	de
 	ret	z
 	ei
 	ret
