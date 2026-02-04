@@ -44,13 +44,13 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	e, a
 	call	__fppop2
 	inc	e
-	jq	z, .nonfinite1
+	jr	z, .nonfinite1
 	inc	d
-	jq	z, .return2
+	jr	z, .return2
 	ld	a, d
 	sub	a, e
-	jq	z, .rounded
-	jq	nc, .sorted
+	jr	z, .rounded
+	jr	nc, .sorted
 	inc	c
 	ex	(sp), hl
 	ld	a, e
@@ -58,25 +58,25 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	d, e
 .sorted:
 	cp	a, 26
-	jq	nc, .largest
+	jr	nc, .largest
 	; Extend to 32 bits and shift left by ~(amount - 1) & 7
 	dec	a
 	ld	b, a
 	xor	a, a
 	srl	b
-	jq	c, .noshift1
+	jr	c, .noshift1
 	add	hl, hl
 	rla
 .noshift1:
 	srl	b
-	jq	c, .noshift2
+	jr	c, .noshift2
 	.rept	2
 	add	hl, hl
 	rla
 	.endr
 .noshift2:
 	srl	b
-	jq	c, .noshift4
+	jr	c, .noshift4
 	.rept	4
 	add	hl, hl
 	rla
@@ -90,11 +90,11 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	push	hl
 	inc	sp
 	ld	a, l
-	jq	nz, .shift16
+	jr	nz, .shift16
 	; Shift by 8 for amounts between 1 and 8
 	pop	hl
 	inc	sp
-	jq	.rounded
+	jr	.rounded
 
 .shift16:
 	; Shift by 16 for amounts between 9 and 16
@@ -102,7 +102,7 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	inc	sp
 	pop	hl
 	dec	b
-	jq	z, .flush
+	jr	z, .flush
 .shift8more:
 	; Shift by 24 for amounts between 17 and 24
 	or	a, e
@@ -121,7 +121,7 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	pop	de
 	ex	(sp), hl
 	add.s	hl, hl
-	jq	nc, .add
+	jr	nc, .add
 	ld	l, h
 	add	hl, bc
 	ld	c, l
@@ -130,7 +130,7 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 
 .nonfinite1:
 	inc	d
-	jq	z, .nonfinite
+	jr	z, .nonfinite
 .return1:
 	pop	bc
 .return1.pop1:
@@ -147,7 +147,7 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 .largest:
 	ld	a, d
 	cp	a, e
-	jq	z, .return1
+	jr	z, .return1
 .return2:
 	pop	bc
 .return2.pop1:
@@ -157,14 +157,14 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	pop	bc
 	pop	bc
 	push	bc
-	jq	.return
+	jr	.return
 
 .add:
 	ld	c, h
 	pop	hl
 	add	hl, de
 	dec	b
-	jq	nc, .done
+	jr	nc, .done
 	ex	de, hl
 	sbc	hl, hl
 	add	hl, sp
@@ -174,12 +174,12 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	rr	h
 	rr	l
 	rra
-	jq	nc, .flushed2
+	jr	nc, .flushed2
 	or	a, 1
 .flushed2:
 	inc	b
 	inc	b
-	jq	z, .infinite
+	jr	z, .infinite
 	djnz	.done	;always taken
 
 .borrow:
@@ -189,8 +189,8 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ex	de, hl
 	neg
 	sbc	hl, de
-	jq	c, .borrow
-	jq	nz, .done
+	jr	c, .borrow
+	jr	nz, .done
 	or	a, a
 .done:
 	ld	de, 0800000h
@@ -204,13 +204,13 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 .nonfinite:
 	xor	a, a
 	sbc	hl, bc
-	jq	nz, .return1
+	jr	nz, .return1
 	pop	hl
 	sbc	hl, bc
-	jq	nz, .return2.pop1
+	jr	nz, .return2.pop1
 	pop	de
 	bit	7, d
-	jq	z, .return1.pop2
+	jr	z, .return1.pop2
 	ld	bc, 0C00000h
 .infinite:
 	ld	a, c

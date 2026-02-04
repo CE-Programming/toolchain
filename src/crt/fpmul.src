@@ -20,17 +20,17 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	e, a
 	call	__fppop2
 	inc	e
-	jq	z, .nonfinite.1
+	jr	z, .nonfinite.1
 	inc	d
-	jq	z, .nonfinite.2
+	jr	z, .nonfinite.2
 	ld	a, d
 	ld	d, b; 0
 	rlc	e
 	ccf
 	rr	e
-	jq	nc, .subtract
+	jr	nc, .subtract
 	add	a, e
-	jq	nc, .continue
+	jr	nc, .continue
 .overflow:
 	pop	af
 	pop	af
@@ -40,10 +40,10 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ret
 .subtract:
 	add	a, e
-	jq	z, .subnormal
-	jq	c, .continue
+	jr	z, .subnormal
+	jr	c, .continue
 	cp	a, -23
-	jq	c, .underflow
+	jr	c, .underflow
 .subnormal:
 	dec	a
 	ld	d, a
@@ -102,7 +102,7 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	mlt	bc
 	add	hl, bc
 	cp	a, d
-	jq	nz, .normalized
+	jr	nz, .normalized
 	ld	bc, (ix + 2)
 	pop	de
 .normalize:
@@ -112,11 +112,11 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	rr	c
 	rr	d
 	rr	e
-	jq	nc, .flushed
+	jr	nc, .flushed
 	ld	e, a
 .flushed:
 	inc	a
-	jq	nz, .normalize
+	jr	nz, .normalize
 	push	de
 	ld	(ix + 2), bc
 .normalized:
@@ -148,31 +148,31 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ret
 .nonfinite:
 	sbc	hl, bc
-	jq	z, .return.2
+	jr	z, .return.2
 	add	hl, bc
 	pop	bc
-	jq	.return.1
+	jr	.return.1
 .nonfinite.1:
 	inc	d
-	jq	z, .nonfinite
+	jr	z, .nonfinite
 	ex	de, hl
 	pop	hl
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
 	ex	de, hl
-	jq	nz, .return.1
+	jr	nz, .return.1
 	ld	h, a
 .return.1:
 	pop	af
 	ex	(sp), hl
 	pop	bc
-	jq	.return
+	jr	.return
 .nonfinite.2:
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jq	z, .return.nan
+	jr	z, .return.nan
 .return.2:
 	pop	bc
 	pop	af
@@ -188,7 +188,7 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	pop	bc
 	set	7, b
 	pop	af
-	jq	.return.pop
+	jr	.return.pop
 
 	.extern	__fppop1
 	.extern	__fppop2

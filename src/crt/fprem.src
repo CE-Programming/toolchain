@@ -32,7 +32,7 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	ex	de, hl
 	sbc	hl, hl
 	add	hl, bc
-	jq	nc, .nan	; Return if dividend non-finite or divisor zero
+	jr	nc, .nan	; Return if dividend non-finite or divisor zero
 	sbc	hl, hl
 	or	a, a
 	sbc	hl, bc
@@ -43,14 +43,14 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	inc	b
 .rem.compare:
 	add	hl, de
-	jq	c, .rem.norestore
+	jr	c, .rem.norestore
 	sbc	hl, de
 .rem.norestore:
 	dec	b
-	jq	z, .rem.finish
+	jr	z, .rem.finish
 .rem.loop:
 	add	hl, hl
-	jq	nc, .rem.compare
+	jr	nc, .rem.compare
 	add	hl, de
 	djnz	.rem.loop
 .rem.finish:

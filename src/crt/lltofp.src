@@ -15,7 +15,7 @@ __lltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)bi
 	ld	a, b
 	or	a, a
 	call	m, __llneg
-	jq	__ulltofp.enter
+	jr	__ulltofp.enter
 
 ;-------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ __ulltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)b
 	djnz	.upper
 	inc	c
 	dec	c
-	jq	z, .lower
+	jr	z, .lower
 .upper:
 	push	bc
 	push	de
