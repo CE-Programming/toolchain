@@ -1,2 +1,13 @@
 # graphx whitespace
 e81339fdc7bc5eea0a794f4ecdbad5b349d32a10
+
+# line endings and final new line
+28def0f97ae4f7e83873c8a48f2228134b0527c4
+# duplicate new lines at the end of files
+63ffd83c10a3cb6eacbf5b320dfe4872bdd7b255
+# trailing whitespace
+5c9d44bb46397476f1e95d9b1032b310ea61d585
+# assembly whitespace
+cbb89d45dd1738d8b40cf5e079990041d01174e3
+# libc whitespace
+24d5225e9ac537c32638d922cfbffcf0fba30939
