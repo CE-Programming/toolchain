@@ -14,9 +14,9 @@ __fpround: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), roundf(b
 	ld	h, a
 	rla
 	sub	a, 07Fh - 1
-	jq	c, .return.zero
+	jr	c, .return.zero
 	sub	a, 24
-	jq	nc, .return
+	jr	nc, .return
 	push	bc
 	cpl
 	ld	c, a
@@ -30,7 +30,7 @@ __fpround: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), roundf(b
 	ex	(sp), hl
 	ex	de, hl
 	jp	pe, .overflow
-	jq	c, .no_overflow
+	jr	c, .no_overflow
 	inc	a
 ;	jq	.overflow
 	db	$38	; jr c, *

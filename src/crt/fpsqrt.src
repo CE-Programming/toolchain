@@ -16,16 +16,16 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jq	z, .zero
+	jr	z, .zero
 	rlca
-	jq	c, .nan
+	jr	c, .nan
 	inc	e
-	jq	z, .nonfinite
+	jr	z, .nonfinite
 	push	hl
 	ex	(sp), ix
 	sbc	hl, hl
 	srl	e
-	jq	nc, .normalize.skip
+	jr	nc, .normalize.skip
 .normalize.loop:
 	add	ix, ix
 	adc	hl, hl
@@ -33,7 +33,7 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	dec	e
 	add	ix, ix
 	adc	hl, hl
-	jq	z, .normalize.loop
+	jr	z, .normalize.loop
 	push	de
 	xor	a, a
 	ex	de, hl
@@ -48,7 +48,7 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	; x -= r << 24
 	sbc	hl, de
 	sbc	a, c
-	jq	nc, .root.onebit
+	jr	nc, .root.onebit
 	; x += r << 24
 	add	hl, de
 	adc	a, c
