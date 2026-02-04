@@ -39,14 +39,14 @@
 long double sinhl(long double arg) {
     long double temp, argsq, x;
     x = fabsl(arg);
-	if (x < 0.5L) {
+    if (x < 0.5L) {
         argsq = x * x;
         temp = (((p3*argsq+p2)*argsq+p1)*argsq+p0) * x;
         temp /= (((argsq+q2)*argsq+q1)*argsq+q0);
-	} else if (x < 709.0L) {
-		temp = (expl(x) - expl(-x)) / 2.0L;
-	} else {
-		temp = expl(x - F64_LN2);
-	}
+    } else if (x < 709.0L) {
+        temp = (expl(x) - expl(-x)) / 2.0L;
+    } else {
+        temp = expl(x - F64_LN2);
+    }
     return copysignl(temp, arg);
 }

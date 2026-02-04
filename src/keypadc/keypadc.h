@@ -134,7 +134,7 @@ typedef enum {
  *
  * Likewise, you can test keys with the following general format:
  * @code{.cpp}
- *  if (kb_Data[group] & kb_Name){
+ *  if (kb_Data[group] & kb_Name) {
  *      ...
  *  }
  * @endcode

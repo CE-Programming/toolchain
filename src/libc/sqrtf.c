@@ -20,10 +20,10 @@ asm
 ; only works for normalized values
 ; CC: 9F + 12R + 9W + 1 | 8 bytes
 __f32_fast_div4:
-	pop	bc, hl, de
-	dec	e	; subtracts 2 from the exponent
-	push	de, hl, bc
-	ret
+    pop     bc, hl, de
+    dec     e ; subtracts 2 from the exponent
+    push    de, hl, bc
+    ret
 */
 float _f32_fast_div4(float x);
 

@@ -22,7 +22,7 @@
 #define q2 0.17492876890931e4L
 
 #if 0
-#define	exp_max_arg 709.79L
+#define exp_max_arg 709.79L
 #define exp_min_arg -744.45L
 #else
 /* mantissa is zero for these constants */
@@ -43,13 +43,13 @@ long double expl(long double arg) {
     long double temp1, temp2, xsq;
     long double ent;
 
-    if ( arg == 0.0L ){
+    if ( arg == 0.0L ) {
         return 1.0L;
     }
-    if ( arg < exp_min_arg ){
+    if ( arg < exp_min_arg ) {
         return 0.0L;
     }
-    if ( arg > exp_max_arg ){
+    if ( arg > exp_max_arg ) {
         errno = ERANGE;
         return HUGE_VALL;
     }

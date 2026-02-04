@@ -1,10 +1,10 @@
 /************************************************************************/
-/*									*/
-/*			Copyright (C)1987-2008 by				*/
-/*		            Zilog, Inc.           			*/
-/*									*/
-/*		        San Jose, California     			*/
-/*									*/
+/*                                                                      */
+/*                      Copyright (C)1987-2008 by                       */
+/*                             Zilog, Inc.                              */
+/*                                                                      */
+/*                         San Jose, California                         */
+/*                                                                      */
 /************************************************************************/
 /*
     floating point tangent
@@ -45,9 +45,9 @@ long double tanl(long double arg)
     sign = signbit(arg);
     x = fabsl(arg);
 
-	if (x < 0x1.0p-26L) {
-		return arg;
-	}
+    if (x < 0x1.0p-26L) {
+        return arg;
+    }
 
     x *= four_mul_invpi; /*overflow?*/
     x = modfl(x, &e);

@@ -28,18 +28,18 @@ float powf(float arg1, float arg2) {
     float result;
     long temp;
 
-    if ( arg1 > 0.0 ){
+    if ( arg1 > 0.0 ) {
         return expf( arg2 * logf( arg1 ) );
     }
-    if ( arg1 < 0.0 ){
+    if ( arg1 < 0.0 ) {
         temp = (long)arg2;
-        if ( (float)temp == arg2 ){
+        if ( (float)temp == arg2 ) {
             result = expf( arg2 * logf( -arg1 ) );
             return temp & 1 ? -result : result;
         }
         errno = EDOM;
     }
-    if ( arg2 <= 0.0 ){
+    if ( arg2 <= 0.0 ) {
         errno = EDOM;
     }
     return 0.0;

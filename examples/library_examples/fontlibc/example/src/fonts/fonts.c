@@ -3,7 +3,7 @@
 /* This contains the raw data for the font. */
 static const unsigned char test_font_data[] =
 {
-	#include "testfont.inc"
+    #include "testfont.inc"
 };
 
 /* However, C89 does not allow us to typecast a byte array into a

@@ -43,8 +43,8 @@ bool boot_CheckOnPressed(void);
  * uint8_t key, i = 0;
  * char buffer[50];
  *
- * while((key = os_GetCSC()) != sk_Enter) {
- *     if(chars[key]) {
+ * while ((key = os_GetCSC()) != sk_Enter) {
+ *     if (chars[key]) {
  *         buffer[i++] = chars[key];
  *     }
  * }

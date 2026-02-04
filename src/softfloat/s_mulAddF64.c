@@ -261,7 +261,7 @@ f64_param A, f64_param B, uint_fast64_t uiC /*, uint_fast8_t op */
     input_mulAddF64 * const input
 #endif
  ) {
-	#define op 0
+    #define op 0
     // bool signA;
     int_fast16_t expA;
     uint64_t sigA;

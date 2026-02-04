@@ -10,7 +10,7 @@ float __hypot3f(float arg_x, float arg_y, float arg_z) {
     F32_pun x, y, z;
     x.flt = fabsf(arg_x);
     y.flt = fabsf(arg_y);
-	z.flt = fabsf(arg_z);
+    z.flt = fabsf(arg_z);
     if (y.bin < z.bin) {
         float temp = y.flt;
         y.flt = z.flt;
